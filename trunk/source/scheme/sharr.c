@@ -29,7 +29,7 @@ static object *_SSI_hash_install(SS_psides *si, object *argl)
     name = NULL;
     obj  = SS_null;
     tab  = si->symtab;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_STRING_I, &name,
 	    SS_OBJECT_I, &obj,
 	    SS_HASHARR_I, &tab,
@@ -61,7 +61,7 @@ static object *_SSI_hash_lookup(SS_psides *si, object *argl)
 
     name = NULL;
     tab  = si->symtab;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_STRING_I, &name,
 	    SS_HASHARR_I, &tab,
 	    0);
@@ -88,7 +88,7 @@ static object *_SSI_hash_remove(SS_psides *si, object *argl)
 
     name = NULL;
     tab  = si->symtab;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_STRING_I, &name,
 	    SS_HASHARR_I, &tab,
 	    0);
@@ -123,7 +123,7 @@ object *SS_hash_dump(SS_psides *si, object *argl)
     patt = NULL;
     sort = SS_t;
 
-    SS_args(argl,
+    SS_args(si, argl,
             SS_OBJECT_I, &to,
 	    SC_STRING_I, &patt,
 	    SS_OBJECT_I, &sort,
@@ -170,7 +170,7 @@ static object *_SSI_hash_info(SS_psides *si, object *arg)
     hasharr *tab;
 
     tab = si->symtab;
-    SS_args(arg,
+    SS_args(si, arg,
 	    SS_HASHARR_I, &tab,
 	    0);
 

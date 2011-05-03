@@ -340,19 +340,16 @@ static void _SS_args(SS_psides *si, object *obj, void *v, int type)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_ARGS - break out the C level data analogs from a Scheme
- *         - object of list of objects
- *         - this is for ease of use
- *         - return the number of Scheme arguments
+/* SS_ARGS_N - break out the C level data analogs from a Scheme
+ *           - object of list of objects
+ *           - this is for ease of use
+ *           - return the number of Scheme arguments
  */
 
-int SS_args(object *s, ...)
+int SS_args(SS_psides *si, object *s, ...)
    {object *obj;
     void *v;
     int type, len;
-    SS_psides *si;    
-
-    si = &_SS_si;
 
     if (SS_nullobjp(s))
        return(0);
@@ -475,7 +472,7 @@ void SS_var_value(SS_psides *si, char *s, int type, void *vr, int flag)
        DEREF(vr) = NULL;
 
     else
-       SS_args(obj, type, vr, 0);
+       SS_args(si, obj, type, vr, 0);
 
     return;}
 
@@ -809,7 +806,7 @@ static int _SS_run(SS_psides *si)
     ret  = SS_eval(si, SS_read(si, port));
     iret = FALSE;
     if (SS_numbp(ret))
-       SS_args(ret,
+       SS_args(si, ret,
 	       SC_INT_I, &iret,
 	       0);
 

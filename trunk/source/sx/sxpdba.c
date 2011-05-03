@@ -26,7 +26,7 @@ static object *_SXI_def_attr(SS_psides *si, object *argl)
     po   = NULL;
     at   = NULL;
     type = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_FILE, &po,
             SC_STRING_I, &at,
             SC_STRING_I, &type,
@@ -58,7 +58,7 @@ static object *_SXI_rem_attr(SS_psides *si, object *argl)
 
     po   = NULL;
     at   = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_FILE, &po,
             SC_STRING_I, &at,
             0);
@@ -97,7 +97,7 @@ static object *_SXI_set_attr_val(SS_psides *si, object *argl)
     at = NULL;
     vr = NULL;
     pv = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_FILE, &po,
             SC_STRING_I, &vr,
             SC_STRING_I, &at,
@@ -202,7 +202,7 @@ static object *_SXI_get_attr_val(SS_psides *si, object *argl)
     po = NULL;
     at = NULL;
     vr = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_FILE, &po,
             SC_STRING_I, &vr,
             SC_STRING_I, &at,
@@ -251,7 +251,7 @@ static object *_SXI_lst_attr(SS_psides *si, object *argl)
     attribute *attr;
 
     po = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_FILE, &po,
             0);
 

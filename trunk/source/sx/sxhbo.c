@@ -710,7 +710,7 @@ static PM_set *_SX_build_restricted_domain(SS_psides *si, PM_set *hd,
     PM_array_real(hd->element_type, hd->extrema, ne, extr);
 
     for (i = 0; i < nd; i++)
-        {SS_args(argl,
+        {SS_args(si, argl,
 		 SC_DOUBLE_I, &mn,
 		 SC_DOUBLE_I, &mx,
 		 0);
@@ -805,7 +805,7 @@ static PM_set *_SX_build_lr_domain(SS_psides *si, PM_set *hd, object *argl)
 
     snprintf(name, MAXLINE, "LR (");
     for (i = 0; i < nd; i++)
-        {SS_args(argl,
+        {SS_args(si, argl,
 		 SC_INT_I, &maxes[i],
 		 0);
 

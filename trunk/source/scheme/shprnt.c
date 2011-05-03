@@ -564,7 +564,7 @@ static object *_SSI_trans_on(SS_psides *si, object *obj)
        SS_error(si, "TRANSCRIPT ALREADY ACTIVE - TRANSCRIPT-ON", obj);
 
     s = NULL;
-    SS_args(obj,
+    SS_args(si, obj,
 	    SC_STRING_I, &s,
 	    0);
 
@@ -607,7 +607,7 @@ static object *_SSI_opn_out(SS_psides *si, object *obj)
     object *prt;
 
     s = NULL;
-    SS_args(obj,
+    SS_args(si, obj,
 	    SC_STRING_I, &s,
 	    0);
 
@@ -653,7 +653,7 @@ object *_SSI_call_of(SS_psides *si, object *argl)
     obj = SS_car(argl);
 
     s = NULL;
-    SS_args(obj,
+    SS_args(si, obj,
 	    SC_STRING_I, &s,
 	    0);
 
@@ -720,7 +720,7 @@ void SS_wr_proc(SS_psides *si, object *obj, object *strm)
 object *SS_banner(SS_psides *si, object *obj)
    {char *s;
 
-    SS_args(obj,
+    SS_args(si, obj,
 	    SC_STRING_I, &s,
 	    SC_INT_I, &_SS.override,
 	    0);
@@ -828,7 +828,7 @@ static object *_SSI_describe(SS_psides *si, object *argl)
 
     obj  = SS_null;
     strm = SS_null;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SS_OBJECT_I, &obj,
 	    SS_OBJECT_I, &strm,
 	    0);
@@ -971,7 +971,7 @@ static object *_SSI_apropos(SS_psides *si, object *argl)
 
     obj  = SS_null;
     strm = SS_null;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SS_OBJECT_I, &obj,
 	    SS_OBJECT_I, &strm,
 	    0);

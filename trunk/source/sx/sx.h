@@ -916,8 +916,10 @@ extern object
 extern object
  *SX_arg_prep(SS_psides *si, object *argl);
 
+extern SS_psides
+ *SX_init(char *code, char *vers);
+
 extern void
- SX_init(char *code, char *vers),
  SX_reset_prefix(void),
  SX_install_funcs(SS_psides *si);
 

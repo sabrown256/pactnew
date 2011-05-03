@@ -894,7 +894,7 @@ object *SX_read_text_table(SS_psides *si, object *argl)
     n      = 1;
     nl     = 1;
     nlabel = 0;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &name,
             SC_INT_I, &n,
             SC_INT_I, &nlabel,
@@ -1011,7 +1011,7 @@ object *SX_table_curve(SS_psides *si, object *argl)
     ys = 1;
     xs = 1;
     xo = -1;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_INT_I, &na,
             SC_INT_I, &yo,
             SC_INT_I, &ys,
@@ -1231,7 +1231,7 @@ object *SX_write_data(SS_psides *si, object *argl)
     SX_prep_arg(si, argl);
     mode  = NULL;
     fname = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_STRING_I, &mode,
 	    SC_STRING_I, &fname,
 	    0);

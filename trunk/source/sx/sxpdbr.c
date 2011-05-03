@@ -182,7 +182,7 @@ object *_SXI_read_numeric_data(SS_psides *si, object *argl)
     argl = SX_get_pdbfile(argl, &file, &po);
 
     name = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &name,
             0);
 

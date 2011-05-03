@@ -12,6 +12,9 @@
 
 #include "shf.h"
 
+SS_psides
+ *_SS_isf;
+
 /*--------------------------------------------------------------------------*/
 
 /*                            GRAMMAR SUPPORT                               */
@@ -78,6 +81,8 @@ object *SS_syntax_f(SS_psides *si, object *str)
 
     else
        {si->character_stream = str;
+
+	_SS_isf = si;
 
 	shgrf_parse();
 

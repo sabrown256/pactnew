@@ -89,7 +89,7 @@ static object *_SX_desc_pan_variable(SS_psides *si, object *obj)
     syment *ep;
 
     pp = NULL;
-    SS_args(obj,
+    SS_args(si, obj,
             G_PANVAR, &pp,
             0);
 
@@ -212,7 +212,7 @@ static object *_SX_desc_pan_package(SS_psides *si, object *obj)
    {PA_package *pck;
 
     pck = NULL;
-    SS_args(obj,
+    SS_args(si, obj,
             G_PACKAGE, &pck,
             0);
 

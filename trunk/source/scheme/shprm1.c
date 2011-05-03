@@ -730,7 +730,7 @@ static object *_SSI_check_objects(SS_psides *si, object *obj)
     object *ret;
 
     kind = -1;
-    SS_args(obj,
+    SS_args(si, obj,
 	    SC_INT_I, &kind,
 	    0);
 
@@ -942,7 +942,7 @@ static object *_SSI_catch_err(SS_psides *si, object *argl)
 
     err_proc  = SS_null;
     proc_call = SS_null;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SS_OBJECT_I, &err_proc,
 	    SS_OBJECT_I, &proc_call,
 	    0);
@@ -1035,12 +1035,12 @@ static object *_SSI_etime(SS_psides *si, object *argl)
 
     obj = SS_null;
     fl  = SS_t;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SS_OBJECT_I, &obj,
 	    SS_OBJECT_I, &fl,
 	    0);
 
-    SS_args(obj,
+    SS_args(si, obj,
 	    SC_INT_I, &ref.tm_year,
 	    SC_INT_I, &ref.tm_mon,
 	    SC_INT_I, &ref.tm_mday,
@@ -1087,7 +1087,7 @@ static object *_SSI_unlink(SS_psides *si, object *argl)
     object *rv;
 
     path = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_STRING_I, &path,
 	    0);
 

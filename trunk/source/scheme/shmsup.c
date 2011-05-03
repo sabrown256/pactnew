@@ -15,6 +15,9 @@
 SS_m_parse_state
  _SS_mps = { FALSE, FALSE };
 
+SS_psides
+ *_SS_ism;
+
 /*--------------------------------------------------------------------------*/
 
 /*                            GRAMMAR SUPPORT                               */
@@ -119,6 +122,8 @@ object *SS_syntax_m(SS_psides *si, object *str)
 
     else
        {si->character_stream = str;
+
+	_SS_ism = si;
 
 	for (ret = SS_null; ret == SS_null; )
 	    {shgrm_parse();

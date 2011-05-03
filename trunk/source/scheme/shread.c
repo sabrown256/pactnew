@@ -470,7 +470,7 @@ static object *_SSI_opn_in(SS_psides *si, object *obj)
     object *rv;
 
     s = NULL;
-    SS_args(obj,
+    SS_args(si, obj,
 	    SC_STRING_I, &s,
 	    0);
 
@@ -703,7 +703,7 @@ static PFPOprs _SS_change_parser(SS_psides *si, object *fnm)
 
     op = NULL;
     s  = NULL;
-    SS_args(fnm,
+    SS_args(si, fnm,
 	    SC_STRING_I, &s,
 	    0);
 

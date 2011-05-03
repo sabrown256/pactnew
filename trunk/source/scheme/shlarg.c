@@ -86,7 +86,7 @@ static object *_SSI_vctref(SS_psides *si, object *argl)
 
     vct = NULL;
     i   = -1;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SS_VECTOR_I,  &vct,
 	    SC_INT_I, &i,
 	    0);
@@ -114,7 +114,7 @@ static object *_SSI_vctset(SS_psides *si, object *argl)
     vct = NULL;
     i   = -1;
     val = SS_null;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SS_VECTOR_I,  &vct,
 	    SC_INT_I, &i,
 	    SS_OBJECT_I,  &val,
@@ -261,7 +261,7 @@ static object *_SSI_sleep(SS_psides *si, object *obj)
    {int n;
 
     n = 0;
-    SS_args(obj,
+    SS_args(si, obj,
             SC_INT_I, &n,
             0);
 
@@ -298,7 +298,7 @@ static object *_SSI_getenv(SS_psides *si, object *obj)
 
     vr = NULL;
     vl = NULL;
-    SS_args(obj,
+    SS_args(si, obj,
             SC_STRING_I, &vr,
             0);
 
@@ -328,7 +328,7 @@ static object *_SSI_setenv(SS_psides *si, object *obj)
     ok = -1;
     vr = NULL;
     vl = NULL;
-    SS_args(obj,
+    SS_args(si, obj,
             SC_STRING_I, &vr,
             SC_STRING_I, &vl,
             0);
@@ -372,7 +372,7 @@ static object *_SSI_printenv(SS_psides *si, object *argl)
 	n = 0;
 	for (l = argl; !SS_nullobjp(l); l = SS_cdr(l))
 	    {v = SS_car(l);
-	     SS_args(v,
+	     SS_args(si, v,
 		     SC_STRING_I, &vr,
 		     0);
 	     snprintf(s, MAXLINE, "$%s", vr);
@@ -429,7 +429,7 @@ static object *_SSI_print_env(SS_psides *si, object *obj)
     char bf[MAXLINE];
 
     n = 0;
-    SS_args(obj,
+    SS_args(si, obj,
             SC_INT_I, &n,
             0);
 
@@ -452,7 +452,7 @@ static object *_SSI_get_pname(SS_psides *si, object *obj)
     object *s;
 
     id = -1;
-    SS_args(obj,
+    SS_args(si, obj,
             SC_INT_I, &id,
             0);
 
@@ -531,7 +531,7 @@ object *_SSI_fopen(SS_psides *si, object *argl)
 
     name = NULL;
     mode = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_STRING_I, &name,
 	    SC_STRING_I, &mode,
 	    0);
@@ -639,7 +639,7 @@ static object *_SSI_mem_monitor(SS_psides *si, object *arg)
     old = 0;
     lev = 0;
     s   = "scheme";
-    SS_args(arg,
+    SS_args(si, arg,
             SC_INT_I, &old,
             SC_INT_I, &lev,
             SC_STRING_I, &s,
@@ -702,7 +702,7 @@ static object *_SSI_sizeof(SS_psides *si, object *arg)
     object *o;
 
     type = NULL;
-    SS_args(arg,
+    SS_args(si, arg,
 	    SC_STRING_I, &type,
 	    0);
 
@@ -725,7 +725,7 @@ static object *_SSI_attach(SS_psides *si, object *arg)
     object *o;
 
     pid = -1;
-    SS_args(arg,
+    SS_args(si, arg,
 	    SC_INT_I, &pid,
 	    0);
 
@@ -747,7 +747,7 @@ static object *_SSI_retrace(SS_psides *si, object *arg)
 
     pid = -1;
     to  = -1;
-    SS_args(arg,
+    SS_args(si, arg,
 	    SC_INT_I, &pid,
 	    SC_INT_I, &to,
 	    0);

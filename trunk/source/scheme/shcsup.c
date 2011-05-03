@@ -38,6 +38,9 @@ SS_c_parse_state
  * on the parse to resolve the conflict
  */
 
+SS_psides
+ *_SS_isc;
+
 /*--------------------------------------------------------------------------*/
 
 /*                            GRAMMAR SUPPORT                               */
@@ -206,7 +209,7 @@ object *_SS_make_cast(SS_psides *si, object *type, object *expr)
     char *t, *p;
     object *typ, *cast;
 
-    SS_args(type,
+    SS_args(si, type,
 	    SC_STRING_I, &t,
 	    LAST);
     strncpy(tname, t, MAXLINE);
@@ -263,6 +266,8 @@ object *SS_syntax_c(SS_psides *si, object *str)
        {si->character_stream   = str;
 	_SS_cps.cpp_directive = FALSE;
        
+	_SS_isc = si;
+
 	shgrc_parse();
 
 	ret = SS_parse_token_val_c();};
@@ -295,7 +300,7 @@ static object *SS_c_add_type(SS_psides *si, object *argl)
     object *typ;
 
     name = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
 	    SC_STRING_I, &name,
 	    0);
 

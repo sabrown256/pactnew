@@ -327,7 +327,7 @@ object *_SXI_menu(SS_psides *si, object *argl)
     po   = NULL;
     patt = NULL;
     type = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_FILE, &po,
             SC_STRING_I, &patt,
             SC_STRING_I, &type,

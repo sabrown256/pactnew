@@ -15,14 +15,15 @@
 
 /* _SS_STRCMP - Scheme version of strcmp */
 
-static object *_SS_strcmp(object *argl, int (*func)(char *s1, char *s2))
+static object *_SS_strcmp(SS_psides *si, object *argl,
+			  int (*func)(char *s1, char *s2))
    {int cmp;
     char *s1, *s2;
     object *rv;
 
     s1 = NULL;
     s2 = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &s1,
             SC_STRING_I, &s2,
             0);
@@ -40,14 +41,15 @@ static object *_SS_strcmp(object *argl, int (*func)(char *s1, char *s2))
 
 /* _SS_CISTRCMP - case insensitive Scheme version of strcmp */
 
-static object *_SS_cistrcmp(object *argl, int (*func)(char *s1, char *s2))
+static object *_SS_cistrcmp(SS_psides *si, object *argl,
+			    int (*func)(char *s1, char *s2))
    {int cmp;
     char *s1, *s2;
     object *rv;
 
     s1 = NULL;
     s2 = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &s1,
             SC_STRING_I, &s2,
             0);
@@ -137,7 +139,7 @@ static int _SS_strlt(char *s1, char *s2)
 static object *_SSI_streq(SS_psides *si, object *argl)
    {object *o;
 
-    o = _SS_strcmp(argl, _SS_streq);
+    o = _SS_strcmp(si, argl, _SS_streq);
 
     return(o);}
 
@@ -149,7 +151,7 @@ static object *_SSI_streq(SS_psides *si, object *argl)
 static object *_SSI_strge(SS_psides *si, object *argl)
    {object *o;
 
-    o = _SS_strcmp(argl, _SS_strge);
+    o = _SS_strcmp(si, argl, _SS_strge);
 
     return(o);}
 
@@ -161,7 +163,7 @@ static object *_SSI_strge(SS_psides *si, object *argl)
 static object *_SSI_strgt(SS_psides *si, object *argl)
    {object *o;
 
-    o = _SS_strcmp(argl, _SS_strgt);
+    o = _SS_strcmp(si, argl, _SS_strgt);
 
     return(o);}
 
@@ -173,7 +175,7 @@ static object *_SSI_strgt(SS_psides *si, object *argl)
 static object *_SSI_strle(SS_psides *si, object *argl)
    {object *o;
 
-    o = _SS_strcmp(argl, _SS_strle);
+    o = _SS_strcmp(si, argl, _SS_strle);
 
     return(o);}
 
@@ -185,7 +187,7 @@ static object *_SSI_strle(SS_psides *si, object *argl)
 static object *_SSI_strlt(SS_psides *si, object *argl)
    {object *o;
 
-    o = _SS_strcmp(argl, _SS_strlt);
+    o = _SS_strcmp(si, argl, _SS_strlt);
 
     return(o);}
 
@@ -197,7 +199,7 @@ static object *_SSI_strlt(SS_psides *si, object *argl)
 static object *_SSI_cistreq(SS_psides *si, object *argl)
    {object *o;
 
-    o = _SS_cistrcmp(argl, _SS_streq);
+    o = _SS_cistrcmp(si, argl, _SS_streq);
 
     return(o);}
 
@@ -209,7 +211,7 @@ static object *_SSI_cistreq(SS_psides *si, object *argl)
 static object *_SSI_cistrge(SS_psides *si, object *argl)
    {object *o;
 
-    o = _SS_cistrcmp(argl, _SS_strge);
+    o = _SS_cistrcmp(si, argl, _SS_strge);
 
     return(o);}
 
@@ -221,7 +223,7 @@ static object *_SSI_cistrge(SS_psides *si, object *argl)
 static object *_SSI_cistrgt(SS_psides *si, object *argl)
    {object *o;
 
-    o = _SS_cistrcmp(argl, _SS_strgt);
+    o = _SS_cistrcmp(si, argl, _SS_strgt);
 
     return(o);}
 
@@ -233,7 +235,7 @@ static object *_SSI_cistrgt(SS_psides *si, object *argl)
 static object *_SSI_cistrle(SS_psides *si, object *argl)
    {object *o;
 
-    o = _SS_cistrcmp(argl, _SS_strle);
+    o = _SS_cistrcmp(si, argl, _SS_strle);
 
     return(o);}
 
@@ -245,7 +247,7 @@ static object *_SSI_cistrle(SS_psides *si, object *argl)
 static object *_SSI_cistrlt(SS_psides *si, object *argl)
    {object *o;
 
-    o = _SS_cistrcmp(argl, _SS_strlt);
+    o = _SS_cistrcmp(si, argl, _SS_strlt);
 
     return(o);}
 
@@ -279,7 +281,7 @@ static object *_SSI_strref(SS_psides *si, object *argl)
 
     s = NULL;
     n = 0;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &s,
             SC_INT_I, &n,
             0);
@@ -304,7 +306,7 @@ static object *_SSI_strcpy(SS_psides *si, object *argl)
     char *s;
 
     s = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &s,
             0);
 
@@ -326,7 +328,7 @@ static object *_SSI_strfil(SS_psides *si, object *argl)
 
     s = NULL;
     c = ' ';
-    SS_args(argl,
+    SS_args(si, argl,
             SS_OBJECT_I, &str,
             SC_INT_I, &c,
             0);
@@ -349,7 +351,7 @@ static object *_SSI_strset(SS_psides *si, object *argl)
     s = NULL;
     n = 0;
     c = ' ';
-    SS_args(argl,
+    SS_args(si, argl,
             SS_OBJECT_I, &str,
             SC_INT_I, &n,
             SC_INT_I, &c,
@@ -373,7 +375,7 @@ static object *_SSI_strsub(SS_psides *si, object *argl)
     s  = NULL;
     n1 = 0;
     n2 = 0;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &s,
             SC_INT_I, &n1,
             SC_INT_I, &n2,
@@ -575,7 +577,7 @@ static object *_SSI_mk_str(SS_psides *si, object *argl)
 
     n = 0;
     c = ' ';
-    SS_args(argl,
+    SS_args(si, argl,
             SC_INT_I, &n,
             SC_INT_I, &c,
             0);
@@ -601,7 +603,7 @@ static object *_SSI_strnum(SS_psides *si, object *argl)
     object *rv;
 
     text  = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &text,
             0);
 
@@ -629,7 +631,7 @@ static object *_SSI_strchr(SS_psides *si, object *argl)
 
     text  = NULL;
     delim = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &text,
             SC_STRING_I, &delim,
             0);
@@ -653,7 +655,7 @@ static object *_SSI_strstr(SS_psides *si, object *argl)
 
     cs = NULL;
     ct = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &cs,
             SC_STRING_I, &ct,
             0);
@@ -677,7 +679,7 @@ static object *_SSI_strcasestr(SS_psides *si, object *argl)
 
     cs = NULL;
     ct = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &cs,
             SC_STRING_I, &ct,
             0);
@@ -708,7 +710,7 @@ static object *_SSI_istrchr(SS_psides *si, object *argl)
 
     text  = NULL;
     delim = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &text,
             SC_STRING_I, &delim,
             0);
@@ -738,7 +740,7 @@ static object *_SSI_istrstr(SS_psides *si, object *argl)
 
     cs = NULL;
     ct = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &cs,
             SC_STRING_I, &ct,
             0);
@@ -768,7 +770,7 @@ static object *_SSI_blankstr(SS_psides *si, object *argl)
 
     cs = NULL;
     ct = "#";
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &cs,
             SC_STRING_I, &ct,
             0);
@@ -795,7 +797,7 @@ static object *_SSI_trim(SS_psides *si, object *argl)
     s   = NULL;
     d   = NULL;
     dir = -1;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &s,
             SC_STRING_I, &d,
             SC_INT_I, &dir,
@@ -832,7 +834,7 @@ static object *_SS_strtok(SS_psides *si, object *argl,
     str   = SS_null;
     delim = NULL;
     flag  = SS_f;
-    SS_args(argl,
+    SS_args(si, argl,
             SS_OBJECT_I, &str,
             SC_STRING_I, &delim,
             SS_OBJECT_I, &flag,

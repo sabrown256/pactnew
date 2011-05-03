@@ -53,7 +53,7 @@ static object *_SXI_def_file_graph(SS_psides *si, object *obj)
     g_file *po;
 
     po = NULL;
-    SS_args(obj,
+    SS_args(si, obj,
             G_FILE, &po,
             0);
 
@@ -92,7 +92,7 @@ static object *_SXI_graph_pdbdata(SS_psides *si, object *argl)
     g    = NULL;
     po   = NULL;
     name = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_GRAPH, &g,
             G_FILE, &po,
             SC_STRING_I, &name,
@@ -297,7 +297,7 @@ static object *_SXI_pdbdata_graph(SS_psides *si, object *argl)
 
     po  = NULL;
     obj = SS_null;
-    SS_args(argl,
+    SS_args(si, argl,
             G_FILE, &po,
             SS_OBJECT_I, &obj,
             0);
@@ -436,7 +436,7 @@ static object *_SXI_menu_item_type(SS_psides *si, object *argl)
 
     po   = NULL;
     indx = -1;
-    SS_args(argl,
+    SS_args(si, argl,
             G_FILE, &po,
             SC_INT_I, &indx,
             0);
@@ -644,7 +644,7 @@ static object *_SXI_graph_pdbcurve(SS_psides *si, object *argl)
     f    = NULL;
     po   = NULL;
     file = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_MAPPING, &f,
             G_FILE, &po,
             0);
@@ -694,7 +694,7 @@ static object *_SXI_image_pdbdata(SS_psides *si, object *argl)
     f    = NULL;
     file = NULL;
     strm = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_IMAGE, &f,
             G_FILE, &file,
             0);
@@ -786,7 +786,7 @@ static object *_SXI_make_device(SS_psides *si, object *argl)
     name  = NULL;
     type  = NULL;
     title = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &name,
             SC_STRING_I, &type,
             SC_STRING_I, &title,
@@ -832,7 +832,7 @@ static object *_SXI_device_props(SS_psides *si, object *argl)
 
     rv  = SS_null;
     dev = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_DEVICE, &dev,
             0);
 
@@ -1051,7 +1051,7 @@ static object *_SXI_open_device(SS_psides *si, object *argl)
     dev = NULL;
     xf  = yf  = 0.0;
     dxf = dyf = 0.0;
-    SS_args(argl,
+    SS_args(si, argl,
             G_DEVICE, &dev,
             SC_DOUBLE_I, &xf,
             SC_DOUBLE_I, &yf,
@@ -1111,7 +1111,7 @@ static object *_SXI_close_device(SS_psides *si, object *argl)
    {PG_device *dev;
 
     dev = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_DEVICE, &dev,
             0);
 
@@ -1183,7 +1183,7 @@ static object *_SXI_make_pgs_graph(SS_psides *si, object *argl)
     if (++_SX.igg > 'Z')
        _SX.igg = 'A';
 
-    SS_args(argl,
+    SS_args(si, argl,
             G_SET, &domain,
             G_SET, &range,
             SC_STRING_I, &name,
@@ -1254,7 +1254,7 @@ static void _SX_set_limits(SS_psides *si, char *t, PM_set *s, object *argl)
 		    {CFREE(extr);
 		     break;};
 
-		 nset = SS_args(argl,
+		 nset = SS_args(si, argl,
 				SC_DOUBLE_I, &xmn,
 				SC_DOUBLE_I, &xmx,
 				0);
@@ -1366,7 +1366,7 @@ static object *_SXI_draw_domain(SS_psides *si, object *argl)
 
     pty  = PLOT_WIRE_MESH;
     extr = SS_null;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_ENUM_I, &pty,
 	    SS_OBJECT_I, &extr,
 	    0);
@@ -1695,7 +1695,7 @@ static object *_SXI_make_image(SS_psides *si, object *argl)
     PG_box_init(1, rbx, 0.0, 0.0);
 
     arr = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_NUM_ARRAY, &arr,
             SC_INT_I, &w,
             SC_INT_I, &h,
@@ -1752,7 +1752,7 @@ static object *_SXI_build_image(SS_psides *si, object *argl)
 
     dev = NULL;
     arr = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_DEVICE, &dev,
             G_NUM_ARRAY, &arr,
             SC_INT_I, &w,
@@ -1805,7 +1805,7 @@ static object *_SXI_draw_image(SS_psides *si, object *argl)
     alist = NULL;
     vp    = FALSE;
 
-    SS_args(argl,
+    SS_args(si, argl,
             G_DEVICE, &dev,
             G_IMAGE, &image,
             SC_DOUBLE_I, &xmn,
@@ -1863,7 +1863,7 @@ pcons *SX_set_attr_alist(SS_psides *si, pcons *inf,
 
 	obj = SS_null;
 	SS_Assign(obj, SX_list_array(si, val));
-	SS_args(obj,
+	SS_args(si, obj,
 		G_NUM_ARRAY, &arr,
 		0);
 
@@ -1884,18 +1884,18 @@ pcons *SX_set_attr_alist(SS_psides *si, pcons *inf,
 
     else if (id == SC_INT_P_I)
        {v = CMAKE(int);
-        SS_args(val,
+        SS_args(si, val,
 		SC_INT_I, v,
 		0);}
 
     else if (id == SC_DOUBLE_P_I)
        {v = CMAKE(double);
-        SS_args(val,
+        SS_args(si, val,
 		SC_DOUBLE_I, v,
 		0);}
 
     else if (id == SC_STRING_I)
-       {SS_args(val,
+       {SS_args(si, val,
 		SC_STRING_I, &v,
 		0);}
 
@@ -1924,7 +1924,7 @@ static object *_SXI_set_attr_graph(SS_psides *si, object *argl)
     name = NULL;
     type = NULL;
     val  = SS_null;
-    SS_args(argl,
+    SS_args(si, argl,
             G_GRAPH, &g,
             SC_STRING_I, &name,
             SC_STRING_I, &type,
@@ -2301,7 +2301,7 @@ static object *_SXI_set_label(SS_psides *si, object *argl)
 
     obj   = NULL;
     label = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SS_OBJECT_I, &obj,
             SC_STRING_I, &label,
             0);
@@ -2406,7 +2406,7 @@ static object *_SX_set_info(SS_psides *si, object *obj,
     if (strcmp(name, "name") == 0)
        {t = s->name;
 	if (val != NULL)
-	   {SS_args(val, SC_STRING_I, &t);
+	   {SS_args(si, val, SC_STRING_I, &t);
 	    s->name = t;};
 
 	ret = SS_mk_string(si, t);}
@@ -2414,7 +2414,7 @@ static object *_SX_set_info(SS_psides *si, object *obj,
     else if (strcmp(name, "element-type") == 0)
        {t = s->element_type;
 	if (val != NULL)
-	   {SS_args(val, SC_STRING_I, &t);
+	   {SS_args(si, val, SC_STRING_I, &t);
 	    s->element_type = t;};
 
 	ret = SS_mk_string(si, t);}
@@ -2422,7 +2422,7 @@ static object *_SX_set_info(SS_psides *si, object *obj,
     else if (strcmp(name, "es-type") == 0)
        {t = s->es_type;
 	if (val != NULL)
-	   {SS_args(val, SC_STRING_I, &t);
+	   {SS_args(si, val, SC_STRING_I, &t);
 	    s->es_type = t;};
 
 	ret = SS_mk_string(si, t);}
@@ -2430,7 +2430,7 @@ static object *_SX_set_info(SS_psides *si, object *obj,
     else if (strcmp(name, "symmetry-type") == 0)
        {t = s->symmetry_type;
 	if (val != NULL)
-	   {SS_args(val, SC_STRING_I, &t);
+	   {SS_args(si, val, SC_STRING_I, &t);
 	    s->symmetry_type = t;};
 
 	ret = SS_mk_string(si, t);}
@@ -2438,7 +2438,7 @@ static object *_SX_set_info(SS_psides *si, object *obj,
     else if (strcmp(name, "topology-type") == 0)
        {t = s->topology_type;
 	if (val != NULL)
-	   {SS_args(val, SC_STRING_I, &t);
+	   {SS_args(si, val, SC_STRING_I, &t);
 	    s->topology_type = t;};
 
 	ret = SS_mk_string(si, t);}
@@ -2446,7 +2446,7 @@ static object *_SX_set_info(SS_psides *si, object *obj,
     else if (strcmp(name, "info-type") == 0)
        {t = s->info_type;
 	if (val != NULL)
-	   {SS_args(val, SC_STRING_I, &t);
+	   {SS_args(si, val, SC_STRING_I, &t);
 	    s->info_type = t;};
 
 	ret = SS_mk_string(si, t);}
@@ -2454,7 +2454,7 @@ static object *_SX_set_info(SS_psides *si, object *obj,
     else if (strcmp(name, "dimension") == 0)
        {v = s->dimension;
 	if (val != NULL)
-           {SS_args(val, SC_INT_I, &v);
+           {SS_args(si, val, SC_INT_I, &v);
 	    s->dimension = v;};
 
 	ret = SS_mk_integer(si, v);}
@@ -2462,7 +2462,7 @@ static object *_SX_set_info(SS_psides *si, object *obj,
     else if (strcmp(name, "dimension-elem") == 0)
        {v = s->dimension_elem;
 	if (val != NULL)
-           {SS_args(val, SC_INT_I, &v);
+           {SS_args(si, val, SC_INT_I, &v);
 	    s->dimension_elem = v;};
 
 	ret = SS_mk_integer(si, v);}
@@ -2470,7 +2470,7 @@ static object *_SX_set_info(SS_psides *si, object *obj,
     else if (strcmp(name, "n-elements") == 0)
        {v = s->n_elements;
 	if (val != NULL)
-           {SS_args(val, SC_INT_I, &v);
+           {SS_args(si, val, SC_INT_I, &v);
 	    s->n_elements = v;};
 
 	ret = SS_mk_integer(si, v);}
@@ -2478,7 +2478,7 @@ static object *_SX_set_info(SS_psides *si, object *obj,
     else if (strcmp(name, "next") == 0)
        {u = s->next;
 	if (val != NULL)
-	   {SS_args(val, G_SET, &u);
+	   {SS_args(si, val, G_SET, &u);
 	    s->next = u;};
 
 	ret = SX_mk_set(si, u);};
@@ -2504,7 +2504,7 @@ static object *_SX_map_info(SS_psides *si, object *obj,
     if (strcmp(name, "name") == 0)
        {t = f->name;
 	if (val != NULL)
-	   {SS_args(val, SC_STRING_I, &t);
+	   {SS_args(si, val, SC_STRING_I, &t);
 	    f->name = t;};
 
 	ret = SS_mk_string(si, t);}
@@ -2512,7 +2512,7 @@ static object *_SX_map_info(SS_psides *si, object *obj,
     else if (strcmp(name, "category") == 0)
        {t = f->category;
 	if (val != NULL)
-	   {SS_args(val, SC_STRING_I, &t);
+	   {SS_args(si, val, SC_STRING_I, &t);
 	    f->category = t;};
 
 	ret = SS_mk_string(si, t);}
@@ -2520,7 +2520,7 @@ static object *_SX_map_info(SS_psides *si, object *obj,
     else if (strcmp(name, "domain") == 0)
        {s = f->domain;
 	if (val != NULL)
-	   {SS_args(val, G_SET, &s);
+	   {SS_args(si, val, G_SET, &s);
 	    f->domain = s;};
 
 	ret = SX_mk_set(si, s);}
@@ -2528,7 +2528,7 @@ static object *_SX_map_info(SS_psides *si, object *obj,
     else if (strcmp(name, "range") == 0)
        {s = f->range;
 	if (val != NULL)
-	   {SS_args(val, G_SET, &s);
+	   {SS_args(si, val, G_SET, &s);
 	    f->range = s;};
 
 	ret = SX_mk_set(si, s);}
@@ -2536,7 +2536,7 @@ static object *_SX_map_info(SS_psides *si, object *obj,
     else if (strcmp(name, "next") == 0)
        {g = f->next;
 	if (val != NULL)
-	   {SS_args(val, G_MAPPING, &g);
+	   {SS_args(si, val, G_MAPPING, &g);
 	    f->next = g;};
 
 	ret = SX_mk_mapping(si, f);}
@@ -2544,7 +2544,7 @@ static object *_SX_map_info(SS_psides *si, object *obj,
     else if (strcmp(name, "file-type") == 0)
        {v = f->file_type;
 	if (val != NULL)
-           {SS_args(val, SC_INT_I, &v);
+           {SS_args(si, val, SC_INT_I, &v);
 	    f->file_type = v;};
 
 	ret = SS_mk_integer(si, v);}
@@ -2552,7 +2552,7 @@ static object *_SX_map_info(SS_psides *si, object *obj,
     else if (strcmp(name, "map-type") == 0)
        {t = f->map_type;
 	if (val != NULL)
-	   {SS_args(val, SC_STRING_I, &t);
+	   {SS_args(si, val, SC_STRING_I, &t);
 	    f->map_type = t;};
 
 	ret = SS_mk_string(si, t);};
@@ -2580,7 +2580,7 @@ static object *_SX_graph_info(SS_psides *si, object *obj,
 	if (val != NULL)
            {PG_rendering pty;
 
-	    SS_args(val, SC_ENUM_I, &pty);
+	    SS_args(si, val, SC_ENUM_I, &pty);
 	    g->rendering = pty;};
 
 	ret = SS_mk_integer(si, v);}
@@ -2588,7 +2588,7 @@ static object *_SX_graph_info(SS_psides *si, object *obj,
     else if (strcmp(name, "identifier") == 0)
        {v = g->identifier;
 	if (val != NULL)
-           {SS_args(val, SC_LONG_I, &v);
+           {SS_args(si, val, SC_LONG_I, &v);
 	    g->identifier = v;};
 
 	ret = SS_mk_integer(si, v);}
@@ -2596,7 +2596,7 @@ static object *_SX_graph_info(SS_psides *si, object *obj,
     else if (strcmp(name, "mesh") == 0)
        {v = g->mesh;
 	if (val != NULL)
-           {SS_args(val, SC_LONG_I, &v);
+           {SS_args(si, val, SC_LONG_I, &v);
 	    g->mesh = v;};
 
 	ret = SS_mk_integer(si, v);}
@@ -2604,7 +2604,7 @@ static object *_SX_graph_info(SS_psides *si, object *obj,
     else if (strcmp(name, "next") == 0)
        {h = g->next;
 	if (val != NULL)
-           {SS_args(val, G_GRAPH, &h);
+           {SS_args(si, val, G_GRAPH, &h);
 	    g->next = h;};
 
 	ret = SX_mk_graph(si, h);}
@@ -2612,7 +2612,7 @@ static object *_SX_graph_info(SS_psides *si, object *obj,
     else if (strcmp(name, "f") == 0)
        {f = g->f;
 	if (val != NULL)
-	   {SS_args(val, G_MAPPING, &f);
+	   {SS_args(si, val, G_MAPPING, &f);
 	    g->f = f;};
 
 	ret = SX_mk_mapping(si, f);}
@@ -2620,7 +2620,7 @@ static object *_SX_graph_info(SS_psides *si, object *obj,
     else if (strcmp(name, "info-type") == 0)
        {t = g->info_type;
 	if (val != NULL)
-	   {SS_args(val, SC_STRING_I, &t);
+	   {SS_args(si, val, SC_STRING_I, &t);
 	    g->info_type = t;};
 
 	ret = SS_mk_string(si, t);}
@@ -2628,7 +2628,7 @@ static object *_SX_graph_info(SS_psides *si, object *obj,
     else if (strcmp(name, "use") == 0)
        {t = g->use;
 	if (val != NULL)
-	   {SS_args(val, SC_STRING_I, &t);
+	   {SS_args(si, val, SC_STRING_I, &t);
 	    g->use = t;};
 
 	ret = SS_mk_string(si, t);};
@@ -2654,7 +2654,7 @@ static object *_SX_image_info(SS_psides *si, object *obj,
     if (strcmp(name, "version-id") == 0)
        {v = im->version_id;
 	if (val != NULL)
-           {SS_args(val, SC_LONG_I, &v);
+           {SS_args(si, val, SC_LONG_I, &v);
 	    im->version_id = v;};
 
 	ret = SS_mk_integer(si, v);}
@@ -2662,7 +2662,7 @@ static object *_SX_image_info(SS_psides *si, object *obj,
     else if (strcmp(name, "kmax") == 0)
        {v = im->kmax;
 	if (val != NULL)
-           {SS_args(val, SC_LONG_I, &v);
+           {SS_args(si, val, SC_LONG_I, &v);
 	    im->kmax = v;};
 
 	ret = SS_mk_integer(si, v);}
@@ -2670,7 +2670,7 @@ static object *_SX_image_info(SS_psides *si, object *obj,
     else if (strcmp(name, "lmax") == 0)
        {v = im->lmax;
 	if (val != NULL)
-           {SS_args(val, SC_LONG_I, &v);
+           {SS_args(si, val, SC_LONG_I, &v);
 	    im->lmax = v;};
 
 	ret = SS_mk_integer(si, v);}
@@ -2678,7 +2678,7 @@ static object *_SX_image_info(SS_psides *si, object *obj,
     else if (strcmp(name, "size") == 0)
        {v = im->size;
 	if (val != NULL)
-           {SS_args(val, SC_LONG_I, &v);
+           {SS_args(si, val, SC_LONG_I, &v);
 	    im->size = v;};
 
 	ret = SS_mk_integer(si, v);}
@@ -2686,7 +2686,7 @@ static object *_SX_image_info(SS_psides *si, object *obj,
     else if (strcmp(name, "bits-pixel") == 0)
        {v = im->bits_pixel;
 	if (val != NULL)
-           {SS_args(val, SC_LONG_I, &v);
+           {SS_args(si, val, SC_LONG_I, &v);
 	    im->bits_pixel = v;};
 
 	ret = SS_mk_integer(si, v);}
@@ -2694,7 +2694,7 @@ static object *_SX_image_info(SS_psides *si, object *obj,
     else if (strcmp(name, "label") == 0)
        {t = im->label;
 	if (val != NULL)
-	   {SS_args(val, SC_STRING_I, &t);
+	   {SS_args(si, val, SC_STRING_I, &t);
 	    im->label = t;};
 
 	ret = SS_mk_string(si, t);}
@@ -2702,7 +2702,7 @@ static object *_SX_image_info(SS_psides *si, object *obj,
     else if (strcmp(name, "element-type") == 0)
        {t = im->element_type;
 	if (val != NULL)
-	   {SS_args(val, SC_STRING_I, &t);
+	   {SS_args(si, val, SC_STRING_I, &t);
 	    im->element_type = t;};
 
 	ret = SS_mk_string(si, t);}
@@ -2710,7 +2710,7 @@ static object *_SX_image_info(SS_psides *si, object *obj,
     else if (strcmp(name, "xmin") == 0)
        {d = im->xmin;
 	if (val != NULL)
-	   {SS_args(val, SC_DOUBLE_I, &d);
+	   {SS_args(si, val, SC_DOUBLE_I, &d);
 	    im->xmin = d;};
 
 	ret = SS_mk_float(si, d);}
@@ -2718,7 +2718,7 @@ static object *_SX_image_info(SS_psides *si, object *obj,
     else if (strcmp(name, "xmax") == 0)
        {d = im->xmax;
 	if (val != NULL)
-	   {SS_args(val, SC_DOUBLE_I, &d);
+	   {SS_args(si, val, SC_DOUBLE_I, &d);
 	    im->xmax = d;};
 
 	ret = SS_mk_float(si, d);}
@@ -2726,7 +2726,7 @@ static object *_SX_image_info(SS_psides *si, object *obj,
     else if (strcmp(name, "ymin") == 0)
        {d = im->ymin;
 	if (val != NULL)
-	   {SS_args(val, SC_DOUBLE_I, &d);
+	   {SS_args(si, val, SC_DOUBLE_I, &d);
 	    im->ymin = d;};
 
 	ret = SS_mk_float(si, d);}
@@ -2734,7 +2734,7 @@ static object *_SX_image_info(SS_psides *si, object *obj,
     else if (strcmp(name, "ymax") == 0)
        {d = im->ymax;
 	if (val != NULL)
-	   {SS_args(val, SC_DOUBLE_I, &d);
+	   {SS_args(si, val, SC_DOUBLE_I, &d);
 	    im->ymax = d;};
 
 	ret = SS_mk_float(si, d);}
@@ -2742,7 +2742,7 @@ static object *_SX_image_info(SS_psides *si, object *obj,
     else if (strcmp(name, "zmin") == 0)
        {d = im->zmin;
 	if (val != NULL)
-	   {SS_args(val, SC_DOUBLE_I, &d);
+	   {SS_args(si, val, SC_DOUBLE_I, &d);
 	    im->zmin = d;};
 
 	ret = SS_mk_float(si, d);}
@@ -2750,7 +2750,7 @@ static object *_SX_image_info(SS_psides *si, object *obj,
     else if (strcmp(name, "zmax") == 0)
        {d = im->zmax;
 	if (val != NULL)
-	   {SS_args(val, SC_DOUBLE_I, &d);
+	   {SS_args(si, val, SC_DOUBLE_I, &d);
 	    im->zmax = d;};
 
 	ret = SS_mk_float(si, d);};
@@ -2772,7 +2772,7 @@ static object *_SXI_drawable_info(SS_psides *si, object *argl)
     obj  = NULL;
     name = NULL;
     val  = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             SS_OBJECT_I, &obj,
             SC_STRING_I, &name,
             SS_OBJECT_I, &val,

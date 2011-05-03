@@ -66,7 +66,7 @@ object *SX_draw_grotrian(SS_psides *si, object *argl)
 
     dev = NULL;
     g   = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_DEVICE, &dev,
             G_GRAPH, &g,
             0);

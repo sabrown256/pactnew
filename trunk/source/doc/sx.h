@@ -2887,7 +2887,7 @@ are specified the same way that they are for <B>SS_make_list</B>.<p></B>
 
 <B></B>
 <BLOCKQUOTE>
-int SS_args(object *s, ...)
+int SS_args(SS_psides *si, object *s, ...)
 </BLOCKQUOTE>
 </B>
 

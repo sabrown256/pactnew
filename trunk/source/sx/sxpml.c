@@ -64,7 +64,7 @@ static object *_SXI_mk_array(SS_psides *si, object *argl)
     rv   = SS_null;
     type = NULL;
     size = 0L;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &type,
             SC_LONG_I, &size,
             0);
@@ -97,7 +97,7 @@ static object *_SXI_resz_array(SS_psides *si, object *argl)
 
     arr  = NULL;
     size = 0L;
-    SS_args(argl,
+    SS_args(si, argl,
             G_NUM_ARRAY, &arr,
             SC_LONG_I, &size,
             0);
@@ -137,7 +137,7 @@ static object *_SXI_sub_array(SS_psides *si, object *argl)
     rv   = SS_null;
     dims = SS_null;
     reg  = SS_null;
-    SS_args(argl,
+    SS_args(si, argl,
             G_NUM_ARRAY, &arr,
             SS_OBJECT_I, &dims,
             SS_OBJECT_I, &reg,
@@ -217,7 +217,7 @@ static object *_SXI_array_ref(SS_psides *si, object *argl)
 
     arr = NULL;
     n   = 0L;
-    SS_args(argl,
+    SS_args(si, argl,
             G_NUM_ARRAY, &arr,
             SC_LONG_I, &n,
             0);
@@ -257,7 +257,7 @@ static object *_SXI_array_set(SS_psides *si, object *argl)
 
     arr = NULL;
     n   = 0L;
-    SS_args(argl,
+    SS_args(si, argl,
             G_NUM_ARRAY, &arr,
             SC_LONG_I, &n,
             SS_OBJECT_I, &val,
@@ -311,14 +311,14 @@ object *SX_list_array(SS_psides *si, object *argl)
        {arr = PM_make_array(SC_LONG_S, n, NULL);
 	lp  = (long *) arr->data;
 	for (lst = argl; !SS_nullobjp(lst); lst = SS_cdr(lst), lp++)
-	    {SS_args(lst,
+	    {SS_args(si, lst,
 		     SC_LONG_I, lp,
 		     0);};}
     else
        {arr = PM_make_array(SC_DOUBLE_S, n, NULL);
 	fp  = (double *) arr->data;
 	for (lst = argl; !SS_nullobjp(lst); lst = SS_cdr(lst), fp++)
-	    {SS_args(lst,
+	    {SS_args(si, lst,
 		     SC_DOUBLE_I, fp,
 		     0);};};
 
@@ -351,7 +351,7 @@ static object *_SXI_array_list(SS_psides *si, object *argl)
     void *data;
 
     arr = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_NUM_ARRAY, &arr,
             0);
 
@@ -439,7 +439,7 @@ static object *_SXI_set_pdbdata(SS_psides *si, object *argl)
     po   = NULL;
     mn   = NULL;
     file = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_SET, &s,
             G_FILE, &po,
             SC_STRING_I, &mn,
@@ -573,7 +573,7 @@ static object *_SXI_make_pml_set(SS_psides *si, object *argl)
     name  = NULL;
     shape = SS_null;
     components = SS_null;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &name,
             SS_OBJECT_I, &shape,
             SS_OBJECT_I, &components,
@@ -700,7 +700,7 @@ static object *_SXI_make_pml_mapping(SS_psides *si, object *argl)
     arr       = NULL;
     name      = NULL;
     next      = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_SET, &domain,
             G_SET, &range,
             SC_ENUM_I, &centering,
@@ -825,7 +825,7 @@ static object *_SXI_set_attr_set(SS_psides *si, object *argl)
     name = NULL;
     type = NULL;
     val  = SS_null;
-    SS_args(argl,
+    SS_args(si, argl,
             G_SET, &s,
             SC_STRING_I, &name,
             SC_STRING_I, &type,
@@ -864,7 +864,7 @@ static object *_SXI_set_map_type(SS_psides *si, object *argl)
 
     f    = NULL;
     name = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_MAPPING, &f,
             SC_STRING_I, &name,
             0);
@@ -897,7 +897,7 @@ static object *_SXI_mapping_pdbdata(SS_psides *si, object *argl)
     po   = NULL;
     mn   = NULL;
     file = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_MAPPING, &f,
             G_FILE, &po,
             SC_STRING_I, &mn,
@@ -1097,7 +1097,7 @@ static object *_SXI_arrays_set(SS_psides *si, object *argl)
     shape = SS_null;
     components = SS_null;
     tflag = FALSE;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_STRING_I, &name,
             SC_INT_I, &tflag,
             SS_OBJECT_I, &shape,
@@ -1195,7 +1195,7 @@ static object *_SXI_lr_ac(SS_psides *si, object *argl)
     rv  = SS_null;
     f   = NULL;
     ord = BND_CELL_MAX;
-    SS_args(argl,
+    SS_args(si, argl,
             G_MAPPING, &f,
             SC_INT_I, &ord,
             0);
@@ -1305,7 +1305,7 @@ static object *_SXI_make_ac_set(SS_psides *si, object *argl)
     for (i = 0; i < ne; i++, nodes = SS_cdr(nodes))
         {node = SS_car(nodes);
 	 for (j = 0; j < nde; j++, node = SS_cdr(node))
-             {SS_args(node,
+             {SS_args(si, node,
 		      SC_DOUBLE_I, elem[j]+i,
 		      0);};};
 
@@ -1324,7 +1324,7 @@ static object *_SXI_make_ac_set(SS_psides *si, object *argl)
          for (i = 0; i < nc; i++, ncells = SS_cdr(ncells))
              {ncell = SS_car(ncells);
 	      for (k = 0; k < ord; k++, ncell = SS_cdr(ncell))
-                  {SS_args(ncell,
+                  {SS_args(si, ncell,
 			   SC_LONG_I, pb++,
 			   0);};};};
 
@@ -1372,7 +1372,7 @@ static object *_SXI_array_pdbdata(SS_psides *si, object *argl)
     po   = NULL;
     mn   = NULL;
     file = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_NUM_ARRAY, &arr,
             G_FILE, &po,
             SC_STRING_I, &mn,
@@ -1424,7 +1424,7 @@ static object *_SXI_array_pdbdata_i(SS_psides *si, object *argl)
     po   = NULL;
     mn   = NULL;
     file = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_NUM_ARRAY, &arr,
             G_FILE, &po,
             SC_STRING_I, &mn,
@@ -1477,7 +1477,7 @@ static object *_SXI_pdbdata_array(SS_psides *si, object *arg)
 
     rv = SS_null;
     pd = NULL;
-    SS_args(arg,
+    SS_args(si, arg,
             G_PDBDATA, &pd,
             0);
 
@@ -1653,7 +1653,7 @@ static object *_SXI_rep_ac_domain(SS_psides *si, object *argl)
     connct = NULL;
     nzname = NULL;
     nnname = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_FILE, &po,
             SC_STRING_I, &xname,
             SC_STRING_I, &yname,
@@ -1722,7 +1722,7 @@ static object *_SXI_find_index(SS_psides *si, object *argl)
     arr  = NULL;
     indx = NULL;
     pred = NULL;
-    SS_args(argl,
+    SS_args(si, argl,
             G_NUM_ARRAY, &arr,
             SS_PROCEDURE_I, &pred,
             SC_DOUBLE_I, &val,
@@ -1831,7 +1831,7 @@ static object *_SXI_mk_polygon(SS_psides *si, object *argl)
 
     rv = SS_null;
     nd = 0L;
-    SS_args(argl,
+    SS_args(si, argl,
             SC_LONG_I, &nd,
             0);
 
@@ -1842,7 +1842,7 @@ static object *_SXI_mk_polygon(SS_psides *si, object *argl)
     py = PM_init_polygon(nd, np);
 
     for (id = 0, ip = 0; !SS_nullobjp(argl); argl = SS_cdr(argl))
-	{SS_args(argl,
+	{SS_args(si, argl,
 		 SC_DOUBLE_I, &v,
 		 0);
 	 py->x[id++][ip] = v;
