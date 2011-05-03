@@ -55,7 +55,7 @@ object *_SXI_display_pan_object(SS_psides *si, object *obj)
        {name = SS_get_string(obj);
         pp   = PA_INQUIRE_VARIABLE(name);
         if (pp == NULL)
-           SS_error_n(si,
+           SS_error(si,
 		      "VARIABLE NOT IN DATA BASE - _SXI_DISPLAY_PAN_OBJECT",
 		      obj);
 
@@ -94,7 +94,7 @@ static object *_SX_desc_pan_variable(SS_psides *si, object *obj)
             0);
 
     if (pp == NULL)
-       SS_error_n(si, "BAD PANACEA VARIABLE - _SX_DESC_PAN_VARIABLE", obj);
+       SS_error(si, "BAD PANACEA VARIABLE - _SX_DESC_PAN_VARIABLE", obj);
 
     else
  
@@ -217,7 +217,7 @@ static object *_SX_desc_pan_package(SS_psides *si, object *obj)
             0);
 
     if (pck == NULL)
-       SS_error_n(si, "BAD PANACEA PACKAGE - _SX_DESC_PAN_PACKAGE", obj);
+       SS_error(si, "BAD PANACEA PACKAGE - _SX_DESC_PAN_PACKAGE", obj);
 
     else
 
@@ -263,7 +263,7 @@ object *_SXI_desc_pan(SS_psides *si, object *obj)
        {s  = SS_get_string(obj);
         hp = SC_hasharr_lookup(PA_variable_tab, s);
         if (hp == NULL)
-           SS_error_n(si, "BAD ENTITY - _SXI_DESC_PAN", obj);
+           SS_error(si, "BAD ENTITY - _SXI_DESC_PAN", obj);
 
 	else if (hp->type[3] == 'p')
            _SX_desc_pan_package(si, obj);

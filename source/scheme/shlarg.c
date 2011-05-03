@@ -36,7 +36,7 @@ static object *_SSI_mkvect(SS_psides *si, object *arg)
     object *o;
 
     if (!SS_integerp(arg))
-       SS_error_n(si, "ARGUMENT NOT INTEGER - MAKE-VECTOR", arg);
+       SS_error(si, "ARGUMENT NOT INTEGER - MAKE-VECTOR", arg);
 
     i = (int) SS_INTEGER_VALUE(arg);
 
@@ -66,7 +66,7 @@ static object *_SSI_vctlen(SS_psides *si, object *arg)
     object *o;
 
     if (!SS_vectorp(arg))
-       SS_error_n(si, "ARGUMENT NOT VECTOR - VECTOR-LENGTH", arg);
+       SS_error(si, "ARGUMENT NOT VECTOR - VECTOR-LENGTH", arg);
 
     i = SS_VECTOR_LENGTH(arg);
 
@@ -95,7 +95,7 @@ static object *_SSI_vctref(SS_psides *si, object *argl)
     va = vct->vect;
 
     if (i >= n)
-       SS_error_n(si, "BAD INDEX - VECTOR-REF", argl);
+       SS_error(si, "BAD INDEX - VECTOR-REF", argl);
 
     o = va[i];
 
@@ -123,7 +123,7 @@ static object *_SSI_vctset(SS_psides *si, object *argl)
     n  = vct->length;
     va = vct->vect;
     if (i >= n)
-       SS_error_n(si, "BAD INDEX - VECTOR-SET!", argl);
+       SS_error(si, "BAD INDEX - VECTOR-SET!", argl);
 
     SS_Assign(va[i], val);
 
@@ -141,7 +141,7 @@ object *SS_vctlst(SS_psides *si, object *arg)
     object **va, *ret, *o;
 
     if (!SS_vectorp(arg))
-       SS_error_n(si, "ARGUMENT NOT VECTOR - VECTOR->LIST", arg);
+       SS_error(si, "ARGUMENT NOT VECTOR - VECTOR->LIST", arg);
 
     k   = SS_VECTOR_LENGTH(arg);
     va  = SS_VECTOR_ARRAY(arg);
@@ -175,7 +175,7 @@ object *SS_lstvct(SS_psides *si, object *arg)
     object **va, *vct;
 
     if (!SS_consp(arg))
-       SS_error_n(si, "ARGUMENT NOT LIST - LIST->VECTOR", arg);
+       SS_error(si, "ARGUMENT NOT LIST - LIST->VECTOR", arg);
 
     k   = SS_length(arg);
     vct = SS_mk_vector(si, k);
@@ -240,7 +240,7 @@ object *_SSI_define_global(SS_psides *si, object *argl)
 		t = SS_params(val);};};}
 
     else
-       SS_error_n(si, "CAN'T DEFINE NON-VARIABLE OBJECT - _SSI_DEFINE_GLOBAL", argl);
+       SS_error(si, "CAN'T DEFINE NON-VARIABLE OBJECT - _SSI_DEFINE_GLOBAL", argl);
 
     if (strcmp(SS_PROCEDURE_NAME(si->fun), "define-global-macro") == 0)
        SS_PROCEDURE_TYPE(val) = SS_MACRO;
@@ -542,7 +542,7 @@ object *_SSI_fopen(SS_psides *si, object *argl)
        str = io_open(name, mode);
 
     if (str == NULL)
-       SS_error_n(si, "CAN'T OPEN FILE - FOPEN", argl);
+       SS_error(si, "CAN'T OPEN FILE - FOPEN", argl);
 
     if ((mode != NULL) && (mode[0] == 'r'))
        prt = SS_mk_inport(si, str, name);
@@ -568,7 +568,7 @@ object *_SSI_fclose(SS_psides *si, object *obj)
     else if (SS_inportp(obj))
        str = SS_INSTREAM(obj);
     else
-       SS_error_n(si, "BAD PORT TO FCLOSE", obj);
+       SS_error(si, "BAD PORT TO FCLOSE", obj);
 
     if (str != NULL)
        io_close(str);
@@ -617,7 +617,7 @@ static object *_SSI_mem_map(SS_psides *si, object *arg)
        arg = si->outdev;
 
     else if (!SS_outportp(arg))
-       SS_error_n(si, "BAD PORT - SC_MEM_MAP", arg);
+       SS_error(si, "BAD PORT - SC_MEM_MAP", arg);
 
     fp = SS_OUTSTREAM(arg);
     SC_mem_map(fp, FALSE);

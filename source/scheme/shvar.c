@@ -121,7 +121,7 @@ static object *_SS_set_var(SS_psides *si, void *vr, object *vl, int type)
 		*((char **) vr) = CSTRSAVE(bf);};}
 
 	else
-	   SS_error_n(si, "OBJECT HAS INCORRECT TYPE - _SS_SET_VAR", vl);};
+	   SS_error(si, "OBJECT HAS INCORRECT TYPE - _SS_SET_VAR", vl);};
 
     return(vl);}
 
@@ -222,7 +222,7 @@ object *SS_install_cv(SS_psides *si, char *name, void *pval, int ityp)
 	typ = SS_POBJECT_S;}
 
     else
-       SS_error_n(si, "BAD VARIABLE TYPE - SX_INSTALL_VARIABLE",
+       SS_error(si, "BAD VARIABLE TYPE - SX_INSTALL_VARIABLE",
 		  SS_null);
 
 /* GOTCHA: the type, typ, is wrong! var is an object * and typ should be
@@ -230,7 +230,7 @@ object *SS_install_cv(SS_psides *si, char *name, void *pval, int ityp)
  *         for such things
  */
     if (SC_hasharr_install(si->symtab, name, var, typ, TRUE, TRUE) == NULL)
-       SS_error_n(si, "INSTALL FAILED - SS_INSTALL_CV", var);
+       SS_error(si, "INSTALL FAILED - SS_INSTALL_CV", var);
 
     return(var);}
 

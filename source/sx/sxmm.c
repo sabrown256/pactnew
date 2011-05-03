@@ -279,7 +279,7 @@ g_file *_SX_mk_open_file(SS_psides *si, char *name, char *type, char *mode)
 
 /* complain about text file */
        {if (SC_isfile_text(name))
-           SS_error_n(si, "REQUESTED FILE IS ASCII - _SX_MK_OPEN_FILE",
+           SS_error(si, "REQUESTED FILE IS ASCII - _SX_MK_OPEN_FILE",
                      SS_mk_string(si, name));
 
 /* return NULL if file exists but could not be opened
@@ -292,7 +292,7 @@ g_file *_SX_mk_open_file(SS_psides *si, char *name, char *type, char *mode)
         else
            {file = PD_open(name, "w");
             if (file == NULL)
-               SS_error_n(si, "CAN'T OPEN FILE - _SX_MK_OPEN_FILE", 
+               SS_error(si, "CAN'T OPEN FILE - _SX_MK_OPEN_FILE", 
                         SS_mk_string(si, name));};};
 
     _PD_def_real(type, file);
@@ -324,7 +324,7 @@ void _SX_rel_open_file(SS_psides *si, g_file *po)
 
 /* close the file */
     if (!PD_close(file))
-       SS_error_n(si, "CAN'T PROPERLY CLOSE FILE - _SX_REL_OPEN_FILE", 
+       SS_error(si, "CAN'T PROPERLY CLOSE FILE - _SX_REL_OPEN_FILE", 
 		  po->file_object);
 
     _SX_rl_file(po);

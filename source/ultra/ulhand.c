@@ -167,7 +167,7 @@ object *UL_opxc(SS_psides *si, C_procedure *cp, object *argl)
             SC_DOUBLE_I, &a,
             0);
     if (a == HUGE)
-       SS_error_n(si, "BAD NUMBER - UL_OPXC ", tok);
+       SS_error(si, "BAD NUMBER - UL_OPXC ", tok);
 
     SS_Assign(tok, SS_null);
 
@@ -218,7 +218,7 @@ object *UL_opyc(SS_psides *si, C_procedure *cp, object *argl)
             SC_DOUBLE_I, &a,
             0);
     if (a == HUGE)
-       SS_error_n(si, "BAD NUMBER - UL_OPYC ", tok);
+       SS_error(si, "BAD NUMBER - UL_OPYC ", tok);
 
     SS_Assign(tok, SS_null);
 
@@ -519,7 +519,7 @@ object *UL_bltoc(SS_psides *si, C_procedure *cp, object *argl)
 
     SX_last_arg(tok, argl);
     if (!SS_numbp(tok))
-       SS_error_n(si, "BAD LAST ARGUMENT - UL_BLTOC", tok);
+       SS_error(si, "BAD LAST ARGUMENT - UL_BLTOC", tok);
 
     SX_prep_arg(si, argl);
 
@@ -558,7 +558,7 @@ object *UL_bltocnp(SS_psides *si, C_procedure *cp, object *argl)
 
     SX_last_arg(tok, argl);
     if (!SS_numbp(tok))
-       SS_error_n(si, "BAD LAST ARGUMENT - BLTOCNP", tok);
+       SS_error(si, "BAD LAST ARGUMENT - BLTOCNP", tok);
 
     if (si->interactive == ON)
        {r  = SS_get_string(si->fun);
@@ -755,7 +755,7 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
 					   SS_get_string(si->fun),
 					   SX_dataset[i].id);};}
                 else
-                   SS_error_n(si, "BAD ARGUMENT - BC", s);
+                   SS_error(si, "BAD ARGUMENT - BC", s);
 
                 if (SS_nullobjp(ch))
                    t = SS_cdr(t);
@@ -896,7 +896,7 @@ object *UL_bcxl(SS_psides *si, C_procedure *cp, object *argl)
             0);
 
     if (i < 0)
-       SS_error_n(si, "BAD LAST ARGUMENT - UL_BCXL", SS_reverse(argl));
+       SS_error(si, "BAD LAST ARGUMENT - UL_BCXL", SS_reverse(argl));
 
 /* set plot flag on so that for example (compose (lst)) causes replot */
     SX_plot_flag = TRUE;
@@ -923,7 +923,7 @@ object *UL_bcxl(SS_psides *si, C_procedure *cp, object *argl)
     for (t = SS_cdr(argl); SS_consp(t); t = SS_cdr(t))
         {s = SS_car(t);
          if (!SX_curvep_a(s))
-            SS_error_n(si, "BAD ARGUMENT - UL_BCXL", s);
+            SS_error(si, "BAD ARGUMENT - UL_BCXL", s);
          i = SX_get_crv_index_i(s);
          if ((SX_dataset[i].id >= 'A') &&
              (SX_dataset[i].id <= 'Z'))

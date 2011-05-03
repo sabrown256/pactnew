@@ -35,13 +35,13 @@ static void _SX_gc_indirection(SS_psides *si, PDBfile *file,
             {bf = SC_dsnprintf(FALSE,
 			       "CAN'T GET POINTER LENGTH ON %s - _SX_GC_INDIRECTION",
 			       dtype);
-             SS_error_n(si, bf, SS_null);};
+             SS_error(si, bf, SS_null);};
 
          if (ditems == -2L)
             {bf = SC_dsnprintf(FALSE,
 			       "UNKNOWN TYPE %s - _SX_GC_INDIRECTION",
 			       dtype);
-             SS_error_n(si, bf, SS_null);};
+             SS_error(si, bf, SS_null);};
 
 /* if the type is an indirection, follow the pointer */
 	 _SX_gc_data(si, file, (char **) DEREF(vr), ditems, dtype);
@@ -65,7 +65,7 @@ static void _SX_gc_leaf(SS_psides *si, PDBfile *file,
     memdes *desc, *mem_lst;
 
     if ((defp = PD_inquire_host_type(file, type)) == NULL)
-       SS_error_n(si, "VARIABLE NOT IN STRUCTURE CHART - _SX_GC_LEAF",
+       SS_error(si, "VARIABLE NOT IN STRUCTURE CHART - _SX_GC_LEAF",
                   SS_mk_string(si, type));
 
     else

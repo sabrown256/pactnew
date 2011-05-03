@@ -32,7 +32,7 @@ static object *_SSI_newsym(SS_psides *si, object *obj)
     else if (SS_variablep(obj))
        token = SS_VARIABLE_NAME(obj);
     else
-       SS_error_n(si, "BAD OBJECT - _SSI_NEWSYM", obj);
+       SS_error(si, "BAD OBJECT - _SSI_NEWSYM", obj);
 
     snprintf(name, MAXLINE, "%s%-d", token, _SS.nsym++);
 
@@ -126,7 +126,7 @@ static object *_SS_quasiq(SS_psides *si, object *obj, int nestl)
            {ncns = _SS_unquote(si, obj);
             return(ncns);}
         else if (Unqsplicing(tcns))
-           SS_error_n(si, "MUST BE IMBEDDED IN LIST - _SS_QUASIQ", obj);};
+           SS_error(si, "MUST BE IMBEDDED IN LIST - _SS_QUASIQ", obj);};
 
 /* look down a quasiquoted list */
     ncns = SS_null;
@@ -251,7 +251,7 @@ static object *SS_let(SS_psides *si, object *let)
     object *prml, *argl, *bdy, *lambda;
 
     if (SS_nullobjp(let) || !SS_consp(let))
-       SS_error_n(si, "BAD LET FORM", let);
+       SS_error(si, "BAD LET FORM", let);
 
 /* convert the locals of the let into a list of formal parameters
  * for the lambda and a list of arguments for the call
@@ -299,7 +299,7 @@ static object *_SSI_letstr(SS_psides *si, object *lets)
     object *prml, *asgn, *asnl, *bdy, *let, *this;
 
     if (SS_nullobjp(lets) || !SS_consp(lets))
-       SS_error_n(si, "BAD LET* FORM", lets);
+       SS_error(si, "BAD LET* FORM", lets);
 
 /* convert the locals of the let* into a list of formal parameters
  * for the lambda and a list of assignment statements to be prepended
@@ -353,7 +353,7 @@ static object *_SSI_letstr(SS_psides *si, object *lets)
     object *prml, *bdy, *asgn;
 
     if (SS_nullobjp(lets) || !SS_consp(lets))
-       SS_error_n(si, "BAD LET* FORM", lets);
+       SS_error(si, "BAD LET* FORM", lets);
 
     SS_Save(si, si->this);
     SS_Save(si, si->argl);
@@ -410,7 +410,7 @@ static object *_SSI_letstr(SS_psides *si, object *letr)
    {object *vlpair, *vr, *vl, *lst, *frm;
 
     if (SS_nullobjp(letr) || !SS_consp(letr))
-       SS_error_n(si, "BAD LET* FORM", letr);
+       SS_error(si, "BAD LET* FORM", letr);
 
     SS_Save(si, si->this);
     SS_Save(si, si->unev);
@@ -607,7 +607,7 @@ static object *_SSI_watch(SS_psides *si, object *obj)
        {_SS.watch_var = obj;
 	_SS.watch_val = SS_VARIABLE_VALUE(obj);}
     else
-       SS_error_n(si, "OBJECT NOT A VARIABLE - _SSI_WATCH", obj);
+       SS_error(si, "OBJECT NOT A VARIABLE - _SSI_WATCH", obj);
 
     return(obj);}
 

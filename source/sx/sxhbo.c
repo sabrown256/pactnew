@@ -52,7 +52,7 @@ static object *_SX_binary_arr(SS_psides *si, C_procedure *cp, object *argl)
 	     break;};};
 
     if (otyp == NULL)
-       SS_error_n(si, "NO ARRAY - _SX_BINARY_ARR", argl);
+       SS_error(si, "NO ARRAY - _SX_BINARY_ARR", argl);
 
 /* accumulate the results */
     acc = NULL;
@@ -70,7 +70,7 @@ static object *_SX_binary_arr(SS_psides *si, C_procedure *cp, object *argl)
 
 	 acc = PM_accumulate_oper(proc, acc, operand, id, v);
 	 if (acc == NULL)
-	    SS_error_n(si, "OBJECT DRIVEN FAILURE - _SX_BINARY_ARR", obj);};
+	    SS_error(si, "OBJECT DRIVEN FAILURE - _SX_BINARY_ARR", obj);};
 
     PM_conv_array(reta, acc, TRUE);
 
@@ -337,7 +337,7 @@ static double **_SX_extract_range(SS_psides *si,
 
 	 for (id = 0; id < dne; id++)
 	     {if (id >= snre)
-		 SS_error_n(si, "IMPROPER MAPPING - _SX_EXTRACT_RANGE", SS_null);
+		 SS_error(si, "IMPROPER MAPPING - _SX_EXTRACT_RANGE", SS_null);
 
 /* loop over neighborhood of id */
 	      trc[id] = sra[id];};};
@@ -427,7 +427,7 @@ static PM_mapping *_SX_build_accumulator_mapping(SS_psides *si,
          tnd   = range->dimension;
          tnde  = range->dimension_elem;
          if ((tnd != nd) || (tnde != nde))
-            SS_error_n(si, "INCOMMENSURATE RANGE SET - _SX_BUILD_ACCUMULATOR_MAPPING",
+            SS_error(si, "INCOMMENSURATE RANGE SET - _SX_BUILD_ACCUMULATOR_MAPPING",
                      SS_null);
 
 /* detect things like (+ a a) */
@@ -511,7 +511,7 @@ static void _SX_init_range(SS_psides *si,
 
 	 ok = PM_conv_array(&dst, &src, FALSE);
 	 if (!ok)
-	    SS_error_n(si, "CAN'T INIT ACCUMULATOR - _SX_INIT_RANGE", obj);};
+	    SS_error(si, "CAN'T INIT ACCUMULATOR - _SX_INIT_RANGE", obj);};
 
 /* clean up the mess */
     if (tre != NULL)
@@ -610,7 +610,7 @@ static void _SX_accumulate_range(SS_psides *si, PM_mapping *d,
 
 	      acc[i] = PM_accumulate_oper(proc, acc[i], &operand, id, v);
 	      if (acc[i] == NULL)
-	         SS_error_n(si, "OBJECT DRIVEN FAILURE - _SX_ACCUMULATE_RANGE",
+	         SS_error(si, "OBJECT DRIVEN FAILURE - _SX_ACCUMULATE_RANGE",
 			  obj);};
 
 	 if (ps != NULL)
@@ -700,7 +700,7 @@ static PM_set *_SX_build_restricted_domain(SS_psides *si, PM_set *hd,
     dmx = hd->max_index;
     ne  = SS_length(argl);
     if (ne != 2*nd)
-       SS_error_n(si,
+       SS_error(si,
 		  "DOMAIN DIMENSION MISMATCH - _SX_BUILD_RESTRICTED_DOMAIN",
 		  argl);
 
@@ -793,7 +793,7 @@ static PM_set *_SX_build_lr_domain(SS_psides *si, PM_set *hd, object *argl)
     nde = hd->dimension_elem;
     ne  = SS_length(argl);
     if (ne != nd)
-       SS_error_n(si, "DOMAIN DIMENSION MISMATCH - SX_BUILD_LR_DOMAIN",
+       SS_error(si, "DOMAIN DIMENSION MISMATCH - SX_BUILD_LR_DOMAIN",
 		  argl);
 
     ne = 2*nd;

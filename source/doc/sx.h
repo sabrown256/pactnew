@@ -2968,7 +2968,7 @@ object *SS_pop_err(int n, int flag)
 <P>
 void SS_push_err(int flag, int type)
 <P>
-void SS_error(char *s, object *obj)
+void SS_error(SS_psides *si, char *s, object *obj)
 <P>
 PFPrintErrMsg SS_set_print_err_func(PFPrintErrMsg *fnc, int dflt)
 <P>

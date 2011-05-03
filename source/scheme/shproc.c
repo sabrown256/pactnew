@@ -104,7 +104,7 @@ static object *_SSI_pr_runp(SS_psides *si, object *obj)
     {object *o;
 
      if (!SS_processp(obj))
-        SS_error_n(si, "OBJECT NOT PROCESS - PROCESS-RUNNING?", obj);
+        SS_error(si, "OBJECT NOT PROCESS - PROCESS-RUNNING?", obj);
 
      o = (SS_PROCESS_STATUS(obj) == SC_RUNNING) ? SS_t : SS_f;
 
@@ -133,7 +133,7 @@ static object *_SSI_opn_pr(SS_psides *si, object *argl)
             0);
 
     if (strchr("rwa", mode[0]) == NULL)
-       SS_error_n(si, "BAD MODE - _SSI_OPN_PR", SS_car(argl));
+       SS_error(si, "BAD MODE - _SSI_OPN_PR", SS_car(argl));
 
     argl = SS_cdr(argl);
 
@@ -151,14 +151,14 @@ static object *_SSI_opn_pr(SS_psides *si, object *argl)
          else if (SS_variablep(obj))
             argv[i++] = SS_VARIABLE_NAME(obj);
          else
-            SS_error_n(si, "BAD OBJECT - PROCESS-OPEN", obj);};
+            SS_error(si, "BAD OBJECT - PROCESS-OPEN", obj);};
 
     argv[i] = NULL;
 
     pp = PC_open(argv, NULL, mode);
     SC_block_file(stdin);   
     if (pp == NULL)
-       SS_error_n(si, "CAN'T OPEN PROCESS - PROCESS-OPEN", obj);
+       SS_error(si, "CAN'T OPEN PROCESS - PROCESS-OPEN", obj);
 
     CFREE(argv);
 
@@ -239,7 +239,7 @@ static object *_SSI_pr_stat(SS_psides *si, object *obj)
     object *ret;
 
     if (!SS_processp(obj))
-       SS_error_n(si, "ARGUMENT NOT PROCESS - PROCESS-STATUS", obj);
+       SS_error(si, "ARGUMENT NOT PROCESS - PROCESS-STATUS", obj);
 
     pp = SS_PROCESS_VALUE(obj);
 
@@ -270,7 +270,7 @@ static object *_SSI_pr_rd_line(SS_psides *si, object *obj)
     object *rv;
 
     if (!SS_processp(obj))
-       SS_error_n(si, "ARGUMENT NOT PROCESS - PROCESS-READ-LINE", obj);
+       SS_error(si, "ARGUMENT NOT PROCESS - PROCESS-READ-LINE", obj);
 
     rv = SS_null;
 

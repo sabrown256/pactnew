@@ -151,7 +151,7 @@ void SX_determine_mapping(SS_psides *si, PM_mapping **pf, object **pargl)
     SX_determine_drw_obj(si, pf, &obj, pargl);
 /*
     if (*pf == NULL)
-       SS_error_n(si, "BAD MAPPING OR GRAPH - SX_DETERMINE_MAPPING",
+       SS_error(si, "BAD MAPPING OR GRAPH - SX_DETERMINE_MAPPING",
 		obj);
 */
     return;}
@@ -242,7 +242,7 @@ object *_SX_mh_u_s(SS_psides *si, C_procedure *cp, object *argl)
 	    else if (SX_SETP(obj))
 	       set = SS_GET(PM_set, obj);
 	    else
-	       SS_error_n(si, "BAD TYPE OBJECT - _SX_MH_U_S", obj);
+	       SS_error(si, "BAD TYPE OBJECT - _SX_MH_U_S", obj);
 
 	    if (set != NULL)
 	       {type = set->element_type;
@@ -383,7 +383,7 @@ object *_SX_m11_b_mrs(SS_psides *si, C_procedure *cp, object *argl)
 	    SC_DOUBLE_I, &a,
 	    0);
     if (a == HUGE)
-       SS_error_n(si, "BAD NUMBER - SX_M11_B_MDS ", argl);
+       SS_error(si, "BAD NUMBER - SX_M11_B_MDS ", argl);
 
     argl = SS_cdr(argl);
     ret  = SS_null;
@@ -424,7 +424,7 @@ object *_SX_m11_b_mds(SS_psides *si, C_procedure *cp, object *argl)
 	    SC_DOUBLE_I, &a,
 	    0);
     if (a == HUGE)
-       SS_error_n(si, "BAD NUMBER - SX_M11_B_MDS ", argl);
+       SS_error(si, "BAD NUMBER - SX_M11_B_MDS ", argl);
 
     argl = SS_cdr(argl);
     ret  = SS_null;
@@ -469,7 +469,7 @@ object *_SX_mij_b_mrs(SS_psides *si, C_procedure *cp, object *argl)
 	    SC_DOUBLE_I, &a,
 	    0);
     if (a == HUGE)
-       SS_error_n(si, "BAD NUMBER - SX_MIJ_B_MDS ", argl);
+       SS_error(si, "BAD NUMBER - SX_MIJ_B_MDS ", argl);
 
 /* NOTE: user specifies 1 for the first component so shitf */
     i--;
@@ -517,7 +517,7 @@ object *_SX_mij_b_mds(SS_psides *si, C_procedure *cp, object *argl)
 	    SC_DOUBLE_I, &a,
 	    0);
     if (a == HUGE)
-       SS_error_n(si, "BAD NUMBER - SX_MIJ_B_MDS ", argl);
+       SS_error(si, "BAD NUMBER - SX_MIJ_B_MDS ", argl);
 
 /* NOTE: user specifies 1 for the first component so shitf */
     i--;

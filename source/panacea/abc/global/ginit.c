@@ -409,66 +409,68 @@ void B_init(void)
 /* B_VARIABLES - define some compiled objects to the interpreter */
 
 static object *B_variables(void)
-   {
+   {SS_psides *si;
+
+    si = &_SS_si;
 
 /* these are required */
-    SS_install_cf("number-of-zones",
+    SS_install_cf(si, "number-of-zones",
 		  "Number of zones in the current problem",
 		  SS_acc_int,
                   &global_swtch[12]);		  
 
-    SS_install_cf("current-cycle",
+    SS_install_cf(si, "current-cycle",
 		  "Current problem cycle",
 		  SS_acc_int,
                   &cycle);
 
-    SS_install_cf("current-time",
+    SS_install_cf(si, "current-time",
 		  "Current problem time",
 		  SS_acc_double,
                   &t);
 
-    SS_install_cf("current-timestep",
+    SS_install_cf(si, "current-timestep",
 		  "Current problem time step",
 		  SS_acc_double,
                   &dt);
 
-    SS_install_cf("state-file-name",
+    SS_install_cf(si, "state-file-name",
 		  "Current state file name",
 		  SS_acc_ptr,
                   &global_name[2]);
 
-    SS_install_cf("edit-file-name",
+    SS_install_cf(si, "edit-file-name",
 		  "Current ASCII edit file name",
 		  SS_acc_ptr,
                   &global_name[3]);
 
-    SS_install_cf("pp-file-name",
+    SS_install_cf(si, "pp-file-name",
 		  "Current post processor file name",
 		  SS_acc_ptr,
                   &global_name[4]);
 
-    SS_install_cf("PVA-file-name",
+    SS_install_cf(si, "PVA-file-name",
 		  "Current PVA file name",
 		  SS_acc_ptr,
                   &global_name[5]);
 
 /* these are not required */
-    SS_install_cf("initial-dtf",
+    SS_install_cf(si, "initial-dtf",
 		  "Initial time step fraction",
 		  SS_acc_double,
                   &global_param[4]);
 
-    SS_install_cf("minimum-dtf",
+    SS_install_cf(si, "minimum-dtf",
 		  "Minimum time step fraction",
 		  SS_acc_double,
                   &global_param[5]);
 
-    SS_install_cf("maximum-dtf",
+    SS_install_cf(si, "maximum-dtf",
 		  "Maximum time step fraction",
 		  SS_acc_double,
                   &global_param[6]);
 
-    SS_install_cf("increment-dtf",
+    SS_install_cf(si, "increment-dtf",
 		  "Maximum time step increment factor",
 		  SS_acc_double,
                   &global_param[7]);
@@ -485,13 +487,17 @@ static object *B_variables(void)
 
 static object *B_files(void)
    {object *o;
+    SS_psides *si;
+
+    si = &_SS_si;
 
     if ((global_name[2] == NULL) || (global_name[3] == NULL) ||
 	(global_name[4] == NULL) || (global_name[5] == NULL))
        o = SS_null;
 
     else
-       o = SS_make_list(SC_STRING_I, global_name[2],
+       o = SS_make_list(si,
+			SC_STRING_I, global_name[2],
 			SC_STRING_I, global_name[5],
 			SC_STRING_I, global_name[3],
 			SC_STRING_I, global_name[4],

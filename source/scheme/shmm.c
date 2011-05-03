@@ -1176,7 +1176,7 @@ object *_SS_numtype_to_list_id(SS_psides *si, int id, void *p, long n)
 	     lst = SS_mk_cons(si, o, lst);};}
 
     else
-       SS_error_n(si, "DATA TYPE NOT SUPPORTED - _SS_NUMTYPE_TO_LIST", SS_null);
+       SS_error(si, "DATA TYPE NOT SUPPORTED - _SS_NUMTYPE_TO_LIST", SS_null);
 
     if (lst != SS_null)
        lst = SS_reverse(lst);
@@ -1329,7 +1329,7 @@ int _SS_list_to_numtype_id(SS_psides *si, int vid, void *p, long n, object *o)
 	else if (ityp == SS_CONS_I)
 	   strncpy(p, SS_STRING_TEXT(SS_car(o)), n);
         else
-	   SS_error_n(si, "EXPECTED A STRING - _SS_LIST_TO_NUMTYPE", o);
+	   SS_error(si, "EXPECTED A STRING - _SS_LIST_TO_NUMTYPE", o);
 
         return(rv);};
 
@@ -1342,7 +1342,7 @@ int _SS_list_to_numtype_id(SS_psides *si, int vid, void *p, long n, object *o)
        {msg = SC_dsnprintf(FALSE,
 			   "MORE DATA THAN EXPECTED %ld > %ld - _SS_LIST_TO_NUMTYPE",
 			   no, n);
-        SS_error_n(si, msg, o);};
+        SS_error(si, msg, o);};
 
     if (SC_is_type_num(vid) == TRUE)
        {int oid;

@@ -52,7 +52,7 @@ static void _SS_fpe_handler(int sig)
     SC_signal(SIGFPE, _SS_fpe_handler);
 #endif
 
-    SS_error_n(si, "FLOATING POINT EXCEPTION - _SS_FPE_HANDLER",
+    SS_error(si, "FLOATING POINT EXCEPTION - _SS_FPE_HANDLER",
 	     SS_mk_cons(si, si->fun, si->argl));
 
     return;}
@@ -657,7 +657,7 @@ static object *_SSI_synonym(SS_psides *si, object *argl)
 
     func = SS_exp_eval(si, SS_car(argl));
     if (!SS_procedurep(func))
-       SS_error_n(si, "FIRST ARG MUST BE FUNCTION - _SSI_SYNONYM", func);
+       SS_error(si, "FIRST ARG MUST BE FUNCTION - _SSI_SYNONYM", func);
 
     for (argl = SS_cdr(argl); SS_consp(argl); argl = SS_cdr(argl))
         {synname = SS_get_string(SS_car(argl));
@@ -762,7 +762,7 @@ static void _SS_restore_state_prim(SS_psides *si, int ns, int nc, int ne)
 
 /* restore the stack */
     if (n < ns)
-       SS_error_n(si,
+       SS_error(si,
 		  "CORRUPT STACK FRAME - _SS_RESTORE_STATE_PRIM",
 		  SS_null);
 
@@ -775,7 +775,7 @@ static void _SS_restore_state_prim(SS_psides *si, int ns, int nc, int ne)
 
 /* restore the continuation stack */
     if (si->cont_ptr < nc)
-       SS_error_n(si,
+       SS_error(si,
 		  "CORRUPT CONTINUATION FRAME - _SS_RESTORE_STATE_PRIM",
 		  SS_null);
 
@@ -785,7 +785,7 @@ static void _SS_restore_state_prim(SS_psides *si, int ns, int nc, int ne)
 
 /* restore the error stack */
     if (si->errlev < ne)
-       SS_error_n(si,
+       SS_error(si,
 		  "CORRUPT ERROR FRAME - _SS_RESTORE_STATE_PRIM",
 		  SS_null);
 
@@ -868,14 +868,14 @@ static object *_SSI_retlev(SS_psides *si, object *argl)
     x    = SS_car(argl);
     argl = SS_cdr(argl);
     if (!SS_integerp(x))
-       SS_error_n(si, "FIRST ARG MUST BE AN INTEGER - _SSI_RETLEV", x);
+       SS_error(si, "FIRST ARG MUST BE AN INTEGER - _SSI_RETLEV", x);
 
     n = (int) SS_INTEGER_VALUE(x);
     n = si->errlev - n;
     n = max(1, n);
 
     if (!SS_consp(argl))
-       SS_error_n(si, "SECOND ARG MISSING - _SSI_RETLEV", x);
+       SS_error(si, "SECOND ARG MISSING - _SSI_RETLEV", x);
     val = SS_car(argl);    
 
     if (si->errlev > 1)
@@ -1008,7 +1008,7 @@ int SS_err_catch(SS_psides *si, int (*fint)(SS_psides *si), PFInt errf)
  *            - create a higher level REPL and push on
  */
 
-void SS_error_n(SS_psides *si, char *s, object *obj)
+void SS_error(SS_psides *si, char *s, object *obj)
    {int nc;
     char *t;
     FILE *str;
@@ -1041,21 +1041,6 @@ void SS_error_n(SS_psides *si, char *s, object *obj)
 
     else
        LONGJMP(SC_gs.cpu, ABORT);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SS_ERROR - signal an error
- *          - create a higher level REPL and push on
- */
-
-void SS_error(char *s, object *obj)
-   {SS_psides *si;
-
-    si = &_SS_si;
-    SS_error_n(si, s, obj);
 
     return;}
 

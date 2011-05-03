@@ -62,13 +62,13 @@ static object *_SXI_def_file_graph(SS_psides *si, object *obj)
 
     else
        {if (strcmp(po->type, PDBFILE_S) != 0)
-	   SS_error_n(si, "REQUIRE PDB FILE - _SXI_DEF_FILE_GRAPH", obj);
+	   SS_error(si, "REQUIRE PDB FILE - _SXI_DEF_FILE_GRAPH", obj);
 
 	file = FILE_FILE(PDBfile, po);};
 
     if (!PD_inquire_type(file, "PM_mapping"))
        if (!PD_def_mapping(file))
-	  SS_error_n(si, "CAN`T DEFINE MAPPINGS - _SXI_DEF_FILE_GRAPH", obj);
+	  SS_error(si, "CAN`T DEFINE MAPPINGS - _SXI_DEF_FILE_GRAPH", obj);
 
     return(SS_t);}
 
@@ -99,11 +99,11 @@ static object *_SXI_graph_pdbdata(SS_psides *si, object *argl)
             0);
 
     if (strcmp(po->type, PDBFILE_S) != 0)
-       SS_error_n(si, "REQUIRE PDB FILE - _SXI_GRAPH_PDBDATA", argl);
+       SS_error(si, "REQUIRE PDB FILE - _SXI_GRAPH_PDBDATA", argl);
     file = FILE_FILE(PDBfile, po);
 
     if (g == NULL)
-       SS_error_n(si, "BAD GRAPH - _SXI_GRAPH_PDBDATA", argl);
+       SS_error(si, "BAD GRAPH - _SXI_GRAPH_PDBDATA", argl);
 
     else
 
@@ -142,7 +142,7 @@ static object *_SX_pdbdata_graph(SS_psides *si, PDBfile *file,
         f = *(PM_mapping **) data.memaddr;}
     else
        {if (!PD_read(file, name, &f))
-           SS_error_n(si, PD_err, SS_null);};
+           SS_error(si, PD_err, SS_null);};
 
 /* reconnect any function pointers or undefined structs/members */
     domain = f->domain;
@@ -159,7 +159,7 @@ static object *_SX_pdbdata_graph(SS_psides *si, PDBfile *file,
             PD_process_set_name(dname);};
 
         if (!PD_read(file, dname, &data.memaddr))
-           SS_error_n(si, PD_err, SS_null);
+           SS_error(si, PD_err, SS_null);
 
         domain = f->domain = (PM_set *) data.memaddr;};
 
@@ -208,7 +208,7 @@ static object *_SX_pdbdata_graph(SS_psides *si, PDBfile *file,
  *         the data
  *         doing algebra would be a problem later on however
          if (ret == FALSE)
-            SS_error_n(si, "NO FIELD FOR TYPE - _SXI_PDBDATA_GRAPH", SS_null);
+            SS_error(si, "NO FIELD FOR TYPE - _SXI_PDBDATA_GRAPH", SS_null);
  */
        };
 
@@ -239,7 +239,7 @@ static object *_SX_pdbcurve_graph(SS_psides *si, PDBfile *file,
 /* read the curve */
     if (!PD_read_pdb_curve(file, name, &x, &y, &n, label,
                            &xmn, &xmx, &ymn, &ymx, X_AND_Y))
-       SS_error_n(si, PD_err, SS_null);
+       SS_error(si, PD_err, SS_null);
 
     domain = PM_make_set("X values", SC_DOUBLE_S, FALSE, 1, n, 1, x);
     range  = PM_make_set("Y values", SC_DOUBLE_S, FALSE, 1, n, 1, y);
@@ -303,7 +303,7 @@ static object *_SXI_pdbdata_graph(SS_psides *si, object *argl)
             0);
 
     if (strcmp(po->type, PDBFILE_S) != 0)
-       SS_error_n(si, "REQUIRE PDB FILE - _SXI_PDBDATA_GRAPH", argl);
+       SS_error(si, "REQUIRE PDB FILE - _SXI_PDBDATA_GRAPH", argl);
 
     file = FILE_FILE(PDBfile, po);
 
@@ -333,7 +333,7 @@ static object *_SXI_pdbdata_graph(SS_psides *si, object *argl)
        /* GOTCHA: images are not currently handled */;
 
     else
-       SS_error_n(si, "VARIABLE NOT MAPPING - _SXI_PDBDATA_GRAPH",
+       SS_error(si, "VARIABLE NOT MAPPING - _SXI_PDBDATA_GRAPH",
                 SS_mk_string(si, name));
 
     return(SS_null);}
@@ -537,7 +537,7 @@ static object *_SXI_pdbdata_image(SS_psides *si, object *argl)
     object *o;
 
     if (!SS_consp(argl))
-       SS_error_n(si, "BAD ARGUMENT LIST - _SXI_PDBDATA_IMAGE", argl);
+       SS_error(si, "BAD ARGUMENT LIST - _SXI_PDBDATA_IMAGE", argl);
 
 /* if the first object is a pdbfile, use it, otherwise, use default file */
     argl = SX_get_file(argl, &po);
@@ -560,10 +560,10 @@ static object *_SXI_pdbdata_image(SS_psides *si, object *argl)
 /* check to see whether or not the variable is in the file */
        {ep = PD_inquire_entry(file, name, TRUE, NULL);
 	if (ep == NULL)
-	   SS_error_n(si, "VARIABLE NOT FOUND - _SXI_PDBDATA_IMAGE", obj);
+	   SS_error(si, "VARIABLE NOT FOUND - _SXI_PDBDATA_IMAGE", obj);
 
 	else if (strcmp(PD_entry_type(ep), "PG_image *") != 0)
-	   SS_error_n(si, "VARIABLE NOT IMAGE - _SXI_PDBDATA_IMAGE", obj);
+	   SS_error(si, "VARIABLE NOT IMAGE - _SXI_PDBDATA_IMAGE", obj);
 
 /* read the mapping */
 	if (file == SX_vif)
@@ -571,7 +571,7 @@ static object *_SXI_pdbdata_image(SS_psides *si, object *argl)
 	    im = *(PG_image **) data.memaddr;}
 	else
 	   {if (!PD_read(file, name, &im))
-	       SS_error_n(si, PD_err, obj);};
+	       SS_error(si, PD_err, obj);};
 
 	o = SX_mk_image(si, im);};
 
@@ -654,10 +654,10 @@ static object *_SXI_graph_pdbcurve(SS_psides *si, object *argl)
     else if (strcmp(po->type, PDBFILE_S) == 0)
        file = FILE_FILE(PDBfile, po);
     else
-       SS_error_n(si, "BAD FILE - _SXI_GRAPH_PDBCURVE", argl);
+       SS_error(si, "BAD FILE - _SXI_GRAPH_PDBCURVE", argl);
 
     if (f == NULL)
-       SS_error_n(si, "BAD ARGUMENT - _SXI_GRAPH_PDBCURVE", argl);
+       SS_error(si, "BAD ARGUMENT - _SXI_GRAPH_PDBCURVE", argl);
 
     else
        {_SX_get_menu(si, po);
@@ -705,10 +705,10 @@ static object *_SXI_image_pdbdata(SS_psides *si, object *argl)
     else if (strcmp(file->type, PDBFILE_S) == 0)
        strm = (PDBfile *) file->file;
     else
-       SS_error_n(si, "BAD FILE - _SXI_IMAGE_PDBDATA", argl);
+       SS_error(si, "BAD FILE - _SXI_IMAGE_PDBDATA", argl);
 
     if (f == NULL)
-       SS_error_n(si, "BAD ARGUMENT - _SXI_IMAGE_PDBDATA", argl);
+       SS_error(si, "BAD ARGUMENT - _SXI_IMAGE_PDBDATA", argl);
 
     _SX_get_menu(si, file);
     for (i = 0; TRUE; i++)
@@ -805,7 +805,7 @@ static object *_SXI_make_device(SS_psides *si, object *argl)
 		     break;};};};
 
         if (title == NULL)
-           SS_error_n(si, "NO TITLE SPECIFIED - _SXI_MAKE_DEVICE", SS_null);};
+           SS_error(si, "NO TITLE SPECIFIED - _SXI_MAKE_DEVICE", SS_null);};
  
     dev = PG_make_device(name, type, title);
 
@@ -837,7 +837,7 @@ static object *_SXI_device_props(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error_n(si, "BAD DEVICE - _SXI_DEVICE_PROPS", SS_null);
+       SS_error(si, "BAD DEVICE - _SXI_DEVICE_PROPS", SS_null);
 
     else
        rv = SS_make_list(si, SC_STRING_I, dev->name,
@@ -1060,7 +1060,7 @@ static object *_SXI_open_device(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error_n(si, "BAD DEVICE - _SXI_OPEN_DEVICE", SS_null);
+       SS_error(si, "BAD DEVICE - _SXI_OPEN_DEVICE", SS_null);
 
     else
 
@@ -1260,7 +1260,7 @@ static void _SX_set_limits(SS_psides *si, char *t, PM_set *s, object *argl)
 				0);
 
 		 if (nset < 2)
-		    SS_error_n(si,
+		    SS_error(si,
 			       "INSUFFICIENT LIMITS SPECS - _SX_SET_LIMITS",
 			       argl);
 
@@ -1375,7 +1375,7 @@ static object *_SXI_draw_domain(SS_psides *si, object *argl)
        _SX_set_limits(si, "LIMITS", data, extr);
 
     if (data == NULL)
-       SS_error_n(si, "BAD DOMAIN - _SXI_DRAW_DOMAIN", obj);
+       SS_error(si, "BAD DOMAIN - _SXI_DRAW_DOMAIN", obj);
 
     else
        {data->info = PG_set_plot_type((pcons *) data->info, pty, CARTESIAN_2D);
@@ -1478,7 +1478,7 @@ static object *_SXI_draw_plot(SS_psides *si, object *argl)
             break;};
 
     if (data == NULL)
-       SS_error_n(si, "BAD GRAPH - _SXI_DRAW_PLOT", obj);
+       SS_error(si, "BAD GRAPH - _SXI_DRAW_PLOT", obj);
 
     if (_SX_grotrian_graphp(data))
        {PG_grotrian_plot(dev, data);
@@ -1712,7 +1712,7 @@ static object *_SXI_make_image(SS_psides *si, object *argl)
        name = "Image";
 
     if (arr == NULL)
-       SS_error_n(si, "BAD DATA - _SXI_MAKE_IMAGE", argl);
+       SS_error(si, "BAD DATA - _SXI_MAKE_IMAGE", argl);
 
     else
        {im = PG_make_image_n(name, arr->type, arr->data,
@@ -1770,10 +1770,10 @@ static object *_SXI_build_image(SS_psides *si, object *argl)
        name = "Image";
 
     if (dev == NULL)
-       SS_error_n(si, "BAD DEVICE - _SXI_BUILD_IMAGE", argl);
+       SS_error(si, "BAD DEVICE - _SXI_BUILD_IMAGE", argl);
 
     if (arr == NULL)
-       SS_error_n(si, "BAD DATA - _SXI_BUILD_IMAGE", argl);
+       SS_error(si, "BAD DATA - _SXI_BUILD_IMAGE", argl);
 
     else
        {im = PG_build_image(dev, name, arr->type, arr->data,
@@ -1900,7 +1900,7 @@ pcons *SX_set_attr_alist(SS_psides *si, pcons *inf,
 		0);}
 
     else
-       SS_error_n(si, "CAN'T HANDLE TYPE - SX_SET_ATTR_ALIST", val);
+       SS_error(si, "CAN'T HANDLE TYPE - SX_SET_ATTR_ALIST", val);
 
     inf = SC_change_alist(inf, name, type, v);
 
@@ -1932,7 +1932,7 @@ static object *_SXI_set_attr_graph(SS_psides *si, object *argl)
             0);
 
     if ((g == NULL) || (name == NULL) || (type == NULL))
-       SS_error_n(si, "INSUFFICIENT ARGUMENTS - _SXI_SET_ATTR_GRAPH", argl);
+       SS_error(si, "INSUFFICIENT ARGUMENTS - _SXI_SET_ATTR_GRAPH", argl);
 
     else
 
@@ -2110,7 +2110,7 @@ static object *_SXI_set_dom_limits(SS_psides *si, object *argl)
     else if (SX_GRAPHP(obj))
        s = SS_GET(PG_graph, obj)->f->domain;
     else
-       SS_error_n(si, "NO SET IMPLIED - _SXI_SET_DOM_LIMITS", obj);
+       SS_error(si, "NO SET IMPLIED - _SXI_SET_DOM_LIMITS", obj);
 
     _SX_set_limits(si, "LIMITS", s, SS_cadr(argl));
 
@@ -2142,7 +2142,7 @@ static object *_SXI_set_ran_limits(SS_psides *si, object *argl)
     else if (SX_GRAPHP(obj))
        s = SS_GET(PG_graph, obj)->f->range;
     else
-       SS_error_n(si, "NO SET IMPLIED - _SXI_SET_RAN_LIMITS", obj);
+       SS_error(si, "NO SET IMPLIED - _SXI_SET_RAN_LIMITS", obj);
 
     _SX_set_limits(si, "LIMITS", s, SS_cadr(argl));
 
@@ -2178,7 +2178,7 @@ static object *_SXI_dom_extrema(SS_psides *si, object *obj)
        rv = _SX_im_dom_extrema(si, SS_GET(PG_image, obj));
 
     else
-       SS_error_n(si, "NO SET IMPLIED - _SXI_DOM_EXTREMA", obj);
+       SS_error(si, "NO SET IMPLIED - _SXI_DOM_EXTREMA", obj);
 
     if (s != NULL)
        rv = _SX_get_extrema(si, s);
@@ -2214,7 +2214,7 @@ static object *_SXI_dom_limits(SS_psides *si, object *argl)
        s = NULL;
 
     else
-       SS_error_n(si, "NO SET IMPLIED - _SXI_DOM_LIMITS", obj);
+       SS_error(si, "NO SET IMPLIED - _SXI_DOM_LIMITS", obj);
 
     if (s != NULL)
        rv = _SX_get_limits(si, s);
@@ -2252,7 +2252,7 @@ static object *_SXI_ran_extrema(SS_psides *si, object *obj)
        rv = _SX_im_ran_extrema(si, SS_GET(PG_image, obj));
 
     else
-       SS_error_n(si, "NO SET IMPLIED - _SXI_RAN_EXTREMA", obj);
+       SS_error(si, "NO SET IMPLIED - _SXI_RAN_EXTREMA", obj);
 
     return(rv);}
 
@@ -2281,7 +2281,7 @@ static object *_SXI_ran_limits(SS_psides *si, object *argl)
     else if (SX_IMAGEP(obj))
        s = NULL;
     else
-       SS_error_n(si, "NO SET IMPLIED - _SXI_RAN_LIMITS", obj);
+       SS_error(si, "NO SET IMPLIED - _SXI_RAN_LIMITS", obj);
 
     if (s != NULL)
        rv = _SX_get_limits(si, s);
@@ -2307,7 +2307,7 @@ static object *_SXI_set_label(SS_psides *si, object *argl)
             0);
 
     if ((obj == NULL) || (label == NULL))
-       SS_error_n(si, "INSUFFICIENT ARGUMENTS - _SXI_SET_LABEL", argl);
+       SS_error(si, "INSUFFICIENT ARGUMENTS - _SXI_SET_LABEL", argl);
 
     if (SX_SETP(obj))
        {PM_set *s;
@@ -2338,7 +2338,7 @@ static object *_SXI_set_label(SS_psides *si, object *argl)
 	s->label = label;}
 
     else
-       SS_error_n(si, "BAD DRAWABLE - _SXI_SET_LABEL", obj);
+       SS_error(si, "BAD DRAWABLE - _SXI_SET_LABEL", obj);
 
     obj = SS_car(argl);
 
@@ -2382,7 +2382,7 @@ static object *_SXI_get_label(SS_psides *si, object *obj)
 	label = s->label;}
 
     else
-       SS_error_n(si, "BAD DRAWABLE - _SXI_GET_LABEL", obj);
+       SS_error(si, "BAD DRAWABLE - _SXI_GET_LABEL", obj);
 
     rv = SS_mk_string(si, label);
 
@@ -2791,7 +2791,7 @@ static object *_SXI_drawable_info(SS_psides *si, object *argl)
        ret = _SX_image_info(si, obj, name, val);
 
     else
-       SS_error_n(si, "BAD DRAWABLE - _SXI_DRAWABLE_INFO", obj);
+       SS_error(si, "BAD DRAWABLE - _SXI_DRAWABLE_INFO", obj);
 
     CFREE(name);
 

@@ -40,7 +40,7 @@ static void _SX_ins_mem(SS_psides *si, defstr *dp,
 
          prev = lst;};
 
-    SS_error_n(si, "HASK_HOOK FAILED - _SX_INS_MEM", SS_null);
+    SS_error(si, "HASK_HOOK FAILED - _SX_INS_MEM", SS_null);
 
     return;}
 

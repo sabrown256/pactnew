@@ -97,7 +97,7 @@ static int _SX_termdata(SS_psides *si, int *aryptr,
 
 /* bail out if not enough memory */
     if ((x[0] == NULL) || (x[1] == NULL))
-       SS_error_n(si, "INSUFFICIENT MEMORY - SX_TERMDATA", SS_null);
+       SS_error(si, "INSUFFICIENT MEMORY - SX_TERMDATA", SS_null);
 
     if ((xbuff[_SX.dataptr-1] == -999) && (ybuff[_SX.dataptr-1] == -999))
        --_SX.dataptr;
@@ -181,7 +181,7 @@ static void _SX_wrt_pdb_curve(SS_psides *si, PDBfile *fp,
 
     if (!PD_wrt_pdb_curve(fp, crv->text, crv->n, crv->x[0], crv->x[1], icurve))
        {PRINT(stdout, "%s\n", PD_err);
-        SS_error_n(si, "CAN'T WRITE THE CURVE - _SX_WRT_PDB_CURVE",
+        SS_error(si, "CAN'T WRITE THE CURVE - _SX_WRT_PDB_CURVE",
 		   SS_null);};
 
     return;}
@@ -269,7 +269,7 @@ static FILE *_SX_open_for_reading(SS_psides *si, char *str, char *mode)
 
     fp = io_open(str, mode);
     if (fp == NULL)
-       SS_error_n(si, "CAN'T OPEN FILE - _SX_OPEN_FOR_READING",
+       SS_error(si, "CAN'T OPEN FILE - _SX_OPEN_FOR_READING",
 		SS_mk_string(si, str));
 
     return(fp);}
@@ -374,7 +374,7 @@ static void _SX_read_bin(SS_psides *si, FILE *fp, char *fname)
         SX_dataset[j].x[0] = CMAKE_N(double, n);
         SX_dataset[j].x[1] = CMAKE_N(double, n);
         if ((SX_dataset[j].x[0] == NULL) || (SX_dataset[j].x[1] == NULL))
-           SS_error_n(si, "INSUFFICIENT MEMORY - READ_BIN", SS_null);
+           SS_error(si, "INSUFFICIENT MEMORY - READ_BIN", SS_null);
 
 /* set up the file info for this curve */
         pbi = CMAKE(bin_info);
@@ -539,11 +539,11 @@ object *SX_read_ver1(SS_psides *si, object *obj)
     strcpy(fname, SS_get_string(obj));
     path = SC_search_file(NULL, fname);
     if (path == NULL)
-       SS_error_n(si, "CAN'T FIND FILE - SX_READ_VER1", obj);
+       SS_error(si, "CAN'T FIND FILE - SX_READ_VER1", obj);
 
     fp = _SX_open_for_reading(si, path, "r");
     if (fp == NULL)
-       {SS_error_n(si, "NON EXISTENT FILE - SX_READ_VER1", obj);}
+       {SS_error(si, "NON EXISTENT FILE - SX_READ_VER1", obj);}
 
     else
 
@@ -577,7 +577,7 @@ static void _SX_read_pdb(SS_psides *si, PDBfile *fp, char *fname)
     names = SC_hasharr_dump(fp->symtab, "*curve*", NULL, TRUE);
       
     if (names == NULL)
-       SS_error_n(si, "NO CURVES IN FILE OR INSUFFICIENT MEMORY - SX_READ_PDB",
+       SS_error(si, "NO CURVES IN FILE OR INSUFFICIENT MEMORY - SX_READ_PDB",
 		SS_null);
 
     else
@@ -629,7 +629,7 @@ object *SX_read_data(SS_psides *si, object *obj)
     strcpy(fname, SS_get_string(obj));
     path = SC_search_file(NULL, fname);
     if (path == NULL)
-       SS_error_n(si, "CAN'T FIND FILE - SX_READ_DATA", obj);
+       SS_error(si, "CAN'T FIND FILE - SX_READ_DATA", obj);
 
     j = _SX_next_number(si, FALSE);
 
@@ -668,7 +668,7 @@ object *SX_read_data(SS_psides *si, object *obj)
 		 rv = SS_t;}
 
 	     else
-	        {SS_error_n(si, "FILE NOT LEGAL ULTRA II FILE - SX_READ_DATA", obj);
+	        {SS_error(si, "FILE NOT LEGAL ULTRA II FILE - SX_READ_DATA", obj);
 
 		 rv = SS_f;};};};
 
@@ -689,7 +689,7 @@ object *SX_crv_file_info(SS_psides *si, object *obj)
     strcpy(fname, SS_get_string(obj));
     path = SC_search_file(NULL, fname);
     if (path == NULL)
-       SS_error_n(si, "CAN'T FIND FILE - SX_CRV_FILE_INFO", obj);
+       SS_error(si, "CAN'T FIND FILE - SX_CRV_FILE_INFO", obj);
 
     o = SS_f;
 
@@ -1257,7 +1257,7 @@ object *SX_write_data(SS_psides *si, object *argl)
         argl  = SS_cdr(argl);};
 
     if (strcmp(fname, "- no print name -") == 0)
-       SS_error_n(si, "BAD FILE NAME - SX_WRITE_DATA", fobj);
+       SS_error(si, "BAD FILE NAME - SX_WRITE_DATA", fobj);
 
 /* check to see whether the file is a first time encounter */
     type = (char *) SC_hasharr_def_lookup(_SX.files, fname);
@@ -1273,14 +1273,14 @@ object *SX_write_data(SS_psides *si, object *argl)
 
                 case FAIL:
 		default :
-		     SS_error_n(si, "FILE ALREADY EXISTS - SX_WRITE_DATA", fobj);
+		     SS_error(si, "FILE ALREADY EXISTS - SX_WRITE_DATA", fobj);
 		     break;};};
 
 	SC_hasharr_install(_SX.files, fname, mode, SC_STRING_S, TRUE, TRUE);}
 
     else
        {if (strcmp(type, mode) != 0)
-           SS_error_n(si,
+           SS_error(si,
 		      "FILE PREVIOUSLY OPENED WITH ANOTHER TYPE - SX_WRITE_DATA",
 		      fobj);};
 
@@ -1296,7 +1296,7 @@ object *SX_write_data(SS_psides *si, object *argl)
 /* check for request to write an ASCII file */
 	      fp = io_open(fname, "a");
 	      if (fp == NULL)
-                 SS_error_n(si,
+                 SS_error(si,
 			    "CAN'T CREATE ASCII FILE - SX_WRITE_DATA",
 			    fobj);
 
@@ -1311,7 +1311,7 @@ object *SX_write_data(SS_psides *si, object *argl)
 /* check for request to write an ULTRA binary file */
 	      fp = io_open(fname, BINARY_MODE_APLUS);
 	      if (fp == NULL)
-                 SS_error_n(si,
+                 SS_error(si,
 			    "CAN'T CREATE BINARY FILE - SX_WRITE_DATA",
 			    fobj);
 
@@ -1332,7 +1332,7 @@ object *SX_write_data(SS_psides *si, object *argl)
 /* check for request to write a pdb file */
 	      fp = PD_open(fname, "a");
 	      if (fp == NULL)
-		 SS_error_n(si, "CAN'T OPEN PDB FILE - SX_WRITE_DATA", fobj);
+		 SS_error(si, "CAN'T OPEN PDB FILE - SX_WRITE_DATA", fobj);
 
 	      _SX_wrt_pdb(si, fp, argl);
 	      PD_close(fp);};
@@ -1376,7 +1376,7 @@ static void _SX_cache_curve(SS_psides *si, curve *crv, SC_file_type type)
 	        {_SX.icc        = 0;
 		 _SX.cache_file = PD_create(_SX.cache_filename);
 		 if (_SX.cache_file == NULL)
-		    SS_error_n(si, "CAN'T CREATE curves.a - _SX_CACHE_CURVE",
+		    SS_error(si, "CAN'T CREATE curves.a - _SX_CACHE_CURVE",
 			       SS_null);
 		 else
 		    {PD_close(_SX.cache_file);
@@ -1388,7 +1388,7 @@ static void _SX_cache_curve(SS_psides *si, curve *crv, SC_file_type type)
 #endif
 		     _SX.cache_file = PD_open(_SX.cache_filename, "a");
 		     if (_SX.cache_file == NULL)
-		        SS_error_n(si,
+		        SS_error(si,
 				   "CAN'T OPEN curves.a - _SX_CACHE_CURVE",
 				   SS_null);
 		     else
@@ -1451,7 +1451,7 @@ void SX_uncache_curve(SS_psides *si, curve *crv)
 	     file = ppi->file;
 	     if (SX_read_pdb_curve(file, (void *) NULL,
 				   ppi->curve_name, crv, X_AND_Y) == FALSE)
-	        SS_error_n(si, "PDB READ FAILED - SX_UNCACHE-CURVE",
+	        SS_error(si, "PDB READ FAILED - SX_UNCACHE-CURVE",
 			   SS_null);
 	     break;};
 

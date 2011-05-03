@@ -126,7 +126,7 @@ static object *_SXI_set_attr_val(SS_psides *si, object *argl)
 
         data_type = pv->ep->type;
         if (strcmp(data_type, attr_type) != 0)
-           SS_error_n(si, "ATTRIBUTE TYPE NOT VALUE TYPE - _SXI_SET_ATTR_VAL",
+           SS_error(si, "ATTRIBUTE TYPE NOT VALUE TYPE - _SXI_SET_ATTR_VAL",
                     argl);
 
         data = pv->data;}
@@ -172,7 +172,7 @@ static object *_SXI_set_attr_val(SS_psides *si, object *argl)
          data = (void *) dv;}
 
     else
-       SS_error_n(si, "BAD ATTRIBUTE VALUE - _SXI_SET_ATTR_VAL", obj);
+       SS_error(si, "BAD ATTRIBUTE VALUE - _SXI_SET_ATTR_VAL", obj);
 
     SC_mark(data, 1);
     PD_set_attribute(file, vr, at, data);
@@ -267,7 +267,7 @@ static object *_SXI_lst_attr(SS_psides *si, object *argl)
     ne      = SC_hasharr_get_n(tab);
     entries = CMAKE_N(char *, ne);
     if (entries == NULL)
-       SS_error_n(si, "CAN'T ALLOCATE MEMORY - _SXI_LST_ATTR", SS_null);
+       SS_error(si, "CAN'T ALLOCATE MEMORY - _SXI_LST_ATTR", SS_null);
 
 /* fill in the list of pointers to names in the hash table */
     n = 0;
