@@ -627,7 +627,7 @@ static object *_SXI_ddpn(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_DDP2", SS_car(argl));
 
-    argl = SS_cddr(SS_cddr(argl));
+    argl = SS_cddr(si, SS_cddr(si, argl));
     if (nd == 2)
        _SX_args_arr_2(si, argl, &n, &x[0], &x[1]);
     else if (nd == 3)
@@ -743,7 +743,7 @@ static object *_SXI_draw_polyline(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_DRAW_POLYLINE", SS_car(argl));
 
-    argl = SS_cddr(SS_cddr(argl));
+    argl = SS_cddr(si, SS_cddr(si, argl));
     o    = SS_car(argl);
     if (SX_POLYGONP(o))
        {py = SS_GET(PM_polygon, o);
@@ -853,7 +853,7 @@ static object *_SXI_fply(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_FPLY", SS_car(argl));
 
-    argl = SS_cddr(argl);
+    argl = SS_cddr(si, argl);
     o    = SS_car(argl);
     if (SX_POLYGONP(o))
        {py = SS_GET(PM_polygon, o);
@@ -2405,7 +2405,7 @@ static object *_SXI_list_pal(SS_psides *si, object *argl)
             SC_STRING_I, &name,
             0);
 
-    colors       = SS_caddr(argl);
+    colors       = SS_caddr(si, argl);
     n_pal_colors = SS_length(colors)/3;
     n_dev_colors = dev->absolute_n_color;
 
@@ -2619,7 +2619,7 @@ static object *_SXI_set_vect_attr(SS_psides *si, object *argl)
             0);
 
     
-    for (lst = SS_cdr(argl); lst != SS_null; lst = SS_cddr(lst))
+    for (lst = SS_cdr(argl); lst != SS_null; lst = SS_cddr(si, lst))
         {SS_args(si, lst,
                  SC_INT_I, &attr,
                  SC_DOUBLE_I, &val,
@@ -2758,7 +2758,7 @@ static object *_SX_get_attrs_alist(SS_psides *si, pcons *alst, object *argl)
 		 SC_STRING_I, &name,
 		 SC_INT_I, &ptr,
 		 0);
-	 argl = SS_cddr(argl);
+	 argl = SS_cddr(si, argl);
 
 	 pc = SC_assoc_entry(alst, name);
 	 if (pc == NULL)
@@ -2923,7 +2923,7 @@ static pcons *_SX_set_attrs_alist(SS_psides *si, pcons *alst, object *argl)
 		 SC_INT_I, &typ,
 		 SC_INT_I, &ptr,
 		 0);
-	 argl = SS_cdddr(argl);
+	 argl = SS_cdddr(si, argl);
 
 /* GOTCHA: none of the PTR cases will work because the variables
  * are static - have to dynamically allocate them eventually

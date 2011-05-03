@@ -208,7 +208,7 @@ ev_args:
 /* SS_SET - set! macro in Scheme */
 
 ev_set:
-    SS_Assign(si->exn, SS_cadr(si->unev));
+    SS_Assign(si->exn, SS_cadr(si, si->unev));
     SS_Assign(si->unev, SS_car(si->unev));
 
     if (!SS_variablep(si->unev))
@@ -402,7 +402,7 @@ macro_ee:
 	case SS_EE_MACRO :
 	case SS_ESC_PROC :
 	case SS_PR_PROC  :
-	     SS_Assign(si->argl, SS_cadr(si->unev));
+	     SS_Assign(si->argl, SS_cadr(si, si->unev));
 	     SS_jump(apply_dis);
 
 	case SS_UE_MACRO :
@@ -417,7 +417,7 @@ macro_ee:
         case SS_AND      :
         case SS_OR       :
 	     SS_Assign(si->exn,
-		       SS_mk_cons(si, si->fun, SS_cadr(si->unev)));
+		       SS_mk_cons(si, si->fun, SS_cadr(si, si->unev)));
 	     SS_jump(eval_disp);
 
         default :
@@ -586,7 +586,7 @@ evc_dec:
     SS_Restore(si, si->env);
     SS_Restore(si, si->unev);
     if (SS_true(si->val))
-       {SS_Assign(si->unev, SS_cdar(si->unev));
+       {SS_Assign(si->unev, SS_cdar(si, si->unev));
         SS_jump(ev_begin);}
     else
        {SS_Assign(si->unev, SS_cdr(si->unev));

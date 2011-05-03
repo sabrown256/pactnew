@@ -197,7 +197,7 @@ object *SS_binary_fix(SS_psides *si, C_procedure *cp, object *argl)
 
     fnc = (PFInt64II) cp->proc[0];
     x1  = SS_car(argl);
-    x2  = SS_cadr(argl);
+    x2  = SS_cadr(si, argl);
 
     if (!SS_integerp(x1) || !SS_integerp(x2))
        SS_error(si, "ARGUMENTS NOT BOTH INTEGERS - SS_BINARY_FIX",

@@ -49,7 +49,7 @@ static object *_SSI_cons(SS_psides *si, object *argl)
    {object *x1, *x2, *o;
 
     x1 = SS_car(argl);
-    x2 = SS_cadr(argl);
+    x2 = SS_cadr(si, argl);
     o  = SS_mk_cons(si, x1, x2);
 
     return(o);}
@@ -96,7 +96,7 @@ object *SS_setcdr(object *pair, object *cdr)
 static object *_SSI_setcar(SS_psides *si, object *argl)
    {object *o;
 
-    o = SS_setcar(SS_car(argl), SS_cadr(argl));
+    o = SS_setcar(SS_car(argl), SS_cadr(si, argl));
 
     return(o);}
 
@@ -108,7 +108,7 @@ static object *_SSI_setcar(SS_psides *si, object *argl)
 static object *_SSI_setcdr(SS_psides *si, object *argl)
    {object *o;
 
-    o = SS_setcdr(SS_car(argl), SS_cadr(argl));
+    o = SS_setcdr(SS_car(argl), SS_cadr(si, argl));
 
     return(o);}
 
@@ -149,7 +149,7 @@ object *SS_cdr(object *obj)
 
 /* SS_CAAR - return a pointer to the caar of the object given */
 
-object *SS_caar(object *obj)
+object *SS_caar(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_car(SS_car(obj));
@@ -161,7 +161,7 @@ object *SS_caar(object *obj)
 
 /* SS_CADR - return a pointer to the cadr of the object given */
 
-object *SS_cadr(object *obj)
+object *SS_cadr(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_car(SS_cdr(obj));
@@ -173,7 +173,7 @@ object *SS_cadr(object *obj)
 
 /* SS_CDAR - return a pointer to the cdar of the object given */
 
-object *SS_cdar(object *obj)
+object *SS_cdar(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_cdr(SS_car(obj));
@@ -185,7 +185,7 @@ object *SS_cdar(object *obj)
 
 /* SS_CDDR - return a pointer to the cddr of the object given */
 
-object *SS_cddr(object *obj)
+object *SS_cddr(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_cdr(SS_cdr(obj));
@@ -197,7 +197,7 @@ object *SS_cddr(object *obj)
 
 /* SS_CAAAR - return a pointer to the caaar of the object given */
 
-object *SS_caaar(object *obj)
+object *SS_caaar(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_car(SS_car(SS_car(obj)));
@@ -209,7 +209,7 @@ object *SS_caaar(object *obj)
 
 /* SS_CAADR - return a pointer to the caadr of the object given */
 
-object *SS_caadr(object *obj)
+object *SS_caadr(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_car(SS_car(SS_cdr(obj)));
@@ -221,7 +221,7 @@ object *SS_caadr(object *obj)
 
 /* SS_CADAR - return a pointer to the cadar of the object given */
 
-object *SS_cadar(object *obj)
+object *SS_cadar(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_car(SS_cdr(SS_car(obj)));
@@ -233,7 +233,7 @@ object *SS_cadar(object *obj)
 
 /* SS_CDAAR - return a pointer to the cdaar of the object given */
 
-object *SS_cdaar(object *obj)
+object *SS_cdaar(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_cdr(SS_car(SS_car(obj)));
@@ -245,7 +245,7 @@ object *SS_cdaar(object *obj)
 
 /* SS_CADDR - return a pointer to the caddr of the object given */
 
-object *SS_caddr(object *obj)
+object *SS_caddr(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_car(SS_cdr(SS_cdr(obj)));
@@ -257,7 +257,7 @@ object *SS_caddr(object *obj)
 
 /* SS_CDADR - return a pointer to the cdadr of the object given */
 
-object *SS_cdadr(object *obj)
+object *SS_cdadr(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_cdr(SS_car(SS_cdr(obj)));
@@ -269,7 +269,7 @@ object *SS_cdadr(object *obj)
 
 /* SS_CDDAR - return a pointer to the cddar of the object given */
 
-object *SS_cddar(object *obj)
+object *SS_cddar(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_cdr(SS_cdr(SS_car(obj)));
@@ -281,7 +281,7 @@ object *SS_cddar(object *obj)
 
 /* SS_CDDDR - return a pointer to the cdddr of the object given */
 
-object *SS_cdddr(object *obj)
+object *SS_cdddr(SS_psides *si, object *obj)
    {object *o;
 
     o = SS_cdr(SS_cdr(SS_cdr(obj)));
@@ -823,7 +823,7 @@ static int _SS_eq(object *o1, object *o2)
 static object *_SSI_eq(SS_psides *si, object *obj)
    {object *o;
 
-    o = _SS_eq(SS_car(obj), SS_cadr(obj)) ? SS_t : SS_f;
+    o = _SS_eq(SS_car(obj), SS_cadr(si, obj)) ? SS_t : SS_f;
 
     return(o);}
 
@@ -835,7 +835,7 @@ static object *_SSI_eq(SS_psides *si, object *obj)
 static object *_SSI_eqv(SS_psides *si, object *obj)
    {object *o;
 
-    o = _SS_eqv(SS_car(obj), SS_cadr(obj)) ? SS_t : SS_f;
+    o = _SS_eqv(SS_car(obj), SS_cadr(si, obj)) ? SS_t : SS_f;
 
     return(o);}
 
@@ -847,7 +847,7 @@ static object *_SSI_eqv(SS_psides *si, object *obj)
 static object *_SSI_equal(SS_psides *si, object *obj)
    {object *o;
 
-    o = _SS_equal(SS_car(obj), SS_cadr(obj)) ? SS_t : SS_f;
+    o = _SS_equal(SS_car(obj), SS_cadr(si, obj)) ? SS_t : SS_f;
 
     return(o);}
 
@@ -881,7 +881,7 @@ static object *_SSI_memq(SS_psides *si, object *argl)
    {object *obj, *lst, *o;
 
     obj = SS_car(argl);
-    lst = SS_cadr(argl);
+    lst = SS_cadr(si, argl);
 
     o = _SS_memp(_SS_eq, obj, lst);
 
@@ -896,7 +896,7 @@ static object *_SSI_memv(SS_psides *si, object *argl)
    {object *obj, *lst, *o;
 
     obj = SS_car(argl);
-    lst = SS_cadr(argl);
+    lst = SS_cadr(si, argl);
 
     o = _SS_memp(_SS_eqv, obj, lst);
 
@@ -911,7 +911,7 @@ static object *_SSI_member(SS_psides *si, object *argl)
    {object *obj, *lst, *o;
 
     obj = SS_car(argl);
-    lst = SS_cadr(argl);
+    lst = SS_cadr(si, argl);
 
     o = _SS_memp(_SS_equal, obj, lst);
 
@@ -942,7 +942,7 @@ static object *_SSI_assq(SS_psides *si, object *argl)
    {object *obj, *lst, *o;
 
     obj = SS_car(argl);
-    lst = SS_cadr(argl);
+    lst = SS_cadr(si, argl);
 
     o = _SS_assp(_SS_eq, obj, lst);
 
@@ -957,7 +957,7 @@ static object *_SSI_assv(SS_psides *si, object *argl)
    {object *obj, *lst, *o;
 
     obj = SS_car(argl);
-    lst = SS_cadr(argl);
+    lst = SS_cadr(si, argl);
 
     o = _SS_assp(_SS_eqv, obj, lst);
 
@@ -972,7 +972,7 @@ static object *_SSI_assoc(SS_psides *si, object *argl)
    {object *obj, *lst, *o;
 
     obj = SS_car(argl);
-    lst = SS_cadr(argl);
+    lst = SS_cadr(si, argl);
 
     o = _SS_assp(_SS_equal, obj, lst);
 

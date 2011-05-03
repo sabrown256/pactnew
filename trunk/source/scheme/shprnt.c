@@ -952,7 +952,7 @@ int SS_prim_apr(SS_psides *si, FILE *str, char *s)
 	 v = SS_car(l);
 	 SC_ASSERT(v != NULL);
 
-	 tab = SS_GET(hasharr, SS_cadr(l));
+	 tab = SS_GET(hasharr, SS_cadr(si, l));
 	 flag |= _SS_prim_apr(si, str, s, tab);};
 
     return(flag);}

@@ -130,7 +130,7 @@ object *_SS_make_cmpnd_stmnt(SS_psides *si, object *dcl, object *sl)
     else
        {dcls = SS_null;
 	for (lst = dcl; !SS_nullobjp(lst); lst = SS_cdr(lst))
-	    {d    = SS_cdar(lst);
+	    {d    = SS_cdar(si, lst);
 	     dcls = SS_append(si, dcls, d);};
 
         dcls = SS_reverse(si, dcls);};

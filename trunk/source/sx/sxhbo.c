@@ -714,7 +714,7 @@ static PM_set *_SX_build_restricted_domain(SS_psides *si, PM_set *hd,
 		 SC_DOUBLE_I, &mn,
 		 SC_DOUBLE_I, &mx,
 		 0);
-         argl = SS_cddr(argl);
+         argl = SS_cddr(si, argl);
 
 	 dn = extr[2*i];
 	 dx = extr[2*i+1];

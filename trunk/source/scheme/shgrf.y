@@ -172,7 +172,7 @@ declaration :
           {object *op, *type;
 
            op   = SS_CAR_MACRO($1);
-           type = SS_cadr($1);
+           type = SS_cadr(SI, $1);
            if (op == _SS_f_typedef)
               {SS_GR_VAL(SS_make_form(SI, _SS_f_typedef,
 				      SS_CAR_MACRO($2), type, LAST));}

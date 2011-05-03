@@ -1976,7 +1976,7 @@ static object *_SXI_make_defstr(SS_psides *si, object *argl)
     else
        file = FILE_FILE(PDBfile, po);
 
-    argl = SS_cddr(argl);
+    argl = SS_cddr(si, argl);
     lst  = NULL;
     for (; !SS_nullobjp(argl); argl = SS_cdr(argl))
         {member_obj = SS_car(argl);
@@ -1992,7 +1992,7 @@ static object *_SXI_make_defstr(SS_psides *si, object *argl)
                  0);
 
 	 snprintf(member, MAXLINE, "%s %s", type, mname);
-	 dim_obj = SS_cddr(member_obj);
+	 dim_obj = SS_cddr(si, member_obj);
 	 if (!SS_nullobjp(dim_obj))
 	    {dims = _SX_make_dims_dimdes(si, file, dim_obj);
 	     memtemp = member + strlen(member);
@@ -2215,7 +2215,7 @@ static object *_SXI_rd_syment(SS_psides *si, object *argl)
 	if (SS_true(err))
 	   return(SS_null);
 	else
-	   SS_error(si, PD_err, SS_cadr(argl));}
+	   SS_error(si, PD_err, SS_cadr(si, argl));}
 
     else if (SC_LAST_CHAR(name) == ']')
        {dp = PD_entry_dimensions(ep);
@@ -2263,7 +2263,7 @@ static SC_array *_SX_make_blocks(SS_psides *si, object *alst, long numb)
 
              tot += ni;
 
-             alst = SS_cddr(alst);};
+             alst = SS_cddr(si, alst);};
 
         if (tot != numb)
            SS_error(si,
@@ -2325,7 +2325,7 @@ static object *_SXI_wr_syment(SS_psides *si, object *argl)
        file = FILE_FILE(PDBfile, po);
 
 /* get optional dimensions */
-    argl = SS_cddr(SS_cddr(argl));
+    argl = SS_cddr(si, SS_cddr(si, argl));
 
     dims = _SX_make_dims_dimdes(si, file, argl);
     n    = _PD_comp_num(dims);

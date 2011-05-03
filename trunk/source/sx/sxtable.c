@@ -514,7 +514,7 @@ static PM_set *_SX_table_set(SS_psides *si, object *specs)
 		     0);
 	     maxes[i] = dv;};
 
-	comps = SS_cddr(specs);
+	comps = SS_cddr(si, specs);
 	nde   = SS_length(comps);
 	elem  = CMAKE_N(double *, nde);
 	ne    = 0;

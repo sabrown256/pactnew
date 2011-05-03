@@ -58,7 +58,7 @@ static object *_SSI_quote(SS_psides *si, object *obj)
 static object *_SS_unquote(SS_psides *si, object *x)
    {
 
-    x = SS_exp_eval(si, SS_cadr(x));
+    x = SS_exp_eval(si, SS_cadr(si, x));
 
     return(x);}
 
@@ -265,7 +265,7 @@ static object *SS_let(SS_psides *si, object *let)
              vl = SS_null;}
          else
             {vr = SS_car(vlpair);
-             vl = SS_cadr(vlpair);};
+             vl = SS_cadr(si, vlpair);};
 
          prml = SS_mk_cons(si, vr, prml);
          argl = SS_mk_cons(si, vl, argl);};
@@ -315,7 +315,7 @@ static object *_SSI_letstr(SS_psides *si, object *lets)
              vl = SS_null;}
          else
             {vr = SS_car(vlpair);
-             vl = SS_cadr(vlpair);};
+             vl = SS_cadr(si, vlpair);};
 
          asgn = SS_make_form(si, SS_setproc, vr, vl, LAST);
          SS_end_cons_macro(asnl, this, asgn);
@@ -369,7 +369,7 @@ static object *_SSI_letstr(SS_psides *si, object *lets)
              vl = SS_null;}
          else
             {vr = SS_car(vlpair);
-             vl = SS_cadr(vlpair);};
+             vl = SS_cadr(si, vlpair);};
 
          asgn = SS_make_form(si, SS_setproc, vr, vl, LAST);
          SS_end_cons_macro(si->argl, si->this, asgn);
@@ -428,7 +428,7 @@ static object *_SSI_letstr(SS_psides *si, object *letr)
              vl = SS_null;}
          else
             {vr = SS_car(vlpair);
-             vl = SS_cadr(vlpair);};
+             vl = SS_cadr(si, vlpair);};
 
          SS_Assign(si->val,
 		   SS_make_form(si, SS_setproc, vr, vl, LAST));
@@ -512,7 +512,7 @@ static object *_SSI_map(SS_psides *si, object *obj)
     ret  = SS_null;
     for (exf = FALSE; !exf; )
         {SS_Assign(vl, _SS_lst_map(si, argl, &exf));
-         if (SS_consp(SS_caar(vl)))
+         if (SS_consp(SS_caar(si, vl)))
             {SS_Assign(args, SS_mk_cons(si, SS_quoteproc, SS_car(vl)));
              SS_Assign(expr, SS_mk_cons(si,
 					proc, SS_mk_cons(si,
@@ -553,7 +553,7 @@ static object *_SSI_foreach(SS_psides *si, object *obj)
     args = SS_null;
     for (exf = FALSE; !exf; )
         {SS_Assign(vl, _SS_lst_map(si, argl, &exf));
-         if (SS_consp(SS_caar(vl)))
+         if (SS_consp(SS_caar(si, vl)))
             {SS_Assign(args, SS_mk_cons(si, SS_quoteproc, SS_car(vl)));
              SS_Assign(expr, SS_mk_cons(si, proc,
 					SS_mk_cons(si, args, SS_null)));}
