@@ -49,7 +49,7 @@ static void _SS_fpe_handler(int sig)
     si = SC_get_context(_SS_fpe_handler);
 
 #ifdef SIGFPE
-    SC_signal(SIGFPE, _SS_fpe_handler);
+    SC_signal_n(SIGFPE, _SS_fpe_handler, si);
 #endif
 
     SS_error(si, "FLOATING POINT EXCEPTION - _SS_FPE_HANDLER",
@@ -68,7 +68,7 @@ static void _SS_sig_handler(int sig)
 
     si = SC_get_context(_SS_sig_handler);
 
-    SC_signal(sig, SIG_IGN);
+    SC_signal_n(sig, SIG_IGN, NULL);
 
     snprintf(msg, MAXLINE, "%s - _SS_SIG_HANDLER", SC_signal_name(sig));
 
@@ -399,19 +399,15 @@ void SS_scheme_path_err(char *path)
 
 SS_psides *SS_init_scheme(char *code, char *vers)
    {object *fr;
-    PFSignal_handler hnd;
+    SC_contextdes hnd;
     SS_psides *si;
 
     si = &_SS_si;
 
     hnd = SC_which_signal_handler(SIGINT);
     SC_setup_sig_handlers(_SS_sig_handler, si, TRUE);
-    PM_enable_fpe(TRUE, (PFSignal_handler) _SS_fpe_handler);
-    SC_signal_n(SIGINT, hnd, si);
-
-#ifdef SIGFPE
-    SC_signal(SIGFPE, _SS_fpe_handler);
-#endif
+    PM_enable_fpe_n(TRUE, (PFSignal_handler) _SS_fpe_handler, si);
+    SC_signal_n(SIGINT, hnd.f, si);
 
 #ifdef LARGE
     si->stack_size = 128;

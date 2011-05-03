@@ -216,7 +216,7 @@ static int poll_mode(descriptors *pd)
     pp = pd->processes;
     n  = pd->n_processes;
 
-    SC_signal(SIGINT, clean_up);
+    SC_signal_n(SIGINT, clean_up, NULL);
 
     while (process_count(pd) > 0)
        {for (i = 0; i < n; i++)
@@ -342,7 +342,7 @@ int main(int argc, char **argv, char **envp)
     d.quiet       = FALSE;
 
 /* set the alarm */
-    SC_timeout(to, clean_up);
+    SC_timeout(to, clean_up, NULL);
 
     if (interrupts)
        ret = interrupt_mode(&d);
@@ -350,7 +350,7 @@ int main(int argc, char **argv, char **envp)
        ret = poll_mode(&d);
 
 /* reset the alarm */
-    SC_timeout(0, clean_up);
+    SC_timeout(0, clean_up, NULL);
 
     PRINT(stdout, "\nProcess test %s ended\n\n", prog);
 

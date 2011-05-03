@@ -333,6 +333,7 @@ int SC_event_loop_poll(SC_evlpdes *pe, void *a, int to)
     SC_poll_desc *pd;
     PFFileCallback fn;
     PFSignal_handler sc;
+    SC_contextdes hnd;
     SC_evlpdes *old, **ev;
 
     ev = _SC_get_ev_loop(-1);
@@ -361,7 +362,7 @@ int SC_event_loop_poll(SC_evlpdes *pe, void *a, int to)
 /* use the SIGCHLD handler specified for the loop */
     sc = pe->sigchld;
     if (sc != NULL)
-       sc = SC_signal(SIGCHLD, sc);
+       hnd = SC_signal_n(SIGCHLD, sc, NULL);
 
 /* reassert raw mode */
     if (pe->raw == TRUE)
@@ -377,7 +378,7 @@ int SC_event_loop_poll(SC_evlpdes *pe, void *a, int to)
 
 /* restore the original SIGCHLD handler */
     if (sc != NULL)
-       SC_signal(SIGCHLD, sc);
+       SC_signal_n(SIGCHLD, hnd.f, hnd.a);
 
     if (nrdy > 0)
        {nacc = 0;
@@ -423,7 +424,7 @@ int SC_event_loop_poll(SC_evlpdes *pe, void *a, int to)
 
 int SC_event_loop(SC_evlpdes *pe, void *a, int to)
    {int nr, rv, err;
-    PFSignal_handler osi;
+    SC_contextdes osi;
     int (*exitf)(int *rv, void *a);
 
     if (pe == NULL)
@@ -452,7 +453,7 @@ int SC_event_loop(SC_evlpdes *pe, void *a, int to)
 	if (err < 0)
 	   rv = err;};
 
-    SC_signal_action_n(SC_SIGIO, osi, NULL, 0, -1);
+    SC_signal_action_n(SC_SIGIO, osi.f, osi.a, 0, -1);
 
     return(rv);}
 
@@ -507,7 +508,7 @@ static int SC_set_fd_async_streams(int fd, int state)
 
 #if defined(HAVE_ASYNC_STREAMS)
         int arg, na, status;
-	PFSignal_handler errf;
+	SC_contextdes hnd;
 
         arg = 0;
 
@@ -527,9 +528,9 @@ static int SC_set_fd_async_streams(int fd, int state)
 
 	if (state)
 	   {ONCE_SAFE(TRUE, NULL)
-	       errf = SC_signal_action_n(SC_SIGIO, _SC_event_loop_handler, NULL,
-					 0, BLOCK_WITH_SIGIO, -1);
-	       if (errf == SIG_ERR)
+	       hnd = SC_signal_action_n(SC_SIGIO, _SC_event_loop_handler, NULL,
+					0, BLOCK_WITH_SIGIO, -1);
+	       if (hnd.f == SIG_ERR)
 	          SC_error(-1, "CAN'T SET SIGIO HANDLER - SC_SET_FD_ASYNC_STREAMS");
 	    END_SAFE;};
 #endif
@@ -554,7 +555,7 @@ static int SC_set_fd_async_streams(int fd, int state)
 
 int SC_set_fd_async_fasync(int fd, int state, int pid)
    {int arg, status, rstrct, rv;
-    PFSignal_handler errf;
+    SC_contextdes hnd;
 
     rv = FALSE;
 
@@ -593,9 +594,9 @@ int SC_set_fd_async_fasync(int fd, int state, int pid)
 /* set the signal handler */
 	if (state)
 	   {ONCE_SAFE(TRUE, NULL)
-	       errf = SC_signal_action_n(SC_SIGIO, _SC_event_loop_handler, NULL,
-					 0, BLOCK_WITH_SIGIO, -1);
-	       if (errf == SIG_ERR)
+	       hnd = SC_signal_action_n(SC_SIGIO, _SC_event_loop_handler, NULL,
+					0, BLOCK_WITH_SIGIO, -1);
+	       if (hnd.f == SIG_ERR)
 	          SC_error(-1, "CAN'T SET SIGIO HANDLER - SC_SET_FD_ASYNC_FASYNC");
 	    END_SAFE;};
 

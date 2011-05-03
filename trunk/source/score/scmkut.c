@@ -537,7 +537,7 @@ int main(int c, char **v, char **env)
     SC_single_thread();
 
     SC_init("PACT: Exit with error", NULL,
-            TRUE, NULL,
+            TRUE, NULL, NULL,
             TRUE, NULL, 0);
 
     argv = v;

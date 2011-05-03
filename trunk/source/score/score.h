@@ -150,12 +150,13 @@
  *         -   void (*_ef)(int err);
  *         -   int _sh;
  *         -   void (*_sf)(int sig);
+ *         -   void *_sa;
  *         -   int _bh;
  *         -   char *_bf;
  *         -   int _bsz;
  */
 
-#define SC_init(_msg, _ef, _sh, _sf, _bh, _bf, _bsz)                         \
+#define SC_init(_msg, _ef, _sh, _sf, _sa, _bh, _bf, _bsz)                    \
    {void (*_lsf)(int sig);                                                   \
     static void (*_lef)(int err) = NULL;                                     \
     switch (SETJMP(SC_gs.cpu))                                               \
@@ -174,9 +175,9 @@
     if (_sh == TRUE)                                                         \
        {_lsf = _sf;                                                          \
         if (_lsf != NULL)                                                    \
-           SC_signal(SIGINT, _lsf);                                          \
+           SC_signal_n(SIGINT, _lsf, _sa);                                   \
         else                                                                 \
-           SC_signal(SIGINT, SC_interrupt_handler);};                        \
+           SC_signal_n(SIGINT, SC_interrupt_handler, NULL);};                \
     if (_bh == TRUE)                                                         \
        {if ((_bf == NULL) || (_bsz <= 0))                                    \
            {SC_setbuf(stdout, NULL);}                                        \
@@ -344,6 +345,7 @@ typedef struct s_SC_logfile SC_logfile;
 typedef struct s_SC_evlpdes SC_evlpdes;
 typedef struct s_SC_rusedes SC_rusedes;
 typedef struct s_SC_mem_fnc SC_mem_fnc;
+typedef struct s_SC_contextdes SC_contextdes;
 typedef struct s_SC_global_state SC_global_state;
 
 typedef void (*PFFileCallback)(int fd, int mask, void *a);
@@ -545,13 +547,17 @@ struct s_SC_evlpdes
 typedef void *(*PFMalloc)(size_t size);
 typedef void *(*PFRealloc)(void *ptr, size_t size);
 
+struct s_SC_contextdes
+   {PFSignal_handler f;         /* function member */
+    void *a;};                  /* context member */
+
 struct s_SC_sigstate
    {int mn;
     int mx;
     PFSignal_handler ignore;
     PFSignal_handler deflt;
     PFSignal_handler error;
-    PFSignal_handler hnd[SC_NSIG];};
+    SC_contextdes hnd[SC_NSIG];};
 
 struct s_SC_errdes
    {int active;
@@ -789,7 +795,7 @@ extern struct tm
 
 extern void
  SC_get_time(double *psec, double *pmusec),
- SC_timeout(int to, PFSignal_handler fnc),
+ SC_timeout(int to, PFSignal_handler fnc, void *a),
  SC_time_str(unsigned long t, char *d),
  SC_sec_str(double t, char *d);
 
@@ -1150,7 +1156,7 @@ extern void
 
 /* SCSIG.C declarations */
 
-extern PFSignal_handler
+extern SC_contextdes
  SC_signal_n(int sig, PFSignal_handler fnc, void *a),
  SC_signal_action_n(int sig, PFSignal_handler fnc, void *a,
 		    int flags, ...),
@@ -1169,7 +1175,7 @@ extern char
 
 extern void
  SC_restore_signal_handlers(SC_sigstate *ss, int rel),
- SC_set_signal_handlers(PFSignal_handler hnd, int mn, int mx),
+ SC_set_signal_handlers(PFSignal_handler f, void *a, int mn, int mx),
  SC_setup_sig_handlers(PFSignal_handler hand, void *a, int fl);
 
 

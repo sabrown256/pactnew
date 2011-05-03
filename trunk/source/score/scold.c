@@ -332,11 +332,11 @@ int SC_zero_on_alloc(void)
  */
 
 PFSignal_handler SC_signal(int sig, PFSignal_handler fnc)
-   {PFSignal_handler rv;
+   {SC_contextdes rv;
 
     rv = SC_signal_n(sig, fnc, NULL);
 
-    return(rv);}
+    return(rv.f);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

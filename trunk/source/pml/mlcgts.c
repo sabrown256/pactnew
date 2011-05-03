@@ -477,7 +477,7 @@ int main(int c, char **v)
 
     SC_zero_space_n(1, -2);
 
-    PM_enable_fpe(TRUE, NULL);
+    PM_enable_fpe_n(TRUE, NULL, NULL);
 
     dscg = TRUE;
     iccg = TRUE;

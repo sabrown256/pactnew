@@ -373,9 +373,11 @@ mode_t SC_get_perm(int exe)
 /* _SC_SEGV_HANDLER - helper for SC_POINTER_OK */
 
 static void _SC_segv_handler(int signo)
-   {
+   {JMP_BUF *cpu;
 
-    LONGJMP(_SC.ok_ptr, 1);}
+    cpu = SC_get_context(_SC_segv_handler);
+
+    LONGJMP(*cpu, 1);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -389,16 +391,17 @@ int SC_pointer_ok(void *p)
    {int ok;
     char *s;
     volatile char c;
-    PFSignal_handler osegv, obus, oill;
+    JMP_BUF cpu;
+    SC_contextdes osegv, obus, oill;
 
     if (p != NULL)
-       {osegv = SC_signal(SIGSEGV, _SC_segv_handler);
+       {osegv = SC_signal_n(SIGSEGV, _SC_segv_handler, &cpu);
 #ifdef SIGBUS
-        obus  = SC_signal(SIGBUS, _SC_segv_handler);
+        obus  = SC_signal_n(SIGBUS, _SC_segv_handler, &cpu);
 #endif
-        oill  = SC_signal(SIGILL, _SC_segv_handler);
+        oill  = SC_signal_n(SIGILL, _SC_segv_handler, &cpu);
 
-        if (SETJMP(_SC.ok_ptr) == 0)
+        if (SETJMP(cpu) == 0)
            {s = (char *) p;
             c = *s++;
 	    SC_ASSERT(c >= 0);
@@ -407,11 +410,11 @@ int SC_pointer_ok(void *p)
         else
             ok = FALSE;
 
-        SC_signal(SIGSEGV, osegv);
+        SC_signal_n(SIGSEGV, osegv.f, osegv.a);
 #ifdef SIGBUS
-        SC_signal(SIGBUS, obus);
+        SC_signal_n(SIGBUS, obus.f, obus.a);
 #endif
-        SC_signal(SIGILL, oill);}
+        SC_signal_n(SIGILL, oill.f, oill.a);}
     else
         ok = TRUE; 
 

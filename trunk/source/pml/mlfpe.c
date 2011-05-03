@@ -314,21 +314,33 @@ void PM_detect_fpu(unsigned int *pf, unsigned int *pm)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_ENABLE_FPE - enable software trapping of floating point exceptions */
+/* PM_ENABLE_FPE_N - enable software trapping of floating point exceptions */
 
-void PM_enable_fpe(int flg, PFSignal_handler hnd)
+void PM_enable_fpe_n(int flg, PFSignal_handler hnd, void *a)
    {
 
 /* assign the signal handler to SIGFPE */
     if ((flg == TRUE) && (hnd != NULL))
-       SC_signal(SIGFPE, hnd);
+       SC_signal_n(SIGFPE, hnd, a);
     else
-       SC_signal(SIGFPE, SIG_DFL);
+       SC_signal_n(SIGFPE, SIG_DFL, NULL);
 
 /* set the exceptions which should raise SIGFPE */
     _PM_enable_fpe(flg, hnd);
 
     _PM.fpe_enabled = flg;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_ENABLE_FPE - enable software trapping of floating point exceptions */
+
+void PM_enable_fpe(int flg, PFSignal_handler hnd)
+   {
+
+    PM_enable_fpe_n(flg, hnd, NULL);
 
     return;}
 

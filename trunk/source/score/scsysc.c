@@ -2096,7 +2096,7 @@ static void _SC_report_job_exit(taskdesc *job, char *where)
     PROCESS *pp;
     tasklst *tl;
     subtask *sub;
-    PFSignal_handler sc;
+    SC_contextdes sc;
     parstate *state;
 
     state = job->context;
@@ -2113,7 +2113,7 @@ static void _SC_report_job_exit(taskdesc *job, char *where)
     idp = pp->id;
 
     sc = SC_which_signal_handler(SIGCHLD);
-    if (sc == SIG_IGN)
+    if (sc.f == SIG_IGN)
        hnd = "off";
     else
        hnd = "on";

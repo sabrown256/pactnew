@@ -348,7 +348,7 @@ int SC_exec_async(char *shell, char **cmnds, char **dirs,
     fspec *filter;
     conpool *cp;
     asyncstate *as;
-    PFSignal_handler hnd;
+    SC_contextdes hnd;
 
     as = CMAKE(asyncstate);
     SC_MEM_INIT(asyncstate, as);
@@ -367,7 +367,7 @@ int SC_exec_async(char *shell, char **cmnds, char **dirs,
     hnd = SC_which_signal_handler(SC_SIGIO);
     ioi = SC_gs.io_interrupts_on;
     SC_gs.io_interrupts_on = FALSE;
-    SC_signal(SC_SIGIO, SIG_IGN);
+    SC_signal_n(SC_SIGIO, SIG_IGN, NULL);
 
     filter = _SC_read_filter(fname);
     shell  = SC_get_shell(shell);
@@ -436,7 +436,7 @@ int SC_exec_async(char *shell, char **cmnds, char **dirs,
 
 /* restore old interrupt state */
     SC_gs.io_interrupts_on = ioi;
-    SC_signal(SC_SIGIO, hnd);
+    SC_signal_n(SC_SIGIO, hnd.f, hnd.a);
 
     if (sig == SC_EXIT_BAD)
        st = sig;
@@ -476,7 +476,7 @@ int SC_exec_async_s(char *shell, char **env,
     fspec *filter;
     taskdesc *job;
     parstate state;
-    PFSignal_handler hnd;
+    SC_contextdes hnd;
 
 /* count commands */
     SC_ptr_arr_len(nc, cmnds);
@@ -499,7 +499,7 @@ int SC_exec_async_s(char *shell, char **env,
     hnd = SC_which_signal_handler(SC_SIGIO);
     ioi = SC_gs.io_interrupts_on;
     SC_gs.io_interrupts_on = FALSE;
-    SC_signal(SC_SIGIO, SIG_IGN);
+    SC_signal_n(SC_SIGIO, SIG_IGN, NULL);
 
     state.time_limit = to;
     state.tstart     = SC_wall_clock_time();
@@ -552,7 +552,7 @@ int SC_exec_async_s(char *shell, char **env,
 
 /* restore old interrupt state */
     SC_gs.io_interrupts_on = ioi;
-    SC_signal(SC_SIGIO, hnd);
+    SC_signal_n(SC_SIGIO, hnd.f, hnd.a);
 
     return(st);}
 
@@ -588,7 +588,7 @@ int SC_exec_async_h(char *shell, char **env,
     fspec *filter;
     taskdesc *job;
     parstate state;
-    PFSignal_handler hnd;
+    SC_contextdes hnd;
 
 /* count commands */
     SC_ptr_arr_len(nc, cmnds);
@@ -613,7 +613,7 @@ int SC_exec_async_h(char *shell, char **env,
     hnd = SC_which_signal_handler(SC_SIGIO);
     ioi = SC_gs.io_interrupts_on;
     SC_gs.io_interrupts_on = FALSE;
-    SC_signal(SC_SIGIO, SIG_IGN);
+    SC_signal_n(SC_SIGIO, SIG_IGN, NULL);
 
     state.time_limit = to;
     state.tstart     = SC_wall_clock_time();
@@ -664,7 +664,7 @@ int SC_exec_async_h(char *shell, char **env,
 
 /* restore old interrupt state */
     SC_gs.io_interrupts_on = ioi;
-    SC_signal(SC_SIGIO, hnd);
+    SC_signal_n(SC_SIGIO, hnd.f, hnd.a);
 
     return(st);}
 
@@ -691,7 +691,7 @@ static int _SC_exec(SC_array *out, char *cmnd, char *shell,
     taskdesc *job;
     asyncstate *as;
     parstate state;
-    PFSignal_handler osi;
+    SC_contextdes osi;
     conpool *cpo;
 
     nf = SC_gs.assert_fail;
@@ -705,7 +705,7 @@ static int _SC_exec(SC_array *out, char *cmnd, char *shell,
 /* save old interrupt state */
     ioi = SC_gs.io_interrupts_on;
     SC_gs.io_interrupts_on = FALSE;
-    osi = SC_signal(SC_SIGIO, SIG_IGN);
+    osi = SC_signal_n(SC_SIGIO, SIG_IGN, NULL);
 
     rv = FALSE;
 
@@ -760,7 +760,7 @@ static int _SC_exec(SC_array *out, char *cmnd, char *shell,
 
 /* restore old interrupt state */
     SC_gs.io_interrupts_on = ioi;
-    SC_signal(SC_SIGIO, osi);
+    SC_signal_n(SC_SIGIO, osi.f, osi.a);
 
     _SC_async_state.pool      = cpo;
     _SC_async_state.to_stdout = sto;

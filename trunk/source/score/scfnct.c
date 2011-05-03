@@ -366,12 +366,13 @@ static void _SC_timeout_error(int sig)
  *            - if FNC is NULL the process will exit on timeout
  */
 
-void SC_timeout(int to, PFSignal_handler fnc)
+void SC_timeout(int to, PFSignal_handler fnc, void *a)
    {
 
 #ifdef UNIX
 
     int ns;
+    void *an;
     PFSignal_handler fn;
 
 /* since alarms do not nest (without much more logic than we have here)
@@ -381,15 +382,21 @@ void SC_timeout(int to, PFSignal_handler fnc)
 
 /* settle on the handler */
        {fn = fnc;
+	an = a;
 	if (fnc == NULL)
-	   fn = (to > 0) ? _SC_timeout_error : _SC.to_err;
+	   {if (to > 0)
+	       {fn = _SC_timeout_error;
+		an = a;}
+	    else
+	       {fn = _SC.to_err.f;
+		an = _SC.to_err.a;};};
 
 /* set the handler and the alarm */
-	_SC.to_err = SC_signal(SIGALRM, fn);
+	_SC.to_err = SC_signal_n(SIGALRM, fn, an);
 	ns         = ALARM(to);
 	SC_ASSERT(ns >= 0);
 
-	if (_SC.to_err == SIG_ERR)
+	if (_SC.to_err.f == SIG_ERR)
 	   SC_error(-1, "SETTING SIGALRM FAILED (%d) - SC_TIMEOUT\n", errno);
 
 /* set _SC.to_lst appropriately */
@@ -408,14 +415,14 @@ void SC_timeout(int to, PFSignal_handler fnc)
 /* _SC_TIMEOUT_CONT - handle timeouts for SC_time_allow */
 
 void _SC_timeout_cont(int sig)
-   {JMP_BUF *bf;
+   {JMP_BUF *cpu;
 
 /* io_printf(stdout, "Timeout %d\n", sig); */
-    SC_timeout(0, _SC_timeout_cont);
+    SC_timeout(0, _SC_timeout_cont, NULL);
     
-    bf = _SC_get_to_buf(-1);
+    cpu = _SC_get_to_buf(-1);
 
-    LONGJMP(*bf, 1);}
+    LONGJMP(*cpu, 1);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

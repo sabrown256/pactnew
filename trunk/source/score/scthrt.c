@@ -271,7 +271,7 @@ int main(argc, argv)
 		     strategy = 1;
 		     break;};};
 
-    SC_timeout(to, NULL);
+    SC_timeout(to, NULL, NULL);
 
     m   = 8/n;
     m   = max(m, 1);
@@ -279,7 +279,7 @@ int main(argc, argv)
     for (i = 0; i < m; i++)
         bad |= test(n, strategy);
 
-    SC_timeout(0, NULL);
+    SC_timeout(0, NULL, NULL);
 
     return(bad);}
 

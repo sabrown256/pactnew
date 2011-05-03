@@ -58,7 +58,7 @@ SC_state
  _SC = {-1, TRUE, -1,
         malloc, realloc, free,
 	{-1.0, -1.0}, -1, -1,
-	(PFSignal_handler) -1, SIG_DFL, -1,
+	(PFSignal_handler) -1, {SIG_DFL, NULL}, -1,
         TYPE_STATE_INIT};
 
 /*--------------------------------------------------------------------------*/
@@ -404,7 +404,7 @@ void SC_interrupt_handler(int sig)
 	     io_printf(stdout, "Exiting program\n\n");
 	     exit(SC_EXIT_SELF);};
 
-    SC_signal(SIGINT, SC_interrupt_handler);
+    SC_signal_n(SIGINT, SC_interrupt_handler, NULL);
 
     return;}
 
