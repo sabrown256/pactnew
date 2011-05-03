@@ -1239,16 +1239,16 @@ object *SX_write_data(SS_psides *si, object *argl)
 /* sort out the file type */
     if (strcmp(mode, "ascii") == 0)
        {imode = SC_ASCII;
-        fobj  = SS_cadr(argl);
-        argl  = SS_cddr(argl);}
+        fobj  = SS_cadr(si, argl);
+        argl  = SS_cddr(si, argl);}
     else if (strcmp(mode, "bin") == 0)
        {imode = SC_BINARY;
-        fobj  = SS_cadr(argl);
-        argl  = SS_cddr(argl);}
+        fobj  = SS_cadr(si, argl);
+        argl  = SS_cddr(si, argl);}
     else if (strcmp(mode, "pdb") == 0)
        {imode = SC_PDB;
-        fobj  = SS_cadr(argl);
-        argl  = SS_cddr(argl);}
+        fobj  = SS_cadr(si, argl);
+        argl  = SS_cddr(si, argl);}
     else
        {imode = SC_PDB;
 	fname = mode;

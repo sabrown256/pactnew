@@ -1249,7 +1249,7 @@ static void _SX_set_limits(SS_psides *si, char *t, PM_set *s, object *argl)
 	   {nd   = s->dimension_elem;
 	    extr = CMAKE_N(double, 2*nd);
 	    pe   = extr;
-	    for (i = 0; i < nd; i++, argl = SS_cddr(argl))
+	    for (i = 0; i < nd; i++, argl = SS_cddr(si, argl))
 	        {if (SS_nullobjp(argl))
 		    {CFREE(extr);
 		     break;};
@@ -2112,7 +2112,7 @@ static object *_SXI_set_dom_limits(SS_psides *si, object *argl)
     else
        SS_error(si, "NO SET IMPLIED - _SXI_SET_DOM_LIMITS", obj);
 
-    _SX_set_limits(si, "LIMITS", s, SS_cadr(argl));
+    _SX_set_limits(si, "LIMITS", s, SS_cadr(si, argl));
 
     return(obj);}
 
@@ -2144,7 +2144,7 @@ static object *_SXI_set_ran_limits(SS_psides *si, object *argl)
     else
        SS_error(si, "NO SET IMPLIED - _SXI_SET_RAN_LIMITS", obj);
 
-    _SX_set_limits(si, "LIMITS", s, SS_cadr(argl));
+    _SX_set_limits(si, "LIMITS", s, SS_cadr(si, argl));
 
     return(obj);}
 

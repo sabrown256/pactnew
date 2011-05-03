@@ -79,8 +79,8 @@ extern "C" {
 #define SX_last_arg(tok, argl)                                               \
    {object *t;                                                               \
     for (t = argl, tok = SS_null; SS_consp(t); t = SS_cdr(t))                \
-        {SS_Assign(tok, SS_cadr(t));                                         \
-         if (SS_nullobjp(SS_cddr(t)))                                        \
+        {SS_Assign(tok, SS_cadr(si, t));                                         \
+         if (SS_nullobjp(SS_cddr(si, t)))                                        \
             {SS_setcdr(t, SS_null);                                          \
 	     break;};};}
 

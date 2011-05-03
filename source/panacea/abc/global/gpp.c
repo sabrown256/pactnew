@@ -676,18 +676,18 @@ object *LR_var_plot(SS_psides *si, object *argl)
 
             if (strcmp(name, "domain") == 0)
                {val    = SS_eval(NULL, sobj);
-                domain = SS_GET(PM_set, SS_cadr(val));
-                arr    = SS_GET(C_array, SS_cddr(val));}
+                domain = SS_GET(PM_set, SS_cadr(si, val));
+                arr    = SS_GET(C_array, SS_cddr(si, val));}
 
             else if (strcmp(name, "device") == 0)
-               {head = SS_cadr(sobj);
+               {head = SS_cadr(si, sobj);
                 if (SX_DEVICEP(head))
                    dev = SS_GET(PG_device, head);
                 else
                    SS_error(si, "BAD DEVICE - LR_VAR_PLOT", head);}
 
             else if (strcmp(name, "file") == 0)
-               {head = SS_cadr(sobj);
+               {head = SS_cadr(si, sobj);
                 if (SX_pdbfilep(head))
                    file = FILE_STREAM(PDBfile, head);
                 else
@@ -730,9 +730,9 @@ object *LR_var_plot(SS_psides *si, object *argl)
                 head = SS_car(val);
                 name = SS_get_string(head);
                 if (strcmp(name, "domain") == 0)
-                   {space  = SS_INTEGER_VALUE(SS_cadr(val));
-                    domain = SS_GET(PM_set, SS_caddr(val));
-                    arr    = SS_GET(C_array, SS_cdddr(val));}
+                   {space  = SS_INTEGER_VALUE(SS_cadr(si, val));
+                    domain = SS_GET(PM_set, SS_caddr(si, val));
+                    arr    = SS_GET(C_array, SS_cdddr(si, val));}
                 else
                    SS_error(si,
 			    "BAD OBJECT IN CONTEXT - LR_VAR_PLOT",

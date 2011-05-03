@@ -39,7 +39,7 @@ static object *_SXI_def_attr(SS_psides *si, object *argl)
 
     PD_def_attribute(file, at, type);
 
-    o = SS_cadr(argl);
+    o = SS_cadr(si, argl);
 
     return(o);}
 
@@ -70,7 +70,7 @@ static object *_SXI_rem_attr(SS_psides *si, object *argl)
 
     PD_rem_attribute(file, at);
 
-    o = SS_cadr(argl);
+    o = SS_cadr(si, argl);
 
     return(o);}
 
@@ -177,7 +177,7 @@ static object *_SXI_set_attr_val(SS_psides *si, object *argl)
     SC_mark(data, 1);
     PD_set_attribute(file, vr, at, data);
 
-    obj = SS_car(SS_cdddr(argl));
+    obj = SS_car(SS_cdddr(si, argl));
 
     return(obj);}
 

@@ -1103,7 +1103,7 @@ static object *_SXI_arrays_set(SS_psides *si, object *argl)
             SS_OBJECT_I, &shape,
             0);
 
-    components = SS_cdddr(argl);
+    components = SS_cdddr(si, argl);
 
 /* extract the name */
     if (name == NULL)
@@ -1132,7 +1132,7 @@ static object *_SXI_arrays_set(SS_psides *si, object *argl)
                      lst);};
 
 /* get the number of elements */
-    lst = SS_caar(components);
+    lst = SS_caar(si, components);
     if (!SX_NUMERIC_ARRAYP(lst))
        SS_error(si, "OBJECT NOT NUMERIC ARRAY - _SXI_ARRAYS_SET", lst);
 

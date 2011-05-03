@@ -14,7 +14,7 @@
    {object *_l, *_v;                                                        \
     _l = SS_car(_e);                                                        \
     _v = SS_car(_l);                                                        \
-    _t = SS_GET(hasharr, SS_cadr(_l));                                      \
+    _t = SS_GET(hasharr, SS_cadr(si, _l));                                  \
     _n = NULL;                                                              \
     if (SS_variablep(_v))                                                   \
        {_n = SS_VARIABLE_NAME(_v);                                          \
@@ -518,7 +518,7 @@ static object *_SS_bound_var(SS_psides *si, char *name,
  *                  - we just want the variable not what it is bound to
  */
 
-object *_SS_get_variable(char *name, object *penv)
+object *_SS_get_variable(SS_psides *si, char *name, object *penv)
    {int i;
     char *fname;
     hasharr *tab;

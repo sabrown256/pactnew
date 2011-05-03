@@ -32,7 +32,7 @@ static object *_SSI_chreq(SS_psides *si, object *argl)
 
     o2 = SS_null;
 
-    if (!SS_charobjp(o1 = SS_car(argl)) || !SS_charobjp(o2 = SS_cadr(argl)))
+    if (!SS_charobjp(o1 = SS_car(argl)) || !SS_charobjp(o2 = SS_cadr(si, argl)))
        SS_error(si, "ARGUMENTS NOT CHARACTERS - CHAR=?", argl);
 
     o = (SS_CHARACTER_VALUE(o1) == SS_CHARACTER_VALUE(o2)) ? SS_t : SS_f;
@@ -49,7 +49,7 @@ static object *_SSI_chrge(SS_psides *si, object *argl)
 
     o2 = SS_null;
 
-    if (!SS_charobjp(o1 = SS_car(argl)) || !SS_charobjp(o2 = SS_cadr(argl)))
+    if (!SS_charobjp(o1 = SS_car(argl)) || !SS_charobjp(o2 = SS_cadr(si, argl)))
        SS_error(si, "ARGUMENTS NOT CHARACTERS - CHAR>=?", argl);
 
     o = (SS_CHARACTER_VALUE(o1) >= SS_CHARACTER_VALUE(o2)) ? SS_t : SS_f;
@@ -66,7 +66,7 @@ static object *_SSI_chrgt(SS_psides *si, object *argl)
 
     o2 = SS_null;
 
-    if (!SS_charobjp(o1 = SS_car(argl)) || !SS_charobjp(o2 = SS_cadr(argl)))
+    if (!SS_charobjp(o1 = SS_car(argl)) || !SS_charobjp(o2 = SS_cadr(si, argl)))
        SS_error(si, "ARGUMENTS NOT CHARACTERS - CHAR>?", argl);
 
     o = (SS_CHARACTER_VALUE(o1) > SS_CHARACTER_VALUE(o2)) ? SS_t : SS_f;
@@ -83,7 +83,7 @@ static object *_SSI_chrle(SS_psides *si, object *argl)
 
     o2 = SS_null;
 
-    if (!SS_charobjp(o1 = SS_car(argl)) || !SS_charobjp(o2 = SS_cadr(argl)))
+    if (!SS_charobjp(o1 = SS_car(argl)) || !SS_charobjp(o2 = SS_cadr(si, argl)))
        SS_error(si, "ARGUMENTS NOT CHARACTERS - CHAR<=?", argl);
 
     o = (SS_CHARACTER_VALUE(o1) <= SS_CHARACTER_VALUE(o2)) ? SS_t : SS_f;
@@ -100,7 +100,7 @@ static object *_SSI_chrlt(SS_psides *si, object *argl)
 
     o2 = SS_null;
 
-    if (!SS_charobjp(o1 = SS_car(argl)) || !SS_charobjp(o2 = SS_cadr(argl)))
+    if (!SS_charobjp(o1 = SS_car(argl)) || !SS_charobjp(o2 = SS_cadr(si, argl)))
        SS_error(si, "ARGUMENTS NOT CHARACTERS - CHAR<?", argl);
 
     o = (SS_CHARACTER_VALUE(o1) < SS_CHARACTER_VALUE(o2)) ? SS_t : SS_f;
