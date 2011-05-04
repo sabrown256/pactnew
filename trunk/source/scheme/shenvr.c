@@ -863,6 +863,165 @@ SS_psides *SS_get_current_scheme(int id)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SS_FPE_HANDLER - handle floating point exception signals */
+
+static void _SS_fpe_handler(int sig)
+   {SS_psides *si;
+
+    si = SC_get_context(_SS_fpe_handler);
+
+#ifdef SIGFPE
+    SC_signal_n(SIGFPE, _SS_fpe_handler, si);
+#endif
+
+    SS_error(si, "FLOATING POINT EXCEPTION - _SS_FPE_HANDLER",
+	     SS_mk_cons(si, si->fun, si->argl));
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_SIG_HANDLER - handle various signals */
+
+static void _SS_sig_handler(int sig)
+   {char msg[MAXLINE];
+    SS_psides *si;
+
+    si = SC_get_context(_SS_sig_handler);
+
+    SC_signal_n(sig, SIG_IGN, NULL);
+
+    snprintf(msg, MAXLINE, "%s - _SS_SIG_HANDLER", SC_signal_name(sig));
+
+    PRINT(stdout, "\n%s\n", msg);
+    SC_retrace_exe(NULL, -1, 120000);
+
+    SS_end_scheme(si, sig);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_PRINT_ERR_MSG - default error message print function for
+ *                   - _SS.pr_err
+ */
+
+static void _SS_print_err_msg(SS_psides *si, FILE *str, char *s, object *obj)
+   {char atype[MAXLINE];
+    char *p;
+
+    if (obj == NULL)
+       PRINT(str, "(%d):  ERROR: %s\n", si->errlev, s);
+
+    else
+       {PRINT(str, "(%d):  ERROR: %s\n      BAD OBJECT (", si->errlev, s);
+
+	p = SS_object_type_name(obj, atype);
+	if (p == NULL)
+	   {switch (SC_arrtype(obj, -1))
+	       {default :
+		     PRINT(str, "unknown");
+		     break;
+
+	        case '\0' :
+                     PRINT(str, "0x0): POINTER 0x%lx IS FREE\n\n",
+			   (long) (obj - (object *) NULL));
+		     return;};};
+
+	PRINT(str, atype);
+
+	SS_print(si, si->outdev, obj, "): ", "\n\n");};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_INIT_SCHEME - initialize an interpreter state instance */
+
+static void _SS_init_scheme(SS_psides *si)
+   {object *fr;
+    SC_contextdes hnd;
+
+    hnd = SC_which_signal_handler(SIGINT);
+    SC_setup_sig_handlers(_SS_sig_handler, si, TRUE);
+    PM_enable_fpe_n(TRUE, (PFSignal_handler) _SS_fpe_handler, si);
+    SC_signal_n(SIGINT, hnd.f, si);
+
+#ifdef LARGE
+    si->stack_size = 128;
+#else
+    si->stack_size = 32;
+#endif
+    si->stack_mask = si->stack_size - 1;
+
+    SS_register_types();
+
+    SS_inst_prm(si);
+    SS_inst_const(si);
+
+    si->trap_error = TRUE;
+    si->err_state  = SS_null;
+    si->env        = SS_null;
+
+    fr            = SS_mk_new_frame(si,
+				    SS_mk_string(si, "global-environment"),
+				    NULL);
+    si->global_env = SS_mk_cons(si, fr, SS_null);
+    SS_UNCOLLECT(si->global_env);
+
+    SS_Assign(si->env, si->global_env);
+
+    SS_define_constant(si, 1,
+		       "system-id", SC_STRING_I, SYSTEM_ID,
+		       "argv",      SS_OBJECT_I, SS_null,
+		       NULL);
+
+    si->this  = SS_null;
+    si->exn   = SS_null;
+    si->val   = SS_null;
+    si->unev  = SS_null;
+    si->argl  = SS_null;
+    si->fun   = SS_null;
+    si->rdobj = SS_null;
+    si->evobj = SS_null;
+
+/* give default values to the lisp package interface variables  */
+    si->post_read  = NULL;
+    si->post_eval  = NULL;
+    si->post_print = NULL;
+    si->pr_ch_un   = SS_unget_ch;
+    si->pr_ch_out  = SS_put_ch;
+
+    SS_set_put_line(si, SS_printf);
+    SS_set_put_string(si, SS_fputs);
+
+#ifdef NO_SHELL
+    SC_set_get_line(PG_wind_fgets);
+#else
+    SC_set_get_line(io_gets);
+#endif
+
+    si->interactive = TRUE;
+    si->lines_page  = 50;
+    si->print_flag  = TRUE;
+    si->stat_flag   = TRUE;
+    si->nsave       = 0;
+    si->nrestore    = 0;
+    si->nsetc       = 0;
+    si->ngoc        = 0;
+
+    SC_mem_stats_set(0L, 0L);
+
+    SS_set_print_err_func(_SS_print_err_msg, FALSE);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SS_INIT_THREAD - init state SA for thread ID */
 
 static void _SS_init_thread(SS_smp_state *sa, int id)
@@ -870,12 +1029,8 @@ static void _SS_init_thread(SS_smp_state *sa, int id)
 
     sa->parser = _SSI_scheme_mode;
 
-/* GOTCHA: this should be calling SS_init_scheme to properly setup
- * the interpreter on the thread
- * the current SS_init_scheme shouldn't be doing more than
- * SS_get_current_scheme
- */
     si = &sa->si;
+    _SS_init_scheme(si);
 
     _SSI_scheme_mode(si);
 
