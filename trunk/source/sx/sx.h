@@ -35,28 +35,28 @@
 
 /* SX_GET_FLOAT_FROM_LIST - extract a double from the list and cdr the list */
 
-#define SX_GET_FLOAT_FROM_LIST(_si, x, argl, s)                              \
-   {obj  = SS_car(si, argl);                                                     \
-    argl = SS_cdr(si, argl);                                                     \
+#define SX_GET_FLOAT_FROM_LIST(_si, _v, _a, _s)                              \
+   {obj = SS_car(_si, _a);                                                   \
+    _a = SS_cdr(_si, _a);                                                    \
     if (SS_integerp(obj))                                                    \
-       x = (double) SS_INTEGER_VALUE(obj);                                   \
+       _v = (double) SS_INTEGER_VALUE(obj);                                  \
     else if (SS_floatp(obj))                                                 \
-       x = SS_FLOAT_VALUE(obj);                                              \
+       _v = SS_FLOAT_VALUE(obj);                                             \
     else                                                                     \
-       SS_error(_si, s, obj);}
+       SS_error(_si, _s, obj);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* SX_GET_INTEGER_FROM_LIST - extract an int from the list and cdr the list */
 
-#define SX_GET_INTEGER_FROM_LIST(_si, x, argl, s)                            \
-   {obj  = SS_car(si, argl);                                                     \
-    argl = SS_cdr(si, argl);                                                     \
+#define SX_GET_INTEGER_FROM_LIST(_si, _v, _a, _s)                            \
+   {obj = SS_car(_si, _a);                                                   \
+    _a = SS_cdr(_si, _a);                                                    \
     if (SS_integerp(obj))                                                    \
-       x = SS_INTEGER_VALUE(obj);                                            \
+       _v = SS_INTEGER_VALUE(obj);                                           \
     else                                                                     \
-       SS_error(_si, s, obj);}
+       SS_error(_si, _s, obj);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -65,10 +65,10 @@
  *                         - and cdr the list
  */
 
-#define SX_GET_STRING_FROM_LIST(x, argl, s)                                  \
-   {obj  = SS_car(si, argl);                                                     \
-    argl = SS_cdr(si, argl);                                                     \
-    x    = CSTRSAVE(SS_get_string(obj));}
+#define SX_GET_STRING_FROM_LIST(_si, _v, _a, _s)                             \
+   {obj = SS_car(_si, _a);                                                   \
+    _a = SS_cdr(_si, _a);                                                    \
+    _v = CSTRSAVE(SS_get_string(obj));}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -77,13 +77,13 @@
  *                         - and cdr the list
  */
 
-#define SX_GET_OBJECT_FROM_LIST(_si, predicate, x, value, argl, s)           \
-   {obj  = SS_car(si, argl);                                                     \
-    argl = SS_cdr(si, argl);                                                     \
-    if (predicate)                                                           \
-       x = (value);                                                          \
+#define SX_GET_OBJECT_FROM_LIST(_si, _pred, _v, _x, _a, _s)                  \
+   {obj = SS_car(_si, _a);                                                   \
+    _a = SS_cdr(_si, _a);                                                    \
+    if (_pred)                                                               \
+       _v = (_x);                                                            \
     else                                                                     \
-       SS_error(_si, s, obj);}
+       SS_error(_si, _s, obj);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -92,13 +92,13 @@
  *                        - and cdr the list
  */
 
-#define SX_GET_ARRAY_FROM_LIST(_si, x, argl, s)                              \
-   {obj  = SS_car(si, argl);                                                     \
-    argl = SS_cdr(si, argl);                                                     \
+#define SX_GET_ARRAY_FROM_LIST(_si, _v, _a, _s)                              \
+   {obj = SS_car(_si, _a);                                                   \
+    _a = SS_cdr(_si, _a);                                                    \
     if (SX_NUMERIC_ARRAYP(obj))                                              \
-       x = NUMERIC_ARRAY_DATA(obj);                                          \
+       _v = NUMERIC_ARRAY_DATA(obj);                                         \
     else                                                                     \
-       SS_error(_si, s, obj);}
+       SS_error(_si, _s, obj);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -107,13 +107,13 @@
  *                        - and cdr the list
  */
 
-#define SX_GET_GRAPH_FROM_LIST(_si, x, argl, s)                              \
-   {obj  = SS_car(si, argl);                                                     \
-    argl = SS_cdr(si, argl);                                                     \
+#define SX_GET_GRAPH_FROM_LIST(_si, _v, _a, _s)                              \
+   {obj  = SS_car(_si, _a);                                                  \
+    _a = SS_cdr(_si, _a);                                                    \
     if (SX_GRAPHP(obj))                                                      \
-       x = SS_GET(PG_graph, obj);                                            \
+       _v = SS_GET(PG_graph, obj);                                           \
     else                                                                     \
-       SS_error(_si, s, obj);}
+       SS_error(_si, _s, obj);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -122,13 +122,13 @@
  *                      - and cdr the list
  */
 
-#define SX_GET_SET_FROM_LIST(_si, x, argl, s)                                \
-   {obj  = SS_car(si, argl);                                                     \
-    argl = SS_cdr(si, argl);                                                     \
+#define SX_GET_SET_FROM_LIST(_si, _v, _a, _s)                                \
+   {obj = SS_car(_si, _a);                                                   \
+    _a = SS_cdr(_si, _a);                                                    \
     if (SX_SETP(obj))                                                        \
-       x = SS_GET(PM_set, obj);                                              \
+       _v = SS_GET(PM_set, obj);                                             \
     else                                                                     \
-       SS_error(_si, s, obj);}
+       SS_error(_si, _s, obj);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -138,19 +138,19 @@
  *                          - if item is a graph extract the mapping from it
  */
 
-#define SX_GET_MAPPING_FROM_LIST(_si, pn, argl)                              \
-    {PG_graph *g;                                                            \
-     object *obj;                                                            \
-     obj  = SS_car(si, argl);                                                    \
-     argl = SS_cdr(si, argl);                                                    \
-     if (SX_GRAPHP(obj))                                                     \
-        {g  = SS_GET(PG_graph, obj);                                         \
-         pn = g->f;}                                                         \
-     else if (SX_MAPPINGP(obj))                                              \
-        pn = SS_GET(PM_mapping, obj);                                        \
+#define SX_GET_MAPPING_FROM_LIST(_si, _p, _a)                                \
+    {PG_graph *_g;                                                           \
+     object *_o;                                                             \
+     _o = SS_car(_si, _a);                                                   \
+     _a = SS_cdr(_si, _a);                                                   \
+     if (SX_GRAPHP(_o))                                                      \
+        {_g = SS_GET(PG_graph, _o);                                          \
+         _p = g->f;}                                                         \
+     else if (SX_MAPPINGP(_o))                                               \
+        _p = SS_GET(PM_mapping, _o);                                         \
      else                                                                    \
-        SS_error(si, "BAD MAPPING OR GRAPH - SX_GET_MAPPING_FROM_LIST",    \
-		   obj);}
+        SS_error(_si, "BAD MAPPING OR GRAPH - SX_GET_MAPPING_FROM_LIST",     \
+		 _o);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -162,125 +162,125 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-#define FUNCTION_NAME(x)                                                     \
-    (SS_GET(SX_object, x)->name)
-#define FUNCTION_PROC(x)                                                     \
-    ((PFPObject) (SS_GET(SX_object, x)->p1.fp))
-#define FUNCTION_HANDLER(x)                                                  \
-    ((PFPObject) (SS_GET(SX_object, x)->p2.fp))
-#define FUNCTION_DOCUMENTATION(x)                                            \
-    ((char *) (SS_GET(SX_object, x)->p3.dp))
+#define FUNCTION_NAME(_o)                                                    \
+    (SS_GET(SX_object, _o)->name)
+#define FUNCTION_PROC(_o)                                                    \
+    ((PFPObject) (SS_GET(SX_object, _o)->p1.fp))
+#define FUNCTION_HANDLER(_o)                                                 \
+    ((PFPObject) (SS_GET(SX_object, _o)->p2.fp))
+#define FUNCTION_DOCUMENTATION(_o)                                           \
+    ((char *) (SS_GET(SX_object, _o)->p3.dp))
 
-#define SX_SET_FUNCTION(x, v)       (SS_GET(SX_object, x)->p1.dp = (void *) v)
-#define SX_SET_HANDLER(x, v)        (SS_GET(SX_object, x)->p2.fp = (PFVoid) v)
-#define SX_SET_DOCUMENTATION(x, v)  (SS_GET(SX_object, x)->p3.dp = (void *) v)
+#define SX_SET_FUNCTION(_o, _v)       (SS_GET(SX_object, _o)->p1.dp = (void *) _v)
+#define SX_SET_HANDLER(_o, _v)        (SS_GET(SX_object, _o)->p2.fp = (PFVoid) _v)
+#define SX_SET_DOCUMENTATION(_o, _v)  (SS_GET(SX_object, _o)->p3.dp = (void *) _v)
 
 /* PDBLib Types */
 
-#define FILE_FILE(type, x)    (type *) ((x)->file)
+#define FILE_FILE(_t, _o)    (_t *) ((_o)->file)
 
-#define FILE_TYPE(x)                   (SS_GET(g_file, x)->type)
-#define FILE_STREAM(type, x)  (type *) (SS_GET(g_file, x)->file)
-#define FILE_NAME(x)                   (SS_GET(g_file, x)->name)
+#define FILE_TYPE(_o)        (SS_GET(g_file, _o)->type)
+#define FILE_STREAM(_t, _o)  (_t *) (SS_GET(g_file, _o)->file)
+#define FILE_NAME(_o)        (SS_GET(g_file, _o)->name)
 
-#define PDBDATA_NAME(x)     (SS_GET(g_pdbdata, x)->name)
-#define PDBDATA_DATA(x)     (SS_GET(g_pdbdata, x)->data)
-#define PDBDATA_EP(x)       (SS_GET(g_pdbdata, x)->ep)
-#define PDBDATA_FILE(x)     (SS_GET(g_pdbdata, x)->file)
+#define PDBDATA_NAME(_o)     (SS_GET(g_pdbdata, _o)->name)
+#define PDBDATA_DATA(_o)     (SS_GET(g_pdbdata, _o)->data)
+#define PDBDATA_EP(_o)       (SS_GET(g_pdbdata, _o)->ep)
+#define PDBDATA_FILE(_o)     (SS_GET(g_pdbdata, _o)->file)
 
-#define SYMENT_TYPE(x)      PD_entry_type(SS_GET(syment, x))
-#define SYMENT_DIMS(x)      PD_entry_dimensions(SS_GET(syment, x))
-#define SYMENT_NUM(x)       PD_entry_number(SS_GET(syment, x))
-#define SYMENT_ADDR(x)      PD_entry_address(SS_GET(syment, x))
+#define SYMENT_TYPE(_o)      PD_entry_type(SS_GET(syment, _o))
+#define SYMENT_DIMS(_o)      PD_entry_dimensions(SS_GET(syment, _o))
+#define SYMENT_NUM(_o)       PD_entry_number(SS_GET(syment, _o))
+#define SYMENT_ADDR(_o)      PD_entry_address(SS_GET(syment, _o))
 
-#define DEFSTR_TYPE(x)      (SS_GET(defstr, x)->type)
-#define DEFSTR_SIZE(x)      (SS_GET(defstr, x)->size)
-#define DEFSTR_ALIGN(x)     (SS_GET(defstr, x)->alignment)
-#define DEFSTR_MEMBERS(x)   (SS_GET(defstr, x)->members)
+#define DEFSTR_TYPE(_o)      (SS_GET(defstr, _o)->type)
+#define DEFSTR_SIZE(_o)      (SS_GET(defstr, _o)->size)
+#define DEFSTR_ALIGN(_o)     (SS_GET(defstr, _o)->alignment)
+#define DEFSTR_MEMBERS(_o)   (SS_GET(defstr, _o)->members)
 
 /* PANACEA Types */
 
-#define PANVAR_NAME(x)      (SS_GET(PA_variable, x)->name)
-#define PANVAR_DATA(x)      (SS_GET(PA_variable, x)->data)
-#define PANVAR_SIZE(x)      (SS_GET(PA_variable, x)->size)
-#define PANVAR_RESTART(x)   (SS_GET(PA_variable, x)->restart)
-#define PANVAR_CLASS(x)     (SS_GET(PA_variable, x)->option)
-#define PANVAR_CONV(x)      (SS_GET(PA_variable, x)->conv)
-#define PANVAR_UNIT(x)      (SS_GET(PA_variable, x)->unit)
-#define PANVAR_DESC(x)      (SS_GET(PA_variable, x)->desc)
+#define PANVAR_NAME(_o)      (SS_GET(PA_variable, _o)->name)
+#define PANVAR_DATA(_o)      (SS_GET(PA_variable, _o)->data)
+#define PANVAR_SIZE(_o)      (SS_GET(PA_variable, _o)->size)
+#define PANVAR_RESTART(_o)   (SS_GET(PA_variable, _o)->restart)
+#define PANVAR_CLASS(_o)     (SS_GET(PA_variable, _o)->option)
+#define PANVAR_CONV(_o)      (SS_GET(PA_variable, _o)->conv)
+#define PANVAR_UNIT(_o)      (SS_GET(PA_variable, _o)->unit)
+#define PANVAR_DESC(_o)      (SS_GET(PA_variable, _o)->desc)
 
-#define PACKAGE_NAME(x)     (SS_GET(PA_package, x)->name)
-#define PACKAGE_TIME(x)     (SS_GET(PA_package, x)->time)
-#define PACKAGE_SPACE(x)    (SS_GET(PA_package, x)->space)
-#define PACKAGE_DT(x)       (SS_GET(PA_package, x)->dt)
-#define PACKAGE_GENCMD(x)   (SS_GET(PA_package, x)->gencmd)
-#define PACKAGE_DFSTRC(x)   (SS_GET(PA_package, x)->dfstrc)
-#define PACKAGE_INTRN(x)    (SS_GET(PA_package, x)->intrn)
-#define PACKAGE_DEFVAR(x)   (SS_GET(PA_package, x)->defvar)
-#define PACKAGE_DEFCNT(x)   (SS_GET(PA_package, x)->defcnt)
-#define PACKAGE_INIZER(x)   (SS_GET(PA_package, x)->inizer)
-#define PACKAGE_MAIN(x)     (SS_GET(PA_package, x)->main)
-#define PACKAGE_PPSOR(x)    (SS_GET(PA_package, x)->ppsor)
-#define PACKAGE_FINZER(x)   (SS_GET(PA_package, x)->finzer)
-#define PACKAGE_PPCMD(x)    (SS_GET(PA_package, x)->ppcmd)
-#define PACKAGE_N_SWTCH(x)  (SS_GET(PA_package, x)->n_swtch)
-#define PACKAGE_SWTCH(x)    (SS_GET(PA_package, x)->iswtch)
-#define PACKAGE_N_PARAM(x)  (SS_GET(PA_package, x)->n_param)
-#define PACKAGE_PARAM(x)    (SS_GET(PA_package, x)->rparam)
-#define PACKAGE_N_ASCII(x)  (SS_GET(PA_package, x)->n_ascii)
-#define PACKAGE_ASCII(x)    (SS_GET(PA_package, x)->ascii)
-#define PACKAGE_S(x)        (SS_GET(PA_package, x)->s)
+#define PACKAGE_NAME(_o)     (SS_GET(PA_package, _o)->name)
+#define PACKAGE_TIME(_o)     (SS_GET(PA_package, _o)->time)
+#define PACKAGE_SPACE(_o)    (SS_GET(PA_package, _o)->space)
+#define PACKAGE_DT(_o)       (SS_GET(PA_package, _o)->dt)
+#define PACKAGE_GENCMD(_o)   (SS_GET(PA_package, _o)->gencmd)
+#define PACKAGE_DFSTRC(_o)   (SS_GET(PA_package, _o)->dfstrc)
+#define PACKAGE_INTRN(_o)    (SS_GET(PA_package, _o)->intrn)
+#define PACKAGE_DEFVAR(_o)   (SS_GET(PA_package, _o)->defvar)
+#define PACKAGE_DEFCNT(_o)   (SS_GET(PA_package, _o)->defcnt)
+#define PACKAGE_INIZER(_o)   (SS_GET(PA_package, _o)->inizer)
+#define PACKAGE_MAIN(_o)     (SS_GET(PA_package, _o)->main)
+#define PACKAGE_PPSOR(_o)    (SS_GET(PA_package, _o)->ppsor)
+#define PACKAGE_FINZER(_o)   (SS_GET(PA_package, _o)->finzer)
+#define PACKAGE_PPCMD(_o)    (SS_GET(PA_package, _o)->ppcmd)
+#define PACKAGE_N_SWTCH(_o)  (SS_GET(PA_package, _o)->n_swtch)
+#define PACKAGE_SWTCH(_o)    (SS_GET(PA_package, _o)->iswtch)
+#define PACKAGE_N_PARAM(_o)  (SS_GET(PA_package, _o)->n_param)
+#define PACKAGE_PARAM(_o)    (SS_GET(PA_package, _o)->rparam)
+#define PACKAGE_N_ASCII(_o)  (SS_GET(PA_package, _o)->n_ascii)
+#define PACKAGE_ASCII(_o)    (SS_GET(PA_package, _o)->ascii)
+#define PACKAGE_S(_o)        (SS_GET(PA_package, _o)->s)
 
-#define SOURCE_VARIABLE_NAME(x)        (SS_GET(PA_src_variable, x)->name)
-#define SOURCE_VARIABLE_VAR_INDEX(x)   (SS_GET(PA_src_variable, x)->var_index)
-#define SOURCE_VARIABLE_N_TIMEs(x)     (SS_GET(PA_src_variable, x)->n_times)
-#define SOURCE_VARIABLE_CONV(x)        (SS_GET(PA_src_variable, x)->conv)
-#define SOURCE_VARIABLE_TIMES(x)       (SS_GET(PA_src_variable, x)->times)
-#define SOURCE_VARIABLE_QUEUE(x)       (SS_GET(PA_src_variable, x)->queue)
-#define SOURCE_VARIABLE_QUEUE_TIMES(x) (SS_GET(PA_src_variable, x)->queue_times)
-#define SOURCE_VARIABLE_INDEX(x)       (SS_GET(PA_src_variable, x)->index)
-#define SOURCE_VARIABLE_SIZE(x)        (SS_GET(PA_src_variable, x)->size)
-#define SOURCE_VARIABLE_FILE(x)        (SS_GET(PA_src_variable, x)->file)
+#define SOURCE_VARIABLE_NAME(_o)        (SS_GET(PA_src_variable, _o)->name)
+#define SOURCE_VARIABLE_VAR_INDEX(_o)   (SS_GET(PA_src_variable, _o)->var_index)
+#define SOURCE_VARIABLE_N_TIMEs(_o)     (SS_GET(PA_src_variable, _o)->n_times)
+#define SOURCE_VARIABLE_CONV(_o)        (SS_GET(PA_src_variable, _o)->conv)
+#define SOURCE_VARIABLE_TIMES(_o)       (SS_GET(PA_src_variable, _o)->times)
+#define SOURCE_VARIABLE_QUEUE(_o)       (SS_GET(PA_src_variable, _o)->queue)
+#define SOURCE_VARIABLE_QUEUE_TIMES(_o) (SS_GET(PA_src_variable, _o)->queue_times)
+#define SOURCE_VARIABLE_INDEX(_o)       (SS_GET(PA_src_variable, _o)->index)
+#define SOURCE_VARIABLE_SIZE(_o)        (SS_GET(PA_src_variable, _o)->size)
+#define SOURCE_VARIABLE_FILE(_o)        (SS_GET(PA_src_variable, _o)->file)
 
 /* IV_SPECIFICATION is PD_DEFSTR'd in DEF_STR in PANACEA.C
  * so any changes here must be reflected there
  */
 
-#define IV_SPECIFICATION_TYPE(x)      (SS_GET(PA_iv_specification, x)->type)
-#define IV_SPECIFICATION_NAME(x)      (SS_GET(PA_iv_specification, x)->name)
-#define IV_SPECIFICATION_FILE(x)      (SS_GET(PA_iv_specification, x)->file)
-#define IV_SPECIFICATION_NUM(x)       (SS_GET(PA_iv_specification, x)->num)
-#define IV_SPECIFICATION_INDEX(x)     (SS_GET(PA_iv_specification, x)->index)
-#define IV_SPECIFICATION_SPEC(x)      (SS_GET(PA_iv_specification, x)->spec)
-#define IV_SPECIFICATION_DATA(x)      (SS_GET(PA_iv_specification, x)->data)
-#define IV_SPECIFICATION_NEXT(x)      (SS_GET(PA_iv_specification, x)->next)
+#define IV_SPECIFICATION_TYPE(_o)      (SS_GET(PA_iv_specification, _o)->type)
+#define IV_SPECIFICATION_NAME(_o)      (SS_GET(PA_iv_specification, _o)->name)
+#define IV_SPECIFICATION_FILE(_o)      (SS_GET(PA_iv_specification, _o)->file)
+#define IV_SPECIFICATION_NUM(_o)       (SS_GET(PA_iv_specification, _o)->num)
+#define IV_SPECIFICATION_INDEX(_o)     (SS_GET(PA_iv_specification, _o)->index)
+#define IV_SPECIFICATION_SPEC(_o)      (SS_GET(PA_iv_specification, _o)->spec)
+#define IV_SPECIFICATION_DATA(_o)      (SS_GET(PA_iv_specification, _o)->data)
+#define IV_SPECIFICATION_NEXT(_o)      (SS_GET(PA_iv_specification, _o)->next)
 
 /* PLOT_REQUEST is PD_DEFSTR'd in DEF_STR in PANACEA.C
  * so any changes here must be reflected there
  */
 
-#define PLOT_REQUEST_Y_AXIS(x)      (SS_GET(plot_request, x)->y_axis)
-#define PLOT_REQUEST_Y_ZONE(x)      (SS_GET(plot_request, x)->y_zone)
-#define PLOT_REQUEST_Y_AXIS_INT(x)  (SS_GET(plot_request, x)->y_axis_int)
-#define PLOT_REQUEST_X_AXIS(x)      (SS_GET(plot_request, x)->x_axis)
-#define PLOT_REQUEST_X_ZONE(x)      (SS_GET(plot_request, x)->x_zone)
-#define PLOT_REQUEST_X_AXIS_INT(x)  (SS_GET(plot_request, x)->x_axis_int)
-#define PLOT_REQUEST_SNAP(x)        (SS_GET(plot_request, x)->snap)
-#define PLOT_REQUEST_SNAP_TIMES(x)  (SS_GET(plot_request, x)->snap_times)
-#define PLOT_REQUEST_NEXT(x)        (SS_GET(plot_request, x)->next)
+#define PLOT_REQUEST_Y_AXIS(_o)      (SS_GET(plot_request, _o)->y_axis)
+#define PLOT_REQUEST_Y_ZONE(_o)      (SS_GET(plot_request, _o)->y_zone)
+#define PLOT_REQUEST_Y_AXIS_INT(_o)  (SS_GET(plot_request, _o)->y_axis_int)
+#define PLOT_REQUEST_X_AXIS(_o)      (SS_GET(plot_request, _o)->x_axis)
+#define PLOT_REQUEST_X_ZONE(_o)      (SS_GET(plot_request, _o)->x_zone)
+#define PLOT_REQUEST_X_AXIS_INT(_o)  (SS_GET(plot_request, _o)->x_axis_int)
+#define PLOT_REQUEST_SNAP(_o)        (SS_GET(plot_request, _o)->snap)
+#define PLOT_REQUEST_SNAP_TIMES(_o)  (SS_GET(plot_request, _o)->snap_times)
+#define PLOT_REQUEST_NEXT(_o)        (SS_GET(plot_request, _o)->next)
 
-#define PLOT_MAP_NAME(x)       (SS_GET(plot_map, x)->name)
-#define PLOT_MAP_FALSE(x)      (SS_GET(plot_map, x)->false)
-#define PLOT_MAP_INDEX(x)      (SS_GET(plot_map, x)->index)
-#define PLOT_MAP_CONV(x)       (SS_GET(plot_map, x)->conv)
+#define PLOT_MAP_NAME(_o)       (SS_GET(plot_map, _o)->name)
+#define PLOT_MAP_FALSE(_o)      (SS_GET(plot_map, _o)->false)
+#define PLOT_MAP_INDEX(_o)      (SS_GET(plot_map, _o)->index)
+#define PLOT_MAP_CONV(_o)       (SS_GET(plot_map, _o)->conv)
 
-#define PLT_CRV_LABEL(x)      (SS_GET(plt_crv, x)->label)
-#define PLT_CRV_Y_INDEX(x)    (SS_GET(plt_crv, x)->y_index)
-#define PLT_CRV_Y_CONV(x)     (SS_GET(plt_crv, x)->y_conv)
-#define PLT_CRV_X_INDEX(x)    (SS_GET(plt_crv, x)->x_index)
-#define PLT_CRV_X_CONV(x)     (SS_GET(plt_crv, x)->x_conv)
-#define PLT_CRV_PLT_R(x)      (SS_GET(plt_crv, x)->plt_r)
-#define PLT_CRV_NPTS(x)       (SS_GET(plt_crv, x)->npts)
+#define PLT_CRV_LABEL(_o)      (SS_GET(plt_crv, _o)->label)
+#define PLT_CRV_Y_INDEX(_o)    (SS_GET(plt_crv, _o)->y_index)
+#define PLT_CRV_Y_CONV(_o)     (SS_GET(plt_crv, _o)->y_conv)
+#define PLT_CRV_X_INDEX(_o)    (SS_GET(plt_crv, _o)->x_index)
+#define PLT_CRV_X_CONV(_o)     (SS_GET(plt_crv, _o)->x_conv)
+#define PLT_CRV_PLT_R(_o)      (SS_GET(plt_crv, _o)->plt_r)
+#define PLT_CRV_NPTS(_o)       (SS_GET(plt_crv, _o)->npts)
 
 /* PGS extensions */
 
@@ -288,146 +288,146 @@
  *       - in some fashion
  */
 
-#define GRAPH_F(x)             (SS_GET(PG_graph, x)->f)
-#define GRAPH_IDENTIFIER(x)    (SS_GET(PG_graph, x)->identifier)
-#define GRAPH_INFO(x)          (SS_GET(PG_graph, x)->info)
-#define GRAPH_NEXT(x)          (SS_GET(PG_graph, x)->next)
+#define GRAPH_F(_o)             (SS_GET(PG_graph, _o)->f)
+#define GRAPH_IDENTIFIER(_o)    (SS_GET(PG_graph, _o)->identifier)
+#define GRAPH_INFO(_o)          (SS_GET(PG_graph, _o)->info)
+#define GRAPH_NEXT(_o)          (SS_GET(PG_graph, _o)->next)
 
 /* INTERFACE_OBJECT - access PG_interface_object structure members */
 
-#define INTERFACE_OBJECT(x)           (SS_GET(PG_interface_object, x))
-#define INTERFACE_OBJECT_NAME(x)      (SS_GET(PG_interface_object, x)->name)
-#define INTERFACE_OBJECT_TYPE(x)      (SS_GET(PG_interface_object, x)->type)
-#define INTERFACE_OBJECT_DEVICE(x)    (SS_GET(PG_interface_object, x)->device)
+#define INTERFACE_OBJECT(_o)         (SS_GET(PG_interface_object, _o))
+#define INTERFACE_OBJECT_NAME(_o)    (SS_GET(PG_interface_object, _o)->name)
+#define INTERFACE_OBJECT_TYPE(_o)    (SS_GET(PG_interface_object, _o)->type)
+#define INTERFACE_OBJECT_DEVICE(_o)  (SS_GET(PG_interface_object, _o)->device)
 
 /* IMAGE - access image structure members */
 
-#define IMAGE_NAME(x)          (SS_GET(PG_image, x)->label)
-#define IMAGE_DATA(x)          (SS_GET(PG_image, x)->bf)
-#define IMAGE_TYPE(x)          (SS_GET(PG_image, x)->element_type)
-#define IMAGE_KMAX(x)          (SS_GET(PG_image, x)->kmax)
-#define IMAGE_LMAX(x)          (SS_GET(PG_image, x)->lmax)
-#define IMAGE_XMAX(x)          (SS_GET(PG_image, x)->xmax)
-#define IMAGE_XMIN(x)          (SS_GET(PG_image, x)->xmin)
-#define IMAGE_YMAX(x)          (SS_GET(PG_image, x)->ymax)
-#define IMAGE_YMIN(x)          (SS_GET(PG_image, x)->ymin)
-#define IMAGE_ZMAX(x)          (SS_GET(PG_image, x)->zmax)
-#define IMAGE_ZMIN(x)          (SS_GET(PG_image, x)->ymin)
+#define IMAGE_NAME(_o)          (SS_GET(PG_image, _o)->label)
+#define IMAGE_DATA(_o)          (SS_GET(PG_image, _o)->bf)
+#define IMAGE_TYPE(_o)          (SS_GET(PG_image, _o)->element_type)
+#define IMAGE_KMAX(_o)          (SS_GET(PG_image, _o)->kmax)
+#define IMAGE_LMAX(_o)          (SS_GET(PG_image, _o)->lmax)
+#define IMAGE_XMAX(_o)          (SS_GET(PG_image, _o)->xmax)
+#define IMAGE_XMIN(_o)          (SS_GET(PG_image, _o)->xmin)
+#define IMAGE_YMAX(_o)          (SS_GET(PG_image, _o)->ymax)
+#define IMAGE_YMIN(_o)          (SS_GET(PG_image, _o)->ymin)
+#define IMAGE_ZMAX(_o)          (SS_GET(PG_image, _o)->zmax)
+#define IMAGE_ZMIN(_o)          (SS_GET(PG_image, _o)->ymin)
 
-#define DEV_ATTRIBUTES_CLIPPING(x)        (SS_GET(PG_dev_attributes, x)->clipping)
-#define DEV_ATTRIBUTES_CHAR_FONT(x)       (SS_GET(PG_dev_attributes, x)->char_font)
-#define DEV_ATTRIBUTES_CHAR_FRAC(x)       (SS_GET(PG_dev_attributes, x)->char_frac)
-#define DEV_ATTRIBUTES_CHAR_HEIGHT(x)     (SS_GET(PG_dev_attributes, x)->char_height)
-#define DEV_ATTRIBUTES_CHAR_PRECISION(x)  (SS_GET(PG_dev_attributes, x)->char_precision)
-#define DEV_ATTRIBUTES_CHAR_SPACE(x)      (SS_GET(PG_dev_attributes, x)->char_space)
-#define DEV_ATTRIBUTES_CHAR_UP_X(x)       (SS_GET(PG_dev_attributes, x)->char_up_x)
-#define DEV_ATTRIBUTES_CHAR_UP_Y(x)       (SS_GET(PG_dev_attributes, x)->char_up_y)
-#define DEV_ATTRIBUTES_CHAR_WIDTH(x)      (SS_GET(PG_dev_attributes, x)->char_width)
-#define DEV_ATTRIBUTES_FILL_COLOR(x)      (SS_GET(PG_dev_attributes, x)->fill_color)
-#define DEV_ATTRIBUTES_LINE_COLOR(x)      (SS_GET(PG_dev_attributes, x)->line_color)
-#define DEV_ATTRIBUTES_LINE_STYLE(x)      (SS_GET(PG_dev_attributes, x)->line_style)
-#define DEV_ATTRIBUTES_LINE_WIDTH(x)      (SS_GET(PG_dev_attributes, x)->line_width)
-#define DEV_ATTRIBUTES_LOGICAL_OP(x)      (SS_GET(PG_dev_attributes, x)->logical_op)
-#define DEV_ATTRIBUTES_TEXT_COLOR(x)      (SS_GET(PG_dev_attributes, x)->text_color)
+#define DEV_ATTRIBUTES_CLIPPING(_o)        (SS_GET(PG_dev_attributes, _o)->clipping)
+#define DEV_ATTRIBUTES_CHAR_FONT(_o)       (SS_GET(PG_dev_attributes, _o)->char_font)
+#define DEV_ATTRIBUTES_CHAR_FRAC(_o)       (SS_GET(PG_dev_attributes, _o)->char_frac)
+#define DEV_ATTRIBUTES_CHAR_HEIGHT(_o)     (SS_GET(PG_dev_attributes, _o)->char_height)
+#define DEV_ATTRIBUTES_CHAR_PRECISION(_o)  (SS_GET(PG_dev_attributes, _o)->char_precision)
+#define DEV_ATTRIBUTES_CHAR_SPACE(_o)      (SS_GET(PG_dev_attributes, _o)->char_space)
+#define DEV_ATTRIBUTES_CHAR_UP_X(_o)       (SS_GET(PG_dev_attributes, _o)->char_up_x)
+#define DEV_ATTRIBUTES_CHAR_UP_Y(_o)       (SS_GET(PG_dev_attributes, _o)->char_up_y)
+#define DEV_ATTRIBUTES_CHAR_WIDTH(_o)      (SS_GET(PG_dev_attributes, _o)->char_width)
+#define DEV_ATTRIBUTES_FILL_COLOR(_o)      (SS_GET(PG_dev_attributes, _o)->fill_color)
+#define DEV_ATTRIBUTES_LINE_COLOR(_o)      (SS_GET(PG_dev_attributes, _o)->line_color)
+#define DEV_ATTRIBUTES_LINE_STYLE(_o)      (SS_GET(PG_dev_attributes, _o)->line_style)
+#define DEV_ATTRIBUTES_LINE_WIDTH(_o)      (SS_GET(PG_dev_attributes, _o)->line_width)
+#define DEV_ATTRIBUTES_LOGICAL_OP(_o)      (SS_GET(PG_dev_attributes, _o)->logical_op)
+#define DEV_ATTRIBUTES_TEXT_COLOR(_o)      (SS_GET(PG_dev_attributes, _o)->text_color)
 
 #ifdef DEVICE_TYPE
 # undef DEVICE_TYPE
 #endif
 
-#define DEVICE_AUTODOMAIN(x)             (SS_GET(PG_device, x)->autodomain)
-#define DEVICE_AUTOPLOT(x)               (SS_GET(PG_device, x)->autoplot)
-#define DEVICE_AUTORANGE(x)              (SS_GET(PG_device, x)->autorange)
-#define DEVICE_BACKGROUND_COLOR_WHITE(x) (SS_GET(PG_device, x)->background_color_white)
-#define DEVICE_BORDER_WIDTH(x)           (SS_GET(PG_device, x)->border_width)
-#define DEVICE_CHAR_FONT(x)              (SS_GET(PG_device, x)->char_font)
-#define DEVICE_CHAR_FRAC(x)              (SS_GET(PG_device, x)->char_frac)
-#define DEVICE_CHAR_HEIGHT(x)            (SS_GET(PG_device, x)->char_height)
-#define DEVICE_CHAR_HEIGHT_S(x)          (SS_GET(PG_device, x)->char_height_s)
-#define DEVICE_CHAR_PRECISION(x)         (SS_GET(PG_device, x)->char_precision)
-#define DEVICE_CHAR_SPACE(x)             (SS_GET(PG_device, x)->char_space)
-#define DEVICE_CHAR_SPACE_S(x)           (SS_GET(PG_device, x)->char_space_s)
-#define DEVICE_CHAR_UP_X(x)              (SS_GET(PG_device, x)->char_up_x)
-#define DEVICE_CHAR_UP_Y(x)              (SS_GET(PG_device, x)->char_up_y)
-#define DEVICE_CHAR_WIDTH(x)             (SS_GET(PG_device, x)->char_width)
-#define DEVICE_CHAR_WIDTH_S(x)           (SS_GET(PG_device, x)->char_width_s)
-#define DEVICE_CLIPPING(x)               (SS_GET(PG_device, x)->clipping)
-#define DEVICE_FILE(x)                   (SS_GET(PG_device, x)->file)
-#define DEVICE_FILL_COLOR(x)             (SS_GET(PG_device, x)->fill_color)
-#define DEVICE_GPRINT_FLAG(x)            (SS_GET(PG_device, x)->gprint_flag)
-#define DEVICE_GRID(x)                   (SS_GET(PG_device, x)->grid)
-#define DEVICE_HARD_COPY_DEVICE(x)       (SS_GET(PG_device, x)->hard_copy_device)
-#define DEVICE_LINE_STYLE(x)             (SS_GET(PG_device, x)->line_style)
-#define DEVICE_LINE_COLOR(x)             (SS_GET(PG_device, x)->line_color)
-#define DEVICE_TEXT_COLOR(x)             (SS_GET(PG_device, x)->text_color)
-#define DEVICE_LINE_WIDTH(x)             (SS_GET(PG_device, x)->line_width)
-#define DEVICE_LOGICAL_OP(x)             (SS_GET(PG_device, x)->logical_op)
-#define DEVICE_MARK(x)                   (SS_GET(PG_device, x)->mark)
-#define DEVICE_MARKER(x)                 (SS_GET(PG_device, x)->marker)
-#define DEVICE_MODE(x)                   (SS_GET(PG_device, x)->mode)
-#define DEVICE_NAME(x)                   (SS_GET(PG_device, x)->name)
-#define DEVICE_N_CHAR_LINE(x)            (SS_GET(PG_device, x)->n_char_line)
-#define DEVICE_NCOLOR(x)                 (SS_GET(PG_device, x)->ncolor)
-#define DEVICE_N_LINES_PAGE(x)           (SS_GET(PG_device, x)->n_lines_page)
-#define DEVICE_NLINES(x)                 (SS_GET(PG_device, x)->nlines)
-#define DEVICE_PS_COLOR(x)               (SS_GET(PG_device, x)->ps_color)
-#define DEVICE_QUADRANT(x)               (SS_GET(PG_device, x)->quadrant)
-#define DEVICE_SCATTER(x)                (SS_GET(PG_device, x)->scatter)
-#define DEVICE_TITLE(x)                  (SS_GET(PG_device, x)->title)
-#define DEVICE_TYPE_INDEX(x)             (SS_GET(PG_device, x)->type_index)
-#define DEVICE_TXT_RATIO(x)              (SS_GET(PG_device, x)->txt_ratio)
-#define DEVICE_TYPE(x)                   (SS_GET(PG_device, x)->type)
-#define DEVICE_VIEW_HEIGHT(x)            (SS_GET(PG_device, x)->view_height)
-#define DEVICE_BLACK(x)                  (SS_GET(PG_device, x)->BLACK)
-#define DEVICE_WHITE(x)                  (SS_GET(PG_device, x)->WHITE)
-#define DEVICE_GRAY(x)                   (SS_GET(PG_device, x)->GRAY)
-#define DEVICE_DARK_GRAY(x)              (SS_GET(PG_device, x)->DARK_GRAY)
-#define DEVICE_BLUE(x)                   (SS_GET(PG_device, x)->BLUE)
-#define DEVICE_GREEN(x)                  (SS_GET(PG_device, x)->GREEN)
-#define DEVICE_CYAN(x)                   (SS_GET(PG_device, x)->CYAN)
-#define DEVICE_RED(x)                    (SS_GET(PG_device, x)->RED)
-#define DEVICE_MAGENTA(x)                (SS_GET(PG_device, x)->MAGENTA)
-#define DEVICE_BROWN(x)                  (SS_GET(PG_device, x)->BROWN)
-#define DEVICE_DARK_BLUE(x)              (SS_GET(PG_device, x)->DARK_BLUE)
-#define DEVICE_DARK_GREEN(x)             (SS_GET(PG_device, x)->DARK_GREEN)
-#define DEVICE_DARK_CYAN(x)              (SS_GET(PG_device, x)->DARK_CYAN)
-#define DEVICE_DARK_RED(x)               (SS_GET(PG_device, x)->DARK_RED)
-#define DEVICE_YELLOW(x)                 (SS_GET(PG_device, x)->YELLOW)
-#define DEVICE_DARK_MAGENTA(x)           (SS_GET(PG_device, x)->DARK_MAGENTA)
+#define DEVICE_AUTODOMAIN(_o)             (SS_GET(PG_device, _o)->autodomain)
+#define DEVICE_AUTOPLOT(_o)               (SS_GET(PG_device, _o)->autoplot)
+#define DEVICE_AUTORANGE(_o)              (SS_GET(PG_device, _o)->autorange)
+#define DEVICE_BACKGROUND_COLOR_WHITE(_o) (SS_GET(PG_device, _o)->background_color_white)
+#define DEVICE_BORDER_WIDTH(_o)           (SS_GET(PG_device, _o)->border_width)
+#define DEVICE_CHAR_FONT(_o)              (SS_GET(PG_device, _o)->char_font)
+#define DEVICE_CHAR_FRAC(_o)              (SS_GET(PG_device, _o)->char_frac)
+#define DEVICE_CHAR_HEIGHT(_o)            (SS_GET(PG_device, _o)->char_height)
+#define DEVICE_CHAR_HEIGHT_S(_o)          (SS_GET(PG_device, _o)->char_height_s)
+#define DEVICE_CHAR_PRECISION(_o)         (SS_GET(PG_device, _o)->char_precision)
+#define DEVICE_CHAR_SPACE(_o)             (SS_GET(PG_device, _o)->char_space)
+#define DEVICE_CHAR_SPACE_S(_o)           (SS_GET(PG_device, _o)->char_space_s)
+#define DEVICE_CHAR_UP_X(_o)              (SS_GET(PG_device, _o)->char_up_x)
+#define DEVICE_CHAR_UP_Y(_o)              (SS_GET(PG_device, _o)->char_up_y)
+#define DEVICE_CHAR_WIDTH(_o)             (SS_GET(PG_device, _o)->char_width)
+#define DEVICE_CHAR_WIDTH_S(_o)           (SS_GET(PG_device, _o)->char_width_s)
+#define DEVICE_CLIPPING(_o)               (SS_GET(PG_device, _o)->clipping)
+#define DEVICE_FILE(_o)                   (SS_GET(PG_device, _o)->file)
+#define DEVICE_FILL_COLOR(_o)             (SS_GET(PG_device, _o)->fill_color)
+#define DEVICE_GPRINT_FLAG(_o)            (SS_GET(PG_device, _o)->gprint_flag)
+#define DEVICE_GRID(_o)                   (SS_GET(PG_device, _o)->grid)
+#define DEVICE_HARD_COPY_DEVICE(_o)       (SS_GET(PG_device, _o)->hard_copy_device)
+#define DEVICE_LINE_STYLE(_o)             (SS_GET(PG_device, _o)->line_style)
+#define DEVICE_LINE_COLOR(_o)             (SS_GET(PG_device, _o)->line_color)
+#define DEVICE_TEXT_COLOR(_o)             (SS_GET(PG_device, _o)->text_color)
+#define DEVICE_LINE_WIDTH(_o)             (SS_GET(PG_device, _o)->line_width)
+#define DEVICE_LOGICAL_OP(_o)             (SS_GET(PG_device, _o)->logical_op)
+#define DEVICE_MARK(_o)                   (SS_GET(PG_device, _o)->mark)
+#define DEVICE_MARKER(_o)                 (SS_GET(PG_device, _o)->marker)
+#define DEVICE_MODE(_o)                   (SS_GET(PG_device, _o)->mode)
+#define DEVICE_NAME(_o)                   (SS_GET(PG_device, _o)->name)
+#define DEVICE_N_CHAR_LINE(_o)            (SS_GET(PG_device, _o)->n_char_line)
+#define DEVICE_NCOLOR(_o)                 (SS_GET(PG_device, _o)->ncolor)
+#define DEVICE_N_LINES_PAGE(_o)           (SS_GET(PG_device, _o)->n_lines_page)
+#define DEVICE_NLINES(_o)                 (SS_GET(PG_device, _o)->nlines)
+#define DEVICE_PS_COLOR(_o)               (SS_GET(PG_device, _o)->ps_color)
+#define DEVICE_QUADRANT(_o)               (SS_GET(PG_device, _o)->quadrant)
+#define DEVICE_SCATTER(_o)                (SS_GET(PG_device, _o)->scatter)
+#define DEVICE_TITLE(_o)                  (SS_GET(PG_device, _o)->title)
+#define DEVICE_TYPE_INDEX(_o)             (SS_GET(PG_device, _o)->type_index)
+#define DEVICE_TXT_RATIO(_o)              (SS_GET(PG_device, _o)->txt_ratio)
+#define DEVICE_TYPE(_o)                   (SS_GET(PG_device, _o)->type)
+#define DEVICE_VIEW_HEIGHT(_o)            (SS_GET(PG_device, _o)->view_height)
+#define DEVICE_BLACK(_o)                  (SS_GET(PG_device, _o)->BLACK)
+#define DEVICE_WHITE(_o)                  (SS_GET(PG_device, _o)->WHITE)
+#define DEVICE_GRAY(_o)                   (SS_GET(PG_device, _o)->GRAY)
+#define DEVICE_DARK_GRAY(_o)              (SS_GET(PG_device, _o)->DARK_GRAY)
+#define DEVICE_BLUE(_o)                   (SS_GET(PG_device, _o)->BLUE)
+#define DEVICE_GREEN(_o)                  (SS_GET(PG_device, _o)->GREEN)
+#define DEVICE_CYAN(_o)                   (SS_GET(PG_device, _o)->CYAN)
+#define DEVICE_RED(_o)                    (SS_GET(PG_device, _o)->RED)
+#define DEVICE_MAGENTA(_o)                (SS_GET(PG_device, _o)->MAGENTA)
+#define DEVICE_BROWN(_o)                  (SS_GET(PG_device, _o)->BROWN)
+#define DEVICE_DARK_BLUE(_o)              (SS_GET(PG_device, _o)->DARK_BLUE)
+#define DEVICE_DARK_GREEN(_o)             (SS_GET(PG_device, _o)->DARK_GREEN)
+#define DEVICE_DARK_CYAN(_o)              (SS_GET(PG_device, _o)->DARK_CYAN)
+#define DEVICE_DARK_RED(_o)               (SS_GET(PG_device, _o)->DARK_RED)
+#define DEVICE_YELLOW(_o)                 (SS_GET(PG_device, _o)->YELLOW)
+#define DEVICE_DARK_MAGENTA(_o)           (SS_GET(PG_device, _o)->DARK_MAGENTA)
 
 /* PML Extensions */
 
-#define NUMERIC_ARRAY(x)            (SS_GET(C_array, x))
-#define NUMERIC_ARRAY_TYPE(x)       (SS_GET(C_array, x)->type)
-#define NUMERIC_ARRAY_LENGTH(x)     (SS_GET(C_array, x)->length)
-#define NUMERIC_ARRAY_DATA(x)       (SS_GET(C_array, x)->data)
+#define NUMERIC_ARRAY(_o)            (SS_GET(C_array, _o))
+#define NUMERIC_ARRAY_TYPE(_o)       (SS_GET(C_array, _o)->type)
+#define NUMERIC_ARRAY_LENGTH(_o)     (SS_GET(C_array, _o)->length)
+#define NUMERIC_ARRAY_DATA(_o)       (SS_GET(C_array, _o)->data)
 
-#define SET_NAME(x)                 (SS_GET(PM_set, x)->name)
-#define SET_ELEMENT_TYPE(x)         (SS_GET(PM_set, x)->element_type)
-#define SET_N_ELEMENTS(x)           (SS_GET(PM_set, x)->n_elements)
-#define SET_DIMENSION(x)            (SS_GET(PM_set, x)->dimension)
-#define SET_MAX_INDEX(x)            (SS_GET(PM_set, x)->max_index)
-#define SET_ELEMENTS(x)             (SS_GET(PM_set, x)->elements)
-#define SET_ES_TYPE(x)              (SS_GET(PM_set, x)->es_type)
-#define SET_EXTREMA(x)              (SS_GET(PM_set, x)->extrema)
-#define SET_SCALES(x)               (SS_GET(PM_set, x)->scales)
-#define SET_OPERS(x)                (SS_GET(PM_set, x)->opers)
-#define SET_METRIC(x)               (SS_GET(PM_set, x)->metric)
-#define SET_SYMMETRY_TYPE(x)        (SS_GET(PM_set, x)->symmetry_type)
-#define SET_SYMMETRY(x)             (SS_GET(PM_set, x)->symmetry)
-#define SET_TOPOLOGY_TYPE(x)        (SS_GET(PM_set, x)->topology_type)
-#define SET_TOPOLOGY(x)             (SS_GET(PM_set, x)->topology)
-#define SET_INFO_TYPE(x)            (SS_GET(PM_set, x)->info_type)
-#define SET_INFO(x)                 (SS_GET(PM_set, x)->info)
+#define SET_NAME(_o)                 (SS_GET(PM_set, _o)->name)
+#define SET_ELEMENT_TYPE(_o)         (SS_GET(PM_set, _o)->element_type)
+#define SET_N_ELEMENTS(_o)           (SS_GET(PM_set, _o)->n_elements)
+#define SET_DIMENSION(_o)            (SS_GET(PM_set, _o)->dimension)
+#define SET_MAX_INDEX(_o)            (SS_GET(PM_set, _o)->max_index)
+#define SET_ELEMENTS(_o)             (SS_GET(PM_set, _o)->elements)
+#define SET_ES_TYPE(_o)              (SS_GET(PM_set, _o)->es_type)
+#define SET_EXTREMA(_o)              (SS_GET(PM_set, _o)->extrema)
+#define SET_SCALES(_o)               (SS_GET(PM_set, _o)->scales)
+#define SET_OPERS(_o)                (SS_GET(PM_set, _o)->opers)
+#define SET_METRIC(_o)               (SS_GET(PM_set, _o)->metric)
+#define SET_SYMMETRY_TYPE(_o)        (SS_GET(PM_set, _o)->symmetry_type)
+#define SET_SYMMETRY(_o)             (SS_GET(PM_set, _o)->symmetry)
+#define SET_TOPOLOGY_TYPE(_o)        (SS_GET(PM_set, _o)->topology_type)
+#define SET_TOPOLOGY(_o)             (SS_GET(PM_set, _o)->topology)
+#define SET_INFO_TYPE(_o)            (SS_GET(PM_set, _o)->info_type)
+#define SET_INFO(_o)                 (SS_GET(PM_set, _o)->info)
 
-#define MAPPING_NAME(x)             (SS_GET(PM_mapping, x)->name)
-#define MAPPING_DOMAIN(x)           (SS_GET(PM_mapping, x)->domain)
-#define MAPPING_RANGE(x)            (SS_GET(PM_mapping, x)->range)
-#define MAPPING_MAP_TYPE(x)         (SS_GET(PM_mapping, x)->map_type)
-#define MAPPING_MAP(x)              (SS_GET(PM_mapping, x)->map)
-#define MAPPING_FILE_TYPE(x)        (SS_GET(PM_mapping, x)->file_type)
-#define MAPPING_FILE_INFO(x)        (SS_GET(PM_mapping, x)->file_info)
-#define MAPPING_FILE(x)             (SS_GET(PM_mapping, x)->file)
-#define MAPPING_NEXT(x)             (SS_GET(PM_mapping, x)->next)
+#define MAPPING_NAME(_o)             (SS_GET(PM_mapping, _o)->name)
+#define MAPPING_DOMAIN(_o)           (SS_GET(PM_mapping, _o)->domain)
+#define MAPPING_RANGE(_o)            (SS_GET(PM_mapping, _o)->range)
+#define MAPPING_MAP_TYPE(_o)         (SS_GET(PM_mapping, _o)->map_type)
+#define MAPPING_MAP(_o)              (SS_GET(PM_mapping, _o)->map)
+#define MAPPING_FILE_TYPE(_o)        (SS_GET(PM_mapping, _o)->file_type)
+#define MAPPING_FILE_INFO(_o)        (SS_GET(PM_mapping, _o)->file_info)
+#define MAPPING_FILE(_o)             (SS_GET(PM_mapping, _o)->file)
+#define MAPPING_NEXT(_o)             (SS_GET(PM_mapping, _o)->next)
 
 /*--------------------------------------------------------------------------*/
 
@@ -437,39 +437,39 @@
  
 /* SX Types */
 
-#define SX_FUNCTIONP(obj)         (SS_OBJECT_TYPE(obj) == G_FUNCTION)
-#define SX_FILEP(obj)             (SS_OBJECT_TYPE(obj) == G_FILE)
+#define SX_FUNCTIONP(_o)         (SS_OBJECT_TYPE(_o) == G_FUNCTION)
+#define SX_FILEP(_o)             (SS_OBJECT_TYPE(_o) == G_FILE)
 
 /* PDBLib Types */
 
-#define SX_DEFSTRP(obj)           (SS_OBJECT_TYPE(obj) == G_DEFSTR)
-#define SX_SYMENTP(obj)           (SS_OBJECT_TYPE(obj) == G_SYMENT)
-#define SX_PDBDATAP(obj)          (SS_OBJECT_TYPE(obj) == G_PDBDATA)
+#define SX_DEFSTRP(_o)           (SS_OBJECT_TYPE(_o) == G_DEFSTR)
+#define SX_SYMENTP(_o)           (SS_OBJECT_TYPE(_o) == G_SYMENT)
+#define SX_PDBDATAP(_o)          (SS_OBJECT_TYPE(_o) == G_PDBDATA)
 
 /* PANACEA Types */
 
-#define SX_PANVARP(obj)           (SS_OBJECT_TYPE(obj) == G_PANVAR)
-#define SX_PACKAGEP(obj)          (SS_OBJECT_TYPE(obj) == G_PACKAGE)
-#define SX_SOURCE_VARIABLEP(obj)  (SS_OBJECT_TYPE(obj) == G_SOURCE_VARIABLE)
-#define SX_IV_SPECIFICATIONP(obj) (SS_OBJECT_TYPE(obj) == G_IV_SPECIFICATION)
-#define SX_PLOT_REQUESTP(obj)     (SS_OBJECT_TYPE(obj) == G_PLOT_REQUEST)
-#define SX_PLOT_MAPP(obj)         (SS_OBJECT_TYPE(obj) == G_PLOT_MAP)
-#define SX_PLT_CRVP(obj)          (SS_OBJECT_TYPE(obj) == G_PLT_CRV)
+#define SX_PANVARP(_o)           (SS_OBJECT_TYPE(_o) == G_PANVAR)
+#define SX_PACKAGEP(_o)          (SS_OBJECT_TYPE(_o) == G_PACKAGE)
+#define SX_SOURCE_VARIABLEP(_o)  (SS_OBJECT_TYPE(_o) == G_SOURCE_VARIABLE)
+#define SX_IV_SPECIFICATIONP(_o) (SS_OBJECT_TYPE(_o) == G_IV_SPECIFICATION)
+#define SX_PLOT_REQUESTP(_o)     (SS_OBJECT_TYPE(_o) == G_PLOT_REQUEST)
+#define SX_PLOT_MAPP(_o)         (SS_OBJECT_TYPE(_o) == G_PLOT_MAP)
+#define SX_PLT_CRVP(_o)          (SS_OBJECT_TYPE(_o) == G_PLT_CRV)
 
 /* PGS Types */
 
-#define SX_GRAPHP(obj)            (SS_OBJECT_TYPE(obj) == G_GRAPH)
-#define SX_IMAGEP(obj)            (SS_OBJECT_TYPE(obj) == G_IMAGE)
-#define SX_INTERFACE_OBJECTP(obj) (SS_OBJECT_TYPE(obj) == G_INTERFACE_OBJECT)
-#define SX_DEVICEP(obj)           (SS_OBJECT_TYPE(obj) == G_DEVICE)
-#define SX_DEV_ATTRIBUTESP(obj)   (SS_OBJECT_TYPE(obj) == G_DEV_ATTRIBUTES)
+#define SX_GRAPHP(_o)            (SS_OBJECT_TYPE(_o) == G_GRAPH)
+#define SX_IMAGEP(_o)            (SS_OBJECT_TYPE(_o) == G_IMAGE)
+#define SX_INTERFACE_OBJECTP(_o) (SS_OBJECT_TYPE(_o) == G_INTERFACE_OBJECT)
+#define SX_DEVICEP(_o)           (SS_OBJECT_TYPE(_o) == G_DEVICE)
+#define SX_DEV_ATTRIBUTESP(_o)   (SS_OBJECT_TYPE(_o) == G_DEV_ATTRIBUTES)
 
 /* PML Types */
 
-#define SX_NUMERIC_ARRAYP(obj)    (SS_OBJECT_TYPE(obj) == G_NUM_ARRAY)
-#define SX_POLYGONP(obj)          (SS_OBJECT_TYPE(obj) == G_POLYGON)
-#define SX_MAPPINGP(obj)          (SS_OBJECT_TYPE(obj) == G_MAPPING)
-#define SX_SETP(obj)              (SS_OBJECT_TYPE(obj) == G_SET)
+#define SX_NUMERIC_ARRAYP(_o)    (SS_OBJECT_TYPE(_o) == G_NUM_ARRAY)
+#define SX_POLYGONP(_o)          (SS_OBJECT_TYPE(_o) == G_POLYGON)
+#define SX_MAPPINGP(_o)          (SS_OBJECT_TYPE(_o) == G_MAPPING)
+#define SX_SETP(_o)              (SS_OBJECT_TYPE(_o) == G_SET)
 
 /*--------------------------------------------------------------------------*/
 

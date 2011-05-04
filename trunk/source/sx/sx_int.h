@@ -52,9 +52,9 @@ extern "C" {
 
 #define SX_prep_ret(_si, _rv)                                                \
     {if (SS_length(_si, _rv) == 1)                                           \
-        {SS_assign(si, _rv, SS_car(_si, _rv));}                                  \
+        {SS_assign(_si, _rv, SS_car(_si, _rv));}                             \
      else                                                                    \
-        {SS_assign(si, _rv, SS_reverse(_si, _rv));};                             \
+        {SS_assign(_si, _rv, SS_reverse(_si, _rv));};                        \
      SC_mark(_rv, -1);}
 
 /*--------------------------------------------------------------------------*/
@@ -66,7 +66,7 @@ extern "C" {
 
 #define SX_prep_retl(_si, _rv)                                               \
     {if (SS_length(_si, _rv) > 1)                                            \
-        {SS_assign(si, _rv, SS_reverse(si, _rv));};                              \
+        {SS_assign(_si, _rv, SS_reverse(_si, _rv));};                        \
      SC_mark(_rv, -1);}
 
 /*--------------------------------------------------------------------------*/
@@ -78,9 +78,9 @@ extern "C" {
 
 #define SX_last_arg(_si, _s, _a)                                             \
    {object *_t;                                                              \
-    for (_t = _a, _s = SS_null; SS_consp(_t); _t = SS_cdr(si, _t))           \
-        {SS_assign(si, _s, SS_cadr(si, _t));                                     \
-         if (SS_nullobjp(SS_cddr(si, _t)))                                   \
+    for (_t = _a, _s = SS_null; SS_consp(_t); _t = SS_cdr(_si, _t))          \
+        {SS_assign(_si, _s, SS_cadr(_si, _t));                               \
+         if (SS_nullobjp(SS_cddr(_si, _t)))                                  \
             {SS_setcdr(_si, _t, SS_null);                                    \
 	     break;};};}
 

@@ -971,13 +971,13 @@ object *_SXI_diff_var(SS_psides *si, object *argl)
        SS_error(si, "BAD SECOND ARGUMENT - _SXI_DIFF_VAR", SS_null);
 
     if (SS_consp(argl))
-       {SX_GET_STRING_FROM_LIST(nma, argl, 
+       {SX_GET_STRING_FROM_LIST(si, nma, argl, 
                                 "THIRD ARGUMENT NOT NAME - _SXI_DIFF_VAR");}
     else
        SS_error(si, "BAD THIRD ARGUMENT - _SXI_DIFF_VAR", SS_null);
 
     if (SS_consp(argl))
-       {SX_GET_STRING_FROM_LIST(nmb, argl, 
+       {SX_GET_STRING_FROM_LIST(si, nmb, argl, 
                                 "FOURTH ARGUMENT NOT NAME - _SXI_DIFF_VAR");}
     else
        SS_error(si, "BAD FOURTH ARGUMENT - _SXI_DIFF_VAR", SS_null);

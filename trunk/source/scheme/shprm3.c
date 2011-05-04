@@ -434,7 +434,7 @@ object *SS_append(SS_psides *si, object *list1, object *list2)
 	SS_assign(si, cr, list1);
         while (SS_consp(cr))
            {nxt = SS_car(si, cr);
-            SS_end_cons(frst, lst, nxt);
+            SS_end_cons(si, frst, lst, nxt);
             SS_assign(si, cr, SS_cdr(si, cr));};
 
         SS_setcdr(si, lst, list2);
