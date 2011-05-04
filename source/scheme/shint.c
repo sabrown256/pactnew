@@ -706,7 +706,7 @@ FIXNUM F77_FUNC(sschem, SSCHEM)(FIXNUM *pnc, F77_string name, ...)
     object *fnc, *expr;
     SS_psides *si;
 
-    si = &_SS_si;
+    si = SS_get_current_scheme(-1);
     
     SC_FORTRAN_STR_C(func, name, *pnc);
 

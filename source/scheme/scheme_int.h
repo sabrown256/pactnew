@@ -96,7 +96,8 @@ struct s_SS_state
     char str[MAXLINE];};
 
 struct s_SS_smp_state
-   {object *(*parser)(SS_psides *si);};
+   {SS_psides si;
+    object *(*parser)(SS_psides *si);};
 
 /*--------------------------------------------------------------------------*/
 
@@ -160,9 +161,6 @@ extern "C" {
 
 extern SS_state
  _SS;
-
-extern SS_psides
- _SS_si;
 
 /*--------------------------------------------------------------------------*/
 

@@ -18,7 +18,9 @@
 int main(int c, char **v, char **env)
    {int i, rv;
     char *cmd, *file;
-    SS_psides *si = &_SS_si;
+    SS_psides *si;
+
+    si = SS_get_current_scheme(-1);
 
 /* process the command line arguments */
     for (i = 1; i < c; i++)

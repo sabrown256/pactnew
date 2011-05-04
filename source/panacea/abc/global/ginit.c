@@ -29,10 +29,6 @@ int
 double
  pc;
 
-static object
- *B_variables(void),
- *B_files(void);
-
 static void
  init_prob(char *s);
 
@@ -352,66 +348,10 @@ int part_reg(char *s)
 
 /*--------------------------------------------------------------------------*/
 
-/* B_INIT - install the B specific objects in the Scheme world */
-
-void B_init(void)
-   {SS_psides *si;
-
-    si = &_SS_si;
-
-    SX_init(CODE, VERSION);
-
-    SS_install(si, "def-cc-vars",
-               "Define compiled variables to interpreter",
-	       SS_zargs,
-	       B_variables, SS_PR_PROC);
-
-    SS_install(si, "plot-var",
-               "Plots the given variables",
-	       SS_nargs,
-	       LR_var_plot, SS_PR_PROC);
-
-    SS_install(si, "files",
-               "Return a list of files: state, pp, PVA, ascii",
-	       SS_zargs,
-	       B_files, SS_PR_PROC);
-
-    SS_install(si, "time-data",
-               "Return a list with t, dt, and cycle",
-	       SS_zargs,
-	       LR_get_time_data, SS_PR_PROC);
-
-    SS_install(si, "mesh-data",
-               "Return a list with N_zones, frz, lrz, frn, lrn, and optionally kmax and lmax",
-	       SS_zargs,
-	       LR_get_mesh_data, SS_PR_PROC);
-
-    SS_install(si, "domain",
-               "Define a domain set on which to plot appropriate variables",
-	       SS_nargs,
-	       LR_def_domain, SS_UR_MACRO);
-
-    SS_install(si, "domain*",
-               "Define a domain set on which to plot appropriate variables",
-	       SS_nargs,
-	       LR_def_domain, SS_PR_PROC);
-
-    SX_pan_data_hook = (PFInt) LR_get_data;
-
-    PRINT(stdout, "\n");
-    strcpy(si->prompt, "B-> ");
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* B_VARIABLES - define some compiled objects to the interpreter */
 
-static object *B_variables(void)
-   {SS_psides *si;
-
-    si = &_SS_si;
+static object *B_variables(SS_psides *si)
+   {
 
 /* these are required */
     SS_install_cf(si, "number-of-zones",
@@ -485,11 +425,8 @@ static object *B_variables(void)
  *         -  NAME[2] NAME[5] NAME[3] NAME[4]
  */
 
-static object *B_files(void)
+static object *B_files(SS_psides *si)
    {object *o;
-    SS_psides *si;
-
-    si = &_SS_si;
 
     if ((global_name[2] == NULL) || (global_name[3] == NULL) ||
 	(global_name[4] == NULL) || (global_name[5] == NULL))
@@ -504,6 +441,60 @@ static object *B_files(void)
 			0);
 
     return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* B_INIT - install the B specific objects in the Scheme world */
+
+void B_init(void)
+   {SS_psides *si;
+
+    si = SS_get_current_scheme(-1);
+
+    SX_init(CODE, VERSION);
+
+    SS_install(si, "def-cc-vars",
+               "Define compiled variables to interpreter",
+	       SS_zargs,
+	       B_variables, SS_PR_PROC);
+
+    SS_install(si, "plot-var",
+               "Plots the given variables",
+	       SS_nargs,
+	       LR_var_plot, SS_PR_PROC);
+
+    SS_install(si, "files",
+               "Return a list of files: state, pp, PVA, ascii",
+	       SS_zargs,
+	       B_files, SS_PR_PROC);
+
+    SS_install(si, "time-data",
+               "Return a list with t, dt, and cycle",
+	       SS_zargs,
+	       LR_get_time_data, SS_PR_PROC);
+
+    SS_install(si, "mesh-data",
+               "Return a list with N_zones, frz, lrz, frn, lrn, and optionally kmax and lmax",
+	       SS_zargs,
+	       LR_get_mesh_data, SS_PR_PROC);
+
+    SS_install(si, "domain",
+               "Define a domain set on which to plot appropriate variables",
+	       SS_nargs,
+	       LR_def_domain, SS_UR_MACRO);
+
+    SS_install(si, "domain*",
+               "Define a domain set on which to plot appropriate variables",
+	       SS_nargs,
+	       LR_def_domain, SS_PR_PROC);
+
+    SX_pan_data_hook = (PFInt) LR_get_data;
+
+    PRINT(stdout, "\n");
+    strcpy(si->prompt, "B-> ");
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 
