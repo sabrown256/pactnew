@@ -101,7 +101,7 @@ static object *_SS_rd_lst(SS_psides *si, object *str)
 				     SS_null);}
 		      else
 			 PUSH_CHAR(c, str);};
-		  SS_end_cons(frst, ths, nxt);
+		  SS_end_cons(si, frst, ths, nxt);
 		  break;};};
 
     return(o);}

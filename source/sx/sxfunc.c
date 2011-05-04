@@ -850,7 +850,7 @@ static object *_SXI_pp_names(SS_psides *si, object *argl)
 
     nchar = 0;
     for (i = 0; i < n; i++)
-        {SX_GET_STRING_FROM_LIST(text, argl, NULL);
+        {SX_GET_STRING_FROM_LIST(si, text, argl, NULL);
          lst[i] = text;
          nc     = strlen(text);
          nchar  = max(nchar, nc);};

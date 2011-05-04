@@ -383,7 +383,7 @@ static int *_SX_index_ptr(SS_psides *si, object **pargl, char *msg)
     object *obj;
     haelem *hp;
 
-    SX_GET_STRING_FROM_LIST(ds, *pargl, msg);
+    SX_GET_STRING_FROM_LIST(si, ds, *pargl, msg);
     if (strcmp(ds, "dimension") == 0)
        rv = NULL;
 
@@ -675,7 +675,7 @@ static object *_SXI_list_pan_pck(SS_psides *si)
                     SX_mk_package(si, pck),
                     si->global_env);
 
-         SS_end_cons(lst, lst_nxt, obj);};
+         SS_end_cons(si, lst, lst_nxt, obj);};
 
     return(lst);}
 
@@ -712,7 +712,7 @@ static object *_SXI_intern_packages(SS_psides *si)
                     SX_mk_package(si, pck),
                     si->global_env);
 
-         SS_end_cons(lst, lst_nxt, obj);};
+         SS_end_cons(si, lst, lst_nxt, obj);};
 
     return(lst);}
 

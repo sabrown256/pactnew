@@ -140,7 +140,7 @@ static object *_SS_quasiq(SS_psides *si, object *obj, int nestl)
 
 /* is it an unquote form? */
              if (SS_Unquoted(car))
-                {SS_end_cons(ncns, y, _SS_unquote(si, tcns));}
+                {SS_end_cons(si, ncns, y, _SS_unquote(si, tcns));}
 
 /* is it an unquote-splicing form? */
              else if (Unqsplicing(car))
@@ -152,11 +152,11 @@ static object *_SS_quasiq(SS_psides *si, object *obj, int nestl)
 
 /* any other list should be searched */
              else
-                {SS_end_cons(ncns, y, _SS_quasiq(si, tcns, nestl));};}
+                {SS_end_cons(si, ncns, y, _SS_quasiq(si, tcns, nestl));};}
 
 /* any non-list element should be added */
          else
-            {SS_end_cons(ncns, y, tcns);};};
+            {SS_end_cons(si, ncns, y, tcns);};};
 
     return(ncns);}
 
@@ -318,7 +318,7 @@ static object *_SSI_letstr(SS_psides *si, object *lets)
              vl = SS_cadr(si, vlpair);};
 
          asgn = SS_make_form(si, SS_setproc, vr, vl, LAST);
-         SS_end_cons_macro(asnl, this, asgn);
+         SS_end_cons_macro(si, asnl, this, asgn);
          prml = SS_mk_cons(si, vr, prml);};
 
 /* append the assignment list to the body */
@@ -372,7 +372,7 @@ static object *_SSI_letstr(SS_psides *si, object *lets)
              vl = SS_cadr(si, vlpair);};
 
          asgn = SS_make_form(si, SS_setproc, vr, vl, LAST);
-         SS_end_cons_macro(si->argl, si->this, asgn);
+         SS_end_cons_macro(si, si->argl, si->this, asgn);
          prml = SS_mk_cons(si, vr, prml);};
 
 /* append the assignment list to the body */
@@ -432,7 +432,7 @@ static object *_SSI_letstr(SS_psides *si, object *letr)
 
          SS_assign(si, si->val,
 		   SS_make_form(si, SS_setproc, vr, vl, LAST));
-         SS_end_cons_macro(si->argl, si->this, si->val);
+         SS_end_cons_macro(si, si->argl, si->this, si->val);
          SS_assign(si, si->unev, SS_mk_cons(si, vr, si->unev));};
 
 /* complete the transformation */
@@ -474,11 +474,11 @@ static object *_SS_lst_map(SS_psides *si, object *argl, int *Ex_flag)
         {lst = SS_car(si, argl);
 
 /* taking the car of each arg LST make up the list of ARGS for proc */
-         SS_end_cons(args, arg_nxt, SS_car(si, lst));
+         SS_end_cons(si, args, arg_nxt, SS_car(si, lst));
 
 /* cons up a list with the REST of the argument lists */
          if (!SS_nullobjp(lst = SS_cdr(si, lst)))
-            {SS_end_cons(rest, rest_nxt, lst);};
+            {SS_end_cons(si, rest, rest_nxt, lst);};
 
 /* if we're at the end of any arg LST signal to exit the loop */
          if (!SS_consp(lst))
@@ -522,7 +522,7 @@ static object *_SSI_map(SS_psides *si, object *obj)
              SS_assign(si, expr, SS_mk_cons(si, proc, args));};
          SS_assign(si, argl, SS_cdr(si, vl));
          SS_save(si, si->env);
-         SS_end_cons(ret, ret_nxt, SS_exp_eval(si, expr));
+         SS_end_cons(si, ret, ret_nxt, SS_exp_eval(si, expr));
          SS_restore(si, si->env);};
 
 /* clean up the mess */

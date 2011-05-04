@@ -113,15 +113,15 @@ struct s_SS_smp_state
 
 /* SS_END_CONS - macro version of the endcons functionality */
 
-#define SS_end_cons(first, ths, nxt)                                        \
-    {object *x;                                                             \
-     x = nxt;                                                               \
-     if (SS_nullobjp(first))                                                \
-        {first = SS_mk_cons(si, x, SS_null);                                \
-         ths = first;}                                                      \
-     else                                                                   \
-        {SS_setcdr(si, ths, SS_mk_cons(si, x, SS_null));                    \
-         ths = SS_cdr(si, ths);};}
+#define SS_end_cons(_si, _frst, _ths, _nxt)                                  \
+    {object *_x;                                                             \
+     _x = _nxt;                                                              \
+     if (SS_nullobjp(_frst))                                                 \
+        {_frst = SS_mk_cons(_si, _x, SS_null);                               \
+         _ths = _frst;}                                                      \
+     else                                                                    \
+        {SS_setcdr(_si, _ths, SS_mk_cons(_si, _x, SS_null));                 \
+         _ths = SS_cdr(_si, _ths);};}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -132,16 +132,16 @@ struct s_SS_smp_state
  *                   - this distinguishes this macro from SS_end_cons
  */
 
-#define SS_end_cons_macro(first, ths, nxt)                                  \
-    {object *x;                                                             \
-     x = nxt;                                                               \
-     if (SS_nullobjp(first))                                                \
-        {first = SS_mk_cons(si, x, SS_null);                                \
-         SS_mark(first);                                                    \
-         SS_assign(si, ths, first);}                                            \
-     else                                                                   \
-        {SS_setcdr(si, ths, SS_mk_cons(si, x, SS_null));                    \
-         SS_assign(si, ths, SS_cdr(si, ths));};}
+#define SS_end_cons_macro(_si, _frst, _ths, _nxt)                            \
+    {object *_x;                                                             \
+     _x = _nxt;                                                              \
+     if (SS_nullobjp(_frst))                                                 \
+        {_frst = SS_mk_cons(_si, _x, SS_null);                               \
+         SS_mark(_frst);                                                     \
+         SS_assign(_si, _ths, _frst);}                                       \
+     else                                                                    \
+        {SS_setcdr(_si, _ths, SS_mk_cons(_si, _x, SS_null));                 \
+         SS_assign(_si, _ths, SS_cdr(_si, _ths));};}
 
 /*--------------------------------------------------------------------------*/
 

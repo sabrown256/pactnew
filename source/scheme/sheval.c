@@ -337,7 +337,7 @@ acc_last:
         SS_restore(si, si->this);
         SS_restore(si, si->argl);
         SS_restore(si, si->fun);
-        SS_end_cons_macro(si->argl, si->this, si->val);
+        SS_end_cons_macro(si, si->argl, si->this, si->val);
         SS_assign(si, si->this, SS_null);         /* done with si->this for now */
         SS_jump(apply_dis);}
     else
@@ -351,7 +351,7 @@ acc_arg:
         SS_restore(si, si->this);
         SS_restore(si, si->unev);
         SS_restore(si, si->argl);
-        SS_end_cons_macro(si->argl, si->this, si->val);
+        SS_end_cons_macro(si, si->argl, si->this, si->val);
         SS_assign(si, si->unev, SS_cdr(si, si->unev));
         SS_jump(eva_loop);};
 

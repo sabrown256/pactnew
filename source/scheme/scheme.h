@@ -348,7 +348,7 @@ struct s_SS_vect
 /*--------------------------------------------------------------------------*/
 
 #define SS_GET(_t, _o)          ((_t *) SS_OBJECT(_o))
-#define SS_PP(_f, _member)       ((procedure *) SS_OBJECT(_f))->_member
+#define SS_PP(_f, _memb)        ((procedure *) SS_OBJECT(_f))->_memb
 
 /* OBJECT ACCESSORS */
 
@@ -361,7 +361,7 @@ struct s_SS_vect
 #define SS_OBJECT_FREE(_si, _o)       (*((_o)->release))(_si, _o)
 #define SS_OBJECT_PRINT(_si, _o, _s)  (*((_o)->print))(_si, _o, _s)
 
-#define SS_INQUIRE_OBJECT(_si, _o)                                          \
+#define SS_INQUIRE_OBJECT(_si, _o)                                           \
    ((object *) SC_hasharr_def_lookup((_si)->symtab, _o))
 
 /* NUMBER ACCESSORS */
@@ -470,7 +470,7 @@ struct s_SS_vect
  *             - return FALSE otherwise
  */
 
-#define SS_integerp(obj) (SC_arrtype(obj, -1) == SC_INT_I)
+#define SS_integerp(_o) (SC_arrtype(_o, -1) == SC_INT_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -479,7 +479,7 @@ struct s_SS_vect
  *           - return FALSE otherwise
  */
 
-#define SS_floatp(obj) (SC_arrtype(obj, -1) == SC_FLOAT_I)
+#define SS_floatp(_o) (SC_arrtype(_o, -1) == SC_FLOAT_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -488,7 +488,7 @@ struct s_SS_vect
  *             - return FALSE otherwise
  */
 
-#define SS_complexp(obj) (SC_arrtype(obj, -1) == SC_DOUBLE_COMPLEX_I)
+#define SS_complexp(_o) (SC_arrtype(_o, -1) == SC_DOUBLE_COMPLEX_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -497,7 +497,7 @@ struct s_SS_vect
  *                - return FALSE otherwise
  */
 
-#define SS_quaterionp(obj) (SC_arrtype(obj, -1) == SC_QUATERNION_I)
+#define SS_quaterionp(_o) (SC_arrtype(_o, -1) == SC_QUATERNION_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -506,7 +506,7 @@ struct s_SS_vect
  *            - return FALSE otherwise
  */
 
-#define SS_stringp(obj) (SC_arrtype(obj, -1) == SC_STRING_I)
+#define SS_stringp(_o) (SC_arrtype(_o, -1) == SC_STRING_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -515,7 +515,7 @@ struct s_SS_vect
  *          - return FALSE otherwise
  */
 
-#define SS_consp(obj) (SC_arrtype(obj, -1) == SS_CONS_I)
+#define SS_consp(_o) (SC_arrtype(_o, -1) == SS_CONS_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -524,7 +524,7 @@ struct s_SS_vect
  *              - return FALSE otherwise
  */
 
-#define SS_variablep(obj) (SC_arrtype(obj, -1) == SS_VARIABLE_I)
+#define SS_variablep(_o) (SC_arrtype(_o, -1) == SS_VARIABLE_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -533,7 +533,7 @@ struct s_SS_vect
  *            - return FALSE otherwise
  */
 
-#define SS_inportp(obj) (SC_arrtype(obj, -1) == SS_INPUT_PORT_I)
+#define SS_inportp(_o) (SC_arrtype(_o, -1) == SS_INPUT_PORT_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -542,7 +542,7 @@ struct s_SS_vect
  *             - return FALSE otherwise
  */
 
-#define SS_outportp(obj) (SC_arrtype(obj, -1) == SS_OUTPUT_PORT_I)
+#define SS_outportp(_o) (SC_arrtype(_o, -1) == SS_OUTPUT_PORT_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -551,7 +551,7 @@ struct s_SS_vect
  *            - return FALSE otherwise
  */
 
-#define SS_eofobjp(obj) (SC_arrtype(obj, -1) == SS_EOF_I)
+#define SS_eofobjp(_o) (SC_arrtype(_o, -1) == SS_EOF_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -560,7 +560,7 @@ struct s_SS_vect
  *             - return FALSE otherwise
  */
 
-#define SS_nullobjp(obj) (SC_arrtype(obj, -1) == SS_NULL_I)
+#define SS_nullobjp(_o) (SC_arrtype(_o, -1) == SS_NULL_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -569,7 +569,7 @@ struct s_SS_vect
  *               - return FALSE otherwise
  */
 
-#define SS_procedurep(obj) (SC_arrtype(obj, -1) == PROC_OBJ)
+#define SS_procedurep(_o) (SC_arrtype(_o, -1) == PROC_OBJ)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -578,7 +578,7 @@ struct s_SS_vect
  *             - return FALSE otherwise
  */
 
-#define SS_booleanp(obj) (SC_arrtype(obj, -1) == SC_BOOL_I)
+#define SS_booleanp(_o) (SC_arrtype(_o, -1) == SC_BOOL_I)
 
 /*--------------------------------------------------------------------------*/
 
@@ -590,7 +590,7 @@ struct s_SS_vect
  *             - return FALSE otherwise
  */
 
-#define SS_hasharrp(obj) (SC_arrtype(obj, -1) == SS_HASHARR_I)
+#define SS_hasharrp(_o) (SC_arrtype(_o, -1) == SS_HASHARR_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -599,7 +599,7 @@ struct s_SS_vect
  *            - return FALSE otherwise
  */
 
-#define SS_haelemp(obj) (SC_arrtype(obj, -1) == SS_HAELEM_I)
+#define SS_haelemp(_o) (SC_arrtype(_o, -1) == SS_HAELEM_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -608,7 +608,7 @@ struct s_SS_vect
  *             - return FALSE otherwise
  */
 
-#define SS_charobjp(obj) (SC_arrtype(obj, -1) == SS_CHARACTER_I)
+#define SS_charobjp(_o) (SC_arrtype(_o, -1) == SS_CHARACTER_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -617,7 +617,7 @@ struct s_SS_vect
  *            - return FALSE otherwise
  */
 
-#define SS_vectorp(obj) (SC_arrtype(obj, -1) == SS_VECTOR_I)
+#define SS_vectorp(_o) (SC_arrtype(_o, -1) == SS_VECTOR_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -626,7 +626,7 @@ struct s_SS_vect
  *             - return FALSE otherwise
  */
 
-#define SS_processp(obj) (SC_arrtype(obj, -1) == SS_PROCESS_I)
+#define SS_processp(_o) (SC_arrtype(_o, -1) == SS_PROCESS_I)
 
 /*--------------------------------------------------------------------------*/
 
@@ -640,7 +640,7 @@ struct s_SS_vect
 
 /* SS_MARK - increment the reference count of the object */
 
-#define SS_mark(_x)  SC_mark(_x, 1)
+#define SS_mark(_o)  SC_mark(_o, 1)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -652,22 +652,22 @@ struct s_SS_vect
 
 #ifdef SCHEME_DEBUG
 
-#define SS_assign(si, _o, _v)                                                    \
-    {_oect *_x;                                                              \
+#define SS_assign(_si, _o, _v)                                               \
+    {object *_x;                                                             \
      _x = _v;                                                                \
      if ((_x->val == NULL) || (_x->eval_type == NO_EV))                      \
-        SS_error(si, "FREED OBJECT - SS_ASSIGN", SS_null);                   \
+        SS_error(_si, "FREED OBJECT - SS_ASSIGN", SS_null);                  \
      SS_mark(_x);                                                            \
-     SS_gc(si, _o);                                                          \
+     SS_gc(_si, _o);                                                         \
      _o = _x;}
 
 #else
 
-#define SS_assign(si, _o, _v)                                                    \
+#define SS_assign(_si, _o, _v)                                               \
     {object *_x;                                                             \
      _x = _v;                                                                \
      SS_mark(_x);                                                            \
-     SS_gc(si, _o);                                                          \
+     SS_gc(_si, _o);                                                         \
      _o = _x;}
 
 #endif
@@ -741,21 +741,21 @@ extern void
 
 /* SS_JUMP - can't bring myself to say goto */
 
-#define SS_jump(x)  goto x
+#define SS_jump(_x)  goto _x
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* SS_TRACEDP - returns the trace field in the procedure struct */
 
-#define SS_tracedp(x) (SS_GET(procedure, x)->trace)
+#define SS_tracedp(_o) (SS_GET(procedure, _o)->trace)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* SS_INT_VAL - return TRUE if the number has an integer value */
 
-#define SS_int_val(x) (floor(x) == ceil(x))
+#define SS_int_val(_x) (floor(_x) == ceil(_x))
 
 #ifdef __cplusplus
 extern "C" {
