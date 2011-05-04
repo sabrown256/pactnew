@@ -23,18 +23,17 @@ extern long double
  logl(long double x),
  sqrtl(long double x);
 
-static JMP_BUF
- cpu;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* TIMEOUT - handle timeout for iteration count */
 
 static void timeout(int sig)
-   {
+   {JMP_BUF *cpu;
 
-    LONGJMP(cpu, TRUE);
+    cpu = SC_get_context(timeout);
+
+    LONGJMP(*cpu, TRUE);
 
     return;}
 
@@ -49,6 +48,7 @@ static int unary_test(char *name, int to,
    {int n, id, il, ok;
     double ad, xd, da, rd, rl;
     long double al, xl;
+    JMP_BUF cpu;
 
     ok = TRUE;
 
@@ -57,7 +57,7 @@ static int unary_test(char *name, int to,
 
 /* do as many iterations as possible in TO seconds */
     if (SETJMP(cpu) == 0)
-       {SC_timeout(to, timeout, NULL);
+       {SC_timeout(to, timeout, &cpu);
 
 	for (id = 0; TRUE; id++)
 	    {for (ad = amn; ad <= amx; ad += da, id++)
@@ -67,7 +67,7 @@ static int unary_test(char *name, int to,
 
 /* do as many iterations as possible in TO seconds */
     if (SETJMP(cpu) == 0)
-       {SC_timeout(to, timeout, NULL);
+       {SC_timeout(to, timeout, &cpu);
 
 	for (il = 0; TRUE; il++)
 	    {for (al = amn; al <= amx; al += da, il++)
@@ -88,7 +88,7 @@ static int unary_test(char *name, int to,
 int main(int c, char **v)
    {int err, rv;
 
-    PM_enable_fpe(TRUE, NULL);
+    PM_enable_fpe_n(TRUE, NULL, NULL);
 
     err = TRUE;
 

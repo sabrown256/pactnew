@@ -27,3 +27,12 @@ ${Files} :: abc.dict
 
 dict : ${Files}
 
+rm :
+	@(echo "Removing generated sources" ; \
+          cd ${PACTTmpDir} ; \
+	  rm -f ${PACTSrcDir}/main/[ab].[ch] ; \
+	  rm -f ${DevInc}/*.h ; \
+	  rm -f ${PACTSrcDir}/global/global.c ; \
+	  rm -f ${PACTSrcDir}/lag/lag.c ; \
+	  rm -f ${PACTSrcDir}/misc/misc.c)
+
