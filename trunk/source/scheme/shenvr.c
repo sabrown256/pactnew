@@ -12,8 +12,8 @@
 
 #define GET_FRAME(_n, _t, _e)                                               \
    {object *_l, *_v;                                                        \
-    _l = SS_car(si, _e);                                                        \
-    _v = SS_car(si, _l);                                                        \
+    _l = SS_car(si, _e);                                                    \
+    _v = SS_car(si, _l);                                                    \
     _t = SS_GET(hasharr, SS_cadr(si, _l));                                  \
     _n = NULL;                                                              \
     if (SS_variablep(_v))                                                   \
@@ -40,7 +40,7 @@ void dproc(SS_psides *si, object *pp)
    {object *name, *params, *penv, *bdy;
 
     if (si == NULL)
-       si = &_SS_si;       /* diagnostic default */
+       si = SS_get_current_scheme(-1);       /* diagnostic default */
 
     if (SS_procedurep(pp))
        {name   = SS_proc_name(si, pp);
@@ -71,7 +71,7 @@ void dpenv(SS_psides *si, object *penv)
     object *b;
 
     if (si == NULL)
-       si = &_SS_si;       /* diagnostic default */
+       si = SS_get_current_scheme(-1);       /* diagnostic default */
 
     if (penv == NULL)
        penv = si->env;
@@ -846,14 +846,36 @@ void SS_env_vars(SS_psides *si, char **vrs, object *penv)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SS_GET_CURRENT_SCHEME - return the current interpreter state
+ *                       - for thread ID
+ */
+
+SS_psides *SS_get_current_scheme(int id)
+   {SS_psides *si;
+    SS_smp_state *sa;
+
+    sa = _SS_get_state(id);
+
+    si = &sa->si;
+
+    return(si);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SS_INIT_THREAD - init state SA for thread ID */
 
 static void _SS_init_thread(SS_smp_state *sa, int id)
    {SS_psides *si;
 
-    si = &_SS_si;
-
     sa->parser = _SSI_scheme_mode;
+
+/* GOTCHA: this should be calling SS_init_scheme to properly setup
+ * the interpreter on the thread
+ * the current SS_init_scheme shouldn't be doing more than
+ * SS_get_current_scheme
+ */
+    si = &sa->si;
 
     _SSI_scheme_mode(si);
 

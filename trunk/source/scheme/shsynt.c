@@ -274,7 +274,7 @@ void dbgst(SS_psides *si, objp *st)
     char msg[MAXLINE];
 
     if (si == NULL)
-       si = &_SS_si;       /* diagnostic default */
+       si = SS_get_current_scheme(-1);       /* diagnostic default */
 
 /* count the number of things on the stack */
     for (i = 0;

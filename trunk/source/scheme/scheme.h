@@ -904,6 +904,9 @@ extern int
 
 /* SHINT.C declarations */
 
+extern SS_psides
+ *SS_get_current_scheme(int tid);
+
 extern object
  *SS_define_constant(SS_psides *si, int n, ...),
  *SS_make_list(SS_psides *si, int first, ...),

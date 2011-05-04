@@ -875,9 +875,8 @@ PM_set *LR_get_set(char *name, PM_centering *pcent, C_array *arr, int space)
 
 /* LR_GET_TIME_DATA - return a list of t, dt, and cycle */
 
-object *LR_get_time_data(void)
+object *LR_get_time_data(SS_psides *si)
    {double tconv, tc, dtc;
-    SS_psides *si = &_SS_si;
 
     tconv = convrsn[SEC]/unit[SEC];
     tc    = tconv*t;
@@ -917,9 +916,8 @@ int LR_get_data(double *pnz, double *pnc, double *pt, double *pdt,
  *                  - and if kmax and lmax
  */
 
-object *LR_get_mesh_data(void)
+object *LR_get_mesh_data(SS_psides *si)
    {object *th;
-    SS_psides *si = &_SS_si;
 
     th = SS_make_list(si,
 		      SC_INTEGER_I, &N_zones,

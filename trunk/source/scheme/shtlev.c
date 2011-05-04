@@ -32,9 +32,6 @@ object
  *SS_f,
  *SS_else;
 
-SS_psides
- _SS_si;
-
 SS_state
  _SS = { -1, 1, -1, 1, };
 
@@ -402,7 +399,7 @@ SS_psides *SS_init_scheme(char *code, char *vers)
     SC_contextdes hnd;
     SS_psides *si;
 
-    si = &_SS_si;
+    si = SS_get_current_scheme(-1);
 
     hnd = SC_which_signal_handler(SIGINT);
     SC_setup_sig_handlers(_SS_sig_handler, si, TRUE);
