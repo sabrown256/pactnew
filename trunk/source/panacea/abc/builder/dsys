@@ -305,6 +305,12 @@ switch ($1)
         touch ../$DevInc/fooin.h
         rm -f ../$DevInc/*in.h
         rm -f ../$DevInc/mesh.h
+
+# remove generated sources
+        pushd .. >& /dev/null
+        pact rm
+        popd >& /dev/null
+
         breaksw
 
 #--------------------------------------------------------------------------

@@ -10,8 +10,7 @@
 
 unalias *
 
-set arch  = `../scripts/cfgman use`
-popd >& /dev/null
+set arch = `../scripts/cfgman use`
 
 set err = 0
 set d   = $cwd

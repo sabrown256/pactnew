@@ -10,21 +10,20 @@
 
 #include "pml.h"
 
-static JMP_BUF
- cpu;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* HANDLER - handle SIGFPE */
 
 static void handler(int sig)
-   {
+   {JMP_BUF *cpu;
+
+    cpu = SC_get_context(handler);
 
     PM_clear_fpu();
-    PM_enable_fpe(TRUE, handler);
+    PM_enable_fpe_n(TRUE, handler, cpu);
 
-    LONGJMP(cpu, 1);
+    LONGJMP(*cpu, 1);
 
     return;}
 
@@ -36,10 +35,11 @@ static void handler(int sig)
 int main(int c, char **v)
    {int i, rv, verbose;
     volatile double a, x, y;
+    JMP_BUF cpu;
 
     verbose = FALSE;
 
-    PM_enable_fpe(TRUE, handler);
+    PM_enable_fpe_n(TRUE, handler, &cpu);
 
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-h") == 0)

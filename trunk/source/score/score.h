@@ -654,6 +654,15 @@ extern int
  SC_check_file(FILE *fp);
 
 
+/* SCCNTX.C declarations */
+
+extern int
+ SC_register_context(void *f, void *a);
+
+extern void
+ *SC_get_context(void *f);
+
+
 /* SCCTL.C declarations */
 
 extern void
