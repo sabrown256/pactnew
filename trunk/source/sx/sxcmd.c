@@ -350,11 +350,11 @@ static object *_SXI_thru(SS_psides *si, object *argl)
         if (first <= last)
            {last = min(last, n);
             for (id = first; id <= last; id++)
-                SS_Assign(ret, SS_mk_cons(si, SS_mk_integer(si, id), ret));}
+                SS_assign(si, ret, SS_mk_cons(si, SS_mk_integer(si, id), ret));}
         else
            {first = min(first, n);
             for (id = first; id >= last; id--)
-                SS_Assign(ret, SS_mk_cons(si, SS_mk_integer(si, id), ret));};}
+                SS_assign(si, ret, SS_mk_cons(si, SS_mk_integer(si, id), ret));};}
 #if 0
     else
        {char first = '\0', last = '\0', id;
@@ -375,12 +375,12 @@ static object *_SXI_thru(SS_psides *si, object *argl)
         if (first <= last)
            {for (id = first; id <= last; id++)
                 if (_SX_mappingp(&id))
-                   SS_Assign(ret, SS_mk_cons(si, SX_get_curve_obj(id - 'A'),
+                   SS_assign(si, ret, SS_mk_cons(si, SX_get_curve_obj(id - 'A'),
 					     ret));}
         else
            {for (id = first; id >= last; id--)
                 if (_SX_mappingp(&id))
-                   SS_Assign(ret, SS_mk_cons(si, SX_get_curve_obj(id - 'A'),
+                   SS_assign(si, ret, SS_mk_cons(si, SX_get_curve_obj(id - 'A'),
 					     ret));};};
 #endif
     SX_prep_ret(si, ret);

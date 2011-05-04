@@ -151,7 +151,7 @@ object *SS_hash_dump(SS_psides *si, object *argl)
     obj = SS_null;
     for (i = nnames-1; i >= 0; i--)
         if ((name = names[i]) != NULL)
-           {SS_Assign(obj, SS_mk_cons(si, SS_mk_string(si, name), obj));};
+           {SS_assign(si, obj, SS_mk_cons(si, SS_mk_string(si, name), obj));};
 
 /* release the pointers */
     CFREE(names);

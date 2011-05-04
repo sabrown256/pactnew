@@ -65,7 +65,7 @@ object *SS_setcar(SS_psides *si, object *pair, object *car)
    {object *oldcar;
 
     oldcar = SS_car(si, pair);
-    SS_MARK(car);
+    SS_mark(car);
     SS_CAR_MACRO(pair) = car;
     SS_gc(si, oldcar);
 
@@ -82,7 +82,7 @@ object *SS_setcdr(SS_psides *si, object *pair, object *cdr)
    {object *oldcdr;
 
     oldcdr = SS_cdr(si, pair);
-    SS_MARK(cdr);
+    SS_mark(cdr);
     SS_CDR_MACRO(pair) = cdr;
     SS_gc(si, oldcdr);
 
@@ -404,7 +404,7 @@ object *SS_reverse(SS_psides *si, object *obj)
           ths = nxt;
           nxt = SS_cdr(si, nxt);
           SS_CDR_MACRO(ths) = prv;
-          SS_MARK(prv);
+          SS_mark(prv);
           SC_mark(nxt, -1);};
 
     return(ths);}
@@ -431,11 +431,11 @@ object *SS_append(SS_psides *si, object *list1, object *list2)
     else if (SS_consp(list1))
        {frst = SS_null;
 	cr   = SS_null;
-	SS_Assign(cr, list1);
+	SS_assign(si, cr, list1);
         while (SS_consp(cr))
            {nxt = SS_car(si, cr);
             SS_end_cons(frst, lst, nxt);
-            SS_Assign(cr, SS_cdr(si, cr));};
+            SS_assign(si, cr, SS_cdr(si, cr));};
 
         SS_setcdr(si, lst, list2);
 

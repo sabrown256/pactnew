@@ -232,7 +232,7 @@ static void _SS_rl_vector(SS_psides *si, object *obj)
     va = SS_VECTOR_ARRAY(obj);
 
     for (i = 0; i < k; i++)
-        {SS_Assign(va[i], SS_null);};
+        {SS_assign(si, va[i], SS_null);};
 
     CFREE(va);
     CFREE(SS_OBJECT(obj));
@@ -381,7 +381,7 @@ static void _SS_rl_procedure(SS_psides *si, object *obj)
 
     switch (pp->type)
 
-/* since the environment part of the procedure was not SS_MARKed at the
+/* since the environment part of the procedure was not SS_marked at the
  * time the procedure was made because of the circularity of the situation 
  * GC the name and lambda only
  */
@@ -556,7 +556,7 @@ static void _SS_wr_vector(SS_psides *si, object *obj, object *strm)
    {object *lst;
 
     lst = SS_vctlst(si, obj);
-    SS_MARK(lst);
+    SS_mark(lst);
     PRINT(SS_OUTSTREAM(strm), "#");
     SS_wr_lst(si, lst, strm);
     SS_gc(si, lst);
@@ -607,9 +607,9 @@ object *SS_mk_procedure(SS_psides *si, object *name,
     sp->lambda = lam_exp;
     sp->env    = penv;
 
-    SS_MARK(sp->name);
-    SS_MARK(sp->lambda);
-/*    SS_MARK(sp->env); */
+    SS_mark(sp->name);
+    SS_mark(sp->lambda);
+/*    SS_mark(sp->env); */
 
     pp = CMAKE(procedure);
 
@@ -839,8 +839,8 @@ object *SS_mk_cons(SS_psides *si, object *ca, object *cd)
     object *op;
 
     cp = CMAKE(cons);
-    SS_MARK(ca);
-    SS_MARK(cd);
+    SS_mark(ca);
+    SS_mark(cd);
     cp->car = ca;
     cp->cdr = cd;
 

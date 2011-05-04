@@ -227,7 +227,7 @@ static void _SX_read(SS_psides *si, object *strm)
         strcpy(t, bf);
 
         SS_PTR(strm) = t;
-        SS_Assign(si->rdobj, SS_read(si, strm));}
+        SS_assign(si, si->rdobj, SS_read(si, strm));}
 
 /* if it is an unbound variable check to see if it is a file variable
  * in which case print or change it
@@ -252,7 +252,7 @@ static void _SX_read(SS_psides *si, object *strm)
 
 	    strcpy(t, bf);
 	    SS_PTR(strm) = t;
-	    SS_Assign(si->rdobj, SS_read(si, strm));};};
+	    SS_assign(si, si->rdobj, SS_read(si, strm));};};
 
     CFREE(s);
 

@@ -258,7 +258,7 @@ static object *_ULI_expunge_macro(SS_psides *si, object *argl)
 
         UL_compress_numbers();}
 
-    SS_Assign(argl, SS_null);
+    SS_assign(si, argl, SS_null);
 
     return(argl);}
 
@@ -811,9 +811,9 @@ static object *UL_print_labels(SS_psides *si, int *indx, int nc,
                     continue;};
 
              if (id_flag == 1)
-                {SS_Assign(ret, SS_mk_cons(si, SS_mk_integer(si, j), ret));}
+                {SS_assign(si, ret, SS_mk_cons(si, SS_mk_integer(si, j), ret));}
              else if (id_flag == 2)
-                {SS_Assign(ret, SS_mk_cons(si, SX_dataset[i].obj, ret));}
+                {SS_assign(si, ret, SS_mk_cons(si, SX_dataset[i].obj, ret));}
 
              if ((silent == FALSE) &&
 		 ((si->interactive == ON) || (fp != stdout)))
@@ -838,7 +838,7 @@ static object *UL_print_labels(SS_psides *si, int *indx, int nc,
     if (name != NULL)
        io_close(fp);
 
-    SS_Assign(ret, SS_reverse(si, ret));
+    SS_assign(si, ret, SS_reverse(si, ret));
 
     return(ret);}
 
@@ -919,7 +919,7 @@ static object *_ULI_prefix(SS_psides *si, object *argl)
                {if (si->interactive == ON)
                    PRINT(stdout, " Prefix %c is not assigned\n", pre);};}
 
-        {SS_Assign(ret,
+        {SS_assign(si, ret,
                    SS_mk_cons(si, arg1,
                               SS_mk_cons(si, SS_mk_integer(si, mindex),
                                          SS_mk_cons(si, SS_mk_string(si, fname),
@@ -934,7 +934,7 @@ static object *_ULI_prefix(SS_psides *si, object *argl)
                 if (si->interactive == ON)
                    PRINT(stdout, " %c%6d    %s\n", pre, mindex, fname);
                 arg1 = SS_mk_char(si, (int) pre);
-                {SS_Assign(ret,
+                {SS_assign(si, ret,
                            SS_mk_cons(si,
 				      SS_mk_cons(si, arg1,
 						 SS_mk_cons(si,
@@ -943,7 +943,7 @@ static object *_ULI_prefix(SS_psides *si, object *argl)
 								       SS_mk_string(si, fname),
                                                                        SS_null))),
                                       ret));};}
-        {SS_Assign(ret, SS_reverse(si, ret));};}
+        {SS_assign(si, ret, SS_reverse(si, ret));};}
 
     return(ret);}
 
@@ -1142,11 +1142,11 @@ static object *_ULI_filter(SS_psides *si, int j, object *argl)
     yexpr = SS_null;
     for (i = 0, k = 0; i < n; i++)
         {xt = x[0][i];
-	 SS_Assign(xexpr, SS_make_list(si, SS_OBJECT_I, dom_pred,
+	 SS_assign(si, xexpr, SS_make_list(si, SS_OBJECT_I, dom_pred,
 				       SC_DOUBLE_I, &xt,
 				       0));
 	 xt = x[1][i];
-         SS_Assign(yexpr, SS_make_list(si, SS_OBJECT_I, ran_pred,
+         SS_assign(si, yexpr, SS_make_list(si, SS_OBJECT_I, ran_pred,
 				       SC_DOUBLE_I, &xt,
 				       0));
          if ((SS_true(SS_exp_eval(si, xexpr))) &&
@@ -1154,8 +1154,8 @@ static object *_ULI_filter(SS_psides *si, int j, object *argl)
             {UL_buf1x[k] = x[0][i];
              UL_buf1y[k] = x[1][i];
              k++;};};
-    SS_Assign(xexpr, SS_null);
-    SS_Assign(yexpr, SS_null);
+    SS_assign(si, xexpr, SS_null);
+    SS_assign(si, yexpr, SS_null);
 
     if (k < 2)
        {CFREE(UL_buf1x);
@@ -1353,10 +1353,10 @@ static object *_ULI_syscmnd(SS_psides *si, object *s)
     if (output != NULL)
        {i = 0;
         while (output[i] != NULL)
-           {SS_Assign(lst, SS_mk_cons(si, SS_mk_string(si, output[i]), lst));
+           {SS_assign(si, lst, SS_mk_cons(si, SS_mk_string(si, output[i]), lst));
             CFREE(output[i]);
             i++;}
-        SS_Assign(lst, SS_reverse(si, lst));
+        SS_assign(si, lst, SS_reverse(si, lst));
         CFREE(output);}
 
     return(lst);}
@@ -1656,7 +1656,7 @@ static object *UL_pr_append(SS_psides *si, object *a, object *b)
     tmp = SS_make_list(si, SS_OBJECT_I, a,
                        SS_OBJECT_I, b,
                        0);
-    SS_MARK(tmp);
+    SS_mark(tmp);
     c = _ULI_average(si, tmp);
     SS_gc(si, tmp);
 

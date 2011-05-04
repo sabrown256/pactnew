@@ -55,7 +55,7 @@ object *SX_display_map(SS_psides *si, object *mo)
 					1, NULL);
 	mo = SX_mk_graph(si, g);
 
-	SS_MARK(mo);
+	SS_mark(mo);
 	SS_call_scheme(si, "display-mapping*",
 		       SS_OBJECT_I, mo,
 		       0);};
@@ -72,7 +72,7 @@ object *SX_display_map(SS_psides *si, object *mo)
 static object *_SX_resolve_mapping(SS_psides *si, object *argl)
    {object *obj, *fo, *var, *fnc;
 
-    SS_Save(si, si->argl);
+    SS_save(si, si->argl);
 
     obj = SS_car(si, argl);
     fo  = obj;
@@ -86,13 +86,13 @@ static object *_SX_resolve_mapping(SS_psides *si, object *argl)
  * freed if this path is taken, so add the mark that tells it that
  * someone else it pointing at it
  */
-	   {SS_MARK(argl);
+	   {SS_mark(argl);
 
 	    fo = SS_call_scheme(si, "map-resolve",
 				SS_OBJECT_I, obj,
 				0);};};
 
-    SS_Restore(si, si->argl);
+    SS_restore(si, si->argl);
 
     return(fo);}
 
@@ -220,7 +220,7 @@ object *_SX_mh_u_s(SS_psides *si, C_procedure *cp, object *argl)
 
     else
        {fn = (PFDoubleR) cp->proc[0];
-	SS_Assign(ret, argl);
+	SS_assign(si, ret, argl);
 
 	while (SS_consp(argl))
 	   {obj  = _SX_resolve_mapping(si, argl);
@@ -295,7 +295,7 @@ object *_SX_m11_x(SS_psides *si, C_procedure *cp, object *argl)
             SX_dataset[j].modified = TRUE;
  */
 
-            SS_Assign(ret, SS_mk_cons(si, obj, ret));
+            SS_assign(si, ret, SS_mk_cons(si, obj, ret));
             PM_find_extrema(set);};};
          
     SX_prep_ret(si, ret);
@@ -327,7 +327,7 @@ object *_SX_m11_b_mro(SS_psides *si, C_procedure *cp, object *argl)
         if (f != NULL)
            op(si, f, al);
 
-	SS_Assign(ret, SS_mk_cons(si, obj, ret));};
+	SS_assign(si, ret, SS_mk_cons(si, obj, ret));};
          
     SX_prep_ret(si, ret);
 
@@ -397,7 +397,7 @@ object *_SX_m11_b_mrs(SS_psides *si, C_procedure *cp, object *argl)
 /* for later
             SX_dataset[j].modified = TRUE;
  */
-            SS_Assign(ret, SS_mk_cons(si, obj, ret));
+            SS_assign(si, ret, SS_mk_cons(si, obj, ret));
             PM_find_extrema(set);};};
          
     SX_prep_ret(si, ret);
@@ -438,7 +438,7 @@ object *_SX_m11_b_mds(SS_psides *si, C_procedure *cp, object *argl)
 /* for later
             SX_dataset[j].modified = TRUE;
  */
-            SS_Assign(ret, SS_mk_cons(si, obj, ret));
+            SS_assign(si, ret, SS_mk_cons(si, obj, ret));
             PM_find_extrema(set);};};
          
     SX_prep_ret(si, ret);
@@ -486,7 +486,7 @@ object *_SX_mij_b_mrs(SS_psides *si, C_procedure *cp, object *argl)
 /* for later
             SX_dataset[j].modified = TRUE;
  */
-            SS_Assign(ret, SS_mk_cons(si, obj, ret));
+            SS_assign(si, ret, SS_mk_cons(si, obj, ret));
             PM_find_extrema(set);};};
          
     SX_prep_ret(si, ret);
@@ -534,7 +534,7 @@ object *_SX_mij_b_mds(SS_psides *si, C_procedure *cp, object *argl)
 /* for later
             SX_dataset[j].modified = TRUE;
  */
-            SS_Assign(ret, SS_mk_cons(si, obj, ret));
+            SS_assign(si, ret, SS_mk_cons(si, obj, ret));
             PM_find_extrema(set);};};
          
     SX_prep_ret(si, ret);
@@ -566,7 +566,7 @@ object *_SX_mh_u_m(SS_psides *si, C_procedure *cp, object *argl)
 	     if (plf)
 	        mo = SX_display_map(si, mo);
 
-	     SS_Assign(ret, SS_mk_cons(si, mo, ret));};};
+	     SS_assign(si, ret, SS_mk_cons(si, mo, ret));};};
          
     SX_prep_ret(si, ret);
 

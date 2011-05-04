@@ -1862,7 +1862,7 @@ pcons *SX_set_attr_alist(SS_psides *si, pcons *inf,
        {char dtype[MAXLINE], stype[MAXLINE];
 
 	obj = SS_null;
-	SS_Assign(obj, SX_list_array(si, val));
+	SS_assign(si, obj, SX_list_array(si, val));
 	SS_args(si, obj,
 		G_NUM_ARRAY, &arr,
 		0);

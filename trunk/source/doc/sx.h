@@ -2592,7 +2592,7 @@ The following are available with the LARGE option (default):<p>
 <TD>decrement the reference count of x and release it if the count is zero </TD></TR>
 <TR><TD>SS_mark(x)</TD>
 <TD>increment the reference count of x </TD></TR>
-<TR><TD>SS_Assign(x, val)</TD>
+<TR><TD>SS_assign(si, x, val)</TD>
 <TD>assign object x to object val making sure to get the reference counts right </TD></TR>
 </TABLE>
 </BLOCKQUOTE>
@@ -2622,9 +2622,9 @@ The following are available with the LARGE option (default):<p>
 
 <BLOCKQUOTE>
 <TABLE>
-<TR><TD WIDTH="100">SS_Save(si, x)</TD>
+<TR><TD WIDTH="100">SS_save(si, x)</TD>
 <TD>save x on the stack </TD></TR>
-<TR><TD>SS_Restore(x)</TD>
+<TR><TD>SS_restore(x)</TD>
 <TD>pop an object off the stack into x and release
 the stack entry </TD></TR>
 </TABLE>

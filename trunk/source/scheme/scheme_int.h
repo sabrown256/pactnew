@@ -137,11 +137,11 @@ struct s_SS_smp_state
      x = nxt;                                                               \
      if (SS_nullobjp(first))                                                \
         {first = SS_mk_cons(si, x, SS_null);                                \
-         SS_MARK(first);                                                    \
-         SS_Assign(ths, first);}                                            \
+         SS_mark(first);                                                    \
+         SS_assign(si, ths, first);}                                            \
      else                                                                   \
         {SS_setcdr(si, ths, SS_mk_cons(si, x, SS_null));                    \
-         SS_Assign(ths, SS_cdr(si, ths));};}
+         SS_assign(si, ths, SS_cdr(si, ths));};}
 
 /*--------------------------------------------------------------------------*/
 

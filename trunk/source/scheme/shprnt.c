@@ -769,7 +769,7 @@ int SS_prim_des(SS_psides *si, object *strm, object *obj)
                 PRINT(str, "     %s", SS_STRING_TEXT(desc));
              else
                 {desc = SS_mk_cons(si, obj, bdy);
-                 SS_MARK(desc);
+                 SS_mark(desc);
                  PRINT(str, "     Compound procedure:\n");
 		 bdy = SS_make_form(si, SS_quoteproc, bdy, LAST);
 		 if (fmt == TRUE)
@@ -790,7 +790,7 @@ int SS_prim_des(SS_psides *si, object *strm, object *obj)
                 PRINT(str, "     %s", SS_STRING_TEXT(desc));
              else
                 {desc = SS_mk_cons(si, obj, bdy);
-                 SS_MARK(desc);
+                 SS_mark(desc);
                  PRINT(str, "     Compound macro:\n");
 		 bdy = SS_make_form(si, SS_quoteproc, bdy, LAST);
 		 if (fmt == TRUE)

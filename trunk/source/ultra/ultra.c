@@ -351,7 +351,7 @@ static void _UL_del_intermediate(SS_psides *si, object *cla, ...)
 /* _UL_PARSE - determine whether or not to reprocess the input for Ultra
  *           - this is the double worker for the si->post_eval
  *           - since this si->evobj is not the same as in SS_REPL
- *           - it should be SS_MARK'd as being an additional pointer to its
+ *           - it should be SS_mark'd as being an additional pointer to its
  *           - respective object
  */
 
@@ -361,7 +361,7 @@ static void _UL_parse(SS_psides *si, object *strm)
     SX_parse(si, UL_plot, _UL_reproc_in, strm);
 
 /* get the list of curves after evaluating the latest expression */
-    SS_Assign(crva, UL_get_crv_list(si));
+    SS_assign(si, crva, UL_get_crv_list(si));
 
 /* identify intermediate results for elimination */
     if (UL_save_intermediate == OFF)
@@ -375,8 +375,8 @@ static void _UL_parse(SS_psides *si, object *strm)
 	       _UL_del_intermediate(si, crva, si->val, NULL);};};
 
 /* free the curve lists */
-    SS_Assign(crva, SS_null);
-    SS_Assign(crvb, SS_null);
+    SS_assign(si, crva, SS_null);
+    SS_assign(si, crvb, SS_null);
 
     return;}
 
@@ -389,7 +389,7 @@ static void _UL_read(SS_psides *si, object *strm)
    {
 
 /* get the list of curves before evaluating the latest expression */
-    SS_Assign(crvb, UL_get_crv_list(si));
+    SS_assign(si, crvb, UL_get_crv_list(si));
 
     return;}
     
@@ -582,7 +582,7 @@ object *_UL_dataid_seq(SS_psides *si, char *first, char *last)
        {num = ilast - ifirst + 1;
         inc = 1;}
 
-    SS_Assign(ret, SS_mk_cons(si,
+    SS_assign(si, ret, SS_mk_cons(si,
 			      SX_get_curve_obj(ifirst),
 			      ret));
     strcpy(prev, first);
@@ -591,7 +591,7 @@ object *_UL_dataid_seq(SS_psides *si, char *first, char *last)
         {strcpy(next, _UL_next_dataid(prev, inc));
          if (SX_curvep(next))
             {icur = SX_get_curve_id(next);
-             SS_Assign(ret, SS_mk_cons(si,
+             SS_assign(si, ret, SS_mk_cons(si,
 				       SX_get_curve_obj(icur),
 				       ret));}
          strcpy(prev, next);}
@@ -630,12 +630,12 @@ object *_ULI_thru(SS_psides *si, object *argl)
 
         if (first <= last)
            {for (id = first; id <= last; id++)
-                SS_Assign(ret, SS_mk_cons(si,
+                SS_assign(si, ret, SS_mk_cons(si,
 					  SS_mk_integer(si, id),
 					  ret));}
         else
            {for (id = first; id >= last; id--)
-                SS_Assign(ret, SS_mk_cons(si,
+                SS_assign(si, ret, SS_mk_cons(si,
 					  SS_mk_integer(si, id),
 					  ret));};}
 
