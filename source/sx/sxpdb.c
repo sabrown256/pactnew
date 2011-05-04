@@ -1525,7 +1525,7 @@ static object *_SXI_list_variables(SS_psides *si, object *argl)
 
     obj = SS_null;
     for (i = num - 1; i >= 0; i--)
-        {SS_Assign(obj, SS_mk_cons(si, SS_mk_string(si, names[i]), obj));};
+        {SS_assign(si, obj, SS_mk_cons(si, SS_mk_string(si, names[i]), obj));};
 
     CFREE(names);
 
@@ -2494,7 +2494,7 @@ static object *_SX_write_filedata(SS_psides *si, object *argl)
 /* if the next item is a pdbdata, use its info */
     symo = SS_car(si, argl);
     if (SX_PDBDATAP(symo))
-       {SS_MARK(symo);
+       {SS_mark(symo);
         ep           = PDBDATA_EP(symo);
         addr.memaddr = (char *) PDBDATA_DATA(symo);
         type         = CSTRSAVE(PD_entry_type(ep));
@@ -2699,7 +2699,7 @@ static object *_SXI_reserve_pdbdata(SS_psides *si, object *argl)
 /* if the next item is a pdbdata, use its info */
     symo = SS_car(si, argl);
     if (SX_PDBDATAP(symo))
-       {SS_MARK(symo);
+       {SS_mark(symo);
         ep           = PDBDATA_EP(symo);
         addr.memaddr = (char *) PDBDATA_DATA(symo);
         type         = CSTRSAVE(PD_entry_type(ep));

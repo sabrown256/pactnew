@@ -186,30 +186,30 @@ object *SX_arg_prep(SS_psides *si, object *argl)
    {object *acc, *lst, *obj;
 
 /* because argl might be si->argl and since it is passed as an argument to
- * a function instead of being SS_Assign'd in the usual manner we MUST
+ * a function instead of being SS_assign'd in the usual manner we MUST
  * protect against GC'ing it when the reference from si->argl is lost
  */
-    SS_MARK(argl);
-    SS_Assign(si->argl, SS_null);
+    SS_mark(argl);
+    SS_assign(si, si->argl, SS_null);
 
 /* make a copy of the arg list other people may be pointing at it */
     for (lst = SS_null, acc = argl; !SS_nullobjp(acc); acc = SS_cdr(si, acc))
         lst = SS_mk_cons(si, SS_car(si, acc), lst);
-    SS_MARK(lst);
+    SS_mark(lst);
 
     acc = SS_null;
     while (!SS_nullobjp(lst))
        {obj = SS_car(si, lst);
         if (SS_consp(obj))
-           {SS_Assign(acc, SS_append(si, obj, acc));}
+           {SS_assign(si, acc, SS_append(si, obj, acc));}
         else
-           {SS_Assign(acc, SS_append(si, SS_mk_cons(si, obj, SS_null), acc));};
+           {SS_assign(si, acc, SS_append(si, SS_mk_cons(si, obj, SS_null), acc));};
 
 /* this frees the cons we made above */
-        SS_Assign(lst, SS_cdr(si, lst));};
+        SS_assign(si, lst, SS_cdr(si, lst));};
 
 /* undo the additional reference that was added at the beginning */
-    SS_Assign(argl, SS_null);
+    SS_assign(si, argl, SS_null);
 
     return(acc);}
 

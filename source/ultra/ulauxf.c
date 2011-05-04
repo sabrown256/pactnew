@@ -281,10 +281,10 @@ static object *_UL_get_value(SS_psides *si, double *sp, double *vp,
                  PRINT(stdout, SX_text_output_format, y);
                  PRINT(stdout, "\n");};
                  
-             SS_Assign(ret, SS_mk_cons(si, SS_mk_float(si, y), ret));};};
+             SS_assign(si, ret, SS_mk_cons(si, SS_mk_float(si, y), ret));};};
 
     if (!SS_nullobjp(ret))
-       {SS_Assign(ret, SS_reverse(si, ret));
+       {SS_assign(si, ret, SS_reverse(si, ret));
         SC_mark(ret, -1);}
     else
        ret = SS_f;
@@ -314,7 +314,7 @@ object *UL_curve_eval(SS_psides *si, object *arg)
 
     ret = _UL_get_value(si, SX_dataset[i].x[0], SX_dataset[i].x[1], value,
 			SX_dataset[i].n, SX_dataset[i].id);
-    SS_MARK(ret);
+    SS_mark(ret);
 
     UL_pause(si, FALSE);
 

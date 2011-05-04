@@ -386,7 +386,7 @@ static object *_SSI_get_host_types(SS_psides *si, object *argl)
 	        break;
 	     else
 	        {s = SS_mk_string(si, t);
-		 SS_Assign(strl, SS_mk_cons(si, s, strl));};};
+		 SS_assign(si, strl, SS_mk_cons(si, s, strl));};};
 
 	SC_free_strings(strs);
 

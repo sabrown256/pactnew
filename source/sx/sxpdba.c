@@ -284,7 +284,7 @@ static object *_SXI_lst_attr(SS_psides *si, object *argl)
     for (i = n-1; i >= 0; i--)
         {name = entries[i];
          if (name != NULL)
-            {SS_Assign(obj, SS_mk_cons(si, SS_mk_string(si, name), obj));};
+            {SS_assign(si, obj, SS_mk_cons(si, SS_mk_string(si, name), obj));};
 
          CFREE(name);};
 

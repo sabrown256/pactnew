@@ -103,9 +103,9 @@ object *UL_us(SS_psides *si, C_procedure *cp, object *argl)
     ret = SS_null;
     for (t = argl; !SS_nullobjp(t); t = SS_cdr(si, t))
         {val = fun(si, SS_car(si, t));
-         SS_Assign(ret, SS_mk_cons(si, val, ret));};
+         SS_assign(si, ret, SS_mk_cons(si, val, ret));};
 
-    SS_Assign(argl, SS_null);
+    SS_assign(si, argl, SS_null);
 
     SX_prep_ret(si, ret);
 
@@ -135,9 +135,9 @@ object *UL_uc(SS_psides *si, C_procedure *cp, object *argl)
     for (t = argl ; !SS_nullobjp(t); t = SS_cdr(si, t))
         {i = SX_get_crv_index_i(SS_car(si, t));
          if (i >= 0)
-            {SS_Assign(ret, SS_mk_cons(si, fun(si, i), ret));};};
+            {SS_assign(si, ret, SS_mk_cons(si, fun(si, i), ret));};};
          
-    SS_Assign(argl, SS_null);
+    SS_assign(si, argl, SS_null);
 
     SX_prep_ret(si, ret);
 
@@ -169,7 +169,7 @@ object *UL_opxc(SS_psides *si, C_procedure *cp, object *argl)
     if (a == HUGE)
        SS_error(si, "BAD NUMBER - UL_OPXC ", tok);
 
-    SS_Assign(tok, SS_null);
+    SS_assign(si, tok, SS_null);
 
 /* set plot flag on so that for example (dx (lst)) causes replot */
     SX_plot_flag = TRUE;
@@ -183,12 +183,12 @@ object *UL_opxc(SS_psides *si, C_procedure *cp, object *argl)
                  *xp = fun(*xp, a);
              SX_dataset[i].modified = TRUE;
 
-             SS_Assign(ret, SS_mk_cons(si, SX_dataset[i].obj, ret));
+             SS_assign(si, ret, SS_mk_cons(si, SX_dataset[i].obj, ret));
              UL_lmt(SX_dataset[i].x[0], n,
                     &SX_dataset[i].wc[0],
                     &SX_dataset[i].wc[1]);};};
          
-    SS_Assign(argl, SS_null);
+    SS_assign(si, argl, SS_null);
 
     SX_prep_ret(si, ret);
 
@@ -220,7 +220,7 @@ object *UL_opyc(SS_psides *si, C_procedure *cp, object *argl)
     if (a == HUGE)
        SS_error(si, "BAD NUMBER - UL_OPYC ", tok);
 
-    SS_Assign(tok, SS_null);
+    SS_assign(si, tok, SS_null);
 
 /* set plot flag on so that for example (dy (lst)) causes replot */
     SX_plot_flag = TRUE;
@@ -234,12 +234,12 @@ object *UL_opyc(SS_psides *si, C_procedure *cp, object *argl)
                  *yp = fun(*yp, a);
              SX_dataset[i].modified = TRUE;
 
-             SS_Assign(ret, SS_mk_cons(si, SX_dataset[i].obj, ret));
+             SS_assign(si, ret, SS_mk_cons(si, SX_dataset[i].obj, ret));
              UL_lmt(SX_dataset[i].x[1], n,
                     &SX_dataset[i].wc[2],
                     &SX_dataset[i].wc[3]);};};
 
-    SS_Assign(argl, SS_null);
+    SS_assign(si, argl, SS_null);
 
     SX_prep_ret(si, ret);
 
@@ -262,14 +262,14 @@ static object *_UL_ul2toc(SS_psides *si, C_procedure *cp,
     tok1 = NULL;
     tok2 = NULL;
 
-    SS_Assign(argl, SS_reverse(si, argl));
+    SS_assign(si, argl, SS_reverse(si, argl));
     tok2 = SS_car(si, argl);
     if (SS_numbp(tok2))
-       {SS_Assign(argl, SS_cdr(si, argl));
+       {SS_assign(si, argl, SS_cdr(si, argl));
 	if (SS_consp(argl))
 	   {tok1 = SS_car(si, argl);
 	    if (SS_numbp(tok1))
-	       {SS_Assign(argl, SS_cdr(si, argl));}
+	       {SS_assign(si, argl, SS_cdr(si, argl));}
 	    else
 	       {tok1 = tok2;
 		tok2 = NULL;};}
@@ -278,7 +278,7 @@ static object *_UL_ul2toc(SS_psides *si, C_procedure *cp,
 	    tok2 = NULL;};}
     else
         tok2 = NULL;
-    SS_Assign(argl, SS_reverse(si, argl));
+    SS_assign(si, argl, SS_reverse(si, argl));
 
     SX_prep_arg(si, argl);
 
@@ -299,12 +299,12 @@ static object *_UL_ul2toc(SS_psides *si, C_procedure *cp,
 			0);
 	     else
 	        d2 = SX_dataset[i].wc[1];
-             SS_Assign(ret,
+             SS_assign(si, ret,
                        SS_mk_cons(si, fun(si, i, d1, d2), ret));};};
 
     SX_plot_flag = replot_flag;
 
-    SS_Assign(argl, SS_null);
+    SS_assign(si, argl, SS_null);
 
     SX_prep_ret(si, ret);
 
@@ -353,7 +353,7 @@ object *UL_ulntoc(SS_psides *si, C_procedure *cp, object *argl)
     for (t = argl, crvs = SS_null; SS_consp(t); t = SS_cdr(si, t))
         {tok = SS_car(si, t);
          if (SX_curvep_a(tok))
-            {SS_Assign(crvs, SS_mk_cons(si, tok, crvs));}
+            {SS_assign(si, crvs, SS_mk_cons(si, tok, crvs));}
          else
             break;};
 
@@ -364,12 +364,12 @@ object *UL_ulntoc(SS_psides *si, C_procedure *cp, object *argl)
         {tok = SS_car(si, u);
          if (SX_curvep_a(tok))
             {i = SX_get_crv_index_i(tok);
-             SS_Assign(ret,
+             SS_assign(si, ret,
                        SS_mk_cons(si, fun(si, i, t), ret));};};
 
-    SS_Assign(crvs, SS_null);
-    SS_Assign(argl, SS_null);
-    SS_Assign(ret, SS_reverse(si, ret));
+    SS_assign(si, crvs, SS_null);
+    SS_assign(si, argl, SS_null);
+    SS_assign(si, ret, SS_reverse(si, ret));
 
     SX_prep_ret(si, ret);
 
@@ -402,12 +402,12 @@ object *UL_uopxc(SS_psides *si, C_procedure *cp, object *argl)
                  *xp = fun(*xp);
              SX_dataset[i].modified = TRUE;
 
-             SS_Assign(ret, SS_mk_cons(si, SX_dataset[i].obj, ret));
+             SS_assign(si, ret, SS_mk_cons(si, SX_dataset[i].obj, ret));
              UL_lmt(SX_dataset[i].x[0], n,
                     &SX_dataset[i].wc[0],
                     &SX_dataset[i].wc[1]);};};
          
-    SS_Assign(argl, SS_null);
+    SS_assign(si, argl, SS_null);
 
     SX_prep_ret(si, ret);
 
@@ -458,9 +458,9 @@ object *UL_uopyc(SS_psides *si, C_procedure *cp, object *argl)
 			      SS_mk_float(si, fun(f)),
 			      ret);};
 
-         SS_Assign(ret, tmp);};
+         SS_assign(si, ret, tmp);};
 
-    SS_Assign(argl, SS_null);
+    SS_assign(si, argl, SS_null);
 
     SX_prep_ret(si, ret);
 
@@ -500,7 +500,7 @@ object *UL_bftoc(SS_psides *si, C_procedure *cp, object *argl)
 
     CFREE(s1);
 
-    SS_Assign(argl, SS_null);
+    SS_assign(si, argl, SS_null);
 
     return(tok);}
 
@@ -531,10 +531,10 @@ object *UL_bltoc(SS_psides *si, C_procedure *cp, object *argl)
         {s = SS_car(si, t);
 
          if (SX_curvep_a(s))
-            SS_Assign(ret, SS_mk_cons(si, fun(si, s, tok), ret));};
+            SS_assign(si, ret, SS_mk_cons(si, fun(si, s, tok), ret));};
 
-    SS_Assign(tok, SS_null);
-    SS_Assign(argl, SS_null);
+    SS_assign(si, tok, SS_null);
+    SS_assign(si, argl, SS_null);
 
     SX_prep_ret(si, ret);
 
@@ -572,12 +572,12 @@ object *UL_bltocnp(SS_psides *si, C_procedure *cp, object *argl)
         {s = SS_car(si, t);
 
          if (SX_curvep_a(s))
-            SS_Assign(ret, SS_mk_cons(si, fun(si, s, tok), ret));};
+            SS_assign(si, ret, SS_mk_cons(si, fun(si, s, tok), ret));};
          
     UL_pause(si, FALSE);
 
-    SS_Assign(tok, SS_null);
-    SS_Assign(argl, SS_null);
+    SS_assign(si, tok, SS_null);
+    SS_assign(si, argl, SS_null);
 
     SX_prep_ret(si, ret);
 
@@ -852,7 +852,7 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
              if (na == -1)
                 return(SS_f);};};
 
-    SS_Assign(argl, SS_null);
+    SS_assign(si, argl, SS_null);
 
 /* delete the temporary curve if allocated */
     if (temp_flag)
@@ -940,7 +940,7 @@ object *UL_bcxl(SS_psides *si, C_procedure *cp, object *argl)
 		       SS_get_string(si->fun), SC_strrev(local));
     ch = SX_mk_curve(si, n, x[0], x[1], lbl, NULL, UL_plot);
 
-    SS_Assign(argl, SS_null);
+    SS_assign(si, argl, SS_null);
 
     CFREE(UL_buf1x);
     CFREE(UL_buf1y);           

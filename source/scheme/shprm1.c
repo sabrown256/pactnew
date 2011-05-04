@@ -174,7 +174,7 @@ static object *_SSI_quasiq(SS_psides *si, object *obj)
 
     _SS.nest_level++;
 
-    SS_Assign(si->val, _SS_quasiq(si, obj, _SS.nest_level));
+    SS_assign(si, si->val, _SS_quasiq(si, obj, _SS.nest_level));
 
     _SS.nest_level--;
 
@@ -276,7 +276,7 @@ static object *SS_let(SS_psides *si, object *let)
     lambda = SS_mk_procedure(si, SS_block_proc, bdy, si->env);
 
 /* now make the procedure call */
-    SS_Assign(si->exn, SS_mk_cons(si, lambda, argl));
+    SS_assign(si, si->exn, SS_mk_cons(si, lambda, argl));
 
     return(si->exn);}
 
@@ -328,7 +328,7 @@ static object *_SSI_letstr(SS_psides *si, object *lets)
     let = SS_mk_cons(si, prml, bdy);
 
 /* process the let form */
-    SS_Assign(si->exn, SS_let(si, let));
+    SS_assign(si, si->exn, SS_let(si, let));
 
     return(si->exn);}
 
@@ -355,13 +355,13 @@ static object *_SSI_letstr(SS_psides *si, object *lets)
     if (SS_nullobjp(lets) || !SS_consp(lets))
        SS_error(si, "BAD LET* FORM", lets);
 
-    SS_Save(si, si->this);
-    SS_Save(si, si->argl);
-    SS_Save(si, si->fun);
+    SS_save(si, si->this);
+    SS_save(si, si->argl);
+    SS_save(si, si->fun);
 
 /* transform into a functionally equivalent let form */
-    SS_Assign(si->this, SS_null);
-    SS_Assign(si->argl, SS_null);
+    SS_assign(si, si->this, SS_null);
+    SS_assign(si, si->argl, SS_null);
     prml = SS_null;
     for (lst = SS_car(si, lets); !SS_nullobjp(lst); lst = SS_cdr(si, lst))
         {if (!SS_consp(vlpair = SS_car(si, lst)))
@@ -380,15 +380,15 @@ static object *_SSI_letstr(SS_psides *si, object *lets)
 
 /* complete the transformation */
     frm = SS_mk_cons(si, prml, bdy);
-    SS_Assign(si->fun, frm);
+    SS_assign(si, si->fun, frm);
 
 /* process the let form */
-    SS_Assign(si->exn, SS_let(si, si->fun));
+    SS_assign(si, si->exn, SS_let(si, si->fun));
 
 /* clean up the mess */
-    SS_Restore(si, si->fun);
-    SS_Restore(si, si->argl);
-    SS_Restore(si, si->this);
+    SS_restore(si, si->fun);
+    SS_restore(si, si->argl);
+    SS_restore(si, si->this);
 
     return(si->exn);}
 
@@ -412,16 +412,16 @@ static object *_SSI_letstr(SS_psides *si, object *letr)
     if (SS_nullobjp(letr) || !SS_consp(letr))
        SS_error(si, "BAD LET* FORM", letr);
 
-    SS_Save(si, si->this);
-    SS_Save(si, si->unev);
-    SS_Save(si, si->argl);
-    SS_Save(si, si->fun);
-    SS_Save(si, si->val);
+    SS_save(si, si->this);
+    SS_save(si, si->unev);
+    SS_save(si, si->argl);
+    SS_save(si, si->fun);
+    SS_save(si, si->val);
 
 /* transform into a functionally equivalent let form */
-    SS_Assign(si->this, SS_null);
-    SS_Assign(si->argl, SS_null);
-    SS_Assign(si->unev, SS_null);
+    SS_assign(si, si->this, SS_null);
+    SS_assign(si, si->argl, SS_null);
+    SS_assign(si, si->unev, SS_null);
     for (lst = SS_car(si, letr); !SS_nullobjp(lst); lst = SS_cdr(si, lst))
         {if (!SS_consp(vlpair = SS_car(si, lst)))
             {vr = vlpair;
@@ -430,24 +430,24 @@ static object *_SSI_letstr(SS_psides *si, object *letr)
             {vr = SS_car(si, vlpair);
              vl = SS_cadr(si, vlpair);};
 
-         SS_Assign(si->val,
+         SS_assign(si, si->val,
 		   SS_make_form(si, SS_setproc, vr, vl, LAST));
          SS_end_cons_macro(si->argl, si->this, si->val);
-         SS_Assign(si->unev, SS_mk_cons(si, vr, si->unev));};
+         SS_assign(si, si->unev, SS_mk_cons(si, vr, si->unev));};
 
 /* complete the transformation */
     frm = SS_mk_cons(si, si->unev, SS_append(si, si->argl, SS_cdr(si, letr)));
-    SS_Assign(si->fun, frm);
+    SS_assign(si, si->fun, frm);
 
 /* process the let form */
-    SS_Assign(si->exn, SS_let(si, si->fun));
+    SS_assign(si, si->exn, SS_let(si, si->fun));
 
 /* clean up the mess */
-    SS_Restore(si, si->val);
-    SS_Restore(si, si->fun);
-    SS_Restore(si, si->argl);
-    SS_Restore(si, si->unev);
-    SS_Restore(si, si->this);
+    SS_restore(si, si->val);
+    SS_restore(si, si->fun);
+    SS_restore(si, si->argl);
+    SS_restore(si, si->unev);
+    SS_restore(si, si->this);
 
     return(si->exn);}
 
@@ -505,25 +505,25 @@ static object *_SSI_map(SS_psides *si, object *obj)
     if (!SS_consp(argl))
        return(proc);
 
-    SS_MARK(argl);
+    SS_mark(argl);
     expr = SS_null;
     vl   = SS_null;
     args = SS_null;
     ret  = SS_null;
     for (exf = FALSE; !exf; )
-        {SS_Assign(vl, _SS_lst_map(si, argl, &exf));
+        {SS_assign(si, vl, _SS_lst_map(si, argl, &exf));
          if (SS_consp(SS_caar(si, vl)))
-            {SS_Assign(args, SS_mk_cons(si, SS_quoteproc, SS_car(si, vl)));
-             SS_Assign(expr, SS_mk_cons(si,
+            {SS_assign(si, args, SS_mk_cons(si, SS_quoteproc, SS_car(si, vl)));
+             SS_assign(si, expr, SS_mk_cons(si,
 					proc, SS_mk_cons(si,
 							 args, SS_null)));}
          else
-            {SS_Assign(args, SS_car(si, vl));
-             SS_Assign(expr, SS_mk_cons(si, proc, args));};
-         SS_Assign(argl, SS_cdr(si, vl));
-         SS_Save(si, si->env);
+            {SS_assign(si, args, SS_car(si, vl));
+             SS_assign(si, expr, SS_mk_cons(si, proc, args));};
+         SS_assign(si, argl, SS_cdr(si, vl));
+         SS_save(si, si->env);
          SS_end_cons(ret, ret_nxt, SS_exp_eval(si, expr));
-         SS_Restore(si, si->env);};
+         SS_restore(si, si->env);};
 
 /* clean up the mess */
     SS_gc(si, expr);
@@ -547,23 +547,23 @@ static object *_SSI_foreach(SS_psides *si, object *obj)
     if (!SS_consp(argl))
        return(proc);
 
-    SS_MARK(argl);
+    SS_mark(argl);
     expr = SS_null;
     vl   = SS_null;
     args = SS_null;
     for (exf = FALSE; !exf; )
-        {SS_Assign(vl, _SS_lst_map(si, argl, &exf));
+        {SS_assign(si, vl, _SS_lst_map(si, argl, &exf));
          if (SS_consp(SS_caar(si, vl)))
-            {SS_Assign(args, SS_mk_cons(si, SS_quoteproc, SS_car(si, vl)));
-             SS_Assign(expr, SS_mk_cons(si, proc,
+            {SS_assign(si, args, SS_mk_cons(si, SS_quoteproc, SS_car(si, vl)));
+             SS_assign(si, expr, SS_mk_cons(si, proc,
 					SS_mk_cons(si, args, SS_null)));}
          else
-            {SS_Assign(args, SS_car(si, vl));
-             SS_Assign(expr, SS_mk_cons(si, proc, args));};
-         SS_Assign(argl, SS_cdr(si, vl));
-         SS_Save(si, si->env);
+            {SS_assign(si, args, SS_car(si, vl));
+             SS_assign(si, expr, SS_mk_cons(si, proc, args));};
+         SS_assign(si, argl, SS_cdr(si, vl));
+         SS_save(si, si->env);
          SS_exp_eval(si, expr);
-         SS_Restore(si, si->env);};
+         SS_restore(si, si->env);};
 
 /* clean up the mess */
     SS_gc(si, expr);
@@ -817,7 +817,7 @@ void _SS_bgn_trace(SS_psides *si, object *pfun, object *pargl)
 		       "Entering procedure %s with:\n  ",
 		       SS_PROCEDURE_NAME(pfun));
 		 SS_print(si, si->outdev, pargl, "", "\n");
-		 SS_Assign(si->continue_int[si->cont_ptr].signal,
+		 SS_assign(si, si->continue_int[si->cont_ptr].signal,
 			   pfun);};
 	     break;
 
@@ -827,7 +827,7 @@ void _SS_bgn_trace(SS_psides *si, object *pfun, object *pargl)
 		       "Entering macro-ev %s with:\n  ",
 		       SS_PROCEDURE_NAME(pfun));
 		 SS_print(si, si->outdev, pargl, "", "\n");
-		 SS_Assign(si->continue_int[si->cont_ptr].signal,
+		 SS_assign(si, si->continue_int[si->cont_ptr].signal,
 			   pfun);};
 	     break;
 
@@ -845,7 +845,7 @@ void _SS_bgn_trace(SS_psides *si, object *pfun, object *pargl)
 		       "Entering macro %s with:\n  ",
 		       SS_PROCEDURE_NAME(pfun));
 		 SS_print(si, si->outdev, pargl, "", "\n");
-		 SS_Assign(si->continue_int[si->cont_ptr].signal,
+		 SS_assign(si, si->continue_int[si->cont_ptr].signal,
 			   pfun);};
 	default :
 	     break;};
@@ -902,7 +902,7 @@ void _SS_end_trace(SS_psides *si)
 	     default :
 	          break;};
 
-        SS_Assign(si->continue_int[si->cont_ptr].signal, SS_null);};
+        SS_assign(si, si->continue_int[si->cont_ptr].signal, SS_null);};
 
     return;}
 
@@ -920,7 +920,7 @@ static object *_SSI_catch(SS_psides *si, object *obj)
 			  SS_OBJECT_I, escape,
 			  0);
 
-/* Use the fact that SS_Assign(si->exn, obj) is done in SS_eval to provide the
+/* Use the fact that SS_assign(si, si->exn, obj) is done in SS_eval to provide the
  * only reference to lst so that GC is done properly
  */
     ret = SS_exp_eval(si, lst);
@@ -948,7 +948,7 @@ static object *_SSI_catch_err(SS_psides *si, object *argl)
 	    0);
 
 /* set the stage for error handling at the SCHEME level */
-    SS_Assign(si->err_state, SS_null);
+    SS_assign(si, si->err_state, SS_null);
     SS_set_print_err_func(NULL, FALSE);
 
     si->cont_ptr++;

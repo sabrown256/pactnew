@@ -115,7 +115,7 @@ void dpenv(SS_psides *si, object *penv)
 object *SS_exp_eval(SS_psides *si, object *obj)
    {
 
-    SS_Assign(si->exn, obj);
+    SS_assign(si, si->exn, obj);
 
     _SS_eval(si);
 
@@ -129,8 +129,8 @@ object *SS_exp_eval(SS_psides *si, object *obj)
 object *SS_eval(SS_psides *si, object *obj)
    {
 
-    SS_Assign(si->exn, obj);
-    SS_Assign(si->env, si->global_env);
+    SS_assign(si, si->exn, obj);
+    SS_assign(si, si->env, si->global_env);
 
     _SS_eval(si);
 
@@ -145,14 +145,14 @@ void SS_save_registers(SS_psides *si, int vp)
    {
 
     if (vp)
-       SS_Save(si, si->val);
+       SS_save(si, si->val);
 
-    SS_Save(si, si->exn);
-    SS_Save(si, si->env);
-    SS_Save(si, si->fun);
-    SS_Save(si, si->this);
-    SS_Save(si, si->unev);
-    SS_Save(si, si->argl);
+    SS_save(si, si->exn);
+    SS_save(si, si->env);
+    SS_save(si, si->fun);
+    SS_save(si, si->this);
+    SS_save(si, si->unev);
+    SS_save(si, si->argl);
 
     return;}
 
@@ -164,15 +164,15 @@ void SS_save_registers(SS_psides *si, int vp)
 void SS_restore_registers(SS_psides *si, int vp)
    {
 
-    SS_Restore(si, si->argl);
-    SS_Restore(si, si->unev);
-    SS_Restore(si, si->this);
-    SS_Restore(si, si->fun);
-    SS_Restore(si, si->env);
-    SS_Restore(si, si->exn);
+    SS_restore(si, si->argl);
+    SS_restore(si, si->unev);
+    SS_restore(si, si->this);
+    SS_restore(si, si->fun);
+    SS_restore(si, si->env);
+    SS_restore(si, si->exn);
 
     if (vp)
-       SS_Restore(si, si->val);
+       SS_restore(si, si->val);
 
     return;}
 
@@ -972,7 +972,7 @@ static void _SS_init_scheme(SS_psides *si)
     si->global_env = SS_mk_cons(si, fr, SS_null);
     SS_UNCOLLECT(si->global_env);
 
-    SS_Assign(si->env, si->global_env);
+    SS_assign(si, si->env, si->global_env);
 
     SS_define_constant(si, 1,
 		       "system-id", SC_STRING_I, SYSTEM_ID,

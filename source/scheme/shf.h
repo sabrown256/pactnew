@@ -33,7 +33,7 @@
 
 #define SI               _SS_isf
 
-#define CAPTURE(x)       (SS_MARK(x), x)
+#define CAPTURE(x)       (SS_mark(x), x)
 
 #define DIAGNOSTIC(x, y) _SS_diagnostic_synt(SI, x, y, SS_diagnostic_f)
 #define SYNTAX_ERR(x)    _SS_unsupported_syntax(SI, x)

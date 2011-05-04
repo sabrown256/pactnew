@@ -640,33 +640,33 @@ struct s_SS_vect
 
 /* SS_MARK - increment the reference count of the object */
 
-#define SS_MARK(_x)  SC_mark(_x, 1)
+#define SS_mark(_x)  SC_mark(_x, 1)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* SS_ASSIGN - do C level variable assignment with GC
- *           - SS_MARK before GC so that cdr'ing down lists works right
+ *           - SS_mark before GC so that cdr'ing down lists works right
  *           - use temporary so that args are eval'd once only
  */
 
 #ifdef SCHEME_DEBUG
 
-#define SS_Assign(_o, _v)                                                    \
+#define SS_assign(si, _o, _v)                                                    \
     {_oect *_x;                                                              \
      _x = _v;                                                                \
      if ((_x->val == NULL) || (_x->eval_type == NO_EV))                      \
         SS_error(si, "FREED OBJECT - SS_ASSIGN", SS_null);                   \
-     SS_MARK(_x);                                                            \
+     SS_mark(_x);                                                            \
      SS_gc(si, _o);                                                          \
      _o = _x;}
 
 #else
 
-#define SS_Assign(_o, _v)                                                    \
+#define SS_assign(si, _o, _v)                                                    \
     {object *_x;                                                             \
      _x = _v;                                                                \
-     SS_MARK(_x);                                                            \
+     SS_mark(_x);                                                            \
      SS_gc(si, _o);                                                          \
      _o = _x;}
 
@@ -680,24 +680,24 @@ struct s_SS_vect
 #ifdef STACK_FNC
 
 extern void
- SS_Save(SS_psides *si, object *obj);
+ SS_save(SS_psides *si, object *obj);
 
 #else
 
 # ifdef SCHEME_DEBUG
 
-#  define SS_Save(_si, _o)                                                   \
+#  define SS_save(_si, _o)                                                   \
    {if ((_o->val == NULL) || (_o->eval_type == NO_EV))                       \
-       SS_error(_si, "FREED _OECT - SS_SAVE", SS_null);                    \
+       SS_error(_si, "FREED _OECT - SS_SAVE", SS_null);                      \
     (_si)->nsave++;                                                          \
-    SS_MARK(_o);                                                             \
+    SS_mark(_o);                                                             \
     SC_array_push((_si)->stack, &_o);}
 
 # else
 
-#  define SS_Save(_si, _o)                                                   \
+#  define SS_save(_si, _o)                                                   \
    {(_si)->nsave++;                                                          \
-    SS_MARK(_o);                                                             \
+    SS_mark(_o);                                                             \
     SC_array_push((_si)->stack, &_o);}
 
 # endif
@@ -711,15 +711,15 @@ extern void
 #ifdef STACK_FNC
 
 extern void
- _SS_Restore(SS_psides *si, object **px);
+ _SS_restore(SS_psides *si, object **px);
 
-# define SS_Restore(_si, _o) _SS_Restore(_si, &_o)
+# define SS_restore(_si, _o) _SS_restore(_si, &_o)
 
 #else
 
 # ifdef SCHEME_DEBUG
 
-#  define SS_Restore(_si, _o)                                                \
+#  define SS_restore(_si, _o)                                                \
    {(_si)->nrestore++;                                                       \
     SS_gc(_si, _o);                                                          \
     _o = *(object **) SC_array_pop((_si)->stack);                            \
@@ -728,7 +728,7 @@ extern void
 
 # else
 
-#  define SS_Restore(_si, _o)                                                \
+#  define SS_restore(_si, _o)                                                \
    {(_si)->nrestore++;                                                       \
     SS_gc(_si, _o);                                                          \
     _o = *(object **) SC_array_pop((_si)->stack);}

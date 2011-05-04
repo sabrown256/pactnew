@@ -124,8 +124,8 @@ static int _SS_repl(SS_psides *si)
    {long ba, bf, bd;
     double evalt;
 
-    SS_Assign(si->rdobj, SS_null);
-    SS_Assign(si->evobj, SS_null);
+    SS_assign(si, si->rdobj, SS_null);
+    SS_assign(si, si->evobj, SS_null);
 
     _SS_set_ans_prompt(si);
 
@@ -139,7 +139,7 @@ static int _SS_repl(SS_psides *si)
 
 /* print the prompt call the Reader */
 	_SS.pr_prompt = si->prompt;
-        SS_Assign(si->rdobj, SS_read(si, si->indev));
+        SS_assign(si, si->rdobj, SS_read(si, si->indev));
 
         if (si->post_read != NULL)
            (*si->post_read)(si, si->indev);
@@ -148,7 +148,7 @@ static int _SS_repl(SS_psides *si)
 
 /* eval the object returned by the Reader */
 	evalt = SC_cpu_time();
-        SS_Assign(si->evobj, SS_eval(si, si->rdobj));
+        SS_assign(si, si->evobj, SS_eval(si, si->rdobj));
 	evalt = SC_cpu_time() - evalt;
 
         if (si->post_eval != NULL)
@@ -158,15 +158,15 @@ static int _SS_repl(SS_psides *si)
         if (si->print_flag)
            SS_print(si, si->outdev, si->evobj, si->ans_prompt, "\n");
 
-        SS_Assign(si->env,   si->global_env);
-        SS_Assign(si->this,  SS_null);
-        SS_Assign(si->exn,   SS_null);
-        SS_Assign(si->val,   SS_null);
-        SS_Assign(si->unev,  SS_null);
-        SS_Assign(si->argl,  SS_null);
-        SS_Assign(si->fun,   SS_null);
-        SS_Assign(si->rdobj, SS_null);
-        SS_Assign(si->evobj, SS_null);
+        SS_assign(si, si->env,   si->global_env);
+        SS_assign(si, si->this,  SS_null);
+        SS_assign(si, si->exn,   SS_null);
+        SS_assign(si, si->val,   SS_null);
+        SS_assign(si, si->unev,  SS_null);
+        SS_assign(si, si->argl,  SS_null);
+        SS_assign(si, si->fun,   SS_null);
+        SS_assign(si, si->rdobj, SS_null);
+        SS_assign(si, si->evobj, SS_null);
 
 /* restore the global environment */
 	SC_mem_stats(&ba, &bf, NULL, NULL);
@@ -552,7 +552,7 @@ void SS_push_err(SS_psides *si, int flag, int type)
     SS_save_registers(si, flag);
 
     x = SS_mk_esc_proc(si, si->errlev, type);
-    SS_MARK(x);
+    SS_mark(x);
     si->err_stack[si->errlev] = x;
 
     si->errlev = (si->errlev + 1) & si->stack_mask;
@@ -623,7 +623,7 @@ static void _SS_restore_state_prim(SS_psides *si, int ns, int nc, int ne)
 
     for (; si->cont_ptr > nc; si->cont_ptr--)
         {si->ngoc++;
-         SS_Assign(si->continue_int[si->cont_ptr].signal, SS_null);};
+         SS_assign(si, si->continue_int[si->cont_ptr].signal, SS_null);};
 
 /* restore the error stack */
     if (si->errlev < ne)
@@ -669,8 +669,8 @@ void _SS_restore_state(SS_psides *si, object *esc_proc)
 static object *_SSI_break(SS_psides *si)
    {
 
-    SS_Save(si, si->evobj);
-    SS_Save(si, si->rdobj);
+    SS_save(si, si->evobj);
+    SS_save(si, si->rdobj);
 
     SS_push_err(si, TRUE, SS_ERROR_I);
     PRINT(stdout,"\n");
@@ -723,8 +723,8 @@ static object *_SSI_retlev(SS_psides *si, object *argl)
     if (si->errlev > 1)
        {x = SS_pop_err(si, n, TRUE);
 
-        SS_Restore(si, si->rdobj);
-        SS_Restore(si, si->evobj);
+        SS_restore(si, si->rdobj);
+        SS_restore(si, si->evobj);
 
 	expr = SS_make_form(si, x,
 			    SS_make_form(si,
@@ -858,7 +858,7 @@ void SS_error(SS_psides *si, char *s, object *obj)
 
     t = CSTRSAVE(s);
 
-    SS_Assign(si->err_state, SS_make_list(si, SS_OBJECT_I, si->fun,
+    SS_assign(si, si->err_state, SS_make_list(si, SS_OBJECT_I, si->fun,
 					  SS_OBJECT_I, si->argl,
 					  SS_OBJECT_I, obj,
 					  SC_STRING_I, t,
@@ -1026,9 +1026,9 @@ static object *_SSI_syscmnd(SS_psides *si, object *argl)
     lst = SS_null;
     if (output != NULL)
        {for (i = 0; output[i] != NULL; i++)
-            {SS_Assign(lst, SS_mk_cons(si, SS_mk_string(si, output[i]), lst));};
+            {SS_assign(si, lst, SS_mk_cons(si, SS_mk_string(si, output[i]), lst));};
 
-        SS_Assign(lst, SS_reverse(si, lst));
+        SS_assign(si, lst, SS_reverse(si, lst));
 	SC_mark(lst, -1);
 
         SC_free_strings(output);}

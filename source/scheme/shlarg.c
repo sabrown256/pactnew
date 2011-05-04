@@ -125,7 +125,7 @@ static object *_SSI_vctset(SS_psides *si, object *argl)
     if (i >= n)
        SS_error(si, "BAD INDEX - VECTOR-SET!", argl);
 
-    SS_Assign(va[i], val);
+    SS_assign(si, va[i], val);
 
     o = va[i];
 
@@ -182,7 +182,7 @@ object *SS_lstvct(SS_psides *si, object *arg)
     va  = SS_VECTOR_ARRAY(vct);
 
     for (i = 0; i < k; i++)
-        {SS_Assign(va[i], SS_car(si, arg));
+        {SS_assign(si, va[i], SS_car(si, arg));
          arg = SS_cdr(si, arg);};
 
     return(vct);}
@@ -234,9 +234,9 @@ object *_SSI_define_global(SS_psides *si, object *argl)
             ptype = SS_PROCEDURE_TYPE(val);
             if ((ptype == SS_PROC) || (ptype == SS_MACRO))
 	       {t = SS_proc_env(si, val);
-		SS_MARK(t);
+		SS_mark(t);
 		t = SS_proc_body(si, val);
-		SS_MARK(t);
+		SS_mark(t);
 		t = SS_params(si, val);};};}
 
     else
@@ -410,7 +410,7 @@ static object *_SSI_printenv(SS_psides *si, object *argl)
 	 pr = SS_make_list(si, SC_STRING_I, vr,
 			   SS_OBJECT_I, vl,
 			   0);
-	 SS_Assign(lst, SS_mk_cons(si, pr, lst));};
+	 SS_assign(si, lst, SS_mk_cons(si, pr, lst));};
 
     SC_mark(lst, -1);
 

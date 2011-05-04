@@ -686,9 +686,9 @@ object *SS_eval_form(SS_psides *si, object *first, ...)
     SC_VA_END;
 
     expr = SS_null;
-    SS_Assign(expr, _SS_make_list(si, i, type, ptr));
+    SS_assign(si, expr, _SS_make_list(si, i, type, ptr));
     res = SS_exp_eval(si, expr);
-    SS_Assign(expr, SS_null);
+    SS_assign(si, expr, SS_null);
 
     return(res);}
 
@@ -728,11 +728,11 @@ FIXNUM F77_FUNC(sschem, SSCHEM)(FIXNUM *pnc, F77_string name, ...)
     SC_VA_END;
 
     expr = SS_null;
-    SS_Assign(expr, SS_mk_cons(si, fnc, _SS_make_list(si, i, type, ptr)));
+    SS_assign(si, expr, SS_mk_cons(si, fnc, _SS_make_list(si, i, type, ptr)));
 
     SS_eval(si, expr);
 
-    SS_Assign(expr, SS_null);
+    SS_assign(si, expr, SS_null);
 
     ret.memaddr = (char *) si->val;
 
@@ -779,12 +779,12 @@ object *SS_call_scheme(SS_psides *si, char *func, ...)
 
     SS_gc(si, expr);
 
-    SS_Assign(si->env, si->global_env);
-    SS_Assign(si->this, SS_null);
-    SS_Assign(si->exn, SS_null);
-    SS_Assign(si->unev, SS_null);
-    SS_Assign(si->argl, SS_null);
-    SS_Assign(si->fun, SS_null);
+    SS_assign(si, si->env, si->global_env);
+    SS_assign(si, si->this, SS_null);
+    SS_assign(si, si->exn, SS_null);
+    SS_assign(si, si->unev, SS_null);
+    SS_assign(si, si->argl, SS_null);
+    SS_assign(si, si->fun, SS_null);
 
     return(si->val);}
 

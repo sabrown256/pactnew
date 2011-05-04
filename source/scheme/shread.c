@@ -115,7 +115,7 @@ static object *_SS_rd_vct(SS_psides *si, object *str)
    {object *lst, *vct;
 
     lst = _SS_rd_lst(si, str);
-    SS_MARK(lst);
+    SS_mark(lst);
     vct = SS_lstvct(si, lst);
     SS_gc(si, lst);
 
@@ -805,7 +805,7 @@ object *SS_load(SS_psides *si, object *argl)
     if (SS_consp(argl))
        {flag = SS_car(si, argl);
         if (SS_true(flag))
-           {SS_Save(si, si->env);
+           {SS_save(si, si->env);
             si->env = si->global_env;};};
 
     strm = _SSI_opn_in(si, fnm);
@@ -822,13 +822,13 @@ object *SS_load(SS_psides *si, object *argl)
     else
        PUSH_CHAR(c, strm);
 
-    SS_Save(si, si->rdobj);
-    SS_Save(si, si->evobj);
+    SS_save(si, si->rdobj);
+    SS_save(si, si->evobj);
 
     prs = _SS_change_parser(si, fnm);
 
     while (TRUE)
-       {SS_Assign(si->rdobj, SS_read(si, strm));
+       {SS_assign(si, si->rdobj, SS_read(si, strm));
         if (si->post_read != NULL)
            (*si->post_read)(si, strm);
 
@@ -836,20 +836,20 @@ object *SS_load(SS_psides *si, object *argl)
            {_SSI_cls_in(si, strm);
 	    SS_gc(si, strm);
             break;};
-        SS_Save(si, si->env);
-        SS_Assign(si->evobj, SS_exp_eval(si, si->rdobj));
-        SS_Restore(si, si->env);
+        SS_save(si, si->env);
+        SS_assign(si, si->evobj, SS_exp_eval(si, si->rdobj));
+        SS_restore(si, si->env);
 
         if (si->post_eval != NULL)
            (*si->post_eval)(si, strm);};
 
     _SS_restore_parser(si, prs);
 
-    SS_Restore(si, si->evobj);
-    SS_Restore(si, si->rdobj);
+    SS_restore(si, si->evobj);
+    SS_restore(si, si->rdobj);
 
     if (SS_true(flag))
-       {SS_Restore(si, si->env);};
+       {SS_restore(si, si->env);};
 
     return(SS_t);}
 

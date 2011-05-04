@@ -304,11 +304,11 @@ static object *_SX_list_vobjects(SS_psides *si, char *patt,
 	     t = mitem->type[3];
 	     if (((type == 0) || (t == type)) && SC_regx_match(s, patt))
 	        {PRINT(stdout, " %ld  %c  %s\n", i+1, t, s);
-		 SS_Assign(ret, SS_mk_cons(si,
+		 SS_assign(si, ret, SS_mk_cons(si,
 					   SS_mk_integer(si, i+1),
 					   ret));}};
 
-	SS_Assign(ret, SS_reverse(si, ret));};
+	SS_assign(si, ret, SS_reverse(si, ret));};
 
     return(ret);}
 
@@ -548,7 +548,7 @@ static int _SX_no_argsp(SS_psides *si, object *obj)
 /* SX_PARSE - determine whether or not to reprocess the input for SX
  *          - this is the real worker for the si->post_eval
  *          - since this si->evobj is not the same as in SS_REPL
- *          - it should be SS_MARK'd as being an additional pointer to its
+ *          - it should be SS_mark'd as being an additional pointer to its
  *          - respective object
  */
 
@@ -571,10 +571,10 @@ void SX_parse(SS_psides *si,
                 while ((t = (*reproc)(si, line)) != NULL)
                   {strcpy(ptr, t);
                    SS_PTR(strm) = SS_BUFFER(strm);
-                   SS_Assign(si->rdobj, SS_read(si, strm));
+                   SS_assign(si, si->rdobj, SS_read(si, strm));
                    si->interactive = ON;
                    SX_plot_flag   = TRUE;
-                   SS_Assign(si->evobj, SS_eval(si, si->rdobj));
+                   SS_assign(si, si->evobj, SS_eval(si, si->rdobj));
                    si->interactive = OFF;};
 
                 if (SX_plot_flag && (strcmp(s, "replot") != 0) &&
