@@ -10,7 +10,6 @@
 #include "cpyright.h"
 
 #include "scheme_int.h"
-#include "syntax.h"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -56,9 +55,6 @@ int main(int c, char **v, char **env)
     si->trap_error = FALSE;
 
     SS_env_vars(si, env, NULL);
-
-/* initialize the available syntax modes */
-    DEF_SYNTAX_MODES(si);
 
     SS_define_argv(si, "scheme", c, v);
 

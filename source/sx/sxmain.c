@@ -10,7 +10,6 @@
  
 #include "sx_int.h"
 #include "scope_raster.h"
-#include "syntax.h"
 #include "scope_proc.h"
 
 #define SCODE "SX 3.0"
@@ -33,6 +32,10 @@ int main(int c, char **v, char **env)
     SS_set_scheme_env(v[0], NULL);
     si = SX_init(SCODE, VERSION);
 
+    SS_init(si, "Aborting with error", SX_end,
+            TRUE, SS_interrupt_handler,
+            TRUE, NULL, 0);
+
 /* NOTE: be able to access remote files
  * this MUST be set before the PD_init_threads uses the current
  * io hooks to initialize the pio hooks
@@ -44,10 +47,6 @@ int main(int c, char **v, char **env)
     PD_init_threads(0, NULL);
 
     PG_IO_INTERRUPTS(FALSE);
-
-    SS_init(si, "Aborting with error", SX_end,
-            TRUE, SS_interrupt_handler,
-            TRUE, NULL, 0);
 
     cmd         = NULL;
     commnd_flag = FALSE;
@@ -196,9 +195,6 @@ int main(int c, char **v, char **env)
     SS_load_scm(si, "nature.scm");
 
     PG_set_use_pixmap(upix);
-
-/* initialize the available syntax modes */
-    DEF_SYNTAX_MODES(si);
 
     if (pvflag)
        {if (SX_gr_mode)

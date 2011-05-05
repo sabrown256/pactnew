@@ -10,7 +10,6 @@
 
 #include "ultra.h"
 #include "scope_raster.h"
-#include "syntax.h"
 #include "scope_proc.h"
 
 typedef void (*PFReplot)(void);
@@ -1193,6 +1192,10 @@ int main(int c, char **v)
     SS_set_scheme_env(v[0], NULL);
     si = SS_init_scheme(CODE, VERSION);
 
+    SS_init(si, "Aborting with error", _UL_quit,
+            TRUE, SS_interrupt_handler,
+            FALSE, NULL, 0);
+
 /* NOTE: be able to access remote files
  * this MUST be set before the PD_init_threads uses the current
  * io hooks to initialize the pio hooks
@@ -1207,10 +1210,6 @@ int main(int c, char **v)
  * that is until we are ready to process the command line args
  */
     PG_IO_INTERRUPTS(FALSE);
-
-    SS_init(si, "Aborting with error", _UL_quit,
-            TRUE, SS_interrupt_handler,
-            FALSE, NULL, 0);
 
     commnd_flag = FALSE;
     tflag       = FALSE;
@@ -1248,9 +1247,6 @@ int main(int c, char **v)
     UL_init_curves(si);
 
     UL_init_env(si);
-
-/* initialize the available syntax modes */
-    DEF_SYNTAX_MODES(si);
 
 /* process the command line arguments */
     for (i = 1; i < c; i++)

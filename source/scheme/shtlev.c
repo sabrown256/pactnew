@@ -9,6 +9,7 @@
 #include "cpyright.h"
 
 #include "scheme_int.h"
+#include "syntax.h"
 
 #define SS_PRINT_ERR_MSG (*_SS.pr_err)
 
@@ -356,7 +357,13 @@ static void _SS_print_err_msg(SS_psides *si, FILE *str, char *s, object *obj)
 SS_psides *SS_init_scheme(char *code, char *vers)
    {SS_psides *si;
 
+    SC_set_banner(" %s  -  %s\n\n", code, vers);
+    SC_init_path(2, "HOME", "SCHEME");
+
     si = SS_get_current_scheme(-1);
+
+/* initialize the available syntax modes */
+    DEF_SYNTAX_MODES(si);
 
     SC_mem_stats_set(0L, 0L);
 
@@ -370,9 +377,6 @@ SS_psides *SS_init_scheme(char *code, char *vers)
 #endif
 
     SS_set_print_err_func(_SS_print_err_msg, FALSE);
-
-    SC_set_banner(" %s  -  %s\n\n", code, vers);
-    SC_init_path(2, "HOME", "SCHEME");
 
     return(si);}
 
