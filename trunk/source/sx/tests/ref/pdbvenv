@@ -1,6 +1,6 @@
 
 define environment variable FOO
-3-> (($FOO 3))
+-> (($FOO 3))
 
 verify that FOO made it out to the environment
 expect: 3
@@ -21,4 +21,3 @@ expect: ../../sxpdbd.c ../../sxpdbf.c
 -> (../../sxpdbd.c
  ../../sxpdbf.c
 )
-

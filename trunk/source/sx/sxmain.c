@@ -32,6 +32,10 @@ int main(int c, char **v, char **env)
     SS_set_scheme_env(v[0], NULL);
     si = SX_init(SCODE, VERSION);
 
+    SS_env_vars(si, env, NULL);
+
+    SS_define_argv(si, c, v);
+
     SS_init(si, "Aborting with error", SX_end,
             TRUE, SS_interrupt_handler,
             TRUE, NULL, 0);
@@ -162,9 +166,9 @@ int main(int c, char **v, char **env)
     SX_background_color_white = TRUE;
 
 /* run in PDBView mode */
+    si->trap_error = trap_error;
     if (pvflag)
        {SC_set_banner(" %s  -  %s\n\n", PCODE, VERSION);
-        si->trap_error = trap_error;
 
 	prog = "pdbview";
 
@@ -187,11 +191,8 @@ int main(int c, char **v, char **env)
     else
        {SC_set_banner(" %s  -  %s\n\n", SCODE, VERSION);
 
-	prog = "sx";
+	prog = "sx";};
 
-        si->trap_error = trap_error;};
-
-    SS_env_vars(si, env, NULL);
     SS_load_scm(si, "nature.scm");
 
     PG_set_use_pixmap(upix);
@@ -211,8 +212,6 @@ int main(int c, char **v, char **env)
         SS_banner(SS_mk_string(si, PCODE));
 
 #endif
-
-    SS_define_argv(si, prog, c, v);
 
 /* read the optionally specified data/scheme files in order */
     for (i = 0; i < n_files; i++)
