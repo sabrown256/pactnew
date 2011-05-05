@@ -942,33 +942,102 @@ static void _SS_print_err_msg(SS_psides *si, FILE *str, char *s, object *obj)
 /* _SS_INIT_SCHEME - initialize an interpreter state instance */
 
 static void _SS_init_scheme(SS_psides *si)
-   {object *fr;
+   {int ssz;
+    object *fr;
     SC_contextdes hnd;
+
+#ifdef LARGE
+    ssz = 128;
+#else
+    ssz = 32;
+#endif
 
     hnd = SC_which_signal_handler(SIGINT);
     SC_setup_sig_handlers(_SS_sig_handler, si, TRUE);
     PM_enable_fpe_n(TRUE, (PFSignal_handler) _SS_fpe_handler, si);
     SC_signal_n(SIGINT, hnd.f, si);
 
-#ifdef LARGE
-    si->stack_size = 128;
-#else
-    si->stack_size = 32;
-#endif
-    si->stack_mask = si->stack_size - 1;
+    SC_MEM_INIT_V(si->prompt);
+    SC_MEM_INIT_V(si->ans_prompt);
+
+    si->interactive      = TRUE;
+    si->trace_env        = 0;
+    si->know_env         = FALSE;
+    si->trap_error       = TRUE;
+    si->lines_page       = 50;
+    si->print_flag       = TRUE;
+    si->stat_flag        = TRUE;
+    si->bracket_flag     = FALSE;
+    si->nsave            = 0;
+    si->nrestore         = 0;
+    si->stack_size       = ssz;
+    si->stack_mask       = si->stack_size - 1;
+
+/* SS_init_cont variables */
+    si->cont_ptr         = 0;
+    si->err_cont_ptr     = 0;
+    si->errlev           = 0;
+    si->continue_int     = NULL;
+    si->continue_err     = NULL;
+    si->err_stack        = NULL;
+
+/* SS_init_stack variables */
+    si->nsetc            = 0;
+    si->ngoc             = 0;
+    si->stack            = NULL;
+
+/* SS_inst_prm */
+    si->symtab           = NULL;
+
+    si->types            = NULL;
+    si->hist_flag        = NO_LOG;
+
+/* SS_inst_const variables */
+    si->indev            = SS_null;
+    si->outdev           = SS_null;
+    si->histdev          = SS_null;
+
+/* registers */
+    si->this             = SS_null;
+    si->val              = SS_null;
+    si->unev             = SS_null;
+    si->exn              = SS_null;
+    si->argl             = SS_null;
+    si->fun              = SS_null;
+    si->err_state        = SS_null;
+    si->rdobj            = SS_null;
+    si->evobj            = SS_null;
+
+/* syntax modes */
+    si->character_stream = NULL;
+    si->eox              = FALSE;
+    si->lex_text         = NULL;
+
+/*	_SS_cps.cpp_directive = FALSE; */
+    si->strict_c         = FALSE;
+
+/* methods */
+    si->pr_gets          = NULL;
+    si->post_print       = NULL;
+    si->post_read        = NULL;
+    si->post_eval        = NULL;
+    si->name_reproc      = NULL;          /* syntax modes */
+    si->read             = NULL;
+    si->get_arg          = NULL;
+    si->call_arg         = NULL;
+    si->pr_ch_un         = SS_unget_ch;
+    si->pr_ch_out        = SS_put_ch;
 
     SS_register_types();
 
     SS_inst_prm(si);
     SS_inst_const(si);
 
-    si->trap_error = TRUE;
-    si->err_state  = SS_null;
-    si->env        = SS_null;
-
-    fr            = SS_mk_new_frame(si,
-				    SS_mk_string(si, "global-environment"),
-				    NULL);
+/* initialize interpreter environment */
+    si->env = SS_null;
+    fr      = SS_mk_new_frame(si,
+			      SS_mk_string(si, "global-environment"),
+			      NULL);
     si->global_env = SS_mk_cons(si, fr, SS_null);
     SS_UNCOLLECT(si->global_env);
 
@@ -979,22 +1048,6 @@ static void _SS_init_scheme(SS_psides *si)
 		       "argv",      SS_OBJECT_I, SS_null,
 		       NULL);
 
-    si->this  = SS_null;
-    si->exn   = SS_null;
-    si->val   = SS_null;
-    si->unev  = SS_null;
-    si->argl  = SS_null;
-    si->fun   = SS_null;
-    si->rdobj = SS_null;
-    si->evobj = SS_null;
-
-/* give default values to the lisp package interface variables  */
-    si->post_read  = NULL;
-    si->post_eval  = NULL;
-    si->post_print = NULL;
-    si->pr_ch_un   = SS_unget_ch;
-    si->pr_ch_out  = SS_put_ch;
-
     SS_set_put_line(si, SS_printf);
     SS_set_put_string(si, SS_fputs);
 
@@ -1003,15 +1056,6 @@ static void _SS_init_scheme(SS_psides *si)
 #else
     SC_set_get_line(io_gets);
 #endif
-
-    si->interactive = TRUE;
-    si->lines_page  = 50;
-    si->print_flag  = TRUE;
-    si->stat_flag   = TRUE;
-    si->nsave       = 0;
-    si->nrestore    = 0;
-    si->nsetc       = 0;
-    si->ngoc        = 0;
 
     SC_mem_stats_set(0L, 0L);
 
