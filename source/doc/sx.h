@@ -1,5 +1,5 @@
 TXT: SX User's Manual
-MOD: 04/29/2011
+MOD: 05/05/2011
 
 <CENTER>
 <P>
@@ -2935,21 +2935,13 @@ entering into read-eval-print loops.<p>
 
 <B></B>
 <BLOCKQUOTE>
-SS_psides *SS_init_scheme(char *Code, char *Vers)
+SS_psides *SS_init_scheme(char *code, char *vers)
 <P>
 void SS_end_scheme(SS_psides *si, int val)
-<P>
-void SS_inst_prm(void)
 <P>
 void SS_repl(SS_psides *si)
 <P>
 void SS_init_path(void)
-<P>
-void SS_inst_const(SS_psides *si)
-<P>
-void SS_init_stack(void)
-<P>
-void SS_init_cont(void)
 <P>
 void SS_interrupt_handler(int sig)
 </BLOCKQUOTE>

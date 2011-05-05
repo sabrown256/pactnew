@@ -935,7 +935,7 @@ object *SS_mk_object(SS_psides *si,
 		     void *np, int type, SS_eval_mode evt, char *pname,
 		     void (*print)(SS_psides *si, object *obj, object *strm),
 		     void (*release)(SS_psides *si, object *obj))
-   {object *op;
+   {object *o;
     SC_mem_opt opt;
 
     opt.perm = FALSE;
@@ -946,24 +946,24 @@ object *SS_mk_object(SS_psides *si,
     opt.file = __FILE__;
     opt.line = __LINE__;
 
-    op = _SC_alloc_n(1L, sizeof(object), &opt);
+    o = _SC_alloc_n(1L, sizeof(object), &opt);
 
     if ((pname != NULL) && (SC_arrlen(pname) < 1))
        pname = CSTRSAVE(pname);
 
-    SC_arrtype(op, type);
+    SC_arrtype(o, type);
 
-    op->eval_type  = evt;
-    op->print_name = pname;
-    op->val        = np;
-    op->print      = print;
-    op->release    = release;
+    o->eval_type  = evt;
+    o->print_name = pname;
+    o->val        = np;
+    o->print      = print;
+    o->release    = release;
 
-    if (_SS.trace_object == op)
-       {PRINT(stdout, "alloc> %p\n", op);
-        SS_print(si, si->outdev, op, "       ", "\n");};
+    if (_SS.trace_object == o)
+       {PRINT(stdout, "alloc> %p\n", o);
+        SS_print(si, si->outdev, o, "       ", "\n");};
 
-    return(op);}
+    return(o);}
 
 /*--------------------------------------------------------------------------*/
 
@@ -975,15 +975,15 @@ object *SS_mk_object(SS_psides *si,
 
 object *SS_mk_char(SS_psides *si, int i)
    {int *ip;
-    object *op;
+    object *o;
 
     ip  = CMAKE(int);
     *ip = i;
 
-    op = SS_mk_object(si, ip, SS_CHARACTER_I, SELF_EV, NULL,
-		      SS_wr_atm, _SS_rl_char);
+    o = SS_mk_object(si, ip, SS_CHARACTER_I, SELF_EV, NULL,
+		     SS_wr_atm, _SS_rl_char);
 
-    return(op);}
+    return(o);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -994,7 +994,7 @@ object *SS_mk_vector(SS_psides *si, int l)
    {vector *vp;
     int i;
     object **va;
-    object *op;
+    object *o;
 
     vp = CMAKE(vector);
     va = CMAKE_N(object *, l);
@@ -1004,10 +1004,10 @@ object *SS_mk_vector(SS_psides *si, int l)
     vp->length = l;
     vp->vect   = va;
 
-    op = SS_mk_object(si, vp, SS_VECTOR_I, SELF_EV, NULL,
-		      _SS_wr_vector, _SS_rl_vector);
+    o = SS_mk_object(si, vp, SS_VECTOR_I, SELF_EV, NULL,
+		     _SS_wr_vector, _SS_rl_vector);
 
-    return(op);}
+    return(o);}
 
 /*--------------------------------------------------------------------------*/
 
@@ -1019,6 +1019,8 @@ object *SS_mk_vector(SS_psides *si, int l)
 
 void SS_register_types(void)
    {
+
+    ONCE_SAFE(TRUE, NULL)
 
     SC_init_base_types();
 
@@ -1064,6 +1066,11 @@ void SS_register_types(void)
     SS_HAELEM_I      = SC_type_register("hash element", KIND_STRUCT, sizeof(haelem),  0);
 
 #endif
+
+    SS_OBJECT_S  = CSTRSAVE("object");
+    SS_POBJECT_S = CSTRSAVE("object *");
+
+    END_SAFE;
 
     return;}
 

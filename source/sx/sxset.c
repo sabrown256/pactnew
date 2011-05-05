@@ -116,8 +116,6 @@ SS_psides *SX_init(char *code, char *vers)
 /* scheme initializations */
     si = SS_init_scheme(code, vers);
 
-    SS_init_cont(si);
-    
 /* SX initializations depending on scheme */
     SX_install_funcs(si);
 

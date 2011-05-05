@@ -1103,12 +1103,8 @@ extern void
  SS_interrupt_handler(int sig),
  SS_scheme_path_err(char *path),
  SS_init_path(void),
- SS_inst_prm(SS_psides *si),
  SS_repl(SS_psides *si),
  SS_end_scheme(SS_psides *si, int val),
- SS_inst_const(SS_psides *si),
- SS_init_stack(SS_psides *si),
- SS_init_cont(SS_psides *si),
  SS_expand_stack(SS_psides *si),
  SS_push_err(SS_psides *si, int flag, int type),
  SS_error(SS_psides *si, char *s, object *obj);
