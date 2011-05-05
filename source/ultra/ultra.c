@@ -1181,7 +1181,7 @@ static void usage(void)
 
 /* MAIN - start up a fun filled session of ULTRA right here */
 
-int main(int c, char **v)
+int main(int c, char **v, char **env)
    {int i, n, load_init, load_rc, zsp, rv;
     int commnd_flag, no_banner, n_files, tflag, track;
     SIGNED int order[4096];
@@ -1191,6 +1191,10 @@ int main(int c, char **v)
 
     SS_set_scheme_env(v[0], NULL);
     si = SS_init_scheme(CODE, VERSION);
+
+    SS_env_vars(si, env, NULL);
+
+    SS_define_argv(si, c, v);
 
     SS_init(si, "Aborting with error", _UL_quit,
             TRUE, SS_interrupt_handler,
@@ -1336,7 +1340,7 @@ int main(int c, char **v)
     PG_expose_device(PG_console_device);
 
 /* if it is not a script then we have to process the files at this level */
-    if (SS_define_argv(si, "ultra", c, v) == FALSE)
+    if (TRUE)
 
 /* read the optionally specified data/scheme files in order */
        {for (i = 0; i < n_files; i++)

@@ -947,7 +947,7 @@ char *SS_exe_script(int c, char **v)
  *                - command line processing in the "main" routine
  */
 
-int SS_define_argv(SS_psides *si, char *program, int c, char **v)
+int SS_define_argv(SS_psides *si, int c, char **v)
    {int i, n, rv, t, after;
     int type[MAXLINE];
     long *lp;
@@ -961,7 +961,18 @@ int SS_define_argv(SS_psides *si, char *program, int c, char **v)
 
     script = SS_exe_script(c, v);
     if (script != NULL)
-       {for (n = 0, i = 0; i < c; i++)
+
+/* set the exit in case the script exits */
+       {switch (SETJMP(SC_gs.cpu))
+	   {case ABORT :
+		 SS_end_scheme(si, ABORT);
+		 exit(1);
+	    case ERR_FREE :
+	         SS_end_scheme(si, ERR_FREE);
+		 exit(0);};
+
+/* process the command line arguments into a list */
+	for (n = 0, i = 0; i < c; i++)
 	    {s = v[i];
 	     if (s == NULL)
 	        break;

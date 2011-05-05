@@ -919,7 +919,7 @@ extern int
  SS_run(SS_psides *si, char *s),
  SS_text_data_filep(char *fname, int cmnt),
  SS_load_scm(SS_psides *si, char *name),
- SS_define_argv(SS_psides *si, char *program, int c, char **v);
+ SS_define_argv(SS_psides *si, int c, char **v);
 
 extern void
  SS_var_value(SS_psides *si, char *s, int type, void *vr, int flag);

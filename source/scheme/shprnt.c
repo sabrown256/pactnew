@@ -111,13 +111,13 @@ char *_SS_vdsnprintf(int cp, char *fmt, va_list __a__)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SS_SPRINTF - takes an object, produces a printable representation, and
+/* _SS_PRINTOUT - takes an object, produces a printable representation, and
  *             - leaves it in _SS.vbf for later use
  *             - this is used by _SS_xprintf to realize format specifications
  *             - such as "%10s"
  */
 
-char *_SS_sprintf(SS_psides *si, char *fmt, object *obj)
+char *_SS_printout(SS_psides *si, char *fmt, object *obj)
    {char *s;
     PFfprintf pr;
     PFfputs ps;
@@ -157,7 +157,7 @@ static object *_SS_sprint(SS_psides *si, object *obj, char *fmt, object *strm)
    {char *s;
     FILE *str;
 
-    s   = _SS_sprintf(si, fmt, obj);
+    s   = _SS_printout(si, fmt, obj);
     str = SS_OUTSTREAM(strm);
 
     PRINT(str, fmt, s);
@@ -366,13 +366,12 @@ static void _SS_xprintf(SS_psides *si, object *str, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SSI_SPRINTF - a C type sprintf for SCHEME */
+/* _SS_SPRINTF_GUTS - a C type sprintf for SCHEME */
 
-static object *_SSI_sprintf(SS_psides *si, object *argl)
+static char *_SS_sprintf_guts(SS_psides *si, object *fp, object *argl)
    {int odf;
     PFfprintf pr;
     PFfputs ps;
-    object *o;
 
     SC_get_put_line(pr);
     SC_get_put_string(ps);
@@ -380,13 +379,83 @@ static object *_SSI_sprintf(SS_psides *si, object *argl)
     SS_set_put_string(si, _SS_push_string);
 
     odf = SS_set_display_flag(TRUE);
-    _SS_xprintf(si, si->outdev, argl);
+    _SS_xprintf(si, fp, argl);
     SS_set_display_flag(odf);
 
     SS_set_put_line(si, pr);
     SS_set_put_string(si, ps);
 
-    o = SS_mk_string(si, _SS.bf);
+    return(_SS.bf);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_SPRINTF - takes an object, produces a printable representation, and
+ *             - leaves it in _SS.vbf for later use
+ *             - this is used by _SS_xprintf to realize format specifications
+ *             - such as "%10s"
+ */
+
+char *_SS_sprintf(SS_psides *si, char *fmt, object *obj)
+   {char *s;
+
+#if 0
+    PFfprintf pr;
+    PFfputs ps;
+
+/* turn off SIGIO handler */
+    SC_catch_io_interrupts(FALSE);
+
+    if (SS_stringp(obj))
+       {s = SS_STRING_TEXT(obj);
+	s = CSTRSAVE(s);}
+    else
+       {CFREE(_SS.vbf);
+
+	SC_get_put_line(pr);
+	SC_get_put_string(ps);
+	SS_set_put_line(si, SS_printf);
+	SS_set_put_string(si, SS_fputs);
+
+	SS_OBJECT_PRINT(si, obj, SS_null);
+
+	SS_set_put_line(si, pr);
+	SS_set_put_string(si, ps);
+
+	s = CSTRSAVE(_SS.vbf);};
+
+/* turn on SIGIO handler */
+    SC_catch_io_interrupts(SC_gs.io_interrupts_on);
+
+#else
+
+    object *x;
+
+    if (SS_consp(obj) == TRUE)
+       x = SS_mk_cons(si, SS_mk_string(si, fmt), obj);
+    else
+       x = SS_make_list(si,
+			SC_STRING_I, fmt,
+			SS_OBJECT_I, obj,
+			0);
+    s = _SS_sprintf_guts(si, si->outdev, x);
+    SS_gc(si, x);
+
+#endif
+
+    return(s);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SSI_SPRINTF - a C type sprintf for SCHEME */
+
+static object *_SSI_sprintf(SS_psides *si, object *argl)
+   {char *s;
+    object *o;
+
+    s = _SS_sprintf_guts(si, si->outdev, argl);
+    o = SS_mk_string(si, s);
 
     return(o);}
 
