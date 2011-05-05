@@ -364,6 +364,7 @@ int PM_cross_line_plane(double *x1, double *x2,
 
 /* _PM_INSERT_POINT - insert I into the vector D */
 
+#if 0
 static INLINE int _PM_insert_point(int i, int ln, int lx, int **pd, int *pn)
     {int l, n;
      int *d;
@@ -386,6 +387,7 @@ static INLINE int _PM_insert_point(int i, int ln, int lx, int **pd, int *pn)
      *pd = d;
 
      return(lx);}
+#endif
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

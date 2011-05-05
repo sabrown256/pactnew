@@ -80,9 +80,8 @@ void SC_get_time(double *psec, double *pmusec)
 #else
 
     struct timeval ts;
-    struct timezone tz;
 
-    gettimeofday(&ts, &tz);
+    gettimeofday(&ts, NULL);
 
     t[0] = ts.tv_sec;
     t[1] = ts.tv_usec;

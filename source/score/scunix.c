@@ -62,11 +62,11 @@ static int _SC_query_mode_unix(char *name, char *mode)
  */
        {if (sb.st_mode & S_IFREG)
 	   {if (mode == NULL)
-	       ret = sb.st_mode & S_IREAD;
+	       ret = sb.st_mode & S_IRUSR;
 	    else if ((strcmp(mode, "r") == 0) || (strcmp(mode, "rb") == 0))
-	       ret = sb.st_mode & S_IREAD;
+	       ret = sb.st_mode & S_IRUSR;
 	    else
-	       ret = sb.st_mode & S_IWRITE;
+	       ret = sb.st_mode & S_IWUSR;
 
 	    if (ret != 0)
 	       ret = TRUE;};};

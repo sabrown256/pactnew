@@ -154,6 +154,9 @@ static char
 static void
  finish(donetdes *st, double gti);
 
+extern int
+ strcasecmp(const char *a, const char *b);
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 

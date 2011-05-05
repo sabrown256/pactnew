@@ -87,7 +87,7 @@ typedef int socklen_t;
 # include <netdb.h>
 #endif
 
-#define SC_NDELAY    FNDELAY
+#define SC_NDELAY    O_NDELAY
 #define SC_APPEND    FAPPEND
 #define SC_SYNC      FSYNC
 

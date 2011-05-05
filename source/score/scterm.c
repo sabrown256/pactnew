@@ -664,8 +664,10 @@ int SC_set_raw_state(int fd, int trap)
 			    ECHOE,     SC_TERM_LOCAL,    FALSE,
 			    ECHOK,     SC_TERM_LOCAL,    FALSE,
 			    IEXTEN,    SC_TERM_LOCAL,    FALSE,
+/* GCC C99 change
 			    ECHOCTL,   SC_TERM_LOCAL,    FALSE,
 			    ECHOKE,    SC_TERM_LOCAL,    FALSE,
+*/
 			    CSIZE,     SC_TERM_CONTROL,  FALSE,
 			    PARENB,    SC_TERM_CONTROL,  FALSE,
 			    CS8,       SC_TERM_CONTROL,  TRUE,
@@ -728,8 +730,10 @@ int SC_set_cooked_state(int fd, int trap)
 			    ECHOE,     SC_TERM_LOCAL,    TRUE,
 			    ECHOK,     SC_TERM_LOCAL,    TRUE,
 			    IEXTEN,    SC_TERM_LOCAL,    TRUE,
+/* GCC C99 change
 			    ECHOCTL,   SC_TERM_LOCAL,    TRUE,
 			    ECHOKE,    SC_TERM_LOCAL,    TRUE,
+*/
 			    CSIZE,     SC_TERM_CONTROL,  TRUE,
 			    PARENB,    SC_TERM_CONTROL,  TRUE,
 			    CS8,       SC_TERM_CONTROL,  TRUE,
