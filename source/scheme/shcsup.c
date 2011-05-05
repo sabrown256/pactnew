@@ -263,7 +263,7 @@ object *SS_syntax_c(SS_psides *si, object *str)
        ret = SS_eof;
 
     else
-       {si->character_stream   = str;
+       {si->character_stream  = str;
 	_SS_cps.cpp_directive = FALSE;
        
 	_SS_isc = si;
