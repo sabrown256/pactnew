@@ -904,35 +904,140 @@ static void _SS_sig_handler(int sig)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SS_PRINT_ERR_MSG - default error message print function for
- *                   - _SS.pr_err
+/* _SS_GET_EXT_REF - get a reference to a SCHEME level function NAME out
+ *                 - at the C level
  */
 
-static void _SS_print_err_msg(SS_psides *si, FILE *str, char *s, object *obj)
-   {char atype[MAXLINE];
-    char *p;
+static object *_SS_get_ext_ref(SS_psides *si, char *name)
+   {char uname[MAXLINE];
+    haelem *hp;
+    object *o;
 
-    if (obj == NULL)
-       PRINT(str, "(%d):  ERROR: %s\n", si->errlev, s);
+    hp = SC_hasharr_lookup(si->symtab, name);
 
-    else
-       {PRINT(str, "(%d):  ERROR: %s\n      BAD OBJECT (", si->errlev, s);
+    if (hp == NULL)
+       {strcpy(uname, name);
+	SC_str_upper(uname);
+	PRINT(ERRDEV, "Error initializing %s\n", uname);
+        LONGJMP(SC_gs.cpu, ABORT);};  
 
-	p = SS_object_type_name(obj, atype);
-	if (p == NULL)
-	   {switch (SC_arrtype(obj, -1))
-	       {default :
-		     PRINT(str, "unknown");
-		     break;
+    o = (object *) hp->def;
 
-	        case '\0' :
-                     PRINT(str, "0x0): POINTER 0x%lx IS FREE\n\n",
-			   (long) (obj - (object *) NULL));
-		     return;};};
+    SS_UNCOLLECT(o);
 
-	PRINT(str, atype);
+    return(o);}
 
-	SS_print(si, si->outdev, obj, "): ", "\n\n");};
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_MAKE_EXT_BOOLEAN - install a boolean in the symbol table and
+ *                      - get a reference at the C level
+ */
+
+static object *_SS_make_ext_boolean(SS_psides *si, char *name, int val)
+   {object *o;
+
+    o = SS_mk_boolean(si, name, val);
+
+    SC_hasharr_install(si->symtab, name, o, SS_POBJECT_S, TRUE, TRUE);
+
+    SS_UNCOLLECT(o);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_INIT_STACK - rewind the stack to the beginning */
+
+static void _SS_init_stack(SS_psides *si)
+   {int ssz;
+
+#ifdef LARGE
+    ssz = 128;
+#else
+    ssz = 32;
+#endif
+
+    si->stack_size = ssz;
+    si->stack_mask = ssz - 1;
+    si->stack      = CMAKE_ARRAY(object *, NULL, 0);
+    si->nsave      = 0;
+    si->nrestore   = 0;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_INIT_CONT - initialize the two continuation stacks */
+
+static void _SS_init_cont(SS_psides *si)
+   {int i, sz;
+
+    sz = si->stack_size;
+
+/* interpreter continuation stack */
+    si->nsetc = 0;
+    si->ngoc  = 0;
+
+    si->cont_ptr     = 0;
+    si->continue_int = CMAKE_N(continuation, sz);
+    if (si->continue_int == NULL)
+       LONGJMP(SC_gs.cpu, ABORT);
+    for (i = 0; i < sz; si->continue_int[i++].signal = SS_null);
+
+/* error continuation stack */
+    si->err_cont_ptr = 0;
+    si->continue_err = CMAKE_N(err_continuation, sz);
+    if (si->continue_err == NULL)
+       LONGJMP(SC_gs.cpu, ABORT);
+    for (i = 0; i < sz; si->continue_err[i++].signal = SS_null);
+
+    si->errlev    = 0;
+    si->err_state = SS_null;
+    si->err_stack = CMAKE_N(object *, sz);
+    if (si->err_stack == NULL)
+       LONGJMP(SC_gs.cpu, ABORT);
+    for (i = 0; i < sz; si->err_stack[i++] = NULL);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_INST_CONST - initialize and install key Scheme constants
+ *                - for use in compiled code
+ */
+
+static void _SS_inst_const(SS_psides *si)
+   {
+
+    ONCE_SAFE(TRUE, NULL)
+
+       SS_quoteproc = _SS_get_ext_ref(si, "quote");
+       SS_quasiproc = _SS_get_ext_ref(si, "quasiquote");
+       SS_unqproc   = _SS_get_ext_ref(si, "unquote");
+       SS_unqspproc = _SS_get_ext_ref(si, "unquote-splicing");
+       SS_setproc   = _SS_get_ext_ref(si, "set!");
+
+       SS_null = _SS_make_ext_boolean(si, "nil",  FALSE);
+       SS_eof  = _SS_make_ext_boolean(si, "#eof", TRUE);
+       SS_t    = _SS_make_ext_boolean(si, "#t",   TRUE);
+       SS_f    = _SS_make_ext_boolean(si, "#f",   FALSE);
+       SS_else = _SS_make_ext_boolean(si, "else", TRUE);
+
+       SC_arrtype(SS_null, SS_NULL_I);
+       SC_arrtype(SS_eof, SS_EOF_I);
+    
+       SS_anon_proc  = SS_mk_string(si, "lambda");
+       SS_UNCOLLECT(SS_anon_proc);
+       SS_anon_macro = SS_mk_string(si, "lambda-macro");
+       SS_UNCOLLECT(SS_anon_macro);
+       SS_block_proc = SS_mk_string(si, "block");
+       SS_UNCOLLECT(SS_block_proc);
+
+    END_SAFE;
 
     return;}
 
@@ -942,15 +1047,17 @@ static void _SS_print_err_msg(SS_psides *si, FILE *str, char *s, object *obj)
 /* _SS_INIT_SCHEME - initialize an interpreter state instance */
 
 static void _SS_init_scheme(SS_psides *si)
-   {int ssz;
-    object *fr;
+   {long ma, mf;
+    object *fr, *ot;
     SC_contextdes hnd;
 
-#ifdef LARGE
-    ssz = 128;
-#else
-    ssz = 32;
-#endif
+    ot = _SS.trace_object;
+    _SS.trace_object = SS_null;
+
+/* hide the memory figures for the interpreter state instance */
+    SC_mem_stats(&ma, &mf, NULL, NULL);
+
+    SS_register_types();
 
     hnd = SC_which_signal_handler(SIGINT);
     SC_setup_sig_handlers(_SS_sig_handler, si, TRUE);
@@ -960,78 +1067,62 @@ static void _SS_init_scheme(SS_psides *si)
     SC_MEM_INIT_V(si->prompt);
     SC_MEM_INIT_V(si->ans_prompt);
 
-    si->interactive      = TRUE;
-    si->trace_env        = 0;
-    si->know_env         = FALSE;
-    si->trap_error       = TRUE;
-    si->lines_page       = 50;
-    si->print_flag       = TRUE;
-    si->stat_flag        = TRUE;
-    si->bracket_flag     = FALSE;
-    si->nsave            = 0;
-    si->nrestore         = 0;
-    si->stack_size       = ssz;
-    si->stack_mask       = si->stack_size - 1;
+    si->interactive  = TRUE;
+    si->trace_env    = 0;
+    si->know_env     = FALSE;
+    si->trap_error   = TRUE;
+    si->lines_page   = 50;
+    si->print_flag   = TRUE;
+    si->stat_flag    = TRUE;
+    si->hist_flag    = NO_LOG;
+    si->bracket_flag = FALSE;
 
-/* SS_init_cont variables */
-    si->cont_ptr         = 0;
-    si->err_cont_ptr     = 0;
-    si->errlev           = 0;
-    si->continue_int     = NULL;
-    si->continue_err     = NULL;
-    si->err_stack        = NULL;
+/* setup symbol table and install compiled primitives */
+    si->symtab = SC_make_hasharr(HSZHUGE, DOC, SC_HA_NAME_KEY);
+    _SS_inst_prm(si);
+    _SS_inst_const(si);
 
-/* SS_init_stack variables */
-    si->nsetc            = 0;
-    si->ngoc             = 0;
-    si->stack            = NULL;
+/* initialize the interpreter execution stack */
+    _SS_init_stack(si);
 
-/* SS_inst_prm */
-    si->symtab           = NULL;
-
-    si->types            = NULL;
-    si->hist_flag        = NO_LOG;
-
-/* SS_inst_const variables */
-    si->indev            = SS_null;
-    si->outdev           = SS_null;
-    si->histdev          = SS_null;
-
-/* registers */
-    si->this             = SS_null;
-    si->val              = SS_null;
-    si->unev             = SS_null;
-    si->exn              = SS_null;
-    si->argl             = SS_null;
-    si->fun              = SS_null;
-    si->err_state        = SS_null;
-    si->rdobj            = SS_null;
-    si->evobj            = SS_null;
+/* initialize interpreter continuation stacks */
+    _SS_init_cont(si);
 
 /* syntax modes */
+    si->types            = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
     si->character_stream = NULL;
     si->eox              = FALSE;
     si->lex_text         = NULL;
-
-/*	_SS_cps.cpp_directive = FALSE; */
     si->strict_c         = FALSE;
 
 /* methods */
-    si->pr_gets          = NULL;
-    si->post_print       = NULL;
-    si->post_read        = NULL;
-    si->post_eval        = NULL;
-    si->name_reproc      = NULL;          /* syntax modes */
-    si->read             = NULL;
-    si->get_arg          = NULL;
-    si->call_arg         = NULL;
-    si->pr_ch_un         = SS_unget_ch;
-    si->pr_ch_out        = SS_put_ch;
+    si->pr_gets     = NULL;
+    si->post_print  = NULL;
+    si->post_read   = NULL;
+    si->post_eval   = NULL;
+    si->name_reproc = NULL;          /* syntax modes */
+    si->read        = NULL;
+    si->get_arg     = NULL;
+    si->call_arg    = NULL;
+    si->pr_ch_un    = SS_unget_ch;
+    si->pr_ch_out   = SS_put_ch;
 
-    SS_register_types();
+/* I/O stream variables */
+    si->histdev = SS_null;
+    si->indev   = SS_mk_inport(si, stdin, "stdin");
+    si->outdev  = SS_mk_outport(si, stdout, "stdout");
+    SS_UNCOLLECT(si->indev);
+    SS_UNCOLLECT(si->outdev);
 
-    SS_inst_prm(si);
-    SS_inst_const(si);
+/* registers */
+    si->this  = SS_null;
+    si->val   = SS_null;
+    si->unev  = SS_null;
+    si->exn   = SS_null;
+    si->argl  = SS_null;
+    si->fun   = SS_null;
+    si->rdobj = SS_null;
+    si->evobj = SS_null;
 
 /* initialize interpreter environment */
     si->env = SS_null;
@@ -1044,22 +1135,17 @@ static void _SS_init_scheme(SS_psides *si)
     SS_assign(si, si->env, si->global_env);
 
     SS_define_constant(si, 1,
-		       "system-id", SC_STRING_I, SYSTEM_ID,
-		       "argv",      SS_OBJECT_I, SS_null,
+		       "system-id",        SC_STRING_I, SYSTEM_ID,
+		       "system-compiler",  SC_STRING_I, USE_COMPILER,
+		       "compiler-version", SC_STRING_I, COMPILER_VERSION,
+		       "pact-version",     SC_STRING_I, PACT_VERSION,
+		       "argv",             SS_OBJECT_I, SS_null,
 		       NULL);
 
-    SS_set_put_line(si, SS_printf);
-    SS_set_put_string(si, SS_fputs);
+/* hide the memory figures for the interpreter state instance */
+    SC_mem_stats_set(ma, mf);
 
-#ifdef NO_SHELL
-    SC_set_get_line(PG_wind_fgets);
-#else
-    SC_set_get_line(io_gets);
-#endif
-
-    SC_mem_stats_set(0L, 0L);
-
-    SS_set_print_err_func(_SS_print_err_msg, FALSE);
+    _SS.trace_object = ot;
 
     return;}
 

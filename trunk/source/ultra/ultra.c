@@ -1235,9 +1235,6 @@ int main(int c, char **v)
 
     SC_zero_space_n(zsp, -2);
 
-    SS_init_stack(si);
-    SS_init_cont(si);
-
     SC_init_path(1, "ULTRA");
 
 /* ULTRA initializations not depending on scheme */

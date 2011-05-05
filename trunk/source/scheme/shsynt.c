@@ -180,9 +180,6 @@ object *SS_lookup_variable(SS_psides *si, char *txt, int verbose)
 object *SS_add_type_synt(SS_psides *si, char *name)
    {object *typ;
 
-    if (si->types == NULL)
-       si->types = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
-
     if (name == NULL)
        typ = SS_null;
 

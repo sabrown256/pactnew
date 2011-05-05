@@ -341,6 +341,7 @@ extern void
 /* SHTLEV.C declarations */
 
 extern void
+ _SS_inst_prm(SS_psides *si),
  _SS_restore_state(SS_psides *si, object *esc_proc);
 
 
