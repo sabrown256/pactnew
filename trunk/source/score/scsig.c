@@ -10,6 +10,13 @@
 
 #include "scope_proc.h"
 
+/* NOTE: Linux defines NSIG as the highest signal number (32)
+ *       Nobody else seems to but the idea is very nice
+ */
+#ifndef NSIG
+# define NSIG  32
+#endif
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 

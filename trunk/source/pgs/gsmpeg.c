@@ -8,24 +8,17 @@
 
 #include "cpyright.h"
 
-#ifdef CLOCKS_PER_SEC
-#include <times.h>
-#else
-#include <sys/times.h>
-#endif
-
 #include "scope_mpeg.h"     /* includes system headers */
 
-#undef MAKE
-#undef MAKE_N
-#undef REMAKE
-#undef REMAKE
-#undef SFREE
+#undef CMAKE
+#undef CMAKE_N
+#undef CREMAKE
+#undef CFREE
 
-#define MAKE(_t)              ((_t *) malloc(sizeof(_t)))
-#define MAKE_N(_t, _n)        ((_t *) malloc((_n)*sizeof(_t)))
-#define REMAKE(_p, _t, _n)    (_p = (_t *) realloc(_p, (_n)*sizeof(_t)))
-#define SFREE(_p)                                                            \
+#define CMAKE(_t)              ((_t *) malloc(sizeof(_t)))
+#define CMAKE_N(_t, _n)        ((_t *) malloc((_n)*sizeof(_t)))
+#define CREMAKE(_p, _t, _n)    (_p = (_t *) realloc(_p, (_n)*sizeof(_t)))
+#define CFREE(_p)                                                            \
    {free(_p);                                                                \
     _p = NULL;}
 
@@ -1767,10 +1760,10 @@ Bitio_New(FILE *filePtr)
 {
     BitBucket *bbPtr;
 
-    bbPtr = MAKE(BitBucket);
+    bbPtr = CMAKE(BitBucket);
     ERRCHK(bbPtr, "malloc");
 
-    bbPtr->firstPtr = bbPtr->lastPtr = MAKE(struct bitBucket);
+    bbPtr->firstPtr = bbPtr->lastPtr = CMAKE(struct bitBucket);
     ERRCHK(bbPtr->firstPtr, "malloc");
 
     bbPtr->totalbits = 0;
@@ -1806,9 +1799,9 @@ Bitio_Free(BitBucket *bbPtr)
 
     for (tmpPtr = bbPtr->firstPtr; tmpPtr != NULL; tmpPtr = nextPtr) {
 	nextPtr = tmpPtr->nextPtr;
-	SFREE(tmpPtr);
+	CFREE(tmpPtr);
     }
-    SFREE(bbPtr);
+    CFREE(bbPtr);
 }
 
 
@@ -1851,7 +1844,7 @@ Bitio_Write(BitBucket *bbPtr, uint32 bits, int nbits)
          * there's not enough room in the current bucket, so we're
          * going to have to allocate another bucket
     	 */
-	newPtr = lastPtr->nextPtr = MAKE(struct bitBucket);
+	newPtr = lastPtr->nextPtr = CMAKE(struct bitBucket);
 	ERRCHK(newPtr, "malloc");
 	newPtr->nextPtr = NULL;
 	newPtr->bitsleft = MAXBITS_PER_BUCKET;
@@ -1988,10 +1981,10 @@ Bitio_Flush(BitBucket *bbPtr)
     while ( bbPtr->firstPtr != ptr ) {
 	tempPtr = bbPtr->firstPtr;
 	bbPtr->firstPtr = tempPtr->nextPtr;
-	SFREE(tempPtr);
+	CFREE(tempPtr);
     }
 
-    SFREE(bbPtr);
+    CFREE(bbPtr);
 
     time(&tempTimeEnd);
     IOtime += (tempTimeEnd-tempTimeStart);
@@ -2079,10 +2072,10 @@ Bitio_WriteToSocket(BitBucket *bbPtr, int socket)
     while ( bbPtr->firstPtr != ptr ) {
 	tempPtr = bbPtr->firstPtr;
 	bbPtr->firstPtr = tempPtr->nextPtr;
-	SFREE(tempPtr);
+	CFREE(tempPtr);
     }
 
-    SFREE(bbPtr);
+    CFREE(bbPtr);
 }
 
 
@@ -2159,7 +2152,7 @@ Dump(BitBucket *bbPtr)
     while ( bbPtr->firstPtr != ptr ) {
 	tempPtr = bbPtr->firstPtr;
 	bbPtr->firstPtr = tempPtr->nextPtr;
-	SFREE(tempPtr);
+	CFREE(tempPtr);
     }
 
     bbPtr->totalbits -= bitsWritten;
@@ -5021,7 +5014,7 @@ void Frame_Resize(MpegFrame *omf, MpegFrame *mf,
 		  int outsize_x, int outsize_y)
    {MpegFrame *frameA;  /* intermediate frame */
   
-    frameA = MAKE(MpegFrame);
+    frameA = CMAKE(MpegFrame);
     if (frameA == NULL)
        return;
   
@@ -5036,8 +5029,8 @@ void Frame_Resize(MpegFrame *omf, MpegFrame *mf,
        Resize_Width(omf,mf,insize_x,insize_y,outsize_x);
 
 /* Free memory */
-    SFREE(frameA);
-    SFREE(mf);
+    CFREE(frameA);
+    CFREE(mf);
 
     return;}
 
@@ -5055,24 +5048,24 @@ int in_x,in_y, out_x;
   omfrw->orig_y = NULL;
   Fsize_x = out_x;
   /* Allocate new frame memory */
-  omfrw->orig_y = MAKE_N(uint8 *, Fsize_y);
+  omfrw->orig_y = CMAKE_N(uint8 *, Fsize_y);
   ERRCHK(omfrw->orig_y, "malloc");
   for (y = 0; y < Fsize_y; y++) {
-    omfrw->orig_y[y] = MAKE_N(uint8, out_x);
+    omfrw->orig_y[y] = CMAKE_N(uint8, out_x);
     ERRCHK(omfrw->orig_y[y], "malloc");
   }
   
-  omfrw->orig_cr = MAKE_N(uint8 *, Fsize_y/2);
+  omfrw->orig_cr = CMAKE_N(uint8 *, Fsize_y/2);
   ERRCHK(omfrw->orig_cr, "malloc");
   for (y = 0; y < Fsize_y / 2; y++) {
-    omfrw->orig_cr[y] = MAKE_N(uint8, out_x/2);
+    omfrw->orig_cr[y] = CMAKE_N(uint8, out_x/2);
     ERRCHK(omfrw->orig_cr[y], "malloc");
   }
   
-  omfrw->orig_cb = MAKE_N(uint8 *, Fsize_y/2);
+  omfrw->orig_cb = CMAKE_N(uint8 *, Fsize_y/2);
   ERRCHK(omfrw->orig_cb, "malloc");
   for (y = 0; y < Fsize_y / 2; y++) {
-    omfrw->orig_cb[y] = MAKE_N(uint8, out_x/2);
+    omfrw->orig_cb[y] = CMAKE_N(uint8, out_x/2);
     ERRCHK(omfrw->orig_cb[y], "malloc");
   }
   
@@ -5090,19 +5083,19 @@ int in_x,in_y, out_x;
   /* Free old frame memory */
   if (mfrw->orig_y) {
     for (i = 0; i < in_y; i++) {
-      SFREE(mfrw->orig_y[i]);
+      CFREE(mfrw->orig_y[i]);
     }
-    SFREE(mfrw->orig_y);
+    CFREE(mfrw->orig_y);
     
     for (i = 0; i < in_y / 2; i++) {
-      SFREE(mfrw->orig_cr[i]);
+      CFREE(mfrw->orig_cr[i]);
     }
-    SFREE(mfrw->orig_cr);
+    CFREE(mfrw->orig_cr);
     
     for (i = 0; i < in_y / 2; i++) {
-      SFREE(mfrw->orig_cb[i]);
+      CFREE(mfrw->orig_cb[i]);
     }
-    SFREE(mfrw->orig_cb);
+    CFREE(mfrw->orig_cb);
   }
   
 }
@@ -5123,24 +5116,24 @@ int i;
 Fsize_y = out_y;
 
 /* Allocate new frame memory */
-    omfrh->orig_y = MAKE_N(uint8 *, out_y);
+    omfrh->orig_y = CMAKE_N(uint8 *, out_y);
     ERRCHK(omfrh->orig_y, "malloc");
     for (y = 0; y < out_y; y++) {
-	omfrh->orig_y[y] = MAKE_N(uint8, Fsize_x);
+	omfrh->orig_y[y] = CMAKE_N(uint8, Fsize_x);
 	ERRCHK(omfrh->orig_y[y], "malloc");
     }
 
-    omfrh->orig_cr = MAKE_N(uint8 *, out_y/2);
+    omfrh->orig_cr = CMAKE_N(uint8 *, out_y/2);
     ERRCHK(omfrh->orig_cr, "malloc");
     for (y = 0; y < out_y / 2; y++) {
-	omfrh->orig_cr[y] = MAKE_N(uint8, Fsize_x/2);
+	omfrh->orig_cr[y] = CMAKE_N(uint8, Fsize_x/2);
 	ERRCHK(omfrh->orig_cr[y], "malloc");
     }
 
-    omfrh->orig_cb = MAKE_N(uint8 *, out_y/2);
+    omfrh->orig_cb = CMAKE_N(uint8 *, out_y/2);
     ERRCHK(omfrh->orig_cb, "malloc");
     for (y = 0; y < out_y / 2; y++) {
-	omfrh->orig_cb[y] = MAKE_N(uint8, Fsize_x/2);
+	omfrh->orig_cb[y] = CMAKE_N(uint8, Fsize_x/2);
 	ERRCHK(omfrh->orig_cb[y], "malloc");
     }
 
@@ -5158,19 +5151,19 @@ Resize_Array_Height(mfrh->orig_cb,(in_x/2),(in_y/2),omfrh->orig_cb,(out_y/2));
 /* Free old frame memory */
     if (mfrh->orig_y) {
 	for (i = 0; i < in_y; i++) {
-	    SFREE(mfrh->orig_y[i]);
+	    CFREE(mfrh->orig_y[i]);
 	}
-	SFREE(mfrh->orig_y);
+	CFREE(mfrh->orig_y);
 
 	for (i = 0; i < in_y / 2; i++) {
-	    SFREE(mfrh->orig_cr[i]);
+	    CFREE(mfrh->orig_cr[i]);
 	}
-	SFREE(mfrh->orig_cr);
+	CFREE(mfrh->orig_cr);
 
 	for (i = 0; i < in_y / 2; i++) {
-	    SFREE(mfrh->orig_cb[i]);
+	    CFREE(mfrh->orig_cb[i]);
 	}
-	SFREE(mfrh->orig_cb);
+	CFREE(mfrh->orig_cb);
     }
 
 }
@@ -5322,7 +5315,7 @@ void Frame_Init(MpegFrame **frameMemory)
    {register int idx;
 
     for (idx = 0; idx < 3; idx++)
-        {frameMemory[idx] = MAKE(MpegFrame);
+        {frameMemory[idx] = CMAKE(MpegFrame);
 
 	 frameMemory[idx]->inUse     = FALSE;
 	 frameMemory[idx]->ppm_data  = NULL;
@@ -5419,11 +5412,11 @@ void Frame_AllocPPM(MpegFrame *frame)
     if (frame->ppm_data != NULL)
        return;
 
-    frame->ppm_data = MAKE_N(uint8 *, Fsize_y);
+    frame->ppm_data = CMAKE_N(uint8 *, Fsize_y);
     ERRCHK(frame->ppm_data, "malloc");
 
     for (y = 0; y < Fsize_y; y++)
-        {frame->ppm_data[y] = MAKE_N(uint8, 3*Fsize_x);
+        {frame->ppm_data[y] = CMAKE_N(uint8, 3*Fsize_x);
 	 ERRCHK(frame->ppm_data[y], "malloc");};
 
     return;}
@@ -5451,21 +5444,21 @@ void Frame_AllocBlocks(MpegFrame *frame)
     dctx = Fsize_x / DCTSIZE;
     dcty = Fsize_y / DCTSIZE;
 
-    frame->y_blocks = MAKE_N(Block *, dcty);
+    frame->y_blocks = CMAKE_N(Block *, dcty);
     ERRCHK(frame->y_blocks, "malloc");
 
     for (i = 0; i < dcty; i++)
-        {frame->y_blocks[i] = MAKE_N(Block, dctx);
+        {frame->y_blocks[i] = CMAKE_N(Block, dctx);
 	 ERRCHK(frame->y_blocks[i], "malloc");};
 
-    frame->cr_blocks = MAKE_N(Block *, (dcty >> 1));
-    frame->cb_blocks = MAKE_N(Block *, (dcty >> 1));
+    frame->cr_blocks = CMAKE_N(Block *, (dcty >> 1));
+    frame->cb_blocks = CMAKE_N(Block *, (dcty >> 1));
     ERRCHK(frame->cr_blocks, "malloc");
     ERRCHK(frame->cb_blocks, "malloc");
 
     for (i = 0; i < (dcty >> 1); i++)
-        {frame->cr_blocks[i] = MAKE_N(Block, (dctx >> 1));
-	 frame->cb_blocks[i] = MAKE_N(Block, (dctx >> 1));
+        {frame->cr_blocks[i] = CMAKE_N(Block, (dctx >> 1));
+	 frame->cb_blocks[i] = CMAKE_N(Block, (dctx >> 1));
 	 ERRCHK(frame->cr_blocks[i], "malloc");
 	 ERRCHK(frame->cb_blocks[i], "malloc");};
 
@@ -5493,25 +5486,25 @@ void Frame_AllocYCC(MpegFrame *frame)
     DBG_PRINT(("ycc_calc:\n"));
 
 /* first, allocate tons of memory */
-    frame->orig_y = MAKE_N(uint8 *, Fsize_y);
+    frame->orig_y = CMAKE_N(uint8 *, Fsize_y);
     ERRCHK(frame->orig_y, "malloc");
 
     for (y = 0; y < Fsize_y; y++)
-        {frame->orig_y[y] = MAKE_N(uint8, Fsize_x);
+        {frame->orig_y[y] = CMAKE_N(uint8, Fsize_x);
 	 ERRCHK(frame->orig_y[y], "malloc");};
 
-    frame->orig_cr = MAKE_N(uint8 *, (Fsize_y >> 1));
+    frame->orig_cr = CMAKE_N(uint8 *, (Fsize_y >> 1));
     ERRCHK(frame->orig_cr, "malloc");
 
     for (y = 0; y < (Fsize_y >> 1); y++)
-        {frame->orig_cr[y] = MAKE_N(uint8, (Fsize_x >> 1));
+        {frame->orig_cr[y] = CMAKE_N(uint8, (Fsize_x >> 1));
 	 ERRCHK(frame->orig_cr[y], "malloc");};
 
-    frame->orig_cb = MAKE_N(uint8 *, (Fsize_y >> 1));
+    frame->orig_cb = CMAKE_N(uint8 *, (Fsize_y >> 1));
     ERRCHK(frame->orig_cb, "malloc");
 
     for (y = 0; y < (Fsize_y >> 1); y++)
-        {frame->orig_cb[y] = MAKE_N(uint8, (Fsize_x >> 1));
+        {frame->orig_cb[y] = CMAKE_N(uint8, (Fsize_x >> 1));
 	 ERRCHK(frame->orig_cb[y], "malloc");};
 
     if (referenceFrame == ORIGINAL_FRAME)
@@ -5539,25 +5532,25 @@ void Frame_AllocHalf(MpegFrame *frame)
     if (frame->halfX != NULL)
        return;
 
-    frame->halfX = MAKE_N(uint8 *, Fsize_y);
+    frame->halfX = CMAKE_N(uint8 *, Fsize_y);
     ERRCHK(frame->halfX, "malloc");
 
-    frame->halfY = MAKE_N(uint8 *, Fsize_y-1);
+    frame->halfY = CMAKE_N(uint8 *, Fsize_y-1);
     ERRCHK(frame->halfY, "malloc");
 
-    frame->halfBoth = MAKE_N(uint8 *, Fsize_y - 1);
+    frame->halfBoth = CMAKE_N(uint8 *, Fsize_y - 1);
     ERRCHK(frame->halfBoth, "malloc");
 
     for (y = 0; y < Fsize_y; y++)
-        {frame->halfX[y] = MAKE_N(uint8, Fsize_x - 1);
+        {frame->halfX[y] = CMAKE_N(uint8, Fsize_x - 1);
 	 ERRCHK(frame->halfX[y], "malloc");};
 
     for (y = 0; y < Fsize_y-1; y++)
-        {frame->halfY[y] = MAKE_N(uint8, Fsize_x);
+        {frame->halfY[y] = CMAKE_N(uint8, Fsize_x);
 	 ERRCHK(frame->halfY[y], "malloc");};
 
     for (y = 0; y < Fsize_y-1; y++)
-        {frame->halfBoth[y] = MAKE_N(uint8, Fsize_x - 1);
+        {frame->halfBoth[y] = CMAKE_N(uint8, Fsize_x - 1);
 	 ERRCHK(frame->halfBoth[y], "malloc");};
 
     return;}
@@ -5587,25 +5580,25 @@ void Frame_AllocDecoded(MpegFrame *frame, boolean makeReference)
  * it for some reason, so do it this way at least for now -- more
  * flexible
  */
-    frame->decoded_y = MAKE_N(uint8 *, Fsize_y);
+    frame->decoded_y = CMAKE_N(uint8 *, Fsize_y);
     ERRCHK(frame->decoded_y, "malloc");
 
     for (y = 0; y < Fsize_y; y++)
-        {frame->decoded_y[y] = MAKE_N(uint8, Fsize_x);
+        {frame->decoded_y[y] = CMAKE_N(uint8, Fsize_x);
 	 ERRCHK(frame->decoded_y[y], "malloc");};
 
-    frame->decoded_cr = MAKE_N(uint8 *, (Fsize_y >> 1));
+    frame->decoded_cr = CMAKE_N(uint8 *, (Fsize_y >> 1));
     ERRCHK(frame->decoded_cr, "malloc");
 
     for (y = 0; y < (Fsize_y >> 1); y++)
-        {frame->decoded_cr[y] = MAKE_N(uint8, (Fsize_x >> 1));
+        {frame->decoded_cr[y] = CMAKE_N(uint8, (Fsize_x >> 1));
 	 ERRCHK(frame->decoded_cr[y], "malloc");};
 
-    frame->decoded_cb = MAKE_N(uint8 *, (Fsize_y >> 1));
+    frame->decoded_cb = CMAKE_N(uint8 *, (Fsize_y >> 1));
     ERRCHK(frame->decoded_cb, "malloc");
 
     for (y = 0; y < (Fsize_y >> 1); y++)
-        {frame->decoded_cb[y] = MAKE_N(uint8, (Fsize_x >> 1));
+        {frame->decoded_cb[y] = CMAKE_N(uint8, (Fsize_x >> 1));
 	 ERRCHK(frame->decoded_cb[y], "malloc");};
 
     if (makeReference)
@@ -5713,69 +5706,69 @@ static void FreeFrame(MpegFrame *frame)
 
     if (frame->orig_y != NULL)
        {for (i = 0; i < Fsize_y; i++)
-	    {SFREE(frame->orig_y[i]);};
+	    {CFREE(frame->orig_y[i]);};
 
-	SFREE(frame->orig_y);
-
-	for (i = 0; i < (Fsize_y >> 1); i++)
-	    {SFREE(frame->orig_cr[i]);}
-
-	SFREE(frame->orig_cr);
+	CFREE(frame->orig_y);
 
 	for (i = 0; i < (Fsize_y >> 1); i++)
-	    {SFREE(frame->orig_cb[i]);};
+	    {CFREE(frame->orig_cr[i]);}
 
-	SFREE(frame->orig_cb);};
+	CFREE(frame->orig_cr);
+
+	for (i = 0; i < (Fsize_y >> 1); i++)
+	    {CFREE(frame->orig_cb[i]);};
+
+	CFREE(frame->orig_cb);};
 
     if (frame->decoded_y != NULL)
        {for (i = 0; i < Fsize_y; i++)
-	    {SFREE(frame->decoded_y[i]);};
+	    {CFREE(frame->decoded_y[i]);};
 
-	SFREE(frame->decoded_y);
-
-	for (i = 0; i < (Fsize_y >> 1); i++)
-	    {SFREE(frame->decoded_cr[i]);};
-
-	SFREE(frame->decoded_cr);
+	CFREE(frame->decoded_y);
 
 	for (i = 0; i < (Fsize_y >> 1); i++)
-	    {SFREE(frame->decoded_cb[i]);};
+	    {CFREE(frame->decoded_cr[i]);};
 
-	SFREE(frame->decoded_cb);};
+	CFREE(frame->decoded_cr);
+
+	for (i = 0; i < (Fsize_y >> 1); i++)
+	    {CFREE(frame->decoded_cb[i]);};
+
+	CFREE(frame->decoded_cb);};
 
     if (frame->y_blocks != NULL)
        {for (i = 0; i < Fsize_y / DCTSIZE; i++)
-	    {SFREE(frame->y_blocks[i]);};
+	    {CFREE(frame->y_blocks[i]);};
 
-	SFREE(frame->y_blocks);
-
-	for (i = 0; i < Fsize_y / (2 * DCTSIZE); i++)
-	    {SFREE(frame->cr_blocks[i]);};
-
-	SFREE(frame->cr_blocks);
+	CFREE(frame->y_blocks);
 
 	for (i = 0; i < Fsize_y / (2 * DCTSIZE); i++)
-	    {SFREE(frame->cb_blocks[i]);};
+	    {CFREE(frame->cr_blocks[i]);};
 
-	SFREE(frame->cb_blocks);};
+	CFREE(frame->cr_blocks);
+
+	for (i = 0; i < Fsize_y / (2 * DCTSIZE); i++)
+	    {CFREE(frame->cb_blocks[i]);};
+
+	CFREE(frame->cb_blocks);};
 
     if (frame->halfX != NULL)
        {for (i = 0; i < Fsize_y; i++)
-	    {SFREE(frame->halfX[i]);};
+	    {CFREE(frame->halfX[i]);};
 
-	SFREE(frame->halfX);
-
-	for (i = 0; i < Fsize_y-1; i++)
-	    {SFREE(frame->halfY[i]);};
-
-	SFREE(frame->halfY);
+	CFREE(frame->halfX);
 
 	for (i = 0; i < Fsize_y-1; i++)
-	    {SFREE(frame->halfBoth[i]);};
+	    {CFREE(frame->halfY[i]);};
 
-	SFREE(frame->halfBoth);};
+	CFREE(frame->halfY);
+
+	for (i = 0; i < Fsize_y-1; i++)
+	    {CFREE(frame->halfBoth[i]);};
+
+	CFREE(frame->halfBoth);};
         
-    SFREE(frame);
+    CFREE(frame);
 
     return;}
 
@@ -5982,7 +5975,7 @@ SetFramePattern(pattern)
       }
     }
 
-    buf = MAKE_N(char, len + 1);
+    buf = CMAKE_N(char, len + 1);
     ERRCHK(buf, "malloc");
 
     firstI = -1;
@@ -6043,7 +6036,7 @@ ComputeFrameTable()
       table_size = framePatternLen;
     }
 
-    frameTable = MAKE_N(FrameTable, 1 + table_size);
+    frameTable = CMAKE_N(FrameTable, 1 + table_size);
     ERRCHK(frameTable, "malloc");
 
     lastIP = NULL;
@@ -7111,12 +7104,12 @@ BlockComputeSNR(current, snr, psnr)
     ySize[0]=Fsize_y;     xSize[0]=Fsize_x;
     ySize[1]=Fsize_y>>1;  xSize[1]=Fsize_x>>1;
     ySize[2]=Fsize_y>>1;  xSize[2]=Fsize_x>>1;
-    SignalY  = MAKE_N(int32 *, ysz);
-    NoiseY   = MAKE_N(int32 *, ysz);
-    SignalCb = MAKE_N(int32 *, ysz);
-    NoiseCb  = MAKE_N(int32 *, ysz);
-    SignalCr = MAKE_N(int32 *, ysz);
-    NoiseCr  = MAKE_N(int32 *, ysz);
+    SignalY  = CMAKE_N(int32 *, ysz);
+    NoiseY   = CMAKE_N(int32 *, ysz);
+    SignalCb = CMAKE_N(int32 *, ysz);
+    NoiseCb  = CMAKE_N(int32 *, ysz);
+    SignalCr = CMAKE_N(int32 *, ysz);
+    NoiseCr  = CMAKE_N(int32 *, ysz);
     if (SignalY == NULL || NoiseY == NULL || SignalCr == NULL || 
 	NoiseCb == NULL || SignalCb == NULL || NoiseCr == NULL) {
       io_printf(stderr, "Out of memory in BlockComputeSNR\n");
@@ -7279,27 +7272,27 @@ AllocDctBlocks()
     dctx = Fsize_x / DCTSIZE;
     dcty = Fsize_y / DCTSIZE;
 
-    dct = MAKE_N(Block *, dcty);
+    dct = CMAKE_N(Block *, dcty);
     ERRCHK(dct, "malloc");
     for (i = 0; i < dcty; i++) {
-	dct[i] = MAKE_N(Block, dctx);
+	dct[i] = CMAKE_N(Block, dctx);
 	ERRCHK(dct[i], "malloc");
     }
 
-    dct_data = MAKE_N(dct_data_type *, dcty);
+    dct_data = CMAKE_N(dct_data_type *, dcty);
     ERRCHK(dct_data, "malloc");
     for (i = 0; i < dcty; i++) {
-	dct_data[i] = MAKE_N(dct_data_type, dctx);
+	dct_data[i] = CMAKE_N(dct_data_type, dctx);
 	ERRCHK(dct[i], "malloc");
     }
 
-    dctr = MAKE_N(Block *, (dcty >> 1));
-    dctb = MAKE_N(Block *, (dcty >> 1));
+    dctr = CMAKE_N(Block *, (dcty >> 1));
+    dctb = CMAKE_N(Block *, (dcty >> 1));
     ERRCHK(dctr, "malloc");
     ERRCHK(dctb, "malloc");
     for (i = 0; i < (dcty >> 1); i++) {
-	dctr[i] = MAKE_N(Block, (dctx >> 1));
-	dctb[i] = MAKE_N(Block, (dctx >> 1));
+	dctr[i] = CMAKE_N(Block, (dctx >> 1));
+	dctb[i] = CMAKE_N(Block, (dctx >> 1));
 	ERRCHK(dctr[i], "malloc");
 	ERRCHK(dctb[i], "malloc");
     }
@@ -8737,7 +8730,7 @@ pm_allocrow(int cols, int size)
 {
   register char* itrow;
 
-  itrow = MAKE_N(char, cols*size);
+  itrow = CMAKE_N(char, cols*size);
   if ( itrow == (char*) 0 )
     {
       (void) io_printf(
@@ -8750,7 +8743,7 @@ pm_allocrow(int cols, int size)
 void pm_freerow(char* itrow) 
    {
 
-    SFREE(itrow);
+    CFREE(itrow);
 
     return;}
 
@@ -8758,15 +8751,15 @@ char **pm_allocarray(int cols, int rows, int size)
    {int i;
     char** its;
 
-    its = MAKE_N(char*, rows);
+    its = CMAKE_N(char*, rows);
     if (its == NULL)
        {io_printf(stderr, "%s: out of memory allocating an array\n", progname );
 	return(NULL);};
 
-    its[0] = MAKE_N(char, rows*cols*size);
+    its[0] = CMAKE_N(char, rows*cols*size);
     if (its[0] == NULL)
        {io_printf(stderr, "%s: out of memory allocating an array\n", progname );
-	SFREE(its);
+	CFREE(its);
 	return(NULL);};
 
     for (i = 1; i < rows; ++i)
@@ -8777,8 +8770,8 @@ char **pm_allocarray(int cols, int rows, int size)
 void pm_freearray(char** its, int rows)
    {
 
-    SFREE(its[0]);
-    SFREE(its);
+    CFREE(its[0]);
+    CFREE(its);
 
     return;}
 
@@ -12477,7 +12470,7 @@ int32 GenMPEGStream(int whichGOP, int frameStart, int frameEnd,
 
 	 frame = Frame_New(i, frameType, frameMemory);
 	 if (frame == NULL)
-	    {SFREE(bb);
+	    {CFREE(bb);
 	     return(0);};
 
 	 pastRefFrame   = futureRefFrame;
@@ -12534,13 +12527,13 @@ int32 GenMPEGStream(int whichGOP, int frameStart, int frameEnd,
 	      
 		     stat(userDataFileName, &statbuf);
 		     userDataSize = statbuf.st_size;
-		     userData     = MAKE_N(char, userDataSize);
+		     userData     = CMAKE_N(char, userDataSize);
 
 		     fp = _PG_fopen(userDataFileName,"rb");
 		     if (fp == NULL)
 		        {io_printf(stderr,"Could not open userdata file-%s.\n",
 				   userDataFileName);
-			 SFREE(userData);
+			 CFREE(userData);
 			 userDataSize = 0;
 			 goto write;};
 
@@ -12548,7 +12541,7 @@ int32 GenMPEGStream(int whichGOP, int frameStart, int frameEnd,
 		        {io_printf(stderr,
 				   "Could not read %d bytes from userdata file-%s.\n",
 				   userDataSize, userDataFileName);
-			 SFREE(userData);
+			 CFREE(userData);
 			 userDataSize = 0;
 			 goto write;};}
 
@@ -12557,7 +12550,7 @@ int32 GenMPEGStream(int whichGOP, int frameStart, int frameEnd,
 		    {time_t now;
 
 		     time(&now);
-		     userData = MAKE_N(char, 100);
+		     userData = CMAKE_N(char, 100);
 		     if (userData != NULL)
 		        {snprintf(userData, 100,
 				  "MPEG stream encoded by UCB Encoder (mpeg_encode) v%s on %s.",
@@ -12575,7 +12568,7 @@ write:
 					 NULL, 0,
 					 userData, userDataSize);
 
-		 SFREE(userData);};
+		 CFREE(userData);};
           
 	     firstFrameDone = TRUE;};
         
@@ -13313,7 +13306,7 @@ static void ProcessRefFrame(MpegFrame *frame, BitBucket *bb, int lastFrame,
 	
 	     if (separateFiles)
 	        {if (bb != NULL)
-		    {SFREE(bb);};
+		    {CFREE(bb);};
 
 		 if (remoteIO)
 		    {if (bb != NULL)
@@ -13387,7 +13380,7 @@ static void ProcessRefFrame(MpegFrame *frame, BitBucket *bb, int lastFrame,
 
 	     if (separateFiles)
 	        {if (bb != NULL)
-		    {SFREE(bb);};
+		    {CFREE(bb);};
 
 		 if (remoteIO)
 		    bb = Bitio_New(NULL);
@@ -14365,9 +14358,9 @@ void SetupLaplace()
 
   DoLaplace = TRUE;
   LaplaceNum = 0;
-  L1      = MAKE_N(double *, 3);
-  L2      = MAKE_N(double *, 3);
-  Lambdas = MAKE_N(double *, 3);
+  L1      = CMAKE_N(double *, 3);
+  L2      = CMAKE_N(double *, 3);
+  Lambdas = CMAKE_N(double *, 3);
   if (L1 == NULL || L2 == NULL || Lambdas == NULL) {
     io_printf(stderr,"Out of memory!!!\n");
     exit(1);
@@ -14375,7 +14368,7 @@ void SetupLaplace()
   for (i = 0; i < 3; i++) {
     L1[i] = (double *)calloc(64, sizeof(double));
     L2[i] = (double *)calloc(64, sizeof(double));
-    Lambdas[i] = MAKE_N(double, 64);
+    Lambdas[i] = CMAKE_N(double, 64);
     if (L1[i] == NULL || L2[i] == NULL || Lambdas[i] == NULL) {
       io_printf(stderr,"Out of memory!!!\n");
       exit(1);
@@ -15515,7 +15508,7 @@ static void ReadInputFileNames(FILE *fpointer, char *endInput)
 
     numPadding = 0;
 
-    inputFileEntries    = MAKE_N(InputFileEntry *, INPUT_ENTRY_BLOCK_SIZE);
+    inputFileEntries    = CMAKE_N(InputFileEntry *, INPUT_ENTRY_BLOCK_SIZE);
     maxInputFileEntries = INPUT_ENTRY_BLOCK_SIZE;
 
     length = strlen(endInput);
@@ -15573,12 +15566,12 @@ static void ReadInputFileNames(FILE *fpointer, char *endInput)
 	if (numInputFileEntries == maxInputFileEntries)
  	   {maxInputFileEntries += INPUT_ENTRY_BLOCK_SIZE;
 
-	    REMAKE(inputFileEntries, InputFileEntry *,  maxInputFileEntries);};
+	    CREMAKE(inputFileEntries, InputFileEntry *,  maxInputFileEntries);};
 
 	if (inputFileEntries == NULL)
 	   return;
 
-	inputFileEntries[numInputFileEntries] = MAKE(InputFileEntry);
+	inputFileEntries[numInputFileEntries] = CMAKE(InputFileEntry);
 	if (inputFileEntries[numInputFileEntries] == NULL)
 	   return;
 
@@ -17948,18 +17941,18 @@ void SetSearchRange(int pixelsP, int pixelsB)
 	nl = 2*max_search + 3;
 
 	na = 2*searchRangeP + 3;
-	pmvHistogram = MAKE_N(int *, na);
+	pmvHistogram = CMAKE_N(int *, na);
 	if (pmvHistogram != NULL)
 	   {for (index = 0; index < nl; index++)
 	        pmvHistogram[index] = (int *) calloc(na, sizeof(int));};
 
 	na = 2*searchRangeB + 3;
-	bbmvHistogram = MAKE_N(int *, na);
+	bbmvHistogram = CMAKE_N(int *, na);
 	if (bbmvHistogram != NULL)
 	   {for (index = 0; index < 2*nl; index++)
 	        bbmvHistogram[index] = (int *) calloc(na, sizeof(int));};
 
-	bfmvHistogram = MAKE_N(int *, na);
+	bfmvHistogram = CMAKE_N(int *, na);
 	if (bfmvHistogram != NULL)
 	   {for (index = 0; index < 2*nl; index++)
 	        bfmvHistogram[index] = (int *) calloc(na, sizeof(int));};};
@@ -21591,7 +21584,7 @@ void Parse_Specifics_File_v2(FILE *fp)
 		 if (num_scanned > 2)
 		    {BlockMV *tmp;
 
-		     tmp = MAKE(BlockMV);
+		     tmp = CMAKE(BlockMV);
 		     switch (num_scanned)
 		        {case 7:
 			      tmp->typ = TYP_BOTH;
@@ -21654,7 +21647,7 @@ void Parse_Specifics_File_v2(FILE *fp)
 FrameSpecList *MakeFslEntry(void)
    {FrameSpecList *fslp;
 
-    fslp = MAKE(FrameSpecList);
+    fslp = CMAKE(FrameSpecList);
     if (fslp != NULL)
        {fslp->framenum = -1;
 	fslp->slc = (Slice_Specifics *) NULL;
@@ -21679,7 +21672,7 @@ void AddSlc(FrameSpecList *c, int snum, int qs)
    {Slice_Specifics *new;
     static Slice_Specifics *last;
 
-    new = MAKE(Slice_Specifics);
+    new = CMAKE(Slice_Specifics);
     if (new != NULL)
        {new->num = snum;
 	new->qscale = qs;
@@ -21710,7 +21703,7 @@ Block_Specifics *AddBs(FrameSpecList *c, boolean rel, int bnum, int qs)
    {Block_Specifics *new;
     static Block_Specifics *last;
 
-    new = MAKE(Block_Specifics);
+    new = CMAKE(Block_Specifics);
     if (new != NULL)
        {new->num = bnum;
 	if (qs == 0)

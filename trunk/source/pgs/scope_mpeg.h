@@ -38,25 +38,7 @@
   which prevents gcc from generating calls to _eprintf.
 */
 
-#include <scdecls.h>
-
-#ifdef SGI
-# ifndef _SGIAPI
-#  define _SGIAPI
-# endif
-#endif
-
 #define NDEBUG
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <math.h>
-#include <assert.h>
-#include <memory.h>
-#include <errno.h>
-#include <unistd.h>
-#include "scconfig.h"
 #include "score.h"
 #undef I                 /* C99 pure imaginary */
 #ifndef PCC

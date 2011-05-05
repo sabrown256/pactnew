@@ -12,6 +12,7 @@
 #include <arpa/inet.h>
 #include <dirent.h>
 #include <sys/socket.h>
+#include <sys/select.h>
 
 #ifndef INADDR_NONE
 # define INADDR_NONE NULL
@@ -282,13 +283,11 @@ static int connect_client(client *cl)
 	    haddr = inet_addr(host);
 
 	    if (haddr == INADDR_NONE)
-	       {int sz;
-		struct hostent *hp;
+	       {struct hostent *hp;
 
 		hp = gethostbyname(host);
 		if (hp != NULL)
-		   {sz = sizeof(in_addr_t);
-		    memcpy(&haddr, hp->h_addr, sz);};};
+		   haddr = *(in_addr_t *) hp->h_addr_list[0];};
 
 	    if (haddr != INADDR_NONE)
 	       {memcpy(&srv->sck.sin_addr, &haddr, sizeof(long));

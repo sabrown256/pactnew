@@ -22,11 +22,10 @@
 double wall_clock_time(void)
    {double sec, usec, rv;
     struct timeval t;
-    struct timezone tz;
     static struct timeval t0;
     static int first = TRUE;
 
-    gettimeofday(&t, &tz);
+    gettimeofday(&t, NULL);
 
     if (first)
        {first = FALSE;

@@ -1421,7 +1421,7 @@ static void _PG_X_make_device_current(PG_device *dev)
 
         XQueryTree(display, window, &root, &parent, &children, &n);
         if (children != NULL)
-	   XFree((caddr_t) children);
+	   XFree(children);
 
         XGetGeometry(display, window, &root,
                      &x, &y, &width, &height, &border_width, &depth);

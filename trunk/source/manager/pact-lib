@@ -12,6 +12,8 @@ unalias *
 
 @ err = 0
 
+setenv HostOS  `uname -s`
+
 set MngDir = $cwd
 setenv System  `../scripts/cfgman use`
 
