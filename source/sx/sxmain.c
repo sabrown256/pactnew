@@ -24,7 +24,7 @@ int main(int c, char **v, char **env)
    {int i, n, commnd_flag, tflag, pvflag, load_rc;
     int load_init, n_files, ret, zsp, trap_error;
     int upix, script_file;
-    char *cmd, *prog;
+    char *cmd;
     SIGNED char order[MAXLINE];
     double evalt;
     SS_psides *si;
@@ -148,7 +148,12 @@ int main(int c, char **v, char **env)
 
 #endif
 
+    si->trap_error   = trap_error;
+    si->bracket_flag = TRUE;
+
     SC_zero_space_n(zsp, -2);
+
+    PG_set_use_pixmap(upix);
 
 /* initialize SX
  * the following variables must be initialized before SX_init
@@ -161,11 +166,8 @@ int main(int c, char **v, char **env)
     SX_background_color_white = TRUE;
 
 /* run in PDBView mode */
-    si->trap_error = trap_error;
     if (pvflag)
        {SC_set_banner(" %s  -  %s\n\n", PCODE, VERSION);
-
-	prog = "pdbview";
 
         SX_init_view(si);
         SX_install_global_vars(si);
@@ -184,13 +186,9 @@ int main(int c, char **v, char **env)
 
 /* run in vanilla SCHEME mode */
     else
-       {SC_set_banner(" %s  -  %s\n\n", SCODE, VERSION);
-
-	prog = "sx";};
+       SC_set_banner(" %s  -  %s\n\n", SCODE, VERSION);
 
     SS_load_scm(si, "nature.scm");
-
-    PG_set_use_pixmap(upix);
 
     if (pvflag)
        {if (SX_gr_mode)
@@ -202,7 +200,6 @@ int main(int c, char **v, char **env)
 
 #ifdef NO_SHELL
 
-/* connect the I/O functions */
     if (SX_gr_mode)
         SS_banner(SS_mk_string(si, PCODE));
 
@@ -222,14 +219,6 @@ int main(int c, char **v, char **env)
                 PRINT(STDOUT,
 		      "   %s load time: (%10.3e)\n",
 		      v[n], evalt);};};
-
-    si->nsave        = 0;
-    si->nrestore     = 0;
-    si->nsetc        = 0;
-    si->ngoc         = 0;
-    si->bracket_flag = TRUE;
-
-    SC_mem_stats_set(0L, 0L);
 
     if (commnd_flag)
        ret = !SS_run(si, cmd);

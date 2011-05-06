@@ -103,13 +103,6 @@ int main(int c, char **v, char **env)
     if (lsch != 0)
        SS_load_scm(si, v[lsch]);
 
-    si->nsave    = 0;
-    si->nrestore = 0;
-    si->nsetc    = 0;
-    si->ngoc     = 0;
-
-    SC_mem_stats_set(0L, 0L);
-
     if (cfl)
        {PRINT(STDOUT, "\n\n");
 	ret = !SS_run(si, cmnd);
