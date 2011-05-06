@@ -534,7 +534,7 @@ int SX_command(SS_psides *si, char *file, char *cmd)
 	SX_console_height   = 0.33;
 	SX_background_color_white = TRUE;
 
-	SX_init(PCODE, VERSION);
+	SX_init(PCODE, VERSION, 0, NULL, NULL);
 	si->trap_error = FALSE;
 
 	SX_init_view(si);

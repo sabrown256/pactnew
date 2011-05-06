@@ -112,11 +112,11 @@ void SX_install_funcs(SS_psides *si)
 
 /* SX_INIT - initialize SX */
 
-SS_psides *SX_init(char *code, char *vers)
+SS_psides *SX_init(char *code, char *vers, int c, char **v, char **env)
    {SS_psides *si;
 
 /* scheme initializations */
-    si = SS_init_scheme(code, vers);
+    si = SS_init_scheme(code, vers, c, v, env);
 
 /* SX initializations depending on scheme */
     SX_install_funcs(si);

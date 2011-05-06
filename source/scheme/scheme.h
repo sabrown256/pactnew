@@ -1080,7 +1080,8 @@ extern object
 /* SHTLEV.C declarations */
 
 extern SS_psides
- *SS_init_scheme(char *code, char *vers);
+ *SS_init_scheme(char *code, char *vers,
+		 int c, char **v, char **env);
 
 extern PFPrintErrMsg
  SS_set_print_err_func(PFPrintErrMsg fnc, int dflt),

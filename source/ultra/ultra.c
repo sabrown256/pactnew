@@ -1189,12 +1189,9 @@ int main(int c, char **v, char **env)
     double evalt;
     SS_psides *si;
 
-    SS_set_scheme_env(v[0], NULL);
-    si = SS_init_scheme(CODE, VERSION);
+    SC_init_path(1, "ULTRA");
 
-    SS_env_vars(si, env, NULL);
-
-    SS_define_argv(si, c, v);
+    si = SS_init_scheme(CODE, VERSION, c, v, env);
 
     SS_init(si, "Aborting with error", _UL_quit,
             TRUE, SS_interrupt_handler,
@@ -1237,8 +1234,6 @@ int main(int c, char **v, char **env)
     zsp = 2;
 
     SC_zero_space_n(zsp, -2);
-
-    SC_init_path(1, "ULTRA");
 
 /* ULTRA initializations not depending on scheme */
     UL_init_view(si);

@@ -452,7 +452,7 @@ void B_init(void)
 
     si = SS_get_current_scheme(-1);
 
-    SX_init(CODE, VERSION);
+    SX_init(CODE, VERSION, 0, NULL, NULL);
 
     SS_install(si, "def-cc-vars",
                "Define compiled variables to interpreter",

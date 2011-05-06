@@ -43,19 +43,13 @@ int main(int c, char **v, char **env)
     char *cmnd;
     SS_psides *si;
 
-    SS_set_scheme_env(v[0], NULL);
-
-    si = SS_init_scheme(CODE, VERSION);
-
-    SS_env_vars(si, env, NULL);
-    SS_define_argv(si, c, v);
+    si = SS_init_scheme(CODE, VERSION, c, v, env);
 
     SS_init(si, "Aborting with error", SS_end_scheme,
             TRUE, SS_interrupt_handler,
             TRUE, NULL, 0);
 
     SS_set_prompt(si, "Scheme-> ");
-    si->trap_error = FALSE;
 
     cmnd  = NULL;
     qfl   = FALSE;
