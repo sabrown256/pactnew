@@ -918,7 +918,7 @@ extern object
  *SX_arg_prep(SS_psides *si, object *argl);
 
 extern SS_psides
- *SX_init(char *code, char *vers);
+ *SX_init(char *code, char *vers, int c, char **v, char **env);
 
 extern void
  SX_reset_prefix(void),

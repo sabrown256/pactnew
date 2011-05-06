@@ -308,7 +308,7 @@ char *SC_pop_path(char *path)
 /* SC_INIT_PATH - set up the search path */
 
 void SC_init_path(int nd, ...)
-   {int j;
+   {int j, ne;
     char delim[10];
     char *bf, *ptr, *s, *var, *token;
 
@@ -319,6 +319,10 @@ void SC_init_path(int nd, ...)
     SC_PATH_DELIMITER(delim);
 
     SC_VA_START(nd);
+
+    ne = SC_array_get_n(_SC.path);
+    if (ne > 1)
+       SC_array_pop(_SC.path);
 
     for (j = 0; j < nd; j++)
         {var = SC_VA_ARG(char *);

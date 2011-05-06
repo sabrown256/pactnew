@@ -354,11 +354,15 @@ static void _SS_print_err_msg(SS_psides *si, FILE *str, char *s, object *obj)
 
 /* SS_INIT_SCHEME - initialize the interpreter */
 
-SS_psides *SS_init_scheme(char *code, char *vers)
+SS_psides *SS_init_scheme(char *code, char *vers,
+			  int c, char **v, char **env)
    {SS_psides *si;
 
     SC_set_banner(" %s  -  %s\n\n", code, vers);
     SC_init_path(2, "HOME", "SCHEME");
+
+    if (v != NULL)
+    SS_set_scheme_env(v[0], NULL);
 
     si = SS_get_current_scheme(-1);
 
@@ -377,6 +381,12 @@ SS_psides *SS_init_scheme(char *code, char *vers)
 #endif
 
     SS_set_print_err_func(_SS_print_err_msg, FALSE);
+
+    if (env != NULL)
+       SS_env_vars(si, env, NULL);
+
+    if (v != NULL)
+       SS_define_argv(si, c, v);
 
     return(si);}
 
