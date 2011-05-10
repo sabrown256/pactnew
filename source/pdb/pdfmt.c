@@ -191,7 +191,7 @@ int _PD_put_text(int reset, int ns, char *s)
 
     if (bf == NULL)
        {ncx = BUFINCR;
-	bf  = SC_permanent(CMAKE_N(char, ncx));
+	bf  = CPMAKE_N(char, ncx, 3);
 	spl = bf;
         nc  = 0;}
 
@@ -202,7 +202,7 @@ int _PD_put_text(int reset, int ns, char *s)
     
     if (nc + ns + 10 > ncx)
        {ncx += BUFINCR;
-	CREMAKE(bf, char, ncx);
+	CPREMAKE(bf, char, ncx, 3);
 	spl = bf + strlen(bf);};
 
     SC_strncpy(spl, ncx, s, ns+1);

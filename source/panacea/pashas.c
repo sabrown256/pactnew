@@ -295,12 +295,8 @@ void PA_init_strings(void)
 
 /* replace the static type strings with dynamic ones */
     ONCE_SAFE(TRUE, NULL)
-       PA_SET_INDEX_P_S = CSTRSAVE("PA_set_index *"),
-       PA_SET_INDEX_S   = CSTRSAVE("PA_set_index"),
-
-/* do not delete any of these strings */
-       SC_permanent(PA_SET_INDEX_P_S);
-       SC_permanent(PA_SET_INDEX_S);
+       PA_SET_INDEX_P_S = CSTRDUP("PA_set_index *", 3);
+       PA_SET_INDEX_S   = CSTRDUP("PA_set_index", 3);
     END_SAFE;
 
     return;}

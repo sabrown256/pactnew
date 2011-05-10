@@ -8,6 +8,7 @@
 
 #include "score_int.h"
 #include "scope_hash.h"
+#include "scope_mem.h"
 
 SC_thread_lock
  SC_ha_lock = SC_LOCK_INIT_STATE;
@@ -87,12 +88,12 @@ static haelem *_SC_make_haelem(hasharr *ha, void *key)
    {void *lkey;
     haelem *hp;
 
-    hp = CMAKE(haelem);
+    hp = CPMAKE(haelem, ha->memfl);
     if (hp != NULL)
 
 /* setup the key */
        {if (HA_STRING_KEY(ha->hash))
-	   {lkey = CSTRSAVE(key);
+	   {lkey = CSTRDUP(key, ha->memfl);
 	    SC_mark(lkey, 1);}
         else
 	   lkey = key;
@@ -219,7 +220,7 @@ static void _SC_hasharr_init(hasharr *ha, char *lm)
     for (i = 0; i < sz; i++)
         tb[i] = NULL;
 
-    ha->a  = CMAKE_ARRAY(haelem *, NULL, 0);
+    ha->a  = CMAKE_ARRAY(haelem *, NULL, ha->memfl);
     ha->ne = 0L;
 
     return;}
@@ -229,16 +230,17 @@ static void _SC_hasharr_init(hasharr *ha, char *lm)
 
 /* SC_MAKE_HASHARR - make an undifferentiated hasharr */
 
-hasharr *SC_make_hasharr(int sz, int docflag, char *lm)
+hasharr *SC_make_hasharr(int sz, int docflag, char *lm, int flags)
    {hasharr *ha;
     haelem **tb;
 
 /* allocate a new hash array */
-    ha = CMAKE(hasharr);
+    ha = CPMAKE(hasharr, flags);
     if (ha != NULL)
-       {tb = CMAKE_N(haelem *, sz);
+       {tb = CPMAKE_N(haelem *, sz, flags);
         if (tb != NULL)
            {ha->size     = sz;
+	    ha->memfl    = flags;
             ha->docp     = docflag;
             ha->table    = tb;
             ha->hash     = NULL;
@@ -565,8 +567,9 @@ int SC_hasharr_rekey(hasharr *ha, char *method)
 	    ha->comp = NULL;};
 
 	if (ha->hash != NULL)
-	   {CFREE(ha->key_type);
-	    ha->key_type = CSTRSAVE(method);};
+	   {SC_set_count(ha->key_type, 0);
+	    CFREE(ha->key_type);
+	    ha->key_type = CSTRDUP(method, ha->memfl);};
 
 /* force array to reset access method
  * needed when hasharr has been read from PDB file
@@ -822,15 +825,16 @@ char *SC_get_entry(int n)
 
 /* SCMKHT - make a hash array */
 
-FIXNUM F77_FUNC(scmkht, SCMKHT)(FIXNUM *psz, FIXNUM *pdoc)
-   {int sz, doc;
+FIXNUM F77_FUNC(scmkht, SCMKHT)(FIXNUM *psz, FIXNUM *pdoc, FIXNUM *pflgs)
+   {int sz, doc, flags;
     hasharr *ha;
     FIXNUM rv;
 
-    sz  = *psz;
-    doc = *pdoc;
+    sz    = *psz;
+    doc   = *pdoc;
+    flags = *pflgs;
 
-    ha = SC_make_hasharr(sz, doc, SC_HA_NAME_KEY);
+    ha = SC_make_hasharr(sz, doc, SC_HA_NAME_KEY, flags);
     if (ha == NULL)
        rv = 0;
     else

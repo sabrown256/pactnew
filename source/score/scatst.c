@@ -59,7 +59,7 @@ static int test_1_hash(void)
     sa = CSTRSAVE("string-a");
     sb = CSTRSAVE("string-b");
 
-    tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+    tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
     hpa = SC_hasharr_install(tab, "a", sa, SC_STRING_S, TRUE, TRUE);
     hpb = SC_hasharr_install(tab, "b", sb, SC_STRING_S, TRUE, TRUE);
 
@@ -102,7 +102,7 @@ static int test_1_ha(void)
     sa = CSTRSAVE("string-a");
     sb = CSTRSAVE("string-b");
 
-    ha = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+    ha = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
     hpa = SC_hasharr_install(ha, "a", sa, SC_STRING_S, TRUE, TRUE);
     hpb = SC_hasharr_install(ha, "b", sb, SC_STRING_S, TRUE, TRUE);
 
@@ -263,7 +263,7 @@ static int test_4(void)
 
     err = 0;
 
-    tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+    tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 
     err += (tab == NULL);
     err += (SC_hasharr_foreach(tab, test_4_callback, NULL) < 0);
@@ -310,7 +310,7 @@ static int test_5(void)
     type = CSTRSAVE("char *");
 
 /* table size of 1 forces a linked list */
-    tab = SC_make_hasharr(1, NODOC, SC_HA_NAME_KEY);
+    tab = SC_make_hasharr(1, NODOC, SC_HA_NAME_KEY, 0);
     err += (tab == NULL);
 
     err += (SC_hasharr_install(tab, type, "foo", NULL, TRUE, TRUE) == NULL);

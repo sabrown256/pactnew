@@ -25,7 +25,7 @@ static hasharr *_SC_init_context_table(void)
    {
 
     if (_SC.context_table == NULL)
-       _SC.context_table = SC_make_hasharr(HSZSMINT, NODOC, SC_HA_ADDR_KEY);
+       _SC.context_table = SC_make_hasharr(HSZSMINT, NODOC, SC_HA_ADDR_KEY, 3);
 
     return(_SC.context_table);}
 
@@ -42,10 +42,12 @@ int SC_register_context(void *f, void *a)
     hasharr *ha;
     haelem *hp;
 
+    rv = FALSE;
     ha = _SC_init_context_table();
 
     hp = SC_hasharr_install(ha, f, a, SC_POINTER_S, FALSE, TRUE);
-    rv = (hp != NULL);
+    if (hp != NULL)
+       rv = TRUE;
 
     return(rv);}
 

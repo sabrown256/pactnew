@@ -12,6 +12,7 @@
  */
 
 #include "score_int.h"
+#include "scope_mem.h"
 #include <sctypeg.h>
 
 /* to add a new primitive type you need to check at least the
@@ -113,7 +114,8 @@ int
  SC_PCONS_I                 = 35,
  SC_PROCESS_I               = 36,
  SC_FILE_I                  = 37,
- SC_PCONS_P_I               = 38,
+ SC_HAELEM_I                = 38,
+ SC_PCONS_P_I               = 39,
 
 /* aliases */
  SC_ENUM_I                  = 7,
@@ -183,6 +185,7 @@ char
  *SC_PCONS_S                 = "pcons",
  *SC_PROCESS_S               = "PROCESS",
  *SC_FILE_S                  = "FILE",
+ *SC_HAELEM_S                = "haelem",
  *SC_PCONS_P_S               = "pcons *",
 
 /* aliases */
@@ -237,22 +240,14 @@ static SC_type *_SC_get_type_name(char *name)
 
 int SC_type_register(char *name, SC_kind kind, int bpi, ...)
    {int id, ok;
-    uint64_t al, fr;
     void *pf;
     SC_type_method attr;
     hasharr *ha;
     SC_type *t;
 
-/* remember current memory stats so that we can make any
- * type manager memory unaccountable
- * this memory doesn't leak per se
- * and the accounting is very difficult
- */
-    SC_mem_statb(&al, &fr, NULL, NULL);
-
     ha = (hasharr *) _SC.types.typ;
     if (ha == NULL)
-       {ha = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
+       {ha = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 3);
 	_SC.types.typ = ha;
 	SC_init_base_types();};
 
@@ -264,9 +259,10 @@ int SC_type_register(char *name, SC_kind kind, int bpi, ...)
     else
        {id = SC_hasharr_get_n(ha);
 
-	t = SC_permanent(CMAKE(SC_type));
+	t = CPMAKE(SC_type, 3);
+
 	t->id   = id;
-	t->type = SC_permanent(CSTRSAVE(name));
+	t->type = CSTRDUP(name, 3);
 	t->kind = kind;
 	t->bpi  = bpi;
 
@@ -295,9 +291,6 @@ int SC_type_register(char *name, SC_kind kind, int bpi, ...)
 
     SC_VA_END;
 
-/* restore the initial memory stats */
-    SC_mem_statb_set(al, fr);
-
     return(id);}
 
 /*--------------------------------------------------------------------------*/
@@ -312,15 +305,15 @@ int SC_type_alias(char *name, int id)
     ha = (hasharr *) _SC.types.typ;
 
     if (ha == NULL)
-       {ha = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
+       {ha = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 3);
 	_SC.types.typ = ha;};
 
     ot = _SC_get_type_id(id);
 
-    t  = SC_permanent(CMAKE(SC_type));
+    t  = CPMAKE(SC_type, 3);
     *t = *ot;
 
-    t->type = SC_permanent(CSTRSAVE(name));
+    t->type = CSTRDUP(name, 3);
 
     SC_hasharr_install(ha, name, t, "SC_TYPE", TRUE, TRUE);
 
@@ -777,6 +770,7 @@ void SC_init_base_types(void)
        SC_PCONS_I                 = SC_type_register(SC_PCONS_S,    KIND_STRUCT,  sizeof(pcons),   0);
        SC_PROCESS_I               = SC_type_register(SC_PROCESS_S,  KIND_STRUCT,  sizeof(PROCESS), 0);
        SC_FILE_I                  = SC_type_register(SC_FILE_S,     KIND_STRUCT,  sizeof(FILE),    0);
+       SC_HAELEM_I                = SC_type_register(SC_HAELEM_S,   KIND_STRUCT,  sizeof(haelem),  0);
 
        SC_PCONS_P_I               = SC_type_register(SC_PCONS_P_S,  KIND_POINTER, szptr,           0);
 
@@ -1183,13 +1177,13 @@ void _SC_set_format_defaults(void)
     if (fmts[SC_BIT_I] != NULL)
        CFREE(fmts[SC_BIT_I]);
 
-    t = SC_permanent(CSTRSAVE("%x"));
+    t = CSTRDUP("%x", 3);
     fmts[SC_BIT_I] = t;
 
     if (fmts[SC_BOOL_I] != NULL)
        CFREE(fmts[SC_BOOL_I]);
 
-    t = SC_permanent(CSTRSAVE("%s"));
+    t = CSTRDUP("%s", 3);
     fmts[SC_BOOL_I] = t;
 
 /* character types (proper) */
@@ -1203,7 +1197,7 @@ void _SC_set_format_defaults(void)
 	 else if (id == SC_WCHAR_I)
 	    snprintf(tmp, MAXLINE, "%%Lc");
 
-	 t = SC_permanent(CSTRSAVE(tmp));
+	 t = CSTRDUP(tmp, 3);
 	 fmts[id] = t;};
 
 /* fixed point types (proper) */
@@ -1219,7 +1213,7 @@ void _SC_set_format_defaults(void)
 	 else
 	    snprintf(tmp, MAXLINE, "%%%dd", fix_pre[i]);
 
-	 t = SC_permanent(CSTRSAVE(tmp));
+	 t = CSTRDUP(tmp, 3);
 	 fmts[id] = t;};
 
 /* real floating point types (proper) */
@@ -1233,7 +1227,7 @@ void _SC_set_format_defaults(void)
 	 else
 	    snprintf(tmp, MAXLINE, "%%# .%de", fp_pre[i].digits);
 
-	 t = SC_permanent(CSTRSAVE(tmp));
+	 t = CSTRDUP(tmp, 3);
 	 fmts[id] = t;};
 
 /* complex floating point types (proper) */
@@ -1249,14 +1243,14 @@ void _SC_set_format_defaults(void)
 	    snprintf(tmp, MAXLINE, "%%# .%de + %%# .%de*I",
 		     fp_pre[i].digits, fp_pre[i].digits);
 
-	 t = SC_permanent(CSTRSAVE(tmp));
+	 t = CSTRDUP(tmp, 3);
 	 fmts[id] = t;};
 
 /* other primitive types */
     if (fmts[SC_STRING_I] != NULL)
        CFREE(fmts[SC_STRING_I]);
 
-    t = SC_permanent(CSTRSAVE("%s"));
+    t = CSTRDUP("%s", 3);
     fmts[SC_STRING_I] = t;
 
 /* fmta is used for arrays */
@@ -1264,7 +1258,7 @@ void _SC_set_format_defaults(void)
         {if (fmta[i] != NULL)
             CFREE(fmta[i]);
 
-         t = SC_permanent(CSTRSAVE(fmts[i]));
+         t = CSTRDUP(fmts[i], 3);
          fmta[i] = t;};
 
     return;}

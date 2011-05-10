@@ -442,6 +442,7 @@ static int test_0(char *base, char *tgt, int n)
     strm = PD_create(datfile);
     if (strm == NULL)
        error(1, fp, "Test couldn't create file %s\r\n", datfile);
+
     PRINT(fp, "File %s created\n", datfile);
 
 /* make a few defstructs */
@@ -469,6 +470,7 @@ static int test_0(char *base, char *tgt, int n)
 /* close the file */
     if (PD_close(strm) == FALSE)
        error(1, fp, "Test couldn't close file %s\r\n", datfile);
+
     PRINT(fp, "File %s closed\n", datfile);
 
     io_close(fp);
@@ -2065,7 +2067,7 @@ static void prep_test_4_data(void)
     char *pc;
     haelem *hp;
 
-    tab4_w = SC_make_hasharr(3, NODOC, SC_HA_NAME_KEY);
+    tab4_w = SC_make_hasharr(3, NODOC, SC_HA_NAME_KEY, 0);
 
     CHAR_S   = CSTRSAVE("char *");
     SHORT_S  = CSTRSAVE("short *");
@@ -3817,6 +3819,9 @@ int main(int c, char **v)
     PD_set_buffer_size(bfsz);
 
     SC_signal(SIGINT, SIG_DFL);
+
+/* force allocation of permanent memory outside of memory monitors */
+    PD_open_vif("foo");
 
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "\t\t                      Memory                Time\n");

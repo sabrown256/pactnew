@@ -19,6 +19,8 @@ setenv PACT_CC_VERSION   ""
 setenv PACT_FC_FAMILY    generic
 setenv PACT_FC_VERSION   ""
 
+setenv C_STD             C99
+
 # GOTCHA: this root may be different for CROSS_COMPILE
 # need script to figure out root includes for given compiler
 setenv RootInc  /usr/include

@@ -75,7 +75,8 @@
 
 /* CSTRSAVE - copy a string */
 
-#define CSTRSAVE(_t)    SC_strsavec(_t, __func__, __FILE__, __LINE__)
+#define CSTRSAVE(_t)     SC_strsavec(_t, 0, __func__, __FILE__, __LINE__)
+#define CSTRDUP(_t, _f)  SC_strsavec(_t, _f, __func__, __FILE__, __LINE__)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -86,13 +87,21 @@
     ((_t *) (*SC_gs.mm.nalloc)(1L, (long) sizeof(_t), FALSE, -1,             \
 			       __func__, __FILE__, __LINE__))
 
+#define CPMAKE(_t, _f)                                                       \
+    ((_t *) (*SC_gs.mm.nalloc)(1L, (long) sizeof(_t), _f, -1,                \
+			       __func__, __FILE__, __LINE__))
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* CMAKE_N - allocate a block of type _t and return a pointer to it */
 
-#define CMAKE_N(_t, n)                                                       \
-    ((_t *) (*SC_gs.mm.nalloc)((long) n, (long) sizeof(_t), FALSE, -1,       \
+#define CMAKE_N(_t, _n)                                                      \
+    ((_t *) (*SC_gs.mm.nalloc)((long) _n, (long) sizeof(_t), FALSE, -1,      \
+			       __func__, __FILE__, __LINE__))
+
+#define CPMAKE_N(_t, _n, _f)                                                 \
+    ((_t *) (*SC_gs.mm.nalloc)((long) _n, (long) sizeof(_t), _f, -1,         \
 			       __func__, __FILE__, __LINE__))
 
 /*--------------------------------------------------------------------------*/
@@ -100,18 +109,22 @@
 
 /* CREMAKE - reallocate a block of type _t and return a pointer to it */
 
-#define CREMAKE(p, _t, n)                                                    \
-   (p = (_t *) (*SC_gs.mm.realloc)((void *) p, (long) (n),                   \
+#define CREMAKE(_p, _t, _n)                                                  \
+   (_p = (_t *) (*SC_gs.mm.realloc)((void *) _p, (long) _n,                  \
 				   (long) sizeof(_t), FALSE, -1))
+
+#define CPREMAKE(_p, _t, _n, _f)                                             \
+   (_p = (_t *) (*SC_gs.mm.realloc)((void *) _p, (long) _n,                  \
+				   (long) sizeof(_t), _f, -1))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* CFREE - release memory and do bookkeeping */
 
-#define CFREE(x)                                                             \
-   {(*SC_gs.mm.free)(x, -1);                                                 \
-    x = NULL;}
+#define CFREE(_x)                                                            \
+   {(*SC_gs.mm.free)(_x, -1);                                                \
+    _x = NULL;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -322,6 +335,9 @@
 # define FLUSH_ON(_f, _x)
 
 #endif
+
+#define SC_GET_CONTEXT(_f)             SC_get_context((void *) (_f))
+#define SC_REGISTER_CONTEXT(_f, _a)    SC_register_context((void *) (_f), _a)
 
 /*--------------------------------------------------------------------------*/
 
@@ -1088,7 +1104,7 @@ extern void
 /* SCSTR.C declarations */
 
 extern char
- *SC_strsavec(char *s, const char *file, const char *fnc, int line),
+ *SC_strsavec(char *s, int memfl, const char *file, const char *fnc, int line),
  *SC_strcat(char *dest, size_t lnd, char *src),
  *SC_vstrcat(char *dest, size_t lnd, char *fmt, ...),
  *SC_dstrcat(char *dest, char *src),

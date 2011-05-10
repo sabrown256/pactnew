@@ -1910,7 +1910,7 @@ static void _PG_setup_callback_table(void)
 
     SC_LOCKON(PG_iob_lock);
 
-    _PG.callback_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
+    _PG.callback_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
 /* action methods */
     PG_register_callback("slider", PG_slider);

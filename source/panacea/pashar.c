@@ -130,7 +130,7 @@ void PA_def_var(char *vname, char *vtype, void *viv,
 
 /* make the variable hash table if it doesn't exist yet */
     if (PA_variable_tab == NULL)
-       PA_variable_tab = SC_make_hasharr(HSZLARGE, DOC, SC_HA_NAME_KEY);
+       PA_variable_tab = SC_make_hasharr(HSZLARGE, DOC, SC_HA_NAME_KEY, 0);
 
     SC_VA_START(vif);
 
@@ -269,7 +269,7 @@ void PA_inst_var(char *vname, char *vtype, void *viv,
 
 /* make the variable hash table if it doesn't exist yet */
     if (PA_variable_tab == NULL)
-       PA_variable_tab = SC_make_hasharr(HSZLARGE, DOC, SC_HA_NAME_KEY);
+       PA_variable_tab = SC_make_hasharr(HSZLARGE, DOC, SC_HA_NAME_KEY, 0);
 
     SC_VA_START(vif);
 
@@ -399,7 +399,7 @@ void PA_inst_scalar(char *vname, char *vtype, void *vaddr, void *viv,
 
 /* make the variable hash table if it doesn't exist yet */
     if (PA_variable_tab == NULL)
-       PA_variable_tab = SC_make_hasharr(HSZLARGE, DOC, SC_HA_NAME_KEY);
+       PA_variable_tab = SC_make_hasharr(HSZLARGE, DOC, SC_HA_NAME_KEY, 0);
 
     SC_VA_START(vif);
 
@@ -412,19 +412,23 @@ void PA_inst_scalar(char *vname, char *vtype, void *vaddr, void *viv,
     while (!enough)
        {v = SC_VA_ARG(int);
         switch (v)
-           {case SCOPE      : vattr[0] = SC_VA_ARG(int);
-                              break;
-            case CLASS      : vattr[1] = SC_VA_ARG(int);
-                              break;
-            case PERSIST    : vattr[2] = SC_VA_ARG(int);
-                              break;
-            case CENTER     : vattr[3] = SC_VA_ARG(int);
-                              break;
-            case ATTRIBUTE  : enough = TRUE;
-                              break;
-            default         : PA_ERR(TRUE,
-                                     "BAD ATTRIBUTE %d - PA_INST_SCALAR",
-                                     v);};};
+           {case SCOPE :
+	         vattr[0] = SC_VA_ARG(int);
+		 break;
+            case CLASS :
+	         vattr[1] = SC_VA_ARG(int);
+		 break;
+            case PERSIST :
+	         vattr[2] = SC_VA_ARG(int);
+		 break;
+            case CENTER :
+	         vattr[3] = SC_VA_ARG(int);
+		 break;
+            case ATTRIBUTE :
+	         enough = TRUE;
+		 break;
+            default :
+	         PA_ERR(TRUE, "BAD ATTRIBUTE %d - PA_INST_SCALAR", v);};};
 
 /* get the units */
     nu = NULL;

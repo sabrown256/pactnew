@@ -150,7 +150,7 @@ static void _SC_make_wait(void *a)
 
     v = (sigchld_rec **) a;
     if (v != NULL)
-       *v = SC_permanent(CMAKE(sigchld_rec));
+       *v = CPMAKE(sigchld_rec, 3);
 
     return;}
 
@@ -170,7 +170,7 @@ static void _SC_init_wait(void)
 
 /* if never initialized do it now */
     if (_SC.wait_list == NULL)
-       {_SC.wait_list = CMAKE_ARRAY(sigchld_rec *, _SC_make_wait, 1);
+       {_SC.wait_list = CMAKE_ARRAY(sigchld_rec *, _SC_make_wait, 3);
 	SC_array_resize(_SC.wait_list, N_PROC_MNG, -1.0);};
 
     return;}
@@ -274,7 +274,7 @@ void _SC_manage_process(PROCESS *pp)
    {
 
     if (_SC.process_list == NULL)
-       {_SC.process_list = CMAKE_ARRAY(PROCESS *, NULL, 1);
+       {_SC.process_list = CMAKE_ARRAY(PROCESS *, NULL, 3);
 	SC_array_resize(_SC.process_list, N_PROC_MNG, -1.0);};
 
     pp->index = SC_array_get_n(_SC.process_list);

@@ -29,25 +29,16 @@ void _PA_internal_init(void)
 
     PA_set_n_threads(1);
 
-    PA_variable_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
+    PA_variable_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
-    PAN_VARIABLE     = CSTRSAVE("PA_variable");
-    PAN_PACKAGE      = CSTRSAVE("PA_package");
-    PAN_ATTRIBUTE    = CSTRSAVE(SC_PCONS_P_S);
-    PAN_UNIT         = CSTRSAVE(SC_PCONS_P_S);
-    PAN_DIMENSION    = CSTRSAVE("PA_dimens");
-    PAN_DOMAIN       = CSTRSAVE("PA_edit_domain");
-    PAN_EDIT_REQUEST = CSTRSAVE("PA_edit_request");
-    PAN_EDIT_OUT     = CSTRSAVE("PA_edit_out");
-
-    SC_permanent(PAN_VARIABLE);
-    SC_permanent(PAN_PACKAGE);
-    SC_permanent(PAN_ATTRIBUTE);
-    SC_permanent(PAN_UNIT);
-    SC_permanent(PAN_DIMENSION);
-    SC_permanent(PAN_DOMAIN);
-    SC_permanent(PAN_EDIT_REQUEST);
-    SC_permanent(PAN_EDIT_OUT);
+    PAN_VARIABLE     = CSTRDUP("PA_variable", 3);
+    PAN_PACKAGE      = CSTRDUP("PA_package", 3);
+    PAN_ATTRIBUTE    = CSTRDUP(SC_PCONS_P_S, 3);
+    PAN_UNIT         = CSTRDUP(SC_PCONS_P_S, 3);
+    PAN_DIMENSION    = CSTRDUP("PA_dimens", 3);
+    PAN_DOMAIN       = CSTRDUP("PA_edit_domain", 3);
+    PAN_EDIT_REQUEST = CSTRDUP("PA_edit_request", 3);
+    PAN_EDIT_OUT     = CSTRDUP("PA_edit_out", 3);
 
     PA_DUL = CMAKE(int);
     PA_DON = CMAKE(int);

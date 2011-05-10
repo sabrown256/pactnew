@@ -113,7 +113,7 @@ PP_PDBfile_close(PP_PDBfileObject *self,
         /* cleanup defstr singletons */
 	SC_free_hasharr(fileinfo->deftypes, _PP_decref_object, NULL);
 
-        fileinfo->deftypes   = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+        fileinfo->deftypes   = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
         /* closing the virtual internal file will free up memory
          * from defstrs thus allowing leak-detection in the
          * test suite to work

@@ -24,7 +24,7 @@
  */
 
 static long _SC_count_tagged(int flag)
-   {int nc, nf;
+   {int nc, nf, acc;
     long i, n, nb, nbt;
     char bf[MAXLINE];
     char *name, *ps;
@@ -44,25 +44,27 @@ static long _SC_count_tagged(int flag)
 	     space = space->block.next, i++)
 	    {desc = &space->block;
 	     if (SCORE_BLOCK_P(desc))
-	        {nb   = desc->length;
-		 name = _SC_block_name(desc);
-		 if ((name == NULL) && ((flag & 8) == TRUE))
-		    nbt += nb;
-		 else
-		    {if (FTN_NAME(desc))
-		        {name = SC_F77_C_STRING((F77_string) name);
-			 nc   = strlen(name);
+	        {acc = ((flag & 8) || (desc->ref_count != UNCOLLECT));
+		 if (acc == TRUE)
+		    {nb   = desc->length;
+		     name = _SC_block_name(desc);
+		     if (name == NULL)
+		        nbt += nb;
+		     else
+		        {if (FTN_NAME(desc))
+			    {name = SC_F77_C_STRING((F77_string) name);
+			     nc   = strlen(name);
 
-			 ps = strchr(name, ' ');
-			 if (ps != NULL)
-			    {nf = ps - name;
-			     nc = min(nc, nf);};
+			     ps = strchr(name, ' ');
+			     if (ps != NULL)
+			        {nf = ps - name;
+				 nc = min(nc, nf);};
 
-			 SC_strncpy(bf, MAXLINE, name, nc);
-			 name = bf;};
+			     SC_strncpy(bf, MAXLINE, name, nc);
+			     name = bf;};
 		     
-		    if ((_SC_name_ok(name, flag)) && ((flag & 8) == TRUE))
-		       nbt += nb;};};
+			 if (name != NULL)
+			    nbt += nb;};};};
 
 	     if ((desc->next == ph->latest_block) ||
 		 (space == NULL))
@@ -83,14 +85,16 @@ static long _SC_count_tagged(int flag)
 
 static int _SC_list_block_info(char *s, SC_heap_des *ph, void *ptr,
 			       long sz, int flag, int show)
-   {int j, perm, rv;
+   {int perm, rv;
     int idok, nmok, prok, nxok, ty, nc, nr;
     long mad, nb;
-    char t[MAXLINE], c;
-    char *pc, *name;
+    char t[MAXLINE];
+    char *name;
     mem_descriptor *desc;
     mem_header *space, *prev, *next;
     SC_address ad;
+
+    rv = FALSE;
 
     space      = (mem_header *) ptr;
     ad.memaddr = (char *) (space + 1);
@@ -113,7 +117,7 @@ static int _SC_list_block_info(char *s, SC_heap_des *ph, void *ptr,
 /* expect an active block if length is greater than 0 */
     if (idok && (nb > 0) && prok && nxok)
        {if (!(flag & 1))
-	   return(FALSE);
+	   return(rv);
 
 	if (name == NULL)
 	   name = "-- no name --";
@@ -130,7 +134,7 @@ static int _SC_list_block_info(char *s, SC_heap_des *ph, void *ptr,
 /* expect a free block if desc is setup right */
     else if (idok && FREE_SCORE_BLOCK_P(desc) && prok && nxok)
        {if (!(flag & 2))
-	   return(FALSE);
+	   return(rv);
 
 	if (!nmok)
 	   {name = "-- corrupt free block --";
@@ -164,34 +168,7 @@ static int _SC_list_block_info(char *s, SC_heap_des *ph, void *ptr,
 
     if ((perm == FALSE) || (show == TRUE))
        {strcpy(s, t);
-	if (strncmp(name, "char*:", 6) == 0)
-	   {strncat(s, " = \"", nc);
-
-/* add no more characters than fills out the entry - do not overflow! */
-	    nc = ENTRY_SIZE - strlen(s) - 1;
-	    nb = min(nb, nc);
-
-	    pc = (char *) (space + 1);
-	    for (j = 0; j < nb; j++)
-	        {c = *pc++;
-                 if (c == '\0')
-		    break;
-		 else
-		    {if (SC_is_print_char(c, 0))
-		        snprintf(t, MAXLINE, "%c", c);
-		     else
-		        snprintf(t, MAXLINE, "\\%03o", c);
-
-		     strcat(s, t);};};
-
-	    strcat(s, "\"");
-
-/* guarantee termination of the entry */
-	    s[ENTRY_SIZE-1] = '\0';};
-
-	rv = TRUE;}
-    else
-       rv = FALSE;
+	rv = TRUE;};
 
     return(rv);}
 
@@ -505,7 +482,7 @@ int SC_mem_map(FILE *fp, int flag)
  */
 
 long SC_mem_monitor(int old, int lev, char *id, char *msg)
-   {int on, actfl, prmfl, pid, st;
+   {int on, actfl, prmfl, show, pid, st;
     long d;
     char base[MAXLINE], ta[MAXLINE], tb[MAXLINE];
     char sd[MAXLINE], td[MAXLINE], cd[MAXLINE];
@@ -525,10 +502,13 @@ long SC_mem_monitor(int old, int lev, char *id, char *msg)
     snprintf(sd, MAXLINE, "diff %s %s > %s", tb, ta, td);
     snprintf(cd, MAXLINE, "cat %s", td);
 
+    show  = FALSE;
     actfl = 1;
     prmfl = 2;
     if (lev & 4)
-       prmfl |= 8;
+       {show   = TRUE;
+	actfl |= 8;
+	prmfl |= 8;};
 
     d = _SC_count_tagged(prmfl);
 /*    SC_mem_stats(NULL, NULL, &d, NULL); */
@@ -536,13 +516,13 @@ long SC_mem_monitor(int old, int lev, char *id, char *msg)
     if (old == -1)
        {if (on > 1)
 	   {fp = fopen(tb, "w");
-	    _SC_mem_map(fp, actfl, FALSE, FALSE);
+	    _SC_mem_map(fp, actfl, show, FALSE);
 	    fclose(fp);};}
 
     else
        {if (on > 1)
 	   {fp = fopen(ta, "w");
-	    _SC_mem_map(fp, actfl, FALSE, FALSE);
+	    _SC_mem_map(fp, actfl, show, FALSE);
 	    fclose(fp);
 
 	    REMOVE(td);
@@ -793,6 +773,23 @@ void *SC_mem_diff(FILE *fp, void *a, void *b, size_t nb)
 	s = NULL;};
 
     return(s);}
+
+/*---------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*/
+
+/* DPRSTATS - print memory stats for specified heap */
+
+void dprstats(int tid)
+   {SC_heap_des *ph;
+
+    ph = _SC_get_heap(tid);
+
+    printf("Allocated: %ld\n", (long) ph->sp_alloc);
+    printf("Freed:     %ld\n", (long) ph->sp_free);
+    printf("Diff:      %ld\n", (long) ph->sp_diff);
+    printf("Max Diff:  %ld\n", (long) ph->sp_max);
+
+    return;}
 
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/

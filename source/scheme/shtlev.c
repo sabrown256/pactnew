@@ -45,7 +45,7 @@ void SS_set_put_string(SS_psides *si, PFfputs ps)
    {
     
     SC_set_put_string(ps);
-    SC_register_context(ps, si);
+    SC_REGISTER_CONTEXT(ps, si);
 
     return;}
 
@@ -58,7 +58,7 @@ void SS_set_put_line(SS_psides *si, int (*pf)(FILE *fp, char *fmt, ...))
    {
     
     SC_set_put_line(pf);
-    SC_register_context(pf, si);
+    SC_REGISTER_CONTEXT(pf, si);
 
     return;}
 
@@ -362,7 +362,7 @@ SS_psides *SS_init_scheme(char *code, char *vers,
     SC_init_path(2, "HOME", "SCHEME");
 
     if (v != NULL)
-    SS_set_scheme_env(v[0], NULL);
+       SS_set_scheme_env(v[0], NULL);
 
     si = SS_get_current_scheme(-1);
 
@@ -676,7 +676,7 @@ void SS_interrupt_handler(int sig)
     object *argl;
     SS_psides *si;
 
-    si = SC_get_context(SS_interrupt_handler);
+    si = SC_GET_CONTEXT(SS_interrupt_handler);
 
     SC_signal_n(SIGINT, SS_interrupt_handler, si);
 

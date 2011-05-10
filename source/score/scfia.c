@@ -49,7 +49,7 @@ int64_t SC_stash_pointer(void *p)
     SC_LOCKON(SC_ptr_lock);
 
     if (_SC.ptr_lst == NULL)
-       _SC.ptr_lst = CMAKE_ARRAY(void *, NULL, 1);
+       _SC.ptr_lst = CMAKE_ARRAY(void *, NULL, 3);
 
     np = SC_array_get_n(_SC.ptr_lst);
 

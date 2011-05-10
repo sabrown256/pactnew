@@ -537,7 +537,7 @@ void turn()
         graphics_init = FALSE;
         window_init   = FALSE;
 
-        swtab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+        swtab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
         SC_hasharr_install(swtab, "mesh",       &mesh_mesh,     SC_INTEGER_S, TRUE, TRUE);
         SC_hasharr_install(swtab, "boundary",   &mesh_bndry,    SC_INTEGER_S, TRUE, TRUE);
         SC_hasharr_install(swtab, "vector",     &mesh_vectr,    SC_INTEGER_S, TRUE, TRUE);

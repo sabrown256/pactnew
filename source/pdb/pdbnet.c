@@ -492,7 +492,7 @@ hasharr *PN_target(data_standard *std, data_alignment *align)
         pa->host_chart = PN_target(pa->host_std, pa->host_align);};
 
 /* initialize the chart */
-    chart  = SC_make_hasharr(1, NODOC, SC_HA_NAME_KEY);
+    chart  = SC_make_hasharr(1, NODOC, SC_HA_NAME_KEY, 0);
 
     _PD_setup_chart(chart, std,
 		    pa->host_std, align, pa->host_align, FALSE, TRUE);
@@ -649,7 +649,6 @@ PDBfile *PN_open(PDBfile *fm, char *bf)
        {*file = *fm;
 
         pu->stream = NULL;
-/*        pu->path   = NULL; */
 
 	_SC_rel_udl(pu);
 
@@ -661,7 +660,7 @@ PDBfile *PN_open(PDBfile *fm, char *bf)
 	file->date             = SC_date();
 	file->virtual_internal = FALSE;
 	file->current_prefix   = NULL;
-	file->symtab           = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+	file->symtab           = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 
 	_PD_ptr_init_apl(file);
 

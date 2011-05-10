@@ -58,7 +58,7 @@ memdes *_SX_hash_hook(PDBfile *file, char *vr, defstr *dp)
     memdes *md;
     SS_psides *si;
 
-    si = SC_get_context(_SX_hash_hook);
+    si = SC_GET_CONTEXT(_SX_hash_hook);
 
     type = dp->type;
 
@@ -142,7 +142,7 @@ int SX_fprintf(FILE *fp, char *fmt, ...)
     SS_psides *si;
     extern int _PG_display_page(PG_device *dev, FILE *fp, char *s);
 
-    si = SC_get_context(SX_fprintf);
+    si = SC_GET_CONTEXT(SX_fprintf);
 
     rv = FALSE;
 
@@ -181,7 +181,7 @@ int SX_fputs(const char *s, FILE *fp)
     SS_psides *si;
     extern int _PG_display_page(PG_device *dev, FILE *fp, char *s);
 
-    si = SC_get_context(SX_fputs);
+    si = SC_GET_CONTEXT(SX_fputs);
 
     rv = FALSE;
 

@@ -619,7 +619,7 @@ PyObject *PP_getattr_from_defstr(PP_file *fileinfo, void *vr, char *type,
 
 void _PP_create_defstr_tab(void)
 {
-    _PP_defstr_tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_ADDR_KEY);
+    _PP_defstr_tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_ADDR_KEY, 0);
 }
 
 /*--------------------------------------------------------------------------*/

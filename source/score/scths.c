@@ -141,9 +141,7 @@ static void _SC_sproc_init_thread(emu_thread_info *pt,
        CFREE(pt->key_data);
 
     if (nk > 0)
-       pt->key_data = SC_alloc_n(nk, sizeof(void *),
-				 SC_MEM_ATTR_NO_ACCOUNT, na,
-				 0);
+       pt->key_data = CPMAKE_N(void *, nk, 2);
 
     return;}
 

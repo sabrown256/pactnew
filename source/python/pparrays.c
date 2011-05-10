@@ -244,7 +244,7 @@ void _PP_init_numpy(void)
     
     import_array();
 
-    _numpy_map = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+    _numpy_map = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 
     for (nentry = entries; nentry->name != NULL; nentry++) {
         tc_to_entry[nentry->typecode] = nentry;

@@ -665,57 +665,56 @@ void *_SC_alloc_n(long ni, long bpi, void *arg)
         file = (char *) opt->file;
         line = opt->line;};
 
+    rv  = NULL;
     nb  = ni*bpi;
     nbp = nb + ph->hdr_size;
 
-    if ((nb <= 0) || ((unsigned long) nb > ph->hdr_size_max))
-       return(NULL);
+    if ((0 < nb) && ((unsigned long) nb <= ph->hdr_size_max))
+       {SC_LOCKON(SC_mm_lock);
 
-    SC_LOCKON(SC_mm_lock);
+	if (na == TRUE)
+	   SC_mem_statb(&a, &f, NULL, NULL);
 
-    if (na == TRUE)
-       SC_mem_statb(&a, &f, NULL, NULL);
+	if (SC_gs.mm_debug == TRUE)
+	   space = (mem_header *) _SC_ALLOC((size_t) nbp);
+	else
+	   space = (mem_header *) _SC_prim_alloc((size_t) nbp, ph, zsp);
 
-    if (SC_gs.mm_debug == TRUE)
-       space = (mem_header *) _SC_ALLOC((size_t) nbp);
-    else
-       space = (mem_header *) _SC_prim_alloc((size_t) nbp, ph, zsp);
+	if (space != NULL)
+	   {mem_descriptor *desc;
 
-    if (space != NULL)
-       {mem_descriptor *desc;
+	    _SC_assign_block(ph, space, nb, func, file, line);
 
-        _SC_assign_block(ph, space, nb, func, file, line);
-
-	_SC_mem_stats_acc(ph, nb, 0L);
+	    _SC_mem_stats_acc(ph, nb, 0L);
     
-	ph->nx_mem_blocks++;
-	ph->n_mem_blocks++;
+	    ph->nx_mem_blocks++;
+	    ph->n_mem_blocks++;
 
-	space->block.type = typ;
+	    space->block.type = typ;
 
-        desc = (mem_descriptor *) space;
-        space++;
+	    desc = (mem_descriptor *) space;
+	    space++;
 
-	if (prm == TRUE)
-	   desc->ref_count = UNCOLLECT;
+	    if (prm == TRUE)
+	       desc->ref_count = UNCOLLECT;
 
 /* zero out the space */
-	if ((zsp == 1) || (zsp == 2) || (zsp == 5))
-	   {if (SC_gs.mm_debug == TRUE)
-	       memset(space, 0, nb);
-	    else if (desc->initialized == FALSE)
-               _SC_prim_memset(space, nb);};
+	    if ((zsp == 1) || (zsp == 2) || (zsp == 5))
+	       {if (SC_gs.mm_debug == TRUE)
+		   memset(space, 0, nb);
+	        else if (desc->initialized == FALSE)
+		   _SC_prim_memset(space, nb);};
 
 /* log this entry if doing memory history */
-	if (_SC.mem_hst != NULL)
-	   _SC.mem_hst(SC_MEM_ALLOC, desc);};
+	    if (_SC.mem_hst != NULL)
+	       _SC.mem_hst(SC_MEM_ALLOC, desc);};
 
-    if (na == TRUE)
-       SC_mem_statb_set(a, f);
+	if (na == TRUE)
+	   SC_mem_statb_set(a, f);
 
-    SC_LOCKOFF(SC_mm_lock);
+	SC_LOCKOFF(SC_mm_lock);
 
-    rv = space;
+	rv = space;};
 
     return(rv);}
 

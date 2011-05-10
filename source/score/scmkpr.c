@@ -905,7 +905,7 @@ void _SC_do_substitutions(anadep *state)
    {
 
     if ((state->rules != NULL) && (state->need_subst == TRUE))
-       {state->temp = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
+       {state->temp = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
 /* do substitutions in the rule names */
 	SC_hasharr_foreach(state->rules, _SC_do_subst_name, state);
@@ -972,8 +972,8 @@ anadep *SC_make_state(void)
     state->show_rules  = FALSE;
     state->verbose     = FALSE;
     state->log         = stdout;
-    state->rules       = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
-    state->variables   = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
+    state->rules       = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
+    state->variables   = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
     state->archives    = NULL;
     state->pred        = _SC_is_newer;
 
@@ -1135,7 +1135,7 @@ int SC_parse_makefile(anadep *state, char *fname)
 	if (t != NULL)
 	   {if (BARRIER != NULL)
 	       {CFREE(BARRIER);};
-	    BARRIER = SC_permanent(CSTRSAVE(t));};};
+	    BARRIER = CSTRDUP(t, 3);};};
 
     SC_ERR_UNTRAP();
 

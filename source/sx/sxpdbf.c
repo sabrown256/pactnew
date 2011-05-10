@@ -136,7 +136,7 @@ object *_SXI_find_types(SS_psides *si, object *arg)
     nitems = PD_entry_number(ep);
 
 /* create a hash table to put all of these types in */
-    tytab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+    tytab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
     strcpy(TYPE, "type");
 
 /* fill the hash table with the types */

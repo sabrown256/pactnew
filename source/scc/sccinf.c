@@ -41,7 +41,7 @@ static void _CC_primitives(void)
    {
 
     if (_CC.primitives == NULL)
-       {_CC.primitives = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+       {_CC.primitives = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 
         SC_hasharr_install(_CC.primitives, "void",       NULL, "expr *", TRUE, TRUE);
         SC_hasharr_install(_CC.primitives, "char",       NULL, "expr *", TRUE, TRUE);
@@ -65,7 +65,7 @@ expr *CC_add_type(char *name, qtype k)
    {expr *t;
 
     if (_CC.types == NULL)
-       {_CC.types = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+       {_CC.types = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 	_CC_primitives();};
 
     if (name == NULL)
@@ -90,7 +90,7 @@ expr *CC_add_const(expr *e)
     snprintf(name, MAXLINE, "const%d", i++);
 
     if (_CC.consts == NULL)
-       _CC.consts = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+       _CC.consts = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 
     SC_hasharr_install(_CC.consts, name, e, "expr *", TRUE, TRUE);
 
@@ -107,7 +107,7 @@ expr *CC_add_depend(char *name, qtype t)
 
     if (name != NULL)
        {if (_CC.depend == NULL)
-	   _CC.depend = SC_make_hasharr(HSZSMALL, FALSE, SC_HA_NAME_KEY);
+	   _CC.depend = SC_make_hasharr(HSZSMALL, FALSE, SC_HA_NAME_KEY, 0);
 
 	v = (expr *) SC_hasharr_def_lookup(_CC.depend, name);
 	if (v == NULL)

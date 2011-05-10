@@ -85,8 +85,6 @@ endsw
 
 setenv ZeroSpace  "-z 2"
 
-# manager way
-# if ($?autotool == 0) then
    pushd .. >& /dev/null
    while (!(-d dev) && !(-d manager))
       cd .. >& /dev/null
@@ -126,6 +124,7 @@ setenv ZeroSpace  "-z 2"
    setenv CFE ""
    if ($CROSS_COMPILE != FALSE) then
       setenv CFE $DORUN
+      setenv DO_RUN_SUBMIT_ENV '-exp_env SCHEME -exp_env ULTRA'
    endif
    setenv PFE       $DORUN
 
@@ -148,65 +147,6 @@ setenv ZeroSpace  "-z 2"
    endif
 
    set Ultra = "$CFE $BinDir/ultra -e -r -x -q -s $ZeroSpace"
-
-# autoconf way
-# else if ($?autotool == 1) then
-#    # RootDir in autotool is where we have untarred
-#    pushd .. >& /dev/null
-#    while (!(-e COPYING) && !(-e README))
-#       cd .. >& /dev/null
-#    end
-#    setenv RootDir  $cwd
-#    popd >& /dev/null
-#    
-#    # BuildDir in autotool is where we ran configure (not necessarily == RootDir)
-#    pushd .. >& /dev/null
-#    while (!(-e config/scconfig.h) && !(-e config.h))
-#       cd .. >& /dev/null
-#    end
-#    setenv BuildDir  $cwd
-#    popd >& /dev/null
-#    
-#    # SrcDir is where there exists a package's Makefile
-#    setenv SrcDir    $BuildDir/$Package
-#    # BinDir is where gmake/make places binaries
-#    setenv BinDir    $BuildDir/$Package
-#    setenv LibDir    $BuildDir/$Package/.libs 
-#    
-#    setenv TestDir   $testsubdir
-#    setenv FilesDir  $RootDir/$Package/tests
-#    
-#    setenv CFE       $BinDir/do-run
-#    setenv PFE       $BinDir/do-run
-# 
-#    setenv TIMER     $BuildDir/scripts/timer
-#    setenv DORUN     $BinDir/do-run
-#    setenv PX        $RootDir/scripts/px
-#    
-# # GOTCHA: we should be getting this via 'pact -info'
-# # FIXME: add info finding ability for both build systems
-#    set LARGE_FILES = ""
-#    switch ($OS)
-#       case "AIX":
-#            # FIX ME
-#            setenv TEST_MPI  "NO"
-#            setenv HaveIPC  YES
-#            setenv HaveDevZero  "HAVE_DEV_ZERO"
-#            breaksw
-#       case "HP-UX":
-#       default:
-#            setenv HaveIPC  YES
-#            setenv HaveDevZero  "HAVE_DEV_ZERO"
-#            breaksw
-#    endsw
-# 
-#    setenv LPYTHON  $BinDir
-# 
-# # GOTCHA: gmake/make leaves binaries in the CWD 
-#    setenv PSDIFF   "$BuildDir/score/ps-diff"
-#    set Ultra   = "$CFE $BuildDir/ultra/ultra -e -r -x -q -s $ZeroSpace"
-# 
-# endif
 
 set path = ( . $BinDir $path )
 

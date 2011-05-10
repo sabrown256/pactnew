@@ -1,5 +1,5 @@
 #
-# SUN - define Sun compilers pre-Solaris
+# SUN - define Sun compilers on LINUX
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -14,6 +14,9 @@ ERR_PATTERN  = ":+sp+error:"
 
 Tool CC {
    Exe      = suncc
+   Flags   += [ _env_ = C_STD ;              # C standard flags
+                C89   = -xc99=none ;
+                C99   = -xc99 ]
    Flags   += [ _env_ = Bits ;               # address bit size
                 *     = -m* ]
    Flags   += [ _cmd_ = -p ;                 # profiling

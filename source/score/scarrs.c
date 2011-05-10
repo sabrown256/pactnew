@@ -172,7 +172,7 @@ static void _SC_array_acc_method(SC_array *a)
 
 static void _SC_array_grow(SC_array *a, long nn)
    {int chg;
-    long i, n, nx, bpi, prm, na;
+    long i, n, nx, bpi;
     double gf, fc;
     char *arr;
     void *e;
@@ -194,26 +194,14 @@ static void _SC_array_grow(SC_array *a, long nn)
        {if (nn == 0)
 	   {nx = 0;
 	    nn = 1;};
-	prm = ((SC_ref_count(a->name) == UNCOLLECT) &&
-	       (SC_ref_count(a->type) == UNCOLLECT));
-	na  = (prm == TRUE);
-	arr = SC_alloc_n(nn, bpi,
-			 SC_MEM_ATTR_PERMANENT,  prm,
-			 SC_MEM_ATTR_NO_ACCOUNT, na,
-			 0);
+	arr = CPMAKE_N(char, nn*bpi, a->memfl);
 	chg = TRUE;}
 
 /* if too small */
     else if (nn > nx)
        {_SC_array_err(a, "growing array %s from %ld to %ld", a->name, nx, nn);
 
-	prm = ((SC_ref_count(a->name) == UNCOLLECT) &&
-	       (SC_ref_count(a->type) == UNCOLLECT));
-	na  = (prm == TRUE);
-	arr = SC_realloc_n(arr, nn, bpi,
-			   SC_MEM_ATTR_PERMANENT,  prm,
-			   SC_MEM_ATTR_NO_ACCOUNT, na,
-			   0);
+	CPREMAKE(arr, char, nn*bpi, a->memfl);
 	chg = TRUE;};
 
 /* if we changed it - make it consistent */
@@ -244,32 +232,16 @@ static void _SC_array_grow(SC_array *a, long nn)
 
 void _SC_init_array(SC_array *a, char *type, int bpi,
 		    void (*init)(void *a), char *name, int flags)
-    {int nt, nn, prm, na;
+    {int nt, nn;
      char *ty, *nm;
-
-     prm = ((flags & 1) != 0);
-     na  = (prm == TRUE);
 
      if (name == NULL)
         name = "array";
      nn = strlen(name) + 1;
-     nm = SC_alloc_n(nn, sizeof(char),
-		     SC_MEM_ATTR_PERMANENT,  prm,
-		     SC_MEM_ATTR_NO_ACCOUNT, na,
-		     SC_MEM_ATTR_FUNC, __func__,
-		     SC_MEM_ATTR_FILE, __FILE__,
-		     SC_MEM_ATTR_LINE, __LINE__,
-		     0);
+     nm = CPMAKE_N(char, nn, flags);
 
      nt = strlen(type) + 4;
-     ty = CMAKE_N(char, nt);
-     ty = SC_alloc_n(nt, sizeof(char),
-		     SC_MEM_ATTR_PERMANENT,  prm,
-		     SC_MEM_ATTR_NO_ACCOUNT, na,
-		     SC_MEM_ATTR_FUNC, __func__,
-		     SC_MEM_ATTR_FILE, __FILE__,
-		     SC_MEM_ATTR_LINE, __LINE__,
-		     0);
+     ty = CPMAKE_N(char, nt, flags);
 
      snprintf(nm, nn, "%s",   name);
      snprintf(ty, nt, "%s *", type);
@@ -277,6 +249,7 @@ void _SC_init_array(SC_array *a, char *type, int bpi,
      a->name  = nm;
      a->type  = ty;
      a->bpi   = bpi;
+     a->memfl = flags;
      a->nx    = 0;
      a->n     = 0;
      a->gf    = GROWTH_FACTOR(3.0);
@@ -296,18 +269,9 @@ void _SC_init_array(SC_array *a, char *type, int bpi,
 
 SC_array *_SC_make_array(char *type, int bpi,
 			 void (*init)(void *a), char *name, int flags)
-    {int prm, na;
-     SC_array *a;
+    {SC_array *a;
 
-     prm = ((flags & 1) != 0);
-     na  = ((flags & 2) != 0);
-
-     a = SC_alloc_n(1, sizeof(SC_array),
-		    SC_MEM_ATTR_PERMANENT,  prm,
-		    SC_MEM_ATTR_NO_ACCOUNT, na,
-		    SC_MEM_ATTR_FUNC, name,
-		    0);
-
+     a = CPMAKE(SC_array, flags);
      if (a != NULL)
         _SC_init_array(a, type, bpi, init, name, flags);
 

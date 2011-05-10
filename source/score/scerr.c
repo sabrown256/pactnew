@@ -19,7 +19,7 @@
 void _SC_init_error_stack(SC_array *err, int id)
    {
 
-    CINIT_ARRAY(err, SC_errdes, NULL, 1);
+    CINIT_ARRAY(err, SC_errdes, NULL, 3);
 
     return;}
 

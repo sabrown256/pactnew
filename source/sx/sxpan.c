@@ -492,7 +492,7 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
 
 /* make the variable hash table if it doesn't exist yet */
     if (PA_variable_tab == NULL)
-       PA_variable_tab = SC_make_hasharr(HSZLARGE, DOC, SC_HA_NAME_KEY);
+       PA_variable_tab = SC_make_hasharr(HSZLARGE, DOC, SC_HA_NAME_KEY, 0);
 
     vattr[0] = RUNTIME;
     vattr[1] = OPTL;

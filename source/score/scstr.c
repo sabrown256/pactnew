@@ -105,9 +105,10 @@ int _SC_fmt_strcat(char *d, int nd, int ln, char *fmt, char *s)
  *             - things in the one bad case
  */
 
-char *SC_strsavec(char *s, const char *file, const char *fnc, int line)
-   {char *p;
-    int sz;
+char *SC_strsavec(char *s, int memfl,
+		  const char *file, const char *fnc, int line)
+   {int prm, na, sz;
+    char *p;
     SC_mem_opt opt;
 
     p = NULL;
@@ -115,8 +116,11 @@ char *SC_strsavec(char *s, const char *file, const char *fnc, int line)
     if (s != NULL)
        {sz = strlen(s) + 2;
 
-	opt.perm = FALSE;
-	opt.na   = FALSE;
+	prm = ((memfl & 1) != 0);
+	na  = ((memfl & 2) != 0);
+
+	opt.perm = prm;
+	opt.na   = na;
 	opt.zsp  = -1;
 	opt.typ  = SC_STRING_I;
 	opt.fnc  = file;
@@ -1950,7 +1954,7 @@ char *SC_vdsnprintf(int cp, const char *format, va_list lst)
 
     pa = (char **) SC_get_thread_array(ita);
     if (*pa == NULL)
-       *pa = SC_permanent(CMAKE_N(char, 4096));
+       *pa = CPMAKE_N(char, 4096, 3);
 
     a  = *pa;
     nc = SC_arrlen(a);

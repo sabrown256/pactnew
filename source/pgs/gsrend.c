@@ -1262,7 +1262,7 @@ void PG_draw_graph(PG_device *dev, PG_graph *data)
     PM_mapping *f;
 
     if (_PG_gattrs.text_format == NULL)
-       _PG_gattrs.text_format = SC_permanent(CSTRSAVE("%.0f"));
+       _PG_gattrs.text_format = CSTRDUP("%.0f", 3);
 
     PG_get_attrs_graph(data, FALSE,
 		       "RENDERING-TYPE", SC_INT_I, &data->rendering, data->rendering,

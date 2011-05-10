@@ -1079,10 +1079,10 @@ void PP_init_type_map_basic(PP_file *fileinfo)
     PP_type_entry *entry;
 
     /* type hash table */
-    fileinfo->type_map   = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
-    fileinfo->object_map = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_ADDR_KEY);
-    fileinfo->class_map  = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_ADDR_KEY);
-    fileinfo->deftypes   = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+    fileinfo->type_map   = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
+    fileinfo->object_map = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_ADDR_KEY, 0);
+    fileinfo->class_map  = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_ADDR_KEY, 0);
+    fileinfo->deftypes   = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 
     descr = PP_make_descr(
         PP_CHAR_I,                      /* typecode */

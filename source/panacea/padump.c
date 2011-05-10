@@ -1289,10 +1289,8 @@ static void _PA_init_mappings(char *ppname)
    {PA_plot_request *pr, *nxt;
     PFPreMap hook;
 
-    PAN_EDIT     = CSTRSAVE("edit_variable");
-    PAN_PLOT_REQ = CSTRSAVE("PA_plot_reqest");
-    SC_permanent(PAN_EDIT);
-    SC_permanent(PAN_PLOT_REQ);
+    PAN_EDIT     = CSTRDUP("edit_variable", 3);
+    PAN_PLOT_REQ = CSTRDUP("PA_plot_reqest", 3);
 
     _PA_init_time_plots(ppname);
 

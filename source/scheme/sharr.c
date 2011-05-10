@@ -204,7 +204,7 @@ static object *_SSI_make_hasharr(SS_psides *si, object *arg)
     else
        SS_error(si, "BAD ARGUMENT - MAKE-HASH-TABLE", arg);
 
-    tab = SC_make_hasharr(sz, NODOC, SC_HA_NAME_KEY);
+    tab = SC_make_hasharr(sz, NODOC, SC_HA_NAME_KEY, 0);
     op  = SS_mk_hasharr(si, tab);
 
     return(op);}

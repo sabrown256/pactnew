@@ -518,7 +518,7 @@ static int test_7(void)
 /* TEST_8 - test permanent arrays */
 
 static int test_8(void)
-   {int i, na, err, cs;
+   {int i, na, err, ocs, ncs;
     char msg[MAXLINE];
     double fc;
     double *dp;
@@ -526,11 +526,11 @@ static int test_8(void)
 
     SC_ENTERING;
 
-    cs = SC_mem_monitor(-1, 2, "T9", msg);
+    ocs = SC_mem_monitor(-1, 2, "T8", msg);
 
     na = 1000;
 
-    da = CMAKE_ARRAY(double, NULL, 1);
+    da = CMAKE_ARRAY(double, NULL, 3);
     SC_array_resize(da, na, -1.0);
 
 /* setting DA */
@@ -546,9 +546,9 @@ static int test_8(void)
 
     CFREE(dp);
 
-    cs = SC_mem_monitor(cs, 2, "T9", msg);
+    ncs = SC_mem_monitor(ocs, 2, "T8", msg);
 
-    err = (cs != 0);
+    err = (ncs != ocs);
 
     SC_LEAVING;
 

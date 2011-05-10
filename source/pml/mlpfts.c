@@ -31,7 +31,7 @@ extern long double
 static void timeout(int sig)
    {JMP_BUF *cpu;
 
-    cpu = SC_get_context(timeout);
+    cpu = SC_GET_CONTEXT(timeout);
 
     LONGJMP(*cpu, TRUE);
 

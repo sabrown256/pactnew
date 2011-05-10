@@ -87,7 +87,7 @@ static void _SC_signal_relay(int sig)
     if (sig < 0)
        return;
 
-    pp = SC_get_context(_SC_signal_relay);
+    pp = SC_GET_CONTEXT(_SC_signal_relay);
 
     if (SC_process_status(pp) == SC_RUNNING)
        SC_send_signal(pp->id, sig);
@@ -104,7 +104,7 @@ static void _SC_signal_relay(int sig)
 static void _SC_ex_int_hnd(int sig)
    {PROCESS *pp;
 
-    pp = SC_get_context(_SC_ex_int_hnd);
+    pp = SC_GET_CONTEXT(_SC_ex_int_hnd);
 
     SC_block_file(stdin);
 
@@ -124,9 +124,6 @@ static void _SC_ex_int_hnd(int sig)
 static void _SC_ex_io_hnd(int sig)
    {int n;
     char bf[1024];
-    PROCESS *pp;
-
-    pp = SC_get_context(_SC_ex_io_hnd);
 
     n = SC_read_sigsafe(0, bf, 1024);
     if (n > 0)
@@ -277,7 +274,7 @@ static int _SC_squeeze_tag(char *s, int ns, char *tag)
 	if (_SC.sqbf != NULL)
 	   {CFREE(_SC.sqbf);};
 
-	_SC.sqbf = SC_permanent(CMAKE_N(char, nb));};
+	_SC.sqbf = CPMAKE_N(char, nb, 3);};
 
     no = 0;
     if ((s != NULL) && (tag != NULL))
@@ -323,9 +320,9 @@ static void _SC_ex_ch_out(int fd, int mask, void *a)
 /* make a big buffer to start out with */
     if (nb == -1L)
        {nb             = SIZE_BUF;
-	_SC.ecbf       = SC_permanent(CMAKE_N(char, nb));
+	_SC.ecbf       = CPMAKE_N(char, nb, 3);
 	_SC.ecbf[nb-1] = '\0';
-	_SC.elbf       = SC_permanent(CMAKE_N(char, nb));
+	_SC.elbf       = CPMAKE_N(char, nb, 3);
 	_SC.elbf[nb-1] = '\0';};
 
     while (SC_gets(_SC.ecbf, nb-1, pp) != NULL)

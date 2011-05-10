@@ -898,7 +898,7 @@ static int64_t _PD_wr_chrt_ii(PDBfile *file, FILE *out, int fh)
     _PD_rev_chrt(ch);
 
 /* the hash array for the structure chart is one element long */
-    n  = 0;
+    n = 0;
     for (i = 0; SC_hasharr_next(ch, &i, &nm, NULL, (void **) &dp); i++)
 
 /* use np->name instead of dp->type or PD_typedef's will not work */

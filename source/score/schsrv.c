@@ -319,7 +319,7 @@ static void _SC_read_host_server_db(char *file)
 
     fp = io_open(file, "r");
     if (fp != NULL)
-       {_SC.hsst = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+       {_SC.hsst = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
          
         if (net != NULL)
 	   {net = CSTRSAVE(net);
@@ -402,7 +402,7 @@ int SC_host_server_init(char *file, int reset, int vrb)
  * host and system type only
  */
 	if ((_SC.hsst == NULL) && (vrb == FALSE))
-	   {_SC.hsst = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+	   {_SC.hsst = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 	    SC_hostname(t, MAXLINE);
 	    r   = SC_dsnprintf(FALSE, "(%s)", t);
 	    rng = _SC_list(r);

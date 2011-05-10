@@ -16,6 +16,9 @@ ERR_PATTERN  = "PGFTN-S- PGF90-S- PGC-S- PGC-F-"
 Tool CC {
    Exe      = pgcc
    Flags    = -Kieee
+   Flags   += [ _env_ = C_STD ;             # C standard flags
+                C89   = -c89 ;
+                C99   = -c99 ]
    Flags   += [ _env_ = Bits ;              # address bit size
                 32    = -tp px ;
                 64    = -tp k8-64 -fpic ]

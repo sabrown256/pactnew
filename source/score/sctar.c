@@ -212,7 +212,7 @@ fcdes *SC_scan_tarfile(char *tarf)
     fp = fopen(tarf, "r");
     if (fp != NULL)
        {nb  = sizeof(tarhdr);
-        tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+        tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
         pp  = (char *) &p;
     
         while (TRUE)
