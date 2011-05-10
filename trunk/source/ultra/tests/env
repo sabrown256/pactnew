@@ -16,7 +16,6 @@ source ../../tests/common
 
 #--------------------------------------------------------------------------
 
-# there is no scheme dir (yet) for autotool until ultra is installed
    NoteD $Log ""
    NoteD $Log -n "                    ULTRA Env Test ............... "
    Note $Log ""
@@ -27,8 +26,9 @@ source ../../tests/common
    set UTime = `$TIMER -r`
    unsetenv SCHEME
    unsetenv ULTRA  
+   setenv DO_RUN_SUBMIT_ENV
    if ("$Valgrind" == "") then
-      flog $Log ($CFE $Ultra -e -n -s \(end\) >& ulenv.log)
+      flog $Log ($CFE $Ultra -n \(end\) >& ulenv.log)
       set xstatus = $status
    else
       ftee $Log $Valgrind $BinDir/ultra -e -n -s \(end\)  |& \

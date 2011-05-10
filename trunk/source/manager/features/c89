@@ -1,0 +1,11 @@
+#
+# C89 - define the use of ISO C89
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+setenv C_STD             C89
+

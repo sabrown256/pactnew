@@ -127,7 +127,7 @@ SS_psides *SX_init(char *code, char *vers, int c, char **v, char **env)
 
 /* PDB initializations */
     pdb_wr_hook = _SX_hash_hook;
-    SC_register_context(_SX_hash_hook, si);
+    SC_REGISTER_CONTEXT(_SX_hash_hook, si);
 
     _SX_init_hash_objects(si, SX_vif);
 
@@ -169,7 +169,7 @@ SS_psides *SX_init(char *code, char *vers, int c, char **v, char **env)
     SC_gs.strtod         = SC_strtod;
     SC_gs.type_container = _SX_type_container;
 
-    SC_register_context(_SX_type_container, si);
+    SC_REGISTER_CONTEXT(_SX_type_container, si);
 
     SX_file_exist_action = FAIL;
 

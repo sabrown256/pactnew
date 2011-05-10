@@ -18,7 +18,7 @@
 static void handler(int sig)
    {JMP_BUF *cpu;
 
-    cpu = SC_get_context(handler);
+    cpu = SC_GET_CONTEXT(handler);
 
     PM_clear_fpu();
     PM_enable_fpe_n(TRUE, handler, cpu);

@@ -690,8 +690,10 @@ pcons *_PA_process_units(va_list *list, pcons *alist)
  */
 
 hasharr *PA_install_table(char *s, void *vr, char *type, hasharr *tab)
-   {if (tab == NULL)
-       tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
+   {
+
+    if (tab == NULL)
+       tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
     SC_hasharr_install(tab, s, vr, type, TRUE, TRUE);
 

@@ -322,7 +322,7 @@ object *SS_mk_new_frame(SS_psides *si, object *name, hasharr *tab)
    {object *pt, *fr;
 
     if (tab == NULL)
-       tab = SC_make_hasharr(HSZHUGE, NODOC, SC_HA_NAME_KEY);
+       tab = SC_make_hasharr(HSZHUGE, NODOC, SC_HA_NAME_KEY, 0);
 
     pt = SS_mk_hasharr(si, tab);
 
@@ -348,7 +348,7 @@ static void SS_add_to_frame(SS_psides *si, char *vr, object *vl, hasharr *tab)
        {t = _SS_sprintf(si, "%s", vl);
 
 	nc = strlen(vr) + strlen(t) + 2;
-	s  = SC_permanent(CMAKE_N(char, nc));
+	s  = CPMAKE_N(char, nc, 3);
 	snprintf(s, nc, "%s=%s", vr+1, t);
 
 	ok = SC_putenv(s);
@@ -370,7 +370,7 @@ static object *_SS_mk_frame(SS_psides *si, object *fnm,
     char *name;
     hasharr *tab;
 
-    tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+    tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 
     if (SS_variablep(vrs))
        {name = SS_VARIABLE_NAME(vrs);
@@ -868,7 +868,7 @@ SS_psides *SS_get_current_scheme(int id)
 static void _SS_fpe_handler(int sig)
    {SS_psides *si;
 
-    si = SC_get_context(_SS_fpe_handler);
+    si = SC_GET_CONTEXT(_SS_fpe_handler);
 
 #ifdef SIGFPE
     SC_signal_n(SIGFPE, _SS_fpe_handler, si);
@@ -888,7 +888,7 @@ static void _SS_sig_handler(int sig)
    {char msg[MAXLINE];
     SS_psides *si;
 
-    si = SC_get_context(_SS_sig_handler);
+    si = SC_GET_CONTEXT(_SS_sig_handler);
 
     SC_signal_n(sig, SIG_IGN, NULL);
 
@@ -1078,7 +1078,7 @@ static void _SS_init_scheme(SS_psides *si)
     si->bracket_flag = FALSE;
 
 /* setup symbol table and install compiled primitives */
-    si->symtab = SC_make_hasharr(HSZHUGE, DOC, SC_HA_NAME_KEY);
+    si->symtab = SC_make_hasharr(HSZHUGE, DOC, SC_HA_NAME_KEY, 0);
     _SS_inst_prm(si);
     _SS_inst_const(si);
 
@@ -1089,7 +1089,7 @@ static void _SS_init_scheme(SS_psides *si)
     _SS_init_cont(si);
 
 /* syntax modes */
-    si->types            = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+    si->types            = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
     si->character_stream = NULL;
     si->eox              = FALSE;
     si->lex_text         = NULL;

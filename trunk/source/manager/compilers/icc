@@ -16,6 +16,9 @@ ERR_PATTERN  = ":+sp+error:"
 Tool CC {
    Exe      = icc
    Flags    = -wd267,1357
+   Flags   += [ _env_ = C_STD ;              # C standard flags
+                C89   = -std=c89 ;
+                C99   = -std=c99 ]
    Flags   += [ _env_ = Bits ;
                 64    = -fPIC ]
    Flags   += [ _cmd_ = -p ;                 # profiling

@@ -324,7 +324,7 @@ void PG_register_device(char *name, PFRDev fnc)
 
     if (_PG.device_table == NULL)
        {type = CSTRSAVE("PFVoid");
-	_PG.device_table = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+	_PG.device_table = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 
 /* register the default set of devices */
 	PG_register_device("SCREEN", PG_setup_window_device);

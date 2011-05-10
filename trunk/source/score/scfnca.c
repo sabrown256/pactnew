@@ -375,7 +375,7 @@ mode_t SC_get_perm(int exe)
 static void _SC_segv_handler(int signo)
    {JMP_BUF *cpu;
 
-    cpu = SC_get_context(_SC_segv_handler);
+    cpu = SC_GET_CONTEXT(_SC_segv_handler);
 
     LONGJMP(*cpu, 1);}
 
@@ -436,7 +436,7 @@ int SC_putenv(char *s)
    {int err;
     char *t;
 
-    t   = SC_permanent(CSTRSAVE(s));
+    t   = CSTRDUP(s, 3);
     err = putenv(t);
 
     return(err);}

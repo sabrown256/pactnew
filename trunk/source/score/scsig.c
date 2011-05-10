@@ -43,7 +43,7 @@ SC_contextdes SC_signal_n(int sig, PFSignal_handler fn, void *a)
    {PFSignal_handler fo;
     SC_contextdes rv;
 
-    rv.a = SC_get_context(fn);
+    rv.a = SC_GET_CONTEXT(fn);
 
 #ifdef USE_POSIX_SIGNALS
 
@@ -68,7 +68,7 @@ SC_contextdes SC_signal_n(int sig, PFSignal_handler fn, void *a)
 
     rv.f = fo;
 
-    SC_register_context(fn, a);
+    SC_REGISTER_CONTEXT(fn, a);
 
     return(rv);}
 
@@ -92,7 +92,7 @@ SC_contextdes SC_signal_action_n(int sig, PFSignal_handler fn, void *a,
    {PFSignal_handler fo;
     SC_contextdes rv;
 
-    rv.a = SC_get_context(fn);
+    rv.a = SC_GET_CONTEXT(fn);
 
 #ifdef USE_POSIX_SIGNALS
 
@@ -137,7 +137,7 @@ SC_contextdes SC_signal_action_n(int sig, PFSignal_handler fn, void *a,
 
     rv.f = fo;
 
-    SC_register_context(fn, a);
+    SC_REGISTER_CONTEXT(fn, a);
 
     return(rv);}
 
@@ -317,7 +317,7 @@ char *SC_signal_name(int sig)
    {int i;
 
     if (_SC.signame == NULL)
-       {_SC.signame = SC_permanent(CMAKE_N(char *, SC_NSIG));
+       {_SC.signame = CPMAKE_N(char *, SC_NSIG, 3);
 
 	for (i = 0; i < SC_NSIG; i++)
 	    _SC.signame[i] = "unknown";
@@ -518,30 +518,30 @@ void SC_setup_sig_handlers(PFSignal_handler hand, void *a, int fl)
     else
        hnd = SIG_IGN;
 
-    SC_signal_n(SIGSEGV, a, hnd);
-    SC_signal_n(SIGBUS,  a, hnd);
-    SC_signal_n(SIGFPE,  a, hnd);
-    SC_signal_n(SIGILL,  a, hnd);
+    SC_signal_n(SIGSEGV, hnd, a);
+    SC_signal_n(SIGBUS,  hnd, a);
+    SC_signal_n(SIGFPE,  hnd, a);
+    SC_signal_n(SIGILL,  hnd, a);
 
-    SC_signal_n(SIGINT,  a, hnd);
-    SC_signal_n(SIGHUP,  a, hnd);
-    SC_signal_n(SIGQUIT, a, hnd);
-    SC_signal_n(SIGTERM, a, hnd);
+    SC_signal_n(SIGINT,  hnd, a);
+    SC_signal_n(SIGHUP,  hnd, a);
+    SC_signal_n(SIGQUIT, hnd, a);
+    SC_signal_n(SIGTERM, hnd, a);
 
-    SC_signal_n(SIGALRM, a, hnd);
+    SC_signal_n(SIGALRM, hnd, a);
 
-    SC_signal_n(SIGTRAP, a, hnd);
-    SC_signal_n(SIGABRT, a, hnd);
+    SC_signal_n(SIGTRAP, hnd, a);
+    SC_signal_n(SIGABRT, hnd, a);
 
 #ifdef SIGIOT
-    SC_signal_n(SIGIOT,  a, hnd);
+    SC_signal_n(SIGIOT,  hnd, a);
 #endif
 
-    SC_signal_n(SIGPIPE, a, hnd);
-    SC_signal_n(SIGSYS,  a, hnd);
+    SC_signal_n(SIGPIPE, hnd, a);
+    SC_signal_n(SIGSYS,  hnd, a);
 
-    SC_signal_n(SIGUSR1, a, hnd);
-    SC_signal_n(SIGUSR2, a, hnd);
+    SC_signal_n(SIGUSR1, hnd, a);
+    SC_signal_n(SIGUSR2, hnd, a);
 
     return;}
 

@@ -93,7 +93,7 @@ fcdes *SC_scan_archive(char *arf)
        {nr = fread(s, 1, 8, fp);
 	fseek(fp, 0, SEEK_SET);
 	if (nr == 8)
-	   {tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+	   {tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 
 /* for a 64 bit archive */
 	    if (strncmp(s, AIAMAGBIG, SAIAMAG) == 0)
@@ -204,7 +204,7 @@ fcdes *SC_scan_archive(char *arf)
 	   {nb = sizeof(struct ar_hdr);
 	    p  = (char *) &hdr;
 
-	    tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+	    tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 	    ext = 0;
 
 	    while (TRUE)
@@ -283,7 +283,7 @@ fcdes *SC_scan_archive(char *arf)
 	   {nb = sizeof(struct ar_hdr);
 	    p  = (char *) &hdr;
 
-	    tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+	    tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 
 	    while (TRUE)
 	       {nr = fread(p, nb, 1, fp);
@@ -355,7 +355,7 @@ fcdes *SC_scan_archive(char *arf)
 	   {nb = sizeof(struct ar_hdr);
 	    p  = (char *) &hdr;
 
-	    tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+	    tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 	    ext = 0;
 
 	    while (TRUE)

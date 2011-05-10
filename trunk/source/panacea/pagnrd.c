@@ -99,7 +99,7 @@ void PA_intern_pck_db(void)
 hasharr *PA_inst_com(void)
    {
 
-    PA_alias_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
+    PA_alias_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
     PAN_COMMAND  = CSTRSAVE("PA_command");
 
 /* this call should be moved into PA_inst_pck_gen_cmmnds */
@@ -136,7 +136,7 @@ void PA_inst_c(char *cname, void *cvar, int ctype, int cnum,
    {PA_command *cp;
  
     if (PA_commands == NULL)
-       PA_commands  = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
+       PA_commands  = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
     cp          = CMAKE(PA_command);
     cp->name    = CSTRSAVE(cname);
@@ -397,7 +397,7 @@ void PA_read_file(char *str, int sfl)
 
     ONCE_SAFE(TRUE, NULL)
        _PA.input_stream = stdin;
-       _PA.inf          = CMAKE_ARRAY(FILE *, NULL, 1);
+       _PA.inf          = CMAKE_ARRAY(FILE *, NULL, 3);
     END_SAFE;
 
     if (sfl)

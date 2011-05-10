@@ -38,7 +38,7 @@ source ../../tests/common
                 -e '/bpi =/d'             \
                 -e '/order/d'             \
                 -e '/format/d'            \
-                -e 's/ . 5 7 6.98/ d 5 7 6.98/g'   \
+                -e 's/ . 0 5 7 6.98/ d 0 5 7 6.98/g'   \
                 -e 's/long_long/long/g'   \
                 -e 's/#([^A-Za-z)]*)//g' > sxhash.res
 

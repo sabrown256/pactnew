@@ -74,12 +74,21 @@ extern "C" {
 
 #ifdef __GNUC__
 
-/* introduced with C99 compiles */
-# define _POSIX_C_SOURCE   200112L
-# define _XOPEN_SOURCE     600
+# ifdef ISO_C99
+#  ifndef _POSIX_C_SOURCE
+#   define _POSIX_C_SOURCE   200112L
+#  endif
+#  ifndef _XOPEN_SOURCE
+#   define _XOPEN_SOURCE     600
+#  endif
+#  ifndef _DARWIN_C_SOURCE
+#   define _DARWIN_C_SOURCE
+#  endif
 
-int getpagesize(void);
+extern int
+ getpagesize(void);
 
+# endif
 
 # ifdef HAVE_GNU_LIBC_6
 

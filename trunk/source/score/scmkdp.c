@@ -84,7 +84,7 @@ static int _SC_is_newer_archive(char *fa, char *fb, time_t tb, anadep *state)
     fcent *ae;
 
     if (state->archives == NULL)
-       state->archives = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+       state->archives = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 
 /* get the name of the archive into arf */
     strcpy(arf, fa);

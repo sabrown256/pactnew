@@ -80,7 +80,7 @@ static int
 static void _SX_diff_signal(int sig)
    {differr *de;
 
-    de = SC_get_context(_SX_diff_signal);
+    de = SC_GET_CONTEXT(_SX_diff_signal);
 
     de->fpe = TRUE;
 
@@ -322,7 +322,7 @@ static int _SX_diff_indirection(SS_psides *si, char *nma, char *nmb,
     if ((pfa == NULL) || (pfb == NULL))
        return(ret);
 
-    de = SC_get_context(_SX_diff_signal);
+    de = SC_GET_CONTEXT(_SX_diff_signal);
 
     fpa = pfa->stream;
     fpb = pfb->stream;
@@ -703,7 +703,7 @@ static int _SX_diff_leaf(SS_psides *si, char *nma, char *nmb,
     PDBfile *pfc;
     differr *de;
 
-    de = SC_get_context(_SX_diff_signal);
+    de = SC_GET_CONTEXT(_SX_diff_signal);
 
     ret = FALSE;
     na  = PD_entry_number(epa);

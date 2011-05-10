@@ -556,17 +556,17 @@ static void _SC_eth_init(void)
 
        SC_THREAD_INIT_SYS();
 
-       _SC.eth_locks = CMAKE_ARRAY(SC_thread_lock *, NULL, 1);
+       _SC.eth_locks = CMAKE_ARRAY(SC_thread_lock *, NULL, 3);
 
        _SC_eth_push_lock(&SC_mm_lock, 0);
        _SC_eth_push_lock(&SC_mc_lock, 1);
        _SC_eth_push_lock(&SC_ts_lock, 2);
 
-       _SC.eth_keys = CMAKE_ARRAY(SC_thread_key *, NULL, 1);
+       _SC.eth_keys = CMAKE_ARRAY(SC_thread_key *, NULL, 3);
 
        _SC_eth_push_key(&SC_thread_oper->ikey, 0);
 
-       _SC.eth_conds = CMAKE_ARRAY(emu_cond_info, NULL, 1);
+       _SC.eth_conds = CMAKE_ARRAY(emu_cond_info, NULL, 3);
 
        _SC_init_emu_threads = TRUE;
 

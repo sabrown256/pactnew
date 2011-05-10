@@ -1297,7 +1297,7 @@ void prep_test_4_data(void)
     double *pd;
     haelem *hp;
 
-    tab4_w = SC_make_hasharr(3, NODOC, SC_HA_NAME_KEY);
+    tab4_w = SC_make_hasharr(3, NODOC, SC_HA_NAME_KEY, 0);
 
     CHAR_S   = CSTRSAVE("char *");
     SHORT_S  = CSTRSAVE("short *");

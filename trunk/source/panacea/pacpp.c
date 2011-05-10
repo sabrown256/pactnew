@@ -89,12 +89,11 @@ hasharr
 void PA_cpp_init(void)
    {
 
-    PA_cpp_name_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
+    PA_cpp_name_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
-    PA_cpp_value_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
+    PA_cpp_value_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
-    PAN_CPP_NODE = CSTRSAVE("PA_cpp_node");
-    SC_permanent(PAN_CPP_NODE);
+    PAN_CPP_NODE = CSTRDUP("PA_cpp_node", 3);
 
     return;}
 
@@ -276,87 +275,45 @@ char *PA_cpp_value_to_name(char *group, ...)
 void PA_cpp_default(void)
    {
 
-    PA_CPP_INFO        = CSTRSAVE("INFO");
-    PA_CPP_ALLOCATION  = CSTRSAVE("ALLOCATION");
-    PA_CPP_SCOPE       = CSTRSAVE("SCOPE");
-    PA_CPP_CLASS       = CSTRSAVE("CLASS");
-    PA_CPP_CENTER      = CSTRSAVE("CENTER");
-    PA_CPP_PERSISTENCE = CSTRSAVE("PERSISTENCE");
-    PA_CPP_UNITS       = CSTRSAVE("UNITS");
-    PA_CPP_TYPE        = CSTRSAVE("TYPE");
-    PA_CPP_TYPE_SC     = CSTRSAVE("TYPE_SC");
-    PA_CPP_TYPE_S      = CSTRSAVE("TYPE_S");
+    PA_CPP_INFO        = CSTRDUP("INFO", 3);
+    PA_CPP_ALLOCATION  = CSTRDUP("ALLOCATION", 3);
+    PA_CPP_SCOPE       = CSTRDUP("SCOPE", 3);
+    PA_CPP_CLASS       = CSTRDUP("CLASS", 3);
+    PA_CPP_CENTER      = CSTRDUP("CENTER", 3);
+    PA_CPP_PERSISTENCE = CSTRDUP("PERSISTENCE", 3);
+    PA_CPP_UNITS       = CSTRDUP("UNITS", 3);
+    PA_CPP_TYPE        = CSTRDUP("TYPE", 3);
+    PA_CPP_TYPE_SC     = CSTRDUP("TYPE_SC", 3);
+    PA_CPP_TYPE_S      = CSTRDUP("TYPE_S", 3);
 
-/* do not delete any of these strings */
-    SC_permanent(PA_CPP_INFO);
-    SC_permanent(PA_CPP_ALLOCATION);
-    SC_permanent(PA_CPP_SCOPE);
-    SC_permanent(PA_CPP_CLASS);
-    SC_permanent(PA_CPP_CENTER);
-    SC_permanent(PA_CPP_PERSISTENCE);
-    SC_permanent(PA_CPP_UNITS);
-    SC_permanent(PA_CPP_TYPE);
-    SC_permanent(PA_CPP_TYPE_SC);
-    SC_permanent(PA_CPP_TYPE_S);
-
-    PA_INFO_TYPE_S         = CSTRSAVE("PA_INFO_TYPE");
-    PA_INFO_N_DIMS_S       = CSTRSAVE("PA_INFO_N_DIMS");
-    PA_INFO_DIMS_S         = CSTRSAVE("PA_INFO_DIMS");
-    PA_INFO_SCOPE_S        = CSTRSAVE("PA_INFO_SCOPE");
-    PA_INFO_CLASS_S        = CSTRSAVE("PA_INFO_CLASS");
-    PA_INFO_CENTER_S       = CSTRSAVE("PA_INFO_CENTER");
-    PA_INFO_PERSISTENCE_S  = CSTRSAVE("PA_INFO_PERSISTENCE");
-    PA_INFO_ALLOCATION_S   = CSTRSAVE("PA_INFO_ALLOCATION");
-    PA_INFO_FILE_NAME_S    = CSTRSAVE("PA_INFO_FILE_NAME");
-    PA_INFO_INIT_VAL_S     = CSTRSAVE("PA_INFO_INIT_VAL");
-    PA_INFO_INIT_FNC_S     = CSTRSAVE("PA_INFO_INIT_FNC");
-    PA_INFO_CONV_S         = CSTRSAVE("PA_INFO_CONV");
-    PA_INFO_UNIT_S         = CSTRSAVE("PA_INFO_UNIT");
-    PA_INFO_KEY_S          = CSTRSAVE("PA_INFO_KEY");
-    PA_INFO_ATTRIBUTE_S    = CSTRSAVE("PA_INFO_ATTRIBUTE");
-    PA_INFO_UNITS_S        = CSTRSAVE("PA_INFO_UNITS");
-    PA_INFO_DATA_PTR_S     = CSTRSAVE("PA_INFO_DATA_PTR");
-    PA_INFO_UNIT_NUMER_S   = CSTRSAVE("PA_INFO_UNIT_NUMER");
-    PA_INFO_UNIT_DENOM_S   = CSTRSAVE("PA_INFO_UNIT_DENOM");
-    PA_INFO_APPL_ATTR_S    = CSTRSAVE("PA_INFO_APPL_ATTR");
-    PA_INFO_DEFAULT_S      = CSTRSAVE("PA_INFO_DEFAULT");
-    PA_INFO_SHARE_S        = CSTRSAVE("PA_INFO_SHARE");
-    PA_INFO_ATT_NAME_S     = CSTRSAVE("PA_INFO_ATT_NAME");
-    PA_INFO_DIM_NAME_S     = CSTRSAVE("PA_INFO_DIM_NAME");
-    PA_INFO_UNITS_NAME_S   = CSTRSAVE("PA_INFO_UNITS_NAME");
-    PA_INFO_DOMAIN_NAME_S  = CSTRSAVE("PA_INFO_DOMAIN_NAME");
-    PA_INFO_MAP_DOMAIN_S   = CSTRSAVE("PA_INFO_MAP_DOMAIN");
-    PA_INFO_BUILD_DOMAIN_S = CSTRSAVE("PA_INFO_BUILD_DOMAIN");
-
-/* do not delete any of these strings */
-    SC_permanent(PA_INFO_TYPE_S);
-    SC_permanent(PA_INFO_N_DIMS_S);
-    SC_permanent(PA_INFO_DIMS_S);
-    SC_permanent(PA_INFO_SCOPE_S);
-    SC_permanent(PA_INFO_CLASS_S);
-    SC_permanent(PA_INFO_CENTER_S);
-    SC_permanent(PA_INFO_PERSISTENCE_S);
-    SC_permanent(PA_INFO_ALLOCATION_S);
-    SC_permanent(PA_INFO_FILE_NAME_S);
-    SC_permanent(PA_INFO_INIT_VAL_S);
-    SC_permanent(PA_INFO_INIT_FNC_S);
-    SC_permanent(PA_INFO_CONV_S);
-    SC_permanent(PA_INFO_UNIT_S);
-    SC_permanent(PA_INFO_KEY_S);
-    SC_permanent(PA_INFO_ATTRIBUTE_S);
-    SC_permanent(PA_INFO_UNITS_S);
-    SC_permanent(PA_INFO_DATA_PTR_S);
-    SC_permanent(PA_INFO_UNIT_NUMER_S);
-    SC_permanent(PA_INFO_UNIT_DENOM_S);
-    SC_permanent(PA_INFO_APPL_ATTR_S);
-    SC_permanent(PA_INFO_DEFAULT_S);
-    SC_permanent(PA_INFO_SHARE_S);
-    SC_permanent(PA_INFO_ATT_NAME_S);
-    SC_permanent(PA_INFO_DIM_NAME_S);
-    SC_permanent(PA_INFO_UNITS_NAME_S);
-    SC_permanent(PA_INFO_DOMAIN_NAME_S);
-    SC_permanent(PA_INFO_MAP_DOMAIN_S);
-    SC_permanent(PA_INFO_BUILD_DOMAIN_S);
+    PA_INFO_TYPE_S         = CSTRDUP("PA_INFO_TYPE", 3);
+    PA_INFO_N_DIMS_S       = CSTRDUP("PA_INFO_N_DIMS", 3);
+    PA_INFO_DIMS_S         = CSTRDUP("PA_INFO_DIMS", 3);
+    PA_INFO_SCOPE_S        = CSTRDUP("PA_INFO_SCOPE", 3);
+    PA_INFO_CLASS_S        = CSTRDUP("PA_INFO_CLASS", 3);
+    PA_INFO_CENTER_S       = CSTRDUP("PA_INFO_CENTER", 3);
+    PA_INFO_PERSISTENCE_S  = CSTRDUP("PA_INFO_PERSISTENCE", 3);
+    PA_INFO_ALLOCATION_S   = CSTRDUP("PA_INFO_ALLOCATION", 3);
+    PA_INFO_FILE_NAME_S    = CSTRDUP("PA_INFO_FILE_NAME", 3);
+    PA_INFO_INIT_VAL_S     = CSTRDUP("PA_INFO_INIT_VAL", 3);
+    PA_INFO_INIT_FNC_S     = CSTRDUP("PA_INFO_INIT_FNC", 3);
+    PA_INFO_CONV_S         = CSTRDUP("PA_INFO_CONV", 3);
+    PA_INFO_UNIT_S         = CSTRDUP("PA_INFO_UNIT", 3);
+    PA_INFO_KEY_S          = CSTRDUP("PA_INFO_KEY", 3);
+    PA_INFO_ATTRIBUTE_S    = CSTRDUP("PA_INFO_ATTRIBUTE", 3);
+    PA_INFO_UNITS_S        = CSTRDUP("PA_INFO_UNITS", 3);
+    PA_INFO_DATA_PTR_S     = CSTRDUP("PA_INFO_DATA_PTR", 3);
+    PA_INFO_UNIT_NUMER_S   = CSTRDUP("PA_INFO_UNIT_NUMER", 3);
+    PA_INFO_UNIT_DENOM_S   = CSTRDUP("PA_INFO_UNIT_DENOM", 3);
+    PA_INFO_APPL_ATTR_S    = CSTRDUP("PA_INFO_APPL_ATTR", 3);
+    PA_INFO_DEFAULT_S      = CSTRDUP("PA_INFO_DEFAULT", 3);
+    PA_INFO_SHARE_S        = CSTRDUP("PA_INFO_SHARE", 3);
+    PA_INFO_ATT_NAME_S     = CSTRDUP("PA_INFO_ATT_NAME", 3);
+    PA_INFO_DIM_NAME_S     = CSTRDUP("PA_INFO_DIM_NAME", 3);
+    PA_INFO_UNITS_NAME_S   = CSTRDUP("PA_INFO_UNITS_NAME", 3);
+    PA_INFO_DOMAIN_NAME_S  = CSTRDUP("PA_INFO_DOMAIN_NAME", 3);
+    PA_INFO_MAP_DOMAIN_S   = CSTRDUP("PA_INFO_MAP_DOMAIN", 3);
+    PA_INFO_BUILD_DOMAIN_S = CSTRDUP("PA_INFO_BUILD_DOMAIN", 3);
 
     PA_cpp_add_group(PA_CPP_INFO,        SC_INT_I, NULL);
     PA_cpp_add_group(PA_CPP_ALLOCATION,  SC_INT_I, NULL);

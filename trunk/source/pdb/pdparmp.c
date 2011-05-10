@@ -966,22 +966,9 @@ static void _PD_pfm_init_d(void)
     SC_LOCKON(pflist_lock_d);
 
     if (_PD_pflst == NULL)
-       {pf = SC_alloc_n(PFM_N_FILES, sizeof(pfelement),
-			SC_MEM_ATTR_PERMANENT,  TRUE,
-			SC_MEM_ATTR_NO_ACCOUNT, TRUE,
-			SC_MEM_ATTR_FUNC, __func__,
-			SC_MEM_ATTR_FILE, __FILE__,
-			SC_MEM_ATTR_LINE, __LINE__,
-			0);
+       {pf = CPMAKE_N(pfelement, PFM_N_FILES, 3);
 
-        _PD_pflst = SC_alloc_n(1, sizeof(pflist),
-			       SC_MEM_ATTR_PERMANENT,  TRUE,
-			       SC_MEM_ATTR_NO_ACCOUNT, TRUE,
-			       SC_MEM_ATTR_FUNC, __func__,
-			       SC_MEM_ATTR_FILE, __FILE__,
-			       SC_MEM_ATTR_LINE, __LINE__,
-			       0);
-
+        _PD_pflst       = CPMAKE(pflist, 3);
 	_PD_pflst->elem = pf;
         _PD_pflst->len  = PFM_N_FILES;
 

@@ -12,11 +12,15 @@
 #ifndef PCK_COMMON
 #define PCK_COMMON
 
-/* introduced with C99 compiles */
+#define ISO_C99
 
-#ifdef __GNUC__
-# define _POSIX_C_SOURCE   200112L
-# define _XOPEN_SOURCE     600
+/* introduced with C99 compiles */
+#ifdef ISO_C99
+# ifdef __GNUC__
+#  define _POSIX_C_SOURCE   200112L
+#  define _XOPEN_SOURCE     600
+#  define _DARWIN_C_SOURCE
+# endif
 #endif
 
 #include <unistd.h>

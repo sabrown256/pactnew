@@ -1086,7 +1086,7 @@ static int _SC_set_query_state(int fd)
 static void _SC_get_term_timeout(int sig)
    {JMP_BUF *cpu;
 
-    cpu = SC_get_context(_SC_get_term_timeout);
+    cpu = SC_GET_CONTEXT(_SC_get_term_timeout);
 
     LONGJMP(*cpu, ABORT);}
 

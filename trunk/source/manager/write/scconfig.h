@@ -65,27 +65,22 @@ source $ldir/env-csh
     endif
 
     Note $STDOUT '#define USE_COMPILER        '$QUOTE$CC_Exe$QUOTE
-    if ($PACT_CC_FAMILY == GNU) then
+    if ($?PACT_CC_FAMILY == 1) then
        Note $STDOUT '#define COMPILER_'$PACT_CC_FAMILY
        Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}$PACT_CC_VERSION${QUOTE}
+    else
+       Note $STDOUT '#define COMPILER_UNKNOWN
+       Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}unknown${QUOTE}
     endif
 
-    if ($HostOS != SunOS) then
-       if ($PACT_CC_FAMILY == PGI) then
-          Note $STDOUT '#define COMPILER_'$PACT_CC_FAMILY
-          Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}$PACT_CC_VERSION${QUOTE}
-       endif
-
-       if ($PACT_CC_FAMILY == INTEL) then
-          Note $STDOUT '#define COMPILER_'$PACT_CC_FAMILY
-          Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}$PACT_CC_VERSION${QUOTE}
-       endif
-
-       if ($PACT_CC_FAMILY == PATHSCALE) then
-          Note $STDOUT '#define COMPILER_'$PACT_CC_FAMILY
-          Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}$PACT_CC_VERSION${QUOTE}
-       endif
-    endif
+    switch ($C_STD)
+       case C99:
+            Note $STDOUT '#define ISO_C99'
+            breaksw
+       case C89:
+            Note $STDOUT '#define ISO_C89'
+            breaksw
+    endsw
 
     Note $STDOUT '#define DEFAULT_SHELL       '$QUOTE$DEFAULT_SHELL$QUOTE
 
@@ -189,12 +184,6 @@ source $ldir/env-csh
        endif
     end
     Note $STDOUT ""
-
-    if (($HostOS == AIX) && ($HaveCOMPLEX == TRUE)) then
-       Note $STDOUT '/* in lieu of xlc option: -qlanglvl=c99complexheader */'
-       Note $STDOUT '# define __C99_COMPLEX_HEADER__'
-       Note $STDOUT ''
-    endif
 
     if (($HaveVACOPY != TRUE) && ($HaveVALIST == FALSE)) then
        Note $STDOUT "#define NO_VA_LIST"

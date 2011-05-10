@@ -773,18 +773,12 @@ void _PD_init_consts(void)
    {
 
     if (PD_DEFSTR_S == NULL)
-       {LAST = SC_alloc_n(1, sizeof(int),
-			  SC_MEM_ATTR_PERMANENT,  TRUE,
-			  SC_MEM_ATTR_NO_ACCOUNT, TRUE,
-			  SC_MEM_ATTR_FUNC, __func__,
-			  SC_MEM_ATTR_FILE, __FILE__,
-			  SC_MEM_ATTR_LINE, __LINE__,
-			  0);
+       {LAST  = CPMAKE(int, 3);
         *LAST = 0;
 
-        PD_DEFSTR_S = SC_mem_attrs(CSTRSAVE("defstr *"), 3);
-        SYMENT_P_S  = SC_mem_attrs(CSTRSAVE("syment *"), 3);
-        SYMENT_S    = SC_mem_attrs(CSTRSAVE("syment"), 3);};
+        PD_DEFSTR_S = CSTRDUP("defstr *", 3);
+        SYMENT_P_S  = CSTRDUP("syment *", 3);
+        SYMENT_S    = CSTRDUP("syment", 3);};
 
     return;}
 

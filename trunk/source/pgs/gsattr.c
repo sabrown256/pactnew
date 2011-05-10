@@ -396,7 +396,7 @@ void PG_setup_attrs_glb(void)
    {
 
     if (_PG.attr_table == NULL)
-       {_PG.attr_table = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
+       {_PG.attr_table = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
 	_PG_gattrs.axis_char_size        = 1;
 	_PG_gattrs.axis_grid_on          = FALSE;

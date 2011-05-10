@@ -132,8 +132,7 @@ static void _SC_server_handler(int sig)
     asyncstate *as;
     parstate *state;
 
-    as    = SC_get_context(_SC_server_handler);
-/*    as    = &_SC_server_state; */
+    as    = SC_GET_CONTEXT(_SC_server_handler);
     state = as->server;
 
     SC_setup_sig_handlers(_SC_server_handler, as, FALSE);

@@ -1,0 +1,11 @@
+#
+# C99 - define the use of ISO C99
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+setenv C_STD             C99
+

@@ -598,7 +598,7 @@ static PG_device *_PG_X_open_screen(PG_device *dev,
     window_name = dev->title;
 
     if (_PG_X_point_list == NULL)
-       _PG_X_point_list = CMAKE_ARRAY(XPoint, NULL, 1);
+       _PG_X_point_list = CMAKE_ARRAY(XPoint, NULL, 3);
 
 /* GOTCHA: if we do this it will be a memory leak
     window_name = CSTRSAVE(dev->title);

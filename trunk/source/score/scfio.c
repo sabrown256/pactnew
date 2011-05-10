@@ -1376,7 +1376,7 @@ static FILE *_SC_ropen(char *name, char *mode)
 
 /* if no host table initialize it */
     if (_SC.hosts == NULL)
-       _SC.hosts = SC_make_hasharr(HSZSMALL, FALSE, SC_HA_NAME_KEY);
+       _SC.hosts = SC_make_hasharr(HSZSMALL, FALSE, SC_HA_NAME_KEY, 0);
 
     strcpy(host, "local");
     strcpy(fname, name);

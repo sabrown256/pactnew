@@ -669,13 +669,13 @@ int PG_set_axis_attributes(PG_device *dev, ...)
     prec = TEXT_CHARACTER_PRECISION;
 
     if (_PG_gattrs.axis_label_x_format == NULL)
-       _PG_gattrs.axis_label_x_format = SC_permanent(CSTRSAVE("%10.2g"));
+       _PG_gattrs.axis_label_x_format = CSTRDUP("%10.2g", 3);
 
     if (_PG_gattrs.axis_label_y_format == NULL)
-       _PG_gattrs.axis_label_y_format = SC_permanent(CSTRSAVE("%10.2g"));
+       _PG_gattrs.axis_label_y_format = CSTRDUP("%10.2g", 3);
 
     if (_PG_gattrs.axis_type_face == NULL)
-       _PG_gattrs.axis_type_face = SC_permanent(CSTRSAVE("helvetica"));
+       _PG_gattrs.axis_type_face = CSTRDUP("helvetica", 3);
 
     charspace = 0.0;
     chpth[0]  = 1.0;

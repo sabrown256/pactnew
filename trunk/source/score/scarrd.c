@@ -38,31 +38,18 @@ void SC_da_clear(SC_dynamic_array *a, int d, int bpi)
  */
 
 void SC_da_init(SC_dynamic_array *a, int bpi, char *tn, int d, char *name)
-    {int n, prm, na;
+    {int n, flags;
      char *s, *lst;
 
-     prm = (strncmp(name, "PERM|", 5) == 0);
-     na  = (prm == TRUE);
+     flags = (strncmp(name, "PERM|", 5) == 0) ? 3 : 0;
 
      n = strlen(tn) + 4;
 
-     s = SC_alloc_n(n, sizeof(char),
-		    SC_MEM_ATTR_PERMANENT,  prm,
-		    SC_MEM_ATTR_NO_ACCOUNT, na,
-		    SC_MEM_ATTR_FUNC, __func__,
-		    SC_MEM_ATTR_FILE, __FILE__,
-		    SC_MEM_ATTR_LINE, __LINE__,
-		    0);
-
+     s = CPMAKE_N(char, n, flags);
      snprintf(s, n, "%s *", tn);
 
      n   = d*bpi;
-     lst = SC_alloc_n(n, sizeof(char),
-		      SC_MEM_ATTR_NO_ACCOUNT, na,
-		      SC_MEM_ATTR_FUNC, __func__,
-		      SC_MEM_ATTR_FILE, __FILE__,
-		      SC_MEM_ATTR_LINE, __LINE__,
-		      0);
+     lst = CPMAKE_N(char, n, flags);
 
      SC_mark(lst, 1);
 

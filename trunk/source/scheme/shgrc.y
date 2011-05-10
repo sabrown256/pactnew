@@ -1725,7 +1725,7 @@ object *SS_parse_string_c(SS_psides *si)
 
     if (s == NULL)
        {ns = MAX_BFSZ;
-	s  = SC_permanent(CMAKE_N(char, ns));
+	s  = CPMAKE_N(char, ns, 3);
 	memset(s, 0, ns);};
 
     strcpy(s, "\"");

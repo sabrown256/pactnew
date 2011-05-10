@@ -61,7 +61,7 @@ int make_lrm(void)
     zs = SC_zero_space(2);
 
     if (curves == NULL)
-       curves = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+       curves = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 
     mesh = PM_make_lr_mesh(parts, curves,
 			   SWTCH[17], SWTCH[15], SWTCH[16],
@@ -709,7 +709,7 @@ PM_conic_curve *rd_cline(char *s)
     PM_conic_curve *cur;
 
     if (curves == NULL)
-       {curves = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+       {curves = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
         MESH_CURVE = CSTRSAVE("PM_conic_curve");};
 
     PA_ERR((SC_hasharr_lookup(curves, s) != NULL),

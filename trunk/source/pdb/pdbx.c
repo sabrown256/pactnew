@@ -194,9 +194,9 @@ int PD_def_attribute(PDBfile *file, char *at, char *type)
        PD_def_attr_str(file);
   
     if (file->attrtab == NULL)
-       {file->attrtab   = SC_make_hasharr(HSZSMINT, NODOC, SC_HA_NAME_KEY);
-        ATTRIBUTE       = SC_permanent(CSTRSAVE("attribute *"));
-        ATTRIBUTE_VALUE = SC_permanent(CSTRSAVE("attribute_value *"));};
+       {file->attrtab   = SC_make_hasharr(HSZSMINT, NODOC, SC_HA_NAME_KEY, 0);
+        ATTRIBUTE       = CSTRDUP("attribute *", 3);
+        ATTRIBUTE_VALUE = CSTRDUP("attribute_value *", 3);};
 
     if (SC_LAST_CHAR(type) == '*')
        snprintf(atype, MAXLINE, "%s**", type);
@@ -431,42 +431,15 @@ int PD_def_pdb_types(PDBfile *file)
 
 int PD_def_hash_types(PDBfile *file, int flag)
    {int err;
-    defstr *dp;
 
     err = TRUE;
 
     if (flag & 0x1)
-       {dp = PD_defstr(file, "haelem",
-		       "long iht",
-		       "long iar",
-		       "char *name", 
-		       "char *type", 
-		       "char *def", 
-		       "int free", 
-		       "haelem *next", 
-		       LAST);
-	if (dp == NULL)
-	   {PD_error("COULDN'T DEFINE HASHEL - PD_DEF_HASH_TYPES", PD_GENERIC);
-	    err = FALSE;};
-
-	err &= PD_cast(file, "haelem", "def", "type");};
+       PD_DEFINE_HAELEM(file);
 
     if (flag & 0x2)
        {PD_DEFINE_SMART_ARRAY(file);
-
-        dp = PD_defstr(file, "hasharr",
-		       "int size", 
-		       "int docp", 
-		       "long ne", 
-		       "function hash",
-		       "function comp",
-		       "char *key_type", 
-		       "haelem **table", 
-		       "SC_array *a", 
-		       LAST);
-	if (dp == NULL)
-	   {PD_error("COULDN'T DEFINE hasharr - PD_DEF_HASH_TYPES", PD_GENERIC);
-	    err = FALSE;};};
+	PD_DEFINE_HASHARRAY(file);};
 
     return(err);}
 
@@ -1153,12 +1126,12 @@ int PD_def_mapping(PDBfile *fp)
 
     ONCE_SAFE(TRUE, NULL)
 
-       SC_PCONS_P_S         = SC_permanent(CSTRSAVE("pcons *"));
-       PM_SET_S             = SC_permanent(CSTRSAVE("PM_set"));
-       PM_SET_P_S           = SC_permanent(CSTRSAVE("PM_set *"));
-       PM_MESH_TOPOLOGY_P_S = SC_permanent(CSTRSAVE("PM_mesh_topology *"));
-       PM_MAPPING_P_S       = SC_permanent(CSTRSAVE("PM_mapping *"));
-       PM_MAPPING_S         = SC_permanent(CSTRSAVE("PM_mapping"));
+       SC_PCONS_P_S         = CSTRDUP("pcons *", 3);
+       PM_SET_S             = CSTRDUP("PM_set", 3);
+       PM_SET_P_S           = CSTRDUP("PM_set *", 3);
+       PM_MESH_TOPOLOGY_P_S = CSTRDUP("PM_mesh_topology *", 3);
+       PM_MAPPING_P_S       = CSTRDUP("PM_mapping *", 3);
+       PM_MAPPING_S         = CSTRDUP("PM_mapping", 3);
     END_SAFE;
 
 /* define the SC_array */

@@ -59,15 +59,41 @@ struct s_haelem
     int free;                /* whether def member was marked (SC_mark?) */
     struct s_haelem *next;}; /* next haelem in linked list */
 
+#define PD_DEFINE_HAELEM(_f)                                       \
+   {PD_defstr(_f, "haelem",                                        \
+	      "long iht",                                          \
+	      "long iar",                                          \
+	      "char *name",                                        \
+	      "char *type",                                        \
+	      "char *def",                                         \
+	      "int free",                                          \
+	      "haelem *next",                                      \
+	      LAST);                                               \
+    PD_cast(_f, "haelem", "def", "type");}
+
 struct s_hasharr
    {int size;                /* number of buckets */
     int docp;                /* TRUE iff doc available in hash elements */
+    int memfl;               /* memory control flags */
     long ne;                 /* number of elements */
     PFKeyHash hash;          /* hash function */
     PFIntBin comp;           /* key equality comparison function */
     char *key_type;          /* type of the key used: name or address */
     haelem **table;          /* size worth of buckets of haelem pointers */
     SC_array *a;};
+
+#define PD_DEFINE_HASHARRAY(_f)                                    \
+    PD_defstr(_f, "hasharr",                                       \
+	      "int size",                                          \
+	      "int docp",                                          \
+	      "int memfl",                                         \
+	      "long ne",                                           \
+	      "function hash",                                     \
+	      "function comp",                                     \
+	      "char *key_type",                                    \
+	      "haelem **table",                                    \
+	      "SC_array *a",                                       \
+	      LAST)
 
 /*--------------------------------------------------------------------------*/
 
@@ -78,7 +104,7 @@ struct s_hasharr
 /* SCTAB.C declarations */
 
 extern hasharr
- *SC_make_hasharr(int sz, int docflag, char *lm);
+ *SC_make_hasharr(int sz, int docflag, char *lm, int flags);
 
 extern haelem
  *SC_hasharr_install(hasharr *ha, void *key, void *obj, char *type,

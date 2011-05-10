@@ -954,8 +954,8 @@ void SX_register_devices(void)
 	 strcpy(uname, devs[i]);
 	 SC_str_upper(uname);
 
-	 out->dname = SC_permanent(CSTRSAVE(lname));
-	 out->dupp  = SC_permanent(CSTRSAVE(uname));
+	 out->dname = CSTRDUP(lname, 3);
+	 out->dupp  = CSTRDUP(uname, 3);
 
 	 dev = PG_make_device(uname, "COLOR", "tmp");
 	 out->exist = (dev != NULL);

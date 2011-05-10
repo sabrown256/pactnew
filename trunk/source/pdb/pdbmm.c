@@ -57,9 +57,9 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
 	file->name       = CSTRSAVE(name);
 	file->type       = NULL;
 
-	file->symtab            = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
-	file->chart             = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
-	file->host_chart        = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+	file->symtab            = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
+	file->chart             = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
+	file->host_chart        = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 	file->attrtab           = NULL;
 	file->mode              = PD_UNINIT;
 	file->file_mode         = CSTRSAVE(md);

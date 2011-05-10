@@ -18,6 +18,9 @@ setenv MPIGoodIO   TRUE
 Tool CC {
    Exe       = mpicc
    Flags     = -fsignaling-nans -ffloat-store
+   Flags    += [ _env_ = C_STD ;             # C standard flags
+                 C89   = -std=c89 ;
+                 C99   = -std=c99 ]
    Flags    += [ _env_ = Bits ;              # address bit size
                  *     = -m* ]
    Flags    += [ _cmd_ = -p ;                # profiling

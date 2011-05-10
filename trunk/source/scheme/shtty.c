@@ -177,7 +177,7 @@ int SS_printf(FILE *fp, char *fmt, ...)
     FILE *hp;
     SS_psides *si;
 
-    si = SC_get_context(SS_printf);
+    si = SC_GET_CONTEXT(SS_printf);
 
     SC_VA_START(fmt);
     s = _SS_vdsnprintf(TRUE, fmt, __a__);
@@ -214,7 +214,7 @@ int SS_fputs(const char *s, FILE *fp)
     FILE *hp;
     SS_psides *si;
 
-    si = SC_get_context(SS_fputs);
+    si = SC_GET_CONTEXT(SS_fputs);
 
     rv = 0;
     if (fp != NULL)

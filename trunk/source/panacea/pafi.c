@@ -554,7 +554,7 @@ static void _PA_rd_dd_tab(PA_package *pck, FILE *fp)
     PA_tab_head *pt;
 
     if (ddtab == NULL)
-       ddtab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
+       ddtab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
     old_delim = PA_token_delimiters;
 
@@ -823,9 +823,10 @@ void PA_install_function(char *s, PFVoid fnc)
     addr.funcaddr = (PFInt) fnc;
 
     if (PA_symbol_tab == NULL)
-       PA_symbol_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
+       PA_symbol_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
-    SC_hasharr_install(PA_symbol_tab, s, addr.memaddr, "procedure", FALSE, TRUE);
+    SC_hasharr_install(PA_symbol_tab, s, addr.memaddr,
+		       "procedure", FALSE, TRUE);
 
     return;}
 
@@ -840,7 +841,7 @@ void PA_install_identifier(char *s, void *vr)
    {
 
     if (PA_symbol_tab == NULL)
-       PA_symbol_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
+       PA_symbol_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
 /* GOTCHA: The variable may or may not be dynamic, so don't mark it.
  *         It's up to the caller to be aware of the reference count.
@@ -858,10 +859,10 @@ void PA_add_hook(char *name, void *fnc)
    {SC_address ad;
 
     if (PA_symbol_tab == NULL)
-       PA_symbol_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY);
+       PA_symbol_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
     ad.funcaddr = (PFInt) fnc;
-    SC_hasharr_install(PA_symbol_tab, name, (void *) ad.memaddr, 
+    SC_hasharr_install(PA_symbol_tab, name, ad.memaddr, 
 		       SC_POINTER_S, FALSE, TRUE);
 
     return;}

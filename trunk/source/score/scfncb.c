@@ -400,7 +400,7 @@ int SC_get_ncpu(void)
 # include <machine/hal_sysinfo.h>
 
    np = -1;
-   getsysinfo(GSI_CPUS_IN_BOX, (caddr_t) &np, sizeof(np),
+   getsysinfo(GSI_CPUS_IN_BOX, &np, sizeof(np),
               NULL, NULL, NULL);
 
 #else

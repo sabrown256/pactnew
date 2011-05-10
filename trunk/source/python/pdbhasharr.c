@@ -370,7 +370,7 @@ PP_hasharr_tp_init(PP_hasharrObject *self, PyObject *args, PyObject *kwds)
                                      &size, &docflag))
         return -1;
 
-    tab = SC_make_hasharr(size, docflag, SC_HA_NAME_KEY);
+    tab = SC_make_hasharr(size, docflag, SC_HA_NAME_KEY, 0);
     if (tab == NULL) {
         return -1;
     }

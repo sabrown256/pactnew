@@ -91,7 +91,7 @@
     (((_d)->ref_count == SC_MEM_MFA) && ((_d)->type == SC_MEM_MFB))
 
 #define FTN_NAME(desc)                                                      \
-    ((SC_FTN_NAME_MASK & (desc)->id) == 0)
+    ((SC_FTN_NAME_MASK & (desc)->id) != 0)
 
 #define SAVE_LINKS(desc)                                                    \
    {prev = desc->prev;                                                      \
@@ -246,11 +246,7 @@ extern void
  *_SC_alloc_n(long ni, long bpi, void *a),
  *SC_alloc_n(long ni, long bpi, ...),
  *_SC_realloc_n(void *p, long nitems, long bpi, void *a),
- *SC_realloc_n(void *p, long nitems, long bpi, ...),
- *_SC_nalloc_w(long nitems, long bpi, int na, int zsp,
-	       const char *fnc, const char *file, int line),
- *_SC_alloc_w(long nitems, long bpi, char *name, int na, int zsp),
- *_SC_realloc_w(void *p, long nitems, long bpi, int na, int zsp);
+ *SC_realloc_n(void *p, long nitems, long bpi, ...);
 
 extern void
  _SC_init_heap(SC_heap_des *ph, int id);
@@ -258,17 +254,22 @@ extern void
 extern int
  _SC_free_n(void *p, void *a),
  SC_free_n(void *p, ...),
- _SC_free_w(void *p, int zsp),
  SC_is_score_space(void *p, mem_header **psp, mem_descriptor **pds);
 
 extern long
  _SC_bin_index(long n);
 
 
-/* SCMEMD.C declarations */
+/* SCMEMDA.C declarations */
+
+extern void
+ *_SC_nalloc_w(long nitems, long bpi, int memfl, int zsp,
+	       const char *fnc, const char *file, int line),
+ *_SC_alloc_w(long nitems, long bpi, char *name, int memfl, int zsp),
+ *_SC_realloc_w(void *p, long nitems, long bpi, int memfl, int zsp);
 
 extern int
- _SC_name_ok(char *name, int flag);
+ _SC_free_w(void *p, int zsp);
 
 extern char
  *_SC_block_name(mem_descriptor *desc);

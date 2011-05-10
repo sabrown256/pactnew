@@ -633,7 +633,7 @@ void SS_add_parser(char *ext, object *(*prs)(SS_psides *si))
    {SC_address ad;
 
     if (_SS.parser_tab == NULL)
-       {_SS.parser_tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY);
+       {_SS.parser_tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 
 	SS_add_parser(".scm", _SSI_scheme_mode);};
 

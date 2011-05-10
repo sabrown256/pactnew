@@ -63,6 +63,7 @@ struct s_SC_array
   {char *name;
    char *type;                                   /* type of array elements */
    int bpi;                                              /* bytes per item */
+   int memfl;                                              /* memory flags */
    long n;                                       /* max referenced element */
    long nx;                                /* number of elements allocated */
    double gf;                                             /* growth factor */
@@ -75,6 +76,7 @@ struct s_SC_array
                     "char *name",                                  \
                     "char *type",                                  \
                     "int bpi",                                     \
+                    "int memfl",                                   \
                     "long n",                                      \
                     "long nx",                                     \
                     "double gf",                                   \

@@ -15,11 +15,15 @@
 
 /* _SC_ALLOC_W - wrapper for _SC_alloc_n */
 
-void *_SC_alloc_w(long nitems, long bpi, char *name, int na, int zsp)
-   {void *p;
+void *_SC_alloc_w(long nitems, long bpi, char *name, int memfl, int zsp)
+   {int prm, na;
+    void *p;
     SC_mem_opt opt;
 
-    opt.perm = FALSE;
+    prm = ((memfl & 1) != 0);
+    na  = ((memfl & 2) != 0);
+
+    opt.perm = prm;
     opt.na   = na;
     opt.zsp  = zsp;
     opt.typ  = -1;
@@ -36,12 +40,16 @@ void *_SC_alloc_w(long nitems, long bpi, char *name, int na, int zsp)
 
 /* _SC_NALLOC_W - wrapper for _SC_alloc_n */
 
-void *_SC_nalloc_w(long nitems, long bpi, int na, int zsp,
+void *_SC_nalloc_w(long nitems, long bpi, int memfl, int zsp,
 		   const char *fnc, const char *file, int line)
-   {void *p;
+   {int prm, na;
+    void *p;
     SC_mem_opt opt;
 
-    opt.perm = FALSE;
+    prm = ((memfl & 1) != 0);
+    na  = ((memfl & 2) != 0);
+
+    opt.perm = prm;
     opt.na   = na;
     opt.zsp  = zsp;
     opt.typ  = -1;
@@ -58,11 +66,15 @@ void *_SC_nalloc_w(long nitems, long bpi, int na, int zsp,
 
 /* _SC_REALLOC_W - wrapper for _SC_realloc_n */
 
-void *_SC_realloc_w(void *p, long nitems, long bpi, int na, int zsp)
-   {void *rv;
+void *_SC_realloc_w(void *p, long nitems, long bpi, int memfl, int zsp)
+   {int prm, na;
+    void *rv;
     SC_mem_opt opt;
 
-    opt.perm = FALSE;
+    prm = ((memfl & 1) != 0);
+    na  = ((memfl & 2) != 0);
+
+    opt.perm = prm;
     opt.na   = na;
     opt.zsp  = zsp;
     opt.typ  = -1;
@@ -362,43 +374,6 @@ void *SC_copy_item(void *in)
 
 /*---------------------------------------------------------------------------*/
 
-/* _SC_NAME_OK - filter names for PACT function names */
-
-int _SC_name_ok(char *name, int flag)
-   {int i, n, rv;
-    char t[MAXLINE];
-    static char *prefixes[] = { "_SC_", "SC_", "_PM_", "PM_", "_PD_", "PD_",
-				"_PC_", "PC_", "_PG_", "PG_", "_PA_", "PA_",
-				"_SH_", "SH_", "_SX_", "SX_", "_UL_", "ULA_",
-				"PAAREC", "PABREC", "PAGRID", "PATRNL",
-				"PATRNN", "PAMRGN"};
-
-    rv = FALSE;
-
-    if (name != NULL)
-       {rv = TRUE;
-	n  = sizeof(prefixes)/sizeof(char *);
-	if (flag & 1)
-	   {for (i = 0; i < n; i++)
-	        {if (strncmp(name, prefixes[i], strlen(prefixes[i])) == 0)
-		    break;
-
-		 snprintf(t, MAXLINE, "char*:%s", prefixes[i]);
-		 if (strncmp(name, t, strlen(t)) == 0)
-		    break;};
-
-	    if (i >= n)
-	       rv = FALSE;};
-
-	if ((flag & 2) && (rv == TRUE))
-	   {if (strncmp(name, "PERM|", 5) == 0)
-	       rv = FALSE;};};
-
-    return(rv);}
-
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
-
 /* _SC_BLOCK_NAME - return the name associated with the object P */
 
 char *_SC_block_name(mem_descriptor *desc)
@@ -431,7 +406,7 @@ char *_SC_block_name(mem_descriptor *desc)
  */
 
 void _SC_print_block_info(FILE *fp, SC_heap_des *ph, void *ptr, int flag)
-   {int j, nc, nr, nf;
+   {int j, nc, nr, nf, acc;
     long nb;
     char bf[MAXLINE], c;
     char *name, *ps, *pc;
@@ -466,7 +441,8 @@ void _SC_print_block_info(FILE *fp, SC_heap_des *ph, void *ptr, int flag)
 	    SC_strncpy(bf, MAXLINE, name, nc);
 	    name = bf;};
 		     
-	if ((_SC_name_ok(name, flag)) && (desc->ref_count != UNCOLLECT))
+	acc  = ((flag & 8) || (desc->ref_count != UNCOLLECT));
+	if ((name != NULL) && (acc == TRUE))
 	   {if (sizeof(char *) == 4)
 	       io_printf(fp, "   0x%012lx %9ld %3d\t%s",
 			 space+1, nb, nr, name);
@@ -635,11 +611,11 @@ int SC_reg_mem(void *p, long length, char *name)
     haelem *hp;
 
     if (_SC.mem_table == NULL)
-       _SC.mem_table = SC_make_hasharr(1001, FALSE, SC_HA_ADDR_KEY);
+       _SC.mem_table = SC_make_hasharr(1001, FALSE, SC_HA_ADDR_KEY, 0);
 
     ph = _SC_tid_mm();
 
-    pd = SC_permanent(CMAKE(mem_descriptor));
+    pd = CPMAKE(mem_descriptor, 3);
 
     pd->heap      = ph;
     pd->func      = name;
@@ -990,7 +966,7 @@ void *SC_mem_attrs(void *p, int attr)
  * this is not the same as doing the allocation with NA == TRUE
  * the difference and maximum difference could be different
  */
-	else if (attr & 2)
+	if (attr & 2)
 	   {uint64_t a, f, nb;
 
 	    SC_mem_statb(&a, &f, NULL, NULL);

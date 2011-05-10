@@ -59,7 +59,7 @@ static void close_command(PROCESS *pp)
 static void interrupt_handler(int sig)
    {info *facts;
 
-    facts = SC_get_context(interrupt_handler);
+    facts = SC_GET_CONTEXT(interrupt_handler);
 
     close_command(facts->pp);
 
@@ -77,7 +77,7 @@ static void report_handler(int sig)
     FILE *lf;
     info *facts;
 
-    facts = SC_get_context(report_handler);
+    facts = SC_GET_CONTEXT(report_handler);
 
     name = SC_dsnprintf(FALSE, "%s/.log.dmnz", getenv("HOME"));
 
@@ -102,9 +102,6 @@ static void report_handler(int sig)
 static void io_handler(int sig)
    {int n;
     char bf[1024];
-    info *facts;
-
-    facts = SC_get_context(io_handler);
 
     n = SC_read_sigsafe(0, bf, 1024);
     if (n > 0)
@@ -125,7 +122,7 @@ static void io_handler(int sig)
 static void timeout_handler(int sig)
    {info *facts;
 
-    facts = SC_get_context(timeout_handler);
+    facts = SC_GET_CONTEXT(timeout_handler);
 
     if (!facts->exit)
        facts->n_timeouts++;

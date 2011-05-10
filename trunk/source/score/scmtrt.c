@@ -77,7 +77,7 @@ int test_1(int nir, int nim)
 static void sigh_2(int sig)
    {statedes *st;
 
-    st = SC_get_context(sigh_2);
+    st = SC_GET_CONTEXT(sigh_2);
 
     SC_signal_n(SIGSEGV, sigh_2, st);
 
@@ -274,7 +274,7 @@ int test_3(int nir, int nim)
 static void sigh_4(int sig)
    {statedes *st;
 
-    st = SC_get_context(sigh_4);
+    st = SC_GET_CONTEXT(sigh_4);
 
     SC_signal_n(SIGSEGV, sigh_4, st);
 

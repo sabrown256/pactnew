@@ -1,5 +1,5 @@
 TXT: SCORE User's Manual
-MOD: 05/03/2011
+MOD: 05/10/2011
 
 <CENTER>
 <P>
@@ -165,8 +165,8 @@ apply a function to all elements in the hash array.
 <p>
 
 <pre>
-<i>C Binding: </i>hasharr *SC_make_hasharr(int size, int docflag, char *lm)
-<i>F77 Binding: </i>integer scmkht(integer size, integer docflag)
+<i>C Binding: </i>hasharr *SC_make_hasharr(int size, int docflag, char *lm, int flags)
+<i>F77 Binding: </i>integer scmkht(integer size, integer docflag, integer flags)
 <i>SX Binding: </i>
 <i>Python Binding: </i>
 </pre>
@@ -181,6 +181,10 @@ The size of a hash array should be a prime number for greatest efficiency.
 For C based applications, there are four #define&#146;d sizes in the header, 
 score.h. They are <tt>HSZSMALL</tt> (31), <tt>HSZSMINT</tt> (67),
 <tt>HSZLRINT</tt> (127), and <tt>HSZLARGE</tt> (521).
+<p>
+Control of the memory involved in a hasharr is controlled by <tt>flags</tt>
+which is a bit array.  Bit 1 marks all the memory as permanent if on and
+bit 2 marks the memory as non-accountable if on.
 <p>
 Applications can have documentation associated with the installed objects, and for
 efficiency in searching a hash array for documentation a flag is provided
