@@ -38,7 +38,7 @@ SaveFiles = *.c *.h
 #
 # Files to remove in directory clean (pact clean)
 #
-CleanFiles = *~ core ${IncDir}/pasrc.h
+CleanFiles = ${bindf} ${hdrf} *~ core
 
 #
 # Things upon which install depends (pact install)
@@ -77,7 +77,7 @@ targets :
 #
 # Headers Files
 #
-Hdrs = ${TGTInc} ${IncDir}/pasrc.h
+Hdrs = ${TGTInc} ${hdrf}
 
 #
 # Object Files
@@ -102,11 +102,35 @@ ArObjs = ${TGTLib}(padef.o) ${TGTLib}(pacpp.o) ${TGTLib}(papkg.o)      \
          ${ArBind}
 
 ${Objs} : ${Hdrs}
-${LibDep} : ${Hdrs}
+${LibDep} : ${Hdrs} ${hdrf} ${gos}
+
+#
+# Generated code rules
+#
 
 ${IncDir}/pasrc.h : pasrc.t
 	@(echo "template pasrc.t -o ${IncDir}/pasrc.h" ;  \
 	  ${BinDir}/template pasrc.t -o ${IncDir}/pasrc.h)
+
+hdrf = ${IncDir}/pasrc.h
+
+# language bindings
+
+bindf = ${PACTTmpDir}/gf-${LibName}.c ../sx/${PACTTmpDir}/gs-${LibName}.c
+gos   = ${PACTTmpDir}/gf-${LibName}.o
+
+${PACTTmpDir}/gf-${LibName}.c : ${LibName}.bind ${Hdrs} ${hdrf}
+	@../scripts/bproto
+
+${gos} : ${PACTTmpDir}/gf-${LibName}.c
+	@(echo "${CCAnnounce} -c $<" ; \
+          ${CC} -c $< -o $@ ; \
+          ${AR} ${AROpt} ${TGTLib} $@ 2> /dev/null )
+
+generate : ${bindf} ${hdrf}
+
+IncAction = @pact generate
+
 
 #
 # time history tests
@@ -183,15 +207,4 @@ inform :
 #
 test :
 	@./patest
-
-#
-# Make C prototypes file
-#
-genf  = gf-${LibName}.c
-bindf = ${LibName}.bind
-
-${genf} : ${bindf}
-	../scripts/bproto
-
-bindings : ${genf}
 

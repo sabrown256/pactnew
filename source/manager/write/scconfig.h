@@ -73,15 +73,6 @@ source $ldir/env-csh
        Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}unknown${QUOTE}
     endif
 
-    switch ($C_STD)
-       case C99:
-            Note $STDOUT '#define ISO_C99'
-            breaksw
-       case C89:
-            Note $STDOUT '#define ISO_C89'
-            breaksw
-    endsw
-
     Note $STDOUT '#define DEFAULT_SHELL       '$QUOTE$DEFAULT_SHELL$QUOTE
 
     if ("$FilterDir" != "") then

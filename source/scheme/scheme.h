@@ -111,6 +111,7 @@ FUNCTION_POINTER(object, *(*PFPObject));
 typedef int (*PFPrChIn)(object *str, int ign_ws);
 typedef void (*PFPrintErrMsg)(SS_psides *si, FILE *str, char *s, object *obj);
 typedef object *(*PFPHand)(SS_psides *si, C_procedure *cp, object *argl);
+typedef object *(*PFPOprs)(SS_psides *si);
 
 #define SS_DEFINE_OBJECT(_si)                                               \
    {defstr *dp;                                                             \
@@ -1048,6 +1049,9 @@ extern int
 
 
 /* SHREAD.C declarations */
+
+extern PFPOprs
+ SS_use_parser(SS_psides *si, char *sfx);
 
 extern object
  *SS_add_variable(SS_psides *si, char *name),

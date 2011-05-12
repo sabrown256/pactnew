@@ -33,7 +33,7 @@ SaveFiles = *.c *.h *.f
 #
 # Files to remove in directory clean (pact clean)
 #
-CleanFiles  = *~ core ${IncDir}/pdform.h
+CleanFiles  = ${bindf} ${hdrf} *~ core
 RemoveFiles = ${BinDir}/pdbtst ${BinDir}/pdatst ${BinDir}/pdasts    \
               ${BinDir}/pdopts ${BinDir}/pdapts ${BinDir}/pdgsts    \
               ${BinDir}/pdfrts ${BinDir}/pdctst \
@@ -113,12 +113,15 @@ ArObjs = ${TGTLib}(pdb.o) ${TGTLib}(pdbaib.o)                        \
          ${TGTLib}(pdspoke.o)                                        \
          ${ArBind}
 
-${Objs} : ${Hdrs} ${IncDir}/pdform.h pdspoke.c
-${LibDep} : ${Hdrs} ${IncDir}/pdform.h pdspoke.c
+${Objs} : ${Hdrs} ${hdrf} pdspoke.c
+${LibDep} : ${Hdrs} ${hdrf} ${gos} pdspoke.c
 
 #
-# detect
+# Generated code rules
 #
+
+# detect
+
 ${BinDir}/detect : detect.c ${Hdrs} 
 	${CCCfe} ${Cfe_LD_Flags} ${Cfe_LD_RPath} -I../score detect.c -o ${BinDir}/detect ${Cfe_LD_Lib}
 
@@ -128,10 +131,33 @@ ${IncDir}/pdform.h : ${BinDir}/detect
 	@(echo "detect -c ${BE} -o pdform.h" ; \
 	  ${CFE} ${BinDir}/detect -c ${BE} -o ${IncDir}/pdform.h)
 
-IncAction = pact ${IncDir}/pdform.h
+hdrf = ${IncDir}/pdform.h
+
+
+# spokes
 
 pdspoke.c : config-spokes pdshar.c
 	config-spokes
+
+spokef = pdspoke.c
+
+# language bindings
+
+bindf = ${PACTTmpDir}/gf-${LibName}.c ../sx/${PACTTmpDir}/gs-${LibName}.c
+gos   = ${PACTTmpDir}/gf-${LibName}.o
+
+${PACTTmpDir}/gf-${LibName}.c : ${LibName}.bind ${Hdrs} ${hdrf}
+	@../scripts/bproto
+
+${gos} : ${PACTTmpDir}/gf-${LibName}.c
+	@(echo "${CCAnnounce} -c $<" ; \
+          ${CC} -c $< -o $@ ; \
+          ${AR} ${AROpt} ${TGTLib} $@ 2> /dev/null )
+
+generate : ${bindf} ${hdrf}
+
+IncAction = @pact generate
+
 
 #
 # standard tests
@@ -313,15 +339,4 @@ inform :
 #
 test :
 	@./pdtest
-
-#
-# Make C prototypes file
-#
-genf  = gf-${LibName}.c
-bindf = ${LibName}.bind
-
-${genf} : ${bindf}
-	../scripts/bproto
-
-bindings : ${genf}
 

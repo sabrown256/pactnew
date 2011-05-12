@@ -104,13 +104,13 @@ Note $Log ""
    set xstatus = $status
 
    if (-f gf-$d.c) then
-      flog $Log mv gf-$d.c ..
+      flog $Log mv gf-$d.c obj
    endif
    if (-f gs-$d.c) then
-      flog $Log mv gs-$d.c ../../sx
+      flog $Log mv gs-$d.c ../../sx/z-$arch/obj
    endif
    if (-f gp-$d.c) then
-      flog $Log mv gp-$d.c ../../python
+      flog $Log mv gp-$d.c ../../python/z-$arch/obj
    endif
    if (-f gh-$d.html) then
       flog $Log mv gh-$d.html ../../doc

@@ -48,7 +48,7 @@ SaveFiles = *.c *.h *.scm
 #
 # Files to remove in directory clean (pact clean)
 #
-CleanFiles = *~ core ${IncDir}/sxpdbd.h
+CleanFiles = ${hdrf} ${gso} *~ core
 
 #
 # Things upon which install depends (pact install)
@@ -84,7 +84,7 @@ targets :
 #
 # Headers Files
 #
-Hdrs = ${TGTInc} ${IncDir}/sxpdbd.h
+Hdrs = ${TGTInc} ${hdrf}
 
 #
 # Object Files
@@ -117,20 +117,42 @@ ArObjs = ${TGTLib}(sxhook.o) ${TGTLib}(sxmm.o) ${TGTLib}(sxmode.o) \
 sxmain.o : ${Hdrs}
 ${ObjsY} : ${Hdrs}
 ${Objs} : ${Hdrs}
-${LibDep} : ${Hdrs} ${IncDir}/sxpdbd.h
+${LibDep} : ${Hdrs} ${hdrf}
+
+#
+# Generated code rules
+#
 
 ${IncDir}/sxpdbd.h : sxpdbd.t
 	@(echo "template sxpdbd.t -o ${IncDir}/sxpdbd.h" ;  \
 	  ${BinDir}/template sxpdbd.t -o ${IncDir}/sxpdbd.h)
+
+hdrf = ${IncDir}/sxpdbd.h
+
+# language bindings
+
+gso = ${PACTTmpDir}/gs-score.o ${PACTTmpDir}/gs-pml.o ${PACTTmpDir}/gs-pdb.o   \
+      ${PACTTmpDir}/gs-ppc.o ${PACTTmpDir}/gs-pgs.o ${PACTTmpDir}/gs-panacea.o \
+      ${PACTTmpDir}/gs-scheme.o
+
+%.o : %.c
+	@(echo "${CCAnnounce} -c $<" ; \
+          ${CC} -c $< -o $@ ; \
+          ${AR} ${AROpt} ${TGTLib} $@ 2>> errlog )
+
+generate : ${hdrf}
+
+bindings : ${gso}
+
+IncAction = @pact generate
+LibAction = build-ext
+
 
 #
 # make the executable
 #
 ${TGTExe} : ${BinDep}
 	${CLD} ${LdFlags} sxmain.c -o ${TGTExe} ${Libs}
-
-# extra commands needed when building TGTLib
-LibAction = build-ext
 
 #
 # make the command test wrapper

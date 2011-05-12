@@ -34,7 +34,7 @@ SaveFiles = *.c *.h
 #
 # Files to remove in directory clean (pact clean)
 #
-CleanFiles = *~ core
+CleanFiles = ${bindf} ${hdrf} *~ core
 
 #
 # Things upon which install depends (pact install)
@@ -95,7 +95,33 @@ ArPARC = ${TGTLib}(pcparc.o) ${TGTLib}(pcparmp.o)
 
 ArNOIPC = ${TGTLib}(pcnil.o)
 
-${TGTLib} : ${LibDep} ${Hdrs}
+${TGTLib} : ${LibDep} ${Hdrs} ${gos}
+
+#
+# Generated code rules
+#
+
+# headers
+
+hdrf = 
+
+# language bindings
+
+bindf = ${PACTTmpDir}/gf-${LibName}.c ../sx/${PACTTmpDir}/gs-${LibName}.c
+gos   = ${PACTTmpDir}/gf-${LibName}.o
+
+${PACTTmpDir}/gf-${LibName}.c : ${LibName}.bind ${Hdrs} ${hdrf}
+	@../scripts/bproto
+
+${gos} : ${PACTTmpDir}/gf-${LibName}.c
+	@(echo "${CCAnnounce} -c $<" ; \
+          ${CC} -c $< -o $@ ; \
+          ${AR} ${AROpt} ${TGTLib} $@ 2> /dev/null )
+
+generate : ${bindf} ${hdrf}
+
+IncAction = @pact generate
+
 
 Cstd : ${BinDir}/pcexec ${BinDir}/pcmtst \
        ${BinDir}/pcbtst ${BinDir}/pcctst
@@ -186,15 +212,4 @@ inform :
 #
 test :
 	@./pctest
-
-#
-# Make C prototypes file
-#
-genf  = gf-${LibName}.c
-bindf = ${LibName}.bind
-
-${genf} : ${bindf}
-	../scripts/bproto
-
-bindings : ${genf}
 

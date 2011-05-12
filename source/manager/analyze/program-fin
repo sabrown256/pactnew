@@ -14,6 +14,7 @@ run write/f90-interface
 run write/make-def
 run write/make-macros
 run write/makefile
+run write/iso-c.h
 run write/scconfig.h
 run write/scdecls.h
 run write/syntax.h

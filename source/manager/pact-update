@@ -479,20 +479,25 @@ Note $Log "Current directory after source setup $cwd"
 
 NoteD $Log "Changing to manager directory: $Manager"
 flog $Log cd $Manager
+flog $Log set Base = $cwd:h
+
+flog $Log unset System
+flog $Log unsetenv System
 
 ./pre-check
 if ($status > 1) then
    exit(1)
 endif
 
-setenv System `../scripts/cfgman use`
-set Base      = $cwd:h
+setenv System `$Base/scripts/cfgman -d $Base/dev use`
+Note $Log "System = $System"
+
 set Root      = $Base/dev/$System
 set IncDir    = $Root/include
 set EnvFile   = $IncDir/env-pact.csh
 set VersionID = `cat ./.pact-version`
 
-NoteD $Log "Configuring PACT version $VersionID with: $CArgs"
+NoteD $Log "Configuring PACT version $VersionID ($System) with: $CArgs"
 flog $Log ./dsys config $CArgs
 set LStat = $status
 if ($LStat == 2) then

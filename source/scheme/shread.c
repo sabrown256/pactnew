@@ -11,8 +11,6 @@
 #include "scheme_int.h"
 #include "syntax.h"
 
-typedef object *(*PFPOprs)(SS_psides *si);
-
 #define PUSH_CHAR         si->pr_ch_un
 #define READ_EXPR(_o)     ((si->read == NULL) ? SS_null : si->read(si, _o))
 

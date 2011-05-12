@@ -354,9 +354,9 @@ EOF
       if ($status == 0) then
          flog $ALog $Tmp
          if ($status == 0) then
-            setenv CC_Flags     "$CC_Flags -arch $hw"               
-            setenv Cfg_CC_Flags "$Cfg_CC_Flags -arch $hw"               
-            setenv Cfe_CC_Flags "$Cfe_CC_Flags -arch $hw"               
+#            setenv CC_Flags     "$CC_Flags -arch $hw"               
+#            setenv Cfg_CC_Flags "$Cfg_CC_Flags -arch $hw"               
+#            setenv Cfe_CC_Flags "$Cfe_CC_Flags -arch $hw"               
             NoteD $ALog "      adding -arch $hw"
          endif
       endif

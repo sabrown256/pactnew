@@ -33,7 +33,7 @@ SaveFiles = *.c *.h
 #
 # Files to remove in directory clean (pact clean)
 #
-CleanFiles = *~ core ${IncDir}/gsimag.h
+CleanFiles = ${bindf} ${hdrf} *~ core
 
 #
 # Things upon which install depends (pact install)
@@ -133,7 +133,7 @@ ArMPG = ${TGTLib}(gsdv_mpg.o) ${TGTLib}(gspr_mpg.o) ${TGTLib}(gsmpeg.o)
 ArPNG = ${TGTLib}(gsdv_png.o)
 
 GrDep = ${GraphicsDevices} ${LibDep}
-${GrDep}  : ${Hdrs} ${IncDir}/gsimag.h
+${GrDep}  : ${Hdrs} ${hdrf} ${gos}
 ${TGTLib} : ${GrDep}
 
 ${ArMPG} : ${MpgHdr}
@@ -143,11 +143,35 @@ ${ArOGL} : ${XHdr}
 #${TGTLib}(gspr_mpg.o) : ${MpgHdr}
 #${TGTLib}(gsmpeg.o) : ${MpgHdr}
 
+#
+# Generated code rules
+#
+
+# headers
+
 ${IncDir}/gsimag.h : gsimag.t
 	@(echo "template gsimag.t -o ${IncDir}/gsimag.h" ;  \
 	  ${BinDir}/template gsimag.t -o ${IncDir}/gsimag.h)
 
-IncAction = pact ${IncDir}/gsimag.h
+hdrf = ${IncDir}/gsimag.h
+
+# language bindings
+
+bindf = ${PACTTmpDir}/gf-${LibName}.c ../sx/${PACTTmpDir}/gs-${LibName}.c
+gos   = ${PACTTmpDir}/gf-${LibName}.o
+
+${PACTTmpDir}/gf-${LibName}.c : ${LibName}.bind ${Hdrs} ${hdrf}
+	@../scripts/bproto
+
+${gos} : ${PACTTmpDir}/gf-${LibName}.c
+	@(echo "${CCAnnounce} -c $<" ; \
+          ${CC} -c $< -o $@ ; \
+          ${AR} ${AROpt} ${TGTLib} $@ 2> /dev/null )
+
+generate : ${bindf} ${hdrf}
+
+IncAction = @pact generate
+
 
 #
 # link 
@@ -351,15 +375,4 @@ ${BinDir}/gsmpgt1 : gsmpgt1.c ${TGTLib}
 
 ${BinDir}/gsmpgt2 : gsmpgt2.c ${TGTLib}
 	${CLD} ${LdFlags} gsmpgt2.c -o ${BinDir}/gsmpgt2 ${Libs}
-
-#
-# Make C prototypes file
-#
-genf  = gf-${LibName}.c
-bindf = ${LibName}.bind
-
-${genf} : ${bindf}
-	../scripts/bproto
-
-bindings : ${genf}
 
