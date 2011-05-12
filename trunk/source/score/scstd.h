@@ -20,6 +20,7 @@
 
 /*--------------------------------------------------------------------------*/
 
+#include <iso-c.h>
 #include <scconfig.h>
 
 #include <scope_thread.h>

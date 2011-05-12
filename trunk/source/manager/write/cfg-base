@@ -18,6 +18,25 @@
    rm -f $Tmp
    touch $Tmp
 
+   set lcc = $CCompiler
+   switch ($lcc)
+      case gnu:
+           set lcc = gcc
+           breaksw
+      case intel:
+           set lcc = icc
+           breaksw
+      case path:
+           set lcc = pathcc
+           breaksw
+      case pgi:
+           set lcc = pgcc
+           breaksw
+      case sun:
+           set lcc = suncc
+           breaksw
+   endsw
+
    echo "include spokes" >>& $Tmp
    switch ($los)
       case aix:
@@ -30,10 +49,21 @@
            echo "include compilers/cygwin" >>& $Tmp
            breaksw
       case darwin:
-           echo "include compilers/gnu-osx" >>& $Tmp
+           switch ($lcc)
+              case *pgcc*:
+                   echo "run std/use-compiler $lcc" >>& $Tmp
+                   echo "include compilers/pgi-osx" >>& $Tmp
+                   breaksw
+              default:
+              case *gcc*:
+                   echo "run std/use-compiler $lcc" >>& $Tmp
+                   echo "include compilers/gnu-osx" >>& $Tmp
+                   breaksw
+           endsw
            breaksw
       case freebsd:
            echo "define FREEBSD" >>& $Tmp
+           echo "run std/use-compiler $lcc" >>& $Tmp
            echo "include ${Bits}-bit" >>& $Tmp
            echo "include compilers/gnu" >>& $Tmp
            breaksw
@@ -57,7 +87,6 @@
            breaksw
       default:
       case linux:
-           set lcc = $CCompiler
            switch ($lcc)
               case gnu-bgl:
                    echo "run std/use-compiler mpgcc" >>& $Tmp
@@ -71,18 +100,12 @@
                    echo "include auto-cxe-gnu" >>& $Tmp
                    breaksw
               case *icc:
-                   if ("$lcc" == intel) then
-                      set lcc = icc
-                   endif
                    echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include ${Bits}-bit" >>& $Tmp
                    echo "include compilers/icc" >>& $Tmp
                    breaksw
               case *path:
               case *pathcc:
-                   if ("$lcc" == path) then
-                      set lcc = pathcc
-                   endif
                    echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include ${Bits}-bit" >>& $Tmp
                    echo "include compilers/path" >>& $Tmp
@@ -92,18 +115,12 @@
                    breaksw
               case *pgi:
               case *pgcc:
-                   if ("$lcc" == pgi) then
-                      set lcc = pgcc
-                   endif
                    echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include ${Bits}-bit" >>& $Tmp
                    echo "include compilers/pgi" >>& $Tmp
                    breaksw
 	      case *sun:
 	      case *suncc:
-                   if ("$lcc" == sun) then
-                      set lcc = suncc
-                   endif
                    echo "run std/use-compiler $lcc" >>& $Tmp
 		   echo "include compilers/sun" >>& $Tmp
                    breaksw
@@ -118,9 +135,6 @@
               default:
               case *gnu:
               case *gcc:
-                   if ("$lcc" == gnu) then
-                      set lcc = gcc
-                   endif
                    echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include ${Bits}-bit" >>& $Tmp
                    echo "include compilers/gnu" >>& $Tmp

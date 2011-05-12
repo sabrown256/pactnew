@@ -329,8 +329,6 @@ void _SC_print_rule_info(anadep *state, int n, ruledes *rd)
 	for (i = 0; i < na; i++)
 	    io_printf(fp, "     %s\n", acts[i]);};
 
-    CFREE(as);
-
     return;}
 
 /*--------------------------------------------------------------------------*/

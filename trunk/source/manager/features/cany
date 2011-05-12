@@ -1,0 +1,11 @@
+#
+# CANY - define the use of any C
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+setenv C_STD             any
+

@@ -13,6 +13,8 @@ source $Me:h/common
 
 SafeEnv HAVE_GNU_LIBC_6 FALSE
 
+setenv GLIBC_VERSION ""
+
 set GCC = `$Which gcc`
 if (-x "$GCC") then
 
@@ -43,6 +45,7 @@ EOF
          endif
       endif
       NoteD $ALog "      has GNU LibC $lvers"
+      setenv GLIBC_VERSION $lvers
       unset inf
       unset lvers
 else
@@ -59,6 +62,7 @@ else
    NoteD $ALog "      no GCC found on this system"
 endif
 
+SetParent GLIBC_VERSION
 SetParent HAVE_GNU_LIBC_6
 
 #exit(0)

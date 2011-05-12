@@ -75,15 +75,6 @@ extern "C" {
 #ifdef __GNUC__
 
 # ifdef ISO_C99
-#  ifndef _POSIX_C_SOURCE
-#   define _POSIX_C_SOURCE   200112L
-#  endif
-#  ifndef _XOPEN_SOURCE
-#   define _XOPEN_SOURCE     600
-#  endif
-#  ifndef _DARWIN_C_SOURCE
-#   define _DARWIN_C_SOURCE
-#  endif
 
 extern int
  getpagesize(void);

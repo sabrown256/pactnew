@@ -32,7 +32,7 @@ CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}
 SaveFiles = *.c *.h *.scm
 
 # files to remove in directory clean (pact clean)
-CleanFiles = *~ core
+CleanFiles = ${bindf} ${hdrf} *~ core
 
 # things upon which install depends (pact install)
 DepLib = ${LibDir}/libppc.a \
@@ -158,11 +158,34 @@ ArObjs = ${TGTLib}(shmm.o) ${TGTLib}(shprnt.o) ${TGTLib}(sheval.o) \
          ${TGTLib}(shproc.o) ${TGTLib}(shsynt.o) ${TGTLib}(shvar.o) \
          ${ArBind}
 
-${LibDep} : ${Hdrs}
+${LibDep} : ${Hdrs} ${gos}
 ${TGTLib} : ${SyntaxModes}
 
-purify :
-	purify ${CLD} ${MDIncs} ${LdFlags} shmain.c -o ${TGTExe} ${Libs}
+#
+# Generated code rules
+#
+
+# headers
+
+hdrf = 
+
+# language bindings
+
+bindf = ${PACTTmpDir}/gf-${LibName}.c ../sx/${PACTTmpDir}/gs-${LibName}.c
+gos   = ${PACTTmpDir}/gf-${LibName}.o
+
+${PACTTmpDir}/gf-${LibName}.c : ${LibName}.bind ${Hdrs} ${hdrf}
+	@../scripts/bproto
+
+${gos} : ${PACTTmpDir}/gf-${LibName}.c
+	@(echo "${CCAnnounce} -c $<" ; \
+          ${CC} -c $< -o $@ ; \
+          ${AR} ${AROpt} ${TGTLib} $@ 2> /dev/null )
+
+generate : ${bindf} ${hdrf}
+
+IncAction = @pact generate
+
 
 profiler : 
 	pact remove
@@ -211,15 +234,4 @@ inform :
 #
 test :
 	@./shtest
-
-#
-# Make C prototypes file
-#
-genf  = gf-${LibName}.c
-bindf = ${LibName}.bind
-
-${genf} : ${bindf}
-	../scripts/bproto
-
-bindings : ${genf}
 

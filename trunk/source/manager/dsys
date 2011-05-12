@@ -52,7 +52,7 @@ unsetenv System
 
 set CfgMan = $ScrDir/cfgman
 
-setenv System  `$CfgMan use`
+setenv System  `$CfgMan -d ../dev use`
 setenv PACTVer `cat $MngDir/.pact-version`
 
 set BaseDev = $Base/dev
@@ -945,6 +945,8 @@ switch ($Cmnd)
         if ($status == 0) then
            flog $Log ./ccw -g do-run.c -o $BinDir/do-run
            flog $Log ./ccw -g perdb.c -o $BinDir/perdb
+           flog $Log ./ccw -g elide.c -o $BinDir/elide
+           flog $Log ./ccw -g blang.c -o $BinDir/blang
            flog $Log ./ccw -g -I../score -I../manager template.c -o $BinDir/template
         endif
         flog $Log popd
@@ -997,7 +999,7 @@ switch ($Cmnd)
         set GenFiles = ""
         set GenFiles = ( $GenFiles package configured f90-interface )
         set GenFiles = ( $GenFiles make-def make-macros makefile )
-        set GenFiles = ( $GenFiles scconfig.h scdecls.h syntax.h)
+        set GenFiles = ( $GenFiles iso-c.h scconfig.h scdecls.h syntax.h)
         set GenFiles = ( $GenFiles spokes.scm )
         set GenFiles = ( $GenFiles env-mio )
         foreach i ( $GenFiles )
@@ -1009,6 +1011,9 @@ switch ($Cmnd)
         foreach i ( $GenFiles )
            flog $Log $RM $BinDir/$i
         endif
+
+# must have cpyright.h available during configuration
+        flog $Log cp cpyright.h $IncDir
 
 # do the main configuration work
         if ("$UCfg" != "") then
@@ -1075,8 +1080,8 @@ switch ($Cmnd)
 
 # NOTE: do it twice as a fault tolerance measure
 # this role will be assumed by dmake after it is successfully built
-                 flog $Log $Mk ${BinDir}/dmake
-                 flog $Log $Mk ${BinDir}/dmake
+                 flog $Log $Mk dmake
+                 flog $Log $Mk dmake
                  set LStat = $status
                  if ($LStat == 0) then
                     Note $Log "Build of dmake succeeded"
@@ -2019,11 +2024,11 @@ CFG_DONE:
 
         NoteD $Log "Removing PACT"
 
-        set BinFiles = ( smake dmake pact template timer px do-run )
+        set BinFiles = ( smake dmake pact template timer px do-run elide blang )
         set BinFiles = ( $BinFiles make-syntax )
         set BinFiles = ( $BinFiles install-pact install-ext )
 
-        set IncFiles = ( scconfig.h scdecls.h cpyright.h syntax.h )
+        set IncFiles = ( iso-c.h scconfig.h scdecls.h cpyright.h syntax.h )
         set IncFiles = ( $IncFiles env-pact.csh env-pact.sh env-pact.dk env-pact.mod )
         set IncFiles = ( $IncFiles env-mio )
         set IncFiles = ( $IncFiles package configured make-def make-macros Makefile )
@@ -2075,7 +2080,8 @@ CFG_DONE:
 # remove other files
         NoteD $Log "    in $Base/"'*'"/z-$System directories"
         flog $Log $RM ../*/z-$System/obj/*.o
-        flog $Log $RM ../*/*.o ../sx/spokes/*/*.o ../score/scf77lr.c
+        flog $Log $RM ../*/*.o ../pdb/spokes/*/*.o ../score/scf77lr.c
+        flog $Log $RM ../*/gf-*.c ../sx/gs-*.c
 
 # check the result
         flog $Log ls -lR $Root

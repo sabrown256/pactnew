@@ -715,6 +715,7 @@ extern char
  *SX_wrap_paren(char *open, char *form, char *close, size_t ln);
 
 extern void
+ SX_register_devices(void),
  SX_load_rc(SS_psides *si, char *ffn, int ldrc, char *ifna, char *ifnb),
  SX_parse(SS_psides *si,
 	  object *(*replot)(SS_psides *si),

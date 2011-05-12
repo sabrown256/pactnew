@@ -34,7 +34,7 @@ SaveFiles = *.c *.h
 #
 # Files to remove in directory clean (pact clean)
 #
-CleanFiles = *~ core ${IncDir}/mlsrch.h
+CleanFiles = ${bindf} ${hdrf} *~ core
 
 #
 # Things upon which install depends (pact install)
@@ -102,14 +102,38 @@ ArObjs = ${TGTLib}(mlmath.o)  ${TGTLib}(mlsrch.o)  ${TGTLib}(mlfft.o)   \
          ${TGTLib}(mlvect.o)  ${TGTLib}(mlsmp.o)                        \
          ${ArBind}
 
-${Objs} : ${Hdrs}
-${LibDep} : ${Hdrs} ${IncDir}/mlsrch.h
+${Objs} : ${Hdrs} ${hdrf}
+${LibDep} : ${Hdrs} ${hdrf} ${gos}
+
+#
+# Generated code rules
+#
+
+# headers
 
 ${IncDir}/mlsrch.h : mlsrch.t
 	@(echo "template mlsrch.t -o ${IncDir}/mlsrch.h" ;  \
 	  ${BinDir}/template mlsrch.t -o ${IncDir}/mlsrch.h)
 
-IncAction = pact ${IncDir}/mlsrch.h
+hdrf = ${IncDir}/mlsrch.h
+
+# language bindings
+
+bindf = ${PACTTmpDir}/gf-${LibName}.c ../sx/${PACTTmpDir}/gs-${LibName}.c
+gos   = ${PACTTmpDir}/gf-${LibName}.o
+
+${PACTTmpDir}/gf-${LibName}.c : ${LibName}.bind ${Hdrs} ${hdrf}
+	@../scripts/bproto
+
+${gos} : ${PACTTmpDir}/gf-${LibName}.c
+	@(echo "${CCAnnounce} -c $<" ; \
+          ${CC} -c $< -o $@ ; \
+          ${AR} ${AROpt} ${TGTLib} $@ 2> /dev/null )
+
+generate : ${bindf} ${hdrf}
+
+IncAction = @pact generate
+
 
 # extra commands needed when building TGTLib
 LibAction = pact patch-fpe
@@ -267,15 +291,4 @@ inform :
 #
 test :
 	@./mltest
-
-#
-# Make C prototypes file
-#
-genf  = gf-${LibName}.c
-bindf = ${LibName}.bind
-
-${genf} : ${bindf}
-	../scripts/bproto
-
-bindings : ${genf}
 

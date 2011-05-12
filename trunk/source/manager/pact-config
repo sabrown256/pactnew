@@ -1367,6 +1367,7 @@ Finish:
     write/make-def
     write/make-macros
     write/makefile
+    write/iso-c.h
     write/scconfig.h
     write/scdecls.h
     write/syntax.h

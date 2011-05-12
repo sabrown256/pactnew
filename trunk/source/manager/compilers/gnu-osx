@@ -14,31 +14,42 @@ ERR_PATTERN  = ":+sp+error:"
 
 Tool CC {
    Exe       = gcc
-   Flags     = -fsignaling-nans -ffloat-store
-   Flags    += [ _env_ = C_STD ;             # C standard flags
+   Flags     = -ffloat-store
+   Flags    += [ _env_ = C_STD ;                # C standard flags
                  C89   = -std=c89 ;
                  C99   = -std=c99 ]
-   Flags    += [ _env_ = Bits ;              # address bit size
+   Flags    += [ _env_ = PACT_CC_VERSION ;      # compiler version flags
+                 4.*   = -fsignaling-nans ]
+   Flags    += [ _env_ = PACT_CC_VERSION ;      # stack checking
+                 4.2.* >= -fstack-protector ]
+   Flags    += [ _env_ = Bits ;                 # address bit size
                  *     = -m* ]
-   Flags    += [ _cmd_ = -p ;                # profiling
+   Flags    += [ _cmd_ = -p ;                   # profiling
 	         on    = -pg ]
-   Flags    += [ _cmd_ = -cov ;              # coverage analysis
+   Flags    += [ _cmd_ = -cov ;                 # coverage analysis
 	         on    = -fprofile-arcs -ftest-coverage ]
    Debug     = -g -O0 -Wall
    Optimize  = -g -O -Wunused
+   Optimize += [ _cmd_ = -tune @ ;              # optimization tuning
+                 *     = -mtune=* ]
    Version   = -v
 }
 
 Tool FC {
-   Exe     = gfortran
-   Flags   = -fsignaling-nans -ffloat-store -ffree-form
-   Flags  += [ _env_ = Bits ;                # address bit size
-               *     = -m* ]
-   Flags  += [ _cmd_ = -p ;                  # profiling
-	       on    = -pg ]
-   Flags  += [ _cmd_ = -cov ;                # coverage analysis
-	       on    = -fprofile-arcs -ftest-coverage ]
-   Version = -v
+   Exe       = gfortran
+   Flags     = -ffloat-store -ffree-form
+   Flags    += [ _env_ = PACT_CC_VERSION ;      # compiler version flags
+                 4.*   = -fsignaling-nans ;
+                 4.6.* >= -fsignaling-nans -Wno-unused-dummy-argument ]
+   Flags    += [ _env_ = Bits ;                 # address bit size
+                 *     = -m* ]
+   Flags    += [ _cmd_ = -p ;                   # profiling
+	         on    = -pg ]
+   Flags    += [ _cmd_ = -cov ;                 # coverage analysis
+	         on    = -fprofile-arcs -ftest-coverage ]
+   Debug     = -g -O0 -Wall
+   Optimize  = -g -O -Wunused
+   Version   = -v
 }
 
 Tool LD {
@@ -60,6 +71,8 @@ Tool Ranlib {
 }
 
 Group Std {
+   CC_Flags = ${CC_Flags}
+   FC_Flags = ${FC_Flags}
    LD_Flags = ${LD_Flags}
 }
 
@@ -92,7 +105,7 @@ Group Python {
 include cpp-rule
 include serial
 
-setenv PATH /sw/bin:/usr/apps/gnu/bin:/usr/local/bin:$PATH
+setenv PATH $PACT_CC_PATH/bin:$PACT_FC_PATH/bin:/sw/bin:/usr/apps/gnu/bin:/usr/local/bin:$PATH
 
 Group PNG {
    Path = /sw

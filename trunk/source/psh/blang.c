@@ -783,9 +783,9 @@ char **wrap_scheme(FILE *fp, char **fl, fdecl *dcl, char *ffn, char **com)
     fprintf(fp, "static object *");
     fprintf(fp, "_SXI_%s", dcl->name);
     if (na == 0)
-       fprintf(fp, "(void)");
+       fprintf(fp, "(SS_psides *si)");
     else
-       fprintf(fp, "(object *argl)");
+       fprintf(fp, "(SS_psides *si, object *argl)");
     fprintf(fp, "\n");
 
 /* local variable declarations */
@@ -843,7 +843,7 @@ char **wrap_scheme(FILE *fp, char **fl, fdecl *dcl, char *ffn, char **com)
 /* add the installation of the function */
     concatenate(t, MAXLINE, com, " ");
     snprintf(a, MAXLINE, 
-	     "    SS_install(\"%s\",\n               \"%s\",\n               SS_nargs,\n               _SXI_%s, SS_PR_PROC);\n\n",
+	     "    SS_install(si, \"%s\",\n               \"%s\",\n               SS_nargs,\n               _SXI_%s, SS_PR_PROC);\n\n",
 	     ffn, t, dcl->name);
     fl = lst_add(fl, a);
 
@@ -885,7 +885,7 @@ int bind_scheme(FILE *fp, char *pck, char **spr, char **sbi)
        {csep(fp);
 
 	fprintf(fp, "\n");
-	fprintf(fp, "void SX_install_%s_bindings(void)\n", pck);
+	fprintf(fp, "void SX_install_%s_bindings(SS_psides *si)\n", pck);
 	fprintf(fp, "   {\n");
 	fprintf(fp, "\n");
 

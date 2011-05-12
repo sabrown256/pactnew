@@ -33,29 +33,23 @@
 
     (define (print-args args)
         (if (pair? args)
-	    (cond ((eqv? target-language 'C)
-		   (let* ((decl (parse-declaration (car args)))
-			  (rest (cdr args))
-			  (name (list-ref decl 1)))
-		     (if rest
-			 (begin (printf file "%s, " name)
-				(print-args rest))
-			 (printf file "%s" name))))
-		  ((eqv? target-language 'C++)
-		   (let* ((decl (car args))
-			  (rest (cdr args)))
-		     (if rest
-			 (begin (printf file "%s, " decl)
-				(print-args rest))
-			 (printf file "%s" decl))))
-		  ((eqv? target-language 'F77)
+	    (cond ((eqv? target-language 'F77)
 		   (let* ((decl (parse-declaration (car args)))
 			  (rest (cdr args))
 			  (name (list-ref decl 1)))
 		     (if rest
 			 (begin (printf file "      %s" name)
 				(print-args rest))
-			 (printf file "       %s" name)))))))
+			 (printf file "       %s" name))))
+
+		  ((or (eqv? target-language 'C)
+		       (eqv? target-language 'C++))
+		   (let* ((decl (car args))
+			  (rest (cdr args)))
+		     (if rest
+			 (begin (printf file "%s, " decl)
+				(print-args rest))
+			 (printf file "%s" decl)))))))
 
     (define (print-def arg)
         (printf file "   %s;\n" arg))
@@ -72,7 +66,8 @@
     (print-args args)
 
     (printf file ")\n")
-    (if (and args (not (eqv? target-language 'C++)))
+    (if (and args (not (or (eqv? target-language 'C)
+			   (eqv? target-language 'C++))))
 	(for-each print-def args)))
 
 ;--------------------------------------------------------------------------

@@ -20,7 +20,7 @@ lib libpanacea.a libpdb.a libpgs.a libpml.a libppc.a
 lib libpsmm.a libscheme.a libscore.a libsx.a
 lib libpact.a
 
-inc cpyright.h scconfig.h scdecls.h
+inc cpyright.h iso-c.h scconfig.h scdecls.h
 inc f77std.h f90kinds.inc f90types.h
 inc score.h scstd.h score_old.h scunix.h scwin32.h scbgl.h
 inc sclnx.h scosx.h sccyg.h scaix.h scsol.h schpux.h scirix.h
@@ -66,7 +66,7 @@ doc scheme.FAQ score.FAQ sx.FAQ ultra.FAQ
 mgr clib.fncs code-date compare-date pact-analyze pact-changes
 mgr pact-commit pact-config cpyright.h pact-dist
 mgr pact-import pact-scs
-mgr pact-update pact.c pact.manifest
+mgr pact-update pact.manifest
 mgr systems.unix
 mgr scscom scshist scslock scstag scsup
 

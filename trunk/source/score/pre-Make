@@ -37,10 +37,9 @@ SaveFiles = *.c *.h *.r
 #
 # Files to remove in directory clean (pact clean)
 #
-CleanFiles = scf77lr.c *~ core ${BinDir}/ptime ${BinDir}/ncpu \
+CleanFiles = ${bindf} ${hdrf} scf77lr.c *~ core ${BinDir}/ptime ${BinDir}/ncpu \
              ${BinDir}/ps-diff ${BinDir}/mpi-io-wrap \
-             ${BinDir}/dmnz ${BinDir}/rpath ${BinDir}/hserve ${BinDir}/fcscan \
-             ${IncDir}/sctypeg.h ${IncDir}/scarg.h ${IncDir}/scfnca.h
+             ${BinDir}/dmnz ${BinDir}/rpath ${BinDir}/hserve ${BinDir}/fcscan
 
 #
 # Things upon which install depends (pact install)
@@ -174,18 +173,23 @@ ${DObjs} : scope_make.h scope_proc.h
 ${MObjs} : scope_mem.h
 ${PObjs} : scope_proc.h
 ${TObjs} : scope_thread.h
-${Objs}  : ${Hdrs} ${IncDir}/sctypeg.h ${IncDir}/scarg.h ${IncDir}/scfnca.h
+${Objs}  : ${Hdrs} ${hdrf}
 
-${LibDep} : ${Hdrs} ${IncDir}/sctypeg.h ${IncDir}/scarg.h ${IncDir}/scfnca.h
+${LibDep} : ${Hdrs} ${hdrf} ${gos}
 ${MMDep}  : ${Hdrs}
 
 #
-# scoerce
+# Generated code rules
 #
+
+# scoerce
+
 ${BinDir}/scoerce : scoerce.c ${Hdrs} 
 	${CCCfe} ${Cfe_LD_Flags} ${Cfe_LD_RPath} -I../score scoerce.c -o ${BinDir}/scoerce ${Cfe_LD_Lib}
 
 scoerce : ${BinDir}/scoerce
+
+# headers
 
 ${IncDir}/sctypeg.h : ${BinDir}/scoerce
 	@(echo "scoerce -o ${IncDir}/sctypeg.h" ; \
@@ -199,9 +203,25 @@ ${IncDir}/scfnca.h : scfnca.t
 	@(echo "template scfnca.t -o ${IncDir}/scfnca.h" ;  \
 	  ${BinDir}/template scfnca.t -o ${IncDir}/scfnca.h)
 
-IncAction = pact ${IncDir}/scarg.h
+hdrf = ${IncDir}/sctypeg.h ${IncDir}/scarg.h ${IncDir}/scfnca.h
 
-gen : ${IncDir}/sctypeg.h ${IncDir}/scarg.h
+# language bindings
+
+bindf = ${PACTTmpDir}/gf-${LibName}.c ../sx/${PACTTmpDir}/gs-${LibName}.c
+gos   = ${PACTTmpDir}/gf-${LibName}.o
+
+${PACTTmpDir}/gf-${LibName}.c : ${LibName}.bind ${Hdrs} ${hdrf}
+	@../scripts/bproto
+
+${gos} : ${PACTTmpDir}/gf-${LibName}.c
+	@(echo "${CCAnnounce} -c $<" ; \
+          ${CC} -c $< -o $@ ; \
+          ${AR} ${AROpt} ${TGTLib} $@ 2> /dev/null )
+
+generate : ${bindf} ${hdrf}
+
+IncAction = @pact generate
+
 
 #
 # MMLib 
@@ -471,10 +491,10 @@ foo : ${TGTLib} foo.c
 #       - this is a special target that you cannot build with dmake
 #       - it must be built with smake
 #
-dmake :
+dmake : ${hdrf}
 	${BinDir}/smake ${BinDir}/dmake
 
-dmt :
+dmt : ${hdrf}
 	${BinDir}/smake ${BinDir}/dmake
 	(cd tests ; do-test)
 
@@ -512,16 +532,4 @@ inform :
 #
 test :
 	@./sctest
-
-#
-# Make C prototypes file
-#
-genf  = gf-${LibName}.c
-bindf = ${LibName}.bind
-
-${genf} : ${bindf}
-	../scripts/bproto
-
-bindings : ${genf}
-
 
