@@ -85,7 +85,7 @@ static long _SC_count_tagged(int flag)
 
 static int _SC_list_block_info(char *s, SC_heap_des *ph, void *ptr,
 			       long sz, int flag, int show)
-   {int perm, rv;
+   {int rv, valid;
     int idok, nmok, prok, nxok, ty, nc, nr;
     long mad, nb;
     char t[MAXLINE];
@@ -115,36 +115,37 @@ static int _SC_list_block_info(char *s, SC_heap_des *ph, void *ptr,
     nxok = SC_pointer_ok(next);
 
 /* expect an active block if length is greater than 0 */
+    valid = TRUE;
     if (idok && (nb > 0) && prok && nxok)
-       {if (!(flag & 1))
-	   return(rv);
-
-	if (name == NULL)
-	   name = "-- no name --";
-	else if (!nmok)
-	   {name = "-- corrupt active block --";
-	    nb   = sz;
-	    ty   = -2;
-	    nr   = -2;}
-	else if (FREE_SCORE_BLOCK_P(desc))
-	   {nb = (nb == 0) ? sz : nb;
-	    ty = -2;
-	    nr = -2;};}
+       {if (flag & 1)
+	   {if (name == NULL)
+	       name = "-- no name --";
+	    else if (!nmok)
+	       {name = "-- corrupt active block --";
+		nb   = sz;
+		ty   = -2;
+		nr   = -2;}
+	    else if (FREE_SCORE_BLOCK_P(desc))
+	       {nb = (nb == 0) ? sz : nb;
+		ty = -2;
+		nr = -2;};}
+	else
+	   valid = FALSE;}
 
 /* expect a free block if desc is setup right */
     else if (idok && FREE_SCORE_BLOCK_P(desc) && prok && nxok)
-       {if (!(flag & 2))
-	   return(rv);
-
-	if (!nmok)
-	   {name = "-- corrupt free block --";
-	    ty   = -2;
-	    nr   = -2;}
-	else
-	   {name = "-- free --";
-	    ty   = -1;
-	    nr   = 0;};
-	nb = sz;}
+       {if (flag & 2)
+	   {if (!nmok)
+	       {name = "-- corrupt free block --";
+		ty   = -2;
+		nr   = -2;}
+	    else
+	       {name = "-- free --";
+		ty   = -1;
+		nr   = 0;};
+	    nb = sz;}
+        else
+	   valid = FALSE;}
 
 /* otherwise a corrupted block */
     else
@@ -154,21 +155,24 @@ static int _SC_list_block_info(char *s, SC_heap_des *ph, void *ptr,
         ty = -2;
         nr = -2;};
 
-    if ((ty == -2) && (nr == -2))
-       nc = snprintf(t, ENTRY_SIZE, "   0x%012lx %9ld ***  ***  %s",
-		     mad, nb, name);
-    else
-       nc = snprintf(t, ENTRY_SIZE, "   0x%012lx %9ld %3d  %3d  %s",
-		     mad, nb, ty, nr, name);
+/* proceed if the block is valid relative to the testing done on it */
+    if (valid == TRUE)
+       {if ((ty == -2) && (nr == -2))
+	   nc = snprintf(t, ENTRY_SIZE, "   0x%012lx %9ld ***  ***  %s",
+			 mad, nb, name);
+        else if (nr == UNCOLLECT)
+	   nc = snprintf(t, ENTRY_SIZE, "   0x%012lx %9ld %3d PERM  %s",
+			 mad, nb, ty, name);
+	else
+	   nc = snprintf(t, ENTRY_SIZE, "   0x%012lx %9ld %3d  %3d  %s",
+			 mad, nb, ty, nr, name);
 
-    nc = ENTRY_SIZE - nc - 1;
+	nc = ENTRY_SIZE - nc - 1;
+	SC_ASSERT(nc > 0);
 
-    perm = ((name != NULL) &&
-	    ((strncmp(name, "PERM|", 5) == 0) || (nr == UNCOLLECT)));
-
-    if ((perm == FALSE) || (show == TRUE))
-       {strcpy(s, t);
-	rv = TRUE;};
+	if ((nr == UNCOLLECT) || (show == TRUE))
+	   {strcpy(s, t);
+	    rv = TRUE;};};
 
     return(rv);}
 
@@ -482,7 +486,7 @@ int SC_mem_map(FILE *fp, int flag)
  */
 
 long SC_mem_monitor(int old, int lev, char *id, char *msg)
-   {int on, actfl, prmfl, show, pid, st;
+   {int on, leva, actfl, prmfl, show, pid, st;
     long d;
     char base[MAXLINE], ta[MAXLINE], tb[MAXLINE];
     char sd[MAXLINE], td[MAXLINE], cd[MAXLINE];
@@ -502,10 +506,11 @@ long SC_mem_monitor(int old, int lev, char *id, char *msg)
     snprintf(sd, MAXLINE, "diff %s %s > %s", tb, ta, td);
     snprintf(cd, MAXLINE, "cat %s", td);
 
+    leva  = abs(lev);
     show  = FALSE;
     actfl = 1;
     prmfl = 2;
-    if (lev & 4)
+    if (leva & 4)
        {show   = TRUE;
 	actfl |= 8;
 	prmfl |= 8;};

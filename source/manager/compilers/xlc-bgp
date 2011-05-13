@@ -20,7 +20,9 @@ Tool CC {
    Flags     = ${XArch} -D_ALL_SOURCE -qsuppress=1500-010:1506-1300:1506-1298:1506-383:1506-377
    Flags    += [ _env_ = C_STD ;             # C standard flags
                  C89   = -qlanglvl=stdc89 ;
-                 C99   = -qlanglvl=stdc99 ]
+                 C99   = -qlanglvl=stdc99 ;
+                 X89   = -qlanglvl=extc89 ;
+                 X99   = -qlanglvl=extc99 ]
    Flags    += [ _env_ = Bits ;              # address bit size
                  *     = -q* ]
    Flags    += [ _cmd_ = -p ;                # profiling

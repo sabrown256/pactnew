@@ -24,6 +24,11 @@ endif
 
 setenv Err  0
 
+# environment variable which any scripts can use should they
+# need to distinguish between running under a do-net and running
+# in a terminal session - panacea/abc test cares for example
+setenv IN_DO_NET   TRUE
+
 umask 007
 
 set argv  = `cat $ArgFile`

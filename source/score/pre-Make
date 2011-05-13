@@ -44,7 +44,7 @@ CleanFiles = ${bindf} ${hdrf} scf77lr.c *~ core ${BinDir}/ptime ${BinDir}/ncpu \
 #
 # Things upon which install depends (pact install)
 #
-InstallDep = ${TGTLib} ${MMLib} ${IncDir}/sctypeg.h ${IncDir}/scarg.h ${IncDir}/scfnca.h
+InstallDep = ${TGTLib} ${MMLib} ${hdrf}
 BinDep =
 BinObj =
 

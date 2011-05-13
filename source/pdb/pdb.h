@@ -278,6 +278,17 @@ enum e_PD_symbol_order
 
 typedef enum e_PD_symbol_order PD_symbol_order;
 
+#ifdef NON_INTEGER_ENUM
+
+#define PD_MD5_OFF     0
+#define PD_MD5_FILE    1
+#define PD_MD5_RW      2
+#define PD_MD5_FULL    3
+
+typedef int PD_checksum_mode;
+
+#else
+
 enum e_PD_checksum_mode
    {PD_MD5_OFF = 0,
     PD_MD5_FILE,
@@ -285,6 +296,8 @@ enum e_PD_checksum_mode
     PD_MD5_FULL};
 
 typedef enum e_PD_checksum_mode PD_checksum_mode;
+
+#endif
 
 /* NOTE: see comment in scope_io.h concerning file_io_desc and the stream member
  *       here the buffer is the analog of the FILE *

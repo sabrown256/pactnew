@@ -88,12 +88,24 @@ struct s_anadep
     char exe[PATH_MAX];
     int (*pred)(anadep *state, char *fa, char *fb, int force);};
 
+#ifdef NON_INTEGER_ENUM
+
+#define IMPLICIT     1
+#define EXPLICIT     2
+#define ARCHIVE      3
+
+typedef int SC_rule_cat;
+
+#else
+
 enum e_SC_rule_cat
    {IMPLICIT  = 1,
     EXPLICIT,
     ARCHIVE};
 
 typedef enum e_SC_rule_cat SC_rule_cat;
+
+#endif
 
 /*--------------------------------------------------------------------------*/
 
