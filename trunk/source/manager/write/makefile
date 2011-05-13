@@ -43,6 +43,16 @@ source $ldir/env-csh
     Note $STDOUT ""
 
     Note $STDOUT 'build:'
+    Note $STDOUT '	@(echo "" ; echo "Generate sources")'
+    Note $STDOUT '	${BARRIER}'
+    foreach i ($Pck)
+       Note $STDOUT '	@(cd '$i' ; echo "" ; echo "pact generate in '$i'" ; ${PACT} -rcr generate)'
+       if ($i == score) then
+          Note $STDOUT '	${BARRIER}'
+       endif
+    end
+    Note $STDOUT '	${BARRIER}'
+
     Note $STDOUT '	@(echo "" ; echo "Install headers")'
     Note $STDOUT '	${BARRIER}'
     foreach i ($Pck)

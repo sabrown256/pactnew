@@ -102,6 +102,23 @@ ArObjs = ${ArPDBO} ${ArPMLO} ${ArPPO} ${ArPGSO} ${ArBind}
 ${Objs} : ${Hdrs}
 ${ArObjs} : ${Hdrs}
 
+#
+# Generated code rules
+#
+
+# headers
+
+hdrf = 
+
+# language bindings
+
+bindf = 
+
+generate : ${bindf} ${hdrf}
+
+IncAction = 
+
+
 TGTSPDB  = ${PyDir}/libpypdb.so
 TGTShPDB = ${TGTSPDB}.1
 

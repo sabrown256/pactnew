@@ -38,6 +38,23 @@ IncFiles : common.h nonstd.h ${LibFiles}
 
 ${InstallDep} : ${IncFiles}
 
+#
+# Generated code rules
+#
+
+# headers
+
+hdrf = 
+
+# language bindings
+
+bindf = 
+
+generate : ${bindf} ${hdrf}
+
+IncAction = 
+
+
 pco : ${BinDir}/pco
 
 ${BinDir}/pco : pco.c libpsh.c

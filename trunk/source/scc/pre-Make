@@ -83,6 +83,23 @@ ArObjs = ${TGTLib}(sccsynt.o) ${TGTLib}(sccinf.o)       \
 ${LibDep} : ${Hdrs}
 ${TGTLib} : ${SyntaxModes}
 
+#
+# Generated code rules
+#
+
+# headers
+
+hdrf = 
+
+# language bindings
+
+bindf = 
+
+generate : ${bindf} ${hdrf}
+
+IncAction = 
+
+
 profiler : 
 	pact remove
 	pact ${TGTLib}
