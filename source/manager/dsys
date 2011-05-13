@@ -2035,9 +2035,6 @@ CFG_DONE:
         set IncFiles = ( $IncFiles f90types.h f90kinds.inc )
         set IncFiles = ( $IncFiles do-run-db cfg.db cfg.pco cfg.pl )
 
-# NOTE: better save this in case of parallel build 
-        set IncFiles = ( $IncFiles scarg.h )
-
         set ScmFiles = ( spokes.scm )
 
 # remove scheme files

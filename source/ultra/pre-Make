@@ -59,6 +59,23 @@ BinDep = ${Hdrs} ${TGTLib} ultra.c ${DepLib}
 BinObj = ${LdFlags} ultra.c
 
 #
+# Generated code rules
+#
+
+# headers
+
+hdrf = 
+
+# language bindings
+
+bindf = 
+
+generate : ${bindf} ${hdrf}
+
+IncAction = 
+
+
+#
 # Required Libraries
 #
 Libs = ${LULTRA} ${LSX} ${LPANACEA} ${LPGS} ${MDGLib} ${LSCHEME} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib} ${MDLibCfg}
