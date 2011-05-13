@@ -1,0 +1,11 @@
+#
+# X89 - define the use of ISO C89 plus POSIX and XOPEN extensions
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+setenv C_STD             X89
+

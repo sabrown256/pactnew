@@ -12,6 +12,8 @@
 #ifndef PCK_COMMON
 #define PCK_COMMON
 
+#if 0
+
 /* GOTCHA: we would like to do this but bootstrapping configuration
  * is a nightmare for now
   #include "iso-c.h"
@@ -26,6 +28,8 @@
 #  define _XOPEN_SOURCE     600
 #  define _DARWIN_C_SOURCE
 # endif
+#endif
+
 #endif
 
 #include <unistd.h>

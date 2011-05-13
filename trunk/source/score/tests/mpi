@@ -80,8 +80,12 @@ if ("$TEST_MPI" == "YES") then
          endif
       else
          Note $LogF "Running MPI version of test"
-         flog $Log  ( (echo "a"; echo "b"; echo "end") | $PFE -f -p 1 $BinDir/sctty -q |& grep -v ATTENTION: >! scmpiwrap.res )
+         flog $Log  ( (echo "a"; echo "b"; echo "end") | $PFE -f -p 1 $BinDir/sctty -q >&! scmpiwrap.res )
          set LStat = $status
+         flog $Log grep 'ATTENTION:' scmpiwrap.res 
+         if ($status == 0) then
+            flog $Log set LStat = 255
+         endif
       endif
 
       flog $Log cat scmpiwrap.res

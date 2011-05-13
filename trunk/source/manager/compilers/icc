@@ -14,17 +14,19 @@ WARN_PATTERN = ":+sp+warning+sp+"
 ERR_PATTERN  = ":+sp+error:"
 
 Tool CC {
-   Exe      = icc
-   Flags    = -wd267,1357
-   Flags   += [ _env_ = C_STD ;              # C standard flags
-                C89   = -std=c89 ;
-                C99   = -std=c99 ]
-   Flags   += [ _env_ = Bits ;
-                64    = -fPIC ]
-   Flags   += [ _cmd_ = -p ;                 # profiling
-	        on    = -qp ]
-   Debug    = -g
-   Optimize = -g
+   Exe       = icc
+   Flags     = -wd267,1357
+   Flags    += [ _env_ = C_STD ;                # C standard flags
+                 C89   = -std=c89 ;
+                 C99   = -std=c99 ;
+                 X89   = -std=gnu89 ;           # gcc default
+                 X99   = -std=gnu99 ]
+   Flags    += [ _env_ = Bits ;
+                 64    = -fPIC ]
+   Flags    += [ _cmd_ = -p ;                   # profiling
+	         on    = -qp ]
+   Debug     = -g
+   Optimize  = -g
 # Use this when icc PML Function test bug is fixed
 #   Optimize = -g -O1
    Version  = -V
@@ -62,3 +64,6 @@ Group OpenMP {
 
 include cpp-rule
 include serial
+
+define NON_INTEGER_ENUM
+

@@ -1494,7 +1494,7 @@ static object *_SXI_draw_plot(SS_psides *si, object *argl)
 
     if (SS_consp(argl))
        {SX_GET_OBJECT_FROM_LIST(si, SS_integerp(obj), apty,
-                                SS_INTEGER_VALUE(obj),
+				(PG_rendering) SS_INTEGER_VALUE(obj),
                                 argl, "BAD PLOT TYPE - _SXI_DRAW_PLOT");
 
 /*	if ((pty == PLOT_NONE) && (apty != PLOT_NONE)) */

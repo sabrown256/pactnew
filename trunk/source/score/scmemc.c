@@ -648,22 +648,25 @@ void *_SC_alloc_n(long ni, long bpi, void *arg)
     ph = _SC_tid_mm();
 
     if (arg == NULL)
-       {na   = FALSE;
+       {func = NULL;
+        file = NULL;
+        line = -1;
 	prm  = FALSE;
+	na   = FALSE;
 	zsp  = ph->zero_space;
-	typ  = -1;
-        func = NULL;
-        func = NULL;
-        line = -1;}
+	typ  = -1;}
     else
        {opt  = (SC_mem_opt *) arg;
-	prm  = opt->perm;
-	na   = opt->na;
-	zsp  = (opt->zsp == -1) ? ph->zero_space : opt->zsp;
-	typ  = opt->typ;
         func = (char *) opt->fnc;
         file = (char *) opt->file;
-        line = opt->line;};
+        line = opt->line;
+	prm  = opt->perm;
+	na   = opt->na;
+	if ((line == -1) && (strncmp(func, "PERM|", 5) == 0))
+	   {prm = TRUE;
+	    na  = TRUE;};
+	zsp  = (opt->zsp == -1) ? ph->zero_space : opt->zsp;
+	typ  = opt->typ;};
 
     rv  = NULL;
     nb  = ni*bpi;

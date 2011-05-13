@@ -10,7 +10,6 @@
 
 source ../../tests/common
 
-
    NoteD $LogF ""
    NoteD $LogF "                    SCORE Parallel Test ........."
 
@@ -30,23 +29,21 @@ source ../../tests/common
       NoteD $LogF "                    SCORE Parallel Test ......... FAILED ($ETime)"
       set Err = 1
    else
-      if ($?IBM_BGP == 1) then
-         set NThrds = (1 2)
+
+      if ($?TEST_MAX_THREADS == 1) then
+         @ nc = $TEST_MAX_THREADS
       else
-         flog $Log ( grep THREADING $IncDir/scconfig.h | grep openmp )
-         if ($status == 0) then
-            set NThrds = ""
-            @ nc = `ncpu`
-            @ ic = 1
-            while (($ic <= $nc) && ($ic < 16))
-               set NThrds = ( $NThrds $ic )
-               @ ic = 2 * $ic
-            end          
-         else
-            set NThrds = (1 2 8 16)
-         endif
+         @ nc = `ncpu`
       endif
-      set lerr   = 0
+
+      set NThrds = ""
+      @ ic = 1
+      while (($ic <= $nc) && ($ic < 16))
+         set NThrds = ( $NThrds $ic )
+         @ ic = 2 * $ic
+      end          
+
+      set lerr = 0
 
       if ("$CFE" != "") then
          setenv CFE   "$CFE -v"

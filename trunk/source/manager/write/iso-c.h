@@ -132,6 +132,10 @@ source $ldir/env-csh
        case C99:
             Note $STDOUT '#define ISO_C99'
             Note $STDOUT ''
+            breaksw
+       case X99:
+            Note $STDOUT '#define ISO_C99'
+            Note $STDOUT ''
             Note $STDOUT '#ifdef __GNUC__'
             Note $STDOUT ''
 #            Note $STDOUT '# ifndef _POSIX_C_SOURCE'
@@ -151,6 +155,26 @@ source $ldir/env-csh
             breaksw
        case C89:
             Note $STDOUT '#define ISO_C89'
+            Note $STDOUT ''
+            breaksw
+       case X89:
+            Note $STDOUT '#define ISO_C89'
+            Note $STDOUT ''
+            Note $STDOUT '#ifdef __GNUC__'
+            Note $STDOUT ''
+#            Note $STDOUT '# ifndef _POSIX_C_SOURCE'
+#            Note $STDOUT "#  define _POSIX_C_SOURCE   ${POSIX_STD}L"
+#            Note $STDOUT '# endif'
+#            Note $STDOUT ''
+            Note $STDOUT '# ifndef _XOPEN_SOURCE'
+            Note $STDOUT "#  define _XOPEN_SOURCE     ${XOPEN_STD}"
+            Note $STDOUT '# endif'
+            Note $STDOUT ''
+            Note $STDOUT '# ifndef _DARWIN_C_SOURCE'
+            Note $STDOUT '#  define _DARWIN_C_SOURCE'
+            Note $STDOUT '# endif'
+            Note $STDOUT ''
+            Note $STDOUT '#endif'
             Note $STDOUT ''
             breaksw
         default:
