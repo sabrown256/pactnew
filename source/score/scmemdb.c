@@ -170,7 +170,7 @@ static int _SC_list_block_info(char *s, SC_heap_des *ph, void *ptr,
 	nc = ENTRY_SIZE - nc - 1;
 	SC_ASSERT(nc > 0);
 
-	if ((nr == UNCOLLECT) || (show == TRUE))
+	if ((nr != UNCOLLECT) || (show == TRUE))
 	   {strcpy(s, t);
 	    rv = TRUE;};};
 
