@@ -76,8 +76,10 @@ extern "C" {
 
 # ifdef ISO_C99
 
+#ifndef __cplusplus
 extern int
  getpagesize(void);
+#endif
 
 # endif
 
