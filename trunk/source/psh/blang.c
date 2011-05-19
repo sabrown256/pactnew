@@ -520,7 +520,8 @@ static void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
 		fprintf(fp, "    _l%s = (%s) *p%s;\n",
 			al[i].name, al[i].type, al[i].name);};};
 
-    fprintf(fp, "\n");
+    if (na > 0)
+       fprintf(fp, "\n");
 
 /* function call */
     fc_call_list(a, MAXLINE, dcl);
@@ -636,12 +637,7 @@ static void fin_fortran(FILE *fp)
 static void mc_type(char *fty, int nf, char *cty, int nc, char *t)
    {
 
-    if (strcmp(t, "char *") == 0)
-       {nstrncpy(fty, nf, "character", -1);
-	nstrncpy(cty, nc, "C_CHAR", -1);}
-
-    else if ((is_ptr(t) == TRUE) || 
-	     (strstr(t, "(*") != NULL))
+    if ((is_ptr(t) == TRUE) || (strstr(t, "(*") != NULL))
        {nstrncpy(fty, nf, "type", -1);
 	nstrncpy(cty, nc, "C_PTR", -1);}
 
@@ -722,9 +718,7 @@ static void mc_decl_list(char *a, int nc, fdecl *dcl)
     al = dcl->al;
 
     a[0] = '\0';
-    if ((na == 0) || (no_args(dcl) == TRUE))
-       nstrcat(a, MAXLINE, "void");
-    else
+    if ((na > 0) && (no_args(dcl) == FALSE))
        {for (i = 0; i < na; i++)
 	    {vstrcat(a, MAXLINE, "%s, ", al[i].name);};
         a[strlen(a) - 2] = '\0';};
@@ -775,11 +769,11 @@ static void wrap_module(FILE *fp, fdecl *dcl, char *cfn)
     rptr = is_ptr(fty);
 
     if (voidf == TRUE)
-      fprintf(fp, "      %s %s(%s)  bind(c, name='%s')\n",
-	      fty, dcn, a, cfn);
+       fprintf(fp, "      %s %s(%s)  bind(c, name='%s')\n",
+	       fty, dcn, a, cfn);
     else
-      fprintf(fp, "      %s (%s) function %s(%s)  bind(c, name='%s')\n",
-	      fty, cty, dcn, a, cfn);
+       fprintf(fp, "      %s (%s) function %s(%s)  bind(c, name='%s')\n",
+	       fty, cty, dcn, a, cfn);
     fprintf(fp, "         use iso_c_binding\n");
     fprintf(fp, "         implicit none\n");
 
