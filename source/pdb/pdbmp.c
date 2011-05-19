@@ -99,7 +99,7 @@ PDBfile *PD_mp_open(char *name, char *mode, SC_communicator comm)
  * 
  */
 
-FIXNUM F77_FUNC(pfinmp, PFINMP)(FIXNUM *masterproc, FIXNUM *pnthreads, 
+FIXNUM FF_ID(pfinmp, PFINMP)(FIXNUM *masterproc, FIXNUM *pnthreads, 
 				PFTid tid)
    {FIXNUM rv;
 
@@ -112,7 +112,7 @@ FIXNUM F77_FUNC(pfinmp, PFINMP)(FIXNUM *masterproc, FIXNUM *pnthreads,
 
 /* PFTMMP - FORTRAN interface routine to terminate pdblib mpi */
 
-FIXNUM F77_FUNC(pftmmp, PFTMMP)(void)
+FIXNUM FF_ID(pftmmp, PFTMMP)(void)
    {
 
     PD_term_mpi();
@@ -128,7 +128,7 @@ FIXNUM F77_FUNC(pftmmp, PFTMMP)(void)
  *        - return 0 otherwise
  */
 
-FIXNUM F77_FUNC(pfmpop, PFMPOP)(FIXNUM *pnchr, char *name,
+FIXNUM FF_ID(pfmpop, PFMPOP)(FIXNUM *pnchr, char *name,
 				char *mode, FIXNUM *pcomm)
    {FIXNUM rv;
     char s[MAXLINE], t[2];
@@ -154,7 +154,7 @@ FIXNUM F77_FUNC(pfmpop, PFMPOP)(FIXNUM *pnchr, char *name,
 
 /* PFMPSS - FORTRAN interface routine to set file->mpi_file */
 
-FIXNUM F77_FUNC(pfmpss, PFMPSS)(FIXNUM *fileid, FIXNUM *v)
+FIXNUM FF_ID(pfmpss, PFMPSS)(FIXNUM *fileid, FIXNUM *v)
    {FIXNUM rv;
     PDBfile *file;
 

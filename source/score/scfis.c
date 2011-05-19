@@ -27,7 +27,7 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_STRLEN - helper to find string length in the F77 convention */
+/* _SC_STRLEN - helper to find string length in the Fortran convention */
 
 int _SC_strlen(char *s, int nx)
    {int n;
@@ -43,17 +43,17 @@ int _SC_strlen(char *s, int nx)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SCSTLN - F77 string length function
+/* SCSTLN - Fortran string length function
  *        - looks from end for first non-blank character in S
  *        - this is simply a convention but one used by some other codes
  *        - NX is the length of the character array
  */
 
-FIXNUM F77_FUNC(scstln, SCSTLN)(char *s, FIXNUM *pnx)
+FIXNUM FF_ID(scstln, SCSTLN)(char *s, FIXNUM *pnx)
    {int n, nx;
     char *t;
 
-    t  = SC_F77_C_STRING(s);
+    t  = s;
     nx = *pnx;
 
     n = _SC_strlen(t, nx);
@@ -68,16 +68,16 @@ FIXNUM F77_FUNC(scstln, SCSTLN)(char *s, FIXNUM *pnx)
  *        - and points S to the next element in the string
  */
 
-void F77_FUNC(scsttk, SCSTTK)(FIXNUM *pnc, char *d,  char *s,
+void FF_ID(scsttk, SCSTTK)(FIXNUM *pnc, char *d,  char *s,
 			      FIXNUM pnd, char *dl)
    {int j, n, nc, flag;
     char *dst, *src, *delim;
     char c;
 
     nc    = *pnc;
-    dst   = SC_F77_C_STRING(d);
-    src   = SC_F77_C_STRING(s);
-    delim = SC_F77_C_STRING(dl);
+    dst   = d;
+    src   = s;
+    delim = dl;
 
     n = _SC_strlen(s, nc);
 
@@ -113,7 +113,7 @@ void F77_FUNC(scsttk, SCSTTK)(FIXNUM *pnc, char *d,  char *s,
  *        - implied in the argument list
  */
 
-void F77_FUNC(scspnt, SCSPNT)(FIXNUM *pnc, char *d, char *f, ...)
+void FF_ID(scspnt, SCSPNT)(FIXNUM *pnc, char *d, char *f, ...)
    {int c, nc, nd;
     char local[MAXLINE], tb[10], ce;
     char *fmt, *le, *lb, *pt, *dst, *s;
@@ -122,8 +122,8 @@ void F77_FUNC(scspnt, SCSPNT)(FIXNUM *pnc, char *d, char *f, ...)
     char *sv;
 
     nc     = (int) *pnc;
-    fmt    = SC_F77_C_STRING(f);
-    dst    = SC_F77_C_STRING(d);
+    fmt    = f;
+    dst    = d;
     dst[0] = '\0';
 
     SC_VA_START(f);

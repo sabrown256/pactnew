@@ -429,10 +429,8 @@ void _SC_print_block_info(FILE *fp, SC_heap_des *ph, void *ptr, int flag)
 	io_printf(fp, "- %d\n", ph->tid);}
 
     else
-       {if (FTN_NAME(desc))
-	   {name = SC_F77_C_STRING(name);
-	    nc   = strlen(name);
-
+       {if (FF_NAME(desc))
+	   {nc = strlen(name);
 	    ps = strchr(name, ' ');
 	    if (ps != NULL)
 	       {nf = ps - name;

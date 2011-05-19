@@ -15,7 +15,7 @@
 
 /* PMSZFT - return the largest M such that 2^M <= N  */
 
-FIXNUM F77_FUNC(pmszft, PMSZFT)(FIXNUM *pn)
+FIXNUM FF_ID(pmszft, PMSZFT)(FIXNUM *pn)
    {
 
     *pn = (FIXNUM) PM_next_exp_two((int) *pn);
@@ -29,9 +29,9 @@ FIXNUM F77_FUNC(pmszft, PMSZFT)(FIXNUM *pn)
  *        - this a wrapper for PM_fft_sc_real_data
  */
 
-FIXNUM F77_FUNC(pmrfft, PMRFFT)(double *outyr, double *outyi, double *outx,
-				FIXNUM *pn, double *inx, double *iny,
-				double *pxn, double *pxx, FIXNUM *po)
+FIXNUM FF_ID(pmrfft, PMRFFT)(double *outyr, double *outyi, double *outx,
+			     FIXNUM *pn, double *inx, double *iny,
+			     double *pxn, double *pxx, FIXNUM *po)
    {int i, n, np, ordr;
     FIXNUM rv;
     double xmn, xmx;
@@ -67,7 +67,7 @@ FIXNUM F77_FUNC(pmrfft, PMRFFT)(double *outyr, double *outyi, double *outx,
  *        - this a wrapper for PM_fft_sc_complex_data
  */
 
-FIXNUM F77_FUNC(pmcfft, PMCFFT)(double *outyr, double *outyi, double *outx,
+FIXNUM FF_ID(pmcfft, PMCFFT)(double *outyr, double *outyi, double *outx,
 				FIXNUM *pn, double *inx, double *inyr,
 				double *inyi, double *pxn, double *pxx,
 				FIXNUM *pf, FIXNUM *po)
@@ -111,7 +111,7 @@ FIXNUM F77_FUNC(pmcfft, PMCFFT)(double *outyr, double *outyi, double *outx,
 
 /* PMBSET - begin making a set */
 
-FIXNUM F77_FUNC(pmbset, PMBSET)(FIXNUM *pn, char *fname, FIXNUM *pt,
+FIXNUM FF_ID(pmbset, PMBSET)(FIXNUM *pn, char *fname, FIXNUM *pt,
 				char *ftype, FIXNUM *pcp, FIXNUM *pnd,
 				FIXNUM *pnde, FIXNUM *pmx, FIXNUM *ptp,
 				FIXNUM *inxt)
@@ -204,7 +204,7 @@ FIXNUM F77_FUNC(pmbset, PMBSET)(FIXNUM *pn, char *fname, FIXNUM *pt,
 
 /* PMESET - complete making a set */
 
-FIXNUM F77_FUNC(pmeset, PMESET)(FIXNUM *iset)
+FIXNUM FF_ID(pmeset, PMESET)(FIXNUM *iset)
    {PM_set *set;
 
     set = SC_GET_POINTER(PM_set, *iset);
@@ -218,7 +218,7 @@ FIXNUM F77_FUNC(pmeset, PMESET)(FIXNUM *iset)
 
 /* PMASET - add a component to a set */
 
-FIXNUM F77_FUNC(pmaset, PMASET)(FIXNUM *iset, FIXNUM *pie, void *px)
+FIXNUM FF_ID(pmaset, PMASET)(FIXNUM *iset, FIXNUM *pie, void *px)
    {int ie, cp;
     pcons *info;
     void **elem;
@@ -259,7 +259,7 @@ FIXNUM F77_FUNC(pmaset, PMASET)(FIXNUM *iset, FIXNUM *pie, void *px)
 
 /* PMMTOP - make a PM_mesh_topology */
 
-FIXNUM F77_FUNC(pmmtop, PMMTOP)(FIXNUM *pnd, FIXNUM *pnc, FIXNUM *pbp,
+FIXNUM FF_ID(pmmtop, PMMTOP)(FIXNUM *pnd, FIXNUM *pnc, FIXNUM *pbp,
 				FIXNUM *pbnd)
    {int i, j, n, nd, ndp;
     int *nc, *nbp;
@@ -310,7 +310,7 @@ FIXNUM F77_FUNC(pmmtop, PMMTOP)(FIXNUM *pnd, FIXNUM *pnc, FIXNUM *pbp,
 
 /* PMEFPE - enable/disable FPE handling */
 
-void F77_FUNC(pmefpe, PMEFPE)(FIXNUM *pflg, PFSignal_handler hnd)
+void FF_ID(pmefpe, PMEFPE)(FIXNUM *pflg, PFSignal_handler hnd)
    {int flg;
 
     flg = *pflg;
@@ -324,7 +324,7 @@ void F77_FUNC(pmefpe, PMEFPE)(FIXNUM *pflg, PFSignal_handler hnd)
 
 /* PMFPTF - classify float type wrt NaN */
 
-FIXNUM F77_FUNC(pmfptf, PMFPTF)(float *pf)
+FIXNUM FF_ID(pmfptf, PMFPTF)(float *pf)
    {FIXNUM rv;
 
     rv = PM_fp_typef(*pf);
@@ -336,7 +336,7 @@ FIXNUM F77_FUNC(pmfptf, PMFPTF)(float *pf)
 
 /* PMFPTD - classify double type wrt NaN */
 
-FIXNUM F77_FUNC(pmfptd, PMFPTD)(double *pd)
+FIXNUM FF_ID(pmfptd, PMFPTD)(double *pd)
    {FIXNUM rv;
 
     rv = PM_fp_typed(*pd);
@@ -348,7 +348,7 @@ FIXNUM F77_FUNC(pmfptd, PMFPTD)(double *pd)
 
 /* PMFXNF - fix float NaNs */
 
-FIXNUM F77_FUNC(pmfxnf, PMFXNF)(FIXNUM *pn, float *pf, FIXNUM *pmsk, double *pv)
+FIXNUM FF_ID(pmfxnf, PMFXNF)(FIXNUM *pn, float *pf, FIXNUM *pmsk, double *pv)
    {int msk;
     long n;
     FIXNUM rv;
@@ -367,7 +367,7 @@ FIXNUM F77_FUNC(pmfxnf, PMFXNF)(FIXNUM *pn, float *pf, FIXNUM *pmsk, double *pv)
 
 /* PMCNNF - count float NaNs */
 
-FIXNUM F77_FUNC(pmcnnf, PMCNNF)(FIXNUM *pn, float *pf, FIXNUM *pmsk)
+FIXNUM FF_ID(pmcnnf, PMCNNF)(FIXNUM *pn, float *pf, FIXNUM *pmsk)
    {int msk;
     long n;
     FIXNUM rv;
@@ -384,7 +384,7 @@ FIXNUM F77_FUNC(pmcnnf, PMCNNF)(FIXNUM *pn, float *pf, FIXNUM *pmsk)
 
 /* PMFXND - fix double NaNs */
 
-FIXNUM F77_FUNC(pmfxnd, PMFXND)(FIXNUM *pn, double *pd,
+FIXNUM FF_ID(pmfxnd, PMFXND)(FIXNUM *pn, double *pd,
 				FIXNUM *pmsk, double *pv)
    {int msk;
     long n;
@@ -404,7 +404,7 @@ FIXNUM F77_FUNC(pmfxnd, PMFXND)(FIXNUM *pn, double *pd,
 
 /* PMCNND - count double NaNs */
 
-FIXNUM F77_FUNC(pmcnnd, PMCNND)(FIXNUM *pn, double *pd, FIXNUM *pmsk)
+FIXNUM FF_ID(pmcnnd, PMCNND)(FIXNUM *pn, double *pd, FIXNUM *pmsk)
    {int msk;
     long n;
     FIXNUM rv;

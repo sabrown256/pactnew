@@ -1,5 +1,5 @@
 TXT: SCORE User's Manual
-MOD: 05/10/2011
+MOD: 05/19/2011
 
 <CENTER>
 <P>
@@ -166,7 +166,7 @@ apply a function to all elements in the hash array.
 
 <pre>
 <i>C Binding: </i>hasharr *SC_make_hasharr(int size, int docflag, char *lm, int flags)
-<i>F77 Binding: </i>integer scmkht(integer size, integer docflag, integer flags)
+<i>Fortran Binding: </i>integer scmkht(integer size, integer docflag, integer flags)
 <i>SX Binding: </i>
 <i>Python Binding: </i>
 </pre>
@@ -198,7 +198,7 @@ pointer otherwise.
 
 <pre>
 <i>C Binding: </i>void SC_free_hasharr(hasharr *ha, int (*f)(haelem *hp, void *a), void *a)
-<i>F77 Binding: </i>integer scrlht(integer ha)
+<i>Fortran Binding: </i>integer scrlht(integer ha)
 <i>SX Binding: </i>
 <i>Python Binding: </i>
 </pre>
@@ -212,7 +212,7 @@ have installed.  The argument <tt>a</tt> is passed through to each call to
 
 <pre>
 <i>C Binding: </i>char **SC_hasharr_dump(hasharr *ha, char *pattern, char *type, int sort)
-<i>F77 Binding: </i>
+<i>Fortran Binding: </i>
 <i>SX Binding: </i>
 <i>Python Binding: </i>
 </pre>
@@ -231,7 +231,7 @@ sorted according the C library function STRCMP.
 
 <pre>
 <i>C Binding: </i>int SC_hasharr_install(hasharr *ha, void *key, void *obj, char *type, int mark, int lookup)
-<i>F77 Binding: </i>integer schins(integer nk, char *key, obj, integer nt,
+<i>Fortran Binding: </i>integer schins(integer nk, char *key, obj, integer nt,
                                    char *type, integer cp, integer ha)
 <i>SX Binding: </i>
 <i>Python Binding: </i>
@@ -258,7 +258,7 @@ The new space will be installed in the hash array.
 
 <pre>
 <i>C Binding: </i>int SC_hasharr_remove(hasharr *ha, void *key)
-<i>F77 Binding: </i>integer schrem(integer nk, char *key, integer ha)
+<i>Fortran Binding: </i>integer schrem(integer nk, char *key, integer ha)
 <i>SX Binding: </i>
 <i>Python Binding: </i>
 </pre>
@@ -271,7 +271,7 @@ otherwise, <tt>FALSE</tt> is returned.
 
 <pre>
 <i>C Binding: </i>void SC_hasharr_clear(hasharr *ha, int (*f)(haelem *hp, void *a), void *a)
-<i>F77 Binding: </i>integer schclr(integer ha)
+<i>Fortran Binding: </i>integer schclr(integer ha)
 <i>SX Binding: </i>
 <i>Python Binding: </i>
 </pre>
@@ -284,7 +284,7 @@ for more installs, lookups, and so on.
 
 <pre>
 <i>C Binding: </i>haelem *SC_hasharr_lookup(hasharr *ha, void *key)
-<i>F77 Binding: </i>
+<i>Fortran Binding: </i>
 <i>SX Binding: </i>
 <i>Python Binding: </i>
 </pre>
@@ -294,7 +294,7 @@ Look up the given key in the hash array and return the associated hash element.
 
 <pre>
 <i>C Binding: </i>void *SC_hasharr_def_lookup(hasharr *ha, void *key)
-<i>F77 Binding: </i>integer schlkp(void *p, integer nk, char *key, integer ha)
+<i>Fortran Binding: </i>integer schlkp(void *p, integer nk, char *key, integer ha)
 <i>SX Binding: </i>
 <i>Python Binding: </i>
 </pre>
@@ -309,7 +309,7 @@ Returns TRUE successful; otherwise, FALSE.
 
 <pre>
 <i>C Binding: </i>void SC_hasharr_foreach(hasharr *ha, int (*f)(haelem *hp, void *a), void *a)
-<i>F77 Binding: </i>
+<i>Fortran Binding: </i>
 <i>SX Binding: </i>
 <i>Python Binding: </i>
 </pre>
@@ -319,7 +319,7 @@ Applies <tt>f</tt> to each entry in the hash array.
 
 <pre>
 <i>C Binding: </i>int SC_hasharr_next(hasharr *ha, long *pi, char **pname, char **ptype, void **po)
-<i>F77 Binding: </i>
+<i>Fortran Binding: </i>
 <i>SX Binding: </i>
 <i>Python Binding: </i>
 </pre>
@@ -330,7 +330,7 @@ non-NULL hash element in the hasharray.
 
 <pre>
 <i>C Binding: </i>void SC_hasharr_sort(hasharr *ha, int (*pred)(void *a, void *b))
-<i>F77 Binding: </i>
+<i>Fortran Binding: </i>
 <i>SX Binding: </i>
 <i>Python Binding: </i>
 </pre>
@@ -341,7 +341,7 @@ Sorts the linear array in <tt>ha</tt> using the supplied predicate function
 
 <pre>
 <i>C Binding: </i>long SC_hasharr_get_n(hasharr *ha)
-<i>F77 Binding: </i>
+<i>Fortran Binding: </i>
 <i>SX Binding: </i>
 <i>Python Binding: </i>
 </pre>
@@ -351,7 +351,7 @@ Return the number of elements in the hash array <tt>ha</tt>.
 
 <pre>
 <i>C Binding: </i>int SC_haelem_data(haelem *hp, char **pname, char **ptype, void **po)
-<i>F77 Binding: </i>
+<i>Fortran Binding: </i>
 <i>SX Binding: </i>
 <i>Python Binding: </i>
 </pre>
@@ -383,7 +383,7 @@ describes a lexical token for parsers and other applications.<p>
 
 <pre>
 <i>C Binding: </i>void SC_close_lexical_stream(SC_lexical_stream *str)
-<i>F77 Binding:</i>integer scclls(integer strid)
+<i>Fortran Binding:</i>integer scclls(integer strid)
 <i>SX Binding: </i>
 <i>Python Binding: </i>
 </pre>
@@ -403,7 +403,7 @@ This function has no return value.
 <pre>
 <I>C Binding: </I>SC_lexical_token *SC_get_next_lexical_token(
                    SC_lexical_stream *str)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 <i>Python Binding: </i>
 </pre>
@@ -428,7 +428,7 @@ input stream has been reached.
                    char *name, int inbfsz, int strbfsz,
                    PFInt scan, PFInt input, PFInt output, PFInt unput,
                    PFInt wrap, PFInt more, PFInt less)
-<I>F77 Binding: </I>integer scopls(integer nchr, char *name, integer inbs,
+<I>Fortran Binding: </I>integer scopls(integer nchr, char *name, integer inbs,
                             integer strbs, integer function scan)
 <I>SX Binding: </I>
 <I>Python Binding: </I>
@@ -476,7 +476,7 @@ lexical stream if successful and -1 otherwise.<p>
 
 <pre>
 <I>C Binding: </I>
-<I>F77 Binding: </I>integer scrdls(integer strid, integer nc, char *s)
+<I>Fortran Binding: </I>integer scrdls(integer strid, integer nc, char *s)
 <I>SX Binding: </I>
 <I>Python Binding: </I>
 </pre>
@@ -499,7 +499,7 @@ character array. The return value is <tt>TRUE</tt> if successful and <tt>FALSE</
 
 <pre>
 <I>C Binding: </I>int SC_scan(SC_lexical_stream *str, int rd)
-<I>F77 Binding: </I>integer scscan(integer strid,  integer mxtok, integer width,
+<I>Fortran Binding: </I>integer scscan(integer strid,  integer mxtok, integer width,
                             char *tok, integer ntok, integer nctok, integer ixtok,
                             integer toktyp, REAL tokval)
 <I>SX Binding: </I>
@@ -580,7 +580,7 @@ developer must decide.<p>
 
 <pre>
 <I>C Binding: </I>pcons *SC_change_alist(pcons *al, char *name, char *type, void *val)
-<I>F77 Binding: </I>integer scchal(integer al, integer nn, char *pname, integer nt,
+<I>Fortran Binding: </I>integer scchal(integer al, integer nn, char *pname, integer nt,
                             char *ptype, integer nv,  val)
 <I>SX Binding: </I>
 <I>Python Binding: </I>
@@ -606,7 +606,7 @@ dynamically allocated with <tt>CMAKE</tt> or <tt>CMAKE_N</tt>.
 
 <pre>
 <I>C Binding: </I>pcons *SC_rem_alist(pcons *al, char *name)
-<I>F77 Binding: </I>integer scrmal(integer al, integer nn, char *name)
+<I>Fortran Binding: </I>integer scrmal(integer al, integer nn, char *name)
 <I>SX Binding: </I>
 <I>Python Binding: </I>
 </pre>
@@ -618,7 +618,7 @@ returned and must be used in all future calls to these functions!<p>
 
 <pre>
 <I>C Binding: </I>void SC_free_alist(pcons *al, int level)
-<I>F77 Binding: </I>integer scrlal(integer al, integer level)
+<I>Fortran Binding: </I>integer scrlal(integer al, integer level)
 <I>SX Binding: </I>
 <I>Python Binding: </I>
 </pre>
@@ -633,7 +633,7 @@ and if <em>level</em> is 3 both are released.<p>
 
 <pre>
 <I>C Binding: </I>pcons *SC_copy_alist(pcons *al)
-<I>F77 Binding: </I>integer sccpal(integer al)
+<I>Fortran Binding: </I>integer sccpal(integer al)
 <I>SX Binding: </I>
 <I>Python Binding: </I>
 </pre>
@@ -643,7 +643,7 @@ This routine returns a copy of the given association list if successful.
 
 <pre>
 <I>C Binding: </I>pcons *SC_append_alist(pcons *al1, pcons *al2)
-<I>F77 Binding: </I>  
+<I>Fortran Binding: </I>  
 <I>SX Binding: </I>
 <I>Python Binding: </I>
 </pre>
@@ -1202,7 +1202,7 @@ true portability and standardization.<p>
 
 <pre>
 <I>C Binding: </I>double SC_cpu_time(void)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 </pre>
 
@@ -1213,7 +1213,7 @@ resolution to 0.01 seconds to reduce overhead.
 
 <pre>
 <I>C Binding: </I>double SC_wall_clock_time(void)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 </pre>
 
@@ -1224,7 +1224,7 @@ seconds to reduce overhead.
 
 <pre>
 <I>C Binding: </I>char *SC_date(void)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 </pre>
 
@@ -1584,7 +1584,7 @@ NOTE: All arguments but the first must be the same in the pairs of
 
 <pre>
 <I>C Binding: </I>int SC_arrlen(void *ptr)
-<I>F77 Binding: </I>integer scalen(pointer ptr)
+<I>Fortran Binding: </I>integer scalen(pointer ptr)
 <I>SX Binding: </I>
 <I>Python Binding: </I>
 </pre>
@@ -1602,7 +1602,7 @@ and -1 if not.
 
 <pre>
 <I>C Binding: </I>void SC_configure_mm(long mxl, long mxm, long bsz, double r)
-<I>F77 Binding: </I> scmmcf(integer mxl, integer mxm, integer bsz, real r)
+<I>Fortran Binding: </I> scmmcf(integer mxl, integer mxm, integer bsz, real r)
 <I>SX Binding: memory management is automatic</I>
 <I>Python Binding: </I>
 </pre>
@@ -1622,7 +1622,7 @@ and <em>r</em>, the bin size ratio in the exponential region.
 
 <pre>
 <I>C Binding: </I>int SC_mem_chk(int n)
-<I>F77 Binding: </I>integer scmemc(integer n)
+<I>Fortran Binding: </I>integer scmemc(integer n)
 <I>SX Binding: </I>
 <I>Python Binding: </I>
 </pre>
@@ -1641,7 +1641,7 @@ violation.  This fact does NOT invalidate this function as a diagnostic.
 
 <pre>
 <I>C Binding: </I>int SC_mem_map(FILE *fp, int flag)
-<I>F77 Binding: </I>integer scmemp(integer flag)
+<I>Fortran Binding: </I>integer scmemp(integer flag)
 <I>SX Binding: </I>(memory-map fp)
 <I>Python Binding: </I>
 </pre>
@@ -1656,7 +1656,7 @@ Return the number of blocks of memory that are in the map.
 
 <pre>
 <I>C Binding: </I>int SC_mem_monitor(int old, int lev, char *id, char *msg)
-<I>F77 Binding: </I>integer scmemm(integer old, integer lev, integer ni,
+<I>Fortran Binding: </I>integer scmemm(integer old, integer lev, integer ni,
                             character*(*) id, integer ncm, character*(*) msg)
 <I>SX Binding: </I>(memory-monitor old lev id)
 <I>Python Binding: </I>
@@ -1684,7 +1684,7 @@ and <em>msg</em>, a character array from the application to hold an error messag
 
 <pre>
 <I>C Binding: </I>int SC_mem_stats(long *al, long *fr, long *df, long *mx)
-<I>F77 Binding: </I>integer scmems(integer al, integer fr, integer df, integer mx)
+<I>Fortran Binding: </I>integer scmems(integer al, integer fr, integer df, integer mx)
 <I>SX Binding: </I>
 <I>Python Binding: </I>
 </pre>
@@ -1698,7 +1698,7 @@ at one time is returned in <em>mx</em>.
 
 <pre>
 <I>C Binding: </I>int SC_mem_stats_acc(long a, long f)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 <I>Python Binding: </I>
 </pre>
@@ -1710,7 +1710,7 @@ respectively.
 
 <pre>
 <I>C Binding: </I>int SC_mem_stats_set(long a, long f)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 <I>Python Binding: </I>
 </pre>
@@ -1728,7 +1728,7 @@ value to store in the freed counter.
 
 <pre>
 <I>C Binding: </I>char *CSTRSAVE(char *s)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 <I>Python Binding: </I>
 </pre>
@@ -1742,7 +1742,7 @@ Return a non-NULL pointer to a newly allocated space if successful and NULL if n
 
 <pre>
 <I>C Binding: </I>char *SC_trap_pointer(void *p, int sig)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 <I>Python Binding: </I>
 </pre>
@@ -1754,7 +1754,7 @@ signal that will be raised.  To turn off pointer trapping use <tt>SC_untrap_poin
 
 <pre>
 <I>C Binding: </I>char *SC_untrap_pointer(void *p)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 <I>Python Binding: </I>
 </pre>
@@ -1764,7 +1764,7 @@ Undo the trap on pointer setup by a call to <tt>SC_trap_pointer</tt>.
 
 <pre>
 <I>C Binding: </I>void SC_use_c_mm(void)
-<I>F77 Binding:</I>
+<I>Fortran Binding:</I>
 <I>SX Binding: </I>
 <I>Python Binding: </I>
 </pre>
@@ -1778,7 +1778,7 @@ hooks can only be accessed by using the SCORE memory manager macros
 
 <pre>
 <I>C Binding: </I>void SC_use_score_mm(void)
-<I>F77 Binding:</I>
+<I>Fortran Binding:</I>
 <I>SX Binding: </I>
 <I>Python Binding: </I>
 </pre>
@@ -1792,7 +1792,7 @@ reallocate and free memory.
 
 <pre>
 <I>C Binding: </I>void SC_use_guarded_mem(int on)
-<I>F77 Binding:</I>integer scgmem(integer on)
+<I>Fortran Binding:</I>integer scgmem(integer on)
 <I>SX Binding: </I>
 <I>Python Binding: </I>
 </pre>
@@ -1803,7 +1803,7 @@ Turn on memory protection if the argument is not 0 and turn it off otherwise.
 
 <pre>
 <I>C Binding: </I>type *CMAKE(type)
-<I>F77 Binding: </I> use scmakf
+<I>Fortran Binding: </I> use scmakf
 <I>SX Binding: memory management is automatic</I> 
 <I>Python Binding: </I>
 </pre>
@@ -1821,7 +1821,7 @@ Fortran binding returns 1 iff successful.
 
 <pre>
 <I>C Binding: </I>type *CMAKE_N(type, long ni)
-<I>F77 Binding: </I>integer scmakf(pointer ptr, integer ni, integer bpi,
+<I>Fortran Binding: </I>integer scmakf(pointer ptr, integer ni, integer bpi,
                                    integer nc, char *name)
 <I>SX Binding: memory management is automatic</I>
 <I>Python Binding: </I>
@@ -1845,7 +1845,7 @@ and NULL if not. The FORTRAN binding returns 1 if successful and 0 if not.
 
 <pre>
 <I>C Binding: </I>type *CREMAKE(void *ptr, type, long ni)
-<I>F77 Binding: </I>integer screma(pointer ptr, integer ni, integer bpi)
+<I>Fortran Binding: </I>integer screma(pointer ptr, integer ni, integer bpi)
 <I>SX Binding: memory management is automatic</I>
 <I>Python Binding: </I>
 </pre>
@@ -1865,7 +1865,7 @@ and NULL if not. The FORTRAN binding returns 1 if successful and 0 if not.
 
 <pre>
 <I>C Binding: </I>void CFREE(void *ptr)
-<I>F77 Binding: </I>integer scfree(pointer ptr)
+<I>Fortran Binding: </I>integer scfree(pointer ptr)
 <I>SX Binding: memory management is automatic</I>
 <I>Python Binding: </I>
 </pre>
@@ -1877,7 +1877,7 @@ and always returns 1.
 
 <pre>
 <I>C Binding: </I>int SC_zero_space_n(int flag, int tid)
-<I>F77 Binding: </I>integer sczrsp(integer flag)
+<I>Fortran Binding: </I>integer sczrsp(integer flag)
 <I>SX Binding: not applicable</I>
 <I>Python Binding: zero_space(int flag)</I>
 </pre>
@@ -1918,7 +1918,7 @@ Returns the old value of the flag.
 
 <pre>
 <I>C Binding: </I>int SC_bit_count(long c, int n)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 </pre>
 
@@ -1927,7 +1927,7 @@ Count the number of set bits in the specified number of bytes of a given long.
 
 <pre>
 <I>C Binding: </I>unsigned int SC_bit_reverse(unsigned int i, int n)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 </pre>
 
@@ -1942,7 +1942,7 @@ Reverse the specified number of bits of a given unsigned int.
 
 <pre>
 <I>C Binding: </I>int SC_stoi(char *s)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 </pre>
 
@@ -1951,7 +1951,7 @@ Convert a string to an int. Return 0 if the string is null.
 
 <pre>
 <I>C Binding: </I>STRTOL(char *str, char **ptr, int base)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 </pre>
 
@@ -1962,7 +1962,7 @@ guaranteed to work SCORE equivalent.
 
 <pre>
 <I>C Binding: </I>double ATOF(char *s)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 </pre>
 
@@ -1972,7 +1972,7 @@ library function atof or the guaranteed to work SCORE equivalent.
 
 <pre>
 <I>C Binding: </I>double SC_stof(char *s)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 </pre>
 
@@ -1981,7 +1981,7 @@ Convert a string to a double. Return 0.0 if the string is null.
 
 <pre>
 <I>C Binding: </I>double STRTOD(char *nptr, char **endptr)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 </pre>
 
@@ -1997,7 +1997,7 @@ guaranteed to work SCORE equivalent.
 
 <pre>
 <I>C Binding: </I>double ABS(double x)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 </pre>
 
@@ -2006,7 +2006,7 @@ Return the absolute value of a double.
 
 <pre>
 <I>C Binding: </I>max(a, b)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 </pre>
 
@@ -2015,7 +2015,7 @@ Return the greater of the two arguments.
 
 <pre>
 <I>C Binding: </I>min(a, b)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 </pre>
 
@@ -2029,7 +2029,7 @@ Return the lesser of the two arguments.
 
 <pre>
 <I>C Binding: </I>int SC_isfile(char *s)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 </pre>
 
@@ -2038,7 +2038,7 @@ Is the string the name of an existing file?
 
 <pre>
 <I>C Binding: </I>int SC_isfile_ascii(char *s)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 </pre>
 
@@ -2047,7 +2047,7 @@ Is the string the name of an existing ascii file?
 
 <pre>
 <I>C Binding: </I>char *SC_search_file(char **directory, char *s)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 </pre>
 
@@ -2077,7 +2077,7 @@ the application is responsible for releasing it with <tt>CFREE</tt>.
 <pre>
 <I>C Binding: </I>void SC_init(char *msg, PFByte fnc, int sighand, PFByte sigfnc,
  void *sigctx, int bfhand, char *bf, int bfsize)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 </pre>
 
@@ -2087,7 +2087,7 @@ buffering for an application.
 
 <pre>
 <I>C Binding: </I>void SC_interrupt_handler(int sig)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 </pre>
 
@@ -2101,7 +2101,7 @@ Handle interrupts in a default sort of way.
 
 <pre>
 <I>C Binding: </I>void SC_banner(char *s)
-<I>F77 Binding: </I>
+<I>Fortran Binding: </I>
 <I>SX Binding: </I>
 </pre>
 
@@ -2110,7 +2110,7 @@ Display the input string as a banner on stdout.
 
 <pre>
 <I>C Binding: </I>void SC_pause(void)
-<I>F77 Binding: </I>integer scpaus(void)
+<I>Fortran Binding: </I>integer scpaus(void)
 <I>SX Binding: </I>
 </pre>
 
@@ -2143,7 +2143,7 @@ For distributed parallel support see PPC.
 
 <pre>
 <i>C Binding: </i>void SC_init_threads(int np, PFVoid tid)
-<i>F77 Binding: </i>
+<i>Fortran Binding: </i>
 <i>SX Binding: </i>
 <i>Python Binding: </i>
 </pre>
@@ -2156,7 +2156,7 @@ in function.
 
 <pre>
 <i>C Binding: </i>void SC_init_tpool(int np, PFVoid tid)
-<i>F77 Binding: </i>
+<i>Fortran Binding: </i>
 <i>SX Binding: </i>
 <i>Python Binding: </i>
 </pre>
@@ -2172,7 +2172,7 @@ by <tt>SC_do_threads</tt>.
 <i>C Binding: </i>void SC_chunk_loop(PFPByte fnc, char *msg,
 			      int mn, int mx,
 			      int serial, byte *argl)
-<i>F77 Binding: </i>
+<i>Fortran Binding: </i>
 <i>SX Binding: </i>
 <i>Python Binding: </i>
 </pre>
@@ -2193,7 +2193,7 @@ be loaded up and a pointer to it passed to <em>fnc</em>.
 <pre>
 <i>C Binding: </i>void SC_chunk_split(int *pmn, int *pmx,
                                void **prv)
-<i>F77 Binding: </i>
+<i>Fortran Binding: </i>
 <i>SX Binding: </i>
 <i>Python Binding: </i>
 </pre>
@@ -2208,7 +2208,7 @@ the entire loop range is completed.
 <pre>
 <i>C Binding: </i>void SC_queue_work(PFPByte fnc,
                               int serial, byte *argl)
-<i>F77 Binding: </i>
+<i>Fortran Binding: </i>
 <i>SX Binding: </i>
 <i>Python Binding: </i>
 </pre>
@@ -2236,7 +2236,7 @@ up and a pointer to it passed to <em>fnc</em>.
 
 <pre>
 <i>C Binding: </i>int SC_queue_next_item(int ng)
-<i>F77 Binding: </i>
+<i>Fortran Binding: </i>
 <i>SX Binding: </i>
 <i>Python Binding: </i>
 </pre>

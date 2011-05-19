@@ -1,5 +1,5 @@
 TXT: PANACEA User's Manual
-MOD: 04/06/2011
+MOD: 05/19/2011
 
 <CENTER>
 <P>
@@ -6398,7 +6398,7 @@ Causes PANACHE to generate compilable code from the currently defined dictionary
 <BLOCKQUOTE>
 <TABLE>
 <TR><TD><I>Usage: </I></TD><TD>(generate </TD><TD>language</TD><TD>type name1 [name2])</TD></TR>
-<TR><TD></TD><TD WIDTH="10">language    </TD><TD>:= </TD><TD>C | C++ | F77</TD></TR>
+<TR><TD></TD><TD WIDTH="10">language    </TD><TD>:= </TD><TD>C | C++ | Fortran</TD></TR>
 <TR><TD></TD><TD>type    </TD><TD>:= </TD><TD>+ | -</TD></TR>
 </TABLE>
 </BLOCKQUOTE>

@@ -209,7 +209,7 @@ void SC_use_guarded_mem(int on)
 
 /* SCGMEM - setup to use mprotect'd memory */
 
-FIXNUM F77_FUNC(scgmem, SCGMEM)(FIXNUM *pon)
+FIXNUM FF_ID(scgmem, SCGMEM)(FIXNUM *pon)
    {int on;
     FIXNUM rv;
 

@@ -27,27 +27,27 @@ int
  debug_mode;
 
 FIXNUM
- F77_FUNC(pathop, PATHOP)(FIXNUM *pnf, char *fname,
+ FF_ID(pathop, PATHOP)(FIXNUM *pnf, char *fname,
 		       FIXNUM *pnm, char *fmode,
 		       FIXNUM *psz, FIXNUM *pnp, char *fprev),
- F77_FUNC(pabrec, PABREC)(FIXNUM *fileid, FIXNUM *pnf,
+ FF_ID(pabrec, PABREC)(FIXNUM *fileid, FIXNUM *pnf,
 		       char *fname, FIXNUM *pnt,
 		       char *ftype, FIXNUM *pnd, char *ftime),
- F77_FUNC(paarec, PAAREC)(FIXNUM *fileid, FIXNUM *recid,
+ FF_ID(paarec, PAAREC)(FIXNUM *fileid, FIXNUM *recid,
 		       FIXNUM *pnm, char *fmemb,
 		       FIXNUM *pnl, char *flabl),
- F77_FUNC(paerec, PAEREC)(FIXNUM *fileid, FIXNUM *recid),
- F77_FUNC(pafrec, PAFREC)(FIXNUM *recid),
- F77_FUNC(pagrid, PAGRID)(FIXNUM *fileid, FIXNUM *pind,
+ FF_ID(paerec, PAEREC)(FIXNUM *fileid, FIXNUM *recid),
+ FF_ID(pafrec, PAFREC)(FIXNUM *recid),
+ FF_ID(pagrid, PAGRID)(FIXNUM *fileid, FIXNUM *pind,
 		       FIXNUM *pnn, char *name,
 		       FIXNUM *pnt, char *type, FIXNUM *prid),
- F77_FUNC(pathfm, PATHFM)(FIXNUM *fileid),
- F77_FUNC(pawrec, PAWREC)(FIXNUM *fileid, FIXNUM *recid,
+ FF_ID(pathfm, PATHFM)(FIXNUM *fileid),
+ FF_ID(pawrec, PAWREC)(FIXNUM *fileid, FIXNUM *recid,
 		       FIXNUM *pinst, FIXNUM *pnr,
 		       void *vr),
- F77_FUNC(patrnl, PATRNL)(FIXNUM *pnchrs, char *chrs,
+ FF_ID(patrnl, PATRNL)(FIXNUM *pnchrs, char *chrs,
 		       FIXNUM *pord, FIXNUM *pncpf),
- F77_FUNC(pfclos, PFCLOS)(FIXNUM *fileid);
+ FF_ID(pfclos, PFCLOS)(FIXNUM *fileid);
 
 static void
  print_help(void);
@@ -729,9 +729,9 @@ static int test_4(char *base, char *seq, char *prev, char *mode,
     else
        np = 0;
     sz     = size;
-    fileid = F77_FUNC(pathop, PATHOP)(&nc, SC_C_F77_STRING(family),
-				      &nm, SC_C_F77_STRING(mode),
-				      &sz, &np, SC_C_F77_STRING(prev));
+    fileid = FF_ID(pathop, PATHOP)(&nc, family,
+				      &nm, mode,
+				      &sz, &np, prev);
     file = SC_GET_POINTER(PDBfile, fileid);
     if (file == NULL)
        {PRINT(STDOUT, "OPEN FAILED - TEST_4\n");
@@ -759,10 +759,10 @@ static int test_4(char *base, char *seq, char *prev, char *mode,
        {FIXNUM nd, nl;
 
         nd = strlen(members[0]);
-        recid = F77_FUNC(pabrec, PABREC)(&fileid,
-					 &nc, SC_C_F77_STRING(thname),
-					 &nt, SC_C_F77_STRING(thtype),
-					 &nd, SC_C_F77_STRING(members[0]));
+        recid = FF_ID(pabrec, PABREC)(&fileid,
+					 &nc, thname,
+					 &nt, thtype,
+					 &nd, members[0]);
         if (recid == 0L)
            {PRINT(STDOUT, "PABREC FAILED - TEST_4\n");
             exit(1);};
@@ -773,20 +773,20 @@ static int test_4(char *base, char *seq, char *prev, char *mode,
                 nl = strlen(labels[i-1]);
 	     else
 	        nl = 0;
-	     if (!F77_FUNC(paarec, PAAREC)(&fileid, &recid,
-					   &nm, SC_C_F77_STRING(members[i]),
-					   &nl, SC_C_F77_STRING(labels[i-1])))
+	     if (!FF_ID(paarec, PAAREC)(&fileid, &recid,
+					   &nm, members[i],
+					   &nl, labels[i-1]))
 	        {PRINT(STDOUT, "PAAREC FAILED - TEST_4\n");
 		 exit(1);};};
 
-	if (!F77_FUNC(paerec, PAEREC)(&fileid, &recid))
+	if (!FF_ID(paerec, PAEREC)(&fileid, &recid))
 	   {PRINT(STDOUT, "PAEREC FAILED - TEST_4\n");
 	    exit(1);};}
     else
        {nm = 0;
-        F77_FUNC(pagrid, PAGRID)(&fileid, &nm,
-				 &nc, SC_C_F77_STRING(thname),
-				 &nt, SC_C_F77_STRING(thtype),
+        FF_ID(pagrid, PAGRID)(&fileid, &nm,
+				 &nc, thname,
+				 &nt, thtype,
 				 &recid);
 	if (recid == 0L)
 	   {PRINT(STDOUT, "PAGRID FAILED - TEST_4\n");
@@ -798,7 +798,7 @@ static int test_4(char *base, char *seq, char *prev, char *mode,
     count = 0;
     ret   = TRUE;
     for (n = n0; n < iter; n++)
-        {nfileid = F77_FUNC(pathfm, PATHFM)(&fileid);
+        {nfileid = FF_ID(pathfm, PATHFM)(&fileid);
 	 nf      = SC_GET_POINTER(PDBfile, nfileid);
          if (file != nf)
             {file   = nf;
@@ -814,7 +814,7 @@ static int test_4(char *base, char *seq, char *prev, char *mode,
          offs = 0;
          nr   = 1;
 
-         ret = F77_FUNC(pawrec, PAWREC)(&fileid, &recid, &indx, &nr, outa);
+         ret = FF_ID(pawrec, PAWREC)(&fileid, &recid, &indx, &nr, outa);
          if (ret == FALSE)
             {PRINT(STDOUT, "WRITE 1 AT indx = %d FAILED - TEST_4\n", indx);
              exit(1);};
@@ -822,7 +822,7 @@ static int test_4(char *base, char *seq, char *prev, char *mode,
          offs += n_members*nr;
 
          nr  = 3;
-         ret = F77_FUNC(pawrec, PAWREC)(&fileid, &recid, &indx, &nr, outa+offs);
+         ret = FF_ID(pawrec, PAWREC)(&fileid, &recid, &indx, &nr, outa+offs);
          if (ret == FALSE)
             {PRINT(STDOUT, "WRITE 2 AT indx = %d FAILED - TEST_4\n", indx);
              exit(1);};
@@ -830,7 +830,7 @@ static int test_4(char *base, char *seq, char *prev, char *mode,
          offs += n_members*nr;
 
          nr  = 2;
-         ret = F77_FUNC(pawrec, PAWREC)(&fileid, &recid, &indx, &nr, outa+offs);
+         ret = FF_ID(pawrec, PAWREC)(&fileid, &recid, &indx, &nr, outa+offs);
          if (ret == FALSE)
             {PRINT(STDOUT, "WRITE 3 AT indx = %d FAILED - TEST_4\n", indx);
              exit(1);};
@@ -838,7 +838,7 @@ static int test_4(char *base, char *seq, char *prev, char *mode,
          offs += n_members*nr;
 
          nr  = 5;
-         ret = F77_FUNC(pawrec, PAWREC)(&fileid, &recid, &indx, &nr, outa+offs);
+         ret = FF_ID(pawrec, PAWREC)(&fileid, &recid, &indx, &nr, outa+offs);
          if (ret == FALSE)
             {PRINT(STDOUT, "WRITE 4 AT indx = %d FAILED - TEST_4\n", indx);
              exit(1);};
@@ -850,12 +850,12 @@ static int test_4(char *base, char *seq, char *prev, char *mode,
     CFREE(members[0]);
     members[0] = CSTRSAVE(file->name);
 
-    F77_FUNC(pfclos, PFCLOS)(&fileid);
+    FF_ID(pfclos, PFCLOS)(&fileid);
 
     nm  = strlen(members[0]);
     ord = -1;
     nc  = 20;
-    F77_FUNC(patrnl, PATRNL)(&nm, SC_C_F77_STRING(members[0]), &ord, &nc);
+    FF_ID(patrnl, PATRNL)(&nm, members[0], &ord, &nc);
 
     for (i = 0; i < n_labels; i++)
         CFREE(labels[i]);
@@ -868,7 +868,7 @@ static int test_4(char *base, char *seq, char *prev, char *mode,
     CFREE(thname);
     CFREE(thtype);
 
-    F77_FUNC(pafrec, PAFREC)(&recid);
+    FF_ID(pafrec, PAFREC)(&recid);
 
     SC_free_stash();
 

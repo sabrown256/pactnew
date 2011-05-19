@@ -285,9 +285,9 @@ double PM_random_s(double x)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PMRNDF - F77 interface to PM_random_48 */
+/* PMRNDF - Fortran interface to PM_random_48 */
 
-double F77_FUNC(pmrndf, PMRNDF)(double *px)
+double FF_ID(pmrndf, PMRNDF)(double *px)
    {double rv;
 
     rv = PM_random_48(*px);
@@ -297,9 +297,9 @@ double F77_FUNC(pmrndf, PMRNDF)(double *px)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PMRNDF - F77 interface to PM_random_s */
+/* PMRNDF - Fortran interface to PM_random_s */
 
-double F77_FUNC(pmrnds, PMRNDS)(double *px)
+double FF_ID(pmrnds, PMRNDS)(double *px)
    {double rv;
 
     rv = PM_random_s(*px);

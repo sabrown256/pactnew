@@ -34,7 +34,7 @@ PG_view_attributes *PG_view_attributes_pointer(int vwatid)
 
 /* PGAXIS - draw an axis set */
 
-FIXNUM F77_FUNC(pgaxis, PGAXIS)(FIXNUM *devid, FIXNUM *paxt)
+FIXNUM FF_ID(pgaxis, PGAXIS)(FIXNUM *devid, FIXNUM *paxt)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -56,7 +56,7 @@ FIXNUM F77_FUNC(pgaxis, PGAXIS)(FIXNUM *devid, FIXNUM *paxt)
  *        - the characters are stored consecutively in PATC
  */
 
-FIXNUM F77_FUNC(pgsaxa, PGSAXA)(FIXNUM *devid, FIXNUM *pn,
+FIXNUM FF_ID(pgsaxa, PGSAXA)(FIXNUM *devid, FIXNUM *pn,
                                 double *pat, char *patc)
    {int i, nc, nn, type, linecolor, txtcolor, prec;
     double *attr;
@@ -95,7 +95,7 @@ FIXNUM F77_FUNC(pgsaxa, PGSAXA)(FIXNUM *devid, FIXNUM *pn,
  * value of type 
  */
     nn   = *pn;
-    pc   = SC_F77_C_STRING(patc);
+    pc   = patc;
     attr = pat;
     for (i = 0; i < nn; i++)
         {type = *attr++;
@@ -186,7 +186,7 @@ FIXNUM F77_FUNC(pgsaxa, PGSAXA)(FIXNUM *devid, FIXNUM *pn,
 
 /* PGGAXD - get axis decades */
 
-FIXNUM F77_FUNC(pggaxd, PGGAXD)(double *pd)
+FIXNUM FF_ID(pggaxd, PGGAXD)(double *pd)
    {
 
     PG_get_axis_decades(*pd);
@@ -198,7 +198,7 @@ FIXNUM F77_FUNC(pggaxd, PGGAXD)(double *pd)
 
 /* PGGAXL - get log axis flags */
 
-FIXNUM F77_FUNC(pggaxl, PGGAXL)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *iflg)
+FIXNUM FF_ID(pggaxl, PGGAXL)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *iflg)
    {int id, nd;
     int ifl[PG_SPACEDM];
     PG_device *dev;
@@ -219,7 +219,7 @@ FIXNUM F77_FUNC(pggaxl, PGGAXL)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *iflg)
 
 /* PGGBSZ - return the I/O buffer size */
 
-FIXNUM F77_FUNC(pggbsz, PGGBSZ)(void)
+FIXNUM FF_ID(pggbsz, PGGBSZ)(void)
    {FIXNUM rv;
     int64_t sz;
 
@@ -233,7 +233,7 @@ FIXNUM F77_FUNC(pggbsz, PGGBSZ)(void)
 
 /* PGCLOS - close the PG_device associated with the integer index */
 
-FIXNUM F77_FUNC(pgclos, PGCLOS)(FIXNUM *devid)
+FIXNUM FF_ID(pgclos, PGCLOS)(FIXNUM *devid)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -251,7 +251,7 @@ FIXNUM F77_FUNC(pgclos, PGCLOS)(FIXNUM *devid)
 
 /* PGCLPG - clear the page */
 
-FIXNUM F77_FUNC(pgclpg, PGCLPG)(FIXNUM *devid, FIXNUM *pi)
+FIXNUM FF_ID(pgclpg, PGCLPG)(FIXNUM *devid, FIXNUM *pi)
    {int i;
     FIXNUM rv;
     PG_device *dev;
@@ -270,7 +270,7 @@ FIXNUM F77_FUNC(pgclpg, PGCLPG)(FIXNUM *devid, FIXNUM *pi)
 
 /* PGCLRG - clear the specified region */
 
-FIXNUM F77_FUNC(pgclrg, PGCLRG)(FIXNUM *devid, double *pxn, double *pxx,
+FIXNUM FF_ID(pgclrg, PGCLRG)(FIXNUM *devid, double *pxn, double *pxx,
                                 double *pyn, double *pyx, FIXNUM *pad)
    {int pd;
     FIXNUM rv;
@@ -296,7 +296,7 @@ FIXNUM F77_FUNC(pgclrg, PGCLRG)(FIXNUM *devid, double *pxn, double *pxx,
 
 /* PGCLSC - clear the screen (necessary for CGM devices) */
 
-FIXNUM F77_FUNC(pgclsc, PGCLSC)(FIXNUM *devid)
+FIXNUM FF_ID(pgclsc, PGCLSC)(FIXNUM *devid)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -312,7 +312,7 @@ FIXNUM F77_FUNC(pgclsc, PGCLSC)(FIXNUM *devid)
 
 /* PGCLVP - clear the viewport */
 
-FIXNUM F77_FUNC(pgclvp, PGCLVP)(FIXNUM *devid)
+FIXNUM FF_ID(pgclvp, PGCLVP)(FIXNUM *devid)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -328,7 +328,7 @@ FIXNUM F77_FUNC(pgclvp, PGCLVP)(FIXNUM *devid)
 
 /* PGDDP2 - draw 2d disjoint polyline */
 
-FIXNUM F77_FUNC(pgddp2, PGDDP2)(FIXNUM *devid, double *px, double *py,
+FIXNUM FF_ID(pgddp2, PGDDP2)(FIXNUM *devid, double *px, double *py,
                                 FIXNUM *pn, FIXNUM *pf, FIXNUM *pc)
    {int f;
     long n;
@@ -357,7 +357,7 @@ FIXNUM F77_FUNC(pgddp2, PGDDP2)(FIXNUM *devid, double *px, double *py,
 
 /* PGDPL2 - draw 2d polyline */
 
-FIXNUM F77_FUNC(pgdpl2, PGDPL2)(FIXNUM *devid, double *px, double *py,
+FIXNUM FF_ID(pgdpl2, PGDPL2)(FIXNUM *devid, double *px, double *py,
                                 FIXNUM *pn, FIXNUM *pc)
    {FIXNUM rv;
     double *t[2];
@@ -379,7 +379,7 @@ FIXNUM F77_FUNC(pgdpl2, PGDPL2)(FIXNUM *devid, double *px, double *py,
 
 /* PGDDP3 - draw 3d disjoint polyline */
 
-FIXNUM F77_FUNC(pgddp3, PGDDP3)(FIXNUM *devid, double *px, double *py, double *pz,
+FIXNUM FF_ID(pgddp3, PGDDP3)(FIXNUM *devid, double *px, double *py, double *pz,
                                 FIXNUM *pn, FIXNUM *pf, FIXNUM *pc)
    {int f;
     long n;
@@ -409,7 +409,7 @@ FIXNUM F77_FUNC(pgddp3, PGDDP3)(FIXNUM *devid, double *px, double *py, double *p
 
 /* PGDRAX - draw a single axis */
 
-FIXNUM F77_FUNC(pgdrax, PGDRAX)(FIXNUM *devid, double *pxl, double *pyl,
+FIXNUM FF_ID(pgdrax, PGDRAX)(FIXNUM *devid, double *pxl, double *pyl,
                                 double *pxr, double *pyr, double *pt1, double *pt2,
                                 double *pv1, double *pv2, double *psc,
                                 FIXNUM *pnc, char *format,
@@ -449,7 +449,7 @@ FIXNUM F77_FUNC(pgdrax, PGDRAX)(FIXNUM *devid, double *pxl, double *pyl,
 
 /* PGDAX3 - draw a 3D axis set */
 
-FIXNUM F77_FUNC(pgdax3, PGDAX3)(FIXNUM *devid, double *pxl, double *pyl,
+FIXNUM FF_ID(pgdax3, PGDAX3)(FIXNUM *devid, double *pxl, double *pyl,
                                 double *pzl, FIXNUM *pnp)
    {FIXNUM rv;
     double *p[PG_SPACEDM];
@@ -472,7 +472,7 @@ FIXNUM F77_FUNC(pgdax3, PGDAX3)(FIXNUM *devid, double *pxl, double *pyl,
 
 /* PGDRMK - draw marker characters */
 
-FIXNUM F77_FUNC(pgdrmk, PGDRMK)(FIXNUM *devid, FIXNUM *pn,
+FIXNUM FF_ID(pgdrmk, PGDRMK)(FIXNUM *devid, FIXNUM *pn,
 			        double *px, double *py, FIXNUM *pmrk)
    {int n, mrk;
     FIXNUM rv;
@@ -497,7 +497,7 @@ FIXNUM F77_FUNC(pgdrmk, PGDRMK)(FIXNUM *devid, FIXNUM *pn,
 
 /* PGDMRK - define a marker character */
 
-FIXNUM F77_FUNC(pgdmrk, PGDMRK)(FIXNUM *pn, double *px1, double *py1,
+FIXNUM FF_ID(pgdmrk, PGDMRK)(FIXNUM *pn, double *px1, double *py1,
                                 double *px2, double *py2)
    {int n;
     FIXNUM rv;
@@ -513,7 +513,7 @@ FIXNUM F77_FUNC(pgdmrk, PGDMRK)(FIXNUM *pn, double *px1, double *py1,
 
 /* PGDPLT - draw a mesh - plot a domain */
 
-FIXNUM F77_FUNC(pgdplt, PGDPLT)(FIXNUM *devid, FIXNUM *dom)
+FIXNUM FF_ID(pgdplt, PGDPLT)(FIXNUM *devid, FIXNUM *dom)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -529,7 +529,7 @@ FIXNUM F77_FUNC(pgdplt, PGDPLT)(FIXNUM *devid, FIXNUM *dom)
 
 /* PGDRBX - draw a box */
 
-FIXNUM F77_FUNC(pgdrbx, PGDRBX)(FIXNUM *devid, double *px1, double *px2,
+FIXNUM FF_ID(pgdrbx, PGDRBX)(FIXNUM *devid, double *px1, double *px2,
 			        double *py1, double *py2)
    {FIXNUM rv;
     double bx[PG_BOXSZ];
@@ -552,7 +552,7 @@ FIXNUM F77_FUNC(pgdrbx, PGDRBX)(FIXNUM *devid, double *px1, double *px2,
 
 /* PGDRIF - draw the set of interface objects for the device */
 
-FIXNUM F77_FUNC(pgdrif, PGDRIF)(FIXNUM *devid)
+FIXNUM FF_ID(pgdrif, PGDRIF)(FIXNUM *devid)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -568,7 +568,7 @@ FIXNUM F77_FUNC(pgdrif, PGDRIF)(FIXNUM *devid)
 
 /* PGDRLN - draw a line between the specified points */
 
-FIXNUM F77_FUNC(pgdrln, PGDRLN)(FIXNUM *devid, double *px1, double *py1,
+FIXNUM FF_ID(pgdrln, PGDRLN)(FIXNUM *devid, double *px1, double *py1,
 				double *px2, double *py2)
    {FIXNUM rv;
     double x1[PG_SPACEDM], x2[PG_SPACEDM];
@@ -591,7 +591,7 @@ FIXNUM F77_FUNC(pgdrln, PGDRLN)(FIXNUM *devid, double *px1, double *py1,
 
 /* PGDRPA - draw the current palette */
 
-FIXNUM F77_FUNC(pgdrpa, PGDRPA)(FIXNUM *devid, double *px1, double *py1,
+FIXNUM FF_ID(pgdrpa, PGDRPA)(FIXNUM *devid, double *px1, double *py1,
 				double *px2, double *py2, double *pz1, double *pz2,
 				double *pw)
    {FIXNUM rv;
@@ -618,7 +618,7 @@ FIXNUM F77_FUNC(pgdrpa, PGDRPA)(FIXNUM *devid, double *px1, double *py1,
 
 /* PGDRPP - draw the current palette */
 
-FIXNUM F77_FUNC(pgdrpp, PGDRPP)(FIXNUM *devid, double *px1, double *py1,
+FIXNUM FF_ID(pgdrpp, PGDRPP)(FIXNUM *devid, double *px1, double *py1,
 				double *px2, double *py2, double *pz1, double *pz2,
 				double *pw, FIXNUM *pe)
    {FIXNUM rv;
@@ -645,7 +645,7 @@ FIXNUM F77_FUNC(pgdrpp, PGDRPP)(FIXNUM *devid, double *px1, double *py1,
 
 /* PGFNPL - finish the plot (necessary for CGM devices) */
 
-FIXNUM F77_FUNC(pgfnpl, PGFNPL)(FIXNUM *devid)
+FIXNUM FF_ID(pgfnpl, PGFNPL)(FIXNUM *devid)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -661,7 +661,7 @@ FIXNUM F77_FUNC(pgfnpl, PGFNPL)(FIXNUM *devid)
 
 /* PGFPLY - draw and fill the specified polygon with the specified color */
 
-FIXNUM F77_FUNC(pgfply, PGFPLY)(FIXNUM *devid, double *px, double *py,
+FIXNUM FF_ID(pgfply, PGFPLY)(FIXNUM *devid, double *px, double *py,
 			        FIXNUM *pn, FIXNUM *pc)
    {FIXNUM rv;
     double *r[2];
@@ -682,7 +682,7 @@ FIXNUM F77_FUNC(pgfply, PGFPLY)(FIXNUM *devid, double *px, double *py,
 
 /* PGGCLM - get the clear mode */
 
-FIXNUM F77_FUNC(pggclm, PGGCLM)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pggclm, PGGCLM)(FIXNUM *devid, FIXNUM *pc)
    {FIXNUM rv;
 
     PG_get_clear_mode(*pc);
@@ -696,7 +696,7 @@ FIXNUM F77_FUNC(pggclm, PGGCLM)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGGCLP - get the clipping */
 
-FIXNUM F77_FUNC(pggclp, PGGCLP)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pggclp, PGGCLP)(FIXNUM *devid, FIXNUM *pc)
    {int flg;
     FIXNUM rv;
     PG_device *dev;
@@ -715,7 +715,7 @@ FIXNUM F77_FUNC(pggclp, PGGCLP)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGGCPW - get the char path direction in WC */
 
-FIXNUM F77_FUNC(pggcpw, PGGCPW)(FIXNUM *devid, double *px, double *py)
+FIXNUM FF_ID(pggcpw, PGGCPW)(FIXNUM *devid, double *px, double *py)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -731,7 +731,7 @@ FIXNUM F77_FUNC(pggcpw, PGGCPW)(FIXNUM *devid, double *px, double *py)
 
 /* PGGCSS - get the char size in NDC */
 
-FIXNUM F77_FUNC(pggcss, PGGCSS)(FIXNUM *devid, double *pw, double *ph)
+FIXNUM FF_ID(pggcss, PGGCSS)(FIXNUM *devid, double *pw, double *ph)
    {FIXNUM rv;
     double p[PG_SPACEDM];
     PG_device *dev;
@@ -751,7 +751,7 @@ FIXNUM F77_FUNC(pggcss, PGGCSS)(FIXNUM *devid, double *pw, double *ph)
 
 /* PGGCSW - get the char size in WC */
 
-FIXNUM F77_FUNC(pggcsw, PGGCSW)(FIXNUM *devid, double *pw, double *ph)
+FIXNUM FF_ID(pggcsw, PGGCSW)(FIXNUM *devid, double *pw, double *ph)
    {FIXNUM rv;
     double p[PG_SPACEDM];
     PG_device *dev;
@@ -771,7 +771,7 @@ FIXNUM F77_FUNC(pggcsw, PGGCSW)(FIXNUM *devid, double *pw, double *ph)
 
 /* PGGCUW - get the char up direction in WC */
 
-FIXNUM F77_FUNC(pggcuw, PGGCUW)(FIXNUM *devid, double *px, double *py)
+FIXNUM FF_ID(pggcuw, PGGCUW)(FIXNUM *devid, double *px, double *py)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -787,7 +787,7 @@ FIXNUM F77_FUNC(pggcuw, PGGCUW)(FIXNUM *devid, double *px, double *py)
 
 /* PGGDPI - get the PostScript dots per inch for 8.5 x 11 page */
 
-FIXNUM F77_FUNC(pggdpi, PGGDPI)(double *dpi)
+FIXNUM FF_ID(pggdpi, PGGDPI)(double *dpi)
    {FIXNUM rv;
 
     PG_get_ps_dots_inch(*dpi);
@@ -801,7 +801,7 @@ FIXNUM F77_FUNC(pggdpi, PGGDPI)(double *dpi)
 
 /* PGGFIN - get the finished status */
 
-FIXNUM F77_FUNC(pggfin, PGGFIN)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pggfin, PGGFIN)(FIXNUM *devid, FIXNUM *pc)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -817,7 +817,7 @@ FIXNUM F77_FUNC(pggfin, PGGFIN)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGGLNC - get the line color */
 
-FIXNUM F77_FUNC(pgglnc, PGGLNC)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pgglnc, PGGLNC)(FIXNUM *devid, FIXNUM *pc)
    {int lc;
     FIXNUM rv;
     PG_device *dev;
@@ -836,7 +836,7 @@ FIXNUM F77_FUNC(pgglnc, PGGLNC)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGGLOP - get the logical operation */
 
-FIXNUM F77_FUNC(pgglop, PGGLOP)(FIXNUM *devid, FIXNUM *plop)
+FIXNUM FF_ID(pgglop, PGGLOP)(FIXNUM *devid, FIXNUM *plop)
    {FIXNUM rv;
     PG_logical_operation lop;
     PG_device *dev;
@@ -855,7 +855,7 @@ FIXNUM F77_FUNC(pgglop, PGGLOP)(FIXNUM *devid, FIXNUM *plop)
 
 /* PGGLNS - get the line style */
 
-FIXNUM F77_FUNC(pgglns, PGGLNS)(FIXNUM *devid, FIXNUM *ps)
+FIXNUM FF_ID(pgglns, PGGLNS)(FIXNUM *devid, FIXNUM *ps)
    {int ls;
     FIXNUM rv;
     PG_device *dev;
@@ -874,7 +874,7 @@ FIXNUM F77_FUNC(pgglns, PGGLNS)(FIXNUM *devid, FIXNUM *ps)
 
 /* PGGLNW - get the line width */
 
-FIXNUM F77_FUNC(pgglnw, PGGLNW)(FIXNUM *devid, double *pw)
+FIXNUM FF_ID(pgglnw, PGGLNW)(FIXNUM *devid, double *pw)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -890,7 +890,7 @@ FIXNUM F77_FUNC(pgglnw, PGGLNW)(FIXNUM *devid, double *pw)
 
 /* PGGMKO - get the marker orientation */
 
-FIXNUM F77_FUNC(pggmko, PGGMKO)(FIXNUM *devid, double *pw)
+FIXNUM FF_ID(pggmko, PGGMKO)(FIXNUM *devid, double *pw)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -906,7 +906,7 @@ FIXNUM F77_FUNC(pggmko, PGGMKO)(FIXNUM *devid, double *pw)
 
 /* PGGMKS - get the marker scale */
 
-FIXNUM F77_FUNC(pggmks, PGGMKS)(FIXNUM *devid, double *ps)
+FIXNUM FF_ID(pggmks, PGGMKS)(FIXNUM *devid, double *ps)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -922,7 +922,7 @@ FIXNUM F77_FUNC(pggmks, PGGMKS)(FIXNUM *devid, double *ps)
 
 /* PGGPMF - get the pixmap flag */
 
-FIXNUM F77_FUNC(pggpmf, PGGPMF)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pggpmf, PGGPMF)(FIXNUM *devid, FIXNUM *pc)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -938,7 +938,7 @@ FIXNUM F77_FUNC(pggpmf, PGGPMF)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGGTLN - get a line of text from the input descriptor */
 
-FIXNUM F77_FUNC(pggtln, PGGTLN)(FIXNUM *pnc, char *s, FIXNUM *pfd)
+FIXNUM FF_ID(pggtln, PGGTLN)(FIXNUM *pnc, char *s, FIXNUM *pfd)
    {FIXNUM rv;
     long fd;
     char *t;
@@ -947,11 +947,11 @@ FIXNUM F77_FUNC(pggtln, PGGTLN)(FIXNUM *pnc, char *s, FIXNUM *pfd)
     fd = (long) *pfd;
 
     if (fd == 0L)
-       t = GETLN(SC_F77_C_STRING(s), (int) *pnc, stdin);
+       t = GETLN(s, (int) *pnc, stdin);
 
     else
        {f.diskaddr = fd;
-        t = GETLN(SC_F77_C_STRING(s), (int) *pnc, (FILE *) f.memaddr);};
+        t = GETLN(s, (int) *pnc, (FILE *) f.memaddr);};
 
     rv = (t != NULL);
 
@@ -962,7 +962,7 @@ FIXNUM F77_FUNC(pggtln, PGGTLN)(FIXNUM *pnc, char *s, FIXNUM *pfd)
 
 /* PGGTXC - get the text color */
 
-FIXNUM F77_FUNC(pggtxc, PGGTXC)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pggtxc, PGGTXC)(FIXNUM *devid, FIXNUM *pc)
    {int lc;
     FIXNUM rv;
     PG_device *dev;
@@ -981,7 +981,7 @@ FIXNUM F77_FUNC(pggtxc, PGGTXC)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGGTXF - get the font */
 
-FIXNUM F77_FUNC(pggtxf, PGGTXF)(FIXNUM *devid, FIXNUM *pncf,
+FIXNUM FF_ID(pggtxf, PGGTXF)(FIXNUM *devid, FIXNUM *pncf,
 				char *pf, FIXNUM *pncs, char *pst,
 				FIXNUM *psz)
    {int ls, nf, ns, lnf, lns;
@@ -1007,8 +1007,8 @@ FIXNUM F77_FUNC(pggtxf, PGGTXF)(FIXNUM *devid, FIXNUM *pncf,
        rv = FALSE;
 
     else
-       {SC_strncpy(SC_F77_C_STRING(pf), *pncf, f, lnf);
-        SC_strncpy(SC_F77_C_STRING(pst), *pncs, st, lns);
+       {SC_strncpy(pf, *pncf, f, lnf);
+        SC_strncpy(pst, *pncs, st, lns);
         *psz = ls;
 
         CFREE(f);
@@ -1023,7 +1023,7 @@ FIXNUM F77_FUNC(pggtxf, PGGTXF)(FIXNUM *devid, FIXNUM *pncf,
 
 /* PGGTEX - get the text extent in CS */
 
-FIXNUM F77_FUNC(pggtex, PGGTEX)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *pc,
+FIXNUM FF_ID(pggtex, PGGTEX)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *pc,
 				FIXNUM *pnc, char *s,
 			        double *pdx, double *pdy)
    {FIXNUM rv;
@@ -1052,7 +1052,7 @@ FIXNUM F77_FUNC(pggtex, PGGTEX)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *pc,
 
 /* PGGVWP - get the viewport */
 
-FIXNUM F77_FUNC(pggvwp, PGGVWP)(FIXNUM *devid, double *px1, double *px2,
+FIXNUM FF_ID(pggvwp, PGGVWP)(FIXNUM *devid, double *px1, double *px2,
 				double *py1, double *py2)
    {FIXNUM rv;
     double ndc[PG_BOXSZ];
@@ -1075,7 +1075,7 @@ FIXNUM F77_FUNC(pggvwp, PGGVWP)(FIXNUM *devid, double *px1, double *px2,
 
 /* PGGWCS - get the world coordinate system */
 
-FIXNUM F77_FUNC(pggwcs, PGGWCS)(FIXNUM *devid, double *px1, double *px2,
+FIXNUM FF_ID(pggwcs, PGGWCS)(FIXNUM *devid, double *px1, double *px2,
 				double *py1, double *py2)
    {FIXNUM rv;
     double wc[PG_BOXSZ];
@@ -1098,7 +1098,7 @@ FIXNUM F77_FUNC(pggwcs, PGGWCS)(FIXNUM *devid, double *px1, double *px2,
 
 /* PGMDVC - make the device current */
 
-FIXNUM F77_FUNC(pgmdvc, PGMDVC)(FIXNUM *devid)
+FIXNUM FF_ID(pgmdvc, PGMDVC)(FIXNUM *devid)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1118,7 +1118,7 @@ FIXNUM F77_FUNC(pgmdvc, PGMDVC)(FIXNUM *devid)
  *        - return -1 otherwise
  */
 
-FIXNUM F77_FUNC(pgmkdv, PGMKDV)(FIXNUM *pncn, char *name,
+FIXNUM FF_ID(pgmkdv, PGMKDV)(FIXNUM *pncn, char *name,
 				FIXNUM *pnct, char *type,
 				FIXNUM *pncl, char *title)
    {FIXNUM rv;
@@ -1143,7 +1143,7 @@ FIXNUM F77_FUNC(pgmkdv, PGMKDV)(FIXNUM *pncn, char *name,
 
 /* PGOPEN - open the specified PG_device */
 
-FIXNUM F77_FUNC(pgopen, PGOPEN)(FIXNUM *devid, double *pxf, double *pyf,
+FIXNUM FF_ID(pgopen, PGOPEN)(FIXNUM *devid, double *pxf, double *pyf,
 				double *pdxf, double *pdyf)
    {FIXNUM rv;
     PG_device *dev;
@@ -1163,7 +1163,7 @@ FIXNUM F77_FUNC(pgopen, PGOPEN)(FIXNUM *devid, double *pxf, double *pyf,
  *        - return -1 otherwise
  */
 
-FIXNUM F77_FUNC(pgptin, PGPTIN)(FIXNUM *pntr, FIXNUM *indx)
+FIXNUM FF_ID(pgptin, PGPTIN)(FIXNUM *pntr, FIXNUM *indx)
    {FIXNUM rv;
 
     rv = (*indx = SC_GET_INDEX((void *) pntr));
@@ -1175,7 +1175,7 @@ FIXNUM F77_FUNC(pgptin, PGPTIN)(FIXNUM *pntr, FIXNUM *indx)
 
 /* PGQDEV - get some physical parameters from the specified PG_device */
 
-FIXNUM F77_FUNC(pgqdev, PGQDEV)(FIXNUM *devid, FIXNUM *pdx, FIXNUM *pdy,
+FIXNUM FF_ID(pgqdev, PGQDEV)(FIXNUM *devid, FIXNUM *pdx, FIXNUM *pdy,
 				FIXNUM *pnc)
    {int dx, dy, nc;
     FIXNUM rv;
@@ -1197,7 +1197,7 @@ FIXNUM F77_FUNC(pgqdev, PGQDEV)(FIXNUM *devid, FIXNUM *pdx, FIXNUM *pdy,
 
 /* PGQWIN - get the window shape of the specified device */
 
-FIXNUM F77_FUNC(pgqwin, PGQWIN)(FIXNUM *devid, FIXNUM *pdx, FIXNUM *pdy)
+FIXNUM FF_ID(pgqwin, PGQWIN)(FIXNUM *devid, FIXNUM *pdx, FIXNUM *pdy)
    {int dx, dy;
     FIXNUM rv;
     PG_device *dev;
@@ -1217,7 +1217,7 @@ FIXNUM F77_FUNC(pgqwin, PGQWIN)(FIXNUM *devid, FIXNUM *pdx, FIXNUM *pdy)
 
 /* PGPLLN - low level line plot routine */
 
-FIXNUM F77_FUNC(pgplln, PGPLLN)(FIXNUM *devid, double *px, double *py,
+FIXNUM FF_ID(pgplln, PGPLLN)(FIXNUM *devid, double *px, double *py,
 			        FIXNUM *pn, FIXNUM *ppty, FIXNUM *paxt,
 				FIXNUM *pcol, double *pwid,
 			        FIXNUM *psty, FIXNUM *psca, FIXNUM *pmrk,
@@ -1255,7 +1255,7 @@ FIXNUM F77_FUNC(pgplln, PGPLLN)(FIXNUM *devid, double *px, double *py,
 
 /* PGPTOS - convert from PC to NDC */
 
-FIXNUM F77_FUNC(pgptos, PGPTOS)(FIXNUM *devid, FIXNUM *pix, FIXNUM *piy,
+FIXNUM FF_ID(pgptos, PGPTOS)(FIXNUM *devid, FIXNUM *pix, FIXNUM *piy,
 			        double *px, double *py)
    {FIXNUM rv;
     double p[PG_SPACEDM];
@@ -1278,7 +1278,7 @@ FIXNUM F77_FUNC(pgptos, PGPTOS)(FIXNUM *devid, FIXNUM *pix, FIXNUM *piy,
 
 /* PGRDIF - read an interface description file */
 
-FIXNUM F77_FUNC(pgrdif, PGRDIF)(FIXNUM *devid, FIXNUM *pnc, char *name)
+FIXNUM FF_ID(pgrdif, PGRDIF)(FIXNUM *devid, FIXNUM *pnc, char *name)
    {FIXNUM rv;
     char lname[MAXLINE];
     PG_device *dev;
@@ -1296,7 +1296,7 @@ FIXNUM F77_FUNC(pgrdif, PGRDIF)(FIXNUM *devid, FIXNUM *pnc, char *name)
 
 /* PGRDVC - release device as the device current */
 
-FIXNUM F77_FUNC(pgrdvc, PGRDVC)(FIXNUM *devid)
+FIXNUM FF_ID(pgrdvc, PGRDVC)(FIXNUM *devid)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1312,7 +1312,7 @@ FIXNUM F77_FUNC(pgrdvc, PGRDVC)(FIXNUM *devid)
 
 /* PGRGDV - register a device */
 
-FIXNUM F77_FUNC(pgrgdv, PGRGDV)(FIXNUM *pnc, char *name)
+FIXNUM FF_ID(pgrgdv, PGRGDV)(FIXNUM *pnc, char *name)
    {FIXNUM rv;
     char lname[MAXLINE];
     
@@ -1339,7 +1339,7 @@ FIXNUM F77_FUNC(pgrgdv, PGRGDV)(FIXNUM *pnc, char *name)
 
 /* PGRGFN - register a call back function with the device */
 
-FIXNUM F77_FUNC(pgrgfn, PGRGFN)(FIXNUM *pnc, char *name,
+FIXNUM FF_ID(pgrgfn, PGRGFN)(FIXNUM *pnc, char *name,
 				PFEvCallback fnc)
    {FIXNUM rv;
     char lname[MAXLINE];
@@ -1356,7 +1356,7 @@ FIXNUM F77_FUNC(pgrgfn, PGRGFN)(FIXNUM *pnc, char *name,
 
 /* PGRGVR - register a variable with the device */
 
-FIXNUM F77_FUNC(pgrgvr, PGRGVR)(FIXNUM *pnc, char *name,
+FIXNUM FF_ID(pgrgvr, PGRGVR)(FIXNUM *pnc, char *name,
 				FIXNUM *pnt, char *type,
 				void *vr, void *vn, void *vx)
    {FIXNUM rv;
@@ -1380,7 +1380,7 @@ FIXNUM F77_FUNC(pgrgvr, PGRGVR)(FIXNUM *pnc, char *name,
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(pgrvpa, PGRVPA)(FIXNUM *devid, FIXNUM *vwatid)
+FIXNUM FF_ID(pgrvpa, PGRVPA)(FIXNUM *devid, FIXNUM *vwatid)
    {FIXNUM rv;
     PG_device *dev;
     PG_view_attributes *d;
@@ -1402,7 +1402,7 @@ FIXNUM F77_FUNC(pgrvpa, PGRVPA)(FIXNUM *devid, FIXNUM *vwatid)
 
 /* PGSADR - set the auto domain and range */
 
-FIXNUM F77_FUNC(pgsadr, PGSADR)(FIXNUM *devid, FIXNUM *pd, FIXNUM *pr)
+FIXNUM FF_ID(pgsadr, PGSADR)(FIXNUM *devid, FIXNUM *pd, FIXNUM *pr)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1420,7 +1420,7 @@ FIXNUM F77_FUNC(pgsadr, PGSADR)(FIXNUM *devid, FIXNUM *pd, FIXNUM *pr)
 
 /* PGSADM - set the auto domain */
 
-FIXNUM F77_FUNC(pgsadm, PGSADM)(FIXNUM *devid, FIXNUM *pd)
+FIXNUM FF_ID(pgsadm, PGSADM)(FIXNUM *devid, FIXNUM *pd)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1437,7 +1437,7 @@ FIXNUM F77_FUNC(pgsadm, PGSADM)(FIXNUM *devid, FIXNUM *pd)
 
 /* PGSARN - set the auto range */
 
-FIXNUM F77_FUNC(pgsarn, PGSARN)(FIXNUM *devid, FIXNUM *pr)
+FIXNUM FF_ID(pgsarn, PGSARN)(FIXNUM *devid, FIXNUM *pr)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1454,7 +1454,7 @@ FIXNUM F77_FUNC(pgsarn, PGSARN)(FIXNUM *devid, FIXNUM *pr)
 
 /* PGSAXD - set axis decades */
 
-FIXNUM F77_FUNC(pgsaxd, PGSAXD)(double *pd)
+FIXNUM FF_ID(pgsaxd, PGSAXD)(double *pd)
    {FIXNUM rv;
     double d;
 
@@ -1471,7 +1471,7 @@ FIXNUM F77_FUNC(pgsaxd, PGSAXD)(double *pd)
 
 /* PGSAXL - set log axis flags */
 
-FIXNUM F77_FUNC(pgsaxl, PGSAXL)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *iflg)
+FIXNUM FF_ID(pgsaxl, PGSAXL)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *iflg)
    {int id, nd;
     int ifl[PG_SPACEDM];
     FIXNUM rv;
@@ -1495,7 +1495,7 @@ FIXNUM F77_FUNC(pgsaxl, PGSAXL)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *iflg)
 
 /* PGSBWD - set the border width */
 
-FIXNUM F77_FUNC(pgsbwd, PGSBWD)(FIXNUM *devid, FIXNUM *pw)
+FIXNUM FF_ID(pgsbwd, PGSBWD)(FIXNUM *devid, FIXNUM *pw)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1512,7 +1512,7 @@ FIXNUM F77_FUNC(pgsbwd, PGSBWD)(FIXNUM *devid, FIXNUM *pw)
 
 /* PGSBSZ - set the I/O buffer size */
 
-FIXNUM F77_FUNC(pgsbsz, PGSBSZ)(FIXNUM *psz)
+FIXNUM FF_ID(pgsbsz, PGSBSZ)(FIXNUM *psz)
    {FIXNUM rv;
     int64_t sz;
 
@@ -1527,7 +1527,7 @@ FIXNUM F77_FUNC(pgsbsz, PGSBSZ)(FIXNUM *psz)
 
 /* PGSCLM - set the clear mode */
 
-FIXNUM F77_FUNC(pgsclm, PGSCLM)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pgsclm, PGSCLM)(FIXNUM *devid, FIXNUM *pc)
    {FIXNUM rv;
 
     PG_set_clear_mode(*pc);
@@ -1541,7 +1541,7 @@ FIXNUM F77_FUNC(pgsclm, PGSCLM)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGSCLP - set the clipping */
 
-FIXNUM F77_FUNC(pgsclp, PGSCLP)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pgsclp, PGSCLP)(FIXNUM *devid, FIXNUM *pc)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1557,7 +1557,7 @@ FIXNUM F77_FUNC(pgsclp, PGSCLP)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGSCPW - set the char path direction in WC */
 
-FIXNUM F77_FUNC(pgscpw, PGSCPW)(FIXNUM *devid, double *px, double *py)
+FIXNUM FF_ID(pgscpw, PGSCPW)(FIXNUM *devid, double *px, double *py)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1573,7 +1573,7 @@ FIXNUM F77_FUNC(pgscpw, PGSCPW)(FIXNUM *devid, double *px, double *py)
 
 /* PGSCUW - set the char up direction in WC */
 
-FIXNUM F77_FUNC(pgscuw, PGSCUW)(FIXNUM *devid, double *px, double *py)
+FIXNUM FF_ID(pgscuw, PGSCUW)(FIXNUM *devid, double *px, double *py)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1589,7 +1589,7 @@ FIXNUM F77_FUNC(pgscuw, PGSCUW)(FIXNUM *devid, double *px, double *py)
 
 /* PGSDPI - set the PostScript dots per inch for 8.5 x 11 page */
 
-FIXNUM F77_FUNC(pgsdpi, PGSDPI)(double *dpi)
+FIXNUM FF_ID(pgsdpi, PGSDPI)(double *dpi)
    {FIXNUM rv;
 
     PG_set_ps_dots_inch(*dpi);
@@ -1603,7 +1603,7 @@ FIXNUM F77_FUNC(pgsdpi, PGSDPI)(double *dpi)
 
 /* PGSELC - select a color from the n-dimensional palette */
 
-FIXNUM F77_FUNC(pgselc, PGSELC)(FIXNUM *devid, FIXNUM *n, double *av,
+FIXNUM FF_ID(pgselc, PGSELC)(FIXNUM *devid, FIXNUM *n, double *av,
 				double *an, double *ax)
    {FIXNUM rv;
     double extr[2];
@@ -1623,7 +1623,7 @@ FIXNUM F77_FUNC(pgselc, PGSELC)(FIXNUM *devid, FIXNUM *n, double *av,
 
 /* PGSFCL - set the fill color */
 
-FIXNUM F77_FUNC(pgsfcl, PGSFCL)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pgsfcl, PGSFCL)(FIXNUM *devid, FIXNUM *pc)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1639,7 +1639,7 @@ FIXNUM F77_FUNC(pgsfcl, PGSFCL)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGSFIN - set the finished status */
 
-FIXNUM F77_FUNC(pgsfin, PGSFIN)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pgsfin, PGSFIN)(FIXNUM *devid, FIXNUM *pc)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1655,7 +1655,7 @@ FIXNUM F77_FUNC(pgsfin, PGSFIN)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGSLNC - set the line color */
 
-FIXNUM F77_FUNC(pgslnc, PGSLNC)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pgslnc, PGSLNC)(FIXNUM *devid, FIXNUM *pc)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1671,7 +1671,7 @@ FIXNUM F77_FUNC(pgslnc, PGSLNC)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGSLOP - set the logical operation */
 
-FIXNUM F77_FUNC(pgslop, PGSLOP)(FIXNUM *devid, FIXNUM *plop)
+FIXNUM FF_ID(pgslop, PGSLOP)(FIXNUM *devid, FIXNUM *plop)
    {FIXNUM rv;
     PG_logical_operation lop;
     PG_device *dev;
@@ -1689,7 +1689,7 @@ FIXNUM F77_FUNC(pgslop, PGSLOP)(FIXNUM *devid, FIXNUM *plop)
 
 /* PGSLNS - set the line style */
 
-FIXNUM F77_FUNC(pgslns, PGSLNS)(FIXNUM *devid, FIXNUM *ps)
+FIXNUM FF_ID(pgslns, PGSLNS)(FIXNUM *devid, FIXNUM *ps)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1705,7 +1705,7 @@ FIXNUM F77_FUNC(pgslns, PGSLNS)(FIXNUM *devid, FIXNUM *ps)
 
 /* PGSLNW - set the line width */
 
-FIXNUM F77_FUNC(pgslnw, PGSLNW)(FIXNUM *devid, double *pw)
+FIXNUM FF_ID(pgslnw, PGSLNW)(FIXNUM *devid, double *pw)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1721,7 +1721,7 @@ FIXNUM F77_FUNC(pgslnw, PGSLNW)(FIXNUM *devid, double *pw)
 
 /* PGSMKO - set the marker orientation */
 
-FIXNUM F77_FUNC(pgsmko, PGSMKO)(FIXNUM *devid, double *pw)
+FIXNUM FF_ID(pgsmko, PGSMKO)(FIXNUM *devid, double *pw)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1737,7 +1737,7 @@ FIXNUM F77_FUNC(pgsmko, PGSMKO)(FIXNUM *devid, double *pw)
 
 /* PGSMKS - set the marker scale */
 
-FIXNUM F77_FUNC(pgsmks, PGSMKS)(FIXNUM *devid, double *ps)
+FIXNUM FF_ID(pgsmks, PGSMKS)(FIXNUM *devid, double *ps)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1753,7 +1753,7 @@ FIXNUM F77_FUNC(pgsmks, PGSMKS)(FIXNUM *devid, double *ps)
 
 /* PGSPAL - set the current palette */
 
-FIXNUM F77_FUNC(pgspal, PGSPAL)(FIXNUM *devid, FIXNUM *pnc, char *pname)
+FIXNUM FF_ID(pgspal, PGSPAL)(FIXNUM *devid, FIXNUM *pnc, char *pname)
    {FIXNUM rv;
     PG_device *dev;
     char lname[MAXLINE];
@@ -1770,7 +1770,7 @@ FIXNUM F77_FUNC(pgspal, PGSPAL)(FIXNUM *devid, FIXNUM *pnc, char *pname)
 
 /* PGSPMF - set the pixmap flag */
 
-FIXNUM F77_FUNC(pgspmf, PGSPMF)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pgspmf, PGSPMF)(FIXNUM *devid, FIXNUM *pc)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1786,7 +1786,7 @@ FIXNUM F77_FUNC(pgspmf, PGSPMF)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGSTOP - convert from NDC to PC */
 
-FIXNUM F77_FUNC(pgstop, PGSTOP)(FIXNUM *devid, double *px, double *py,
+FIXNUM FF_ID(pgstop, PGSTOP)(FIXNUM *devid, double *px, double *py,
 			        FIXNUM *pix, FIXNUM *piy)
    {FIXNUM rv;
     double p[PG_SPACEDM];
@@ -1809,7 +1809,7 @@ FIXNUM F77_FUNC(pgstop, PGSTOP)(FIXNUM *devid, double *px, double *py,
 
 /* PGSTOW - convert from NDC to WC */
 
-FIXNUM F77_FUNC(pgstow, PGSTOW)(FIXNUM *devid, double *px, double *py)
+FIXNUM FF_ID(pgstow, PGSTOW)(FIXNUM *devid, double *px, double *py)
    {FIXNUM rv;
     double p[PG_SPACEDM];
     PG_device *dev;
@@ -1831,7 +1831,7 @@ FIXNUM F77_FUNC(pgstow, PGSTOW)(FIXNUM *devid, double *px, double *py)
 
 /* PGSTXC - set the text color */
 
-FIXNUM F77_FUNC(pgstxc, PGSTXC)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pgstxc, PGSTXC)(FIXNUM *devid, FIXNUM *pc)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1847,7 +1847,7 @@ FIXNUM F77_FUNC(pgstxc, PGSTXC)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGSTXF - set the font */
 
-FIXNUM F77_FUNC(pgstxf, PGSTXF)(FIXNUM *devid, FIXNUM *pncf,
+FIXNUM FF_ID(pgstxf, PGSTXF)(FIXNUM *devid, FIXNUM *pncf,
 				char *face, FIXNUM *pncs,
 				char *style, FIXNUM *psize)
    {FIXNUM rv;
@@ -1877,7 +1877,7 @@ FIXNUM F77_FUNC(pgstxf, PGSTXF)(FIXNUM *devid, FIXNUM *pncf,
  *        - to be reused
  */
 
-FIXNUM F77_FUNC(pgsvpa, PGSVPA)(FIXNUM *devid, FIXNUM *pn)
+FIXNUM FF_ID(pgsvpa, PGSVPA)(FIXNUM *devid, FIXNUM *pn)
    {int n;
     FIXNUM rv;
     PG_device *dev;
@@ -1922,7 +1922,7 @@ FIXNUM F77_FUNC(pgsvpa, PGSVPA)(FIXNUM *devid, FIXNUM *pn)
 
 /* PGSVWP - set the viewport */
 
-FIXNUM F77_FUNC(pgsvwp, PGSVWP)(FIXNUM *devid, double *px1, double *px2,
+FIXNUM FF_ID(pgsvwp, PGSVWP)(FIXNUM *devid, double *px1, double *px2,
 				double *py1, double *py2)
    {FIXNUM rv;
     double ndc[PG_BOXSZ];
@@ -1945,7 +1945,7 @@ FIXNUM F77_FUNC(pgsvwp, PGSVWP)(FIXNUM *devid, double *px1, double *px2,
 
 /* PGSVPS - set viewport position */
 
-FIXNUM F77_FUNC(pgsvps, PGSVPS)(FIXNUM *devid, double *px, double *py)
+FIXNUM FF_ID(pgsvps, PGSVPS)(FIXNUM *devid, double *px, double *py)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1962,7 +1962,7 @@ FIXNUM F77_FUNC(pgsvps, PGSVPS)(FIXNUM *devid, double *px, double *py)
 
 /* PGSVSH - set viewport shape */
 
-FIXNUM F77_FUNC(pgsvsh, PGSVSH)(FIXNUM *devid, double *pw, double *ph, double *pa)
+FIXNUM FF_ID(pgsvsh, PGSVSH)(FIXNUM *devid, double *pw, double *ph, double *pa)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1979,7 +1979,7 @@ FIXNUM F77_FUNC(pgsvsh, PGSVSH)(FIXNUM *devid, double *pw, double *ph, double *p
 
 /* PGSWCS - set the world coordinate system */
 
-FIXNUM F77_FUNC(pgswcs, PGSWCS)(FIXNUM *devid, double *px1, double *px2,
+FIXNUM FF_ID(pgswcs, PGSWCS)(FIXNUM *devid, double *px1, double *px2,
 				double *py1, double *py2)
    {FIXNUM rv;
     double wc[PG_BOXSZ];
@@ -2001,7 +2001,7 @@ FIXNUM F77_FUNC(pgswcs, PGSWCS)(FIXNUM *devid, double *px1, double *px2,
 
 /* PGTDID - turn device data id on or off */
 
-FIXNUM F77_FUNC(pgtdid, PGTDID)(FIXNUM *devid, FIXNUM *val)
+FIXNUM FF_ID(pgtdid, PGTDID)(FIXNUM *devid, FIXNUM *val)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -2018,7 +2018,7 @@ FIXNUM F77_FUNC(pgtdid, PGTDID)(FIXNUM *devid, FIXNUM *val)
 
 /* PGUPVS - update the view surface of the PG_device */
 
-FIXNUM F77_FUNC(pgupvs, PGUPVS)(FIXNUM *devid)
+FIXNUM FF_ID(pgupvs, PGUPVS)(FIXNUM *devid)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -2034,7 +2034,7 @@ FIXNUM F77_FUNC(pgupvs, PGUPVS)(FIXNUM *devid)
 
 /* PGWRCL - write label centered wrt x */
 
-FIXNUM F77_FUNC(pgwrcl, PGWRCL)(FIXNUM *devid, double *psy,
+FIXNUM FF_ID(pgwrcl, PGWRCL)(FIXNUM *devid, double *psy,
 				FIXNUM *pnc, char *label)
    {FIXNUM rv;
     char llabel[MAXLINE];
@@ -2055,7 +2055,7 @@ FIXNUM F77_FUNC(pgwrcl, PGWRCL)(FIXNUM *devid, double *psy,
 
 /* PGWRIF - write an interface description file */
 
-FIXNUM F77_FUNC(pgwrif, PGWRIF)(FIXNUM *devid, FIXNUM *pnc, char *name)
+FIXNUM FF_ID(pgwrif, PGWRIF)(FIXNUM *devid, FIXNUM *pnc, char *name)
    {FIXNUM rv;
     char lname[MAXLINE];
     PG_device *dev;
@@ -2075,7 +2075,7 @@ FIXNUM F77_FUNC(pgwrif, PGWRIF)(FIXNUM *devid, FIXNUM *pnc, char *name)
  *        - at the specified screen coordinate in WC
  */
 
-FIXNUM F77_FUNC(pgwrta, PGWRTA)(FIXNUM *devid, double *px, double *py,
+FIXNUM FF_ID(pgwrta, PGWRTA)(FIXNUM *devid, double *px, double *py,
 				FIXNUM *pnc, char *msg)
    {FIXNUM rv;
     double x, y;
@@ -2100,7 +2100,7 @@ FIXNUM F77_FUNC(pgwrta, PGWRTA)(FIXNUM *devid, double *px, double *py,
 
 /* PGWTOS - convert from WC to NDC */
 
-FIXNUM F77_FUNC(pgwtos, PGWTOS)(FIXNUM *devid, double *px, double *py)
+FIXNUM FF_ID(pgwtos, PGWTOS)(FIXNUM *devid, double *px, double *py)
    {FIXNUM rv;
     double p[PG_SPACEDM];
     PG_device *dev;
@@ -2122,7 +2122,7 @@ FIXNUM F77_FUNC(pgwtos, PGWTOS)(FIXNUM *devid, double *px, double *py)
 
 /* PGSVA - set the view angle */
 
-FIXNUM F77_FUNC(pgsva, PGSVA)(FIXNUM *devid, double *pt, double *pp, double *pc)
+FIXNUM FF_ID(pgsva, PGSVA)(FIXNUM *devid, double *pt, double *pp, double *pc)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -2139,7 +2139,7 @@ FIXNUM F77_FUNC(pgsva, PGSVA)(FIXNUM *devid, double *pt, double *pp, double *pc)
 
 /* PGSLA - set the lighting angle */
 
-FIXNUM F77_FUNC(pgsla, PGSLA)(FIXNUM *devid, double *pt, double *pp)
+FIXNUM FF_ID(pgsla, PGSLA)(FIXNUM *devid, double *pt, double *pp)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -2156,7 +2156,7 @@ FIXNUM F77_FUNC(pgsla, PGSLA)(FIXNUM *devid, double *pt, double *pp)
 
 /* PGGVA - get the view angle */
 
-FIXNUM F77_FUNC(pggva, PGGVA)(FIXNUM *devid, FIXNUM *pcnv,
+FIXNUM FF_ID(pggva, PGGVA)(FIXNUM *devid, FIXNUM *pcnv,
 			      double *pt, double *pp, double *pc)
    {FIXNUM rv;
     PG_device *dev;
@@ -2174,7 +2174,7 @@ FIXNUM F77_FUNC(pggva, PGGVA)(FIXNUM *devid, FIXNUM *pcnv,
 
 /* PGGLA - get the lighting angle */
 
-FIXNUM F77_FUNC(pggla, PGGLA)(FIXNUM *devid, FIXNUM *pcnv, double *pt, double *pp)
+FIXNUM FF_ID(pggla, PGGLA)(FIXNUM *devid, FIXNUM *pcnv, double *pt, double *pp)
    {FIXNUM rv;
     PG_device *dev;
 

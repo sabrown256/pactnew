@@ -1,5 +1,5 @@
 TXT: PGS User's Manual
-MOD: 04/06/2011
+MOD: 05/19/2011
 
 <CENTER>
 <P>
@@ -602,39 +602,39 @@ assign their function to these hooks.<p>
 
 <I>C Binding: </I>PFByte PG_set_key_down_event_handler(PG_device *d, void 
 (*fnc)())
-<BR><I>F77 Binding: </I>integer pgsekd(integer d, fnc)
+<BR><I>Fortran Binding: </I>integer pgsekd(integer d, fnc)
 <BR><I>SX Binding: </I>
 
 <P>
 <I>C Binding: </I>PFByte PG_set_key_up_event_handler(PG_device *d, void (*fnc)())
-<BR><I>F77 Binding: </I>integer pgseku(integer d, fnc)
+<BR><I>Fortran Binding: </I>integer pgseku(integer d, fnc)
 <BR><I>SX Binding: </I>
 
 <P>          
 <I>C Binding: </I>PFByte PG_set_mouse_down_event_handler(PG_device *d, void 
 (*fnc)())
-<BR><I>F77 Binding: </I>integer pgsemd(integer d, fnc)
+<BR><I>Fortran Binding: </I>integer pgsemd(integer d, fnc)
 <BR><I>SX Binding: </I>
 
 <P>          
 <I>C Binding: </I>PFByte PG_set_mouse_up_event_handler(PG_device *d, void 
 (*fnc)())
-<BR><I>F77 Binding: </I>integer pgsemu(integer d, fnc)
+<BR><I>Fortran Binding: </I>integer pgsemu(integer d, fnc)
 <BR><I>SX Binding: </I>
 
 <P>          
 <I>C Binding: </I>PFByte PG_set_update_event_handler(PG_device *d, void (*fnc)())
-<BR><I>F77 Binding: </I>integer pgseup(integer d, fnc)
+<BR><I>Fortran Binding: </I>integer pgseup(integer d, fnc)
 <BR><I>SX Binding: </I>
 
 <P>          
 <I>C Binding: </I>PFByte PG_set_expose_event_handler(PG_device *d, void (*fnc)())
-<BR><I>F77 Binding: </I>integer pgseex(integer d, fnc)
+<BR><I>Fortran Binding: </I>integer pgseex(integer d, fnc)
 <BR><I>SX Binding: </I>
 
 <P>          
 <I>C Binding: </I>PFByte PG_set_default_event_handler(PG_device *d, void (*fnc)())
-<BR><I>F77 Binding: </I>integer pgsedf(integer d, fnc)
+<BR><I>Fortran Binding: </I>integer pgsedf(integer d, fnc)
 <BR><I>SX Binding: </I>
 
 <P>          
@@ -690,7 +690,7 @@ functions can use to access event information.<p>
 
 <p>
 <I>C Binding: </I>int PG_get_next_event(PG_event *ev)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
 Does a blocking read of the next event from the windowing system and fills
@@ -698,20 +698,20 @@ in the specified PG_event structure, ev.<p>
 
 <p>
 <I>C Binding: </I>void PG_key_event_info(PG_device *d, PG_event ev, int *iev, char *bf, int n, int *mod)
-<BR><I>F77 Binding: </I>integer pgqkbd(integer d, integer x, integer y, integer c, integer mod)
+<BR><I>Fortran Binding: </I>integer pgqkbd(integer d, integer x, integer y, integer c, integer mod)
 <BR><I>SX Binding: </I>
 
 <P>
 Return the state of the  keyboard for the specified window, d. The x and y
 coordinates of the mouse or locator, which key is pressed, and which modifiers
-are present are returned in iev, c, and mod respectively.  In the F77 binding
+are present are returned in iev, c, and mod respectively.  In the Fortran Binding
 this is associated only with one specific keyboard event. It should be called
 only a single time from a key-down-event handler. In the C binding the actual
 keyboard event is supplied in ev.<p>
 
 <p>
 <I>C Binding: </I>void PG_query_pointer(PG_device *d, int *ir, int *pb, int *pq)
-<BR><I>F77 Binding: </I>integer pgqptr(integer d, integer x, integer y, integer b, integer q)
+<BR><I>Fortran Binding: </I>integer pgqptr(integer d, integer x, integer y, integer b, integer q)
 <BR><I>SX Binding: </I>
 
 <P>
@@ -749,7 +749,7 @@ KEY_SHIFT
 <P>
 <BR>
 <I>C Binding: </I>PG_device *PG_get_event_device(PG_event *ev)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <UL>
 Return a pointer to the PG_device (screen window) in which the event,
@@ -759,7 +759,7 @@ ev, occurred or to which it relates.
 <p>
 
 <I>C Binding: </I>int PG_get_char(PG_device *d)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <UL>
 Return the ASCII code of the next character entered from the keyboard
@@ -2054,7 +2054,7 @@ graph level control.<p>
 
 <I>C Binding: </I>int PG_def_marker(int n_seg, double *x1, double *y1, double *x2, 
 double *y2)
-<BR><I>F77 Binding: </I>integer pgdmrk(integer n_seg, REAL x1, REAL y1, REAL x2, REAL y2)
+<BR><I>Fortran Binding: </I>integer pgdmrk(integer n_seg, REAL x1, REAL y1, REAL x2, REAL y2)
 <BR><I>SX Binding: </I>(pg-define-marker x1 y1 x2 y2 ...)
 <P>
 This routine defines a new marker in terms of a set of line segments. The
@@ -2069,7 +2069,7 @@ attribute where called for.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_clear_mode(int mode)
-<BR><I>F77 Binding: </I>integer pgsclm(integer mode)
+<BR><I>Fortran Binding: </I>integer pgsclm(integer mode)
 <BR><I>SX Binding: </I>
 <P>
 Set a global mode which the high level rendering routines use to interpret
@@ -2084,7 +2084,7 @@ clear anything.<p>
 <p>
 
 <I>C Binding: </I>
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-set-view-angle! theta phi chi)
 <P>
 Set a global default viewing angle for 3D plots. From the observer&#146;s
@@ -2102,7 +2102,7 @@ theta equal to 90 degrees.<p>
 <p>
 
 <I>C Binding: </I>int64_t PG_get_buffer_size(void)
-<BR><I>F77 Binding: </I>integer pgsbsz(integer sz)
+<BR><I>Fortran Binding: </I>integer pgsbsz(integer sz)
 <BR><I>SX Binding: </I>(pg-get-buffer-size)
 <P>
 Get the I/O buffer size for graphics files.<p>
@@ -2110,7 +2110,7 @@ Get the I/O buffer size for graphics files.<p>
 <p>
 
 <I>C Binding: </I>void PG_get_clear_mode(int mode)
-<BR><I>F77 Binding: </I>integer pggclm(integer mode)
+<BR><I>Fortran Binding: </I>integer pggclm(integer mode)
 <BR><I>SX Binding: </I>
 <P>
 Get the current value of the global mode which the high level rendering
@@ -2128,7 +2128,7 @@ data structures.<p>
 <p>
 
 <I>C Binding: </I>PG_device *PG_make_device(char *name, char *type, char *title)
-<BR><I>F77 Binding: </I>integer pgmkdv(integer ncn, char *name, integer nct, char *type, 
+<BR><I>Fortran Binding: </I>integer pgmkdv(integer ncn, char *name, integer nct, char *type, 
 integer ncl, char *title)
 <BR><I>SX Binding: </I>(pg-make-device name type title)
 <P>
@@ -2155,7 +2155,7 @@ applications. Values of 2.0 or 3.0 are most common.<p>
 
 <I>C Binding: </I>PG_graph *PG_make_graph_from_mapping(PM_mapping *f, char 
 *info_type, void *info, int id, PG_graph *next)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
 Setup and return a PG_graph using a PM_mapping, f, and rendering information
@@ -2169,7 +2169,7 @@ next graph in a chain.<p>
 <I>C Binding: </I>PG_graph *PG_make_graph_from_sets(char *label, PM_set 
 *domain, PM_set *range, int centering, char *info_type, 
 void *info, int id, PG_graph *next)
-<BR><I>F77 Binding: </I>integer pgmgfs(integer nl, char *label, integer domid, integer ranid, 
+<BR><I>Fortran Binding: </I>integer pgmgfs(integer nl, char *label, integer domid, integer ranid, 
 integer centering, integer id, integer next)
 <BR><I>SX Binding: </I>(pg-make-graph domain range [centering color width style emap name])
 <P>
@@ -2188,7 +2188,7 @@ next is used to point to the next graph in a chain.<p>
 <I>C Binding: </I>PG_graph *PG_make_graph_r2_r1(int id, char *label, int cp, 
 int kmax, int lmax, int centering, double *x, double *y, 
 double *r, char *dname, char *rname)
-<BR><I>F77 Binding: </I>integer pgmg21(integer id, integer nl, char *label, integer cp, integer 
+<BR><I>Fortran Binding: </I>integer pgmg21(integer id, integer nl, char *label, integer cp, integer 
 kmax, integer lmax, integer centering, REAL x, REAL y, REAL 
 r, integer nd, char *dname, integer nr, char *rname)
 <BR><I>SX Binding: </I>
@@ -2208,7 +2208,7 @@ entire plot and may be plotted in some circumstances.<p>
 
 <I>C Binding: </I>PG_graph *PG_make_graph_1d(int id, char *label, int cp, 
 int n, double *x, double *y, char *xname, char *yname)
-<BR><I>F77 Binding: </I>integer pgmg11(integer id, integer nl, char *label, integer cp, integer n, 
+<BR><I>Fortran Binding: </I>integer pgmg11(integer id, integer nl, char *label, integer cp, integer n, 
 real x, REAL y, integer nx, char *xname, integer ny, char 
 *yname)
 <BR><I>SX Binding: </I>
@@ -2227,7 +2227,7 @@ the entire plot and may be plotted in some circumstances.<p>
 <p>
 
 <I>C Binding: </I>void PG_rl_graph(PG_graph *g, int rld, int rlr)
-<BR><I>F77 Binding: </I>integer pgrlgr(integer g, integer rld, integer rlr)
+<BR><I>Fortran Binding: </I>integer pgrlgr(integer g, integer rld, integer rlr)
 <BR><I>SX Binding: </I>                 automatically garbage collected
 <P>
 This function releases an instance of a PG_graph. If rld is TRUE the data
@@ -2238,7 +2238,7 @@ in the range set will be freed.<p>
 
 <I>C Binding: </I>PG_image *PG_make_image_n(char *label, char *type,
 int nd, PG_coord_sys cs, double *dbx, double *rbx, int w, int h, int bpp, PG_palette *palette)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-build-image dev data w h [name xmn xmx ymn ymx zmn zmx])
 <P>
 The arguments to this function are:<p>
@@ -2262,7 +2262,7 @@ The arguments to this function are:<p>
 <P>
 
 <I>C Binding: </I>void PG_rl_image(PG_image *im)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I> automatically garbage collected
 <P>
 These two functions create and release PG_image instances. The images are
@@ -2281,7 +2281,7 @@ permit applications to set various aspects of the state of devices.<p>
 <p>
 
 <I>C Binding: </I>void PG_clear_page(PG_device *dev, int i)
-<BR><I>F77 Binding: </I> integer pgclpg(integer devid, int i)
+<BR><I>Fortran Binding: </I> integer pgclpg(integer devid, int i)
 <BR><I>SX Binding: </I>
 <P>
 Clear the page for a text window such as the console. Leave the current
@@ -2291,7 +2291,7 @@ line at line i in the PGS window.<p>
 
 <I>C Binding: </I>void PG_clear_region(PG_device *dev, int nd, PG_coord_sys cs,
 double *bx, int pad)
-<BR><I>F77 Binding: </I>integer pgclrg(integer devid, REAL xmn, REAL xmx, REAL ymn, REAL ymx, 
+<BR><I>Fortran Binding: </I>integer pgclrg(integer devid, REAL xmn, REAL xmx, REAL ymn, REAL ymx, 
 integer pad)
 <BR><I>SX Binding: </I>(pg-clear-region dev <xmn xmx ymn ymx> | <xmn xmx ymn ymx zmn zmx> pad)
 <P>
@@ -2304,7 +2304,7 @@ a border line around the region.<p>
 <p>
 
 <I>C Binding: </I>void PG_clear_window(PG_device *dev)
-<BR><I>F77 Binding: </I>integer pgclsc(integer devid)
+<BR><I>Fortran Binding: </I>integer pgclsc(integer devid)
 <BR><I>SX Binding: </I>(pg-clear-window dev)
 <P>
 Clear the entire PGS window on the specified device.<p>
@@ -2312,7 +2312,7 @@ Clear the entire PGS window on the specified device.<p>
 <p>
 
 <I>C Binding: </I>void PG_clear_viewspace(PG_device *dev)
-<BR><I>F77 Binding: </I>integer pgclvp(integer devid)
+<BR><I>Fortran Binding: </I>integer pgclvp(integer devid)
 <BR><I>SX Binding: </I>(pg-clear-viewspace dev)
 <P>
 Clear the current viewspace region only on the specified device.<p>
@@ -2320,7 +2320,7 @@ Clear the current viewspace region only on the specified device.<p>
 <p>
 
 <I>C Binding: </I>void PG_close_console(void)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
 Close the console device.<p>
@@ -2328,7 +2328,7 @@ Close the console device.<p>
 <p>
 
 <I>C Binding: </I>void PG_close_device(PG_device *dev)
-<BR><I>F77 Binding: </I>integer pgclos(integer dev)
+<BR><I>Fortran Binding: </I>integer pgclos(integer dev)
 <BR><I>SX Binding: </I>(pg-close-device dev)
 <P>
 Close the specified device, dev.<p>
@@ -2336,7 +2336,7 @@ Close the specified device, dev.<p>
 <p>
 
 <I>C Binding: </I>void PG_finish_plot(PG_device *dev)
-<BR><I>F77 Binding: </I>integer pgfnpl(integer devid)
+<BR><I>Fortran Binding: </I>integer pgfnpl(integer devid)
 <BR><I>SX Binding: </I>(pg-finish-plot dev)
 <P>
 Finish the picture on the specified device. Once a picture is finished,
@@ -2347,7 +2347,7 @@ devices such as PS and CGM devices.<p>
 <p>
 
 <I>C Binding: </I>void PG_get_axis_log_scale(PG_device *dev, int nd, int *iflg)
-<BR><I>F77 Binding: </I>integer pggaxl(integer devid, int nd, integer ifld)
+<BR><I>Fortran Binding: </I>integer pggaxl(integer devid, int nd, integer ifld)
 <BR><I>SX Binding: </I>
 <P>
 Get the log scale flags in the specified device. The argument IFLG
@@ -2356,7 +2356,7 @@ contains the value of the log flag in each direction.<p>
 <p>
 
 <I>C Binding: </I>void PG_make_device_current(PG_device *dev)
-<BR><I>F77 Binding: </I>integer pgmdvc(integer devid)
+<BR><I>Fortran Binding: </I>integer pgmdvc(integer devid)
 <BR><I>SX Binding: </I>(pg-make-device-current dev)
 <P>
 Make the specified device the current device for drawing.<p>
@@ -2365,7 +2365,7 @@ Make the specified device the current device for drawing.<p>
 
 <I>C Binding: </I>void PG_open_console(char *title, char *type, int bckgr, double xf, 
 double yf, double dxf, double dyf)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
 Open a console device at the specified point (xf, yf) with the specified
@@ -2379,7 +2379,7 @@ FALSE for black background.<p>
 
 <I>C Binding: </I>PG_device *PG_open_device(PG_device *dev, double xf, double yf, 
 double dxf, double dyf)
-<BR><I>F77 Binding: </I>integer pgopen(integer devid, double xf, double yf, double dxf, double 
+<BR><I>Fortran Binding: </I>integer pgopen(integer devid, double xf, double yf, double dxf, double 
 dyf)
 <BR><I>SX Binding: </I>(pg-open-device dev xf yf dxf dyf)
 <P>
@@ -2391,7 +2391,7 @@ pixel height of the PGS window is computed as dyf*display_pixel_width!<p>
 <p>
 
 <I>C Binding: </I>void PG_release_current_device(PG_device *dev)
-<BR><I>F77 Binding: </I>integer pgrdvc(integer devid)
+<BR><I>Fortran Binding: </I>integer pgrdvc(integer devid)
 <BR><I>SX Binding: </I>(pg-release-current-device dev)
 <P>
 Release the specified device as the current drawing device. (A few host
@@ -2400,7 +2400,7 @@ graphics systems need this functionality).<p>
 <p>
 
 <I>C Binding: </I>void PG_set_attributes(PG_device *dev, PG_dev_attributes *attr)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
 Set the collection of attributes from the PG_dev_attributes structure
@@ -2409,7 +2409,7 @@ attr in the specified device.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_attrs_glb(int dflt, ...)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: (pg-set-attrs-global! [<name> <value>]*)</I>
 <P>
 Set the values of the specified global attributes.<p>
@@ -2417,7 +2417,7 @@ Set the values of the specified global attributes.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_attrs_graph(PG_graph *g,  ...)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: (pg-set-attrs-graph! g [<name> <type> <ptr> <value>]*)</I></I>
 <P>
 Set the values of the specified attributes in the PG_graph g.<p>
@@ -2425,7 +2425,7 @@ Set the values of the specified attributes in the PG_graph g.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_attrs_mapping(PM_mapping *f, ...)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: (pg-set-attrs-mapping! f [<name> <type> <ptr> <value>]*)</I></I>
 <P>
 Set the values of the specified attributes in the PM_mapping f.<p>
@@ -2433,7 +2433,7 @@ Set the values of the specified attributes in the PM_mapping f.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_attrs_set(PM_set *s, ...)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: (pg-set-attrs-set! s [<name> <type> <ptr> <value>]*)</I></I>
 <P>
 Set the values of the specified attributes in the PM_set s.<p>
@@ -2441,7 +2441,7 @@ Set the values of the specified attributes in the PM_set s.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_axis_log_scale(PG_device *dev, int nd, int *iflg)
-<BR><I>F77 Binding: </I>integer pgsaxl(integer devid, integer nd, integer iflg)
+<BR><I>Fortran Binding: </I>integer pgsaxl(integer devid, integer nd, integer iflg)
 <BR><I>SX Binding: </I>
 <P>
 Set the axis log scale flags in the specified device. The argument
@@ -2451,7 +2451,7 @@ to be plotted with a log scale if TRUE.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_border_width(PG_device *dev, int t)
-<BR><I>F77 Binding: </I>integer pgsbwd(integer devid, integer t)
+<BR><I>Fortran Binding: </I>integer pgsbwd(integer devid, integer t)
 <BR><I>SX Binding: </I>(pg-set-border-width dev t)
 <P>
 Set the width of the window border in pixels.<p>
@@ -2459,7 +2459,7 @@ Set the width of the window border in pixels.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_buffer_size(int64_t sz)
-<BR><I>F77 Binding: </I>integer pgsbsz(integer sz)
+<BR><I>Fortran Binding: </I>integer pgsbsz(integer sz)
 <BR><I>SX Binding: </I>(pg-set-bbuffer-size! sz)
 <P>
 Set the I/O buffer size for graphics files.<p>
@@ -2467,7 +2467,7 @@ Set the I/O buffer size for graphics files.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_clipping(PG_device *dev, int flag)
-<BR><I>F77 Binding: </I>integer pgsclp(integer devid, integer c)
+<BR><I>Fortran Binding: </I>integer pgsclp(integer devid, integer c)
 <BR><I>SX Binding: </I>(pg-set-clipping! dev flag)
 <P>
 Turn on clipping to the current viewspace if flag is TRUE and turn off
@@ -2478,7 +2478,7 @@ clipping rectangle. To do this turn clipping off and back on again.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_fill_color(PG_device *dev, int color)
-<BR><I>F77 Binding: </I>integer pgsfcl(integer devid, integer color)
+<BR><I>Fortran Binding: </I>integer pgsfcl(integer devid, integer color)
 <BR><I>SX Binding: </I>(pg-set-fill-color dev color)
 <P>
 Set the fill color for the device to color. The color index is mapped
@@ -2487,7 +2487,7 @@ through the current palette.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_finish_state(PG_device *dev, int fin)
-<BR><I>F77 Binding: </I>integer pgsfin(integer dev, integer fin)
+<BR><I>Fortran Binding: </I>integer pgsfin(integer dev, integer fin)
 <BR><I>SX Binding: </I>(pg-set-finish-state! dev fin)
 <P>
 Set the state of the flag that tells the high level rendering routines
@@ -2498,7 +2498,7 @@ a plot after the high level renderer returns.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_marker_orientation(PG_device *dev, double theta)
-<BR><I>F77 Binding: </I>integer pgsmko(integer devid, REAL theta)
+<BR><I>Fortran Binding: </I>integer pgsmko(integer devid, REAL theta)
 <BR><I>SX Binding: </I>(pg-set-marker-orientation! dev theta)
 <P>
 Set the orientation angle to be applied when drawing markers. Markers can be
@@ -2509,7 +2509,7 @@ marker.  It is measured in degrees.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_marker_scale(PG_device *dev, double v)
-<BR><I>F77 Binding: </I>integer pgsms(integer devid, REAL v)
+<BR><I>Fortran Binding: </I>integer pgsms(integer devid, REAL v)
 <BR><I>SX Binding: </I>(pg-set-marker-scale! dev v)
 <P>
 Set the scale factor to be applied when drawing markers. Markers can be
@@ -2520,7 +2520,7 @@ value might be 0.01.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_max_intensity(PG_device *dev, double osc)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-set-maximum-intensity! dev osc rsc gsc bsc)
 <P>
 To better match the characteristics of varying output devices (especially
@@ -2532,7 +2532,7 @@ respectively.<p>
 <p>
 
 <I>C Binding: </I>PG_palette *PG_set_palette(PG_device *dev, char *name)
-<BR><I>F77 Binding: </I>integer pgspal(integer devid, integer nc, char *name)
+<BR><I>Fortran Binding: </I>integer pgspal(integer devid, integer nc, char *name)
 <BR><I>SX Binding: </I>(pg-set-palette! dev name)
 <P>
 Set the current palette to be the named one. The built-in palettes are named:
@@ -2544,7 +2544,7 @@ available palettes may be viewed with PG_show_palettes.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_res_scale_factor(PG_device *dev, double f)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-set-resolution-scale-factor! dev sf)
 <P>
 Set the value of the hardcopy resolution scale factor. Hardcopy devices can
@@ -2557,7 +2557,7 @@ This means a factor of 64 in size for raster images.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_viewspace_pos(PG_device *dev, double x, double y)
-<BR><I>F77 Binding: </I>integer pgsvps(integer devid, REAL x, REAL y)
+<BR><I>Fortran Binding: </I>integer pgsvps(integer devid, REAL x, REAL y)
 <BR><I>SX Binding: </I>
 <P>
 Set the position of the viewspace in the window. The specifications are
@@ -2567,7 +2567,7 @@ normalized.<p>
 
 <I>C Binding: </I>void PG_set_viewspace_shape(PG_device *dev, double width, double 
 height, double aspect)
-<BR><I>F77 Binding: </I>integer pgsvsh(integer devid, REAL width, REAL height, REAL aspect)
+<BR><I>Fortran Binding: </I>integer pgsvsh(integer devid, REAL width, REAL height, REAL aspect)
 <BR><I>SX Binding: </I>
 <P>
 Set the shape of the viewspace in the window. The specifications are normalized.
@@ -2576,7 +2576,7 @@ The aspect ratio is used iff the height is given as 0.0.<p>
 <p>
 
 <I>C Binding: </I>void PG_turn_autodomain(PG_device *dev, int n)
-<BR><I>F77 Binding: </I>integer pgsadm(integer dev, integer dm)
+<BR><I>Fortran Binding: </I>integer pgsadm(integer dev, integer dm)
 <BR><I>SX Binding: </I>(pg-set-autodomain! dev n)
 <P>
 Determine the domain interval from the data iff n or dm is ON.<p>
@@ -2584,7 +2584,7 @@ Determine the domain interval from the data iff n or dm is ON.<p>
 <p>
 
 <I>C Binding: </I>void PG_turn_autoplot(PG_device *dev, int n)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-set-autoplot! dev n)
 <P>
 Set flag to applications to automatically replot iff n is ON. This is
@@ -2594,7 +2594,7 @@ control plotting.<p>
 <p>
 
 <I>C Binding: </I>void PG_turn_autorange(PG_device *dev, int n)
-<BR><I>F77 Binding: </I>integer pgsarn(integer dev, integer rn)
+<BR><I>Fortran Binding: </I>integer pgsarn(integer dev, integer rn)
 <BR><I>SX Binding: </I>(pg-set-autorange! dev n)
 <P>
 Determine the range interval from the data iff n or rn is ON.<p>
@@ -2602,7 +2602,7 @@ Determine the range interval from the data iff n or rn is ON.<p>
 <p>
 
 <I>C Binding: </I>void PG_turn_data_id(PG_device *dev, int n)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-set-data-id-flag! dev n)
 <P>
 Draw data identifiers on plots iff n is ON.<p>
@@ -2610,7 +2610,7 @@ Draw data identifiers on plots iff n is ON.<p>
 <p>
 
 <I>C Binding: </I>void PG_turn_grid(PG_device *dev, int n)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-set-grid-flag! dev n)
 <P>
 Turn the full axis grid ON or OFF.<p>
@@ -2618,7 +2618,7 @@ Turn the full axis grid ON or OFF.<p>
 <p>
 
 <I>C Binding: </I>void PG_turn_scatter(PG_device *dev, int n)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-set-scatter-flag! dev n)
 <P>
 Draw 1D data sets as scatter plots iff n is ON.<p>
@@ -2626,7 +2626,7 @@ Draw 1D data sets as scatter plots iff n is ON.<p>
 <p>
 
 <I>C Binding: </I>void PG_update_vs(PG_device *dev)
-<BR><I>F77 Binding: </I>integer pgupvs(integer devid)
+<BR><I>Fortran Binding: </I>integer pgupvs(integer devid)
 <BR><I>SX Binding: </I>(pg-update-view-surface dev)
 <P>
 Update the view surface of the specified device. This flushes any
@@ -2635,7 +2635,7 @@ buffered graphics to the output medium of the device.<p>
 <p>
 
 <I>C Binding: </I>void PG_white_background(PG_device *dev, int n)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-set-white-background! dev n)
 <P>
 If n is TRUE use a white background otherwise use a black background.<p>
@@ -2646,7 +2646,7 @@ If n is TRUE use a white background otherwise use a black background.<p>
 <p>
 
 <I>C Binding: </I>int COLOR_POSTSCRIPT_DEVICE(PG_device *dev)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
 TRUE iff dev is a color PostScript device.<p>
@@ -2654,7 +2654,7 @@ TRUE iff dev is a color PostScript device.<p>
 <p>
 
 <I>C Binding: </I>
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-device-properties dev)
 <P>
 Return the name, type, and title of the device as given in the
@@ -2663,7 +2663,7 @@ PG_make_device call which created the device.<p>
 <p>
 
 <I>C Binding: </I>PG_dev_attributes *PG_get_attributes(PG_device *dev)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
 Collect and return the selection of attributes from the specified device
@@ -2672,7 +2672,7 @@ in a newly allocated PG_dev_attributes structure.<p>
 <p>
 
 <I>C Binding: </I>void PG_get_attrs_glb(int dflt, ...)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
 Get the values of the specified global attributes.<p>
@@ -2680,7 +2680,7 @@ Get the values of the specified global attributes.<p>
 <p>
 
 <I>C Binding: </I>void PG_get_attrs_graph(PG_graph *g, ...)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
 Get the values of the specified attributes in the PG_graph g.<p>
@@ -2688,7 +2688,7 @@ Get the values of the specified attributes in the PG_graph g.<p>
 <p>
 
 <I>C Binding: </I>void PG_get_attrs_mapping(PM_mapping *f, ...)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
 Get the values of the specified attributes in the PM_mapping f.<p>
@@ -2696,7 +2696,7 @@ Get the values of the specified attributes in the PM_mapping f.<p>
 <p>
 
 <I>C Binding: </I>void PG_get_attrs_set(PM_set *s, ...)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
 Get the values of the specified attributes in the PM_set s.<p>
@@ -2704,7 +2704,7 @@ Get the values of the specified attributes in the PM_set s.<p>
 <p>
 
 <I>C Binding: </I>void PG_get_clipping(PG_device *dev, int *flag)
-<BR><I>F77 Binding: </I>integer pggclp(integer devid, integer flag)
+<BR><I>Fortran Binding: </I>integer pggclp(integer devid, integer flag)
 <BR><I>SX Binding: </I>(pg-clipping? dev)
 <P>
 Get the current clipping state for the specified device in flag.<p>
@@ -2712,7 +2712,7 @@ Get the current clipping state for the specified device in flag.<p>
 <p>
 
 <I>C Binding: </I>
-<BR><I>F77 Binding: </I>integer pggfin(integer dev, integer fin)
+<BR><I>Fortran Binding: </I>integer pggfin(integer dev, integer fin)
 <BR><I>SX Binding: </I>(pg-finish-state dev)
 <P>
 Return the state of the flag that tells the high level rendering
@@ -2722,7 +2722,7 @@ call to PG_finish_plot.<p>
 <p>
 
 <I>C Binding: </I>void PG_get_marker_orientation(PG_device *dev, double *v)
-<BR><I>F77 Binding: </I>integer pggmko(integer dev, REAL v)
+<BR><I>Fortran Binding: </I>integer pggmko(integer dev, REAL v)
 <BR><I>SX Binding: </I>(pg-marker-orientation dev)
 <P>
 
@@ -2734,7 +2734,7 @@ comprising the marker.  The angle is measured in degrees.<p>
 <p>
 
 <I>C Binding: </I>void PG_get_marker_scale(PG_device *dev, double *s)
-<BR><I>F77 Binding: </I>integer pggmks(integer devid, REAL s)
+<BR><I>Fortran Binding: </I>integer pggmks(integer devid, REAL s)
 <BR><I>SX Binding: </I>(pg-marker-scale dev)
 <P>
 Get the current marker scale factor of the device. Markers can be drawn to any
@@ -2744,7 +2744,7 @@ factor returned in s controls the actual size.<p>
 <p>
 
 <I>C Binding: </I>
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-maximum-intensity dev)
 <P>
 Return the maximum intensity aggregate value and the individual values
@@ -2754,7 +2754,7 @@ normalized (0.0 to 1.0).<p>
 <p>
 
 <I>C Binding: </I>PG_palette *PG_get_palette(PG_device *dev, char *name)
-<BR><I>F77 Binding: </I>                         not applicable
+<BR><I>Fortran Binding: </I>                         not applicable
 <BR><I>SX Binding: </I>(pg-palette-&gt;list dev name)
 <P>
 Returns a pointer to the palette specified by name.<p>
@@ -2762,7 +2762,7 @@ Returns a pointer to the palette specified by name.<p>
 <p>
 
 <I>C Binding: </I>
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-palettes dev)
 <P>
 Return a list of palettes available for the specified device.<p>
@@ -2770,7 +2770,7 @@ Return a list of palettes available for the specified device.<p>
 <p>
 
 <I>C Binding: </I>int POSTSCRIPT_DEVICE(PG_device *dev)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
 TRUE iff dev is a PostScript device.<p>
@@ -2778,7 +2778,7 @@ TRUE iff dev is a PostScript device.<p>
 <p>
 
 <I>C Binding: </I>void PG_query_screen(PG_device *dev, int *pdx, int *pdy, int *pnc)
-<BR><I>F77 Binding: </I>integer pgqdev(integer devid, integer dx, integer dy, integer nc)
+<BR><I>Fortran Binding: </I>integer pgqdev(integer devid, integer dx, integer dy, integer nc)
 <BR><I>SX Binding: </I>(pg-query-device dev)
 <P>
 Query the device for size in pixels and color planes. The number
@@ -2787,7 +2787,7 @@ of colors which a device supports is 2nplanes.<p>
 <p>
 
 <I>C Binding: </I>void PG_query_window(PG_device *dev, int *pdx, int *pdy)
-<BR><I>F77 Binding: </I>integer pgqwin(integer devid, integer dx, integer dy)
+<BR><I>Fortran Binding: </I>integer pgqwin(integer devid, integer dx, integer dy)
 <BR><I>SX Binding: </I>(pg-query-window dev)
 <P>
 Query the shape of the window on the device.<p>
@@ -2795,7 +2795,7 @@ Query the shape of the window on the device.<p>
 <p>
 
 <I>C Binding: </I>
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-show-markers)
 <P>
 Temporarily spawn a window to display the available marker characters on
@@ -2815,7 +2815,7 @@ application at hand.<p>
 <p>
 
 <I>C Binding: </I>void PtoS(PG_device *dev, int ix, int iy, double x, double y)
-<BR><I>F77 Binding: </I>integer pgptos(integer devid, integer ix, integer iy, REAL x, REAL y)
+<BR><I>Fortran Binding: </I>integer pgptos(integer devid, integer ix, integer iy, REAL x, REAL y)
 <BR><I>SX Binding: </I>(pg-pixel-&gt;normalized dev ix iy)
 <P>
 Converts (ix, iy) from pixel coordinates to NDC/Screen coordinates (x, y).<p>
@@ -2823,7 +2823,7 @@ Converts (ix, iy) from pixel coordinates to NDC/Screen coordinates (x, y).<p>
 <p>
 
 <I>C Binding: </I>void StoP(PG_device *dev, double x, double y, int ix, int iy)
-<BR><I>F77 Binding: </I>integer pgstop(integer devid, REAL x, REAL y, integer ix, integer iy)
+<BR><I>Fortran Binding: </I>integer pgstop(integer devid, REAL x, REAL y, integer ix, integer iy)
 <BR><I>SX Binding: </I>(pg-normalized-&gt;pixel dev x y)
 <P>
 Converts (x, y) from NDC/Screen coordinates to pixel coordinates (ix, iy).<p>
@@ -2831,7 +2831,7 @@ Converts (x, y) from NDC/Screen coordinates to pixel coordinates (ix, iy).<p>
 <p>
 
 <I>C Binding: </I>void StoW(PG_device *dev, double x, double y)
-<BR><I>F77 Binding: </I>integer pgstow(integer devid, REAL x, REAL y)
+<BR><I>Fortran Binding: </I>integer pgstow(integer devid, REAL x, REAL y)
 <BR><I>SX Binding: </I>(pg-normalized-&gt;world dev x y)
 <P>
 Converts (x, y) from screen coordinates to world coordinates.<p>
@@ -2839,7 +2839,7 @@ Converts (x, y) from screen coordinates to world coordinates.<p>
 <p>
 
 <I>C Binding: </I>void WtoS(PG_device *dev, double x, double y)
-<BR><I>F77 Binding: </I>integer pgwtos(integer devid, REAL x, REAL y)
+<BR><I>Fortran Binding: </I>integer pgwtos(integer devid, REAL x, REAL y)
 <BR><I>SX Binding: </I>(pg-world-&gt;normalized dev x y)
 <P>
 Converts (x, y) from world coordinates to screen coordinates.<p>
@@ -2856,7 +2856,7 @@ of a PGS window.<p>
 
 <I>C Binding: </I>void PG_get_frame(PG_device *dev, double *x1, double *x2, double 
 *y1, double *y2)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-frame dev)
 <P>
 Get the frame of the specified device. The x and y intervals are specified
@@ -2866,7 +2866,7 @@ in NDC by (x1, x2) and (y1, y2) respectively.<p>
 
 <I>C Binding: </I>void PG_get_viewspace(PG_device *dev, double *x1, double *x2, double 
 *y1, double *y2)
-<BR><I>F77 Binding: </I>integer pggvwp(integer devid, REAL x1, REAL x2, REAL y1, REAL 
+<BR><I>Fortran Binding: </I>integer pggvwp(integer devid, REAL x1, REAL x2, REAL y1, REAL 
 y2)
 <BR><I>SX Binding: </I>(pg-viewspace dev)
 <P>
@@ -2877,7 +2877,7 @@ specified in NDC by (x1, x2) and (y1, y2) respectively.<p>
 
 <I>C Binding: </I>void PG_get_window(PG_device *dev, double *xmn, double *xmx, 
 double *ymn, double *ymx)
-<BR><I>F77 Binding: </I>integer pggwcs(integer devid, REAL x1, REAL x2, REAL y1, REAL 
+<BR><I>Fortran Binding: </I>integer pggwcs(integer devid, REAL x1, REAL x2, REAL y1, REAL 
 y2)
 <BR><I>SX Binding: </I>(pg-world-coordinate-system dev)
 <P>
@@ -2888,7 +2888,7 @@ and (y1, y2) respectively.<p>
 <p>
 
 <I>C Binding: </I>
-<BR><I>F77 Binding: </I>integer pgrvpa(integer devid, integer n)
+<BR><I>Fortran Binding: </I>integer pgrvpa(integer devid, integer n)
 <BR><I>SX Binding: </I>
 <P>
 Restore the current viewspace, coordinate transformations, and related graphical
@@ -2897,7 +2897,7 @@ state. A previously saved state (see pgsvpa) is referenced by the index n.<p>
 <p>
 
 <I>C Binding: </I>
-<BR><I>F77 Binding: </I>integer pgsvpa(integer devid, integer n)
+<BR><I>Fortran Binding: </I>integer pgsvpa(integer devid, integer n)
 <BR><I>SX Binding: </I>
 <P>
 Save the current viewspace, coordinate transformations, and related graphical
@@ -2909,7 +2909,7 @@ in n which is to be used with a corresponding call to pgrvpa.<p>
 
 <I>C Binding: </I>void PG_set_frame(PG_device, double x1, double x2, double y1, 
 double y2)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-set-frame! dev x1 x2 y1 y2)
 <P>
 Set the frame of the specified device. The x and y intervals are specified
@@ -2919,7 +2919,7 @@ in NDC by (x1, x2) and (y1, y2) respectively.<p>
 
 <I>C Binding: </I>void PG_set_limits_n(PG_device *dev, int nd, PG_coord_sys cs, long n,
  double **x, int type)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
 Set the coordinate system CS (defined relative to the viewspace) for
@@ -2931,7 +2931,7 @@ type (PLOT_INSEL, PLOT_HISTOGRAM, PLOT_POLAR, PLOT_CARTESIAN).<p>
 
 <I>C Binding: </I>void PG_set_viewspace(PG_device *dev, double x1, double x2, double 
 y1, double y2)
-<BR><I>F77 Binding: </I>integer pgsvwp(integer devid, REAL x1, REAL x2, REAL y1, REAL 
+<BR><I>Fortran Binding: </I>integer pgsvwp(integer devid, REAL x1, REAL x2, REAL y1, REAL 
 y2)
 <BR><I>SX Binding: </I>(pg-set-viewspace! dev x1 x2 y1 y2)
 <P>
@@ -2942,7 +2942,7 @@ specified in NDC by (x1, x2) and (y1, y2) respectively.<p>
 
 <I>C Binding: </I>void PG_set_window(PG_device *dev, double x1, double x2, double y1, 
 double y2)
-<BR><I>F77 Binding: </I>integer pgswcs(integer devid, REAL x1, REAL x2, REAL y1, REAL 
+<BR><I>Fortran Binding: </I>integer pgswcs(integer devid, REAL x1, REAL x2, REAL y1, REAL 
 y2)
 <BR><I>SX Binding: </I>(pg-set-world-coordinate-system! dev x1 x2 y1 y2)
 <P>
@@ -2953,7 +2953,7 @@ and (y1, y2) respectively.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_view_angle(PG_device *dev, double theta, double phi, double chi)
-<BR><I>F77 Binding: </I>integer pgsva(integer devid, REAL theta, REAL phi, REAL chi)
+<BR><I>Fortran Binding: </I>integer pgsva(integer devid, REAL theta, REAL phi, REAL chi)
 <BR><I>SX Binding: </I>(pg-set-view-angle! [dev] theta phi chi)
 <P>
 Set the view angle for the specified device. The angles are the three Euler
@@ -2965,7 +2965,7 @@ global state.
 <p>
 
 <I>C Binding: </I>void PG_get_view_angle(PG_device *dev, int cnv, double *theta, double *phi, double *chi)
-<BR><I>F77 Binding: </I>integer pggva(integer devid, integer cnv, REAL theta, REAL phi, REAL chi)
+<BR><I>Fortran Binding: </I>integer pggva(integer devid, integer cnv, REAL theta, REAL phi, REAL chi)
 <BR><I>SX Binding: </I>(pg-get-view-angle [dev] theta phi chi)
 <P>
 Get the view angle for the specified device. The angles are the three Euler
@@ -2975,7 +2975,7 @@ about the new x axis; and finally chi about the new z axis.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_light_angle(PG_device *dev, double theta, double phi, double chi)
-<BR><I>F77 Binding: </I>integer pgsva(integer devid, REAL theta, REAL phi, REAL chi)
+<BR><I>Fortran Binding: </I>integer pgsva(integer devid, REAL theta, REAL phi, REAL chi)
 <BR><I>SX Binding: </I>(pg-set-light-angle! [dev] theta phi chi)
 <P>
 Set the angle of light sources for the specified device. The angles are two Euler
@@ -2985,7 +2985,7 @@ about the x axis.<p>
 <p>
 
 <I>C Binding: </I>void PG_get_light_angle(PG_device *dev, int cnv, double *theta, double *phi, double *chi)
-<BR><I>F77 Binding: </I>integer pggva(integer devid, integer cnv, REAL theta, REAL phi, REAL chi)
+<BR><I>Fortran Binding: </I>integer pggva(integer devid, integer cnv, REAL theta, REAL phi, REAL chi)
 <BR><I>SX Binding: </I>(pg-get-light-angle [dev] theta phi chi)
 <P>
 Get the angle of light sources for the specified device. The angles are two Euler
@@ -3002,37 +3002,37 @@ These routines provide control over how lines appear when drawn.<p>
 <p>
 
 <I>C Binding: </I>void PG_get_line_color(PG_device *dev, int *plc)
-<BR><I>F77 Binding: </I>integer pgglnc(integer devid, integer lc)
+<BR><I>Fortran Binding: </I>integer pgglnc(integer devid, integer lc)
 <BR><I>SX Binding: </I>(pg-line-color dev)
 <P>
 
 <p>
 <I>C Binding: </I>void PG_get_line_style(PG_device *dev, int *pls)
-<BR><I>F77 Binding: </I>integer pgglns(integer devid, integer ls)
+<BR><I>Fortran Binding: </I>integer pgglns(integer devid, integer ls)
 <BR><I>SX Binding: </I>(pg-line-style dev)
 <P>
 
 <p>
 <I>C Binding: </I>void PG_get_line_width(PG_device *dev, double *plw)
-<BR><I>F77 Binding: </I>integer pgglnw(integer devid, REAL lw)
+<BR><I>Fortran Binding: </I>integer pgglnw(integer devid, REAL lw)
 <BR><I>SX Binding: </I>(pg-line-width dev)
 <P>
 
 <p>
 <I>C Binding: </I>void PG_set_line_color(PG_device *dev, int lc)
-<BR><I>F77 Binding: </I>integer pgslnc(integer devid, integer lc)
+<BR><I>Fortran Binding: </I>integer pgslnc(integer devid, integer lc)
 <BR><I>SX Binding: </I>(pg-set-line-color! dev lc)
 <P>
 
 <p>
 <I>C Binding: </I>void PG_set_line_style(PG_device *dev, int ls)
-<BR><I>F77 Binding: </I>integer pgslns(integer devid, integer ls)
+<BR><I>Fortran Binding: </I>integer pgslns(integer devid, integer ls)
 <BR><I>SX Binding: </I>(pg-set-line-style! dev ls)
 <P>
 
 <p>
 <I>C Binding: </I>void PG_set_line_width(PG_device *dev, double lw)
-<BR><I>F77 Binding: </I>integer pgslnw(integer devid, REAL lw)
+<BR><I>Fortran Binding: </I>integer pgslnw(integer devid, REAL lw)
 <BR><I>SX Binding: </I>(pg-set-line-width! dev lw)
 <P>
 These routines access the state contained in a PG_device pertaining to lines.
@@ -3054,7 +3054,7 @@ type faces.<p>
 <p>
 
 <CENTER><B></B></CENTER><CENTER><B></B></CENTER><I>C Binding: </I>
-<BR><I>F77 Binding: </I>integer pgscpw(integer devid, REAL x, REAL y)
+<BR><I>Fortran Binding: </I>integer pgscpw(integer devid, REAL x, REAL y)
 <BR><I>SX Binding: </I>(pg-set-char-path! dev x y)
 <P>
 This routine sets the direction along which text will be written.<p>
@@ -3062,7 +3062,7 @@ This routine sets the direction along which text will be written.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double w, double h)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
 Set the current character size in CS coordinates.<p>
@@ -3070,7 +3070,7 @@ Set the current character size in CS coordinates.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_char_space(PG_device *dev, double s)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
 This routine sets the spacing between characters in world coordinates.<p>
@@ -3078,7 +3078,7 @@ This routine sets the spacing between characters in world coordinates.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_char_up(PG_device *dev, double x, double y)
-<BR><I>F77 Binding: </I>integer pgscuw(integer devid, REAL x, REAL y)
+<BR><I>Fortran Binding: </I>integer pgscuw(integer devid, REAL x, REAL y)
 <BR><I>SX Binding: </I>(pg-set-char-up! dev x y)
 <P>
 This routine sets the direction along which characters will be oriented. This
@@ -3087,7 +3087,7 @@ is usually orthogonal to the direction along which characters are written.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_font(PG_device *dev, char *face, char *style, int size)
-<BR><I>F77 Binding: </I>integer pgstxf(integer devid, integer ncf, char *face, integer ncs, char 
+<BR><I>Fortran Binding: </I>integer pgstxf(integer devid, integer ncf, char *face, integer ncs, char 
 *style, integer size)
 <BR><I>SX Binding: </I>(pg-set-text-font! dev face style size)
 <P>
@@ -3099,7 +3099,7 @@ bold-italic. Size refers to type size in points.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_text_color(PG_device *dev, int tc)
-<BR><I>F77 Binding: </I>integer pgstxc(integer devid, integer tc)
+<BR><I>Fortran Binding: </I>integer pgstxc(integer devid, integer tc)
 <BR><I>SX Binding: </I>(pg-set-text-color! dev tc)
 <P>
 Set the text color for the specified device.<p>
@@ -3107,7 +3107,7 @@ Set the text color for the specified device.<p>
 <p>
 
 <CENTER><B></B></CENTER><CENTER><B></B></CENTER><I>C Binding: </I>
-<BR><I>F77 Binding: </I>integer pggcpw(integer devid, REAL x, REAL y)
+<BR><I>Fortran Binding: </I>integer pggcpw(integer devid, REAL x, REAL y)
 <BR><I>SX Binding: </I>(pg-character-path dev)
 <P>
 This routine returns the direction along which text will be written.<p>
@@ -3115,7 +3115,7 @@ This routine returns the direction along which text will be written.<p>
 <p>
 
 <I>C Binding: </I>
-<BR><I>F77 Binding: </I>integer pggcss(integer devid, REAL w, REAL h)
+<BR><I>Fortran Binding: </I>integer pggcss(integer devid, REAL w, REAL h)
 <BR><I>SX Binding: </I>(pg-character-size-ndc dev)
 <P>
 Return the current character size in normalized coordinates.<p>
@@ -3123,7 +3123,7 @@ Return the current character size in normalized coordinates.<p>
 <p>
 
 <I>C Binding: </I>
-<BR><I>F77 Binding: </I>integer pggcsw(integer devid, REAL w, REAL h)
+<BR><I>Fortran Binding: </I>integer pggcsw(integer devid, REAL w, REAL h)
 <BR><I>SX Binding: </I>
 <P>
 Get the current character size in world coordinates.<p>
@@ -3131,7 +3131,7 @@ Get the current character size in world coordinates.<p>
 <p>
 
 <I>C Binding: </I>void PG_get_char_space(PG_device *dev, double *pcsp)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
 This routine returns the spacing between characters in world coordinates.<p>
@@ -3139,7 +3139,7 @@ This routine returns the spacing between characters in world coordinates.<p>
 <p>
 
 <I>C Binding: </I>void PG_get_char_up(PG_device *dev, double *px, double *py)
-<BR><I>F77 Binding: </I>integer pggcuw(integer devid, REAL x, REAL y)
+<BR><I>Fortran Binding: </I>integer pggcuw(integer devid, REAL x, REAL y)
 <BR><I>SX Binding: </I>(pg-character-up dev)
 <P>
 This routine returns the direction along which characters will be oriented.
@@ -3149,7 +3149,7 @@ are written.<p>
 <p>
 
 <I>C Binding: </I>void PG_get_font(PG_device *dev, char **face, char **style, int *size)
-<BR><I>F77 Binding: </I>integer pggtxf(integer devid, integer ncf, char *face, integer ncs, char 
+<BR><I>Fortran Binding: </I>integer pggtxf(integer devid, integer ncf, char *face, integer ncs, char 
 *style, integer size)
 <BR><I>SX Binding: </I>(pg-text-font dev)
 <P>
@@ -3167,7 +3167,7 @@ then make a second call with larger buffers.<p>
 <p>
 
 <I>C Binding: </I>void PG_get_text_color(PG_device *dev, int *ptc)
-<BR><I>F77 Binding: </I>integer pggtxc(integer devid, integer tc)
+<BR><I>Fortran Binding: </I>integer pggtxc(integer devid, integer tc)
 <BR><I>SX Binding: </I>(pg-text-color dev)
 <P>
 Query the text color for the specified device.<p>
@@ -3176,7 +3176,7 @@ Query the text color for the specified device.<p>
 
 <I>C Binding: </I>void PG_get_text_ext_n(PG_device *dev, int nd, PG_coord_sys cs,
  char *s, double *)
-<BR><I>F77 Binding: </I>integer pggtex(integer devid, int nd, PG_coord_sys cs, integer nc, char *s, REAL dx, REAL dy)
+<BR><I>Fortran Binding: </I>integer pggtex(integer devid, int nd, PG_coord_sys cs, integer nc, char *s, REAL dx, REAL dy)
 <BR><I>SX Binding: </I>(pg-text-extent dev nd cs s)
 <P>
 This routine returns the extent of the character string S in coordinate
@@ -3185,7 +3185,7 @@ system CS as a vector in p.<p>
 <p>
 
 <I>C Binding: </I>
-<BR><I>F77 Binding: </I>integer pggtes(integer devid, integer nc, char *s, REAL dx, REAL dy)
+<BR><I>Fortran Binding: </I>integer pggtes(integer devid, integer nc, char *s, REAL dx, REAL dy)
 <BR><I>SX Binding: </I>
 <P>
 This routine returns the normalized coordinate extent of the character string s as a width in px and height in py.<p>
@@ -3202,7 +3202,7 @@ PG_console_device, which is opened with PG_open_console.<p>
 <p>
 
 <I>C Binding: </I>void PG_center_label(PG_device *dev, double sy, char *label)
-<BR><I>F77 Binding: </I>integer pgwrcl(integer dev, REAL sy, integer nc, char *label)
+<BR><I>Fortran Binding: </I>integer pgwrcl(integer dev, REAL sy, integer nc, char *label)
 <BR><I>SX Binding: </I>(pg-center-label dev sy label)
 <P>
 This routine prints a text string, label, on the specified device and centered horizontally with a normalized vertical position specified by sy.<p>
@@ -3210,7 +3210,7 @@ This routine prints a text string, label, on the specified device and centered h
 <p>
 
 <I>C Binding: </I>char *PG_fgets(char *buffer, int maxlen, FILE *stream)
-<BR><I>F77 Binding: </I> integer pggtln(integer maxlen, char *buffer, integer stream)
+<BR><I>Fortran Binding: </I> integer pggtln(integer maxlen, char *buffer, integer stream)
 <BR><I>SX Binding: </I>
 <P>
 This function is call compatible with the standard C library fgets call. It
@@ -3221,7 +3221,7 @@ results in the use of stdin.<p>
 <p>
 
 <I>C Binding: </I>int PG_fprintf(FILE *fp, char *fmt, ...)
-<BR><I>F77 Binding: </I>                             not applicable
+<BR><I>Fortran Binding: </I>                             not applicable
 <BR><I>SX Binding: </I>
 <P>
 This function is call compatible with the standard C library fprintf call. It
@@ -3231,7 +3231,7 @@ to a file otherwise.<p>
 <p>
 
 <I>C Binding: </I>int PG_write_n(PG_device *dev, int nd, PG_coord_sys cs, double *x, char *fmt, ...)
-<BR><I>F77 Binding: </I>integer pgwrta(integer devid, REAL x, REAL y, integer nc, char *txt)
+<BR><I>Fortran Binding: </I>integer pgwrta(integer devid, REAL x, REAL y, integer nc, char *txt)
 <BR><I>SX Binding: </I>(pg-draw-text dev nd, cs, x y txt)
 <P>
 This routine does an sprintf style print to the specified device, dev,
@@ -3248,19 +3248,19 @@ which the next text and line drawing operations will start.<p>
 <p>
 
 <I>C Binding: </I>void PG_move_gr_abs(PG_device *dev, double x, double y)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 
 <p>
 
 <I>C Binding: </I>void PG_move_tx_abs(PG_device *dev, double x, double y)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 
 <p>
 
 <I>C Binding: </I>void PG_move_tx_rel(PG_device *dev, double x, double y)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
 These move the line drawing point (gr) or the text drawing point (tx) to
@@ -3282,7 +3282,7 @@ directly in terms of them.<p>
 
 <I>C Binding: </I>void PG_draw_line_n(PG_device *dev, int nd, PG_coord_sys cs,
 				      double *x1, double *x2, int clip)
-<BR><I>F77 Binding: </I>integer pgdrln(integer devid, REAL x1, REAL y1, REAL x2, REAL 
+<BR><I>Fortran Binding: </I>integer pgdrln(integer devid, REAL x1, REAL y1, REAL x2, REAL 
 y2)
 <BR><I>SX Binding: </I>(pg-draw-line dev <x1 y1 x2 y2> | <x1 y1 z1 x2 y2 xz>)
 <P>
@@ -3292,13 +3292,13 @@ coordinates specified by X1 and X2.<p>
 <p>
 
 <I>C Binding: </I>void PG_draw_to_abs(PG_device *dev, double x, double y)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
 <p>
 
 <I>C Binding: </I>void PG_draw_to_rel(PG_device *dev, double x, double y)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
 These draw a line segment on the specified device to the absolute world
@@ -3309,7 +3309,7 @@ These both reset the current drawing point to the destination endpoint.<p>
 
 <I>C Binding: </I>void PG_draw_polyline_n(PG_device *dev, int nd, PG_coord_sys cs,
 long n, double **x, int clp)
-<BR><I>F77 Binding: </I>integer pgdpln(integer devid, REAL x, REAL y, integer n, integer clp)
+<BR><I>Fortran Binding: </I>integer pgdpln(integer devid, REAL x, REAL y, integer n, integer clp)
 <BR><I>SX Binding: </I>(pg-draw-polyline-n dev nd cs clp <x1 y1 x2 y2 ...> | <x1 y1 z1 x2 y2 z1 ...>)
 <P>
 This routine draws a connected line on the device, dev, starting with the
@@ -3320,7 +3320,7 @@ polyline to be clipped to the current viewspace if TRUE.<p>
 <p>
 
 <I>C Binding: </I>void PG_shade_poly(PG_device *dev, double *x, double *y, int n)
-<BR><I>F77 Binding: </I>integer pgfply(integer devid, REAL *px, REAL *py, integer n, integer 
+<BR><I>Fortran Binding: </I>integer pgfply(integer devid, REAL *px, REAL *py, integer n, integer 
 c)
 <BR><I>SX Binding: </I>(pg-fill-polygon dev c x1 y1 x2 y2 ...)
 <P>
@@ -3331,7 +3331,7 @@ in the x and y arrays and fills it with the current fill color
 <p>
 
 <I>C Binding: </I>void PG_shade_poly_n(PG_device *dev, int nd, int n, double **r)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 c)
 <BR><I>SX Binding: </I>
 <P>
@@ -3353,7 +3353,7 @@ still low level routines, but they handle some fairly common situations.<p>
 
 <I>C Binding: </I>void PG_draw_arc(PG_device *dev, double r, double a1, double a2, 
 double x, double y, int unit)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-draw-arc dev r a1 a2 x y unit)
 <P>
 This routine draws an arc with radius, r, in world coordinates from angles
@@ -3364,7 +3364,7 @@ for PG_draw_rad below for additional details.<p>
 <p>
 
 <I>C Binding: </I>void PG_draw_box_n(PG_device *dev, int nd, PG_coord_sys cs, double *bx)
-<BR><I>F77 Binding: </I>integer pgdrbx(integer devid, REAL xmn, REAL xmx,
+<BR><I>Fortran Binding: </I>integer pgdrbx(integer devid, REAL xmn, REAL xmx,
                                        REAL ymn, REAL ymx)
 <BR><I>SX Binding: </I>(pg-draw-box dev xmn xmx ymn ymx zmn zmx)
 <P>
@@ -3377,7 +3377,7 @@ NORMC, or PIXELC<p>
 
 <I>C Binding: </I>void PG_draw_disjoint_polyline_n(PG_device *dev, int nd,
 PG_coord_sys cs, long n, double **x, int clip)
-<BR><I>F77 Binding: </I>integer pgddpn(integer devid, REAL *x, REAL *y, REAL *z,
+<BR><I>Fortran Binding: </I>integer pgddpn(integer devid, REAL *x, REAL *y, REAL *z,
 integer n, integer clip, integer cs)
 <BR><I>SX Binding: </I>(pg-draw-disjoint-polyline-n dev clip norm x1 y1 z1 x2 y2 
 z2 x3 y3 z3 x4 y4 z4 ...)
@@ -3392,7 +3392,7 @@ whether the line segments are clipped to the viewspace limits.<p>
 
 <I>C Binding: </I>void PG_draw_markers_n(PG_device *dev, int nd, PG_coord_sys cs,
 int n, double **r, int marker)
-<BR><I>F77 Binding: </I>integer pgdrmk(integer dev, integer n, REAL x, REAL y, integer marker)
+<BR><I>Fortran Binding: </I>integer pgdrmk(integer dev, integer n, REAL x, REAL y, integer marker)
 <BR><I>SX Binding: </I>(pg-draw-markers nd cs dev marker x y [z])
 <P>
 This routine draws the marker character specified by marker at each of
@@ -3403,7 +3403,7 @@ specified device.<p>
 
 <I>C Binding: </I>void PG_draw_rad(PG_device *dev, double rmin, double rmax, 
 double a, double x, double y, int unit)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-draw-radius dev rmin rmax a x y unit)
 <P>
 This routine draws a radial line from the central point (x, y) from rmin to
@@ -3424,7 +3424,7 @@ characteristics.<p>
 <p>
 
 <I>C Binding: </I>void PG_axis(PG_device *dev, int axis_type)
-<BR><I>F77 Binding: </I>integer pgaxis(integer devid, integer axt)
+<BR><I>Fortran Binding: </I>integer pgaxis(integer devid, integer axt)
 <BR><I>SX Binding: </I>(pg-axis device type)
 <P>
 This routine draws a set of axes which are tied to the viewspace and world
@@ -3436,7 +3436,7 @@ section above for the definition of the view boundary.<p>
 
 <I>C Binding: </I>void PG_axis_3(PG_device *dev, double **x,
 int np, double *extr)
-<BR><I>F77 Binding: </I>integer pgdax3(integer devid, REAL *x, REAL *y, REAL *z,
+<BR><I>Fortran Binding: </I>integer pgdax3(integer devid, REAL *x, REAL *y, REAL *z,
  integer n, integer norm)
 <BR><I>SX Binding: </I>
 <P>
@@ -3450,7 +3450,7 @@ and zmx.<p>
 <I>C Binding: </I>PG_axis_def *PG_draw_axis_n(PG_device *dev, double *xl, 
 double *xr, double *tn, double *vw, double sc, char *format, int tick_type, int 
 label_type, int flag, ...)
-<BR><I>F77 Binding: </I>integer pgdrax(integer devid, REAL xl, REAL yl, REAL xr, REAL yr, 
+<BR><I>Fortran Binding: </I>integer pgdrax(integer devid, REAL xl, REAL yl, REAL xr, REAL yr, 
 REAL t1, REAL t2, REAL v1, REAL v2, REAL sc, 
 integer nc, char *format, integer tickdef, integer 
 tick_type, integer label_type)
@@ -3516,12 +3516,12 @@ line segment as follows:<p>
 <p>
 
 <I>C Binding: </I>int PG_set_axis_attributes(PG_device *dev, ...)
-<BR><I>F77 Binding: </I>integer pgsaxa(integer devid, integer n, REAL attr, char *attrs)
+<BR><I>Fortran Binding: </I>integer pgsaxa(integer devid, integer n, REAL attr, char *attrs)
 <BR><I>SX Binding: </I>
 <P>
 This routine sets the parameters which control the look of the axes being
 drawn. An arbitrary number of specifications can be made in key/value pairs.
-The list is terminated with a zero key. In the F77 binding the key/value
+The list is terminated with a zero key. In the Fortran Binding the key/value
 pairs are placed as floating point numbers in the array attr. The value n
 is the number of pairs. If the attribute is a character string, the value
 is put in the character array attrs, and the number of characters is put
@@ -3626,7 +3626,7 @@ associate the attribute with its position in the string attrs.<p>
 </BLOCKQUOTE>
 
 <P><I>C Binding: </I>void PG_get_axis_decades(double *d)
-<BR><I>F77 Binding: </I>integer pggaxd(real d)
+<BR><I>Fortran Binding: </I>integer pggaxd(real d)
 <BR><I>SX Binding: </I>
 <P>
 This routine returns the current maximum number of decades that log axes will
@@ -3637,7 +3637,7 @@ values (such as very small positive numbers) don&#146;t interfere with the
 display of otherwise fine values.<p>
 
 <I>C Binding: </I>void PG_set_axis_decades(double *d)
-<BR><I>F77 Binding: </I>integer pgsaxd(real d)
+<BR><I>Fortran Binding: </I>integer pgsaxd(real d)
 <BR><I>SX Binding: </I>
 <P>
 This routine sets the current maximum number of decades that log axes will
@@ -3653,7 +3653,7 @@ don&#146;t interfere with the display of otherwise fine values.<p>
 <p>
 
 <I>C Binding: </I>void PG_show_colormap(PG_device *dev, int all)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
 Display the colormap for the current palette if all is FALSE and for
@@ -3662,7 +3662,7 @@ the entire device colormap if all is TRUE.<p>
 <p>
 
 <I>C Binding: </I>void PG_show_palettes(PG_device *dev, char *type, int wbck)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-show-palettes dev wbck)
 <P>
 This routine pops up a temporary new window to display the palettes available
@@ -3677,7 +3677,7 @@ black one.<p>
 
 <I>C Binding: </I>PG_palette *PG_make_palette(PG_device *dev, char *name, int nc, 
 int wbck)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-make-palette dev name nc wbck)
 <P>
 This routine pops up a temporary new window with the available colors of the
@@ -3696,7 +3696,7 @@ the PG_rd_palette function.<p>
 <p>
 
 <I>C Binding: </I>PG_palette *PG_rd_palette(PG_device *dev, char *fname)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-read-palette dev fname)
 <P>
 This function reads a palette file and makes the resulting palette the current
@@ -3708,7 +3708,7 @@ values.<p>
 <p>
 
 <I>C Binding: </I>int PG_wr_palette(PG_device *dev, PG_palette *pal, char *fname)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-write-palette dev pal fname)
 <P>
 This function writes a specified palette, pal, to a palette file. The format
@@ -3728,7 +3728,7 @@ by user oriented specifications.<p>
 <p>
 
 <I>C Binding: </I>void PG_draw_graph(PG_device *dev, PG_graph *data)
-<BR><I>F77 Binding: </I>integer pgplot(integer devid, integer dataid)
+<BR><I>Fortran Binding: </I>integer pgplot(integer devid, integer dataid)
 <BR><I>SX Binding: </I>(pg-draw-graph dev [data]* rendering)
 <P>
 This routine draws the graph specified by data on the device specified by
@@ -3737,7 +3737,7 @@ dev. The PG_graph structure contains both data and rendering specifications.<p>
 <p>
 
 <I>C Binding: </I>void PG_domain_plot(PG_device *dev, PM_set *dom, PM_set *ran)
-<BR><I>F77 Binding: </I>integer pgdplt(integer devid, integer domid)
+<BR><I>Fortran Binding: </I>integer pgdplt(integer devid, integer domid)
 <BR><I>SX Binding: </I>(pg-draw-domain dev [dom]* [type extrema])
 <P>
 This routine draws the domain set specified by dom on the device specified
@@ -3754,7 +3754,7 @@ PLOT_WIRE_MESH<p>
 <p>
 
 <I>C Binding: </I>void PG_get_identifier(PG_graph *g, int id)
-<BR><I>F77 Binding: </I>integer pgggid(integer gid, integer id)
+<BR><I>Fortran Binding: </I>integer pgggid(integer gid, integer id)
 <BR><I>SX Binding: </I>
 <P>
 Return the identifier character, id, of the specified graph. In the C
@@ -3763,7 +3763,7 @@ binding this is a macro.<p>
 <p>
 
 <I>C Binding: </I>void PG_get_render_info(PG_graph *g, pcons *alst)
-<BR><I>F77 Binding: </I>integer pgginf(integer gid, integer alst)
+<BR><I>Fortran Binding: </I>integer pgginf(integer gid, integer alst)
 <BR><I>SX Binding: </I>
 <P>
 Return the attribute list, alst, of the specified graph. In the C
@@ -3772,7 +3772,7 @@ binding this is a macro.<p>
 <p>
 
 <I>C Binding: </I>
-<BR><I>F77 Binding: </I>integer pgsdlm(integer grid, integer n, double v)
+<BR><I>Fortran Binding: </I>integer pgsdlm(integer grid, integer n, double v)
 <BR><I>SX Binding: </I>(pg-set-domain-limits! gr v1mn v1mx ...)
 <P>
 Restrict the domain of the mapping contained in the graph to the values in
@@ -3782,7 +3782,7 @@ dimensionality of the domain.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_identifier(PG_graph *g, int id)
-<BR><I>F77 Binding: </I>integer pgsgid(integer gid, integer id)
+<BR><I>Fortran Binding: </I>integer pgsgid(integer gid, integer id)
 <BR><I>SX Binding: </I>
 <P>
 Set the identifier character, id, of the specified graph. In the C
@@ -3791,7 +3791,7 @@ binding this is a macro.<p>
 <p>
 
 <I>C Binding: </I>void  PG_set_render_info(PG_graph *g, pcons *alst)
-<BR><I>F77 Binding: </I>integer pgsinf(integer gid, integer alst)
+<BR><I>Fortran Binding: </I>integer pgsinf(integer gid, integer alst)
 <BR><I>SX Binding: </I>
 <P>
 Set the attribute list, alst, of the specified graph. In the C
@@ -3800,7 +3800,7 @@ binding this is a macro.<p>
 <p>
 
 <I>C Binding: </I>
-<BR><I>F77 Binding: </I>integer pgsrat(integer grid, integer n, char *name, integer t, char 
+<BR><I>Fortran Binding: </I>integer pgsrat(integer grid, integer n, char *name, integer t, char 
 *type, char *val)
 <BR><I>SX Binding: </I>(pg-set-graph-attribute! gr name type val)
 <P>
@@ -3811,7 +3811,7 @@ on attributes for more information on attributes and their values.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_plot_type(pcons *inf, int plt, int axs)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
 Set the plot type, plt, and axis type, axs, for the specified association
@@ -3820,7 +3820,7 @@ list, inf. This list is usually the info part of a PG_graph.<p>
 <p>
 
 <I>C Binding: </I>
-<BR><I>F77 Binding: </I>integer pgsrlm(integer grid, integer n, double v)
+<BR><I>Fortran Binding: </I>integer pgsrlm(integer grid, integer n, double v)
 <BR><I>SX Binding: </I>(pg-set-range-limits! gr v1mn v1mx ...)
 <P>
 Restrict the range of the mapping contained in the graph to the values in
@@ -3830,7 +3830,7 @@ dimensionality of the range.<p>
 <p>
 
 <I>C Binding: </I>
-<BR><I>F77 Binding: </I>integer pgsvlm(integer grid, double v)
+<BR><I>Fortran Binding: </I>integer pgsvlm(integer grid, double v)
 <BR><I>SX Binding: </I>
 <P>
 A PG_graph may have its own viewspace limits which supercede the device
@@ -3849,7 +3849,7 @@ These routines plot curves in various renderings.<p>
 
 <I>C Binding: </I>void PG_plot_curve(PG_device *dev, double *x, double *y, int n, pcons 
 *info, int l)
-<BR><I>F77 Binding: </I>integer pgplln(integer devid, REAL *px, REAL *py, integer n, integer 
+<BR><I>Fortran Binding: </I>integer pgplln(integer devid, REAL *px, REAL *py, integer n, integer 
 mod, integer axt, integer col, REAL wid, integer sty, 
 integer sca, integer mrk, integer sta, integer l)
 <BR><I>SX Binding: </I>                             use pg-draw-graph
@@ -3886,14 +3886,14 @@ axes are drawn</TD></TR>
 <P><I>C Binding: </I>void PG_histogram_plot(PG_device *dev, double *x, double *y, int n, 
 int lncol, double lnwid, int lnsty, int scatter, int marker, 
 int start, int l)
-<BR><I>F77 Binding: </I>  use pgplot
+<BR><I>Fortran Binding: </I>  use pgplot
 <BR><I>SX Binding: </I>   use pg-draw-graph
 <P>
 <p>
 
 <I>C Binding: </I>void PG_insel_plot(PG_device *dev, double *x, double *y, int n, int 
 lncol, double lnwid, int lnsty, int l)
-<BR><I>F77 Binding: </I>  use pgplot
+<BR><I>Fortran Binding: </I>  use pgplot
 <BR><I>SX Binding: </I>   use pg-draw-graph
 <P>
 <p>
@@ -3901,7 +3901,7 @@ lncol, double lnwid, int lnsty, int l)
 <I>C Binding: </I>void PG_polar_plot(PG_device *dev, double *x, double *y, int n, int 
 lncol, double lnwid, int lnsty, int scatter, int marker, int 
 l)
-<BR><I>F77 Binding: </I>  use pgplot
+<BR><I>Fortran Binding: </I>  use pgplot
 <BR><I>SX Binding: </I>   use pg-draw-graph
 <P>
 <p>
@@ -3909,7 +3909,7 @@ l)
 <I>C Binding: </I>void PG_rect_plot(PG_device *dev, double *x, double *y, int n, int 
 lncol, double lnwid, int lnsty, int scatter, int marker, int 
 l)
-<BR><I>F77 Binding: </I> use pgplot
+<BR><I>Fortran Binding: </I> use pgplot
 <BR><I>SX Binding: </I>  use pg-draw-graph
 <P>
 These routines plot the n points in the x and y arrays as a: rectangular
@@ -3943,7 +3943,7 @@ qualifying arguments are:<p>
 <p>
 
 <I>C Binding: </I>void PG_contour_plot(PG_device *dev, PG_graph *data)
-<BR><I>F77 Binding: </I>                                  use pgplot
+<BR><I>Fortran Binding: </I>                                  use pgplot
 <BR><I>SX Binding: </I>                             use pg-draw-graph
 <P>
 This routine renders the specified graph as a contour plot. PG_draw_graph dispatches
@@ -3952,7 +3952,7 @@ to this routine when the rendering specified in data is a contour plot.<p>
 <p>
 
 <I>C Binding: </I>
-<BR><I>F77 Binding: </I>integer pgplcn(integer devid, REAL x, REAL y, REAL z, REAL lev, 
+<BR><I>Fortran Binding: </I>integer pgplcn(integer devid, REAL x, REAL y, REAL z, REAL lev, 
 integer k, integer l, integer nlev, integer labl, integer 
 alst)
 <BR><I>SX Binding: </I>                             use pg-draw-graph
@@ -3978,7 +3978,7 @@ The arguments are:<p>
 
 <I>C Binding: </I>int PG_contour_levels(double *lev, int nlev, double fmn, double fmx, 
 double ratio)
-<BR><I>F77 Binding: </I>integer pgclev(REAL lev, integer nlev, REAL fmn, REAL fmx, REAL 
+<BR><I>Fortran Binding: </I>integer pgclev(REAL lev, integer nlev, REAL fmn, REAL fmx, REAL 
 ratio)
 <BR><I>SX Binding: </I>                             set LEVEL attribute
 <P>
@@ -4004,7 +4004,7 @@ levels</TD></TR>
 <p>
 
 <I>C Binding: </I>void PG_poly_fill_plot(PG_device *dev, PG_graph *data)
-<BR><I>F77 Binding: </I>                                    use pgplot
+<BR><I>Fortran Binding: </I>                                    use pgplot
 <BR><I>SX Binding: </I>                             use pg-draw-graph
 <P>
 This routine renders the specified graph as a filled polygon plot.
@@ -4019,7 +4019,7 @@ in data is a a filled polygon plot.<p>
 <p>
 
 <I>C Binding: </I>void PG_image_plot(PG_device *dev, PG_graph *data)
-<BR><I>F77 Binding: </I>                                   use pgplot
+<BR><I>Fortran Binding: </I>                                   use pgplot
 <BR><I>SX Binding: </I>                             use pg-draw-graph
 <P>
 This routine renders the specified graph as a raster image plot.
@@ -4030,7 +4030,7 @@ in data is an image plot.<p>
 
 <I>C Binding: </I>void PG_draw_image(PG_device *dev, PG_image *im, char *label, 
 pcons *alist)
-<BR><I>F77 Binding: </I>
+<BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-draw-image dev im)
 <P>
 This routine makes an image plot from a PG_image structure. A pointer to the
@@ -4039,7 +4039,7 @@ image is in im and a label for the plot is in label.<p>
 <p>
 
 <I>C Binding: </I>
-<BR><I>F77 Binding: </I>integer pgplim(integer devid, integer nc, char *name, integer nct, char 
+<BR><I>Fortran Binding: </I>integer pgplim(integer devid, integer nc, char *name, integer nct, char 
 *type, REAL *pz, integer k, integer l, REAL xmn, 
 REAL xmx, REAL ymn, REAL ymx, REAL zmn, 
 REAL zmx, integer alst)
@@ -4074,7 +4074,7 @@ of the device)</TD></TR>
 
 <P><I>C Binding: </I>void PG_draw_palette_n(PG_device *dev, double *dbx,
  double *rbx, double wid, int exact)
-<BR><I>F77 Binding: </I>integer pgdrpp(integer devid, REAL xmn, REAL xmx, 
+<BR><I>Fortran Binding: </I>integer pgdrpp(integer devid, REAL xmn, REAL xmx, 
 REAL ymn, REAL ymx, REAL zmn, REAL zmx, REAL wid, integer exact)
 <BR><I>SX Binding: </I>(pg-draw-palette dev xmn xmx ymn ymx zmn zmx wid exact)
 <P>
@@ -4089,7 +4089,7 @@ The width of the palette in the rectangle is specified in normalized form by wid
 <p>
 
 <I>C Binding: </I>void PG_surface_plot(PG_device *dev, PG_graph *data)
-<BR><I>F77 Binding: </I>                                   use pgplot
+<BR><I>Fortran Binding: </I>                                   use pgplot
 <BR><I>SX Binding: </I>                             use pg-draw-graph
 <P>
 This routine renders the specified graph as a surface plot. PG_draw_graph dispatches
@@ -4101,7 +4101,7 @@ to this routine when the rendering specified in data is a surface plot.<p>
 double *aext, double **r, int nn, double *va, double width, int color, int style, 
 int type, char *label, char *mesh_type, void *cnnct, 
 pcons *alist)
-<BR><I>F77 Binding: </I>integer pgplsf(integer devid, REAL *px, REAL *py, REAL *pz, 
+<BR><I>Fortran Binding: </I>integer pgplsf(integer devid, REAL *px, REAL *py, REAL *pz, 
 integer n, REAL xn, REAL xx, REAL yn, REAL yx, 
 REAL zn, REAL zx, integer kx, integer lx, REAL th, 
 REAL ph, REAL ch, integer typ, integer col, REAL wid, 
@@ -4167,7 +4167,7 @@ or a pointer to a PM_mesh_topology struct for AC meshes</TD></TR>
 <p>
 
 <I>C Binding: </I>void PG_vector_plot(PG_device *dev, PG_graph *data)
-<BR><I>F77 Binding: </I>                                   use pgplot
+<BR><I>Fortran Binding: </I>                                   use pgplot
 <BR><I>SX Binding: </I>                             use pg-draw-graph
 <P>
 This routine renders the specified graph as a vector plot. PG_draw_graph
@@ -4177,7 +4177,7 @@ plot.<p>
 <p>
 
 <I>C Binding: </I>
-<BR><I>F77 Binding: </I>integer pgplvc(integer devid, REAL *px, REAL *py, REAL *pu, 
+<BR><I>Fortran Binding: </I>integer pgplvc(integer devid, REAL *px, REAL *py, REAL *pu, 
 REAL *pv, integer n, integer alst)
 <BR><I>SX Binding: </I>                             use pg-draw-graph
 <P>
@@ -4202,7 +4202,7 @@ Make a vector plot of the given data set on the specified device.<p>
 <p>
 
 <I>C Binding: </I>void PG_set_vec_attr(PG_device *dev, ...)
-<BR><I>F77 Binding: </I>integer pgsvat(integer devid, ...)
+<BR><I>Fortran Binding: </I>integer pgsvat(integer devid, ...)
 <BR><I>SX Binding: </I>(pg-set-vector-attributes! dev ...)
 <P>
 This routine sets the properties of the vectors for the next vector plot. The
@@ -4288,7 +4288,7 @@ This routine draws a level diagram or grotrian plot.<p>
 <p>
 
 <I>C Binding: </I>void PG_grotrian_plot(PG_device *dev, PG_graph *data)
-<BR><I>F77 Binding: </I>                                   use pgplot
+<BR><I>Fortran Binding: </I>                                   use pgplot
 <BR><I>SX Binding: </I>                             use pg-draw-graph
 <P>
 This routine renders the specified graph as a level diagram plot.
@@ -4305,7 +4305,7 @@ user and runtime configurable graphical user interfaces.<p>
 <p>
 
 <I>C Binding: </I>void PG_draw_interface_objects(PG_device *dev)
-<BR><I>F77 Binding: </I>integer pgdrif(integer devid)
+<BR><I>Fortran Binding: </I>integer pgdrif(integer devid)
 <BR><I>SX Binding: </I>
 <P>
 This routine draws the entire graphical interface of the specified device.<p>
@@ -4313,7 +4313,7 @@ This routine draws the entire graphical interface of the specified device.<p>
 <p>
 
 <I>C Binding: </I>void PG_query_pointer(PG_device *dev, int *ir, int *pbtn, int *mod)
-<BR><I>F77 Binding: </I>integer pgqptr(integer devid, integer x, integer y, integer btn, integer 
+<BR><I>Fortran Binding: </I>integer pgqptr(integer devid, integer x, integer y, integer btn, integer 
 mod)
 <BR><I>SX Binding: </I>
 <P>
@@ -4327,7 +4327,7 @@ can be and&#146;d to ascertain which combinations are pressed.<p>
 <p>
 
 <I>C Binding: </I>int PG_read_interface(PG_device *dev, char *fname)
-<BR><I>F77 Binding: </I>integer pgrdif(integer devid, integer n, char *fname)
+<BR><I>Fortran Binding: </I>integer pgrdif(integer devid, integer n, char *fname)
 <BR><I>SX Binding: </I>
 <P>
 This routine reads the entire graphical interface from the named file
@@ -4336,7 +4336,7 @@ into the specified device.<p>
 <p>
 
 <I>C Binding: </I>void PG_register_callback(char *name, PFVoid fnc)
-<BR><I>F77 Binding: </I>integer pgrgfn(integer nc, char *name, function fnc)
+<BR><I>Fortran Binding: </I>integer pgrgfn(integer nc, char *name, function fnc)
 <BR><I>SX Binding: </I>
 <P>
 This routine registers a function with PGS so that it may be called by an
@@ -4346,7 +4346,7 @@ such applications<p>
 
 <I>C Binding: </I>void PG_register_variable(char *name, char *type, void *var, void 
 *vmin, void *vmax)
-<BR><I>F77 Binding: </I>integer pgrgvr(integer nc, char *name, integer nt, char *type, var, 
+<BR><I>Fortran Binding: </I>integer pgrgvr(integer nc, char *name, integer nt, char *type, var, 
 vmin, vmax)
 <BR><I>SX Binding: </I>
 <P>
@@ -4359,7 +4359,7 @@ be supplied (NULL if not wanted).<p>
 <p>
 
 <I>C Binding: </I>int PG_write_interface(PG_device *dev, char *fname)
-<BR><I>F77 Binding: </I>integer pgwrif(integer devid, integer n, char *fname)
+<BR><I>Fortran Binding: </I>integer pgwrif(integer devid, integer n, char *fname)
 <BR><I>SX Binding: </I>
 <P>
 This routine writes the entire graphical interface of the specified

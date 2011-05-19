@@ -1,5 +1,5 @@
 TXT: PACT User's Guide
-MOD: 04/06/2011
+MOD: 05/19/2011
 
 <CENTER>
 <h1><FONT color="#ff0000">PACT User's Guide</FONT></h1>
@@ -1199,18 +1199,18 @@ NACF spoke is included with the distribution.
 <B>FCompiler</B>
 <BR>
 <UL>The name of the FORTRAN compiler to be used.
-<BR>Default is &#147;f77&#148;</UL>
+<BR>Default is &#147;f90&#148;</UL>
 
 <P>
 <B>FDebug</B>
 <BR>
-<UL>F77 compiler flags to specify debuggable packages.
+<UL>Fortran compiler flags to specify debuggable packages.
 <BR>Default is &#147;-g&#148;</UL>
 
 <P>
 <B>FFLAGS</B>
 <BR>
-<UL>F77 compiler flags to be used for all PACT packages.  This is for those
+<UL>Fortran compiler flags to be used for all PACT packages.  This is for those
 options which do not control debugging or optimization. Use FDebug or
 FOptimize for those purposes.
 <BR>Default is &#147;&#147;</UL>
@@ -1218,7 +1218,7 @@ FOptimize for those purposes.
 <P>
 <B>FOptimize</B>
 <BR>
-<UL>F77 compiler flags to specify optimized packages.
+<UL>Fortran compiler flags to specify optimized packages.
 <BR>Default is &#147;-O&#148;</UL>
 
 <P>
@@ -1367,11 +1367,6 @@ PACT sources. Use at most one.<p>
 <P>
 <br>
 <CENTER><B>FORTRAN Language Standard</B></CENTER>
-
-<P>
-<B>ANSI_F77</B>
-<BR>
-<UL>Conforming to ANSI FORTRAN 77.</UL>
 
 <P>
 <br>

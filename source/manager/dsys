@@ -1574,7 +1574,7 @@ CFG_DONE:
            wc -l $FSrc     |&                                                 \
            grep -v "wc:"   |                                                  \
            tail -n 1       |                                                  \
-           awk '{ printf "%8d\tlines F77 source", $1 }' >>& $STDOUT
+           awk '{ printf "%8d\tlines Fortran source", $1 }' >>& $STDOUT
            $RM foobar
            echo " in $#FSrc files" >>& $STDOUT
 

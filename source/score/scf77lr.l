@@ -18,7 +18,7 @@
 
 #include "sclexan.h"
 
-#define scf77lr_lex F77_FUNC(f77lxr, F77LXR)
+#define scf77lr_lex FF_ID(f77lxr, F77LXR)
 
 /*--------------------------------------------------------------------------*/
 

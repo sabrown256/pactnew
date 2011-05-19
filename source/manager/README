@@ -821,14 +821,6 @@ ANSI
    Conforming to ANSI C (this is the default).
 
 
-                    FORTRAN Language Standard
-
-ANSI_F77
-   Conforming to ANSI FORTRAN 77. Specifically, this means that when calling
-   FORTRAN routines from C or C routines from FORTRAN, the compiler maps
-   names to all upper-case.
-
-
              System Dependent Parameters Which Must Exist
 
 The following parameters are implied by other selected options:

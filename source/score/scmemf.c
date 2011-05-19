@@ -12,14 +12,14 @@
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
 
-/* _SC_MAKE_F77 - allocate a chunk of memory and set the pointer
- *              - keep a name attached to this piece of memory
- *              - WARNING: only for FORTRAN with pointers
- *              - return TRUE if successful and FALSE otherwise
+/* _SC_MAKE_FF - allocate a chunk of memory and set the pointer
+ *             - keep a name attached to this piece of memory
+ *             - WARNING: only for FORTRAN with pointers
+ *             - return TRUE if successful and FALSE otherwise
  */
 
-FIXNUM _SC_make_f77(void **pm, FIXNUM *pni, FIXNUM *pnb, FIXNUM *pnc,
-		    char *pname, int zsp)
+FIXNUM _SC_make_ff(void **pm, FIXNUM *pni, FIXNUM *pnb, FIXNUM *pnc,
+		   char *pname, int zsp)
    {void *s;
     FIXNUM ok;
     mem_header *space;
@@ -44,7 +44,7 @@ FIXNUM _SC_make_f77(void **pm, FIXNUM *pni, FIXNUM *pnb, FIXNUM *pnc,
        {space = ((mem_header *) s) - 1;
 	desc  = &space->block;
 	
-	desc->id &= ~SC_FTN_NAME_MASK;};
+	desc->id &= ~SC_FF_NAME_MASK;};
 
     ok  = (s != NULL);
     *pm = s;
@@ -60,11 +60,11 @@ FIXNUM _SC_make_f77(void **pm, FIXNUM *pni, FIXNUM *pnb, FIXNUM *pnc,
  *        - return TRUE if successful and FALSE otherwise
  */
 
-FIXNUM F77_FUNC(scmakz, SCMAKZ)(void **pm, FIXNUM *pni, FIXNUM *pnb,
-				FIXNUM *pnc, char *pname, FIXNUM *pzsp)
+FIXNUM FF_ID(scmakz, SCMAKZ)(void **pm, FIXNUM *pni, FIXNUM *pnb,
+			     FIXNUM *pnc, char *pname, FIXNUM *pzsp)
    {FIXNUM ok;
 
-    ok = _SC_make_f77(pm, pni, pnb, pnc, pname, (int) *pzsp);
+    ok = _SC_make_ff(pm, pni, pnb, pnc, pname, (int) *pzsp);
 
     return(ok);}
 
@@ -77,11 +77,11 @@ FIXNUM F77_FUNC(scmakz, SCMAKZ)(void **pm, FIXNUM *pni, FIXNUM *pnb,
  *        - return TRUE if successful and FALSE otherwise
  */
 
-FIXNUM F77_FUNC(scmakf, SCMAKF)(void **pm, FIXNUM *pni, FIXNUM *pnb,
-				FIXNUM *pnc, char *pname)
+FIXNUM FF_ID(scmakf, SCMAKF)(void **pm, FIXNUM *pni, FIXNUM *pnb,
+			     FIXNUM *pnc, char *pname)
    {FIXNUM ok;
 
-    ok = _SC_make_f77(pm, pni, pnb, pnc, pname, -1);
+    ok = _SC_make_ff(pm, pni, pnb, pnc, pname, -1);
 
     return(ok);}
 
@@ -93,10 +93,10 @@ FIXNUM F77_FUNC(scmakf, SCMAKF)(void **pm, FIXNUM *pni, FIXNUM *pnb,
  *        - return TRUE if successful and FALSE otherwise
  */
 
-FIXNUM F77_FUNC(scmake, SCMAKE)(void **pm, FIXNUM *pni, FIXNUM *pnb)
+FIXNUM FF_ID(scmake, SCMAKE)(void **pm, FIXNUM *pni, FIXNUM *pnb)
    {FIXNUM ok;
 
-    ok = _SC_make_f77(pm, pni, pnb, NULL, NULL, -1);
+    ok = _SC_make_ff(pm, pni, pnb, NULL, NULL, -1);
 
     return(ok);}
 
@@ -104,12 +104,12 @@ FIXNUM F77_FUNC(scmake, SCMAKE)(void **pm, FIXNUM *pni, FIXNUM *pnb)
 /*--------------------------------------------------------------------------*/
 
 /* SCREMZ - reallocate a chunk of memory and set the pointer
- *        - WARNING: only for F77 with CRAY pointer extensions
+ *        - WARNING: only for Fortran with CRAY pointer extensions
  *        - return TRUE if successful and FALSE otherwise
  */
 
-FIXNUM F77_FUNC(scremz, SCREMZ)(void **pm, FIXNUM *pni,
-				FIXNUM *pnb, FIXNUM *pzsp)
+FIXNUM FF_ID(scremz, SCREMZ)(void **pm, FIXNUM *pni,
+			     FIXNUM *pnb, FIXNUM *pzsp)
    {FIXNUM rv;
     void *s;
 
@@ -123,11 +123,11 @@ FIXNUM F77_FUNC(scremz, SCREMZ)(void **pm, FIXNUM *pni,
 /*--------------------------------------------------------------------------*/
 
 /* SCREMA - reallocate a chunk of memory and set the pointer
- *        - WARNING: only for F77 with CRAY pointer extensions
+ *        - WARNING: only for Fortran with CRAY pointer extensions
  *        - return TRUE if successful and FALSE otherwise
  */
 
-FIXNUM F77_FUNC(screma, SCREMA)(void **pm, FIXNUM *pni, FIXNUM *pnb)
+FIXNUM FF_ID(screma, SCREMA)(void **pm, FIXNUM *pni, FIXNUM *pnb)
    {long nb;
     FIXNUM rv;
     void *s;
@@ -144,7 +144,7 @@ FIXNUM F77_FUNC(screma, SCREMA)(void **pm, FIXNUM *pni, FIXNUM *pnb)
 
 /* SCFREZ - free a chunk of memory */
 
-FIXNUM F77_FUNC(scfrez, SCFREZ)(void **pm, FIXNUM *pzsp)
+FIXNUM FF_ID(scfrez, SCFREZ)(void **pm, FIXNUM *pzsp)
    {FIXNUM ok;
 
     ok = _SC_free_w(*pm, (int) *pzsp);
@@ -158,7 +158,7 @@ FIXNUM F77_FUNC(scfrez, SCFREZ)(void **pm, FIXNUM *pzsp)
 
 /* SCFREE - free a chunk of memory */
 
-FIXNUM F77_FUNC(scfree, SCFREE)(void **pm)
+FIXNUM FF_ID(scfree, SCFREE)(void **pm)
    {FIXNUM ok;
 
     ok = _SC_free_n(*pm, NULL);
@@ -170,10 +170,10 @@ FIXNUM F77_FUNC(scfree, SCFREE)(void **pm)
 
 /* SCFPTE - free a chunk of memory */
 
-FIXNUM F77_FUNC(scfpte, SCFPTE)(void *pm)
+FIXNUM FF_ID(scfpte, SCFPTE)(void *pm)
    {FIXNUM rv;
 
-    rv = F77_FUNC(scfree, SCFREE)(&pm);
+    rv = FF_ID(scfree, SCFREE)(&pm);
 
     return(rv);}
 
@@ -182,7 +182,7 @@ FIXNUM F77_FUNC(scfpte, SCFPTE)(void *pm)
 
 /* SCISSP - is the space SCORE allocated */
 
-FIXNUM F77_FUNC(scissp, SCISSP)(void **pm)
+FIXNUM FF_ID(scissp, SCISSP)(void **pm)
    {FIXNUM ok;
 
     ok = SC_is_score_ptr(*pm);
@@ -194,7 +194,7 @@ FIXNUM F77_FUNC(scissp, SCISSP)(void **pm)
 
 /* SCMEMT - FORTRAN interface to SC_mem_trace */
 
-FIXNUM F77_FUNC(scmemt, SCMEMT)(void)
+FIXNUM FF_ID(scmemt, SCMEMT)(void)
    {FIXNUM rv;
 
     rv = SC_mem_trace();
@@ -206,7 +206,7 @@ FIXNUM F77_FUNC(scmemt, SCMEMT)(void)
 
 /* SCMEMC - FORTRAN interface to SC_mem_chk */
 
-FIXNUM F77_FUNC(scmemc, SCMEMC)(FIXNUM *pt)
+FIXNUM FF_ID(scmemc, SCMEMC)(FIXNUM *pt)
    {int typ;
     FIXNUM rv;
 
@@ -221,8 +221,8 @@ FIXNUM F77_FUNC(scmemc, SCMEMC)(FIXNUM *pt)
 
 /* SCMEMS - FORTRAN interface to SC_mem_stats */
 
-FIXNUM F77_FUNC(scmems, SCMEMS)(FIXNUM *pal, FIXNUM *pfr,
-				FIXNUM *pdf, FIXNUM *pmx)
+FIXNUM FF_ID(scmems, SCMEMS)(FIXNUM *pal, FIXNUM *pfr,
+			     FIXNUM *pdf, FIXNUM *pmx)
    {long pl, pf, pd, pm;
     FIXNUM rv;
 
@@ -242,8 +242,8 @@ FIXNUM F77_FUNC(scmems, SCMEMS)(FIXNUM *pal, FIXNUM *pfr,
 
 /* SCMEMM - FORTRAN interface to SC_mem_monitor */
 
-FIXNUM F77_FUNC(scmemm, SCMEMM)(FIXNUM *po, FIXNUM *pl, FIXNUM *pni,
-				char *pid, FIXNUM *pnc, char *pmsg)
+FIXNUM FF_ID(scmemm, SCMEMM)(FIXNUM *po, FIXNUM *pl, FIXNUM *pni,
+			     char *pid, FIXNUM *pnc, char *pmsg)
    {int old, lev, ni, nc, n;
     FIXNUM rv;
     char msg[MAXLINE], id[MAXLINE];
@@ -259,7 +259,7 @@ FIXNUM F77_FUNC(scmemm, SCMEMM)(FIXNUM *po, FIXNUM *pl, FIXNUM *pni,
 
     n = strlen(msg);
     n = min(n, nc);
-    SC_strncpy(SC_F77_C_STRING(pmsg), *pnc, msg, n);
+    SC_strncpy(pmsg, *pnc, msg, n);
 
     return(rv);}
 
@@ -268,7 +268,7 @@ FIXNUM F77_FUNC(scmemm, SCMEMM)(FIXNUM *po, FIXNUM *pl, FIXNUM *pni,
 
 /* SCMEML - FORTRAN interface to SC_mem_lookup */
 
-FIXNUM F77_FUNC(scmeml, SCMEML)(FIXNUM *po, FIXNUM *pnc, char *pmsg)
+FIXNUM FF_ID(scmeml, SCMEML)(FIXNUM *po, FIXNUM *pnc, char *pmsg)
    {int n, nc;
     FIXNUM ok;
     char *name;
@@ -278,7 +278,7 @@ FIXNUM F77_FUNC(scmeml, SCMEML)(FIXNUM *po, FIXNUM *pnc, char *pmsg)
        {n  = strlen(name);
 	nc = *pnc;
 	n  = min(n, nc);
-	SC_strncpy(SC_F77_C_STRING(pmsg), *pnc, name, n);
+	SC_strncpy(pmsg, *pnc, name, n);
 	ok = TRUE;}
     else
        {n  = 0;
@@ -293,7 +293,7 @@ FIXNUM F77_FUNC(scmeml, SCMEML)(FIXNUM *po, FIXNUM *pnc, char *pmsg)
 
 /* SCMEMP - FORTRAN interface to SC_mem_map */
 
-FIXNUM F77_FUNC(scmemp, SCMEMP)(FIXNUM *po)
+FIXNUM FF_ID(scmemp, SCMEMP)(FIXNUM *po)
    {int ord;
     FIXNUM rv;
 
@@ -307,8 +307,8 @@ FIXNUM F77_FUNC(scmemp, SCMEMP)(FIXNUM *po)
 
 /* SCMMCF - FORTRAN interface to SC_configure_mm */
 
-FIXNUM F77_FUNC(scmmcf, SCMMCF)(FIXNUM *pxl, FIXNUM *pxm, FIXNUM *psz,
-				REAL *pr)
+FIXNUM FF_ID(scmmcf, SCMMCF)(FIXNUM *pxl, FIXNUM *pxm, FIXNUM *psz,
+			     REAL *pr)
    {long mxl, mxm, bsz;
     double r;
     FIXNUM rv;
@@ -329,7 +329,7 @@ FIXNUM F77_FUNC(scmmcf, SCMMCF)(FIXNUM *pxl, FIXNUM *pxm, FIXNUM *psz,
 
 /* SCMARK - fortran interface for SC_mark */
 
-FIXNUM F77_FUNC(scmark, SCMARK)(void *pm, FIXNUM *pn)
+FIXNUM FF_ID(scmark, SCMARK)(void *pm, FIXNUM *pn)
    {FIXNUM rv;
 
     rv = SC_mark(*(char **) pm, *pn);
@@ -341,7 +341,7 @@ FIXNUM F77_FUNC(scmark, SCMARK)(void *pm, FIXNUM *pn)
 
 /* SCMPNT - fortran interface for SC_mem_print */
 
-FIXNUM F77_FUNC(scmpnt, SCMPNT)(void *pm)
+FIXNUM FF_ID(scmpnt, SCMPNT)(void *pm)
    {FIXNUM rv;
 
     SC_mem_print(*(char **) pm);

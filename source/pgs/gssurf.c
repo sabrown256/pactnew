@@ -1403,7 +1403,7 @@ void PG_draw_surface_n(PG_device *dev, double *a1, double *a2, double *extr,
 
 /* PGPLSF - low level surface plot routine */
 
-FIXNUM F77_FUNC(pgplsf, PGPLSF)(FIXNUM *devid, double *px, double *py, double *pz,
+FIXNUM FF_ID(pgplsf, PGPLSF)(FIXNUM *devid, double *px, double *py, double *pz,
 			     FIXNUM *pn, double *pxn, double *pxx,
 			     double *pyn, double *pyx, double *pzn, double *pzx,
 			     FIXNUM *pkx, FIXNUM *plx,

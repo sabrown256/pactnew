@@ -103,8 +103,8 @@ source $ldir/env-csh
        Note $STDOUT "#define LONG64"
     endif
 
-    if ("$F77IntPtrDiffer" != "") then
-       Note $STDOUT "#define $F77IntPtrDiffer"
+    if ("$FFIntPtrDiffer" != "") then
+       Note $STDOUT "#define $FFIntPtrDiffer"
     endif
 
     if (-e $IncDir/Finteger.bytes) then
@@ -235,23 +235,15 @@ source $ldir/env-csh
 
     if ("$FC_ID_CASE" == "upper") then
        if ("$FC_ID_UNDERSCORE" == "") then
-          Note $STDOUT "#define F77_ID(x_, x, X) X"
-          Note $STDOUT "#define F77_FUNC(x, X)   X"
           Note $STDOUT "#define FF_ID(x, X)      X"
        else
-          Note $STDOUT "#define F77_ID(x_, x, X) X ## $FC_ID_UNDERSCORE"
-          Note $STDOUT "#define F77_FUNC(x, X)   X ## $FC_ID_UNDERSCORE"
           Note $STDOUT "#define FF_ID(x, X)      X ## $FC_ID_UNDERSCORE"
        endif
        Note $STDOUT ""
     else if ("$FC_ID_CASE" == "lower") then
        if ("$FC_ID_UNDERSCORE" == "") then
-          Note $STDOUT "#define F77_ID(x_, x, X) x"
-          Note $STDOUT "#define F77_FUNC(x, X)   x"
           Note $STDOUT "#define FF_ID(x, X)      x"
        else
-          Note $STDOUT "#define F77_ID(x_, x, X) x ## $FC_ID_UNDERSCORE"
-          Note $STDOUT "#define F77_FUNC(x, X)   x ## $FC_ID_UNDERSCORE"
           Note $STDOUT "#define FF_ID(x, X)      x ## $FC_ID_UNDERSCORE"
        endif
        Note $STDOUT ""
