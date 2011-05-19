@@ -697,7 +697,7 @@ object *SS_eval_form(SS_psides *si, object *first, ...)
 
 /* SSCHEM - do a Fortran version of SS_call_scheme */
 
-FIXNUM F77_FUNC(sschem, SSCHEM)(FIXNUM *pnc, F77_string name, ...)
+FIXNUM F77_FUNC(sschem, SSCHEM)(FIXNUM *pnc, char *name, ...)
    {int i, type[MAXLINE];
     FIXNUM rv;
     void *ptr[MAXLINE];

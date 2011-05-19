@@ -1618,8 +1618,8 @@ void _PG_intp_byte(unsigned char *op, unsigned char *np,
 
 /* PGPLIM - low level image plot routine */
 
-FIXNUM F77_FUNC(pgplim, PGPLIM)(FIXNUM *devid, FIXNUM *pnc, F77_string name,
-			     FIXNUM *pnct, F77_string type, double *pz,
+FIXNUM F77_FUNC(pgplim, PGPLIM)(FIXNUM *devid, FIXNUM *pnc, char *name,
+			     FIXNUM *pnct, char *type, double *pz,
 			     FIXNUM *pk, FIXNUM *pl,
 			     double *pxn, double *pxx, double *pyn, double *pyx,
 			     double *pzn, double *pzx, FIXNUM *pal)

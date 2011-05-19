@@ -49,7 +49,7 @@ int _SC_strlen(char *s, int nx)
  *        - NX is the length of the character array
  */
 
-FIXNUM F77_FUNC(scstln, SCSTLN)(F77_string s, FIXNUM *pnx)
+FIXNUM F77_FUNC(scstln, SCSTLN)(char *s, FIXNUM *pnx)
    {int n, nx;
     char *t;
 
@@ -68,8 +68,8 @@ FIXNUM F77_FUNC(scstln, SCSTLN)(F77_string s, FIXNUM *pnx)
  *        - and points S to the next element in the string
  */
 
-void F77_FUNC(scsttk, SCSTTK)(FIXNUM *pnc, F77_string d,  F77_string s,
-			      FIXNUM pnd, F77_string dl)
+void F77_FUNC(scsttk, SCSTTK)(FIXNUM *pnc, char *d,  char *s,
+			      FIXNUM pnd, char *dl)
    {int j, n, nc, flag;
     char *dst, *src, *delim;
     char c;
@@ -113,13 +113,13 @@ void F77_FUNC(scsttk, SCSTTK)(FIXNUM *pnc, F77_string d,  F77_string s,
  *        - implied in the argument list
  */
 
-void F77_FUNC(scspnt, SCSPNT)(FIXNUM *pnc, F77_string d, F77_string f, ...)
+void F77_FUNC(scspnt, SCSPNT)(FIXNUM *pnc, char *d, char *f, ...)
    {int c, nc, nd;
     char local[MAXLINE], tb[10], ce;
     char *fmt, *le, *lb, *pt, *dst, *s;
     FIXNUM *lv;
     double *dv;
-    F77_string sv;
+    char *sv;
 
     nc     = (int) *pnc;
     fmt    = SC_F77_C_STRING(f);
@@ -175,7 +175,7 @@ void F77_FUNC(scspnt, SCSPNT)(FIXNUM *pnc, F77_string d, F77_string f, ...)
                      _SC.ta = CPMAKE_N(char, _SC.nt, 3);
                      memset(_SC.ta, 0, _SC.nt);}
 
-	         sv = SC_VA_ARG(F77_string);
+	         sv = SC_VA_ARG(char *);
 		 SC_FORTRAN_STR_C(_SC.ta, sv, min(nc, _SC.nt-1));
 		 nd = _SC_fmt_strcat(dst, nc, nd, local, _SC.ta);
 		 if (nd == -1)
@@ -183,7 +183,7 @@ void F77_FUNC(scspnt, SCSPNT)(FIXNUM *pnc, F77_string d, F77_string f, ...)
                  break;
 
             case 'c' :
-	         sv = SC_VA_ARG(F77_string);
+	         sv = SC_VA_ARG(char *);
 		 SC_FORTRAN_STR_C(tb, sv, 1);
 		 CAT(dst, nc, nd, tb);
                  break;

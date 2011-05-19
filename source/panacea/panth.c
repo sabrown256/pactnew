@@ -1259,9 +1259,9 @@ int PA_merge_files(char *base, int n, char **files, int ncpf)
 
 /* PATHOP - open a time history file */
 
-FIXNUM F77_FUNC(pathop, PATHOP)(FIXNUM *pnf, F77_string fname, FIXNUM *pnm,
-				F77_string fmode, FIXNUM *psz, FIXNUM *pnp,
-				F77_string fprev)
+FIXNUM F77_FUNC(pathop, PATHOP)(FIXNUM *pnf, char *fname, FIXNUM *pnm,
+				char *fmode, FIXNUM *psz, FIXNUM *pnp,
+				char *fprev)
    {int np;
     FIXNUM rv;
     char s[MAXLINE], t[2], u[MAXLINE], *lmode;
@@ -1324,9 +1324,9 @@ FIXNUM F77_FUNC(pathfm, PATHFM)(FIXNUM *fileid)
 
 /* PABREC - begin a time domain struct definition */
 
-FIXNUM F77_FUNC(pabrec, PABREC)(FIXNUM *fileid, FIXNUM *pnf, F77_string fname,
-				FIXNUM *pnt, F77_string ftype, FIXNUM *pnd,
-				F77_string ftime)
+FIXNUM F77_FUNC(pabrec, PABREC)(FIXNUM *fileid, FIXNUM *pnf, char *fname,
+				FIXNUM *pnt, char *ftype, FIXNUM *pnd,
+				char *ftime)
    {size_t nc;
     FIXNUM rv;
     char ltype[MAXLINE], lname[MAXLINE], ltime[MAXLINE];
@@ -1360,7 +1360,7 @@ FIXNUM F77_FUNC(pabrec, PABREC)(FIXNUM *fileid, FIXNUM *pnf, F77_string fname,
 /* PAGRID - return the record id for the named record */
 
 FIXNUM F77_FUNC(pagrid, PAGRID)(FIXNUM *fileid, FIXNUM *pind, FIXNUM *pnn,
-				F77_string name, FIXNUM *pnt, F77_string type,
+				char *name, FIXNUM *pnt, char *type,
 				FIXNUM *prid)
    {int n;
     FIXNUM rv;
@@ -1406,7 +1406,7 @@ FIXNUM F77_FUNC(pagrid, PAGRID)(FIXNUM *fileid, FIXNUM *pind, FIXNUM *pnn,
 /* PAAREC - add a member to a time domain struct definition */
 
 FIXNUM F77_FUNC(paarec, PAAREC)(FIXNUM *fileid, FIXNUM *recid, FIXNUM *pnm,
-				F77_string fmemb, FIXNUM *pnl, F77_string flabl)
+				char *fmemb, FIXNUM *pnl, char *flabl)
    {int nc;
     FIXNUM rv;
     char lmemb[MAXLINE], llabl[MAXLINE], *s;
@@ -1491,7 +1491,7 @@ FIXNUM F77_FUNC(pawrec, PAWREC)(FIXNUM *fileid, FIXNUM *recid,
 /* PAWMEM - write a time domain record member */
 
 FIXNUM F77_FUNC(pawmem, PAWMEM)(FIXNUM *fileid, FIXNUM *recid, FIXNUM *pnc,
-				F77_string mbr, FIXNUM *pinst, FIXNUM *pnr,
+				char *mbr, FIXNUM *pinst, FIXNUM *pnr,
 				void *vr)
    {FIXNUM ret;
     char memb[MAXLINE];
@@ -1513,8 +1513,8 @@ FIXNUM F77_FUNC(pawmem, PAWMEM)(FIXNUM *fileid, FIXNUM *recid, FIXNUM *pnc,
 
 /* PAWRIA - write a time domain record instance attribute */
 
-FIXNUM F77_FUNC(pawria, PAWRIA)(FIXNUM *fileid, FIXNUM *pnv, F77_string fvar,
-				FIXNUM *pinst, FIXNUM *pna, F77_string fattr,
+FIXNUM F77_FUNC(pawria, PAWRIA)(FIXNUM *fileid, FIXNUM *pnv, char *fvar,
+				FIXNUM *pinst, FIXNUM *pna, char *fattr,
 				void *avl)
    {FIXNUM ret;
     char lvar[MAXLINE], lattr[MAXLINE];
@@ -1535,7 +1535,7 @@ FIXNUM F77_FUNC(pawria, PAWRIA)(FIXNUM *fileid, FIXNUM *pnv, F77_string fvar,
 /* PATHTR - transpose a time history file family */
 /* THIS FUNCTION IS DEPRECATED - USE PATRNF INSTEAD */
 
-FIXNUM F77_FUNC(pathtr, PATHTR)(FIXNUM *pnf, F77_string fname, FIXNUM *pncpf)
+FIXNUM F77_FUNC(pathtr, PATHTR)(FIXNUM *pnf, char *fname, FIXNUM *pncpf)
    {FIXNUM ret;
     char s[MAXLINE];
 
@@ -1552,7 +1552,7 @@ FIXNUM F77_FUNC(pathtr, PATHTR)(FIXNUM *pnf, F77_string fname, FIXNUM *pncpf)
  *        - Return 1 if successful and 0 otherwise.
  */
 
-FIXNUM F77_FUNC(patrnf, PATRNF)(FIXNUM *pnf, F77_string fname, FIXNUM *pord,
+FIXNUM F77_FUNC(patrnf, PATRNF)(FIXNUM *pnf, char *fname, FIXNUM *pord,
 				FIXNUM *pncpf)
    {FIXNUM ret;
     char s[MAXLINE];
@@ -1570,7 +1570,7 @@ FIXNUM F77_FUNC(patrnf, PATRNF)(FIXNUM *pnf, F77_string fname, FIXNUM *pord,
  *        - THIS FUNCTION IS DEPRECATED - USE PATRNN INSTEAD
  */
 
-FIXNUM F77_FUNC(pathtn, PATHTN)(F77_string chrs, FIXNUM *pord, FIXNUM *pncpf)
+FIXNUM F77_FUNC(pathtn, PATHTN)(char *chrs, FIXNUM *pord, FIXNUM *pncpf)
    {int n;
     FIXNUM ret;
     char *pc, **names;
@@ -1592,7 +1592,7 @@ FIXNUM F77_FUNC(pathtn, PATHTN)(F77_string chrs, FIXNUM *pord, FIXNUM *pncpf)
  *        - Return 1 if successful and 0 otherwise.
  */
 
-FIXNUM F77_FUNC(patrnn, PATRNN)(FIXNUM *pnchrs, F77_string chrs,
+FIXNUM F77_FUNC(patrnn, PATRNN)(FIXNUM *pnchrs, char *chrs,
 				FIXNUM *pord, FIXNUM *pncpf)
    {int n;
     FIXNUM ret;
@@ -1619,7 +1619,7 @@ FIXNUM F77_FUNC(patrnn, PATRNN)(FIXNUM *pnchrs, F77_string chrs,
  *        - THIS FUNCTION IS DEPRECATED - USE PATRNL INSTEAD
  */
 
-FIXNUM F77_FUNC(pathtl, PATHTL)(F77_string chrs, FIXNUM *pord, FIXNUM *pncpf)
+FIXNUM F77_FUNC(pathtl, PATHTL)(char *chrs, FIXNUM *pord, FIXNUM *pncpf)
    {int n;
     FIXNUM ret;
     char **names, *pc;
@@ -1641,7 +1641,7 @@ FIXNUM F77_FUNC(pathtl, PATHTL)(F77_string chrs, FIXNUM *pord, FIXNUM *pncpf)
  *        - Return 1 if successful and 0 otherwise.
  */
 
-FIXNUM F77_FUNC(patrnl, PATRNL)(FIXNUM *pnchrs, F77_string chrs,
+FIXNUM F77_FUNC(patrnl, PATRNL)(FIXNUM *pnchrs, char *chrs,
 				FIXNUM *pord, FIXNUM *pncpf)
    {int n;
     FIXNUM ret;
@@ -1674,8 +1674,8 @@ FIXNUM F77_FUNC(patrnl, PATRNL)(FIXNUM *pnchrs, F77_string chrs,
  *        - PNCPF:  Number of curves per target file.
  */
 
-FIXNUM F77_FUNC(pamrgf, PAMRGF)(FIXNUM *pnb, F77_string base, FIXNUM *pnf,
-				F77_string family, FIXNUM *pncpf)
+FIXNUM F77_FUNC(pamrgf, PAMRGF)(FIXNUM *pnb, char *base, FIXNUM *pnf,
+				char *family, FIXNUM *pncpf)
    {FIXNUM ret;
     char s[MAXLINE];
     char t[MAXLINE];
@@ -1700,8 +1700,8 @@ FIXNUM F77_FUNC(pamrgf, PAMRGF)(FIXNUM *pnb, F77_string base, FIXNUM *pnf,
  *        - PNCPF:  Number of curves per target file.
  */
 
-FIXNUM F77_FUNC(pamrgn, PAMRGN)(FIXNUM *pnb, F77_string base, FIXNUM *pnchrs,
-				F77_string chrs, FIXNUM *pncpf)
+FIXNUM F77_FUNC(pamrgn, PAMRGN)(FIXNUM *pnb, char *base, FIXNUM *pnchrs,
+				char *chrs, FIXNUM *pncpf)
    {int n;
     FIXNUM ret;
     char **files, *pc, s[MAXLINE];

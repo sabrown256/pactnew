@@ -430,7 +430,7 @@ void _SC_print_block_info(FILE *fp, SC_heap_des *ph, void *ptr, int flag)
 
     else
        {if (FTN_NAME(desc))
-	   {name = SC_F77_C_STRING((F77_string) name);
+	   {name = SC_F77_C_STRING(name);
 	    nc   = strlen(name);
 
 	    ps = strchr(name, ' ');

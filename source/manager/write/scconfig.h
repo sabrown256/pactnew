@@ -107,16 +107,6 @@ source $ldir/env-csh
        Note $STDOUT "#define $F77IntPtrDiffer"
     endif
 
-    if ($?INT4 == 1) then
-       Note $STDOUT "typedef $INT4 SC_INT4;"
-       Note $STDOUT "typedef unsigned $INT4 SC_UINT4;"
-    endif
-
-    if ($?INT8 == 1) then
-       Note $STDOUT "typedef $INT8 SC_INT8;"
-       Note $STDOUT "typedef unsigned $INT8 SC_UINT8;"
-    endif
-
     if (-e $IncDir/Finteger.bytes) then
        Note $STDOUT `cat $IncDir/Finteger.bytes`
        $RM $IncDir/Finteger.bytes

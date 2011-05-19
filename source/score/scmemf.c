@@ -19,7 +19,7 @@
  */
 
 FIXNUM _SC_make_f77(void **pm, FIXNUM *pni, FIXNUM *pnb, FIXNUM *pnc,
-		    F77_string pname, int zsp)
+		    char *pname, int zsp)
    {void *s;
     FIXNUM ok;
     mem_header *space;
@@ -38,7 +38,7 @@ FIXNUM _SC_make_f77(void **pm, FIXNUM *pni, FIXNUM *pnb, FIXNUM *pnc,
 
 /* mark this block as having been allocated to FORTRAN
  * the memory map will need to know how to interpret the
- * F77_string pname correctly
+ * char *pname correctly
  */
     if (s != NULL)
        {space = ((mem_header *) s) - 1;
@@ -61,7 +61,7 @@ FIXNUM _SC_make_f77(void **pm, FIXNUM *pni, FIXNUM *pnb, FIXNUM *pnc,
  */
 
 FIXNUM F77_FUNC(scmakz, SCMAKZ)(void **pm, FIXNUM *pni, FIXNUM *pnb,
-				FIXNUM *pnc, F77_string pname, FIXNUM *pzsp)
+				FIXNUM *pnc, char *pname, FIXNUM *pzsp)
    {FIXNUM ok;
 
     ok = _SC_make_f77(pm, pni, pnb, pnc, pname, (int) *pzsp);
@@ -78,7 +78,7 @@ FIXNUM F77_FUNC(scmakz, SCMAKZ)(void **pm, FIXNUM *pni, FIXNUM *pnb,
  */
 
 FIXNUM F77_FUNC(scmakf, SCMAKF)(void **pm, FIXNUM *pni, FIXNUM *pnb,
-				FIXNUM *pnc, F77_string pname)
+				FIXNUM *pnc, char *pname)
    {FIXNUM ok;
 
     ok = _SC_make_f77(pm, pni, pnb, pnc, pname, -1);
@@ -243,7 +243,7 @@ FIXNUM F77_FUNC(scmems, SCMEMS)(FIXNUM *pal, FIXNUM *pfr,
 /* SCMEMM - FORTRAN interface to SC_mem_monitor */
 
 FIXNUM F77_FUNC(scmemm, SCMEMM)(FIXNUM *po, FIXNUM *pl, FIXNUM *pni,
-				F77_string pid, FIXNUM *pnc, F77_string pmsg)
+				char *pid, FIXNUM *pnc, char *pmsg)
    {int old, lev, ni, nc, n;
     FIXNUM rv;
     char msg[MAXLINE], id[MAXLINE];
@@ -268,7 +268,7 @@ FIXNUM F77_FUNC(scmemm, SCMEMM)(FIXNUM *po, FIXNUM *pl, FIXNUM *pni,
 
 /* SCMEML - FORTRAN interface to SC_mem_lookup */
 
-FIXNUM F77_FUNC(scmeml, SCMEML)(FIXNUM *po, FIXNUM *pnc, F77_string pmsg)
+FIXNUM F77_FUNC(scmeml, SCMEML)(FIXNUM *po, FIXNUM *pnc, char *pmsg)
    {int n, nc;
     FIXNUM ok;
     char *name;

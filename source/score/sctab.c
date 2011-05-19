@@ -887,8 +887,8 @@ FIXNUM F77_FUNC(schclr, SCHCLR)(FIXNUM *haid)
  *        - only info install has to go on
  */
 
-FIXNUM F77_FUNC(schins, SCHINS)(FIXNUM *pnc, F77_string pname, void *ptr,
-                                FIXNUM *pnt, F77_string ptype,
+FIXNUM F77_FUNC(schins, SCHINS)(FIXNUM *pnc, char *pname, void *ptr,
+                                FIXNUM *pnt, char *ptype,
                                 FIXNUM *pcp, FIXNUM *haid)
    {int cp;
     char name[MAXLINE], type[MAXLINE];
@@ -927,7 +927,7 @@ FIXNUM F77_FUNC(schins, SCHINS)(FIXNUM *pnc, F77_string pname, void *ptr,
  *        - return the object thru P
  */
 
-FIXNUM F77_FUNC(schlkp, SCHLKP)(void *p, FIXNUM *pnc, F77_string pname,
+FIXNUM F77_FUNC(schlkp, SCHLKP)(void *p, FIXNUM *pnc, char *pname,
                                 FIXNUM *haid)
    {int n;
     FIXNUM rv;
@@ -958,7 +958,7 @@ FIXNUM F77_FUNC(schlkp, SCHLKP)(void *p, FIXNUM *pnc, F77_string pname,
  *        - return a pointer to the object thru P
  */
 
-FIXNUM F77_FUNC(schlku, SCHLKU)(void **p, FIXNUM *pnc, F77_string pname,
+FIXNUM F77_FUNC(schlku, SCHLKU)(void **p, FIXNUM *pnc, char *pname,
                                 FIXNUM *haid)
    {FIXNUM rv;
     char name[MAXLINE];
@@ -983,7 +983,7 @@ FIXNUM F77_FUNC(schlku, SCHLKU)(void **p, FIXNUM *pnc, F77_string pname,
 
 /* SCHREM - remove an object from a hash array */
 
-FIXNUM F77_FUNC(schrem, SCHREM)(FIXNUM *pnc, F77_string pname, FIXNUM *haid)
+FIXNUM F77_FUNC(schrem, SCHREM)(FIXNUM *pnc, char *pname, FIXNUM *haid)
    {FIXNUM rv;
     char name[MAXLINE];
     hasharr *ha;
