@@ -283,7 +283,7 @@ int SC_unpack_bits(char *out, char *in, int ityp, int nbits,
 #if 1
 	 if (SC_is_type_fix(ityp) == TRUE)
 	    {if (SC_unpack_bits_fnc[ityp] != NULL)
-	        SC_unpack_bits_fnc[ityp](out, i, fld);};};
+	        SC_unpack_bits_fnc[ityp](out, i, fld);};
 #else
 	 if (ityp == SC_INT8_I)
 	    {int8_t *pv;
@@ -308,9 +308,10 @@ int SC_unpack_bits(char *out, char *in, int ityp, int nbits,
 	 else if (ityp == SC_LONG_LONG_I)
 	    {long long *pv;
 	     pv    = (long long *) out;
-	     pv[i] = (long long) fld;};};
+	     pv[i] = (long long) fld;};
 
 #endif
+        };
 
     return(TRUE);}
 

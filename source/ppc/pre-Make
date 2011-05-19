@@ -82,12 +82,9 @@ OPARC  = pcparc.o pcparmp.o
 
 ONOIPC = pcnil.o
 
-ArBind = ${TGTLib}(gf-${LibName}.o)
-
 ArObjs = ${MPassDevices} ${IPCDevices}       \
          ${TGTLib}(ppc.o) ${TGTLib}(pcbin.o) \
-         ${TGTLib}(pcpio.o)                  \
-         ${ArBind}
+         ${TGTLib}(pcpio.o)
 
 ArMPSC = ${TGTLib}(pcmpsc.o)
 ArLMPS = ${TGTLib}(pclmps.o)
@@ -95,7 +92,7 @@ ArPARC = ${TGTLib}(pcparc.o) ${TGTLib}(pcparmp.o)
 
 ArNOIPC = ${TGTLib}(pcnil.o)
 
-${TGTLib} : ${LibDep} ${Hdrs} ${gos}
+${TGTLib} : ${Hdrs} ${gos} ${LibDep}
 
 #
 # Generated code rules
@@ -107,7 +104,8 @@ hdrf =
 
 # language bindings
 
-bindf = ${PACTTmpDir}/gf-${LibName}.c ../sx/${PACTTmpDir}/gs-${LibName}.c
+archo = z-${System}/obj
+bindf = ${PACTTmpDir}/gf-${LibName}.c ../sx/${archo}/gs-${LibName}.c
 gos   = ${PACTTmpDir}/gf-${LibName}.o
 
 ${PACTTmpDir}/gf-${LibName}.c : ${LibName}.bind ${Hdrs} ${hdrf}

@@ -20,6 +20,10 @@ source ../../tests/common
    NoteD $Log -n "                    SCHEME Integer Syntax Test ... "
    Note $Log ""
 
+# test that the SCHEME variable can be derived from the executable path
+   flog $Log unsetenv SCHEME
+   flog $Log unsetenv DO_RUN_SUBMIT_ENV
+
    flog $Log pwd
    if ( $?autotool ) then
      if ( !(-e ../shsint.scm) ) then 

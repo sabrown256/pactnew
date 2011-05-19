@@ -106,6 +106,9 @@ Note $Log ""
    if (-f gf-$d.c) then
       flog $Log mv gf-$d.c obj
    endif
+   if (-f gm-$d.f) then
+      flog $Log mv gm-$d.f obj
+   endif
    if (-f gs-$d.c) then
       flog $Log mv gs-$d.c ../../sx/z-$arch/obj
    endif
@@ -117,7 +120,7 @@ Note $Log ""
    endif
 
    if ($xstatus == 0) then
-      flog $Log $RM $d.proto
+#      flog $Log $RM $d.proto
    endif
 
    flog $Log popd

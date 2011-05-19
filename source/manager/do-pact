@@ -173,6 +173,7 @@ switch ($Phase)
 # clean out residue from a previous MultiConfig build
         flog $LogHost cd $WrkDir/$Builder
         flog $LogHost dsys delete -a
+        flog $LogHost rm -rf gen/*
 
         if ($UsingRSYNC == FALSE) then
            if ($?TmpTar) then
