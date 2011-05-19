@@ -111,8 +111,8 @@ FIXNUM F77_FUNC(pmcfft, PMCFFT)(double *outyr, double *outyi, double *outx,
 
 /* PMBSET - begin making a set */
 
-FIXNUM F77_FUNC(pmbset, PMBSET)(FIXNUM *pn, F77_string fname, FIXNUM *pt,
-				F77_string ftype, FIXNUM *pcp, FIXNUM *pnd,
+FIXNUM F77_FUNC(pmbset, PMBSET)(FIXNUM *pn, char *fname, FIXNUM *pt,
+				char *ftype, FIXNUM *pcp, FIXNUM *pnd,
 				FIXNUM *pnde, FIXNUM *pmx, FIXNUM *ptp,
 				FIXNUM *inxt)
    {int i, id, cp, nd, nde, bpi;

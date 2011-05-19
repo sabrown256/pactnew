@@ -57,7 +57,7 @@ FIXNUM F77_FUNC(pgaxis, PGAXIS)(FIXNUM *devid, FIXNUM *paxt)
  */
 
 FIXNUM F77_FUNC(pgsaxa, PGSAXA)(FIXNUM *devid, FIXNUM *pn,
-                                double *pat, F77_string patc)
+                                double *pat, char *patc)
    {int i, nc, nn, type, linecolor, txtcolor, prec;
     double *attr;
     double charspace, chupx, chupy, chpthx, chpthy;
@@ -412,7 +412,7 @@ FIXNUM F77_FUNC(pgddp3, PGDDP3)(FIXNUM *devid, double *px, double *py, double *p
 FIXNUM F77_FUNC(pgdrax, PGDRAX)(FIXNUM *devid, double *pxl, double *pyl,
                                 double *pxr, double *pyr, double *pt1, double *pt2,
                                 double *pv1, double *pv2, double *psc,
-                                FIXNUM *pnc, F77_string format,
+                                FIXNUM *pnc, char *format,
                                 FIXNUM *ptd, FIXNUM *ptt, FIXNUM *plt)
    {int td;
     FIXNUM rv;
@@ -938,7 +938,7 @@ FIXNUM F77_FUNC(pggpmf, PGGPMF)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGGTLN - get a line of text from the input descriptor */
 
-FIXNUM F77_FUNC(pggtln, PGGTLN)(FIXNUM *pnc, F77_string s, FIXNUM *pfd)
+FIXNUM F77_FUNC(pggtln, PGGTLN)(FIXNUM *pnc, char *s, FIXNUM *pfd)
    {FIXNUM rv;
     long fd;
     char *t;
@@ -982,7 +982,7 @@ FIXNUM F77_FUNC(pggtxc, PGGTXC)(FIXNUM *devid, FIXNUM *pc)
 /* PGGTXF - get the font */
 
 FIXNUM F77_FUNC(pggtxf, PGGTXF)(FIXNUM *devid, FIXNUM *pncf,
-				F77_string pf, FIXNUM *pncs, F77_string pst,
+				char *pf, FIXNUM *pncs, char *pst,
 				FIXNUM *psz)
    {int ls, nf, ns, lnf, lns;
     FIXNUM rv;
@@ -1024,7 +1024,7 @@ FIXNUM F77_FUNC(pggtxf, PGGTXF)(FIXNUM *devid, FIXNUM *pncf,
 /* PGGTEX - get the text extent in CS */
 
 FIXNUM F77_FUNC(pggtex, PGGTEX)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *pc,
-				FIXNUM *pnc, F77_string s,
+				FIXNUM *pnc, char *s,
 			        double *pdx, double *pdy)
    {FIXNUM rv;
     double p[PG_SPACEDM];
@@ -1118,9 +1118,9 @@ FIXNUM F77_FUNC(pgmdvc, PGMDVC)(FIXNUM *devid)
  *        - return -1 otherwise
  */
 
-FIXNUM F77_FUNC(pgmkdv, PGMKDV)(FIXNUM *pncn, F77_string name,
-				FIXNUM *pnct, F77_string type,
-				FIXNUM *pncl, F77_string title)
+FIXNUM F77_FUNC(pgmkdv, PGMKDV)(FIXNUM *pncn, char *name,
+				FIXNUM *pnct, char *type,
+				FIXNUM *pncl, char *title)
    {FIXNUM rv;
     char lname[MAXLINE], ltype[MAXLINE], ltitle[MAXLINE];
     PG_device *dev;
@@ -1278,7 +1278,7 @@ FIXNUM F77_FUNC(pgptos, PGPTOS)(FIXNUM *devid, FIXNUM *pix, FIXNUM *piy,
 
 /* PGRDIF - read an interface description file */
 
-FIXNUM F77_FUNC(pgrdif, PGRDIF)(FIXNUM *devid, FIXNUM *pnc, F77_string name)
+FIXNUM F77_FUNC(pgrdif, PGRDIF)(FIXNUM *devid, FIXNUM *pnc, char *name)
    {FIXNUM rv;
     char lname[MAXLINE];
     PG_device *dev;
@@ -1312,7 +1312,7 @@ FIXNUM F77_FUNC(pgrdvc, PGRDVC)(FIXNUM *devid)
 
 /* PGRGDV - register a device */
 
-FIXNUM F77_FUNC(pgrgdv, PGRGDV)(FIXNUM *pnc, F77_string name)
+FIXNUM F77_FUNC(pgrgdv, PGRGDV)(FIXNUM *pnc, char *name)
    {FIXNUM rv;
     char lname[MAXLINE];
     
@@ -1339,7 +1339,7 @@ FIXNUM F77_FUNC(pgrgdv, PGRGDV)(FIXNUM *pnc, F77_string name)
 
 /* PGRGFN - register a call back function with the device */
 
-FIXNUM F77_FUNC(pgrgfn, PGRGFN)(FIXNUM *pnc, F77_string name,
+FIXNUM F77_FUNC(pgrgfn, PGRGFN)(FIXNUM *pnc, char *name,
 				PFEvCallback fnc)
    {FIXNUM rv;
     char lname[MAXLINE];
@@ -1356,8 +1356,8 @@ FIXNUM F77_FUNC(pgrgfn, PGRGFN)(FIXNUM *pnc, F77_string name,
 
 /* PGRGVR - register a variable with the device */
 
-FIXNUM F77_FUNC(pgrgvr, PGRGVR)(FIXNUM *pnc, F77_string name,
-				FIXNUM *pnt, F77_string type,
+FIXNUM F77_FUNC(pgrgvr, PGRGVR)(FIXNUM *pnc, char *name,
+				FIXNUM *pnt, char *type,
 				void *vr, void *vn, void *vx)
    {FIXNUM rv;
     char lname[MAXLINE], ltype[MAXLINE];
@@ -1753,7 +1753,7 @@ FIXNUM F77_FUNC(pgsmks, PGSMKS)(FIXNUM *devid, double *ps)
 
 /* PGSPAL - set the current palette */
 
-FIXNUM F77_FUNC(pgspal, PGSPAL)(FIXNUM *devid, FIXNUM *pnc, F77_string pname)
+FIXNUM F77_FUNC(pgspal, PGSPAL)(FIXNUM *devid, FIXNUM *pnc, char *pname)
    {FIXNUM rv;
     PG_device *dev;
     char lname[MAXLINE];
@@ -1848,8 +1848,8 @@ FIXNUM F77_FUNC(pgstxc, PGSTXC)(FIXNUM *devid, FIXNUM *pc)
 /* PGSTXF - set the font */
 
 FIXNUM F77_FUNC(pgstxf, PGSTXF)(FIXNUM *devid, FIXNUM *pncf,
-				F77_string face, FIXNUM *pncs,
-				F77_string style, FIXNUM *psize)
+				char *face, FIXNUM *pncs,
+				char *style, FIXNUM *psize)
    {FIXNUM rv;
     PG_device *dev;
     char lface[MAXLINE], lstyle[MAXLINE];
@@ -2035,7 +2035,7 @@ FIXNUM F77_FUNC(pgupvs, PGUPVS)(FIXNUM *devid)
 /* PGWRCL - write label centered wrt x */
 
 FIXNUM F77_FUNC(pgwrcl, PGWRCL)(FIXNUM *devid, double *psy,
-				FIXNUM *pnc, F77_string label)
+				FIXNUM *pnc, char *label)
    {FIXNUM rv;
     char llabel[MAXLINE];
     PG_device *dev;
@@ -2055,7 +2055,7 @@ FIXNUM F77_FUNC(pgwrcl, PGWRCL)(FIXNUM *devid, double *psy,
 
 /* PGWRIF - write an interface description file */
 
-FIXNUM F77_FUNC(pgwrif, PGWRIF)(FIXNUM *devid, FIXNUM *pnc, F77_string name)
+FIXNUM F77_FUNC(pgwrif, PGWRIF)(FIXNUM *devid, FIXNUM *pnc, char *name)
    {FIXNUM rv;
     char lname[MAXLINE];
     PG_device *dev;
@@ -2076,7 +2076,7 @@ FIXNUM F77_FUNC(pgwrif, PGWRIF)(FIXNUM *devid, FIXNUM *pnc, F77_string name)
  */
 
 FIXNUM F77_FUNC(pgwrta, PGWRTA)(FIXNUM *devid, double *px, double *py,
-				FIXNUM *pnc, F77_string msg)
+				FIXNUM *pnc, char *msg)
    {FIXNUM rv;
     double x, y;
     char lmsg[MAXLINE];

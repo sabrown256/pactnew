@@ -128,8 +128,8 @@ FIXNUM F77_FUNC(pftmmp, PFTMMP)(void)
  *        - return 0 otherwise
  */
 
-FIXNUM F77_FUNC(pfmpop, PFMPOP)(FIXNUM *pnchr, F77_string name,
-				F77_string mode, FIXNUM *pcomm)
+FIXNUM F77_FUNC(pfmpop, PFMPOP)(FIXNUM *pnchr, char *name,
+				char *mode, FIXNUM *pcomm)
    {FIXNUM rv;
     char s[MAXLINE], t[2];
     PDBfile *file;

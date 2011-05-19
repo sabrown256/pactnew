@@ -209,7 +209,7 @@ int SC_free_stash(void)
  *        - as the return value
  */
 
-FIXNUM F77_FUNC(scvers, SCVERS)(FIXNUM *pn, F77_string name)
+FIXNUM F77_FUNC(scvers, SCVERS)(FIXNUM *pn, char *name)
    {int n, m, l;
     FIXNUM rv;
 
@@ -258,7 +258,7 @@ FIXNUM F77_FUNC(scpaus, SCPAUS)(void)
 
 /* SCFTCS - FORTRAN interface to convert FORTRAN string to C string */
 
-FIXNUM F77_FUNC(scftcs, SCFTCS)(F77_string out, F77_string in, FIXNUM *pnc)
+FIXNUM F77_FUNC(scftcs, SCFTCS)(char *out, char *in, FIXNUM *pnc)
    {FIXNUM rv;
 
     SC_FORTRAN_STR_C(SC_F77_C_STRING(out), in , *pnc);
@@ -272,7 +272,7 @@ FIXNUM F77_FUNC(scftcs, SCFTCS)(F77_string out, F77_string in, FIXNUM *pnc)
 
 /* SCADVN - FORTRAN interface to SC_advance_name */
 
-FIXNUM F77_FUNC(scadvn, SCADVN)(FIXNUM *pnc, F77_string name)
+FIXNUM F77_FUNC(scadvn, SCADVN)(FIXNUM *pnc, char *name)
    {int n;
     FIXNUM rv;
     char bf[MAXLINE];
@@ -318,7 +318,7 @@ static SC_lexical_stream *SC_lex_str_ptr(int strid)
  *        - return -1 otherwise
  */
 
-FIXNUM F77_FUNC(scopls, SCOPLS)(FIXNUM *pnchr, F77_string name,
+FIXNUM F77_FUNC(scopls, SCOPLS)(FIXNUM *pnchr, char *name,
                                 FIXNUM *pinbs, FIXNUM *pstrbs,
                                 PFInt scan, FIXNUM *pfl)
    {FIXNUM rv;
@@ -376,7 +376,7 @@ FIXNUM F77_FUNC(scclls, SCCLLS)(FIXNUM *strid)
  *        - return TRUE if successful and FALSE otherwise
  */
 
-FIXNUM F77_FUNC(scrdls, SCRDLS)(FIXNUM *strid, FIXNUM *pnc, F77_string ps)
+FIXNUM F77_FUNC(scrdls, SCRDLS)(FIXNUM *strid, FIXNUM *pnc, char *ps)
    {int n, nr, ni;
     FIXNUM rv;
     char *s;
@@ -439,7 +439,7 @@ FIXNUM F77_FUNC(scrdls, SCRDLS)(FIXNUM *strid, FIXNUM *pnc, F77_string ps)
  */
 
 FIXNUM F77_FUNC(scscan, SCSCAN)(FIXNUM *strid, FIXNUM *pmxtok, FIXNUM *pwidth,
-                                F77_string tok, FIXNUM *pntok, FIXNUM *nctok,
+                                char *tok, FIXNUM *pntok, FIXNUM *nctok,
                                 FIXNUM *ixtok, FIXNUM *toktyp, double *tokval)
    {int i, indx, nc;
     int n_tok, n_tok_max, width;
@@ -509,8 +509,8 @@ FIXNUM F77_FUNC(scscan, SCSCAN)(FIXNUM *strid, FIXNUM *pmxtok, FIXNUM *pwidth,
  *        - PTYPE names the type and has one less indirection than PV
  */
 
-FIXNUM F77_FUNC(scchal, SCCHAL)(FIXNUM *pal, FIXNUM *nn, F77_string pname,
-                                FIXNUM *nt, F77_string ptype, FIXNUM *nv,
+FIXNUM F77_FUNC(scchal, SCCHAL)(FIXNUM *pal, FIXNUM *nn, char *pname,
+                                FIXNUM *nt, char *ptype, FIXNUM *nv,
                                 void *pv)
    {long nb, ni;
     FIXNUM rv;
@@ -551,7 +551,7 @@ FIXNUM F77_FUNC(scchal, SCCHAL)(FIXNUM *pal, FIXNUM *nn, F77_string pname,
 
 /* SCRMAL - remove an item from the given association list */
 
-FIXNUM F77_FUNC(scrmal, SCRMAL)(FIXNUM *pal, FIXNUM *nn, F77_string pname)
+FIXNUM F77_FUNC(scrmal, SCRMAL)(FIXNUM *pal, FIXNUM *nn, char *pname)
    {FIXNUM rv;
     char lname[MAXLINE];
     pcons *pc;
@@ -671,7 +671,7 @@ FIXNUM F77_FUNC(scwtim, SCWTIM)(double *ptim)
  *          ANSI function ctime
  */
 
-FIXNUM F77_FUNC(scdate, SCDATE)(FIXNUM *pnc, F77_string date)
+FIXNUM F77_FUNC(scdate, SCDATE)(FIXNUM *pnc, char *date)
    {int nc, lc;
     FIXNUM rv;
     char *cdate;

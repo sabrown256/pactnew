@@ -570,7 +570,7 @@ static void *_SC_do_new_thread(void *x)
     ti->tid   = SC_THREAD_SELF();
     ti->exeid = ti->ide;
 /* printf("newt>                 ->    %p   (%4d %8llx)\n",
-       ti, ti->ide, (SC_INT8) ti->tid); */
+       ti, ti->ide, (long long) ti->tid); */
 
     SC_LOCKOFF(SC_ts_lock);
 

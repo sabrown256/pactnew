@@ -50,7 +50,7 @@ FIXNUM F77_FUNC(pamcon, PAMCON)(FIXNUM *pnc, char **pvn, void **pp, FIXNUM *pn)
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(pantrn, PANTRN)(void *pv, FIXNUM *pnc, F77_string vname)
+FIXNUM F77_FUNC(pantrn, PANTRN)(void *pv, FIXNUM *pnc, char *vname)
    {char t[MAXLINE];
 
     SC_FORTRAN_STR_C(t, vname, *pnc);
@@ -66,7 +66,7 @@ FIXNUM F77_FUNC(pantrn, PANTRN)(void *pv, FIXNUM *pnc, F77_string vname)
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(paconn, PACONN)(void **pv, FIXNUM *pnc, F77_string vname,
+FIXNUM F77_FUNC(paconn, PACONN)(void **pv, FIXNUM *pnc, char *vname,
 			     FIXNUM *pf)
    {char t[MAXLINE];
 
@@ -83,7 +83,7 @@ FIXNUM F77_FUNC(paconn, PACONN)(void **pv, FIXNUM *pnc, F77_string vname,
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(padcon, PADCON)(void **pv, FIXNUM *pnc, F77_string vname)
+FIXNUM F77_FUNC(padcon, PADCON)(void **pv, FIXNUM *pnc, char *vname)
    {char t[MAXLINE], s[MAXLINE];
 
     SC_FORTRAN_STR_C(t, vname, *pnc);
@@ -126,7 +126,7 @@ FIXNUM F77_FUNC(paloca, PALOCA)(void **pv, FIXNUM *pbpi, FIXNUM *pn, ...)
  */
 
 FIXNUM F77_FUNC(palloc, PALLOC)(void **pv, FIXNUM *pnc,
-			     F77_string vname, FIXNUM *pf, ...)
+			     char *vname, FIXNUM *pf, ...)
    {char s[MAXLINE];
     int *pdima;
     PA_variable *pp;
@@ -196,7 +196,7 @@ FIXNUM F77_FUNC(palloc, PALLOC)(void **pv, FIXNUM *pnc,
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(paspck, PASPCK)(FIXNUM *pnc, F77_string pname)
+FIXNUM F77_FUNC(paspck, PASPCK)(FIXNUM *pnc, char *pname)
    {char t[MAXLINE];
 
     SC_FORTRAN_STR_C(t, pname, *pnc);
@@ -210,7 +210,7 @@ FIXNUM F77_FUNC(paspck, PASPCK)(FIXNUM *pnc, F77_string pname)
 
 /* PAERR - handle errors */
 
-void F77_FUNC(paerr, PAERR)(FIXNUM *pnc, F77_string pname)
+void F77_FUNC(paerr, PAERR)(FIXNUM *pnc, char *pname)
    {char t[MAXLINE];
 
     SC_FORTRAN_STR_C(t, pname, *pnc);
@@ -246,7 +246,7 @@ void F77_FUNC(pasdof, PASDOF)(FIXNUM *pd)
 
 /* PASEQV - set an equivalenced value */
 
-void F77_FUNC(paseqv, PASEQV)(FIXNUM *pnc, F77_string name, void *vl)
+void F77_FUNC(paseqv, PASEQV)(FIXNUM *pnc, char *name, void *vl)
    {char t[MAXLINE];
 
     SC_FORTRAN_STR_C(t, name, *pnc);
@@ -260,7 +260,7 @@ void F77_FUNC(paseqv, PASEQV)(FIXNUM *pnc, F77_string name, void *vl)
 
 /* PADEQV - define an equivalence */
 
-void F77_FUNC(padeqv, PADEQV)(void *vr, FIXNUM *pnc, F77_string name)
+void F77_FUNC(padeqv, PADEQV)(void *vr, FIXNUM *pnc, char *name)
    {char t[MAXLINE];
 
     SC_FORTRAN_STR_C(t, name, *pnc);

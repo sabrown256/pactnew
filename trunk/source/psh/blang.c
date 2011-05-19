@@ -322,9 +322,8 @@ static void cf_type(char *a, int nc, char *t)
 static void fc_type(char *a, int nc, char *t)
    {
 
-    if ((strcmp(t, "char *") == 0) ||
-	(strcmp(t, "F77_string") == 0))
-       nstrncpy(a, nc, "F77_string", -1);
+    if (strcmp(t, "char *") == 0)
+       nstrncpy(a, nc, "char *", -1);
     else if ((is_ptr(t) == TRUE) || 
 	     (strstr(t, "(*") != NULL))
        nstrncpy(a, nc, "void *", -1);
@@ -862,9 +861,8 @@ static void fin_module(FILE *fp)
 static void sc_type(char *a, int nc, char *t)
    {
 
-    if ((strcmp(t, "char *") == 0) ||
-	(strcmp(t, "F77_string") == 0))
-       nstrncpy(a, nc, "F77_string", -1);
+    if (strcmp(t, "char *") == 0)
+       nstrncpy(a, nc, "char *", -1);
     else if ((is_ptr(t) == TRUE) ||
 	     (strstr(t, "(*") != NULL))
        nstrncpy(a, nc, "void *", -1);

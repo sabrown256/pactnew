@@ -70,22 +70,22 @@
  */
 
 #define PM_MD5_FF(a, b, c, d, x, s, ac)                                        \
-   {(a) += PM_MD5_F((b), (c), (d)) + (x) + (SC_UINT4) (ac);                    \
+   {(a) += PM_MD5_F((b), (c), (d)) + (x) + (u_int32_t) (ac);                   \
     (a)  = PM_MD5_ROTATE_LEFT((a), (s));                                       \
     (a) += (b);}
 
 #define PM_MD5_GG(a, b, c, d, x, s, ac)                                        \
-   {(a) += PM_MD5_G((b), (c), (d)) + (x) + (SC_UINT4) (ac);                    \
+   {(a) += PM_MD5_G((b), (c), (d)) + (x) + (u_int32_t) (ac);                   \
     (a)  = PM_MD5_ROTATE_LEFT((a), (s));                                       \
     (a) += (b);}
 
 #define PM_MD5_HH(a, b, c, d, x, s, ac)                                        \
-   {(a) += PM_MD5_H((b), (c), (d)) + (x) + (SC_UINT4) (ac);                    \
+   {(a) += PM_MD5_H((b), (c), (d)) + (x) + (u_int32_t) (ac);                   \
     (a)  = PM_MD5_ROTATE_LEFT((a), (s));                                       \
     (a) += (b);}
 
 #define PM_MD5_II(a, b, c, d, x, s, ac)                                        \
-   {(a) += PM_MD5_I((b), (c), (d)) + (x) + (SC_UINT4) (ac);                    \
+   {(a) += PM_MD5_I((b), (c), (d)) + (x) + (u_int32_t) (ac);                   \
     (a)  = PM_MD5_ROTATE_LEFT((a), (s));                                       \
     (a) += (b);}
 
@@ -97,8 +97,8 @@
 typedef struct s_PM_MD5_CTX PM_MD5_CTX;
 
 struct s_PM_MD5_CTX
-   {SC_UINT4 state[4];                                        /* state (ABCD) */
-    SC_UINT4 count[2];             /* number of bits, modulo 2^64 (lsb first) */
+   {u_int32_t state[4];                                       /* state (ABCD) */
+    u_int32_t count[2];            /* number of bits, modulo 2^64 (lsb first) */
     unsigned char buffer[64];};                               /* input buffer */
 
 
@@ -124,7 +124,7 @@ union ci
  *                - assume LEN is a multiple of 4
  */
 
-static void _PM_md5_encode(unsigned char *out, SC_UINT4 *in,
+static void _PM_md5_encode(unsigned char *out, u_int32_t *in,
 			   unsigned int len) 
    {unsigned int i, j;
 
@@ -143,15 +143,15 @@ static void _PM_md5_encode(unsigned char *out, SC_UINT4 *in,
  *                - assume LEN is a multiple of 4
  */
 
-static void _PM_md5_decode(SC_UINT4 *out, unsigned char *in,
+static void _PM_md5_decode(u_int32_t *out, unsigned char *in,
 			   unsigned int len) 
    {unsigned int i, j;
 
     for (i = 0, j = 0; j < len; i++, j += 4)
-        out[i] = ((SC_UINT4) in[j])           |
-	         (((SC_UINT4) in[j+1]) << 8)  |
-	         (((SC_UINT4) in[j+2]) << 16) |
-		 (((SC_UINT4) in[j+3]) << 24);
+        out[i] = ((u_int32_t) in[j])           |
+	         (((u_int32_t) in[j+1]) << 8)  |
+	         (((u_int32_t) in[j+2]) << 16) |
+		 (((u_int32_t) in[j+3]) << 24);
 
     return;}
 
@@ -162,8 +162,8 @@ static void _PM_md5_decode(SC_UINT4 *out, unsigned char *in,
  *                   - transform state based on block
  */
 
-static void _PM_md5_transform(SC_UINT4 state[4], unsigned char block[64]) 
-   {SC_UINT4 a, b, c, d, x[16];
+static void _PM_md5_transform(u_int32_t state[4], unsigned char block[64]) 
+   {u_int32_t a, b, c, d, x[16];
 
     a = state[0];
     b = state[1];
@@ -292,10 +292,10 @@ static void _PM_md5_update(PM_MD5_CTX *mc, unsigned char *in,
     index = (unsigned int) ((mc->count[0] >> 3) & 0x3F);
 
 /* update number of bits */
-    if ((mc->count[0] += ((SC_UINT4) inl << 3)) < ((SC_UINT4) inl << 3))
+    if ((mc->count[0] += ((u_int32_t) inl << 3)) < ((u_int32_t) inl << 3))
        mc->count[1]++;
 
-    mc->count[1] += ((SC_UINT4) inl >> 29);
+    mc->count[1] += ((u_int32_t) inl >> 29);
 
     pln = 64 - index;
 

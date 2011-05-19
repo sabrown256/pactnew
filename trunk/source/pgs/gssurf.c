@@ -1409,7 +1409,7 @@ FIXNUM F77_FUNC(pgplsf, PGPLSF)(FIXNUM *devid, double *px, double *py, double *p
 			     FIXNUM *pkx, FIXNUM *plx,
 			     double *pth, double *pph, double *pch,
 			     FIXNUM *ptyp, FIXNUM *pcol, double *pwid,
-			     FIXNUM *psty, FIXNUM *pnc, F77_string label)
+			     FIXNUM *psty, FIXNUM *pnc, char *label)
    {int sty, clr;
     int maxes[2];
     FIXNUM rv;

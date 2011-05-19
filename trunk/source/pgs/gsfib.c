@@ -83,10 +83,10 @@ FIXNUM F77_FUNC(pggupm, PGGUPM)(FIXNUM *flg)
 /* PGMG11 - make a 1D-1D graph */
 
 FIXNUM F77_FUNC(pgmg11, PGMG11)(FIXNUM *pid,
-                                FIXNUM *pnl, F77_string flabel,
+                                FIXNUM *pnl, char *flabel,
                                 FIXNUM *pcp, FIXNUM *pn, double *x, double *y,
-                                FIXNUM *pnx, F77_string fxname,
-                                FIXNUM *pny, F77_string fyname)
+                                FIXNUM *pnx, char *fxname,
+                                FIXNUM *pny, char *fyname)
    {int id, cp, n;
     FIXNUM rv;
     char label[MAXLINE], xname[MAXLINE], yname[MAXLINE];
@@ -115,11 +115,11 @@ FIXNUM F77_FUNC(pgmg11, PGMG11)(FIXNUM *pid,
 /* PGMG21 - make a 2D-1D graph */
 
 FIXNUM F77_FUNC(pgmg21, PGMG21)(FIXNUM *pid,
-                                FIXNUM *pnl, F77_string flabel,
+                                FIXNUM *pnl, char *flabel,
                                 FIXNUM *pcp, FIXNUM *pk, FIXNUM *pl,
                                 FIXNUM *pcen, double *x, double *y, double *r,
-                                FIXNUM *pnd, F77_string fdname,
-                                FIXNUM *pnr, F77_string frname)
+                                FIXNUM *pnd, char *fdname,
+                                FIXNUM *pnr, char *frname)
    {int id, cp, kmax, lmax;
     FIXNUM rv;
     char label[MAXLINE], dname[MAXLINE], rname[MAXLINE];
@@ -152,12 +152,12 @@ FIXNUM F77_FUNC(pgmg21, PGMG21)(FIXNUM *pid,
 /* PGMG22 - make a 2D-2D graph */
 
 FIXNUM F77_FUNC(pgmg22, PGMG22)(FIXNUM *pid,
-                                FIXNUM *pnl, F77_string flabel,
+                                FIXNUM *pnl, char *flabel,
                                 FIXNUM *pcp, FIXNUM *pk, FIXNUM *pl,
                                 FIXNUM *pcen,
                                 double *x, double *y, double *u, double *v,
-                                FIXNUM *pnd, F77_string fdname,
-                                FIXNUM *pnr, F77_string frname)
+                                FIXNUM *pnd, char *fdname,
+                                FIXNUM *pnr, char *frname)
    {int id, cp, kmax, lmax;
     FIXNUM rv;
     char label[MAXLINE], dname[MAXLINE], rname[MAXLINE];
@@ -196,7 +196,7 @@ FIXNUM F77_FUNC(pgmg22, PGMG22)(FIXNUM *pid,
 
 /* PGMGFS - make a graph from sets */
 
-FIXNUM F77_FUNC(pgmgfs, PGMGFS)(FIXNUM *pnl, F77_string fname,
+FIXNUM F77_FUNC(pgmgfs, PGMGFS)(FIXNUM *pnl, char *fname,
                                 FIXNUM *idom, FIXNUM *iran, FIXNUM *pcen,
                                 FIXNUM *pid, FIXNUM *inxt)
    {int id;
@@ -562,9 +562,9 @@ FIXNUM F77_FUNC(pgsupm, PGSUPM)(FIXNUM *flg)
 /* PGSRAT - set a graph's rendering attributes */
 
 FIXNUM F77_FUNC(pgsrat, PGSRAT)(FIXNUM *grid,
-                                FIXNUM *pn, F77_string name,
-                                FIXNUM *pt, F77_string type,
-                                F77_string val)
+                                FIXNUM *pn, char *name,
+                                FIXNUM *pt, char *type,
+                                char *val)
    {int id;
     FIXNUM rv;
     long n;

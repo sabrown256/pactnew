@@ -52,7 +52,7 @@ static long _SC_count_tagged(int flag)
 		        nbt += nb;
 		     else
 		        {if (FTN_NAME(desc))
-			    {name = SC_F77_C_STRING((F77_string) name);
+			    {name = SC_F77_C_STRING(name);
 			     nc   = strlen(name);
 
 			     ps = strchr(name, ' ');
