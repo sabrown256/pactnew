@@ -822,7 +822,7 @@ void PG_contour_plot(PG_device *dev, PG_graph *data, ...)
 
 /* PGCLEV - compute contour levels */
 
-FIXNUM F77_FUNC(pgclev, PGCLEV)(double *lev, FIXNUM *pn,
+FIXNUM FF_ID(pgclev, PGCLEV)(double *lev, FIXNUM *pn,
 			     double *pfn, double *pfx, double *pr)
    {FIXNUM rv;
     
@@ -837,7 +837,7 @@ FIXNUM F77_FUNC(pgclev, PGCLEV)(double *lev, FIXNUM *pn,
 
 /* PGPLCN - low level contour plot routine */
 
-FIXNUM F77_FUNC(pgplcn, PGPLCN)(FIXNUM *devid, double *px, double *py,
+FIXNUM FF_ID(pgplcn, PGPLCN)(FIXNUM *devid, double *px, double *py,
 			     double *pa, double *pl, FIXNUM *pkx, FIXNUM *plx,
 			     FIXNUM *pnl, FIXNUM *pli, FIXNUM *pal)
    {int maxes[2];

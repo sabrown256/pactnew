@@ -1,5 +1,5 @@
 TXT: PACT: Application Samples
-MOD: 12/19/2005
+MOD: 05/19/2011
 
 <blockquote>
 
@@ -22,7 +22,7 @@ in the case of the interpreters, which files to look at.
 ; Hash table and association list test (C API)
 ; pact ha</li>
 <li>schtst
-; Hash table and association list test (F77 API)
+; Hash table and association list test (Fortran API)
 ; pact fha</li>
 <li>tscctl, tscctla
 ; Test some of the string handling functions (C API)
@@ -72,7 +72,7 @@ pdatst
 </li>
 <li>
 pdftst
-; Main PDB test excersizing most of PDB (F77 API)
+; Main PDB test excersizing most of PDB (Fortran API)
 ; pact Fstd
 </li>
 <li>

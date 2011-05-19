@@ -61,7 +61,7 @@
 #define	SC_MEM_MFB        ((short) 0xD2C3)
 #define SC_MEM_ID         0xCAFEFEED
 #define SC_BLOCK_ID_MASK  0xEFFFFF00
-#define SC_FTN_NAME_MASK  0x10000000
+#define SC_FF_NAME_MASK   0x10000000
 #define HEAPS_UNIT_DELTA  1000L
 #define BLOCKS_UNIT_DELTA 10L
 
@@ -90,8 +90,8 @@
 #define FREE_SCORE_BLOCK_P(_d)                                              \
     (((_d)->ref_count == SC_MEM_MFA) && ((_d)->type == SC_MEM_MFB))
 
-#define FTN_NAME(desc)                                                      \
-    ((SC_FTN_NAME_MASK & (desc)->id) != 0)
+#define FF_NAME(desc)                                                      \
+    ((SC_FF_NAME_MASK & (desc)->id) != 0)
 
 #define SAVE_LINKS(desc)                                                    \
    {prev = desc->prev;                                                      \

@@ -41,8 +41,6 @@
 /*--------------------------------------------------------------------------*/
 
 #ifndef __GNUC__
-# define F77_FUNC(x, X)    x
-# define F77_ID(x_, x, X)  x
 # define FF_ID(x, X)       x
 #endif
 

@@ -825,7 +825,7 @@ char *SC_get_entry(int n)
 
 /* SCMKHT - make a hash array */
 
-FIXNUM F77_FUNC(scmkht, SCMKHT)(FIXNUM *psz, FIXNUM *pdoc, FIXNUM *pflgs)
+FIXNUM FF_ID(scmkht, SCMKHT)(FIXNUM *psz, FIXNUM *pdoc, FIXNUM *pflgs)
    {int sz, doc, flags;
     hasharr *ha;
     FIXNUM rv;
@@ -847,7 +847,7 @@ FIXNUM F77_FUNC(scmkht, SCMKHT)(FIXNUM *psz, FIXNUM *pdoc, FIXNUM *pflgs)
 
 /* SCRLHT - release a hash array */
 
-FIXNUM F77_FUNC(scrlht, SCRLHT)(FIXNUM *haid)
+FIXNUM FF_ID(scrlht, SCRLHT)(FIXNUM *haid)
    {hasharr *ha;
     FIXNUM rv;
 
@@ -866,7 +866,7 @@ FIXNUM F77_FUNC(scrlht, SCRLHT)(FIXNUM *haid)
 
 /* SCHCLR - clear a hash array */
 
-FIXNUM F77_FUNC(schclr, SCHCLR)(FIXNUM *haid)
+FIXNUM FF_ID(schclr, SCHCLR)(FIXNUM *haid)
    {hasharr *ha;
     FIXNUM rv;
 
@@ -887,7 +887,7 @@ FIXNUM F77_FUNC(schclr, SCHCLR)(FIXNUM *haid)
  *        - only info install has to go on
  */
 
-FIXNUM F77_FUNC(schins, SCHINS)(FIXNUM *pnc, char *pname, void *ptr,
+FIXNUM FF_ID(schins, SCHINS)(FIXNUM *pnc, char *pname, void *ptr,
                                 FIXNUM *pnt, char *ptype,
                                 FIXNUM *pcp, FIXNUM *haid)
    {int cp;
@@ -927,7 +927,7 @@ FIXNUM F77_FUNC(schins, SCHINS)(FIXNUM *pnc, char *pname, void *ptr,
  *        - return the object thru P
  */
 
-FIXNUM F77_FUNC(schlkp, SCHLKP)(void *p, FIXNUM *pnc, char *pname,
+FIXNUM FF_ID(schlkp, SCHLKP)(void *p, FIXNUM *pnc, char *pname,
                                 FIXNUM *haid)
    {int n;
     FIXNUM rv;
@@ -958,7 +958,7 @@ FIXNUM F77_FUNC(schlkp, SCHLKP)(void *p, FIXNUM *pnc, char *pname,
  *        - return a pointer to the object thru P
  */
 
-FIXNUM F77_FUNC(schlku, SCHLKU)(void **p, FIXNUM *pnc, char *pname,
+FIXNUM FF_ID(schlku, SCHLKU)(void **p, FIXNUM *pnc, char *pname,
                                 FIXNUM *haid)
    {FIXNUM rv;
     char name[MAXLINE];
@@ -983,7 +983,7 @@ FIXNUM F77_FUNC(schlku, SCHLKU)(void **p, FIXNUM *pnc, char *pname,
 
 /* SCHREM - remove an object from a hash array */
 
-FIXNUM F77_FUNC(schrem, SCHREM)(FIXNUM *pnc, char *pname, FIXNUM *haid)
+FIXNUM FF_ID(schrem, SCHREM)(FIXNUM *pnc, char *pname, FIXNUM *haid)
    {FIXNUM rv;
     char name[MAXLINE];
     hasharr *ha;

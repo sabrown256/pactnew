@@ -1,5 +1,5 @@
 TXT: PDBLib User's Manual
-MOD: 04/06/2011
+MOD: 05/19/2011
 
 <CENTER>
 <P>
@@ -596,7 +596,7 @@ A Python module is also available to access PDBLib's functionality.
 <p>
 <pre>
 <i>C Binding: </i>  void PD_get_format_version(int v)
-<i>F77 Binding: </i>integer PFGFMV(integer v)
+<i>Fortran Binding: </i>integer PFGFMV(integer v)
 <i>SX Binding: </i> (format-version)
 <i>Python Binding: </i> XXX - missing
 </pre>
@@ -1806,7 +1806,7 @@ be a valid PDB file. This functionality is provided by <tt>PD_flush</tt>.
 <p>
 <pre>
 <i>C Binding: </i>  int64_t PD_set_buffer_size(int64_t v)
-<i>F77 Binding: </i>integer PFSBFS(integer v)
+<i>Fortran Binding: </i>integer PFSBFS(integer v)
 <i>SX Binding: </i> (pd-set-buffer-size! v)
 <i>Python Binding: </i> XXX - missing
 </pre>
@@ -1879,7 +1879,7 @@ Return the integer value of the buffer size in bytes.
 <p>
 <pre>
 <i>C Binding: </i>  int PD_target(data_standard *std, data_alignment *align)
-<i>F77 Binding: </i>integer PFTRGT(integer is, integer ia)
+<i>Fortran Binding: </i>integer PFTRGT(integer is, integer ia)
 <i>SX Binding: </i> (target is ia)
 <i>Python Binding: </i> XXX - missing
 </pre>
@@ -2246,7 +2246,7 @@ void test_target(char *tgt, char *base, int n,
 <p>
 <pre>
 <i>C Binding: </i>  int PD_isfile(char *fname)
-<i>F77 Binding: </i>none
+<i>Fortran Binding: </i>none
 <i>SX Binding: </i> none
 <i>Python Binding: </i> none
 </pre>
@@ -2292,7 +2292,7 @@ The function returns TRUE if the file is a PDBfile and FALSE otherwise.
 <p>
 <pre>
 <i>C Binding: </i>  PDBfile *PD_open(char *filename, char *mode)
-<i>F77 Binding: </i>integer PFOPEN(integer nchr, character name, character mode)
+<i>Fortran Binding: </i>integer PFOPEN(integer nchr, character name, character mode)
 <i>SX Binding: </i> (open-pdbfile name mode)
 <i>Python Binding: </i> pact.pdb.open(name, mode='r')
 </pre>
@@ -2420,7 +2420,7 @@ is returned and an ASCII string error message can be retrieved through a call to
 <p>
 <pre>
 <i>C Binding: </i>  void PD_set_major_order(PDBfile *file, int v)
-<i>F77 Binding: </i>integer PFSMJO(integer fileid, integer v)
+<i>Fortran Binding: </i>integer PFSMJO(integer fileid, integer v)
 <i>SX Binding: </i> (major-order file v)
 <i>Python Binding: </i> XXX - missing
 </pre>
@@ -2506,7 +2506,7 @@ In the FORTRAN binding return 1 if successful, 0 otherwise.
 <p>
 <pre>
 <i>C Binding: </i>  void PD_set_format_version(int v)
-<i>F77 Binding: </i>integer PFSFMV(integer v)
+<i>Fortran Binding: </i>integer PFSFMV(integer v)
 <i>SX Binding: </i> (format-version v)
 <i>Python Binding: </i> XXX - missing
 </pre>
@@ -2584,7 +2584,7 @@ In the FORTRAN binding return 1 if successful, 0 otherwise.
 <p>
 <pre>
 <i>C Binding: </i>  PD_set_max_file_size(PDBfile *file, int v)
-<i>F77 Binding: </i>integer PFSMXS(integer fileid, integer v)
+<i>Fortran Binding: </i>integer PFSMXS(integer fileid, integer v)
 <i>SX Binding: </i> (set-maximum-file-size! file v)
 <i>Python Binding: </i> XXX - missing
 </pre>
@@ -2673,7 +2673,7 @@ See also:
 <p>
 <pre>
 <i>C Binding: </i>  void PD_set_offset(PDBfile *file, int v)
-<i>F77 Binding: </i>integer PFSOFF(integer fileid, integer v)
+<i>Fortran Binding: </i>integer PFSOFF(integer fileid, integer v)
 <i>SX Binding: </i> (default-offset file v)
 <i>Python Binding: </i> XXX - missing
 </pre>
@@ -2764,7 +2764,7 @@ In the FORTRAN binding return 1 if successful, 0 otherwise.
 <p>
 <pre>
 <i>C Binding: </i>  PDBfile *PD_family(PDBfile *file, int flag)
-<i>F77 Binding: </i>integer pffami(integer fileid, integer flag)
+<i>Fortran Binding: </i>integer pffami(integer fileid, integer flag)
 <i>SX Binding: </i> (family-file file flag)
 <i>Python Binding: </i> XXX - missing
 </pre>
@@ -2878,7 +2878,7 @@ See also:
 <p>
 <pre>
 <i>C Binding: </i> int PD_fix_denorm(data_standard* std, char *type, long len, void *vr)
-<i>F77 Binding: </i>integer PFDNRM(integer istd, integer nc, character type,
+<i>Fortran Binding: </i>integer PFDNRM(integer istd, integer nc, character type,
                  integer len, void vr)
 </pre>
 <p>
@@ -2969,7 +2969,7 @@ and
 <p>
 <pre>
 <i>C Binding: </i>  int PD_flush(PDBfile *file)
-<i>F77 Binding: </i>integer PFFLSH(integer fileid)
+<i>Fortran Binding: </i>integer PFFLSH(integer fileid)
 <i>SX Binding: </i> (flush-pdbfile file)
 <i>Python Binding: </i> file.flush()
 </pre>
@@ -3066,7 +3066,7 @@ FORTRAN programs may retrieve an error message by invoking function <tt>PFGERR</
 <p>
 <pre>
 <i>C Binding: </i>  int PD_close(PDBfile *file)
-<i>F77 Binding: </i>integer PFCLOS(integer fileid)
+<i>Fortran Binding: </i>integer PFCLOS(integer fileid)
 <i>SX Binding: </i> (close-pdbfile file)
 <i>Python Binding: </i> file.close()
 </pre>
@@ -3159,7 +3159,7 @@ and an ASCII string error message can be retrieved through a call to
 <p>
 <pre>
 <i>C Binding: </i>  int PD_remove_entry(PDBfile *file, char *name)
-<i>F77 Binding: </i>integer PFRENT(integer fileid, char name)
+<i>Fortran Binding: </i>integer PFRENT(integer fileid, char name)
 <i>SX Binding: </i> (remove-entry file name)
 </pre>
 <p>
@@ -3284,7 +3284,7 @@ of commands.
 <pre>
 <i>C Binding: </i>  int PD_write(PDBfile *file, char *name,
                           char *type, void *var)
-<i>F77 Binding: </i>integer PFWRTA(integer fileid, integer nchr, character name,
+<i>Fortran Binding: </i>integer PFWRTA(integer fileid, integer nchr, character name,
                             integer ntype, character type, void space)
 <i>SX Binding: </i> (write-pdbdata file (type dimension) data)
                     (write-pdbdata file pdbdata)
@@ -3527,7 +3527,7 @@ See also:
 <pre>
 <i>C Binding: </i>  int PD_write_alt(PDBfile *file, char *name, char *type,
                               void *var, int nd, long *ind)
-<i>F77 Binding: </i>integer PFWRTD(integer fileid,
+<i>Fortran Binding: </i>integer PFWRTD(integer fileid,
                             integer nchr, character name,
                             integer ntype, character type,
                             void vr, integer nd, integer ind)
@@ -3676,7 +3676,7 @@ and
 <pre>
 <i>C Binding: </i>  int PD_write_as(PDBfile *file, char *name,
                              char *intype, char *outtype, void *var)
-<i>F77 Binding: </i>integer PFWRAS(integer fileid,
+<i>Fortran Binding: </i>integer PFWRAS(integer fileid,
                             integer nchr, character name,
                             integer ntypin, character intype,
                             integer ntypout, character outtype, void vr)
@@ -3785,7 +3785,7 @@ See also:
 <i>C Binding: </i>  int PD_write_as_alt(PDBfile *file,
                                  char *name, char *intype, char *outtype,
                                  void *var, int nd, long *ind)
-<i>F77 Binding: </i>integer PFWRAD(integer fileid,
+<i>Fortran Binding: </i>integer PFWRAD(integer fileid,
                             integer nchr, character name,
                             integer ntypin, character intype,
                             integer ntypout, character outtype,
@@ -3911,7 +3911,7 @@ and
 <p>
 <pre>
 <i>C Binding: </i>  int PD_append(PDBfile *file, char *name, void *vr)
-<i>F77 Binding: </i>integer pfappa(integer fileid, integer nchr,
+<i>Fortran Binding: </i>integer pfappa(integer fileid, integer nchr,
                             character name, void vr)
 <i>SX Binding: </i> none
 <i>Python Binding: </i> XXX - none
@@ -4014,7 +4014,7 @@ Compare this with the example of <tt>PD_write</tt>.
 <pre>
 <i>C Binding: </i>  int PD_append_alt(PDBfile *file, char *name,
                                void *vr, int nd, long *ind)
-<i>F77 Binding: </i>integer pfappd(integer fileid,
+<i>Fortran Binding: </i>integer pfappd(integer fileid,
                             integer nchr, character name,
                             void vr, integer nd, integer ind)
 <i>SX Binding: </i> none
@@ -4132,7 +4132,7 @@ c ... append to x
                               char *name,
                               char *intype,
                               void *vr)
-<i>F77 Binding: </i>integer PFAPAS(integer fileid,
+<i>Fortran Binding: </i>integer PFAPAS(integer fileid,
                               integer nchr,
                               character name,
                               integer ntype,
@@ -4251,7 +4251,7 @@ Compare this with the example of <tt>PFWRAS</tt>.
 <i>C Binding: </i>  int PD_append_as_alt(PDBfile *file char *name,
                                   char *intype, void *vr,
                                   int nd, long *ind)
-<i>F77 Binding: </i>integer PFAPAD(integer fileid,
+<i>Fortran Binding: </i>integer PFAPAD(integer fileid,
                             integer nchr, character name,
                             integer ntype, character intype,
                             void vr, integer nd, integer ind)
@@ -4390,7 +4390,7 @@ supports.  See the discussion of the <tt>PD_append</tt> family of functions.
 <pre>
 <i>C Binding: </i>  syment *PD_defent(PDBfile *file,
                                char *name, char *outtype)
-<i>F77 Binding: </i>integer PFDEFA(integer fileid,
+<i>Fortran Binding: </i>integer PFDEFA(integer fileid,
                             integer nc, char *name,
                             integer nt, char *type)
 <i>SX Binding: </i> none
@@ -4503,7 +4503,7 @@ Compare this with the example of <tt>PFWRTA</tt>.
 <pre>
 <i>C Binding: </i>  syment *PD_defent_alt(PDBfile *file, char *name,
                                    char *outtype, int nd, long *ind)
-<i>F77 Binding: </i>integer PFDEFD(integer fileid,
+<i>Fortran Binding: </i>integer PFDEFD(integer fileid,
                             integer nc, char *name,
                             integer nt, char *outtype,
                             integer nd, integer ind)
@@ -4643,7 +4643,7 @@ files.
 <p>
 <pre>
 <i>C Binding: </i>  int PD_read(PDBfile *file, char *name, void *var)
-<i>F77 Binding: </i>integer PFREAD(integer fileid,
+<i>Fortran Binding: </i>integer PFREAD(integer fileid,
                             integer nchr, character name, void var)
 <i>SX Binding: </i> (read-pdbdata file name)
 <i>Python Binding: </i> file.read(name)
@@ -4796,7 +4796,7 @@ See also:
 <pre>
 <i>C Binding: </i>  int PD_read_alt(PDBfile *file, char *name,
                              void *var, long *ind)
-<i>F77 Binding: </i>integer PFPTRD(integer fileid,
+<i>Fortran Binding: </i>integer PFPTRD(integer fileid,
                             integer nchr, character name,
                             void var, integer ind)
 <i>SX Binding: </i> none
@@ -4905,7 +4905,7 @@ See also:
 <pre>
 <i>C Binding: </i>  int PD_read_as(PDBfile *file,
                             char *name, char *intype, void *var)
-<i>F77 Binding: </i>integer PFRDAS(integer fileid,
+<i>Fortran Binding: </i>integer PFRDAS(integer fileid,
                             integer nchr, character name,
                             integer ntype, character intype, void var)
 <i>SX Binding: </i> none.
@@ -5054,7 +5054,7 @@ See also:
 <i>C Binding: </i>  int PD_read_as_alt(PDBfile *file,
                                 char *name, char *type,
                                 void *var, long *ind)
-<i>F77 Binding: </i>integer PFRDAD(integer fileid,
+<i>Fortran Binding: </i>integer PFRDAD(integer fileid,
                             integer nchr, character name,
                             integer ntype, character intype,
                             void var, integer ind)
@@ -5199,7 +5199,7 @@ member. The function <tt>PD_cast</tt> is used to set up this behavior.
 <pre>
 <i>C Binding: </i>  int PD_cast(PDBfile *file, char *type,
                          char *memb, char *contr)
-<i>F77 Binding: </i>none
+<i>Fortran Binding: </i>none
 <i>SX Binding: </i> (make-cast file type memb contr)
 <i>Python Binding: </i> XXX - missing
 </pre>
@@ -5279,7 +5279,7 @@ and an ASCII string error message can be retrieved through a call to
 <pre>
 <i>C Binding: </i>  defstr *PD_defix(PDBfile *file, char *name,
                               long bytespitem, int align, int flg)
-<i>F77 Binding: </i>none
+<i>Fortran Binding: </i>none
 <i>SX Binding: </i> none
 <i>Python Binding: </i> none
 </pre>
@@ -5343,7 +5343,7 @@ and an ASCII string error message can be retrieved through a call to
                                 long bytespitem, int align, int *ordr,
                                 long expb, long mantb, long sbs, long sbe,
                                 long sbm, long hmb, long bias)
-<i>F77 Binding: </i>none
+<i>Fortran Binding: </i>none
 <i>SX Binding: </i> none
 <i>Python Binding: </i> none
 </pre>
@@ -5406,7 +5406,7 @@ and an ASCII string error message can be retrieved through a call to
 <pre>
 <i>C Binding: </i>  defstr *PD_defncv(PDBfile *file, char *name,
                                long bytespitem, int align)
-<i>F77 Binding: </i>none
+<i>Fortran Binding: </i>none
 <i>SX Binding: </i> none
 <i>Python Binding: </i> none
 </pre>
@@ -5459,7 +5459,7 @@ and an ASCII string error message can be retrieved through a call to
                                char *name,
                                char *mem1, ..., memn,
                                int *LAST)
-<i>F77 Binding: </i>integer PFDEFS(integer fileid,
+<i>Fortran Binding: </i>integer PFDEFS(integer fileid,
                             integer nchr,
                             character name,
                             integer ncm1, character mem1,
@@ -5686,7 +5686,7 @@ be retrieved by invoking function <tt>PFGERR</tt>.
                                    char *name,
                                    int nmemb,
                                    char **members)
-<i>F77 Binding: </i>integer PFDEFT(integer fileid,
+<i>Fortran Binding: </i>integer PFDEFT(integer fileid,
                             integer nchr,
                             character name,
                             integer nmemb,
@@ -5884,7 +5884,7 @@ Compare with the example for <tt>PFDEFS</tt>.
 <p>
 <pre>
 <i>C Binding: </i>  defstr *PD_typedef(PDBfile *file, char *oname, char *tname)
-<i>F77 Binding: </i>none
+<i>Fortran Binding: </i>none
 <i>SX Binding: </i> (make-typedef file oname tname)
 <i>Python Binding: </i> XXX - missing
 </pre>
@@ -5968,7 +5968,7 @@ functions to manage attributive data: <tt>PD_def_attribute</tt>,
 <p>
 <pre>
 <i>C Binding: </i>  int PD_def_attribute(PDBfile *file, char *attr, char *type)
-<i>F77 Binding: </i>integer PFDATT(integer fileid,
+<i>Fortran Binding: </i>integer PFDATT(integer fileid,
                             integer na, char *attr,
                             integer nt, char *type)
 <i>SX Binding: </i> (def-attribute file name type)
@@ -6064,7 +6064,7 @@ See also:
 <pre>
 <i>C Binding: </i>  void *PD_get_attribute(PDBfile *file,
                                     char *vr, char *attr)
-<i>F77 Binding: </i>integer PFGVAT(integer fileid,
+<i>Fortran Binding: </i>integer PFGVAT(integer fileid,
                             integer nv, char *vr,
                             integer na char *attr,
                             void value)
@@ -6172,7 +6172,7 @@ See also:
 <p>
 <pre>
 <i>C Binding: </i>  int PD_rem_attribute(PDBfile *file, char *attr)
-<i>F77 Binding: </i>integer PFRATT(integer fileid, integer na, char *attr)
+<i>Fortran Binding: </i>integer PFRATT(integer fileid, integer na, char *attr)
 <i>SX Binding: </i> (rem-attribute file attr)
 <i>Python Binding: </i> XXX - missing
 </pre>
@@ -6268,7 +6268,7 @@ See also:
 <pre>
 <i>C Binding: </i>  int PD_set_attribute(PDBfile *file,
                                   char *vr, char *attr, void *vl)
-<i>F77 Binding: </i>integer PFSVAT(integer fileid,
+<i>Fortran Binding: </i>integer PFSVAT(integer fileid,
                             integer nv, char *vr,
                             integer na char *attr, void vl)
 <i>SX Binding: </i> (set-attribute-value! file vr attr vl)
@@ -6382,7 +6382,7 @@ See also:
 <p>
 <pre>
 <i>C Binding: </i>  int64_t PD_get_buffer_size(void)
-<i>F77 Binding: </i>integer PFGBFS()
+<i>Fortran Binding: </i>integer PFGBFS()
 <i>SX Binding: </i> (pd-get-buffer-size)
 <i>Python Binding: </i> XXX - missing
 </pre>
@@ -6451,7 +6451,7 @@ otherwise, return -1.
 <p>
 <pre>
 <i>C Binding: </i>  char *PD_get_error(void)
-<i>F77 Binding: </i>integer PFGERR(integer nchr, character err)
+<i>Fortran Binding: </i>integer PFGERR(integer nchr, character err)
 <i>SX Binding: </i> (pd-error-message)
 <i>Python Binding: </i> XXX - missing
 </pre>
@@ -6523,7 +6523,7 @@ In the FORTRAN binding this function returns 1 if successful, 0 otherwise.
 <p>
 <pre>
 <i>C Binding: </i>  int64_t PD_get_file_length(PDBfile *file)
-<i>F77 Binding: </i>integer PFGFLN(integer fileid,
+<i>Fortran Binding: </i>integer PFGFLN(integer fileid,
                             integer len)
 <i>SX Binding: </i> 
 <i>Python Binding: </i> XXX - missing
@@ -6595,7 +6595,7 @@ returned and an error message may be retrieved by invoking function <tt>PFGERR</
 <p>
 <pre>
 <i>C Binding: </i>  char *PD_get_file_name(PDBfile *file)
-<i>F77 Binding: </i>integer PFGFNM(integer fileid,
+<i>Fortran Binding: </i>integer PFGFNM(integer fileid,
                             integer nchr, character name)
 <i>SX Binding: </i> (file-info file "name")
 <i>Python Binding: </i> file.name
@@ -6690,7 +6690,7 @@ returned and an error message may be retrieved by invoking function <tt>PFGERR</
 <p>
 <pre>
 <i>C Binding: </i>  int PD_get_major_order(PDBfile *file)
-<i>F77 Binding: </i>integer PFGMJO(integer fileid, integer val)
+<i>Fortran Binding: </i>integer PFGMJO(integer fileid, integer val)
 <i>SX Binding: </i> (file-info file "major-order")
 <i>Python Binding: </i> file.major_order
 </pre>
@@ -6764,7 +6764,7 @@ otherwise.
 <p>
 <pre>
 <i>C Binding: </i>  int PD_get_max_file_size(PDBfile *file)
-<i>F77 Binding: </i>integer PFGMXS(integer fileid)
+<i>Fortran Binding: </i>integer PFGMXS(integer fileid)
 <i>SX Binding: </i> (file-info file "maximum-size")
 <i>Python Binding: </i> XXX - missing
 </pre>
@@ -6842,7 +6842,7 @@ Return the integer value of the current maximum file size.
 <p>
 <pre>
 <i>C Binding: </i>  int PD_get_mode(PDBfile *file)
-<i>F77 Binding: </i>integer PFGMOD(integer fileid)
+<i>Fortran Binding: </i>integer PFGMOD(integer fileid)
 <i>SX Binding: </i> (file-info file "mode")
 <i>Python Binding: </i> file.mode
 </pre>
@@ -6924,7 +6924,7 @@ Return the integer value of the current mode.
 <p>
 <pre>
 <i>C Binding: </i>  int PD_get_offset(PDBfile *file)
-<i>F77 Binding: </i>integer PFGOFF(integer fileid)
+<i>Fortran Binding: </i>integer PFGOFF(integer fileid)
 <i>SX Binding: </i> (file-info file "default-offset")
 <i>Python Binding: </i> file.default_offset
 </pre>
@@ -7007,7 +7007,7 @@ Return the integer value of the default offset.
 <p>
 <pre>
 <i>C Binding: </i>  syment *PD_query_entry(PDBfile *file, char *name, char *fullname)
-<i>F77 Binding: </i>none
+<i>Fortran Binding: </i>none
 <i>SX Binding: </i> (read-syment file name)
 <i>Python Binding: </i> XXX - 
 </pre>
@@ -7090,7 +7090,7 @@ and an ASCII string error message can be retrieved through a call to
 <pre>
 <i>C Binding: </i>  int PD_get_entry_info(syment *ep, char **type, long *size,
                                    int *ndims, long **dims)
-<i>F77 Binding: </i>integer PFIVAR(integer fileid,
+<i>Fortran Binding: </i>integer PFIVAR(integer fileid,
                             integer nchr, character name,
                             integer ntype, character type,
                             integer size, integer ndims, integer dims)
@@ -7187,7 +7187,7 @@ Output from this function is:<BR>
 <p>
 <pre>
 <i>C Binding: </i>  void PD_free_entry_info(char *type, long *dims)
-<i>F77 Binding: </i> XXX - missing
+<i>Fortran Binding: </i> XXX - missing
 <i>SX Binding: </i> XXX - missing
 <i>Python Binding: </i> XXX - missing
 </pre>
@@ -7211,7 +7211,7 @@ See <a href="#PD_get_entry_info"><tt>PD_get_entry_info</tt></a> for examples.
 <pre>
 <i>C Binding: </i>  defstr *PD_inquire_type(PDBfile *file, char *type)
               defstr *PD_inquire_host_type(PDBfile *file, char *type)
-<i>F77 Binding: </i>integer PFITYP(integer fileid,
+<i>Fortran Binding: </i>integer PFITYP(integer fileid,
                             integer ntype, character type,
                             void size, integer align, integer ind)
 <i>SX Binding: </i> (read-defstr file type)
@@ -7308,7 +7308,7 @@ In the FORTRAN binding output for this function is:
 <p>
 <pre>
 <i>C Binding: </i>  none
-<i>F77 Binding: </i>integer PFIMBR(integer fileid, integer ntype, char *type,
+<i>Fortran Binding: </i>integer PFIMBR(integer fileid, integer ntype, char *type,
                             integer n, integer size, char *space)
 <i>SX Binding: </i> none
 </pre>
@@ -7414,7 +7414,7 @@ its lists of remembered pointers (again on a per file basis).
 <p>
 <pre>
 <i>C Binding: </i>  void PD_get_track_pointers(PDBfile *file)
-<i>F77 Binding: </i>integer PFGTPT(integer fileid)
+<i>Fortran Binding: </i>integer PFGTPT(integer fileid)
 <i>SX Binding: </i> (file-info file "track-pointers")
 <i>Python Binding: </i> XXX - missing
 </pre>
@@ -7484,7 +7484,7 @@ Return the value of the flag.
 <p>
 <pre>
 <i>C Binding: </i>  void PD_set_track_pointers(PDBfile *file, int v)
-<i>F77 Binding: </i>integer PFSTPT(integer fileid, integer v)
+<i>Fortran Binding: </i>integer PFSTPT(integer fileid, integer v)
 <i>SX Binding: </i> (set-track-pointers! file v)
 <i>Python Binding: </i> XXX - missing
 </pre>
@@ -7558,7 +7558,7 @@ In the FORTRAN binding return 1 if successful, 0 otherwise.
 <p>
 <pre>
 <i>C Binding: </i>  int PD_reset_ptr_list(PDBfile *file)
-<i>F77 Binding: </i>integer PFRSPL(integer fileid)
+<i>Fortran Binding: </i>integer PFRSPL(integer fileid)
 <i>SX Binding: </i> (reset-pointer-list! file)
 <i>Python Binding: </i> XXX - missing
 </pre>
@@ -7642,7 +7642,7 @@ and an ASCII string error message can be retrieved through a call to
 <p>
 <pre>
 <i>C Binding: </i>  int PD_free(PDBfile *file, char *type, void *var)
-<i>F77 Binding: </i>integer PFREE(integer fileid,
+<i>Fortran Binding: </i>integer PFREE(integer fileid,
                             integer nchr, character type, void var)
 <i>SX Binding: </i>
 <i>Python Binding: </i>
@@ -7743,7 +7743,7 @@ and an ASCII string error message can be retrieved through a call to
 <p>
 <pre>
 <i>C Binding: </i>  int PD_cd(PDBfile *file, char *dir)
-<i>F77 Binding: </i>integer PFCD(integer fileid,
+<i>Fortran Binding: </i>integer PFCD(integer fileid,
                           integer nchr, char *dir)
 <i>SX Binding: </i> (change-directory file dir)
 <i>Python Binding: </i> file.cd(dir)
@@ -7876,7 +7876,7 @@ See also:
 <pre>
 <i>C Binding: </i>  int PD_ln(PDBfile *file,
                        char *var, char *link)
-<i>F77 Binding: </i>integer PFLN(integer fileid,
+<i>Fortran Binding: </i>integer PFLN(integer fileid,
                           integer nvar, char *var,
                           integer nlink, char *link)
 <i>SX Binding: </i> (create-link file var link)
@@ -7984,7 +7984,7 @@ See also:
 <pre>
 <i>C Binding: </i>  char **PD_ls(PDBfile *file,
                           char *path, char *type, int *num)
-<i>F77 Binding: </i>integer PFLST(integer fileid,
+<i>Fortran Binding: </i>integer PFLST(integer fileid,
                            integer npath, char *path,
                            integer ntype, char *type, integer num)
              integer PFGLS(integer n,
@@ -8177,7 +8177,7 @@ See also:
 <p>
 <pre>
 <i>C Binding: </i>  none
-<i>F77 Binding: </i>integer PFVART(integer fileid,
+<i>Fortran Binding: </i>integer PFVART(integer fileid,
                             integer order, integer nvars)
                   integer PFGVAR(integer n, integer nchar, character name)
                   integer PFDVAR()
@@ -8278,7 +8278,7 @@ c ... release the table now
 <p>
 <pre>
 <i>C Binding: </i>  int PD_mkdir(PDBfile *file, char *dir)
-<i>F77 Binding: </i>integer PFMKDR(integer fileid, integer nchr, char *dir)
+<i>Fortran Binding: </i>integer PFMKDR(integer fileid, integer nchr, char *dir)
 <i>SX Binding: </i> (make-directory file dir flag)
 <i>Python Binding: </i> file.mkdir(dir)
 </pre>
@@ -8383,7 +8383,7 @@ See also:
 <p>
 <pre>
 <i>C Binding: </i>  char *PD_pwd(PDBfile *file)
-<i>F77 Binding: </i>integer PFPWD(integer fileid, integer nchr, char *dir)
+<i>Fortran Binding: </i>integer PFPWD(integer fileid, integer nchr, char *dir)
 <i>SX Binding: </i> (current-directory file)
 <i>Python Binding: </i> file.pwd()
 </pre>
@@ -8497,7 +8497,7 @@ See also:
 <p>
 <pre>
 <i>C Binding: </i>  int PD_isdir(PDBfile *file, char *dir)
-<i>F77 Binding: </i>integer PFISDR(integer fileid, integer nchr, char *dir)
+<i>Fortran Binding: </i>integer PFISDR(integer fileid, integer nchr, char *dir)
 <i>SX Binding: </i> (file-directory? file dir)
 <i>Python Binding: </i> file.isdir(dir)
 </pre>
@@ -8675,7 +8675,7 @@ other participating processes before returning from PDBlib calls to read or writ
 <p>
 <pre>
 <i>C Binding: </i>  int PD_init_threads(int np, void (*tid)(int *))
-<i>F77 Binding: </i>integer PFINTH(integer np, external tid)
+<i>Fortran Binding: </i>integer PFINTH(integer np, external tid)
 <i>SX Binding: </i> none
 <i>Python Binding: </i> none
 </pre>
@@ -8750,7 +8750,7 @@ The return value is <tt>TRUE</tt> if successful; otherwise, <tt>FALSE</tt> is re
 <p>
 <pre>
 <i>C Binding: </i>  int PD_init_mpi(int masterproc, int nthreads, void (*tid)(int *))
-<i>F77 Binding: </i>integer PFINMP(integer masterproc, integer nthreads, external tid)
+<i>Fortran Binding: </i>integer PFINMP(integer masterproc, integer nthreads, external tid)
 </pre>
 <p>
 
@@ -8816,7 +8816,7 @@ The return value is <tt>TRUE</tt> if successful; otherwise, <tt>FALSE</tt> is re
 <p>
 <pre>
 <i>C Binding: </i>  void PD_term_mpi()
-<i>F77 Binding: </i>integer PFTMMP()
+<i>Fortran Binding: </i>integer PFTMMP()
 
 </pre>
 <p>
@@ -8869,7 +8869,7 @@ There is no return value.
 <p>
 <pre>
 <i>C Binding: </i>  PDBfile *PD_mp_open(char *filename, char *mode, MPI_Comm comm)
-<i>F77 Binding: </i>integer PFMPOP(integer nchr, character name, character mode, integer comm)
+<i>Fortran Binding: </i>integer PFMPOP(integer nchr, character name, character mode, integer comm)
 </pre>
 <p>
 
@@ -9009,7 +9009,7 @@ PDBView can do analysis and visualization operations with such data.
 <pre>
 <i>C Binding: </i>  int PD_put_image(PDBfile *file, PD_image *image,
                               int index)
-<i>F77 Binding: </i>integer PFWIMA(integer fileid,
+<i>Fortran Binding: </i>integer PFWIMA(integer fileid,
                             integer nchr, character name,
                             integer pkn, integer pkx,
                             integer pln, integer plx,
@@ -9129,7 +9129,7 @@ For FORTRAN programs an error message may be retrieved by invoking function <tt>
 <pre>
 <i>C Binding: </i>  int PD_put_mapping(PDBfile *file,
                                 PM_mapping *mapping, int index)
-<i>F77 Binding: </i>integer PFWMAP(integer fileid,
+<i>Fortran Binding: </i>integer PFWMAP(integer fileid,
                             character dname, integer dp, real*8 dm,
                             character rname, integer rp, real*8 rm,
                             integer pim)
@@ -9303,7 +9303,7 @@ For FORTRAN programs an error message may be retrieved by invoking function <tt>
 <p>
 <pre>
 <i>C Binding: </i>  none
-<i>F77 Binding: </i>integer PFWRAN(integer fileid,
+<i>Fortran Binding: </i>integer PFWRAN(integer fileid,
                             character dname, integer nchr,
                             character rname, integer rp, real*8 rm,
                             integer pim)
@@ -9455,7 +9455,7 @@ an error message may be retrieved by invoking function <tt>PFGERR</tt>.
 <p>
 <pre>
 <i>C Binding: </i>  int PD_put_set(PDBfile *file, PM_set *set)
-<i>F77 Binding: </i>integer PFWSET(integer fileid,
+<i>Fortran Binding: </i>integer PFWSET(integer fileid,
                             character dname, integer dp, real*8 dm)
 <i>SX Binding: </i> none
 <i>Python Binding: </i> none
@@ -9610,7 +9610,7 @@ For FORTRAN programs an error message may be retrieved by invoking function <tt>
                                      double xmin, double xmax,
                                      double ymin, double ymax,
                                      double zmin, double zmax)
-<i>F77 Binding: </i>none
+<i>Fortran Binding: </i>none
 <i>SX Binding: </i> none
 <i>Python Binding: </i> none
 </pre>
@@ -9665,7 +9665,7 @@ Returns	a pointer to a <tt>PD_image</tt>.
 <p>
 <pre>
 <i>C Binding: </i>  void PD_rel_image(PD_image *image)
-<i>F77 Binding: </i>none
+<i>Fortran Binding: </i>none
 <i>SX Binding: </i> none
 <i>Python Binding: </i> none
 </pre>
@@ -9702,7 +9702,7 @@ Input to this function is:
 <p>
 <pre>
 <i>C Binding: </i>  int PD_autofix_denorm(PDBfile *file, int flag)
-<i>F77 Binding: </i>none
+<i>Fortran Binding: </i>none
 <i>SX Binding: </i> none
 <i>Python Binding: </i> none
 </pre>
@@ -9747,7 +9747,7 @@ File example:
 <p>
 <pre>
 <i>C Binding: </i>  int PD_activate_cksum(PDBfile *file, int flag)
-<i>F77 Binding: </i>integer PFSCSM(integer fileid, int flag)
+<i>Fortran Binding: </i>integer PFSCSM(integer fileid, int flag)
 <i>SX Binding: </i> (set-activate-checksum! file flag)
 <i>Python Binding: </i> XXX - missing
 </pre>
@@ -9864,7 +9864,7 @@ Variable example:
 <p>
 <pre>
 <i>C Binding: </i>  int PD_verify(PDBfile *file)
-<i>F77 Binding: </i>none
+<i>Fortran Binding: </i>none
 <i>SX Binding: </i> none
 <i>Python Binding: </i> none
 </pre>

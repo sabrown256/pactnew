@@ -51,10 +51,8 @@ static long _SC_count_tagged(int flag)
 		     if (name == NULL)
 		        nbt += nb;
 		     else
-		        {if (FTN_NAME(desc))
-			    {name = SC_F77_C_STRING(name);
-			     nc   = strlen(name);
-
+		        {if (FF_NAME(desc))
+			    {nc = strlen(name);
 			     ps = strchr(name, ' ');
 			     if (ps != NULL)
 			        {nf = ps - name;

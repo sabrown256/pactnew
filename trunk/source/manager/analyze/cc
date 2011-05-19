@@ -237,14 +237,14 @@ if ($Cfg_CC_Exe != "") then
 #include <stdio.h>
 int main(int c, char **v)
 {if (sizeof(int) != sizeof(char *))
-    printf("F77_INT_SIZE_PTR_DIFFER");
+    printf("FF_INT_SIZE_PTR_DIFFER");
  return(0);}
 EOF
 
    flog $ALog cat $Tmp.c
    flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
    if ($status == 0) then
-      set F77IntPtrDiffer = `$CFE ./$Tmp $BE`
+      set FFIntPtrDiffer = `$CFE ./$Tmp $BE`
    else
       NoteD $ALog " "
       NoteD $ALog " "
@@ -257,7 +257,7 @@ EOF
    endif
    Note $ALog ""
 
-   if ("$F77IntPtrDiffer" != "") then
+   if ("$FFIntPtrDiffer" != "") then
       NoteD $ALog "      pointer size differs from Fortran INTEGER size"
    endif
 
@@ -378,7 +378,7 @@ EOF
    Note $ALog "   AnsiCC          = |$AnsiCC|"
    Note $ALog "   CC_Exe          = |$CC_Exe|"
    Note $ALog "   Cfg_CC_Exe      = |$Cfg_CC_Exe|"
-   Note $ALog "   F77IntPtrDiffer = |$F77IntPtrDiffer|"
+   Note $ALog "   FFIntPtrDiffer  = |$FFIntPtrDiffer|"
    Note $ALog "   LONG64          = |$LONG64|"
    Note $ALog ""
 
@@ -414,7 +414,7 @@ SetParent Cfe_CC_Inc
 SetParent Save_CC
 SetParent Save_CFLAGS
 SetParent LONG64
-SetParent F77IntPtrDiffer
+SetParent FFIntPtrDiffer
 SetParent NEED_ALT_LARGE_FILE
 
 #--------------------------------------------------------------------------

@@ -186,7 +186,7 @@ int PD_target(data_standard *data, data_alignment *align)
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(pftrgt, PFTRGT)(FIXNUM *pis, FIXNUM *pia)
+FIXNUM FF_ID(pftrgt, PFTRGT)(FIXNUM *pis, FIXNUM *pia)
    {int al, st;
     FIXNUM rv;
     PD_smp_state *pa;
@@ -216,7 +216,7 @@ FIXNUM F77_FUNC(pftrgt, PFTRGT)(FIXNUM *pis, FIXNUM *pia)
  *          return a structure chart
  */
 
-FIXNUM F77_FUNC(pfntgt, PFNTGT)(FIXNUM *pis, FIXNUM *pia)
+FIXNUM FF_ID(pfntgt, PFNTGT)(FIXNUM *pis, FIXNUM *pia)
    {int al, st, ret;
     FIXNUM rv;
     hasharr *chart;

@@ -684,7 +684,7 @@ void PG_set_vec_attr(PG_device *dev, ...)
  *        - (see the documentation for PD_SET_VEC_ATTR)
  */
 
-void F77_FUNC(pgsvat, PGSVAT)(FIXNUM *devid, ...)
+void FF_ID(pgsvat, PGSVAT)(FIXNUM *devid, ...)
    {int type, itemp;
     double diffvp, diffwd, temp;
     double wc[PG_BOXSZ];
@@ -816,7 +816,7 @@ void PG_vector_plot(PG_device *dev, PG_graph *data, ...)
 
 /* PGPLVC - low level vector plot routine */
 
-FIXNUM F77_FUNC(pgplvc, PGPLVC)(FIXNUM *devid,
+FIXNUM FF_ID(pgplvc, PGPLVC)(FIXNUM *devid,
                                 double *px, double *py, double *pu, double *pv,
                                 FIXNUM *pn, FIXNUM *pal)
    {FIXNUM rv;

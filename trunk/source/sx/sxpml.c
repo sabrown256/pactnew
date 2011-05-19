@@ -2155,11 +2155,11 @@ void SX_install_pml_funcs(SS_psides *si)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SXDTAC - F77 interface to SX_rep_to_ac */
+/* SXDTAC - Fortran interface to SX_rep_to_ac */
 
-FIXNUM F77_FUNC(sxdtac, SXDTAC)(FIXNUM *pnc, char *pname,
-                                double *rx, double *ry,
-                                FIXNUM *pnn, FIXNUM *pnz, FIXNUM *pzones)
+FIXNUM FF_ID(sxdtac, SXDTAC)(FIXNUM *pnc, char *pname,
+			     double *rx, double *ry,
+			     FIXNUM *pnn, FIXNUM *pnz, FIXNUM *pzones)
    {int n_nodes, n_zones;
     FIXNUM rv;
     char name[MAXLINE];

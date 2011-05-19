@@ -11,7 +11,7 @@
 #include "score.h"
 
 extern int
- F77_FUNC(f77lxr, F77LXR)(void);
+ FF_ID(f77lxr, F77LXR)(void);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -33,7 +33,7 @@ int main(int c, char **v)
        name = NULL;
 
     str = SC_open_lexical_stream(name, 0, 0,
-				 F77_FUNC(f77lxr, F77LXR),
+				 FF_ID(f77lxr, F77LXR),
 				 NULL, NULL, NULL, NULL, NULL, NULL);
 
     t = str->out_bf;

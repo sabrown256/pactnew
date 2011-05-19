@@ -532,7 +532,7 @@ void SC_do_tasks_f(PFInt fnc, void **pa, int *pnt, int *poff, int *pon)
 
 /*--------------------------------------------------------------------------*/
 
-FIXNUM F77_FUNC(scinth, SCINTH)(FIXNUM *pnt, PFTid tid)
+FIXNUM FF_ID(scinth, SCINTH)(FIXNUM *pnt, PFTid tid)
    {int nt;
     FIXNUM rv;
 

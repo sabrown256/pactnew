@@ -11,7 +11,7 @@
 #include "pdb_int.h"
 
 
-#ifndef F77_INT_SIZE_PTR_DIFFER
+#ifndef FF_INT_SIZE_PTR_DIFFER
 
 # define _PD_append_aux(file, name, type, space, nd, dims)                   \
     ((FIXNUM) PD_append_as_alt(file, name, type, space, nd, (long *) dims))
@@ -23,7 +23,7 @@
 
 /*--------------------------------------------------------------------------*/
 
-#ifdef F77_INT_SIZE_PTR_DIFFER
+#ifdef FF_INT_SIZE_PTR_DIFFER
 
 /*--------------------------------------------------------------------------*/
 
@@ -188,13 +188,13 @@ FIXNUM _PD_write_aux(PDBfile *file, char *name, char *typi, char *typo,
 
 /* PFGERR - FORTRAN interface routine to fetch PD_ERR */
 
-FIXNUM F77_FUNC(pfgerr, PFGERR)(FIXNUM *nchr, char *err)
+FIXNUM FF_ID(pfgerr, PFGERR)(FIXNUM *nchr, char *err)
    {FIXNUM rv;
     PD_smp_state *pa;
 
     pa = _PD_get_state(-1);
 
-    SC_strncpy(SC_F77_C_STRING(err), *nchr, pa->err, MAXLINE);
+    SC_strncpy(err, *nchr, pa->err, MAXLINE);
 
     *nchr = strlen(pa->err);
 
@@ -207,7 +207,7 @@ FIXNUM F77_FUNC(pfgerr, PFGERR)(FIXNUM *nchr, char *err)
 
 /* PFGFNM - FORTRAN interface routine to fetch the name of the file */
 
-FIXNUM F77_FUNC(pfgfnm, PFGFNM)(FIXNUM *fileid, FIXNUM *pnc, char *name)
+FIXNUM FF_ID(pfgfnm, PFGFNM)(FIXNUM *fileid, FIXNUM *pnc, char *name)
    {PDBfile *file;
     int nc, lc;
     FIXNUM rv;
@@ -221,7 +221,7 @@ FIXNUM F77_FUNC(pfgfnm, PFGFNM)(FIXNUM *fileid, FIXNUM *pnc, char *name)
        *pnc = lc;
 
     if (nc >= lc)
-       {strncpy(SC_F77_C_STRING(name), file->name, nc);
+       {strncpy(name, file->name, nc);
         rv = TRUE;}
     else
        {PD_error("BUFFER TOO SMALL TO HOLD FILE NAME - PFGFNM", PD_GENERIC);
@@ -234,7 +234,7 @@ FIXNUM F77_FUNC(pfgfnm, PFGFNM)(FIXNUM *fileid, FIXNUM *pnc, char *name)
 
 /* PFGFDT - FORTRAN interface routine to fetch the file creation date */
 
-FIXNUM F77_FUNC(pfgfdt, PFGFDT)(FIXNUM *fileid, FIXNUM *pnc, char *date)
+FIXNUM FF_ID(pfgfdt, PFGFDT)(FIXNUM *fileid, FIXNUM *pnc, char *date)
    {PDBfile *file;
     int nc, lc;
     FIXNUM rv;
@@ -248,7 +248,7 @@ FIXNUM F77_FUNC(pfgfdt, PFGFDT)(FIXNUM *fileid, FIXNUM *pnc, char *date)
        *pnc = lc;
 
     if (nc >= lc)
-       {SC_strncpy(SC_F77_C_STRING(date), *pnc, file->date, nc);
+       {SC_strncpy(date, *pnc, file->date, nc);
         rv = TRUE;}
     else
        {PD_error("BUFFER TOO SMALL TO HOLD FILE DATE - PFGFDT", PD_GENERIC);
@@ -261,7 +261,7 @@ FIXNUM F77_FUNC(pfgfdt, PFGFDT)(FIXNUM *fileid, FIXNUM *pnc, char *date)
 
 /* PFGCSM - FORTRAN interface routine to fetch file->use_cksum */
 
-FIXNUM F77_FUNC(pfgcsm, PFGCSM)(FIXNUM *fileid, FIXNUM *v)
+FIXNUM FF_ID(pfgcsm, PFGCSM)(FIXNUM *fileid, FIXNUM *v)
    {FIXNUM rv;
     PDBfile *file;
 
@@ -276,7 +276,7 @@ FIXNUM F77_FUNC(pfgcsm, PFGCSM)(FIXNUM *fileid, FIXNUM *v)
 
 /* PFSCSM - FORTRAN interface routine to set file->use_cksum */
 
-FIXNUM F77_FUNC(pfscsm, PFSCSM)(FIXNUM *fileid, FIXNUM *pv)
+FIXNUM FF_ID(pfscsm, PFSCSM)(FIXNUM *fileid, FIXNUM *pv)
    {FIXNUM rv;
     PD_checksum_mode v;
     PDBfile *file;
@@ -294,7 +294,7 @@ FIXNUM F77_FUNC(pfscsm, PFSCSM)(FIXNUM *fileid, FIXNUM *pv)
 
 /* PFGTPT - FORTRAN interface routine to fetch file->track_pointers */
 
-FIXNUM F77_FUNC(pfgtpt, PFGTPT)(FIXNUM *fileid, FIXNUM *v)
+FIXNUM FF_ID(pfgtpt, PFGTPT)(FIXNUM *fileid, FIXNUM *v)
    {FIXNUM rv;
     PDBfile *file;
 
@@ -309,7 +309,7 @@ FIXNUM F77_FUNC(pfgtpt, PFGTPT)(FIXNUM *fileid, FIXNUM *v)
 
 /* PFSTPT - FORTRAN interface routine to set file->track_pointers */
 
-FIXNUM F77_FUNC(pfstpt, PFSTPT)(FIXNUM *fileid, FIXNUM *v)
+FIXNUM FF_ID(pfstpt, PFSTPT)(FIXNUM *fileid, FIXNUM *v)
    {FIXNUM rv;
     PDBfile *file;
 
@@ -325,7 +325,7 @@ FIXNUM F77_FUNC(pfstpt, PFSTPT)(FIXNUM *fileid, FIXNUM *v)
 
 /* PFGBFS - FORTRAN interface routine to fetch PD_buffer_size */
 
-FIXNUM F77_FUNC(pfgbfs, PFGBFS)(void)
+FIXNUM FF_ID(pfgbfs, PFGBFS)(void)
    {FIXNUM rv;
     PD_smp_state *pa;
 
@@ -344,7 +344,7 @@ FIXNUM F77_FUNC(pfgbfs, PFGBFS)(void)
 
 /* PFSBFS - FORTRAN interface routine to set PD_buffer_size */
 
-FIXNUM F77_FUNC(pfsbfs, PFSBFS)(FIXNUM *psz)
+FIXNUM FF_ID(pfsbfs, PFSBFS)(FIXNUM *psz)
    {FIXNUM rv;
     int64_t sz;
     PD_smp_state *pa;
@@ -364,7 +364,7 @@ FIXNUM F77_FUNC(pfsbfs, PFSBFS)(FIXNUM *psz)
 
 /* PFGFMV - FORTRAN interface routine to fetch PD_default_format_version */
 
-FIXNUM F77_FUNC(pfgfmv, PFGFMV)(FIXNUM *v)
+FIXNUM FF_ID(pfgfmv, PFGFMV)(FIXNUM *v)
    {FIXNUM rv;
 
     PD_get_format_version(*v);
@@ -378,7 +378,7 @@ FIXNUM F77_FUNC(pfgfmv, PFGFMV)(FIXNUM *v)
 
 /* PFSFMV - FORTRAN interface routine to set PD_default_format_version */
 
-FIXNUM F77_FUNC(pfsfmv, PFSFMV)(FIXNUM *v)
+FIXNUM FF_ID(pfsfmv, PFSFMV)(FIXNUM *v)
    {FIXNUM rv;
 
     PD_set_format_version(*v);
@@ -394,7 +394,7 @@ FIXNUM F77_FUNC(pfsfmv, PFSFMV)(FIXNUM *v)
  *        - file's default_offset
  */
 
-FIXNUM F77_FUNC(pfgoff, PFGOFF)(FIXNUM *fileid)
+FIXNUM FF_ID(pfgoff, PFGOFF)(FIXNUM *fileid)
    {FIXNUM rv;
     PDBfile *file;
 
@@ -411,7 +411,7 @@ FIXNUM F77_FUNC(pfgoff, PFGOFF)(FIXNUM *fileid)
  *        - file's default_offset
  */
 
-FIXNUM F77_FUNC(pfsoff, PFSOFF)(FIXNUM *fileid, FIXNUM *v)
+FIXNUM FF_ID(pfsoff, PFSOFF)(FIXNUM *fileid, FIXNUM *v)
    {FIXNUM rv;
     PDBfile *file;
 
@@ -429,7 +429,7 @@ FIXNUM F77_FUNC(pfsoff, PFSOFF)(FIXNUM *fileid, FIXNUM *v)
  *        - file's maximum size
  */
 
-FIXNUM F77_FUNC(pfgmxs, PFGMXS)(FIXNUM *fileid)
+FIXNUM FF_ID(pfgmxs, PFGMXS)(FIXNUM *fileid)
    {FIXNUM rv;
     PDBfile *file;
 
@@ -446,7 +446,7 @@ FIXNUM F77_FUNC(pfgmxs, PFGMXS)(FIXNUM *fileid)
  *        - file's maximum size
  */
 
-FIXNUM F77_FUNC(pfsmxs, PFSMXS)(FIXNUM *fileid, FIXNUM *v)
+FIXNUM FF_ID(pfsmxs, PFSMXS)(FIXNUM *fileid, FIXNUM *v)
    {FIXNUM rv;
     PDBfile *file;
 
@@ -464,7 +464,7 @@ FIXNUM F77_FUNC(pfsmxs, PFSMXS)(FIXNUM *fileid, FIXNUM *v)
  *        - file's mode
  */
 
-FIXNUM F77_FUNC(pfgmod, PFGMOD)(FIXNUM *fileid)
+FIXNUM FF_ID(pfgmod, PFGMOD)(FIXNUM *fileid)
    {FIXNUM rv;
     PDBfile *file;
 
@@ -481,7 +481,7 @@ FIXNUM F77_FUNC(pfgmod, PFGMOD)(FIXNUM *fileid)
  * 
  */
 
-FIXNUM F77_FUNC(pfinth, PFINTH)(FIXNUM *pnthreads, PFTid tid)
+FIXNUM FF_ID(pfinth, PFINTH)(FIXNUM *pnthreads, PFTid tid)
    {int numthreads;
     PFTid threadid;
     
@@ -504,7 +504,7 @@ FIXNUM F77_FUNC(pfinth, PFINTH)(FIXNUM *pnthreads, PFTid tid)
  *        - returns 1 if successful and 0 otherwise
  */
 
-FIXNUM F77_FUNC(pfvart, PFVART)(FIXNUM *fileid, FIXNUM *pord, FIXNUM *n)
+FIXNUM FF_ID(pfvart, PFVART)(FIXNUM *fileid, FIXNUM *pord, FIXNUM *n)
    {int entries;
     int (*fun)(haelem **v, int n);
     FIXNUM rv;
@@ -543,7 +543,7 @@ FIXNUM F77_FUNC(pfvart, PFVART)(FIXNUM *fileid, FIXNUM *pord, FIXNUM *n)
  *        - call to PFVART.
  */
 
-FIXNUM F77_FUNC(pfdvar, PFDVAR)(void)
+FIXNUM FF_ID(pfdvar, PFDVAR)(void)
    {
 
     SC_free_hash_dump();
@@ -557,7 +557,7 @@ FIXNUM F77_FUNC(pfdvar, PFDVAR)(void)
  *        - by a call to PFVART. return 1 if successful and 0 otherwise.
  */
 
-FIXNUM F77_FUNC(pfgvar, PFGVAR)(FIXNUM *pn, FIXNUM *pnchr, char *pname)
+FIXNUM FF_ID(pfgvar, PFGVAR)(FIXNUM *pn, FIXNUM *pnchr, char *pname)
    {int n;
     FIXNUM rv;
     char *s;
@@ -569,7 +569,7 @@ FIXNUM F77_FUNC(pfgvar, PFGVAR)(FIXNUM *pn, FIXNUM *pnchr, char *pname)
 	rv = FALSE;}
 
     else
-       {strcpy(SC_F77_C_STRING(pname), s);
+       {strcpy(pname, s);
         *pnchr = strlen(s);
         rv = TRUE;};
 
@@ -584,7 +584,7 @@ FIXNUM F77_FUNC(pfgvar, PFGVAR)(FIXNUM *pn, FIXNUM *pnchr, char *pname)
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(pfivar, PFIVAR)(FIXNUM *fileid, FIXNUM *pnchr,
+FIXNUM FF_ID(pfivar, PFIVAR)(FIXNUM *fileid, FIXNUM *pnchr,
 				char *name, FIXNUM *pntyp,
 				char *type,
 				FIXNUM *psize, FIXNUM *pndims, FIXNUM *dims)
@@ -597,7 +597,7 @@ FIXNUM F77_FUNC(pfivar, PFIVAR)(FIXNUM *fileid, FIXNUM *pnchr,
 
     SC_FORTRAN_STR_C(s, name, *pnchr);
 
-    ltype = SC_F77_C_STRING(type);
+    ltype = type;
 
     file = SC_GET_POINTER(PDBfile, *fileid);
 
@@ -634,7 +634,7 @@ FIXNUM F77_FUNC(pfivar, PFIVAR)(FIXNUM *fileid, FIXNUM *pnchr,
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(pfctyp, PFCTYP)(FIXNUM *sfid, FIXNUM *dfid, FIXNUM *pntyp,
+FIXNUM FF_ID(pfctyp, PFCTYP)(FIXNUM *sfid, FIXNUM *dfid, FIXNUM *pntyp,
 			     char *type)
    {FIXNUM rv;
     char s[MAXLINE];
@@ -678,7 +678,7 @@ FIXNUM F77_FUNC(pfctyp, PFCTYP)(FIXNUM *sfid, FIXNUM *dfid, FIXNUM *pntyp,
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(pfityp, PFITYP)(FIXNUM *fileid, FIXNUM *pntyp,
+FIXNUM FF_ID(pfityp, PFITYP)(FIXNUM *fileid, FIXNUM *pntyp,
 				char *type,
 				FIXNUM *psize, FIXNUM *palgn, FIXNUM *pind)
    {FIXNUM rv;
@@ -716,7 +716,7 @@ FIXNUM F77_FUNC(pfityp, PFITYP)(FIXNUM *fileid, FIXNUM *pntyp,
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(pfimbr, PFIMBR)(FIXNUM *fileid, FIXNUM *pntyp,
+FIXNUM FF_ID(pfimbr, PFIMBR)(FIXNUM *fileid, FIXNUM *pntyp,
 				char *type,
 				FIXNUM *pn, FIXNUM *psize,
 				char *space)
@@ -756,7 +756,7 @@ FIXNUM F77_FUNC(pfimbr, PFIMBR)(FIXNUM *fileid, FIXNUM *pntyp,
 	       *psize = nc;
 
 	    if (sz >= nc)
-	       strncpy(SC_F77_C_STRING(space), ps, sz);
+	       strncpy(space, ps, sz);
 	    else
 	       {PD_error("BUFFER TOO SMALL TO HOLD DESCRIPTION - PFIMBR",
 			 PD_GENERIC);
@@ -777,7 +777,7 @@ FIXNUM F77_FUNC(pfimbr, PFIMBR)(FIXNUM *fileid, FIXNUM *pntyp,
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(pfqmbr, PFQMBR)(FIXNUM *fileid, FIXNUM *pntyp,
+FIXNUM FF_ID(pfqmbr, PFQMBR)(FIXNUM *fileid, FIXNUM *pntyp,
 			     char *type,
 			     FIXNUM *pn, FIXNUM *pname,
 			     char *name,
@@ -822,7 +822,7 @@ FIXNUM F77_FUNC(pfqmbr, PFQMBR)(FIXNUM *fileid, FIXNUM *pntyp,
 	   *pname = nc;
 
         if (sz >= nc)
-           SC_strncpy(SC_F77_C_STRING(name), *pn, ps, sz);
+           SC_strncpy(name, *pn, ps, sz);
         else
            {err = (FIXNUM) TRUE;
             SC_strcat(errmsg, MAXLINE, "NAME BUFFER TOO SMALL TO HOLD NAME\n");};
@@ -835,7 +835,7 @@ FIXNUM F77_FUNC(pfqmbr, PFQMBR)(FIXNUM *fileid, FIXNUM *pntyp,
 	   *pntout = nc;
 
         if (sz >= nc)
-           SC_strncpy(SC_F77_C_STRING(tout), *pntout, ps, sz);
+           SC_strncpy(tout, *pntout, ps, sz);
         else
            {err = (FIXNUM) TRUE;
             SC_strcat(errmsg, MAXLINE, "TYPE BUFFER TOO SMALL TO HOLD TYPE\n");};
@@ -878,7 +878,7 @@ FIXNUM F77_FUNC(pfqmbr, PFQMBR)(FIXNUM *fileid, FIXNUM *pntyp,
  *        - given by TYPE (PDBLib will allocated space if necessary)!
  */
 
-FIXNUM F77_FUNC(pfread, PFREAD)(FIXNUM *fileid, FIXNUM *pnchr,
+FIXNUM FF_ID(pfread, PFREAD)(FIXNUM *fileid, FIXNUM *pnchr,
 				char *name, void *space)
    {FIXNUM rv;
     char s[MAXLINE];
@@ -905,7 +905,7 @@ FIXNUM F77_FUNC(pfread, PFREAD)(FIXNUM *fileid, FIXNUM *pnchr,
  *        - given by TYPE (PDBLib will allocated space if necessary)!
  */
 
-FIXNUM F77_FUNC(pfrdas, PFRDAS)(FIXNUM *fileid, FIXNUM *pnchr,
+FIXNUM FF_ID(pfrdas, PFRDAS)(FIXNUM *fileid, FIXNUM *pnchr,
 				char *name,
 				FIXNUM *pntyp, char *type,
 				void *space)
@@ -927,7 +927,7 @@ FIXNUM F77_FUNC(pfrdas, PFRDAS)(FIXNUM *fileid, FIXNUM *pnchr,
 
 /* PFRDAI - FORTRAN interface to PD_read_as_dwim */
 
-FIXNUM F77_FUNC(pfrdai, PFRDAI)(FIXNUM *fileid, FIXNUM *pnchr,
+FIXNUM FF_ID(pfrdai, PFRDAI)(FIXNUM *fileid, FIXNUM *pnchr,
 			     char *name,
 			     FIXNUM *pntyp, char *type,
 			     FIXNUM *pni, void *space)
@@ -958,7 +958,7 @@ FIXNUM F77_FUNC(pfrdai, PFRDAI)(FIXNUM *fileid, FIXNUM *pnchr,
  *        - given by TYPE (differs from the conventional PDB rule)
  */
 
-FIXNUM F77_FUNC(pfrptr, PFRPTR)(FIXNUM *fileid, FIXNUM *pnchr,
+FIXNUM FF_ID(pfrptr, PFRPTR)(FIXNUM *fileid, FIXNUM *pnchr,
 				char *name,
 				FIXNUM *pni, void *space)
    {FIXNUM rv;
@@ -1035,7 +1035,7 @@ FIXNUM F77_FUNC(pfrptr, PFRPTR)(FIXNUM *fileid, FIXNUM *pnchr,
  *        - space if necessary)!
  */
 
-FIXNUM F77_FUNC(pfptrd, PFPTRD)(FIXNUM *fileid, FIXNUM *pnchr,
+FIXNUM FF_ID(pfptrd, PFPTRD)(FIXNUM *fileid, FIXNUM *pnchr,
 				char *name, void *space,
 				FIXNUM *ind)
    {FIXNUM rv;
@@ -1067,7 +1067,7 @@ FIXNUM F77_FUNC(pfptrd, PFPTRD)(FIXNUM *fileid, FIXNUM *pnchr,
  *        - space if necessary)!
  */
 
-FIXNUM F77_FUNC(pfrdad, PFRDAD)(FIXNUM *fileid, FIXNUM *pnchr,
+FIXNUM FF_ID(pfrdad, PFRDAD)(FIXNUM *fileid, FIXNUM *pnchr,
 				char *name,
 				FIXNUM *pntyp, char *type,
 				void *space, FIXNUM *ind)
@@ -1094,7 +1094,7 @@ FIXNUM F77_FUNC(pfrdad, PFRDAD)(FIXNUM *fileid, FIXNUM *pnchr,
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(pfappa, PFAPPA)(FIXNUM *fileid, FIXNUM *pnchr,
+FIXNUM FF_ID(pfappa, PFAPPA)(FIXNUM *fileid, FIXNUM *pnchr,
 				char *name, void *space)
    {FIXNUM rv;
     char s[MAXLINE];
@@ -1119,7 +1119,7 @@ FIXNUM F77_FUNC(pfappa, PFAPPA)(FIXNUM *fileid, FIXNUM *pnchr,
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(pfapas, PFAPAS)(FIXNUM *fileid, FIXNUM *pnchr,
+FIXNUM FF_ID(pfapas, PFAPAS)(FIXNUM *fileid, FIXNUM *pnchr,
 				char *name, FIXNUM *pntyp,
 				char *intype, void *space)
    {FIXNUM rv;
@@ -1143,7 +1143,7 @@ FIXNUM F77_FUNC(pfapas, PFAPAS)(FIXNUM *fileid, FIXNUM *pnchr,
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(pfappd, PFAPPD)(FIXNUM *fileid, FIXNUM *pnchr,
+FIXNUM FF_ID(pfappd, PFAPPD)(FIXNUM *fileid, FIXNUM *pnchr,
 				char *name, void *space,
 				FIXNUM *pndims, FIXNUM *dims)
    {FIXNUM rv;
@@ -1167,7 +1167,7 @@ FIXNUM F77_FUNC(pfappd, PFAPPD)(FIXNUM *fileid, FIXNUM *pnchr,
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(pfapad, PFAPAD)(FIXNUM *fileid, FIXNUM *pnchr,
+FIXNUM FF_ID(pfapad, PFAPAD)(FIXNUM *fileid, FIXNUM *pnchr,
 				char *name, FIXNUM *pntyp,
 				char *intype, void *space,
 				FIXNUM *pndims, FIXNUM *dims)
@@ -1194,7 +1194,7 @@ FIXNUM F77_FUNC(pfapad, PFAPAD)(FIXNUM *fileid, FIXNUM *pnchr,
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(pfwrta, PFWRTA)(FIXNUM *fileid, FIXNUM *pnchr,
+FIXNUM FF_ID(pfwrta, PFWRTA)(FIXNUM *fileid, FIXNUM *pnchr,
 				char *name, FIXNUM *pntyp,
 				char *type, void *space)
    {FIXNUM rv;
@@ -1220,7 +1220,7 @@ FIXNUM F77_FUNC(pfwrta, PFWRTA)(FIXNUM *fileid, FIXNUM *pnchr,
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(pfwras, PFWRAS)(FIXNUM *fileid, FIXNUM *pnchr,
+FIXNUM FF_ID(pfwras, PFWRAS)(FIXNUM *fileid, FIXNUM *pnchr,
 				char *name, FIXNUM *pintyp,
 				char *intype, FIXNUM *poutyp, 
 				char *outtype, void *space)
@@ -1246,7 +1246,7 @@ FIXNUM F77_FUNC(pfwras, PFWRAS)(FIXNUM *fileid, FIXNUM *pnchr,
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(pfwrtd, PFWRTD)(FIXNUM *fileid, FIXNUM *pnchr,
+FIXNUM FF_ID(pfwrtd, PFWRTD)(FIXNUM *fileid, FIXNUM *pnchr,
 				char *name, FIXNUM *pntyp,
 				char *type, void *space,
 				FIXNUM *pndims, FIXNUM *dims)
@@ -1271,7 +1271,7 @@ FIXNUM F77_FUNC(pfwrtd, PFWRTD)(FIXNUM *fileid, FIXNUM *pnchr,
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(pfwrad, PFWRAD)(FIXNUM *fileid, FIXNUM *pnchr,
+FIXNUM FF_ID(pfwrad, PFWRAD)(FIXNUM *fileid, FIXNUM *pnchr,
 				char *name, FIXNUM *pintyp,
 				char *intype, FIXNUM *poutyp, 
 				char *outtype, void *space,
@@ -1298,7 +1298,7 @@ FIXNUM F77_FUNC(pfwrad, PFWRAD)(FIXNUM *fileid, FIXNUM *pnchr,
  *        - return TRUE if successful, FALSE otherwise
  */
 
-FIXNUM F77_FUNC(pfdefa, PFDEFA)(FIXNUM *fileid, FIXNUM *pnchr,
+FIXNUM FF_ID(pfdefa, PFDEFA)(FIXNUM *fileid, FIXNUM *pnchr,
 				char *name, FIXNUM *pntyp,
 				char *type)
    {FIXNUM rv;
@@ -1324,7 +1324,7 @@ FIXNUM F77_FUNC(pfdefa, PFDEFA)(FIXNUM *fileid, FIXNUM *pnchr,
  *        - return TRUE if successful, FALSE otherwise
  */
 
-FIXNUM F77_FUNC(pfdefd, PFDEFD)(FIXNUM *fileid, FIXNUM *pnchr,
+FIXNUM FF_ID(pfdefd, PFDEFD)(FIXNUM *fileid, FIXNUM *pnchr,
 				char *name, FIXNUM *pntyp,
 				char *type, FIXNUM *pndims, FIXNUM *dims)
    {FIXNUM rv;
@@ -1347,7 +1347,7 @@ FIXNUM F77_FUNC(pfdefd, PFDEFD)(FIXNUM *fileid, FIXNUM *pnchr,
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(pfdefs, PFDEFS)(FIXNUM *fileid,
+FIXNUM FF_ID(pfdefs, PFDEFS)(FIXNUM *fileid,
 				FIXNUM *pnchr, char *name, ...)
    {FIXNUM n, rv;
     FIXNUM *pn;
@@ -1410,7 +1410,7 @@ FIXNUM F77_FUNC(pfdefs, PFDEFS)(FIXNUM *fileid,
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(pfdeft, PFDEFT)(FIXNUM *fileid, FIXNUM *pnchr, char *name,
+FIXNUM FF_ID(pfdeft, PFDEFT)(FIXNUM *fileid, FIXNUM *pnchr, char *name,
 				FIXNUM *pnm, FIXNUM *nc, char *nm)
    {int i, n, indx, mc;
     FIXNUM rv;
@@ -1419,7 +1419,7 @@ FIXNUM F77_FUNC(pfdeft, PFDEFT)(FIXNUM *fileid, FIXNUM *pnchr, char *name,
     PDBfile *file;
 
     file = SC_GET_POINTER(PDBfile, *fileid);
-    lnm  = SC_F77_C_STRING(nm);
+    lnm  = nm;
 
     SC_FORTRAN_STR_C(lname, name, *pnchr);
 
@@ -1452,7 +1452,7 @@ FIXNUM F77_FUNC(pfdeft, PFDEFT)(FIXNUM *fileid, FIXNUM *pnchr, char *name,
  *        - given by TYPE (PDBLib will allocated space if necessary)!
  */
 
-FIXNUM F77_FUNC(pffree, PFFREE)(FIXNUM *fileid, FIXNUM *pnchr,
+FIXNUM FF_ID(pffree, PFFREE)(FIXNUM *fileid, FIXNUM *pnchr,
 				char *type, void *space)
    {FIXNUM rv;
     PDBfile *file;
@@ -1475,7 +1475,7 @@ FIXNUM F77_FUNC(pffree, PFFREE)(FIXNUM *fileid, FIXNUM *pnchr,
  *        - return 0 otherwise
  */
 
-FIXNUM F77_FUNC(pfopen, PFOPEN)(FIXNUM *pnchr, char *name,
+FIXNUM FF_ID(pfopen, PFOPEN)(FIXNUM *pnchr, char *name,
 				char *mode)
    {FIXNUM rv;
     char s[MAXLINE], t[2];
@@ -1503,7 +1503,7 @@ FIXNUM F77_FUNC(pfopen, PFOPEN)(FIXNUM *pnchr, char *name,
  *        - return TRUE if successful and FALSE otherwise
  */
 
-FIXNUM F77_FUNC(pfclos, PFCLOS)(FIXNUM *fileid)
+FIXNUM FF_ID(pfclos, PFCLOS)(FIXNUM *fileid)
    {FIXNUM rv;
     PDBfile *file;
 
@@ -1520,7 +1520,7 @@ FIXNUM F77_FUNC(pfclos, PFCLOS)(FIXNUM *fileid)
 
 /* PFWULC - write an ULTRA curve into a PDB file */
 
-FIXNUM F77_FUNC(pfwulc, PFWULC)(FIXNUM *fileid, FIXNUM *pnchr,
+FIXNUM FF_ID(pfwulc, PFWULC)(FIXNUM *fileid, FIXNUM *pnchr,
 				char *labl, FIXNUM *pnpts,
 				double *px, double *py, FIXNUM *pic)
    {int i, n, rv;
@@ -1546,7 +1546,7 @@ FIXNUM F77_FUNC(pfwulc, PFWULC)(FIXNUM *fileid, FIXNUM *pnchr,
 
 /* PFWULY - write the y values for an ULTRA curve into a PDB file */
 
-FIXNUM F77_FUNC(pfwuly, PFWULY)(FIXNUM *fileid, FIXNUM *pnchr,
+FIXNUM FF_ID(pfwuly, PFWULY)(FIXNUM *fileid, FIXNUM *pnchr,
 				char *labl, FIXNUM *pnpts, FIXNUM *pix,
 				double *py, FIXNUM *pic)
    {int i, n, rv;
@@ -1630,7 +1630,7 @@ static PM_set *_PD_build_set(FIXNUM *si, double *sd, char *sname)
  *        -                                elements
  */
 
-FIXNUM F77_FUNC(pfwmap, PFWMAP)(FIXNUM *fileid, char *dname,
+FIXNUM FF_ID(pfwmap, PFWMAP)(FIXNUM *fileid, char *dname,
 				FIXNUM *dp, double *dm, char *rname,
 				FIXNUM *rp, double *rm, FIXNUM *pim)
    {FIXNUM rv;
@@ -1673,7 +1673,7 @@ FIXNUM F77_FUNC(pfwmap, PFWMAP)(FIXNUM *fileid, char *dname,
 
 /* PFWIMA - write a PG_image into a PDB file */
 
-FIXNUM F77_FUNC(pfwima, PFWIMA)(FIXNUM *fileid, FIXNUM *nchr, char *name,
+FIXNUM FF_ID(pfwima, PFWIMA)(FIXNUM *fileid, FIXNUM *nchr, char *name,
 				FIXNUM *pkn, FIXNUM *pkx,
 				FIXNUM *pln, FIXNUM *plx,
 				double *data, double *pxn, double *pxx,
@@ -1756,7 +1756,7 @@ FIXNUM F77_FUNC(pfwima, PFWIMA)(FIXNUM *fileid, FIXNUM *nchr, char *name,
  *        -                                elements
  */
 
-FIXNUM F77_FUNC(pfwset, PFWSET)(FIXNUM *fileid, char *dname,
+FIXNUM FF_ID(pfwset, PFWSET)(FIXNUM *fileid, char *dname,
 				FIXNUM *dp, double *dm)
    {FIXNUM rv;
     char s[MAXLINE];
@@ -1817,7 +1817,7 @@ FIXNUM F77_FUNC(pfwset, PFWSET)(FIXNUM *fileid, char *dname,
  *        -                                elements
  */
 
-FIXNUM F77_FUNC(pfwrae, PFWRAE)(FIXNUM *fileid, char *dname,
+FIXNUM FF_ID(pfwrae, PFWRAE)(FIXNUM *fileid, char *dname,
 				FIXNUM *nchr, char *rname,
 				FIXNUM *rp, double *rm,
 				FIXNUM *inf, FIXNUM *pim)
@@ -1931,12 +1931,12 @@ FIXNUM F77_FUNC(pfwrae, PFWRAE)(FIXNUM *fileid, char *dname,
  *        -                                elements
  */
 
-FIXNUM F77_FUNC(pfwran, PFWRAN)(FIXNUM *fileid, char *dname,
+FIXNUM FF_ID(pfwran, PFWRAN)(FIXNUM *fileid, char *dname,
 				FIXNUM *nchr, char *rname,
 				FIXNUM *rp, double *rm, FIXNUM *pim)
    {FIXNUM rv;
 
-    rv = F77_FUNC(pfwrae, PFWRAE)(fileid, dname, nchr,
+    rv = FF_ID(pfwrae, PFWRAE)(fileid, dname, nchr,
 				  rname, rp, rm,
 				  NULL, pim);
 
@@ -1947,7 +1947,7 @@ FIXNUM F77_FUNC(pfwran, PFWRAN)(FIXNUM *fileid, char *dname,
 
 /* PFDATT - FORTRAN interface routine to define an attribute */
 
-FIXNUM F77_FUNC(pfdatt, PFDATT)(FIXNUM *fileid, FIXNUM *pna,
+FIXNUM FF_ID(pfdatt, PFDATT)(FIXNUM *fileid, FIXNUM *pna,
 				char *fattr, FIXNUM *pnt,
 				char *ftype)
    {int nc;
@@ -1972,7 +1972,7 @@ FIXNUM F77_FUNC(pfdatt, PFDATT)(FIXNUM *fileid, FIXNUM *pna,
 
 /* PFRATT - FORTRAN interface routine to remove an attribute */
 
-FIXNUM F77_FUNC(pfratt, PFRATT)(FIXNUM *fileid, FIXNUM *pna,
+FIXNUM FF_ID(pfratt, PFRATT)(FIXNUM *fileid, FIXNUM *pna,
 				char *fattr)
    {int nc;
     FIXNUM rv;
@@ -1995,7 +1995,7 @@ FIXNUM F77_FUNC(pfratt, PFRATT)(FIXNUM *fileid, FIXNUM *pna,
  *        - a variable
  */
 
-FIXNUM F77_FUNC(pfsvat, PFSVAT)(FIXNUM *fileid, FIXNUM *pnv,
+FIXNUM FF_ID(pfsvat, PFSVAT)(FIXNUM *fileid, FIXNUM *pnv,
 				char *fvar, FIXNUM *pna,
 				char *fattr, void *vl)
    {int nc;
@@ -2030,7 +2030,7 @@ FIXNUM F77_FUNC(pfsvat, PFSVAT)(FIXNUM *fileid, FIXNUM *pnv,
  *        - a variable
  */
 
-FIXNUM F77_FUNC(pfgvat, PFGVAT)(FIXNUM *fileid, FIXNUM *pnv, char *fvar,
+FIXNUM FF_ID(pfgvat, PFGVAT)(FIXNUM *fileid, FIXNUM *pnv, char *fvar,
 				FIXNUM *pna, char *fattr, void *vl)
    {int nc;
     FIXNUM rv;
@@ -2060,7 +2060,7 @@ FIXNUM F77_FUNC(pfgvat, PFGVAT)(FIXNUM *fileid, FIXNUM *pnv, char *fvar,
 
 /* PFFLSH - FORTRAN interface routine to PD_flush */
 
-FIXNUM F77_FUNC(pfflsh, PFFLSH)(FIXNUM *fileid)
+FIXNUM FF_ID(pfflsh, PFFLSH)(FIXNUM *fileid)
    {FIXNUM rv;
     PDBfile *file;
 
@@ -2075,7 +2075,7 @@ FIXNUM F77_FUNC(pfflsh, PFFLSH)(FIXNUM *fileid)
 
 /* PFFAMI - FORTRAN interface routine to PD_family */
 
-FIXNUM F77_FUNC(pffami, PFFAMI)(FIXNUM *fileid, FIXNUM *pf)
+FIXNUM FF_ID(pffami, PFFAMI)(FIXNUM *fileid, FIXNUM *pf)
    {FIXNUM rv;
     PDBfile *file, *nfile;
 
@@ -2094,7 +2094,7 @@ FIXNUM F77_FUNC(pffami, PFFAMI)(FIXNUM *fileid, FIXNUM *pf)
 
 /* PFCD - FORTRAN interface routine to change currrent working directory */
 
-FIXNUM F77_FUNC(pfcd, PFCD)(FIXNUM *fileid, FIXNUM *nchr, char *dirname)
+FIXNUM FF_ID(pfcd, PFCD)(FIXNUM *fileid, FIXNUM *nchr, char *dirname)
    {FIXNUM rv;
     char dir[MAXLINE+1];
     PDBfile *file;
@@ -2117,7 +2117,7 @@ FIXNUM F77_FUNC(pfcd, PFCD)(FIXNUM *fileid, FIXNUM *nchr, char *dirname)
 
 /* PFLN - FORTRAN interface routine to create a link to a variable */
 
-FIXNUM F77_FUNC(pfln, PFLN)(FIXNUM *fileid, FIXNUM *ochr, char *oname,
+FIXNUM FF_ID(pfln, PFLN)(FIXNUM *fileid, FIXNUM *ochr, char *oname,
 			    FIXNUM *nchr, char *nname)
    {FIXNUM rv;
     char oldname[MAXLINE+1], newname[MAXLINE+1];
@@ -2144,7 +2144,7 @@ FIXNUM F77_FUNC(pfln, PFLN)(FIXNUM *fileid, FIXNUM *ochr, char *oname,
  *       - match the specified pattern and type. Previous lists are deleted.
  */
 
-FIXNUM F77_FUNC(pflst, PFLST)(FIXNUM *fileid, FIXNUM *npath, char *path,
+FIXNUM FF_ID(pflst, PFLST)(FIXNUM *fileid, FIXNUM *npath, char *path,
 			      FIXNUM *ntype, char *type,
 			      FIXNUM *num)
    {FIXNUM rv;
@@ -2200,7 +2200,7 @@ FIXNUM F77_FUNC(pflst, PFLST)(FIXNUM *fileid, FIXNUM *npath, char *path,
  *       - directory in the internal sorted table set up by a call to PFLST.
  */
 
-FIXNUM F77_FUNC(pfgls, PFGLS)(FIXNUM *ord, FIXNUM *len, char *name)
+FIXNUM FF_ID(pfgls, PFGLS)(FIXNUM *ord, FIXNUM *len, char *name)
    {int n;
     FIXNUM rv;
     char *s;
@@ -2216,7 +2216,7 @@ FIXNUM F77_FUNC(pfgls, PFGLS)(FIXNUM *ord, FIXNUM *len, char *name)
     else
        {s = pa->outlist[n];
 
-	strcpy(SC_F77_C_STRING(name), s);
+	strcpy(name, s);
 	*len = strlen(s);
 
 	rv = TRUE;};
@@ -2230,7 +2230,7 @@ FIXNUM F77_FUNC(pfgls, PFGLS)(FIXNUM *ord, FIXNUM *len, char *name)
  *       - to PFLST.
  */
 
-FIXNUM F77_FUNC(pfdls, PFDLS)(void)
+FIXNUM FF_ID(pfdls, PFDLS)(void)
    {FIXNUM rv;
     PD_smp_state *pa;
 
@@ -2248,7 +2248,7 @@ FIXNUM F77_FUNC(pfdls, PFDLS)(void)
 
 /* PFMKDR - FORTRAN interface routine to create a directory */
 
-FIXNUM F77_FUNC(pfmkdr, PFMKDR)(FIXNUM *fileid, FIXNUM *nchr,
+FIXNUM FF_ID(pfmkdr, PFMKDR)(FIXNUM *fileid, FIXNUM *nchr,
 				char *dirname)
    {FIXNUM rv;
     char dir[MAXLINE+1];
@@ -2271,7 +2271,7 @@ FIXNUM F77_FUNC(pfmkdr, PFMKDR)(FIXNUM *fileid, FIXNUM *nchr,
 
 /* PFISDR - FORTRAN interface routine to test for a directory */
 
-FIXNUM F77_FUNC(pfisdr, PFISDR)(FIXNUM *fileid, FIXNUM *nchr,
+FIXNUM FF_ID(pfisdr, PFISDR)(FIXNUM *fileid, FIXNUM *nchr,
 				char *dirname)
    {FIXNUM rv;
     char dir[MAXLINE+1];
@@ -2294,7 +2294,7 @@ FIXNUM F77_FUNC(pfisdr, PFISDR)(FIXNUM *fileid, FIXNUM *nchr,
 
 /* PFPWD - FORTRAN interface routine to return currrent working directory */
 
-FIXNUM F77_FUNC(pfpwd, PFPWD)(FIXNUM *fileid, FIXNUM *nchr, char *cwd)
+FIXNUM FF_ID(pfpwd, PFPWD)(FIXNUM *fileid, FIXNUM *nchr, char *cwd)
    {FIXNUM rv;
     char *pwd, *lcwd;
     PDBfile *file;
@@ -2302,7 +2302,7 @@ FIXNUM F77_FUNC(pfpwd, PFPWD)(FIXNUM *fileid, FIXNUM *nchr, char *cwd)
     rv = TRUE;
 
     file = SC_GET_POINTER(PDBfile, *fileid);
-    lcwd = SC_F77_C_STRING(cwd);
+    lcwd = cwd;
 
     pwd = PD_pwd(file);
     if (pwd == NULL)
@@ -2322,7 +2322,7 @@ FIXNUM F77_FUNC(pfpwd, PFPWD)(FIXNUM *fileid, FIXNUM *nchr, char *cwd)
  *          to the format of the host machine.                           
  */
 
-FIXNUM F77_FUNC(pfncin, PFNCIN)(void *out, void *in,
+FIXNUM FF_ID(pfncin, PFNCIN)(void *out, void *in,
 				FIXNUM *nitems, FIXNUM *chart, FIXNUM *pntyp,
 				char *type)
    {FIXNUM rv;
@@ -2347,7 +2347,7 @@ FIXNUM F77_FUNC(pfncin, PFNCIN)(void *out, void *in,
  *          with a different architecture.
  */
 
-FIXNUM F77_FUNC(pfncot, PFNCOT)(void *out, void *in,
+FIXNUM FF_ID(pfncot, PFNCOT)(void *out, void *in,
 				FIXNUM *nitems, FIXNUM *chart, FIXNUM *pntyp,
 				char *type)
    {FIXNUM rv;
@@ -2371,7 +2371,7 @@ FIXNUM F77_FUNC(pfncot, PFNCOT)(void *out, void *in,
  *
  */
 
-FIXNUM F77_FUNC(pfrdbt, PFRDBT)(FIXNUM *fileid, FIXNUM *nchrnm,
+FIXNUM FF_ID(pfrdbt, PFRDBT)(FIXNUM *fileid, FIXNUM *nchrnm,
 				char *name, FIXNUM *nchrtp,
 				char *type, FIXNUM *nitems,
 				FIXNUM *sgned, FIXNUM *nbits, FIXNUM *padsz,
@@ -2414,7 +2414,7 @@ FIXNUM F77_FUNC(pfrdbt, PFRDBT)(FIXNUM *fileid, FIXNUM *nchrnm,
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(pfsmjo, PFSMJO)(FIXNUM *fileid, FIXNUM *pval)
+FIXNUM FF_ID(pfsmjo, PFSMJO)(FIXNUM *fileid, FIXNUM *pval)
    {FIXNUM rv;
     PDBfile *file;
 
@@ -2434,7 +2434,7 @@ FIXNUM F77_FUNC(pfsmjo, PFSMJO)(FIXNUM *fileid, FIXNUM *pval)
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(pfgmjo, PFGMJO)(FIXNUM *fileid, FIXNUM *pval)
+FIXNUM FF_ID(pfgmjo, PFGMJO)(FIXNUM *fileid, FIXNUM *pval)
    {FIXNUM rv;
     PDBfile *file;
 
@@ -2454,7 +2454,7 @@ FIXNUM F77_FUNC(pfgmjo, PFGMJO)(FIXNUM *fileid, FIXNUM *pval)
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(pfrspl, PFRSPL)(FIXNUM *fileid)
+FIXNUM FF_ID(pfrspl, PFRSPL)(FIXNUM *fileid)
    {FIXNUM rv;
     PDBfile *file;
 
@@ -2473,7 +2473,7 @@ FIXNUM F77_FUNC(pfrspl, PFRSPL)(FIXNUM *fileid)
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(pfgfln, PFGFLN)(FIXNUM *fileid, FIXNUM *pln)
+FIXNUM FF_ID(pfgfln, PFGFLN)(FIXNUM *fileid, FIXNUM *pln)
    {FIXNUM rv;
     PDBfile *file;
 
@@ -2493,7 +2493,7 @@ FIXNUM F77_FUNC(pfgfln, PFGFLN)(FIXNUM *fileid, FIXNUM *pln)
  *        - return FALSE if not a floating point type
  */
 
-FIXNUM F77_FUNC(pfdnrm, PFDNRM)(FIXNUM *istd, FIXNUM *pnc, char *type,
+FIXNUM FF_ID(pfdnrm, PFDNRM)(FIXNUM *istd, FIXNUM *pnc, char *type,
 				FIXNUM *plen, void *vr) 
    {int is;
     long n;
@@ -2521,7 +2521,7 @@ FIXNUM F77_FUNC(pfdnrm, PFDNRM)(FIXNUM *istd, FIXNUM *pnc, char *type,
  *        - return TRUE iff successful
  */
 
-FIXNUM F77_FUNC(pfrent, PFRENT)(FIXNUM *fileid, FIXNUM *nchrnm,
+FIXNUM FF_ID(pfrent, PFRENT)(FIXNUM *fileid, FIXNUM *nchrnm,
 				char *name)
    {FIXNUM rv;
     char lnam[MAXLINE];

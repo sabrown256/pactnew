@@ -16,7 +16,7 @@
 
 /* PGGBKC - get the white background flag */
 
-FIXNUM F77_FUNC(pggbkc, PGGBKC)(FIXNUM *devid, FIXNUM *clr)
+FIXNUM FF_ID(pggbkc, PGGBKC)(FIXNUM *devid, FIXNUM *clr)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -33,7 +33,7 @@ FIXNUM F77_FUNC(pggbkc, PGGBKC)(FIXNUM *devid, FIXNUM *clr)
 
 /* PGGINF - get the graph attribute list */
 
-FIXNUM F77_FUNC(pgginf, PGGINF)(FIXNUM *gid, FIXNUM *pal)
+FIXNUM FF_ID(pgginf, PGGINF)(FIXNUM *gid, FIXNUM *pal)
    {FIXNUM rv;
     PG_graph *g;
     pcons *alist;
@@ -52,7 +52,7 @@ FIXNUM F77_FUNC(pgginf, PGGINF)(FIXNUM *gid, FIXNUM *pal)
 
 /* PGGGID - get the graph identifier */
 
-FIXNUM F77_FUNC(pgggid, PGGGID)(FIXNUM *gid, FIXNUM *pc)
+FIXNUM FF_ID(pgggid, PGGGID)(FIXNUM *gid, FIXNUM *pc)
    {FIXNUM rv;
     PG_graph *g;
 
@@ -68,7 +68,7 @@ FIXNUM F77_FUNC(pgggid, PGGGID)(FIXNUM *gid, FIXNUM *pc)
 
 /* PGGUPM - get the use-pixmap flag (X device) */
 
-FIXNUM F77_FUNC(pggupm, PGGUPM)(FIXNUM *flg)
+FIXNUM FF_ID(pggupm, PGGUPM)(FIXNUM *flg)
    {FIXNUM rv;
 
     PG_get_use_pixmap(*flg);
@@ -82,7 +82,7 @@ FIXNUM F77_FUNC(pggupm, PGGUPM)(FIXNUM *flg)
 
 /* PGMG11 - make a 1D-1D graph */
 
-FIXNUM F77_FUNC(pgmg11, PGMG11)(FIXNUM *pid,
+FIXNUM FF_ID(pgmg11, PGMG11)(FIXNUM *pid,
                                 FIXNUM *pnl, char *flabel,
                                 FIXNUM *pcp, FIXNUM *pn, double *x, double *y,
                                 FIXNUM *pnx, char *fxname,
@@ -114,7 +114,7 @@ FIXNUM F77_FUNC(pgmg11, PGMG11)(FIXNUM *pid,
 
 /* PGMG21 - make a 2D-1D graph */
 
-FIXNUM F77_FUNC(pgmg21, PGMG21)(FIXNUM *pid,
+FIXNUM FF_ID(pgmg21, PGMG21)(FIXNUM *pid,
                                 FIXNUM *pnl, char *flabel,
                                 FIXNUM *pcp, FIXNUM *pk, FIXNUM *pl,
                                 FIXNUM *pcen, double *x, double *y, double *r,
@@ -151,7 +151,7 @@ FIXNUM F77_FUNC(pgmg21, PGMG21)(FIXNUM *pid,
 
 /* PGMG22 - make a 2D-2D graph */
 
-FIXNUM F77_FUNC(pgmg22, PGMG22)(FIXNUM *pid,
+FIXNUM FF_ID(pgmg22, PGMG22)(FIXNUM *pid,
                                 FIXNUM *pnl, char *flabel,
                                 FIXNUM *pcp, FIXNUM *pk, FIXNUM *pl,
                                 FIXNUM *pcen,
@@ -196,7 +196,7 @@ FIXNUM F77_FUNC(pgmg22, PGMG22)(FIXNUM *pid,
 
 /* PGMGFS - make a graph from sets */
 
-FIXNUM F77_FUNC(pgmgfs, PGMGFS)(FIXNUM *pnl, char *fname,
+FIXNUM FF_ID(pgmgfs, PGMGFS)(FIXNUM *pnl, char *fname,
                                 FIXNUM *idom, FIXNUM *iran, FIXNUM *pcen,
                                 FIXNUM *pid, FIXNUM *inxt)
    {int id;
@@ -236,7 +236,7 @@ FIXNUM F77_FUNC(pgmgfs, PGMGFS)(FIXNUM *pnl, char *fname,
 
 /* PGQKBD - get some information about the keyboard */
 
-FIXNUM F77_FUNC(pgqkbd, PGQKBD)(FIXNUM *devid, FIXNUM *px, FIXNUM *py,
+FIXNUM FF_ID(pgqkbd, PGQKBD)(FIXNUM *devid, FIXNUM *px, FIXNUM *py,
                                 FIXNUM *pc, FIXNUM *pmod)
    {FIXNUM rv;
 
@@ -263,7 +263,7 @@ FIXNUM F77_FUNC(pgqkbd, PGQKBD)(FIXNUM *devid, FIXNUM *px, FIXNUM *py,
 
 /* PGQPTR - get some information about the pointer (mouse) */
 
-FIXNUM F77_FUNC(pgqptr, PGQPTR)(FIXNUM *devid, FIXNUM *px, FIXNUM *py,
+FIXNUM FF_ID(pgqptr, PGQPTR)(FIXNUM *devid, FIXNUM *px, FIXNUM *py,
                                 FIXNUM *pbtn, FIXNUM *pmod)
    {int btn, mod;
     int ir[PG_SPACEDM];
@@ -287,7 +287,7 @@ FIXNUM F77_FUNC(pgqptr, PGQPTR)(FIXNUM *devid, FIXNUM *px, FIXNUM *py,
 
 /* PGPLOT - render a graph */
 
-FIXNUM F77_FUNC(pgplot, PGPLOT)(FIXNUM *devid, FIXNUM *grid)
+FIXNUM FF_ID(pgplot, PGPLOT)(FIXNUM *devid, FIXNUM *grid)
    {FIXNUM rv;
      PG_device *dev;
     PG_graph *g;
@@ -306,7 +306,7 @@ FIXNUM F77_FUNC(pgplot, PGPLOT)(FIXNUM *devid, FIXNUM *grid)
 
 /* PGRLGR - release a graph */
 
-FIXNUM F77_FUNC(pgrlgr, PGRLGR)(FIXNUM *grid, FIXNUM *prd, FIXNUM *prr)
+FIXNUM FF_ID(pgrlgr, PGRLGR)(FIXNUM *grid, FIXNUM *prd, FIXNUM *prr)
    {int rld, rlr;
     FIXNUM rv;
     PG_graph *g;
@@ -328,7 +328,7 @@ FIXNUM F77_FUNC(pgrlgr, PGRLGR)(FIXNUM *grid, FIXNUM *prd, FIXNUM *prr)
 
 /* PGSBKC - set the white background flag */
 
-FIXNUM F77_FUNC(pgsbkc, PGSBKC)(FIXNUM *devid, FIXNUM *clr)
+FIXNUM FF_ID(pgsbkc, PGSBKC)(FIXNUM *devid, FIXNUM *clr)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -345,7 +345,7 @@ FIXNUM F77_FUNC(pgsbkc, PGSBKC)(FIXNUM *devid, FIXNUM *clr)
 
 /* PGSDLM - set a graph's domain limits */
 
-FIXNUM F77_FUNC(pgsdlm, PGSDLM)(FIXNUM *grid, FIXNUM *pn, double *v)
+FIXNUM FF_ID(pgsdlm, PGSDLM)(FIXNUM *grid, FIXNUM *pn, double *v)
    {FIXNUM rv;
     long n;
     double *pt;
@@ -368,7 +368,7 @@ FIXNUM F77_FUNC(pgsdlm, PGSDLM)(FIXNUM *grid, FIXNUM *pn, double *v)
 
 /* PGSEDF - set the default event handler */
 
-FIXNUM F77_FUNC(pgsedf, PGSEDF)(FIXNUM *devid, PFEventHand fnc)
+FIXNUM FF_ID(pgsedf, PGSEDF)(FIXNUM *devid, PFEventHand fnc)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -386,7 +386,7 @@ FIXNUM F77_FUNC(pgsedf, PGSEDF)(FIXNUM *devid, PFEventHand fnc)
 
 /* PGSEEX - set the expose event handler */
 
-FIXNUM F77_FUNC(pgseex, PGSEEX)(FIXNUM *devid, PFEventHand fnc)
+FIXNUM FF_ID(pgseex, PGSEEX)(FIXNUM *devid, PFEventHand fnc)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -404,7 +404,7 @@ FIXNUM F77_FUNC(pgseex, PGSEEX)(FIXNUM *devid, PFEventHand fnc)
 
 /* PGSEKD - set the key down event handler */
 
-FIXNUM F77_FUNC(pgsekd, PGSEKD)(FIXNUM *devid, PFEventHand fnc)
+FIXNUM FF_ID(pgsekd, PGSEKD)(FIXNUM *devid, PFEventHand fnc)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -422,7 +422,7 @@ FIXNUM F77_FUNC(pgsekd, PGSEKD)(FIXNUM *devid, PFEventHand fnc)
 
 /* PGSEKU - set the key up event handler */
 
-FIXNUM F77_FUNC(pgseku, PGSEKU)(FIXNUM *devid, PFEventHand fnc)
+FIXNUM FF_ID(pgseku, PGSEKU)(FIXNUM *devid, PFEventHand fnc)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -440,7 +440,7 @@ FIXNUM F77_FUNC(pgseku, PGSEKU)(FIXNUM *devid, PFEventHand fnc)
 
 /* PGSEMD - set the mouse down event handler */
 
-FIXNUM F77_FUNC(pgsemd, PGSEMD)(FIXNUM *devid, PFEventHand fnc)
+FIXNUM FF_ID(pgsemd, PGSEMD)(FIXNUM *devid, PFEventHand fnc)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -458,7 +458,7 @@ FIXNUM F77_FUNC(pgsemd, PGSEMD)(FIXNUM *devid, PFEventHand fnc)
 
 /* PGSEMO - set the motion event handler */
 
-FIXNUM F77_FUNC(pgsemo, PGSEMO)(FIXNUM *devid, PFEventHand fnc)
+FIXNUM FF_ID(pgsemo, PGSEMO)(FIXNUM *devid, PFEventHand fnc)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -476,7 +476,7 @@ FIXNUM F77_FUNC(pgsemo, PGSEMO)(FIXNUM *devid, PFEventHand fnc)
 
 /* PGSEMU - set the mouse up event handler */
 
-FIXNUM F77_FUNC(pgsemu, PGSEMU)(FIXNUM *devid, PFEventHand fnc)
+FIXNUM FF_ID(pgsemu, PGSEMU)(FIXNUM *devid, PFEventHand fnc)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -494,7 +494,7 @@ FIXNUM F77_FUNC(pgsemu, PGSEMU)(FIXNUM *devid, PFEventHand fnc)
 
 /* PGSEUP - set the update event handler */
 
-FIXNUM F77_FUNC(pgseup, PGSEUP)(FIXNUM *devid, PFEventHand fnc)
+FIXNUM FF_ID(pgseup, PGSEUP)(FIXNUM *devid, PFEventHand fnc)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -512,7 +512,7 @@ FIXNUM F77_FUNC(pgseup, PGSEUP)(FIXNUM *devid, PFEventHand fnc)
 
 /* PGSINF - set the graph attribute list */
 
-FIXNUM F77_FUNC(pgsinf, PGSINF)(FIXNUM *gid, FIXNUM *pal)
+FIXNUM FF_ID(pgsinf, PGSINF)(FIXNUM *gid, FIXNUM *pal)
    {FIXNUM rv;
     PG_graph *g;
     pcons *alist;
@@ -531,7 +531,7 @@ FIXNUM F77_FUNC(pgsinf, PGSINF)(FIXNUM *gid, FIXNUM *pal)
 
 /* PGSGID - set the graph identifier */
 
-FIXNUM F77_FUNC(pgsgid, PGSGID)(FIXNUM *gid, FIXNUM *pc)
+FIXNUM FF_ID(pgsgid, PGSGID)(FIXNUM *gid, FIXNUM *pc)
    {FIXNUM rv;
     PG_graph *g;
 
@@ -547,7 +547,7 @@ FIXNUM F77_FUNC(pgsgid, PGSGID)(FIXNUM *gid, FIXNUM *pc)
 
 /* PGSUPM - set the use-pixmap flag (X device) */
 
-FIXNUM F77_FUNC(pgsupm, PGSUPM)(FIXNUM *flg)
+FIXNUM FF_ID(pgsupm, PGSUPM)(FIXNUM *flg)
    {FIXNUM rv;
 
     PG_set_use_pixmap(*flg);
@@ -561,7 +561,7 @@ FIXNUM F77_FUNC(pgsupm, PGSUPM)(FIXNUM *flg)
 
 /* PGSRAT - set a graph's rendering attributes */
 
-FIXNUM F77_FUNC(pgsrat, PGSRAT)(FIXNUM *grid,
+FIXNUM FF_ID(pgsrat, PGSRAT)(FIXNUM *grid,
                                 FIXNUM *pn, char *name,
                                 FIXNUM *pt, char *type,
                                 char *val)
@@ -592,7 +592,7 @@ FIXNUM F77_FUNC(pgsrat, PGSRAT)(FIXNUM *grid,
        return((FIXNUM) FALSE);
 
     pv = CMAKE_N(char, n);
-    memcpy(pv, SC_F77_C_STRING(val), n);
+    memcpy(pv, val, n);
 
     info = (pcons *) g->info;
 
@@ -609,7 +609,7 @@ FIXNUM F77_FUNC(pgsrat, PGSRAT)(FIXNUM *grid,
 
 /* PGSRLM - set a graph's range limits */
 
-FIXNUM F77_FUNC(pgsrlm, PGSRLM)(FIXNUM *grid, FIXNUM *pn, double *v)
+FIXNUM FF_ID(pgsrlm, PGSRLM)(FIXNUM *grid, FIXNUM *pn, double *v)
    {PG_graph *g;
     long n;
     double *pt;
@@ -629,7 +629,7 @@ FIXNUM F77_FUNC(pgsrlm, PGSRLM)(FIXNUM *grid, FIXNUM *pn, double *v)
 
 /* PGSVLM - set a graph's viewport limits */
 
-FIXNUM F77_FUNC(pgsvlm, PGSVLM)(FIXNUM *grid, double *v)
+FIXNUM FF_ID(pgsvlm, PGSVLM)(FIXNUM *grid, double *v)
    {FIXNUM rv;
     double *pv;
     PG_graph *g;

@@ -105,12 +105,12 @@ foreach d ($Dirs)
 #   sed 's/[ \t][ \t]*/ /g'               compress white space
 #   awk '$0 ~ /,[ \t]*$/   { printf("%s", $0) }     join lines ending in ','
 #        $0 !~ /,[ \t]*$/  { printf("%s\n", $0) }'
-#   grep 'F77_FUNC('                    
-#   grep -v "#"                           suppress #define F77_FUNC
-#   grep -v ";"                           suppress ... F77_FUNC(x,X)(...);
-#   grep -v "="                           suppress x = F77_FUNC(x,X)(...
-#   sed 's/, .*)(/(/'                     F77_FUNC(x, X)(  -> F77_FUNC(x)(
-#   sed 's/F77_FUNC(//'                   F77_FUNC(x)      -> x
+#   grep 'FF_ID('                    
+#   grep -v "#"                           suppress #define FF_ID
+#   grep -v ";"                           suppress ... FF_ID(x,X)(...);
+#   grep -v "="                           suppress x = FF_ID(x,X)(...
+#   sed 's/, .*)(/(/'                     FF_ID(x, X)(     -> FF_ID(x)(
+#   sed 's/FF_ID(//'                      FF_ID(x)         -> x
 #   sed 's/(void)/()/'                    (void)           -> ()
 #   sed 's/(/ /'                          '('              -> ' '
 #   sed 's/)$/ END/'                      foo(...)         -> foo(... END
@@ -123,9 +123,9 @@ foreach d ($Dirs)
 #   sed 's/REAL/real*8/g'                 REAL             -> real*8
 #   sed 's/double/real*8/g'               double           -> real*8
 #   sed 's/float/real*4/g'                float            -> real*4
+#   sed 's/char */character*(*)/g'        char *           -> character*(*)
 #   sed 's/*//g'                          '*'              -> ''
 #   sed 's/,/ /g'                         ','              -> ' '
-#   sed 's/F77_string/character*(*)/g'    F77_string       -> character*(*)
 #   sed 's/PF[^ ]* /external /g'          function pointer -> external
 #
 
@@ -133,12 +133,12 @@ foreach d ($Dirs)
    sed 's/[ \t][ \t]*/ /g'                        | \
    awk '$0 ~ /,[ \t]*$/   { printf("%s", $0) }      \
         $0 !~ /,[ \t]*$/  { printf("%s\n", $0) }' | \
-   grep 'F77_FUNC('                               | \
+   grep 'FF_ID('                                  | \
    grep -v "#"                                    | \
    grep -v ";"                                    | \
    grep -v "="                                    | \
    sed 's/, .*)(/(/'                              | \
-   sed 's/F77_FUNC(//'                            | \
+   sed 's/FF_ID(//'                               | \
    sed 's/(void)/()/'                             | \
    sed 's/(/ /'                                   | \
    sed 's/)[ \t]*$/ END/'                         | \
@@ -151,9 +151,9 @@ foreach d ($Dirs)
    sed 's/REAL/real--8/g'                         | \
    sed 's/double/real--8/g'                       | \
    sed 's/float/real--4/g'                        | \
+   sed 's/char */character*(*)/g'                 | \
    sed 's/*//g'                                   | \
    sed 's/,/ /g'                                  | \
-   sed 's/F77_string/character*(*)/g'             | \
    sed 's/PF[^ ]* /external /g'                   | \
    sed 's/.*:/      /'                            | \
    sed 's/--/*/g'                                 | \

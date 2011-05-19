@@ -1246,7 +1246,7 @@ int SC_zero_on_alloc_n(int tid)
 
 /* SCZRSP - fortran interface for SC_zero_space */
 
-FIXNUM F77_FUNC(sczrsp, SCZRSP)(FIXNUM *pf)
+FIXNUM FF_ID(sczrsp, SCZRSP)(FIXNUM *pf)
    {FIXNUM zsp;
 
     zsp = SC_zero_space_n((int) *pf, -2);
