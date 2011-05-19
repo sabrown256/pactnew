@@ -147,8 +147,6 @@ ArW32Objs = ${TGTLib}(sclpwin32.o) ${TGTLib}(scwin32.o)
 ArUnxObjs = ${TGTLib}(sclppsx.o) ${TGTLib}(scunix.o) \
             ${TGTLib}(scaix.o) ${TGTLib}(scbgl.o) ${TGTLib}(sccyg.o)
 
-ArBind = ${TGTLib}(gf-${LibName}.o)
-
 ArObjs = ${ArDObjs} ${ArMObjs} ${ArPObjs} \
          ${ArSObjs} ${ArTObjs} ${OSSupport} \
          ${TGTLib}(scctl.o) ${TGTLib}(scfia.o) ${TGTLib}(scfis.o) \
@@ -157,8 +155,7 @@ ArObjs = ${ArDObjs} ${ArMObjs} ${ArPObjs} \
          ${TGTLib}(schash.o) ${TGTLib}(sctree.o) ${TGTLib}(sctab.o) \
          ${TGTLib}(scrsca.o) ${TGTLib}(scrscb.o) \
          ${TGTLib}(sctrk.o) ${TGTLib}(sclog.o)   \
-         ${TGTLib}(scold.o) ${TGTLib}(scf77lr.o) \
-         ${ArBind}
+         ${TGTLib}(scold.o) ${TGTLib}(scf77lr.o)
 
 scf77lr.o : scf77lr.l sclexan.h
 
@@ -207,7 +204,8 @@ hdrf = ${IncDir}/sctypeg.h ${IncDir}/scarg.h ${IncDir}/scfnca.h
 
 # language bindings
 
-bindf = ${PACTTmpDir}/gf-${LibName}.c ../sx/${PACTTmpDir}/gs-${LibName}.c
+archo = z-${System}/obj
+bindf = ${PACTTmpDir}/gf-${LibName}.c ../sx/${archo}/gs-${LibName}.c
 gos   = ${PACTTmpDir}/gf-${LibName}.o
 
 ${PACTTmpDir}/gf-${LibName}.c : ${LibName}.bind ${Hdrs} ${hdrf}

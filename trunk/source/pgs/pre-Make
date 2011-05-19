@@ -106,8 +106,6 @@ OPNG = gsdv_png.o
 ${OX} : ${XHdr}
 ${OOGL} : ${XHdr}
 
-ArBind = ${TGTLib}(gf-${LibName}.o)
-
 ArObjs = ${TGTLib}(gsdv.o) ${TGTLib}(gspr.o) ${TGTLib}(gsvsp.o) \
          ${TGTLib}(gsdv_im.o) ${TGTLib}(gsevmn.o) \
          ${TGTLib}(gsdv_rst.o) ${TGTLib}(gspr_rst.o) ${TGTLib}(gsdlr.o) \
@@ -120,8 +118,7 @@ ArObjs = ${TGTLib}(gsdv.o) ${TGTLib}(gspr.o) ${TGTLib}(gsvsp.o) \
          ${TGTLib}(gsimag.o) ${TGTLib}(gssurf.o) ${TGTLib}(gsdvb.o) ${TGTLib}(gspolf.o) \
          ${TGTLib}(gsgrot.o) ${TGTLib}(gshls.o) ${TGTLib}(gsscat.o) \
          ${TGTLib}(gsclr.o) ${TGTLib}(gsfia.o) ${TGTLib}(gsfib.o)   \
-         ${TGTLib}(gsold.o) ${TGTLib}(gssfnt.o)                     \
-         ${ArBind}
+         ${TGTLib}(gsold.o) ${TGTLib}(gssfnt.o)
 
 ArPS  = ${TGTLib}(gsdv_ps.o) ${TGTLib}(gspr_ps.o)
 ArCGM = ${TGTLib}(gsdv_cgm.o) ${TGTLib}(gspr_cgm.o)
@@ -132,9 +129,7 @@ ArJPG = ${TGTLib}(gsdv_jpg.o)
 ArMPG = ${TGTLib}(gsdv_mpg.o) ${TGTLib}(gspr_mpg.o) ${TGTLib}(gsmpeg.o)
 ArPNG = ${TGTLib}(gsdv_png.o)
 
-GrDep = ${GraphicsDevices} ${LibDep}
-${GrDep}  : ${Hdrs} ${hdrf} ${gos}
-${TGTLib} : ${GrDep}
+${TGTLib} : ${hdrf} ${gos} ${Hdrs} ${GraphicsDevices} ${LibDep}
 
 ${ArMPG} : ${MpgHdr}
 ${ArX}   : ${XHdr}
@@ -157,7 +152,8 @@ hdrf = ${IncDir}/gsimag.h
 
 # language bindings
 
-bindf = ${PACTTmpDir}/gf-${LibName}.c ../sx/${PACTTmpDir}/gs-${LibName}.c
+archo = z-${System}/obj
+bindf = ${PACTTmpDir}/gf-${LibName}.c ../sx/${archo}/gs-${LibName}.c
 gos   = ${PACTTmpDir}/gf-${LibName}.o
 
 ${PACTTmpDir}/gf-${LibName}.c : ${LibName}.bind ${Hdrs} ${hdrf}

@@ -643,16 +643,6 @@ int SC_set_raw_state(int fd, int trap)
 
 # else
 
-#  if 0
-       {TERMINAL t;
-
-	rv = _SC_get_tty_attr(fd);
-
-	    rv = _SC_set_tty_attr(fd, &t, TRUE);
-	    if (rv < 0)
-	       SC_error(-1, "COULDN'T SET I/O FLAGS %d - SC_SET_RAW_STATE",
-			errno);};};
-#  else
        rv = SC_set_io_attrs(fd,
 			    SC_NDELAY, SC_TERM_DESC,     TRUE,
 			    ICRNL,     SC_TERM_INPUT,    FALSE,
@@ -674,7 +664,6 @@ int SC_set_raw_state(int fd, int trap)
 			    VMIN,      SC_TERM_CHAR,     0,
 			    VTIME,     SC_TERM_CHAR,     0,
 			    0);
-#  endif
 # endif
 
     if (trap)

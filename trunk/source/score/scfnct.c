@@ -351,7 +351,17 @@ static void _SC_timeout_error(int sig)
    {
 
 #ifdef UNIX
-    io_printf(stdout, "\nProcess %d timed out\n\n", getpid());
+
+    char s[MAXLINE];
+
+    snprintf(s, MAXLINE, "\nProcess %d timed out\n\n", getpid());
+
+/* NOTE: do not use io_puts here because timeouts often occur because
+ * of memory deadlocks and io_puts allocates more memory so we would
+ * hang here
+ */
+    fputs(s, stdout);
+
 #endif
 
     exit(SC_EXIT_TIMEOUT);}

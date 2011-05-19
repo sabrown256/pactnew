@@ -97,8 +97,6 @@ Objs = pdb.o pdbaib.o pdbmp.o pdser.o pdlow.o pdblk.o \
        pdcsum.o pdbx.o pdszof.o pdfia.o pdbdir.o pdpar.o pdcomm.o \
        pdtgt.o pdtyp.o pdtypa.o pdtypb.o pdtypc.o pdspoke.o
 
-ArBind = ${TGTLib}(gf-${LibName}.o)
-
 ArObjs = ${TGTLib}(pdb.o) ${TGTLib}(pdbaib.o)                        \
          ${TGTLib}(pdfmt.o) ${TGTLib}(pdfmta.o)                      \
          ${TGTLib}(pdfmtb.o) ${TGTLib}(pdfmtc.o)                     \
@@ -110,11 +108,10 @@ ArObjs = ${TGTLib}(pdb.o) ${TGTLib}(pdbaib.o)                        \
          ${TGTLib}(pdprnt.o) ${TGTLib}(pdshar.o) ${TGTLib}(pdtgt.o)  \
          ${TGTLib}(pdbx.o) ${TGTLib}(pdfia.o)  ${TGTLib}(pdbdir.o)   \
          ${TGTLib}(pdszof.o) ${TGTLib}(pdpar.o) ${TGTLib}(pdparmp.o) \
-         ${TGTLib}(pdspoke.o)                                        \
-         ${ArBind}
+         ${TGTLib}(pdspoke.o)
 
-${Objs} : ${Hdrs} ${hdrf} pdspoke.c
-${LibDep} : ${Hdrs} ${hdrf} ${gos} pdspoke.c
+${Objs} : ${hdrf} ${Hdrs} pdspoke.c
+${LibDep} : ${hdrf} ${gos} ${Hdrs} pdspoke.c
 
 #
 # Generated code rules
@@ -143,7 +140,8 @@ spokef = pdspoke.c
 
 # language bindings
 
-bindf = ${PACTTmpDir}/gf-${LibName}.c ../sx/${PACTTmpDir}/gs-${LibName}.c
+archo = z-${System}/obj
+bindf = ${PACTTmpDir}/gf-${LibName}.c ../sx/${archo}/gs-${LibName}.c
 gos   = ${PACTTmpDir}/gf-${LibName}.o
 
 ${PACTTmpDir}/gf-${LibName}.c : ${LibName}.bind ${Hdrs} ${hdrf}

@@ -124,7 +124,19 @@ setenv ZeroSpace  "-z 2"
    setenv CFE ""
    if ($CROSS_COMPILE != FALSE) then
       setenv CFE $DORUN
-      setenv DO_RUN_SUBMIT_ENV '-exp_env SCHEME -exp_env ULTRA'
+
+# make up the list of environment variable to pass through submit
+      set lenv = ""
+#      foreach i (SCHEME ULTRA)
+      foreach i (SCHEME)
+         printenv $i >& /dev/null
+         if ($status == 0) then
+            set lenv = ( $lenv -exp_env $i )
+         endif
+      end
+
+      setenv DO_RUN_SUBMIT_ENV "$lenv"
+      unset lenv
    endif
    setenv PFE       $DORUN
 

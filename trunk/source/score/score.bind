@@ -11,11 +11,11 @@
 
 # SCFIA.C
 SC_arrlen             scalen   none              arrlen			Return the byte length of the specified pointer
-#SC_pause              scpaus   none              pause			Stop and await user response
-#SC_advance_name       scadvn   none              none
-#SC_cpu_time           scctim   cpu-time          none                   Return the CPU time in seconds since the last call
-#SC_wall_clock_time    scwtim   wall-clock-time   none			Return the wall clock time in seconds since the last call
-#SC_date               scdate   date              none                   Return the date
+SC_pause              scpaus   none              pause			Stop and await user response
+SC_advance_name       scadvn   none              none
+SC_cpu_time           scctim   cpu-time          none                   Return the CPU time in seconds since the last call
+SC_wall_clock_time    scwtim   wall-clock-time   none			Return the wall clock time in seconds since the last call
+SC_date               scdate   date              none                   Return the date
 
 # SCFIS.C
 #_SC_strlen            scstln   none              none                   Return the length of the specified string

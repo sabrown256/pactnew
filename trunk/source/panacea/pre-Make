@@ -89,8 +89,6 @@ PPObjs  = papp.o padump.o panth.o
 SorObjs = pasrc.o
 Objs    = ${GenObjs} ${SorObjs} ${PanObjs} ${PPObjs}
 
-ArBind = ${TGTLib}(gf-${LibName}.o)
-
 ArObjs = ${TGTLib}(padef.o) ${TGTLib}(pacpp.o) ${TGTLib}(papkg.o)      \
 	 ${TGTLib}(pagnrd.o) ${TGTLib}(pahand.o) ${TGTLib}(pafi.o)     \
          ${TGTLib}(panacea.o) ${TGTLib}(pashar.o) ${TGTLib}(pashas.o)  \
@@ -98,8 +96,7 @@ ArObjs = ${TGTLib}(padef.o) ${TGTLib}(pacpp.o) ${TGTLib}(papkg.o)      \
          ${TGTLib}(pavars.o) ${TGTLib}(papp.o) ${TGTLib}(padump.o)     \
          ${TGTLib}(pasrc.o) ${TGTLib}(pastr.o) ${TGTLib}(pafia.o)      \
          ${TGTLib}(pasmp.o)                                            \
-         ${TGTLib}(panth.o)                                            \
-         ${ArBind}
+         ${TGTLib}(panth.o)
 
 ${Objs} : ${Hdrs}
 ${LibDep} : ${Hdrs} ${hdrf} ${gos}
@@ -116,7 +113,8 @@ hdrf = ${IncDir}/pasrc.h
 
 # language bindings
 
-bindf = ${PACTTmpDir}/gf-${LibName}.c ../sx/${PACTTmpDir}/gs-${LibName}.c
+archo = z-${System}/obj
+bindf = ${PACTTmpDir}/gf-${LibName}.c ../sx/${archo}/gs-${LibName}.c
 gos   = ${PACTTmpDir}/gf-${LibName}.o
 
 ${PACTTmpDir}/gf-${LibName}.c : ${LibName}.bind ${Hdrs} ${hdrf}

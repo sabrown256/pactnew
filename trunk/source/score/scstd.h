@@ -488,46 +488,15 @@ struct s_quaternion
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* F77_STRING - get around the problem of C and F77 vendors who can't
- *            - agree on what a string is
- *            - NOTE: Scot Futral contributed info and code here
- */
-
-/* NOTE: this case is preserved only to demonstrate why we keep this
- * abstraction of the Fortran string
- * the UNICOS to which we ported long ago is gone and if Cray keeps UNICOS
- * it will be a new port for us anyway
- */
-#ifdef UNICOS
-
-# ifndef __cplusplus
-#  include <fortran.h>
-
-typedef _fcd F77_string;
-
-#  define SC_F77_C_STRING(_f) _fcdtocp((_f))
-#  define SC_C_F77_STRING(_c) _cptofcd((_c), ((_c) ? strlen((_c)) : 0))
-
-# else
-
-typedef char *F77_string;
-
-#  define SC_F77_C_STRING(_f) ((char *) _f)
-#  define SC_C_F77_STRING(_c) ((char *) _c)
-
-# endif
-
-#else
+/* F77_STRING - historical, obviated by Fortran/C interoperability standard */
 
 typedef char *F77_string;
 
 # define SC_F77_C_STRING(_f) ((char *) _f)
 # define SC_C_F77_STRING(_c) ((char *) _c)
 
-#endif
-
 #define SC_FORTRAN_STR_C(_cstr, _fstr, _nc)                                  \
-   {strncpy(_cstr, SC_F77_C_STRING(_fstr), _nc);                             \
+   {strncpy(_cstr, (char *) (_fstr), _nc);                                   \
     _cstr[_nc] = '\0';}
 
 /*--------------------------------------------------------------------------*/
@@ -536,13 +505,9 @@ typedef char *F77_string;
 
 /*--------------------------------------------------------------------------*/
 
-#ifdef ANSI
-
 #define SC_VA_START(x)                                                       \
    {va_list __a__;                                                           \
     va_start(__a__, x)
-
-#endif
 
 #define SC_VA_ARG(x)      va_arg(__a__, x)
 

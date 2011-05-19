@@ -33,7 +33,7 @@ struct s_fdecl
 
 /* CONCATENATE - concatenate tokens SA to string S */
 
-char *concatenate(char *s, int nc, char **sa, char *dlm)
+static char *concatenate(char *s, int nc, char **sa, char *dlm)
    {int i;
 
     s[0] = '\0';
@@ -49,7 +49,7 @@ char *concatenate(char *s, int nc, char **sa, char *dlm)
 
 /* IS_PTR - return TRUE if TYPE is a pointer */
 
-int is_ptr(char *type)
+static int is_ptr(char *type)
    {int rv;
 
     rv = (strchr(type, '*') != NULL);
@@ -61,7 +61,7 @@ int is_ptr(char *type)
 
 /* NO_ARGS - return TRUE if function takes no args */
 
-int no_args(fdecl *dcl)
+static int no_args(fdecl *dcl)
    {int rv;
 
     rv = ((dcl->na == 1) && (dcl->al[0].name[0] == '\0'));
@@ -78,7 +78,7 @@ int no_args(fdecl *dcl)
  *            - return TRUE if S is a function pointer
  */
 
-int split_decl(char *type, int nt, char *name, int nn, char *s)
+static int split_decl(char *type, int nt, char *name, int nn, char *s)
    {int nb, nc, rv;
     char t[MAXLINE];
     char *p, *pn;
@@ -118,7 +118,7 @@ int split_decl(char *type, int nt, char *name, int nn, char *s)
 
 /* SPLIT_ARGS - split an arg list into individual args */
 
-char **split_args(char *args)
+static char **split_args(char *args)
    {char *cc, *cp, *p, *pa, **al;
 
     al = NULL;
@@ -153,7 +153,7 @@ char **split_args(char *args)
 
 /* PROC_ARGS - process the arg list in the declaration DCL */
 
-farg *proc_args(fdecl *dcl)
+static farg *proc_args(fdecl *dcl)
    {int i, na;
     char **args;
     farg *al;
@@ -178,7 +178,7 @@ farg *proc_args(fdecl *dcl)
 
 /* FREE_ARGS - release the arg list AL */
 
-void free_args(farg *al)
+static void free_args(farg *al)
    {
 
     FREE(al);
@@ -192,7 +192,7 @@ void free_args(farg *al)
  *            - return it iff successful
  */
 
-fdecl *find_proto(char **spr, char *f)
+static fdecl *find_proto(char **spr, char *f)
    {int ip, na, nt;
     char pf[MAXLINE];
     char *p, *pa, *sp, *pro, *cfn;
@@ -250,7 +250,7 @@ fdecl *find_proto(char **spr, char *f)
 
 /* FREE_DECL - release the declaration DCL */
 
-void free_decl(fdecl *dcl)
+static void free_decl(fdecl *dcl)
    {
 
     free_args(dcl->al);
@@ -264,7 +264,7 @@ void free_decl(fdecl *dcl)
 
 /* CSEP - print C comment separator */
 
-void csep(FILE *fp)
+static void csep(FILE *fp)
    {
 
     fprintf(fp, "/*--------------------------------------------------------------------------*/\n");
@@ -276,7 +276,7 @@ void csep(FILE *fp)
 
 /* HSEP - print HTML comment separator */
 
-void hsep(FILE *fp)
+static void hsep(FILE *fp)
    {
 
     fprintf(fp, "<!-- -------------------------------------------------------------------- -->\n");
@@ -291,7 +291,7 @@ void hsep(FILE *fp)
 
 /* CF_TYPE - return Fortran type corresponding to C type T */
 
-void cf_type(char *a, int nc, char *t)
+static void cf_type(char *a, int nc, char *t)
    {
 
     if (strcmp(t, "char *") == 0)
@@ -319,7 +319,7 @@ void cf_type(char *a, int nc, char *t)
 
 /* FC_TYPE - return C type corresponding to FORTRAN type T */
 
-void fc_type(char *a, int nc, char *t)
+static void fc_type(char *a, int nc, char *t)
    {
 
     if ((strcmp(t, "char *") == 0) ||
@@ -354,7 +354,7 @@ void fc_type(char *a, int nc, char *t)
  *              - Fortran callable C wrapper
  */
 
-void fc_decl_list(char *a, int nc, fdecl *dcl)
+static void fc_decl_list(char *a, int nc, fdecl *dcl)
    {int i, na;
     char lt[MAXLINE];
     farg *al;
@@ -385,7 +385,7 @@ void fc_decl_list(char *a, int nc, fdecl *dcl)
  *              - C function call
  */
 
-void fc_call_list(char *a, int nc, fdecl *dcl)
+static void fc_call_list(char *a, int nc, fdecl *dcl)
    {int i, na, voida;
     farg *al;
 
@@ -410,7 +410,7 @@ void fc_call_list(char *a, int nc, fdecl *dcl)
  *              - Fortran callable C wrapper
  */
 
-void f_proto_list(char *a, int nc, fdecl *dcl)
+static void f_proto_list(char *a, int nc, fdecl *dcl)
    {int i, na;
     char t[MAXLINE];
     farg *al;
@@ -434,7 +434,7 @@ void f_proto_list(char *a, int nc, fdecl *dcl)
 
 /* INIT_FORTRAN - initialize Fortran file */
 
-FILE *init_fortran(char *pck)
+static FILE *init_fortran(char *pck)
    {FILE *fp;
 
     fp = open_file("w", "gf-%s.c", pck);
@@ -454,7 +454,7 @@ FILE *init_fortran(char *pck)
  *              - using name FFN
  */
 
-void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
+static void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
    {int i, na, nv, voidf, voida, rptr;
     char ufn[MAXLINE], a[MAXLINE], rt[MAXLINE], t[MAXLINE];
     farg *al;
@@ -476,9 +476,9 @@ void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
     fprintf(fp, "\n");
 
     if (rptr == TRUE)
-       snprintf(t, MAXLINE, "FIXNUM FF_ID(%s, %s)(%s)\n", ffn, ufn, a);
+       snprintf(t, MAXLINE, "FIXNUM FF_ID(w%s, W%s)(%s)\n", ffn, ufn, a);
     else
-       snprintf(t, MAXLINE, "%s FF_ID(%s, %s)(%s)\n", rt, ffn, ufn, a);
+       snprintf(t, MAXLINE, "%s FF_ID(w%s, W%s)(%s)\n", rt, ffn, ufn, a);
     fputs(subst(t, "* ", "*", -1), fp);
 
 /* local variable declarations */
@@ -552,7 +552,7 @@ void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
  *              - return TRUE iff successful
  */
 
-int bind_fortran(FILE *fp, char **spr, char **sbi)
+static int bind_fortran(FILE *fp, char **spr, char **sbi)
    {int ib, rv;
     char t[MAXLINE];
     char *sb, **ta;
@@ -582,10 +582,271 @@ int bind_fortran(FILE *fp, char **spr, char **sbi)
 
 /* FIN_FORTRAN - finalize Fortran file */
 
-void fin_fortran(FILE *fp)
+static void fin_fortran(FILE *fp)
    {
 
     csep(fp);
+    fclose(fp);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+
+/*                         FORTRAN MODULE ROUTINES                          */
+
+/*--------------------------------------------------------------------------*/
+
+/* MC_TYPE - return FORTRAN type, FTY, C cognate type, CTY,
+ *         - corresponding to C type T
+ *
+ *    Type	Named constant	        C type or types
+ *    INTEGER
+ *    	C_INT			int, signed int
+ *      C_SHORT			short int, signed short int
+ *      C_LONG			long int, signed long int
+ *      C_LONG_LONG		long long int, signed long long int
+ *      C_SIGNED_CHAR		signed char, unsigned char
+ *      C_SIZE_T		size_t
+ *    	C_INT_LEAST8_T		int_least8_t
+ *    	C_INT_LEAST16_T		int_least16_t
+ *    	C_INT_LEAST32_T		int_least32_t
+ *    	C_INT_LEAST64_T		int_least64_t
+ *    	C_INT_FAST8_T		int_fast8_t
+ *    	C_INT_FAST16_T		int_fast16_t
+ *    	C_INT_FAST32_T		int_fast32_t
+ *    	C_INT_FAST64_T		int_fast64_t
+ *    	C_INTMAX_T		c intmax_t
+ *    
+ *    REAL
+ *    	C_FLOAT			float, float _Imaginary
+ *    	C_DOUBLE		double, double _Imaginary
+ *    
+ *    COMPLEX
+ *    	C_LONG_DOUBLE		long double, long double _Imaginary
+ *    	C_COMPLEX		_Complex
+ *    	C_DOUBLE_COMPLEX	double _Complex
+ *    	C_LONG_DOUBLE_COMPLEX  	long double _Complex
+ *    
+ *    LOGICAL
+ *    	C_BOOL			_Bool
+ *    
+ *    CHARACTER
+ *    	C_CHAR			char
+ */
+
+static void mc_type(char *fty, int nf, char *cty, int nc, char *t)
+   {
+
+    if (strcmp(t, "char *") == 0)
+       {nstrncpy(fty, nf, "character", -1);
+	nstrncpy(cty, nc, "C_CHAR", -1);}
+
+    else if ((is_ptr(t) == TRUE) || 
+	     (strstr(t, "(*") != NULL))
+       {nstrncpy(fty, nf, "type", -1);
+	nstrncpy(cty, nc, "C_PTR", -1);}
+
+    else if (strstr(t, "long long") != NULL)
+       {nstrncpy(fty, nf, "integer", -1);
+	nstrncpy(cty, nc, "C_LONG_LONG", -1);}
+
+    else if (strstr(t, "long") != NULL)
+       {nstrncpy(fty, nf, "integer", -1);
+	nstrncpy(cty, nc, "C_LONG", -1);}
+
+    else if (strstr(t, "short") != NULL)
+       {nstrncpy(fty, nf, "integer", -1);
+	nstrncpy(cty, nc, "C_SHORT", -1);}
+
+    else if (strstr(t, "int") != NULL)
+       {nstrncpy(fty, nf, "integer", -1);
+	nstrncpy(cty, nc, "C_INT", -1);}
+
+    else if (strstr(t, "signed char") != NULL)
+       {nstrncpy(fty, nf, "integer", -1);
+	nstrncpy(cty, nc, "C_SIGNED_CHAR", -1);}
+
+    else if (strstr(t, "size_t") != NULL)
+       {nstrncpy(fty, nf, "integer", -1);
+	nstrncpy(cty, nc, "C_SIZE_T", -1);}
+
+    else if (strstr(t, "long double _Complex") != NULL)
+       {nstrncpy(fty, nf, "complex", -1);
+	nstrncpy(cty, nc, "C_LONG_DOUBLE_COMPLEX", -1);}
+
+    else if (strstr(t, "double _Complex") != NULL)
+       {nstrncpy(fty, nf, "complex", -1);
+	nstrncpy(cty, nc, "C_DOUBLE_COMPLEX", -1);}
+
+    else if (strstr(t, "_Complex") != NULL)
+       {nstrncpy(fty, nf, "complex", -1);
+	nstrncpy(cty, nc, "C_COMPLEX", -1);}
+
+    else if (strstr(t, "long double") != NULL)
+       {nstrncpy(fty, nf, "complex", -1);
+	nstrncpy(cty, nc, "C_LONG_DOUBLE", -1);}
+
+    else if (strstr(t, "double") != NULL)
+       {nstrncpy(fty, nf, "real", -1);
+	nstrncpy(cty, nc, "C_DOUBLE", -1);}
+
+    else if (strstr(t, "float") != NULL)
+       {nstrncpy(fty, nf, "real", -1);
+	nstrncpy(cty, nc, "C_FLOAT", -1);}
+
+    else if (strstr(t, "_Bool") != NULL)
+       {nstrncpy(fty, nf, "logical", -1);
+	nstrncpy(cty, nc, "C_BOOL", -1);}
+
+    else if (strcmp(t, "void") == 0)
+       {nstrncpy(fty, nf, "subroutine", -1);
+	nstrncpy(cty, nc, "C_VOID", -1);}
+
+    else
+       {nstrncpy(fty, nf, "unknown", -1);
+	nstrncpy(cty, nc, "unknown", -1);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* MC_DECL_LIST - render the arg list of DCL into A for the
+ *              - Fortran/C interoperability module interface
+ */
+
+static void mc_decl_list(char *a, int nc, fdecl *dcl)
+   {int i, na;
+    farg *al;
+
+    na = dcl->na;
+    al = dcl->al;
+
+    a[0] = '\0';
+    if ((na == 0) || (no_args(dcl) == TRUE))
+       nstrcat(a, MAXLINE, "void");
+    else
+       {for (i = 0; i < na; i++)
+	    {vstrcat(a, MAXLINE, "%s, ", al[i].name);};
+        a[strlen(a) - 2] = '\0';};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* INIT_MODULE - initialize Fortran/C interoperatbility module file */
+
+static FILE *init_module(char *pck)
+   {FILE *fp;
+
+    fp = open_file("w", "gm-%s.f", pck);
+
+    fprintf(fp, "module %s\n", pck);
+    fprintf(fp, "   use iso_c_binding\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "   interface\n");
+    fprintf(fp, "\n");
+
+    return(fp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* WRAP_MODULE - generate FORTRAN interface specification for
+ *             - C function CFN using name FFN
+ */
+
+static void wrap_module(FILE *fp, fdecl *dcl, char *cfn)
+   {int i, na, nv, voidf, voida, rptr;
+    char dcn[MAXLINE], a[MAXLINE], fty[MAXLINE], cty[MAXLINE];
+    farg *al;
+
+    nstrncpy(dcn, MAXLINE, cfn, -1);
+    downcase(dcn);
+
+    na    = dcl->na;
+    al    = dcl->al;
+    voidf = (strcmp(dcl->type, "void") == 0);
+    voida = no_args(dcl);
+
+    mc_type(fty, MAXLINE, cty, MAXLINE, dcl->type);
+    mc_decl_list(a, MAXLINE, dcl);
+
+    rptr = is_ptr(fty);
+
+    if (voidf == TRUE)
+      fprintf(fp, "      %s %s(%s)  bind(c, name='%s')\n",
+	      fty, dcn, a, cfn);
+    else
+      fprintf(fp, "      %s (%s) function %s(%s)  bind(c, name='%s')\n",
+	      fty, cty, dcn, a, cfn);
+    fprintf(fp, "         use iso_c_binding\n");
+    fprintf(fp, "         implicit none\n");
+
+/* argument declarations */
+    nv = 0;
+    for (i = 0; i < na; i++)
+        {if ((voida == TRUE) && (i == 0))
+	    continue;
+
+	 mc_type(fty, MAXLINE, cty, MAXLINE, al[i].type);
+	 fprintf(fp, "         %s (%s), value :: %s\n",
+		 fty, cty, al[i].name);};
+
+    if (voidf == TRUE)
+       fprintf(fp, "      end subroutine %s\n", dcn);
+    else
+       fprintf(fp, "      end function %s\n", dcn);
+    fprintf(fp, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* BIND_MODULE - generate Fortran/C interoperability interface
+ *             - from SPR and SBI
+ *             - return TRUE iff successful
+ */
+
+static int bind_module(FILE *fp, char **spr, char **sbi)
+   {int ib, rv;
+    char t[MAXLINE];
+    char *sb, **ta;
+    char *cfn;
+    fdecl *dcl;
+
+    rv = TRUE;
+
+    for (ib = 0; sbi[ib] != NULL; ib++)
+        {sb = sbi[ib];
+	 if (blank_line(sb) == FALSE)
+	    {nstrncpy(t, MAXLINE, sb, -1);
+	     ta = tokenize(t, " \t");
+	     cfn = ta[0];
+             dcl = find_proto(spr, cfn);
+	     if (dcl != NULL)
+	        {wrap_module(fp, dcl, cfn);
+		 free_decl(dcl);};
+
+	     free_strings(ta);};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FIN_MODULE - finalize Fortran/C interoperability interface module file */
+
+static void fin_module(FILE *fp)
+   {
+
+    fprintf(fp, "   end interface\n");
+    fprintf(fp, "\n");
+    fprintf(fp, "end module score\n");
+    fprintf(fp, "\n");
+
     fclose(fp);
 
     return;}
@@ -598,7 +859,7 @@ void fin_fortran(FILE *fp)
 
 /* SC_TYPE - return C type corresponding to SCHEME type T */
 
-void sc_type(char *a, int nc, char *t)
+static void sc_type(char *a, int nc, char *t)
    {
 
     if ((strcmp(t, "char *") == 0) ||
@@ -631,7 +892,7 @@ void sc_type(char *a, int nc, char *t)
 
 /* CS_TYPE - return "Scheme" type corresponding to C type T */
 
-void cs_type(char *a, int nc, char *t)
+static void cs_type(char *a, int nc, char *t)
    {
 
     if (strcmp(t, "char *") == 0)
@@ -698,7 +959,7 @@ void cs_type(char *a, int nc, char *t)
  *              - Scheme to C value extaction
  */
 
-void cs_decl_list(char *a, int nc, fdecl *dcl)
+static void cs_decl_list(char *a, int nc, fdecl *dcl)
    {int i, na;
     char ty[MAXLINE];
     farg *al;
@@ -721,7 +982,7 @@ void cs_decl_list(char *a, int nc, fdecl *dcl)
  *              - Scheme prototype
  */
 
-void s_proto_list(char *a, int nc, fdecl *dcl)
+static void s_proto_list(char *a, int nc, fdecl *dcl)
    {int i, na;
     farg *al;
 
@@ -742,7 +1003,7 @@ void s_proto_list(char *a, int nc, fdecl *dcl)
 
 /* INIT_SCHEME - initialize Scheme file */
 
-FILE *init_scheme(char *pck)
+static FILE *init_scheme(char *pck)
    {FILE *fp;
 
     fp = open_file("w", "gs-%s.c", pck);
@@ -762,7 +1023,7 @@ FILE *init_scheme(char *pck)
  *             - using name FFN
  */
 
-char **wrap_scheme(FILE *fp, char **fl, fdecl *dcl, char *ffn, char **com)
+static char **wrap_scheme(FILE *fp, char **fl, fdecl *dcl, char *ffn, char **com)
    {int i, na, nv, voidf, voida;
     char ufn[MAXLINE], a[MAXLINE], rt[MAXLINE], t[MAXLINE];
     farg *al;
@@ -856,7 +1117,7 @@ char **wrap_scheme(FILE *fp, char **fl, fdecl *dcl, char *ffn, char **com)
  *             - return TRUE iff successful
  */
 
-int bind_scheme(FILE *fp, char *pck, char **spr, char **sbi)
+static int bind_scheme(FILE *fp, char *pck, char **spr, char **sbi)
    {int i, ib, rv;
     char t[MAXLINE];
     char *sb, **ta, **fl;
@@ -905,7 +1166,7 @@ int bind_scheme(FILE *fp, char *pck, char **spr, char **sbi)
 
 /* FIN_SCHEME - finalize Scheme file */
 
-void fin_scheme(FILE *fp)
+static void fin_scheme(FILE *fp)
    {
 
     csep(fp);
@@ -923,7 +1184,7 @@ void fin_scheme(FILE *fp)
  *              - Python callable C wrapper
  */
 
-void p_proto_list(char *a, int nc, fdecl *dcl)
+static void p_proto_list(char *a, int nc, fdecl *dcl)
    {int i, na;
     farg *al;
 
@@ -945,7 +1206,7 @@ void p_proto_list(char *a, int nc, fdecl *dcl)
 
 /* INIT_PYTHON - initialize Python file */
 
-FILE *init_python(char *pck)
+static FILE *init_python(char *pck)
    {FILE *fp;
 
     fp = open_file("w", "gp-%s.c", pck);
@@ -965,7 +1226,7 @@ FILE *init_python(char *pck)
  *             - using name FFN
  */
 
-void wrap_python(FILE *fp, fdecl *dcl, char *ffn)
+static void wrap_python(FILE *fp, fdecl *dcl, char *ffn)
    {char ufn[MAXLINE];
 
     nstrncpy(ufn, MAXLINE, ffn, -1);
@@ -986,7 +1247,7 @@ void wrap_python(FILE *fp, fdecl *dcl, char *ffn)
  *             - return TRUE iff successful
  */
 
-int bind_python(FILE *fp, char **spr, char **sbi)
+static int bind_python(FILE *fp, char **spr, char **sbi)
    {int ib, rv;
     char t[MAXLINE];
     char *sb, **ta;
@@ -1016,7 +1277,7 @@ int bind_python(FILE *fp, char **spr, char **sbi)
 
 /* FIN_PYTHON - finalize Python file */
 
-void fin_python(FILE *fp)
+static void fin_python(FILE *fp)
    {
 
     csep(fp);
@@ -1032,7 +1293,7 @@ void fin_python(FILE *fp)
 
 /* INIT_DOC - initialize Doc file */
 
-FILE *init_doc(char *pck)
+static FILE *init_doc(char *pck)
    {FILE *fp;
 
     fp = open_file("w", "gh-%s.html", pck);
@@ -1050,7 +1311,7 @@ FILE *init_doc(char *pck)
  *          - using names in FN
  */
 
-void wrap_doc(FILE *fp, fdecl *dcl, char **fn, char **com)
+static void wrap_doc(FILE *fp, fdecl *dcl, char **fn, char **com)
    {int voidf;
     char ufn[MAXLINE], lfn[MAXLINE];
     char af[MAXLINE], as[MAXLINE], ap[MAXLINE];
@@ -1119,7 +1380,7 @@ void wrap_doc(FILE *fp, fdecl *dcl, char **fn, char **com)
  *          - return TRUE iff successful
  */
 
-int bind_doc(FILE *fp, char **spr, char **sbi)
+static int bind_doc(FILE *fp, char **spr, char **sbi)
    {int ib, rv;
     char t[MAXLINE];
     char *sb, **ta;
@@ -1148,7 +1409,7 @@ int bind_doc(FILE *fp, char **spr, char **sbi)
 
 /* FIN_DOC - finalize Doc file */
 
-void fin_doc(FILE *fp)
+static void fin_doc(FILE *fp)
    {
 
     hsep(fp);
@@ -1163,10 +1424,10 @@ void fin_doc(FILE *fp)
  *       - return TRUE iff successful
  */
 
-int blang(char *pck, char *fpr, char *fbi)
+static int blang(char *pck, char *fpr, char *fbi)
    {int rv;
     char **spr, **sbi;
-    FILE *ff, *fs, *fp, *fd;
+    FILE *ff, *fm, *fs, *fp, *fd;
 
     if ((IS_NULL(fpr) == TRUE) || (IS_NULL(fbi) == TRUE))
        rv = FALSE;
@@ -1179,17 +1440,20 @@ int blang(char *pck, char *fpr, char *fbi)
 
 	if (spr != NULL)
 	   {ff = init_fortran(pck);
+	    fm = init_module(pck);
 	    fs = init_scheme(pck);
 	    fp = init_python(pck);
 	    fd = init_doc(pck);
 
 	    if (sbi != NULL)
 	       {rv &= bind_fortran(ff, spr, sbi);
+		rv &= bind_module(fm, spr, sbi);
 		rv &= bind_scheme(fs, pck, spr, sbi);
 		rv &= bind_python(fp, spr, sbi);
 		rv &= bind_doc(fd, spr, sbi);};
 
 	    fin_fortran(ff);
+	    fin_module(fm);
 	    fin_scheme(fs);
 	    fin_python(fp);
 	    fin_doc(fd);

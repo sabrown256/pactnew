@@ -359,10 +359,12 @@ SS_psides *SS_init_scheme(char *code, char *vers,
    {SS_psides *si;
 
     SC_set_banner(" %s  -  %s\n\n", code, vers);
-    SC_init_path(2, "HOME", "SCHEME");
 
+/* try to ensure that the SCHEME environment variable is properly set */
     if (v != NULL)
        SS_set_scheme_env(v[0], NULL);
+
+    SC_init_path(2, "HOME", "SCHEME");
 
     si = SS_get_current_scheme(-1);
 

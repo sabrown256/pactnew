@@ -1057,6 +1057,8 @@ switch ($Cmnd)
            SafeEnv CROSS_COMPILE FALSE
         endif
 
+        Note $Log "CROSS_COMPILE = $CROSS_COMPILE"
+
         set LStat = 1
         if ($CROSS_COMPILE == "FALSE") then
            flog $Log pushd $Base/score
@@ -1099,7 +1101,9 @@ switch ($Cmnd)
            set dm = `which-exe -d ${BinDir} dmake`
            if (-x "$dm") then
               flog $Log cp $dm ${BinDir}/dmake
-              set LStat = 0
+              flog $Log set LStat = 0
+           else
+              Note $Log "No dmake found for bootstrap CROSS_COMPILE"
            endif
         endif
 
@@ -1109,8 +1113,10 @@ switch ($Cmnd)
            if ($status == 0) then
               flog $Log set Opt = dmake
            endif
-        else
+        else if (-f $Base/score/z-$System/test/log.tmake) then
            flog $Log cat $Base/score/z-$System/test/log.tmake
+        else
+           Note $Log "Proceding with untested version"
         endif
         ftee $Log $DSYS pact $Opt
 
