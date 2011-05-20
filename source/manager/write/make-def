@@ -45,6 +45,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "#"
     Note $STDOUT ""
     Note $STDOUT "System  = $System"
+    Note $STDOUT 'archo   = z-${System}/obj'
     set QUOTE = \"
     set THE_DATE = `cat .pact-version`
     Note $STDOUT "Version = $THE_DATE"

@@ -33,7 +33,7 @@ SaveFiles = *.c *.h *.f
 #
 # Files to remove in directory clean (pact clean)
 #
-CleanFiles  = ${bindf} ${hdrf} *~ core
+CleanFiles  = 
 RemoveFiles = ${BinDir}/pdbtst ${BinDir}/pdatst ${BinDir}/pdasts    \
               ${BinDir}/pdopts ${BinDir}/pdapts ${BinDir}/pdgsts    \
               ${BinDir}/pdfrts ${BinDir}/pdctst \
@@ -110,8 +110,7 @@ ArObjs = ${TGTLib}(pdb.o) ${TGTLib}(pdbaib.o)                        \
          ${TGTLib}(pdszof.o) ${TGTLib}(pdpar.o) ${TGTLib}(pdparmp.o) \
          ${TGTLib}(pdspoke.o)
 
-${Objs} : ${hdrf} ${Hdrs} pdspoke.c
-${LibDep} : ${hdrf} ${gos} ${Hdrs} pdspoke.c
+${LibDep} : ${gobj} ${hdrf} ${Hdrs} pdspoke.c
 
 #
 # Generated code rules
@@ -130,29 +129,12 @@ ${IncDir}/pdform.h : ${BinDir}/detect
 
 hdrf = ${IncDir}/pdform.h
 
-
 # spokes
 
 pdspoke.c : config-spokes pdshar.c
 	config-spokes
 
 spokef = pdspoke.c
-
-# language bindings
-
-archo = z-${System}/obj
-bindf = ${PACTTmpDir}/gf-${LibName}.c ../sx/${archo}/gs-${LibName}.c
-gos   = ${PACTTmpDir}/gf-${LibName}.o
-
-${PACTTmpDir}/gf-${LibName}.c : ${LibName}.bind ${Hdrs} ${hdrf}
-	@../scripts/bproto
-
-${gos} : ${PACTTmpDir}/gf-${LibName}.c
-	@(echo "${CCAnnounce} -c $<" ; \
-          ${CC} -c $< -o $@ ; \
-          ${AR} ${AROpt} ${TGTLib} $@ 2> /dev/null )
-
-generate : ${bindf} ${hdrf}
 
 IncAction = @pact generate
 

@@ -197,6 +197,7 @@ set LibVers = 1
     Note $STDOUT '	${CleanAction}'
     Note $STDOUT '	@touch tarfu~ core'
     Note $STDOUT '	@${RM} *~ core ${CleanFiles} > /dev/null 2>&1'
+    Note $STDOUT '	@${RM} ${gsrc} ${hdrf} > /dev/null 2>&1'
 
     Note $STDOUT '#'
     Note $STDOUT '# remove binaries and libraries'
@@ -267,6 +268,51 @@ set LibVers = 1
     Note $STDOUT 'noinc :'
     Note $STDOUT '	@cd .'
     Note $STDOUT ""
+
+    Note $STDOUT '#'
+    Note $STDOUT '# Generated code rules'
+    Note $STDOUT '#'
+    Note $STDOUT ''
+
+    Note $STDOUT '# language bindings'
+    Note $STDOUT ''
+
+    Note $STDOUT 'gfb  = ${PACTTmpDir}/gf-${LibName}.c'
+    Note $STDOUT 'gfo  = ${PACTTmpDir}/gf-${LibName}.o'
+    Note $STDOUT 'gfm  = ${PACTTmpDir}/gf-${LibName}.f'
+    Note $STDOUT 'gmo  = ${PACTTmpDir}/${LibName}.mod'
+    Note $STDOUT 'gsb  = ../sx/${archo}/gs-${LibName}.c'
+    Note $STDOUT 'gpb  = ../python/${archo}/gp-${LibName}.c'
+    Note $STDOUT 'gobj = ${gmo} ${gfo}'
+    Note $STDOUT 'gsrc = ${gfm} ${gfb} ${gsb} ${gpb}'
+    Note $STDOUT ''
+
+# NOTE: technically this should be gsrc but that results in
+# bproto being run 3 times - at least by dmake
+    Note $STDOUT '${gfb} : ${LibName}.bind ${Hdrs} ${hdrf}'
+    Note $STDOUT '	@../scripts/bproto'
+    Note $STDOUT ''
+
+    Note $STDOUT '${gfo} : ${gfb}'
+    Note $STDOUT '	@(echo "${CCAnnounce} -c $<" ; \'
+    Note $STDOUT '          ${CC} -c $< -o $@ ; \'
+    Note $STDOUT '          ${AR} ${AROpt} ${TGTLib} $@ 2> /dev/null )'
+    Note $STDOUT ''
+
+    Note $STDOUT '${gmo} : ${gfm} ${gfb}'
+    Note $STDOUT '	@(cd ${PACTTmpDir} ; \'
+    Note $STDOUT '	  ${RM} ${LibName}.mod ; \'
+    Note $STDOUT '	  echo "${FC} -c gm-${LibName}.f" ; \'
+    Note $STDOUT '	  ${FC} -c gm-${LibName}.f ; \'
+    Note $STDOUT '	  ${RM} gm-${LibName}.o)'
+    Note $STDOUT '	 @[ -f ${gmo} ] ; ${INSTALL} ${gmo} ${IncDir}'
+    Note $STDOUT ''
+
+    Note $STDOUT 'module : ${gmo}'
+    Note $STDOUT ''
+
+    Note $STDOUT 'generate : ${gfb} ${hdrf}'
+    Note $STDOUT ''
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

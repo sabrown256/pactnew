@@ -582,7 +582,7 @@ static int bind_fortran(FILE *fp, char **spr, char **sbi)
 
 /* FIN_FORTRAN - finalize Fortran file */
 
-static void fin_fortran(FILE *fp)
+static void fin_fortran(FILE *fp, char *pck)
    {
 
     csep(fp);
@@ -637,7 +637,12 @@ static void fin_fortran(FILE *fp)
 static void mc_type(char *fty, int nf, char *cty, int nc, char *t)
    {
 
-    if ((is_ptr(t) == TRUE) || (strstr(t, "(*") != NULL))
+    if ((strstr(t, "(*") != NULL) ||
+	(strncmp(t, "PF", 2) == 0))
+       {nstrncpy(fty, nf, "type", -1);
+	nstrncpy(cty, nc, "C_FUNPTR", -1);}
+
+    else if (is_ptr(t) == TRUE)
        {nstrncpy(fty, nf, "type", -1);
 	nstrncpy(cty, nc, "C_PTR", -1);}
 
@@ -832,12 +837,12 @@ static int bind_module(FILE *fp, char **spr, char **sbi)
 
 /* FIN_MODULE - finalize Fortran/C interoperability interface module file */
 
-static void fin_module(FILE *fp)
+static void fin_module(FILE *fp, char *pck)
    {
 
     fprintf(fp, "   end interface\n");
     fprintf(fp, "\n");
-    fprintf(fp, "end module score\n");
+    fprintf(fp, "end module %s\n", pck);
     fprintf(fp, "\n");
 
     fclose(fp);
@@ -1444,8 +1449,8 @@ static int blang(char *pck, char *fpr, char *fbi)
 		rv &= bind_python(fp, spr, sbi);
 		rv &= bind_doc(fd, spr, sbi);};
 
-	    fin_fortran(ff);
-	    fin_module(fm);
+	    fin_fortran(ff, pck);
+	    fin_module(fm, pck);
 	    fin_scheme(fs);
 	    fin_python(fp);
 	    fin_doc(fd);

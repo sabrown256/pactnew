@@ -37,9 +37,11 @@ SaveFiles = *.c *.h *.r
 #
 # Files to remove in directory clean (pact clean)
 #
-CleanFiles = ${bindf} ${hdrf} scf77lr.c *~ core ${BinDir}/ptime ${BinDir}/ncpu \
-             ${BinDir}/ps-diff ${BinDir}/mpi-io-wrap \
-             ${BinDir}/dmnz ${BinDir}/rpath ${BinDir}/hserve ${BinDir}/fcscan
+CleanFiles  = scf77lr.c
+RemoveFiles = ${BinDir}/ptime ${BinDir}/ncpu \
+              ${BinDir}/ps-diff ${BinDir}/mpi-io-wrap \
+              ${BinDir}/dmnz ${BinDir}/rpath ${BinDir}/hserve \
+              ${BinDir}/fcscan
 
 #
 # Things upon which install depends (pact install)
@@ -172,7 +174,7 @@ ${PObjs} : scope_proc.h
 ${TObjs} : scope_thread.h
 ${Objs}  : ${Hdrs} ${hdrf}
 
-${LibDep} : ${Hdrs} ${hdrf} ${gos}
+${LibDep} : ${gobj} ${hdrf} ${Hdrs}
 ${MMDep}  : ${Hdrs}
 
 #
@@ -201,22 +203,6 @@ ${IncDir}/scfnca.h : scfnca.t
 	  ${BinDir}/template scfnca.t -o ${IncDir}/scfnca.h)
 
 hdrf = ${IncDir}/sctypeg.h ${IncDir}/scarg.h ${IncDir}/scfnca.h
-
-# language bindings
-
-archo = z-${System}/obj
-bindf = ${PACTTmpDir}/gf-${LibName}.c ../sx/${archo}/gs-${LibName}.c
-gos   = ${PACTTmpDir}/gf-${LibName}.o
-
-${PACTTmpDir}/gf-${LibName}.c : ${LibName}.bind ${Hdrs} ${hdrf}
-	@../scripts/bproto
-
-${gos} : ${PACTTmpDir}/gf-${LibName}.c
-	@(echo "${CCAnnounce} -c $<" ; \
-          ${CC} -c $< -o $@ ; \
-          ${AR} ${AROpt} ${TGTLib} $@ 2> /dev/null )
-
-generate : ${bindf} ${hdrf}
 
 IncAction = @pact generate
 

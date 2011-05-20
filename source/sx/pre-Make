@@ -140,8 +140,6 @@ gso = ${PACTTmpDir}/gs-score.o ${PACTTmpDir}/gs-pml.o ${PACTTmpDir}/gs-pdb.o   \
           ${CC} -c $< -o $@ ; \
           ${AR} ${AROpt} ${TGTLib} $@ 2>> errlog )
 
-generate : ${hdrf}
-
 bindings : ${gso}
 
 IncAction = @pact generate

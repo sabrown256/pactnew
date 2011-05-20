@@ -46,12 +46,6 @@ ${InstallDep} : ${IncFiles}
 
 hdrf = 
 
-# language bindings
-
-bindf = 
-
-generate : ${bindf} ${hdrf}
-
 IncAction = 
 
 
