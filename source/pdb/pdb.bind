@@ -10,29 +10,60 @@
 #  C function         Fortran  Scheme            Python
 
 # PDBMP.C
-#PD_init_mpi           pfinmp   none              none
-#PD_term_mpi           pftmmp   none              none
+PD_init_mpi           pfinmp   none              none
+PD_term_mpi           pftmmp   none              none
+PD_mp_set_serial      pfmpss   none              none
 #FIXNUM F77_FUNC(pfmpop, PFMPOP)(FIXNUM *pnchr, F77_string name,
-#PD_mp_set_serial      pfmpss   none              none
 
 # PDFIA.C
+PD_activate_cksum     pfscsm   none              none
+PD_get_format_version pfgfmv   none              none
+PD_set_format_version pfsfmv   none              none
+PD_init_threads       pfinth   none              none
+PD_read               pfread   none              none
+PD_read_as            pfrdas   none              none
+PD_read_as_dwim       pfrdai   none              none
+PD_append             pfappa   none              none
+PD_append_as          pfapas   none              none
+PD_write              pfwrta   none              none
+PD_write_as           pfwras   none              none
+PD_defent             pfdefa   none              none
+PD_free               pffree   none              none
+PD_close              pfclos   none              none
+PD_wrt_pdb_curve      pfwulc   none              none
+PD_wrt_pdb_curve_y    pfwuly   none              none
+PD_def_attribute      pfdatt   none              none
+PD_rem_attribute      pfratt   none              none
+PD_set_attribute      pfsvat   none              none
+PD_get_attribute      pfgvat   none              none
+PD_flush              pfflsh   none              none
+PD_family             pffami   none              none
+PD_cd                 pfcd   none              none
+PD_ln                 pfln   none              none
+PD_mkdir              pfmkdr   none              none
+PD_isdir              pfisdr   none              none
+PD_pwd                pfpwd   none               none
+PN_conv_in            pfncin   none              none
+PN_conv_out           pfncot   none              none
+PN_target             pfntgt   none              none
+PD_read_bits          pfrdbt   none              none
+PD_reset_ptr_list     pfrspl   none              none
+PD_get_file_length    pfgfln   none              none
+PD_fix_denorm         pfdnrm   none              none
+PD_remove_entry       pfrent   none              none
 #FIXNUM F77_FUNC(pfgerr, PFGERR)(FIXNUM *nchr, F77_string err)
 #FIXNUM F77_FUNC(pfgfnm, PFGFNM)(FIXNUM *fileid, FIXNUM *pnc, F77_string name)
 #FIXNUM F77_FUNC(pfgfdt, PFGFDT)(FIXNUM *fileid, FIXNUM *pnc, F77_string date)
 #FIXNUM F77_FUNC(pfgcsm, PFGCSM)(FIXNUM *fileid, FIXNUM *v)
-#PD_activate_cksum     pfscsm   none              none
 #FIXNUM F77_FUNC(pfgtpt, PFGTPT)(FIXNUM *fileid, FIXNUM *v)
 #FIXNUM F77_FUNC(pfstpt, PFSTPT)(FIXNUM *fileid, FIXNUM *v)
 #FIXNUM F77_FUNC(pfgbfs, PFGBFS)(void)
 #FIXNUM F77_FUNC(pfsbfs, PFSBFS)(FIXNUM *psz)
-#PD_get_format_version pfgfmv   none              none
-#PD_set_format_version pfsfmv   none              none
 #FIXNUM F77_FUNC(pfgoff, PFGOFF)(FIXNUM *fileid)
 #FIXNUM F77_FUNC(pfsoff, PFSOFF)(FIXNUM *fileid, FIXNUM *v)
 #FIXNUM F77_FUNC(pfgmxs, PFGMXS)(FIXNUM *fileid)
 #FIXNUM F77_FUNC(pfsmxs, PFSMXS)(FIXNUM *fileid, FIXNUM *v)
 #FIXNUM F77_FUNC(pfgmod, PFGMOD)(FIXNUM *fileid)
-#PD_init_threads       pfinth   none              none
 #FIXNUM F77_FUNC(pfvart, PFVART)(FIXNUM *fileid, FIXNUM *pord, FIXNUM *n)
 #FIXNUM F77_FUNC(pfdvar, PFDVAR)(void)
 #FIXNUM F77_FUNC(pfgvar, PFGVAR)(FIXNUM *pn, FIXNUM *pnchr, F77_string pname)
@@ -41,56 +72,25 @@
 #FIXNUM F77_FUNC(pfityp, PFITYP)(FIXNUM *fileid, FIXNUM *pntyp,
 #FIXNUM F77_FUNC(pfimbr, PFIMBR)(FIXNUM *fileid, FIXNUM *pntyp,
 #FIXNUM F77_FUNC(pfqmbr, PFQMBR)(FIXNUM *fileid, FIXNUM *pntyp,
-#PD_read               pfread   none              none
-#PD_read_as            pfrdas   none              none
-#PD_read_as_dwim       pfrdai   none              none
 #FIXNUM F77_FUNC(pfrptr, PFRPTR)(FIXNUM *fileid, FIXNUM *pnchr,
 #FIXNUM F77_FUNC(pfptrd, PFPTRD)(FIXNUM *fileid, FIXNUM *pnchr,
 #FIXNUM F77_FUNC(pfrdad, PFRDAD)(FIXNUM *fileid, FIXNUM *pnchr,
-#PD_append             pfappa   none              none
-#PD_append_as          pfapas   none              none
 #FIXNUM F77_FUNC(pfappd, PFAPPD)(FIXNUM *fileid, FIXNUM *pnchr,
 #FIXNUM F77_FUNC(pfapad, PFAPAD)(FIXNUM *fileid, FIXNUM *pnchr,
-#PD_write              pfwrta   none              none
-#PD_write_as           pfwras   none              none
 #FIXNUM F77_FUNC(pfwrtd, PFWRTD)(FIXNUM *fileid, FIXNUM *pnchr,
 #FIXNUM F77_FUNC(pfwrad, PFWRAD)(FIXNUM *fileid, FIXNUM *pnchr,
-#PD_defent             pfdefa   none              none
 #FIXNUM F77_FUNC(pfdefd, PFDEFD)(FIXNUM *fileid, FIXNUM *pnchr,
 #FIXNUM F77_FUNC(pfdefs, PFDEFS)(FIXNUM *fileid,
 #FIXNUM F77_FUNC(pfdeft, PFDEFT)(FIXNUM *fileid, FIXNUM *pnchr, F77_string name,
-#PD_free               pffree   none              none
 #FIXNUM F77_FUNC(pftrgt, PFTRGT)(FIXNUM *pis, FIXNUM *pia)
 #FIXNUM F77_FUNC(pfopen, PFOPEN)(FIXNUM *pnchr, F77_string name,
-#PD_close              pfclos   none              none
-#PD_wrt_pdb_curve      pfwulc   none              none
-#PD_wrt_pdb_curve_y    pfwuly   none              none
 #FIXNUM F77_FUNC(pfwmap, PFWMAP)(FIXNUM *fileid, F77_string dname,
 #FIXNUM F77_FUNC(pfwima, PFWIMA)(FIXNUM *fileid, FIXNUM *nchr, F77_string name,
 #FIXNUM F77_FUNC(pfwset, PFWSET)(FIXNUM *fileid, F77_string dname,
 #FIXNUM F77_FUNC(pfwrae, PFWRAE)(FIXNUM *fileid, F77_string dname,
 #FIXNUM F77_FUNC(pfwran, PFWRAN)(FIXNUM *fileid, F77_string dname,
-#PD_def_attribute      pfdatt   none              none
-#PD_rem_attribute      pfratt   none              none
-#PD_set_attribute      pfsvat   none              none
-#PD_get_attribute      pfgvat   none              none
-#PD_flush              pfflsh   none              none
-#PD_family             pffami   none              none
-#PD_cd                 pfcd   none              none
-#PD_ln                 pfln   none              none
 #FIXNUM F77_FUNC(pflst, PFLST)(FIXNUM *fileid, FIXNUM *npath, F77_string path,
 #FIXNUM F77_FUNC(pfgls, PFGLS)(FIXNUM *ord, FIXNUM *len, F77_string name)
 #FIXNUM F77_FUNC(pfdls, PFDLS)(void)
-#PD_mkdir              pfmkdr   none              none
-#PD_isdir              pfisdr   none              none
-#PD_pwd                pfpwd   none              none
-#PN_conv_in            pfncin   none              none
-#PN_conv_out           pfncot   none              none
-#PN_target             pfntgt   none              none
-#PD_read_bits          pfrdbt   none              none
 #FIXNUM F77_FUNC(pfsmjo, PFSMJO)(FIXNUM *fileid, FIXNUM *pval)
 #FIXNUM F77_FUNC(pfgmjo, PFGMJO)(FIXNUM *fileid, FIXNUM *pval)
-#PD_reset_ptr_list     pfrspl   none              none
-#PD_get_file_length    pfgfln   none              none
-#PD_fix_denorm         pfdnrm   none              none
-#PD_remove_entry       pfrent   none              none

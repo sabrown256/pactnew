@@ -319,32 +319,47 @@ static void cf_type(char *a, int nc, char *t)
 
 /* FC_TYPE - return C type corresponding to FORTRAN type T */
 
-static void fc_type(char *a, int nc, char *t)
-   {
+static int fc_type(char *a, int nc, char *t)
+   {int rv;
 
-    if (strcmp(t, "char *") == 0)
+    rv = TRUE;
+
+    if (strcmp(t, "...") == 0)
+       {nstrncpy(a, nc, "char *", -1);
+	rv = FALSE;}
+
+    else if (strcmp(t, "char *") == 0)
        nstrncpy(a, nc, "char *", -1);
+
     else if ((is_ptr(t) == TRUE) || 
 	     (strstr(t, "(*") != NULL))
        nstrncpy(a, nc, "void *", -1);
+
+/* follow the PACT function pointer PF convention */
     else if (strncmp(t, "PF", 2) == 0)
        nstrncpy(a, nc, "PFInt", -1);
+
     else if ((strncmp(t, "int", 3) == 0) ||
 	     (strncmp(t, "long", 4) == 0) || 
 	     (strncmp(t, "short", 5) == 0) || 
 	     (strncmp(t, "long long", 9) == 0) ||
 	     (strncmp(t, "FIXNUM", 6) == 0))
        nstrncpy(a, nc, "FIXNUM", -1);
+
     else if (strncmp(t, "double", 6) == 0)
        nstrncpy(a, nc, "double", -1);
+
     else if (strncmp(t, "float", 6) == 0)
        nstrncpy(a, nc, "float", -1);
+
     else if (strncmp(t, "void", 4) == 0)
        nstrncpy(a, nc, "void", -1);
-    else
-       nstrncpy(a, nc, "unknown", -1);
 
-    return;}
+/* take unknown types to be integer - covers enums */
+    else
+       nstrncpy(a, nc, "int", -1);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -354,7 +369,7 @@ static void fc_type(char *a, int nc, char *t)
  */
 
 static void fc_decl_list(char *a, int nc, fdecl *dcl)
-   {int i, na;
+   {int i, na, ok;
     char lt[MAXLINE];
     farg *al;
 
@@ -366,7 +381,7 @@ static void fc_decl_list(char *a, int nc, fdecl *dcl)
        nstrcat(a, MAXLINE, "void");
     else
        {for (i = 0; i < na; i++)
-	    {fc_type(lt, MAXLINE, al[i].type);
+	    {ok = fc_type(lt, MAXLINE, al[i].type);
 	     if (al[i].fptr == TRUE)
 	        vstrcat(a, MAXLINE, "%s p%s, ", lt, al[i].name);
 	     else
@@ -454,94 +469,102 @@ static FILE *init_fortran(char *pck)
  */
 
 static void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
-   {int i, na, nv, voidf, voida, rptr;
+   {int i, na, nv, voidf, voida, rptr, ok;
     char ufn[MAXLINE], a[MAXLINE], rt[MAXLINE], t[MAXLINE];
     farg *al;
 
-    nstrncpy(ufn, MAXLINE, ffn, -1);
-    upcase(ufn);
+    if (strstr(dcl->proto, "...") != NULL)
+       printf("\nError: %s is not interoperable - variable args\n", ffn);
 
-    na    = dcl->na;
-    al    = dcl->al;
-    voidf = (strcmp(dcl->type, "void") == 0);
-    voida = no_args(dcl);
-
-    fc_type(rt, MAXLINE, dcl->type);
-    fc_decl_list(a, MAXLINE, dcl);
-
-    rptr = is_ptr(rt);
-
-    csep(fp);
-    fprintf(fp, "\n");
-
-    if (rptr == TRUE)
-       snprintf(t, MAXLINE, "FIXNUM FF_ID(w%s, W%s)(%s)\n", ffn, ufn, a);
     else
-       snprintf(t, MAXLINE, "%s FF_ID(w%s, W%s)(%s)\n", rt, ffn, ufn, a);
-    fputs(subst(t, "* ", "*", -1), fp);
+       {nstrncpy(ufn, MAXLINE, ffn, -1);
+	upcase(ufn);
+
+	na    = dcl->na;
+	al    = dcl->al;
+	voidf = (strcmp(dcl->type, "void") == 0);
+	voida = no_args(dcl);
+
+	ok = fc_type(rt, MAXLINE, dcl->type);
+	fc_decl_list(a, MAXLINE, dcl);
+
+	rptr = is_ptr(rt);
+
+	csep(fp);
+	fprintf(fp, "\n");
+
+	if (rptr == TRUE)
+	   snprintf(t, MAXLINE, "FIXNUM FF_ID(w%s, W%s)(%s)\n",
+		    ffn, ufn, a);
+	else
+	   snprintf(t, MAXLINE, "%s FF_ID(w%s, W%s)(%s)\n",
+		    rt, ffn, ufn, a);
+	fputs(subst(t, "* ", "*", -1), fp);
 
 /* local variable declarations */
-    nv = 0;
-    for (i = 0; i <= na; i++)
-        {if ((voida == TRUE) && (i == 0))
-	    continue;
+	nv = 0;
+	for (i = 0; i <= na; i++)
+	    {if ((voida == TRUE) && (i == 0))
+	        continue;
 
-	 if (nv == 0)
-	    fprintf(fp, "   {");
-	 else
-	    fprintf(fp, "    ");
+	     if (nv == 0)
+	        fprintf(fp, "   {");
+	     else
+	        fprintf(fp, "    ");
 
-	 t[0] = '\0';
+	     t[0] = '\0';
 
 /* variable for return value */
-	 if ((i == na) && (voidf == FALSE))
-	    {if (rptr == TRUE)
-		snprintf(t, MAXLINE, "FIXNUM _rv;\n");
-	      else
-		snprintf(t, MAXLINE, "%s _rv;\n", rt);}
+	     if (i == na)
+	        {if (voidf == FALSE)
+		    {if (rptr == TRUE)
+		        snprintf(t, MAXLINE, "FIXNUM _rv;\n");
+		     else
+		        snprintf(t, MAXLINE, "%s _rv;\n", rt);};}
 
 /* local vars */
-	 else if (al[i].name[0] != '\0')
-	    {snprintf(t, MAXLINE, "%s _l%s;\n", al[i].type, al[i].name);
-	     nv++;};
+	     else if (al[i].name[0] != '\0')
+	        {snprintf(t, MAXLINE, "%s _l%s;\n", al[i].type, al[i].name);
+		 nv++;};
 
-	 if (IS_NULL(t) == FALSE)
-	    fputs(subst(t, "* ", "*", -1), fp);};
+	     if (IS_NULL(t) == FALSE)
+	        fputs(subst(t, "* ", "*", -1), fp);};
 
-    fprintf(fp, "\n");
+	fprintf(fp, "\n");
 
 /* local variable assignments */
-    for (i = 0; i < na; i++)
-        {if (al[i].name[0] != '\0')
-	    {if (al[i].fptr == TRUE)
-		fprintf(fp, "    _l%s = (%s) p%s;\n",
-			al[i].name, al[i].type, al[i].name);
-	     else
-		fprintf(fp, "    _l%s = (%s) *p%s;\n",
-			al[i].name, al[i].type, al[i].name);};};
+	for (i = 0; i < na; i++)
+	    {if (al[i].name[0] != '\0')
+	        {if (al[i].fptr == TRUE)
+		    fprintf(fp, "    _l%s = (%s) p%s;\n",
+			    al[i].name, al[i].type, al[i].name);
+		 else
+		    fprintf(fp, "    _l%s = (%s) *p%s;\n",
+			    al[i].name, al[i].type, al[i].name);};};
 
-    if (na > 0)
-       fprintf(fp, "\n");
+	if (na > 0)
+	   fprintf(fp, "\n");
 
 /* function call */
-    fc_call_list(a, MAXLINE, dcl);
-    if (voidf == FALSE)
-       {if (rptr == TRUE)
-	   fprintf(fp, "    _rv = SC_ADD_POINTER(%s(%s));\n", dcl->name, a);
+	fc_call_list(a, MAXLINE, dcl);
+	if (voidf == FALSE)
+	   {if (rptr == TRUE)
+	       fprintf(fp, "    _rv = SC_ADD_POINTER(%s(%s));\n",
+		       dcl->name, a);
+	    else
+	       fprintf(fp, "    _rv = %s(%s);\n", dcl->name, a);}
 	else
-	   fprintf(fp, "    _rv = %s(%s);\n", dcl->name, a);}
-    else
-       fprintf(fp, "    %s(%s);\n", dcl->name, a);
+	   fprintf(fp, "    %s(%s);\n", dcl->name, a);
 
-    fprintf(fp, "\n");
+	fprintf(fp, "\n");
 
-    if (voidf == FALSE)
-       fprintf(fp, "    return(_rv);}\n");
-    else
-       fprintf(fp, "    return;}\n");
+	if (voidf == FALSE)
+	   fprintf(fp, "    return(_rv);}\n");
+	else
+	   fprintf(fp, "    return;}\n");
 
-    fprintf(fp, "\n");
-    csep(fp);
+	fprintf(fp, "\n");
+	csep(fp);};
 
     return;}
 
@@ -634,10 +657,18 @@ static void fin_fortran(FILE *fp, char *pck)
  *    	C_CHAR			char
  */
 
-static void mc_type(char *fty, int nf, char *cty, int nc, char *t)
-   {
+static int mc_type(char *fty, int nf, char *cty, int nc, char *t)
+   {int rv;
 
-    if ((strstr(t, "(*") != NULL) ||
+    rv = TRUE;
+
+    if (strcmp(t, "...") == 0)
+       {rv = FALSE;
+        nstrncpy(fty, nf, "error", -1);
+	nstrncpy(cty, nc, "error", -1);}
+
+/* follow the PACT function pointer PF convention */
+    else if ((strstr(t, "(*") != NULL) ||
 	(strncmp(t, "PF", 2) == 0))
        {nstrncpy(fty, nf, "type", -1);
 	nstrncpy(cty, nc, "C_FUNPTR", -1);}
@@ -702,11 +733,12 @@ static void mc_type(char *fty, int nf, char *cty, int nc, char *t)
        {nstrncpy(fty, nf, "subroutine", -1);
 	nstrncpy(cty, nc, "C_VOID", -1);}
 
+/* take unknown types to be integer - covers enums */
     else
-       {nstrncpy(fty, nf, "unknown", -1);
-	nstrncpy(cty, nc, "unknown", -1);};
+       {nstrncpy(fty, nf, "integer", -1);
+	nstrncpy(cty, nc, "C_INT", -1);};
 
-    return;}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -756,47 +788,59 @@ static FILE *init_module(char *pck)
  */
 
 static void wrap_module(FILE *fp, fdecl *dcl, char *cfn)
-   {int i, na, nv, voidf, voida, rptr;
+   {int i, na, nv, voidf, voida, rptr, ok;
     char dcn[MAXLINE], a[MAXLINE], fty[MAXLINE], cty[MAXLINE];
+    char cd[MAXLINE], cb[MAXLINE];
     farg *al;
 
-    nstrncpy(dcn, MAXLINE, cfn, -1);
-    downcase(dcn);
+    if (strstr(dcl->proto, "...") != NULL)
+       printf("\nError: %s is not interoperable - variable args\n", cfn);
 
-    na    = dcl->na;
-    al    = dcl->al;
-    voidf = (strcmp(dcl->type, "void") == 0);
-    voida = no_args(dcl);
-
-    mc_type(fty, MAXLINE, cty, MAXLINE, dcl->type);
-    mc_decl_list(a, MAXLINE, dcl);
-
-    rptr = is_ptr(fty);
-
-    if (voidf == TRUE)
-       fprintf(fp, "      %s %s(%s)  bind(c, name='%s')\n",
-	       fty, dcn, a, cfn);
     else
-       fprintf(fp, "      %s (%s) function %s(%s)  bind(c, name='%s')\n",
-	       fty, cty, dcn, a, cfn);
-    fprintf(fp, "         use iso_c_binding\n");
-    fprintf(fp, "         implicit none\n");
+       {nstrncpy(dcn, MAXLINE, cfn, -1);
+	downcase(dcn);
+
+	na    = dcl->na;
+	al    = dcl->al;
+	voidf = (strcmp(dcl->type, "void") == 0);
+	voida = no_args(dcl);
+
+	ok = mc_type(fty, MAXLINE, cty, MAXLINE, dcl->type);
+	mc_decl_list(a, MAXLINE, dcl);
+
+	rptr = is_ptr(fty);
+
+	if (voidf == TRUE)
+	   snprintf(cd, MAXLINE, "      %s %s(%s)", fty, dcn, a);
+	else
+	   snprintf(cd, MAXLINE, "      %s (%s) function %s(%s)",
+		    fty, cty, dcn, a);
+
+	snprintf(cb, MAXLINE, "bind(c, name='%s')", cfn);
+
+	if (strlen(cd) > 70)
+	   fprintf(fp, "%s &\n                %s\n", cd, cb);
+	else
+	   fprintf(fp, "%s %s\n", cd, cb);
+
+	fprintf(fp, "         use iso_c_binding\n");
+	fprintf(fp, "         implicit none\n");
 
 /* argument declarations */
-    nv = 0;
-    for (i = 0; i < na; i++)
-        {if ((voida == TRUE) && (i == 0))
-	    continue;
+	nv = 0;
+	for (i = 0; i < na; i++)
+	    {if ((voida == TRUE) && (i == 0))
+	        continue;
 
-	 mc_type(fty, MAXLINE, cty, MAXLINE, al[i].type);
-	 fprintf(fp, "         %s (%s), value :: %s\n",
-		 fty, cty, al[i].name);};
+	     ok = mc_type(fty, MAXLINE, cty, MAXLINE, al[i].type);
+	     fprintf(fp, "         %s (%s), value :: %s\n",
+		     fty, cty, al[i].name);};
 
-    if (voidf == TRUE)
-       fprintf(fp, "      end subroutine %s\n", dcn);
-    else
-       fprintf(fp, "      end function %s\n", dcn);
-    fprintf(fp, "\n");
+	if (voidf == TRUE)
+	   fprintf(fp, "      end subroutine %s\n", dcn);
+	else
+	   fprintf(fp, "      end function %s\n", dcn);
+	fprintf(fp, "\n");};
 
     return;}
 

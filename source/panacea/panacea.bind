@@ -10,32 +10,32 @@
 #  C function         Fortran  Scheme            Python
 
 # PAFIA.C
+PA_intern             pantrn   none              none
+PA_get_access         paconn   none              none
+PA_rel_access         padcon   none              none
+PA_control_set        paspck   none              none
+PA_error              paerr    none              none
+PA_get_default_offset pagdof   none              none
+PA_set_default_offset pasdof   none              none
+PA_set_equiv          paseqv   none              none
+PA_equivalence        padeqv   none              none
 #FIXNUM F77_FUNC(pamcon, PAMCON)(FIXNUM *pnc, char **pvn, void **pp, FIXNUM *pn)
-#PA_intern             pantrn   none              none
-#PA_get_access         paconn   none              none
-#PA_rel_access         padcon   none              none
 #FIXNUM F77_FUNC(paloca, PALOCA)(void **pv, FIXNUM *pbpi, FIXNUM *pn, ...)
 #FIXNUM F77_FUNC(palloc, PALLOC)(void **pv, FIXNUM *pnc,
-#PA_control_set        paspck   none              none
-#PA_error              paerr    none              none
-#PA_get_default_offset pagdof   none              none
-#PA_set_default_offset pasdof   none              none
-#PA_set_equiv          paseqv   none              none
-#PA_equivalence        padeqv   none              none
 
 # PANTH.C
+PA_th_write           pawrec   none              none
+PA_th_wr_member       pawmem   none              none
+PA_th_wr_iattr        pawria   none              none
+PA_th_trans_family    patrnf   none              none
+PA_th_trans_name      patrnn   none              none
+PA_th_trans_link      patrnl   none              none
+PA_merge_family       pamrgf   none              none
+PA_merge_files        pamrgn   none              none
 #FIXNUM F77_FUNC(pathop, PATHOP)(FIXNUM *pnf, F77_string fname, FIXNUM *pnm,
 #FIXNUM F77_FUNC(pathfm, PATHFM)(FIXNUM *fileid)
 #FIXNUM F77_FUNC(pabrec, PABREC)(FIXNUM *fileid, FIXNUM *pnf, F77_string fname,
 #FIXNUM F77_FUNC(pagrid, PAGRID)(FIXNUM *fileid, FIXNUM *pind, FIXNUM *pnn,
 #FIXNUM F77_FUNC(paarec, PAAREC)(FIXNUM *fileid, FIXNUM *recid, FIXNUM *pnm,
 #FIXNUM F77_FUNC(paerec, PAEREC)(FIXNUM *fileid, FIXNUM *recid)
-#PA_th_write           pawrec   none              none
-#PA_th_wr_member       pawmem   none              none
-#PA_th_wr_iattr        pawria   none              none
-#PA_th_trans_family    patrnf   none              none
-#PA_th_trans_name      patrnn   none              none
-#PA_th_trans_link      patrnl   none              none
-#PA_merge_family       pamrgf   none              none
-#PA_merge_files        pamrgn   none              none
 #FIXNUM F77_FUNC(pafrec, PAFREC)(FIXNUM *recid)
