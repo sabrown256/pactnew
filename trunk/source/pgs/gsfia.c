@@ -57,10 +57,10 @@ FIXNUM FF_ID(pgaxis, PGAXIS)(FIXNUM *devid, FIXNUM *paxt)
  */
 
 FIXNUM FF_ID(pgsaxa, PGSAXA)(FIXNUM *devid, FIXNUM *pn,
-                                double *pat, char *patc)
-   {int i, nc, nn, type, linecolor, txtcolor, prec;
+			     double *pat, char *patc)
+   {int i, nc, nn, type, lnclr, txclr, prec;
     double *attr;
-    double charspace, chupx, chupy, chpthx, chpthy;
+    double chsp, chupx, chupy, chpthx, chpthy;
     char *pc, bf[MAXLINE];
     PG_device *dev;
 
@@ -70,9 +70,9 @@ FIXNUM FF_ID(pgsaxa, PGSAXA)(FIXNUM *devid, FIXNUM *pn,
        return(FALSE);
 
 /* load default values for external variables */
-    linecolor     = dev->WHITE;
-    txtcolor      = dev->WHITE;
-    prec          = TEXT_CHARACTER_PRECISION;
+    lnclr = dev->WHITE;
+    txclr = dev->WHITE;
+    prec  = TEXT_CHARACTER_PRECISION;
 
     if (_PG_gattrs.axis_label_x_format == NULL)
        _PG_gattrs.axis_label_x_format = CSTRSAVE("%10.2g");
@@ -83,11 +83,11 @@ FIXNUM FF_ID(pgsaxa, PGSAXA)(FIXNUM *devid, FIXNUM *pn,
     if (_PG_gattrs.axis_type_face == NULL)
        _PG_gattrs.axis_type_face = CSTRSAVE("helvetica");
 
-    charspace    = 0.0;
-    chpthx       = 1.0;
-    chpthy       = 0.0;
-    chupx        = 0.0;
-    chupy        = 1.0;
+    chsp   = 0.0;
+    chpthx = 1.0;
+    chpthy = 0.0;
+    chupx  = 0.0;
+    chupy  = 1.0;
 
     _PG_gattrs.axis_grid_on = FALSE;
 
@@ -109,11 +109,11 @@ FIXNUM FF_ID(pgsaxa, PGSAXA)(FIXNUM *devid, FIXNUM *pn,
                   break;
 
              case AXIS_LINECOLOR :
-                  linecolor = *attr++;
+                  lnclr = *attr++;
                   break;
 
              case AXIS_LABELCOLOR :
-                  txtcolor = *attr++;
+                  txclr = *attr++;
                   break;
 
              case AXIS_LABELSIZE :
@@ -169,13 +169,14 @@ FIXNUM FF_ID(pgsaxa, PGSAXA)(FIXNUM *devid, FIXNUM *pn,
 
 /* set attribute values */
     PG_set_clipping(dev, FALSE);
-    PG_set_color_text(dev, txtcolor, TRUE);
-    PG_set_font(dev, _PG_gattrs.axis_type_face, dev->type_style, dev->type_size);
+    PG_set_color_text(dev, txclr, TRUE);
+    PG_set_font(dev, _PG_gattrs.axis_type_face,
+		dev->type_style, dev->type_size);
     PG_set_char_precision(dev, prec);
     PG_set_char_path(dev, chpthx, chpthy);
     PG_set_char_up(dev, chupx, chupy);
-    PG_set_char_space(dev, charspace);
-    PG_set_color_line(dev, linecolor, TRUE);
+    PG_set_char_space(dev, chsp);
+    PG_set_color_line(dev, lnclr, TRUE);
     PG_set_line_style(dev, _PG_gattrs.axis_line_style);
     PG_set_line_width(dev, _PG_gattrs.axis_line_width);
 
@@ -271,7 +272,7 @@ FIXNUM FF_ID(pgclpg, PGCLPG)(FIXNUM *devid, FIXNUM *pi)
 /* PGCLRG - clear the specified region */
 
 FIXNUM FF_ID(pgclrg, PGCLRG)(FIXNUM *devid, double *pxn, double *pxx,
-                                double *pyn, double *pyx, FIXNUM *pad)
+			     double *pyn, double *pyx, FIXNUM *pad)
    {int pd;
     FIXNUM rv;
     double ndc[PG_BOXSZ];
@@ -329,7 +330,7 @@ FIXNUM FF_ID(pgclvp, PGCLVP)(FIXNUM *devid)
 /* PGDDP2 - draw 2d disjoint polyline */
 
 FIXNUM FF_ID(pgddp2, PGDDP2)(FIXNUM *devid, double *px, double *py,
-                                FIXNUM *pn, FIXNUM *pf, FIXNUM *pc)
+			     FIXNUM *pn, FIXNUM *pf, FIXNUM *pc)
    {int f;
     long n;
     FIXNUM rv;
@@ -358,7 +359,7 @@ FIXNUM FF_ID(pgddp2, PGDDP2)(FIXNUM *devid, double *px, double *py,
 /* PGDPL2 - draw 2d polyline */
 
 FIXNUM FF_ID(pgdpl2, PGDPL2)(FIXNUM *devid, double *px, double *py,
-                                FIXNUM *pn, FIXNUM *pc)
+			     FIXNUM *pn, FIXNUM *pc)
    {FIXNUM rv;
     double *t[2];
     PG_device *dev;
@@ -380,7 +381,7 @@ FIXNUM FF_ID(pgdpl2, PGDPL2)(FIXNUM *devid, double *px, double *py,
 /* PGDDP3 - draw 3d disjoint polyline */
 
 FIXNUM FF_ID(pgddp3, PGDDP3)(FIXNUM *devid, double *px, double *py, double *pz,
-                                FIXNUM *pn, FIXNUM *pf, FIXNUM *pc)
+			     FIXNUM *pn, FIXNUM *pf, FIXNUM *pc)
    {int f;
     long n;
     FIXNUM rv;
@@ -410,10 +411,11 @@ FIXNUM FF_ID(pgddp3, PGDDP3)(FIXNUM *devid, double *px, double *py, double *pz,
 /* PGDRAX - draw a single axis */
 
 FIXNUM FF_ID(pgdrax, PGDRAX)(FIXNUM *devid, double *pxl, double *pyl,
-                                double *pxr, double *pyr, double *pt1, double *pt2,
-                                double *pv1, double *pv2, double *psc,
-                                FIXNUM *pnc, char *format,
-                                FIXNUM *ptd, FIXNUM *ptt, FIXNUM *plt)
+			     double *pxr, double *pyr,
+			     double *pt1, double *pt2,
+			     double *pv1, double *pv2, double *psc,
+			     FIXNUM *pnc, char *format,
+			     FIXNUM *ptd, FIXNUM *ptt, FIXNUM *plt)
    {int td;
     FIXNUM rv;
     double tn[2], vw[2];
@@ -450,7 +452,7 @@ FIXNUM FF_ID(pgdrax, PGDRAX)(FIXNUM *devid, double *pxl, double *pyl,
 /* PGDAX3 - draw a 3D axis set */
 
 FIXNUM FF_ID(pgdax3, PGDAX3)(FIXNUM *devid, double *pxl, double *pyl,
-                                double *pzl, FIXNUM *pnp)
+			     double *pzl, FIXNUM *pnp)
    {FIXNUM rv;
     double *p[PG_SPACEDM];
     PG_device *dev;
@@ -473,7 +475,7 @@ FIXNUM FF_ID(pgdax3, PGDAX3)(FIXNUM *devid, double *pxl, double *pyl,
 /* PGDRMK - draw marker characters */
 
 FIXNUM FF_ID(pgdrmk, PGDRMK)(FIXNUM *devid, FIXNUM *pn,
-			        double *px, double *py, FIXNUM *pmrk)
+			     double *px, double *py, FIXNUM *pmrk)
    {int n, mrk;
     FIXNUM rv;
     double *r[PG_SPACEDM];
@@ -498,7 +500,7 @@ FIXNUM FF_ID(pgdrmk, PGDRMK)(FIXNUM *devid, FIXNUM *pn,
 /* PGDMRK - define a marker character */
 
 FIXNUM FF_ID(pgdmrk, PGDMRK)(FIXNUM *pn, double *px1, double *py1,
-                                double *px2, double *py2)
+			     double *px2, double *py2)
    {int n;
     FIXNUM rv;
 
@@ -530,7 +532,7 @@ FIXNUM FF_ID(pgdplt, PGDPLT)(FIXNUM *devid, FIXNUM *dom)
 /* PGDRBX - draw a box */
 
 FIXNUM FF_ID(pgdrbx, PGDRBX)(FIXNUM *devid, double *px1, double *px2,
-			        double *py1, double *py2)
+			     double *py1, double *py2)
    {FIXNUM rv;
     double bx[PG_BOXSZ];
     PG_device *dev;
@@ -569,7 +571,7 @@ FIXNUM FF_ID(pgdrif, PGDRIF)(FIXNUM *devid)
 /* PGDRLN - draw a line between the specified points */
 
 FIXNUM FF_ID(pgdrln, PGDRLN)(FIXNUM *devid, double *px1, double *py1,
-				double *px2, double *py2)
+			     double *px2, double *py2)
    {FIXNUM rv;
     double x1[PG_SPACEDM], x2[PG_SPACEDM];
     PG_device *dev;
@@ -592,8 +594,9 @@ FIXNUM FF_ID(pgdrln, PGDRLN)(FIXNUM *devid, double *px1, double *py1,
 /* PGDRPA - draw the current palette */
 
 FIXNUM FF_ID(pgdrpa, PGDRPA)(FIXNUM *devid, double *px1, double *py1,
-				double *px2, double *py2, double *pz1, double *pz2,
-				double *pw)
+			     double *px2, double *py2,
+			     double *pz1, double *pz2,
+			     double *pw)
    {FIXNUM rv;
     double dbx[PG_BOXSZ], rbx[PG_BOXSZ];
     PG_device *dev;
@@ -619,8 +622,9 @@ FIXNUM FF_ID(pgdrpa, PGDRPA)(FIXNUM *devid, double *px1, double *py1,
 /* PGDRPP - draw the current palette */
 
 FIXNUM FF_ID(pgdrpp, PGDRPP)(FIXNUM *devid, double *px1, double *py1,
-				double *px2, double *py2, double *pz1, double *pz2,
-				double *pw, FIXNUM *pe)
+			     double *px2, double *py2,
+			     double *pz1, double *pz2,
+			     double *pw, FIXNUM *pe)
    {FIXNUM rv;
     double dbx[PG_BOXSZ], rbx[PG_BOXSZ];
     PG_device *dev;
@@ -662,7 +666,7 @@ FIXNUM FF_ID(pgfnpl, PGFNPL)(FIXNUM *devid)
 /* PGFPLY - draw and fill the specified polygon with the specified color */
 
 FIXNUM FF_ID(pgfply, PGFPLY)(FIXNUM *devid, double *px, double *py,
-			        FIXNUM *pn, FIXNUM *pc)
+			     FIXNUM *pn, FIXNUM *pc)
    {FIXNUM rv;
     double *r[2];
     PG_device *dev;
@@ -982,8 +986,8 @@ FIXNUM FF_ID(pggtxc, PGGTXC)(FIXNUM *devid, FIXNUM *pc)
 /* PGGTXF - get the font */
 
 FIXNUM FF_ID(pggtxf, PGGTXF)(FIXNUM *devid, FIXNUM *pncf,
-				char *pf, FIXNUM *pncs, char *pst,
-				FIXNUM *psz)
+			     char *pf, FIXNUM *pncs, char *pst,
+			     FIXNUM *psz)
    {int ls, nf, ns, lnf, lns;
     FIXNUM rv;
     char *f, *st;
@@ -1024,8 +1028,8 @@ FIXNUM FF_ID(pggtxf, PGGTXF)(FIXNUM *devid, FIXNUM *pncf,
 /* PGGTEX - get the text extent in CS */
 
 FIXNUM FF_ID(pggtex, PGGTEX)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *pc,
-				FIXNUM *pnc, char *s,
-			        double *pdx, double *pdy)
+			     FIXNUM *pnc, char *s,
+			     double *pdx, double *pdy)
    {FIXNUM rv;
     double p[PG_SPACEDM];
     char ls[MAXLINE];
@@ -1053,7 +1057,7 @@ FIXNUM FF_ID(pggtex, PGGTEX)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *pc,
 /* PGGVWP - get the viewport */
 
 FIXNUM FF_ID(pggvwp, PGGVWP)(FIXNUM *devid, double *px1, double *px2,
-				double *py1, double *py2)
+			     double *py1, double *py2)
    {FIXNUM rv;
     double ndc[PG_BOXSZ];
     PG_device *dev;
@@ -1076,7 +1080,7 @@ FIXNUM FF_ID(pggvwp, PGGVWP)(FIXNUM *devid, double *px1, double *px2,
 /* PGGWCS - get the world coordinate system */
 
 FIXNUM FF_ID(pggwcs, PGGWCS)(FIXNUM *devid, double *px1, double *px2,
-				double *py1, double *py2)
+			     double *py1, double *py2)
    {FIXNUM rv;
     double wc[PG_BOXSZ];
     PG_device *dev;
@@ -1119,8 +1123,8 @@ FIXNUM FF_ID(pgmdvc, PGMDVC)(FIXNUM *devid)
  */
 
 FIXNUM FF_ID(pgmkdv, PGMKDV)(FIXNUM *pncn, char *name,
-				FIXNUM *pnct, char *type,
-				FIXNUM *pncl, char *title)
+			     FIXNUM *pnct, char *type,
+			     FIXNUM *pncl, char *title)
    {FIXNUM rv;
     char lname[MAXLINE], ltype[MAXLINE], ltitle[MAXLINE];
     PG_device *dev;
@@ -1144,7 +1148,7 @@ FIXNUM FF_ID(pgmkdv, PGMKDV)(FIXNUM *pncn, char *name,
 /* PGOPEN - open the specified PG_device */
 
 FIXNUM FF_ID(pgopen, PGOPEN)(FIXNUM *devid, double *pxf, double *pyf,
-				double *pdxf, double *pdyf)
+			     double *pdxf, double *pdyf)
    {FIXNUM rv;
     PG_device *dev;
 
@@ -1176,7 +1180,7 @@ FIXNUM FF_ID(pgptin, PGPTIN)(FIXNUM *pntr, FIXNUM *indx)
 /* PGQDEV - get some physical parameters from the specified PG_device */
 
 FIXNUM FF_ID(pgqdev, PGQDEV)(FIXNUM *devid, FIXNUM *pdx, FIXNUM *pdy,
-				FIXNUM *pnc)
+			     FIXNUM *pnc)
    {int dx, dy, nc;
     FIXNUM rv;
     PG_device *dev;
@@ -1218,10 +1222,10 @@ FIXNUM FF_ID(pgqwin, PGQWIN)(FIXNUM *devid, FIXNUM *pdx, FIXNUM *pdy)
 /* PGPLLN - low level line plot routine */
 
 FIXNUM FF_ID(pgplln, PGPLLN)(FIXNUM *devid, double *px, double *py,
-			        FIXNUM *pn, FIXNUM *ppty, FIXNUM *paxt,
-				FIXNUM *pcol, double *pwid,
-			        FIXNUM *psty, FIXNUM *psca, FIXNUM *pmrk,
-				FIXNUM *psta, FIXNUM *pl)
+			     FIXNUM *pn, FIXNUM *ppty, FIXNUM *paxt,
+			     FIXNUM *pcol, double *pwid,
+			     FIXNUM *psty, FIXNUM *psca, FIXNUM *pmrk,
+			     FIXNUM *psta, FIXNUM *pl)
    {int axt, sty, sca, mrk, clr, sta;
     long n, l;
     FIXNUM rv;
@@ -1256,7 +1260,7 @@ FIXNUM FF_ID(pgplln, PGPLLN)(FIXNUM *devid, double *px, double *py,
 /* PGPTOS - convert from PC to NDC */
 
 FIXNUM FF_ID(pgptos, PGPTOS)(FIXNUM *devid, FIXNUM *pix, FIXNUM *piy,
-			        double *px, double *py)
+			     double *px, double *py)
    {FIXNUM rv;
     double p[PG_SPACEDM];
     PG_device *dev;
@@ -1339,8 +1343,7 @@ FIXNUM FF_ID(pgrgdv, PGRGDV)(FIXNUM *pnc, char *name)
 
 /* PGRGFN - register a call back function with the device */
 
-FIXNUM FF_ID(pgrgfn, PGRGFN)(FIXNUM *pnc, char *name,
-				PFEvCallback fnc)
+FIXNUM FF_ID(pgrgfn, PGRGFN)(FIXNUM *pnc, char *name, PFEvCallback fnc)
    {FIXNUM rv;
     char lname[MAXLINE];
 
@@ -1357,8 +1360,8 @@ FIXNUM FF_ID(pgrgfn, PGRGFN)(FIXNUM *pnc, char *name,
 /* PGRGVR - register a variable with the device */
 
 FIXNUM FF_ID(pgrgvr, PGRGVR)(FIXNUM *pnc, char *name,
-				FIXNUM *pnt, char *type,
-				void *vr, void *vn, void *vx)
+			     FIXNUM *pnt, char *type,
+			     void *vr, void *vn, void *vx)
    {FIXNUM rv;
     char lname[MAXLINE], ltype[MAXLINE];
 
@@ -1604,7 +1607,7 @@ FIXNUM FF_ID(pgsdpi, PGSDPI)(double *dpi)
 /* PGSELC - select a color from the n-dimensional palette */
 
 FIXNUM FF_ID(pgselc, PGSELC)(FIXNUM *devid, FIXNUM *n, double *av,
-				double *an, double *ax)
+			     double *an, double *ax)
    {FIXNUM rv;
     double extr[2];
     PG_device *dev;
@@ -1787,7 +1790,7 @@ FIXNUM FF_ID(pgspmf, PGSPMF)(FIXNUM *devid, FIXNUM *pc)
 /* PGSTOP - convert from NDC to PC */
 
 FIXNUM FF_ID(pgstop, PGSTOP)(FIXNUM *devid, double *px, double *py,
-			        FIXNUM *pix, FIXNUM *piy)
+			     FIXNUM *pix, FIXNUM *piy)
    {FIXNUM rv;
     double p[PG_SPACEDM];
     PG_device *dev;
@@ -1848,8 +1851,8 @@ FIXNUM FF_ID(pgstxc, PGSTXC)(FIXNUM *devid, FIXNUM *pc)
 /* PGSTXF - set the font */
 
 FIXNUM FF_ID(pgstxf, PGSTXF)(FIXNUM *devid, FIXNUM *pncf,
-				char *face, FIXNUM *pncs,
-				char *style, FIXNUM *psize)
+			     char *face, FIXNUM *pncs,
+			     char *style, FIXNUM *psize)
    {FIXNUM rv;
     PG_device *dev;
     char lface[MAXLINE], lstyle[MAXLINE];
@@ -1923,7 +1926,7 @@ FIXNUM FF_ID(pgsvpa, PGSVPA)(FIXNUM *devid, FIXNUM *pn)
 /* PGSVWP - set the viewport */
 
 FIXNUM FF_ID(pgsvwp, PGSVWP)(FIXNUM *devid, double *px1, double *px2,
-				double *py1, double *py2)
+			     double *py1, double *py2)
    {FIXNUM rv;
     double ndc[PG_BOXSZ];
     PG_device *dev;
@@ -1980,7 +1983,7 @@ FIXNUM FF_ID(pgsvsh, PGSVSH)(FIXNUM *devid, double *pw, double *ph, double *pa)
 /* PGSWCS - set the world coordinate system */
 
 FIXNUM FF_ID(pgswcs, PGSWCS)(FIXNUM *devid, double *px1, double *px2,
-				double *py1, double *py2)
+			     double *py1, double *py2)
    {FIXNUM rv;
     double wc[PG_BOXSZ];
     PG_device *dev;
@@ -2035,7 +2038,7 @@ FIXNUM FF_ID(pgupvs, PGUPVS)(FIXNUM *devid)
 /* PGWRCL - write label centered wrt x */
 
 FIXNUM FF_ID(pgwrcl, PGWRCL)(FIXNUM *devid, double *psy,
-				FIXNUM *pnc, char *label)
+			     FIXNUM *pnc, char *label)
    {FIXNUM rv;
     char llabel[MAXLINE];
     PG_device *dev;
@@ -2076,7 +2079,7 @@ FIXNUM FF_ID(pgwrif, PGWRIF)(FIXNUM *devid, FIXNUM *pnc, char *name)
  */
 
 FIXNUM FF_ID(pgwrta, PGWRTA)(FIXNUM *devid, double *px, double *py,
-				FIXNUM *pnc, char *msg)
+			     FIXNUM *pnc, char *msg)
    {FIXNUM rv;
     double x, y;
     char lmsg[MAXLINE];
@@ -2157,7 +2160,7 @@ FIXNUM FF_ID(pgsla, PGSLA)(FIXNUM *devid, double *pt, double *pp)
 /* PGGVA - get the view angle */
 
 FIXNUM FF_ID(pggva, PGGVA)(FIXNUM *devid, FIXNUM *pcnv,
-			      double *pt, double *pp, double *pc)
+			   double *pt, double *pp, double *pc)
    {FIXNUM rv;
     PG_device *dev;
 
