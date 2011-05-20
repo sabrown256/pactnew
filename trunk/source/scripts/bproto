@@ -109,18 +109,39 @@ Note $Log ""
    if (-f gm-$d.f) then
       flog $Log mv gm-$d.f obj
    endif
+
    if (-f gs-$d.c) then
-      flog $Log mv gs-$d.c ../../sx/z-$arch/obj
+      set ldir =  ../../sx/z-$arch/obj
+      if (-d $ldir) then
+         flog $Log mv gs-$d.c $ldir
+      else
+         flog $Log rm -f gs-$d.c
+      endif
+      unset ldir
    endif
+
    if (-f gp-$d.c) then
-      flog $Log mv gp-$d.c ../../python/z-$arch/obj
+      set ldir =  ../../python/z-$arch/obj
+      if (-d $ldir) then
+         flog $Log mv gp-$d.c $ldir
+      else
+         flog $Log rm -f gp-$d.c
+      endif
+      unset ldir
    endif
+
    if (-f gh-$d.html) then
-      flog $Log mv gh-$d.html ../../doc
+      set ldir =  ../../doc
+      if (-d $ldir) then
+         flog $Log mv gh-$d.html $ldir
+      else
+         flog $Log rm -f gh-$d.html
+      endif
+      unset ldir
    endif
 
    if ($xstatus == 0) then
-#      flog $Log $RM $d.proto
+      flog $Log $RM $d.proto
    endif
 
    flog $Log popd

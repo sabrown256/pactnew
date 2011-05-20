@@ -91,12 +91,6 @@ ${TGTLib} : ${SyntaxModes}
 
 hdrf = 
 
-# language bindings
-
-bindf = 
-
-generate : ${bindf} ${hdrf}
-
 IncAction = 
 
 

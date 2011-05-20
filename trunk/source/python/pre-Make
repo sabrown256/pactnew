@@ -110,12 +110,6 @@ ${ArObjs} : ${Hdrs}
 
 hdrf = 
 
-# language bindings
-
-bindf = 
-
-generate : ${bindf} ${hdrf}
-
 IncAction = 
 
 

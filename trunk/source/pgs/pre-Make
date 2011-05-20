@@ -33,7 +33,7 @@ SaveFiles = *.c *.h
 #
 # Files to remove in directory clean (pact clean)
 #
-CleanFiles = ${bindf} ${hdrf} *~ core
+CleanFiles = 
 
 #
 # Things upon which install depends (pact install)
@@ -129,7 +129,7 @@ ArJPG = ${TGTLib}(gsdv_jpg.o)
 ArMPG = ${TGTLib}(gsdv_mpg.o) ${TGTLib}(gspr_mpg.o) ${TGTLib}(gsmpeg.o)
 ArPNG = ${TGTLib}(gsdv_png.o)
 
-${TGTLib} : ${hdrf} ${gos} ${Hdrs} ${GraphicsDevices} ${LibDep}
+${LibDep} : ${gobj} ${hdrf} ${Hdrs} ${GraphicsDevices}
 
 ${ArMPG} : ${MpgHdr}
 ${ArX}   : ${XHdr}
@@ -149,22 +149,6 @@ ${IncDir}/gsimag.h : gsimag.t
 	  ${BinDir}/template gsimag.t -o ${IncDir}/gsimag.h)
 
 hdrf = ${IncDir}/gsimag.h
-
-# language bindings
-
-archo = z-${System}/obj
-bindf = ${PACTTmpDir}/gf-${LibName}.c ../sx/${archo}/gs-${LibName}.c
-gos   = ${PACTTmpDir}/gf-${LibName}.o
-
-${PACTTmpDir}/gf-${LibName}.c : ${LibName}.bind ${Hdrs} ${hdrf}
-	@../scripts/bproto
-
-${gos} : ${PACTTmpDir}/gf-${LibName}.c
-	@(echo "${CCAnnounce} -c $<" ; \
-          ${CC} -c $< -o $@ ; \
-          ${AR} ${AROpt} ${TGTLib} $@ 2> /dev/null )
-
-generate : ${bindf} ${hdrf}
 
 IncAction = @pact generate
 

@@ -333,7 +333,7 @@ fcdes *SC_scan_archive(char *arf)
  */
 
 fcdes *SC_scan_archive(char *arf)
-   {int nr, nb;
+   {int nr, nb, ni;
     int64_t ext, org, off;
     int64_t pos;
     char s[MAXLINE], lname[MAXLINE];
@@ -375,7 +375,8 @@ fcdes *SC_scan_archive(char *arf)
 		    pos = ext + off;
 		    org = ftell(fp);
 		    fseek(fp, pos, SEEK_SET);
-		    fread(lname, MAXLINE, 1, fp);
+		    ni = fread(lname, MAXLINE, 1, fp);
+		    SC_ASSERT(ni > 0);
 		    fseek(fp, org, SEEK_SET);
 		    name = strtok(lname, "/");}
 		else
