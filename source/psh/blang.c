@@ -446,14 +446,33 @@ static void f_proto_list(char *a, int nc, fdecl *dcl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* INIT_FORTRAN - initialize Fortran file */
+/* INIT_FORTRAN - initialize Fortran wrapper file */
 
 static FILE *init_fortran(char *pck)
-   {FILE *fp;
+   {int nc;
+    char fn[MAXLINE], ufn[MAXLINE], fill[MAXLINE];
+    FILE *fp;
 
-    fp = open_file("w", "gf-%s.c", pck);
+    snprintf(fn, MAXLINE, "gf-%s.c", pck);
+    nstrncpy(ufn, MAXLINE, fn, -1);
+    upcase(ufn);
+
+    nc = strlen(fn);
+    memset(fill, ' ', nc);
+    fill[nc] = '\0';
+
+    fp = open_file("w", fn);
+
+    fprintf(fp, "/*\n");
+    fprintf(fp, " * %s - F90 wrappers for %s\n", ufn, pck);
+    fprintf(fp, " * %s - NOTE: this file was automatically generated\n", fill);
+    fprintf(fp, " * %s - any manual changes will not be effective\n", fill);
+    fprintf(fp, " *\n");
+    fprintf(fp, " */\n");
+    fprintf(fp, "\n");
 
     fprintf(fp, "\n");
+    fprintf(fp, "#include \"cpyright.h\"\n");
     fprintf(fp, "#include \"%s_int.h\"\n", pck);
     fprintf(fp, "\n");
 
@@ -743,6 +762,33 @@ static int mc_type(char *fty, int nf, char *cty, int nc, char *t)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* MC_NEED_PTR - return TRUE if the package types module will be needed */
+
+static int mc_need_ptr(fdecl *dcl)
+   {int i, na, ok;
+    char fty[MAXLINE], cty[MAXLINE];
+    farg *al;
+
+    na = dcl->na;
+    al = dcl->al;
+
+    ok = FALSE;
+
+    if (mc_type(fty, MAXLINE, cty, MAXLINE, dcl->type) == TRUE)
+       ok |= ((strcmp(cty, "C_PTR") == 0) ||
+	      (strcmp(cty, "C_FUNPTR") == 0));
+
+    if ((na > 0) && (no_args(dcl) == FALSE))
+       {for (i = 0; i < na; i++)
+	    {if (mc_type(fty, MAXLINE, cty, MAXLINE, al[i].type) == TRUE)
+	        ok |= ((strcmp(cty, "C_PTR") == 0) ||
+		       (strcmp(cty, "C_FUNPTR") == 0));};};
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* MC_DECL_LIST - render the arg list of DCL into A for the
  *              - Fortran/C interoperability module interface
  */
@@ -768,17 +814,137 @@ static void mc_decl_list(char *a, int nc, fdecl *dcl)
 /* INIT_MODULE - initialize Fortran/C interoperatbility module file */
 
 static FILE *init_module(char *pck)
-   {FILE *fp;
+   {int nc;
+    char fn[MAXLINE], ufn[MAXLINE], fill[MAXLINE];
+    FILE *fp;
 
-    fp = open_file("w", "gm-%s.f", pck);
+    snprintf(fn, MAXLINE, "gm-%s.f", pck);
+    nstrncpy(ufn, MAXLINE, fn, -1);
+    upcase(ufn);
+
+    nc = strlen(fn);
+    memset(fill, ' ', nc);
+    fill[nc] = '\0';
+
+    fp = open_file("w", fn);
+
+    fprintf(fp, "!\n");
+    fprintf(fp, "! %s - F90 interfaces for %s\n", ufn, pck);
+    fprintf(fp, "! %s - NOTE: this file was automatically generated\n", fill);
+    fprintf(fp, "! %s - any manual changes will not be effective\n", fill);
+    fprintf(fp, "!\n");
+    fprintf(fp, "\n");
+
+/* if there are no interfaces there is no need for the types module */
+    fprintf(fp, "module %stypes\n", pck);
+    fprintf(fp, "   integer, parameter :: isizea = %d\n",
+	    (int) sizeof(char *));
+    fprintf(fp, "end module %stypes\n", pck);
+    fprintf(fp, "\n");
 
     fprintf(fp, "module %s\n", pck);
     fprintf(fp, "   use iso_c_binding\n");
     fprintf(fp, "\n");
-    fprintf(fp, "   interface\n");
-    fprintf(fp, "\n");
 
     return(fp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* ITF_WRAP_EXT - write the interface for a simple extern */
+
+static void itf_wrap_ext(FILE *fp, char *pck, fdecl *dcl,
+			 char *cfn, char *ffn)
+   {int ok;
+    char fty[MAXLINE], cty[MAXLINE];
+    char *rty;
+    static int first = TRUE;
+
+/* declare the incomplete ones as external */
+    if (strstr(dcl->proto, "...") != NULL)
+       {if (mc_need_ptr(dcl) == TRUE)
+	   {if (first == TRUE)
+	       {first = FALSE;
+		fprintf(fp, "   use %stypes\n", pck);
+		fprintf(fp, "\n");};};
+
+	rty = dcl->type;
+	ok  = mc_type(fty, MAXLINE, cty, MAXLINE, rty);
+	if (strcmp(rty, "void") == 0)
+	   fprintf(fp, "   external :: w%s\n", ffn);
+        else
+	  {if ((strcmp(cty, "C_PTR") == 0) || (strcmp(cty, "C_FUNPTR") == 0))
+	      fprintf(fp, "   integer(isizea), external :: w%s\n", ffn);
+	   else
+	     fprintf(fp, "   %s, external :: w%s\n", fty, ffn);};
+
+	fprintf(fp, "\n");};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* ITF_WRAP_FULL - write the interface for the fully wrapped version */
+
+static void itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
+			  char *cfn, char *ffn)
+   {int i, na, voidf, voida, ok;
+    char a[MAXLINE], fty[MAXLINE], cty[MAXLINE];
+    char *pr, *rty, *oper;
+    farg *al;
+
+    pr = dcl->proto;
+
+/* emit complete declarations */
+    if (strstr(pr, "...") == NULL)
+       {rty = dcl->type;
+
+	na    = dcl->na;
+	al    = dcl->al;
+	voidf = (strcmp(rty, "void") == 0);
+	voida = no_args(dcl);
+
+	ok = mc_type(fty, MAXLINE, cty, MAXLINE, rty);
+	mc_decl_list(a, MAXLINE, dcl);
+
+	if (voidf == TRUE)
+           oper = "subroutine";
+        else
+           oper = "function";
+
+	fprintf(fp, "      %s w%s(%s)\n", oper, ffn, a);
+
+	if (mc_need_ptr(dcl) == TRUE)
+	   fprintf(fp, "         use %stypes\n", pck);
+
+	fprintf(fp, "         implicit none\n");
+
+/* return value declaration */
+	if (voidf == FALSE)
+	   {if ((strcmp(cty, "C_PTR") == 0) ||
+		(strcmp(cty, "C_FUNPTR") == 0))
+	       fprintf(fp, "         integer(isizea)  :: w%s\n", ffn);
+	    else
+	       fprintf(fp, "         %-16s :: w%s\n", fty, ffn);};
+
+/* argument declarations */
+	for (i = 0; i < na; i++)
+	    {if ((voida == TRUE) && (i == 0))
+	        continue;
+
+	     ok = mc_type(fty, MAXLINE, cty, MAXLINE, al[i].type);
+	     if ((strcmp(cty, "C_PTR") == 0) ||
+		 (strcmp(cty, "C_FUNPTR") == 0))
+	        fprintf(fp, "         integer(isizea)  :: %s\n", al[i].name);
+	     else
+	        fprintf(fp, "         %-16s :: %s\n", fty, al[i].name);};
+
+	fprintf(fp, "      end %s w%s\n", oper, ffn);
+
+	fprintf(fp, "\n");};
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -852,27 +1018,53 @@ static void wrap_module(FILE *fp, fdecl *dcl, char *cfn)
  *             - return TRUE iff successful
  */
 
-static int bind_module(FILE *fp, char **spr, char **sbi)
+static int bind_module(FILE *fp, char *pck, char **spr, char **sbi)
    {int ib, rv;
     char t[MAXLINE];
     char *sb, **ta;
-    char *cfn;
+    char *cfn, *ffn;
     fdecl *dcl;
 
     rv = TRUE;
 
+/* make simple external declaration for variable argument functions */
     for (ib = 0; sbi[ib] != NULL; ib++)
         {sb = sbi[ib];
 	 if (blank_line(sb) == FALSE)
 	    {nstrncpy(t, MAXLINE, sb, -1);
 	     ta = tokenize(t, " \t");
 	     cfn = ta[0];
+	     ffn = ta[1];
              dcl = find_proto(spr, cfn);
 	     if (dcl != NULL)
-	        {wrap_module(fp, dcl, cfn);
+	        {itf_wrap_ext(fp, pck, dcl, cfn, ffn);
 		 free_decl(dcl);};
 
 	     free_strings(ta);};};
+
+/* start the interface */
+    fprintf(fp, "   interface\n");
+    fprintf(fp, "\n");
+
+/* make full interface for non-variable argument functions */
+    for (ib = 0; sbi[ib] != NULL; ib++)
+        {sb = sbi[ib];
+	 if (blank_line(sb) == FALSE)
+	    {nstrncpy(t, MAXLINE, sb, -1);
+	     ta = tokenize(t, " \t");
+	     cfn = ta[0];
+	     ffn = ta[1];
+             dcl = find_proto(spr, cfn);
+	     if (dcl != NULL)
+	        {wrap_module(fp, dcl, cfn);
+		 itf_wrap_full(fp, dcl, pck, cfn, ffn);
+		 free_decl(dcl);};
+
+	     free_strings(ta);};};
+
+/* finish the interface */
+    fprintf(fp, "   end interface\n");
+    fprintf(fp, "\n");
 
     return(rv);}
 
@@ -884,8 +1076,6 @@ static int bind_module(FILE *fp, char **spr, char **sbi)
 static void fin_module(FILE *fp, char *pck)
    {
 
-    fprintf(fp, "   end interface\n");
-    fprintf(fp, "\n");
     fprintf(fp, "end module %s\n", pck);
     fprintf(fp, "\n");
 
@@ -1465,7 +1655,7 @@ static void fin_doc(FILE *fp)
  *       - return TRUE iff successful
  */
 
-static int blang(char *pck, char *fpr, char *fbi)
+static int blang(char *pck, int fwr, char *fpr, char *fbi)
    {int rv;
     char **spr, **sbi;
     FILE *ff, *fm, *fs, *fp, *fd;
@@ -1480,21 +1670,27 @@ static int blang(char *pck, char *fpr, char *fbi)
 	sbi = file_text(fbi);
 
 	if (spr != NULL)
-	   {ff = init_fortran(pck);
-	    fm = init_module(pck);
+	   {if (fwr & 1)
+	       ff = init_fortran(pck);
+	    if (fwr & 2)
+	       fm = init_module(pck);
 	    fs = init_scheme(pck);
 	    fp = init_python(pck);
 	    fd = init_doc(pck);
 
 	    if (sbi != NULL)
-	       {rv &= bind_fortran(ff, spr, sbi);
-		rv &= bind_module(fm, spr, sbi);
+	       {if (fwr & 1)
+		   rv &= bind_fortran(ff, spr, sbi);
+		if (fwr & 2)
+		   rv &= bind_module(fm, pck, spr, sbi);
 		rv &= bind_scheme(fs, pck, spr, sbi);
 		rv &= bind_python(fp, spr, sbi);
 		rv &= bind_doc(fd, spr, sbi);};
 
-	    fin_fortran(ff, pck);
-	    fin_module(fm, pck);
+	    if (fwr & 1)
+	       fin_fortran(ff, pck);
+	    if (fwr & 2)
+	       fin_module(fm, pck);
 	    fin_scheme(fs);
 	    fin_python(fp);
 	    fin_doc(fd);
@@ -1510,20 +1706,27 @@ static int blang(char *pck, char *fpr, char *fbi)
 /* MAIN - start it out here */
 
 int main(int c, char **v)
-   {int i, rv;
+   {int i, rv, fif;
     char pck[MAXLINE], msg[MAXLINE];
     char *fpr, *fbi;
 
     fpr = "";
     fbi = "";
+    fif = 3;
 
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-h") == 0)
-            {printf("Usage: blang [-h] <prototypes> <bindings>\n");
-             printf("   h          this help message\n");
+            {printf("Usage: blang [-h] [-w] <prototypes> <bindings>\n");
+             printf("   h    this help message\n");
+             printf("   o    no interoprabilty interfaces (Fortran wrappers only)\n");
+             printf("   w    no Fortran wrappers (interoperability only)\n");
              printf("   <prototypes>    file containing C function prototypes\n");
              printf("   <binding>       file specifying function bindings\n");
              printf("\n");}
+	 else if (strcmp(v[i], "-o") == 0)
+            fif &= ~2;
+	 else if (strcmp(v[i], "-w") == 0)
+            fif &= ~1;
 	 else
 	    {if (IS_NULL(fpr) == TRUE)
 	        fpr = v[i];
@@ -1535,7 +1738,7 @@ int main(int c, char **v)
 
     printf("      %s ", fill_string(msg, 25));
 
-    rv = blang(pck, fpr, fbi);
+    rv = blang(pck, fif, fpr, fbi);
     rv = (rv != TRUE);
 
     printf("done\n");
