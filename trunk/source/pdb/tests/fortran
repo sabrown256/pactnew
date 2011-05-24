@@ -22,7 +22,8 @@ else
    fog $LogF set LStat = 1
 endif
 
-if (($LStat == 0) && ("$MPI" == "")) then
+#if (($LStat == 0) && ("$MPI" == "")) then
+if ($LStat == 0) then
    NoteD $LogF ""
    NoteD $LogF "                    PDB FORTRAN Interface Test ......... "
 

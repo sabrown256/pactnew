@@ -65,7 +65,9 @@ Note $Log ""
 #           - the transformations are:
 #   elide '/*' '*/' $Files                         remove C comments
 #   elide '{' '}' -                                remove compound statements
-#   sed 'N;s/\\\n//'                               combine lines ending in \
+#   awk '$NF ~ /\\/ { printf("%s ", $0); }         merge lines ending in  \
+#        $NF !~ /\\/ { printf("%s\n", $0); }'  
+#   sed 's/\\/ /g'                                 remove embedded \
 #   elide '#if' '#endif' -                         remove conditionals
 #   grep -v '#'                                    remove #include, #define
 #   sed 's/[ \t][ \t]*/ /g'                        compress whitespace
@@ -78,7 +80,9 @@ Note $Log ""
 
    elide '/*' '*/' $Files                          | \
    elide '{' '}' -                                 | \
-   sed 'N;s/\\\n//'                                | \
+   awk '$NF ~ /\\/ { printf("%s ", $0); }            \
+        $NF !~ /\\/ { printf("%s\n", $0); }'       | \
+   sed 's/\\/ /g'                                  | \
    elide '#if' '#endif' -                          | \
    grep -v '#'                                     | \
    sed 's/[ \t][ \t]*/ /g'                         | \
@@ -102,47 +106,25 @@ Note $Log ""
 
    flog $Log blang $d.proto ../$d.bind
    set xstatus = $status
-   if ($xstatus != 0) then
-      echo "Error: blang failed ($xstatus)"
-   else
+
+   if (-f gf-$d.c) then
+      flog $Log mv gf-$d.c obj
+   endif
+   if (-f gm-$d.f) then
+      flog $Log mv gm-$d.f obj
+   endif
+   if (-f gs-$d.c) then
+      flog $Log mv gs-$d.c ../../sx/z-$arch/obj
+   endif
+   if (-f gp-$d.c) then
+      flog $Log mv gp-$d.c ../../python/z-$arch/obj
+   endif
+   if (-f gh-$d.html) then
+      flog $Log mv gh-$d.html ../../doc
+   endif
+
+   if ($xstatus == 0) then
 #      flog $Log $RM $d.proto
-
-      if (-f gf-$d.c) then
-         flog $Log mv gf-$d.c obj
-      endif
-      if (-f gm-$d.f) then
-         flog $Log mv gm-$d.f obj
-      endif
-
-      if (-f gs-$d.c) then
-         set ldir =  ../../sx/z-$arch/obj
-         if (-d $ldir) then
-            flog $Log mv gs-$d.c $ldir
-         else
-            flog $Log rm -f gs-$d.c
-         endif
-         unset ldir
-      endif
-
-      if (-f gp-$d.c) then
-         set ldir =  ../../python/z-$arch/obj
-         if (-d $ldir) then
-            flog $Log mv gp-$d.c $ldir
-         else
-            flog $Log rm -f gp-$d.c
-         endif
-         unset ldir
-      endif
-
-      if (-f gh-$d.html) then
-         set ldir =  ../../doc
-         if (-d $ldir) then
-            flog $Log mv gh-$d.html $ldir
-         else
-            flog $Log rm -f gh-$d.html
-         endif
-         unset ldir
-      endif
    endif
 
    flog $Log popd

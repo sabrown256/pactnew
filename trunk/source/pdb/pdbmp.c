@@ -99,11 +99,10 @@ PDBfile *PD_mp_open(char *name, char *mode, SC_communicator comm)
  * 
  */
 
-FIXNUM FF_ID(pfinmp, PFINMP)(FIXNUM *masterproc, FIXNUM *pnthreads, 
-				PFTid tid)
+FIXNUM FF_ID(pfinmp, PFINMP)(FIXNUM *smp, FIXNUM *snt, PFTid tid)
    {FIXNUM rv;
 
-    rv = PD_init_mpi(*masterproc, *pnthreads, tid);
+    rv = PD_init_mpi(*smp, *snt, tid);
 
     return(rv);}
 
@@ -128,16 +127,16 @@ FIXNUM FF_ID(pftmmp, PFTMMP)(void)
  *        - return 0 otherwise
  */
 
-FIXNUM FF_ID(pfmpop, PFMPOP)(FIXNUM *pnchr, char *name,
-				char *mode, FIXNUM *pcomm)
+FIXNUM FF_ID(pfmpop, PFMPOP)(FIXNUM *sncn, char *name,
+			     char *mode, FIXNUM *scomm)
    {FIXNUM rv;
     char s[MAXLINE], t[2];
     PDBfile *file;
     SC_communicator comm;
 
-    SC_FORTRAN_STR_C(s, name, *pnchr);
+    SC_FORTRAN_STR_C(s, name, *sncn);
     SC_FORTRAN_STR_C(t, mode, 1);
-    comm = (SC_communicator) MPI_Comm_f2c(*pcomm);
+    comm = (SC_communicator) MPI_Comm_f2c(*scomm);
 
     rv   = 0;
     file = PD_mp_open(s, t, comm);
@@ -154,12 +153,12 @@ FIXNUM FF_ID(pfmpop, PFMPOP)(FIXNUM *pnchr, char *name,
 
 /* PFMPSS - FORTRAN interface routine to set file->mpi_file */
 
-FIXNUM FF_ID(pfmpss, PFMPSS)(FIXNUM *fileid, FIXNUM *v)
+FIXNUM FF_ID(pfmpss, PFMPSS)(FIXNUM *sfid, FIXNUM *sv)
    {FIXNUM rv;
     PDBfile *file;
 
-    file = SC_GET_POINTER(PDBfile, *fileid);
-    rv   = PD_mp_set_serial(file, *v);
+    file = SC_GET_POINTER(PDBfile, *sfid);
+    rv   = PD_mp_set_serial(file, *sv);
   
     return(rv);}
   

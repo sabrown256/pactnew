@@ -2030,10 +2030,12 @@ CFG_DONE:
 
         NoteD $Log "Removing PACT"
 
+# save the files in BinDir
         set BinFiles = ( smake dmake pact template timer px do-run elide blang )
         set BinFiles = ( $BinFiles make-syntax )
         set BinFiles = ( $BinFiles install-pact install-ext )
 
+# save the files in IncDir
         set IncFiles = ( iso-c.h scconfig.h scdecls.h cpyright.h syntax.h )
         set IncFiles = ( $IncFiles env-pact.csh env-pact.sh env-pact.dk env-pact.mod )
         set IncFiles = ( $IncFiles env-mio )
@@ -2085,7 +2087,7 @@ CFG_DONE:
 
 # remove other files
         NoteD $Log "    in $Base/"'*'"/z-$System directories"
-        flog $Log $RM ../*/z-$System/obj/*.o
+        flog $Log $RM ../*/z-$System/obj/*.[ofc] ../*/z-$System/obj/*.mod
         flog $Log $RM ../*/*.o ../pdb/spokes/*/*.o ../score/scf77lr.c
         flog $Log $RM ../*/gf-*.c ../sx/gs-*.c
 
