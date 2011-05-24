@@ -209,16 +209,16 @@ int SC_free_stash(void)
  *        - as the return value
  */
 
-FIXNUM FF_ID(scvers, SCVERS)(FIXNUM *pn, char *name)
+FIXNUM FF_ID(scvers, SCVERS)(FIXNUM *sncn, char *name)
    {int n, m, l;
     FIXNUM rv;
 
-    n = *pn;
+    n = *sncn;
     m = strlen(SC_gs.version);
 
     l = min(n, m);
 
-    SC_strncpy(name, *pn, SC_gs.version, l);
+    SC_strncpy(name, *sncn, SC_gs.version, l);
 
     rv = m;
 
@@ -258,10 +258,10 @@ FIXNUM FF_ID(scpaus, SCPAUS)(void)
 
 /* SCFTCS - FORTRAN interface to convert FORTRAN string to C string */
 
-FIXNUM FF_ID(scftcs, SCFTCS)(char *out, char *in, FIXNUM *pnc)
+FIXNUM FF_ID(scftcs, SCFTCS)(char *out, char *in, FIXNUM *snci)
    {FIXNUM rv;
 
-    SC_FORTRAN_STR_C(out, in , *pnc);
+    SC_FORTRAN_STR_C(out, in, *snci);
 
     rv = TRUE;
 

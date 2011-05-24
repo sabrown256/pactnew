@@ -101,7 +101,11 @@ foreach d ($Dirs)
 #--------------------------------------------------------------------------
 
 # TRANSFORM - process the C declarations into F90 interface blocks
+#           - account for the convention:
+#           -    <type> *sxxx    is a scalar
+#           -    <type> *axxx    is an array
 #           - the transformations are:
+#
 #   sed 's/[ \t][ \t]*/ /g'               compress white space
 #   awk '$0 ~ /,[ \t]*$/   { printf("%s", $0) }     join lines ending in ','
 #        $0 !~ /,[ \t]*$/  { printf("%s\n", $0) }'
@@ -143,15 +147,15 @@ foreach d ($Dirs)
    sed 's/(/ /'                                   | \
    sed 's/)[ \t]*$/ END/'                         | \
    sed 's/FIXNUM/integer/g'                       | \
-   sed 's/char *\*/integer(isizea) /g'            | \
+   sed 's/char *\*/character /g'                  | \
    sed 's/void *\*/integer(isizea) /g'            | \
-   sed 's/integer *\*/integer /g'                 | \
+   sed 's/integer *\*s/integer s/g'               | \
+   sed 's/integer *\*/integerARRAY /g'            | \
    sed 's/REAL *\*/real--8 /g'                    | \
    sed 's/double *\*/real--8 /g'                  | \
    sed 's/REAL/real--8/g'                         | \
    sed 's/double/real--8/g'                       | \
    sed 's/float/real--4/g'                        | \
-   sed 's/char */character*(*)/g'                 | \
    sed 's/*//g'                                   | \
    sed 's/,/ /g'                                  | \
    sed 's/PF[^ ]* /external /g'                   | \
@@ -169,12 +173,12 @@ foreach d ($Dirs)
    endif
 
 # declare the incomplete ones as external
-   cat $Mod.tmp                                                         | \
-   awk '{if (($0 ~ /\.\.\./) || ($NF != "END"))                           \
-            {if ($1 == "void")                                            \
-                {printf("   external :: %s\n", $2);}                      \
-             else                                                         \
-                {printf("   %s, external :: %s\n", $1, $2);};};}'       | \
+   cat $Mod.tmp                                                               | \
+   awk '{if (($0 ~ /\.\.\./) || ($0 ~ /integer\(isizea\)/) || ($NF != "END"))   \
+            {if ($1 == "void")                                                  \
+                {printf("   external :: %s\n", $2);}                            \
+             else                                                               \
+                {printf("   %s, external :: %s\n", $1, $2);};};}'             | \
    cat >&! $Mod.ext
 
    @ LnExt = `cat $Mod.ext | wc -l`
@@ -182,31 +186,37 @@ foreach d ($Dirs)
    flog $Log cat $Mod.ext
 
 # emit complete declarations
-   cat $Mod.tmp                                                         | \
-   awk '{if ($1 == "void")                                                \
-            {oper = "subroutine";}                                        \
-         else                                                             \
-            {oper = "function";}                                          \
-         if (($0 !~ /\.\.\./) && ($NF == "END"))                          \
-            {printf("      %s %s(", oper, $2);                            \
-             for (i = 4; i < NF; i += 2)                                  \
-                 {if (i == 4)                                             \
-                     {printf("%s", $i);}                                  \
-                  else if ((i - 4) % 16 == 0)                             \
-                     {printf(", &\n                      %s", $i);}       \
-                  else                                                    \
-                     {printf(", %s", $i);};};                             \
-             printf(")\n");                                               \
-             if ($0 ~ /(isizea)/)                                         \
-                {printf("         use XXXtypes\n");};                     \
-             printf("         implicit none\n");                          \
-             if (oper == "function")                                      \
-                {printf("         %-16s :: %s\n", $1, $2);};              \
-             for (i = 3; i < NF; i += 2)                                  \
-                 {printf("         %-16s :: %s\n", $i, $(i+1));};         \
-                  printf("      end %s %s\n", oper, $2);                  \
-                  printf("\n");};}'                                     | \
-   sed 's/XXX/'$d'/'                                                    | \
+   cat $Mod.tmp                                                                | \
+   awk '{if ($1 == "void")                                                       \
+            {oper = "subroutine";}                                               \
+         else                                                                    \
+            {oper = "function";}                                                 \
+         if (($0 !~ /\.\.\./) && ($0 !~ /integer\(isizea\)/) && ($NF == "END"))  \
+            {printf("      %s %s(", oper, $2);                                   \
+             for (i = 4; i < NF; i += 2)                                         \
+                 {if (i == 4)                                                    \
+                     {printf("%s", $i);}                                         \
+                  else if ((i - 4) % 16 == 0)                                    \
+                     {printf(", &\n                      %s", $i);}              \
+                  else                                                           \
+                     {printf(", %s", $i);};};                                    \
+             printf(")\n");                                                      \
+             if ($0 ~ /(isizea)/)                                                \
+                {printf("         use XXXtypes\n");};                            \
+             printf("         implicit none\n");                                 \
+             if (oper == "function")                                             \
+                {printf("         %-12s :: %s\n", $1, $2);};                     \
+             for (i = 3; i < NF; i += 2)                                         \
+                 {if ($i == "character")                                         \
+                     printf("         %s(*) :: %s\n", $i, $(i+1));               \
+                  else if ($i == "integerARRAY")                                 \
+                     printf("         %-12s :: %s(*)\n", "integer", $(i+1));     \
+                  else                                                           \
+                     printf("         %-12s :: %s\n", $i, $(i+1));};             \
+             printf("      end %s %s\n", oper, $2);                              \
+             printf("\n");};}'                                                 | \
+   sed 's/XXX/'$d'/'                                                           | \
+   sed 's/xxx/\*/g'                                                            | \
    cat >&! $Mod.itf
 
    @ LnItf = `cat $Mod.itf | wc -l`

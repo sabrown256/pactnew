@@ -32,9 +32,13 @@
 #include <string.h>
 
 #include <math.h>
-#ifdef HAVE_ANSI_C9X_COMPLEX
-#include <complex.h>
+
+#ifndef __cplusplus
+# ifdef HAVE_ANSI_C9X_COMPLEX
+#  include <complex.h>
+# endif
 #endif
+
 #include <stdbool.h>
 #include <ctype.h>
 #include <wctype.h>

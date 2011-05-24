@@ -223,7 +223,8 @@ dimdes *_PD_ex_dims(char *memb, int defoff, int *pde)
  */
 
 int _PD_adj_dimensions(PDBfile *file, char *name, syment *ep)
-   {long imin, imax, istep, i;
+   {int id;
+    long imin, imax, istep, i;
     char head[MAXLINE], expr[MAXLINE], tail[MAXLINE], bf[MAXLINE];
     char expr2[MAXLINE];
     char *token, *smax, *sinc;
@@ -237,38 +238,38 @@ int _PD_adj_dimensions(PDBfile *file, char *name, syment *ep)
     strcpy(head, SC_firsttok(bf, "([\001\n"));
     tail[0] = '\0';
 
-    while ((token = SC_firsttok(bf, ",)] ")) != NULL)
-       {if (token[0] == '.')
-	   {strcpy(tail, token);
-	    break;};
-	smax = strchr(token, ':');
-	if (smax == NULL)
-	   PD_error("MAXIMUM INDEX MISSING - _PD_ADJ_DIMENSIONS", PD_WRITE);
+    for (id = 0; (token = SC_firsttok(bf, ",)] ")) != NULL; id++)
+        {if (token[0] == '.')
+	    {strcpy(tail, token);
+	     break;};
+	 smax = strchr(token, ':');
+	 if (smax == NULL)
+ 	    PD_error("MAXIMUM INDEX MISSING - _PD_ADJ_DIMENSIONS", PD_WRITE);
 
-	*smax++ = '\0';
-	sinc = strchr(smax, ':');
-	if (sinc != NULL)
-	   *sinc++ = '\0';
+	 *smax++ = '\0';
+	 sinc = strchr(smax, ':');
+	 if (sinc != NULL)
+	    *sinc++ = '\0';
 
-	imin = atol(token);
-	imax = atol(smax);
-	if (sinc != NULL)
-	   istep = atol(sinc);
-	else
-	   istep = 1;
+	 imin = atol(token);
+	 imax = atol(smax);
+	 if (sinc != NULL)
+	    istep = atol(sinc);
+	 else
+	    istep = 1;
 
-	if (imin == file->default_offset)
-	   if (((file->major_order == ROW_MAJOR_ORDER) &&
-		(dims == ep->dimensions)) ||
-	       ((file->major_order == COLUMN_MAJOR_ORDER) &&
-		(dims->next == NULL)))
-	      {i = dims->index_max + 1 - imin;
-	       imin += i;
-	       imax += i;};
+	 if (imin == file->default_offset)
+	    {if (((file->major_order == ROW_MAJOR_ORDER) &&
+		  (dims == ep->dimensions)) ||
+		 ((file->major_order == COLUMN_MAJOR_ORDER) &&
+		  (dims->next == NULL)))
+	        {i = dims->index_max + 1 - imin;
+		 imin += i;
+		 imax += i;};};
 
-	snprintf(expr, MAXLINE, "%s%ld:%ld:%ld,", expr2, imin, imax, istep);
-        strcpy(expr2, expr);
-        dims = dims->next;};
+	 snprintf(expr, MAXLINE, "%s%ld:%ld:%ld,", expr2, imin, imax, istep);
+	 strcpy(expr2, expr);
+	 dims = dims->next;};
 
     if (expr[0] != '\0')
        {if (strchr(head, '.') != NULL)

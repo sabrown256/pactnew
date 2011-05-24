@@ -31,6 +31,27 @@ struct s_fdecl
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* BERR - report error for blang */
+
+static void berr(char *fmt, ...)
+   {char s[LRG];
+    static int first = TRUE;
+
+    VA_START(fmt);
+    VSNPRINTF(s, LRG, fmt);
+    VA_END;
+
+    if (first == TRUE)
+       {first = FALSE;
+	printf("\n");};
+
+    printf("Error: %s\n", s);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* CONCATENATE - concatenate tokens SA to string S */
 
 static char *concatenate(char *s, int nc, char **sa, char *dlm)
@@ -79,17 +100,25 @@ static int no_args(fdecl *dcl)
  */
 
 static int split_decl(char *type, int nt, char *name, int nn, char *s)
-   {int nb, nc, rv;
+   {int nc, rv;
     char t[MAXLINE];
     char *p, *pn;
 
     nstrncpy(t, MAXLINE, s, -1);
 
-    p  = trim(strtok(t, "),"), BOTH, " \t");
-    nc = strcspn(p, " *\t");
-    nb = strspn(p+nc, " *\t");
+    p = trim(strtok(t, "),"), BOTH, " \t");
 
-    pn = p + nc + nb;
+    if (strcmp(p, "void") == 0)
+       pn = p + 4;
+    else
+       {nc = strlen(p);
+	for (pn = p + nc - 1; pn > p; pn--)
+	    {if (strchr(" *\t", *pn) != NULL)
+	        break;};
+	if ((pn > p) && (pn[-1] == '('))
+	   pn--;
+	else
+	   pn++;};
 
 /* handle function pointer case which would be like '(*f' here */
     if (*pn == '(')
@@ -209,7 +238,7 @@ static fdecl *find_proto(char **spr, char *f)
 		 break;};};};
 
     if (pro == NULL)
-       {printf("Error: no binding for '%s'\n", f);
+       {berr("no binding for '%s'", f);
 	dcl = NULL;}
 
     else
@@ -493,9 +522,9 @@ static void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
     farg *al;
 
     if (strstr(dcl->proto, "...") != NULL)
-       printf("\nError: %s is not interoperable - variable args\n", ffn);
+       berr("%s is not interoperable - variable args", ffn);
 
-    else
+    else if (strcmp(ffn, "none") != 0)
        {nstrncpy(ufn, MAXLINE, ffn, -1);
 	upcase(ufn);
 
@@ -836,13 +865,13 @@ static FILE *init_module(char *pck)
     fprintf(fp, "\n");
 
 /* if there are no interfaces there is no need for the types module */
-    fprintf(fp, "module %stypes\n", pck);
+    fprintf(fp, "module types_%s\n", pck);
     fprintf(fp, "   integer, parameter :: isizea = %d\n",
 	    (int) sizeof(char *));
-    fprintf(fp, "end module %stypes\n", pck);
+    fprintf(fp, "end module types_%s\n", pck);
     fprintf(fp, "\n");
 
-    fprintf(fp, "module %s\n", pck);
+    fprintf(fp, "module pact_%s\n", pck);
     fprintf(fp, "   use iso_c_binding\n");
     fprintf(fp, "\n");
 
@@ -865,7 +894,7 @@ static void itf_wrap_ext(FILE *fp, char *pck, fdecl *dcl,
        {if (mc_need_ptr(dcl) == TRUE)
 	   {if (first == TRUE)
 	       {first = FALSE;
-		fprintf(fp, "   use %stypes\n", pck);
+		fprintf(fp, "   use types_%s\n", pck);
 		fprintf(fp, "\n");};};
 
 	rty = dcl->type;
@@ -897,7 +926,7 @@ static void itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
     pr = dcl->proto;
 
 /* emit complete declarations */
-    if (strstr(pr, "...") == NULL)
+    if ((strstr(pr, "...") == NULL) && (strcmp(ffn, "none") != 0))
        {rty = dcl->type;
 
 	na    = dcl->na;
@@ -916,7 +945,7 @@ static void itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
 	fprintf(fp, "      %s w%s(%s)\n", oper, ffn, a);
 
 	if (mc_need_ptr(dcl) == TRUE)
-	   fprintf(fp, "         use %stypes\n", pck);
+	   fprintf(fp, "         use types_%s\n", pck);
 
 	fprintf(fp, "         implicit none\n");
 
@@ -960,7 +989,7 @@ static void wrap_module(FILE *fp, fdecl *dcl, char *cfn)
     farg *al;
 
     if (strstr(dcl->proto, "...") != NULL)
-       printf("\nError: %s is not interoperable - variable args\n", cfn);
+       berr("%s is not interoperable - variable args", cfn);
 
     else
        {nstrncpy(dcn, MAXLINE, cfn, -1);
@@ -1076,7 +1105,7 @@ static int bind_module(FILE *fp, char *pck, char **spr, char **sbi)
 static void fin_module(FILE *fp, char *pck)
    {
 
-    fprintf(fp, "end module %s\n", pck);
+    fprintf(fp, "end module pact_%s\n", pck);
     fprintf(fp, "\n");
 
     fclose(fp);

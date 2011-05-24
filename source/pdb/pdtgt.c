@@ -186,15 +186,15 @@ int PD_target(data_standard *data, data_alignment *align)
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(pftrgt, PFTRGT)(FIXNUM *pis, FIXNUM *pia)
+FIXNUM FF_ID(pftrgt, PFTRGT)(FIXNUM *sis, FIXNUM *sia)
    {int al, st;
     FIXNUM rv;
     PD_smp_state *pa;
 
     pa = _PD_get_state(-1);
 
-    al = *pia;
-    st = *pis;
+    al = *sia;
+    st = *sis;
     rv = (al != 6);
     if (rv)
        {pa->req_std   = PD_std_standards[st - 1];
@@ -216,13 +216,13 @@ FIXNUM FF_ID(pftrgt, PFTRGT)(FIXNUM *pis, FIXNUM *pia)
  *          return a structure chart
  */
 
-FIXNUM FF_ID(pfntgt, PFNTGT)(FIXNUM *pis, FIXNUM *pia)
+FIXNUM FF_ID(pfntgt, PFNTGT)(FIXNUM *sis, FIXNUM *sia)
    {int al, st, ret;
     FIXNUM rv;
     hasharr *chart;
 
-    al = *pia;
-    st = *pis;
+    al = *sia;
+    st = *sis;
     ret = (al != 6);
     if (ret)
        {chart = PN_target(PD_std_standards[st - 1], PD_std_alignments[al - 1]);

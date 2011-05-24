@@ -21,6 +21,7 @@ OD = DefaultG
 #
 UniFlags =
 CcFlags  = ${ODC} -I. -I${IncDir} ${MDInc}
+FcFlags  = ${ODF} -I. -I${IncDir}
 LdFlags  = -L${LibDir} ${LDFLAGS}
 
 CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}
@@ -199,7 +200,7 @@ ${BinDir}/pdftst : pdftst.f ${InstallDep} ${Hdrs}
 	${FC} ${LdFlags} pdftst.f -o ${BinDir}/pdftst ${Libs}
 
 ${BinDir}/pdfhyts : pdfhyts.f ${InstallDep} ${Hdrs}
-	${FC} ${LdFlags} pdfhyts.c -o ${BinDir}/pdfhyts ${Libs}
+	${FC} ${LdFlags} pdfhyts.f -o ${BinDir}/pdfhyts ${Libs}
 
 #
 # net io test
