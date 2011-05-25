@@ -662,7 +662,7 @@ void *_SC_alloc_n(long ni, long bpi, void *arg)
         line = opt->line;
 	prm  = opt->perm;
 	na   = opt->na;
-	if ((line == -1) && (strncmp(func, "PERM|", 5) == 0))
+	if ((line == -1) && (func != NULL) && (strncmp(func, "PERM|", 5) == 0))
 	   {prm = TRUE;
 	    na  = TRUE;};
 	zsp  = (opt->zsp == -1) ? ph->zero_space : opt->zsp;
