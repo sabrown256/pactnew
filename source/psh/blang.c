@@ -11,11 +11,18 @@
 #include "common.h"
 #include "libpsh.c"
 
+enum e_fparam
+   {FP_ANY = -1, FP_VARARG, FP_FNC, FP_PTR,
+    FP_SCALAR, FP_ARRAY, FP_STRING, FP_VOID};
+
+typedef enum e_fparam fparam;
+
 typedef struct s_fdecl fdecl;
 typedef struct s_farg farg;
 
 struct s_farg
    {int fptr;
+    fparam knd;
     char *arg;
     char type[MAXLINE];
     char name[MAXLINE];};
@@ -318,6 +325,23 @@ static void hsep(FILE *fp)
 
 /*--------------------------------------------------------------------------*/
 
+/* DEREF - dereference a pointer S
+ *       - place result in D
+ */
+
+static char *deref(char *d, int nc, char *s)
+   {
+
+    nstrncpy(d, nc, s, -1);
+    LAST_CHAR(d) = '\0';
+
+    memmove(d, trim(d, BOTH, " \t"), nc);
+
+    return(d);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* CF_TYPE - return Fortran type corresponding to C type T */
 
 static void cf_type(char *a, int nc, char *t)
@@ -346,47 +370,88 @@ static void cf_type(char *a, int nc, char *t)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* FC_TYPE - return C type corresponding to FORTRAN type T */
+/* FC_TYPE_PRIM - return C type corresponding to dereferenced
+ *              - FORTRAN type TY in WTY
+ *              - return the kind of FORTRAN argument TY is
+ */
 
-static int fc_type(char *a, int nc, char *t)
-   {int rv;
+static fparam fc_type_prim(char *wty, int nc, char *ty, int ptr)
+   {fparam rv;
 
-    rv = TRUE;
+    if (strcmp(ty, "char") == 0)
+       {nstrncpy(wty, nc, ty, -1);
+	rv = ptr ? FP_STRING : FP_SCALAR;}
 
-    if (strcmp(t, "...") == 0)
-       {nstrncpy(a, nc, "char *", -1);
-	rv = FALSE;}
+    else if (is_ptr(ty) == TRUE)
+       {nstrncpy(wty, nc, "void *", -1);
+	rv = FP_ARRAY;}
 
-    else if (strcmp(t, "char *") == 0)
-       nstrncpy(a, nc, "char *", -1);
+    else if ((strncmp(ty, "int", 3) == 0) ||
+	     (strncmp(ty, "long", 4) == 0) || 
+	     (strncmp(ty, "short", 5) == 0) || 
+	     (strncmp(ty, "long long", 9) == 0) ||
+	     (strncmp(ty, "FIXNUM", 6) == 0))
+       {nstrncpy(wty, nc, "FIXNUM", -1);
+	rv = ptr ? FP_ARRAY : FP_SCALAR;}
 
-    else if ((is_ptr(t) == TRUE) || 
-	     (strstr(t, "(*") != NULL))
-       nstrncpy(a, nc, "void *", -1);
+    else if (strncmp(ty, "double", 6) == 0)
+       {nstrncpy(wty, nc, "double", -1);
+	rv = ptr ? FP_ARRAY : FP_SCALAR;}
 
-/* follow the PACT function pointer PF convention */
-    else if (strncmp(t, "PF", 2) == 0)
-       nstrncpy(a, nc, "PFInt", -1);
+    else if (strncmp(ty, "float", 6) == 0)
+       {nstrncpy(wty, nc, "float", -1);
+	rv = ptr ? FP_ARRAY : FP_SCALAR;}
 
-    else if ((strncmp(t, "int", 3) == 0) ||
-	     (strncmp(t, "long", 4) == 0) || 
-	     (strncmp(t, "short", 5) == 0) || 
-	     (strncmp(t, "long long", 9) == 0) ||
-	     (strncmp(t, "FIXNUM", 6) == 0))
-       nstrncpy(a, nc, "FIXNUM", -1);
+    else if (strncmp(ty, "void", 4) == 0)
+       {nstrncpy(wty, nc, "void", -1);
+	rv = ptr ? FP_ARRAY : FP_VOID;}
 
-    else if (strncmp(t, "double", 6) == 0)
-       nstrncpy(a, nc, "double", -1);
-
-    else if (strncmp(t, "float", 6) == 0)
-       nstrncpy(a, nc, "float", -1);
-
-    else if (strncmp(t, "void", 4) == 0)
-       nstrncpy(a, nc, "void", -1);
+/* handle other pointers */
+    else if (ptr)
+       {nstrncpy(wty, nc, "void *", -1);
+	rv = FP_PTR;}
 
 /* take unknown types to be integer - covers enums */
     else
-       nstrncpy(a, nc, "int", -1);
+       {nstrncpy(wty, nc, "int", -1);
+	rv = ptr ? FP_ARRAY : FP_SCALAR;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FC_TYPE - return C type corresponding to FORTRAN type TY in WTY
+ *         - return the kind of FORTRAN argument TY is
+ */
+
+static fparam fc_type(char *wty, int nc, char *ty)
+   {fparam rv;
+    char lty[MAXLINE];
+
+/* handle variable arg list */
+    if (strcmp(ty, "...") == 0)
+       {nstrncpy(wty, nc, "char *", -1);
+	rv = FP_VARARG;}
+
+/* handle function pointer */
+    else if (strstr(ty, "(*") != NULL)
+       {nstrncpy(wty, nc, "void *", -1);
+	rv = FP_FNC;}
+
+/* follow the PACT function pointer PF convention */
+    else if (strncmp(ty, "PF", 2) == 0)
+       {nstrncpy(wty, nc, "PFInt", -1);
+	rv = FP_FNC;}
+
+/* handle pointers */
+    else if (is_ptr(ty) == TRUE)
+       {deref(lty, MAXLINE, ty);
+        rv = fc_type_prim(wty, nc, lty, TRUE);}
+  
+/* handle scalars */
+    else
+       rv = fc_type_prim(wty, nc, ty, FALSE);
 
     return(rv);}
 
@@ -398,8 +463,10 @@ static int fc_type(char *a, int nc, char *t)
  */
 
 static void fc_decl_list(char *a, int nc, fdecl *dcl)
-   {int i, na, ok;
-    char lt[MAXLINE];
+   {int i, na;
+    fparam knd;
+    char lty[MAXLINE], lnm[MAXLINE];
+    char *nm;
     farg *al;
 
     na = dcl->na;
@@ -410,11 +477,36 @@ static void fc_decl_list(char *a, int nc, fdecl *dcl)
        nstrcat(a, MAXLINE, "void");
     else
        {for (i = 0; i < na; i++)
-	    {ok = fc_type(lt, MAXLINE, al[i].type);
-	     if (al[i].fptr == TRUE)
-	        vstrcat(a, MAXLINE, "%s p%s, ", lt, al[i].name);
-	     else
-	        vstrcat(a, MAXLINE, "%s *p%s, ", lt, al[i].name);};
+	    {nm = al[i].name;
+	     nstrncpy(lnm, MAXLINE, nm, -1);
+	     knd = fc_type(lty, MAXLINE, al[i].type);
+	     switch (knd)
+	        {case FP_PTR :
+		      snprintf(nm, MAXLINE, "u%s", lnm);
+		      vstrcat(a, MAXLINE, "%s %s, ", lty, nm);
+		      break;
+		 case FP_FNC :
+		      snprintf(nm, MAXLINE, "f%s", lnm);
+		      vstrcat(a, MAXLINE, "%s %s, ", lty, nm);
+		      break;
+		 case FP_STRING :
+		      snprintf(nm, MAXLINE, "c%s", lnm);
+		      vstrcat(a, MAXLINE, "%s *%s, ", lty, nm);
+		      break;
+		 case FP_ARRAY :
+		      snprintf(nm, MAXLINE, "a%s", lnm);
+		      vstrcat(a, MAXLINE, "%s *%s, ", lty, nm);
+		      break;
+		 case FP_SCALAR :
+		      snprintf(nm, MAXLINE, "s%s", lnm);
+		      vstrcat(a, MAXLINE, "%s *%s, ", lty, nm);
+		      break;
+		 default :
+		      printf("Unknown type: %s\n", lty);
+		      break;};
+
+	   al[i].knd = knd;};
+
         a[strlen(a) - 2] = '\0';};
 
     nstrncpy(a, nc, subst(a, "* ", "*", -1), -1);
@@ -517,7 +609,8 @@ static FILE *init_fortran(char *pck)
  */
 
 static void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
-   {int i, na, nv, voidf, voida, rptr, ok;
+   {int i, na, nv, voidf, voida, rptr, done;
+    fparam knd;
     char ufn[MAXLINE], a[MAXLINE], rt[MAXLINE], t[MAXLINE];
     farg *al;
 
@@ -533,7 +626,7 @@ static void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
 	voidf = (strcmp(dcl->type, "void") == 0);
 	voida = no_args(dcl);
 
-	ok = fc_type(rt, MAXLINE, dcl->type);
+	knd = fc_type(rt, MAXLINE, dcl->type);
 	fc_decl_list(a, MAXLINE, dcl);
 
 	rptr = is_ptr(rt);
@@ -541,12 +634,29 @@ static void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
 	csep(fp);
 	fprintf(fp, "\n");
 
-	if (rptr == TRUE)
-	   snprintf(t, MAXLINE, "FIXNUM FF_ID(w%s, W%s)(%s)\n",
-		    ffn, ufn, a);
-	else
-	   snprintf(t, MAXLINE, "%s FF_ID(w%s, W%s)(%s)\n",
-		    rt, ffn, ufn, a);
+	switch (knd)
+	   {case FP_PTR    :
+	         snprintf(t, MAXLINE, "%s *FF_ID(w%s, W%s)(%s)\n",
+			  rt, ffn, ufn, a);
+		 break;
+	    case FP_STRING :
+	         snprintf(t, MAXLINE, "%s *FF_ID(w%s, W%s)(%s)\n",
+			  rt, ffn, ufn, a);
+		 break;
+	    case FP_ARRAY  :
+	         snprintf(t, MAXLINE, "%s *FF_ID(w%s, W%s)(%s)\n",
+			  rt, ffn, ufn, a);
+		 break;
+	    case FP_ANY    :
+	    case FP_VARARG :
+	    case FP_FNC    :
+	    case FP_SCALAR :
+	    case FP_VOID   :
+	    default        :
+	         snprintf(t, MAXLINE, "%s FF_ID(w%s, W%s)(%s)\n",
+			  rt, ffn, ufn, a);
+		 break;};
+
 	fputs(subst(t, "* ", "*", -1), fp);
 
 /* local variable declarations */
@@ -562,18 +672,58 @@ static void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
 
 	     t[0] = '\0';
 
+	     done = FALSE;
+
 /* variable for return value */
 	     if (i == na)
 	        {if (voidf == FALSE)
-		    {if (rptr == TRUE)
-		        snprintf(t, MAXLINE, "FIXNUM _rv;\n");
-		     else
-		        snprintf(t, MAXLINE, "%s _rv;\n", rt);};}
+		    {switch (knd)
+		        {case FP_PTR    :
+			      snprintf(t, MAXLINE, "%s *_rv;\n", rt);
+			      break;
+			 case FP_STRING :
+			      snprintf(t, MAXLINE, "%s *_rv;\n", rt);
+			      break;
+			    case FP_ARRAY  :
+			      snprintf(t, MAXLINE, "%s *_rv;\n", rt);
+			      break;
+			 case FP_ANY    :
+			 case FP_VARARG :
+			 case FP_FNC    :
+			 case FP_SCALAR :
+			 case FP_VOID   :
+			 default        :
+			      snprintf(t, MAXLINE, "%s _rv;\n", rt);
+			      break;};};
+
+		 done = TRUE;}
 
 /* local vars */
 	     else if (al[i].name[0] != '\0')
-	        {snprintf(t, MAXLINE, "%s _l%s;\n", al[i].type, al[i].name);
-		 nv++;};
+	        {switch (al[i].knd)
+		    {case FP_PTR    :
+		          snprintf(t, MAXLINE, "%s _l%s;\n",
+				   al[i].type, al[i].name);
+		          break;
+		     case FP_STRING :
+		          snprintf(t, MAXLINE, "%s_l%s;\n",
+				   al[i].type, al[i].name);
+		          break;
+		     case FP_ARRAY  :
+		          snprintf(t, MAXLINE, "%s_l%s;\n",
+				   al[i].type, al[i].name);
+		          break;
+		     case FP_ANY    :
+		     case FP_VARARG :
+		     case FP_FNC    :
+		     case FP_SCALAR :
+		     case FP_VOID   :
+		     default        :
+		          snprintf(t, MAXLINE, "%s _l%s;\n",
+				   al[i].type, al[i].name);
+		          break;};
+		 nv++;
+		 done = TRUE;};
 
 	     if (IS_NULL(t) == FALSE)
 	        fputs(subst(t, "* ", "*", -1), fp);};
@@ -581,16 +731,38 @@ static void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
 	fprintf(fp, "\n");
 
 /* local variable assignments */
+	nv = 0;
 	for (i = 0; i < na; i++)
 	    {if (al[i].name[0] != '\0')
-	        {if (al[i].fptr == TRUE)
-		    fprintf(fp, "    _l%s = (%s) p%s;\n",
-			    al[i].name, al[i].type, al[i].name);
-		 else
-		    fprintf(fp, "    _l%s = (%s) *p%s;\n",
-			    al[i].name, al[i].type, al[i].name);};};
+	        {switch (al[i].knd)
+		    {case FP_PTR    :
+		          snprintf(t, MAXLINE, "    _l%-8s = (%s) %s;\n",
+				   al[i].name, al[i].type, al[i].name);
+		          break;
+		     case FP_STRING :
+		          snprintf(t, MAXLINE, "    _l%-8s = %s;\n",
+				   al[i].name, al[i].name);
+		          break;
+		     case FP_ARRAY  :
+		          snprintf(t, MAXLINE, "    _l%-8s = (%s) %s;\n",
+				   al[i].name, al[i].type, al[i].name);
+		          break;
+		     case FP_FNC    :
+		          snprintf(t, MAXLINE, "    _l%-8s = (%s) %s;\n",
+				   al[i].name, al[i].type, al[i].name);
+		          break;
+		     case FP_ANY    :
+		     case FP_VARARG :
+		     case FP_SCALAR :
+		     case FP_VOID   :
+		     default        :
+		          snprintf(t, MAXLINE, "    _l%-8s = (%s) *%s;\n",
+				   al[i].name, al[i].type, al[i].name);
+		          break;};
+		 nv++;
+		 fputs(t, fp);};};
 
-	if (na > 0)
+	if (nv > 0)
 	   fprintf(fp, "\n");
 
 /* function call */
