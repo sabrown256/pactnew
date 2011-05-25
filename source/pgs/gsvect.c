@@ -684,16 +684,16 @@ void PG_set_vec_attr(PG_device *dev, ...)
  *        - (see the documentation for PD_SET_VEC_ATTR)
  */
 
-void FF_ID(pgsvat, PGSVAT)(FIXNUM *devid, ...)
+void FF_ID(pgsvat, PGSVAT)(FIXNUM *sdid, ...)
    {int type, itemp;
     double diffvp, diffwd, temp;
     double wc[PG_BOXSZ];
     PG_device *dev;
 
-    dev = *(PG_device **) devid;
+    dev = *(PG_device **) sdid;
 
-/* get the current viewport & window -- this is used to go from NDC to
- * WC for specifying _PG.fixsize & _PG.maxvsz 
+/* get the current viewport and window -- this is used to go from NDC to
+ * WC for specifying _PG.fixsize and _PG.maxvsz 
  */
     PG_get_viewspace(dev, NORMC, wc);
     diffvp = wc[1] - wc[0];
@@ -701,7 +701,7 @@ void FF_ID(pgsvat, PGSVAT)(FIXNUM *devid, ...)
     diffwd = wc[1] - wc[0];
 
 /* get the attributes */
-    SC_VA_START(devid);
+    SC_VA_START(sdid);
     while (TRUE)
        {type = *SC_VA_ARG(FIXNUM *);
         if (type == 0)
@@ -816,21 +816,21 @@ void PG_vector_plot(PG_device *dev, PG_graph *data, ...)
 
 /* PGPLVC - low level vector plot routine */
 
-FIXNUM FF_ID(pgplvc, PGPLVC)(FIXNUM *devid,
-                                double *px, double *py, double *pu, double *pv,
-                                FIXNUM *pn, FIXNUM *pal)
+FIXNUM FF_ID(pgplvc, PGPLVC)(FIXNUM *sdid,
+			     double *ax, double *ay, double *au, double *av,
+			     FIXNUM *sn, FIXNUM *said)
    {FIXNUM rv;
     double *x[PG_SPACEDM], *u[PG_SPACEDM];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    x[0] = px;
-    x[1] = py;
-    u[0] = pu;
-    u[1] = pv;
+    x[0] = ax;
+    x[1] = ay;
+    u[0] = au;
+    u[1] = av;
 
-    PG_draw_vector_n(dev, 2, WORLDC, *pn, x, u);
+    PG_draw_vector_n(dev, 2, WORLDC, *sn, x, u);
 
     rv = TRUE;
 

@@ -488,31 +488,6 @@ int PA_th_wr_iattr(PDBfile *strm, char *vr, int inst, char *attr, void *avl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PA_TH_TRANSPOSE - process a family of time history files into ULTRA files
- *
- *                 - NAME: base name of both the TH and ULTRA file families
- *                 - NCPF: maximum number of curves per ULTRA file
- */
-
-/* THIS FUNCTION IS DEPRECATED - USE PA_TH_TRANS_FAMILY INSTEAD */
-
-int PA_th_transpose(char *name, int ncpf)
-   {int i, nthf, ret;
-    char **thfiles;
-
-    nthf = PA_th_family_list(name, 't', &thfiles);
-
-    ret  = PA_th_trans_files(name, ncpf, nthf, thfiles, 1, FALSE);
-
-    for (i = 0; i < nthf; i++)
-        CFREE(thfiles[i]);
-    CFREE(thfiles);
-
-    return(ret);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PA_TH_TRANS_FAMILY - Process family of time history files into ULTRA files.
  *
  *                    - NAME: base name of both the TH and ULTRA file families
@@ -1259,27 +1234,26 @@ int PA_merge_files(char *base, int n, char **files, int ncpf)
 
 /* PATHOP - open a time history file */
 
-FIXNUM FF_ID(pathop, PATHOP)(FIXNUM *pnf, char *fname, FIXNUM *pnm,
-				char *fmode, FIXNUM *psz, FIXNUM *pnp,
-				char *fprev)
+FIXNUM FF_ID(pathop, PATHOP)(FIXNUM *sncn, char *fname, char *fmode,
+			     FIXNUM *ssz, FIXNUM *sncp, char *fprev)
    {int np;
     FIXNUM rv;
     char s[MAXLINE], t[2], u[MAXLINE], *lmode;
     PDBfile *file;
 
-    SC_FORTRAN_STR_C(s, fname, *pnf);
+    SC_FORTRAN_STR_C(s, fname, *sncn);
 
     lmode = fmode;
 
     t[0] = *lmode;
     t[1] = '\0';
 
-    np = *pnp;
+    np = *sncp;
     if (np == 0)
-       file = PA_th_open(s, t, (long) *psz, NULL);
+       file = PA_th_open(s, t, (long) *ssz, NULL);
     else
        {SC_FORTRAN_STR_C(u, fprev, np);
-        file = PA_th_open(s, t, (long) *psz, u);};
+        file = PA_th_open(s, t, (long) *ssz, u);};
 
     if (file == NULL)
        rv = -1;
@@ -1298,18 +1272,18 @@ FIXNUM FF_ID(pathop, PATHOP)(FIXNUM *pnf, char *fname, FIXNUM *pnm,
  *        - if appropriate
  */
 
-FIXNUM FF_ID(pathfm, PATHFM)(FIXNUM *fileid)
+FIXNUM FF_ID(pathfm, PATHFM)(FIXNUM *sfid)
    {FIXNUM ret;
     PDBfile *file, *newfile;
 
-    file = SC_GET_POINTER(PDBfile, *fileid);
-    ret = *fileid;    
+    file = SC_GET_POINTER(PDBfile, *sfid);
+    ret = *sfid;    
 
     newfile = PA_th_family(file);
 
     if (newfile != file)
        {ret = SC_ADD_POINTER(newfile);
-        file = SC_DEL_POINTER(PDBfile, *fileid);}
+        file = SC_DEL_POINTER(PDBfile, *sfid);}
         
     if (newfile == NULL)
        ret = -1;
@@ -1324,19 +1298,16 @@ FIXNUM FF_ID(pathfm, PATHFM)(FIXNUM *fileid)
 
 /* PABREC - begin a time domain struct definition */
 
-FIXNUM FF_ID(pabrec, PABREC)(FIXNUM *fileid, FIXNUM *pnf, char *fname,
-				FIXNUM *pnt, char *ftype, FIXNUM *pnd,
-				char *ftime)
-   {size_t nc;
-    FIXNUM rv;
+FIXNUM FF_ID(pabrec, PABREC)(FIXNUM *sfid, FIXNUM *sncn, char *fname,
+			     FIXNUM *snct, char *ftype,
+			     FIXNUM *sncm, char *ftime)
+   {FIXNUM rv;
     char ltype[MAXLINE], lname[MAXLINE], ltime[MAXLINE];
     ff_th_record *fth;
 
-    nc = *pnt;
-    SC_FORTRAN_STR_C(ltype, ftype, nc);
+    SC_FORTRAN_STR_C(ltype, ftype, *snct);
 
-    nc = *pnf;
-    SC_FORTRAN_STR_C(lname, fname, nc);
+    SC_FORTRAN_STR_C(lname, fname, *sncn);
 
     fth = CMAKE(ff_th_record);
     
@@ -1345,8 +1316,7 @@ FIXNUM FF_ID(pabrec, PABREC)(FIXNUM *fileid, FIXNUM *pnf, char *fname,
     fth->type       = CSTRSAVE(ltype);
     fth->entry_name = CSTRSAVE(lname);
 
-    nc = *pnd;
-    SC_FORTRAN_STR_C(ltime, ftime, nc);
+    SC_FORTRAN_STR_C(ltime, ftime, *sncm);
 
     SC_array_string_add_copy(fth->members, ltime);
 
@@ -1359,9 +1329,9 @@ FIXNUM FF_ID(pabrec, PABREC)(FIXNUM *fileid, FIXNUM *pnf, char *fname,
 
 /* PAGRID - return the record id for the named record */
 
-FIXNUM FF_ID(pagrid, PAGRID)(FIXNUM *fileid, FIXNUM *pind, FIXNUM *pnn,
-				char *name, FIXNUM *pnt, char *type,
-				FIXNUM *prid)
+FIXNUM FF_ID(pagrid, PAGRID)(FIXNUM *sfid, FIXNUM *sind,
+			     FIXNUM *sncn, char *name,
+			     FIXNUM *snct, char *type, FIXNUM *srid)
    {int n;
     FIXNUM rv;
     char dname[MAXLINE], *s;
@@ -1371,9 +1341,9 @@ FIXNUM FF_ID(pagrid, PAGRID)(FIXNUM *fileid, FIXNUM *pind, FIXNUM *pnn,
 
     rv = FALSE;
 
-    file = SC_GET_POINTER(PDBfile, *fileid);
+    file = SC_GET_POINTER(PDBfile, *sfid);
     
-    snprintf(dname, MAXLINE, "th%d", (int) *pind);
+    snprintf(dname, MAXLINE, "th%d", (int) *sind);
     if (PD_read(file, dname, &thd) != 0)
        {fth = CMAKE(ff_th_record);
     
@@ -1386,15 +1356,15 @@ FIXNUM FF_ID(pagrid, PAGRID)(FIXNUM *fileid, FIXNUM *pind, FIXNUM *pnn,
 
 	s = thd.entry_name;
 	n = strlen(s);
-	SC_strncpy(name, *pnn, s, n);
-	*pnn = n;
+	SC_strncpy(name, *sncn, s, n);
+	*sncn = n;
 
 	s = thd.type;
 	n = strlen(s);
-	SC_strncpy(type, *pnt, s, n);
-	*pnt  = n;
+	SC_strncpy(type, *snct, s, n);
+	*snct  = n;
 
-	*prid = (FIXNUM) SC_ADD_POINTER(fth);
+	*srid = (FIXNUM) SC_ADD_POINTER(fth);
 
         rv = TRUE;};
 
@@ -1405,19 +1375,19 @@ FIXNUM FF_ID(pagrid, PAGRID)(FIXNUM *fileid, FIXNUM *pind, FIXNUM *pnn,
 
 /* PAAREC - add a member to a time domain struct definition */
 
-FIXNUM FF_ID(paarec, PAAREC)(FIXNUM *fileid, FIXNUM *recid, FIXNUM *pnm,
-				char *fmemb, FIXNUM *pnl, char *flabl)
+FIXNUM FF_ID(paarec, PAAREC)(FIXNUM *sfid, FIXNUM *srid,
+			     FIXNUM *sncm, char *fmemb,
+			     FIXNUM *sncl, char *flabl)
    {int nc;
     FIXNUM rv;
     char lmemb[MAXLINE], llabl[MAXLINE], *s;
     ff_th_record *fth;
 
-    fth  = SC_GET_POINTER(ff_th_record, *recid);
+    fth  = SC_GET_POINTER(ff_th_record, *srid);
 
-    nc = *pnm;
-    SC_FORTRAN_STR_C(lmemb, fmemb, nc);
+    SC_FORTRAN_STR_C(lmemb, fmemb, *sncm);
 
-    nc = *pnl;
+    nc = *sncl;
     SC_FORTRAN_STR_C(llabl, flabl, nc);
 
     SC_array_string_add_copy(fth->members, lmemb);
@@ -1438,7 +1408,7 @@ FIXNUM FF_ID(paarec, PAAREC)(FIXNUM *fileid, FIXNUM *recid, FIXNUM *pnm,
 
 /* PAEREC - finish a time domain struct definition */
 
-FIXNUM FF_ID(paerec, PAEREC)(FIXNUM *fileid, FIXNUM *recid)
+FIXNUM FF_ID(paerec, PAEREC)(FIXNUM *sfid, FIXNUM *srid)
    {int nm;
     FIXNUM rv;
     char **sm, **sl;
@@ -1447,8 +1417,8 @@ FIXNUM FF_ID(paerec, PAEREC)(FIXNUM *fileid, FIXNUM *recid)
     defstr *dp;
     SC_array *fm, *fl;
 
-    file = SC_GET_POINTER(PDBfile, *fileid);
-    fth  = SC_GET_POINTER(ff_th_record, *recid);
+    file = SC_GET_POINTER(PDBfile, *sfid);
+    fth  = SC_GET_POINTER(ff_th_record, *srid);
     fm   = fth->members;
     fl   = fth->labels;
 
@@ -1471,17 +1441,17 @@ FIXNUM FF_ID(paerec, PAEREC)(FIXNUM *fileid, FIXNUM *recid)
 
 /* PAWREC - write a time domain record */
 
-FIXNUM FF_ID(pawrec, PAWREC)(FIXNUM *fileid, FIXNUM *recid,
-				FIXNUM *pinst, FIXNUM *pnr, void *vr)
+FIXNUM FF_ID(pawrec, PAWREC)(FIXNUM *sfid, FIXNUM *srid,
+			     FIXNUM *sinst, FIXNUM *snr, void *avr)
    {FIXNUM ret;
     PDBfile *file;
     ff_th_record *fth;
 
-    file = SC_GET_POINTER(PDBfile, *fileid);
-    fth  = SC_GET_POINTER(ff_th_record, *recid);
+    file = SC_GET_POINTER(PDBfile, *sfid);
+    fth  = SC_GET_POINTER(ff_th_record, *srid);
 
     ret = PA_th_write(file, fth->entry_name, fth->type,
-                      (int) *pinst, (int) *pnr, vr);
+                      (int) *sinst, (int) *snr, avr);
 
     return(ret);}
 
@@ -1490,21 +1460,21 @@ FIXNUM FF_ID(pawrec, PAWREC)(FIXNUM *fileid, FIXNUM *recid,
 
 /* PAWMEM - write a time domain record member */
 
-FIXNUM FF_ID(pawmem, PAWMEM)(FIXNUM *fileid, FIXNUM *recid, FIXNUM *pnc,
-				char *mbr, FIXNUM *pinst, FIXNUM *pnr,
-				void *vr)
+FIXNUM FF_ID(pawmem, PAWMEM)(FIXNUM *sfid, FIXNUM *srid,
+			     FIXNUM *sncm, char *mbr,
+			     FIXNUM *sinst, FIXNUM *snr, void *avr)
    {FIXNUM ret;
     char memb[MAXLINE];
     PDBfile *file;
     ff_th_record *fth;
 
-    file = SC_GET_POINTER(PDBfile, *fileid);
-    fth  = SC_GET_POINTER(ff_th_record, *recid);
+    file = SC_GET_POINTER(PDBfile, *sfid);
+    fth  = SC_GET_POINTER(ff_th_record, *srid);
 
-    SC_FORTRAN_STR_C(memb, mbr, *pnc);
+    SC_FORTRAN_STR_C(memb, mbr, *sncm);
 
     ret = PA_th_wr_member(file, fth->entry_name, memb, fth->type,
-			  (int) *pinst, vr);
+			  (int) *sinst, avr);
 
     return(ret);}
 
@@ -1513,35 +1483,19 @@ FIXNUM FF_ID(pawmem, PAWMEM)(FIXNUM *fileid, FIXNUM *recid, FIXNUM *pnc,
 
 /* PAWRIA - write a time domain record instance attribute */
 
-FIXNUM FF_ID(pawria, PAWRIA)(FIXNUM *fileid, FIXNUM *pnv, char *fvar,
-				FIXNUM *pinst, FIXNUM *pna, char *fattr,
-				void *avl)
+FIXNUM FF_ID(pawria, PAWRIA)(FIXNUM *sfid, FIXNUM *sncv, char *fvar,
+			     FIXNUM *sinst, FIXNUM *snca, char *fattr,
+			     void *avl)
    {FIXNUM ret;
     char lvar[MAXLINE], lattr[MAXLINE];
     PDBfile *file;
 
-    file = SC_GET_POINTER(PDBfile, *fileid);
+    file = SC_GET_POINTER(PDBfile, *sfid);
 
-    SC_FORTRAN_STR_C(lvar, fvar, *pnv);
-    SC_FORTRAN_STR_C(lattr, fattr, *pna);
+    SC_FORTRAN_STR_C(lvar, fvar, *sncv);
+    SC_FORTRAN_STR_C(lattr, fattr, *snca);
 
-    ret = PA_th_wr_iattr(file, lvar, (int) *pinst, lattr, avl);
-
-    return(ret);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PATHTR - transpose a time history file family */
-/* THIS FUNCTION IS DEPRECATED - USE PATRNF INSTEAD */
-
-FIXNUM FF_ID(pathtr, PATHTR)(FIXNUM *pnf, char *fname, FIXNUM *pncpf)
-   {FIXNUM ret;
-    char s[MAXLINE];
-
-    SC_FORTRAN_STR_C(s, fname, *pnf);
-
-    ret = PA_th_trans_family(s, 1, (int) *pncpf);
+    ret = PA_th_wr_iattr(file, lvar, (int) *sinst, lattr, avl);
 
     return(ret);}
 
@@ -1549,39 +1503,17 @@ FIXNUM FF_ID(pathtr, PATHTR)(FIXNUM *pnf, char *fname, FIXNUM *pncpf)
 /*--------------------------------------------------------------------------*/
 
 /* PATRNF - transpose a time history file family
- *        - Return 1 if successful and 0 otherwise.
+ *        - return 1 if successful and 0 otherwise.
  */
 
-FIXNUM FF_ID(patrnf, PATRNF)(FIXNUM *pnf, char *fname, FIXNUM *pord,
-				FIXNUM *pncpf)
+FIXNUM FF_ID(patrnf, PATRNF)(FIXNUM *sncn, char *fname, FIXNUM *sord,
+			     FIXNUM *sncpf)
    {FIXNUM ret;
     char s[MAXLINE];
 
-    SC_FORTRAN_STR_C(s, fname, *pnf);
+    SC_FORTRAN_STR_C(s, fname, *sncn);
 
-    ret = PA_th_trans_family(s, (int) *pord, (int) *pncpf);
-
-    return(ret);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PATHTN - transpose a time history file family by explicit names
- *        - THIS FUNCTION IS DEPRECATED - USE PATRNN INSTEAD
- */
-
-FIXNUM FF_ID(pathtn, PATHTN)(char *chrs, FIXNUM *pord, FIXNUM *pncpf)
-   {int n;
-    FIXNUM ret;
-    char *pc, **names;
-
-    pc    = chrs;
-    names = SC_tokenize(pc, " \t\f\n\r");
-    for (n = 0; names[n] != NULL; n++);
-
-    ret = PA_th_trans_name(n, names, (int) *pord, (int) *pncpf);
-
-    SC_free_strings(names);
+    ret = PA_th_trans_family(s, (int) *sord, (int) *sncpf);
 
     return(ret);}
 
@@ -1589,22 +1521,22 @@ FIXNUM FF_ID(pathtn, PATHTN)(char *chrs, FIXNUM *pord, FIXNUM *pncpf)
 /*--------------------------------------------------------------------------*/
 
 /* PATRNN - transpose a time history file family by explicit names
- *        - Return 1 if successful and 0 otherwise.
+ *        - return 1 if successful and 0 otherwise.
  */
 
-FIXNUM FF_ID(patrnn, PATRNN)(FIXNUM *pnchrs, char *chrs,
-				FIXNUM *pord, FIXNUM *pncpf)
+FIXNUM FF_ID(patrnn, PATRNN)(FIXNUM *sncc, char *chrs,
+			     FIXNUM *sord, FIXNUM *sncpf)
    {int n;
     FIXNUM ret;
     char **names, *pc;
 
-    pc = CMAKE_N(char, *pnchrs + 2);
-    SC_FORTRAN_STR_C(pc, chrs, *pnchrs);
+    pc = CMAKE_N(char, *sncc + 2);
+    SC_FORTRAN_STR_C(pc, chrs, *sncc);
 
     names = SC_tokenize(pc, " \t\f\n\r");
     for (n = 0; names[n] != NULL; n++);
 
-    ret = PA_th_trans_name(n, names, (int) *pord, (int) *pncpf);
+    ret = PA_th_trans_name(n, names, (int) *sord, (int) *sncpf);
 
     SC_free_strings(names);
 
@@ -1615,45 +1547,23 @@ FIXNUM FF_ID(patrnn, PATRNN)(FIXNUM *pnchrs, char *chrs,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PATHTL - transpose a time history file family by links
- *        - THIS FUNCTION IS DEPRECATED - USE PATRNL INSTEAD
- */
-
-FIXNUM FF_ID(pathtl, PATHTL)(char *chrs, FIXNUM *pord, FIXNUM *pncpf)
-   {int n;
-    FIXNUM ret;
-    char **names, *pc;
-
-    pc    = chrs;
-    names = SC_tokenize(pc, " \t\f\n\r");
-    for (n = 0; names[n] != NULL; n++);
-
-    ret = PA_th_trans_link(n, names, (int) *pord, (int) *pncpf);
-    
-    SC_free_strings(names);
-
-    return(ret);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PATRNL - transpose a time history file family by links
  *        - Return 1 if successful and 0 otherwise.
  */
 
-FIXNUM FF_ID(patrnl, PATRNL)(FIXNUM *pnchrs, char *chrs,
-				FIXNUM *pord, FIXNUM *pncpf)
+FIXNUM FF_ID(patrnl, PATRNL)(FIXNUM *sncc, char *chrs,
+			     FIXNUM *sord, FIXNUM *sncpf)
    {int n;
     FIXNUM ret;
     char **names, *pc;
 
-    pc = CMAKE_N(char, *pnchrs + 2);
-    SC_FORTRAN_STR_C(pc, chrs, *pnchrs);
+    pc = CMAKE_N(char, *sncc + 2);
+    SC_FORTRAN_STR_C(pc, chrs, *sncc);
 
     names = SC_tokenize(pc, " \t\f\n\r");
     for (n = 0; names[n] != NULL; n++);
 
-    ret = PA_th_trans_link(n, names, (int) *pord, (int) *pncpf);
+    ret = PA_th_trans_link(n, names, (int) *sord, (int) *sncpf);
     
     SC_free_strings(names);
 
@@ -1667,23 +1577,23 @@ FIXNUM FF_ID(patrnl, PATRNL)(FIXNUM *pnchrs, char *chrs,
 /* PAMRGF - FORTRAN interface routine to merge a family of ULTRA files
  *        - Return 1 if successful and 0 otherwise.
  *
- *        - PNB:    Number of characters in BASE.
- *        - BASE:   Base name of target (merged) file family.
- *        - PNF:    Number of characters in FAMILY.
- *        - FAMILY: Base name of source file family.
- *        - PNCPF:  Number of curves per target file.
+ *        - SNCB    number of characters in BASE
+ *        - BASE    base name of target (merged) file family
+ *        - SNCF    number of characters in FAMILY
+ *        - FAMILY  base name of source file family
+ *        - SNCPF   number of curves per target file
  */
 
-FIXNUM FF_ID(pamrgf, PAMRGF)(FIXNUM *pnb, char *base, FIXNUM *pnf,
-				char *family, FIXNUM *pncpf)
+FIXNUM FF_ID(pamrgf, PAMRGF)(FIXNUM *sncb, char *base,
+			     FIXNUM *sncf, char *family, FIXNUM *sncpf)
    {FIXNUM ret;
     char s[MAXLINE];
     char t[MAXLINE];
 
-    SC_FORTRAN_STR_C(s, base, *pnb);
-    SC_FORTRAN_STR_C(t, family, *pnf);
+    SC_FORTRAN_STR_C(s, base, *sncb);
+    SC_FORTRAN_STR_C(t, family, *sncf);
 
-    ret = PA_merge_family(s, t, (int) *pncpf);
+    ret = PA_merge_family(s, t, (int) *sncpf);
 
     return(ret);}
 
@@ -1691,29 +1601,29 @@ FIXNUM FF_ID(pamrgf, PAMRGF)(FIXNUM *pnb, char *base, FIXNUM *pnf,
 /*--------------------------------------------------------------------------*/
 
 /* PAMRGN - FORTRAN interface routine to merge a list of ULTRA files.
- *        - Return 1 if successful and 0 otherwise.
+ *        - return 1 if successful and 0 otherwise.
  *
- *        - PNB:    Number of characters in BASE.
- *        - BASE:   Base name of target (merged) file family.
- *        - PNCHRS: Number of characters in CHRS.
- *        - CHRS:   List of file names.
- *        - PNCPF:  Number of curves per target file.
+ *        - SNCB    number of characters in BASE
+ *        - BASE    base name of target (merged) file family
+ *        - SNCC    number of characters in CHRS
+ *        - CHRS    list of file names
+ *        - SNCPF   number of curves per target file
  */
 
-FIXNUM FF_ID(pamrgn, PAMRGN)(FIXNUM *pnb, char *base, FIXNUM *pnchrs,
-				char *chrs, FIXNUM *pncpf)
+FIXNUM FF_ID(pamrgn, PAMRGN)(FIXNUM *sncb, char *base,
+			     FIXNUM *sncc, char *chrs, FIXNUM *sncpf)
    {int n;
     FIXNUM ret;
     char **files, *pc, s[MAXLINE];
 
-    pc = CMAKE_N(char, *pnchrs + 2);
-    SC_FORTRAN_STR_C(pc, chrs, *pnchrs);
-    SC_FORTRAN_STR_C(s, base, *pnb);
+    pc = CMAKE_N(char, *sncc + 2);
+    SC_FORTRAN_STR_C(pc, chrs, *sncc);
+    SC_FORTRAN_STR_C(s, base, *sncb);
 
     files = SC_tokenize(pc, " \t\f\n\r");
     for (n = 0; files[n] != NULL; n++);
 
-    ret = PA_merge_files(s, n, files, (int) *pncpf);
+    ret = PA_merge_files(s, n, files, (int) *sncpf);
 
     SC_free_strings(files);
 
@@ -1726,11 +1636,11 @@ FIXNUM FF_ID(pamrgn, PAMRGN)(FIXNUM *pnb, char *base, FIXNUM *pnchrs,
 
 /* PAFREC - Free a time domain record */
 
-FIXNUM FF_ID(pafrec, PAFREC)(FIXNUM *recid)
+FIXNUM FF_ID(pafrec, PAFREC)(FIXNUM *srid)
    {FIXNUM rv;
     ff_th_record *fth;
 
-    fth = SC_GET_POINTER(ff_th_record, *recid);
+    fth = SC_GET_POINTER(ff_th_record, *srid);
 
     SC_free_array(fth->labels, SC_array_free_n);
     SC_free_array(fth->members, SC_array_free_n);
@@ -1743,6 +1653,98 @@ FIXNUM FF_ID(pafrec, PAFREC)(FIXNUM *recid)
     rv = TRUE;
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                             DEPRECATED ROUTINES                          */
+
+/*--------------------------------------------------------------------------*/
+
+/* PA_TH_TRANSPOSE - process a family of time history files into ULTRA files
+ *
+ *                 - NAME  base name of both the TH and ULTRA file families
+ *                 - SNCPF maximum number of curves per ULTRA file
+ *                 -
+ *                 - USE PA_TH_TRANS_FAMILY INSTEAD
+ */
+
+int PA_th_transpose(char *name, int sncpf)
+   {int i, nthf, ret;
+    char **thfiles;
+
+    nthf = PA_th_family_list(name, 't', &thfiles);
+
+    ret  = PA_th_trans_files(name, sncpf, nthf, thfiles, 1, FALSE);
+
+    for (i = 0; i < nthf; i++)
+        CFREE(thfiles[i]);
+    CFREE(thfiles);
+
+    return(ret);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PATHTR - transpose a time history file family
+ *        -
+ *        - USE PATRNF INSTEAD
+ */
+
+FIXNUM FF_ID(pathtr, PATHTR)(FIXNUM *sncn, char *fname, FIXNUM *sncpf)
+   {FIXNUM ret;
+    char s[MAXLINE];
+
+    SC_FORTRAN_STR_C(s, fname, *sncn);
+
+    ret = PA_th_trans_family(s, 1, (int) *sncpf);
+
+    return(ret);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PATHTN - transpose a time history file family by explicit names
+ *        -
+ *        - USE PATRNN INSTEAD
+ */
+
+FIXNUM FF_ID(pathtn, PATHTN)(char *chrs, FIXNUM *sord, FIXNUM *sncpf)
+   {int n;
+    FIXNUM ret;
+    char *pc, **names;
+
+    pc    = chrs;
+    names = SC_tokenize(pc, " \t\f\n\r");
+    for (n = 0; names[n] != NULL; n++);
+
+    ret = PA_th_trans_name(n, names, (int) *sord, (int) *sncpf);
+
+    SC_free_strings(names);
+
+    return(ret);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PATHTL - transpose a time history file family by links
+ *        -
+ *        - USE PATRNL INSTEAD
+ */
+
+FIXNUM FF_ID(pathtl, PATHTL)(char *chrs, FIXNUM *sord, FIXNUM *sncpf)
+   {int n;
+    FIXNUM ret;
+    char **names, *pc;
+
+    pc    = chrs;
+    names = SC_tokenize(pc, " \t\f\n\r");
+    for (n = 0; names[n] != NULL; n++);
+
+    ret = PA_th_trans_link(n, names, (int) *sord, (int) *sncpf);
+    
+    SC_free_strings(names);
+
+    return(ret);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

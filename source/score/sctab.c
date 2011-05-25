@@ -825,14 +825,14 @@ char *SC_get_entry(int n)
 
 /* SCMKHT - make a hash array */
 
-FIXNUM FF_ID(scmkht, SCMKHT)(FIXNUM *psz, FIXNUM *pdoc, FIXNUM *pflgs)
+FIXNUM FF_ID(scmkht, SCMKHT)(FIXNUM *ssz, FIXNUM *sdoc, FIXNUM *sflgs)
    {int sz, doc, flags;
     hasharr *ha;
     FIXNUM rv;
 
-    sz    = *psz;
-    doc   = *pdoc;
-    flags = *pflgs;
+    sz    = *ssz;
+    doc   = *sdoc;
+    flags = *sflgs;
 
     ha = SC_make_hasharr(sz, doc, SC_HA_NAME_KEY, flags);
     if (ha == NULL)
@@ -847,15 +847,15 @@ FIXNUM FF_ID(scmkht, SCMKHT)(FIXNUM *psz, FIXNUM *pdoc, FIXNUM *pflgs)
 
 /* SCRLHT - release a hash array */
 
-FIXNUM FF_ID(scrlht, SCRLHT)(FIXNUM *haid)
+FIXNUM FF_ID(scrlht, SCRLHT)(FIXNUM *sha)
    {hasharr *ha;
     FIXNUM rv;
 
-    ha = SC_DEL_POINTER(hasharr, *haid);
+    ha = SC_DEL_POINTER(hasharr, *sha);
 
     SC_free_hasharr(ha, NULL, NULL);
 
-    *haid = 0;
+    *sha = 0;
 
     rv = TRUE;
 
@@ -866,11 +866,11 @@ FIXNUM FF_ID(scrlht, SCRLHT)(FIXNUM *haid)
 
 /* SCHCLR - clear a hash array */
 
-FIXNUM FF_ID(schclr, SCHCLR)(FIXNUM *haid)
+FIXNUM FF_ID(schclr, SCHCLR)(FIXNUM *sha)
    {hasharr *ha;
     FIXNUM rv;
 
-    ha = SC_GET_POINTER(hasharr, *haid);
+    ha = SC_GET_POINTER(hasharr, *sha);
 
     SC_hasharr_clear(ha, NULL, NULL);
 
@@ -887,9 +887,9 @@ FIXNUM FF_ID(schclr, SCHCLR)(FIXNUM *haid)
  *        - only info install has to go on
  */
 
-FIXNUM FF_ID(schins, SCHINS)(FIXNUM *pnc, char *pname, void *ptr,
-                                FIXNUM *pnt, char *ptype,
-                                FIXNUM *pcp, FIXNUM *haid)
+FIXNUM FF_ID(schins, SCHINS)(FIXNUM *sha, FIXNUM *sncn, char *pname,
+			     void *ptr, FIXNUM *snct, char *ptype,
+			     FIXNUM *scp)
    {int cp;
     char name[MAXLINE], type[MAXLINE];
     char *t;
@@ -897,11 +897,11 @@ FIXNUM FF_ID(schins, SCHINS)(FIXNUM *pnc, char *pname, void *ptr,
     haelem *hp;
     FIXNUM rv;
 
-    cp  = *pcp;
-    ha = SC_GET_POINTER(hasharr, *haid);
+    cp = *scp;
+    ha = SC_GET_POINTER(hasharr, *sha);
 
-    SC_FORTRAN_STR_C(name, pname, *pnc);
-    SC_FORTRAN_STR_C(type, ptype, *pnt);
+    SC_FORTRAN_STR_C(name, pname, *sncn);
+    SC_FORTRAN_STR_C(type, ptype, *snct);
 
     if (cp)
        {long n;
@@ -927,17 +927,17 @@ FIXNUM FF_ID(schins, SCHINS)(FIXNUM *pnc, char *pname, void *ptr,
  *        - return the object thru P
  */
 
-FIXNUM FF_ID(schlkp, SCHLKP)(void *p, FIXNUM *pnc, char *pname,
-                                FIXNUM *haid)
+FIXNUM FF_ID(schlkp, SCHLKP)(FIXNUM *sha, void *p,
+			     FIXNUM *sncn, char *pname)
    {int n;
     FIXNUM rv;
     char name[MAXLINE];
     haelem *hp;
     hasharr *ha;
 
-    ha = SC_GET_POINTER(hasharr, *haid);
+    ha = SC_GET_POINTER(hasharr, *sha);
 
-    SC_FORTRAN_STR_C(name, pname, *pnc);
+    SC_FORTRAN_STR_C(name, pname, *sncn);
 
     hp = SC_hasharr_lookup(ha, name);
     if (hp == NULL)
@@ -958,16 +958,16 @@ FIXNUM FF_ID(schlkp, SCHLKP)(void *p, FIXNUM *pnc, char *pname,
  *        - return a pointer to the object thru P
  */
 
-FIXNUM FF_ID(schlku, SCHLKU)(void **p, FIXNUM *pnc, char *pname,
-                                FIXNUM *haid)
+FIXNUM FF_ID(schlku, SCHLKU)(FIXNUM *sha, void **p,
+			     FIXNUM *sncn, char *pname)
    {FIXNUM rv;
     char name[MAXLINE];
     haelem *hp;
     hasharr *ha;
 
-    ha = SC_GET_POINTER(hasharr, *haid);
+    ha = SC_GET_POINTER(hasharr, *sha);
 
-    SC_FORTRAN_STR_C(name, pname, *pnc);
+    SC_FORTRAN_STR_C(name, pname, *sncn);
 
     hp = SC_hasharr_lookup(ha, name);
     if (hp == NULL)
@@ -983,14 +983,14 @@ FIXNUM FF_ID(schlku, SCHLKU)(void **p, FIXNUM *pnc, char *pname,
 
 /* SCHREM - remove an object from a hash array */
 
-FIXNUM FF_ID(schrem, SCHREM)(FIXNUM *pnc, char *pname, FIXNUM *haid)
+FIXNUM FF_ID(schrem, SCHREM)(FIXNUM *sha, FIXNUM *sncn, char *pname)
    {FIXNUM rv;
     char name[MAXLINE];
     hasharr *ha;
 
-    ha = SC_GET_POINTER(hasharr, *haid);
+    ha = SC_GET_POINTER(hasharr, *sha);
 
-    SC_FORTRAN_STR_C(name, pname, *pnc);
+    SC_FORTRAN_STR_C(name, pname, *sncn);
 
     rv = SC_hasharr_remove(ha, name);
 

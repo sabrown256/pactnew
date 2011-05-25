@@ -1403,13 +1403,13 @@ void PG_draw_surface_n(PG_device *dev, double *a1, double *a2, double *extr,
 
 /* PGPLSF - low level surface plot routine */
 
-FIXNUM FF_ID(pgplsf, PGPLSF)(FIXNUM *devid, double *px, double *py, double *pz,
-			     FIXNUM *pn, double *pxn, double *pxx,
-			     double *pyn, double *pyx, double *pzn, double *pzx,
-			     FIXNUM *pkx, FIXNUM *plx,
-			     double *pth, double *pph, double *pch,
-			     FIXNUM *ptyp, FIXNUM *pcol, double *pwid,
-			     FIXNUM *psty, FIXNUM *pnc, char *label)
+FIXNUM FF_ID(pgplsf, PGPLSF)(FIXNUM *sdid, double *ax, double *ay, double *az,
+			     FIXNUM *sn, double *sxn, double *sxx,
+			     double *syn, double *syx, double *szn, double *szx,
+			     FIXNUM *skx, FIXNUM *slx,
+			     double *sth, double *sph, double *sch,
+			     FIXNUM *styp, FIXNUM *scol, double *swid,
+			     FIXNUM *ssty, FIXNUM *sncl, char *label)
    {int sty, clr;
     int maxes[2];
     FIXNUM rv;
@@ -1419,31 +1419,31 @@ FIXNUM FF_ID(pgplsf, PGPLSF)(FIXNUM *devid, double *px, double *py, double *pz,
     PG_rendering pty;
     PG_device *dev;
 
-    maxes[0] = (int) *pkx;
-    maxes[1] = (int) *plx;
+    maxes[0] = (int) *skx;
+    maxes[1] = (int) *slx;
 
-    clr = *pcol;
-    sty = *psty;
-    pty = (PG_rendering) *ptyp;
+    clr = *scol;
+    sty = *ssty;
+    pty = (PG_rendering) *styp;
 
-    ext[0] = *pzn;
-    ext[1] = *pzx;
-    ext[2] = *pzn;
-    ext[3] = *pzx; 
+    ext[0] = *szn;
+    ext[1] = *szx;
+    ext[2] = *szn;
+    ext[3] = *szx; 
 
-    SC_FORTRAN_STR_C(llabel, label, *pnc);
+    SC_FORTRAN_STR_C(llabel, label, *sncl);
 
-    r[0] = px;
-    r[1] = py;
+    r[0] = ax;
+    r[1] = ay;
 
-    va[0] = *pth;
-    va[1] = *pph;
-    va[2] = *pch;
+    va[0] = *sth;
+    va[1] = *sph;
+    va[2] = *sch;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    PG_draw_surface_n(dev, pz, pz, ext, r, *pn,
-		      va, *pwid, clr, sty,
+    PG_draw_surface_n(dev, az, az, ext, r, *sn,
+		      va, *swid, clr, sty,
 		      pty, llabel, PM_LR_S, maxes, NULL);
 
     rv = TRUE;

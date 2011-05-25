@@ -697,7 +697,7 @@ object *SS_eval_form(SS_psides *si, object *first, ...)
 
 /* SSCHEM - do a Fortran version of SS_call_scheme */
 
-FIXNUM FF_ID(sschem, SSCHEM)(FIXNUM *pnc, char *name, ...)
+FIXNUM FF_ID(sschem, SSCHEM)(FIXNUM *snc, char *name, ...)
    {int i, type[MAXLINE];
     FIXNUM rv;
     void *ptr[MAXLINE];
@@ -708,7 +708,7 @@ FIXNUM FF_ID(sschem, SSCHEM)(FIXNUM *pnc, char *name, ...)
 
     si = SS_get_current_scheme(-1);
     
-    SC_FORTRAN_STR_C(func, name, *pnc);
+    SC_FORTRAN_STR_C(func, name, *snc);
 
     SC_VA_START(name);
 

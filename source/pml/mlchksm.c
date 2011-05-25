@@ -607,14 +607,14 @@ long PM_checksum_file(FILE* file, int64_t start, int64_t stop, int nbts)
 
 /* PMCSMA - Fortran callable wrapper for PM_checksum_array */
 
-FIXNUM FF_ID(pmcsma, PMCSMA)(void *arr, FIXNUM *pni, FIXNUM *pbpi,
-				FIXNUM *pnbts)
+FIXNUM FF_ID(pmcsma, PMCSMA)(void *arr, FIXNUM *sni, FIXNUM *sbpi,
+			     FIXNUM *snbts)
    {int ni, bpi, nbts;
     FIXNUM cs;
 
-    ni   = *pni;
-    bpi  = *pbpi;
-    nbts = *pnbts;
+    ni   = *sni;
+    bpi  = *sbpi;
+    nbts = *snbts;
 
     cs = PM_checksum_array(arr, ni, bpi, nbts);
 

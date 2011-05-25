@@ -7,29 +7,6 @@
 !
 ! include "cpyright.h"
 !
-! Usage: 
-!   pdftst [help|-h]
-!     Print this help package
-!  
-!   pdftst
-!     Test attributes; make directory;
-!     write curve, image and mappings in
-!     directory dir1; write double as float
-!     to CRAY Unicos file.
-!  
-!   pdftst [-p] [-a] [-d] [-o opt] [-as] [-t]
-!     -p   PRINT progress to terminal          (df = false)
-!     -a   Define, set, remove attributes      (df = true)
-!     -d   Make Directory                      (df = false)
-!     -o   Write curve, image and mappings:     (df = 0)
-!            0 - none
-!            1 - before directory created
-!            2 - in root directory
-!            3 - in directory dir1
-!     -as f|d                                  (df = d)
-!          Set write_as to float or double
-!     -t   Set target to CRAY Unicos           (df = false)
-!
 
 ! --------------------------------------------------------------------------
 ! --------------------------------------------------------------------------
@@ -37,25 +14,23 @@
 ! ERRPROC - handle errors
 
       subroutine errproc
-!      use pdb
+      use pdb
       implicit none
 
-      integer pfgerr
-
+! ... local variables
       integer, parameter :: MAXMSG = 256
-      integer i, nchar
-      character err(MAXMSG)
+      integer nchar
+      character*256 err
 
       nchar = MAXMSG
       if ((pfgerr(nchar, err) .eq. 1) .and. (nchar .gt. 0)) then
          nchar = min(nchar, MAXMSG)
          write(6, 100)
  100     format()
-         write(6, 101) (err(i), i=1, nchar)
- 101     format(72a1)
+         write(6, *) err
       else
          write(6, 102)
- 102     format(/, 'Error in PDFTST.', /)
+ 102     format(/, 'Error in PDWFTS', /)
       endif
 
       stop 1
@@ -67,14 +42,14 @@
 ! WRTCUR - write a curve
 
       subroutine wrtcur(fileid)
+      use pdb
       implicit none
 
       integer fileid
 
-      integer i, index
+! ... local variables
+      integer i, index, st
       real*8 dm(0:99), rm1(0:99), rm2(0:99)
-
-      integer pfwulc, pfwuly
 
       index = 0
 
@@ -84,12 +59,12 @@
          rm2(i) = sin(6.28*float(i)/99.)
       enddo
 
-      if (pfwulc(fileid, 12, "cosine curve", 100, dm, rm1, index) &
-           .eq. 0) &
+      st = pfwulc(fileid, 12, "cosine curve", 100, dm, rm1, index)
+      if (st .eq. 0) &
          call errproc
 
-      if (pfwuly(fileid, 9, "sin curve", 100, index - 1, rm2, index) &
-           .eq. 0) &
+      st = pfwuly(fileid, 9, "sin curve", 100, index - 1, rm2, index)
+      if (st .eq. 0) &
          call errproc
 
       return
@@ -101,16 +76,16 @@
 ! CHKCUR - check curve
 
       subroutine chkcur(fileid, tolerance)
+      use pdb
       implicit none
 
       integer fileid
       real*8 tolerance
 
+! ... local variables
       integer i
       real*8 dm(0:99), rm1(0:99), rm2(0:99)
       real*8 odm(0:99), orm1(0:99), orm2(0:99)
-
-      integer pfread
 
       do i = 0, 99
          dm(i)  = 6.28*float(i)/99.
@@ -143,14 +118,14 @@
 ! WRTIMA - write an image
 
       subroutine wrtima(fileid)
+      use pdb
       implicit none
 
       integer fileid
 
-      integer k, l
+! ... local variables
+      integer k, l, st
       real*8 xmin, xmax, ymin, ymax, data(0:10, 0:10)
-
-      integer pfwima
 
       xmin = 0.
       xmax = 10.
@@ -163,8 +138,9 @@
          enddo
       enddo
 
-      if (pfwima(fileid, 10, 'Test image', 0, 10, 0, 10,  &
-           data, xmin, xmax, ymin, ymax, 0) .eq. 0)       &
+      st = pfwima(fileid, 10, 'Test image', 0, 10, 0, 10,  &
+                  data, xmin, xmax, ymin, ymax, 0)
+      if (st .eq. 0) &
          call errproc
 
       return
@@ -176,14 +152,14 @@
 ! CHKIMA - check image
 
       subroutine chkima(fileid)
+      use pdb
       implicit none
 
       integer fileid
 
-      integer k, l, ret
+! ... local variables
+      integer k, l, st
       real*8 data(0:10, 0:10), odata(0:10, 0:10)
-
-      integer pfrptr
 
       do l = 0, 10
          do k = 0, 10
@@ -191,8 +167,8 @@
          enddo
       enddo
 
-      ret = pfrptr(fileid, 14, 'Image0->buffer', 121, odata)
-      if (ret .eq. 0) &
+      st = pfrptr(fileid, 14, 'Image0->buffer', 121, odata)
+      if (st .eq. 0) &
          call errproc
 
       do l = 0, 10
@@ -211,14 +187,15 @@
 ! WRTMAP - write some mappings
 
       subroutine wrtmap(fileid)
+      use pdb
       implicit none
 
       integer fileid
 
-      integer i, pim, dp(5), rp(5)
+! ... local variables
+      integer i, pim, st
+      integer dp(5), rp(5)
       real*8 dm(0:99), rm(0:99)
-
-      integer pfwmap, pfwset, pfwran
 
       pim = 0
       dp(1) = 7
@@ -237,13 +214,15 @@
          rm(i) = sin(6.28*float(i)/99.)
       enddo
 
-      if (pfwmap(fileid, 'Domain0', dp, dm, 'Range0', rp, rm, pim) &
-          .eq. 0) &
+      st = pfwmap(fileid, 'Domain0', dp, dm, 'Range0', rp, rm, pim)
+      if (st .eq. 0) &
          call errproc
 
       pim = 1
+
       if (pfwset(fileid, 'Domain1', dp, dm) .eq. 0) &
          call errproc
+
       if (pfwran(fileid, 'Domain1', 7, 'Range1', rp, rm, pim) .eq. 0) &
          call errproc
 
@@ -256,28 +235,28 @@
 ! CHKMAP - check mappings
 
       subroutine chkmap(fileid, tolerance)
+      use pdb
       implicit none
 
       integer fileid
       real*8 tolerance
 
-      integer i
+! ... local variables
+      integer i, st
       real*8 dm(0:99), rm(0:99)
       real*8 odm(0:99), orm(0:99)
 
-      integer pfread, pfrptr
-
       do i = 0, 99
-         dm(i) = 6.28*float(i)/99.
-         rm(i) = sin(6.28*float(i)/99.)
+         dm(i) = 6.28*float(i)/99.0
+         rm(i) = sin(6.28*float(i)/99.0)
       enddo
 
-      if (pfrptr(fileid, 29, 'Mapping0->domain->elements[1]', &
-           100, odm) .eq. 0) &
+      st = pfrptr(fileid, 29, 'Mapping0->domain->elements[1]', 100, odm)
+      if (st .eq. 0) &
          call errproc
 
-      if (pfread(fileid, 35, 'Mapping0->range->elements[1][1:100]', &
-           orm) .eq. 0) &
+      st = pfread(fileid, 35, 'Mapping0->range->elements[1][1:100]', orm)
+      if (st .eq. 0) &
          call errproc
 
       do i = 0, 99
@@ -286,13 +265,12 @@
             call errproc
       enddo
 
-      if (pfread(fileid, 27, 'Domain1->elements[1][1:100]', odm) &
-           .eq. 0) &
+      st = pfread(fileid, 27, 'Domain1->elements[1][1:100]', odm)
+      if (st .eq. 0) &
          call errproc
 
-      if (pfrptr(fileid, 28, 'Mapping1->range->elements[1]', &
-           100, orm) &
-           .eq. 0) &
+      st = pfrptr(fileid, 28, 'Mapping1->range->elements[1]', 100, orm)
+      if (st .eq. 0) &
          call errproc
 
       do i = 0, 99
@@ -310,6 +288,7 @@
 ! TEST_1 - basic file testing
 
       subroutine test_1(nout, outtype, date, PRINT, DIR, ATTR, OPTION)
+      use pdb
       implicit none 
 
       integer nout
@@ -320,30 +299,18 @@
       logical ATTR
       character*8  OPTION
 
-! ... PDBlib Fortran API
-      integer pfopen, pfsoff
-      integer pfgoff, pfdefs, pfwrta, pfclos
-      integer pfpwd,  pfwrtd
-      integer pfdefa, pfdefd, pfcd,   pfln
-      integer pfmkdr, pfappa, pfappd
-      integer pfgmod, pfflsh, pfdeft
-      integer pfdatt, pfsvat, pffami
-      integer pfapas, pfapad
-      integer pfwras, pfwrad
-
-
+! ... local variables
       integer i, j, k, l
-      integer fileid, offset
+      integer fileid, offset, st
       integer ndims, dims(14), pairs(6)
       integer nchar
       integer istring
       integer LAST
       
       real*8 a, c, g, z, zz, zzx
-      real*8 TOLERANCE
       real*8 x(20)
 
-      character name(256)
+      character*256 name
       character*8 strings(4)
 
       common /abc/ a(2), c(2, 2:4), g(5, 2:10), z(4, 5, 2)
@@ -353,7 +320,6 @@
       equivalence (istring, strings)
 
       data  LAST /0/
-      data  TOLERANCE /3.e-14/
 
       if (PRINT) then
          write(6, *) '------------------------------------------------'
@@ -436,11 +402,11 @@
          call errproc
 
       if (PRINT) then
-         write(6, 350) (name(i), i=1, nchar)
- 350     format(/, 'Current working directory:  ', 256a1)
+         write(6, 350) name(1:nchar)
+ 350     format(/, 'Current working directory:  ', a)
       endif
 
-      if ((name(1) .ne. '/') .or. (nchar .ne. 1)) &
+      if ((name(1:nchar) .ne. '/') .or. (nchar .ne. 1)) &
          call errproc
 
 ! ... write curve, image, and mappings in root after creating directory
@@ -453,8 +419,9 @@
       x(1) = 100
 
 ! ... write  data item z   write_as,  append,  append_alt
-      if (pfwras(fileid, 8, 'z(4,5,1)', 6, 'double', 6, 'double', z) &
-            .eq. 0)  call errproc
+      st = pfwras(fileid, 8, 'z(4,5,1)', 6, 'double', 6, 'double', z)
+      if (st .eq. 0) &
+         call errproc
 
       if (pfappa(fileid, 14, 'z(1:4,1:5,1:1)', z) .eq. 0) &
          call errproc
@@ -485,11 +452,14 @@
       dims(7) = 1
       dims(8) = 1
       dims(9) = 1
-      if (pfwrad(fileid, 2, 'zz', 6, 'double', nout, outtype, zz, &
-            ndims, dims) .eq. 0)  call errproc
+      st = pfwrad(fileid, 2, 'zz', 6, 'double', nout, outtype, zz, &
+                  ndims, dims)
+      if (st .eq. 0) &
+         call errproc
 
-      if (pfapas(fileid, 15, 'zz(1:4,1:5,1:1)', 6, 'double', zz(1, 1, 2)) &
-            .eq. 0)  call errproc
+      st = pfapas(fileid, 15, 'zz(1:4,1:5,1:1)', 6, 'double', zz(1, 1, 2))
+      if (st .eq. 0) &
+         call errproc
 
       ndims = 3
       dims(1) = 1
@@ -521,8 +491,8 @@
          call errproc
 
       if (PRINT) then
-         write(6, 351) (name(i), i=1, nchar)
- 351     format(/, 'Current working directory:  ', 256a1)
+         write(6, 351) name(1:nchar)
+ 351     format(/, 'Current working directory:  ', a)
       endif
 
       if (((.not. DIR) .and. (nchar .ne. 1)) .or.&
@@ -539,8 +509,9 @@
       endif
 
 ! ... define and write some data structures
-      if (pfdefs(fileid, 3, 'abc', 11, 'double a(2)', 8, 'double b', &
-           15, 'double c(2, 2:4)', LAST) .eq. 0) &
+      st = pfdefs(fileid, 3, 'abc', 11, 'double a(2)', 8, 'double b', &
+                  15, 'double c(2, 2:4)', LAST)
+      if (st .eq. 0) &
          call errproc
 
       if (pfwrta(fileid, 3, 'abc', 3, 'abc', a) .eq. 0) &
@@ -571,8 +542,9 @@
       dims(4) = 1
       dims(5) = 4
       dims(6) = 1
-      if (pfwrtd(fileid, 7, 'strings', 4, 'char', istring, &
-           ndims, dims) .eq. 0) &
+      st = pfwrtd(fileid, 7, 'strings', 4, 'char', istring, &
+                  ndims, dims)
+      if (st .eq. 0) &
          call errproc
 
 ! ... define an attribute
@@ -663,6 +635,7 @@
 ! TEST_2 - feature testing
 
       subroutine test_2(date, PRINT, DIR, ATTR)
+      use pdb
       implicit none 
 
       character*80 date
@@ -670,28 +643,19 @@
       logical DIR
       logical ATTR
 
-! ... PDBlib Fortran API
-      integer pfopen, pfclos
-      integer pfityp, pfivar, pfptrd
-      integer pfpwd, pfcd
-      integer pfgmod, pfgfnm
-      integer pfgvat, pfratt
-      integer pfimbr
-      integer pfrdas, pfrdad
-
-      integer i, n, nt, fileid
+! ... local variables
+      integer i, j, k, l, n
+      integer nt, fileid, st
       integer ntype, ndims, dims(14), nitems
       integer typsiz, align, nptr
-      integer j, k, l
       integer kindx
       integer nchar
-      integer LAST
        
-      character name(256)
+      character*256 name
       character*8 name1, name2
       character*5 name3, name4
       character*80 dt
-      character type(72)
+      character*72 type
 
       real*8 x(20)
       real*8 a, c, g, z, zz, zzx
@@ -705,8 +669,7 @@
       common /abc2/ zz2(4, 5, 2)
       common /jkl/ j, k, l
 
-      data  LAST /0/
-      data  TOLERANCE /3.e-14/
+      data  TOLERANCE /3.0e-14/
 
       if (PRINT) then
          write(6, *) '------------------------------------------------'
@@ -844,7 +807,7 @@
          do j = 1, 5
             do i = 1, 4
                if (abs(zz2(i, j, kindx) - zz(i, j, kindx)) &
-                   .gt. tolerance) &
+                   .gt. TOLERANCE) &
                   call errproc
             enddo
          enddo
@@ -859,7 +822,7 @@
             do j = 1, 5
                do i = 1, 4
                  if (abs(zz2(i, j, kindx) - zzx(i, j, kindx)) &
-                     .gt. tolerance) &
+                     .gt. TOLERANCE) &
                     call errproc
             enddo
          enddo
@@ -876,11 +839,11 @@
          call errproc
 
       if (PRINT) then
-         write(6, 352) (name(i), i=1, nchar)
- 352     format(/, 'Current working directory:  ', 256a1)
+         write(6, 352) name(1:nchar)
+ 352     format(/, 'Current working directory:  ', a)
       endif
 
-      if ((name(1) .ne. '/') .or. (nchar .ne. 1)) &
+      if ((name(1:nchar) .ne. '/') .or. (nchar .ne. 1)) &
          call errproc
 
 ! ... change directory
@@ -894,7 +857,7 @@
          call errproc
 
       if (PRINT) then
-         write(6, 352) (name(i), i=1, nchar)
+         write(6, 352) name(1:nchar)
       endif
 
       if (((.not. DIR) .and. (nchar .ne. 1)) .or.&
@@ -923,8 +886,8 @@
          call errproc
 
 ! ... inquire about unwritten variable
-      if (pfivar(fileid, 1, 'f', ntype, type, nitems, ndims, dims) &
-           .eq. 0) &
+      st = pfivar(fileid, 1, 'f', ntype, type, nitems, ndims, dims)
+      if (st .eq. 0) &
          call errproc
 
       if (PRINT) then
@@ -938,9 +901,10 @@
          call errproc
 
 ! ... inquire about written variable
-      if (pfivar(fileid, 1, 'c', ntype, type, nitems, ndims, dims) &
-           .eq. 0) &
+      st = pfivar(fileid, 1, 'c', ntype, type, nitems, ndims, dims)
+      if (st .eq. 0) &
          call errproc
+
       if (PRINT) then
          write(6, 502) nitems
  502     format(/, 'Number of items in variable c:', i5)
@@ -975,12 +939,12 @@
       logical DIR
       character*8  OPTION
 
+! ... local variables
       integer i, j, k, l, n
       integer j2, k2, l2
       integer fileid, nfileid, st
       integer ntype, ndims, nitems
       integer pord, nvar, nchar
-      integer LAST
       integer dims(14)
 
       real*8 x(20)
@@ -999,8 +963,7 @@
       common /jkl/ j, k, l
       common /jkl2/ j2, k2, l2
 
-      data  LAST /0/
-      data  TOLERANCE /3.e-14/
+      data  TOLERANCE /3.0e-14/
 
       if (PRINT) then
          write(6, *) '------------------------------------------------'
@@ -1073,8 +1036,8 @@
          call errproc
 
 ! ... inquire about a structure member
-      if (pfivar(fileid, 3, 'abc.c', ntype, type, nitems, ndims, dims) &
-           .eq. 0) &
+      st = pfivar(fileid, 3, 'abc.c', ntype, type, nitems, ndims, dims)
+      if (st .eq. 0) &
          call errproc
 
       if (PRINT) then
@@ -1149,7 +1112,7 @@
          if (pfgvar(n, nchar, vname) .eq. 0) &
             call errproc
          if (PRINT) then
-            write(6, 702) vname
+            write(6, 702) vname(1:nchar)
  702        format('    ', a)
          endif
       enddo
@@ -1174,11 +1137,11 @@
          if (pfgls(n, nchar, vname) .eq. 0) &
             call errproc
          if (PRINT) then
-            write(6, 702) vname
+            write(6, 702) vname(1:nchar)
          endif
       enddo
 
-      if (vname(1:2) .ne. 'z') &
+      if (vname(1:1) .ne. 'z') &
          call errproc
 
 ! ... get the variable and directory names in dir1
@@ -1198,7 +1161,7 @@
          if (pfgls(n, nchar, vname) .eq. 0) &
             call errproc
          if (PRINT) then
-            write(6, 702) vname
+            write(6, 702) vname(1:nchar)
          endif
       enddo
 
@@ -1226,9 +1189,9 @@
 ! --------------------------------------------------------------------------
 ! --------------------------------------------------------------------------
 
-! PDFTST - main test routine
+! PDFWTS - main test routine
 
-      program pdftst
+      program pdfwts
       use score
       use pdb
       implicit none 
@@ -1239,9 +1202,7 @@
       integer is, ia, st
       integer bufsiz1, bufsiz2, bufsiz3
       integer narg, iarg, iargc
-      integer nout, err, LAST
-
-      real*8 TOLERANCE
+      integer nout, err
 
       character*8 outtype
       character*8 arg
@@ -1254,9 +1215,6 @@
 !        2 - in root directory
 !        3 - in directory dir1
       character*8  OPTION
-
-      data  LAST /0/
-      data  TOLERANCE /3.e-14/
 
       err = pfinth(0, 0)
       err = sczrsp(0)
@@ -1299,7 +1257,7 @@
                outtype = 'float'
             endif
          elseif (arg .eq. "-h" .or. arg .eq. "help") then
-            write(6, *) 'Usage: pdftst [-a f|d] [-as] [-d] [-h] &
+            write(6, *) 'Usage: pdfwts [-a f|d] [-as] [-d] [-h] &
 &[-o opt] [-p] [-t]'
             write(6, *) '    Test attributes; make directory;'
             write(6, *) '    write curve, image and mappings in'
