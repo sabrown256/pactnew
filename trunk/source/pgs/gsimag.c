@@ -1618,11 +1618,12 @@ void _PG_intp_byte(unsigned char *op, unsigned char *np,
 
 /* PGPLIM - low level image plot routine */
 
-FIXNUM FF_ID(pgplim, PGPLIM)(FIXNUM *devid, FIXNUM *pnc, char *name,
-			     FIXNUM *pnct, char *type, double *pz,
-			     FIXNUM *pk, FIXNUM *pl,
-			     double *pxn, double *pxx, double *pyn, double *pyx,
-			     double *pzn, double *pzx, FIXNUM *pal)
+FIXNUM FF_ID(pgplim, PGPLIM)(FIXNUM *sdid, FIXNUM *sncn, char *name,
+			     FIXNUM *snct, char *type,
+			     double *az, FIXNUM *sk, FIXNUM *sl,
+			     double *sxn, double *sxx,
+			     double *syn, double *syx,
+			     double *szn, double *szx, FIXNUM *said)
    {int maxes[2];
     FIXNUM rv;
     double frm[PG_BOXSZ];
@@ -1630,23 +1631,23 @@ FIXNUM FF_ID(pgplim, PGPLIM)(FIXNUM *devid, FIXNUM *pnc, char *name,
     pcons *alst;
     PG_device *dev;
 
-    SC_FORTRAN_STR_C(lname, name, *pnc);
-    SC_FORTRAN_STR_C(ltype, type, *pnct);
+    SC_FORTRAN_STR_C(lname, name, *sncn);
+    SC_FORTRAN_STR_C(ltype, type, *snct);
 
-    maxes[0] = *pk;
-    maxes[1] = *pl;
+    maxes[0] = *sk;
+    maxes[1] = *sl;
 
-    dev  = SC_GET_POINTER(PG_device, *devid);
-    alst = SC_GET_POINTER(pcons, *pal);
+    dev  = SC_GET_POINTER(PG_device, *sdid);
+    alst = SC_GET_POINTER(pcons, *said);
 
-    _PG_draw_image_nc_lr(dev, lname, ltype, pz, frm, maxes, alst);
+    _PG_draw_image_nc_lr(dev, lname, ltype, az, frm, maxes, alst);
 
-    *pxn = frm[0];
-    *pxx = frm[1];
-    *pyn = frm[2];
-    *pyx = frm[3];
-    *pzn = frm[4];
-    *pzx = frm[5];
+    *sxn = frm[0];
+    *sxx = frm[1];
+    *syn = frm[2];
+    *syx = frm[3];
+    *szn = frm[4];
+    *szx = frm[5];
 
     rv = TRUE;
 

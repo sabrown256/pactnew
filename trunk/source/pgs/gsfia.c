@@ -34,12 +34,12 @@ PG_view_attributes *PG_view_attributes_pointer(int vwatid)
 
 /* PGAXIS - draw an axis set */
 
-FIXNUM FF_ID(pgaxis, PGAXIS)(FIXNUM *devid, FIXNUM *paxt)
+FIXNUM FF_ID(pgaxis, PGAXIS)(FIXNUM *sdid, FIXNUM *saxt)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    PG_axis(dev, (int) *paxt);
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_axis(dev, (int) *saxt);
 
     rv = TRUE;
 
@@ -56,15 +56,15 @@ FIXNUM FF_ID(pgaxis, PGAXIS)(FIXNUM *devid, FIXNUM *paxt)
  *        - the characters are stored consecutively in PATC
  */
 
-FIXNUM FF_ID(pgsaxa, PGSAXA)(FIXNUM *devid, FIXNUM *pn,
-			     double *pat, char *patc)
+FIXNUM FF_ID(pgsaxa, PGSAXA)(FIXNUM *sdid, FIXNUM *sn,
+			     double *aat, char *patc)
    {int i, nc, nn, type, lnclr, txclr, prec;
     double *attr;
     double chsp, chupx, chupy, chpthx, chpthy;
     char *pc, bf[MAXLINE];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
     if (dev == NULL)
        return(FALSE);
@@ -94,9 +94,9 @@ FIXNUM FF_ID(pgsaxa, PGSAXA)(FIXNUM *devid, FIXNUM *pn,
 /* the type of the second part of the pair is dependent on the
  * value of type 
  */
-    nn   = *pn;
+    nn   = *sn;
     pc   = patc;
-    attr = pat;
+    attr = aat;
     for (i = 0; i < nn; i++)
         {type = *attr++;
          switch (type)
@@ -187,10 +187,10 @@ FIXNUM FF_ID(pgsaxa, PGSAXA)(FIXNUM *devid, FIXNUM *pn,
 
 /* PGGAXD - get axis decades */
 
-FIXNUM FF_ID(pggaxd, PGGAXD)(double *pd)
+FIXNUM FF_ID(pggaxd, PGGAXD)(double *sd)
    {
 
-    PG_get_axis_decades(*pd);
+    PG_get_axis_decades(*sd);
 
     return(TRUE);}
 
@@ -199,19 +199,19 @@ FIXNUM FF_ID(pggaxd, PGGAXD)(double *pd)
 
 /* PGGAXL - get log axis flags */
 
-FIXNUM FF_ID(pggaxl, PGGAXL)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *iflg)
+FIXNUM FF_ID(pggaxl, PGGAXL)(FIXNUM *sdid, FIXNUM *snd, FIXNUM *aflg)
    {int id, nd;
     int ifl[PG_SPACEDM];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    nd = *pnd;
+    nd = *snd;
 
     PG_get_axis_log_scale(dev, nd, ifl);
 
     for (id = 0; id < nd; id++)
-        iflg[id] = ifl[id];
+        aflg[id] = ifl[id];
 
     return(TRUE);}
 
@@ -234,14 +234,14 @@ FIXNUM FF_ID(pggbsz, PGGBSZ)(void)
 
 /* PGCLOS - close the PG_device associated with the integer index */
 
-FIXNUM FF_ID(pgclos, PGCLOS)(FIXNUM *devid)
+FIXNUM FF_ID(pgclos, PGCLOS)(FIXNUM *sdid)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_DEL_POINTER(PG_device, *devid);
+    dev = SC_DEL_POINTER(PG_device, *sdid);
     PG_close_device(dev);
 
-    *devid = -1;
+    *sdid = -1;
 
     rv = TRUE;
 
@@ -252,13 +252,13 @@ FIXNUM FF_ID(pgclos, PGCLOS)(FIXNUM *devid)
 
 /* PGCLPG - clear the page */
 
-FIXNUM FF_ID(pgclpg, PGCLPG)(FIXNUM *devid, FIXNUM *pi)
+FIXNUM FF_ID(pgclpg, PGCLPG)(FIXNUM *sdid, FIXNUM *si)
    {int i;
     FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    i   = *pi;
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    i   = *si;
 
     PG_clear_page(dev, i);
 
@@ -271,20 +271,20 @@ FIXNUM FF_ID(pgclpg, PGCLPG)(FIXNUM *devid, FIXNUM *pi)
 
 /* PGCLRG - clear the specified region */
 
-FIXNUM FF_ID(pgclrg, PGCLRG)(FIXNUM *devid, double *pxn, double *pxx,
-			     double *pyn, double *pyx, FIXNUM *pad)
+FIXNUM FF_ID(pgclrg, PGCLRG)(FIXNUM *sdid, double *sxn, double *sxx,
+			     double *syn, double *syx, FIXNUM *sad)
    {int pd;
     FIXNUM rv;
     double ndc[PG_BOXSZ];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    pd  = *pad;
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    pd  = *sad;
 
-    ndc[0] = *pxn;
-    ndc[1] = *pxx;
-    ndc[2] = *pyn;
-    ndc[3] = *pyx;
+    ndc[0] = *sxn;
+    ndc[1] = *sxx;
+    ndc[2] = *syn;
+    ndc[3] = *syx;
 
     PG_clear_region(dev, 2, NORMC, ndc, pd);
 
@@ -297,11 +297,11 @@ FIXNUM FF_ID(pgclrg, PGCLRG)(FIXNUM *devid, double *pxn, double *pxx,
 
 /* PGCLSC - clear the screen (necessary for CGM devices) */
 
-FIXNUM FF_ID(pgclsc, PGCLSC)(FIXNUM *devid)
+FIXNUM FF_ID(pgclsc, PGCLSC)(FIXNUM *sdid)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
     PG_clear_window(dev);
 
     rv = TRUE;
@@ -313,11 +313,11 @@ FIXNUM FF_ID(pgclsc, PGCLSC)(FIXNUM *devid)
 
 /* PGCLVP - clear the viewport */
 
-FIXNUM FF_ID(pgclvp, PGCLVP)(FIXNUM *devid)
+FIXNUM FF_ID(pgclvp, PGCLVP)(FIXNUM *sdid)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
     PG_clear_viewport(dev);
 
     rv = TRUE;
@@ -329,8 +329,8 @@ FIXNUM FF_ID(pgclvp, PGCLVP)(FIXNUM *devid)
 
 /* PGDDP2 - draw 2d disjoint polyline */
 
-FIXNUM FF_ID(pgddp2, PGDDP2)(FIXNUM *devid, double *px, double *py,
-			     FIXNUM *pn, FIXNUM *pf, FIXNUM *pc)
+FIXNUM FF_ID(pgddp2, PGDDP2)(FIXNUM *sdid, double *ax, double *ay,
+			     FIXNUM *sn, FIXNUM *sf, FIXNUM *sc)
    {int f;
     long n;
     FIXNUM rv;
@@ -338,14 +338,14 @@ FIXNUM FF_ID(pgddp2, PGDDP2)(FIXNUM *devid, double *px, double *py,
     PG_coord_sys cs;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    t[0] = px;
-    t[1] = py;
+    t[0] = ax;
+    t[1] = ay;
 
-    f  = (int) *pf;
-    n  = (long) *pn;
-    cs = (PG_coord_sys) *pc;
+    f  = (int) *sf;
+    n  = (long) *sn;
+    cs = (PG_coord_sys) *sc;
 
     PG_draw_disjoint_polyline_n(dev, 2, cs, n, t, f);
 
@@ -358,18 +358,18 @@ FIXNUM FF_ID(pgddp2, PGDDP2)(FIXNUM *devid, double *px, double *py,
 
 /* PGDPL2 - draw 2d polyline */
 
-FIXNUM FF_ID(pgdpl2, PGDPL2)(FIXNUM *devid, double *px, double *py,
-			     FIXNUM *pn, FIXNUM *pc)
+FIXNUM FF_ID(pgdpl2, PGDPL2)(FIXNUM *sdid, double *ax, double *ay,
+			     FIXNUM *sn, FIXNUM *sc)
    {FIXNUM rv;
     double *t[2];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    t[0] = px;
-    t[1] = py;
+    t[0] = ax;
+    t[1] = ay;
 
-    PG_draw_polyline_n(dev, 2, WORLDC, (long) *pn, t, (int) *pc);
+    PG_draw_polyline_n(dev, 2, WORLDC, (long) *sn, t, (int) *sc);
 
     rv = TRUE;
 
@@ -380,8 +380,8 @@ FIXNUM FF_ID(pgdpl2, PGDPL2)(FIXNUM *devid, double *px, double *py,
 
 /* PGDDP3 - draw 3d disjoint polyline */
 
-FIXNUM FF_ID(pgddp3, PGDDP3)(FIXNUM *devid, double *px, double *py, double *pz,
-			     FIXNUM *pn, FIXNUM *pf, FIXNUM *pc)
+FIXNUM FF_ID(pgddp3, PGDDP3)(FIXNUM *sdid, double *ax, double *ay, double *az,
+			     FIXNUM *sn, FIXNUM *sf, FIXNUM *sc)
    {int f;
     long n;
     FIXNUM rv;
@@ -389,15 +389,15 @@ FIXNUM FF_ID(pgddp3, PGDDP3)(FIXNUM *devid, double *px, double *py, double *pz,
     PG_coord_sys cs;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    t[0] = px;
-    t[1] = py;
-    t[2] = pz;
+    t[0] = ax;
+    t[1] = ay;
+    t[2] = az;
 
-    f  = (int) *pf;
-    n  = (long) *pn;
-    cs = (PG_coord_sys) *pc;
+    f  = (int) *sf;
+    n  = (long) *sn;
+    cs = (PG_coord_sys) *sc;
 
     PG_draw_disjoint_polyline_n(dev, 3, cs, n, t, f);
 
@@ -410,12 +410,12 @@ FIXNUM FF_ID(pgddp3, PGDDP3)(FIXNUM *devid, double *px, double *py, double *pz,
 
 /* PGDRAX - draw a single axis */
 
-FIXNUM FF_ID(pgdrax, PGDRAX)(FIXNUM *devid, double *pxl, double *pyl,
-			     double *pxr, double *pyr,
-			     double *pt1, double *pt2,
-			     double *pv1, double *pv2, double *psc,
-			     FIXNUM *pnc, char *format,
-			     FIXNUM *ptd, FIXNUM *ptt, FIXNUM *plt)
+FIXNUM FF_ID(pgdrax, PGDRAX)(FIXNUM *sdid, double *sxl, double *syl,
+			     double *sxr, double *syr,
+			     double *st1, double *st2,
+			     double *sv1, double *sv2, double *ssc,
+			     FIXNUM *sncf, char *format,
+			     FIXNUM *std, FIXNUM *stt, FIXNUM *slt)
    {int td;
     FIXNUM rv;
     double tn[2], vw[2];
@@ -423,23 +423,23 @@ FIXNUM FF_ID(pgdrax, PGDRAX)(FIXNUM *devid, double *pxl, double *pyl,
     char lformat[MAXLINE];
     PG_device *dev;
 
-    SC_FORTRAN_STR_C(lformat, format, *pnc);
+    SC_FORTRAN_STR_C(lformat, format, *sncf);
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    td = *ptd;
+    td = *std;
 
-    xl[0] = *pxl;
-    xl[1] = *pyl;
-    xr[0] = *pxr;
-    xr[1] = *pyr;
-    tn[0] = *pt1;
-    tn[1] = *pt2;
-    vw[0] = *pv1;
-    vw[1] = *pv2;
+    xl[0] = *sxl;
+    xl[1] = *syl;
+    xr[0] = *sxr;
+    xr[1] = *syr;
+    tn[0] = *st1;
+    tn[1] = *st2;
+    vw[0] = *sv1;
+    vw[1] = *sv2;
 
-    PG_draw_axis_n(dev, xl, xr, tn, vw, *psc, lformat,
-		   (int) *ptt, (int) *plt, FALSE,
+    PG_draw_axis_n(dev, xl, xr, tn, vw, *ssc, lformat,
+		   (int) *stt, (int) *slt, FALSE,
 		   td, 0);
 
     rv = TRUE;
@@ -451,19 +451,19 @@ FIXNUM FF_ID(pgdrax, PGDRAX)(FIXNUM *devid, double *pxl, double *pyl,
 
 /* PGDAX3 - draw a 3D axis set */
 
-FIXNUM FF_ID(pgdax3, PGDAX3)(FIXNUM *devid, double *pxl, double *pyl,
-			     double *pzl, FIXNUM *pnp)
+FIXNUM FF_ID(pgdax3, PGDAX3)(FIXNUM *sdid, double *axl, double *ayl,
+			     double *azl, FIXNUM *snp)
    {FIXNUM rv;
     double *p[PG_SPACEDM];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    p[0] = pxl;
-    p[1] = pyl;
-    p[2] = pzl;
+    p[0] = axl;
+    p[1] = ayl;
+    p[2] = azl;
 
-    PG_axis_3(dev, p, (int) *pnp, NULL);
+    PG_axis_3(dev, p, (int) *snp, NULL);
 
     rv = TRUE;
 
@@ -474,19 +474,19 @@ FIXNUM FF_ID(pgdax3, PGDAX3)(FIXNUM *devid, double *pxl, double *pyl,
 
 /* PGDRMK - draw marker characters */
 
-FIXNUM FF_ID(pgdrmk, PGDRMK)(FIXNUM *devid, FIXNUM *pn,
-			     double *px, double *py, FIXNUM *pmrk)
+FIXNUM FF_ID(pgdrmk, PGDRMK)(FIXNUM *sdid, FIXNUM *sn,
+			     double *ax, double *ay, FIXNUM *smrk)
    {int n, mrk;
     FIXNUM rv;
     double *r[PG_SPACEDM];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    n   = *pn;
-    mrk = *pmrk;
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    n   = *sn;
+    mrk = *smrk;
 
-    r[0] = px;
-    r[1] = py;
+    r[0] = ax;
+    r[1] = ay;
 
     PG_draw_markers_n(dev, 2, WORLDC, n, r, mrk);
 
@@ -499,14 +499,14 @@ FIXNUM FF_ID(pgdrmk, PGDRMK)(FIXNUM *devid, FIXNUM *pn,
 
 /* PGDMRK - define a marker character */
 
-FIXNUM FF_ID(pgdmrk, PGDMRK)(FIXNUM *pn, double *px1, double *py1,
-			     double *px2, double *py2)
+FIXNUM FF_ID(pgdmrk, PGDMRK)(FIXNUM *sn, double *ax1, double *ay1,
+			     double *ax2, double *ay2)
    {int n;
     FIXNUM rv;
 
-    n = *pn;
+    n = *sn;
 
-    rv = PG_def_marker(n, px1, py1, px2, py2);
+    rv = PG_def_marker(n, ax1, ay1, ax2, ay2);
 
     return(rv);}
 
@@ -515,12 +515,15 @@ FIXNUM FF_ID(pgdmrk, PGDMRK)(FIXNUM *pn, double *px1, double *py1,
 
 /* PGDPLT - draw a mesh - plot a domain */
 
-FIXNUM FF_ID(pgdplt, PGDPLT)(FIXNUM *devid, FIXNUM *dom)
+FIXNUM FF_ID(pgdplt, PGDPLT)(FIXNUM *sdid, FIXNUM *sdom)
    {FIXNUM rv;
     PG_device *dev;
+    PM_set *set;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    PG_domain_plot(dev, *(PM_set **) dom, NULL);
+    set = *(PM_set **) sdom;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_domain_plot(dev, set, NULL);
 
     rv = TRUE;
 
@@ -531,18 +534,18 @@ FIXNUM FF_ID(pgdplt, PGDPLT)(FIXNUM *devid, FIXNUM *dom)
 
 /* PGDRBX - draw a box */
 
-FIXNUM FF_ID(pgdrbx, PGDRBX)(FIXNUM *devid, double *px1, double *px2,
-			     double *py1, double *py2)
+FIXNUM FF_ID(pgdrbx, PGDRBX)(FIXNUM *sdid, double *sx1, double *sx2,
+			     double *sy1, double *sy2)
    {FIXNUM rv;
     double bx[PG_BOXSZ];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    bx[0] = *px1;
-    bx[1] = *px2;
-    bx[2] = *py1;
-    bx[3] = *py2;
+    bx[0] = *sx1;
+    bx[1] = *sx2;
+    bx[2] = *sy1;
+    bx[3] = *sy2;
     PG_draw_box_n(dev, 2, WORLDC, bx);
 
     rv = TRUE;
@@ -554,11 +557,11 @@ FIXNUM FF_ID(pgdrbx, PGDRBX)(FIXNUM *devid, double *px1, double *px2,
 
 /* PGDRIF - draw the set of interface objects for the device */
 
-FIXNUM FF_ID(pgdrif, PGDRIF)(FIXNUM *devid)
+FIXNUM FF_ID(pgdrif, PGDRIF)(FIXNUM *sdid)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
     PG_draw_interface_objects(dev);
 
     rv = TRUE;
@@ -570,18 +573,18 @@ FIXNUM FF_ID(pgdrif, PGDRIF)(FIXNUM *devid)
 
 /* PGDRLN - draw a line between the specified points */
 
-FIXNUM FF_ID(pgdrln, PGDRLN)(FIXNUM *devid, double *px1, double *py1,
-			     double *px2, double *py2)
+FIXNUM FF_ID(pgdrln, PGDRLN)(FIXNUM *sdid, double *sx1, double *sy1,
+			     double *sx2, double *sy2)
    {FIXNUM rv;
     double x1[PG_SPACEDM], x2[PG_SPACEDM];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    x1[0] = *px1;
-    x1[1] = *py1;
-    x2[0] = *px2;
-    x2[1] = *py2;
+    x1[0] = *sx1;
+    x1[1] = *sy1;
+    x2[0] = *sx2;
+    x2[1] = *sy2;
     PG_draw_line_n(dev, 2, WORLDC, x1, x2, dev->clipping);
 
     rv = TRUE;
@@ -593,24 +596,24 @@ FIXNUM FF_ID(pgdrln, PGDRLN)(FIXNUM *devid, double *px1, double *py1,
 
 /* PGDRPA - draw the current palette */
 
-FIXNUM FF_ID(pgdrpa, PGDRPA)(FIXNUM *devid, double *px1, double *py1,
-			     double *px2, double *py2,
-			     double *pz1, double *pz2,
-			     double *pw)
+FIXNUM FF_ID(pgdrpa, PGDRPA)(FIXNUM *sdid, double *sx1, double *sy1,
+			     double *sx2, double *sy2,
+			     double *sz1, double *sz2,
+			     double *sw)
    {FIXNUM rv;
     double dbx[PG_BOXSZ], rbx[PG_BOXSZ];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    dbx[0] = *px1;
-    dbx[1] = *px2;
-    dbx[2] = *py1;
-    dbx[3] = *py2;
-    rbx[0] = *pz1;
-    rbx[1] = *pz2;
+    dbx[0] = *sx1;
+    dbx[1] = *sx2;
+    dbx[2] = *sy1;
+    dbx[3] = *sy2;
+    rbx[0] = *sz1;
+    rbx[1] = *sz2;
 
-    PG_draw_palette_n(dev, dbx, rbx, *pw, FALSE);
+    PG_draw_palette_n(dev, dbx, rbx, *sw, FALSE);
 
     rv = TRUE;
 
@@ -621,24 +624,24 @@ FIXNUM FF_ID(pgdrpa, PGDRPA)(FIXNUM *devid, double *px1, double *py1,
 
 /* PGDRPP - draw the current palette */
 
-FIXNUM FF_ID(pgdrpp, PGDRPP)(FIXNUM *devid, double *px1, double *py1,
-			     double *px2, double *py2,
-			     double *pz1, double *pz2,
-			     double *pw, FIXNUM *pe)
+FIXNUM FF_ID(pgdrpp, PGDRPP)(FIXNUM *sdid, double *sx1, double *sy1,
+			     double *sx2, double *sy2,
+			     double *sz1, double *sz2,
+			     double *sw, FIXNUM *se)
    {FIXNUM rv;
     double dbx[PG_BOXSZ], rbx[PG_BOXSZ];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    dbx[0] = *px1;
-    dbx[1] = *px2;
-    dbx[2] = *py1;
-    dbx[3] = *py2;
-    rbx[0] = *pz1;
-    rbx[1] = *pz2;
+    dbx[0] = *sx1;
+    dbx[1] = *sx2;
+    dbx[2] = *sy1;
+    dbx[3] = *sy2;
+    rbx[0] = *sz1;
+    rbx[1] = *sz2;
 
-    PG_draw_palette_n(dev, dbx, rbx, *pw, *pe);
+    PG_draw_palette_n(dev, dbx, rbx, *sw, *se);
 
     rv = TRUE;
 
@@ -649,11 +652,11 @@ FIXNUM FF_ID(pgdrpp, PGDRPP)(FIXNUM *devid, double *px1, double *py1,
 
 /* PGFNPL - finish the plot (necessary for CGM devices) */
 
-FIXNUM FF_ID(pgfnpl, PGFNPL)(FIXNUM *devid)
+FIXNUM FF_ID(pgfnpl, PGFNPL)(FIXNUM *sdid)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
     PG_finish_plot(dev);
 
     rv = TRUE;
@@ -665,17 +668,17 @@ FIXNUM FF_ID(pgfnpl, PGFNPL)(FIXNUM *devid)
 
 /* PGFPLY - draw and fill the specified polygon with the specified color */
 
-FIXNUM FF_ID(pgfply, PGFPLY)(FIXNUM *devid, double *px, double *py,
-			     FIXNUM *pn, FIXNUM *pc)
+FIXNUM FF_ID(pgfply, PGFPLY)(FIXNUM *sdid, double *ax, double *ay,
+			     FIXNUM *sn, FIXNUM *sc)
    {FIXNUM rv;
     double *r[2];
     PG_device *dev;
 
-    r[0] = px;
-    r[1] = py;
+    r[0] = ax;
+    r[1] = ay;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    PG_fill_polygon_n(dev, (int) *pc, TRUE, 2, WORLDC, *pn, r);
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_fill_polygon_n(dev, (int) *sc, TRUE, 2, WORLDC, *sn, r);
 
     rv = TRUE;
 
@@ -686,10 +689,10 @@ FIXNUM FF_ID(pgfply, PGFPLY)(FIXNUM *devid, double *px, double *py,
 
 /* PGGCLM - get the clear mode */
 
-FIXNUM FF_ID(pggclm, PGGCLM)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pggclm, PGGCLM)(FIXNUM *sdid, FIXNUM *sc)
    {FIXNUM rv;
 
-    PG_get_clear_mode(*pc);
+    PG_get_clear_mode(*sc);
 
     rv = TRUE;
 
@@ -700,15 +703,15 @@ FIXNUM FF_ID(pggclm, PGGCLM)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGGCLP - get the clipping */
 
-FIXNUM FF_ID(pggclp, PGGCLP)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pggclp, PGGCLP)(FIXNUM *sdid, FIXNUM *sc)
    {int flg;
     FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
     PG_get_clipping(dev, &flg);
 
-    *pc = flg;
+    *sc = flg;
 
     rv = TRUE;
 
@@ -719,12 +722,12 @@ FIXNUM FF_ID(pggclp, PGGCLP)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGGCPW - get the char path direction in WC */
 
-FIXNUM FF_ID(pggcpw, PGGCPW)(FIXNUM *devid, double *px, double *py)
+FIXNUM FF_ID(pggcpw, PGGCPW)(FIXNUM *sdid, double *sx, double *sy)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    PG_get_char_path(dev, px, py);
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_get_char_path(dev, sx, sy);
 
     rv = TRUE;
 
@@ -735,16 +738,16 @@ FIXNUM FF_ID(pggcpw, PGGCPW)(FIXNUM *devid, double *px, double *py)
 
 /* PGGCSS - get the char size in NDC */
 
-FIXNUM FF_ID(pggcss, PGGCSS)(FIXNUM *devid, double *pw, double *ph)
+FIXNUM FF_ID(pggcss, PGGCSS)(FIXNUM *sdid, double *sw, double *sh)
    {FIXNUM rv;
     double p[PG_SPACEDM];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
     PG_get_char_size_n(dev, 2, NORMC, p);
 
-    *pw = p[0];
-    *ph = p[1];
+    *sw = p[0];
+    *sh = p[1];
 
     rv = TRUE;
 
@@ -755,16 +758,16 @@ FIXNUM FF_ID(pggcss, PGGCSS)(FIXNUM *devid, double *pw, double *ph)
 
 /* PGGCSW - get the char size in WC */
 
-FIXNUM FF_ID(pggcsw, PGGCSW)(FIXNUM *devid, double *pw, double *ph)
+FIXNUM FF_ID(pggcsw, PGGCSW)(FIXNUM *sdid, double *sw, double *sh)
    {FIXNUM rv;
     double p[PG_SPACEDM];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
     PG_get_char_size_n(dev, 2, WORLDC, p);
 
-    *pw = p[0];
-    *ph = p[1];
+    *sw = p[0];
+    *sh = p[1];
 
     rv = TRUE;
 
@@ -775,12 +778,12 @@ FIXNUM FF_ID(pggcsw, PGGCSW)(FIXNUM *devid, double *pw, double *ph)
 
 /* PGGCUW - get the char up direction in WC */
 
-FIXNUM FF_ID(pggcuw, PGGCUW)(FIXNUM *devid, double *px, double *py)
+FIXNUM FF_ID(pggcuw, PGGCUW)(FIXNUM *sdid, double *sx, double *sy)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    PG_get_char_up(dev, px, py);
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_get_char_up(dev, sx, sy);
 
     rv = TRUE;
 
@@ -791,10 +794,10 @@ FIXNUM FF_ID(pggcuw, PGGCUW)(FIXNUM *devid, double *px, double *py)
 
 /* PGGDPI - get the PostScript dots per inch for 8.5 x 11 page */
 
-FIXNUM FF_ID(pggdpi, PGGDPI)(double *dpi)
+FIXNUM FF_ID(pggdpi, PGGDPI)(double *sdpi)
    {FIXNUM rv;
 
-    PG_get_ps_dots_inch(*dpi);
+    PG_get_ps_dots_inch(*sdpi);
 
     rv = TRUE;
 
@@ -805,12 +808,12 @@ FIXNUM FF_ID(pggdpi, PGGDPI)(double *dpi)
 
 /* PGGFIN - get the finished status */
 
-FIXNUM FF_ID(pggfin, PGGFIN)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pggfin, PGGFIN)(FIXNUM *sdid, FIXNUM *sc)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    *pc = dev->finished;
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    *sc = dev->finished;
 
     rv = TRUE;
 
@@ -821,15 +824,15 @@ FIXNUM FF_ID(pggfin, PGGFIN)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGGLNC - get the line color */
 
-FIXNUM FF_ID(pgglnc, PGGLNC)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pgglnc, PGGLNC)(FIXNUM *sdid, FIXNUM *sc)
    {int lc;
     FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
     PG_get_line_color(dev, &lc);
 
-    *pc = lc;
+    *sc = lc;
 
     rv = TRUE;
 
@@ -840,15 +843,15 @@ FIXNUM FF_ID(pgglnc, PGGLNC)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGGLOP - get the logical operation */
 
-FIXNUM FF_ID(pgglop, PGGLOP)(FIXNUM *devid, FIXNUM *plop)
+FIXNUM FF_ID(pgglop, PGGLOP)(FIXNUM *sdid, FIXNUM *slop)
    {FIXNUM rv;
     PG_logical_operation lop;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
     PG_get_logical_op(dev, &lop);
 
-    *plop = lop;
+    *slop = lop;
 
     rv = TRUE;
 
@@ -859,15 +862,15 @@ FIXNUM FF_ID(pgglop, PGGLOP)(FIXNUM *devid, FIXNUM *plop)
 
 /* PGGLNS - get the line style */
 
-FIXNUM FF_ID(pgglns, PGGLNS)(FIXNUM *devid, FIXNUM *ps)
+FIXNUM FF_ID(pgglns, PGGLNS)(FIXNUM *sdid, FIXNUM *ss)
    {int ls;
     FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
     PG_get_line_style(dev, &ls);
 
-    *ps = ls;
+    *ss = ls;
 
     rv = TRUE;
 
@@ -878,12 +881,12 @@ FIXNUM FF_ID(pgglns, PGGLNS)(FIXNUM *devid, FIXNUM *ps)
 
 /* PGGLNW - get the line width */
 
-FIXNUM FF_ID(pgglnw, PGGLNW)(FIXNUM *devid, double *pw)
+FIXNUM FF_ID(pgglnw, PGGLNW)(FIXNUM *sdid, double *sw)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    PG_get_line_width(dev, pw);
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_get_line_width(dev, sw);
 
     rv = TRUE;
 
@@ -894,12 +897,12 @@ FIXNUM FF_ID(pgglnw, PGGLNW)(FIXNUM *devid, double *pw)
 
 /* PGGMKO - get the marker orientation */
 
-FIXNUM FF_ID(pggmko, PGGMKO)(FIXNUM *devid, double *pw)
+FIXNUM FF_ID(pggmko, PGGMKO)(FIXNUM *sdid, double *sw)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    PG_get_marker_orientation(dev, *pw);
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_get_marker_orientation(dev, *sw);
 
     rv = TRUE;
 
@@ -910,12 +913,12 @@ FIXNUM FF_ID(pggmko, PGGMKO)(FIXNUM *devid, double *pw)
 
 /* PGGMKS - get the marker scale */
 
-FIXNUM FF_ID(pggmks, PGGMKS)(FIXNUM *devid, double *ps)
+FIXNUM FF_ID(pggmks, PGGMKS)(FIXNUM *sdid, double *ss)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    PG_get_marker_scale(dev, *ps);
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_get_marker_scale(dev, *ss);
 
     rv = TRUE;
 
@@ -926,12 +929,12 @@ FIXNUM FF_ID(pggmks, PGGMKS)(FIXNUM *devid, double *ps)
 
 /* PGGPMF - get the pixmap flag */
 
-FIXNUM FF_ID(pggpmf, PGGPMF)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pggpmf, PGGPMF)(FIXNUM *sdid, FIXNUM *sc)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    PG_get_pixmap_flag(dev, *pc);
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_get_pixmap_flag(dev, *sc);
 
     rv = TRUE;
 
@@ -942,20 +945,20 @@ FIXNUM FF_ID(pggpmf, PGGPMF)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGGTLN - get a line of text from the input descriptor */
 
-FIXNUM FF_ID(pggtln, PGGTLN)(FIXNUM *pnc, char *s, FIXNUM *pfd)
+FIXNUM FF_ID(pggtln, PGGTLN)(FIXNUM *sncs, char *s, FIXNUM *sfd)
    {FIXNUM rv;
     long fd;
     char *t;
     SC_address f;
 
-    fd = (long) *pfd;
+    fd = (long) *sfd;
 
     if (fd == 0L)
-       t = GETLN(s, (int) *pnc, stdin);
+       t = GETLN(s, (int) *sncs, stdin);
 
     else
        {f.diskaddr = fd;
-        t = GETLN(s, (int) *pnc, (FILE *) f.memaddr);};
+        t = GETLN(s, (int) *sncs, (FILE *) f.memaddr);};
 
     rv = (t != NULL);
 
@@ -966,15 +969,15 @@ FIXNUM FF_ID(pggtln, PGGTLN)(FIXNUM *pnc, char *s, FIXNUM *pfd)
 
 /* PGGTXC - get the text color */
 
-FIXNUM FF_ID(pggtxc, PGGTXC)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pggtxc, PGGTXC)(FIXNUM *sdid, FIXNUM *sc)
    {int lc;
     FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
     PG_get_text_color(dev, &lc);
 
-    *pc = lc;
+    *sc = lc;
 
     rv = TRUE;
 
@@ -985,35 +988,36 @@ FIXNUM FF_ID(pggtxc, PGGTXC)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGGTXF - get the font */
 
-FIXNUM FF_ID(pggtxf, PGGTXF)(FIXNUM *devid, FIXNUM *pncf,
-			     char *pf, FIXNUM *pncs, char *pst,
-			     FIXNUM *psz)
+FIXNUM FF_ID(pggtxf, PGGTXF)(FIXNUM *sdid,
+			     FIXNUM *sncf, char *pf,
+			     FIXNUM *sncs, char *pst,
+			     FIXNUM *ssz)
    {int ls, nf, ns, lnf, lns;
     FIXNUM rv;
     char *f, *st;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
     PG_get_font(dev, &f, &st, &ls);
 
     nf = strlen(f);
     ns = strlen(st);
 
 /* get the buffer sizes */
-    lnf = *pncf;
-    lns = *pncs;
+    lnf = *sncf;
+    lns = *sncs;
 
 /* return the actual string lengths */
-    *pncf = nf;
-    *pncs = ns;
+    *sncf = nf;
+    *sncs = ns;
 
     if ((nf > lnf) || (ns > lns))
        rv = FALSE;
 
     else
-       {SC_strncpy(pf, *pncf, f, lnf);
-        SC_strncpy(pst, *pncs, st, lns);
-        *psz = ls;
+       {SC_strncpy(pf, *sncf, f, lnf);
+        SC_strncpy(pst, *sncs, st, lns);
+        *ssz = ls;
 
         CFREE(f);
         CFREE(st);
@@ -1027,25 +1031,25 @@ FIXNUM FF_ID(pggtxf, PGGTXF)(FIXNUM *devid, FIXNUM *pncf,
 
 /* PGGTEX - get the text extent in CS */
 
-FIXNUM FF_ID(pggtex, PGGTEX)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *pc,
-			     FIXNUM *pnc, char *s,
-			     double *pdx, double *pdy)
+FIXNUM FF_ID(pggtex, PGGTEX)(FIXNUM *sdid, FIXNUM *snd, FIXNUM *sc,
+			     FIXNUM *sncs, char *s,
+			     double *sdx, double *sdy)
    {FIXNUM rv;
     double p[PG_SPACEDM];
     char ls[MAXLINE];
     PG_coord_sys cs;
     PG_device *dev;
 
-    SC_FORTRAN_STR_C(ls, s, *pnc);
+    SC_FORTRAN_STR_C(ls, s, *sncs);
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    cs = (PG_coord_sys) *pc;
+    cs = (PG_coord_sys) *sc;
 
-    PG_get_text_ext_n(dev, *pnd, cs, ls, p);
+    PG_get_text_ext_n(dev, *snd, cs, ls, p);
 
-    *pdx = p[0];
-    *pdy = p[1];
+    *sdx = p[0];
+    *sdy = p[1];
 
     rv = TRUE;
 
@@ -1056,19 +1060,19 @@ FIXNUM FF_ID(pggtex, PGGTEX)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *pc,
 
 /* PGGVWP - get the viewport */
 
-FIXNUM FF_ID(pggvwp, PGGVWP)(FIXNUM *devid, double *px1, double *px2,
-			     double *py1, double *py2)
+FIXNUM FF_ID(pggvwp, PGGVWP)(FIXNUM *sdid, double *sx1, double *sx2,
+			     double *sy1, double *sy2)
    {FIXNUM rv;
     double ndc[PG_BOXSZ];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
     PG_get_viewspace(dev, WORLDC, ndc);
-    *px1 = ndc[0];
-    *px2 = ndc[1];
-    *py1 = ndc[2];
-    *py2 = ndc[3];
+    *sx1 = ndc[0];
+    *sx2 = ndc[1];
+    *sy1 = ndc[2];
+    *sy2 = ndc[3];
 
     rv = TRUE;
 
@@ -1079,19 +1083,19 @@ FIXNUM FF_ID(pggvwp, PGGVWP)(FIXNUM *devid, double *px1, double *px2,
 
 /* PGGWCS - get the world coordinate system */
 
-FIXNUM FF_ID(pggwcs, PGGWCS)(FIXNUM *devid, double *px1, double *px2,
-			     double *py1, double *py2)
+FIXNUM FF_ID(pggwcs, PGGWCS)(FIXNUM *sdid, double *sx1, double *sx2,
+			     double *sy1, double *sy2)
    {FIXNUM rv;
     double wc[PG_BOXSZ];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
     PG_get_viewspace(dev, WORLDC, wc);
-    *px1 = wc[0];
-    *px2 = wc[1];
-    *py1 = wc[2];
-    *py2 = wc[3];
+    *sx1 = wc[0];
+    *sx2 = wc[1];
+    *sy1 = wc[2];
+    *sy2 = wc[3];
 
     rv = TRUE;
 
@@ -1102,11 +1106,11 @@ FIXNUM FF_ID(pggwcs, PGGWCS)(FIXNUM *devid, double *px1, double *px2,
 
 /* PGMDVC - make the device current */
 
-FIXNUM FF_ID(pgmdvc, PGMDVC)(FIXNUM *devid)
+FIXNUM FF_ID(pgmdvc, PGMDVC)(FIXNUM *sdid)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
     PG_make_device_current(dev);
 
     rv = TRUE;
@@ -1122,16 +1126,16 @@ FIXNUM FF_ID(pgmdvc, PGMDVC)(FIXNUM *devid)
  *        - return -1 otherwise
  */
 
-FIXNUM FF_ID(pgmkdv, PGMKDV)(FIXNUM *pncn, char *name,
-			     FIXNUM *pnct, char *type,
-			     FIXNUM *pncl, char *title)
+FIXNUM FF_ID(pgmkdv, PGMKDV)(FIXNUM *sncn, char *name,
+			     FIXNUM *snct, char *type,
+			     FIXNUM *sncl, char *title)
    {FIXNUM rv;
     char lname[MAXLINE], ltype[MAXLINE], ltitle[MAXLINE];
     PG_device *dev;
 
-    SC_FORTRAN_STR_C(lname, name, *pncn);
-    SC_FORTRAN_STR_C(ltype, type, *pnct);
-    SC_FORTRAN_STR_C(ltitle, title, *pncl);
+    SC_FORTRAN_STR_C(lname, name, *sncn);
+    SC_FORTRAN_STR_C(ltype, type, *snct);
+    SC_FORTRAN_STR_C(ltitle, title, *sncl);
 
     dev = PG_make_device(lname, ltype, ltitle);
     if (dev == NULL)
@@ -1147,13 +1151,13 @@ FIXNUM FF_ID(pgmkdv, PGMKDV)(FIXNUM *pncn, char *name,
 
 /* PGOPEN - open the specified PG_device */
 
-FIXNUM FF_ID(pgopen, PGOPEN)(FIXNUM *devid, double *pxf, double *pyf,
-			     double *pdxf, double *pdyf)
+FIXNUM FF_ID(pgopen, PGOPEN)(FIXNUM *sdid, double *sxf, double *syf,
+			     double *sdxf, double *sdyf)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    if (PG_open_device(dev, *pxf, *pyf, *pdxf, *pdyf) == NULL)
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    if (PG_open_device(dev, *sxf, *syf, *sdxf, *sdyf) == NULL)
        rv = FALSE;
     else
        rv = TRUE;
@@ -1167,10 +1171,10 @@ FIXNUM FF_ID(pgopen, PGOPEN)(FIXNUM *devid, double *pxf, double *pyf,
  *        - return -1 otherwise
  */
 
-FIXNUM FF_ID(pgptin, PGPTIN)(FIXNUM *pntr, FIXNUM *indx)
+FIXNUM FF_ID(pgptin, PGPTIN)(FIXNUM *sptr, FIXNUM *sidx)
    {FIXNUM rv;
 
-    rv = (*indx = SC_GET_INDEX((void *) pntr));
+    rv = (*sidx = SC_GET_INDEX((void *) sptr));
 
     return(rv);}
         
@@ -1179,18 +1183,18 @@ FIXNUM FF_ID(pgptin, PGPTIN)(FIXNUM *pntr, FIXNUM *indx)
 
 /* PGQDEV - get some physical parameters from the specified PG_device */
 
-FIXNUM FF_ID(pgqdev, PGQDEV)(FIXNUM *devid, FIXNUM *pdx, FIXNUM *pdy,
-			     FIXNUM *pnc)
+FIXNUM FF_ID(pgqdev, PGQDEV)(FIXNUM *sdid, FIXNUM *sdx, FIXNUM *sdy,
+			     FIXNUM *snc)
    {int dx, dy, nc;
     FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
     PG_query_device(dev, &dx, &dy, &nc);
 
-    *pdx = dx;
-    *pdy = dy;
-    *pnc = nc;
+    *sdx = dx;
+    *sdy = dy;
+    *snc = nc;
 
     rv = TRUE;
 
@@ -1201,16 +1205,16 @@ FIXNUM FF_ID(pgqdev, PGQDEV)(FIXNUM *devid, FIXNUM *pdx, FIXNUM *pdy,
 
 /* PGQWIN - get the window shape of the specified device */
 
-FIXNUM FF_ID(pgqwin, PGQWIN)(FIXNUM *devid, FIXNUM *pdx, FIXNUM *pdy)
+FIXNUM FF_ID(pgqwin, PGQWIN)(FIXNUM *sdid, FIXNUM *sdx, FIXNUM *sdy)
    {int dx, dy;
     FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
     PG_query_window(dev, &dx, &dy);
 
-    *pdx = dx;
-    *pdy = dy;
+    *sdx = dx;
+    *sdy = dy;
 
     rv = TRUE;
 
@@ -1221,11 +1225,11 @@ FIXNUM FF_ID(pgqwin, PGQWIN)(FIXNUM *devid, FIXNUM *pdx, FIXNUM *pdy)
 
 /* PGPLLN - low level line plot routine */
 
-FIXNUM FF_ID(pgplln, PGPLLN)(FIXNUM *devid, double *px, double *py,
-			     FIXNUM *pn, FIXNUM *ppty, FIXNUM *paxt,
-			     FIXNUM *pcol, double *pwid,
-			     FIXNUM *psty, FIXNUM *psca, FIXNUM *pmrk,
-			     FIXNUM *psta, FIXNUM *pl)
+FIXNUM FF_ID(pgplln, PGPLLN)(FIXNUM *sdid, double *ax, double *ay,
+			     FIXNUM *sn, FIXNUM *spty, FIXNUM *saxt,
+			     FIXNUM *scol, double *swid,
+			     FIXNUM *ssty, FIXNUM *ssca, FIXNUM *smrk,
+			     FIXNUM *ssta, FIXNUM *sl)
    {int axt, sty, sca, mrk, clr, sta;
     long n, l;
     FIXNUM rv;
@@ -1233,20 +1237,20 @@ FIXNUM FF_ID(pgplln, PGPLLN)(FIXNUM *devid, double *px, double *py,
     PG_device *dev;
     pcons *info;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    n   = *pn;
-    l   = *pl;
-    axt = *paxt;
-    sty = *psty;
-    sca = *psca;
-    mrk = *pmrk;
-    clr = *pcol;
-    sta = *psta;
-    pty = (PG_rendering) *ppty;
+    n   = *sn;
+    l   = *sl;
+    axt = *saxt;
+    sty = *ssty;
+    sca = *ssca;
+    mrk = *smrk;
+    clr = *scol;
+    sta = *ssta;
+    pty = (PG_rendering) *spty;
 
-    info = PG_set_line_info(NULL, pty, axt, sty, sca, mrk, clr, sta, *pwid);
-    PG_plot_curve(dev, px, py, n, info, l);
+    info = PG_set_line_info(NULL, pty, axt, sty, sca, mrk, clr, sta, *swid);
+    PG_plot_curve(dev, ax, ay, n, info, l);
 
     SC_free_alist(info, 2);
 
@@ -1259,19 +1263,19 @@ FIXNUM FF_ID(pgplln, PGPLLN)(FIXNUM *devid, double *px, double *py,
 
 /* PGPTOS - convert from PC to NDC */
 
-FIXNUM FF_ID(pgptos, PGPTOS)(FIXNUM *devid, FIXNUM *pix, FIXNUM *piy,
-			     double *px, double *py)
+FIXNUM FF_ID(pgptos, PGPTOS)(FIXNUM *sdid, FIXNUM *six, FIXNUM *siy,
+			     double *sx, double *sy)
    {FIXNUM rv;
     double p[PG_SPACEDM];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    p[0] = *pix;
-    p[1] = *piy;
+    p[0] = *six;
+    p[1] = *siy;
     PG_trans_point(dev, 2, PIXELC, p, NORMC, p);
-    *px = p[0];
-    *py = p[1];
+    *sx = p[0];
+    *sy = p[1];
 
     rv = TRUE;
 
@@ -1282,14 +1286,14 @@ FIXNUM FF_ID(pgptos, PGPTOS)(FIXNUM *devid, FIXNUM *pix, FIXNUM *piy,
 
 /* PGRDIF - read an interface description file */
 
-FIXNUM FF_ID(pgrdif, PGRDIF)(FIXNUM *devid, FIXNUM *pnc, char *name)
+FIXNUM FF_ID(pgrdif, PGRDIF)(FIXNUM *sdid, FIXNUM *sncn, char *name)
    {FIXNUM rv;
     char lname[MAXLINE];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    SC_FORTRAN_STR_C(lname, name, *pnc);
+    SC_FORTRAN_STR_C(lname, name, *sncn);
 
     rv = PG_read_interface(dev, lname);
 
@@ -1300,11 +1304,11 @@ FIXNUM FF_ID(pgrdif, PGRDIF)(FIXNUM *devid, FIXNUM *pnc, char *name)
 
 /* PGRDVC - release device as the device current */
 
-FIXNUM FF_ID(pgrdvc, PGRDVC)(FIXNUM *devid)
+FIXNUM FF_ID(pgrdvc, PGRDVC)(FIXNUM *sdid)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
     PG_release_current_device(dev);
 
     rv = TRUE;
@@ -1316,11 +1320,11 @@ FIXNUM FF_ID(pgrdvc, PGRDVC)(FIXNUM *devid)
 
 /* PGRGDV - register a device */
 
-FIXNUM FF_ID(pgrgdv, PGRGDV)(FIXNUM *pnc, char *name)
+FIXNUM FF_ID(pgrgdv, PGRGDV)(FIXNUM *sncn, char *name)
    {FIXNUM rv;
     char lname[MAXLINE];
     
-    SC_FORTRAN_STR_C(lname, name, *pnc);
+    SC_FORTRAN_STR_C(lname, name, *sncn);
 
     rv = FALSE;
 
@@ -1343,11 +1347,11 @@ FIXNUM FF_ID(pgrgdv, PGRGDV)(FIXNUM *pnc, char *name)
 
 /* PGRGFN - register a call back function with the device */
 
-FIXNUM FF_ID(pgrgfn, PGRGFN)(FIXNUM *pnc, char *name, PFEvCallback fnc)
+FIXNUM FF_ID(pgrgfn, PGRGFN)(FIXNUM *sncn, char *name, PFEvCallback fnc)
    {FIXNUM rv;
     char lname[MAXLINE];
 
-    SC_FORTRAN_STR_C(lname, name, *pnc);
+    SC_FORTRAN_STR_C(lname, name, *sncn);
     PG_register_callback(lname, fnc);
 
     rv = TRUE;
@@ -1359,14 +1363,14 @@ FIXNUM FF_ID(pgrgfn, PGRGFN)(FIXNUM *pnc, char *name, PFEvCallback fnc)
 
 /* PGRGVR - register a variable with the device */
 
-FIXNUM FF_ID(pgrgvr, PGRGVR)(FIXNUM *pnc, char *name,
-			     FIXNUM *pnt, char *type,
+FIXNUM FF_ID(pgrgvr, PGRGVR)(FIXNUM *sncn, char *name,
+			     FIXNUM *snct, char *type,
 			     void *vr, void *vn, void *vx)
    {FIXNUM rv;
     char lname[MAXLINE], ltype[MAXLINE];
 
-    SC_FORTRAN_STR_C(lname, name, *pnc);
-    SC_FORTRAN_STR_C(ltype, type, *pnt);
+    SC_FORTRAN_STR_C(lname, name, *sncn);
+    SC_FORTRAN_STR_C(ltype, type, *snct);
 
     PG_register_variable(lname,
 			 CSTRSAVE(ltype),
@@ -1383,16 +1387,16 @@ FIXNUM FF_ID(pgrgvr, PGRGVR)(FIXNUM *pnc, char *name,
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(pgrvpa, PGRVPA)(FIXNUM *devid, FIXNUM *vwatid)
+FIXNUM FF_ID(pgrvpa, PGRVPA)(FIXNUM *sdid, FIXNUM *svwatid)
    {FIXNUM rv;
     PG_device *dev;
     PG_view_attributes *d;
 
     rv = FALSE;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
     if (dev != NULL)
-       {d = PG_view_attributes_pointer((int) *vwatid);
+       {d = PG_view_attributes_pointer((int) *svwatid);
 
 	PG_restore_view_attributes(dev, d);
 
@@ -1405,14 +1409,14 @@ FIXNUM FF_ID(pgrvpa, PGRVPA)(FIXNUM *devid, FIXNUM *vwatid)
 
 /* PGSADR - set the auto domain and range */
 
-FIXNUM FF_ID(pgsadr, PGSADR)(FIXNUM *devid, FIXNUM *pd, FIXNUM *pr)
+FIXNUM FF_ID(pgsadr, PGSADR)(FIXNUM *sdid, FIXNUM *sd, FIXNUM *sr)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    dev->autodomain = *pd;
-    dev->autorange  = *pr;
+    dev->autodomain = *sd;
+    dev->autorange  = *sr;
 
     rv = TRUE;
 
@@ -1423,13 +1427,13 @@ FIXNUM FF_ID(pgsadr, PGSADR)(FIXNUM *devid, FIXNUM *pd, FIXNUM *pr)
 
 /* PGSADM - set the auto domain */
 
-FIXNUM FF_ID(pgsadm, PGSADM)(FIXNUM *devid, FIXNUM *pd)
+FIXNUM FF_ID(pgsadm, PGSADM)(FIXNUM *sdid, FIXNUM *sd)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    dev->autodomain = *pd;
+    dev->autodomain = *sd;
 
     rv = TRUE;
 
@@ -1440,13 +1444,13 @@ FIXNUM FF_ID(pgsadm, PGSADM)(FIXNUM *devid, FIXNUM *pd)
 
 /* PGSARN - set the auto range */
 
-FIXNUM FF_ID(pgsarn, PGSARN)(FIXNUM *devid, FIXNUM *pr)
+FIXNUM FF_ID(pgsarn, PGSARN)(FIXNUM *sdid, FIXNUM *sr)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    dev->autorange  = *pr;
+    dev->autorange  = *sr;
 
     rv = TRUE;
 
@@ -1457,11 +1461,11 @@ FIXNUM FF_ID(pgsarn, PGSARN)(FIXNUM *devid, FIXNUM *pr)
 
 /* PGSAXD - set axis decades */
 
-FIXNUM FF_ID(pgsaxd, PGSAXD)(double *pd)
+FIXNUM FF_ID(pgsaxd, PGSAXD)(double *sd)
    {FIXNUM rv;
     double d;
 
-    d = *pd;
+    d = *sd;
 
     PG_set_axis_decades(d);
 
@@ -1474,18 +1478,18 @@ FIXNUM FF_ID(pgsaxd, PGSAXD)(double *pd)
 
 /* PGSAXL - set log axis flags */
 
-FIXNUM FF_ID(pgsaxl, PGSAXL)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *iflg)
+FIXNUM FF_ID(pgsaxl, PGSAXL)(FIXNUM *sdid, FIXNUM *snd, FIXNUM *aflg)
    {int id, nd;
     int ifl[PG_SPACEDM];
     FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    nd = *pnd;
+    nd = *snd;
 
     for (id = 0; id < nd; id++)
-        ifl[id] = iflg[id];
+        ifl[id] = aflg[id];
 
     PG_set_axis_log_scale(dev, nd, ifl);
 
@@ -1498,13 +1502,13 @@ FIXNUM FF_ID(pgsaxl, PGSAXL)(FIXNUM *devid, FIXNUM *pnd, FIXNUM *iflg)
 
 /* PGSBWD - set the border width */
 
-FIXNUM FF_ID(pgsbwd, PGSBWD)(FIXNUM *devid, FIXNUM *pw)
+FIXNUM FF_ID(pgsbwd, PGSBWD)(FIXNUM *sdid, FIXNUM *sw)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    PG_set_border_width(dev, *pw);
+    PG_set_border_width(dev, *sw);
 
     rv = TRUE;
 
@@ -1515,11 +1519,11 @@ FIXNUM FF_ID(pgsbwd, PGSBWD)(FIXNUM *devid, FIXNUM *pw)
 
 /* PGSBSZ - set the I/O buffer size */
 
-FIXNUM FF_ID(pgsbsz, PGSBSZ)(FIXNUM *psz)
+FIXNUM FF_ID(pgsbsz, PGSBSZ)(FIXNUM *ssz)
    {FIXNUM rv;
     int64_t sz;
 
-    sz = *psz;
+    sz = *ssz;
     PG_set_buffer_size(sz);
     rv = sz;
 
@@ -1530,10 +1534,10 @@ FIXNUM FF_ID(pgsbsz, PGSBSZ)(FIXNUM *psz)
 
 /* PGSCLM - set the clear mode */
 
-FIXNUM FF_ID(pgsclm, PGSCLM)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pgsclm, PGSCLM)(FIXNUM *sdid, FIXNUM *sc)
    {FIXNUM rv;
 
-    PG_set_clear_mode(*pc);
+    PG_set_clear_mode(*sc);
 
     rv = TRUE;
 
@@ -1544,12 +1548,12 @@ FIXNUM FF_ID(pgsclm, PGSCLM)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGSCLP - set the clipping */
 
-FIXNUM FF_ID(pgsclp, PGSCLP)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pgsclp, PGSCLP)(FIXNUM *sdid, FIXNUM *sc)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    PG_set_clipping(dev, (int) *pc);
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_set_clipping(dev, (int) *sc);
 
     rv = TRUE;
 
@@ -1560,12 +1564,12 @@ FIXNUM FF_ID(pgsclp, PGSCLP)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGSCPW - set the char path direction in WC */
 
-FIXNUM FF_ID(pgscpw, PGSCPW)(FIXNUM *devid, double *px, double *py)
+FIXNUM FF_ID(pgscpw, PGSCPW)(FIXNUM *sdid, double *sx, double *sy)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    PG_set_char_path(dev, (double) *px, (double) *py);
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_set_char_path(dev, (double) *sx, (double) *sy);
 
     rv = TRUE;
 
@@ -1576,12 +1580,12 @@ FIXNUM FF_ID(pgscpw, PGSCPW)(FIXNUM *devid, double *px, double *py)
 
 /* PGSCUW - set the char up direction in WC */
 
-FIXNUM FF_ID(pgscuw, PGSCUW)(FIXNUM *devid, double *px, double *py)
+FIXNUM FF_ID(pgscuw, PGSCUW)(FIXNUM *sdid, double *sx, double *sy)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    PG_set_char_up(dev, (double) *px, (double) *py);
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_set_char_up(dev, (double) *sx, (double) *sy);
 
     rv = TRUE;
 
@@ -1592,10 +1596,10 @@ FIXNUM FF_ID(pgscuw, PGSCUW)(FIXNUM *devid, double *px, double *py)
 
 /* PGSDPI - set the PostScript dots per inch for 8.5 x 11 page */
 
-FIXNUM FF_ID(pgsdpi, PGSDPI)(double *dpi)
+FIXNUM FF_ID(pgsdpi, PGSDPI)(double *sdpi)
    {FIXNUM rv;
 
-    PG_set_ps_dots_inch(*dpi);
+    PG_set_ps_dots_inch(*sdpi);
 
     rv = TRUE;
 
@@ -1606,7 +1610,7 @@ FIXNUM FF_ID(pgsdpi, PGSDPI)(double *dpi)
 
 /* PGSELC - select a color from the n-dimensional palette */
 
-FIXNUM FF_ID(pgselc, PGSELC)(FIXNUM *devid, FIXNUM *n, double *av,
+FIXNUM FF_ID(pgselc, PGSELC)(FIXNUM *sdid, FIXNUM *sn, double *av,
 			     double *an, double *ax)
    {FIXNUM rv;
     double extr[2];
@@ -1615,9 +1619,9 @@ FIXNUM FF_ID(pgselc, PGSELC)(FIXNUM *devid, FIXNUM *n, double *av,
     extr[0] = *an;
     extr[1] = *ax;
     
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    rv = PG_select_color(dev, *n, av, extr);
+    rv = PG_select_color(dev, *sn, av, extr);
 
     return(rv);}
 
@@ -1626,12 +1630,12 @@ FIXNUM FF_ID(pgselc, PGSELC)(FIXNUM *devid, FIXNUM *n, double *av,
 
 /* PGSFCL - set the fill color */
 
-FIXNUM FF_ID(pgsfcl, PGSFCL)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pgsfcl, PGSFCL)(FIXNUM *sdid, FIXNUM *sc)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    PG_set_fill_color(dev, *pc);
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_set_fill_color(dev, *sc);
 
     rv = TRUE;
 
@@ -1642,12 +1646,12 @@ FIXNUM FF_ID(pgsfcl, PGSFCL)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGSFIN - set the finished status */
 
-FIXNUM FF_ID(pgsfin, PGSFIN)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pgsfin, PGSFIN)(FIXNUM *sdid, FIXNUM *sc)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    dev->finished = *pc;
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    dev->finished = *sc;
 
     rv = TRUE;
 
@@ -1658,12 +1662,12 @@ FIXNUM FF_ID(pgsfin, PGSFIN)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGSLNC - set the line color */
 
-FIXNUM FF_ID(pgslnc, PGSLNC)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pgslnc, PGSLNC)(FIXNUM *sdid, FIXNUM *sc)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    PG_set_color_line(dev, (int) *pc, TRUE);
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_set_color_line(dev, (int) *sc, TRUE);
 
     rv = TRUE;
 
@@ -1674,13 +1678,13 @@ FIXNUM FF_ID(pgslnc, PGSLNC)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGSLOP - set the logical operation */
 
-FIXNUM FF_ID(pgslop, PGSLOP)(FIXNUM *devid, FIXNUM *plop)
+FIXNUM FF_ID(pgslop, PGSLOP)(FIXNUM *sdid, FIXNUM *slop)
    {FIXNUM rv;
     PG_logical_operation lop;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    lop = (PG_logical_operation) *plop;
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    lop = (PG_logical_operation) *slop;
     PG_set_logical_op(dev, lop);
 
     rv = TRUE;
@@ -1692,12 +1696,12 @@ FIXNUM FF_ID(pgslop, PGSLOP)(FIXNUM *devid, FIXNUM *plop)
 
 /* PGSLNS - set the line style */
 
-FIXNUM FF_ID(pgslns, PGSLNS)(FIXNUM *devid, FIXNUM *ps)
+FIXNUM FF_ID(pgslns, PGSLNS)(FIXNUM *sdid, FIXNUM *ss)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    PG_set_line_style(dev, (int) *ps);
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_set_line_style(dev, (int) *ss);
 
     rv = TRUE;
 
@@ -1708,12 +1712,12 @@ FIXNUM FF_ID(pgslns, PGSLNS)(FIXNUM *devid, FIXNUM *ps)
 
 /* PGSLNW - set the line width */
 
-FIXNUM FF_ID(pgslnw, PGSLNW)(FIXNUM *devid, double *pw)
+FIXNUM FF_ID(pgslnw, PGSLNW)(FIXNUM *sdid, double *sw)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    PG_set_line_width(dev, (double) *pw);
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_set_line_width(dev, (double) *sw);
 
     rv = TRUE;
 
@@ -1724,12 +1728,12 @@ FIXNUM FF_ID(pgslnw, PGSLNW)(FIXNUM *devid, double *pw)
 
 /* PGSMKO - set the marker orientation */
 
-FIXNUM FF_ID(pgsmko, PGSMKO)(FIXNUM *devid, double *pw)
+FIXNUM FF_ID(pgsmko, PGSMKO)(FIXNUM *sdid, double *sw)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    PG_set_marker_orientation(dev, (double) *pw);
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_set_marker_orientation(dev, (double) *sw);
 
     rv = TRUE;
 
@@ -1740,12 +1744,12 @@ FIXNUM FF_ID(pgsmko, PGSMKO)(FIXNUM *devid, double *pw)
 
 /* PGSMKS - set the marker scale */
 
-FIXNUM FF_ID(pgsmks, PGSMKS)(FIXNUM *devid, double *ps)
+FIXNUM FF_ID(pgsmks, PGSMKS)(FIXNUM *sdid, double *ss)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    PG_set_marker_scale(dev, (double) *ps);
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_set_marker_scale(dev, (double) *ss);
 
     rv = TRUE;
 
@@ -1756,13 +1760,13 @@ FIXNUM FF_ID(pgsmks, PGSMKS)(FIXNUM *devid, double *ps)
 
 /* PGSPAL - set the current palette */
 
-FIXNUM FF_ID(pgspal, PGSPAL)(FIXNUM *devid, FIXNUM *pnc, char *pname)
+FIXNUM FF_ID(pgspal, PGSPAL)(FIXNUM *sdid, FIXNUM *sncn, char *pname)
    {FIXNUM rv;
     PG_device *dev;
     char lname[MAXLINE];
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    SC_FORTRAN_STR_C(lname, pname, *pnc);
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    SC_FORTRAN_STR_C(lname, pname, *sncn);
 
     rv = (PG_set_palette(dev, lname) != NULL);
 
@@ -1773,12 +1777,12 @@ FIXNUM FF_ID(pgspal, PGSPAL)(FIXNUM *devid, FIXNUM *pnc, char *pname)
 
 /* PGSPMF - set the pixmap flag */
 
-FIXNUM FF_ID(pgspmf, PGSPMF)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pgspmf, PGSPMF)(FIXNUM *sdid, FIXNUM *sc)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    PG_set_pixmap_flag(dev, *pc);
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_set_pixmap_flag(dev, *sc);
 
     rv = TRUE;
 
@@ -1789,19 +1793,19 @@ FIXNUM FF_ID(pgspmf, PGSPMF)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGSTOP - convert from NDC to PC */
 
-FIXNUM FF_ID(pgstop, PGSTOP)(FIXNUM *devid, double *px, double *py,
-			     FIXNUM *pix, FIXNUM *piy)
+FIXNUM FF_ID(pgstop, PGSTOP)(FIXNUM *sdid, double *sx, double *sy,
+			     FIXNUM *six, FIXNUM *siy)
    {FIXNUM rv;
     double p[PG_SPACEDM];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    p[0] = *px;
-    p[1] = *py;
+    p[0] = *sx;
+    p[1] = *sy;
     PG_trans_point(dev, 2, NORMC, p, PIXELC, p);
-    *pix = p[0];
-    *piy = p[1];
+    *six = p[0];
+    *siy = p[1];
 
     rv = TRUE;
 
@@ -1812,18 +1816,18 @@ FIXNUM FF_ID(pgstop, PGSTOP)(FIXNUM *devid, double *px, double *py,
 
 /* PGSTOW - convert from NDC to WC */
 
-FIXNUM FF_ID(pgstow, PGSTOW)(FIXNUM *devid, double *px, double *py)
+FIXNUM FF_ID(pgstow, PGSTOW)(FIXNUM *sdid, double *sx, double *sy)
    {FIXNUM rv;
     double p[PG_SPACEDM];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    p[0] = *px;
-    p[1] = *py;
+    p[0] = *sx;
+    p[1] = *sy;
     PG_trans_point(dev, 2, NORMC, p, WORLDC, p);
-    *px = p[0];
-    *py = p[1];
+    *sx = p[0];
+    *sy = p[1];
 
     rv = TRUE;
 
@@ -1834,12 +1838,12 @@ FIXNUM FF_ID(pgstow, PGSTOW)(FIXNUM *devid, double *px, double *py)
 
 /* PGSTXC - set the text color */
 
-FIXNUM FF_ID(pgstxc, PGSTXC)(FIXNUM *devid, FIXNUM *pc)
+FIXNUM FF_ID(pgstxc, PGSTXC)(FIXNUM *sdid, FIXNUM *sc)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    PG_set_color_text(dev, (int) *pc, TRUE);
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_set_color_text(dev, (int) *sc, TRUE);
 
     rv = TRUE;
 
@@ -1850,19 +1854,18 @@ FIXNUM FF_ID(pgstxc, PGSTXC)(FIXNUM *devid, FIXNUM *pc)
 
 /* PGSTXF - set the font */
 
-FIXNUM FF_ID(pgstxf, PGSTXF)(FIXNUM *devid, FIXNUM *pncf,
-			     char *face, FIXNUM *pncs,
-			     char *style, FIXNUM *psize)
+FIXNUM FF_ID(pgstxf, PGSTXF)(FIXNUM *sdid, FIXNUM *sncf, char *face,
+			     FIXNUM *sncs, char *style, FIXNUM *ssz)
    {FIXNUM rv;
     PG_device *dev;
     char lface[MAXLINE], lstyle[MAXLINE];
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    SC_FORTRAN_STR_C(lface, face, *pncf);
-    SC_FORTRAN_STR_C(lstyle, style, *pncs);
+    SC_FORTRAN_STR_C(lface, face, *sncf);
+    SC_FORTRAN_STR_C(lstyle, style, *sncs);
 
-    PG_set_font(dev, lface, lstyle, (int) *psize);
+    PG_set_font(dev, lface, lstyle, (int) *ssz);
 
     rv = TRUE;
 
@@ -1880,14 +1883,14 @@ FIXNUM FF_ID(pgstxf, PGSTXF)(FIXNUM *devid, FIXNUM *pncf,
  *        - to be reused
  */
 
-FIXNUM FF_ID(pgsvpa, PGSVPA)(FIXNUM *devid, FIXNUM *pn)
+FIXNUM FF_ID(pgsvpa, PGSVPA)(FIXNUM *sdid, FIXNUM *sn)
    {int n;
     FIXNUM rv;
     PG_device *dev;
     PG_view_attributes *d;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    n   = *pn;
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    n   = *sn;
     if ((n < 0) || (n >= _PG.view_attr_indx))
 
 /* the first time out allocate the lists of pointers and disk addresses */
@@ -1914,7 +1917,7 @@ FIXNUM FF_ID(pgsvpa, PGSVPA)(FIXNUM *devid, FIXNUM *pn)
        {d = _PG.view_attr_list[n];
         PG_save_view_attributes(d, dev);};
 
-    *pn = n;
+    *sn = n;
 
     rv = TRUE;
 
@@ -1925,17 +1928,17 @@ FIXNUM FF_ID(pgsvpa, PGSVPA)(FIXNUM *devid, FIXNUM *pn)
 
 /* PGSVWP - set the viewport */
 
-FIXNUM FF_ID(pgsvwp, PGSVWP)(FIXNUM *devid, double *px1, double *px2,
-			     double *py1, double *py2)
+FIXNUM FF_ID(pgsvwp, PGSVWP)(FIXNUM *sdid, double *sx1, double *sx2,
+			     double *sy1, double *sy2)
    {FIXNUM rv;
     double ndc[PG_BOXSZ];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    ndc[0] = *px1;
-    ndc[1] = *px2;
-    ndc[2] = *py1;
-    ndc[3] = *py2;
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    ndc[0] = *sx1;
+    ndc[1] = *sx2;
+    ndc[2] = *sy1;
+    ndc[3] = *sy2;
 
     PG_set_viewspace(dev, 2, NORMC, ndc);
 
@@ -1948,13 +1951,13 @@ FIXNUM FF_ID(pgsvwp, PGSVWP)(FIXNUM *devid, double *px1, double *px2,
 
 /* PGSVPS - set viewport position */
 
-FIXNUM FF_ID(pgsvps, PGSVPS)(FIXNUM *devid, double *px, double *py)
+FIXNUM FF_ID(pgsvps, PGSVPS)(FIXNUM *sdid, double *sx, double *sy)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    PG_set_viewport_pos(dev, *px, *py);
+    PG_set_viewport_pos(dev, *sx, *sy);
 
     rv = TRUE;
 
@@ -1965,13 +1968,13 @@ FIXNUM FF_ID(pgsvps, PGSVPS)(FIXNUM *devid, double *px, double *py)
 
 /* PGSVSH - set viewport shape */
 
-FIXNUM FF_ID(pgsvsh, PGSVSH)(FIXNUM *devid, double *pw, double *ph, double *pa)
+FIXNUM FF_ID(pgsvsh, PGSVSH)(FIXNUM *sdid, double *sw, double *sh, double *sa)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    PG_set_viewport_shape(dev, *pw, *ph, *pa);
+    PG_set_viewport_shape(dev, *sw, *sh, *sa);
 
     rv = TRUE;
 
@@ -1982,17 +1985,17 @@ FIXNUM FF_ID(pgsvsh, PGSVSH)(FIXNUM *devid, double *pw, double *ph, double *pa)
 
 /* PGSWCS - set the world coordinate system */
 
-FIXNUM FF_ID(pgswcs, PGSWCS)(FIXNUM *devid, double *px1, double *px2,
-			     double *py1, double *py2)
+FIXNUM FF_ID(pgswcs, PGSWCS)(FIXNUM *sdid, double *sx1, double *sx2,
+			     double *sy1, double *sy2)
    {FIXNUM rv;
     double wc[PG_BOXSZ];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    wc[0] = *px1;
-    wc[1] = *px2;
-    wc[2] = *py1;
-    wc[3] = *py2;
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    wc[0] = *sx1;
+    wc[1] = *sx2;
+    wc[2] = *sy1;
+    wc[3] = *sy2;
     PG_set_viewspace(dev, 2, WORLDC, wc);
 
     rv = TRUE;
@@ -2004,13 +2007,13 @@ FIXNUM FF_ID(pgswcs, PGSWCS)(FIXNUM *devid, double *px1, double *px2,
 
 /* PGTDID - turn device data id on or off */
 
-FIXNUM FF_ID(pgtdid, PGTDID)(FIXNUM *devid, FIXNUM *val)
+FIXNUM FF_ID(pgtdid, PGTDID)(FIXNUM *sdid, FIXNUM *sval)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    PG_turn_data_id(dev, *val);
+    PG_turn_data_id(dev, *sval);
 
     rv = TRUE;
 
@@ -2021,11 +2024,11 @@ FIXNUM FF_ID(pgtdid, PGTDID)(FIXNUM *devid, FIXNUM *val)
 
 /* PGUPVS - update the view surface of the PG_device */
 
-FIXNUM FF_ID(pgupvs, PGUPVS)(FIXNUM *devid)
+FIXNUM FF_ID(pgupvs, PGUPVS)(FIXNUM *sdid)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
     PG_update_vs(dev);
 
     rv = TRUE;
@@ -2037,17 +2040,17 @@ FIXNUM FF_ID(pgupvs, PGUPVS)(FIXNUM *devid)
 
 /* PGWRCL - write label centered wrt x */
 
-FIXNUM FF_ID(pgwrcl, PGWRCL)(FIXNUM *devid, double *psy,
-			     FIXNUM *pnc, char *label)
+FIXNUM FF_ID(pgwrcl, PGWRCL)(FIXNUM *sdid, double *ssy,
+			     FIXNUM *sncl, char *label)
    {FIXNUM rv;
     char llabel[MAXLINE];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    SC_FORTRAN_STR_C(llabel, label, *pnc);
+    SC_FORTRAN_STR_C(llabel, label, *sncl);
 
-    PG_center_label(dev, *psy, llabel);
+    PG_center_label(dev, *ssy, llabel);
 
     rv = TRUE;
 
@@ -2058,14 +2061,14 @@ FIXNUM FF_ID(pgwrcl, PGWRCL)(FIXNUM *devid, double *psy,
 
 /* PGWRIF - write an interface description file */
 
-FIXNUM FF_ID(pgwrif, PGWRIF)(FIXNUM *devid, FIXNUM *pnc, char *name)
+FIXNUM FF_ID(pgwrif, PGWRIF)(FIXNUM *sdid, FIXNUM *sncn, char *name)
    {FIXNUM rv;
     char lname[MAXLINE];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    SC_FORTRAN_STR_C(lname, name, *pnc);
+    SC_FORTRAN_STR_C(lname, name, *sncn);
 
     rv = PG_write_interface(dev, lname);
 
@@ -2078,18 +2081,18 @@ FIXNUM FF_ID(pgwrif, PGWRIF)(FIXNUM *devid, FIXNUM *pnc, char *name)
  *        - at the specified screen coordinate in WC
  */
 
-FIXNUM FF_ID(pgwrta, PGWRTA)(FIXNUM *devid, double *px, double *py,
-			     FIXNUM *pnc, char *msg)
+FIXNUM FF_ID(pgwrta, PGWRTA)(FIXNUM *sdid, double *sx, double *sy,
+			     FIXNUM *sncm, char *msg)
    {FIXNUM rv;
     double x, y;
     char lmsg[MAXLINE];
     PG_device *dev;
 
-    x = *px;
-    y = *py;
-    SC_FORTRAN_STR_C(lmsg, msg, *pnc);
+    x = *sx;
+    y = *sy;
+    SC_FORTRAN_STR_C(lmsg, msg, *sncm);
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
     if ((dev != NULL) && (dev->gprint_flag))
        {PG_move_tx_abs(dev, x, y);
         PG_write_text(dev, stdscr, lmsg);};
@@ -2103,18 +2106,18 @@ FIXNUM FF_ID(pgwrta, PGWRTA)(FIXNUM *devid, double *px, double *py,
 
 /* PGWTOS - convert from WC to NDC */
 
-FIXNUM FF_ID(pgwtos, PGWTOS)(FIXNUM *devid, double *px, double *py)
+FIXNUM FF_ID(pgwtos, PGWTOS)(FIXNUM *sdid, double *sx, double *sy)
    {FIXNUM rv;
     double p[PG_SPACEDM];
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    p[0] = *px;
-    p[1] = *py;
+    p[0] = *sx;
+    p[1] = *sy;
     PG_trans_point(dev, 2, WORLDC, p, NORMC, p);
-    *px = p[0];
-    *py = p[1];
+    *sx = p[0];
+    *sy = p[1];
 
     rv = TRUE;
 
@@ -2125,13 +2128,13 @@ FIXNUM FF_ID(pgwtos, PGWTOS)(FIXNUM *devid, double *px, double *py)
 
 /* PGSVA - set the view angle */
 
-FIXNUM FF_ID(pgsva, PGSVA)(FIXNUM *devid, double *pt, double *pp, double *pc)
+FIXNUM FF_ID(pgsva, PGSVA)(FIXNUM *sdid, double *st, double *sp, double *sc)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    PG_set_view_angle(dev, *pt, *pp, *pc);
+    PG_set_view_angle(dev, *st, *sp, *sc);
 
     rv = TRUE;
 
@@ -2142,13 +2145,13 @@ FIXNUM FF_ID(pgsva, PGSVA)(FIXNUM *devid, double *pt, double *pp, double *pc)
 
 /* PGSLA - set the lighting angle */
 
-FIXNUM FF_ID(pgsla, PGSLA)(FIXNUM *devid, double *pt, double *pp)
+FIXNUM FF_ID(pgsla, PGSLA)(FIXNUM *sdid, double *st, double *sp)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    PG_set_light_angle(dev, *pt, *pp);
+    PG_set_light_angle(dev, *st, *sp);
 
     rv = TRUE;
 
@@ -2159,14 +2162,14 @@ FIXNUM FF_ID(pgsla, PGSLA)(FIXNUM *devid, double *pt, double *pp)
 
 /* PGGVA - get the view angle */
 
-FIXNUM FF_ID(pggva, PGGVA)(FIXNUM *devid, FIXNUM *pcnv,
-			   double *pt, double *pp, double *pc)
+FIXNUM FF_ID(pggva, PGGVA)(FIXNUM *sdid, FIXNUM *scnv,
+			   double *st, double *sp, double *sc)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    PG_get_view_angle(dev, *pcnv, pt, pp, pc);
+    PG_get_view_angle(dev, *scnv, st, sp, sc);
 
     rv = TRUE;
 
@@ -2177,13 +2180,13 @@ FIXNUM FF_ID(pggva, PGGVA)(FIXNUM *devid, FIXNUM *pcnv,
 
 /* PGGLA - get the lighting angle */
 
-FIXNUM FF_ID(pggla, PGGLA)(FIXNUM *devid, FIXNUM *pcnv, double *pt, double *pp)
+FIXNUM FF_ID(pggla, PGGLA)(FIXNUM *sdid, FIXNUM *scnv, double *st, double *sp)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    PG_get_light_angle(dev, *pcnv, pt, pp);
+    PG_get_light_angle(dev, *scnv, st, sp);
 
     rv = TRUE;
 

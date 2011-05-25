@@ -60,11 +60,11 @@ FIXNUM _SC_make_ff(void **pm, FIXNUM *pni, FIXNUM *pnb, FIXNUM *pnc,
  *        - return TRUE if successful and FALSE otherwise
  */
 
-FIXNUM FF_ID(scmakz, SCMAKZ)(void **pm, FIXNUM *pni, FIXNUM *pnb,
-			     FIXNUM *pnc, char *pname, FIXNUM *pzsp)
+FIXNUM FF_ID(scmakz, SCMAKZ)(void **am, FIXNUM *sni, FIXNUM *snb,
+			     FIXNUM *sncn, char *pname, FIXNUM *szsp)
    {FIXNUM ok;
 
-    ok = _SC_make_ff(pm, pni, pnb, pnc, pname, (int) *pzsp);
+    ok = _SC_make_ff(am, sni, snb, sncn, pname, (int) *szsp);
 
     return(ok);}
 
@@ -77,11 +77,11 @@ FIXNUM FF_ID(scmakz, SCMAKZ)(void **pm, FIXNUM *pni, FIXNUM *pnb,
  *        - return TRUE if successful and FALSE otherwise
  */
 
-FIXNUM FF_ID(scmakf, SCMAKF)(void **pm, FIXNUM *pni, FIXNUM *pnb,
-			     FIXNUM *pnc, char *pname)
+FIXNUM FF_ID(scmakf, SCMAKF)(void **am, FIXNUM *sni, FIXNUM *snb,
+			     FIXNUM *sncn, char *pname)
    {FIXNUM ok;
 
-    ok = _SC_make_ff(pm, pni, pnb, pnc, pname, -1);
+    ok = _SC_make_ff(am, sni, snb, sncn, pname, -1);
 
     return(ok);}
 
@@ -93,10 +93,10 @@ FIXNUM FF_ID(scmakf, SCMAKF)(void **pm, FIXNUM *pni, FIXNUM *pnb,
  *        - return TRUE if successful and FALSE otherwise
  */
 
-FIXNUM FF_ID(scmake, SCMAKE)(void **pm, FIXNUM *pni, FIXNUM *pnb)
+FIXNUM FF_ID(scmake, SCMAKE)(void **am, FIXNUM *sni, FIXNUM *snb)
    {FIXNUM ok;
 
-    ok = _SC_make_ff(pm, pni, pnb, NULL, NULL, -1);
+    ok = _SC_make_ff(am, sni, snb, NULL, NULL, -1);
 
     return(ok);}
 
@@ -108,14 +108,14 @@ FIXNUM FF_ID(scmake, SCMAKE)(void **pm, FIXNUM *pni, FIXNUM *pnb)
  *        - return TRUE if successful and FALSE otherwise
  */
 
-FIXNUM FF_ID(scremz, SCREMZ)(void **pm, FIXNUM *pni,
-			     FIXNUM *pnb, FIXNUM *pzsp)
+FIXNUM FF_ID(scremz, SCREMZ)(void **am, FIXNUM *sni,
+			     FIXNUM *snb, FIXNUM *szsp)
    {FIXNUM rv;
     void *s;
 
-    s = _SC_realloc_w(*pm, (long) *pni, (long) *pnb, FALSE, (int) *pzsp);
+    s = _SC_realloc_w(*am, (long) *sni, (long) *snb, FALSE, (int) *szsp);
 
-    rv = ((*pm = s) != NULL);
+    rv = ((*am = s) != NULL);
 
     return(rv);}
 
@@ -127,15 +127,15 @@ FIXNUM FF_ID(scremz, SCREMZ)(void **pm, FIXNUM *pni,
  *        - return TRUE if successful and FALSE otherwise
  */
 
-FIXNUM FF_ID(screma, SCREMA)(void **pm, FIXNUM *pni, FIXNUM *pnb)
+FIXNUM FF_ID(screma, SCREMA)(void **am, FIXNUM *sni, FIXNUM *snb)
    {long nb;
     FIXNUM rv;
     void *s;
 
-    nb = (*pni)*(*pnb);
-    s  = CREMAKE(*pm, char, nb);
+    nb = (*sni)*(*snb);
+    s  = CREMAKE(*am, char, nb);
 
-    rv = ((*pm = s) != NULL);
+    rv = ((*am = s) != NULL);
 
     return(rv);}
 
@@ -144,12 +144,12 @@ FIXNUM FF_ID(screma, SCREMA)(void **pm, FIXNUM *pni, FIXNUM *pnb)
 
 /* SCFREZ - free a chunk of memory */
 
-FIXNUM FF_ID(scfrez, SCFREZ)(void **pm, FIXNUM *pzsp)
+FIXNUM FF_ID(scfrez, SCFREZ)(void **am, FIXNUM *szsp)
    {FIXNUM ok;
 
-    ok = _SC_free_w(*pm, (int) *pzsp);
+    ok = _SC_free_w(*am, (int) *szsp);
     if (ok)
-       *pm = NULL;
+       *am = NULL;
 
     return(ok);}
 
@@ -158,10 +158,10 @@ FIXNUM FF_ID(scfrez, SCFREZ)(void **pm, FIXNUM *pzsp)
 
 /* SCFREE - free a chunk of memory */
 
-FIXNUM FF_ID(scfree, SCFREE)(void **pm)
+FIXNUM FF_ID(scfree, SCFREE)(void **am)
    {FIXNUM ok;
 
-    ok = _SC_free_n(*pm, NULL);
+    ok = _SC_free_n(*am, NULL);
 
     return(ok);}
 
@@ -170,10 +170,10 @@ FIXNUM FF_ID(scfree, SCFREE)(void **pm)
 
 /* SCFPTE - free a chunk of memory */
 
-FIXNUM FF_ID(scfpte, SCFPTE)(void *pm)
+FIXNUM FF_ID(scfpte, SCFPTE)(void *am)
    {FIXNUM rv;
 
-    rv = FF_ID(scfree, SCFREE)(&pm);
+    rv = FF_ID(scfree, SCFREE)(&am);
 
     return(rv);}
 
@@ -182,10 +182,10 @@ FIXNUM FF_ID(scfpte, SCFPTE)(void *pm)
 
 /* SCISSP - is the space SCORE allocated */
 
-FIXNUM FF_ID(scissp, SCISSP)(void **pm)
+FIXNUM FF_ID(scissp, SCISSP)(void **am)
    {FIXNUM ok;
 
-    ok = SC_is_score_ptr(*pm);
+    ok = SC_is_score_ptr(*am);
 
     return(ok);}
 
@@ -206,11 +206,11 @@ FIXNUM FF_ID(scmemt, SCMEMT)(void)
 
 /* SCMEMC - FORTRAN interface to SC_mem_chk */
 
-FIXNUM FF_ID(scmemc, SCMEMC)(FIXNUM *pt)
+FIXNUM FF_ID(scmemc, SCMEMC)(FIXNUM *st)
    {int typ;
     FIXNUM rv;
 
-    typ = *pt;
+    typ = *st;
 
     rv = SC_mem_chk(typ);
 
@@ -221,17 +221,17 @@ FIXNUM FF_ID(scmemc, SCMEMC)(FIXNUM *pt)
 
 /* SCMEMS - FORTRAN interface to SC_mem_stats */
 
-FIXNUM FF_ID(scmems, SCMEMS)(FIXNUM *pal, FIXNUM *pfr,
-			     FIXNUM *pdf, FIXNUM *pmx)
+FIXNUM FF_ID(scmems, SCMEMS)(FIXNUM *sal, FIXNUM *sfr,
+			     FIXNUM *sdf, FIXNUM *smx)
    {long pl, pf, pd, pm;
     FIXNUM rv;
 
     SC_mem_stats(&pl, &pf, &pd, &pm);
 
-    *pal = pl;
-    *pfr = pf;
-    *pdf = pd;
-    *pmx = pm;
+    *sal = pl;
+    *sfr = pf;
+    *sdf = pd;
+    *smx = pm;
 
     rv = TRUE;
 
@@ -242,16 +242,16 @@ FIXNUM FF_ID(scmems, SCMEMS)(FIXNUM *pal, FIXNUM *pfr,
 
 /* SCMEMM - FORTRAN interface to SC_mem_monitor */
 
-FIXNUM FF_ID(scmemm, SCMEMM)(FIXNUM *po, FIXNUM *pl, FIXNUM *pni,
-			     char *pid, FIXNUM *pnc, char *pmsg)
+FIXNUM FF_ID(scmemm, SCMEMM)(FIXNUM *so, FIXNUM *sl, FIXNUM *sni,
+			     char *pid, FIXNUM *sncm, char *pmsg)
    {int old, lev, ni, nc, n;
     FIXNUM rv;
     char msg[MAXLINE], id[MAXLINE];
 
-    old = *po;
-    lev = *pl;
-    ni  = *pni;
-    nc  = *pnc;
+    old = *so;
+    lev = *sl;
+    ni  = *sni;
+    nc  = *sncm;
 
     SC_FORTRAN_STR_C(id, pid, ni);
 
@@ -259,7 +259,7 @@ FIXNUM FF_ID(scmemm, SCMEMM)(FIXNUM *po, FIXNUM *pl, FIXNUM *pni,
 
     n = strlen(msg);
     n = min(n, nc);
-    SC_strncpy(pmsg, *pnc, msg, n);
+    SC_strncpy(pmsg, *sncm, msg, n);
 
     return(rv);}
 
@@ -268,23 +268,23 @@ FIXNUM FF_ID(scmemm, SCMEMM)(FIXNUM *po, FIXNUM *pl, FIXNUM *pni,
 
 /* SCMEML - FORTRAN interface to SC_mem_lookup */
 
-FIXNUM FF_ID(scmeml, SCMEML)(FIXNUM *po, FIXNUM *pnc, char *pmsg)
+FIXNUM FF_ID(scmeml, SCMEML)(FIXNUM *so, FIXNUM *sncm, char *pmsg)
    {int n, nc;
     FIXNUM ok;
     char *name;
 
-    name = SC_mem_lookup((void *) po);
+    name = SC_mem_lookup((void *) so);
     if (name != NULL)
        {n  = strlen(name);
-	nc = *pnc;
+	nc = *sncm;
 	n  = min(n, nc);
-	SC_strncpy(pmsg, *pnc, name, n);
+	SC_strncpy(pmsg, *sncm, name, n);
 	ok = TRUE;}
     else
        {n  = 0;
 	ok = FALSE;};
 
-    *pnc = n;
+    *sncm = n;
 
     return(ok);}
 
@@ -293,11 +293,11 @@ FIXNUM FF_ID(scmeml, SCMEML)(FIXNUM *po, FIXNUM *pnc, char *pmsg)
 
 /* SCMEMP - FORTRAN interface to SC_mem_map */
 
-FIXNUM FF_ID(scmemp, SCMEMP)(FIXNUM *po)
+FIXNUM FF_ID(scmemp, SCMEMP)(FIXNUM *so)
    {int ord;
     FIXNUM rv;
 
-    ord = *po;
+    ord = *so;
     rv  = SC_mem_map(stdout, ord);
 
     return(rv);}
@@ -307,16 +307,16 @@ FIXNUM FF_ID(scmemp, SCMEMP)(FIXNUM *po)
 
 /* SCMMCF - FORTRAN interface to SC_configure_mm */
 
-FIXNUM FF_ID(scmmcf, SCMMCF)(FIXNUM *pxl, FIXNUM *pxm, FIXNUM *psz,
-			     REAL *pr)
+FIXNUM FF_ID(scmmcf, SCMMCF)(FIXNUM *sxl, FIXNUM *sxm, FIXNUM *ssz,
+			     REAL *sr)
    {long mxl, mxm, bsz;
     double r;
     FIXNUM rv;
 
-    mxl = *pxl;
-    mxm = *pxm;
-    bsz = *psz;
-    r   = *pr;
+    mxl = *sxl;
+    mxm = *sxm;
+    bsz = *ssz;
+    r   = *sr;
 
     SC_configure_mm(mxl, mxm, bsz, r);
 
@@ -329,10 +329,10 @@ FIXNUM FF_ID(scmmcf, SCMMCF)(FIXNUM *pxl, FIXNUM *pxm, FIXNUM *psz,
 
 /* SCMARK - fortran interface for SC_mark */
 
-FIXNUM FF_ID(scmark, SCMARK)(void *pm, FIXNUM *pn)
+FIXNUM FF_ID(scmark, SCMARK)(void *am, FIXNUM *sn)
    {FIXNUM rv;
 
-    rv = SC_mark(*(char **) pm, *pn);
+    rv = SC_mark(*(char **) am, *sn);
 
     return(rv);}
 
@@ -341,10 +341,10 @@ FIXNUM FF_ID(scmark, SCMARK)(void *pm, FIXNUM *pn)
 
 /* SCMPNT - fortran interface for SC_mem_print */
 
-FIXNUM FF_ID(scmpnt, SCMPNT)(void *pm)
+FIXNUM FF_ID(scmpnt, SCMPNT)(void *am)
    {FIXNUM rv;
 
-    SC_mem_print(*(char **) pm);
+    SC_mem_print(*(char **) am);
 
     rv = TRUE;
 

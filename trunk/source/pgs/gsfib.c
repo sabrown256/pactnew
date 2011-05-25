@@ -16,13 +16,13 @@
 
 /* PGGBKC - get the white background flag */
 
-FIXNUM FF_ID(pggbkc, PGGBKC)(FIXNUM *devid, FIXNUM *clr)
+FIXNUM FF_ID(pggbkc, PGGBKC)(FIXNUM *sdid, FIXNUM *sclr)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    *clr = dev->background_color_white;
+    *sclr = dev->background_color_white;
 
     rv = TRUE;
 
@@ -33,15 +33,15 @@ FIXNUM FF_ID(pggbkc, PGGBKC)(FIXNUM *devid, FIXNUM *clr)
 
 /* PGGINF - get the graph attribute list */
 
-FIXNUM FF_ID(pgginf, PGGINF)(FIXNUM *gid, FIXNUM *pal)
+FIXNUM FF_ID(pgginf, PGGINF)(FIXNUM *sgid, FIXNUM *said)
    {FIXNUM rv;
     PG_graph *g;
     pcons *alist;
 
-    g = SC_GET_POINTER(PG_graph, *gid);
+    g = SC_GET_POINTER(PG_graph, *sgid);
 
     PG_get_render_info(g, alist);
-    *pal = (FIXNUM) SC_ADD_POINTER(alist);
+    *said = (FIXNUM) SC_ADD_POINTER(alist);
 
     rv = TRUE;
 
@@ -52,12 +52,12 @@ FIXNUM FF_ID(pgginf, PGGINF)(FIXNUM *gid, FIXNUM *pal)
 
 /* PGGGID - get the graph identifier */
 
-FIXNUM FF_ID(pgggid, PGGGID)(FIXNUM *gid, FIXNUM *pc)
+FIXNUM FF_ID(pgggid, PGGGID)(FIXNUM *sgid, FIXNUM *sc)
    {FIXNUM rv;
     PG_graph *g;
 
-    g = SC_GET_POINTER(PG_graph, *gid);
-    PG_get_identifier(g, *pc);
+    g = SC_GET_POINTER(PG_graph, *sgid);
+    PG_get_identifier(g, *sc);
 
     rv = TRUE;
 
@@ -68,10 +68,10 @@ FIXNUM FF_ID(pgggid, PGGGID)(FIXNUM *gid, FIXNUM *pc)
 
 /* PGGUPM - get the use-pixmap flag (X device) */
 
-FIXNUM FF_ID(pggupm, PGGUPM)(FIXNUM *flg)
+FIXNUM FF_ID(pggupm, PGGUPM)(FIXNUM *sflg)
    {FIXNUM rv;
 
-    PG_get_use_pixmap(*flg);
+    PG_get_use_pixmap(*sflg);
 
     rv = TRUE;
 
@@ -82,11 +82,11 @@ FIXNUM FF_ID(pggupm, PGGUPM)(FIXNUM *flg)
 
 /* PGMG11 - make a 1D-1D graph */
 
-FIXNUM FF_ID(pgmg11, PGMG11)(FIXNUM *pid,
-                                FIXNUM *pnl, char *flabel,
-                                FIXNUM *pcp, FIXNUM *pn, double *x, double *y,
-                                FIXNUM *pnx, char *fxname,
-                                FIXNUM *pny, char *fyname)
+FIXNUM FF_ID(pgmg11, PGMG11)(FIXNUM *sid,
+			     FIXNUM *sncl, char *flabel,
+			     FIXNUM *scp, FIXNUM *sn, double *ax, double *ay,
+			     FIXNUM *sncx, char *fxname,
+			     FIXNUM *sncy, char *fyname)
    {int id, cp, n;
     FIXNUM rv;
     char label[MAXLINE], xname[MAXLINE], yname[MAXLINE];
@@ -94,15 +94,15 @@ FIXNUM FF_ID(pgmg11, PGMG11)(FIXNUM *pid,
 
     rv = -1;
 
-    SC_FORTRAN_STR_C(label, flabel, *pnl);
-    SC_FORTRAN_STR_C(xname, fxname, *pnx);
-    SC_FORTRAN_STR_C(yname, fyname, *pny);
+    SC_FORTRAN_STR_C(label, flabel, *sncl);
+    SC_FORTRAN_STR_C(xname, fxname, *sncx);
+    SC_FORTRAN_STR_C(yname, fyname, *sncy);
 
-    id = *pid;
-    cp = *pcp;
-    n  = *pn;
+    id = *sid;
+    cp = *scp;
+    n  = *sn;
 
-    g = PG_make_graph_1d(id, label, cp, n, x, y, xname, yname);
+    g = PG_make_graph_1d(id, label, cp, n, ax, ay, xname, yname);
 
     if (g != NULL)
        rv = SC_ADD_POINTER(g);
@@ -114,12 +114,13 @@ FIXNUM FF_ID(pgmg11, PGMG11)(FIXNUM *pid,
 
 /* PGMG21 - make a 2D-1D graph */
 
-FIXNUM FF_ID(pgmg21, PGMG21)(FIXNUM *pid,
-                                FIXNUM *pnl, char *flabel,
-                                FIXNUM *pcp, FIXNUM *pk, FIXNUM *pl,
-                                FIXNUM *pcen, double *x, double *y, double *r,
-                                FIXNUM *pnd, char *fdname,
-                                FIXNUM *pnr, char *frname)
+FIXNUM FF_ID(pgmg21, PGMG21)(FIXNUM *sid,
+			     FIXNUM *sncl, char *flabel,
+			     FIXNUM *scp, FIXNUM *sk, FIXNUM *sl,
+			     FIXNUM *scen,
+			     double *ax, double *ay, double *ar,
+			     FIXNUM *sncd, char *fdname,
+			     FIXNUM *sncr, char *frname)
    {int id, cp, kmax, lmax;
     FIXNUM rv;
     char label[MAXLINE], dname[MAXLINE], rname[MAXLINE];
@@ -128,18 +129,18 @@ FIXNUM FF_ID(pgmg21, PGMG21)(FIXNUM *pid,
 
     rv = -1;
 
-    SC_FORTRAN_STR_C(label, flabel, *pnl);
-    SC_FORTRAN_STR_C(dname, fdname, *pnd);
-    SC_FORTRAN_STR_C(rname, frname, *pnr);
+    SC_FORTRAN_STR_C(label, flabel, *sncl);
+    SC_FORTRAN_STR_C(dname, fdname, *sncd);
+    SC_FORTRAN_STR_C(rname, frname, *sncr);
 
-    id        = *pid;
-    cp        = *pcp;
-    kmax      = *pk;
-    lmax      = *pl;
-    centering = (PM_centering) *pcen;
+    id        = *sid;
+    cp        = *scp;
+    kmax      = *sk;
+    lmax      = *sl;
+    centering = (PM_centering) *scen;
 
     g = PG_make_graph_r2_r1(id, label, cp, kmax, lmax, centering,
-			    x, y, r, dname, rname);
+			    ax, ay, ar, dname, rname);
 
     if (g != NULL)
        rv = SC_ADD_POINTER(g);
@@ -151,13 +152,13 @@ FIXNUM FF_ID(pgmg21, PGMG21)(FIXNUM *pid,
 
 /* PGMG22 - make a 2D-2D graph */
 
-FIXNUM FF_ID(pgmg22, PGMG22)(FIXNUM *pid,
-                                FIXNUM *pnl, char *flabel,
-                                FIXNUM *pcp, FIXNUM *pk, FIXNUM *pl,
-                                FIXNUM *pcen,
-                                double *x, double *y, double *u, double *v,
-                                FIXNUM *pnd, char *fdname,
-                                FIXNUM *pnr, char *frname)
+FIXNUM FF_ID(pgmg22, PGMG22)(FIXNUM *sid,
+			     FIXNUM *sncl, char *flabel,
+			     FIXNUM *scp, FIXNUM *sk, FIXNUM *sl,
+			     FIXNUM *scen,
+			     double *ax, double *ay, double *au, double *av,
+			     FIXNUM *sncd, char *fdname,
+			     FIXNUM *sncr, char *frname)
    {int id, cp, kmax, lmax;
     FIXNUM rv;
     char label[MAXLINE], dname[MAXLINE], rname[MAXLINE];
@@ -167,21 +168,21 @@ FIXNUM FF_ID(pgmg22, PGMG22)(FIXNUM *pid,
 
     rv = -1;
 
-    SC_FORTRAN_STR_C(label, flabel, *pnl);
-    SC_FORTRAN_STR_C(dname, fdname, *pnd);
-    SC_FORTRAN_STR_C(rname, frname, *pnr);
+    SC_FORTRAN_STR_C(label, flabel, *sncl);
+    SC_FORTRAN_STR_C(dname, fdname, *sncd);
+    SC_FORTRAN_STR_C(rname, frname, *sncr);
 
-    id        = *pid;
-    cp        = *pcp;
-    kmax      = *pk;
-    lmax      = *pl;
-    centering = (PM_centering) *pcen;
+    id        = *sid;
+    cp        = *scp;
+    kmax      = *sk;
+    lmax      = *sl;
+    centering = (PM_centering) *scen;
 
 /* build the domain set */
-    domain = PM_make_set(dname, SC_DOUBLE_S, cp, 2, kmax, lmax, 2, x, y);
+    domain = PM_make_set(dname, SC_DOUBLE_S, cp, 2, kmax, lmax, 2, ax, ay);
 
 /* build the range set */
-    range = PM_make_set(rname, SC_DOUBLE_S, cp, 2, kmax, lmax, 2, u, v);
+    range = PM_make_set(rname, SC_DOUBLE_S, cp, 2, kmax, lmax, 2, au, av);
 
     g = PG_make_graph_from_sets(label, domain, range, centering,
                                 SC_PCONS_P_S, NULL, id, NULL);
@@ -196,9 +197,9 @@ FIXNUM FF_ID(pgmg22, PGMG22)(FIXNUM *pid,
 
 /* PGMGFS - make a graph from sets */
 
-FIXNUM FF_ID(pgmgfs, PGMGFS)(FIXNUM *pnl, char *fname,
-                                FIXNUM *idom, FIXNUM *iran, FIXNUM *pcen,
-                                FIXNUM *pid, FIXNUM *inxt)
+FIXNUM FF_ID(pgmgfs, PGMGFS)(FIXNUM *sncn, char *fname,
+			     FIXNUM *sidm, FIXNUM *sirn, FIXNUM *scen,
+			     FIXNUM *sid, FIXNUM *sinxt)
    {int id;
     FIXNUM rv;
     char name[MAXLINE];
@@ -209,14 +210,14 @@ FIXNUM FF_ID(pgmgfs, PGMGFS)(FIXNUM *pnl, char *fname,
 
     rv = -1;
 
-    domain = SC_GET_POINTER(PM_set, *idom);
-    range  = SC_GET_POINTER(PM_set, *iran);
-    next   = SC_GET_POINTER(PG_graph, *inxt);
+    domain = SC_GET_POINTER(PM_set, *sidm);
+    range  = SC_GET_POINTER(PM_set, *sirn);
+    next   = SC_GET_POINTER(PG_graph, *sinxt);
 
-    SC_FORTRAN_STR_C(name, fname, *pnl);
+    SC_FORTRAN_STR_C(name, fname, *sncn);
 
-    id        = *pid;
-    centering = (PM_centering) *pcen;
+    id        = *sid;
+    centering = (PM_centering) *scen;
 
 /* build the mapping */
     if (domain->topology == NULL)
@@ -236,8 +237,8 @@ FIXNUM FF_ID(pgmgfs, PGMGFS)(FIXNUM *pnl, char *fname,
 
 /* PGQKBD - get some information about the keyboard */
 
-FIXNUM FF_ID(pgqkbd, PGQKBD)(FIXNUM *devid, FIXNUM *px, FIXNUM *py,
-                                FIXNUM *pc, FIXNUM *pmod)
+FIXNUM FF_ID(pgqkbd, PGQKBD)(FIXNUM *sdid, FIXNUM *sx, FIXNUM *sy,
+			     FIXNUM *sc, FIXNUM *smod)
    {FIXNUM rv;
 
 #ifdef HAVE_WINDOW_DEVICE
@@ -245,13 +246,13 @@ FIXNUM FF_ID(pgqkbd, PGQKBD)(FIXNUM *devid, FIXNUM *px, FIXNUM *py,
     int iev[PG_SPACEDM], mod;
     char bf[2];
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
     PG_key_event_info(dev, &_PG_gcont.current_event, iev, bf, 2, &mod);
 
-    *px   = iev[0];
-    *py   = iev[1];
-    *pc   = bf[0];
-    *pmod = mod;
+    *sx   = iev[0];
+    *sy   = iev[1];
+    *sc   = bf[0];
+    *smod = mod;
 #endif
 
     rv = TRUE;
@@ -263,20 +264,20 @@ FIXNUM FF_ID(pgqkbd, PGQKBD)(FIXNUM *devid, FIXNUM *px, FIXNUM *py,
 
 /* PGQPTR - get some information about the pointer (mouse) */
 
-FIXNUM FF_ID(pgqptr, PGQPTR)(FIXNUM *devid, FIXNUM *px, FIXNUM *py,
-                                FIXNUM *pbtn, FIXNUM *pmod)
+FIXNUM FF_ID(pgqptr, PGQPTR)(FIXNUM *sdid, FIXNUM *sx, FIXNUM *sy,
+			     FIXNUM *sbtn, FIXNUM *smod)
    {int btn, mod;
     int ir[PG_SPACEDM];
     FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
     PG_query_pointer(dev, ir, &btn, &mod);
 
-    *px   = ir[0];
-    *py   = ir[1];
-    *pbtn = btn;
-    *pmod = mod;
+    *sx   = ir[0];
+    *sy   = ir[1];
+    *sbtn = btn;
+    *smod = mod;
 
     rv = TRUE;
     
@@ -287,13 +288,13 @@ FIXNUM FF_ID(pgqptr, PGQPTR)(FIXNUM *devid, FIXNUM *px, FIXNUM *py,
 
 /* PGPLOT - render a graph */
 
-FIXNUM FF_ID(pgplot, PGPLOT)(FIXNUM *devid, FIXNUM *grid)
+FIXNUM FF_ID(pgplot, PGPLOT)(FIXNUM *sdid, FIXNUM *sgid)
    {FIXNUM rv;
      PG_device *dev;
     PG_graph *g;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
-    g   = SC_GET_POINTER(PG_graph, *grid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    g   = SC_GET_POINTER(PG_graph, *sgid);
 
     PG_draw_graph(dev, g);
 
@@ -306,18 +307,18 @@ FIXNUM FF_ID(pgplot, PGPLOT)(FIXNUM *devid, FIXNUM *grid)
 
 /* PGRLGR - release a graph */
 
-FIXNUM FF_ID(pgrlgr, PGRLGR)(FIXNUM *grid, FIXNUM *prd, FIXNUM *prr)
+FIXNUM FF_ID(pgrlgr, PGRLGR)(FIXNUM *sgid, FIXNUM *srd, FIXNUM *srr)
    {int rld, rlr;
     FIXNUM rv;
     PG_graph *g;
 
-    g   = SC_GET_POINTER(PG_graph, *grid);
-    rld = *prd;
-    rlr = *prr;
+    g   = SC_GET_POINTER(PG_graph, *sgid);
+    rld = *srd;
+    rlr = *srr;
 
     PG_rl_graph(g, rld, rlr);
 
-    *grid = 0;
+    *sgid = 0;
 
     rv = TRUE;
 
@@ -328,13 +329,13 @@ FIXNUM FF_ID(pgrlgr, PGRLGR)(FIXNUM *grid, FIXNUM *prd, FIXNUM *prr)
 
 /* PGSBKC - set the white background flag */
 
-FIXNUM FF_ID(pgsbkc, PGSBKC)(FIXNUM *devid, FIXNUM *clr)
+FIXNUM FF_ID(pgsbkc, PGSBKC)(FIXNUM *sdid, FIXNUM *sclr)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
-    dev->background_color_white = *clr;
+    dev->background_color_white = *sclr;
 
     rv = TRUE;
 
@@ -345,17 +346,17 @@ FIXNUM FF_ID(pgsbkc, PGSBKC)(FIXNUM *devid, FIXNUM *clr)
 
 /* PGSDLM - set a graph's domain limits */
 
-FIXNUM FF_ID(pgsdlm, PGSDLM)(FIXNUM *grid, FIXNUM *pn, double *v)
+FIXNUM FF_ID(pgsdlm, PGSDLM)(FIXNUM *sgid, FIXNUM *sn, double *av)
    {FIXNUM rv;
     long n;
     double *pt;
     PG_graph *g;
 
-    g = SC_GET_POINTER(PG_graph, *grid);
-    n = *pn;
+    g = SC_GET_POINTER(PG_graph, *sgid);
+    n = *sn;
 
     pt = CMAKE_N(double, n);
-    memcpy(pt, v, n*sizeof(double));
+    memcpy(pt, av, n*sizeof(double));
 
     PM_set_limits(g->f->domain, pt);
 
@@ -368,11 +369,11 @@ FIXNUM FF_ID(pgsdlm, PGSDLM)(FIXNUM *grid, FIXNUM *pn, double *v)
 
 /* PGSEDF - set the default event handler */
 
-FIXNUM FF_ID(pgsedf, PGSEDF)(FIXNUM *devid, PFEventHand fnc)
+FIXNUM FF_ID(pgsedf, PGSEDF)(FIXNUM *sdid, PFEventHand fnc)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
     PG_set_default_event_handler(dev, fnc);
     dev->default_event_handler.lang = _FORTRAN_LANG;
@@ -386,11 +387,11 @@ FIXNUM FF_ID(pgsedf, PGSEDF)(FIXNUM *devid, PFEventHand fnc)
 
 /* PGSEEX - set the expose event handler */
 
-FIXNUM FF_ID(pgseex, PGSEEX)(FIXNUM *devid, PFEventHand fnc)
+FIXNUM FF_ID(pgseex, PGSEEX)(FIXNUM *sdid, PFEventHand fnc)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
     PG_set_expose_event_handler(dev, fnc);
     dev->expose_event_handler.lang = _FORTRAN_LANG;
@@ -404,11 +405,11 @@ FIXNUM FF_ID(pgseex, PGSEEX)(FIXNUM *devid, PFEventHand fnc)
 
 /* PGSEKD - set the key down event handler */
 
-FIXNUM FF_ID(pgsekd, PGSEKD)(FIXNUM *devid, PFEventHand fnc)
+FIXNUM FF_ID(pgsekd, PGSEKD)(FIXNUM *sdid, PFEventHand fnc)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
     PG_set_key_down_event_handler(dev, fnc);
     dev->key_down_event_handler.lang = _FORTRAN_LANG;
@@ -422,11 +423,11 @@ FIXNUM FF_ID(pgsekd, PGSEKD)(FIXNUM *devid, PFEventHand fnc)
 
 /* PGSEKU - set the key up event handler */
 
-FIXNUM FF_ID(pgseku, PGSEKU)(FIXNUM *devid, PFEventHand fnc)
+FIXNUM FF_ID(pgseku, PGSEKU)(FIXNUM *sdid, PFEventHand fnc)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
     PG_set_key_up_event_handler(dev, fnc);
     dev->key_up_event_handler.lang = _FORTRAN_LANG;
@@ -440,11 +441,11 @@ FIXNUM FF_ID(pgseku, PGSEKU)(FIXNUM *devid, PFEventHand fnc)
 
 /* PGSEMD - set the mouse down event handler */
 
-FIXNUM FF_ID(pgsemd, PGSEMD)(FIXNUM *devid, PFEventHand fnc)
+FIXNUM FF_ID(pgsemd, PGSEMD)(FIXNUM *sdid, PFEventHand fnc)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
     PG_set_mouse_down_event_handler(dev, fnc);
     dev->mouse_down_event_handler.lang = _FORTRAN_LANG;
@@ -458,11 +459,11 @@ FIXNUM FF_ID(pgsemd, PGSEMD)(FIXNUM *devid, PFEventHand fnc)
 
 /* PGSEMO - set the motion event handler */
 
-FIXNUM FF_ID(pgsemo, PGSEMO)(FIXNUM *devid, PFEventHand fnc)
+FIXNUM FF_ID(pgsemo, PGSEMO)(FIXNUM *sdid, PFEventHand fnc)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
     PG_set_motion_event_handler(dev, fnc);
     dev->motion_event_handler.lang = _FORTRAN_LANG;
@@ -476,11 +477,11 @@ FIXNUM FF_ID(pgsemo, PGSEMO)(FIXNUM *devid, PFEventHand fnc)
 
 /* PGSEMU - set the mouse up event handler */
 
-FIXNUM FF_ID(pgsemu, PGSEMU)(FIXNUM *devid, PFEventHand fnc)
+FIXNUM FF_ID(pgsemu, PGSEMU)(FIXNUM *sdid, PFEventHand fnc)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
     PG_set_mouse_up_event_handler(dev, fnc);
     dev->mouse_up_event_handler.lang = _FORTRAN_LANG;
@@ -494,11 +495,11 @@ FIXNUM FF_ID(pgsemu, PGSEMU)(FIXNUM *devid, PFEventHand fnc)
 
 /* PGSEUP - set the update event handler */
 
-FIXNUM FF_ID(pgseup, PGSEUP)(FIXNUM *devid, PFEventHand fnc)
+FIXNUM FF_ID(pgseup, PGSEUP)(FIXNUM *sdid, PFEventHand fnc)
    {FIXNUM rv;
     PG_device *dev;
 
-    dev = SC_GET_POINTER(PG_device, *devid);
+    dev = SC_GET_POINTER(PG_device, *sdid);
 
     PG_set_update_event_handler(dev, fnc);
     dev->update_event_handler.lang = _FORTRAN_LANG;
@@ -512,14 +513,14 @@ FIXNUM FF_ID(pgseup, PGSEUP)(FIXNUM *devid, PFEventHand fnc)
 
 /* PGSINF - set the graph attribute list */
 
-FIXNUM FF_ID(pgsinf, PGSINF)(FIXNUM *gid, FIXNUM *pal)
+FIXNUM FF_ID(pgsinf, PGSINF)(FIXNUM *sgid, FIXNUM *said)
    {FIXNUM rv;
     PG_graph *g;
     pcons *alist;
 
-    g = SC_GET_POINTER(PG_graph, *gid);
+    g = SC_GET_POINTER(PG_graph, *sgid);
 
-    alist = SC_GET_POINTER(pcons, *pal);
+    alist = SC_GET_POINTER(pcons, *said);
     PG_set_render_info(g, alist);
 
     rv = TRUE;
@@ -531,12 +532,12 @@ FIXNUM FF_ID(pgsinf, PGSINF)(FIXNUM *gid, FIXNUM *pal)
 
 /* PGSGID - set the graph identifier */
 
-FIXNUM FF_ID(pgsgid, PGSGID)(FIXNUM *gid, FIXNUM *pc)
+FIXNUM FF_ID(pgsgid, PGSGID)(FIXNUM *sgid, FIXNUM *sc)
    {FIXNUM rv;
     PG_graph *g;
 
-    g = SC_GET_POINTER(PG_graph, *gid);
-    PG_set_identifier(g, *pc);
+    g = SC_GET_POINTER(PG_graph, *sgid);
+    PG_set_identifier(g, *sc);
 
     rv = TRUE;
 
@@ -547,10 +548,10 @@ FIXNUM FF_ID(pgsgid, PGSGID)(FIXNUM *gid, FIXNUM *pc)
 
 /* PGSUPM - set the use-pixmap flag (X device) */
 
-FIXNUM FF_ID(pgsupm, PGSUPM)(FIXNUM *flg)
+FIXNUM FF_ID(pgsupm, PGSUPM)(FIXNUM *sflg)
    {FIXNUM rv;
 
-    PG_set_use_pixmap(*flg);
+    PG_set_use_pixmap(*sflg);
 
     rv = TRUE;
 
@@ -561,10 +562,10 @@ FIXNUM FF_ID(pgsupm, PGSUPM)(FIXNUM *flg)
 
 /* PGSRAT - set a graph's rendering attributes */
 
-FIXNUM FF_ID(pgsrat, PGSRAT)(FIXNUM *grid,
-                                FIXNUM *pn, char *name,
-                                FIXNUM *pt, char *type,
-                                char *val)
+FIXNUM FF_ID(pgsrat, PGSRAT)(FIXNUM *sgid,
+			     FIXNUM *sncn, char *name,
+			     FIXNUM *snct, char *type,
+			     char *val)
    {int id;
     FIXNUM rv;
     long n;
@@ -572,10 +573,10 @@ FIXNUM FF_ID(pgsrat, PGSRAT)(FIXNUM *grid,
     pcons *info;
     PG_graph *g;
 
-    g = SC_GET_POINTER(PG_graph, *grid);
+    g = SC_GET_POINTER(PG_graph, *sgid);
 
-    SC_FORTRAN_STR_C(lname, name, *pn);
-    SC_FORTRAN_STR_C(ltype, type, *pt);
+    SC_FORTRAN_STR_C(lname, name, *sncn);
+    SC_FORTRAN_STR_C(ltype, type, *snct);
 
     id = SC_type_id(ltype, FALSE);
 
@@ -609,16 +610,16 @@ FIXNUM FF_ID(pgsrat, PGSRAT)(FIXNUM *grid,
 
 /* PGSRLM - set a graph's range limits */
 
-FIXNUM FF_ID(pgsrlm, PGSRLM)(FIXNUM *grid, FIXNUM *pn, double *v)
+FIXNUM FF_ID(pgsrlm, PGSRLM)(FIXNUM *sgid, FIXNUM *sn, double *av)
    {PG_graph *g;
     long n;
     double *pt;
 
-    g = SC_GET_POINTER(PG_graph, *grid);
-    n = *pn;
+    g = SC_GET_POINTER(PG_graph, *sgid);
+    n = *sn;
 
     pt = CMAKE_N(double, n);
-    memcpy(pt, v, n*sizeof(double));
+    memcpy(pt, av, n*sizeof(double));
 
     PM_set_limits(g->f->range, pt);
 
@@ -629,15 +630,15 @@ FIXNUM FF_ID(pgsrlm, PGSRLM)(FIXNUM *grid, FIXNUM *pn, double *v)
 
 /* PGSVLM - set a graph's viewport limits */
 
-FIXNUM FF_ID(pgsvlm, PGSVLM)(FIXNUM *grid, double *v)
+FIXNUM FF_ID(pgsvlm, PGSVLM)(FIXNUM *sgid, double *av)
    {FIXNUM rv;
     double *pv;
     PG_graph *g;
 
-    g = SC_GET_POINTER(PG_graph, *grid);
+    g = SC_GET_POINTER(PG_graph, *sgid);
 
     pv = CMAKE_N(double, 4);
-    memcpy(pv, v, 4*sizeof(double));
+    memcpy(pv, av, 4*sizeof(double));
 
     PG_set_attrs_graph(g,
 		       "VIEW-PORT", SC_DOUBLE_I, TRUE, pv,

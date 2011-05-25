@@ -19,13 +19,13 @@
 /* PAMCON - give FORTRAN routines access to the database
  *        - via pointers
  *        -   NAME is the package name
- *        -   PVN is the array of variable names
- *        -   PP is the array of pointers to connect
- *        -   PN is the number of variables to connect
+ *        -   AVN is the array of variable names
+ *        -   AP is the array of pointers to connect
+ *        -   SN is the number of variables to connect
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(pamcon, PAMCON)(FIXNUM *pnc, char **pvn, void **pp, FIXNUM *pn)
+FIXNUM FF_ID(pamcon, PAMCON)(FIXNUM *anc, char **avn, void **ap, FIXNUM *sn)
    {int i, n;
     char t[MAXLINE];
     void **ptr;
@@ -34,11 +34,11 @@ FIXNUM FF_ID(pamcon, PAMCON)(FIXNUM *pnc, char **pvn, void **pp, FIXNUM *pn)
     pck = PA_current_package();
     SC_ASSERT(pck != NULL);
 
-    n = *pn;
+    n = *sn;
     for (i = 0; i < n; i++)
-        {SC_strncpy(t, MAXLINE, pvn[i], pnc[i]);
+        {SC_strncpy(t, MAXLINE, avn[i], anc[i]);
 
-         ptr = pp + i;
+         ptr = ap + i;
          PA_get_access(ptr, t, -1L, 0L, TRUE);};
 
     return(TRUE);}
@@ -50,12 +50,12 @@ FIXNUM FF_ID(pamcon, PAMCON)(FIXNUM *pnc, char **pvn, void **pp, FIXNUM *pn)
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(pantrn, PANTRN)(void *pv, FIXNUM *pnc, char *vname)
+FIXNUM FF_ID(pantrn, PANTRN)(void *av, FIXNUM *sncn, char *vname)
    {char t[MAXLINE];
 
-    SC_FORTRAN_STR_C(t, vname, *pnc);
+    SC_FORTRAN_STR_C(t, vname, *sncn);
 
-    PA_intern(pv, t);
+    PA_intern(av, t);
 
     return(TRUE);}
 
@@ -66,13 +66,13 @@ FIXNUM FF_ID(pantrn, PANTRN)(void *pv, FIXNUM *pnc, char *vname)
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(paconn, PACONN)(void **pv, FIXNUM *pnc, char *vname,
-			     FIXNUM *pf)
+FIXNUM FF_ID(paconn, PACONN)(void **av, FIXNUM *sncn, char *vname,
+			     FIXNUM *sf)
    {char t[MAXLINE];
 
-    SC_FORTRAN_STR_C(t, vname, *pnc);
+    SC_FORTRAN_STR_C(t, vname, *sncn);
 
-    PA_get_access(pv, t, -1L, 0L, *pf);
+    PA_get_access(av, t, -1L, 0L, *sf);
 
     return(TRUE);}
 
@@ -83,12 +83,12 @@ FIXNUM FF_ID(paconn, PACONN)(void **pv, FIXNUM *pnc, char *vname,
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(padcon, PADCON)(void **pv, FIXNUM *pnc, char *vname)
+FIXNUM FF_ID(padcon, PADCON)(void **av, FIXNUM *sncn, char *vname)
    {char t[MAXLINE], s[MAXLINE];
 
-    SC_FORTRAN_STR_C(t, vname, *pnc);
+    SC_FORTRAN_STR_C(t, vname, *sncn);
 
-    PA_rel_access(pv, s, -1L, 0L);
+    PA_rel_access(av, s, -1L, 0L);
 
     return(TRUE);}
 
@@ -100,13 +100,13 @@ FIXNUM FF_ID(padcon, PADCON)(void **pv, FIXNUM *pnc, char *vname)
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(paloca, PALOCA)(void **pv, FIXNUM *pbpi, FIXNUM *pn, ...)
+FIXNUM FF_ID(paloca, PALOCA)(void **av, FIXNUM *sbpi, FIXNUM *sn, ...)
    {long i, n, size;
     FIXNUM *dim;
 
-    SC_VA_START(pn);
+    SC_VA_START(sn);
 
-    n    = *pn;
+    n    = *sn;
     size = 1L;
     for (i = 0L; i < n; i++)
         {dim   = SC_VA_ARG(FIXNUM *);
@@ -114,7 +114,7 @@ FIXNUM FF_ID(paloca, PALOCA)(void **pv, FIXNUM *pbpi, FIXNUM *pn, ...)
 
     SC_VA_END;
 
-    *pv = CMAKE_N(char, size*(*pbpi));
+    *av = CMAKE_N(char, size*(*sbpi));
 
     return(TRUE);}
 
@@ -125,21 +125,21 @@ FIXNUM FF_ID(paloca, PALOCA)(void **pv, FIXNUM *pbpi, FIXNUM *pn, ...)
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(palloc, PALLOC)(void **pv, FIXNUM *pnc,
-			     char *vname, FIXNUM *pf, ...)
+FIXNUM FF_ID(palloc, PALLOC)(void **av, FIXNUM *sncn,
+			     char *vname, FIXNUM *sf, ...)
    {char s[MAXLINE];
     int *pdima;
     PA_variable *pp;
     dimdes *dims, *pd;
     PA_dimens *vdims, *pvd;
 
-    SC_FORTRAN_STR_C(s, vname, *pnc);
+    SC_FORTRAN_STR_C(s, vname, *sncn);
 
     pp = PA_inquire_variable(s);
     PA_ERR(pp == NULL,
            "VARIABLE %s NOT IN DATABASE - PALLOC", vname);
 
-    SC_VA_START(pf);
+    SC_VA_START(sf);
 
 /* GOTCHA: there is real trouble if a sizeof(FIXNUM) != sizeof(int)
  *         FORTRAN naturally uses FIXNUM as ints
@@ -185,7 +185,7 @@ FIXNUM FF_ID(palloc, PALLOC)(void **pv, FIXNUM *pnc,
 
     SC_VA_END;
 
-    PA_get_access(pv, s, -1L, 0L, *pf);
+    PA_get_access(av, s, -1L, 0L, *sf);
 
     return(TRUE);}
 
@@ -196,10 +196,10 @@ FIXNUM FF_ID(palloc, PALLOC)(void **pv, FIXNUM *pnc,
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(paspck, PASPCK)(FIXNUM *pnc, char *pname)
+FIXNUM FF_ID(paspck, PASPCK)(FIXNUM *sncn, char *pname)
    {char t[MAXLINE];
 
-    SC_FORTRAN_STR_C(t, pname, *pnc);
+    SC_FORTRAN_STR_C(t, pname, *sncn);
 
     PA_control_set(t);
 
@@ -210,10 +210,10 @@ FIXNUM FF_ID(paspck, PASPCK)(FIXNUM *pnc, char *pname)
 
 /* PAERR - handle errors */
 
-void FF_ID(paerr, PAERR)(FIXNUM *pnc, char *pname)
+void FF_ID(paerr, PAERR)(FIXNUM *sncn, char *pname)
    {char t[MAXLINE];
 
-    SC_FORTRAN_STR_C(t, pname, *pnc);
+    SC_FORTRAN_STR_C(t, pname, *sncn);
 
     PA_error(t);}
 
@@ -222,10 +222,10 @@ void FF_ID(paerr, PAERR)(FIXNUM *pnc, char *pname)
 
 /* PAGDOF - get the file default offset */
 
-void FF_ID(pagdof, PAGDOF)(FIXNUM *pd)
+void FF_ID(pagdof, PAGDOF)(FIXNUM *sd)
    {
 
-    *pd = PA_get_default_offset();
+    *sd = PA_get_default_offset();
 
     return;}
 
@@ -234,10 +234,10 @@ void FF_ID(pagdof, PAGDOF)(FIXNUM *pd)
 
 /* PASDOF - set the file default offset */
 
-void FF_ID(pasdof, PASDOF)(FIXNUM *pd)
+void FF_ID(pasdof, PASDOF)(FIXNUM *sd)
    {
 
-    PA_set_default_offset(*pd);
+    PA_set_default_offset(*sd);
 
     return;}
 
@@ -246,12 +246,12 @@ void FF_ID(pasdof, PASDOF)(FIXNUM *pd)
 
 /* PASEQV - set an equivalenced value */
 
-void FF_ID(paseqv, PASEQV)(FIXNUM *pnc, char *name, void *vl)
+void FF_ID(paseqv, PASEQV)(FIXNUM *sncn, char *name, void *avl)
    {char t[MAXLINE];
 
-    SC_FORTRAN_STR_C(t, name, *pnc);
+    SC_FORTRAN_STR_C(t, name, *sncn);
 
-    PA_set_equiv(t, vl);
+    PA_set_equiv(t, avl);
 
     return;}
 
@@ -260,12 +260,12 @@ void FF_ID(paseqv, PASEQV)(FIXNUM *pnc, char *name, void *vl)
 
 /* PADEQV - define an equivalence */
 
-void FF_ID(padeqv, PADEQV)(void *vr, FIXNUM *pnc, char *name)
+void FF_ID(padeqv, PADEQV)(void *avr, FIXNUM *sncn, char *name)
    {char t[MAXLINE];
 
-    SC_FORTRAN_STR_C(t, name, *pnc);
+    SC_FORTRAN_STR_C(t, name, *sncn);
 
-    PA_equivalence(vr, t);
+    PA_equivalence(avr, t);
 
     return;}
 

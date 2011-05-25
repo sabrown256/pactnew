@@ -822,13 +822,11 @@ void PG_contour_plot(PG_device *dev, PG_graph *data, ...)
 
 /* PGCLEV - compute contour levels */
 
-FIXNUM FF_ID(pgclev, PGCLEV)(double *lev, FIXNUM *pn,
-			     double *pfn, double *pfx, double *pr)
+FIXNUM FF_ID(pgclev, PGCLEV)(double *lev, FIXNUM *sn,
+			     double *sfn, double *sfx, double *sr)
    {FIXNUM rv;
     
-    rv = PG_contour_levels(lev, (int) *pn,
-			   (double) *pfn, (double) *pfx,
-			   (double) *pr);
+    rv = PG_contour_levels(lev, (int) *sn, *sfn, *sfx, *sr);
 
     return(rv);}
 
@@ -837,26 +835,27 @@ FIXNUM FF_ID(pgclev, PGCLEV)(double *lev, FIXNUM *pn,
 
 /* PGPLCN - low level contour plot routine */
 
-FIXNUM FF_ID(pgplcn, PGPLCN)(FIXNUM *devid, double *px, double *py,
-			     double *pa, double *pl, FIXNUM *pkx, FIXNUM *plx,
-			     FIXNUM *pnl, FIXNUM *pli, FIXNUM *pal)
+FIXNUM FF_ID(pgplcn, PGPLCN)(FIXNUM *sdid, double *ax, double *ay,
+			     double *aa, double *al,
+			     FIXNUM *skx, FIXNUM *slx,
+			     FIXNUM *snl, FIXNUM *sli, FIXNUM *said)
    {int maxes[2];
     FIXNUM rv;
     double *x[2];
     pcons *alst;
     PG_device *dev;
 
-    maxes[0] = *pkx;
-    maxes[1] = *plx;
+    maxes[0] = *skx;
+    maxes[1] = *slx;
 
-    dev  = SC_GET_POINTER(PG_device, *devid);
-    alst = SC_GET_POINTER(pcons, *pal);
+    dev  = SC_GET_POINTER(PG_device, *sdid);
+    alst = SC_GET_POINTER(pcons, *said);
 
-    x[0] = px;
-    x[1] = py;
+    x[0] = ax;
+    x[1] = ay;
 
-    PG_draw_iso_nc_lr(dev, pa, 2, x, pl,
-                      (int) *pnl, (int) *pli, (void *) maxes, alst);
+    PG_draw_iso_nc_lr(dev, aa, 2, x, al,
+                      (int) *snl, (int) *sli, (void *) maxes, alst);
 
     rv = TRUE;
 

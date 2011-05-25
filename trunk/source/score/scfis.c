@@ -49,12 +49,12 @@ int _SC_strlen(char *s, int nx)
  *        - NX is the length of the character array
  */
 
-FIXNUM FF_ID(scstln, SCSTLN)(char *s, FIXNUM *pnx)
+FIXNUM FF_ID(scstln, SCSTLN)(char *s, FIXNUM *snx)
    {int n, nx;
     char *t;
 
     t  = s;
-    nx = *pnx;
+    nx = *snx;
 
     n = _SC_strlen(t, nx);
 
@@ -68,13 +68,13 @@ FIXNUM FF_ID(scstln, SCSTLN)(char *s, FIXNUM *pnx)
  *        - and points S to the next element in the string
  */
 
-void FF_ID(scsttk, SCSTTK)(FIXNUM *pnc, char *d,  char *s,
-			      FIXNUM pnd, char *dl)
+void FF_ID(scsttk, SCSTTK)(FIXNUM *sncs, char *d, char *s,
+			   FIXNUM sndl, char *dl)
    {int j, n, nc, flag;
     char *dst, *src, *delim;
     char c;
 
-    nc    = *pnc;
+    nc    = *sncs;
     dst   = d;
     src   = s;
     delim = dl;
@@ -113,7 +113,7 @@ void FF_ID(scsttk, SCSTTK)(FIXNUM *pnc, char *d,  char *s,
  *        - implied in the argument list
  */
 
-void FF_ID(scspnt, SCSPNT)(FIXNUM *pnc, char *d, char *f, ...)
+void FF_ID(scspnt, SCSPNT)(FIXNUM *sncd, char *d, char *f, ...)
    {int c, nc, nd;
     char local[MAXLINE], tb[10], ce;
     char *fmt, *le, *lb, *pt, *dst, *s;
@@ -121,7 +121,7 @@ void FF_ID(scspnt, SCSPNT)(FIXNUM *pnc, char *d, char *f, ...)
     double *dv;
     char *sv;
 
-    nc     = (int) *pnc;
+    nc     = (int) *sncd;
     fmt    = f;
     dst    = d;
     dst[0] = '\0';

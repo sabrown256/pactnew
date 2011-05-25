@@ -11,8 +11,8 @@
 #include "panace.h"
 
 typedef int (*PFTest)(char *base, char *seq, char *prev, char *mode,
-		       long size, double time, int indx, int iter,
-		       int steps, int flush);
+		      long size, double time, int indx, int iter,
+		      int steps, int flush);
 
 typedef struct s_dt_2 dt_2;
 
@@ -27,8 +27,7 @@ int
  debug_mode;
 
 FIXNUM
- FF_ID(pathop, PATHOP)(FIXNUM *pnf, char *fname,
-		       FIXNUM *pnm, char *fmode,
+ FF_ID(pathop, PATHOP)(FIXNUM *pnf, char *fname, char *fmode,
 		       FIXNUM *psz, FIXNUM *pnp, char *fprev),
  FF_ID(pabrec, PABREC)(FIXNUM *fileid, FIXNUM *pnf,
 		       char *fname, FIXNUM *pnt,
@@ -729,9 +728,8 @@ static int test_4(char *base, char *seq, char *prev, char *mode,
     else
        np = 0;
     sz     = size;
-    fileid = FF_ID(pathop, PATHOP)(&nc, family,
-				      &nm, mode,
-				      &sz, &np, prev);
+    fileid = FF_ID(pathop, PATHOP)(&nc, family, mode,
+				   &sz, &np, prev);
     file = SC_GET_POINTER(PDBfile, fileid);
     if (file == NULL)
        {PRINT(STDOUT, "OPEN FAILED - TEST_4\n");
@@ -760,9 +758,9 @@ static int test_4(char *base, char *seq, char *prev, char *mode,
 
         nd = strlen(members[0]);
         recid = FF_ID(pabrec, PABREC)(&fileid,
-					 &nc, thname,
-					 &nt, thtype,
-					 &nd, members[0]);
+				      &nc, thname,
+				      &nt, thtype,
+				      &nd, members[0]);
         if (recid == 0L)
            {PRINT(STDOUT, "PABREC FAILED - TEST_4\n");
             exit(1);};
@@ -774,8 +772,8 @@ static int test_4(char *base, char *seq, char *prev, char *mode,
 	     else
 	        nl = 0;
 	     if (!FF_ID(paarec, PAAREC)(&fileid, &recid,
-					   &nm, members[i],
-					   &nl, labels[i-1]))
+					&nm, members[i],
+					&nl, labels[i-1]))
 	        {PRINT(STDOUT, "PAAREC FAILED - TEST_4\n");
 		 exit(1);};};
 
@@ -785,9 +783,9 @@ static int test_4(char *base, char *seq, char *prev, char *mode,
     else
        {nm = 0;
         FF_ID(pagrid, PAGRID)(&fileid, &nm,
-				 &nc, thname,
-				 &nt, thtype,
-				 &recid);
+			      &nc, thname,
+			      &nt, thtype,
+			      &recid);
 	if (recid == 0L)
 	   {PRINT(STDOUT, "PAGRID FAILED - TEST_4\n");
 	    exit(1);};};

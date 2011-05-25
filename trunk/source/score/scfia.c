@@ -272,16 +272,16 @@ FIXNUM FF_ID(scftcs, SCFTCS)(char *out, char *in, FIXNUM *snci)
 
 /* SCADVN - FORTRAN interface to SC_advance_name */
 
-FIXNUM FF_ID(scadvn, SCADVN)(FIXNUM *pnc, char *name)
+FIXNUM FF_ID(scadvn, SCADVN)(FIXNUM *sncn, char *name)
    {int n;
     FIXNUM rv;
     char bf[MAXLINE];
 
-    n = *pnc;
+    n = *sncn;
 
     SC_FORTRAN_STR_C(bf, name, n);
     SC_advance_name(bf);
-    SC_strncpy(name, *pnc, bf, n);
+    SC_strncpy(name, *sncn, bf, n);
 
     rv = TRUE;
 
@@ -318,16 +318,15 @@ static SC_lexical_stream *SC_lex_str_ptr(int strid)
  *        - return -1 otherwise
  */
 
-FIXNUM FF_ID(scopls, SCOPLS)(FIXNUM *pnchr, char *name,
-			     FIXNUM *pinbs, FIXNUM *pstrbs,
-			     PFInt scan, FIXNUM *pfl)
+FIXNUM FF_ID(scopls, SCOPLS)(FIXNUM *sncn, char *name,
+			     PFInt scan, FIXNUM *sfl)
    {FIXNUM rv;
     char s[MAXLINE];
     SC_lexical_stream *str;
 
-    SC_FORTRAN_STR_C(s, name, *pnchr);
+    SC_FORTRAN_STR_C(s, name, *sncn);
 
-    if (*pfl == 0)
+    if (*sfl == 0)
        scan = DEFAULT_SCANNER;
 
     if (strcmp(s, "tty") == 0)
@@ -351,12 +350,12 @@ FIXNUM FF_ID(scopls, SCOPLS)(FIXNUM *pnchr, char *name,
  *        - return TRUE if successful and FALSE otherwise
  */
 
-FIXNUM FF_ID(scclls, SCCLLS)(FIXNUM *strid)
+FIXNUM FF_ID(scclls, SCCLLS)(FIXNUM *sid)
    {int id;
     FIXNUM rv;
     SC_lexical_stream *str, *v;
 
-    id = *strid;
+    id = *sid;
     v  = NULL;
 
     str = SC_lex_str_ptr(id);
@@ -376,27 +375,27 @@ FIXNUM FF_ID(scclls, SCCLLS)(FIXNUM *strid)
  *        - return TRUE if successful and FALSE otherwise
  */
 
-FIXNUM FF_ID(scrdls, SCRDLS)(FIXNUM *strid, FIXNUM *pnc, char *ps)
+FIXNUM FF_ID(scrdls, SCRDLS)(FIXNUM *sid, FIXNUM *sncs, char *ps)
    {int n, nr, ni;
     FIXNUM rv;
     char *s;
     SC_lexical_stream *str;
 
-    str = SC_lex_str_ptr((int) *strid);
+    str = SC_lex_str_ptr((int) *sid);
     if (str != NULL)
        {s = str->in_bf;
 	n = SC_arrlen(s);
 	GETLN(s, n, str->file);
 
-	ni = *pnc;
+	ni = *sncs;
 	nr = strlen(s);    
 
 	ni = min(ni, nr);
 
 	memset(ps, ' ', ni);
-	SC_strncpy(ps, *pnc, s, ni);
+	SC_strncpy(ps, *sncs, s, ni);
 
-	*pnc = ni;};
+	*sncs = ni;};
 
     rv = TRUE;
 
@@ -413,15 +412,15 @@ FIXNUM FF_ID(scrdls, SCRDLS)(FIXNUM *strid, FIXNUM *pnc, char *ps)
  *        - and must be supplied by a call to SCRDLS
  *        - Arguments:
  *        - 
- *        -    STRID  - id number of lexical stream (scalar)
- *        -    PMXTOK - maximum number of tokens to be returned (scalar)
- *        -    PWIDTH - character field width (e.g. char*8 => 8) (scalar)
- *        -    TOK    - character array char*PWIDTH(PMXTOK) for returned
+ *        -    SID    - id number of lexical stream (scalar)
+ *        -    SMXTOK - maximum number of tokens to be returned (scalar)
+ *        -    SWIDTH - character field width (e.g. char*8 => 8) (scalar)
+ *        -    TOK    - character array char*SWIDTH(SMXTOK) for returned
  *        -           - tokens (array)
- *        -    PNTOK  - actual number of tokens available (scalar)
- *        -    NCTOK  - character length of each non-numeric token (array)
- *        -    IXTOK  - index in TOK for each non-numeric token (array)
- *        -    TOKTYP - type for each token (array)
+ *        -    SNTOK  - actual number of tokens available (scalar)
+ *        -    ANCTOK - character length of each non-numeric token (array)
+ *        -    AIXTOK - index in TOK for each non-numeric token (array)
+ *        -    ATOKTY - type for each token (array)
  *        -           - default scanner uses:
  *        -           -  TYPE   NAME         EXAMPLE
  *        -           -     1   DELIMITER    & ( ) , : < = > _ |
@@ -433,14 +432,14 @@ FIXNUM FF_ID(scrdls, SCRDLS)(FIXNUM *strid, FIXNUM *pnc, char *ps)
  *        -           -     7   OPERAND      .and.
  *        -           -     8   STRING       "foo"
  *        -           -  1000   HOLLERITH    3hFOO
- *        -    TOKVAL - numerical value for numerical tokens as REAL (array)
+ *        -    ATOKVL - numerical value for numerical tokens as REAL (array)
  *        -
  *        - return TRUE if successful and FALSE otherwise
  */
 
-FIXNUM FF_ID(scscan, SCSCAN)(FIXNUM *strid, FIXNUM *pmxtok, FIXNUM *pwidth,
-			     char *tok, FIXNUM *pntok, FIXNUM *nctok,
-			     FIXNUM *ixtok, FIXNUM *toktyp, double *tokval)
+FIXNUM FF_ID(scscan, SCSCAN)(FIXNUM *sid, FIXNUM *smxtok, FIXNUM *swidth,
+			     char *tok, FIXNUM *sntok, FIXNUM *anctok,
+			     FIXNUM *aixtok, FIXNUM *atokty, double *atokvl)
    {int i, indx, nc;
     int n_tok, n_tok_max, width;
     FIXNUM rv;
@@ -449,32 +448,32 @@ FIXNUM FF_ID(scscan, SCSCAN)(FIXNUM *strid, FIXNUM *pmxtok, FIXNUM *pwidth,
     char *s;
     SC_lexical_stream *str;
 
-    str = SC_lex_str_ptr((int) *strid);
+    str = SC_lex_str_ptr((int) *sid);
     if (str != NULL)
        {SC_scan(str, FALSE);
 
 	n_tok  = str->n_tokens;
-	*pntok = (FIXNUM) n_tok;
+	*sntok = (FIXNUM) n_tok;
 
-	width     = *pwidth;
-	n_tok_max = *pmxtok;
+	width     = *swidth;
+	n_tok_max = *smxtok;
 	n_tok     = min(n_tok, n_tok_max);
 	for (indx = 0, i = 0; i < n_tok; i++)
-	    {toktyp[i] = SC_TOKEN_TYPE(str, i);
-	     ixtok[i]  = 0;
-	     nctok[i]  = 0;
+	    {atokty[i] = SC_TOKEN_TYPE(str, i);
+	     aixtok[i]  = 0;
+	     anctok[i]  = 0;
 
-	     switch (toktyp[i])
+	     switch (atokty[i])
 	        {case SC_DINT_TOK :
 		 case SC_HINT_TOK :
 		 case SC_OINT_TOK :
 		      lval = SC_TOKEN_INTEGER(str, i);
-		      tokval[i] = lval;
+		      atokvl[i] = lval;
 		      break;
 
 		 case SC_REAL_TOK :
 		      dval = SC_TOKEN_REAL(str, i);
-		      tokval[i] = dval;
+		      atokvl[i] = dval;
 		      break;
    
 		 case SC_STRING_TOK :
@@ -483,8 +482,8 @@ FIXNUM FF_ID(scscan, SCSCAN)(FIXNUM *strid, FIXNUM *pmxtok, FIXNUM *pwidth,
 		      strncpy(tok + indx*width,
 			      s, nc);
 
-		      ixtok[i] = indx;
-		      nctok[i] = nc;
+		      aixtok[i] = indx;
+		      anctok[i] = nc;
 
 		      indx += (nc + width - 1)/width;
 		      break;
@@ -509,38 +508,38 @@ FIXNUM FF_ID(scscan, SCSCAN)(FIXNUM *strid, FIXNUM *pmxtok, FIXNUM *pwidth,
  *        - PTYPE names the type and has one less indirection than PV
  */
 
-FIXNUM FF_ID(scchal, SCCHAL)(FIXNUM *pal, FIXNUM *nn, char *pname,
-			     FIXNUM *nt, char *ptype, FIXNUM *nv,
-			     void *pv)
+FIXNUM FF_ID(scchal, SCCHAL)(FIXNUM *sal, FIXNUM *sncn, char *pname,
+			     FIXNUM *scnt, char *ptype, FIXNUM *snv,
+			     void *av)
    {long nb, ni;
     FIXNUM rv;
     char lname[MAXLINE], ltype[MAXLINE];
     void *val, *p;
     pcons *pc;
 
-    if (*pal == 0)
+    if (*sal == 0)
        pc = NULL;
     else
-       pc = SC_GET_POINTER(pcons, *pal);
+       pc = SC_GET_POINTER(pcons, *sal);
 
-    SC_FORTRAN_STR_C(lname, pname, *nn);
-    SC_FORTRAN_STR_C(ltype, ptype, *nt);
+    SC_FORTRAN_STR_C(lname, pname, *sncn);
+    SC_FORTRAN_STR_C(ltype, ptype, *scnt);
 
 /* copy the incoming values */
     nb  = SIZEOF(ltype);
-    ni  = *nv;
+    ni  = *snv;
     val = CMAKE_N(char, ni*nb);
-    memcpy(val, pv, ni*nb);
+    memcpy(val, av, ni*nb);
 
 /* add the extra level of indirection needed */
     SC_strcat(ltype, MAXLINE, " *");
 
     pc = SC_change_alist(pc, lname, ltype, val);
-    if (*pal != 0)
-       {p = SC_DEL_POINTER(void, *pal);
+    if (*sal != 0)
+       {p = SC_DEL_POINTER(void, *sal);
 	SC_ASSERT(p != NULL);};
 
-    *pal = (FIXNUM) SC_ADD_POINTER(pc);
+    *sal = (FIXNUM) SC_ADD_POINTER(pc);
 
     rv = TRUE;
 
@@ -551,26 +550,26 @@ FIXNUM FF_ID(scchal, SCCHAL)(FIXNUM *pal, FIXNUM *nn, char *pname,
 
 /* SCRMAL - remove an item from the given association list */
 
-FIXNUM FF_ID(scrmal, SCRMAL)(FIXNUM *pal, FIXNUM *nn, char *pname)
+FIXNUM FF_ID(scrmal, SCRMAL)(FIXNUM *sal, FIXNUM *sncn, char *pname)
    {FIXNUM rv;
     char lname[MAXLINE];
     pcons *pc;
     void *p;
 
-    pc = SC_GET_POINTER(pcons, *pal);
+    pc = SC_GET_POINTER(pcons, *sal);
 
 /* cheap insurance */
     if (pc == NULL)
        rv = FALSE;
 
     else
-       {SC_FORTRAN_STR_C(lname, pname, *nn);
+       {SC_FORTRAN_STR_C(lname, pname, *sncn);
 
 	pc = SC_rem_alist(pc, lname);
-	p  = SC_DEL_POINTER(void, *pal);
+	p  = SC_DEL_POINTER(void, *sal);
 	SC_ASSERT(p != NULL);
 
-	*pal = (FIXNUM) SC_ADD_POINTER(pc);
+	*sal = (FIXNUM) SC_ADD_POINTER(pc);
 
 	rv = TRUE;};
 
@@ -581,24 +580,24 @@ FIXNUM FF_ID(scrmal, SCRMAL)(FIXNUM *pal, FIXNUM *nn, char *pname)
 
 /* SCRLAL - release an association list */
 
-FIXNUM FF_ID(scrlal, SCRLAL)(FIXNUM *pal, FIXNUM *pl)
+FIXNUM FF_ID(scrlal, SCRLAL)(FIXNUM *sal, FIXNUM *al)
    {FIXNUM rv;
     pcons *pc;
     void *p;
 
-    pc = SC_GET_POINTER(pcons, *pal);
+    pc = SC_GET_POINTER(pcons, *sal);
 
 /* cheap insurance */
     if (pc == NULL)
        rv = FALSE;
 
     else
-       {SC_free_alist(pc, *pl);
+       {SC_free_alist(pc, *al);
 
-	p = SC_DEL_POINTER(void, *pal);    
+	p = SC_DEL_POINTER(void, *sal);    
 	SC_ASSERT(p != NULL);
 
-	*pal = 0L;
+	*sal = 0L;
 
 	rv = TRUE;};
 
@@ -607,23 +606,23 @@ FIXNUM FF_ID(scrlal, SCRLAL)(FIXNUM *pal, FIXNUM *pl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SCAPAL - append the contents of PAL2 to PAL1 */
+/* SCAPAL - append the contents of SAL2 to SAL1 */
 
-FIXNUM FF_ID(scapal, SCAPAL)(FIXNUM *pal1, FIXNUM *pal2)
+FIXNUM FF_ID(scapal, SCAPAL)(FIXNUM *sal1, FIXNUM *sal2)
    {FIXNUM rv;
     pcons *pc1, *pc2;
     void *p;
 
-    pc1 = SC_GET_POINTER(pcons, *pal1);
-    pc2 = SC_GET_POINTER(pcons, *pal2);
+    pc1 = SC_GET_POINTER(pcons, *sal1);
+    pc2 = SC_GET_POINTER(pcons, *sal2);
 
     pc2 = SC_copy_alist(pc2);
     pc1 = SC_append_alist(pc1, pc2);
 
-    p = SC_DEL_POINTER(void, *pal1);
+    p = SC_DEL_POINTER(void, *sal1);
     SC_ASSERT(p != NULL);
 
-    *pal1 = (FIXNUM) SC_ADD_POINTER(pc1);
+    *sal1 = (FIXNUM) SC_ADD_POINTER(pc1);
 
     rv = TRUE;
 
@@ -639,10 +638,10 @@ FIXNUM FF_ID(scapal, SCAPAL)(FIXNUM *pal1, FIXNUM *pal2)
  *          SINCE THE FIRST CALL
  */
 
-FIXNUM FF_ID(scctim, SCCTIM)(double *ptim)
+FIXNUM FF_ID(scctim, SCCTIM)(double *stim)
    {FIXNUM rv;
 
-    *ptim = (double) SC_cpu_time();
+    *stim = (double) SC_cpu_time();
 
     rv = TRUE;
 
@@ -655,10 +654,10 @@ FIXNUM FF_ID(scctim, SCCTIM)(double *ptim)
  *          SINCE THE FIRST CALL
  */
 
-FIXNUM FF_ID(scwtim, SCWTIM)(double *ptim)
+FIXNUM FF_ID(scwtim, SCWTIM)(double *stim)
    {FIXNUM rv;
 
-    *ptim = (double) SC_wall_clock_time();
+    *stim = (double) SC_wall_clock_time();
 
     rv = TRUE;
 
@@ -671,19 +670,19 @@ FIXNUM FF_ID(scwtim, SCWTIM)(double *ptim)
  *          ANSI function ctime
  */
 
-FIXNUM FF_ID(scdate, SCDATE)(FIXNUM *pnc, char *date)
+FIXNUM FF_ID(scdate, SCDATE)(FIXNUM *sncd, char *date)
    {int nc, lc;
     FIXNUM rv;
     char *cdate;
 
-    nc    = *pnc;
+    nc    = *sncd;
     cdate = SC_date();
     lc    = strlen(cdate);    
 
-    SC_strncpy(date, *pnc, cdate, nc);
+    SC_strncpy(date, *sncd, cdate, nc);
     CFREE(cdate);
 
-    *pnc = lc;
+    *sncd = lc;
 
     rv = TRUE;
 

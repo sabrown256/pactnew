@@ -532,11 +532,11 @@ void SC_do_tasks_f(PFInt fnc, void **pa, int *pnt, int *poff, int *pon)
 
 /*--------------------------------------------------------------------------*/
 
-FIXNUM FF_ID(scinth, SCINTH)(FIXNUM *pnt, PFTid tid)
+FIXNUM FF_ID(scinth, SCINTH)(FIXNUM *snt, PFTid tid)
    {int nt;
     FIXNUM rv;
 
-    nt = *pnt;
+    nt = *snt;
 
     SC_init_threads(nt, tid);
 

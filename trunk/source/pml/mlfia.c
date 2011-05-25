@@ -15,12 +15,14 @@
 
 /* PMSZFT - return the largest M such that 2^M <= N  */
 
-FIXNUM FF_ID(pmszft, PMSZFT)(FIXNUM *pn)
-   {
+FIXNUM FF_ID(pmszft, PMSZFT)(FIXNUM *sn)
+   {FIXNUM rv;
 
-    *pn = (FIXNUM) PM_next_exp_two((int) *pn);
+    *sn = (FIXNUM) PM_next_exp_two((int) *sn);
 
-    return((FIXNUM) TRUE);}
+    rv = TRUE;
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -29,29 +31,29 @@ FIXNUM FF_ID(pmszft, PMSZFT)(FIXNUM *pn)
  *        - this a wrapper for PM_fft_sc_real_data
  */
 
-FIXNUM FF_ID(pmrfft, PMRFFT)(double *outyr, double *outyi, double *outx,
-			     FIXNUM *pn, double *inx, double *iny,
-			     double *pxn, double *pxx, FIXNUM *po)
+FIXNUM FF_ID(pmrfft, PMRFFT)(double *aoutyr, double *aoutyi, double *aoutx,
+			     FIXNUM *sn, double *ainx, double *ainy,
+			     double *sxn, double *sxx, FIXNUM *so)
    {int i, n, np, ordr;
     FIXNUM rv;
     double xmn, xmx;
     double *rx;
     complex *cy;
 
-    n    = *pn;
-    xmn  = *pxn;
-    xmx  = *pxx;
-    ordr = *po;
+    n    = *sn;
+    xmn  = *sxn;
+    xmx  = *sxx;
+    ordr = *so;
 
-    if (!PM_fft_sc_real_data(&cy, &rx, inx, iny, n, xmn, xmx, ordr))
+    if (!PM_fft_sc_real_data(&cy, &rx, ainx, ainy, n, xmn, xmx, ordr))
        rv = FALSE;
 
     else
        {np = n + 1;
 	for (i = 0; i < np; i++)
-	    {outyr[i] = PM_REAL_C(cy[i]);
-	     outyi[i] = PM_IMAGINARY_C(cy[i]);
-	     outx[i]  = rx[i];};
+	    {aoutyr[i] = PM_REAL_C(cy[i]);
+	     aoutyi[i] = PM_IMAGINARY_C(cy[i]);
+	     aoutx[i]  = rx[i];};
 
 	CFREE(rx);
 	CFREE(cy);
@@ -67,36 +69,36 @@ FIXNUM FF_ID(pmrfft, PMRFFT)(double *outyr, double *outyi, double *outx,
  *        - this a wrapper for PM_fft_sc_complex_data
  */
 
-FIXNUM FF_ID(pmcfft, PMCFFT)(double *outyr, double *outyi, double *outx,
-				FIXNUM *pn, double *inx, double *inyr,
-				double *inyi, double *pxn, double *pxx,
-				FIXNUM *pf, FIXNUM *po)
+FIXNUM FF_ID(pmcfft, PMCFFT)(double *aoutyr, double *aoutyi, double *aoutx,
+			     FIXNUM *sn, double *ainx, double *ainyr,
+			     double *ainyi, double *sxn, double *sxx,
+			     FIXNUM *sf, FIXNUM *so)
    {int i, n, np, flag, ordr;
     FIXNUM rv;
     double xmn, xmx;
     double *rx;
     complex *cy, *incy;
 
-    n    = *pn;
-    xmn  = *pxn;
-    xmx  = *pxx;
-    flag = *pf;
-    ordr = *po;
+    n    = *sn;
+    xmn  = *sxn;
+    xmx  = *sxx;
+    flag = *sf;
+    ordr = *so;
 
     incy = CMAKE_N(complex, n);
     for (i = 0; i < n; i++)
-        incy[i] = PM_COMPLEX(inyr[i], inyi[i]);
+        incy[i] = PM_COMPLEX(ainyr[i], ainyi[i]);
 
-    if (!PM_fft_sc_complex_data(&cy, &rx, inx, incy, n,
+    if (!PM_fft_sc_complex_data(&cy, &rx, ainx, incy, n,
 				xmn, xmx, flag, ordr))
        rv = FALSE;
 
     else
        {np = n + 1;
 	for (i = 0; i < np; i++)
-	    {outyr[i] = PM_REAL_C(cy[i]);
-	     outyi[i] = PM_IMAGINARY_C(cy[i]);
-	     outx[i]  = rx[i];};
+	    {aoutyr[i] = PM_REAL_C(cy[i]);
+	     aoutyi[i] = PM_IMAGINARY_C(cy[i]);
+	     aoutx[i]  = rx[i];};
 
 	CFREE(rx);
 	CFREE(cy);
@@ -111,10 +113,11 @@ FIXNUM FF_ID(pmcfft, PMCFFT)(double *outyr, double *outyi, double *outx,
 
 /* PMBSET - begin making a set */
 
-FIXNUM FF_ID(pmbset, PMBSET)(FIXNUM *pn, char *fname, FIXNUM *pt,
-				char *ftype, FIXNUM *pcp, FIXNUM *pnd,
-				FIXNUM *pnde, FIXNUM *pmx, FIXNUM *ptp,
-				FIXNUM *inxt)
+FIXNUM FF_ID(pmbset, PMBSET)(FIXNUM *sncn, char *fname,
+			     FIXNUM *snct, char *ftype,
+			     FIXNUM *scp, FIXNUM *snd,
+			     FIXNUM *snde, FIXNUM *amx, FIXNUM *stp,
+			     FIXNUM *sinxt)
    {int i, id, cp, nd, nde, bpi;
     int *maxes;
     long ne, tp, d;
@@ -125,20 +128,20 @@ FIXNUM FF_ID(pmbset, PMBSET)(FIXNUM *pn, char *fname, FIXNUM *pt,
     PM_set *set, *next;
     PM_mesh_topology *top;
 
-    SC_FORTRAN_STR_C(name, fname, *pn);
-    SC_FORTRAN_STR_C(type, ftype, *pt);
+    SC_FORTRAN_STR_C(name, fname, *sncn);
+    SC_FORTRAN_STR_C(type, ftype, *snct);
 
-    next = SC_GET_POINTER(PM_set, *inxt);
-    cp   = *pcp;
-    nd   = *pnd;
-    nde  = *pnde;
-    tp   = *ptp;
+    next = SC_GET_POINTER(PM_set, *sinxt);
+    cp   = *scp;
+    nd   = *snd;
+    nde  = *snde;
+    tp   = *stp;
 
     if (tp == -1)
        {maxes = CMAKE_N(int, nd);
 	ne    = 1L;
         for (i = 0; i < nd; i++)
-	    {d = pmx[i];
+	    {d = amx[i];
 	     maxes[i] = d;
 	     ne *= d;};
         topt = NULL;
@@ -146,7 +149,7 @@ FIXNUM FF_ID(pmbset, PMBSET)(FIXNUM *pn, char *fname, FIXNUM *pt,
 
     else
        {topt  = PM_MESH_TOPOLOGY_P_S;
-        top   = SC_GET_POINTER(PM_mesh_topology, *ptp);
+        top   = SC_GET_POINTER(PM_mesh_topology, *stp);
 	maxes = NULL;
         ne    = top->n_cells[0];};
 
@@ -204,29 +207,33 @@ FIXNUM FF_ID(pmbset, PMBSET)(FIXNUM *pn, char *fname, FIXNUM *pt,
 
 /* PMESET - complete making a set */
 
-FIXNUM FF_ID(pmeset, PMESET)(FIXNUM *iset)
-   {PM_set *set;
+FIXNUM FF_ID(pmeset, PMESET)(FIXNUM *siset)
+   {FIXNUM rv;
+    PM_set *set;
 
-    set = SC_GET_POINTER(PM_set, *iset);
+    set = SC_GET_POINTER(PM_set, *siset);
 
     PM_find_extrema(set);
 
-    return((FIXNUM) TRUE);}
+    rv = TRUE;
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* PMASET - add a component to a set */
 
-FIXNUM FF_ID(pmaset, PMASET)(FIXNUM *iset, FIXNUM *pie, void *px)
+FIXNUM FF_ID(pmaset, PMASET)(FIXNUM *siset, FIXNUM *sie, void *ax)
    {int ie, cp;
+    FIXNUM rv;
     pcons *info;
     void **elem;
     PM_set *set;
     char *s;
 
-    set  = SC_GET_POINTER(PM_set, *iset);
-    ie   = *pie - 1;
+    set  = SC_GET_POINTER(PM_set, *siset);
+    ie   = *sie - 1;
     elem = (void **) set->elements;
     info = (pcons *) set->info;
     SC_assoc_info(info,
@@ -247,20 +254,22 @@ FIXNUM FF_ID(pmaset, PMASET)(FIXNUM *iset, FIXNUM *pie, void *px)
 
 	nv = CMAKE_N(char, ne*bpi);
 	elem[ie] = nv;
-	memcpy(nv, px, ne*bpi);}
+	memcpy(nv, ax, ne*bpi);}
 
     else
-       elem[ie] = px;
+       elem[ie] = ax;
 
-    return((FIXNUM) TRUE);}
+    rv = TRUE;
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* PMMTOP - make a PM_mesh_topology */
 
-FIXNUM FF_ID(pmmtop, PMMTOP)(FIXNUM *pnd, FIXNUM *pnc, FIXNUM *pbp,
-				FIXNUM *pbnd)
+FIXNUM FF_ID(pmmtop, PMMTOP)(FIXNUM *snd, FIXNUM *anc, FIXNUM *abp,
+			     FIXNUM *abnd)
    {int i, j, n, nd, ndp;
     int *nc, *nbp;
     long **bnd, *pbd;
@@ -268,20 +277,20 @@ FIXNUM FF_ID(pmmtop, PMMTOP)(FIXNUM *pnd, FIXNUM *pnc, FIXNUM *pbp,
     FIXNUM *pbs;
     PM_mesh_topology *mt;
     
-    nd  = *pnd;
+    nd  = *snd;
     ndp = nd + 1;
 
 /* setup the number of cells array */
     nc = CMAKE_N(int, ndp);
     for (i = 0; i < ndp; i++)
-        nc[i] = pnc[i];
+        nc[i] = anc[i];
 
 /* setup the number of boundary parameters array */
     nbp = CMAKE_N(int, ndp);
     for (i = 0; i < ndp; i++)
-        nbp[i] = pbp[i];
+        nbp[i] = abp[i];
 
-    pbs = pbnd;
+    pbs = abnd;
     bnd = CMAKE_N(long *, ndp);
     for (i = 1; i < ndp; i++)
         {n = nbp[i]*nc[i];
@@ -310,10 +319,10 @@ FIXNUM FF_ID(pmmtop, PMMTOP)(FIXNUM *pnd, FIXNUM *pnc, FIXNUM *pbp,
 
 /* PMEFPE - enable/disable FPE handling */
 
-void FF_ID(pmefpe, PMEFPE)(FIXNUM *pflg, PFSignal_handler hnd)
+void FF_ID(pmefpe, PMEFPE)(FIXNUM *sflg, PFSignal_handler hnd)
    {int flg;
 
-    flg = *pflg;
+    flg = *sflg;
 
     PM_enable_fpe_n(flg, hnd, NULL);
 
@@ -324,10 +333,10 @@ void FF_ID(pmefpe, PMEFPE)(FIXNUM *pflg, PFSignal_handler hnd)
 
 /* PMFPTF - classify float type wrt NaN */
 
-FIXNUM FF_ID(pmfptf, PMFPTF)(float *pf)
+FIXNUM FF_ID(pmfptf, PMFPTF)(float *sf)
    {FIXNUM rv;
 
-    rv = PM_fp_typef(*pf);
+    rv = PM_fp_typef(*sf);
 
     return(rv);}
 
@@ -336,10 +345,10 @@ FIXNUM FF_ID(pmfptf, PMFPTF)(float *pf)
 
 /* PMFPTD - classify double type wrt NaN */
 
-FIXNUM FF_ID(pmfptd, PMFPTD)(double *pd)
+FIXNUM FF_ID(pmfptd, PMFPTD)(double *sd)
    {FIXNUM rv;
 
-    rv = PM_fp_typed(*pd);
+    rv = PM_fp_typed(*sd);
 
     return(rv);}
 
@@ -348,17 +357,17 @@ FIXNUM FF_ID(pmfptd, PMFPTD)(double *pd)
 
 /* PMFXNF - fix float NaNs */
 
-FIXNUM FF_ID(pmfxnf, PMFXNF)(FIXNUM *pn, float *pf, FIXNUM *pmsk, double *pv)
+FIXNUM FF_ID(pmfxnf, PMFXNF)(FIXNUM *sn, float *sf, FIXNUM *smsk, double *sv)
    {int msk;
     long n;
     FIXNUM rv;
     float v;
 
-    n   = *pn;
-    msk = *pmsk;
-    v   = *pv;
+    n   = *sn;
+    msk = *smsk;
+    v   = *sv;
 
-    rv = PM_fix_nanf(n, pf, msk, v);
+    rv = PM_fix_nanf(n, sf, msk, v);
 
     return(rv);}
 
@@ -367,15 +376,15 @@ FIXNUM FF_ID(pmfxnf, PMFXNF)(FIXNUM *pn, float *pf, FIXNUM *pmsk, double *pv)
 
 /* PMCNNF - count float NaNs */
 
-FIXNUM FF_ID(pmcnnf, PMCNNF)(FIXNUM *pn, float *pf, FIXNUM *pmsk)
+FIXNUM FF_ID(pmcnnf, PMCNNF)(FIXNUM *sn, float *sf, FIXNUM *smsk)
    {int msk;
     long n;
     FIXNUM rv;
 
-    n   = *pn;
-    msk = *pmsk;
+    n   = *sn;
+    msk = *smsk;
 
-    rv = PM_count_nanf(n, pf, msk);
+    rv = PM_count_nanf(n, sf, msk);
 
     return(rv);}
 
@@ -384,18 +393,18 @@ FIXNUM FF_ID(pmcnnf, PMCNNF)(FIXNUM *pn, float *pf, FIXNUM *pmsk)
 
 /* PMFXND - fix double NaNs */
 
-FIXNUM FF_ID(pmfxnd, PMFXND)(FIXNUM *pn, double *pd,
-				FIXNUM *pmsk, double *pv)
+FIXNUM FF_ID(pmfxnd, PMFXND)(FIXNUM *sn, double *ad,
+			     FIXNUM *smsk, double *sv)
    {int msk;
     long n;
     FIXNUM rv;
     double v;
 
-    n   = *pn;
-    msk = *pmsk;
-    v   = *pv;
+    n   = *sn;
+    msk = *smsk;
+    v   = *sv;
 
-    rv = PM_fix_nand(n, pd, msk, v);
+    rv = PM_fix_nand(n, ad, msk, v);
 
     return(rv);}
 
@@ -404,15 +413,15 @@ FIXNUM FF_ID(pmfxnd, PMFXND)(FIXNUM *pn, double *pd,
 
 /* PMCNND - count double NaNs */
 
-FIXNUM FF_ID(pmcnnd, PMCNND)(FIXNUM *pn, double *pd, FIXNUM *pmsk)
+FIXNUM FF_ID(pmcnnd, PMCNND)(FIXNUM *sn, double *ad, FIXNUM *smsk)
    {int msk;
     long n;
     FIXNUM rv;
 
-    n   = *pn;
-    msk = *pmsk;
+    n   = *sn;
+    msk = *smsk;
 
-    rv = PM_count_nand(n, pd, msk);
+    rv = PM_count_nand(n, ad, msk);
 
     return(rv);}
 
