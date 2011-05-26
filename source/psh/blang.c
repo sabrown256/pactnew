@@ -390,7 +390,14 @@ static fparam fc_type_prim(char *wty, int nc, char *ty, int ptr,
 	rv = ptr ? FP_STRING : FP_SCALAR;}
 
     else if (is_ptr(ty) == TRUE)
-       {nstrncpy(wty, nc, "void *", -1);
+       {switch (md)
+	   {case MODE_C :
+	         nstrncpy(wty, nc, "void *", -1);
+		 break;
+	    case MODE_F :
+	    default :
+	         nstrncpy(wty, nc, "integer(isizea)", -1);
+		 break;};
 	rv = FP_ARRAY;}
 
     else if ((strncmp(ty, "int", 3) == 0) ||
@@ -398,15 +405,36 @@ static fparam fc_type_prim(char *wty, int nc, char *ty, int ptr,
 	     (strncmp(ty, "short", 5) == 0) || 
 	     (strncmp(ty, "long long", 9) == 0) ||
 	     (strncmp(ty, "FIXNUM", 6) == 0))
-       {nstrncpy(wty, nc, "FIXNUM", -1);
+       {switch (md)
+	   {case MODE_C :
+	         nstrncpy(wty, nc, "FIXNUM", -1);
+		 break;
+	    case MODE_F :
+	    default :
+	         nstrncpy(wty, nc, "integer", -1);
+		 break;};
 	rv = ptr ? FP_ARRAY : FP_SCALAR;}
 
     else if (strncmp(ty, "double", 6) == 0)
-       {nstrncpy(wty, nc, "double", -1);
+       {switch (md)
+	   {case MODE_C :
+	         nstrncpy(wty, nc, "double", -1);
+		 break;
+	    case MODE_F :
+	    default :
+	         nstrncpy(wty, nc, "real*8", -1);
+		 break;};
 	rv = ptr ? FP_ARRAY : FP_SCALAR;}
 
     else if (strncmp(ty, "float", 6) == 0)
-       {nstrncpy(wty, nc, "float", -1);
+       {switch (md)
+	   {case MODE_C :
+	         nstrncpy(wty, nc, "float", -1);
+		 break;
+	    case MODE_F :
+	    default :
+	         nstrncpy(wty, nc, "real*4", -1);
+		 break;};
 	rv = ptr ? FP_ARRAY : FP_SCALAR;}
 
     else if (strncmp(ty, "void", 4) == 0)
@@ -420,7 +448,14 @@ static fparam fc_type_prim(char *wty, int nc, char *ty, int ptr,
 
 /* take unknown types to be integer - covers enums */
     else
-       {nstrncpy(wty, nc, "int", -1);
+       {switch (md)
+	   {case MODE_C :
+	         nstrncpy(wty, nc, "int", -1);
+		 break;
+	    case MODE_F :
+	    default :
+	         nstrncpy(wty, nc, "integer", -1);
+		 break;};
 	rv = ptr ? FP_ARRAY : FP_SCALAR;};
 
     return(rv);}
@@ -1006,6 +1041,9 @@ static int mc_need_ptr(fdecl *dcl)
 
 static void mc_decl_list(char *a, int nc, fdecl *dcl)
    {int i, na;
+    fparam knd;
+    char lnm[MAXLINE], lty[MAXLINE];
+    char *nm;
     farg *al;
 
     na = dcl->na;
@@ -1014,8 +1052,39 @@ static void mc_decl_list(char *a, int nc, fdecl *dcl)
     a[0] = '\0';
     if ((na > 0) && (no_args(dcl) == FALSE))
        {for (i = 0; i < na; i++)
-	    {vstrcat(a, MAXLINE, "%s, ", al[i].name);};
-        a[strlen(a) - 2] = '\0';};
+	    {nm = al[i].name;
+
+/* if the names have not be processed to the S/A convention */
+	     if (dcl->proc == FALSE)
+	        {nstrncpy(lnm, MAXLINE, nm, -1);
+		 knd = fc_type(lty, MAXLINE, al[i].type, MODE_F);
+		 switch (knd)
+		    {case FP_PTR :
+		          snprintf(nm, MAXLINE, "u%s", lnm);
+			  break;
+		     case FP_FNC :
+			  snprintf(nm, MAXLINE, "f%s", lnm);
+			  break;
+		     case FP_STRING :
+			  snprintf(nm, MAXLINE, "c%s", lnm);
+			  break;
+		     case FP_ARRAY :
+			  snprintf(nm, MAXLINE, "a%s", lnm);
+			  break;
+		     case FP_SCALAR :
+			  snprintf(nm, MAXLINE, "s%s", lnm);
+			  break;
+		     default :
+		          printf("Unknown type: %s\n", lty);
+			  break;};
+
+		 al[i].knd = knd;};
+
+	     vstrcat(a, MAXLINE, "%s, ", nm);};
+
+        a[strlen(a) - 2] = '\0';
+
+	dcl->proc = TRUE;};
 
     return;}
 
@@ -1074,7 +1143,9 @@ static void itf_wrap_ext(FILE *fp, char *pck, fdecl *dcl,
     pr = dcl->proto;
 
 /* declare the incomplete ones as external */
-    if (strstr(dcl->proto, "...") != NULL)
+    if (((strstr(pr, "...") != NULL) ||
+	 (strstr(pr, "void *") != NULL)) &&
+	(strcmp(ffn, "none") != 0))
        {if (mc_need_ptr(dcl) == TRUE)
 	   {if (first == TRUE)
 	       {first = FALSE;
@@ -1110,7 +1181,9 @@ static void itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
     pr = dcl->proto;
 
 /* emit complete declarations */
-    if ((strstr(pr, "...") == NULL) && (strcmp(ffn, "none") != 0))
+    if ((strstr(pr, "...") == NULL) &&
+	(strstr(pr, "void *") == NULL) &&
+	(strcmp(ffn, "none") != 0))
        {rty = dcl->type;
 
 	na    = dcl->na;
@@ -1151,11 +1224,27 @@ static void itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
 	     ty  = al[i].type;
 	     nm  = al[i].name;
 	     knd = mc_type(MAXLINE, fty, cty, wty, nm, ty);
-	     if ((strcmp(cty, "C_PTR") == 0) ||
-		 (strcmp(cty, "C_FUNPTR") == 0))
-	        fprintf(fp, "         integer(isizea)  :: %s\n", al[i].name);
-	     else
-	        fprintf(fp, "         %-16s :: %s\n", fty, al[i].name);};
+	     switch (knd)
+	        {case FP_PTR :
+		 case FP_FNC :
+		      snprintf(t, MAXLINE, "         integer(isizea) :: %s\n",
+			       nm);
+		      break;
+		 case FP_STRING :
+		      snprintf(t, MAXLINE, "         character(*)    :: %s\n",
+			       nm);
+		      break;
+		 case FP_ARRAY :
+		      snprintf(t, MAXLINE, "         %-15s :: %s(*)\n",
+			       wty, nm);
+		      break;
+		 case FP_SCALAR :
+		 default :
+		      snprintf(t, MAXLINE, "         %-15s :: %s\n",
+			       wty, nm);
+		      break;};
+
+	     fputs(t, fp);};
 
 	fprintf(fp, "      end %s w%s\n", oper, ffn);
 
@@ -1335,7 +1424,7 @@ static void sc_type(char *a, int nc, char *t)
     else if (strncmp(t, "void", 4) == 0)
        nstrncpy(a, nc, "void", -1);
     else
-       nstrncpy(a, nc, "unknown", -1);
+       nstrncpy(a, nc, t, -1);
 
     return;}
 
@@ -1462,6 +1551,7 @@ static FILE *init_scheme(char *pck)
 
     fprintf(fp, "\n");
     fprintf(fp, "#include \"sx_int.h\"\n");
+    fprintf(fp, "#include \"%s_int.h\"\n", pck);
     fprintf(fp, "\n");
 
     csep(fp);
