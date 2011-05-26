@@ -1,0 +1,14 @@
+#
+# BL1.BIND - basic blang test
+#
+
+# C	Fortran	Scheme	Python
+
+fav1	fav1f	fav1s	fav1p
+fav2	fav2f	fav2s	fav2p
+fav3	fav3f	fav3s	fav3p
+fav4	fav4f	fav4s	fav4p
+favp1	favp1f	favp1s	favp1p
+favp2	favp2f	favp2s	favp2p
+favp3	favp3f	favp3s	favp3p
+favp4	favp4f	favp4s	favp4p
