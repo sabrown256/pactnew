@@ -24,6 +24,7 @@ typedef enum e_fparam fparam;
 
 typedef struct s_fdecl fdecl;
 typedef struct s_farg farg;
+typedef struct s_mtype mtype;
 
 struct s_farg
    {fparam knd;
@@ -39,6 +40,12 @@ struct s_fdecl
     int na;
     char **args;
     farg *al;};
+
+struct s_mtype
+   {char *cty;
+    char *fty;
+    char *sty;
+    char *pty;};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -327,6 +334,143 @@ static void hsep(FILE *fp)
 
 /*--------------------------------------------------------------------------*/
 
+/*                           TYPE MAP ROUTINES                              */
+
+/*--------------------------------------------------------------------------*/
+
+/* GET_TYPE_MAP - return the type map
+ *              - if NA > 0 add that many elements to the map
+ *              - return the number of elements in the map via PN
+ *              - return the map via PMAP
+ */
+
+static void get_type_map(int *pn, mtype **pmap, int na)
+   {static int n = 0;
+    static int nx = 0;
+    static mtype *map = NULL;
+
+    if (map == NULL)
+       {nx = 50;
+        map = MAKE_N(mtype, nx);};
+
+    if (n+na+1 >= nx)
+       {nx += max(10, na);
+        REMAKE(map, mtype, nx);};
+
+    n += na;
+
+    if (pn != NULL)
+       *pn = n;
+
+    if (pmap != NULL)
+       *pmap = map;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* ADD_TYPE - add a type to the map */
+
+static void add_type(char *cty, char *fty, char *sty, char *pty)
+   {int n;
+    mtype *map;
+
+    get_type_map(&n, &map, 1);
+
+    n--;
+    n = max(n, 0);
+
+    map[n].cty = cty;
+    map[n].fty = fty;
+    map[n].sty = sty;
+    map[n].pty = pty;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* LOOKUP_TYPE - lookup and return a type from the map */
+
+static char *lookup_type(char *ty, langmode ity, langmode oty)
+   {int i, l, n;
+    char *rv;
+    mtype *map;
+
+    get_type_map(&n, &map, 0);
+
+    l = -1;
+    switch (ity)
+       {case MODE_C :
+             for (i = 0; i < n; i++)
+	         {if (strcmp(ty, map[i].cty) == 0)
+		     {l = i;
+		      break;};};
+	     break;
+        case MODE_F :
+             for (i = 0; i < n; i++)
+	         {if (strcmp(ty, map[i].fty) == 0)
+		     {l = i;
+		      break;};};
+	     break;
+        case MODE_S :
+             for (i = 0; i < n; i++)
+	         {if (strcmp(ty, map[i].sty) == 0)
+		     {l = i;
+		      break;};};
+	     break;
+        case MODE_P :
+             for (i = 0; i < n; i++)
+	         {if (strcmp(ty, map[i].pty) == 0)
+		     {l = i;
+		      break;};};
+	     break;};
+
+    rv = NULL;
+    if (l != -1)
+       {switch (oty)
+	   {case MODE_C :
+                 rv = map[l].cty;
+	         break;
+	    case MODE_F :
+                 rv = map[l].fty;
+	         break;
+	    case MODE_S :
+                 rv = map[l].sty;
+	         break;
+	    case MODE_P :
+                 rv = map[l].pty;
+	         break;};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* INIT_TYPES - initialize the type map */
+
+static void init_types(void)
+   {
+
+    add_type("char",                 "character",  "object", NULL);
+    add_type("int",                  "integer",    "object", NULL);
+    add_type("short",                "integer",    "object", NULL);
+    add_type("long",                 "integer",    "object", NULL);
+    add_type("long long",            "integer",    "object", NULL);
+    add_type("float",                "real*4",     "object", NULL);
+    add_type("double",               "real*8",     "object", NULL);
+    add_type("long double",          "real*16",    "object", NULL);
+    add_type("float _Complex",       "complex*4",  "object", NULL);
+    add_type("double _Complex",      "complex*8",  "object", NULL);
+    add_type("long double _Complex", "complex*16", "object", NULL);
+
+    add_type("void",                 "",           "", NULL);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+
 /*                            FORTRAN ROUTINES                              */
 
 /*--------------------------------------------------------------------------*/
@@ -348,26 +492,36 @@ static char *deref(char *d, int nc, char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* CF_TYPE - return Fortran type corresponding to C type T */
+/* CF_TYPE - return Fortran type corresponding to C type TY */
 
-static void cf_type(char *a, int nc, char *t)
-   {
+static void cf_type(char *a, int nc, char *ty)
+   {char *fty;
 
-    if (strcmp(t, "char *") == 0)
+    fty = lookup_type(ty, MODE_C, MODE_F);
+    if (fty != NULL)
+       nstrncpy(a, nc, fty, -1);
+
+    if (strcmp(ty, "char *") == 0)
        nstrncpy(a, nc, "string", -1);
-    else if (is_ptr(t) == TRUE)
+
+    else if (is_ptr(ty) == TRUE)
        nstrncpy(a, nc, "void *", -1);
-    else if ((strncmp(t, "int", 3) == 0) ||
-	     (strncmp(t, "long", 4) == 0) || 
-	     (strncmp(t, "short", 5) == 0) || 
-	     (strncmp(t, "long long", 9) == 0))
+
+    else if ((strncmp(ty, "int", 3) == 0) ||
+	     (strncmp(ty, "long", 4) == 0) || 
+	     (strncmp(ty, "short", 5) == 0) || 
+	     (strncmp(ty, "long long", 9) == 0))
        nstrncpy(a, nc, "integer", -1);
-    else if (strncmp(t, "double", 6) == 0)
+
+    else if (strncmp(ty, "double", 6) == 0)
        nstrncpy(a, nc, "real*8", -1);
-    else if (strncmp(t, "float", 6) == 0)
+
+    else if (strncmp(ty, "float", 6) == 0)
        nstrncpy(a, nc, "real*4", -1);
-    else if (strncmp(t, "void", 4) == 0)
+
+    else if (strncmp(ty, "void", 4) == 0)
        nstrncpy(a, nc, "", -1);
+
     else
        nstrncpy(a, nc, "unknown", -1);
 
@@ -2049,6 +2203,8 @@ int main(int c, char **v)
     snprintf(msg, MAXLINE, "%s bindings", pck);
 
     printf("      %s ", fill_string(msg, 25));
+
+    init_types();
 
     rv = blang(pck, fif, fpr, fbi);
     rv = (rv != TRUE);

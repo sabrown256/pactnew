@@ -98,46 +98,90 @@ else
 # compile Fortran module
       Note $Log ""
       Note $Log "Compile fortran module"
-      flog $Log ${fc} -c gm-$i.f
-      if ($status == 0) then
+      flog $Log set file = gm-$i.f
+      flog $Log ${fc} -c $file
+      @ xstatus = $status
+      if (-f $RefDir/$file) then
+         flog $Log diff $file $RefDir/$file
+         if ($status != 0) then
+            @ xstatus = $xstatus + 1
+         endif
+      else
+         flog $Log cp $file $RefDir/$file
+      endif
+      if ($xstatus == 0) then
          NoteD $Log -n "."
       else
          NoteD $Log -n "x"
          @ lerr = $lerr + 1
       endif
+      unset file
 
 # compile Fortran wrapper
       Note $Log ""
       Note $Log "Compile fortran wrapper"
-      flog $Log ${cc} -c gf-$i.c
-      if ($status == 0) then
+      flog $Log set file = gf-$i.c
+      flog $Log ${cc} -c $file
+      @ xstatus = $status
+      if (-f $RefDir/$file) then
+         flog $Log diff $file $RefDir/$file
+         if ($status != 0) then
+            @ xstatus = $xstatus + 1
+         endif
+      else
+         flog $Log cp $file $RefDir/$file
+      endif
+      if ($xstatus == 0) then
          NoteD $Log -n "."
       else
          NoteD $Log -n "x"
          @ lerr = $lerr + 1
       endif
+      unset file
 
 # compile Scheme wrapper
       Note $Log ""
       Note $Log "Compile scheme wrapper"
-      flog $Log ${cc} -c gs-$i.c
-      if ($status == 0) then
+      flog $Log set file = gs-$i.c
+      flog $Log ${cc} -c $file
+      @ xstatus = $status
+      if (-f $RefDir/$file) then
+         flog $Log diff $file $RefDir/$file
+         if ($status != 0) then
+            @ xstatus = $xstatus + 1
+         endif
+      else
+         flog $Log cp $file $RefDir/$file
+      endif
+      if ($xstatus == 0) then
          NoteD $Log -n "."
       else
          NoteD $Log -n "x"
          @ lerr = $lerr + 1
       endif
+      unset file
 
 # compile Python wrapper
       Note $Log ""
       Note $Log "Compile python wrapper"
-      flog $Log ${cc} -c gp-$i.c
-      if ($status == 0) then
+      flog $Log set file = gp-$i.c
+      flog $Log ${cc} -c $file
+      @ xstatus = $status
+      if (-f $RefDir/$file) then
+         flog $Log diff $file $RefDir/$file
+         if ($status != 0) then
+            @ xstatus = $xstatus + 1
+         endif
+      else
+         flog $Log cp $file $RefDir/$file
+      endif
+      if ($xstatus == 0) then
          NoteD $Log -n "."
       else
          NoteD $Log -n "x"
          @ lerr = $lerr + 1
       endif
+      unset file
 
 # report status
       Note $Log ""
