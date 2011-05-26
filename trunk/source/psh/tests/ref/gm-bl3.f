@@ -14,20 +14,44 @@ module pact_bl3
 
    interface
 
-      type (C_PTR) function fe1(a1, sa2) bind(c, name='fe1')
+      type (C_PTR) function fe1(a1, sa2) &
+                bind(c, name='fe1')
          use iso_c_binding
          implicit none
          type (C_PTR), value :: a1
          integer (C_INT), value :: sa2
       end function fe1
 
-      function wfe1f(a1, sa2)
+      function wfe1f(a1, sa2) 
          use types_bl3
          implicit none
          integer(isizea) :: wfe1f
          integer(isizea) :: a1
          integer         :: sa2
       end function wfe1f
+
+      subroutine fe2(dev, ax, ay, sn, ainfo, sl) &
+                bind(c, name='fe2')
+         use iso_c_binding
+         implicit none
+         type (C_PTR), value :: dev
+         type (C_PTR), value :: ax
+         type (C_PTR), value :: ay
+         integer (C_INT), value :: sn
+         type (C_PTR), value :: ainfo
+         integer (C_INT), value :: sl
+      end subroutine fe2
+
+      subroutine wfe2f(dev, ax, ay, sn, ainfo, sl) 
+         use types_bl3
+         implicit none
+         integer(isizea) :: dev
+         real*8          :: ax(*)
+         real*8          :: ay(*)
+         integer         :: sn
+         integer(isizea) :: ainfo
+         integer         :: sl
+      end subroutine wfe2f
 
    end interface
 

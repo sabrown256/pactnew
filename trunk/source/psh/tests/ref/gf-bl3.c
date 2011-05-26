@@ -26,3 +26,25 @@ FIXNUM FF_ID(wfe1f, WFE1F)(str **ta1, int *sa2)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+void FF_ID(wfe2f, WFE2F)(str **tdev, double *ax, double *ay, int *sn, pcons *ainfo, int *sl)
+   {str *_ltdev;
+    double *_lax;
+    double *_lay;
+    int _lsn;
+    pcons *_lainfo;
+    int _lsl;
+    
+    _ltdev     = (str *) *tdev;
+    _lax       = (double *) ax;
+    _lay       = (double *) ay;
+    _lsn       = (int) *sn;
+    _lainfo    = (pcons *) ainfo;
+    _lsl       = (int) *sl;
+
+    fe2(_ltdev, _lax, _lay, _lsn, _lainfo, _lsl);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/

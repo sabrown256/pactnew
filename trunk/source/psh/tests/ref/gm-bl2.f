@@ -14,7 +14,8 @@ module pact_bl2
 
    interface
 
-      type (C_PTR) function fbcv1(sa, sb, sc, sd, fe, ff) bind(c, name='fbcv1')
+      type (C_PTR) function fbcv1(sa, sb, sc, sd, fe, ff) &
+                bind(c, name='fbcv1')
          use iso_c_binding
          implicit none
          integer (C_INT), value :: sa
@@ -25,7 +26,7 @@ module pact_bl2
          type (C_FUNPTR), value :: ff
       end function fbcv1
 
-      function wfbcv1f(sa, sb, sc, sd, fe, ff)
+      function wfbcv1f(sa, sb, sc, sd, fe, ff) 
          use types_bl2
          implicit none
          integer(isizea) :: wfbcv1f
@@ -37,7 +38,8 @@ module pact_bl2
          integer(isizea) :: ff
       end function wfbcv1f
 
-      type (C_PTR) function fbmcv1(sa, sb, sc, sd) bind(c, name='fbmcv1')
+      type (C_PTR) function fbmcv1(sa, sb, sc, sd) &
+                bind(c, name='fbmcv1')
          use iso_c_binding
          implicit none
          integer (C_INT), value :: sa
@@ -46,7 +48,7 @@ module pact_bl2
          integer (C_INT), value :: sd
       end function fbmcv1
 
-      function wfbmcv1f(sa, sb, sc, sd)
+      function wfbmcv1f(sa, sb, sc, sd) 
          use types_bl2
          implicit none
          integer(isizea) :: wfbmcv1f
@@ -56,7 +58,8 @@ module pact_bl2
          character       :: sd
       end function wfbmcv1f
 
-      type (C_PTR) function fbmcr2(aa, ab, ac, ad) bind(c, name='fbmcr2')
+      type (C_PTR) function fbmcr2(aa, ab, ac, ad) &
+                bind(c, name='fbmcr2')
          use iso_c_binding
          implicit none
          type (C_PTR), value :: aa
@@ -65,7 +68,7 @@ module pact_bl2
          type (C_PTR), value :: ad
       end function fbmcr2
 
-      function wfbmcr2f(aa, ab, ac, ad)
+      function wfbmcr2f(aa, ab, ac, ad) 
          use types_bl2
          implicit none
          integer(isizea) :: wfbmcr2f
