@@ -22,24 +22,24 @@ PD_open				pdopen		none		none
 PD_family			pdfami		none		none
 PD_create			pdcreat		none		none
 PD_open_vif			pdopnv		none		none
-PD_defent			pddefa		none		none
-PD_defent_alt			pddeft		none		none
 PD_close			pdclos		none		none
 PD_flush			pdflsh		none		none
 PD_remove_entry			pdrent		none		none
-PD_append			pdappa		none		none
+PD_append			pdapp		none		none
 PD_append_alt			pdappt		none		none
-PD_append_as			pdapas		none		none
+PD_append_as			pdappa		none		none
 PD_append_as_alt		pdapat		none		none
-PD_write			pdwrta		none		none
-PD_write_alt			pdwrtt		none		none
-PD_write_as			pdwras		none		none
-PD_write_as_alt			pdwrat		none		none
+PD_defent			pdden		none		none
+PD_defent_alt			pddent		none		none
 PD_read				pdread		none		none
-PD_read_as			pdrdas		none		none
+PD_read_as			pdrda		none		none
 PD_read_as_dwim			pdrdai		none		none
 PD_read_alt			pdrdt		none		none
 PD_read_as_alt			pdrdat		none		none
+PD_write			pdwrt		none		none
+PD_write_alt			pdwrtt		none		none
+PD_write_as			pdwras		none		none
+PD_write_as_alt			pdwrat		none		none
 PD_cast				pdcast		none		none
 PD_free				pdfree		none		none
 PD_fix_denorm			pddnrm		none		none
@@ -72,7 +72,7 @@ PD_alloc_entry			none		none		none
 # PDBDIR.C
 
 PD_ls				pdls		none		none
-PD_ls_alt			none		none		none
+PD_ls_alt			pdlst		none		none
 PD_pwd				pdpwd		none		none
 PD_cd				pdcd		none		none
 PD_isdir			pdisdr		none		none
@@ -147,16 +147,16 @@ PD_activate_cksum		pdscsm		none		none
 
 # PDFMT.C
 
-PD_isfile			none		none		none
+PD_isfile			pdisfil		none		none
 
 # PDLOW.C
 
 PD_inquire_type			none		none		none
 PD_inquire_host_type		none		none		none
-PD_get_error			none		none		none
+PD_get_error			pdgerr		none		none
 PD_get_entry_info		none		none		none
-PD_get_buffer_size		none		none		none
-PD_set_buffer_size		none		none		none
+PD_get_buffer_size		pdgbsz		none		none
+PD_set_buffer_size		pdsbsz		none		none
 PD_entry_set_address		none		none		none
 PD_entry_address		none		none		none
 PD_get_file_length		pdgfln		none		none
@@ -210,11 +210,11 @@ PN_relocate			none		none		none
 
 # PDTGT.C
 
-PD_target_n_platforms		none		none		none
-PD_target_platform		none		none		none
-PD_target_platform_n		none		none		none
+PD_target_n_platforms		pdgtgn		none		none
+PD_target_platform		pdtgtp		none		none
+PD_target_platform_n		pdtgtn		none		none
 PD_target			pdtrgt		none		none
-PD_target_platform_name		none		none		none
+PD_target_platform_name		pdgtgp		none		none
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

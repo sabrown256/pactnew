@@ -39,7 +39,8 @@ RemoveFiles = ${BinDir}/pdbtst ${BinDir}/pdatst ${BinDir}/pdasts    \
               ${BinDir}/pdopts ${BinDir}/pdapts ${BinDir}/pdgsts    \
               ${BinDir}/pdfrts ${BinDir}/pdctst \
               ${BinDir}/pdlsts ${BinDir}/pdnormtst ${BinDir}/pdcsts \
-              ${BinDir}/pdftst ${BinDir}/pdfwts ${BinDir}/pdfhyts \
+              ${BinDir}/pdftst ${BinDir}/pdfwts \
+              ${BinDir}/pdfwts ${BinDir}/pdfhyts \
               ${BinDir}/pdntst   \
               ${BinDir}/pdb2hdf ${BinDir}/pdsmp ${BinDir}/pddpts    \
               ${BinDir}/pdfdpt ${BinDir}/pxrdts ${BinDir}/pxntst    \
@@ -195,13 +196,16 @@ ${BinDir}/pdbfts : pdbfts.c ${InstallDep} ${Hdrs}
 ${BinDir}/pdfcts : pdfcts.c ${InstallDep} ${Hdrs}
 	${CLD} ${LdFlags} pdfcts.c -o ${BinDir}/pdfcts ${Libs}
         
-Fstd : ${BinDir}/pdftst ${BinDir}/pdfwts ${BinDir}/pdfhyts
+Fstd : ${BinDir}/pdftst ${BinDir}/pdfwts ${BinDir}/pdfgts ${BinDir}/pdfhyts
 
 ${BinDir}/pdftst : pdftst.f ${InstallDep} ${Hdrs}
 	${FC} ${LdFlags} pdftst.f -o ${BinDir}/pdftst ${Libs}
 
 ${BinDir}/pdfwts : pdfwts.f ${InstallDep} ${Hdrs}
 	${FC} ${LdFlags} pdfwts.f -o ${BinDir}/pdfwts ${Libs}
+
+${BinDir}/pdfgts : pdfgts.f ${InstallDep} ${Hdrs}
+	${FC} ${LdFlags} pdfgts.f -o ${BinDir}/pdfgts ${Libs}
 
 ${BinDir}/pdfhyts : pdfhyts.f ${InstallDep} ${Hdrs}
 	${FC} ${LdFlags} pdfhyts.f -o ${BinDir}/pdfhyts ${Libs}
