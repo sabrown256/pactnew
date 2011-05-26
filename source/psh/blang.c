@@ -71,6 +71,45 @@ static void berr(char *fmt, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* FEMIT - emit lines broken apropriately for Fortran */
+
+static void femit(FILE *fp, char *t, char *trm)
+   {int i, c, n, nc;
+    char *pt;
+
+    nc = strlen(t);
+
+    for (pt = t; nc > 0; )
+        {n = (pt == t) ? 73 : 51;
+	 if (n > nc)
+	    {if (pt == t)
+		fprintf(fp, "%s %s\n", pt, trm);
+	     else
+		fprintf(fp, "                      %s %s\n", pt, trm);
+	     break;}
+	 else
+	    {n = min(n, nc);
+	     for (i = n-1; i >= 0; i--)
+	         {if (strchr(", \t", pt[i]) != NULL)
+		     {c = pt[i+1];
+		      pt[i+1] = '\0';
+		      if (pt == t)
+			 fprintf(fp, "%s &\n", pt);
+		      else
+			 fprintf(fp, "                      %s &\n", pt);
+		      pt[i+1] = c;
+		      i++;
+		      pt += i;
+		      nc -= i;
+		      break;};};
+	     if (i < 0)
+	        break;};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* CONCATENATE - concatenate tokens SA to string S */
 
 static char *concatenate(char *s, int nc, char **sa, char *dlm)
@@ -459,14 +498,24 @@ static void init_types(void)
     add_type("void",        "",           "",                 NULL);
     add_type("bool",        "logical",    "SC_BOOL_I",        NULL);
     add_type("char",        "character",  "SC_CHAR_I",        NULL);
+
+/* fixed point types */
+    add_type("short",       "integer*2",  "SC_SHORT_I",       NULL);
     add_type("int",         "integer",    "SC_INT_I",         NULL);
-    add_type("short",       "integer",    "SC_SHORT_I",       NULL);
-    add_type("long",        "integer",    "SC_LONG_I",        NULL);
-    add_type("long long",   "integer",    "SC_LONG_LONG_I",   NULL);
+    add_type("long",        "integer*8",  "SC_LONG_I",        NULL);
+    add_type("long long",   "integer*8",  "SC_LONG_LONG_I",   NULL);
+
+/* fixed width fixed point types */
+    add_type("int16_t",     "integer*2",  "SC_INT16_I",       NULL);
+    add_type("int32_t",     "integer*4",  "SC_INT32_I",       NULL);
+    add_type("int64_t",     "integer*8",  "SC_INT64_I",       NULL);
+
+/* floating point types */
     add_type("float",       "real*4",     "SC_FLOAT_I",       NULL);
     add_type("double",      "real*8",     "SC_DOUBLE_I",      NULL);
     add_type("long double", "real*16",    "SC_LONG_DOUBLE_I", NULL);
 
+/* complex types */
     add_type("float _Complex",       "complex*4",
 	     "SC_FLOAT_COMPLEX_I", NULL);
     add_type("double _Complex",      "complex*8",
@@ -474,21 +523,21 @@ static void init_types(void)
     add_type("long double _Complex", "complex*16",
 	     "SC_LONG_DOUBLE_COMPLEX_I", NULL);
 
-    add_type("void *",        "integer(isizea)", "SC_VOID_P_I",        NULL);
-    add_type("bool *",        "logical-A",       "SC_BOOL_P_I",        NULL);
-    add_type("char *",        "character-A",     "SC_STRING_I",        NULL);
-    add_type("int *",         "integer-A",       "SC_INT_P_I",         NULL);
-    add_type("short *",       "integer-A",       "SC_SHORT_P_I",       NULL);
-    add_type("long *",        "integer-A",       "SC_LONG_P_I",        NULL);
-    add_type("long long *",   "integer-A",       "SC_LONG_LONG_P_I",   NULL);
-    add_type("float *",       "real*4-A",        "SC_FLOAT_P_I",       NULL);
-    add_type("double *",      "real*8-A",        "SC_DOUBLE_P_I",      NULL);
-    add_type("long double *", "real*16-A",       "SC_LONG_DOUBLE_P_I", NULL);
+    add_type("void *",        "C_PTR-A",     "SC_VOID_P_I",        NULL);
+    add_type("bool *",        "logical-A",   "SC_BOOL_P_I",        NULL);
+    add_type("char *",        "character-A", "SC_STRING_I",        NULL);
+    add_type("int *",         "integer-A",   "SC_INT_P_I",         NULL);
+    add_type("short *",       "integer-A",   "SC_SHORT_P_I",       NULL);
+    add_type("long *",        "integer-A",   "SC_LONG_P_I",        NULL);
+    add_type("long long *",   "integer-A",   "SC_LONG_LONG_P_I",   NULL);
+    add_type("float *",       "real*4-A",    "SC_FLOAT_P_I",       NULL);
+    add_type("double *",      "real*8-A",    "SC_DOUBLE_P_I",      NULL);
+    add_type("long double *", "real*16-A",   "SC_LONG_DOUBLE_P_I", NULL);
 
-    add_type("pcons",         "integer(isizea)", "SC_PCONS_I",         NULL);
-    add_type("pcons *",       "integer(isizea)", "SC_PCONS_P_I",       NULL);
-    add_type("FILE *",        "integer(isizea)", "SC_FILE_I",          NULL);
-    add_type("PROCESS *",     "integer(isizea)", "SC_PROCESS_I",       NULL);
+    add_type("pcons",         "C_PTR-A",     "SC_PCONS_I",         NULL);
+    add_type("pcons *",       "C_PTR-A",     "SC_PCONS_P_I",       NULL);
+    add_type("FILE *",        "C_PTR-A",     "SC_FILE_I",          NULL);
+    add_type("PROCESS *",     "C_PTR-A",     "SC_PROCESS_I",       NULL);
 
     return;}
 
@@ -1331,7 +1380,8 @@ static void itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
         else
            oper = "function";
 
-	fprintf(fp, "      %s w%s(%s)\n", oper, ffn, a);
+	snprintf(t, MAXLINE, "      %s w%s(%s)", oper, ffn, a);
+	femit(fp, t, "");
 
 	if (mc_need_ptr(dcl) == TRUE)
 	   fprintf(fp, "         use types_%s\n", pck);
@@ -1366,6 +1416,9 @@ static void itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
 		 case FP_ARRAY :
 		      if (strcmp(wty, "character") == 0)
 			 snprintf(t, MAXLINE, "         character(*)    :: %s\n", 
+				  nm);
+		      else if (strcmp(wty, "C_PTR") == 0)
+			 snprintf(t, MAXLINE, "         integer(isizea) :: %s\n",
 				  nm);
 		      else
 			 snprintf(t, MAXLINE, "         %-15s :: %s(*)\n",
@@ -1425,10 +1478,8 @@ static void wrap_module(FILE *fp, fdecl *dcl, char *cfn)
 
 	snprintf(cb, MAXLINE, "bind(c, name='%s')", cfn);
 
-	if (strlen(cd) > 70)
-	   fprintf(fp, "%s &\n                %s\n", cd, cb);
-	else
-	   fprintf(fp, "%s %s\n", cd, cb);
+	femit(fp, cd, "&");
+	fprintf(fp, "                %s\n", cb);
 
 	fprintf(fp, "         use iso_c_binding\n");
 	fprintf(fp, "         implicit none\n");

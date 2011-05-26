@@ -45,7 +45,7 @@
       use pact_pdb
       implicit none
 
-      integer fileid
+      integer(isizea) fileid
 
 ! ... local variables
       integer i, index, st
@@ -79,7 +79,7 @@
       use pact_pdb
       implicit none
 
-      integer fileid
+      integer(isizea) fileid
       real*8 tolerance
 
 ! ... local variables
@@ -121,7 +121,7 @@
       use pact_pdb
       implicit none
 
-      integer fileid
+      integer(isizea) fileid
 
 ! ... local variables
       integer k, l, st

@@ -7,6 +7,12 @@
 # include "cpyright.h"
 #
 
+# treat a struct as a character array - unless specific definition exists
+derived PG_device      		character-A	SC_STRING_I	SC_STRING_I
+derived PG_coord_sys		integer		SC_ENUM_I	SC_ENUM_I
+derived PG_rendering		integer		SC_ENUM_I	SC_ENUM_I
+derived PM_centering		integer		SC_ENUM_I	SC_ENUM_I
+
 #  C function         Fortran  Scheme            Python
 
 # GSCNTR.C

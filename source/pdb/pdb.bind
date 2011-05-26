@@ -7,6 +7,13 @@
 # include "cpyright.h"
 #
 
+# treat a struct as a character array - unless specific definition exists
+derived PDBfile	      		character-A	SC_STRING_I	SC_STRING_I
+derived PD_major_op		integer		SC_ENUM_I	SC_ENUM_I
+derived PD_byte_order		integer		SC_ENUM_I	SC_ENUM_I
+derived PD_curve_io		integer		SC_ENUM_I	SC_ENUM_I
+derived PD_checksum_mode	integer		SC_ENUM_I	SC_ENUM_I
+
 #  C function			Fortran		Scheme		Python
 
 # PDB.C
