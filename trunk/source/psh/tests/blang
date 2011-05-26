@@ -40,11 +40,6 @@ end
 
 InitLog Log $TestDir/log.blang.$LogSfx
 
-flog $Log pushd $RootDir/score
-flog $Log $MAKE -i mpitty
-flog $Log popd
-flog $Log rehash
-
 @ Err  = 0
 @ lerr = 0
 
@@ -75,7 +70,7 @@ else
 
    @ nerr = 0
 
-   foreach i (bl1 bl2)
+   foreach i (bl1 bl2 bl3)
 
       @ lerr = 0
 

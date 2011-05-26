@@ -1,0 +1,13 @@
+#
+# BL3.BIND - exceptional case blang test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+derived str	character-A	SC_STRING_I	SC_STRING_I
+
+fe1	fe1f	fe1s	fe1p
+
