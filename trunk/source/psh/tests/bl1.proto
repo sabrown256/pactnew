@@ -1,0 +1,24 @@
+#
+# BL1.PROTO - basic blang test prototypes
+#
+
+void fav1(void)
+int fav2(void)
+double fav3(void)
+str fav4(void)
+
+void *favp1(void)
+int *favp2(void)
+double *favp3(void)
+str *favp4(void)
+
+int fbv1(int a, float b, double c, char d, int (*e)(void), PFInt f)
+int fbr2(int *a, float *b, double *c, char *d, int (*e)(void), PFInt f)
+int *fbpv1(int a, float b, double c, char d, int (*e)(void), PFInt f)
+int *fbpr2(int *a, float *b, double *c, char *d, int (*e)(void), PFInt f)
+
+int fbmv1(int a, float b, double c, char d)
+int fbmr2(int *a, float *b, double *c, char *d)
+int *fbmpv1(int a, float b, double c, char d)
+int *fbmpr2(int *a, float *b, double *c, char *d)
+

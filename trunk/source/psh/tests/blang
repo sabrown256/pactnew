@@ -1,0 +1,163 @@
+#!/bin/csh -f
+#
+# BLANG - blang testing
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Package = psh
+if (-f test-env) then
+   source test-env
+   pushd $TestDir >& /dev/null
+else if ($?Log == 1) then
+   if (-f $Log) then
+      mv $Log $Log.tmp
+      source ../../../scripts/test-env
+      mv $Log.tmp $Log
+   else
+      source ../../../scripts/test-env
+   endif
+else
+   source ../../../scripts/test-env
+endif
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: blang [-h]"
+           echo "  h  this help message"
+           echo ""
+           exit(1);
+      default:
+           breaksw
+   endsw
+   shift
+end
+
+InitLog Log $TestDir/log.blang.$LogSfx
+
+flog $Log pushd $RootDir/score
+flog $Log $MAKE -i mpitty
+flog $Log popd
+flog $Log rehash
+
+@ Err  = 0
+@ lerr = 0
+
+flog $Log cd $TestDir
+
+NoteD $Log ""
+
+# omit tests - usually in difficult CROSS_COMPILE situation
+if ($RUN_TESTS == FALSE) then
+   NoteD $Log "                    BLANG Test ..................... omitted"
+   NoteD $Log ""
+
+else
+
+   set BTime = `$TIMER -r`
+
+   NoteD $Log "                    BLANG Test ..................... "
+   Note $Log ""
+
+   set TstDir = $SrcDir/tests
+   set RefDir = $TstDir/ref
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   @ lerr = 0
+
+   flog $Log set cc = ( ${PACT_CC_EXE} ${CDefDebug} -I${IncDir} )
+   flog $Log set fc = ( ${PACT_FC_EXE} ${CDefDebug} -I${IncDir} )
+
+   foreach i (bl1)
+      set f = ( `fill-string -n 24 $i` )
+      NoteD $Log -n "                        $f"
+      Note $Log ""
+
+      flog $Log cp $TstDir/$i.* .
+
+      flog $Log blang $i.proto $i.bind
+      flog $Log ln -s ${IncDir}/sx_int.h ${i}_int.h
+
+# compile Fortran module
+      Note $Log ""
+      Note $Log "Compile fortran module"
+      flog $Log ${fc} -c gm-$i.f
+      if ($status == 0) then
+         NoteD $Log -n "."
+      else
+         NoteD $Log -n "x"
+         @ lerr = $lerr + 1
+      endif
+
+# compile Fortran wrapper
+      Note $Log ""
+      Note $Log "Compile fortran wrapper"
+      flog $Log ${cc} -c gf-$i.c
+      if ($status == 0) then
+         NoteD $Log -n "."
+      else
+         NoteD $Log -n "x"
+         @ lerr = $lerr + 1
+      endif
+
+# compile Scheme wrapper
+      Note $Log ""
+      Note $Log "Compile scheme wrapper"
+      flog $Log ${cc} -c gs-$i.c
+      if ($status == 0) then
+         NoteD $Log -n "."
+      else
+         NoteD $Log -n "x"
+         @ lerr = $lerr + 1
+      endif
+
+# compile Python wrapper
+      Note $Log ""
+      Note $Log "Compile python wrapper"
+      flog $Log ${cc} -c gp-$i.c
+      if ($status == 0) then
+         NoteD $Log -n "."
+      else
+         NoteD $Log -n "x"
+         @ lerr = $lerr + 1
+      endif
+
+# report status
+      Note $Log ""
+      if ($lerr == 0) then
+         NoteD $Log " ok"
+         $RM $i*.*
+      else
+         NoteD $Log " ng"
+      endif
+
+   end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   Separator $Log
+
+   set ETime = `$TIMER -b $BTime`
+
+   if ($lerr != 0) then
+      NoteD $Log "                    BLANG Test ..................... FAILED ($lerr/$ETime)"
+      @ Err = 1
+   else
+      NoteD $Log "                    BLANG Test ..................... PASSED ($ETime)"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+endif
+
+exit($Err)
+
