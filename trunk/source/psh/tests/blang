@@ -72,8 +72,8 @@ else
 
    @ lerr = 0
 
-   flog $Log set cc = ( ${PACT_CC_EXE} ${CDefDebug} -I${IncDir} )
-   flog $Log set fc = ( ${PACT_FC_EXE} ${CDefDebug} -I${IncDir} )
+   flog $Log set cc = ( ${PACT_CC_EXE} ${CDefDebug} ${CC_Flags} -I${IncDir} )
+   flog $Log set fc = ( ${PACT_FC_EXE} ${CDefDebug} ${FC_Flags} -I${IncDir} )
 
    foreach i (bl1)
       set f = ( `fill-string -n 24 $i` )
@@ -83,7 +83,17 @@ else
       flog $Log cp $TstDir/$i.* .
 
       flog $Log blang $i.proto $i.bind
-      flog $Log ln -s ${IncDir}/sx_int.h ${i}_int.h
+
+      flog $Log set hdr = ${i}_int.h
+      flog $Log $RM $hdr
+      touch $Log $hdr
+      Note $hdr "#include <sx_int.h>"
+      Note $hdr "struct s_str {int a; double b;};"
+      Note $hdr "typedef struct s_str str;"
+      Note $hdr "#include <sx_int.h>"
+      cat $i.proto | \
+      grep -v '#' | \
+      awk '$0 != "" { printf("extern %s;\n", $0); }' >>& $hdr
 
 # compile Fortran module
       Note $Log ""
@@ -133,7 +143,7 @@ else
       Note $Log ""
       if ($lerr == 0) then
          NoteD $Log " ok"
-         $RM $i*.*
+         $RM $i*.* $hdr
       else
          NoteD $Log " ng"
       endif
