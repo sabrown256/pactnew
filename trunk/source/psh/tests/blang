@@ -70,12 +70,17 @@ else
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   @ lerr = 0
-
    flog $Log set cc = ( ${PACT_CC_EXE} ${CDefDebug} ${CC_Flags} -I${IncDir} )
    flog $Log set fc = ( ${PACT_FC_EXE} ${CDefDebug} ${FC_Flags} -I${IncDir} )
 
-   foreach i (bl1)
+   @ nerr = 0
+
+   foreach i (bl1 bl2)
+
+      @ lerr = 0
+
+      Separator $Log
+
       set f = ( `fill-string -n 24 $i` )
       NoteD $Log -n "                        $f"
       Note $Log ""
@@ -190,6 +195,7 @@ else
          $RM $i*.* $hdr
       else
          NoteD $Log " ng"
+         @ nerr = $nerr + 1
       endif
 
    end
@@ -201,7 +207,7 @@ else
 
    set ETime = `$TIMER -b $BTime`
 
-   if ($lerr != 0) then
+   if ($nerr != 0) then
       NoteD $Log "                    BLANG Test ..................... FAILED ($lerr/$ETime)"
       @ Err = 1
    else
