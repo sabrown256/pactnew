@@ -256,7 +256,10 @@ static fdecl *find_proto(char **spr, char *f)
 	        {pro = sp;
 		 break;};};};
 
-    if (pro == NULL)
+    if (strcmp(f, "derived") == 0)
+       dcl = NULL;
+
+    else if (pro == NULL)
        {berr("no binding for '%s'", f);
 	dcl = NULL;}
 
@@ -453,19 +456,60 @@ static char *lookup_type(char *ty, langmode ity, langmode oty)
 static void init_types(void)
    {
 
-    add_type("char",                 "character",  "object", NULL);
-    add_type("int",                  "integer",    "object", NULL);
-    add_type("short",                "integer",    "object", NULL);
-    add_type("long",                 "integer",    "object", NULL);
-    add_type("long long",            "integer",    "object", NULL);
-    add_type("float",                "real*4",     "object", NULL);
-    add_type("double",               "real*8",     "object", NULL);
-    add_type("long double",          "real*16",    "object", NULL);
-    add_type("float _Complex",       "complex*4",  "object", NULL);
-    add_type("double _Complex",      "complex*8",  "object", NULL);
-    add_type("long double _Complex", "complex*16", "object", NULL);
+    add_type("void",        "",           "",                 NULL);
+    add_type("bool",        "logical",    "SC_BOOL_I",        NULL);
+    add_type("char",        "character",  "SC_CHAR_I",        NULL);
+    add_type("int",         "integer",    "SC_INT_I",         NULL);
+    add_type("short",       "integer",    "SC_SHORT_I",       NULL);
+    add_type("long",        "integer",    "SC_LONG_I",        NULL);
+    add_type("long long",   "integer",    "SC_LONG_LONG_I",   NULL);
+    add_type("float",       "real*4",     "SC_FLOAT_I",       NULL);
+    add_type("double",      "real*8",     "SC_DOUBLE_I",      NULL);
+    add_type("long double", "real*16",    "SC_LONG_DOUBLE_I", NULL);
 
-    add_type("void",                 "",           "", NULL);
+    add_type("float _Complex",       "complex*4",
+	     "SC_FLOAT_COMPLEX_I", NULL);
+    add_type("double _Complex",      "complex*8",
+	     "SC_DOUBLE_COMPLEX_I", NULL);
+    add_type("long double _Complex", "complex*16",
+	     "SC_LONG_DOUBLE_COMPLEX_I", NULL);
+
+    add_type("void *",        "integer(isizea)", "SC_VOID_P_I",        NULL);
+    add_type("bool *",        "logical-A",       "SC_BOOL_P_I",        NULL);
+    add_type("char *",        "character-A",     "SC_STRING_I",        NULL);
+    add_type("int *",         "integer-A",       "SC_INT_P_I",         NULL);
+    add_type("short *",       "integer-A",       "SC_SHORT_P_I",       NULL);
+    add_type("long *",        "integer-A",       "SC_LONG_P_I",        NULL);
+    add_type("long long *",   "integer-A",       "SC_LONG_LONG_P_I",   NULL);
+    add_type("float *",       "real*4-A",        "SC_FLOAT_P_I",       NULL);
+    add_type("double *",      "real*8-A",        "SC_DOUBLE_P_I",      NULL);
+    add_type("long double *", "real*16-A",       "SC_LONG_DOUBLE_P_I", NULL);
+
+    add_type("pcons",         "integer(isizea)", "SC_PCONS_I",         NULL);
+    add_type("pcons *",       "integer(isizea)", "SC_PCONS_P_I",       NULL);
+    add_type("FILE *",        "integer(isizea)", "SC_FILE_I",          NULL);
+    add_type("PROCESS *",     "integer(isizea)", "SC_PROCESS_I",       NULL);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* ADD_DERIVED_TYPES - add derived types */
+
+static void add_derived_types(char **sbi)
+   {int ib;
+    char s[MAXLINE];
+    char *sb, **ta;
+
+    for (ib = 0; sbi[ib] != NULL; ib++)
+        {sb = sbi[ib];
+	 if (blank_line(sb) == FALSE)
+	    {if (strncmp(sb, "derived ", 8) == 0)
+		 {nstrncpy(s, MAXLINE, sb, -1);
+		  ta = tokenize(s, " \t");
+		  add_type(ta[1], ta[2], ta[3], ta[4]);
+		  free_strings(ta);};};};
 
     return;}
 
@@ -497,33 +541,18 @@ static char *deref(char *d, int nc, char *s)
 static void cf_type(char *a, int nc, char *ty)
    {char *fty;
 
-    fty = lookup_type(ty, MODE_C, MODE_F);
-    if (fty != NULL)
-       nstrncpy(a, nc, fty, -1);
-
     if (strcmp(ty, "char *") == 0)
        nstrncpy(a, nc, "string", -1);
 
     else if (is_ptr(ty) == TRUE)
        nstrncpy(a, nc, "void *", -1);
 
-    else if ((strncmp(ty, "int", 3) == 0) ||
-	     (strncmp(ty, "long", 4) == 0) || 
-	     (strncmp(ty, "short", 5) == 0) || 
-	     (strncmp(ty, "long long", 9) == 0))
-       nstrncpy(a, nc, "integer", -1);
-
-    else if (strncmp(ty, "double", 6) == 0)
-       nstrncpy(a, nc, "real*8", -1);
-
-    else if (strncmp(ty, "float", 6) == 0)
-       nstrncpy(a, nc, "real*4", -1);
-
-    else if (strncmp(ty, "void", 4) == 0)
-       nstrncpy(a, nc, "", -1);
-
     else
-       nstrncpy(a, nc, "unknown", -1);
+       {fty = lookup_type(ty, MODE_C, MODE_F);
+	if (fty != NULL)
+	   nstrncpy(a, nc, fty, -1);
+	else
+	   nstrncpy(a, nc, "unknown", -1);};
 
     return;}
 
@@ -538,9 +567,19 @@ static void cf_type(char *a, int nc, char *ty)
 static fparam fc_type_prim(char *wty, int nc, char *ty, int ptr,
 			   langmode md)
    {fparam rv;
+    char *lty;
+
+    lty = lookup_type(ty, MODE_C, md);
 
     if (strcmp(ty, "char") == 0)
-       {nstrncpy(wty, nc, ty, -1);
+       {switch (md)
+	   {case MODE_C :
+	         nstrncpy(wty, nc, "char", -1);
+		 break;
+	    case MODE_F :
+	    default :
+	         nstrncpy(wty, nc, "character", -1);
+		 break;};
 	rv = ptr ? FP_STRING : FP_SCALAR;}
 
     else if (is_ptr(ty) == TRUE)
@@ -1285,21 +1324,35 @@ static FILE *init_module(char *pck)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* ITF_WRAPPABLE - return TRUE iff the function described by DCL
+ *               - can be fully wrapped as opposed to being declared
+ *               - external
+ */
+
+static int itf_wrappable(fdecl *dcl)
+   {int rv;
+    char *pr;
+
+    pr = dcl->proto;
+
+    rv = ((strstr(pr, "...") == NULL) && (strstr(pr, "void *") == NULL));
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* ITF_WRAP_EXT - write the interface for a simple extern */
 
 static void itf_wrap_ext(FILE *fp, char *pck, fdecl *dcl,
 			 char *cfn, char *ffn)
    {fparam knd;
     char fty[MAXLINE], cty[MAXLINE], wty[MAXLINE], wnm[MAXLINE];
-    char *rty, *pr;
+    char *rty;
     static int first = TRUE;
 
-    pr = dcl->proto;
-
 /* declare the incomplete ones as external */
-    if (((strstr(pr, "...") != NULL) ||
-	 (strstr(pr, "void *") != NULL)) &&
-	(strcmp(ffn, "none") != 0))
+    if ((itf_wrappable(dcl) == FALSE) && (strcmp(ffn, "none") != 0))
        {if (mc_need_ptr(dcl) == TRUE)
 	   {if (first == TRUE)
 	       {first = FALSE;
@@ -1329,15 +1382,11 @@ static void itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
     fparam knd;
     char a[MAXLINE], t[MAXLINE];
     char fty[MAXLINE], cty[MAXLINE], wty[MAXLINE], wnm[MAXLINE];
-    char *nm, *ty, *pr, *rty, *oper;
+    char *nm, *ty, *rty, *oper;
     farg *al;
 
-    pr = dcl->proto;
-
 /* emit complete declarations */
-    if ((strstr(pr, "...") == NULL) &&
-	(strstr(pr, "void *") == NULL) &&
-	(strcmp(ffn, "none") != 0))
+    if ((itf_wrappable(dcl) == TRUE) && (strcmp(ffn, "none") != 0))
        {rty = dcl->type;
 
 	na    = dcl->na;
@@ -1585,61 +1634,21 @@ static void sc_type(char *a, int nc, char *t)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* CS_TYPE - return "Scheme" type corresponding to C type T */
+/* CS_TYPE - return "Scheme" type corresponding to C type TY */
 
-static void cs_type(char *a, int nc, char *t)
-   {
+static void cs_type(char *a, int nc, char *ty)
+   {char *sty;
 
-    if (strcmp(t, "char *") == 0)
-       nstrncpy(a, nc, "SC_STRING_I", -1);
-    else if (strcmp(t, "char") == 0)
-       nstrncpy(a, nc, "SC_CHAR_I", -1);
+    sty = lookup_type(ty, MODE_C, MODE_S);
+    if (sty != NULL)
+       nstrncpy(a, nc, sty, -1);
 
-/* integer type */
-    else if (strcmp(t, "int") == 0)
-       nstrncpy(a, nc, "SC_INT_I", -1);
-    else if (strcmp(t, "int *") == 0)
-       nstrncpy(a, nc, "SC_INT_P_I", -1);
-    else if (strcmp(t, "long") == 0)
-       nstrncpy(a, nc, "SC_LONG_I", -1);
-    else if (strcmp(t, "long *") == 0)
-       nstrncpy(a, nc, "SC_LONG_P_I", -1);
-    else if (strcmp(t, "short") == 0)
-       nstrncpy(a, nc, "SC_SHORT_I", -1);
-    else if (strcmp(t, "short *") == 0)
-       nstrncpy(a, nc, "SC_SHORT_P_I", -1);
-
-    else if (strcmp(t, "long long") == 0)
-       nstrncpy(a, nc, "SC_LONG_LONG_I", -1);
-    else if (strcmp(t, "long long *") == 0)
-       nstrncpy(a, nc, "SC_LONG_LONG_P_I", -1);
-
-/* floating point types */
-    else if (strcmp(t, "double") == 0)
-       nstrncpy(a, nc, "SC_DOUBLE_I", -1);
-    else if (strcmp(t, "double *") == 0)
-       nstrncpy(a, nc, "SC_DOUBLE_P_I", -1);
-    else if (strcmp(t, "float") == 0)
-       nstrncpy(a, nc, "SC_FLOAT_I", -1);
-    else if (strcmp(t, "float *") == 0)
-       nstrncpy(a, nc, "SC_FLOAT_P_I", -1);
-
-/* structured types */
-    else if (strcmp(t, "pcons") == 0)
-       nstrncpy(a, nc, "SC_PCONS_I", -1);
-    else if (strcmp(t, "pcons *") == 0)
-       nstrncpy(a, nc, "SC_PCONS_P_I", -1);
-    else if (strcmp(t, "FILE *") == 0)
-       nstrncpy(a, nc, "SC_FILE_I", -1);
-    else if (strcmp(t, "PROCESS *") == 0)
-       nstrncpy(a, nc, "SC_PROCESS_I", -1);
-
-/* others */
-    else if (strcmp(t, "void *") == 0)
+    else if (strcmp(ty, "void *") == 0)
        nstrncpy(a, nc, "SC_VOID_I", -1);
-    else if ((strchr(t, '*') != NULL) ||
-	     (strstr(t, "(*") != NULL) ||
-	     (strstr(t, "PF") != NULL))
+
+    else if ((strchr(ty, '*') != NULL) ||
+	     (strstr(ty, "(*") != NULL) ||
+	     (strstr(ty, "PF") != NULL))
        nstrncpy(a, nc, "SC_POINTER_I", -1);
 
     else
@@ -2134,6 +2143,8 @@ static int blang(char *pck, int fwr, char *fpr, char *fbi)
 
 	spr = file_text(fpr);
 	sbi = file_text(fbi);
+
+	add_derived_types(sbi);
 
 	if (spr != NULL)
 	   {if (fwr & 1)

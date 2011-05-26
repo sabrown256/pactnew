@@ -1,6 +1,15 @@
 #
 # BL1.BIND - basic blang test
 #
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+# treat a struct as a character array - unless specific definition exists
+derived str	character-A	SC_STRING_I	SC_STRING_I
+derived etyp	integer		SC_ENUM_I	SC_ENUM_I
 
 # C	Fortran	Scheme	Python
 

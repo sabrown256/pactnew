@@ -1,6 +1,11 @@
 #
 # BL1.PROTO - basic blang test prototypes
 #
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
 
 void fav1(void)
 int fav2(void)
@@ -22,3 +27,6 @@ int fbmr2(int *a, float *b, double *c, char *d)
 int *fbmpv1(int a, float b, double c, char d)
 int *fbmpr2(int *a, float *b, double *c, char *d)
 
+char *fbcv1(int a, float b, double c, char d, int (*e)(void), PFInt f)
+char *fbmcv1(int a, float b, double c, char d)
+char *fbmcr2(int *a, float *b, double *c, char *d)
