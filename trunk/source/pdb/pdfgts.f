@@ -20,18 +20,18 @@
 ! ... local variables
       integer, parameter :: MAXMSG = 256
       integer nchar
-      character*256 err
+!      character*256 err
 
       nchar = MAXMSG
-      if ((wpdgerr(nchar, err) .eq. 1) .and. (nchar .gt. 0)) then
-         nchar = min(nchar, MAXMSG)
-         write(6, 100)
- 100     format()
-         write(6, *) err
-      else
-         write(6, 102)
- 102     format(/, 'Error in PDWFTS', /)
-      endif
+!      if ((wpdgerr(nchar, err) .eq. 1) .and. (nchar .gt. 0)) then
+!         nchar = min(nchar, MAXMSG)
+!         write(6, 100)
+! 100     format()
+!         write(6, *) err
+!      else
+!         write(6, 102)
+! 102     format(/, 'Error in PDWFTS', /)
+!      endif
 
       stop 1
       end
@@ -124,24 +124,24 @@
       integer(isizea) fileid
 
 ! ... local variables
-      integer k, l, st
-      real*8 xmin, xmax, ymin, ymax, data(0:10, 0:10)
-
-      xmin = 0.
-      xmax = 10.
-      ymin = 0.
-      ymax = 10.
-
-      do l = 0, 10
-         do k = 0, 10
-            data(k, l) = float((k - 5)**2 + (l - 5)**2)
-         enddo
-      enddo
-
-      st = wpdwima(fileid, 10, 'Test image', 0, 10, 0, 10,  &
-                  data, xmin, xmax, ymin, ymax, 0)
-      if (st .eq. 0) &
-         call errproc
+!      integer k, l, st
+!      real*8 xmin, xmax, ymin, ymax, data(0:10, 0:10)
+!
+!      xmin = 0.0
+!      xmax = 10.0
+!      ymin = 0.0
+!      ymax = 10.0
+!
+!      do l = 0, 10
+!         do k = 0, 10
+!            data(k, l) = float((k - 5)**2 + (l - 5)**2)
+!         enddo
+!      enddo
+!
+!      st = wpdwima(fileid, 10, 'Test image', 0, 10, 0, 10,  &
+!                  data, xmin, xmax, ymin, ymax, 0)
+!      if (st .eq. 0) &
+!         call errproc
 
       return
       end subroutine wrtima
@@ -155,7 +155,7 @@
       use pact_pdb
       implicit none
 
-      integer fileid
+      integer(isizea) fileid
 
 ! ... local variables
       integer k, l, st
@@ -167,9 +167,9 @@
          enddo
       enddo
 
-      st = wpdrptr(fileid, 14, 'Image0->buffer', 121, odata)
-      if (st .eq. 0) &
-         call errproc
+!      st = wpdrptr(fileid, 14, 'Image0->buffer', 121, odata)
+!      if (st .eq. 0) &
+!         call errproc
 
       do l = 0, 10
          do k = 0, 10
@@ -214,17 +214,17 @@
          rm(i) = sin(6.28*float(i)/99.)
       enddo
 
-      st = wpdwmap(fileid, 'Domain0', dp, dm, 'Range0', rp, rm, pim)
-      if (st .eq. 0) &
-         call errproc
+!      st = wpdwmap(fileid, 'Domain0', dp, dm, 'Range0', rp, rm, pim)
+!      if (st .eq. 0) &
+!         call errproc
 
       pim = 1
 
-      if (wpdwset(fileid, 'Domain1', dp, dm) .eq. 0) &
-         call errproc
+!      if (wpdwset(fileid, 'Domain1', dp, dm) .eq. 0) &
+!         call errproc
 
-      if (wpdwran(fileid, 'Domain1', 7, 'Range1', rp, rm, pim) .eq. 0) &
-         call errproc
+!      if (wpdwran(fileid, 'Domain1', 7, 'Range1', rp, rm, pim) .eq. 0) &
+!         call errproc
 
       return
       end subroutine wrtmap
@@ -238,7 +238,7 @@
       use pact_pdb
       implicit none
 
-      integer fileid
+      integer(isizea) fileid
       real*8 tolerance
 
 ! ... local variables
@@ -251,9 +251,9 @@
          rm(i) = sin(6.28*float(i)/99.0)
       enddo
 
-      st = wpdrptr(fileid, 29, 'Mapping0->domain->elements[1]', 100, odm)
-      if (st .eq. 0) &
-         call errproc
+!      st = wpdrptr(fileid, 29, 'Mapping0->domain->elements[1]', 100, odm)
+!      if (st .eq. 0) &
+!         call errproc
 
       st = wpdread(fileid, 35, 'Mapping0->range->elements[1][1:100]', orm)
       if (st .eq. 0) &
@@ -269,9 +269,9 @@
       if (st .eq. 0) &
          call errproc
 
-      st = wpdrptr(fileid, 28, 'Mapping1->range->elements[1]', 100, orm)
-      if (st .eq. 0) &
-         call errproc
+!      st = wpdrptr(fileid, 28, 'Mapping1->range->elements[1]', 100, orm)
+!      if (st .eq. 0) &
+!         call errproc
 
       do i = 0, 99
          if ((abs(dm(i) - odm(i)) .gt. tolerance) &
@@ -301,12 +301,15 @@
 
 ! ... local variables
       integer i, j, k, l
-      integer fileid, offset, st
+      integer offset, st
       integer ndims, dims(14), pairs(6)
       integer nchar
       integer istring
       integer LAST
       
+      integer(isizea) fileid
+      integer(isizea) ad
+
       real*8 a, c, g, z, zz, zzx
       real*8 x(20)
 
@@ -346,7 +349,7 @@
       l = 3
 
 ! ... open file for writing
-      fileid = wpdopen(8, 'file.pdb', 'w')
+      fileid = wpdopen('file.pdb', 'w')
       if (fileid .le. 0) &
          call errproc
 
@@ -355,14 +358,14 @@
          call errproc
 
 ! ... check file mode
-      if (wpdgmod(fileid) .ne. 4) &
-         call errproc
+!      if (wpdgmod(fileid) .ne. 4) &
+!         call errproc
 
 ! ... set and get and verify default offset
       offset = 1
-      if (wpdsoff(fileid, offset) .eq. 0) &
-         call errproc
-      offset = wpdgoff(fileid)
+!      if (wpdsoff(fileid, offset) .eq. 0) &
+!         call errproc
+!      offset = wpdgoff(fileid)
 
       if (PRINT) then
          write(6, 300) offset
@@ -373,10 +376,10 @@
          call errproc
 
 ! ... write at least one variable before creating a directory
-      if (wpdwrta(fileid, 5, 'x(20)', 6, 'double', x) .eq. 0) &
+      if (wpdwrt(fileid, 'x(20)', 'double', x) .eq. 0) &
          call errproc
 
-      if (wpdappa(fileid, 7, 'x(1:10)', x) .eq. 0) &
+      if (wpdapp(fileid, 'x(1:10)', x) .eq. 0) &
          call errproc
 
       if (PRINT) then 
@@ -393,21 +396,21 @@
 
 ! ... create a directory
       if (DIR) then
-         if (wpdmkdr(fileid, 4, "dir1") .eq. 0) &
+         if (wpdmkdr(fileid, "dir1") .eq. 0) &
             call errproc
       endif
 
 ! ... get current working directory
-      if (wpdpwd(fileid, nchar, name) .eq. 0) &
-         call errproc
-
-      if (PRINT) then
-         write(6, 350) name(1:nchar)
- 350     format(/, 'Current working directory:  ', a)
-      endif
-
-      if ((name(1:nchar) .ne. '/') .or. (nchar .ne. 1)) &
-         call errproc
+!      if (wpdpwd(fileid, nchar, name) .eq. 0) &
+!         call errproc
+!
+!      if (PRINT) then
+!         write(6, 350) name(1:nchar)
+! 350     format(/, 'Current working directory:  ', a)
+!      endif
+!
+!      if ((name(1:nchar) .ne. '/') .or. (nchar .ne. 1)) &
+!         call errproc
 
 ! ... write curve, image, and mappings in root after creating directory
       if (OPTION .eq. "2") then
@@ -436,12 +439,10 @@
       dims(7) = 1
       dims(8) = 2
       dims(9) = 1
-      if (wpdappd(fileid, 1, 'z', z, ndims, dims) .eq. 0) &
+      if (wpdapp(fileid, 1, 'z', z, ndims, dims) .eq. 0) &
          call errproc
 
-! ... write  data item zz   write_as_alt
-!                                     append_as,  append_as_alt
-
+! ... write  data item zz   write_as_alt, append_as, append_as_alt
       ndims = 3
       dims(1) = 1
       dims(2) = 4
@@ -452,12 +453,11 @@
       dims(7) = 1
       dims(8) = 1
       dims(9) = 1
-      st = wpdwrad(fileid, 2, 'zz', 6, 'double', nout, outtype, zz, &
-                  ndims, dims)
+      st = wpdwrat(fileid, 'zz', 'double', nout, outtype, zz, ndims, dims)
       if (st .eq. 0) &
          call errproc
 
-      st = wpdapas(fileid, 15, 'zz(1:4,1:5,1:1)', 6, 'double', zz(1, 1, 2))
+      st = wpdappa(fileid, 'zz(1:4,1:5,1:1)', 'double', zz(1, 1, 2))
       if (st .eq. 0) &
          call errproc
 
@@ -471,9 +471,9 @@
       dims(7) = 1
       dims(8) = 2
       dims(9) = 1
-      if (wpdapad(fileid, 2, 'zz', 6, 'double', zzx, ndims, dims) .eq. 0) &
+      st = wpdapat(fileid, 'zz', 'double', zzx, ndims, dims)
+      if (st .eq. 0) &
          call errproc
-
 
       if (PRINT) then 
          write(6, 305) 
@@ -482,39 +482,39 @@
 
 ! ... change directory
       if (DIR) then
-         if (wpdcd(fileid, 4, "dir1") .eq. 0) &
+         if (wpdcd(fileid, "dir1") .eq. 0) &
             call errproc
       endif
 
 ! ... get current working directory
-      if (wpdpwd(fileid, nchar, name) .eq. 0) &
-         call errproc
-
-      if (PRINT) then
-         write(6, 351) name(1:nchar)
- 351     format(/, 'Current working directory:  ', a)
-      endif
-
-      if (((.not. DIR) .and. (nchar .ne. 1)) .or.&
-          (DIR .and. (nchar .ne. 5))) &
-         call errproc
+!      if (wpdpwd(fileid, nchar, name) .eq. 0) &
+!         call errproc
+!
+!      if (PRINT) then
+!         write(6, 351) name(1:nchar)
+! 351     format(/, 'Current working directory:  ', a)
+!      endif
+!
+!      if (((.not. DIR) .and. (nchar .ne. 1)) .or. &
+!          (DIR .and. (nchar .ne. 5))) &
+!         call errproc
 
 ! ... create a link
       if (DIR) then
-         if (wpdln(fileid, 2, '/x', 6, 'x_link') .eq. 0) &
+         if (wpdln(fileid, '/x', 'x_link') .eq. 0) &
             call errproc
       else
-         if (wpdln(fileid, 1, 'x', 6, 'x_link') .eq. 0) &
+         if (wpdln(fileid, 'x', 'x_link') .eq. 0) &
             call errproc
       endif
 
 ! ... define and write some data structures
-      st = wpddefs(fileid, 3, 'abc', 11, 'double a(2)', 8, 'double b', &
-                  15, 'double c(2, 2:4)', LAST)
-      if (st .eq. 0) &
-         call errproc
+!      ad = wpddfsr(fileid, 'abc', 'double a(2)', 'double b', &
+!                   'double c(2, 2:4)', LAST)
+!      if (ad .eq. 0) &
+!         call errproc
 
-      if (wpdwrta(fileid, 3, 'abc', 3, 'abc', a) .eq. 0) &
+      if (wpdwrt(fileid, 'abc', 'abc', a) .eq. 0) &
          call errproc
 
       pairs(1) = 0
@@ -523,10 +523,10 @@
       pairs(4) = 5
       pairs(5) = 10
       pairs(6) = 5
-      if (wpddeft(fileid, 3, 'jkl', 3, pairs, 'int jint kint l') .eq. 0) &
-         call errproc
+!      if (wpddent(fileid, 'jkl', pairs, 'int jint kint l') .eq. 0) &
+!         call errproc
 
-      if (wpdwrta(fileid, 3, 'jkl', 3, 'jkl', j) .eq. 0) &
+      if (wpdwrt(fileid, 'jkl', 'jkl', j) .eq. 0) &
          call errproc
 
 ! ... define and write arrays of strings
@@ -542,19 +542,18 @@
       dims(4) = 1
       dims(5) = 4
       dims(6) = 1
-      st = wpdwrtd(fileid, 7, 'strings', 4, 'char', istring, &
-                  ndims, dims)
+      st = wpdwrt(fileid, 'strings', 'char', istring, ndims, dims)
       if (st .eq. 0) &
          call errproc
 
 ! ... define an attribute
       if (ATTR) then
-         if (wpddatt(fileid, 4, 'date', 6, 'char *') .eq. 0) &
+         if (wpddatt(fileid, 'date', 'char *') .eq. 0) &
             call errproc
       endif
 
 ! ... define some symbol table entries and reserve disk space
-      if (wpddefa(fileid, 14, 'f(0:3, 4:6, 1:2)', 6, 'double') .eq. 0) &
+      if (wpdden(fileid, 'f(0:3, 4:6, 1:2)', 'double') .eq. 0) &
          call errproc
 
       ndims = 2
@@ -562,7 +561,7 @@
       dims(2) = 5
       dims(3) = 2
       dims(4) = 10
-      if (wpddefd(fileid, 1, 'g', 6, 'double', ndims, dims) .eq. 0) &
+      if (wpddent(fileid, 'g', 'double', ndims, dims) .eq. 0) &
          call errproc
 
       ndims = 2
@@ -574,9 +573,9 @@
       dims(6) = 1
       g(1, 2) = 100
       g(2, 2) = 101
-      if (wpdwrtd(fileid, 1, 'g', 6, 'double', g, ndims, dims) .eq. 0) &
+      if (wpdwrt(fileid, 'g', 'double', g, ndims, dims) .eq. 0) &
          call errproc
-!      if (wpdwrtd(fileid, 6, 'g[1, 2]', 6, 'double', g, ndims, dims) &
+!      if (wpdwrt(fileid, 'g[1, 2]', 'double', g, ndims, dims) &
 !           .eq. 0) &
 !         call errproc
 
@@ -584,7 +583,7 @@
       dims(1) = 1
       dims(2) = 2
       dims(3) = 1
-      if (wpdwrtd(fileid, 1, 'a', 6, 'double', a, ndims, dims) .eq. 0) &
+      if (wpdwrt(fileid, 1, 'a', 6, 'double', a, ndims, dims) .eq. 0) &
          call errproc
 
       ndims = 2
@@ -594,11 +593,11 @@
       dims(4) = 2
       dims(5) = 4
       dims(6) = 1
-      if (wpdwrtd(fileid, 1, 'c', 6, 'double', c, ndims, dims) .eq. 0) &
+      if (wpdwrt(fileid, 'c', 'double', c, ndims, dims) .eq. 0) &
          call errproc
 
 ! ... create a link
-      if (wpdln(fileid, 3, 'jkl', 9, '/jkl_link') .eq. 0) &
+      if (wpdln(fileid, 'jkl', '/jkl_link') .eq. 0) &
          call errproc
 
 ! ... set attribute value for member of struct
@@ -645,12 +644,14 @@
 
 ! ... local variables
       integer i, j, k, l, n
-      integer nt, fileid, st
+      integer nt, st
       integer ntype, ndims, dims(14), nitems
       integer typsiz, align, nptr
       integer kindx
       integer nchar
        
+      integer(isizea) fileid
+
       character*256 name
       character*8 name1, name2
       character*5 name3, name4
@@ -700,29 +701,29 @@
       l = 3
 
 ! ... open the file for reading
-      fileid = wpdopen(8, 'file.pdb', 'a')
+      fileid = wpdopen('file.pdb', 'a')
       if (fileid .eq. 0) &
          call errproc
 
 ! ... get file name given id
-      nchar = 8
-      if (wpdgfnm(fileid, nchar, name1) .eq. 0) &
-         call errproc
-
-      name2 = 'file.pdb'
-      if (name1 .ne. name2) &
-         call errproc
+!      nchar = 8
+!      if (wpdgfnm(fileid, nchar, name1) .eq. 0) &
+!         call errproc
+!
+!      name2 = 'file.pdb'
+!      if (name1 .ne. name2) &
+!         call errproc
 
 ! ... check file mode
-      if (wpdgmod(fileid) .ne. 2) &
-         call errproc
+!      if (wpdgmod(fileid) .ne. 2) &
+!         call errproc
 
 ! ... retrieve and verify the value of an attribute
       if (ATTR) then
-         if (wpdcd(fileid, 4, "dir1") .eq. 0) &
+         if (wpdcd(fileid, "dir1") .eq. 0) &
             call errproc
 
-         if (wpdgvat(fileid, 11, '/jkl_link.k', 4, 'date', dt) .eq. 0) &
+         if (wpdgvat(fileid, '/jkl_link.k', 'date', dt) .eq. 0) &
             call errproc
 
          if (PRINT) then
@@ -736,18 +737,18 @@
          enddo
 
 ! ... remove an attribute
-         if (wpdratt(fileid, 4, 'date') .eq. 0) &
+         if (wpdratt(fileid, 'date') .eq. 0) &
             call errproc
 
 ! ... verify that attribute was removed
-         if (wpdgvat(fileid, 11, '/jkl_link.k', 4, 'date', dt) &
+         if (wpdgvat(fileid, '/jkl_link.k', 'date', dt) &
               .ne. 0) then
             write(6, 380)
  380        format(/, 'Attribute was not removed.')
             stop 1
          endif
       
-         if (wpdcd(fileid, 1, "/") .eq. 0) &
+         if (wpdcd(fileid, "/") .eq. 0) &
             call errproc
 
       endif
@@ -766,8 +767,8 @@
       do n = 1, 4
          dims(7) = n
          dims(8) = n
-         if (wpdptrd(fileid, 1, 'z', z2, dims) .eq. 0) &
-            call errproc
+!         if (wpdptrd(fileid, 'z', z2, dims) .eq. 0) &
+!            call errproc
 
          do j = 1, 5
             do i = 1, 4
@@ -799,9 +800,9 @@
       dims(8) = 2
       dims(9) = 1
 
-      if (wpdrdad(fileid, 2, 'zz', 6, 'double', zz2, dims) .eq. 0) &
+      if (wpdrdat(fileid, 'zz', 'double', zz2, dims) .eq. 0) &
          call errproc
-!      if (wpdptrd(fileid, 2, 'zz', zz2, dims) .eq. 0) &
+!      if (wpdptrd(fileid, 'zz', zz2, dims) .eq. 0) &
 !         call errproc
       do kindx = 1, 2
          do j = 1, 5
@@ -813,9 +814,9 @@
          enddo
       enddo
 
-      if (wpdrdas(fileid, 15, 'zz(1:4,1:5,3:4)', 6, 'double', zz2) &
+      if (wpdrda(fileid, 'zz(1:4,1:5,3:4)', 'double', zz2) &
              .eq. 0) call errproc
-!      if (wpdread(fileid, 15, 'zz(1:4,1:5,3:4)', zz2) &
+!      if (wpdread(fileid, 'zz(1:4,1:5,3:4)', zz2) &
 !             .eq. 0) call errproc
 
          do kindx = 1, 2
@@ -835,38 +836,38 @@
 
 
 ! ... get current working directory
-      if (wpdpwd(fileid, nchar, name) .eq. 0) &
-         call errproc
-
-      if (PRINT) then
-         write(6, 352) name(1:nchar)
- 352     format(/, 'Current working directory:  ', a)
-      endif
-
-      if ((name(1:nchar) .ne. '/') .or. (nchar .ne. 1)) &
-         call errproc
+!      if (wpdpwd(fileid, nchar, name) .eq. 0) &
+!         call errproc
+!
+!      if (PRINT) then
+!         write(6, 352) name(1:nchar)
+! 352     format(/, 'Current working directory:  ', a)
+!      endif
+!
+!      if ((name(1:nchar) .ne. '/') .or. (nchar .ne. 1)) &
+!         call errproc
 
 ! ... change directory
       if (DIR) then
-         if (wpdcd(fileid, 4, "dir1") .eq. 0) &
+         if (wpdcd(fileid, "dir1") .eq. 0) &
             call errproc
       endif
 
 ! ... get current working directory
-      if (wpdpwd(fileid, nchar, name) .eq. 0) &
-         call errproc
-
-      if (PRINT) then
-         write(6, 352) name(1:nchar)
-      endif
-
-      if (((.not. DIR) .and. (nchar .ne. 1)) .or.&
-          (DIR .and. (nchar .ne. 5))) &
-         call errproc
+!      if (wpdpwd(fileid, nchar, name) .eq. 0) &
+!         call errproc
+!
+!      if (PRINT) then
+!         write(6, 352) name(1:nchar)
+!      endif
+!
+!      if (((.not. DIR) .and. (nchar .ne. 1)) .or. &
+!          (DIR .and. (nchar .ne. 5))) &
+!         call errproc
 
 ! ... inquire about a struct types
-      if (wpdityp(fileid, 3, 'abc', typsiz, align, nptr) .eq. 0) &
-         call errproc
+!      if (wpdityp(fileid, 'abc', typsiz, align, nptr) .eq. 0) &
+!         call errproc
 
       if (PRINT) then
          write(6, 450) typsiz, align, nptr
@@ -877,18 +878,18 @@
       if ((typsiz .ne. 72) .or. (nptr .ne. 0)) &
          call errproc
 
-      nchar = 5
-      if (wpdimbr(fileid, 3, 'jkl', 3, nchar, name3) .eq. 0) &
-         call errproc
-
-      name4 = 'int l'
-      if ((nchar .ne. 5) .or. (name3 .ne. name4)) &
-         call errproc
+!      nchar = 5
+!      if (wpdimbr(fileid, 'jkl', nchar, name3) .eq. 0) &
+!         call errproc
+!
+!      name4 = 'int l'
+!      if ((nchar .ne. 5) .or. (name3 .ne. name4)) &
+!         call errproc
 
 ! ... inquire about unwritten variable
-      st = wpdivar(fileid, 1, 'f', ntype, type, nitems, ndims, dims)
-      if (st .eq. 0) &
-         call errproc
+!      st = wpdivar(fileid, 'f', ntype, type, nitems, ndims, dims)
+!      if (st .eq. 0) &
+!         call errproc
 
       if (PRINT) then
          write(6, 500) nitems
@@ -901,9 +902,9 @@
          call errproc
 
 ! ... inquire about written variable
-      st = wpdivar(fileid, 1, 'c', ntype, type, nitems, ndims, dims)
-      if (st .eq. 0) &
-         call errproc
+!      st = wpdivar(fileid, 'c', ntype, type, nitems, ndims, dims)
+!      if (st .eq. 0) &
+!         call errproc
 
       if (PRINT) then
          write(6, 502) nitems
@@ -942,10 +943,11 @@
 ! ... local variables
       integer i, j, k, l, n
       integer j2, k2, l2
-      integer fileid, nfileid, st
-      integer ntype, ndims, nitems
+      integer st, ntype, ndims, nitems
       integer pord, nvar, nchar
       integer dims(14)
+
+      integer(isizea) fileid, nfileid
 
       real*8 x(20)
       real*8 a, c, g, z, zz, zzx
@@ -994,51 +996,51 @@
       l = 3
 
 ! ... open the original file for reading
-      fileid = wpdopen(8, 'file.pdb', 'a')
+      fileid = wpdopen('file.pdb', 'a')
       if (fileid .eq. 0) &
          call errproc
 
 ! ... change directory
       if (DIR) then
-         if (wpdcd(fileid, 4, "dir1") .eq. 0) &
+         if (wpdcd(fileid, "dir1") .eq. 0) &
             call errproc
       endif
 
 ! ... copy type definition to new file and write variable
-      nfileid = wpdopen(9, 'file2.pdb', 'w')
+      nfileid = wpdopen('file2.pdb', 'w')
       if (nfileid .le. 0) &
          call errproc
 
-      if (wpdctyp(fileid, nfileid, 3, 'jkl') .eq. 0) &
-         call errproc
+!      if (wpdctyp(fileid, nfileid, 'jkl') .eq. 0) &
+!         call errproc
 
       j = 1
       k = 2
       l = 3
-      if (wpdwrta(nfileid, 3, 'jkl', 3, 'jkl', j) .eq. 0) &
+      if (wpdwrt(nfileid, 'jkl', 'jkl', j) .eq. 0) &
          call errproc
 
       if (wpdclos(nfileid) .eq. 0) &
          call errproc
 
 ! ... verify correctness of variable
-      if (wpdread(fileid, 1, 'a', a2) .eq. 0) &
+      if (wpdread(fileid, 'a', a2) .eq. 0) &
          call errproc
 
       if ((a(1) .ne. 1.) .or. (a(2) .ne. 2.)) &
          call errproc
 
 ! ... verify correctness of partially written variable
-      if (wpdread(fileid, 1, 'g', g2) .eq. 0) &
+      if (wpdread(fileid, 'g', g2) .eq. 0) &
          call errproc
 
       if ((g2(1, 2) .ne. 100) .or. (g2(2, 2) .ne. 0)) &
          call errproc
 
 ! ... inquire about a structure member
-      st = wpdivar(fileid, 3, 'abc.c', ntype, type, nitems, ndims, dims)
-      if (st .eq. 0) &
-         call errproc
+!      st = wpdivar(fileid, 'abc.c', ntype, type, nitems, ndims, dims)
+!      if (st .eq. 0) &
+!         call errproc
 
       if (PRINT) then
          write(6, 504) nitems
@@ -1048,14 +1050,14 @@
       endif
 
 ! ... read struct by link and verify
-      if (wpdread(fileid, 9, '/jkl_link', j2) .eq. 0) &
+      if (wpdread(fileid, '/jkl_link', j2) .eq. 0) &
          call errproc
 
       if ((j2 .ne. 1) .or. (k2 .ne. 2) .or. (l2 .ne. 3)) &
          call errproc
 
 ! ... read struct member
-      if (wpdread(fileid, 5, 'jkl.k', k2) .eq. 0) &
+      if (wpdread(fileid, 'jkl.k', k2) .eq. 0) &
          call errproc
 
       if (PRINT) then
@@ -1071,8 +1073,8 @@
       dims(1) = 2
       dims(2) = 2
       dims(3) = 1
-      if (wpdptrd(fileid, 5, 'abc.a', abc_a, dims) .eq. 0) &
-         call errproc
+!      if (wpdptrd(fileid, 'abc.a', abc_a, dims) .eq. 0) &
+!         call errproc
 
       if (PRINT) then
          write(6, 602)
@@ -1085,13 +1087,13 @@
          call errproc
 
 ! ... read elements of struct members
-      if (wpdread(fileid, 8, 'abc.a(2)', abc_a) .eq. 0) &
+      if (wpdread(fileid, 'abc.a(2)', abc_a) .eq. 0) &
          call errproc
 
       if (abc_a .ne. 2.0) &
          call errproc
 
-      if (wpdread(fileid, 10, 'abc.c(1,2)', c_1_2) .eq. 0) &
+      if (wpdread(fileid, 'abc.c(1,2)', c_1_2) .eq. 0) &
          call errproc
 
       if (c_1_2 .ne. 4.0) &
@@ -1100,56 +1102,56 @@
 ! ... get the variable names in alphabetic order and check last name
       pord = 1
       nvar = 0
-      if (wpdvart(fileid, pord, nvar) .eq. 0) &
-         call errproc
+!      if (wpdvart(fileid, pord, nvar) .eq. 0) &
+!         call errproc
 
       if (PRINT) then
          write(6, 700)
  700     format(/, 'Alphabetic list of variables:')
       endif
 
-      do n = 1, nvar
-         if (wpdgvar(n, nchar, vname) .eq. 0) &
-            call errproc
-         if (PRINT) then
-            write(6, 702) vname(1:nchar)
- 702        format('    ', a)
-         endif
-      enddo
+!      do n = 1, nvar
+!         if (wpdgvar(n, nchar, vname) .eq. 0) &
+!            call errproc
+!         if (PRINT) then
+!            write(6, 702) vname(1:nchar)
+! 702        format('    ', a)
+!         endif
+!      enddo
 
-!      if ((DIR .and. (vname(1) .ne. 'x')) .or.&
-!          ((.not. DIR) .and. (vname(1) .ne. 'z'))) &
+!!      if ((DIR .and. (vname(1) .ne. 'x')) .or.&
+!!          ((.not. DIR) .and. (vname(1) .ne. 'z'))) &
+!!         call errproc
+
+!      if (wpddvar() .eq. 0) &
 !         call errproc
 
-      if (wpddvar() .eq. 0) &
-         call errproc
-
-! ... get the variable and directory names in root
-      if (wpdlst(fileid, 1, '/', 0, ' ', nvar) .eq. 0) &
-         call errproc
+!! ... get the variable and directory names in root
+!      if (wpdls(fileid, '/', ' ', nvar) .eq. 0) &
+!         call errproc
 
       if (PRINT) then
          write(6, 800)
  800     format(/, 'Variables and directories in root:')
       endif
 
-      do n = 1, nvar
-         if (wpdgls(n, nchar, vname) .eq. 0) &
-            call errproc
-         if (PRINT) then
-            write(6, 702) vname(1:nchar)
-         endif
-      enddo
+!      do n = 1, nvar
+!         if (wpdgls(n, nchar, vname) .eq. 0) &
+!            call errproc
+!         if (PRINT) then
+!            write(6, 702) vname(1:nchar)
+!         endif
+!      enddo
 
-      if (vname(1:1) .ne. 'z') &
-         call errproc
+!      if (vname(1:1) .ne. 'z') &
+!         call errproc
 
 ! ... get the variable and directory names in dir1
       nvar = 0
 
       if (DIR) then
-         if (wpdlst(fileid, 5, '/dir1', 0, ' ', nvar) .eq. 0) &
-            call errproc
+!         if (wpdlst(fileid, '/dir1', ' ', nvar) .eq. 0) &
+!            call errproc
       endif
 
       if (PRINT) then
@@ -1157,16 +1159,16 @@
  850     format(/, 'Variables and directories in dir1:')
       endif
 
-      do n = 1, nvar
-         if (wpdgls(n, nchar, vname) .eq. 0) &
-            call errproc
-         if (PRINT) then
-            write(6, 702) vname(1:nchar)
-         endif
-      enddo
-
-      if (wpddls() .eq. 0) &
-         call errproc
+!      do n = 1, nvar
+!         if (wpdgls(n, nchar, vname) .eq. 0) &
+!            call errproc
+!         if (PRINT) then
+!            write(6, 702) vname(1:nchar)
+!         endif
+!      enddo
+!
+!      if (wpddls() .eq. 0) &
+!         call errproc
 
 ! ... check curve, image, mapping
       if (OPTION .ne. "0") then
@@ -1199,10 +1201,11 @@
 ! ... program input command option flags
       logical PRINT, DIR, TARGET, ATTR
 
-      integer is, ia, st
-      integer bufsiz1, bufsiz2, bufsiz3
+      integer is, st
       integer narg, iarg, iargc
       integer nout, err
+
+      integer*8 bufsiz1, bufsiz2, bufsiz3
 
       character*8 outtype
       character*8 arg
@@ -1216,7 +1219,7 @@
 !        3 - in directory dir1
       character*8  OPTION
 
-      err = wpdinth(0, 0)
+!      err = wpdinth(0, 0)
       err = sczrsp(0)
 
 ! ... initialize input command option flags
@@ -1296,8 +1299,8 @@
 
 ! ... set and get buffer size
       bufsiz1 = 4096
-      bufsiz2 = wpdsbfs(bufsiz1)
-      bufsiz3 = wpdgbfs()
+      bufsiz2 = wpdsbsz(bufsiz1)
+      bufsiz3 = wpdgbsz()
       if (bufsiz3 .eq. -1) then
          write(6, 200)
  200     format(/, 'Buffer size not previously set.')
@@ -1321,9 +1324,8 @@
 
 ! ... CRAY standard and alignment
          is = 9
-         ia = 4
 
-         if (wpdtrgt(is, ia) .eq. 0) &
+         if (wpdtgtn(is) .eq. 0) &
             call errproc
       endif
 
