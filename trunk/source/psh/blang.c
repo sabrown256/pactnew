@@ -560,103 +560,6 @@ static void cf_type(char *a, int nc, char *ty)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* FC_TYPE_PRIM - return C type corresponding to dereferenced
- *              - FORTRAN type TY in WTY
- *              - return the kind of FORTRAN argument TY is
- */
-
-static fparam fc_type_prim(char *wty, int nc, char *ty, int ptr,
-			   langmode md)
-   {fparam rv;
-    char *lty;
-
-    lty = lookup_type(ty, MODE_C, md);
-
-    if (strcmp(ty, "char") == 0)
-       {switch (md)
-	   {case MODE_C :
-	         nstrncpy(wty, nc, "char", -1);
-		 break;
-	    case MODE_F :
-	    default :
-	         nstrncpy(wty, nc, "character", -1);
-		 break;};
-	rv = ptr ? FP_STRING : FP_SCALAR;}
-
-    else if (is_ptr(ty) == TRUE)
-       {switch (md)
-	   {case MODE_C :
-	         nstrncpy(wty, nc, "void *", -1);
-		 break;
-	    case MODE_F :
-	    default :
-	         nstrncpy(wty, nc, "integer(isizea)", -1);
-		 break;};
-	rv = FP_ARRAY;}
-
-    else if ((strncmp(ty, "int", 3) == 0) ||
-	     (strncmp(ty, "long", 4) == 0) || 
-	     (strncmp(ty, "short", 5) == 0) || 
-	     (strncmp(ty, "long long", 9) == 0) ||
-	     (strncmp(ty, "FIXNUM", 6) == 0))
-       {switch (md)
-	   {case MODE_C :
-	         nstrncpy(wty, nc, "FIXNUM", -1);
-		 break;
-	    case MODE_F :
-	    default :
-	         nstrncpy(wty, nc, "integer", -1);
-		 break;};
-	rv = ptr ? FP_ARRAY : FP_SCALAR;}
-
-    else if (strncmp(ty, "double", 6) == 0)
-       {switch (md)
-	   {case MODE_C :
-	         nstrncpy(wty, nc, "double", -1);
-		 break;
-	    case MODE_F :
-	    default :
-	         nstrncpy(wty, nc, "real*8", -1);
-		 break;};
-	rv = ptr ? FP_ARRAY : FP_SCALAR;}
-
-    else if (strncmp(ty, "float", 6) == 0)
-       {switch (md)
-	   {case MODE_C :
-	         nstrncpy(wty, nc, "float", -1);
-		 break;
-	    case MODE_F :
-	    default :
-	         nstrncpy(wty, nc, "real*4", -1);
-		 break;};
-	rv = ptr ? FP_ARRAY : FP_SCALAR;}
-
-    else if (strncmp(ty, "void", 4) == 0)
-       {nstrncpy(wty, nc, "void", -1);
-	rv = ptr ? FP_ARRAY : FP_VOID;}
-
-/* handle other pointers */
-    else if (ptr)
-       {nstrncpy(wty, nc, "void *", -1);
-	rv = FP_PTR;}
-
-/* take unknown types to be integer - covers enums */
-    else
-       {switch (md)
-	   {case MODE_C :
-	         nstrncpy(wty, nc, "int", -1);
-		 break;
-	    case MODE_F :
-	    default :
-	         nstrncpy(wty, nc, "integer", -1);
-		 break;};
-	rv = ptr ? FP_ARRAY : FP_SCALAR;};
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* FC_TYPE - return C type corresponding to FORTRAN type TY in WTY
  *         - return the kind of FORTRAN argument TY is
  */
@@ -697,10 +600,11 @@ static fparam fc_type(char *wty, int nc, char *ty, langmode mode)
 	    nstrncpy(wty, nc, pty, -1);};}
 
     else
-       {berr("Unknown type '%s'", ty);
-	nstrncpy(wty, nc, ty, -1);
+       {nstrncpy(wty, nc, ty, -1);
 	if (LAST_CHAR(ty) == '*')
-	   rv = FP_STRUCT;};
+	   rv = FP_STRUCT;
+	else
+	   berr("Unknown type '%s'", ty);};
 
     return(rv);}
 
