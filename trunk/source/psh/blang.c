@@ -17,7 +17,7 @@ enum e_langmode
 typedef enum e_langmode langmode;
 
 enum e_fparam
-   {FP_ANY = -1, FP_VARARG, FP_FNC, FP_PTR,
+   {FP_ANY = -1, FP_VARARG, FP_FNC, FP_PTR, FP_STRUCT,
     FP_SCALAR, FP_ARRAY, FP_STRING, FP_VOID};
 
 typedef enum e_fparam fparam;
@@ -509,7 +509,8 @@ static void add_derived_types(char **sbi)
 		 {nstrncpy(s, MAXLINE, sb, -1);
 		  ta = tokenize(s, " \t");
 		  add_type(ta[1], ta[2], ta[3], ta[4]);
-		  free_strings(ta);};};};
+		  FREE(ta[0]);
+		  FREE(ta);};};};
 
     return;}
 
@@ -660,9 +661,11 @@ static fparam fc_type_prim(char *wty, int nc, char *ty, int ptr,
  *         - return the kind of FORTRAN argument TY is
  */
 
-static fparam fc_type(char *wty, int nc, char *ty, int mode)
+static fparam fc_type(char *wty, int nc, char *ty, langmode mode)
    {fparam rv;
-    char lty[MAXLINE];
+    char *pty;
+
+    pty = lookup_type(ty, MODE_C, mode);
 
 /* handle variable arg list */
     if (strcmp(ty, "...") == 0)
@@ -679,14 +682,25 @@ static fparam fc_type(char *wty, int nc, char *ty, int mode)
        {nstrncpy(wty, nc, "PFInt", -1);
 	rv = FP_FNC;}
 
-/* handle pointers */
-    else if (is_ptr(ty) == TRUE)
-       {deref(lty, MAXLINE, ty);
-        rv = fc_type_prim(wty, nc, lty, TRUE, mode);}
-  
-/* handle scalars */
+    else if (pty != NULL)
+       {if (LAST_CHAR(ty) == '*')
+	   {rv = FP_ARRAY;
+	    if (mode == MODE_C)
+	       deref(wty, MAXLINE, pty);
+	    else if (mode == MODE_F)
+	       {nstrncpy(wty, nc, pty, -1);
+		wty[strlen(wty)-2] = '\0';}
+	    else
+	       nstrncpy(wty, nc, pty, -1);}
+	else
+	   {rv = FP_SCALAR;
+	    nstrncpy(wty, nc, pty, -1);};}
+
     else
-       rv = fc_type_prim(wty, nc, ty, FALSE, mode);
+       {berr("Unknown type '%s'", ty);
+	nstrncpy(wty, nc, ty, -1);
+	if (LAST_CHAR(ty) == '*')
+	   rv = FP_STRUCT;};
 
     return(rv);}
 
@@ -870,7 +884,7 @@ static void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
 	fprintf(fp, "\n");
 
 	switch (knd)
-	   {case FP_PTR    :
+	   {case FP_PTR :
 	         snprintf(t, MAXLINE, "%s *FF_ID(w%s, W%s)(%s)\n",
 			  rt, ffn, ufn, a);
 		 break;
@@ -878,9 +892,13 @@ static void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
 	         snprintf(t, MAXLINE, "%s *FF_ID(w%s, W%s)(%s)\n",
 			  rt, ffn, ufn, a);
 		 break;
-	    case FP_ARRAY  :
+	    case FP_ARRAY :
 	         snprintf(t, MAXLINE, "%s *FF_ID(w%s, W%s)(%s)\n",
 			  rt, ffn, ufn, a);
+		 break;
+	    case FP_STRUCT :
+	         snprintf(t, MAXLINE, "FIXNUM FF_ID(w%s, W%s)(%s)\n",
+			  ffn, ufn, a);
 		 break;
 	    case FP_ANY    :
 	    case FP_VARARG :
@@ -913,14 +931,17 @@ static void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
 	     if (i == na)
 	        {if (voidf == FALSE)
 		    {switch (knd)
-		        {case FP_PTR    :
+		        {case FP_PTR :
 			      snprintf(t, MAXLINE, "%s *_rv;\n", rt);
 			      break;
 			 case FP_STRING :
 			      snprintf(t, MAXLINE, "%s *_rv;\n", rt);
 			      break;
-			    case FP_ARRAY  :
+			 case FP_ARRAY :
 			      snprintf(t, MAXLINE, "%s *_rv;\n", rt);
+			      break;
+			 case FP_STRUCT :
+			      snprintf(t, MAXLINE, "FIXNUM _rv;\n");
 			      break;
 			 case FP_ANY    :
 			 case FP_VARARG :
@@ -936,7 +957,7 @@ static void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
 /* local vars */
 	     else if (al[i].name[0] != '\0')
 	        {switch (al[i].knd)
-		    {case FP_PTR    :
+		    {case FP_PTR :
 		          snprintf(t, MAXLINE, "%s _l%s;\n",
 				   al[i].type, al[i].name);
 		          break;
@@ -944,7 +965,7 @@ static void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
 		          snprintf(t, MAXLINE, "%s_l%s;\n",
 				   al[i].type, al[i].name);
 		          break;
-		     case FP_ARRAY  :
+		     case FP_ARRAY :
 		          snprintf(t, MAXLINE, "%s_l%s;\n",
 				   al[i].type, al[i].name);
 		          break;
@@ -1003,7 +1024,7 @@ static void wrap_fortran(FILE *fp, fdecl *dcl, char *ffn)
 /* function call */
 	fc_call_list(a, MAXLINE, dcl);
 	if (voidf == FALSE)
-	   {if (rptr == TRUE)
+	   {if ((rptr == TRUE) || (knd == FP_STRUCT))
 	       fprintf(fp, "    _rv = SC_ADD_POINTER(%s(%s));\n",
 		       dcl->name, a);
 	    else
@@ -1433,13 +1454,13 @@ static void itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
 		      snprintf(t, MAXLINE, "         integer(isizea) :: %s\n",
 			       nm);
 		      break;
-		 case FP_STRING :
-		      snprintf(t, MAXLINE, "         character(*)    :: %s\n",
-			       nm);
-		      break;
 		 case FP_ARRAY :
-		      snprintf(t, MAXLINE, "         %-15s :: %s(*)\n",
-			       wty, nm);
+		      if (strcmp(wty, "character") == 0)
+			 snprintf(t, MAXLINE, "         character(*)    :: %s\n", 
+				  nm);
+		      else
+			 snprintf(t, MAXLINE, "         %-15s :: %s(*)\n",
+				  wty, nm);
 		      break;
 		 case FP_SCALAR :
 		 default :

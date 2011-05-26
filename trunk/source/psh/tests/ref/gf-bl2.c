@@ -12,7 +12,7 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-char *FF_ID(wfbcv1f, WFBCV1F)(FIXNUM *sa, float *sb, double *sc, char *sd, PFInt fe, PFInt ff)
+char *FF_ID(wfbcv1f, WFBCV1F)(int *sa, float *sb, double *sc, char *sd, PFInt fe, PFInt ff)
    {int _lsa;
     float _lsb;
     double _lsc;
@@ -35,7 +35,7 @@ char *FF_ID(wfbcv1f, WFBCV1F)(FIXNUM *sa, float *sb, double *sc, char *sd, PFInt
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-char *FF_ID(wfbmcv1f, WFBMCV1F)(FIXNUM *sa, float *sb, double *sc, char *sd)
+char *FF_ID(wfbmcv1f, WFBMCV1F)(int *sa, float *sb, double *sc, char *sd)
    {int _lsa;
     float _lsb;
     double _lsc;
@@ -54,19 +54,19 @@ char *FF_ID(wfbmcv1f, WFBMCV1F)(FIXNUM *sa, float *sb, double *sc, char *sd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-char *FF_ID(wfbmcr2f, WFBMCR2F)(FIXNUM *aa, float *ab, double *ac, char *cd)
+char *FF_ID(wfbmcr2f, WFBMCR2F)(int *aa, float *ab, double *ac, char *ad)
    {int *_laa;
     float *_lab;
     double *_lac;
-    char *_lcd;
+    char *_lad;
     char *_rv;
 
     _laa       = (int *) aa;
     _lab       = (float *) ab;
     _lac       = (double *) ac;
-    _lcd       = cd;
+    _lad       = (char *) ad;
 
-    _rv = fbmcr2(_laa, _lab, _lac, _lcd);
+    _rv = fbmcr2(_laa, _lab, _lac, _lad);
 
     return(_rv);}
 

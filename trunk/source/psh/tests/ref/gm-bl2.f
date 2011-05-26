@@ -56,23 +56,23 @@ module pact_bl2
          character       :: sd
       end function wfbmcv1f
 
-      type (C_PTR) function fbmcr2(aa, ab, ac, cd) bind(c, name='fbmcr2')
+      type (C_PTR) function fbmcr2(aa, ab, ac, ad) bind(c, name='fbmcr2')
          use iso_c_binding
          implicit none
          type (C_PTR), value :: aa
          type (C_PTR), value :: ab
          type (C_PTR), value :: ac
-         type (C_PTR), value :: cd
+         type (C_PTR), value :: ad
       end function fbmcr2
 
-      function wfbmcr2f(aa, ab, ac, cd)
+      function wfbmcr2f(aa, ab, ac, ad)
          use types_bl2
          implicit none
          integer(isizea) :: wfbmcr2f
          integer         :: aa(*)
          real*4          :: ab(*)
          real*8          :: ac(*)
-         character(*)    :: cd
+         character(*)    :: ad
       end function wfbmcr2f
 
    end interface
