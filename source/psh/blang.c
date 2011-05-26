@@ -654,6 +654,10 @@ static void fc_decl_list(char *a, int nc, fdecl *dcl)
 		      snprintf(nm, MAXLINE, "s%s", lnm);
 		      vstrcat(a, MAXLINE, "%s *%s, ", lty, nm);
 		      break;
+		 case FP_STRUCT :
+		      snprintf(nm, MAXLINE, "t%s", lnm);
+		      vstrcat(a, MAXLINE, "%s *%s, ", lty, nm);
+		      break;
 		 default :
 		      printf("Unknown type: %s\n", lty);
 		      break;};
@@ -1353,8 +1357,9 @@ static void itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
 	     nm  = al[i].name;
 	     knd = mc_type(MAXLINE, fty, cty, wty, nm, ty);
 	     switch (knd)
-	        {case FP_PTR :
-		 case FP_FNC :
+	        {case FP_PTR    :
+		 case FP_FNC    :
+		 case FP_STRUCT :
 		      snprintf(t, MAXLINE, "         integer(isizea) :: %s\n",
 			       nm);
 		      break;
