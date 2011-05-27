@@ -11,26 +11,41 @@ end module types_bl3
 module pact_bl3
    use iso_c_binding
 
+! ... external declarations for generated wrappers
+
 
    interface
 
-      type (C_PTR) function fe1(a1, sa2) &
+! ... declarations for generated wrappers
+      function fe1(a1, sa2) 
+         use types_bl3
+         implicit none
+         integer(isizea) :: fe1
+         integer(isizea) :: a1
+         integer         :: sa2
+      end function fe1
+
+      subroutine fe2(dev, ax, ay, sn, ainfo, sl) 
+         use types_bl3
+         implicit none
+         integer(isizea) :: dev
+         real*8          :: ax(*)
+         real*8          :: ay(*)
+         integer         :: sn
+         integer(isizea) :: ainfo
+         integer         :: sl
+      end subroutine fe2
+
+! ... declarations for interoperability
+      type (C_PTR) function fe1_i(a1, sa2) &
                 bind(c, name='fe1')
          use iso_c_binding
          implicit none
          type (C_PTR), value :: a1
          integer (C_INT), value :: sa2
-      end function fe1
+      end function fe1_i
 
-      function wfe1f(a1, sa2) 
-         use types_bl3
-         implicit none
-         integer(isizea) :: wfe1f
-         integer(isizea) :: a1
-         integer         :: sa2
-      end function wfe1f
-
-      subroutine fe2(dev, ax, ay, sn, ainfo, sl) &
+      subroutine fe2_i(dev, ax, ay, sn, ainfo, sl) &
                 bind(c, name='fe2')
          use iso_c_binding
          implicit none
@@ -40,18 +55,7 @@ module pact_bl3
          integer (C_INT), value :: sn
          type (C_PTR), value :: ainfo
          integer (C_INT), value :: sl
-      end subroutine fe2
-
-      subroutine wfe2f(dev, ax, ay, sn, ainfo, sl) 
-         use types_bl3
-         implicit none
-         integer(isizea) :: dev
-         real*8          :: ax(*)
-         real*8          :: ay(*)
-         integer         :: sn
-         integer(isizea) :: ainfo
-         integer         :: sl
-      end subroutine wfe2f
+      end subroutine fe2_i
 
    end interface
 

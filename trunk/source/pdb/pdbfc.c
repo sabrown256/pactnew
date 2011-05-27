@@ -293,7 +293,11 @@ FILE *_PD_open_container_file(char *name, char *mode)
     cf = CMAKE(containerf);
 
     fc = SC_open_fcontainer(cntr, SC_UNKNOWN);
-    fe = (fcent *) SC_hasharr_def_lookup(fc->handle->entries, file);
+    if (fc == NULL)
+       fe = NULL;
+    else
+       fe = (fcent *) SC_hasharr_def_lookup(fc->handle->entries, file);
+
     if (fe == NULL)
        {SC_close_fcontainer(fc);
 	CFREE(cf);}

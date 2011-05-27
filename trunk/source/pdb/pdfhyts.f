@@ -13,10 +13,14 @@
 ! ERRPROC - handle errors
 
       subroutine errproc
+!      use pact_pdb
+      implicit none
 
-      parameter(MAXMSG = 256)
-      integer i, nchar, pfgerr
+      integer, parameter :: MAXMSG = 256
+      integer i, nchar
       character err(MAXMSG)
+
+      integer pfgerr
 
       if ((pfgerr(nchar, err) .eq. 1) .and. (nchar .gt. 0)) then
          nchar = min(nchar, MAXMSG)
@@ -36,21 +40,8 @@
 ! --------------------------------------------------------------------------
 
       program pdfhyts
+      use pact_pdb
       implicit none
-
-! ... PDBlib Fortran ADI:
-      integer pfopen, pfsbfs, pfgbfs, pfsoff
-      integer pfgoff, pfdefs, pfwrta, pfclos
-      integer pfityp, pfivar, pfread, pfptrd
-      integer pfpwd,  pfvart, pfgvar, pfwrtd
-      integer pfdefa, pfdefd, pfcd,   pfln
-      integer pflst,  pfgls,  pfdls,  pfmkdr
-      integer pftrgt, pfdvar, pfappa, pfappd
-      integer pfgmod, pfflsh, pfgfnm, pfdeft
-      integer pfdatt, pfsvat, pfgvat, pfratt
-      integer pffami, pfimbr, pfctyp
-      integer pfapas, pfapad, pfrdas, pfrdad
-      integer pfwras, pfwrad
 
       integer noneW(24)     ! these are all half the size of the 
       integer middleW(24)   ! space that will be defent for them

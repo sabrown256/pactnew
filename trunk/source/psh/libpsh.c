@@ -115,7 +115,8 @@ char **tokenize(char *s, char *delim)
 		 *p = c;
 		 ps = p + 1;}
 	     else
-	        {sa[i++] = STRSAVE(ps);
+	        {if (IS_NULL(ps) == FALSE)
+		    sa[i++] = STRSAVE(ps);
 		 break;};};
 
 	if (sa != NULL)

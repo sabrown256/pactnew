@@ -407,92 +407,6 @@ static int _UL_print(SS_psides *si)
 
 /*--------------------------------------------------------------------------*/
 
-#if 0
-
-/*--------------------------------------------------------------------------*/
-
-/* UL_EXPOSE_EVENT_HANDLER - handle expose events  */
-
-static void UL_expose_event_handler(PG_device *dev, PG_event *ev)
-   {
-
-    UL_motion_event_handler(dev, ev);
-
-/*
-    UL_plot();
-*/
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* UL_MOTION_EVENT_HANDLER - handle motion events  */
-
-static void UL_motion_event_handler(PG_device *dev, PG_event *ev)
-   {
-
-    if (SX_show_mouse_location)
-       PG_print_pointer_location(dev,
-                                 SX_show_mouse_location_x,
-                                 SX_show_mouse_location_y,
-                                 TRUE);
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* UL_UPDATE_EVENT_HANDLER - handle update events  */
-
-static void UL_update_event_handler(PG_device *dev, PG_event *ev)
-   {int width, height, min_dim, ncol;
-    double labsp;
-
-    PG_make_device_current(dev);
-
-    SX_window_height_P = PG_window_height(dev);
-    SX_window_width_P  = PG_window_width(dev);
-    SX_window_P[0]     = dev->g.hwin[0];
-    SX_window_P[1]     = dev->g.hwin[2];
-
-    PG_query_screen(dev, &width, &height, &ncol);
-    
-    PG_get_attrs_glb(TRUE,
-		     "label-space", &labsp,
-		     NULL);
-
-    min_dim = min(width, height);
-
-    SX_window_width  = SX_window_width_P/min_dim;
-    SX_window_height = SX_window_height_P/(min_dim*(1 + labsp)); 
-
-    SX_window_x[0] = SX_window_P[0]/min_dim;
-    SX_window_x[1] = SX_window_P[1]/min_dim;           
-
-    UL_plot();
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* UL_DEFAULT_EVENT_HANDLER - handle events that get through to here */
-
-static void UL_default_event_handler(dev, ev)
-   PG_device *dev;
-   PG_event *ev;
-   {
-
-    UL_motion_event_handler(dev, ev);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-
-#endif
-
-/*--------------------------------------------------------------------------*/
-
 /*                       CURVE MANAGEMENT ROUTINES                          */
 
 /*--------------------------------------------------------------------------*/
@@ -1063,6 +977,12 @@ object *UL_mode_graphics(SS_psides *si)
 
 	    PG_set_update_event_handler(SX_graphics_device,
 					SX_update_event_handler);
+
+	    SC_REGISTER_CONTEXT(SX_default_event_handler, si);
+	    SC_REGISTER_CONTEXT(SX_motion_event_handler,  si);
+	    SC_REGISTER_CONTEXT(SX_mouse_event_handler,   si);
+	    SC_REGISTER_CONTEXT(SX_expose_event_handler,  si);
+	    SC_REGISTER_CONTEXT(SX_update_event_handler,  si);
 
 /* remember the window size and position in pixels */
 	    SX_window_height_P = PG_window_height(SX_graphics_device);
