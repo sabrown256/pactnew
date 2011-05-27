@@ -329,12 +329,6 @@ switch ($Cmnd)
            NoteD $Log "Making integrated PACT library"
            ftee $Log ./pact-lib
            NoteD $Log "done"
-
-           NoteD $Log ""
-           Separator $Log
-           NoteD $Log "Building F90 interfaces"
-           ftee $Log ./itf90
-           NoteD $Log "done"
         endif
 
 # fix up cross compile executables that need to run on the current host

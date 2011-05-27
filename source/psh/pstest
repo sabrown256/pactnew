@@ -20,7 +20,7 @@ while ($#argv > 0)
            echo "Usage: pstest [-h] [<test>*]"
            echo "  h  this help message"
            echo ""
-           echo "Tests: elide blang regx pco do-net dorun verify"
+           echo "Tests: elide regx pco do-net dorun verify"
            echo ""
            exit(1);
       default:
@@ -48,7 +48,7 @@ NoteD $Log "PSH TEST ..."
 
 if ("$Tests" == "") then
    set Tests = ""
-   set Tests = ($Tests do-net elide blang regx pco pcsh perdb dorun verify)
+   set Tests = ($Tests do-net elide regx pco pcsh perdb dorun verify)
 endif
 
 foreach i ($Tests)

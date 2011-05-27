@@ -12,7 +12,7 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-char *FF_ID(wfbcv1f, WFBCV1F)(int *sa, float *sb, double *sc, char *sd, PFInt fe, PFInt ff)
+char *FF_ID(fbcv1, FBCV1)(int *sa, float *sb, double *sc, char *sd, PFInt fe, PFInt ff)
    {int _lsa;
     float _lsb;
     double _lsc;
@@ -35,7 +35,7 @@ char *FF_ID(wfbcv1f, WFBCV1F)(int *sa, float *sb, double *sc, char *sd, PFInt fe
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-char *FF_ID(wfbmcv1f, WFBMCV1F)(int *sa, float *sb, double *sc, char *sd)
+char *FF_ID(fbmcv1, FBMCV1)(int *sa, float *sb, double *sc, char *sd)
    {int _lsa;
     float _lsb;
     double _lsc;
@@ -54,17 +54,17 @@ char *FF_ID(wfbmcv1f, WFBMCV1F)(int *sa, float *sb, double *sc, char *sd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-char *FF_ID(wfbmcr2f, WFBMCR2F)(int *aa, float *ab, double *ac, char *ad)
+char *FF_ID(fbmcr2, FBMCR2)(int *aa, float *ab, double *ac, char *ad, int sncad)
    {int *_laa;
     float *_lab;
     double *_lac;
-    char *_lad;
+    char _lad[MAXLINE];
     char *_rv;
 
     _laa       = (int *) aa;
     _lab       = (float *) ab;
     _lac       = (double *) ac;
-    _lad       = (char *) ad;
+    SC_FORTRAN_STR_C(_lad, ad, sncad);
 
     _rv = fbmcr2(_laa, _lab, _lac, _lad);
 

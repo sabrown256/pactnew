@@ -452,6 +452,12 @@ object *SX_mode_graphics(SS_psides *si)
 	    PG_set_update_event_handler(SX_graphics_device,
 					SX_update_event_handler);
 
+	    SC_REGISTER_CONTEXT(SX_default_event_handler, si);
+	    SC_REGISTER_CONTEXT(SX_motion_event_handler,  si);
+	    SC_REGISTER_CONTEXT(SX_mouse_event_handler,   si);
+	    SC_REGISTER_CONTEXT(SX_expose_event_handler,  si);
+	    SC_REGISTER_CONTEXT(SX_update_event_handler,  si);
+
 /* remember the window size and position in pixels */
 	    SX_window_height_P = PG_window_height(SX_graphics_device);
 	    SX_window_width_P  = PG_window_width(SX_graphics_device);

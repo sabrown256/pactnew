@@ -12,7 +12,7 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-FIXNUM FF_ID(wfe1f, WFE1F)(str **ta1, int *sa2)
+FIXNUM FF_ID(fe1, FE1)(str **ta1, int *sa2)
    {str *_lta1;
     int _lsa2;
     FIXNUM _rv;
@@ -27,7 +27,7 @@ FIXNUM FF_ID(wfe1f, WFE1F)(str **ta1, int *sa2)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-void FF_ID(wfe2f, WFE2F)(str **tdev, double *ax, double *ay, int *sn, pcons *ainfo, int *sl)
+void FF_ID(fe2, FE2)(str **tdev, double *ax, double *ay, int *sn, pcons *ainfo, int *sl)
    {str *_ltdev;
     double *_lax;
     double *_lay;

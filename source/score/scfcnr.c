@@ -196,9 +196,10 @@ void SC_list_fcontainer(FILE *f, fcontainer *cf, int full)
 void SC_close_fcontainer(fcontainer *cf)
    {
 
-    SC_free_fcontainer(cf->handle);        
-    CFREE(cf->name);
-    CFREE(cf);
+    if (cf != NULL)
+       {SC_free_fcontainer(cf->handle);        
+	CFREE(cf->name);
+        CFREE(cf);};
 
     return;}
 

@@ -37,7 +37,7 @@
 ! ERRPROC - handle errors
 
       subroutine errproc
-!      use pdb
+!      use pact_pdb
       implicit none
 
       integer pfgerr
@@ -67,14 +67,13 @@
 ! WRTCUR - write a curve
 
       subroutine wrtcur(fileid)
+      use pact_pdb
       implicit none
 
       integer fileid
 
       integer i, index
       real*8 dm(0:99), rm1(0:99), rm2(0:99)
-
-      integer pfwulc, pfwuly
 
       index = 0
 
@@ -101,6 +100,7 @@
 ! CHKCUR - check curve
 
       subroutine chkcur(fileid, tolerance)
+      use pact_pdb
       implicit none
 
       integer fileid
@@ -109,8 +109,6 @@
       integer i
       real*8 dm(0:99), rm1(0:99), rm2(0:99)
       real*8 odm(0:99), orm1(0:99), orm2(0:99)
-
-      integer pfread
 
       do i = 0, 99
          dm(i)  = 6.28*float(i)/99.
@@ -143,14 +141,13 @@
 ! WRTIMA - write an image
 
       subroutine wrtima(fileid)
+      use pact_pdb
       implicit none
 
       integer fileid
 
       integer k, l
       real*8 xmin, xmax, ymin, ymax, data(0:10, 0:10)
-
-      integer pfwima
 
       xmin = 0.
       xmax = 10.
@@ -176,14 +173,13 @@
 ! CHKIMA - check image
 
       subroutine chkima(fileid)
+      use pact_pdb
       implicit none
 
       integer fileid
 
       integer k, l, ret
       real*8 data(0:10, 0:10), odata(0:10, 0:10)
-
-      integer pfrptr
 
       do l = 0, 10
          do k = 0, 10
@@ -211,14 +207,13 @@
 ! WRTMAP - write some mappings
 
       subroutine wrtmap(fileid)
+      use pact_pdb
       implicit none
 
       integer fileid
 
       integer i, pim, dp(5), rp(5)
       real*8 dm(0:99), rm(0:99)
-
-      integer pfwmap, pfwset, pfwran
 
       pim = 0
       dp(1) = 7
@@ -256,6 +251,7 @@
 ! CHKMAP - check mappings
 
       subroutine chkmap(fileid, tolerance)
+      use pact_pdb
       implicit none
 
       integer fileid
@@ -264,8 +260,6 @@
       integer i
       real*8 dm(0:99), rm(0:99)
       real*8 odm(0:99), orm(0:99)
-
-      integer pfread, pfrptr
 
       do i = 0, 99
          dm(i) = 6.28*float(i)/99.
@@ -968,7 +962,7 @@
 ! TEST_3 - feature testing
 
       subroutine test_3(PRINT, DIR, OPTION)
-      use pdb
+      use pact_pdb
       implicit none 
 
       logical PRINT
@@ -977,7 +971,7 @@
 
       integer i, j, k, l, n
       integer j2, k2, l2
-      integer fileid, nfileid, st
+      integer fileid, nfileid
       integer ntype, ndims, nitems
       integer pord, nvar, nchar
       integer LAST
@@ -1229,8 +1223,8 @@
 ! PDFTST - main test routine
 
       program pdftst
-      use score
-      use pdb
+      use pact_score
+      use pact_pdb
       implicit none 
 
 ! ... program input command option flags

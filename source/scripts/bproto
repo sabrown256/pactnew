@@ -61,8 +61,8 @@ Note $Log ""
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# TRANSFORM - process the C declarations
-#           - the transformations are:
+# FIND_CC_DECL - process the C declarations
+#              - the transformations are:
 #   elide '/*' '*/' $Files                         remove C comments
 #   elide '{' '}' -                                remove compound statements
 #   awk '$NF ~ /\\/ { printf("%s ", $0); }         merge lines ending in  \
@@ -97,14 +97,83 @@ Note $Log ""
    sort                                            | \
    cat >&! z-$arch/$d.proto
 
-   NoteD $Log "done"
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FIND_FF_WRAPPER - find the FF_ID declarations
+#                 - account for the convention:
+#                 -    <type> *sxxx    is a scalar
+#                 -    <type> *axxx    is an array
+#                 - the transformations are:
+#
+#   sed 's/[ \t][ \t]*/ /g'               compress white space
+#   awk '$0 ~ /,[ \t]*$/   { printf("%s", $0) }     join lines ending in ','
+#        $0 !~ /,[ \t]*$/  { printf("%s\n", $0) }'
+#   grep 'FF_ID('                    
+#   grep -v "#"                           suppress #define FF_ID
+#   grep -v ";"                           suppress ... FF_ID(x,X)(...);
+#   grep -v "="                           suppress x = FF_ID(x,X)(...
+#   sed 's/, .*)(/(/'                     FF_ID(x, X)(     -> FF_ID(x)(
+#   sed 's/FF_ID(//'                      FF_ID(x)         -> x
+#   sed 's/(void)/()/'                    (void)           -> ()
+#   sed 's/(/ /'                          '('              -> ' '
+#   sed 's/)$/ END/'                      foo(...)         -> foo(... END
+#   sed 's/FIXNUM/integer/g'              FIXNUM           -> integer
+#   sed 's/char *\*/integer(isizea) /g'   char *           -> integer(isizea)
+#   sed 's/void *\*/integer(isizea) /g'   void *           -> integer(isizea)
+#   sed 's/integer *\*s/integer s/g'      integer *s       -> integer
+#   sed 's/integer *\*/integerARRAY /g'   integer *        -> integer(*)
+#   sed 's/integer *\*/integer /g'        integer *        -> integer
+#   sed 's/REAL *\*/real /g'              REAL *           -> real*8
+#   sed 's/double *\*/real /g'            double *         -> real*8
+#   sed 's/REAL/real*8/g'                 REAL             -> real*8
+#   sed 's/double/real*8/g'               double           -> real*8
+#   sed 's/float/real*4/g'                float            -> real*4
+#   sed 's/char */character*(*)/g'        char *           -> character*(*)
+#   sed 's/*//g'                          '*'              -> ''
+#   sed 's/,/ /g'                         ','              -> ' '
+#   sed 's/PF[^ ]* /external /g'          function pointer -> external
+#
+
+   cat $Files                                     | \
+   sed 's/[ \t][ \t]*/ /g'                        | \
+   awk '$0 ~ /,[ \t]*$/   { printf("%s", $0) }      \
+        $0 !~ /,[ \t]*$/  { printf("%s\n", $0) }' | \
+   grep 'FF_ID('                                  | \
+   grep -v "#"                                    | \
+   grep -v ";"                                    | \
+   grep -v "="                                    | \
+   sed 's/, .*)(/(/'                              | \
+   sed 's/FF_ID(//'                               | \
+   sed 's/(void)/()/'                             | \
+   sed 's/(/ /'                                   | \
+   sed 's/)[ \t]*$//'                             | \
+   sed 's/FIXNUM/integer/g'                       | \
+   sed 's/char *\*/character /g'                  | \
+   sed 's/void *\*/integer(isizea) /g'            | \
+   sed 's/integer *\*s/integer s/g'               | \
+   sed 's/integer *\*/integer-A /g'               | \
+   sed 's/REAL *\*/real--8 /g'                    | \
+   sed 's/double *\*s/real--8 s/g'                | \
+   sed 's/double *\*/real8-A /g'                  | \
+   sed 's/REAL/real--8/g'                         | \
+   sed 's/double/real--8/g'                       | \
+   sed 's/float/real--4/g'                        | \
+   sed 's/*//g'                                   | \
+   sed 's/,/ /g'                                  | \
+   sed 's/PF[^ ]* /external /g'                   | \
+   sed 's/.*:/      /'                            | \
+   sed 's/--/*/g'                                 | \
+   cat >&! z-$arch/$d.wrapper
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+   NoteD $Log "done"
 
    flog $Log pushd z-$arch
 
-   flog $Log blang $d.proto ../$d.bind
+   flog $Log blang $d.proto ../$d.bind $d.wrapper
    set xstatus = $status
 
    if (-f gf-$d.c) then

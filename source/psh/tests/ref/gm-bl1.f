@@ -11,96 +11,100 @@ end module types_bl1
 module pact_bl1
    use iso_c_binding
 
+! ... external declarations for generated wrappers
    use types_bl1
 
-   integer(isizea), external :: wfavp1f
+   integer(isizea), external :: favp1
+
 
    interface
 
-      subroutine fav1() &
-                bind(c, name='fav1')
-         use iso_c_binding
+! ... declarations for generated wrappers
+      subroutine fav1() 
          implicit none
       end subroutine fav1
 
-      subroutine wfav1f() 
+      function fav2() 
          implicit none
-      end subroutine wfav1f
+         integer         :: fav2
+      end function fav2
 
-      integer (C_INT) function fav2() &
+      function fav3() 
+         implicit none
+         real            :: fav3
+      end function fav3
+
+      function fav4() 
+         implicit none
+         integer         :: fav4
+      end function fav4
+
+      function favp2() 
+         use types_bl1
+         implicit none
+         integer(isizea) :: favp2
+      end function favp2
+
+      function favp3() 
+         use types_bl1
+         implicit none
+         integer(isizea) :: favp3
+      end function favp3
+
+      function favp4() 
+         use types_bl1
+         implicit none
+         integer(isizea) :: favp4
+      end function favp4
+
+! ... declarations for interoperability
+      subroutine fav1_i() &
+                bind(c, name='fav1')
+         use iso_c_binding
+         implicit none
+      end subroutine fav1_i
+
+      integer (C_INT) function fav2_i() &
                 bind(c, name='fav2')
          use iso_c_binding
          implicit none
-      end function fav2
+      end function fav2_i
 
-      function wfav2f() 
-         implicit none
-         integer         :: wfav2f
-      end function wfav2f
-
-      real (C_DOUBLE) function fav3() &
+      real (C_DOUBLE) function fav3_i() &
                 bind(c, name='fav3')
          use iso_c_binding
          implicit none
-      end function fav3
+      end function fav3_i
 
-      function wfav3f() 
-         implicit none
-         real            :: wfav3f
-      end function wfav3f
-
-      integer (C_INT) function fav4() &
+      integer (C_INT) function fav4_i() &
                 bind(c, name='fav4')
          use iso_c_binding
          implicit none
-      end function fav4
+      end function fav4_i
 
-      function wfav4f() 
-         implicit none
-         integer         :: wfav4f
-      end function wfav4f
-
-      type (C_PTR) function favp1() &
+      type (C_PTR) function favp1_i() &
                 bind(c, name='favp1')
          use iso_c_binding
          implicit none
-      end function favp1
+      end function favp1_i
 
-      type (C_PTR) function favp2() &
+      type (C_PTR) function favp2_i() &
                 bind(c, name='favp2')
          use iso_c_binding
          implicit none
-      end function favp2
+      end function favp2_i
 
-      function wfavp2f() 
-         use types_bl1
-         implicit none
-         integer(isizea) :: wfavp2f
-      end function wfavp2f
-
-      type (C_PTR) function favp3() &
+      type (C_PTR) function favp3_i() &
                 bind(c, name='favp3')
          use iso_c_binding
          implicit none
-      end function favp3
+      end function favp3_i
 
-      function wfavp3f() 
-         use types_bl1
-         implicit none
-         integer(isizea) :: wfavp3f
-      end function wfavp3f
-
-      type (C_PTR) function favp4() &
+      type (C_PTR) function favp4_i() &
                 bind(c, name='favp4')
          use iso_c_binding
          implicit none
-      end function favp4
-
-      function wfavp4f() 
-         use types_bl1
-         implicit none
-         integer(isizea) :: wfavp4f
-      end function wfavp4f
+      end function favp4_i
 
    end interface
 
