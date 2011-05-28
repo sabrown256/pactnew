@@ -1,5 +1,5 @@
 TXT: PDBLib User's Manual
-MOD: 05/19/2011
+MOD: 05/27/2011
 
 <CENTER>
 <P>
@@ -86,7 +86,7 @@ indicates functions for optional use
 <a href="#pd_fix_denorm">PD_FIX_DENORM</a>
 
 <dt><dd><font color="#009900">o </font>
-<a href="#pd_set_format_version">PD_SET_FORMAT_VERSION</a>
+<a href="#pd_set_fmt_version">PD_SET_FMT_VERSION</a>
 
 <dt><dd><font color="#009900">o </font>
 <a href="#pd_set_major_order">PD_SET_MAJOR_ORDER</a>
@@ -227,7 +227,7 @@ indicates functions for optional use
 <a href="#pd_get_file_name">PD_GET_FILE_NAME</a>
 
 <dt><dd><font color="#009900">o </font>
-<a href="#pd_get_format_version">PD_GET_FORMAT_VERSION</a>
+<a href="#pd_get_fmt_version">PD_GET_FMT_VERSION</a>
 
 <dt><dd><font color="#009900">o </font>
 <a href="#pd_get_max_file_size">PD_GET_MAX_FILE_SIZE</a>
@@ -590,12 +590,12 @@ A Python module is also available to access PDBLib's functionality.
 <!-- -------------------------------------------------------------------- --> 
 <!-- -------------------------------------------------------------------- --> 
 
-<a name="pd_get_format_version"><h2>PD_GET_FORMAT_VERSION</h2></a>
+<a name="pd_get_fmt_version"><h2>PD_GET_FMT_VERSION</h2></a>
 
 
 <p>
 <pre>
-<i>C Binding: </i>  void PD_get_format_version(int v)
+<i>C Binding: </i> int PD_get_fmt_version(int v)
 <i>Fortran Binding: </i>integer PFGFMV(integer v)
 <i>SX Binding: </i> (format-version)
 <i>Python Binding: </i> XXX - missing
@@ -609,8 +609,7 @@ for a discussion of the PDB file formats.
 Input to this function is:
 <em>v</em>, an integer in which to return the format version.
 <p>
-In the C binding return the value of the format version.
-In the FORTRAN binding return 1 if successful, 0 otherwise.
+Return the value of the format version.
 <p>
 
 <hr>
@@ -621,7 +620,7 @@ In the FORTRAN binding return 1 if successful, 0 otherwise.
              .
              .
 
-       PD_get_format_version(v);
+       v = PD_get_fmt_version();
              .
              .
              .
@@ -636,8 +635,8 @@ In the FORTRAN binding return 1 if successful, 0 otherwise.
              .
              .
 
-       v = 3
-       if (pfgfmv(v) .eq. 0)
+       v = pfgfmv()
+       if (v .eq. 0)
       &amp;   call errproc
              .
              .
@@ -1243,7 +1242,7 @@ The current default is to write format version II files.  This
 is a transitional measure to allow users to become familiar with
 format version III.  An application can select which format
 version to use when creating new PDB files.  See the
-<a href="#pd_set_format_version">PD_set_format_version</a> routine for details.
+<a href="#pd_set_fmt_version">PD_set_fmt_version</a> routine for details.
 
 <h3>Format Version III Syntax</h3>
 <p>
@@ -2500,12 +2499,12 @@ In the FORTRAN binding return 1 if successful, 0 otherwise.
 <!-- -------------------------------------------------------------------- --> 
 <!-- -------------------------------------------------------------------- --> 
 
-<a name="pd_set_format_version"><h2>PD_SET_FORMAT_VERSION</h2></a>
+<a name="pd_set_fmt_version"><h2>PD_SET_FMT_VERSION</h2></a>
 
 
 <p>
 <pre>
-<i>C Binding: </i>  void PD_set_format_version(int v)
+<i>C Binding: </i> int PD_set_fmt_version(int v)
 <i>Fortran Binding: </i>integer PFSFMV(integer v)
 <i>SX Binding: </i> (format-version v)
 <i>Python Binding: </i> XXX - missing
@@ -2519,8 +2518,7 @@ for a discussion of the PDB file formats.
 Input to this function is:
 <em>v</em>, an integer value for the format version.
 <p>
-In the C binding return the value of the format version.
-In the FORTRAN binding return 1 if successful, 0 otherwise.
+Return the old value of the format version.
 <p>
 
 <hr>
@@ -2530,7 +2528,7 @@ In the FORTRAN binding return 1 if successful, 0 otherwise.
              .
              .
 
-       PD_set_format_version(3);
+       PD_set_fmt_version(3);
              .
              .
              .
@@ -2545,9 +2543,7 @@ In the FORTRAN binding return 1 if successful, 0 otherwise.
              .
              .
 
-       v = 3
-       if (pfsfmv(v) .eq. 0)
-      &amp;   call errproc
+       pfsfmv(3)
              .
              .
              .
@@ -2583,7 +2579,7 @@ In the FORTRAN binding return 1 if successful, 0 otherwise.
 
 <p>
 <pre>
-<i>C Binding: </i>  PD_set_max_file_size(PDBfile *file, int v)
+<i>C Binding: </i> int64_t PD_set_max_file_size(PDBfile *file, int64_t v)
 <i>Fortran Binding: </i>integer PFSMXS(integer fileid, integer v)
 <i>SX Binding: </i> (set-maximum-file-size! file v)
 <i>Python Binding: </i> XXX - missing
@@ -2599,8 +2595,7 @@ Input to this function is:
 Output from this function is:
 <em>v</em>, an integer value for the maximum file size.
 <p>
-In the C binding return the new integer value of the maximum file size.
-In the FORTRAN binding return 1 if successful, 0 otherwise.
+Return the old value of the maximum file size.
 <p>
 See also:
 <a href="#pd_family">PD_family</a>
@@ -2694,8 +2689,7 @@ Input to this function is:
 Output from this function is:
 <em>v</em>, an integer value for the default offset.
 <p>
-In the C binding return the value of the offset.
-In the FORTRAN binding return 1 if successful, 0 otherwise.
+Return the old value of the default offset.
 <p>
 
 <hr>
@@ -6763,7 +6757,7 @@ otherwise.
 
 <p>
 <pre>
-<i>C Binding: </i>  int PD_get_max_file_size(PDBfile *file)
+<i>C Binding: </i>  int64_t PD_get_max_file_size(PDBfile *file)
 <i>Fortran Binding: </i>integer PFGMXS(integer fileid)
 <i>SX Binding: </i> (file-info file "maximum-size")
 <i>Python Binding: </i> XXX - missing
@@ -7413,7 +7407,7 @@ its lists of remembered pointers (again on a per file basis).
 
 <p>
 <pre>
-<i>C Binding: </i>  void PD_get_track_pointers(PDBfile *file)
+<i>C Binding: </i>  int PD_get_track_pointers(PDBfile *file)
 <i>Fortran Binding: </i>integer PFGTPT(integer fileid)
 <i>SX Binding: </i> (file-info file "track-pointers")
 <i>Python Binding: </i> XXX - missing
@@ -7483,7 +7477,7 @@ Return the value of the flag.
 
 <p>
 <pre>
-<i>C Binding: </i>  void PD_set_track_pointers(PDBfile *file, int v)
+<i>C Binding: </i>  int PD_set_track_pointers(PDBfile *file, int v)
 <i>Fortran Binding: </i>integer PFSTPT(integer fileid, integer v)
 <i>SX Binding: </i> (set-track-pointers! file v)
 <i>Python Binding: </i> XXX - missing
@@ -7501,8 +7495,7 @@ Input to this function is:
 Output from this function is:
 <em>v</em>, an integer value for the track pointer flag.
 <p>
-In the C binding return the value of the flag.
-In the FORTRAN binding return 1 if successful, 0 otherwise.
+Return the old value of the flag.
 <p>
 
 <hr>

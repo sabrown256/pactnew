@@ -491,7 +491,7 @@ int main(int c, char **v)
                       nthreads = atol(v[++i]);
                       break;
                  case 'v' :
-                      PD_set_format_version(SC_stoi(v[++i]));
+                      PD_set_fmt_version(SC_stoi(v[++i]));
                       break;};}
          else
             break;};

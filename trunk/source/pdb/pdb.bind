@@ -18,251 +18,215 @@ derived PD_checksum_mode	integer		SC_ENUM_I	SC_ENUM_I
 
 # PDB.C
 
-PD_open				pdopen		none		none
-PD_family			pdfami		none		none
-PD_create			pdcreat		none		none
-PD_open_vif			pdopnv		none		none
-PD_close			pdclos		none		none
-PD_flush			pdflsh		none		none
-PD_remove_entry			pdrent		none		none
-PD_append			pdapp		none		none
-PD_append_alt			pdappt		none		none
-PD_append_as			pdappa		none		none
-PD_append_as_alt		pdapat		none		none
-PD_defent			pdden		none		none
-PD_defent_alt			pddent		none		none
-PD_read				pdread		none		none
-PD_read_as			pdrda		none		none
-PD_read_as_dwim			pdrdai		none		none
-PD_read_alt			pdrdt		none		none
-PD_read_as_alt			pdrdat		none		none
-PD_write			pdwrt		none		none
-PD_write_alt			pdwrtt		none		none
-PD_write_as			pdwras		none		none
-PD_write_as_alt			pdwrat		none		none
-PD_cast				pdcast		none		none
-PD_free				pdfree		none		none
-PD_fix_denorm			pddnrm		none		none
-PD_autofix_denorm		pfafdm		none		none
-PD_error			pderr		none		none
+PD_open				yes		none		none
+PD_family			yes		none		none
+PD_create			yes		none		none
+PD_open_vif			yes		none		none
+PD_close			yes		none		none
+PD_flush			yes		none		none
+PD_remove_entry			yes		none		none
+PD_append			yes		none		none
+PD_append_alt			yes		none		none
+PD_append_as			yes		none		none
+PD_append_as_alt		yes		none		none
+PD_defent			yes		none		none
+PD_defent_alt			yes		none		none
+PD_read				yes		none		none
+PD_read_as			yes		none		none
+PD_read_as_dwim			yes		none		none
+PD_read_alt			yes		none		none
+PD_read_as_alt			yes		none		none
+PD_write			yes		none		none
+PD_write_alt			yes		none		none
+PD_write_as			yes		none		none
+PD_write_as_alt			yes		none		none
+PD_cast				yes		none		none
+PD_free				yes		none		none
+PD_fix_denorm			yes		none		none
+PD_autofix_denorm		yes		none		none
+PD_error			yes		none		none
 
 # PDBAIB.C
 
-PD_typedef			pdtypd		none		none
-PD_defncv			pddfnc		none		none
-PD_defchr			pddfch		none		none
-PD_defix			pddffx		none		none
-PD_defixnum			pddffn		none		none
-PD_defloat			pddffp		none		none
-PD_defstr			pddfsr		none		none
-PD_defstr_alt			pddfst		none		none
-PD_verify_writes		none		none		none
-PD_change_primitive		none		none		none
-PD_contents			none		none		none
+PD_typedef			yes		none		none
+PD_defncv			yes		none		none
+PD_defchr			yes		none		none
+PD_defix			yes		none		none
+PD_defixnum			yes		none		none
+PD_defloat			yes		none		none
+PD_defstr			yes		none		none
+PD_defstr_alt			yes		none		none
+PD_verify_writes		yes		none		none
+PD_change_primitive		yes		none		none
+PD_contents			yes		none		none
 PD_fp_toler			none		none		none
 
 # PDBMM.C
 
-PD_copy_syment			none		none		none
-PD_copy_members			none		none		none
-PD_copy_dims			none		none		none
-PD_alloc_entry			none		none		none
+PD_copy_syment			yes		none		none
+PD_copy_members			yes		none		none
+PD_copy_dims			yes		none		none
+PD_alloc_entry			yes		none		none
 
 
 # PDBDIR.C
 
-PD_ls				pdls		none		none
-PD_ls_alt			pdlst		none		none
-PD_pwd				pdpwd		none		none
-PD_cd				pdcd		none		none
-PD_isdir			pdisdr		none		none
-PD_mkdir			pdmkdr		none		none
-PD_ln				pdln		none		none
-PD_def_dir			none		none		none
+PD_ls				yes		none		none
+PD_ls_alt			yes		none		none
+PD_pwd				yes		none		none
+PD_cd				yes		none		none
+PD_isdir			yes		none		none
+PD_mkdir			yes		none		none
+PD_ln				yes		none		none
+PD_def_dir			yes		none		none
 
 
 # PDBMP.C
 
-PD_mp_open			none		none		none
-PD_mp_create			none		none		none
-PD_mp_set_collective		none		none		none
-PD_mp_set_serial		pdmpss		none		none
+PD_mp_open			yes		none		none
+PD_mp_create			yes		none		none
+PD_mp_set_collective		yes		none		none
+PD_mp_set_serial		yes		none		none
 
 
 # PDBNET.C
 
-PN_conv_in			pdncin		none		none
-PN_conv_out			pdncot		none		none
-PN_close			pnclos		none		none
-PN_write			pnwrt		none		none
-PN_read				pnread		none		none
-PN_open				pnopen		none		none
-PN_target			pdntgt		none		none
-PN_defstr			pndfsr		none		none
+PN_conv_in			yes		none		none
+PN_conv_out			yes		none		none
+PN_close			yes		none		none
+PN_write			yes		none		none
+PN_read				yes		none		none
+PN_open				yes		none		none
+PN_target			yes		none		none
+PN_defstr			yes		none		none
 
 
 # PDBX.C
 
-PD_get_attribute		pdgvat		none		none
-PD_def_pdb_types		none		none		none
-PD_def_attr_str			none		none		none
-PD_def_attribute		pddatt		none		none
-PD_set_attribute		pdsvat		none		none
-PD_rem_attribute		pdratt		none		none
-PD_def_hash_types		none		none		none
-PD_read_pdb_curve		pdrulce		none		none
-PD_wrt_pdb_curve		pdwulc		none		none
-PD_wrt_pdb_curve_y		pdwuly		none		none
-PD_put_mapping			none		none		none
-PD_put_image			none		none		none
-PD_put_set			none		none		none
-PD_mesh_struct			none		none		none
-PD_def_mapping			none		none		none
-PD_mk_attribute			none		none		none
-PD_inquire_attribute		none		none		none
-PD_inquire_attribute_value	none		none		none
-PD_rel_image			none		none		none
-PD_rel_attr_table		none		none		none
-PD_write_table			none		none		none
-PD_replace			none		none		none
-PD_process_set_name		none		none		none
-PD_make_image			none		none		none
+PD_get_attribute		yes		none		none
+PD_def_pdb_types		yes		none		none
+PD_def_attr_str			yes		none		none
+PD_def_attribute		yes		none		none
+PD_set_attribute		yes		none		none
+PD_rem_attribute		yes		none		none
+PD_def_hash_types		yes		none		none
+PD_read_pdb_curve		yes		none		none
+PD_wrt_pdb_curve		yes		none		none
+PD_wrt_pdb_curve_y		yes		none		none
+PD_put_mapping			yes		none		none
+PD_put_image			yes		none		none
+PD_put_set			yes		none		none
+PD_mesh_struct			yes		none		none
+PD_def_mapping			yes		none		none
+PD_mk_attribute			yes		none		none
+PD_inquire_attribute		yes		none		none
+PD_inquire_attribute_value	yes		none		none
+PD_rel_image			yes		none		none
+PD_rel_attr_table		yes		none		none
+PD_write_table			yes		none		none
+PD_replace			yes		none		none
+PD_process_set_name		yes		none		none
+PD_make_image			yes		none		none
 
 # PDCONV.C
 
-PD_byte_reverse			none		none		none
-PD_convert			none		none		none
+PD_byte_reverse			yes		none		none
+PD_convert			yes		none		none
 
 # PDGS.C
 
-PD_gather_as			none		none		none
-PD_gather			none		none		none
-PD_scatter_as			none		none		none
-PD_scatter			none		none		none
+PD_gather_as			yes		none		none
+PD_gather			yes		none		none
+PD_scatter_as			yes		none		none
+PD_scatter			yes		none		none
 
 # PDCSUM.C
 
-PD_verify			none		none		none
-PD_activate_cksum		pdscsm		none		none
+PD_verify			yes		none		none
+PD_activate_cksum		yes		none		none
 
 # PDFMT.C
 
-PD_isfile			pdisfil		none		none
+PD_isfile			yes		none		none
 
 # PDLOW.C
 
-PD_inquire_type			none		none		none
-PD_inquire_host_type		none		none		none
-PD_get_error			pdgerr		none		none
-PD_get_entry_info		none		none		none
-PD_get_buffer_size		pdgbsz		none		none
-PD_set_buffer_size		pdsbsz		none		none
-PD_entry_set_address		none		none		none
-PD_entry_address		none		none		none
-PD_get_file_length		pdgfln		none		none
-PD_free_entry_info		none		none		none
-PD_rel_entry_info		none		none		none
-PD_typedef_primitive_types	none		none		none
+PD_inquire_type			yes		none		none
+PD_inquire_host_type		yes		none		none
+PD_get_error			yes		none		none
+PD_get_entry_info		yes		none		none
+PD_get_buffer_size		yes		none		none
+PD_set_buffer_size		yes		none		none
+PD_entry_set_address		yes		none		none
+PD_entry_address		yes		none		none
+PD_get_file_length		yes		none		none
+PD_free_entry_info		yes		none		none
+PD_rel_entry_info		yes		none		none
+PD_typedef_primitive_types	yes		none		none
+
+PD_get_mode			yes		none		none
+PD_set_mode			yes		none		none
+PD_get_offset			yes		none		none
+PD_set_offset			yes		none		none
+PD_get_track_pointers		yes		none		none
+PD_set_track_pointers		yes		none		none
+PD_get_max_file_size		yes		none		none
+PD_set_max_file_size		yes		none		none
+PD_get_fmt_version		yes		none		none
+PD_set_fmt_version		yes		none		none
 
 # PDMEMB.C
 
-PD_index_to_expr		none		none		none
-PD_inquire_symbol		none		none		none
-PD_inquire_entry		none		none		none
-PD_query_entry			none		none		none
-PD_effective_entry		none		none		none
+PD_index_to_expr		yes		none		none
+PD_inquire_symbol		yes		none		none
+PD_inquire_entry		yes		none		none
+PD_query_entry			yes		none		none
+PD_effective_entry		yes		none		none
 
 # PDPARMP.C
 
-PD_init_mpi			pdinmp		none		none
-PD_term_mpi			pdtmmp		none		none
+PD_init_mpi			yes		none		none
+PD_term_mpi			yes		none		none
 
 # PDPATH.C
 
-PD_hyper_number			none		none		none
+PD_hyper_number			yes		none		none
 
 # PDPRNT.C
 
-PD_print_entry			none		none		none
-PD_write_entry			none		none		none
-PD_print_extras			none		none		none
-PD_print_syment			none		none		none
-PD_print_defstr			none		none		none
-PD_write_extras			none		none		none
-PD_write_syment			none		none		none
-PD_write_defstr			none		none		none
+PD_print_entry			yes		none		none
+PD_write_entry			yes		none		none
+PD_print_extras			yes		none		none
+PD_print_syment			yes		none		none
+PD_print_defstr			yes		none		none
+PD_write_extras			yes		none		none
+PD_write_syment			yes		none		none
+PD_write_defstr			yes		none		none
 
 # PDRDWR.C
 
-PD_dereference			none		none		none
-PD_read_bits			pdrdbt		none		none
-PD_reset_ptr_list		pdrspl		none		none
+PD_dereference			yes		none		none
+PD_read_bits			yes		none		none
+PD_reset_ptr_list		yes		none		none
 
 # PDSER.C
 
-PD_init_threads			pdinth		none		none
-PD_init_threads_arg		none		none		none
+PD_init_threads			yes		none		none
+PD_init_threads_arg		yes		none		none
 
 # PDSZOF.C
 
-PD_sizeof			none		none		none
-PN_relocate			none		none		none
+PD_sizeof			yes		none		none
+PN_relocate			yes		none		none
 
 # PDTGT.C
 
-PD_target_n_platforms		pdgtgn		none		none
-PD_target_platform		pdtgtp		none		none
-PD_target_platform_n		pdtgtn		none		none
-PD_target			pdtrgt		none		none
-PD_target_platform_name		pdgtgp		none		none
+PD_target_n_platforms		yes		none		none
+PD_target_platform		yes		none		none
+PD_target_platform_n		yes		none		none
+PD_target			yes		none		none
+PD_target_platform_name		yes		none		none
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# PDFIA.C
-PD_get_format_version		pfgfmv		none		none
-PD_set_format_version		pfsfmv		none		none
-
-#FIXNUM F77_FUNC(pfgerr, PFGERR)(FIXNUM *nchr, F77_string err)
-#FIXNUM F77_FUNC(pfgfnm, PFGFNM)(FIXNUM *fileid, FIXNUM *pnc, F77_string name)
-#FIXNUM F77_FUNC(pfgfdt, PFGFDT)(FIXNUM *fileid, FIXNUM *pnc, F77_string date)
-#FIXNUM F77_FUNC(pfgcsm, PFGCSM)(FIXNUM *fileid, FIXNUM *v)
-#FIXNUM F77_FUNC(pfgtpt, PFGTPT)(FIXNUM *fileid, FIXNUM *v)
-#FIXNUM F77_FUNC(pfstpt, PFSTPT)(FIXNUM *fileid, FIXNUM *v)
-#FIXNUM F77_FUNC(pfgbfs, PFGBFS)(void)
-#FIXNUM F77_FUNC(pfsbfs, PFSBFS)(FIXNUM *psz)
-#FIXNUM F77_FUNC(pfgoff, PFGOFF)(FIXNUM *fileid)
-#FIXNUM F77_FUNC(pfsoff, PFSOFF)(FIXNUM *fileid, FIXNUM *v)
-#FIXNUM F77_FUNC(pfgmxs, PFGMXS)(FIXNUM *fileid)
-#FIXNUM F77_FUNC(pfsmxs, PFSMXS)(FIXNUM *fileid, FIXNUM *v)
-#FIXNUM F77_FUNC(pfgmod, PFGMOD)(FIXNUM *fileid)
-#FIXNUM F77_FUNC(pfvart, PFVART)(FIXNUM *fileid, FIXNUM *pord, FIXNUM *n)
-#FIXNUM F77_FUNC(pfdvar, PFDVAR)(void)
-#FIXNUM F77_FUNC(pfgvar, PFGVAR)(FIXNUM *pn, FIXNUM *pnchr, F77_string pname)
-#FIXNUM F77_FUNC(pfivar, PFIVAR)(FIXNUM *fileid, FIXNUM *pnchr,
-#FIXNUM F77_FUNC(pfctyp, PFCTYP)(FIXNUM *sfid, FIXNUM *dfid, FIXNUM *pntyp,
-#FIXNUM F77_FUNC(pfityp, PFITYP)(FIXNUM *fileid, FIXNUM *pntyp,
-#FIXNUM F77_FUNC(pfimbr, PFIMBR)(FIXNUM *fileid, FIXNUM *pntyp,
-#FIXNUM F77_FUNC(pfqmbr, PFQMBR)(FIXNUM *fileid, FIXNUM *pntyp,
-#FIXNUM F77_FUNC(pfrptr, PFRPTR)(FIXNUM *fileid, FIXNUM *pnchr,
-#FIXNUM F77_FUNC(pfptrd, PFPTRD)(FIXNUM *fileid, FIXNUM *pnchr,
-#FIXNUM F77_FUNC(pfrdad, PFRDAD)(FIXNUM *fileid, FIXNUM *pnchr,
-#FIXNUM F77_FUNC(pfappd, PFAPPD)(FIXNUM *fileid, FIXNUM *pnchr,
-#FIXNUM F77_FUNC(pfapad, PFAPAD)(FIXNUM *fileid, FIXNUM *pnchr,
-#FIXNUM F77_FUNC(pfwrtd, PFWRTD)(FIXNUM *fileid, FIXNUM *pnchr,
-#FIXNUM F77_FUNC(pfwrad, PFWRAD)(FIXNUM *fileid, FIXNUM *pnchr,
-#FIXNUM F77_FUNC(pfdefd, PFDEFD)(FIXNUM *fileid, FIXNUM *pnchr,
-#FIXNUM F77_FUNC(pfdefs, PFDEFS)(FIXNUM *fileid,
-#FIXNUM F77_FUNC(pfdeft, PFDEFT)(FIXNUM *fileid, FIXNUM *pnchr, F77_string name,
-#FIXNUM F77_FUNC(pftrgt, PFTRGT)(FIXNUM *pis, FIXNUM *pia)
-#FIXNUM F77_FUNC(pfopen, PFOPEN)(FIXNUM *pnchr, F77_string name,
-#FIXNUM F77_FUNC(pfwmap, PFWMAP)(FIXNUM *fileid, F77_string dname,
-#FIXNUM F77_FUNC(pfwima, PFWIMA)(FIXNUM *fileid, FIXNUM *nchr, F77_string name,
-#FIXNUM F77_FUNC(pfwset, PFWSET)(FIXNUM *fileid, F77_string dname,
-#FIXNUM F77_FUNC(pfwrae, PFWRAE)(FIXNUM *fileid, F77_string dname,
-#FIXNUM F77_FUNC(pfwran, PFWRAN)(FIXNUM *fileid, F77_string dname,
-#FIXNUM F77_FUNC(pflst, PFLST)(FIXNUM *fileid, FIXNUM *npath, F77_string path,
-#FIXNUM F77_FUNC(pfgls, PFGLS)(FIXNUM *ord, FIXNUM *len, F77_string name)
-#FIXNUM F77_FUNC(pfdls, PFDLS)(void)
-#FIXNUM F77_FUNC(pfsmjo, PFSMJO)(FIXNUM *fileid, FIXNUM *pval)
-#FIXNUM F77_FUNC(pfgmjo, PFGMJO)(FIXNUM *fileid, FIXNUM *pval)

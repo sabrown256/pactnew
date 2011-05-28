@@ -1123,7 +1123,7 @@ int main(int c, char **v, char **env)
  */
     SC_io_connect(PC_REMOTE);
 
-    PD_set_format_version(3);
+    PD_set_fmt_version(3);
 
     PD_init_threads(0, NULL);
 

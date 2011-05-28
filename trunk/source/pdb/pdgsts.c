@@ -841,7 +841,7 @@ int main(int c, char **v)
 		      native_only = TRUE;
 		      break;
                  case 'v' :
-                      PD_set_format_version(SC_stoi(v[++i]));
+                      PD_set_fmt_version(SC_stoi(v[++i]));
 		      break;
                  case '1' :
 		      test_one = FALSE;

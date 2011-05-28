@@ -544,21 +544,23 @@ static void init_types(void)
     add_type("long double _Complex", "complex(16)",
 	     "SC_LONG_DOUBLE_COMPLEX_I", NULL);
 
-    add_type("void *",        "C_PTR-A",     "SC_VOID_P_I",        NULL);
-    add_type("bool *",        "logical-A",   "SC_BOOL_P_I",        NULL);
-    add_type("char *",        "character-A", "SC_STRING_I",        NULL);
-    add_type("int *",         "integer-A",   "SC_INT_P_I",         NULL);
-    add_type("short *",       "integer-A",   "SC_SHORT_P_I",       NULL);
-    add_type("long *",        "integer-A",   "SC_LONG_P_I",        NULL);
-    add_type("long long *",   "integer-A",   "SC_LONG_LONG_P_I",   NULL);
-    add_type("float *",       "real(4)-A",   "SC_FLOAT_P_I",       NULL);
-    add_type("double *",      "real(8)-A",   "SC_DOUBLE_P_I",      NULL);
-    add_type("long double *", "real(16)-A",  "SC_LONG_DOUBLE_P_I", NULL);
+    add_type("void *",        "C_PTR-A",      "SC_VOID_P_I",        NULL);
+    add_type("bool *",        "logical-A",    "SC_BOOL_P_I",        NULL);
+    add_type("char *",        "character-A",  "SC_STRING_I",        NULL);
 
-    add_type("pcons",         "C_PTR-A",     "SC_PCONS_I",         NULL);
-    add_type("pcons *",       "C_PTR-A",     "SC_PCONS_P_I",       NULL);
-    add_type("FILE *",        "C_PTR-A",     "SC_FILE_I",          NULL);
-    add_type("PROCESS *",     "C_PTR-A",     "SC_PROCESS_I",       NULL);
+    add_type("short *",       "integer(2)-A", "SC_SHORT_P_I",       NULL);
+    add_type("int *",         "integer-A",    "SC_INT_P_I",         NULL);
+    add_type("long *",        "integer(8)-A", "SC_LONG_P_I",        NULL);
+    add_type("long long *",   "integer(8)-A", "SC_LONG_LONG_P_I",   NULL);
+
+    add_type("float *",       "real(4)-A",    "SC_FLOAT_P_I",       NULL);
+    add_type("double *",      "real(8)-A",    "SC_DOUBLE_P_I",      NULL);
+    add_type("long double *", "real(16)-A",   "SC_LONG_DOUBLE_P_I", NULL);
+
+    add_type("pcons",         "C_PTR-A",      "SC_PCONS_I",         NULL);
+    add_type("pcons *",       "C_PTR-A",      "SC_PCONS_P_I",       NULL);
+    add_type("FILE *",        "C_PTR-A",      "SC_FILE_I",          NULL);
+    add_type("PROCESS *",     "C_PTR-A",      "SC_PROCESS_I",       NULL);
 
     return;}
 
