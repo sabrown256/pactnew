@@ -1187,9 +1187,9 @@ void _PD_set_standard(PDBfile *file, data_standard *std, data_alignment *algn)
        {int nv;
 
 /* must be format version 3 or higher */
-	PD_get_format_version(nv);
+	nv = PD_get_fmt_version();
 	nv = max(nv, 3);
-	PD_set_format_version(nv);
+	PD_set_fmt_version(nv);
 
 /* set the TEXT standard */
 	file->std   = _PD_copy_standard(&TEXT_STD);
@@ -1348,11 +1348,144 @@ PDBfile *_PD_open(tr_layer *tr, SC_udl *pu, char *name, char *mode, void *a)
 
 /*--------------------------------------------------------------------------*/
 
+/*                            FILE INFO ROUTINES                            */
+
+/*--------------------------------------------------------------------------*/
+
+PD_major_op PD_get_mode(PDBfile *file)
+   {PD_major_op rv;
+
+    if (file != NULL)
+       rv = file->mode;
+    else
+       rv = PD_GENERIC;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+PD_major_op PD_set_mode(PDBfile *file, PD_major_op v)
+   {PD_major_op rv;
+
+    if (file != NULL)
+       {rv = file->mode;
+	file->mode = v;}
+    else
+       rv = PD_GENERIC;
+
+    return(rv);}
+ 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+int PD_get_offset(PDBfile *file)
+   {int rv;
+
+    if (file != NULL)
+       rv = file->default_offset;
+    else
+       rv = 0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+int PD_set_offset(PDBfile *file, int v)
+   {int rv;
+
+    if (file != NULL)
+       {rv = file->default_offset;
+	file->default_offset = v;}
+    else
+       rv = 0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+int PD_get_track_pointers(PDBfile *file)
+   {int rv;
+
+    if (file != NULL)
+       rv = file->track_pointers;
+    else
+       rv = TRUE;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+int PD_set_track_pointers(PDBfile *file, int v)
+   {int rv;
+
+    if (file != NULL)
+       {rv = file->track_pointers;
+	file->track_pointers = v;}
+    else
+       rv = TRUE;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+int64_t PD_get_max_file_size(PDBfile *file)
+   {int64_t rv;
+
+    if (file != NULL)
+       rv = file->maximum_size;
+    else
+       rv = TRUE;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+int64_t PD_set_max_file_size(PDBfile *file, int64_t v)
+   {int64_t rv;
+
+    if (file != NULL)
+       {rv = file->maximum_size;
+	file->maximum_size = v;}
+    else
+       rv = TRUE;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+int PD_get_fmt_version(void)
+   {int rv;
+
+    rv = PD_default_format_version;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+int PD_set_fmt_version(int v)
+   {int rv;
+
+    rv = PD_default_format_version;
+    PD_default_format_version = v;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
 /*                      FREE_LIST MANAGEMENT ROUTINES                       */
 
 /*--------------------------------------------------------------------------*/
 
 #if 0
+
 /* _PD_ADD_FREE_SPACE - add block to free list in descending size order
  */
 

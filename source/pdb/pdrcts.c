@@ -76,7 +76,7 @@ int main(int c, char **v)
 		      read_only = TRUE;
                       break;
                  case 'v' :
-                      PD_set_format_version(SC_stoi(v[++i]));
+                      PD_set_fmt_version(SC_stoi(v[++i]));
 		      break;};}
          else
 	    fname = v[i];};

@@ -62,7 +62,7 @@ int main(int c, char **v)
 		      print_help();
 		      return(1);
                  case 'v' :
-                      PD_set_format_version(SC_stoi(v[++i]));
+                      PD_set_fmt_version(SC_stoi(v[++i]));
 		      break;};}
          else
             break;};

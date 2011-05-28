@@ -356,54 +356,62 @@ int _PD_block_set_csum(SC_array *bl, long n, unsigned char *dig)
  */
    
 static int _PD_consistent_dims(PDBfile *file, syment *ep, dimdes *ndims)
-   {dimdes *odims, *od, *nd;
+   {int rv;
+    dimdes *odims, *od, *nd;
 
     if ((file == NULL) || (ep == NULL) || (ndims == NULL))
-       return(FALSE);
-
-    od    = NULL;
-    nd    = NULL;
-    odims = PD_entry_dimensions(ep);
-
-/* check the dimensions for consistency */
-    if (file->major_order == COLUMN_MAJOR_ORDER)
-       {for (od = odims, nd = ndims;
-	     (od != NULL) && (nd != NULL) && (nd->next != NULL);
-	     od = od->next, nd = nd->next)
-            {if ((od->index_min != nd->index_min) ||
-                 (od->index_max != nd->index_max) ||
-                 (od->number != nd->number))
-                return(FALSE);};}
-
-    else if (file->major_order == ROW_MAJOR_ORDER)
-       {for (od = odims->next, nd = ndims->next;
-             (od != NULL) && (nd != NULL);
-	     od = od->next, nd = nd->next)
-            {if ((od->index_min != nd->index_min) ||
-                 (od->index_max != nd->index_max) ||
-                 (od->number != nd->number))
-                return(FALSE);};
-
-        nd = ndims;
-        od = odims;};
-
-    if ((nd == NULL) || (od == NULL))
-       return(FALSE);
-
-    else if (nd->index_min == file->default_offset)
-       od->index_max += nd->index_max - nd->index_min + 1;
-
-    else if (nd->index_min == od->index_max + 1L)
-       od->index_max = nd->index_max;
+       rv = FALSE;
 
     else
-       return(FALSE);
+       {rv = TRUE;
 
-    od->number = od->index_max - od->index_min + 1L;
+	od    = NULL;
+	nd    = NULL;
+	odims = PD_entry_dimensions(ep);
 
-    PD_entry_number(ep) = _PD_comp_num(odims);
+/* check the dimensions for consistency */
+	if (file->major_order == COLUMN_MAJOR_ORDER)
+	   {for (od = odims, nd = ndims;
+		 (od != NULL) && (nd != NULL) && (nd->next != NULL);
+		 od = od->next, nd = nd->next)
+	        {if ((od->index_min != nd->index_min) ||
+		     (od->index_max != nd->index_max) ||
+		     (od->number != nd->number))
+		    {rv = FALSE;
+		     break;};};}
 
-    return(TRUE);}
+	else if (file->major_order == ROW_MAJOR_ORDER)
+	   {for (od = odims->next, nd = ndims->next;
+		 (od != NULL) && (nd != NULL);
+		 od = od->next, nd = nd->next)
+	        {if ((od->index_min != nd->index_min) ||
+		     (od->index_max != nd->index_max) ||
+		     (od->number != nd->number))
+		    {rv = FALSE;
+		     break;};};
+
+	    nd = ndims;
+	    od = odims;};
+
+	if (rv == TRUE)
+	   {if ((nd == NULL) || (od == NULL))
+	       rv = FALSE;
+
+	    else if (nd->index_min == file->default_offset)
+	       od->index_max += nd->index_max - nd->index_min + 1;
+
+	    else if (nd->index_min == od->index_max + 1L)
+	       od->index_max = nd->index_max;
+
+	    else
+	       rv = FALSE;
+
+	    if (rv == TRUE)
+	       {od->number = od->index_max - od->index_min + 1L;
+
+		PD_entry_number(ep) = _PD_comp_num(odims);};};};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

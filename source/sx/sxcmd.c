@@ -501,7 +501,7 @@ int SX_command(SS_psides *si, char *file, char *cmd)
        {first = FALSE;
 	SC_io_connect(SC_REMOTE);
 
-	PD_set_format_version(3);
+	PD_set_fmt_version(3);
 
 	PD_init_threads(0, NULL);
 

@@ -922,7 +922,7 @@ static object *_SXI_file_content(SS_psides *si, object *argl)
     FILE *out;
     object *fout;
 
-    PD_get_format_version(vers);
+    vers = PD_get_fmt_version();
 
     po   = NULL;
     fout = SS_null;

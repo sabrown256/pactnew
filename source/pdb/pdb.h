@@ -127,21 +127,9 @@
 #define PD_get_file_type(file)                                               \
    (((file)->type == NULL) ? PDBFILE_S : (file)->type)
 
-#define PD_get_mode(file)              ((file)->mode)
-#define PD_set_mode(file, v)           (file)->mode = (v)
-#define PD_get_offset(file)            ((file)->default_offset)
-#define PD_set_offset(file, v)         (file)->default_offset = (v)
-#define PD_get_track_pointers(file)    ((file)->track_pointers)
-#define PD_set_track_pointers(file, v) (file)->track_pointers = (v)
-
-/* #define PD_file_maximum_size(file) file->maximum_size           */
-/* replaced by PD_get_max_file_size and PD_set_max_file_size below */
-
-#define PD_get_max_file_size(file)     ((file)->maximum_size)
-#define PD_set_max_file_size(file, v)  (file)->maximum_size = (v)
-
-#define PD_set_format_version(_n)    PD_default_format_version = _n
-#define PD_get_format_version(_n)    _n = PD_default_format_version
+/* deprecated in favor PD_set_fmt_version and PD_get_fmt_version */
+#define PD_set_format_version        PD_set_fmt_version
+#define PD_get_format_version(_n)    (_n = PD_get_fmt_version())
 
 #define PD_entry_type(ep)            (ep)->type
 #define PD_entry_dimensions(ep)      (ep)->dimensions
@@ -1090,6 +1078,22 @@ extern void
  PD_free_entry_info(char *typ, long *pdim),
  PD_rel_entry_info(syment *ep, char *typ, long *pdim),
  PD_typedef_primitive_types(PDBfile *file);
+
+extern PD_major_op
+ PD_get_mode(PDBfile *file),
+ PD_set_mode(PDBfile *file, PD_major_op v);
+
+extern int
+ PD_get_offset(PDBfile *file),
+ PD_set_offset(PDBfile *file, int v),
+ PD_get_track_pointers(PDBfile *file),
+ PD_set_track_pointers(PDBfile *file, int v),
+ PD_get_fmt_version(void),
+ PD_set_fmt_version(int v);
+
+extern int64_t
+ PD_get_max_file_size(PDBfile *file),
+ PD_set_max_file_size(PDBfile *file, int64_t v);
 
 
 /* PDMEMB.C declarations */

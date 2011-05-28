@@ -367,7 +367,7 @@ FIXNUM FF_ID(pfsbfs, PFSBFS)(FIXNUM *ssz)
 FIXNUM FF_ID(pfgfmv, PFGFMV)(FIXNUM *sv)
    {FIXNUM rv;
 
-    PD_get_format_version(*sv);
+    *sv = PD_get_fmt_version();
 
     rv = *sv;
 
@@ -381,7 +381,7 @@ FIXNUM FF_ID(pfgfmv, PFGFMV)(FIXNUM *sv)
 FIXNUM FF_ID(pfsfmv, PFSFMV)(FIXNUM *sv)
    {FIXNUM rv;
 
-    PD_set_format_version(*sv);
+    PD_set_fmt_version(*sv);
 
     rv = *sv;
 

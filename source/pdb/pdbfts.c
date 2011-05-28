@@ -136,7 +136,7 @@ int main(int c, char **v)
          else
             break;};
 
-    PD_set_format_version(vers);
+    PD_set_fmt_version(vers);
     PD_set_buffer_size(bfsz);
 
     test_1(n, nc);
