@@ -38,7 +38,7 @@ module pact_bl4
          implicit none
          integer         :: fb3_f
          integer(2)      :: sa1
-         integer         :: aa2(*)
+         integer(2)      :: aa2(*)
       end function fb3_f
 
       function fb4_f(sa1, aa2) 
@@ -54,7 +54,7 @@ module pact_bl4
          implicit none
          integer         :: fb5_f
          integer(8)      :: sa1
-         integer         :: aa2(*)
+         integer(8)      :: aa2(*)
       end function fb5_f
 
       function fb6_f(sa1, aa2) 
@@ -62,7 +62,7 @@ module pact_bl4
          implicit none
          integer         :: fb6_f
          integer(8)      :: sa1
-         integer         :: aa2(*)
+         integer(8)      :: aa2(*)
       end function fb6_f
 
       function fb7_f(sa1, aa2) 
