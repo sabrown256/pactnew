@@ -5,14 +5,13 @@
  *
  */
 
-
 #include "cpyright.h"
 #include "bl2_int.h"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-char *FF_ID(fbcv1, FBCV1)(int *sa, float *sb, double *sc, char *sd, PFInt fe, PFInt ff)
+char *FF_ID(fbcv1_f, FBCV1_F)(int *sa, float *sb, double *sc, char *sd, PFInt fe, PFInt ff)
    {int _lsa;
     float _lsb;
     double _lsc;
@@ -35,7 +34,7 @@ char *FF_ID(fbcv1, FBCV1)(int *sa, float *sb, double *sc, char *sd, PFInt fe, PF
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-char *FF_ID(fbmcv1, FBMCV1)(int *sa, float *sb, double *sc, char *sd)
+char *FF_ID(fbmcv1_f, FBMCV1_F)(int *sa, float *sb, double *sc, char *sd)
    {int _lsa;
     float _lsb;
     double _lsc;
@@ -54,7 +53,7 @@ char *FF_ID(fbmcv1, FBMCV1)(int *sa, float *sb, double *sc, char *sd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-char *FF_ID(fbmcr2, FBMCR2)(int *aa, float *ab, double *ac, char *ad, int sncad)
+char *FF_ID(fbmcr2_f, FBMCR2_F)(int *aa, float *ab, double *ac, char *ad, int sncad)
    {int *_laa;
     float *_lab;
     double *_lac;

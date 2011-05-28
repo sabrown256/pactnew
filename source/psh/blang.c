@@ -516,32 +516,32 @@ static char *lookup_type(char *ty, langmode ity, langmode oty)
 static void init_types(void)
    {
 
-    add_type("void",        "",           "",                 NULL);
-    add_type("bool",        "logical",    "SC_BOOL_I",        NULL);
-    add_type("char",        "character",  "SC_CHAR_I",        NULL);
+    add_type("void",        "",            "",                 NULL);
+    add_type("bool",        "logical",     "SC_BOOL_I",        NULL);
+    add_type("char",        "character",   "SC_CHAR_I",        NULL);
 
 /* fixed point types */
-    add_type("short",       "integer*2",  "SC_SHORT_I",       NULL);
-    add_type("int",         "integer",    "SC_INT_I",         NULL);
-    add_type("long",        "integer*8",  "SC_LONG_I",        NULL);
-    add_type("long long",   "integer*8",  "SC_LONG_LONG_I",   NULL);
+    add_type("short",       "integer(2)",  "SC_SHORT_I",       NULL);
+    add_type("int",         "integer",     "SC_INT_I",         NULL);
+    add_type("long",        "integer(8)",  "SC_LONG_I",        NULL);
+    add_type("long long",   "integer(8)",  "SC_LONG_LONG_I",   NULL);
 
 /* fixed width fixed point types */
-    add_type("int16_t",     "integer*2",  "SC_INT16_I",       NULL);
-    add_type("int32_t",     "integer*4",  "SC_INT32_I",       NULL);
-    add_type("int64_t",     "integer*8",  "SC_INT64_I",       NULL);
+    add_type("int16_t",     "integer(2)",  "SC_INT16_I",       NULL);
+    add_type("int32_t",     "integer(4)",  "SC_INT32_I",       NULL);
+    add_type("int64_t",     "integer(8)",  "SC_INT64_I",       NULL);
 
 /* floating point types */
-    add_type("float",       "real*4",     "SC_FLOAT_I",       NULL);
-    add_type("double",      "real*8",     "SC_DOUBLE_I",      NULL);
-    add_type("long double", "real*16",    "SC_LONG_DOUBLE_I", NULL);
+    add_type("float",       "real(4)",     "SC_FLOAT_I",       NULL);
+    add_type("double",      "real(8)",     "SC_DOUBLE_I",      NULL);
+    add_type("long double", "real(16)",    "SC_LONG_DOUBLE_I", NULL);
 
 /* complex types */
-    add_type("float _Complex",       "complex*4",
+    add_type("float _Complex",       "complex(4)",
 	     "SC_FLOAT_COMPLEX_I", NULL);
-    add_type("double _Complex",      "complex*8",
+    add_type("double _Complex",      "complex(8)",
 	     "SC_DOUBLE_COMPLEX_I", NULL);
-    add_type("long double _Complex", "complex*16",
+    add_type("long double _Complex", "complex(16)",
 	     "SC_LONG_DOUBLE_COMPLEX_I", NULL);
 
     add_type("void *",        "C_PTR-A",     "SC_VOID_P_I",        NULL);
@@ -551,9 +551,9 @@ static void init_types(void)
     add_type("short *",       "integer-A",   "SC_SHORT_P_I",       NULL);
     add_type("long *",        "integer-A",   "SC_LONG_P_I",        NULL);
     add_type("long long *",   "integer-A",   "SC_LONG_LONG_P_I",   NULL);
-    add_type("float *",       "real*4-A",    "SC_FLOAT_P_I",       NULL);
-    add_type("double *",      "real*8-A",    "SC_DOUBLE_P_I",      NULL);
-    add_type("long double *", "real*16-A",   "SC_LONG_DOUBLE_P_I", NULL);
+    add_type("float *",       "real(4)-A",   "SC_FLOAT_P_I",       NULL);
+    add_type("double *",      "real(8)-A",   "SC_DOUBLE_P_I",      NULL);
+    add_type("long double *", "real(16)-A",  "SC_LONG_DOUBLE_P_I", NULL);
 
     add_type("pcons",         "C_PTR-A",     "SC_PCONS_I",         NULL);
     add_type("pcons *",       "C_PTR-A",     "SC_PCONS_P_I",       NULL);
@@ -585,9 +585,56 @@ static void add_derived_types(char **sbi)
     return;}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
-/*                            FORTRAN ROUTINES                              */
+/* RENAME_VAR - rename the variable ONM to NNM according to type KND */
 
+static void rename_var(char *nnm, int nc, char *onm, fparam knd)
+   {
+
+    switch (knd)
+       {case FP_FNC :
+	     snprintf(nnm, nc, "f%s", onm);
+	     break;
+        case FP_ARRAY :
+	     snprintf(nnm, nc, "a%s", onm);
+	     break;
+        case FP_SCALAR :
+	     snprintf(nnm, nc, "s%s", onm);
+	     break;
+        case FP_STRUCT :
+	     snprintf(nnm, nc, "t%s", onm);
+	     break;
+        default :
+	     printf("Unknown type: %s\n", onm);
+	     break;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* MAP_NAME - map the C function name S to form target language */
+
+static char *map_name(char *d, int nc, char *s, char *sfx, int cs)
+   {
+
+    if (sfx != NULL)
+       snprintf(d, nc, "%s_%s", s, sfx);
+    else
+       snprintf(d, nc, "%s", s);
+
+    switch (cs)
+       {case -1 :
+	     downcase(d);
+	     break;
+	case 1 :
+	     upcase(d);
+	     break;};
+
+    return(d);}
+
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* DEREF - dereference a pointer S
@@ -605,6 +652,9 @@ static char *deref(char *d, int nc, char *s)
     return(d);}
 
 /*--------------------------------------------------------------------------*/
+
+/*                            FORTRAN ROUTINES                              */
+
 /*--------------------------------------------------------------------------*/
 
 /* CF_TYPE - return Fortran type corresponding to C type TY */
@@ -712,23 +762,20 @@ static void fc_decl_list(char *a, int nc, fdecl *dcl)
 	    {nm = al[i].name;
 	     nstrncpy(lnm, MAXLINE, nm, -1);
 	     knd = fc_type(lty, MAXLINE, al[i].type, MODE_C);
+             rename_var(nm, MAXLINE, lnm, knd);
 	     switch (knd)
 	        {case FP_FNC :
-		      snprintf(nm, MAXLINE, "f%s", lnm);
 		      vstrcat(a, MAXLINE, "%s %s, ", lty, nm);
 		      break;
 		 case FP_ARRAY :
 		      if ((dcl->nc == 0) && (strcmp(lty, "char") == 0))
 			 dcl->cargs = lst_push(dcl->cargs, lnm);
-		      snprintf(nm, MAXLINE, "a%s", lnm);
 		      vstrcat(a, MAXLINE, "%s *%s, ", lty, nm);
 		      break;
 		 case FP_SCALAR :
-		      snprintf(nm, MAXLINE, "s%s", lnm);
 		      vstrcat(a, MAXLINE, "%s *%s, ", lty, nm);
 		      break;
 		 case FP_STRUCT :
-		      snprintf(nm, MAXLINE, "t%s", lnm);
 		      vstrcat(a, MAXLINE, "%s *%s, ", lty, nm);
 		      break;
 		 default :
@@ -778,11 +825,11 @@ static void fc_call_list(char *a, int nc, fdecl *dcl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* F_PROTO_LIST - render the arg list of DCL into A for the
- *              - Fortran callable C wrapper
+/* FORTRAN_PROTO_LIST - render the arg list of DCL into A for the
+ *                    - Fortran callable C wrapper
  */
 
-static void f_proto_list(char *a, int nc, fdecl *dcl)
+static void fortran_proto_list(char *a, int nc, fdecl *dcl)
    {int i, na;
     char t[MAXLINE];
     farg *al;
@@ -829,7 +876,6 @@ static FILE *init_fortran(char *pck)
     fprintf(fp, " */\n");
     fprintf(fp, "\n");
 
-    fprintf(fp, "\n");
     fprintf(fp, "#include \"cpyright.h\"\n");
     fprintf(fp, "#include \"%s_int.h\"\n", pck);
     fprintf(fp, "\n");
@@ -841,14 +887,13 @@ static FILE *init_fortran(char *pck)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRAP_FORTRAN_DECL - function declaration */
+/* FORTRAN_WRAP_DECL - function declaration */
 
-static void wrap_fortran_decl(FILE *fp, fdecl *dcl,
+static void fortran_wrap_decl(FILE *fp, fdecl *dcl,
 			      fparam knd, char *rt, char *cfn)
    {char ucn[MAXLINE], dcn[MAXLINE], a[MAXLINE], t[MAXLINE];
 
-    snprintf(dcn, MAXLINE, "%s", cfn);
-    downcase(dcn);
+    map_name(dcn, MAXLINE, cfn, "f", -1);
 
     nstrncpy(ucn, MAXLINE, dcn, -1);
     upcase(ucn);
@@ -858,19 +903,19 @@ static void wrap_fortran_decl(FILE *fp, fdecl *dcl,
     fprintf(fp, "\n");
 
     switch (knd)
-       {case FP_ARRAY :
-	     snprintf(t, MAXLINE, "%s *FF_ID(%s, %s)(%s)\n",
-		      rt, dcn, ucn, a);
-	     break;
-        case FP_STRUCT :
+       {case FP_STRUCT :
 	     snprintf(t, MAXLINE, "FIXNUM FF_ID(%s, %s)(%s)\n",
 		      dcn, ucn, a);
 	     break;
-        case FP_ANY    :
-        case FP_VARARG :
-        case FP_FNC    :
+        case FP_ARRAY :
+	     snprintf(t, MAXLINE, "%s *FF_ID(%s, %s)(%s)\n",
+		      rt, dcn, ucn, a);
+	     break;
         case FP_SCALAR :
-        default        :
+	     snprintf(t, MAXLINE, "%s FF_ID(%s, %s)(%s)\n",
+		      rt, dcn, ucn, a);
+	     break;
+        default :
 	     snprintf(t, MAXLINE, "%s FF_ID(%s, %s)(%s)\n",
 		      rt, dcn, ucn, a);
 	     break;};
@@ -882,9 +927,9 @@ static void wrap_fortran_decl(FILE *fp, fdecl *dcl,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRAP_FORTRAN_LOCAL_DECL - local variable declarations */
+/* FORTRAN_WRAP_LOCAL_DECL - local variable declarations */
 
-static void wrap_fortran_local_decl(FILE *fp, fdecl *dcl,
+static void fortran_wrap_local_decl(FILE *fp, fdecl *dcl,
 				    fparam knd, char *rt, int voidf)
    {int i, na, nv, done, voida;
     char t[MAXLINE];
@@ -915,17 +960,18 @@ static void wrap_fortran_local_decl(FILE *fp, fdecl *dcl,
 	 if (i == na)
 	    {if (voidf == FALSE)
 		{switch (knd)
-		    {case FP_ARRAY :
+		    {case FP_STRUCT :
+		          snprintf(t, MAXLINE, "FIXNUM _rv;\n");
+			  vstrcat(t, MAXLINE, "    SC_address _ad%s;\n",
+				  dcl->name);
+			  break;
+		     case FP_ARRAY :
 			  snprintf(t, MAXLINE, "%s *_rv;\n", rt);
 			  break;
-		     case FP_STRUCT :
-		          snprintf(t, MAXLINE, "FIXNUM _rv;\n");
-			  break;
-		     case FP_ANY    :
-		     case FP_VARARG :
-		     case FP_FNC    :
 		     case FP_SCALAR :
-		     default        :
+		          snprintf(t, MAXLINE, "%s _rv;\n", rt);
+			  break;
+		     default :
 		          snprintf(t, MAXLINE, "%s _rv;\n", rt);
 			  break;};};
 
@@ -935,17 +981,19 @@ static void wrap_fortran_local_decl(FILE *fp, fdecl *dcl,
 	 else if (nm[0] != '\0')
 	    {ty = al[i].type;
 	     switch (al[i].knd)
-		{case FP_ARRAY :
+		{case FP_STRUCT :
+		      snprintf(t, MAXLINE, "%s _l%s;\n", ty, nm);
+		      break;
+		 case FP_ARRAY :
 		      if (strcmp(ty, "char *") == 0)
 			 snprintf(t, MAXLINE, "char _l%s[MAXLINE];\n", nm);
 		      else
 			 snprintf(t, MAXLINE, "%s_l%s;\n", ty, nm);
 		      break;
-		 case FP_ANY    :
-		 case FP_VARARG :
-		 case FP_FNC    :
 		 case FP_SCALAR :
-		 default        :
+		      snprintf(t, MAXLINE, "%s _l%s;\n", ty, nm);
+		      break;
+		 default :
 		      snprintf(t, MAXLINE, "%s _l%s;\n", ty, nm);
 		      break;};
 	     nv++;
@@ -961,9 +1009,9 @@ static void wrap_fortran_local_decl(FILE *fp, fdecl *dcl,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRAP_FORTRAN_LOCAL_ASSN - local variable assignments */
+/* FORTRAN_WRAP_LOCAL_ASSN - local variable assignments */
 
-static void wrap_fortran_local_assn(FILE *fp, fdecl *dcl)
+static void fortran_wrap_local_assn(FILE *fp, fdecl *dcl)
    {int i, na, nv;
     fparam knd;
     char t[MAXLINE];
@@ -980,7 +1028,15 @@ static void wrap_fortran_local_assn(FILE *fp, fdecl *dcl)
 	    {ty  = al[i].type;
 	     knd = al[i].knd;
 	     switch (knd)
-		{case FP_ARRAY  :
+	        {case FP_FNC :
+		      snprintf(t, MAXLINE, "    _l%-8s = (%s) %s;\n",
+			       nm, ty, nm);
+		      break;
+		 case FP_STRUCT :
+		      snprintf(t, MAXLINE, "    _l%-8s = *(%s*) %s;\n",
+			       nm, ty, nm);
+		      break;
+		 case FP_ARRAY :
 		      if (strcmp(ty, "char *") == 0)
 			 snprintf(t, MAXLINE,
 				  "    SC_FORTRAN_STR_C(_l%s, %s, snc%s);\n",
@@ -989,14 +1045,11 @@ static void wrap_fortran_local_assn(FILE *fp, fdecl *dcl)
 			 snprintf(t, MAXLINE, "    _l%-8s = (%s) %s;\n",
 				  nm, ty, nm);
 		      break;
-		 case FP_FNC    :
-		      snprintf(t, MAXLINE, "    _l%-8s = (%s) %s;\n",
+		 case FP_SCALAR :
+		      snprintf(t, MAXLINE, "    _l%-8s = (%s) *%s;\n",
 			       nm, ty, nm);
 		      break;
-		 case FP_ANY    :
-		 case FP_VARARG :
-		 case FP_SCALAR :
-		 default        :
+		 default :
 		      snprintf(t, MAXLINE, "    _l%-8s = (%s) *%s;\n",
 			       nm, ty, nm);
 		      break;};
@@ -1011,25 +1064,27 @@ static void wrap_fortran_local_assn(FILE *fp, fdecl *dcl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRAP_FORTRAN_LOCAL_CALL - function call */
+/* FORTRAN_WRAP_LOCAL_CALL - function call */
 
-static void wrap_fortran_local_call(FILE *fp, fdecl *dcl,
+static void fortran_wrap_local_call(FILE *fp, fdecl *dcl,
 				    fparam knd, char *rt, int voidf)
-   {int rptr;
-    char a[MAXLINE];
-    
-    rptr = is_ptr(rt);
+   {char a[MAXLINE];
+    char *nm;
 
     fc_call_list(a, MAXLINE, dcl);
 
+    nm = dcl->name;
     if (voidf == FALSE)
-       {if ((rptr == TRUE) || (knd == FP_STRUCT))
-	   fprintf(fp, "    _rv = SC_ADD_POINTER(%s(%s));\n",
-		   dcl->name, a);
-	 else
-	    fprintf(fp, "    _rv = %s(%s);\n", dcl->name, a);}
+       {switch (knd)
+	   {case FP_STRUCT :
+	         fprintf(fp, "    _ad%s.memaddr = (void *) %s(%s);\n",
+			 nm, nm, a);
+		 break;
+	    default :
+	         fprintf(fp, "    _rv = %s(%s);\n", nm, a);
+		 break;};}
     else
-       fprintf(fp, "    %s(%s);\n", dcl->name, a);
+       fprintf(fp, "    %s(%s);\n", nm, a);
 
     fprintf(fp, "\n");
 
@@ -1038,13 +1093,22 @@ static void wrap_fortran_local_call(FILE *fp, fdecl *dcl,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRAP_FORTRAN_LOCAL_RETURN - emit the return */
+/* FORTRAN_WRAP_LOCAL_RETURN - emit the return */
 
-static void wrap_fortran_local_return(FILE *fp, fdecl *dcl, int voidf)
-   {
+static void fortran_wrap_local_return(FILE *fp, fdecl *dcl,
+				      fparam knd, int voidf)
+   {char *nm;
 
+    nm = dcl->name;
     if (voidf == FALSE)
-       fprintf(fp, "    return(_rv);}\n");
+       {switch (knd)
+	   {case FP_STRUCT :
+	         fprintf(fp, "    _rv = _ad%s.diskaddr;\n\n", nm);
+	         fprintf(fp, "    return(_rv);}\n");
+		 break;
+	    default :
+	         fprintf(fp, "    return(_rv);}\n");
+		 break;};}
     else
        fprintf(fp, "    return;}\n");
 
@@ -1055,11 +1119,11 @@ static void wrap_fortran_local_return(FILE *fp, fdecl *dcl, int voidf)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRAP_FORTRAN - wrap C function PRO in FORTRAN callable function
+/* FORTRAN_WRAP - wrap C function PRO in FORTRAN callable function
  *              - using name FFN
  */
 
-static void wrap_fortran(FILE *fp, fdecl *dcl, char *cfn, char *ffn)
+static void fortran_wrap(FILE *fp, fdecl *dcl, char *cfn, char *ffn)
    {int voidf;
     fparam knd;
     char rt[MAXLINE];
@@ -1075,19 +1139,19 @@ static void wrap_fortran(FILE *fp, fdecl *dcl, char *cfn, char *ffn)
 	csep(fp);
 
 /* function declaration */
-	wrap_fortran_decl(fp, dcl, knd, rt, cfn);
+	fortran_wrap_decl(fp, dcl, knd, rt, cfn);
 
 /* local variable declarations */
-        wrap_fortran_local_decl(fp, dcl, knd, rt, voidf);
+        fortran_wrap_local_decl(fp, dcl, knd, rt, voidf);
 
 /* local variable assignments */
-	wrap_fortran_local_assn(fp, dcl);
+	fortran_wrap_local_assn(fp, dcl);
 
 /* function call */
-	wrap_fortran_local_call(fp, dcl, knd, rt, voidf);
+	fortran_wrap_local_call(fp, dcl, knd, rt, voidf);
 
 /* return */
-        wrap_fortran_local_return(fp, dcl, voidf);
+        fortran_wrap_local_return(fp, dcl, knd, voidf);
 
 	csep(fp);};
 
@@ -1118,7 +1182,7 @@ static int bind_fortran(FILE *fp, char **spr, char **sbi)
 	     ffn = ta[1];
              dcl = find_proto(spr, cfn);
 	     if (dcl != NULL)
-	        {wrap_fortran(fp, dcl, cfn, ffn);
+	        {fortran_wrap(fp, dcl, cfn, ffn);
 		 free_decl(dcl);};
 
 	     free_strings(ta);};};
@@ -1172,6 +1236,7 @@ static void fin_fortran(FILE *fp, char *pck)
  *    COMPLEX
  *    	C_LONG_DOUBLE		long double, long double _Imaginary
  *    	C_COMPLEX		_Complex
+ *    	C_FLOAT_COMPLEX		float _Complex
  *    	C_DOUBLE_COMPLEX	double _Complex
  *    	C_LONG_DOUBLE_COMPLEX  	long double _Complex
  *    
@@ -1237,12 +1302,12 @@ static fparam mc_type(int nc, char *fty, char *cty,
        {nstrncpy(fty, nc, "complex", -1);
 	nstrncpy(cty, nc, "C_DOUBLE_COMPLEX", -1);}
 
-    else if (strstr(ty, "_Complex") != NULL)
+    else if (strstr(ty, "float _Complex") != NULL)
        {nstrncpy(fty, nc, "complex", -1);
-	nstrncpy(cty, nc, "C_COMPLEX", -1);}
+	nstrncpy(cty, nc, "C_FLOAT_COMPLEX", -1);}
 
     else if (strstr(ty, "long double") != NULL)
-       {nstrncpy(fty, nc, "complex", -1);
+       {nstrncpy(fty, nc, "real", -1);
 	nstrncpy(cty, nc, "C_LONG_DOUBLE", -1);}
 
     else if (strstr(ty, "double") != NULL)
@@ -1321,20 +1386,7 @@ static void mc_decl_list(char *a, int nc, fdecl *dcl)
 	     if (dcl->proc == FALSE)
 	        {nstrncpy(lnm, MAXLINE, nm, -1);
 		 knd = fc_type(lty, MAXLINE, al[i].type, MODE_F);
-		 switch (knd)
-		    {case FP_FNC :
-			  snprintf(nm, MAXLINE, "f%s", lnm);
-			  break;
-		     case FP_ARRAY :
-			  snprintf(nm, MAXLINE, "a%s", lnm);
-			  break;
-		     case FP_SCALAR :
-			  snprintf(nm, MAXLINE, "s%s", lnm);
-			  break;
-		     default :
-		          printf("Unknown type: %s\n", lty);
-			  break;};
-
+		 rename_var(nm, MAXLINE, lnm, knd);
 		 al[i].knd = knd;};
 
 	     vstrcat(a, MAXLINE, "%s, ", nm);};
@@ -1388,12 +1440,12 @@ static FILE *init_module(char *pck)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PRE_WRAPPABLE - return TRUE iff the function described by PR
- *               - can be fully wrapped as opposed to being declared
- *               - external
+/* MODULE_PRE_WRAPPABLE - return TRUE iff the function described by PR
+ *                      - can be fully wrapped as opposed to being declared
+ *                      - external
  */
 
-static int pre_wrappable(char *pr)
+static int module_pre_wrappable(char *pr)
    {int rv;
 
     rv = ((strstr(pr, "...") == NULL) &&
@@ -1405,15 +1457,15 @@ static int pre_wrappable(char *pr)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PRE_WRAP_EXT - write the Fortran interface for hand written
- *              - prototype PR
- *              - for functions that can only be declared external
+/* MODULE_PRE_WRAP_EXT - write the Fortran interface for hand written
+ *                     - prototype PR
+ *                     - for functions that can only be declared external
  */
 
-static void pre_wrap_ext(FILE *fp, char *pr, char **ta, char *pck)
+static void module_pre_wrap_ext(FILE *fp, char *pr, char **ta, char *pck)
    {
 
-    if ((ta != NULL) && (pre_wrappable(pr) == FALSE))
+    if ((ta != NULL) && (module_pre_wrappable(pr) == FALSE))
        {if (strcmp(ta[0], "void") == 0)
 	   fprintf(fp, "   external :: %s\n", ta[1]);
 	else
@@ -1424,17 +1476,17 @@ static void pre_wrap_ext(FILE *fp, char *pr, char **ta, char *pck)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PRE_WRAP_FULL - write the Fortran interface for hand written
- *               - prototype PR
- *               - for functions that can only be fully declared
+/* MODULE_PRE_WRAP_FULL - write the Fortran interface for hand written
+ *                      - prototype PR
+ *                      - for functions that can only be fully declared
  */
 
-static void pre_wrap_full(FILE *fp, char *pr, char **ta, char *pck)
+static void module_pre_wrap_full(FILE *fp, char *pr, char **ta, char *pck)
    {int i, nt;
     char a[MAXLINE];
     char *oper;
 
-    if ((ta != NULL) && (pre_wrappable(pr) == TRUE))
+    if ((ta != NULL) && (module_pre_wrappable(pr) == TRUE))
        {if (strcmp(ta[0], "void") == 0)
            oper = "subroutine";
         else
@@ -1477,12 +1529,12 @@ static void pre_wrap_full(FILE *fp, char *pr, char **ta, char *pck)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* ITF_WRAPPABLE - return TRUE iff the function described by DCL
- *               - can be fully wrapped as opposed to being declared
- *               - external
+/* MODULE_ITF_WRAPPABLE - return TRUE iff the function described by DCL
+ *                      - can be fully wrapped as opposed to being declared
+ *                      - external
  */
 
-static int itf_wrappable(fdecl *dcl)
+static int module_itf_wrappable(fdecl *dcl)
    {int rv;
     char *pr;
 
@@ -1495,10 +1547,10 @@ static int itf_wrappable(fdecl *dcl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* ITF_WRAP_EXT - write the interface for a simple extern */
+/* MODULE_ITF_WRAP_EXT - write the interface for a simple extern */
 
-static void itf_wrap_ext(FILE *fp, char *pck, fdecl *dcl,
-			 char *cfn, char *ffn)
+static void module_itf_wrap_ext(FILE *fp, char *pck, fdecl *dcl,
+				char *cfn, char *ffn)
    {fparam knd;
     char dcn[MAXLINE], wnm[MAXLINE];
     char fty[MAXLINE], cty[MAXLINE], wty[MAXLINE];
@@ -1506,9 +1558,8 @@ static void itf_wrap_ext(FILE *fp, char *pck, fdecl *dcl,
     static int first = TRUE;
 
 /* declare the incomplete ones as external */
-    if ((itf_wrappable(dcl) == FALSE) && (strcmp(ffn, "none") != 0))
-       {snprintf(dcn, MAXLINE, "%s", cfn);
-	downcase(dcn);
+    if ((module_itf_wrappable(dcl) == FALSE) && (strcmp(ffn, "none") != 0))
+       {map_name(dcn, MAXLINE, cfn, "f", -1);
 
 	if (mc_need_ptr(dcl) == TRUE)
 	   {if (first == TRUE)
@@ -1531,12 +1582,12 @@ static void itf_wrap_ext(FILE *fp, char *pck, fdecl *dcl,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* ITF_WRAP_FULL - write the Fortran interface for
- *               - C function CFN
+/* MODULE_ITF_WRAP_FULL - write the Fortran interface for
+ *                      - C function CFN
  */
 
-static void itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
-			  char *cfn, char *ffn)
+static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
+				 char *cfn, char *ffn)
    {int i, na, voidf, voida;
     fparam knd;
     char dcn[MAXLINE], a[MAXLINE], t[MAXLINE];
@@ -1545,9 +1596,8 @@ static void itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
     farg *al;
 
 /* emit complete declarations */
-    if ((itf_wrappable(dcl) == TRUE) && (strcmp(ffn, "none") != 0))
-       {snprintf(dcn, MAXLINE, "%s", cfn);
-	downcase(dcn);
+    if ((module_itf_wrappable(dcl) == TRUE) && (strcmp(ffn, "none") != 0))
+       {map_name(dcn, MAXLINE, cfn, "f", -1);
 
 	rty   = dcl->type;
 	na    = dcl->na;
@@ -1603,6 +1653,9 @@ static void itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
 				  wty, nm);
 		      break;
 		 case FP_SCALAR :
+		      snprintf(t, MAXLINE, "         %-15s :: %s\n",
+			       wty, nm);
+		      break;
 		 default :
 		      snprintf(t, MAXLINE, "         %-15s :: %s\n",
 			       wty, nm);
@@ -1619,11 +1672,11 @@ static void itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* INTEROP_WRAP - generate FORTRAN/C interoperability interface for
- *              - C function CFN
+/* MODULE_INTEROP_WRAP - generate FORTRAN/C interoperability interface for
+ *                     - C function CFN
  */
 
-static void interop_wrap(FILE *fp, fdecl *dcl, char *cfn)
+static void module_interop_wrap(FILE *fp, fdecl *dcl, char *cfn)
    {int i, na, nv, voidf, voida;
     fparam knd;
     char dcn[MAXLINE], a[MAXLINE];
@@ -1636,8 +1689,7 @@ static void interop_wrap(FILE *fp, fdecl *dcl, char *cfn)
        berr("%s is not interoperable - variable args", cfn);
 
     else
-       {snprintf(dcn, MAXLINE, "%s_i", cfn);
-	downcase(dcn);
+       {map_name(dcn, MAXLINE, cfn, "i", -1);
 
 	rty   = dcl->type;
 	na    = dcl->na;
@@ -1709,7 +1761,7 @@ static int bind_module(FILE *fp, char *pck,
 	     ffn = ta[1];
              dcl = find_proto(spr, cfn);
 	     if (dcl != NULL)
-	        {itf_wrap_ext(fp, pck, dcl, cfn, ffn);
+	        {module_itf_wrap_ext(fp, pck, dcl, cfn, ffn);
 		 free_decl(dcl);};
 
 	     free_strings(ta);};};
@@ -1724,7 +1776,7 @@ static int bind_module(FILE *fp, char *pck,
 	     if (blank_line(sb) == FALSE)
 	        {nstrncpy(t, MAXLINE, sb, -1);
 		 ta = tokenize(t, " \t");
-		 pre_wrap_ext(fp, sb, ta, pck);
+		 module_pre_wrap_ext(fp, sb, ta, pck);
 		 free_strings(ta);};};};
 
     fprintf(fp, "\n");
@@ -1744,7 +1796,7 @@ static int bind_module(FILE *fp, char *pck,
 	     ffn = ta[1];
              dcl = find_proto(spr, cfn);
 	     if (dcl != NULL)
-	        {itf_wrap_full(fp, dcl, pck, cfn, ffn);
+	        {module_itf_wrap_full(fp, dcl, pck, cfn, ffn);
 		 free_decl(dcl);};
 
 	     free_strings(ta);};};
@@ -1757,7 +1809,7 @@ static int bind_module(FILE *fp, char *pck,
 	     if (blank_line(sb) == FALSE)
 	        {nstrncpy(t, MAXLINE, sb, -1);
 		 ta = tokenize(t, " \t");
-		 pre_wrap_full(fp, sb, ta, pck);
+		 module_pre_wrap_full(fp, sb, ta, pck);
 		 free_strings(ta);};};};
 
 /* make full interface for non-variable argument functions */
@@ -1771,7 +1823,7 @@ static int bind_module(FILE *fp, char *pck,
 	     ffn = ta[1];
              dcl = find_proto(spr, cfn);
 	     if (dcl != NULL)
-	        {interop_wrap(fp, dcl, cfn);
+	        {module_interop_wrap(fp, dcl, cfn);
 		 free_decl(dcl);};
 
 	     free_strings(ta);};};
@@ -1883,11 +1935,11 @@ static void cs_decl_list(char *a, int nc, fdecl *dcl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* S_PROTO_LIST - render the arg list of DCL into A for the
- *              - Scheme prototype
+/* SCHEME_PROTO_LIST - render the arg list of DCL into A for the
+ *                   - Scheme prototype
  */
 
-static void s_proto_list(char *a, int nc, fdecl *dcl)
+static void scheme_proto_list(char *a, int nc, fdecl *dcl)
    {int i, na;
     farg *al;
 
@@ -2087,11 +2139,11 @@ static void fin_scheme(FILE *fp)
 
 /*--------------------------------------------------------------------------*/
 
-/* P_PROTO_LIST - render the arg list of DCL into A for the
- *              - Python callable C wrapper
+/* PYTHON_PROTO_LIST - render the arg list of DCL into A for the
+ *                   - Python callable C wrapper
  */
 
-static void p_proto_list(char *a, int nc, fdecl *dcl)
+static void python_proto_list(char *a, int nc, fdecl *dcl)
    {int i, na;
     farg *al;
 
@@ -2234,9 +2286,9 @@ static void wrap_doc(FILE *fp, fdecl *dcl, char **fn, char **com)
 
     cf_type(fty, MAXLINE, dcl->type);
 
-    f_proto_list(af, MAXLINE, dcl);
-    s_proto_list(as, MAXLINE, dcl);
-    p_proto_list(ap, MAXLINE, dcl);
+    fortran_proto_list(af, MAXLINE, dcl);
+    scheme_proto_list(as, MAXLINE, dcl);
+    python_proto_list(ap, MAXLINE, dcl);
 
     hsep(fp);
     fprintf(fp, "\n");

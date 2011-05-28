@@ -14,48 +14,48 @@ module pact_bl1
 ! ... external declarations for generated wrappers
    use types_bl1
 
-   integer(isizea), external :: favp1
+   integer(isizea), external :: favp1_f
 
 
    interface
 
 ! ... declarations for generated wrappers
-      subroutine fav1() 
+      subroutine fav1_f() 
          implicit none
-      end subroutine fav1
+      end subroutine fav1_f
 
-      function fav2() 
+      function fav2_f() 
          implicit none
-         integer         :: fav2
-      end function fav2
+         integer         :: fav2_f
+      end function fav2_f
 
-      function fav3() 
+      function fav3_f() 
          implicit none
-         real            :: fav3
-      end function fav3
+         real            :: fav3_f
+      end function fav3_f
 
-      function fav4() 
+      function fav4_f() 
          implicit none
-         integer         :: fav4
-      end function fav4
+         integer         :: fav4_f
+      end function fav4_f
 
-      function favp2() 
+      function favp2_f() 
          use types_bl1
          implicit none
-         integer(isizea) :: favp2
-      end function favp2
+         integer(isizea) :: favp2_f
+      end function favp2_f
 
-      function favp3() 
+      function favp3_f() 
          use types_bl1
          implicit none
-         integer(isizea) :: favp3
-      end function favp3
+         integer(isizea) :: favp3_f
+      end function favp3_f
 
-      function favp4() 
+      function favp4_f() 
          use types_bl1
          implicit none
-         integer(isizea) :: favp4
-      end function favp4
+         integer(isizea) :: favp4_f
+      end function favp4_f
 
 ! ... declarations for interoperability
       subroutine fav1_i() &

@@ -17,39 +17,39 @@ module pact_bl3
    interface
 
 ! ... declarations for generated wrappers
-      function fe1(a1, sa2) 
+      function fe1_f(ta1, sa2) 
          use types_bl3
          implicit none
-         integer(isizea) :: fe1
-         integer(isizea) :: a1
+         integer(isizea) :: fe1_f
+         integer(isizea) :: ta1
          integer         :: sa2
-      end function fe1
+      end function fe1_f
 
-      subroutine fe2(dev, ax, ay, sn, ainfo, sl) 
+      subroutine fe2_f(tdev, ax, ay, sn, ainfo, sl) 
          use types_bl3
          implicit none
-         integer(isizea) :: dev
-         real*8          :: ax(*)
-         real*8          :: ay(*)
+         integer(isizea) :: tdev
+         real(8)         :: ax(*)
+         real(8)         :: ay(*)
          integer         :: sn
          integer(isizea) :: ainfo
          integer         :: sl
-      end subroutine fe2
+      end subroutine fe2_f
 
 ! ... declarations for interoperability
-      type (C_PTR) function fe1_i(a1, sa2) &
+      type (C_PTR) function fe1_i(ta1, sa2) &
                 bind(c, name='fe1')
          use iso_c_binding
          implicit none
-         type (C_PTR), value :: a1
+         type (C_PTR), value :: ta1
          integer (C_INT), value :: sa2
       end function fe1_i
 
-      subroutine fe2_i(dev, ax, ay, sn, ainfo, sl) &
+      subroutine fe2_i(tdev, ax, ay, sn, ainfo, sl) &
                 bind(c, name='fe2')
          use iso_c_binding
          implicit none
-         type (C_PTR), value :: dev
+         type (C_PTR), value :: tdev
          type (C_PTR), value :: ax
          type (C_PTR), value :: ay
          integer (C_INT), value :: sn

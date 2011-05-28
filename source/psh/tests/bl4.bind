@@ -1,0 +1,53 @@
+#
+# BL4.BIND - systematic type case blang test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+derived str	character-A	SC_STRING_I	SC_STRING_I
+
+fb1	yes	yes	yes
+fb2	yes	yes	yes
+fb3	yes	yes	yes
+fb4	yes	yes	yes
+fb5	yes	yes	yes
+fb6	yes	yes	yes
+fb7	yes	yes	yes
+fb8	yes	yes	yes
+# fb9	yes	yes	yes
+fb10	yes	yes	yes
+fb11	yes	yes	yes
+# fb12	yes	yes	yes
+# fb13	yes	yes	yes
+
+fr1	yes	yes	yes
+fr2	yes	yes	yes
+fr3	yes	yes	yes
+fr4	yes	yes	yes
+fr5	yes	yes	yes
+fr6	yes	yes	yes
+fr7	yes	yes	yes
+fr8	yes	yes	yes
+# fr9	yes	yes	yes
+fr10	yes	yes	yes
+fr11	yes	yes	yes
+# fr12	yes	yes	yes
+fr13	yes	yes	yes
+
+fp1	yes	yes	yes
+fp2	yes	yes	yes
+fp3	yes	yes	yes
+fp4	yes	yes	yes
+fp5	yes	yes	yes
+fp6	yes	yes	yes
+fp7	yes	yes	yes
+fp8	yes	yes	yes
+# fp9	yes	yes	yes
+fp10	yes	yes	yes
+fp11	yes	yes	yes
+# fp12	yes	yes	yes
+fp13	yes	yes	yes
+

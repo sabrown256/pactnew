@@ -1,0 +1,51 @@
+#
+# BL4.PROTO - systematic type blang test prototypes
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+int fb1(bool a1, bool *a2)
+int fb2(char a1, char *a2)
+int fb3(short a1, short *a2)
+int fb4(int a1, int *a2)
+int fb5(long a1, long *a2)
+int fb6(long long a1, long long *a2)
+int fb7(float a1, float *a2)
+int fb8(double a1, double *a2)
+int fb9(long double a1, long double *a2)
+int fb10(float _Complex a1, float _Complex *a2)
+int fb11(double _Complex a1, double _Complex *a2)
+int fb12(long double _Complex a1, long double _Complex *a2)
+int fb13(str a1, str *a2)
+
+bool fr1(int a1)
+char fr2(int a1)
+short fr3(int a1)
+int fr4(int a1)
+long fr5(int a1)
+long long fr6(int a1)
+float fr7(int a1)
+double fr8(int a1)
+long double fr9(int a1)
+float _Complex fr10(int a1)
+double _Complex fr11(int a1)
+long double _Complex fr12(int a1)
+str fr13(int a1)
+
+bool *fp1(int a1)
+char *fp2(int a1)
+short *fp3(int a1)
+int *fp4(int a1)
+long *fp5(int a1)
+long long *fp6(int a1)
+float *fp7(int a1)
+double *fp8(int a1)
+long double *fp9(int a1)
+float _Complex *fp10(int a1)
+double _Complex *fp11(int a1)
+long double _Complex *fp12(int a1)
+str *fp13(int a1)
+
