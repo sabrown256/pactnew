@@ -21,9 +21,22 @@ enum e_fparam
 
 typedef enum e_fparam fparam;
 
+typedef struct s_bindes bindes;
 typedef struct s_fdecl fdecl;
 typedef struct s_farg farg;
 typedef struct s_mtype mtype;
+
+struct s_bindes
+   {int cfl;
+    char *pck;
+    char **spr;
+    char **sbi;
+    char **swr;
+    FILE *fp;
+    void (*init)(bindes *bd, char *pck, int cfl,
+		 char **spr, char **sbi, char **swr);
+    int (*bind)(bindes *bd);
+    void (*fin)(bindes *bd);};
 
 struct s_farg
    {fparam knd;
@@ -654,6 +667,25 @@ static char *deref(char *d, int nc, char *s)
     return(d);}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SETUP_BINDER - initialize the data members of BD */
+
+static void setup_binder(bindes *bd, FILE *fp, char *pck, int cfl,
+			 char **spr, char **sbi, char **swr)
+   {
+
+    if (bd != NULL)
+       {bd->pck = pck;
+	bd->fp  = fp;
+	bd->cfl = cfl;
+	bd->spr = spr;
+	bd->sbi = sbi;
+	bd->swr = swr;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
 
 /*                            FORTRAN ROUTINES                              */
 
@@ -855,36 +887,42 @@ static void fortran_proto_list(char *a, int nc, fdecl *dcl)
 
 /* INIT_FORTRAN - initialize Fortran wrapper file */
 
-static FILE *init_fortran(char *pck)
+static void init_fortran(bindes *bd, char *pck, int cfl,
+			 char **spr, char **sbi, char **swr)
    {int nc;
     char fn[MAXLINE], ufn[MAXLINE], fill[MAXLINE];
     FILE *fp;
 
-    snprintf(fn, MAXLINE, "gf-%s.c", pck);
-    nstrncpy(ufn, MAXLINE, fn, -1);
-    upcase(ufn);
+    fp = NULL;
 
-    nc = strlen(fn);
-    memset(fill, ' ', nc);
-    fill[nc] = '\0';
+    if (cfl & 1)
+       {snprintf(fn, MAXLINE, "gf-%s.c", pck);
+	nstrncpy(ufn, MAXLINE, fn, -1);
+	upcase(ufn);
 
-    fp = open_file("w", fn);
+	nc = strlen(fn);
+	memset(fill, ' ', nc);
+	fill[nc] = '\0';
 
-    fprintf(fp, "/*\n");
-    fprintf(fp, " * %s - F90 wrappers for %s\n", ufn, pck);
-    fprintf(fp, " * %s - NOTE: this file was automatically generated\n", fill);
-    fprintf(fp, " * %s - any manual changes will not be effective\n", fill);
-    fprintf(fp, " *\n");
-    fprintf(fp, " */\n");
-    fprintf(fp, "\n");
+	fp = open_file("w", fn);
 
-    fprintf(fp, "#include \"cpyright.h\"\n");
-    fprintf(fp, "#include \"%s_int.h\"\n", pck);
-    fprintf(fp, "\n");
+	fprintf(fp, "/*\n");
+	fprintf(fp, " * %s - F90 wrappers for %s\n", ufn, pck);
+	fprintf(fp, " * %s - NOTE: this file was automatically generated\n", fill);
+	fprintf(fp, " * %s - any manual changes will not be effective\n", fill);
+	fprintf(fp, " *\n");
+	fprintf(fp, " */\n");
+	fprintf(fp, "\n");
 
-    csep(fp);
+	fprintf(fp, "#include \"cpyright.h\"\n");
+	fprintf(fp, "#include \"%s_int.h\"\n", pck);
+	fprintf(fp, "\n");
 
-    return(fp);}
+	csep(fp);};
+
+    setup_binder(bd, fp, pck, cfl, spr, sbi, swr);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1166,28 +1204,35 @@ static void fortran_wrap(FILE *fp, fdecl *dcl, char *cfn, char *ffn)
  *              - return TRUE iff successful
  */
 
-static int bind_fortran(FILE *fp, char **spr, char **sbi)
+static int bind_fortran(bindes *bd)
    {int ib, rv;
     char t[MAXLINE];
     char *sb, **ta;
     char *cfn, *ffn;
     fdecl *dcl;
+    FILE *fp;
+    char **spr, **sbi;
 
     rv = TRUE;
 
-    for (ib = 0; sbi[ib] != NULL; ib++)
-        {sb = sbi[ib];
-	 if (blank_line(sb) == FALSE)
-	    {nstrncpy(t, MAXLINE, sb, -1);
-	     ta = tokenize(t, " \t");
-	     cfn = ta[0];
-	     ffn = ta[1];
-             dcl = find_proto(spr, cfn);
-	     if (dcl != NULL)
-	        {fortran_wrap(fp, dcl, cfn, ffn);
-		 free_decl(dcl);};
+    if (bd->cfl & 1)
+       {fp  = bd->fp;
+	spr = bd->spr;
+	sbi = bd->sbi;
 
-	     free_strings(ta);};};
+	for (ib = 0; sbi[ib] != NULL; ib++)
+	    {sb = sbi[ib];
+	     if (blank_line(sb) == FALSE)
+	        {nstrncpy(t, MAXLINE, sb, -1);
+		 ta = tokenize(t, " \t");
+		 cfn = ta[0];
+		 ffn = ta[1];
+		 dcl = find_proto(spr, cfn);
+		 if (dcl != NULL)
+		    {fortran_wrap(fp, dcl, cfn, ffn);
+		     free_decl(dcl);};
+
+		 free_strings(ta);};};};
 
     return(rv);}
 
@@ -1196,11 +1241,15 @@ static int bind_fortran(FILE *fp, char **spr, char **sbi)
 
 /* FIN_FORTRAN - finalize Fortran file */
 
-static void fin_fortran(FILE *fp, char *pck)
-   {
+static void fin_fortran(bindes *bd)
+   {FILE *fp;
+
+    fp = bd->fp;
 
     csep(fp);
     fclose(fp);
+
+    bd->fp = NULL;
 
     return;}
 
@@ -1404,40 +1453,46 @@ static void mc_decl_list(char *a, int nc, fdecl *dcl)
 
 /* INIT_MODULE - initialize Fortran/C interoperatbility module file */
 
-static FILE *init_module(char *pck)
+static void init_module(bindes *bd, char *pck, int cfl,
+			char **spr, char **sbi, char **swr)
    {int nc;
     char fn[MAXLINE], ufn[MAXLINE], fill[MAXLINE];
     FILE *fp;
 
-    snprintf(fn, MAXLINE, "gm-%s.f", pck);
-    nstrncpy(ufn, MAXLINE, fn, -1);
-    upcase(ufn);
+    fp = NULL;
 
-    nc = strlen(fn);
-    memset(fill, ' ', nc);
-    fill[nc] = '\0';
+    if (cfl & 2)
+       {snprintf(fn, MAXLINE, "gm-%s.f", pck);
+	nstrncpy(ufn, MAXLINE, fn, -1);
+	upcase(ufn);
 
-    fp = open_file("w", fn);
+	nc = strlen(fn);
+	memset(fill, ' ', nc);
+	fill[nc] = '\0';
 
-    fprintf(fp, "!\n");
-    fprintf(fp, "! %s - F90 interfaces for %s\n", ufn, pck);
-    fprintf(fp, "! %s - NOTE: this file was automatically generated\n", fill);
-    fprintf(fp, "! %s - any manual changes will not be effective\n", fill);
-    fprintf(fp, "!\n");
-    fprintf(fp, "\n");
+	fp = open_file("w", fn);
+
+	fprintf(fp, "!\n");
+	fprintf(fp, "! %s - F90 interfaces for %s\n", ufn, pck);
+	fprintf(fp, "! %s - NOTE: this file was automatically generated\n", fill);
+	fprintf(fp, "! %s - any manual changes will not be effective\n", fill);
+	fprintf(fp, "!\n");
+	fprintf(fp, "\n");
 
 /* if there are no interfaces there is no need for the types module */
-    fprintf(fp, "module types_%s\n", pck);
-    fprintf(fp, "   integer, parameter :: isizea = %d\n",
-	    (int) sizeof(char *));
-    fprintf(fp, "end module types_%s\n", pck);
-    fprintf(fp, "\n");
+	fprintf(fp, "module types_%s\n", pck);
+	fprintf(fp, "   integer, parameter :: isizea = %d\n",
+		(int) sizeof(char *));
+	fprintf(fp, "end module types_%s\n", pck);
+	fprintf(fp, "\n");
 
-    fprintf(fp, "module pact_%s\n", pck);
-    fprintf(fp, "   use iso_c_binding\n");
-    fprintf(fp, "\n");
+	fprintf(fp, "module pact_%s\n", pck);
+	fprintf(fp, "   use iso_c_binding\n");
+	fprintf(fp, "\n");};
 
-    return(fp);}
+    setup_binder(bd, fp, pck, cfl, spr, sbi, swr);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1742,97 +1797,105 @@ static void module_interop_wrap(FILE *fp, fdecl *dcl, char *cfn)
  *             - return TRUE iff successful
  */
 
-static int bind_module(FILE *fp, char *pck,
-		       char **spr, char **sbi, char **swr)
+static int bind_module(bindes *bd)
    {int ib, iw, rv;
     char t[MAXLINE];
     char *sb, **ta;
     char *cfn, *ffn;
     fdecl *dcl;
+    FILE *fp;
+    char *pck, **spr, **sbi, **swr;
 
     rv = TRUE;
 
+    if (bd->cfl & 2)
+       {fp  = bd->fp;
+	pck = bd->pck;
+	spr = bd->spr;
+	sbi = bd->sbi;
+	swr = bd->swr;
+
 /* make simple external declaration for variable argument functions */
-    fprintf(fp, "! ... external declarations for generated wrappers\n");
-    for (ib = 0; sbi[ib] != NULL; ib++)
-        {sb = sbi[ib];
-	 if (blank_line(sb) == FALSE)
-	    {nstrncpy(t, MAXLINE, sb, -1);
-	     ta = tokenize(t, " \t");
-	     cfn = ta[0];
-	     ffn = ta[1];
-             dcl = find_proto(spr, cfn);
-	     if (dcl != NULL)
-	        {module_itf_wrap_ext(fp, pck, dcl, cfn, ffn);
-		 free_decl(dcl);};
+	fprintf(fp, "! ... external declarations for generated wrappers\n");
+	for (ib = 0; sbi[ib] != NULL; ib++)
+	    {sb = sbi[ib];
+	     if (blank_line(sb) == FALSE)
+	        {nstrncpy(t, MAXLINE, sb, -1);
+		 ta = tokenize(t, " \t");
+		 cfn = ta[0];
+		 ffn = ta[1];
+		 dcl = find_proto(spr, cfn);
+		 if (dcl != NULL)
+		    {module_itf_wrap_ext(fp, pck, dcl, cfn, ffn);
+		     free_decl(dcl);};
 
-	     free_strings(ta);};};
+		 free_strings(ta);};};
 
-    fprintf(fp, "\n");
+	fprintf(fp, "\n");
 
 /* make external declarations for variable argument pre-wrapped functions */
-    if (swr != NULL)
-       {fprintf(fp, "! ... external declarations for old wrappers\n");
-        for (iw = 0; swr[iw] != NULL; iw++)
-	    {sb = swr[iw];
-	     if (blank_line(sb) == FALSE)
-	        {nstrncpy(t, MAXLINE, sb, -1);
-		 ta = tokenize(t, " \t");
-		 module_pre_wrap_ext(fp, sb, ta, pck);
-		 free_strings(ta);};};};
+	if (swr != NULL)
+	   {fprintf(fp, "! ... external declarations for old wrappers\n");
+	    for (iw = 0; swr[iw] != NULL; iw++)
+	        {sb = swr[iw];
+		 if (blank_line(sb) == FALSE)
+		    {nstrncpy(t, MAXLINE, sb, -1);
+		     ta = tokenize(t, " \t");
+		     module_pre_wrap_ext(fp, sb, ta, pck);
+		     free_strings(ta);};};};
 
-    fprintf(fp, "\n");
+	fprintf(fp, "\n");
 
 /* start the interface */
-    fprintf(fp, "   interface\n");
-    fprintf(fp, "\n");
+	fprintf(fp, "   interface\n");
+	fprintf(fp, "\n");
 
 /* make full interface for non-variable argument functions */
-    fprintf(fp, "! ... declarations for generated wrappers\n");
-    for (ib = 0; sbi[ib] != NULL; ib++)
-        {sb = sbi[ib];
-	 if (blank_line(sb) == FALSE)
-	    {nstrncpy(t, MAXLINE, sb, -1);
-	     ta = tokenize(t, " \t");
-	     cfn = ta[0];
-	     ffn = ta[1];
-             dcl = find_proto(spr, cfn);
-	     if (dcl != NULL)
-	        {module_itf_wrap_full(fp, dcl, pck, cfn, ffn);
-		 free_decl(dcl);};
-
-	     free_strings(ta);};};
-
-/* make full interface for non-variable argument pre-wrapped functions */
-    if (swr != NULL)
-       {fprintf(fp, "! ... declarations for old wrappers\n");
-	for (iw = 0; swr[iw] != NULL; iw++)
-	    {sb = swr[iw];
+	fprintf(fp, "! ... declarations for generated wrappers\n");
+	for (ib = 0; sbi[ib] != NULL; ib++)
+	    {sb = sbi[ib];
 	     if (blank_line(sb) == FALSE)
 	        {nstrncpy(t, MAXLINE, sb, -1);
 		 ta = tokenize(t, " \t");
-		 module_pre_wrap_full(fp, sb, ta, pck);
-		 free_strings(ta);};};};
+		 cfn = ta[0];
+		 ffn = ta[1];
+		 dcl = find_proto(spr, cfn);
+		 if (dcl != NULL)
+		    {module_itf_wrap_full(fp, dcl, pck, cfn, ffn);
+		     free_decl(dcl);};
+
+		 free_strings(ta);};};
+
+/* make full interface for non-variable argument pre-wrapped functions */
+	if (swr != NULL)
+	   {fprintf(fp, "! ... declarations for old wrappers\n");
+	    for (iw = 0; swr[iw] != NULL; iw++)
+	        {sb = swr[iw];
+		 if (blank_line(sb) == FALSE)
+		    {nstrncpy(t, MAXLINE, sb, -1);
+		     ta = tokenize(t, " \t");
+		     module_pre_wrap_full(fp, sb, ta, pck);
+		     free_strings(ta);};};};
 
 /* make full interface for non-variable argument functions */
-    fprintf(fp, "! ... declarations for interoperability\n");
-    for (ib = 0; sbi[ib] != NULL; ib++)
-        {sb = sbi[ib];
-	 if (blank_line(sb) == FALSE)
-	    {nstrncpy(t, MAXLINE, sb, -1);
-	     ta = tokenize(t, " \t");
-	     cfn = ta[0];
-	     ffn = ta[1];
-             dcl = find_proto(spr, cfn);
-	     if (dcl != NULL)
-	        {module_interop_wrap(fp, dcl, cfn);
-		 free_decl(dcl);};
+	fprintf(fp, "! ... declarations for interoperability\n");
+	for (ib = 0; sbi[ib] != NULL; ib++)
+	    {sb = sbi[ib];
+	     if (blank_line(sb) == FALSE)
+	        {nstrncpy(t, MAXLINE, sb, -1);
+		 ta = tokenize(t, " \t");
+		 cfn = ta[0];
+		 ffn = ta[1];
+		 dcl = find_proto(spr, cfn);
+		 if (dcl != NULL)
+		    {module_interop_wrap(fp, dcl, cfn);
+		     free_decl(dcl);};
 
-	     free_strings(ta);};};
+		 free_strings(ta);};};
 
 /* finish the interface */
-    fprintf(fp, "   end interface\n");
-    fprintf(fp, "\n");
+	fprintf(fp, "   end interface\n");
+	fprintf(fp, "\n");};
 
     return(rv);}
 
@@ -1841,13 +1904,19 @@ static int bind_module(FILE *fp, char *pck,
 
 /* FIN_MODULE - finalize Fortran/C interoperability interface module file */
 
-static void fin_module(FILE *fp, char *pck)
-   {
+static void fin_module(bindes *bd)
+   {char *pck;
+    FILE *fp;
+
+    fp  = bd->fp;
+    pck = bd->pck;
 
     fprintf(fp, "end module pact_%s\n", pck);
     fprintf(fp, "\n");
 
     fclose(fp);
+
+    bd->fp = NULL;
 
     return;}
 
@@ -1962,7 +2031,8 @@ static void scheme_proto_list(char *a, int nc, fdecl *dcl)
 
 /* INIT_SCHEME - initialize Scheme file */
 
-static FILE *init_scheme(char *pck)
+static void init_scheme(bindes *bd, char *pck, int cfl,
+			char **spr, char **sbi, char **swr)
    {FILE *fp;
 
     fp = open_file("w", "gs-%s.c", pck);
@@ -1974,7 +2044,9 @@ static FILE *init_scheme(char *pck)
 
     csep(fp);
 
-    return(fp);}
+    setup_binder(bd, fp, pck, cfl, spr, sbi, swr);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -2078,12 +2150,20 @@ static char **wrap_scheme(FILE *fp, char **fl, fdecl *dcl,
  *             - return TRUE iff successful
  */
 
-static int bind_scheme(FILE *fp, char *pck, char **spr, char **sbi)
+static int bind_scheme(bindes *bd)
    {int i, ib, rv;
     char t[MAXLINE];
     char *sb, **ta, **fl;
     char *cfn, *ffn;
     fdecl *dcl;
+    FILE *fp;
+    char *pck, **spr, **sbi, **swr;
+
+    fp  = bd->fp;
+    pck = bd->pck;
+    spr = bd->spr;
+    sbi = bd->sbi;
+    swr = bd->swr;
 
     rv = TRUE;
     fl = NULL;
@@ -2127,11 +2207,15 @@ static int bind_scheme(FILE *fp, char *pck, char **spr, char **sbi)
 
 /* FIN_SCHEME - finalize Scheme file */
 
-static void fin_scheme(FILE *fp)
-   {
+static void fin_scheme(bindes *bd)
+   {FILE *fp;
+
+    fp = bd->fp;
 
     csep(fp);
     fclose(fp);
+
+    bd->fp = NULL;
 
     return;}
 
@@ -2167,7 +2251,8 @@ static void python_proto_list(char *a, int nc, fdecl *dcl)
 
 /* INIT_PYTHON - initialize Python file */
 
-static FILE *init_python(char *pck)
+static void init_python(bindes *bd, char *pck, int cfl,
+			char **spr, char **sbi, char **swr)
    {FILE *fp;
 
     fp = open_file("w", "gp-%s.c", pck);
@@ -2178,7 +2263,9 @@ static FILE *init_python(char *pck)
 
     csep(fp);
 
-    return(fp);}
+    setup_binder(bd, fp, pck, cfl, spr, sbi, swr);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -2208,12 +2295,20 @@ static void wrap_python(FILE *fp, fdecl *dcl, char *ffn)
  *             - return TRUE iff successful
  */
 
-static int bind_python(FILE *fp, char **spr, char **sbi)
+static int bind_python(bindes *bd)
    {int ib, rv;
     char t[MAXLINE];
     char *sb, **ta;
     char *cfn, *ffn;
     fdecl *dcl;
+    FILE *fp;
+    char *pck, **spr, **sbi, **swr;
+
+    fp  = bd->fp;
+    pck = bd->pck;
+    spr = bd->spr;
+    sbi = bd->sbi;
+    swr = bd->swr;
 
     rv = TRUE;
 
@@ -2238,11 +2333,15 @@ static int bind_python(FILE *fp, char **spr, char **sbi)
 
 /* FIN_PYTHON - finalize Python file */
 
-static void fin_python(FILE *fp)
-   {
+static void fin_python(bindes *bd)
+   {FILE *fp;
+
+    fp = bd->fp;
 
     csep(fp);
     fclose(fp);
+
+    bd->fp = NULL;
 
     return;}
 
@@ -2254,7 +2353,8 @@ static void fin_python(FILE *fp)
 
 /* INIT_DOC - initialize Doc file */
 
-static FILE *init_doc(char *pck)
+static void init_doc(bindes *bd, char *pck, int cfl,
+		     char **spr, char **sbi, char **swr)
    {FILE *fp;
 
     fp = open_file("w", "gh-%s.html", pck);
@@ -2263,7 +2363,9 @@ static FILE *init_doc(char *pck)
 
     hsep(fp);
 
-    return(fp);}
+    setup_binder(bd, fp, pck, cfl, spr, sbi, swr);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -2274,7 +2376,7 @@ static FILE *init_doc(char *pck)
 
 static void wrap_doc(FILE *fp, fdecl *dcl, char **fn, char **com)
    {int voidf;
-    char ufn[MAXLINE], lfn[MAXLINE];
+    char ufn[MAXLINE], lfn[MAXLINE], dcn[MAXLINE];
     char af[MAXLINE], as[MAXLINE], ap[MAXLINE];
     char fty[MAXLINE], t[MAXLINE];
 
@@ -2288,10 +2390,6 @@ static void wrap_doc(FILE *fp, fdecl *dcl, char **fn, char **com)
 
     cf_type(fty, MAXLINE, dcl->type);
 
-    fortran_proto_list(af, MAXLINE, dcl);
-    scheme_proto_list(as, MAXLINE, dcl);
-    python_proto_list(ap, MAXLINE, dcl);
-
     hsep(fp);
     fprintf(fp, "\n");
 
@@ -2300,26 +2398,40 @@ static void wrap_doc(FILE *fp, fdecl *dcl, char **fn, char **com)
     fprintf(fp, "<p>\n");
     fprintf(fp, "<pre>\n");
 
+/* C */
     fprintf(fp, "<i>C Binding: </i>       %s\n", dcl->proto);
 
+/* Fortran */
     if (strcmp(fn[0], "none") == 0)
        fprintf(fp, "<i>Fortran Binding: </i>    none\n");
-    else if (voidf == TRUE)
-       fprintf(fp, "<i>Fortran Binding: </i> %s(%s)\n", fn[0], af);
     else
-       fprintf(fp, "<i>Fortran Binding: </i> %s %s(%s)\n", fty, fn[0], af);
+       {fortran_proto_list(af, MAXLINE, dcl);
+	map_name(dcn, MAXLINE, fn[0], "f", -1);
+	if (voidf == TRUE)
+	   fprintf(fp, "<i>Fortran Binding: </i> %s(%s)\n",
+		   dcn, af);
+	else
+	   fprintf(fp, "<i>Fortran Binding: </i> %s %s(%s)\n",
+		   fty, dcn, af);};
 
+/* Scheme */
     if (strcmp(fn[1], "none") == 0)
        fprintf(fp, "<i>SX Binding: </i>         none\n");
-    else if (IS_NULL(as) == TRUE)
-       fprintf(fp, "<i>SX Binding: </i>      (%s)\n", fn[1]);
     else
-       fprintf(fp, "<i>SX Binding: </i>      (%s %s)\n", fn[1], as);
+       {map_name(dcn, MAXLINE, fn[1], "", -1);
+	scheme_proto_list(as, MAXLINE, dcl);
+	if (IS_NULL(as) == TRUE)
+	   fprintf(fp, "<i>SX Binding: </i>      (%s)\n", dcn);
+	else
+	   fprintf(fp, "<i>SX Binding: </i>      (%s %s)\n", dcn, as);};
 
+/* Python */
     if (strcmp(fn[2], "none") == 0)
        fprintf(fp, "<i>Python Binding: </i>     none\n");
     else
-       fprintf(fp, "<i>Python Binding: </i>  pact.%s(%s)\n", fn[2], ap);
+       {map_name(dcn, MAXLINE, fn[2], "", -1);
+	python_proto_list(ap, MAXLINE, dcl);
+	fprintf(fp, "<i>Python Binding: </i>  pact.%s(%s)\n", dcn, ap);};
 
     fprintf(fp, "</pre>\n");
     fprintf(fp, "<p>\n");
@@ -2341,12 +2453,20 @@ static void wrap_doc(FILE *fp, fdecl *dcl, char **fn, char **com)
  *          - return TRUE iff successful
  */
 
-static int bind_doc(FILE *fp, char **spr, char **sbi)
+static int bind_doc(bindes *bd)
    {int ib, rv;
     char t[MAXLINE];
     char *sb, **ta;
     char *cfn;
     fdecl *dcl;
+    FILE *fp;
+    char *pck, **spr, **sbi, **swr;
+
+    fp  = bd->fp;
+    pck = bd->pck;
+    spr = bd->spr;
+    sbi = bd->sbi;
+    swr = bd->swr;
 
     rv = TRUE;
 
@@ -2370,11 +2490,15 @@ static int bind_doc(FILE *fp, char **spr, char **sbi)
 
 /* FIN_DOC - finalize Doc file */
 
-static void fin_doc(FILE *fp)
-   {
+static void fin_doc(bindes *bd)
+   {FILE *fp;
+
+    fp = bd->fp;
 
     hsep(fp);
     fclose(fp);
+
+    bd->fp = NULL;
 
     return;}
 
@@ -2385,59 +2509,55 @@ static void fin_doc(FILE *fp)
  *       - return TRUE iff successful
  */
 
-static int blang(char *pck, int fif, char *fpr, char *fbi, char *fwr)
-   {int rv;
+static int blang(char *pck, int cfl, char *fpr, char *fbi, char *fwr)
+   {int ib, nb, rv;
     char **spr, **sbi, **swr;
-    FILE *ff, *fm, *fs, *fp, *fd;
+    bindes *pb;
+    bindes bd[] = { {0, NULL, NULL, NULL, NULL, NULL,
+		     init_fortran, bind_fortran, fin_fortran},
+		    {0, NULL, NULL, NULL, NULL, NULL,
+		     init_module, bind_module, fin_module},
+		    {0, NULL, NULL, NULL, NULL, NULL,
+		     init_scheme, bind_scheme, fin_scheme},
+		    {0, NULL, NULL, NULL, NULL, NULL,
+		     init_python, bind_python, fin_python},
+		    {0, NULL, NULL, NULL, NULL, NULL,
+		     init_doc, bind_doc, fin_doc} };
 
-    if ((IS_NULL(fpr) == TRUE) || (IS_NULL(fbi) == TRUE))
-       rv = FALSE;
+    rv = FALSE;
 
-    else
+    if ((IS_NULL(fpr) == FALSE) && (IS_NULL(fbi) == FALSE))
        {spr = file_text(fpr);
 	sbi = file_text(fbi);
 	swr = file_text(fwr);
 
 	if (spr == NULL)
-	   {printf("No prototypes found for '%s'\n", pck);
-            rv = FALSE;}
-        else if (sbi == NULL)
-	   {printf("No bindings found for '%s'\n", pck);
-            rv = FALSE;}
-	else
-	   {rv = TRUE;
+	   printf("No prototypes found for '%s'\n", pck);
 
-	    add_derived_types(sbi);
+        else if (sbi == NULL)
+	   printf("No bindings found for '%s'\n", pck);
+            
+	else
+	   {add_derived_types(sbi);
 
 	    if (spr != NULL)
-	       {if (fif & 1)
-		   ff = init_fortran(pck);
-		if (fif & 2)
-		   fm = init_module(pck);
-		fs = init_scheme(pck);
-		fp = init_python(pck);
-		fd = init_doc(pck);
+	       {nb = sizeof(bd)/sizeof(bindes);
+
+		for (pb = bd, ib = 0; ib < nb; ib++, pb++)
+		    pb->init(pb, pck, cfl, spr, sbi, swr);
 
 		if (sbi != NULL)
-		   {if (fif & 1)
-		       rv &= bind_fortran(ff, spr, sbi);
-		    if (fif & 2)
-		       rv &= bind_module(fm, pck, spr, sbi, swr);
-		    rv &= bind_scheme(fs, pck, spr, sbi);
-		    rv &= bind_python(fp, spr, sbi);
-		    rv &= bind_doc(fd, spr, sbi);};
+		   {for (pb = bd, ib = 0; ib < nb; ib++, pb++)
+		        pb->bind(pb);};
 
-		if (fif & 1)
-		   fin_fortran(ff, pck);
-		if (fif & 2)
-		   fin_module(fm, pck);
-		fin_scheme(fs);
-		fin_python(fp);
-		fin_doc(fd);
+		for (pb = bd, ib = 0; ib < nb; ib++, pb++)
+		    pb->fin(pb);
 
-		free_strings(spr);
-		free_strings(sbi);
-		free_strings(swr);};};};
+		rv = TRUE;};};
+
+	free_strings(spr);
+	free_strings(sbi);
+	free_strings(swr);};
 
     return(rv);}
 
@@ -2447,14 +2567,14 @@ static int blang(char *pck, int fif, char *fpr, char *fbi, char *fwr)
 /* MAIN - start it out here */
 
 int main(int c, char **v)
-   {int i, rv, fif;
+   {int i, rv, cfl;
     char pck[MAXLINE], msg[MAXLINE];
     char *fpr, *fwr, *fbi;
 
     fpr = "";
     fwr = "";
     fbi = "";
-    fif = 3;
+    cfl = 3;
 
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-h") == 0)
@@ -2466,9 +2586,9 @@ int main(int c, char **v)
              printf("   <binding>       file specifying function bindings\n");
              printf("\n");}
 	 else if (strcmp(v[i], "-o") == 0)
-            fif &= ~2;
+            cfl &= ~2;
 	 else if (strcmp(v[i], "-w") == 0)
-            fif &= ~1;
+            cfl &= ~1;
 	 else
 	    {if (IS_NULL(fpr) == TRUE)
 	        fpr = v[i];
@@ -2484,7 +2604,7 @@ int main(int c, char **v)
 
     init_types();
 
-    rv = blang(pck, fif, fpr, fbi, fwr);
+    rv = blang(pck, cfl, fpr, fbi, fwr);
     rv = (rv != TRUE);
 
     printf("done\n");
