@@ -17,37 +17,37 @@ module pact_bl2
    interface
 
 ! ... declarations for generated wrappers
-      function fbcv1(sa, sb, sc, sd, fe, ff) 
+      function fbcv1_f(sa, sb, sc, sd, fe, ff) 
          use types_bl2
          implicit none
-         integer(isizea) :: fbcv1
+         integer(isizea) :: fbcv1_f
          integer         :: sa
-         real*4          :: sb
-         real*8          :: sc
+         real(4)         :: sb
+         real(8)         :: sc
          character       :: sd
          integer(isizea) :: fe
          integer(isizea) :: ff
-      end function fbcv1
+      end function fbcv1_f
 
-      function fbmcv1(sa, sb, sc, sd) 
+      function fbmcv1_f(sa, sb, sc, sd) 
          use types_bl2
          implicit none
-         integer(isizea) :: fbmcv1
+         integer(isizea) :: fbmcv1_f
          integer         :: sa
-         real*4          :: sb
-         real*8          :: sc
+         real(4)         :: sb
+         real(8)         :: sc
          character       :: sd
-      end function fbmcv1
+      end function fbmcv1_f
 
-      function fbmcr2(aa, ab, ac, ad) 
+      function fbmcr2_f(aa, ab, ac, ad) 
          use types_bl2
          implicit none
-         integer(isizea) :: fbmcr2
+         integer(isizea) :: fbmcr2_f
          integer         :: aa(*)
-         real*4          :: ab(*)
-         real*8          :: ac(*)
+         real(4)         :: ab(*)
+         real(8)         :: ac(*)
          character(*)    :: ad
-      end function fbmcr2
+      end function fbmcr2_f
 
 ! ... declarations for interoperability
       type (C_PTR) function fbcv1_i(sa, sb, sc, sd, fe, ff) &
