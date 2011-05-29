@@ -53,6 +53,8 @@ struct s_fdecl
     char **args;                      /* all args */
     int nc;
     char **cargs;                     /* char * args */
+    int ntf;
+    char **tfproto;                   /* type, var fortran prototype pairs */
     farg *al;};
 
 struct s_mtype
@@ -60,6 +62,12 @@ struct s_mtype
     char *fty;
     char *sty;
     char *pty;};
+
+static char
+ **mc_proto_list(fdecl *dcl);
+
+static fparam
+ fc_type(char *wty, int nc, char *ty, langmode mode);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -254,6 +262,33 @@ static char **split_args(char *args)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* RENAME_VAR - rename the variable ONM to NNM according to type KND */
+
+static void rename_var(char *nnm, int nc, char *onm, fparam knd)
+   {
+
+    switch (knd)
+       {case FP_FNC :
+	     snprintf(nnm, nc, "f%s", onm);
+	     break;
+        case FP_ARRAY :
+	     snprintf(nnm, nc, "a%s", onm);
+	     break;
+        case FP_SCALAR :
+	     snprintf(nnm, nc, "s%s", onm);
+	     break;
+        case FP_STRUCT :
+	     snprintf(nnm, nc, "t%s", onm);
+	     break;
+        default :
+	     printf("Unknown type: %s\n", onm);
+	     break;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PROC_ARGS - process the arg list in the declaration DCL */
 
 static farg *proc_args(fdecl *dcl)
@@ -380,6 +415,8 @@ static void free_decl(fdecl *dcl)
 
     free_args(dcl->al);
     free_strings(dcl->args);
+    free_strings(dcl->cargs);
+    free_strings(dcl->tfproto);
     FREE(dcl);
 
     return;}
@@ -602,33 +639,6 @@ static void add_derived_types(char **sbi)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* RENAME_VAR - rename the variable ONM to NNM according to type KND */
-
-static void rename_var(char *nnm, int nc, char *onm, fparam knd)
-   {
-
-    switch (knd)
-       {case FP_FNC :
-	     snprintf(nnm, nc, "f%s", onm);
-	     break;
-        case FP_ARRAY :
-	     snprintf(nnm, nc, "a%s", onm);
-	     break;
-        case FP_SCALAR :
-	     snprintf(nnm, nc, "s%s", onm);
-	     break;
-        case FP_STRUCT :
-	     snprintf(nnm, nc, "t%s", onm);
-	     break;
-        default :
-	     printf("Unknown type: %s\n", onm);
-	     break;};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* MAP_NAME - map the C function name S to form target language */
 
 static char *map_name(char *d, int nc, char *s, char *sfx, int cs)
@@ -779,14 +789,16 @@ static fparam fc_type(char *wty, int nc, char *ty, langmode mode)
  */
 
 static void fc_decl_list(char *a, int nc, fdecl *dcl)
-   {int i, na, nca;
+   {int i, na, nt, nca;
     fparam knd;
     char lty[MAXLINE], lnm[MAXLINE];
-    char *nm, **cargs;
+    char *nm, **cargs, **args;
     farg *al;
 
     na = dcl->na;
     al = dcl->al;
+    args = dcl->tfproto;
+    nt   = dcl->ntf;
 
     a[0] = '\0';
     if ((na == 0) || (no_args(dcl) == TRUE))
@@ -853,32 +865,6 @@ static void fc_call_list(char *a, int nc, fdecl *dcl)
 	    vstrcat(a, MAXLINE, "_l%s, ", al[i].name);
 
 	a[strlen(a) - 2] = '\0';};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* FORTRAN_PROTO_LIST - render the arg list of DCL into A for the
- *                    - Fortran callable C wrapper
- */
-
-static void fortran_proto_list(char *a, int nc, fdecl *dcl)
-   {int i, na;
-    char t[MAXLINE];
-    farg *al;
-
-    na = dcl->na;
-    al = dcl->al;
-
-    a[0] = '\0';
-    if (na != 0)
-       {for (i = 0; i < na; i++)
-	    {cf_type(t, MAXLINE, al[i].type);
-	     vstrcat(a, MAXLINE, "%s %s, ", t, al[i].name);};
-        a[strlen(a) - 2] = '\0';};
-
-    memmove(a, trim(subst(a, "* ", "*", -1), BOTH, " "), nc);
 
     return;}
 
@@ -1299,90 +1285,153 @@ static void fin_fortran(bindes *bd)
  */
 
 static fparam mc_type(int nc, char *fty, char *cty,
-		      char *wty, char *wnm, char *ty)
+		      char *wty, char *ty)
    {fparam knd;
-    char lnm[MAXLINE];
+    char lfty[MAXLINE], lcty[MAXLINE], lwty[MAXLINE];
 
-    nstrncpy(lnm, MAXLINE, wnm, -1);
-    knd = fc_type(wty, nc, ty, MODE_F);
-    memmove(wty, subst(wty, "FIXNUM", "integer", -1), nc);
+    knd = fc_type(lwty, nc, ty, MODE_F);
+    memmove(lwty, subst(lwty, "FIXNUM", "integer", -1), nc);
 
     if (strcmp(ty, "...") == 0)
-       {nstrncpy(fty, nc, "error", -1);
-	nstrncpy(cty, nc, "error", -1);}
+       {nstrncpy(lfty, MAXLINE, "error", -1);
+	nstrncpy(lcty, MAXLINE, "error", -1);}
 
 /* follow the PACT function pointer PF convention */
     else if ((strstr(ty, "(*") != NULL) ||
 	     (strncmp(ty, "PF", 2) == 0))
-       {nstrncpy(fty, nc, "type", -1);
-	nstrncpy(cty, nc, "C_FUNPTR", -1);}
+       {nstrncpy(lfty, MAXLINE, "type", -1);
+	nstrncpy(lcty, MAXLINE, "C_FUNPTR", -1);}
 
     else if (is_ptr(ty) == TRUE)
-       {nstrncpy(fty, nc, "type", -1);
-	nstrncpy(cty, nc, "C_PTR", -1);}
+       {nstrncpy(lfty, MAXLINE, "type", -1);
+	nstrncpy(lcty, MAXLINE, "C_PTR", -1);}
 
     else if (strstr(ty, "long long") != NULL)
-       {nstrncpy(fty, nc, "integer", -1);
-	nstrncpy(cty, nc, "C_LONG_LONG", -1);}
+       {nstrncpy(lfty, MAXLINE, "integer", -1);
+	nstrncpy(lcty, MAXLINE, "C_LONG_LONG", -1);}
 
     else if (strstr(ty, "long") != NULL)
-       {nstrncpy(fty, nc, "integer", -1);
-	nstrncpy(cty, nc, "C_LONG", -1);}
+       {nstrncpy(lfty, MAXLINE, "integer", -1);
+	nstrncpy(lcty, MAXLINE, "C_LONG", -1);}
 
     else if (strstr(ty, "short") != NULL)
-       {nstrncpy(fty, nc, "integer", -1);
-	nstrncpy(cty, nc, "C_SHORT", -1);}
+       {nstrncpy(lfty, MAXLINE, "integer", -1);
+	nstrncpy(lcty, MAXLINE, "C_SHORT", -1);}
 
     else if (strstr(ty, "int") != NULL)
-       {nstrncpy(fty, nc, "integer", -1);
-	nstrncpy(cty, nc, "C_INT", -1);}
+       {nstrncpy(lfty, MAXLINE, "integer", -1);
+	nstrncpy(lcty, MAXLINE, "C_INT", -1);}
 
     else if (strstr(ty, "signed char") != NULL)
-       {nstrncpy(fty, nc, "integer", -1);
-	nstrncpy(cty, nc, "C_SIGNED_CHAR", -1);}
+       {nstrncpy(lfty, MAXLINE, "integer", -1);
+	nstrncpy(lcty, MAXLINE, "C_SIGNED_CHAR", -1);}
 
     else if (strstr(ty, "size_t") != NULL)
-       {nstrncpy(fty, nc, "integer", -1);
-	nstrncpy(cty, nc, "C_SIZE_T", -1);}
+       {nstrncpy(lfty, MAXLINE, "integer", -1);
+	nstrncpy(lcty, MAXLINE, "C_SIZE_T", -1);}
 
     else if (strstr(ty, "long double _Complex") != NULL)
-       {nstrncpy(fty, nc, "complex", -1);
-	nstrncpy(cty, nc, "C_LONG_DOUBLE_COMPLEX", -1);}
+       {nstrncpy(lfty, MAXLINE, "complex", -1);
+	nstrncpy(lcty, MAXLINE, "C_LONG_DOUBLE_COMPLEX", -1);}
 
     else if (strstr(ty, "double _Complex") != NULL)
-       {nstrncpy(fty, nc, "complex", -1);
-	nstrncpy(cty, nc, "C_DOUBLE_COMPLEX", -1);}
+       {nstrncpy(lfty, MAXLINE, "complex", -1);
+	nstrncpy(lcty, MAXLINE, "C_DOUBLE_COMPLEX", -1);}
 
     else if (strstr(ty, "float _Complex") != NULL)
-       {nstrncpy(fty, nc, "complex", -1);
-	nstrncpy(cty, nc, "C_FLOAT_COMPLEX", -1);}
+       {nstrncpy(lfty, MAXLINE, "complex", -1);
+	nstrncpy(lcty, MAXLINE, "C_FLOAT_COMPLEX", -1);}
 
     else if (strstr(ty, "long double") != NULL)
-       {nstrncpy(fty, nc, "real", -1);
-	nstrncpy(cty, nc, "C_LONG_DOUBLE", -1);}
+       {nstrncpy(lfty, MAXLINE, "real", -1);
+	nstrncpy(lcty, MAXLINE, "C_LONG_DOUBLE", -1);}
 
     else if (strstr(ty, "double") != NULL)
-       {nstrncpy(fty, nc, "real", -1);
-	nstrncpy(cty, nc, "C_DOUBLE", -1);}
+       {nstrncpy(lfty, MAXLINE, "real", -1);
+	nstrncpy(lcty, MAXLINE, "C_DOUBLE", -1);}
 
     else if (strstr(ty, "float") != NULL)
-       {nstrncpy(fty, nc, "real", -1);
-	nstrncpy(cty, nc, "C_FLOAT", -1);}
+       {nstrncpy(lfty, MAXLINE, "real", -1);
+	nstrncpy(lcty, MAXLINE, "C_FLOAT", -1);}
 
     else if (strstr(ty, "_Bool") != NULL)
-       {nstrncpy(fty, nc, "logical", -1);
-	nstrncpy(cty, nc, "C_BOOL", -1);}
+       {nstrncpy(lfty, MAXLINE, "logical", -1);
+	nstrncpy(lcty, MAXLINE, "C_BOOL", -1);}
 
     else if (strcmp(ty, "void") == 0)
-       {nstrncpy(fty, nc, "subroutine", -1);
-	nstrncpy(cty, nc, "C_VOID", -1);}
+       {nstrncpy(lfty, MAXLINE, "subroutine", -1);
+	nstrncpy(lcty, MAXLINE, "C_VOID", -1);}
 
 /* take unknown types to be integer - covers enums */
     else
-       {nstrncpy(fty, nc, "integer", -1);
-	nstrncpy(cty, nc, "C_INT", -1);};
+       {nstrncpy(lfty, MAXLINE, "integer", -1);
+	nstrncpy(lcty, MAXLINE, "C_INT", -1);};
+
+    if (fty != NULL)
+       nstrncpy(fty, nc, lfty, -1);
+
+    if (cty != NULL)
+       nstrncpy(cty, nc, lcty, -1);
+
+    if (wty != NULL)
+       nstrncpy(wty, nc, lwty, -1);
 
     return(knd);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* MC_PROTO_LIST - return list of tokens for type and name of argument
+ *               - caller formats and frees list
+ */
+
+static char **mc_proto_list(fdecl *dcl)
+   {int i, na, voida;
+    fparam knd;
+    char wty[MAXLINE];
+    char **lst, *ty, *nm;
+    farg *al;
+
+    lst = NULL;
+
+    na    = dcl->na;
+    al    = dcl->al;
+    voida = no_args(dcl);
+
+    for (i = 0; i < na; i++)
+        {if ((voida == TRUE) && (i == 0))
+	    continue;
+
+	 ty  = al[i].type;
+	 nm  = al[i].name;
+	 knd = mc_type(MAXLINE, NULL, NULL, wty, ty);
+	 switch (knd)
+	    {case FP_FNC    :
+	     case FP_STRUCT :
+	          lst = lst_push(lst, "integer(isizea)");
+	          lst = lst_push(lst, nm);
+		  break;
+	     case FP_ARRAY :
+	          if (strcmp(wty, "character") == 0)
+		     {lst = lst_push(lst, "character(*)");
+		      lst = lst_push(lst, nm);}
+		  else if (strcmp(wty, "C_PTR") == 0)
+		     {lst = lst_push(lst, "integer(isizea)");
+		      lst = lst_push(lst, nm);}
+		  else
+		     {lst = lst_push(lst, wty);
+		      lst = lst_push(lst, "%s(*)", nm);};
+		  break;
+	     case FP_SCALAR :
+	     default        :
+	          lst = lst_push(lst, wty);
+	          lst = lst_push(lst, nm);
+		  break;};};
+
+    dcl->tfproto = lst;
+    dcl->ntf     = lst_length(lst);
+
+    return(lst);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1391,7 +1440,7 @@ static fparam mc_type(int nc, char *fty, char *cty,
 
 static int mc_need_ptr(fdecl *dcl)
    {int i, na, ok;
-    char fty[MAXLINE], cty[MAXLINE], wty[MAXLINE], wnm[MAXLINE];
+    char fty[MAXLINE], cty[MAXLINE], wty[MAXLINE];
     farg *al;
 
     na = dcl->na;
@@ -1399,13 +1448,13 @@ static int mc_need_ptr(fdecl *dcl)
 
     ok = FALSE;
 
-    if (mc_type(MAXLINE, fty, cty, wty, wnm, dcl->type) != FP_VARARG)
+    if (mc_type(MAXLINE, fty, cty, wty, dcl->type) != FP_VARARG)
        ok |= ((strcmp(cty, "C_PTR") == 0) ||
 	      (strcmp(cty, "C_FUNPTR") == 0));
 
     if ((na > 0) && (no_args(dcl) == FALSE))
        {for (i = 0; i < na; i++)
-	    {if (mc_type(MAXLINE, fty, cty, wty, wnm, al[i].type) != FP_VARARG)
+	    {if (mc_type(MAXLINE, fty, cty, wty, al[i].type) != FP_VARARG)
 	        ok |= ((strcmp(cty, "C_PTR") == 0) ||
 		       (strcmp(cty, "C_FUNPTR") == 0));};};
 
@@ -1609,7 +1658,7 @@ static int module_itf_wrappable(fdecl *dcl)
 static void module_itf_wrap_ext(FILE *fp, char *pck, fdecl *dcl,
 				char *cfn, char *ffn)
    {fparam knd;
-    char dcn[MAXLINE], wnm[MAXLINE];
+    char dcn[MAXLINE];
     char fty[MAXLINE], cty[MAXLINE], wty[MAXLINE];
     char *rty;
     static int first = TRUE;
@@ -1625,7 +1674,7 @@ static void module_itf_wrap_ext(FILE *fp, char *pck, fdecl *dcl,
 		fprintf(fp, "\n");};};
 
 	rty = dcl->type;
-	knd = mc_type(MAXLINE, fty, cty, wty, wnm, rty);
+	knd = mc_type(MAXLINE, fty, cty, wty, rty);
 	if (strcmp(rty, "void") == 0)
 	   fprintf(fp, "   external :: %s\n", dcn);
         else
@@ -1648,7 +1697,7 @@ static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
    {int i, na, voidf, voida;
     fparam knd;
     char dcn[MAXLINE], a[MAXLINE], t[MAXLINE];
-    char fty[MAXLINE], cty[MAXLINE], wty[MAXLINE], wnm[MAXLINE];
+    char fty[MAXLINE], cty[MAXLINE], wty[MAXLINE];
     char *nm, *ty, *rty, *oper;
     farg *al;
 
@@ -1663,7 +1712,7 @@ static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
 	voidf = (strcmp(rty, "void") == 0);
 	oper  = (voidf == TRUE) ? "subroutine" : "function";
 
-	knd = mc_type(MAXLINE, fty, cty, wty, wnm, rty);
+	knd = mc_type(MAXLINE, fty, cty, wty, rty);
 	mc_decl_list(a, MAXLINE, dcl);
 
 	snprintf(t, MAXLINE, "      %s %s(%s)", oper, dcn, a);
@@ -1691,7 +1740,7 @@ static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
 
 	     ty  = al[i].type;
 	     nm  = al[i].name;
-	     knd = mc_type(MAXLINE, fty, cty, wty, nm, ty);
+	     knd = mc_type(MAXLINE, fty, cty, wty, ty);
 	     switch (knd)
 	        {case FP_FNC    :
 		 case FP_STRUCT :
@@ -1737,7 +1786,7 @@ static void module_interop_wrap(FILE *fp, fdecl *dcl, char *cfn)
    {int i, na, nv, voidf, voida;
     fparam knd;
     char dcn[MAXLINE], a[MAXLINE];
-    char fty[MAXLINE], cty[MAXLINE], wty[MAXLINE], wnm[MAXLINE];
+    char fty[MAXLINE], cty[MAXLINE], wty[MAXLINE];
     char cd[MAXLINE], cb[MAXLINE];
     char *nm, *ty, *rty, *oper;
     farg *al;
@@ -1756,7 +1805,7 @@ static void module_interop_wrap(FILE *fp, fdecl *dcl, char *cfn)
 	oper  = (voidf == TRUE) ? "subroutine" : "function";
 
 
-	knd = mc_type(MAXLINE, fty, cty, wty, wnm, rty);
+	knd = mc_type(MAXLINE, fty, cty, wty, rty);
 	mc_decl_list(a, MAXLINE, dcl);
 
 	if (voidf == TRUE)
@@ -1780,7 +1829,7 @@ static void module_interop_wrap(FILE *fp, fdecl *dcl, char *cfn)
 
 	     ty  = al[i].type;
 	     nm  = al[i].name;
-	     knd = mc_type(MAXLINE, fty, cty, wty, wnm, ty);
+	     knd = mc_type(MAXLINE, fty, cty, wty, ty);
 	     fprintf(fp, "         %s (%s), value :: %s\n",
 		     fty, cty, nm);};
 
@@ -2006,29 +2055,6 @@ static void cs_decl_list(char *a, int nc, fdecl *dcl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SCHEME_PROTO_LIST - render the arg list of DCL into A for the
- *                   - Scheme prototype
- */
-
-static void scheme_proto_list(char *a, int nc, fdecl *dcl)
-   {int i, na;
-    farg *al;
-
-    na = dcl->na;
-    al = dcl->al;
-
-    a[0] = '\0';
-    if (na != 0)
-       {for (i = 0; i < na; i++)
-	    vstrcat(a, MAXLINE, " %s", al[i].name);};
-
-    memmove(a, trim(a, BOTH, " "), nc);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* INIT_SCHEME - initialize Scheme file */
 
 static void init_scheme(bindes *bd, char *pck, int cfl,
@@ -2225,30 +2251,6 @@ static void fin_scheme(bindes *bd)
 
 /*--------------------------------------------------------------------------*/
 
-/* PYTHON_PROTO_LIST - render the arg list of DCL into A for the
- *                   - Python callable C wrapper
- */
-
-static void python_proto_list(char *a, int nc, fdecl *dcl)
-   {int i, na;
-    farg *al;
-
-    na = dcl->na;
-    al = dcl->al;
-
-    a[0] = '\0';
-    if (na != 0)
-       {for (i = 0; i < na; i++)
-	    vstrcat(a, MAXLINE, "%s %s, ", al[i].type, al[i].name);
-        a[strlen(a) - 2] = '\0';};
-
-    memmove(a, trim(subst(a, "* ", "*", -1), BOTH, " "), nc);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* INIT_PYTHON - initialize Python file */
 
 static void init_python(bindes *bd, char *pck, int cfl,
@@ -2370,6 +2372,79 @@ static void init_doc(bindes *bd, char *pck, int cfl,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* DOC_PROTO_FORTRAN - render the arg list of DCL into A for the
+ *                   - Fortran callable C wrapper
+ */
+
+static void doc_proto_fortran(char *a, int nc, fdecl *dcl)
+   {int i, na;
+    char t[MAXLINE];
+    farg *al;
+
+    na = dcl->na;
+    al = dcl->al;
+
+    a[0] = '\0';
+    if (na != 0)
+       {for (i = 0; i < na; i++)
+	    {cf_type(t, MAXLINE, al[i].type);
+	     vstrcat(a, MAXLINE, "%s %s, ", t, al[i].name);};
+        a[strlen(a) - 2] = '\0';};
+
+    memmove(a, trim(subst(a, "* ", "*", -1), BOTH, " "), nc);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DOC_PROTO_SCHEME - render the arg list of DCL into A for the
+ *                  - Scheme prototype
+ */
+
+static void doc_proto_scheme(char *a, int nc, fdecl *dcl)
+   {int i, na;
+    farg *al;
+
+    na = dcl->na;
+    al = dcl->al;
+
+    a[0] = '\0';
+    if (na != 0)
+       {for (i = 0; i < na; i++)
+	    vstrcat(a, MAXLINE, " %s", al[i].name);};
+
+    memmove(a, trim(a, BOTH, " "), nc);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DOC_PROTO_PYTHON - render the arg list of DCL into A for the
+ *                  - Python callable C wrapper
+ */
+
+static void doc_proto_python(char *a, int nc, fdecl *dcl)
+   {int i, na;
+    farg *al;
+
+    na = dcl->na;
+    al = dcl->al;
+
+    a[0] = '\0';
+    if (na != 0)
+       {for (i = 0; i < na; i++)
+	    vstrcat(a, MAXLINE, "%s %s, ", al[i].type, al[i].name);
+        a[strlen(a) - 2] = '\0';};
+
+    memmove(a, trim(subst(a, "* ", "*", -1), BOTH, " "), nc);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* WRAP_DOC - wrap C function DCL in DOC callable function
  *          - using names in FN
  */
@@ -2405,7 +2480,7 @@ static void wrap_doc(FILE *fp, fdecl *dcl, char **fn, char **com)
     if (strcmp(fn[0], "none") == 0)
        fprintf(fp, "<i>Fortran Binding: </i>    none\n");
     else
-       {fortran_proto_list(af, MAXLINE, dcl);
+       {doc_proto_fortran(af, MAXLINE, dcl);
 	map_name(dcn, MAXLINE, fn[0], "f", -1);
 	if (voidf == TRUE)
 	   fprintf(fp, "<i>Fortran Binding: </i> %s(%s)\n",
@@ -2418,8 +2493,8 @@ static void wrap_doc(FILE *fp, fdecl *dcl, char **fn, char **com)
     if (strcmp(fn[1], "none") == 0)
        fprintf(fp, "<i>SX Binding: </i>         none\n");
     else
-       {map_name(dcn, MAXLINE, fn[1], "", -1);
-	scheme_proto_list(as, MAXLINE, dcl);
+       {map_name(dcn, MAXLINE, fn[1], NULL, -1);
+	doc_proto_scheme(as, MAXLINE, dcl);
 	if (IS_NULL(as) == TRUE)
 	   fprintf(fp, "<i>SX Binding: </i>      (%s)\n", dcn);
 	else
@@ -2429,8 +2504,8 @@ static void wrap_doc(FILE *fp, fdecl *dcl, char **fn, char **com)
     if (strcmp(fn[2], "none") == 0)
        fprintf(fp, "<i>Python Binding: </i>     none\n");
     else
-       {map_name(dcn, MAXLINE, fn[2], "", -1);
-	python_proto_list(ap, MAXLINE, dcl);
+       {map_name(dcn, MAXLINE, fn[2], NULL, -1);
+	doc_proto_python(ap, MAXLINE, dcl);
 	fprintf(fp, "<i>Python Binding: </i>  pact.%s(%s)\n", dcn, ap);};
 
     fprintf(fp, "</pre>\n");
