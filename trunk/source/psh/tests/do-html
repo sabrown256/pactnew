@@ -1,0 +1,63 @@
+#!/bin/csh -f
+#
+# DO-HTML - assemble the generated HTML files into
+#         - a file that a browser can render
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Package = psh
+if (-f test-env) then
+   source test-env
+   pushd $TestDir >& /dev/null
+else if ($?Log == 1) then
+   if (-f $Log) then
+      mv $Log $Log.tmp
+      source ../../../scripts/test-env
+      mv $Log.tmp $Log
+   else
+      source ../../../scripts/test-env
+   endif
+else
+   source ../../../scripts/test-env
+endif
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: do-html [-h]"
+           echo "  h  this help message"
+           echo ""
+           exit(1);
+      default:
+           breaksw
+   endsw
+   shift
+end
+
+@ err = 0
+
+set doc = $cwd/gdoc.html
+rm -f $doc
+
+Note $doc '<html>'
+Note $doc '  <head>'
+Note $doc '    <title>Generated Documentation</title>'
+Note $doc '  </head>'
+Note $doc '  <body>'
+
+foreach i (gh*.html)
+   cat $i >> $doc
+end
+
+Note $doc '  </body>'
+Note $doc '</html>'
+
+chmod 644 $doc
+
+exit($err)
+

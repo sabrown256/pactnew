@@ -76,7 +76,7 @@ else
 
       Separator $Log
 
-      set f = ( `fill-string -n 24 $i` )
+      set f = ( `fill-string -n 23 $i` )
       NoteD $Log -n "                        $f"
       Note $Log ""
 
@@ -167,6 +167,26 @@ else
       flog $Log set file = gp-$i.c
       flog $Log ${cc} -c $file
       @ xstatus = $status
+      if (-f $RefDir/$file) then
+         flog $Log diff $file $RefDir/$file
+         if ($status != 0) then
+            @ xstatus = $xstatus + 1
+         endif
+      else
+         flog $Log cp $file $RefDir/$file
+      endif
+      if ($xstatus == 0) then
+         NoteD $Log -n "."
+      else
+         NoteD $Log -n "x"
+         @ lerr = $lerr + 1
+      endif
+      unset file
+
+# compare HTML
+      Note $Log ""
+      flog $Log set file = gh-$i.html
+      @ xstatus = 0
       if (-f $RefDir/$file) then
          flog $Log diff $file $RefDir/$file
          if ($status != 0) then
