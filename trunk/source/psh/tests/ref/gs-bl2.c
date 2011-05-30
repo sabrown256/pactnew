@@ -82,17 +82,17 @@ void SX_install_bl2_bindings(SS_psides *si)
    {
 
     SS_install(si, "fbcv1s",
-               "",
+               "Procedure: fbcv1s\n     Usage: (fbcv1s a b c d e f)",
                SS_nargs,
                _SXI_fbcv1, SS_PR_PROC);
 
     SS_install(si, "fbmcv1s",
-               "",
+               "Procedure: fbmcv1s\n     Usage: (fbmcv1s a b c d)",
                SS_nargs,
                _SXI_fbmcv1, SS_PR_PROC);
 
     SS_install(si, "fbmcr2s",
-               "",
+               "Procedure: fbmcr2s\n     Usage: (fbmcr2s a b c d)",
                SS_nargs,
                _SXI_fbmcr2, SS_PR_PROC);
 

@@ -2043,12 +2043,37 @@ static void init_scheme(bindes *bd, char *pck, int cfl,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_CALL_LIST - render the arg list of DCL into A for the
+ *              - SCHEME function call
+ */
+
+static void sc_call_list(char *a, int nc, fdecl *dcl)
+   {int i, na, voida;
+    farg *al;
+
+    na = dcl->na;
+    al = dcl->al;
+
+    voida = no_args(dcl);
+
+    a[0] = '\0';
+    if (voida == FALSE)
+       {for (i = 0; i < na; i++)
+	    vstrcat(a, MAXLINE, "%s ", al[i].name);
+
+	a[strlen(a) - 1] = '\0';};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* WRAP_SCHEME - wrap C function DCL in SCHEME callable function
  *             - using name FFN
  */
 
 static char **wrap_scheme(FILE *fp, char **fl, fdecl *dcl,
-			  char *ffn, char **com)
+			  char *sfn, char **com)
    {int i, na, nv, voidf, voida;
     char ufn[MAXLINE], a[MAXLINE], rt[MAXLINE], t[MAXLINE];
     farg *al;
@@ -2058,7 +2083,7 @@ static char **wrap_scheme(FILE *fp, char **fl, fdecl *dcl,
     voidf = (strcmp(dcl->type, "void") == 0);
     voida = no_args(dcl);
 
-    nstrncpy(ufn, MAXLINE, ffn, -1);
+    nstrncpy(ufn, MAXLINE, sfn, -1);
     upcase(ufn);
 
     sc_type(rt, MAXLINE, dcl->type);
@@ -2126,11 +2151,27 @@ static char **wrap_scheme(FILE *fp, char **fl, fdecl *dcl,
     fprintf(fp, "\n");
     csep(fp);
 
-/* add the installation of the function */
+/* prepare the function inline documenation */
     concatenate(t, MAXLINE, com, " ");
-    snprintf(a, MAXLINE, 
-	     "    SS_install(si, \"%s\",\n               \"%s\",\n               SS_nargs,\n               _SXI_%s, SS_PR_PROC);\n\n",
-	     ffn, t, dcl->name);
+    if (IS_NULL(t) == TRUE)
+       {sc_call_list(a, MAXLINE, dcl);
+	if (voidf == FALSE)
+	   snprintf(t, MAXLINE, "Procedure: %s\\n     Usage: (%s %s)",
+		    sfn, sfn, a);
+	else
+	   snprintf(t, MAXLINE, "Procedure: %s\\n     Usage: (%s)",
+		    sfn, sfn);};
+
+/* add the installation of the function */
+    if (voidf == FALSE)
+       snprintf(a, MAXLINE, 
+		"    SS_install(si, \"%s\",\n               \"%s\",\n               SS_nargs,\n               _SXI_%s, SS_PR_PROC);\n\n",
+		sfn, t, dcl->name);
+    else
+       snprintf(a, MAXLINE, 
+		"    SS_install(si, \"%s\",\n               \"%s\",\n               SS_zargs,\n               _SXI_%s, SS_PR_PROC);\n\n",
+		sfn, t, dcl->name);
+
     fl = lst_add(fl, a);
 
     return(fl);}
@@ -2146,7 +2187,7 @@ static int bind_scheme(bindes *bd)
    {int i, ib, rv;
     char t[MAXLINE];
     char *sb, **ta, **fl;
-    char *cfn, *ffn;
+    char *cfn, *sfn;
     fdecl *dcl;
     FILE *fp;
     char *pck, **spr, **sbi, **swr;
@@ -2166,10 +2207,10 @@ static int bind_scheme(bindes *bd)
 	    {nstrncpy(t, MAXLINE, sb, -1);
 	     ta = tokenize(t, " \t");
 	     cfn = ta[0];
-	     ffn = ta[2];
+	     sfn = ta[2];
              dcl = find_proto(spr, cfn);
 	     if (dcl != NULL)
-	        {fl = wrap_scheme(fp, fl, dcl, ffn, ta+4);
+	        {fl = wrap_scheme(fp, fl, dcl, sfn, ta+4);
 		 free_decl(dcl);};
 
 	     free_strings(ta);};};
@@ -2239,13 +2280,13 @@ static void init_python(bindes *bd, char *pck, int cfl,
 /*--------------------------------------------------------------------------*/
 
 /* WRAP_PYTHON - wrap C function DCL in PYTHON callable function
- *             - using name FFN
+ *             - using name PFN
  */
 
-static void wrap_python(FILE *fp, fdecl *dcl, char *ffn)
+static void wrap_python(FILE *fp, fdecl *dcl, char *pfn)
    {char ufn[MAXLINE];
 
-    nstrncpy(ufn, MAXLINE, ffn, -1);
+    nstrncpy(ufn, MAXLINE, pfn, -1);
     upcase(ufn);
 
     csep(fp);
@@ -2267,7 +2308,7 @@ static int bind_python(bindes *bd)
    {int ib, rv;
     char t[MAXLINE];
     char *sb, **ta;
-    char *cfn, *ffn;
+    char *cfn, *pfn;
     fdecl *dcl;
     FILE *fp;
     char *pck, **spr, **sbi, **swr;
@@ -2286,10 +2327,10 @@ static int bind_python(bindes *bd)
 	    {nstrncpy(t, MAXLINE, sb, -1);
 	     ta = tokenize(t, " \t");
 	     cfn = ta[0];
-	     ffn = ta[3];
+	     pfn = ta[3];
              dcl = find_proto(spr, cfn);
 	     if (dcl != NULL)
-	        {wrap_python(fp, dcl, ffn);
+	        {wrap_python(fp, dcl, pfn);
 		 free_decl(dcl);};
 
 	     free_strings(ta);};};
