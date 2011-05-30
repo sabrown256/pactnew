@@ -2068,111 +2068,116 @@ static void sc_call_list(char *a, int nc, fdecl *dcl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRAP_SCHEME - wrap C function DCL in SCHEME callable function
+/* SCHEME_WRAP - wrap C function DCL in SCHEME callable function
  *             - using name FFN
  */
 
-static char **wrap_scheme(FILE *fp, char **fl, fdecl *dcl,
+static char **scheme_wrap(FILE *fp, char **fl, fdecl *dcl,
 			  char *sfn, char **com)
    {int i, na, nv, voidf, voida;
-    char ufn[MAXLINE], a[MAXLINE], rt[MAXLINE], t[MAXLINE];
+    char usn[MAXLINE], dcn[MAXLINE];
+    char a[MAXLINE], rt[MAXLINE], t[MAXLINE];
     farg *al;
 
-    na    = dcl->na;
-    al    = dcl->al;
-    voidf = (strcmp(dcl->type, "void") == 0);
-    voida = no_args(dcl);
+    if (strcmp(sfn, "none") != 0)
+       {na    = dcl->na;
+	al    = dcl->al;
+	voidf = (strcmp(dcl->type, "void") == 0);
+	voida = no_args(dcl);
 
-    nstrncpy(ufn, MAXLINE, sfn, -1);
-    upcase(ufn);
+	nstrncpy(dcn, MAXLINE, dcl->name, -1);
+	downcase(dcn);
 
-    sc_type(rt, MAXLINE, dcl->type);
+	nstrncpy(usn, MAXLINE, sfn, -1);
+	upcase(usn);
 
-    csep(fp);
-    fprintf(fp, "\n");
+	sc_type(rt, MAXLINE, dcl->type);
 
-    fprintf(fp, "static object *");
-    fprintf(fp, "_SXI_%s", dcl->name);
-    if (na == 0)
-       fprintf(fp, "(SS_psides *si)");
-    else
-       fprintf(fp, "(SS_psides *si, object *argl)");
-    fprintf(fp, "\n");
+	csep(fp);
+	fprintf(fp, "\n");
+
+	fprintf(fp, "static object *");
+	fprintf(fp, "_SXI_%s", dcn);
+	if (na == 0)
+	   fprintf(fp, "(SS_psides *si)");
+	else
+	   fprintf(fp, "(SS_psides *si, object *argl)");
+	fprintf(fp, "\n");
 
 /* local variable declarations */
-    nv = 0;
-    for (i = 0; i <= na; i++)
-        {if ((voida == TRUE) && (i == 0))
-	    continue;
+	nv = 0;
+	for (i = 0; i <= na; i++)
+	    {if ((voida == TRUE) && (i == 0))
+		continue;
 
-	 if (nv == 0)
-	    fprintf(fp, "   {");
-	 else
-	    fprintf(fp, "    ");
+	     if (nv == 0)
+	        fprintf(fp, "   {");
+	     else
+	        fprintf(fp, "    ");
 
-	 t[0] = '\0';
+	     t[0] = '\0';
 
 /* variable for return value */
-	 if (i == na)
-	    {if (voidf == FALSE)
-		snprintf(t, MAXLINE, "%s _rv;\n    ", rt);
+	     if (i == na)
+	        {if (voidf == FALSE)
+		    snprintf(t, MAXLINE, "%s _rv;\n    ", rt);
 
-	     nstrcat(t, MAXLINE, "object *_lo;\n");}
+		 nstrcat(t, MAXLINE, "object *_lo;\n");}
 
 /* local vars */
-	 else if (al[i].name[0] != '\0')
-	    {snprintf(t, MAXLINE, "%s _l%s;\n", al[i].type, al[i].name);
-	     nv++;};
+	     else if (al[i].name[0] != '\0')
+	        {snprintf(t, MAXLINE, "%s _l%s;\n", al[i].type, al[i].name);
+		 nv++;};
 
-	 if (IS_NULL(t) == FALSE)
-	    fputs(subst(t, "* ", "*", -1), fp);};
+	     if (IS_NULL(t) == FALSE)
+	        fputs(subst(t, "* ", "*", -1), fp);};
 
-    fprintf(fp, "\n");
+	fprintf(fp, "\n");
 
-    if (voida == FALSE)
-       {cs_decl_list(a, MAXLINE, dcl);
-        fprintf(fp, "    SS_args(si, argl,\n");
-	fprintf(fp, "%s", a);
-	fprintf(fp, "            0);\n");
-	fprintf(fp, "\n");};
+	if (voida == FALSE)
+	   {cs_decl_list(a, MAXLINE, dcl);
+	    fprintf(fp, "    SS_args(si, argl,\n");
+	    fprintf(fp, "%s", a);
+	    fprintf(fp, "            0);\n");
+	    fprintf(fp, "\n");};
 
 /* function call */
-    fc_call_list(a, MAXLINE, dcl);
-    if (voidf == FALSE)
-       fprintf(fp, "    _rv = %s(%s);\n", dcl->name, a);
-    else
-       fprintf(fp, "    %s(%s);\n", dcl->name, a);
+	fc_call_list(a, MAXLINE, dcl);
+	if (voidf == FALSE)
+	   fprintf(fp, "    _rv = %s(%s);\n", dcn, a);
+	else
+	   fprintf(fp, "    %s(%s);\n", dcn, a);
 
-    fprintf(fp, "    _lo = SS_null;\n");
-    fprintf(fp, "\n");
+	fprintf(fp, "    _lo = SS_null;\n");
+	fprintf(fp, "\n");
 
-    fprintf(fp, "    return(_lo);}\n");
+	fprintf(fp, "    return(_lo);}\n");
 
-    fprintf(fp, "\n");
-    csep(fp);
+	fprintf(fp, "\n");
+	csep(fp);
 
 /* prepare the function inline documenation */
-    concatenate(t, MAXLINE, com, " ");
-    if (IS_NULL(t) == TRUE)
-       {sc_call_list(a, MAXLINE, dcl);
-	if (voidf == FALSE)
-	   snprintf(t, MAXLINE, "Procedure: %s\\n     Usage: (%s %s)",
-		    sfn, sfn, a);
-	else
-	   snprintf(t, MAXLINE, "Procedure: %s\\n     Usage: (%s)",
-		    sfn, sfn);};
+	concatenate(t, MAXLINE, com, " ");
+	if (IS_NULL(t) == TRUE)
+	   {sc_call_list(a, MAXLINE, dcl);
+	    if (voidf == FALSE)
+	       snprintf(t, MAXLINE, "Procedure: %s\\n     Usage: (%s %s)",
+			sfn, sfn, a);
+	    else
+	       snprintf(t, MAXLINE, "Procedure: %s\\n     Usage: (%s)",
+			sfn, sfn);};
 
 /* add the installation of the function */
-    if (voidf == FALSE)
-       snprintf(a, MAXLINE, 
-		"    SS_install(si, \"%s\",\n               \"%s\",\n               SS_nargs,\n               _SXI_%s, SS_PR_PROC);\n\n",
-		sfn, t, dcl->name);
-    else
-       snprintf(a, MAXLINE, 
-		"    SS_install(si, \"%s\",\n               \"%s\",\n               SS_zargs,\n               _SXI_%s, SS_PR_PROC);\n\n",
-		sfn, t, dcl->name);
+	if (voidf == FALSE)
+	   snprintf(a, MAXLINE, 
+		    "    SS_install(si, \"%s\",\n               \"%s\",\n               SS_nargs,\n               _SXI_%s, SS_PR_PROC);\n\n",
+		    sfn, t, dcn);
+	else
+	   snprintf(a, MAXLINE, 
+		    "    SS_install(si, \"%s\",\n               \"%s\",\n               SS_zargs,\n               _SXI_%s, SS_PR_PROC);\n\n",
+		    sfn, t, dcn);
 
-    fl = lst_add(fl, a);
+	fl = lst_add(fl, a);};
 
     return(fl);}
 
@@ -2210,7 +2215,7 @@ static int bind_scheme(bindes *bd)
 	     sfn = ta[2];
              dcl = find_proto(spr, cfn);
 	     if (dcl != NULL)
-	        {fl = wrap_scheme(fp, fl, dcl, sfn, ta+4);
+	        {fl = scheme_wrap(fp, fl, dcl, sfn, ta+4);
 		 free_decl(dcl);};
 
 	     free_strings(ta);};};
@@ -2279,21 +2284,22 @@ static void init_python(bindes *bd, char *pck, int cfl,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRAP_PYTHON - wrap C function DCL in PYTHON callable function
+/* PYTHON_WRAP - wrap C function DCL in PYTHON callable function
  *             - using name PFN
  */
 
-static void wrap_python(FILE *fp, fdecl *dcl, char *pfn)
-   {char ufn[MAXLINE];
+static void python_wrap(FILE *fp, fdecl *dcl, char *pfn)
+   {char upn[MAXLINE];
 
-    nstrncpy(ufn, MAXLINE, pfn, -1);
-    upcase(ufn);
+    if (strcmp(pfn, "none") != 0)
+       {nstrncpy(upn, MAXLINE, pfn, -1);
+	upcase(upn);
 
-    csep(fp);
-    fprintf(fp, "\n");
+	csep(fp);
+	fprintf(fp, "\n");
 
-    fprintf(fp, "\n");
-    csep(fp);
+	fprintf(fp, "\n");
+	csep(fp);};
 
     return;}
 
@@ -2330,7 +2336,7 @@ static int bind_python(bindes *bd)
 	     pfn = ta[3];
              dcl = find_proto(spr, cfn);
 	     if (dcl != NULL)
-	        {wrap_python(fp, dcl, pfn);
+	        {python_wrap(fp, dcl, pfn);
 		 free_decl(dcl);};
 
 	     free_strings(ta);};};
@@ -2453,21 +2459,21 @@ static void doc_proto_python(char *a, int nc, fdecl *dcl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRAP_DOC - wrap C function DCL in DOC callable function
+/* DOC_WRAP - wrap C function DCL in DOC callable function
  *          - using names in FN
  */
 
-static void wrap_doc(FILE *fp, fdecl *dcl, char *cfn, char **fn, char **com)
+static void doc_wrap(FILE *fp, fdecl *dcl, char *cfn, char **fn, char **com)
    {int voidf;
-    char ufn[MAXLINE], lfn[MAXLINE], dcn[MAXLINE];
+    char upn[MAXLINE], lfn[MAXLINE], dcn[MAXLINE];
     char af[MAXLINE], as[MAXLINE], ap[MAXLINE];
     char fty[MAXLINE], t[MAXLINE];
     char **args;
 
     voidf = (strcmp(dcl->type, "void") == 0);
 
-    nstrncpy(ufn, MAXLINE, cfn, -1);
-    upcase(ufn);
+    nstrncpy(upn, MAXLINE, cfn, -1);
+    upcase(upn);
 
     nstrncpy(lfn, MAXLINE, cfn, -1);
     upcase(lfn);
@@ -2477,7 +2483,7 @@ static void wrap_doc(FILE *fp, fdecl *dcl, char *cfn, char **fn, char **com)
     hsep(fp);
     fprintf(fp, "\n");
 
-    fprintf(fp, "<a name=\"%s\"><h2>%s</h2></a>\n", lfn, ufn);
+    fprintf(fp, "<a name=\"%s\"><h2>%s</h2></a>\n", lfn, upn);
     fprintf(fp, "\n");
     fprintf(fp, "<p>\n");
     fprintf(fp, "<pre>\n");
@@ -2564,7 +2570,7 @@ static int bind_doc(bindes *bd)
 	     cfn = ta[0];
              dcl = find_proto(spr, cfn);
 	     if (dcl != NULL)
-	        {wrap_doc(fp, dcl, cfn, ta+1, ta+4);
+	        {doc_wrap(fp, dcl, cfn, ta+1, ta+4);
 		 free_decl(dcl);};
 
 	     free_strings(ta);};};
