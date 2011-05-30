@@ -54,13 +54,13 @@ void SX_install_bl3_bindings(SS_psides *si)
    {
 
     SS_install(si, "fe1s",
-               "",
+               "Procedure: fe1s\n     Usage: (fe1s a1 a2)",
                SS_nargs,
                _SXI_fe1, SS_PR_PROC);
 
     SS_install(si, "fe2s",
-               "",
-               SS_nargs,
+               "Procedure: fe2s\n     Usage: (fe2s)",
+               SS_zargs,
                _SXI_fe2, SS_PR_PROC);
 
    return;}
