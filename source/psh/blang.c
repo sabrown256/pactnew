@@ -573,7 +573,7 @@ static void init_types(void)
     add_type("long double _Complex", "complex(16)",
 	     "SC_LONG_DOUBLE_COMPLEX_I", NULL);
 
-    add_type("void *",        "C_PTR-A",      "SC_VOID_P_I",        NULL);
+    add_type("void *",        "C_PTR-A",      "SC_POINTER_I",       NULL);
     add_type("bool *",        "logical-A",    "SC_BOOL_P_I",        NULL);
     add_type("char *",        "character-A",  "SC_STRING_I",        NULL);
 
@@ -2144,9 +2144,9 @@ static char **scheme_wrap(FILE *fp, char **fl, fdecl *dcl,
 /* function call */
 	fc_call_list(a, MAXLINE, dcl);
 	if (voidf == FALSE)
-	   fprintf(fp, "    _rv = %s(%s);\n", dcn, a);
+	   fprintf(fp, "    _rv = %s(%s);\n", dcl->name, a);
 	else
-	   fprintf(fp, "    %s(%s);\n", dcn, a);
+	   fprintf(fp, "    %s(%s);\n", dcl->name, a);
 
 	fprintf(fp, "    _lo = SS_null;\n");
 	fprintf(fp, "\n");
@@ -2184,12 +2184,39 @@ static char **scheme_wrap(FILE *fp, char **fl, fdecl *dcl,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SCHEME_INSTALL - write the routine to install the bindings */
+
+static void scheme_install(FILE *fp, char *pck, char **fl)
+    {int i;
+
+     csep(fp);
+
+     fprintf(fp, "\n");
+     fprintf(fp, "void SX_install_%s_bindings(SS_psides *si)\n", pck);
+     fprintf(fp, "   {\n");
+     fprintf(fp, "\n");
+
+     if (fl != NULL)
+        {for (i = 0; fl[i] != NULL; i++)
+	     fputs(fl[i], fp);
+
+	 free_strings(fl);};
+
+     fprintf(fp, "   return;}\n");
+     fprintf(fp, "\n");
+     csep(fp);
+
+     return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* BIND_SCHEME - generate Scheme bindings from SPR and SBI
  *             - return TRUE iff successful
  */
 
 static int bind_scheme(bindes *bd)
-   {int i, ib, rv;
+   {int ib, rv;
     char t[MAXLINE];
     char *sb, **ta, **fl;
     char *cfn, *sfn;
@@ -2221,22 +2248,7 @@ static int bind_scheme(bindes *bd)
 	     free_strings(ta);};};
 
 /* write the routine to install the bindings */
-    if (fl != NULL)
-       {csep(fp);
-
-	fprintf(fp, "\n");
-	fprintf(fp, "void SX_install_%s_bindings(SS_psides *si)\n", pck);
-	fprintf(fp, "   {\n");
-	fprintf(fp, "\n");
-
-	for (i = 0; fl[i] != NULL; i++)
-	    fputs(fl[i], fp);
-
-	free_strings(fl);
-
-	fprintf(fp, "   return;}\n");
-	fprintf(fp, "\n");
-	csep(fp);};
+    scheme_install(fp, pck, fl);
 
     return(rv);}
 

@@ -44,10 +44,10 @@ SC_use_guarded_mem	yes	none              none
 SC_init_threads		yes	none              none
 
 # SCTAB.C
-SC_make_hasharr		yes	make-hash-table   none
+SC_make_hasharr		yes	none		  none
 SC_free_hasharr		yes	none              none
-SC_hasharr_def_lookup	yes	hash-lookup       def_lookup
-SC_hasharr_clear	yes	clear-hash-table  none
+SC_hasharr_def_lookup	yes	none              def_lookup
+SC_hasharr_clear	yes	none		  none
 SC_hasharr_lookup	yes	none              none
-SC_hasharr_remove	yes	hash-remove       none
+SC_hasharr_remove	yes	none		  none
 

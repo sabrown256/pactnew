@@ -51,19 +51,26 @@ char
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-#if 0
-static INLINE int EOI(object *str)
-   {int rv;
-    char *p, *s;
+/* _SX_INSTALL_GENERATED - install the automatically generated wrappers */
 
-    p = SS_PTR(str);
-    s = SS_BUFFER(str);
+static void _SX_install_generated(SS_psides *si)
+   {extern void SX_install_score_bindings(SS_psides *si);
+    extern void SX_install_pml_bindings(SS_psides *si);
+    extern void SX_install_pdb_bindings(SS_psides *si);
+    extern void SX_install_ppc_bindings(SS_psides *si);
+    extern void SX_install_pgs_bindings(SS_psides *si);
+    extern void SX_install_panacea_bindings(SS_psides *si);
+    extern void SX_install_scheme_bindings(SS_psides *si);
 
-/*    rv = (((p != s) && (*(p - 1) == '\n')) || (*p == '\0')); */
-    rv = (((p != s) && (*(p - 1) == '\n') && (*p == '\0')) || (*p == '\0'));
+    SX_install_score_bindings(si);
+    SX_install_pml_bindings(si);
+    SX_install_pdb_bindings(si);
+    SX_install_ppc_bindings(si);
+    SX_install_pgs_bindings(si);
+    SX_install_panacea_bindings(si);
+    SX_install_scheme_bindings(si);
 
-    return(rv);}
-#endif
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -76,6 +83,8 @@ void SX_install_funcs(SS_psides *si)
     PA_init_strings();
 
     SX_install_global_vars(si);
+
+    _SX_install_generated(si);
 
 /* PDBLib related functions */
     SX_install_pdb_funcs(si);
