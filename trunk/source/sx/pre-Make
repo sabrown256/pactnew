@@ -117,7 +117,7 @@ ArObjs = ${TGTLib}(sxhook.o) ${TGTLib}(sxmm.o) ${TGTLib}(sxmode.o) \
 sxmain.o : ${Hdrs}
 ${ObjsY} : ${Hdrs}
 ${Objs} : ${Hdrs}
-${LibDep} : ${Hdrs} ${hdrf}
+${LibDep} : ${Hdrs} ${gso} ${hdrf}
 
 #
 # Generated code rules
@@ -138,7 +138,8 @@ gso = ${PACTTmpDir}/gs-score.o ${PACTTmpDir}/gs-pml.o ${PACTTmpDir}/gs-pdb.o   \
 %.o : %.c
 	@(echo "${CCAnnounce} -c $<" ; \
           ${CC} -c $< -o $@ ; \
-          ${AR} ${AROpt} ${TGTLib} $@ 2>> errlog )
+          ${AR} ${AROpt} ${TGTLib} $@ 2>> errlog ;\
+	  ${RM} $@ )
 
 bindings : ${gso}
 

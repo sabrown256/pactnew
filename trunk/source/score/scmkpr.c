@@ -705,14 +705,14 @@ char *_SC_subst_macro(char *src, int off, SC_rule_cat whch, int exd,
 		        {t = strtok(s, "(");
 			 t = strtok(NULL, ")");
 			 if (t != NULL)
-			    {base = strchr(t, '.');
+			    {base = strrchr(t, '.');
 			     if (base != NULL)
 			        base[1] = sfx[1];
 			     base = t;};}
 		     else if (whch == EXPLICIT)
 		        base = dep;
 		     else
-		        {base = strchr(s, '.');
+		        {base = strrchr(s, '.');
 			 if (base != NULL)
 			    base[1] = sfx[1];
 			 base = s;};

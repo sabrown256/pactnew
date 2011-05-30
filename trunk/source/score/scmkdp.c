@@ -189,7 +189,7 @@ static int _SC_add_actions(char *tgt, char *dep, char *sfx,
 			   ruledes *rd, int whch, anadep *state)
    {int i, n, ns, ok;
     char s[MAXLINE];
-    char **b, *t;
+    char **b, *t, *pt;
     cmdes a, *as;
 
     n = rd->n_actions;
@@ -212,7 +212,11 @@ static int _SC_add_actions(char *tgt, char *dep, char *sfx,
 	   t = s;
 	else
 	   t++;
-	t   = strtok(t, ".");
+
+	pt = strrchr(t, '.');
+	if (pt != NULL)
+	   *pt = '\0';
+/*	t   = strtok(t, "."); */
 	dep = SC_dsnprintf(TRUE, "%s%s", t, a.suffix);
         a.dependent = dep;}
 
