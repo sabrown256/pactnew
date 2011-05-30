@@ -11,16 +11,16 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-FIXNUM FF_ID(fe1_f, FE1_F)(str **ta1, int *sa2)
-   {str *_lta1;
-    int _lsa2;
+FIXNUM FF_ID(fe1_f, FE1_F)(str **a1, int *a2)
+   {str *_la1;
+    int _la2;
     FIXNUM _rv;
     SC_address _adfe1;
 
-    _lta1      = *(str **) ta1;
-    _lsa2      = (int) *sa2;
+    _la1       = *(str **) a1;
+    _la2       = (int) *a2;
 
-    _adfe1.memaddr = (void *) fe1(_lta1, _lsa2);
+    _adfe1.memaddr = (void *) fe1(_la1, _la2);
 
     _rv = _adfe1.diskaddr;
 
@@ -29,22 +29,22 @@ FIXNUM FF_ID(fe1_f, FE1_F)(str **ta1, int *sa2)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-void FF_ID(fe2_f, FE2_F)(str **tdev, double *ax, double *ay, int *sn, pcons *ainfo, int *sl)
-   {str *_ltdev;
-    double *_lax;
-    double *_lay;
-    int _lsn;
-    pcons *_lainfo;
-    int _lsl;
+void FF_ID(fe2_f, FE2_F)(str **dev, double *x, double *y, int *n, pcons *info, int *l)
+   {str *_ldev;
+    double *_lx;
+    double *_ly;
+    int _ln;
+    pcons *_linfo;
+    int _ll;
     
-    _ltdev     = *(str **) tdev;
-    _lax       = (double *) ax;
-    _lay       = (double *) ay;
-    _lsn       = (int) *sn;
-    _lainfo    = (pcons *) ainfo;
-    _lsl       = (int) *sl;
+    _ldev      = *(str **) dev;
+    _lx        = (double *) x;
+    _ly        = (double *) y;
+    _ln        = (int) *n;
+    _linfo     = (pcons *) info;
+    _ll        = (int) *l;
 
-    fe2(_ltdev, _lax, _lay, _lsn, _lainfo, _lsl);
+    fe2(_ldev, _lx, _ly, _ln, _linfo, _ll);
 
     return;}
 
