@@ -17,69 +17,69 @@ module pact_bl2
    interface
 
 ! ... declarations for generated wrappers
-      function fbcv1_f(sa, sb, sc, sd, fe, ff) 
+      function fbcv1_f(a, b, c, d, e, f) 
          use types_bl2
          implicit none
          integer(isizea) :: fbcv1_f
-         integer         :: sa
-         real(4)         :: sb
-         real(8)         :: sc
-         character       :: sd
-         integer(isizea) :: fe
-         integer(isizea) :: ff
+         integer         :: a
+         real(4)         :: b
+         real(8)         :: c
+         character       :: d
+         integer(isizea) :: e
+         integer(isizea) :: f
       end function fbcv1_f
 
-      function fbmcv1_f(sa, sb, sc, sd) 
+      function fbmcv1_f(a, b, c, d) 
          use types_bl2
          implicit none
          integer(isizea) :: fbmcv1_f
-         integer         :: sa
-         real(4)         :: sb
-         real(8)         :: sc
-         character       :: sd
+         integer         :: a
+         real(4)         :: b
+         real(8)         :: c
+         character       :: d
       end function fbmcv1_f
 
-      function fbmcr2_f(aa, ab, ac, ad) 
+      function fbmcr2_f(a, b, c, d) 
          use types_bl2
          implicit none
          integer(isizea) :: fbmcr2_f
-         integer         :: aa(*)
-         real(4)         :: ab(*)
-         real(8)         :: ac(*)
-         character(*)    :: ad
+         integer         :: a(*)
+         real(4)         :: b(*)
+         real(8)         :: c(*)
+         character(*)    :: d
       end function fbmcr2_f
 
 ! ... declarations for interoperability
-      type (C_PTR) function fbcv1_i(sa, sb, sc, sd, fe, ff) &
+      type (C_PTR) function fbcv1_i(a, b, c, d, e, f) &
                 bind(c, name='fbcv1')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: sa
-         real (C_FLOAT), value :: sb
-         real (C_DOUBLE), value :: sc
-         integer (C_INT), value :: sd
-         type (C_FUNPTR), value :: fe
-         type (C_FUNPTR), value :: ff
+         integer (C_INT), value :: a
+         real (C_FLOAT), value :: b
+         real (C_DOUBLE), value :: c
+         integer (C_INT), value :: d
+         type (C_FUNPTR), value :: e
+         type (C_FUNPTR), value :: f
       end function fbcv1_i
 
-      type (C_PTR) function fbmcv1_i(sa, sb, sc, sd) &
+      type (C_PTR) function fbmcv1_i(a, b, c, d) &
                 bind(c, name='fbmcv1')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: sa
-         real (C_FLOAT), value :: sb
-         real (C_DOUBLE), value :: sc
-         integer (C_INT), value :: sd
+         integer (C_INT), value :: a
+         real (C_FLOAT), value :: b
+         real (C_DOUBLE), value :: c
+         integer (C_INT), value :: d
       end function fbmcv1_i
 
-      type (C_PTR) function fbmcr2_i(aa, ab, ac, ad) &
+      type (C_PTR) function fbmcr2_i(a, b, c, d) &
                 bind(c, name='fbmcr2')
          use iso_c_binding
          implicit none
-         type (C_PTR), value :: aa
-         type (C_PTR), value :: ab
-         type (C_PTR), value :: ac
-         type (C_PTR), value :: ad
+         type (C_PTR), value :: a
+         type (C_PTR), value :: b
+         type (C_PTR), value :: c
+         type (C_PTR), value :: d
       end function fbmcr2_i
 
    end interface

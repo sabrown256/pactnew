@@ -11,61 +11,61 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-char *FF_ID(fbcv1_f, FBCV1_F)(int *sa, float *sb, double *sc, char *sd, PFInt fe, PFInt ff)
-   {int _lsa;
-    float _lsb;
-    double _lsc;
-    char _lsd;
-    PFInt _lfe;
-    PFInt _lff;
+char *FF_ID(fbcv1_f, FBCV1_F)(int *a, float *b, double *c, char *d, PFInt e, PFInt f)
+   {int _la;
+    float _lb;
+    double _lc;
+    char _ld;
+    PFInt _le;
+    PFInt _lf;
     char *_rv;
 
-    _lsa       = (int) *sa;
-    _lsb       = (float) *sb;
-    _lsc       = (double) *sc;
-    _lsd       = (char) *sd;
-    _lfe       = (PFInt) fe;
-    _lff       = (PFInt) ff;
+    _la        = (int) *a;
+    _lb        = (float) *b;
+    _lc        = (double) *c;
+    _ld        = (char) *d;
+    _le        = (PFInt) e;
+    _lf        = (PFInt) f;
 
-    _rv = fbcv1(_lsa, _lsb, _lsc, _lsd, _lfe, _lff);
+    _rv = fbcv1(_la, _lb, _lc, _ld, _le, _lf);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-char *FF_ID(fbmcv1_f, FBMCV1_F)(int *sa, float *sb, double *sc, char *sd)
-   {int _lsa;
-    float _lsb;
-    double _lsc;
-    char _lsd;
+char *FF_ID(fbmcv1_f, FBMCV1_F)(int *a, float *b, double *c, char *d)
+   {int _la;
+    float _lb;
+    double _lc;
+    char _ld;
     char *_rv;
 
-    _lsa       = (int) *sa;
-    _lsb       = (float) *sb;
-    _lsc       = (double) *sc;
-    _lsd       = (char) *sd;
+    _la        = (int) *a;
+    _lb        = (float) *b;
+    _lc        = (double) *c;
+    _ld        = (char) *d;
 
-    _rv = fbmcv1(_lsa, _lsb, _lsc, _lsd);
+    _rv = fbmcv1(_la, _lb, _lc, _ld);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-char *FF_ID(fbmcr2_f, FBMCR2_F)(int *aa, float *ab, double *ac, char *ad, int sncad)
-   {int *_laa;
-    float *_lab;
-    double *_lac;
-    char _lad[MAXLINE];
+char *FF_ID(fbmcr2_f, FBMCR2_F)(int *a, float *b, double *c, char *d, int sncd)
+   {int *_la;
+    float *_lb;
+    double *_lc;
+    char _ld[MAXLINE];
     char *_rv;
 
-    _laa       = (int *) aa;
-    _lab       = (float *) ab;
-    _lac       = (double *) ac;
-    SC_FORTRAN_STR_C(_lad, ad, sncad);
+    _la        = (int *) a;
+    _lb        = (float *) b;
+    _lc        = (double *) c;
+    SC_FORTRAN_STR_C(_ld, d, sncd);
 
-    _rv = fbmcr2(_laa, _lab, _lac, _lad);
+    _rv = fbmcr2(_la, _lb, _lc, _ld);
 
     return(_rv);}
 

@@ -11,411 +11,411 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-int FF_ID(fb1_f, FB1_F)(bool *sa1, bool *aa2)
-   {bool _lsa1;
-    bool *_laa2;
+int FF_ID(fb1_f, FB1_F)(bool *a1, bool *a2)
+   {bool _la1;
+    bool *_la2;
     int _rv;
 
-    _lsa1      = (bool) *sa1;
-    _laa2      = (bool *) aa2;
+    _la1       = (bool) *a1;
+    _la2       = (bool *) a2;
 
-    _rv = fb1(_lsa1, _laa2);
+    _rv = fb1(_la1, _la2);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-int FF_ID(fb2_f, FB2_F)(char *sa1, char *aa2, int sncaa2)
-   {char _lsa1;
-    char _laa2[MAXLINE];
+int FF_ID(fb2_f, FB2_F)(char *a1, char *a2, int snca2)
+   {char _la1;
+    char _la2[MAXLINE];
     int _rv;
 
-    _lsa1      = (char) *sa1;
-    SC_FORTRAN_STR_C(_laa2, aa2, sncaa2);
+    _la1       = (char) *a1;
+    SC_FORTRAN_STR_C(_la2, a2, snca2);
 
-    _rv = fb2(_lsa1, _laa2);
+    _rv = fb2(_la1, _la2);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-int FF_ID(fb3_f, FB3_F)(short *sa1, short *aa2)
-   {short _lsa1;
-    short *_laa2;
+int FF_ID(fb3_f, FB3_F)(short *a1, short *a2)
+   {short _la1;
+    short *_la2;
     int _rv;
 
-    _lsa1      = (short) *sa1;
-    _laa2      = (short *) aa2;
+    _la1       = (short) *a1;
+    _la2       = (short *) a2;
 
-    _rv = fb3(_lsa1, _laa2);
+    _rv = fb3(_la1, _la2);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-int FF_ID(fb4_f, FB4_F)(int *sa1, int *aa2)
-   {int _lsa1;
-    int *_laa2;
+int FF_ID(fb4_f, FB4_F)(int *a1, int *a2)
+   {int _la1;
+    int *_la2;
     int _rv;
 
-    _lsa1      = (int) *sa1;
-    _laa2      = (int *) aa2;
+    _la1       = (int) *a1;
+    _la2       = (int *) a2;
 
-    _rv = fb4(_lsa1, _laa2);
+    _rv = fb4(_la1, _la2);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-int FF_ID(fb5_f, FB5_F)(long *sa1, long *aa2)
-   {long _lsa1;
-    long *_laa2;
+int FF_ID(fb5_f, FB5_F)(long *a1, long *a2)
+   {long _la1;
+    long *_la2;
     int _rv;
 
-    _lsa1      = (long) *sa1;
-    _laa2      = (long *) aa2;
+    _la1       = (long) *a1;
+    _la2       = (long *) a2;
 
-    _rv = fb5(_lsa1, _laa2);
+    _rv = fb5(_la1, _la2);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-int FF_ID(fb6_f, FB6_F)(long long *sa1, long long *aa2)
-   {long long _lsa1;
-    long long *_laa2;
+int FF_ID(fb6_f, FB6_F)(long long *a1, long long *a2)
+   {long long _la1;
+    long long *_la2;
     int _rv;
 
-    _lsa1      = (long long) *sa1;
-    _laa2      = (long long *) aa2;
+    _la1       = (long long) *a1;
+    _la2       = (long long *) a2;
 
-    _rv = fb6(_lsa1, _laa2);
+    _rv = fb6(_la1, _la2);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-int FF_ID(fb7_f, FB7_F)(float *sa1, float *aa2)
-   {float _lsa1;
-    float *_laa2;
+int FF_ID(fb7_f, FB7_F)(float *a1, float *a2)
+   {float _la1;
+    float *_la2;
     int _rv;
 
-    _lsa1      = (float) *sa1;
-    _laa2      = (float *) aa2;
+    _la1       = (float) *a1;
+    _la2       = (float *) a2;
 
-    _rv = fb7(_lsa1, _laa2);
+    _rv = fb7(_la1, _la2);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-int FF_ID(fb8_f, FB8_F)(double *sa1, double *aa2)
-   {double _lsa1;
-    double *_laa2;
+int FF_ID(fb8_f, FB8_F)(double *a1, double *a2)
+   {double _la1;
+    double *_la2;
     int _rv;
 
-    _lsa1      = (double) *sa1;
-    _laa2      = (double *) aa2;
+    _la1       = (double) *a1;
+    _la2       = (double *) a2;
 
-    _rv = fb8(_lsa1, _laa2);
+    _rv = fb8(_la1, _la2);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-int FF_ID(fb10_f, FB10_F)(float _Complex *sa1, float _Complex **ta2)
-   {float _Complex _lsa1;
-    float _Complex *_lta2;
+int FF_ID(fb10_f, FB10_F)(float _Complex *a1, float _Complex **a2)
+   {float _Complex _la1;
+    float _Complex *_la2;
     int _rv;
 
-    _lsa1      = (float _Complex) *sa1;
-    _lta2      = *(float _Complex **) ta2;
+    _la1       = (float _Complex) *a1;
+    _la2       = *(float _Complex **) a2;
 
-    _rv = fb10(_lsa1, _lta2);
+    _rv = fb10(_la1, _la2);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-int FF_ID(fb11_f, FB11_F)(double _Complex *sa1, double _Complex **ta2)
-   {double _Complex _lsa1;
-    double _Complex *_lta2;
+int FF_ID(fb11_f, FB11_F)(double _Complex *a1, double _Complex **a2)
+   {double _Complex _la1;
+    double _Complex *_la2;
     int _rv;
 
-    _lsa1      = (double _Complex) *sa1;
-    _lta2      = *(double _Complex **) ta2;
+    _la1       = (double _Complex) *a1;
+    _la2       = *(double _Complex **) a2;
 
-    _rv = fb11(_lsa1, _lta2);
+    _rv = fb11(_la1, _la2);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-bool FF_ID(fr1_f, FR1_F)(int *sa1)
-   {int _lsa1;
+bool FF_ID(fr1_f, FR1_F)(int *a1)
+   {int _la1;
     bool _rv;
 
-    _lsa1      = (int) *sa1;
+    _la1       = (int) *a1;
 
-    _rv = fr1(_lsa1);
+    _rv = fr1(_la1);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-char FF_ID(fr2_f, FR2_F)(int *sa1)
-   {int _lsa1;
+char FF_ID(fr2_f, FR2_F)(int *a1)
+   {int _la1;
     char _rv;
 
-    _lsa1      = (int) *sa1;
+    _la1       = (int) *a1;
 
-    _rv = fr2(_lsa1);
+    _rv = fr2(_la1);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-short FF_ID(fr3_f, FR3_F)(int *sa1)
-   {int _lsa1;
+short FF_ID(fr3_f, FR3_F)(int *a1)
+   {int _la1;
     short _rv;
 
-    _lsa1      = (int) *sa1;
+    _la1       = (int) *a1;
 
-    _rv = fr3(_lsa1);
+    _rv = fr3(_la1);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-int FF_ID(fr4_f, FR4_F)(int *sa1)
-   {int _lsa1;
+int FF_ID(fr4_f, FR4_F)(int *a1)
+   {int _la1;
     int _rv;
 
-    _lsa1      = (int) *sa1;
+    _la1       = (int) *a1;
 
-    _rv = fr4(_lsa1);
+    _rv = fr4(_la1);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-long FF_ID(fr5_f, FR5_F)(int *sa1)
-   {int _lsa1;
+long FF_ID(fr5_f, FR5_F)(int *a1)
+   {int _la1;
     long _rv;
 
-    _lsa1      = (int) *sa1;
+    _la1       = (int) *a1;
 
-    _rv = fr5(_lsa1);
+    _rv = fr5(_la1);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-long long FF_ID(fr6_f, FR6_F)(int *sa1)
-   {int _lsa1;
+long long FF_ID(fr6_f, FR6_F)(int *a1)
+   {int _la1;
     long long _rv;
 
-    _lsa1      = (int) *sa1;
+    _la1       = (int) *a1;
 
-    _rv = fr6(_lsa1);
+    _rv = fr6(_la1);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-float FF_ID(fr7_f, FR7_F)(int *sa1)
-   {int _lsa1;
+float FF_ID(fr7_f, FR7_F)(int *a1)
+   {int _la1;
     float _rv;
 
-    _lsa1      = (int) *sa1;
+    _la1       = (int) *a1;
 
-    _rv = fr7(_lsa1);
+    _rv = fr7(_la1);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-double FF_ID(fr8_f, FR8_F)(int *sa1)
-   {int _lsa1;
+double FF_ID(fr8_f, FR8_F)(int *a1)
+   {int _la1;
     double _rv;
 
-    _lsa1      = (int) *sa1;
+    _la1       = (int) *a1;
 
-    _rv = fr8(_lsa1);
+    _rv = fr8(_la1);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-float _Complex FF_ID(fr10_f, FR10_F)(int *sa1)
-   {int _lsa1;
+float _Complex FF_ID(fr10_f, FR10_F)(int *a1)
+   {int _la1;
     float _Complex _rv;
 
-    _lsa1      = (int) *sa1;
+    _la1       = (int) *a1;
 
-    _rv = fr10(_lsa1);
+    _rv = fr10(_la1);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-double _Complex FF_ID(fr11_f, FR11_F)(int *sa1)
-   {int _lsa1;
+double _Complex FF_ID(fr11_f, FR11_F)(int *a1)
+   {int _la1;
     double _Complex _rv;
 
-    _lsa1      = (int) *sa1;
+    _la1       = (int) *a1;
 
-    _rv = fr11(_lsa1);
+    _rv = fr11(_la1);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-str FF_ID(fr13_f, FR13_F)(int *sa1)
-   {int _lsa1;
+str FF_ID(fr13_f, FR13_F)(int *a1)
+   {int _la1;
     str _rv;
 
-    _lsa1      = (int) *sa1;
+    _la1       = (int) *a1;
 
-    _rv = fr13(_lsa1);
+    _rv = fr13(_la1);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-bool *FF_ID(fp1_f, FP1_F)(int *sa1)
-   {int _lsa1;
+bool *FF_ID(fp1_f, FP1_F)(int *a1)
+   {int _la1;
     bool *_rv;
 
-    _lsa1      = (int) *sa1;
+    _la1       = (int) *a1;
 
-    _rv = fp1(_lsa1);
+    _rv = fp1(_la1);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-char *FF_ID(fp2_f, FP2_F)(int *sa1)
-   {int _lsa1;
+char *FF_ID(fp2_f, FP2_F)(int *a1)
+   {int _la1;
     char *_rv;
 
-    _lsa1      = (int) *sa1;
+    _la1       = (int) *a1;
 
-    _rv = fp2(_lsa1);
+    _rv = fp2(_la1);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-short *FF_ID(fp3_f, FP3_F)(int *sa1)
-   {int _lsa1;
+short *FF_ID(fp3_f, FP3_F)(int *a1)
+   {int _la1;
     short *_rv;
 
-    _lsa1      = (int) *sa1;
+    _la1       = (int) *a1;
 
-    _rv = fp3(_lsa1);
+    _rv = fp3(_la1);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-int *FF_ID(fp4_f, FP4_F)(int *sa1)
-   {int _lsa1;
+int *FF_ID(fp4_f, FP4_F)(int *a1)
+   {int _la1;
     int *_rv;
 
-    _lsa1      = (int) *sa1;
+    _la1       = (int) *a1;
 
-    _rv = fp4(_lsa1);
+    _rv = fp4(_la1);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-long *FF_ID(fp5_f, FP5_F)(int *sa1)
-   {int _lsa1;
+long *FF_ID(fp5_f, FP5_F)(int *a1)
+   {int _la1;
     long *_rv;
 
-    _lsa1      = (int) *sa1;
+    _la1       = (int) *a1;
 
-    _rv = fp5(_lsa1);
+    _rv = fp5(_la1);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-long long *FF_ID(fp6_f, FP6_F)(int *sa1)
-   {int _lsa1;
+long long *FF_ID(fp6_f, FP6_F)(int *a1)
+   {int _la1;
     long long *_rv;
 
-    _lsa1      = (int) *sa1;
+    _la1       = (int) *a1;
 
-    _rv = fp6(_lsa1);
+    _rv = fp6(_la1);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-float *FF_ID(fp7_f, FP7_F)(int *sa1)
-   {int _lsa1;
+float *FF_ID(fp7_f, FP7_F)(int *a1)
+   {int _la1;
     float *_rv;
 
-    _lsa1      = (int) *sa1;
+    _la1       = (int) *a1;
 
-    _rv = fp7(_lsa1);
+    _rv = fp7(_la1);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-double *FF_ID(fp8_f, FP8_F)(int *sa1)
-   {int _lsa1;
+double *FF_ID(fp8_f, FP8_F)(int *a1)
+   {int _la1;
     double *_rv;
 
-    _lsa1      = (int) *sa1;
+    _la1       = (int) *a1;
 
-    _rv = fp8(_lsa1);
+    _rv = fp8(_la1);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-FIXNUM FF_ID(fp10_f, FP10_F)(int *sa1)
-   {int _lsa1;
+FIXNUM FF_ID(fp10_f, FP10_F)(int *a1)
+   {int _la1;
     FIXNUM _rv;
     SC_address _adfp10;
 
-    _lsa1      = (int) *sa1;
+    _la1       = (int) *a1;
 
-    _adfp10.memaddr = (void *) fp10(_lsa1);
+    _adfp10.memaddr = (void *) fp10(_la1);
 
     _rv = _adfp10.diskaddr;
 
@@ -424,14 +424,14 @@ FIXNUM FF_ID(fp10_f, FP10_F)(int *sa1)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-FIXNUM FF_ID(fp11_f, FP11_F)(int *sa1)
-   {int _lsa1;
+FIXNUM FF_ID(fp11_f, FP11_F)(int *a1)
+   {int _la1;
     FIXNUM _rv;
     SC_address _adfp11;
 
-    _lsa1      = (int) *sa1;
+    _la1       = (int) *a1;
 
-    _adfp11.memaddr = (void *) fp11(_lsa1);
+    _adfp11.memaddr = (void *) fp11(_la1);
 
     _rv = _adfp11.diskaddr;
 
@@ -440,14 +440,14 @@ FIXNUM FF_ID(fp11_f, FP11_F)(int *sa1)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-FIXNUM FF_ID(fp13_f, FP13_F)(int *sa1)
-   {int _lsa1;
+FIXNUM FF_ID(fp13_f, FP13_F)(int *a1)
+   {int _la1;
     FIXNUM _rv;
     SC_address _adfp13;
 
-    _lsa1      = (int) *sa1;
+    _la1       = (int) *a1;
 
-    _adfp13.memaddr = (void *) fp13(_lsa1);
+    _adfp13.memaddr = (void *) fp13(_la1);
 
     _rv = _adfp13.diskaddr;
 

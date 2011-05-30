@@ -2,14 +2,14 @@
 <!-- -------------------------------------------------------------------- -->
 <!-- -------------------------------------------------------------------- -->
 
-<a name="FE1F"><h2>FE1F</h2></a>
+<a name="FE1"><h2>FE1</h2></a>
 
 <p>
 <pre>
 <i>C Binding: </i>       str *fe1(str *a1, int a2)
-<i>Fortran Binding: </i> void * fe1f_f(void *a1, integer a2)
-<i>SX Binding: </i>      (fe1s a1 a2)
-<i>Python Binding: </i>  pact.fe1p(str *a1, int a2)
+<i>Fortran Binding: </i> integer(isizea) fe1_f(integer(isizea) a1, integer a2)
+<i>SX Binding: </i>      (fe1 a1 a2)
+<i>Python Binding: </i>  pact.fe1(str *a1, int a2)
 </pre>
 <p>
 
@@ -18,14 +18,14 @@
 <!-- -------------------------------------------------------------------- -->
 <!-- -------------------------------------------------------------------- -->
 
-<a name="FE2F"><h2>FE2F</h2></a>
+<a name="FE2"><h2>FE2</h2></a>
 
 <p>
 <pre>
 <i>C Binding: </i>       void fe2(str *dev, double *x, double *y, int n, pcons *info, int l)
-<i>Fortran Binding: </i> fe2f_f(void *dev, void *x, void *y, integer n, void *info, integer l)
-<i>SX Binding: </i>      (fe2s dev x y n info l)
-<i>Python Binding: </i>  pact.fe2p(str *dev, double *x, double *y, int n, pcons *info, int l)
+<i>Fortran Binding: </i> fe2_f(integer(isizea) dev, real(8) x(*), real(8) y(*), integer n, integer(isizea) info, integer l)
+<i>SX Binding: </i>      (fe2 dev x y n info l)
+<i>Python Binding: </i>  pact.fe2(str *dev, double *x, double *y, int n, pcons *info, int l)
 </pre>
 <p>
 

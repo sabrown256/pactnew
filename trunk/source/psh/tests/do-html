@@ -51,6 +51,8 @@ Note $doc '  </head>'
 Note $doc '  <body>'
 
 foreach i (gh*.html)
+   Note $doc "<hr>"
+   Note $doc "<h1>$i</h1>"
    cat $i >> $doc
 end
 
