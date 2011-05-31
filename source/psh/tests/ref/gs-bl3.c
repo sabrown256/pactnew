@@ -8,7 +8,9 @@
 static object *_SXI_fe1(SS_psides *si, object *argl)
    {str *_la1;
     int _la2;
-    void *_rv;
+    str *_rv;
+    long _sz;
+    C_array *_arr;
     object *_lo;
 
     SS_args(si, argl,
@@ -17,7 +19,9 @@ static object *_SXI_fe1(SS_psides *si, object *argl)
             0);
 
     _rv = fe1(_la1, _la2);
-    _lo = SS_null;
+    _sz = SC_arrlen(_rv)/sizeof(str);
+    _arr = PM_make_array("str", _sz, _rv);
+    _lo  = SX_mk_C_array(si, _arr);
 
     return(_lo);}
 

@@ -1941,38 +1941,6 @@ static void fin_module(bindes *bd)
 
 /*--------------------------------------------------------------------------*/
 
-/* SC_TYPE - return C type corresponding to SCHEME type T */
-
-static void sc_type(char *a, int nc, char *t)
-   {
-
-    if (strcmp(t, "char *") == 0)
-       nstrncpy(a, nc, "char *", -1);
-    else if ((is_ptr(t) == TRUE) ||
-	     (strstr(t, "(*") != NULL))
-       nstrncpy(a, nc, "void *", -1);
-    else if (strncmp(t, "PF", 2) == 0)
-       nstrncpy(a, nc, "PFInt", -1);
-    else if ((strncmp(t, "int", 3) == 0) ||
-	     (strncmp(t, "long", 4) == 0) || 
-	     (strncmp(t, "short", 5) == 0) || 
-	     (strncmp(t, "long long", 9) == 0) ||
-	     (strncmp(t, "FIXNUM", 6) == 0))
-       nstrncpy(a, nc, "FIXNUM", -1);
-    else if (strncmp(t, "double", 6) == 0)
-       nstrncpy(a, nc, "double", -1);
-    else if (strncmp(t, "float", 6) == 0)
-       nstrncpy(a, nc, "float", -1);
-    else if (strncmp(t, "void", 4) == 0)
-       nstrncpy(a, nc, "void", -1);
-    else
-       nstrncpy(a, nc, t, -1);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* CS_TYPE - return "Scheme" type corresponding to C type TY */
 
 static void cs_type(char *a, int nc, char *ty)
@@ -1998,25 +1966,51 @@ static void cs_type(char *a, int nc, char *ty)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* CS_DECL_LIST - render the arg list of DCL into A for the
- *              - Scheme to C value extaction
- */
+/* SO_TYPE - return the Scheme object constructor for C type TY */
 
-static void cs_decl_list(char *a, int nc, fdecl *dcl)
-   {int i, na;
-    char ty[MAXLINE];
-    farg *al;
+static fparam so_type(char *a, int nc, char *ty)
+   {fparam rv;
 
-    na = dcl->na;
-    al = dcl->al;
+    rv = FP_SCALAR;
 
-    a[0] = '\0';
-    for (i = 0; i < na; i++)
-        {cs_type(ty, MAXLINE, al[i].type);
-	 vstrcat(a, MAXLINE, "            %s, &_l%s,\n",
-		 ty, al[i].name);};
+    if (strcmp(ty, "char") == 0)
+       nstrncpy(a, nc, "SS_mk_char", -1);
+       
+    else if (strcmp(ty, "char *") == 0)
+       nstrncpy(a, nc, "SS_mk_string", -1);
+       
+    else if (strcmp(ty, "bool") == 0)
+       nstrncpy(a, nc, "SS_mk_boolean", -1);
+       
+    else if ((strcmp(ty, "short") == 0) ||
+	     (strcmp(ty, "int") == 0) ||
+	     (strcmp(ty, "long") == 0) ||
+	     (strcmp(ty, "long long") == 0) ||
+	     (strcmp(ty, "int16_t") == 0) ||
+	     (strcmp(ty, "int32_t") == 0) ||
+	     (strcmp(ty, "int64_t") == 0))
+       nstrncpy(a, nc, "SS_mk_integer", -1);
+       
+    else if ((strcmp(ty, "float") == 0) ||
+	     (strcmp(ty, "double") == 0) ||
+	     (strcmp(ty, "long double") == 0))
+       nstrncpy(a, nc, "SS_mk_float", -1);
+       
+    else if ((strcmp(ty, "float _Complex") == 0) ||
+	     (strcmp(ty, "double _Complex") == 0) ||
+	     (strcmp(ty, "long double _Complex") == 0))
+       nstrncpy(a, nc, "SS_mk_complex", -1);
+       
+    else if (is_ptr(ty) == TRUE)
+       {rv = FP_ARRAY;
+	nstrncpy(a, nc, "SX_mk_C_array", -1);}
 
-    return;}
+/* handle unknown types with a mostly graceful failure */
+    else
+       {rv = FP_ANY;
+	nstrncpy(a, nc, "none", -1);};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -2068,116 +2062,267 @@ static void sc_call_list(char *a, int nc, fdecl *dcl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SCHEME_WRAP_DECL - function declaration */
+
+static void scheme_wrap_decl(FILE *fp, fdecl *dcl)
+   {int na;
+    char dcn[MAXLINE];
+
+    na = dcl->na;
+
+    nstrncpy(dcn, MAXLINE, dcl->name, -1);
+    downcase(dcn);
+
+    fprintf(fp, "\n");
+
+    fprintf(fp, "static object *");
+    fprintf(fp, "_SXI_%s", dcn);
+    if (na == 0)
+       fprintf(fp, "(SS_psides *si)");
+    else
+       fprintf(fp, "(SS_psides *si, object *argl)");
+
+    fprintf(fp, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SCHEME_WRAP_LOCAL_DECL - local variable declarations */
+
+static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
+				   fparam knd, char *so, int voida)
+   {int i, na, nv, voidf;
+    char t[MAXLINE];
+    char *ty, *nm, *rty;
+    farg *al;
+
+    na = dcl->na;
+    al = dcl->al;
+
+    rty = dcl->type;
+
+    voidf = (strcmp(dcl->type, "void") == 0);
+	
+    nv = 0;
+    for (i = 0; i <= na; i++)
+        {if ((voida == TRUE) && (i == 0))
+	    continue;
+
+	 ty = al[i].type;
+	 nm = al[i].name;
+
+	 if (nv == 0)
+	    fprintf(fp, "   {");
+	 else
+	    fprintf(fp, "    ");
+
+	 t[0] = '\0';
+
+/* variable for return value */
+	 if (i == na)
+	    {if (voidf == FALSE)
+	        {snprintf(t, MAXLINE, "%s _rv;\n    ", rty);
+		 if (knd == FP_ARRAY)
+		    {nstrcat(t, MAXLINE, "long _sz;\n");
+		     nstrcat(t, MAXLINE, "    C_array *_arr;\n    ");};};
+
+	     nstrcat(t, MAXLINE, "object *_lo;\n");}
+
+/* local vars */
+	 else if (al[i].name[0] != '\0')
+	    {snprintf(t, MAXLINE, "%s _l%s;\n", ty, nm);
+	     nv++;};
+
+	 if (IS_NULL(t) == FALSE)
+	    fputs(subst(t, "* ", "*", -1), fp);};
+
+    fprintf(fp, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SCHEME_WRAP_LOCAL_ASSN - local variable assignments */
+
+static void scheme_wrap_local_assn(FILE *fp, fdecl *dcl, int voida)
+   {int i, na;
+    char a[MAXLINE], ty[MAXLINE];
+    farg *al;
+
+    if (voida == FALSE)
+       {na = dcl->na;
+	al = dcl->al;
+
+	a[0] = '\0';
+	for (i = 0; i < na; i++)
+	    {cs_type(ty, MAXLINE, al[i].type);
+	     vstrcat(a, MAXLINE, "            %s, &_l%s,\n",
+		     ty, al[i].name);};
+
+	fprintf(fp, "    SS_args(si, argl,\n");
+	fprintf(fp, "%s", a);
+	fprintf(fp, "            0);\n");
+	fprintf(fp, "\n");};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SCHEME_WRAP_LOCAL_CALL - function call */
+
+static void scheme_wrap_local_call(FILE *fp, fdecl *dcl)
+   {char a[MAXLINE], t[MAXLINE];
+    char *ty, *nm;
+
+    ty = dcl->type;
+    nm = dcl->name;
+
+    fc_call_list(a, MAXLINE, dcl);
+
+    if (strcmp(ty, "void") == 0)
+       snprintf(t, MAXLINE, "    %s(%s);\n", nm, a);
+    else
+       snprintf(t, MAXLINE, "    _rv = %s(%s);\n", nm, a);
+
+    fputs(t, fp);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SCHEME_WRAP_LOCAL_RETURN - function return */
+
+static void scheme_wrap_local_return(FILE *fp, fdecl *dcl,
+				     fparam knd, char *so)
+   {char t[MAXLINE], dty[MAXLINE];
+    char *ty, *nm;
+
+    ty = dcl->type;
+    nm = dcl->name;
+
+    if (strcmp(ty, "void") == 0)
+       snprintf(t, MAXLINE, "    _lo = SS_null;\n");
+    else
+       {if (IS_NULL(so) == FALSE)
+	   {switch (knd)
+	       {case FP_ANY :
+		     snprintf(t, MAXLINE,
+			      "\n/* no way to return '%s' */\n", ty);
+		     nstrcat(t, MAXLINE, "    _lo = SS_null;\n");
+		     break;
+
+	        case FP_ARRAY :
+		     deref(dty, MAXLINE, ty);
+		     snprintf(t, MAXLINE,
+			      "    _sz = SC_arrlen(_rv)/sizeof(%s);\n",
+			      dty);
+		     vstrcat(t, MAXLINE,
+			     "    _arr = PM_make_array(\"%s\", _sz, _rv);\n",
+			     dty);
+		     vstrcat(t, MAXLINE, "    _lo  = %s(si, _arr);\n", so);
+		     break;
+	        default :
+                     if (strcmp(ty, "bool") == 0)
+		        snprintf(t, MAXLINE, "    _lo = %s(si, \"g\", (int) _rv);\n",
+				 so);
+		     else
+		        snprintf(t, MAXLINE, "    _lo = %s(si, _rv);\n", so);
+		     break;};}
+	else
+	   snprintf(t, MAXLINE, "    _lo = SS_null;\n");};
+    fputs(t, fp);
+
+    fprintf(fp, "\n");
+
+    fprintf(fp, "    return(_lo);}\n");
+    fprintf(fp, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SCHEME_WRAP_INSTALL - add the installation of the function */
+
+static char **scheme_wrap_install(char **fl, fdecl *dcl, char *sfn,
+				  char **com)
+   {int voidf;
+    char a[MAXLINE], t[MAXLINE], dcn[MAXLINE];
+
+    voidf = (strcmp(dcl->type, "void") == 0);
+	
+    nstrncpy(dcn, MAXLINE, dcl->name, -1);
+    downcase(dcn);
+
+/* prepare the function inline documenation */
+    concatenate(t, MAXLINE, com, " ");
+    if (IS_NULL(t) == TRUE)
+       {sc_call_list(a, MAXLINE, dcl);
+	if (voidf == FALSE)
+	   snprintf(t, MAXLINE, "Procedure: %s\\n     Usage: (%s %s)",
+		    sfn, sfn, a);
+	else
+	   snprintf(t, MAXLINE, "Procedure: %s\\n     Usage: (%s)",
+		    sfn, sfn);};
+
+/* add the installation of the function */
+    if (voidf == FALSE)
+       snprintf(a, MAXLINE, 
+		"    SS_install(si, \"%s\",\n               \"%s\",\n               SS_nargs,\n               _SXI_%s, SS_PR_PROC);\n\n",
+		sfn, t, dcn);
+    else
+       snprintf(a, MAXLINE, 
+		"    SS_install(si, \"%s\",\n               \"%s\",\n               SS_zargs,\n               _SXI_%s, SS_PR_PROC);\n\n",
+		sfn, t, dcn);
+
+    fl = lst_add(fl, a);
+
+    return(fl);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SCHEME_WRAP - wrap C function DCL in SCHEME callable function
  *             - using name FFN
  */
 
 static char **scheme_wrap(FILE *fp, char **fl, fdecl *dcl,
 			  char *sfn, char **com)
-   {int i, na, nv, voidf, voida;
-    char usn[MAXLINE], dcn[MAXLINE];
-    char a[MAXLINE], rt[MAXLINE], t[MAXLINE];
-    farg *al;
+   {int voida;
+    fparam knd;
+    char so[MAXLINE];
 
     if (strcmp(sfn, "none") != 0)
-       {na    = dcl->na;
-	al    = dcl->al;
-	voidf = (strcmp(dcl->type, "void") == 0);
-	voida = no_args(dcl);
-
-	nstrncpy(dcn, MAXLINE, dcl->name, -1);
-	downcase(dcn);
-
-	nstrncpy(usn, MAXLINE, sfn, -1);
-	upcase(usn);
-
-	sc_type(rt, MAXLINE, dcl->type);
+       {voida = no_args(dcl);
 
 	csep(fp);
-	fprintf(fp, "\n");
 
-	fprintf(fp, "static object *");
-	fprintf(fp, "_SXI_%s", dcn);
-	if (na == 0)
-	   fprintf(fp, "(SS_psides *si)");
-	else
-	   fprintf(fp, "(SS_psides *si, object *argl)");
-	fprintf(fp, "\n");
+	knd = so_type(so, MAXLINE, dcl->type);
+	
+/* function declaration */
+	scheme_wrap_decl(fp, dcl);
 
 /* local variable declarations */
-	nv = 0;
-	for (i = 0; i <= na; i++)
-	    {if ((voida == TRUE) && (i == 0))
-		continue;
+	scheme_wrap_local_decl(fp, dcl, knd, so, voida);
 
-	     if (nv == 0)
-	        fprintf(fp, "   {");
-	     else
-	        fprintf(fp, "    ");
-
-	     t[0] = '\0';
-
-/* variable for return value */
-	     if (i == na)
-	        {if (voidf == FALSE)
-		    snprintf(t, MAXLINE, "%s _rv;\n    ", rt);
-
-		 nstrcat(t, MAXLINE, "object *_lo;\n");}
-
-/* local vars */
-	     else if (al[i].name[0] != '\0')
-	        {snprintf(t, MAXLINE, "%s _l%s;\n", al[i].type, al[i].name);
-		 nv++;};
-
-	     if (IS_NULL(t) == FALSE)
-	        fputs(subst(t, "* ", "*", -1), fp);};
-
-	fprintf(fp, "\n");
-
-	if (voida == FALSE)
-	   {cs_decl_list(a, MAXLINE, dcl);
-	    fprintf(fp, "    SS_args(si, argl,\n");
-	    fprintf(fp, "%s", a);
-	    fprintf(fp, "            0);\n");
-	    fprintf(fp, "\n");};
+/* local variable assignments */
+	scheme_wrap_local_assn(fp, dcl, voida);
 
 /* function call */
-	fc_call_list(a, MAXLINE, dcl);
-	if (voidf == FALSE)
-	   fprintf(fp, "    _rv = %s(%s);\n", dcl->name, a);
-	else
-	   fprintf(fp, "    %s(%s);\n", dcl->name, a);
+	scheme_wrap_local_call(fp, dcl);
 
-	fprintf(fp, "    _lo = SS_null;\n");
-	fprintf(fp, "\n");
+/* function return */
+	scheme_wrap_local_return(fp, dcl, knd, so);
 
-	fprintf(fp, "    return(_lo);}\n");
-
-	fprintf(fp, "\n");
 	csep(fp);
 
-/* prepare the function inline documenation */
-	concatenate(t, MAXLINE, com, " ");
-	if (IS_NULL(t) == TRUE)
-	   {sc_call_list(a, MAXLINE, dcl);
-	    if (voidf == FALSE)
-	       snprintf(t, MAXLINE, "Procedure: %s\\n     Usage: (%s %s)",
-			sfn, sfn, a);
-	    else
-	       snprintf(t, MAXLINE, "Procedure: %s\\n     Usage: (%s)",
-			sfn, sfn);};
-
 /* add the installation of the function */
-	if (voidf == FALSE)
-	   snprintf(a, MAXLINE, 
-		    "    SS_install(si, \"%s\",\n               \"%s\",\n               SS_nargs,\n               _SXI_%s, SS_PR_PROC);\n\n",
-		    sfn, t, dcn);
-	else
-	   snprintf(a, MAXLINE, 
-		    "    SS_install(si, \"%s\",\n               \"%s\",\n               SS_zargs,\n               _SXI_%s, SS_PR_PROC);\n\n",
-		    sfn, t, dcn);
-
-	fl = lst_add(fl, a);};
+	fl = scheme_wrap_install(fl, dcl, sfn, com);};
 
     return(fl);}
 
