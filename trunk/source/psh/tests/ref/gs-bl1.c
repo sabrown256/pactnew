@@ -17,11 +17,11 @@ static object *_SXI_fav1(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 
 static object *_SXI_fav2(SS_psides *si, object *argl)
-   {FIXNUM _rv;
+   {int _rv;
     object *_lo;
 
     _rv = fav2();
-    _lo = SS_null;
+    _lo = SS_mk_integer(si, _rv);
 
     return(_lo);}
 
@@ -33,7 +33,7 @@ static object *_SXI_fav3(SS_psides *si, object *argl)
     object *_lo;
 
     _rv = fav3();
-    _lo = SS_null;
+    _lo = SS_mk_float(si, _rv);
 
     return(_lo);}
 
@@ -45,6 +45,8 @@ static object *_SXI_fav4(SS_psides *si, object *argl)
     object *_lo;
 
     _rv = fav4();
+
+/* no way to return 'str' */
     _lo = SS_null;
 
     return(_lo);}
@@ -54,10 +56,14 @@ static object *_SXI_fav4(SS_psides *si, object *argl)
 
 static object *_SXI_favp1(SS_psides *si, object *argl)
    {void *_rv;
+    long _sz;
+    C_array *_arr;
     object *_lo;
 
     _rv = favp1();
-    _lo = SS_null;
+    _sz = SC_arrlen(_rv)/sizeof(void);
+    _arr = PM_make_array("void", _sz, _rv);
+    _lo  = SX_mk_C_array(si, _arr);
 
     return(_lo);}
 
@@ -65,11 +71,15 @@ static object *_SXI_favp1(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 
 static object *_SXI_favp2(SS_psides *si, object *argl)
-   {void *_rv;
+   {int *_rv;
+    long _sz;
+    C_array *_arr;
     object *_lo;
 
     _rv = favp2();
-    _lo = SS_null;
+    _sz = SC_arrlen(_rv)/sizeof(int);
+    _arr = PM_make_array("int", _sz, _rv);
+    _lo  = SX_mk_C_array(si, _arr);
 
     return(_lo);}
 
@@ -77,11 +87,15 @@ static object *_SXI_favp2(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 
 static object *_SXI_favp3(SS_psides *si, object *argl)
-   {void *_rv;
+   {double *_rv;
+    long _sz;
+    C_array *_arr;
     object *_lo;
 
     _rv = favp3();
-    _lo = SS_null;
+    _sz = SC_arrlen(_rv)/sizeof(double);
+    _arr = PM_make_array("double", _sz, _rv);
+    _lo  = SX_mk_C_array(si, _arr);
 
     return(_lo);}
 
@@ -89,11 +103,15 @@ static object *_SXI_favp3(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 
 static object *_SXI_favp4(SS_psides *si, object *argl)
-   {void *_rv;
+   {str *_rv;
+    long _sz;
+    C_array *_arr;
     object *_lo;
 
     _rv = favp4();
-    _lo = SS_null;
+    _sz = SC_arrlen(_rv)/sizeof(str);
+    _arr = PM_make_array("str", _sz, _rv);
+    _lo  = SX_mk_C_array(si, _arr);
 
     return(_lo);}
 

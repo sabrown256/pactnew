@@ -25,7 +25,7 @@ static object *_SXI_fbcv1(SS_psides *si, object *argl)
             0);
 
     _rv = fbcv1(_la, _lb, _lc, _ld, _le, _lf);
-    _lo = SS_null;
+    _lo = SS_mk_string(si, _rv);
 
     return(_lo);}
 
@@ -48,7 +48,7 @@ static object *_SXI_fbmcv1(SS_psides *si, object *argl)
             0);
 
     _rv = fbmcv1(_la, _lb, _lc, _ld);
-    _lo = SS_null;
+    _lo = SS_mk_string(si, _rv);
 
     return(_lo);}
 
@@ -71,7 +71,7 @@ static object *_SXI_fbmcr2(SS_psides *si, object *argl)
             0);
 
     _rv = fbmcr2(_la, _lb, _lc, _ld);
-    _lo = SS_null;
+    _lo = SS_mk_string(si, _rv);
 
     return(_lo);}
 
