@@ -63,8 +63,8 @@ void SX_install_bl3_bindings(SS_psides *si)
                _SXI_fe1, SS_PR_PROC);
 
     SS_install(si, "fe2s",
-               "Procedure: fe2s\n     Usage: (fe2s)",
-               SS_zargs,
+               "Procedure: fe2s\n     Usage: (fe2s dev x y n info l)",
+               SS_nargs,
                _SXI_fe2, SS_PR_PROC);
 
    return;}

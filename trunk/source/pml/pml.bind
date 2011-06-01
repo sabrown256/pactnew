@@ -10,24 +10,24 @@
 #  C function		Fortran	Scheme		Python
 
 # MLCHKSM.C
-PM_checksum_array	yes	none            none
+PM_checksum_array	yes	yes            none
 
 # MLFIA.C
-PM_next_exp_two		yes	none            none
-PM_fft_sc_real_data	yes	none            none
+PM_next_exp_two		yes	yes            none
+PM_fft_sc_real_data	yes	yes            none
 PM_fft_sc_complex_data	yes     none            none
 PM_enable_fpe		yes     none            none
-PM_fp_typef		yes	none            none
-PM_fp_typed		yes	none            none
-PM_fix_nanf		yes	none            none
-PM_count_nanf		yes	none            none
-PM_fix_nand		yes	none            none
-PM_count_nand		yes	none            none
+PM_fp_typef		yes	yes            none
+PM_fp_typed		yes	yes            none
+PM_fix_nanf		yes	yes            none
+PM_count_nanf		yes	yes            none
+PM_fix_nand		yes	yes            none
+PM_count_nand		yes	yes            none
 #FIXNUM F77_FUNC(pmbset, PMBSET)(FIXNUM *pn, F77_string fname, FIXNUM *pt,
 #FIXNUM F77_FUNC(pmeset, PMESET)(FIXNUM *iset)
 #FIXNUM F77_FUNC(pmaset, PMASET)(FIXNUM *iset, FIXNUM *pie, void *px)
 #FIXNUM F77_FUNC(pmmtop, PMMTOP)(FIXNUM *pnd, FIXNUM *pnc, FIXNUM *pbp,
 
 # MLRAND.C
-PM_random_48		yes	none            none
-PM_random_s		yes	none            none
+PM_random_48		yes	yes            none
+PM_random_s		yes	yes            none
