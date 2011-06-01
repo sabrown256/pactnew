@@ -614,163 +614,163 @@ static object *_SXI_fp13(SS_psides *si, object *argl)
 void SX_install_bl4_bindings(SS_psides *si)
    {
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1 a2)",
+    SS_install(si, "fb1",
+               "Procedure: fb1\n     Usage: (fb1 a1 a2)",
                SS_nargs,
                _SXI_fb1, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1 a2)",
+    SS_install(si, "fb2",
+               "Procedure: fb2\n     Usage: (fb2 a1 a2)",
                SS_nargs,
                _SXI_fb2, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1 a2)",
+    SS_install(si, "fb3",
+               "Procedure: fb3\n     Usage: (fb3 a1 a2)",
                SS_nargs,
                _SXI_fb3, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1 a2)",
+    SS_install(si, "fb4",
+               "Procedure: fb4\n     Usage: (fb4 a1 a2)",
                SS_nargs,
                _SXI_fb4, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1 a2)",
+    SS_install(si, "fb5",
+               "Procedure: fb5\n     Usage: (fb5 a1 a2)",
                SS_nargs,
                _SXI_fb5, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1 a2)",
+    SS_install(si, "fb6",
+               "Procedure: fb6\n     Usage: (fb6 a1 a2)",
                SS_nargs,
                _SXI_fb6, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1 a2)",
+    SS_install(si, "fb7",
+               "Procedure: fb7\n     Usage: (fb7 a1 a2)",
                SS_nargs,
                _SXI_fb7, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1 a2)",
+    SS_install(si, "fb8",
+               "Procedure: fb8\n     Usage: (fb8 a1 a2)",
                SS_nargs,
                _SXI_fb8, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1 a2)",
+    SS_install(si, "fb10",
+               "Procedure: fb10\n     Usage: (fb10 a1 a2)",
                SS_nargs,
                _SXI_fb10, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1 a2)",
+    SS_install(si, "fb11",
+               "Procedure: fb11\n     Usage: (fb11 a1 a2)",
                SS_nargs,
                _SXI_fb11, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1)",
+    SS_install(si, "fr1",
+               "Procedure: fr1\n     Usage: (fr1 a1)",
                SS_nargs,
                _SXI_fr1, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1)",
+    SS_install(si, "fr2",
+               "Procedure: fr2\n     Usage: (fr2 a1)",
                SS_nargs,
                _SXI_fr2, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1)",
+    SS_install(si, "fr3",
+               "Procedure: fr3\n     Usage: (fr3 a1)",
                SS_nargs,
                _SXI_fr3, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1)",
+    SS_install(si, "fr4",
+               "Procedure: fr4\n     Usage: (fr4 a1)",
                SS_nargs,
                _SXI_fr4, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1)",
+    SS_install(si, "fr5",
+               "Procedure: fr5\n     Usage: (fr5 a1)",
                SS_nargs,
                _SXI_fr5, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1)",
+    SS_install(si, "fr6",
+               "Procedure: fr6\n     Usage: (fr6 a1)",
                SS_nargs,
                _SXI_fr6, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1)",
+    SS_install(si, "fr7",
+               "Procedure: fr7\n     Usage: (fr7 a1)",
                SS_nargs,
                _SXI_fr7, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1)",
+    SS_install(si, "fr8",
+               "Procedure: fr8\n     Usage: (fr8 a1)",
                SS_nargs,
                _SXI_fr8, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1)",
+    SS_install(si, "fr10",
+               "Procedure: fr10\n     Usage: (fr10 a1)",
                SS_nargs,
                _SXI_fr10, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1)",
+    SS_install(si, "fr11",
+               "Procedure: fr11\n     Usage: (fr11 a1)",
                SS_nargs,
                _SXI_fr11, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1)",
+    SS_install(si, "fr13",
+               "Procedure: fr13\n     Usage: (fr13 a1)",
                SS_nargs,
                _SXI_fr13, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1)",
+    SS_install(si, "fp1",
+               "Procedure: fp1\n     Usage: (fp1 a1)",
                SS_nargs,
                _SXI_fp1, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1)",
+    SS_install(si, "fp2",
+               "Procedure: fp2\n     Usage: (fp2 a1)",
                SS_nargs,
                _SXI_fp2, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1)",
+    SS_install(si, "fp3",
+               "Procedure: fp3\n     Usage: (fp3 a1)",
                SS_nargs,
                _SXI_fp3, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1)",
+    SS_install(si, "fp4",
+               "Procedure: fp4\n     Usage: (fp4 a1)",
                SS_nargs,
                _SXI_fp4, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1)",
+    SS_install(si, "fp5",
+               "Procedure: fp5\n     Usage: (fp5 a1)",
                SS_nargs,
                _SXI_fp5, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1)",
+    SS_install(si, "fp6",
+               "Procedure: fp6\n     Usage: (fp6 a1)",
                SS_nargs,
                _SXI_fp6, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1)",
+    SS_install(si, "fp7",
+               "Procedure: fp7\n     Usage: (fp7 a1)",
                SS_nargs,
                _SXI_fp7, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1)",
+    SS_install(si, "fp8",
+               "Procedure: fp8\n     Usage: (fp8 a1)",
                SS_nargs,
                _SXI_fp8, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1)",
+    SS_install(si, "fp10",
+               "Procedure: fp10\n     Usage: (fp10 a1)",
                SS_nargs,
                _SXI_fp10, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1)",
+    SS_install(si, "fp11",
+               "Procedure: fp11\n     Usage: (fp11 a1)",
                SS_nargs,
                _SXI_fp11, SS_PR_PROC);
 
-    SS_install(si, "yes",
-               "Procedure: yes\n     Usage: (yes a1)",
+    SS_install(si, "fp13",
+               "Procedure: fp13\n     Usage: (fp13 a1)",
                SS_nargs,
                _SXI_fp13, SS_PR_PROC);
 

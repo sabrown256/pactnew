@@ -10,28 +10,28 @@
 #  C function		Fortran	Scheme		Python
 
 # PAFIA.C
-PA_intern		yes	none            none
-PA_get_access		yes	none            none
-PA_rel_access		yes	none            none
-PA_control_set		yes	none            none
-PA_error		yes	none            none
-PA_get_default_offset	yes	none            none
-PA_set_default_offset	yes	none            none
-PA_set_equiv		yes	none            none
-PA_equivalence		yes	none            none
+PA_intern		yes	yes            none
+PA_get_access		yes	yes            none
+PA_rel_access		yes	yes            none
+PA_control_set		yes	yes            none
+PA_error		yes	yes            none
+PA_get_default_offset	yes	yes            none
+PA_set_default_offset	yes	yes            none
+PA_set_equiv		yes	yes            none
+PA_equivalence		yes	yes            none
 #FIXNUM F77_FUNC(pamcon, PAMCON)(FIXNUM *pnc, char **pvn, void **pp, FIXNUM *pn)
 #FIXNUM F77_FUNC(paloca, PALOCA)(void **pv, FIXNUM *pbpi, FIXNUM *pn, ...)
 #FIXNUM F77_FUNC(palloc, PALLOC)(void **pv, FIXNUM *pnc,
 
 # PANTH.C
-PA_th_write		yes	none            none
-PA_th_wr_member		yes	none            none
-PA_th_wr_iattr		yes	none            none
-PA_th_trans_family	yes	none            none
-PA_th_trans_name	yes	none            none
-PA_th_trans_link	yes	none            none
-PA_merge_family		yes	none            none
-PA_merge_files		yes	none            none
+PA_th_write		yes	yes            none
+PA_th_wr_member		yes	yes            none
+PA_th_wr_iattr		yes	yes            none
+PA_th_trans_family	yes	yes            none
+PA_th_trans_name	yes	yes            none
+PA_th_trans_link	yes	yes            none
+PA_merge_family		yes	yes            none
+PA_merge_files		yes	yes            none
 #FIXNUM F77_FUNC(pathop, PATHOP)(FIXNUM *pnf, F77_string fname, FIXNUM *pnm,
 #FIXNUM F77_FUNC(pathfm, PATHFM)(FIXNUM *fileid)
 #FIXNUM F77_FUNC(pabrec, PABREC)(FIXNUM *fileid, FIXNUM *pnf, F77_string fname,

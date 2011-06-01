@@ -127,38 +127,38 @@ void SX_install_bl1_bindings(SS_psides *si)
                _SXI_fav1, SS_PR_PROC);
 
     SS_install(si, "fav2s",
-               "Procedure: fav2s\n     Usage: (fav2s )",
-               SS_nargs,
+               "Procedure: fav2s\n     Usage: (fav2s)",
+               SS_zargs,
                _SXI_fav2, SS_PR_PROC);
 
     SS_install(si, "fav3s",
-               "Procedure: fav3s\n     Usage: (fav3s )",
-               SS_nargs,
+               "Procedure: fav3s\n     Usage: (fav3s)",
+               SS_zargs,
                _SXI_fav3, SS_PR_PROC);
 
     SS_install(si, "fav4s",
-               "Procedure: fav4s\n     Usage: (fav4s )",
-               SS_nargs,
+               "Procedure: fav4s\n     Usage: (fav4s)",
+               SS_zargs,
                _SXI_fav4, SS_PR_PROC);
 
     SS_install(si, "favp1s",
-               "Procedure: favp1s\n     Usage: (favp1s )",
-               SS_nargs,
+               "Procedure: favp1s\n     Usage: (favp1s)",
+               SS_zargs,
                _SXI_favp1, SS_PR_PROC);
 
     SS_install(si, "favp2s",
-               "Procedure: favp2s\n     Usage: (favp2s )",
-               SS_nargs,
+               "Procedure: favp2s\n     Usage: (favp2s)",
+               SS_zargs,
                _SXI_favp2, SS_PR_PROC);
 
     SS_install(si, "favp3s",
-               "Procedure: favp3s\n     Usage: (favp3s )",
-               SS_nargs,
+               "Procedure: favp3s\n     Usage: (favp3s)",
+               SS_zargs,
                _SXI_favp3, SS_PR_PROC);
 
     SS_install(si, "favp4s",
-               "Procedure: favp4s\n     Usage: (favp4s )",
-               SS_nargs,
+               "Procedure: favp4s\n     Usage: (favp4s)",
+               SS_zargs,
                _SXI_favp4, SS_PR_PROC);
 
    return;}

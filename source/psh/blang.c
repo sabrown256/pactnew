@@ -620,7 +620,7 @@ static void add_derived_types(char **sbi)
 
 /* MAP_NAME - map the C function name S to form target language */
 
-static char *map_name(char *d, int nc, char *s, char *sfx, int cs)
+static char *map_name(char *d, int nc, char *s, char *sfx, int cs, int us)
    {
 
     if (sfx != NULL)
@@ -635,6 +635,10 @@ static char *map_name(char *d, int nc, char *s, char *sfx, int cs)
 	case 1 :
 	     upcase(d);
 	     break;};
+
+/* map underscore to dash */
+    if (us == TRUE)
+       memmove(d, subst(d, "_", "-", -1), nc);
 
     return(d);}
 
@@ -897,7 +901,7 @@ static void fortran_wrap_decl(FILE *fp, fdecl *dcl,
 			      fparam knd, char *rt, char *cfn)
    {char ucn[MAXLINE], dcn[MAXLINE], a[MAXLINE], t[MAXLINE];
 
-    map_name(dcn, MAXLINE, cfn, "f", -1);
+    map_name(dcn, MAXLINE, cfn, "f", -1, FALSE);
 
     nstrncpy(ucn, MAXLINE, dcn, -1);
     upcase(ucn);
@@ -1659,7 +1663,7 @@ static void module_itf_wrap_ext(FILE *fp, char *pck, fdecl *dcl,
 
 /* declare the incomplete ones as external */
     if ((module_itf_wrappable(dcl) == FALSE) && (strcmp(ffn, "none") != 0))
-       {map_name(dcn, MAXLINE, cfn, "f", -1);
+       {map_name(dcn, MAXLINE, cfn, "f", -1, FALSE);
 
 	if (mc_need_ptr(dcl) == TRUE)
 	   {if (first == TRUE)
@@ -1697,7 +1701,7 @@ static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
 
 /* emit complete declarations */
     if ((module_itf_wrappable(dcl) == TRUE) && (strcmp(ffn, "none") != 0))
-       {map_name(dcn, MAXLINE, cfn, "f", -1);
+       {map_name(dcn, MAXLINE, cfn, "f", -1, FALSE);
 
 	rty   = dcl->type;
 	na    = dcl->na;
@@ -1761,7 +1765,7 @@ static void module_interop_wrap(FILE *fp, fdecl *dcl, char *cfn)
        berr("%s is not interoperable - variable args", cfn);
 
     else
-       {map_name(dcn, MAXLINE, cfn, "i", -1);
+       {map_name(dcn, MAXLINE, cfn, "i", -1, FALSE);
 
 	rty   = dcl->type;
 	na    = dcl->na;
@@ -2250,35 +2254,37 @@ static void scheme_wrap_local_return(FILE *fp, fdecl *dcl,
 /* SCHEME_WRAP_INSTALL - add the installation of the function */
 
 static char **scheme_wrap_install(char **fl, fdecl *dcl, char *sfn,
-				  char **com)
-   {int voidf;
-    char a[MAXLINE], t[MAXLINE], dcn[MAXLINE];
+				  int voida, char **com)
+   {char a[MAXLINE], t[MAXLINE], dcn[MAXLINE], ifn[MAXLINE];
+    char *pi;
 
-    voidf = (strcmp(dcl->type, "void") == 0);
-	
     nstrncpy(dcn, MAXLINE, dcl->name, -1);
     downcase(dcn);
+
+/* make the scheme interpreter name */
+    pi = (strcmp(sfn, "yes") == 0) ? dcl->name : sfn;
+    map_name(ifn, MAXLINE, pi, NULL, -1, TRUE);
 
 /* prepare the function inline documenation */
     concatenate(t, MAXLINE, com, " ");
     if (IS_NULL(t) == TRUE)
        {sc_call_list(a, MAXLINE, dcl);
-	if (voidf == FALSE)
+	if (voida == FALSE)
 	   snprintf(t, MAXLINE, "Procedure: %s\\n     Usage: (%s %s)",
-		    sfn, sfn, a);
+		    ifn, ifn, a);
 	else
 	   snprintf(t, MAXLINE, "Procedure: %s\\n     Usage: (%s)",
-		    sfn, sfn);};
+		    ifn, ifn);};
 
 /* add the installation of the function */
-    if (voidf == FALSE)
+    if (voida == FALSE)
        snprintf(a, MAXLINE, 
 		"    SS_install(si, \"%s\",\n               \"%s\",\n               SS_nargs,\n               _SXI_%s, SS_PR_PROC);\n\n",
-		sfn, t, dcn);
+		ifn, t, dcn);
     else
        snprintf(a, MAXLINE, 
 		"    SS_install(si, \"%s\",\n               \"%s\",\n               SS_zargs,\n               _SXI_%s, SS_PR_PROC);\n\n",
-		sfn, t, dcn);
+		ifn, t, dcn);
 
     fl = lst_add(fl, a);
 
@@ -2322,7 +2328,7 @@ static char **scheme_wrap(FILE *fp, char **fl, fdecl *dcl,
 	csep(fp);
 
 /* add the installation of the function */
-	fl = scheme_wrap_install(fl, dcl, sfn, com);};
+	fl = scheme_wrap_install(fl, dcl, sfn, voida, com);};
 
     return(fl);}
 
@@ -2655,7 +2661,7 @@ static void doc_wrap(FILE *fp, fdecl *dcl, char *cfn, char **fn, char **com)
        {args = dcl->tfproto;
 
 	doc_proto_fortran(af, MAXLINE, dcl);
-	map_name(dcn, MAXLINE, args[1], "f", -1);
+	map_name(dcn, MAXLINE, args[1], "f", -1, FALSE);
 	if (voidf == TRUE)
 	   fprintf(fp, "<i>Fortran Binding: </i> %s(%s)\n",
 		   dcn, af);
@@ -2667,7 +2673,7 @@ static void doc_wrap(FILE *fp, fdecl *dcl, char *cfn, char **fn, char **com)
     if (strcmp(fn[1], "none") == 0)
        fprintf(fp, "<i>SX Binding: </i>         none\n");
     else
-       {map_name(dcn, MAXLINE, cfn, NULL, -1);
+       {map_name(dcn, MAXLINE, cfn, NULL, -1, TRUE);
 	doc_proto_scheme(as, MAXLINE, dcl);
 	if (IS_NULL(as) == TRUE)
 	   fprintf(fp, "<i>SX Binding: </i>      (%s)\n", dcn);
@@ -2676,9 +2682,9 @@ static void doc_wrap(FILE *fp, fdecl *dcl, char *cfn, char **fn, char **com)
 
 /* Python */
     if (strcmp(fn[2], "none") == 0)
-       fprintf(fp, "<i>Python Binding: </i>     none\n");
+       fprintf(fp, "<i>Python Binding: </i>  none\n");
     else
-       {map_name(dcn, MAXLINE, cfn, NULL, -1);
+       {map_name(dcn, MAXLINE, cfn, NULL, -1, FALSE);
 	doc_proto_python(ap, MAXLINE, dcl);
 	fprintf(fp, "<i>Python Binding: </i>  pact.%s(%s)\n", dcn, ap);};
 
