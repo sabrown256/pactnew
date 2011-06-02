@@ -67,7 +67,7 @@ PG_query_window			yes	yes              none
 PG_plot_curve			yes	yes              none
 PG_read_interface		yes	yes              none
 PG_release_current_device	yes	yes              none
-PG_register_device		yes	yes              none
+PG_register_device		yes	none             none
 PG_register_callback		yes	none             none
 PG_register_variable		yes	yes              none
 PG_restore_view_attributes	yes	yes              none

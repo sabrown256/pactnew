@@ -1,0 +1,21 @@
+#
+# BL5.PROTO - function pointer blang test prototypes
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+void a_f1(PFDouble a)
+void a_f2(int (*b)(int *a))
+void a_f3(PFDouble a, int (*b)(int *a))
+void a_f4(int (*b)(int *a), PFDouble a)
+
+void B_f1(PFDouble a, int b)
+void B_f2(int (*a)(int *a), int b)
+void B_f3(PFDouble a, int (*b)(int *a), int c)
+void B_f4(int (*a)(int *a), PFDouble b, int c)
+void B_f5(int a, PFDouble b, int (*c)(int *a))
+void B_f6(int a, int (*b)(int *a), PFDouble c)
+
