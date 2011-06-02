@@ -205,19 +205,21 @@ static int split_decl(char *type, int nt, char *name, int nn, char *s)
 /* handle function pointer case which would be like '(*f' here */
     if (*pn == '(')
        {nstrncpy(name, nn, pn+2, -1);
-
 	*pn = '\0';
+	nstrncpy(type, nt, s, -1);
 
-	strcpy(type, "PFInt");
+	rv = TRUE;}
+
+    else if (strncmp(p, "PF", 2) == 0)
+       {nstrncpy(name, nn, pn, -1);
+	nstrncpy(type, nt, s, -1);
 
 	rv = TRUE;}
 
 /* handle other args */
     else
        {nstrncpy(name, nn, pn, -1);
-
 	*pn = '\0';
-
 	nstrncpy(type, nt, trim(p, BACK, " \t"), -1);
 
 	rv = FALSE;};
@@ -724,12 +726,12 @@ static fparam fc_type(char *wty, int nc, char *ty, langmode mode)
 
 /* handle function pointer */
     else if (strstr(ty, "(*") != NULL)
-       {nstrncpy(wty, nc, "void *", -1);
+       {nstrncpy(wty, nc, ty, -1);
 	rv = FP_FNC;}
 
 /* follow the PACT function pointer PF convention */
     else if (strncmp(ty, "PF", 2) == 0)
-       {nstrncpy(wty, nc, "PFInt", -1);
+       {nstrncpy(wty, nc, ty, -1);
 	rv = FP_FNC;}
 
     else if (pty != NULL)
@@ -793,8 +795,8 @@ static void fc_decl_list(char *a, int nc, fdecl *dcl)
 
 	     switch (knd)
 	        {case FP_FNC :
-		      vstrcat(a, MAXLINE, "%s %s, ", ty, nm);
-		      break;
+		      vstrcat(a, MAXLINE, "%s, ", ty);
+ 		      break;
 		 case FP_ARRAY :
 		      if ((dcl->nc == 0) && (strcmp(ty, "char *") == 0))
 			 dcl->cargs = lst_push(dcl->cargs, nm);
@@ -832,7 +834,7 @@ static void fc_decl_list(char *a, int nc, fdecl *dcl)
  *              - C function call
  */
 
-static void fc_call_list(char *a, int nc, fdecl *dcl)
+static void fc_call_list(char *a, int nc, fdecl *dcl, int local)
    {int i, na, voida;
     farg *al;
 
@@ -844,7 +846,10 @@ static void fc_call_list(char *a, int nc, fdecl *dcl)
     a[0] = '\0';
     if (voida == FALSE)
        {for (i = 0; i < na; i++)
-	    vstrcat(a, MAXLINE, "_l%s, ", al[i].name);
+	    {if ((al[i].knd == FP_FNC) && (local == FALSE))
+	        vstrcat(a, MAXLINE, "%s, ", al[i].name);
+	     else
+	        vstrcat(a, MAXLINE, "_l%s, ", al[i].name);};
 
 	a[strlen(a) - 2] = '\0';};
 
@@ -956,11 +961,9 @@ static void fortran_wrap_local_decl(FILE *fp, fdecl *dcl,
 	    continue;
 
 	 if (nv == 0)
-	    fprintf(fp, "   {");
+	    snprintf(t, MAXLINE, "   {");
 	 else
-	    fprintf(fp, "    ");
-
-	 t[0] = '\0';
+	    snprintf(t, MAXLINE, "    ");
 
 	 done = FALSE;
 
@@ -969,18 +972,18 @@ static void fortran_wrap_local_decl(FILE *fp, fdecl *dcl,
 	    {if (voidf == FALSE)
 		{switch (knd)
 		    {case FP_STRUCT :
-		          snprintf(t, MAXLINE, "FIXNUM _rv;\n");
+		          nstrcat(t, MAXLINE, "FIXNUM _rv;\n");
 			  vstrcat(t, MAXLINE, "    SC_address _ad%s;\n",
 				  dcl->name);
 			  break;
 		     case FP_ARRAY :
-			  snprintf(t, MAXLINE, "%s *_rv;\n", rt);
+			  vstrcat(t, MAXLINE, "%s *_rv;\n", rt);
 			  break;
 		     case FP_SCALAR :
-		          snprintf(t, MAXLINE, "%s _rv;\n", rt);
+		          vstrcat(t, MAXLINE, "%s _rv;\n", rt);
 			  break;
 		     default :
-		          snprintf(t, MAXLINE, "%s _rv;\n", rt);
+		          vstrcat(t, MAXLINE, "%s _rv;\n", rt);
 			  break;};};
 
 	     done = TRUE;}
@@ -989,20 +992,26 @@ static void fortran_wrap_local_decl(FILE *fp, fdecl *dcl,
 	 else if (nm[0] != '\0')
 	    {ty = al[i].type;
 	     switch (al[i].knd)
-		{case FP_STRUCT :
-		      snprintf(t, MAXLINE, "%s _l%s;\n", ty, nm);
+		{case FP_FNC :
+                      if (nv > 0)
+			 t[0] = '\0';
+		      else
+			 nstrcat(t, MAXLINE, "\n");
+		      break;
+		 case FP_STRUCT :
+		      vstrcat(t, MAXLINE, "%s _l%s;\n", ty, nm);
 		      break;
 		 case FP_ARRAY :
 		      if (strcmp(ty, "char *") == 0)
-			 snprintf(t, MAXLINE, "char _l%s[MAXLINE];\n", nm);
+			 vstrcat(t, MAXLINE, "char _l%s[MAXLINE];\n", nm);
 		      else
-			 snprintf(t, MAXLINE, "%s_l%s;\n", ty, nm);
+			 vstrcat(t, MAXLINE, "%s_l%s;\n", ty, nm);
 		      break;
 		 case FP_SCALAR :
-		      snprintf(t, MAXLINE, "%s _l%s;\n", ty, nm);
+		      vstrcat(t, MAXLINE, "%s _l%s;\n", ty, nm);
 		      break;
 		 default :
-		      snprintf(t, MAXLINE, "%s _l%s;\n", ty, nm);
+		      vstrcat(t, MAXLINE, "%s _l%s;\n", ty, nm);
 		      break;};
 	     nv++;
 	     done = TRUE;};
@@ -1037,8 +1046,7 @@ static void fortran_wrap_local_assn(FILE *fp, fdecl *dcl)
 	     knd = al[i].knd;
 	     switch (knd)
 	        {case FP_FNC :
-		      snprintf(t, MAXLINE, "    _l%-8s = (%s) %s;\n",
-			       nm, ty, nm);
+		      t[0] = '\0';
 		      break;
 		 case FP_STRUCT :
 		      snprintf(t, MAXLINE, "    _l%-8s = *(%s*) %s;\n",
@@ -1061,8 +1069,10 @@ static void fortran_wrap_local_assn(FILE *fp, fdecl *dcl)
 		      snprintf(t, MAXLINE, "    _l%-8s = (%s) *%s;\n",
 			       nm, ty, nm);
 		      break;};
-	     nv++;
-	     fputs(t, fp);};};
+
+	     if (IS_NULL(t) == FALSE)
+	        {nv++;
+		 fputs(t, fp);};};};
 
     if (nv > 0)
        fprintf(fp, "\n");
@@ -1079,7 +1089,7 @@ static void fortran_wrap_local_call(FILE *fp, fdecl *dcl,
    {char a[MAXLINE];
     char *nm;
 
-    fc_call_list(a, MAXLINE, dcl);
+    fc_call_list(a, MAXLINE, dcl, FALSE);
 
     nm = dcl->name;
     if (voidf == FALSE)
@@ -2114,20 +2124,18 @@ static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
         {if ((voida == TRUE) && (i == 0))
 	    continue;
 
-	 ty = al[i].type;
-	 nm = al[i].name;
+	 ty  = al[i].type;
+	 nm  = al[i].name;
 
 	 if (nv == 0)
-	    fprintf(fp, "   {");
+	    snprintf(t, MAXLINE, "   {");
 	 else
-	    fprintf(fp, "    ");
-
-	 t[0] = '\0';
+	    snprintf(t, MAXLINE, "    ");
 
 /* variable for return value */
 	 if (i == na)
 	    {if (voidf == FALSE)
-	        {snprintf(t, MAXLINE, "%s _rv;\n    ", rty);
+	        {vstrcat(t, MAXLINE, "%s _rv;\n    ", rty);
 		 if (knd == FP_ARRAY)
 		    {nstrcat(t, MAXLINE, "long _sz;\n");
 		     nstrcat(t, MAXLINE, "    C_array *_arr;\n    ");};};
@@ -2135,8 +2143,11 @@ static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
 	     nstrcat(t, MAXLINE, "object *_lo;\n");}
 
 /* local vars */
-	 else if (al[i].name[0] != '\0')
-	    {snprintf(t, MAXLINE, "%s _l%s;\n", ty, nm);
+	 else if (nm != '\0')
+	    {if (al[i].knd == FP_FNC)
+	        vstrcat(t, MAXLINE, "PFInt _l%s;\n", nm);
+	     else
+	        vstrcat(t, MAXLINE, "%s _l%s;\n", ty, nm);
 	     nv++;};
 
 	 if (IS_NULL(t) == FALSE)
@@ -2185,7 +2196,7 @@ static void scheme_wrap_local_call(FILE *fp, fdecl *dcl)
     ty = dcl->type;
     nm = dcl->name;
 
-    fc_call_list(a, MAXLINE, dcl);
+    fc_call_list(a, MAXLINE, dcl, TRUE);
 
     if (strcmp(ty, "void") == 0)
        snprintf(t, MAXLINE, "    %s(%s);\n", nm, a);

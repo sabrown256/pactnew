@@ -211,8 +211,8 @@ PD_reset_ptr_list		yes		yes		none
 
 # PDSER.C
 
-PD_init_threads			yes		yes		none
-PD_init_threads_arg		yes		yes		none
+PD_init_threads			yes		none		none
+PD_init_threads_arg		yes		none		none
 
 # PDSZOF.C
 

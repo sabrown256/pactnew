@@ -11,23 +11,19 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-char *FF_ID(fbcv1_f, FBCV1_F)(int *a, float *b, double *c, char *d, PFInt e, PFInt f)
+char *FF_ID(fbcv1_f, FBCV1_F)(int *a, float *b, double *c, char *d, int (*e)(void), PFInt f)
    {int _la;
     float _lb;
     double _lc;
     char _ld;
-    PFInt _le;
-    PFInt _lf;
     char *_rv;
 
     _la        = (int) *a;
     _lb        = (float) *b;
     _lc        = (double) *c;
     _ld        = (char) *d;
-    _le        = (PFInt) e;
-    _lf        = (PFInt) f;
 
-    _rv = fbcv1(_la, _lb, _lc, _ld, _le, _lf);
+    _rv = fbcv1(_la, _lb, _lc, _ld, e, f);
 
     return(_rv);}
 

@@ -1,0 +1,24 @@
+#
+# BL5.BIND - function pointer case blang test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+a_f1	yes	yes		yes
+a_f2	yes	yes		yes
+a_f3	yes	yes		yes
+a_f4	yes	yes		yes
+
+B_f1	yes	yes		yes
+B_f2	yes	yes		yes
+B_f3	yes	yes		yes
+B_f4	yes	yes		yes
+B_f5	yes	yes		yes
+B_f6	yes	yes		yes
+
+
+
+
