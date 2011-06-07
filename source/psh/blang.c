@@ -2597,11 +2597,11 @@ static void doc_proto_fortran(char *a, int nc, fdecl *dcl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DOC_PROTO_SCHEME - render the arg list of DCL into A for the
- *                  - Scheme prototype
+/* DOC_PROTO_NAME_ONLY - render the arg list of DCL into A using
+ *                     - variable names only
  */
 
-static void doc_proto_scheme(char *a, int nc, fdecl *dcl)
+static void doc_proto_name_only(char *a, int nc, fdecl *dcl, char *dlm)
    {int i, na;
     farg *al;
 
@@ -2610,34 +2610,15 @@ static void doc_proto_scheme(char *a, int nc, fdecl *dcl)
 
     a[0] = '\0';
     if (na != 0)
-       {for (i = 0; i < na; i++)
-	    vstrcat(a, MAXLINE, " %s", al[i].name);};
+       {if (dlm == NULL)
+	   {for (i = 0; i < na; i++)
+	        vstrcat(a, MAXLINE, " %s", al[i].name);}
+	else
+	   {for (i = 0; i < na; i++)
+	        vstrcat(a, MAXLINE, " %s%s", al[i].name, dlm);
+	    a[strlen(a)-strlen(dlm)] = '\0';};};
 
     memmove(a, trim(a, BOTH, " "), nc);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DOC_PROTO_PYTHON - render the arg list of DCL into A for the
- *                  - Python callable C wrapper
- */
-
-static void doc_proto_python(char *a, int nc, fdecl *dcl)
-   {int i, na;
-    farg *al;
-
-    na = dcl->na;
-    al = dcl->al;
-
-    a[0] = '\0';
-    if (na != 0)
-       {for (i = 0; i < na; i++)
-	    vstrcat(a, MAXLINE, "%s %s, ", al[i].type, al[i].name);
-        a[strlen(a) - 2] = '\0';};
-
-    memmove(a, trim(subst(a, "* ", "*", -1), BOTH, " "), nc);
 
     return;}
 
@@ -2661,7 +2642,7 @@ static void doc_wrap(FILE *fp, fdecl *dcl, char *cfn, char **fn, char **com)
     upcase(upn);
 
     nstrncpy(lfn, MAXLINE, cfn, -1);
-    upcase(lfn);
+    downcase(lfn);
 
     cf_type(fty, MAXLINE, dcl->type);
 
@@ -2696,7 +2677,7 @@ static void doc_wrap(FILE *fp, fdecl *dcl, char *cfn, char **fn, char **com)
        fprintf(fp, "<i>SX Binding: </i>         none\n");
     else
        {map_name(dcn, MAXLINE, cfn, NULL, -1, TRUE);
-	doc_proto_scheme(as, MAXLINE, dcl);
+	doc_proto_name_only(as, MAXLINE, dcl, NULL);
 	if (IS_NULL(as) == TRUE)
 	   fprintf(fp, "<i>SX Binding: </i>      (%s)\n", dcn);
 	else
@@ -2707,7 +2688,7 @@ static void doc_wrap(FILE *fp, fdecl *dcl, char *cfn, char **fn, char **com)
        fprintf(fp, "<i>Python Binding: </i>  none\n");
     else
        {map_name(dcn, MAXLINE, cfn, NULL, -1, FALSE);
-	doc_proto_python(ap, MAXLINE, dcl);
+	doc_proto_name_only(ap, MAXLINE, dcl, ",");
 	fprintf(fp, "<i>Python Binding: </i>  pact.%s(%s)\n", dcn, ap);};
 
     fprintf(fp, "</pre>\n");
