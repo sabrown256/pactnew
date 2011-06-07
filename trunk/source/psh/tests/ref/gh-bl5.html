@@ -2,14 +2,14 @@
 <!-- -------------------------------------------------------------------- -->
 <!-- -------------------------------------------------------------------- -->
 
-<a name="A_F1"><h2>A_F1</h2></a>
+<a name="a_f1"><h2>A_F1</h2></a>
 
 <p>
 <pre>
 <i>C Binding: </i>       void a_f1(PFDouble a)
 <i>Fortran Binding: </i> a_f1_f(integer(isizea) a)
 <i>SX Binding: </i>      (a-f1 a)
-<i>Python Binding: </i>  pact.a_f1(PFDouble a a)
+<i>Python Binding: </i>  pact.a_f1(a)
 </pre>
 <p>
 
@@ -18,14 +18,14 @@
 <!-- -------------------------------------------------------------------- -->
 <!-- -------------------------------------------------------------------- -->
 
-<a name="A_F2"><h2>A_F2</h2></a>
+<a name="a_f2"><h2>A_F2</h2></a>
 
 <p>
 <pre>
 <i>C Binding: </i>       void a_f2(int (*b)(int *a))
 <i>Fortran Binding: </i> a_f2_f(integer(isizea) b)
 <i>SX Binding: </i>      (a-f2 b)
-<i>Python Binding: </i>  pact.a_f2(int (*b)(int *a) b)
+<i>Python Binding: </i>  pact.a_f2(b)
 </pre>
 <p>
 
@@ -34,14 +34,14 @@
 <!-- -------------------------------------------------------------------- -->
 <!-- -------------------------------------------------------------------- -->
 
-<a name="A_F3"><h2>A_F3</h2></a>
+<a name="a_f3"><h2>A_F3</h2></a>
 
 <p>
 <pre>
 <i>C Binding: </i>       void a_f3(PFDouble a, int (*b)(int *a))
 <i>Fortran Binding: </i> a_f3_f(integer(isizea) a, integer(isizea) b)
 <i>SX Binding: </i>      (a-f3 a b)
-<i>Python Binding: </i>  pact.a_f3(PFDouble a a, int (*b)(int *a) b)
+<i>Python Binding: </i>  pact.a_f3(a, b)
 </pre>
 <p>
 
@@ -50,14 +50,14 @@
 <!-- -------------------------------------------------------------------- -->
 <!-- -------------------------------------------------------------------- -->
 
-<a name="A_F4"><h2>A_F4</h2></a>
+<a name="a_f4"><h2>A_F4</h2></a>
 
 <p>
 <pre>
 <i>C Binding: </i>       void a_f4(int (*b)(int *a), PFDouble a)
 <i>Fortran Binding: </i> a_f4_f(integer(isizea) b, integer(isizea) a)
 <i>SX Binding: </i>      (a-f4 b a)
-<i>Python Binding: </i>  pact.a_f4(int (*b)(int *a) b, PFDouble a a)
+<i>Python Binding: </i>  pact.a_f4(b, a)
 </pre>
 <p>
 
@@ -66,14 +66,14 @@
 <!-- -------------------------------------------------------------------- -->
 <!-- -------------------------------------------------------------------- -->
 
-<a name="B_F1"><h2>B_F1</h2></a>
+<a name="b_f1"><h2>B_F1</h2></a>
 
 <p>
 <pre>
 <i>C Binding: </i>       void B_f1(PFDouble a, int b)
 <i>Fortran Binding: </i> b_f1_f(integer(isizea) a, integer b)
 <i>SX Binding: </i>      (b-f1 a b)
-<i>Python Binding: </i>  pact.b_f1(PFDouble a a, int b)
+<i>Python Binding: </i>  pact.b_f1(a, b)
 </pre>
 <p>
 
@@ -82,14 +82,14 @@
 <!-- -------------------------------------------------------------------- -->
 <!-- -------------------------------------------------------------------- -->
 
-<a name="B_F2"><h2>B_F2</h2></a>
+<a name="b_f2"><h2>B_F2</h2></a>
 
 <p>
 <pre>
 <i>C Binding: </i>       void B_f2(int (*a)(int *a), int b)
 <i>Fortran Binding: </i> b_f2_f(integer(isizea) a, integer b)
 <i>SX Binding: </i>      (b-f2 a b)
-<i>Python Binding: </i>  pact.b_f2(int (*a)(int *a) a, int b)
+<i>Python Binding: </i>  pact.b_f2(a, b)
 </pre>
 <p>
 
@@ -98,14 +98,14 @@
 <!-- -------------------------------------------------------------------- -->
 <!-- -------------------------------------------------------------------- -->
 
-<a name="B_F3"><h2>B_F3</h2></a>
+<a name="b_f3"><h2>B_F3</h2></a>
 
 <p>
 <pre>
 <i>C Binding: </i>       void B_f3(PFDouble a, int (*b)(int *a), int c)
 <i>Fortran Binding: </i> b_f3_f(integer(isizea) a, integer(isizea) b, integer c)
 <i>SX Binding: </i>      (b-f3 a b c)
-<i>Python Binding: </i>  pact.b_f3(PFDouble a a, int (*b)(int *a) b, int c)
+<i>Python Binding: </i>  pact.b_f3(a, b, c)
 </pre>
 <p>
 
@@ -114,14 +114,14 @@
 <!-- -------------------------------------------------------------------- -->
 <!-- -------------------------------------------------------------------- -->
 
-<a name="B_F4"><h2>B_F4</h2></a>
+<a name="b_f4"><h2>B_F4</h2></a>
 
 <p>
 <pre>
 <i>C Binding: </i>       void B_f4(int (*a)(int *a), PFDouble b, int c)
 <i>Fortran Binding: </i> b_f4_f(integer(isizea) a, integer(isizea) b, integer c)
 <i>SX Binding: </i>      (b-f4 a b c)
-<i>Python Binding: </i>  pact.b_f4(int (*a)(int *a) a, PFDouble b b, int c)
+<i>Python Binding: </i>  pact.b_f4(a, b, c)
 </pre>
 <p>
 
@@ -130,14 +130,14 @@
 <!-- -------------------------------------------------------------------- -->
 <!-- -------------------------------------------------------------------- -->
 
-<a name="B_F5"><h2>B_F5</h2></a>
+<a name="b_f5"><h2>B_F5</h2></a>
 
 <p>
 <pre>
 <i>C Binding: </i>       void B_f5(int a, PFDouble b, int (*c)(int *a))
 <i>Fortran Binding: </i> b_f5_f(integer a, integer(isizea) b, integer(isizea) c)
 <i>SX Binding: </i>      (b-f5 a b c)
-<i>Python Binding: </i>  pact.b_f5(int a, PFDouble b b, int (*c)(int *a) c)
+<i>Python Binding: </i>  pact.b_f5(a, b, c)
 </pre>
 <p>
 
@@ -146,14 +146,14 @@
 <!-- -------------------------------------------------------------------- -->
 <!-- -------------------------------------------------------------------- -->
 
-<a name="B_F6"><h2>B_F6</h2></a>
+<a name="b_f6"><h2>B_F6</h2></a>
 
 <p>
 <pre>
 <i>C Binding: </i>       void B_f6(int a, int (*b)(int *a), PFDouble c)
 <i>Fortran Binding: </i> b_f6_f(integer a, integer(isizea) b, integer(isizea) c)
 <i>SX Binding: </i>      (b-f6 a b c)
-<i>Python Binding: </i>  pact.b_f6(int a, int (*b)(int *a) b, PFDouble c c)
+<i>Python Binding: </i>  pact.b_f6(a, b, c)
 </pre>
 <p>
 
