@@ -296,7 +296,6 @@ switch ($Cmnd)
            Note $Log "pact -log $Log -f $IncDir/Makefile $Args build"
            pact -log $Log -f $IncDir/Makefile $Args build
            set RStatus = $status
-           set Build   = "build"
 
            flog $Log popd
         else
@@ -316,20 +315,12 @@ switch ($Cmnd)
               endif
            end
            set RStatus = $status
-           set Build   = "packages"
         endif
 
+        Note $Log "Build exit status = $RStatus"
         flog $Log pushd ../doc
         flog $Log pact install
         flog $Log popd
-
-        if ($RStatus == 0) then
-           NoteD $Log ""
-           Separator $Log
-           NoteD $Log "Making integrated PACT library"
-           ftee $Log ./pact-lib
-           NoteD $Log "done"
-        endif
 
 # fix up cross compile executables that need to run on the current host
 # some things should be on the back end for testing
@@ -352,18 +343,30 @@ switch ($Cmnd)
            NoteD $Log "done"
         endif
 
-        set ETime = `$TIMER -b $BeginTime`
-
-        if ($RStatus != 0) then
+        if ($RStatus == 0) then
            NoteD $Log ""
            Separator $Log
-           Note $Log "Build failed - some hints may be found in the files:"
-           flog $Log ls -l ../*/z-$System/obj/errlog
+           NoteD $Log "Making integrated PACT library"
+           ftee $Log ./pact-lib
+           NoteD $Log "done"
         endif
+
+        set ETime = `$TIMER -b $BeginTime`
 
         NoteD $Log ""
         Separator $Log
-        NoteD $Log "PACT $Build on $Host complete ($RStatus/$ETime)"
+        if ($RStatus != 0) then
+           foreach i (../*/z-$System/obj/errlog)
+              if (!(-z $i)) then
+                 flog $Log cat $i
+              endif
+           end
+           NoteD $Log "PACT build on $Host failed ($RStatus/$ETime)"
+           NoteD $Log "Check log file: ../dev/$System/log/build"
+        else
+           NoteD $Log "PACT build on $Host complete (/$ETime)"
+        endif
+
         NoteD $Log ""
 
         breaksw
@@ -2081,9 +2084,9 @@ CFG_DONE:
 
 # remove other files
         NoteD $Log "    in $Base/"'*'"/z-$System directories"
-        flog $Log $RM ../*/z-$System/obj/*.[ofc] ../*/z-$System/obj/*.mod
+        flog $Log $RM ../*/z-$System/obj/*.[cfo] ../*/z-$System/obj/*.mod
         flog $Log $RM ../*/*.o ../pdb/spokes/*/*.o ../score/scf77lr.c
-        flog $Log $RM ../*/gf-*.c ../sx/gs-*.c
+        flog $Log $RM ../sx/z-$System/obj/*.[cfo]
 
 # check the result
         flog $Log ls -lR $Root

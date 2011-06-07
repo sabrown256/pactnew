@@ -1399,11 +1399,15 @@ static int _SC_bclose(FILE *fp)
 /* _SC_BFLUSH - method for fflush */
 
 static int _SC_bflush(FILE *fp)
-   {int ret;
+   {int ret, st;
 
     ACCESS(fp);
 
     ret = _SC_bio_flush(bid);
+
+    st = fsync(bid->fd);
+
+    SC_ASSERT(st != 0);
 
     return(ret);}
 

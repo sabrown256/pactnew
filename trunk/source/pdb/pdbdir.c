@@ -335,7 +335,7 @@ char **_PD_ls_extr(PDBfile *file, char *path, char *type, long size,
                  continue;
 
 /* check to see if type of this variable matches request */
-              if (type != NULL)
+              if ((type != NULL) && (type[0] != '*'))
                  {ep = PD_inquire_entry(file, varlist[i], FALSE, NULL);
                   if (strcmp(ep->type, type) != 0)
 		     continue;};

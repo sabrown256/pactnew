@@ -774,15 +774,13 @@ static fparam fc_type(char *wty, int nc, char *ty, langmode mode)
  */
 
 static void fc_decl_list(char *a, int nc, fdecl *dcl)
-   {int i, na, nt, nca;
+   {int i, na, nca;
     fparam knd;
-    char *ty, *nm, **cargs, **args;
+    char *ty, *nm, **cargs;
     farg *al;
 
     na = dcl->na;
     al = dcl->al;
-    args = dcl->tfproto;
-    nt   = dcl->ntf;
 
     a[0] = '\0';
     if ((na == 0) || (no_args(dcl) == TRUE))
@@ -944,7 +942,7 @@ static void fortran_wrap_decl(FILE *fp, fdecl *dcl,
 
 static void fortran_wrap_local_decl(FILE *fp, fdecl *dcl,
 				    fparam knd, char *rt, int voidf)
-   {int i, na, nv, done, voida;
+   {int i, na, nv, voida;
     char t[MAXLINE];
     char *nm, *ty;
     farg *al;
@@ -965,8 +963,6 @@ static void fortran_wrap_local_decl(FILE *fp, fdecl *dcl,
 	 else
 	    snprintf(t, MAXLINE, "    ");
 
-	 done = FALSE;
-
 /* variable for return value */
 	 if (i == na)
 	    {if (voidf == FALSE)
@@ -984,9 +980,7 @@ static void fortran_wrap_local_decl(FILE *fp, fdecl *dcl,
 			  break;
 		     default :
 		          vstrcat(t, MAXLINE, "%s _rv;\n", rt);
-			  break;};};
-
-	     done = TRUE;}
+			  break;};};}
 
 /* local vars */
 	 else if (nm[0] != '\0')
@@ -1013,8 +1007,7 @@ static void fortran_wrap_local_decl(FILE *fp, fdecl *dcl,
 		 default :
 		      vstrcat(t, MAXLINE, "%s _l%s;\n", ty, nm);
 		      break;};
-	     nv++;
-	     done = TRUE;};
+	     nv++;};
 
 	 if (IS_NULL(t) == FALSE)
 	    fputs(subst(t, "* ", "*", -1), fp);};
@@ -1702,21 +1695,17 @@ static void module_itf_wrap_ext(FILE *fp, char *pck, fdecl *dcl,
 
 static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
 				 char *cfn, char *ffn)
-   {int i, na, ns, voidf, voida;
+   {int i, ns, voidf;
     fparam knd;
     char dcn[MAXLINE], a[MAXLINE], t[MAXLINE];
     char fty[MAXLINE], cty[MAXLINE];
     char *rty, *oper, **args;
-    farg *al;
 
 /* emit complete declarations */
     if ((module_itf_wrappable(dcl) == TRUE) && (strcmp(ffn, "none") != 0))
        {map_name(dcn, MAXLINE, cfn, "f", -1, FALSE);
 
 	rty   = dcl->type;
-	na    = dcl->na;
-	al    = dcl->al;
-	voida = no_args(dcl);
 	voidf = (strcmp(rty, "void") == 0);
 	oper  = (voidf == TRUE) ? "subroutine" : "function";
 
@@ -1763,7 +1752,7 @@ static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
  */
 
 static void module_interop_wrap(FILE *fp, fdecl *dcl, char *cfn)
-   {int i, na, nv, voidf, voida;
+   {int i, na, voidf, voida;
     fparam knd;
     char dcn[MAXLINE], a[MAXLINE];
     char fty[MAXLINE], cty[MAXLINE];
@@ -1802,7 +1791,6 @@ static void module_interop_wrap(FILE *fp, fdecl *dcl, char *cfn)
 	fprintf(fp, "         implicit none\n");
 
 /* argument declarations */
-	nv = 0;
 	for (i = 0; i < na; i++)
 	    {if ((voida == TRUE) && (i == 0))
 	        continue;
@@ -1878,6 +1866,29 @@ static int bind_module(bindes *bd)
 /* start the interface */
 	fprintf(fp, "   interface\n");
 	fprintf(fp, "\n");
+
+#if 0
+	fprintf(fp, "      function c_charpp_f(n, cp, m)\n");
+	fprintf(fp, "         use iso_c_binding\n");
+	fprintf(fp, "         implicit none\n");
+	fprintf(fp, "         character(m), allocatable :: c_charpp_f(:)\n");
+	fprintf(fp, "         integer(C_INT), value, intent(in) :: n\n");
+	fprintf(fp, "         integer(8), target, value, intent(in) :: cp\n");
+/*	fprintf(fp, "         type(C_PTR), intent(in) :: cp(*)\n"); */
+	fprintf(fp, "         integer(C_INT), value, intent(in) :: m\n");
+	fprintf(fp, "      end function c_charpp_f\n");
+	fprintf(fp, "\n");
+
+	fprintf(fp, "      function c_charp_f(cp, m)\n");
+	fprintf(fp, "         use iso_c_binding\n");
+	fprintf(fp, "         implicit none\n");
+	fprintf(fp, "         character(m) :: c_charp_f\n");
+	fprintf(fp, "         integer(8), intent(in) :: cp(*)\n");
+/*	fprintf(fp, "         type(C_PTR), value, intent(in) :: cp\n"); */
+	fprintf(fp, "         integer(C_INT), value, intent(in) :: m\n");
+	fprintf(fp, "      end function c_charp_f\n");
+	fprintf(fp, "\n");
+#endif
 
 /* make full interface for non-variable argument functions */
 	fprintf(fp, "! ... declarations for generated wrappers\n");
@@ -2215,10 +2226,9 @@ static void scheme_wrap_local_call(FILE *fp, fdecl *dcl)
 static void scheme_wrap_local_return(FILE *fp, fdecl *dcl,
 				     fparam knd, char *so)
    {char t[MAXLINE], dty[MAXLINE];
-    char *ty, *nm;
+    char *ty;
 
     ty = dcl->type;
-    nm = dcl->name;
 
     if (strcmp(ty, "void") == 0)
        snprintf(t, MAXLINE, "    _lo = SS_null;\n");
@@ -2233,12 +2243,18 @@ static void scheme_wrap_local_return(FILE *fp, fdecl *dcl,
 
 	        case FP_ARRAY :
 		     deref(dty, MAXLINE, ty);
-		     snprintf(t, MAXLINE,
-			      "    _sz = SC_arrlen(_rv)/sizeof(%s);\n",
-			      dty);
-		     vstrcat(t, MAXLINE,
-			     "    _arr = PM_make_array(\"%s\", _sz, _rv);\n",
-			     dty);
+		     if (strcmp(dty, "void") == 0)
+		        {snprintf(t, MAXLINE,
+				  "    _sz = SC_arrlen(_rv);\n");
+			 vstrcat(t, MAXLINE,
+				 "    _arr = PM_make_array(\"char\", _sz, _rv);\n");}
+		     else
+		        {snprintf(t, MAXLINE,
+				  "    _sz = SC_arrlen(_rv)/sizeof(%s);\n",
+				  dty);
+			 vstrcat(t, MAXLINE,
+				 "    _arr = PM_make_array(\"%s\", _sz, _rv);\n",
+				 dty);};
 		     vstrcat(t, MAXLINE, "    _lo  = %s(si, _arr);\n", so);
 		     break;
 	        default :
@@ -2384,13 +2400,12 @@ static int bind_scheme(bindes *bd)
     char *cfn, *sfn;
     fdecl *dcl;
     FILE *fp;
-    char *pck, **spr, **sbi, **swr;
+    char *pck, **spr, **sbi;
 
     fp  = bd->fp;
     pck = bd->pck;
     spr = bd->spr;
     sbi = bd->sbi;
-    swr = bd->swr;
 
     rv = TRUE;
     fl = NULL;
@@ -2491,13 +2506,11 @@ static int bind_python(bindes *bd)
     char *cfn, *pfn;
     fdecl *dcl;
     FILE *fp;
-    char *pck, **spr, **sbi, **swr;
+    char **spr, **sbi;
 
     fp  = bd->fp;
-    pck = bd->pck;
     spr = bd->spr;
     sbi = bd->sbi;
-    swr = bd->swr;
 
     rv = TRUE;
 
@@ -2566,10 +2579,8 @@ static void init_doc(bindes *bd, char *pck, int cfl,
 static void doc_proto_fortran(char *a, int nc, fdecl *dcl)
    {int i, na, ns;
     char **args;
-    farg *al;
 
     na = dcl->na;
-    al = dcl->al;
 
     a[0] = '\0';
     if (na != 0)
@@ -2726,13 +2737,11 @@ static int bind_doc(bindes *bd)
     char *cfn;
     fdecl *dcl;
     FILE *fp;
-    char *pck, **spr, **sbi, **swr;
+    char **spr, **sbi;
 
     fp  = bd->fp;
-    pck = bd->pck;
     spr = bd->spr;
     sbi = bd->sbi;
-    swr = bd->swr;
 
     rv = TRUE;
 

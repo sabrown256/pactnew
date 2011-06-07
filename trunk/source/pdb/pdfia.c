@@ -636,35 +636,15 @@ FIXNUM FF_ID(pfivar, PFIVAR)(FIXNUM *sfid, FIXNUM *sncn, char *name,
 FIXNUM FF_ID(pfctyp, PFCTYP)(FIXNUM *ssfid, FIXNUM *sdfid,
 			     FIXNUM *snct, char *type)
    {FIXNUM rv;
-    char s[MAXLINE];
-    defstr *dp;
-    memdes *lst;
+    char ty[MAXLINE];
     PDBfile *sf, *df;
-    PD_smp_state *pa;
 
-    rv = TRUE;
-
-    SC_FORTRAN_STR_C(s, type, *snct);
+    SC_FORTRAN_STR_C(ty, type, *snct);
 
     sf = SC_GET_POINTER(PDBfile, *ssfid);
     df = SC_GET_POINTER(PDBfile, *sdfid);
 
-    pa = _PD_get_state(-1);
-
-    dp = PD_inquire_type(sf, s);
-    if (dp == NULL)
-       {snprintf(pa->err, MAXLINE,
-		 "ERROR: TYPE %s NOT FOUND - PFCTYP\n", s);
-        rv = FALSE;}
-
-    else
-       {lst = PD_copy_members(dp->members);
-	dp  = _PD_defstr_inst(df, s, STRUCT_KIND, lst,
-			      NO_ORDER, NULL, NULL, FALSE);
-	if (dp == NULL)
-	   {snprintf(pa->err, MAXLINE,
-		     "ERROR: CANNOT CREATE TYPE %s - PFCTYP\n", s);
-	    rv = FALSE;};};
+    rv = PD_copy_type(sf, df, ty);
 
     return(rv);}
 

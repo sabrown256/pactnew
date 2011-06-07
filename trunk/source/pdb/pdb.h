@@ -850,6 +850,7 @@ extern int
  PD_read_alt(PDBfile *file, char *name, void *vr, long *ind),
  PD_read_as_alt(PDBfile *file, char *name, char *type, void *vr,
 		long *ind),
+ PD_copy_type(PDBfile *sf, PDBfile *df, char *type),
  PD_cast(PDBfile *file, char *type, char *memb, char *contr),
  PD_free(PDBfile *file, char *type, void *var),
  PD_fix_denorm(data_standard* std, char *type, int64_t ni, void *vr),

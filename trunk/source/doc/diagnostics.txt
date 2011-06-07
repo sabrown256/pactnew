@@ -13,9 +13,9 @@ which no other PACT routines should do.
 
    void daprint(pcons *alst)
 
-/* DHASH - debugging printout of names in hash table (schash.c) */
+/* DHASH - debugging printout of names in hash table (sctab.c) */
 
-   void dhash(HASHTAB *self, char *patt)
+   void dhash(HASHTAB *self, char *patt, int sort)
 
 /* DSOCKET - diagnostic print of socket info (schp.c) */
 
