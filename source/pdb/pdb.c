@@ -198,6 +198,41 @@ PDBfile *PD_open_vif(char *name)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PD_COPY_TYPE - copy a TYPE definition from source file SF to
+ *              - destination file DF
+ *              - return TRUE iff successful
+ */
+
+int PD_copy_type(PDBfile *sf, PDBfile *df, char *type)
+   {int rv;
+    defstr *dp;
+    memdes *lst;
+    PD_smp_state *pa;
+
+    rv = TRUE;
+
+    pa = _PD_get_state(-1);
+
+    dp = PD_inquire_type(sf, type);
+    if (dp == NULL)
+       {snprintf(pa->err, MAXLINE,
+		 "ERROR: TYPE %s NOT FOUND - PD_COPY_TYPE\n", type);
+        rv = FALSE;}
+
+    else
+       {lst = PD_copy_members(dp->members);
+	dp  = _PD_defstr_inst(df, type, STRUCT_KIND, lst,
+			      NO_ORDER, NULL, NULL, FALSE);
+	if (dp == NULL)
+	   {snprintf(pa->err, MAXLINE,
+		     "ERROR: CANNOT CREATE TYPE %s - PD_COPY_TYPE\n", type);
+	    rv = FALSE;};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PD_CLOSE - close a PDB file after writing out the symbol table and
  *          - structure chart and completing the header
  *          - return TRUE if successful and FALSE otherwise

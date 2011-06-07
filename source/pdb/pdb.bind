@@ -42,6 +42,7 @@ PD_write_as			yes		yes		none
 PD_write_as_alt			yes		yes		none
 PD_cast				yes		yes		none
 PD_free				yes		yes		none
+PD_copy_type			yes		yes		none
 PD_fix_denorm			yes		yes		none
 PD_autofix_denorm		yes		yes		none
 PD_error			yes		yes		none

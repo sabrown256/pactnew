@@ -183,10 +183,18 @@ Note $Log ""
       flog $Log mv gm-$d.f obj
    endif
    if (-f gs-$d.c) then
-      flog $Log mv gs-$d.c ../../sx/z-$arch/obj
+      set ldst =  ../../sx/z-$arch/obj
+      if (!(-d $ldst)) then
+         flog $Log mkdir -p $ldst
+      endif
+      flog $Log mv gs-$d.c $ldst
    endif
    if (-f gp-$d.c) then
-      flog $Log mv gp-$d.c ../../python/z-$arch/obj
+      set ldst =  ../../python/z-$arch/obj
+      if (!(-d $ldst)) then
+         flog $Log mkdir -p $ldst
+      endif
+      flog $Log mv gp-$d.c $ldst
    endif
    if (-f gh-$d.html) then
       flog $Log mv gh-$d.html ../../doc
