@@ -61,8 +61,8 @@ static object *_SXI_favp1(SS_psides *si, object *argl)
     object *_lo;
 
     _rv = favp1();
-    _sz = SC_arrlen(_rv)/sizeof(void);
-    _arr = PM_make_array("void", _sz, _rv);
+    _sz = SC_arrlen(_rv);
+    _arr = PM_make_array("char", _sz, _rv);
     _lo  = SX_mk_C_array(si, _arr);
 
     return(_lo);}
