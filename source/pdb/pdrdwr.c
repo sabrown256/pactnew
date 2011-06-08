@@ -1159,8 +1159,8 @@ static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
     blo    = epo->blocks;
 
     bl = ep->blocks;
-    PD_entry_type(ep)       = intype;
-    PD_entry_dimensions(ep) = NULL;
+    ep->type       = intype;
+    ep->dimensions = NULL;
 
     nrd = 0;
     if (addr >= 0)
@@ -1187,7 +1187,7 @@ static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
 		niw = min(nitems, nb);
 
 		_PD_block_set_desc(eaddr, niw, bl, 0);
-		PD_entry_number(ep) = niw;
+		ep->number = niw;
 
 		if (_PD_csum_block_read(file, name, epo, n) == FALSE)
 		   nr = 0;
@@ -1201,7 +1201,7 @@ static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
 
 /* items not logically contiguous */
         else
-	   {PD_entry_number(ep) = 1L;
+	   {ep->number = 1L;
 	    for (; addr <= stop; addr += step, out += hbyt)
 	        {eaddr = addr;
 		 n = _PD_effective_addr(&eaddr, &nb, fbyt, blo);
@@ -1225,19 +1225,19 @@ static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
 	   {nitems = (stop - addr)/step + 1L;
 
 /* NOTE: multi-block bitstreams are not supported */
-	    PD_entry_number(ep)  = nitems;
+	    ep->number = nitems;
 	    PD_entry_set_address(ep, addr);
 	    nrd += _PD_sys_read(file, ep, outtype, out);
 	    out += hbyt*nitems;}
 
 /* items not logically contiguous */
 	else
-	   {PD_entry_number(ep) = 1L;
+	   {ep->number = 1L;
 	    for (; addr >= stop; addr += step, out += hbyt)
 	        {PD_entry_set_address(ep, addr);
 		 nrd += _PD_sys_read(file, ep, outtype, out);};};};
 
-    PD_entry_type(ep) = NULL;
+    ep->type = NULL;
 
     return(nrd);}
 
@@ -1448,7 +1448,7 @@ int _PD_indexed_read_as(PDBfile *file, char *fullpath, char *type, void *vr,
        PD_error("CAN'T FIND ENTRY - _PD_INDEXED_READ_AS", PD_READ);
 
     else
-       {PD_entry_number(ep) = PD_hyper_number(file, hname, ep);
+       {ep->number = PD_hyper_number(file, hname, ep);
 	if (type == NULL)
 	   type = PD_entry_type(ep);
 
@@ -1626,8 +1626,8 @@ int _PD_rd_bits(PDBfile *file, char *name, char *type, long nitems,
 
     CFREE(etype);
 
-    PD_entry_type(ep)   = CSTRSAVE(SC_CHAR_S);
-    PD_entry_number(ep) = enumb;
+    ep->type   = CSTRSAVE(SC_CHAR_S);
+    ep->number = enumb;
     ni = _PD_sys_read(file, ep, SC_CHAR_S, in);
     if (ni != enumb)
        {CFREE(in);

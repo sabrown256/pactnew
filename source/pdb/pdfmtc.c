@@ -684,7 +684,7 @@ static void _PD_rd_blocks_iii(PDBfile *file)
 	    dim->index_max = dim->index_min + stride - 1L;};
 
 /* adjust the number to reflect the entire entry */
-	PD_entry_number(ep) = nt;};
+	ep->number = nt;};
 
     return;}
 

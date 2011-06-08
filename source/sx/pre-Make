@@ -131,15 +131,20 @@ hdrf = ${IncDir}/sxpdbd.h
 
 # language bindings
 
+gsrc = ${PACTTmpDir}/gs-score.c ${PACTTmpDir}/gs-pml.c ${PACTTmpDir}/gs-pdb.c   \
+       ${PACTTmpDir}/gs-ppc.c ${PACTTmpDir}/gs-pgs.c ${PACTTmpDir}/gs-panacea.c \
+       ${PACTTmpDir}/gs-scheme.c
+
 gso = ${PACTTmpDir}/gs-score.o ${PACTTmpDir}/gs-pml.o ${PACTTmpDir}/gs-pdb.o   \
       ${PACTTmpDir}/gs-ppc.o ${PACTTmpDir}/gs-pgs.o ${PACTTmpDir}/gs-panacea.o \
       ${PACTTmpDir}/gs-scheme.o
 
+${gso} : ${gsrc}
+
 %.o : %.c
 	@(echo "${CCAnnounce} -c $<" ; \
           ${CC} -c $< -o $@ ; \
-          ${AR} ${AROpt} ${TGTLib} $@ 2>> errlog ;\
-	  ${RM} $@ )
+          ${AR} ${AROpt} ${TGTLib} $@ 2>> errlog )
 
 bindings : ${gso}
 

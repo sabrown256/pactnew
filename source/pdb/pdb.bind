@@ -55,8 +55,9 @@ PD_defchr			yes		yes		none
 PD_defix			yes		yes		none
 PD_defixnum			yes		yes		none
 PD_defloat			yes		yes		none
-PD_defstr			yes		none		pdb.defstr
-PD_defstr_alt			yes		yes		none
+PD_defstr			none		none		pdb.defstr
+PD_defstr_alt			none		yes		none
+PD_defstr_s			yes		yes		none
 PD_verify_writes		yes		yes		none
 PD_change_primitive		yes		yes		none
 PD_contents			yes		yes		none
@@ -169,12 +170,22 @@ PD_get_mode			yes		yes		none
 PD_set_mode			yes		yes		none
 PD_get_offset			yes		yes		none
 PD_set_offset			yes		yes		none
+PD_get_major_order		yes		yes		none
+PD_set_major_order		yes		yes		none
 PD_get_track_pointers		yes		yes		none
 PD_set_track_pointers		yes		yes		none
 PD_get_max_file_size		yes		yes		none
 PD_set_max_file_size		yes		yes		none
 PD_get_fmt_version		yes		yes		none
 PD_set_fmt_version		yes		yes		none
+PD_get_file_name		yes		yes		none
+PD_entry_type			yes		yes		none
+PD_entry_dimensions		yes		yes		none
+PD_entry_number			yes		yes		none
+PD_entry_n_dimensions		yes		yes		none
+PD_type_size			yes		yes		none
+PD_type_alignment		yes		yes		none
+PD_type_n_indirects		yes		yes		none
 
 # PDMEMB.C
 
@@ -231,7 +242,3 @@ PD_target_platform_name		yes		yes		none
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# PD_get_file_name
-# PD_get_major_order
-# PD_get_mode
-# PD_get_offset

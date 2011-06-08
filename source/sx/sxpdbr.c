@@ -282,8 +282,8 @@ syment *_SX_rd_data(SS_psides *si, PDBfile *file, char *name, syment *ep,
 	    if (dpf->convert)
 	       {odp = PD_inquire_table_type(file->host_chart, type);
 		if (strcmp(type, odp->type) != 0)
-		   {CFREE(PD_entry_type(cp));
-		    PD_entry_type(cp) = CSTRSAVE(odp->type);};};};}
+		   {CFREE(cp->type);
+		    cp->type = CSTRSAVE(odp->type);};};};}
 
     else
 

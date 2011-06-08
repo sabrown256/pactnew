@@ -549,9 +549,9 @@ static syment *_SX_spec_instance(SS_psides *si, PDBfile *file,
 				 val.memaddr, number, type, dims);
 		SC_mark(val.memaddr, 1);};
 
-	    PD_entry_type(ep)       = CSTRSAVE(type);
-            PD_entry_dimensions(ep) = dims;
-            PD_entry_number(ep)     = number;
+	    ep->type       = CSTRSAVE(type);
+            ep->dimensions = dims;
+            ep->number     = number;
             PD_entry_set_address(ep, val.diskaddr);};};
 
     return(ep);}
@@ -2220,7 +2220,7 @@ static object *_SXI_rd_syment(SS_psides *si, object *argl)
 
     else if (SC_LAST_CHAR(name) == ']')
        {dp = PD_entry_dimensions(ep);
-        PD_entry_dimensions(ep) = _PD_hyper_dims(file, name, dp);
+        ep->dimensions = _PD_hyper_dims(file, name, dp);
 
 /* GOTCHA: this set of dimensions may still be valid for the original ep
  *         they weren't copied - its certainly TRUE in cases with VIF's

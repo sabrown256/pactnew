@@ -364,7 +364,7 @@ switch ($Cmnd)
            NoteD $Log "PACT build on $Host failed ($RStatus/$ETime)"
            NoteD $Log "Check log file: ../dev/$System/log/build"
         else
-           NoteD $Log "PACT build on $Host complete (/$ETime)"
+           NoteD $Log "PACT build on $Host complete ($ETime)"
         endif
 
         NoteD $Log ""

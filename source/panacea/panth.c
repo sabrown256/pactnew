@@ -961,7 +961,7 @@ static int _PA_proc_rec(char *name, PDBfile *th, int ncpf, int recn)
     en = _PD_mk_syment(NULL, 0L, 0L, NULL, NULL);
 
     if (en != NULL)
-       {PD_entry_type(en) = rtyp;
+       {en->type = rtyp;
 	SC_mark(rtyp, 1);};
 
 /* find the maximum number of stripe laid out */
@@ -992,7 +992,7 @@ static int _PA_proc_rec(char *name, PDBfile *th, int ncpf, int recn)
 
          _PD_entry_set_address(en, 0, addr);
          _PD_entry_set_number(en, 0, nitems);
-	 PD_entry_number(en) = nitems;
+	 en->number = nitems;
 
          nrd += _PD_sys_read(th, en, rtyp, stripe);
 

@@ -131,6 +131,7 @@
 #define PD_set_format_version        PD_set_fmt_version
 #define PD_get_format_version(_n)    (_n = PD_get_fmt_version())
 
+#if 0
 #define PD_entry_type(ep)            (ep)->type
 #define PD_entry_dimensions(ep)      (ep)->dimensions
 #define PD_entry_number(ep)          (ep)->number
@@ -139,6 +140,8 @@
 #define PD_get_major_order(file)       (((file) != NULL) ? (file)->major_order : NO_MAJOR_ORDER)
 #define PD_set_major_order(file, type) if ((file) != NULL) (file)->major_order = (type)
 #define PD_get_file_name(file)         (((file) != NULL) ? (file)->name : NULL)
+#endif
+
 #define PD_has_directories(file)                                             \
     ((file != NULL) && (file->current_prefix != NULL))
 
@@ -876,7 +879,8 @@ extern defstr
 	     int *ordr, long expb, long mantb, long sbs, long sbe,
 	     long sbm, long hmb, long bias),
  *PD_defstr(PDBfile *file, char *name, ...),
- *PD_defstr_alt(PDBfile *file, char *name, int nmemb, char **members);
+ *PD_defstr_alt(PDBfile *file, char *name, int nmemb, char **members),
+ *PD_defstr_s(PDBfile *file, char *name, char *members);
 
 extern int
  PD_verify_writes(int st),
@@ -1056,45 +1060,51 @@ extern int
 
 /* PDLOW.C declarations */
 
+extern dimdes
+ *PD_entry_dimensions(syment *ep);
+
 extern defstr
  *PD_inquire_type(PDBfile *file, char *name),
  *PD_inquire_host_type(PDBfile *file, char *name);
 
 extern char
+ *PD_get_file_name(PDBfile *file),
+ *PD_entry_type(syment *ep),
  *PD_get_error(void);
-
-extern int
- PD_get_entry_info(syment *ep, char **ptyp, long *pni, int *pnd, long **pdim);
-
-extern int64_t
- PD_get_buffer_size(void),
- PD_set_buffer_size(int64_t v);
-
-extern int64_t
- PD_entry_set_address(syment *ep, int64_t a),
- PD_entry_address(syment *ep),
- PD_get_file_length(PDBfile *file);
-
-extern void
- PD_free_entry_info(char *typ, long *pdim),
- PD_rel_entry_info(syment *ep, char *typ, long *pdim),
- PD_typedef_primitive_types(PDBfile *file);
 
 extern PD_major_op
  PD_get_mode(PDBfile *file),
  PD_set_mode(PDBfile *file, PD_major_op v);
 
+extern int64_t
+ PD_get_buffer_size(void),
+ PD_set_buffer_size(int64_t v),
+ PD_entry_set_address(syment *ep, int64_t a),
+ PD_entry_address(syment *ep),
+ PD_get_file_length(PDBfile *file),
+ PD_get_max_file_size(PDBfile *file),
+ PD_set_max_file_size(PDBfile *file, int64_t v);
+
 extern int
+ PD_get_entry_info(syment *ep, char **ptyp, long *pni, int *pnd, long **pdim),
  PD_get_offset(PDBfile *file),
  PD_set_offset(PDBfile *file, int v),
+ PD_get_major_order(PDBfile *file),
+ PD_set_major_order(PDBfile *file, int v),
  PD_get_track_pointers(PDBfile *file),
  PD_set_track_pointers(PDBfile *file, int v),
  PD_get_fmt_version(void),
- PD_set_fmt_version(int v);
+ PD_set_fmt_version(int v),
+ PD_entry_number(syment *ep),
+ PD_entry_n_dimensions(syment *ep),
+ PD_type_size(defstr *dp),
+ PD_type_alignment(defstr *dp),
+ PD_type_n_indirects(defstr *dp);
 
-extern int64_t
- PD_get_max_file_size(PDBfile *file),
- PD_set_max_file_size(PDBfile *file, int64_t v);
+extern void
+ PD_free_entry_info(char *typ, long *pdim),
+ PD_rel_entry_info(syment *ep, char *typ, long *pdim),
+ PD_typedef_primitive_types(PDBfile *file);
 
 
 /* PDMEMB.C declarations */

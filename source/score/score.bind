@@ -43,6 +43,10 @@ SC_use_guarded_mem	yes	none              none
 # SCPAR.C
 SC_init_threads		yes	none              none
 
+# SCSTR.C
+SC_free_strings		yes	none		none
+
+
 # SCTAB.C
 SC_make_hasharr		yes	none		  none
 SC_free_hasharr		yes	none              none

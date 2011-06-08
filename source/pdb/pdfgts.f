@@ -8,7 +8,7 @@
 ! include "cpyright.h"
 !
 
-! --------------------------------------------------------------------------
+!--------------------------------------------------------------------------
 !--------------------------------------------------------------------------
 
 ! C_CHARPP_F - wrap C char ** variable CP in Fortran character(M) A(N)
@@ -82,7 +82,57 @@
       end function c_charp_f
 
 !--------------------------------------------------------------------------
-! --------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+! C_STRLENC - return the length of a C string
+
+      function c_strlenc(cp)
+
+      use iso_c_binding
+      implicit none
+
+      integer :: c_strlenc
+      type(C_PTR) :: cp
+
+      interface
+         function strlen(s) bind(C)
+           import
+           integer(C_SIZE_T) :: strlen
+           type(C_PTR), intent(in) :: s
+         end function strlen
+      end interface
+
+      c_strlenc = transfer(strlen(cp), c_strlenc)
+
+      end function c_strlenc
+
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+! C_STRLENF - return the length of a C string
+
+      function c_strlenf(cp)
+
+      use iso_c_binding
+      implicit none
+
+      integer :: c_strlenf
+      character, intent(in) :: cp(*)
+
+      interface
+         function strlen(s) bind(C)
+           import
+           integer(C_SIZE_T) :: strlen
+           character, intent(in) :: s(*)
+         end function strlen
+      end interface
+
+      c_strlenf = transfer(strlen(cp), c_strlenf)
+
+      end function c_strlenf
+
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
 
 ! ERRPROC - handle errors
 
@@ -109,8 +159,8 @@
       stop 1
       end
 
-! --------------------------------------------------------------------------
-! --------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
 
 ! WRTCUR - write a curve
 
@@ -143,8 +193,8 @@
       return
       end subroutine wrtcur
 
-! --------------------------------------------------------------------------
-! --------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
 
 ! CHKCUR - check curve
 
@@ -185,8 +235,8 @@
       return
       end subroutine chkcur
 
-! --------------------------------------------------------------------------
-! --------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
 
 ! WRTIMA - write an image
 
@@ -197,30 +247,31 @@
       type(C_PTR) fileid
 
 ! ... local variables
-!      integer k, l, st
-!      real*8 xmin, xmax, ymin, ymax, data(0:10, 0:10)
-!
-!      xmin = 0.0
-!      xmax = 10.0
-!      ymin = 0.0
-!      ymax = 10.0
-!
-!      do l = 0, 10
-!         do k = 0, 10
-!            data(k, l) = float((k - 5)**2 + (l - 5)**2)
-!         enddo
-!      enddo
-!
+      integer k, l, st
+      real*8 xmin, xmax, ymin, ymax, data(0:10, 0:10)
+
+      xmin = 0.0
+      xmax = 10.0
+      ymin = 0.0
+      ymax = 10.0
+
+      do l = 0, 10
+         do k = 0, 10
+            data(k, l) = float((k - 5)**2 + (l - 5)**2)
+         enddo
+      enddo
+
+      st = 1
 !      st = wpdwima(fileid, 10, 'Test image', 0, 10, 0, 10,  &
 !                  data, xmin, xmax, ymin, ymax, 0)
-!      if (st .eq. 0) &
-!         call errproc
+      if (st .eq. 0) &
+         call errproc
 
       return
       end subroutine wrtima
 
-! --------------------------------------------------------------------------
-! --------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
 
 ! CHKIMA - check image
 
@@ -240,9 +291,10 @@
          enddo
       enddo
 
-!      st = wpdrptr(fileid, 14, 'Image0->buffer', 121, odata)
-!      if (st .eq. 0) &
-!         call errproc
+      st = 1
+      st = pd_read_f(fileid, "Image0->buffer", odata)
+      if (st .eq. 0) &
+         call errproc
 
       do l = 0, 10
          do k = 0, 10
@@ -254,8 +306,8 @@
       return
       end subroutine chkima
 
-! --------------------------------------------------------------------------
-! --------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
 
 ! WRTMAP - write some mappings
 
@@ -263,12 +315,12 @@
       use pact_pdb
       implicit none
 
-      integer*8 fileid
+      type(C_PTR) :: fileid
 
 ! ... local variables
-      integer i, pim, st
-      integer dp(5), rp(5)
-      real*8 dm(0:99), rm(0:99)
+      integer :: i, pim, st
+      integer :: dp(5), rp(5)
+      real*8 :: dm(0:99), rm(0:99)
 
       pim = 0
       dp(1) = 7
@@ -283,27 +335,28 @@
       rp(5) = 100
 
       do i = 0, 99
-         dm(i) = 6.28*float(i)/99.
-         rm(i) = sin(6.28*float(i)/99.)
+         dm(i) = 6.28*float(i)/99.0
+         rm(i) = sin(6.28*float(i)/99.0)
       enddo
 
+      st = 1
 !      st = wpdwmap(fileid, 'Domain0', dp, dm, 'Range0', rp, rm, pim)
-!      if (st .eq. 0) &
-!         call errproc
+      if (st .eq. 0) &
+         call errproc
 
       pim = 1
 
 !      if (wpdwset(fileid, 'Domain1', dp, dm) .eq. 0) &
 !         call errproc
 
-!      if (wpdwran(fileid, 'Domain1', 7, 'Range1', rp, rm, pim) .eq. 0) &
+!      if (wpdwran(fileid, 'Domain1', 'Range1', rp, rm, pim) .eq. 0) &
 !         call errproc
 
       return
       end subroutine wrtmap
 
-! --------------------------------------------------------------------------
-! --------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
 
 ! CHKMAP - check mappings
 
@@ -324,11 +377,11 @@
          rm(i) = sin(6.28*float(i)/99.0)
       enddo
 
-!      st = wpdrptr(fileid, 29, 'Mapping0->domain->elements[1]', 100, odm)
-!      if (st .eq. 0) &
-!         call errproc
+      st = pd_read_f(fileid, 'Mapping0->domain->elements[1]', odm)
+      if (st .eq. 0) &
+         call errproc
 
-      st = pd_read_f(fileid, 35, 'Mapping0->range->elements[1][1:100]', orm)
+      st = pd_read_f(fileid, 'Mapping0->range->elements[1][1:100]', orm)
       if (st .eq. 0) &
          call errproc
 
@@ -338,13 +391,13 @@
             call errproc
       enddo
 
-      st = pd_read_f(fileid, 27, 'Domain1->elements[1][1:100]', odm)
+      st = pd_read_f(fileid, 'Domain1->elements[1][1:100]', odm)
       if (st .eq. 0) &
          call errproc
 
-!      st = wpdrptr(fileid, 28, 'Mapping1->range->elements[1]', 100, orm)
-!      if (st .eq. 0) &
-!         call errproc
+      st = pd_read_f(fileid, 'Mapping1->range->elements[1]', orm)
+      if (st .eq. 0) &
+         call errproc
 
       do i = 0, 99
          if ((abs(dm(i) - odm(i)) .gt. tolerance) &
@@ -355,16 +408,15 @@
       return
       end subroutine chkmap
 
-! --------------------------------------------------------------------------
-! --------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
 
 ! TEST_1 - basic file testing
 
-      subroutine test_1(nout, outtype, date, PRINT, DIR, ATTR, OPTION)
+      subroutine test_1(outtype, date, PRINT, DIR, ATTR, OPTION)
       use pact_pdb
       implicit none 
 
-      integer nout
       character*8 outtype
       character*80 date
       logical PRINT
@@ -374,22 +426,21 @@
 
 ! ... local variables
       integer i, j, k, l
-      integer offset, st
-      integer ndims, dims(14), pairs(6)
-      integer nchar
-      integer istring
-      integer LAST
+      integer offset, order, st
+      integer ndims, nc, istring, LAST
       
       integer(8) ldims(14)
 
-      type(C_PTR) fileid
-      type(C_PTR) ad
+      type(C_PTR) :: fileid, cp
 
       real*8 a, c, g, z, zz, zzx
       real*8 x(20)
 
-      character*256 name
       character*8 strings(4)
+
+      character(80), pointer :: vnm
+
+      logical ok
 
       common /abc/ a(2), c(2, 2:4), g(5, 2:10), z(4, 5, 2)
       common /abc/ zz(4, 5, 2), zzx(4, 5, 2)
@@ -425,22 +476,28 @@
 
 ! ... open file for writing
       fileid = pd_open_f('file.pdb', 'w')
-      if (c_associated(fileid)) &
+      if (.not. c_associated(fileid)) &
          call errproc
 
 ! ... faux fam
-      if (c_associated(pd_family_f(fileid, 1))) &
+      if (.not. c_associated(pd_family_f(fileid, 1))) &
          call errproc
 
 ! ... check file mode
-!      if (wpdgmod(fileid) .ne. 4) &
-!         call errproc
+      if (pd_get_mode_f(fileid) .ne. 4) &
+         call errproc
+
+! ... set and get and verify major order
+      order = 102
+      if (pd_set_major_order_f(fileid, order) .ne. 101) &
+         call errproc
+      order = pd_get_major_order_f(fileid)
 
 ! ... set and get and verify default offset
       offset = 1
-!      if (wpdsoff(fileid, offset) .eq. 0) &
-!         call errproc
-!      offset = wpdgoff(fileid)
+      if (pd_set_offset_f(fileid, offset) .ne. 0) &
+         call errproc
+      offset = pd_get_offset_f(fileid)
 
       if (PRINT) then
          write(6, 300) offset
@@ -476,16 +533,20 @@
       endif
 
 ! ... get current working directory
-!      if (pd_pwd_f(fileid, nchar, name) .eq. 0) &
-!         call errproc
-!
-!      if (PRINT) then
-!         write(6, 350) name(1:nchar)
-! 350     format(/, 'Current working directory:  ', a)
-!      endif
-!
-!      if ((name(1:nchar) .ne. '/') .or. (nchar .ne. 1)) &
-!         call errproc
+      cp = pd_pwd_f(fileid)
+      if (c_associated(cp)) then
+         call c_f_pointer(cp, vnm)
+         nc = c_strlenf(vnm)
+         if (PRINT) then
+            write(6, 352) vnm(1:nc)
+ 352        format(/, 'Current working directory:  ', a)
+         endif
+
+         if ((vnm(1:nc) .ne. '/') .or. (nc .ne. 1)) &
+            call errproc
+      else
+         call errproc
+      endif
 
 ! ... write curve, image, and mappings in root after creating directory
       if (OPTION .eq. "2") then
@@ -505,30 +566,30 @@
          call errproc
 
       ndims = 3
-      dims(1) = 1
-      dims(2) = 4
-      dims(3) = 1
-      dims(4) = 1
-      dims(5) = 5
-      dims(6) = 1
-      dims(7) = 1
-      dims(8) = 2
-      dims(9) = 1
-      if (pd_append_alt_f(fileid, 'z', z, ndims, dims) .eq. 0) &
+      ldims(1) = 1
+      ldims(2) = 4
+      ldims(3) = 1
+      ldims(4) = 1
+      ldims(5) = 5
+      ldims(6) = 1
+      ldims(7) = 1
+      ldims(8) = 2
+      ldims(9) = 1
+      if (pd_append_alt_f(fileid, 'z', z, ndims, ldims) .eq. 0) &
          call errproc
 
 ! ... write  data item zz   write_as_alt, append_as, append_as_alt
       ndims = 3
-      dims(1) = 1
-      dims(2) = 4
-      dims(3) = 1
-      dims(4) = 1
-      dims(5) = 5
-      dims(6) = 1
-      dims(7) = 1
-      dims(8) = 1
-      dims(9) = 1
-      st = pd_write_as_alt_f(fileid, 'zz', 'double', outtype, zz, ndims, dims)
+      ldims(1) = 1
+      ldims(2) = 4
+      ldims(3) = 1
+      ldims(4) = 1
+      ldims(5) = 5
+      ldims(6) = 1
+      ldims(7) = 1
+      ldims(8) = 1
+      ldims(9) = 1
+      st = pd_write_as_alt_f(fileid, 'zz', 'double', outtype, zz, ndims, ldims)
       if (st .eq. 0) &
          call errproc
 
@@ -537,16 +598,16 @@
          call errproc
 
       ndims = 3
-      dims(1) = 1
-      dims(2) = 4
-      dims(3) = 1
-      dims(4) = 1
-      dims(5) = 5
-      dims(6) = 1
-      dims(7) = 1
-      dims(8) = 2
-      dims(9) = 1
-      st = pd_append_as_alt_f(fileid, 'zz', 'double', zzx, ndims, dims)
+      ldims(1) = 1
+      ldims(2) = 4
+      ldims(3) = 1
+      ldims(4) = 1
+      ldims(5) = 5
+      ldims(6) = 1
+      ldims(7) = 1
+      ldims(8) = 2
+      ldims(9) = 1
+      st = pd_append_as_alt_f(fileid, 'zz', 'double', zzx, ndims, ldims)
       if (st .eq. 0) &
          call errproc
 
@@ -562,17 +623,21 @@
       endif
 
 ! ... get current working directory
-!      if (pd_pwd_f(fileid, nchar, name) .eq. 0) &
-!         call errproc
-!
-!      if (PRINT) then
-!         write(6, 351) name(1:nchar)
-! 351     format(/, 'Current working directory:  ', a)
-!      endif
-!
-!      if (((.not. DIR) .and. (nchar .ne. 1)) .or. &
-!          (DIR .and. (nchar .ne. 5))) &
-!         call errproc
+      cp = pd_pwd_f(fileid)
+      if (c_associated(cp)) then
+         call c_f_pointer(cp, vnm)
+         nc = c_strlenf(vnm)
+         if (PRINT) then
+            write(6, 351) vnm(1:nc)
+ 351        format(/, 'Current working directory:  ', a)
+         endif
+
+         if (((.not. DIR) .and. (nc .ne. 1)) .or. &
+             (DIR .and. (nc .ne. 5))) &
+            call errproc
+      else
+         call errproc
+      endif
 
 ! ... create a link
       if (DIR) then
@@ -584,22 +649,17 @@
       endif
 
 ! ... define and write some data structures
-!      ad = pd_defstr_f(fileid, 'abc', 'double a(2)', 'double b', &
-!                       'double c(2, 2:4)', LAST)
-!      if (ad .eq. 0) &
-!         call errproc
+      cp = pd_defstr_s_f(fileid, 'abc', &
+                         'double a(2) ; double b ; double c(2, 2:4)')
+      if (.not. c_associated(cp)) &
+         call errproc
 
       if (pd_write_f(fileid, 'abc', 'abc', a) .eq. 0) &
          call errproc
 
-      pairs(1) = 0
-      pairs(2) = 5
-      pairs(3) = 5
-      pairs(4) = 5
-      pairs(5) = 10
-      pairs(6) = 5
-!      if (pd_defent_alt_f(fileid, 'jkl', pairs, 'int jint kint l') .eq. 0) &
-!         call errproc
+      cp = pd_defstr_s_f(fileid, 'jkl', 'int j; int k; int l')
+      if (.not. c_associated(cp)) &
+         call errproc
 
       if (pd_write_f(fileid, 'jkl', 'jkl', j) .eq. 0) &
          call errproc
@@ -611,13 +671,13 @@
       strings(4) = 'ponmlkji'
 
       ndims = 2
-      dims(1) = 1
-      dims(2) = 8
-      dims(3) = 1
-      dims(4) = 1
-      dims(5) = 4
-      dims(6) = 1
-      st = pd_write_f(fileid, 'strings', 'char', istring, ndims, dims)
+      ldims(1) = 1
+      ldims(2) = 8
+      ldims(3) = 1
+      ldims(4) = 1
+      ldims(5) = 4
+      ldims(6) = 1
+      st = pd_write_alt_f(fileid, 'strings', 'char', istring, ndims, ldims)
       if (st .eq. 0) &
          call errproc
 
@@ -628,7 +688,8 @@
       endif
 
 ! ... define some symbol table entries and reserve disk space
-      if (c_associated(pd_defent_f(fileid, 'f(0:3, 4:6, 1:2)', 'double'))) &
+      ok = c_associated(pd_defent_f(fileid, 'f(0:3, 4:6, 1:2)', 'double'))
+      if (.not. ok) &
          call errproc
 
       ndims = 2
@@ -636,39 +697,40 @@
       ldims(2) = 5
       ldims(3) = 2
       ldims(4) = 10
-      if (c_associated(pd_defent_alt_f(fileid, 'g', 'double', ndims, ldims))) &
+      ok = c_associated(pd_defent_alt_f(fileid, 'g', 'double', ndims, ldims))
+      if (.not. ok) &
          call errproc
 
       ndims = 2
-      dims(1) = 1
-      dims(2) = 1
-      dims(3) = 1
-      dims(4) = 2
-      dims(5) = 2
-      dims(6) = 1
+      ldims(1) = 1
+      ldims(2) = 1
+      ldims(3) = 1
+      ldims(4) = 2
+      ldims(5) = 2
+      ldims(6) = 1
       g(1, 2) = 100
       g(2, 2) = 101
-      if (pd_write_f(fileid, 'g', 'double', g, ndims, dims) .eq. 0) &
+      if (pd_write_alt_f(fileid, 'g', 'double', g, ndims, ldims) .eq. 0) &
          call errproc
-!      if (pd_write_f(fileid, 'g[1, 2]', 'double', g, ndims, dims) &
-!           .eq. 0) &
-!         call errproc
+      if (pd_write_alt_f(fileid, 'g[1, 2]', 'double', g, ndims, ldims) &
+           .eq. 0) &
+         call errproc
 
       ndims = 1
-      dims(1) = 1
-      dims(2) = 2
-      dims(3) = 1
-      if (pd_write_f(fileid, 1, 'a', 6, 'double', a, ndims, dims) .eq. 0) &
+      ldims(1) = 1
+      ldims(2) = 2
+      ldims(3) = 1
+      if (pd_write_alt_f(fileid, 'a', 'double', a, ndims, ldims) .eq. 0) &
          call errproc
 
       ndims = 2
-      dims(1) = 1
-      dims(2) = 2
-      dims(3) = 1
-      dims(4) = 2
-      dims(5) = 4
-      dims(6) = 1
-      if (pd_write_f(fileid, 'c', 'double', c, ndims, dims) .eq. 0) &
+      ldims(1) = 1
+      ldims(2) = 2
+      ldims(3) = 1
+      ldims(4) = 2
+      ldims(5) = 4
+      ldims(6) = 1
+      if (pd_write_alt_f(fileid, 'c', 'double', c, ndims, ldims) .eq. 0) &
          call errproc
 
 ! ... create a link
@@ -677,7 +739,7 @@
 
 ! ... set attribute value for member of struct
       if (ATTR) then
-         if (pd_set_attribute_f(fileid, 11, '/jkl_link.k', 4, 'date', date) .eq. 0) &
+         if (pd_set_attribute_f(fileid, '/jkl_link.k', 'date', date) .eq. 0) &
             call errproc
       endif
 
@@ -703,8 +765,8 @@
       return
       end subroutine test_1
 
-! --------------------------------------------------------------------------
-! --------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
 
 ! TEST_2 - feature testing
 
@@ -719,19 +781,21 @@
 
 ! ... local variables
       integer i, j, k, l, n
-      integer nt, st
-      integer ntype, ndims, dims(14), nitems
+      integer nt, ni
+      integer ndims, nitems
       integer typsiz, align, nptr
       integer kindx
-      integer nchar
+      integer nchar, nc
        
-      type(C_PTR) fileid, p
+      integer(C_LONG) :: dims(14)
 
-      character*256 name
-      character*8 name1, name2
+      type(C_PTR) fileid, p, cp
+
+      character*8 name2
       character*5 name3, name4
       character*80 dt
-      character*72 type
+
+      character(80), pointer :: vnm, name1
 
       real*8 x(20)
       real*8 a, c, g, z, zz, zzx
@@ -763,12 +827,12 @@
 
 ! ... initialize zz array (a(94)...)
       do i = 1, 40
-         a(i+93) = float(i) + 1000.0
+         a(i+93)    = float(i) + 1000.0
          a(i+40+93) = 2*(float(i) + 1000.0)
       enddo
 
       do i = 1, 73
-         a2(i) = 0.
+         a2(i) = 0.0
       enddo
 
       j = 1
@@ -777,21 +841,22 @@
 
 ! ... open the file for reading
       fileid = pd_open_f('file.pdb', 'a')
-      if (c_associated(fileid)) &
+      if (.not. c_associated(fileid)) &
          call errproc
 
 ! ... get file name given id
-!      nchar = 8
-!      if (wpdgfnm(fileid, nchar, name1) .eq. 0) &
-!         call errproc
-!
-!      name2 = 'file.pdb'
-!      if (name1 .ne. name2) &
-!         call errproc
+      cp = pd_get_file_name_f(fileid)
+      if (.not. c_associated(cp)) &
+         call errproc
+
+      call c_f_pointer(cp, name1)
+      name2 = 'file.pdb'
+      if (name1(1:8) .ne. name2) &
+         call errproc
 
 ! ... check file mode
-!      if (wpdgmod(fileid) .ne. 2) &
-!         call errproc
+      if (pd_get_mode_f(fileid) .ne. 2) &
+         call errproc
 
 ! ... retrieve and verify the value of an attribute
       if (ATTR) then
@@ -799,7 +864,7 @@
             call errproc
 
          p = pd_get_attribute_f(fileid, '/jkl_link.k', 'date', dt)
-         if (c_associated(p)) &
+         if (.not. c_associated(p)) &
             call errproc
 
          if (PRINT) then
@@ -818,7 +883,7 @@
 
 ! ... verify that attribute was removed
          p = pd_get_attribute_f(fileid, '/jkl_link.k', 'date', dt)
-         if (c_associated(p)) then
+         if (.not. c_associated(p)) then
             write(6, 380)
  380        format(/, 'Attribute was not removed.')
             stop 1
@@ -843,8 +908,9 @@
       do n = 1, 4
          dims(7) = n
          dims(8) = n
-!         if (wpdptrd(fileid, 'z', z2, dims) .eq. 0) &
-!            call errproc
+         ni = pd_read_alt_f(fileid, 'z', z2, dims)
+         if (ni .eq. 0) &
+            call errproc
 
          do j = 1, 5
             do i = 1, 4
@@ -876,10 +942,10 @@
       dims(8) = 2
       dims(9) = 1
 
-      if (pd_read_as_alt_f(fileid, 'zz', 'double', zz2, dims) .eq. 0) &
+      ni = pd_read_as_alt_f(fileid, 'zz', 'double', zz2, dims)
+      if (ni .eq. 0) &
          call errproc
-!      if (wpdptrd(fileid, 'zz', zz2, dims) .eq. 0) &
-!         call errproc
+
       do kindx = 1, 2
          do j = 1, 5
             do i = 1, 4
@@ -890,17 +956,15 @@
          enddo
       enddo
 
-      if (pd_read_as_f(fileid, 'zz(1:4,1:5,3:4)', 'double', zz2) &
-             .eq. 0) call errproc
-!      if (pd_read_f(fileid, 'zz(1:4,1:5,3:4)', zz2) &
-!             .eq. 0) call errproc
+      ni = pd_read_as_f(fileid, 'zz(1:4,1:5,3:4)', 'double', zz2)
+      if (ni .eq. 0) &
+         call errproc
 
-         do kindx = 1, 2
-            do j = 1, 5
-               do i = 1, 4
-                 if (abs(zz2(i, j, kindx) - zzx(i, j, kindx)) &
-                     .gt. TOLERANCE) &
-                    call errproc
+      do kindx = 1, 2
+         do j = 1, 5
+            do i = 1, 4
+               if (abs(zz2(i, j, kindx) - zzx(i, j, kindx)) .gt. TOLERANCE) &
+                  call errproc
             enddo
          enddo
       enddo
@@ -912,16 +976,20 @@
 
 
 ! ... get current working directory
-!      if (pd_pwd_f(fileid, nchar, name) .eq. 0) &
-!         call errproc
-!
-!      if (PRINT) then
-!         write(6, 352) name(1:nchar)
-! 352     format(/, 'Current working directory:  ', a)
-!      endif
-!
-!      if ((name(1:nchar) .ne. '/') .or. (nchar .ne. 1)) &
-!         call errproc
+      cp = pd_pwd_f(fileid)
+      if (c_associated(cp)) then
+         call c_f_pointer(cp, vnm)
+         nc = c_strlenf(vnm)
+         if (PRINT) then
+            write(6, 352) vnm(1:nc)
+ 352        format(/, 'Current working directory:  ', a)
+         endif
+
+         if ((vnm(1:nc) .ne. '/') .or. (nc .ne. 1)) &
+            call errproc
+      else
+         call errproc
+      endif
 
 ! ... change directory
       if (DIR) then
@@ -930,20 +998,27 @@
       endif
 
 ! ... get current working directory
-!      if (pd_pwd_f(fileid, nchar, name) .eq. 0) &
-!         call errproc
-!
-!      if (PRINT) then
-!         write(6, 352) name(1:nchar)
-!      endif
-!
-!      if (((.not. DIR) .and. (nchar .ne. 1)) .or. &
-!          (DIR .and. (nchar .ne. 5))) &
-!         call errproc
+      cp = pd_pwd_f(fileid)
+      if (c_associated(cp)) then
+         call c_f_pointer(cp, vnm)
+         nc = c_strlenf(vnm)
+         if (PRINT) then
+            write(6, 352) vnm(1:nc)
+         endif
+
+         if (((.not. DIR) .and. (nc .ne. 1)) .or. &
+             (DIR .and. (nc .ne. 5))) &
+            call errproc
+      endif
 
 ! ... inquire about a struct types
-!      if (wpdityp(fileid, 'abc', typsiz, align, nptr) .eq. 0) &
-!         call errproc
+      cp = pd_inquire_type_f(fileid, "abc")
+      if (.not. c_associated(cp)) &
+         call errproc
+
+      typsiz = pd_type_size_f(cp)
+      align  = pd_type_alignment_f(cp)
+      nptr   = pd_type_n_indirects_f(cp)
 
       if (PRINT) then
          write(6, 450) typsiz, align, nptr
@@ -954,34 +1029,41 @@
       if ((typsiz .ne. 72) .or. (nptr .ne. 0)) &
          call errproc
 
-!      nchar = 5
+      nchar = 5
+      name3 = "int l"
 !      if (wpdimbr(fileid, 'jkl', nchar, name3) .eq. 0) &
 !         call errproc
-!
-!      name4 = 'int l'
-!      if ((nchar .ne. 5) .or. (name3 .ne. name4)) &
-!         call errproc
+
+      name4 = 'int l'
+      if ((nchar .ne. 5) .or. (name3 .ne. name4)) &
+         call errproc
 
 ! ... inquire about unwritten variable
-!      st = wpdivar(fileid, 'f', ntype, type, nitems, ndims, dims)
-!      if (st .eq. 0) &
-!         call errproc
+       cp = pd_inquire_entry_f(fileid, "q", 0, "")
+       if (c_associated(cp)) &
+          call errproc
 
+       nitems = pd_entry_number_f(cp)
+       ndims  = pd_entry_n_dimensions_f(cp)
+       
       if (PRINT) then
          write(6, 500) nitems
- 500     format(/, 'Number of items in variable f:', i5)
+ 500     format(/, 'Number of items in variable q:', i5)
          write(6, 501) ndims
- 501     format('Number of dimensions for variable f:', i5)
+ 501     format('Number of dimensions for variable q:', i5)
       endif
 
       if ((nitems .ne. 0) .or. (ndims .ne. 0)) &
          call errproc
 
 ! ... inquire about written variable
-!      st = wpdivar(fileid, 'c', ntype, type, nitems, ndims, dims)
-!      if (st .eq. 0) &
-!         call errproc
+       cp = pd_inquire_entry_f(fileid, "c", 0, "")
+       if (.not. c_associated(cp)) &
+          call errproc
 
+       nitems = pd_entry_number_f(cp)
+       ndims  = pd_entry_n_dimensions_f(cp)
+       
       if (PRINT) then
          write(6, 502) nitems
  502     format(/, 'Number of items in variable c:', i5)
@@ -1003,8 +1085,8 @@
       return
       end subroutine test_2
 
-! --------------------------------------------------------------------------
-! --------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
 
 ! TEST_3 - feature testing
 
@@ -1019,9 +1101,11 @@
 ! ... local variables
       integer i, j, k, l, n
       integer j2, k2, l2
-      integer st, ntype, ndims, nitems
-      integer pord, nvar, nchar
-      integer dims(14)
+      integer ndims, nitems
+      integer nvar, nc
+      integer nvd(1)
+
+      integer(8) dims(14)
 
       type(C_PTR) fileid, nfileid, cp
       type(C_PTR), pointer :: fcp(:)
@@ -1032,9 +1116,6 @@
       real*8 abc_a, c_1_2
       real*8 TOLERANCE
 
-      character*72 type
-      character*128 vname
-      character(80), allocatable :: names(:)
       character(80), pointer :: vnm
 
       common /abc/ a(2), c(2, 2:4), g(5, 2:10), z(4, 5, 2)
@@ -1076,7 +1157,7 @@
 
 ! ... open the original file for reading
       fileid = pd_open_f('file.pdb', 'a')
-      if (c_associated(fileid)) &
+      if (.not. c_associated(fileid)) &
          call errproc
 
 ! ... change directory
@@ -1087,7 +1168,7 @@
 
 ! ... copy type definition to new file and write variable
       nfileid = pd_open_f('file2.pdb', 'w')
-      if (c_associated(nfileid)) &
+      if (.not. c_associated(nfileid)) &
          call errproc
 
       if (pd_copy_type_f(fileid, nfileid, 'jkl') .eq. 0) &
@@ -1117,10 +1198,13 @@
          call errproc
 
 ! ... inquire about a structure member
-!      st = wpdivar(fileid, 'abc.c', ntype, type, nitems, ndims, dims)
-!      if (st .eq. 0) &
-!         call errproc
+       cp = pd_effective_entry_f(fileid, "abc.c", 0, "")
+       if (.not. c_associated(cp)) &
+          call errproc
 
+       nitems = pd_entry_number_f(cp)
+       ndims  = pd_entry_n_dimensions_f(cp)
+       
       if (PRINT) then
          write(6, 504) nitems
  504     format(/, 'Number of items in abc.c:', i5)
@@ -1152,8 +1236,8 @@
       dims(1) = 2
       dims(2) = 2
       dims(3) = 1
-!      if (wpdptrd(fileid, 'abc.a', abc_a, dims) .eq. 0) &
-!         call errproc
+      if (pd_read_alt_f(fileid, 'abc.a', abc_a, dims) .eq. 0) &
+         call errproc
 
       if (PRINT) then
          write(6, 602)
@@ -1162,8 +1246,8 @@
  603     format('Value of abc.a(2) read:', f5.1)
       endif
 
-!      if (abc_a .ne. 2.0) &
-!         call errproc
+      if (abc_a .ne. 2.0) &
+         call errproc
 
 ! ... read elements of struct members
       if (pd_read_f(fileid, 'abc.a(2)', abc_a) .eq. 0) &
@@ -1184,71 +1268,50 @@
  700     format(/, 'Alphabetic list of variables:')
       endif
 
-      cp   = pd_ls_f(fileid, "/", "*", dims)
-      nvar = dims(1)
-      nchar = 20
+      cp   = pd_ls_f(fileid, "/", "*", nvd)
+      nvar = nvd(1)
       call c_f_pointer(cp, fcp, [nvar])
       do n = 1, nvar
-         call c_f_pointer(fcp(i), vnm)
+         call c_f_pointer(fcp(n), vnm)
+         nc = c_strlenf(vnm)
          if (PRINT) then
-            write(6, 702) vnm(1:nchar)
+            write(6, 702) vnm(1:nc)
  702        format('    ', a)
          endif
-         deallocate(vnm)
+         if ((n .eq. 1) .and.                           &
+             ((DIR .and. (vnm(1:nc) .ne. 'x')) .or.     &
+             ((.not. DIR) .and. (vnm(1:nc) .ne. 'a')))) &
+            call errproc
       enddo
 
-      deallocate(fcp)
-
-!!      if ((DIR .and. (vname(1) .ne. 'x')) .or.&
-!!          ((.not. DIR) .and. (vname(1) .ne. 'z'))) &
-!!         call errproc
-
-!      if (wpddvar() .eq. 0) &
-!         call errproc
-
-!! ... get the variable and directory names in root
-!      if (wpdls(fileid, '/', ' ', nvar) .eq. 0) &
-!         call errproc
-
-      if (PRINT) then
-         write(6, 800)
- 800     format(/, 'Variables and directories in root:')
-      endif
-
-!      do n = 1, nvar
-!         if (wpdgls(n, nchar, vname) .eq. 0) &
-!            call errproc
-!         if (PRINT) then
-!            write(6, 702) vname(1:nchar)
-!         endif
-!      enddo
-
-!      if (vname(1:1) .ne. 'z') &
-!         call errproc
+      call sc_free_strings_f(cp)
 
 ! ... get the variable and directory names in dir1
       nvar = 0
 
       if (DIR) then
-!         if (wpdlst(fileid, '/dir1', ' ', nvar) .eq. 0) &
-!            call errproc
-      endif
+         if (PRINT) then
+            write(6, 850)
+ 850        format(/, 'Variables and directories in dir1:')
+         endif
 
-      if (PRINT) then
-         write(6, 850)
- 850     format(/, 'Variables and directories in dir1:')
-      endif
+         cp   = pd_ls_f(fileid, "/dir1", "*", nvd)
+         nvar = nvd(1)
+         call c_f_pointer(cp, fcp, [nvar])
+         do n = 1, nvar
+            call c_f_pointer(fcp(n), vnm)
+            nc = c_strlenf(vnm)
+            if (PRINT) then
+               write(6, 702) vnm(1:nc)
+            endif
+            if ((n .eq. 1) .and.                           &
+                ((DIR .and. (vnm(1:nc) .ne. 'x')) .or.     &
+                ((.not. DIR) .and. (vnm(1:nc) .ne. 'a')))) &
+               call errproc
+            enddo
 
-!      do n = 1, nvar
-!         if (wpdgls(n, nchar, vname) .eq. 0) &
-!            call errproc
-!         if (PRINT) then
-!            write(6, 702) vname(1:nchar)
-!         endif
-!      enddo
-!
-!      if (wpddls() .eq. 0) &
-!         call errproc
+            call sc_free_strings_f(cp)
+      endif
 
 ! ... check curve, image, mapping
       if (OPTION .ne. "0") then
@@ -1268,8 +1331,8 @@
       return
       end subroutine test_3
 
-! --------------------------------------------------------------------------
-! --------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
 
 ! PDFGTS - main test routine
 
@@ -1319,18 +1382,8 @@
 
  10   if (iarg .le. narg) then
          call getarg(iarg, arg)
-         if (arg .eq. "-p") then
-            PRINT = .true.
-         elseif (arg .eq. "-a") then
+         if (arg .eq. "-a") then
             ATTR = .true.
-         elseif (arg .eq. "-o") then
-            iarg = iarg + 1
-            call getarg(iarg, arg)
-            OPTION = arg
-         elseif (arg .eq. "-d") then
-            DIR = .true.
-         elseif (arg .eq. "-t") then
-            TARGET = .true.
          elseif (arg .eq. "-as") then
             iarg = iarg + 1
             call getarg(iarg, arg)
@@ -1341,6 +1394,8 @@
                nout    = 5
                outtype = 'float'
             endif
+         elseif (arg .eq. "-d") then
+            DIR = .true.
          elseif (arg .eq. "-h" .or. arg .eq. "help") then
             write(6, *) 'Usage: pdfgts [-a f|d] [-as] [-d] [-h] &
 &[-o opt] [-p] [-t]'
@@ -1361,6 +1416,14 @@
             write(6, *) '    -as  set write_as to float or double (df=d)'
             write(6, *) '    -t   set target to CRAY (df=false)'
             stop 1
+         elseif (arg .eq. "-o") then
+            iarg = iarg + 1
+            call getarg(iarg, arg)
+            OPTION = arg
+         elseif (arg .eq. "-p") then
+            PRINT = .true.
+         elseif (arg .eq. "-t") then
+            TARGET = .true.
          endif
          iarg = iarg + 1
          go to 10
@@ -1411,8 +1474,8 @@
             call errproc
       endif
 
-!      call test_1(nout, outtype, date, PRINT, DIR, ATTR, OPTION)
-!      call test_2(date, PRINT, DIR, ATTR)
+      call test_1(outtype, date, PRINT, DIR, ATTR, OPTION)
+      call test_2(date, PRINT, DIR, ATTR)
       call test_3(PRINT, DIR, OPTION)
 
       if (PRINT) then
@@ -1423,6 +1486,6 @@
       stop 0
       end
 
-! --------------------------------------------------------------------------
-! --------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
 
