@@ -365,6 +365,36 @@ defstr *PD_defstr_alt(PDBfile *file, char *name, int nmemb,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PD_DEFSTR_S - define a struct from a string
+ *             -
+ *             - sample syntax:
+ *             -
+ *             -   PD_defstr_s(<PDB file>, "<struct name>", n_members,
+ *             -               <text>);
+ *             - the text consists of semicolon delimited member specifications
+ *             - as the individual members in PD_defstr
+ */
+
+defstr *PD_defstr_s(PDBfile *file, char *name, char *members)
+   {int nm;
+    char **mbr;
+    defstr *dp;
+
+    mbr = SC_tokenize(members, ";");
+    SC_ptr_arr_len(nm, mbr);
+
+    dp = PD_defstr_alt(file, name, nm, mbr);
+
+    SC_free_strings(mbr);
+
+    if (dp == NULL)
+       PD_error("CAN'T DEFINE STRUCT - PD_DEFSTR_S", PD_GENERIC);
+
+    return(dp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PD_CHANGE_PRIMITIVE - change the description of a primitive type
  *                     - the type is known by index
  */

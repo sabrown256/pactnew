@@ -733,7 +733,7 @@ void _PA_wrrstrt(char *rsname, int conv_flag)
 	     psz = _PA_list_to_dims(PA_VARIABLE_DIMS(pp),
 				    PD_entry_dimensions(sp));
 	     PA_VARIABLE_SIZE(pp) = psz;
-	     PD_entry_number(sp)  = psz;
+	     sp->number           = psz;
 
 	     switch (pclass)
 	        {case REQU :
@@ -959,7 +959,7 @@ void _PA_rd_variable(PDBfile *pdrs, PA_variable *pp,
     psz                  = _PA_dims_to_list(PD_entry_dimensions(sp),
                                             PA_VARIABLE_DIMS(pp));
     PA_VARIABLE_SIZE(pp) = psz;
-    PD_entry_number(sp)  = psz;
+    sp->number           = psz;
 
 /* if conversions are requested check that the conversion factor isn't unity */
     COMPUTE_CONVERSION_FACTOR(conv_flag, conv_fac,

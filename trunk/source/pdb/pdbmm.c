@@ -414,10 +414,10 @@ syment *PD_copy_syment(syment *osym)
 
     _PD_block_copy(nsym, osym);
 
-    PD_entry_type(nsym)       = ntype;
-    PD_entry_dimensions(nsym) = ndims;
-    PD_entry_number(nsym)     = PD_entry_number(osym);
-    PD_entry_indirects(nsym)  = PD_entry_indirects(osym);
+    nsym->type       = ntype;
+    nsym->dimensions = ndims;
+    nsym->number     = PD_entry_number(osym);
+    nsym->indirects  = osym->indirects;
 
     SC_mark(ntype, 1);
     SC_mark(ndims, 1);
@@ -450,19 +450,19 @@ syment *_PD_mk_syment(char *type, long ni, int64_t addr, symindir *indr,
 	   {t = CSTRSAVE(type);
 	    SC_mark(t, 1);};
 
-	PD_entry_type(ep)       = t;
-	PD_entry_number(ep)     = ni;
-	PD_entry_dimensions(ep) = dims;
+	ep->type       = t;
+	ep->number     = ni;
+	ep->dimensions = dims;
 
 	if (indr == NULL)
 	   {symindir iloc;
 	    iloc.addr       = 0;
 	    iloc.n_ind_type = 0L;
-	    iloc.arr_offs = 0L;
-	    PD_entry_indirects(ep) = iloc;}
+	    iloc.arr_offs   = 0L;
+	    ep->indirects   = iloc;}
 
 	else
-	   PD_entry_indirects(ep)  = *indr;
+	   ep->indirects = *indr;
 
 	SC_mark(dims, 1);};
 
@@ -517,7 +517,7 @@ void _PD_rl_syment(syment *ep)
    {
 
     if (ep != NULL)
-       {CFREE(PD_entry_type(ep));
+       {CFREE(ep->type);
 	_PD_block_rel(ep);
 	CFREE(ep);};
 

@@ -491,7 +491,7 @@ int PD_read_as_dwim(PDBfile *file, char *name, char *outtype, long nix,
 	ntr = PD_entry_number(ep);
 	if (nir > nix)
 	   {nl  = -ntr;
-	    PD_entry_number(ep) = nix;}
+	    ep->number = nix;}
 	else
 	   nl = ntr;
 	
@@ -806,8 +806,8 @@ syment *_PD_write(PDBfile *file, char *name, char *intype, char *outtype,
 					  FALSE, FALSE, TRUE);
 
 	    _PD_block_init(ep, TRUE);
-	    PD_entry_number(ep)     = number;
-	    PD_entry_dimensions(ep) = dims;
+	    ep->number     = number;
+	    ep->dimensions = dims;
 	    _PD_entry_set_address(ep, 0, addr);
 	    _PD_entry_set_number(ep, 0, number);
 
@@ -1028,6 +1028,11 @@ int PD_write_as_alt(PDBfile *file, char *name, char *intype, char *outtype,
         snprintf(hname, MAXLINE, "%s%s", name, index);}
     else
        strcpy(hname, name);
+
+    if (intype != NULL)
+       SC_trim_right(intype, " \t");
+    if (outtype != NULL)
+       SC_trim_right(outtype, " \t");
 
     appnd = pa->append_flag;
     strcpy(fullpath, _PD_fixname(file, hname));

@@ -408,8 +408,7 @@ static int _PD_consistent_dims(PDBfile *file, syment *ep, dimdes *ndims)
 
 	    if (rv == TRUE)
 	       {od->number = od->index_max - od->index_min + 1L;
-
-		PD_entry_number(ep) = _PD_comp_num(odims);};};};
+		ep->number = _PD_comp_num(odims);};};};
 
     return(rv);}
 
@@ -563,7 +562,7 @@ void _PD_block_truncate(syment *ep, long ni)
     symblock *sp;
 
     if (ep != NULL)
-       {PD_entry_number(ep) = ni;
+       {ep->number = ni;
 
 /* find and adjust the last block contained in the new size */
 	n = _PD_n_blocks(ep);

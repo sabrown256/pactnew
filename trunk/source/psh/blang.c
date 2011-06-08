@@ -11,7 +11,7 @@
 #include "common.h"
 #include "libpsh.c"
 
-#define RETURN_INTEGER
+/* #define RETURN_INTEGER */
 
 #ifdef RETURN_INTEGER
 #define C_PTR_RETURN "integer(isizea)"
@@ -923,8 +923,14 @@ static void fortran_wrap_decl(FILE *fp, fdecl *dcl,
 
     switch (knd)
        {case FP_STRUCT_P :
+
+#ifdef RETURN_INTEGER
+	     snprintf(t, MAXLINE, "FIXNUM FF_ID(%s, %s)(%s)\n",
+		      dcn, ucn, a);
+#else
 	     snprintf(t, MAXLINE, "void *FF_ID(%s, %s)(%s)\n",
 		      dcn, ucn, a);
+#endif
 	     break;
         case FP_ARRAY :
 	     snprintf(t, MAXLINE, "%s *FF_ID(%s, %s)(%s)\n",
@@ -976,10 +982,12 @@ static void fortran_wrap_local_decl(FILE *fp, fdecl *dcl,
 	    {if (voidf == FALSE)
 		{switch (knd)
 		    {case FP_STRUCT_P :
-		          nstrcat(t, MAXLINE, "void *_rv;\n");
 #ifdef RETURN_INTEGER
+		          nstrcat(t, MAXLINE, "FIXNUM _rv;\n");
 			  vstrcat(t, MAXLINE, "    SC_address _ad%s;\n",
 				  dcl->name);
+#else
+		          nstrcat(t, MAXLINE, "void *_rv;\n");
 #endif
 			  break;
 		     case FP_ARRAY :
@@ -1123,14 +1131,13 @@ static void fortran_wrap_local_call(FILE *fp, fdecl *dcl,
 
 static void fortran_wrap_local_return(FILE *fp, fdecl *dcl,
 				      fparam knd, int voidf)
-   {char *nm;
+   {
 
-    nm = dcl->name;
     if (voidf == FALSE)
        {switch (knd)
 	   {case FP_STRUCT_P :
 #ifdef RETURN_INTEGER
-	         fprintf(fp, "    _rv = _ad%s.diskaddr;\n\n", nm);
+	         fprintf(fp, "    _rv = _ad%s.diskaddr;\n\n", dcl->name);
 #endif
 	         fprintf(fp, "    return(_rv);}\n");
 		 break;
@@ -1574,7 +1581,8 @@ static int module_pre_wrappable(char *pr)
    {int rv;
 
     rv = ((strstr(pr, "...") == NULL) &&
-	  (strstr(pr, C_PTR_RETURN) == NULL) &&
+	  (strstr(pr, "integer(isizea)") == NULL) &&
+	  (strstr(pr, "type(C_PTR)") == NULL) &&
 	  (strstr(pr, "external") == NULL));
 
     return(rv);}
@@ -1675,8 +1683,7 @@ static int module_itf_wrappable(fdecl *dcl)
 
 static void module_itf_wrap_ext(FILE *fp, char *pck, fdecl *dcl,
 				char *cfn, char *ffn)
-   {fparam knd;
-    char dcn[MAXLINE], fty[MAXLINE], cty[MAXLINE];
+   {char dcn[MAXLINE], fty[MAXLINE], cty[MAXLINE];
     char *rty;
     static int first = TRUE;
 
@@ -1691,7 +1698,7 @@ static void module_itf_wrap_ext(FILE *fp, char *pck, fdecl *dcl,
 		fprintf(fp, "\n");};};
 
 	rty = dcl->type;
-	knd = mc_type(MAXLINE, fty, cty, NULL, rty);
+	mc_type(MAXLINE, fty, cty, NULL, rty);
 	if (strcmp(rty, "void") == 0)
 	   fprintf(fp, "   external :: %s\n", dcn);
         else
@@ -1713,7 +1720,6 @@ static void module_itf_wrap_ext(FILE *fp, char *pck, fdecl *dcl,
 static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
 				 char *cfn, char *ffn)
    {int i, ns, voidf;
-    fparam knd;
     char dcn[MAXLINE], a[MAXLINE], t[MAXLINE];
     char fty[MAXLINE], cty[MAXLINE];
     char *rty, *oper, **args;
@@ -1726,7 +1732,7 @@ static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
 	voidf = (strcmp(rty, "void") == 0);
 	oper  = (voidf == TRUE) ? "subroutine" : "function";
 
-	knd = mc_type(MAXLINE, fty, cty, NULL, rty);
+	mc_type(MAXLINE, fty, cty, NULL, rty);
 	mc_decl_list(a, MAXLINE, dcl);
 
 	snprintf(t, MAXLINE, "      %s %s(%s)", oper, dcn, a);
@@ -1772,7 +1778,6 @@ static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
 
 static void module_interop_wrap(FILE *fp, fdecl *dcl, char *cfn)
    {int i, na, voidf, voida;
-    fparam knd;
     char dcn[MAXLINE], a[MAXLINE];
     char fty[MAXLINE], cty[MAXLINE];
     char cd[MAXLINE], cb[MAXLINE];
@@ -1793,7 +1798,7 @@ static void module_interop_wrap(FILE *fp, fdecl *dcl, char *cfn)
 	oper  = (voidf == TRUE) ? "subroutine" : "function";
 
 
-	knd = mc_type(MAXLINE, fty, cty, NULL, rty);
+	mc_type(MAXLINE, fty, cty, NULL, rty);
 	mc_decl_list(a, MAXLINE, dcl);
 
 	if (voidf == TRUE)
@@ -1814,9 +1819,9 @@ static void module_interop_wrap(FILE *fp, fdecl *dcl, char *cfn)
 	    {if ((voida == TRUE) && (i == 0))
 	        continue;
 
-	     ty  = al[i].type;
-	     nm  = al[i].name;
-	     knd = mc_type(MAXLINE, fty, cty, NULL, ty);
+	     ty = al[i].type;
+	     nm = al[i].name;
+	     mc_type(MAXLINE, fty, cty, NULL, ty);
 	     fprintf(fp, "         %s (%s), value :: %s\n",
 		     fty, cty, nm);};
 
@@ -1884,6 +1889,30 @@ static int bind_module(bindes *bd)
 
 /* start the interface */
 	fprintf(fp, "   interface\n");
+	fprintf(fp, "\n");
+
+	fprintf(fp, "      function strlen(s) bind(C)\n");
+	fprintf(fp, "         use iso_c_binding\n");
+	fprintf(fp, "         implicit none\n");
+	fprintf(fp, "         integer(C_SIZE_T) :: strlen\n");
+	fprintf(fp, "         type(C_PTR), intent(in) :: s\n");
+	fprintf(fp, "      end function strlen\n");
+	fprintf(fp, "\n");
+
+	fprintf(fp, "      function c_strlenc(s)\n");
+	fprintf(fp, "         use iso_c_binding\n");
+	fprintf(fp, "         implicit none\n");
+	fprintf(fp, "         integer :: c_strlenc\n");
+	fprintf(fp, "         type(C_PTR), intent(in) :: s(*)\n");
+	fprintf(fp, "      end function c_strlenc\n");
+	fprintf(fp, "\n");
+
+	fprintf(fp, "      function c_strlenf(s)\n");
+	fprintf(fp, "         use iso_c_binding\n");
+	fprintf(fp, "         implicit none\n");
+	fprintf(fp, "         integer :: c_strlenf\n");
+	fprintf(fp, "         character(*), intent(in) :: s\n");
+	fprintf(fp, "      end function c_strlenf\n");
 	fprintf(fp, "\n");
 
 #if 0

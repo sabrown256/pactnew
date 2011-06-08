@@ -613,11 +613,9 @@ FIXNUM FF_ID(pfivar, PFIVAR)(FIXNUM *sfid, FIXNUM *sncn, char *name,
 	*snct = strlen(ltype);
 	*ssz = PD_entry_number(ep);
 
-	for (nd = (FIXNUM) 0, pd = PD_entry_dimensions(ep);
-	     pd != NULL;
-	     pd = pd->next)
-	   {dims[nd++] = pd->index_min;
-	    dims[nd++] = pd->index_max;};
+	for (nd = 0, pd = PD_entry_dimensions(ep); pd != NULL; pd = pd->next)
+	    {dims[nd++] = pd->index_min;
+	     dims[nd++] = pd->index_max;};
 	*snd = nd/2;
 
 	_PD_rl_syment_d(ep);
