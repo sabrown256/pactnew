@@ -21,37 +21,44 @@ module pact_bl1
 
 ! ... declarations for generated wrappers
       subroutine fav1_f() 
+         use iso_c_binding
          implicit none
       end subroutine fav1_f
 
       function fav2_f() 
+         use iso_c_binding
          implicit none
          integer         :: fav2_f
       end function fav2_f
 
       function fav3_f() 
+         use iso_c_binding
          implicit none
          real            :: fav3_f
       end function fav3_f
 
       function fav4_f() 
+         use iso_c_binding
          implicit none
          integer         :: fav4_f
       end function fav4_f
 
       function favp2_f() 
+         use iso_c_binding
          use types_bl1
          implicit none
          integer(isizea) :: favp2_f
       end function favp2_f
 
       function favp3_f() 
+         use iso_c_binding
          use types_bl1
          implicit none
          integer(isizea) :: favp3_f
       end function favp3_f
 
       function favp4_f() 
+         use iso_c_binding
          use types_bl1
          implicit none
          integer(isizea) :: favp4_f

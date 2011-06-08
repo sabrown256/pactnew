@@ -18,6 +18,7 @@ module pact_bl4
 
 ! ... declarations for generated wrappers
       function fb1_f(a1, a2) 
+         use iso_c_binding
          use types_bl4
          implicit none
          integer         :: fb1_f
@@ -26,6 +27,7 @@ module pact_bl4
       end function fb1_f
 
       function fb2_f(a1, a2) 
+         use iso_c_binding
          use types_bl4
          implicit none
          integer         :: fb2_f
@@ -34,6 +36,7 @@ module pact_bl4
       end function fb2_f
 
       function fb3_f(a1, a2) 
+         use iso_c_binding
          use types_bl4
          implicit none
          integer         :: fb3_f
@@ -42,6 +45,7 @@ module pact_bl4
       end function fb3_f
 
       function fb4_f(a1, a2) 
+         use iso_c_binding
          use types_bl4
          implicit none
          integer         :: fb4_f
@@ -50,6 +54,7 @@ module pact_bl4
       end function fb4_f
 
       function fb5_f(a1, a2) 
+         use iso_c_binding
          use types_bl4
          implicit none
          integer         :: fb5_f
@@ -58,6 +63,7 @@ module pact_bl4
       end function fb5_f
 
       function fb6_f(a1, a2) 
+         use iso_c_binding
          use types_bl4
          implicit none
          integer         :: fb6_f
@@ -66,6 +72,7 @@ module pact_bl4
       end function fb6_f
 
       function fb7_f(a1, a2) 
+         use iso_c_binding
          use types_bl4
          implicit none
          integer         :: fb7_f
@@ -74,6 +81,7 @@ module pact_bl4
       end function fb7_f
 
       function fb8_f(a1, a2) 
+         use iso_c_binding
          use types_bl4
          implicit none
          integer         :: fb8_f
@@ -82,6 +90,7 @@ module pact_bl4
       end function fb8_f
 
       function fb10_f(a1, a2) 
+         use iso_c_binding
          use types_bl4
          implicit none
          integer         :: fb10_f
@@ -90,6 +99,7 @@ module pact_bl4
       end function fb10_f
 
       function fb11_f(a1, a2) 
+         use iso_c_binding
          use types_bl4
          implicit none
          integer         :: fb11_f
@@ -98,72 +108,84 @@ module pact_bl4
       end function fb11_f
 
       function fr1_f(a1) 
+         use iso_c_binding
          implicit none
          integer         :: fr1_f
          integer         :: a1
       end function fr1_f
 
       function fr2_f(a1) 
+         use iso_c_binding
          implicit none
          integer         :: fr2_f
          integer         :: a1
       end function fr2_f
 
       function fr3_f(a1) 
+         use iso_c_binding
          implicit none
          integer         :: fr3_f
          integer         :: a1
       end function fr3_f
 
       function fr4_f(a1) 
+         use iso_c_binding
          implicit none
          integer         :: fr4_f
          integer         :: a1
       end function fr4_f
 
       function fr5_f(a1) 
+         use iso_c_binding
          implicit none
          integer         :: fr5_f
          integer         :: a1
       end function fr5_f
 
       function fr6_f(a1) 
+         use iso_c_binding
          implicit none
          integer         :: fr6_f
          integer         :: a1
       end function fr6_f
 
       function fr7_f(a1) 
+         use iso_c_binding
          implicit none
          real            :: fr7_f
          integer         :: a1
       end function fr7_f
 
       function fr8_f(a1) 
+         use iso_c_binding
          implicit none
          real            :: fr8_f
          integer         :: a1
       end function fr8_f
 
       function fr10_f(a1) 
+         use iso_c_binding
          implicit none
          complex         :: fr10_f
          integer         :: a1
       end function fr10_f
 
       function fr11_f(a1) 
+         use iso_c_binding
          implicit none
          complex         :: fr11_f
          integer         :: a1
       end function fr11_f
 
       function fr13_f(a1) 
+         use iso_c_binding
          implicit none
          integer         :: fr13_f
          integer         :: a1
       end function fr13_f
 
       function fp1_f(a1) 
+         use iso_c_binding
          use types_bl4
          implicit none
          integer(isizea) :: fp1_f
@@ -171,6 +193,7 @@ module pact_bl4
       end function fp1_f
 
       function fp2_f(a1) 
+         use iso_c_binding
          use types_bl4
          implicit none
          integer(isizea) :: fp2_f
@@ -178,6 +201,7 @@ module pact_bl4
       end function fp2_f
 
       function fp3_f(a1) 
+         use iso_c_binding
          use types_bl4
          implicit none
          integer(isizea) :: fp3_f
@@ -185,6 +209,7 @@ module pact_bl4
       end function fp3_f
 
       function fp4_f(a1) 
+         use iso_c_binding
          use types_bl4
          implicit none
          integer(isizea) :: fp4_f
@@ -192,6 +217,7 @@ module pact_bl4
       end function fp4_f
 
       function fp5_f(a1) 
+         use iso_c_binding
          use types_bl4
          implicit none
          integer(isizea) :: fp5_f
@@ -199,6 +225,7 @@ module pact_bl4
       end function fp5_f
 
       function fp6_f(a1) 
+         use iso_c_binding
          use types_bl4
          implicit none
          integer(isizea) :: fp6_f
@@ -206,6 +233,7 @@ module pact_bl4
       end function fp6_f
 
       function fp7_f(a1) 
+         use iso_c_binding
          use types_bl4
          implicit none
          integer(isizea) :: fp7_f
@@ -213,6 +241,7 @@ module pact_bl4
       end function fp7_f
 
       function fp8_f(a1) 
+         use iso_c_binding
          use types_bl4
          implicit none
          integer(isizea) :: fp8_f
@@ -220,6 +249,7 @@ module pact_bl4
       end function fp8_f
 
       function fp10_f(a1) 
+         use iso_c_binding
          use types_bl4
          implicit none
          integer(isizea) :: fp10_f
@@ -227,6 +257,7 @@ module pact_bl4
       end function fp10_f
 
       function fp11_f(a1) 
+         use iso_c_binding
          use types_bl4
          implicit none
          integer(isizea) :: fp11_f
@@ -234,6 +265,7 @@ module pact_bl4
       end function fp11_f
 
       function fp13_f(a1) 
+         use iso_c_binding
          use types_bl4
          implicit none
          integer(isizea) :: fp13_f

@@ -80,8 +80,8 @@ double *FF_ID(favp3_f, FAVP3_F)(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-FIXNUM FF_ID(favp4_f, FAVP4_F)(void)
-   {FIXNUM _rv;
+void *FF_ID(favp4_f, FAVP4_F)(void)
+   {void *_rv;
     SC_address _adfavp4;
 
     _adfavp4.memaddr = (void *) favp4();

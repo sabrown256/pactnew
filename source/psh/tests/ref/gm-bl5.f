@@ -18,18 +18,21 @@ module pact_bl5
 
 ! ... declarations for generated wrappers
       subroutine a_f1_f(a) 
+         use iso_c_binding
          use types_bl5
          implicit none
          integer(isizea) :: a
       end subroutine a_f1_f
 
       subroutine a_f2_f(b) 
+         use iso_c_binding
          use types_bl5
          implicit none
          integer(isizea) :: b
       end subroutine a_f2_f
 
       subroutine a_f3_f(a, b) 
+         use iso_c_binding
          use types_bl5
          implicit none
          integer(isizea) :: a
@@ -37,6 +40,7 @@ module pact_bl5
       end subroutine a_f3_f
 
       subroutine a_f4_f(b, a) 
+         use iso_c_binding
          use types_bl5
          implicit none
          integer(isizea) :: b
@@ -44,6 +48,7 @@ module pact_bl5
       end subroutine a_f4_f
 
       subroutine b_f1_f(a, b) 
+         use iso_c_binding
          use types_bl5
          implicit none
          integer(isizea) :: a
@@ -51,6 +56,7 @@ module pact_bl5
       end subroutine b_f1_f
 
       subroutine b_f2_f(a, b) 
+         use iso_c_binding
          use types_bl5
          implicit none
          integer(isizea) :: a
@@ -58,6 +64,7 @@ module pact_bl5
       end subroutine b_f2_f
 
       subroutine b_f3_f(a, b, c) 
+         use iso_c_binding
          use types_bl5
          implicit none
          integer(isizea) :: a
@@ -66,6 +73,7 @@ module pact_bl5
       end subroutine b_f3_f
 
       subroutine b_f4_f(a, b, c) 
+         use iso_c_binding
          use types_bl5
          implicit none
          integer(isizea) :: a
@@ -74,6 +82,7 @@ module pact_bl5
       end subroutine b_f4_f
 
       subroutine b_f5_f(a, b, c) 
+         use iso_c_binding
          use types_bl5
          implicit none
          integer         :: a
@@ -82,6 +91,7 @@ module pact_bl5
       end subroutine b_f5_f
 
       subroutine b_f6_f(a, b, c) 
+         use iso_c_binding
          use types_bl5
          implicit none
          integer         :: a

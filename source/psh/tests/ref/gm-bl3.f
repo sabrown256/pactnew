@@ -18,6 +18,7 @@ module pact_bl3
 
 ! ... declarations for generated wrappers
       function fe1_f(a1, a2) 
+         use iso_c_binding
          use types_bl3
          implicit none
          integer(isizea) :: fe1_f
@@ -26,6 +27,7 @@ module pact_bl3
       end function fe1_f
 
       subroutine fe2_f(dev, x, y, n, info, l) 
+         use iso_c_binding
          use types_bl3
          implicit none
          integer(isizea) :: dev

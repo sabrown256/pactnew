@@ -18,12 +18,12 @@ derived PD_checksum_mode	integer		SC_ENUM_I	SC_ENUM_I
 
 # PDB.C
 
-PD_open				yes		yes		none
+PD_open				yes		yes		pdb.open
 PD_family			yes		yes		none
 PD_create			yes		yes		none
 PD_open_vif			yes		yes		none
-PD_close			yes		yes		none
-PD_flush			yes		yes		none
+PD_close			yes		yes		file.close
+PD_flush			yes		yes		file.flush
 PD_remove_entry			yes		yes		none
 PD_append			yes		yes		none
 PD_append_alt			yes		yes		none
@@ -31,12 +31,12 @@ PD_append_as			yes		yes		none
 PD_append_as_alt		yes		yes		none
 PD_defent			yes		yes		none
 PD_defent_alt			yes		yes		none
-PD_read				yes		yes		none
+PD_read				yes		yes		file.read
 PD_read_as			yes		yes		none
 PD_read_as_dwim			yes		yes		none
 PD_read_alt			yes		yes		none
 PD_read_as_alt			yes		yes		none
-PD_write			yes		yes		none
+PD_write			yes		yes		file.write
 PD_write_alt			yes		yes		none
 PD_write_as			yes		yes		none
 PD_write_as_alt			yes		yes		none
@@ -55,7 +55,7 @@ PD_defchr			yes		yes		none
 PD_defix			yes		yes		none
 PD_defixnum			yes		yes		none
 PD_defloat			yes		yes		none
-PD_defstr			yes		none		none
+PD_defstr			yes		none		pdb.defstr
 PD_defstr_alt			yes		yes		none
 PD_verify_writes		yes		yes		none
 PD_change_primitive		yes		yes		none
@@ -72,13 +72,13 @@ PD_alloc_entry			yes		yes		none
 
 # PDBDIR.C
 
-PD_ls				yes		yes		none
+PD_ls				yes		yes		file.ls
 PD_ls_alt			yes		yes		none
-PD_pwd				yes		yes		none
-PD_cd				yes		yes		none
-PD_isdir			yes		yes		none
-PD_mkdir			yes		yes		none
-PD_ln				yes		yes		none
+PD_pwd				yes		yes		file.pwd
+PD_cd				yes		yes		file.cd
+PD_isdir			yes		yes		file.isdir
+PD_mkdir			yes		yes		file.mkdir
+PD_ln				yes		yes		file.ln
 PD_def_dir			yes		yes		none
 
 
@@ -231,3 +231,7 @@ PD_target_platform_name		yes		yes		none
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+# PD_get_file_name
+# PD_get_major_order
+# PD_get_mode
+# PD_get_offset
