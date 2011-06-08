@@ -118,7 +118,7 @@
       use pact_pdb
       implicit none
 
-      integer(isizea) fileid
+      type(C_PTR) fileid
 
 ! ... local variables
       integer i, index, st
@@ -152,7 +152,7 @@
       use pact_pdb
       implicit none
 
-      integer(isizea) fileid
+      type(C_PTR) fileid
       real*8 tolerance
 
 ! ... local variables
@@ -194,7 +194,7 @@
       use pact_pdb
       implicit none
 
-      integer(isizea) fileid
+      type(C_PTR) fileid
 
 ! ... local variables
 !      integer k, l, st
@@ -228,7 +228,7 @@
       use pact_pdb
       implicit none
 
-      integer(isizea) fileid
+      type(C_PTR) fileid
 
 ! ... local variables
       integer k, l, st
@@ -311,7 +311,7 @@
       use pact_pdb
       implicit none
 
-      integer(isizea) fileid
+      type(C_PTR) fileid
       real*8 tolerance
 
 ! ... local variables
@@ -382,8 +382,8 @@
       
       integer(8) ldims(14)
 
-      integer(isizea) fileid
-      integer(isizea) ad
+      type(C_PTR) fileid
+      type(C_PTR) ad
 
       real*8 a, c, g, z, zz, zzx
       real*8 x(20)
@@ -425,11 +425,11 @@
 
 ! ... open file for writing
       fileid = pd_open_f('file.pdb', 'w')
-      if (fileid .le. 0) &
+      if (c_associated(fileid)) &
          call errproc
 
 ! ... faux fam
-      if (pd_family_f(fileid, 1) .eq. 0) &
+      if (c_associated(pd_family_f(fileid, 1))) &
          call errproc
 
 ! ... check file mode
@@ -628,7 +628,7 @@
       endif
 
 ! ... define some symbol table entries and reserve disk space
-      if (pd_defent_f(fileid, 'f(0:3, 4:6, 1:2)', 'double') .eq. 0) &
+      if (c_associated(pd_defent_f(fileid, 'f(0:3, 4:6, 1:2)', 'double'))) &
          call errproc
 
       ndims = 2
@@ -636,7 +636,7 @@
       ldims(2) = 5
       ldims(3) = 2
       ldims(4) = 10
-      if (pd_defent_alt_f(fileid, 'g', 'double', ndims, ldims) .eq. 0) &
+      if (c_associated(pd_defent_alt_f(fileid, 'g', 'double', ndims, ldims))) &
          call errproc
 
       ndims = 2
@@ -725,7 +725,7 @@
       integer kindx
       integer nchar
        
-      integer(isizea) fileid
+      type(C_PTR) fileid, p
 
       character*256 name
       character*8 name1, name2
@@ -777,7 +777,7 @@
 
 ! ... open the file for reading
       fileid = pd_open_f('file.pdb', 'a')
-      if (fileid .eq. 0) &
+      if (c_associated(fileid)) &
          call errproc
 
 ! ... get file name given id
@@ -798,7 +798,8 @@
          if (pd_cd_f(fileid, "dir1") .eq. 0) &
             call errproc
 
-         if (pd_get_attribute_f(fileid, '/jkl_link.k', 'date', dt) .eq. 0) &
+         p = pd_get_attribute_f(fileid, '/jkl_link.k', 'date', dt)
+         if (c_associated(p)) &
             call errproc
 
          if (PRINT) then
@@ -816,8 +817,8 @@
             call errproc
 
 ! ... verify that attribute was removed
-         if (pd_get_attribute_f(fileid, '/jkl_link.k', 'date', dt) &
-              .ne. 0) then
+         p = pd_get_attribute_f(fileid, '/jkl_link.k', 'date', dt)
+         if (c_associated(p)) then
             write(6, 380)
  380        format(/, 'Attribute was not removed.')
             stop 1
@@ -1022,7 +1023,8 @@
       integer pord, nvar, nchar
       integer dims(14)
 
-      integer(isizea) fileid, nfileid, cp
+      type(C_PTR) fileid, nfileid, cp
+      type(C_PTR), pointer :: fcp(:)
 
       real*8 x(20)
       real*8 a, c, g, z, zz, zzx
@@ -1033,6 +1035,7 @@
       character*72 type
       character*128 vname
       character(80), allocatable :: names(:)
+      character(80), pointer :: vnm
 
       common /abc/ a(2), c(2, 2:4), g(5, 2:10), z(4, 5, 2)
       common /abc/ zz(4, 5, 2), zzx(4, 5, 2)
@@ -1073,7 +1076,7 @@
 
 ! ... open the original file for reading
       fileid = pd_open_f('file.pdb', 'a')
-      if (fileid .eq. 0) &
+      if (c_associated(fileid)) &
          call errproc
 
 ! ... change directory
@@ -1084,7 +1087,7 @@
 
 ! ... copy type definition to new file and write variable
       nfileid = pd_open_f('file2.pdb', 'w')
-      if (nfileid .le. 0) &
+      if (c_associated(nfileid)) &
          call errproc
 
       if (pd_copy_type_f(fileid, nfileid, 'jkl') .eq. 0) &
@@ -1181,17 +1184,20 @@
  700     format(/, 'Alphabetic list of variables:')
       endif
 
-      cp = pd_ls_f(fileid, "/", "*", dims)
+      cp   = pd_ls_f(fileid, "/", "*", dims)
       nvar = dims(1)
-!      names = c_charpp_f(nvar, cp, 80)
-!      do n = 1, nvar
-!         if (wpdgvar(n, nchar, vname) .eq. 0) &
-!            call errproc
-!         if (PRINT) then
-!            write(6, 702) vname(1:nchar)
-! 702        format('    ', a)
-!         endif
-!      enddo
+      nchar = 20
+      call c_f_pointer(cp, fcp, [nvar])
+      do n = 1, nvar
+         call c_f_pointer(fcp(i), vnm)
+         if (PRINT) then
+            write(6, 702) vnm(1:nchar)
+ 702        format('    ', a)
+         endif
+         deallocate(vnm)
+      enddo
+
+      deallocate(fcp)
 
 !!      if ((DIR .and. (vname(1) .ne. 'x')) .or.&
 !!          ((.not. DIR) .and. (vname(1) .ne. 'z'))) &
@@ -1279,7 +1285,8 @@
       integer narg, iarg, iargc
       integer nout, err
 
-      integer*8 bufsiz1, bufsiz2, bufsiz3, ftid
+      integer*8 bufsiz1, bufsiz2, bufsiz3
+      type(C_PTR) :: ftid
 
       character*8 outtype
       character*8 arg
@@ -1293,7 +1300,7 @@
 !        3 - in directory dir1
       character*8  OPTION
 
-      ftid = 0
+      ftid = C_NULL_PTR
       err = pd_init_threads_f(0, ftid)
       err = sc_zero_space_f(0)
 

@@ -18,6 +18,7 @@ module pact_bl2
 
 ! ... declarations for generated wrappers
       function fbcv1_f(a, b, c, d, e, f) 
+         use iso_c_binding
          use types_bl2
          implicit none
          integer(isizea) :: fbcv1_f
@@ -30,6 +31,7 @@ module pact_bl2
       end function fbcv1_f
 
       function fbmcv1_f(a, b, c, d) 
+         use iso_c_binding
          use types_bl2
          implicit none
          integer(isizea) :: fbmcv1_f
@@ -40,6 +42,7 @@ module pact_bl2
       end function fbmcv1_f
 
       function fbmcr2_f(a, b, c, d) 
+         use iso_c_binding
          use types_bl2
          implicit none
          integer(isizea) :: fbmcr2_f

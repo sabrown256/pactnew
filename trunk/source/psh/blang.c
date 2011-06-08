@@ -11,13 +11,21 @@
 #include "common.h"
 #include "libpsh.c"
 
+#define RETURN_INTEGER
+
+#ifdef RETURN_INTEGER
+#define C_PTR_RETURN "integer(isizea)"
+#else
+#define C_PTR_RETURN "type(C_PTR)"
+#endif
+
 enum e_langmode
    {MODE_C = 1, MODE_F, MODE_S, MODE_P };
 
 typedef enum e_langmode langmode;
 
 enum e_fparam
-   {FP_ANY = -1, FP_VARARG, FP_FNC, FP_STRUCT, FP_SCALAR, FP_ARRAY};
+   {FP_ANY = -1, FP_VARARG, FP_FNC, FP_STRUCT_P, FP_SCALAR, FP_ARRAY};
 
 typedef enum e_fparam fparam;
 
@@ -760,7 +768,7 @@ static fparam fc_type(char *wty, int nc, char *ty, langmode mode)
 
 /* assume a pointer to an unknown type is a struct pointer */
 	if (LAST_CHAR(ty) == '*')
-	   rv = FP_STRUCT;
+	   rv = FP_STRUCT_P;
 	else
 	   berr("Unknown type '%s'", ty);};
 
@@ -803,7 +811,7 @@ static void fc_decl_list(char *a, int nc, fdecl *dcl)
 		 case FP_SCALAR :
 		      vstrcat(a, MAXLINE, "%s *%s, ", ty, nm);
 		      break;
-		 case FP_STRUCT :
+		 case FP_STRUCT_P :
 		      vstrcat(a, MAXLINE, "%s *%s, ", ty, nm);
 		      break;
 		 default :
@@ -914,8 +922,8 @@ static void fortran_wrap_decl(FILE *fp, fdecl *dcl,
     fprintf(fp, "\n");
 
     switch (knd)
-       {case FP_STRUCT :
-	     snprintf(t, MAXLINE, "FIXNUM FF_ID(%s, %s)(%s)\n",
+       {case FP_STRUCT_P :
+	     snprintf(t, MAXLINE, "void *FF_ID(%s, %s)(%s)\n",
 		      dcn, ucn, a);
 	     break;
         case FP_ARRAY :
@@ -967,10 +975,12 @@ static void fortran_wrap_local_decl(FILE *fp, fdecl *dcl,
 	 if (i == na)
 	    {if (voidf == FALSE)
 		{switch (knd)
-		    {case FP_STRUCT :
-		          nstrcat(t, MAXLINE, "FIXNUM _rv;\n");
+		    {case FP_STRUCT_P :
+		          nstrcat(t, MAXLINE, "void *_rv;\n");
+#ifdef RETURN_INTEGER
 			  vstrcat(t, MAXLINE, "    SC_address _ad%s;\n",
 				  dcl->name);
+#endif
 			  break;
 		     case FP_ARRAY :
 			  vstrcat(t, MAXLINE, "%s *_rv;\n", rt);
@@ -992,7 +1002,7 @@ static void fortran_wrap_local_decl(FILE *fp, fdecl *dcl,
 		      else
 			 nstrcat(t, MAXLINE, "\n");
 		      break;
-		 case FP_STRUCT :
+		 case FP_STRUCT_P :
 		      vstrcat(t, MAXLINE, "%s _l%s;\n", ty, nm);
 		      break;
 		 case FP_ARRAY :
@@ -1041,7 +1051,7 @@ static void fortran_wrap_local_assn(FILE *fp, fdecl *dcl)
 	        {case FP_FNC :
 		      t[0] = '\0';
 		      break;
-		 case FP_STRUCT :
+		 case FP_STRUCT_P :
 		      snprintf(t, MAXLINE, "    _l%-8s = *(%s*) %s;\n",
 			       nm, ty, nm);
 		      break;
@@ -1087,9 +1097,14 @@ static void fortran_wrap_local_call(FILE *fp, fdecl *dcl,
     nm = dcl->name;
     if (voidf == FALSE)
        {switch (knd)
-	   {case FP_STRUCT :
+	   {case FP_STRUCT_P :
+#ifdef RETURN_INTEGER
 	         fprintf(fp, "    _ad%s.memaddr = (void *) %s(%s);\n",
 			 nm, nm, a);
+#else
+	         fprintf(fp, "    _rv = (void *) %s(%s);\n",
+			 nm, a);
+#endif
 		 break;
 	    default :
 	         fprintf(fp, "    _rv = %s(%s);\n", nm, a);
@@ -1113,8 +1128,10 @@ static void fortran_wrap_local_return(FILE *fp, fdecl *dcl,
     nm = dcl->name;
     if (voidf == FALSE)
        {switch (knd)
-	   {case FP_STRUCT :
+	   {case FP_STRUCT_P :
+#ifdef RETURN_INTEGER
 	         fprintf(fp, "    _rv = _ad%s.diskaddr;\n\n", nm);
+#endif
 	         fprintf(fp, "    return(_rv);}\n");
 		 break;
 	    default :
@@ -1388,9 +1405,9 @@ static char **mc_proto_list(fdecl *dcl)
     nm  = dcl->name;
     knd = mc_type(MAXLINE, NULL, NULL, wty, ty);
     switch (knd)
-       {case FP_FNC    :
-        case FP_STRUCT :
-	     lst = lst_push(lst, "integer(isizea)");
+       {case FP_FNC      :
+        case FP_STRUCT_P :
+	     lst = lst_push(lst, C_PTR_RETURN);
 	     lst = lst_push(lst, nm);
 	     break;
         case FP_ARRAY :
@@ -1398,7 +1415,7 @@ static char **mc_proto_list(fdecl *dcl)
 	        {lst = lst_push(lst, "character(*)");
 		 lst = lst_push(lst, nm);}
 	     else if (strcmp(wty, "C_PTR") == 0)
-	        {lst = lst_push(lst, "integer(isizea)");
+	        {lst = lst_push(lst, C_PTR_RETURN);
 		 lst = lst_push(lst, nm);}
 	     else
 	        {lst = lst_push(lst, wty);
@@ -1419,9 +1436,9 @@ static char **mc_proto_list(fdecl *dcl)
 	 nm  = al[i].name;
 	 knd = mc_type(MAXLINE, NULL, NULL, wty, ty);
 	 switch (knd)
-	    {case FP_FNC    :
-	     case FP_STRUCT :
-	          lst = lst_push(lst, "integer(isizea)");
+	    {case FP_FNC      :
+	     case FP_STRUCT_P :
+	          lst = lst_push(lst, C_PTR_RETURN);
 	          lst = lst_push(lst, nm);
 		  break;
 	     case FP_ARRAY :
@@ -1429,7 +1446,7 @@ static char **mc_proto_list(fdecl *dcl)
 		     {lst = lst_push(lst, "character(*)");
 		      lst = lst_push(lst, nm);}
 		  else if (strcmp(wty, "C_PTR") == 0)
-		     {lst = lst_push(lst, "integer(isizea)");
+		     {lst = lst_push(lst, C_PTR_RETURN);
 		      lst = lst_push(lst, nm);}
 		  else
 		     {lst = lst_push(lst, wty);
@@ -1557,7 +1574,7 @@ static int module_pre_wrappable(char *pr)
    {int rv;
 
     rv = ((strstr(pr, "...") == NULL) &&
-	  (strstr(pr, "integer(isizea)") == NULL) &&
+	  (strstr(pr, C_PTR_RETURN) == NULL) &&
 	  (strstr(pr, "external") == NULL));
 
     return(rv);}
@@ -1612,9 +1629,8 @@ static void module_pre_wrap_full(FILE *fp, char *pr, char **ta, char *pck)
 
 	femit(fp, a, "");
 
-	if (strstr(pr, "(isizea)") != NULL)
-	   fprintf(fp, "         use types_%s\n", pck);
-
+	fprintf(fp, "         use iso_c_binding\n");
+	fprintf(fp, "         use types_%s\n", pck);
 	fprintf(fp, "         implicit none\n");
 	if (strcmp(oper, "function") == 0)
 	   fprintf(fp, "         %-12s :: %s\n", ta[0], ta[1]);
@@ -1680,7 +1696,8 @@ static void module_itf_wrap_ext(FILE *fp, char *pck, fdecl *dcl,
 	   fprintf(fp, "   external :: %s\n", dcn);
         else
 	  {if ((strcmp(cty, "C_PTR") == 0) || (strcmp(cty, "C_FUNPTR") == 0))
-	      fprintf(fp, "   integer(isizea), external :: %s\n", dcn);
+	      fprintf(fp, "   %s, external :: %s\n",
+		      C_PTR_RETURN, dcn);
 	   else
 	     fprintf(fp, "   %s, external :: %s\n", fty, dcn);};};
 
@@ -1715,6 +1732,7 @@ static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
 	snprintf(t, MAXLINE, "      %s %s(%s)", oper, dcn, a);
 	femit(fp, t, "");
 
+	fprintf(fp, "         use iso_c_binding\n");
 	if (mc_need_ptr(dcl) == TRUE)
 	   fprintf(fp, "         use types_%s\n", pck);
 
@@ -1724,7 +1742,8 @@ static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
 	if (voidf == FALSE)
 	   {if ((strcmp(cty, "C_PTR") == 0) ||
 		(strcmp(cty, "C_FUNPTR") == 0))
-	       snprintf(t, MAXLINE, "         integer(isizea) :: %s\n", dcn);
+	       snprintf(t, MAXLINE, "         %-15s :: %s\n",
+			C_PTR_RETURN, dcn);
 	    else
 	       snprintf(t, MAXLINE, "         %-15s :: %s\n", fty, dcn);
 
