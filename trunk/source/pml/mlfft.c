@@ -130,7 +130,10 @@ complex *PM_uniform_complex_y(int no, double *xo,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_NEXT_EXP_TWO - return the largest M such that 2^M <= N  */
+/* PM_NEXT_EXP_TWO - return the largest M such that 2^M <= N
+ *
+ * #bind PM_next_exp_two fortran() scheme()
+ */
 
 int PM_next_exp_two(int n)
    {int i, m;
@@ -380,6 +383,8 @@ complex *PM_fft_sc_real(double *x, int n, int flag)
  *                     - the transform data (this is controlled by ORDR)
  *                     - return the number of points in the transform arrays
  *                     - if successful and 0 otherwise
+ *
+ * #bind PM_fft_sc_real_data fortran() scheme()
  */
 
 int PM_fft_sc_real_data(complex **pyo, double **pxo, double *xi, double *yi,
@@ -426,6 +431,8 @@ int PM_fft_sc_real_data(complex **pyo, double **pxo, double *xi, double *yi,
  *                        - (this is controlled by ORDR)
  *                        - return the number of points in the transform
  *                        - arrays if successful and 0 otherwise
+ *
+ * #bind PM_fft_sc_complex_data fortran() scheme()
  */
 
 int PM_fft_sc_complex_data(complex **pyo, double **pxo, double *xi,

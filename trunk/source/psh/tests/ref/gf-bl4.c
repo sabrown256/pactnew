@@ -411,13 +411,10 @@ double *FF_ID(fp8_f, FP8_F)(int *a1)
 void *FF_ID(fp10_f, FP10_F)(int *a1)
    {int _la1;
     void *_rv;
-    SC_address _adfp10;
 
     _la1       = (int) *a1;
 
-    _adfp10.memaddr = (void *) fp10(_la1);
-
-    _rv = _adfp10.diskaddr;
+    _rv = (void *) fp10(_la1);
 
     return(_rv);}
 
@@ -427,13 +424,10 @@ void *FF_ID(fp10_f, FP10_F)(int *a1)
 void *FF_ID(fp11_f, FP11_F)(int *a1)
    {int _la1;
     void *_rv;
-    SC_address _adfp11;
 
     _la1       = (int) *a1;
 
-    _adfp11.memaddr = (void *) fp11(_la1);
-
-    _rv = _adfp11.diskaddr;
+    _rv = (void *) fp11(_la1);
 
     return(_rv);}
 
@@ -443,13 +437,10 @@ void *FF_ID(fp11_f, FP11_F)(int *a1)
 void *FF_ID(fp13_f, FP13_F)(int *a1)
    {int _la1;
     void *_rv;
-    SC_address _adfp13;
 
     _la1       = (int) *a1;
 
-    _adfp13.memaddr = (void *) fp13(_la1);
-
-    _rv = _adfp13.diskaddr;
+    _rv = (void *) fp13(_la1);
 
     return(_rv);}
 

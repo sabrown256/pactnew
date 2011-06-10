@@ -15,7 +15,7 @@ Separator $Log
 Note $Log "Analyze: x11"
 
 SafeEnv AnaDir           analyze
-SafeEnv ALog             $cwd/log.analyze
+SafeEnv ALog             $cwd/cfg-$System/log.analyze
 SafeEnv HostOS           `uname -s`
 SafeEnv GraphicsDevices  ""
 SafeEnv GraphicsFlag     ""

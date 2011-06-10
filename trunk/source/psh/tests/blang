@@ -82,7 +82,7 @@ else
 
       flog $Log cp $TstDir/$i.* .
 
-      flog $Log blang $i.proto $i.bind
+      flog $Log blang $i.bind $i.proto
 
       flog $Log set hdr = ${i}_int.h
       flog $Log $RM $hdr

@@ -14,104 +14,128 @@ module pact_bl1
 ! ... external declarations for generated wrappers
    use types_bl1
 
-   integer(isizea), external :: favp1_f
+   type(C_PTR), external :: favp1f
 
 
    interface
 
 ! ... declarations for generated wrappers
-      subroutine fav1_f() 
+      subroutine fav1f() 
          use iso_c_binding
          implicit none
-      end subroutine fav1_f
+      end subroutine fav1f
 
-      function fav2_f() 
+      function fav2f() 
          use iso_c_binding
          implicit none
-         integer         :: fav2_f
-      end function fav2_f
+         integer         :: fav2f
+      end function fav2f
 
-      function fav3_f() 
+      function fav3f() 
          use iso_c_binding
          implicit none
-         real            :: fav3_f
-      end function fav3_f
+         real            :: fav3f
+      end function fav3f
 
-      function fav4_f() 
+      function fav4f() 
          use iso_c_binding
          implicit none
-         integer         :: fav4_f
-      end function fav4_f
+         integer         :: fav4f
+      end function fav4f
 
-      function favp2_f() 
+      function favp2f() 
          use iso_c_binding
          use types_bl1
          implicit none
-         integer(isizea) :: favp2_f
-      end function favp2_f
+         type(C_PTR)     :: favp2f
+      end function favp2f
 
-      function favp3_f() 
+      function favp3f() 
          use iso_c_binding
          use types_bl1
          implicit none
-         integer(isizea) :: favp3_f
-      end function favp3_f
+         type(C_PTR)     :: favp3f
+      end function favp3f
 
-      function favp4_f() 
+      function favp4f() 
          use iso_c_binding
          use types_bl1
          implicit none
-         integer(isizea) :: favp4_f
-      end function favp4_f
+         type(C_PTR)     :: favp4f
+      end function favp4f
+
+      subroutine fav5_f() 
+         use iso_c_binding
+         implicit none
+      end subroutine fav5_f
 
 ! ... declarations for interoperability
-      subroutine fav1_i() &
+      subroutine fav1f_i() &
                 bind(c, name='fav1')
          use iso_c_binding
          implicit none
-      end subroutine fav1_i
+      end subroutine fav1f_i
 
-      integer (C_INT) function fav2_i() &
+      function fav2f_i() &
                 bind(c, name='fav2')
          use iso_c_binding
          implicit none
-      end function fav2_i
+         integer(C_INT) :: fav2f_i
+      end function fav2f_i
 
-      real (C_DOUBLE) function fav3_i() &
+      function fav3f_i() &
                 bind(c, name='fav3')
          use iso_c_binding
          implicit none
-      end function fav3_i
+         real(C_DOUBLE) :: fav3f_i
+      end function fav3f_i
 
-      integer (C_INT) function fav4_i() &
+      function fav4f_i() &
                 bind(c, name='fav4')
          use iso_c_binding
          implicit none
-      end function fav4_i
+         integer(C_INT) :: fav4f_i
+      end function fav4f_i
 
-      type (C_PTR) function favp1_i() &
+      function favp1f_i() &
                 bind(c, name='favp1')
          use iso_c_binding
          implicit none
-      end function favp1_i
+         type(C_PTR) :: favp1f_i
+      end function favp1f_i
 
-      type (C_PTR) function favp2_i() &
+      function favp2f_i() &
                 bind(c, name='favp2')
          use iso_c_binding
          implicit none
-      end function favp2_i
+         type(C_PTR) :: favp2f_i
+      end function favp2f_i
 
-      type (C_PTR) function favp3_i() &
+      function favp3f_i() &
                 bind(c, name='favp3')
          use iso_c_binding
          implicit none
-      end function favp3_i
+         type(C_PTR) :: favp3f_i
+      end function favp3f_i
 
-      type (C_PTR) function favp4_i() &
+      function favp4f_i() &
                 bind(c, name='favp4')
          use iso_c_binding
          implicit none
-      end function favp4_i
+         type(C_PTR) :: favp4f_i
+      end function favp4f_i
+
+      subroutine fav5_i() &
+                bind(c, name='fav5')
+         use iso_c_binding
+         implicit none
+      end subroutine fav5_i
+
+      subroutine fav6_i() &
+                bind(c, name='fav6')
+         use iso_c_binding
+         implicit none
+      end subroutine fav6_i
 
    end interface
 

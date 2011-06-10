@@ -47,15 +47,21 @@ Note $Log ""
 # PARSE - parse the pre-Make file and make a file list
 
    set Lst = ( `grep '${TGTLib}(' pre-Make | sed 's/TGTLib//g' | sed 's/[=()$\]//g'` )
-   set Files = ""
+   set Cfiles = ""
+   set Ffiles = ""
    foreach i ($Lst)
       set j = $i:r.c
       if (-f $j) then
-         set Files = ( $Files $j )
+         set Cfiles = ( $Cfiles $j )
+      endif
+      set j = $i:r.f
+      if (-f $j) then
+         set Ffiles = ( $Ffiles $j )
       endif
    end
 
-   Note $Log "Files = $Files"
+   Note $Log "Cfiles = $Cfiles"
+   Note $Log "Ffiles = $Ffiles"
    Note $Log ""
 
 #--------------------------------------------------------------------------
@@ -63,7 +69,7 @@ Note $Log ""
 
 # FIND_CC_DECL - process the C declarations
 #              - the transformations are:
-#   elide '/*' '*/' $Files                         remove C comments
+#   elide '/*' '*/' $Cfiles                        remove C comments
 #   elide '{' '}' -                                remove compound statements
 #   awk '$NF ~ /\\/ { printf("%s ", $0); }         merge lines ending in  \
 #        $NF !~ /\\/ { printf("%s\n", $0); }'  
@@ -78,7 +84,9 @@ Note $Log ""
 #   grep -v '='                                    remove lines with assignments
 #
 
-   elide '/*' '*/' $Files                          | \
+   flog $Log set cproto = z-$arch/$d.protoc
+
+   elide '/*' '*/' $Cfiles                         | \
    elide '{' '}' -                                 | \
    awk '$NF ~ /\\/ { printf("%s ", $0); }            \
         $NF !~ /\\/ { printf("%s\n", $0); }'       | \
@@ -95,7 +103,29 @@ Note $Log ""
    grep -v 'static'                                | \
    grep '('                                        | \
    sort                                            | \
-   cat >&! z-$arch/$d.proto
+   cat >&! $cproto
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FIND_FC_DECL - process the Fortran declarations
+
+   flog $Log set fproto = z-$arch/$d.protof
+
+   flog $Log rm -f $fproto
+   flog $Log touch $fproto
+
+   foreach f ($Ffiles)
+      cat $f                                                                  | \
+      grep -v '!'                                                             | \
+      awk 'BEGIN { fn = 0; md = 0; nv = 0; }                                    \
+           $1 == "module" { md = 1; }                                           \
+           $0 ~ /end module/ { md = 0; nv = 0; }                                \
+           md == 0 && $1 == "function" || $1 == "subroutine" { print ; fn = 1; }           \
+           md == 0 && $0 ~ /end function/ || $0 ~ /end subroutine/ { printf("\n"); fn = 0; nv = 0; }     \
+           md == 0 && $0 ~ /::/ && fn == 1 { print ; nv++; }                               \
+           $0 == "" && nv > 0 { fn = 0; }' >>& $fproto
+   end
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -135,7 +165,9 @@ Note $Log ""
 #   sed 's/PF[^ ]* /external /g'          function pointer -> external
 #
 
-   cat $Files                                     | \
+   flog $Log set fwrap = z-$arch/$d.wrapper
+
+   cat $Cfiles                                     | \
    sed 's/[ \t][ \t]*/ /g'                        | \
    awk '$0 ~ /,[ \t]*$/   { printf("%s", $0) }      \
         $0 !~ /,[ \t]*$/  { printf("%s\n", $0) }' | \
@@ -164,7 +196,7 @@ Note $Log ""
    sed 's/PF[^ ]* /external /g'                   | \
    sed 's/.*:/      /'                            | \
    sed 's/--/*/g'                                 | \
-   cat >&! z-$arch/$d.wrapper
+   cat >&! $fwrap
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -173,7 +205,7 @@ Note $Log ""
 
    flog $Log pushd z-$arch
 
-   flog $Log blang $d.proto ../$d.bind $d.wrapper
+   flog $Log blang ../$d.bind $cproto:t $fproto:t $fwrap:t
    set xstatus = $status
 
    if (-f gf-$d.c) then

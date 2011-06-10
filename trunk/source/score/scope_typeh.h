@@ -348,9 +348,6 @@ extern int
 
 /* SCFNCA.C declarations */
 
-extern char
- *SC_dereference(char *s);
-
 extern int
  SC_fix_lmt(int nb, int64_t *pmn, int64_t *pmx, int64_t *pumx),
  SC_unpack_bits(char *out, char *in, int ityp, int nbits,

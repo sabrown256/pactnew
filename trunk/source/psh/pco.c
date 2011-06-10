@@ -1492,17 +1492,25 @@ static void default_rules(void)
       
 /* Fortran rules */
     snprintf(st.rules.fo, LRG,
-	     "\t@(%s ; \\\n          %s)\n",
-	     "echo \"${FCAnnounce} -c $<\"",
-	     "${FC} -c $< -o $@");
+	     "\t%s \\\n\t%s \\\n\t%s \\\n\t%s \\\n\t%s \\\n\t%s\n",
+	     "@if [ ${FC_Exe} == none ]; then",
+	     "   echo \"No Fortran compiler for $<\" ;",
+	     "else",
+	     "   echo \"${FCAnnounce} -c $<\" ;",
+	     "   ${FC} -c $< -o $@ ;",
+	     "fi");
 
     snprintf(st.rules.fa, LRG,
-	     "\t@(%s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s ; \\\n          %s)\n",
-	     "echo \"${FCAnnounce} -c $<\"",
+	     "\t%s \\\n\t%s \\\n\t%s \\\n\t%s \\\n\t     %s ; \\\n\t     %s ; \\\n\t     %s ; \\\n\t%s \\\n\t     %s ; \\\n\t%s \\\n\t%s\n",
+	     "@if [ ${FC_Exe} == none ]; then",
+	     "   echo \"No Fortran compiler for $<\" ;",
+	     "else",
+	     "   echo \"${FCAnnounce} -c $<\" ;",
 	     cd, rm, tc,
-	     "${FC} -c ${PACTSrcDir}/$< -o $*.o",
+	     "    ${FC} -c ${PACTSrcDir}/$< -o $*.o ;",
 	     ar,
-	     "${RM} $*.o 2>> errlog");
+	     "    ${RM} $*.o 2>> errlog ;",
+	     "fi");
 
 /* template rules */
     snprintf(st.rules.th, LRG,

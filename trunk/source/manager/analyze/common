@@ -16,7 +16,7 @@ if ($?AnaDir == 0) then
    setenv AnaDir $ExeDir
 endif
 if ($?ALog == 0) then
-   setenv ALog $cwd/log.analyze
+   setenv ALog $cwd/cfg-$System/log.analyze
 endif
 
 if (-f ../scripts/env-csh) then

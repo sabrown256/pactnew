@@ -95,7 +95,7 @@ module pact_bl4
          implicit none
          integer         :: fb10_f
          complex(4)      :: a1
-         integer(isizea) :: a2
+         type(C_PTR)     :: a2
       end function fb10_f
 
       function fb11_f(a1, a2) 
@@ -104,7 +104,7 @@ module pact_bl4
          implicit none
          integer         :: fb11_f
          complex(8)      :: a1
-         integer(isizea) :: a2
+         type(C_PTR)     :: a2
       end function fb11_f
 
       function fr1_f(a1) 
@@ -188,7 +188,7 @@ module pact_bl4
          use iso_c_binding
          use types_bl4
          implicit none
-         integer(isizea) :: fp1_f
+         type(C_PTR)     :: fp1_f
          integer         :: a1
       end function fp1_f
 
@@ -196,7 +196,7 @@ module pact_bl4
          use iso_c_binding
          use types_bl4
          implicit none
-         integer(isizea) :: fp2_f
+         type(C_PTR)     :: fp2_f
          integer         :: a1
       end function fp2_f
 
@@ -204,7 +204,7 @@ module pact_bl4
          use iso_c_binding
          use types_bl4
          implicit none
-         integer(isizea) :: fp3_f
+         type(C_PTR)     :: fp3_f
          integer         :: a1
       end function fp3_f
 
@@ -212,7 +212,7 @@ module pact_bl4
          use iso_c_binding
          use types_bl4
          implicit none
-         integer(isizea) :: fp4_f
+         type(C_PTR)     :: fp4_f
          integer         :: a1
       end function fp4_f
 
@@ -220,7 +220,7 @@ module pact_bl4
          use iso_c_binding
          use types_bl4
          implicit none
-         integer(isizea) :: fp5_f
+         type(C_PTR)     :: fp5_f
          integer         :: a1
       end function fp5_f
 
@@ -228,7 +228,7 @@ module pact_bl4
          use iso_c_binding
          use types_bl4
          implicit none
-         integer(isizea) :: fp6_f
+         type(C_PTR)     :: fp6_f
          integer         :: a1
       end function fp6_f
 
@@ -236,7 +236,7 @@ module pact_bl4
          use iso_c_binding
          use types_bl4
          implicit none
-         integer(isizea) :: fp7_f
+         type(C_PTR)     :: fp7_f
          integer         :: a1
       end function fp7_f
 
@@ -244,7 +244,7 @@ module pact_bl4
          use iso_c_binding
          use types_bl4
          implicit none
-         integer(isizea) :: fp8_f
+         type(C_PTR)     :: fp8_f
          integer         :: a1
       end function fp8_f
 
@@ -252,7 +252,7 @@ module pact_bl4
          use iso_c_binding
          use types_bl4
          implicit none
-         integer(isizea) :: fp10_f
+         type(C_PTR)     :: fp10_f
          integer         :: a1
       end function fp10_f
 
@@ -260,7 +260,7 @@ module pact_bl4
          use iso_c_binding
          use types_bl4
          implicit none
-         integer(isizea) :: fp11_f
+         type(C_PTR)     :: fp11_f
          integer         :: a1
       end function fp11_f
 
@@ -268,243 +268,275 @@ module pact_bl4
          use iso_c_binding
          use types_bl4
          implicit none
-         integer(isizea) :: fp13_f
+         type(C_PTR)     :: fp13_f
          integer         :: a1
       end function fp13_f
 
 ! ... declarations for interoperability
-      integer (C_INT) function fb1_i(a1, a2) &
+      function fb1_i(a1, a2) &
                 bind(c, name='fb1')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
-         type (C_PTR), value :: a2
+         integer(C_INT) :: fb1_i
+         integer(C_INT), value :: a1
+         type(C_PTR), value :: a2
       end function fb1_i
 
-      integer (C_INT) function fb2_i(a1, a2) &
+      function fb2_i(a1, a2) &
                 bind(c, name='fb2')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
-         type (C_PTR), value :: a2
+         integer(C_INT) :: fb2_i
+         integer(C_INT), value :: a1
+         type(C_PTR), value :: a2
       end function fb2_i
 
-      integer (C_INT) function fb3_i(a1, a2) &
+      function fb3_i(a1, a2) &
                 bind(c, name='fb3')
          use iso_c_binding
          implicit none
-         integer (C_SHORT), value :: a1
-         type (C_PTR), value :: a2
+         integer(C_INT) :: fb3_i
+         integer(C_SHORT), value :: a1
+         type(C_PTR), value :: a2
       end function fb3_i
 
-      integer (C_INT) function fb4_i(a1, a2) &
+      function fb4_i(a1, a2) &
                 bind(c, name='fb4')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
-         type (C_PTR), value :: a2
+         integer(C_INT) :: fb4_i
+         integer(C_INT), value :: a1
+         type(C_PTR), value :: a2
       end function fb4_i
 
-      integer (C_INT) function fb5_i(a1, a2) &
+      function fb5_i(a1, a2) &
                 bind(c, name='fb5')
          use iso_c_binding
          implicit none
-         integer (C_LONG), value :: a1
-         type (C_PTR), value :: a2
+         integer(C_INT) :: fb5_i
+         integer(C_LONG), value :: a1
+         type(C_PTR), value :: a2
       end function fb5_i
 
-      integer (C_INT) function fb6_i(a1, a2) &
+      function fb6_i(a1, a2) &
                 bind(c, name='fb6')
          use iso_c_binding
          implicit none
-         integer (C_LONG_LONG), value :: a1
-         type (C_PTR), value :: a2
+         integer(C_INT) :: fb6_i
+         integer(C_LONG_LONG), value :: a1
+         type(C_PTR), value :: a2
       end function fb6_i
 
-      integer (C_INT) function fb7_i(a1, a2) &
+      function fb7_i(a1, a2) &
                 bind(c, name='fb7')
          use iso_c_binding
          implicit none
-         real (C_FLOAT), value :: a1
-         type (C_PTR), value :: a2
+         integer(C_INT) :: fb7_i
+         real(C_FLOAT), value :: a1
+         type(C_PTR), value :: a2
       end function fb7_i
 
-      integer (C_INT) function fb8_i(a1, a2) &
+      function fb8_i(a1, a2) &
                 bind(c, name='fb8')
          use iso_c_binding
          implicit none
-         real (C_DOUBLE), value :: a1
-         type (C_PTR), value :: a2
+         integer(C_INT) :: fb8_i
+         real(C_DOUBLE), value :: a1
+         type(C_PTR), value :: a2
       end function fb8_i
 
-      integer (C_INT) function fb10_i(a1, a2) &
+      function fb10_i(a1, a2) &
                 bind(c, name='fb10')
          use iso_c_binding
          implicit none
-         complex (C_FLOAT_COMPLEX), value :: a1
-         type (C_PTR), value :: a2
+         integer(C_INT) :: fb10_i
+         complex(C_FLOAT_COMPLEX), value :: a1
+         type(C_PTR), value :: a2
       end function fb10_i
 
-      integer (C_INT) function fb11_i(a1, a2) &
+      function fb11_i(a1, a2) &
                 bind(c, name='fb11')
          use iso_c_binding
          implicit none
-         complex (C_DOUBLE_COMPLEX), value :: a1
-         type (C_PTR), value :: a2
+         integer(C_INT) :: fb11_i
+         complex(C_DOUBLE_COMPLEX), value :: a1
+         type(C_PTR), value :: a2
       end function fb11_i
 
-      integer (C_INT) function fr1_i(a1) &
+      function fr1_i(a1) &
                 bind(c, name='fr1')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
+         integer(C_INT) :: fr1_i
+         integer(C_INT), value :: a1
       end function fr1_i
 
-      integer (C_INT) function fr2_i(a1) &
+      function fr2_i(a1) &
                 bind(c, name='fr2')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
+         integer(C_INT) :: fr2_i
+         integer(C_INT), value :: a1
       end function fr2_i
 
-      integer (C_SHORT) function fr3_i(a1) &
+      function fr3_i(a1) &
                 bind(c, name='fr3')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
+         integer(C_SHORT) :: fr3_i
+         integer(C_INT), value :: a1
       end function fr3_i
 
-      integer (C_INT) function fr4_i(a1) &
+      function fr4_i(a1) &
                 bind(c, name='fr4')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
+         integer(C_INT) :: fr4_i
+         integer(C_INT), value :: a1
       end function fr4_i
 
-      integer (C_LONG) function fr5_i(a1) &
+      function fr5_i(a1) &
                 bind(c, name='fr5')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
+         integer(C_LONG) :: fr5_i
+         integer(C_INT), value :: a1
       end function fr5_i
 
-      integer (C_LONG_LONG) function fr6_i(a1) &
+      function fr6_i(a1) &
                 bind(c, name='fr6')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
+         integer(C_LONG_LONG) :: fr6_i
+         integer(C_INT), value :: a1
       end function fr6_i
 
-      real (C_FLOAT) function fr7_i(a1) &
+      function fr7_i(a1) &
                 bind(c, name='fr7')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
+         real(C_FLOAT) :: fr7_i
+         integer(C_INT), value :: a1
       end function fr7_i
 
-      real (C_DOUBLE) function fr8_i(a1) &
+      function fr8_i(a1) &
                 bind(c, name='fr8')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
+         real(C_DOUBLE) :: fr8_i
+         integer(C_INT), value :: a1
       end function fr8_i
 
-      complex (C_FLOAT_COMPLEX) function fr10_i(a1) &
+      function fr10_i(a1) &
                 bind(c, name='fr10')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
+         complex(C_FLOAT_COMPLEX) :: fr10_i
+         integer(C_INT), value :: a1
       end function fr10_i
 
-      complex (C_DOUBLE_COMPLEX) function fr11_i(a1) &
+      function fr11_i(a1) &
                 bind(c, name='fr11')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
+         complex(C_DOUBLE_COMPLEX) :: fr11_i
+         integer(C_INT), value :: a1
       end function fr11_i
 
-      integer (C_INT) function fr13_i(a1) &
+      function fr13_i(a1) &
                 bind(c, name='fr13')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
+         integer(C_INT) :: fr13_i
+         integer(C_INT), value :: a1
       end function fr13_i
 
-      type (C_PTR) function fp1_i(a1) &
+      function fp1_i(a1) &
                 bind(c, name='fp1')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
+         type(C_PTR) :: fp1_i
+         integer(C_INT), value :: a1
       end function fp1_i
 
-      type (C_PTR) function fp2_i(a1) &
+      function fp2_i(a1) &
                 bind(c, name='fp2')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
+         type(C_PTR) :: fp2_i
+         integer(C_INT), value :: a1
       end function fp2_i
 
-      type (C_PTR) function fp3_i(a1) &
+      function fp3_i(a1) &
                 bind(c, name='fp3')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
+         type(C_PTR) :: fp3_i
+         integer(C_INT), value :: a1
       end function fp3_i
 
-      type (C_PTR) function fp4_i(a1) &
+      function fp4_i(a1) &
                 bind(c, name='fp4')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
+         type(C_PTR) :: fp4_i
+         integer(C_INT), value :: a1
       end function fp4_i
 
-      type (C_PTR) function fp5_i(a1) &
+      function fp5_i(a1) &
                 bind(c, name='fp5')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
+         type(C_PTR) :: fp5_i
+         integer(C_INT), value :: a1
       end function fp5_i
 
-      type (C_PTR) function fp6_i(a1) &
+      function fp6_i(a1) &
                 bind(c, name='fp6')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
+         type(C_PTR) :: fp6_i
+         integer(C_INT), value :: a1
       end function fp6_i
 
-      type (C_PTR) function fp7_i(a1) &
+      function fp7_i(a1) &
                 bind(c, name='fp7')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
+         type(C_PTR) :: fp7_i
+         integer(C_INT), value :: a1
       end function fp7_i
 
-      type (C_PTR) function fp8_i(a1) &
+      function fp8_i(a1) &
                 bind(c, name='fp8')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
+         type(C_PTR) :: fp8_i
+         integer(C_INT), value :: a1
       end function fp8_i
 
-      type (C_PTR) function fp10_i(a1) &
+      function fp10_i(a1) &
                 bind(c, name='fp10')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
+         type(C_PTR) :: fp10_i
+         integer(C_INT), value :: a1
       end function fp10_i
 
-      type (C_PTR) function fp11_i(a1) &
+      function fp11_i(a1) &
                 bind(c, name='fp11')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
+         type(C_PTR) :: fp11_i
+         integer(C_INT), value :: a1
       end function fp11_i
 
-      type (C_PTR) function fp13_i(a1) &
+      function fp13_i(a1) &
                 bind(c, name='fp13')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a1
+         type(C_PTR) :: fp13_i
+         integer(C_INT), value :: a1
       end function fp13_i
 
    end interface
