@@ -288,7 +288,10 @@ int _PD_safe_flush(PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_INQUIRE_TYPE - lookup and return the file chart entry for NAME */
+/* PD_INQUIRE_TYPE - lookup and return the file chart entry for NAME
+ *
+ * #bind PD_inquire_type fortran() scheme()
+ */
 
 defstr *PD_inquire_type(PDBfile *file, char *name)
    {defstr *dp;
@@ -303,7 +306,10 @@ defstr *PD_inquire_type(PDBfile *file, char *name)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_INQUIRE_HOST_TYPE - lookup and return the host chart entry for NAME */
+/* PD_INQUIRE_HOST_TYPE - lookup and return the host chart entry for NAME
+ *
+ * #bind PD_inquire_host_type fortran() scheme()
+ */
 
 defstr *PD_inquire_host_type(PDBfile *file, char *name)
    {defstr *dp;
@@ -582,6 +588,8 @@ defstr *_PD_defstr_inst(PDBfile *file, char *name, PD_type_kind kind,
 
 /* PD_TYPEDEF_PRIMITIVE_TYPES - make typedefs for user-defined primitives
  *                            - in the file chart
+ *
+ * #bind PD_typedef_primitive_types fortran() scheme()
  */
 
 void PD_typedef_primitive_types(PDBfile *file)
@@ -743,7 +751,10 @@ int64_t _PD_eod(PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_ENTRY_SET_ADDRESS - return the address of the first block of EP */
+/* PD_ENTRY_SET_ADDRESS - return the address of the first block of EP
+ *
+ * #bind PD_entry_set_address fortran() scheme(pd-entry-set-address!)
+ */
 
 int64_t PD_entry_set_address(syment *ep, int64_t addr)
    {
@@ -755,7 +766,10 @@ int64_t PD_entry_set_address(syment *ep, int64_t addr)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_ENTRY_ADDRESS - return the address of the first block of EP */
+/* PD_ENTRY_ADDRESS - return the address of the first block of EP
+ *
+ * #bind PD_entry_address fortran() scheme()
+ */
 
 int64_t PD_entry_address(syment *ep)
    {int64_t addr;
@@ -1004,7 +1018,10 @@ int _PD_rev_chrt(hasharr *ch)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_GET_ERROR - fetch PD_err */
+/* PD_GET_ERROR - fetch PD_err
+ *
+ * #bind PD_get_error fortran() scheme()
+ */
 
 char *PD_get_error(void)
    {PD_smp_state *pa;
@@ -1016,7 +1033,10 @@ char *PD_get_error(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_GET_BUFFER_SIZE - fetch PD_buffer_size */
+/* PD_GET_BUFFER_SIZE - fetch PD_buffer_size
+ *
+ * #bind PD_get_buffer_size fortran() scheme()
+ */
 
 int64_t PD_get_buffer_size(void)
    {int64_t rv;
@@ -1036,7 +1056,10 @@ int64_t PD_get_buffer_size(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_SET_BUFFER_SIZE - set PD_buffer_size */
+/* PD_SET_BUFFER_SIZE - set PD_buffer_size
+ *
+ * #bind PD_set_buffer_size fortran() scheme(pd-set-buffer-size!)
+ */
 
 int64_t PD_set_buffer_size(int64_t v)
    {PD_smp_state *pa;
@@ -1055,7 +1078,10 @@ int64_t PD_set_buffer_size(int64_t v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_GET_FILE_LENGTH - return the current file length */
+/* PD_GET_FILE_LENGTH - return the current file length
+ *
+ * #bind PD_get_file_length fortran() scheme()
+ */
 
 int64_t PD_get_file_length(PDBfile *file)
    {int64_t rv;
@@ -1088,6 +1114,8 @@ char *PD_set_text_delimiter(PDBfile *file, char *d)
 
 /* PD_GET_ENTRY_INFO - return the type, number of items, number of dimensions
  *                   - and dimensions
+ *
+ * #bind PD_get_entry_info fortran() scheme()
  */
 
 int PD_get_entry_info(syment *ep, char **ptyp, long *pni,
@@ -1133,7 +1161,10 @@ int PD_get_entry_info(syment *ep, char **ptyp, long *pni,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_FREE_ENTRY_INFO - free the info allocated by PD_get_entry */
+/* PD_FREE_ENTRY_INFO - free the info allocated by PD_get_entry
+ *
+ * #bind PD_free_entry_info fortran() scheme()
+ */
 
 void PD_free_entry_info(char *typ, long *pdim)
    {
@@ -1146,7 +1177,10 @@ void PD_free_entry_info(char *typ, long *pdim)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_REL_ENTRY_INFO - release the info allocated by PD_get_entry */
+/* PD_REL_ENTRY_INFO - release the info allocated by PD_get_entry
+ *
+ * #bind PD_rel_entry_info fortran() scheme()
+ */
 
 void PD_rel_entry_info(syment *ep, char *typ, long *pdim)
    {
@@ -1352,6 +1386,11 @@ PDBfile *_PD_open(tr_layer *tr, SC_udl *pu, char *name, char *mode, void *a)
 
 /*--------------------------------------------------------------------------*/
 
+/* PD_GET_MODE - return the file mode
+ *
+ * #bind PD_get_mode fortran() scheme()
+ */
+
 PD_major_op PD_get_mode(PDBfile *file)
    {PD_major_op rv;
 
@@ -1364,6 +1403,11 @@ PD_major_op PD_get_mode(PDBfile *file)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* PD_SET_MODE - set the file mode and return the old file mode
+ *
+ * #bind PD_set_mode fortran() scheme(pd-set-mode!)
+ */
 
 PD_major_op PD_set_mode(PDBfile *file, PD_major_op v)
    {PD_major_op rv;
@@ -1379,6 +1423,11 @@ PD_major_op PD_set_mode(PDBfile *file, PD_major_op v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PD_GET_OFFSET - return the file default offset
+ *
+ * #bind PD_get_offset fortran() scheme()
+ */
+
 int PD_get_offset(PDBfile *file)
    {int rv;
 
@@ -1391,6 +1440,11 @@ int PD_get_offset(PDBfile *file)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* PD_SET_OFFSET - set the file default offset and return the old offset
+ *
+ * #bind PD_set_offset fortran() scheme(pd-set-offset!)
+ */
 
 int PD_set_offset(PDBfile *file, int v)
    {int rv;
@@ -1406,6 +1460,11 @@ int PD_set_offset(PDBfile *file, int v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PD_GET_MAJOR_ORDER - return the file major_order
+ *
+ * #bind PD_get_major_order fortran() scheme()
+ */
+
 int PD_get_major_order(PDBfile *file)
    {int rv;
 
@@ -1418,6 +1477,11 @@ int PD_get_major_order(PDBfile *file)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* PD_SET_MAJOR_ORDER - set the file major_order and return the old value
+ *
+ * #bind PD_set_major_order fortran() scheme(pd-set-major_order!)
+ */
 
 int PD_set_major_order(PDBfile *file, int v)
    {int rv;
@@ -1433,6 +1497,11 @@ int PD_set_major_order(PDBfile *file, int v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PD_GET_TRACK_POINTERS - return the file track_pointers
+ *
+ * #bind PD_get_track_pointers fortran() scheme()
+ */
+
 int PD_get_track_pointers(PDBfile *file)
    {int rv;
 
@@ -1445,6 +1514,12 @@ int PD_get_track_pointers(PDBfile *file)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* PD_SET_TRACK_POINTERS - set the file pointer tracking flag and
+ *                       - return the old value
+ *
+ * #bind PD_set_track_pointers fortran() scheme(pd-set-track_pointers!)
+ */
 
 int PD_set_track_pointers(PDBfile *file, int v)
    {int rv;
@@ -1460,6 +1535,11 @@ int PD_set_track_pointers(PDBfile *file, int v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PD_GET_MAX_FILE_SIZE - return the file max_file_size
+ *
+ * #bind PD_get_max_file_size fortran() scheme()
+ */
+
 int64_t PD_get_max_file_size(PDBfile *file)
    {int64_t rv;
 
@@ -1472,6 +1552,12 @@ int64_t PD_get_max_file_size(PDBfile *file)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* PD_SET_MAX_FILE_SIZE - set the maximum file size and
+ *                      - return the old value
+ *
+ * #bind PD_set_max_file_size fortran() scheme(pd-set-max_file_size!)
+ */
 
 int64_t PD_set_max_file_size(PDBfile *file, int64_t v)
    {int64_t rv;
@@ -1487,6 +1573,11 @@ int64_t PD_set_max_file_size(PDBfile *file, int64_t v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PD_GET_FMT_VERSION - return the file format version
+ *
+ * #bind PD_get_fmt_version fortran() scheme()
+ */
+
 int PD_get_fmt_version(void)
    {int rv;
 
@@ -1496,6 +1587,12 @@ int PD_get_fmt_version(void)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* PD_SET_FMT_VERSION - set the file format version and
+ *                      - return the old value
+ *
+ * #bind PD_set_fmt_version fortran() scheme(pd-set-fmt_version!)
+ */
 
 int PD_set_fmt_version(int v)
    {int rv;
@@ -1507,6 +1604,11 @@ int PD_set_fmt_version(int v)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* PD_GET_FILE_NAME - return the file name
+ *
+ * #bind PD_get_file_name fortran() scheme()
+ */
 
 char *PD_get_file_name(PDBfile *file)
    {char *rv;
@@ -1521,6 +1623,11 @@ char *PD_get_file_name(PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PD_ENTRY_TYPE - return the type of the syment EP
+ *
+ * #bind PD_entry_type fortran() scheme()
+ */
+
 char *PD_entry_type(syment *ep)
    {char *rv;
 
@@ -1534,6 +1641,11 @@ char *PD_entry_type(syment *ep)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PD_ENTRY_NUMBER - return the number of items of the syment EP
+ *
+ * #bind PD_entry_number fortran() scheme()
+ */
+
 int PD_entry_number(syment *ep)
    {int rv;
 
@@ -1546,6 +1658,11 @@ int PD_entry_number(syment *ep)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* PD_ENTRY_N_DIMENSIONS - return the number of dimensions of the syment EP
+ *
+ * #bind PD_entry_n_dimensions fortran() scheme()
+ */
 
 int PD_entry_n_dimensions(syment *ep)
    {int nd;
@@ -1563,6 +1680,11 @@ int PD_entry_n_dimensions(syment *ep)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PD_ENTRY_DIMENSIONS - return the dimensions of the syment EP
+ *
+ * #bind PD_entry_dimensions fortran() scheme()
+ */
+
 dimdes *PD_entry_dimensions(syment *ep)
    {dimdes *rv;
 
@@ -1575,6 +1697,11 @@ dimdes *PD_entry_dimensions(syment *ep)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* PD_TYPE_SIZE - return byte size of the defstr DP
+ *
+ * #bind PD_type_size fortran() scheme()
+ */
 
 int PD_type_size(defstr *dp)
    {int rv;
@@ -1589,6 +1716,11 @@ int PD_type_size(defstr *dp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PD_TYPE_ALIGNMENT - return byte alignment of the defstr DP
+ *
+ * #bind PD_type_alignment fortran() scheme()
+ */
+
 int PD_type_alignment(defstr *dp)
    {int rv;
 
@@ -1601,6 +1733,11 @@ int PD_type_alignment(defstr *dp)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* PD_TYPE_N_INDIRECTS - return number of indirects of the defstr DP
+ *
+ * #bind PD_type_n_indirects fortran() scheme()
+ */
 
 int PD_type_n_indirects(defstr *dp)
    {int rv;

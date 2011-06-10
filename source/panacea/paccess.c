@@ -600,8 +600,6 @@ void PA_rel_access(void **vp, char *s, long offs, long ne)
 	     break;
 
         case SCRATCH :
-	     if (offs >= 0L)
-/*              PD_replace(); */
 	     break;
 
         case RUNTIME :

@@ -516,7 +516,10 @@ int64_t _PD_member_location(char *s, hasharr *tab, defstr *dp, memdes **pdesc)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_INQUIRE_SYMBOL - look up the entry for the named quantity */
+/* PD_INQUIRE_SYMBOL - look up the entry for the named quantity
+ *
+ * #bind PD_inquire_symbol fortran() scheme()
+ */
 
 haelem *PD_inquire_symbol(PDBfile *file, char *name, int flag,
 			  char *fullname, hasharr *tab)
@@ -557,7 +560,10 @@ haelem *PD_inquire_symbol(PDBfile *file, char *name, int flag,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_QUERY_ENTRY - look up the symbol table entry for the named quantity */
+/* PD_QUERY_ENTRY - look up the symbol table entry for the named quantity
+ *
+ * #bind PD_query_entry fortran() scheme()
+ */
 
 syment *PD_query_entry(PDBfile *file, char *name, char *fullname)
    {haelem *hp;
@@ -571,7 +577,10 @@ syment *PD_query_entry(PDBfile *file, char *name, char *fullname)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_INQUIRE_ENTRY - look up the symbol table entry for the named quantity */
+/* PD_INQUIRE_ENTRY - look up the symbol table entry for the named quantity
+ *
+ * #bind PD_inquire_entry fortran() scheme()
+ */
 
 syment *PD_inquire_entry(PDBfile *file, char *name,
 			 int flag, char *fullname)
@@ -591,6 +600,8 @@ syment *PD_inquire_entry(PDBfile *file, char *name,
  *                    -     a.b.c
  *                    -     a->b
  *                    - and all other possibilities
+ *
+ * #bind PD_effective_entry fortran() scheme()
  */
 
 syment *PD_effective_entry(PDBfile *file, char *name,
@@ -680,6 +691,8 @@ static char *_PD_col_major_expr(char *bf, dimdes *pd, long indx, int def_off)
 
 /* PD_INDEX_TO_EXPR - convert a linear index into
  *                  - an ASCII index expression
+ *
+ * #bind PD_index_to_expr fortran() scheme()
  */
 
 char *PD_index_to_expr(char *bf, long indx, dimdes *dim,

@@ -8,47 +8,49 @@
 #
 
 # treat a struct as a character array - unless specific definition exists
-derived PDBfile	      		character-A	SC_STRING_I	SC_STRING_I
 derived PD_major_op		integer		SC_ENUM_I	SC_ENUM_I
 derived PD_byte_order		integer		SC_ENUM_I	SC_ENUM_I
 derived PD_curve_io		integer		SC_ENUM_I	SC_ENUM_I
 derived PD_checksum_mode	integer		SC_ENUM_I	SC_ENUM_I
+derived PDBfile	      		character-A	SC_STRING_I	SC_STRING_I
 
 #  C function			Fortran		Scheme		Python
 
 # PDB.C
 
+PD_create			yes		yes		none
 PD_open				yes		yes		pdb.open
 PD_family			yes		yes		none
-PD_create			yes		yes		none
 PD_open_vif			yes		yes		none
+PD_copy_type			yes		yes		none
 PD_close			yes		yes		file.close
 PD_flush			yes		yes		file.flush
-PD_remove_entry			yes		yes		none
-PD_append			yes		yes		none
-PD_append_alt			yes		yes		none
-PD_append_as			yes		yes		none
-PD_append_as_alt		yes		yes		none
-PD_defent			yes		yes		none
-PD_defent_alt			yes		yes		none
 PD_read				yes		yes		file.read
 PD_read_as			yes		yes		none
 PD_read_as_dwim			yes		yes		none
 PD_read_alt			yes		yes		none
 PD_read_as_alt			yes		yes		none
+PD_defent			yes		yes		none
+PD_defent_alt			yes		yes		none
 PD_write			yes		yes		file.write
-PD_write_alt			yes		yes		none
 PD_write_as			yes		yes		none
+PD_write_alt			yes		yes		none
 PD_write_as_alt			yes		yes		none
+PD_append			yes		yes		none
+PD_append_as			yes		yes		none
+PD_append_alt			yes		yes		none
+PD_append_as_alt		yes		yes		none
 PD_cast				yes		yes		none
-PD_free				yes		yes		none
-PD_copy_type			yes		yes		none
-PD_fix_denorm			yes		yes		none
-PD_autofix_denorm		yes		yes		none
 PD_error			yes		yes		none
+PD_free				yes		yes		none
+PD_remove_entry			yes		yes		none
+PD_autofix_denorm		yes		yes		none
+PD_fix_denorm			yes		yes		none
 
 # PDBAIB.C
 
+PD_verify_writes		yes		yes		none
+PD_contents			yes		yes		none
 PD_typedef			yes		yes		none
 PD_defncv			yes		yes		none
 PD_defchr			yes		yes		none
@@ -58,89 +60,77 @@ PD_defloat			yes		yes		none
 PD_defstr			none		none		pdb.defstr
 PD_defstr_alt			none		yes		none
 PD_defstr_s			yes		yes		none
-PD_verify_writes		yes		yes		none
 PD_change_primitive		yes		yes		none
-PD_contents			yes		yes		none
 PD_fp_toler			none		none		none
-
-# PDBMM.C
-
-PD_copy_syment			yes		yes		none
-PD_copy_members			yes		yes		none
-PD_copy_dims			yes		yes		none
-PD_alloc_entry			yes		yes		none
-
 
 # PDBDIR.C
 
+PD_cd				yes		yes		file.cd
+PD_ln				yes		yes		file.ln
 PD_ls				yes		yes		file.ls
 PD_ls_alt			yes		yes		none
-PD_pwd				yes		yes		file.pwd
-PD_cd				yes		yes		file.cd
+PD_def_dir			yes		yes		none
 PD_isdir			yes		yes		file.isdir
 PD_mkdir			yes		yes		file.mkdir
-PD_ln				yes		yes		file.ln
-PD_def_dir			yes		yes		none
+PD_pwd				yes		yes		file.pwd
+
+
+# PDBMM.C
+
+PD_alloc_entry			yes		yes		none
+PD_copy_dims			yes		yes		none
+PD_copy_syment			yes		yes		none
+PD_copy_members			yes		yes		none
 
 
 # PDBMP.C
 
-PD_mp_open			yes		yes		none
-PD_mp_create			yes		yes		none
-PD_mp_set_collective		yes		yes		none
 PD_mp_set_serial		yes		yes		none
+PD_mp_set_collective		yes		yes		none
+PD_mp_create			yes		yes		none
+PD_mp_open			yes		yes		none
 
 
 # PDBNET.C
 
 PN_conv_in			yes		yes		none
 PN_conv_out			yes		yes		none
+PN_target			yes		yes		none
+PN_defstr			yes		none		none
+PN_open				yes		yes		none
 PN_close			yes		yes		none
 PN_write			yes		yes		none
 PN_read				yes		yes		none
-PN_open				yes		yes		none
-PN_target			yes		yes		none
-PN_defstr			yes		none		none
-
 
 # PDBX.C
 
+PD_mk_attribute			yes		yes		none
+PD_inquire_attribute		yes		yes		none
+PD_inquire_attribute_value	yes		yes		none
+PD_rel_attr_table		yes		yes		none
 PD_get_attribute		yes		yes		none
-PD_def_pdb_types		yes		yes		none
-PD_def_attr_str			yes		yes		none
-PD_def_attribute		yes		yes		none
-PD_set_attribute		yes		yes		none
 PD_rem_attribute		yes		yes		none
+PD_set_attribute		yes		yes		none
+PD_def_attribute		yes		yes		none
+PD_def_pdb_types		yes		yes		none
 PD_def_hash_types		yes		yes		none
+PD_def_attr_str			yes		yes		none
 PD_read_pdb_curve		yes		yes		none
 PD_wrt_pdb_curve		yes		yes		none
 PD_wrt_pdb_curve_y		yes		yes		none
 PD_put_mapping			yes		yes		none
 PD_put_image			yes		yes		none
 PD_put_set			yes		yes		none
+PD_process_set_name		yes		yes		none
 PD_mesh_struct			yes		yes		none
 PD_def_mapping			yes		yes		none
-PD_mk_attribute			yes		yes		none
-PD_inquire_attribute		yes		yes		none
-PD_inquire_attribute_value	yes		yes		none
-PD_rel_image			yes		yes		none
-PD_rel_attr_table		yes		yes		none
-PD_write_table			yes		yes		none
-PD_replace			yes		yes		none
-PD_process_set_name		yes		yes		none
 PD_make_image			yes		yes		none
+PD_rel_image			yes		yes		none
 
 # PDCONV.C
 
 PD_byte_reverse			yes		yes		none
 PD_convert			yes		yes		none
-
-# PDGS.C
-
-PD_gather_as			yes		yes		none
-PD_gather			yes		yes		none
-PD_scatter_as			yes		yes		none
-PD_scatter			yes		yes		none
 
 # PDCSUM.C
 
@@ -151,21 +141,27 @@ PD_activate_cksum		yes		yes		none
 
 PD_isfile			yes		yes		none
 
+# PDGS.C
+
+PD_gather_as			yes		yes		none
+PD_gather			yes		yes		none
+PD_scatter_as			yes		yes		none
+PD_scatter			yes		yes		none
+
 # PDLOW.C
 
 PD_inquire_type			yes		yes		none
 PD_inquire_host_type		yes		yes		none
-PD_get_error			yes		yes		none
-PD_get_entry_info		yes		yes		none
-PD_get_buffer_size		yes		yes		none
-PD_set_buffer_size		yes		yes		none
+PD_typedef_primitive_types	yes		yes		none
 PD_entry_set_address		yes		yes		none
 PD_entry_address		yes		yes		none
+PD_get_error			yes		yes		none
+PD_get_buffer_size		yes		yes		none
+PD_set_buffer_size		yes		yes		none
 PD_get_file_length		yes		yes		none
+PD_get_entry_info		yes		yes		none
 PD_free_entry_info		yes		yes		none
 PD_rel_entry_info		yes		yes		none
-PD_typedef_primitive_types	yes		yes		none
-
 PD_get_mode			yes		yes		none
 PD_set_mode			yes		yes		none
 PD_get_offset			yes		yes		none
@@ -180,46 +176,46 @@ PD_get_fmt_version		yes		yes		none
 PD_set_fmt_version		yes		yes		none
 PD_get_file_name		yes		yes		none
 PD_entry_type			yes		yes		none
-PD_entry_dimensions		yes		yes		none
 PD_entry_number			yes		yes		none
 PD_entry_n_dimensions		yes		yes		none
+PD_entry_dimensions		yes		yes		none
 PD_type_size			yes		yes		none
 PD_type_alignment		yes		yes		none
 PD_type_n_indirects		yes		yes		none
 
 # PDMEMB.C
 
-PD_index_to_expr		yes		yes		none
 PD_inquire_symbol		yes		yes		none
-PD_inquire_entry		yes		yes		none
 PD_query_entry			yes		yes		none
+PD_inquire_entry		yes		yes		none
 PD_effective_entry		yes		yes		none
+PD_index_to_expr		yes		yes		none
 
 # PDPARMP.C
 
 PD_init_mpi			yes		yes		none
 PD_term_mpi			yes		yes		none
 
-# PDPATH.C
-
-PD_hyper_number			yes		yes		none
-
 # PDPRNT.C
 
-PD_print_entry			yes		yes		none
-PD_write_entry			yes		yes		none
-PD_print_extras			yes		yes		none
-PD_print_syment			yes		yes		none
-PD_print_defstr			yes		yes		none
 PD_write_extras			yes		yes		none
+PD_print_extras			yes		yes		none
 PD_write_syment			yes		yes		none
+PD_print_syment			yes		yes		none
 PD_write_defstr			yes		yes		none
+PD_print_defstr			yes		yes		none
+PD_write_entry			yes		yes		none
+PD_print_entry			yes		yes		none
+
+# PDPTR.C
+
+PD_reset_ptr_list		yes		yes		none
 
 # PDRDWR.C
 
 PD_dereference			yes		yes		none
+PD_hyper_number			yes		yes		none
 PD_read_bits			yes		yes		none
-PD_reset_ptr_list		yes		yes		none
 
 # PDSER.C
 

@@ -170,7 +170,10 @@ void _PD_rl_pdb(PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_ALLOC_ENTRY - allocate memory for the variable type */
+/* PD_ALLOC_ENTRY - allocate memory for the variable type
+ *
+ * #bind PD_alloc_entry fortran() scheme()
+ */
 
 void *PD_alloc_entry(PDBfile *file, char *name)
    {syment *ep;
@@ -371,7 +374,10 @@ void _PD_rl_alignment(data_alignment *align)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_COPY_DIMS - make and return a copy of the given dimension list */
+/* PD_COPY_DIMS - make and return a copy of the given dimension list
+ *
+ * #bind PD_copy_dims fortran() scheme()
+ */
 
 dimdes *PD_copy_dims(dimdes *odims)
    {dimdes *od, *ndims, *prev, *next;
@@ -397,7 +403,10 @@ dimdes *PD_copy_dims(dimdes *odims)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_COPY_SYMENT - make and return a copy of the given syment */
+/* PD_COPY_SYMENT - make and return a copy of the given syment
+ *
+ * #bind PD_copy_syment fortran() scheme()
+ */
 
 syment *PD_copy_syment(syment *osym)
    {char *ntype;
@@ -733,7 +742,10 @@ void _PD_free_tuple(multides *tuple)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_COPY_MEMBERS - copy a linked list of members */
+/* PD_COPY_MEMBERS - copy a linked list of members
+ *
+ * #bind PD_copy_members fortran() scheme()
+ */
 
 memdes *PD_copy_members(memdes *desc)
    {memdes *newm, *nnxt, *thism, *prevm;

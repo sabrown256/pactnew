@@ -21,6 +21,8 @@ char
 
 /* PD_MK_ATTRIBUTE - initialize an attribute with identifier AT and
  *                 - type TYPE
+ *
+ * #bind PD_mk_attribute fortran() scheme()
  */
 
 attribute *PD_mk_attribute(char *at, char *type)
@@ -110,7 +112,10 @@ static void _PD_rl_attribute_value(attribute_value *avl)
 
 /*--------------------------------------------------------------------------*/
 
-/* PD_INQUIRE_ATTRIBUTE - look up the table entry for the named attribute */
+/* PD_INQUIRE_ATTRIBUTE - look up the table entry for the named attribute
+ *
+ * #bind PD_inquire_attribute fortran() scheme()
+ */
 
 attribute *PD_inquire_attribute(PDBfile *file, char *name, char *path)
    {haelem *hp;
@@ -127,6 +132,8 @@ attribute *PD_inquire_attribute(PDBfile *file, char *name, char *path)
 
 /* PD_INQUIRE_ATTRIBUTE_VALUE - look up the table entry for
  *                            - the named attribute value
+ *
+ * #bind PD_inquire_attribute_value fortran() scheme()
  */
 
 attribute_value *PD_inquire_attribute_value(PDBfile *file,
@@ -168,6 +175,8 @@ static int _PD_rel_attr(haelem *hp, void *a)
 
 /* PD_REL_ATTR_TABLE - release the attribute table of FILE
  *                   - if it exists
+ *
+ * #bind PD_rel_attr_table fortran() scheme()
  */
 
 void PD_rel_attr_table(PDBfile *file)
@@ -184,6 +193,8 @@ void PD_rel_attr_table(PDBfile *file)
 
 /* PD_DEF_ATTRIBUTE - define an attribute by specifying its type
  *                  - return TRUE if successful and FALSE otherwise
+ *
+ * #bind PD_get_attribute fortran() scheme()
  */
 
 int PD_def_attribute(PDBfile *file, char *at, char *type)
@@ -224,6 +235,8 @@ int PD_def_attribute(PDBfile *file, char *at, char *type)
  *                  -       table the NULL data pointer is used to tell the
  *                  -       attribute value lookup operation that the
  *                  -       attribute no longer exists
+ *
+ * #bind PD_rem_attribute fortran() scheme()
  */
 
 int PD_rem_attribute(PDBfile *file, char *at)
@@ -247,6 +260,8 @@ int PD_rem_attribute(PDBfile *file, char *at)
 /* PD_SET_ATTRIBUTE - set the value of the specified attribute for the
  *                  - specified variable
  *                  - return TRUE if successful and FALSE otherwise
+ *
+ * #bind PD_set_attribute fortran() scheme(pd-set-attribute!)
  */
 
 int PD_set_attribute(PDBfile *file, char *vr, char *at, void *vl)
@@ -309,6 +324,8 @@ int PD_set_attribute(PDBfile *file, char *vr, char *at, void *vl)
  *                  - specified variable
  *                  - return a pointer to the attribute value if successful
  *                  - and NULL otherwise
+ *
+ * #bind PD_get_attribute fortran() scheme()
  */
 
 void *PD_get_attribute(PDBfile *file, char *vr, char *at)
@@ -359,7 +376,10 @@ void *PD_get_attribute(PDBfile *file, char *vr, char *at)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DEF_PDB_TYPES - define in one place PDB data types for PDB files */
+/* PD_DEF_PDB_TYPES - define in one place PDB data types for PDB files
+ *
+ * #bind PD_def_pdb_types fortran() scheme()
+ */
 
 int PD_def_pdb_types(PDBfile *file)
    {defstr *dp;
@@ -427,6 +447,8 @@ int PD_def_pdb_types(PDBfile *file)
  *                   - FLAG controls which structs get defined
  *                   -  bit 1   define haelem
  *                   -  bit 2   define hasharr
+ *
+ * #bind PD_def_hash_types fortran() scheme()
  */
 
 int PD_def_hash_types(PDBfile *file, int flag)
@@ -448,6 +470,8 @@ int PD_def_hash_types(PDBfile *file, int flag)
 
 /* PD_DEF_ATTR_STR - define hashing, attribute, attribute value
  *                 - structures
+ *
+ * #bind PD_def_attr_str fortran() scheme()
  */
 
 int PD_def_attr_str(PDBfile *file)
@@ -655,6 +679,8 @@ int _PD_contains_indirections(hasharr *tab, char *type)
  *                   - set the number of points
  *                   - fill the x and y extrema values
  *                   - fill the x and y arrays depending on value of flag
+ *
+ * #bind PD_read_pdb_curve fortran() scheme()
  */
 
 int PD_read_pdb_curve(PDBfile *fp, char *name, double **pxp, double **pyp,
@@ -788,6 +814,8 @@ int PD_read_pdb_curve(PDBfile *fp, char *name, double **pxp, double **pyp,
  *                  - as the icurve'th curve in the file
  *                  - NOTE: the order of the writes is crucial for
  *                  - performance for remote files
+ *
+ * #bind PD_wrt_pdb_curve fortran() scheme()
  */
 
 int PD_wrt_pdb_curve(PDBfile *fp, char *labl, int n,
@@ -883,6 +911,8 @@ int PD_wrt_pdb_curve(PDBfile *fp, char *labl, int n,
  *                    - x values is correct
  *                    - NOTE: the order of the writes is crucial for
  *                    - performance for remote files
+ *
+ * #bind PD_wrt_pdb_curve_y fortran() scheme()
  */
 
 int PD_wrt_pdb_curve_y(PDBfile *fp, char *labl, int n, int ix,
@@ -946,6 +976,8 @@ int PD_wrt_pdb_curve_y(PDBfile *fp, char *labl, int n, int ix,
 
 /* PD_PUT_MAPPING - write a mapping F to the PDBfile, FILE, with index
  *                - MAPPING
+ *
+ * #bind PD_put_mapping fortran() scheme()
  */
 
 int PD_put_mapping(PDBfile *file, PM_mapping *f, int mapping)
@@ -965,6 +997,8 @@ int PD_put_mapping(PDBfile *file, PM_mapping *f, int mapping)
 
 /* PD_PUT_IMAGE - write an image F to the PDBfile, FILE, with index IMAGE
  *              - do a slight fudge because PG_image isn't defined
+ *
+ * #bind PD_put_image fortran() scheme()
  */
 
 int PD_put_image(PDBfile *file, void *f, int image)
@@ -984,6 +1018,8 @@ int PD_put_image(PDBfile *file, void *f, int image)
 
 /* PD_PUT_SET - write a set S to the PDBfile, FILE, under the name of 
  *            - the set
+ *
+ * #bind PD_put_set fortran() scheme()
  */
 
 int PD_put_set(PDBfile *file, PM_set *s)
@@ -1007,6 +1043,8 @@ int PD_put_set(PDBfile *file, PM_set *s)
  *                     - PDBLib doesn't mistake the variable for
  *                     - a structure
  *                     - the input string, DNAME, will be mangled!!!
+ *
+ * #bind PD_process_set_name fortran() scheme()
  */
 
 char *PD_process_set_name(char *dname)
@@ -1024,7 +1062,10 @@ char *PD_process_set_name(char *dname)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_MESH_STRUCT - define types for mesh generation */
+/* PD_MESH_STRUCT - define types for mesh generation
+ *
+ * #bind PD_mesh_struct fortran() scheme()
+ */
 
 int PD_mesh_struct(PDBfile *file)
    {int err;
@@ -1118,6 +1159,8 @@ int PD_mesh_struct(PDBfile *file)
 /* PD_DEF_MAPPING - define PM_set and PM_mapping to 
  *                - a PDB file thereby preparing it for mappings
  *                - return TRUE iff successful
+ *
+ * #bind PD_def_mapping fortran() scheme()
  */
 
 int PD_def_mapping(PDBfile *fp)
@@ -1245,7 +1288,10 @@ int PD_def_mapping(PDBfile *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_MAKE_IMAGE - create and return a PD_IMAGE */
+/* PD_MAKE_IMAGE - create and return a PD_IMAGE
+ *
+ * #bind PD_make_image fortran() scheme()
+ */
 
 PD_image *PD_make_image(char *name, char *type, void *data,
 		        int kmax, int lmax, int bpp,
@@ -1277,7 +1323,10 @@ PD_image *PD_make_image(char *name, char *type, void *data,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_REL_IMAGE - release a PD_IMAGE */
+/* PD_REL_IMAGE - release a PD_IMAGE
+ *
+ * #bind PD_rel_image fortran() scheme()
+ */
 
 void PD_rel_image(PD_image *im)
    {
