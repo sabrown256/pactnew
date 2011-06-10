@@ -442,6 +442,8 @@ static long _PD_ptr_find_addr(PDBfile *file, int64_t addr)
  *                   - so that indirect connectivity bookkeeping
  *                   - is re-initialized this will give the application
  *                   - some control over this process
+ *
+ * #bind PD_reset_ptr_list fortran() scheme()
  */
 
 int PD_reset_ptr_list(PDBfile *file)

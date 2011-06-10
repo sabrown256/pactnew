@@ -409,6 +409,8 @@ static int _PN_sizeof(char *s)
  *            - from a remote host with different architecture
  *            - NITEMS of type, TYPE, from IN and put them in OUT
  *            - all additional information comes from OUT_CHART
+ *
+ * #bind PN_conv_in fortran() scheme()
  */
 
 void PN_conv_in(void *out, void *in, char *type, long nitems,
@@ -442,6 +444,8 @@ void PN_conv_in(void *out, void *in, char *type, long nitems,
  *             - to a remote host with different architecture
  *             - NITEMS of type, TYPE, from IN and put them in OUT
  *             - all additional information comes from OUT_CHART
+ *
+ * #bind PN_conv_out fortran() scheme()
  */
 
 void PN_conv_out(void *out, void *in, char *type, long nitems,
@@ -474,6 +478,8 @@ void PN_conv_out(void *out, void *in, char *type, long nitems,
 /* PN_TARGET - allocate, initialize, and return a structure chart
  *           - for the associated standard and alignment
  *           - for network PDB
+ *
+ * #bind PN_target fortran() scheme()
  */
 
 hasharr *PN_target(data_standard *std, data_alignment *align)
@@ -535,6 +541,8 @@ hasharr *PN_target(data_standard *std, data_alignment *align)
  *           - which consist of pointers
  *           -
  *           - Returns NULL if member types are unknown
+ *
+ * #bind PN_defstr fortran() scheme()
  */
 
 defstr *PN_defstr(hasharr *chart, char *name, data_alignment *align,
@@ -597,6 +605,8 @@ defstr *PN_defstr(hasharr *chart, char *name, data_alignment *align,
 
 /* PN_OPEN - create a special pseudo PDBfile and set all the
  *         - io hooks appropriately
+ *
+ * #bind PN_open fortran() scheme()
  */
 
 PDBfile *PN_open(PDBfile *fm, char *bf)
@@ -679,6 +689,8 @@ PDBfile *PN_open(PDBfile *fm, char *bf)
 
 /* PN_CLOSE - close the special pseudo PDBfile and reset all the
  *          - io hooks
+ *
+ * #bind PN_close fortran() scheme()
  */
 
 int PN_close(PDBfile *file)
@@ -708,7 +720,10 @@ int PN_close(PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PN_WRITE - write the given data to the special pseudo PDBfile */
+/* PN_WRITE - write the given data to the special pseudo PDBfile
+ *
+ * #bind PN_write fortran() scheme()
+ */
 
 int PN_write(PDBfile *file, char *type, long nitems, void *vr)
    {int ret;
@@ -725,7 +740,10 @@ int PN_write(PDBfile *file, char *type, long nitems, void *vr)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PN_READ - read the given data from the special pseudo PDBfile */
+/* PN_READ - read the given data from the special pseudo PDBfile
+ *
+ * #bind PN_read fortran() scheme()
+ */
 
 int PN_read(PDBfile *file, char *type, long nitems, void *vr)
    {int ret;

@@ -1818,6 +1818,8 @@ static void _PD_comm_connect_mpi(void)
  *             -             from other processes
  *             - Have to initialize threads here because we need to
  *             - add 1 for the master process
+ *
+ * #bind PD_init_mpi fortran() scheme()
  */
 
 int PD_init_mpi(int masterproc, int nthreads, PFTid tid)
@@ -1887,7 +1889,10 @@ int PD_init_mpi(int masterproc, int nthreads, PFTid tid)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_TERM_MPI - shutdown the library--terminate the master thread */
+/* PD_TERM_MPI - shutdown the library--terminate the master thread
+ *
+ * #bind PD_term_mpi fortran() scheme()
+ */
 
 void PD_term_mpi(void)
    {

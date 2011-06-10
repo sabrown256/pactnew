@@ -21,6 +21,8 @@
  *                  - you want to do this with flaky hardware of file systems
  *                  - as such all files are likely to be effected
  *                  - return the old value of the flag
+ *
+ * #bind PD_verify_writes fortran() scheme()
  */
 
 int PD_verify_writes(int st)
@@ -39,6 +41,8 @@ int PD_verify_writes(int st)
  *             - and the extras of any PDBfile *file to the file OUT
  *             - if FH == 0 write the file chart and if 1
  *             - write the host chart
+ *
+ * #bind PD_contents fortran() scheme()
  */
 
 void PD_contents(PDBfile *file, FILE *out, int fh, int vers)
@@ -60,6 +64,8 @@ void PD_contents(PDBfile *file, FILE *out, int fh, int vers)
  *            - to have a primitive type known to both charts
  *            - return a pointer to the original type's defstr if
  *            - successful and NULL otherwise
+ *
+ * #bind PD_typedef fortran() scheme()
  */
 
 defstr *PD_typedef(PDBfile *file, char *oname, char *tname)
@@ -93,6 +99,8 @@ defstr *PD_typedef(PDBfile *file, char *oname, char *tname)
 
 /* PD_DEFNCV - define a primitive type that will not be format converted
  *           - do it in both charts
+ *
+ * #bind PD_defncv fortran() scheme()
  */
 
 defstr *PD_defncv(PDBfile *file, char *name, long bpi, int align)
@@ -116,6 +124,8 @@ defstr *PD_defncv(PDBfile *file, char *name, long bpi, int align)
 /* PD_DEFCHR - define a primitive character based type
  *           - this is needed in connection with TEXT
  *           - e.g. SQL date and time types
+ *
+ * #bind PD_defchr fortran() scheme()
  */
 
 defstr *PD_defchr(PDBfile *file, char *name, long bpi, int align,
@@ -137,7 +147,10 @@ defstr *PD_defchr(PDBfile *file, char *name, long bpi, int align,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DEFIXNUM - define an new integer primitive type for the file chart */
+/* PD_DEFIXNUM - define an new integer primitive type for the file chart
+ *
+ * #bind PD_defixnum fortran() scheme()
+ */
 
 defstr *PD_defixnum(PDBfile *file, char *name, long bpi,
 		    int align, PD_byte_order ord, int unsgned, int onescmp)
@@ -158,7 +171,10 @@ defstr *PD_defixnum(PDBfile *file, char *name, long bpi,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DEFIX - define an new integer primitive type */
+/* PD_DEFIX - define an new integer primitive type
+ *
+ * #bind PD_defix fortran() scheme()
+ */
 
 defstr *PD_defix(PDBfile *file, char *name, long bpi,
 		 int align, PD_byte_order ord)
@@ -172,7 +188,8 @@ defstr *PD_defix(PDBfile *file, char *name, long bpi,
 /*--------------------------------------------------------------------------*/
 
 /* PD_DEFLOAT - define an new floating point primitive type
- * 
+ *
+ * #bind PD_defloat fortran() scheme()
  */
 
 defstr *PD_defloat(PDBfile *file, char *name, long bpi,
@@ -240,6 +257,8 @@ defstr *PD_defloat(PDBfile *file, char *name, long bpi,
  *           - which consist of pointers
  *           -
  *           - Returns NULL if member types are unknown
+ *
+ * #bind PD_defstr python(pdb.defstr)
  */
 
 defstr *PD_defstr(PDBfile *file, char *name, ...)
@@ -307,6 +326,8 @@ defstr *PD_defstr(PDBfile *file, char *name, ...)
  *               -                 <member-array>);
  *               - the member array elements have the same syntax as for
  *               - PD_defstr
+ *
+ * #bind PD_defstr_alt scheme()
  */
 
 defstr *PD_defstr_alt(PDBfile *file, char *name, int nmemb,
@@ -373,6 +394,8 @@ defstr *PD_defstr_alt(PDBfile *file, char *name, int nmemb,
  *             -               <text>);
  *             - the text consists of semicolon delimited member specifications
  *             - as the individual members in PD_defstr
+ *
+ * #bind PD_defstr_s fortran() scheme()
  */
 
 defstr *PD_defstr_s(PDBfile *file, char *name, char *members)
@@ -397,6 +420,8 @@ defstr *PD_defstr_s(PDBfile *file, char *name, char *members)
 
 /* PD_CHANGE_PRIMITIVE - change the description of a primitive type
  *                     - the type is known by index
+ *
+ * #bind PD_change_primitive fortran() scheme()
  */
 
 int PD_change_primitive(PDBfile *file, int ityp, int nb, int algn,
@@ -471,6 +496,8 @@ int PD_change_primitive(PDBfile *file, int ityp, int nb, int algn,
 /* PD_FP_TOLER - fill array of tolerances for
  *             - floating point type comparisons
  *             - this is mainly test support
+ *
+ * #bind PD_fp_toler fortran() scheme()
  */
 
 void PD_fp_toler(PDBfile *file, long double *fptol)

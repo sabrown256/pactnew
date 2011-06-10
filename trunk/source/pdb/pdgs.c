@@ -157,6 +157,8 @@ static int _PD_hyper_scatter(char *dst, int id, int nd, long *dind, char *src,
  *              - NOTE: VR must be a pointer to an object with the type
  *              - of the object associated with NAME (PDBLib will
  *              - allocated space if necessary)!
+ *
+ * #bind PD_gather_as fortran() scheme()
  */
 
 int PD_gather_as(PDBfile *file, char *name, char *type,
@@ -197,6 +199,8 @@ int PD_gather_as(PDBfile *file, char *name, char *type,
  *           -
  *           - NOTE: VR must be a pointer to an object with the type
  *           - given by TYPE (PDBLib will allocated space if necessary)!
+ *
+ * #bind PD_gather fortran() scheme()
  */
 
 int PD_gather(PDBfile *file, char *name, void *vr, long *sind,
@@ -224,6 +228,8 @@ int PD_gather(PDBfile *file, char *name, void *vr, long *sind,
  *               -
  *               - NOTE: VR must be a pointer to an object with the type
  *               - given by TYPE!!!!
+ *
+ * #bind PD_scatter_as fortran() scheme()
  */
 
 int PD_scatter_as(PDBfile *file, char *name, char *intype, char *outtype,
@@ -259,6 +265,8 @@ int PD_scatter_as(PDBfile *file, char *name, char *intype, char *outtype,
  *            -
  *            - NOTE: VR must be a pointer to an object with the type
  *            - given by TYPE!!!!
+ *
+ * #bind PD_scatter fortran() scheme()
  */
 
 int PD_scatter(PDBfile *file, char *name, char *type, void *vr,

@@ -159,6 +159,8 @@ int _PD_indirection(char *s)
  *                - the first non-blank character and if it is a '*'
  *                - insert '\0' in its place
  *                - return a pointer to the beginning of the string
+ *
+ * #bind PD_dereference fortran() scheme()
  */
 
 char *PD_dereference(char *s)
@@ -380,6 +382,8 @@ long _PD_hyper_number(PDBfile *file, char *indxpr, long numb, dimdes *dims, long
 /* PD_HYPER_NUMBER - THREADSAFE
  *                 - return the number of elements implied by a hyper
  *                 - index expression
+ *
+ * #bind PD_hyper_number fortran() scheme()
  */
 
 long PD_hyper_number(PDBfile *file, char *name, syment *ep)
@@ -1560,6 +1564,8 @@ int _PD_hyper_read(PDBfile *file, char *name, char *outtype,
  *              -   OFFS    offset from the beginning of the input data
  *              -   PAN     the number of items found 
  *              -   PDATA   the data array returned
+ *
+ * #bind PD_read_bits fortran() scheme()
  */
 
 int PD_read_bits(PDBfile *file, char *name, char *type, long nitems,

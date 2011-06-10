@@ -214,7 +214,10 @@ static void _PD_disp_data(PD_printdes *prnt, void *x,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_WRITE_EXTRAS - write the extra stuff about a PDBfile */
+/* PD_WRITE_EXTRAS - write the extra stuff about a PDBfile
+ *
+ * #bind PD_write_extras fortran() scheme()
+ */
 
 void PD_write_extras(FILE *f0, PDBfile *file)
    {long i;
@@ -271,7 +274,10 @@ void PD_write_extras(FILE *f0, PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_PRINT_EXTRAS - print the extra stuff about a PDBfile */
+/* PD_PRINT_EXTRAS - print the extra stuff about a PDBfile
+ *
+ * #bind PD_print_extras fortran() scheme()
+ */
 
 void PD_print_extras(PDBfile *file)
    {
@@ -283,7 +289,10 @@ void PD_print_extras(PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_WRITE_SYMENT - write a symbol table entry in human readable form */
+/* PD_WRITE_SYMENT - write a symbol table entry in human readable form
+ *
+ * #bind PD_write_syment fortran() scheme()
+ */
 
 void PD_write_syment(FILE *f0, syment *ep)
    {dimdes *dim;
@@ -307,7 +316,10 @@ void PD_write_syment(FILE *f0, syment *ep)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_PRINT_SYMENT - print a symbol table entry in human readable form */
+/* PD_PRINT_SYMENT - print a symbol table entry in human readable form
+ *
+ * #bind PD_print_syment fortran() scheme()
+ */
 
 void PD_print_syment(syment *ep)
    {
@@ -319,7 +331,10 @@ void PD_print_syment(syment *ep)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_WRITE_DEFSTR - write a defstr in human readable form */
+/* PD_WRITE_DEFSTR - write a defstr in human readable form
+ *
+ * #bind PD_write_defstr fortran() scheme()
+ */
 
 void PD_write_defstr(FILE *f0, defstr *dp)
    {memdes *lst, *nxt;
@@ -353,7 +368,10 @@ void PD_write_defstr(FILE *f0, defstr *dp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_PRINT_DEFSTR - print a defstr in human readable form */
+/* PD_PRINT_DEFSTR - print a defstr in human readable form
+ *
+ * #bind PD_print_defstr fortran() scheme()
+ */
 
 void PD_print_defstr(defstr *dp)
    {
@@ -575,7 +593,10 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_WRITE_ENTRY - write a data item from a PDB file in a formated way */
+/* PD_WRITE_ENTRY - write a data item from a PDB file in a formated way
+ *
+ * #bind PD_write_entry fortran() scheme()
+ */
 
 int PD_write_entry(FILE *f0, PDBfile *file, char *name, void *vr,
 		   syment *ep, int n, long *ind)
@@ -621,7 +642,10 @@ int PD_write_entry(FILE *f0, PDBfile *file, char *name, void *vr,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_PRINT_ENTRY - print a data item from a PDB file in a formated way */
+/* PD_PRINT_ENTRY - print a data item from a PDB file in a formated way
+ *
+ * #bind PD_print_entry fortran() scheme()
+ */
 
 int PD_print_entry(PDBfile *file, char *name, void *vr, syment *ep)
    {int rv;

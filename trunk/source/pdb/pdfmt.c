@@ -513,7 +513,10 @@ int _PD_format_version(PDBfile *file, int vers)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_ISFILE - return TRUE iff FNAME is a PDB file */
+/* PD_ISFILE - return TRUE iff FNAME is a PDB file
+ *
+ * #bind PD_isfile fortran() scheme(pd-isfile?)
+ */
 
 int PD_isfile(char *fname)
    {int vers, ok;

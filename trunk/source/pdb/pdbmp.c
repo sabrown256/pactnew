@@ -20,6 +20,8 @@
 /* PD_MP_SET_SERIAL - set the file->mpi_file field to
  *                  - the input value
  *                  - returns the old value
+ *
+ * #bind PD_mp_set_serial fortran() scheme(pd-mp-set-serial!)
  */
 
 int PD_mp_set_serial(PDBfile *file, int flag)
@@ -35,6 +37,8 @@ int PD_mp_set_serial(PDBfile *file, int flag)
 
 /* PD_MP_SET_COLLECTIVE - set the I/O (write right now)
  *                      - operations to be collective
+ *
+ * #bind PD_mp_set_collective fortran() scheme(pd-mp-set-collective!)
  */
 
 int PD_mp_set_collective(int flag)
@@ -52,6 +56,8 @@ int PD_mp_set_collective(int flag)
  *              - if successful else NULL
  *              - if comm == SC_COMM_SELF the file is opened only on the
  *              - local processor
+ *
+ * #bind PD_mp_create fortran() scheme()
  */
 
 PDBfile *PD_mp_create(char *name, SC_communicator *comm)
@@ -75,6 +81,8 @@ PDBfile *PD_mp_create(char *name, SC_communicator *comm)
  *            - if successful else NULL
  *            - if comm == SC_COMM_SELF the file is opened only on the
  *            - local processor
+ *
+ * #bind PD_mp_open fortran() scheme()
  */
 
 PDBfile *PD_mp_open(char *name, char *mode, SC_communicator comm)

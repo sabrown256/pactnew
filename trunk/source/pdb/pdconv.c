@@ -414,6 +414,8 @@ void _PD_ones_complement(char *out, long nitems, int nbo, int *order)
 
 /* PD_BYTE_REVERSE - byte reverse nitems words
  *                 - each word is nb bytes long where nb is even
+ *
+ * #bind PD_byte_reverse fortran() scheme()
  */
 
 void PD_byte_reverse(char *out, long nb, long nitems)
@@ -2144,6 +2146,8 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
  *            - type, TYPE, from IN and put them in OUT
  *            - ISTD and OSTD are the data format standards of IN and 
  *            - OUT respectively
+ *
+ * #bind PD_convert fortran() scheme()
  */
 
 int PD_convert(char **out, char **in, char *typi, char *typo,

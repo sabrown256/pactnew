@@ -191,6 +191,8 @@ static int _PD_ptr_sz_itags(long *pnb, PDBfile *file, void *vr,
  *           - which means that it can overestimate the actual space
  *           - a subsequent PD_write will use by the amount of space
  *           - for pointees already written
+ *
+ * #bind PD_sizeof fortran() scheme()
  */
 
 long PD_sizeof(PDBfile *file, char *type, long nitems, void *vri)
@@ -401,6 +403,8 @@ long PD_sizeof(PDBfile *file, char *type, long nitems, void *vri)
  *             - buffer space
  *             - this is to cover the case of multiply referenced spaces
  *             - buffers which have been passed around
+ *
+ * #bind PN_relocate fortran() scheme()
  */
 
 int PN_relocate(PDBfile *file, char *type, long n)

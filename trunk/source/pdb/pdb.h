@@ -208,6 +208,10 @@ typedef struct s_PD_pfm_fnc PD_pfm_fnc;
 typedef memdes *(*PFPDBwrite)(PDBfile *file, char *vr, defstr *defp);
 typedef memdes *(*PFPDBread)(memdes *members);
 
+/*
+ * #bind derived PD_major_op integer SC_ENUM_I SC_ENUM_I
+ */
+
 enum e_PD_major_op
    {PD_READ = 0,
     PD_WRITE,
@@ -221,6 +225,10 @@ enum e_PD_major_op
     PD_UNINIT};
 
 typedef enum e_PD_major_op PD_major_op;
+
+/*
+ * #bind derived PD_byte_order integer SC_ENUM_I SC_ENUM_I
+ */
 
 enum e_PD_byte_order
    {NO_ORDER = 0,             /* opaque type - no order */
@@ -255,6 +263,10 @@ enum e_PD_major_order
 
 typedef enum e_PD_major_order PD_major_order;
 
+/*
+ * #bind derived PD_curve_io integer SC_ENUM_I SC_ENUM_I
+ */
+
 enum e_PD_curve_io
    {NOR_X_Y = 0,
     X_AND_Y,
@@ -268,6 +280,10 @@ enum e_PD_symbol_order
     PF_DISK_ORDER};
 
 typedef enum e_PD_symbol_order PD_symbol_order;
+
+/*
+ * #bind derived PD_checksum_mode integer SC_ENUM_I SC_ENUM_I
+ */
 
 #ifdef NON_INTEGER_ENUM
 
@@ -365,6 +381,10 @@ struct s_sys_layer
 		 char *outtype, void *vr);
     long (*write)(PDBfile *file, char *vr, long nitems,
 		  char *intype, char *outtype);};
+
+/*
+ * #bind derived PDBfile character-A SC_STRING_I SC_STRING_I
+ */
 
 struct s_PDBfile
    {FILE *stream;                     /* actual stream to the file */
@@ -1000,10 +1020,6 @@ extern void
  PD_rel_image(PD_image *im),
  PD_rel_attr_table(PDBfile *file);
 
-extern syment
- *PD_write_table(PDBfile *file, char *name, hasharr *tab),
- *PD_replace(PDBfile *file, char *name, char *type, void *vr, dimdes *dims);
-
 extern char
  *PD_process_set_name(char *dname);
 
@@ -1131,12 +1147,6 @@ extern int
  PD_init_mpi(int masterproc, int nthreads, PFTid tid);
 
 
-/* PDPATH.C declarations */
-
-extern long
- PD_hyper_number(PDBfile *file, char *name, syment *ep);
-
-
 /* PDPRNT.C declarations */
 
 extern int
@@ -1154,7 +1164,16 @@ extern void
  PD_write_defstr(FILE *f0, defstr *dp);
 
 
+/* PDPTR.C declarations */
+
+extern int
+ PD_reset_ptr_list(PDBfile *file);
+
+
 /* PDRDWR.C declarations */
+
+extern long
+ PD_hyper_number(PDBfile *file, char *name, syment *ep);
 
 extern char
  *PD_dereference(char *s);
@@ -1163,9 +1182,7 @@ extern int
  PD_read_bits(PDBfile *file, char *name, char *type,
 	      long nitems, int sgned, int nbits, int padsz, int fpp, long offs,
 	      long *pan, char **pdata),
- _PD_indirection(char *s),
- PD_reset_ptr_list(PDBfile *file);
-
+ _PD_indirection(char *s);
 
 /* PDSER.C declarations */
 
