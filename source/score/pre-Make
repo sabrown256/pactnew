@@ -101,6 +101,8 @@ Hdrs = scstd.h scunix.h scwin32.h scbgl.h \
 #
 DObjs = scmkdp.o scmkpr.o scar.o sctar.o scfcnr.o
 
+FObjs = scffnc.o
+
 MObjs = scmemc.o scmemda.o scmemdb.o scmeme.o scmemf.o \
         scmemg.o scmemh.o scmemt.o sctyp.o
 
@@ -116,7 +118,7 @@ TObjs = scpar.o scthn.o scthe.o scthp.o sctho.o scths.o
 OW32Objs = sclpwin32.o scwin32.o
 OUnxObjs = sclppsx.o scunix.o scaix.o scbgl.o sccyg.o
 
-Objs = ${MObjs} ${PObjs} ${TObjs} ${OSSupport} \
+Objs = ${FObjs} ${MObjs} ${PObjs} ${TObjs} ${OSSupport} \
        scctl.o scfia.o scfis.o scfnca.o scfncb.o scfnct.o \
        scarrd.o scarrs.o \
        schash.o sctree.o sctab.o \
@@ -125,6 +127,8 @@ Objs = ${MObjs} ${PObjs} ${TObjs} ${OSSupport} \
 
 ArDObjs = ${TGTLib}(scmkdp.o) ${TGTLib}(scmkpr.o) ${TGTLib}(scar.o) \
           ${TGTLib}(sctar.o) ${TGTLib}(scfcnr.o)
+
+ArFObjs = ${TGTLib}(scffnc.o)
 
 ArMObjs = ${TGTLib}(scmemc.o) ${TGTLib}(scmemda.o) ${TGTLib}(scmemdb.o) \
           ${TGTLib}(scmeme.o) ${TGTLib}(scmemf.o) ${TGTLib}(scmemg.o) \
@@ -149,7 +153,7 @@ ArW32Objs = ${TGTLib}(sclpwin32.o) ${TGTLib}(scwin32.o)
 ArUnxObjs = ${TGTLib}(sclppsx.o) ${TGTLib}(scunix.o) \
             ${TGTLib}(scaix.o) ${TGTLib}(scbgl.o) ${TGTLib}(sccyg.o)
 
-ArObjs = ${ArDObjs} ${ArMObjs} ${ArPObjs} \
+ArObjs = ${ArFObjs} ${ArDObjs} ${ArMObjs} ${ArPObjs} \
          ${ArSObjs} ${ArTObjs} ${OSSupport} \
          ${TGTLib}(scctl.o) ${TGTLib}(scfia.o) ${TGTLib}(scfis.o) \
 	 ${TGTLib}(scfnca.o) ${TGTLib}(scfncb.o) ${TGTLib}(scfnct.o) \

@@ -228,7 +228,10 @@ static void _SC_hasharr_init(hasharr *ha, char *lm)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_MAKE_HASHARR - make an undifferentiated hasharr */
+/* SC_MAKE_HASHARR - make an inhomogeneous hasharr
+ *
+ * #bind SC_make_hasharr fortran()
+ */
 
 hasharr *SC_make_hasharr(int sz, int docflag, char *lm, int flags)
    {hasharr *ha;
@@ -293,6 +296,8 @@ static void _SC_hasharr_free_elements(hasharr *ha)
  *                  - then free all of the hash elements
  *                  - leaves a pristine hash array
  *                  - for new installs, lookups, ...
+ *
+ * #bind SC_hasharr_clear fortran()
  */
 
 int SC_hasharr_clear(hasharr *ha, int (*f)(haelem *hp, void *a), void *a)
@@ -314,6 +319,8 @@ int SC_hasharr_clear(hasharr *ha, int (*f)(haelem *hp, void *a), void *a)
 /* SC_FREE_HASHARR - release a hasharr
  *                 - like SC_hasharr_clear except that the
  *                 - hash array is freed and cannot be used again
+ *
+ * #bind SC_free_hasharr fortran()
  */
 
 void SC_free_hasharr(hasharr *ha, int (*f)(haelem *hp, void *a), void *a)
@@ -451,7 +458,10 @@ int SC_hasharr_next(hasharr *ha, long *pi,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_HASHARR_LOOKUP - lookup the haelem for the given KEY */
+/* SC_HASHARR_LOOKUP - lookup the haelem for the given KEY
+ *
+ * #bind SC_hasharr_lookup fortran()
+ */
 
 haelem *SC_hasharr_lookup(hasharr *ha, void *key)
    {int sz;
@@ -485,7 +495,10 @@ haelem *SC_hasharr_lookup(hasharr *ha, void *key)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_HASHARR_DEF_LOOKUP - lookup the actual object for the given KEY */
+/* SC_HASHARR_DEF_LOOKUP - lookup the actual object for the given KEY
+ *
+ * #bind SC_hasharr_def_lookup fortran() python(def_lookup)
+ */
 
 void *SC_hasharr_def_lookup(hasharr *ha, void *key)
    {haelem *hp;
@@ -627,6 +640,8 @@ static int _SC_splice_out_haelem(hasharr *ha, void *key,
 
 /* SC_HASHARR_REMOVE - remove the entry corresponding to the specified key 
  *                   - return TRUE iff successfully removed 
+ *
+ * #bind SC_hasharr_remove fortran()
  */
 
 int SC_hasharr_remove(hasharr *ha, void *key)

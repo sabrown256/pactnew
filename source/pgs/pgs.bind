@@ -9,6 +9,8 @@
 
 # treat a struct as a character array - unless specific definition exists
 derived PG_device      		character-A	SC_STRING_I	SC_STRING_I
+derived PG_image      		character-A	SC_STRING_I	SC_STRING_I
+derived PG_palette     		character-A	SC_STRING_I	SC_STRING_I
 derived PG_coord_sys		integer		SC_ENUM_I	SC_ENUM_I
 derived PG_rendering		integer		SC_ENUM_I	SC_ENUM_I
 derived PM_centering		integer		SC_ENUM_I	SC_ENUM_I
@@ -146,6 +148,7 @@ PG_set_use_pixmap	yes	yes              none
 #FIXNUM F77_FUNC(pgsvlm, PGSVLM)(FIXNUM *grid, double *v)
 
 # GSIMAG.C
+PG_make_image_n		yes	yes		 none
 _PG_draw_image_nc_lr	yes	yes              none
 
 # GSSURF.C

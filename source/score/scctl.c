@@ -699,6 +699,8 @@ char *SC_search_file(char **path, char *name)
  *                 - assumes name is of the form:
  *                 -    <base>.[a-zA-Z]dd
  *                 -    d = [0-9a-zA-Z]
+ *
+ * #bind SC_advance_name fortran()
  */
 
 void SC_advance_name(char *s)
@@ -843,7 +845,10 @@ int SC_remove(char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_PAUSE - give the user a chance to think about things */
+/* SC_PAUSE - give the user a chance to think about things
+ *
+ * #bind SC_pause fortran() python()
+ */
 
 void SC_pause(void)
    {char s[10];

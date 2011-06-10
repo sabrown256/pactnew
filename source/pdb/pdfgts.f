@@ -11,150 +11,34 @@
 !--------------------------------------------------------------------------
 !--------------------------------------------------------------------------
 
-! C_CHARPP_F - wrap C char ** variable CP in Fortran character(M) A(N)
-!            - caller must free CP and returned space
-
-      function c_charpp_f(n, cp, m)
-
-      use iso_c_binding
-      implicit none
-
-      character(m), allocatable :: c_charpp_f(:)
-
-      integer(C_INT), value, intent(in) :: n
-!      type(C_PTR), intent(in) :: cp(*)
-      integer(8), target, value, intent(in) :: cp
-      integer(C_INT), value, intent(in) :: m
-
-      integer :: i
-      integer :: ln(2)
-      character(m), pointer :: s
-      character(m), allocatable :: rv(:)
-      type(C_PTR) :: lcp(n)
-
-      lcp = transfer(cp, lcp)
-
-      allocate(s)
-      allocate(rv(n))
-
-      ln(1) = 1
-      ln(2) = m
-
-      do i = 1, n
-         call c_f_pointer(lcp(i), s)
-         rv(i) = s
-      enddo
-
-      deallocate(s)
-
-      c_charpp_f = rv
-
-      end function c_charpp_f
-
-!--------------------------------------------------------------------------
-!--------------------------------------------------------------------------
-
-! C_CHARP_F - wrap C char * variable CP in Fortran character(M)
-!           - caller must free CP
-
-      function c_charp_f(cp, m)
-
-      use iso_c_binding
-      implicit none
-
-      character(m) :: c_charp_f
-
-      type(C_PTR), value, intent(in) :: cp
-      integer(C_INT), value, intent(in) :: m
-
-      integer :: ln(2)
-      character(m), pointer :: rv
-
-      allocate(rv)
-
-      ln(1) = 1
-      ln(2) = m
-
-      call c_f_pointer(cp, rv)
-
-      c_charp_f = rv
-
-      end function c_charp_f
-
-!--------------------------------------------------------------------------
-!--------------------------------------------------------------------------
-
-! C_STRLENC - return the length of a C string
-
-      function c_strlenc(cp)
-
-      use iso_c_binding
-      implicit none
-
-      integer :: c_strlenc
-      type(C_PTR) :: cp
-
-      interface
-         function strlen(s) bind(C)
-           import
-           integer(C_SIZE_T) :: strlen
-           type(C_PTR), intent(in) :: s
-         end function strlen
-      end interface
-
-      c_strlenc = transfer(strlen(cp), c_strlenc)
-
-      end function c_strlenc
-
-!--------------------------------------------------------------------------
-!--------------------------------------------------------------------------
-
-! C_STRLENF - return the length of a C string
-
-      function c_strlenf(cp)
-
-      use iso_c_binding
-      implicit none
-
-      integer :: c_strlenf
-      character, intent(in) :: cp(*)
-
-      interface
-         function strlen(s) bind(C)
-           import
-           integer(C_SIZE_T) :: strlen
-           character, intent(in) :: s(*)
-         end function strlen
-      end interface
-
-      c_strlenf = transfer(strlen(cp), c_strlenf)
-
-      end function c_strlenf
-
-!--------------------------------------------------------------------------
-!--------------------------------------------------------------------------
-
 ! ERRPROC - handle errors
 
       subroutine errproc
+      use pact_score
       use pact_pdb
       implicit none
 
 ! ... local variables
-      integer, parameter :: MAXMSG = 256
-      integer nchar
-!      character*256 err
+      integer :: nc
+      type(C_PTR) :: cp
+      character(80), pointer :: err
 
-      nchar = MAXMSG
-!      if ((pd_get_error(nchar, err) .eq. 1) .and. (nchar .gt. 0)) then
-!         nchar = min(nchar, MAXMSG)
-!         write(6, 100)
-! 100     format()
-!         write(6, *) err
-!      else
-!         write(6, 102)
-! 102     format(/, 'Error in PDWFTS', /)
-!      endif
+      cp = pd_get_error_f()
+      if (c_associated(cp)) then
+         call c_f_pointer(cp, err)
+         nc = c_strlenf(err)
+         if (nc > 0) then
+            write(6, 100)
+            write(6, *) err
+         else
+            write(6, 102)
+         endif
+      else
+         write(6, 102)
+      endif
+
+ 100  format()
+ 102  format(/, 'Error in PDWFTS', /)
 
       stop 1
       end
@@ -171,8 +55,8 @@
       type(C_PTR) fileid
 
 ! ... local variables
-      integer i, index, st
-      real*8 dm(0:99), rm1(0:99), rm2(0:99)
+      integer :: i, index, st
+      real*8 :: dm(0:99), rm1(0:99), rm2(0:99)
 
       index = 0
 
@@ -186,7 +70,7 @@
       if (st .eq. 0) &
          call errproc
 
-      st = pd_wrt_pdb_curve_y_f(fileid, "sin curve", 100, index - 1, rm2, index)
+      st = pd_wrt_pdb_curve_y_f(fileid, "sin curve", 100, index, rm2, index)
       if (st .eq. 0) &
          call errproc
 
@@ -202,13 +86,13 @@
       use pact_pdb
       implicit none
 
-      type(C_PTR) fileid
-      real*8 tolerance
+      type(C_PTR) :: fileid
+      real*8 :: tolerance
 
 ! ... local variables
-      integer i
-      real*8 dm(0:99), rm1(0:99), rm2(0:99)
-      real*8 odm(0:99), orm1(0:99), orm2(0:99)
+      integer :: i
+      real*8 :: dm(0:99), rm1(0:99), rm2(0:99)
+      real*8 :: odm(0:99), orm1(0:99), orm2(0:99)
 
       do i = 0, 99
          dm(i)  = 6.28*float(i)/99.
@@ -244,16 +128,27 @@
       use pact_pdb
       implicit none
 
-      type(C_PTR) fileid
+      type(C_PTR) :: fileid
 
 ! ... local variables
-      integer k, l, st
-      real*8 xmin, xmax, ymin, ymax, data(0:10, 0:10)
+      integer :: nd, w, h, bpp
+      integer :: k, l, st
+      real*8 :: xmin, xmax, ymin, ymax, zmin, zmax, data(0:10, 0:10)
+
+      type(C_PTR) :: cp
+
+      nd  = 2
+      bpp = 24
+      w   = 10
+      h   = 10
 
       xmin = 0.0
       xmax = 10.0
       ymin = 0.0
       ymax = 10.0
+
+      zmin = 0.0
+      zmax = 50.0
 
       do l = 0, 10
          do k = 0, 10
@@ -261,9 +156,11 @@
          enddo
       enddo
 
-      st = 1
-!      st = wpdwima(fileid, 10, 'Test image', 0, 10, 0, 10,  &
-!                  data, xmin, xmax, ymin, ymax, 0)
+      st = pd_def_mapping_f(fileid)
+
+      cp = pd_make_image_f("Test image", "double", data, w, h, bpp, &
+                           xmin, xmax, ymin, ymax, zmin, zmax)
+      st = pd_write_f(fileid, 'Image0[1]', 'PG_image *', cp)
       if (st .eq. 0) &
          call errproc
 
@@ -279,11 +176,11 @@
       use pact_pdb
       implicit none
 
-      type(C_PTR) fileid
+      type(C_PTR) :: fileid
 
 ! ... local variables
-      integer k, l, st
-      real*8 data(0:10, 0:10), odata(0:10, 0:10)
+      integer :: k, l, st
+      real*8 :: data(0:10, 0:10), odata(0:10, 0:10)
 
       do l = 0, 10
          do k = 0, 10
@@ -291,8 +188,7 @@
          enddo
       enddo
 
-      st = 1
-      st = pd_read_f(fileid, "Image0->buffer", odata)
+      st = pd_read_f(fileid, "Image0[1]->buffer", odata)
       if (st .eq. 0) &
          call errproc
 
@@ -328,6 +224,7 @@
       dp(3) = 1
       dp(4) = 100
       dp(5) = 100
+
       rp(1) = 6
       rp(2) = 1
       rp(3) = 1
@@ -364,13 +261,13 @@
       use pact_pdb
       implicit none
 
-      type(C_PTR) fileid
-      real*8 tolerance
+      type(C_PTR) :: fileid
+      real*8 :: tolerance
 
 ! ... local variables
-      integer i, st
-      real*8 dm(0:99), rm(0:99)
-      real*8 odm(0:99), orm(0:99)
+      integer :: i, st
+      real*8 :: dm(0:99), rm(0:99)
+      real*8 :: odm(0:99), orm(0:99)
 
       do i = 0, 99
          dm(i) = 6.28*float(i)/99.0
@@ -414,33 +311,34 @@
 ! TEST_1 - basic file testing
 
       subroutine test_1(outtype, date, PRINT, DIR, ATTR, OPTION)
+      use pact_score
       use pact_pdb
       implicit none 
 
-      character*8 outtype
-      character*80 date
-      logical PRINT
-      logical DIR
-      logical ATTR
-      character*8  OPTION
+      character*8 :: outtype
+      character*80 :: date
+      logical :: PRINT
+      logical :: DIR
+      logical :: ATTR
+      character*8 :: OPTION
 
 ! ... local variables
-      integer i, j, k, l
-      integer offset, order, st
-      integer ndims, nc, istring, LAST
+      integer :: i, j, k, l
+      integer :: offset, order, st
+      integer :: ndims, nc, istring, LAST
       
-      integer(8) ldims(14)
+      integer(8) :: ldims(14)
 
       type(C_PTR) :: fileid, cp
 
-      real*8 a, c, g, z, zz, zzx
-      real*8 x(20)
+      real*8 :: a, c, g, z, zz, zzx
+      real*8 :: x(20)
 
-      character*8 strings(4)
+      character*8 :: strings(4)
 
       character(80), pointer :: vnm
 
-      logical ok
+      logical :: ok
 
       common /abc/ a(2), c(2, 2:4), g(5, 2:10), z(4, 5, 2)
       common /abc/ zz(4, 5, 2), zzx(4, 5, 2)
@@ -771,37 +669,38 @@
 ! TEST_2 - feature testing
 
       subroutine test_2(date, PRINT, DIR, ATTR)
+      use pact_score
       use pact_pdb
       implicit none 
 
-      character*80 date
-      logical PRINT
-      logical DIR
-      logical ATTR
+      character*80 :: date
+      logical :: PRINT
+      logical :: DIR
+      logical :: ATTR
 
 ! ... local variables
-      integer i, j, k, l, n
-      integer nt, ni
-      integer ndims, nitems
-      integer typsiz, align, nptr
-      integer kindx
-      integer nchar, nc
+      integer :: i, j, k, l, n
+      integer :: nt, ni
+      integer :: ndims, nitems
+      integer :: typsiz, align, nptr
+      integer :: kindx
+      integer :: nchar, nc
        
       integer(C_LONG) :: dims(14)
 
-      type(C_PTR) fileid, p, cp
+      type(C_PTR) :: fileid, p, cp
 
-      character*8 name2
-      character*5 name3, name4
-      character*80 dt
+      character*8 :: name2
+      character*5 :: name3, name4
+      character*80 :: dt
 
       character(80), pointer :: vnm, name1
 
-      real*8 x(20)
-      real*8 a, c, g, z, zz, zzx
-      real*8 a2, c2, g2, z2, zz2
-      real*8 v1, v2
-      real*8 TOLERANCE
+      real*8 :: x(20)
+      real*8 :: a, c, g, z, zz, zzx
+      real*8 :: a2, c2, g2, z2, zz2
+      real*8 :: v1, v2
+      real*8 :: TOLERANCE
 
       common /abc/ a(2), c(2, 2:4), g(5, 2:10), z(4, 5, 2)
       common /abc/ zz(4, 5, 2), zzx(4, 5, 2)
@@ -1091,30 +990,31 @@
 ! TEST_3 - feature testing
 
       subroutine test_3(PRINT, DIR, OPTION)
+      use pact_score
       use pact_pdb
       implicit none 
 
-      logical PRINT
-      logical DIR
-      character*8  OPTION
+      logical :: PRINT
+      logical :: DIR
+      character*8 :: OPTION
 
 ! ... local variables
-      integer i, j, k, l, n
-      integer j2, k2, l2
-      integer ndims, nitems
-      integer nvar, nc
-      integer nvd(1)
+      integer :: i, j, k, l, n
+      integer :: j2, k2, l2
+      integer :: ndims, nitems
+      integer :: nvar, nc
+      integer :: nvd(1)
 
-      integer(8) dims(14)
+      integer(8) :: dims(14)
 
-      type(C_PTR) fileid, nfileid, cp
+      type(C_PTR) :: fileid, nfileid, cp
       type(C_PTR), pointer :: fcp(:)
 
-      real*8 x(20)
-      real*8 a, c, g, z, zz, zzx
-      real*8 a2, c2, g2, z2, zz2
-      real*8 abc_a, c_1_2
-      real*8 TOLERANCE
+      real*8 :: x(20)
+      real*8 :: a, c, g, z, zz, zzx
+      real*8 :: a2, c2, g2, z2, zz2
+      real*8 :: abc_a, c_1_2
+      real*8 :: TOLERANCE
 
       character(80), pointer :: vnm
 
@@ -1280,7 +1180,7 @@
          endif
          if ((n .eq. 1) .and.                           &
              ((DIR .and. (vnm(1:nc) .ne. 'x')) .or.     &
-             ((.not. DIR) .and. (vnm(1:nc) .ne. 'a')))) &
+             ((.not. DIR) .and. (vnm(1:nc) .ne. 'Image0')))) &
             call errproc
       enddo
 
@@ -1315,8 +1215,8 @@
 
 ! ... check curve, image, mapping
       if (OPTION .ne. "0") then
-         call chkcur(fileid, TOLERANCE)
          call chkima(fileid)
+         call chkcur(fileid, TOLERANCE)
          call chkmap(fileid, TOLERANCE)
       endif
 
@@ -1342,30 +1242,30 @@
       implicit none 
 
 ! ... program input command option flags
-      logical PRINT, DIR, TARGET, ATTR
+      logical :: PRINT, DIR, TARGET, ATTR
 
-      integer is, st
-      integer narg, iarg, iargc
-      integer nout, err
+      integer :: is, st
+      integer :: narg, iarg, iargc
+      integer :: nout, err
 
-      integer*8 bufsiz1, bufsiz2, bufsiz3
+      integer*8 :: bufsiz1, bufsiz2, bufsiz3
       type(C_PTR) :: ftid
 
-      character*8 outtype
-      character*8 arg
-      character*80 date
-      character*12 vers
+      character*8 :: outtype
+      character*8 :: arg
+      character*80 :: date
+      character*12 :: vers
 
 ! ... OPTION determines when curve, image and mappings are written:
 !        0 - none
 !        1 - before directory created
 !        2 - in root directory
 !        3 - in directory dir1
-      character*8  OPTION
+      character*8 :: OPTION
 
       ftid = C_NULL_PTR
-      err = pd_init_threads_f(0, ftid)
-      err = sc_zero_space_f(0)
+      err  = pd_init_threads_f(0, ftid)
+      err  = sc_zero_space_f(0)
 
 ! ... initialize input command option flags
       PRINT  = .false.

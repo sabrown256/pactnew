@@ -21,37 +21,37 @@ module pact_bl5
          use iso_c_binding
          use types_bl5
          implicit none
-         integer(isizea) :: a
+         type(C_PTR)     :: a
       end subroutine a_f1_f
 
       subroutine a_f2_f(b) 
          use iso_c_binding
          use types_bl5
          implicit none
-         integer(isizea) :: b
+         type(C_PTR)     :: b
       end subroutine a_f2_f
 
       subroutine a_f3_f(a, b) 
          use iso_c_binding
          use types_bl5
          implicit none
-         integer(isizea) :: a
-         integer(isizea) :: b
+         type(C_PTR)     :: a
+         type(C_PTR)     :: b
       end subroutine a_f3_f
 
       subroutine a_f4_f(b, a) 
          use iso_c_binding
          use types_bl5
          implicit none
-         integer(isizea) :: b
-         integer(isizea) :: a
+         type(C_PTR)     :: b
+         type(C_PTR)     :: a
       end subroutine a_f4_f
 
       subroutine b_f1_f(a, b) 
          use iso_c_binding
          use types_bl5
          implicit none
-         integer(isizea) :: a
+         type(C_PTR)     :: a
          integer         :: b
       end subroutine b_f1_f
 
@@ -59,7 +59,7 @@ module pact_bl5
          use iso_c_binding
          use types_bl5
          implicit none
-         integer(isizea) :: a
+         type(C_PTR)     :: a
          integer         :: b
       end subroutine b_f2_f
 
@@ -67,8 +67,8 @@ module pact_bl5
          use iso_c_binding
          use types_bl5
          implicit none
-         integer(isizea) :: a
-         integer(isizea) :: b
+         type(C_PTR)     :: a
+         type(C_PTR)     :: b
          integer         :: c
       end subroutine b_f3_f
 
@@ -76,8 +76,8 @@ module pact_bl5
          use iso_c_binding
          use types_bl5
          implicit none
-         integer(isizea) :: a
-         integer(isizea) :: b
+         type(C_PTR)     :: a
+         type(C_PTR)     :: b
          integer         :: c
       end subroutine b_f4_f
 
@@ -86,8 +86,8 @@ module pact_bl5
          use types_bl5
          implicit none
          integer         :: a
-         integer(isizea) :: b
-         integer(isizea) :: c
+         type(C_PTR)     :: b
+         type(C_PTR)     :: c
       end subroutine b_f5_f
 
       subroutine b_f6_f(a, b, c) 
@@ -95,8 +95,8 @@ module pact_bl5
          use types_bl5
          implicit none
          integer         :: a
-         integer(isizea) :: b
-         integer(isizea) :: c
+         type(C_PTR)     :: b
+         type(C_PTR)     :: c
       end subroutine b_f6_f
 
 ! ... declarations for interoperability
@@ -104,82 +104,82 @@ module pact_bl5
                 bind(c, name='a_f1')
          use iso_c_binding
          implicit none
-         type (C_FUNPTR), value :: a
+         type(C_FUNPTR), value :: a
       end subroutine a_f1_i
 
       subroutine a_f2_i(b) &
                 bind(c, name='a_f2')
          use iso_c_binding
          implicit none
-         type (C_FUNPTR), value :: b
+         type(C_FUNPTR), value :: b
       end subroutine a_f2_i
 
       subroutine a_f3_i(a, b) &
                 bind(c, name='a_f3')
          use iso_c_binding
          implicit none
-         type (C_FUNPTR), value :: a
-         type (C_FUNPTR), value :: b
+         type(C_FUNPTR), value :: a
+         type(C_FUNPTR), value :: b
       end subroutine a_f3_i
 
       subroutine a_f4_i(b, a) &
                 bind(c, name='a_f4')
          use iso_c_binding
          implicit none
-         type (C_FUNPTR), value :: b
-         type (C_FUNPTR), value :: a
+         type(C_FUNPTR), value :: b
+         type(C_FUNPTR), value :: a
       end subroutine a_f4_i
 
       subroutine b_f1_i(a, b) &
                 bind(c, name='B_f1')
          use iso_c_binding
          implicit none
-         type (C_FUNPTR), value :: a
-         integer (C_INT), value :: b
+         type(C_FUNPTR), value :: a
+         integer(C_INT), value :: b
       end subroutine b_f1_i
 
       subroutine b_f2_i(a, b) &
                 bind(c, name='B_f2')
          use iso_c_binding
          implicit none
-         type (C_FUNPTR), value :: a
-         integer (C_INT), value :: b
+         type(C_FUNPTR), value :: a
+         integer(C_INT), value :: b
       end subroutine b_f2_i
 
       subroutine b_f3_i(a, b, c) &
                 bind(c, name='B_f3')
          use iso_c_binding
          implicit none
-         type (C_FUNPTR), value :: a
-         type (C_FUNPTR), value :: b
-         integer (C_INT), value :: c
+         type(C_FUNPTR), value :: a
+         type(C_FUNPTR), value :: b
+         integer(C_INT), value :: c
       end subroutine b_f3_i
 
       subroutine b_f4_i(a, b, c) &
                 bind(c, name='B_f4')
          use iso_c_binding
          implicit none
-         type (C_FUNPTR), value :: a
-         type (C_FUNPTR), value :: b
-         integer (C_INT), value :: c
+         type(C_FUNPTR), value :: a
+         type(C_FUNPTR), value :: b
+         integer(C_INT), value :: c
       end subroutine b_f4_i
 
       subroutine b_f5_i(a, b, c) &
                 bind(c, name='B_f5')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a
-         type (C_FUNPTR), value :: b
-         type (C_FUNPTR), value :: c
+         integer(C_INT), value :: a
+         type(C_FUNPTR), value :: b
+         type(C_FUNPTR), value :: c
       end subroutine b_f5_i
 
       subroutine b_f6_i(a, b, c) &
                 bind(c, name='B_f6')
          use iso_c_binding
          implicit none
-         integer (C_INT), value :: a
-         type (C_FUNPTR), value :: b
-         type (C_FUNPTR), value :: c
+         integer(C_INT), value :: a
+         type(C_FUNPTR), value :: b
+         type(C_FUNPTR), value :: c
       end subroutine b_f6_i
 
    end interface

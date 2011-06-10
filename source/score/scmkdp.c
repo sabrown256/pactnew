@@ -376,18 +376,17 @@ static int _SC_implicit_obj(char *tgt, char *dep, int nc,
 			 nt   += na;
 			 found = (na > 0);};};};};
 
-/* check each pattern rule period */
-	for (i = 0; (i < ns) && (found == FALSE); i++)
-	    {t    = *(char **) SC_array_get(state->suffices, i);
-	     ptrn = SC_dsnprintf(FALSE, "%%.%s", sfx);
-	     rd   = (ruledes *) SC_hasharr_def_lookup(state->rules, ptrn);
-	     if (rd != NULL)
-	        {snprintf(src, MAXLINE, "%s%s", base, t);
-		 ps    = (dep != NULL) ? dep : src;
-		 na    = _SC_try_implicit_rule(tgt, ps, t, rd,
-					       FALSE, state);
-		 nt   += na;
-		 found = (na > 0);};};
+/* check pattern rules */
+	ptrn = SC_dsnprintf(FALSE, "%%.%s", sfx);
+	rd   = (ruledes *) SC_hasharr_def_lookup(state->rules, ptrn);
+	if (rd != NULL)
+	   {t = rd->dependencies[0];
+	    t++;
+	    snprintf(src, MAXLINE, "%s%s", base, t);
+	    ps    = (dep != NULL) ? dep : src;
+	    na    = _SC_try_implicit_rule(tgt, ps, t, rd, FALSE, state);
+	    nt   += na;
+	    found = (na > 0);};
 
 /* check each implicit rule period */
 	for (i = 0; (i < ns) && (found == FALSE); i++)

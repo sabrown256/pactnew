@@ -483,6 +483,8 @@ void PM_md5_checksum_file(FILE *file, int64_t start, int64_t stop,
  *             -      {PM_checksum(&sum, &rmdr, in, boff, ni, bpi, 29);
  *             -        ... get next in, boff, ni, and bpi ...
  *             -      };
+ *
+ * #bind PM_checksum_array fortran() scheme()
  */
 
 void PM_checksum(long *psum, int *prmdr, void *parr, int boff,

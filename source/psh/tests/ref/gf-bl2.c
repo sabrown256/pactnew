@@ -11,7 +11,7 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-char *FF_ID(fbcv1_f, FBCV1_F)(int *a, float *b, double *c, char *d, int (*e)(void), PFInt f)
+char *FF_ID(fbcv1f, FBCV1F)(int *a, float *b, double *c, char *d, int (*e)(void), PFInt f)
    {int _la;
     float _lb;
     double _lc;
@@ -30,7 +30,7 @@ char *FF_ID(fbcv1_f, FBCV1_F)(int *a, float *b, double *c, char *d, int (*e)(voi
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-char *FF_ID(fbmcv1_f, FBMCV1_F)(int *a, float *b, double *c, char *d)
+char *FF_ID(fbmcv1f, FBMCV1F)(int *a, float *b, double *c, char *d)
    {int _la;
     float _lb;
     double _lc;
@@ -49,7 +49,7 @@ char *FF_ID(fbmcv1_f, FBMCV1_F)(int *a, float *b, double *c, char *d)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-char *FF_ID(fbmcr2_f, FBMCR2_F)(int *a, float *b, double *c, char *d, int sncd)
+char *FF_ID(fbmcr2f, FBMCR2F)(int *a, float *b, double *c, char *d, int sncd)
    {int *_la;
     float *_lb;
     double *_lc;

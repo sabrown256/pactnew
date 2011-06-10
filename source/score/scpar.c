@@ -278,6 +278,8 @@ int dtid(void)
  *                 - NOTE: policy is that SC_init_threads really works
  *                 -       once, that is you can call it all you want but
  *                 -       only the first one will allocate any threads!
+ *
+ * #bind SC_init_threads fortran()
  */
 
 int SC_init_threads(int nt, PFTid tid)

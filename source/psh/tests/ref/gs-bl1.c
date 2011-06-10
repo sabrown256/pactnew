@@ -118,6 +118,17 @@ static object *_SXI_favp4(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+static object *_SXI_fav5(SS_psides *si, object *argl)
+   {object *_lo;
+
+    fav5();
+    _lo = SS_null;
+
+    return(_lo);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 void SX_install_bl1_bindings(SS_psides *si)
    {
 
@@ -160,6 +171,11 @@ void SX_install_bl1_bindings(SS_psides *si)
                "Procedure: favp4s\n     Usage: (favp4s)",
                SS_zargs,
                _SXI_favp4, SS_PR_PROC);
+
+    SS_install(si, "fav5",
+               "Procedure: fav5\n     Usage: (fav5)",
+               SS_zargs,
+               _SXI_fav5, SS_PR_PROC);
 
    return;}
 

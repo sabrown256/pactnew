@@ -30,3 +30,6 @@ int *fbmpr2(int *a, float *b, double *c, char *d)
 char *fbcv1(int a, float b, double c, char d, int (*e)(void), PFInt f)
 char *fbmcv1(int a, float b, double c, char d)
 char *fbmcr2(int *a, float *b, double *c, char *d)
+
+void fav5(void)
+void fav6(void)

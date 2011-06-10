@@ -135,7 +135,7 @@
 <p>
 <pre>
 <i>C Binding: </i>       int fb10(float _Complex a1, float _Complex *a2)
-<i>Fortran Binding: </i> integer fb10_f(complex(4) a1, integer(isizea) a2)
+<i>Fortran Binding: </i> integer fb10_f(complex(4) a1, type(C_PTR) a2)
 <i>SX Binding: </i>      (fb10 a1 a2)
 <i>Python Binding: </i>  pact.fb10(a1, a2)
 </pre>
@@ -151,7 +151,7 @@
 <p>
 <pre>
 <i>C Binding: </i>       int fb11(double _Complex a1, double _Complex *a2)
-<i>Fortran Binding: </i> integer fb11_f(complex(8) a1, integer(isizea) a2)
+<i>Fortran Binding: </i> integer fb11_f(complex(8) a1, type(C_PTR) a2)
 <i>SX Binding: </i>      (fb11 a1 a2)
 <i>Python Binding: </i>  pact.fb11(a1, a2)
 </pre>
@@ -471,7 +471,7 @@
 <p>
 <pre>
 <i>C Binding: </i>       float _Complex *fp10(int a1)
-<i>Fortran Binding: </i> integer(isizea) fp10_f(integer a1)
+<i>Fortran Binding: </i> type(C_PTR) fp10_f(integer a1)
 <i>SX Binding: </i>      (fp10 a1)
 <i>Python Binding: </i>  pact.fp10(a1)
 </pre>
@@ -487,7 +487,7 @@
 <p>
 <pre>
 <i>C Binding: </i>       double _Complex *fp11(int a1)
-<i>Fortran Binding: </i> integer(isizea) fp11_f(integer a1)
+<i>Fortran Binding: </i> type(C_PTR) fp11_f(integer a1)
 <i>SX Binding: </i>      (fp11 a1)
 <i>Python Binding: </i>  pact.fp11(a1)
 </pre>
@@ -503,7 +503,7 @@
 <p>
 <pre>
 <i>C Binding: </i>       str *fp13(int a1)
-<i>Fortran Binding: </i> integer(isizea) fp13_f(integer a1)
+<i>Fortran Binding: </i> type(C_PTR) fp13_f(integer a1)
 <i>SX Binding: </i>      (fp13 a1)
 <i>Python Binding: </i>  pact.fp13(a1)
 </pre>

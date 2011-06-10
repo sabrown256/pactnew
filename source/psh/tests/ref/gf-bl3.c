@@ -11,25 +11,22 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-void *FF_ID(fe1_f, FE1_F)(str **a1, int *a2)
+void *FF_ID(fe1f, FE1F)(str **a1, int *a2)
    {str *_la1;
     int _la2;
     void *_rv;
-    SC_address _adfe1;
 
     _la1       = *(str **) a1;
     _la2       = (int) *a2;
 
-    _adfe1.memaddr = (void *) fe1(_la1, _la2);
-
-    _rv = _adfe1.diskaddr;
+    _rv = (void *) fe1(_la1, _la2);
 
     return(_rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-void FF_ID(fe2_f, FE2_F)(str **dev, double *x, double *y, int *n, pcons *info, int *l)
+void FF_ID(fe2f, FE2F)(str **dev, double *x, double *y, int *n, pcons *info, int *l)
    {str *_ldev;
     double *_lx;
     double *_ly;

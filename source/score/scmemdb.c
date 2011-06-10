@@ -456,7 +456,10 @@ int _SC_mem_map(FILE *fp, int flag, int show, int lineno)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_MEM_MAP - print out a memory map to the given FILE */
+/* SC_MEM_MAP - print out a memory map to the given FILE
+ *
+ * #bind SC_mem_map fortran() scheme(memory-map)
+ */
 
 int SC_mem_map(FILE *fp, int flag)
    {int nbl;
@@ -481,6 +484,8 @@ int SC_mem_map(FILE *fp, int flag)
  *                -          4 - non-accountable blocks included
  *                -    ID    identifier for temporary files
  *                -    MSG   user allocated space to return error message
+ *
+ * #bind SC_mem_monitor fortran() scheme(memory-monitor) python(mem_monitor)
  */
 
 long SC_mem_monitor(int old, int lev, char *id, char *msg)
@@ -678,7 +683,10 @@ long SC_mem_object_trace(long nb, int type,
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
 
-/* SC_MEM_PRINT - print the mem_descriptor info for the given pointer */
+/* SC_MEM_PRINT - print the mem_descriptor info for the given pointer
+ *
+ * #bind SC_mem_print fortran() python(mem_print)
+ */
 
 void SC_mem_print(void *p)
    {mem_descriptor *desc;

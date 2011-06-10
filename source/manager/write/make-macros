@@ -290,7 +290,8 @@ set LibVers = 1
 
 # NOTE: technically this should be gsrc but that results in
 # bproto being run 3 times - at least by dmake
-    Note $STDOUT '${gfb} : ${LibName}.bind ${Hdrs} ${hdrf}'
+#    Note $STDOUT '${gfb} : ${LibName}.bind ${Hdrs} ${hdrf}'
+    Note $STDOUT '${gfb} : ${LibName}.bind'
     Note $STDOUT '	@../scripts/bproto'
     Note $STDOUT ''
 

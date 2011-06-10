@@ -37,6 +37,8 @@ struct tm *SC_localtime(const time_t *t, struct tm *tms)
 
 /* SC_DATE - return a string with the time and date as defined by the
  *         - ANSI function ctime
+ *
+ * #bind SC_date fortran() scheme(date)
  */
 
 char *SC_date(void)
@@ -131,6 +133,8 @@ char *SC_datef(void)
 
 /* SC_CPU_TIME - return the cpu time used in seconds and microseconds
  *               SINCE THE FIRST CALL!
+ *
+ * #bind SC_cpu_time fortran() scheme(cpu-time)
  */
 
 double SC_cpu_time(void)
@@ -206,6 +210,8 @@ double SC_cpu_time(void)
 
 /* SC_WALL_CLOCK_TIME - return the wall clock time in seconds and microseconds
  *                      SINCE THE FIRST CALL!
+ *
+ * #bind SC_wall_clock_time fortran() scheme(wall-clock-time)
  */
 
 double SC_wall_clock_time(void)
