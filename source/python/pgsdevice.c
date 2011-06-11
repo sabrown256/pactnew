@@ -128,7 +128,7 @@ PP_device_set_font(PP_deviceObject *self,
         return NULL;
 #if 0
     int result;
-    result = PG_set_font(self->dev, face, style, size);
+    result = PG_fset_font(self->dev, face, style, size);
     return PyInt_FromLong((long) result);
 #else
     if ((self->dev) != NULL)                                                         \

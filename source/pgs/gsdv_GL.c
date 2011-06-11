@@ -334,7 +334,7 @@ PG_device *_PG_GL_open_imbedded_screen(PG_device *dev, Display *display,
 
     dev->font_family = ff;
 
-    PG_set_font(dev, "helvetica", "medium", 12);
+    PG_fset_font(dev, "helvetica", "medium", 12);
     for (i = 0; dev->font_info == NULL; i++)
         {if (i > 1)
 	    return(NULL);
@@ -606,7 +606,7 @@ static PG_device *_PG_GL_open_screen(PG_device *dev, double xf, double yf,
 
     dev->font_family = ff;
 
-    PG_set_font(dev, "helvetica", "medium", 12);
+    PG_fset_font(dev, "helvetica", "medium", 12);
     for (i = 0; dev->font_info == NULL; i++)
         {if (i > 1)
 	    return(NULL);
@@ -852,7 +852,7 @@ static int _PG_GL_open_console(char *title, char *type, int bckgr,
 /* initialize text size info */
     tx[0] = 1.0/TXSPAN;
     tx[1] = PG_console_device->txt_ratio*tx[0];
-    PG_set_char_size_n(PG_console_device, 2, NORMC, tx);
+    PG_fset_char_size_n(PG_console_device, 2, NORMC, tx);
 
     SC_setbuf(stdout, NULL);
 

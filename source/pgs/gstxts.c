@@ -19,7 +19,7 @@ static void sf_dt(PG_device *dev, double x1, double y1,
 		  char *face, char *style, int size)
    {double bx[PG_BOXSZ], dx[PG_SPACEDM], p[PG_SPACEDM];
 
-    PG_set_font(dev, face, style, size);
+    PG_fset_font(dev, face, style, size);
 
     PG_get_text_ext_n(dev, 2, WORLDC, "foo", dx);
 
@@ -173,7 +173,7 @@ int main(int argc, char **argv)
 
         PG_clear_viewport(SCR_dev);
 
-        PG_set_font(SCR_dev, face, style, size);
+        PG_fset_font(SCR_dev, face, style, size);
 
         PG_get_text_ext_n(SCR_dev, 2, WORLDC, "foo", dx);
         bx[1] = bx[0] + dx[0];

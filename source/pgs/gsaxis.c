@@ -642,9 +642,9 @@ void PG_axis(PG_device *dev, int axis_type)
  *                        - AXIS_LABELCOLOR   - the color of the labels
  *                        -                     (see PG_set_color_text)
  *                        - AXIS_LABELFONT    - the label font type_face
- *                        -                     (see PG_set_font)
+ *                        -                     (see PG_fset_font)
  *                        - AXIS_LABELPREC    - the character precision
- *                        -                     (see PG_set_char_precision)
+ *                        -                     (see PG_fset_char_precision)
  *                        - AXIS_X_FORMAT     - the format of the x labels
  *                        -                     (e.g. %10.2f)
  *                        - AXIS_Y_FORMAT     - the format of the y labels
@@ -658,7 +658,7 @@ void PG_axis(PG_device *dev, int axis_type)
 
 int PG_set_axis_attributes(PG_device *dev, ...)
    {int type, linecolor, txtcolor, prec;
-    double charspace, chup[2], chpth[2];
+    double chsp, chup[2], chpth[2];
 
 /* load default values for external variables */
     if (dev != NULL)
@@ -679,11 +679,11 @@ int PG_set_axis_attributes(PG_device *dev, ...)
     if (_PG_gattrs.axis_type_face == NULL)
        _PG_gattrs.axis_type_face = CSTRDUP("helvetica", 3);
 
-    charspace = 0.0;
-    chpth[0]  = 1.0;
-    chpth[1]  = 0.0;
-    chup[0]   = 0.0;
-    chup[1]   = 1.0;
+    chsp     = 0.0;
+    chpth[0] = 1.0;
+    chpth[1] = 0.0;
+    chup[0]  = 0.0;
+    chup[1]  = 1.0;
 
     _PG_gattrs.axis_grid_on = FALSE;
 
@@ -756,11 +756,12 @@ int PG_set_axis_attributes(PG_device *dev, ...)
 /* set attribute values */
     PG_fset_clipping(dev, FALSE);
     PG_set_color_text(dev, txtcolor, TRUE);
-    PG_set_font(dev, _PG_gattrs.axis_type_face, dev->type_style, dev->type_size);
-    PG_set_char_precision(dev, prec);
+    PG_fset_font(dev, _PG_gattrs.axis_type_face,
+		 dev->type_style, dev->type_size);
     PG_fset_char_path(dev, chpth);
+    PG_fset_char_precision(dev, prec);
     PG_fset_char_up(dev, chup);
-    PG_set_char_space(dev, charspace);
+    PG_fset_char_space(dev, chsp);
     PG_set_color_line(dev, linecolor, TRUE);
     PG_set_line_style(dev, _PG_gattrs.axis_line_style);
     PG_set_line_width(dev, _PG_gattrs.axis_line_width);
@@ -1176,8 +1177,8 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
 
 /* set the axis type size now */
     if (_PG_gattrs.axis_char_size >= 8)
-       {PG_get_font(dev, &tf, &ts, &sz);
-	PG_set_font(dev, tf, ts, _PG_gattrs.axis_char_size);};
+       {PG_fget_font(dev, &tf, &ts, &sz);
+	PG_fset_font(dev, tf, ts, _PG_gattrs.axis_char_size);};
 
 /* if the labels cannot be distinguished because of the precision
  * try a different tack
@@ -1233,7 +1234,7 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
 
 /* reset the axis type */
     if (_PG_gattrs.axis_char_size >= 8)
-       {PG_set_font(dev, tf, ts, sz);
+       {PG_fset_font(dev, tf, ts, sz);
         CFREE(tf);
         CFREE(ts);};
 

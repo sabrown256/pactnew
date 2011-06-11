@@ -175,7 +175,7 @@ void get_input(void *d, PG_event *ev)
 	else
 	   return;
 
-	PG_set_font(dev, face, style, size);
+	PG_fset_font(dev, face, style, size);
 
 	PG_get_text_ext_n(dev, 2, WORLDC, "foo", dx);
 	bx[1] = bx[0] + dx[0];

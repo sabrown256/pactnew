@@ -13,70 +13,12 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_GET_CHAR_SPACE - inquire about the space
- *                   - to be used between characters
- */
-
-void PG_get_char_space(PG_device *dev, double *pcsp)
-   {
-
-    *pcsp = dev->char_space;
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PG_GET_CHAR_PRECISION - inquire about the character precision
- *                       - fast and fixed size or
- *                       - slow and flexible
- */
-
-void PG_get_char_precision(PG_device *dev, int *pcp)
-   {
-
-    *pcp = dev->char_precision;
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PG_GET_LINE_WIDTH - return the width of a line */
 
 void PG_get_line_width(PG_device *dev, double *plw)
    {
 
     *plw = dev->line_width;
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PG_GET_FONT - return the current font info */
-
-void PG_get_font(PG_device *dev, char **pf, char **pst, int *psz)
-   {
-
-    *pf  = CSTRSAVE(dev->type_face);
-    *pst = CSTRSAVE(dev->type_style);
-    *psz = dev->type_size;
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PG_GET_CHAR_SIZE_N - return the character size in CS */
-
-void PG_get_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double *p)
-   {
-
-    p[0] = dev->char_height_s;
-    p[1] = dev->char_width_s;
-
-    PG_trans_point(dev, nd, NORMC, p, cs, p);
 
     return;}
 

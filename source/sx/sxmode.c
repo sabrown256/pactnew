@@ -67,7 +67,7 @@ static void SX_set_graphics_state(PG_device *d)
 		     NULL);
 
     PG_set_axis_log_scale(d, 2, SX_log_scale);
-    PG_set_font(d, axstf, SX_plot_type_style, SX_plot_type_size);
+    PG_fset_font(d, axstf, SX_plot_type_style, SX_plot_type_size);
     PG_set_marker_scale(d, mrks);
     PG_set_marker_orientation(d, SX_marker_orientation);
 

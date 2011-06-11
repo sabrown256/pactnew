@@ -777,7 +777,7 @@ static void PG_surface_hand(PG_device *dev, PG_graph *g, PG_rendering pty,
     if ((dev == NULL) || (g == NULL))
        return;
 
-    PG_get_fill_bound(dev, mesh);
+    mesh = PG_fget_fill_bound(dev);
 
     PG_get_attrs_graph(g, FALSE,
 		       "THETA",      SC_DOUBLE_I,  &va[0], 0.0,

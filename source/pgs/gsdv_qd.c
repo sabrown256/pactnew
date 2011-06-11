@@ -174,7 +174,7 @@ PG_device *_PG_qd_open_screen(PG_device *dev, double xf, double yf,
 
     dev->font_family = ff;
 
-    PG_set_font(dev, "helvetica", "medium", 10);
+    PG_fset_font(dev, "helvetica", "medium", 10);
  
 /* set MAC colors - the order here matters because devices with fewer planes
  * will have the color map entries overwritten possibly many times

@@ -2486,7 +2486,7 @@ through the current palette.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_set_finish_state(PG_device *dev, int fin)
+<I>C Binding: </I>int PG_fset_finish_state(PG_device *dev, int fin)
 <BR><I>Fortran Binding: </I>integer pgsfin(integer dev, integer fin)
 <BR><I>SX Binding: </I>(pg-set-finish-state! dev fin)
 <P>
@@ -3061,7 +3061,7 @@ This routine sets the direction along which text will be written.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_set_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double w, double h)
+<I>C Binding: </I>void PG_fset_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double w, double h)
 <BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
@@ -3069,7 +3069,7 @@ Set the current character size in CS coordinates.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_set_char_space(PG_device *dev, double s)
+<I>C Binding: </I>double PG_fset_char_space(PG_device *dev, double s)
 <BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
@@ -3086,8 +3086,8 @@ is usually orthogonal to the direction along which characters are written.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_set_font(PG_device *dev, char *face, char *style, int size)
-<BR><I>Fortran Binding: </I>integer pgstxf(integer devid, integer ncf, char *face, integer ncs, char 
+<I>C Binding: </I>void PG_fset_font(PG_device *dev, char *face, char *style, int size)
+<BR><I>Fortran Binding: </I>void pgstxf(integer devid, integer ncf, char *face, integer ncs, char 
 *style, integer size)
 <BR><I>SX Binding: </I>(pg-set-text-font! dev face style size)
 <P>
@@ -3130,7 +3130,7 @@ Get the current character size in world coordinates.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_get_char_space(PG_device *dev, double *pcsp)
+<I>C Binding: </I>double PG_fget_char_space(PG_device *dev)
 <BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
@@ -3148,8 +3148,8 @@ are written.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_get_font(PG_device *dev, char **face, char **style, int *size)
-<BR><I>Fortran Binding: </I>integer pggtxf(integer devid, integer ncf, char *face, integer ncs, char 
+<I>C Binding: </I>void PG_fget_font(PG_device *dev, char **face, char **style, int *size)
+<BR><I>Fortran Binding: </I>void pggtxf(integer devid, integer ncf, char *face, integer ncs, char 
 *style, integer size)
 <BR><I>SX Binding: </I>(pg-text-font dev)
 <P>
@@ -4954,7 +4954,7 @@ The following program demonstrates some of the PGS functionality for placement a
 		       char *face, char *style, int size)
         {double bx[PG_BOXSZ], dx[PG_SPACEDM], p[PG_SPACEDM];
 
-	 PG_set_font(dev, face, style, size);
+	 PG_fset_font(dev, face, style, size);
 
          PG_get_text_ext_n(dev, 2, WORLDC, "foo", dx);
 

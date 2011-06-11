@@ -527,7 +527,7 @@ static void sf_dt(PG_device *dev, double x1, double y1,
 		  char *face, char *style, int size)
    {double bx[PG_BOXSZ], dx[PG_SPACEDM], p[PG_SPACEDM];
 
-    PG_set_font(dev, face, style, size);
+    PG_fset_font(dev, face, style, size);
 
     PG_get_text_ext_n(dev, 2, WORLDC, "foo", dx);
 
@@ -645,7 +645,7 @@ static int test_4(PG_device *dev)
     test_4_aux(dev);
 
 /* reset for following tests */
-    PG_set_font(dev, "helvetica", "medium", 10);
+    PG_fset_font(dev, "helvetica", "medium", 10);
 
     PG_finish_plot(dev);
 

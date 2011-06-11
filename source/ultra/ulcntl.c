@@ -340,7 +340,7 @@ static void _UL_draw_plot(PG_device *dev)
 static void UL_draw_plot(PG_device *dev)
    {
 
-    PG_set_finish_state(dev, FALSE);
+    PG_fset_finish_state(dev, FALSE);
 
 /* draw the curves */
     _UL_draw_plot(dev);
