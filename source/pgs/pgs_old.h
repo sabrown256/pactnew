@@ -12,25 +12,19 @@
 
 #define PCK_PGS_OLD
 
+#ifndef PGS_3_0_API
+
 /*--------------------------------------------------------------------------*/
 
 /*                            PROCEDURAL MACROS                             */
 
 /*--------------------------------------------------------------------------*/
 
-#if 0
-
 #define PG_set_axis_decades(_d) PG_set_attrs_glb(TRUE, "axis-n-decades", (double) _d, NULL)
 #define PG_get_axis_decades(_d) PG_get_attrs_glb(TRUE, "axis-n-decades", &(_d), NULL)
 
 #define PG_set_clear_mode(_i)   PG_set_attrs_glb(TRUE, "hl-clear-mode", (int) _i, NULL)
 #define PG_get_clear_mode(_i)   PG_get_attrs_glb(TRUE, "hl-clear-mode", &(_i), NULL)
-
-/*--------------------------------------------------------------------------*/
-
-#else
-
-/*--------------------------------------------------------------------------*/
 
 #define PG_set_clipping(d, flag)                                             \
     if ((d) != NULL)                                                         \
@@ -496,7 +490,70 @@
 	else                                                                 \
 	   dev->ps_color = FALSE;}
 
-#endif
+/*--------------------------------------------------------------------------*/
+
+/* GSOLD.C declarations - deprecated */
+
+#define PG_write_abs          PG_write_WC
+
+#define PG_set_char_size_NDC(d, x, y)                                        \
+   {double _p[PG_SPACEDM];                                                   \
+    _p[0] = x;                                                               \
+    _p[1] = y;                                                               \
+    if ((d) != NULL)                                                         \
+       {if ((d)->set_char_size != NULL)                                      \
+           (*(d)->set_char_size)(d, 2, NORMC, _p);};}
+#define PG_get_text_ext_NDC(d, s, px, py)                                    \
+   {double _p[PG_SPACEDM];                                                   \
+    _p[0] = 0.0;                                                             \
+    _p[1] = 0.0;                                                             \
+    if ((d) != NULL)                                                         \
+       {if ((d)->get_text_ext != NULL)                                       \
+           (*(d)->get_text_ext)(d, 2, NORMC, s, _p);}                        \
+    *px = _p[0];                                                             \
+    *py = _p[1];}
+
+#define WtoS(_d, _x, _y)                                                     \
+   {double _p[PG_SPACEDM];                                                   \
+    _p[0] = _x;                                                              \
+    _p[1] = _y;                                                              \
+    PG_trans_point(_d, 2, WORLDC, _p, NORMC, _p);                            \
+    _x = _p[0];                                                              \
+    _y = _p[1];}
+
+#define StoW(_d, _x, _y)                                                     \
+   {double _p[PG_SPACEDM];                                                   \
+    _p[0] = _x;                                                              \
+    _p[1] = _y;                                                              \
+    PG_trans_point(_d, 2, NORMC, _p, WORLDC, _p);                            \
+    _x = _p[0];                                                              \
+    _y = _p[1];}
+
+#define StoP(_d, _x, _y, _ix, _iy)                                           \
+   {double _p[PG_SPACEDM];                                                   \
+    _p[0] = _x;                                                              \
+    _p[1] = _y;                                                              \
+    PG_trans_point(_d, 2, NORMC, _p, PIXELC, _p);                            \
+    _ix = _p[0];                                                             \
+    _iy = _p[1];}
+
+#define PtoS(_d, _ix, _iy, _x, _y)                                           \
+   {double _p[PG_SPACEDM];                                                   \
+    _p[0] = _ix;                                                             \
+    _p[1] = _iy;                                                             \
+    PG_trans_point(_d, 2, PIXELC, _p, NORMC, _p);                            \
+    _x = _p[0];                                                              \
+    _y = _p[1];}
+
+#define PG_clear_region_NDC(d, xmn, xmx, ymn, ymx, pad)                      \
+    if ((d) != NULL)                                                         \
+       {if ((d)->clear_region != NULL)                                       \
+           {double _ndc[PG_BOXSZ];                                           \
+	    _ndc[0] = xmn;                                                   \
+	    _ndc[1] = xmx;                                                   \
+	    _ndc[2] = ymn;                                                   \
+	    _ndc[3] = ymx;                                                   \
+	    (*(d)->clear_region)(d, 2, NORMC, _ndc, pad);};}
 
 /*--------------------------------------------------------------------------*/
  
@@ -520,9 +577,78 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
+/* GSPR.C declarations */
+
+extern void
+ PG_get_clipping(PG_device *dev, int *flag),
+ PG_get_char_path(PG_device *dev, double *px, double *py),
+ PG_get_char_up(PG_device *dev, double *px, double *py);
+
+
+/* GSOLD.C declarations */
+
+extern void
+ PG_draw_line(PG_device *dev, double x1, double y1, double x2, double y2),
+ PG_draw_polyline(PG_device *dev, double *x, double *y, int n, int clip),
+ PG_draw_box(PG_device *dev, double xmn, double xmx,
+	     double ymn, double ymx),
+ PG_draw_box_ndc(PG_device *dev, double xmn, double xmx,
+	        double ymn, double ymx),
+ PG_get_bound(PG_device *dev,
+	      double *xmn, double *xmx, double *ymn, double *ymx),
+ PG_get_window(PG_device *dev,
+	       double *xmn, double *xmx, double *ymn, double *ymx),
+ PG_get_frame(PG_device *dev, double *xmn, double *xmx, 
+	      double *ymn, double *ymx),
+ PG_get_viewport(PG_device *dev,
+		 double *xmn, double *xmx, double *ymn, double *ymx),
+ PG_set_bound(PG_device *dev, double xmn, double xmx,
+	      double ymn, double ymx),
+ PG_set_window(PG_device *dev, double xmn, double xmx,
+	       double ymn, double ymx),
+ PG_set_frame(PG_device *dev, double x1, double x2, double y1, double y2),
+ PG_set_viewport(PG_device *dev, double x1, double x2, double y1, double y2),
+ PG_axis_3d(PG_device *dev, double *px, double *py, double *pz,
+	    int n_pts, double theta, double phi, double chi,
+	    double xmn, double xmx, double ymn, double ymx,
+	    double zmn, double zmx, int norm),
+ PG_draw_surface(PG_device *dev, double *a1, double *a2, double *aext,
+		 double *x, double *y, int nn,
+		 double xmn, double xmx, double ymn, double ymx,
+		 double *va, double width,
+		 int color, int style, int type, char *name,
+		 char *mesh_type, void *cnnct, pcons *alist),
+ PG_draw_palette(PG_device *dev, double xmn, double ymn,
+		 double xmx, double ymx, double zmn, double zmx,
+		 double wid),
+ PG_get_text_ext(PG_device *dev, char *s, double *px, double *py),
+ PG_get_char_size_NDC(PG_device *dev, double *pw, double *ph),
+ PG_get_char_size(PG_device *dev, double *pw, double *ph),
+ PG_draw_markers(PG_device *dev, int n, double *x, double *y, int marker),
+ PG_draw_markers_3(PG_device *dev, int n, double **r, int marker),
+ PG_set_limits(PG_device *dev, double *x, double *y, int n, int type),
+ PG_fill_polygon(PG_device *dev, int color, int mapped,
+		 double *x, double *y, int n);
+
+extern int
+ PG_write_NDC(PG_device *dev, double x, double y, char *fmt, ...),
+ PG_write_WC(PG_device *dev, double x, double y, char *fmt, ...);
+
+extern PG_image
+ *PG_make_image(char *label, char *type, void *z, double xmn, double xmx,
+		double ymn, double ymx, double zmn, double zmx,
+		int w, int h, int bpp, PG_palette *palette);
+
+extern PG_axis_def
+ *PG_draw_axis(PG_device *dev, double xl, double yl, double xr, double yr,
+	       double t1, double t2, double v1, double v2,
+	       double sc, char *format, int tick_type, int label_type,
+	       int flag);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif

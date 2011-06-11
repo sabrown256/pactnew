@@ -92,14 +92,13 @@ PP_device_set_char_path(PP_deviceObject *self,
                   PyObject *kwds)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.device.method.set_char_path) UNMODIFIED */
-    double x;
-    double y;
+    double x[PG_SPACEDM];
     char *kw_list[] = {"x", "y", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "dd:set_char_path", kw_list,
-                                     &x, &y))
+                                     &x[0], &x[1]))
         return NULL;
-    PG_set_char_path(self->dev, x, y);
+    PG_fset_char_path(self->dev, x);
     Py_INCREF(Py_None);
     return Py_None;
 /* DO-NOT-DELETE splicer.end(pgs.device.method.set_char_path) */

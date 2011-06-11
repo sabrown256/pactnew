@@ -98,7 +98,7 @@ static void _PG_draw_scatter(PG_device *dev, int nd, double **f,
 /* rotate X into rX */
     PG_rotate_vectors(dev, 3, nn, r);
 
-    PG_set_clipping(dev, FALSE);
+    PG_fset_clipping(dev, FALSE);
 
 /* sort f, r[0], and r[1] into ascending r[2] order */
     for (ig = nn >> 1; ig > 0; ig >>= 1)
@@ -328,7 +328,7 @@ PG_picture_desc *PG_setup_picture_scatter(PG_device *dev, PG_graph *data,
 	   pd->ax_type = CARTESIAN_3D;
 
 /* set scatter plot attribute values */
-	PG_set_clipping(dev, FALSE);};
+	PG_fset_clipping(dev, FALSE);};
 
     return(pd);}
 

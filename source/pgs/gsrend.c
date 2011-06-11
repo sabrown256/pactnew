@@ -795,7 +795,7 @@ static void _PG_adorn_picture(PG_device *dev, PG_picture_desc *pd,
 	    ((axty != CARTESIAN_3D) && !wh));
 
     if (now)
-       {PG_get_clipping(dev, &clp);
+       {clp = PG_fget_clipping(dev);
 
 /* draw the palette if needed */
 	if (pd->legend_palette_fl)
@@ -817,7 +817,7 @@ static void _PG_adorn_picture(PG_device *dev, PG_picture_desc *pd,
 	if (pd->legend_curve_fl || (_PG_gattrs.plot_labels == TRUE))
 	   _PG_print_labels(dev, data);
 
-	PG_set_clipping(dev, clp);
+	PG_fset_clipping(dev, clp);
 
 	PG_update_vs(dev);};
 
@@ -1113,7 +1113,7 @@ void PG_finish_picture(PG_device *dev, PG_graph *data, PG_picture_desc *pd)
     if ((dev == NULL) || (pd == NULL) || (data == NULL))
        return;
 
-    PG_set_clipping(dev, FALSE);
+    PG_fset_clipping(dev, FALSE);
 
     cpl = pd->legend_palette;
 

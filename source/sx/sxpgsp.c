@@ -155,7 +155,7 @@ static object *_SXI_set_clr_mode(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_SET_CLR_MODE", SS_null);
 
-    PG_set_clear_mode(mode);
+    PG_fset_clear_mode(mode);
 
     rv = SS_mk_integer(si, mode);
 
@@ -179,7 +179,7 @@ static object *_SXI_clr_mode(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_CLR_MODE", SS_null);
 
-    mode = PG_get_clear_mode();
+    mode = PG_fget_clear_mode();
 
     o = SS_mk_integer(si, mode);
 
@@ -894,7 +894,7 @@ static object *_SXI_finish_plot(SS_psides *si, object *argl)
 /* _SXI_GCPW - return the character path */
 
 static object *_SXI_gcpw(SS_psides *si, object *argl)
-   {double x1, y1;
+   {double x[PG_SPACEDM];
     PG_device *dev;
     object *o;
 
@@ -906,10 +906,10 @@ static object *_SXI_gcpw(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_GCPW", SS_null);
 
-    PG_get_char_path(dev, &x1, &y1);
+    PG_fget_char_path(dev, x);
 
-    o = SS_make_list(si, SC_DOUBLE_I, &x1,
-		     SC_DOUBLE_I, &y1,
+    o = SS_make_list(si, SC_DOUBLE_I, &x[0],
+		     SC_DOUBLE_I, &x[1],
 		     0);
 
     return(o);}
@@ -946,7 +946,7 @@ static object *_SXI_gcss(SS_psides *si, object *argl)
 /* _SXI_GCUW - return the character up direction */
 
 static object *_SXI_gcuw(SS_psides *si, object *argl)
-   {double x1, y1;
+   {double x[PG_SPACEDM];
     PG_device *dev;
     object *o;
 
@@ -958,10 +958,10 @@ static object *_SXI_gcuw(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_GCUW", SS_null);
 
-    PG_get_char_up(dev, &x1, &y1);
+    PG_fget_char_up(dev, x);
 
-    o = SS_make_list(si, SC_DOUBLE_I, &x1,
-		     SC_DOUBLE_I, &y1,
+    o = SS_make_list(si, SC_DOUBLE_I, &x[0],
+		     SC_DOUBLE_I, &x[1],
 		     0);
 
     return(o);}
@@ -984,7 +984,7 @@ static object *_SXI_gclp(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_GCLP", SS_null);
 
-    PG_get_clipping(dev, &clp);
+    clp = PG_fget_clipping(dev);
 
     o = clp ? SS_t : SS_f;
 
@@ -1539,21 +1539,22 @@ static object *_SXI_sbwd(SS_psides *si, object *argl)
 /* _SXI_SCPW - set the character path */
 
 static object *_SXI_scpw(SS_psides *si, object *argl)
-   {PG_device *dev;
-    double x1, y1;
+   {double x[PG_SPACEDM];
+    PG_device *dev;
 
-    dev = NULL;
-    x1 = y1 = 0.0;
+    dev  = NULL;
+    x[0] = 0.0;
+    x[1] = 0.0;
     SS_args(si, argl,
             G_DEVICE, &dev,
-            SC_DOUBLE_I, &x1,
-            SC_DOUBLE_I, &y1,
+            SC_DOUBLE_I, &x[0],
+            SC_DOUBLE_I, &x[1],
             0);
 
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_SCPW", SS_null);
 
-    PG_set_char_path(dev, x1, y1);
+    PG_fset_char_path(dev, x);
 
     return(SS_f);}
 
@@ -1563,21 +1564,22 @@ static object *_SXI_scpw(SS_psides *si, object *argl)
 /* _SXI_SCUW - set the character up direction */
 
 static object *_SXI_scuw(SS_psides *si, object *argl)
-   {PG_device *dev;
-    double x1, y1;
+   {double x[PG_SPACEDM];
+    PG_device *dev;
 
-    dev = NULL;
-    x1 = y1 = 0.0;
+    dev  = NULL;
+    x[0] = 0.0;
+    x[1] = 0.0;
     SS_args(si, argl,
             G_DEVICE, &dev,
-            SC_DOUBLE_I, &x1,
-            SC_DOUBLE_I, &y1,
+            SC_DOUBLE_I, &x[0],
+            SC_DOUBLE_I, &x[1],
             0);
 
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_SCUW", SS_null);
 
-    PG_set_char_path(dev, x1, y1);
+    PG_fset_char_path(dev, x);
 
     return(SS_f);}
 
@@ -1600,7 +1602,7 @@ static object *_SXI_sclp(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_SCLP", SS_null);
 
-    PG_set_clipping(dev, c);
+    PG_fset_clipping(dev, c);
 
     return(SS_f);}
 

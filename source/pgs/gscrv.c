@@ -393,7 +393,7 @@ static void PG_draw_data_ids_alt(PG_device *dev, double *x, double *y,
     double *ln;
     PG_rendering pty;
 
-    PG_set_clipping(dev, TRUE);
+    PG_fset_clipping(dev, TRUE);
     PG_get_viewspace(dev, WORLDC, wc);
  
     mark[0] = label;
@@ -512,7 +512,7 @@ static void PG_draw_data_ids_alt(PG_device *dev, double *x, double *y,
 	     if (PG_box_contains(2, wc, xp) == TRUE)
 	        PG_write_n(dev, 2, WORLDC, xp, mark);};};
  
-    PG_set_clipping(dev, FALSE);
+    PG_fset_clipping(dev, FALSE);
  
     return;}
  
@@ -554,7 +554,7 @@ void PG_draw_data_ids(PG_device *dev, double *x, double *y,
         x = xrv[0];
         y = xrv[1];}
 
-    PG_set_clipping(dev, TRUE);
+    PG_fset_clipping(dev, TRUE);
     PG_get_viewspace(dev, WORLDC, wc);
 
     if (wc[0] > wc[1])
@@ -663,7 +663,7 @@ void PG_draw_data_ids(PG_device *dev, double *x, double *y,
              if (PG_box_contains(2, box, xc) == TRUE)
                 PG_write_n(dev, 2, WORLDC, xc, mark);};};
  
-    PG_set_clipping(dev, FALSE);
+    PG_fset_clipping(dev, FALSE);
 
     if (irev)
        PM_free_vectors(2, xrv);
@@ -701,7 +701,7 @@ static void PG_error_plot(PG_device *dev, double **x, int n, int lncol,
        {PG_set_limits_n(dev, 2, WORLDC, n, r, PLOT_CARTESIAN);
         PG_axis(dev, CARTESIAN_2D);};
  
-    PG_set_clipping(dev, TRUE);
+    PG_fset_clipping(dev, TRUE);
     PG_set_color_line(dev, lncol, TRUE);
     PG_set_line_width(dev, lnwid);
     PG_set_line_style(dev, lnsty);
@@ -780,7 +780,7 @@ static void PG_error_plot(PG_device *dev, double **x, int n, int lncol,
  
     PM_free_vectors(2, t);
 
-    PG_set_clipping(dev, FALSE);
+    PG_fset_clipping(dev, FALSE);
     PG_set_line_width(dev, 0.0);
     PG_set_line_style(dev, LINE_SOLID);
  
@@ -811,8 +811,8 @@ void PG_rect_plot(PG_device *dev, double *x, double *y, int n, int lncol,
        {PG_set_limits_n(dev, 2, WORLDC, n, r, PLOT_CARTESIAN);
         PG_axis(dev, CARTESIAN_2D);};
  
-    PG_get_clipping(dev, &clp);
-    PG_set_clipping(dev, TRUE);
+    clp = PG_fget_clipping(dev);
+    PG_fset_clipping(dev, TRUE);
  
 /* worst case scenario is every line between adjacent points
  * intersects domain/range boundary rectangle twice.
@@ -860,7 +860,7 @@ void PG_rect_plot(PG_device *dev, double *x, double *y, int n, int lncol,
  
     PM_free_vectors(2, t);
 
-    PG_set_clipping(dev, clp);
+    PG_fset_clipping(dev, clp);
     PG_set_line_width(dev, wd);
     PG_set_line_style(dev, st);
  
@@ -894,7 +894,7 @@ void PG_histogram_plot(PG_device *dev, double *x, double *y, int n, int lncol,
        {PG_set_limits_n(dev, 2, WORLDC, n, r, PLOT_CARTESIAN);
         PG_axis(dev, CARTESIAN_2D);};
  
-    PG_set_clipping(dev, TRUE);
+    PG_fset_clipping(dev, TRUE);
     PG_set_color_line(dev, lncol, TRUE);
     PG_set_line_width(dev, lnwid);
     PG_set_line_style(dev, lnsty);
@@ -949,7 +949,7 @@ void PG_histogram_plot(PG_device *dev, double *x, double *y, int n, int lncol,
     PM_free_vectors(2, t);
     PM_free_vectors(2, xl);
 
-    PG_set_clipping(dev, FALSE);
+    PG_fset_clipping(dev, FALSE);
     PG_set_line_width(dev, 0.0);
     PG_set_line_style(dev, LINE_SOLID);
  
@@ -985,7 +985,7 @@ void PG_insel_plot(PG_device *dev, double *x, double *y, int n, int lncol,
        {PG_set_limits_n(dev, 2, WORLDC, n, r, PLOT_CARTESIAN);
         PG_axis(dev, INSEL);};
  
-    PG_set_clipping(dev, TRUE);
+    PG_fset_clipping(dev, TRUE);
     PG_set_color_line(dev, lncol, TRUE);
     PG_set_line_width(dev, lnwid);
     PG_set_line_style(dev, lnsty);
@@ -1013,7 +1013,7 @@ void PG_insel_plot(PG_device *dev, double *x, double *y, int n, int lncol,
 	     x2[1] = xc[1];
              PG_draw_line_n(dev, 2, WORLDC, x1, x2, dev->clipping);};};
  
-    PG_set_clipping(dev, FALSE);
+    PG_fset_clipping(dev, FALSE);
     PG_set_line_width(dev, 0.0);
     PG_set_line_style(dev, LINE_SOLID);
  
@@ -1048,7 +1048,7 @@ void PG_polar_plot(PG_device *dev, double *x, double *y, int n, int lncol,
        {PG_set_limits_n(dev, 2, WORLDC, n, r, PLOT_CARTESIAN);
         PG_axis(dev, POLAR);};
  
-    PG_set_clipping(dev, TRUE);
+    PG_fset_clipping(dev, TRUE);
     PG_set_color_line(dev, lncol, TRUE);
     PG_set_line_width(dev, lnwid);
     PG_set_line_style(dev, lnsty);
@@ -1092,7 +1092,7 @@ void PG_polar_plot(PG_device *dev, double *x, double *y, int n, int lncol,
              xco[0] = xc[0];
              xco[1] = xc[1];};};
  
-    PG_set_clipping(dev, FALSE);
+    PG_fset_clipping(dev, FALSE);
     PG_set_line_width(dev, 0.0);
     PG_set_line_style(dev, LINE_SOLID);
  

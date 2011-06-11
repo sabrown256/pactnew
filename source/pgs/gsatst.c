@@ -661,11 +661,13 @@ static int test_4(PG_device *dev)
         {an = i*PI/4.0;
          x0[0] = cos(an);
          x0[1] = sin(an);
-         PG_set_char_path(dev, x0[0], x0[1]);
+         PG_fset_char_path(dev, x0);
          PG_write_n(dev, 2, WORLDC, x0, "Sample");};
 
 /* reset for following tests */
-    PG_set_char_path(dev, 1.0, 0.0);
+    x0[0] = 1.0;
+    x0[1] = 0.0;
+    PG_fset_char_path(dev, x0);
 
     PG_finish_plot(dev);
 

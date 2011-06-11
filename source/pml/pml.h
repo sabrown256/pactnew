@@ -265,6 +265,10 @@ enum e_PM_binary_operation
 
 typedef enum e_PM_binary_operation PM_binary_operation;
 
+/*
+ * #bind derived PM_centering integer SC_ENUM_I SC_ENUM_I
+ */
+
 enum e_PM_centering
    {Z_CENT = -1,                                      /* zone centered */
     N_CENT = -2,                                      /* node centered */

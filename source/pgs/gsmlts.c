@@ -110,10 +110,10 @@ int main(int argc, char **argv)
                    *pz++ = z;};};};
 
 /* draw a cubic lattice */
-    PG_set_clipping(SCR_dev, TRUE);
-    PG_set_clipping(SCR_dew, TRUE);
-    PG_set_clipping(PS_dev, TRUE);
-    PG_set_clipping(CGM_dev, TRUE);
+    PG_fset_clipping(SCR_dev, TRUE);
+    PG_fset_clipping(SCR_dew, TRUE);
+    PG_fset_clipping(PS_dev, TRUE);
+    PG_fset_clipping(CGM_dev, TRUE);
 
     PG_turn_autorange(SCR_dev, TRUE);
     PG_turn_autorange(SCR_dew, TRUE);

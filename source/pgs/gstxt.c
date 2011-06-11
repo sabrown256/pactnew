@@ -320,7 +320,7 @@ void PG_refresh_text_box(PG_text_box *b)
    {int i, ln;
     char **bf;
     double ang, bwid;
-    double x[PG_SPACEDM], o[PG_SPACEDM];
+    double x[PG_SPACEDM], o[PG_SPACEDM], dc[PG_SPACEDM];
     PG_device *dev;
     PG_curve *crv;
     PG_palette *pl;
@@ -337,6 +337,9 @@ void PG_refresh_text_box(PG_text_box *b)
 
 	ln = b->n_lines;
 	bf = b->text_buffer;
+
+	dc[0] = cos(ang);
+	dc[1] = sin(ang);
 
 	pl = dev->current_palette;
 	PG_set_palette(dev, "standard");
@@ -365,15 +368,15 @@ void PG_refresh_text_box(PG_text_box *b)
 	    PG_draw_curve(dev, crv, FALSE);
 	    PG_set_line_width(dev, wid);};
 
-	PG_get_char_path(dev, &x[0], &x[1]);
-	PG_set_char_path(dev, cos(ang), sin(ang));
+	PG_fget_char_path(dev, x);
+	PG_fset_char_path(dev, dc);
 	(*dev->set_text_color)(dev, b->foreground, FALSE);
 
 	for (i = 0; i < ln; i++)
 	    {_PG_move_to(b, 0, i);
 	     PG_write_text(dev, stdscr, bf[i]);};
 
-	PG_set_char_path(dev, x[0], x[1]);
+	PG_fset_char_path(dev, x);
 
 	dev->current_palette = pl;};
 

@@ -80,7 +80,7 @@ static void _PG_draw_polar_grid_lines(PG_device *dev, PG_axis_def *ad,
     r[1]  = max(r[1], r4);
 
     PG_set_line_style(dev, _PG_gattrs.axis_grid_style);
-    PG_set_clipping(dev, TRUE);
+    PG_fset_clipping(dev, TRUE);
 
     dr = (en[1] - en[0])/((double) n - 1.0);
     for (i = 1; i <= nr; i++)
@@ -99,7 +99,7 @@ static void _PG_draw_polar_grid_lines(PG_device *dev, PG_axis_def *ad,
         {if ((i % 8) != 0)
             PG_draw_rad(dev, 0.0, r[1], a1, 0.0, 0.0, RADIAN);};
 
-    PG_set_clipping(dev, FALSE);
+    PG_fset_clipping(dev, FALSE);
     PG_set_line_style(dev, _PG_gattrs.axis_line_style);
 
     _PG_rl_axis_def(ad);
@@ -754,12 +754,12 @@ int PG_set_axis_attributes(PG_device *dev, ...)
     chup[1]  =  chpth[0];
 
 /* set attribute values */
-    PG_set_clipping(dev, FALSE);
+    PG_fset_clipping(dev, FALSE);
     PG_set_color_text(dev, txtcolor, TRUE);
     PG_set_font(dev, _PG_gattrs.axis_type_face, dev->type_style, dev->type_size);
     PG_set_char_precision(dev, prec);
-    PG_set_char_path(dev, chpth[0], chpth[1]);
-    PG_set_char_up(dev, chup[0], chup[1]);
+    PG_fset_char_path(dev, chpth);
+    PG_fset_char_up(dev, chup);
     PG_set_char_space(dev, charspace);
     PG_set_color_line(dev, linecolor, TRUE);
     PG_set_line_style(dev, _PG_gattrs.axis_line_style);
@@ -1435,12 +1435,12 @@ void PG_axis_3(PG_device *dev, double **x, int np, double *databox)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_GET_AXIS_DECADES - get the number of decades for axis plotting
+/* PG_FGET_AXIS_DECADES - get the number of decades for axis plotting
  *
- * #bind PG_get_axis_decades fortran() scheme()
+ * #bind PG_fget_axis_decades fortran() scheme()
  */
 
-double PG_get_axis_decades(void)
+double PG_fget_axis_decades(void)
    {double d;
 
     PG_get_attrs_glb(TRUE, "axis-n-decades", &d, NULL);
@@ -1450,12 +1450,12 @@ double PG_get_axis_decades(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_SET_AXIS_DECADES - set the number of decades for axis plotting
+/* PG_FSET_AXIS_DECADES - set the number of decades for axis plotting
  *
- * #bind PG_set_axis_decades fortran() scheme()
+ * #bind PG_fset_axis_decades fortran() scheme()
  */
 
-double PG_set_axis_decades(double d)
+double PG_fset_axis_decades(double d)
    {
 
     PG_set_attrs_glb(TRUE, "axis-n-decades", d, NULL);
