@@ -745,6 +745,8 @@ FIXNUM FF_ID(sschem, SSCHEM)(FIXNUM *snc, char *name, ...)
 
 /* SS_CALL_SCHEME - make a C level call to a SCHEME level function
  *                - return the SCHEME result object
+ *
+ * #bind SS_call_scheme  fortran()
  */
 
 object *SS_call_scheme(SS_psides *si, char *func, ...)

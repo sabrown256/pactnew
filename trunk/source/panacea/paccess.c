@@ -43,6 +43,8 @@ PA_variable *PA_inquire_variable(char *x)
 /* PA_EQUIVALENCE - proclaim that the given pointer's address is to
  *                - contain the same content as the named variable's
  *                - data
+ *
+ * #bind PA_equivalence fortran() scheme()
  */
 
 void PA_equivalence(void *vr, char *s)
@@ -93,6 +95,8 @@ void PA_equivalence(void *vr, char *s)
 
 /* PA_SET_EQUIV - set the value of every body who is equivalences to the
  *              - named variable
+ *
+ * #bind PA_set_equiv fortran() scheme(pa-set-equivalence!)
  */
 
 void PA_set_equiv(char *s, void *vl)
@@ -259,6 +263,8 @@ static void _PA_load_space(PA_variable *pp, long psz)
 /* PA_GET_ACCESS - obtain a pointer to part of a data array 
  *               - some of which may be off on disk
  *               - return a pointer to it
+ *
+ * #bind PA_get_access fortran() scheme()
  */
 
 void *PA_get_access(void **vr, char *s, long offs, long ne, int track)
@@ -571,6 +577,8 @@ static int _PA_remove_ref(void **vp, PA_variable *pp)
 
 /* PA_REL_ACCESS - release a connection obtained by PA_get_access
  *               - put away any scratch variables first
+ *
+ * #bind PA_rel_access fortran() scheme()
  */
 
 void PA_rel_access(void **vp, char *s, long offs, long ne)

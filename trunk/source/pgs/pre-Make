@@ -78,14 +78,14 @@ targets :
 #
 # Headers Files
 #
-Hdrs   = pgs.h pgs_int.h scope_cgm.h scope_raster.h
+Hdrs   = pgs.h pgs_int.h pgs_old.h scope_cgm.h scope_raster.h
 MpgHdr = scope_mpeg.h
 XHdr   = scope_x11.h
 
 #
 # Object Files
 #
-GObjsA = gsaux.o gsaxis.o gsscale.o gsdlin.o gscrv.o gscntr.o gsvect.o gsimag.o gssurf.o gshls.o
+GObjsA = gsaux.o gsaxis.o gsscale.o gsdlin.o gscrv.o gscntr.o gsvect.o gsimag.o gssurf.o gshls.o gsacc.o
 GObjsB = gsdvb.o gspolf.o gsdplt.o gsgrot.o gsscat.o gsiob.o gsiod.o gsrwi.o
 GObjsC = gsmm.o gsattr.o gstxt.o gsclr.o gshigh.o gsdv.o gspr.o gsvsp.o gsrend.o
 GObjsD = gsdv_im.o gsdv_rst.o gspr_rst.o gsdlr.o gsold.o gssfnt.o
@@ -106,7 +106,8 @@ OPNG = gsdv_png.o
 ${OX} : ${XHdr}
 ${OOGL} : ${XHdr}
 
-ArObjs = ${TGTLib}(gsdv.o) ${TGTLib}(gspr.o) ${TGTLib}(gsvsp.o) \
+ArObjs = ${TGTLib}(gsdv.o) ${TGTLib}(gspr.o) \
+         ${TGTLib}(gsacc.o) ${TGTLib}(gsvsp.o) \
          ${TGTLib}(gsdv_im.o) ${TGTLib}(gsevmn.o) \
          ${TGTLib}(gsdv_rst.o) ${TGTLib}(gspr_rst.o) ${TGTLib}(gsdlr.o) \
 	 ${TGTLib}(gsaux.o) ${TGTLib}(gsmm.o) ${TGTLib}(gsattr.o) \

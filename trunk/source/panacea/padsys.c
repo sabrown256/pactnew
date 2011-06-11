@@ -195,6 +195,8 @@ void PA_def_package(char *name, PFPkgGencmd gcmd, PFPkgDfstrc dfs,
 
 /* PA_CONTROL_SET - connect the control array pointers: iswtch, rparam, and
  *                - name to the named package control arrays
+ *
+ * #bind PA_control_set fortran() scheme()
  */
 
 void PA_control_set(char *s)

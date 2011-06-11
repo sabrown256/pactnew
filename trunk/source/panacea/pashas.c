@@ -595,10 +595,12 @@ void PA_change_size(char *name, int flag)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PA_INTERN - intern a variable pointed to by the first arg in the
- *            - variable table under the name given by the second arg
- *            - if vr is NULL and is an array allocate the space
- *            - return a pointer to the data
+/* PA_INTERN - intern a variable pointed to by the first arg in the
+ *           - variable table under the name given by the second arg
+ *           - if vr is NULL and is an array allocate the space
+ *           - return a pointer to the data
+ *
+ * #bind PA_intern fortran() scheme()
  */
 
 void *PA_intern(void *vr, char *name)

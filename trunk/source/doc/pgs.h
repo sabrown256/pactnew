@@ -1,5 +1,5 @@
 TXT: PGS User's Manual
-MOD: 05/19/2011
+MOD: 06/10/2011
 
 <CENTER>
 <P>
@@ -2068,7 +2068,7 @@ attribute where called for.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_set_clear_mode(int mode)
+<I>C Binding: </I>int PG_set_clear_mode(int mode)
 <BR><I>Fortran Binding: </I>integer pgsclm(integer mode)
 <BR><I>SX Binding: </I>
 <P>
@@ -2109,8 +2109,8 @@ Get the I/O buffer size for graphics files.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_get_clear_mode(int mode)
-<BR><I>Fortran Binding: </I>integer pggclm(integer mode)
+<I>C Binding: </I>int PG_get_clear_mode(void)
+<BR><I>Fortran Binding: </I>integer pggclm(void)
 <BR><I>SX Binding: </I>
 <P>
 Get the current value of the global mode which the high level rendering
@@ -3625,7 +3625,7 @@ associate the attribute with its position in the string attrs.<p>
 </TABLE>
 </BLOCKQUOTE>
 
-<P><I>C Binding: </I>void PG_get_axis_decades(double *d)
+<P><I>C Binding: </I>double PG_get_axis_decades(void)
 <BR><I>Fortran Binding: </I>integer pggaxd(real d)
 <BR><I>SX Binding: </I>
 <P>
@@ -3636,7 +3636,7 @@ number of decades plotted. In this way, potentially ill-defined logarithmic
 values (such as very small positive numbers) don&#146;t interfere with the
 display of otherwise fine values.<p>
 
-<I>C Binding: </I>void PG_set_axis_decades(double *d)
+<I>C Binding: </I>void PG_set_axis_decades(double d)
 <BR><I>Fortran Binding: </I>integer pgsaxd(real d)
 <BR><I>SX Binding: </I>
 <P>

@@ -1119,8 +1119,7 @@ extern void
  PA_init_scalar(char *s),
  PA_error_handler(int test, char *fmt, ...),
  PA_warning_handler(int test, char *fmt, ...),
- PA_error(char *msg),
- *PA_intern(void *vr, char *name);
+ PA_error(char *msg);
 
 extern PDBfile
  *PA_open(char *name, char *mode, int flag);
@@ -1139,7 +1138,8 @@ extern void
  PA_init_strings(void),
  PA_def_str(PDBfile *pdrs),
  PA_change_dim(int *pdm, int val),
- PA_change_size(char *name, int flag);
+ PA_change_size(char *name, int flag),
+ *PA_intern(void *vr, char *name);
 
 extern int
  PA_sizeof(char *s);

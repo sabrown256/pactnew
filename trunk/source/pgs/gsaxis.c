@@ -573,6 +573,8 @@ static void _PG_aux_axis(PG_device *dev, int axis_type)
  
 /* PG_AXIS - draw the axes
  *         - the information for this is set up by a setlimits call
+ *
+ * #bind PG_axis fortran() scheme ()
  */
  
 void PG_axis(PG_device *dev, int axis_type)
@@ -1285,6 +1287,8 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
  *                - EN cannot be magnitudes only because the interval (-1, 1)
  *                - would have en[0] = en[1]
  *                - This is independent of tick type!
+ *
+ * #bind PG_draw_axis_n fortran() scheme ()
  */
 
 PG_axis_def *PG_draw_axis_n(PG_device *dev, double *xl, double *xr,
@@ -1373,7 +1377,10 @@ PG_axis_def *PG_draw_axis_n(PG_device *dev, double *xl, double *xr,
 
 /*--------------------------------------------------------------------------*/
 
-/* PG_AXIS_3 - draw a set of axes for a surface plot */
+/* PG_AXIS_3 - draw a set of axes for a surface plot
+ *
+ * #bind PG_axis_3 fortran() scheme ()
+ */
 
 void PG_axis_3(PG_device *dev, double **x, int np, double *databox)
    {int lc, ls;
@@ -1427,3 +1434,34 @@ void PG_axis_3(PG_device *dev, double **x, int np, double *databox)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* PG_GET_AXIS_DECADES - get the number of decades for axis plotting
+ *
+ * #bind PG_get_axis_decades fortran() scheme()
+ */
+
+double PG_get_axis_decades(void)
+   {double d;
+
+    PG_get_attrs_glb(TRUE, "axis-n-decades", &d, NULL);
+
+    return(d);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_SET_AXIS_DECADES - set the number of decades for axis plotting
+ *
+ * #bind PG_set_axis_decades fortran() scheme()
+ */
+
+double PG_set_axis_decades(double d)
+   {
+
+    PG_set_attrs_glb(TRUE, "axis-n-decades", d, NULL);
+
+    return(d);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+

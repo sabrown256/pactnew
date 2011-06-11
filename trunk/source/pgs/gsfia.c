@@ -14,6 +14,63 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PGGAXD - get axis decades */
+
+double FF_ID(pggaxd, PGGAXD)(void)
+   {double d;
+
+    d = PG_get_axis_decades();
+
+    return(d);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSAXD - set axis decades */
+
+double FF_ID(pgsaxd, PGSAXD)(double *sd)
+   {double d;
+
+    d = *sd;
+
+    PG_set_axis_decades(d);
+
+    return(d);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGGCLM - get the clear mode */
+
+FIXNUM FF_ID(pggclm, PGGCLM)(void)
+   {FIXNUM rv;
+
+    rv = PG_get_clear_mode();
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSCLM - set the clear mode */
+
+FIXNUM FF_ID(pgsclm, PGSCLM)(FIXNUM *sc)
+   {FIXNUM rv;
+
+    rv = *sc;
+
+    PG_set_clear_mode(rv);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+
+
+
+
+/*--------------------------------------------------------------------------*/
+
 /* PG_VIEW_ATTRIBUTES_POINTER - return the PG_view_attributes pointer
  *                            - associated with the index if the index
  *                            - is valid and NULL otherwise
@@ -179,18 +236,6 @@ FIXNUM FF_ID(pgsaxa, PGSAXA)(FIXNUM *sdid, FIXNUM *sn,
     PG_set_color_line(dev, lnclr, TRUE);
     PG_set_line_style(dev, _PG_gattrs.axis_line_style);
     PG_set_line_width(dev, _PG_gattrs.axis_line_width);
-
-    return(TRUE);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGGAXD - get axis decades */
-
-FIXNUM FF_ID(pggaxd, PGGAXD)(double *sd)
-   {
-
-    PG_get_axis_decades(*sd);
 
     return(TRUE);}
 
@@ -679,20 +724,6 @@ FIXNUM FF_ID(pgfply, PGFPLY)(FIXNUM *sdid, double *ax, double *ay,
 
     dev = SC_GET_POINTER(PG_device, *sdid);
     PG_fill_polygon_n(dev, (int) *sc, TRUE, 2, WORLDC, *sn, r);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGGCLM - get the clear mode */
-
-FIXNUM FF_ID(pggclm, PGGCLM)(FIXNUM *sdid, FIXNUM *sc)
-   {FIXNUM rv;
-
-    PG_get_clear_mode(*sc);
 
     rv = TRUE;
 
@@ -1459,23 +1490,6 @@ FIXNUM FF_ID(pgsarn, PGSARN)(FIXNUM *sdid, FIXNUM *sr)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PGSAXD - set axis decades */
-
-FIXNUM FF_ID(pgsaxd, PGSAXD)(double *sd)
-   {FIXNUM rv;
-    double d;
-
-    d = *sd;
-
-    PG_set_axis_decades(d);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PGSAXL - set log axis flags */
 
 FIXNUM FF_ID(pgsaxl, PGSAXL)(FIXNUM *sdid, FIXNUM *snd, FIXNUM *aflg)
@@ -1526,20 +1540,6 @@ FIXNUM FF_ID(pgsbsz, PGSBSZ)(FIXNUM *ssz)
     sz = *ssz;
     PG_set_buffer_size(sz);
     rv = sz;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGSCLM - set the clear mode */
-
-FIXNUM FF_ID(pgsclm, PGSCLM)(FIXNUM *sdid, FIXNUM *sc)
-   {FIXNUM rv;
-
-    PG_set_clear_mode(*sc);
-
-    rv = TRUE;
 
     return(rv);}
 
