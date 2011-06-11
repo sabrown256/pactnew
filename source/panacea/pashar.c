@@ -1074,7 +1074,10 @@ void PA_warning_handler(int test, char *fmt, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PA_ERROR - the lowest level error handler */
+/* PA_ERROR - the lowest level error handler
+ *
+ * #bind PA_error fortran() scheme()
+ */
 
 void PA_error(char *msg)
    {
@@ -1088,6 +1091,8 @@ void PA_error(char *msg)
 
 /* PA_SET_DEFAULT_OFFSET - set the default file offset and
  *                       - return the old value
+ *
+ * #bind PA_set_default_offset fortran() scheme(pa-set-default-offset!)
  */
 
 int PA_set_default_offset(int d)
@@ -1101,7 +1106,10 @@ int PA_set_default_offset(int d)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PA_GET_DEFAULT_OFFSET - return the default file offset value */
+/* PA_GET_DEFAULT_OFFSET - return the default file offset value
+ *
+ * #bind PA_get_default_offset fortran() scheme()
+ */
 
 int PA_get_default_offset(void)
    {

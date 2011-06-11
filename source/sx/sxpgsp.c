@@ -179,7 +179,7 @@ static object *_SXI_clr_mode(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_CLR_MODE", SS_null);
 
-    PG_get_clear_mode(mode);
+    mode = PG_get_clear_mode();
 
     o = SS_mk_integer(si, mode);
 

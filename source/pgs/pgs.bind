@@ -17,143 +17,132 @@ derived PM_centering		integer		SC_ENUM_I	SC_ENUM_I
 
 #  C function			Fortran	Scheme		Python
 
+# GSACC.C
+PG_get_clear_mode		yes	yes              none
+PG_set_clear_mode		yes	yes              none
+PG_get_clipping			yes	yes              none
+PG_set_clipping			yes	yes              none
+PG_get_char_path		yes	yes              none
+PG_set_char_path		yes	yes              none
+PG_get_char_up			yes	yes              none
+PG_set_char_up			yes	yes              none
+PG_get_font			yes	yes              none
+PG_set_font			yes	yes              none
+PG_get_identifier		yes	yes              none
+PG_set_identifier		yes	yes              none
+PG_get_logical_op		yes	yes              none
+PG_set_logical_op		yes	yes              none
+PG_get_line_style		yes	yes              none
+PG_set_line_style		yes	yes              none
+PG_get_line_width		yes	yes              none
+PG_set_line_width		yes	yes              none
+PG_get_marker_orientation	yes	yes              none
+PG_set_marker_orientation	yes	yes              none
+PG_get_marker_scale		yes	yes              none
+PG_set_marker_scale		yes	yes              none
+PG_get_pixmap_flag		yes	yes              none
+PG_set_pixmap_flag		yes	yes              none
+PG_get_ps_dots_inch		yes	yes              none
+PG_set_ps_dots_inch		yes	yes              none
+PG_get_render_info		yes	yes              none
+PG_set_render_info		yes	yes              none
+PG_get_use_pixmap		yes	yes              none
+PG_set_use_pixmap		yes	yes              none
+
+PG_get_line_color		yes	yes              none
+PG_set_color_line		yes	yes              none
+PG_get_text_color		yes	yes              none
+PG_set_color_text		yes	yes              none
+
+PG_set_fill_color		yes	yes              none
+
+PG_get_text_ext_n		yes	yes              none
+PG_set_border_width		yes	yes              none
+PG_set_palette			yes	yes              none
+PG_set_viewport_pos		yes	yes              none
+PG_set_viewport_shape		yes	yes              none
+PG_get_char_size_n		yes	yes              none
+PG_select_color			yes	yes              none
+
+# GSAXIS.C
+PG_draw_axis_n			yes	none             none
+PG_axis_3			yes	yes              none
+PG_axis				yes	yes              none
+PG_get_axis_decades		yes	yes              none
+PG_set_axis_decades		yes	yes              none
+PG_get_axis_log_scale		yes	yes              none
+PG_set_axis_log_scale		yes	yes              none
+
 # GSCNTR.C
 PG_contour_levels		yes	yes              none
 PG_draw_iso_nc_lr		yes	yes              none
 
-# GSFIA.C
-PG_axis				yes	yes              none
-PG_get_axis_decades		yes	yes              none
-PG_get_axis_log_scale		yes	yes              none
+# GSCRV.C
+PG_plot_curve			yes	yes              none
+PG_turn_data_id			yes	yes              none
+
+# GSDV.C
 PG_get_buffer_size		yes	yes              none
+PG_set_buffer_size		yes	yes              none
+PG_make_device_current		yes	yes              none
+PG_open_device			yes	yes              none
+PG_query_device			yes	yes              none
+PG_query_window			yes	yes              none
 PG_close_device			yes	yes              none
+PG_release_current_device	yes	yes              none
+PG_update_vs			yes	yes              none
+PG_key_event_info		yes	yes              none
+PG_query_pointer		yes	yes              none
+
+# GSHIGH.C
+PG_center_label			yes	yes              none
+
+# GSIMAG.C
+PG_draw_palette_n		yes	yes              none
+PG_make_image_n			yes	yes		 none
+_PG_draw_image_nc_lr		yes	yes              none
+
+# GSIOB.C
+PG_register_callback		yes	none             none
+PG_register_variable		yes	yes              none
+PG_draw_interface_objects	yes	yes              none
+
+# GSMM.C
+PG_make_device			yes	yes              none
+PG_make_graph_1d		yes	yes              none
+PG_make_graph_r2_r1		yes	yes              none
+PG_register_device		yes	none             none
+PG_restore_view_attributes	yes	yes              none
+
+# GSPR.C
+PG_draw_box_n			yes	yes              none
+PG_fill_polygon_n		yes	yes              none
+PG_draw_line_n			yes	yes              none
+PG_draw_disjoint_polyline_n	yes	yes              none
+PG_draw_polyline_n		yes	yes              none
+PG_draw_markers_n		yes	yes              none
+PG_def_marker			yes	yes              none
+PG_finish_plot			yes	yes              none
+PG_draw_graph			yes	yes              none
+PG_domain_plot			yes	yes              none
 PG_clear_page			yes	yes              none
 PG_clear_region			yes	yes              none
 PG_clear_window			yes	yes              none
 PG_clear_viewport		yes	yes              none
-PG_draw_disjoint_polyline_n	yes	yes              none
-PG_draw_polyline_n		yes	yes              none
-PG_draw_axis_n			yes	none             none
-PG_axis_3			yes	yes              none
-PG_draw_markers_n		yes	yes              none
-PG_def_marker			yes	yes              none
-PG_domain_plot			yes	yes              none
-PG_draw_box_n			yes	yes              none
-PG_draw_interface_objects	yes	yes              none
-PG_draw_line_n			yes	yes              none
-PG_draw_palette_n		yes	yes              none
-PG_finish_plot			yes	yes              none
-PG_fill_polygon_n		yes	yes              none
-PG_get_clear_mode		yes	yes              none
-PG_get_clipping			yes	yes              none
-PG_get_char_path		yes	yes              none
-PG_get_char_size_n		yes	yes              none
-PG_get_char_up			yes	yes              none
-PG_get_ps_dots_inch		yes	yes              none
-PG_get_line_color		yes	yes              none
-PG_get_logical_op		yes	yes              none
-PG_get_line_style		yes	yes              none
-PG_get_line_width		yes	yes              none
-PG_get_marker_orientation	yes	yes              none
-PG_get_marker_scale		yes	yes              none
-PG_get_pixmap_flag		yes	yes              none
-PG_get_text_color		yes	yes              none
-PG_get_font			yes	yes              none
-PG_get_text_ext_n		yes	yes              none
-PG_get_viewspace		yes	yes              none
-PG_make_device_current		yes	yes              none
-PG_make_device			yes	yes              none
-PG_open_device			yes	yes              none
-PG_query_device			yes	yes              none
-PG_query_window			yes	yes              none
-PG_plot_curve			yes	yes              none
+
+# GSRWI.C
 PG_read_interface		yes	yes              none
-PG_release_current_device	yes	yes              none
-PG_register_device		yes	none             none
-PG_register_callback		yes	none             none
-PG_register_variable		yes	yes              none
-PG_restore_view_attributes	yes	yes              none
-PG_set_axis_decades		yes	yes              none
-PG_set_axis_log_scale		yes	yes              none
-PG_set_border_width		yes	yes              none
-PG_set_buffer_size		yes	yes              none
-PG_set_clear_mode		yes	yes              none
-PG_set_clipping			yes	yes              none
-PG_set_char_path		yes	yes              none
-PG_set_char_up			yes	yes              none
-PG_set_ps_dots_inch		yes	yes              none
-PG_select_color			yes	yes              none
-PG_set_fill_color		yes	yes              none
-PG_set_color_line		yes	yes              none
-PG_set_logical_op		yes	yes              none
-PG_set_line_style		yes	yes              none
-PG_set_line_width		yes	yes              none
-PG_set_marker_orientation	yes	yes              none
-PG_set_marker_scale		yes	yes              none
-PG_set_palette			yes	yes              none
-PG_set_pixmap_flag		yes	yes              none
-PG_trans_point			yes	yes              none
-PG_set_color_text		yes	yes              none
-PG_set_font			yes	yes              none
-PG_set_viewspace		yes	yes              none
-PG_set_viewport_pos		yes	yes              none
-PG_set_viewport_shape		yes	yes              none
-PG_turn_data_id			yes	yes              none
-PG_update_vs			yes	yes              none
-PG_center_label			yes	yes              none
 PG_write_interface		yes	yes              none
+
+# GSSURF.C
+PG_draw_surface_n		yes	yes              none
+
+# GSVSP.C
+PG_get_viewspace		yes	yes              none
+PG_set_viewspace		yes	yes              none
+PG_trans_point			yes	yes              none
 PG_set_view_angle		yes	yes              none
 PG_set_light_angle		yes	yes              none
 PG_get_view_angle		yes	yes              none
 PG_get_light_angle		yes	yes              none
-#FIXNUM F77_FUNC(pgsaxa, PGSAXA)(FIXNUM *devid, FIXNUM *pn,
-#FIXNUM F77_FUNC(pggfin, PGGFIN)(FIXNUM *devid, FIXNUM *pc)
-#FIXNUM F77_FUNC(pggtln, PGGTLN)(FIXNUM *pnc, F77_string s, FIXNUM *pfd)
-#FIXNUM F77_FUNC(pgptin, PGPTIN)(FIXNUM *pntr, FIXNUM *indx)
-#FIXNUM F77_FUNC(pgsadr, PGSADR)(FIXNUM *devid, FIXNUM *pd, FIXNUM *pr)
-#FIXNUM F77_FUNC(pgsadm, PGSADM)(FIXNUM *devid, FIXNUM *pd)
-#FIXNUM F77_FUNC(pgsarn, PGSARN)(FIXNUM *devid, FIXNUM *pr)
-#FIXNUM F77_FUNC(pgsfin, PGSFIN)(FIXNUM *devid, FIXNUM *pc)
-#FIXNUM F77_FUNC(pgsvpa, PGSVPA)(FIXNUM *devid, FIXNUM *pn)
-#FIXNUM F77_FUNC(pgwrta, PGWRTA)(FIXNUM *devid, double *px, double *py,
 
-# GSFIB.C
-PG_get_render_info	yes	yes              none
-PG_get_identifier	yes	yes              none
-PG_get_use_pixmap	yes	yes              none
-PG_make_graph_1d	yes	yes              none
-PG_make_graph_r2_r1	yes	yes              none
-PG_key_event_info	yes	yes              none
-PG_query_pointer	yes	yes              none
-PG_draw_graph		yes	yes              none
-PG_set_render_info	yes	yes              none
-PG_set_identifier	yes	yes              none
-PG_set_use_pixmap	yes	yes              none
-#FIXNUM F77_FUNC(pggbkc, PGGBKC)(FIXNUM *devid, FIXNUM *clr)
-#FIXNUM F77_FUNC(pgmg22, PGMG22)(FIXNUM *pid,
-#FIXNUM F77_FUNC(pgmgfs, PGMGFS)(FIXNUM *pnl, F77_string fname,
-#FIXNUM F77_FUNC(pgrlgr, PGRLGR)(FIXNUM *grid, FIXNUM *prd, FIXNUM *prr)
-#FIXNUM F77_FUNC(pgsbkc, PGSBKC)(FIXNUM *devid, FIXNUM *clr)
-#FIXNUM F77_FUNC(pgsdlm, PGSDLM)(FIXNUM *grid, FIXNUM *pn, double *v)
-#FIXNUM F77_FUNC(pgsedf, PGSEDF)(FIXNUM *devid, PFEventHand fnc)
-#FIXNUM F77_FUNC(pgseex, PGSEEX)(FIXNUM *devid, PFEventHand fnc)
-#FIXNUM F77_FUNC(pgsekd, PGSEKD)(FIXNUM *devid, PFEventHand fnc)
-#FIXNUM F77_FUNC(pgseku, PGSEKU)(FIXNUM *devid, PFEventHand fnc)
-#FIXNUM F77_FUNC(pgsemd, PGSEMD)(FIXNUM *devid, PFEventHand fnc)
-#FIXNUM F77_FUNC(pgsemo, PGSEMO)(FIXNUM *devid, PFEventHand fnc)
-#FIXNUM F77_FUNC(pgsemu, PGSEMU)(FIXNUM *devid, PFEventHand fnc)
-#FIXNUM F77_FUNC(pgseup, PGSEUP)(FIXNUM *devid, PFEventHand fnc)
-#FIXNUM F77_FUNC(pgsrat, PGSRAT)(FIXNUM *grid,
-#FIXNUM F77_FUNC(pgsrlm, PGSRLM)(FIXNUM *grid, FIXNUM *pn, double *v)
-#FIXNUM F77_FUNC(pgsvlm, PGSVLM)(FIXNUM *grid, double *v)
-
-# GSIMAG.C
-PG_make_image_n		yes	yes		 none
-_PG_draw_image_nc_lr	yes	yes              none
-
-# GSSURF.C
-PG_draw_surface_n	yes	yes              none
-
-# GSVECT.C
-#void F77_FUNC(pgsvat, PGSVAT)(FIXNUM *devid, ...)
-#FIXNUM F77_FUNC(pgplvc, PGPLVC)(FIXNUM *devid,

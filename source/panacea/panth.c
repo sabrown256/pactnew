@@ -333,6 +333,8 @@ static syment *_PA_truncate_entry(PDBfile *file, char *name, long indx)
  *             -          of records for this block of records)
  *             -   NR   - number of records in this block
  *             -   VR   - the data which must be NR*sizeof(<TYPE>) long
+ *
+ * #bind PA_th_write fortran() scheme()
  */
 
 int PA_th_write(PDBfile *strm, char *name, char *type, int inst, int nr,
@@ -388,6 +390,8 @@ int PA_th_write(PDBfile *strm, char *name, char *type, int inst, int nr,
  *                 -   INST - instance index (starting index in a linear
  *                 -          array of records for this block of records)
  *                 -   VR   - the data which must be NR*sizeof(<TYPE>) long
+ *
+ * #bind PA_th_wr_member fortran() scheme()
  */
 
 int PA_th_wr_member(PDBfile *strm, char *name, char *member, char *type,
@@ -473,6 +477,8 @@ int PA_th_wr_member(PDBfile *strm, char *name, char *member, char *type,
  *                -   INST - instance index being tagged
  *                -   ATTR - name of the attribute (must be defined)
  *                -   AVL  - pointer to the attribute value data
+ *
+ * #bind PA_th_wr_iattr fortran() scheme()
  */
 
 int PA_th_wr_iattr(PDBfile *strm, char *vr, int inst, char *attr, void *avl)
@@ -493,6 +499,8 @@ int PA_th_wr_iattr(PDBfile *strm, char *vr, int inst, char *attr, void *avl)
  *                    - NAME: base name of both the TH and ULTRA file families
  *                    - ORD:  1 for normal order and -1 for reverse order
  *                    - NCPF: maximum number of curves per ULTRA file
+ *
+ * #bind PA_th_trans_family fortran() scheme()
  */
 
 int PA_th_trans_family(char *name, int ord, int ncpf)
@@ -547,6 +555,8 @@ int PA_th_family_list(char *name, int c, char ***pfiles)
  *                  - ORD is 1 for normal order and -1 for reverse order
  *                  - NCPF is the number of curves per ULTRA file
  *                  - returns TRUE iff successful
+ *
+ * #bind PA_th_trans_name fortran() scheme()
  */
 
 int PA_th_trans_name(int n, char **names, int ord, int ncpf)
@@ -608,6 +618,8 @@ int PA_th_name_list(int n, char **names, char ***pthfiles)
  *                  - ORD is 1 for normal order and -1 for reverse order
  *                  - NCPF is the number of curves per ULTRA file
  *                  - returns TRUE iff successful
+ *
+ * #bind PA_th_trans_link fortran() scheme()
  */
 
 
@@ -1125,6 +1137,8 @@ int PA_th_trans_files(char *name, int ncpf, int nthf, char **thfiles,
  *                 - FAMILY: is the base name of the family of files to merge. 
  *                 - NCPF:   approximate number of curves per target file.
  *                 -         (If NCPF = 0, don't family merged file.)
+ *
+ * #bind PA_merge_family fortran() scheme()
  */
 
 int PA_merge_family(char *base, char *family, int ncpf)
@@ -1159,6 +1173,8 @@ int PA_merge_family(char *base, char *family, int ncpf)
  *                - Also, source files are not split across target files. Both
  *                - of these features are subject to change with some loss of
  *                - efficiency and simplicity.
+ *
+ * #bind PA_merge_files fortran() scheme()
  */
 
 int PA_merge_files(char *base, int n, char **files, int ncpf)
