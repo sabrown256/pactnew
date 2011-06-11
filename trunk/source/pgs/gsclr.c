@@ -2029,7 +2029,7 @@ void PG_show_palettes(PG_device *sdev, char *type, int wbck)
         {PG_clear_window(dev);
          if (!HARDCOPY_DEVICE(dev))
             {dev->current_palette = std_pal;
-             PG_set_font(dev, "helvetica", "medium", 12);
+             PG_fset_font(dev, "helvetica", "medium", 12);
              PG_draw_interface_objects(dev);};
 
          for (i = 0, y = dy; i < 8; i++, y += dy)
@@ -2042,14 +2042,14 @@ void PG_show_palettes(PG_device *sdev, char *type, int wbck)
 
               dev->current_palette = std_pal;
               PG_set_line_color(dev, dev->WHITE);
-              PG_set_font(dev, "helvetica", "medium", 12);
+              PG_fset_font(dev, "helvetica", "medium", 12);
 
 	      p[0] = 0.05;
 	      p[1] = y;
               PG_write_n(dev, 2, WORLDC, p, pal->name);
 
               dev->current_palette = pal;
-              PG_set_font(dev, "helvetica", "medium", 8);
+              PG_fset_font(dev, "helvetica", "medium", 8);
 
               obx[0] = 0.2;
 	      obx[1] = 0.9;

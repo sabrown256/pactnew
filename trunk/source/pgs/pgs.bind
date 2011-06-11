@@ -26,8 +26,11 @@ PG_fget_char_path		yes	yes              none
 PG_fset_char_path		yes	yes              none
 PG_fget_char_up			yes	yes              none
 PG_fset_char_up			yes	yes              none
-PG_get_font			yes	yes              none
-PG_set_font			yes	yes              none
+PG_fget_char_size_n		yes	yes              none
+PG_fset_char_size_n		yes	yes              none
+PG_fget_font			yes	yes              none
+PG_fset_font			yes	yes              none
+
 PG_get_identifier		yes	yes              none
 PG_set_identifier		yes	yes              none
 PG_get_logical_op		yes	yes              none
@@ -61,7 +64,6 @@ PG_set_border_width		yes	yes              none
 PG_set_palette			yes	yes              none
 PG_set_viewport_pos		yes	yes              none
 PG_set_viewport_shape		yes	yes              none
-PG_get_char_size_n		yes	yes              none
 PG_select_color			yes	yes              none
 
 # GSAXIS.C

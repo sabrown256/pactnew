@@ -677,7 +677,7 @@ static PG_device *_PG_IM_open(PG_device *dev, double xf, double yf,
 
         dev->font_family = ff;
 
-        PG_set_font(dev, "helvetica", "medium", 12);
+        PG_fset_font(dev, "helvetica", "medium", 12);
 
 /* put in the default palettes */
         intensity  = dev->max_intensity*MAXPIX;

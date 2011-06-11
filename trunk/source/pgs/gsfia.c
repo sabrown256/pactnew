@@ -144,6 +144,32 @@ void FF_ID(pgscuw, PGSCUW)(FIXNUM *sdid, double *ax)
     return;}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGGCSS - get the char size in NDC */
+
+void FF_ID(pggcss, PGGCSS)(FIXNUM *sdid, double *as)
+   {PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_fget_char_size_n(dev, 2, NORMC, as);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGGCSW - get the char size in WC */
+
+void FF_ID(pggcsw, PGGCSW)(FIXNUM *sdid, double *as)
+   {PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_fget_char_size_n(dev, 2, WORLDC, as);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
 
 
 
@@ -308,12 +334,12 @@ FIXNUM FF_ID(pgsaxa, PGSAXA)(FIXNUM *sdid, FIXNUM *sn,
 /* set attribute values */
     PG_fset_clipping(dev, FALSE);
     PG_set_color_text(dev, txclr, TRUE);
-    PG_set_font(dev, _PG_gattrs.axis_type_face,
-		dev->type_style, dev->type_size);
-    PG_set_char_precision(dev, prec);
+    PG_fset_font(dev, _PG_gattrs.axis_type_face,
+		 dev->type_style, dev->type_size);
     PG_fset_char_path(dev, chpth);
+    PG_fset_char_precision(dev, prec);
     PG_fset_char_up(dev, chup);
-    PG_set_char_space(dev, chsp);
+    PG_fset_char_space(dev, chsp);
     PG_set_color_line(dev, lnclr, TRUE);
     PG_set_line_style(dev, _PG_gattrs.axis_line_style);
     PG_set_line_width(dev, _PG_gattrs.axis_line_width);
@@ -813,46 +839,6 @@ FIXNUM FF_ID(pgfply, PGFPLY)(FIXNUM *sdid, double *ax, double *ay,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PGGCSS - get the char size in NDC */
-
-FIXNUM FF_ID(pggcss, PGGCSS)(FIXNUM *sdid, double *sw, double *sh)
-   {FIXNUM rv;
-    double p[PG_SPACEDM];
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_get_char_size_n(dev, 2, NORMC, p);
-
-    *sw = p[0];
-    *sh = p[1];
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGGCSW - get the char size in WC */
-
-FIXNUM FF_ID(pggcsw, PGGCSW)(FIXNUM *sdid, double *sw, double *sh)
-   {FIXNUM rv;
-    double p[PG_SPACEDM];
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_get_char_size_n(dev, 2, WORLDC, p);
-
-    *sw = p[0];
-    *sh = p[1];
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PGGDPI - get the PostScript dots per inch for 8.5 x 11 page */
 
 FIXNUM FF_ID(pggdpi, PGGDPI)(double *sdpi)
@@ -1059,7 +1045,7 @@ FIXNUM FF_ID(pggtxf, PGGTXF)(FIXNUM *sdid,
     PG_device *dev;
 
     dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_get_font(dev, &f, &st, &ls);
+    PG_fget_font(dev, &f, &st, &ls);
 
     nf = strlen(f);
     ns = strlen(st);
@@ -1847,7 +1833,7 @@ FIXNUM FF_ID(pgstxf, PGSTXF)(FIXNUM *sdid, FIXNUM *sncf, char *face,
     SC_FORTRAN_STR_C(lface, face, *sncf);
     SC_FORTRAN_STR_C(lstyle, style, *sncs);
 
-    PG_set_font(dev, lface, lstyle, (int) *ssz);
+    PG_fset_font(dev, lface, lstyle, (int) *ssz);
 
     rv = TRUE;
 

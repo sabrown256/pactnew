@@ -1084,17 +1084,31 @@ extern PG_device
 
 /* GSACC.C declarations */
 
+extern double
+ PG_fget_char_space(PG_device *dev),
+ PG_fset_char_space(PG_device *dev, double d);
+
 extern int
  PG_fget_clear_mode(void),
  PG_fset_clear_mode(int i),
  PG_fget_clipping(PG_device *dev),
- PG_fset_clipping(PG_device *dev, int flag);
+ PG_fset_clipping(PG_device *dev, int flag),
+ PG_fget_char_precision(PG_device *dev),
+ PG_fset_char_precision(PG_device *dev, int p),
+ PG_fget_fill_bound(PG_device *dev),
+ PG_fset_fill_bound(PG_device *dev, int v),
+ PG_fget_finish_state(PG_device *dev),
+ PG_fset_finish_state(PG_device *dev, int v);
 
 extern void
  PG_fget_char_path(PG_device *dev, double *x),
  PG_fset_char_path(PG_device *dev, double *x),
  PG_fget_char_up(PG_device *dev, double *x),
- PG_fset_char_up(PG_device *dev, double *x);
+ PG_fset_char_up(PG_device *dev, double *x),
+ PG_fget_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double *p),
+ PG_fset_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double *p),
+ PG_fget_font(PG_device *dev, char **of, char **ost, int *osz),
+ PG_fset_font(PG_device *dev, char *face, char *style, int sz);
 
 
 /* GSATTR.C declarations */
@@ -1591,11 +1605,7 @@ extern PG_dev_attributes
  *PG_get_attributes(PG_device *dev);
 
 extern void
- PG_get_char_space(PG_device *dev, double *pcsp),
- PG_get_char_precision(PG_device *dev, int *pcp),
  PG_get_line_width(PG_device *dev, double *plw),
- PG_get_font(PG_device *dev, char **pf, char **pst, int *psz),
- PG_get_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double *p),
  PG_get_line_style(PG_device *dev, int *pl),
  PG_get_logical_op(PG_device *dev, PG_logical_operation *plop),
  PG_get_text_ext_n(PG_device *dev, int nd, PG_coord_sys cs, char *s, double *p),

@@ -84,7 +84,7 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
     pl = dev->current_palette;
 
     clp = PG_fget_clipping(dev);
-    PG_get_font(dev, &face, &style, &size);
+    PG_fget_font(dev, &face, &style, &size);
     PG_get_text_color(dev, &color);
     PG_set_text_color(dev, dev->WHITE);
 /*
@@ -105,7 +105,7 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
 	xb[1] = 0;
 	PG_trans_point(dev, 2, PIXELC, xb, WORLDC, xb);
         if (_PG_gattrs.plot_date == TRUE)
-           {PG_set_font(dev, face, style, 6);
+           {PG_fset_font(dev, face, style, 6);
             memset(label, '\0', MAXLINE);
 	    s = SC_date();
             strcpy(label, s);
@@ -123,7 +123,7 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
             PG_write_n(dev, 2, WORLDC, p, label);};}
 
     PG_get_viewspace(dev, WORLDC, wc);
-    PG_set_font(dev, face, style, lts);
+    PG_fset_font(dev, face, style, lts);
 
     sx[0] = 0.0;
     sx[1] = 0.992;
@@ -142,7 +142,7 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
        {PG_fset_clipping(dev, clp);
         PG_set_text_color(dev, color);
         PG_set_axis_log_scale(dev, 2, oflg);
-        PG_set_font(dev, face, style, size);
+        PG_fset_font(dev, face, style, size);
         return;};
 
     PG_get_text_ext_n(dev, 2, NORMC, "FILE", dxt);
@@ -305,7 +305,7 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
     PG_fset_clipping(dev, clp);
     PG_set_text_color(dev, color);
     PG_set_axis_log_scale(dev, 2, oflg);
-    PG_set_font(dev, face, style, size);
+    PG_fset_font(dev, face, style, size);
 
     CFREE(face);
     CFREE(style);

@@ -365,7 +365,6 @@
 #define DEVICE_MARKER(_o)                 (SS_GET(PG_device, _o)->marker)
 #define DEVICE_MODE(_o)                   (SS_GET(PG_device, _o)->mode)
 #define DEVICE_NAME(_o)                   (SS_GET(PG_device, _o)->name)
-#define DEVICE_N_CHAR_LINE(_o)            (SS_GET(PG_device, _o)->n_char_line)
 #define DEVICE_NCOLOR(_o)                 (SS_GET(PG_device, _o)->ncolor)
 #define DEVICE_N_LINES_PAGE(_o)           (SS_GET(PG_device, _o)->n_lines_page)
 #define DEVICE_NLINES(_o)                 (SS_GET(PG_device, _o)->nlines)

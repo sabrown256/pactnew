@@ -311,7 +311,7 @@ static PG_device *_PG_CGM_open(PG_device *dev,
 
     CFREE(font_name);
 
-    PG_set_font(dev, "helvetica", "medium", 12);
+    PG_fset_font(dev, "helvetica", "medium", 12);
 
 /* put in the default palettes */
     PG_setup_standard_palettes(dev, 64,

@@ -932,7 +932,7 @@ static object *_SXI_gcss(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_GCSS", SS_null);
 
-    PG_get_char_size_n(dev, 2, NORMC, x);
+    PG_fget_char_size_n(dev, 2, NORMC, x);
 
     o = SS_make_list(si, SC_DOUBLE_I, &x[0],
 		     SC_DOUBLE_I, &x[1],
@@ -1008,7 +1008,7 @@ static object *_SXI_gfin(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_GFIN", SS_null);
 
-    PG_get_finish_state(dev, fl);
+    fl = PG_fget_finish_state(dev);
 
     o = SS_mk_integer(si, fl);
 
@@ -1221,7 +1221,7 @@ static object *_SXI_gtxf(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_GTXF", SS_null);
 
-    PG_get_font(dev, &face, &style, &size);
+    PG_fget_font(dev, &face, &style, &size);
 
     ret = SS_make_list(si, SC_STRING_I, face,
                        SC_STRING_I, style,
@@ -1671,7 +1671,7 @@ static object *_SXI_sfin(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_SFIN", SS_null);
 
-    PG_set_finish_state(dev, c);
+    PG_fset_finish_state(dev, c);
 
     return(SS_f);}
 
@@ -1968,7 +1968,7 @@ static object *_SXI_stxf(SS_psides *si, object *argl)
 	if (style == NULL)
 	   style = CSTRSAVE("medium");
 
-	PG_set_font(dev, face, style, size);};
+	PG_fset_font(dev, face, style, size);};
 
     CFREE(face);
     CFREE(style);

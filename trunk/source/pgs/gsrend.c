@@ -552,7 +552,6 @@ static void _PG_legend_contours(PG_device *dev, PG_picture_desc *pd,
 
 	PG_set_axis_log_scale(dev, 2, nflg);
 
-	PG_set_char_line(dev, 100);
 	PG_get_text_ext_n(dev, 2, NORMC, "XX ", dxt);
 
 	dt = 1.02*dxt[1];
@@ -660,8 +659,6 @@ static void _PG_legend_contours(PG_device *dev, PG_picture_desc *pd,
 		 PM_free_vectors(2, r);
 	         break;};
              
-	PG_set_char_line(dev, 80);
-
 	PG_set_axis_log_scale(dev, 2, oflg);};
 
     PG_make_palette_current(dev, opl);
@@ -980,7 +977,7 @@ void PG_draw_picture(PG_device *dev, PM_mapping *f,
        return;
 
 /* save device attributes */
-    PG_get_fill_bound(dev, fls);
+    fls = PG_fget_fill_bound(dev);
     axs = _PG_gattrs.axis_on;
 
 /* set device attributes */
@@ -1092,7 +1089,7 @@ void PG_draw_picture(PG_device *dev, PM_mapping *f,
     dev->supress_setup = FALSE;
 
 /* restore device attributes */
-    PG_set_fill_bound(dev, fls);
+    PG_fset_fill_bound(dev, fls);
     _PG_gattrs.axis_on = axs;
 
     _PG_gattrs.plot_title = save_pt;

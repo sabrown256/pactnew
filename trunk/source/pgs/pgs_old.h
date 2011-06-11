@@ -582,7 +582,11 @@ extern "C" {
 extern void
  PG_get_clipping(PG_device *dev, int *flag),
  PG_get_char_path(PG_device *dev, double *px, double *py),
- PG_get_char_up(PG_device *dev, double *px, double *py);
+ PG_get_char_up(PG_device *dev, double *px, double *py),
+ PG_get_char_precision(PG_device *dev, int *pcp),
+ PG_get_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double *p),
+ PG_get_char_space(PG_device *dev, double *pcsp),
+ PG_get_font(PG_device *dev, char **pf, char **pst, int *psz);
 
 
 /* GSOLD.C declarations */

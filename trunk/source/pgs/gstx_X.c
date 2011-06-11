@@ -260,7 +260,7 @@ static PG_device *_PG_X_txt_open_screen(PG_device *dev, double dxf, double dyf)
 
     dev->font_family = ff;
 
-    PG_set_font(dev, "helvetica", "medium", 12);
+    PG_fset_font(dev, "helvetica", "medium", 12);
     for (i = 0; dev->font_info == NULL; i++)
         {if (i > 3)
 	    return(NULL);
@@ -622,7 +622,7 @@ int _PG_X_draw_text(PG_device *dev, char *s, double *x)
 
 /* otherwise you asked for it */
     else
-       {PG_get_font(dev, &face, &sty, &sz);
+       {PG_fget_font(dev, &face, &sty, &sz);
 
 	if (_PG.txtd == NULL)
 	   {_PG.txtd = PG_make_device("SCREEN", "COLOR", "TextBuffer");
@@ -665,7 +665,7 @@ int _PG_rst_draw_text(PG_device *dev, char *s)
 
     nd = 2;
 
-    PG_get_font(dev, &face, &sty, &sz);
+    PG_fget_font(dev, &face, &sty, &sz);
 
     bc = dev->BLACK;
     PG_get_text_color(dev, &fc);

@@ -153,27 +153,227 @@ void PG_fset_char_up(PG_device *dev, double *x)
     return;}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_CHAR_PRECISION - return the device character precision
+ *                        - defaults to 1
+ *
+ * #bind PG_fget_char_precision fortran() scheme()
+ */
+
+int PG_fget_char_precision(PG_device *dev)
+   {int rv;
+
+    if (dev != NULL)
+       rv = dev->char_precision;
+    else
+       rv = 1;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_CHAR_PRECISION - set the device character precision
+ *
+ * #bind PG_fset_char_precision fortran() scheme()
+ */
+
+int PG_fset_char_precision(PG_device *dev, int p)
+   {
+
+    if (dev != NULL)
+       {if (dev->set_char_precision != NULL)
+           (*dev->set_char_precision)(dev, p);};
+
+    return(p);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_CHAR_SIZE_N - return the character size in CS
+ *
+ * #bind PG_fget_char_size_n fortran() scheme()
+ */
+
+void PG_fget_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double *p)
+   {
+
+    if (dev != NULL)
+       {p[0] = dev->char_height_s;
+	p[1] = dev->char_width_s;}
+    else
+       {p[0] = 0.0;
+	p[1] = 0.0;};
+
+    PG_trans_point(dev, nd, NORMC, p, cs, p);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_CHAR_SIZE_N - return the character size in CS
+ *
+ * #bind PG_fset_char_size_n fortran() scheme()
+ */
+
+void PG_fset_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double *p)
+   {
+
+    if (dev != NULL)
+       {if (dev->set_char_size != NULL)
+           (*dev->set_char_size)(dev, nd, cs, p);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_CHAR_SPACE - inquire about the space
+ *                    - to be used between characters
+ *                    - defaults to 0.0
+ *
+ * #bind PG_fget_char_space fortran() scheme()
+ */
+
+double PG_fget_char_space(PG_device *dev)
+   {double d;
+
+    if (dev != NULL)
+       d = dev->char_space;
+    else
+       d = 0.0;
+
+    return(d);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_CHAR_SPACE - set the space
+ *                    - to be used between characters
+ *
+ * #bind PG_fset_char_space fortran() scheme()
+ */
+
+double PG_fset_char_space(PG_device *dev, double d)
+   {
+
+    if (dev != NULL)
+       {if (dev->set_char_space != NULL)
+           (*dev->set_char_space)(dev, d);};
+
+    return(d);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_FILL_BOUND - return the device draw_fill_bound flag
+ *                    - defaults to FALSE
+ *
+ * #bind PG_fget_fill_bound fortran() scheme()
+ */
+
+int PG_fget_fill_bound(PG_device *dev)
+   {int rv;
+
+    if (dev != NULL)
+       rv = dev->draw_fill_bound;
+    else
+       rv = FALSE;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_FILL_BOUND - set the device draw_fill_bound flag
+ *
+ * #bind PG_fset_fill_bound fortran() scheme()
+ */
+
+int PG_fset_fill_bound(PG_device *dev, int v)
+   {
+
+    if (dev != NULL)
+       dev->draw_fill_bound = v;
+
+    return(v);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_FINISH_STATE - return the device finished flag
+ *                      - defaults to TRUE
+ *
+ * #bind PG_fget_finish_state fortran() scheme()
+ */
+
+int PG_fget_finish_state(PG_device *dev)
+   {int rv;
+
+    if (dev != NULL)
+       rv = dev->finished;
+    else
+       rv = TRUE;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_FINISH_STATE - set the device finished flag
+ *
+ * #bind PG_fset_finish_state fortran() scheme()
+ */
+
+int PG_fset_finish_state(PG_device *dev, int v)
+   {
+
+    if (dev != NULL)
+       dev->finished = v;
+
+    return(v);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_FONT - return the current font info
+ *
+ * #bind PG_fget_font fortran() scheme()
+ */
+
+void PG_fget_font(PG_device *dev, char **of, char **ost, int *osz)
+   {
+
+    *of  = CSTRSAVE(dev->type_face);
+    *ost = CSTRSAVE(dev->type_style);
+    *osz = dev->type_size;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_FONT - return the current font info
+ *
+ * #bind PG_fset_font fortran() scheme()
+ */
+
+void PG_fset_font(PG_device *dev, char *face, char *style, int sz)
+   {
+
+    if (dev != NULL)
+       {if (dev->set_font != NULL)
+           (*dev->set_font)(dev, face, style, sz);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
 
 #if 0
 
 /*--------------------------------------------------------------------------*/
-
-#define PG_fget_fill_bound(d, v)                                              \
-   (v = (d != NULL) ?  d->draw_fill_bound : 0)
-#define PG_fset_fill_bound(d, v)                                              \
-   {if (d != NULL)                                                         \
-       d->draw_fill_bound = (v);}
-
-#define PG_fget_finish_state(d, v)                                            \
-   (v = (d != NULL) ? d->finished : 0)
-#define PG_fset_finish_state(d, v)                                            \
-   {if (d != NULL)                                                         \
-       d->finished = (v);}
-
-#define PG_fset_font(d, face, style, size)                                    \
-    if (d != NULL)                                                         \
-       {if (d->set_font != NULL)                                           \
-           (*d->set_font)(d, face, style, size);}
 
 #define PG_fget_identifier(g, i)                                              \
    (((g) != NULL) ? i = (g)->identifier : 'A')
@@ -306,26 +506,6 @@ void PG_fset_char_up(PG_device *dev, double *x)
     if (d != NULL)                                                         \
        {if (d->set_text_color != NULL)                                     \
            (*d->set_text_color)(d, color, mapped);}
-
-#define PG_fset_char_precision(d, p)                                          \
-    if (d != NULL)                                                         \
-       {if (d->set_char_precision != NULL)                                 \
-           (*d->set_char_precision)(d, p);}
-
-#define PG_fset_char_space(d, s)                                              \
-    if (d != NULL)                                                         \
-       {if (d->set_char_space != NULL)                                     \
-           (*d->set_char_space)(d, s);}
-
-#define PG_fset_char_size_n(d, nd, cs, x)                                     \
-    if (d != NULL)                                                         \
-       {if (d->set_char_size != NULL)                                      \
-           (*d->set_char_size)(d, nd, cs, x);}
-
-#define PG_fset_char_line(d, n)                                               \
-    if (d != NULL)                                                         \
-       {if (d->set_char_line != NULL)                                      \
-           (*d->set_char_line)(d, n);}
 
 #define PG_fset_fill_color(d, color)                                          \
     if (d != NULL)                                                         \

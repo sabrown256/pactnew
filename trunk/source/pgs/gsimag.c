@@ -1130,8 +1130,8 @@ void PG_draw_2dpalette(PG_device *dev, double *frm, double *rex, double wid)
        {hvf   = HORIZONTAL;
         scale = (frm[1] - frm[0])/(rex[1] - rex[0] + SMALL);
 
-        PG_get_font(dev, &face, &style, &fsize);
-        PG_set_font(dev, face, style, 8);
+        PG_fget_font(dev, &face, &style, &fsize);
+        PG_fset_font(dev, face, style, 8);
         
 	xl[0] = frm[0];
 	xl[1] = frm[2];
@@ -1159,7 +1159,7 @@ void PG_draw_2dpalette(PG_device *dev, double *frm, double *rex, double wid)
 		       AXIS_TICK_LEFT, AXIS_TICK_LEFT, FALSE,
 		       AXIS_TICK_MAJOR | AXIS_TICK_NONE | AXIS_TICK_LABEL, 0);
 
-        PG_set_font(dev, face, style, fsize);
+        PG_fset_font(dev, face, style, fsize);
 
         dev->current_palette = pal;}
 

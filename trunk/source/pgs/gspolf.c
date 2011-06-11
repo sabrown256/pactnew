@@ -122,7 +122,7 @@ static void PG_fill_hand(PG_device *dev, PG_graph *g,
 			 PFPolfZC fnc_zc, PFPolfNC fnc_nc)
    {int i, npts, clip, prec, nd, same, sid;
     char bf[MAXLINE], *mtype, *s;
-    double charspace;
+    double chsp;
     double dextr[4], chup[PG_SPACEDM], chpth[PG_SPACEDM];
     double **afs, **afd, **r, **d;
     double *fextr, *rextr, *aext;
@@ -181,18 +181,18 @@ static void PG_fill_hand(PG_device *dev, PG_graph *g,
 	 attr = PG_get_attributes(dev);
 
 /* set attribute values */
-	 clip      = TRUE;
-	 prec      = TEXT_CHARACTER_PRECISION;
-	 charspace = 0.0;
-	 chup[0]   = 0.0;
-	 chup[1]   = 1.0;
-	 chpth[0]  = 1.0;
-	 chpth[1]  = 0.0;
+	 clip     = TRUE;
+	 prec     = TEXT_CHARACTER_PRECISION;
+	 chsp     = 0.0;
+	 chup[0]  = 0.0;
+	 chup[1]  = 1.0;
+	 chpth[0] = 1.0;
+	 chpth[1] = 0.0;
 	 PG_fset_clipping(dev, clip);
 	 PG_fset_char_path(dev, chpth);
-	 PG_set_char_precision(dev, prec);
+	 PG_fset_char_precision(dev, prec);
 	 PG_fset_char_up(dev, chup);
-	 PG_set_char_space(dev, charspace);
+	 PG_fset_char_space(dev, chsp);
   
 	 cnnct = PM_connectivity(h);
 
