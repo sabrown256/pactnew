@@ -455,7 +455,7 @@ int _PG_X_txt_place_image(PG_device *src, int *dx,
     int ir[PG_SPACEDM], ip[PG_SPACEDM];
     unsigned long msk;
     unsigned char *sr, *dr, *dg, *db;
-    double ca, sa;
+    double dc[PG_SPACEDM];
     XImage *xi;
     frame *img;
     PG_RAST_device *mdv;
@@ -493,7 +493,7 @@ int _PG_X_txt_place_image(PG_device *src, int *dx,
 	pxss = xi->bits_per_pixel >> 3;
 	bprs = xi->bytes_per_line;
 
-	PG_get_char_path(dst, &ca, &sa);
+	PG_fget_char_path(dst, dc);
 
 	for (iy = 0; iy < dx[1]; iy++)
 	    {sr = (unsigned char *) (xi->data + bprs*iy);
@@ -504,8 +504,8 @@ int _PG_X_txt_place_image(PG_device *src, int *dx,
 		      bi  = sr[2];
 		      sr += pxss;
 
-		      ir[0] =  ix*ca + iy*sa;
-		      ir[1] = -ix*sa + iy*ca;
+		      ir[0] =  ix*dc[0] + iy*dc[1];
+		      ir[1] = -ix*dc[1] + iy*dc[0];
 
 		      ip[0] = xo[0] + ir[0];
 		      ip[1] = xo[1] + ir[1];
@@ -525,8 +525,8 @@ int _PG_X_txt_place_image(PG_device *src, int *dx,
 		      ri  = sr[2];
 		      sr += pxss;
 
-		      ir[0] =  ix*ca + iy*sa;
-		      ir[1] = -ix*sa + iy*ca;
+		      ir[0] =  ix*dc[0] + iy*dc[1];
+		      ir[1] = -ix*dc[1] + iy*dc[0];
 
 		      ip[0] = xo[0] + ir[0];
 		      ip[1] = xo[1] + ir[1];
@@ -566,7 +566,7 @@ int _PG_X_txt_place_text(PG_device *src, int *dx,
    {int ok;
     int dir, asc, dsc;
     unsigned long msk;
-    double ca, sa;
+    double dc[PG_SPACEDM];
     XCharStruct overall;
     XFontStruct *fnt;
     XImage *si;
@@ -579,13 +579,13 @@ int _PG_X_txt_place_text(PG_device *src, int *dx,
 	xo[1] -= asc;
 	dx[0] += 2*pad;
 
-	PG_get_char_path(dst, &ca, &sa);
+	PG_fget_char_path(dst, dc);
 	msk = AllPlanes;
 	si  = XGetImage(src->display, src->pixmap,
 			0, 0, dx[0], dx[1], msk, ZPixmap);
 
 	ok = _PG_X_put_ximage(dst, si, bc, src->BLACK, src->WHITE,
-			      xo, dx, ca, sa, FALSE);
+			      xo, dx, dc[0], dc[1], FALSE);
 
 	XDestroyImage(si);};
 
@@ -603,7 +603,7 @@ int _PG_X_draw_text(PG_device *dev, char *s, double *x)
    {int id, nd;
     int ok, bc, fc, sz, pad;
     int ir[PG_SPACEDM], dx[PG_SPACEDM];
-    double ca, sa;
+    double dc[PG_SPACEDM];
     char *face, *sty;
 
     nd = 2;
@@ -611,12 +611,12 @@ int _PG_X_draw_text(PG_device *dev, char *s, double *x)
     for (id = 0; id < nd; id++)
         ir[id] = x[id];
 
-    PG_get_char_path(dev, &ca, &sa);
+    PG_fget_char_path(dev, dc);
 
     PG_QUAD_FOUR_POINT(dev, ir);
 
 /* if the text path is horizontal left to right do the quick thing */
-    if ((ca == 1.0) && (sa == 0.0))
+    if ((dc[0] == 1.0) && (dc[1] == 0.0))
        ok = XDrawString(dev->display, PG_X11_DRAWABLE(dev), dev->gc,
 			ir[0], ir[1], s, strlen(s));
 

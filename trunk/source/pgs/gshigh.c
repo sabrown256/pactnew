@@ -83,7 +83,7 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
     yo = *pyo;
     pl = dev->current_palette;
 
-    PG_get_clipping(dev, &clp);
+    clp = PG_fget_clipping(dev);
     PG_get_font(dev, &face, &style, &size);
     PG_get_text_color(dev, &color);
     PG_set_text_color(dev, dev->WHITE);
@@ -96,7 +96,7 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
 
     PG_get_axis_log_scale(dev, 2, oflg);
     PG_set_axis_log_scale(dev, 2, nflg);
-    PG_set_clipping(dev, FALSE);
+    PG_fset_clipping(dev, FALSE);
 
     PG_get_viewspace(dev, BOUNDC, bnd);
 
@@ -139,7 +139,7 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
 	     dxtfile = max(dxtfile, dxt[0]);};};
 
     if (nlabs <= 0)
-       {PG_set_clipping(dev, clp);
+       {PG_fset_clipping(dev, clp);
         PG_set_text_color(dev, color);
         PG_set_axis_log_scale(dev, 2, oflg);
         PG_set_font(dev, face, style, size);
@@ -302,7 +302,7 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
 
 	 yo -= dxt[1];};
 
-    PG_set_clipping(dev, clp);
+    PG_fset_clipping(dev, clp);
     PG_set_text_color(dev, color);
     PG_set_axis_log_scale(dev, 2, oflg);
     PG_set_font(dev, face, style, size);

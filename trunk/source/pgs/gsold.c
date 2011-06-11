@@ -640,4 +640,47 @@ void PG_fill_polygon(PG_device *dev, int color, int mapped,
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+ 
+/* PG_GET_CLIPPING - return the state of the clipping */
+
+void PG_get_clipping(PG_device *dev, int *flag)
+   {
+
+    *flag = dev->clipping;
+
+    return;}
+ 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_GET_CHAR_PATH - return the direction in which text is to be written
+ *                  - defaults to (1, 0)
+ */
+
+void PG_get_char_path(PG_device *dev, double *px, double *py)
+   {
+
+    *px = dev->char_path[0];
+    *py = dev->char_path[1];
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_GET_CHAR_UP - inquire about the direction which constitutes up for
+ *                - the characters
+ *                - defaults to (0, 1)
+ */
+
+void PG_get_char_up(PG_device *dev, double *px, double *py)
+   {
+
+    *px = dev->char_up[0];
+    *py = dev->char_up[1];
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 

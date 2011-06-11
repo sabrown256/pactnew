@@ -667,7 +667,7 @@ static void _PG_draw_surface(PG_device *dev, int nd,
     for (i = 0; i < 4; i++)
         iext[i] = dext[i];
 
-    PG_set_clipping(dev, FALSE);
+    PG_fset_clipping(dev, FALSE);
 
 /* find mins and maxes for the integer mesh */
     PM_vector_extrema(1, nn, &r[2], vext);
@@ -969,7 +969,7 @@ PG_picture_desc *PG_setup_picture_surface(PG_device *dev, PG_graph *data,
 	    PG_set_view_angle(dev, pd->va[0], pd->va[1], pd->va[2]);};
 
 /* set surface plot attribute values */
-	PG_set_clipping(dev, FALSE);};
+	PG_fset_clipping(dev, FALSE);};
 
     return(pd);}
 

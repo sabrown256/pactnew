@@ -2068,7 +2068,7 @@ attribute where called for.<p>
 
 <p>
 
-<I>C Binding: </I>int PG_set_clear_mode(int mode)
+<I>C Binding: </I>int PG_fset_clear_mode(int mode)
 <BR><I>Fortran Binding: </I>integer pgsclm(integer mode)
 <BR><I>SX Binding: </I>
 <P>
@@ -2109,13 +2109,13 @@ Get the I/O buffer size for graphics files.<p>
 
 <p>
 
-<I>C Binding: </I>int PG_get_clear_mode(void)
+<I>C Binding: </I>int PG_fget_clear_mode(void)
 <BR><I>Fortran Binding: </I>integer pggclm(void)
 <BR><I>SX Binding: </I>
 <P>
 Get the current value of the global mode which the high level rendering
 routines use to interpret what it means to clear the current picture. See
-PG_set_clear_mode for a fuller discussion.<p>
+PG_fset_clear_mode for a fuller discussion.<p>
 
 <p>
 
@@ -2466,7 +2466,7 @@ Set the I/O buffer size for graphics files.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_set_clipping(PG_device *dev, int flag)
+<I>C Binding: </I>void PG_fset_clipping(PG_device *dev, int flag)
 <BR><I>Fortran Binding: </I>integer pgsclp(integer devid, integer c)
 <BR><I>SX Binding: </I>(pg-set-clipping! dev flag)
 <P>
@@ -2703,8 +2703,8 @@ Get the values of the specified attributes in the PM_set s.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_get_clipping(PG_device *dev, int *flag)
-<BR><I>Fortran Binding: </I>integer pggclp(integer devid, integer flag)
+<I>C Binding: </I>int PG_fget_clipping(PG_device *dev)
+<BR><I>Fortran Binding: </I>integer pggclp(integer devid)
 <BR><I>SX Binding: </I>(pg-clipping? dev)
 <P>
 Get the current clipping state for the specified device in flag.<p>
@@ -3077,8 +3077,8 @@ This routine sets the spacing between characters in world coordinates.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_set_char_up(PG_device *dev, double x, double y)
-<BR><I>Fortran Binding: </I>integer pgscuw(integer devid, REAL x, REAL y)
+<I>C Binding: </I>void PG_fset_char_up(PG_device *dev, double *x)
+<BR><I>Fortran Binding: </I>void pgscuw(integer devid, REAL *x)
 <BR><I>SX Binding: </I>(pg-set-char-up! dev x y)
 <P>
 This routine sets the direction along which characters will be oriented. This
@@ -3138,8 +3138,8 @@ This routine returns the spacing between characters in world coordinates.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_get_char_up(PG_device *dev, double *px, double *py)
-<BR><I>Fortran Binding: </I>integer pggcuw(integer devid, REAL x, REAL y)
+<I>C Binding: </I>void PG_fget_char_up(PG_device *dev, double *x)
+<BR><I>Fortran Binding: </I>void pggcuw(integer devid, REAL *x)
 <BR><I>SX Binding: </I>(pg-character-up dev)
 <P>
 This routine returns the direction along which characters will be oriented.
@@ -3625,7 +3625,7 @@ associate the attribute with its position in the string attrs.<p>
 </TABLE>
 </BLOCKQUOTE>
 
-<P><I>C Binding: </I>double PG_get_axis_decades(void)
+<P><I>C Binding: </I>double PG_fget_axis_decades(void)
 <BR><I>Fortran Binding: </I>integer pggaxd(real d)
 <BR><I>SX Binding: </I>
 <P>
@@ -3636,7 +3636,7 @@ number of decades plotted. In this way, potentially ill-defined logarithmic
 values (such as very small positive numbers) don&#146;t interfere with the
 display of otherwise fine values.<p>
 
-<I>C Binding: </I>void PG_set_axis_decades(double d)
+<I>C Binding: </I>void PG_fset_axis_decades(double d)
 <BR><I>Fortran Binding: </I>integer pgsaxd(real d)
 <BR><I>SX Binding: </I>
 <P>

@@ -697,7 +697,7 @@ static void PG_iso_hand(PG_device *dev, PG_graph *g, PG_picture_desc *pd,
     if (dev == NULL)
        return;
 
-    PG_set_clipping(dev, TRUE);
+    PG_fset_clipping(dev, TRUE);
 
     nlev = pd->n_levels;
     lev  = pd->levels;

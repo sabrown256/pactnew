@@ -19,7 +19,7 @@
 double FF_ID(pggaxd, PGGAXD)(void)
    {double d;
 
-    d = PG_get_axis_decades();
+    d = PG_fget_axis_decades();
 
     return(d);}
 
@@ -33,7 +33,7 @@ double FF_ID(pgsaxd, PGSAXD)(double *sd)
 
     d = *sd;
 
-    PG_set_axis_decades(d);
+    PG_fset_axis_decades(d);
 
     return(d);}
 
@@ -45,7 +45,7 @@ double FF_ID(pgsaxd, PGSAXD)(double *sd)
 FIXNUM FF_ID(pggclm, PGGCLM)(void)
    {FIXNUM rv;
 
-    rv = PG_get_clear_mode();
+    rv = PG_fget_clear_mode();
 
     return(rv);}
 
@@ -59,9 +59,89 @@ FIXNUM FF_ID(pgsclm, PGSCLM)(FIXNUM *sc)
 
     rv = *sc;
 
-    PG_set_clear_mode(rv);
+    PG_fset_clear_mode(rv);
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGGCLP - get the clipping */
+
+FIXNUM FF_ID(pggclp, PGGCLP)(FIXNUM *sdid)
+   {FIXNUM rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    rv  = PG_fget_clipping(dev);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSCLP - set the clipping */
+
+FIXNUM FF_ID(pgsclp, PGSCLP)(FIXNUM *sdid, FIXNUM *sc)
+   {FIXNUM rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    rv  = PG_fset_clipping(dev, *sc);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGGCPW - get the char path direction in WC */
+
+void FF_ID(pggcpw, PGGCPW)(FIXNUM *sdid, double *ax)
+   {PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_fget_char_path(dev, ax);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSCPW - set the char path direction in WC */
+
+void FF_ID(pgscpw, PGSCPW)(FIXNUM *sdid, double *ax)
+   {PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_fset_char_path(dev, ax);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGGCUW - get the char up direction in WC */
+
+void FF_ID(pggcuw, PGGCUW)(FIXNUM *sdid, double *ax)
+   {PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_fget_char_up(dev, ax);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSCUW - set the char up direction in WC */
+
+void FF_ID(pgscuw, PGSCUW)(FIXNUM *sdid, double *ax)
+   {PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_fset_char_up(dev, ax);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 
@@ -117,7 +197,8 @@ FIXNUM FF_ID(pgsaxa, PGSAXA)(FIXNUM *sdid, FIXNUM *sn,
 			     double *aat, char *patc)
    {int i, nc, nn, type, lnclr, txclr, prec;
     double *attr;
-    double chsp, chupx, chupy, chpthx, chpthy;
+    double chsp;
+    double chup[PG_SPACEDM], chpth[PG_SPACEDM];
     char *pc, bf[MAXLINE];
     PG_device *dev;
 
@@ -141,10 +222,10 @@ FIXNUM FF_ID(pgsaxa, PGSAXA)(FIXNUM *sdid, FIXNUM *sn,
        _PG_gattrs.axis_type_face = CSTRSAVE("helvetica");
 
     chsp   = 0.0;
-    chpthx = 1.0;
-    chpthy = 0.0;
-    chupx  = 0.0;
-    chupy  = 1.0;
+    chpth[0] = 1.0;
+    chpth[1] = 0.0;
+    chup[0]  = 0.0;
+    chup[1]  = 1.0;
 
     _PG_gattrs.axis_grid_on = FALSE;
 
@@ -221,17 +302,17 @@ FIXNUM FF_ID(pgsaxa, PGSAXA)(FIXNUM *sdid, FIXNUM *sn,
              default :
                   return(FALSE);};};
 
-    chpthx = sin(_PG_gattrs.axis_char_angle);
-    chpthy = cos(_PG_gattrs.axis_char_angle);
+    chpth[0] = sin(_PG_gattrs.axis_char_angle);
+    chpth[1] = cos(_PG_gattrs.axis_char_angle);
 
 /* set attribute values */
-    PG_set_clipping(dev, FALSE);
+    PG_fset_clipping(dev, FALSE);
     PG_set_color_text(dev, txclr, TRUE);
     PG_set_font(dev, _PG_gattrs.axis_type_face,
 		dev->type_style, dev->type_size);
     PG_set_char_precision(dev, prec);
-    PG_set_char_path(dev, chpthx, chpthy);
-    PG_set_char_up(dev, chupx, chupy);
+    PG_fset_char_path(dev, chpth);
+    PG_fset_char_up(dev, chup);
     PG_set_char_space(dev, chsp);
     PG_set_color_line(dev, lnclr, TRUE);
     PG_set_line_style(dev, _PG_gattrs.axis_line_style);
@@ -732,41 +813,6 @@ FIXNUM FF_ID(pgfply, PGFPLY)(FIXNUM *sdid, double *ax, double *ay,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PGGCLP - get the clipping */
-
-FIXNUM FF_ID(pggclp, PGGCLP)(FIXNUM *sdid, FIXNUM *sc)
-   {int flg;
-    FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_get_clipping(dev, &flg);
-
-    *sc = flg;
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGGCPW - get the char path direction in WC */
-
-FIXNUM FF_ID(pggcpw, PGGCPW)(FIXNUM *sdid, double *sx, double *sy)
-   {FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_get_char_path(dev, sx, sy);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PGGCSS - get the char size in NDC */
 
 FIXNUM FF_ID(pggcss, PGGCSS)(FIXNUM *sdid, double *sw, double *sh)
@@ -799,22 +845,6 @@ FIXNUM FF_ID(pggcsw, PGGCSW)(FIXNUM *sdid, double *sw, double *sh)
 
     *sw = p[0];
     *sh = p[1];
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGGCUW - get the char up direction in WC */
-
-FIXNUM FF_ID(pggcuw, PGGCUW)(FIXNUM *sdid, double *sx, double *sy)
-   {FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_get_char_up(dev, sx, sy);
 
     rv = TRUE;
 
@@ -1540,54 +1570,6 @@ FIXNUM FF_ID(pgsbsz, PGSBSZ)(FIXNUM *ssz)
     sz = *ssz;
     PG_set_buffer_size(sz);
     rv = sz;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGSCLP - set the clipping */
-
-FIXNUM FF_ID(pgsclp, PGSCLP)(FIXNUM *sdid, FIXNUM *sc)
-   {FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_set_clipping(dev, (int) *sc);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGSCPW - set the char path direction in WC */
-
-FIXNUM FF_ID(pgscpw, PGSCPW)(FIXNUM *sdid, double *sx, double *sy)
-   {FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_set_char_path(dev, (double) *sx, (double) *sy);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGSCUW - set the char up direction in WC */
-
-FIXNUM FF_ID(pgscuw, PGSCUW)(FIXNUM *sdid, double *sx, double *sy)
-   {FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_set_char_up(dev, (double) *sx, (double) *sy);
-
-    rv = TRUE;
 
     return(rv);}
 

@@ -292,7 +292,7 @@ PG_picture_desc *PG_setup_picture_image(PG_device *dev, PG_graph *data,
 	CFREE(ddex);
 	CFREE(rdex);
 
-	PG_set_clipping(dev, FALSE);};
+	PG_fset_clipping(dev, FALSE);};
 
     return(pd);}
 

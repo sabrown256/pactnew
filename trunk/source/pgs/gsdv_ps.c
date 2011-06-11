@@ -575,12 +575,12 @@ static void _PG_PS_clear_window(PG_device *dev)
     dev->raster = NULL;
 
 /* NOTE: this is critical for the correct balancing of
- *       gsave's and grestore's used by PG_set_clipping,
+ *       gsave's and grestore's used by PG_fset_clipping,
  *       PG_clear_window, and PG_finish_plot
  */
     if (dev->clipping)
        {dev->clipping = FALSE;
-        PG_set_clipping(dev, TRUE);};
+        PG_fset_clipping(dev, TRUE);};
 
     return;}
  

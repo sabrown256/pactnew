@@ -100,8 +100,8 @@ static void PG_dvb_hand(PG_device *dev, PG_graph *g, PFDvbZC fnc_zc,
     int color, style;
     int *afd, *aext;
     char bf[MAXLINE], *mtype, *s;
-    double charspace, chupx, chupy;
-    double chpthx, chpthy, width;
+    double charspace, width;
+    double chup[PG_SPACEDM], chpth[PG_SPACEDM];
     double *afs, **r, **d;
     double dextr[4], *fextr, *rextr, *aextr;
     void *cnnct;
@@ -171,14 +171,14 @@ static void PG_dvb_hand(PG_device *dev, PG_graph *g, PFDvbZC fnc_zc,
 	 clip      = TRUE;
 	 prec      = TEXT_CHARACTER_PRECISION;
 	 charspace = 0.0;
-	 chupx     = 0.0;
-	 chupy     = 1.0;
-	 chpthx    = 1.0;
-	 chpthy    = 0.0;
-	 PG_set_clipping(dev, clip);
+	 chup[0]     = 0.0;
+	 chup[1]     = 1.0;
+	 chpth[0]    = 1.0;
+	 chpth[1]    = 0.0;
+	 PG_fset_clipping(dev, clip);
 	 PG_set_char_precision(dev, prec);
-	 PG_set_char_path(dev, chpthx, chpthy);
-	 PG_set_char_up(dev, chupx, chupy);
+	 PG_fset_char_path(dev, chpth);
+	 PG_fset_char_up(dev, chup);
 	 PG_set_char_space(dev, charspace);
   
 	 cnnct = PM_connectivity(h);
@@ -201,7 +201,7 @@ static void PG_dvb_hand(PG_device *dev, PG_graph *g, PFDvbZC fnc_zc,
 
 	 PG_update_vs(dev);
 
-	 PG_set_clipping(dev, FALSE);
+	 PG_fset_clipping(dev, FALSE);
 
 /* reset user's values for various attributes */
 	 PG_set_attributes(dev, attr);

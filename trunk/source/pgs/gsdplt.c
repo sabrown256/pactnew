@@ -1023,7 +1023,7 @@ PG_picture_desc *PG_setup_picture_mesh(PG_device *dev, PG_graph *data,
 	else
 	   clip = TRUE;
 
-	PG_set_clipping(dev, clip);};
+	PG_fset_clipping(dev, clip);};
 
     if ((th != 0.0) || (ph != 0.0) || (ch != 0.0))
        PG_set_view_angle(dev, th, ph, ch);
@@ -1079,7 +1079,7 @@ void PG_domain_plot(PG_device *dev, PM_set *dom, PM_set *ran)
     PG_set_color_line(dev, color, TRUE);
     PG_set_line_width(dev, width);
     PG_set_line_style(dev, style);
-    PG_set_clipping(dev, TRUE);
+    PG_fset_clipping(dev, TRUE);
 
     PG_set_view_angle(dev, pd->va[0], pd->va[1], pd->va[2]);
 
@@ -1285,9 +1285,9 @@ void PG_draw_domain_boundary(PG_device *dev, PM_mapping *f)
        {PG_get_line_color(dev, &clr);
 	PG_get_line_style(dev, &sty);
 	PG_get_line_width(dev, &wid);
-	PG_get_clipping(dev, &cl);
+	cl = PG_fget_clipping(dev);
 
-	PG_set_clipping(dev, TRUE);
+	PG_fset_clipping(dev, TRUE);
 	PG_set_line_color(dev, dbclr);
 	PG_set_line_style(dev, dbsty);
 	PG_set_line_width(dev, dbwid);
@@ -1318,7 +1318,7 @@ void PG_draw_domain_boundary(PG_device *dev, PM_mapping *f)
 	if (eflag)
 	   CFREE(emap);
 
-	PG_set_clipping(dev, cl);
+	PG_fset_clipping(dev, cl);
 	PG_set_line_color(dev, clr);
 	PG_set_line_style(dev, sty);
 	PG_set_line_width(dev, wid);};
@@ -1358,8 +1358,8 @@ void PG_ref_mesh(PG_device *dev, PG_graph *data, int ndims,
 /* save some state */
 	save_axis_on  = _PG_gattrs.axis_on;
 	save_title_on = _PG_gattrs.plot_title;
-	PG_get_clipping(dev, &clp);
-	PG_set_clipping(dev, TRUE);
+	clp = PG_fget_clipping(dev);
+	PG_fset_clipping(dev, TRUE);
 
 /* don't plot axis or title for reference mesh */
 	_PG_gattrs.axis_on    = FALSE;
@@ -1385,7 +1385,7 @@ void PG_ref_mesh(PG_device *dev, PG_graph *data, int ndims,
 /* restore the state */
 	_PG_gattrs.axis_on    = save_axis_on;
 	_PG_gattrs.plot_title = save_title_on;
-	PG_set_clipping(dev, clp);
+	PG_fset_clipping(dev, clp);
 
 	if (ndc == NULL)
 	   {PG_rem_attrs_graph(data, "VIEW-PORT", NULL);

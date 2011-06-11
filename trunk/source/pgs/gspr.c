@@ -54,34 +54,6 @@ void PG_get_line_width(PG_device *dev, double *plw)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_GET_CHAR_UP - inquire about the direction which constitutes up for
- *                - the characters
- *                - defaults to (0, 1)
- */
-
-void PG_get_char_up(PG_device *dev, double *px, double *py)
-   {
-
-    *px = dev->char_up[0];
-    *py = dev->char_up[1];
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* PG_GET_CLIPPING - return the state of the clipping */
-
-void PG_get_clipping(PG_device *dev, int *flag)
-   {
-
-    *flag = dev->clipping;
-
-    return;}
- 
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PG_GET_FONT - return the current font info */
 
 void PG_get_font(PG_device *dev, char **pf, char **pst, int *psz)
@@ -129,21 +101,6 @@ void PG_get_line_style(PG_device *dev, int *pl)
    {
 
     *pl = dev->line_style;
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PG_GET_CHAR_PATH - return the direction in which text is to be written
- *                  - defaults to (1, 0)
- */
-
-void PG_get_char_path(PG_device *dev, double *px, double *py)
-   {
-
-    *px = dev->char_path[0];
-    *py = dev->char_path[1];
 
     return;}
 
@@ -490,7 +447,7 @@ void PG_set_attributes(PG_device *dev, PG_dev_attributes *attr)
    {int id;
 
     if ((dev != NULL) && (attr != NULL))
-       {PG_set_clipping(dev, attr->clipping);
+       {PG_fset_clipping(dev, attr->clipping);
 
 	dev->char_frac       = attr->char_frac;
 	dev->char_precision  = attr->char_precision;
