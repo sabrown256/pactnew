@@ -187,7 +187,7 @@ PP_device_set_line_style(PP_deviceObject *self,
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "i:set_line_style", kw_list,
                                      &style))
         return NULL;
-    PG_set_line_style(self->dev, style);
+    PG_fset_line_style(self->dev, style);
     Py_INCREF(Py_None);
     return Py_None;
 /* DO-NOT-DELETE splicer.end(pgs.device.method.set_line_style) */
@@ -213,7 +213,7 @@ PP_device_set_line_width(PP_deviceObject *self,
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "d:set_line_width", kw_list,
                                      &width))
         return NULL;
-    PG_set_line_width(self->dev, width);
+    PG_fset_line_width(self->dev, width);
     Py_INCREF(Py_None);
     return Py_None;
 /* DO-NOT-DELETE splicer.end(pgs.device.method.set_line_width) */

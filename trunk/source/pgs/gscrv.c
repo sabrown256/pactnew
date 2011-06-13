@@ -266,7 +266,7 @@ void PG_curve_plot(PG_device *dev, PG_graph *data, ...)
 				 "PLOT-TYPE",  SC_INT_I, &plt,   PLOT_CARTESIAN,
 				 NULL);
 
-	      PG_get_render_info(g, info);
+	      info = PG_fget_render_info(g);
 	      if (pty == PLOT_LOGICAL)
 		 {ix = CMAKE_N(double, n);
 		  for (j = 1; j <= n; j++)
@@ -703,8 +703,8 @@ static void PG_error_plot(PG_device *dev, double **x, int n, int lncol,
  
     PG_fset_clipping(dev, TRUE);
     PG_set_color_line(dev, lncol, TRUE);
-    PG_set_line_width(dev, lnwid);
-    PG_set_line_style(dev, lnsty);
+    PG_fset_line_width(dev, lnwid);
+    PG_fset_line_style(dev, lnsty);
  
     tn = 12*n*(((xp[0] != NULL) || (xm[0] != NULL)) +
                ((xp[1] != NULL) || (xm[1] != NULL)));
@@ -781,8 +781,8 @@ static void PG_error_plot(PG_device *dev, double **x, int n, int lncol,
     PM_free_vectors(2, t);
 
     PG_fset_clipping(dev, FALSE);
-    PG_set_line_width(dev, 0.0);
-    PG_set_line_style(dev, LINE_SOLID);
+    PG_fset_line_width(dev, 0.0);
+    PG_fset_line_style(dev, LINE_SOLID);
  
     return;}
  
@@ -844,12 +844,12 @@ void PG_rect_plot(PG_device *dev, double *x, double *y, int n, int lncol,
 
        PG_fill_polygon_n(dev, dev->fill_color, TRUE, 2, WORLDC, np, t);};
 	
-    PG_get_line_width(dev, &wd);
-    PG_get_line_style(dev, &st);
+    wd = PG_fget_line_width(dev);
+    st = PG_fget_line_style(dev);
  
     PG_set_color_line(dev, lncol, TRUE);
-    PG_set_line_width(dev, lnwid);
-    PG_set_line_style(dev, lnsty);
+    PG_fset_line_width(dev, lnwid);
+    PG_fset_line_style(dev, lnsty);
 
 /* plot lines unless scatter set */
     if (tn > 0)
@@ -861,8 +861,8 @@ void PG_rect_plot(PG_device *dev, double *x, double *y, int n, int lncol,
     PM_free_vectors(2, t);
 
     PG_fset_clipping(dev, clp);
-    PG_set_line_width(dev, wd);
-    PG_set_line_style(dev, st);
+    PG_fset_line_width(dev, wd);
+    PG_fset_line_style(dev, st);
  
     if (POSTSCRIPT_DEVICE(dev))
        io_printf(dev->file, "%s", "\n%\n% End CURVE\n%\n");
@@ -896,8 +896,8 @@ void PG_histogram_plot(PG_device *dev, double *x, double *y, int n, int lncol,
  
     PG_fset_clipping(dev, TRUE);
     PG_set_color_line(dev, lncol, TRUE);
-    PG_set_line_width(dev, lnwid);
-    PG_set_line_style(dev, lnsty);
+    PG_fset_line_width(dev, lnwid);
+    PG_fset_line_style(dev, lnsty);
  
 /* transform data to histogram form */
     nm = n - 1;
@@ -950,8 +950,8 @@ void PG_histogram_plot(PG_device *dev, double *x, double *y, int n, int lncol,
     PM_free_vectors(2, xl);
 
     PG_fset_clipping(dev, FALSE);
-    PG_set_line_width(dev, 0.0);
-    PG_set_line_style(dev, LINE_SOLID);
+    PG_fset_line_width(dev, 0.0);
+    PG_fset_line_style(dev, LINE_SOLID);
  
     if (POSTSCRIPT_DEVICE(dev))
        io_printf(dev->file, "%s", "\n%\n% End CURVE\n%\n");
@@ -987,8 +987,8 @@ void PG_insel_plot(PG_device *dev, double *x, double *y, int n, int lncol,
  
     PG_fset_clipping(dev, TRUE);
     PG_set_color_line(dev, lncol, TRUE);
-    PG_set_line_width(dev, lnwid);
-    PG_set_line_style(dev, lnsty);
+    PG_fset_line_width(dev, lnwid);
+    PG_fset_line_style(dev, lnsty);
  
 /* get window and viewport limits */
     PG_get_viewspace(dev, WORLDC, wc);
@@ -1014,8 +1014,8 @@ void PG_insel_plot(PG_device *dev, double *x, double *y, int n, int lncol,
              PG_draw_line_n(dev, 2, WORLDC, x1, x2, dev->clipping);};};
  
     PG_fset_clipping(dev, FALSE);
-    PG_set_line_width(dev, 0.0);
-    PG_set_line_style(dev, LINE_SOLID);
+    PG_fset_line_width(dev, 0.0);
+    PG_fset_line_style(dev, LINE_SOLID);
  
     if (POSTSCRIPT_DEVICE(dev))
        io_printf(dev->file, "%s", "\n%\n% End CURVE\n%\n");
@@ -1050,8 +1050,8 @@ void PG_polar_plot(PG_device *dev, double *x, double *y, int n, int lncol,
  
     PG_fset_clipping(dev, TRUE);
     PG_set_color_line(dev, lncol, TRUE);
-    PG_set_line_width(dev, lnwid);
-    PG_set_line_style(dev, lnsty);
+    PG_fset_line_width(dev, lnwid);
+    PG_fset_line_style(dev, lnsty);
  
 /* get window and viewport limits */
     PG_get_viewspace(dev, WORLDC, wc);
@@ -1093,8 +1093,8 @@ void PG_polar_plot(PG_device *dev, double *x, double *y, int n, int lncol,
              xco[1] = xc[1];};};
  
     PG_fset_clipping(dev, FALSE);
-    PG_set_line_width(dev, 0.0);
-    PG_set_line_style(dev, LINE_SOLID);
+    PG_fset_line_width(dev, 0.0);
+    PG_fset_line_style(dev, LINE_SOLID);
  
     if (POSTSCRIPT_DEVICE(dev))
        io_printf(dev->file, "%s", "\n%\n% End CURVE\n%\n");

@@ -14,17 +14,28 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PGGBKC - get the white background flag */
+/* PGGGID - get the graph identifier */
 
-FIXNUM FF_ID(pggbkc, PGGBKC)(FIXNUM *sdid, FIXNUM *sclr)
+FIXNUM FF_ID(pgggid, PGGGID)(FIXNUM *sgid)
    {FIXNUM rv;
-    PG_device *dev;
+    PG_graph *g;
 
-    dev = SC_GET_POINTER(PG_device, *sdid);
+    g = SC_GET_POINTER(PG_graph, *sgid);
+    rv = PG_fget_identifier(g);
 
-    *sclr = dev->background_color_white;
+    return(rv);}
 
-    rv = TRUE;
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSGID - set the graph identifier */
+
+FIXNUM FF_ID(pgsgid, PGSGID)(FIXNUM *sgid, FIXNUM *sc)
+   {FIXNUM rv;
+    PG_graph *g;
+
+    g  = SC_GET_POINTER(PG_graph, *sgid);
+    rv = PG_fset_identifier(g, *sc);
 
     return(rv);}
 
@@ -40,8 +51,8 @@ FIXNUM FF_ID(pgginf, PGGINF)(FIXNUM *sgid, FIXNUM *said)
 
     g = SC_GET_POINTER(PG_graph, *sgid);
 
-    PG_get_render_info(g, alist);
-    *said = (FIXNUM) SC_ADD_POINTER(alist);
+    alist = PG_fget_render_info(g);
+    *said = SC_ADD_POINTER(alist);
 
     rv = TRUE;
 
@@ -50,14 +61,17 @@ FIXNUM FF_ID(pgginf, PGGINF)(FIXNUM *sgid, FIXNUM *said)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PGGGID - get the graph identifier */
+/* PGSINF - set the graph attribute list */
 
-FIXNUM FF_ID(pgggid, PGGGID)(FIXNUM *sgid, FIXNUM *sc)
+FIXNUM FF_ID(pgsinf, PGSINF)(FIXNUM *sgid, FIXNUM *said)
    {FIXNUM rv;
     PG_graph *g;
+    pcons *alist;
 
     g = SC_GET_POINTER(PG_graph, *sgid);
-    PG_get_identifier(g, *sc);
+
+    alist = SC_GET_POINTER(pcons, *said);
+    PG_fset_render_info(g, alist);
 
     rv = TRUE;
 
@@ -68,10 +82,44 @@ FIXNUM FF_ID(pgggid, PGGGID)(FIXNUM *sgid, FIXNUM *sc)
 
 /* PGGUPM - get the use-pixmap flag (X device) */
 
-FIXNUM FF_ID(pggupm, PGGUPM)(FIXNUM *sflg)
+FIXNUM FF_ID(pggupm, PGGUPM)(void)
    {FIXNUM rv;
 
-    PG_get_use_pixmap(*sflg);
+    rv = PG_fget_use_pixmap();
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSUPM - set the use-pixmap flag (X device) */
+
+FIXNUM FF_ID(pgsupm, PGSUPM)(FIXNUM *sflg)
+   {FIXNUM rv;
+
+    rv = PG_fset_use_pixmap(*sflg);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+
+
+
+
+
+
+/*--------------------------------------------------------------------------*/
+
+/* PGGBKC - get the white background flag */
+
+FIXNUM FF_ID(pggbkc, PGGBKC)(FIXNUM *sdid, FIXNUM *sclr)
+   {FIXNUM rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+
+    *sclr = dev->background_color_white;
 
     rv = TRUE;
 
@@ -503,55 +551,6 @@ FIXNUM FF_ID(pgseup, PGSEUP)(FIXNUM *sdid, PFEventHand fnc)
 
     PG_set_update_event_handler(dev, fnc);
     dev->update_event_handler.lang = _FORTRAN_LANG;
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGSINF - set the graph attribute list */
-
-FIXNUM FF_ID(pgsinf, PGSINF)(FIXNUM *sgid, FIXNUM *said)
-   {FIXNUM rv;
-    PG_graph *g;
-    pcons *alist;
-
-    g = SC_GET_POINTER(PG_graph, *sgid);
-
-    alist = SC_GET_POINTER(pcons, *said);
-    PG_set_render_info(g, alist);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGSGID - set the graph identifier */
-
-FIXNUM FF_ID(pgsgid, PGSGID)(FIXNUM *sgid, FIXNUM *sc)
-   {FIXNUM rv;
-    PG_graph *g;
-
-    g = SC_GET_POINTER(PG_graph, *sgid);
-    PG_set_identifier(g, *sc);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGSUPM - set the use-pixmap flag (X device) */
-
-FIXNUM FF_ID(pgsupm, PGSUPM)(FIXNUM *sflg)
-   {FIXNUM rv;
-
-    PG_set_use_pixmap(*sflg);
 
     rv = TRUE;
 

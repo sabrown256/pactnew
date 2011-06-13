@@ -742,3 +742,39 @@ void PG_get_font(PG_device *dev, char **pf, char **pst, int *psz)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PG_GET_LOGICAL_OP - return the logical operation */
+
+void PG_get_logical_op(PG_device *dev, PG_logical_operation *plop)
+   {
+
+    *plop = dev->logical_op;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_GET_LINE_STYLE - return the line style */
+
+void PG_get_line_style(PG_device *dev, int *pl)
+   {
+
+    *pl = dev->line_style;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_GET_LINE_WIDTH - return the width of a line */
+
+void PG_get_line_width(PG_device *dev, double *plw)
+   {
+
+    *plw = dev->line_width;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+

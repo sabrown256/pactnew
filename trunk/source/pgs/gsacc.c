@@ -355,7 +355,7 @@ void PG_fget_font(PG_device *dev, char **of, char **ost, int *osz)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_FSET_FONT - return the current font info
+/* PG_FSET_FONT - set the current font info
  *
  * #bind PG_fset_font fortran() scheme()
  */
@@ -370,93 +370,538 @@ void PG_fset_font(PG_device *dev, char *face, char *style, int sz)
     return;}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
-#if 0
+/* PG_FGET_IDENTIFIER - return the identifier of graph G
+ *
+ * #bind PG_fget_identifier fortran() scheme()
+ */
+
+int PG_fget_identifier(PG_graph *g)
+   {int rv;
+
+    if (g != NULL)
+       rv = g->identifier;
+    else
+       rv = 'A';
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_IDENTIFIER - set the identifier of graph G
+ *                    - return the old value
+ *
+ * #bind PG_fset_identifier fortran() scheme()
+ */
+
+int PG_fset_identifier(PG_graph *g, int id)
+   {int rv;
+
+    if (g != NULL)
+       {rv = g->identifier;
+	g->identifier = id;}
+    else
+       rv = 'A';
+       
+    return(id);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_LOGICAL_OP - return the device logical operation flag
+ *                    - default is GS_COPY
+ *
+ * #bind PG_fget_logical_op fortran() scheme()
+ */
+
+PG_logical_operation PG_fget_logical_op(PG_device *dev)
+   {PG_logical_operation lop;
+
+    if (dev != NULL)
+       lop = dev->logical_op;
+    else
+       lop = GS_COPY;
+
+    return(lop);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_LOGICAL_OP - set the device logical operation flag
+ *                    - return the old value
+ *
+ * #bind PG_fset_logical_op fortran() scheme()
+ */
+
+PG_logical_operation PG_fset_logical_op(PG_device *dev,
+					PG_logical_operation lop)
+   {PG_logical_operation rv;
+
+    if ((dev != NULL) && (dev->set_logical_op != NULL))
+       (*dev->set_logical_op)(dev, lop);
+    else
+       rv = GS_COPY;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_LINE_STYLE - return the device line style
+ *                    - default is LINE_SOLID
+ *
+ * #bind PG_fget_line_style fortran() scheme()
+ */
+
+int PG_fget_line_style(PG_device *dev)
+   {int st;
+
+    if (dev != NULL)
+       st = dev->line_style;
+    else
+       st = LINE_SOLID;
+
+    return(st);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_LINE_STYLE - set the device line style
+ *                    - return the old value
+ *
+ * #bind PG_fset_line_style fortran() scheme()
+ */
+
+int PG_fset_line_style(PG_device *dev, int st)
+   {int rv;
+
+    if ((dev != NULL) && (dev->set_line_style != NULL))
+       {rv = dev->line_style;
+	(*dev->set_line_style)(dev, st);}
+    else
+       rv = LINE_SOLID;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_LINE_WIDTH - return the device line width
+ *                    - default is 0.1
+ *
+ * #bind PG_fget_line_width fortran() scheme()
+ */
+
+double PG_fget_line_width(PG_device *dev)
+   {double wd;
+
+    if (dev != NULL)
+       wd = dev->line_width;
+    else
+       wd = 0.1;
+
+    return(wd);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_LINE_WIDTH - set the device line width
+ *                    - return the old value
+ *
+ * #bind PG_fset_line_width fortran() scheme()
+ */
+
+double PG_fset_line_width(PG_device *dev, double wd)
+   {double owd;
+
+    PG_get_attrs_glb(TRUE, "line-width", &owd, NULL);
+    if (wd <= 0.0)
+       wd = owd;
+
+    if ((dev != NULL) && (dev->set_line_width != NULL))
+       {owd = dev->line_width;
+	(*dev->set_line_width)(dev, wd);};
+
+    return(owd);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_MARKER_ORIENTATION - return the device marker orientation
+ *                            - default is 0.0
+ *
+ * #bind PG_fget_marker_orientation fortran() scheme()
+ */
+
+double PG_fget_marker_orientation(PG_device *dev)
+   {double rv;
+
+    if (dev != NULL)
+       rv = dev->marker_orientation;
+    else
+       rv = 0.0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_MARKER_ORIENTATION - set the device marker orientation
+ *                            - return the old value
+ *
+ * #bind PG_fset_marker_orientation fortran() scheme()
+ */
+
+double PG_fset_marker_orientation(PG_device *dev, double a)
+   {double rv;
+
+    if (dev != NULL)
+       {rv = dev->marker_orientation;
+	dev->marker_orientation = a;}
+    else
+       rv = 0.0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_MARKER_SCALE - return the device marker scale
+ *                      - default is 0.0
+ *
+ * #bind PG_fget_marker_scale fortran() scheme()
+ */
+
+double PG_fget_marker_scale(PG_device *dev)
+   {double rv;
+
+    if (dev != NULL)
+       rv = dev->marker_scale;
+    else
+       rv = 0.0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_MARKER_SCALE - set the device marker scale
+ *                      - return the old value
+ *
+ * #bind PG_fset_marker_scale fortran() scheme()
+ */
+
+double PG_fset_marker_scale(PG_device *dev, double s)
+   {double rv;
+
+    if (dev != NULL)
+       {rv = dev->marker_scale;
+	dev->marker_scale = max(s, 0.0);}
+    else
+       rv = 0.0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_MAX_INTENSITY - return the device maximum intensity
+ *                       - default is 0.0
+ *
+ * #bind PG_fget_max_intensity fortran() scheme()
+ */
+
+double PG_fget_max_intensity(PG_device *dev)
+   {double rv;
+
+    if (dev != NULL)
+       rv = dev->max_intensity;
+    else
+       rv = 0.0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_MAX_INTENSITY - set the device maximum intensity
+ *                       - return the old value
+ *
+ * #bind PG_fset_max_intensity fortran() scheme()
+ */
+
+double PG_fset_max_intensity(PG_device *dev, double i)
+   {double rv;
+
+    if (dev != NULL)
+       {rv = dev->max_intensity;
+	dev->max_intensity = min(i, 1.0);}
+    else
+       rv = 0.0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_MAX_RED_INTENSITY - return the device maximum red intensity
+ *                           - default is 0.0
+ *
+ * #bind PG_fget_max_red_intensity fortran() scheme()
+ */
+
+double PG_fget_max_red_intensity(PG_device *dev)
+   {double rv;
+
+    if (dev != NULL)
+       rv = dev->max_red_intensity;
+    else
+       rv = 0.0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_MAX_RED_INTENSITY - set the device maximum red intensity
+ *                           - return the old value
+ *
+ * #bind PG_fset_max_red_intensity fortran() scheme()
+ */
+
+double PG_fset_max_red_intensity(PG_device *dev, double i)
+   {double rv;
+
+    if (dev != NULL)
+       {rv = dev->max_red_intensity;
+	dev->max_red_intensity = min(i, 1.0);}
+    else
+       rv = 0.0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_MAX_GREEN_INTENSITY - return the device maximum green intensity
+ *                             - default is 0.0
+ *
+ * #bind PG_fget_max_green_intensity fortran() scheme()
+ */
+
+double PG_fget_max_green_intensity(PG_device *dev)
+   {double rv;
+
+    if (dev != NULL)
+       rv = dev->max_green_intensity;
+    else
+       rv = 0.0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_MAX_GREEN_INTENSITY - set the device maximum green intensity
+ *                             - return the old value
+ *
+ * #bind PG_fset_max_green_intensity fortran() scheme()
+ */
+
+double PG_fset_max_green_intensity(PG_device *dev, double i)
+   {double rv;
+
+    if (dev != NULL)
+       {rv = dev->max_green_intensity;
+	dev->max_green_intensity = min(i, 1.0);}
+    else
+       rv = 0.0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_MAX_BLUE_INTENSITY - return the device maximum blue intensity
+ *                            - default is 0.0
+ *
+ * #bind PG_fget_max_blue_intensity fortran() scheme()
+ */
+
+double PG_fget_max_blue_intensity(PG_device *dev)
+   {double rv;
+
+    if (dev != NULL)
+       rv = dev->max_blue_intensity;
+    else
+       rv = 0.0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_MAX_BLUE_INTENSITY - set the device maximum blue intensity
+ *                       - return the old value
+ *
+ * #bind PG_fset_max_blue_intensity fortran() scheme()
+ */
+
+double PG_fset_max_blue_intensity(PG_device *dev, double i)
+   {double rv;
+
+    if (dev != NULL)
+       {rv = dev->max_blue_intensity;
+	dev->max_blue_intensity = min(i, 1.0);}
+    else
+       rv = 0.0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_PIXMAP_FLAG - return the device pixmap flag
+ *                     - default is 0
+ *
+ * #bind PG_fget_pixmap_flag fortran() scheme()
+ */
+
+int PG_fget_pixmap_flag(PG_device *dev)
+   {int fl;
+
+    if (dev != NULL)
+       fl = dev->use_pixmap;
+    else
+       fl = 0;
+
+    return(fl);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_PIXMAP_FLAG - set the device pixmap flag
+ *                     - return the old value
+ *
+ * #bind PG_fset_pixmap_flag fortran() scheme()
+ */
+
+int PG_fset_pixmap_flag(PG_device *dev, int fl)
+   {int rv;
+
+    if (dev != NULL)
+       {rv = dev->use_pixmap;
+	dev->use_pixmap = fl;}
+    else
+       rv = 0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_PS_DOTS_INCH - return the device dots per inch
+ *                      - default is 0
+ *
+ * #bind PG_fget_ps_dots_inch fortran() scheme()
+ */
+
+double PG_fget_ps_dots_inch(void)
+   {double dpi;
+
+    PG_get_attrs_glb(TRUE, "ps-dots-inch", &dpi, NULL);
+
+    return(dpi);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_PS_DOTS_INCH - set the device dots per inch
+ *                     - return the old value
+ *
+ * #bind PG_fset_ps_dots_inch fortran() scheme()
+ */
+
+double PG_fset_ps_dots_inch(double dpi)
+   {
+
+    PG_set_attrs_glb(TRUE, "ps-dots-inch", dpi, NULL);
+
+    return(dpi);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_RENDER_INFO - get the graph render_info
+ *                     - defaults to NULL
+ *
+ * #bind PG_fget_render_info fortran() scheme()
+ */
+
+pcons *PG_fget_render_info(PG_graph *g)
+   {pcons *rv;
+
+    rv = NULL;
+    if ((g != NULL) && (g->info_type != NULL))
+       {if (strcmp(g->info_type, SC_PCONS_P_S) == 0)
+	   rv = (pcons *) g->info;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_RENDER_INFO - set the graph render_info
+ *
+ * #bind PG_fset_render_info fortran() scheme()
+ */
+
+pcons *PG_fset_render_info(PG_graph *g, pcons *a)
+   {pcons *rv;
+
+    if (g != NULL)
+       {rv = g->info;
+	g->info = a;}
+    else
+       rv = NULL;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_USE_PIXMAP - get the high level clear mode
+ *
+ * #bind PG_fget_use_pixmap fortran() scheme()
+ */
+
+int PG_fget_use_pixmap(void)
+   {int i;
+
+    PG_get_attrs_glb(TRUE, "use-pixmap", &i, NULL);
+
+    return(i);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_USE_PIXMAP - set the high level clear mode
+ *
+ * #bind PG_fset_use_pixmap fortran() scheme()
+ */
+
+int PG_fset_use_pixmap(int i)
+   {
+
+    PG_set_attrs_glb(TRUE, "use-pixmap", i, NULL);
+
+    return(i);}
 
 /*--------------------------------------------------------------------------*/
 
-#define PG_fget_identifier(g, i)                                              \
-   (((g) != NULL) ? i = (g)->identifier : 'A')
-#define PG_fset_identifier(g, i)                                              \
-   {if ((g) != NULL)                                                         \
-       (g)->identifier = (i);}
-
-#define PG_fset_logical_op(d, lop)                                            \
-    if (d != NULL)                                                         \
-       {if (d->set_logical_op != NULL)                                     \
-           (*d->set_logical_op)(d, lop);}
-
-#define PG_fset_line_style(d, style)                                          \
-    if (d != NULL)                                                         \
-       {if (d->set_line_style != NULL)                                     \
-           (*d->set_line_style)(d, style);}
-
-#define PG_fset_line_width(d, width)                                          \
-    if (d != NULL)                                                         \
-       {if (d->set_line_width != NULL)                                     \
-	   {if (width > 0.0)                                                 \
-	       (*d->set_line_width)(d, width);                             \
-	    else                                                             \
-               {double _lw;                                                  \
-		PG_get_attrs_glb(TRUE, "line-width", &_lw, NULL);            \
-		(*d->set_line_width)(d, _lw);};};}
-
-#define PG_fget_marker_orientation(d, v)                                      \
-   (v = (d != NULL) ? d->marker_orientation : 0)
-#define PG_fset_marker_orientation(d, v)                                      \
-   {if (d != NULL)                                                         \
-       d->marker_orientation = (v);}
-
-#define PG_fget_marker_scale(d, v)                                            \
-   (v = (d != NULL) ? d->marker_scale : 0.0)
-#define PG_fset_marker_scale(d, v)                                            \
-   {if (d != NULL)                                                         \
-       d->marker_scale = max(v, 0.0);}
-
-#define PG_fget_max_intensity(d, v)                                           \
-   (v = (d != NULL) ? d->max_intensity : 0)
-#define PG_fset_max_intensity(d, v)                                           \
-   {if (d != NULL)                                                         \
-       d->max_intensity = min(v, 1.0);}
-
-#define PG_fget_max_red_intensity(d, v)                                       \
-   (v = (d != NULL) ? d->max_red_intensity : 0)
-#define PG_fset_max_red_intensity(d, v)                                       \
-   {if (d != NULL)                                                         \
-       d->max_red_intensity = min(v, 1.0);}
-
-#define PG_fget_max_green_intensity(d, v)                                     \
-   (v = (d != NULL) ? d->max_green_intensity : 0)
-#define PG_fset_max_green_intensity(d, v)                                     \
-   {if (d != NULL)                                                         \
-       d->max_green_intensity = min(v, 1.0);}
-
-#define PG_fget_max_blue_intensity(d, v)                                      \
-   (v = (d != NULL) ? d->max_blue_intensity : 0)
-#define PG_fset_max_blue_intensity(d, v)                                      \
-   {if (d != NULL)                                                         \
-       d->max_blue_intensity = min(v, 1.0);}
-
-#define PG_fget_pixmap_flag(d, v)                                             \
-   (v = (d != NULL) ? d->use_pixmap : 0)
-#define PG_fset_pixmap_flag(d, v)                                             \
-   {if (d != NULL)                                                         \
-       d->use_pixmap = v;}
-
-#define PG_fget_ps_dots_inch(_d) PG_get_attrs_glb(TRUE, "ps-dots-inch", &(_d), NULL)
-#define PG_fset_ps_dots_inch(_d) PG_set_attrs_glb(TRUE, "ps-dots-inch", (double) _d, NULL)
-
-#define PG_fget_render_info(_g, _a)                                           \
-    {_a = NULL;                                                              \
-     if (((_g) != NULL) && ((_g)->info_type != NULL))                        \
-        {if (strcmp((_g)->info_type, SC_PCONS_P_S) == 0)                     \
-	    _a = (pcons *) ((_g)->info);};}
-#define PG_fset_render_info(g, a)                                             \
-   {if ((g) != NULL)                                                         \
-       (g)->info = (char *) (a);}
-
-#define PG_fget_use_pixmap(_i)   PG_get_attrs_glb(TRUE, "use-pixmap", &(_i), NULL)
-#define PG_fset_use_pixmap(_i)   PG_set_attrs_glb(TRUE, "use-pixmap", (int) _i, NULL)
+#if 0
 
 /*--------------------------------------------------------------------------*/
 

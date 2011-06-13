@@ -365,11 +365,11 @@ static object *_ULI_toggle_logical_op(SS_psides *si)
 	        dev = NULL;};
 
 	 if (dev != NULL)
-	    {PG_get_logical_op(dev, &lop);
+	    {lop = PG_fget_logical_op(dev);
 
 	     lop = (lop == GS_COPY) ? GS_XOR : GS_COPY;
 
-	     PG_set_logical_op(dev, lop);};};
+	     PG_fset_logical_op(dev, lop);};};
 
     return(SS_f);}
 

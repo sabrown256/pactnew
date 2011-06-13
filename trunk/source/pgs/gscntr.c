@@ -711,8 +711,8 @@ static void PG_iso_hand(PG_device *dev, PG_graph *g, PG_picture_desc *pd,
 			    "LINE-WIDTH", SC_DOUBLE_I,  &width, 0.0,
 			    NULL);
 
-	 PG_set_line_style(dev, style);
-	 PG_set_line_width(dev, width);
+	 PG_fset_line_style(dev, style);
+	 PG_fset_line_width(dev, width);
 
 	 domain = h->domain;
 	 npts  = domain->n_elements;

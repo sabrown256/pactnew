@@ -170,6 +170,206 @@ void FF_ID(pggcsw, PGGCSW)(FIXNUM *sdid, double *as)
     return;}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGGLOP - get the logical operation */
+
+FIXNUM FF_ID(pgglop, PGGLOP)(FIXNUM *sdid)
+   {FIXNUM rv;
+    PG_logical_operation lop;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    lop = PG_fget_logical_op(dev);
+    rv  = lop;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSLOP - set the logical operation */
+
+FIXNUM FF_ID(pgslop, PGSLOP)(FIXNUM *sdid, FIXNUM *slop)
+   {FIXNUM rv;
+    PG_logical_operation lop;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    lop = (PG_logical_operation) *slop;
+    lop = PG_fset_logical_op(dev, lop);
+    rv  = lop;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGGLNS - get the line style */
+
+FIXNUM FF_ID(pgglns, PGGLNS)(FIXNUM *sdid, FIXNUM *ss)
+   {FIXNUM rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    rv  = PG_fget_line_style(dev);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSLNS - set the line style */
+
+FIXNUM FF_ID(pgslns, PGSLNS)(FIXNUM *sdid, FIXNUM *ss)
+   {FIXNUM rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    rv  = PG_fset_line_style(dev, *ss);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGGLNW - get the line width */
+
+double FF_ID(pgglnw, PGGLNW)(FIXNUM *sdid)
+   {double rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    rv  = PG_fget_line_width(dev);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSLNW - set the line width */
+
+double FF_ID(pgslnw, PGSLNW)(FIXNUM *sdid, double *sw)
+   {double rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    rv  = PG_fset_line_width(dev, *sw);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGGMKO - get the marker orientation */
+
+double FF_ID(pggmko, PGGMKO)(FIXNUM *sdid)
+   {double rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    rv  = PG_fget_marker_orientation(dev);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSMKO - set the marker orientation */
+
+double FF_ID(pgsmko, PGSMKO)(FIXNUM *sdid, double *sw)
+   {double rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    rv  = PG_fset_marker_orientation(dev, *sw);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGGMKS - get the marker scale */
+
+double FF_ID(pggmks, PGGMKS)(FIXNUM *sdid)
+   {double rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    rv  = PG_fget_marker_scale(dev);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSMKS - set the marker scale */
+
+double FF_ID(pgsmks, PGSMKS)(FIXNUM *sdid, double *ss)
+   {double rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    rv  = PG_fset_marker_scale(dev, *ss);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGGPMF - get the pixmap flag */
+
+FIXNUM FF_ID(pggpmf, PGGPMF)(FIXNUM *sdid)
+   {FIXNUM rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    rv  = PG_fget_pixmap_flag(dev);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSPMF - set the pixmap flag */
+
+FIXNUM FF_ID(pgspmf, PGSPMF)(FIXNUM *sdid, FIXNUM *sc)
+   {FIXNUM rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    rv  = PG_fset_pixmap_flag(dev, *sc);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGGDPI - get the PostScript dots per inch for 8.5 x 11 page */
+
+double FF_ID(pggdpi, PGGDPI)(void)
+   {double rv;
+
+    rv = PG_fget_ps_dots_inch();
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSDPI - set the PostScript dots per inch for 8.5 x 11 page */
+
+double FF_ID(pgsdpi, PGSDPI)(double *sdpi)
+   {double rv;
+
+    rv = PG_fset_ps_dots_inch(*sdpi);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+
+
 
 
 
@@ -341,8 +541,8 @@ FIXNUM FF_ID(pgsaxa, PGSAXA)(FIXNUM *sdid, FIXNUM *sn,
     PG_fset_char_up(dev, chup);
     PG_fset_char_space(dev, chsp);
     PG_set_color_line(dev, lnclr, TRUE);
-    PG_set_line_style(dev, _PG_gattrs.axis_line_style);
-    PG_set_line_width(dev, _PG_gattrs.axis_line_width);
+    PG_fset_line_style(dev, _PG_gattrs.axis_line_style);
+    PG_fset_line_width(dev, _PG_gattrs.axis_line_width);
 
     return(TRUE);}
 
@@ -839,20 +1039,6 @@ FIXNUM FF_ID(pgfply, PGFPLY)(FIXNUM *sdid, double *ax, double *ay,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PGGDPI - get the PostScript dots per inch for 8.5 x 11 page */
-
-FIXNUM FF_ID(pggdpi, PGGDPI)(double *sdpi)
-   {FIXNUM rv;
-
-    PG_get_ps_dots_inch(*sdpi);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PGGFIN - get the finished status */
 
 FIXNUM FF_ID(pggfin, PGGFIN)(FIXNUM *sdid, FIXNUM *sc)
@@ -880,108 +1066,6 @@ FIXNUM FF_ID(pgglnc, PGGLNC)(FIXNUM *sdid, FIXNUM *sc)
     PG_get_line_color(dev, &lc);
 
     *sc = lc;
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGGLOP - get the logical operation */
-
-FIXNUM FF_ID(pgglop, PGGLOP)(FIXNUM *sdid, FIXNUM *slop)
-   {FIXNUM rv;
-    PG_logical_operation lop;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_get_logical_op(dev, &lop);
-
-    *slop = lop;
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGGLNS - get the line style */
-
-FIXNUM FF_ID(pgglns, PGGLNS)(FIXNUM *sdid, FIXNUM *ss)
-   {int ls;
-    FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_get_line_style(dev, &ls);
-
-    *ss = ls;
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGGLNW - get the line width */
-
-FIXNUM FF_ID(pgglnw, PGGLNW)(FIXNUM *sdid, double *sw)
-   {FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_get_line_width(dev, sw);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGGMKO - get the marker orientation */
-
-FIXNUM FF_ID(pggmko, PGGMKO)(FIXNUM *sdid, double *sw)
-   {FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_get_marker_orientation(dev, *sw);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGGMKS - get the marker scale */
-
-FIXNUM FF_ID(pggmks, PGGMKS)(FIXNUM *sdid, double *ss)
-   {FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_get_marker_scale(dev, *ss);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGGPMF - get the pixmap flag */
-
-FIXNUM FF_ID(pggpmf, PGGPMF)(FIXNUM *sdid, FIXNUM *sc)
-   {FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_get_pixmap_flag(dev, *sc);
 
     rv = TRUE;
 
@@ -1562,20 +1646,6 @@ FIXNUM FF_ID(pgsbsz, PGSBSZ)(FIXNUM *ssz)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PGSDPI - set the PostScript dots per inch for 8.5 x 11 page */
-
-FIXNUM FF_ID(pgsdpi, PGSDPI)(double *sdpi)
-   {FIXNUM rv;
-
-    PG_set_ps_dots_inch(*sdpi);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PGSELC - select a color from the n-dimensional palette */
 
 FIXNUM FF_ID(pgselc, PGSELC)(FIXNUM *sdid, FIXNUM *sn, double *av,
@@ -1644,88 +1714,6 @@ FIXNUM FF_ID(pgslnc, PGSLNC)(FIXNUM *sdid, FIXNUM *sc)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PGSLOP - set the logical operation */
-
-FIXNUM FF_ID(pgslop, PGSLOP)(FIXNUM *sdid, FIXNUM *slop)
-   {FIXNUM rv;
-    PG_logical_operation lop;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    lop = (PG_logical_operation) *slop;
-    PG_set_logical_op(dev, lop);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGSLNS - set the line style */
-
-FIXNUM FF_ID(pgslns, PGSLNS)(FIXNUM *sdid, FIXNUM *ss)
-   {FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_set_line_style(dev, (int) *ss);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGSLNW - set the line width */
-
-FIXNUM FF_ID(pgslnw, PGSLNW)(FIXNUM *sdid, double *sw)
-   {FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_set_line_width(dev, (double) *sw);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGSMKO - set the marker orientation */
-
-FIXNUM FF_ID(pgsmko, PGSMKO)(FIXNUM *sdid, double *sw)
-   {FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_set_marker_orientation(dev, (double) *sw);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGSMKS - set the marker scale */
-
-FIXNUM FF_ID(pgsmks, PGSMKS)(FIXNUM *sdid, double *ss)
-   {FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_set_marker_scale(dev, (double) *ss);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PGSPAL - set the current palette */
 
 FIXNUM FF_ID(pgspal, PGSPAL)(FIXNUM *sdid, FIXNUM *sncn, char *pname)
@@ -1737,22 +1725,6 @@ FIXNUM FF_ID(pgspal, PGSPAL)(FIXNUM *sdid, FIXNUM *sncn, char *pname)
     SC_FORTRAN_STR_C(lname, pname, *sncn);
 
     rv = (PG_set_palette(dev, lname) != NULL);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGSPMF - set the pixmap flag */
-
-FIXNUM FF_ID(pgspmf, PGSPMF)(FIXNUM *sdid, FIXNUM *sc)
-   {FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_set_pixmap_flag(dev, *sc);
-
-    rv = TRUE;
 
     return(rv);}
 

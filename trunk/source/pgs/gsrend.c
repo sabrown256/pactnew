@@ -368,7 +368,7 @@ PG_picture_desc *PG_get_rendering_properties(PG_device *dev, PG_graph *data)
 
     pd = CMAKE(PG_picture_desc);
 
-    PG_get_render_info(data, alst);
+    alst = PG_fget_render_info(data);
 
     if (data->f != NULL)
        labl = (datafl) ? data->f->name : ((PG_image *) data->f)->label;

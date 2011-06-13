@@ -419,7 +419,7 @@ int main(int c, char **v)
     CGM_dev = PG_make_device("CGM", "MONOCHROME", "gsctst");
     PG_open_device(CGM_dev, 0.0, 0.0, 0.0, 0.0);
 
-    PG_set_pixmap_flag(SCR_dev, FALSE);
+    PG_fset_pixmap_flag(SCR_dev, FALSE);
 
     if (fl2ds)
        test_2d_simple();

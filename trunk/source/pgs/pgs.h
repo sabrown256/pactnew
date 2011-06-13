@@ -1086,7 +1086,23 @@ extern PG_device
 
 extern double
  PG_fget_char_space(PG_device *dev),
- PG_fset_char_space(PG_device *dev, double d);
+ PG_fset_char_space(PG_device *dev, double d),
+ PG_fget_line_width(PG_device *dev),
+ PG_fset_line_width(PG_device *dev, double wd),
+ PG_fget_marker_orientation(PG_device *dev),
+ PG_fset_marker_orientation(PG_device *dev, double a),
+ PG_fget_marker_scale(PG_device *dev),
+ PG_fset_marker_scale(PG_device *dev, double s),
+ PG_fget_max_intensity(PG_device *dev),
+ PG_fset_max_intensity(PG_device *dev, double i),
+ PG_fget_max_red_intensity(PG_device *dev),
+ PG_fset_max_red_intensity(PG_device *dev, double i),
+ PG_fget_max_green_intensity(PG_device *dev),
+ PG_fset_max_green_intensity(PG_device *dev, double i),
+ PG_fget_max_blue_intensity(PG_device *dev),
+ PG_fset_max_blue_intensity(PG_device *dev, double i),
+ PG_fget_ps_dots_inch(void),
+ PG_fset_ps_dots_inch(double dpi);
 
 extern int
  PG_fget_clear_mode(void),
@@ -1098,7 +1114,15 @@ extern int
  PG_fget_fill_bound(PG_device *dev),
  PG_fset_fill_bound(PG_device *dev, int v),
  PG_fget_finish_state(PG_device *dev),
- PG_fset_finish_state(PG_device *dev, int v);
+ PG_fset_finish_state(PG_device *dev, int v),
+ PG_fget_identifier(PG_graph *g),
+ PG_fset_identifier(PG_graph *g, int id),
+ PG_fget_line_style(PG_device *dev),
+ PG_fset_line_style(PG_device *dev, int st),
+ PG_fget_pixmap_flag(PG_device *dev),
+ PG_fset_pixmap_flag(PG_device *dev, int fl),
+ PG_fget_use_pixmap(void),
+ PG_fset_use_pixmap(int i);
 
 extern void
  PG_fget_char_path(PG_device *dev, double *x),
@@ -1109,6 +1133,14 @@ extern void
  PG_fset_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double *p),
  PG_fget_font(PG_device *dev, char **of, char **ost, int *osz),
  PG_fset_font(PG_device *dev, char *face, char *style, int sz);
+
+extern PG_logical_operation
+ PG_fget_logical_op(PG_device *dev),
+ PG_fset_logical_op(PG_device *dev, PG_logical_operation lop);
+
+extern pcons
+ *PG_fget_render_info(PG_graph *g),
+ *PG_fset_render_info(PG_graph *g, pcons *a);
 
 
 /* GSATTR.C declarations */
@@ -1605,9 +1637,6 @@ extern PG_dev_attributes
  *PG_get_attributes(PG_device *dev);
 
 extern void
- PG_get_line_width(PG_device *dev, double *plw),
- PG_get_line_style(PG_device *dev, int *pl),
- PG_get_logical_op(PG_device *dev, PG_logical_operation *plop),
  PG_get_text_ext_n(PG_device *dev, int nd, PG_coord_sys cs, char *s, double *p),
  PG_set_attributes(PG_device *dev, PG_dev_attributes *attr),
  PG_setup_markers(void),

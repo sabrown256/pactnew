@@ -1051,8 +1051,8 @@ void UL_set_graphics_state(PG_device *d)
 
 	PG_set_axis_log_scale(d, 2, SX_log_scale);
 	PG_fset_font(d, axstf, SX_plot_type_style, SX_plot_type_size);
-	PG_set_marker_scale(d, mrks);
-	PG_set_marker_orientation(d, SX_marker_orientation);
+	PG_fset_marker_scale(d, mrks);
+	PG_fset_marker_orientation(d, SX_marker_orientation);
 
 	if (!POSTSCRIPT_DEVICE(d))
 	   {g->hwin[0] = SX_window_P[0];
@@ -1149,7 +1149,7 @@ int main(int c, char **v, char **env)
     load_rc   = TRUE;
 #endif
 
-    PG_set_use_pixmap(FALSE);
+    PG_fset_use_pixmap(FALSE);
 
     zsp = 2;
 
@@ -1185,7 +1185,7 @@ int main(int c, char **v, char **env)
                      order[n_files++] = ++i;
                      break;
                 case 'm' :                          /* use X pixmap for drawing */
-                     PG_set_use_pixmap(TRUE);
+                     PG_fset_use_pixmap(TRUE);
                      break; 
                 case 'n' :                          /* don't load init file */
                      load_init = FALSE;
@@ -1211,7 +1211,7 @@ int main(int c, char **v, char **env)
                      break;
                 case 'w' :                       /* use X window for drawing */
                                                  /* not pixmap               */
-                     PG_set_use_pixmap(FALSE);
+                     PG_fset_use_pixmap(FALSE);
                      break;
                case 'x' :
                      track = FALSE;

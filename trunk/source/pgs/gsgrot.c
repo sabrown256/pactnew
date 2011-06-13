@@ -62,7 +62,7 @@ static void _PG_grotrian_plot(PG_device *dev, PG_graph *g)
 
 /* draw the vertical axis */
     strcpy(format, "%10.2g");
-    PG_set_line_width(dev, 0.0);
+    PG_fset_line_width(dev, 0.0);
 
     xl[0] = wc[0];
     xl[1] = wc[2];
@@ -85,7 +85,7 @@ static void _PG_grotrian_plot(PG_device *dev, PG_graph *g)
 	 PG_write_n(dev, 2, WORLDC, p, "%ld", (int) (x1[0] + 0.5));};
 
 /* draw the states */
-    PG_set_line_width(dev, 1.0);
+    PG_fset_line_width(dev, 1.0);
     for (i = 0; i < n_s; i++)
         {x1[0] = d[0][i] - 0.25;    
          x1[1] = d[1][i];

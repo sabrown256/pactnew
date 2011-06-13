@@ -184,14 +184,14 @@ static void _PG_dom_lr_2d(PG_device *dev, double *rx, double *ry,
         lwd = str[13]/1000.0;};
 
     PG_get_line_color(dev, &lc);
-    PG_get_line_style(dev, &ls);
-    PG_get_line_width(dev, &lw);
+    ls = PG_fget_line_style(dev);
+    lw = PG_fget_line_width(dev);
 
 /* draw the k lines */
     if (kon == TRUE)
        {PG_set_line_color(dev, kcl);
-	PG_set_line_style(dev, kst);
-	PG_set_line_width(dev, kwd);
+	PG_fset_line_style(dev, kst);
+	PG_fset_line_width(dev, kwd);
 
 	for (l = lmn; l <= lmx; l += lnc)
 	    for (k = kmn; k < kmx; k++)
@@ -214,8 +214,8 @@ static void _PG_dom_lr_2d(PG_device *dev, double *rx, double *ry,
 /* draw the l lines */
     if (lon == TRUE)
        {PG_set_line_color(dev, lcl);
-	PG_set_line_style(dev, lst);
-	PG_set_line_width(dev, lwd);
+	PG_fset_line_style(dev, lst);
+	PG_fset_line_width(dev, lwd);
 
 	for (k = kmn; k <= kmx; k += knc)
 	    for (l = lmn; l < lmx; l++)
@@ -236,8 +236,8 @@ static void _PG_dom_lr_2d(PG_device *dev, double *rx, double *ry,
 		 PG_draw_line_n(dev, 2, WORLDC, x1, x2, dev->clipping);};};
 
     PG_set_line_color(dev, lc);
-    PG_set_line_style(dev, ls);
-    PG_set_line_width(dev, lw);
+    PG_fset_line_style(dev, ls);
+    PG_fset_line_width(dev, lw);
 
     if (eflag)
        CFREE(emap);
@@ -359,8 +359,8 @@ static void _PG_dom_2d(PG_device *dev, PM_set *dom, PM_set *ran)
 
          if (style != LINE_NONE)
 	    {PG_set_color_line(dev, color, TRUE);
-	     PG_set_line_width(dev, width);
-	     PG_set_line_style(dev, style);
+	     PG_fset_line_width(dev, width);
+	     PG_fset_line_style(dev, style);
 
 	     d = PM_convert_vectors(2, npts, r, p->element_type);
 
@@ -473,8 +473,8 @@ static void _PG_dom_lr_3d(PG_device *dev, double **r,
     PG_ADJUST_LIMITS_3D(dextr, box);
 
     PG_get_line_color(dev, &lc);
-    PG_get_line_style(dev, &ls);
-    PG_get_line_width(dev, &lw);
+    ls = PG_fget_line_style(dev);
+    lw = PG_fget_line_width(dev);
 
 /* lines in the i direction */
     stride = 1;
@@ -488,8 +488,8 @@ static void _PG_dom_lr_3d(PG_device *dev, double **r,
 		     np = _PG_save_seg(i1, i2, np, r, t, box);};
 
 	PG_set_line_color(dev, icl);
-	PG_set_line_style(dev, ist);
-	PG_set_line_width(dev, iwd);
+	PG_fset_line_style(dev, ist);
+	PG_fset_line_width(dev, iwd);
 
 	ns = np >> 1;
 	PG_draw_disjoint_polyline_n(dev, 3, WORLDC, ns, t, TRUE);};
@@ -506,8 +506,8 @@ static void _PG_dom_lr_3d(PG_device *dev, double **r,
 		     np = _PG_save_seg(i1, i2, np, r, t, box);};
 
 	PG_set_line_color(dev, jcl);
-	PG_set_line_style(dev, jst);
-	PG_set_line_width(dev, jwd);
+	PG_fset_line_style(dev, jst);
+	PG_fset_line_width(dev, jwd);
 
 	ns = np >> 1;
 	PG_draw_disjoint_polyline_n(dev, 3, WORLDC, ns, t, TRUE);};
@@ -524,15 +524,15 @@ static void _PG_dom_lr_3d(PG_device *dev, double **r,
 		     np = _PG_save_seg(i1, i2, np, r, t, box);};
 
 	PG_set_line_color(dev, kcl);
-	PG_set_line_style(dev, kst);
-	PG_set_line_width(dev, kwd);
+	PG_fset_line_style(dev, kst);
+	PG_fset_line_width(dev, kwd);
 
 	ns = np >> 1;
 	PG_draw_disjoint_polyline_n(dev, 3, WORLDC, ns, t, TRUE);};
 
     PG_set_line_color(dev, lc);
-    PG_set_line_style(dev, ls);
-    PG_set_line_width(dev, lw);
+    PG_fset_line_style(dev, ls);
+    PG_fset_line_width(dev, lw);
 
     if (eflag)
        CFREE(emap);
@@ -932,8 +932,8 @@ static void _PG_dom_3d(PG_device *dev, PM_set *dom, PM_set *ran)
 			  NULL);
 
 	 PG_set_color_line(dev, color, TRUE);
-	 PG_set_line_style(dev, style);
-	 PG_set_line_width(dev, width);
+	 PG_fset_line_style(dev, style);
+	 PG_fset_line_width(dev, width);
 
 	 t = PM_convert_vectors(nd, n, r, p->element_type);
 
@@ -1033,8 +1033,8 @@ PG_picture_desc *PG_setup_picture_mesh(PG_device *dev, PG_graph *data,
 
     PG_set_color_text(dev, dev->WHITE, TRUE);
     PG_set_line_color(dev, clr);
-    PG_set_line_width(dev, wid);
-    PG_set_line_style(dev, sty);
+    PG_fset_line_width(dev, wid);
+    PG_fset_line_style(dev, sty);
 
     return(pd);}
 
@@ -1077,8 +1077,8 @@ void PG_domain_plot(PG_device *dev, PM_set *dom, PM_set *ran)
 		     NULL);
 
     PG_set_color_line(dev, color, TRUE);
-    PG_set_line_width(dev, width);
-    PG_set_line_style(dev, style);
+    PG_fset_line_width(dev, width);
+    PG_fset_line_style(dev, style);
     PG_fset_clipping(dev, TRUE);
 
     PG_set_view_angle(dev, pd->va[0], pd->va[1], pd->va[2]);
@@ -1283,14 +1283,14 @@ void PG_draw_domain_boundary(PG_device *dev, PM_mapping *f)
 
     if (dbwid > -1.0)
        {PG_get_line_color(dev, &clr);
-	PG_get_line_style(dev, &sty);
-	PG_get_line_width(dev, &wid);
-	cl = PG_fget_clipping(dev);
+	sty = PG_fget_line_style(dev);
+	wid = PG_fget_line_width(dev);
+	cl  = PG_fget_clipping(dev);
 
 	PG_fset_clipping(dev, TRUE);
 	PG_set_line_color(dev, dbclr);
-	PG_set_line_style(dev, dbsty);
-	PG_set_line_width(dev, dbwid);
+	PG_fset_line_style(dev, dbsty);
+	PG_fset_line_width(dev, dbwid);
 
 	emap = PM_check_emap(&eflag, f->map, f->range->n_elements);
 
@@ -1320,8 +1320,8 @@ void PG_draw_domain_boundary(PG_device *dev, PM_mapping *f)
 
 	PG_fset_clipping(dev, cl);
 	PG_set_line_color(dev, clr);
-	PG_set_line_style(dev, sty);
-	PG_set_line_width(dev, wid);};
+	PG_fset_line_style(dev, sty);
+	PG_fset_line_width(dev, wid);};
 
     dev->current_palette = pl;
 

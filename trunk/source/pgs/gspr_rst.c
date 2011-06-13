@@ -730,8 +730,8 @@ void _PG_rst_shade_poly(PG_device *dev, int nd, int n, double **r)
 	PG_get_fill_color(dev, &fclr);
 	PG_set_color_line(dev, fclr, FALSE);
 
-	PG_get_line_width(dev, &lwd);
-	PG_set_line_width(dev, _PG_gattrs.line_width);
+	lwd = PG_fget_line_width(dev);
+	PG_fset_line_width(dev, _PG_gattrs.line_width);
 
 	et = _PG_make_edge_table(dev, nd, n, r, iymx, iymn);
 	if (et != NULL)
@@ -746,7 +746,7 @@ void _PG_rst_shade_poly(PG_device *dev, int nd, int n, double **r)
 	    CFREE(ae);
 	    _PG_free_edge_table(et, iymn, iymx);};
 
-	PG_set_line_width(dev, lwd);
+	PG_fset_line_width(dev, lwd);
 	PG_set_line_color(dev, lclr);};
 
     return;}
