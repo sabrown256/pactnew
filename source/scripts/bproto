@@ -86,24 +86,29 @@ Note $Log ""
 
    flog $Log set cproto = z-$arch/$d.protoc
 
-   elide '/*' '*/' $Cfiles                         | \
-   elide '{' '}' -                                 | \
-   awk '$NF ~ /\\/ { printf("%s ", $0); }            \
-        $NF !~ /\\/ { printf("%s\n", $0); }'       | \
-   sed 's/\\/ /g'                                  | \
-   elide '#if' '#endif' -                          | \
-   grep -v '#'                                     | \
-   sed 's/[ \t][ \t]*/ /g'                         | \
-   awk '$0 ~ /,[ \t]*$/   { printf("%s", $0) }       \
-        $0 !~ /,[ \t]*$/  { printf("%s\n", $0) }'  | \
-   sed '/^[ \t]*$/d'                               | \
-   sed '/;[ \t]*$/d'                               | \
-   grep -v '='                                     | \
-   grep -v 'FIXNUM'                                | \
-   grep -v 'static'                                | \
-   grep '('                                        | \
-   sort                                            | \
-   cat >&! $cproto
+   if ("$Cfiles" != "") then
+      elide '/*' '*/' $Cfiles                         | \
+      elide '{' '}' -                                 | \
+      awk '$NF ~ /\\/ { printf("%s ", $0); }            \
+           $NF !~ /\\/ { printf("%s\n", $0); }'       | \
+      sed 's/\\/ /g'                                  | \
+      elide '#if' '#endif' -                          | \
+      grep -v '#'                                     | \
+      sed 's/[ \t][ \t]*/ /g'                         | \
+      awk '$0 ~ /,[ \t]*$/   { printf("%s", $0) }       \
+           $0 !~ /,[ \t]*$/  { printf("%s\n", $0) }'  | \
+      sed '/^[ \t]*$/d'                               | \
+      sed '/;[ \t]*$/d'                               | \
+      grep -v '='                                     | \
+      grep -v 'FIXNUM'                                | \
+      grep -v 'static'                                | \
+      grep '('                                        | \
+      sort                                            | \
+      cat >&! $cproto
+   else
+      flog $Log rm -f $cproto
+      flog $Log touch $cproto
+   endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -167,36 +172,41 @@ Note $Log ""
 
    flog $Log set fwrap = z-$arch/$d.wrapper
 
-   cat $Cfiles                                     | \
-   sed 's/[ \t][ \t]*/ /g'                        | \
-   awk '$0 ~ /,[ \t]*$/   { printf("%s", $0) }      \
-        $0 !~ /,[ \t]*$/  { printf("%s\n", $0) }' | \
-   grep 'FF_ID('                                  | \
-   grep -v "#"                                    | \
-   grep -v ";"                                    | \
-   grep -v "="                                    | \
-   sed 's/, .*)(/(/'                              | \
-   sed 's/FF_ID(//'                               | \
-   sed 's/(void)/()/'                             | \
-   sed 's/(/ /'                                   | \
-   sed 's/)[ \t]*$//'                             | \
-   sed 's/FIXNUM/integer/g'                       | \
-   sed 's/char *\*/character /g'                  | \
-   sed 's/void *\*/integer(isizea) /g'            | \
-   sed 's/integer *\*s/integer s/g'               | \
-   sed 's/integer *\*/integer-A /g'               | \
-   sed 's/REAL *\*/real--8 /g'                    | \
-   sed 's/double *\*s/real--8 s/g'                | \
-   sed 's/double *\*/real8-A /g'                  | \
-   sed 's/REAL/real--8/g'                         | \
-   sed 's/double/real--8/g'                       | \
-   sed 's/float/real--4/g'                        | \
-   sed 's/*//g'                                   | \
-   sed 's/,/ /g'                                  | \
-   sed 's/PF[^ ]* /external /g'                   | \
-   sed 's/.*:/      /'                            | \
-   sed 's/--/*/g'                                 | \
-   cat >&! $fwrap
+   if ("$Cfiles" != "") then
+      cat $Cfiles                                    | \
+      sed 's/[ \t][ \t]*/ /g'                        | \
+      awk '$0 ~ /,[ \t]*$/   { printf("%s", $0) }      \
+           $0 !~ /,[ \t]*$/  { printf("%s\n", $0) }' | \
+      grep 'FF_ID('                                  | \
+      grep -v "#"                                    | \
+      grep -v ";"                                    | \
+      grep -v "="                                    | \
+      sed 's/, .*)(/(/'                              | \
+      sed 's/FF_ID(//'                               | \
+      sed 's/(void)/()/'                             | \
+      sed 's/(/ /'                                   | \
+      sed 's/)[ \t]*$//'                             | \
+      sed 's/FIXNUM/integer/g'                       | \
+      sed 's/char *\*/character /g'                  | \
+      sed 's/void *\*/integer(isizea) /g'            | \
+      sed 's/integer *\*s/integer s/g'               | \
+      sed 's/integer *\*/integer-A /g'               | \
+      sed 's/REAL *\*/real--8 /g'                    | \
+      sed 's/double *\*s/real--8 s/g'                | \
+      sed 's/double *\*/real8-A /g'                  | \
+      sed 's/REAL/real--8/g'                         | \
+      sed 's/double/real--8/g'                       | \
+      sed 's/float/real--4/g'                        | \
+      sed 's/*//g'                                   | \
+      sed 's/,/ /g'                                  | \
+      sed 's/PF[^ ]* /external /g'                   | \
+      sed 's/.*:/      /'                            | \
+      sed 's/--/*/g'                                 | \
+      cat >&! $fwrap
+   else
+      flog $Log rm -f $fwrap
+      flog $Log touch $fwrap
+   endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -212,7 +222,11 @@ Note $Log ""
       flog $Log mv gf-$d.c obj
    endif
    if (-f gm-$d.f) then
-      flog $Log mv gm-$d.f obj
+      set ldst =  ../../fortran/z-$arch/obj
+      if (!(-d $ldst)) then
+         flog $Log mkdir -p $ldst
+      endif
+      flog $Log mv gm-$d.f $ldst
    endif
    if (-f gs-$d.c) then
       set ldst =  ../../sx/z-$arch/obj

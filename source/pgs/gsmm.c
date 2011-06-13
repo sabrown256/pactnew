@@ -90,6 +90,8 @@ void PG_rl_all(void)
 /* PG_MAKE_GRAPH_1D - assemble a bunch of stuff together in a graph struct
  *                  - which will describe a 1d graph and return a pointer
  *                  - to it
+ *
+ * #bind PG_make_graph_1d fortran() scheme()
  */
 
 PG_graph *PG_make_graph_1d(int id, char *label, int cp, int n,
@@ -119,6 +121,8 @@ PG_graph *PG_make_graph_1d(int id, char *label, int cp, int n,
 /* PG_MAKE_GRAPH_R2_R1 - assemble a bunch of stuff together in a graph struct
  *                     - which will describe a mapping from R2 to R1 
  *                     - and return a pointer to it
+ *
+ * #bind PG_make_graph_r2_r1 fortran() scheme()
  */
 
 PG_graph *PG_make_graph_r2_r1(int id, char *label, int cp,
@@ -314,6 +318,8 @@ void PG_rl_graph(PG_graph *g, int rld, int rlr)
 /* PG_REGISTER_DEVICE - let users add their own devices
  *                    - to do so they must register a setup function
  *                    - under the device name
+ *
+ * #bind PG_register_device fortran() scheme()
  */
 
 void PG_register_device(char *name, PFRDev fnc)
@@ -611,7 +617,10 @@ static PG_device *PG_make_raw_device(char *name, char *type, char *title,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_MAKE_DEVICE - initialize a graphical device */
+/* PG_MAKE_DEVICE - initialize a graphical device
+ *
+ * #bind PG_make_device fortran() scheme()
+ */
 
 PG_device *PG_make_device(char *name, char *type, char *title)
    {int ip, np;
@@ -763,6 +772,8 @@ void PG_save_view_attributes(PG_view_attributes *d, PG_device *dev)
 
 /* PG_RESTORE_VIEW_ATTRIBUTES - restore the PG_view_attributes to the
  *                            - graphical device
+ *
+ * #bind PG_restore_view_attributes fortran() scheme()
  */
 
 void PG_restore_view_attributes(PG_device *dev, PG_view_attributes *d)

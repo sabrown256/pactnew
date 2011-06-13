@@ -1619,8 +1619,9 @@ static char **module_native_f(FILE *fp, char **sa, char *pck)
 	    fprintf(fp, "   %s\n", p);};
 
     if (oper != NULL)
-       {fprintf(fp, "      end %s\n", oper);
-	fprintf(fp, "\n");};
+       fprintf(fp, "      end %s\n", oper);
+
+    fprintf(fp, "\n");
 
     return(sa);}
 

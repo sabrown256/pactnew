@@ -193,13 +193,6 @@ sharedlib:
 	pact incinstall
 
 #
-# remove everything
-#
-remove-sys :
-	pact remove
-	cd spokes ; pact remove
-
-#
 # inform
 #
 inform :

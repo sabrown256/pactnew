@@ -42,6 +42,8 @@ int
  *                - type - a qualifier for the device
  *                -        MONOCHROME - black and white display
  *                -        COLOR      - color display
+ *
+ * #bind PG_open_device fortran() scheme()
  */
  
 PG_device *PG_open_device(PG_device *dev, double xf, double yf,
@@ -107,7 +109,10 @@ void PG_device_filename(char *fname, char *raw, char *ext)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_QUERY_DEVICE - query some physical device characteristics */
+/* PG_QUERY_DEVICE - query some physical device characteristics
+ *
+ * #bind PG_query_device fortran() scheme()
+ */
 
 void PG_query_device(PG_device *dev, int *pdx, int *pdy, int *pnc)
    {
@@ -119,7 +124,10 @@ void PG_query_device(PG_device *dev, int *pdx, int *pdy, int *pnc)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_QUERY_WINDOW - query the window shape */
+/* PG_QUERY_WINDOW - query the window shape
+ *
+ * #bind PG_query_window fortran() scheme()
+ */
 
 void PG_query_window(PG_device *dev, int *pdx, int *pdy)
    {PG_dev_geometry *g;
@@ -559,36 +567,6 @@ FILE *_PG_fopen(char *name, char *mode)
        io_setvbuf(fp, NULL, 0, _PG.buffer_size);
 
     return(fp);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PG_SET_BUFFER_SIZE - set the default I/O buffer size to SZ
- *                    - return the old value
- *                    - -1 turns off default buffering optimization
- *                    - which happens on file open
- */
-
-int64_t PG_set_buffer_size(int64_t sz)
-   {int64_t rv;
-    
-    rv = _PG.buffer_size;
-    
-    _PG.buffer_size = sz;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PG_GET_BUFFER_SIZE - get the default I/O buffer size */
-
-int64_t PG_get_buffer_size(void)
-   {int64_t rv;
-    
-    rv = _PG.buffer_size;
-
-    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

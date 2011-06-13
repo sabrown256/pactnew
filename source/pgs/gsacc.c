@@ -13,6 +13,41 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PG_FGET_BUFFER_SIZE - get the default I/O buffer size
+ *
+ * #bind PG_fget_buffer_size fortran() scheme()
+ */
+
+int64_t PG_fget_buffer_size(void)
+   {int64_t rv;
+    
+    rv = _PG.buffer_size;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_BUFFER_SIZE - set the default I/O buffer size to SZ
+ *                    - return the old value
+ *                    - -1 turns off default buffering optimization
+ *                    - which happens on file open
+ *
+ * #bind PG_fset_buffer_size fortran() scheme()
+ */
+
+int64_t PG_fset_buffer_size(int64_t sz)
+   {int64_t rv;
+    
+    rv = _PG.buffer_size;
+    
+    _PG.buffer_size = sz;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PG_FGET_CLEAR_MODE - get the high level clear mode
  *
  * #bind PG_fget_clear_mode fortran() scheme()
@@ -405,7 +440,7 @@ int PG_fset_identifier(PG_graph *g, int id)
     else
        rv = 'A';
        
-    return(id);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1054,14 +1089,6 @@ void PG_fset_viewport_shape(PG_device *dev, double *dx, double asp)
 
 /*--------------------------------------------------------------------------*/
 
-#define PG_fget_type_size(d, v)                                               \
-    {v = -1;                                                                 \
-     if (d != NULL)                                                        \
-        v = d->type_size;}
-
-#define PG_fget_chard                                                       \
-    (((d != NULL) && (d->get_char != NULL)) ? (*d->get_char)d : '\0')
-
 #define PG_fset_line_color(d, color)                                          \
     if (d != NULL)                                                         \
        {if (d->set_line_color != NULL)                                     \
@@ -1279,15 +1306,15 @@ void PG_fset_viewport_shape(PG_device *dev, double *dx, double asp)
     if (d != NULL)                                                         \
        {d->current_palette = p;}
 
-#define PG_make_device_currentd                                            \
+#define PG_make_device_current                                            \
     if (d != NULL)                                                         \
        {if (d->make_device_current != NULL)                                \
-           (*d->make_device_current)d;}
+           (*d->make_device_current);}
 
-#define PG_release_current_deviced                                         \
+#define PG_release_current_device                                         \
     if (d != NULL)                                                         \
        {if (d->release_current_device != NULL)                             \
-           (*d->release_current_device)d;}
+           (*d->release_current_device);}
 
 #define PG_get_image(d, bf, ix, iy, nx, ny)                                  \
     if (d != NULL)                                                         \

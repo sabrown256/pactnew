@@ -1252,7 +1252,10 @@ static void _PG_dispatch_3d(PG_device *dev, PG_graph *data, int range_dim)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* PG_DRAW_GRAPH - main graph plotting control routine */
+/* PG_DRAW_GRAPH - main graph plotting control routine
+ *
+ * #bind PG_draw_graph fortran() scheme()
+ */
 
 void PG_draw_graph(PG_device *dev, PG_graph *data)
    {int domain_dim, range_dim;

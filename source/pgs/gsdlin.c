@@ -118,6 +118,8 @@ void PG_draw_multiple_line(PG_device *dev, int nlines,
 
 /* PG_DRAW_LINE_N - draw ND dimensional line segment (X1, X2) in 
  *                - coordinate system CS
+ *
+ * #bind PG_draw_line_n fortran() scheme()
  */
 
 void PG_draw_line_n(PG_device *dev, int nd, PG_coord_sys cs,
@@ -157,7 +159,10 @@ void PG_draw_line_n(PG_device *dev, int nd, PG_coord_sys cs,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* PG_DRAW_POLYLINE_N - draw a ND polyline in CS */
+/* PG_DRAW_POLYLINE_N - draw a ND polyline in CS
+ *
+ * #bind PG_draw_polyline_n fortran() scheme()
+ */
  
 void PG_draw_polyline_n(PG_device *dev, int nd, PG_coord_sys cs,
 			long n, double **x, int clip)
@@ -211,6 +216,8 @@ void PG_draw_polyline_n(PG_device *dev, int nd, PG_coord_sys cs,
  *                             - and X[2*i+1] is the other endpoint
  *                             - CLIP specifies wether the set is clipped
  *                             - to the viewport limits
+ *
+ * #bind PG_draw_disjoint_polyline_n fortran() scheme()
  */
 
 void PG_draw_disjoint_polyline_n(PG_device *dev, int nd, PG_coord_sys cs,
