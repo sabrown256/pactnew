@@ -367,6 +367,54 @@ double FF_ID(pgsdpi, PGSDPI)(double *sdpi)
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSBWD - set the border width */
+
+FIXNUM FF_ID(pgsbwd, PGSBWD)(FIXNUM *sdid, FIXNUM *sw)
+   {FIXNUM rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    rv  = PG_fset_border_width(dev, *sw);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSVPS - set viewport position */
+
+FIXNUM FF_ID(pgsvps, PGSVPS)(FIXNUM *sdid, double *ax)
+   {FIXNUM rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+
+    PG_fset_viewport_pos(dev, ax);
+
+    rv = TRUE;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSVSH - set viewport shape */
+
+FIXNUM FF_ID(pgsvsh, PGSVSH)(FIXNUM *sdid, double *ax, double *sa)
+   {FIXNUM rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+
+    PG_fset_viewport_shape(dev, ax, *sa);
+
+    rv = TRUE;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
 
 
 
@@ -1614,23 +1662,6 @@ FIXNUM FF_ID(pgsaxl, PGSAXL)(FIXNUM *sdid, FIXNUM *snd, FIXNUM *aflg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PGSBWD - set the border width */
-
-FIXNUM FF_ID(pgsbwd, PGSBWD)(FIXNUM *sdid, FIXNUM *sw)
-   {FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-
-    PG_set_border_width(dev, *sw);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PGSBSZ - set the I/O buffer size */
 
 FIXNUM FF_ID(pgsbsz, PGSBSZ)(FIXNUM *ssz)
@@ -1881,40 +1912,6 @@ FIXNUM FF_ID(pgsvwp, PGSVWP)(FIXNUM *sdid, double *sx1, double *sx2,
     ndc[3] = *sy2;
 
     PG_set_viewspace(dev, 2, NORMC, ndc);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGSVPS - set viewport position */
-
-FIXNUM FF_ID(pgsvps, PGSVPS)(FIXNUM *sdid, double *sx, double *sy)
-   {FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-
-    PG_set_viewport_pos(dev, *sx, *sy);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGSVSH - set viewport shape */
-
-FIXNUM FF_ID(pgsvsh, PGSVSH)(FIXNUM *sdid, double *sw, double *sh, double *sa)
-   {FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-
-    PG_set_viewport_shape(dev, *sw, *sh, *sa);
 
     rv = TRUE;
 

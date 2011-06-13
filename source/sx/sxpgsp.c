@@ -1511,8 +1511,9 @@ static object *_SXI_sarn(SS_psides *si, object *argl)
 /* _SXI_SBWD - set the border width in pixels */
 
 static object *_SXI_sbwd(SS_psides *si, object *argl)
-   {int c;
+   {int c, oc;
     PG_device *dev;
+    object *o;
 
     dev = NULL;
     c   = 1;
@@ -1524,9 +1525,10 @@ static object *_SXI_sbwd(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_SBWD", SS_null);
 
-    PG_set_border_width(dev, c);
+    oc = PG_fset_border_width(dev, c);
+    o  = SS_mk_integer(si, oc);
 
-    return(SS_f);}
+    return(o);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1866,8 +1868,9 @@ static object *_SXI_spal(SS_psides *si, object *argl)
 /* _SXI_SRES_SF - set the resolution scale factor */
 
 static object *_SXI_sres_sf(SS_psides *si, object *argl)
-   {int sf;
+   {int sf, rv;
     PG_device *dev;
+    object *o;
 
     dev = NULL;
     SS_args(si, argl,
@@ -1876,9 +1879,13 @@ static object *_SXI_sres_sf(SS_psides *si, object *argl)
             0);
 
     if (dev != NULL)
-       PG_set_res_scale_factor(dev, sf);
+       rv = PG_fset_res_scale_factor(dev, sf);
+    else
+       rv = 1;
 
-    return(SS_f);}
+    o = SS_mk_integer(si, rv);
+
+    return(o);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
