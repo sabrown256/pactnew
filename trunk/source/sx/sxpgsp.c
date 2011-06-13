@@ -3053,13 +3053,13 @@ static object *_SXI_satst(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* _SXI_GBFSZ - wrapper for PG_get_buffer_size */
+/* _SXI_GBFSZ - wrapper for PG_fget_buffer_size */
 
 static object *_SXI_gbfsz(SS_psides *si)
-   {object *rv;
-    int64_t sz;
+   {int64_t sz;
+    object *rv;
 
-    sz = PG_get_buffer_size();
+    sz = PG_fget_buffer_size();
     rv = SS_mk_integer(si, sz);
 
     return(rv);}
@@ -3067,19 +3067,19 @@ static object *_SXI_gbfsz(SS_psides *si)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* _SXI_SBFSZ - wrapper for PG_set_buffer_size */
+/* _SXI_SBFSZ - wrapper for PG_fset_buffer_size */
 
 static object *_SXI_sbfsz(SS_psides *si, object *argl)
-   {object *rv;
-    int64_t sz;
+   {int64_t sz, osz;
+    object *rv;
 
     sz = -1;
     SS_args(si, argl,
 	    SC_LONG_LONG_I, &sz,
 	    0);
 
-    PG_set_buffer_size(sz);
-    rv = SS_mk_integer(si, sz);
+    osz = PG_fset_buffer_size(sz);
+    rv  = SS_mk_integer(si, osz);
 
     return(rv);}
 

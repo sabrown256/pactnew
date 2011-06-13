@@ -1,5 +1,5 @@
 TXT: PGS User's Manual
-MOD: 06/10/2011
+MOD: 06/13/2011
 
 <CENTER>
 <P>
@@ -2101,8 +2101,8 @@ theta equal to 90 degrees.<p>
 
 <p>
 
-<I>C Binding: </I>int64_t PG_get_buffer_size(void)
-<BR><I>Fortran Binding: </I>integer pgsbsz(integer sz)
+<I>C Binding: </I>int64_t PG_fget_buffer_size(void)
+<BR><I>Fortran Binding: </I>integer pggbsz(void)
 <BR><I>SX Binding: </I>(pg-get-buffer-size)
 <P>
 Get the I/O buffer size for graphics files.<p>
@@ -2458,11 +2458,12 @@ Set the width of the window border in pixels.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_set_buffer_size(int64_t sz)
+<I>C Binding: </I>int64_t PG_set_buffer_size(int64_t sz)
 <BR><I>Fortran Binding: </I>integer pgsbsz(integer sz)
 <BR><I>SX Binding: </I>(pg-set-bbuffer-size! sz)
 <P>
-Set the I/O buffer size for graphics files.<p>
+Set the I/O buffer size for graphics files.  The old value
+is returned.<p>
 
 <p>
 

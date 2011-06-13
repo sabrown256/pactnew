@@ -252,6 +252,8 @@ static int PG_write_interface_object(FILE *fp, PG_interface_object *iob,
 /* PG_WRITE_INTERFACE - write out the interface descriptions to the
  *                    - given file
  *                    - return TRUE iff successful
+ *
+ * #bind PG_write_interface fortran() scheme()
  */
 
 int PG_write_interface(PG_device *dev, char *name)
@@ -625,6 +627,8 @@ static PG_interface_object *_PG_read_interface_object(PG_device *dev, FILE *fp,
 /* PG_READ_INTERFACE - read in the interface descriptions from the
  *                   - given file
  *                   - return TRUE iff successful
+ *
+ * #bind PG_read_interface fortran() scheme()
  */
 
 int PG_read_interface(PG_device *dev, char *name)

@@ -58,6 +58,7 @@ BinObj =
 # Required Libraries
 #
 Libs = ${LPDB} ${LPML} ${LSCORE} ${MDLib}
+FLibs = -lpftn
 
 DepLib = ${LibDir}/libpml.a \
 	 ${LibDir}/libscore.a
@@ -199,16 +200,16 @@ ${BinDir}/pdfcts : pdfcts.c ${InstallDep} ${Hdrs}
 Fstd : ${BinDir}/pdftst ${BinDir}/pdfwts ${BinDir}/pdfgts ${BinDir}/pdfhyts
 
 ${BinDir}/pdftst : pdftst.f ${InstallDep} ${Hdrs}
-	${FC} ${LdFlags} pdftst.f -o ${BinDir}/pdftst ${Libs} ${DPLib}
+	${FC} ${LdFlags} pdftst.f -o ${BinDir}/pdftst ${Libs} ${FLibs} ${DPLib}
 
 ${BinDir}/pdfwts : pdfwts.f ${InstallDep} ${Hdrs}
-	${FC} ${LdFlags} pdfwts.f -o ${BinDir}/pdfwts ${Libs} ${DPLib}
+	${FC} ${LdFlags} pdfwts.f -o ${BinDir}/pdfwts ${Libs} ${FLibs} ${DPLib}
 
 ${BinDir}/pdfgts : pdfgts.f ${InstallDep} ${Hdrs}
-	${FC} ${LdFlags} pdfgts.f -o ${BinDir}/pdfgts ${Libs} ${DPLib}
+	${FC} ${LdFlags} pdfgts.f -o ${BinDir}/pdfgts ${Libs} ${FLibs} ${DPLib}
 
 ${BinDir}/pdfhyts : pdfhyts.f ${InstallDep} ${Hdrs}
-	${FC} ${LdFlags} pdfhyts.f -o ${BinDir}/pdfhyts ${Libs} ${DPLib}
+	${FC} ${LdFlags} pdfhyts.f -o ${BinDir}/pdfhyts ${Libs} ${FLibs} ${DPLib}
 
 #
 # net io test

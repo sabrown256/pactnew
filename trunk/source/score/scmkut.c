@@ -524,7 +524,7 @@ void usage(void)
 /* MAIN - start here */
 
 int main(int c, char **v, char **env)
-   {int i, dryrun, ignore, show, st, na, nt, rv;
+   {int i, dryrun, ignore, show, st, na, no, nt, rv;
     int async, nconn, recur, dmp, mem, cs;
     int rnfd, rnprc;
     int64_t rmem, rcpu, rfsz;
@@ -728,11 +728,17 @@ int main(int c, char **v, char **env)
 /* parse makefile(s) */
     phase = 1;
 
+/* compute offset to end of mkname - length of "pre-Make"
+ * to allow things like -f <path>/pre-Make to work
+ */
+    no = strlen(mkname) - 8;
+    no = max(no, 0);
+
     if (strcmp(mkname, ".command") == 0)
        rv = command_makefile(state, v+i+1);
 
 /* read a pre-Make if that is what is requested */
-    else if (strcmp(mkname, "pre-Make") == 0)
+    else if (strcmp(mkname+no, "pre-Make") == 0)
        rv = SC_parse_premake(state, mkname);
 
 /* read anything else as if a complete Makefile */

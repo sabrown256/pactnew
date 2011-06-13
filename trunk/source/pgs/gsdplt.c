@@ -1041,7 +1041,10 @@ PG_picture_desc *PG_setup_picture_mesh(PG_device *dev, PG_graph *data,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* PG_DOMAIN_PLOT - plot the mesh of the given domain set */
+/* PG_DOMAIN_PLOT - plot the mesh of the given domain set
+ *
+ * #bind PG_domain_plot fortran() scheme()
+ */
 
 void PG_domain_plot(PG_device *dev, PM_set *dom, PM_set *ran)
    {int color, style;

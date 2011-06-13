@@ -1336,6 +1336,8 @@ void PG_surface_plot(PG_device *dev, PG_graph *data, ...)
  *                   - suitable scanning function, and a scalar array
  *                   - rotate to view angle, plot with hidden line
  *                   - algorithm, and shade if requested
+ *
+ * #bind PG_draw_surface_n fortran() scheme()
  */
 
 void PG_draw_surface_n(PG_device *dev, double *a1, double *a2, double *extr,

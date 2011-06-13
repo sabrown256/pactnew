@@ -835,6 +835,8 @@ void PG_trans_points(PG_device *dev, int n, int nd, PG_coord_sys ics, double **x
 /* PG_TRANS_POINT - convert a ND point XI in ICS to XO in OCS
  *                - NOTE: vectors in PC are really integer but are
  *                - represented here as double
+ *
+ * #bind PG_trans_point fortran() scheme()
  */
 
 void PG_trans_point(PG_device *dev, int nd, PG_coord_sys ics, double *xi,
@@ -1586,45 +1588,10 @@ static INLINE void _PG_set_space_WC(PG_device *dev, int nd, double *wc)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_SET_VIEWSPACE - set the view space from the given extremal box
- *                  - if CS == BOUNDC set BND
- *                  - if CS == WORLDC set WC
- *                  - if CS == NORMC  set NDC
+/* PG_GET_VIEWSPACE - return the viewspace limits
+ *
+ * #bind PG_get_viewspace fortran() scheme()
  */
-
-void PG_set_viewspace(PG_device *dev, int nd, PG_coord_sys cs, double *box)
-   {double bx[PG_BOXSZ];
-
-    if (box == NULL)
-       {PG_box_init(nd, bx, 0.0, 1.0);
-	box = bx;};
-
-    switch (cs)
-       {case BOUNDC :
-	     _PG_set_space_BND(dev, nd, box);
-	     break;
-
-        case WORLDC :
-	     _PG_set_space_WC(dev, nd, box);
-	     break;
-
-        case FRAMEC :
-	     _PG_set_space_FRM(dev, nd, box);
-	     break;
-
-	case NORMC :
-	     _PG_set_space_NDC(dev, nd, box);
-	     break;
-
-        default :
-             break;};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PG_GET_VIEWSPACE - return the viewspace limits */
 
 void PG_get_viewspace(PG_device *dev, PG_coord_sys cs, double *box)
    {PG_dev_geometry *g;
@@ -1657,6 +1624,46 @@ void PG_get_viewspace(PG_device *dev, PG_coord_sys cs, double *box)
              _PG_box_pc(dev, PG_SPACEDM, NORMC, g->ndc, box);
 	     if (box[2] > box[3])
 	        {SC_SWAP_VALUE(double, box[2], box[3]);};
+             break;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_SET_VIEWSPACE - set the view space from the given extremal box
+ *                  - if CS == BOUNDC set BND
+ *                  - if CS == WORLDC set WC
+ *                  - if CS == NORMC  set NDC
+ *
+ * #bind PG_set_viewspace fortran() scheme()
+ */
+
+void PG_set_viewspace(PG_device *dev, int nd, PG_coord_sys cs, double *box)
+   {double bx[PG_BOXSZ];
+
+    if (box == NULL)
+       {PG_box_init(nd, bx, 0.0, 1.0);
+	box = bx;};
+
+    switch (cs)
+       {case BOUNDC :
+	     _PG_set_space_BND(dev, nd, box);
+	     break;
+
+        case WORLDC :
+	     _PG_set_space_WC(dev, nd, box);
+	     break;
+
+        case FRAMEC :
+	     _PG_set_space_FRM(dev, nd, box);
+	     break;
+
+	case NORMC :
+	     _PG_set_space_NDC(dev, nd, box);
+	     break;
+
+        default :
              break;};
 
     return;}
@@ -2036,29 +2043,10 @@ void PG_viewport_frame(PG_device *dev, int nd, double *ndc)
 
 /*--------------------------------------------------------------------------*/
 
-/* PG_SET_VIEW_ANGLE - set the view angle in degrees for DEV */
-
-void PG_set_view_angle(PG_device *dev, double theta, double phi, double chi)
-   {PG_dev_geometry *g;
-
-    g = &dev->g;
-
-    if (theta != HUGE)
-       g->view_angle[0] = DEG_RAD*theta;
-
-    if (phi != HUGE)
-       g->view_angle[1] = DEG_RAD*phi;
-
-    if (chi != HUGE)
-       g->view_angle[2] = DEG_RAD*chi;
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PG_GET_VIEW_ANGLE - get the view angle in degrees if CNV is TRUE
  *                   - otherwise in radians
+ *
+ * #bind PG_get_view_angle fortran() scheme()
  */
 
 void PG_get_view_angle(PG_device *dev, int cnv,
@@ -2083,16 +2071,24 @@ void PG_get_view_angle(PG_device *dev, int cnv,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_SET_LIGHT_ANGLE - set the light angle in degrees for DEV */
+/* PG_SET_VIEW_ANGLE - set the view angle in degrees for DEV
+ *
+ * #bind PG_set_view_angle fortran() scheme()
+ */
 
-void PG_set_light_angle(PG_device *dev, double theta, double phi)
-   {
+void PG_set_view_angle(PG_device *dev, double theta, double phi, double chi)
+   {PG_dev_geometry *g;
+
+    g = &dev->g;
 
     if (theta != HUGE)
-       dev->light_angle[0] = DEG_RAD*theta;
+       g->view_angle[0] = DEG_RAD*theta;
 
     if (phi != HUGE)
-       dev->light_angle[1] = DEG_RAD*phi;
+       g->view_angle[1] = DEG_RAD*phi;
+
+    if (chi != HUGE)
+       g->view_angle[2] = DEG_RAD*chi;
 
     return;}
 
@@ -2101,6 +2097,8 @@ void PG_set_light_angle(PG_device *dev, double theta, double phi)
 
 /* PG_GET_LIGHT_ANGLE - get the lighting angle in degrees if CNV is TRUE
  *                    - otherwise in radians
+ *
+ * #bind PG_get_light_angle fortran() scheme()
  */
 
 void PG_get_light_angle(PG_device *dev, int cnv, double *pt, double *pp)
@@ -2113,6 +2111,25 @@ void PG_get_light_angle(PG_device *dev, int cnv, double *pt, double *pp)
 
     if (pp != NULL)
        *pp = cf*dev->light_angle[1];
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_SET_LIGHT_ANGLE - set the light angle in degrees for DEV
+ *
+ * #bind PG_set_light_angle fortran() scheme()
+ */
+
+void PG_set_light_angle(PG_device *dev, double theta, double phi)
+   {
+
+    if (theta != HUGE)
+       dev->light_angle[0] = DEG_RAD*theta;
+
+    if (phi != HUGE)
+       dev->light_angle[1] = DEG_RAD*phi;
 
     return;}
 

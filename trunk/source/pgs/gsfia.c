@@ -40,6 +40,30 @@ double FF_ID(pgsaxd, PGSAXD)(double *sd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PGGBSZ - return the I/O buffer size */
+
+FIXNUM FF_ID(pggbsz, PGGBSZ)(void)
+   {FIXNUM rv;
+
+    rv = PG_fget_buffer_size();
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSBSZ - set the I/O buffer size */
+
+FIXNUM FF_ID(pgsbsz, PGSBSZ)(FIXNUM *ssz)
+   {FIXNUM rv;
+
+    rv = PG_fset_buffer_size(*ssz);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PGGCLM - get the clear mode */
 
 FIXNUM FF_ID(pggclm, PGGCLM)(void)
@@ -614,20 +638,6 @@ FIXNUM FF_ID(pggaxl, PGGAXL)(FIXNUM *sdid, FIXNUM *snd, FIXNUM *aflg)
         aflg[id] = ifl[id];
 
     return(TRUE);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGGBSZ - return the I/O buffer size */
-
-FIXNUM FF_ID(pggbsz, PGGBSZ)(void)
-   {FIXNUM rv;
-    int64_t sz;
-
-    sz = PG_get_buffer_size();
-    rv = sz;
-
-    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1656,21 +1666,6 @@ FIXNUM FF_ID(pgsaxl, PGSAXL)(FIXNUM *sdid, FIXNUM *snd, FIXNUM *aflg)
     PG_set_axis_log_scale(dev, nd, ifl);
 
     rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGSBSZ - set the I/O buffer size */
-
-FIXNUM FF_ID(pgsbsz, PGSBSZ)(FIXNUM *ssz)
-   {FIXNUM rv;
-    int64_t sz;
-
-    sz = *ssz;
-    PG_set_buffer_size(sz);
-    rv = sz;
 
     return(rv);}
 

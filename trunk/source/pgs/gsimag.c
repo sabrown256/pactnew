@@ -897,6 +897,8 @@ static void _PG_fill_palette_image(PG_device *dev, unsigned char *bf,
 /* PG_DRAW_PALETTE_N - display the palette
  *                   - place it exactly where requested iff
  *                   - EXACT is TRUE
+ *
+ * #bind PG_draw_palette_n fortran() scheme()
  */
 
 void PG_draw_palette_n(PG_device *dev, double *dbx, double *rbx,
@@ -1245,7 +1247,10 @@ int _PG_byte_bit_map(unsigned char *bf, int nx, int ny, int complmnt)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_MAKE_IMAGE_N - initialize an image */
+/* PG_MAKE_IMAGE_N - initialize an image
+ *
+ * #bind PG_make_image_n fortran() scheme()
+ */
 
 PG_image *PG_make_image_n(char *label, char *type, void *z,
 			  int nd, PG_coord_sys cs, double *dbx, double *rbx,

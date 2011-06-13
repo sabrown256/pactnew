@@ -448,6 +448,10 @@ enum e_PG_angle_unit
 
 typedef enum e_PG_angle_unit PG_angle_unit;
 
+/*
+ * #bind derived PG_logical_operation integer SC_ENUM_I SC_ENUM_I
+ */
+
 enum e_PG_logical_operation
    {GS_COPY = 3,
     GS_XOR  = 6};
@@ -1104,6 +1108,10 @@ extern double
  PG_fget_ps_dots_inch(void),
  PG_fset_ps_dots_inch(double dpi);
 
+extern int64_t
+ PG_fget_buffer_size(void),
+ PG_fset_buffer_size(int64_t sz);
+
 extern int
  PG_fget_clear_mode(void),
  PG_fset_clear_mode(int i),
@@ -1310,10 +1318,6 @@ extern int
  PG_wind_fputs(char *s, FILE *fp),
  PG_open_console(char *title, char *type, int bckgr,
 		 double xf, double yf, double dxf, double dyf);
-
-extern int64_t
- PG_set_buffer_size(int64_t sz),
- PG_get_buffer_size(void);
 
 
 /* GSEVMN.C declarations */
