@@ -2450,7 +2450,7 @@ to be plotted with a log scale if TRUE.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_set_border_width(PG_device *dev, int t)
+<I>C Binding: </I>int PG_fset_border_width(PG_device *dev, int t)
 <BR><I>Fortran Binding: </I>integer pgsbwd(integer devid, integer t)
 <BR><I>SX Binding: </I>(pg-set-border-width dev t)
 <P>
@@ -2543,7 +2543,7 @@ available palettes may be viewed with PG_show_palettes.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_set_res_scale_factor(PG_device *dev, double f)
+<I>C Binding: </I>int PG_fset_res_scale_factor(PG_device *dev, int f)
 <BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-set-resolution-scale-factor! dev sf)
 <P>
@@ -5293,7 +5293,7 @@ int main(int argc, char **argv)
     PG_set_viewspace_shape(SCR_dev, 0.5, 0.0, 0.5/0.3333);
 
     PG_white_background(SCR_dev, TRUE);
-    PG_set_border_width(SCR_dev, 5);
+    PG_fset_border_width(SCR_dev, 5);
 
 /* set up data */
 

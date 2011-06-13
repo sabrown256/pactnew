@@ -51,8 +51,15 @@ int main(argc, argv)
 
     SCR_dev = PG_make_device("WINDOW", "COLOR", "PGS Test A");
     PG_white_background(SCR_dev, TRUE);
-    PG_set_viewport_pos(SCR_dev, 0.0, 0.0);
-    PG_set_viewport_shape(SCR_dev, 1.0, 0.0, 1.0);
+
+    x1[0] = 0.0;
+    x1[1] = 0.0;
+    PG_fset_viewport_pos(SCR_dev, x1);
+
+    x1[0] = 1.0;
+    x1[1] = 0.0;
+    PG_fset_viewport_shape(SCR_dev, x1, 1.0);
+
     PG_open_device(SCR_dev, 0.1, 0.1, 0.4, 0.4);
 
     PG_set_viewspace(SCR_dev, 2, NORMC, NULL);
@@ -60,8 +67,15 @@ int main(argc, argv)
 
     SCR_dew = PG_make_device("WINDOW", "COLOR", "PGS Test B");
     PG_white_background(SCR_dew, FALSE);
-    PG_set_viewport_pos(SCR_dew, 0.0, 0.0);
-    PG_set_viewport_shape(SCR_dew, 1.0, 0.0, 1.0);
+
+    x1[0] = 0.0;
+    x1[1] = 0.0;
+    PG_fset_viewport_pos(SCR_dew, x1);
+
+    x1[0] = 1.0;
+    x1[1] = 0.0;
+    PG_fset_viewport_shape(SCR_dew, x1, 1.0);
+
     PG_open_device(SCR_dew, 0.5, 0.1, 0.4, 0.4);
 
     PG_set_viewspace(SCR_dew, 2, NORMC, NULL);

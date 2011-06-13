@@ -900,29 +900,159 @@ int PG_fset_use_pixmap(int i)
     return(i);}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_RES_SCALE_FACTOR - get the device resolution scale factor
+ *                          - defaults to 1
+ *
+ * #bind PG_fget_res_scale_factor fortran() scheme()
+ */
+
+int PG_fget_res_scale_factor(PG_device *dev)
+   {int rv;
+
+    if (dev != NULL)
+       rv = dev->resolution_scale_factor;
+    else
+       rv = 1;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_RES_SCALE_FACTOR - set the device resolution scale factor
+ *
+ * #bind PG_fset_res_scale_factor fortran() scheme()
+ */
+
+int PG_fset_res_scale_factor(PG_device *dev, int s)
+   {int rv;
+
+    if (dev != NULL)
+       {rv = dev->resolution_scale_factor;
+	dev->resolution_scale_factor = s;}
+    else
+       rv = 1;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_BORDER_WIDTH - get the device border width
+ *                      - defaults to 1
+ *
+ * #bind PG_fget_border_width fortran() scheme()
+ */
+
+int PG_fget_border_width(PG_device *dev)
+   {int rv;
+
+    if (dev != NULL)
+       rv = dev->border_width;
+    else
+       rv = 1;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_BORDER_WIDTH - set the device border width
+ *
+ * #bind PG_fset_border_width fortran() scheme()
+ */
+
+int PG_fset_border_width(PG_device *dev, int w)
+   {int rv;
+
+    if (dev != NULL)
+       {rv = dev->border_width;
+	dev->border_width = w;}
+    else
+       rv = 1;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_VIEWPORT_POS - return the current viewport position
+ *
+ * #bind PG_fget_viewport_pos fortran() scheme()
+ */
+
+void PG_fget_viewport_pos(PG_device *dev, double *x)
+   {
+
+    if (dev != NULL)
+       {x[0] = dev->view_x[0];
+	x[1] = dev->view_x[2];}
+    else
+       {x[0] = 0.0;
+	x[1] = 0.0;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_VIEWPORT_POS - set the current viewport position
+ *
+ * #bind PG_fset_viewport_pos fortran() scheme()
+ */
+
+void PG_fset_viewport_pos(PG_device *dev, double *x)
+   {
+
+    if (dev != NULL)
+       {dev->view_x[0] = x[0];
+	dev->view_x[2] = x[1];};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_VIEWPORT_SHAPE - return the current viewport shape
+ *
+ * #bind PG_fget_viewport_shape fortran() scheme()
+ */
+
+void PG_fget_viewport_shape(PG_device *dev, double *dx, double *pa)
+   {
+
+    if (dev != NULL)
+       {dx[0] = dev->view_x[1] - dev->view_x[0];
+	dx[1] = dev->view_x[3] - dev->view_x[2];
+        *pa   = dev->view_aspect;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_VIEWPORT_SHAPE - set the current viewport shape
+ *
+ * #bind PG_fset_viewport_shape fortran() scheme()
+ */
+
+void PG_fset_viewport_shape(PG_device *dev, double *dx, double asp)
+   {
+
+    if (dev != NULL)
+       {dev->view_x[1]   = dev->view_x[0] + dx[0];
+        dev->view_x[3]   = dev->view_x[2] + dx[1];
+        dev->view_aspect = asp;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
 
 #if 0
 
 /*--------------------------------------------------------------------------*/
-
-#define PG_fset_res_scale_factor(d, t)                                        \
-   {if (d != NULL)                                                         \
-       d->resolution_scale_factor = (t);}
-
-#define PG_fset_border_width(d, t)                                            \
-   {if (d != NULL)                                                         \
-       d->border_width = (t);}
-
-#define PG_fset_viewport_pos(d, x, y)                                         \
-   {if (d != NULL)                                                         \
-       {d->view_x[0] = (x);                                                \
-        d->view_x[2] = (y);};}
-
-#define PG_fset_viewport_shape(d, w, h, a)                                    \
-   {if (d != NULL)                                                         \
-       {d->view_x[1]   = d->view_x[0] + (w);                             \
-        d->view_x[3]   = d->view_x[2] + (h);                             \
-        d->view_aspect = (a);};}
 
 #define PG_fget_type_size(d, v)                                               \
     {v = -1;                                                                 \

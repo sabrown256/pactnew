@@ -1122,7 +1122,11 @@ extern int
  PG_fget_pixmap_flag(PG_device *dev),
  PG_fset_pixmap_flag(PG_device *dev, int fl),
  PG_fget_use_pixmap(void),
- PG_fset_use_pixmap(int i);
+ PG_fset_use_pixmap(int i),
+ PG_fget_res_scale_factor(PG_device *dev),
+ PG_fset_res_scale_factor(PG_device *dev, int s),
+ PG_fget_border_width(PG_device *dev),
+ PG_fset_border_width(PG_device *dev, int w);
 
 extern void
  PG_fget_char_path(PG_device *dev, double *x),
@@ -1132,7 +1136,11 @@ extern void
  PG_fget_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double *p),
  PG_fset_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double *p),
  PG_fget_font(PG_device *dev, char **of, char **ost, int *osz),
- PG_fset_font(PG_device *dev, char *face, char *style, int sz);
+ PG_fset_font(PG_device *dev, char *face, char *style, int sz),
+ PG_fget_viewport_pos(PG_device *dev, double *x),
+ PG_fset_viewport_pos(PG_device *dev, double *x),
+ PG_fget_viewport_shape(PG_device *dev, double *dx, double *pa),
+ PG_fset_viewport_shape(PG_device *dev, double *dx, double asp);
 
 extern PG_logical_operation
  PG_fget_logical_op(PG_device *dev),

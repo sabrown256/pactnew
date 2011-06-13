@@ -12,8 +12,9 @@
 int main(int argc, char **argv)
   {int i, k, l, kmax, lmax, kxl;
    int id, lncolor, lnstyle;
-   double *x, *y, *f, r, t, lnwidth;
    double xmin, xmax, ymin, ymax;
+   double xc[PG_SPACEDM];
+   double *x, *y, *f, r, t, lnwidth;
    PM_centering centering;
    PG_device *SCR_dev;
    PG_graph *dataset;
@@ -23,11 +24,16 @@ int main(int argc, char **argv)
    SCR_dev = PG_make_device("WINDOW", "COLOR", "PGS Contour Test");
    PG_open_device(SCR_dev, 0.05, 0.2, 0.45, 0.45);
 
-   PG_set_viewport_pos(SCR_dev, 0.25, 0.15);
-   PG_set_viewport_shape(SCR_dev, 0.5, 0.0, 0.5/0.3333);
+   xc[0] = 0.25;
+   xc[1] = 0.15;
+   PG_fset_viewport_pos(SCR_dev, x);
+
+   xc[0] = 0.5;
+   xc[1] = 0.0;
+   PG_fset_viewport_shape(SCR_dev, xc, 0.500/0.333);
 
    PG_white_background(SCR_dev, TRUE);
-   PG_set_border_width(SCR_dev, 5);
+   PG_fset_border_width(SCR_dev, 5);
 
 /* set up data */
    kmax      = 20;

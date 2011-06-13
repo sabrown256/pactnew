@@ -18,8 +18,9 @@
 int main(int argc, char **argv)
    {int i, k, l, kmax, lmax, kxl;
     int id, lncolor, lnstyle;
-    double *x, *y, *u, *v, lnwidth;
     double xmin, xmax, ymin, ymax, km, lm;
+    double xc[PG_SPACEDM];
+    double *x, *y, *u, *v, lnwidth;
     PG_device *SCR_dev, *PS_dev, *CGM_dev;
     PM_centering centering;
     PM_set *domain, *range;
@@ -29,8 +30,14 @@ int main(int argc, char **argv)
     SCR_dev = PG_make_device("WINDOW", "COLOR", "PGS Vector Test");
 
     PG_white_background(SCR_dev, TRUE);
-    PG_set_viewport_pos(SCR_dev, 0.250, 0.150);
-    PG_set_viewport_shape(SCR_dev, 0.500, 0.0, 0.500/0.333);
+
+    xc[0] = 0.25;
+    xc[1] = 0.15;
+    PG_fset_viewport_pos(SCR_dev, x);
+
+    xc[0] = 0.5;
+    xc[1] = 0.0;
+    PG_fset_viewport_shape(SCR_dev, xc, 0.500/0.333);
 
     PG_open_device(SCR_dev, 0.05, 0.2, 0.45, 0.45);
 

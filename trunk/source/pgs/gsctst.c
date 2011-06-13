@@ -373,6 +373,7 @@ static void test_3d_new(void)
 int main(int c, char **v)
    {int i, sc;
     int fl2d, fl2ds, fl3d;
+    double x[PG_SPACEDM];
     char msg[MAXLINE];
 
     SC_setbuf(stdout, NULL);
@@ -407,9 +408,16 @@ int main(int c, char **v)
     SCR_dev = PG_make_device("WINDOW", "COLOR", "PGS Contour Test");
 
     PG_white_background(SCR_dev, TRUE);
-    PG_set_viewport_pos(SCR_dev, 0.250, 0.150);
-    PG_set_viewport_shape(SCR_dev, 0.500, 0.0, 0.500/0.333);
-    PG_set_border_width(SCR_dev, 5);
+
+    x[0] = 0.250;
+    x[1] = 0.150;
+    PG_fset_viewport_pos(SCR_dev, x);
+
+    x[0] = 0.5;
+    x[1] = 0.0;
+    PG_fset_viewport_shape(SCR_dev, x, 0.500/0.333);
+
+    PG_fset_border_width(SCR_dev, 5);
 
     PG_open_device(SCR_dev, 0.78, 0.002, 0.45, 0.45);
 
