@@ -122,8 +122,8 @@ static void PG_dvb_hand(PG_device *dev, PG_graph *g, PFDvbZC fnc_zc,
 		       NULL);
 
     PG_set_line_color(dev, color);
-    PG_set_line_style(dev, style);
-    PG_set_line_width(dev, width);
+    PG_fset_line_style(dev, style);
+    PG_fset_line_width(dev, width);
 
     fextr = dev->range_extrema;
 

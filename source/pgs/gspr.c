@@ -13,42 +13,6 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_GET_LINE_WIDTH - return the width of a line */
-
-void PG_get_line_width(PG_device *dev, double *plw)
-   {
-
-    *plw = dev->line_width;
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PG_GET_LOGICAL_OP - return the logical operation */
-
-void PG_get_logical_op(PG_device *dev, PG_logical_operation *plop)
-   {
-
-    *plop = dev->logical_op;
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PG_GET_LINE_STYLE - return the line style */
-
-void PG_get_line_style(PG_device *dev, int *pl)
-   {
-
-    *pl = dev->line_style;
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PG_GET_TEXT_EXT_N - return the text extent in NDC of the given string */
 
 void PG_get_text_ext_n(PG_device *dev, int nd, PG_coord_sys cs, char *s, double *p)
@@ -76,7 +40,7 @@ static double _PG_get_marker_scale(PG_device *dev)
    {double sc;
     PG_RAST_device *mdv;
 
-    PG_get_marker_scale(dev, sc);
+    sc = PG_fget_marker_scale(dev);
     
     GET_RAST_DEVICE(dev, mdv);
     if (mdv != NULL)
@@ -405,7 +369,7 @@ void PG_set_attributes(PG_device *dev, PG_dev_attributes *attr)
 	    dev->char_up[id] = attr->char_up[id];
 
 /* because of the line width mapping this cannot be done as the other are */
-	PG_set_line_width(dev, attr->line_width);};
+	PG_fset_line_width(dev, attr->line_width);};
 
     return;}
 

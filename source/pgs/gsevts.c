@@ -322,7 +322,7 @@ int main(int argc, char *argv[])
     PG_open_console("PGS Test", "COLOR", TRUE, 0.1, 0.7, 0.5, 0.3);
 
     SCR_dev = PG_make_device("WINDOW", "COLOR", "PGS Test");
-    PG_set_pixmap_flag(SCR_dev, FALSE);
+    PG_fset_pixmap_flag(SCR_dev, FALSE);
 
     PG_open_device(SCR_dev, 0.1, 0.1, 0.5, 0.6);
 

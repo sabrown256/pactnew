@@ -219,11 +219,13 @@ static void _PG_clear_text_box(PG_text_box *b, int i)
 	if (bwid > 0.0)
 	   {double wid;
 
+	    wid = PG_fget_line_width(dev);
+	    PG_fset_line_width(dev, bwid);
 	    PG_set_color_line(dev, bgc, FALSE);
-	    PG_get_line_width(dev, &wid);
-	    PG_set_line_width(dev, bwid);
+
 	    PG_draw_curve(dev, crv, FALSE);
-	    PG_set_line_width(dev, wid);};
+
+	    PG_fset_line_width(dev, wid);};
 
 	PG_update_vs(dev);
 
@@ -362,11 +364,13 @@ void PG_refresh_text_box(PG_text_box *b)
 	if (bwid > 0.0)
 	   {double wid;
 
-	    PG_get_line_width(dev, &wid);
-	    PG_set_line_width(dev, bwid);
+	    wid = PG_fget_line_width(dev);
+	    PG_fset_line_width(dev, bwid);
 	    (*dev->set_line_color)(dev, b->foreground, FALSE);
+
 	    PG_draw_curve(dev, crv, FALSE);
-	    PG_set_line_width(dev, wid);};
+
+	    PG_fset_line_width(dev, wid);};
 
 	PG_fget_char_path(dev, x);
 	PG_fset_char_path(dev, dc);

@@ -181,7 +181,7 @@ int main(int argc, char **argv)
     SCR_dew = PG_make_device(s, "COLOR", "PGS Test B");
     PG_white_background(SCR_dew, FALSE);
     PG_turn_data_id(SCR_dew, ON);
-    PG_set_max_intensity(SCR_dew, 0.8);
+    PG_fset_max_intensity(SCR_dew, 0.8);
     PG_open_device(SCR_dew, 0.5, 0.2, 0.45, 0.45);
 
 /* set up the hard copy device */
@@ -198,7 +198,7 @@ int main(int argc, char **argv)
     else
        CGM_dev = PG_make_device("CGM", "MONOCHROME", "gsltst");
     PG_turn_data_id(CGM_dev, ON);
-    PG_set_max_intensity(CGM_dev, 0.8);
+    PG_fset_max_intensity(CGM_dev, 0.8);
     PG_open_device(CGM_dev, 0.0, 0.0, 0.0, 0.0);
 
     draw_set_1(x, y, SCR_dev, SCR_dew, PS_dev, CGM_dev);

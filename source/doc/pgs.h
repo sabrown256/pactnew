@@ -2062,7 +2062,7 @@ arguments are the number of segments, n_seg, and arrays specifying the
 x and y values of the endpoints of each segment. Each array must be n_seg
 elements long. The values in the arrays must be between -1.0 and 1.0. The
 marker can be scaled to any size and rotated by using the macros
-PG_set_marker_scale and PG_set_marker_orientation. The index of the
+PG_fset_marker_scale and PG_fset_marker_orientation. The index of the
 new marker is returned and should be used as values for the MARKER-INDEX
 attribute where called for.<p>
 
@@ -2497,8 +2497,8 @@ a plot after the high level renderer returns.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_set_marker_orientation(PG_device *dev, double theta)
-<BR><I>Fortran Binding: </I>integer pgsmko(integer devid, REAL theta)
+<I>C Binding: </I>double PG_fset_marker_orientation(PG_device *dev, double theta)
+<BR><I>Fortran Binding: </I>real*8 pgsmko(integer devid, real*8 theta)
 <BR><I>SX Binding: </I>(pg-set-marker-orientation! dev theta)
 <P>
 Set the orientation angle to be applied when drawing markers. Markers can be
@@ -2508,8 +2508,8 @@ marker.  It is measured in degrees.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_set_marker_scale(PG_device *dev, double v)
-<BR><I>Fortran Binding: </I>integer pgsms(integer devid, REAL v)
+<I>C Binding: </I>double PG_fset_marker_scale(PG_device *dev, double sc)
+<BR><I>Fortran Binding: </I>double pgsms(integer devid, REAL sc)
 <BR><I>SX Binding: </I>(pg-set-marker-scale! dev v)
 <P>
 Set the scale factor to be applied when drawing markers. Markers can be
@@ -2519,7 +2519,7 @@ value might be 0.01.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_set_max_intensity(PG_device *dev, double osc)
+<I>C Binding: </I>double PG_fset_max_intensity(PG_device *dev, double osc)
 <BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>(pg-set-maximum-intensity! dev osc rsc gsc bsc)
 <P>
@@ -2721,8 +2721,8 @@ call to PG_finish_plot.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_get_marker_orientation(PG_device *dev, double *v)
-<BR><I>Fortran Binding: </I>integer pggmko(integer dev, REAL v)
+<I>C Binding: </I>double PG_fget_marker_orientation(PG_device *dev)
+<BR><I>Fortran Binding: </I>real*8 pggmko(integer dev)
 <BR><I>SX Binding: </I>(pg-marker-orientation dev)
 <P>
 
@@ -2733,8 +2733,8 @@ comprising the marker.  The angle is measured in degrees.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_get_marker_scale(PG_device *dev, double *s)
-<BR><I>Fortran Binding: </I>integer pggmks(integer devid, REAL s)
+<I>C Binding: </I>double PG_fget_marker_scale(PG_device *dev)
+<BR><I>Fortran Binding: </I>real*8 integer pggmks(integer devid)
 <BR><I>SX Binding: </I>(pg-marker-scale dev)
 <P>
 Get the current marker scale factor of the device. Markers can be drawn to any
@@ -3007,14 +3007,14 @@ These routines provide control over how lines appear when drawn.<p>
 <P>
 
 <p>
-<I>C Binding: </I>void PG_get_line_style(PG_device *dev, int *pls)
-<BR><I>Fortran Binding: </I>integer pgglns(integer devid, integer ls)
+<I>C Binding: </I>int PG_fget_line_style(PG_device *dev)
+<BR><I>Fortran Binding: </I>integer pgglns(integer devid)
 <BR><I>SX Binding: </I>(pg-line-style dev)
 <P>
 
 <p>
-<I>C Binding: </I>void PG_get_line_width(PG_device *dev, double *plw)
-<BR><I>Fortran Binding: </I>integer pgglnw(integer devid, REAL lw)
+<I>C Binding: </I>double PG_fget_line_width(PG_device *dev)
+<BR><I>Fortran Binding: </I>real*8 pgglnw(integer devid)
 <BR><I>SX Binding: </I>(pg-line-width dev)
 <P>
 
@@ -3025,14 +3025,14 @@ These routines provide control over how lines appear when drawn.<p>
 <P>
 
 <p>
-<I>C Binding: </I>void PG_set_line_style(PG_device *dev, int ls)
+<I>C Binding: </I>int PG_fset_line_style(PG_device *dev, int ls)
 <BR><I>Fortran Binding: </I>integer pgslns(integer devid, integer ls)
 <BR><I>SX Binding: </I>(pg-set-line-style! dev ls)
 <P>
 
 <p>
-<I>C Binding: </I>void PG_set_line_width(PG_device *dev, double lw)
-<BR><I>Fortran Binding: </I>integer pgslnw(integer devid, REAL lw)
+<I>C Binding: </I>double PG_fset_line_width(PG_device *dev, double lw)
+<BR><I>Fortran Binding: </I>real*8 pgslnw(integer devid, real*8 lw)
 <BR><I>SX Binding: </I>(pg-set-line-width! dev lw)
 <P>
 These routines access the state contained in a PG_device pertaining to lines.
@@ -3753,21 +3753,21 @@ PLOT_WIRE_MESH<p>
 
 <p>
 
-<I>C Binding: </I>void PG_get_identifier(PG_graph *g, int id)
-<BR><I>Fortran Binding: </I>integer pgggid(integer gid, integer id)
+<I>C Binding: </I>int PG_fget_identifier(PG_graph *g)
+<BR><I>Fortran Binding: </I>integer pgggid(integer gid)
 <BR><I>SX Binding: </I>
 <P>
-Return the identifier character, id, of the specified graph. In the C
-binding this is a macro.<p>
+Return the identifier character, id, of the specified graph.
+<p>
 
 <p>
 
-<I>C Binding: </I>void PG_get_render_info(PG_graph *g, pcons *alst)
+<I>C Binding: </I>pcons *PG_fget_render_info(PG_graph *g)
 <BR><I>Fortran Binding: </I>integer pgginf(integer gid, integer alst)
 <BR><I>SX Binding: </I>
 <P>
-Return the attribute list, alst, of the specified graph. In the C
-binding this is a macro.<p>
+Return the attribute list, alst, of the specified graph.
+<p>
 
 <p>
 
@@ -3781,21 +3781,22 @@ dimensionality of the domain.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_set_identifier(PG_graph *g, int id)
+<I>C Binding: </I>int PG_set_identifier(PG_graph *g, int id)
 <BR><I>Fortran Binding: </I>integer pgsgid(integer gid, integer id)
 <BR><I>SX Binding: </I>
 <P>
-Set the identifier character, id, of the specified graph. In the C
-binding this is a macro.<p>
+Set the identifier character, id, of the specified graph. Return
+the old value.
+<p>
 
 <p>
 
-<I>C Binding: </I>void  PG_set_render_info(PG_graph *g, pcons *alst)
+<I>C Binding: </I>pcons *PG_fset_render_info(PG_graph *g, pcons *alst)
 <BR><I>Fortran Binding: </I>integer pgsinf(integer gid, integer alst)
 <BR><I>SX Binding: </I>
 <P>
-Set the attribute list, alst, of the specified graph. In the C
-binding this is a macro.<p>
+Set the attribute list, alst, of the specified graph.
+<p>
 
 <p>
 
@@ -4837,9 +4838,9 @@ PG_finish_plot be called once per picture.<p>
 
 To gain control of the appearance of high level plots, applications must
 set rendering attributes.  See the discussion of rendering attributes
-before going any further here. The sequence is to use PG_get_render_info
+before going any further here. The sequence is to use PG_fget_render_info
 to obtain the attribute list from the graph, use SC_change_alist to
-change or add values to the list, and use PG_set_render_info to update
+change or add values to the list, and use PG_fset_render_info to update
 the graph&#146;s attribute list.<p>
 
 
@@ -4859,10 +4860,10 @@ nlev  = CMAKE(int);
 *nlev = 6;
 clev  = CMAKE_N(double, *nlev);
 
-PG_get_render_info(g, alst);
+alst = PG_fget_render_info(g);
 alst = SC_change_alist(alst, "LEVELS", "double *", clev);
 alst = SC_change_alist(alst, "N-LEVELS", "int *", nlev);
-PG_set_render_info(g, alst);
+PG_fset_render_info(g, alst);
 
 </PRE>
 </BLOCKQUOTE>

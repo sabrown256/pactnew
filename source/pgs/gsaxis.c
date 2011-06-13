@@ -27,11 +27,11 @@ static void _PG_draw_grid_lines(PG_device *dev, PG_axis_def *ad,
     n  = td->n;
     dx = td->dx;
 
-    PG_set_line_style(dev, _PG_gattrs.axis_grid_style);
+    PG_fset_line_style(dev, _PG_gattrs.axis_grid_style);
 
     PG_draw_multiple_line(dev, n, x1n, x1x, x2n, x2x, dx);
 
-    PG_set_line_style(dev, _PG_gattrs.axis_line_style);
+    PG_fset_line_style(dev, _PG_gattrs.axis_line_style);
 
     _PG_rl_axis_def(ad);
 
@@ -79,7 +79,7 @@ static void _PG_draw_polar_grid_lines(PG_device *dev, PG_axis_def *ad,
     r[1]  = max(r[1], r3);
     r[1]  = max(r[1], r4);
 
-    PG_set_line_style(dev, _PG_gattrs.axis_grid_style);
+    PG_fset_line_style(dev, _PG_gattrs.axis_grid_style);
     PG_fset_clipping(dev, TRUE);
 
     dr = (en[1] - en[0])/((double) n - 1.0);
@@ -100,7 +100,7 @@ static void _PG_draw_polar_grid_lines(PG_device *dev, PG_axis_def *ad,
             PG_draw_rad(dev, 0.0, r[1], a1, 0.0, 0.0, RADIAN);};
 
     PG_fset_clipping(dev, FALSE);
-    PG_set_line_style(dev, _PG_gattrs.axis_line_style);
+    PG_fset_line_style(dev, _PG_gattrs.axis_line_style);
 
     _PG_rl_axis_def(ad);
 
@@ -634,9 +634,9 @@ void PG_axis(PG_device *dev, int axis_type)
  *                        - the control parameters are:
  *                        -
  *                        - AXIS_LINESTYLE    - the style of the lines
- *                        -                     (see PG_set_line_style)
+ *                        -                     (see PG_fset_line_style)
  *                        - AXIS_LINETHICK    - the thickness of the lines
- *                        -                     (see PG_set_line_width)
+ *                        -                     (see PG_fset_line_width)
  *                        - AXIS_LINECOLOR    - the color of the lines
  *                        -                     (see PG_set_color_line)
  *                        - AXIS_LABELCOLOR   - the color of the labels
@@ -763,8 +763,8 @@ int PG_set_axis_attributes(PG_device *dev, ...)
     PG_fset_char_up(dev, chup);
     PG_fset_char_space(dev, chsp);
     PG_set_color_line(dev, linecolor, TRUE);
-    PG_set_line_style(dev, _PG_gattrs.axis_line_style);
-    PG_set_line_width(dev, _PG_gattrs.axis_line_width);
+    PG_fset_line_style(dev, _PG_gattrs.axis_line_style);
+    PG_fset_line_width(dev, _PG_gattrs.axis_line_width);
 
     return(TRUE);}
 
@@ -1393,9 +1393,9 @@ void PG_axis_3(PG_device *dev, double **x, int np, double *databox)
 
 /* axis drawing properties */
     PG_get_line_color(dev, &lc);
-    PG_get_line_style(dev, &ls);
+    ls = PG_fget_line_style(dev);
     PG_set_color_line(dev, dev->WHITE, TRUE);
-    PG_set_line_style(dev, 3);
+    PG_fset_line_style(dev, 3);
 
 /* draw axes on the databox */
     if (databox != NULL)
@@ -1429,7 +1429,7 @@ void PG_axis_3(PG_device *dev, double **x, int np, double *databox)
     PM_free_vectors(3, p);
 
     PG_set_line_color(dev, lc);
-    PG_set_line_style(dev, ls);
+    PG_fset_line_style(dev, ls);
 
     return;}
 

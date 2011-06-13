@@ -361,9 +361,8 @@ static object *_SXI_mrk_ornt(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_MRK_ORNT", SS_null);
 
-    PG_get_marker_orientation(dev, theta);
-
-    o = SS_mk_float(si, theta);
+    theta = PG_fget_marker_orientation(dev);
+    o     = SS_mk_float(si, theta);
 
     return(o);}
 
@@ -373,7 +372,7 @@ static object *_SXI_mrk_ornt(SS_psides *si, object *argl)
 /* _SXI_MRK_SCAL - get the marker scale */
 
 static object *_SXI_mrk_scal(SS_psides *si, object *argl)
-   {double scale;
+   {double sc;
     PG_device *dev;
     object *o;
 
@@ -385,9 +384,8 @@ static object *_SXI_mrk_scal(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_MRK_SCAL", SS_null);
 
-    PG_get_marker_scale(dev, scale);
-
-    o = SS_mk_float(si, scale);
+    sc = PG_fget_marker_scale(dev);
+    o  = SS_mk_float(si, sc);
 
     return(o);}
 
@@ -411,9 +409,8 @@ static object *_SXI_set_mrk_ornt(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_SET_MRK_ORNT", SS_null);
 
-    PG_set_marker_orientation(dev, theta);
-
-    o = SS_mk_float(si, theta);
+    theta = PG_fset_marker_orientation(dev, theta);
+    o     = SS_mk_float(si, theta);
 
     return(o);}
 
@@ -423,23 +420,22 @@ static object *_SXI_set_mrk_ornt(SS_psides *si, object *argl)
 /* _SXI_SET_MRK_SCAL - set the marker scale */
 
 static object *_SXI_set_mrk_scal(SS_psides *si, object *argl)
-   {double scale;
+   {double sc;
     PG_device *dev;
     object *o;
 
-    dev   = NULL;
-    scale = 0.0;
+    dev = NULL;
+    sc  = 0.0;
     SS_args(si, argl,
             G_DEVICE, &dev,
-            SC_DOUBLE_I, &scale,
+            SC_DOUBLE_I, &sc,
             0);
 
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_SET_MRK_SCAL", SS_null);
 
-    PG_set_marker_scale(dev, scale);
-
-    o = SS_mk_float(si, scale);
+    sc = PG_fset_marker_scale(dev, sc);
+    o  = SS_mk_float(si, sc);
 
     return(o);}
 
@@ -1056,7 +1052,7 @@ static object *_SXI_glop(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_GLOP", SS_null);
 
-    PG_get_logical_op(dev, &lop);
+    lop = PG_fget_logical_op(dev);
 
     o = SS_mk_integer(si, lop);
 
@@ -1080,8 +1076,7 @@ static object *_SXI_glns(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_GLNS", SS_null);
 
-    PG_get_line_style(dev, &s);
-
+    s = PG_fget_line_style(dev);
     o = SS_mk_integer(si, s);
 
     return(o);}
@@ -1104,7 +1099,7 @@ static object *_SXI_glnw(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_GLNW", SS_null);
 
-    PG_get_line_width(dev, &w);
+    w = PG_fget_line_width(dev);
 
     o = SS_mk_float(si, w);
 
@@ -1128,10 +1123,10 @@ static object *_SXI_gmxi(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_GMXI", SS_null);
 
-    PG_get_max_intensity(dev, i);
-    PG_get_max_red_intensity(dev, r);
-    PG_get_max_green_intensity(dev, g);
-    PG_get_max_blue_intensity(dev, b);
+    i = PG_fget_max_intensity(dev);
+    r = PG_fget_max_red_intensity(dev);
+    g = PG_fget_max_green_intensity(dev);
+    b = PG_fget_max_blue_intensity(dev);
 
     o = SS_make_list(si, SC_DOUBLE_I, &i,
 		     SC_DOUBLE_I, &r,
@@ -1729,6 +1724,7 @@ static object *_SXI_slnc(SS_psides *si, object *argl)
 static object *_SXI_slop(SS_psides *si, object *argl)
    {PG_logical_operation lop;
     PG_device *dev;
+    object *o;
 
     dev = NULL;
     lop = GS_COPY;
@@ -1740,9 +1736,10 @@ static object *_SXI_slop(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_SLOP", SS_null);
 
-    PG_set_logical_op(dev, lop);
+    lop = PG_fset_logical_op(dev, lop);
+    o   = SS_mk_integer(si, lop);
 
-    return(SS_f);}
+    return(o);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1750,8 +1747,9 @@ static object *_SXI_slop(SS_psides *si, object *argl)
 /* _SXI_SLNS - set the line style */
 
 static object *_SXI_slns(SS_psides *si, object *argl)
-   {int s;
+   {int s, st;
     PG_device *dev;
+    object *o;
 
     dev = NULL;
     s   = LINE_SOLID;
@@ -1763,9 +1761,10 @@ static object *_SXI_slns(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_SLNS", SS_null);
 
-    PG_set_line_style(dev, s);
+    st = PG_fset_line_style(dev, s);
+    o  = SS_mk_integer(si, st);
 
-    return(SS_f);}
+    return(o);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1773,8 +1772,9 @@ static object *_SXI_slns(SS_psides *si, object *argl)
 /* _SXI_SLNW - set the line width */
 
 static object *_SXI_slnw(SS_psides *si, object *argl)
-   {PG_device *dev;
-    double w;
+   {double w;
+    PG_device *dev;
+    object *o;
 
     dev = NULL;
     w   = 0.0;
@@ -1786,9 +1786,10 @@ static object *_SXI_slnw(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_SLNW", SS_null);
 
-    PG_set_line_width(dev, w);
+    w = PG_fset_line_width(dev, w);
+    o = SS_mk_float(si, w);
 
-    return(SS_f);}
+    return(o);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1824,10 +1825,10 @@ static object *_SXI_smxi(SS_psides *si, object *argl)
     b = max(0.0, b);
     b = min(1.0, b);
 
-    PG_set_max_intensity(dev, i);
-    PG_set_max_red_intensity(dev, r);
-    PG_set_max_green_intensity(dev, g);
-    PG_set_max_blue_intensity(dev, b);
+    PG_fset_max_intensity(dev, i);
+    PG_fset_max_red_intensity(dev, r);
+    PG_fset_max_green_intensity(dev, g);
+    PG_fset_max_blue_intensity(dev, b);
 
     return(SS_f);}
 

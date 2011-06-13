@@ -136,8 +136,8 @@ static void PG_vct_hand(PG_device *dev, PG_graph *g,
 		       NULL);
 
     PG_set_color_line(dev, color, TRUE);
-    PG_set_line_style(dev, style);
-    PG_set_line_width(dev, width);
+    PG_fset_line_style(dev, style);
+    PG_fset_line_width(dev, width);
 
 /* find the additional mapping information */
     centering = N_CENT;
@@ -656,12 +656,12 @@ void PG_set_vec_attr(PG_device *dev, ...)
 
             case VEC_LINESTYLE :
 	         itemp = SC_VA_ARG(int);
-		 PG_set_line_style(dev, itemp);
+		 PG_fset_line_style(dev, itemp);
 		 break;
 
             case VEC_LINETHICK :
 	         temp = SC_VA_ARG(double);
-		 PG_set_line_width(dev, temp);
+		 PG_fset_line_width(dev, temp);
 		 break;
 
             case VEC_COLOR :
@@ -743,12 +743,12 @@ void FF_ID(pgsvat, PGSVAT)(FIXNUM *sdid, ...)
 
             case VEC_LINESTYLE :
 	         itemp = *SC_VA_ARG(FIXNUM *);
-		 PG_set_line_style(dev, itemp);
+		 PG_fset_line_style(dev, itemp);
 		 break;
 
             case VEC_LINETHICK :
 	         temp = *SC_VA_ARG(double *);
-		 PG_set_line_width(dev, temp);
+		 PG_fset_line_width(dev, temp);
 		 break;
 
             case VEC_COLOR :

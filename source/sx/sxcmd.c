@@ -544,7 +544,7 @@ int SX_command(SS_psides *si, char *file, char *cmd)
 
 	SS_load_scm(si, "nature.scm");
 
-	PG_set_use_pixmap(TRUE);
+	PG_fset_use_pixmap(TRUE);
 
 /* initialize the available syntax modes */
 	DEF_SYNTAX_MODES(si);

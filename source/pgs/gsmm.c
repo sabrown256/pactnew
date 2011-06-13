@@ -522,7 +522,7 @@ static PG_device *PG_make_raw_device(char *name, char *type, char *title,
     d->supress_setup           = FALSE;
     d->text_color              = txclr;
     d->title                   = CSTRSAVE(pttl);
-    PG_get_use_pixmap(d->use_pixmap);
+    d->use_pixmap              = PG_fget_use_pixmap();
 
     d->txt_ratio               = 1.0;
     d->type                    = SC_str_upper(CSTRSAVE(type));

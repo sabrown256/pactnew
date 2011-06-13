@@ -44,16 +44,16 @@ void PG_define_region(PG_device *dev, PG_coord_sys cs, double *bx)
        return;
 
     PG_get_line_color(dev, &lnc);
-    PG_get_line_style(dev, &lns);
-    PG_get_logical_op(dev, &lop);
+    lns = PG_fget_line_style(dev);
+    lop = PG_fget_logical_op(dev);
 
     if (dev->xor_parity)
        {PG_set_color_line(dev, dev->WHITE, FALSE);}
     else
        PG_set_color_line(dev, dev->BLACK, FALSE);
 
-    PG_set_line_style(dev, LINE_DOTTED);
-    PG_set_logical_op(dev, GS_XOR);
+    PG_fset_line_style(dev, LINE_DOTTED);
+    PG_fset_logical_op(dev, GS_XOR);
 
 /* wait for the left button to be pressed */
     for (btn = FALSE; btn != MOUSE_LEFT; )
@@ -86,8 +86,8 @@ void PG_define_region(PG_device *dev, PG_coord_sys cs, double *bx)
 	PG_draw_box_n(dev, 2, WORLDC, wc);};
 
     PG_set_line_color(dev, lnc);
-    PG_set_line_style(dev, lns);
-    PG_set_logical_op(dev, lop);
+    PG_fset_line_style(dev, lns);
+    PG_fset_logical_op(dev, lop);
 
     pc[0] = min(xa[0], xb[0]);
     pc[1] = max(xa[0], xb[0]);
@@ -505,9 +505,9 @@ void PG_move_object(PG_interface_object *iob, double *obx, int redraw)
 
     PG_make_device_current(dev);
 
-    PG_get_logical_op(dev, &lop);
+    lop = PG_fget_logical_op(dev);
     PG_get_line_color(dev, &lclr);
-    PG_get_line_style(dev, &lns);
+    lns = PG_fget_line_style(dev);
     PG_get_fill_color(dev, &fclr);
 
     if (obx[0] > obx[1])
@@ -528,8 +528,8 @@ void PG_move_object(PG_interface_object *iob, double *obx, int redraw)
     else
        PG_set_color_line(dev, dev->BLACK, FALSE);
 
-    PG_set_line_style(dev, LINE_DOTTED);
-    PG_set_logical_op(dev, GS_XOR);
+    PG_fset_line_style(dev, LINE_DOTTED);
+    PG_fset_logical_op(dev, GS_XOR);
 
     first = TRUE;
     btn   = TRUE;
@@ -563,10 +563,11 @@ void PG_move_object(PG_interface_object *iob, double *obx, int redraw)
 	PG_draw_curve(dev, crv, TRUE);};
 
     PG_draw_curve(dev, crv, TRUE);
-    PG_set_logical_op(dev, lop);
+
+    PG_fset_logical_op(dev, lop);
     PG_set_fill_color(dev, fclr);
     PG_set_line_color(dev, lclr);
-    PG_set_line_style(dev, lns);
+    PG_fset_line_style(dev, lns);
 
     xo = crv->x_origin;
     yo = crv->y_origin;

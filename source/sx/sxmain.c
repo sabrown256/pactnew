@@ -153,7 +153,7 @@ int main(int c, char **v, char **env)
 
     SC_zero_space_n(zsp, -2);
 
-    PG_set_use_pixmap(upix);
+    PG_fset_use_pixmap(upix);
 
 /* initialize SX
  * the following variables must be initialized before SX_init

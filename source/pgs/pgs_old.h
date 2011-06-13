@@ -586,7 +586,10 @@ extern void
  PG_get_char_precision(PG_device *dev, int *pcp),
  PG_get_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double *p),
  PG_get_char_space(PG_device *dev, double *pcsp),
- PG_get_font(PG_device *dev, char **pf, char **pst, int *psz);
+ PG_get_font(PG_device *dev, char **pf, char **pst, int *psz),
+ PG_get_logical_op(PG_device *dev, PG_logical_operation *plop),
+ PG_get_line_style(PG_device *dev, int *pls),
+ PG_get_line_width(PG_device *dev, double *plw);
 
 
 /* GSOLD.C declarations */

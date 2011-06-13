@@ -1117,14 +1117,14 @@ static int test_10(PG_device *dev)
     y  = 0.5*dy;
     for (i = 0; i < n; i++)
         {w = 0.3*i;
-	 PG_set_line_width(dev, w);
+	 PG_fset_line_width(dev, w);
 	 for (j = 0; j < 4; j++)
 	     {x1[0] = 0.25*j + 0.05;
 	      x1[1] = y;
 	      x2[0] = 0.25*(j+1) - 0.05;
 	      x2[1] = y;
 
-	      PG_set_line_style(dev, sty[j]);
+	      PG_fset_line_style(dev, sty[j]);
 	      PG_draw_line_n(dev, 2, WORLDC, x1, x2, dev->clipping);};
 
          y += dy;};

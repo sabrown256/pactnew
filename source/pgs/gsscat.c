@@ -178,7 +178,7 @@ static void PG_scatter_hand(PG_device *dev, PG_graph *g)
        PG_set_palette(dev, pn);
 
     if (pm != NULL)
-       PG_set_marker_scale(dev, *pm);
+       PG_fset_marker_scale(dev, *pm);
 
     h      = g->f;
     domain = h->domain;
