@@ -921,7 +921,7 @@ PG_picture_desc *PG_setup_picture_surface(PG_device *dev, PG_graph *data,
 
     pd = PG_get_rendering_properties(dev, data);
 
-    PG_set_view_angle(dev, pd->va[0], pd->va[1], pd->va[2]);
+    PG_fset_view_angle(dev, pd->va[0], pd->va[1], pd->va[2]);
 
     pd->legend_contour_fl = FALSE;
     pd->mesh_fl           = FALSE;
@@ -966,7 +966,7 @@ PG_picture_desc *PG_setup_picture_surface(PG_device *dev, PG_graph *data,
 /* GOTCHA: this isn't the only time we want 3d axes */
 	if ((pd->va[0] != HUGE) || (nde == 3))
 	   {pd->ax_type = CARTESIAN_3D;
-	    PG_set_view_angle(dev, pd->va[0], pd->va[1], pd->va[2]);};
+	    PG_fset_view_angle(dev, pd->va[0], pd->va[1], pd->va[2]);};
 
 /* set surface plot attribute values */
 	PG_fset_clipping(dev, FALSE);};

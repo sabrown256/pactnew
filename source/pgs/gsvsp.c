@@ -1420,9 +1420,12 @@ void _PG_fix_wtos(PG_device *dev, int wh)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_GET_AXIS_LOG_SCALE - return the settings of the log axis flags */
+/* PG_FGET_AXIS_LOG_SCALE - return the settings of the log axis flags
+ *
+ * #bind PG_fget_axis_log_scale fortran() scheme()
+ */
 
-void PG_get_axis_log_scale(PG_device *dev, int nd, int *iflg)
+void PG_fget_axis_log_scale(PG_device *dev, int nd, int *iflg)
    {int id;
     PG_dev_geometry *g;
 
@@ -1437,9 +1440,12 @@ void PG_get_axis_log_scale(PG_device *dev, int nd, int *iflg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_SET_AXIS_LOG_SCALE - make sure that a log scale is handled correctly */
+/* PG_FSET_AXIS_LOG_SCALE - make sure that a log scale is handled correctly
+ *
+ * #bind PG_fset_axis_log_scale fortran() scheme()
+ */
 
-void PG_set_axis_log_scale(PG_device *dev, int nd, int *iflg)
+void PG_fset_axis_log_scale(PG_device *dev, int nd, int *iflg)
    {int id;
     double wc[PG_BOXSZ];
     PG_dev_geometry *g;
@@ -2043,13 +2049,13 @@ void PG_viewport_frame(PG_device *dev, int nd, double *ndc)
 
 /*--------------------------------------------------------------------------*/
 
-/* PG_GET_VIEW_ANGLE - get the view angle in degrees if CNV is TRUE
- *                   - otherwise in radians
+/* PG_FGET_VIEW_ANGLE - get the view angle in degrees if CNV is TRUE
+ *                    - otherwise in radians
  *
- * #bind PG_get_view_angle fortran() scheme()
+ * #bind PG_fget_view_angle fortran() scheme()
  */
 
-void PG_get_view_angle(PG_device *dev, int cnv,
+void PG_fget_view_angle(PG_device *dev, int cnv,
 		       double *pt, double *pp, double *pc)
    {double cf;
     PG_dev_geometry *g;
@@ -2071,12 +2077,12 @@ void PG_get_view_angle(PG_device *dev, int cnv,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_SET_VIEW_ANGLE - set the view angle in degrees for DEV
+/* PG_FSET_VIEW_ANGLE - set the view angle in degrees for DEV
  *
- * #bind PG_set_view_angle fortran() scheme()
+ * #bind PG_fset_view_angle fortran() scheme()
  */
 
-void PG_set_view_angle(PG_device *dev, double theta, double phi, double chi)
+void PG_fset_view_angle(PG_device *dev, double theta, double phi, double chi)
    {PG_dev_geometry *g;
 
     g = &dev->g;
@@ -2095,13 +2101,13 @@ void PG_set_view_angle(PG_device *dev, double theta, double phi, double chi)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_GET_LIGHT_ANGLE - get the lighting angle in degrees if CNV is TRUE
- *                    - otherwise in radians
+/* PG_FGET_LIGHT_ANGLE - get the lighting angle in degrees if CNV is TRUE
+ *                     - otherwise in radians
  *
- * #bind PG_get_light_angle fortran() scheme()
+ * #bind PG_fget_light_angle fortran() scheme()
  */
 
-void PG_get_light_angle(PG_device *dev, int cnv, double *pt, double *pp)
+void PG_fget_light_angle(PG_device *dev, int cnv, double *pt, double *pp)
    {double cf;
 
     cf = (cnv == TRUE) ? RAD_DEG : 1.0;
@@ -2117,12 +2123,12 @@ void PG_get_light_angle(PG_device *dev, int cnv, double *pt, double *pp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_SET_LIGHT_ANGLE - set the light angle in degrees for DEV
+/* PG_FSET_LIGHT_ANGLE - set the light angle in degrees for DEV
  *
- * #bind PG_set_light_angle fortran() scheme()
+ * #bind PG_fset_light_angle fortran() scheme()
  */
 
-void PG_set_light_angle(PG_device *dev, double theta, double phi)
+void PG_fset_light_angle(PG_device *dev, double theta, double phi)
    {
 
     if (theta != HUGE)

@@ -493,7 +493,7 @@ static void _PG_display_image(PG_device *dev, PG_image *pim)
 /* make the single image */
             nim = PG_make_image_n(labl, type, NULL,
 				  2, WORLDC, dbx, rbx, w, h, bpp,
-				  PG_set_palette(dd, cpn));
+				  PG_fset_palette(dd, cpn));
 	    if (nim != NULL)
 	       {memset(nim->buffer, dev->background_color_white, nim->size);
 

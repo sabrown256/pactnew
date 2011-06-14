@@ -295,7 +295,7 @@ void PG_axis_3d(PG_device *dev, double *px, double *py, double *pz,
    {double extr[PG_BOXSZ];
     double *p[PG_SPACEDM];
 
-    PG_set_view_angle(dev, theta, phi, chi);
+    PG_fset_view_angle(dev, theta, phi, chi);
 
     p[0] = px;
     p[1] = py;
@@ -444,10 +444,10 @@ int PG_write_NDC(PG_device *dev, double x, double y, char *fmt, ...)
 	if ((s != NULL) && (*s != '\0'))
 	   {logflag = (g->iflog[0] || g->iflog[1]);
 	    if (logflag)
-	       {PG_get_axis_log_scale(dev, 2, iflg);
+	       {PG_fget_axis_log_scale(dev, 2, iflg);
 		for (id = 0; id < 2; id++)
 		    nflg[id] = FALSE;
-		PG_set_axis_log_scale(dev, 2, nflg);}
+		PG_fset_axis_log_scale(dev, 2, nflg);}
        
 	    PG_trans_point(dev, 2, NORMC, p, WORLDC, p);
 
@@ -455,7 +455,7 @@ int PG_write_NDC(PG_device *dev, double x, double y, char *fmt, ...)
 	    PG_write_text(dev, stdscr, s);
 
 	    if (logflag)
-	       PG_set_axis_log_scale(dev, 2, iflg);
+	       PG_fset_axis_log_scale(dev, 2, iflg);
 
 #if DEBUG_TEXT
 	    {double wc[PG_BOXSZ], dx[PG_SPACEDM];

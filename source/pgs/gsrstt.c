@@ -132,7 +132,7 @@ int main(int argc, char **argv)
             exit(1);};
 
 /* draw the first image */
-        pl = PG_set_palette(PS_dev, "rainbow");
+        pl = PG_fset_palette(PS_dev, "rainbow");
         bf = calc_im->buffer;
         sf = pl->n_pal_colors;
         for (l = 0; l < h; l++)
@@ -145,7 +145,7 @@ int main(int argc, char **argv)
         PG_draw_image(PS_dev, calc_im, "Test Data A", NULL);
 
 /* draw the second image */
-        pl = PG_set_palette(PS_dev, "spectrum");
+        pl = PG_fset_palette(PS_dev, "spectrum");
         dx = 2.0*PI/((double) w);
         dy = 2.0*PI/((double) h);
         bf = calc_im->buffer;

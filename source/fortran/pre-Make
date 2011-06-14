@@ -1,0 +1,131 @@
+#
+# pre-Makefile for PFTN
+#
+# Files and Directories
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+LibName=pftn
+
+TGTLib = ${LibDir}/lib${LibName}.a
+TGTInc = none
+
+OD = DefaultO
+
+#
+# Compiler/Loader Options
+#
+CcFlags = ${ODC} -I. -I${PACTSrcDir} -I${IncDir} ${MDInc}
+FcFlags = ${ODF}
+LdFlags = -L${LibDir} ${LDFLAGS}
+
+CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}
+
+#
+# Files to Save for Backup (make save)
+#
+SaveFiles = *.f
+
+#
+# Files to remove in directory clean (pact clean)
+#
+CleanFiles = ${gmo} *~ core
+
+#
+# Files to remove in directory clean (pact clean)
+#
+RemoveFiles = ${gmo} *~ core
+
+#
+# Things upon which install depends (pact install)
+#
+InstallDep = ${TGTLib}
+BinDep =
+BinObj =
+
+#
+# Required Libraries
+#
+
+targets :
+	@echo "Targets for PFTN"
+	@echo "   install      : install PFTN headers and utilities in dev/arch"
+	@echo "   link         : link PFTN utilities for public use"
+	@echo "   test         : run the PFTN test suite"
+
+#
+# Headers Files
+#
+Hdrs = 
+
+#
+# Object Files
+#
+Objs = flibc.o
+
+ArObjs = ${TGTLib}(flibc.o)
+
+${ArObjs}  : ${Hdrs}
+${Objs}  : ${Hdrs}
+${LibDep} : ${Hdrs}
+
+# language bindings
+
+gsrc = gm-score.f gm-pml.f gm-pdb.f   \
+       gm-ppc.f gm-pgs.f gm-panacea.f \
+       gm-scheme.f
+
+gmo = gm-score.o gm-pml.o gm-pdb.o   \
+      gm-ppc.o gm-pgs.o gm-panacea.o \
+      gm-scheme.o
+
+${gmo} : ${gsrc}
+
+%.o : %.f
+	@if [ ${FC_Exe} == none ]; then \
+ 	    echo "No Fortran compiler for $<" ; \
+ 	 else \
+ 	    (touch errlog ; \
+	     echo "${FCAnnounce} -c $<" ; \
+	     ${FC} -c $< -o $@ ; \
+       	     ${AR} ${AROpt} ${TGTLib} $@ 2>> errlog ) ; \
+	 fi
+
+modules : ${gmo}
+	cp *.mod ${IncDir}
+
+${PACTTmpDir}/gm-${LibName}.f : flibc.f
+	@../scripts/bproto
+
+genmod : ${PACTTmpDir}/gm-${LibName}.f
+
+IncAction = @pact genmod
+LibAction = (cd ${PACTTmpDir} ; pact -f ../../pre-Make modules)
+
+#
+# link 
+#
+link: ${InstallDep}
+
+#
+# install
+#
+install:
+	pact link
+
+#
+# sharedlib
+#
+sharedlib:
+	pact shared
+
+#
+# Run the PFTN test suite
+#
+test :
+	@./fttest
+

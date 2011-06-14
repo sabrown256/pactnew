@@ -671,7 +671,7 @@ static void _PG_dom_ac_3d_shaded(PG_device *dev, double **r,
     if (tri == NULL)
        return;
 
-    PG_get_light_angle(dev, TRUE, &thld, &phld);
+    PG_fget_light_angle(dev, TRUE, &thld, &phld);
 
 /* check for applicable attributes */
     PG_get_attrs_alist(alist,
@@ -683,7 +683,7 @@ static void _PG_dom_ac_3d_shaded(PG_device *dev, double **r,
     thl *= DEG_RAD;
     phl *= DEG_RAD;
 
-    PG_set_palette(dev, pal);
+    PG_fset_palette(dev, pal);
 
     ctl = cos(thl);
     cpl = cos(phl);
@@ -1026,10 +1026,10 @@ PG_picture_desc *PG_setup_picture_mesh(PG_device *dev, PG_graph *data,
 	PG_fset_clipping(dev, clip);};
 
     if ((th != 0.0) || (ph != 0.0) || (ch != 0.0))
-       PG_set_view_angle(dev, th, ph, ch);
-    PG_set_light_angle(dev, thl, phl);
+       PG_fset_view_angle(dev, th, ph, ch);
+    PG_fset_light_angle(dev, thl, phl);
 
-    PG_set_palette(dev, "standard");
+    PG_fset_palette(dev, "standard");
 
     PG_fset_text_color(dev, dev->WHITE, TRUE);
     PG_fset_line_color(dev, clr, TRUE);
@@ -1084,7 +1084,7 @@ void PG_domain_plot(PG_device *dev, PM_set *dom, PM_set *ran)
     PG_fset_line_style(dev, style);
     PG_fset_clipping(dev, TRUE);
 
-    PG_set_view_angle(dev, pd->va[0], pd->va[1], pd->va[2]);
+    PG_fset_view_angle(dev, pd->va[0], pd->va[1], pd->va[2]);
 
 /* plot the domain */
     switch (dom->dimension_elem)
@@ -1276,7 +1276,7 @@ void PG_draw_domain_boundary(PG_device *dev, PM_mapping *f)
     nd     = domain->dimension;
     pl     = dev->current_palette;
 
-    PG_set_palette(dev, "standard");
+    PG_fset_palette(dev, "standard");
 
     PG_get_attrs_set(domain,
 		     "DOMAIN-BORDER-WIDTH", SC_DOUBLE_I, &dbwid, -1.0,

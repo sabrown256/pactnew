@@ -250,7 +250,7 @@ static void _PG_fill_cell(PG_device *dev, int nd, double *a, double *aext,
     color = PG_select_color(dev, nd, a, aext);
     if (color < 2)
        {pal = dev->current_palette;
-	PG_set_palette(dev, "standard");
+	PG_fset_palette(dev, "standard");
 
 	color = (color == 0) ? dev->GRAY : dev->DARK_GRAY;
 	PG_fill_polygon_n(dev, color, TRUE, 2, WORLDC, np, r);
