@@ -109,17 +109,6 @@
 
 /*--------------------------------------------------------------------------*/
 
-#else
-
-/*--------------------------------------------------------------------------*/
-
-#define PG_query_screen(d, pdx, pdy, pnc)                                    \
-    if ((d) != NULL)                                                         \
-       {if ((d)->query_screen != NULL)                                       \
-           (*(d)->query_screen)(d, pdx, pdy, pnc);}
-
-/*--------------------------------------------------------------------------*/
-
 #define PG_clear_frame(d)                                                    \
    {if ((d) != NULL)                                                         \
        PG_clear_region(d, 2, NORMC, d->g.fr, 0);}
@@ -147,6 +136,64 @@
 
 /*--------------------------------------------------------------------------*/
 
+#define PG_write_text(d, fp, s)                                              \
+    if ((d) != NULL)                                                         \
+       {if ((d)->write_text != NULL)                                         \
+           (*(d)->write_text)(d, fp, s);}
+
+#define PG_next_line(d, fp)                                                  \
+    if ((d) != NULL)                                                         \
+       {if ((d)->next_line != NULL)                                          \
+           (*(d)->next_line)(d, fp);}
+
+#define PG_shade_poly_n(d, nd, n, r)                                         \
+    if ((d) != NULL)                                                         \
+       {if ((d)->shade_poly != NULL)                                         \
+           (*(d)->shade_poly)(d, nd, n, r);}
+
+#define PG_fill_curve(d, c)                                                  \
+    if ((d) != NULL)                                                         \
+       {if ((d)->fill_curve != NULL)                                         \
+           (*(d)->fill_curve)(d, c);}
+
+#define PG_draw_curve(d, c, clip)                                            \
+    if ((d) != NULL)                                                         \
+       {if ((d)->draw_curve != NULL)                                         \
+           (*(d)->draw_curve)(d, c, clip);}
+
+#define PG_make_palette_current(d, p)                                        \
+    if ((d) != NULL)                                                         \
+       {(d)->current_palette = p;}
+
+/*--------------------------------------------------------------------------*/
+
+#else
+
+/*--------------------------------------------------------------------------*/
+
+#define PG_query_screen(d, pdx, pdy, pnc)                                    \
+    if ((d) != NULL)                                                         \
+       {if ((d)->query_screen != NULL)                                       \
+           (*(d)->query_screen)(d, pdx, pdy, pnc);}
+
+/*--------------------------------------------------------------------------*/
+
+#define PG_fgetc(stream)                                                     \
+    (((PG_console_device != NULL) && (PG_console_device->ggetc != NULL)) ?   \
+     (*PG_console_device->ggetc)(stream) :                                   \
+     EOF)
+
+#define PG_fgets(buffer, maxlen, stream)                                     \
+    (((PG_console_device != NULL) && (PG_console_device->ggets != NULL)) ?   \
+     (*PG_console_device->ggets)(buffer, maxlen, stream) :                   \
+     NULL)
+
+#define PG_puts(bf)                                                          \
+    if ((PG_console_device != NULL) && (PG_console_device->gputs != NULL))   \
+       (*PG_console_device->gputs)(bf)
+
+/*--------------------------------------------------------------------------*/
+
 #define PG_move_gr_abs(d, x, y)                                              \
     if ((d) != NULL)                                                         \
        {if ((d)->move_gr_abs != NULL)                                        \
@@ -171,83 +218,6 @@
     if ((d) != NULL)                                                         \
        {if ((d)->draw_to_rel != NULL)                                        \
            (*(d)->draw_to_rel)(d, x, y);}
-
-/*--------------------------------------------------------------------------*/
-
-#define PG_shade_poly(d, x, y, n)                                            \
-    if ((d) != NULL)                                                         \
-       {if ((d)->shade_poly != NULL)                                         \
-           {double *_r[2];                                                   \
-	    _r[0] = x;                                                       \
-	    _r[1] = y;                                                       \
-	    (*(d)->shade_poly)(d, 2, n, _r);};}
-
-#define PG_shade_poly_n(d, nd, n, r)                                         \
-    if ((d) != NULL)                                                         \
-       {if ((d)->shade_poly != NULL)                                         \
-           (*(d)->shade_poly)(d, nd, n, r);}
-
-#define PG_fill_curve(d, c)                                                  \
-    if ((d) != NULL)                                                         \
-       {if ((d)->fill_curve != NULL)                                         \
-           (*(d)->fill_curve)(d, c);}
-
-/*--------------------------------------------------------------------------*/
-
-#define PG_draw_curve(d, c, clip)                                            \
-    if ((d) != NULL)                                                         \
-       {if ((d)->draw_curve != NULL)                                         \
-           (*(d)->draw_curve)(d, c, clip);}
-
-#define PG_draw_disjoint_polyline_2(d, x, y, n, flag, coord)                 \
-    if ((d) != NULL)                                                         \
-       {if ((d)->draw_dj_polyln_2 != NULL)                                   \
-           {double *_r[2];                                                   \
-	    _r[0] = x;                                                       \
-	    _r[1] = y;                                                       \
-	    (*(d)->draw_dj_polyln_2)(d, _r, n, flag, coord);};}
-
-/*--------------------------------------------------------------------------*/
-
-#define PG_make_palette_current(d, p)                                        \
-    if ((d) != NULL)                                                         \
-       {(d)->current_palette = p;}
-
-#define PG_get_image(d, bf, ix, iy, nx, ny)                                  \
-    if ((d) != NULL)                                                         \
-       {if ((d)->get_image != NULL)                                          \
-           (*(d)->get_image)(d, bf, ix, iy, nx, ny);}
-
-#define PG_put_image(d, bf, ix, iy, nx, ny)                                  \
-    if ((d) != NULL)                                                         \
-       {if ((d)->put_image != NULL)                                          \
-           (*(d)->put_image)(d, bf, ix, iy, nx, ny);}
-
-#define PG_write_text(d, fp, s)                                              \
-    if ((d) != NULL)                                                         \
-       {if ((d)->write_text != NULL)                                         \
-           (*(d)->write_text)(d, fp, s);}
-
-#define PG_next_line(d, fp)                                                  \
-    if ((d) != NULL)                                                         \
-       {if ((d)->next_line != NULL)                                          \
-           (*(d)->next_line)(d, fp);}
-
-/*--------------------------------------------------------------------------*/
-
-#define PG_fgetc(stream)                                                     \
-    (((PG_console_device != NULL) && (PG_console_device->ggetc != NULL)) ?   \
-     (*PG_console_device->ggetc)(stream) :                                   \
-     EOF)
-
-#define PG_fgets(buffer, maxlen, stream)                                     \
-    (((PG_console_device != NULL) && (PG_console_device->ggets != NULL)) ?   \
-     (*PG_console_device->ggets)(buffer, maxlen, stream) :                   \
-     NULL)
-
-#define PG_puts(bf)                                                          \
-    if ((PG_console_device != NULL) && (PG_console_device->gputs != NULL))   \
-       (*PG_console_device->gputs)(bf)
 
 /*--------------------------------------------------------------------------*/
 
@@ -450,6 +420,32 @@
     if ((d) != NULL)                                                         \
        {if ((d)->set_fill_color != NULL)                                     \
            (*(d)->set_fill_color)(d, color, mapped);}
+
+#define PG_shade_poly(d, x, y, n)                                            \
+    if ((d) != NULL)                                                         \
+       {if ((d)->shade_poly != NULL)                                         \
+           {double *_r[2];                                                   \
+	    _r[0] = x;                                                       \
+	    _r[1] = y;                                                       \
+	    (*(d)->shade_poly)(d, 2, n, _r);};}
+
+#define PG_draw_disjoint_polyline_2(d, x, y, n, flag, coord)                 \
+    if ((d) != NULL)                                                         \
+       {if ((d)->draw_dj_polyln_2 != NULL)                                   \
+           {double *_r[2];                                                   \
+	    _r[0] = x;                                                       \
+	    _r[1] = y;                                                       \
+	    (*(d)->draw_dj_polyln_2)(d, _r, n, flag, coord);};}
+
+#define PG_get_image(d, bf, ix, iy, nx, ny)                                  \
+    if ((d) != NULL)                                                         \
+       {if ((d)->get_image != NULL)                                          \
+           (*(d)->get_image)(d, bf, ix, iy, nx, ny);}
+
+#define PG_put_image(d, bf, ix, iy, nx, ny)                                  \
+    if ((d) != NULL)                                                         \
+       {if ((d)->put_image != NULL)                                          \
+           (*(d)->put_image)(d, bf, ix, iy, nx, ny);}
 
 /*--------------------------------------------------------------------------*/
 

@@ -1183,7 +1183,23 @@ extern void
  PG_finish_plot(PG_device *dev),
  PG_expose_device(PG_device *dev),
  PG_close_device(PG_device *dev),
- PG_close_console(void);
+ PG_close_console(void),
+ PG_clear_frame(PG_device *dev),
+ PG_clear_window(PG_device *dev),
+ PG_clear_viewport(PG_device *dev),
+ PG_clear_region(PG_device *dev, int nd, PG_coord_sys cs,
+		 double *ndc, int pad),
+ PG_clear_page(PG_device *dev, int i),
+ PG_write_text(PG_device *dev, FILE *fp, char *s),
+ PG_next_line(PG_device *dev, FILE *fp),
+ PG_shade_poly_n(PG_device *dev, int nd, int n, double **r),
+ PG_fill_curve(PG_device *dev, PG_curve *crv),
+ PG_draw_curve(PG_device *dev, PG_curve *crv, int clip),
+ PG_make_palette_current(PG_device *dev, PG_palette *p),
+ PG_get_image_n(PG_device *dev, unsigned char *bf,
+		PG_coord_sys cs, double *irg),
+ PG_put_image_n(PG_device *dev, unsigned char *bf,
+		PG_coord_sys cs, double *irg);
 
 extern PG_logical_operation
  PG_fget_logical_op(PG_device *dev),
