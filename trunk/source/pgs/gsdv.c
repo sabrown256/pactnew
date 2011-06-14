@@ -115,9 +115,12 @@ void PG_device_filename(char *fname, char *raw, char *ext)
  */
 
 void PG_query_device(PG_device *dev, int *pdx, int *pdy, int *pnc)
-   {
+   {int dx[PG_SPACEDM];
 
-    PG_query_screen(dev, pdx, pdy, pnc);
+    PG_query_screen_n(dev, dx, pnc);
+
+    *pdx = dx[0];
+    *pdy = dx[1];
 
     return;}
 

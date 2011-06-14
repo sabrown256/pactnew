@@ -1140,7 +1140,15 @@ extern int
  PG_fget_text_color(PG_device *dev),
  PG_fset_text_color(PG_device *dev, int clr, int mapped),
  PG_fget_fill_color(PG_device *dev),
- PG_fset_fill_color(PG_device *dev, int clr, int mapped);
+ PG_fset_fill_color(PG_device *dev, int clr, int mapped),
+ PG_white_background(PG_device *dev, int t),
+ PG_turn_grid(PG_device *dev, int t),
+ PG_turn_data_id(PG_device *dev, int t),
+ PG_turn_scatter(PG_device *dev, int t),
+ PG_turn_autodomain(PG_device *dev, int t),
+ PG_turn_autorange(PG_device *dev, int t),
+ PG_turn_autoplot(PG_device *dev, int t),
+ PG_n_events_pending(PG_device *dev);
 
 extern void
  PG_fget_char_path(PG_device *dev, double *x),
@@ -1154,7 +1162,28 @@ extern void
  PG_fget_viewport_pos(PG_device *dev, double *x),
  PG_fset_viewport_pos(PG_device *dev, double *x),
  PG_fget_viewport_shape(PG_device *dev, double *dx, double *pa),
- PG_fset_viewport_shape(PG_device *dev, double *dx, double asp);
+ PG_fset_viewport_shape(PG_device *dev, double *dx, double asp),
+ PG_handle_expose_event(PG_device *dev, PG_event *ev),
+ PG_handle_update_event(PG_device *dev, PG_event *ev),
+ PG_handle_mouse_down_event(PG_device *dev, PG_event *ev),
+ PG_handle_mouse_up_event(PG_device *dev, PG_event *ev),
+ PG_handle_key_down_event(PG_device *dev, PG_event *ev),
+ PG_handle_key_up_event(PG_device *dev, PG_event *ev),
+ PG_handle_default_event(PG_device *dev, PG_event *ev),
+ PG_query_pointer(PG_device *dev, int *ir, int *pb, int *pq),
+ PG_mouse_event_info(PG_device *dev, PG_event *ev,
+			 int *iev, PG_mouse_button *peb, int *peq),
+ PG_key_event_info(PG_device *dev, PG_event *ev, int *iev,
+		       char *bf, int n, int *peq),
+ PG_open_screen(PG_device *dev, double *ndc),
+ PG_query_screen_n(PG_device *dev, int *dx, int *pnc),
+ PG_make_device_current(PG_device *dev),
+ PG_release_current_device(PG_device *dev),
+ PG_update_vs(PG_device *dev),
+ PG_finish_plot(PG_device *dev),
+ PG_expose_device(PG_device *dev),
+ PG_close_device(PG_device *dev),
+ PG_close_console(void);
 
 extern PG_logical_operation
  PG_fget_logical_op(PG_device *dev),

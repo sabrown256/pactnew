@@ -2778,8 +2778,8 @@ TRUE iff dev is a PostScript device.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_query_screen(PG_device *dev, int *pdx, int *pdy, int *pnc)
-<BR><I>Fortran Binding: </I>integer pgqdev(integer devid, integer dx, integer dy, integer nc)
+<I>C Binding: </I>void PG_query_screen_n(PG_device *dev, int *dx, int *pnc)
+<BR><I>Fortran Binding: </I>integer pgqdev(integer devid, integer dx, integer nc)
 <BR><I>SX Binding: </I>(pg-query-device dev)
 <P>
 Query the device for size in pixels and color planes. The number

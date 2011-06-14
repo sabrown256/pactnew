@@ -1010,6 +1010,7 @@ object *UL_mode_graphics(SS_psides *si)
 
 void UL_set_graphics_state(PG_device *d)
    {int i, nc, width, height;
+    int dx[PG_SPACEDM];
     double mrks;
     char *axstf;
     out_device *out;
@@ -1060,9 +1061,9 @@ void UL_set_graphics_state(PG_device *d)
 	    g->hwin[2] = SX_window_P[1];
 	    g->hwin[3] = g->hwin[2] + SX_window_height_P;}
 	else
-	   {PG_query_screen(d, &width, &height, &nc);   
-	    g->hwin[1] = g->hwin[0] + width;
-	    g->hwin[3] = g->hwin[2] + height;};};
+	   {PG_query_screen_n(d, dx, &nc);   
+	    g->hwin[1] = g->hwin[0] + dx[0];
+	    g->hwin[3] = g->hwin[2] + dx[1];};};
 
     return;}
 

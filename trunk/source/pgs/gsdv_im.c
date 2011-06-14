@@ -579,7 +579,8 @@ static void _PG_IM_finish_plot(PG_device *dev)
 static PG_device *_PG_IM_open(PG_device *dev, double xf, double yf,
                               double dxf, double dyf)
    {int Lightest, Light, Light_Gray, Dark_Gray, Dark, Darkest;
-    int display_width, display_height, n_colors, re_open;
+    int n_colors, re_open;
+    int dx[PG_SPACEDM];
     double intensity;
     PG_par_rend_info *pri;
     PG_font_family *ff;
@@ -625,20 +626,20 @@ static PG_device *_PG_IM_open(PG_device *dev, double xf, double yf,
 
     SET_RAST_DEVICE(dev, mdv);
 
-    PG_query_screen(dev, &display_width, &display_height, &n_colors);
+    PG_query_screen_n(dev, dx, &n_colors);
 
 /* set device pixel coordinate limits */
-    g->cpc[0] = SHRT_MIN + display_width;
-    g->cpc[1] = SHRT_MAX - display_width;
-    g->cpc[2] = SHRT_MIN + display_height;
-    g->cpc[3] = SHRT_MAX - display_height;
+    g->cpc[0] = SHRT_MIN + dx[0];
+    g->cpc[1] = SHRT_MAX - dx[0];
+    g->cpc[2] = SHRT_MIN + dx[1];
+    g->cpc[3] = SHRT_MAX - dx[1];
     g->cpc[4] = SHRT_MIN;
     g->cpc[5] = SHRT_MAX;
 
     g->hwin[0] = 0.0;
-    g->hwin[1] = display_width;
+    g->hwin[1] = dx[0];
     g->hwin[2] = 0.0;
-    g->hwin[3] = display_width;
+    g->hwin[3] = dx[0];
 
     SET_PC_FROM_HWIN(g);
 

@@ -408,7 +408,8 @@ static object *_SXI_iobp(SS_psides *si, object *obj)
 /* _SXI_TOGGLE_GRI - start the graphical interface window */
 
 static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
-   {int i, flag, sdx, sdy, nc;
+   {int i, flag, nc;
+    int sdx[PG_SPACEDM];
     int *clrmd, *nlev, *mrki, *labcf, *labln, *labts;
     double ndc[PG_BOXSZ];
     double *axsca, *axslw, *axsmts, *axsmjt, *axsmnt;
@@ -474,12 +475,12 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 /* connect the I/O functions */
 	_SX.gri = PG_make_device("WINDOW", "COLOR", SX_GRI_title);
 
-	PG_query_screen(PG_console_device, &sdx, &sdy, &nc);
+	PG_query_screen_n(PG_console_device, sdx, &nc);
         if (SX_GRI_dx == 0.0)
-           SX_GRI_dx = 30.0*SX_GRI_type_size/((double) sdx);
+           SX_GRI_dx = 30.0*SX_GRI_type_size/((double) sdx[0]);
 
         if (SX_GRI_dy == 0.0)
-           SX_GRI_dy = 15.0*SX_GRI_type_size/((double) sdy);
+           SX_GRI_dy = 15.0*SX_GRI_type_size/((double) sdx[1]);
 
 	PG_open_device(_SX.gri, SX_GRI_x, SX_GRI_y, SX_GRI_dx, SX_GRI_dy);
 

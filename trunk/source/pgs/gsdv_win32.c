@@ -709,8 +709,9 @@ static void _PG_win32_open_text_window(PG_device *dev, int vis,
 static void _PG_win32_open_graphics_window(PG_device *dev,
 					   double xfrac, double yfrac,
 					   double dxfrac, double dyfrac)
-   {int idx, idy, ixul, iyul, ixlr, iylr;
+   {int ixul, iyul, ixlr, iylr;
     int font_size, n_colors;
+    int dx[PG_SPACEDM];
     double ratio;
     PG_dev_geometry *g;
    
@@ -724,18 +725,18 @@ static void _PG_win32_open_graphics_window(PG_device *dev,
     dev->type_index = GRAPHIC_WINDOW_DEVICE;
     dev->quadrant   = QUAD_FOUR;
 
-    PG_query_screen(dev, &idx, &idy, &n_colors);
-    if ((idx == 0) && (idy == 0) &&
+    PG_query_screen_n(dev, dx, &n_colors);
+    if ((dx[0] == 0) && (dx[1] == 0) &&
         (n_colors == 0))
        return;
 
 /* GOTCHA: The following pixel coordinate limits may be incorrect
  * set device pixel coordinate limits
  */
-    g->cnv[0] = INT_MIN + idx;
-    g->cnv[1] = INT_MAX - idx;
-    g->cpc[2] = INT_MIN + idy;
-    g->cpc[3] = INT_MAX - idy;
+    g->cnv[0] = INT_MIN + dx[0];
+    g->cnv[1] = INT_MAX - dx[0];
+    g->cpc[2] = INT_MIN + dx[1];
+    g->cpc[3] = INT_MAX - dx[1];
     g->cpc[4] = INT_MIN;
     g->cpc[5] = INT_MAX;
 
@@ -754,10 +755,10 @@ static void _PG_win32_open_graphics_window(PG_device *dev,
        {dxfrac = 0.5;
         dyfrac = 0.5;};
 
-    g->hwin[0] = idx*xfrac;
-    g->hwin[1] = g->hwin[0] + idx*dxfrac;
-    g->hwin[2] = idx*yfrac;
-    g->hwin[3] = g->hwin[2] + idx*dyfrac;
+    g->hwin[0] = dx[0]*xfrac;
+    g->hwin[1] = g->hwin[0] + dx[0]*dxfrac;
+    g->hwin[2] = dx[0]*yfrac;
+    g->hwin[3] = g->hwin[2] + dx[0]*dyfrac;
 
     SET_PC_FROM_HWIN(g);
 
@@ -769,7 +770,7 @@ static void _PG_win32_open_graphics_window(PG_device *dev,
  /* Mac coding: */
 
     GetFontInfo(&font_data);
-    ratio = dxfrac*idx/(80*font_data.widMax);
+    ratio = dxfrac*dx[0]/(80*font_data.widMax);
     font_size = DEFAULT_FONT_SIZE;
     if (ratio < 1.0)
        {font_size = 0.5*(ratio*font_size + 0.5);
@@ -790,7 +791,8 @@ static void _PG_win32_open_graphics_window(PG_device *dev,
 static PG_device *_PG_win32_open_screen(PG_device *dev,
 					double xf, double yf,
 					double dxf, double dyf)
-   {int bck_color, for_color, idx, idy;
+   {int bck_color, for_color;
+    int dx[PG_SPACEDM];
     double intensity;
     unsigned int Lightest, Light, Light_Gray, Dark_Gray, Dark, Darkest;
     PG_font_family *ff;

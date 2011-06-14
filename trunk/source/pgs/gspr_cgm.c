@@ -146,7 +146,8 @@ void _PG_CGM_set_fill_color(PG_device *dev, int color, int mapped)
 /* _PG_CGM_SET_FONT - set the character font */
 
 int _PG_CGM_set_font(PG_device *dev, char *face, char *style, int size)
-   {int nfont, nstyle, ih, dx, dy, nc;
+   {int nfont, nstyle, ih, nc;
+    int dx[PG_SPACEDM];
     char *font_name;
     double sx, sy, scale;
 
@@ -157,10 +158,10 @@ int _PG_CGM_set_font(PG_device *dev, char *face, char *style, int size)
        return(FALSE);
 
     scale = 0.77;
-    PG_query_screen(dev, &dx, &dy, &nc);
+    PG_query_screen_n(dev, dx, &nc);
 
-    sx = 1200.0*PG_window_width(dev)/((double) dx);
-    sy = 1200.0*PG_window_height(dev)/((double) dy);
+    sx = 1200.0*PG_window_width(dev)/((double) dx[0]);
+    sy = 1200.0*PG_window_height(dev)/((double) dx[1]);
 
     dev->char_width_s  = scale*size/sx;
     dev->char_height_s = scale*size/sy;
@@ -633,10 +634,11 @@ void _PG_CGM_fill_curve(PG_device *dev, PG_curve *crv)
 
 void _PG_CGM_put_image(PG_device *dev, unsigned char *bf,
                        int ix, int iy, int nx, int ny)
-   {int params[10], dx, dy, n, i, k, l;
-    double rv;
+   {int params[10], n, i, k, l;
+    int dx[PG_SPACEDM];
     int n_pal_colors, n_dev_colors;
     unsigned char *pbf;
+    double rv;
     PG_palette *pal;
     RGB_color_map *pseudo_cm;
 
@@ -669,23 +671,23 @@ void _PG_CGM_put_image(PG_device *dev, unsigned char *bf,
                           pseudo_cm[i].green : pseudo_cm[i].blue;};};
 
     n  = nx*ny;
-    dx = nx*dev->resolution_scale_factor;
-    dy = ny*dev->resolution_scale_factor;
+    dx[0] = nx*dev->resolution_scale_factor;
+    dx[1] = ny*dev->resolution_scale_factor;
 
 /*
     params[0] = ix;
     params[1] = iy;
-    params[2] = ix + dx;
-    params[3] = iy - dy;
-    params[4] = ix + dx;
+    params[2] = ix + dx[0];
+    params[3] = iy - dx[1];
+    params[4] = ix + dx[0];
     params[5] = iy;
 */
     params[0] = ix;
-    params[1] = iy + dy;
-    params[2] = ix + dx;
+    params[1] = iy + dx[1];
+    params[2] = ix + dx[0];
     params[3] = iy;
-    params[4] = ix + dx;
-    params[5] = iy + dy;
+    params[4] = ix + dx[0];
+    params[5] = iy + dx[1];
 
     params[6] = nx;
     params[7] = ny;

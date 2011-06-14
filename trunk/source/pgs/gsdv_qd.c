@@ -1101,8 +1101,9 @@ static void _PG_qd_init_mac(void)
 static void _PG_qd_open_text_window(PG_device *dev, int vis,
 				    double xfrac, double yfrac,
 				    double dxfrac, double dyfrac)
-   {int idx, idy, ixul, iyul, ixlr, iylr;
+   {int ixul, iyul, ixlr, iylr;
     int font_size, n_colors;
+    int dx[PG_SPACEDM];
     double ratio;
     Rect physical_screen_shape, *window_shape, port_shape;
     FontInfo font_data;
@@ -1124,7 +1125,7 @@ static void _PG_qd_open_text_window(PG_device *dev, int vis,
     window_shape = &dev->window_shape;
     physical_screen_shape = SCREEN_BITS.bounds;
 
-    PG_query_screen(dev, &idx, &idy, &n_colors);
+    PG_query_screen_n(dev, dx, &n_colors);
 
     dev->ncolor           = n_colors;
     dev->absolute_n_color = n_colors;
@@ -1132,17 +1133,17 @@ static void _PG_qd_open_text_window(PG_device *dev, int vis,
 /* NOTE: since window height is expressed as a fraction of screen WIDTH, in order
  *       to calculate window height in pixels, multiply by WIDTH, not height!
  */
-    g->hwin[0] = idx*xfrac;
-    g->hwin[1] = g->hwin[0] + idx*dxfrac;
-    g->hwin[2] = idx*yfrac;
-    g->hwin[3] = g->hwin[2] + idx*dyfrac;
+    g->hwin[0] = dx[0]*xfrac;
+    g->hwin[1] = g->hwin[0] + dx[0]*dxfrac;
+    g->hwin[2] = dx[0]*yfrac;
+    g->hwin[3] = g->hwin[2] + dx[0]*dyfrac;
 
     SET_PC_FROM_HWIN(g);
 
-    ixul = xfrac*idx;
-    iyul = yfrac*idx + 2*MENU_HEIGHT;
-    ixlr = (xfrac + dxfrac)*idx;
-    iylr = (yfrac + dyfrac)*idx + MENU_HEIGHT;
+    ixul = xfrac*dx[0];
+    iyul = yfrac*dx[0] + 2*MENU_HEIGHT;
+    ixlr = (xfrac + dxfrac)*dx[0];
+    iylr = (yfrac + dyfrac)*dx[0] + MENU_HEIGHT;
     SETRECT(window_shape, ixul, iyul, ixlr, iylr);
 
 /* create window */
@@ -1192,7 +1193,7 @@ static void _PG_qd_open_text_window(PG_device *dev, int vis,
     
 /* set up the font */
     GetFontInfo(&font_data);
-    ratio = dxfrac*idx/(80*font_data.widMax);
+    ratio = dxfrac*dx[0]/(80*font_data.widMax);
     font_size = DEFAULT_FONT_SIZE;
     if (ratio < 1.0)
        {font_size = 0.5*(ratio*font_size + 0.5);
@@ -1218,7 +1219,7 @@ static void _PG_qd_open_text_window(PG_device *dev, int vis,
 void _PG_qd_open_graphics_window(PG_device *dev,
 				 double xfrac, double yfrac,
 				 double dxfrac, double dyfrac)
-   {int idx, idy, ixul, iyul, ixlr, iylr;
+   {int dx[0], dx[1], ixul, iyul, ixlr, iylr;
     int font_size, n_colors;
     double ratio;
     Rect physical_screen_shape, *window_shape;
@@ -1238,14 +1239,14 @@ void _PG_qd_open_graphics_window(PG_device *dev,
     window_shape    = &dev->window_shape;
     physical_screen_shape = SCREEN_BITS.bounds;
 
-    PG_query_screen(dev, &idx, &idy, &n_colors);
+    PG_query_screen_n(dev, dx, &n_colors);
 
 /* GOTCHA: The following pixel coordinate limits may be incorrect */
 /* set device pixel coordinate limits */
-    g->cnv[0] = INT_MIN + idx;
-    g->cnv[1] = INT_MAX - idx;
-    g->cpc[2] = INT_MIN + idy;
-    g->cpc[3] = INT_MAX - idy;
+    g->cnv[0] = INT_MIN + dx[0];
+    g->cnv[1] = INT_MAX - dx[0];
+    g->cpc[2] = INT_MIN + dx[1];
+    g->cpc[3] = INT_MAX - dx[1];
     g->cpc[4] = INT_MIN;
     g->cpc[5] = INT_MAX;
 
@@ -1255,17 +1256,17 @@ void _PG_qd_open_graphics_window(PG_device *dev,
 /* NOTE: since window height is expressed as a fraction of screen WIDTH, in order
  *       to calculate window height in pixels, multiply by WIDTH, not height!
  */
-    g->hwin[0] = idx*xfrac;
-    g->hwin[1] = g->hwin[0] + idx*dxfrac;
-    g->hwin[2] = idx*yfrac;
-    g->hwin[3] = g->hwin[2] + idx*dyfrac;
+    g->hwin[0] = dx[0]*xfrac;
+    g->hwin[1] = g->hwin[0] + dx[0]*dxfrac;
+    g->hwin[2] = dx[0]*yfrac;
+    g->hwin[3] = g->hwin[2] + dx[0]*dyfrac;
 
     SET_PC_FROM_HWIN(g);
 
-    ixul = xfrac*idx;
-    iyul = yfrac*idx + 2*MENU_HEIGHT;
-    ixlr = (xfrac + dxfrac)*idx;
-    iylr = (yfrac + dyfrac)*idx + MENU_HEIGHT;
+    ixul = xfrac*dx[0];
+    iyul = yfrac*dx[0] + 2*MENU_HEIGHT;
+    ixlr = (xfrac + dxfrac)*dx[0];
+    iylr = (yfrac + dyfrac)*dx[0] + MENU_HEIGHT;
     SETRECT(window_shape, ixul, iyul, ixlr, iylr);
 
 /* create window */
@@ -1296,7 +1297,7 @@ void _PG_qd_open_graphics_window(PG_device *dev,
 
 /* set up the font */
     GetFontInfo(&font_data);
-    ratio = dxfrac*idx/(80*font_data.widMax);
+    ratio = dxfrac*dx[0]/(80*font_data.widMax);
     font_size = DEFAULT_FONT_SIZE;
     if (ratio < 1.0)
        {font_size = 0.5*(ratio*font_size + 0.5);

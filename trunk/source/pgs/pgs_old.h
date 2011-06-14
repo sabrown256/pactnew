@@ -20,6 +20,237 @@
 
 /*--------------------------------------------------------------------------*/
 
+#if 0
+
+#define PG_n_events_pending(d)                                               \
+    (((d) != NULL) ? (*((d)->events_pending))(d) : 0)
+
+#define PG_handle_expose_event(d, ev)                                        \
+    {if ((d) != NULL)                                                        \
+        (*((d)->expose_event_handler.fnc))(d, &ev);}
+
+#define PG_handle_update_event(d, ev)                                        \
+    {if ((d) != NULL)                                                        \
+        (*((d)->update_event_handler.fnc))(d, &ev);}
+
+#define PG_handle_mouse_down_event(d, ev)                                    \
+    {if ((d) != NULL)                                                        \
+        (*((d)->mouse_down_event_handler.fnc))(d, &ev);}
+
+#define PG_handle_mouse_up_event(d, ev)                                      \
+    {if ((d) != NULL)                                                        \
+        (*((d)->mouse_up_event_handler.fnc))(d, &ev);}
+
+#define PG_handle_key_down_event(d, ev)                                      \
+    {if ((d) != NULL)                                                        \
+        (*((d)->key_down_event_handler.fnc))(d, &ev);}
+
+#define PG_handle_key_up_event(d, ev)                                        \
+    {if ((d) != NULL)                                                        \
+        (*((d)->key_up_event_handler.fnc))(d, &ev);}
+
+#define PG_handle_default_event(d, ev)                                       \
+    {if ((d) != NULL)                                                        \
+        (*((d)->default_event_handler.fnc))(d, &ev);}
+
+#define PG_query_pointer(d, ir, pb, pq)                                      \
+    if ((d)->query_pointer != NULL)                                          \
+       (*(d)->query_pointer)(d, ir, pb, pq)
+
+#define PG_mouse_event_info(d, ev, iev, eb, eq)                              \
+    if ((d)->mouse_event_info != NULL)                                       \
+       (*(d)->mouse_event_info)(d, ev, iev, eb, eq)
+
+#define PG_key_event_info(d, ev, iev, bf, n, eq)                             \
+    if ((d)->key_event_info != NULL)                                         \
+       (*(d)->key_event_info)(d, ev, iev, bf, n, eq)
+
+/*--------------------------------------------------------------------------*/
+
+#define PG_open_screen(d, xf, yf, dxf, dyf)                                  \
+    if ((d) != NULL)                                                         \
+       {if ((d)->open_screen != NULL)                                        \
+           (*(d)->open_screen)(d, xf, yf, dxf, dyf);}
+
+#define PG_make_device_current(d)                                            \
+    if ((d) != NULL)                                                         \
+       {if ((d)->make_device_current != NULL)                                \
+           (*(d)->make_device_current)(d);}
+
+#define PG_release_current_device(d)                                         \
+    if ((d) != NULL)                                                         \
+       {if ((d)->release_current_device != NULL)                             \
+           (*(d)->release_current_device)(d);}
+
+#define PG_update_vs(d)                                                      \
+    if ((d) != NULL)                                                         \
+       {if ((d)->update_vs != NULL)                                          \
+           (*(d)->update_vs)(d);}
+
+#define PG_finish_plot(d)                                                    \
+    if ((d) != NULL)                                                         \
+       {if ((d)->finish_plot != NULL)                                        \
+           (*(d)->finish_plot)(d);}
+
+#define PG_expose_device(d)                                                  \
+    if ((d) != NULL)                                                         \
+       {if ((d)->expose_device != NULL)                                      \
+           (*(d)->expose_device)(d);}
+
+#define PG_close_device(d)                                                   \
+    if ((d) != NULL)                                                         \
+       {if ((d)->close_device != NULL)                                       \
+           (*(d)->close_device)(d);}
+
+#define PG_close_console                                                     \
+    if ((PG_console_device != NULL) &&                                       \
+        (PG_console_device->close_console != NULL))                          \
+       (*PG_console_device->close_console)
+
+/*--------------------------------------------------------------------------*/
+
+#else
+
+/*--------------------------------------------------------------------------*/
+
+#define PG_query_screen(d, pdx, pdy, pnc)                                    \
+    if ((d) != NULL)                                                         \
+       {if ((d)->query_screen != NULL)                                       \
+           (*(d)->query_screen)(d, pdx, pdy, pnc);}
+
+/*--------------------------------------------------------------------------*/
+
+#define PG_clear_frame(d)                                                    \
+   {if ((d) != NULL)                                                         \
+       PG_clear_region(d, 2, NORMC, d->g.fr, 0);}
+
+#define PG_clear_window(d)                                                   \
+    if ((d) != NULL)                                                         \
+       {if ((d)->clear_window != NULL)                                       \
+	   {PG_set_attrs_glb(TRUE, "label-position-y", HUGE, NULL);          \
+	    (*(d)->clear_window)(d);};}
+
+#define PG_clear_viewport(d)                                                 \
+    if ((d) != NULL)                                                         \
+       {if ((d)->clear_viewport != NULL)                                     \
+           (*(d)->clear_viewport)(d);}
+
+#define PG_clear_region(d, nd, cs, bx, pad)                                  \
+    if ((d) != NULL)                                                         \
+       {if ((d)->clear_region != NULL)                                       \
+	   (*(d)->clear_region)(d, nd, cs, bx, pad);}
+
+#define PG_clear_page(d, i)                                                  \
+    if ((d) != NULL)                                                         \
+       {if ((d)->clear_page != NULL)                                         \
+           (*(d)->clear_page)(d, i);}
+
+/*--------------------------------------------------------------------------*/
+
+#define PG_move_gr_abs(d, x, y)                                              \
+    if ((d) != NULL)                                                         \
+       {if ((d)->move_gr_abs != NULL)                                        \
+           (*(d)->move_gr_abs)(d, x, y);}
+
+#define PG_move_tx_abs(d, x, y)                                              \
+    if ((d) != NULL)                                                         \
+       {if ((d)->move_tx_abs != NULL)                                        \
+           (*(d)->move_tx_abs)(d, x, y);}
+
+#define PG_move_tx_rel(d, x, y)                                              \
+    if ((d) != NULL)                                                         \
+       {if ((d)->move_tx_rel != NULL)                                        \
+           (*(d)->move_tx_rel)(d, x, y);}
+
+#define PG_draw_to_abs(d, x, y)                                              \
+    if ((d) != NULL)                                                         \
+       {if ((d)->draw_to_abs != NULL)                                        \
+           (*(d)->draw_to_abs)(d, x, y);}
+
+#define PG_draw_to_rel(d, x, y)                                              \
+    if ((d) != NULL)                                                         \
+       {if ((d)->draw_to_rel != NULL)                                        \
+           (*(d)->draw_to_rel)(d, x, y);}
+
+/*--------------------------------------------------------------------------*/
+
+#define PG_shade_poly(d, x, y, n)                                            \
+    if ((d) != NULL)                                                         \
+       {if ((d)->shade_poly != NULL)                                         \
+           {double *_r[2];                                                   \
+	    _r[0] = x;                                                       \
+	    _r[1] = y;                                                       \
+	    (*(d)->shade_poly)(d, 2, n, _r);};}
+
+#define PG_shade_poly_n(d, nd, n, r)                                         \
+    if ((d) != NULL)                                                         \
+       {if ((d)->shade_poly != NULL)                                         \
+           (*(d)->shade_poly)(d, nd, n, r);}
+
+#define PG_fill_curve(d, c)                                                  \
+    if ((d) != NULL)                                                         \
+       {if ((d)->fill_curve != NULL)                                         \
+           (*(d)->fill_curve)(d, c);}
+
+/*--------------------------------------------------------------------------*/
+
+#define PG_draw_curve(d, c, clip)                                            \
+    if ((d) != NULL)                                                         \
+       {if ((d)->draw_curve != NULL)                                         \
+           (*(d)->draw_curve)(d, c, clip);}
+
+#define PG_draw_disjoint_polyline_2(d, x, y, n, flag, coord)                 \
+    if ((d) != NULL)                                                         \
+       {if ((d)->draw_dj_polyln_2 != NULL)                                   \
+           {double *_r[2];                                                   \
+	    _r[0] = x;                                                       \
+	    _r[1] = y;                                                       \
+	    (*(d)->draw_dj_polyln_2)(d, _r, n, flag, coord);};}
+
+/*--------------------------------------------------------------------------*/
+
+#define PG_make_palette_current(d, p)                                        \
+    if ((d) != NULL)                                                         \
+       {(d)->current_palette = p;}
+
+#define PG_get_image(d, bf, ix, iy, nx, ny)                                  \
+    if ((d) != NULL)                                                         \
+       {if ((d)->get_image != NULL)                                          \
+           (*(d)->get_image)(d, bf, ix, iy, nx, ny);}
+
+#define PG_put_image(d, bf, ix, iy, nx, ny)                                  \
+    if ((d) != NULL)                                                         \
+       {if ((d)->put_image != NULL)                                          \
+           (*(d)->put_image)(d, bf, ix, iy, nx, ny);}
+
+#define PG_write_text(d, fp, s)                                              \
+    if ((d) != NULL)                                                         \
+       {if ((d)->write_text != NULL)                                         \
+           (*(d)->write_text)(d, fp, s);}
+
+#define PG_next_line(d, fp)                                                  \
+    if ((d) != NULL)                                                         \
+       {if ((d)->next_line != NULL)                                          \
+           (*(d)->next_line)(d, fp);}
+
+/*--------------------------------------------------------------------------*/
+
+#define PG_fgetc(stream)                                                     \
+    (((PG_console_device != NULL) && (PG_console_device->ggetc != NULL)) ?   \
+     (*PG_console_device->ggetc)(stream) :                                   \
+     EOF)
+
+#define PG_fgets(buffer, maxlen, stream)                                     \
+    (((PG_console_device != NULL) && (PG_console_device->ggets != NULL)) ?   \
+     (*PG_console_device->ggets)(buffer, maxlen, stream) :                   \
+     NULL)
+
+#define PG_puts(bf)                                                          \
+    if ((PG_console_device != NULL) && (PG_console_device->gputs != NULL))   \
+       (*PG_console_device->gputs)(bf)
+
+/*--------------------------------------------------------------------------*/
+
 #define PG_set_axis_decades(_d) PG_set_attrs_glb(TRUE, "axis-n-decades", (double) _d, NULL)
 #define PG_get_axis_decades(_d) PG_get_attrs_glb(TRUE, "axis-n-decades", &(_d), NULL)
 
@@ -222,256 +453,7 @@
 
 /*--------------------------------------------------------------------------*/
 
-#define PG_white_background(d, t)                                            \
-   {if ((d) != NULL)                                                         \
-       (d)->background_color_white = (t);}
-
-#define PG_turn_grid(d, t)                                                   \
-   {if ((d) != NULL)                                                         \
-       (d)->grid = (t);}
-
-#define PG_turn_data_id(d, t)                                                \
-   {if ((d) != NULL)                                                         \
-       (d)->data_id = (t);}
-
-#define PG_turn_scatter(d, t)                                                \
-   {if ((d) != NULL)                                                         \
-       (d)->scatter = (t);}
-
-#define PG_turn_autodomain(d, t)                                             \
-   {if ((d) != NULL)                                                         \
-       (d)->autodomain = (t);}
-
-#define PG_turn_autorange(d, t)                                              \
-   {if ((d) != NULL)                                                         \
-       (d)->autorange = (t);}
-
-#define PG_turn_autoplot(d, t)                                               \
-   {if ((d) != NULL)                                                         \
-       (d)->autoplot = (t);}
-
-/*--------------------------------------------------------------------------*/
-
-#define PG_clear_frame(d)                                                    \
-   {if ((d) != NULL)                                                         \
-       PG_clear_region(d, 2, NORMC, d->g.fr, 0);}
-
-#define PG_n_events_pending(d)                                               \
-    (((d) != NULL) ? (*((d)->events_pending))(d) : 0)
-
-/*--------------------------------------------------------------------------*/
-
-#define PG_handle_expose_event(d, ev)                                        \
-    {if ((d) != NULL)                                                        \
-        (*((d)->expose_event_handler.fnc))(d, &ev);}
-
-#define PG_handle_update_event(d, ev)                                        \
-    {if ((d) != NULL)                                                        \
-        (*((d)->update_event_handler.fnc))(d, &ev);}
-
-#define PG_handle_mouse_down_event(d, ev)                                    \
-    {if ((d) != NULL)                                                        \
-        (*((d)->mouse_down_event_handler.fnc))(d, &ev);}
-
-#define PG_handle_mouse_up_event(d, ev)                                      \
-    {if ((d) != NULL)                                                        \
-        (*((d)->mouse_up_event_handler.fnc))(d, &ev);}
-
-#define PG_handle_key_down_event(d, ev)                                      \
-    {if ((d) != NULL)                                                        \
-        (*((d)->key_down_event_handler.fnc))(d, &ev);}
-
-#define PG_handle_key_up_event(d, ev)                                        \
-    {if ((d) != NULL)                                                        \
-        (*((d)->key_up_event_handler.fnc))(d, &ev);}
-
-#define PG_handle_default_event(d, ev)                                       \
-    {if ((d) != NULL)                                                        \
-        (*((d)->default_event_handler.fnc))(d, &ev);}
-
-#define PG_query_pointer(d, ir, pb, pq)                                      \
-    if ((d)->query_pointer != NULL)                                          \
-       (*(d)->query_pointer)(d, ir, pb, pq)
-
-#define PG_mouse_event_info(d, ev, iev, eb, eq)                              \
-    if ((d)->mouse_event_info != NULL)                                       \
-       (*(d)->mouse_event_info)(d, ev, iev, eb, eq)
-
-#define PG_key_event_info(d, ev, iev, bf, n, eq)                             \
-    if ((d)->key_event_info != NULL)                                         \
-       (*(d)->key_event_info)(d, ev, iev, bf, n, eq)
-
-/*--------------------------------------------------------------------------*/
-
-#define PG_shade_poly(d, x, y, n)                                            \
-    if ((d) != NULL)                                                         \
-       {if ((d)->shade_poly != NULL)                                         \
-           {double *_r[2];                                                   \
-	    _r[0] = x;                                                       \
-	    _r[1] = y;                                                       \
-	    (*(d)->shade_poly)(d, 2, n, _r);};}
-
-#define PG_shade_poly_n(d, nd, n, r)                                         \
-    if ((d) != NULL)                                                         \
-       {if ((d)->shade_poly != NULL)                                         \
-           (*(d)->shade_poly)(d, nd, n, r);}
-
-#define PG_fill_curve(d, c)                                                  \
-    if ((d) != NULL)                                                         \
-       {if ((d)->fill_curve != NULL)                                         \
-           (*(d)->fill_curve)(d, c);}
-
-/*--------------------------------------------------------------------------*/
-
-#define PG_move_gr_abs(d, x, y)                                              \
-    if ((d) != NULL)                                                         \
-       {if ((d)->move_gr_abs != NULL)                                        \
-           (*(d)->move_gr_abs)(d, x, y);}
-
-#define PG_move_tx_abs(d, x, y)                                              \
-    if ((d) != NULL)                                                         \
-       {if ((d)->move_tx_abs != NULL)                                        \
-           (*(d)->move_tx_abs)(d, x, y);}
-
-#define PG_move_tx_rel(d, x, y)                                              \
-    if ((d) != NULL)                                                         \
-       {if ((d)->move_tx_rel != NULL)                                        \
-           (*(d)->move_tx_rel)(d, x, y);}
-
-#define PG_draw_to_abs(d, x, y)                                              \
-    if ((d) != NULL)                                                         \
-       {if ((d)->draw_to_abs != NULL)                                        \
-           (*(d)->draw_to_abs)(d, x, y);}
-
-#define PG_draw_to_rel(d, x, y)                                              \
-    if ((d) != NULL)                                                         \
-       {if ((d)->draw_to_rel != NULL)                                        \
-           (*(d)->draw_to_rel)(d, x, y);}
-
-/*--------------------------------------------------------------------------*/
-
-#define PG_draw_curve(d, c, clip)                                            \
-    if ((d) != NULL)                                                         \
-       {if ((d)->draw_curve != NULL)                                         \
-           (*(d)->draw_curve)(d, c, clip);}
-
-#define PG_draw_disjoint_polyline_2(d, x, y, n, flag, coord)                 \
-    if ((d) != NULL)                                                         \
-       {if ((d)->draw_dj_polyln_2 != NULL)                                   \
-           {double *_r[2];                                                   \
-	    _r[0] = x;                                                       \
-	    _r[1] = y;                                                       \
-	    (*(d)->draw_dj_polyln_2)(d, _r, n, flag, coord);};}
-
-/*--------------------------------------------------------------------------*/
-
-#define PG_clear_window(d)                                                   \
-    if ((d) != NULL)                                                         \
-       {if ((d)->clear_window != NULL)                                       \
-	   {PG_set_attrs_glb(TRUE, "label-position-y", HUGE, NULL);          \
-	    (*(d)->clear_window)(d);};}
-
-#define PG_clear_viewport(d)                                                 \
-    if ((d) != NULL)                                                         \
-       {if ((d)->clear_viewport != NULL)                                     \
-           (*(d)->clear_viewport)(d);}
-
-#define PG_clear_region(d, nd, cs, bx, pad)                                  \
-    if ((d) != NULL)                                                         \
-       {if ((d)->clear_region != NULL)                                       \
-	   (*(d)->clear_region)(d, nd, cs, bx, pad);}
-
-/*--------------------------------------------------------------------------*/
-
-#define PG_update_vs(d)                                                      \
-    if ((d) != NULL)                                                         \
-       {if ((d)->update_vs != NULL)                                          \
-           (*(d)->update_vs)(d);}
-
-#define PG_finish_plot(d)                                                    \
-    if ((d) != NULL)                                                         \
-       {if ((d)->finish_plot != NULL)                                        \
-           (*(d)->finish_plot)(d);}
-
-#define PG_clear_page(d, i)                                                  \
-    if ((d) != NULL)                                                         \
-       {if ((d)->clear_page != NULL)                                         \
-           (*(d)->clear_page)(d, i);}
-
-#define PG_expose_device(d)                                                  \
-    if ((d) != NULL)                                                         \
-       {if ((d)->expose_device != NULL)                                      \
-           (*(d)->expose_device)(d);}
-
-#define PG_make_palette_current(d, p)                                        \
-    if ((d) != NULL)                                                         \
-       {(d)->current_palette = p;}
-
-#define PG_make_device_current(d)                                            \
-    if ((d) != NULL)                                                         \
-       {if ((d)->make_device_current != NULL)                                \
-           (*(d)->make_device_current)(d);}
-
-#define PG_release_current_device(d)                                         \
-    if ((d) != NULL)                                                         \
-       {if ((d)->release_current_device != NULL)                             \
-           (*(d)->release_current_device)(d);}
-
-#define PG_get_image(d, bf, ix, iy, nx, ny)                                  \
-    if ((d) != NULL)                                                         \
-       {if ((d)->get_image != NULL)                                          \
-           (*(d)->get_image)(d, bf, ix, iy, nx, ny);}
-
-#define PG_put_image(d, bf, ix, iy, nx, ny)                                  \
-    if ((d) != NULL)                                                         \
-       {if ((d)->put_image != NULL)                                          \
-           (*(d)->put_image)(d, bf, ix, iy, nx, ny);}
-
-#define PG_write_text(d, fp, s)                                              \
-    if ((d) != NULL)                                                         \
-       {if ((d)->write_text != NULL)                                         \
-           (*(d)->write_text)(d, fp, s);}
-
-#define PG_next_line(d, fp)                                                  \
-    if ((d) != NULL)                                                         \
-       {if ((d)->next_line != NULL)                                          \
-           (*(d)->next_line)(d, fp);}
-
-#define PG_open_screen(d, xf, yf, dxf, dyf)                                  \
-    if ((d) != NULL)                                                         \
-       {if ((d)->open_screen != NULL)                                        \
-           (*(d)->open_screen)(d, xf, yf, dxf, dyf);}
-
-#define PG_query_screen(d, pdx, pdy, pnc)                                    \
-    if ((d) != NULL)                                                         \
-       {if ((d)->query_screen != NULL)                                       \
-           (*(d)->query_screen)(d, pdx, pdy, pnc);}
-
-#define PG_close_device(d)                                                   \
-    if ((d) != NULL)                                                         \
-       {if ((d)->close_device != NULL)                                       \
-           (*(d)->close_device)(d);}
-
-#define PG_close_console                                                     \
-    if ((PG_console_device != NULL) &&                                       \
-        (PG_console_device->close_console != NULL))                          \
-       (*PG_console_device->close_console)
-
-/*--------------------------------------------------------------------------*/
-
-#define PG_fgetc(stream)                                                     \
-    (((PG_console_device != NULL) && (PG_console_device->ggetc != NULL)) ?   \
-     (*PG_console_device->ggetc)(stream) :                                   \
-     EOF)
-
-#define PG_fgets(buffer, maxlen, stream)                                     \
-    (((PG_console_device != NULL) && (PG_console_device->ggets != NULL)) ?   \
-     (*PG_console_device->ggets)(buffer, maxlen, stream) :                   \
-     NULL)
-
-#define PG_puts(bf)                                                          \
-    if ((PG_console_device != NULL) && (PG_console_device->gputs != NULL))   \
-       (*PG_console_device->gputs)(bf)
+#endif
 
 /*--------------------------------------------------------------------------*/
 
