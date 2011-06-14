@@ -577,6 +577,14 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
+/* GSCLR.C declarations */
+
+extern void
+ PG_get_line_color(PG_device *dev, int *pcl),
+ PG_get_text_color(PG_device *dev, int *pcl),
+ PG_get_fill_color(PG_device *dev, int *pcl);
+
+
 /* GSPR.C declarations */
 
 extern void

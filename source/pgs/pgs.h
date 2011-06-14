@@ -1134,7 +1134,13 @@ extern int
  PG_fget_res_scale_factor(PG_device *dev),
  PG_fset_res_scale_factor(PG_device *dev, int s),
  PG_fget_border_width(PG_device *dev),
- PG_fset_border_width(PG_device *dev, int w);
+ PG_fset_border_width(PG_device *dev, int w),
+ PG_fget_line_color(PG_device *dev),
+ PG_fset_line_color(PG_device *dev, int clr, int mapped),
+ PG_fget_text_color(PG_device *dev),
+ PG_fset_text_color(PG_device *dev, int clr, int mapped),
+ PG_fget_fill_color(PG_device *dev),
+ PG_fset_fill_color(PG_device *dev, int clr, int mapped);
 
 extern void
  PG_fget_char_path(PG_device *dev, double *x),
@@ -1221,9 +1227,6 @@ extern int
  PG_wr_palette(PG_device *dev, PG_palette *pal, char *fname);
 
 extern void
- PG_get_fill_color(PG_device *dev, int *pcl),
- PG_get_line_color(PG_device *dev, int *pcl),
- PG_get_text_color(PG_device *dev, int *pcl),
  PG_register_palette(PG_device *dev, PG_palette *pal, int map),
  PG_setup_standard_palettes(PG_device *dev, int nc, int l1,
 			    int l2, int l3, int l4,

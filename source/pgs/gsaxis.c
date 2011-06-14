@@ -638,9 +638,9 @@ void PG_axis(PG_device *dev, int axis_type)
  *                        - AXIS_LINETHICK    - the thickness of the lines
  *                        -                     (see PG_fset_line_width)
  *                        - AXIS_LINECOLOR    - the color of the lines
- *                        -                     (see PG_set_color_line)
+ *                        -                     (see PG_fset_line_color)
  *                        - AXIS_LABELCOLOR   - the color of the labels
- *                        -                     (see PG_set_color_text)
+ *                        -                     (see PG_fset_text_color)
  *                        - AXIS_LABELFONT    - the label font type_face
  *                        -                     (see PG_fset_font)
  *                        - AXIS_LABELPREC    - the character precision
@@ -755,14 +755,14 @@ int PG_set_axis_attributes(PG_device *dev, ...)
 
 /* set attribute values */
     PG_fset_clipping(dev, FALSE);
-    PG_set_color_text(dev, txtcolor, TRUE);
+    PG_fset_text_color(dev, txtcolor, TRUE);
     PG_fset_font(dev, _PG_gattrs.axis_type_face,
 		 dev->type_style, dev->type_size);
     PG_fset_char_path(dev, chpth);
     PG_fset_char_precision(dev, prec);
     PG_fset_char_up(dev, chup);
     PG_fset_char_space(dev, chsp);
-    PG_set_color_line(dev, linecolor, TRUE);
+    PG_fset_line_color(dev, linecolor, TRUE);
     PG_fset_line_style(dev, _PG_gattrs.axis_line_style);
     PG_fset_line_width(dev, _PG_gattrs.axis_line_width);
 
@@ -1337,7 +1337,7 @@ PG_axis_def *PG_draw_axis_n(PG_device *dev, double *xl, double *xr,
 	   {SC_SWAP_VALUE(double, tn[0], tn[1]);
 	    SC_SWAP_VALUE(double, vo[0], vo[1]);};
 
-	PG_set_color_line(dev, dev->line_color, TRUE);
+	PG_fset_line_color(dev, dev->line_color, TRUE);
 	PG_draw_line_n(dev, 2, WORLDC, xl, xr, dev->clipping);
 
 	PG_get_viewspace(dev, BOUNDC, bnd);
@@ -1360,7 +1360,7 @@ PG_axis_def *PG_draw_axis_n(PG_device *dev, double *xl, double *xr,
 		_PG_draw_tick(dev, ad, majorsz, AXIS_TICK_MAJOR);};
 
 	    if (tickdef & AXIS_TICK_LABEL)
-	       {PG_set_color_text(dev, dev->text_color, TRUE);
+	       {PG_fset_text_color(dev, dev->text_color, TRUE);
 		_PG_tick(ad, AXIS_TICK_LABEL);
 		_PG_draw_label(dev, ad, format);};};
 
@@ -1392,9 +1392,9 @@ void PG_axis_3(PG_device *dev, double **x, int np, double *databox)
     g = &dev->g;
 
 /* axis drawing properties */
-    PG_get_line_color(dev, &lc);
+    lc = PG_fget_line_color(dev);
     ls = PG_fget_line_style(dev);
-    PG_set_color_line(dev, dev->WHITE, TRUE);
+    PG_fset_line_color(dev, dev->WHITE, TRUE);
     PG_fset_line_style(dev, 3);
 
 /* draw axes on the databox */
@@ -1428,7 +1428,7 @@ void PG_axis_3(PG_device *dev, double **x, int np, double *databox)
 
     PM_free_vectors(3, p);
 
-    PG_set_line_color(dev, lc);
+    PG_fset_line_color(dev, lc, TRUE);
     PG_fset_line_style(dev, ls);
 
     return;}

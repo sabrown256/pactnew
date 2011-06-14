@@ -137,10 +137,10 @@ int main(int argc, char **argv)
 	PG_set_view_angle(PS_dev, theta, phi, 0.0);
 	PG_set_view_angle(CGM_dev, theta, phi, 0.0);
 
-        PG_set_color_line(SCR_dev, i, TRUE);
-        PG_set_color_line(SCR_dew, i, TRUE);
-        PG_set_color_line(PS_dev, i, TRUE);
-        PG_set_color_line(CGM_dev, i, TRUE);
+        PG_fset_line_color(SCR_dev, i, TRUE);
+        PG_fset_line_color(SCR_dew, i, TRUE);
+        PG_fset_line_color(PS_dev, i, TRUE);
+        PG_fset_line_color(CGM_dev, i, TRUE);
 
         PG_clear_window(SCR_dev);
         PG_clear_window(PS_dev);

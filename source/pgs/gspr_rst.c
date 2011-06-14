@@ -726,9 +726,9 @@ void _PG_rst_shade_poly(PG_device *dev, int nd, int n, double **r)
 	PG_trans_point(dev, 2, WORLDC, x2, PIXELC, x2);
 	iymx = x2[1];
 
-	PG_get_line_color(dev, &lclr);
-	PG_get_fill_color(dev, &fclr);
-	PG_set_color_line(dev, fclr, FALSE);
+	lclr = PG_fget_line_color(dev);
+	fclr = PG_fget_fill_color(dev);
+	PG_fset_line_color(dev, fclr, FALSE);
 
 	lwd = PG_fget_line_width(dev);
 	PG_fset_line_width(dev, _PG_gattrs.line_width);
@@ -747,7 +747,7 @@ void _PG_rst_shade_poly(PG_device *dev, int nd, int n, double **r)
 	    _PG_free_edge_table(et, iymn, iymx);};
 
 	PG_fset_line_width(dev, lwd);
-	PG_set_line_color(dev, lclr);};
+	PG_fset_line_color(dev, lclr, TRUE);};
 
     return;}
 

@@ -439,6 +439,78 @@ FIXNUM FF_ID(pgsvsh, PGSVSH)(FIXNUM *sdid, double *ax, double *sa)
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGGLNC - get the line color */
+
+FIXNUM FF_ID(pgglnc, PGGLNC)(FIXNUM *sdid)
+   {FIXNUM rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    rv  = PG_fget_line_color(dev);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSLNC - set the line color */
+
+FIXNUM FF_ID(pgslnc, PGSLNC)(FIXNUM *sdid, FIXNUM *sc)
+   {FIXNUM rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    rv  = PG_fset_line_color(dev, *sc, TRUE);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGGTXC - get the text color */
+
+FIXNUM FF_ID(pggtxc, PGGTXC)(FIXNUM *sdid)
+   {FIXNUM rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    rv  = PG_fget_text_color(dev);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSTXC - set the text color */
+
+FIXNUM FF_ID(pgstxc, PGSTXC)(FIXNUM *sdid, FIXNUM *sc)
+   {FIXNUM rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    PG_fset_text_color(dev, (int) *sc, TRUE);
+
+    rv = TRUE;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSFCL - set the fill color */
+
+FIXNUM FF_ID(pgsfcl, PGSFCL)(FIXNUM *sdid, FIXNUM *sc)
+   {FIXNUM rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+    rv  = PG_fset_fill_color(dev, *sc, TRUE);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
 
 
 
@@ -605,14 +677,14 @@ FIXNUM FF_ID(pgsaxa, PGSAXA)(FIXNUM *sdid, FIXNUM *sn,
 
 /* set attribute values */
     PG_fset_clipping(dev, FALSE);
-    PG_set_color_text(dev, txclr, TRUE);
+    PG_fset_text_color(dev, txclr, TRUE);
     PG_fset_font(dev, _PG_gattrs.axis_type_face,
 		 dev->type_style, dev->type_size);
     PG_fset_char_path(dev, chpth);
     PG_fset_char_precision(dev, prec);
     PG_fset_char_up(dev, chup);
     PG_fset_char_space(dev, chsp);
-    PG_set_color_line(dev, lnclr, TRUE);
+    PG_fset_line_color(dev, lnclr, TRUE);
     PG_fset_line_style(dev, _PG_gattrs.axis_line_style);
     PG_fset_line_width(dev, _PG_gattrs.axis_line_width);
 
@@ -1113,25 +1185,6 @@ FIXNUM FF_ID(pggfin, PGGFIN)(FIXNUM *sdid, FIXNUM *sc)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PGGLNC - get the line color */
-
-FIXNUM FF_ID(pgglnc, PGGLNC)(FIXNUM *sdid, FIXNUM *sc)
-   {int lc;
-    FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_get_line_color(dev, &lc);
-
-    *sc = lc;
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PGGTLN - get a line of text from the input descriptor */
 
 FIXNUM FF_ID(pggtln, PGGTLN)(FIXNUM *sncs, char *s, FIXNUM *sfd)
@@ -1150,25 +1203,6 @@ FIXNUM FF_ID(pggtln, PGGTLN)(FIXNUM *sncs, char *s, FIXNUM *sfd)
         t = GETLN(s, (int) *sncs, (FILE *) f.memaddr);};
 
     rv = (t != NULL);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGGTXC - get the text color */
-
-FIXNUM FF_ID(pggtxc, PGGTXC)(FIXNUM *sdid, FIXNUM *sc)
-   {int lc;
-    FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_get_text_color(dev, &lc);
-
-    *sc = lc;
-
-    rv = TRUE;
 
     return(rv);}
 
@@ -1692,22 +1726,6 @@ FIXNUM FF_ID(pgselc, PGSELC)(FIXNUM *sdid, FIXNUM *sn, double *av,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PGSFCL - set the fill color */
-
-FIXNUM FF_ID(pgsfcl, PGSFCL)(FIXNUM *sdid, FIXNUM *sc)
-   {FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_set_fill_color(dev, *sc);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PGSFIN - set the finished status */
 
 FIXNUM FF_ID(pgsfin, PGSFIN)(FIXNUM *sdid, FIXNUM *sc)
@@ -1716,22 +1734,6 @@ FIXNUM FF_ID(pgsfin, PGSFIN)(FIXNUM *sdid, FIXNUM *sc)
 
     dev = SC_GET_POINTER(PG_device, *sdid);
     dev->finished = *sc;
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGSLNC - set the line color */
-
-FIXNUM FF_ID(pgslnc, PGSLNC)(FIXNUM *sdid, FIXNUM *sc)
-   {FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_set_color_line(dev, (int) *sc, TRUE);
 
     rv = TRUE;
 
@@ -1794,22 +1796,6 @@ FIXNUM FF_ID(pgstow, PGSTOW)(FIXNUM *sdid, double *sx, double *sy)
     PG_trans_point(dev, 2, NORMC, p, WORLDC, p);
     *sx = p[0];
     *sy = p[1];
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGSTXC - set the text color */
-
-FIXNUM FF_ID(pgstxc, PGSTXC)(FIXNUM *sdid, FIXNUM *sc)
-   {FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-    PG_set_color_text(dev, (int) *sc, TRUE);
 
     rv = TRUE;
 

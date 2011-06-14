@@ -503,7 +503,7 @@ void PG_fill_poly_zc_lr(PG_device *dev, int nd, double **a,
     r[1] = ry;
 
     if (dev->draw_fill_bound)
-       {PG_set_color_fill(dev, dev->WHITE, TRUE);
+       {PG_fset_fill_color(dev, dev->WHITE, TRUE);
 
 	for (l = 0; l < lz; l++)
 	    for (k = 0; k < kz; k++)
@@ -690,7 +690,7 @@ void PG_fill_poly_nc_lr(PG_device *dev, int nd, double **a,
     r[1] = ry;
 
     if (dev->draw_fill_bound)
-       {PG_set_color_fill(dev, dev->WHITE, TRUE);
+       {PG_fset_fill_color(dev, dev->WHITE, TRUE);
 
 	for (l = 0; l < lm; l++)
 	    for (k = 0; k < km; k++)
@@ -807,7 +807,7 @@ void PG_fill_poly_zc_ac(PG_device *dev, int nd, double **a,
 			      r[0], r[1], npt);};};
 
     if (dev->draw_fill_bound)
-       {PG_set_color_fill(dev, dev->WHITE, TRUE);
+       {PG_fset_fill_color(dev, dev->WHITE, TRUE);
 
 	for (iz = 0; iz <= nz; iz++)
 	    {oz  = iz*nzp;

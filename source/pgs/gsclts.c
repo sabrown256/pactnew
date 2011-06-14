@@ -117,27 +117,27 @@ int main(argc, argv)
 	 p[1] = y;
 
 	 PG_make_device_current(SCR_dev);
-         PG_set_color_line(SCR_dev, i, mapped);
+         PG_fset_line_color(SCR_dev, i, mapped);
 	 PG_draw_line_n(SCR_dev, 2, WORLDC, x1, x2, SCR_dev->clipping);
-         PG_set_color_text(SCR_dev, i, mapped);
+         PG_fset_text_color(SCR_dev, i, mapped);
          PG_write_n(SCR_dev, 2, WORLDC, p, "%d %s", i, clrs[i]);
 
          PG_make_device_current(SCR_dew);
-         PG_set_color_line(SCR_dew, i, mapped);
+         PG_fset_line_color(SCR_dew, i, mapped);
 	 PG_draw_line_n(SCR_dew, 2, WORLDC, x1, x2, SCR_dew->clipping);
-         PG_set_color_text(SCR_dew, i, mapped);
+         PG_fset_text_color(SCR_dew, i, mapped);
          PG_write_n(SCR_dew, 2, WORLDC, p, "%d %s", i, clrs[i]);
 
          PG_make_device_current(PS_dev);
-         PG_set_color_line(PS_dev, i, mapped);
+         PG_fset_line_color(PS_dev, i, mapped);
 	 PG_draw_line_n(PS_dev, 2, WORLDC, x1, x2, PS_dev->clipping);
-         PG_set_color_text(PS_dev, i, mapped);
+         PG_fset_text_color(PS_dev, i, mapped);
          PG_write_n(PS_dev, 2, WORLDC, p, "%d %s", i, clrs[i]);
 
          PG_make_device_current(CGM_dev);
-         PG_set_color_line(CGM_dev, i, mapped);
+         PG_fset_line_color(CGM_dev, i, mapped);
 	 PG_draw_line_n(CGM_dev, 2, WORLDC, x1, x2, CGM_dev->clipping);
-         PG_set_color_text(CGM_dev, i, mapped);
+         PG_fset_text_color(CGM_dev, i, mapped);
          PG_write_n(CGM_dev, 2, WORLDC, p, "%d %s", i, clrs[i]);
 
          y += dy;};

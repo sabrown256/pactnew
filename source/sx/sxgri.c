@@ -192,11 +192,11 @@ static void SX_annot_action(void *d, PG_event *ev)
 			 break;
 
 		    case MOUSE_RIGHT :
-			 PG_set_color_fill(dev, dev->BLACK, TRUE);
+			 PG_fset_fill_color(dev, dev->BLACK, TRUE);
 			 PG_fill_curve(dev, iob->curve);
-			 PG_set_color_line(dev, dev->BLACK, FALSE);
+			 PG_fset_line_color(dev, dev->BLACK, FALSE);
 			 PG_draw_curve(dev, iob->curve, FALSE);
-			 PG_set_color_line(dev, dev->WHITE, TRUE);
+			 PG_fset_line_color(dev, dev->WHITE, TRUE);
 
 			 SX_rem_iob(iob, TRUE);
 

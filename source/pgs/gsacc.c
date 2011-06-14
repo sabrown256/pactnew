@@ -1084,292 +1084,362 @@ void PG_fset_viewport_shape(PG_device *dev, double *dx, double asp)
     return;}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_LINE_COLOR - inquire about the current line color
+ *
+ * #bind PG_fget_line_color fortran() scheme()
+ */
+
+int PG_fget_line_color(PG_device *dev)
+   {int rv;
+
+    rv = dev->line_color;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_LINE_COLOR - set the current line color
+ *
+ * #bind PG_fset_line_color fortran() scheme()
+ */
+
+int PG_fset_line_color(PG_device *dev, int clr, int mapped)
+   {int rv;
+
+    if ((dev != NULL) && (dev->set_line_color != NULL))
+       {rv = dev->line_color;
+	(*dev->set_line_color)(dev, clr, mapped);}
+    else
+       PG_get_attrs_glb(TRUE, "line-color", &rv, NULL);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_TEXT_COLOR - inquire about the current text color
+ *
+ * #bind PG_fget_text_color fortran() scheme()
+ */
+
+int PG_fget_text_color(PG_device *dev)
+   {int rv;
+
+    rv = dev->text_color;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_TEXT_COLOR - set the current text color
+ *
+ * #bind PG_fset_text_color fortran() scheme()
+ */
+
+int PG_fset_text_color(PG_device *dev, int clr, int mapped)
+   {int rv;
+
+    if ((dev != NULL) && (dev->set_text_color != NULL))
+       {rv = dev->text_color;
+	(*dev->set_text_color)(dev, clr, mapped);}
+    else
+       PG_get_attrs_glb(TRUE, "text-color", &rv, NULL);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FGET_FILL_COLOR - inquire about the current fill color
+ *
+ * #bind PG_fget_fill_color fortran() scheme()
+ */
+
+int PG_fget_fill_color(PG_device *dev)
+   {int rv;
+
+    rv = dev->fill_color;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FSET_FILL_COLOR - set the current fill color
+ *
+ * #bind PG_fset_fill_color fortran() scheme()
+ */
+
+int PG_fset_fill_color(PG_device *dev, int clr, int mapped)
+   {int rv;
+
+    if ((dev != NULL) && (dev->set_fill_color != NULL))
+       {rv = dev->fill_color;
+	(*dev->set_fill_color)(dev, clr, mapped);}
+    else
+       PG_get_attrs_glb(TRUE, "fill-color", &rv, NULL);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
 
 #if 0
 
 /*--------------------------------------------------------------------------*/
 
-#define PG_fset_line_color(d, color)                                          \
-    if (d != NULL)                                                         \
-       {if (d->set_line_color != NULL)                                     \
-           (*d->set_line_color)(d, color, TRUE);}
+#define PG_white_background(dev, t)
+   {if (dev != NULL)
+       dev->background_color_white = (t);}
 
-#define PG_fset_color_line(d, color, mapped)                                  \
-    if (d != NULL)                                                         \
-       {if (d->set_line_color != NULL)                                     \
-           (*d->set_line_color)(d, color, mapped);}
+#define PG_turn_grid(dev, t)
+   {if (dev != NULL)
+       dev->grid = (t);}
 
-#define PG_fset_text_color(d, color)                                          \
-    if (d != NULL)                                                         \
-       {if (d->set_text_color != NULL)                                     \
-           (*d->set_text_color)(d, color, TRUE);}
+#define PG_turn_data_id(dev, t)
+   {if (dev != NULL)
+       dev->data_id = (t);}
 
-#define PG_fset_color_text(d, color, mapped)                                  \
-    if (d != NULL)                                                         \
-       {if (d->set_text_color != NULL)                                     \
-           (*d->set_text_color)(d, color, mapped);}
+#define PG_turn_scatter(dev, t)
+   {if (dev != NULL)
+       dev->scatter = (t);}
 
-#define PG_fset_fill_color(d, color)                                          \
-    if (d != NULL)                                                         \
-       {if (d->set_fill_color != NULL)                                     \
-           (*d->set_fill_color)(d, color, TRUE);}
+#define PG_turn_autodomain(dev, t)
+   {if (dev != NULL)
+       dev->autodomain = (t);}
 
-#define PG_fset_color_fill(d, color, mapped)                                  \
-    if (d != NULL)                                                         \
-       {if (d->set_fill_color != NULL)                                     \
-           (*d->set_fill_color)(d, color, mapped);}
+#define PG_turn_autorange(dev, t)
+   {if (dev != NULL)
+       dev->autorange = (t);}
+
+#define PG_turn_autoplot(dev, t)
+   {if (dev != NULL)
+       dev->autoplot = (t);}
 
 /*--------------------------------------------------------------------------*/
 
-#define PG_white_background(d, t)                                            \
-   {if (d != NULL)                                                         \
-       d->background_color_white = (t);}
+#define PG_clear_frame(dev)
+   {if (dev != NULL)
+       PG_clear_region(dev, 2, NORMC, dev->g.fr, 0);}
 
-#define PG_turn_grid(d, t)                                                   \
-   {if (d != NULL)                                                         \
-       d->grid = (t);}
-
-#define PG_turn_data_id(d, t)                                                \
-   {if (d != NULL)                                                         \
-       d->data_id = (t);}
-
-#define PG_turn_scatter(d, t)                                                \
-   {if (d != NULL)                                                         \
-       d->scatter = (t);}
-
-#define PG_turn_autodomain(d, t)                                             \
-   {if (d != NULL)                                                         \
-       d->autodomain = (t);}
-
-#define PG_turn_autorange(d, t)                                              \
-   {if (d != NULL)                                                         \
-       d->autorange = (t);}
-
-#define PG_turn_autoplot(d, t)                                               \
-   {if (d != NULL)                                                         \
-       d->autoplot = (t);}
+#define PG_n_events_pending(dev)
+    ((dev != NULL) ? (*(dev->events_pending)) : 0)
 
 /*--------------------------------------------------------------------------*/
 
-#define PG_clear_framed                                                    \
-   {if (d != NULL)                                                         \
-       PG_clear_region(d, 2, NORMC, d->g.fr, 0);}
+#define PG_handle_expose_event(dev, ev)
+    {if (dev != NULL)
+        (*(dev->expose_event_handler.fnc))(dev, &ev);}
 
-#define PG_n_events_pendingd                                               \
-    ((d != NULL) ? (*(d->events_pending))d : 0)
+#define PG_handle_update_event(dev, ev)
+    {if (dev != NULL)
+        (*(dev->update_event_handler.fnc))(dev, &ev);}
 
-/*--------------------------------------------------------------------------*/
+#define PG_handle_mouse_down_event(dev, ev)
+    {if (dev != NULL)
+        (*(dev->mouse_down_event_handler.fnc))(dev, &ev);}
 
-#define PG_handle_expose_event(d, ev)                                        \
-    {if (d != NULL)                                                        \
-        (*(d->expose_event_handler.fnc))(d, &ev);}
+#define PG_handle_mouse_up_event(dev, ev)
+    {if (dev != NULL)
+        (*(dev->mouse_up_event_handler.fnc))(dev, &ev);}
 
-#define PG_handle_update_event(d, ev)                                        \
-    {if (d != NULL)                                                        \
-        (*(d->update_event_handler.fnc))(d, &ev);}
+#define PG_handle_key_down_event(dev, ev)
+    {if (dev != NULL)
+        (*(dev->key_down_event_handler.fnc))(dev, &ev);}
 
-#define PG_handle_mouse_down_event(d, ev)                                    \
-    {if (d != NULL)                                                        \
-        (*(d->mouse_down_event_handler.fnc))(d, &ev);}
+#define PG_handle_key_up_event(dev, ev)
+    {if (dev != NULL)
+        (*(dev->key_up_event_handler.fnc))(dev, &ev);}
 
-#define PG_handle_mouse_up_event(d, ev)                                      \
-    {if (d != NULL)                                                        \
-        (*(d->mouse_up_event_handler.fnc))(d, &ev);}
+#define PG_handle_default_event(dev, ev)
+    {if (dev != NULL)
+        (*(dev->default_event_handler.fnc))(dev, &ev);}
 
-#define PG_handle_key_down_event(d, ev)                                      \
-    {if (d != NULL)                                                        \
-        (*(d->key_down_event_handler.fnc))(d, &ev);}
+#define PG_query_pointer(dev, ir, pb, pq)
+    if (dev->query_pointer != NULL)
+       (*dev->query_pointer)(dev, ir, pb, pq)
 
-#define PG_handle_key_up_event(d, ev)                                        \
-    {if (d != NULL)                                                        \
-        (*(d->key_up_event_handler.fnc))(d, &ev);}
+#define PG_mouse_event_info(dev, ev, iev, eb, eq)
+    if (dev->mouse_event_info != NULL)
+       (*dev->mouse_event_info)(dev, ev, iev, eb, eq)
 
-#define PG_handle_default_event(d, ev)                                       \
-    {if (d != NULL)                                                        \
-        (*(d->default_event_handler.fnc))(d, &ev);}
-
-#define PG_query_pointer(d, ir, pb, pq)                                      \
-    if (d->query_pointer != NULL)                                          \
-       (*d->query_pointer)(d, ir, pb, pq)
-
-#define PG_mouse_event_info(d, ev, iev, eb, eq)                              \
-    if (d->mouse_event_info != NULL)                                       \
-       (*d->mouse_event_info)(d, ev, iev, eb, eq)
-
-#define PG_key_event_info(d, ev, iev, bf, n, eq)                             \
-    if (d->key_event_info != NULL)                                         \
-       (*d->key_event_info)(d, ev, iev, bf, n, eq)
+#define PG_key_event_info(dev, ev, iev, bf, n, eq)
+    if (dev->key_event_info != NULL)
+       (*dev->key_event_info)(dev, ev, iev, bf, n, eq)
 
 /*--------------------------------------------------------------------------*/
 
-#define PG_shade_poly(d, x, y, n)                                            \
-    if (d != NULL)                                                         \
-       {if (d->shade_poly != NULL)                                         \
-           {double *_r[2];                                                   \
-	    _r[0] = x;                                                       \
-	    _r[1] = y;                                                       \
-	    (*d->shade_poly)(d, 2, n, _r);};}
+#define PG_shade_poly(dev, x, y, n)
+    if (dev != NULL)
+       {if (dev->shade_poly != NULL)
+           {double *_r[2];
+	    _r[0] = x;
+	    _r[1] = y;
+	    (*dev->shade_poly)(dev, 2, n, _r);};}
 
-#define PG_shade_poly_n(d, nd, n, r)                                         \
-    if (d != NULL)                                                         \
-       {if (d->shade_poly != NULL)                                         \
-           (*d->shade_poly)(d, nd, n, r);}
+#define PG_shade_poly_n(dev, nd, n, r)
+    if (dev != NULL)
+       {if (dev->shade_poly != NULL)
+           (*dev->shade_poly)(dev, nd, n, r);}
 
-#define PG_fill_curve(d, c)                                                  \
-    if (d != NULL)                                                         \
-       {if (d->fill_curve != NULL)                                         \
-           (*d->fill_curve)(d, c);}
-
-/*--------------------------------------------------------------------------*/
-
-#define PG_move_gr_abs(d, x, y)                                              \
-    if (d != NULL)                                                         \
-       {if (d->move_gr_abs != NULL)                                        \
-           (*d->move_gr_abs)(d, x, y);}
-
-#define PG_move_tx_abs(d, x, y)                                              \
-    if (d != NULL)                                                         \
-       {if (d->move_tx_abs != NULL)                                        \
-           (*d->move_tx_abs)(d, x, y);}
-
-#define PG_move_tx_rel(d, x, y)                                              \
-    if (d != NULL)                                                         \
-       {if (d->move_tx_rel != NULL)                                        \
-           (*d->move_tx_rel)(d, x, y);}
-
-#define PG_draw_to_abs(d, x, y)                                              \
-    if (d != NULL)                                                         \
-       {if (d->draw_to_abs != NULL)                                        \
-           (*d->draw_to_abs)(d, x, y);}
-
-#define PG_draw_to_rel(d, x, y)                                              \
-    if (d != NULL)                                                         \
-       {if (d->draw_to_rel != NULL)                                        \
-           (*d->draw_to_rel)(d, x, y);}
+#define PG_fill_curve(dev, c)
+    if (dev != NULL)
+       {if (dev->fill_curve != NULL)
+           (*dev->fill_curve)(dev, c);}
 
 /*--------------------------------------------------------------------------*/
 
-#define PG_draw_curve(d, c, clip)                                            \
-    if (d != NULL)                                                         \
-       {if (d->draw_curve != NULL)                                         \
-           (*d->draw_curve)(d, c, clip);}
+#define PG_move_gr_abs(dev, x, y)
+    if (dev != NULL)
+       {if (dev->move_gr_abs != NULL)
+           (*dev->move_gr_abs)(dev, x, y);}
 
-#define PG_draw_disjoint_polyline_2(d, x, y, n, flag, coord)                 \
-    if (d != NULL)                                                         \
-       {if (d->draw_dj_polyln_2 != NULL)                                   \
-           {double *_r[2];                                                   \
-	    _r[0] = x;                                                       \
-	    _r[1] = y;                                                       \
-	    (*d->draw_dj_polyln_2)(d, _r, n, flag, coord);};}
+#define PG_move_tx_abs(dev, x, y)
+    if (dev != NULL)
+       {if (dev->move_tx_abs != NULL)
+           (*dev->move_tx_abs)(dev, x, y);}
 
-/*--------------------------------------------------------------------------*/
+#define PG_move_tx_rel(dev, x, y)
+    if (dev != NULL)
+       {if (dev->move_tx_rel != NULL)
+           (*dev->move_tx_rel)(dev, x, y);}
 
-#define PG_clear_windowd                                                   \
-    if (d != NULL)                                                         \
-       {if (d->clear_window != NULL)                                       \
-	   {PG_set_attrs_glb(TRUE, "label-position-y", HUGE, NULL);          \
-	    (*d->clear_window)d;};}
+#define PG_draw_to_abs(dev, x, y)
+    if (dev != NULL)
+       {if (dev->draw_to_abs != NULL)
+           (*dev->draw_to_abs)(dev, x, y);}
 
-#define PG_clear_viewportd                                                 \
-    if (d != NULL)                                                         \
-       {if (d->clear_viewport != NULL)                                     \
-           (*d->clear_viewport)d;}
-
-#define PG_clear_region(d, nd, cs, bx, pad)                                  \
-    if (d != NULL)                                                         \
-       {if (d->clear_region != NULL)                                       \
-	   (*d->clear_region)(d, nd, cs, bx, pad);}
+#define PG_draw_to_rel(dev, x, y)
+    if (dev != NULL)
+       {if (dev->draw_to_rel != NULL)
+           (*dev->draw_to_rel)(dev, x, y);}
 
 /*--------------------------------------------------------------------------*/
 
-#define PG_update_vsd                                                      \
-    if (d != NULL)                                                         \
-       {if (d->update_vs != NULL)                                          \
-           (*d->update_vs)d;}
+#define PG_draw_curve(dev, c, clip)
+    if (dev != NULL)
+       {if (dev->draw_curve != NULL)
+           (*dev->draw_curve)(dev, c, clip);}
 
-#define PG_finish_plotd                                                    \
-    if (d != NULL)                                                         \
-       {if (d->finish_plot != NULL)                                        \
-           (*d->finish_plot)d;}
+#define PG_draw_disjoint_polyline_2(dev, x, y, n, flag, coord)
+    if (dev != NULL)
+       {if (dev->draw_dj_polyln_2 != NULL)
+           {double *_r[2];
+	    _r[0] = x;
+	    _r[1] = y;
+	    (*dev->draw_dj_polyln_2)(dev, _r, n, flag, coord);};}
 
-#define PG_clear_page(d, i)                                                  \
-    if (d != NULL)                                                         \
-       {if (d->clear_page != NULL)                                         \
-           (*d->clear_page)(d, i);}
+/*--------------------------------------------------------------------------*/
 
-#define PG_expose_deviced                                                  \
-    if (d != NULL)                                                         \
-       {if (d->expose_device != NULL)                                      \
-           (*d->expose_device)d;}
+#define PG_clear_window(dev)
+    if (dev != NULL)
+       {if (dev->clear_window != NULL)
+	   {PG_set_attrs_glb(TRUE, "label-position-y", HUGE, NULL);
+	    (*dev->clear_window)d;};}
 
-#define PG_make_palette_current(d, p)                                        \
-    if (d != NULL)                                                         \
-       {d->current_palette = p;}
+#define PG_clear_viewport(dev)
+    if (dev != NULL)
+       {if (dev->clear_viewport != NULL)
+           (*dev->clear_viewport)d;}
 
-#define PG_make_device_current                                            \
-    if (d != NULL)                                                         \
-       {if (d->make_device_current != NULL)                                \
-           (*d->make_device_current);}
+#define PG_clear_region(dev, nd, cs, bx, pad)
+    if (dev != NULL)
+       {if (dev->clear_region != NULL)
+	   (*dev->clear_region)(dev, nd, cs, bx, pad);}
 
-#define PG_release_current_device                                         \
-    if (d != NULL)                                                         \
-       {if (d->release_current_device != NULL)                             \
-           (*d->release_current_device);}
+/*--------------------------------------------------------------------------*/
 
-#define PG_get_image(d, bf, ix, iy, nx, ny)                                  \
-    if (d != NULL)                                                         \
-       {if (d->get_image != NULL)                                          \
-           (*d->get_image)(d, bf, ix, iy, nx, ny);}
+#define PG_update_vs(dev)
+    if (dev != NULL)
+       {if (dev->update_vs != NULL)
+           (*dev->update_vs)(dev);}
 
-#define PG_put_image(d, bf, ix, iy, nx, ny)                                  \
-    if (d != NULL)                                                         \
-       {if (d->put_image != NULL)                                          \
-           (*d->put_image)(d, bf, ix, iy, nx, ny);}
+#define PG_finish_plot(dev)
+    if (dev != NULL)
+       {if (dev->finish_plot != NULL)
+           (*dev->finish_plot)(dev);}
 
-#define PG_write_text(d, fp, s)                                              \
-    if (d != NULL)                                                         \
-       {if (d->write_text != NULL)                                         \
-           (*d->write_text)(d, fp, s);}
+#define PG_clear_page(dev, i)
+    if (dev != NULL)
+       {if (dev->clear_page != NULL)
+           (*dev->clear_page)(dev, i);}
 
-#define PG_next_line(d, fp)                                                  \
-    if (d != NULL)                                                         \
-       {if (d->next_line != NULL)                                          \
-           (*d->next_line)(d, fp);}
+#define PG_expose_device(dev)
+    if (dev != NULL)
+       {if (dev->expose_device != NULL)
+           (*dev->expose_device)(dev);}
 
-#define PG_open_screen(d, xf, yf, dxf, dyf)                                  \
-    if (d != NULL)                                                         \
-       {if (d->open_screen != NULL)                                        \
-           (*d->open_screen)(d, xf, yf, dxf, dyf);}
+#define PG_make_palette_current(dev, p)
+    if (dev != NULL)
+       {dev->current_palette = p;}
 
-#define PG_query_screen(d, pdx, pdy, pnc)                                    \
-    if (d != NULL)                                                         \
-       {if (d->query_screen != NULL)                                       \
-           (*d->query_screen)(d, pdx, pdy, pnc);}
+#define PG_make_device_current(dev)
+    if (dev != NULL)
+       {if (dev->make_device_current != NULL)
+           (*dev->make_device_current);}
 
-#define PG_close_deviced                                                   \
-    if (d != NULL)                                                         \
-       {if (d->close_device != NULL)                                       \
-           (*d->close_device)d;}
+#define PG_release_current_device(dev)
+    if (dev != NULL)
+       {if (dev->release_current_device != NULL)
+           (*dev->release_current_device);}
 
-#define PG_close_console                                                     \
-    if ((PG_console_device != NULL) &&                                       \
-        (PG_console_device->close_console != NULL))                          \
+#define PG_get_image(dev, bf, ix, iy, nx, ny)
+    if (dev != NULL)
+       {if (dev->get_image != NULL)
+           (*dev->get_image)(dev, bf, ix, iy, nx, ny);}
+
+#define PG_put_image(dev, bf, ix, iy, nx, ny)
+    if (dev != NULL)
+       {if (dev->put_image != NULL)
+           (*dev->put_image)(dev, bf, ix, iy, nx, ny);}
+
+#define PG_write_text(dev, fp, s)
+    if (dev != NULL)
+       {if (dev->write_text != NULL)
+           (*dev->write_text)(dev, fp, s);}
+
+#define PG_next_line(dev, fp)
+    if (dev != NULL)
+       {if (dev->next_line != NULL)
+           (*dev->next_line)(dev, fp);}
+
+#define PG_open_screen(dev, xf, yf, dxf, dyf)
+    if (dev != NULL)
+       {if (dev->open_screen != NULL)
+           (*dev->open_screen)(dev, xf, yf, dxf, dyf);}
+
+#define PG_query_screen(dev, pdx, pdy, pnc)
+    if (dev != NULL)
+       {if (dev->query_screen != NULL)
+           (*dev->query_screen)(dev, pdx, pdy, pnc);}
+
+#define PG_close_device(dev)
+    if (dev != NULL)
+       {if (dev->close_device != NULL)
+           (*dev->close_device)(dev);}
+
+#define PG_close_console
+    if ((PG_console_device != NULL) &&
+        (PG_console_device->close_console != NULL))
        (*PG_console_device->close_console)
 
 /*--------------------------------------------------------------------------*/
 
-#define PG_fgetc(stream)                                                     \
-    (((PG_console_device != NULL) && (PG_console_device->ggetc != NULL)) ?   \
-     (*PG_console_device->ggetc)(stream) :                                   \
+#define PG_fgetc(stream)
+    (((PG_console_device != NULL) && (PG_console_device->ggetc != NULL)) ?
+     (*PG_console_device->ggetc)(stream) :
      EOF)
 
-#define PG_fgets(buffer, maxlen, stream)                                     \
-    (((PG_console_device != NULL) && (PG_console_device->ggets != NULL)) ?   \
-     (*PG_console_device->ggets)(buffer, maxlen, stream) :                   \
+#define PG_fgets(buffer, maxlen, stream)
+    (((PG_console_device != NULL) && (PG_console_device->ggets != NULL)) ?
+     (*PG_console_device->ggets)(buffer, maxlen, stream) :
      NULL)
 
-#define PG_puts(bf)                                                          \
-    if ((PG_console_device != NULL) && (PG_console_device->gputs != NULL))   \
+#define PG_puts(bf)
+    if ((PG_console_device != NULL) && (PG_console_device->gputs != NULL))
        (*PG_console_device->gputs)(bf)
 
 /*--------------------------------------------------------------------------*/

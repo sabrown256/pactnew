@@ -2478,9 +2478,9 @@ clipping rectangle. To do this turn clipping off and back on again.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_set_fill_color(PG_device *dev, int color)
-<BR><I>Fortran Binding: </I>integer pgsfcl(integer devid, integer color)
-<BR><I>SX Binding: </I>(pg-set-fill-color dev color)
+<I>C Binding: </I>int PG_fset_fill_color(PG_device *dev, int color, int mapped)
+<BR><I>Fortran Binding: </I>integer pgsfcl(integer devid, integer color, integer mapped)
+<BR><I>SX Binding: </I>(pg-set-fill-color! dev color mapped)
 <P>
 Set the fill color for the device to color. The color index is mapped
 through the current palette.<p>
@@ -3002,9 +3002,9 @@ These routines provide control over how lines appear when drawn.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_get_line_color(PG_device *dev, int *plc)
-<BR><I>Fortran Binding: </I>integer pgglnc(integer devid, integer lc)
-<BR><I>SX Binding: </I>(pg-line-color dev)
+<I>C Binding: </I>int PG_fget_line_color(PG_device *dev)
+<BR><I>Fortran Binding: </I>integer pgglnc(integer devid)
+<BR><I>SX Binding: </I>(pg-color-line dev)
 <P>
 
 <p>
@@ -3020,9 +3020,9 @@ These routines provide control over how lines appear when drawn.<p>
 <P>
 
 <p>
-<I>C Binding: </I>void PG_set_line_color(PG_device *dev, int lc)
-<BR><I>Fortran Binding: </I>integer pgslnc(integer devid, integer lc)
-<BR><I>SX Binding: </I>(pg-set-line-color! dev lc)
+<I>C Binding: </I>int PG_fset_line_color(PG_device *dev, int lc, int mapped)
+<BR><I>Fortran Binding: </I>integer pgslnc(integer devid, integer lc, integer mapped)
+<BR><I>SX Binding: </I>(pg-set-line-color! dev lc mapped)
 <P>
 
 <p>
@@ -3099,9 +3099,9 @@ bold-italic. Size refers to type size in points.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_set_text_color(PG_device *dev, int tc)
-<BR><I>Fortran Binding: </I>integer pgstxc(integer devid, integer tc)
-<BR><I>SX Binding: </I>(pg-set-text-color! dev tc)
+<I>C Binding: </I>int PG_fset_text_color(PG_device *dev, int tc, int mapped)
+<BR><I>Fortran Binding: </I>integer pgstxc(integer devid, integer tc, integer mapped)
+<BR><I>SX Binding: </I>(pg-set-text-color! dev tc mapped)
 <P>
 Set the text color for the specified device.<p>
 
@@ -3167,8 +3167,8 @@ then make a second call with larger buffers.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_get_text_color(PG_device *dev, int *ptc)
-<BR><I>Fortran Binding: </I>integer pggtxc(integer devid, integer tc)
+<I>C Binding: </I>int PG_fget_text_color(PG_device *dev)
+<BR><I>Fortran Binding: </I>integer pggtxc(integer devid)
 <BR><I>SX Binding: </I>(pg-text-color dev)
 <P>
 Query the text color for the specified device.<p>
@@ -3327,7 +3327,7 @@ c)
 <P>
 This routine draws a polygon specified by the n world coordinate points
 in the x and y arrays and fills it with the current fill color
-(see PG_set_fill_color).<p>
+(see PG_fset_fill_color).<p>
 
 <p>
 
@@ -3339,7 +3339,7 @@ c)
 This routine draws an nd dimensional polygon specified by the
 n world coordinate points
 in the arrays r and fills it with the current fill color
-(see PG_set_fill_color).<p>
+(see PG_fset_fill_color).<p>
 
 <p>
 
@@ -4979,8 +4979,8 @@ The following program demonstrates some of the PGS functionality for placement a
      /* TEST_DEV - test the entire device */
 
      static void test_dev(PG_device *dev)
-        {PG_set_line_color(dev, dev->BLACK);
-         PG_set_text_color(dev, dev->BLACK);
+        {PG_fset_line_color(dev, dev->BLACK, TRUE);
+         PG_fset_text_color(dev, dev->BLACK, TRUE);
 
          sf_dt(dev, .1, .9, "helvetica", "medium", 12);
          sf_dt(dev, .1, .8, "helvetica", "italic", 12);
@@ -5108,14 +5108,14 @@ main(int argc, char **argv)
 	 p[0] = 0.6;
 	 p[1] = y;
 
-	 PG_set_line_color(SCR_dev, i);
+	 PG_fset_line_color(SCR_dev, i, TRUE);
 	 PG_draw_line_n(SCR_dev, 2, WORLDC, x1, x2, SCR_dev->clipping);
-	 PG_set_text_color(SCR_dev, i);
+	 PG_fset_text_color(SCR_dev, i, TRUE);
          PG_write_n(SCR_dev, 2, WORLDC, p, "%d %s", i, color[i]);
 
-	 PG_set_line_color(SCR_dew, i);
+	 PG_fset_line_color(SCR_dew, i, TRUE);
 	 PG_draw_line_n(SCR_dew, 2, WORLDC, x1, x2, SCR_dew->clipping);
-	 PG_set_text_color(SCR_dew, i);
+	 PG_fset_text_color(SCR_dew, i, TRUE);
          PG_write_n(SCR_dew, 2, WORLDC, p, "%d %s", i, color[i]);
 
 	 y += dy;};

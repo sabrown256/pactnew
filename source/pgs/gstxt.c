@@ -207,13 +207,13 @@ static void _PG_clear_text_box(PG_text_box *b, int i)
 
 /* redisplay iff text box is active */
     if ((dev != NULL) && (b->active))
-       {PG_get_line_color(dev, &lclr);
-	PG_get_fill_color(dev, &fclr);
+       {lclr = PG_fget_line_color(dev);
+	fclr = PG_fget_fill_color(dev);
 
 	if (HARDCOPY_DEVICE(dev))
-	   {PG_set_color_fill(dev, bgc, FALSE);}
+	   PG_fset_fill_color(dev, bgc, FALSE);
 	else
-	   PG_set_fill_color(dev, bgc);
+	   PG_fset_fill_color(dev, bgc, TRUE);
 	PG_fill_curve(dev, crv);
 
 	if (bwid > 0.0)
@@ -221,7 +221,7 @@ static void _PG_clear_text_box(PG_text_box *b, int i)
 
 	    wid = PG_fget_line_width(dev);
 	    PG_fset_line_width(dev, bwid);
-	    PG_set_color_line(dev, bgc, FALSE);
+	    PG_fset_line_color(dev, bgc, FALSE);
 
 	    PG_draw_curve(dev, crv, FALSE);
 
@@ -229,8 +229,8 @@ static void _PG_clear_text_box(PG_text_box *b, int i)
 
 	PG_update_vs(dev);
 
-	PG_set_color_fill(dev, fclr, FALSE);
-	PG_set_color_line(dev, lclr, FALSE);
+	PG_fset_fill_color(dev, fclr, FALSE);
+	PG_fset_line_color(dev, lclr, FALSE);
 
 	PG_release_current_device(dev);};
 
@@ -347,9 +347,9 @@ void PG_refresh_text_box(PG_text_box *b)
 	PG_set_palette(dev, "standard");
 
 	if (HARDCOPY_DEVICE(dev))
-	   {PG_set_color_fill(dev, b->background, FALSE);}
+	   PG_fset_fill_color(dev, b->background, FALSE);
 	else
-	   PG_set_fill_color(dev, b->background);
+	   PG_fset_fill_color(dev, b->background, TRUE);
 
 /* update the pixel location of curve (window may have changed) */
 	o[0] = crv->rx_origin;
@@ -374,7 +374,7 @@ void PG_refresh_text_box(PG_text_box *b)
 
 	PG_fget_char_path(dev, x);
 	PG_fset_char_path(dev, dc);
-	(*dev->set_text_color)(dev, b->foreground, FALSE);
+	PG_fset_text_color(dev, b->foreground, FALSE);
 
 	for (i = 0; i < ln; i++)
 	    {_PG_move_to(b, 0, i);
@@ -441,7 +441,7 @@ static void _PG_clear_line(PG_text_box *b, int l)
 	   {bf = b->text_buffer[l];
 	    if (bf != NULL)
 	       {_PG_move_to(b, 0, l);
-		(*dev->set_text_color)(dev, b->background, FALSE);
+		PG_fset_text_color(dev, b->background, FALSE);
 		PG_write_text(dev, stdscr, bf);};};};
 
     return;}    
@@ -507,9 +507,9 @@ void _PG_draw_cursor(PG_text_box *b, int inv)
 	   {fc = b->background;
 	    bc = b->foreground;};
 
-	PG_set_fill_color(dev, fc);
+	PG_fset_fill_color(dev, fc, TRUE);
 	PG_fill_curve(dev, crv);
-	(*dev->set_text_color)(dev, bc, FALSE);
+	PG_fset_text_color(dev, bc, FALSE);
 
 	if (!eol)
 	   PG_write_text(dev, stdscr, crsr);
@@ -534,7 +534,7 @@ static void _PG_redraw_text_line(PG_text_box *b, int c, int l, int flag)
 
 	    _PG_clear_line(b, l);
 	    _PG_move_to(b, 0, l);
-	    (*dev->set_text_color)(dev, b->foreground, FALSE);
+	    PG_fset_text_color(dev, b->foreground, FALSE);
 	    PG_write_text(dev, stdscr, bf);};};
 
     return;}
@@ -629,7 +629,7 @@ static void _PG_newline(PG_text_box *b)
             PG_update_vs(dev);
 	    PG_get_char(dev);
 
-	    PG_set_fill_color(dev, b->background);
+	    PG_fset_fill_color(dev, b->background, TRUE);
 	    PG_fill_curve(dev, b->bnd);
 
 	    for (i = 0; i < nl; i++)
@@ -645,10 +645,10 @@ static void _PG_newline(PG_text_box *b)
 	    memset(p0, 0, nc);
 
 	    if (b->active)
-	       {PG_set_fill_color(dev, b->background);
+	       {PG_fset_fill_color(dev, b->background, TRUE);
 		PG_fill_curve(dev, b->bnd);
 
-		PG_set_fill_color(dev, b->foreground);};
+		PG_fset_fill_color(dev, b->foreground, TRUE);};
 
 	    for (i = 0; i < line; i++)
 	        {_PG_move_to(b, 0, i);
@@ -689,7 +689,7 @@ static char *_PG_backup_char(PG_text_box *b, char *p, int n)
 	       {PG_get_text_ext_n(dev, 2, WORLDC, p, dx);
 
 		PG_move_tx_rel(dev, -dx[0], 0);
-		(*dev->set_text_color)(dev, b->background, FALSE);
+		PG_fset_text_color(dev, b->background, FALSE);
 		PG_write_text(dev, stdscr, p);
 
 		PG_move_tx_rel(dev, 0, 0);};};};

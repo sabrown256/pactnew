@@ -738,7 +738,7 @@ static void UL_mark_curve_points(double **x, int n, char *indx)
                      color   = off ? dev->RED : dev->GREEN;
 
 /* toggle the color of the point between green and red */
-                     PG_set_line_color(dev, color);
+                     PG_fset_line_color(dev, color, TRUE);
 		     r[0] = xc;
 		     r[1] = xc + 1;
                      PG_draw_markers_n(dev, 2, WORLDC, 1, r, 0);

@@ -45,8 +45,8 @@ static void sf_dt(PG_device *dev, double x1, double y1,
 static void test_dev(PG_device *dev)
    {
 
-    PG_set_color_line(dev, dev->BLACK, TRUE);
-    PG_set_color_text(dev, dev->BLACK, TRUE);
+    PG_fset_line_color(dev, dev->BLACK, TRUE);
+    PG_fset_text_color(dev, dev->BLACK, TRUE);
 
     sf_dt(dev, .1, .9, "helvetica", "medium", 12);
     sf_dt(dev, .1, .8, "helvetica", "italic", 12);

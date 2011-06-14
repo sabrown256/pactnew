@@ -43,14 +43,14 @@ void PG_define_region(PG_device *dev, PG_coord_sys cs, double *bx)
     if (dev == NULL)
        return;
 
-    PG_get_line_color(dev, &lnc);
+    lnc = PG_fget_line_color(dev);
     lns = PG_fget_line_style(dev);
     lop = PG_fget_logical_op(dev);
 
     if (dev->xor_parity)
-       {PG_set_color_line(dev, dev->WHITE, FALSE);}
+       {PG_fset_line_color(dev, dev->WHITE, FALSE);}
     else
-       PG_set_color_line(dev, dev->BLACK, FALSE);
+       PG_fset_line_color(dev, dev->BLACK, FALSE);
 
     PG_fset_line_style(dev, LINE_DOTTED);
     PG_fset_logical_op(dev, GS_XOR);
@@ -85,7 +85,7 @@ void PG_define_region(PG_device *dev, PG_coord_sys cs, double *bx)
 /* draw the new one */
 	PG_draw_box_n(dev, 2, WORLDC, wc);};
 
-    PG_set_line_color(dev, lnc);
+    PG_fset_line_color(dev, lnc, TRUE);
     PG_fset_line_style(dev, lns);
     PG_fset_logical_op(dev, lop);
 
@@ -144,7 +144,7 @@ void PG_print_pointer_location(PG_device *dev, double cx, double cy, int coord)
            {dx[0] = ir[0];
 	    dx[1] = ir[1];
 	    PG_trans_point(dev, 2, PIXELC, dx, WORLDC, dx);
-            PG_set_text_color(dev, dev->WHITE);
+            PG_fset_text_color(dev, dev->WHITE, TRUE);
             PG_write_n(dev, 2, NORMC, c, "x = %10.3e, y = %10.3e",
 		       dx[0], dx[1]);}
         else
@@ -509,10 +509,10 @@ void PG_move_object(PG_interface_object *iob, double *obx, int redraw)
 
     PG_make_device_current(dev);
 
-    lop = PG_fget_logical_op(dev);
-    PG_get_line_color(dev, &lclr);
-    lns = PG_fget_line_style(dev);
-    PG_get_fill_color(dev, &fclr);
+    lop  = PG_fget_logical_op(dev);
+    lclr = PG_fget_line_color(dev);
+    lns  = PG_fget_line_style(dev);
+    fclr = PG_fget_fill_color(dev);
 
     if (obx[0] > obx[1])
        SC_SWAP_VALUE(double, obx[0], obx[1]);
@@ -522,15 +522,15 @@ void PG_move_object(PG_interface_object *iob, double *obx, int redraw)
 
     bc = dev->BLACK;
 
-    PG_set_color_line(dev, bc, FALSE);
+    PG_fset_line_color(dev, bc, FALSE);
     PG_draw_curve(dev, crv, TRUE);
-    PG_set_fill_color(dev, bc);
+    PG_fset_fill_color(dev, bc, TRUE);
     PG_fill_curve(dev, crv);
 
     if (dev->xor_parity)
-       {PG_set_color_line(dev, dev->WHITE, FALSE);}
+       {PG_fset_line_color(dev, dev->WHITE, FALSE);}
     else
-       PG_set_color_line(dev, dev->BLACK, FALSE);
+       PG_fset_line_color(dev, dev->BLACK, FALSE);
 
     PG_fset_line_style(dev, LINE_DOTTED);
     PG_fset_logical_op(dev, GS_XOR);
@@ -569,8 +569,8 @@ void PG_move_object(PG_interface_object *iob, double *obx, int redraw)
     PG_draw_curve(dev, crv, TRUE);
 
     PG_fset_logical_op(dev, lop);
-    PG_set_fill_color(dev, fclr);
-    PG_set_line_color(dev, lclr);
+    PG_fset_fill_color(dev, fclr, TRUE);
+    PG_fset_line_color(dev, lclr, TRUE);
     PG_fset_line_style(dev, lns);
 
     xo = crv->x_origin;
@@ -928,7 +928,7 @@ static void _PG_draw_variable_object(PG_interface_object *iob)
 	ndc[0] += 0.5*(dx - tx[0]);
 	ndc[2] += 0.5*(dy - tx[1]);
 
-	PG_set_color_text(dev, iob->foreground, TRUE);
+	PG_fset_text_color(dev, iob->foreground, TRUE);
 
 	p[0] = ndc[0];
 	p[1] = ndc[2];
@@ -955,15 +955,15 @@ static void _PG_draw_button_object(PG_interface_object *iob)
     crv = iob->curve;
 
     if (dev != NULL)
-       {PG_get_fill_color(dev, &fclr);
-	PG_set_color_fill(dev, iob->background, TRUE);
+       {fclr = PG_fget_fill_color(dev);
+	PG_fset_fill_color(dev, iob->background, TRUE);
 	PG_fill_curve(dev, crv);
-	PG_set_color_fill(dev, fclr, TRUE);
+	PG_fset_fill_color(dev, fclr, TRUE);
 
-	PG_get_line_color(dev, &lclr);
-	PG_set_color_line(dev, dev->WHITE, TRUE);
+	lclr = PG_fget_line_color(dev);
+	PG_fset_line_color(dev, dev->WHITE, TRUE);
 	PG_draw_curve(dev, crv, TRUE);
-	PG_set_color_line(dev, lclr, TRUE);};
+	PG_fset_line_color(dev, lclr, TRUE);};
 
     return;}
 
@@ -1170,7 +1170,7 @@ static void _PG_switch_object_state(PG_interface_object *iob, int isv,
     else
        {dev = iob->device;
 
-        PG_set_fill_color(dev, iob->background);
+        PG_fset_fill_color(dev, iob->background, TRUE);
 	PG_fill_curve(dev, iob->curve);
 	PG_draw_curve(dev, iob->curve, TRUE);
 

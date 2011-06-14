@@ -936,14 +936,14 @@ void PG_fill_polygon_n(PG_device *dev, int color, int mapped,
 		 cr = pc->x;
 		 n  = pc->nn;
        
-		 PG_set_color_fill(dev, color, mapped);
+		 PG_fset_fill_color(dev, color, mapped);
 		 PG_shade_poly_n(dev, nd, n, cr);};
 
 	    PM_free_polygons(a, TRUE);}
 
 	else
 	   {cr = py->x;
-	    PG_set_color_fill(dev, color, mapped);
+	    PG_fset_fill_color(dev, color, mapped);
 	    PG_shade_poly_n(dev, nd, n, cr);};
 
 	PM_free_polygon(py);

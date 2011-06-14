@@ -412,9 +412,9 @@ static void _PG_CGM_clear_window(PG_device *dev)
 
     fc = dev->fill_color;
     if (dev->current_palette != dev->palettes)
-       {PG_set_color_fill(dev, 9, FALSE);}
+       {PG_fset_fill_color(dev, 9, FALSE);}
     else
-       {PG_set_color_fill(dev, dev->BLACK, FALSE);};
+       {PG_fset_fill_color(dev, dev->BLACK, FALSE);};
 
     pts[0] = 0;
     pts[1] = 0;
@@ -427,10 +427,10 @@ static void _PG_CGM_clear_window(PG_device *dev)
     pts[8] = 0;
     pts[9] = 0;
     PG_CGM_command(dev, POLYGON(10), pts);
-    PG_set_color_fill(dev, fc, FALSE);
+    PG_fset_fill_color(dev, fc, FALSE);
 
-    PG_set_color_text(dev, dev->WHITE, TRUE);
-    PG_set_color_line(dev, dev->WHITE, TRUE);
+    PG_fset_text_color(dev, dev->WHITE, TRUE);
+    PG_fset_line_color(dev, dev->WHITE, TRUE);
 
     PG_release_current_device(dev);
 

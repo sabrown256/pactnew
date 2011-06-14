@@ -949,7 +949,7 @@ void PG_draw_palette_n(PG_device *dev, double *dbx, double *rbx,
     pal = dev->current_palette;
     dev->current_palette = dev->palettes;
 
-    PG_set_color_line(dev, dev->WHITE, TRUE);
+    PG_fset_line_color(dev, dev->WHITE, TRUE);
     strcpy(format, "%10.2g");
 
 /* NOTE: this value is chosen to avoid problems with coordinate conversions
@@ -1080,7 +1080,7 @@ void PG_draw_2dpalette(PG_device *dev, double *frm, double *rex, double wid)
 
     dev->current_palette = dev->palettes;
 
-    PG_set_color_line(dev, dev->WHITE, TRUE);
+    PG_fset_line_color(dev, dev->WHITE, TRUE);
     strcpy(format, "%10.2g");
 
 /* NOTE: this value is chosen to avoid problems with coordinate conversions
