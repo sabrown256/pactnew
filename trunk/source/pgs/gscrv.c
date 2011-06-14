@@ -275,11 +275,11 @@ void PG_curve_plot(PG_device *dev, PG_graph *data, ...)
 		  PG_plot_curve(dev, ix, y, n, info, 1);
 
 		  if ((dev->data_id == TRUE) && (plt != PLOT_INSEL))
-		     {PG_set_color_text(dev, color, TRUE);
+		     {PG_fset_text_color(dev, color, TRUE);
 		      PG_draw_data_ids(dev, ix, y,
 				       (int) domain->n_elements,
 				       g->identifier, info);
-		      PG_set_color_text(dev, dev->WHITE, TRUE);};
+		      PG_fset_text_color(dev, dev->WHITE, TRUE);};
 
 		  CFREE(ix);}
 
@@ -290,11 +290,11 @@ void PG_curve_plot(PG_device *dev, PG_graph *data, ...)
 		  PG_plot_curve(dev, x, y, n, info, 1);
 
 		  if ((dev->data_id == TRUE) && (plt != PLOT_INSEL))
-		     {PG_set_color_text(dev, color, TRUE);
+		     {PG_fset_text_color(dev, color, TRUE);
 		      PG_draw_data_ids(dev, x, y,
 				       (int) domain->n_elements,
 				       g->identifier, info);
-		      PG_set_color_text(dev, dev->WHITE, TRUE);};
+		      PG_fset_text_color(dev, dev->WHITE, TRUE);};
 
 		  CFREE(x);};
 
@@ -702,7 +702,7 @@ static void PG_error_plot(PG_device *dev, double **x, int n, int lncol,
         PG_axis(dev, CARTESIAN_2D);};
  
     PG_fset_clipping(dev, TRUE);
-    PG_set_color_line(dev, lncol, TRUE);
+    PG_fset_line_color(dev, lncol, TRUE);
     PG_fset_line_width(dev, lnwid);
     PG_fset_line_style(dev, lnsty);
  
@@ -847,7 +847,7 @@ void PG_rect_plot(PG_device *dev, double *x, double *y, int n, int lncol,
     wd = PG_fget_line_width(dev);
     st = PG_fget_line_style(dev);
  
-    PG_set_color_line(dev, lncol, TRUE);
+    PG_fset_line_color(dev, lncol, TRUE);
     PG_fset_line_width(dev, lnwid);
     PG_fset_line_style(dev, lnsty);
 
@@ -895,7 +895,7 @@ void PG_histogram_plot(PG_device *dev, double *x, double *y, int n, int lncol,
         PG_axis(dev, CARTESIAN_2D);};
  
     PG_fset_clipping(dev, TRUE);
-    PG_set_color_line(dev, lncol, TRUE);
+    PG_fset_line_color(dev, lncol, TRUE);
     PG_fset_line_width(dev, lnwid);
     PG_fset_line_style(dev, lnsty);
  
@@ -986,7 +986,7 @@ void PG_insel_plot(PG_device *dev, double *x, double *y, int n, int lncol,
         PG_axis(dev, INSEL);};
  
     PG_fset_clipping(dev, TRUE);
-    PG_set_color_line(dev, lncol, TRUE);
+    PG_fset_line_color(dev, lncol, TRUE);
     PG_fset_line_width(dev, lnwid);
     PG_fset_line_style(dev, lnsty);
  
@@ -1049,7 +1049,7 @@ void PG_polar_plot(PG_device *dev, double *x, double *y, int n, int lncol,
         PG_axis(dev, POLAR);};
  
     PG_fset_clipping(dev, TRUE);
-    PG_set_color_line(dev, lncol, TRUE);
+    PG_fset_line_color(dev, lncol, TRUE);
     PG_fset_line_width(dev, lnwid);
     PG_fset_line_style(dev, lnsty);
  

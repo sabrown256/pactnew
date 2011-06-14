@@ -1814,7 +1814,7 @@ void PG_show_colormap(char *type, int wbck)
 
 	     y[0] += dy;};
 
-	PG_set_color_line(dev, dev->WHITE, TRUE);
+	PG_fset_line_color(dev, dev->WHITE, TRUE);
 
 	ns++;
 	x1[0] = wc[0];
@@ -2041,7 +2041,7 @@ void PG_show_palettes(PG_device *sdev, char *type, int wbck)
               z   = pal->n_pal_colors;
 
               dev->current_palette = std_pal;
-              PG_set_line_color(dev, dev->WHITE);
+              PG_fset_line_color(dev, dev->WHITE, TRUE);
               PG_fset_font(dev, "helvetica", "medium", 12);
 
 	      p[0] = 0.05;
@@ -2436,7 +2436,7 @@ PG_palette *PG_make_ndim_palette(PG_device *tdev, char *name,
 	thrs = 1.0/7.0 - 1.0e-6;
 
 /* draw the axes and such */
-	PG_set_line_color(dev, dev->WHITE);
+	PG_fset_line_color(dev, dev->WHITE, TRUE);
 	PG_draw_box_n(dev, 2, WORLDC, wc);
 
 /* saturation axis */
@@ -2670,42 +2670,6 @@ int _PG_trans_color(PG_device *dev, int color)
 	       clr = c;};};
 
     return(clr);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PG_GET_FILL_COLOR - inquire about the fill color */
-
-void PG_get_fill_color(PG_device *dev, int *pcl)
-   {
-
-    *pcl = dev->fill_color;
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PG_GET_LINE_COLOR - inquire about the current line color */
-
-void PG_get_line_color(PG_device *dev, int *pcl)
-   {
-
-    *pcl = dev->line_color;
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PG_GET_TEXT_COLOR - inquire about the text color */
-
-void PG_get_text_color(PG_device *dev, int *pcl)
-   {
-
-    *pcl = dev->text_color;
-
-    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

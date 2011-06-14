@@ -161,7 +161,7 @@ PP_device_set_color_line(PP_deviceObject *self,
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "ii:set_color_line", kw_list,
                                      &color, &mapped))
         return NULL;
-    PG_set_color_line(self->dev, color, mapped);
+    PG_fset_line_color(self->dev, color, mapped);
     Py_INCREF(Py_None);
     return Py_None;
 /* DO-NOT-DELETE splicer.end(pgs.device.method.set_color_line) */
@@ -259,7 +259,7 @@ PP_device_set_line_color(PP_deviceObject *self,
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "i:set_line_color", kw_list,
                                      &color))
         return NULL;
-    PG_set_line_color(self->dev, color);
+    PG_fset_line_color(self->dev, color, TRUE);
     Py_INCREF(Py_None);
     return Py_None;
 /* DO-NOT-DELETE splicer.end(pgs.device.method.set_line_color) */
@@ -285,7 +285,7 @@ PP_device_set_text_color(PP_deviceObject *self,
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "i:set_text_color", kw_list,
                                      &color))
         return NULL;
-    PG_set_text_color(self->dev, color);
+    PG_fset_text_color(self->dev, color, TRUE);
     Py_INCREF(Py_None);
     return Py_None;
 /* DO-NOT-DELETE splicer.end(pgs.device.method.set_text_color) */
@@ -312,7 +312,7 @@ PP_device_set_color_text(PP_deviceObject *self,
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "ii:set_color_text", kw_list,
                                      &color, &mapped))
         return NULL;
-    PG_set_color_text(self->dev, color, mapped);
+    PG_fset_text_color(self->dev, color, mapped);
     Py_INCREF(Py_None);
     return Py_None;
 /* DO-NOT-DELETE splicer.end(pgs.device.method.set_color_text) */

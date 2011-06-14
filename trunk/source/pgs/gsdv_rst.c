@@ -577,7 +577,7 @@ static int _PG_rst_stroke_text(PG_device *dev, FILE *fp, char *s)
 	ncharin   = strlen(s);
 	dx        = (dev->char_width_s + dev->char_space_s)*(dev->g.nd_w[1]);
 	savlinclr = dev->line_color;
-	PG_set_line_color(dev, dev->text_color);
+	PG_fset_line_color(dev, dev->text_color, TRUE);
 
 	savlwd = PG_fget_line_width(dev);
 	style  = dev->type_style;
@@ -605,7 +605,7 @@ static int _PG_rst_stroke_text(PG_device *dev, FILE *fp, char *s)
  */
              dev->tcur[0] += dx;};
 
-	PG_set_line_color(dev, savlinclr);
+	PG_fset_line_color(dev, savlinclr, TRUE);
 	PG_fset_line_width(dev, savlwd);};
 
     return(TRUE);}

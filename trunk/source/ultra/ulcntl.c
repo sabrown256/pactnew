@@ -316,11 +316,11 @@ static void _UL_draw_plot(PG_device *dev)
                                info, 1);
 
                  if ((dev->data_id == TRUE) && (pty != PLOT_INSEL))
-                    {PG_set_text_color(dev, color);
+                    {PG_fset_text_color(dev, color, TRUE);
 		     m = (ndi == TRUE) ? data[i].id - 'A' + 1 : data[i].id;
                      PG_draw_data_ids(dev, data[i].x[0], data[i].x[1],
                                       data[i].n, m, info);
-                     PG_set_text_color(dev, dev->WHITE);};};};};
+                     PG_fset_text_color(dev, dev->WHITE, TRUE);};};};};
 
 
     if (first)

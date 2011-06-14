@@ -512,7 +512,7 @@ static object *_SXI_draw_arc(SS_psides *si, object *argl)
     else
        unit = RADIAN;
 
-    PG_set_line_color(dev, dev->line_color);
+    PG_fset_line_color(dev, dev->line_color, TRUE);
     PG_draw_arc(dev, r, a1, a2, x, y, unit);
 
     return(SS_f);}
@@ -593,7 +593,7 @@ static object *_SXI_draw_box(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_DRAW_BOX", SS_null);
 
-    PG_set_line_color(dev, dev->line_color);
+    PG_fset_line_color(dev, dev->line_color, TRUE);
     PG_draw_box_n(dev, nd, cs, bx);
 
     return(SS_f);}
@@ -629,7 +629,7 @@ static object *_SXI_ddpn(SS_psides *si, object *argl)
     else if (nd == 3)
        _SX_args_arr_3(si, argl, &n, &x[0], &x[1], &x[2]);
 
-    PG_set_line_color(dev, dev->line_color);
+    PG_fset_line_color(dev, dev->line_color, TRUE);
 
     PG_draw_disjoint_polyline_n(dev, nd, cs, (long) n/2, x, clip);
 
@@ -671,7 +671,7 @@ static object *_SXI_draw_line(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_DRAW_LINE", SS_null);
 
-    PG_set_line_color(dev, dev->line_color);
+    PG_fset_line_color(dev, dev->line_color, TRUE);
     PG_draw_line_n(dev, nd, WORLDC, x1, x2, dev->clipping);
 
     return(SS_f);}
@@ -751,7 +751,7 @@ static object *_SXI_draw_polyline(SS_psides *si, object *argl)
         else if (nd == 3)
 	   _SX_args_arr_3(si, argl, &n, &x[0], &x[1], &x[2]);
 
-	PG_set_line_color(dev, dev->line_color);
+	PG_fset_line_color(dev, dev->line_color, TRUE);
 
 	PG_draw_polyline_n(dev, nd, cs, n, x, clip);
 
@@ -786,7 +786,7 @@ static object *_SXI_draw_rad(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_DRAW_RAD", SS_null);
 
-    PG_set_line_color(dev, dev->line_color);
+    PG_fset_line_color(dev, dev->line_color, TRUE);
     PG_draw_rad(dev, rn, rx, a, x, y, unit);
 
     return(SS_f);}
@@ -820,7 +820,7 @@ static object *_SXI_draw_text(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_DRAW_TEXT_WC", SS_null);
 
-    PG_set_text_color(dev, dev->text_color);
+    PG_fset_text_color(dev, dev->text_color, TRUE);
     PG_write_n(dev, nd, cs, p, "%s", txt);
 
     CFREE(txt);
@@ -1028,8 +1028,7 @@ static object *_SXI_glnc(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_GLNC", SS_null);
 
-    PG_get_line_color(dev, &c);
-
+    c = PG_fget_line_color(dev);
     o = SS_mk_integer(si, c);
 
     return(o);}
@@ -1191,8 +1190,7 @@ static object *_SXI_gtxc(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_GTXC", SS_null);
 
-    PG_get_text_color(dev, &c);
-
+    c = PG_fget_text_color(dev);
     o = SS_mk_integer(si, c);
 
     return(o);}
@@ -1634,6 +1632,7 @@ static object *_SXI_sdti(SS_psides *si, object *argl)
 static object *_SXI_sfic(SS_psides *si, object *argl)
    {int c;
     PG_device *dev;
+    object *o;
 
     dev = NULL;
     c   = 1;
@@ -1645,9 +1644,10 @@ static object *_SXI_sfic(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_SFIC", SS_null);
 
-    PG_set_fill_color(dev, c);
+    c = PG_fset_fill_color(dev, c, TRUE);
+    o = SS_mk_integer(si, c);
 
-    return(SS_f);}
+    return(o);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1714,7 +1714,7 @@ static object *_SXI_slnc(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_SLNC", SS_null);
 
-    PG_set_line_color(dev, c);
+    PG_fset_line_color(dev, c, TRUE);
 
     return(SS_f);}
 
@@ -1937,6 +1937,7 @@ static object *_SXI_swbk(SS_psides *si, object *argl)
 static object *_SXI_stxc(SS_psides *si, object *argl)
    {int c;
     PG_device *dev;
+    object *o;
 
     dev = NULL;
     c   = 1;
@@ -1946,9 +1947,12 @@ static object *_SXI_stxc(SS_psides *si, object *argl)
             0);
 
     if (dev != NULL)
-       PG_set_text_color(dev, c);
+       {c = PG_fset_text_color(dev, c, TRUE);
+	o = SS_mk_integer(si, c);}
+    else
+       o = SS_f;
 
-    return(SS_f);}
+    return(o);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

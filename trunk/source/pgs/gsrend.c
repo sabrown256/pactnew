@@ -534,7 +534,7 @@ static void _PG_legend_contours(PG_device *dev, PG_picture_desc *pd,
     PG_set_palette(dev, "standard");
     spl = PG_get_palette(dev, NULL);
 
-    PG_set_text_color(dev, dev->WHITE);
+    PG_fset_text_color(dev, dev->WHITE, TRUE);
 
     did = (datafl) ? pd->data->identifier : 'A';
     lv  = pd->levels;
@@ -591,13 +591,13 @@ static void _PG_legend_contours(PG_device *dev, PG_picture_desc *pd,
              
 /* color coded contour lines */
 	    case 2 :
-	         PG_get_text_color(dev, &tclr);
+	         tclr = PG_fget_text_color(dev);
 	         for (i = 0; i < nl; i += di)
 		     {xw[1] -= dt;
 		      clr = i + 4;
 		      idt = did + i;
 
-		      PG_set_text_color(dev, clr);
+		      PG_fset_text_color(dev, clr, TRUE);
 
 		      PG_frame_point(dev, 2, NORMC, xw, xf);
 
@@ -609,14 +609,14 @@ static void _PG_legend_contours(PG_device *dev, PG_picture_desc *pd,
 		      else
 			 PG_write_n(dev, 2, NORMC, xf, "%d", idt-'A'+1);
 
-		      PG_set_text_color(dev, dev->WHITE);
+		      PG_fset_text_color(dev, dev->WHITE, TRUE);
 
 		      p[0] = xw[0] + dxt[0];
 		      p[1] = xw[1];
 		      PG_frame_point(dev, 2, NORMC, p, xf);
 		      PG_write_n(dev, 2, NORMC, xf, "%.2e ", lv[i]);};
 
-	         PG_set_text_color(dev, tclr);
+	         PG_fset_text_color(dev, tclr, TRUE);
 	         break;
              
 /* fill contours */
@@ -626,7 +626,7 @@ static void _PG_legend_contours(PG_device *dev, PG_picture_desc *pd,
 
 		 dxw[0] = 0.7*(1.0 - ndc[1]);
 		 dxw[1] = dxt[1];
-	         PG_get_text_color(dev, &tclr);
+	         tclr = PG_fget_text_color(dev);
 	         for (i = 0; i < nl; i += di)
 		     {xw[1] -= dt;
 
@@ -648,14 +648,14 @@ static void _PG_legend_contours(PG_device *dev, PG_picture_desc *pd,
 		      PG_fill_polygon_n(dev, clr, TRUE, 2, NORMC, 5, r);
 
 		      PG_make_palette_current(dev, spl);
-		      PG_set_text_color(dev, dev->WHITE);
+		      PG_fset_text_color(dev, dev->WHITE, TRUE);
 
 		      p[0] = xw[0] + 0.1*dxw[0];
 		      p[1] = xw[1] + 0.1*dxw[1];
 		      PG_frame_point(dev, 2, NORMC, p, xf);
 		      PG_write_n(dev, 2, NORMC, xf, "< %.2e ", lv[i]);};
 
-	         PG_set_text_color(dev, tclr);
+	         PG_fset_text_color(dev, tclr, TRUE);
 		 PM_free_vectors(2, r);
 	         break;};
              
@@ -683,7 +683,7 @@ static void _PG_legend_label(PG_device *dev, PG_picture_desc *pd,
     opl = PG_get_palette(dev, NULL);
     PG_set_palette(dev, "standard");
 
-    PG_set_text_color(dev, dev->WHITE);
+    PG_fset_text_color(dev, dev->WHITE, TRUE);
 
     label = pd->legend_label;
     axty  = pd->ax_type;

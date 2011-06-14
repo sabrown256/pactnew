@@ -127,14 +127,14 @@ static void _PG_draw_scatter(PG_device *dev, int nd, double **f,
 
 	 color = PG_select_color(dev, 1, &fc, lextr);
          
-	 PG_set_color_line(dev, color, FALSE);
+	 PG_fset_line_color(dev, color, FALSE);
 
 	 for (id = 0; id < 2; id++)
 	     rd[id] = r[id] + i;
 	 PG_draw_markers_n(dev, 2, WORLDC, 1, rd, 1);};
 
     PG_set_palette(dev, "standard");
-    PG_set_line_color(dev, dev->WHITE);
+    PG_fset_line_color(dev, dev->WHITE, TRUE);
 
     PG_draw_box_n(dev, 3, WORLDC, bx);
 

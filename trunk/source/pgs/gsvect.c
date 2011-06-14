@@ -82,8 +82,8 @@ PG_picture_desc *PG_setup_picture_vector(PG_device *dev, PG_graph *data,
 
 	PG_set_palette(dev, "standard");
 
-	PG_set_color_line(dev, dev->WHITE, TRUE);
-	PG_set_color_text(dev, dev->WHITE, TRUE);
+	PG_fset_line_color(dev, dev->WHITE, TRUE);
+	PG_fset_text_color(dev, dev->WHITE, TRUE);
 
 /*        PG_set_vec_attr(dev, VEC_SCALE, scale, 0); */
 
@@ -135,7 +135,7 @@ static void PG_vct_hand(PG_device *dev, PG_graph *g,
 		       "LINE-WIDTH", SC_DOUBLE_I,    &width, 0.0,
 		       NULL);
 
-    PG_set_color_line(dev, color, TRUE);
+    PG_fset_line_color(dev, color, TRUE);
     PG_fset_line_style(dev, style);
     PG_fset_line_width(dev, width);
 
@@ -666,7 +666,7 @@ void PG_set_vec_attr(PG_device *dev, ...)
 
             case VEC_COLOR :
 	         itemp = SC_VA_ARG(int);
-		 PG_set_color_line(dev, itemp, TRUE);
+		 PG_fset_line_color(dev, itemp, TRUE);
 		 break;
 
             default :
@@ -753,7 +753,7 @@ void FF_ID(pgsvat, PGSVAT)(FIXNUM *sdid, ...)
 
             case VEC_COLOR :
 	         itemp = *SC_VA_ARG(FIXNUM *);
-		 PG_set_color_line(dev, itemp, TRUE);
+		 PG_fset_line_color(dev, itemp, TRUE);
 		 break;
 
             default :

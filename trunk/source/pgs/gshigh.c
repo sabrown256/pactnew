@@ -87,8 +87,9 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
 
     clp = PG_fget_clipping(dev);
     PG_fget_font(dev, &face, &style, &size);
-    PG_get_text_color(dev, &color);
-    PG_set_text_color(dev, dev->WHITE);
+
+    color = PG_fget_text_color(dev);
+    PG_fset_text_color(dev, dev->WHITE, TRUE);
 /*
     PG_set_palette(dev, "standard");
 */
@@ -142,7 +143,7 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
 
     if (nlabs <= 0)
        {PG_fset_clipping(dev, clp);
-        PG_set_text_color(dev, color);
+        PG_fset_text_color(dev, color, TRUE);
         PG_set_axis_log_scale(dev, 2, oflg);
         PG_fset_font(dev, face, style, size);
         return;};
@@ -254,7 +255,7 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
 
 	 if ((lcf == TRUE) && (clr != NULL))
 	    {tc = clr[i];
-	     PG_set_text_color(dev, tc);};
+	     PG_fset_text_color(dev, tc, TRUE);};
 
 /* prep the label text */
 	 strcpy(label, s);
@@ -305,7 +306,7 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
 	 yo -= dxt[1];};
 
     PG_fset_clipping(dev, clp);
-    PG_set_text_color(dev, color);
+    PG_fset_text_color(dev, color, TRUE);
     PG_set_axis_log_scale(dev, 2, oflg);
     PG_fset_font(dev, face, style, size);
 

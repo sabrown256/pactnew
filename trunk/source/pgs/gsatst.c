@@ -556,8 +556,8 @@ static void test_4_aux(PG_device *dev)
     if (dev == NULL)
        return;
 
-    PG_set_color_line(dev, dev->WHITE, TRUE);
-    PG_set_color_text(dev, dev->WHITE, TRUE);
+    PG_fset_line_color(dev, dev->WHITE, TRUE);
+    PG_fset_text_color(dev, dev->WHITE, TRUE);
 
     sf_dt(dev, 0.1, 0.9, "helvetica", "medium", 12);
     sf_dt(dev, 0.1, 0.8, "helvetica", "italic", 12);
@@ -1093,12 +1093,12 @@ static int test_10(PG_device *dev)
     dy = 1.0/(n + 1.0);
     y  = 0.5*dy;
     for (i = 0; i < n; i++)
-        {PG_set_color_line(dev, i, TRUE);
+        {PG_fset_line_color(dev, i, TRUE);
 	 x1[1] = y;
 	 x2[1] = y;
 	 PG_draw_line_n(dev, 2, WORLDC, x1, x2, dev->clipping);
 
-         PG_set_color_text(dev, i, TRUE);
+         PG_fset_text_color(dev, i, TRUE);
 
 	 p[0] = 0.6;
 	 p[1] = y;
@@ -1109,7 +1109,7 @@ static int test_10(PG_device *dev)
     PG_finish_plot(dev);
 
 /* widths and styles */
-    PG_set_line_color(dev, dev->WHITE);
+    PG_fset_line_color(dev, dev->WHITE, TRUE);
     PG_clear_screen(dev);
 
     n  = 10;

@@ -631,7 +631,7 @@ int _PG_X_draw_text(PG_device *dev, char *s, double *x)
 	pad = 2;
 
 	bc = dev->BLACK;
-	PG_get_text_color(dev, &fc);
+	fc = PG_fget_text_color(dev);
 
 	_PG_X_txt_clear_window(_PG.txtd, bc);
 	_PG_X_txt_set_font(_PG.txtd, face, sty, sz);
@@ -668,7 +668,7 @@ int _PG_rst_draw_text(PG_device *dev, char *s)
     PG_fget_font(dev, &face, &sty, &sz);
 
     bc = dev->BLACK;
-    PG_get_text_color(dev, &fc);
+    fc = PG_fget_text_color(dev);
 
     for (id = 0; id < nd; id++)
         o[id] = dev->tcur[id];

@@ -86,7 +86,7 @@ void clear_window(void *d, PG_event *ev)
     dev = PG_handle_button_press(d, ev);
     if (dev != NULL)
        {PG_clear_window(dev);
-        PG_set_line_color(dev, dev->WHITE);
+        PG_fset_line_color(dev, dev->WHITE, TRUE);
 	PG_box_init(2, bx, 0.0, 1.0);
         PG_draw_box_n(dev, 2, WORLDC, bx);
         PG_draw_interface_objects(dev);};

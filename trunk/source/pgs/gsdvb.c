@@ -121,7 +121,7 @@ static void PG_dvb_hand(PG_device *dev, PG_graph *g, PFDvbZC fnc_zc,
 		       "LINE-WIDTH", SC_DOUBLE_I,    &width, 0.0,
 		       NULL);
 
-    PG_set_line_color(dev, color);
+    PG_fset_line_color(dev, color, TRUE);
     PG_fset_line_style(dev, style);
     PG_fset_line_width(dev, width);
 

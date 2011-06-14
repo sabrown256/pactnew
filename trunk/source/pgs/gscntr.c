@@ -253,7 +253,7 @@ static void _PG_poly_fill_contour(PG_device *dev, double *lev,
 	if ((method == 3) && (ic == 2))
 	   {l1 = icross[0];
 	    l2 = icross[1];
-	    PG_set_line_color(dev, dev->WHITE);
+	    PG_fset_line_color(dev, dev->WHITE, TRUE);
 	    x1[0] = ilx[l1];
 	    x1[1] = ily[l1];
 	    x2[0] = ilx[l2];
@@ -413,8 +413,8 @@ PG_picture_desc *PG_setup_picture_contour(PG_device *dev, PG_graph *data,
 /* set up the drawing properties */
 	PG_set_palette(dev, "standard");
 
-	PG_set_color_line(dev, dev->WHITE, TRUE);
-	PG_set_color_text(dev, dev->WHITE, TRUE);
+	PG_fset_line_color(dev, dev->WHITE, TRUE);
+	PG_fset_text_color(dev, dev->WHITE, TRUE);
 
 	PG_setup_iso_levels(dev, data, pd);
 
@@ -738,7 +738,7 @@ static void PG_iso_hand(PG_device *dev, PG_graph *g, PG_picture_desc *pd,
 				     NULL);
 	 cnnct     = PM_connectivity(h);
 
-	 PG_set_color_line(dev, color, TRUE);
+	 PG_fset_line_color(dev, color, TRUE);
 	 switch (centering)
 	    {case Z_CENT :
                   (*fnc_zc)(dev, f, ndd, x, lev, nlev, id, cnnct, alst);
