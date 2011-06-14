@@ -1661,9 +1661,6 @@ void PG_close_console(void)
     return;}
 
 /*--------------------------------------------------------------------------*/
-
-#if 0
-
 /*--------------------------------------------------------------------------*/
 
 /* PG_CLEAR_FRAME - clear the current frame
@@ -1725,7 +1722,7 @@ void PG_clear_region(PG_device *dev, int nd, PG_coord_sys cs,
    {
 
     if ((dev != NULL) && (dev->clear_region != NULL))
-       (*dev->clear_region)(dev, nd, cs, bx, pad);
+       (*dev->clear_region)(dev, nd, cs, ndc, pad);
 
     return;}
 
@@ -1747,91 +1744,146 @@ void PG_clear_page(PG_device *dev, int i)
 
 /*--------------------------------------------------------------------------*/
 
-void PG_move_gr_abs(PG_device *dev, x, y)
-    if (dev != NULL)
-       {if (dev->move_gr_abs != NULL)
-           (*dev->move_gr_abs)(dev, x, y);}
+/* PG_WRITE_TEXT - write S to FP and/or DEV
+ *
+ * #bind PG_write_text fortran() scheme()
+ */
 
-void PG_move_tx_abs(PG_device *dev, x, y)
-    if (dev != NULL)
-       {if (dev->move_tx_abs != NULL)
-           (*dev->move_tx_abs)(dev, x, y);}
+void PG_write_text(PG_device *dev, FILE *fp, char *s)
+   {
 
-void PG_move_tx_rel(PG_device *dev, x, y)
-    if (dev != NULL)
-       {if (dev->move_tx_rel != NULL)
-           (*dev->move_tx_rel)(dev, x, y);}
+    if ((dev != NULL) && (dev->write_text != NULL))
+       (*dev->write_text)(dev, fp, s);
 
-void PG_draw_to_abs(PG_device *dev, x, y)
-    if (dev != NULL)
-       {if (dev->draw_to_abs != NULL)
-           (*dev->draw_to_abs)(dev, x, y);}
+    return;}
 
-void PG_draw_to_rel(PG_device *dev, x, y)
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_NEXT_LINE - move to next line on FP and/or DEV
+ *
+ * #bind PG_next_line fortran() scheme()
+ */
+
+void PG_next_line(PG_device *dev, FILE *fp)
+   {
+
+    if ((dev != NULL) && (dev->next_line != NULL))
+       (*dev->next_line)(dev, fp);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_SHADE_POLY_N - draw and fill polygon R
+ *
+ * #bind PG_shade_poly_n fortran() scheme()
+ */
+
+void PG_shade_poly_n(PG_device *dev, int nd, int n, double **r)
+   {
+
+    if ((dev != NULL) && (dev->shade_poly != NULL))
+       (*dev->shade_poly)(dev, nd, n, r);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FILL_CURVE - draw curve CRV and fill underneath it
+ *
+ * #bind PG_fill_curve fortran() scheme()
+ */
+
+void PG_fill_curve(PG_device *dev, PG_curve *crv)
+   {
+
+    if ((dev != NULL) && (dev->fill_curve != NULL))
+       (*dev->fill_curve)(dev, crv);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_DRAW_CURVE - draw curve CRV
+ *
+ * #bind PG_draw_curve fortran() scheme()
+ */
+
+void PG_draw_curve(PG_device *dev, PG_curve *crv, int clip)
+   {
+
+    if ((dev != NULL) && (dev->draw_curve != NULL))
+       (*dev->draw_curve)(dev, crv, clip);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_MAKE_PALETTE_CURRENT - make P the current palette of DEV
+ *
+ * #bind PG_make_palette_current fortran() scheme()
+ */
+
+void PG_make_palette_current(PG_device *dev, PG_palette *p)
+   {
+
     if (dev != NULL)
-       {if (dev->draw_to_rel != NULL)
-           (*dev->draw_to_rel)(dev, x, y);}
+       dev->current_palette = p;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_GET_IMAGE_N - copy the region IRG of DEV into BF
+ *
+ * #bind PG_get_image_n fortran() scheme()
+ */
+
+void PG_get_image_n(PG_device *dev, unsigned char *bf,
+		    PG_coord_sys cs, double *irg)
+   {double ix[PG_SPACEDM], nx[PG_SPACEDM], pc[PG_BOXSZ];
+
+    if ((dev != NULL) && (dev->get_image != NULL))
+       {PG_trans_box(dev, 2, cs, irg, PIXELC, pc);
+	ix[0] = pc[0];
+	ix[1] = pc[2];
+	nx[0] = pc[1] - pc[0];
+	nx[1] = pc[3] - pc[2];
+	(*dev->get_image)(dev, bf, ix[0], ix[1], nx[0], nx[1]);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_PUT_IMAGE_N - copy the BF into region IRG of DEV
+ *
+ * #bind PG_put_image_n fortran() scheme()
+ */
+
+void PG_put_image_n(PG_device *dev, unsigned char *bf,
+		    PG_coord_sys cs, double *irg)
+   {double ix[PG_SPACEDM], nx[PG_SPACEDM], pc[PG_BOXSZ];
+
+    if ((dev != NULL) && (dev->put_image != NULL))
+       {PG_trans_box(dev, 2, cs, irg, PIXELC, pc);
+	ix[0] = pc[0];
+	ix[1] = pc[2];
+	nx[0] = pc[1] - pc[0];
+	nx[1] = pc[3] - pc[2];
+	(*dev->put_image)(dev, bf, ix[0], ix[1], nx[0], nx[1]);};
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 
-void PG_shade_poly(PG_device *dev, x, y, n)
-    if (dev != NULL)
-       {if (dev->shade_poly != NULL)
-           {double *_r[2];
-	    _r[0] = x;
-	    _r[1] = y;
-	    (*dev->shade_poly)(dev, 2, n, _r);};}
-
-void PG_shade_poly_n(PG_device *dev, nd, n, r)
-    if (dev != NULL)
-       {if (dev->shade_poly != NULL)
-           (*dev->shade_poly)(dev, nd, n, r);}
-
-void PG_fill_curve(PG_device *dev, c)
-    if (dev != NULL)
-       {if (dev->fill_curve != NULL)
-           (*dev->fill_curve)(dev, c);}
-
-/*--------------------------------------------------------------------------*/
-
-void PG_draw_curve(PG_device *dev, c, clip)
-    if (dev != NULL)
-       {if (dev->draw_curve != NULL)
-           (*dev->draw_curve)(dev, c, clip);}
-
-void PG_draw_disjoint_polyline_2(PG_device *dev, x, y, n, flag, coord)
-    if (dev != NULL)
-       {if (dev->draw_dj_polyln_2 != NULL)
-           {double *_r[2];
-	    _r[0] = x;
-	    _r[1] = y;
-	    (*dev->draw_dj_polyln_2)(dev, _r, n, flag, coord);};}
-
-/*--------------------------------------------------------------------------*/
-
-void PG_make_palette_current(PG_device *dev, p)
-    if (dev != NULL)
-       {dev->current_palette = p;}
-
-void PG_get_image(PG_device *dev, bf, ix, iy, nx, ny)
-    if (dev != NULL)
-       {if (dev->get_image != NULL)
-           (*dev->get_image)(dev, bf, ix, iy, nx, ny);}
-
-void PG_put_image(PG_device *dev, bf, ix, iy, nx, ny)
-    if (dev != NULL)
-       {if (dev->put_image != NULL)
-           (*dev->put_image)(dev, bf, ix, iy, nx, ny);}
-
-void PG_write_text(PG_device *dev, fp, s)
-    if (dev != NULL)
-       {if (dev->write_text != NULL)
-           (*dev->write_text)(dev, fp, s);}
-
-void PG_next_line(PG_device *dev, fp)
-    if (dev != NULL)
-       {if (dev->next_line != NULL)
-           (*dev->next_line)(dev, fp);}
+#if 0
 
 /*--------------------------------------------------------------------------*/
 
@@ -1848,6 +1900,85 @@ void PG_next_line(PG_device *dev, fp)
 #define PG_puts(bf)
     if ((PG_console_device != NULL) && (PG_console_device->gputs != NULL))
        (*PG_console_device->gputs)(bf)
+
+/*--------------------------------------------------------------------------*/
+
+/* PG_MOVE_GR_ABS_N - move the current point of DEV to X
+ *
+ * #bind PG_move_gr_abs_n fortran() scheme()
+ */
+
+void PG_move_gr_abs_n(PG_device *dev, double *x)
+   {
+
+    if ((dev != NULL) && (dev->move_gr_abs != NULL))
+       (*dev->move_gr_abs)(dev, x[0], x[1]);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_MOVE_TX_ABS_N - move the current text point of DEV to X
+ *
+ * #bind PG_move_tx_abs_n fortran() scheme()
+ */
+
+void PG_move_tx_abs_n(PG_device *dev, double *x)
+   {
+
+    if ((dev != NULL) && (dev->move_tx_abs != NULL))
+       (*dev->move_tx_abs)(dev, x[0], x[1]);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_MOVE_TX_REL_N - move the current text point of DEV by X
+ *
+ * #bind PG_move_tx_rel_n fortran() scheme()
+ */
+
+void PG_move_tx_rel_n(PG_device *dev, double *x)
+   {
+
+    if ((dev != NULL) && (dev->move_tx_rel != NULL))
+       (*dev->move_tx_rel)(dev, x[0], x[1]);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_DRAW_TO_ABS_N - draw from the current point of DEV to X
+ *
+ * #bind PG_draw_to_abs_n fortran() scheme()
+ */
+
+void PG_draw_to_abs_n(PG_device *dev, double *x)
+   {
+
+    if ((dev != NULL) && (dev->draw_to_abs != NULL))
+       (*dev->draw_to_abs)(dev, x[0], x[1]);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_DRAW_TO_REL_N - draw from the current point of DEV by X
+ *
+ * #bind PG_draw_to_rel_n fortran() scheme()
+ */
+
+void PG_draw_to_rel_n(PG_device *dev, double *x)
+   {
+
+    if ((dev != NULL) && (dev->draw_to_rel != NULL))
+       (*dev->draw_to_rel)(dev, x[0], x[1]);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 

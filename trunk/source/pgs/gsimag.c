@@ -672,7 +672,8 @@ static PG_image *PG_prep_image(PG_device *dev, PG_image *im,
  */
 
 void PG_draw_image(PG_device *dev, PG_image *im, char *label, pcons *alist)
-   {int ix, iy, nx, ny, do_par_set;
+   {int nx, ny, do_par_set;
+    double pc[PG_BOXSZ];
     PG_image *nim;
     PG_graph g, *data;
     PG_picture_desc *pd;
@@ -699,7 +700,9 @@ void PG_draw_image(PG_device *dev, PG_image *im, char *label, pcons *alist)
 
 	PG_adorn_before(dev, pd, data);
 
-	PG_get_viewport_size(dev, &ix, &iy, &nx, &ny);
+	PG_get_viewspace(dev, PIXELC, pc);
+	nx = pc[1] - pc[0];
+	ny = pc[3] - pc[2];
 
 	if (!_PG_allocate_image_buffer(dev, NULL, &nx, &ny))
 	   return;
@@ -710,7 +713,7 @@ void PG_draw_image(PG_device *dev, PG_image *im, char *label, pcons *alist)
 	if (_PG.pol_extr != NULL)
 	   PG_polar_image(nim, _PG.pol_extr, dev->BLACK);
 
-	PG_put_image(dev, nim->buffer, ix, iy, nx, ny);
+	PG_put_image_n(dev, nim->buffer, PIXELC, pc);
 
 	PG_rl_image(nim);
 
@@ -725,27 +728,24 @@ void PG_draw_image(PG_device *dev, PG_image *im, char *label, pcons *alist)
 /*--------------------------------------------------------------------------*/
  
 /* PG_EXTRACT_IMAGE - extract a PG_image from the region of DEV
- *                  - specified by the origin (IX, IY) and
- *                  - the extent (NX, NY)
+ *                  - specified by the box DBX
  */
  
 PG_image *PG_extract_image(PG_device *dev, double *dbx, double *rbx)
-   {int ix, iy, nx, ny, bpp;
+   {int nx, ny, bpp;
     unsigned char *bf;
     double wc[PG_BOXSZ];
     PG_image *im;
 
-     ix = dbx[0];
-     nx = dbx[1] - ix;
-     iy = dbx[2];
-     ny = dbx[3] - iy;
-
     im = NULL;
     if (dev != NULL)
-       {if ((nx == 0) || (ny == 0))
-	   PG_get_viewport_size(dev, &ix, &iy, &nx, &ny);
+       {if ((dbx[2] == 0.0) || (dbx[3] == 0.0))
+	   PG_get_viewspace(dev, PIXELC, dbx);
 
 	PG_get_viewspace(dev, WORLDC, wc);
+
+	nx = dbx[1] - dbx[0];
+	ny = dbx[3] - dbx[2];
 
 	bpp = log((double) (dev->absolute_n_color))/log(2.0) + 0.5;
 	im  = PG_make_image_n(dev->title, SC_CHAR_S, NULL, 2, WORLDC,
@@ -754,7 +754,7 @@ PG_image *PG_extract_image(PG_device *dev, double *dbx, double *rbx)
 /* load up the image data */
 	if (im != NULL)
 	   {bf = im->buffer;
-	    PG_get_image(dev, bf, ix, iy, nx, ny);};};
+	    PG_get_image_n(dev, bf, PIXELC, dbx);};};
  
     return(im);}
  
@@ -800,6 +800,7 @@ static void _PG_par_reset_viewport(PG_device *dev, PG_image *im,
 
 void PG_render_parallel(PG_device *dd, PG_image *nim, int np, PG_image *pim)
    {int ix, iy, nx, ny;
+    double pc[PG_BOXSZ];
     PG_graph g, *data;
     PG_picture_desc *pd;
     PG_palette *pl;
@@ -820,18 +821,24 @@ void PG_render_parallel(PG_device *dd, PG_image *nim, int np, PG_image *pim)
 
     PG_adorn_before(dd, pd, data);
 
-    PG_get_viewport_size(dd, &ix, &iy, &nx, &ny);
+    PG_get_viewspace(dd, PIXELC, pc);
+    ix = pc[0];
+    iy = pc[2];
+    nx = pc[1] - pc[0];
+    ny = pc[3] - pc[2];
 
 /* GOTCHA: this is only necessary because the round off issues
  *         are not dealt with completely in PG_setup_parallel
  *         hence nx and nim->kmax et. al. differ by 2-5 pixels
  */
     _PG_par_reset_viewport(dd, nim, ix, iy, &nx, &ny);
+    pc[2] = nx + pc[0];
+    pc[3] = ny + pc[1];
 
     pl = dd->current_palette;
     dd->current_palette = dd->color_table;
 
-    PG_put_image(dd, nim->buffer, ix, iy, nx, ny);
+    PG_put_image_n(dd, nim->buffer, PIXELC, pc);
 
     dd->current_palette = pl;
 
@@ -894,6 +901,56 @@ static void _PG_fill_palette_image(PG_device *dev, unsigned char *bf,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PG_RENDER_PALETTE - draw a 1D or 2D palette */
+
+static void _PG_render_palette(PG_device *dev, PG_palette *pal,
+			       int hvf, int nd, int *nc, double *ndc)
+   {int n_color;
+    int ix[PG_SPACEDM], nx[PG_SPACEDM];
+    double pc[PG_BOXSZ];
+    unsigned char *bf;
+
+    PG_trans_box(dev, 2, NORMC, ndc, PIXELC, pc);
+
+    ix[0] = pc[0];
+    nx[0] = pc[1];
+    ix[1] = pc[2];
+    nx[1] = pc[3];
+
+    nx[0] = nx[0] - ix[0] + 1;
+    if (nx[1] > ix[1])
+       nx[1] = nx[1] - ix[1] + 1;
+    else
+       nx[1] = ix[1] - nx[1] + 1;
+
+    if (!_PG_allocate_image_buffer(dev, &bf, &nx[0], &nx[1]))
+       return;
+
+    pc[1] = pc[0] + nx[0];
+    pc[3] = pc[2] + nx[1];
+
+/* compute a palette image */
+    n_color = pal->n_pal_colors;
+    _PG_fill_palette_image(dev, bf, nx[0], nx[1], hvf, n_color, nc[0], nc[1]);
+
+/* move image off axis */
+    if (hvf == VERTICAL)
+       ix[0] -= 1;
+    else
+       ix[1] += 1;
+
+    PG_invert_image_data(bf, nx[0], nx[1], 1);
+
+/* draw the palette image */
+    PG_put_image_n(dev, bf, PIXELC, pc);
+
+    CFREE(bf);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PG_DRAW_PALETTE_N - display the palette
  *                   - place it exactly where requested iff
  *                   - EXACT is TRUE
@@ -903,13 +960,12 @@ static void _PG_fill_palette_image(PG_device *dev, unsigned char *bf,
 
 void PG_draw_palette_n(PG_device *dev, double *dbx, double *rbx,
 		       double wid, int exact)
-   {int ix, iy, nx, ny;
-    int n_color, hvf;
-    unsigned char *bf;
+   {int hvf;
+    int nc[PG_SPACEDM];
     char format[20];
     double scale, toler;
     double tn[2], vw[2];
-    double pc[PG_BOXSZ], ndc[PG_BOXSZ];
+    double ndc[PG_BOXSZ];
     double xl[PG_SPACEDM], xr[PG_SPACEDM];
     PG_palette *pal;
 
@@ -1007,38 +1063,10 @@ void PG_draw_palette_n(PG_device *dev, double *dbx, double *rbx,
        {dev->current_palette = pal;
         return;};
 
-    PG_trans_box(dev, 2, NORMC, ndc, PIXELC, pc);
+    nc[0] = pal->n_pal_colors;
+    nc[1] = 0;
 
-    ix = pc[0];
-    nx = pc[1];
-    iy = pc[2];
-    ny = pc[3];
-
-    nx = nx - ix + 1;
-    if (ny > iy)
-       ny = ny - iy + 1;
-    else
-       ny = iy - ny + 1;
-
-    if (!_PG_allocate_image_buffer(dev, &bf, &nx, &ny))
-       return;
-
-/* compute a palette image */
-    n_color = pal->n_pal_colors;
-    _PG_fill_palette_image(dev, bf, nx, ny, hvf, n_color, n_color, 0);
-
-/* move image off axis */
-    if (hvf == VERTICAL)
-       ix -= 1;
-    else
-       iy += 1;
-
-    PG_invert_image_data(bf, nx, ny, 1);
-
-/* draw the palette image */
-    PG_put_image(dev, bf, ix, iy, nx, ny);
-
-    CFREE(bf);
+    _PG_render_palette(dev, pal, hvf, 1, nc, ndc);
 
     return;}
 
@@ -1048,13 +1076,12 @@ void PG_draw_palette_n(PG_device *dev, double *dbx, double *rbx,
 /* PG_DRAW_2DPALETTE - display the palette next to the image */
 
 void PG_draw_2dpalette(PG_device *dev, double *frm, double *rex, double wid)
-   {int ix, iy, nx, ny, ncx, ncy;
-    int n_color, **pd, *shape, hvf, fsize;
-    unsigned char *bf;
+   {int **pd, *shape, hvf, fsize;
+    int nc[PG_SPACEDM];
     char format[20], *face, *style;
     double scale, toler;
     double tn[2], vw[2];
-    double pc[PG_BOXSZ], ndc[PG_BOXSZ];
+    double ndc[PG_BOXSZ];
     double xl[PG_SPACEDM], xr[PG_SPACEDM];
     PG_palette *pal;
 
@@ -1104,8 +1131,8 @@ void PG_draw_2dpalette(PG_device *dev, double *frm, double *rex, double wid)
 	    rex[3] += 0.5*toler*rex[3];};};
 
     shape = pal->pal_dims[pal->max_pal_dims - 1];
-    ncx = shape[0];
-    ncy = shape[1];
+    nc[0] = shape[0];
+    nc[1] = shape[1];
 
     if (ndc[0] == ndc[1])
 /*
@@ -1165,35 +1192,7 @@ void PG_draw_2dpalette(PG_device *dev, double *frm, double *rex, double wid)
 
         dev->current_palette = pal;}
 
-    PG_trans_box(dev, 2, NORMC, ndc, PIXELC, pc);
-    ix = pc[0];
-    nx = pc[1];
-    iy = pc[2];
-    ny = pc[3];
-
-    nx = nx - ix + 1;
-    if (ny > iy)
-       ny = ny - iy + 1;
-    else
-       ny = iy - ny + 1;
-
-    if (!_PG_allocate_image_buffer(dev, &bf, &nx, &ny))
-       return;
-
-/* compute a palette image */
-    n_color = pal->n_pal_colors;
-    _PG_fill_palette_image(dev, bf, nx, ny, hvf, n_color, ncx, ncy);
-
-/* move image off axis */
-    if (hvf == VERTICAL)
-       ix -= 1;
-    else
-       iy += 1;
-
-/* draw the palette image */
-    PG_put_image(dev, bf, ix, iy, nx, ny);
-
-    CFREE(bf);
+    _PG_render_palette(dev, pal, hvf, 2, nc, ndc);
 
     return;}
 
@@ -1318,35 +1317,36 @@ PG_image *PG_make_image_n(char *label, char *type, void *z,
 
 int _PG_allocate_image_buffer(PG_device *dev, unsigned char **pbf,
 			      int *pnx, int *pny)
-   {int i, nx, ny, ix, iy;
+   {int i;
+    int ix[PG_SPACEDM], nx[PG_SPACEDM];
     unsigned char *bf;
 
-    ix = 0;
-    iy = 0;
-    nx = *pnx;
-    ny = *pny;
+    ix[0] = 0;
+    ix[1] = 0;
+    nx[0] = *pnx;
+    nx[1] = *pny;
 
 /* allocate the working buffer according to the scale factor
  * or largest array the system will give us
  */
     bf = NULL;
     for (i = dev->resolution_scale_factor; i < 512; i <<= 2)
-        {ix = nx/i;
-         iy = ny/i;
+        {ix[0] = nx[0]/i;
+         ix[1] = nx[1]/i;
 
 	 if (CGM_DEVICE(dev))
-	    {if (ix & 1)
-	        ix++;
+	    {if (ix[0] & 1)
+	        ix[0]++;
 
-	     if (iy & 1)
-	        iy++;};
+	     if (ix[1] & 1)
+	        ix[1]++;};
 
-	 bf = CMAKE_N(unsigned char, ix*iy);
+	 bf = CMAKE_N(unsigned char, ix[0]*ix[1]);
          if (bf != NULL)
             break;};
 
     if (bf != NULL)
-       memset(bf, dev->BLACK, ix*iy);
+       memset(bf, dev->BLACK, ix[0]*ix[1]);
 
     dev->resolution_scale_factor = i;
 
@@ -1355,8 +1355,8 @@ int _PG_allocate_image_buffer(PG_device *dev, unsigned char **pbf,
     else
        CFREE(bf);
 
-    *pnx = ix;
-    *pny = iy;
+    *pnx = ix[0];
+    *pny = ix[1];
 
     return(i < 512);}
 

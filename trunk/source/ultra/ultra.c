@@ -1009,7 +1009,7 @@ object *UL_mode_graphics(SS_psides *si)
  */
 
 void UL_set_graphics_state(PG_device *d)
-   {int i, nc, width, height;
+   {int i, nc;
     int dx[PG_SPACEDM];
     double mrks;
     char *axstf;
