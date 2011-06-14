@@ -1882,25 +1882,6 @@ void PG_put_image_n(PG_device *dev, unsigned char *bf,
     return;}
 
 /*--------------------------------------------------------------------------*/
-
-#if 0
-
-/*--------------------------------------------------------------------------*/
-
-#define PG_fgetc(stream)
-    (((PG_console_device != NULL) && (PG_console_device->ggetc != NULL)) ?
-     (*PG_console_device->ggetc)(stream) :
-     EOF)
-
-#define PG_fgets(buffer, maxlen, stream)
-    (((PG_console_device != NULL) && (PG_console_device->ggets != NULL)) ?
-     (*PG_console_device->ggets)(buffer, maxlen, stream) :
-     NULL)
-
-#define PG_puts(bf)
-    if ((PG_console_device != NULL) && (PG_console_device->gputs != NULL))
-       (*PG_console_device->gputs)(bf)
-
 /*--------------------------------------------------------------------------*/
 
 /* PG_MOVE_GR_ABS_N - move the current point of DEV to X
@@ -1981,7 +1962,4 @@ void PG_draw_to_rel_n(PG_device *dev, double *x)
     return;}
 
 /*--------------------------------------------------------------------------*/
-
-#endif
-
 /*--------------------------------------------------------------------------*/

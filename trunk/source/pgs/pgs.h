@@ -1199,7 +1199,12 @@ extern void
  PG_get_image_n(PG_device *dev, unsigned char *bf,
 		PG_coord_sys cs, double *irg),
  PG_put_image_n(PG_device *dev, unsigned char *bf,
-		PG_coord_sys cs, double *irg);
+		PG_coord_sys cs, double *irg),
+ PG_move_gr_abs_n(PG_device *dev, double *p),
+ PG_move_tx_abs_n(PG_device *dev, double *p),
+ PG_move_tx_rel_n(PG_device *dev, double *p),
+ PG_draw_to_abs_n(PG_device *dev, double *p),
+ PG_draw_to_rel_n(PG_device *dev, double *p);
 
 extern PG_logical_operation
  PG_fget_logical_op(PG_device *dev),

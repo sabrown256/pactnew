@@ -939,7 +939,7 @@ void PG_histogram_plot(PG_device *dev, double *x, double *y, int n, int lncol,
     PG_clip_data(dev, t[0], t[1], &tn, xl[0], xl[1], nl);
 
 /* plot lines unless scatter set */
-    PG_move_gr_abs(dev, t[0][0], t[1][0]);
+    PG_move_gr_abs_n(dev, t);
 
     if (scatter != 1)
        PG_draw_polyline_n(dev, 2, WORLDC, tn, t, FALSE);

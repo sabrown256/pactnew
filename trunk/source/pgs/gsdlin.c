@@ -148,8 +148,8 @@ void PG_draw_line_n(PG_device *dev, int nd, PG_coord_sys cs,
 		 l2[id] = xi[id][1];};
 
 	    if (PG_clip_line_seg(dev, l1, l2))
-	       {PG_move_gr_abs(dev, l1[0], l1[1]);
-		PG_draw_to_abs(dev, l2[0], l2[1]);};}
+	       {PG_move_gr_abs_n(dev, l1);
+		PG_draw_to_abs_n(dev, l2);};}
 
 	else
 	   _PG_rst_draw_disjoint_polyline_3(dev, cs, 1, p, clip, FALSE);};
