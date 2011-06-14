@@ -12,6 +12,21 @@
 
 #define DEBUG_TEXT 0
 
+#define _FGETC(stream)                                                       \
+    (((PG_console_device != NULL) && (PG_console_device->ggetc != NULL)) ?   \
+     (*PG_console_device->ggetc)(stream) :                                   \
+     EOF)
+
+#define _FGETS(buffer, maxlen, stream)                                       \
+    (((PG_console_device != NULL) && (PG_console_device->ggets != NULL)) ?   \
+     (*PG_console_device->ggets)(buffer, maxlen, stream) :                   \
+     NULL)
+
+#define _PUTS(bf)                                                            \
+    if ((PG_console_device != NULL) && (PG_console_device->gputs != NULL))   \
+       (*PG_console_device->gputs)(bf)
+
+
 FILE
  *stdscr;              /* this is the effective file pointer for the screen */
 
@@ -261,7 +276,7 @@ int PG_write_n(PG_device *dev, int nd, PG_coord_sys cs, double *x, char *fmt, ..
 		PG_set_axis_log_scale(dev, nd, nflg);};
 
 	    PG_trans_point(dev, nd, cs, x, WORLDC, y);
-	    PG_move_tx_abs(dev, y[0], y[1]);
+	    PG_move_tx_abs_n(dev, y);
 	    PG_write_text(dev, stdscr, s);
 
 	    if (cs != WORLDC)
@@ -387,7 +402,7 @@ int PG_wind_fgetc(FILE *stream)
    {int c;
 
     if (stream == stdin)
-       c = PG_fgetc(stream);
+       c = _FGETC(stream);
     else
        c = io_getc(stream);
 
@@ -404,7 +419,7 @@ char *PG_wind_fgets(char *str, int maxlen, FILE *stream)
    {char *p;
 
     if (stream == stdin)
-       p = PG_fgets(str, maxlen, stream);
+       p = _FGETS(str, maxlen, stream);
     else
        p = io_gets(str, maxlen, stream);
 
@@ -455,7 +470,7 @@ int PG_wind_fprintf(FILE *fp, char *fmt, ...)
 
 		rv = strlen(bf);
 
-		PG_puts(bf);};}
+		_PUTS(bf);};}
 
        else
 	  {SC_VA_START(fmt);

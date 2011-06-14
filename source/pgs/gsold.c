@@ -191,8 +191,8 @@ void PG_draw_line(PG_device *dev,
 	p2[1] = y2;
 
 	if (PG_clip_line_seg(dev, p1, p2))
-	   {PG_move_gr_abs(dev, p1[0], p1[1]);
-	    PG_draw_to_abs(dev, p2[0], p2[1]);};};
+	   {PG_move_gr_abs_n(dev, p1);
+	    PG_draw_to_abs_n(dev, p2);};};
  
     return;}
  
@@ -451,7 +451,7 @@ int PG_write_NDC(PG_device *dev, double x, double y, char *fmt, ...)
        
 	    PG_trans_point(dev, 2, NORMC, p, WORLDC, p);
 
-	    PG_move_tx_abs(dev, p[0], p[1]);
+	    PG_move_tx_abs_n(dev, p);
 	    PG_write_text(dev, stdscr, s);
 
 	    if (logflag)
@@ -483,6 +483,7 @@ int PG_write_NDC(PG_device *dev, double x, double y, char *fmt, ...)
 int PG_write_WC(PG_device *dev, double x, double y, char *fmt, ...)
    {int rv;
     char *s;
+    double p[PG_SPACEDM];
 
     if (dev == NULL)
        rv = FALSE;
@@ -490,7 +491,9 @@ int PG_write_WC(PG_device *dev, double x, double y, char *fmt, ...)
     else if (dev->gprint_flag)
        {SC_VDSNPRINTF(TRUE, s, fmt);
 
-        PG_move_tx_abs(dev, x, y);
+	p[0] = x;
+	p[1] = y;
+        PG_move_tx_abs_n(dev, p);
         PG_write_text(dev, stdscr, s);
 
 #if DEBUG_TEXT

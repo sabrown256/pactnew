@@ -3210,27 +3210,6 @@ This routine prints a text string, label, on the specified device and centered h
 
 <p>
 
-<I>C Binding: </I>char *PG_fgets(char *buffer, int maxlen, FILE *stream)
-<BR><I>Fortran Binding: </I> integer pggtln(integer maxlen, char *buffer, integer stream)
-<BR><I>SX Binding: </I>
-<P>
-This function is call compatible with the standard C library fgets call. It
-gets input from the console device, PG_console_device, window if stream is
-stdin and from a file otherwise. In the FORTRAN binding using 0 for stream
-results in the use of stdin.<p>
-
-<p>
-
-<I>C Binding: </I>int PG_fprintf(FILE *fp, char *fmt, ...)
-<BR><I>Fortran Binding: </I>                             not applicable
-<BR><I>SX Binding: </I>
-<P>
-This function is call compatible with the standard C library fprintf call. It
-prints to the console device, PG_console_device, window if fp is stdout and
-to a file otherwise.<p>
-
-<p>
-
 <I>C Binding: </I>int PG_write_n(PG_device *dev, int nd, PG_coord_sys cs, double *x, char *fmt, ...)
 <BR><I>Fortran Binding: </I>integer pgwrta(integer devid, REAL x, REAL y, integer nc, char *txt)
 <BR><I>SX Binding: </I>(pg-draw-text dev nd, cs, x y txt)
@@ -3248,19 +3227,19 @@ which the next text and line drawing operations will start.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_move_gr_abs(PG_device *dev, double x, double y)
+<I>C Binding: </I>void PG_move_gr_abs_n(PG_device *dev, double *p)
 <BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 
 <p>
 
-<I>C Binding: </I>void PG_move_tx_abs(PG_device *dev, double x, double y)
+<I>C Binding: </I>void PG_move_tx_abs_n(PG_device *dev, double *p)
 <BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 
 <p>
 
-<I>C Binding: </I>void PG_move_tx_rel(PG_device *dev, double x, double y)
+<I>C Binding: </I>void PG_move_tx_rel_n(PG_device *dev, double *p)
 <BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
@@ -3292,13 +3271,13 @@ coordinates specified by X1 and X2.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_draw_to_abs(PG_device *dev, double x, double y)
+<I>C Binding: </I>void PG_draw_to_abs_n(PG_device *dev, double *p)
 <BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>
 <p>
 
-<I>C Binding: </I>void PG_draw_to_rel(PG_device *dev, double x, double y)
+<I>C Binding: </I>void PG_draw_to_rel_n(PG_device *dev, double *p)
 <BR><I>Fortran Binding: </I>
 <BR><I>SX Binding: </I>
 <P>

@@ -37,7 +37,7 @@ static INLINE void _PG_place_text(PG_device *dev, char *p)
        {dx[0] = dev->tcur[0];
         dx[1] = dev->tcur[1];
 
-        PG_move_tx_abs(dev, dx[0], dx[1]);
+        PG_move_tx_abs_n(dev, dx);
 
         PG_get_text_ext_n(dev, 2, WORLDC, p, dx);
         dev->tcur[0] += dx[0];
@@ -307,7 +307,7 @@ static void _PG_move_to(PG_text_box *b, int c, int l)
 	f[1] += sin(ang)*(dxe[0] - dxp[0]) - cos(ang)*(l*dxe[1]);
 	PG_trans_point(dev, 2, NORMC, f, WORLDC, f);
 
-	PG_move_tx_abs(dev, f[0], f[1]);};
+	PG_move_tx_abs_n(dev, f);};
 
     return;}
 
@@ -677,7 +677,7 @@ static void _PG_newline(PG_text_box *b)
  */
 
 static char *_PG_backup_char(PG_text_box *b, char *p, int n)
-   {double dx[PG_SPACEDM];
+   {double dx[PG_SPACEDM], x[PG_SPACEDM];
     PG_device *dev;
 
     if (b != NULL)
@@ -688,11 +688,16 @@ static char *_PG_backup_char(PG_text_box *b, char *p, int n)
 	    if (b->active)
 	       {PG_get_text_ext_n(dev, 2, WORLDC, p, dx);
 
-		PG_move_tx_rel(dev, -dx[0], 0);
+		x[0] = -dx[0];
+		x[1] = 0.0;
+		PG_move_tx_rel_n(dev, x);
+
 		PG_fset_text_color(dev, b->background, FALSE);
 		PG_write_text(dev, stdscr, p);
 
-		PG_move_tx_rel(dev, 0, 0);};};};
+		x[0] = 0.0;
+		x[1] = 0.0;
+		PG_move_tx_rel_n(dev, x);};};};
 
     return(p);}
 

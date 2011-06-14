@@ -2002,17 +2002,17 @@ FIXNUM FF_ID(pgwrif, PGWRIF)(FIXNUM *sdid, FIXNUM *sncn, char *name)
 FIXNUM FF_ID(pgwrta, PGWRTA)(FIXNUM *sdid, double *sx, double *sy,
 			     FIXNUM *sncm, char *msg)
    {FIXNUM rv;
-    double x, y;
+    double x[PG_SPACEDM];
     char lmsg[MAXLINE];
     PG_device *dev;
 
-    x = *sx;
-    y = *sy;
+    x[0] = *sx;
+    x[1] = *sy;
     SC_FORTRAN_STR_C(lmsg, msg, *sncm);
 
     dev = SC_GET_POINTER(PG_device, *sdid);
     if ((dev != NULL) && (dev->gprint_flag))
-       {PG_move_tx_abs(dev, x, y);
+       {PG_move_tx_abs_n(dev, x);
         PG_write_text(dev, stdscr, lmsg);};
 
     rv = TRUE;

@@ -489,10 +489,10 @@ void _PG_qd_draw_to_rel(PG_device *dev, double x, double y)
 void _PG_qd_draw_polyline(PG_device *dev, double *x, double *y, int n)
    {int i;
 
-    PG_move_gr_abs(dev, x[0], y[0]);
+    PG_move_gr_abs_n(dev, x);
 
     for (i = 1; i < n; i++)
-        PG_draw_to_abs(dev, x[i], y[i]);
+        PG_draw_to_abs_n(dev, x);
 
     return;}
  
@@ -570,9 +570,14 @@ void _PG_qd_shade_poly(PG_device *dev, int nd, int n, double **r)
        {SetPort(dev->window);
 
 	poly = OpenPoly();
-	PG_move_gr_abs(dev, r[0][0], r[1][0]);
+
+	pc[0] = r[0][0];
+	pc[1] = r[1][0];
+	PG_move_gr_abs_n(dev, p);
 	for (i = 1; i < n; i++)
-	    PG_draw_to_abs(dev, r[0][i], r[1][i]);
+	    {pc[0] = r[0][i];
+	     pc[1] = r[1][i];
+	     PG_draw_to_abs_n(dev, p);};
 
 	ClosePoly();
 

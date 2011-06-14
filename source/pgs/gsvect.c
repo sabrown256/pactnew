@@ -568,13 +568,13 @@ void _PG_draw_vec_distinct(PG_device *dev,
              xw[1][1] -= dp[1];};
 
 /* draw the shaft */
-         PG_move_gr_abs(dev, x0[0], x0[1]);
-         PG_draw_to_abs(dev, x1[0], x1[1]);
+         PG_move_gr_abs_n(dev, x0);
+         PG_draw_to_abs_n(dev, x1);
 
 /* draw the head */
-         PG_move_gr_abs(dev, xw[0][0], xw[0][1]);
-         PG_draw_to_abs(dev, x1[0], x1[1]);
-         PG_draw_to_abs(dev, xw[1][0], xw[1][1]);};
+         PG_move_gr_abs_n(dev, xw[0]);
+         PG_draw_to_abs_n(dev, x1);
+         PG_draw_to_abs_n(dev, xw[1]);};
 
     return;}
 
