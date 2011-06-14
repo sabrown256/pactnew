@@ -34,10 +34,10 @@ main()
     PG_set_viewspace(SCR, 2, WORLDC, NULL);
 
 /* draw the first image */
-    PG_set_palette(SCR_dev, "spectrum");
+    PG_fset_palette(SCR_dev, "spectrum");
     PG_show_colormap(SCR_dev, FALSE);
 
-    PG_set_palette(SCR_dew, "bw");
+    PG_fset_palette(SCR_dew, "bw");
     PG_show_colormap(SCR_dew, TRUE);
 
     SC_pause();

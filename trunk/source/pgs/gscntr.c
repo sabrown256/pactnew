@@ -56,7 +56,7 @@ int _PG_get_fill_contour_color(PG_device *dev, int l, int n)
    {int nc, clr;
     PG_palette *pal;
 
-    pal = PG_get_palette(dev, NULL);
+    pal = PG_fget_palette(dev, NULL);
     nc  = pal->n_pal_colors - 2;
 
     clr = l*nc/n + 2;
@@ -411,7 +411,7 @@ PG_picture_desc *PG_setup_picture_contour(PG_device *dev, PG_graph *data,
 	CFREE(rdex);
 
 /* set up the drawing properties */
-	PG_set_palette(dev, "standard");
+	PG_fset_palette(dev, "standard");
 
 	PG_fset_line_color(dev, dev->WHITE, TRUE);
 	PG_fset_text_color(dev, dev->WHITE, TRUE);

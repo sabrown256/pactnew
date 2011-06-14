@@ -1289,8 +1289,8 @@ extern void
 
 extern PG_palette
  *PG_mk_palette(PG_device *dev, char *name, int nclr),
- *PG_get_palette(PG_device *dev, char *name),
- *PG_set_palette(PG_device *dev, char *name),
+ *PG_fget_palette(PG_device *dev, char *name),
+ *PG_fset_palette(PG_device *dev, char *name),
  *PG_make_palette(PG_device *tdev, char *name,
 		  int nclr, int wbck),
  *PG_make_ndim_palette(PG_device *tdev, char *name,
@@ -1558,8 +1558,8 @@ extern void
 		 int mshp, int cmsh, int smsh, double wmsh),
  PG_finish_picture(PG_device *dev, PG_graph *data, PG_picture_desc *pd),
  PG_draw_graph(PG_device *dev, PG_graph *data),
- PG_set_picture_hook(void (*f)(PG_device *dev, PG_graph *data,
-			       PG_picture_desc *pd));
+ PG_fset_picture_hook(void (*f)(PG_device *dev, PG_graph *data,
+				PG_picture_desc *pd));
 
 extern PG_picture_desc
  *PG_setup_picture(PG_device *dev, PG_graph *data, int save,
@@ -1839,15 +1839,15 @@ extern void
  PG_frame_box(PG_device *dev, int nd, PG_coord_sys cs, double *box),
  PG_frame_viewport(PG_device *dev, int nd, double *ndc),
  PG_viewport_frame(PG_device *dev, int nd, double *ndc),
- PG_get_axis_log_scale(PG_device *dev, int nd, int *iflg),
- PG_set_axis_log_scale(PG_device *dev, int nd, int *iflg),
+ PG_fget_axis_log_scale(PG_device *dev, int nd, int *iflg),
+ PG_fset_axis_log_scale(PG_device *dev, int nd, int *iflg),
  PG_init_viewspace(PG_device *dev, int setw),
  PG_set_viewspace(PG_device *dev, int nd, PG_coord_sys cs, double *extr),
  PG_get_viewspace(PG_device *dev, PG_coord_sys cs, double *box),
- PG_set_view_angle(PG_device *dev, double theta, double phi, double chi),
- PG_get_view_angle(PG_device *dev, int cnv, double *pt, double *pp, double *pc),
- PG_set_light_angle(PG_device *dev, double theta, double phi),
- PG_get_light_angle(PG_device *dev, int cnv, double *pt, double *pp),
+ PG_fset_view_angle(PG_device *dev, double theta, double phi, double chi),
+ PG_fget_view_angle(PG_device *dev, int cnv, double *pt, double *pp, double *pc),
+ PG_fset_light_angle(PG_device *dev, double theta, double phi),
+ PG_fget_light_angle(PG_device *dev, int cnv, double *pt, double *pp),
  PG_scale_points(PG_device *dev, int n, int nd, PG_coord_sys ics, double **xi,
 		 PG_coord_sys ocs, double **xo),
  PG_trans_points(PG_device *dev, int n, int nd, PG_coord_sys ics, double **xi,

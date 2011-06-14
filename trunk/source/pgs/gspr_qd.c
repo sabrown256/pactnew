@@ -720,7 +720,7 @@ void _PG_qd_put_image(PG_device *dev, unsigned char *bf,
             {dcs[l].value = l;
              dcs[l].rgb   = true_cm[i];};
 
-        stdpal  = PG_set_palette(dev, "standard");
+        stdpal  = PG_fset_palette(dev, "standard");
         true_cm = stdpal->true_colormap;
         for (i = 0; i < 16; i++)
             {dcs[i].value = i;
@@ -869,7 +869,7 @@ void _PG_qd_put_image(PG_device *dev, unsigned char *bf,
             {dcs[l].value = l;
              dcs[l].rgb   = true_cm[i];};
 
-        stdpal  = PG_set_palette(dev, "standard");
+        stdpal  = PG_fset_palette(dev, "standard");
         true_cm = stdpal->true_colormap;
         for (i = 0; i < 16; i++)
             {dcs[i].value = i;

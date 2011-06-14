@@ -270,17 +270,17 @@ int PG_write_n(PG_device *dev, int nd, PG_coord_sys cs, double *x, char *fmt, ..
 
 	if ((s != NULL) && (*s != '\0'))
 	   {if (cs != WORLDC)
-	       {PG_get_axis_log_scale(dev, nd, oflg);
+	       {PG_fget_axis_log_scale(dev, nd, oflg);
 		for (id = 0; id < nd; id++)
 		    nflg[id] = FALSE;
-		PG_set_axis_log_scale(dev, nd, nflg);};
+		PG_fset_axis_log_scale(dev, nd, nflg);};
 
 	    PG_trans_point(dev, nd, cs, x, WORLDC, y);
 	    PG_move_tx_abs_n(dev, y);
 	    PG_write_text(dev, stdscr, s);
 
 	    if (cs != WORLDC)
-	       PG_set_axis_log_scale(dev, nd, oflg);
+	       PG_fset_axis_log_scale(dev, nd, oflg);
 
 #if DEBUG_TEXT
 	    {double wc[PG_BOXSZ], dx[PG_SPACEDM];

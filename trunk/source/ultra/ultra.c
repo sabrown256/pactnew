@@ -1050,7 +1050,7 @@ void UL_set_graphics_state(PG_device *d)
 			 "marker-scale",   &mrks,
 			 NULL);
 
-	PG_set_axis_log_scale(d, 2, SX_log_scale);
+	PG_fset_axis_log_scale(d, 2, SX_log_scale);
 	PG_fset_font(d, axstf, SX_plot_type_style, SX_plot_type_size);
 	PG_fset_marker_scale(d, mrks);
 	PG_fset_marker_orientation(d, SX_marker_orientation);

@@ -110,24 +110,24 @@ int main(int argc, char **argv)
     PG_set_viewspace(SCR_dev, 2, NORMC, NULL);
     PG_set_viewspace(SCR_dev, 2, WORLDC, NULL);
 
-    PG_set_palette(SCR_dev, "spectrum");
+    PG_fset_palette(SCR_dev, "spectrum");
 
 /* draw the first image */
     PG_draw_image(SCR_dev, calc_im, "Test Data A", NULL);
 
 #ifndef SLOW
-    PG_set_palette(PS_mdev, palettes[palette]);
+    PG_fset_palette(PS_mdev, palettes[palette]);
     PG_draw_image(PS_mdev, calc_im, "Test Data HC", NULL);
 
-    PG_set_palette(PS_cdev, palettes[palette]);
+    PG_fset_palette(PS_cdev, palettes[palette]);
     PG_draw_image(PS_cdev, calc_im, "Test Data HC", NULL);
 
     PG_white_background(CGM_mdev, TRUE);
-    PG_set_palette(CGM_mdev, palettes[palette]);
+    PG_fset_palette(CGM_mdev, palettes[palette]);
     PG_draw_image(CGM_mdev, calc_im, "Test Data HC", NULL);
 
     PG_white_background(CGM_cdev, TRUE);
-    PG_set_palette(CGM_cdev, palettes[palette]);
+    PG_fset_palette(CGM_cdev, palettes[palette]);
     PG_draw_image(CGM_cdev, calc_im, "Test Data HC", NULL);
 #endif
 
@@ -152,7 +152,7 @@ int main(int argc, char **argv)
     PG_set_viewspace(SCR_dew, 2, NORMC, NULL);
     PG_set_viewspace(SCR_dew, 2, WORLDC, NULL);
 
-    PG_set_palette(SCR_dew, "cym");
+    PG_fset_palette(SCR_dew, "cym");
     PG_clear_window(SCR_dew);
 
 /* draw the second image */

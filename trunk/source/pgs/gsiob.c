@@ -604,16 +604,16 @@ void PG_draw_interface_object(PG_interface_object *iob)
 	    if ((dev != NULL) && (iob->draw != NULL))
 	       {PG_make_device_current(dev);
 
-		PG_get_axis_log_scale(dev, 2, oflg);
+		PG_fget_axis_log_scale(dev, 2, oflg);
 
 		for (id = 0; id < 2; id++)
 		    nflg[id] = FALSE;
 
-		PG_set_axis_log_scale(dev, 2, nflg);
+		PG_fset_axis_log_scale(dev, 2, nflg);
 
 		(*iob->draw)(iob);
 
-		PG_set_axis_log_scale(dev, 2, oflg);};
+		PG_fset_axis_log_scale(dev, 2, oflg);};
 
 	    n = SC_array_get_n(iob->children);
 	    for (i = 0; i < n; i++)

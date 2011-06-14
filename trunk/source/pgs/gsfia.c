@@ -40,6 +40,51 @@ double FF_ID(pgsaxd, PGSAXD)(double *sd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PGGAXL - get log axis flags */
+
+FIXNUM FF_ID(pggaxl, PGGAXL)(FIXNUM *sdid, FIXNUM *snd, FIXNUM *aflg)
+   {int id, nd;
+    int ifl[PG_SPACEDM];
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+
+    nd = *snd;
+
+    PG_fget_axis_log_scale(dev, nd, ifl);
+
+    for (id = 0; id < nd; id++)
+        aflg[id] = ifl[id];
+
+    return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSAXL - set log axis flags */
+
+FIXNUM FF_ID(pgsaxl, PGSAXL)(FIXNUM *sdid, FIXNUM *snd, FIXNUM *aflg)
+   {int id, nd;
+    int ifl[PG_SPACEDM];
+    FIXNUM rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+
+    nd = *snd;
+
+    for (id = 0; id < nd; id++)
+        ifl[id] = aflg[id];
+
+    PG_fset_axis_log_scale(dev, nd, ifl);
+
+    rv = TRUE;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PGGBSZ - return the I/O buffer size */
 
 FIXNUM FF_ID(pggbsz, PGGBSZ)(void)
@@ -687,27 +732,6 @@ FIXNUM FF_ID(pgsaxa, PGSAXA)(FIXNUM *sdid, FIXNUM *sn,
     PG_fset_line_color(dev, lnclr, TRUE);
     PG_fset_line_style(dev, _PG_gattrs.axis_line_style);
     PG_fset_line_width(dev, _PG_gattrs.axis_line_width);
-
-    return(TRUE);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGGAXL - get log axis flags */
-
-FIXNUM FF_ID(pggaxl, PGGAXL)(FIXNUM *sdid, FIXNUM *snd, FIXNUM *aflg)
-   {int id, nd;
-    int ifl[PG_SPACEDM];
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-
-    nd = *snd;
-
-    PG_get_axis_log_scale(dev, nd, ifl);
-
-    for (id = 0; id < nd; id++)
-        aflg[id] = ifl[id];
 
     return(TRUE);}
 
@@ -1682,30 +1706,6 @@ FIXNUM FF_ID(pgsarn, PGSARN)(FIXNUM *sdid, FIXNUM *sr)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PGSAXL - set log axis flags */
-
-FIXNUM FF_ID(pgsaxl, PGSAXL)(FIXNUM *sdid, FIXNUM *snd, FIXNUM *aflg)
-   {int id, nd;
-    int ifl[PG_SPACEDM];
-    FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-
-    nd = *snd;
-
-    for (id = 0; id < nd; id++)
-        ifl[id] = aflg[id];
-
-    PG_set_axis_log_scale(dev, nd, ifl);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PGSELC - select a color from the n-dimensional palette */
 
 FIXNUM FF_ID(pgselc, PGSELC)(FIXNUM *sdid, FIXNUM *sn, double *av,
@@ -1752,7 +1752,7 @@ FIXNUM FF_ID(pgspal, PGSPAL)(FIXNUM *sdid, FIXNUM *sncn, char *pname)
     dev = SC_GET_POINTER(PG_device, *sdid);
     SC_FORTRAN_STR_C(lname, pname, *sncn);
 
-    rv = (PG_set_palette(dev, lname) != NULL);
+    rv = (PG_fset_palette(dev, lname) != NULL);
 
     return(rv);}
 
@@ -2052,7 +2052,7 @@ FIXNUM FF_ID(pgsva, PGSVA)(FIXNUM *sdid, double *st, double *sp, double *sc)
 
     dev = SC_GET_POINTER(PG_device, *sdid);
 
-    PG_set_view_angle(dev, *st, *sp, *sc);
+    PG_fset_view_angle(dev, *st, *sp, *sc);
 
     rv = TRUE;
 
@@ -2069,7 +2069,7 @@ FIXNUM FF_ID(pgsla, PGSLA)(FIXNUM *sdid, double *st, double *sp)
 
     dev = SC_GET_POINTER(PG_device, *sdid);
 
-    PG_set_light_angle(dev, *st, *sp);
+    PG_fset_light_angle(dev, *st, *sp);
 
     rv = TRUE;
 
@@ -2087,7 +2087,7 @@ FIXNUM FF_ID(pggva, PGGVA)(FIXNUM *sdid, FIXNUM *scnv,
 
     dev = SC_GET_POINTER(PG_device, *sdid);
 
-    PG_get_view_angle(dev, *scnv, st, sp, sc);
+    PG_fget_view_angle(dev, *scnv, st, sp, sc);
 
     rv = TRUE;
 
@@ -2104,7 +2104,7 @@ FIXNUM FF_ID(pggla, PGGLA)(FIXNUM *sdid, FIXNUM *scnv, double *st, double *sp)
 
     dev = SC_GET_POINTER(PG_device, *sdid);
 
-    PG_get_light_angle(dev, *scnv, st, sp);
+    PG_fget_light_angle(dev, *scnv, st, sp);
 
     rv = TRUE;
 

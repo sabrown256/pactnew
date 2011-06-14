@@ -133,7 +133,7 @@ static void _PG_draw_scatter(PG_device *dev, int nd, double **f,
 	     rd[id] = r[id] + i;
 	 PG_draw_markers_n(dev, 2, WORLDC, 1, rd, 1);};
 
-    PG_set_palette(dev, "standard");
+    PG_fset_palette(dev, "standard");
     PG_fset_line_color(dev, dev->WHITE, TRUE);
 
     PG_draw_box_n(dev, 3, WORLDC, bx);
@@ -175,7 +175,7 @@ static void PG_scatter_hand(PG_device *dev, PG_graph *g)
 		       NULL);
 
     if (pn != NULL)
-       PG_set_palette(dev, pn);
+       PG_fset_palette(dev, pn);
 
     if (pm != NULL)
        PG_fset_marker_scale(dev, *pm);

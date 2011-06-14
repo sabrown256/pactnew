@@ -132,10 +132,10 @@ int main(int argc, char **argv)
            break;
         phi = ATOF(token);
 
-	PG_set_view_angle(SCR_dev, theta, phi, 0.0);
-	PG_set_view_angle(SCR_dew, theta, phi, 0.0);
-	PG_set_view_angle(PS_dev, theta, phi, 0.0);
-	PG_set_view_angle(CGM_dev, theta, phi, 0.0);
+	PG_fset_view_angle(SCR_dev, theta, phi, 0.0);
+	PG_fset_view_angle(SCR_dew, theta, phi, 0.0);
+	PG_fset_view_angle(PS_dev, theta, phi, 0.0);
+	PG_fset_view_angle(CGM_dev, theta, phi, 0.0);
 
         PG_fset_line_color(SCR_dev, i, TRUE);
         PG_fset_line_color(SCR_dew, i, TRUE);

@@ -402,12 +402,12 @@ PG_picture_desc *PG_get_rendering_properties(PG_device *dev, PG_graph *data)
     pd->legend_label    = labl;
     pd->legend_curve_fl = FALSE;
     if (ppal != NULL)
-       {plo = PG_get_palette(dev, NULL);
-	PG_set_palette(dev, ppal);
-	pd->legend_palette = PG_get_palette(dev, NULL);
+       {plo = PG_fget_palette(dev, NULL);
+	PG_fset_palette(dev, ppal);
+	pd->legend_palette = PG_fget_palette(dev, NULL);
         PG_make_palette_current(dev, plo);}
     else
-       pd->legend_palette = PG_get_palette(dev, NULL);
+       pd->legend_palette = PG_fget_palette(dev, NULL);
 
     for (i = 0; i < 4; i++)
         {pd->view[i] = 0.0;
@@ -456,7 +456,7 @@ static void _PG_legend_palette(PG_device *dev,	PG_picture_desc *pd,
     else
        extr = (double *) data->f->range->extrema;
 
-    opl = PG_get_palette(dev, NULL);
+    opl = PG_fget_palette(dev, NULL);
 
     if (cpl != NULL)
        {PG_make_palette_current(dev, cpl);};
@@ -529,10 +529,10 @@ static void _PG_legend_contours(PG_device *dev, PG_picture_desc *pd,
 
     lpl    = pd->legend_place;
     datafl = PG_render_data_type(data);
-    opl    = PG_get_palette(dev, NULL);
+    opl    = PG_fget_palette(dev, NULL);
 
-    PG_set_palette(dev, "standard");
-    spl = PG_get_palette(dev, NULL);
+    PG_fset_palette(dev, "standard");
+    spl = PG_fget_palette(dev, NULL);
 
     PG_fset_text_color(dev, dev->WHITE, TRUE);
 
@@ -545,12 +545,12 @@ static void _PG_legend_contours(PG_device *dev, PG_picture_desc *pd,
 
 	_PG_get_place(ndc+2, lpl, ndc+2);
 
-	PG_get_axis_log_scale(dev, 2, oflg);
+	PG_fget_axis_log_scale(dev, 2, oflg);
 
 	for (id = 0; id < 2; id++)
 	    nflg[id] = FALSE;
 
-	PG_set_axis_log_scale(dev, 2, nflg);
+	PG_fset_axis_log_scale(dev, 2, nflg);
 
 	PG_get_text_ext_n(dev, 2, NORMC, "XX ", dxt);
 
@@ -659,7 +659,7 @@ static void _PG_legend_contours(PG_device *dev, PG_picture_desc *pd,
 		 PM_free_vectors(2, r);
 	         break;};
              
-	PG_set_axis_log_scale(dev, 2, oflg);};
+	PG_fset_axis_log_scale(dev, 2, oflg);};
 
     PG_make_palette_current(dev, opl);
 
@@ -680,8 +680,8 @@ static void _PG_legend_label(PG_device *dev, PG_picture_desc *pd,
     if (dev == NULL)
        return;
 
-    opl = PG_get_palette(dev, NULL);
-    PG_set_palette(dev, "standard");
+    opl = PG_fget_palette(dev, NULL);
+    PG_fset_palette(dev, "standard");
 
     PG_fset_text_color(dev, dev->WHITE, TRUE);
 
@@ -716,13 +716,13 @@ static void _PG_picture_axes(PG_device *dev, PG_picture_desc *pd,
     if (dev == NULL)
        return;
 
-    opl = PG_get_palette(dev, NULL);
-    PG_set_palette(dev, "standard");
+    opl = PG_fget_palette(dev, NULL);
+    PG_fset_palette(dev, "standard");
 
     PG_set_axis_attributes(dev, AXIS_LINECOLOR, dev->line_color,
                                 AXIS_LABELCOLOR, dev->text_color, 0);
 
-    PG_set_view_angle(dev, pd->va[0], pd->va[1], pd->va[2]);
+    PG_fset_view_angle(dev, pd->va[0], pd->va[1], pd->va[2]);
 
     extr   = dev->range_extrema;
     axty   = pd->ax_type;
@@ -1302,10 +1302,10 @@ void PG_draw_graph(PG_device *dev, PG_graph *data)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_SET_PICTURE_HOOK - set the picture hook */
+/* PG_FSET_PICTURE_HOOK - set the picture hook */
 
-void PG_set_picture_hook(void (*f)(PG_device *dev, PG_graph *data,
-				   PG_picture_desc *pd))
+void PG_fset_picture_hook(void (*f)(PG_device *dev, PG_graph *data,
+				    PG_picture_desc *pd))
    {
 
     _PG.picture = f;

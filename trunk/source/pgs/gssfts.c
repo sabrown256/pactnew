@@ -167,7 +167,7 @@ int main(int argc, char **argv)
     PG_open_device(SCR_dev, 0.1, 0.1, 0.4, 0.4);
 
     if (pty == PLOT_SURFACE)
-       PG_set_palette(SCR_dev, palettes[palette]);
+       PG_fset_palette(SCR_dev, palettes[palette]);
 
     if (fast)
        {PS_cdev  = PG_make_device("PS", "COLOR", "gssfts-c");
@@ -181,10 +181,10 @@ int main(int argc, char **argv)
 	PG_open_device(CGM_mdev, 0.0, 0.0, 0.0, 0.0);
 
 	if (pty == PLOT_SURFACE)
-	   {PG_set_palette(PS_mdev, palettes[palette]);
-	    PG_set_palette(CGM_mdev, palettes[palette]);
-	    PG_set_palette(PS_cdev, palettes[palette]);
-	    PG_set_palette(CGM_cdev, palettes[palette]);};};
+	   {PG_fset_palette(PS_mdev, palettes[palette]);
+	    PG_fset_palette(CGM_mdev, palettes[palette]);
+	    PG_fset_palette(PS_cdev, palettes[palette]);
+	    PG_fset_palette(CGM_cdev, palettes[palette]);};};
 
     rx = px = CMAKE_N(double, n_pts);
     ry = py = CMAKE_N(double, n_pts);

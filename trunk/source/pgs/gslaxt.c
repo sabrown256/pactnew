@@ -110,7 +110,7 @@ static void show_dir(PG_device *dev, int k)
     for (id = 0; id < 2; id++)
         nflg[id] = FALSE;
 
-    PG_set_axis_log_scale(dev, 2, nflg);
+    PG_fset_axis_log_scale(dev, 2, nflg);
 
     PG_set_viewspace(dev, 2, WORLDC, NULL);
 
@@ -295,7 +295,7 @@ static void axis_core(PG_device *dev, int k, int l, FILE *fp,
 		  nflg[1] = lax;
 		  break;};
 
-	 PG_set_axis_log_scale(dev, 2, nflg);
+	 PG_fset_axis_log_scale(dev, 2, nflg);
 
 	 PG_set_viewspace(dev, 2, WORLDC, wc);
 

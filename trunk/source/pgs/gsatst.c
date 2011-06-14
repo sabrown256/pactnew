@@ -480,7 +480,7 @@ static int test_3(PG_device *dev)
        {PRINT(STDOUT, "CAN'T ALLOCATE IMAGE");
 	exit(1);};
 
-    pl = PG_set_palette(dev, PAL(1));
+    pl = PG_fset_palette(dev, PAL(1));
     SC_ASSERT(pl != NULL);
 
 /* compute the first image */
@@ -493,7 +493,7 @@ static int test_3(PG_device *dev)
 /* draw the first image */
     PG_draw_image(dev, calc_im, "Test Data A", NULL);
 
-    pl = PG_set_palette(dev, PAL(2));
+    pl = PG_fset_palette(dev, PAL(2));
     SC_ASSERT(pl != NULL);
 
 /* compute the second image */
@@ -827,7 +827,7 @@ static int test_7(PG_device *dev)
 		     "plot-labels", FALSE,
 		     NULL);
 
-    PG_set_palette(dev, PAL(3));
+    PG_fset_palette(dev, PAL(3));
     PG_poly_fill_plot(dev, data);
 
     PG_rl_graph(data, TRUE, TRUE);
@@ -901,7 +901,7 @@ static int test_8(PG_device *dev)
 		     NULL);
 
 /* draw the wire frames */
-    PG_set_palette(dev, "standard");
+    PG_fset_palette(dev, "standard");
 
     for (theta = 0.0; theta <= 90.0; theta += dtheta)
         for (phi = 0.0; phi <= 90.0; phi += dphi)
@@ -917,7 +917,7 @@ static int test_8(PG_device *dev)
 
 /* draw the surface frames */
     if (!single_frame)
-       {PG_set_palette(dev, PAL(4));
+       {PG_fset_palette(dev, PAL(4));
 
 	for (theta = 0.0; theta <= 90.0; theta += dtheta)
 	    for (phi = 0.0; phi <= 90.0; phi += dphi)
@@ -1081,7 +1081,7 @@ static int test_10(PG_device *dev)
     ndc[3] = 0.95;
     PG_set_viewspace(dev, 2, NORMC, ndc);
     PG_set_viewspace(dev, 2, WORLDC, NULL);
-    PG_set_palette(dev, "standard");
+    PG_fset_palette(dev, "standard");
 
 /* colors */
     PG_clear_screen(dev);

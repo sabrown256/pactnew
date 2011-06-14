@@ -1,5 +1,5 @@
 TXT: PGS User's Manual
-MOD: 06/13/2011
+MOD: 06/14/2011
 
 <CENTER>
 <P>
@@ -2346,7 +2346,7 @@ devices such as PS and CGM devices.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_get_axis_log_scale(PG_device *dev, int nd, int *iflg)
+<I>C Binding: </I>void PG_fget_axis_log_scale(PG_device *dev, int nd, int *iflg)
 <BR><I>Fortran Binding: </I>integer pggaxl(integer devid, int nd, integer ifld)
 <BR><I>SX Binding: </I>
 <P>
@@ -2440,7 +2440,7 @@ Set the values of the specified attributes in the PM_set s.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_set_axis_log_scale(PG_device *dev, int nd, int *iflg)
+<I>C Binding: </I>void PG_fset_axis_log_scale(PG_device *dev, int nd, int *iflg)
 <BR><I>Fortran Binding: </I>integer pgsaxl(integer devid, integer nd, integer iflg)
 <BR><I>SX Binding: </I>
 <P>
@@ -2532,7 +2532,7 @@ respectively.<p>
 
 <p>
 
-<I>C Binding: </I>PG_palette *PG_set_palette(PG_device *dev, char *name)
+<I>C Binding: </I>PG_palette *PG_fset_palette(PG_device *dev, char *name)
 <BR><I>Fortran Binding: </I>integer pgspal(integer devid, integer nc, char *name)
 <BR><I>SX Binding: </I>(pg-set-palette! dev name)
 <P>
@@ -2557,7 +2557,7 @@ This means a factor of 64 in size for raster images.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_set_viewspace_pos(PG_device *dev, double x, double y)
+<I>C Binding: </I>void PG_fset_viewspace_pos(PG_device *dev, double x, double y)
 <BR><I>Fortran Binding: </I>integer pgsvps(integer devid, REAL x, REAL y)
 <BR><I>SX Binding: </I>
 <P>
@@ -2754,7 +2754,7 @@ normalized (0.0 to 1.0).<p>
 
 <p>
 
-<I>C Binding: </I>PG_palette *PG_get_palette(PG_device *dev, char *name)
+<I>C Binding: </I>PG_palette *PG_fget_palette(PG_device *dev, char *name)
 <BR><I>Fortran Binding: </I>                         not applicable
 <BR><I>SX Binding: </I>(pg-palette-&gt;list dev name)
 <P>
@@ -2953,7 +2953,7 @@ and (y1, y2) respectively.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_set_view_angle(PG_device *dev, double theta, double phi, double chi)
+<I>C Binding: </I>void PG_fset_view_angle(PG_device *dev, double theta, double phi, double chi)
 <BR><I>Fortran Binding: </I>integer pgsva(integer devid, REAL theta, REAL phi, REAL chi)
 <BR><I>SX Binding: </I>(pg-set-view-angle! [dev] theta phi chi)
 <P>
@@ -2965,7 +2965,7 @@ The device is optional in the SX binding.  If absent the angles are stored as
 global state.
 <p>
 
-<I>C Binding: </I>void PG_get_view_angle(PG_device *dev, int cnv, double *theta, double *phi, double *chi)
+<I>C Binding: </I>void PG_fget_view_angle(PG_device *dev, int cnv, double *theta, double *phi, double *chi)
 <BR><I>Fortran Binding: </I>integer pggva(integer devid, integer cnv, REAL theta, REAL phi, REAL chi)
 <BR><I>SX Binding: </I>(pg-get-view-angle [dev] theta phi chi)
 <P>
@@ -2975,7 +2975,7 @@ about the new x axis; and finally chi about the new z axis.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_set_light_angle(PG_device *dev, double theta, double phi, double chi)
+<I>C Binding: </I>void PG_fset_light_angle(PG_device *dev, double theta, double phi, double chi)
 <BR><I>Fortran Binding: </I>integer pgsva(integer devid, REAL theta, REAL phi, REAL chi)
 <BR><I>SX Binding: </I>(pg-set-light-angle! [dev] theta phi chi)
 <P>
@@ -2985,7 +2985,7 @@ about the x axis.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_get_light_angle(PG_device *dev, int cnv, double *theta, double *phi, double *chi)
+<I>C Binding: </I>void PG_fget_light_angle(PG_device *dev, int cnv, double *theta, double *phi, double *chi)
 <BR><I>Fortran Binding: </I>integer pggva(integer devid, integer cnv, REAL theta, REAL phi, REAL chi)
 <BR><I>SX Binding: </I>(pg-get-light-angle [dev] theta phi chi)
 <P>
@@ -5507,7 +5507,7 @@ int main(int c, char **v)
 /* draw the first image */
 
     bf = calc_im->buffer;
-    pl = PG_set_palette(SCR_dev, "bw");
+    pl = PG_fset_palette(SCR_dev, "bw");
     sf = pl->n_pal_colors;
 
     for (l = 0; l < h; l++)
@@ -5517,7 +5517,7 @@ int main(int c, char **v)
 
     PG_draw_image(SCR_dev, calc_im, "Test Data A");
 
-    PG_set_palette(PS_dev, "bw");
+    PG_fset_palette(PS_dev, "bw");
     PG_draw_image(PS_dev, calc_im, "Test Data HC");
 
     SC_pause();
@@ -5527,7 +5527,7 @@ int main(int c, char **v)
     dx = 2.0*PI/((double) w);
     dy = 2.0*PI/((double) h);
     bf = calc_im->buffer;
-    pl = PG_set_palette(SCR_dew, "rainbow");
+    pl = PG_fset_palette(SCR_dew, "rainbow");
     sf = pl->n_pal_colors;
 
     for (l = 0; l < h; l++)
@@ -5626,7 +5626,7 @@ main(argc, argv)
     PG_open_device(SCR_dev, 0.1, 0.1, 0.4, 0.4);
 
     if (type == PLOT_SURFACE)
-       PG_set_palette(SCR_dev, "spectrum");
+       PG_fset_palette(SCR_dev, "spectrum");
 
     rx = px = CMAKE_N(double, n_pts);
     ry = py = CMAKE_N(double, n_pts);

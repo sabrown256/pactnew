@@ -571,7 +571,7 @@ PP_device_set_palette(PP_deviceObject *self,
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "s:set_palette", kw_list,
                                      &name))
         return NULL;
-    result = PG_set_palette(self->dev, name);
+    result = PG_fset_palette(self->dev, name);
     return PPpalette_from_ptr(result);
 /* DO-NOT-DELETE splicer.end(pgs.device.method.set_palette) */
 }

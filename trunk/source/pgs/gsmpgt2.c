@@ -110,7 +110,7 @@ int main(int c, char **v)
 				    kmax, lmax, centering,
 				    x, y, f, "xy", "f");
 
-	 PG_set_palette(dev, PAL(n));
+	 PG_fset_palette(dev, PAL(n));
 	 PG_poly_fill_plot(dev, data);}
 
     if (data != NULL)

@@ -1856,7 +1856,7 @@ static object *_SXI_spal(SS_psides *si, object *argl)
     if (!SX_OK_TO_DRAW(dev))
        o = SS_f;
     else
-       o = (PG_set_palette(dev, txt) == NULL) ? SS_f : SS_t;
+       o = (PG_fset_palette(dev, txt) == NULL) ? SS_f : SS_t;
 
     CFREE(txt);
 
@@ -2223,7 +2223,7 @@ static object *_SXI_setva(SS_psides *si, object *argl)
 	    0);
 
     if (dev != NULL)
-       PG_set_view_angle(dev, SX_theta, SX_phi, SX_chi);
+       PG_fset_view_angle(dev, SX_theta, SX_phi, SX_chi);
 
     return(argl);}
 
@@ -2248,7 +2248,7 @@ static object *_SXI_getva(SS_psides *si, object *argl)
        SS_error(si, "BAD DEVICE - _SXI_GETVA", SS_car(si, argl));
 
     else
-       {PG_get_view_angle(dev, TRUE, &theta, &phi, &chi);
+       {PG_fget_view_angle(dev, TRUE, &theta, &phi, &chi);
         rv = SS_make_list(si, SC_DOUBLE_I, &theta,
 			  SC_DOUBLE_I, &phi,
 			  SC_DOUBLE_I, &chi,
@@ -2278,7 +2278,7 @@ static object *_SXI_setla(SS_psides *si, object *argl)
        SS_error(si, "BAD DEVICE - _SXI_SETLA", SS_car(si, argl));
 
     else
-       PG_set_light_angle(dev, theta, phi);
+       PG_fset_light_angle(dev, theta, phi);
 
     return(SS_f);}
 
@@ -2303,7 +2303,7 @@ static object *_SXI_getla(SS_psides *si, object *argl)
        SS_error(si, "BAD DEVICE - _SXI_GETLA", SS_car(si, argl));
 
     else
-       {PG_get_light_angle(dev, TRUE, &theta, &phi);
+       {PG_fget_light_angle(dev, TRUE, &theta, &phi);
         rv = SS_make_list(si, SC_DOUBLE_I, &theta,
 			  SC_DOUBLE_I, &phi,
 			  0);};
@@ -2607,7 +2607,7 @@ static object *_SXI_wr_pal(SS_psides *si, object *argl)
             SC_STRING_I, &fname,
             0);
 
-    pal = PG_get_palette(dev, pname);
+    pal = PG_fget_palette(dev, pname);
 
     PG_wr_palette(dev, pal, fname);
 

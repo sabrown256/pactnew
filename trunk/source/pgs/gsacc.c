@@ -105,7 +105,7 @@ int PG_fset_clipping(PG_device *dev, int flag)
 
     if (dev != NULL)
        {if (dev->set_clipping != NULL)
-           (*dev->set_clipping)(dev, flag);};
+           dev->set_clipping(dev, flag);};
 
     return(rv);}
 
@@ -143,7 +143,7 @@ void PG_fset_char_path(PG_device *dev, double *x)
 
     if (dev != NULL)
        {if (dev->set_char_path != NULL)
-           (*dev->set_char_path)(dev, x[0], x[1]);}
+           dev->set_char_path(dev, x[0], x[1]);}
 
     return;}
 
@@ -183,7 +183,7 @@ void PG_fset_char_up(PG_device *dev, double *x)
 
     if (dev != NULL)
        {if (dev->set_char_up != NULL)
-           (*dev->set_char_up)(dev, x[0], x[1]);};
+           dev->set_char_up(dev, x[0], x[1]);};
 
     return;}
 
@@ -219,7 +219,7 @@ int PG_fset_char_precision(PG_device *dev, int p)
 
     if (dev != NULL)
        {if (dev->set_char_precision != NULL)
-           (*dev->set_char_precision)(dev, p);};
+           dev->set_char_precision(dev, p);};
 
     return(p);}
 
@@ -258,7 +258,7 @@ void PG_fset_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double *p)
 
     if (dev != NULL)
        {if (dev->set_char_size != NULL)
-           (*dev->set_char_size)(dev, nd, cs, p);};
+           dev->set_char_size(dev, nd, cs, p);};
 
     return;}
 
@@ -296,7 +296,7 @@ double PG_fset_char_space(PG_device *dev, double d)
 
     if (dev != NULL)
        {if (dev->set_char_space != NULL)
-           (*dev->set_char_space)(dev, d);};
+           dev->set_char_space(dev, d);};
 
     return(d);}
 
@@ -400,7 +400,7 @@ void PG_fset_font(PG_device *dev, char *face, char *style, int sz)
 
     if (dev != NULL)
        {if (dev->set_font != NULL)
-           (*dev->set_font)(dev, face, style, sz);};
+           dev->set_font(dev, face, style, sz);};
 
     return;}
 
@@ -475,7 +475,7 @@ PG_logical_operation PG_fset_logical_op(PG_device *dev,
    {PG_logical_operation rv;
 
     if ((dev != NULL) && (dev->set_logical_op != NULL))
-       (*dev->set_logical_op)(dev, lop);
+       dev->set_logical_op(dev, lop);
     else
        rv = GS_COPY;
 
@@ -514,7 +514,7 @@ int PG_fset_line_style(PG_device *dev, int st)
 
     if ((dev != NULL) && (dev->set_line_style != NULL))
        {rv = dev->line_style;
-	(*dev->set_line_style)(dev, st);}
+	dev->set_line_style(dev, st);}
     else
        rv = LINE_SOLID;
 
@@ -557,7 +557,7 @@ double PG_fset_line_width(PG_device *dev, double wd)
 
     if ((dev != NULL) && (dev->set_line_width != NULL))
        {owd = dev->line_width;
-	(*dev->set_line_width)(dev, wd);};
+	dev->set_line_width(dev, wd);};
 
     return(owd);}
 
@@ -1111,7 +1111,7 @@ int PG_fset_line_color(PG_device *dev, int clr, int mapped)
 
     if ((dev != NULL) && (dev->set_line_color != NULL))
        {rv = dev->line_color;
-	(*dev->set_line_color)(dev, clr, mapped);}
+	dev->set_line_color(dev, clr, mapped);}
     else
        PG_get_attrs_glb(TRUE, "line-color", &rv, NULL);
 
@@ -1145,7 +1145,7 @@ int PG_fset_text_color(PG_device *dev, int clr, int mapped)
 
     if ((dev != NULL) && (dev->set_text_color != NULL))
        {rv = dev->text_color;
-	(*dev->set_text_color)(dev, clr, mapped);}
+	dev->set_text_color(dev, clr, mapped);}
     else
        PG_get_attrs_glb(TRUE, "text-color", &rv, NULL);
 
@@ -1179,7 +1179,7 @@ int PG_fset_fill_color(PG_device *dev, int clr, int mapped)
 
     if ((dev != NULL) && (dev->set_fill_color != NULL))
        {rv = dev->fill_color;
-	(*dev->set_fill_color)(dev, clr, mapped);}
+	dev->set_fill_color(dev, clr, mapped);}
     else
        PG_get_attrs_glb(TRUE, "fill-color", &rv, NULL);
 
@@ -1337,7 +1337,7 @@ int PG_n_events_pending(PG_device *dev)
    {int rv;
 
     if (dev != NULL)
-       rv = (*(dev->events_pending))(dev);
+       rv = dev->events_pending(dev);
     else
        rv = 0;
 
@@ -1355,7 +1355,7 @@ void PG_handle_expose_event(PG_device *dev, PG_event *ev)
    {
 
     if ((dev != NULL) && (dev->expose_event_handler.fnc != NULL))
-       (*(dev->expose_event_handler.fnc))(dev, ev);
+       dev->expose_event_handler.fnc(dev, ev);
 
     return;}
 
@@ -1371,7 +1371,7 @@ void PG_handle_update_event(PG_device *dev, PG_event *ev)
    {
 
     if ((dev != NULL) && (dev->update_event_handler.fnc != NULL))
-       (*(dev->update_event_handler.fnc))(dev, ev);
+       dev->update_event_handler.fnc(dev, ev);
 
     return;}
 
@@ -1387,7 +1387,7 @@ void PG_handle_mouse_down_event(PG_device *dev, PG_event *ev)
    {
 
     if ((dev != NULL) && (dev->mouse_down_event_handler.fnc != NULL))
-       (*(dev->mouse_down_event_handler.fnc))(dev, ev);
+       dev->mouse_down_event_handler.fnc(dev, ev);
 
     return;}
 
@@ -1403,7 +1403,7 @@ void PG_handle_mouse_up_event(PG_device *dev, PG_event *ev)
    {
 
     if ((dev != NULL) && (dev->mouse_up_event_handler.fnc != NULL))
-       (*(dev->mouse_up_event_handler.fnc))(dev, ev);
+       dev->mouse_up_event_handler.fnc(dev, ev);
 
     return;}
 
@@ -1419,7 +1419,7 @@ void PG_handle_key_down_event(PG_device *dev, PG_event *ev)
    {
 
     if ((dev != NULL) && (dev->key_down_event_handler.fnc != NULL))
-       (*(dev->key_down_event_handler.fnc))(dev, ev);
+       dev->key_down_event_handler.fnc(dev, ev);
 
     return;}
 
@@ -1435,7 +1435,7 @@ void PG_handle_key_up_event(PG_device *dev, PG_event *ev)
    {
 
     if ((dev != NULL) && (dev->key_up_event_handler.fnc != NULL))
-       (*(dev->key_up_event_handler.fnc))(dev, ev);
+       dev->key_up_event_handler.fnc(dev, ev);
 
     return;}
 
@@ -1451,7 +1451,7 @@ void PG_handle_default_event(PG_device *dev, PG_event *ev)
    {
 
     if ((dev != NULL) && (dev->default_event_handler.fnc != NULL))
-       (*(dev->default_event_handler.fnc))(dev, ev);
+       dev->default_event_handler.fnc(dev, ev);
 
     return;}
 
@@ -1467,7 +1467,7 @@ void PG_query_pointer(PG_device *dev, int *ir, int *pb, int *pq)
    {
 
     if ((dev != NULL) && (dev->query_pointer != NULL))
-       (*dev->query_pointer)(dev, ir, pb, pq);
+       dev->query_pointer(dev, ir, pb, pq);
 
     return;}
 
@@ -1484,7 +1484,7 @@ void PG_mouse_event_info(PG_device *dev, PG_event *ev,
    {
 
     if ((dev != NULL) && (dev->mouse_event_info != NULL))
-       (*dev->mouse_event_info)(dev, ev, iev, peb, peq);
+       dev->mouse_event_info(dev, ev, iev, peb, peq);
 
     return;}
 
@@ -1501,7 +1501,7 @@ void PG_key_event_info(PG_device *dev, PG_event *ev, int *iev,
    {
 
     if ((dev != NULL) && (dev->key_event_info != NULL))
-       (*dev->key_event_info)(dev, ev, iev, bf, n, peq);
+       dev->key_event_info(dev, ev, iev, bf, n, peq);
 
     return;}
 
@@ -1522,7 +1522,7 @@ void PG_open_screen(PG_device *dev, double *ndc)
 	yf = ndc[1];
 	dxf = ndc[2] - xf;
 	dyf = ndc[3] - yf;
-	(*dev->open_screen)(dev, xf, yf, dxf, dyf);};
+	dev->open_screen(dev, xf, yf, dxf, dyf);};
 
     return;}
 
@@ -1539,7 +1539,7 @@ void PG_query_screen_n(PG_device *dev, int *dx, int *pnc)
    {int ldx, ldy;
 
     if ((dev != NULL) && (dev->query_screen != NULL))
-       {(*dev->query_screen)(dev, &ldx, &ldy, pnc);
+       {dev->query_screen(dev, &ldx, &ldy, pnc);
 	dx[0] = ldx;
 	dx[1] = ldy;};
 
@@ -1557,7 +1557,7 @@ void PG_make_device_current(PG_device *dev)
    {
 
     if ((dev != NULL) && (dev->make_device_current != NULL))
-       (*dev->make_device_current)(dev);
+       dev->make_device_current(dev);
 
     return;}
 
@@ -1574,7 +1574,7 @@ void PG_release_current_device(PG_device *dev)
    {
 
     if ((dev != NULL) && (dev->release_current_device != NULL))
-       (*dev->release_current_device)(dev);
+       dev->release_current_device(dev);
 
     return;}
 
@@ -1590,7 +1590,7 @@ void PG_update_vs(PG_device *dev)
    {
 
     if ((dev != NULL) && (dev->update_vs != NULL))
-       (*dev->update_vs)(dev);
+       dev->update_vs(dev);
 
     return;}
 
@@ -1607,7 +1607,7 @@ void PG_finish_plot(PG_device *dev)
    {
 
     if ((dev != NULL) && (dev->finish_plot != NULL))
-       (*dev->finish_plot)(dev);
+       dev->finish_plot(dev);
 
     return;}
 
@@ -1623,7 +1623,7 @@ void PG_expose_device(PG_device *dev)
    {
 
     if ((dev != NULL) && (dev->expose_device != NULL))
-       (*dev->expose_device)(dev);
+       dev->expose_device(dev);
 
     return;}
 
@@ -1639,7 +1639,7 @@ void PG_close_device(PG_device *dev)
    {
 
     if ((dev != NULL) && (dev->close_device != NULL))
-       (*dev->close_device)(dev);
+       dev->close_device(dev);
 
     return;}
 
@@ -1656,7 +1656,7 @@ void PG_close_console(void)
 
     if ((PG_console_device != NULL) &&
 	(PG_console_device->close_console != NULL))
-       (*PG_console_device->close_console)();
+       PG_console_device->close_console();
 
     return;}
 
@@ -1689,7 +1689,7 @@ void PG_clear_window(PG_device *dev)
 
     if ((dev != NULL) && (dev->clear_window != NULL))
        {PG_set_attrs_glb(TRUE, "label-position-y", HUGE, NULL);
-	(*dev->clear_window)(dev);};
+	dev->clear_window(dev);};
 
     return;}
 
@@ -1705,7 +1705,7 @@ void PG_clear_viewport(PG_device *dev)
    {
 
     if ((dev != NULL) && (dev->clear_viewport != NULL))
-       (*dev->clear_viewport)(dev);
+       dev->clear_viewport(dev);
 
     return;}
 
@@ -1722,7 +1722,7 @@ void PG_clear_region(PG_device *dev, int nd, PG_coord_sys cs,
    {
 
     if ((dev != NULL) && (dev->clear_region != NULL))
-       (*dev->clear_region)(dev, nd, cs, ndc, pad);
+       dev->clear_region(dev, nd, cs, ndc, pad);
 
     return;}
 
@@ -1738,7 +1738,7 @@ void PG_clear_page(PG_device *dev, int i)
    {
 
     if ((dev != NULL) && (dev->clear_page != NULL))
-       (*dev->clear_page)(dev, i);
+       dev->clear_page(dev, i);
 
     return;}
 
@@ -1753,7 +1753,7 @@ void PG_write_text(PG_device *dev, FILE *fp, char *s)
    {
 
     if ((dev != NULL) && (dev->write_text != NULL))
-       (*dev->write_text)(dev, fp, s);
+       dev->write_text(dev, fp, s);
 
     return;}
 
@@ -1769,7 +1769,7 @@ void PG_next_line(PG_device *dev, FILE *fp)
    {
 
     if ((dev != NULL) && (dev->next_line != NULL))
-       (*dev->next_line)(dev, fp);
+       dev->next_line(dev, fp);
 
     return;}
 
@@ -1785,7 +1785,7 @@ void PG_shade_poly_n(PG_device *dev, int nd, int n, double **r)
    {
 
     if ((dev != NULL) && (dev->shade_poly != NULL))
-       (*dev->shade_poly)(dev, nd, n, r);
+       dev->shade_poly(dev, nd, n, r);
 
     return;}
 
@@ -1801,7 +1801,7 @@ void PG_fill_curve(PG_device *dev, PG_curve *crv)
    {
 
     if ((dev != NULL) && (dev->fill_curve != NULL))
-       (*dev->fill_curve)(dev, crv);
+       dev->fill_curve(dev, crv);
 
     return;}
 
@@ -1817,7 +1817,7 @@ void PG_draw_curve(PG_device *dev, PG_curve *crv, int clip)
    {
 
     if ((dev != NULL) && (dev->draw_curve != NULL))
-       (*dev->draw_curve)(dev, crv, clip);
+       dev->draw_curve(dev, crv, clip);
 
     return;}
 
@@ -1855,7 +1855,7 @@ void PG_get_image_n(PG_device *dev, unsigned char *bf,
 	ix[1] = pc[2];
 	nx[0] = pc[1] - pc[0];
 	nx[1] = pc[3] - pc[2];
-	(*dev->get_image)(dev, bf, ix[0], ix[1], nx[0], nx[1]);};
+	dev->get_image(dev, bf, ix[0], ix[1], nx[0], nx[1]);};
 
     return;}
 
@@ -1877,7 +1877,7 @@ void PG_put_image_n(PG_device *dev, unsigned char *bf,
 	ix[1] = pc[2];
 	nx[0] = pc[1] - pc[0];
 	nx[1] = pc[3] - pc[2];
-	(*dev->put_image)(dev, bf, ix[0], ix[1], nx[0], nx[1]);};
+	dev->put_image(dev, bf, ix[0], ix[1], nx[0], nx[1]);};
 
     return;}
 
@@ -1893,7 +1893,7 @@ void PG_move_gr_abs_n(PG_device *dev, double *x)
    {
 
     if ((dev != NULL) && (dev->move_gr_abs != NULL))
-       (*dev->move_gr_abs)(dev, x[0], x[1]);
+       dev->move_gr_abs(dev, x[0], x[1]);
 
     return;}
 
@@ -1909,7 +1909,7 @@ void PG_move_tx_abs_n(PG_device *dev, double *x)
    {
 
     if ((dev != NULL) && (dev->move_tx_abs != NULL))
-       (*dev->move_tx_abs)(dev, x[0], x[1]);
+       dev->move_tx_abs(dev, x[0], x[1]);
 
     return;}
 
@@ -1925,7 +1925,7 @@ void PG_move_tx_rel_n(PG_device *dev, double *x)
    {
 
     if ((dev != NULL) && (dev->move_tx_rel != NULL))
-       (*dev->move_tx_rel)(dev, x[0], x[1]);
+       dev->move_tx_rel(dev, x[0], x[1]);
 
     return;}
 
@@ -1941,7 +1941,7 @@ void PG_draw_to_abs_n(PG_device *dev, double *x)
    {
 
     if ((dev != NULL) && (dev->draw_to_abs != NULL))
-       (*dev->draw_to_abs)(dev, x[0], x[1]);
+       dev->draw_to_abs(dev, x[0], x[1]);
 
     return;}
 
@@ -1957,7 +1957,7 @@ void PG_draw_to_rel_n(PG_device *dev, double *x)
    {
 
     if ((dev != NULL) && (dev->draw_to_rel != NULL))
-       (*dev->draw_to_rel)(dev, x[0], x[1]);
+       dev->draw_to_rel(dev, x[0], x[1]);
 
     return;}
 

@@ -110,10 +110,10 @@ int main(int argc, char **argv)
     data = PG_make_graph_r2_r1(id, "{x, y}->f", FALSE,
                      kmax, lmax, centering, x, y, f, "xy", "f");
 
-    PG_set_palette(SC_dev, palettes[palette]);
+    PG_fset_palette(SC_dev, palettes[palette]);
     PG_poly_fill_plot(SC_dev, data);
 
-    PG_set_palette(PS_dev, palettes[palette]);
+    PG_fset_palette(PS_dev, palettes[palette]);
     PG_poly_fill_plot(PS_dev, data);
     PG_finish_plot(PS_dev);
 

@@ -80,7 +80,7 @@ PG_picture_desc *PG_setup_picture_vector(PG_device *dev, PG_graph *data,
 	CFREE(ddex);
 	CFREE(rdex);
 
-	PG_set_palette(dev, "standard");
+	PG_fset_palette(dev, "standard");
 
 	PG_fset_line_color(dev, dev->WHITE, TRUE);
 	PG_fset_text_color(dev, dev->WHITE, TRUE);

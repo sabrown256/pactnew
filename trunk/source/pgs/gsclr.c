@@ -1583,11 +1583,13 @@ int PG_select_color(PG_device *dev, int n, double *a, double *extr)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_GET_PALETTE - return the palette of DEV specified by NAME
- *                - if NAME is NULL return current palette
+/* PG_FGET_PALETTE - return the palette of DEV specified by NAME
+ *                 - if NAME is NULL return current palette
+ *
+ * #bind PG_fget_palette fortran() scheme()
  */
 
-PG_palette *PG_get_palette(PG_device *dev, char *name)
+PG_palette *PG_fget_palette(PG_device *dev, char *name)
    {PG_palette *pal;
 
     if (name == NULL)
@@ -1609,12 +1611,14 @@ PG_palette *PG_get_palette(PG_device *dev, char *name)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_SET_PALETTE - set the color palette of the given device
- *                - return the named palette if successful
- *                - return NULL otherwise
+/* PG_FSET_PALETTE - set the color palette of the given device
+ *                 - return the named palette if successful
+ *                 - return NULL otherwise
+ *
+ * #bind PG_fset_palette fortran() scheme()
  */
 
-PG_palette *PG_set_palette(PG_device *dev, char *name)
+PG_palette *PG_fset_palette(PG_device *dev, char *name)
    {PG_palette *pal;
 
     pal = dev->palettes;

@@ -344,7 +344,7 @@ void PG_refresh_text_box(PG_text_box *b)
 	dc[1] = sin(ang);
 
 	pl = dev->current_palette;
-	PG_set_palette(dev, "standard");
+	PG_fset_palette(dev, "standard");
 
 	if (HARDCOPY_DEVICE(dev))
 	   PG_fset_fill_color(dev, b->background, FALSE);
