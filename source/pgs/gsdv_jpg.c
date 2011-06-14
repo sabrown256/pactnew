@@ -134,11 +134,12 @@ static void _PG_JP_finish_plot(PG_device *dev)
  
 static PG_device *_PG_JP_open(PG_device *dev,
 			      double xf, double yf, double dxf, double dyf)
-   {PG_RAST_device *mdv;
-    int Lightest, Light, Light_Gray, Dark_Gray, Dark, Darkest;
-    int display_width, display_height, n_colors;
+   {int Lightest, Light, Light_Gray, Dark_Gray, Dark, Darkest;
+    int n_colors;
+    int dx[PG_SPACEDM];
     char fname[MAXLINE];
     double intensity;
+    PG_RAST_device *mdv;
     PG_font_family *ff;
     PG_dev_geometry *g;
 
@@ -174,20 +175,20 @@ static PG_device *_PG_JP_open(PG_device *dev,
        {dxf = 1.0;
         dyf = 1.0;};
 
-    PG_query_screen(dev, &display_width, &display_height, &n_colors);
+    PG_query_screen_n(dev, dx, &n_colors);
 
 /* set device pixel coordinate limits */
-    g->cpc[0] = SHRT_MIN + display_width;
-    g->cpc[1] = SHRT_MAX - display_width;
-    g->cpc[2] = SHRT_MIN + display_height;
-    g->cpc[3] = SHRT_MAX - display_height;
+    g->cpc[0] = SHRT_MIN + dx[0];
+    g->cpc[1] = SHRT_MAX - dx[0];
+    g->cpc[2] = SHRT_MIN + dx[1];
+    g->cpc[3] = SHRT_MAX - dx[1];
     g->cpc[4] = SHRT_MIN;
     g->cpc[5] = SHRT_MAX;
 
     g->hwin[0] = 0.0;
-    g->hwin[1] = display_width;
+    g->hwin[1] = dx[0];
     g->hwin[2] = 0.0;
-    g->hwin[3] = display_width;
+    g->hwin[3] = dx[0];
 
     SET_PC_FROM_HWIN(g);
 

@@ -29,9 +29,9 @@ int64_t PG_fget_buffer_size(void)
 /*--------------------------------------------------------------------------*/
 
 /* PG_FSET_BUFFER_SIZE - set the default I/O buffer size to SZ
- *                    - return the old value
- *                    - -1 turns off default buffering optimization
- *                    - which happens on file open
+ *                     - return the old value
+ *                     - -1 turns off default buffering optimization
+ *                     - which happens on file open
  *
  * #bind PG_fset_buffer_size fortran() scheme()
  */
@@ -1186,93 +1186,595 @@ int PG_fset_fill_color(PG_device *dev, int clr, int mapped)
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_WHITE_BACKGROUND - set the device background color white flag
+ *                     - return the old value
+ *
+ * #bind PG_white_background fortran() scheme()
+ */
+
+int PG_white_background(PG_device *dev, int t)
+   {int rv;
+
+    if (dev != NULL)
+       {rv = dev->background_color_white;
+	dev->background_color_white = t;}
+    else
+       rv = TRUE;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_TURN_GRID - set the device grid flag
+ *              - return the old value
+ *
+ * #bind PG_turn_grid fortran() scheme()
+ */
+
+int PG_turn_grid(PG_device *dev, int t)
+   {int rv;
+
+    if (dev != NULL)
+       {rv = dev->grid;
+	dev->grid = t;}
+    else
+       rv = FALSE;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_TURN_DATA_ID - set the device data_id flag
+ *                 - return the old value
+ *
+ * #bind PG_turn_data_id fortran() scheme()
+ */
+
+int PG_turn_data_id(PG_device *dev, int t)
+   {int rv;
+
+    if (dev != NULL)
+       {rv = dev->data_id;
+	dev->data_id = t;}
+    else
+       rv = 0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_TURN_SCATTER - set the device scatter flag
+ *                 - return the old value
+ *
+ * #bind PG_turn_scatter fortran() scheme()
+ */
+
+int PG_turn_scatter(PG_device *dev, int t)
+   {int rv;
+
+    if (dev != NULL)
+       {rv = dev->scatter;
+	dev->scatter = t;}
+    else
+       rv = 0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_TURN_AUTODOMAIN - set the device autodomain flag
+ *                    - return the old value
+ *
+ * #bind PG_turn_autodomain fortran() scheme()
+ */
+
+int PG_turn_autodomain(PG_device *dev, int t)
+   {int rv;
+
+    if (dev != NULL)
+       {rv = dev->autodomain;
+	dev->autodomain = t;}
+    else
+       rv = TRUE;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_TURN_AUTORANGE - set the device autorange flag
+ *                   - return the old value
+ *
+ * #bind PG_turn_autorange fortran() scheme()
+ */
+
+int PG_turn_autorange(PG_device *dev, int t)
+   {int rv;
+
+    if (dev != NULL)
+       {rv = dev->autorange;
+	dev->autorange = t;}
+    else
+       rv = TRUE;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_TURN_AUTOPLOT - set the device autoplot flag
+ *                  - return the old value
+ *
+ * #bind PG_turn_autoplot fortran() scheme()
+ */
+
+int PG_turn_autoplot(PG_device *dev, int t)
+   {int rv;
+
+    if (dev != NULL)
+       {rv = dev->autoplot;
+	dev->autoplot = t;}
+    else
+       rv = 0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_N_EVENTS_PENDING - return the number of events pending on device
+ *
+ * #bind PG_n_events_pending fortran() scheme()
+ */
+
+int PG_n_events_pending(PG_device *dev)
+   {int rv;
+
+    if (dev != NULL)
+       rv = (*(dev->events_pending))(dev);
+    else
+       rv = 0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_HANDLE_EXPOSE_EVENT - handle an expose event
+ *
+ * #bind PG_handle_expose_event fortran() scheme()
+ */
+
+void PG_handle_expose_event(PG_device *dev, PG_event *ev)
+   {
+
+    if ((dev != NULL) && (dev->expose_event_handler.fnc != NULL))
+       (*(dev->expose_event_handler.fnc))(dev, ev);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_HANDLE_UPDATE_EVENT - handle an update event
+ *
+ * #bind PG_handle_update_event fortran() scheme()
+ */
+
+void PG_handle_update_event(PG_device *dev, PG_event *ev)
+   {
+
+    if ((dev != NULL) && (dev->update_event_handler.fnc != NULL))
+       (*(dev->update_event_handler.fnc))(dev, ev);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_HANDLE_MOUSE_DOWN_EVENT - handle an mouse_down event
+ *
+ * #bind PG_handle_mouse_down_event fortran() scheme()
+ */
+
+void PG_handle_mouse_down_event(PG_device *dev, PG_event *ev)
+   {
+
+    if ((dev != NULL) && (dev->mouse_down_event_handler.fnc != NULL))
+       (*(dev->mouse_down_event_handler.fnc))(dev, ev);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_HANDLE_MOUSE_UP_EVENT - handle an mouse_up event
+ *
+ * #bind PG_handle_mouse_up_event fortran() scheme()
+ */
+
+void PG_handle_mouse_up_event(PG_device *dev, PG_event *ev)
+   {
+
+    if ((dev != NULL) && (dev->mouse_up_event_handler.fnc != NULL))
+       (*(dev->mouse_up_event_handler.fnc))(dev, ev);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_HANDLE_KEY_DOWN_EVENT - handle an key_down event
+ *
+ * #bind PG_handle_key_down_event fortran() scheme()
+ */
+
+void PG_handle_key_down_event(PG_device *dev, PG_event *ev)
+   {
+
+    if ((dev != NULL) && (dev->key_down_event_handler.fnc != NULL))
+       (*(dev->key_down_event_handler.fnc))(dev, ev);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_HANDLE_KEY_UP_EVENT - handle an key_up event
+ *
+ * #bind PG_handle_key_up_event fortran() scheme()
+ */
+
+void PG_handle_key_up_event(PG_device *dev, PG_event *ev)
+   {
+
+    if ((dev != NULL) && (dev->key_up_event_handler.fnc != NULL))
+       (*(dev->key_up_event_handler.fnc))(dev, ev);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_HANDLE_DEFAULT_EVENT - handle an default event
+ *
+ * #bind PG_handle_default_event fortran() scheme()
+ */
+
+void PG_handle_default_event(PG_device *dev, PG_event *ev)
+   {
+
+    if ((dev != NULL) && (dev->default_event_handler.fnc != NULL))
+       (*(dev->default_event_handler.fnc))(dev, ev);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_QUERY_POINTER - report the pointer state
+ *
+ * #bind PG_query_pointer fortran() scheme()
+ */
+
+void PG_query_pointer(PG_device *dev, int *ir, int *pb, int *pq)
+   {
+
+    if ((dev != NULL) && (dev->query_pointer != NULL))
+       (*dev->query_pointer)(dev, ir, pb, pq);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_MOUSE_EVENT_INFO - return info on mouse events
+ *
+ * #bind PG_mouse_event_info fortran() scheme()
+ */
+
+void PG_mouse_event_info(PG_device *dev, PG_event *ev,
+			 int *iev, PG_mouse_button *peb, int *peq)
+   {
+
+    if ((dev != NULL) && (dev->mouse_event_info != NULL))
+       (*dev->mouse_event_info)(dev, ev, iev, peb, peq);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_KEY_EVENT_INFO - return info on key events
+ *
+ * #bind PG_key_event_info fortran() scheme()
+ */
+
+void PG_key_event_info(PG_device *dev, PG_event *ev, int *iev,
+		       char *bf, int n, int *peq)
+   {
+
+    if ((dev != NULL) && (dev->key_event_info != NULL))
+       (*dev->key_event_info)(dev, ev, iev, bf, n, peq);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_OPEN_SCREEN - open the device DEV at the NDC box
+ *                - of the physical device
+ *
+ * #bind PG_open_screen fortran() scheme()
+ */
+
+void PG_open_screen(PG_device *dev, double *ndc)
+   {double xf, yf, dxf, dyf;
+
+    if ((dev != NULL) && (dev->open_screen != NULL))
+       {xf = ndc[0];
+	yf = ndc[1];
+	dxf = ndc[2] - xf;
+	dyf = ndc[3] - yf;
+	(*dev->open_screen)(dev, xf, yf, dxf, dyf);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_QUERY_SCREEN_N - query the device DEV
+ *                   - return size and number of colors
+ *
+ * #bind PG_query_screen_n fortran() scheme()
+ */
+
+void PG_query_screen_n(PG_device *dev, int *dx, int *pnc)
+   {int ldx, ldy;
+
+    if ((dev != NULL) && (dev->query_screen != NULL))
+       {(*dev->query_screen)(dev, &ldx, &ldy, pnc);
+	dx[0] = ldx;
+	dx[1] = ldy;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_MAKE_DEVICE_CURRENT - make the device DEV the current one for drawing
+ *
+ * #bind PG_make_device_current fortran() scheme()
+ */
+
+void PG_make_device_current(PG_device *dev)
+   {
+
+    if ((dev != NULL) && (dev->make_device_current != NULL))
+       (*dev->make_device_current)(dev);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_RELEASE_DEVICE_CURRENT - make the device DEV NOT
+ *                           - the current one for drawing
+ *
+ * #bind PG_release_device_current fortran() scheme()
+ */
+
+void PG_release_current_device(PG_device *dev)
+   {
+
+    if ((dev != NULL) && (dev->release_current_device != NULL))
+       (*dev->release_current_device)(dev);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_UPDATE_VS - update the view surface of the device DEV
+ *
+ * #bind PG_update_vs fortran() scheme()
+ */
+
+void PG_update_vs(PG_device *dev)
+   {
+
+    if ((dev != NULL) && (dev->update_vs != NULL))
+       (*dev->update_vs)(dev);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_FINISH_PLOT - declare the picture in the view surface of the device DEV
+ *                - finished
+ *
+ * #bind PG_finish_plot fortran() scheme()
+ */
+
+void PG_finish_plot(PG_device *dev)
+   {
+
+    if ((dev != NULL) && (dev->finish_plot != NULL))
+       (*dev->finish_plot)(dev);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_EXPOSE_DEVICE - bring the device DEV to the top
+ *
+ * #bind PG_expose_device fortran() scheme()
+ */
+
+void PG_expose_device(PG_device *dev)
+   {
+
+    if ((dev != NULL) && (dev->expose_device != NULL))
+       (*dev->expose_device)(dev);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_CLOSE_DEVICE - close the device DEV
+ *
+ * #bind PG_close_device fortran() scheme()
+ */
+
+void PG_close_device(PG_device *dev)
+   {
+
+    if ((dev != NULL) && (dev->close_device != NULL))
+       (*dev->close_device)(dev);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_CLOSE_CONSOLE - close the console device
+ *
+ * #bind PG_close_console fortran() scheme()
+ */
+
+void PG_close_console(void)
+   {
+
+    if ((PG_console_device != NULL) &&
+	(PG_console_device->close_console != NULL))
+       (*PG_console_device->close_console)();
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
 
 #if 0
 
 /*--------------------------------------------------------------------------*/
 
-#define PG_white_background(dev, t)
-   {if (dev != NULL)
-       dev->background_color_white = (t);}
+/* PG_CLEAR_FRAME - clear the current frame
+ *
+ * #bind PG_clear_frame fortran() scheme()
+ */
 
-#define PG_turn_grid(dev, t)
-   {if (dev != NULL)
-       dev->grid = (t);}
+void PG_clear_frame(PG_device *dev)
+   {
 
-#define PG_turn_data_id(dev, t)
-   {if (dev != NULL)
-       dev->data_id = (t);}
+    if (dev != NULL)
+       PG_clear_region(dev, 2, NORMC, dev->g.fr, 0);
 
-#define PG_turn_scatter(dev, t)
-   {if (dev != NULL)
-       dev->scatter = (t);}
+    return;}
 
-#define PG_turn_autodomain(dev, t)
-   {if (dev != NULL)
-       dev->autodomain = (t);}
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
-#define PG_turn_autorange(dev, t)
-   {if (dev != NULL)
-       dev->autorange = (t);}
+/* PG_CLEAR_WINDOW - clear the current window
+ *
+ * #bind PG_clear_window fortran() scheme()
+ */
 
-#define PG_turn_autoplot(dev, t)
-   {if (dev != NULL)
-       dev->autoplot = (t);}
+void PG_clear_window(PG_device *dev)
+   {
+
+    if ((dev != NULL) && (dev->clear_window != NULL))
+       {PG_set_attrs_glb(TRUE, "label-position-y", HUGE, NULL);
+	(*dev->clear_window)(dev);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_CLEAR_VIEWPORT - clear the current viewport
+ *
+ * #bind PG_clear_viewport fortran() scheme()
+ */
+
+void PG_clear_viewport(PG_device *dev)
+   {
+
+    if ((dev != NULL) && (dev->clear_viewport != NULL))
+       (*dev->clear_viewport)(dev);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_CLEAR_REGION - clear the region specified by NDC
+ *
+ * #bind PG_clear_region fortran() scheme()
+ */
+
+void PG_clear_region(PG_device *dev, int nd, PG_coord_sys cs,
+		     double *ndc, int pad)
+   {
+
+    if ((dev != NULL) && (dev->clear_region != NULL))
+       (*dev->clear_region)(dev, nd, cs, bx, pad);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_CLEAR_PAGE - clear the current page
+ *
+ * #bind PG_clear_page fortran() scheme()
+ */
+
+void PG_clear_page(PG_device *dev, int i)
+   {
+
+    if ((dev != NULL) && (dev->clear_page != NULL))
+       (*dev->clear_page)(dev, i);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 
-#define PG_clear_frame(dev)
-   {if (dev != NULL)
-       PG_clear_region(dev, 2, NORMC, dev->g.fr, 0);}
+void PG_move_gr_abs(PG_device *dev, x, y)
+    if (dev != NULL)
+       {if (dev->move_gr_abs != NULL)
+           (*dev->move_gr_abs)(dev, x, y);}
 
-#define PG_n_events_pending(dev)
-    ((dev != NULL) ? (*(dev->events_pending)) : 0)
+void PG_move_tx_abs(PG_device *dev, x, y)
+    if (dev != NULL)
+       {if (dev->move_tx_abs != NULL)
+           (*dev->move_tx_abs)(dev, x, y);}
 
-/*--------------------------------------------------------------------------*/
+void PG_move_tx_rel(PG_device *dev, x, y)
+    if (dev != NULL)
+       {if (dev->move_tx_rel != NULL)
+           (*dev->move_tx_rel)(dev, x, y);}
 
-#define PG_handle_expose_event(dev, ev)
-    {if (dev != NULL)
-        (*(dev->expose_event_handler.fnc))(dev, &ev);}
+void PG_draw_to_abs(PG_device *dev, x, y)
+    if (dev != NULL)
+       {if (dev->draw_to_abs != NULL)
+           (*dev->draw_to_abs)(dev, x, y);}
 
-#define PG_handle_update_event(dev, ev)
-    {if (dev != NULL)
-        (*(dev->update_event_handler.fnc))(dev, &ev);}
-
-#define PG_handle_mouse_down_event(dev, ev)
-    {if (dev != NULL)
-        (*(dev->mouse_down_event_handler.fnc))(dev, &ev);}
-
-#define PG_handle_mouse_up_event(dev, ev)
-    {if (dev != NULL)
-        (*(dev->mouse_up_event_handler.fnc))(dev, &ev);}
-
-#define PG_handle_key_down_event(dev, ev)
-    {if (dev != NULL)
-        (*(dev->key_down_event_handler.fnc))(dev, &ev);}
-
-#define PG_handle_key_up_event(dev, ev)
-    {if (dev != NULL)
-        (*(dev->key_up_event_handler.fnc))(dev, &ev);}
-
-#define PG_handle_default_event(dev, ev)
-    {if (dev != NULL)
-        (*(dev->default_event_handler.fnc))(dev, &ev);}
-
-#define PG_query_pointer(dev, ir, pb, pq)
-    if (dev->query_pointer != NULL)
-       (*dev->query_pointer)(dev, ir, pb, pq)
-
-#define PG_mouse_event_info(dev, ev, iev, eb, eq)
-    if (dev->mouse_event_info != NULL)
-       (*dev->mouse_event_info)(dev, ev, iev, eb, eq)
-
-#define PG_key_event_info(dev, ev, iev, bf, n, eq)
-    if (dev->key_event_info != NULL)
-       (*dev->key_event_info)(dev, ev, iev, bf, n, eq)
+void PG_draw_to_rel(PG_device *dev, x, y)
+    if (dev != NULL)
+       {if (dev->draw_to_rel != NULL)
+           (*dev->draw_to_rel)(dev, x, y);}
 
 /*--------------------------------------------------------------------------*/
 
-#define PG_shade_poly(dev, x, y, n)
+void PG_shade_poly(PG_device *dev, x, y, n)
     if (dev != NULL)
        {if (dev->shade_poly != NULL)
            {double *_r[2];
@@ -1280,51 +1782,24 @@ int PG_fset_fill_color(PG_device *dev, int clr, int mapped)
 	    _r[1] = y;
 	    (*dev->shade_poly)(dev, 2, n, _r);};}
 
-#define PG_shade_poly_n(dev, nd, n, r)
+void PG_shade_poly_n(PG_device *dev, nd, n, r)
     if (dev != NULL)
        {if (dev->shade_poly != NULL)
            (*dev->shade_poly)(dev, nd, n, r);}
 
-#define PG_fill_curve(dev, c)
+void PG_fill_curve(PG_device *dev, c)
     if (dev != NULL)
        {if (dev->fill_curve != NULL)
            (*dev->fill_curve)(dev, c);}
 
 /*--------------------------------------------------------------------------*/
 
-#define PG_move_gr_abs(dev, x, y)
-    if (dev != NULL)
-       {if (dev->move_gr_abs != NULL)
-           (*dev->move_gr_abs)(dev, x, y);}
-
-#define PG_move_tx_abs(dev, x, y)
-    if (dev != NULL)
-       {if (dev->move_tx_abs != NULL)
-           (*dev->move_tx_abs)(dev, x, y);}
-
-#define PG_move_tx_rel(dev, x, y)
-    if (dev != NULL)
-       {if (dev->move_tx_rel != NULL)
-           (*dev->move_tx_rel)(dev, x, y);}
-
-#define PG_draw_to_abs(dev, x, y)
-    if (dev != NULL)
-       {if (dev->draw_to_abs != NULL)
-           (*dev->draw_to_abs)(dev, x, y);}
-
-#define PG_draw_to_rel(dev, x, y)
-    if (dev != NULL)
-       {if (dev->draw_to_rel != NULL)
-           (*dev->draw_to_rel)(dev, x, y);}
-
-/*--------------------------------------------------------------------------*/
-
-#define PG_draw_curve(dev, c, clip)
+void PG_draw_curve(PG_device *dev, c, clip)
     if (dev != NULL)
        {if (dev->draw_curve != NULL)
            (*dev->draw_curve)(dev, c, clip);}
 
-#define PG_draw_disjoint_polyline_2(dev, x, y, n, flag, coord)
+void PG_draw_disjoint_polyline_2(PG_device *dev, x, y, n, flag, coord)
     if (dev != NULL)
        {if (dev->draw_dj_polyln_2 != NULL)
            {double *_r[2];
@@ -1334,97 +1809,29 @@ int PG_fset_fill_color(PG_device *dev, int clr, int mapped)
 
 /*--------------------------------------------------------------------------*/
 
-#define PG_clear_window(dev)
-    if (dev != NULL)
-       {if (dev->clear_window != NULL)
-	   {PG_set_attrs_glb(TRUE, "label-position-y", HUGE, NULL);
-	    (*dev->clear_window)d;};}
-
-#define PG_clear_viewport(dev)
-    if (dev != NULL)
-       {if (dev->clear_viewport != NULL)
-           (*dev->clear_viewport)d;}
-
-#define PG_clear_region(dev, nd, cs, bx, pad)
-    if (dev != NULL)
-       {if (dev->clear_region != NULL)
-	   (*dev->clear_region)(dev, nd, cs, bx, pad);}
-
-/*--------------------------------------------------------------------------*/
-
-#define PG_update_vs(dev)
-    if (dev != NULL)
-       {if (dev->update_vs != NULL)
-           (*dev->update_vs)(dev);}
-
-#define PG_finish_plot(dev)
-    if (dev != NULL)
-       {if (dev->finish_plot != NULL)
-           (*dev->finish_plot)(dev);}
-
-#define PG_clear_page(dev, i)
-    if (dev != NULL)
-       {if (dev->clear_page != NULL)
-           (*dev->clear_page)(dev, i);}
-
-#define PG_expose_device(dev)
-    if (dev != NULL)
-       {if (dev->expose_device != NULL)
-           (*dev->expose_device)(dev);}
-
-#define PG_make_palette_current(dev, p)
+void PG_make_palette_current(PG_device *dev, p)
     if (dev != NULL)
        {dev->current_palette = p;}
 
-#define PG_make_device_current(dev)
-    if (dev != NULL)
-       {if (dev->make_device_current != NULL)
-           (*dev->make_device_current);}
-
-#define PG_release_current_device(dev)
-    if (dev != NULL)
-       {if (dev->release_current_device != NULL)
-           (*dev->release_current_device);}
-
-#define PG_get_image(dev, bf, ix, iy, nx, ny)
+void PG_get_image(PG_device *dev, bf, ix, iy, nx, ny)
     if (dev != NULL)
        {if (dev->get_image != NULL)
            (*dev->get_image)(dev, bf, ix, iy, nx, ny);}
 
-#define PG_put_image(dev, bf, ix, iy, nx, ny)
+void PG_put_image(PG_device *dev, bf, ix, iy, nx, ny)
     if (dev != NULL)
        {if (dev->put_image != NULL)
            (*dev->put_image)(dev, bf, ix, iy, nx, ny);}
 
-#define PG_write_text(dev, fp, s)
+void PG_write_text(PG_device *dev, fp, s)
     if (dev != NULL)
        {if (dev->write_text != NULL)
            (*dev->write_text)(dev, fp, s);}
 
-#define PG_next_line(dev, fp)
+void PG_next_line(PG_device *dev, fp)
     if (dev != NULL)
        {if (dev->next_line != NULL)
            (*dev->next_line)(dev, fp);}
-
-#define PG_open_screen(dev, xf, yf, dxf, dyf)
-    if (dev != NULL)
-       {if (dev->open_screen != NULL)
-           (*dev->open_screen)(dev, xf, yf, dxf, dyf);}
-
-#define PG_query_screen(dev, pdx, pdy, pnc)
-    if (dev != NULL)
-       {if (dev->query_screen != NULL)
-           (*dev->query_screen)(dev, pdx, pdy, pnc);}
-
-#define PG_close_device(dev)
-    if (dev != NULL)
-       {if (dev->close_device != NULL)
-           (*dev->close_device)(dev);}
-
-#define PG_close_console
-    if ((PG_console_device != NULL) &&
-        (PG_console_device->close_console != NULL))
-       (*PG_console_device->close_console)
 
 /*--------------------------------------------------------------------------*/
 

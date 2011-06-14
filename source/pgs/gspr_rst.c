@@ -135,7 +135,8 @@ void _PG_rst_set_fill_color(PG_device *dev, int color, int mapped)
 /* _PG_RST_SET_FONT - set the character font */
 
 int _PG_rst_set_font(PG_device *dev, char *face, char *style, int size)
-   {int nfont, nstyle, dx, dy, nc, rv;
+   {int nfont, nstyle, nc, rv;
+    int dx[PG_SPACEDM];
     double scale, sc;
     char *font_name;
 
@@ -143,15 +144,15 @@ int _PG_rst_set_font(PG_device *dev, char *face, char *style, int size)
 
     if ((dev != NULL) &&
 	PG_setup_font(dev, face, style, size, &font_name, &nfont, &nstyle))
-       {PG_query_screen(dev, &dx, &dy, &nc);
+       {PG_query_screen_n(dev, dx, &nc);
 
 	scale = 0.6;
 
-	dev->char_width_s  = scale*((double) size)/((double) dx);
-	dev->char_height_s = scale*((double) size)/((double) dy);
+	dev->char_width_s  = scale*((double) size)/((double) dx[0]);
+	dev->char_height_s = scale*((double) size)/((double) dx[1]);
 	dev->char_space_s  = 0.001 * dev->char_width_s;
 
-	sc = (100.0*size)/(3.0*dx);
+	sc = (100.0*size)/(3.0*dx[0]);
 	_PG_set_raster_text_scale(dev, sc);
 
 	rv = TRUE;};

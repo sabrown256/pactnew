@@ -150,8 +150,9 @@ PG_device *_PG_GL_open_imbedded_screen(PG_device *dev, Display *display,
                                        double dxf, double dyf)
    {unsigned long bck_color, for_color;
     int i, Lightest, Light, Light_Gray, Dark_Gray, Dark, Darkest;
-    int screen, display_width, display_height, min_dim;
+    int screen, min_dim;
     int n_dev_colors;
+    int dx[PG_SPACEDM];
     double intensity;
     XVisualInfo *vi;
     XWindowAttributes windowattr;
@@ -177,8 +178,8 @@ PG_device *_PG_GL_open_imbedded_screen(PG_device *dev, Display *display,
     dev->type_index = GRAPHIC_WINDOW_DEVICE;
     dev->quadrant   = QUAD_FOUR;
 
-    PG_query_screen(dev, &display_width, &display_height, &n_dev_colors);
-    if ((display_width == 0) && (display_height == 0) &&
+    PG_query_screen_n(dev, dx, &n_dev_colors);
+    if ((dx[0] == 0) && (dx[1] == 0) &&
         (n_dev_colors == 0))
        return(NULL);
 
@@ -188,10 +189,10 @@ PG_device *_PG_GL_open_imbedded_screen(PG_device *dev, Display *display,
     screen = DefaultScreen(dev->display);
  
 /* set device pixel coordinate limits */
-    dev->g.cpc[0] = -16383 + display_width;
-    dev->g.cpc[1] =  16383 - display_width;
-    dev->g.cpc[2] = -16383 + display_height;
-    dev->g.cpc[3] =  16383 - display_height;
+    dev->g.cpc[0] = -16383 + dx[0];
+    dev->g.cpc[1] =  16383 - dx[0];
+    dev->g.cpc[2] = -16383 + dx[1];
+    dev->g.cpc[3] =  16383 - dx[1];
     dev->g.cpc[4] = -16383;
     dev->g.cpc[5] =  16383;
  
@@ -204,13 +205,13 @@ PG_device *_PG_GL_open_imbedded_screen(PG_device *dev, Display *display,
        {dxf = 0.5;
         dyf = 0.5;};
 
-/* the following calculations used to use display_width to */
-/* set up the default size for a square window.  We now    */
-/* use min(display_width, display_height) to make things   */
-/* work better for two screen systems configured as one    */
-/* logical screen.                                         */
-
-    min_dim = min(display_width, display_height);
+/* the following calculations used to use dx[0] to
+ * set up the default size for a square window.  We now
+ * use min(dx[0], dx[1]) to make things
+ * work better for two screen systems configured as one
+ * logical screen
+ */
+    min_dim = min(dx[0], dx[1]);
 
 /* decide on the overall color layout and choose WHITE or BLACK background */
     dev->absolute_n_color = n_dev_colors;
@@ -394,7 +395,7 @@ static PG_device *_PG_GL_open_screen(PG_device *dev, double xf, double yf,
 
     valuemask = 0;
 
-    PG_query_screen(dev, &dc[0], &dc[1], &n_dev_colors);
+    PG_query_screen_n(dev, dc, &n_dev_colors);
     if ((dc[0] == 0) && (dc[1] == 0) && (n_dev_colors == 0))
        return(NULL);
 
@@ -834,7 +835,8 @@ static int _PG_GL_set_font(PG_device *dev, char *face, char *style,
  
 static int _PG_GL_open_console(char *title, char *type, int bckgr,
 			       double xf, double yf, double dxf, double dyf)
-   {int dx, dy, nc;
+   {int nc;
+    int dx[PG_SPACEDM];
     double tx[PG_SPACEDM];
 
     PG_setup_markers();
@@ -843,8 +845,8 @@ static int _PG_GL_open_console(char *title, char *type, int bckgr,
     if (PG_console_device == NULL)
        return(FALSE);
 
-    PG_query_screen(PG_console_device, &dx, &dy, &nc);
-    if ((dx == 0) && (dy == 0) && (nc == 0))
+    PG_query_screen_n(PG_console_device, dx, &nc);
+    if ((dx[0] == 0) && (dx[1] == 0) && (nc == 0))
        return(FALSE);
 
     PG_console_device->background_color_white = bckgr;

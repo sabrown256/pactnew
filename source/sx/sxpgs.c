@@ -964,7 +964,8 @@ void SX_motion_event_handler(PG_device *dev, PG_event *ev)
 /* SX_UPDATE_EVENT_HANDLER - handle update events  */
 
 void SX_update_event_handler(PG_device *dev, PG_event *ev)
-   {int width, height, min_dim, ncol;
+   {int min_dim, ncol;
+    int dx[PG_SPACEDM];
 
     if (dev != NULL)
        {PG_make_device_current(dev);
@@ -974,8 +975,8 @@ void SX_update_event_handler(PG_device *dev, PG_event *ev)
 	SX_window_P[0]     = dev->g.hwin[0];
 	SX_window_P[1]     = dev->g.hwin[2];
 
-	PG_query_screen(dev, &width, &height, &ncol);
-	min_dim = min(width, height);
+	PG_query_screen_n(dev, dx, &ncol);
+	min_dim = min(dx[0], dx[1]);
 
 	SX_window_width  = SX_window_width_P/min_dim;
 	SX_window_height = SX_window_height_P/min_dim; 
