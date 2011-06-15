@@ -50,7 +50,6 @@ Libs = ${LPML} ${LSCORE} ${MDLib}
 
 targets :
 	@echo "Targets for PML"
-	@echo "   bindings  : make the language bindings"
 	@echo "   cgsolv    : make sparse linear CG solvers test"
 	@echo "   checksum  : make checksum routines test"
 	@echo "   eigen     : make eigen systems tests"

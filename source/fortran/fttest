@@ -20,7 +20,7 @@ while ($#argv > 0)
       case -h:
            echo "Usage: fttest [-h] [<test>]*"
            echo "  h       this help message"
-           echo "  <test>  one of: "
+           echo "  <test>  one of: pdb"
            echo ""
            exit(1)
       case -*:
@@ -70,6 +70,7 @@ else if ($FC_Exe != none) then
 
    if ("$Test" == "") then
       set Test = ""
+      set Test = ($Test pdb)
    endif
 
    foreach i ($Test)
@@ -106,7 +107,7 @@ NoteD $Log " --------------------------------------------------------"
 
 set xstatus = 0
 if ($ERROR == "TRUE") then
-   set xstatus = 1
+#   set xstatus = 1
 endif
 
 Note $Log "Exiting with status $xstatus"
