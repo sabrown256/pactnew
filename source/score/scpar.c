@@ -530,24 +530,6 @@ void SC_do_tasks_f(PFInt fnc, void **pa, int *pnt, int *poff, int *pon)
 
 /*--------------------------------------------------------------------------*/
 
-/*                         FORTRAN API ROUTINES                             */
-
-/*--------------------------------------------------------------------------*/
-
-FIXNUM FF_ID(scinth, SCINTH)(FIXNUM *snt, PFTid tid)
-   {int nt;
-    FIXNUM rv;
-
-    nt = *snt;
-
-    SC_init_threads(nt, tid);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-
 #ifdef HAVE_THREADS
 
 /*--------------------------------------------------------------------------*/

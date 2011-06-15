@@ -210,22 +210,6 @@ void SC_use_guarded_mem(int on)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SCGMEM - setup to use mprotect'd memory */
-
-FIXNUM FF_ID(scgmem, SCGMEM)(FIXNUM *son)
-   {int on;
-    FIXNUM rv;
-
-    on = *son;
-    SC_use_guarded_mem(on);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SC_MEM_GUARD_HIGH - guard the upper memory bound if ON == TRUE
  *                   - otherwise guard the lower bound
  */
