@@ -58,7 +58,6 @@ MLibs = ${LSCORE} ${LMM} ${MDLib}
 
 targets :
 	@echo "Targets for SCORE"
-	@echo "   bindings     : make the language bindings"
 	@echo "   compre       : make comprehensive unit test programs"
 	@echo "   disk         : make simple utility to measure available disk space"
 	@echo "   dmake        : make the dmake utility"
@@ -66,7 +65,6 @@ targets :
 	@echo "   error        : make test program for error handling routines in SCORE"
 	@echo "   exec         : make test program for SC_exec_server"
 	@echo "   fcscan       : make simple utility to scan containers such as tar files"
-	@echo "   fha          : make test program for fortran API of hash functionality"
 	@echo "   ha           : make scatst and sctrts test programs for hash and alist functionality"
 	@echo "   install      : install SCORE headers and utilities in dev/arch"
 	@echo "   io           : make test programs for I/O functionality"
@@ -372,28 +370,12 @@ ${BinDir}/sctrts : ${TGTLib} sctrts.c
 	${CLD} ${LdFlags} sctrts.c -o ${BinDir}/sctrts ${Libs}
 
 #
-# fortran hash test
-#
-fha : ${BinDir}/schtst
-
-${BinDir}/schtst : schtst.f ${TGTLib} ${Hdrs}
-	${FC} ${FcFlags} ${PACTTmpDic}/schtst.o -o ${BinDir}/schtst ${Libs}
-
-#
 # resource usage test
 #
 resource : ${BinDir}/scrsts
 
 ${BinDir}/scrsts : ${TGTLib} scrsts.c
 	${CLD} ${LdFlags} scrsts.c -o ${BinDir}/scrsts ${Libs}
-
-#
-# fortran OMP/sproc test
-#
-omp : ${BinDir}/scompt
-
-${BinDir}/scompt : scompt.f ${TGTLib} ${Hdrs}
-	${FC} ${FcFlags} ${PACTTmpDic}/scompt.o -o ${BinDir}/scompt ${Libs}
 
 #
 # io file test

@@ -64,7 +64,6 @@ NGLibs = ${LPANACEA} ${LPGS} ${MDGLib} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib
 
 targets :
 	@echo "Targets for PANACEA"
-	@echo "   bindings  : make the language bindings"
 	@echo "   Cth       : make C time history tests"
 	@echo "   defvar    : make variable definition test"
 	@echo "   Fth       : make Fortran time history tests"

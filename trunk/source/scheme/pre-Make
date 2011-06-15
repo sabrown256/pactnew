@@ -50,7 +50,6 @@ Libs = ${LSCHEME} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib}
 
 targets :
 	@echo "Targets for SCHEME"
-	@echo "   bindings  : make the language bindings"
 	@echo "   install   : install SCHEME headers and utilities in dev/arch"
 	@echo "   link      : link SCHEME utilities for public use"
 	@echo "   profiler  : make a profiling version"

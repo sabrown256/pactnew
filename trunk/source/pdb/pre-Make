@@ -58,24 +58,20 @@ BinObj =
 # Required Libraries
 #
 Libs = ${LPDB} ${LPML} ${LSCORE} ${MDLib}
-FLibs = -lfpact
 
 DepLib = ${LibDir}/libpml.a \
 	 ${LibDir}/libscore.a
 
 targets :
 	@echo "Targets for PDB"
-	@echo "   bindings  : make the language bindings"
 	@echo "   Cstd      : make standard tests"
 	@echo "   Apps      : make pdb2hdf   "
 	@echo "   Gst       : make gather test"
 	@echo "   Lst       : make list test"
-	@echo "   Fstd      : make standard Fortran API tests"
 	@echo "   net       : make net IO test"
 	@echo "   pdb2hdf   : make pdb2hdf"
 	@echo "   smp       : make SMP IO test"
 	@echo "   dp        : make DP IO test"
-	@echo "   fdp       : make Fortran DP IO test"
 	@echo "   fd        : make file descriptor test"
 	@echo "   attr      : make attribute tests"
 	@echo "   def       : make typedef and cast tests"
@@ -197,20 +193,6 @@ ${BinDir}/pdbfts : pdbfts.c ${InstallDep} ${Hdrs}
 ${BinDir}/pdfcts : pdfcts.c ${InstallDep} ${Hdrs}
 	${CLD} ${LdFlags} pdfcts.c -o ${BinDir}/pdfcts ${Libs}
         
-Fstd : ${BinDir}/pdftst ${BinDir}/pdfwts ${BinDir}/pdfgts ${BinDir}/pdfhyts
-
-${BinDir}/pdftst : pdftst.f ${InstallDep} ${Hdrs}
-	${FC} ${LdFlags} pdftst.f -o ${BinDir}/pdftst ${Libs} ${FLibs} ${DPLib}
-
-${BinDir}/pdfwts : pdfwts.f ${InstallDep} ${Hdrs}
-	${FC} ${LdFlags} pdfwts.f -o ${BinDir}/pdfwts ${Libs} ${FLibs} ${DPLib}
-
-${BinDir}/pdfgts : pdfgts.f ${InstallDep} ${Hdrs}
-	${FC} ${LdFlags} pdfgts.f -o ${BinDir}/pdfgts ${Libs} ${FLibs} ${DPLib}
-
-${BinDir}/pdfhyts : pdfhyts.f ${InstallDep} ${Hdrs}
-	${FC} ${LdFlags} pdfhyts.f -o ${BinDir}/pdfhyts ${Libs} ${FLibs} ${DPLib}
-
 #
 # net io test
 #
@@ -242,11 +224,6 @@ dp : ${BinDir}/pddpts
 
 ${BinDir}/pddpts : pddpts.c ${InstallDep} ${Hdrs}
 	${CC} ${LdFlags} pddpts.c -o ${BinDir}/pddpts ${Libs} ${DPLib}
-
-fdp : ${BinDir}/pdfdpt
-
-${BinDir}/pdfdpt : pdfdpt.f ${InstallDep} ${Hdrs}
-	${FC} ${LdFlags} pdfdpt.c -o ${BinDir}/pdfdpt ${Libs} ${DPLib}
 
 #
 # test attribute handling

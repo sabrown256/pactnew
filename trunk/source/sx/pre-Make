@@ -146,8 +146,6 @@ ${gso} : ${gsrc}
           ${CC} -c $< -o $@ ; \
           ${AR} ${AROpt} ${TGTLib} $@ 2>> errlog )
 
-bindings : ${gso}
-
 IncAction = @pact generate
 LibAction = build-ext
 

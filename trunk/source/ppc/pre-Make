@@ -52,9 +52,7 @@ SLibs = ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib}
 
 targets :
 	@echo "Targets for PPC"
-	@echo "   bindings  : make the language bindings"
 	@echo "   Cstd      : make standard tests and pcexec"
-	@echo "   Fstd      : make Fortran tests"
 	@echo "   install   : install PPC headers and utilities in dev/arch"
 	@echo "   link      : link PPC utilities for public use"
 	@echo "   parallel  : make parallel process tests"
@@ -108,8 +106,6 @@ IncAction = @pact generate
 Cstd : ${BinDir}/pcexec ${BinDir}/pcmtst \
        ${BinDir}/pcbtst ${BinDir}/pcctst
 
-Fstd : ${BinDir}/pcftst
-
 parallel : ${BinDir}/pcptst ${BinDir}/pcexec
 
 web : ${BinDir}/pcweb
@@ -123,8 +119,6 @@ ${BinDir}/pcbtst : ${TGTLib} pcbtst.c
 ${BinDir}/pcctst : ${TGTLib} pcctst.c
 	${CLD} ${LdFlags} pcctst.c -o ${BinDir}/pcctst ${Libs}
 
-${BinDir}/pcftst : ${TGTLib} pcftst.f
-	${FC} ${LdFlags} pcftst.c -o ${BinDir}/pcftst ${Libs}
 #
 # multiple process tests
 #

@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# FORTRAN - PDB fortran test
+# PDB - Fortran test
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942

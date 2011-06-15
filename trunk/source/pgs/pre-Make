@@ -49,14 +49,12 @@ Libs = ${LPGS} ${MDGLib} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib}
 
 targets :
 	@echo "Targets for PGS"
-	@echo "   bindings  : make the language bindings"
 	@echo "   axis      : make axis test"
 	@echo "   colormap  : make show colormap utility"
 	@echo "   contour   : make contour test"
 	@echo "   Cstd      : make basic drawing test"
 	@echo "   curve     : make curve drawing test"
 	@echo "   event     : make event handling test"
-	@echo "   Fcontour  : make fortran contour test"
 	@echo "   fillpoly  : make fill-poly test"
 	@echo "   Fstd      : make fortran API test"
 	@echo "   grotrian  : make grotrian test"
@@ -181,17 +179,6 @@ Cstd : ${BinDir}/gsatst
 ${BinDir}/gsatst : gsatst.c ${TGTLib}
 	${CLD} ${LdFlags} gsatst.c -o ${BinDir}/gsatst ${Libs}
 
-foo : foo.c ${TGTLib}
-	${CLD} ${LdFlags} foo.c -o foo ${Libs}
-
-#
-# fortran API test
-#
-Fstd : ${BinDir}/gsftst
-
-${BinDir}/gsftst : gsftst.f ${TGTLib}
-	${FC} ${LdFlags} gsftst.f -o ${BinDir}/gsftst ${Libs}
-
 #
 # event handling test
 #
@@ -272,15 +259,6 @@ scontour : ${BinDir}/gssctst
 
 ${BinDir}/gssctst : gssctst.c ${TGTLib}
 	${CLD} ${LdFlags} gssctst.c -o ${BinDir}/gssctst ${Libs}
-
-#
-# fortran contour test
-#
-Fcontour : ${BinDir}/gsfctst
-
-${BinDir}/gsfctst : gsfctst.f ${TGTLib}
-	${FC} ${LdFlags} gsfctst.f -o ${BinDir}/gsfctst ${Libs}
-
 
 #
 # vector test
