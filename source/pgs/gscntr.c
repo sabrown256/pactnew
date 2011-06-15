@@ -539,9 +539,9 @@ static void _PG_iso_nc_lr_2d(PG_device *dev, double *a,
  * #bind PG_draw_iso_nc_lr fortran() scheme()
  */
 
-static void PG_draw_iso_nc_lr(PG_device *dev, double *a,
-			      int ndd, double **x, double *lev,
-			      int nlev, int id, void *cnnct, pcons *alist)
+void PG_draw_iso_nc_lr(PG_device *dev, double *a,
+		       int ndd, double **x, double *lev,
+		       int nlev, int id, void *cnnct, pcons *alist)
    {int method;
 
     PG_get_attrs_alist(alist,
@@ -818,53 +818,6 @@ void PG_contour_plot(PG_device *dev, PG_graph *data, ...)
        _PG_contour_core(dev, data, PG_draw_iso_zc_ac, PG_draw_iso_nc_ac);
 
     return;}
-
-/*--------------------------------------------------------------------------*/
-
-/*                            FORTRAN API ROUTINES                          */
-
-/*--------------------------------------------------------------------------*/
-
-/* PGCLEV - compute contour levels */
-
-FIXNUM FF_ID(pgclev, PGCLEV)(double *lev, FIXNUM *sn,
-			     double *sfn, double *sfx, double *sr)
-   {FIXNUM rv;
-    
-    rv = PG_contour_levels(lev, (int) *sn, *sfn, *sfx, *sr);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGPLCN - low level contour plot routine */
-
-FIXNUM FF_ID(pgplcn, PGPLCN)(FIXNUM *sdid, double *ax, double *ay,
-			     double *aa, double *al,
-			     FIXNUM *skx, FIXNUM *slx,
-			     FIXNUM *snl, FIXNUM *sli, FIXNUM *said)
-   {int maxes[2];
-    FIXNUM rv;
-    double *x[2];
-    pcons *alst;
-    PG_device *dev;
-
-    maxes[0] = *skx;
-    maxes[1] = *slx;
-
-    dev  = SC_GET_POINTER(PG_device, *sdid);
-    alst = SC_GET_POINTER(pcons, *said);
-
-    x[0] = ax;
-    x[1] = ay;
-
-    PG_draw_iso_nc_lr(dev, aa, 2, x, al,
-                      (int) *snl, (int) *sli, (void *) maxes, alst);
-
-    rv = TRUE;
-
-    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

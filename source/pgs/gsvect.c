@@ -678,93 +678,6 @@ void PG_set_vec_attr(PG_device *dev, ...)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
-/* PGSVAT - set the properties of the vectors for the
- *        - next vector plot
- *        - (see the documentation for PD_SET_VEC_ATTR)
- */
-
-void FF_ID(pgsvat, PGSVAT)(FIXNUM *sdid, ...)
-   {int type, itemp;
-    double diffvp, diffwd, temp;
-    double wc[PG_BOXSZ];
-    PG_device *dev;
-
-    dev = *(PG_device **) sdid;
-
-/* get the current viewport and window -- this is used to go from NDC to
- * WC for specifying _PG.fixsize and _PG.maxvsz 
- */
-    PG_get_viewspace(dev, NORMC, wc);
-    diffvp = wc[1] - wc[0];
-    PG_get_viewspace(dev, WORLDC, wc);
-    diffwd = wc[1] - wc[0];
-
-/* get the attributes */
-    SC_VA_START(sdid);
-    while (TRUE)
-       {type = *SC_VA_ARG(FIXNUM *);
-        if (type == 0)
-           break;
-
-        switch (type)
-           {case VEC_SCALE :
-	         _PG.scale = (double) *SC_VA_ARG(double *);
-		 break;
-
-            case VEC_ANGLE :
-	         _PG.hdangle = (double) *SC_VA_ARG(double *);
-		 break;
-
-            case VEC_FIXHEAD :
-	         _PG.ifixhead = *SC_VA_ARG(FIXNUM *);
-		 break;
-
-            case VEC_HEADSIZE :
-	         _PG.headsize = (double) *SC_VA_ARG(double *);
-		 break;
-
-            case VEC_FIXSIZE :
-	         temp = *SC_VA_ARG(double *);
-		 if (temp > 0.0)
-		    {_PG.ifix = TRUE;
-		     _PG.fixsize = temp*diffwd/diffvp;};
-		 break;
-
-            case VEC_MAXSIZE :
-	         temp = *SC_VA_ARG(double *);
-		 if (temp > 0.0)
-		    {_PG.maxvsz = TRUE;
-		     _PG.sizemax = temp*diffwd/diffvp;}
-		 else
-		    {_PG.maxvsz = FALSE;
-		     _PG.sizemax = 0.0;};
-		 break;
-
-            case VEC_LINESTYLE :
-	         itemp = *SC_VA_ARG(FIXNUM *);
-		 PG_fset_line_style(dev, itemp);
-		 break;
-
-            case VEC_LINETHICK :
-	         temp = *SC_VA_ARG(double *);
-		 PG_fset_line_width(dev, temp);
-		 break;
-
-            case VEC_COLOR :
-	         itemp = *SC_VA_ARG(FIXNUM *);
-		 PG_fset_line_color(dev, itemp, TRUE);
-		 break;
-
-            default :
-	         break;};};
-
-    SC_VA_END;
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
  
 /* _PG_VECTOR_CORE - vector plot skeleton routine */
 
@@ -807,34 +720,6 @@ void PG_vector_plot(PG_device *dev, PG_graph *data, ...)
     SC_VA_END;
 
     return;}
-
-/*--------------------------------------------------------------------------*/
-
-/*                            FORTRAN API ROUTINES                          */
-
-/*--------------------------------------------------------------------------*/
-
-/* PGPLVC - low level vector plot routine */
-
-FIXNUM FF_ID(pgplvc, PGPLVC)(FIXNUM *sdid,
-			     double *ax, double *ay, double *au, double *av,
-			     FIXNUM *sn, FIXNUM *said)
-   {FIXNUM rv;
-    double *x[PG_SPACEDM], *u[PG_SPACEDM];
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-
-    x[0] = ax;
-    x[1] = ay;
-    u[0] = au;
-    u[1] = av;
-
-    PG_draw_vector_n(dev, 2, WORLDC, *sn, x, u);
-
-    rv = TRUE;
-
-    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

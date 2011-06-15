@@ -9,7 +9,6 @@
 #include "cpyright.h"
 
 #include "pdb_int.h"
-#include "scope_mpi.h"
 
 #ifndef FF_INT_SIZE_PTR_DIFFER
 
@@ -2545,6 +2544,12 @@ FIXNUM FF_ID(pfntgt, PFNTGT)(FIXNUM *sis, FIXNUM *sia)
 
 /*--------------------------------------------------------------------------*/
 
+#ifdef HAVE_MPI
+
+#include "scope_mpi.h"
+
+/*--------------------------------------------------------------------------*/
+
 /* PFINMP - FORTRAN interface routine to initialize pdblib for dpi
  * 
  */
@@ -2559,15 +2564,17 @@ FIXNUM FF_ID(pfinmp, PFINMP)(FIXNUM *smp, FIXNUM *snt, PFTid tid)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PFTMMP - FORTRAN interface routine to terminate pdblib mpi */
+/* PFMPSS - FORTRAN interface routine to set file->mpi_file */
 
-FIXNUM FF_ID(pftmmp, PFTMMP)(void)
-   {
+FIXNUM FF_ID(pfmpss, PFMPSS)(FIXNUM *sfid, FIXNUM *sv)
+   {FIXNUM rv;
+    PDBfile *file;
 
-    PD_term_mpi();
-
-    return(TRUE);}
-
+    file = SC_GET_POINTER(PDBfile, *sfid);
+    rv   = PD_mp_set_serial(file, *sv);
+  
+    return(rv);}
+  
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -2601,17 +2608,18 @@ FIXNUM FF_ID(pfmpop, PFMPOP)(FIXNUM *sncn, char *name,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PFMPSS - FORTRAN interface routine to set file->mpi_file */
+/* PFTMMP - FORTRAN interface routine to terminate pdblib mpi */
 
-FIXNUM FF_ID(pfmpss, PFMPSS)(FIXNUM *sfid, FIXNUM *sv)
-   {FIXNUM rv;
-    PDBfile *file;
+FIXNUM FF_ID(pftmmp, PFTMMP)(void)
+   {
 
-    file = SC_GET_POINTER(PDBfile, *sfid);
-    rv   = PD_mp_set_serial(file, *sv);
-  
-    return(rv);}
-  
+    PD_term_mpi();
+
+    return(TRUE);}
+
 /*--------------------------------------------------------------------------*/
+
+#endif
+
 /*--------------------------------------------------------------------------*/
 

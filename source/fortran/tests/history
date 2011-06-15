@@ -18,7 +18,7 @@ Note $LogF ""
 set UTime = `$TIMER -r`
 
 flog $LogF pushd $SrcDir
-flog $LogF $MAKE Cth
+flog $LogF $MAKE panacea
 set xstatus = $status
 flog $LogF popd
 

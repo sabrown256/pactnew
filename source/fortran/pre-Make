@@ -59,6 +59,7 @@ targets :
 	@echo "   fha          : make Fortran API of hash test"
 	@echo "   install      : install PFTN headers and utilities in dev/arch"
 	@echo "   link         : link PFTN utilities for public use"
+	@echo "   panacea      : make PANACEA Fortran API tests"
 	@echo "   pdb          : make PDB Fortran API tests"
 	@echo "   ppc          : make PPC Fortran tests"
 	@echo "   test         : run the PFTN test suite"
@@ -91,7 +92,9 @@ gmo = gm-score.o gm-pml.o gm-pdb.o   \
 Objs = ${gmo} ${gfo} flibc.o \
        scfia.o scfib.o scfis.o scmemf.o \
        mlfia.o \
-       pdfia.o
+       pdfia.o \
+       pafia.o \
+       gsfia.o gsfib.o gsfic.o
 
 gfa = ${TGTLib}(gf-score.o) ${TGTLib}(gf-pml.o) ${TGTLib}(gf-pdb.o)   \
       ${TGTLib}(gf-ppc.o) ${TGTLib}(gf-pgs.o) ${TGTLib}(gf-panacea.o) \
@@ -105,7 +108,9 @@ ArObjs = ${gma} ${gfa} ${TGTLib}(flibc.o) \
          ${TGTLib}(scfia.o) ${TGTLib}(scfib.o) ${TGTLib}(scfis.o) \
          ${TGTLib}(scmemf.o) \
          ${TGTLib}(mlfia.o) \
-         ${TGTLib}(pdfia.o)
+         ${TGTLib}(pdfia.o) \
+         ${TGTLib}(pafia.o) \
+         ${TGTLib}(gsfia.o) ${TGTLib}(gsfib.o) ${TGTLib}(gsfic.o)
 
 ${ArObjs} : ${Hdrs}
 ${Objs} : ${Hdrs}
@@ -126,6 +131,7 @@ IncAction = @pact genmod
 LibAction = @(cd ${PACTTmpDir} ; pact PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=\"\" -f ../../pre-Make modules)
 
 Libs = -lfpact ${LPDB} ${LPML} ${LSCORE} ${MDLib}
+NGLibs = -lfpact ${LPANACEA} ${LPGS} ${MDGLib} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib}
 
 
 # PDB tests
@@ -182,6 +188,17 @@ omp : ${BinDir}/scompt
 ${BinDir}/scompt : scompt.f ${TGTLib} ${Hdrs}
 	${FC} ${FcFlags} ${PACTTmpDic}/scompt.o -o ${BinDir}/scompt ${Libs}
 
+#
+# PANACEA tests
+#
+#panacea : ${BinDir}/pathts ${BinDir}/pathft
+panacea : ${BinDir}/pathts
+
+${BinDir}/pathts : pathts.c ${TGTLib}
+	${CLD} ${LdFlags} pathts.c -o ${BinDir}/pathts ${NGLibs}
+
+${BinDir}/pathft : pathft.f ${TGTLib}
+	${FC} ${LdFlags} pathft.f -o ${BinDir}/pathft ${NGLibs}
 
 #
 # link 

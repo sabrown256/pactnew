@@ -344,6 +344,11 @@ extern int
 extern int
  _PG_get_fill_contour_color(PG_device *dev, int l, int n);
 
+extern void
+ PG_draw_iso_nc_lr(PG_device *dev, double *a,
+		   int ndd, double **x, double *lev,
+		   int nlev, int id, void *cnnct, pcons *alist);
+
 
 /* GSDV.C declarations */
 
@@ -397,7 +402,10 @@ extern PG_triangle
 
 extern void
  _PG_intp_byte(unsigned char *op, unsigned char *np, int ox, int nx,
-	       int os, int ns);
+	       int os, int ns),
+ _PG_draw_image_nc_lr(PG_device *dev, char *name, char *type,
+		      void *f, double *frm,
+		      void *cnnct, pcons *alist);
 
 extern int
  _PG_allocate_image_buffer(PG_device *dev, unsigned char **pbf,
