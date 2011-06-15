@@ -9,7 +9,7 @@
 # include "cpyright.h"
 #
 
-LibName=pftn
+LibName=fpact
 
 TGTLib = ${LibDir}/lib${LibName}.a
 TGTInc = none
@@ -62,41 +62,46 @@ targets :
 #
 Hdrs = 
 
+gfs = gf-score.c gf-pml.c gf-pdb.c   \
+      gf-ppc.c gf-pgs.c gf-panacea.c \
+      gf-scheme.c
+
+gms = gm-score.f gm-pml.f gm-pdb.f   \
+      gm-ppc.f gm-pgs.f gm-panacea.f \
+      gm-scheme.f
+
 #
 # Object Files
 #
-Objs = flibc.o
 
-ArObjs = ${TGTLib}(flibc.o)
-
-${ArObjs}  : ${Hdrs}
-${Objs}  : ${Hdrs}
-${LibDep} : ${Hdrs}
-
-# language bindings
-
-gsrc = gm-score.f gm-pml.f gm-pdb.f   \
-       gm-ppc.f gm-pgs.f gm-panacea.f \
-       gm-scheme.f
+gfo = gf-score.o gf-pml.o gf-pdb.o   \
+      gf-ppc.o gf-pgs.o gf-panacea.o \
+      gf-scheme.o
 
 gmo = gm-score.o gm-pml.o gm-pdb.o   \
       gm-ppc.o gm-pgs.o gm-panacea.o \
       gm-scheme.o
 
-${gmo} : ${gsrc}
+Objs = ${gmo} ${gfo} flibc.o
 
-%.o : %.f
-	@if [ ${FC_Exe} == none ]; then \
- 	    echo "No Fortran compiler for $<" ; \
- 	 else \
- 	    (touch errlog ; \
-	     echo "${FCAnnounce} -c $<" ; \
-	     ${FC} -c $< -o $@ ; \
-       	     ${AR} ${AROpt} ${TGTLib} $@ 2>> errlog ) ; \
-	 fi
+gfa = ${TGTLib}(gf-score.o) ${TGTLib}(gf-pml.o) ${TGTLib}(gf-pdb.o)   \
+      ${TGTLib}(gf-ppc.o) ${TGTLib}(gf-pgs.o) ${TGTLib}(gf-panacea.o) \
+      ${TGTLib}(gf-scheme.o)
 
-modules : ${gmo}
+gma = ${TGTLib}(gm-score.o) ${TGTLib}(gm-pml.o) ${TGTLib}(gm-pdb.o)   \
+      ${TGTLib}(gm-ppc.o) ${TGTLib}(gm-pgs.o) ${TGTLib}(gm-panacea.o) \
+      ${TGTLib}(gm-scheme.o)
+
+ArObjs = ${gma} ${gfa} ${TGTLib}(flibc.o)
+
+${ArObjs}  : ${Hdrs}
+${Objs}  : ${Hdrs}
+${LibDep} : ${Hdrs}
+
+modules : ${gmo} ${gfo}
+	@touch dummy.mod
 	cp *.mod ${IncDir}
+	@rm -f ${IncDir}/dummy.mod
 
 ${PACTTmpDir}/gm-${LibName}.f : flibc.f
 	@../scripts/bproto
@@ -104,7 +109,7 @@ ${PACTTmpDir}/gm-${LibName}.f : flibc.f
 genmod : ${PACTTmpDir}/gm-${LibName}.f
 
 IncAction = @pact genmod
-LibAction = (cd ${PACTTmpDir} ; pact -f ../../pre-Make modules)
+LibAction = @(cd ${PACTTmpDir} ; pact -f ../../pre-Make modules)
 
 #
 # link 

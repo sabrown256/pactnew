@@ -99,7 +99,7 @@ ArObjs = ${TGTLib}(mlmath.o)  ${TGTLib}(mlsrch.o)  ${TGTLib}(mlfft.o)   \
          ${TGTLib}(mlmextr.o) ${TGTLib}(mlchksm.o) ${TGTLib}(mlfia.o)   \
          ${TGTLib}(mlvect.o)  ${TGTLib}(mlsmp.o)
 
-${LibDep} : ${gobj} ${hdrf} ${Hdrs}
+${LibDep} : ${hdrf} ${Hdrs}
 
 #
 # Generated code rules

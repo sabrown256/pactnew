@@ -40,7 +40,7 @@ if ($RUN_TESTS == FALSE) then
    NoteD $Log "FORTRAN TESTS ... omitted"
 
 # run the tests
-else
+else if ($FC_Exe != none) then
    set BeginTime = `$TIMER -r`
 
    NoteD $Log ""

@@ -497,7 +497,7 @@ int PD_change_primitive(PDBfile *file, int ityp, int nb, int algn,
  *             - floating point type comparisons
  *             - this is mainly test support
  *
- * #bind PD_fp_toler fortran() scheme()
+ * #bind PD_fp_toler scheme()
  */
 
 void PD_fp_toler(PDBfile *file, long double *fptol)

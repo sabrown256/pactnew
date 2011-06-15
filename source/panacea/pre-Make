@@ -98,7 +98,7 @@ ArObjs = ${TGTLib}(padef.o) ${TGTLib}(pacpp.o) ${TGTLib}(papkg.o)      \
          ${TGTLib}(pasmp.o)                                            \
          ${TGTLib}(panth.o)
 
-${LibDep} : ${gobj} ${hdrf} ${Hdrs}
+${LibDep} : ${hdrf} ${Hdrs}
 
 #
 # Generated code rules

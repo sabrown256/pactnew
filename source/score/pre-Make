@@ -174,7 +174,7 @@ ${PObjs} : scope_proc.h
 ${TObjs} : scope_thread.h
 ${Objs}  : ${Hdrs} ${hdrf}
 
-${LibDep} : ${gobj} ${hdrf} ${Hdrs}
+${LibDep} : ${hdrf} ${Hdrs}
 ${MMDep}  : ${Hdrs}
 
 #
