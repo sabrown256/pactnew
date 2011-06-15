@@ -427,3 +427,45 @@ FIXNUM FF_ID(pmcnnd, PMCNND)(FIXNUM *sn, double *ad, FIXNUM *smsk)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* PMRNDF - Fortran interface to PM_random_48 */
+
+double FF_ID(pmrndf, PMRNDF)(double *px)
+   {double rv;
+
+    rv = PM_random_48(*px);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PMRNDF - Fortran interface to PM_random_s */
+
+double FF_ID(pmrnds, PMRNDS)(double *px)
+   {double rv;
+
+    rv = PM_random_s(*px);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PMCSMA - Fortran callable wrapper for PM_checksum_array */
+
+FIXNUM FF_ID(pmcsma, PMCSMA)(void *arr, FIXNUM *sni, FIXNUM *sbpi,
+			     FIXNUM *snbts)
+   {int ni, bpi, nbts;
+    FIXNUM cs;
+
+    ni   = *sni;
+    bpi  = *sbpi;
+    nbts = *snbts;
+
+    cs = PM_checksum_array(arr, ni, bpi, nbts);
+
+    return(cs);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/

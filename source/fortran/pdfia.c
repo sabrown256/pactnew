@@ -9,7 +9,7 @@
 #include "cpyright.h"
 
 #include "pdb_int.h"
-
+#include "scope_mpi.h"
 
 #ifndef FF_INT_SIZE_PTR_DIFFER
 
@@ -2472,6 +2472,146 @@ FIXNUM FF_ID(pfrent, PFRENT)(FIXNUM *sfid, FIXNUM *sncn, char *name)
 
     return(rv);}
 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PFTRGT - target the next file to be opened
+ *        - given an index from the following list:
+ *        -
+ *        -   (1,  5)  - GCC 4.0 and later X86_64
+ *        -   (2,  5)  - GCC 4.0 and later Ix86
+ *        -   (1,  5)  - Mac OSX 10.6 and later
+ *        -   (3, 11)  - Mac OSX 10.5
+ *        -   (2,  7)  - Cygwin i686
+ *        -   (5,  9)  - IBM PPC64 XLC 64 bit
+ *        -   (6, 10)  - IBM PPC64 XLC 32 bit
+ *        -   (6, 12)  - SPARC
+ *        -   (4,  2)  - DOS
+ *        -
+ *        - return TRUE iff successful
+ */
+
+FIXNUM FF_ID(pftrgt, PFTRGT)(FIXNUM *sis, FIXNUM *sia)
+   {int al, st;
+    FIXNUM rv;
+    PD_smp_state *pa;
+
+    pa = _PD_get_state(-1);
+
+    al = *sia;
+    st = *sis;
+    rv = (al != 6);
+    if (rv)
+       {pa->req_std   = PD_std_standards[st - 1];
+        pa->req_align = PD_std_alignments[al - 1];}
+
+    else
+       {pa->req_std   = NULL;
+        pa->req_align = NULL;
+
+        PD_error("REQUESTED ALIGNMENT NO LONGER EXISTS - PFTRGT",
+		 PD_GENERIC);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PFNTGT - FORTRAN interface to a routine to allocate, initialize, and
+ *          return a structure chart
+ */
+
+FIXNUM FF_ID(pfntgt, PFNTGT)(FIXNUM *sis, FIXNUM *sia)
+   {int al, st, ret;
+    FIXNUM rv;
+    hasharr *chart;
+
+    al = *sia;
+    st = *sis;
+    ret = (al != 6);
+    if (ret)
+       {chart = PN_target(PD_std_standards[st - 1], PD_std_alignments[al - 1]);
+        rv    = SC_ADD_POINTER(chart);}
+
+    else
+       {PD_error("REQUESTED ALIGNMENT NO LONGER EXISTS - PFNTGT", PD_GENERIC);
+        rv = -1;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                                DP ROUTINES                               */
+
+/*--------------------------------------------------------------------------*/
+
+/* PFINMP - FORTRAN interface routine to initialize pdblib for dpi
+ * 
+ */
+
+FIXNUM FF_ID(pfinmp, PFINMP)(FIXNUM *smp, FIXNUM *snt, PFTid tid)
+   {FIXNUM rv;
+
+    rv = PD_init_mpi(*smp, *snt, tid);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PFTMMP - FORTRAN interface routine to terminate pdblib mpi */
+
+FIXNUM FF_ID(pftmmp, PFTMMP)(void)
+   {
+
+    PD_term_mpi();
+
+    return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PFMPOP - open a PDBfile for dpi
+ *        - save the PDBfile pointer in an internal array
+ *        - and return an integer index to the pointer if successful
+ *        - return 0 otherwise
+ */
+
+FIXNUM FF_ID(pfmpop, PFMPOP)(FIXNUM *sncn, char *name,
+			     char *mode, FIXNUM *scomm)
+   {FIXNUM rv;
+    char s[MAXLINE], t[2];
+    PDBfile *file;
+    SC_communicator comm;
+
+    SC_FORTRAN_STR_C(s, name, *sncn);
+    SC_FORTRAN_STR_C(t, mode, 1);
+    comm = (SC_communicator) MPI_Comm_f2c(*scomm);
+
+    rv   = 0;
+    file = PD_mp_open(s, t, comm);
+    if (file != NULL)
+       {file->major_order    = COLUMN_MAJOR_ORDER;
+        file->default_offset = 1;
+
+        rv = SC_ADD_POINTER(file);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PFMPSS - FORTRAN interface routine to set file->mpi_file */
+
+FIXNUM FF_ID(pfmpss, PFMPSS)(FIXNUM *sfid, FIXNUM *sv)
+   {FIXNUM rv;
+    PDBfile *file;
+
+    file = SC_GET_POINTER(PDBfile, *sfid);
+    rv   = PD_mp_set_serial(file, *sv);
+  
+    return(rv);}
+  
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
