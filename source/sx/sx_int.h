@@ -409,6 +409,10 @@ extern SX_menu_item
 
 /* SXPML.C declarations */
 
+extern PM_set
+ *SX_rep_to_ac(char *name, double *rx, double *ry,
+	       int n_nodes, int n_zones, int *zones);
+
 extern object
  *_SXI_list_array(SS_psides *si, object *argl);
 

@@ -530,7 +530,7 @@ void *SS_var_reference(SS_psides *si, char *s)
 
 /* _SS_MAKE_LIST - make a SCHEME list from a C arg list */
 
-static object *_SS_make_list(SS_psides *si, int n, int *type, void **ptr)
+object *_SS_make_list(SS_psides *si, int n, int *type, void **ptr)
    {int i, c, ityp;
     char *s;
     void *vl;
@@ -691,54 +691,6 @@ object *SS_eval_form(SS_psides *si, object *first, ...)
     SS_assign(si, expr, SS_null);
 
     return(res);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SSCHEM - do a Fortran version of SS_call_scheme */
-
-FIXNUM FF_ID(sschem, SSCHEM)(FIXNUM *snc, char *name, ...)
-   {int i, type[MAXLINE];
-    FIXNUM rv;
-    void *ptr[MAXLINE];
-    char func[80];
-    SC_address ret;
-    object *fnc, *expr;
-    SS_psides *si;
-
-    si = SS_get_current_scheme(-1);
-    
-    SC_FORTRAN_STR_C(func, name, *snc);
-
-    SC_VA_START(name);
-
-    fnc = (object *) SC_hasharr_def_lookup(si->symtab, func);
-    if (fnc == NULL)
-       SS_error(si, "UNKNOWN PROCEDURE - SSCHEM", SS_mk_string(si, func));
-
-    for (i = 0; i < MAXLINE; i++)
-        {type[i] = *SC_VA_ARG(int *);
-         if (type[i] == 0)
-            break;
-
-         ptr[i] = (void *) *SC_VA_ARG(char **);
-         if (ptr[i] == (void *) LAST)
-            break;};
-
-    SC_VA_END;
-
-    expr = SS_null;
-    SS_assign(si, expr, SS_mk_cons(si, fnc, _SS_make_list(si, i, type, ptr)));
-
-    SS_eval(si, expr);
-
-    SS_assign(si, expr, SS_null);
-
-    ret.memaddr = (char *) si->val;
-
-    rv = ret.diskaddr;
-
-    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

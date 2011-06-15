@@ -1552,6 +1552,8 @@ object *SX_mk_C_array(SS_psides *si, C_array *arr)
 /* SX_REP_TO_AC - map a the given connectivity representation into
  *              - the PACT mesh topology representation
  *              - and return a domain set
+ *
+ * #bind SX_rep_to_ac fortran()
  */
 
 PM_set *SX_rep_to_ac(char *name, double *rx, double *ry,
@@ -2151,30 +2153,6 @@ void SX_install_pml_funcs(SS_psides *si)
                _SXI_union_polygon, SS_PR_PROC);
 
     return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SXDTAC - Fortran interface to SX_rep_to_ac */
-
-FIXNUM FF_ID(sxdtac, SXDTAC)(FIXNUM *sncn, char *pname,
-			     double *arx, double *ary,
-			     FIXNUM *snn, FIXNUM *snz, FIXNUM *azones)
-   {int n_nodes, n_zones;
-    FIXNUM rv;
-    char name[MAXLINE];
-    PM_set *set;
-
-    SC_FORTRAN_STR_C(name, pname, *sncn);
-
-    n_nodes = *snn;
-    n_zones = *snz;
-
-    set = SX_rep_to_ac(name, arx, ary, n_nodes, n_zones, (int *) azones);
-
-    rv = SC_ADD_POINTER(set);
-
-    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
