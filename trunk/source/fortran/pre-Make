@@ -20,7 +20,7 @@ OD = DefaultO
 # Compiler/Loader Options
 #
 CcFlags = ${ODC} -I. -I${PACTSrcDir} -I${IncDir} ${MDInc}
-FcFlags = ${ODF}
+FcFlags = ${ODF} -I${IncDir}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
 CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}
@@ -69,11 +69,11 @@ Hdrs =
 
 gfs = gf-score.c gf-pml.c gf-pdb.c   \
       gf-ppc.c gf-pgs.c gf-panacea.c \
-      gf-scheme.c
+      gf-scheme.c gf-fortran.c
 
 gms = gm-score.f gm-pml.f gm-pdb.f   \
       gm-ppc.f gm-pgs.f gm-panacea.f \
-      gm-scheme.f
+      gm-scheme.f gm-fortran.f
 
 #
 # Object Files
@@ -81,32 +81,33 @@ gms = gm-score.f gm-pml.f gm-pdb.f   \
 
 gfo = gf-score.o gf-pml.o gf-pdb.o   \
       gf-ppc.o gf-pgs.o gf-panacea.o \
-      gf-scheme.o
+      gf-scheme.o gf-fortran.o
 
 gmo = gm-score.o gm-pml.o gm-pdb.o   \
       gm-ppc.o gm-pgs.o gm-panacea.o \
-      gm-scheme.o
+      gm-scheme.o gm-fortran.o
 
 Objs = ${gmo} ${gfo} flibc.o
 
 gfa = ${TGTLib}(gf-score.o) ${TGTLib}(gf-pml.o) ${TGTLib}(gf-pdb.o)   \
       ${TGTLib}(gf-ppc.o) ${TGTLib}(gf-pgs.o) ${TGTLib}(gf-panacea.o) \
-      ${TGTLib}(gf-scheme.o)
+      ${TGTLib}(gf-scheme.o) ${TGTLib}(gf-fortran.o)
 
 gma = ${TGTLib}(gm-score.o) ${TGTLib}(gm-pml.o) ${TGTLib}(gm-pdb.o)   \
       ${TGTLib}(gm-ppc.o) ${TGTLib}(gm-pgs.o) ${TGTLib}(gm-panacea.o) \
-      ${TGTLib}(gm-scheme.o)
+      ${TGTLib}(gm-scheme.o) ${TGTLib}(gm-fortran.o)
 
 ArObjs = ${gma} ${gfa} ${TGTLib}(flibc.o)
 
-${ArObjs}  : ${Hdrs}
-${Objs}  : ${Hdrs}
+${ArObjs} : ${Hdrs}
+${Objs} : ${Hdrs}
 ${LibDep} : ${Hdrs}
 
-modules : ${gmo} ${gfo}
+modules : ${LibDep}
 	@touch dummy.mod
 	cp *.mod ${IncDir}
-	@rm -f ${IncDir}/dummy.mod
+	@rm -f dummy.mod ${IncDir}/dummy.mod
+	@rm -rf z-${System}
 
 ${PACTTmpDir}/gm-${LibName}.f : flibc.f
 	@../scripts/bproto
@@ -114,26 +115,26 @@ ${PACTTmpDir}/gm-${LibName}.f : flibc.f
 genmod : ${PACTTmpDir}/gm-${LibName}.f
 
 IncAction = @pact genmod
-LibAction = @(cd ${PACTTmpDir} ; pact -f ../../pre-Make modules)
+LibAction = @(cd ${PACTTmpDir} ; pact PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=\"\" -f ../../pre-Make modules)
 
-Libs = ${LPDB} ${LPML} ${LSCORE} ${MDLib}
-FLibs = -lfpact
+Libs = -lfpact ${LPDB} ${LPML} ${LSCORE} ${MDLib}
+
 
 # PDB tests
 
 pdb : ${BinDir}/pdftst ${BinDir}/pdfwts ${BinDir}/pdfgts ${BinDir}/pdfhyts
 
 ${BinDir}/pdftst : pdftst.f ${InstallDep} ${Hdrs}
-	${FC} ${LdFlags} pdftst.f -o ${BinDir}/pdftst ${Libs} ${FLibs} ${DPLib}
+	${FC} ${LdFlags} pdftst.f -o ${BinDir}/pdftst ${Libs} ${DPLib}
 
 ${BinDir}/pdfwts : pdfwts.f ${InstallDep} ${Hdrs}
-	${FC} ${LdFlags} pdfwts.f -o ${BinDir}/pdfwts ${Libs} ${FLibs} ${DPLib}
+	${FC} ${LdFlags} pdfwts.f -o ${BinDir}/pdfwts ${Libs} ${DPLib}
 
 ${BinDir}/pdfgts : pdfgts.f ${InstallDep} ${Hdrs}
-	${FC} ${LdFlags} pdfgts.f -o ${BinDir}/pdfgts ${Libs} ${FLibs} ${DPLib}
+	${FC} ${LdFlags} pdfgts.f -o ${BinDir}/pdfgts ${Libs} ${DPLib}
 
 ${BinDir}/pdfhyts : pdfhyts.f ${InstallDep} ${Hdrs}
-	${FC} ${LdFlags} pdfhyts.f -o ${BinDir}/pdfhyts ${Libs} ${FLibs} ${DPLib}
+	${FC} ${LdFlags} pdfhyts.f -o ${BinDir}/pdfhyts ${Libs} ${DPLib}
 
 fdp : ${BinDir}/pdfdpt
 

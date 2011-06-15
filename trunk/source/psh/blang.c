@@ -36,6 +36,10 @@ typedef struct s_mtype mtype;
 
 struct s_bindes
    {int cfl;
+    int nbi;
+    int ncp;
+    int nfp;
+    int nfw;
     char *pck;
     char **sbi;
     char **cpr;
@@ -699,18 +703,26 @@ static char *deref(char *d, int nc, char *s)
 
 /* SETUP_BINDER - initialize the data members of BD */
 
-static void setup_binder(bindes *bd, FILE *fp, char *pck, int cfl,
+static void setup_binder(bindes *bd, char *pck, int cfl,
 			 char **sbi, char **cpr, char **fpr, char **fwr)
    {
 
     if (bd != NULL)
        {bd->pck = pck;
-	bd->fp  = fp;
+	bd->fp  = NULL;
 	bd->cfl = cfl;
+
 	bd->sbi = sbi;
+	bd->nbi = lst_length(sbi);
+
 	bd->cpr = cpr;
+	bd->ncp = lst_length(cpr);
+
 	bd->fpr = fpr;
-	bd->fwr = fwr;};
+	bd->nfp = lst_length(fpr);
+
+	bd->fwr = fwr;
+	bd->nfw = lst_length(fwr);};
 
     return;}
 
@@ -933,6 +945,8 @@ static void init_fortran(bindes *bd, char *pck, int cfl,
     char fn[MAXLINE], ufn[MAXLINE], fill[MAXLINE];
     FILE *fp;
 
+    setup_binder(bd, pck, cfl, sbi, cpr, fpr, fwr);
+
     fp = NULL;
 
     if (cfl & 1)
@@ -955,12 +969,14 @@ static void init_fortran(bindes *bd, char *pck, int cfl,
 	fprintf(fp, "\n");
 
 	fprintf(fp, "#include \"cpyright.h\"\n");
-	fprintf(fp, "#include \"%s_int.h\"\n", pck);
-	fprintf(fp, "\n");
 
+	if ((bd->nbi > 0) || (bd->ncp > 0) || (bd->nfw > 0))
+	   fprintf(fp, "#include \"%s_int.h\"\n", pck);
+
+	fprintf(fp, "\n");
 	csep(fp);};
 
-    setup_binder(bd, fp, pck, cfl, sbi, cpr, fpr, fwr);
+    bd->fp = fp;
 
     return;}
 
@@ -1593,6 +1609,8 @@ static void init_module(bindes *bd, char *pck, int cfl,
     char fn[MAXLINE], ufn[MAXLINE], fill[MAXLINE];
     FILE *fp;
 
+    setup_binder(bd, pck, cfl, sbi, cpr, fpr, fwr);
+
     fp = NULL;
 
     if (cfl & 2)
@@ -1624,7 +1642,7 @@ static void init_module(bindes *bd, char *pck, int cfl,
 	fprintf(fp, "   use iso_c_binding\n");
 	fprintf(fp, "\n");};
 
-    setup_binder(bd, fp, pck, cfl, sbi, cpr, fpr, fwr);
+    bd->fp = fp;
 
     return;}
 
@@ -2151,6 +2169,8 @@ static void init_scheme(bindes *bd, char *pck, int cfl,
 			char **sbi, char **cpr, char **fpr, char **fwr)
    {FILE *fp;
 
+    setup_binder(bd, pck, cfl, sbi, cpr, fpr, fwr);
+
     fp = open_file("w", "gs-%s.c", pck);
 
     fprintf(fp, "\n");
@@ -2160,7 +2180,7 @@ static void init_scheme(bindes *bd, char *pck, int cfl,
 
     csep(fp);
 
-    setup_binder(bd, fp, pck, cfl, sbi, cpr, fpr, fwr);
+    bd->fp = fp;
 
     return;}
 
@@ -2561,6 +2581,8 @@ static void init_python(bindes *bd, char *pck, int cfl,
 			char **sbi, char **cpr, char **fpr, char **fwr)
    {FILE *fp;
 
+    setup_binder(bd, pck, cfl, sbi, cpr, fpr, fwr);
+
     fp = open_file("w", "gp-%s.c", pck);
 
     fprintf(fp, "\n");
@@ -2569,7 +2591,7 @@ static void init_python(bindes *bd, char *pck, int cfl,
 
     csep(fp);
 
-    setup_binder(bd, fp, pck, cfl, sbi, cpr, fpr, fwr);
+    bd->fp = fp;
 
     return;}
 
@@ -2660,13 +2682,15 @@ static void init_doc(bindes *bd, char *pck, int cfl,
 		     char **sbi, char **cpr, char **fpr, char **fwr)
    {FILE *fp;
 
+    setup_binder(bd, pck, cfl, sbi, cpr, fpr, fwr);
+
     fp = open_file("w", "gh-%s.html", pck);
 
     fprintf(fp, "\n");
 
     hsep(fp);
 
-    setup_binder(bd, fp, pck, cfl, sbi, cpr, fpr, fwr);
+    bd->fp = fp;
 
     return;}
 
@@ -2874,15 +2898,15 @@ static int blang(char *pck, int cfl, char *fbi,
    {int ib, nb, rv;
     char **sbi, **scp, **sfp, **swr;
     bindes *pb;
-    bindes bd[] = { {0, NULL, NULL, NULL, NULL, NULL, NULL,
+    bindes bd[] = { {0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL,
 		     init_fortran, bind_fortran, fin_fortran},
-		    {0, NULL, NULL, NULL, NULL, NULL, NULL,
+		    {0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL,
 		     init_module, bind_module, fin_module},
-		    {0, NULL, NULL, NULL, NULL, NULL, NULL,
+		    {0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL,
 		     init_scheme, bind_scheme, fin_scheme},
-		    {0, NULL, NULL, NULL, NULL, NULL, NULL,
+		    {0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL,
 		     init_python, bind_python, fin_python},
-		    {0, NULL, NULL, NULL, NULL, NULL, NULL,
+		    {0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL,
 		     init_doc, bind_doc, fin_doc} };
 
     rv = FALSE;

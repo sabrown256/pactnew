@@ -1507,9 +1507,9 @@ static void default_rules(void)
 	     "else",
 	     "   echo \"${FCAnnounce} -c $<\" ;",
 	     cd, rm, tc,
-	     "    ${FC} -c ${PACTSrcDir}/$< -o $*.o ;",
+	     "     ${FC} -c ${PACTSrcDir}/$< -o $*.o ;",
 	     ar,
-	     "    ${RM} $*.o 2>> errlog ;",
+	     "     ${RM} $*.o 2>> errlog ;",
 	     "fi");
 
 /* template rules */

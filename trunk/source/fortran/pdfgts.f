@@ -14,7 +14,7 @@
 ! ERRPROC - handle errors
 
       subroutine errproc
-      use pact_score
+      use pact_fortran
       use pact_pdb
       implicit none
 
@@ -311,7 +311,7 @@
 ! TEST_1 - basic file testing
 
       subroutine test_1(outtype, date, PRINT, DIR, ATTR, OPTION)
-      use pact_score
+      use pact_fortran
       use pact_pdb
       implicit none 
 
@@ -669,7 +669,7 @@
 ! TEST_2 - feature testing
 
       subroutine test_2(date, PRINT, DIR, ATTR)
-      use pact_score
+      use pact_fortran
       use pact_pdb
       implicit none 
 
@@ -990,7 +990,7 @@
 ! TEST_3 - feature testing
 
       subroutine test_3(PRINT, DIR, OPTION)
-      use pact_score
+      use pact_fortran
       use pact_pdb
       implicit none 
 
@@ -1179,8 +1179,7 @@
  702        format('    ', a)
          endif
          if ((n .eq. 1) .and.                           &
-             ((DIR .and. (vnm(1:nc) .ne. 'x')) .or.     &
-             ((.not. DIR) .and. (vnm(1:nc) .ne. 'Image0')))) &
+             (DIR .and. (vnm(1:nc) .ne. 'x')))          &
             call errproc
       enddo
 
@@ -1237,6 +1236,7 @@
 ! PDFGTS - main test routine
 
       program pdfgts
+      use pact_fortran
       use pact_score
       use pact_pdb
       implicit none 
@@ -1265,7 +1265,7 @@
 
       ftid = C_NULL_PTR
       err  = pd_init_threads_f(0, ftid)
-      err  = sc_zero_space_f(0)
+      err  = sc_zero_space_n_f(0, -1)
 
 ! ... initialize input command option flags
       PRINT  = .false.
