@@ -20,7 +20,7 @@ while ($#argv > 0)
       case -h:
            echo "Usage: fttest [-h] [<test>]*"
            echo "  h       this help message"
-           echo "  <test>  one of: pdb"
+           echo "  <test>  one of: pdb history"
            echo ""
            exit(1)
       case -*:
@@ -70,7 +70,7 @@ else if ($FC_Exe != none) then
 
    if ("$Test" == "") then
       set Test = ""
-      set Test = ($Test pdb)
+      set Test = ($Test pdb history)
    endif
 
    foreach i ($Test)

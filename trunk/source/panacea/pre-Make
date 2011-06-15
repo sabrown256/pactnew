@@ -11,7 +11,7 @@ LibName=panacea
 
 TGTLib = ${LibDir}/lib${LibName}.a
 TGTExe = ${BinDir}/toul
-TGTInc = panace.h panacea_int.h f77std.h
+TGTInc = panace.h panacea_int.h
 
 TGTScm = applications/panache.scm applications/panabgc.scm applications/panagc.scm \
          applications/panbgc.scm applications/panpgc.scm applications/panint.scm
@@ -81,7 +81,7 @@ Hdrs = ${TGTInc} ${hdrf}
 #
 # Object Files
 #
-GenObjs = pagnrd.o pahand.o pafi.o pafia.o
+GenObjs = pagnrd.o pahand.o pafi.o
 PanObjs = padsys.o pamm.o panacea.o paccess.o pashar.o pashas.o pastr.o pavars.o \
  	  padef.o pacpp.o papkg.o pasmp.o
 PPObjs  = papp.o padump.o panth.o
@@ -93,7 +93,7 @@ ArObjs = ${TGTLib}(padef.o) ${TGTLib}(pacpp.o) ${TGTLib}(papkg.o)      \
          ${TGTLib}(panacea.o) ${TGTLib}(pashar.o) ${TGTLib}(pashas.o)  \
          ${TGTLib}(paccess.o) ${TGTLib}(padsys.o) ${TGTLib}(pamm.o)    \
          ${TGTLib}(pavars.o) ${TGTLib}(papp.o) ${TGTLib}(padump.o)     \
-         ${TGTLib}(pasrc.o) ${TGTLib}(pastr.o) ${TGTLib}(pafia.o)      \
+         ${TGTLib}(pasrc.o) ${TGTLib}(pastr.o)                         \
          ${TGTLib}(pasmp.o)                                            \
          ${TGTLib}(panth.o)
 
@@ -110,20 +110,6 @@ ${IncDir}/pasrc.h : pasrc.t
 hdrf = ${IncDir}/pasrc.h
 
 IncAction = @pact generate
-
-
-#
-# time history tests
-#
-Cth : ${BinDir}/pathts
-
-${BinDir}/pathts : pathts.c ${TGTLib}
-	${CLD} ${LdFlags} pathts.c -o ${BinDir}/pathts ${NGLibs}
-
-Fth : ${BinDir}/pathft
-
-${BinDir}/pathft : pathft.f ${TGTLib}
-	${FC} ${LdFlags} pathft.c -o ${BinDir}/pathft ${NGLibs}
 
 #
 # pata

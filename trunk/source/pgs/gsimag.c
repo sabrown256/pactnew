@@ -332,9 +332,9 @@ static void _PG_image_core(PG_device *dev, PG_graph *data,
  *                      - on a Logical-Rectangular mesh
  */
 
-static void _PG_draw_image_nc_lr(PG_device *dev, char *name, char *type,
-				 void *f, double *frm,
-				 void *cnnct, pcons *alist)
+void _PG_draw_image_nc_lr(PG_device *dev, char *name, char *type,
+			  void *f, double *frm,
+			  void *cnnct, pcons *alist)
    {int *maxes, w, h, bpp;
     PG_image *im;
 
@@ -1614,49 +1614,6 @@ void _PG_intp_byte(unsigned char *op, unsigned char *np,
          np[i*ns] = ov1*(io1 + 1 - si) + ov2*(si - io1) + 0.5;};
 
     return;}
-
-/*--------------------------------------------------------------------------*/
-
-/*                            FORTRAN API ROUTINES                          */
-
-/*--------------------------------------------------------------------------*/
-
-/* PGPLIM - low level image plot routine */
-
-FIXNUM FF_ID(pgplim, PGPLIM)(FIXNUM *sdid, FIXNUM *sncn, char *name,
-			     FIXNUM *snct, char *type,
-			     double *az, FIXNUM *sk, FIXNUM *sl,
-			     double *sxn, double *sxx,
-			     double *syn, double *syx,
-			     double *szn, double *szx, FIXNUM *said)
-   {int maxes[2];
-    FIXNUM rv;
-    double frm[PG_BOXSZ];
-    char lname[MAXLINE], ltype[MAXLINE];
-    pcons *alst;
-    PG_device *dev;
-
-    SC_FORTRAN_STR_C(lname, name, *sncn);
-    SC_FORTRAN_STR_C(ltype, type, *snct);
-
-    maxes[0] = *sk;
-    maxes[1] = *sl;
-
-    dev  = SC_GET_POINTER(PG_device, *sdid);
-    alst = SC_GET_POINTER(pcons, *said);
-
-    _PG_draw_image_nc_lr(dev, lname, ltype, az, frm, maxes, alst);
-
-    *sxn = frm[0];
-    *sxx = frm[1];
-    *syn = frm[2];
-    *syx = frm[3];
-    *szn = frm[4];
-    *szx = frm[5];
-
-    rv = TRUE;
-
-    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
