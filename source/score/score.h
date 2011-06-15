@@ -664,6 +664,20 @@ extern SC_global_state
 /*--------------------------------------------------------------------------*/
 
 
+/* SCAPI.C declarations */
+
+extern int
+ SC_free_stash(void);
+
+extern int64_t
+ SC_stash_pointer(void *p),
+ SC_pointer_index(void *p);
+
+extern void
+ *SC_get_pointer(int64_t n),
+ *SC_del_pointer(int n);
+
+
 /* SCBIO.C declarations */
 
 extern int
@@ -751,20 +765,6 @@ extern void
 
 extern int
  SC_error_explanation(int st, char *s, int nc);
-
-
-/* SCFIA.C declarations */
-
-extern int
- SC_free_stash(void);
-
-extern int64_t
- SC_stash_pointer(void *p),
- SC_pointer_index(void *p);
-
-extern void
- *SC_get_pointer(int64_t n),
- *SC_del_pointer(int n);
 
 
 /* SCFNCA.C declarations */
