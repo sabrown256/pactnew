@@ -942,7 +942,7 @@ static void fc_call_list(char *a, int nc, fdecl *dcl, int local)
 static void init_fortran(bindes *bd, char *pck, int cfl,
 			 char **sbi, char **cpr, char **fpr, char **fwr)
    {int nc;
-    char fn[MAXLINE], ufn[MAXLINE], fill[MAXLINE];
+    char fn[MAXLINE], hf[MAXLINE], ufn[MAXLINE], fill[MAXLINE];
     FILE *fp;
 
     setup_binder(bd, pck, cfl, sbi, cpr, fpr, fwr);
@@ -970,8 +970,11 @@ static void init_fortran(bindes *bd, char *pck, int cfl,
 
 	fprintf(fp, "#include \"cpyright.h\"\n");
 
-	if ((bd->nbi > 0) || (bd->ncp > 0) || (bd->nfw > 0))
-	   fprintf(fp, "#include \"%s_int.h\"\n", pck);
+	snprintf(hf, MAXLINE, "%s_int.h", pck);
+	if (file_exists(hf) == TRUE)
+	   fprintf(fp, "#include \"%s\"\n", hf);
+	else
+	   fprintf(fp, "#include \"sx_int.h\"\n");
 
 	fprintf(fp, "\n");
 	csep(fp);};
