@@ -1223,7 +1223,7 @@
 ! PDFTST - main test routine
 
       program pdftst
-      use pact_score
+      use pact_fortran
       use pact_pdb
       implicit none 
 

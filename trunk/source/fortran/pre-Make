@@ -24,6 +24,7 @@ FcFlags = ${ODF} -I${IncDir}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
 CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}
+FCAnnounce = ${FCompiler} ${ODC} ${FFLAGS}
 
 #
 # Files to Save for Backup (make save)
@@ -87,7 +88,8 @@ gmo = gm-score.o gm-pml.o gm-pdb.o   \
       gm-ppc.o gm-pgs.o gm-panacea.o \
       gm-scheme.o gm-fortran.o
 
-Objs = ${gmo} ${gfo} flibc.o scfia.o
+Objs = ${gmo} ${gfo} flibc.o \
+       scfia.o scfib.o scfis.o scmemf.o
 
 gfa = ${TGTLib}(gf-score.o) ${TGTLib}(gf-pml.o) ${TGTLib}(gf-pdb.o)   \
       ${TGTLib}(gf-ppc.o) ${TGTLib}(gf-pgs.o) ${TGTLib}(gf-panacea.o) \
@@ -97,7 +99,9 @@ gma = ${TGTLib}(gm-score.o) ${TGTLib}(gm-pml.o) ${TGTLib}(gm-pdb.o)   \
       ${TGTLib}(gm-ppc.o) ${TGTLib}(gm-pgs.o) ${TGTLib}(gm-panacea.o) \
       ${TGTLib}(gm-scheme.o) ${TGTLib}(gm-fortran.o)
 
-ArObjs = ${gma} ${gfa} ${TGTLib}(flibc.o) ${TGTLib}(scfia.o)
+ArObjs = ${gma} ${gfa} ${TGTLib}(flibc.o) \
+         ${TGTLib}(scfia.o) ${TGTLib}(scfib.o) ${TGTLib}(scfis.o) \
+         ${TGTLib}(scmemf.o)
 
 ${ArObjs} : ${Hdrs}
 ${Objs} : ${Hdrs}
