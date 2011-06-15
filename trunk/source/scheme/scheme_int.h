@@ -207,6 +207,9 @@ extern void
 
 /* SHINT.C declarations */
 
+extern object
+ *_SS_make_list(SS_psides *si, int n, int *type, void **ptr);
+
 extern int
  _SS_text_data_filep(FILE *fp, int cmnt);
 
