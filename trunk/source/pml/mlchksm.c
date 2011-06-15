@@ -567,7 +567,7 @@ long PM_checksum_file(FILE* file, int64_t start, int64_t stop, int nbts)
     int64_t here, nb;
     unsigned char bf[1024];
 
-/* Sanity checks */
+/* sanity checks */
     if (file == NULL)
       return(-1);
 
@@ -603,24 +603,6 @@ long PM_checksum_file(FILE* file, int64_t start, int64_t stop, int nbts)
     io_seek(file, here, SEEK_SET);
 
     return(sum);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PMCSMA - Fortran callable wrapper for PM_checksum_array */
-
-FIXNUM FF_ID(pmcsma, PMCSMA)(void *arr, FIXNUM *sni, FIXNUM *sbpi,
-			     FIXNUM *snbts)
-   {int ni, bpi, nbts;
-    FIXNUM cs;
-
-    ni   = *sni;
-    bpi  = *sbpi;
-    nbts = *snbts;
-
-    cs = PM_checksum_array(arr, ni, bpi, nbts);
-
-    return(cs);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -83,7 +83,7 @@ Objs = mlmath.o mlsrch.o mlrand.o mlnls.o mlmatr.o                \
        mlfft.o mllsq.o mlfpe.o mloper.o mlgeom.o mlsort.o mlmm.o  \
        mlintm.o mlintp.o mlints.o                                 \
        mlchksm.o mlmesh.o mlmsrch.o mlcmsh.o mlmextr.o            \
-       mlfia.o mlvect.o mlsmp.o 
+       mlvect.o mlsmp.o 
 
 ArObjs = ${TGTLib}(mlmath.o)  ${TGTLib}(mlsrch.o)  ${TGTLib}(mlfft.o)   \
          ${TGTLib}(mlmatr.o)  ${TGTLib}(mlsort.o)  ${TGTLib}(mlnls.o)   \
@@ -95,7 +95,7 @@ ArObjs = ${TGTLib}(mlmath.o)  ${TGTLib}(mlsrch.o)  ${TGTLib}(mlfft.o)   \
          ${TGTLib}(mllsq.o)   ${TGTLib}(mlfpe.o)   ${TGTLib}(mloper.o)  \
 	 ${TGTLib}(mlgeom.o)  ${TGTLib}(mlrand.o)  ${TGTLib}(mlmm.o)    \
          ${TGTLib}(mlmesh.o)  ${TGTLib}(mlmsrch.o) ${TGTLib}(mlcmsh.o)  \
-         ${TGTLib}(mlmextr.o) ${TGTLib}(mlchksm.o) ${TGTLib}(mlfia.o)   \
+         ${TGTLib}(mlmextr.o) ${TGTLib}(mlchksm.o)                      \
          ${TGTLib}(mlvect.o)  ${TGTLib}(mlsmp.o)
 
 ${LibDep} : ${hdrf} ${Hdrs}
