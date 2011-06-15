@@ -87,6 +87,9 @@ Note $Log ""
       grep '#bind' $Hfiles $Cfiles  | \
       sed 's/^.*#bind[ \t]*//'      | \
       cat >&! $cbind
+   else
+      flog $Log rm -f $cbind
+      flog $Log touch $cbind
    endif
 
 #--------------------------------------------------------------------------
@@ -246,37 +249,43 @@ Note $Log ""
    set xstatus = $status
 
 # move all fortran stuff to the fortran package
-   if (-f gf-$d.c) then
-      set ldst =  ../../../fortran/$zdir
-      if (!(-d $ldst)) then
-         flog $Log mkdir -p $ldst
+   if ($d != fortran) then
+      if (-f gf-$d.c) then
+         set ldst =  ../../../fortran/$zdir
+         if (!(-d $ldst)) then
+            flog $Log mkdir -p $ldst
+         endif
+         flog $Log mv gf-$d.c $ldst
       endif
-      flog $Log mv gf-$d.c $ldst
-   endif
-   if (-f gm-$d.f) then
-      set ldst =  ../../../fortran/$zdir
-      if (!(-d $ldst)) then
-         flog $Log mkdir -p $ldst
+      if (-f gm-$d.f) then
+         set ldst =  ../../../fortran/$zdir
+         if (!(-d $ldst)) then
+            flog $Log mkdir -p $ldst
+         endif
+         flog $Log mv gm-$d.f $ldst
       endif
-      flog $Log mv gm-$d.f $ldst
    endif
 
 # move all scheme stuff to the sx package
-   if (-f gs-$d.c) then
-      set ldst =  ../../../sx/$zdir
-      if (!(-d $ldst)) then
-         flog $Log mkdir -p $ldst
+   if ($d != sx) then
+      if (-f gs-$d.c) then
+         set ldst =  ../../../sx/$zdir
+         if (!(-d $ldst)) then
+            flog $Log mkdir -p $ldst
+         endif
+         flog $Log mv gs-$d.c $ldst
       endif
-      flog $Log mv gs-$d.c $ldst
    endif
 
 # move all python stuff to the python package
-   if (-f gp-$d.c) then
-      set ldst =  ../../../python/$zdir
-      if (!(-d $ldst)) then
-         flog $Log mkdir -p $ldst
+   if ($d != python) then
+      if (-f gp-$d.c) then
+         set ldst =  ../../../python/$zdir
+         if (!(-d $ldst)) then
+            flog $Log mkdir -p $ldst
+         endif
+         flog $Log mv gp-$d.c $ldst
       endif
-      flog $Log mv gp-$d.c $ldst
    endif
 
 # move all documentation to the doc package
