@@ -130,7 +130,7 @@ ArJPG = ${TGTLib}(gsdv_jpg.o)
 ArMPG = ${TGTLib}(gsdv_mpg.o) ${TGTLib}(gspr_mpg.o) ${TGTLib}(gsmpeg.o)
 ArPNG = ${TGTLib}(gsdv_png.o)
 
-${LibDep} : ${gobj} ${hdrf} ${Hdrs} ${GraphicsDevices}
+${LibDep} : ${hdrf} ${Hdrs} ${GraphicsDevices}
 
 ${ArMPG} : ${MpgHdr}
 ${ArX}   : ${XHdr}

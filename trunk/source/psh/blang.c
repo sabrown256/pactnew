@@ -175,7 +175,20 @@ static int no_args(fdecl *dcl)
    {int rv;
 
     rv = ((dcl->na == 1) && (dcl->al[0].name[0] == '\0'));
-/* (strcmp(dcl->al[0].type, "void") == 0) */
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* IS_VAR_ARG - return TRUE iff the function described by PR
+ *            - has a variable arg list
+ */
+
+static int is_var_arg(char *pr)
+   {int rv;
+
+    rv = (strstr(pr, "...") != NULL);
 
     return(rv);}
 
@@ -199,7 +212,7 @@ static int split_decl(char *type, int nt, char *name, int nn, char *s)
 
     if (strcmp(p, "void") == 0)
        pn = p + 4;
-    else if (strcmp(p, "...") == 0)
+    else if (is_var_arg(p) == TRUE)
        pn = p + 3;
     else
        {nc = strlen(p);
@@ -702,6 +715,41 @@ static void setup_binder(bindes *bd, FILE *fp, char *pck, int cfl,
     return;}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PARSE_BIND - parse out the binding specifications of S for LANG */
+
+static char **parse_bind(char *s, char *lang)
+   {int i, nc;
+    char t[MAXLINE];
+    char *p, **sa, **ta;
+
+    ta = NULL;
+
+    if ((s != NULL) && (lang != NULL))
+       {nstrncpy(t, MAXLINE, s, -1);
+	sa = tokenize(t, " \t");
+
+	nc = strlen(lang);
+	ta = lst_push(ta, sa[0]);
+	for (i = 1; sa[i] != NULL; i++)
+	    {if (strncmp(sa[i], lang, nc) == 0)
+	        {p = sa[i] + nc + 1;
+		 p = trim(p, BACK, ")");
+		 if (IS_NULL(p) == TRUE)
+		    ta = lst_push(ta, "yes");
+		 else
+		    ta = lst_push(ta, p);
+		 break;};};
+
+	if (sa[i] == NULL)
+	   ta = lst_push(ta, "none");
+
+	free_strings(sa);};
+
+    return(ta);}
+
+/*--------------------------------------------------------------------------*/
 
 /*                            FORTRAN ROUTINES                              */
 
@@ -741,7 +789,7 @@ static fparam fc_type(char *wty, int nc, char *ty, langmode mode)
     pty = lookup_type(ty, MODE_C, mode);
 
 /* handle variable arg list */
-    if (strcmp(ty, "...") == 0)
+    if (is_var_arg(ty) == TRUE)
        {nstrncpy(wty, nc, "char *", -1);
 	rv = FP_VARARG;}
 
@@ -1176,7 +1224,7 @@ static void fortran_wrap(FILE *fp, fdecl *dcl, char *cfn, char *ffn)
     fparam knd;
     char rt[MAXLINE];
 
-    if (strstr(dcl->proto, "...") != NULL)
+    if (is_var_arg(dcl->proto) == TRUE)
        berr("%s is not interoperable - variable args", ffn);
 
     else if (strcmp(ffn, "none") != 0)
@@ -1214,7 +1262,6 @@ static void fortran_wrap(FILE *fp, fdecl *dcl, char *cfn, char *ffn)
 
 static int bind_fortran(bindes *bd)
    {int ib, rv;
-    char t[MAXLINE];
     char *sb, **ta;
     char *cfn, *ffn;
     fdecl *dcl;
@@ -1231,8 +1278,7 @@ static int bind_fortran(bindes *bd)
 	for (ib = 0; sbi[ib] != NULL; ib++)
 	    {sb = sbi[ib];
 	     if (blank_line(sb) == FALSE)
-	        {nstrncpy(t, MAXLINE, sb, -1);
-		 ta = tokenize(t, " \t");
+	        {ta = parse_bind(sb, "fortran");
 		 cfn = ta[0];
 		 ffn = ta[1];
 		 dcl = find_proto(cpr, cfn);
@@ -1314,7 +1360,7 @@ static fparam mc_type(int nc, char *fty, char *cty,
     knd = fc_type(lwty, nc, ty, MODE_F);
     memmove(lwty, subst(lwty, "FIXNUM", "integer", -1), nc);
 
-    if (strcmp(ty, "...") == 0)
+    if (is_var_arg(ty) == TRUE)
        {nstrncpy(lfty, MAXLINE, "error", -1);
 	nstrncpy(lcty, MAXLINE, "error", -1);}
 
@@ -1636,7 +1682,7 @@ static char **module_native_f(FILE *fp, char **sa, char *pck)
 static int module_pre_wrappable(char *pr)
    {int rv;
 
-    rv = ((strstr(pr, "...") == NULL) &&
+    rv = ((is_var_arg(pr) == FALSE) &&
 	  (strstr(pr, "integer(isizea)") == NULL) &&
 	  (strstr(pr, "type(C_PTR)") == NULL) &&
 	  (strstr(pr, "external") == NULL));
@@ -1727,7 +1773,7 @@ static int module_itf_wrappable(fdecl *dcl)
 
     pr = dcl->proto;
 
-    rv = ((strstr(pr, "...") == NULL) && (strstr(pr, "void *") == NULL));
+    rv = ((is_var_arg(pr) == FALSE) && (strstr(pr, "void *") == NULL));
 
     return(rv);}
 
@@ -1839,7 +1885,7 @@ static void module_interop_wrap(FILE *fp, fdecl *dcl, char *cfn, char *ffn)
     char *nm, *ty, *rty, *oper;
     farg *al;
 
-    if (strstr(dcl->proto, "...") != NULL)
+    if (is_var_arg(dcl->proto) == TRUE)
        berr("%s is not interoperable - variable args", cfn);
 
     else
@@ -1914,8 +1960,7 @@ static int bind_module(bindes *bd)
 	for (ib = 0; sbi[ib] != NULL; ib++)
 	    {sb = sbi[ib];
 	     if (blank_line(sb) == FALSE)
-	        {nstrncpy(t, MAXLINE, sb, -1);
-		 ta = tokenize(t, " \t");
+	        {ta = parse_bind(sb, "fortran");
 		 cfn = ta[0];
 		 ffn = ta[1];
 		 dcl = find_proto(cpr, cfn);
@@ -1957,8 +2002,7 @@ static int bind_module(bindes *bd)
 	for (ib = 0; sbi[ib] != NULL; ib++)
 	    {sb = sbi[ib];
 	     if (blank_line(sb) == FALSE)
-	        {nstrncpy(t, MAXLINE, sb, -1);
-		 ta = tokenize(t, " \t");
+	        {ta = parse_bind(sb, "fortran");
 		 cfn = ta[0];
 		 ffn = ta[1];
 		 dcl = find_proto(cpr, cfn);
@@ -1984,8 +2028,7 @@ static int bind_module(bindes *bd)
 	for (ib = 0; sbi[ib] != NULL; ib++)
 	    {sb = sbi[ib];
 	     if (blank_line(sb) == FALSE)
-	        {nstrncpy(t, MAXLINE, sb, -1);
-		 ta = tokenize(t, " \t");
+	        {ta = parse_bind(sb, "fortran");
 		 cfn = ta[0];
 		 ffn = ta[1];
 		 dcl = find_proto(cpr, cfn);
@@ -2392,7 +2435,7 @@ static char **scheme_wrap(FILE *fp, char **fl, fdecl *dcl,
     fparam knd;
     char so[MAXLINE];
 
-    if (strcmp(sfn, "none") != 0)
+    if ((is_var_arg(dcl->proto) == FALSE) && (strcmp(sfn, "none") != 0))
        {voida = no_args(dcl);
 
 	csep(fp);
@@ -2457,7 +2500,6 @@ static void scheme_install(FILE *fp, char *pck, char **fl)
 
 static int bind_scheme(bindes *bd)
    {int ib, rv;
-    char t[MAXLINE];
     char *sb, **ta, **fl;
     char *cfn, *sfn;
     fdecl *dcl;
@@ -2475,10 +2517,9 @@ static int bind_scheme(bindes *bd)
     for (ib = 0; sbi[ib] != NULL; ib++)
         {sb = sbi[ib];
 	 if (blank_line(sb) == FALSE)
-	    {nstrncpy(t, MAXLINE, sb, -1);
-	     ta = tokenize(t, " \t");
+	    {ta = parse_bind(sb, "scheme");
 	     cfn = ta[0];
-	     sfn = ta[2];
+	     sfn = ta[1];
              dcl = find_proto(cpr, cfn);
 	     if (dcl != NULL)
 	        {fl = scheme_wrap(fp, fl, dcl, sfn, ta+4);
@@ -2563,7 +2604,6 @@ static void python_wrap(FILE *fp, fdecl *dcl, char *pfn)
 
 static int bind_python(bindes *bd)
    {int ib, rv;
-    char t[MAXLINE];
     char *sb, **ta;
     char *cfn, *pfn;
     fdecl *dcl;
@@ -2579,10 +2619,9 @@ static int bind_python(bindes *bd)
     for (ib = 0; sbi[ib] != NULL; ib++)
         {sb = sbi[ib];
 	 if (blank_line(sb) == FALSE)
-	    {nstrncpy(t, MAXLINE, sb, -1);
-	     ta = tokenize(t, " \t");
+	    {ta = parse_bind(sb, "python");
 	     cfn = ta[0];
-	     pfn = ta[3];
+	     pfn = ta[1];
              dcl = find_proto(cpr, cfn);
 	     if (dcl != NULL)
 	        {python_wrap(fp, dcl, pfn);
@@ -2691,12 +2730,15 @@ static void doc_proto_name_only(char *a, int nc, fdecl *dcl, char *dlm)
  *          - using names in FN
  */
 
-static void doc_wrap(FILE *fp, fdecl *dcl, char *cfn, char **fn, char **com)
+static void doc_wrap(FILE *fp, fdecl *dcl, char *sb, char *cfn, char **tok)
    {int voidf;
     char upn[MAXLINE], lfn[MAXLINE], dcn[MAXLINE];
     char af[MAXLINE], as[MAXLINE], ap[MAXLINE];
     char fty[MAXLINE], t[MAXLINE];
     char **args;
+    char **com;
+
+    com = tok + 3;
 
     voidf = (strcmp(dcl->type, "void") == 0);
 
@@ -2720,7 +2762,7 @@ static void doc_wrap(FILE *fp, fdecl *dcl, char *cfn, char **fn, char **com)
     fprintf(fp, "<i>C Binding: </i>       %s\n", dcl->proto);
 
 /* Fortran */
-    if (strcmp(fn[0], "none") == 0)
+    if (strstr(sb, "fortran(") == NULL)
        fprintf(fp, "<i>Fortran Binding: </i> none\n");
     else
        {args = dcl->tfproto;
@@ -2735,7 +2777,7 @@ static void doc_wrap(FILE *fp, fdecl *dcl, char *cfn, char **fn, char **com)
 		   args[0], dcn, af);};
 
 /* Scheme */
-    if (strcmp(fn[1], "none") == 0)
+    if (strcmp(sb, "scheme(") == 0)
        fprintf(fp, "<i>SX Binding: </i>      none\n");
     else
        {map_name(dcn, MAXLINE, cfn, NULL, NULL, -1, TRUE);
@@ -2746,7 +2788,7 @@ static void doc_wrap(FILE *fp, fdecl *dcl, char *cfn, char **fn, char **com)
 	   fprintf(fp, "<i>SX Binding: </i>      (%s %s)\n", dcn, as);};
 
 /* Python */
-    if (strcmp(fn[2], "none") == 0)
+    if (strcmp(sb, "python(") == 0)
        fprintf(fp, "<i>Python Binding: </i>  none\n");
     else
        {map_name(dcn, MAXLINE, cfn, NULL, NULL, -1, FALSE);
@@ -2791,12 +2833,12 @@ static int bind_doc(bindes *bd)
     for (ib = 0; sbi[ib] != NULL; ib++)
         {sb = sbi[ib];
 	 if (blank_line(sb) == FALSE)
-	    {nstrncpy(t, MAXLINE, sb, -1);
-	     ta = tokenize(t, " \t");
+            {nstrncpy(t, MAXLINE, sb, -1);
+             ta = tokenize(t, " \t");
 	     cfn = ta[0];
              dcl = find_proto(cpr, cfn);
 	     if (dcl != NULL)
-	        {doc_wrap(fp, dcl, cfn, ta+1, ta+4);
+	        {doc_wrap(fp, dcl, sb, cfn, ta+1);
 		 free_decl(dcl);};
 
 	     free_strings(ta);};};

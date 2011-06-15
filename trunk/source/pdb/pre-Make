@@ -58,7 +58,7 @@ BinObj =
 # Required Libraries
 #
 Libs = ${LPDB} ${LPML} ${LSCORE} ${MDLib}
-FLibs = -lpftn
+FLibs = -lfpact
 
 DepLib = ${LibDir}/libpml.a \
 	 ${LibDir}/libscore.a
@@ -114,7 +114,7 @@ ArObjs = ${TGTLib}(pdb.o) ${TGTLib}(pdbaib.o)                        \
          ${TGTLib}(pdszof.o) ${TGTLib}(pdpar.o) ${TGTLib}(pdparmp.o) \
          ${TGTLib}(pdspoke.o)
 
-${LibDep} : ${gobj} ${hdrf} ${Hdrs} pdspoke.c
+${LibDep} : ${hdrf} ${Hdrs} pdspoke.c
 
 #
 # Generated code rules

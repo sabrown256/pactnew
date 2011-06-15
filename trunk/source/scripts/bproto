@@ -60,6 +60,13 @@ Note $Log ""
       endif
    end
 
+   if (-f $d.h) then
+      set Hfiles = ( ../*/*.h )
+   else
+      set Hfiles = ""
+   endif
+
+   Note $Log "Hfiles = $Hfiles"
    Note $Log "Cfiles = $Cfiles"
    Note $Log "Ffiles = $Ffiles"
    Note $Log ""
@@ -67,7 +74,26 @@ Note $Log ""
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+# FIND_BIND - process the C files for #bind directives
+#
+#              - the transformations are:
+#   grep '#bind'                        find the #bind directives
+#   sed 's/^.*#bind[ \t]*//'            remove the #bind token, anything
+#                                       preceeding it, and whitespace after
+
+   flog $Log set cbind = z-$arch/obj/$d.bind
+
+   if ("$Cfiles" != "") then
+      grep '#bind' $Hfiles $Cfiles  | \
+      sed 's/^.*#bind[ \t]*//'      | \
+      cat >&! $cbind
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # FIND_CC_DECL - process the C declarations
+#
 #              - the transformations are:
 #   elide '/*' '*/' $Cfiles                        remove C comments
 #   elide '{' '}' -                                remove compound statements
@@ -84,7 +110,7 @@ Note $Log ""
 #   grep -v '='                                    remove lines with assignments
 #
 
-   flog $Log set cproto = z-$arch/$d.protoc
+   flog $Log set cproto = z-$arch/obj/$d.protoc
 
    if ("$Cfiles" != "") then
       elide '/*' '*/' $Cfiles                         | \
@@ -115,7 +141,7 @@ Note $Log ""
 
 # FIND_FC_DECL - process the Fortran declarations
 
-   flog $Log set fproto = z-$arch/$d.protof
+   flog $Log set fproto = z-$arch/obj/$d.protof
 
    flog $Log rm -f $fproto
    flog $Log touch $fproto
@@ -170,7 +196,7 @@ Note $Log ""
 #   sed 's/PF[^ ]* /external /g'          function pointer -> external
 #
 
-   flog $Log set fwrap = z-$arch/$d.wrapper
+   flog $Log set fwrap = z-$arch/obj/$d.wrapper
 
    if ("$Cfiles" != "") then
       cat $Cfiles                                    | \
@@ -213,41 +239,49 @@ Note $Log ""
 
    NoteD $Log "done"
 
-   flog $Log pushd z-$arch
+   set zdir = z-$arch/obj
+   flog $Log pushd $zdir
 
-   flog $Log blang ../$d.bind $cproto:t $fproto:t $fwrap:t
+   flog $Log blang $cbind:t $cproto:t $fproto:t $fwrap:t
    set xstatus = $status
 
+# move all fortran stuff to the fortran package
    if (-f gf-$d.c) then
-      flog $Log mv gf-$d.c obj
+      set ldst =  ../../../fortran/$zdir
+      if (!(-d $ldst)) then
+         flog $Log mkdir -p $ldst
+      endif
+      flog $Log mv gf-$d.c $ldst
    endif
    if (-f gm-$d.f) then
-      set ldst =  ../../fortran/z-$arch/obj
+      set ldst =  ../../../fortran/$zdir
       if (!(-d $ldst)) then
          flog $Log mkdir -p $ldst
       endif
       flog $Log mv gm-$d.f $ldst
    endif
+
+# move all scheme stuff to the sx package
    if (-f gs-$d.c) then
-      set ldst =  ../../sx/z-$arch/obj
+      set ldst =  ../../../sx/$zdir
       if (!(-d $ldst)) then
          flog $Log mkdir -p $ldst
       endif
       flog $Log mv gs-$d.c $ldst
    endif
+
+# move all python stuff to the python package
    if (-f gp-$d.c) then
-      set ldst =  ../../python/z-$arch/obj
+      set ldst =  ../../../python/$zdir
       if (!(-d $ldst)) then
          flog $Log mkdir -p $ldst
       endif
       flog $Log mv gp-$d.c $ldst
    endif
-   if (-f gh-$d.html) then
-      flog $Log mv gh-$d.html ../../doc
-   endif
 
-   if ($xstatus == 0) then
-#      flog $Log $RM $d.proto
+# move all documentation to the doc package
+   if (-f gh-$d.html) then
+      flog $Log mv gh-$d.html ../../../doc
    endif
 
    flog $Log popd

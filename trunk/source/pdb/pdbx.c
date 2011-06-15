@@ -194,7 +194,7 @@ void PD_rel_attr_table(PDBfile *file)
 /* PD_DEF_ATTRIBUTE - define an attribute by specifying its type
  *                  - return TRUE if successful and FALSE otherwise
  *
- * #bind PD_get_attribute fortran() scheme()
+ * #bind PD_def_attribute fortran() scheme()
  */
 
 int PD_def_attribute(PDBfile *file, char *at, char *type)

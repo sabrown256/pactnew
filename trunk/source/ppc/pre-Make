@@ -92,7 +92,7 @@ ArPARC = ${TGTLib}(pcparc.o) ${TGTLib}(pcparmp.o)
 
 ArNOIPC = ${TGTLib}(pcnil.o)
 
-${LibDep} : ${gobj} ${hdrf} ${Hdrs}
+${LibDep} : ${hdrf} ${Hdrs}
 
 #
 # Generated code rules
