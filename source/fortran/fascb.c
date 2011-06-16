@@ -1,5 +1,5 @@
 /*
- * SCFIB.C - FORTRAN interface routines for SCORE
+ * FASCB.C - FORTRAN interface routines for SCORE
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942

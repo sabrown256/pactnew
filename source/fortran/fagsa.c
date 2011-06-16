@@ -1,5 +1,5 @@
 /*
- * GSFIA.C - FORTRAN interface routines for PGS
+ * FAGSA.C - FORTRAN interface routines for PGS
  *         - NOTE: let's keep these in alphabetical order
  *
  * Source Version: 3.0

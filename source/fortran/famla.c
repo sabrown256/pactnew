@@ -1,5 +1,5 @@
 /*
- * MLFIA.C - FORTRAN interface to PML
+ * FAMLA.C - FORTRAN interface to PML
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942

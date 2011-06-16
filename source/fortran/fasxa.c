@@ -1,5 +1,5 @@
 /*
- * SXFIA.C - FORTRAN interface routines for SCORE/SX
+ * FASXA.C - FORTRAN interface routines for SCORE/SX
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942

@@ -1,5 +1,5 @@
 /*
- * PDFIA.C - FORTRAN interface routines for PDBLib (in PDBX)
+ * FAPDA.C - FORTRAN interface routines for PDBLib (in PDBX)
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942

@@ -40,11 +40,6 @@
 
 /*--------------------------------------------------------------------------*/
 
-#ifndef __GNUC__
-# define FF_ID(x, X)       x
-#endif
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif

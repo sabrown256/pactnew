@@ -1,5 +1,5 @@
 /*
- * SCFIS.C - FORTRAN usable string handling facilities
+ * FASCS.C - FORTRAN usable string handling facilities
  *         - there is a convention is some applications in which
  *         - FORTRAN strings are blank filled to the end and this
  *         - implies the possibliity of computing string length by

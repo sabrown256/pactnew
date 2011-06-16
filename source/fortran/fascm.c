@@ -1,5 +1,5 @@
 /*
- * SCMEMF.C - memory management Fortran wrappers
+ * FASCM.C - memory management Fortran wrappers
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
@@ -10,8 +10,8 @@
 
 #include "fpact.h"
 
-/*---------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _SC_MAKE_FF - allocate a chunk of memory and set the pointer
  *             - keep a name attached to this piece of memory

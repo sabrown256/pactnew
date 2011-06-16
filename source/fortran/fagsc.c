@@ -1,5 +1,5 @@
 /*
- * GSFIC.C - FORTRAN interface routines for PGS
+ * FAGSC.C - FORTRAN interface routines for PGS
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
