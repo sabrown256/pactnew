@@ -44,6 +44,9 @@ if ($LStat == 0) then
       flog $LogF rm -f $BinDir/pdfhyts
    else
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # test hand written wrappers
       NoteD $LogF -n "                        manual ......................... "
       Note $LogF ""
@@ -65,6 +68,9 @@ if ($LStat == 0) then
          set FAIL = "YES"
       endif
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # test automatically generated wrappers
       NoteD $LogF -n "                        auto ........................... "
       Note $LogF ""
@@ -85,6 +91,9 @@ if ($LStat == 0) then
          NoteD $LogF "ng"
          set FAIL = "YES"
       endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 # hyperstride test
       NoteD $LogF -n "                        hyperstride .................... "
@@ -109,6 +118,45 @@ if ($LStat == 0) then
          NoteD $LogF "ng"
          set FAIL = "YES"
       endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# distribute parallel test
+      if ($MPI == HAVE_MPI) then
+         flog $LogF pushd $SrcDir
+         flog $LogF $MAKE +na 2 fdp
+         set TStatus = $status
+         flog $LogF popd
+
+         set CFE = $BinDir/do-run
+
+         NoteD $LogF -n "                        dp ............................. "
+         Note $LogF ""
+         if ("$Valgrind" == "") then
+            flog $LogF $CFE -p 4 $BinDir/pdfdpt
+            set xstatus = $status
+         else
+            Note $LogF ""
+            ftee $LogF $Valgrind $BinDir/pdfdpt  |& \
+            grep "ERROR SUMMARY:"                |& \
+            awk '{ print $4 }'   >&! $Tmp
+            set xstatus = `cat $Tmp`
+            flog $LogF $RM $Tmp
+         endif
+
+         if (($xstatus == 254) || ($xstatus == 255)) then
+            NoteD $LogF "omitted"
+         else if ($xstatus == 0) then
+            NoteD $LogF "ok"
+         else
+            NoteD $LogF "ng"
+            set FAIL = "YES"
+         endif
+      endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
    endif
 

@@ -1,0 +1,143 @@
+#!/bin/csh -f
+#
+# SCORE - SCORE Fortran API tests
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+NoteD $LogF ""
+NoteD $LogF "                    SCORE API Test ..................... "
+Note $LogF ""
+
+set UTime = `$TIMER -r`
+
+flog $LogF pushd $SrcDir
+flog $LogF $MAKE scan
+set TStatus = $status
+flog $LogF popd
+
+set ETime   = `$TIMER -b $UTime`
+
+if ($TStatus != 0) then
+   NoteD $LogF ""
+   NoteD $LogF "                         ERROR Building SCORE API Tests"
+   set ERROR = TRUE
+else
+   set ERROR = FALSE
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   NoteD $LogF -n "                        lexical scan ................... "
+   Note $LogF ""
+   if ("$Valgrind" == "") then
+      $CFE $BinDir/sclsts $TDir/sclsts.src > sclsts.res
+      set xstatus = $status
+      diff sclsts.res $RefDir/sclsts > sclsts.res.diff
+      set Files = `find . -name "sclsts.res.diff" -size 0 -print`
+   else
+      ftee $LogF $Valgrind $BinDir/sclsts $TDir/sclsts.src          |& \
+      grep "ERROR SUMMARY:"                                         |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $LogF $RM $Tmp
+      set Files = ( 1 )
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if (($xstatus == 254) || ($xstatus == 255)) then
+      NoteD $LogF "omitted ($xstatus/$ETime)"
+   else if (($xstatus != 0) || ($#Files == 0)) then
+      NoteD $LogF "ng ($xstatus/$ETime)"
+      set ERROR = TRUE
+   else
+      NoteD $LogF "ok ($ETime)"
+      flog $LogF rm -f sclsts.res sclsts.res.diff
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   flog $LogF pushd $SrcDir
+   flog $LogF $MAKE -na 2 fha
+   set TStatus = $status
+   flog $LogF popd
+
+   NoteD $LogF -n "                        hash ........................... "
+   Note $LogF ""
+   if ("$Valgrind" == "") then
+      flog $LogF $CFE $BinDir/schtst
+      set xstatus = $status
+   else
+      ftee $LogF $Valgrind $BinDir/schtst                     |& \
+      grep "ERROR SUMMARY:"                                   |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $LogF $RM $Tmp
+      set Files = ( 1 )
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if (($xstatus == 254) || ($xstatus == 255)) then
+      NoteD $LogF "omitted ($xstatus/$ETime)"
+   else if (($xstatus != 0) || ($#Files == 0)) then
+      NoteD $LogF "ng ($xstatus/$ETime)"
+      set ERROR = TRUE
+   else
+      NoteD $LogF "ok ($ETime)"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   flog $LogF pushd $SrcDir
+   flog $LogF $MAKE -na 2 omp
+   set TStatus = $status
+   flog $LogF popd
+
+   NoteD $LogF -n "                        omp ............................ "
+   Note $LogF ""
+   if ("$Valgrind" == "") then
+      flog $LogF ( echo 2 | $CFE $BinDir/scompt )
+      set xstatus = $status
+   else
+      ftee $LogF ( echo 2 | $Valgrind $BinDir/scompt          |& \
+      grep "ERROR SUMMARY:"                                   |& \
+      awk '{ print $4 }'   >&! $Tmp
+      set xstatus = `cat $Tmp`
+      flog $LogF $RM $Tmp
+      set Files = ( 1 )
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if (($xstatus == 254) || ($xstatus == 255)) then
+      NoteD $LogF "omitted ($xstatus/$ETime)"
+   else if (($xstatus != 0) || ($#Files == 0)) then
+      NoteD $LogF "ng ($xstatus/$ETime)"
+      set ERROR = TRUE
+   else
+      NoteD $LogF "ok ($ETime)"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+endif
+
+if ($ERROR == TRUE) then
+   NoteD $LogF "                    SCORE API Test ..................... FAILED ($xstatus/$ETime)"
+   set Err = 1
+else
+   NoteD $LogF "                    SCORE API Test ..................... PASSED ($ETime)"
+endif
+
+exit($Err)
+

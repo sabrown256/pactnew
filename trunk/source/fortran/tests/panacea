@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# HISTORY - test time history
+# PANACEA - PANACEA API tests
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -12,8 +12,7 @@ source ../../tests/common
 
 
 NoteD $LogF ""
-NoteD $LogF -n "                    Building PANACEA Test ....."
-Note $LogF ""
+NoteD $LogF "                    PANACEA API Test ..................."
 
 set UTime = `$TIMER -r`
 
@@ -24,12 +23,12 @@ flog $LogF popd
 
 if ($xstatus != 0) then
    NoteD $LogF ""
-   NoteD $LogF "                         Can't build PANACEA Test ($xstatus)"
+   NoteD $LogF "                         Can't build PANACEA API Tests ($xstatus)"
    set ERROR = "TRUE"
 else
-   NoteD $LogF " DONE"
+   set ERROR = "FALSE"
    NoteD $LogF ""
-   NoteD $LogF "                    PANACEA Time History Test ....."
+   NoteD $LogF "                        time history ..................."
 
    if ("$Valgrind" == "") then
       ftee $LogF $CFE ${BinDir}/pathts -c 2
@@ -45,13 +44,20 @@ else
    set ETime = `$TIMER -b $UTime`
 
    if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "                    PANACEA Time History Test ..... OMITTED ($xstatus/$ETime)"
+      NoteD $LogF "                        time history ................... omitted"
    else if ($xstatus != 0) then
-      NoteD $LogF "                    PANACEA Time History Test ..... FAILED ($xstatus/$ETime)"
-      set Err = 1
+      NoteD $LogF "                        time history ................... ng ($xstatus/$ETime)"
+      set ERROR = "TRUE"
    else
-      NoteD $LogF "                    PANACEA Time History Test ..... PASSED ($ETime)"
+      NoteD $LogF "                        time history ................... ok ($ETime)"
    endif
+endif
+
+if ($ERROR == TRUE) then
+   NoteD $LogF "                    PANACEA API Test ................... FAILED ($xstatus/$ETime)"
+   set Err = 1
+else
+   NoteD $LogF "                    PANACEA API Test ................... PASSED ($ETime)"
 endif
 
 exit($Err)

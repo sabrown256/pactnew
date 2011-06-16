@@ -20,7 +20,7 @@ OD = DefaultO
 # Compiler/Loader Options
 #
 CcFlags = ${ODC} -I. -I${PACTSrcDir} -I${IncDir} ${MDInc}
-FcFlags = ${ODF} -I${IncDir}
+FcFlags = ${ODF} -I${IncDir} ${MDInc}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
 CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}
@@ -129,9 +129,27 @@ genmod : ${PACTTmpDir}/gm-${LibName}.f
 IncAction = @pact genmod
 LibAction = @(cd ${PACTTmpDir} ; pact PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=\"\" -f ../../pre-Make modules)
 
-Libs = -lfpact ${LPDB} ${LPML} ${LSCORE} ${MDLib}
-NGLibs = -lfpact ${LPANACEA} ${LPGS} ${MDGLib} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib}
+Libs = -lfpact ${LPDB} ${LPML} ${LSCORE} ${MDLib} ${DPLib}
+NGLibs = -lfpact ${LPANACEA} ${LPGS} ${MDGLib} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib} ${DPLib}
 
+#
+# SCORE tests
+#
+
+fha : ${BinDir}/schtst
+
+${BinDir}/schtst : schtst.f ${InstallDep}
+	${FC} ${LdFlags} schtst.f -o ${BinDir}/schtst ${Libs}
+
+omp : ${BinDir}/scompt
+
+${BinDir}/scompt : scompt.f ${InstallDep}
+	${FC} ${LdFlags} scompt.f -o ${BinDir}/scompt ${Libs}
+
+scan : ${BinDir}/sclsts
+
+${BinDir}/sclsts : sclsts.c ${InstallDep}
+	${CLD} ${LdFlags} sclsts.c -o ${BinDir}/sclsts ${Libs}
 
 # PDB tests
 
@@ -154,18 +172,6 @@ fdp : ${BinDir}/pdfdpt
 ${BinDir}/pdfdpt : pdfdpt.f ${InstallDep}
 	${FC} ${LdFlags} pdfdpt.f -o ${BinDir}/pdfdpt ${Libs} ${DPLib}
 
-# PGS tests
-
-pgs : ${BinDir}/gsftst
-
-${BinDir}/gsftst : gsftst.f ${InstallDep}
-	${FC} ${LdFlags} gsftst.f -o ${BinDir}/gsftst ${NGLibs}
-
-contour : ${BinDir}/gsfctst
-
-${BinDir}/gsfctst : gsfctst.f ${InstallDep}
-	${FC} ${LdFlags} gsfctst.f -o ${BinDir}/gsfctst ${NGLibs}
-
 # PPC tests
 
 ppc : ${BinDir}/pcftst
@@ -173,24 +179,18 @@ ppc : ${BinDir}/pcftst
 ${BinDir}/pcftst : pcftst.f ${InstallDep}
 	${FC} ${LdFlags} pcftst.f -o ${BinDir}/pcftst ${Libs}
 
-#
-# SCORE tests
-#
+# PGS tests
 
-fha : ${BinDir}/schtst
+pgs : ${BinDir}/gsftst ${BinDir}/gsfcts
 
-${BinDir}/schtst : schtst.f ${InstallDep}
-	${FC} ${LdFlags} schtst.f -o ${BinDir}/schtst ${Libs}
+${BinDir}/gsftst : gsftst.f ${InstallDep}
+	${FC} ${LdFlags} gsftst.f -o ${BinDir}/gsftst ${NGLibs}
 
-omp : ${BinDir}/scompt
+contour : ${BinDir}/gsfcts
 
-${BinDir}/scompt : scompt.f ${InstallDep}
-	${FC} ${LdFlags} scompt.f -o ${BinDir}/scompt ${Libs}
+${BinDir}/gsfcts : gsfcts.f ${InstallDep}
+	${FC} ${LdFlags} gsfcts.f -o ${BinDir}/gsfcts ${NGLibs}
 
-scan : ${BinDir}/sclsts
-
-${BinDir}/sclsts : sclsts.c ${InstallDep}
-	${CLD} ${LdFlags} sclsts.c -o ${BinDir}/sclsts ${Libs}
 #
 # PANACEA tests
 #
@@ -223,5 +223,5 @@ sharedlib:
 # Run the PFTN test suite
 #
 test :
-	@./fttest
+	@./fatest
 
