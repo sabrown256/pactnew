@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# FTTEST - test FORTRAN
+# FATEST - test FORTRAN APIs
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -18,9 +18,9 @@ set Test = ""
 while ($#argv > 0)
    switch ($1)
       case -h:
-           echo "Usage: fttest [-h] [<test>]*"
+           echo "Usage: fatest [-h] [<test>]*"
            echo "  h       this help message"
-           echo "  <test>  one of: lex pdb history"
+           echo "  <test>  one of: score pdb pgs panacea"
            echo ""
            exit(1)
       case -*:
@@ -70,7 +70,7 @@ else if ($FC_Exe != none) then
 
    if ("$Test" == "") then
       set Test = ""
-      set Test = ($Test lex pdb history)
+      set Test = ($Test score pdb pgs panacea)
    endif
 
    foreach i ($Test)

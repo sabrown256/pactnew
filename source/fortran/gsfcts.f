@@ -24,93 +24,77 @@
 
       integer :: dev
 
-! ... local variables
-      integer :: st
-      double precision :: x1, y1, x2, y2
-      double precision :: x(5), y(5), u(4), v(4)
-      character*12 :: name4
+      integer, parameter :: KMX = 20
+      integer, parameter :: LMX = 20
+      integer, parameter :: KSZ  = KMX*LMX
 
-! ... open the device
-      x1 = 0.0
-      y1 = 0.0
-      x2 = 0.0
-      y2 = 0.0
+! ... PGS centering options
+      integer, parameter :: Z_CENT = -1
+      integer, parameter :: N_CENT = -2
+      integer, parameter :: F_CENT = -3
+      integer, parameter :: E_CENT = -4
+      integer, parameter :: U_CENT = -5
+
+! ... local variables
+      integer i, k, l, st
+      integer id, cp, igraph
+      integer centering
+      integer kmax, lmax, kxl
+
+      real*8 x1, y1, x2, y2
+      real*8 xmin, xmax, ymin, ymax, r, t
+      real*8 x(KSZ), y(KSZ), f(KSZ)
+      
+! ... create the window on the screen
+      x1 = 0.05
+      y1 = 0.2
+      x2 = 0.45
+      y2 = 0.45
       st = pgopen(dev, x1, y1, x2, y2)
 
+! ... clear the screen
       st = pgclsc(dev)
 
-! ... set up the view port and world coordinate system
+! ... set up the view port
       x1 = 0.1
       x2 = 0.9
       y1 = 0.1
       y2 = 0.9
       st = pgsvwp(dev, x1, x2, y1, y2)
 
-      x1 =   0.0
-      x2 =  10.0
-      y1 = -15.0
-      y2 =  30.0
-      st = pgswcs(dev, x1, x2, y1, y2)
+      kmax = KMX
+      lmax = LMX
+      kxl  = KSZ
+      xmin = -5.0
+      xmax = 5.0
+      ymin = -5.0
+      ymax = 5.0
+      id   = 1
+      cp   = 0
+      centering = N_CENT
 
-! ... draw a bounding box
-      x1 =   0.0
-      x2 =  10.0
-      y1 = -15.0
-      y2 =  30.0
-      st = pgdrbx(dev, x1, x2, y1, y2)
+! ... generate some data
+      do l = 1, lmax
+         do k = 1, kmax
+            i = (k-1)*lmax + l
+            x(i) = l/10.0 - 5.0
+            y(i) = k/10.0 - 5.0
+            r = x(i)*x(i) + y(i)*y(i)
+            t = 5.0*atan(y(i)/x(i))
+            r = r**0.125
+            f(i) = exp(-r)*(1.0 + 0.1*cos(t))
+         enddo
+      enddo
 
-! ... write a string
-      x1 = 5.0
-      y1 = 0.0
-      name4 = 'TEXT STRING'
+! ... turn data ids on
+      st = pgtdid(dev, 1);
 
-      st = pgstxf(dev, 9, 'helvetica', 6, 'medium', 9)
-      st = pgwrta(dev, x1, y1, 11, name4)
+! ... make a graph for PGS to plot
+      igraph = pgmg21(id, 7, 'contour', cp, kmax, lmax, centering, &
+                      x, y, f, 2, 'xy', 1, 'f')
 
-! ... draw a line
-      x1 =  1.0
-      x2 =  9.0
-      y1 = -4.0
-      y2 = -1.0
-      st = pgdrln(dev, x1, y1, x2, y2)
-
-! ... do a vector plot
-      x(1) =  3.0
-      y(1) =  4.0
-      u(1) = -0.5
-      v(1) = -0.25
-
-      x(2) =  4.0
-      y(2) =  4.0
-      u(2) =  0.5
-      v(2) = -0.25
-
-      x(3) = 4.0
-      y(3) = 5.0
-      u(3) = 0.5
-      v(3) = 0.0
-
-      x(4) =  3.0
-      y(4) =  5.0
-      u(4) = -0.5
-      v(4) =  0.5
-
-      st = pgplvc(dev, x, y, u, v, 4, 0)
-
-! ... draw and fill a polygon (color 4 is blue)
-      x(1) = 5.0
-      x(2) = 6.0
-      x(3) = 6.0
-      x(4) = 5.0
-      x(5) = 5.0
-      y(1) = 8.0
-      y(2) = 8.0
-      y(3) = 9.0
-      y(4) = 9.0
-      y(5) = 8.0
-      st = pgfply(dev, x, y, 5, 4)
-
-      st = pgfnpl(dev)
+! ... plot the graph
+      st = pgplot(dev, igraph)
 
 !      pause
 
@@ -134,7 +118,7 @@
 ! ... set up the PS device
       namep = 'PS'
       name2 = 'MONOCHROME'
-      name3 = 'gsftst'
+      name3 = 'gsfcts'
       idvp = pgmkdv(2, namep, 10, name2, 6, name3)
 
       call test(idvp)
@@ -186,7 +170,7 @@
  10   if (iarg .le. narg) then
          call getarg(iarg, arg)
          if (arg .eq. "-h" .or. arg .eq. "help") then
-            write(6, *) 'Usage: gsftst [-p] [-s]'
+            write(6, *) 'Usage: gsfcts [-p] [-s]'
             write(6, *) '    -h   this help message'
             write(6, *) '    -p   do not test PS device'
             write(6, *) '    -s   do not test SCREEN device'

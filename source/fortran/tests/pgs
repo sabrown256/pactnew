@@ -1,0 +1,113 @@
+#!/bin/csh -f
+#
+# PGS - Fortran test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set tst = $1
+
+# check for Fortran compiler before doing Fortran test
+set FC = `awk '$1 == "FCompiler" { print $3 }' $IncDir/make-def`
+if ("$FC" != "") then
+   Note $LogF "Using fortran compiler $FC"
+   flog $LogF swhich -1 $FC
+   flog $LogF set LStat = $status
+else
+   fog $LogF set LStat = 1
+endif
+
+#if (($LStat == 0) && ("$MPI" == "")) then
+if ($LStat == 0) then
+   NoteD $LogF ""
+   NoteD $LogF "                    PGS API Test ....................... "
+
+   set FAIL = "NO"
+
+   set UTime = `$TIMER -r`
+
+   flog $LogF pushd $SrcDir
+   flog $LogF $MAKE +na 2 pgs
+   set TStatus = $status
+   flog $LogF popd
+
+   if ($TStatus != 0) then
+      NoteD $LogF ""
+      NoteD $LogF "                         Cannot build PGS FORTRAN Test Program"
+      flog $LogF rm -f $BinDir/pdftst
+      flog $LogF rm -f $BinDir/pdfgts
+      flog $LogF rm -f $BinDir/pdfhyts
+   else
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# test hand written wrappers
+      NoteD $LogF -n "                        manual ......................... "
+      Note $LogF ""
+      if ("$Valgrind" == "") then
+         flog $LogF $CFE $BinDir/gsftst -s
+         set xstatus = $status
+      else
+         Note $LogF ""
+         ftee $LogF $Valgrind $BinDir/gsftst |& \
+         grep "ERROR SUMMARY:"               |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+         flog $LogF $RM $Tmp
+      endif
+      if ($xstatus == 0) then
+         NoteD $LogF "ok"
+      else
+         NoteD $LogF "ng"
+         set FAIL = "YES"
+      endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# contour test
+      NoteD $LogF -n "                        contour ........................ "
+      Note $LogF ""
+      if ("$Valgrind" == "") then
+         flog $LogF $CFE $BinDir/gsfcts
+         set xstatus = $status
+      else
+         Note $LogF ""
+         ftee $LogF $Valgrind $BinDir/gsfcts -s |& \
+         grep "ERROR SUMMARY:"                  |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+         flog $LogF $RM $Tmp
+      endif
+
+      if (($xstatus == 254) || ($xstatus == 255)) then
+         NoteD $LogF "omitted"
+      else if ($xstatus == 0) then
+         NoteD $LogF "ok"
+      else
+         NoteD $LogF "ng"
+         set FAIL = "YES"
+      endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if ($FAIL == "YES") then
+      NoteD $LogF "                    PGS API Test ....................... FAILED ($ETime)"
+      set Err = 1
+   else
+      NoteD $LogF "                    PGS API Test ....................... PASSED ($ETime)"
+   endif
+endif
+
+exit($Err)

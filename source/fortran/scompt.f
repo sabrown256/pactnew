@@ -1,5 +1,5 @@
 !
-! SCOMPT.F - IRIX test of "threads" using sproc and OpemMP
+! SCOMPT.F - OpenMP test
 !
 !
 ! Source Version: 3.0
@@ -65,8 +65,8 @@
       enddo
 
 ! ... report the allocs
-!      write(6, 101) iprc, nprc, nok
-! 101  format('Allocs(', i2, '/', i2, ') = ', i2)
+      write(6, 101) iprc, nprc, nok
+ 101  format('   alloc .... (', i2, '/', i2, ') = ', i8)
 
 ! ... count the bytes allocated
       nit = 0
@@ -75,8 +75,8 @@
       enddo
 
 ! ... report the number of bytes
-!      write(6, 102) iprc, nprc, nit
-! 102  format('Count(', i2, '/', i2, ') = ', i8)
+      write(6, 102) iprc, nprc, nit
+ 102  format('   bytes .... (', i2, '/', i2, ') = ', i8)
 
 ! ... do the frees
       do j = 1, 10
@@ -90,8 +90,8 @@
       enddo
 
 ! ... report the frees
-!      write(6, 103) iprc, nprc, nok
-! 103  format('Frees(', i2, '/', i2, ') = ', i2)
+      write(6, 103) iprc, nprc, nok
+ 103  format('   free ..... (', i2, '/', i2, ') = ', i8)
 
       return
       end
@@ -100,6 +100,7 @@
 !--------------------------------------------------------------------------
 
       program main
+      use pact_fortran
       implicit none
 
       integer jotsk, nprc, rprc
@@ -108,8 +109,7 @@
       integer omp_get_num_threads, omp_get_thread_num
       external omp_get_num_threads, omp_get_thread_num
 
-      integer scinth
-      external scinth, sid
+      external sid
 
       print *, 'Enter the number of processes to use: '
       read *, rprc
@@ -118,18 +118,23 @@
       call omp_set_num_threads(jotsk)
 
       nprc = omp_get_num_threads()
-      print *, 'Number of processes available: ', nprc
+      print *, 'number of threads available: ', nprc
 
       err = scinth(rprc, sid)
-      print *, 'SCORE initialized'
+      if (err .eq. 1) then
+         print *, 'SCORE initialization succeeded'
+      else
+         print *, 'SCORE initialization failed'
+      endif
 
-!$omp parallel
+!$omp parallel &
 !$omp&   default(private)
       call mema
 !$omp end parallel
 
-      print *, 'Done'
+      print *, 'threads done'
 
+      stop 0
       end
 
 !--------------------------------------------------------------------------

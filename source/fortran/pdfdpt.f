@@ -1,119 +1,178 @@
-c
-c PDFDPT.F - test the Fortran application interface to
-c          - the PACT pdb library DP routines
-c
-c Source Version: 3.0
-c Software Release #: LLNL-CODE-422942
-c include "cpyright.h"
-c
-c This program is designed to be run on 4 processors.
+!
+! PDFDPT.F - test the Fortran application interface to
+!          - the PACT pdb library DP routines
+!
+! Source Version: 3.0
+! Software Release #: LLNL-CODE-422942
+! include "cpyright.h"
+!
+
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+! ERRPROC - handle errors
+      
+      subroutine errproc
+!      use pact_fortran
+      implicit none
+      
+      integer pfgerr
+
+      integer, parameter :: MAXMSG = 256
+      integer :: i, nchar
+      character err(MAXMSG)
+
+      nchar = MAXMSG
+      if ((pfgerr(nchar, err) .eq. 1) .and. (nchar .gt. 0)) then
+         nchar = min(nchar, MAXMSG)
+         write(6, 100)
+ 100     format()
+         write(6, 101) (err(i), i=1, nchar)
+ 101     format(72a1)
+      else
+         write(6, 102)
+ 102     format(/, 'Error in PDFDPT.', /)
+      endif
+
+      stop
+      end subroutine
+
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+! WRTF - write a parallel file
+
+      subroutine wrtf(rank, numtasks, comm)
+      use pact_fortran
+      implicit none
+
+      integer :: rank, numtasks, comm
+
+      include 'mpif.h'
+
+! ... local variables
+      integer, parameter :: N_ELEM = 256
+
+      integer :: i
+      integer :: fileid, nwrite
+      integer :: dims(6)
+      real*8 :: darray(N_ELEM)
+
+      do i = 1, N_ELEM
+         darray(i) = rank
+      enddo
+
+      fileid = pfmpop(15, "test_par_2d.pdb", "w", comm)
+      
+      dims(1) = 1
+      dims(2) = N_ELEM
+
+! ... reserve some disk space for a distributed array
+      if (pfdefd(fileid, 6, 'darray', 6, 'double', 1, dims) .eq. 0) &
+         call errproc
+
+! ... each process writes its share of the distributed array      
+      nwrite  = N_ELEM / numtasks
+      dims(1) = (rank * nwrite) + 1
+      dims(2) = (rank + 1) *  nwrite
+      dims(3) = 1 
+      if (pfwrtd(fileid, 6, 'darray', 6, 'double', darray, 1, dims) .eq. 0) &
+         call errproc
+      
+      if (pfclos(fileid) .eq. 0) &
+         call errproc
+
+      write(6, 31) rank
+ 31   format('   data written on  ', i4)
+
+      return
+      end subroutine
+
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+! RDF - read the parallel file back
+
+      subroutine rdf(rank, numtasks, comm)
+      use pact_fortran
+      implicit none
+
+      integer :: rank, numtasks, comm
+
+      include 'mpif.h'
+
+! ... local variables
+      integer, parameter :: N_ELEM = 256
+
+      integer :: i, j
+      integer :: fileid, nwrite
+      real*8 :: rdarray(N_ELEM)
+
+      fileid = pfmpop(15, "test_par_2d.pdb", "r", comm)
+      
+      if (pfread(fileid, 6, 'darray', rdarray) .eq. 0) &
+         call errproc
+
+      if (pfclos(fileid) .eq. 0) &
+         call errproc
+
+      nwrite  = N_ELEM / numtasks
+      do i = 1, numtasks
+         do j = 1, nwrite
+            if (rdarray((i-1) * nwrite + j) .ne. (i - 1)) then
+                write(6, 20) i, j
+ 20             format('input data error--quitting, i = ', i4, 'j = ', i4)
+                stop
+            endif
+         enddo
+      enddo
+
+      write(6, 30) rank
+ 30   format('   data read back on', i4)
+
+      return
+      end
+
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
+
+! PDFDPT - this program is designed to be run on 4 processors
 
       program pdfdpt
-
+      use pact_fortran
       implicit none
 
       include 'mpif.h'
 
-      integer TASKS, N_ELEM
-      parameter(TASKS  = 4)
-      parameter(N_ELEM = 256)
+      integer, parameter :: TASKS  = 4
 
-      integer pfmpop, pfwrad, pfappd, pfdefd, pfwrtd
-      integer pfclos, pfread
-      integer dims(6), nwrite
-      integer i, j, numtasks, rank, ierr
-      integer fileid
-      real*8 darray(N_ELEM), rdarray(N_ELEM)
+      integer numtasks, rank, ierr, st
 
       call MPI_INIT(ierr)
 
       call MPI_COMM_SIZE(MPI_COMM_WORLD, numtasks, ierr)
-      if(numtasks .ne. TASKS) then
-         write(6,10) TASKS
+      if (numtasks .ne. TASKS) then
+         write(6, 10) TASKS
  10      format('This program requires ', i4, ' processors')
          stop
       endif
 
       call MPI_COMM_RANK(MPI_COMM_WORLD, rank, ierr)
 
-      call pfinmp(0,1,0)
+      st = pfinmp(0, 1, 0)
 
-      do 100 i = 1, N_ELEM
-         darray(i) = rank
- 100  continue
-
-      fileid = pfmpop(15,"test_par_2d.pdb","w",MPI_COMM_WORLD)
-      
-      dims(1) = 1
-      dims(2) = N_ELEM
-
-c     ..........reserve some disk space for a distributed array
-      if(pfdefd(fileid, 6, 'darray', 6, 'double', 1, dims) .eq. 0)
-     $    call errproc
-
-c     ..........each process writes its share of the distributed array      
-      nwrite  = N_ELEM / numtasks
-      dims(1) = (rank * nwrite) + 1
-      dims(2) = (rank + 1) *  nwrite
-      dims(3) = 1 
-      if(pfwrtd(fileid, 6, 'darray', 6, 'double', darray, 1, dims) 
-     $    .eq. 0)
-     $    call errproc
-      
-      if (pfclos(fileid) .eq. 0)
-     $     call errproc
-
+      call wrtf(rank, numtasks, MPI_COMM_WORLD)
 
       call MPI_BARRIER(MPI_COMM_WORLD, ierr)
 
-      fileid = pfmpop(15,"test_par_2d.pdb","r",MPI_COMM_WORLD)
-      
-      if (pfread(fileid, 6, 'darray', rdarray) .eq. 0)
-     $     call errproc
+      call rdf(rank, numtasks, MPI_COMM_WORLD)
 
-      if (pfclos(fileid) .eq. 0)
-     $     call errproc
-
-      do 200 i = 1, numtasks
-         do 200 j = 1, nwrite
-            if (rdarray((i-1) * nwrite + j) .ne. (i - 1)) then
-                write(6, 20) i, j
- 20             format('input data error--quitting, i = ', i4,
-     $                 'j = ', i4)
-                stop
-            endif
- 200  continue
-
-      write(6, 30)
- 30   format('Read test passed')
-
-      call pftmmp()
+      st = pftmmp()
 
       call MPI_FINALIZE(ierr)
-
       
       end
       
-      
-!     ERRPROC - handle errors
-      
-      subroutine errproc
-      
-      parameter(MAXMSG = 256)
-      integer i, nchar, pfgerr
-      character err(MAXMSG)
-
-      if ((pfgerr(nchar, err) .eq. 1) .and. (nchar .gt. 0)) then
-         nchar = min(nchar, MAXMSG)
-         write(6,100)
- 100     format()
-         write(6,101) (err(i), i=1,nchar)
- 101     format(72a1)
-      else
-         write(6,102)
- 102     format(/,'Error in PDFDPT.',/)
-      endif
-
-      stop
-      end subroutine
+!--------------------------------------------------------------------------
+!--------------------------------------------------------------------------
 
