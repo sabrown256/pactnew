@@ -1,5 +1,5 @@
 /*
- * GSFIB.C - FORTRAN interface routines for PGS
+ * FAGSB.C - FORTRAN interface routines for PGS
  *         - NOTE: let's keep these in alphabetical order
  *
  * Source Version: 3.0

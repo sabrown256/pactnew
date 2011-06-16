@@ -1,5 +1,5 @@
 /*
- * SCFIA.C - FORTRAN interface routines for SCORE
+ * FASCA.C - FORTRAN interface routines for SCORE
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942

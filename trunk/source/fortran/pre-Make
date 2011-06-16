@@ -90,10 +90,10 @@ gmo = gm-score.o gm-pml.o gm-pdb.o   \
       gm-scheme.o gm-fortran.o
 
 Objs = ${gmo} ${gfo} flibc.o \
-       scfia.o scfib.o scfis.o scmemf.o \
-       mlfia.o pdfia.o pafia.o \
-       gsfia.o gsfib.o gsfic.o \
-       sxfia.o
+       fasca.o fascb.o fascs.o fascm.o \
+       famla.o fapda.o fapana.o \
+       fagsa.o fagsb.o fagsb.o \
+       fasxa.o
 
 gfa = ${TGTLib}(gf-score.o) ${TGTLib}(gf-pml.o) ${TGTLib}(gf-pdb.o)   \
       ${TGTLib}(gf-ppc.o) ${TGTLib}(gf-pgs.o) ${TGTLib}(gf-panacea.o) \
@@ -104,11 +104,11 @@ gma = ${TGTLib}(gm-score.o) ${TGTLib}(gm-pml.o) ${TGTLib}(gm-pdb.o)   \
       ${TGTLib}(gm-scheme.o) ${TGTLib}(gm-fortran.o)
 
 ArObjs = ${gma} ${gfa} ${TGTLib}(flibc.o) \
-         ${TGTLib}(scfia.o) ${TGTLib}(scfib.o) ${TGTLib}(scfis.o) \
-         ${TGTLib}(scmemf.o) \
-         ${TGTLib}(mlfia.o) ${TGTLib}(pdfia.o) ${TGTLib}(pafia.o) \
-         ${TGTLib}(gsfia.o) ${TGTLib}(gsfib.o) ${TGTLib}(gsfic.o) \
-         ${TGTLib}(sxfia.o)
+         ${TGTLib}(fasca.o) ${TGTLib}(fascb.o) ${TGTLib}(fascs.o) \
+         ${TGTLib}(fascm.o) \
+         ${TGTLib}(famla.o) ${TGTLib}(fapda.o) ${TGTLib}(fapana.o) \
+         ${TGTLib}(fagsa.o) ${TGTLib}(fagsb.o) ${TGTLib}(fagsb.o) \
+         ${TGTLib}(fasxa.o)
 
 ${ArObjs} : ${Hdrs}
 ${Objs} : ${Hdrs}

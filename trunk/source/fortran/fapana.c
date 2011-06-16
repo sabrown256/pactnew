@@ -1,5 +1,5 @@
 /*
- * PAFIA.C - FORTRAN interface routines for PANACEA
+ * FAPANA.C - FORTRAN interface routines for PANACEA
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
