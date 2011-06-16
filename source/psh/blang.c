@@ -601,6 +601,18 @@ static void init_types(void)
     add_type("long double _Complex", "complex(16)",
 	     "SC_LONG_DOUBLE_COMPLEX_I", NULL);
 
+/* GOTCHA: there is a general issue with pointers and Fortran here
+ * doing add_type on "void *" causes Fortran wrapper declarations
+ * to be generated with "void *" in the arg list
+ * if on the other hand we do not to an add_type on "void *" then
+ * blang will generate Fortran wrapper declarations with "void **"
+ * in the arg list
+ * in some contexts we would rather have "void **" to accord with
+ * the extra reference added by Fortran which is call by reference
+ * by default
+ * the same applies to all of these pointers and we have been
+ * bitten by FILE and void in the tests
+ */
     add_type("void *",        "C_PTR-A",      "SC_POINTER_I",       NULL);
     add_type("bool *",        "logical-A",    "SC_BOOL_P_I",        NULL);
     add_type("char *",        "character-A",  "SC_STRING_I",        NULL);
@@ -616,7 +628,7 @@ static void init_types(void)
 
     add_type("pcons",         "C_PTR-A",      "SC_PCONS_I",         NULL);
     add_type("pcons *",       "C_PTR-A",      "SC_PCONS_P_I",       NULL);
-    add_type("FILE *",        "C_PTR-A",      "SC_FILE_I",          NULL);
+/*    add_type("FILE *",        "C_PTR-A",      "SC_FILE_I",          NULL); */
     add_type("PROCESS *",     "C_PTR-A",      "SC_PROCESS_I",       NULL);
 
     return;}

@@ -7,17 +7,17 @@
 # include "cpyright.h"
 #
 
-a_f1	yes	yes		yes
-a_f2	yes	yes		yes
-a_f3	yes	yes		yes
-a_f4	yes	yes		yes
+a_f1	fortran()	scheme()		python()
+a_f2	fortran()	scheme()		python()
+a_f3	fortran()	scheme()		python()
+a_f4	fortran()	scheme()		python()
 
-B_f1	yes	yes		yes
-B_f2	yes	yes		yes
-B_f3	yes	yes		yes
-B_f4	yes	yes		yes
-B_f5	yes	yes		yes
-B_f6	yes	yes		yes
+B_f1	fortran()	scheme()		python()
+B_f2	fortran()	scheme()		python()
+B_f3	fortran()	scheme()		python()
+B_f4	fortran()	scheme()		python()
+B_f5	fortran()	scheme()		python()
+B_f6	fortran()	scheme()		python()
 
 
 

@@ -9,5 +9,5 @@
 
 derived str	character-A	SC_STRING_I	SC_STRING_I
 
-fe1	fe1f	fe1s	fe1p
-fe2	fe2f	fe2s	fe2p
+fe1	fortran(fe1f)	scheme(fe1s)	python(fe1p)
+fe2	fortran(fe2f)	scheme(fe2s)	python(fe2p)

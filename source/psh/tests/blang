@@ -82,15 +82,16 @@ else
 
       flog $Log cp $TstDir/$i.* .
 
-      flog $Log blang $i.bind $i.proto
-
       flog $Log set hdr = ${i}_int.h
       flog $Log $RM $hdr
-      touch $Log $hdr
+      flog $Log touch $hdr
       Note $hdr "#include <sx_int.h>"
       Note $hdr "struct s_str {int a; double b;};"
       Note $hdr "typedef struct s_str str;"
-      Note $hdr "#include <sx_int.h>"
+      flog $Log cat $hdr
+
+      flog $Log blang $i.bind $i.proto
+
       cat $i.proto | \
       grep -v '#' | \
       awk '$0 != "" { printf("extern %s;\n", $0); }' >>& $hdr

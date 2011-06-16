@@ -13,14 +13,14 @@ derived etyp	integer		SC_ENUM_I	SC_ENUM_I
 
 # C	Fortran	Scheme	Python
 
-fav1	fav1f	fav1s	fav1p
-fav2	fav2f	fav2s	fav2p
-fav3	fav3f	fav3s	fav3p
-fav4	fav4f	fav4s	fav4p
-favp1	favp1f	favp1s	favp1p
-favp2	favp2f	favp2s	favp2p
-favp3	favp3f	favp3s	favp3p
-favp4	favp4f	favp4s	favp4p
+fav1	fortran(fav1f)	scheme(fav1s)	python(fav1p)
+fav2	fortran(fav2f)	scheme(fav2s)	python(fav2p)
+fav3	fortran(fav3f)	scheme(fav3s)	python(fav3p)
+fav4	fortran(fav4f)	scheme(fav4s)	python(fav4p)
+favp1	fortran(favp1f)	scheme(favp1s)	python(favp1p)
+favp2	fortran(favp2f)	scheme(favp2s)	python(favp2p)
+favp3	fortran(favp3f)	scheme(favp3s)	python(favp3p)
+favp4	fortran(favp4f)	scheme(favp4s)	python(favp4p)
 
-fav5	yes	yes	yes
-fav6	none	none	none
+fav5	fortran()	scheme()	python()
+fav6

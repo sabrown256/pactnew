@@ -9,45 +9,45 @@
 
 derived str	character-A	SC_STRING_I	SC_STRING_I
 
-fb1	yes	yes	yes
-fb2	yes	yes	yes
-fb3	yes	yes	yes
-fb4	yes	yes	yes
-fb5	yes	yes	yes
-fb6	yes	yes	yes
-fb7	yes	yes	yes
-fb8	yes	yes	yes
-# fb9	yes	yes	yes
-fb10	yes	yes	yes
-fb11	yes	yes	yes
-# fb12	yes	yes	yes
-# fb13	yes	yes	yes
+fb1	fortran()	scheme()	python()
+fb2	fortran()	scheme()	python()
+fb3	fortran()	scheme()	python()
+fb4	fortran()	scheme()	python()
+fb5	fortran()	scheme()	python()
+fb6	fortran()	scheme()	python()
+fb7	fortran()	scheme()	python()
+fb8	fortran()	scheme()	python()
+# fb9	fortran()	scheme()	python()
+fb10	fortran()	scheme()	python()
+fb11	fortran()	scheme()	python()
+# fb12	fortran()	scheme()	python()
+# fb13	fortran()	scheme()	python()
 
-fr1	yes	yes	yes
-fr2	yes	yes	yes
-fr3	yes	yes	yes
-fr4	yes	yes	yes
-fr5	yes	yes	yes
-fr6	yes	yes	yes
-fr7	yes	yes	yes
-fr8	yes	yes	yes
-# fr9	yes	yes	yes
-fr10	yes	yes	yes
-fr11	yes	yes	yes
-# fr12	yes	yes	yes
-fr13	yes	yes	yes
+fr1	fortran()	scheme()	python()
+fr2	fortran()	scheme()	python()
+fr3	fortran()	scheme()	python()
+fr4	fortran()	scheme()	python()
+fr5	fortran()	scheme()	python()
+fr6	fortran()	scheme()	python()
+fr7	fortran()	scheme()	python()
+fr8	fortran()	scheme()	python()
+# fr9	fortran()	scheme()	python()
+fr10	fortran()	scheme()	python()
+fr11	fortran()	scheme()	python()
+# fr12	fortran()	scheme()	python()
+fr13	fortran()	scheme()	python()
 
-fp1	yes	yes	yes
-fp2	yes	yes	yes
-fp3	yes	yes	yes
-fp4	yes	yes	yes
-fp5	yes	yes	yes
-fp6	yes	yes	yes
-fp7	yes	yes	yes
-fp8	yes	yes	yes
-# fp9	yes	yes	yes
-fp10	yes	yes	yes
-fp11	yes	yes	yes
-# fp12	yes	yes	yes
-fp13	yes	yes	yes
+fp1	fortran()	scheme()	python()
+fp2	fortran()	scheme()	python()
+fp3	fortran()	scheme()	python()
+fp4	fortran()	scheme()	python()
+fp5	fortran()	scheme()	python()
+fp6	fortran()	scheme()	python()
+fp7	fortran()	scheme()	python()
+fp8	fortran()	scheme()	python()
+# fp9	fortran()	scheme()	python()
+fp10	fortran()	scheme()	python()
+fp11	fortran()	scheme()	python()
+# fp12	fortran()	scheme()	python()
+fp13	fortran()	scheme()	python()
 

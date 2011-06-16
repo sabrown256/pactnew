@@ -1871,11 +1871,11 @@ extern double
  **PG_get_space_box(PG_device *dev, double *extr, int offs);
 
 
-#include "pgs_old.h"
-
 #ifdef __cplusplus
 }
 #endif
+
+#include "pgs_old.h"
 
 #endif
 

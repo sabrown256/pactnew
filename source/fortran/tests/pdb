@@ -150,7 +150,7 @@ if ($LStat == 0) then
          else if ($xstatus == 0) then
             NoteD $LogF "ok"
          else
-            NoteD $LogF "ng"
+            NoteD $LogF "ng ($xstatus)"
             set FAIL = "YES"
          endif
       endif
