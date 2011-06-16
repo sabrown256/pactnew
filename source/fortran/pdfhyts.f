@@ -13,7 +13,7 @@
 ! ERRPROC - handle errors
 
       subroutine errproc
-!      use pact_pdb
+!      use pact_fortran
       implicit none
 
       integer, parameter :: MAXMSG = 256
@@ -43,7 +43,7 @@
 
       program pdfhyts
       use pact_score
-      use pact_pdb
+      use pact_fortran
       implicit none
 
       integer noneW(24)     ! these are all half the size of the 

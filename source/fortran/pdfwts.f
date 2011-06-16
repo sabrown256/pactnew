@@ -37,7 +37,7 @@
 ! ERRPROC - handle errors
 
       subroutine errproc
-!      use pact_pdb
+!      use pact_fortran
       implicit none
 
       integer pfgerr
@@ -67,7 +67,7 @@
 ! WRTCUR - write a curve
 
       subroutine wrtcur(fileid)
-      use pact_pdb
+      use pact_fortran
       implicit none
 
       integer fileid
@@ -100,7 +100,7 @@
 ! CHKCUR - check curve
 
       subroutine chkcur(fileid, tolerance)
-      use pact_pdb
+      use pact_fortran
       implicit none
 
       integer fileid
@@ -141,7 +141,7 @@
 ! WRTIMA - write an image
 
       subroutine wrtima(fileid)
-      use pact_pdb
+      use pact_fortran
       implicit none
 
       integer fileid
@@ -173,7 +173,7 @@
 ! CHKIMA - check image
 
       subroutine chkima(fileid)
-      use pact_pdb
+      use pact_fortran
       implicit none
 
       integer fileid
@@ -207,7 +207,7 @@
 ! WRTMAP - write some mappings
 
       subroutine wrtmap(fileid)
-      use pact_pdb
+      use pact_fortran
       implicit none
 
       integer fileid
@@ -251,7 +251,7 @@
 ! CHKMAP - check mappings
 
       subroutine chkmap(fileid, tolerance)
-      use pact_pdb
+      use pact_fortran
       implicit none
 
       integer fileid
@@ -962,7 +962,7 @@
 ! TEST_3 - feature testing
 
       subroutine test_3(PRINT, DIR, OPTION)
-      use pact_pdb
+      use pact_fortran
       implicit none 
 
       logical PRINT
@@ -1224,7 +1224,7 @@
 
       program pdftst
       use pact_fortran
-      use pact_pdb
+      use pact_fortran
       implicit none 
 
 ! ... program input command option flags
