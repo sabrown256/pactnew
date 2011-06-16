@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
 
-#include "pdb_int.h"
+#include "fpact.h"
 
 #ifndef FF_INT_SIZE_PTR_DIFFER
 

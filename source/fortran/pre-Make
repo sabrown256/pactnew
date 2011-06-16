@@ -67,7 +67,7 @@ targets :
 #
 # Headers Files
 #
-Hdrs = 
+Hdrs = fpact.h
 
 gfs = gf-score.c gf-pml.c gf-pdb.c   \
       gf-ppc.c gf-pgs.c gf-panacea.c \

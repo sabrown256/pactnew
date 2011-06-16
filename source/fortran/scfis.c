@@ -13,7 +13,7 @@
 
 #include "cpyright.h"
 
-#include "score_int.h"
+#include "fpact.h"
 
 #define CAT(_d, _nd, _n, _s)                                                \
    {int _ns;                                                                \
