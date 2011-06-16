@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
  
-#include "panace.h"
+#include "fpact.h"
 
 typedef int (*PFTest)(char *base, char *seq, char *prev, char *mode,
 		      long size, double time, int indx, int iter,

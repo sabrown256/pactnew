@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
 
-#include "panacea_int.h"
+#include "fpact.h"
 
 typedef struct s_ff_th_record ff_th_record;
 
