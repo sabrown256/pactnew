@@ -31,9 +31,22 @@ targets :
 	@echo "   link      : install utilities for public use"
 	@echo "   test      : run the SCRIPTS test suite"
 
+#
+# Generated code rules
+#
+
+# headers
+
+hdrf = 
+
 # language bindings
+
 bindf = 
-generate : ${bindf}
+
+generate : ${bindf} ${hdrf}
+
+IncAction = 
+
 
 link :
 	pact scrinstall

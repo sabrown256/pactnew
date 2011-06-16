@@ -71,6 +71,30 @@ if ($LStat == 0) then
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+# test generated wrappers
+      NoteD $LogF -n "                        auto ........................... "
+      Note $LogF ""
+      if ("$Valgrind" == "") then
+         flog $LogF $CFE $BinDir/gsfgts -s
+         set xstatus = $status
+      else
+         Note $LogF ""
+         ftee $LogF $Valgrind $BinDir/gsfgts |& \
+         grep "ERROR SUMMARY:"               |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+         flog $LogF $RM $Tmp
+      endif
+      if ($xstatus == 0) then
+         NoteD $LogF "ok"
+      else
+         NoteD $LogF "ng"
+         set FAIL = "YES"
+      endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # contour test
       NoteD $LogF -n "                        contour ........................ "
       Note $LogF ""

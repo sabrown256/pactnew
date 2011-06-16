@@ -9,6 +9,6 @@
 
 # C	Fortran	Scheme	Python
 
-fbcv1	fbcv1f	fbcv1s	fbcv1p
-fbmcv1	fbmcv1f	fbmcv1s fbmcv1p
-fbmcr2	fbmcr2f	fbmcr2s	fbmcr2p
+fbcv1	fortran(fbcv1f)		scheme(fbcv1s)	python(fbcv1p)
+fbmcv1	fortran(fbmcv1f)	scheme(fbmcv1s) python(fbmcv1p)
+fbmcr2	fortran(fbmcr2f)	scheme(fbmcr2s)	python(fbmcr2p)

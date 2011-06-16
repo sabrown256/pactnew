@@ -289,6 +289,8 @@ static void _PG_draw_vct_zc_ac(PG_device *dev, double **u, double **r,
 /* PG_DRAW_VECTOR_N - draw N ND vectors in CS
  *                  -   X base points of vectors
  *                  -   U vectors
+ *
+ * #bind PG_draw_vector_n fortran() scheme()
  */
 
 void PG_draw_vector_n(PG_device *dev, int nd, PG_coord_sys cs, long n,
