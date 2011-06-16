@@ -352,13 +352,6 @@ ${BinDir}/scmtrt : scmtrt.c ${TGTLib}
 ${BinDir}/scmpft : scmpft.c ${TGTLib}
 	${CLD} ${LdFlags} scmpft.c -o ${BinDir}/scmpft ${Libs}
 #
-# lexical scanner test
-#
-scan : ${BinDir}/sclsts
-
-${BinDir}/sclsts : ${TGTLib} sclsts.c
-	${CLD} ${LdFlags} sclsts.c -o ${BinDir}/sclsts ${Libs}
-#
 # hash/alist test
 #
 ha : ${BinDir}/scatst ${BinDir}/sctrts

@@ -62,6 +62,7 @@ targets :
 	@echo "   panacea      : make PANACEA Fortran API tests"
 	@echo "   pdb          : make PDB Fortran API tests"
 	@echo "   ppc          : make PPC Fortran tests"
+	@echo "   scan         : make lexical scanner test"
 	@echo "   test         : run the PFTN test suite"
 
 #
@@ -92,7 +93,7 @@ gmo = gm-score.o gm-pml.o gm-pdb.o   \
 Objs = ${gmo} ${gfo} flibc.o \
        fasca.o fascb.o fascs.o fascm.o \
        famla.o fapda.o fapana.o \
-       fagsa.o fagsb.o fagsb.o \
+       fagsa.o fagsb.o fagsc.o \
        fasxa.o
 
 gfa = ${TGTLib}(gf-score.o) ${TGTLib}(gf-pml.o) ${TGTLib}(gf-pdb.o)   \
@@ -107,7 +108,7 @@ ArObjs = ${gma} ${gfa} ${TGTLib}(flibc.o) \
          ${TGTLib}(fasca.o) ${TGTLib}(fascb.o) ${TGTLib}(fascs.o) \
          ${TGTLib}(fascm.o) \
          ${TGTLib}(famla.o) ${TGTLib}(fapda.o) ${TGTLib}(fapana.o) \
-         ${TGTLib}(fagsa.o) ${TGTLib}(fagsb.o) ${TGTLib}(fagsb.o) \
+         ${TGTLib}(fagsa.o) ${TGTLib}(fagsb.o) ${TGTLib}(fagsc.o) \
          ${TGTLib}(fasxa.o)
 
 ${ArObjs} : ${Hdrs}
@@ -136,40 +137,40 @@ NGLibs = -lfpact ${LPANACEA} ${LPGS} ${MDGLib} ${LPPC} ${LPDB} ${LPML} ${LSCORE}
 
 pdb : ${BinDir}/pdftst ${BinDir}/pdfwts ${BinDir}/pdfgts ${BinDir}/pdfhyts
 
-${BinDir}/pdftst : pdftst.f ${InstallDep} ${Hdrs}
+${BinDir}/pdftst : pdftst.f ${InstallDep}
 	${FC} ${LdFlags} pdftst.f -o ${BinDir}/pdftst ${Libs} ${DPLib}
 
-${BinDir}/pdfwts : pdfwts.f ${InstallDep} ${Hdrs}
+${BinDir}/pdfwts : pdfwts.f ${InstallDep}
 	${FC} ${LdFlags} pdfwts.f -o ${BinDir}/pdfwts ${Libs} ${DPLib}
 
-${BinDir}/pdfgts : pdfgts.f ${InstallDep} ${Hdrs}
+${BinDir}/pdfgts : pdfgts.f ${InstallDep}
 	${FC} ${LdFlags} pdfgts.f -o ${BinDir}/pdfgts ${Libs} ${DPLib}
 
-${BinDir}/pdfhyts : pdfhyts.f ${InstallDep} ${Hdrs}
+${BinDir}/pdfhyts : pdfhyts.f ${InstallDep}
 	${FC} ${LdFlags} pdfhyts.f -o ${BinDir}/pdfhyts ${Libs} ${DPLib}
 
 fdp : ${BinDir}/pdfdpt
 
-${BinDir}/pdfdpt : pdfdpt.f ${InstallDep} ${Hdrs}
+${BinDir}/pdfdpt : pdfdpt.f ${InstallDep}
 	${FC} ${LdFlags} pdfdpt.f -o ${BinDir}/pdfdpt ${Libs} ${DPLib}
 
 # PGS tests
 
 pgs : ${BinDir}/gsftst
 
-${BinDir}/gsftst : gsftst.f ${TGTLib}
-	${FC} ${LdFlags} gsftst.f -o ${BinDir}/gsftst ${Libs}
+${BinDir}/gsftst : gsftst.f ${InstallDep}
+	${FC} ${LdFlags} gsftst.f -o ${BinDir}/gsftst ${NGLibs}
 
 contour : ${BinDir}/gsfctst
 
-${BinDir}/gsfctst : gsfctst.f ${TGTLib}
-	${FC} ${LdFlags} gsfctst.f -o ${BinDir}/gsfctst ${Libs}
+${BinDir}/gsfctst : gsfctst.f ${InstallDep}
+	${FC} ${LdFlags} gsfctst.f -o ${BinDir}/gsfctst ${NGLibs}
 
 # PPC tests
 
 ppc : ${BinDir}/pcftst
 
-${BinDir}/pcftst : ${TGTLib} pcftst.f
+${BinDir}/pcftst : pcftst.f ${InstallDep}
 	${FC} ${LdFlags} pcftst.f -o ${BinDir}/pcftst ${Libs}
 
 #
@@ -178,24 +179,27 @@ ${BinDir}/pcftst : ${TGTLib} pcftst.f
 
 fha : ${BinDir}/schtst
 
-${BinDir}/schtst : schtst.f ${TGTLib} ${Hdrs}
-	${FC} ${FcFlags} ${PACTTmpDic}/schtst.o -o ${BinDir}/schtst ${Libs}
+${BinDir}/schtst : schtst.f ${InstallDep}
+	${FC} ${LdFlags} schtst.f -o ${BinDir}/schtst ${Libs}
 
 omp : ${BinDir}/scompt
 
-${BinDir}/scompt : scompt.f ${TGTLib} ${Hdrs}
-	${FC} ${FcFlags} ${PACTTmpDic}/scompt.o -o ${BinDir}/scompt ${Libs}
+${BinDir}/scompt : scompt.f ${InstallDep}
+	${FC} ${LdFlags} scompt.f -o ${BinDir}/scompt ${Libs}
 
+scan : ${BinDir}/sclsts
+
+${BinDir}/sclsts : sclsts.c ${InstallDep}
+	${CLD} ${LdFlags} sclsts.c -o ${BinDir}/sclsts ${Libs}
 #
 # PANACEA tests
 #
-#panacea : ${BinDir}/pathts ${BinDir}/pathft
-panacea : ${BinDir}/pathts
+panacea : ${BinDir}/pathts ${BinDir}/pathft
 
-${BinDir}/pathts : pathts.c ${TGTLib}
+${BinDir}/pathts : pathts.c ${InstallDep}
 	${CLD} ${LdFlags} pathts.c -o ${BinDir}/pathts ${NGLibs}
 
-${BinDir}/pathft : pathft.f ${TGTLib}
+${BinDir}/pathft : pathft.f ${InstallDep}
 	${FC} ${LdFlags} pathft.f -o ${BinDir}/pathft ${NGLibs}
 
 #
