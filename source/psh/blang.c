@@ -80,7 +80,7 @@ static char
  **mc_proto_list(fdecl *dcl);
 
 static fparam
- fc_type(char *wty, int nc, char *ty, langmode mode);
+ fc_type(char *wty, int nc, char *ty, char *arg, langmode mode);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -232,13 +232,14 @@ static int split_decl(char *type, int nt, char *name, int nn, char *s)
     if (*pn == '(')
        {nstrncpy(name, nn, pn+2, -1);
 	*pn = '\0';
-	nstrncpy(type, nt, s, -1);
+	nstrncpy(type, nt, "PFInt", -1);
 
 	rv = TRUE;}
 
     else if (strncmp(p, "PF", 2) == 0)
        {nstrncpy(name, nn, pn, -1);
-	nstrncpy(type, nt, s, -1);
+	pn[-1] = '\0';
+	nstrncpy(type, nt, p, -1);
 
 	rv = TRUE;}
 
@@ -309,7 +310,7 @@ static farg *proc_args(fdecl *dcl)
 		    al[i].name, MAXLINE,
 		    al[i].arg);
 
-	 al[i].knd = fc_type(lty, MAXLINE, al[i].type, MODE_C);};
+	 al[i].knd = fc_type(lty, MAXLINE, al[i].type, al[i].arg, MODE_C);};
 
     dcl->al = al;
 
@@ -612,6 +613,8 @@ static void init_types(void)
  * by default
  * the same applies to all of these pointers and we have been
  * bitten by FILE and void in the tests
+ * with "void *" defined pd_write_f works for real*8 a(10)
+ * but fails for type(C_PTR) b
  */
     add_type("void *",        "C_PTR-A",      "SC_POINTER_I",       NULL);
     add_type("bool *",        "logical-A",    "SC_BOOL_P_I",        NULL);
@@ -806,7 +809,7 @@ static void cf_type(char *a, int nc, char *ty)
  *         - return the kind of FORTRAN argument TY is
  */
 
-static fparam fc_type(char *wty, int nc, char *ty, langmode mode)
+static fparam fc_type(char *wty, int nc, char *ty, char *arg, langmode mode)
    {fparam rv;
     char *pty;
 
@@ -818,8 +821,8 @@ static fparam fc_type(char *wty, int nc, char *ty, langmode mode)
 	rv = FP_VARARG;}
 
 /* handle function pointer */
-    else if (strstr(ty, "(*") != NULL)
-       {nstrncpy(wty, nc, ty, -1);
+    else if ((arg != NULL) && (strstr(arg, "(*") != NULL))
+       {nstrncpy(wty, nc, arg, -1);
 	rv = FP_FNC;}
 
 /* follow the PACT function pointer PF convention */
@@ -869,7 +872,7 @@ static fparam fc_type(char *wty, int nc, char *ty, langmode mode)
 static void fc_decl_list(char *a, int nc, fdecl *dcl)
    {int i, na, nca;
     fparam knd;
-    char *ty, *nm, **cargs;
+    char *ty, *nm, *arg, **cargs;
     farg *al;
 
     na = dcl->na;
@@ -882,11 +885,12 @@ static void fc_decl_list(char *a, int nc, fdecl *dcl)
        {for (i = 0; i < na; i++)
 	    {nm  = al[i].name;
 	     ty  = al[i].type;
+             arg = al[i].arg;
 	     knd = al[i].knd;
 
 	     switch (knd)
 	        {case FP_FNC :
-		      vstrcat(a, MAXLINE, "%s, ", ty);
+		      vstrcat(a, MAXLINE, "%s, ", arg);
  		      break;
 		 case FP_ARRAY :
 		      if ((dcl->nc == 0) && (strcmp(ty, "char *") == 0))
@@ -1011,6 +1015,8 @@ static void fortran_wrap_decl(FILE *fp, fdecl *dcl,
 
     fc_decl_list(a, MAXLINE, dcl);
 
+    fprintf(fp, "\n");
+    fprintf(fp, "/* WRAP |%s| */\n", dcl->proto);
     fprintf(fp, "\n");
 
     switch (knd)
@@ -1261,7 +1267,7 @@ static void fortran_wrap(FILE *fp, fdecl *dcl, char *cfn, char *ffn)
     else if (strcmp(ffn, "none") != 0)
        {voidf = (strcmp(dcl->type, "void") == 0);
 
-	knd = fc_type(rt, MAXLINE, dcl->type, MODE_C);
+	knd = fc_type(rt, MAXLINE, dcl->type, NULL, MODE_C);
 
 	csep(fp);
 
@@ -1388,7 +1394,7 @@ static fparam mc_type(int nc, char *fty, char *cty,
    {fparam knd;
     char lfty[MAXLINE], lcty[MAXLINE], lwty[MAXLINE];
 
-    knd = fc_type(lwty, nc, ty, MODE_F);
+    knd = fc_type(lwty, nc, ty, NULL, MODE_F);
     memmove(lwty, subst(lwty, "FIXNUM", "integer", -1), nc);
 
     if (is_var_arg(ty) == TRUE)
@@ -2239,6 +2245,8 @@ static void scheme_wrap_decl(FILE *fp, fdecl *dcl)
     downcase(dcn);
 
     fprintf(fp, "\n");
+    fprintf(fp, "/* WRAP |%s| */\n", dcl->proto);
+    fprintf(fp, "\n");
 
     fprintf(fp, "static object *");
     fprintf(fp, "_SXI_%s", dcn);
@@ -2259,8 +2267,9 @@ static void scheme_wrap_decl(FILE *fp, fdecl *dcl)
 static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
 				   fparam knd, char *so, int voida)
    {int i, na, nv, voidf;
-    char t[MAXLINE];
-    char *ty, *nm, *rty;
+    char s[MAXLINE], t[MAXLINE];
+    char oexp[MAXLINE], nexp[MAXLINE];
+    char *ty, *nm, *arg, *rty;
     farg *al;
 
     na = dcl->na;
@@ -2277,6 +2286,7 @@ static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
 
 	 ty  = al[i].type;
 	 nm  = al[i].name;
+	 arg = al[i].arg;
 
 	 if (nv == 0)
 	    snprintf(t, MAXLINE, "   {");
@@ -2295,10 +2305,13 @@ static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
 
 /* local vars */
 	 else if (nm != '\0')
-	    {if (al[i].knd == FP_FNC)
-	        vstrcat(t, MAXLINE, "PFInt _l%s;\n", nm);
+	    {if (strstr(arg, "(*") == NULL)
+		vstrcat(t, MAXLINE, "%s _l%s;\n", ty, nm);
 	     else
-	        vstrcat(t, MAXLINE, "%s _l%s;\n", ty, nm);
+	        {snprintf(oexp, MAXLINE, "(*%s)", nm);
+		 snprintf(nexp, MAXLINE, "(*_l%s)", nm);
+		 nstrncpy(s, MAXLINE, arg, -1);
+		 vstrcat(t, MAXLINE, "%s;\n", subst(s, oexp, nexp, 1));};
 	     nv++;};
 
 	 if (IS_NULL(t) == FALSE)

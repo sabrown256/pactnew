@@ -5,6 +5,8 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |void fav1(void)| */
+
 static object *_SXI_fav1(SS_psides *si, object *argl)
    {object *_lo;
 
@@ -15,6 +17,8 @@ static object *_SXI_fav1(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |int fav2(void)| */
 
 static object *_SXI_fav2(SS_psides *si, object *argl)
    {int _rv;
@@ -28,6 +32,8 @@ static object *_SXI_fav2(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |double fav3(void)| */
+
 static object *_SXI_fav3(SS_psides *si, object *argl)
    {double _rv;
     object *_lo;
@@ -39,6 +45,8 @@ static object *_SXI_fav3(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |str fav4(void)| */
 
 static object *_SXI_fav4(SS_psides *si, object *argl)
    {str _rv;
@@ -53,6 +61,8 @@ static object *_SXI_fav4(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |void *favp1(void)| */
 
 static object *_SXI_favp1(SS_psides *si, object *argl)
    {void *_rv;
@@ -70,6 +80,8 @@ static object *_SXI_favp1(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |int *favp2(void)| */
+
 static object *_SXI_favp2(SS_psides *si, object *argl)
    {int *_rv;
     long _sz;
@@ -85,6 +97,8 @@ static object *_SXI_favp2(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |double *favp3(void)| */
 
 static object *_SXI_favp3(SS_psides *si, object *argl)
    {double *_rv;
@@ -102,6 +116,8 @@ static object *_SXI_favp3(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |str *favp4(void)| */
+
 static object *_SXI_favp4(SS_psides *si, object *argl)
    {str *_rv;
     long _sz;
@@ -117,6 +133,8 @@ static object *_SXI_favp4(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |void fav5(void)| */
 
 static object *_SXI_fav5(SS_psides *si, object *argl)
    {object *_lo;
