@@ -5,12 +5,14 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |char *fbcv1(int a, float b, double c, char d, int (*e)(void), PFInt f)| */
+
 static object *_SXI_fbcv1(SS_psides *si, object *argl)
    {int _la;
     float _lb;
     double _lc;
     char _ld;
-    PFInt _le;
+    int (*_le)(void);
     PFInt _lf;
     char *_rv;
     object *_lo;
@@ -31,6 +33,8 @@ static object *_SXI_fbcv1(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |char *fbmcv1(int a, float b, double c, char d)| */
 
 static object *_SXI_fbmcv1(SS_psides *si, object *argl)
    {int _la;
@@ -54,6 +58,8 @@ static object *_SXI_fbmcv1(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |char *fbmcr2(int *a, float *b, double *c, char *d)| */
 
 static object *_SXI_fbmcr2(SS_psides *si, object *argl)
    {int *_la;

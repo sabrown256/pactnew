@@ -711,7 +711,8 @@ object *SS_call_scheme(SS_psides *si, char *func, ...)
     fnc = _SS_lk_var_valc(si, func, si->env);
 /*    fnc = (object *) SC_hasharr_def_lookup(si->symtab, func); */
     if (fnc == NULL)
-       SS_error(si, "UNKNOWN PROCEDURE - SS_CALL_SCHEME", SS_mk_string(si, func));
+       SS_error(si, "UNKNOWN PROCEDURE - SS_CALL_SCHEME",
+		SS_mk_string(si, func));
 
     for (i = 0; i < MAXLINE; i++)
         {type[i] = SC_VA_ARG(int);

@@ -97,34 +97,36 @@ else
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   flog $LogF pushd $SrcDir
-   flog $LogF $MAKE -na 2 omp
-   set TStatus = $status
-   flog $LogF popd
+   if ($HAVE_OPENMP == TRUE) then
+      flog $LogF pushd $SrcDir
+      flog $LogF $MAKE -na 2 omp
+      set TStatus = $status
+      flog $LogF popd
 
-   NoteD $LogF -n "                        omp ............................ "
-   Note $LogF ""
-   if ("$Valgrind" == "") then
-      flog $LogF ( echo 2 | $CFE $BinDir/scompt )
-      set xstatus = $status
-   else
-      ftee $LogF ( echo 2 | $Valgrind $BinDir/scompt          |& \
-      grep "ERROR SUMMARY:"                                   |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      flog $LogF $RM $Tmp
-      set Files = ( 1 )
-   endif
+      NoteD $LogF -n "                        omp ............................ "
+      Note $LogF ""
+      if ("$Valgrind" == "") then
+         flog $LogF ( echo 2 | $CFE $BinDir/scompt )
+         set xstatus = $status
+      else
+         ftee $LogF ( echo 2 | $Valgrind $BinDir/scompt          |& \
+         grep "ERROR SUMMARY:"                                   |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+         flog $LogF $RM $Tmp
+         set Files = ( 1 )
+      endif
 
-   set ETime = `$TIMER -b $UTime`
+      set ETime = `$TIMER -b $UTime`
 
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "omitted ($xstatus/$ETime)"
-   else if (($xstatus != 0) || ($#Files == 0)) then
-      NoteD $LogF "ng ($xstatus/$ETime)"
-      set ERROR = TRUE
-   else
-      NoteD $LogF "ok ($ETime)"
+      if (($xstatus == 254) || ($xstatus == 255)) then
+         NoteD $LogF "omitted ($xstatus/$ETime)"
+      else if (($xstatus != 0) || ($#Files == 0)) then
+         NoteD $LogF "ng ($xstatus/$ETime)"
+         set ERROR = TRUE
+      else
+         NoteD $LogF "ok ($ETime)"
+      endif
    endif
 
 #--------------------------------------------------------------------------

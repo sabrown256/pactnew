@@ -5,6 +5,8 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |int fb1(bool a1, bool *a2)| */
+
 static object *_SXI_fb1(SS_psides *si, object *argl)
    {bool _la1;
     bool *_la2;
@@ -23,6 +25,8 @@ static object *_SXI_fb1(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |int fb2(char a1, char *a2)| */
 
 static object *_SXI_fb2(SS_psides *si, object *argl)
    {char _la1;
@@ -43,6 +47,8 @@ static object *_SXI_fb2(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |int fb3(short a1, short *a2)| */
+
 static object *_SXI_fb3(SS_psides *si, object *argl)
    {short _la1;
     short *_la2;
@@ -61,6 +67,8 @@ static object *_SXI_fb3(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |int fb4(int a1, int *a2)| */
 
 static object *_SXI_fb4(SS_psides *si, object *argl)
    {int _la1;
@@ -81,6 +89,8 @@ static object *_SXI_fb4(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |int fb5(long a1, long *a2)| */
+
 static object *_SXI_fb5(SS_psides *si, object *argl)
    {long _la1;
     long *_la2;
@@ -99,6 +109,8 @@ static object *_SXI_fb5(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |int fb6(long long a1, long long *a2)| */
 
 static object *_SXI_fb6(SS_psides *si, object *argl)
    {long long _la1;
@@ -119,6 +131,8 @@ static object *_SXI_fb6(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |int fb7(float a1, float *a2)| */
+
 static object *_SXI_fb7(SS_psides *si, object *argl)
    {float _la1;
     float *_la2;
@@ -137,6 +151,8 @@ static object *_SXI_fb7(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |int fb8(double a1, double *a2)| */
 
 static object *_SXI_fb8(SS_psides *si, object *argl)
    {double _la1;
@@ -157,6 +173,8 @@ static object *_SXI_fb8(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |int fb10(float _Complex a1, float _Complex *a2)| */
+
 static object *_SXI_fb10(SS_psides *si, object *argl)
    {float _Complex _la1;
     float _Complex *_la2;
@@ -175,6 +193,8 @@ static object *_SXI_fb10(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |int fb11(double _Complex a1, double _Complex *a2)| */
 
 static object *_SXI_fb11(SS_psides *si, object *argl)
    {double _Complex _la1;
@@ -195,6 +215,8 @@ static object *_SXI_fb11(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |bool fr1(int a1)| */
+
 static object *_SXI_fr1(SS_psides *si, object *argl)
    {int _la1;
     bool _rv;
@@ -211,6 +233,8 @@ static object *_SXI_fr1(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |char fr2(int a1)| */
 
 static object *_SXI_fr2(SS_psides *si, object *argl)
    {int _la1;
@@ -229,6 +253,8 @@ static object *_SXI_fr2(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |short fr3(int a1)| */
+
 static object *_SXI_fr3(SS_psides *si, object *argl)
    {int _la1;
     short _rv;
@@ -245,6 +271,8 @@ static object *_SXI_fr3(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |int fr4(int a1)| */
 
 static object *_SXI_fr4(SS_psides *si, object *argl)
    {int _la1;
@@ -263,6 +291,8 @@ static object *_SXI_fr4(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |long fr5(int a1)| */
+
 static object *_SXI_fr5(SS_psides *si, object *argl)
    {int _la1;
     long _rv;
@@ -279,6 +309,8 @@ static object *_SXI_fr5(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |long long fr6(int a1)| */
 
 static object *_SXI_fr6(SS_psides *si, object *argl)
    {int _la1;
@@ -297,6 +329,8 @@ static object *_SXI_fr6(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |float fr7(int a1)| */
+
 static object *_SXI_fr7(SS_psides *si, object *argl)
    {int _la1;
     float _rv;
@@ -313,6 +347,8 @@ static object *_SXI_fr7(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |double fr8(int a1)| */
 
 static object *_SXI_fr8(SS_psides *si, object *argl)
    {int _la1;
@@ -331,6 +367,8 @@ static object *_SXI_fr8(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |float _Complex fr10(int a1)| */
+
 static object *_SXI_fr10(SS_psides *si, object *argl)
    {int _la1;
     float _Complex _rv;
@@ -348,6 +386,8 @@ static object *_SXI_fr10(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |double _Complex fr11(int a1)| */
+
 static object *_SXI_fr11(SS_psides *si, object *argl)
    {int _la1;
     double _Complex _rv;
@@ -364,6 +404,8 @@ static object *_SXI_fr11(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |str fr13(int a1)| */
 
 static object *_SXI_fr13(SS_psides *si, object *argl)
    {int _la1;
@@ -383,6 +425,8 @@ static object *_SXI_fr13(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |bool *fp1(int a1)| */
 
 static object *_SXI_fp1(SS_psides *si, object *argl)
    {int _la1;
@@ -405,6 +449,8 @@ static object *_SXI_fp1(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |char *fp2(int a1)| */
+
 static object *_SXI_fp2(SS_psides *si, object *argl)
    {int _la1;
     char *_rv;
@@ -421,6 +467,8 @@ static object *_SXI_fp2(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |short *fp3(int a1)| */
 
 static object *_SXI_fp3(SS_psides *si, object *argl)
    {int _la1;
@@ -443,6 +491,8 @@ static object *_SXI_fp3(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |int *fp4(int a1)| */
+
 static object *_SXI_fp4(SS_psides *si, object *argl)
    {int _la1;
     int *_rv;
@@ -463,6 +513,8 @@ static object *_SXI_fp4(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |long *fp5(int a1)| */
 
 static object *_SXI_fp5(SS_psides *si, object *argl)
    {int _la1;
@@ -485,6 +537,8 @@ static object *_SXI_fp5(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |long long *fp6(int a1)| */
+
 static object *_SXI_fp6(SS_psides *si, object *argl)
    {int _la1;
     long long *_rv;
@@ -505,6 +559,8 @@ static object *_SXI_fp6(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |float *fp7(int a1)| */
 
 static object *_SXI_fp7(SS_psides *si, object *argl)
    {int _la1;
@@ -527,6 +583,8 @@ static object *_SXI_fp7(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |double *fp8(int a1)| */
+
 static object *_SXI_fp8(SS_psides *si, object *argl)
    {int _la1;
     double *_rv;
@@ -547,6 +605,8 @@ static object *_SXI_fp8(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |float _Complex *fp10(int a1)| */
 
 static object *_SXI_fp10(SS_psides *si, object *argl)
    {int _la1;
@@ -569,6 +629,8 @@ static object *_SXI_fp10(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |double _Complex *fp11(int a1)| */
+
 static object *_SXI_fp11(SS_psides *si, object *argl)
    {int _la1;
     double _Complex *_rv;
@@ -589,6 +651,8 @@ static object *_SXI_fp11(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |str *fp13(int a1)| */
 
 static object *_SXI_fp13(SS_psides *si, object *argl)
    {int _la1;

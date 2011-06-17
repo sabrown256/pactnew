@@ -5,6 +5,8 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |str *fe1(str *a1, int a2)| */
+
 static object *_SXI_fe1(SS_psides *si, object *argl)
    {str *_la1;
     int _la2;
@@ -27,6 +29,8 @@ static object *_SXI_fe1(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |void fe2(str *dev, double *x, double *y, int n, pcons *info, int l)| */
 
 static object *_SXI_fe2(SS_psides *si, object *argl)
    {str *_ldev;

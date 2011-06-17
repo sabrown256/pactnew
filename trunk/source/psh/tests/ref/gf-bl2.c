@@ -11,6 +11,8 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |char *fbcv1(int a, float b, double c, char d, int (*e)(void), PFInt f)| */
+
 char *FF_ID(fbcv1f, FBCV1F)(int *a, float *b, double *c, char *d, int (*e)(void), PFInt f)
    {int _la;
     float _lb;
@@ -30,6 +32,8 @@ char *FF_ID(fbcv1f, FBCV1F)(int *a, float *b, double *c, char *d, int (*e)(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |char *fbmcv1(int a, float b, double c, char d)| */
+
 char *FF_ID(fbmcv1f, FBMCV1F)(int *a, float *b, double *c, char *d)
    {int _la;
     float _lb;
@@ -48,6 +52,8 @@ char *FF_ID(fbmcv1f, FBMCV1F)(int *a, float *b, double *c, char *d)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* WRAP |char *fbmcr2(int *a, float *b, double *c, char *d)| */
 
 char *FF_ID(fbmcr2f, FBMCR2F)(int *a, float *b, double *c, char *d, int sncd)
    {int *_la;

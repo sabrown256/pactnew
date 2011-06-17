@@ -5,8 +5,10 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |void a_f1(PFDouble a)| */
+
 static object *_SXI_a_f1(SS_psides *si, object *argl)
-   {PFInt _la;
+   {PFDouble _la;
     object *_lo;
 
     SS_args(si, argl,
@@ -21,8 +23,10 @@ static object *_SXI_a_f1(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |void a_f2(int (*b)(int *a))| */
+
 static object *_SXI_a_f2(SS_psides *si, object *argl)
-   {PFInt _lb;
+   {int (*_lb)(int *a);
     object *_lo;
 
     SS_args(si, argl,
@@ -37,9 +41,11 @@ static object *_SXI_a_f2(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |void a_f3(PFDouble a, int (*b)(int *a))| */
+
 static object *_SXI_a_f3(SS_psides *si, object *argl)
-   {PFInt _la;
-    PFInt _lb;
+   {PFDouble _la;
+    int (*_lb)(int *a);
     object *_lo;
 
     SS_args(si, argl,
@@ -55,9 +61,11 @@ static object *_SXI_a_f3(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |void a_f4(int (*b)(int *a), PFDouble a)| */
+
 static object *_SXI_a_f4(SS_psides *si, object *argl)
-   {PFInt _lb;
-    PFInt _la;
+   {int (*_lb)(int *a);
+    PFDouble _la;
     object *_lo;
 
     SS_args(si, argl,
@@ -73,8 +81,10 @@ static object *_SXI_a_f4(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |void B_f1(PFDouble a, int b)| */
+
 static object *_SXI_b_f1(SS_psides *si, object *argl)
-   {PFInt _la;
+   {PFDouble _la;
     int _lb;
     object *_lo;
 
@@ -91,8 +101,10 @@ static object *_SXI_b_f1(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |void B_f2(int (*a)(int *a), int b)| */
+
 static object *_SXI_b_f2(SS_psides *si, object *argl)
-   {PFInt _la;
+   {int (*_la)(int *a);
     int _lb;
     object *_lo;
 
@@ -109,9 +121,11 @@ static object *_SXI_b_f2(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |void B_f3(PFDouble a, int (*b)(int *a), int c)| */
+
 static object *_SXI_b_f3(SS_psides *si, object *argl)
-   {PFInt _la;
-    PFInt _lb;
+   {PFDouble _la;
+    int (*_lb)(int *a);
     int _lc;
     object *_lo;
 
@@ -129,9 +143,11 @@ static object *_SXI_b_f3(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |void B_f4(int (*a)(int *a), PFDouble b, int c)| */
+
 static object *_SXI_b_f4(SS_psides *si, object *argl)
-   {PFInt _la;
-    PFInt _lb;
+   {int (*_la)(int *a);
+    PFDouble _lb;
     int _lc;
     object *_lo;
 
@@ -149,10 +165,12 @@ static object *_SXI_b_f4(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |void B_f5(int a, PFDouble b, int (*c)(int *a))| */
+
 static object *_SXI_b_f5(SS_psides *si, object *argl)
    {int _la;
-    PFInt _lb;
-    PFInt _lc;
+    PFDouble _lb;
+    int (*_lc)(int *a);
     object *_lo;
 
     SS_args(si, argl,
@@ -169,10 +187,12 @@ static object *_SXI_b_f5(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WRAP |void B_f6(int a, int (*b)(int *a), PFDouble c)| */
+
 static object *_SXI_b_f6(SS_psides *si, object *argl)
    {int _la;
-    PFInt _lb;
-    PFInt _lc;
+    int (*_lb)(int *a);
+    PFDouble _lc;
     object *_lo;
 
     SS_args(si, argl,
