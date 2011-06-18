@@ -209,7 +209,7 @@ typedef memdes *(*PFPDBwrite)(PDBfile *file, char *vr, defstr *defp);
 typedef memdes *(*PFPDBread)(memdes *members);
 
 /*
- * #bind derived PD_major_op integer SC_ENUM_I SC_ENUM_I
+ * #bind derived PD_major_op integer SC_ENUM_I SC_ENUM_I PD_GENERIC
  */
 
 enum e_PD_major_op
@@ -227,7 +227,7 @@ enum e_PD_major_op
 typedef enum e_PD_major_op PD_major_op;
 
 /*
- * #bind derived PD_byte_order integer SC_ENUM_I SC_ENUM_I
+ * #bind derived PD_byte_order integer SC_ENUM_I SC_ENUM_I NO_ORDER
  */
 
 enum e_PD_byte_order
@@ -264,7 +264,7 @@ enum e_PD_major_order
 typedef enum e_PD_major_order PD_major_order;
 
 /*
- * #bind derived PD_curve_io integer SC_ENUM_I SC_ENUM_I
+ * #bind derived PD_curve_io integer SC_ENUM_I SC_ENUM_I NOR_X_Y
  */
 
 enum e_PD_curve_io
@@ -282,7 +282,7 @@ enum e_PD_symbol_order
 typedef enum e_PD_symbol_order PD_symbol_order;
 
 /*
- * #bind derived PD_checksum_mode integer SC_ENUM_I SC_ENUM_I
+ * #bind derived PD_checksum_mode integer SC_ENUM_I SC_ENUM_I PD_MD5_OFF
  */
 
 #ifdef NON_INTEGER_ENUM
@@ -383,7 +383,7 @@ struct s_sys_layer
 		  char *intype, char *outtype);};
 
 /*
- * #bind derived PDBfile character-A SC_STRING_I SC_STRING_I
+ * #bind derived PDBfile character-A SC_STRING_I SC_STRING_I NULL
  */
 
 struct s_PDBfile

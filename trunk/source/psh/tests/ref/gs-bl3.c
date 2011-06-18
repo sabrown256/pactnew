@@ -15,6 +15,8 @@ static object *_SXI_fe1(SS_psides *si, object *argl)
     C_array *_arr;
     object *_lo;
 
+    _la1 = NULL;
+    _la2 = 0;
     SS_args(si, argl,
             SC_POINTER_I, &_la1,
             SC_INT_I, &_la2,
@@ -41,6 +43,12 @@ static object *_SXI_fe2(SS_psides *si, object *argl)
     int _ll;
     object *_lo;
 
+    _ldev = NULL;
+    _lx = NULL;
+    _ly = NULL;
+    _ln = 0;
+    _linfo = NULL;
+    _ll = 0;
     SS_args(si, argl,
             SC_POINTER_I, &_ldev,
             SC_DOUBLE_P_I, &_lx,

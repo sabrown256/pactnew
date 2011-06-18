@@ -621,7 +621,7 @@ static object *_SXI_ddpn(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_DDP2", SS_car(si, argl));
+       SS_error(si, "BAD DEVICE - _SXI_DDPN", SS_car(si, argl));
 
     argl = SS_cddr(si, SS_cddr(si, argl));
     if (nd == 2)
@@ -818,7 +818,7 @@ static object *_SXI_draw_text(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_DRAW_TEXT_WC", SS_null);
+       SS_error(si, "BAD DEVICE - _SXI_DRAW_TEXT", SS_null);
 
     PG_fset_text_color(dev, dev->text_color, TRUE);
     PG_write_n(dev, nd, cs, p, "%s", txt);
