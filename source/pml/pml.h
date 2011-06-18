@@ -266,7 +266,7 @@ enum e_PM_binary_operation
 typedef enum e_PM_binary_operation PM_binary_operation;
 
 /*
- * #bind derived PM_centering integer SC_ENUM_I SC_ENUM_I
+ * #bind derived PM_centering integer SC_ENUM_I SC_ENUM_I U_CENT
  */
 
 enum e_PM_centering
@@ -609,7 +609,8 @@ struct s_PM_mesh_topology
  *     - Assume that for anything after elements which is NULL that a set
  *     - is a part of flat, singly connected Euclidean N space over the
  *     - field of reals (doubles) and has a logical mesh structure 
- * #bind derived PM_set character-A SC_STRING_I SC_STRING_I
+ *
+ * #bind derived PM_set character-A G_SET SC_STRING_I NULL
  */
 
 struct s_PM_set
@@ -651,7 +652,7 @@ struct s_PM_map_info
 
 /* PM_MAPPING - describe mapping of domain set to range set
  *
- * #bind derived PM_mapping character-A SC_STRING_I SC_STRING_I
+ * #bind derived PM_mapping character-A G_MAPPING SC_STRING_I NULL
  */
 
 struct s_PM_mapping

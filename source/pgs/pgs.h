@@ -244,7 +244,7 @@ typedef int (*PFRDev)(PG_device *dev);
 typedef void (*PFKeymap)(PG_text_box *b);
 
 /*
- * #bind derived PG_coord_sys integer SC_ENUM_I SC_ENUM_I
+ * #bind derived PG_coord_sys integer SC_ENUM_I SC_ENUM_I WORLDC
  */
 
 enum e_PG_coord_sys
@@ -271,7 +271,7 @@ enum e_PG_dev_type
 typedef enum e_PG_dev_type PG_dev_type;
 
 /*
- * #bind derived PG_rendering integer SC_ENUM_I SC_ENUM_I
+ * #bind derived PG_rendering integer SC_ENUM_I SC_ENUM_I PLOT_NONE
  */
 
 enum e_PG_rendering
@@ -449,7 +449,7 @@ enum e_PG_angle_unit
 typedef enum e_PG_angle_unit PG_angle_unit;
 
 /*
- * #bind derived PG_logical_operation integer SC_ENUM_I SC_ENUM_I
+ * #bind derived PG_logical_operation integer SC_ENUM_I SC_ENUM_I GS_COPY
  */
 
 enum e_PG_logical_operation
@@ -579,7 +579,7 @@ typedef struct s_RGB_color_map RGB_color_map;
 /*--------------------------------------------------------------------------*/
 
 /* palette structure
- * #bind derived PG_palette character-A SC_STRING_I SC_STRING_I
+ * #bind derived PG_palette character-A SC_STRING_I SC_STRING_I NULL
  */
 
 struct s_PG_palette
@@ -731,7 +731,7 @@ struct s_PG_dev_geometry
 /*--------------------------------------------------------------------------*/
 
 /* PG_DEVICE - graphics device structure
- * #bind derived PG_device character-A SC_STRING_I SC_STRING_I
+ * #bind derived PG_device character-A G_DEVICE SC_STRING_I NULL
  */
 
 struct s_PG_device
@@ -989,7 +989,7 @@ struct s_PG_device
 
 /* PG_IMAGE is PD_defstr'd in PDBX.C any changes here must be reflected
  * there!!
- * #bind derived PG_image character-A SC_STRING_I SC_STRING_I
+ * #bind derived PG_image character-A G_IMAGE SC_STRING_I NULL
  */
 
 struct s_PG_image

@@ -55,7 +55,8 @@ struct s_farg
    {fparam knd;
     char *arg;
     char type[MAXLINE];
-    char name[MAXLINE];};
+    char name[MAXLINE];
+    char val[MAXLINE];};
 
 struct s_fdecl
    {int proc;                         /* TRUE iff processed */
@@ -74,9 +75,11 @@ struct s_mtype
    {char *cty;
     char *fty;
     char *sty;
-    char *pty;};
+    char *pty;
+    char *defv;};
 
 static char
+ *lookup_type(char *val, char *ty, langmode ity, langmode oty),
  **mc_proto_list(fdecl *dcl);
 
 static fparam
@@ -205,7 +208,7 @@ static int is_var_arg(char *pr)
  *            - return TRUE if S is a function pointer
  */
 
-static int split_decl(char *type, int nt, char *name, int nn, char *s)
+static int split_decl(int ns, char *type, char *name, char *val, char *s)
    {int nc, rv;
     char t[MAXLINE];
     char *p, *pn;
@@ -230,26 +233,28 @@ static int split_decl(char *type, int nt, char *name, int nn, char *s)
 
 /* handle function pointer case which would be like '(*f' here */
     if (*pn == '(')
-       {nstrncpy(name, nn, pn+2, -1);
+       {nstrncpy(name, ns, pn+2, -1);
 	*pn = '\0';
-	nstrncpy(type, nt, "PFInt", -1);
+	nstrncpy(type, ns, "PFInt", -1);
 
 	rv = TRUE;}
 
     else if (strncmp(p, "PF", 2) == 0)
-       {nstrncpy(name, nn, pn, -1);
+       {nstrncpy(name, ns, pn, -1);
 	pn[-1] = '\0';
-	nstrncpy(type, nt, p, -1);
+	nstrncpy(type, ns, p, -1);
 
 	rv = TRUE;}
 
 /* handle other args */
     else
-       {nstrncpy(name, nn, pn, -1);
+       {nstrncpy(name, ns, pn, -1);
 	*pn = '\0';
-	nstrncpy(type, nt, trim(p, BACK, " \t"), -1);
+	nstrncpy(type, ns, trim(p, BACK, " \t"), -1);
 
 	rv = FALSE;};
+
+    lookup_type(val, type, MODE_C, MODE_C);
 
     return(rv);}
 
@@ -306,10 +311,7 @@ static farg *proc_args(fdecl *dcl)
 
     for (i = 0; i < na; i++)
         {al[i].arg  = args[i];
-	 split_decl(al[i].type, MAXLINE,
-		    al[i].name, MAXLINE,
-		    al[i].arg);
-
+	 split_decl(MAXLINE, al[i].type, al[i].name, al[i].val, al[i].arg);
 	 al[i].knd = fc_type(lty, MAXLINE, al[i].type, al[i].arg, MODE_C);};
 
     dcl->al = al;
@@ -392,7 +394,7 @@ static fdecl *find_proto(char **cpr, char *f)
 	LAST_CHAR(pa) = '\0';
 
 /* get the return type */
-        split_decl(dcl->type, MAXLINE, dcl->name, MAXLINE, pf);
+        split_decl(MAXLINE, dcl->type, dcl->name, NULL, pf);
 	
 	ty = tokenize(pf, " \t");
 	nt = lst_length(ty);
@@ -493,7 +495,7 @@ static void get_type_map(int *pn, mtype **pmap, int na)
 
 /* ADD_TYPE - add a type to the map */
 
-static void add_type(char *cty, char *fty, char *sty, char *pty)
+static void add_type(char *cty, char *fty, char *sty, char *pty, char *defv)
    {int n;
     mtype *map;
 
@@ -502,10 +504,11 @@ static void add_type(char *cty, char *fty, char *sty, char *pty)
     n--;
     n = max(n, 0);
 
-    map[n].cty = cty;
-    map[n].fty = fty;
-    map[n].sty = sty;
-    map[n].pty = pty;
+    map[n].cty  = cty;
+    map[n].fty  = fty;
+    map[n].sty  = sty;
+    map[n].pty  = pty;
+    map[n].defv = defv;
 
     return;}
 
@@ -514,9 +517,9 @@ static void add_type(char *cty, char *fty, char *sty, char *pty)
 
 /* LOOKUP_TYPE - lookup and return a type from the map */
 
-static char *lookup_type(char *ty, langmode ity, langmode oty)
+static char *lookup_type(char *val, char *ty, langmode ity, langmode oty)
    {int i, l, n;
-    char *rv;
+    char *rv, *dv;
     mtype *map;
 
     get_type_map(&n, &map, 0);
@@ -549,8 +552,10 @@ static char *lookup_type(char *ty, langmode ity, langmode oty)
 	     break;};
 
     rv = NULL;
+    dv = "NULL";
     if (l != -1)
-       {switch (oty)
+       {dv = map[l].defv;
+	switch (oty)
 	   {case MODE_C :
                  rv = map[l].cty;
 	         break;
@@ -564,6 +569,9 @@ static char *lookup_type(char *ty, langmode ity, langmode oty)
                  rv = map[l].pty;
 	         break;};};
 
+    if (val != NULL)
+       strcpy(val, dv);
+
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
@@ -574,33 +582,33 @@ static char *lookup_type(char *ty, langmode ity, langmode oty)
 static void init_types(void)
    {
 
-    add_type("void",        "",            "",                 NULL);
-    add_type("bool",        "logical",     "SC_BOOL_I",        NULL);
-    add_type("char",        "character",   "SC_CHAR_I",        NULL);
+    add_type("void",        "",            "",                 NULL, "NULL");
+    add_type("bool",        "logical",     "SC_BOOL_I",        NULL, "FALSE");
+    add_type("char",        "character",   "SC_CHAR_I",        NULL, "'\\0'");
 
 /* fixed point types */
-    add_type("short",       "integer(2)",  "SC_SHORT_I",       NULL);
-    add_type("int",         "integer",     "SC_INT_I",         NULL);
-    add_type("long",        "integer(8)",  "SC_LONG_I",        NULL);
-    add_type("long long",   "integer(8)",  "SC_LONG_LONG_I",   NULL);
+    add_type("short",       "integer(2)",  "SC_SHORT_I",       NULL, "0");
+    add_type("int",         "integer",     "SC_INT_I",         NULL, "0");
+    add_type("long",        "integer(8)",  "SC_LONG_I",        NULL, "0L");
+    add_type("long long",   "integer(8)",  "SC_LONG_LONG_I",   NULL, "0LL");
 
 /* fixed width fixed point types */
-    add_type("int16_t",     "integer(2)",  "SC_INT16_I",       NULL);
-    add_type("int32_t",     "integer(4)",  "SC_INT32_I",       NULL);
-    add_type("int64_t",     "integer(8)",  "SC_INT64_I",       NULL);
+    add_type("int16_t",     "integer(2)",  "SC_INT16_I",       NULL, "0");
+    add_type("int32_t",     "integer(4)",  "SC_INT32_I",       NULL, "0");
+    add_type("int64_t",     "integer(8)",  "SC_INT64_I",       NULL, "0L");
 
 /* floating point types */
-    add_type("float",       "real(4)",     "SC_FLOAT_I",       NULL);
-    add_type("double",      "real(8)",     "SC_DOUBLE_I",      NULL);
-    add_type("long double", "real(16)",    "SC_LONG_DOUBLE_I", NULL);
+    add_type("float",       "real(4)",     "SC_FLOAT_I",       NULL, "0.0");
+    add_type("double",      "real(8)",     "SC_DOUBLE_I",      NULL, "0.0");
+    add_type("long double", "real(16)",    "SC_LONG_DOUBLE_I", NULL, "0.0");
 
 /* complex types */
     add_type("float _Complex",       "complex(4)",
-	     "SC_FLOAT_COMPLEX_I", NULL);
+	     "SC_FLOAT_COMPLEX_I", NULL, "0.0");
     add_type("double _Complex",      "complex(8)",
-	     "SC_DOUBLE_COMPLEX_I", NULL);
+	     "SC_DOUBLE_COMPLEX_I", NULL, "0.0");
     add_type("long double _Complex", "complex(16)",
-	     "SC_LONG_DOUBLE_COMPLEX_I", NULL);
+	     "SC_LONG_DOUBLE_COMPLEX_I", NULL, "0.0");
 
 /* GOTCHA: there is a general issue with pointers and Fortran here
  * doing add_type on "void *" causes Fortran wrapper declarations
@@ -616,23 +624,23 @@ static void init_types(void)
  * with "void *" defined pd_write_f works for real*8 a(10)
  * but fails for type(C_PTR) b
  */
-    add_type("void *",        "C_PTR-A",      "SC_POINTER_I",       NULL);
-    add_type("bool *",        "logical-A",    "SC_BOOL_P_I",        NULL);
-    add_type("char *",        "character-A",  "SC_STRING_I",        NULL);
+    add_type("void *",        "C_PTR-A",      "SC_POINTER_I",       NULL, "NULL");
+    add_type("bool *",        "logical-A",    "SC_BOOL_P_I",        NULL, "NULL");
+    add_type("char *",        "character-A",  "SC_STRING_I",        NULL, "NULL");
 
-    add_type("short *",       "integer(2)-A", "SC_SHORT_P_I",       NULL);
-    add_type("int *",         "integer-A",    "SC_INT_P_I",         NULL);
-    add_type("long *",        "integer(8)-A", "SC_LONG_P_I",        NULL);
-    add_type("long long *",   "integer(8)-A", "SC_LONG_LONG_P_I",   NULL);
+    add_type("short *",       "integer(2)-A", "SC_SHORT_P_I",       NULL, "NULL");
+    add_type("int *",         "integer-A",    "SC_INT_P_I",         NULL, "NULL");
+    add_type("long *",        "integer(8)-A", "SC_LONG_P_I",        NULL, "NULL");
+    add_type("long long *",   "integer(8)-A", "SC_LONG_LONG_P_I",   NULL, "NULL");
 
-    add_type("float *",       "real(4)-A",    "SC_FLOAT_P_I",       NULL);
-    add_type("double *",      "real(8)-A",    "SC_DOUBLE_P_I",      NULL);
-    add_type("long double *", "real(16)-A",   "SC_LONG_DOUBLE_P_I", NULL);
+    add_type("float *",       "real(4)-A",    "SC_FLOAT_P_I",       NULL, "NULL");
+    add_type("double *",      "real(8)-A",    "SC_DOUBLE_P_I",      NULL, "NULL");
+    add_type("long double *", "real(16)-A",   "SC_LONG_DOUBLE_P_I", NULL, "NULL");
 
-    add_type("pcons",         "C_PTR-A",      "SC_PCONS_I",         NULL);
-    add_type("pcons *",       "C_PTR-A",      "SC_PCONS_P_I",       NULL);
-/*    add_type("FILE *",        "C_PTR-A",      "SC_FILE_I",          NULL); */
-    add_type("PROCESS *",     "C_PTR-A",      "SC_PROCESS_I",       NULL);
+    add_type("pcons",         "C_PTR-A",      "SC_PCONS_I",         NULL, "NULL");
+    add_type("pcons *",       "C_PTR-A",      "SC_PCONS_P_I",       NULL, "NULL");
+/*    add_type("FILE *",        "C_PTR-A",      "SC_FILE_I",          NULL, "NULL"); */
+    add_type("PROCESS *",     "C_PTR-A",      "SC_PROCESS_I",       NULL, "NULL");
 
     return;}
 
@@ -652,7 +660,7 @@ static void add_derived_types(char **sbi)
 	    {if (strncmp(sb, "derived ", 8) == 0)
 		 {nstrncpy(s, MAXLINE, sb, -1);
 		  ta = tokenize(s, " \t");
-		  add_type(ta[1], ta[2], ta[3], ta[4]);
+		  add_type(ta[1], ta[2], ta[3], ta[4], ta[5]);
 		  FREE(ta[0]);
 		  FREE(ta);};};};
 
@@ -794,7 +802,7 @@ static void cf_type(char *a, int nc, char *ty)
        nstrncpy(a, nc, "void *", -1);
 
     else
-       {fty = lookup_type(ty, MODE_C, MODE_F);
+       {fty = lookup_type(NULL, ty, MODE_C, MODE_F);
 	if (fty != NULL)
 	   nstrncpy(a, nc, fty, -1);
 	else
@@ -813,7 +821,7 @@ static fparam fc_type(char *wty, int nc, char *ty, char *arg, langmode mode)
    {fparam rv;
     char *pty;
 
-    pty = lookup_type(ty, MODE_C, mode);
+    pty = lookup_type(NULL, ty, MODE_C, mode);
 
 /* handle variable arg list */
     if (is_var_arg(ty) == TRUE)
@@ -2115,7 +2123,7 @@ static void fin_module(bindes *bd)
 static void cs_type(char *a, int nc, char *ty)
    {char *sty;
 
-    sty = lookup_type(ty, MODE_C, MODE_S);
+    sty = lookup_type(NULL, ty, MODE_C, MODE_S);
     if (sty != NULL)
        nstrncpy(a, nc, sty, -1);
 
@@ -2335,6 +2343,11 @@ static void scheme_wrap_local_assn(FILE *fp, fdecl *dcl, int voida)
        {na = dcl->na;
 	al = dcl->al;
 
+/* set the default values */
+	for (i = 0; i < na; i++)
+	    fprintf(fp, "    _l%s = %s;\n", al[i].name, al[i].val);
+
+/* make the SS_args call */
 	a[0] = '\0';
 	for (i = 0; i < na; i++)
 	    {cs_type(ty, MAXLINE, al[i].type);
