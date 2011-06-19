@@ -17,18 +17,18 @@ int *favp2(void)
 double *favp3(void)
 str *favp4(void)
 
-int fbv1(int a, float b, double c, char d, int (*e)(void), PFInt f)
+int fbv1(int a ARG(2,in), float b, double c, char d, int (*e)(void), PFInt f)
 int fbr2(int *a, float *b, double *c, char *d, int (*e)(void), PFInt f)
-int *fbpv1(int a, float b, double c, char d, int (*e)(void), PFInt f)
+int *fbpv1(int a, float b ARG(3.14), double c, char d, int (*e)(void), PFInt f)
 int *fbpr2(int *a, float *b, double *c, char *d, int (*e)(void), PFInt f)
 
-int fbmv1(int a, float b, double c, char d)
+int fbmv1(int a, float b, double c, char d ARG('A'))
 int fbmr2(int *a, float *b, double *c, char *d)
 int *fbmpv1(int a, float b, double c, char d)
 int *fbmpr2(int *a, float *b, double *c, char *d)
 
 char *fbcv1(int a, float b, double c, char d, int (*e)(void), PFInt f)
-char *fbmcv1(int a, float b, double c, char d)
+char *fbmcv1(int a ARG(3), float b ARG(3.14,in), double c, char d ARG('A'))
 char *fbmcr2(int *a, float *b, double *c, char *d)
 
 void fav5(void)

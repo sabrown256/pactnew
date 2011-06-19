@@ -36,7 +36,7 @@ int64_t PG_fget_buffer_size(void)
  * #bind PG_fset_buffer_size fortran() scheme()
  */
 
-int64_t PG_fset_buffer_size(int64_t sz)
+int64_t PG_fset_buffer_size(int64_t sz ARG(-1,in))
    {int64_t rv;
     
     rv = _PG.buffer_size;
@@ -68,7 +68,7 @@ int PG_fget_clear_mode(void)
  * #bind PG_fset_clear_mode fortran() scheme()
  */
 
-int PG_fset_clear_mode(int i)
+int PG_fset_clear_mode(int i ARG(CLEAR_SCREEN))
    {
 
     PG_set_attrs_glb(TRUE, "hl-clear-mode", i, NULL);
@@ -98,14 +98,14 @@ int PG_fget_clipping(PG_device *dev)
  * #bind PG_fset_clipping fortran() scheme()
  */
 
-int PG_fset_clipping(PG_device *dev, int flag)
+int PG_fset_clipping(PG_device *dev, int flag ARG(TRUE))
    {int rv;
 
-    rv = flag;
-
-    if (dev != NULL)
-       {if (dev->set_clipping != NULL)
-           dev->set_clipping(dev, flag);};
+    if ((dev != NULL) && (dev->set_clipping != NULL))
+       {rv = dev->clipping;
+	dev->set_clipping(dev, flag);}
+    else
+       rv = flag;
 
     return(rv);}
 
@@ -118,7 +118,7 @@ int PG_fset_clipping(PG_device *dev, int flag)
  * #bind PG_fget_char_path fortran() scheme()
  */
 
-void PG_fget_char_path(PG_device *dev, double *x)
+void PG_fget_char_path(PG_device *dev, double *x ARG(,out))
    {
 
     if (dev != NULL)
@@ -138,12 +138,20 @@ void PG_fget_char_path(PG_device *dev, double *x)
  * #bind PG_fset_char_path fortran() scheme()
  */
 
-void PG_fset_char_path(PG_device *dev, double *x)
-   {
+void PG_fset_char_path(PG_device *dev, double *x ARG([1.0,0.0],in))
+   {double xo[PG_SPACEDM];
 
-    if (dev != NULL)
-       {if (dev->set_char_path != NULL)
-           dev->set_char_path(dev, x[0], x[1]);}
+    if ((dev != NULL) && (dev->set_char_path != NULL))
+       {xo[0] = dev->char_path[0];
+	xo[1] = dev->char_path[1];
+
+	dev->set_char_path(dev, x[0], x[1]);
+
+#if 0
+	x[0] = xo[0];
+	x[1] = xo[1];
+#endif
+       };
 
     return;}
 
@@ -157,7 +165,7 @@ void PG_fset_char_path(PG_device *dev, double *x)
  * #bind PG_fget_char_up fortran() scheme()
  */
 
-void PG_fget_char_up(PG_device *dev, double *x)
+void PG_fget_char_up(PG_device *dev, double *x ARG(,out))
    {
 
     if (dev != NULL)
@@ -178,12 +186,19 @@ void PG_fget_char_up(PG_device *dev, double *x)
  * #bind PG_fset_char_up fortran() scheme()
  */
 
-void PG_fset_char_up(PG_device *dev, double *x)
-   {
+void PG_fset_char_up(PG_device *dev, double *x ARG([0.0,1.0],in))
+   {double xo[PG_SPACEDM];
 
-    if (dev != NULL)
-       {if (dev->set_char_up != NULL)
-           dev->set_char_up(dev, x[0], x[1]);};
+    if ((dev != NULL) && (dev->set_char_up != NULL))
+       {xo[0] = dev->char_up[0];
+	xo[1] = dev->char_up[1];
+
+	dev->set_char_up(dev, x[0], x[1]);
+#if 0
+	x[0] = xo[0];
+	x[1] = xo[1];
+#endif
+	};
 
     return;}
 
@@ -214,12 +229,14 @@ int PG_fget_char_precision(PG_device *dev)
  * #bind PG_fset_char_precision fortran() scheme()
  */
 
-int PG_fset_char_precision(PG_device *dev, int p)
-   {
+int PG_fset_char_precision(PG_device *dev, int p ARG(1,in))
+   {int rv;
 
-    if (dev != NULL)
-       {if (dev->set_char_precision != NULL)
-           dev->set_char_precision(dev, p);};
+    if ((dev != NULL) && (dev->set_char_precision != NULL))
+       {rv = dev->char_precision;
+	dev->set_char_precision(dev, p);}
+    else
+       rv = 1;
 
     return(p);}
 
@@ -231,7 +248,8 @@ int PG_fset_char_precision(PG_device *dev, int p)
  * #bind PG_fget_char_size_n fortran() scheme()
  */
 
-void PG_fget_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double *p)
+void PG_fget_char_size_n(PG_device *dev, int nd, PG_coord_sys cs,
+			 double *p ARG([0.0,0.0],out))
    {
 
     if (dev != NULL)
@@ -253,12 +271,23 @@ void PG_fget_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double *p)
  * #bind PG_fset_char_size_n fortran() scheme()
  */
 
-void PG_fset_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double *p)
-   {
+void PG_fset_char_size_n(PG_device *dev, int nd, PG_coord_sys cs,
+			 double *p ARG([0.0,0.0],io))
+   {double po[PG_SPACEDM];
 
-    if (dev != NULL)
-       {if (dev->set_char_size != NULL)
-           dev->set_char_size(dev, nd, cs, p);};
+    if ((dev != NULL) && (dev->set_char_size != NULL))
+       {po[0] = dev->char_width_s;
+	po[1] = dev->char_height_s;
+
+	dev->set_char_size(dev, nd, cs, p);
+
+	p[0] = po[0];
+	p[0] = po[1];}
+    else
+       {p[0] = 0.0;
+	p[0] = 0.0;};
+
+    PG_trans_point(dev, nd, NORMC, p, cs, p);
 
     return;}
 
@@ -291,14 +320,16 @@ double PG_fget_char_space(PG_device *dev)
  * #bind PG_fset_char_space fortran() scheme()
  */
 
-double PG_fset_char_space(PG_device *dev, double d)
-   {
+double PG_fset_char_space(PG_device *dev, double d ARG(0.0,in))
+   {double rv;
 
-    if (dev != NULL)
-       {if (dev->set_char_space != NULL)
-           dev->set_char_space(dev, d);};
+    if ((dev != NULL) && (dev->set_char_space != NULL))
+       {rv = dev->char_space;
+	dev->set_char_space(dev, d);}
+    else
+       rv = 0.0;
 
-    return(d);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -327,11 +358,14 @@ int PG_fget_fill_bound(PG_device *dev)
  * #bind PG_fset_fill_bound fortran() scheme()
  */
 
-int PG_fset_fill_bound(PG_device *dev, int v)
-   {
+int PG_fset_fill_bound(PG_device *dev, int v ARG(FALSE,in))
+   {int rv;
 
     if (dev != NULL)
-       dev->draw_fill_bound = v;
+       {rv = dev->draw_fill_bound;
+	dev->draw_fill_bound = v;}
+    else
+       rv = FALSE;
 
     return(v);}
 
@@ -362,11 +396,14 @@ int PG_fget_finish_state(PG_device *dev)
  * #bind PG_fset_finish_state fortran() scheme()
  */
 
-int PG_fset_finish_state(PG_device *dev, int v)
-   {
+int PG_fset_finish_state(PG_device *dev, int v ARG(TRUE,in))
+   {int rv;
 
     if (dev != NULL)
-       dev->finished = v;
+       {rv = dev->finished;
+	dev->finished = v;}
+    else
+       rv = TRUE;
 
     return(v);}
 
@@ -395,12 +432,14 @@ void PG_fget_font(PG_device *dev, char **of, char **ost, int *osz)
  * #bind PG_fset_font fortran() scheme()
  */
 
-void PG_fset_font(PG_device *dev, char *face, char *style, int sz)
+void PG_fset_font(PG_device *dev,
+		  char *face ARG("helvetica",in),
+		  char *style ARG("medium",in),
+		  int sz ARG(12,in))
    {
 
-    if (dev != NULL)
-       {if (dev->set_font != NULL)
-           dev->set_font(dev, face, style, sz);};
+    if ((dev != NULL) && (dev->set_font != NULL))
+       dev->set_font(dev, face, style, sz);
 
     return;}
 
@@ -431,7 +470,7 @@ int PG_fget_identifier(PG_graph *g)
  * #bind PG_fset_identifier fortran() scheme()
  */
 
-int PG_fset_identifier(PG_graph *g, int id)
+int PG_fset_identifier(PG_graph *g, int id ARG('A',in))
    {int rv;
 
     if (g != NULL)
@@ -471,11 +510,12 @@ PG_logical_operation PG_fget_logical_op(PG_device *dev)
  */
 
 PG_logical_operation PG_fset_logical_op(PG_device *dev,
-					PG_logical_operation lop)
+					PG_logical_operation lop ARG(GS_COPY,in))
    {PG_logical_operation rv;
 
     if ((dev != NULL) && (dev->set_logical_op != NULL))
-       dev->set_logical_op(dev, lop);
+       {rv = dev->logical_op;
+	dev->set_logical_op(dev, lop);}
     else
        rv = GS_COPY;
 
@@ -509,7 +549,7 @@ int PG_fget_line_style(PG_device *dev)
  * #bind PG_fset_line_style fortran() scheme()
  */
 
-int PG_fset_line_style(PG_device *dev, int st)
+int PG_fset_line_style(PG_device *dev, int st ARG(LINE_SOLID,in))
    {int rv;
 
     if ((dev != NULL) && (dev->set_line_style != NULL))
@@ -548,7 +588,7 @@ double PG_fget_line_width(PG_device *dev)
  * #bind PG_fset_line_width fortran() scheme()
  */
 
-double PG_fset_line_width(PG_device *dev, double wd)
+double PG_fset_line_width(PG_device *dev, double wd ARG(0.1,in))
    {double owd;
 
     PG_get_attrs_glb(TRUE, "line-width", &owd, NULL);
@@ -589,7 +629,7 @@ double PG_fget_marker_orientation(PG_device *dev)
  * #bind PG_fset_marker_orientation fortran() scheme()
  */
 
-double PG_fset_marker_orientation(PG_device *dev, double a)
+double PG_fset_marker_orientation(PG_device *dev, double a ARG(0.0,in))
    {double rv;
 
     if (dev != NULL)
@@ -628,7 +668,7 @@ double PG_fget_marker_scale(PG_device *dev)
  * #bind PG_fset_marker_scale fortran() scheme()
  */
 
-double PG_fset_marker_scale(PG_device *dev, double s)
+double PG_fset_marker_scale(PG_device *dev, double s ARG(0.0,in))
    {double rv;
 
     if (dev != NULL)
@@ -667,14 +707,14 @@ double PG_fget_max_intensity(PG_device *dev)
  * #bind PG_fset_max_intensity fortran() scheme()
  */
 
-double PG_fset_max_intensity(PG_device *dev, double i)
+double PG_fset_max_intensity(PG_device *dev, double i ARG(1.0,in))
    {double rv;
 
     if (dev != NULL)
        {rv = dev->max_intensity;
 	dev->max_intensity = min(i, 1.0);}
     else
-       rv = 0.0;
+       rv = 1.0;
 
     return(rv);}
 
@@ -706,14 +746,14 @@ double PG_fget_max_red_intensity(PG_device *dev)
  * #bind PG_fset_max_red_intensity fortran() scheme()
  */
 
-double PG_fset_max_red_intensity(PG_device *dev, double i)
+double PG_fset_max_red_intensity(PG_device *dev, double i ARG(1.0,in))
    {double rv;
 
     if (dev != NULL)
        {rv = dev->max_red_intensity;
 	dev->max_red_intensity = min(i, 1.0);}
     else
-       rv = 0.0;
+       rv = 1.0;
 
     return(rv);}
 
@@ -745,14 +785,14 @@ double PG_fget_max_green_intensity(PG_device *dev)
  * #bind PG_fset_max_green_intensity fortran() scheme()
  */
 
-double PG_fset_max_green_intensity(PG_device *dev, double i)
+double PG_fset_max_green_intensity(PG_device *dev, double i ARG(1.0,in))
    {double rv;
 
     if (dev != NULL)
        {rv = dev->max_green_intensity;
 	dev->max_green_intensity = min(i, 1.0);}
     else
-       rv = 0.0;
+       rv = 1.0;
 
     return(rv);}
 
@@ -784,14 +824,14 @@ double PG_fget_max_blue_intensity(PG_device *dev)
  * #bind PG_fset_max_blue_intensity fortran() scheme()
  */
 
-double PG_fset_max_blue_intensity(PG_device *dev, double i)
+double PG_fset_max_blue_intensity(PG_device *dev, double i ARG(1.0,in))
    {double rv;
 
     if (dev != NULL)
        {rv = dev->max_blue_intensity;
 	dev->max_blue_intensity = min(i, 1.0);}
     else
-       rv = 0.0;
+       rv = 1.0;
 
     return(rv);}
 
@@ -823,7 +863,7 @@ int PG_fget_pixmap_flag(PG_device *dev)
  * #bind PG_fset_pixmap_flag fortran() scheme()
  */
 
-int PG_fset_pixmap_flag(PG_device *dev, int fl)
+int PG_fset_pixmap_flag(PG_device *dev, int fl ARG(0,in))
    {int rv;
 
     if (dev != NULL)
@@ -961,7 +1001,7 @@ int PG_fget_res_scale_factor(PG_device *dev)
  * #bind PG_fset_res_scale_factor fortran() scheme()
  */
 
-int PG_fset_res_scale_factor(PG_device *dev, int s)
+int PG_fset_res_scale_factor(PG_device *dev, int s ARG(1,in))
    {int rv;
 
     if (dev != NULL)
@@ -999,7 +1039,7 @@ int PG_fget_border_width(PG_device *dev)
  * #bind PG_fset_border_width fortran() scheme()
  */
 
-int PG_fset_border_width(PG_device *dev, int w)
+int PG_fset_border_width(PG_device *dev, int w ARG(1,in))
    {int rv;
 
     if (dev != NULL)
@@ -1038,12 +1078,21 @@ void PG_fget_viewport_pos(PG_device *dev, double *x)
  * #bind PG_fset_viewport_pos fortran() scheme()
  */
 
-void PG_fset_viewport_pos(PG_device *dev, double *x)
-   {
+void PG_fset_viewport_pos(PG_device *dev, double *x ARG([0.0,0.0],in))
+   {double xo[PG_SPACEDM];
 
     if (dev != NULL)
-       {dev->view_x[0] = x[0];
-	dev->view_x[2] = x[1];};
+       {xo[0] = dev->view_x[0];
+	xo[1] = dev->view_x[2];
+
+	dev->view_x[0] = x[0];
+	dev->view_x[2] = x[1];
+
+	x[0] = xo[0];
+	x[1] = xo[1];}
+    else
+       {x[0] = 0.0;
+	x[1] = 0.0;};
 
     return;}
 
@@ -1061,7 +1110,11 @@ void PG_fget_viewport_shape(PG_device *dev, double *dx, double *pa)
     if (dev != NULL)
        {dx[0] = dev->view_x[1] - dev->view_x[0];
 	dx[1] = dev->view_x[3] - dev->view_x[2];
-        *pa   = dev->view_aspect;};
+        *pa   = dev->view_aspect;}
+    else
+       {dx[0] = 0.0;
+	dx[1] = 0.0;
+        *pa   = 1.0;};
 
     return;}
 
@@ -1073,13 +1126,24 @@ void PG_fget_viewport_shape(PG_device *dev, double *dx, double *pa)
  * #bind PG_fset_viewport_shape fortran() scheme()
  */
 
-void PG_fset_viewport_shape(PG_device *dev, double *dx, double asp)
-   {
+void PG_fset_viewport_shape(PG_device *dev,
+			    double *dx ARG([0.0,0.0],in),
+			    double asp)
+   {double dxo[PG_SPACEDM];
 
     if (dev != NULL)
-       {dev->view_x[1]   = dev->view_x[0] + dx[0];
+       {dxo[0] = dev->view_x[1] - dev->view_x[0];
+	dxo[1] = dev->view_x[3] - dev->view_x[2];
+
+	dev->view_x[1]   = dev->view_x[0] + dx[0];
         dev->view_x[3]   = dev->view_x[2] + dx[1];
-        dev->view_aspect = asp;};
+        dev->view_aspect = asp;
+
+	dx[0] = dxo[0];
+	dx[1] = dxo[1];}
+    else
+       {dx[0] = 0.0;
+	dx[1] = 0.0;};
 
     return;}
 
@@ -1106,7 +1170,9 @@ int PG_fget_line_color(PG_device *dev)
  * #bind PG_fset_line_color fortran() scheme()
  */
 
-int PG_fset_line_color(PG_device *dev, int clr, int mapped)
+int PG_fset_line_color(PG_device *dev,
+		       int clr ARG(1,in),
+		       int mapped ARG(TRUE,in))
    {int rv;
 
     if ((dev != NULL) && (dev->set_line_color != NULL))
@@ -1140,7 +1206,9 @@ int PG_fget_text_color(PG_device *dev)
  * #bind PG_fset_text_color fortran() scheme()
  */
 
-int PG_fset_text_color(PG_device *dev, int clr, int mapped)
+int PG_fset_text_color(PG_device *dev,
+		       int clr ARG(1,in),
+		       int mapped ARG(TRUE,in))
    {int rv;
 
     if ((dev != NULL) && (dev->set_text_color != NULL))
@@ -1174,7 +1242,9 @@ int PG_fget_fill_color(PG_device *dev)
  * #bind PG_fset_fill_color fortran() scheme()
  */
 
-int PG_fset_fill_color(PG_device *dev, int clr, int mapped)
+int PG_fset_fill_color(PG_device *dev,
+		       int clr ARG(1,in),
+		       int mapped ARG(TRUE,in))
    {int rv;
 
     if ((dev != NULL) && (dev->set_fill_color != NULL))
@@ -1194,7 +1264,7 @@ int PG_fset_fill_color(PG_device *dev, int clr, int mapped)
  * #bind PG_white_background fortran() scheme()
  */
 
-int PG_white_background(PG_device *dev, int t)
+int PG_white_background(PG_device *dev, int t ARG(TRUE,in))
    {int rv;
 
     if (dev != NULL)
@@ -1214,14 +1284,14 @@ int PG_white_background(PG_device *dev, int t)
  * #bind PG_turn_grid fortran() scheme()
  */
 
-int PG_turn_grid(PG_device *dev, int t)
+int PG_turn_grid(PG_device *dev, int t ARG(TRUE,in))
    {int rv;
 
     if (dev != NULL)
        {rv = dev->grid;
 	dev->grid = t;}
     else
-       rv = FALSE;
+       rv = TRUE;
 
     return(rv);}
 
@@ -1234,14 +1304,14 @@ int PG_turn_grid(PG_device *dev, int t)
  * #bind PG_turn_data_id fortran() scheme()
  */
 
-int PG_turn_data_id(PG_device *dev, int t)
+int PG_turn_data_id(PG_device *dev, int t ARG(TRUE,in))
    {int rv;
 
     if (dev != NULL)
        {rv = dev->data_id;
 	dev->data_id = t;}
     else
-       rv = 0;
+       rv = TRUE;
 
     return(rv);}
 
@@ -1254,14 +1324,14 @@ int PG_turn_data_id(PG_device *dev, int t)
  * #bind PG_turn_scatter fortran() scheme()
  */
 
-int PG_turn_scatter(PG_device *dev, int t)
+int PG_turn_scatter(PG_device *dev, int t ARG(TRUE,in))
    {int rv;
 
     if (dev != NULL)
        {rv = dev->scatter;
 	dev->scatter = t;}
     else
-       rv = 0;
+       rv = TRUE;
 
     return(rv);}
 
@@ -1274,7 +1344,7 @@ int PG_turn_scatter(PG_device *dev, int t)
  * #bind PG_turn_autodomain fortran() scheme()
  */
 
-int PG_turn_autodomain(PG_device *dev, int t)
+int PG_turn_autodomain(PG_device *dev, int t ARG(TRUE,in))
    {int rv;
 
     if (dev != NULL)
@@ -1294,7 +1364,7 @@ int PG_turn_autodomain(PG_device *dev, int t)
  * #bind PG_turn_autorange fortran() scheme()
  */
 
-int PG_turn_autorange(PG_device *dev, int t)
+int PG_turn_autorange(PG_device *dev, int t ARG(TRUE,in))
    {int rv;
 
     if (dev != NULL)
@@ -1314,14 +1384,14 @@ int PG_turn_autorange(PG_device *dev, int t)
  * #bind PG_turn_autoplot fortran() scheme()
  */
 
-int PG_turn_autoplot(PG_device *dev, int t)
+int PG_turn_autoplot(PG_device *dev, int t ARG(TRUE,in))
    {int rv;
 
     if (dev != NULL)
        {rv = dev->autoplot;
 	dev->autoplot = t;}
     else
-       rv = 0;
+       rv = TRUE;
 
     return(rv);}
 
@@ -1564,10 +1634,10 @@ void PG_make_device_current(PG_device *dev)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_RELEASE_DEVICE_CURRENT - make the device DEV NOT
+/* PG_RELEASE_CURRENT_DEVICE - make the device DEV NOT
  *                           - the current one for drawing
  *
- * #bind PG_release_device_current fortran() scheme()
+ * #bind PG_release_current_device fortran() scheme()
  */
 
 void PG_release_current_device(PG_device *dev)
@@ -1742,6 +1812,7 @@ void PG_clear_page(PG_device *dev, int i)
 
     return;}
 
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* PG_WRITE_TEXT - write S to FP and/or DEV
@@ -1963,3 +2034,4 @@ void PG_draw_to_rel_n(PG_device *dev, double *x)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+

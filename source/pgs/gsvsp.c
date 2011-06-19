@@ -2082,7 +2082,10 @@ void PG_fget_view_angle(PG_device *dev, int cnv,
  * #bind PG_fset_view_angle fortran() scheme()
  */
 
-void PG_fset_view_angle(PG_device *dev, double theta, double phi, double chi)
+void PG_fset_view_angle(PG_device *dev,
+			double theta ARG(0.0,in),
+			double phi ARG(0.0,in),
+			double chi ARG(0.0,in))
    {PG_dev_geometry *g;
 
     g = &dev->g;
@@ -2128,7 +2131,9 @@ void PG_fget_light_angle(PG_device *dev, int cnv, double *pt, double *pp)
  * #bind PG_fset_light_angle fortran() scheme()
  */
 
-void PG_fset_light_angle(PG_device *dev, double theta, double phi)
+void PG_fset_light_angle(PG_device *dev,
+			 double theta ARG(0.0,in),
+			 double phi ARG(0.0,in))
    {
 
     if (theta != HUGE)

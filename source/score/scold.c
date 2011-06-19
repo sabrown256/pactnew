@@ -29,6 +29,8 @@ void *SC_alloc(long nitems, long bpi, char *name)
    {void *rv;
     SC_mem_opt opt;
 
+    DEPRECATED(2011-01-01);
+
     opt.perm = FALSE;
     opt.na   = FALSE;
     opt.zsp  = -1;
@@ -53,6 +55,8 @@ void *SC_alloc(long nitems, long bpi, char *name)
 void *SC_alloc_na(long nitems, long bpi, char *name, int na)
    {void *p;
     SC_mem_opt opt;
+
+    DEPRECATED(2011-01-01);
 
     opt.perm = FALSE;
     opt.na   = na;
@@ -81,6 +85,8 @@ void *SC_alloc_nz(long nitems, long bpi, char *name, int na, int zsp)
    {void *p;
     SC_mem_opt opt;
 
+    DEPRECATED(2011-01-01);
+
     opt.perm = FALSE;
     opt.na   = na;
     opt.zsp  = zsp;
@@ -103,6 +109,8 @@ void *SC_alloc_nz(long nitems, long bpi, char *name, int na, int zsp)
 void *SC_realloc(void *p, long nitems, long bpi)
    {void *rv;
     SC_mem_opt opt;
+
+    DEPRECATED(2011-01-01);
 
     opt.perm = FALSE;
     opt.na   = FALSE;
@@ -128,6 +136,8 @@ void *SC_realloc(void *p, long nitems, long bpi)
 void *SC_realloc_na(void *p, long nitems, long bpi, int na)
    {void *rv;
     SC_mem_opt opt;
+
+    DEPRECATED(2011-01-01);
 
     opt.perm = FALSE;
     opt.na   = na;
@@ -156,6 +166,8 @@ void *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp)
    {void *rv;
     SC_mem_opt opt;
 
+    DEPRECATED(2011-01-01);
+
     opt.perm = FALSE;
     opt.na   = na;
     opt.zsp  = zsp;
@@ -179,6 +191,8 @@ void *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp)
 int SC_free(void *p)
    {int rv;
     SC_mem_opt opt;
+
+    DEPRECATED(2011-01-01);
 
     opt.perm = FALSE;
     opt.na   = -1;
@@ -204,6 +218,8 @@ int SC_free_z(void *p, int zsp)
    {int rv;
     SC_mem_opt opt;
 
+    DEPRECATED(2011-01-01);
+
     opt.perm = FALSE;
     opt.na   = -1;
     opt.zsp  = zsp;
@@ -228,6 +244,8 @@ char *SC_strsave(char *s)
    {char *p;
     int sz;
 
+    DEPRECATED(2011-01-01);
+
     p = NULL;
 
     if (s != NULL)
@@ -250,6 +268,8 @@ char *SC_strsave(char *s)
 char *SC_strsavef(char *s, char *name)
    {char *p;
     int sz;
+
+    DEPRECATED(2011-01-01);
 
     p = NULL;
 
@@ -274,6 +294,8 @@ char *SC_strsaven(char *s, char *name)
    {int sz;
     char *p;
     SC_mem_opt opt;
+
+    DEPRECATED(2011-01-01);
 
     p = NULL;
 
@@ -305,6 +327,8 @@ char *SC_strsaven(char *s, char *name)
 int SC_zero_space(int flag)
    {int rv;
 
+    DEPRECATED(2011-01-01);
+
     rv = _SC.zero_space;
     if ((0 <= flag) && (flag <= 5))
        {SC_zero_space_n(flag, -2);
@@ -320,6 +344,8 @@ int SC_zero_space(int flag)
 int SC_zero_on_alloc(void)
    {int rv;
 
+    DEPRECATED(2011-01-01);
+
     rv = SC_zero_on_alloc_n(-2);
 
     return(rv);}
@@ -333,6 +359,8 @@ int SC_zero_on_alloc(void)
 
 PFSignal_handler SC_signal(int sig, PFSignal_handler fnc)
    {SC_contextdes rv;
+
+    DEPRECATED(2011-01-01);
 
     rv = SC_signal_n(sig, fnc, NULL);
 

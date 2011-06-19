@@ -19,6 +19,8 @@ void PG_get_bound(PG_device *dev,
 		  double *xmn, double *xmx, double *ymn, double *ymx)
    {PG_dev_geometry *g;
 
+    DEPRECATED(2009-10-08);
+
     g = &dev->g;
 
     *xmn = g->bnd[0];
@@ -36,6 +38,8 @@ void PG_get_bound(PG_device *dev,
 void PG_get_window(PG_device *dev,
 		   double *xmn, double *xmx, double *ymn, double *ymx)
    {PG_dev_geometry *g;
+
+    DEPRECATED(2009-10-08);
 
     g = &dev->g;
 
@@ -55,6 +59,8 @@ void PG_get_frame(PG_device *dev,
                   double *xmn, double *xmx, double *ymn, double *ymx)
    {PG_dev_geometry *g;
 
+    DEPRECATED(2009-10-08);
+
     g = &dev->g;
 
     *xmn = g->fr[0];
@@ -72,6 +78,8 @@ void PG_get_frame(PG_device *dev,
 void PG_get_viewport(PG_device *dev,
                      double *xmn, double *xmx, double *ymn, double *ymx)
    {double frm[PG_BOXSZ];
+
+    DEPRECATED(2009-10-08);
 
     PG_viewport_frame(dev, 2, frm);
 
@@ -93,6 +101,8 @@ void PG_get_viewport(PG_device *dev,
 void PG_set_bound(PG_device *dev,
 		  double xmn, double xmx, double ymn, double ymx)
    {PG_dev_geometry *g;
+
+    DEPRECATED(2009-10-08);
 
     g = &dev->g;
 
@@ -122,6 +132,8 @@ void PG_set_window(PG_device *dev,
                    double xmn, double xmx, double ymn, double ymx)
   {double wc[PG_BOXSZ];
 
+    DEPRECATED(2009-10-08);
+
     wc[0] = xmn;
     wc[1] = xmx;
     wc[2] = ymn;
@@ -139,6 +151,8 @@ void PG_set_window(PG_device *dev,
 void PG_set_frame(PG_device *dev,
                   double x1, double x2, double y1, double y2)
    {double frm[PG_BOXSZ];
+
+    DEPRECATED(2009-10-08);
 
     frm[0] = x1;
     frm[1] = x2;
@@ -163,6 +177,8 @@ void PG_set_viewport(PG_device *dev,
                      double x1, double x2, double y1, double y2)
    {double ndc[PG_BOXSZ];
 
+    DEPRECATED(2009-10-08);
+
     ndc[0] = x1;
     ndc[1] = x2;
     ndc[2] = y1;
@@ -183,6 +199,8 @@ void PG_set_viewport(PG_device *dev,
 void PG_draw_line(PG_device *dev,
                   double x1, double y1, double x2, double y2)
    {double p1[PG_SPACEDM], p2[PG_SPACEDM];
+
+    DEPRECATED(2009-10-08);
 
     if (dev != NULL)
        {p1[0] = x1;
@@ -206,6 +224,8 @@ void PG_draw_polyline(PG_device *dev, double *x, double *y, int n, int clip)
     double xo[PG_SPACEDM];
     double *r[PG_SPACEDM];
     PG_curve *crv;
+
+    DEPRECATED(2009-10-08);
 
     if (dev == NULL)
        return;
@@ -237,6 +257,8 @@ void PG_draw_box_ndc(PG_device *dev,
    {double x[5], y[5];
     double *r[PG_SPACEDM];
 
+    DEPRECATED(2009-10-08);
+
     x[0] = xmin;
     y[0] = ymin;
     x[1] = xmin;
@@ -264,6 +286,8 @@ void PG_draw_box(PG_device *dev,
                  double xmin, double xmax, double ymin, double ymax)
    {double x[5], y[5];
     double *r[PG_SPACEDM];
+
+    DEPRECATED(2009-10-08);
 
     x[0] = xmin;
     y[0] = ymin;
@@ -294,6 +318,8 @@ void PG_axis_3d(PG_device *dev, double *px, double *py, double *pz,
 		double zmn, double zmx, int norm)
    {double extr[PG_BOXSZ];
     double *p[PG_SPACEDM];
+
+    DEPRECATED(2009-10-08);
 
     PG_fset_view_angle(dev, theta, phi, chi);
 
@@ -330,6 +356,8 @@ void PG_draw_surface(PG_device *dev, double *a1, double *a2, double *aext,
    {double *r[PG_SPACEDM];
     PG_rendering pty;
 
+    DEPRECATED(2009-10-08);
+
     r[0] = x;
     r[1] = y;
 
@@ -350,6 +378,8 @@ void PG_draw_palette(PG_device *dev,
 		     double xmn, double ymn, double xmx, double ymx,
 		     double zmn, double zmx, double wid)
    {double dbx[PG_BOXSZ], rbx[PG_BOXSZ];
+
+    DEPRECATED(2009-10-08);
 
     dbx[0] = xmn;
     dbx[1] = xmx;
@@ -374,6 +404,8 @@ PG_image *PG_make_image(char *label, char *type, void *z,
 			int w, int h, int bpp, PG_palette *palette)
    {double dbx[PG_BOXSZ], rbx[PG_BOXSZ];
     PG_image *im;
+
+    DEPRECATED(2009-10-08);
 
     dbx[0] = xmn;
     dbx[1] = xmx;
@@ -402,6 +434,8 @@ PG_axis_def *PG_draw_axis(PG_device *dev, double x1, double y1,
     double xl[PG_SPACEDM], xr[PG_SPACEDM];
     PG_axis_def *ad;
 
+    DEPRECATED(2009-10-08);
+
     xl[0] = x1;
     xl[1] = y1;
     xr[0] = x2;
@@ -429,6 +463,8 @@ int PG_write_NDC(PG_device *dev, double x, double y, char *fmt, ...)
     double p[PG_SPACEDM];
     char *s;
     PG_dev_geometry *g;
+
+    DEPRECATED(2009-10-08);
 
     if (dev == NULL)
        return(FALSE);
@@ -485,6 +521,8 @@ int PG_write_WC(PG_device *dev, double x, double y, char *fmt, ...)
     char *s;
     double p[PG_SPACEDM];
 
+    DEPRECATED(2009-10-08);
+
     if (dev == NULL)
        rv = FALSE;
 
@@ -522,6 +560,8 @@ void PG_get_text_ext(PG_device *dev, char *s, double *px, double *py)
    {double t[PG_SPACEDM];
     PG_dev_geometry *g;
 
+    DEPRECATED(2009-10-08);
+
     PG_get_text_ext_n(dev, 2, NORMC, s, t);
 
     if (dev != NULL)
@@ -548,6 +588,8 @@ void PG_get_text_ext(PG_device *dev, char *s, double *px, double *py)
 void PG_get_char_size_NDC(PG_device *dev, double *pw, double *ph)
    {
 
+    DEPRECATED(2009-10-08);
+
     *ph = dev->char_height_s;
     *pw = dev->char_width_s;
 
@@ -561,6 +603,8 @@ void PG_get_char_size_NDC(PG_device *dev, double *pw, double *ph)
 void PG_get_char_size(PG_device *dev, double *pw, double *ph)
    {
 
+    DEPRECATED(2009-10-08);
+
     *pw = (dev->char_width_s)*(dev->g.nd_w[1]);
     *ph = (dev->char_height_s)*(dev->g.nd_w[3]);
 
@@ -573,6 +617,8 @@ void PG_get_char_size(PG_device *dev, double *pw, double *ph)
 
 void PG_draw_markers(PG_device *dev, int n, double *x, double *y, int marker)
    {double *r[PG_SPACEDM];
+
+    DEPRECATED(2009-10-08);
 
     r[0] = x;
     r[1] = y;
@@ -589,6 +635,8 @@ void PG_draw_markers(PG_device *dev, int n, double *x, double *y, int marker)
 void PG_draw_markers_3(PG_device *dev, int n, double **r, int marker)
    {
 
+    DEPRECATED(2009-10-08);
+
     PG_draw_markers_n(dev, 3, WORLDC, n, r, marker);
 
     return;}
@@ -600,6 +648,8 @@ void PG_draw_markers_3(PG_device *dev, int n, double **r, int marker)
 
 void _PG_draw_vct(PG_device *dev, double **x, double **u, int npts)
    {
+
+    DEPRECATED(2009-10-08);
 
     PG_draw_vector_n(dev, 2, WORLDC, npts, x, u);
 
@@ -613,6 +663,8 @@ void _PG_draw_vct(PG_device *dev, double **x, double **u, int npts)
 void PG_set_limits(PG_device *dev, double *x, double *y, int n, int type)
    {double *r[PG_SPACEDM];
     PG_rendering pty;
+
+    DEPRECATED(2009-10-08);
 
     r[0] = x;
     r[1] = y;
@@ -634,6 +686,8 @@ void PG_fill_polygon(PG_device *dev, int color, int mapped,
 		     double *x, double *y, int n)
    {double *r[2];
 
+    DEPRECATED(2009-10-08);
+
     r[0] = x;
     r[1] = y;
 
@@ -649,6 +703,8 @@ void PG_fill_polygon(PG_device *dev, int color, int mapped,
 void PG_get_clipping(PG_device *dev, int *flag)
    {
 
+    DEPRECATED(2011-06-12);
+
     *flag = dev->clipping;
 
     return;}
@@ -662,6 +718,8 @@ void PG_get_clipping(PG_device *dev, int *flag)
 
 void PG_get_char_path(PG_device *dev, double *px, double *py)
    {
+
+    DEPRECATED(2011-06-12);
 
     *px = dev->char_path[0];
     *py = dev->char_path[1];
@@ -679,6 +737,8 @@ void PG_get_char_path(PG_device *dev, double *px, double *py)
 void PG_get_char_up(PG_device *dev, double *px, double *py)
    {
 
+    DEPRECATED(2011-06-12);
+
     *px = dev->char_up[0];
     *py = dev->char_up[1];
 
@@ -695,6 +755,8 @@ void PG_get_char_up(PG_device *dev, double *px, double *py)
 void PG_get_char_precision(PG_device *dev, int *pcp)
    {
 
+    DEPRECATED(2011-06-12);
+
     *pcp = dev->char_precision;
 
     return;}
@@ -706,6 +768,8 @@ void PG_get_char_precision(PG_device *dev, int *pcp)
 
 void PG_get_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double *p)
    {
+
+    DEPRECATED(2011-06-12);
 
     p[0] = dev->char_height_s;
     p[1] = dev->char_width_s;
@@ -724,6 +788,8 @@ void PG_get_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double *p)
 void PG_get_char_space(PG_device *dev, double *pcsp)
    {
 
+    DEPRECATED(2011-06-12);
+
     *pcsp = dev->char_space;
 
     return;}
@@ -735,6 +801,8 @@ void PG_get_char_space(PG_device *dev, double *pcsp)
 
 void PG_get_font(PG_device *dev, char **pf, char **pst, int *psz)
    {
+
+    DEPRECATED(2011-06-12);
 
     *pf  = CSTRSAVE(dev->type_face);
     *pst = CSTRSAVE(dev->type_style);
@@ -750,6 +818,8 @@ void PG_get_font(PG_device *dev, char **pf, char **pst, int *psz)
 void PG_get_logical_op(PG_device *dev, PG_logical_operation *plop)
    {
 
+    DEPRECATED(2011-06-12);
+
     *plop = dev->logical_op;
 
     return;}
@@ -761,6 +831,8 @@ void PG_get_logical_op(PG_device *dev, PG_logical_operation *plop)
 
 void PG_get_line_style(PG_device *dev, int *pl)
    {
+
+    DEPRECATED(2011-06-12);
 
     *pl = dev->line_style;
 
@@ -774,6 +846,8 @@ void PG_get_line_style(PG_device *dev, int *pl)
 void PG_get_line_width(PG_device *dev, double *plw)
    {
 
+    DEPRECATED(2011-06-12);
+
     *plw = dev->line_width;
 
     return;}
@@ -785,6 +859,8 @@ void PG_get_line_width(PG_device *dev, double *plw)
 
 void PG_get_line_color(PG_device *dev, int *pcl)
    {
+
+    DEPRECATED(2011-06-12);
 
     *pcl = dev->line_color;
 
@@ -798,6 +874,8 @@ void PG_get_line_color(PG_device *dev, int *pcl)
 void PG_get_text_color(PG_device *dev, int *pcl)
    {
 
+    DEPRECATED(2011-06-12);
+
     *pcl = dev->text_color;
 
     return;}
@@ -809,6 +887,8 @@ void PG_get_text_color(PG_device *dev, int *pcl)
 
 void PG_get_fill_color(PG_device *dev, int *pcl)
    {
+
+    DEPRECATED(2011-06-12);
 
     *pcl = dev->fill_color;
 

@@ -254,9 +254,14 @@ void _PG_remove_device(PG_device *dev)
 
 /* PG_WRITE_N - print formatted output
  *            - at the specified coordinates in CS
+ *
+ * #bind PG_write_n fortran() scheme()
  */
 
-int PG_write_n(PG_device *dev, int nd, PG_coord_sys cs, double *x, char *fmt, ...)
+int PG_write_n(PG_device *dev, int nd ARG(2),
+	       PG_coord_sys cs ARG(NORMC),
+	       double *x ARG([0.0,0.0]),
+	       char *fmt, ...)
    {int id, rv;
     int oflg[PG_SPACEDM], nflg[PG_SPACEDM];
     double y[PG_SPACEDM];
