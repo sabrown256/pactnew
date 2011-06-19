@@ -201,7 +201,7 @@ static object *_SXI_fb10(SS_psides *si, object *argl)
     _la2       = NULL;
     SS_args(si, argl,
             SC_FLOAT_COMPLEX_I, &_la1,
-            SC_POINTER_I, &_la2,
+            SC_FLOAT_COMPLEX_P_I, &_la2,
             0);
 
     _rv = fb10(_la1, _la2);
@@ -224,7 +224,7 @@ static object *_SXI_fb11(SS_psides *si, object *argl)
     _la2       = NULL;
     SS_args(si, argl,
             SC_DOUBLE_COMPLEX_I, &_la1,
-            SC_POINTER_I, &_la2,
+            SC_DOUBLE_COMPLEX_P_I, &_la2,
             0);
 
     _rv = fb11(_la1, _la2);

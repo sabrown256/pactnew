@@ -1422,7 +1422,7 @@ void _PG_fix_wtos(PG_device *dev, int wh)
 
 /* PG_FGET_AXIS_LOG_SCALE - return the settings of the log axis flags
  *
- * #bind PG_fget_axis_log_scale fortran() scheme()
+ * #bind PG_fget_axis_log_scale fortran() scheme(pg-get-axis-log-scale)
  */
 
 void PG_fget_axis_log_scale(PG_device *dev, int nd, int *iflg)
@@ -1442,7 +1442,7 @@ void PG_fget_axis_log_scale(PG_device *dev, int nd, int *iflg)
 
 /* PG_FSET_AXIS_LOG_SCALE - make sure that a log scale is handled correctly
  *
- * #bind PG_fset_axis_log_scale fortran() scheme()
+ * #bind PG_fset_axis_log_scale fortran() scheme(pg-set-axis-log-scale!)
  */
 
 void PG_fset_axis_log_scale(PG_device *dev, int nd, int *iflg)

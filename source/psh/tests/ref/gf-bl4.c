@@ -149,13 +149,13 @@ int FF_ID(fb8_f, FB8_F)(double *a1, double *a2)
 
 /* WRAP |int fb10(float _Complex a1, float _Complex *a2)| */
 
-int FF_ID(fb10_f, FB10_F)(float _Complex *a1, float _Complex **a2)
+int FF_ID(fb10_f, FB10_F)(float _Complex *a1, float _Complex *a2)
    {float _Complex _la1;
     float _Complex *_la2;
     int _rv;
 
     _la1       = (float _Complex) *a1;
-    _la2       = *(float _Complex **) a2;
+    _la2       = (float _Complex *) a2;
 
     _rv = fb10(_la1, _la2);
 
@@ -166,13 +166,13 @@ int FF_ID(fb10_f, FB10_F)(float _Complex *a1, float _Complex **a2)
 
 /* WRAP |int fb11(double _Complex a1, double _Complex *a2)| */
 
-int FF_ID(fb11_f, FB11_F)(double _Complex *a1, double _Complex **a2)
+int FF_ID(fb11_f, FB11_F)(double _Complex *a1, double _Complex *a2)
    {double _Complex _la1;
     double _Complex *_la2;
     int _rv;
 
     _la1       = (double _Complex) *a1;
-    _la2       = *(double _Complex **) a2;
+    _la2       = (double _Complex *) a2;
 
     _rv = fb11(_la1, _la2);
 
@@ -468,13 +468,13 @@ double *FF_ID(fp8_f, FP8_F)(int *a1)
 
 /* WRAP |float _Complex *fp10(int a1)| */
 
-void *FF_ID(fp10_f, FP10_F)(int *a1)
+float _Complex *FF_ID(fp10_f, FP10_F)(int *a1)
    {int _la1;
-    void *_rv;
+    float _Complex *_rv;
 
     _la1       = (int) *a1;
 
-    _rv = (void *) fp10(_la1);
+    _rv = fp10(_la1);
 
     return(_rv);}
 
@@ -483,13 +483,13 @@ void *FF_ID(fp10_f, FP10_F)(int *a1)
 
 /* WRAP |double _Complex *fp11(int a1)| */
 
-void *FF_ID(fp11_f, FP11_F)(int *a1)
+double _Complex *FF_ID(fp11_f, FP11_F)(int *a1)
    {int _la1;
-    void *_rv;
+    double _Complex *_rv;
 
     _la1       = (int) *a1;
 
-    _rv = (void *) fp11(_la1);
+    _rv = fp11(_la1);
 
     return(_rv);}
 

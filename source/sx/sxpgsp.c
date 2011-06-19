@@ -75,112 +75,6 @@ static void _SX_args_arr_3(SS_psides *si, object *argl, int *pn,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* _SXI_AXIS - draw a complete axis set */
-
-static object *_SXI_axis(SS_psides *si, object *argl)
-   {int type;
-    PG_device *dev;
-
-    dev  = NULL;
-    type = CARTESIAN_2D;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_INT_I, &type,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_AXIS", SS_null);
-
-    PG_axis(dev, type);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_CLEAR_WINDOW - clear the screen */
-
-static object *_SXI_clear_window(SS_psides *si, object *argl)
-   {PG_device *dev;
-
-    dev = NULL;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_CLEAR_WINDOW", SS_null);
-
-    PG_clear_window(dev);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_CLEAR_VIEWPORT - clear the viewport */
-
-static object *_SXI_clear_viewport(SS_psides *si, object *argl)
-   {PG_device *dev;
-
-    dev = NULL;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_CLEAR_VIEWPORT", SS_null);
-
-    PG_clear_viewport(dev);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_SET_CLR_MODE - set the clear mode */
-
-static object *_SXI_set_clr_mode(SS_psides *si, object *argl)
-   {int mode;
-    object *rv;
-
-    mode = CLEAR_SCREEN;
-    SS_args(si, argl,
-	    SC_INT_I, &mode,
-            0);
-
-    PG_fset_clear_mode(mode);
-    rv = SS_mk_integer(si, mode);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_CLR_MODE - return the clear mode */
-
-static object *_SXI_clr_mode(SS_psides *si, object *argl)
-   {int mode;
-    PG_device *dev;
-    object *o;
-
-    dev = NULL;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_CLR_MODE", SS_null);
-
-    mode = PG_fget_clear_mode();
-
-    o = SS_mk_integer(si, mode);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
 /* _SXI_CLEAR_REGION - clear the region */
 
 static object *_SXI_clear_region(SS_psides *si, object *argl)
@@ -335,102 +229,6 @@ static object *_SXI_drw_mrk(SS_psides *si, object *argl)
     obj = SS_mk_integer(si, ns);
 
     return(obj);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_MRK_ORNT - get the marker orientation */
-
-static object *_SXI_mrk_ornt(SS_psides *si, object *argl)
-   {double theta;
-    PG_device *dev;
-    object *o;
-
-    dev = NULL;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_MRK_ORNT", SS_null);
-
-    theta = PG_fget_marker_orientation(dev);
-    o     = SS_mk_float(si, theta);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_MRK_SCAL - get the marker scale */
-
-static object *_SXI_mrk_scal(SS_psides *si, object *argl)
-   {double sc;
-    PG_device *dev;
-    object *o;
-
-    dev = NULL;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_MRK_SCAL", SS_null);
-
-    sc = PG_fget_marker_scale(dev);
-    o  = SS_mk_float(si, sc);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_SET_MRK_ORNT - set the marker orientation */
-
-static object *_SXI_set_mrk_ornt(SS_psides *si, object *argl)
-   {double theta;
-    PG_device *dev;
-    object *o;
-
-    dev   = NULL;
-    theta = 0.0;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_DOUBLE_I, &theta,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_SET_MRK_ORNT", SS_null);
-
-    theta = PG_fset_marker_orientation(dev, theta);
-    o     = SS_mk_float(si, theta);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_SET_MRK_SCAL - set the marker scale */
-
-static object *_SXI_set_mrk_scal(SS_psides *si, object *argl)
-   {double sc;
-    PG_device *dev;
-    object *o;
-
-    dev = NULL;
-    sc  = 0.0;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_DOUBLE_I, &sc,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_SET_MRK_SCAL", SS_null);
-
-    sc = PG_fset_marker_scale(dev, sc);
-    o  = SS_mk_float(si, sc);
-
-    return(o);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -859,26 +657,6 @@ static object *_SXI_fply(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
- 
-/* _SXI_FINISH_PLOT - finish the frame */
-
-static object *_SXI_finish_plot(SS_psides *si, object *argl)
-   {PG_device *dev;
-
-    dev = NULL;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_FINISH_PLOT", SS_null);
-
-    PG_finish_plot(dev);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 
 /* _SXI_GCPW - return the character path */
 
@@ -982,53 +760,6 @@ static object *_SXI_gclp(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* _SXI_GFIN - report the state of the finished flag */
-
-static object *_SXI_gfin(SS_psides *si, object *argl)
-   {int fl;
-    PG_device *dev;
-    object *o;
-
-    dev = NULL;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_GFIN", SS_null);
-
-    fl = PG_fget_finish_state(dev);
-
-    o = SS_mk_integer(si, fl);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_GLNC - get the line color */
-
-static object *_SXI_glnc(SS_psides *si, object *argl)
-   {int c;
-    PG_device *dev;
-    object *o;
-
-    dev = NULL;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_GLNC", SS_null);
-
-    c = PG_fget_line_color(dev);
-    o = SS_mk_integer(si, c);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
 /* _SXI_GLOP - get the logical operation */
 
 static object *_SXI_glop(SS_psides *si, object *argl)
@@ -1047,53 +778,6 @@ static object *_SXI_glop(SS_psides *si, object *argl)
     lop = PG_fget_logical_op(dev);
 
     o = SS_mk_integer(si, lop);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_GLNS - get the line style */
-
-static object *_SXI_glns(SS_psides *si, object *argl)
-   {int s;
-    PG_device *dev;
-    object *o;
-
-    dev = NULL;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_GLNS", SS_null);
-
-    s = PG_fget_line_style(dev);
-    o = SS_mk_integer(si, s);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_GLNW - get the line width */
-
-static object *_SXI_glnw(SS_psides *si, object *argl)
-   {double w;
-    PG_device *dev;
-    object *o;
-
-    dev = NULL;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_GLNW", SS_null);
-
-    w = PG_fget_line_width(dev);
-
-    o = SS_mk_float(si, w);
 
     return(o);}
 
@@ -1162,29 +846,6 @@ static object *_SXI_gtew(SS_psides *si, object *argl)
 		     SC_DOUBLE_I, &x[1],
 		     SC_DOUBLE_I, &x[2],
 		     0);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_GTXC - get the text color */
-
-static object *_SXI_gtxc(SS_psides *si, object *argl)
-   {int c;
-    PG_device *dev;
-    object *o;
-
-    dev = NULL;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_GTXC", SS_null);
-
-    c = PG_fget_text_color(dev);
-    o = SS_mk_integer(si, c);
 
     return(o);}
 
@@ -1306,26 +967,6 @@ static object *_SXI_get_window(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* _SXI_MDVC - make the device current */
-
-static object *_SXI_mdvc(SS_psides *si, object *argl)
-   {PG_device *dev;
-
-    dev = NULL;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_MDVC", SS_null);
-
-    PG_make_device_current(dev);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
 /* _SXI_PTOS - convert from pixel to screen coordinates */
 
 static object *_SXI_ptos(SS_psides *si, object *argl)
@@ -1410,120 +1051,6 @@ static object *_SXI_qwin(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* _SXI_RDVC - release the device */
-
-static object *_SXI_rdvc(SS_psides *si, object *argl)
-   {PG_device *dev;
-
-    dev = NULL;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_RDVC", SS_null);
-
-    PG_release_current_device(dev);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_SADM - set the autodomain flag */
-
-static object *_SXI_sadm(SS_psides *si, object *argl)
-   {int c;
-    PG_device *dev;
-
-    dev = NULL;
-    c   = 1;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_INT_I, &c,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_SADM", SS_null);
-
-    PG_turn_autodomain(dev, c);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_SAPL - set the autoplot flag */
-
-static object *_SXI_sapl(SS_psides *si, object *argl)
-   {int c;
-    PG_device *dev;
-
-    dev = NULL;
-    c   = 1;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_INT_I, &c,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_SAPL", SS_null);
-
-    PG_turn_autoplot(dev, c);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_SARN - set the autorange flag */
-
-static object *_SXI_sarn(SS_psides *si, object *argl)
-   {int c;
-    PG_device *dev;
-
-    dev = NULL;
-    c   = 1;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_INT_I, &c,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_SARN", SS_null);
-
-    PG_turn_autorange(dev, c);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_SBWD - set the border width in pixels */
-
-static object *_SXI_sbwd(SS_psides *si, object *argl)
-   {int c, oc;
-    PG_device *dev;
-    object *o;
-
-    dev = NULL;
-    c   = 1;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_INT_I, &c,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_SBWD", SS_null);
-
-    oc = PG_fset_border_width(dev, c);
-    o  = SS_mk_integer(si, oc);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
 /* _SXI_SCPW - set the character path */
 
 static object *_SXI_scpw(SS_psides *si, object *argl)
@@ -1597,123 +1124,6 @@ static object *_SXI_sclp(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* _SXI_SDTI - set the data id flag */
-
-static object *_SXI_sdti(SS_psides *si, object *argl)
-   {int c;
-    PG_device *dev;
-
-    dev = NULL;
-    c   = 1;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_INT_I, &c,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_SDTI", SS_null);
-
-    PG_turn_data_id(dev, c);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_SFIC - set the fill color */
-
-static object *_SXI_sfic(SS_psides *si, object *argl)
-   {int c;
-    PG_device *dev;
-    object *o;
-
-    dev = NULL;
-    c   = 1;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_INT_I, &c,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_SFIC", SS_null);
-
-    c = PG_fset_fill_color(dev, c, TRUE);
-    o = SS_mk_integer(si, c);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_SFIN - set the finish state */
-
-static object *_SXI_sfin(SS_psides *si, object *argl)
-   {int c;
-    PG_device *dev;
-
-    dev = NULL;
-    c   = 1;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_INT_I, &c,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_SFIN", SS_null);
-
-    PG_fset_finish_state(dev, c);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_SGRD - set the grid flag */
-
-static object *_SXI_sgrd(SS_psides *si, object *argl)
-   {int c;
-    PG_device *dev;
-
-    dev = NULL;
-    c   = 1;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_INT_I, &c,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_SGRD", SS_null);
-
-    PG_turn_grid(dev, c);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_SLNC - set the line color */
-
-static object *_SXI_slnc(SS_psides *si, object *argl)
-   {int c;
-    PG_device *dev;
-
-    dev = NULL;
-    c   = 1;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_INT_I, &c,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_SLNC", SS_null);
-
-    PG_fset_line_color(dev, c, TRUE);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
 /* _SXI_SLOP - set the logical operation */
 
 static object *_SXI_slop(SS_psides *si, object *argl)
@@ -1733,56 +1143,6 @@ static object *_SXI_slop(SS_psides *si, object *argl)
 
     lop = PG_fset_logical_op(dev, lop);
     o   = SS_mk_integer(si, lop);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_SLNS - set the line style */
-
-static object *_SXI_slns(SS_psides *si, object *argl)
-   {int s, st;
-    PG_device *dev;
-    object *o;
-
-    dev = NULL;
-    s   = LINE_SOLID;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_INT_I, &s,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_SLNS", SS_null);
-
-    st = PG_fset_line_style(dev, s);
-    o  = SS_mk_integer(si, st);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_SLNW - set the line width */
-
-static object *_SXI_slnw(SS_psides *si, object *argl)
-   {double w;
-    PG_device *dev;
-    object *o;
-
-    dev = NULL;
-    w   = 0.1;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_DOUBLE_I, &w,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_SLNW", SS_null);
-
-    w = PG_fset_line_width(dev, w);
-    o = SS_mk_float(si, w);
 
     return(o);}
 
@@ -1852,98 +1212,6 @@ static object *_SXI_spal(SS_psides *si, object *argl)
        o = (PG_fset_palette(dev, txt) == NULL) ? SS_f : SS_t;
 
     CFREE(txt);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_SRES_SF - set the resolution scale factor */
-
-static object *_SXI_sres_sf(SS_psides *si, object *argl)
-   {int sf, rv;
-    PG_device *dev;
-    object *o;
-
-    dev = NULL;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_INT_I, &sf,
-            0);
-
-    if (dev != NULL)
-       rv = PG_fset_res_scale_factor(dev, sf);
-    else
-       rv = 1;
-
-    o = SS_mk_integer(si, rv);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_SSCT - set the scatter flag */
-
-static object *_SXI_ssct(SS_psides *si, object *argl)
-   {int c;
-    PG_device *dev;
-
-    dev = NULL;
-    c   = 1;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_INT_I, &c,
-            0);
-
-    if (dev != NULL)
-       PG_turn_scatter(dev, c);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_SWBK - set the white background flag */
-
-static object *_SXI_swbk(SS_psides *si, object *argl)
-   {int c;
-    PG_device *dev;
-
-    dev = NULL;
-    c   = 1;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_INT_I, &c,
-            0);
-
-    if (dev != NULL)
-       PG_white_background(dev, c);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_STXC - set the text color */
-
-static object *_SXI_stxc(SS_psides *si, object *argl)
-   {int c;
-    PG_device *dev;
-    object *o;
-
-    dev = NULL;
-    c   = 1;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_INT_I, &c,
-            0);
-
-    if (dev != NULL)
-       {c = PG_fset_text_color(dev, c, TRUE);
-	o = SS_mk_integer(si, c);}
-    else
-       o = SS_f;
 
     return(o);}
 
@@ -2076,26 +1344,6 @@ static object *_SXI_set_window(SS_psides *si, object *argl)
        SS_error(si, "BAD DEVICE - _SXI_SET_WINDOW", SS_null);
 
     PG_set_viewspace(dev, nd, WORLDC, wc);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_UPDATE_VS - update the view surface with a flush */
-
-static object *_SXI_update_vs(SS_psides *si, object *argl)
-   {PG_device *dev;
-
-    dev = NULL;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_UPDATE_VS", SS_null);
-
-    PG_update_vs(dev);
 
     return(SS_f);}
 
@@ -3049,49 +2297,11 @@ static object *_SXI_satst(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
- 
-/* _SXI_GBFSZ - wrapper for PG_fget_buffer_size */
-
-static object *_SXI_gbfsz(SS_psides *si)
-   {int64_t sz;
-    object *rv;
-
-    sz = PG_fget_buffer_size();
-    rv = SS_mk_integer(si, sz);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_SBFSZ - wrapper for PG_fset_buffer_size */
-
-static object *_SXI_sbfsz(SS_psides *si, object *argl)
-   {int64_t sz, osz;
-    object *rv;
-
-    sz = -1;
-    SS_args(si, argl,
-	    SC_LONG_LONG_I, &sz,
-	    0);
-
-    osz = PG_fset_buffer_size(sz);
-    rv  = SS_mk_integer(si, osz);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 
 /* _SX_INSTALL_PGS_PRIMITIVES - install the PGS primitives */
 
 void _SX_install_pgs_primitives(SS_psides *si)
    {
-
-    SS_install(si, "pg-axis",
-               "Draw a complete axis set on the given device",
-               SS_nargs,
-               _SXI_axis, SS_PR_PROC);
 
     SS_install(si, "pg-character-path",
                "Return a pair specifying the character path direction on the given device",
@@ -3108,25 +2318,10 @@ void _SX_install_pgs_primitives(SS_psides *si)
                SS_nargs,
                _SXI_gcuw, SS_PR_PROC);
 
-    SS_install(si, "pg-clear-mode",
-               "Return the clear mode",
-               SS_nargs,
-               _SXI_clr_mode, SS_PR_PROC);
-
     SS_install(si, "pg-clipping?",
                "Return #t iff clipping is on in the given device",
                SS_nargs,
                _SXI_gclp, SS_PR_PROC);
-
-    SS_install(si, "pg-clear-window",
-               "Clear the screen and initialize a frame of the given device",
-               SS_nargs,
-               _SXI_clear_window, SS_PR_PROC);
-
-    SS_install(si, "pg-clear-viewport",
-               "Clear the current viewport of the given device",
-               SS_nargs,
-               _SXI_clear_viewport, SS_PR_PROC);
 
     SS_install(si, "pg-clear-region",
                "Clear the specified rectangular region of the given device",
@@ -3203,16 +2398,6 @@ void _SX_install_pgs_primitives(SS_psides *si)
                SS_nargs,
                _SXI_fply, SS_PR_PROC);
 
-    SS_install(si, "pg-finish-plot",
-               "Finish the plot frame on the given device",
-               SS_nargs,
-               _SXI_finish_plot, SS_PR_PROC);
-
-    SS_install(si, "pg-finish-state",
-               "Get the finish flag of the given device",
-               SS_nargs,
-               _SXI_gfin, SS_PR_PROC);
-
     SS_install(si, "pg-frame",
                "Return a list of numbers defining the extent of the frame in NDC",
                SS_nargs,
@@ -3238,50 +2423,15 @@ void _SX_install_pgs_primitives(SS_psides *si)
                SS_nargs,
                _SXI_gatst, SS_PR_PROC);
 
-    SS_install(si, "pg-get-buffer-size",
-               "Get the I/O buffer size for graphics files",
-               SS_zargs,
-               _SXI_gbfsz, SS_PR_PROC);
-
-    SS_install(si, "pg-line-color",
-               "Get the line color on the given device",
-               SS_nargs,
-               _SXI_glnc, SS_PR_PROC);
-
     SS_install(si, "pg-logical-op",
                "Get the logical operation on the given device",
                SS_nargs,
                _SXI_glop, SS_PR_PROC);
 
-    SS_install(si, "pg-line-style",
-               "Get the line style on the given device",
-               SS_nargs,
-               _SXI_glns, SS_PR_PROC);
-
-    SS_install(si, "pg-line-width",
-               "Get the line width on the given device",
-               SS_nargs,
-               _SXI_glnw, SS_PR_PROC);
-
     SS_install(si, "list->pg-palette",
                "Convert a list of values into a palette and register it in the device",
                SS_nargs,
                _SXI_list_pal, SS_PR_PROC);
-
-    SS_install(si, "pg-make-device-current",
-               "Make the given device the current device for drawing",
-               SS_nargs,
-               _SXI_mdvc, SS_PR_PROC);
-
-    SS_install(si, "pg-marker-orientation",
-               "Get the orientation angle for marker characters",
-               SS_nargs,
-               _SXI_mrk_ornt, SS_PR_PROC);
-
-    SS_install(si, "pg-marker-scale",
-               "Get the scale for marker characters",
-               SS_nargs,
-               _SXI_mrk_scal, SS_PR_PROC);
 
     SS_install(si, "pg-maximum-intensity",
                "Return the maximum fractional intensities for colors (0.0 to 1.0)",
@@ -3323,11 +2473,6 @@ void _SX_install_pgs_primitives(SS_psides *si)
                SS_nargs,
                _SXI_qwin, SS_PR_PROC);
 
-    SS_install(si, "pg-release-current-device",
-               "Release the given device as the current device",
-               SS_nargs,
-               _SXI_rdvc, SS_PR_PROC);
-
     SS_install(si, "pg-set-attrs-global!",
                "Set the global graphics attributes",
                SS_nargs,
@@ -3348,31 +2493,6 @@ void _SX_install_pgs_primitives(SS_psides *si)
                SS_nargs,
                _SXI_satst, SS_PR_PROC);
 
-    SS_install(si, "pg-set-autodomain!",
-               "Set the autodomain flag of the given device",
-               SS_nargs,
-               _SXI_sadm, SS_PR_PROC);
-
-    SS_install(si, "pg-set-autoplot!",
-               "Set the autoplot flag of the given device",
-               SS_nargs,
-               _SXI_sapl, SS_PR_PROC);
-
-    SS_install(si, "pg-set-autorange!",
-               "Set the autorange flag of the given device",
-               SS_nargs,
-               _SXI_sarn, SS_PR_PROC);
-
-    SS_install(si, "pg-set-border-width!",
-               "Set the device border width in pixels",
-               SS_nargs,
-               _SXI_sbwd, SS_PR_PROC);
-
-    SS_install(si, "pg-set-buffer-size!",
-               "Set the I/O buffer size for graphics files",
-               SS_sargs,
-               _SXI_sbfsz, SS_PR_PROC);
-
     SS_install(si, "pg-set-char-path!",
                "Set the character path direction for the given device",
                SS_nargs,
@@ -3383,65 +2503,15 @@ void _SX_install_pgs_primitives(SS_psides *si)
                SS_nargs,
                _SXI_scuw, SS_PR_PROC);
 
-    SS_install(si, "pg-set-clear-mode!",
-               "Set the clear mode",
-               SS_nargs,
-               _SXI_set_clr_mode, SS_PR_PROC);
-
     SS_install(si, "pg-set-clipping!",
                "Set the clipping state of the given device",
                SS_nargs,
                _SXI_sclp, SS_PR_PROC);
 
-    SS_install(si, "pg-set-data-id-flag!",
-               "Set the data-id flag of the given device",
-               SS_nargs,
-               _SXI_sdti, SS_PR_PROC);
-
-    SS_install(si, "pg-set-fill-color!",
-               "Set the fill color on the given device",
-               SS_nargs,
-               _SXI_sfic, SS_PR_PROC);
-
-    SS_install(si, "pg-set-finish-state!",
-               "Set the finish flag of the given device",
-               SS_nargs,
-               _SXI_sfin, SS_PR_PROC);
-
-    SS_install(si, "pg-set-grid-flag!",
-               "Set the grid flag on the given device",
-               SS_nargs,
-               _SXI_sgrd, SS_PR_PROC);
-
-    SS_install(si, "pg-set-line-color!",
-               "Set the line color on the given device",
-               SS_nargs,
-               _SXI_slnc, SS_PR_PROC);
-
     SS_install(si, "pg-set-logical-op!",
                "Set the logical operation on the given device",
                SS_nargs,
                _SXI_slop, SS_PR_PROC);
-
-    SS_install(si, "pg-set-line-style!",
-               "Set the line style on the given device",
-               SS_nargs,
-               _SXI_slns, SS_PR_PROC);
-
-    SS_install(si, "pg-set-line-width!",
-               "Set the line width on the given device",
-               SS_nargs,
-               _SXI_slnw, SS_PR_PROC);
-
-    SS_install(si, "pg-set-marker-orientation!",
-               "Set the orientation angle for marker characters",
-               SS_nargs,
-               _SXI_set_mrk_ornt, SS_PR_PROC);
-
-    SS_install(si, "pg-set-marker-scale!",
-               "Set the scale for marker characters",
-               SS_nargs,
-               _SXI_set_mrk_scal, SS_PR_PROC);
 
     SS_install(si, "pg-set-maximum-intensity!",
                "Set the maximum fractional intensity for colors (0.0 to 1.0) and optionally for RGB too",
@@ -3453,30 +2523,10 @@ void _SX_install_pgs_primitives(SS_psides *si)
                SS_nargs,
                _SXI_spal, SS_PR_PROC);
 
-    SS_install(si, "pg-set-resolution-scale-factor!",
-               "Set the resolution scale factor for the given device",
-               SS_nargs,
-               _SXI_sres_sf, SS_PR_PROC);
-
-    SS_install(si, "pg-set-scatter-flag!",
-               "Set the scatter plot flag on the given device",
-               SS_nargs,
-               _SXI_ssct, SS_PR_PROC);
-
-    SS_install(si, "pg-set-text-color!",
-               "Set the text color on the given device",
-               SS_nargs,
-               _SXI_stxc, SS_PR_PROC);
-
     SS_install(si, "pg-set-text-font!",
                "Set the text type face, type style, and point size on the given device",
                SS_nargs,
                _SXI_stxf, SS_PR_PROC);
-
-    SS_install(si, "pg-set-white-background!",
-               "Set the white background flag on the given device",
-               SS_nargs,
-               _SXI_swbk, SS_PR_PROC);
 
     SS_install(si, "pg-set-frame!",
                "Set the frame for the given device",
@@ -3523,11 +2573,6 @@ void _SX_install_pgs_primitives(SS_psides *si)
                SS_nargs,
                _SXI_wr_pal, SS_PR_PROC);
 
-    SS_install(si, "pg-text-color",
-               "Return the current text color on the given device",
-               SS_nargs,
-               _SXI_gtxc, SS_PR_PROC);
-
     SS_install(si, "pg-text-extent",
                "Return a pair of numbers specifying the WC extent of the given string",
                SS_nargs,
@@ -3537,11 +2582,6 @@ void _SX_install_pgs_primitives(SS_psides *si)
                "Return a list of current font specifications on the given device",
                SS_nargs,
                _SXI_gtxf, SS_PR_PROC);
-
-    SS_install(si, "pg-update-view-surface",
-               "Update the view surface for the given device",
-               SS_nargs,
-               _SXI_update_vs, SS_PR_PROC);
 
     SS_install(si, "pg-viewport",
                "Return a list of numbers defining the extent of the viewport in NDC",
@@ -3582,8 +2622,1009 @@ void _SX_install_pgs_primitives(SS_psides *si)
                "Set the color type on the given device",
                SS_nargs,
                _SXI_set_color_type, SS_PR_PROC);
+
     return;}
 
 /*--------------------------------------------------------------------------*/
+
+#if 0
+
+/*                      REPLACED BY GENERATED WRAPPERS                      */
+
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_AXIS - draw a complete axis set */
+
+static object *_SXI_axis(SS_psides *si, object *argl)
+   {int type;
+    PG_device *dev;
+
+    dev  = NULL;
+    type = CARTESIAN_2D;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_INT_I, &type,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_AXIS", SS_null);
+
+    PG_axis(dev, type);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_GBFSZ - wrapper for PG_fget_buffer_size */
+
+static object *_SXI_gbfsz(SS_psides *si)
+   {int64_t sz;
+    object *rv;
+
+    sz = PG_fget_buffer_size();
+    rv = SS_mk_integer(si, sz);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SBFSZ - wrapper for PG_fset_buffer_size */
+
+static object *_SXI_sbfsz(SS_psides *si, object *argl)
+   {int64_t sz, osz;
+    object *rv;
+
+    sz = -1;
+    SS_args(si, argl,
+	    SC_LONG_LONG_I, &sz,
+	    0);
+
+    osz = PG_fset_buffer_size(sz);
+    rv  = SS_mk_integer(si, osz);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SET_CLR_MODE - set the clear mode */
+
+static object *_SXI_set_clr_mode(SS_psides *si, object *argl)
+   {int mode;
+    object *rv;
+
+    mode = CLEAR_SCREEN;
+    SS_args(si, argl,
+	    SC_INT_I, &mode,
+            0);
+
+    PG_fset_clear_mode(mode);
+    rv = SS_mk_integer(si, mode);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_CLR_MODE - return the clear mode */
+
+static object *_SXI_clr_mode(SS_psides *si, object *argl)
+   {int mode;
+    PG_device *dev;
+    object *o;
+
+    dev = NULL;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_CLR_MODE", SS_null);
+
+    mode = PG_fget_clear_mode();
+
+    o = SS_mk_integer(si, mode);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_GFIN - report the state of the finished flag */
+
+static object *_SXI_gfin(SS_psides *si, object *argl)
+   {int fl;
+    PG_device *dev;
+    object *o;
+
+    dev = NULL;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_GFIN", SS_null);
+
+    fl = PG_fget_finish_state(dev);
+
+    o = SS_mk_integer(si, fl);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SFIN - set the finish state */
+
+static object *_SXI_sfin(SS_psides *si, object *argl)
+   {int c;
+    PG_device *dev;
+
+    dev = NULL;
+    c   = 1;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_INT_I, &c,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_SFIN", SS_null);
+
+    PG_fset_finish_state(dev, c);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_GLNS - get the line style */
+
+static object *_SXI_glns(SS_psides *si, object *argl)
+   {int s;
+    PG_device *dev;
+    object *o;
+
+    dev = NULL;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_GLNS", SS_null);
+
+    s = PG_fget_line_style(dev);
+    o = SS_mk_integer(si, s);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SLNS - set the line style */
+
+static object *_SXI_slns(SS_psides *si, object *argl)
+   {int s, st;
+    PG_device *dev;
+    object *o;
+
+    dev = NULL;
+    s   = LINE_SOLID;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_INT_I, &s,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_SLNS", SS_null);
+
+    st = PG_fset_line_style(dev, s);
+    o  = SS_mk_integer(si, st);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_GLNW - get the line width */
+
+static object *_SXI_glnw(SS_psides *si, object *argl)
+   {double w;
+    PG_device *dev;
+    object *o;
+
+    dev = NULL;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_GLNW", SS_null);
+
+    w = PG_fget_line_width(dev);
+
+    o = SS_mk_float(si, w);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SLNW - set the line width */
+
+static object *_SXI_slnw(SS_psides *si, object *argl)
+   {double w;
+    PG_device *dev;
+    object *o;
+
+    dev = NULL;
+    w   = 0.1;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_DOUBLE_I, &w,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_SLNW", SS_null);
+
+    w = PG_fset_line_width(dev, w);
+    o = SS_mk_float(si, w);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_MRK_ORNT - get the marker orientation */
+
+static object *_SXI_mrk_ornt(SS_psides *si, object *argl)
+   {double theta;
+    PG_device *dev;
+    object *o;
+
+    dev = NULL;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_MRK_ORNT", SS_null);
+
+    theta = PG_fget_marker_orientation(dev);
+    o     = SS_mk_float(si, theta);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SET_MRK_ORNT - set the marker orientation */
+
+static object *_SXI_set_mrk_ornt(SS_psides *si, object *argl)
+   {double theta;
+    PG_device *dev;
+    object *o;
+
+    dev   = NULL;
+    theta = 0.0;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_DOUBLE_I, &theta,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_SET_MRK_ORNT", SS_null);
+
+    theta = PG_fset_marker_orientation(dev, theta);
+    o     = SS_mk_float(si, theta);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_MRK_SCAL - get the marker scale */
+
+static object *_SXI_mrk_scal(SS_psides *si, object *argl)
+   {double sc;
+    PG_device *dev;
+    object *o;
+
+    dev = NULL;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_MRK_SCAL", SS_null);
+
+    sc = PG_fget_marker_scale(dev);
+    o  = SS_mk_float(si, sc);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SET_MRK_SCAL - set the marker scale */
+
+static object *_SXI_set_mrk_scal(SS_psides *si, object *argl)
+   {double sc;
+    PG_device *dev;
+    object *o;
+
+    dev = NULL;
+    sc  = 0.0;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_DOUBLE_I, &sc,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_SET_MRK_SCAL", SS_null);
+
+    sc = PG_fset_marker_scale(dev, sc);
+    o  = SS_mk_float(si, sc);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SBWD - set the border width in pixels */
+
+static object *_SXI_sbwd(SS_psides *si, object *argl)
+   {int c, oc;
+    PG_device *dev;
+    object *o;
+
+    dev = NULL;
+    c   = 1;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_INT_I, &c,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_SBWD", SS_null);
+
+    oc = PG_fset_border_width(dev, c);
+    o  = SS_mk_integer(si, oc);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SRES_SF - set the resolution scale factor */
+
+static object *_SXI_sres_sf(SS_psides *si, object *argl)
+   {int sf, rv;
+    PG_device *dev;
+    object *o;
+
+    dev = NULL;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_INT_I, &sf,
+            0);
+
+    if (dev != NULL)
+       rv = PG_fset_res_scale_factor(dev, sf);
+    else
+       rv = 1;
+
+    o = SS_mk_integer(si, rv);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_GLNC - get the line color */
+
+static object *_SXI_glnc(SS_psides *si, object *argl)
+   {int c;
+    PG_device *dev;
+    object *o;
+
+    dev = NULL;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_GLNC", SS_null);
+
+    c = PG_fget_line_color(dev);
+    o = SS_mk_integer(si, c);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SLNC - set the line color */
+
+static object *_SXI_slnc(SS_psides *si, object *argl)
+   {int c;
+    PG_device *dev;
+
+    dev = NULL;
+    c   = 1;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_INT_I, &c,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_SLNC", SS_null);
+
+    PG_fset_line_color(dev, c, TRUE);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_GTXC - get the text color */
+
+static object *_SXI_gtxc(SS_psides *si, object *argl)
+   {int c;
+    PG_device *dev;
+    object *o;
+
+    dev = NULL;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_GTXC", SS_null);
+
+    c = PG_fget_text_color(dev);
+    o = SS_mk_integer(si, c);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_STXC - set the text color */
+
+static object *_SXI_stxc(SS_psides *si, object *argl)
+   {int c;
+    PG_device *dev;
+    object *o;
+
+    dev = NULL;
+    c   = 1;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_INT_I, &c,
+            0);
+
+    if (dev != NULL)
+       {c = PG_fset_text_color(dev, c, TRUE);
+	o = SS_mk_integer(si, c);}
+    else
+       o = SS_f;
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SFIC - set the fill color */
+
+static object *_SXI_sfic(SS_psides *si, object *argl)
+   {int c;
+    PG_device *dev;
+    object *o;
+
+    dev = NULL;
+    c   = 1;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_INT_I, &c,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_SFIC", SS_null);
+
+    c = PG_fset_fill_color(dev, c, TRUE);
+    o = SS_mk_integer(si, c);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SWBK - set the white background flag */
+
+static object *_SXI_swbk(SS_psides *si, object *argl)
+   {int c;
+    PG_device *dev;
+
+    dev = NULL;
+    c   = 1;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_INT_I, &c,
+            0);
+
+    if (dev != NULL)
+       PG_white_background(dev, c);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SGRD - set the grid flag */
+
+static object *_SXI_sgrd(SS_psides *si, object *argl)
+   {int c;
+    PG_device *dev;
+
+    dev = NULL;
+    c   = 1;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_INT_I, &c,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_SGRD", SS_null);
+
+    PG_turn_grid(dev, c);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SDTI - set the data id flag */
+
+static object *_SXI_sdti(SS_psides *si, object *argl)
+   {int c;
+    PG_device *dev;
+
+    dev = NULL;
+    c   = 1;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_INT_I, &c,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_SDTI", SS_null);
+
+    PG_turn_data_id(dev, c);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SSCT - set the scatter flag */
+
+static object *_SXI_ssct(SS_psides *si, object *argl)
+   {int c;
+    PG_device *dev;
+
+    dev = NULL;
+    c   = 1;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_INT_I, &c,
+            0);
+
+    if (dev != NULL)
+       PG_turn_scatter(dev, c);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SADM - set the autodomain flag */
+
+static object *_SXI_sadm(SS_psides *si, object *argl)
+   {int c;
+    PG_device *dev;
+
+    dev = NULL;
+    c   = 1;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_INT_I, &c,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_SADM", SS_null);
+
+    PG_turn_autodomain(dev, c);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SARN - set the autorange flag */
+
+static object *_SXI_sarn(SS_psides *si, object *argl)
+   {int c;
+    PG_device *dev;
+
+    dev = NULL;
+    c   = 1;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_INT_I, &c,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_SARN", SS_null);
+
+    PG_turn_autorange(dev, c);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SAPL - set the autoplot flag */
+
+static object *_SXI_sapl(SS_psides *si, object *argl)
+   {int c;
+    PG_device *dev;
+
+    dev = NULL;
+    c   = 1;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_INT_I, &c,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_SAPL", SS_null);
+
+    PG_turn_autoplot(dev, c);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_MDVC - make the device current */
+
+static object *_SXI_mdvc(SS_psides *si, object *argl)
+   {PG_device *dev;
+
+    dev = NULL;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_MDVC", SS_null);
+
+    PG_make_device_current(dev);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_RDVC - release the device */
+
+static object *_SXI_rdvc(SS_psides *si, object *argl)
+   {PG_device *dev;
+
+    dev = NULL;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_RDVC", SS_null);
+
+    PG_release_current_device(dev);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_UPDATE_VS - update the view surface with a flush */
+
+static object *_SXI_update_vs(SS_psides *si, object *argl)
+   {PG_device *dev;
+
+    dev = NULL;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_UPDATE_VS", SS_null);
+
+    PG_update_vs(dev);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_FINISH_PLOT - finish the frame */
+
+static object *_SXI_finish_plot(SS_psides *si, object *argl)
+   {PG_device *dev;
+
+    dev = NULL;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_FINISH_PLOT", SS_null);
+
+    PG_finish_plot(dev);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_CLOSE_DEVICE - SX level interface to PG_close_device */
+
+static object *_SXI_close_device(SS_psides *si, object *argl)
+   {PG_device *dev;
+
+    dev = NULL;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            0);
+
+    PG_close_device(dev);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_CLEAR_WINDOW - clear the screen */
+
+static object *_SXI_clear_window(SS_psides *si, object *argl)
+   {PG_device *dev;
+
+    dev = NULL;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_CLEAR_WINDOW", SS_null);
+
+    PG_clear_window(dev);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_CLEAR_VIEWPORT - clear the viewport */
+
+static object *_SXI_clear_viewport(SS_psides *si, object *argl)
+   {PG_device *dev;
+
+    dev = NULL;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_CLEAR_VIEWPORT", SS_null);
+
+    PG_clear_viewport(dev);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SX_INSTALL_PGS_PRIMITIVES - install the PGS primitives */
+
+void _SX_install_pgs_primitives(SS_psides *si)
+   {
+
+    SS_install(si, "pg-axis",
+               "Draw a complete axis set on the given device",
+               SS_nargs,
+               _SXI_axis, SS_PR_PROC);
+
+    SS_install(si, "pg-get-buffer-size",
+               "Get the I/O buffer size for graphics files",
+               SS_zargs,
+               _SXI_gbfsz, SS_PR_PROC);
+
+    SS_install(si, "pg-set-buffer-size!",
+               "Set the I/O buffer size for graphics files",
+               SS_sargs,
+               _SXI_sbfsz, SS_PR_PROC);
+
+    SS_install(si, "pg-get-clear-mode",
+               "Return the clear mode",
+               SS_nargs,
+               _SXI_clr_mode, SS_PR_PROC);
+
+    SS_install(si, "pg-set-clear-mode!",
+               "Set the clear mode",
+               SS_nargs,
+               _SXI_set_clr_mode, SS_PR_PROC);
+
+    SS_install(si, "pg-finish-state",
+               "Get the finish flag of the given device",
+               SS_nargs,
+               _SXI_gfin, SS_PR_PROC);
+
+    SS_install(si, "pg-set-finish-state!",
+               "Set the finish flag of the given device",
+               SS_nargs,
+               _SXI_sfin, SS_PR_PROC);
+
+    SS_install(si, "pg-line-style",
+               "Get the line style on the given device",
+               SS_nargs,
+               _SXI_glns, SS_PR_PROC);
+
+    SS_install(si, "pg-set-line-style!",
+               "Set the line style on the given device",
+               SS_nargs,
+               _SXI_slns, SS_PR_PROC);
+
+    SS_install(si, "pg-line-width",
+               "Get the line width on the given device",
+               SS_nargs,
+               _SXI_glnw, SS_PR_PROC);
+
+    SS_install(si, "pg-set-line-width!",
+               "Set the line width on the given device",
+               SS_nargs,
+               _SXI_slnw, SS_PR_PROC);
+
+    SS_install(si, "pg-marker-orientation",
+               "Get the orientation angle for marker characters",
+               SS_nargs,
+               _SXI_mrk_ornt, SS_PR_PROC);
+
+    SS_install(si, "pg-set-marker-orientation!",
+               "Set the orientation angle for marker characters",
+               SS_nargs,
+               _SXI_set_mrk_ornt, SS_PR_PROC);
+
+    SS_install(si, "pg-marker-scale",
+               "Get the scale for marker characters",
+               SS_nargs,
+               _SXI_mrk_scal, SS_PR_PROC);
+
+    SS_install(si, "pg-set-marker-scale!",
+               "Set the scale for marker characters",
+               SS_nargs,
+               _SXI_set_mrk_scal, SS_PR_PROC);
+
+    SS_install(si, "pg-set-border-width!",
+               "Set the device border width in pixels",
+               SS_nargs,
+               _SXI_sbwd, SS_PR_PROC);
+
+    SS_install(si, "pg-set-resolution-scale-factor!",
+               "Set the resolution scale factor for the given device",
+               SS_nargs,
+               _SXI_sres_sf, SS_PR_PROC);
+
+    SS_install(si, "pg-line-color",
+               "Get the line color on the given device",
+               SS_nargs,
+               _SXI_glnc, SS_PR_PROC);
+
+    SS_install(si, "pg-set-line-color!",
+               "Set the line color on the given device",
+               SS_nargs,
+               _SXI_slnc, SS_PR_PROC);
+
+    SS_install(si, "pg-set-text-color!",
+               "Set the text color on the given device",
+               SS_nargs,
+               _SXI_stxc, SS_PR_PROC);
+
+    SS_install(si, "pg-text-color",
+               "Return the current text color on the given device",
+               SS_nargs,
+               _SXI_gtxc, SS_PR_PROC);
+
+    SS_install(si, "pg-set-fill-color!",
+               "Set the fill color on the given device",
+               SS_nargs,
+               _SXI_sfic, SS_PR_PROC);
+
+    SS_install(si, "pg-set-white-background!",
+               "Set the white background flag on the given device",
+               SS_nargs,
+               _SXI_swbk, SS_PR_PROC);
+
+    SS_install(si, "pg-set-grid-flag!",
+               "Set the grid flag on the given device",
+               SS_nargs,
+               _SXI_sgrd, SS_PR_PROC);
+
+    SS_install(si, "pg-set-data-id-flag!",
+               "Set the data-id flag of the given device",
+               SS_nargs,
+               _SXI_sdti, SS_PR_PROC);
+
+    SS_install(si, "pg-set-scatter-flag!",
+               "Set the scatter plot flag on the given device",
+               SS_nargs,
+               _SXI_ssct, SS_PR_PROC);
+
+    SS_install(si, "pg-set-autodomain!",
+               "Set the autodomain flag of the given device",
+               SS_nargs,
+               _SXI_sadm, SS_PR_PROC);
+
+    SS_install(si, "pg-set-autorange!",
+               "Set the autorange flag of the given device",
+               SS_nargs,
+               _SXI_sarn, SS_PR_PROC);
+
+    SS_install(si, "pg-set-autoplot!",
+               "Set the autoplot flag of the given device",
+               SS_nargs,
+               _SXI_sapl, SS_PR_PROC);
+
+    SS_install(si, "pg-make-device-current",
+               "Make the given device the current device for drawing",
+               SS_nargs,
+               _SXI_mdvc, SS_PR_PROC);
+
+    SS_install(si, "pg-release-current-device",
+               "Release the given device as the current device",
+               SS_nargs,
+               _SXI_rdvc, SS_PR_PROC);
+
+    SS_install(si, "pg-update-view-surface",
+               "Update the view surface for the given device",
+               SS_nargs,
+               _SXI_update_vs, SS_PR_PROC);
+
+    SS_install(si, "pg-finish-plot",
+               "Finish the plot frame on the given device",
+               SS_nargs,
+               _SXI_finish_plot, SS_PR_PROC);
+
+    SS_install(si, "pg-close-device",
+               "Closes a PGS device",
+               SS_nargs,
+               _SXI_close_device, SS_PR_PROC);
+
+    SS_install(si, "pg-clear-window",
+               "Clear the screen and initialize a frame of the given device",
+               SS_nargs,
+               _SXI_clear_window, SS_PR_PROC);
+
+    SS_install(si, "pg-clear-viewport",
+               "Clear the current viewport of the given device",
+               SS_nargs,
+               _SXI_clear_viewport, SS_PR_PROC);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+
+#endif
+
 /*--------------------------------------------------------------------------*/
 
