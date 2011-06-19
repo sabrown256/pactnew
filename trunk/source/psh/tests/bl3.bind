@@ -7,7 +7,7 @@
 # include "cpyright.h"
 #
 
-derived str	character-A	SC_STRING_I	SC_STRING_I
+derived str	character-A	G_STR	SC_STRING_I
 
 fe1	fortran(fe1f)	scheme(fe1s)	python(fe1p)
 fe2	fortran(fe2f)	scheme(fe2s)	python(fe2p)

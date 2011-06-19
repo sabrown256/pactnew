@@ -17,8 +17,8 @@
 
 (printf nil "Setting orientation: %s\n" (pg-set-marker-orientation! dev 60.0))
 (printf nil "Setting scale: %s\n" (pg-set-marker-scale! dev 0.02))
-(printf nil "Checking orientation: %s\n" (pg-marker-orientation dev))
-(printf nil "Checking scale: %s\n" (pg-marker-scale dev))
+(printf nil "Checking orientation: %s\n" (pg-get-marker-orientation dev))
+(printf nil "Checking scale: %s\n" (pg-get-marker-scale dev))
 
 (pg-clear-window dev)
 (pg-axis dev)

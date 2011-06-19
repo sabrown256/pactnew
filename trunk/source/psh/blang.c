@@ -25,7 +25,12 @@ enum e_langmode
 typedef enum e_langmode langmode;
 
 enum e_fparam
-   {FP_ANY = -1, FP_VARARG, FP_FNC, FP_STRUCT_P, FP_SCALAR, FP_ARRAY};
+   {FP_ANY = -1,
+    FP_VARARG,
+    FP_FNC,            /* pointer to function */
+    FP_INDIRECT,       /* pointer to undefined type */
+    FP_ARRAY,          /* pointer to defined type */
+    FP_SCALAR};
 
 typedef enum e_fparam fparam;
 
@@ -375,7 +380,7 @@ static farg *proc_args(fdecl *dcl)
     al = MAKE_N(farg, na);
 
     for (i = 0; i < na; i++)
-        {al[i].arg  = args[i];
+        {al[i].arg = args[i];
 	 split_decl(al+i, al[i].arg);
 	 al[i].knd = fc_type(lty, MAXLINE, al[i].type, al[i].arg, MODE_C);};
 
@@ -704,6 +709,14 @@ static void init_types(void)
     add_type("double *",      "real(8)-A",    "SC_DOUBLE_P_I",      NULL, "NULL");
     add_type("long double *", "real(16)-A",   "SC_LONG_DOUBLE_P_I", NULL, "NULL");
 
+/* complex types */
+    add_type("float _Complex *",       "complex(4)-A",
+	     "SC_FLOAT_COMPLEX_P_I", NULL, "NULL");
+    add_type("double _Complex *",      "complex(8)-A",
+	     "SC_DOUBLE_COMPLEX_P_I", NULL, "NULL");
+    add_type("long double _Complex *", "complex(16)-A",
+	     "SC_LONG_DOUBLE_COMPLEX_P_I", NULL, "NULL");
+
     add_type("pcons",         "C_PTR-A",      "SC_PCONS_I",         NULL, "NULL");
     add_type("pcons *",       "C_PTR-A",      "SC_PCONS_P_I",       NULL, "NULL");
 /*    add_type("FILE *",        "C_PTR-A",      "SC_FILE_I",          NULL, "NULL"); */
@@ -929,9 +942,8 @@ static fparam fc_type(char *wty, int nc, char *ty, char *arg, langmode mode)
     else
        {nstrncpy(wty, nc, ty, -1);
 
-/* assume a pointer to an unknown type is a struct pointer */
 	if (LAST_CHAR(ty) == '*')
-	   rv = FP_STRUCT_P;
+	   rv = FP_INDIRECT;
 	else
 	   berr("Unknown type '%s'", ty);};
 
@@ -975,7 +987,7 @@ static void fc_decl_list(char *a, int nc, fdecl *dcl)
 		 case FP_SCALAR :
 		      vstrcat(a, MAXLINE, "%s *%s, ", ty, nm);
 		      break;
-		 case FP_STRUCT_P :
+		 case FP_INDIRECT :
 		      vstrcat(a, MAXLINE, "%s *%s, ", ty, nm);
 		      break;
 		 default :
@@ -1095,7 +1107,7 @@ static void fortran_wrap_decl(FILE *fp, fdecl *dcl,
     fprintf(fp, "\n");
 
     switch (knd)
-       {case FP_STRUCT_P :
+       {case FP_INDIRECT :
 
 #ifdef RETURN_INTEGER
 	     snprintf(t, MAXLINE, "FIXNUM FF_ID(%s, %s)(%s)\n",
@@ -1154,7 +1166,7 @@ static void fortran_wrap_local_decl(FILE *fp, fdecl *dcl,
 	 if (i == na)
 	    {if (voidf == FALSE)
 		{switch (knd)
-		    {case FP_STRUCT_P :
+		    {case FP_INDIRECT :
 #ifdef RETURN_INTEGER
 		          nstrcat(t, MAXLINE, "FIXNUM _rv;\n");
 			  vstrcat(t, MAXLINE, "    SC_address _ad%s;\n",
@@ -1183,7 +1195,7 @@ static void fortran_wrap_local_decl(FILE *fp, fdecl *dcl,
 		      else
 			 nstrcat(t, MAXLINE, "\n");
 		      break;
-		 case FP_STRUCT_P :
+		 case FP_INDIRECT :
 		      vstrcat(t, MAXLINE, "%s _l%s;\n", ty, nm);
 		      break;
 		 case FP_ARRAY :
@@ -1232,7 +1244,7 @@ static void fortran_wrap_local_assn(FILE *fp, fdecl *dcl)
 	        {case FP_FNC :
 		      t[0] = '\0';
 		      break;
-		 case FP_STRUCT_P :
+		 case FP_INDIRECT :
 		      snprintf(t, MAXLINE, "    _l%-8s = *(%s*) %s;\n",
 			       nm, ty, nm);
 		      break;
@@ -1278,7 +1290,7 @@ static void fortran_wrap_local_call(FILE *fp, fdecl *dcl,
     nm = dcl->proto.name;
     if (voidf == FALSE)
        {switch (knd)
-	   {case FP_STRUCT_P :
+	   {case FP_INDIRECT :
 #ifdef RETURN_INTEGER
 	         fprintf(fp, "    _ad%s.memaddr = (void *) %s(%s);\n",
 			 nm, nm, a);
@@ -1308,7 +1320,7 @@ static void fortran_wrap_local_return(FILE *fp, fdecl *dcl,
 
     if (voidf == FALSE)
        {switch (knd)
-	   {case FP_STRUCT_P :
+	   {case FP_INDIRECT :
 #ifdef RETURN_INTEGER
 	         fprintf(fp, "    _rv = _ad%s.diskaddr;\n\n", dcl->proto.name);
 #endif
@@ -1586,7 +1598,7 @@ static char **mc_proto_list(fdecl *dcl)
     knd = mc_type(MAXLINE, NULL, NULL, wty, ty);
     switch (knd)
        {case FP_FNC      :
-        case FP_STRUCT_P :
+        case FP_INDIRECT :
 	     lst = lst_push(lst, C_PTR_RETURN);
 	     lst = lst_push(lst, nm);
 	     break;
@@ -1617,7 +1629,7 @@ static char **mc_proto_list(fdecl *dcl)
 	 knd = mc_type(MAXLINE, NULL, NULL, wty, ty);
 	 switch (knd)
 	    {case FP_FNC      :
-	     case FP_STRUCT_P :
+	     case FP_INDIRECT :
 	          lst = lst_push(lst, C_PTR_RETURN);
 	          lst = lst_push(lst, nm);
 		  break;
@@ -2187,10 +2199,17 @@ static void fin_module(bindes *bd)
 
 /*--------------------------------------------------------------------------*/
 
-/* CS_TYPE - return "Scheme" type corresponding to C type TY */
+/* CS_TYPE - return "Scheme" type corresponding to C type TY
+ *         - to make SS_args call
+ */
 
-static void cs_type(char *a, int nc, char *ty)
-   {char *sty;
+static void cs_type(char *a, int nc, farg *arg)
+   {fparam knd;
+    char t[MAXLINE];
+    char *ty, *sty, *dty;
+
+    ty  = arg->type;
+    knd = arg->knd;
 
     sty = lookup_type(NULL, ty, MODE_C, MODE_S);
     if (sty != NULL)
@@ -2199,10 +2218,17 @@ static void cs_type(char *a, int nc, char *ty)
     else if (strcmp(ty, "void *") == 0)
        nstrncpy(a, nc, "SC_VOID_I", -1);
 
-    else if ((strchr(ty, '*') != NULL) ||
-	     (strstr(ty, "(*") != NULL) ||
+    else if ((strstr(ty, "(*") != NULL) ||
 	     (strstr(ty, "PF") != NULL))
        nstrncpy(a, nc, "SC_POINTER_I", -1);
+
+    else if (strchr(ty, '*') != NULL)
+       {deref(t, MAXLINE, ty);
+	dty = lookup_type(NULL, t, MODE_C, MODE_S);
+	if (dty != NULL)
+	   nstrncpy(a, nc, dty, -1);
+	else
+	   nstrncpy(a, nc, "SC_POINTER_I", -1);}
 
     else
        nstrncpy(a, nc, "SC_UNKNOWN_I", -1);
@@ -2424,7 +2450,7 @@ static void scheme_wrap_local_assn(FILE *fp, fdecl *dcl, int voida)
 /* make the SS_args call */
 	a[0] = '\0';
 	for (i = 0; i < na; i++)
-	    {cs_type(ty, MAXLINE, al[i].type);
+	    {cs_type(ty, MAXLINE, al+i);
 	     vstrcat(a, MAXLINE, "            %s, &_l%s,\n",
 		     ty, al[i].name);};
 
@@ -2471,7 +2497,7 @@ static void scheme_wrap_local_return(FILE *fp, fdecl *dcl,
     ty = dcl->proto.type;
 
     if (strcmp(ty, "void") == 0)
-       snprintf(t, MAXLINE, "    _lo = SS_null;\n");
+       snprintf(t, MAXLINE, "    _lo = SS_f;\n");
     else
        {if (IS_NULL(so) == FALSE)
 	   {switch (knd)

@@ -17,7 +17,7 @@ static object *_SXI_a_f1(SS_psides *si, object *argl)
             0);
 
     a_f1(_la);
-    _lo = SS_null;
+    _lo = SS_f;
 
     return(_lo);}
 
@@ -36,7 +36,7 @@ static object *_SXI_a_f2(SS_psides *si, object *argl)
             0);
 
     a_f2(_lb);
-    _lo = SS_null;
+    _lo = SS_f;
 
     return(_lo);}
 
@@ -58,7 +58,7 @@ static object *_SXI_a_f3(SS_psides *si, object *argl)
             0);
 
     a_f3(_la, _lb);
-    _lo = SS_null;
+    _lo = SS_f;
 
     return(_lo);}
 
@@ -80,7 +80,7 @@ static object *_SXI_a_f4(SS_psides *si, object *argl)
             0);
 
     a_f4(_lb, _la);
-    _lo = SS_null;
+    _lo = SS_f;
 
     return(_lo);}
 
@@ -102,7 +102,7 @@ static object *_SXI_b_f1(SS_psides *si, object *argl)
             0);
 
     B_f1(_la, _lb);
-    _lo = SS_null;
+    _lo = SS_f;
 
     return(_lo);}
 
@@ -124,7 +124,7 @@ static object *_SXI_b_f2(SS_psides *si, object *argl)
             0);
 
     B_f2(_la, _lb);
-    _lo = SS_null;
+    _lo = SS_f;
 
     return(_lo);}
 
@@ -149,7 +149,7 @@ static object *_SXI_b_f3(SS_psides *si, object *argl)
             0);
 
     B_f3(_la, _lb, _lc);
-    _lo = SS_null;
+    _lo = SS_f;
 
     return(_lo);}
 
@@ -174,7 +174,7 @@ static object *_SXI_b_f4(SS_psides *si, object *argl)
             0);
 
     B_f4(_la, _lb, _lc);
-    _lo = SS_null;
+    _lo = SS_f;
 
     return(_lo);}
 
@@ -199,7 +199,7 @@ static object *_SXI_b_f5(SS_psides *si, object *argl)
             0);
 
     B_f5(_la, _lb, _lc);
-    _lo = SS_null;
+    _lo = SS_f;
 
     return(_lo);}
 
@@ -224,7 +224,7 @@ static object *_SXI_b_f6(SS_psides *si, object *argl)
             0);
 
     B_f6(_la, _lb, _lc);
-    _lo = SS_null;
+    _lo = SS_f;
 
     return(_lo);}
 

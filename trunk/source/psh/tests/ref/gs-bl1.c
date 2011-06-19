@@ -11,7 +11,7 @@ static object *_SXI_fav1(SS_psides *si, object *argl)
    {object *_lo;
 
     fav1();
-    _lo = SS_null;
+    _lo = SS_f;
 
     return(_lo);}
 
@@ -140,7 +140,7 @@ static object *_SXI_fav5(SS_psides *si, object *argl)
    {object *_lo;
 
     fav5();
-    _lo = SS_null;
+    _lo = SS_f;
 
     return(_lo);}
 

@@ -1106,23 +1106,6 @@ static object *_SXI_open_device(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SXI_CLOSE_DEVICE - SX level interface to PG_close_device */
-
-static object *_SXI_close_device(SS_psides *si, object *argl)
-   {PG_device *dev;
-
-    dev = NULL;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            0);
-
-    PG_close_device(dev);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SX_NEXT_COLOR - return the next available color */
 
 int SX_next_color(PG_device *dev)
@@ -2823,11 +2806,6 @@ void SX_install_pgs_funcs(SS_psides *si)
                "Build a PGS image object\nFORM (pg-build-image <data> <kmax> <lmax> [<name> <xmin> <xmax> <ymin> <ymax> <zmin> zmax>])",
                SS_nargs,
                _SXI_build_image, SS_PR_PROC);
-
-    SS_install(si, "pg-close-device",
-               "Closes a PGS device",
-               SS_nargs,
-               _SXI_close_device, SS_PR_PROC);
 
     SS_install(si, "pg-def-graph-file",
                "Set up a PDB file to recieve PGS graph objects",

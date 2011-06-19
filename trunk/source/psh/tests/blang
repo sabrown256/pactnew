@@ -86,6 +86,7 @@ else
       flog $Log $RM $hdr
       flog $Log touch $hdr
       Note $hdr "#include <sx_int.h>"
+      Note $hdr "#define G_STR  256"
       Note $hdr "struct s_str {int a; double b;};"
       Note $hdr "typedef struct s_str str;"
       flog $Log cat $hdr

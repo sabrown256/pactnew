@@ -15,7 +15,7 @@
 
 /* PG_FGET_BUFFER_SIZE - get the default I/O buffer size
  *
- * #bind PG_fget_buffer_size fortran() scheme()
+ * #bind PG_fget_buffer_size fortran() scheme(pg-get-buffer-size)
  */
 
 int64_t PG_fget_buffer_size(void)
@@ -33,7 +33,7 @@ int64_t PG_fget_buffer_size(void)
  *                     - -1 turns off default buffering optimization
  *                     - which happens on file open
  *
- * #bind PG_fset_buffer_size fortran() scheme()
+ * #bind PG_fset_buffer_size fortran() scheme(pg-set-buffer-size!)
  */
 
 int64_t PG_fset_buffer_size(int64_t sz ARG(-1,in))
@@ -50,7 +50,7 @@ int64_t PG_fset_buffer_size(int64_t sz ARG(-1,in))
 
 /* PG_FGET_CLEAR_MODE - get the high level clear mode
  *
- * #bind PG_fget_clear_mode fortran() scheme()
+ * #bind PG_fget_clear_mode fortran() scheme(pg-get-clear-mode)
  */
 
 int PG_fget_clear_mode(void)
@@ -65,7 +65,7 @@ int PG_fget_clear_mode(void)
 
 /* PG_FSET_CLEAR_MODE - set the high level clear mode
  *
- * #bind PG_fset_clear_mode fortran() scheme()
+ * #bind PG_fset_clear_mode fortran() scheme(pg-set-clear-mode!)
  */
 
 int PG_fset_clear_mode(int i ARG(CLEAR_SCREEN))
@@ -208,7 +208,7 @@ void PG_fset_char_up(PG_device *dev, double *x ARG([0.0,1.0],in))
 /* PG_FGET_CHAR_PRECISION - return the device character precision
  *                        - defaults to 1
  *
- * #bind PG_fget_char_precision fortran() scheme()
+ * #bind PG_fget_char_precision fortran() scheme(pg-get-char-precision)
  */
 
 int PG_fget_char_precision(PG_device *dev)
@@ -226,7 +226,7 @@ int PG_fget_char_precision(PG_device *dev)
 
 /* PG_FSET_CHAR_PRECISION - set the device character precision
  *
- * #bind PG_fset_char_precision fortran() scheme()
+ * #bind PG_fset_char_precision fortran() scheme(pg-set-char-precision!)
  */
 
 int PG_fset_char_precision(PG_device *dev, int p ARG(1,in))
@@ -298,7 +298,7 @@ void PG_fset_char_size_n(PG_device *dev, int nd, PG_coord_sys cs,
  *                    - to be used between characters
  *                    - defaults to 0.0
  *
- * #bind PG_fget_char_space fortran() scheme()
+ * #bind PG_fget_char_space fortran() scheme(pg-get-char-space)
  */
 
 double PG_fget_char_space(PG_device *dev)
@@ -317,7 +317,7 @@ double PG_fget_char_space(PG_device *dev)
 /* PG_FSET_CHAR_SPACE - set the space
  *                    - to be used between characters
  *
- * #bind PG_fset_char_space fortran() scheme()
+ * #bind PG_fset_char_space fortran() scheme(pg-set-char-space!)
  */
 
 double PG_fset_char_space(PG_device *dev, double d ARG(0.0,in))
@@ -337,7 +337,7 @@ double PG_fset_char_space(PG_device *dev, double d ARG(0.0,in))
 /* PG_FGET_FILL_BOUND - return the device draw_fill_bound flag
  *                    - defaults to FALSE
  *
- * #bind PG_fget_fill_bound fortran() scheme()
+ * #bind PG_fget_fill_bound fortran() scheme(pg-get-fill-bound)
  */
 
 int PG_fget_fill_bound(PG_device *dev)
@@ -355,7 +355,7 @@ int PG_fget_fill_bound(PG_device *dev)
 
 /* PG_FSET_FILL_BOUND - set the device draw_fill_bound flag
  *
- * #bind PG_fset_fill_bound fortran() scheme()
+ * #bind PG_fset_fill_bound fortran() scheme(pg-set-fill-bound!)
  */
 
 int PG_fset_fill_bound(PG_device *dev, int v ARG(FALSE,in))
@@ -375,7 +375,7 @@ int PG_fset_fill_bound(PG_device *dev, int v ARG(FALSE,in))
 /* PG_FGET_FINISH_STATE - return the device finished flag
  *                      - defaults to TRUE
  *
- * #bind PG_fget_finish_state fortran() scheme()
+ * #bind PG_fget_finish_state fortran() scheme(pg-get-finish-state)
  */
 
 int PG_fget_finish_state(PG_device *dev)
@@ -393,7 +393,7 @@ int PG_fget_finish_state(PG_device *dev)
 
 /* PG_FSET_FINISH_STATE - set the device finished flag
  *
- * #bind PG_fset_finish_state fortran() scheme()
+ * #bind PG_fset_finish_state fortran() scheme(pg-set-finish-state!)
  */
 
 int PG_fset_finish_state(PG_device *dev, int v ARG(TRUE,in))
@@ -448,7 +448,7 @@ void PG_fset_font(PG_device *dev,
 
 /* PG_FGET_IDENTIFIER - return the identifier of graph G
  *
- * #bind PG_fget_identifier fortran() scheme()
+ * #bind PG_fget_identifier fortran() scheme(pg-get-identifier)
  */
 
 int PG_fget_identifier(PG_graph *g)
@@ -467,7 +467,7 @@ int PG_fget_identifier(PG_graph *g)
 /* PG_FSET_IDENTIFIER - set the identifier of graph G
  *                    - return the old value
  *
- * #bind PG_fset_identifier fortran() scheme()
+ * #bind PG_fset_identifier fortran() scheme(pg-set-identifier!)
  */
 
 int PG_fset_identifier(PG_graph *g, int id ARG('A',in))
@@ -527,7 +527,7 @@ PG_logical_operation PG_fset_logical_op(PG_device *dev,
 /* PG_FGET_LINE_STYLE - return the device line style
  *                    - default is LINE_SOLID
  *
- * #bind PG_fget_line_style fortran() scheme()
+ * #bind PG_fget_line_style fortran() scheme(pg-get-line-style)
  */
 
 int PG_fget_line_style(PG_device *dev)
@@ -546,7 +546,7 @@ int PG_fget_line_style(PG_device *dev)
 /* PG_FSET_LINE_STYLE - set the device line style
  *                    - return the old value
  *
- * #bind PG_fset_line_style fortran() scheme()
+ * #bind PG_fset_line_style fortran() scheme(pg-set-line-style!)
  */
 
 int PG_fset_line_style(PG_device *dev, int st ARG(LINE_SOLID,in))
@@ -566,7 +566,7 @@ int PG_fset_line_style(PG_device *dev, int st ARG(LINE_SOLID,in))
 /* PG_FGET_LINE_WIDTH - return the device line width
  *                    - default is 0.1
  *
- * #bind PG_fget_line_width fortran() scheme()
+ * #bind PG_fget_line_width fortran() scheme(pg-get-line-width)
  */
 
 double PG_fget_line_width(PG_device *dev)
@@ -585,7 +585,7 @@ double PG_fget_line_width(PG_device *dev)
 /* PG_FSET_LINE_WIDTH - set the device line width
  *                    - return the old value
  *
- * #bind PG_fset_line_width fortran() scheme()
+ * #bind PG_fset_line_width fortran() scheme(pg-set-line-width!)
  */
 
 double PG_fset_line_width(PG_device *dev, double wd ARG(0.1,in))
@@ -607,7 +607,7 @@ double PG_fset_line_width(PG_device *dev, double wd ARG(0.1,in))
 /* PG_FGET_MARKER_ORIENTATION - return the device marker orientation
  *                            - default is 0.0
  *
- * #bind PG_fget_marker_orientation fortran() scheme()
+ * #bind PG_fget_marker_orientation fortran() scheme(pg-get-marker-orientation)
  */
 
 double PG_fget_marker_orientation(PG_device *dev)
@@ -626,7 +626,7 @@ double PG_fget_marker_orientation(PG_device *dev)
 /* PG_FSET_MARKER_ORIENTATION - set the device marker orientation
  *                            - return the old value
  *
- * #bind PG_fset_marker_orientation fortran() scheme()
+ * #bind PG_fset_marker_orientation fortran() scheme(pg-set-marker-orientation!)
  */
 
 double PG_fset_marker_orientation(PG_device *dev, double a ARG(0.0,in))
@@ -646,7 +646,7 @@ double PG_fset_marker_orientation(PG_device *dev, double a ARG(0.0,in))
 /* PG_FGET_MARKER_SCALE - return the device marker scale
  *                      - default is 0.0
  *
- * #bind PG_fget_marker_scale fortran() scheme()
+ * #bind PG_fget_marker_scale fortran() scheme(pg-get-marker-scale)
  */
 
 double PG_fget_marker_scale(PG_device *dev)
@@ -665,7 +665,7 @@ double PG_fget_marker_scale(PG_device *dev)
 /* PG_FSET_MARKER_SCALE - set the device marker scale
  *                      - return the old value
  *
- * #bind PG_fset_marker_scale fortran() scheme()
+ * #bind PG_fset_marker_scale fortran() scheme(pg-set-marker-scale!)
  */
 
 double PG_fset_marker_scale(PG_device *dev, double s ARG(0.0,in))
@@ -724,7 +724,7 @@ double PG_fset_max_intensity(PG_device *dev, double i ARG(1.0,in))
 /* PG_FGET_MAX_RED_INTENSITY - return the device maximum red intensity
  *                           - default is 0.0
  *
- * #bind PG_fget_max_red_intensity fortran() scheme()
+ * #bind PG_fget_max_red_intensity fortran() scheme(pg-get-max-red-intensity)
  */
 
 double PG_fget_max_red_intensity(PG_device *dev)
@@ -743,7 +743,7 @@ double PG_fget_max_red_intensity(PG_device *dev)
 /* PG_FSET_MAX_RED_INTENSITY - set the device maximum red intensity
  *                           - return the old value
  *
- * #bind PG_fset_max_red_intensity fortran() scheme()
+ * #bind PG_fset_max_red_intensity fortran() scheme(pg-set-max-red-intensity!)
  */
 
 double PG_fset_max_red_intensity(PG_device *dev, double i ARG(1.0,in))
@@ -763,7 +763,7 @@ double PG_fset_max_red_intensity(PG_device *dev, double i ARG(1.0,in))
 /* PG_FGET_MAX_GREEN_INTENSITY - return the device maximum green intensity
  *                             - default is 0.0
  *
- * #bind PG_fget_max_green_intensity fortran() scheme()
+ * #bind PG_fget_max_green_intensity fortran() scheme(pg-get-max-green-intensity)
  */
 
 double PG_fget_max_green_intensity(PG_device *dev)
@@ -782,7 +782,7 @@ double PG_fget_max_green_intensity(PG_device *dev)
 /* PG_FSET_MAX_GREEN_INTENSITY - set the device maximum green intensity
  *                             - return the old value
  *
- * #bind PG_fset_max_green_intensity fortran() scheme()
+ * #bind PG_fset_max_green_intensity fortran() scheme(pg-set-max-green-intensity!)
  */
 
 double PG_fset_max_green_intensity(PG_device *dev, double i ARG(1.0,in))
@@ -802,7 +802,7 @@ double PG_fset_max_green_intensity(PG_device *dev, double i ARG(1.0,in))
 /* PG_FGET_MAX_BLUE_INTENSITY - return the device maximum blue intensity
  *                            - default is 0.0
  *
- * #bind PG_fget_max_blue_intensity fortran() scheme()
+ * #bind PG_fget_max_blue_intensity fortran() scheme(pg-get-max-blue-intensity)
  */
 
 double PG_fget_max_blue_intensity(PG_device *dev)
@@ -821,7 +821,7 @@ double PG_fget_max_blue_intensity(PG_device *dev)
 /* PG_FSET_MAX_BLUE_INTENSITY - set the device maximum blue intensity
  *                       - return the old value
  *
- * #bind PG_fset_max_blue_intensity fortran() scheme()
+ * #bind PG_fset_max_blue_intensity fortran() scheme(pg-set-max-blue-intensity!)
  */
 
 double PG_fset_max_blue_intensity(PG_device *dev, double i ARG(1.0,in))
@@ -841,7 +841,7 @@ double PG_fset_max_blue_intensity(PG_device *dev, double i ARG(1.0,in))
 /* PG_FGET_PIXMAP_FLAG - return the device pixmap flag
  *                     - default is 0
  *
- * #bind PG_fget_pixmap_flag fortran() scheme()
+ * #bind PG_fget_pixmap_flag fortran() scheme(ps-get-pixmap-flag)
  */
 
 int PG_fget_pixmap_flag(PG_device *dev)
@@ -860,7 +860,7 @@ int PG_fget_pixmap_flag(PG_device *dev)
 /* PG_FSET_PIXMAP_FLAG - set the device pixmap flag
  *                     - return the old value
  *
- * #bind PG_fset_pixmap_flag fortran() scheme()
+ * #bind PG_fset_pixmap_flag fortran() scheme(pg-set-pixmap-flag!)
  */
 
 int PG_fset_pixmap_flag(PG_device *dev, int fl ARG(0,in))
@@ -880,7 +880,7 @@ int PG_fset_pixmap_flag(PG_device *dev, int fl ARG(0,in))
 /* PG_FGET_PS_DOTS_INCH - return the device dots per inch
  *                      - default is 0
  *
- * #bind PG_fget_ps_dots_inch fortran() scheme()
+ * #bind PG_fget_ps_dots_inch fortran() scheme(pg-get-ps-dots-inch)
  */
 
 double PG_fget_ps_dots_inch(void)
@@ -896,7 +896,7 @@ double PG_fget_ps_dots_inch(void)
 /* PG_FSET_PS_DOTS_INCH - set the device dots per inch
  *                     - return the old value
  *
- * #bind PG_fset_ps_dots_inch fortran() scheme()
+ * #bind PG_fset_ps_dots_inch fortran() scheme(pg-set-ps-dots-inch!)
  */
 
 double PG_fset_ps_dots_inch(double dpi)
@@ -949,7 +949,7 @@ pcons *PG_fset_render_info(PG_graph *g, pcons *a)
 
 /* PG_FGET_USE_PIXMAP - get the high level clear mode
  *
- * #bind PG_fget_use_pixmap fortran() scheme()
+ * #bind PG_fget_use_pixmap fortran() scheme(pg-get-use-pixmap)
  */
 
 int PG_fget_use_pixmap(void)
@@ -964,7 +964,7 @@ int PG_fget_use_pixmap(void)
 
 /* PG_FSET_USE_PIXMAP - set the high level clear mode
  *
- * #bind PG_fset_use_pixmap fortran() scheme()
+ * #bind PG_fset_use_pixmap fortran() scheme(pg-set-use-pixmap!)
  */
 
 int PG_fset_use_pixmap(int i)
@@ -980,7 +980,7 @@ int PG_fset_use_pixmap(int i)
 /* PG_FGET_RES_SCALE_FACTOR - get the device resolution scale factor
  *                          - defaults to 1
  *
- * #bind PG_fget_res_scale_factor fortran() scheme()
+ * #bind PG_fget_res_scale_factor fortran() scheme(pg-get-resolution-scale-factor)
  */
 
 int PG_fget_res_scale_factor(PG_device *dev)
@@ -998,7 +998,7 @@ int PG_fget_res_scale_factor(PG_device *dev)
 
 /* PG_FSET_RES_SCALE_FACTOR - set the device resolution scale factor
  *
- * #bind PG_fset_res_scale_factor fortran() scheme()
+ * #bind PG_fset_res_scale_factor fortran() scheme(pg-set-resolution-scale-factor!)
  */
 
 int PG_fset_res_scale_factor(PG_device *dev, int s ARG(1,in))
@@ -1018,7 +1018,7 @@ int PG_fset_res_scale_factor(PG_device *dev, int s ARG(1,in))
 /* PG_FGET_BORDER_WIDTH - get the device border width
  *                      - defaults to 1
  *
- * #bind PG_fget_border_width fortran() scheme()
+ * #bind PG_fget_border_width fortran() scheme(pg-get-border-width)
  */
 
 int PG_fget_border_width(PG_device *dev)
@@ -1036,7 +1036,7 @@ int PG_fget_border_width(PG_device *dev)
 
 /* PG_FSET_BORDER_WIDTH - set the device border width
  *
- * #bind PG_fset_border_width fortran() scheme()
+ * #bind PG_fset_border_width fortran() scheme(pg-set-border-width!)
  */
 
 int PG_fset_border_width(PG_device *dev, int w ARG(1,in))
@@ -1152,7 +1152,7 @@ void PG_fset_viewport_shape(PG_device *dev,
 
 /* PG_FGET_LINE_COLOR - inquire about the current line color
  *
- * #bind PG_fget_line_color fortran() scheme()
+ * #bind PG_fget_line_color fortran() scheme(pg-get-line-color)
  */
 
 int PG_fget_line_color(PG_device *dev)
@@ -1167,7 +1167,7 @@ int PG_fget_line_color(PG_device *dev)
 
 /* PG_FSET_LINE_COLOR - set the current line color
  *
- * #bind PG_fset_line_color fortran() scheme()
+ * #bind PG_fset_line_color fortran() scheme(pg-set-line-color!)
  */
 
 int PG_fset_line_color(PG_device *dev,
@@ -1188,7 +1188,7 @@ int PG_fset_line_color(PG_device *dev,
 
 /* PG_FGET_TEXT_COLOR - inquire about the current text color
  *
- * #bind PG_fget_text_color fortran() scheme()
+ * #bind PG_fget_text_color fortran() scheme(pg-get-text-color)
  */
 
 int PG_fget_text_color(PG_device *dev)
@@ -1203,7 +1203,7 @@ int PG_fget_text_color(PG_device *dev)
 
 /* PG_FSET_TEXT_COLOR - set the current text color
  *
- * #bind PG_fset_text_color fortran() scheme()
+ * #bind PG_fset_text_color fortran() scheme(pg-set-text-color!)
  */
 
 int PG_fset_text_color(PG_device *dev,
@@ -1224,7 +1224,7 @@ int PG_fset_text_color(PG_device *dev,
 
 /* PG_FGET_FILL_COLOR - inquire about the current fill color
  *
- * #bind PG_fget_fill_color fortran() scheme()
+ * #bind PG_fget_fill_color fortran() scheme(pg-get-fill-color)
  */
 
 int PG_fget_fill_color(PG_device *dev)
@@ -1239,7 +1239,7 @@ int PG_fget_fill_color(PG_device *dev)
 
 /* PG_FSET_FILL_COLOR - set the current fill color
  *
- * #bind PG_fset_fill_color fortran() scheme()
+ * #bind PG_fset_fill_color fortran() scheme(pg-set-fill-color!)
  */
 
 int PG_fset_fill_color(PG_device *dev,
@@ -1261,7 +1261,7 @@ int PG_fset_fill_color(PG_device *dev,
 /* PG_WHITE_BACKGROUND - set the device background color white flag
  *                     - return the old value
  *
- * #bind PG_white_background fortran() scheme()
+ * #bind PG_white_background fortran() scheme(pg-set-white-background!)
  */
 
 int PG_white_background(PG_device *dev, int t ARG(TRUE,in))
@@ -1281,7 +1281,7 @@ int PG_white_background(PG_device *dev, int t ARG(TRUE,in))
 /* PG_TURN_GRID - set the device grid flag
  *              - return the old value
  *
- * #bind PG_turn_grid fortran() scheme()
+ * #bind PG_turn_grid fortran() scheme(pg-set-grid-flag!)
  */
 
 int PG_turn_grid(PG_device *dev, int t ARG(TRUE,in))
@@ -1301,7 +1301,7 @@ int PG_turn_grid(PG_device *dev, int t ARG(TRUE,in))
 /* PG_TURN_DATA_ID - set the device data_id flag
  *                 - return the old value
  *
- * #bind PG_turn_data_id fortran() scheme()
+ * #bind PG_turn_data_id fortran() scheme(pg-set-data-id-flag!)
  */
 
 int PG_turn_data_id(PG_device *dev, int t ARG(TRUE,in))
@@ -1321,7 +1321,7 @@ int PG_turn_data_id(PG_device *dev, int t ARG(TRUE,in))
 /* PG_TURN_SCATTER - set the device scatter flag
  *                 - return the old value
  *
- * #bind PG_turn_scatter fortran() scheme()
+ * #bind PG_turn_scatter fortran() scheme(pg-set-scatter-flag!)
  */
 
 int PG_turn_scatter(PG_device *dev, int t ARG(TRUE,in))
@@ -1341,7 +1341,7 @@ int PG_turn_scatter(PG_device *dev, int t ARG(TRUE,in))
 /* PG_TURN_AUTODOMAIN - set the device autodomain flag
  *                    - return the old value
  *
- * #bind PG_turn_autodomain fortran() scheme()
+ * #bind PG_turn_autodomain fortran() scheme(pg-set-autodomain!)
  */
 
 int PG_turn_autodomain(PG_device *dev, int t ARG(TRUE,in))
@@ -1361,7 +1361,7 @@ int PG_turn_autodomain(PG_device *dev, int t ARG(TRUE,in))
 /* PG_TURN_AUTORANGE - set the device autorange flag
  *                   - return the old value
  *
- * #bind PG_turn_autorange fortran() scheme()
+ * #bind PG_turn_autorange fortran() scheme(pg-set-autorange!)
  */
 
 int PG_turn_autorange(PG_device *dev, int t ARG(TRUE,in))
@@ -1381,7 +1381,7 @@ int PG_turn_autorange(PG_device *dev, int t ARG(TRUE,in))
 /* PG_TURN_AUTOPLOT - set the device autoplot flag
  *                  - return the old value
  *
- * #bind PG_turn_autoplot fortran() scheme()
+ * #bind PG_turn_autoplot fortran() scheme(pg-set-autoplot!)
  */
 
 int PG_turn_autoplot(PG_device *dev, int t ARG(TRUE,in))
@@ -1400,7 +1400,7 @@ int PG_turn_autoplot(PG_device *dev, int t ARG(TRUE,in))
 
 /* PG_N_EVENTS_PENDING - return the number of events pending on device
  *
- * #bind PG_n_events_pending fortran() scheme()
+ * #bind PG_n_events_pending fortran() scheme(pg-get-n-events-pending)
  */
 
 int PG_n_events_pending(PG_device *dev)
@@ -1653,7 +1653,7 @@ void PG_release_current_device(PG_device *dev)
 
 /* PG_UPDATE_VS - update the view surface of the device DEV
  *
- * #bind PG_update_vs fortran() scheme()
+ * #bind PG_update_vs fortran() scheme(pg-update-view-surface)
  */
 
 void PG_update_vs(PG_device *dev)

@@ -18,7 +18,7 @@ static object *_SXI_fe1(SS_psides *si, object *argl)
     _la1       = NULL;
     _la2       = 0;
     SS_args(si, argl,
-            SC_POINTER_I, &_la1,
+            G_STR, &_la1,
             SC_INT_I, &_la2,
             0);
 
@@ -50,7 +50,7 @@ static object *_SXI_fe2(SS_psides *si, object *argl)
     _linfo     = NULL;
     _ll        = 0;
     SS_args(si, argl,
-            SC_POINTER_I, &_ldev,
+            G_STR, &_ldev,
             SC_DOUBLE_P_I, &_lx,
             SC_DOUBLE_P_I, &_ly,
             SC_INT_I, &_ln,
@@ -59,7 +59,7 @@ static object *_SXI_fe2(SS_psides *si, object *argl)
             0);
 
     fe2(_ldev, _lx, _ly, _ln, _linfo, _ll);
-    _lo = SS_null;
+    _lo = SS_f;
 
     return(_lo);}
 

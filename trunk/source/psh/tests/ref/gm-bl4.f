@@ -95,7 +95,7 @@ module pact_bl4
          implicit none
          integer         :: fb10_f
          complex(4)      :: a1
-         type(C_PTR)     :: a2
+         complex(4)      :: a2(*)
       end function fb10_f
 
       function fb11_f(a1, a2) 
@@ -104,7 +104,7 @@ module pact_bl4
          implicit none
          integer         :: fb11_f
          complex(8)      :: a1
-         type(C_PTR)     :: a2
+         complex(8)      :: a2(*)
       end function fb11_f
 
       function fr1_f(a1) 
