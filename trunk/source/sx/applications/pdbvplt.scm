@@ -159,7 +159,7 @@
 
     (setup-viewport device shape)
     (pg-set-finish-state! device off)
-    (pg-set-clear-mode! device off)
+    (pg-set-clear-mode! off)
 
     (if overlay-flag
 	(begin (set-viewport-area! gr ms im)
@@ -176,7 +176,7 @@
 ; draw the images
     (view-up-i device im 1 dextr viewport-area-box)
 
-    (pg-set-clear-mode! device WINDOW)
+    (pg-set-clear-mode! WINDOW)
     (pg-update-view-surface device)
 
     (set! current-window swin)
@@ -1155,7 +1155,7 @@
 		 (apply pg-set-text-font! finfo)
 
 		 (pg-clear-window device)
-		 (pg-set-clear-mode! device off)
+		 (pg-set-clear-mode! off)
 		 (pg-set-finish-state! device off)
 		 (for-each (lambda (x)
 			     (vp-hardcopy device res
@@ -1163,7 +1163,7 @@
 					  rest))
 			   vports)
 
-		 (pg-set-clear-mode! device WINDOW)
+		 (pg-set-clear-mode! WINDOW)
 		 (pg-set-finish-state! device on)
 		 (pg-finish-plot device)
 
@@ -1590,12 +1590,12 @@
 	(pg-set-resolution-scale-factor! device res))
     (pg-clear-window device)
     (pg-set-finish-state! device off)
-    (pg-set-clear-mode! device off)
+    (pg-set-clear-mode! off)
 
     (vp-hardcopy device res vname rest)
 
     (pg-set-finish-state! device on)
-    (pg-set-clear-mode! device WINDOW)
+    (pg-set-clear-mode! WINDOW)
     (pg-finish-plot device))
 
 ;--------------------------------------------------------------------------

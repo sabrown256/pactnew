@@ -958,8 +958,11 @@ static void _PG_render_palette(PG_device *dev, PG_palette *pal,
  * #bind PG_draw_palette_n fortran() scheme()
  */
 
-void PG_draw_palette_n(PG_device *dev, double *dbx, double *rbx,
-		       double wid, int exact)
+void PG_draw_palette_n(PG_device *dev,
+		       double *dbx ARG([0.0,1.0,0.0,1.0,0.0,1.0]),
+                       double *rbx ARG([0.0,1.0,0.0,1.0,0.0,1.0]),
+		       double wid ARG(0.0),
+		       int exact ARG(FALSE))
    {int hvf;
     int nc[PG_SPACEDM];
     char format[20];

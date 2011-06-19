@@ -13,9 +13,13 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_GET_TEXT_EXT_N - return the text extent in NDC of the given string */
+/* PG_GET_TEXT_EXT_N - return the text extent in NDC of the given string
+ *
+ * #bind fortran() scheme()
+ */
 
-void PG_get_text_ext_n(PG_device *dev, int nd, PG_coord_sys cs, char *s, double *p)
+void PG_get_text_ext_n(PG_device *dev, int nd,
+		       PG_coord_sys cs ARG(NORMC), char *s, double *p)
    {
 
     p[0] = 0.0;
@@ -914,8 +918,10 @@ void PG_draw_box_n(PG_device *dev, int nd, PG_coord_sys cs, double *box)
  * #bind PG_fill_polygon_n fortran() scheme()
  */
 
-void PG_fill_polygon_n(PG_device *dev, int color, int mapped,
-		       int nd, PG_coord_sys cs, long n, double **r)
+void PG_fill_polygon_n(PG_device *dev, int color ARG(1),
+		       int mapped ARG(TRUE),
+		       int nd, PG_coord_sys cs ARG(WORLDC),
+		       long n, double **r)
    {int ip, np;
     double **cr;
     PM_polygon *pc, *py;

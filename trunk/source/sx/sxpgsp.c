@@ -142,21 +142,14 @@ static object *_SXI_clear_viewport(SS_psides *si, object *argl)
 
 static object *_SXI_set_clr_mode(SS_psides *si, object *argl)
    {int mode;
-    PG_device *dev;
     object *rv;
 
-    dev  = NULL;
     mode = CLEAR_SCREEN;
     SS_args(si, argl,
-            G_DEVICE, &dev,
 	    SC_INT_I, &mode,
             0);
 
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_SET_CLR_MODE", SS_null);
-
     PG_fset_clear_mode(mode);
-
     rv = SS_mk_integer(si, mode);
 
     return(rv);}
@@ -616,7 +609,7 @@ static object *_SXI_ddpn(SS_psides *si, object *argl)
     SS_args(si, argl,
             G_DEVICE, &dev,
             SC_INT_I, &nd,
-            SC_ENUM_I,    &cs,
+            SC_ENUM_I, &cs,
             SC_INT_I, &clip,
             0);
 
@@ -1152,10 +1145,10 @@ static object *_SXI_gtew(SS_psides *si, object *argl)
     cs  = NORMC;
     dev = NULL;
     SS_args(si, argl,
-            G_DEVICE,     &dev,
+            G_DEVICE, &dev,
             SC_INT_I, &nd,
-            SC_ENUM_I,    &cs,
-            SC_STRING_I,  &s,
+            SC_ENUM_I, &cs,
+            SC_STRING_I, &s,
             0);
 
     if (dev == NULL)
@@ -1538,7 +1531,7 @@ static object *_SXI_scpw(SS_psides *si, object *argl)
     PG_device *dev;
 
     dev  = NULL;
-    x[0] = 0.0;
+    x[0] = 1.0;
     x[1] = 0.0;
     SS_args(si, argl,
             G_DEVICE, &dev,
@@ -1564,7 +1557,7 @@ static object *_SXI_scuw(SS_psides *si, object *argl)
 
     dev  = NULL;
     x[0] = 0.0;
-    x[1] = 0.0;
+    x[1] = 1.0;
     SS_args(si, argl,
             G_DEVICE, &dev,
             SC_DOUBLE_I, &x[0],
@@ -1779,7 +1772,7 @@ static object *_SXI_slnw(SS_psides *si, object *argl)
     object *o;
 
     dev = NULL;
-    w   = 0.0;
+    w   = 0.1;
     SS_args(si, argl,
             G_DEVICE, &dev,
             SC_DOUBLE_I, &w,

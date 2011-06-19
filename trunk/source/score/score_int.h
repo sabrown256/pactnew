@@ -49,6 +49,35 @@
 
 /*--------------------------------------------------------------------------*/
 
+/* DEPRECATE - mark deprecated functions */
+
+#ifdef DEPRECATE_RUNTIME
+
+#define DEPRECATED(_date)                                                    \
+   printf("WARNING: %s deprecated on %s\n", __func__, #_date)
+
+#else
+
+#define DEPRECATED(_date)
+
+#endif
+
+/* helpers for bindings */
+
+/* variadic macro example:
+ * #define eprintf(...) fprintf (stderr, __VA_ARGS__)
+ */
+
+/* ARG - specify default value, in/out, etc
+ *     - ignored by CC but parsed by BLANG
+ */
+
+#undef ARG
+#define ARG(...)
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 #define SC_PATH_DELIMITER   _SC_os.path_delimiter
 #define SC_FILE_LENGTH      _SC_os.file_length
 #define SC_QUERY_MODE       _SC_os.query_mode

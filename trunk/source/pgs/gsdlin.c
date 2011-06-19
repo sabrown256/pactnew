@@ -122,8 +122,11 @@ void PG_draw_multiple_line(PG_device *dev, int nlines,
  * #bind PG_draw_line_n fortran() scheme()
  */
 
-void PG_draw_line_n(PG_device *dev, int nd, PG_coord_sys cs,
-		    double *x1, double *x2, int clip)
+void PG_draw_line_n(PG_device *dev, int nd,
+		    PG_coord_sys cs ARG(WORLDC),
+		    double *x1 ARG([0.0,0.0,0.0]),
+		    double *x2 ARG([1.0,1.0,1.0]),
+		    int clip)
    {int id;
     double xi[PG_SPACEDM][2];
     double l1[PG_SPACEDM], l2[PG_SPACEDM];
@@ -164,8 +167,10 @@ void PG_draw_line_n(PG_device *dev, int nd, PG_coord_sys cs,
  * #bind PG_draw_polyline_n fortran() scheme()
  */
  
-void PG_draw_polyline_n(PG_device *dev, int nd, PG_coord_sys cs,
-			long n, double **x, int clip)
+void PG_draw_polyline_n(PG_device *dev, int nd,
+			PG_coord_sys cs ARG(WORLDC),
+			long n, double **x,
+			int clip ARG(TRUE))
    {int i, j, m, id;
     double xa, xb;
     double **rx, *px;
@@ -220,8 +225,10 @@ void PG_draw_polyline_n(PG_device *dev, int nd, PG_coord_sys cs,
  * #bind PG_draw_disjoint_polyline_n fortran() scheme()
  */
 
-void PG_draw_disjoint_polyline_n(PG_device *dev, int nd, PG_coord_sys cs,
-				 long n, double **x, int clip)
+void PG_draw_disjoint_polyline_n(PG_device *dev, int nd,
+				 PG_coord_sys cs ARG(WORLDC),
+				 long n, double **x,
+				 int clip ARG(TRUE))
    {
 
     if (dev != NULL)
@@ -247,10 +254,13 @@ void PG_draw_disjoint_polyline_n(PG_device *dev, int nd, PG_coord_sys cs,
  *             - (increasing counter-clockwise)
  *             - angle units (radians or degrees) specified by UNIT
  *             - from central point (X, Y)
+ *
+ * #bind PG_draw_rad fortran() scheme()
  */
 
 void PG_draw_rad(PG_device *dev, double rmin, double rmax, double a,
-		 double x, double y, int unit)
+		 double x, double y,
+		 int unit ARG(DEGREE))
    {double ca, sa;
     double x1[PG_SPACEDM], x2[PG_SPACEDM];
 

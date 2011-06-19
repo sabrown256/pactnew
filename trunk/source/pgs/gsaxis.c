@@ -577,7 +577,7 @@ static void _PG_aux_axis(PG_device *dev, int axis_type)
  * #bind PG_axis fortran() scheme ()
  */
  
-void PG_axis(PG_device *dev, int axis_type)
+void PG_axis(PG_device *dev, int axis_type ARG(CARTESIAN_2D))
    {PG_dev_attributes *attr;
 
     if (_PG_gattrs.axis_on == FALSE)
