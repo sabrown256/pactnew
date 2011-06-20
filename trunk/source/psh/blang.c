@@ -2492,7 +2492,7 @@ static void scheme_wrap_local_call(FILE *fp, fdecl *dcl)
 static void scheme_wrap_local_return(FILE *fp, fdecl *dcl,
 				     fparam knd, char *so)
    {char t[MAXLINE], dty[MAXLINE];
-    char *ty;
+    char *ty, *sty;
 
     ty = dcl->proto.type;
 
@@ -2502,9 +2502,13 @@ static void scheme_wrap_local_return(FILE *fp, fdecl *dcl,
        {if (IS_NULL(so) == FALSE)
 	   {switch (knd)
 	       {case FP_ANY :
-		     snprintf(t, MAXLINE,
-			      "\n/* no way to return '%s' */\n", ty);
-		     nstrcat(t, MAXLINE, "    _lo = SS_null;\n");
+		     sty = lookup_type(NULL, ty, MODE_C, MODE_S);
+		     if (strcmp(sty, "SC_ENUM_I") == 0)
+		        snprintf(t, MAXLINE, "    _lo = SS_mk_integer(si, _rv);\n");
+		     else
+		        {snprintf(t, MAXLINE,
+				  "\n/* no way to return '%s' */\n", ty);
+			 nstrcat(t, MAXLINE, "    _lo = SS_null;\n");};
 		     break;
 
 	        case FP_ARRAY :
