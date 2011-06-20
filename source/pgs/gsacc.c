@@ -490,7 +490,7 @@ int PG_fset_identifier(PG_graph *g, int id ARG('A',in))
 /* PG_FGET_LOGICAL_OP - return the device logical operation flag
  *                    - default is GS_COPY
  *
- * #bind PG_fget_logical_op fortran() scheme()
+ * #bind PG_fget_logical_op fortran() scheme(pg-get-logical-op)
  */
 
 PG_logical_operation PG_fget_logical_op(PG_device *dev)
@@ -509,7 +509,7 @@ PG_logical_operation PG_fget_logical_op(PG_device *dev)
 /* PG_FSET_LOGICAL_OP - set the device logical operation flag
  *                    - return the old value
  *
- * #bind PG_fset_logical_op fortran() scheme()
+ * #bind PG_fset_logical_op fortran() scheme(pg-set-logical-op!)
  */
 
 PG_logical_operation PG_fset_logical_op(PG_device *dev,

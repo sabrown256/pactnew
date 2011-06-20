@@ -760,30 +760,6 @@ static object *_SXI_gclp(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* _SXI_GLOP - get the logical operation */
-
-static object *_SXI_glop(SS_psides *si, object *argl)
-   {PG_device *dev;
-    PG_logical_operation lop;
-    object *o;
-
-    dev = NULL;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_GLOP", SS_null);
-
-    lop = PG_fget_logical_op(dev);
-
-    o = SS_mk_integer(si, lop);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
 /* _SXI_GMXI - get the maximum intensities */
 
 static object *_SXI_gmxi(SS_psides *si, object *argl)
@@ -1120,31 +1096,6 @@ static object *_SXI_sclp(SS_psides *si, object *argl)
     PG_fset_clipping(dev, c);
 
     return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_SLOP - set the logical operation */
-
-static object *_SXI_slop(SS_psides *si, object *argl)
-   {PG_logical_operation lop;
-    PG_device *dev;
-    object *o;
-
-    dev = NULL;
-    lop = GS_COPY;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_ENUM_I, &lop,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_SLOP", SS_null);
-
-    lop = PG_fset_logical_op(dev, lop);
-    o   = SS_mk_integer(si, lop);
-
-    return(o);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -2423,11 +2374,6 @@ void _SX_install_pgs_primitives(SS_psides *si)
                SS_nargs,
                _SXI_gatst, SS_PR_PROC);
 
-    SS_install(si, "pg-logical-op",
-               "Get the logical operation on the given device",
-               SS_nargs,
-               _SXI_glop, SS_PR_PROC);
-
     SS_install(si, "list->pg-palette",
                "Convert a list of values into a palette and register it in the device",
                SS_nargs,
@@ -2507,11 +2453,6 @@ void _SX_install_pgs_primitives(SS_psides *si)
                "Set the clipping state of the given device",
                SS_nargs,
                _SXI_sclp, SS_PR_PROC);
-
-    SS_install(si, "pg-set-logical-op!",
-               "Set the logical operation on the given device",
-               SS_nargs,
-               _SXI_slop, SS_PR_PROC);
 
     SS_install(si, "pg-set-maximum-intensity!",
                "Set the maximum fractional intensity for colors (0.0 to 1.0) and optionally for RGB too",
@@ -3434,6 +3375,55 @@ static object *_SXI_clear_viewport(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+ 
+/* _SXI_GLOP - get the logical operation */
+
+static object *_SXI_glop(SS_psides *si, object *argl)
+   {PG_device *dev;
+    PG_logical_operation lop;
+    object *o;
+
+    dev = NULL;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_GLOP", SS_null);
+
+    lop = PG_fget_logical_op(dev);
+
+    o = SS_mk_integer(si, lop);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SLOP - set the logical operation */
+
+static object *_SXI_slop(SS_psides *si, object *argl)
+   {PG_logical_operation lop;
+    PG_device *dev;
+    object *o;
+
+    dev = NULL;
+    lop = GS_COPY;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_ENUM_I, &lop,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_SLOP", SS_null);
+
+    lop = PG_fset_logical_op(dev, lop);
+    o   = SS_mk_integer(si, lop);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _SX_INSTALL_PGS_PRIMITIVES - install the PGS primitives */
 
@@ -3619,6 +3609,16 @@ void _SX_install_pgs_primitives(SS_psides *si)
                "Clear the current viewport of the given device",
                SS_nargs,
                _SXI_clear_viewport, SS_PR_PROC);
+
+    SS_install(si, "pg-logical-op",
+               "Get the logical operation on the given device",
+               SS_nargs,
+               _SXI_glop, SS_PR_PROC);
+
+    SS_install(si, "pg-set-logical-op!",
+               "Set the logical operation on the given device",
+               SS_nargs,
+               _SXI_slop, SS_PR_PROC);
 
     return;}
 
