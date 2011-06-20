@@ -129,8 +129,9 @@ genmod : ${PACTTmpDir}/gm-${LibName}.f
 IncAction = @pact genmod
 LibAction = @(cd ${PACTTmpDir} ; pact PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=\"\" -f ../../pre-Make modules)
 
-Libs = -lfpact ${LPDB} ${LPML} ${LSCORE} ${MDLib} ${DPLib}
-NGLibs = -lfpact ${LPANACEA} ${LPGS} ${MDGLib} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib} ${DPLib}
+SLibs = ${DPLib} ${FLib} ${MDLib}
+Libs = -lfpact ${LPDB} ${LPML} ${LSCORE} ${SLibs}
+NGLibs = -lfpact ${LPANACEA} ${LPGS} ${MDGLib} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${SLibs}
 
 #
 # SCORE tests

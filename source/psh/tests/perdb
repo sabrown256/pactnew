@@ -43,7 +43,8 @@ while ($#argv > 0)
    shift
 end
 
-rm -f $TestDir/*.*
+touch dbfoo.db
+rm -f $TestDir/db*.*
 
 InitLog Log $TestDir/log.perdb.$LogSfx
 

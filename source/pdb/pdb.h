@@ -1123,6 +1123,23 @@ extern void
  PD_typedef_primitive_types(PDBfile *file);
 
 
+/* PDMAP.C declarations */
+
+extern int
+ PD_wrt_curve_alt(PDBfile *file, char *labl,
+		  int n, double *x, double *y, int *sic),
+ PD_wrt_curve_y_alt(PDBfile *file, char *labl,
+		    int n, int ix, double *y, int *sic),
+ PD_wrt_set(PDBfile *file, char *dname, int *adp, double *adm),
+ PD_wrt_map(PDBfile *file,
+	    char *dname, int *adp, double *adm,
+	    char *rname, int *arp, double *arm,
+	    int *sim),
+ PD_wrt_map_ran(PDBfile *file, char *dname,
+		char *rname, int *arp, double *arm,
+		pcons *info, int *sim);
+
+
 /* PDMEMB.C declarations */
 
 extern char

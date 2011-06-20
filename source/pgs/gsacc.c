@@ -418,9 +418,12 @@ int PG_fset_finish_state(PG_device *dev, int v ARG(TRUE,in))
 void PG_fget_font(PG_device *dev, char **of, char **ost, int *osz)
    {
 
-    *of  = CSTRSAVE(dev->type_face);
-    *ost = CSTRSAVE(dev->type_style);
-    *osz = dev->type_size;
+    if (of != NULL)
+       *of  = CSTRSAVE(dev->type_face);
+    if (ost != NULL)
+       *ost = CSTRSAVE(dev->type_style);
+    if (osz != NULL)
+       *osz = dev->type_size;
 
     return;}
 

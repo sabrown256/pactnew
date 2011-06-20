@@ -223,67 +223,37 @@
 
 ! ... local variables
       integer :: i, st
-      integer :: dp(5), rp(5)
+      integer :: dp(5), rp(5), pim(1)
       real*8, target :: dm(0:99), rm(0:99)
-
-      type(C_PTR), target :: ad(1), ar(1)
-      type(C_PTR), target :: dom, ran, map
-      type(C_PTR) :: adp, arp
 
       do i = 0, 99
          dm(i) = 6.28*float(i)/99.0
          rm(i) = sin(6.28*float(i)/99.0)
       enddo
 
-      ad(1) = C_LOC(dm)
-      ar(1) = C_LOC(rm)
+      pim = 0
+      dp(1) = 7
+      dp(2) = 1
+      dp(3) = 1
+      dp(4) = 100
+      dp(5) = 100
+      rp(1) = 6
+      rp(2) = 1
+      rp(3) = 1
+      rp(4) = 100
+      rp(5) = 100
 
-      adp = C_LOC(ad)
-      arp = C_LOC(ar)
-
-      dp(1) = 100
-      rp(1) = 100
-
-! ... does what pfwmap does
-      dom = pm_make_set_alt_f("Domain0", "double", 1, 1, dp, 1, adp)
-      ran = pm_make_set_alt_f("Range0", "double", 1, 1, rp, 1, arp)
-      map = pm_make_mapping_f("{x}->{f}", "Logical-Rectangular", &
-                              dom, ran, N_CENT, C_NULL_PTR)
-
-!      st = wpdwmap(fileid, 'Domain0', dp, dm, 'Range0', rp, rm, pim)
-! GOTCHA: there is a dereference issue
-      st = pd_write_f(fileid, 'Mapping0', 'PM_mapping *', map)
-      if (st .eq. 0) then
+      st = pd_wrt_map_f(fileid, "Domain0", dp, dm, "Range0", rp, rm, pim)
+      if (st .eq. 0) &
          call errproc
-      else
-         call pm_rel_mapping_f(map, 0, 0)
-      endif
 
-! ... does what pfwset does
-! GOTCHA: there is a dereference issue
-      st = pd_write_f(fileid, 'Domain1', 'PM_set *', dom)
-      if (st .eq. 0) then
+      st = pd_wrt_set_f(fileid, "Domain1", dp, dm)
+      if (st .eq. 0) &
          call errproc
-      else
-         call pm_rel_set_f(dom, 1)
-      endif
 
-!      if (wpdwset(fileid, 'Domain1', dp, dm) .eq. 0) &
-!         call errproc
-
-! ... does what pfwran does
-      map = pm_make_mapping_f("Domain1->Range1", "Logical-Rectangular", &
-                              C_NULL_PTR, ran, N_CENT, C_NULL_PTR)
-! GOTCHA: there is a dereference issue
-      st = pd_write_f(fileid, 'Mapping1', 'PM_mapping *', map)
-      if (st .eq. 0) then
+      st = pd_wrt_map_ran_f(fileid, "Domain1", "Range1", rp, rm, C_NULL_PTR, pim)
+      if (st .eq. 0) &
          call errproc
-      else
-         call pm_rel_mapping_f(map, 1, 1)
-      endif
-
-!      if (wpdwran(fileid, 'Domain1', 'Range1', rp, rm, pim) .eq. 0) &
-!         call errproc
 
       return
       end subroutine wrtmap

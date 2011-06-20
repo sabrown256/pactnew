@@ -34,6 +34,7 @@ Tool FC {
    Flags   += [ _env_ = Bits ;                # address bit size
                 *     = -m* ]
    LD_RPath = -z -rpath,@
+#   LD_Lib   = -lgfortran
    Version  = -V
 }
 

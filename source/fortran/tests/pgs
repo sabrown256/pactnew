@@ -99,7 +99,7 @@ if ($LStat == 0) then
       NoteD $LogF -n "                        contour ........................ "
       Note $LogF ""
       if ("$Valgrind" == "") then
-         flog $LogF $CFE $BinDir/gsfcts
+         flog $LogF $CFE $BinDir/gsfcts -s
          set xstatus = $status
       else
          Note $LogF ""

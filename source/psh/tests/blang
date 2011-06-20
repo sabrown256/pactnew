@@ -24,6 +24,8 @@ else
    source ../../../scripts/test-env
 endif
 
+source $IncDir/env-pact.csh
+
 while ($#argv > 0)
    switch ($1)
       case -h:
@@ -65,8 +67,8 @@ else
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   flog $Log set cc = ( ${PACT_CC_EXE} ${CDefDebug} ${CC_Flags} -I${IncDir} ${DP_Inc} )
-   flog $Log set fc = ( ${PACT_FC_EXE} ${CDefDebug} ${FC_Flags} -I${IncDir} )
+   flog $Log set cc = ( ${CC_Exe} ${CDefDebug} ${CC_Flags} -I${IncDir} ${DP_Inc} )
+   flog $Log set fc = ( ${FC_Exe} ${CDefDebug} ${FC_Flags} -I${IncDir} )
 
    @ nerr = 0
 
@@ -98,26 +100,33 @@ else
       awk '$0 != "" { printf("extern %s;\n", $0); }' >>& $hdr
 
 # compile Fortran module
-      Note $Log ""
-      Note $Log "Compile fortran module"
-      flog $Log set file = gm-$i.f
-      flog $Log ${fc} -c $file
-      @ xstatus = $status
-      if (-f $RefDir/$file) then
-         flog $Log diff $file $RefDir/$file
-         if ($status != 0) then
-            @ xstatus = $xstatus + 1
-         endif
-      else
-         flog $Log cp $file $RefDir/$file
-      endif
-      if ($xstatus == 0) then
+      if ($FC_Exe == none) then
          NoteD $Log -n "."
       else
-         NoteD $Log -n "x"
-         @ lerr = $lerr + 1
+         Note $Log ""
+         Note $Log "Compile fortran module"
+         flog $Log set file = gm-$i.f
+         flog $Log ${fc} -c $file
+         @ xstatus = $status
+         if (-f $RefDir/$file) then
+            flog $Log ( grep -v 'isizea =' $file >&! $file.cmp )
+            flog $Log ( grep -v 'isizea =' $RefDir/$file >&! $file.ref.cmp )
+            flog $Log diff $file.cmp $file.ref.cmp
+            if ($status != 0) then
+               @ xstatus = $xstatus + 1
+               flog $Log rm -f $file.cmp $file.ref.cmp
+            endif
+         else
+            flog $Log cp $file $RefDir/$file
+         endif
+         if ($xstatus == 0) then
+            NoteD $Log -n "."
+         else
+            NoteD $Log -n "x"
+            @ lerr = $lerr + 1
+         endif
+         unset file
       endif
-      unset file
 
 # compile Fortran wrapper
       Note $Log ""
@@ -229,6 +238,7 @@ else
       @ Err = 1
    else
       NoteD $Log "                    BLANG Test ..................... PASSED ($ETime)"
+      flog $Log rm -f *.o *.mod
    endif
 
 #--------------------------------------------------------------------------
