@@ -1488,11 +1488,9 @@ FIXNUM FF_ID(pfwulc, PFWULC)(FIXNUM *sfid, FIXNUM *sncl, char *labl,
     n    = *snp;
     file = SC_GET_POINTER(PDBfile, *sfid);
 
-    rv = PD_wrt_pdb_curve(file, s, n, px, py, i);
+    rv = PD_wrt_curve_alt(file, s, n, px, py, &i);
 
-/* increment the curve count if no error */
-    if (rv)
-       (*sic)++;
+    *sic = i;
 
     return(rv);}
 
@@ -1514,50 +1512,52 @@ FIXNUM FF_ID(pfwuly, PFWULY)(FIXNUM *sfid, FIXNUM *sncl, char *labl,
     n    = *snp;
     file = SC_GET_POINTER(PDBfile, *sfid);
 
-    rv = PD_wrt_pdb_curve_y(file, s, n, (int) *six, py, i);
+    rv = PD_wrt_curve_y_alt(file, s, n, *six, py, &i);
 
-/* increment the curve count if no error */
-    if (rv)
-       (*sic)++;
+    *sic = i;
 
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_BUILD_SET - build and return a set from FORTRAN type information */
+/* PFWSET - write a PM_set into a PDB file
+ *        - the set information (dname, dp, dm) is structured
+ *        - as follows:
+ *        -
+ *        - dname : the FORTRAN version of the set name left justified
+ *        -
+ *        - dp[1]              : the number of characters in dname
+ *        - dp[2]              : the dimensionality of the set - nd
+ *        - dp[3]              : the dimensionality of the elements - nde
+ *        - dp[4]              : the number of elements in the set - ne
+ *        - dp[5] ... dp[5+nd] : the sizes in each dimension
+ *        -
+ *        - dm[1]      - dm[ne]          : values of first component of
+ *        -                                elements
+ *        -            .
+ *        -            .
+ *        -            .
+ *        -
+ *        - dm[nde*ne] - dm[nde*ne + ne] : values of nde'th component of
+ *        -                                elements
+ */
 
-static PM_set *_PD_build_set(FIXNUM *ai, double *ad, char *sname)
-   {int i, j, nd, nde, ne;
-    int *maxes;
-    void **elem;
-    double *data;
-    double tmp;
-    PM_set *set;
+FIXNUM FF_ID(pfwset, PFWSET)(FIXNUM *sfid, char *dname,
+			     FIXNUM *adp, double *adm)
+   {FIXNUM rv;
+    char s[MAXLINE];
+    PDBfile *file;
 
-    nd  = ai[0];
-    nde = ai[1];
-    ne  = ai[2];
+    rv = TRUE;
 
-    maxes = CMAKE_N(int, nd);
-    for (i = 0; i < nd; i++)
-        maxes[i] = (int) ai[i+3];
+    file = SC_GET_POINTER(PDBfile, *sfid);
 
-    elem = CMAKE_N(void *, nde);
-    for (i = 0; i < nde; i++)
-        {data    = CMAKE_N(double, ne);
-         elem[i] = (void *) data;
-         for (j = 0; j < ne; j++)
-             {tmp = *ad++;
-              *data++ = tmp;};};
+    SC_FORTRAN_STR_C(s, dname, adp[0]);
 
-    set = PM_mk_set(sname, SC_DOUBLE_S, FALSE,
-		    ne, nd, nde, maxes, elem,
-		    PM_fp_opers, NULL,
-		    NULL, NULL, NULL, NULL, NULL, NULL,
-		    NULL);
+    rv = PD_wrt_set(file, s, adp, adm);
 
-    return(set);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1589,37 +1589,114 @@ FIXNUM FF_ID(pfwmap, PFWMAP)(FIXNUM *sfid, char *dname,
 			     FIXNUM *adp, double *adm, char *rname,
 			     FIXNUM *arp, double *arm, FIXNUM *sim)
    {FIXNUM rv;
-    char s[MAXLINE];
-    PM_mapping *f;
-    PM_set *domain, *range;
+    char d[MAXLINE], r[MAXLINE];
     PDBfile *file;
-
-    rv = TRUE;
 
     file = SC_GET_POINTER(PDBfile, *sfid);
 
-    if ((SC_hasharr_lookup(file->chart, "PM_mapping") == NULL) &&
-	(!PD_def_mapping(file)))
-       rv = FALSE;
+    SC_FORTRAN_STR_C(d, dname, adp[0]);
+    SC_FORTRAN_STR_C(r, rname, arp[0]);
 
+    rv = PD_wrt_map(file, d, adp, adm, r, arp, arm, sim);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PFWRAE - write a PM_mapping into a PDB file
+ *        - only the range part of the mapping is given
+ *        - but additional information is given in INFO such as
+ *        - an existence map and centering are included
+ *        - the domain (common to many mappings) is written separately
+ *        -
+ *        - the domain name is the only part of the domain specified
+ *        -
+ *        - the range information (rname, rp, rm) is structured
+ *        - as follows:
+ *        -
+ *        - rname : the FORTRAN version of the set name left justified
+ *        -
+ *        - rp[1]              : the number of characters in rname
+ *        - rp[2]              : the dimensionality of the set - nd
+ *        - rp[3]              : the dimensionality of the elements - nde
+ *        - rp[4]              : the number of elements in the set - ne
+ *        - rp[5] ... rp[5+nd] : the sizes in each dimension
+ *        -
+ *        - rm[1]      - rm[ne]          : values of first component of
+ *        -                                elements
+ *        -            .
+ *        -            .
+ *        -            .
+ *        -
+ *        - rm[nde*ne] - rm[nde*ne + ne] : values of nde'th component of
+ *        -                                elements
+ */
+
+FIXNUM FF_ID(pfwrae, PFWRAE)(FIXNUM *sfid, char *dname, FIXNUM *sncd,
+			     char *rname, FIXNUM *arp, double *arm,
+			     FIXNUM *sinf, FIXNUM *sim)
+   {FIXNUM rv;
+    char d[MAXLINE], r[MAXLINE];
+    pcons *info;
+    PDBfile *file;
+
+    file = SC_GET_POINTER(PDBfile, *sfid);
+    if (sinf == NULL)
+       info = NULL;
     else
-       {SC_FORTRAN_STR_C(s, dname, adp[0]);
-	domain = _PD_build_set(adp+1, adm, s);
+       info = SC_GET_POINTER(pcons, *sinf);
 
-	SC_FORTRAN_STR_C(s, rname, arp[0]);
-	range  = _PD_build_set(arp+1, arm, s);
+    SC_FORTRAN_STR_C(d, dname, *sncd);
+    SC_FORTRAN_STR_C(r, rname, arp[0]);
 
-	snprintf(s, MAXLINE, "%s->%s", domain->name, range->name);
-	f = PM_make_mapping(s, PM_LR_S, domain, range, N_CENT, NULL);
+    rv = PD_wrt_map_ran(file, d, r, arp, arm, info, sim);
 
-/* disconnect the function pointers or undefined structs/members */
-	f->domain->opers = NULL;
-	f->range->opers  = NULL;
+    return(rv);}
 
-	if (!PD_put_mapping(file, f, (*sim)++))
-	   rv = FALSE;
-	else
-	   PM_rel_mapping(f, TRUE, TRUE);};
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PFWRAN - write a PM_mapping into a PDB file
+ *        - only the range part of the mapping is given
+ *        - the domain (common to many mappings) is written separately
+ *        -
+ *        - the domain name is the only part of the domain specified
+ *        -
+ *        - the range information (rname, rp, rm) is structured
+ *        - as follows:
+ *        -
+ *        - rname : the FORTRAN version of the set name left justified
+ *        -
+ *        - rp[1]              : the number of characters in rname
+ *        - rp[2]              : the dimensionality of the set - nd
+ *        - rp[3]              : the dimensionality of the elements - nde
+ *        - rp[4]              : the number of elements in the set - ne
+ *        - rp[5] ... rp[5+nd] : the sizes in each dimension
+ *        -
+ *        - rm[1]      - rm[ne]          : values of first component of
+ *        -                                elements
+ *        -            .
+ *        -            .
+ *        -            .
+ *        -
+ *        - rm[nde*ne] - rm[nde*ne + ne] : values of nde'th component of
+ *        -                                elements
+ */
+
+FIXNUM FF_ID(pfwran, PFWRAN)(FIXNUM *sfid, char *dname, FIXNUM *sncd,
+			     char *rname, FIXNUM *arp, double *arm,
+			     FIXNUM *sim)
+   {FIXNUM rv;
+    char d[MAXLINE], r[MAXLINE];
+    PDBfile *file;
+
+    file = SC_GET_POINTER(PDBfile, *sfid);
+
+    SC_FORTRAN_STR_C(d, dname, *sncd);
+    SC_FORTRAN_STR_C(r, rname, arp[0]);
+
+    rv = PD_wrt_map_ran(file, d, r, arp, arm, NULL, sim);
 
     return(rv);}
 
@@ -1683,216 +1760,6 @@ FIXNUM FF_ID(pfwima, PFWIMA)(FIXNUM *sfid, FIXNUM *sncn, char *name,
 	   rv = FALSE;
 	else
 	   PD_rel_image(im);};
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PFWSET - write a PM_set into a PDB file
- *        - the set information (dname, dp, dm) is structured
- *        - as follows:
- *        -
- *        - dname : the FORTRAN version of the set name left justified
- *        -
- *        - dp[1]              : the number of characters in dname
- *        - dp[2]              : the dimensionality of the set - nd
- *        - dp[3]              : the dimensionality of the elements - nde
- *        - dp[4]              : the number of elements in the set - ne
- *        - dp[5] ... dp[5+nd] : the sizes in each dimension
- *        -
- *        - dm[1]      - dm[ne]          : values of first component of
- *        -                                elements
- *        -            .
- *        -            .
- *        -            .
- *        -
- *        - dm[nde*ne] - dm[nde*ne + ne] : values of nde'th component of
- *        -                                elements
- */
-
-FIXNUM FF_ID(pfwset, PFWSET)(FIXNUM *sfid, char *dname,
-			     FIXNUM *adp, double *adm)
-   {FIXNUM rv;
-    char s[MAXLINE];
-    PDBfile *file;
-    PM_set *set;
-
-    rv = TRUE;
-
-    file = SC_GET_POINTER(PDBfile, *sfid);
-
-    if ((SC_hasharr_lookup(file->chart, "PM_set") == NULL) &&
-	(!PD_def_mapping(file)))
-       rv = FALSE;
-
-    else
-       {SC_FORTRAN_STR_C(s, dname, adp[0]);
-	set = _PD_build_set(adp+1, adm, s);
-
-/* disconnect the function pointers or undefined structs/members */
-	set->opers = NULL;
-
-	if (!PD_put_set(file, set))
-	   rv = FALSE;
-	else
-	   PM_rel_set(set, FALSE);};
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PFWRAE - write a PM_mapping into a PDB file
- *        - only the range part of the mapping is given
- *        - but additional information is given in INFO such as
- *        - an existence map and centering are included
- *        - the domain (common to many mappings) is written separately
- *        -
- *        - the domain name is the only part of the domain specified
- *        -
- *        - the range information (rname, rp, rm) is structured
- *        - as follows:
- *        -
- *        - rname : the FORTRAN version of the set name left justified
- *        -
- *        - rp[1]              : the number of characters in rname
- *        - rp[2]              : the dimensionality of the set - nd
- *        - rp[3]              : the dimensionality of the elements - nde
- *        - rp[4]              : the number of elements in the set - ne
- *        - rp[5] ... rp[5+nd] : the sizes in each dimension
- *        -
- *        - rm[1]      - rm[ne]          : values of first component of
- *        -                                elements
- *        -            .
- *        -            .
- *        -            .
- *        -
- *        - rm[nde*ne] - rm[nde*ne + ne] : values of nde'th component of
- *        -                                elements
- */
-
-FIXNUM FF_ID(pfwrae, PFWRAE)(FIXNUM *sfid, char *dname, FIXNUM *sncd,
-			     char *rname, FIXNUM *arp, double *arm,
-			     FIXNUM *sinf, FIXNUM *sim)
-   {int i;
-    FIXNUM rv;
-    char d[MAXLINE], r[MAXLINE], s[MAXLINE], name[MAXLINE];
-    PM_centering cent, *pcent;
-    PM_mapping *f, *link, *pm;
-    PM_set *range, *bs;
-    pcons *info, *alst;
-    PDBfile *file;
-
-    rv = TRUE;
-
-    file = SC_GET_POINTER(PDBfile, *sfid);
-    if (sinf == NULL)
-       info = NULL;
-    else
-       info = SC_GET_POINTER(pcons, *sinf);
-
-    if (SC_hasharr_lookup(file->chart, "PM_mapping") == NULL)
-       {if (!PD_def_mapping(file))
-           return(FALSE);};
-
-    SC_FORTRAN_STR_C(d, dname, *sncd);
-    SC_FORTRAN_STR_C(r, rname, arp[0]);
-
-    pcent = (PM_centering *) SC_assoc(info, "CENTERING");
-    cent  = (pcent == NULL) ? N_CENT : *pcent;
-    range = _PD_build_set(arp+1, arm, r);
-
-    snprintf(s, MAXLINE, "%s->%s", d, range->name);
-    f = PM_make_mapping(s, PM_LR_S, NULL, range, cent, NULL);
-
-/* disconnect the function pointers or undefined structs/members */
-    f->range->opers = NULL;
-
-    link = f;
-    if (info != NULL)
-
-/* check for mappings to overlay */
-       {for (i = 0; TRUE; i++)
-	    {snprintf(name, MAXLINE, "OVERLAY[%d]", i);
-	     pm = (PM_mapping *) SC_assoc(info, name);
-	     if (pm == NULL)
-	        break;
-
-	     else
-	        {link->next = pm;
-		 link       = pm;
-		 SC_mark(pm, 1);
-
-		 info = SC_rem_alist(info, name);};};
-
-/* check for boundary sets to overlay */
-	for (i = 0; TRUE; i++)
-	    {snprintf(name, MAXLINE, "BND[%d]", i);
-	     bs = (PM_set *) SC_assoc(info, name);
-	     if (bs == NULL)
-	        break;
-
-	     else
-	        {pm = PM_make_mapping(name, PM_AC_S, bs, NULL,
-				      N_CENT, NULL);
-
-		 link->next = pm;
-		 link       = pm;
-		 SC_mark(pm, 1);
-
-		 info = SC_rem_alist(info, name);};};
-
-/* append all other info to the mapping's info list */
-	alst   = (pcons *) f->map;
-	alst   = SC_append_alist(alst, info);
-	f->map = (void *) alst;};
-
-    if (!PD_put_mapping(file, f, (*sim)++))
-       rv = FALSE;
-    else
-       PM_rel_mapping(f, TRUE, TRUE);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PFWRAN - write a PM_mapping into a PDB file
- *        - only the range part of the mapping is given
- *        - the domain (common to many mappings) is written separately
- *        -
- *        - the domain name is the only part of the domain specified
- *        -
- *        - the range information (rname, rp, rm) is structured
- *        - as follows:
- *        -
- *        - rname : the FORTRAN version of the set name left justified
- *        -
- *        - rp[1]              : the number of characters in rname
- *        - rp[2]              : the dimensionality of the set - nd
- *        - rp[3]              : the dimensionality of the elements - nde
- *        - rp[4]              : the number of elements in the set - ne
- *        - rp[5] ... rp[5+nd] : the sizes in each dimension
- *        -
- *        - rm[1]      - rm[ne]          : values of first component of
- *        -                                elements
- *        -            .
- *        -            .
- *        -            .
- *        -
- *        - rm[nde*ne] - rm[nde*ne + ne] : values of nde'th component of
- *        -                                elements
- */
-
-FIXNUM FF_ID(pfwran, PFWRAN)(FIXNUM *sfid, char *dname, FIXNUM *sncd,
-			     char *rname, FIXNUM *arp, double *arm,
-			     FIXNUM *sim)
-   {FIXNUM rv;
-
-    rv = FF_ID(pfwrae, PFWRAE)(sfid, dname, sncd,
-			       rname, arp, arm,
-			       NULL, sim);
 
     return(rv);}
 

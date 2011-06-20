@@ -59,6 +59,7 @@ Group PThread {
 
 Group OpenMP {
    CC_Flags = -openmp
+   FC_Flags = -openmp
    LD_Lib   = -lpthread 
 }
 

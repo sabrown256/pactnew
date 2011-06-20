@@ -48,13 +48,13 @@ source ../../tests/common
       set ETime = `$TIMER -b $UTime`
 
       if ($xstatus == 123) then
-         NoteD $Log "                       new ....... to ($ETime)"
+         NoteD $Log "                        new ....... to ($ETime)"
          set lErr = 1
       else if ($xstatus != 0) then
-         NoteD $Log "                       new ....... ng ($xstatus/$ETime)"
+         NoteD $Log "                        new ....... ng ($xstatus/$ETime)"
          set lErr = 2
       else
-         NoteD $Log "                       new ....... ok ($ETime)"
+         NoteD $Log "                        new ....... ok ($ETime)"
          flog $Log rm -f gscgmt.cgm
       endif
 
@@ -75,13 +75,13 @@ source ../../tests/common
       set ETime = `$TIMER -b $UTime`
 
       if ($xstatus == 123) then
-         NoteD $Log "                       pool ...... to ($ETime)"
+         NoteD $Log "                        pool ...... to ($ETime)"
          set lErr = 3
       else if ($xstatus != 0) then
-         NoteD $Log "                       pool ...... ng ($xstatus/$ETime)"
+         NoteD $Log "                        pool ...... ng ($xstatus/$ETime)"
          set lErr = 4
       else
-         NoteD $Log "                       pool ...... ok ($ETime)"
+         NoteD $Log "                        pool ...... ok ($ETime)"
          flog $Log rm -f gscgmt.cgm
       endif
 

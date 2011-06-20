@@ -75,7 +75,7 @@ switch ($OS[1])
 
    case "linux" :
         set Concise = unk
-        foreach i (/lib/libc*.so*)
+        foreach i (/lib*/libc*.so*)
            set ve = `echo $i | sed 's/-/ /' | sed 's/\./ /g'`
            if (($ve[1] == /lib/libc) && ($#ve > 3)) then
               set Concise = "$ve[2].$ve[3]"

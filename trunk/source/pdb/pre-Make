@@ -94,7 +94,7 @@ Hdrs = pdb.h pdb_int.h
 Objs = pdb.o pdbaib.o pdbmp.o pdser.o pdlow.o pdblk.o \
        pdrdwr.o pdptr.o pdprnt.o pdmemb.o \
        pdbmm.o pdconv.o pdpath.o pdbfc.o pdbnet.o pdshar.o \
-       pdcsum.o pdbx.o pdszof.o pdbdir.o pdpar.o pdcomm.o \
+       pdcsum.o pdbx.o pdmap.o pdszof.o pdbdir.o pdpar.o pdcomm.o \
        pdtgt.o pdtyp.o pdtypa.o pdtypb.o pdtypc.o pdspoke.o
 
 ArObjs = ${TGTLib}(pdb.o) ${TGTLib}(pdbaib.o)                        \
@@ -106,7 +106,7 @@ ArObjs = ${TGTLib}(pdb.o) ${TGTLib}(pdbaib.o)                        \
          ${TGTLib}(pdblk.o) ${TGTLib}(pdbmm.o) ${TGTLib}(pdconv.o)   \
          ${TGTLib}(pdpath.o) ${TGTLib}(pdbfc.o) ${TGTLib}(pdbnet.o)  \
          ${TGTLib}(pdprnt.o) ${TGTLib}(pdshar.o) ${TGTLib}(pdtgt.o)  \
-         ${TGTLib}(pdbx.o)  ${TGTLib}(pdbdir.o)                      \
+         ${TGTLib}(pdbx.o) ${TGTLib}(pdmap.o) ${TGTLib}(pdbdir.o)    \
          ${TGTLib}(pdszof.o) ${TGTLib}(pdpar.o) ${TGTLib}(pdparmp.o) \
          ${TGTLib}(pdspoke.o)
 

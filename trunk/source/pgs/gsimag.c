@@ -707,6 +707,9 @@ void PG_draw_image(PG_device *dev, PG_image *im, char *label, pcons *alist)
 	if (!_PG_allocate_image_buffer(dev, NULL, &nx, &ny))
 	   return;
 
+	pc[1] = pc[0] + nx;
+	pc[3] = pc[2] + ny;
+
 /* scale the image to fit its part of the viewport */
 	nim = PG_prep_image(dev, im, nx, ny);
 
