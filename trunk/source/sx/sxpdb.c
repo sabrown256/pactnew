@@ -4183,31 +4183,6 @@ void SX_install_pdb_funcs(SS_psides *si)
 #if 0
 
 /*--------------------------------------------------------------------------*/
- 
-/* SX_INSTALL_PDB_FUNCS - install the PDB extensions to Scheme */
- 
-void SX_install_pdb_funcs(SS_psides *si)
-   {
-
-    SS_install(si, "pd-get-buffer-size",
-               "Get the default buffer size for I/O files",
-               SS_zargs,
-               _SXI_get_buffer_size, SS_PR_PROC);
-
-    SS_install(si, "pd-set-buffer-size!",
-               "Set the default file buffer size",
-               SS_nargs, 
-               _SXI_set_buffer_size, SS_PR_PROC);
-
-    SS_install(si, "pd-error-message",
-               "Get the last PDB error message",
-               SS_zargs,
-               _SXI_get_error, SS_PR_PROC);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 
 /* _SXI_SET_BUFFER_SIZE - set the buffer_size */
 
@@ -4250,6 +4225,31 @@ static object *_SXI_get_error(SS_psides *si)
     o = SS_mk_string(si, v);
 
     return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* SX_INSTALL_PDB_FUNCS - install the PDB extensions to Scheme */
+ 
+void SX_install_pdb_funcs(SS_psides *si)
+   {
+
+    SS_install(si, "pd-get-buffer-size",
+               "Get the default buffer size for I/O files",
+               SS_zargs,
+               _SXI_get_buffer_size, SS_PR_PROC);
+
+    SS_install(si, "pd-set-buffer-size!",
+               "Set the default file buffer size",
+               SS_nargs, 
+               _SXI_set_buffer_size, SS_PR_PROC);
+
+    SS_install(si, "pd-error-message",
+               "Get the last PDB error message",
+               SS_zargs,
+               _SXI_get_error, SS_PR_PROC);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 

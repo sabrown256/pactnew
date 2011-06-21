@@ -1350,7 +1350,10 @@ static void fortran_wrap(FILE *fp, fdecl *dcl, char *cfn, char *ffn)
     char *fn;
 
     if (is_var_arg(dcl->proto.arg) == TRUE)
-       {fn = (strcmp(ffn, "yes") == 0) ? cfn : ffn;
+       {if ((strcmp(ffn, "yes") == 0) || (strcmp(ffn, "none") == 0))
+	   fn = cfn;
+        else
+	   fn = ffn;
 	berr("%s is not interoperable - variable args", fn);}
 
     else if (strcmp(ffn, "none") != 0)
