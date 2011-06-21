@@ -15,7 +15,7 @@
 
 /* PG_GET_TEXT_EXT_N - return the text extent in NDC of the given string
  *
- * #bind fortran() scheme()
+ * #bind PG_get_text_ext_n fortran() scheme()
  */
 
 void PG_get_text_ext_n(PG_device *dev, int nd,

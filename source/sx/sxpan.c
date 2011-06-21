@@ -977,41 +977,6 @@ void SX_install_panacea_funcs(SS_psides *si)
 #if 0
 
 /*--------------------------------------------------------------------------*/
- 
-/* SX_INSTALL_PANACEA_FUNCS - install the PANACEA extensions to Scheme */
- 
-void SX_install_panacea_funcs(SS_psides *si)
-   {
-
-    SS_install(si, "pa-read-state-file",
-               "Reads the named state file and does the specified conversions",
-               SS_nargs,
-               _SXI_rd_restart, SS_PR_PROC);
-
-    SS_install(si, "pa-init-simulation",
-               "Initialize a numerical simulation",
-               SS_nargs,
-               _SXI_init_problem, SS_PR_PROC);
-
-    SS_install(si, "pa-read-commands",
-               "Read the commands in the specified source file",
-               SS_nargs,
-               _SXI_readh, SS_PR_PROC);
-
-    SS_install(si, "pa-finish-simulation",
-               "Gracefully conclude a numerical simulation",
-               SS_nargs,
-               _SXI_fin_system, SS_PR_PROC);
-
-    SS_install(si, "pa-write-state-file",
-               "Write a state file",
-               SS_sargs,
-               _SXI_wr_restart, SS_PR_PROC);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 
 /* _SXI_RD_RESTART - read a restart dump from Scheme level */
 
@@ -1120,6 +1085,41 @@ static object *_SXI_wr_restart(SS_psides *si, object *argl)
        PA_wr_restart(name);
 
     return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* SX_INSTALL_PANACEA_FUNCS - install the PANACEA extensions to Scheme */
+ 
+void SX_install_panacea_funcs(SS_psides *si)
+   {
+
+    SS_install(si, "pa-read-state-file",
+               "Reads the named state file and does the specified conversions",
+               SS_nargs,
+               _SXI_rd_restart, SS_PR_PROC);
+
+    SS_install(si, "pa-init-simulation",
+               "Initialize a numerical simulation",
+               SS_nargs,
+               _SXI_init_problem, SS_PR_PROC);
+
+    SS_install(si, "pa-read-commands",
+               "Read the commands in the specified source file",
+               SS_nargs,
+               _SXI_readh, SS_PR_PROC);
+
+    SS_install(si, "pa-finish-simulation",
+               "Gracefully conclude a numerical simulation",
+               SS_nargs,
+               _SXI_fin_system, SS_PR_PROC);
+
+    SS_install(si, "pa-write-state-file",
+               "Write a state file",
+               SS_sargs,
+               _SXI_wr_restart, SS_PR_PROC);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 

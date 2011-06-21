@@ -255,7 +255,7 @@ void PG_draw_disjoint_polyline_n(PG_device *dev, int nd,
  *             - angle units (radians or degrees) specified by UNIT
  *             - from central point (X, Y)
  *
- * #bind PG_draw_rad fortran() scheme()
+ * #bind PG_draw_rad fortran() scheme(pg-draw-radius)
  */
 
 void PG_draw_rad(PG_device *dev, double rmin, double rmax, double a,
@@ -287,6 +287,8 @@ void PG_draw_rad(PG_device *dev, double rmin, double rmax, double a,
  *             - (increasing counter-clockwise)
  *             - angle units (radians or degrees) specified by UNIT
  *             - from central point (X, Y)
+ *
+ * #bind PG_draw_arc fortran() scheme()
  */
 
 void PG_draw_arc(PG_device *dev, double r, double a1, double a2,

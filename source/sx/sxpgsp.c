@@ -247,42 +247,6 @@ static object *_SXI_show_mrk(SS_psides *si)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* _SXI_DRAW_ARC - draw a portion of an arc */
-
-static object *_SXI_draw_arc(SS_psides *si, object *argl)
-   {int unit;
-    double a1, a2, r, x, y;
-    PG_device *dev;
-
-    dev = NULL;
-    x = y = r = 0.0;
-    a1 = a2 = 0.0;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_DOUBLE_I, &r,
-            SC_DOUBLE_I, &a1,
-            SC_DOUBLE_I, &a2,
-            SC_DOUBLE_I, &x,
-            SC_DOUBLE_I, &y,
-            SC_INT_I, &unit,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_DRAW_ARC", SS_null);
-
-    if (unit == 1)
-       unit = DEGREE;
-    else
-       unit = RADIAN;
-
-    PG_fset_line_color(dev, dev->line_color, TRUE);
-    PG_draw_arc(dev, r, a1, a2, x, y, unit);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
 /* _SXI_DRAW_AXIS - draw a axis */
 
 static object *_SXI_draw_axis(SS_psides *si, object *argl)
@@ -520,37 +484,6 @@ static object *_SXI_draw_polyline(SS_psides *si, object *argl)
 
 	for (i = 0; i < nd; i++)
 	    {CFREE(x[i]);};};
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_DRAW_RAD - draw a radial line segment */
-
-static object *_SXI_draw_rad(SS_psides *si, object *argl)
-   {int unit;
-    double a, rn, rx, x, y;
-    PG_device *dev;
-
-    dev = NULL;
-    x = y = 0.0;
-    rn = rx = 0.0;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_DOUBLE_I, &rn,
-            SC_DOUBLE_I, &rx,
-            SC_DOUBLE_I, &a,
-            SC_DOUBLE_I, &x,
-            SC_DOUBLE_I, &y,
-            SC_INT_I, &unit,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_DRAW_RAD", SS_null);
-
-    PG_fset_line_color(dev, dev->line_color, TRUE);
-    PG_draw_rad(dev, rn, rx, a, x, y, unit);
 
     return(SS_f);}
 
@@ -2239,11 +2172,6 @@ void _SX_install_pgs_primitives(SS_psides *si)
                SS_nargs,
                _SXI_def_mrk, SS_PR_PROC);
 
-    SS_install(si, "pg-draw-arc",
-               "Draw a section of a circular arc on the given device",
-               SS_nargs,
-               _SXI_draw_arc, SS_PR_PROC);
-
     SS_install(si, "pg-draw-axis",
                "Draw a single axis on the given device",
                SS_nargs,
@@ -2278,11 +2206,6 @@ void _SX_install_pgs_primitives(SS_psides *si)
                "Draw a set of connected ND line segments",
                SS_nargs,
                _SXI_draw_polyline, SS_PR_PROC);
-
-    SS_install(si, "pg-draw-radius",
-               "Draw a radial line segment on the given device",
-               SS_nargs,
-               _SXI_draw_rad, SS_PR_PROC);
 
     SS_install(si, "pg-draw-text",
                "Draw text at the given point on the given device",
@@ -3414,6 +3337,73 @@ static object *_SXI_show_pal(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+ 
+/* _SXI_DRAW_RAD - draw a radial line segment */
+
+static object *_SXI_draw_rad(SS_psides *si, object *argl)
+   {int unit;
+    double a, rn, rx, x, y;
+    PG_device *dev;
+
+    dev = NULL;
+    x = y = 0.0;
+    rn = rx = 0.0;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_DOUBLE_I, &rn,
+            SC_DOUBLE_I, &rx,
+            SC_DOUBLE_I, &a,
+            SC_DOUBLE_I, &x,
+            SC_DOUBLE_I, &y,
+            SC_INT_I, &unit,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_DRAW_RAD", SS_null);
+
+    PG_fset_line_color(dev, dev->line_color, TRUE);
+    PG_draw_rad(dev, rn, rx, a, x, y, unit);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_DRAW_ARC - draw a portion of an arc */
+
+static object *_SXI_draw_arc(SS_psides *si, object *argl)
+   {int unit;
+    double a1, a2, r, x, y;
+    PG_device *dev;
+
+    dev = NULL;
+    x = y = r = 0.0;
+    a1 = a2 = 0.0;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_DOUBLE_I, &r,
+            SC_DOUBLE_I, &a1,
+            SC_DOUBLE_I, &a2,
+            SC_DOUBLE_I, &x,
+            SC_DOUBLE_I, &y,
+            SC_INT_I, &unit,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_DRAW_ARC", SS_null);
+
+    if (unit == 1)
+       unit = DEGREE;
+    else
+       unit = RADIAN;
+
+    PG_fset_line_color(dev, dev->line_color, TRUE);
+    PG_draw_arc(dev, r, a1, a2, x, y, unit);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _SX_INSTALL_PGS_PRIMITIVES - install the PGS primitives */
 
@@ -3619,6 +3609,16 @@ void _SX_install_pgs_primitives(SS_psides *si)
                "Show the available palettes and make selected palette the current one",
                SS_nargs,
                _SXI_show_pal, SS_PR_PROC);
+
+    SS_install(si, "pg-draw-radius",
+               "Draw a radial line segment on the given device",
+               SS_nargs,
+               _SXI_draw_rad, SS_PR_PROC);
+
+    SS_install(si, "pg-draw-arc",
+               "Draw a section of a circular arc on the given device",
+               SS_nargs,
+               _SXI_draw_arc, SS_PR_PROC);
 
     return;}
 
