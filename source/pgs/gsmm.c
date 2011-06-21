@@ -618,6 +618,14 @@ static PG_device *PG_make_raw_device(char *name, char *type, char *title,
 /*--------------------------------------------------------------------------*/
 
 /* PG_MAKE_DEVICE - initialize a graphical device
+ *                - NAME - a desriptive name of the device
+ *                -        WINDOW - display screen window
+ *                -        PS     - PostScript
+ *                -        CGM    - CGM device
+ *                -        RASTER - raster device
+ *                - TYPE - a qualifier for the device
+ *                -        MONOCHROME - black and white display
+ *                -        COLOR      - color display
  *
  * #bind PG_make_device fortran() scheme()
  */

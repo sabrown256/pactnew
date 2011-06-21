@@ -250,6 +250,13 @@ HAVE_SUBROUTINES
        endif
     endif
 
+# FPACT Library
+    Note $FOUT "Library/fpact {"
+    Note $FOUT "  Archives  = fpact"
+    Note $FOUT "  Libraries = pact"
+    Note $FOUT "}"
+    Note $FOUT ""
+
 # PACT Library
     Note $FOUT "Library/pact {"
     Note $FOUT "  Libraries = pgs pdb pml score"
