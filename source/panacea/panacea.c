@@ -13,6 +13,26 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PA_INIT_FILES - initialize the auxilliary files */
+
+void _PA_init_files(char *edname, char *ppname, char *gfname)
+   {
+
+/* make the name of the first edit file */
+    if (edname != NULL)
+       {PA_edit_file = io_open(edname, "w");
+	PA_ERR((PA_edit_file == NULL),
+	       "CAN'T OPEN FILE %s - _PA_INIT_FILES", edname);
+	PRINT(stdout, "Edit file %s opened\n", edname);};
+
+/* initialize the post processor file */
+    _PA_init_pp(ppname, gfname);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PA_SIMULATE - given that a numerical simulation code has been defined
  *             - with def_system, and properly initialized, perform the
  *             - simulation as defined
@@ -27,14 +47,15 @@
  *             -    dtf_min  - minimum fractional dt
  *             -    dtf_max  - maximum fractional dt
  *             -    dtf_inc  - fractional increase in dt per cycle
+ *
+ * #bind PA_simulate fortran() scheme()
  */
 
-void PA_simulate(tc, nc, nz, ti, tf, dtf_init, dtf_min, dtf_max, dtf_inc,
-                 rsname, edname, ppname, gfname)
-   double tc;
-   int nc, nz;
-   double ti, tf, dtf_init, dtf_min, dtf_max, dtf_inc;
-   char *rsname, *edname, *ppname, *gfname;
+void PA_simulate(double tc, int nc, int nz,
+		 double ti, double tf,
+		 double dtf_init, double dtf_min,
+		 double dtf_max, double dtf_inc,
+		 char *rsname, char *edname, char *ppname, char *gfname)
    {double deltat, tconv, dtmn, dtmx, dtf, dt, t;
     int cycle;
 
@@ -93,17 +114,20 @@ void PA_simulate(tc, nc, nz, ti, tf, dtf_init, dtf_min, dtf_max, dtf_inc,
 /* PA_INIT_SYSTEM - initialize the code system
  *                - connect the global variables, open the post-processor
  *                - file and the edit file, and run the package initializers
+ *
+ * #bind PA_init_system fortran() scheme(pa-init-simulation)
  */
 
-void PA_init_system(t, dt, nc, edname, ppname, gfname)
-   double t, dt;
-   int nc;
-   char *edname, *ppname, *gfname;
+void PA_init_system(double t, double dt, int nc,
+		    char *edname, char *ppname, char *gfname)
    {PA_package *pck;
     PFPkgInizer pck_init;
     PFBuildMap hook;
 
     SC_sizeof_hook = PA_sizeof;
+
+    t  *= unit[SEC]/convrsn[SEC];
+    dt *= unit[SEC]/convrsn[SEC];
 
     PA_init_strings();
     PA_cpp_init();
@@ -148,11 +172,12 @@ void PA_init_system(t, dt, nc, edname, ppname, gfname)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PA_RUN_PACKAGES - call the packages and their post-processors */
+/* PA_RUN_PACKAGES - call the packages and their post-processors
+ *
+ * #bind PA_run_packages fortran() scheme()
+ */
 
-void PA_run_packages(t, dt, cycle)
-   double t, dt;
-   int cycle;
+void PA_run_packages(double t, double dt, int cycle)
    {PA_package *pck;
     PFPkgMain pck_entry;
     char *pck_name;
@@ -187,10 +212,11 @@ void PA_run_packages(t, dt, cycle)
  *              - the time steps returned by the packages are checked
  *              - against the min and max allowable dt (dtmn and dtmx
  *              - respectively) and an initial dt value
+ *
+ * #bind PA_advance_t fortran() scheme()
  */
 
-double PA_advance_t(dtmn, dtn, dtmx)
-   double dtmn, dtn, dtmx;
+double PA_advance_t(double dtmn, double dtn, double dtmx)
    {double dt, pck_dt;
     PA_package *pck;
 
@@ -209,10 +235,11 @@ double PA_advance_t(dtmn, dtn, dtmx)
 
 /* PA_FIN_SYSTEM - call the finalizers for all of the packages and
  *               - dump the performance statistics for the run
+ *
+ * #bind PA_fin_system fortran() scheme(pa-finish-simulation)
  */
 
-void PA_fin_system(nz, nc, silent)
-   int nz, nc, silent;
+void PA_fin_system(int nz, int nc, int silent)
    {int i;
     long lmx;
     PA_package *pck;
@@ -333,11 +360,11 @@ void PA_fin_system(nz, nc, silent)
 
 /* PA_TERMINATE - close all the open files and generally gracefully end
  *              - the PANACEA run
+ *
+ * #bind PA_terminate fortran() scheme()
  */
 
-void PA_terminate(edname, ppname, gfname, cycle)
-   char *edname, *ppname, *gfname;
-   int cycle;
+void PA_terminate(char *edname, char *ppname, char *gfname, int cycle)
    {int i;
 
     if (PA_edit_file != NULL)
@@ -367,27 +394,6 @@ void PA_terminate(edname, ppname, gfname, cycle)
     PA_pva_file   = NULL;
     PA_edit_file  = NULL;
     PA_cache_file = NULL;
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PA_INIT_FILES - initialize the auxilliary files */
-
-void _PA_init_files(edname, ppname, gfname)
-   char *edname, *ppname, *gfname;
-   {
-
-/* make the name of the first edit file */
-    if (edname != NULL)
-       {PA_edit_file = io_open(edname, "w");
-	PA_ERR((PA_edit_file == NULL),
-	       "CAN'T OPEN FILE %s - _PA_INIT_FILES", edname);
-	PRINT(stdout, "Edit file %s opened\n", edname);};
-
-/* initialize the post processor file */
-    _PA_init_pp(ppname, gfname);
 
     return;}
 

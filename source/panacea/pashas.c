@@ -230,6 +230,8 @@ void PA_file_mon(char *edname, char *ppname, char *gfname)
  *               - The system of units of the data in the restart dump is
  *               - under the control of the code developer, but it must
  *               - be consistent.
+ *
+ * #bind PA_rd_restart fortran() scheme(pa-read-state-file)
  */
 
 void PA_rd_restart(char *rsname, int convs)
@@ -252,9 +254,12 @@ void PA_rd_restart(char *rsname, int convs)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PA_WR_RESTART - prepare and write a restart dump */
+/* PA_WR_RESTART - prepare and write a restart dump
+ *
+ * #bind PA_wr_restart fortran() scheme(pa-write-state-file)
+ */
 
-void PA_wr_restart(char *rsname)
+void PA_wr_restart(char *rsname ARG("state.tmp",in))
    {
 
     if (rsname != NULL)

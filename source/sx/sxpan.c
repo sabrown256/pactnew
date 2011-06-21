@@ -624,29 +624,6 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SXI_RD_RESTART - read a restart dump from Scheme level */
-
-static object *_SXI_rd_restart(SS_psides *si, object *argl)
-   {int convs;
-    char *name;
-
-    name  = NULL;
-    convs = NONE;
-    SS_args(si, argl,
-            SC_STRING_I, &name,
-            SC_INT_I, &convs,
-            0);
-
-    if (name == NULL)
-       SS_error(si, "BAD FILE NAME - _SXI_RD_RESTART", argl);
-
-    PA_rd_restart(name, convs);
-
-    return(SS_t);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _SXI_LIST_PAN_PCK - return a list of PANACEA packages */
 
 static object *_SXI_list_pan_pck(SS_psides *si)
@@ -719,64 +696,12 @@ static object *_SXI_intern_packages(SS_psides *si)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SXI_INIT_PROBLEM - execute PA_init_system at Scheme level
- *                   - this should happen after the dump has been read
- */
-
-static object *_SXI_init_problem(SS_psides *si, object *argl)
-   {int nc;
-    double t, dt;
-    char *edname, *ppname, *gfname;
-
-    t  = 0.0;
-    dt = 0.0;
-    nc = 0;
-    edname = NULL;
-    ppname = NULL;
-    gfname = NULL;
-    SS_args(si, argl,
-            SC_DOUBLE_I, &t,
-            SC_DOUBLE_I, &dt,
-            SC_INT_I, &nc,
-            SC_STRING_I, &edname,
-            SC_STRING_I, &ppname,
-            SC_STRING_I, &gfname,
-            0);
-
-    t  *= unit[SEC]/convrsn[SEC];
-    dt *= unit[SEC]/convrsn[SEC];
-
-/* read the source files, initialize the packages */
-    PA_init_system(t, dt, nc, edname, ppname, gfname);
-
-    return(SS_t);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _SXI_INST_COM - execute PA_inst_com at Scheme level */
 
 static object *_SXI_inst_com(SS_psides *si)
    {
 
     PA_inst_com();
-
-    return(SS_t);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SXI_READH - execute PA_readh at Scheme level */
-
-static object *_SXI_readh(SS_psides *si, object *argl)
-   {char *name;
-
-    name = NULL;
-    SS_args(si, argl,
-            SC_STRING_I, &name,
-            0);
-
-    PA_readh(name);
 
     return(SS_t);}
 
@@ -807,25 +732,6 @@ static object *_SXI_pan_cmmnd(SS_psides *si, object *argl)
         o = SS_t;};
 
     return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SXI_FIN_SYSTEM - execute fin_system at Scheme level */
-
-static object *_SXI_fin_system(SS_psides *si, object *argl)
-   {int nz, cy;
-
-    nz = 0;
-    cy = 0;
-    SS_args(si, argl,
-            SC_INT_I, &nz,
-            SC_INT_I, &cy,
-            0);
-
-    PA_fin_system(nz, cy, FALSE);
-
-    return(SS_t);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -908,26 +814,6 @@ static object *_SXI_db_numeric_data(SS_psides *si, object *obj)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
-/* _SXI_WR_RESTART - write a restart dump from Scheme level */
-
-static object *_SXI_wr_restart(SS_psides *si, object *argl)
-   {char *name;
-
-    name = NULL;
-    SS_args(si, argl,
-            SC_STRING_I, &name,
-            0);
-
-    if (name == NULL)
-       PA_wr_restart("state.tmp");
-    else
-       PA_wr_restart(name);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
  
 /* SX_INSTALL_PANACEA_FUNCS - install the PANACEA extensions to Scheme */
  
@@ -964,16 +850,6 @@ void SX_install_panacea_funcs(SS_psides *si)
                SS_sargs,
                _SXI_display_pan_object, SS_PR_PROC);
 
-    SS_install(si, "pa-finish-simulation",
-               "Gracefully conclude a numerical simulation",
-               SS_nargs,
-               _SXI_fin_system, SS_PR_PROC);
-
-    SS_install(si, "pa-init-simulation",
-               "Initialize a numerical simulation",
-               SS_nargs,
-               _SXI_init_problem, SS_PR_PROC);
-
     SS_install(si, "pa-install-commands",
                "Install the commands from all packages",
                SS_zargs,
@@ -1004,16 +880,6 @@ void SX_install_panacea_funcs(SS_psides *si)
                SS_sargs,
                _SXI_package_name, SS_PR_PROC);
 
-    SS_install(si, "pa-read-commands",
-               "Read the commands in the specified source file",
-               SS_nargs,
-               _SXI_readh, SS_PR_PROC);
-
-    SS_install(si, "pa-read-state-file",
-               "Reads the named state file and does the specified conversions",
-               SS_nargs,
-               _SXI_rd_restart, SS_PR_PROC);
-
     SS_install(si, "pa-run-package",
                "Executes the given package and returns its time step and controlling zone",
                SS_nargs,
@@ -1043,11 +909,6 @@ void SX_install_panacea_funcs(SS_psides *si)
                "Save the data for the output requests from this cycle",
                SS_sargs,
                _SXI_db_numeric_data, SS_PR_PROC);
-
-    SS_install(si, "pa-write-state-file",
-               "Write a state file",
-               SS_sargs,
-               _SXI_wr_restart, SS_PR_PROC);
 
     SS_define_constant(si, 0,
                        "dimension",     SC_STRING_I, "dimension",
@@ -1112,4 +973,156 @@ void SX_install_panacea_funcs(SS_psides *si)
     return;}
 
 /*--------------------------------------------------------------------------*/
+
+#if 0
+
+/*--------------------------------------------------------------------------*/
+ 
+/* SX_INSTALL_PANACEA_FUNCS - install the PANACEA extensions to Scheme */
+ 
+void SX_install_panacea_funcs(SS_psides *si)
+   {
+
+    SS_install(si, "pa-read-state-file",
+               "Reads the named state file and does the specified conversions",
+               SS_nargs,
+               _SXI_rd_restart, SS_PR_PROC);
+
+    SS_install(si, "pa-init-simulation",
+               "Initialize a numerical simulation",
+               SS_nargs,
+               _SXI_init_problem, SS_PR_PROC);
+
+    SS_install(si, "pa-read-commands",
+               "Read the commands in the specified source file",
+               SS_nargs,
+               _SXI_readh, SS_PR_PROC);
+
+    SS_install(si, "pa-finish-simulation",
+               "Gracefully conclude a numerical simulation",
+               SS_nargs,
+               _SXI_fin_system, SS_PR_PROC);
+
+    SS_install(si, "pa-write-state-file",
+               "Write a state file",
+               SS_sargs,
+               _SXI_wr_restart, SS_PR_PROC);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_RD_RESTART - read a restart dump from Scheme level */
+
+static object *_SXI_rd_restart(SS_psides *si, object *argl)
+   {int convs;
+    char *name;
+
+    name  = NULL;
+    convs = NONE;
+    SS_args(si, argl,
+            SC_STRING_I, &name,
+            SC_INT_I, &convs,
+            0);
+
+    if (name == NULL)
+       SS_error(si, "BAD FILE NAME - _SXI_RD_RESTART", argl);
+
+    PA_rd_restart(name, convs);
+
+    return(SS_t);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_INIT_PROBLEM - execute PA_init_system at Scheme level
+ *                   - this should happen after the dump has been read
+ */
+
+static object *_SXI_init_problem(SS_psides *si, object *argl)
+   {int nc;
+    double t, dt;
+    char *edname, *ppname, *gfname;
+
+    t  = 0.0;
+    dt = 0.0;
+    nc = 0;
+    edname = NULL;
+    ppname = NULL;
+    gfname = NULL;
+    SS_args(si, argl,
+            SC_DOUBLE_I, &t,
+            SC_DOUBLE_I, &dt,
+            SC_INT_I, &nc,
+            SC_STRING_I, &edname,
+            SC_STRING_I, &ppname,
+            SC_STRING_I, &gfname,
+            0);
+
+/* read the source files, initialize the packages */
+    PA_init_system(t, dt, nc, edname, ppname, gfname);
+
+    return(SS_t);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_READH - execute PA_readh at Scheme level */
+
+static object *_SXI_readh(SS_psides *si, object *argl)
+   {char *name;
+
+    name = NULL;
+    SS_args(si, argl,
+            SC_STRING_I, &name,
+            0);
+
+    PA_readh(name);
+
+    return(SS_t);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_FIN_SYSTEM - execute fin_system at Scheme level */
+
+static object *_SXI_fin_system(SS_psides *si, object *argl)
+   {int nz, cy;
+
+    nz = 0;
+    cy = 0;
+    SS_args(si, argl,
+            SC_INT_I, &nz,
+            SC_INT_I, &cy,
+            0);
+
+    PA_fin_system(nz, cy, FALSE);
+
+    return(SS_t);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_WR_RESTART - write a restart dump from Scheme level */
+
+static object *_SXI_wr_restart(SS_psides *si, object *argl)
+   {char *name;
+
+    name = NULL;
+    SS_args(si, argl,
+            SC_STRING_I, &name,
+            0);
+
+    if (name == NULL)
+       PA_wr_restart("state.tmp");
+    else
+       PA_wr_restart(name);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+
+#endif
+
 /*--------------------------------------------------------------------------*/

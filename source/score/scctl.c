@@ -700,7 +700,7 @@ char *SC_search_file(char **path, char *name)
  *                 -    <base>.[a-zA-Z]dd
  *                 -    d = [0-9a-zA-Z]
  *
- * #bind SC_advance_name fortran()
+ * #bind SC_advance_name fortran() scheme()
  */
 
 void SC_advance_name(char *s)

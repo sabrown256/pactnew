@@ -1956,7 +1956,10 @@ static void _PG_pal_mouse_ev_hand(PG_device *dev, PG_event *ev)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_SHOW_PALETTES - display the palettes for the given device */
+/* PG_SHOW_PALETTES - display the palettes for the given device
+ *
+ * #bind PG_show_palettes fortran() scheme(pg-show-palettes)
+ */
 
 void PG_show_palettes(PG_device *sdev, char *type, int wbck)
    {int i, j, k, np, page;

@@ -3294,51 +3294,6 @@ static object *_SXI_set_switch(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SXI_SET_BUFFER_SIZE - set the buffer_size */
-
-static object *_SXI_set_buffer_size(SS_psides *si, object *argl)
-   {int v;
-
-    v = -1;
-    SS_args(si, argl,
-            SC_INT_I, &v,
-            0);
-
-    PD_set_buffer_size(v);
-
-    return(SS_t);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SXI_GET_BUFFER_SIZE - get the buffer_size */
-
-static object *_SXI_get_buffer_size(SS_psides *si)
-   {long long v;
-    object *o;
-
-    v = PD_get_buffer_size();
-    o = SS_mk_integer(si, v);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SXI_GET_ERROR - get the PD_err */
-
-static object *_SXI_get_error(SS_psides *si)
-   {char *v;
-    object *o;
-
-    v = PD_get_error();
-    o = SS_mk_string(si, v);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _SXI_SET_MAX_SIZE - set the file->maximum_size */
 
 static object *_SXI_set_max_size(SS_psides *si, object *argl)
@@ -3775,11 +3730,6 @@ static object *_SXI_index_to_expr(SS_psides *si, object *argl)
 void SX_install_pdb_funcs(SS_psides *si)
    {
 
-    SS_install(si, "pd-get-buffer-size",
-               "Get the default buffer size for I/O files",
-               SS_zargs,
-               _SXI_get_buffer_size, SS_PR_PROC);
-
     SS_install(si, "change-directory",
                "Change current working directory in a file",
                SS_nargs,
@@ -4010,11 +3960,6 @@ void SX_install_pdb_funcs(SS_psides *si)
                SS_nargs, 
                _SXI_parse_type, SS_PR_PROC);
 
-    SS_install(si, "pd-error-message",
-               "Get the last PDB error message",
-               SS_zargs,
-               _SXI_get_error, SS_PR_PROC);
-
     SS_install(si, "pd-entry-number",
                "Return the number of items for the named variabled",
                SS_nargs, 
@@ -4119,11 +4064,6 @@ void SX_install_pdb_funcs(SS_psides *si)
                "Set a code switch",
                SS_nargs, 
                _SXI_set_switch, SS_PR_PROC);
-
-    SS_install(si, "pd-set-buffer-size!",
-               "Set the default file buffer size",
-               SS_nargs, 
-               _SXI_set_buffer_size, SS_PR_PROC);
 
     SS_install(si, "set-maximum-file-size!",
                "Set the maximum file size for a PDB file",
@@ -4239,4 +4179,80 @@ void SX_install_pdb_funcs(SS_psides *si)
     return;}
  
 /*--------------------------------------------------------------------------*/
+
+#if 0
+
+/*--------------------------------------------------------------------------*/
+ 
+/* SX_INSTALL_PDB_FUNCS - install the PDB extensions to Scheme */
+ 
+void SX_install_pdb_funcs(SS_psides *si)
+   {
+
+    SS_install(si, "pd-get-buffer-size",
+               "Get the default buffer size for I/O files",
+               SS_zargs,
+               _SXI_get_buffer_size, SS_PR_PROC);
+
+    SS_install(si, "pd-set-buffer-size!",
+               "Set the default file buffer size",
+               SS_nargs, 
+               _SXI_set_buffer_size, SS_PR_PROC);
+
+    SS_install(si, "pd-error-message",
+               "Get the last PDB error message",
+               SS_zargs,
+               _SXI_get_error, SS_PR_PROC);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_SET_BUFFER_SIZE - set the buffer_size */
+
+static object *_SXI_set_buffer_size(SS_psides *si, object *argl)
+   {int v;
+
+    v = -1;
+    SS_args(si, argl,
+            SC_INT_I, &v,
+            0);
+
+    PD_set_buffer_size(v);
+
+    return(SS_t);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_GET_BUFFER_SIZE - get the buffer_size */
+
+static object *_SXI_get_buffer_size(SS_psides *si)
+   {long long v;
+    object *o;
+
+    v = PD_get_buffer_size();
+    o = SS_mk_integer(si, v);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_GET_ERROR - get the PD_err */
+
+static object *_SXI_get_error(SS_psides *si)
+   {char *v;
+    object *o;
+
+    v = PD_get_error();
+    o = SS_mk_string(si, v);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+
+#endif
+
 /*--------------------------------------------------------------------------*/

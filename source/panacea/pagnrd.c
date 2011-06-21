@@ -94,6 +94,8 @@ void PA_intern_pck_db(void)
  *             - only the commands which are generic to all PANACEA
  *             - generators should be here
  *             - the others belong with the packages they serve
+ *
+ * #bind PA_inst_com fortran() scheme()
  */
  
 hasharr *PA_inst_com(void)
@@ -427,7 +429,10 @@ void PA_read_file(char *str, int sfl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PA_READH - handle the read command */
+/* PA_READH - handle the read command
+ *
+ * #bind PA_readh fortran() scheme(pa-read-commands)
+ */
 
 void PA_readh(char *str)
    {
