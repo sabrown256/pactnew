@@ -18,18 +18,21 @@ int
 
 /* PA_DEFCNT - define PANACEA controls */
 
-void PA_defcnt()
-   {return;}
+void PA_defcnt(void)
+   {
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* PA_GENCMD - install PANACEA commands */
 
-void PA_gencmd()
+void PA_gencmd(void)
+   {
 
 /* install the commands which control the generator */
-   {PA_inst_c("end",    none,     FALSE,     0, (PFVoid) PA_done,     PA_zargs);
+    PA_inst_c("end",    none,     FALSE,     0, (PFVoid) PA_done,     PA_zargs);
     PA_inst_c("define", none,     FALSE,     0, (PFVoid) PA_defh,     PA_zargs);
     PA_inst_c("dump",   none,     FALSE,     0, (PFVoid) PA_wrrstrth, PA_zargs);
 
@@ -62,8 +65,10 @@ void PA_gencmd()
 
 /* PA_DEFUN - define units for PANACEA */
 
-void PA_defunc()
-   {PA_radian          = PA_def_unit(1.0, UNITS);
+void PA_defunc(void )
+   {
+
+    PA_radian          = PA_def_unit(1.0, UNITS);
     PA_steradian       = PA_def_unit(1.0, UNITS);
     PA_mole            = PA_def_unit(1.0, UNITS);
     PA_electric_charge = PA_def_unit(1.0, UNITS);

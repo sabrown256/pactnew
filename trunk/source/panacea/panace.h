@@ -47,7 +47,11 @@
 #define ERG       PA_erg
 #define CC        PA_cc
 
-#define SCOPE     'a'
+/*--------------------------------------------------------------------------*/
+
+/*
+ * #bind derived PA_scope_kind integer SC_ENUM_I SC_ENUM_I RUNTIME
+ */
 
 enum e_PA_scope_kind
    {DEFN    = -1,
@@ -58,10 +62,14 @@ enum e_PA_scope_kind
     SCRATCH = -6};
 typedef enum e_PA_scope_kind PA_scope_kind;
 
+#define SCOPE     'a'
+
+/*
+ * #bind derived PA_class_kind integer SC_ENUM_I SC_ENUM_I REQU
+ */
+
 #undef REQU
 #undef OPTL
-
-#define CLASS     'b'
 
 enum e_PA_class_kind
    {REQU   = 1,
@@ -70,7 +78,11 @@ enum e_PA_class_kind
 
 typedef enum e_PA_class_kind PA_class_kind;
 
-#define PERSIST   'c'
+#define CLASS     'b'
+
+/*
+ * #bind derived PA_persist_kind integer SC_ENUM_I SC_ENUM_I REL
+ */
 
 enum e_PA_persist_kind
    {REL     = -10,
@@ -80,9 +92,14 @@ enum e_PA_persist_kind
 
 typedef enum e_PA_persist_kind PA_persist_kind;
 
+#define PERSIST   'c'
+
+
 /* CENTER and centerings are alread defined */
 
-#define ALLOCATION 'e'
+/*
+ * #bind derived PA_allocation_kind integer SC_ENUM_I SC_ENUM_I REL
+ */
 
 enum e_PA_allocation_kind
    {STATIC  = -100,
@@ -90,9 +107,13 @@ enum e_PA_allocation_kind
 
 typedef enum e_PA_allocation_kind PA_allocation_kind;
 
-#undef NONE
+#define ALLOCATION 'e'
 
-#define ATTRIBUTE 'f'
+/*
+ * #bind derived PA_unit_conversion integer SC_ENUM_I SC_ENUM_I INT_CGS
+ */
+
+#undef NONE
 
 enum e_PA_unit_conversion
    {INT_CGS = -20,
@@ -104,6 +125,10 @@ enum e_PA_unit_conversion
     NONE    = -26};
 
 typedef enum e_PA_unit_conversion PA_unit_conversion;
+
+#define ATTRIBUTE 'f'
+
+/*--------------------------------------------------------------------------*/
 
 #define NO_VALUE_I 0x80000000
 

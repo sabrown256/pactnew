@@ -31,9 +31,7 @@ int
  *             - initialize the next ultra file in the family
  */
 
-static void _PA_next_uf(ufname, flag)
-   char *ufname;
-   int flag;
+static void _PA_next_uf(char *ufname, int flag)
    {if (flag)
        {if (pduf != NULL)
            PA_ERR(!PD_close(pduf),
@@ -73,9 +71,7 @@ static void _PA_next_uf(ufname, flag)
  *                 - NOTE: the family part isn't implemented yet
  */
 
-void PA_transpose_pp(ppname, ntp, nuv)
-   char *ppname;
-   int ntp, nuv;
+void PA_transpose_pp(char *ppname, int ntp, int nuv)
    {char s[MAXLINE], *ufname, *ps;
 
     if (ntp <= 0)
@@ -138,8 +134,7 @@ void PA_transpose_pp(ppname, ntp, nuv)
  *               -         This gotcha may or may not be true now.        
  */
 
-static void _PA_t_wr_data(fcyc, nfirst, nlast, n_dom)
-   int fcyc, nfirst, nlast, n_dom;
+static void _PA_t_wr_data(int fcyc, int nfirst, int nlast, int n_dom)
    {int i, j, n_arrays, nptm;
     double *stripe;
     double **crve;
@@ -225,8 +220,7 @@ static void _PA_t_wr_data(fcyc, nfirst, nlast, n_dom)
  *               -         This gotcha may or may not be true now.        
  */
 
-void _PA_proc_time(ufname)
-   char *ufname;
+void _PA_proc_time(char *ufname)
    {int it, nt, ntu, nfirst, n_dom, nd;
     char *labl, *npts, *s;
     long ind[3];

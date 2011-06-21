@@ -112,34 +112,6 @@ static object *_SXI_clear_region(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* _SXI_CENTER_LABEL - print a label centered in a line */
-
-static object *_SXI_center_label(SS_psides *si, object *argl)
-   {PG_device *dev;
-    double sy;
-    char *label;
-
-    dev   = NULL;
-    sy    = 0.0;
-    label = NULL;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_DOUBLE_I, &sy,
-            SC_STRING_I, &label,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_CENTER_LABEL", SS_null);
-
-    PG_center_label(dev, sy, label);
-
-    CFREE(label);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
 /* _SXI_DEF_MRK - define a new marker character
  *              - a marker is defined by a set of line segments (4 numbers)
  *              - in the box -1 <= x <= 1 , -1 <= y <= 1
@@ -1700,28 +1672,6 @@ static object *_SXI_pals(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SXI_SHOW_PAL - show the available palettes
- *               - a background color flag is optional
- */
-
-static object *_SXI_show_pal(SS_psides *si, object *argl)
-   {int wbck;
-    PG_device *dev;
-
-    dev  = NULL;
-    wbck = TRUE;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_INT_I, &wbck,
-            0);
-
-    PG_show_palettes(dev, "WINDOW", wbck);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _SXI_MK_PAL - graphically construct a palette
  *             - make it the current palette
  */
@@ -2279,11 +2229,6 @@ void _SX_install_pgs_primitives(SS_psides *si)
                SS_nargs,
                _SXI_clear_region, SS_PR_PROC);
 
-    SS_install(si, "pg-center-label",
-               "Print a label string centered on a line at an NDC height",
-               SS_nargs,
-               _SXI_center_label, SS_PR_PROC);
-
     SS_install(si, "pg-current-palette",
                "Return the current palette for the given device",
                SS_nargs,
@@ -2498,11 +2443,6 @@ void _SX_install_pgs_primitives(SS_psides *si)
                "Graphically make a palette and make it the current palette",
                SS_nargs,
                _SXI_mk_pal, SS_PR_PROC);
-
-    SS_install(si, "pg-show-palettes",
-               "Show the available palettes and make selected palette the current one",
-               SS_nargs,
-               _SXI_show_pal, SS_PR_PROC);
 
     SS_install(si, "pg-read-palette",
                "Read a palette from the given file",
@@ -3424,6 +3364,56 @@ static object *_SXI_slop(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+ 
+/* _SXI_CENTER_LABEL - print a label centered in a line */
+
+static object *_SXI_center_label(SS_psides *si, object *argl)
+   {PG_device *dev;
+    double sy;
+    char *label;
+
+    dev   = NULL;
+    sy    = 0.0;
+    label = NULL;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_DOUBLE_I, &sy,
+            SC_STRING_I, &label,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_CENTER_LABEL", SS_null);
+
+    PG_center_label(dev, sy, label);
+
+    CFREE(label);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_SHOW_PAL - show the available palettes
+ *               - a background color flag is optional
+ */
+
+static object *_SXI_show_pal(SS_psides *si, object *argl)
+   {int wbck;
+    PG_device *dev;
+
+    dev  = NULL;
+    wbck = TRUE;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_INT_I, &wbck,
+            0);
+
+    PG_show_palettes(dev, "WINDOW", wbck);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _SX_INSTALL_PGS_PRIMITIVES - install the PGS primitives */
 
@@ -3619,6 +3609,16 @@ void _SX_install_pgs_primitives(SS_psides *si)
                "Set the logical operation on the given device",
                SS_nargs,
                _SXI_slop, SS_PR_PROC);
+
+    SS_install(si, "pg-center-label",
+               "Print a label string centered on a line at an NDC height",
+               SS_nargs,
+               _SXI_center_label, SS_PR_PROC);
+
+    SS_install(si, "pg-show-palettes",
+               "Show the available palettes and make selected palette the current one",
+               SS_nargs,
+               _SXI_show_pal, SS_PR_PROC);
 
     return;}
 
