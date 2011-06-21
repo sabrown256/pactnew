@@ -1,0 +1,68 @@
+#!/bin/csh -f
+#
+# FIND-COMMENTS - print all the C comments in files
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+@ err = 0
+set files = ""
+set txt   = ""
+set icase = 0
+
+while ($#argv > 0)
+   switch($1)
+      case -h:
+           echo ""
+           echo "Usage: find-comments [-h] [-i] [-t <text>] <files>*"
+           echo "   h  this help message"
+           echo "   i  ignore case"
+           echo "   t  find only comments with <text>"
+           echo ""
+           exit(1)
+      case -i:
+           set icase = 1
+           breaksw
+      case -t:
+           shift
+           set txt = "$1"
+           breaksw
+      default:
+           set files = ( $files $1 )
+           breaksw
+   endsw
+   shift
+end
+
+if ("$files" == "") then
+   echo "No files specified - exiting"
+   exit(1)
+endif
+
+echo ""
+if ("$txt" != "") then
+   echo "Searching for comments containing '$txt'"
+endif
+
+foreach f ($files)
+   awk 'BEGIN {IGNORECASE = '$icase';              \
+               file  = "'$f'";                     \
+               start = 0;                          \
+               cur   = "";                         \
+               all   = "";}                        \
+        $0 ~ /\/\*/ {start = 1;}                   \
+        start == 1  {cur = cur $0 "\n";}           \
+        $0 ~ /\*\// {if (cur ~ /'"$txt"'/)         \
+                        {all = all cur "\n";};     \
+                     start = 0;                    \
+                     cur   = "";}                  \
+        END {if (all != "")                        \
+                {printf("--------------------\n"); \
+                 printf("   %s\n\n", file);        \
+                 printf("%s", all);};}' $f
+end
+
+exit($err)

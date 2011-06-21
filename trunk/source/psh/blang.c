@@ -48,16 +48,18 @@ struct s_bindes
    {int cfl;
     int nbi;
     int ncp;
+    int ndc;
     int nfp;
     int nfw;
     char *pck;
     char **sbi;
+    char **cdc;
     char **cpr;
     char **fpr;
     char **fwr;
     FILE *fp;
     void (*init)(bindes *bd, char *pck, int cfl,
-		 char **sbi, char **cpr, char **fpr, char **fwr);
+		 char **sbi, char **cdc, char **cpr, char **fpr, char **fwr);
     int (*bind)(bindes *bd);
     void (*fin)(bindes *bd);};
 
@@ -91,8 +93,8 @@ static char
  *lookup_type(char *val, char *ty, langmode ity, langmode oty),
  **mc_proto_list(fdecl *dcl);
 
-static fparam
- fc_type(char *wty, int nc, char *ty, char *arg, langmode mode);
+static void
+ fc_type(char *wty, int nc, farg *al, int afl, langmode mode);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -370,7 +372,6 @@ static int split_decl(farg *al, char *s)
 
 static farg *proc_args(fdecl *dcl)
    {int i, na;
-    char lty[MAXLINE];
     char **args;
     farg *al;
 
@@ -382,7 +383,7 @@ static farg *proc_args(fdecl *dcl)
     for (i = 0; i < na; i++)
         {al[i].arg = args[i];
 	 split_decl(al+i, al[i].arg);
-	 al[i].knd = fc_type(lty, MAXLINE, al[i].type, al[i].arg, MODE_C);};
+	 fc_type(NULL, 0, al+i, TRUE, MODE_C);};
 
     dcl->al = al;
 
@@ -807,7 +808,8 @@ static char *deref(char *d, int nc, char *s)
 /* SETUP_BINDER - initialize the data members of BD */
 
 static void setup_binder(bindes *bd, char *pck, int cfl,
-			 char **sbi, char **cpr, char **fpr, char **fwr)
+			 char **sbi, char **cdc, char **cpr,
+			 char **fpr, char **fwr)
    {
 
     if (bd != NULL)
@@ -817,6 +819,9 @@ static void setup_binder(bindes *bd, char *pck, int cfl,
 
 	bd->sbi = sbi;
 	bd->nbi = lst_length(sbi);
+
+	bd->cdc = cdc;
+	bd->ndc = lst_length(cdc);
 
 	bd->cpr = cpr;
 	bd->ncp = lst_length(cpr);
@@ -897,30 +902,38 @@ static void cf_type(char *a, int nc, char *ty)
  *         - return the kind of FORTRAN argument TY is
  */
 
-static fparam fc_type(char *wty, int nc, char *ty, char *arg, langmode mode)
-   {fparam rv;
-    char *pty;
+static void fc_type(char *wty, int nc, farg *al, int afl, langmode mode)
+   {fparam knd;
+    char lty[MAXLINE];
+    char *pty, *arg, *ty;
+
+    if (wty == NULL)
+       {wty = lty;
+	nc  = MAXLINE;};
+
+    arg = al->arg;
+    ty  = al->type;
 
     pty = lookup_type(NULL, ty, MODE_C, mode);
 
 /* handle variable arg list */
     if (is_var_arg(ty) == TRUE)
        {nstrncpy(wty, nc, "char *", -1);
-	rv = FP_VARARG;}
+	knd = FP_VARARG;}
 
 /* handle function pointer */
-    else if ((arg != NULL) && (strstr(arg, "(*") != NULL))
+    else if ((afl == TRUE) && (strstr(arg, "(*") != NULL))
        {nstrncpy(wty, nc, arg, -1);
-	rv = FP_FNC;}
+	knd = FP_FNC;}
 
 /* follow the PACT function pointer PF convention */
     else if (strncmp(ty, "PF", 2) == 0)
        {nstrncpy(wty, nc, ty, -1);
-	rv = FP_FNC;}
+	knd = FP_FNC;}
 
     else if (pty != NULL)
        {if (LAST_CHAR(ty) == '*')
-	   {rv = FP_ARRAY;
+	   {knd = FP_ARRAY;
 
 /* for C dereference the type so that we have an array of type */
 	    if (mode == MODE_C)
@@ -935,7 +948,7 @@ static fparam fc_type(char *wty, int nc, char *ty, char *arg, langmode mode)
 	    else
 	       nstrncpy(wty, nc, pty, -1);}
 	else
-	   {rv = FP_SCALAR;
+	   {knd = FP_SCALAR;
 	    nstrncpy(wty, nc, pty, -1);};}
 
 /* unknown type */
@@ -943,11 +956,13 @@ static fparam fc_type(char *wty, int nc, char *ty, char *arg, langmode mode)
        {nstrncpy(wty, nc, ty, -1);
 
 	if (LAST_CHAR(ty) == '*')
-	   rv = FP_INDIRECT;
+	   knd = FP_INDIRECT;
 	else
 	   berr("Unknown type '%s'", ty);};
 
-    return(rv);}
+    al->knd = knd;
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1043,12 +1058,13 @@ static void fc_call_list(char *a, int nc, fdecl *dcl, int local)
 /* INIT_FORTRAN - initialize Fortran wrapper file */
 
 static void init_fortran(bindes *bd, char *pck, int cfl,
-			 char **sbi, char **cpr, char **fpr, char **fwr)
+			 char **sbi, char **cdc, char **cpr,
+			 char **fpr, char **fwr)
    {int nc;
     char fn[MAXLINE], hf[MAXLINE], ufn[MAXLINE], fill[MAXLINE];
     FILE *fp;
 
-    setup_binder(bd, pck, cfl, sbi, cpr, fpr, fwr);
+    setup_binder(bd, pck, cfl, sbi, cdc, cpr, fpr, fwr);
 
     fp = NULL;
 
@@ -1357,9 +1373,10 @@ static void fortran_wrap(FILE *fp, fdecl *dcl, char *cfn, char *ffn)
 	berr("%s is not interoperable - variable args", fn);}
 
     else if (strcmp(ffn, "none") != 0)
-       {voidf = (strcmp(dcl->proto.type, "void") == 0);
+       {fc_type(rt, MAXLINE, &dcl->proto, FALSE, MODE_C);
 
-	knd = fc_type(rt, MAXLINE, dcl->proto.type, NULL, MODE_C);
+	voidf = (strcmp(dcl->proto.type, "void") == 0);
+	knd   = dcl->proto.knd;
 
 	csep(fp);
 
@@ -1481,14 +1498,15 @@ static void fin_fortran(bindes *bd)
  *    	C_CHAR			char
  */
 
-static fparam mc_type(int nc, char *fty, char *cty,
-		      char *wty, char *ty)
-   {fparam knd;
-    char lfty[MAXLINE], lcty[MAXLINE], lwty[MAXLINE];
+static void mc_type(int nc, char *fty, char *cty,
+		    char *wty, farg *arg)
+   {char lfty[MAXLINE], lcty[MAXLINE], lwty[MAXLINE];
+    char *ty;
 
-    knd = fc_type(lwty, nc, ty, NULL, MODE_F);
+    fc_type(lwty, nc, arg, FALSE, MODE_F);
     memmove(lwty, subst(lwty, "FIXNUM", "integer", -1), nc);
 
+    ty = arg->type;
     if (is_var_arg(ty) == TRUE)
        {nstrncpy(lfty, MAXLINE, "error", -1);
 	nstrncpy(lcty, MAXLINE, "error", -1);}
@@ -1573,7 +1591,7 @@ static fparam mc_type(int nc, char *fty, char *cty,
     if (wty != NULL)
        nstrncpy(wty, nc, lwty, -1);
 
-    return(knd);}
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1596,9 +1614,10 @@ static char **mc_proto_list(fdecl *dcl)
     voida = no_args(dcl);
 
 /* function/return type */
+    mc_type(MAXLINE, NULL, NULL, wty, &dcl->proto);
     ty  = dcl->proto.type;
     nm  = dcl->proto.name;
-    knd = mc_type(MAXLINE, NULL, NULL, wty, ty);
+    knd = dcl->proto.knd;
     switch (knd)
        {case FP_FNC      :
         case FP_INDIRECT :
@@ -1627,9 +1646,10 @@ static char **mc_proto_list(fdecl *dcl)
         {if ((voida == TRUE) && (i == 0))
 	    continue;
 
+	 mc_type(MAXLINE, NULL, NULL, wty, al+i);
 	 ty  = al[i].type;
 	 nm  = al[i].name;
-	 knd = mc_type(MAXLINE, NULL, NULL, wty, ty);
+	 knd = al[i].knd;
 	 switch (knd)
 	    {case FP_FNC      :
 	     case FP_INDIRECT :
@@ -1673,13 +1693,15 @@ static int mc_need_ptr(fdecl *dcl)
 
     ok = FALSE;
 
-    if (mc_type(MAXLINE, NULL, cty, NULL, dcl->proto.type) != FP_VARARG)
+    mc_type(MAXLINE, NULL, cty, NULL, &dcl->proto);
+    if (dcl->proto.knd != FP_VARARG)
        ok |= ((strcmp(cty, "C_PTR") == 0) ||
 	      (strcmp(cty, "C_FUNPTR") == 0));
 
     if ((na > 0) && (no_args(dcl) == FALSE))
        {for (i = 0; i < na; i++)
-	    {if (mc_type(MAXLINE, NULL, cty, NULL, al[i].type) != FP_VARARG)
+	    {mc_type(MAXLINE, NULL, cty, NULL, al+i);
+	     if (al[i].knd != FP_VARARG)
 	        ok |= ((strcmp(cty, "C_PTR") == 0) ||
 		       (strcmp(cty, "C_FUNPTR") == 0));};};
 
@@ -1717,12 +1739,13 @@ static void mc_decl_list(char *a, int nc, fdecl *dcl)
 /* INIT_MODULE - initialize Fortran/C interoperatbility module file */
 
 static void init_module(bindes *bd, char *pck, int cfl,
-			char **sbi, char **cpr, char **fpr, char **fwr)
+			char **sbi, char **cdc, char **cpr,
+			char **fpr, char **fwr)
    {int nc;
     char fn[MAXLINE], ufn[MAXLINE], fill[MAXLINE];
     FILE *fp;
 
-    setup_binder(bd, pck, cfl, sbi, cpr, fpr, fwr);
+    setup_binder(bd, pck, cfl, sbi, cdc, cpr, fpr, fwr);
 
     fp = NULL;
 
@@ -1903,7 +1926,6 @@ static int module_itf_wrappable(fdecl *dcl)
     char *pr;
 
     pr = dcl->proto.arg;
-
     rv = ((is_var_arg(pr) == FALSE) && (strstr(pr, "void *") == NULL));
 
     return(rv);}
@@ -1930,7 +1952,7 @@ static void module_itf_wrap_ext(FILE *fp, char *pck, fdecl *dcl,
 		fprintf(fp, "\n");};};
 
 	rty = dcl->proto.type;
-	mc_type(MAXLINE, fty, cty, NULL, rty);
+	mc_type(MAXLINE, fty, cty, NULL, &dcl->proto);
 	if (strcmp(rty, "void") == 0)
 	   fprintf(fp, "   external :: %s\n", dcn);
         else
@@ -1964,7 +1986,7 @@ static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
 	voidf = (strcmp(rty, "void") == 0);
 	oper  = (voidf == TRUE) ? "subroutine" : "function";
 
-	mc_type(MAXLINE, fty, cty, NULL, rty);
+	mc_type(MAXLINE, fty, cty, NULL, &dcl->proto);
 	mc_decl_list(a, MAXLINE, dcl);
 
 	snprintf(t, MAXLINE, "      %s %s(%s)", oper, dcn, a);
@@ -2029,7 +2051,7 @@ static void module_interop_wrap(FILE *fp, fdecl *dcl, char *cfn, char *ffn)
 	voidf = (strcmp(rty, "void") == 0);
 	oper  = (voidf == TRUE) ? "subroutine" : "function";
 
-	mc_type(MAXLINE, fty, cty, NULL, rty);
+	mc_type(MAXLINE, fty, cty, NULL, &dcl->proto);
 	mc_decl_list(a, MAXLINE, dcl);
 
 	snprintf(cd, MAXLINE, "      %s %s(%s)", oper, dcn, a);
@@ -2048,9 +2070,9 @@ static void module_interop_wrap(FILE *fp, fdecl *dcl, char *cfn, char *ffn)
 	    {if ((voida == TRUE) && (i == 0))
 	        continue;
 
+	     mc_type(MAXLINE, fty, cty, NULL, al+i);
 	     ty = al[i].type;
 	     nm = al[i].name;
-	     mc_type(MAXLINE, fty, cty, NULL, ty);
 	     fprintf(fp, "         %s(%s), value :: %s\n",
 		     fty, cty, nm);};
 
@@ -2293,10 +2315,11 @@ static fparam so_type(char *a, int nc, char *ty)
 /* INIT_SCHEME - initialize Scheme file */
 
 static void init_scheme(bindes *bd, char *pck, int cfl,
-			char **sbi, char **cpr, char **fpr, char **fwr)
+			char **sbi, char **cdc, char **cpr,
+			char **fpr, char **fwr)
    {FILE *fp;
 
-    setup_binder(bd, pck, cfl, sbi, cpr, fpr, fwr);
+    setup_binder(bd, pck, cfl, sbi, cdc, cpr, fpr, fwr);
 
     fp = open_file("w", "gs-%s.c", pck);
 
@@ -2726,10 +2749,11 @@ static void fin_scheme(bindes *bd)
 /* INIT_PYTHON - initialize Python file */
 
 static void init_python(bindes *bd, char *pck, int cfl,
-			char **sbi, char **cpr, char **fpr, char **fwr)
+			char **sbi, char **cdc, char **cpr,
+			char **fpr, char **fwr)
    {FILE *fp;
 
-    setup_binder(bd, pck, cfl, sbi, cpr, fpr, fwr);
+    setup_binder(bd, pck, cfl, sbi, cdc, cpr, fpr, fwr);
 
     fp = open_file("w", "gp-%s.c", pck);
 
@@ -2827,10 +2851,11 @@ static void fin_python(bindes *bd)
 /* INIT_DOC - initialize Doc file */
 
 static void init_doc(bindes *bd, char *pck, int cfl,
-		     char **sbi, char **cpr, char **fpr, char **fwr)
+		     char **sbi, char **cdc, char **cpr,
+		     char **fpr, char **fwr)
    {FILE *fp;
 
-    setup_binder(bd, pck, cfl, sbi, cpr, fpr, fwr);
+    setup_binder(bd, pck, cfl, sbi, cdc, cpr, fpr, fwr);
 
     fp = open_file("w", "gh-%s.html", pck);
 
@@ -2898,11 +2923,58 @@ static void doc_proto_name_only(char *a, int nc, fdecl *dcl, char *dlm)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* FIND_COMMENT - return a pointer to the part of CDC which
+ *              - documents CFN
+ */
+
+static char **find_comment(char *cfn, int ndc, char **cdc)
+   {int i;
+    char *s, **com;
+
+    com = NULL;
+    for (i = 0; (i < ndc) && (com == NULL); i++)
+        {s = cdc[i];
+	 if ((strstr(s, "#bind") != NULL) &&
+	     (strstr(s, cfn) != NULL))
+	    {for ( ; i >= 0; i--)
+	         {s = cdc[i];
+                  if (strncmp(s, "/*", 2) == 0)
+		     {com = cdc + i;
+		      break;};};};};
+
+    return(com);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PROCESS_DOC - process the comments into a string */
+
+static void process_doc(char *t, int nc, char **com)
+   {int i;
+    char *s, *p;
+
+    t[0] = '\0';
+    if (com != NULL)
+       {for (i = 0; IS_NULL(com[i]) == FALSE; i++)
+	    {s = com[i] + 3;
+	     if (strstr(s, "#bind ") == NULL)
+	        {p = strchr(s, '-');
+		 if (p != NULL)
+		    vstrcat(t, nc, "%s\n", p+2);
+		 else
+		    nstrcat(t, nc, "\n");};};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* DOC_WRAP - wrap C function DCL in DOC callable function
  *          - using names in FN
  */
 
-static void doc_wrap(FILE *fp, fdecl *dcl, char *sb, char *cfn, char **tok)
+static void doc_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc,
+		     char *cfn, char **tok)
    {int voidf;
     char upn[MAXLINE], lfn[MAXLINE], dcn[MAXLINE];
     char af[MAXLINE], as[MAXLINE], ap[MAXLINE];
@@ -2910,7 +2982,10 @@ static void doc_wrap(FILE *fp, fdecl *dcl, char *sb, char *cfn, char **tok)
     char **args;
     char **com;
 
-    com = tok + 3;
+    if (IS_NULL(tok[3]) == FALSE)
+       com = tok + 3;
+    else
+       com = find_comment(cfn, ndc, cdc);
 
     voidf = (strcmp(dcl->proto.type, "void") == 0);
 
@@ -2970,11 +3045,13 @@ static void doc_wrap(FILE *fp, fdecl *dcl, char *sb, char *cfn, char **tok)
     fprintf(fp, "</pre>\n");
     fprintf(fp, "<p>\n");
 
-    concatenate(t, MAXLINE, com, " ");
-    fputs(t, fp);
-    fprintf(fp, "\n");
-    fprintf(fp, "<p>\n");
+    process_doc(t, MAXLINE, com);
+    if (IS_NULL(t) == FALSE)
+       {fprintf(fp, "<pre>\n");
+	fputs(t, fp);
+	fprintf(fp, "</pre>\n");};
 
+    fprintf(fp, "<p>\n");
     fprintf(fp, "\n");
     hsep(fp);
 
@@ -2988,16 +3065,17 @@ static void doc_wrap(FILE *fp, fdecl *dcl, char *sb, char *cfn, char **tok)
  */
 
 static int bind_doc(bindes *bd)
-   {int ib, rv;
+   {int ib, ndc, rv;
     char t[MAXLINE];
-    char *sb, **ta;
-    char *cfn;
+    char *sb, *cfn;
+    char **cpr, **cdc, **sbi, **ta;
     fdecl *dcl;
     FILE *fp;
-    char **cpr, **sbi;
 
     fp  = bd->fp;
     cpr = bd->cpr;
+    ndc = bd->ndc;
+    cdc = bd->cdc;
     sbi = bd->sbi;
 
     rv = TRUE;
@@ -3010,7 +3088,7 @@ static int bind_doc(bindes *bd)
 	     cfn = ta[0];
              dcl = find_proto(cpr, cfn);
 	     if (dcl != NULL)
-	        {doc_wrap(fp, dcl, sb, cfn, ta+1);
+	        {doc_wrap(fp, dcl, sb, ndc, cdc, cfn, ta+1);
 		 free_decl(dcl);};
 
 	     free_strings(ta);};};
@@ -3042,25 +3120,26 @@ static void fin_doc(bindes *bd)
  */
 
 static int blang(char *pck, int cfl, char *fbi,
-		 char *cpr, char *fpr, char *fwr)
+		 char *cdc, char *cpr, char *fpr, char *fwr)
    {int ib, nb, rv;
-    char **sbi, **scp, **sfp, **swr;
+    char **sbi, **sdc, **scp, **sfp, **swr;
     bindes *pb;
-    bindes bd[] = { {0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL,
+    bindes bd[] = { {0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 		     init_fortran, bind_fortran, fin_fortran},
-		    {0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL,
+		    {0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 		     init_module, bind_module, fin_module},
-		    {0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL,
+		    {0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 		     init_scheme, bind_scheme, fin_scheme},
-		    {0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL,
+		    {0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 		     init_python, bind_python, fin_python},
-		    {0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL,
+		    {0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 		     init_doc, bind_doc, fin_doc} };
 
     rv = FALSE;
 
     if ((IS_NULL(cpr) == FALSE) && (IS_NULL(fbi) == FALSE))
        {sbi = file_text(fbi);
+	sdc = file_text(cdc);
 	scp = file_text(cpr);
 	sfp = file_text(fpr);
 	swr = file_text(fwr);
@@ -3078,7 +3157,7 @@ static int blang(char *pck, int cfl, char *fbi,
 	       {nb = sizeof(bd)/sizeof(bindes);
 
 		for (pb = bd, ib = 0; ib < nb; ib++, pb++)
-		    pb->init(pb, pck, cfl, sbi, scp, sfp, swr);
+		    pb->init(pb, pck, cfl, sbi, sdc, scp, sfp, swr);
 
 		if (sbi != NULL)
 		   {for (pb = bd, ib = 0; ib < nb; ib++, pb++)
@@ -3090,6 +3169,7 @@ static int blang(char *pck, int cfl, char *fbi,
 		rv = TRUE;};};
 
 	free_strings(sbi);
+	free_strings(sdc);
 	free_strings(scp);
 	free_strings(sfp);
 	free_strings(swr);};
@@ -3104,36 +3184,43 @@ static int blang(char *pck, int cfl, char *fbi,
 int main(int c, char **v)
    {int i, rv, cfl;
     char pck[MAXLINE], msg[MAXLINE];
-    char *fbi, *cpr, *fpr, *fwr;
+    char *fbi, *cdc, *cpr, *fpr, *fwr;
 
     fbi = "";
     cpr = "";
+    cdc = "";
     fpr = "";
     fwr = "";
     cfl = 3;
 
     for (i = 1; i < c; i++)
-        {if (strcmp(v[i], "-h") == 0)
-            {printf("Usage: blang [-h] [-w] <prototypes> <bindings>\n");
+        {if (strcmp(v[i], "-b") == 0)
+	    fbi = v[++i];
+	 else if (strcmp(v[i], "-c") == 0)
+	    cpr = v[++i];
+	 else if (strcmp(v[i], "-d") == 0)
+	    cdc = v[++i];
+	 else if (strcmp(v[i], "-f") == 0)
+	    fpr = v[++i];
+	 else if (strcmp(v[i], "-h") == 0)
+            {printf("Usage: blang -b <bindings> -c <c-proto> [-d <doc>] [-f <f-proto>] [-h] [-w <f-wrapper>] [-wr] <prototypes> <bindings>\n");
+             printf("   b    file containing binding specifications\n");
+             printf("   c    file containing C prototypes\n");
+             printf("   d    file containing documentation comments\n");
+             printf("   f    file containing Fortran prototypes\n");
              printf("   h    this help message\n");
              printf("   o    no interoprabilty interfaces (Fortran wrappers only)\n");
-             printf("   w    no Fortran wrappers (interoperability only)\n");
+             printf("   w    file containing Fortran wrapper specifications\n");
+             printf("   wr   no Fortran wrappers (interoperability only)\n");
              printf("   <prototypes>    file containing C function prototypes\n");
              printf("   <binding>       file specifying function bindings\n");
              printf("\n");}
 	 else if (strcmp(v[i], "-o") == 0)
             cfl &= ~2;
 	 else if (strcmp(v[i], "-w") == 0)
-            cfl &= ~1;
-	 else
-	    {if (IS_NULL(fbi) == TRUE)
-	        fbi = v[i];
-	     else if (IS_NULL(cpr) == TRUE)
-	        cpr = v[i];
-	     else if (IS_NULL(fpr) == TRUE)
-	        fpr = v[i];
-	     else if (IS_NULL(fwr) == TRUE)
-	        fwr = v[i];};};
+	    fwr = v[++i];
+	 else if (strcmp(v[i], "-wr") == 0)
+            cfl &= ~1;};
 
     snprintf(pck, MAXLINE, "%s", path_base(path_tail(fbi)));
     snprintf(msg, MAXLINE, "%s bindings", pck);
@@ -3142,7 +3229,7 @@ int main(int c, char **v)
 
     init_types();
 
-    rv = blang(pck, cfl, fbi, cpr, fpr, fwr);
+    rv = blang(pck, cfl, fbi, cdc, cpr, fpr, fwr);
     rv = (rv != TRUE);
 
     printf("done\n");

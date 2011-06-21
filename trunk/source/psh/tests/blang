@@ -93,7 +93,7 @@ else
       Note $hdr "typedef struct s_str str;"
       flog $Log cat $hdr
 
-      flog $Log blang $i.bind $i.proto
+      flog $Log blang -b $i.bind -c $i.proto
 
       cat $i.proto | \
       grep -v '#' | \

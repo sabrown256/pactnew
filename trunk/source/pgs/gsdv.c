@@ -48,15 +48,11 @@ int
  
 /*--------------------------------------------------------------------------*/
  
-/* PG_OPEN_DEVICE - initialize a graphics device and return a pointer to it
- *                - name - a desriptive name of the device
- *                -        WINDOW - display screen window
- *                -        PS     - PostScript
- *                -        CGM    - CGM device
- *                -        RASTER - raster device
- *                - type - a qualifier for the device
- *                -        MONOCHROME - black and white display
- *                -        COLOR      - color display
+/* PG_OPEN_DEVICE - open the graphics device DEV at (XF,YF) on
+ *                - the physical device
+ *                - the device shape is DXF by DYF
+ *                - all quantities are fractions of the physical device
+ *                - size
  *
  * #bind PG_open_device fortran() scheme()
  */

@@ -240,12 +240,27 @@ Note $Log ""
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+# FIND_DOC - process the C files for comments with #bind directives
+
+   flog $Log set cdoc = z-$arch/obj/$d.doc
+
+   if ("$Cfiles" != "") then
+      find-comments -t '#bind' $Hfiles $Cfiles | \
+      cat >&! $cdoc
+   else
+      flog $Log rm -f $cdoc
+      flog $Log touch $cdoc
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
    NoteD $Log "done"
 
    set zdir = z-$arch/obj
    flog $Log pushd $zdir
 
-   flog $Log blang $cbind:t $cproto:t $fproto:t $fwrap:t
+   flog $Log blang -b $cbind:t -c $cproto:t -d $cdoc:t -f $fproto:t -w $fwrap:t
    set xstatus = $status
 
 # move all fortran stuff to the fortran package

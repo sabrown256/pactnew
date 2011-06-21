@@ -19,7 +19,7 @@ TGTScr = do-local do-stats do-automake distribute \
          check-hosts check-service all-service \
          cdlog which-cfg mpi-info diff-tree use-tcsh \
          simplify-path simplify-list gcc-info sinstall fill-string \
-         mall png-diff sunrace cross-info
+         mall png-diff sunrace cross-info find-comments
 
 TGTInc = env-csh csh-subroutines
 
