@@ -244,6 +244,7 @@ ${BinDir}/mlpfts : mlpfts.c ${TGTLib}
 # link 
 #
 link: ${InstallDep}
+	pact man3install
 
 #
 # install 

@@ -805,7 +805,7 @@ static void check_dir(void)
     char Created[LRG], Missing[LRG];
     char *sib, *dir;
     static char *dlst[] = {"bin", "lib", "include", "include/shell",
-			   "scheme", "man", "man/man1"};
+			   "scheme", "man", "man/man1", "man/man3"};
 
     n   = sizeof(dlst)/sizeof(char *);
     sib = dbget(NULL, TRUE, "InstBase");
@@ -1346,7 +1346,8 @@ static void default_var(char *base)
     dbinitv(NULL, "PubInc",        "");
     dbinitv(NULL, "PubLib",        "");
     dbinitv(NULL, "ScmDir",        "scheme");
-    dbinitv(NULL, "ManDir",        "man/man1");
+    dbinitv(NULL, "Man1Dir",       "man/man1");
+    dbinitv(NULL, "Man3Dir",       "man/man3");
     dbinitv(NULL, "CROSS_COMPILE", "FALSE");
 
 /* global variables */

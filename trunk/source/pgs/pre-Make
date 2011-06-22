@@ -155,6 +155,7 @@ IncAction = @pact generate
 # link 
 #
 link: ${InstallDep}
+	pact man3install
 
 #
 # install 

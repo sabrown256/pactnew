@@ -145,11 +145,43 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
+; SYMENT-TYPE - return the syment's type
+
+(define (syment-type ep)
+    (if ep (list-ref (pdb->list ep) 0) nil))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; SYMENT-N-ITEMS - return a list of the syment's number of items
+
+(define (syment-n-items ep)
+    (if ep (list-ref (pdb->list ep) 1) nil))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; SYMENT-ADDRESS - return the syment's address
+
+(define (syment-address ep)
+    (if ep (list-ref (pdb->list ep) 2) nil))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; SYMENT-DIMENSIONS - return a list of the syment's dimensions
+
+(define (syment-dimensions ep)
+    (if ep (list-tail (pdb->list ep) 3) nil))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
 ; VARIABLE-DIMENSIONS - return a list of the variable's dimensions
 
 (define (variable-dimensions name)
     (let* ((ep (read-syment current-file name)))
-          (if ep (cddr (pdb->list ep)) nil)))
+          (syment-dimensions ep)))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -158,7 +190,7 @@
 
 (define (variable-type name)
     (let* ((ep (read-syment current-file name)))
-          (if ep (car (pdb->list ep)) nil)))
+          (syment-type ep)))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -167,7 +199,7 @@
 
 (define (variable-address name)
     (let* ((ep (read-syment current-file name)))
-          (if ep (cadr (pdb->list ep)) nil)))
+          (syment-address ep)))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------

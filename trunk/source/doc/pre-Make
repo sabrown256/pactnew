@@ -14,6 +14,7 @@ MAN     = *.1
 
 install :
 	make-html
+	pact man
 
 html :
 	make-html -i
@@ -22,5 +23,5 @@ html :
 	make-html
 
 man :
-	cp ${MAN} ${ManDir}
+	cp ${MAN} ${Man1Dir}
 

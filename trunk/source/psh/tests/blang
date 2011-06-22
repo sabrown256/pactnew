@@ -67,7 +67,7 @@ else
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   flog $Log set cc = ( ${CC_Exe} ${CDefDebug} ${CC_Flags} -I${IncDir} ${DP_Inc} )
+   flog $Log set cc = ( ${CC_Exe} ${CDefDebug} ${CC_Flags} -I${IncDir} ${MDG_Inc} ${DP_Inc} )
    flog $Log set fc = ( ${FC_Exe} ${CDefDebug} ${FC_Flags} -I${IncDir} )
 
    @ nerr = 0

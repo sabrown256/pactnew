@@ -57,7 +57,8 @@ source $ldir/env-csh
        Note $STDOUT 'set DocDir    = $LRoot/doc'
        Note $STDOUT "set InstDir   = $InstBase"
        Note $STDOUT 'set SchemeDir = $InstDir/'$ScmDir
-       Note $STDOUT 'set ManDir    = $InstDir/'$ManDir
+       Note $STDOUT 'set Man1Dir   = $InstDir/'$Man1Dir
+       Note $STDOUT 'set Man3Dir   = $InstDir/'$Man3Dir
        Note $STDOUT ""
 
        if ($HavePython == TRUE) then
@@ -331,9 +332,25 @@ source $ldir/env-csh
        Note $STDOUT "# install MAN files with 664"
        Note $STDOUT 'pushd $DocDir >& /dev/null'
        Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "Installing MAN files in $ManDir"'
-       Note $STDOUT 'set DestDir = $ManDir'
+       Note $STDOUT 'echo "Installing MAN files in $Man1Dir"'
+       Note $STDOUT 'set DestDir = $Man1Dir'
        Note $STDOUT 'foreach file (*.1)'
+       Note $STDOUT '   if (-f $file) then'
+       Note $STDOUT '      if (!(-d $file)) then'
+       Note $STDOUT '         touch $DestDir/.lock'
+       Note $STDOUT '         sinstall -p 664 $file $DestDir'
+       Note $STDOUT '         if ($status != 0) then'
+       Note $STDOUT '            echo "   FAILED ($status) $file"'
+       Note $STDOUT '         else'
+       Note $STDOUT '            echo "   $file"'
+       Note $STDOUT '         endif'
+       Note $STDOUT '      endif'
+       Note $STDOUT '   endif'
+       Note $STDOUT 'end'
+       Note $STDOUT 'popd >& /dev/null'
+       Note $STDOUT ""
+       Note $STDOUT 'set DestDir = $Man3Dir'
+       Note $STDOUT 'foreach file (*.3)'
        Note $STDOUT '   if (-f $file) then'
        Note $STDOUT '      if (!(-d $file)) then'
        Note $STDOUT '         touch $DestDir/.lock'

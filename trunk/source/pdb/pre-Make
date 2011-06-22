@@ -279,13 +279,14 @@ LibAction = build-spokes
 # link 
 #
 link: ${InstallDep}
+	pact man3install
 
 #
 # install 
 #
 install:
-	pact incinstall
 	pact link
+	pact incinstall
 
 #
 # sharedlib

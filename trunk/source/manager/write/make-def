@@ -62,7 +62,8 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT 'BinDir  = ${RootDir}/bin'
     Note $STDOUT 'LibDir  = ${RootDir}/lib'
     Note $STDOUT 'IncDir  = ${RootDir}/include'
-    Note $STDOUT 'ManDir  = ${RootDir}/man/man1'
+    Note $STDOUT 'Man1Dir = ${RootDir}/man/man1'
+    Note $STDOUT 'Man3Dir = ${RootDir}/man/man3'
     Note $STDOUT ""
 
     if ("$HostOS" == "HP-UX") then
@@ -74,6 +75,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT 'TGTScr  = noscr'
     Note $STDOUT 'TGTScmX = noscmx'
     Note $STDOUT 'TGTScrX = noscrx'
+    Note $STDOUT 'TGTMan3 = noman'
     Note $STDOUT 'LibName = noname'
     Note $STDOUT ""
 
