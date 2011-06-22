@@ -3038,12 +3038,10 @@ static void process_doc(char *t, int nc, char **com)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DOC_WRAP - wrap C function DCL in DOC callable function
- *          - using names in FN
- */
+/* HTML_WRAP - wrap C function DCL in HTML form */
 
-static void doc_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc,
-		     char *cfn, char **tok)
+static void html_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc,
+		      char *cfn, char **tok)
    {int voidf;
     char upn[MAXLINE], lfn[MAXLINE], dcn[MAXLINE];
     char af[MAXLINE], as[MAXLINE], ap[MAXLINE];
@@ -3129,6 +3127,122 @@ static void doc_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* MAN_WRAP - wrap C function DCL in MAN form */
+
+static void man_wrap(fdecl *dcl, char *sb, char *pck, int ndc, char **cdc,
+		     char *cfn, char **tok)
+   {int voidf;
+    char fname[MAXLINE], upk[MAXLINE];
+    char upn[MAXLINE], lfn[MAXLINE], dcn[MAXLINE];
+    char af[MAXLINE], as[MAXLINE], ap[MAXLINE];
+    char fty[MAXLINE], t[MAXLINE];
+    char **args, **com;
+    FILE *fp;
+
+    if (IS_NULL(tok[3]) == FALSE)
+       com = tok + 3;
+    else
+       com = find_comment(cfn, ndc, cdc);
+
+    voidf = (strcmp(dcl->proto.type, "void") == 0);
+
+    nstrncpy(upk, MAXLINE, pck, -1);
+    upcase(upk);
+
+    nstrncpy(upn, MAXLINE, cfn, -1);
+    upcase(upn);
+
+    nstrncpy(lfn, MAXLINE, cfn, -1);
+    downcase(lfn);
+
+    cf_type(fty, MAXLINE, dcl->proto.type);
+
+    snprintf(fname, MAXLINE, "%s.3", cfn);
+    fp = fopen(fname, "w");
+
+    fprintf(fp, ".\\\"\n");
+    fprintf(fp, ".\\\" See the terms of include/cpyright.h\n");
+    fprintf(fp, ".\\\"\n");
+    fprintf(fp, ".TH %s 3  2011-06-21 \"%s\" \"%s Documentation\"\n",
+	    upn, upk, upk);
+    fprintf(fp, ".SH NAME\n");
+    fprintf(fp, "%s \\- \n", cfn);
+    fprintf(fp, ".SH SYNOPSIS\n");
+    fprintf(fp, ".nf\n");
+
+    fprintf(fp, ".B #include <%s.h>\n", pck);
+    fprintf(fp, ".sp\n");
+
+/* C */
+    fprintf(fp, ".B C Binding:       %s\n", dcl->proto.arg);
+    fprintf(fp, ".sp\n");
+
+/* Fortran */
+    if (strstr(sb, "fortran(") == NULL)
+       {fprintf(fp, ".B Fortran Binding: none\n");
+	fprintf(fp, ".sp\n");}
+    else
+       {args = dcl->tfproto;
+
+	doc_proto_fortran(af, MAXLINE, dcl);
+	map_name(dcn, MAXLINE, args[1], NULL, "f", -1, FALSE);
+	if (voidf == TRUE)
+	   fprintf(fp, ".B Fortran Binding: %s(%s)\n",
+		   dcn, af);
+	else
+	   fprintf(fp, ".B Fortran Binding: %s %s(%s)\n",
+		   args[0], dcn, af);
+
+	fprintf(fp, ".sp\n");};
+
+/* Scheme */
+    if (strcmp(sb, "scheme(") == 0)
+       {fprintf(fp, ".B SX Binding:      none\n");
+	fprintf(fp, ".sp\n");}
+    else
+       {map_name(dcn, MAXLINE, cfn, NULL, NULL, -1, TRUE);
+	doc_proto_name_only(as, MAXLINE, dcl, NULL);
+	if (IS_NULL(as) == TRUE)
+	   fprintf(fp, ".B SX Binding:      (%s)\n", dcn);
+	else
+	   fprintf(fp, ".B SX Binding:      (%s %s)\n", dcn, as);
+
+	fprintf(fp, ".sp\n");};
+
+/* Python */
+    if (strcmp(sb, "python(") == 0)
+       {fprintf(fp, ".B Python Binding:  none\n");
+	fprintf(fp, ".sp\n");}
+    else
+       {map_name(dcn, MAXLINE, cfn, NULL, NULL, -1, FALSE);
+	doc_proto_name_only(ap, MAXLINE, dcl, ",");
+	fprintf(fp, ".B Python Binding:  pact.%s(%s)\n", dcn, ap);
+	fprintf(fp, ".sp\n");};
+
+    process_doc(t, MAXLINE, com);
+    if (IS_NULL(t) == FALSE)
+       {fprintf(fp, ".fi\n");
+	fprintf(fp, ".SH DESCRIPTION\n");
+	fprintf(fp, "%s\n", t);};
+
+    if (voidf == TRUE)
+       {fprintf(fp, ".SH RETURN VALUE\n");
+	fprintf(fp, "none\n");
+	fprintf(fp, ".sp\n");};
+
+    fprintf(fp, ".SH COPYRIGHT\n");
+    fprintf(fp, "include/cpyright.h\n");
+    fprintf(fp, ".sp\n");
+
+    fprintf(fp, "\n");
+
+    fclose(fp);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* BIND_DOC - generate Doc bindings from CPR and SBI
  *          - return TRUE iff successful
  */
@@ -3136,7 +3250,7 @@ static void doc_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc,
 static int bind_doc(bindes *bd)
    {int ib, ndc, rv;
     char t[MAXLINE];
-    char *sb, *cfn;
+    char *sb, *cfn, *pck;
     char **cpr, **cdc, **sbi, **ta;
     fdecl *dcl;
     FILE *fp;
@@ -3146,6 +3260,7 @@ static int bind_doc(bindes *bd)
     ndc = bd->ndc;
     cdc = bd->cdc;
     sbi = bd->sbi;
+    pck = bd->pck;
 
     rv = TRUE;
 
@@ -3157,7 +3272,8 @@ static int bind_doc(bindes *bd)
 	     cfn = ta[0];
              dcl = find_proto(cpr, cfn);
 	     if (dcl != NULL)
-	        {doc_wrap(fp, dcl, sb, ndc, cdc, cfn, ta+1);
+	        {html_wrap(fp, dcl, sb, ndc, cdc, cfn, ta+1);
+		 man_wrap(dcl, sb, pck, ndc, cdc, cfn, ta+1);
 		 free_decl(dcl);};
 
 	     free_strings(ta);};};

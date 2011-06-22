@@ -1,4 +1,5 @@
-#!/bin/csh -f
+#!/usr/bin/env pcsh
+#OPT -f
 #
 # PDBLS - list the contents of a PDB file
 #
@@ -9,15 +10,42 @@
 # include "cpyright.h"
 #
 
-set Root = `echo $SCHEME`
+# determine the bin directory path
+set BinDir = $PACT/bin
 
-if ($#argv != 1) then
-   echo ""
-   echo "Usage: pdbls <pdb-file>"
-   echo ""
-   exit(0)
-endif
+set CFE = ""
 
-sx -l $Root/sxview.scm \(pdbls $1\)
+set digits = 4
+set files  =
+set full   = "#f"
 
-exit($status)
+while ($#argv > 0)
+   switch ($1)
+      case -f:
+         set full = "#t"
+         breaksw
+      case -h:
+	 echo ""
+	 echo "Usage: pdbls [-f] [-h] [-p n] <file>*"
+	 echo ""
+	 echo "   -f   display variable values with descriptive info"
+	 echo "   -h   display this usage information"
+	 echo "   -p   display floating point numbers with n digits"
+	 echo ""
+         exit(0)
+      case -p:
+         shift
+         set digits = $1
+         breaksw
+      default:
+         set files = ( $files $1 )
+         breaksw
+   endsw
+   shift
+end
+
+$CFE $BinDir/sx -s -l sxview.scm \(binls $files $digits $full\)
+set RetVal = $status;
+
+exit($RetVal)
+

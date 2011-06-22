@@ -108,7 +108,8 @@ setenv IncDir   $RootDir/include
 setenv BinDir   $RootDir/bin
 setenv LibDir   $RootDir/lib
 setenv ScmDir   scheme
-setenv ManDir   man/man1
+setenv Man1Dir  man/man1
+setenv Man3Dir  man/man3
 setenv EnvCsh   $IncDir/env-pact.csh
 setenv EnvSh    $IncDir/env-pact.sh
 setenv EnvDk    $IncDir/env-pact.dk
@@ -372,9 +373,13 @@ CheckDir:
              mkdir -p $InstBase/$ScmDir
              set Created = ( $Created $InstBase/$ScmDir )
           endif
-          if (!(-d $InstBase/$ManDir)) then
-             mkdir -p $InstBase/$ManDir
-             set Created = ( $Created $InstBase/$ManDir )
+          if (!(-d $InstBase/$Man1Dir)) then
+             mkdir -p $InstBase/$Man1Dir
+             set Created = ( $Created $InstBase/$Man1Dir )
+          endif
+          if (!(-d $InstBase/$Man3Dir)) then
+             mkdir -p $InstBase/$Man3Dir
+             set Created = ( $Created $InstBase/$Man3Dir )
           endif
        endif
        if ("$Created" != "") then
@@ -401,8 +406,11 @@ CheckDir:
           if (!(-d $InstBase/$ScmDir)) then
              set Missing = ( $Missing $InstBase/$ScmDir )
           endif
-          if (!(-d $InstBase/$ManDir)) then
-             set Missing = ( $Missing $InstBase/$ManDir )
+          if (!(-d $InstBase/$Man1Dir)) then
+             set Missing = ( $Missing $InstBase/$Man1Dir )
+          endif
+          if (!(-d $InstBase/$Man3Dir)) then
+             set Missing = ( $Missing $InstBase/$Man3Dir )
           endif
        endif
        if ("$Missing" != "") then

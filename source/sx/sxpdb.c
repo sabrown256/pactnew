@@ -1181,7 +1181,7 @@ object *_SX_pdbfile_to_list(SS_psides *si, PDBfile *file)
 /*--------------------------------------------------------------------------*/
 
 /* _SX_SYMENT_TO_LIST - returns the syment as a list of objects
- *                    - (type diskaddr dimensions)
+ *                    - (type nitems diskaddr dimensions)
  */
 
 object *_SX_syment_to_list(SS_psides *si, syment *ep)
@@ -1189,6 +1189,7 @@ object *_SX_syment_to_list(SS_psides *si, syment *ep)
 
     obj = _SX_make_dims_obj(si, PD_entry_dimensions(ep));
     obj = SS_mk_cons(si, SS_mk_integer(si, PD_entry_address(ep)), obj);
+    obj = SS_mk_cons(si, SS_mk_integer(si, PD_entry_number(ep)), obj);
     obj = SS_mk_cons(si, SS_mk_string(si, PD_entry_type(ep)), obj);
 
     return(obj);}
@@ -1197,7 +1198,7 @@ object *_SX_syment_to_list(SS_psides *si, syment *ep)
 /*--------------------------------------------------------------------------*/
 
 /* _SX_DEFSTR_TO_LIST - returns the defstr as a list of objects
- *                    - (name (members))
+ *                    - (name size align kind (members))
  *                    - members (type name dimensions)
  */
 
@@ -1207,6 +1208,9 @@ object *_SX_defstr_to_list(SS_psides *si, defstr *dp)
 
     obj = SS_null;
     obj = SS_mk_cons(si, SS_mk_string(si, dp->type), obj);
+    obj = SS_mk_cons(si, SS_mk_integer(si, dp->size), obj);
+    obj = SS_mk_cons(si, SS_mk_integer(si, dp->kind), obj);
+    obj = SS_mk_cons(si, SS_mk_integer(si, dp->alignment), obj);
 
 /* convert to dimension from a dimdes to a cons list */
     for (lst = dp->members; lst != NULL; lst = lst->next)

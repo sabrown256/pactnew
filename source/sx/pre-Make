@@ -24,7 +24,8 @@ TGTScm = applications/sxview.scm applications/sxcomp.scm applications/sxdm.scm \
          applications/pdbvxmpl.scm applications/pdbview.pui \
          applications/gcel.scm applications/vcel.scm applications/nature.scm \
          applications/netcdf.scm applications/ezn.scm
-TGTScr = applications/pdbview applications/pdbdiff applications/pdbcp
+TGTScr = applications/pdbview applications/pdbdiff \
+         applications/pdbls applications/pdbcp
 
 TGTScrX = tpu tzu
 

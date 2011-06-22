@@ -924,6 +924,15 @@ switch ($Cmnd)
         if (!(-d $InstBase/include/shell)) then
            mkdir $InstBase/include/shell
         endif
+        if (!(-d $InstBase/man)) then
+           mkdir $InstBase/man
+        endif
+        if (!(-d $InstBase/man/man1)) then
+           mkdir $InstBase/man/man1
+        endif
+        if (!(-d $InstBase/man/man3)) then
+           mkdir $InstBase/man/man3
+        endif
         if (!(-d $InstBase/scheme)) then
            mkdir $InstBase/scheme
         endif
@@ -1386,7 +1395,8 @@ CFG_DONE:
         set IncDir  = ""
         set MgrDir  = ""
         set DocDir  = ""
-        set ManDir  = ""
+        set Man1Dir = ""
+        set Man3Dir = ""
         set Tags    = ""
         set ChkVer  = ""
 
@@ -1517,12 +1527,13 @@ CFG_DONE:
         end
 
         if ($All != "") then
-           set SrcDir = $DAI_ROOT/pact/wrk
-           set BinDir = "$BINDIR"
-           set LibDir = ( "$BINDIR:h""/lib" )
-           set IncDir = ( "$BINDIR:h""/include" )
-           set ManDir = $DAI_ROOT/pact/new_sources/doc
-           set DocDir = $DAI_ROOT/pact/docs
+           set SrcDir  = $DAI_ROOT/pact/wrk
+           set BinDir  = "$BINDIR"
+           set LibDir  = ( "$BINDIR:h""/lib" )
+           set IncDir  = ( "$BINDIR:h""/include" )
+           set Man1Dir = $DAI_ROOT/pact/man/man1
+           set Man3Dir = $DAI_ROOT/pact/man/man3
+           set DocDir  = $DAI_ROOT/pact/docs
         endif
 
         set LS = 'ls -l'
@@ -1683,13 +1694,14 @@ CFG_DONE:
 
 # MAN PAGES
 
-        if ($ManDir != "") then
+        if ($Man1Dir != "") then
            echo ""
-           echo "PACT man pages reside in $ManDir"
-           cd $ManDir
-           $LS *.1 | awk '    { bytes = bytes + $5                                       \
-                                      printf "%8d\t%s %s %s\t%s\n", $5, $6, $7, $8, $9 } \
-                                END { printf "Total space for man pages is %d bytes (~%d lines)\n\n", bytes, bytes/26 }'
+           echo "PACT man pages reside in $Man1Dir and $Man3Dir"
+           cd $Man1Dir:h
+           $LS man1/*.1 man3/*.3 | \
+           awk '    { bytes = bytes + $5                                       \
+                      printf "%8d\t%s %s %s\t%s\n", $5, $6, $7, $8, $9 } \
+                END { printf "Total space for man pages is %d bytes (~%d lines)\n\n", bytes, bytes/26 }'
         endif
 
 # DOCS

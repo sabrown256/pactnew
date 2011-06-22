@@ -142,6 +142,7 @@ ${TGTExe} : ${BinDep}
 # link 
 #
 link: ${InstallDep}
+	pact man3install
 	pact scminstall
 	pact scrinstall
 

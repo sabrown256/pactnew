@@ -191,6 +191,18 @@ set LibVers = 1
     Note $STDOUT ""
 
     Note $STDOUT '#'
+    Note $STDOUT '# install man pages'
+    Note $STDOUT '#'
+    Note $STDOUT 'man1install :'
+    Note $STDOUT '	@[ ! -f ${IncDir}/.lock ] || { echo "${IncDir} is locked" ; exit 1 ; }'
+    Note $STDOUT '	@(echo "cp ${archo}/*.1 ${Man1Dir}" ; cp ${archo}/*.1 ${Man1Dir})'
+    Note $STDOUT ""
+    Note $STDOUT 'man3install :'
+    Note $STDOUT '	@[ ! -f ${IncDir}/.lock ] || { echo "${IncDir} is locked" ; exit 1 ; }'
+    Note $STDOUT '	@(echo "cp ${archo}/*.3 ${Man3Dir}" ; cp ${archo}/*.3 ${Man3Dir})'
+    Note $STDOUT ""
+
+    Note $STDOUT '#'
     Note $STDOUT '# clean up the directory'
     Note $STDOUT '#'
     Note $STDOUT 'clean :'

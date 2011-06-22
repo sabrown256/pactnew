@@ -464,6 +464,7 @@ link: ${InstallDep} ${BinDir}/ps-diff ${BinDir}/ptime \
       ${BinDir}/ncpu ${BinDir}/propr ${BinDir}/dmnz \
       ${BinDir}/rpath ${BinDir}/hserve ${BinDir}/latency \
       ${BinDir}/mpi-io-wrap ${BinDir}/fcscan
+	pact man3install
 
 #
 # install
