@@ -1,0 +1,15 @@
+#
+# BL6.BIND - systematic tests of ARG
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+# C	Fortran	Scheme	Python
+
+fa1	fortran(fa1f)	scheme(fa1s)	python(fa1p)
+fa2	fortran(fa2f)	scheme(fa2s)	python(fa2p)
+fa3	fortran(fa3f)	scheme(fa3s)	python(fa3p)
+fa4	fortran(fa4f)	scheme(fa4s)	python(fa4p)

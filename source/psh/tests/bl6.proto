@@ -1,0 +1,14 @@
+#
+# BL6.PROTO - systematic tests of ARG
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+int fa1(int a ARG(2,in), float b ARG(2.0,io), long c ARG(2L,out))
+int fa2(int a ARG([1,2,3],in), int b ARG([1,2,3],io), int c ARG([1,2,3],out))
+int fa3(int *a ARG([1,2,3],in), int *b ARG([1,2,3],io), int *c ARG([1,2,3],out))
+int fa4(int *a ARG(,in), int *b ARG(,io), int *c ARG(,out))
+
