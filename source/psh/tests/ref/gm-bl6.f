@@ -26,15 +26,6 @@ module pact_bl6
          integer(8)      :: c
       end function fa1f
 
-      function fa2f(a, b, c) 
-         use iso_c_binding
-         implicit none
-         integer         :: fa2f
-         integer         :: a
-         integer         :: b
-         integer         :: c
-      end function fa2f
-
       function fa3f(a, b, c) 
          use iso_c_binding
          use types_bl6
@@ -65,16 +56,6 @@ module pact_bl6
          real(C_FLOAT), value :: b
          integer(C_LONG), value :: c
       end function fa1f_i
-
-      function fa2f_i(a, b, c) &
-                bind(c, name='fa2')
-         use iso_c_binding
-         implicit none
-         integer(C_INT) :: fa2f_i
-         integer(C_INT), value :: a
-         integer(C_INT), value :: b
-         integer(C_INT), value :: c
-      end function fa2f_i
 
       function fa3f_i(a, b, c) &
                 bind(c, name='fa3')

@@ -25,7 +25,7 @@ enum e_langmode
 typedef enum e_langmode langmode;
 
 enum e_fparam
-   {FP_ANY = -1,
+   {FP_ANY = 0,
     FP_VARARG,
     FP_FNC,            /* pointer to function */
     FP_INDIRECT,       /* pointer to undefined type */
@@ -64,12 +64,13 @@ struct s_bindes
     void (*fin)(bindes *bd);};
 
 struct s_farg
-   {fparam knd;
+   {int nv;
+    fparam knd;
     fdir dir;
     char *arg;
     char type[MAXLINE];
     char name[MAXLINE];
-    char val[MAXLINE];};
+    char **val;};
 
 struct s_fdecl
    {int proc;                         /* TRUE iff processed */
@@ -90,7 +91,7 @@ struct s_mtype
     char *defv;};
 
 static char
- *lookup_type(char *val, char *ty, langmode ity, langmode oty),
+ *lookup_type(char ***val, char *ty, langmode ity, langmode oty),
  **mc_proto_list(fdecl *dcl);
 
 static void
@@ -187,6 +188,28 @@ static int is_ptr(char *type)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* IS_FUNC_PTR - return TRUE if TYPE is a function pointer */
+
+static int is_func_ptr(char *type, int wh)
+   {int rv, syn, cnv;
+
+    syn = (strstr(type, "(*") != NULL);
+    cnv = (strstr(type, "PF") != NULL);
+
+    if ((wh & 1) && (syn == TRUE))
+       rv = TRUE;
+
+    else if ((wh & 2) && (cnv == TRUE))
+       rv = TRUE;
+
+    else
+       rv = FALSE;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* NO_ARGS - return TRUE if function takes no args */
 
 static int no_args(fdecl *dcl)
@@ -264,11 +287,16 @@ static char **split_args(char *args)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PROCESS_QUALIFIERS - process argument qualifiers */
+/* PROCESS_QUALIFIERS - process argument qualifiers
+ *                    - return TRUE if successful
+ */
 
-static void process_qualifiers(farg *arg, char *qual)
-   {char t[MAXLINE];
-    char *val, *dir, **al;
+static int process_qualifiers(farg *arg, char *qual)
+   {int rv;
+    char t[MAXLINE];
+    char *val, *dir, **lst, **al;
+
+    rv = TRUE;
 
     if (IS_NULL(qual) == FALSE)
        {nstrncpy(t, MAXLINE, qual+4, -1);
@@ -278,10 +306,18 @@ static void process_qualifiers(farg *arg, char *qual)
 
 /* get default value */
 	val = al[0];
+	lst = NULL;
 	if (IS_NULL(val) == TRUE)
-	   lookup_type(arg->val, arg->type, MODE_C, MODE_C);
+	   lookup_type(&lst, arg->type, MODE_C, MODE_C);
 	else
-	   nstrncpy(arg->val, MAXLINE, val, -1);
+	   lst = tokenize(val, "[,]");
+	arg->val = lst;
+	arg->nv  = lst_length(lst);
+
+	if ((arg->nv > 1) && (is_ptr(arg->type) == FALSE))
+	   {berr("multiple values illegal with scalar '%s'", arg->arg);
+	    arg->nv = 0;
+	    rv = FALSE;};
 
 /* get argument IN/OUT direction */
 	arg->dir = FD_NONE;
@@ -296,10 +332,10 @@ static void process_qualifiers(farg *arg, char *qual)
 
 	free_strings(al);}
     else
-       {lookup_type(arg->val, arg->type, MODE_C, MODE_C);
+       {lookup_type(&arg->val, arg->type, MODE_C, MODE_C);
 	arg->dir = FD_NONE;};
 
-    return;}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -307,7 +343,7 @@ static void process_qualifiers(farg *arg, char *qual)
 /* SPLIT_DECL - split a declaration S of the form
  *            -    <type> ['*']* <name> [ARG([spec,]* | [spec])]
  *            - into proper type and name
- *            - return TRUE if S is a function pointer
+ *            - return TRUE iff successful
  */
 
 static int split_decl(farg *al, char *s)
@@ -346,7 +382,7 @@ static int split_decl(farg *al, char *s)
 
 	rv = TRUE;}
 
-    else if (strncmp(p, "PF", 2) == 0)
+    else if (is_func_ptr(p, 2) == TRUE)
        {nstrncpy(al->name, MAXLINE, pn, -1);
 	pn[-1] = '\0';
 	nstrncpy(al->type, MAXLINE, p, -1);
@@ -361,7 +397,7 @@ static int split_decl(farg *al, char *s)
 
 	rv = FALSE;};
 
-    process_qualifiers(al, qual);
+    rv = process_qualifiers(al, qual);
 
     return(rv);}
 
@@ -371,7 +407,7 @@ static int split_decl(farg *al, char *s)
 /* PROC_ARGS - process the arg list in the declaration DCL */
 
 static farg *proc_args(fdecl *dcl)
-   {int i, na;
+   {int i, na, ok;
     char **args;
     farg *al;
 
@@ -382,13 +418,19 @@ static farg *proc_args(fdecl *dcl)
 
     for (i = 0; i < na; i++)
         {al[i].arg = args[i];
-	 split_decl(al+i, al[i].arg);
-	 fc_type(NULL, 0, al+i, TRUE, MODE_C);};
+	 ok = split_decl(al+i, al[i].arg);
+	 if (ok == FALSE)
+	    {FREE(al);
+	     dcl->na = 0;
+	     break;}
+	 else
+	    fc_type(NULL, 0, al+i, TRUE, MODE_C);};
 
-    dcl->al = al;
+    if (al != NULL)
+       {dcl->al = al;
 
 /* fill in the Fortran prototype token pairs */
-    mc_proto_list(dcl);
+	mc_proto_list(dcl);};
 
     return(al);}
 
@@ -426,7 +468,7 @@ static int find_func(char *pr, char *f)
  */
 
 static fdecl *find_proto(char **cpr, char *f)
-   {int ip, na, nt;
+   {int ip, na, nt, ok;
     char pf[MAXLINE];
     char *p, *pa, *sp, *pro, *cfn;
     char **ty, **args;
@@ -466,7 +508,7 @@ static fdecl *find_proto(char **cpr, char *f)
 	LAST_CHAR(pa) = '\0';
 
 /* get the return type */
-        split_decl(&dcl->proto, pf);
+        ok = split_decl(&dcl->proto, pf);
 	
 	ty = tokenize(pf, " \t");
 	nt = lst_length(ty);
@@ -481,7 +523,8 @@ static fdecl *find_proto(char **cpr, char *f)
 	dcl->na   = na;
 	dcl->args = args;
 
-	proc_args(dcl);
+	if (proc_args(dcl) == NULL)
+	   FREE(dcl);
 
 	free_strings(ty);};
 
@@ -589,9 +632,9 @@ static void add_type(char *cty, char *fty, char *sty, char *pty, char *defv)
 
 /* LOOKUP_TYPE - lookup and return a type from the map */
 
-static char *lookup_type(char *val, char *ty, langmode ity, langmode oty)
+static char *lookup_type(char ***val, char *ty, langmode ity, langmode oty)
    {int i, l, n;
-    char *rv, *dv;
+    char *rv, *dv, **lst;
     mtype *map;
 
     get_type_map(&n, &map, 0);
@@ -642,8 +685,10 @@ static char *lookup_type(char *val, char *ty, langmode ity, langmode oty)
 	         break;};};
 
     if (val != NULL)
-       {if (dv != NULL)
-	   strcpy(val, dv);};
+       {lst = NULL;
+	if (dv != NULL)
+	   lst = lst_push(lst, dv);
+        *val = lst;};
 
     return(rv);}
 
@@ -907,60 +952,61 @@ static void fc_type(char *wty, int nc, farg *al, int afl, langmode mode)
     char lty[MAXLINE];
     char *pty, *arg, *ty;
 
-    if (wty == NULL)
-       {wty = lty;
-	nc  = MAXLINE;};
+    if (al != NULL)
+       {if (wty == NULL)
+	   {wty = lty;
+	    nc  = MAXLINE;};
 
-    arg = al->arg;
-    ty  = al->type;
+	arg = al->arg;
+	ty  = al->type;
 
-    pty = lookup_type(NULL, ty, MODE_C, mode);
+	pty = lookup_type(NULL, ty, MODE_C, mode);
 
 /* handle variable arg list */
-    if (is_var_arg(ty) == TRUE)
-       {nstrncpy(wty, nc, "char *", -1);
-	knd = FP_VARARG;}
+	if (is_var_arg(ty) == TRUE)
+	   {nstrncpy(wty, nc, "char *", -1);
+	    knd = FP_VARARG;}
 
 /* handle function pointer */
-    else if ((afl == TRUE) && (strstr(arg, "(*") != NULL))
-       {nstrncpy(wty, nc, arg, -1);
-	knd = FP_FNC;}
+	else if ((afl == TRUE) && (strstr(arg, "(*") != NULL))
+	   {nstrncpy(wty, nc, arg, -1);
+	    knd = FP_FNC;}
 
 /* follow the PACT function pointer PF convention */
-    else if (strncmp(ty, "PF", 2) == 0)
-       {nstrncpy(wty, nc, ty, -1);
-	knd = FP_FNC;}
+	else if (is_func_ptr(ty, 2) == TRUE)
+	   {nstrncpy(wty, nc, ty, -1);
+	    knd = FP_FNC;}
 
-    else if (pty != NULL)
-       {if (LAST_CHAR(ty) == '*')
-	   {knd = FP_ARRAY;
+	else if (pty != NULL)
+	   {if (LAST_CHAR(ty) == '*')
+	       {knd = FP_ARRAY;
 
 /* for C dereference the type so that we have an array of type */
-	    if (mode == MODE_C)
-	       deref(wty, MAXLINE, pty);
+		if (mode == MODE_C)
+		   deref(wty, MAXLINE, pty);
 
 /* for Fortran account for the -A convention used in the type registry */
-	    else if (mode == MODE_F)
-	       {nstrncpy(wty, nc, pty, -1);
-		wty[strlen(wty)-2] = '\0';}
+		else if (mode == MODE_F)
+		   {nstrncpy(wty, nc, pty, -1);
+		    wty[strlen(wty)-2] = '\0';}
 
 /* do not yet know to do anything but take the type for other bindings */
+		else
+		   nstrncpy(wty, nc, pty, -1);}
 	    else
-	       nstrncpy(wty, nc, pty, -1);}
-	else
-	   {knd = FP_SCALAR;
-	    nstrncpy(wty, nc, pty, -1);};}
+	       {knd = FP_SCALAR;
+		nstrncpy(wty, nc, pty, -1);};}
 
 /* unknown type */
-    else
-       {nstrncpy(wty, nc, ty, -1);
-
-	if (LAST_CHAR(ty) == '*')
-	   knd = FP_INDIRECT;
 	else
-	   berr("Unknown type '%s'", ty);};
+	   {nstrncpy(wty, nc, ty, -1);
 
-    al->knd = knd;
+	    if (LAST_CHAR(ty) == '*')
+	       knd = FP_INDIRECT;
+	    else
+	       berr("Unknown type '%s'", ty);};
+
+	al->knd = knd;};
 
     return;}
 
@@ -1503,93 +1549,93 @@ static void mc_type(int nc, char *fty, char *cty,
    {char lfty[MAXLINE], lcty[MAXLINE], lwty[MAXLINE];
     char *ty;
 
-    fc_type(lwty, nc, arg, FALSE, MODE_F);
-    memmove(lwty, subst(lwty, "FIXNUM", "integer", -1), nc);
+    if (arg != NULL)
+       {fc_type(lwty, nc, arg, FALSE, MODE_F);
+	memmove(lwty, subst(lwty, "FIXNUM", "integer", -1), nc);
 
-    ty = arg->type;
-    if (is_var_arg(ty) == TRUE)
-       {nstrncpy(lfty, MAXLINE, "error", -1);
-	nstrncpy(lcty, MAXLINE, "error", -1);}
+	ty = arg->type;
+	if (is_var_arg(ty) == TRUE)
+	   {nstrncpy(lfty, MAXLINE, "error", -1);
+	    nstrncpy(lcty, MAXLINE, "error", -1);}
 
 /* follow the PACT function pointer PF convention */
-    else if ((strstr(ty, "(*") != NULL) ||
-	     (strncmp(ty, "PF", 2) == 0))
-       {nstrncpy(lfty, MAXLINE, "type", -1);
-	nstrncpy(lcty, MAXLINE, "C_FUNPTR", -1);}
+	else if (is_func_ptr(ty, 3) == TRUE)
+	   {nstrncpy(lfty, MAXLINE, "type", -1);
+	    nstrncpy(lcty, MAXLINE, "C_FUNPTR", -1);}
 
-    else if (is_ptr(ty) == TRUE)
-       {nstrncpy(lfty, MAXLINE, "type", -1);
-	nstrncpy(lcty, MAXLINE, "C_PTR", -1);}
+	else if (is_ptr(ty) == TRUE)
+	   {nstrncpy(lfty, MAXLINE, "type", -1);
+	    nstrncpy(lcty, MAXLINE, "C_PTR", -1);}
 
-    else if (strstr(ty, "long long") != NULL)
-       {nstrncpy(lfty, MAXLINE, "integer", -1);
-	nstrncpy(lcty, MAXLINE, "C_LONG_LONG", -1);}
+	else if (strstr(ty, "long long") != NULL)
+	   {nstrncpy(lfty, MAXLINE, "integer", -1);
+	    nstrncpy(lcty, MAXLINE, "C_LONG_LONG", -1);}
 
-    else if (strstr(ty, "long") != NULL)
-       {nstrncpy(lfty, MAXLINE, "integer", -1);
-	nstrncpy(lcty, MAXLINE, "C_LONG", -1);}
+	else if (strstr(ty, "long") != NULL)
+	   {nstrncpy(lfty, MAXLINE, "integer", -1);
+	    nstrncpy(lcty, MAXLINE, "C_LONG", -1);}
 
-    else if (strstr(ty, "short") != NULL)
-       {nstrncpy(lfty, MAXLINE, "integer", -1);
-	nstrncpy(lcty, MAXLINE, "C_SHORT", -1);}
+	else if (strstr(ty, "short") != NULL)
+	   {nstrncpy(lfty, MAXLINE, "integer", -1);
+	    nstrncpy(lcty, MAXLINE, "C_SHORT", -1);}
 
-    else if (strstr(ty, "int") != NULL)
-       {nstrncpy(lfty, MAXLINE, "integer", -1);
-	nstrncpy(lcty, MAXLINE, "C_INT", -1);}
+	else if (strstr(ty, "int") != NULL)
+	   {nstrncpy(lfty, MAXLINE, "integer", -1);
+	    nstrncpy(lcty, MAXLINE, "C_INT", -1);}
 
-    else if (strstr(ty, "signed char") != NULL)
-       {nstrncpy(lfty, MAXLINE, "integer", -1);
-	nstrncpy(lcty, MAXLINE, "C_SIGNED_CHAR", -1);}
+	else if (strstr(ty, "signed char") != NULL)
+	   {nstrncpy(lfty, MAXLINE, "integer", -1);
+	    nstrncpy(lcty, MAXLINE, "C_SIGNED_CHAR", -1);}
 
-    else if (strstr(ty, "size_t") != NULL)
-       {nstrncpy(lfty, MAXLINE, "integer", -1);
-	nstrncpy(lcty, MAXLINE, "C_SIZE_T", -1);}
+	else if (strstr(ty, "size_t") != NULL)
+	   {nstrncpy(lfty, MAXLINE, "integer", -1);
+	    nstrncpy(lcty, MAXLINE, "C_SIZE_T", -1);}
 
-    else if (strstr(ty, "long double _Complex") != NULL)
-       {nstrncpy(lfty, MAXLINE, "complex", -1);
-	nstrncpy(lcty, MAXLINE, "C_LONG_DOUBLE_COMPLEX", -1);}
+	else if (strstr(ty, "long double _Complex") != NULL)
+	   {nstrncpy(lfty, MAXLINE, "complex", -1);
+	    nstrncpy(lcty, MAXLINE, "C_LONG_DOUBLE_COMPLEX", -1);}
 
-    else if (strstr(ty, "double _Complex") != NULL)
-       {nstrncpy(lfty, MAXLINE, "complex", -1);
-	nstrncpy(lcty, MAXLINE, "C_DOUBLE_COMPLEX", -1);}
+	else if (strstr(ty, "double _Complex") != NULL)
+	   {nstrncpy(lfty, MAXLINE, "complex", -1);
+	    nstrncpy(lcty, MAXLINE, "C_DOUBLE_COMPLEX", -1);}
 
-    else if (strstr(ty, "float _Complex") != NULL)
-       {nstrncpy(lfty, MAXLINE, "complex", -1);
-	nstrncpy(lcty, MAXLINE, "C_FLOAT_COMPLEX", -1);}
+	else if (strstr(ty, "float _Complex") != NULL)
+	   {nstrncpy(lfty, MAXLINE, "complex", -1);
+	    nstrncpy(lcty, MAXLINE, "C_FLOAT_COMPLEX", -1);}
 
-    else if (strstr(ty, "long double") != NULL)
-       {nstrncpy(lfty, MAXLINE, "real", -1);
-	nstrncpy(lcty, MAXLINE, "C_LONG_DOUBLE", -1);}
+	else if (strstr(ty, "long double") != NULL)
+	   {nstrncpy(lfty, MAXLINE, "real", -1);
+	    nstrncpy(lcty, MAXLINE, "C_LONG_DOUBLE", -1);}
 
-    else if (strstr(ty, "double") != NULL)
-       {nstrncpy(lfty, MAXLINE, "real", -1);
-	nstrncpy(lcty, MAXLINE, "C_DOUBLE", -1);}
+	else if (strstr(ty, "double") != NULL)
+	   {nstrncpy(lfty, MAXLINE, "real", -1);
+	    nstrncpy(lcty, MAXLINE, "C_DOUBLE", -1);}
 
-    else if (strstr(ty, "float") != NULL)
-       {nstrncpy(lfty, MAXLINE, "real", -1);
-	nstrncpy(lcty, MAXLINE, "C_FLOAT", -1);}
+	else if (strstr(ty, "float") != NULL)
+	   {nstrncpy(lfty, MAXLINE, "real", -1);
+	    nstrncpy(lcty, MAXLINE, "C_FLOAT", -1);}
 
-    else if (strstr(ty, "_Bool") != NULL)
-       {nstrncpy(lfty, MAXLINE, "logical", -1);
-	nstrncpy(lcty, MAXLINE, "C_BOOL", -1);}
+	else if (strstr(ty, "_Bool") != NULL)
+	   {nstrncpy(lfty, MAXLINE, "logical", -1);
+	    nstrncpy(lcty, MAXLINE, "C_BOOL", -1);}
 
-    else if (strcmp(ty, "void") == 0)
-       {nstrncpy(lfty, MAXLINE, "subroutine", -1);
-	nstrncpy(lcty, MAXLINE, "C_VOID", -1);}
+	else if (strcmp(ty, "void") == 0)
+	   {nstrncpy(lfty, MAXLINE, "subroutine", -1);
+	    nstrncpy(lcty, MAXLINE, "C_VOID", -1);}
 
 /* take unknown types to be integer - covers enums */
-    else
-       {nstrncpy(lfty, MAXLINE, "integer", -1);
-	nstrncpy(lcty, MAXLINE, "C_INT", -1);};
+	else
+	   {nstrncpy(lfty, MAXLINE, "integer", -1);
+	    nstrncpy(lcty, MAXLINE, "C_INT", -1);};
 
-    if (fty != NULL)
-       nstrncpy(fty, nc, lfty, -1);
+	if (fty != NULL)
+	   nstrncpy(fty, nc, lfty, -1);
 
-    if (cty != NULL)
-       nstrncpy(cty, nc, lcty, -1);
+	if (cty != NULL)
+	   nstrncpy(cty, nc, lcty, -1);
 
-    if (wty != NULL)
-       nstrncpy(wty, nc, lwty, -1);
+	if (wty != NULL)
+	   nstrncpy(wty, nc, lwty, -1);};
 
     return;}
 
@@ -1611,35 +1657,36 @@ static char **mc_proto_list(fdecl *dcl)
 
     na    = dcl->na;
     al    = dcl->al;
-    voida = no_args(dcl);
+    if (al != NULL)
+       {voida = no_args(dcl);
 
 /* function/return type */
-    mc_type(MAXLINE, NULL, NULL, wty, &dcl->proto);
-    ty  = dcl->proto.type;
-    nm  = dcl->proto.name;
-    knd = dcl->proto.knd;
-    switch (knd)
-       {case FP_FNC      :
-        case FP_INDIRECT :
-	     lst = lst_push(lst, C_PTR_RETURN);
-	     lst = lst_push(lst, nm);
-	     break;
-        case FP_ARRAY :
-	     if (strcmp(wty, "character") == 0)
-	        {lst = lst_push(lst, "character(*)");
-		 lst = lst_push(lst, nm);}
-	     else if (strcmp(wty, "C_PTR") == 0)
-	        {lst = lst_push(lst, C_PTR_RETURN);
-		 lst = lst_push(lst, nm);}
-	     else
-	        {lst = lst_push(lst, wty);
-		 lst = lst_push(lst, "%s(*)", nm);};
-	     break;
-        case FP_SCALAR :
-        default        :
-	     lst = lst_push(lst, wty);
-	     lst = lst_push(lst, nm);
-	     break;};
+	mc_type(MAXLINE, NULL, NULL, wty, &dcl->proto);
+	ty  = dcl->proto.type;
+	nm  = dcl->proto.name;
+	knd = dcl->proto.knd;
+	switch (knd)
+	   {case FP_FNC      :
+	    case FP_INDIRECT :
+	         lst = lst_push(lst, C_PTR_RETURN);
+		 lst = lst_push(lst, nm);
+		 break;
+	    case FP_ARRAY :
+	         if (strcmp(wty, "character") == 0)
+		    {lst = lst_push(lst, "character(*)");
+		     lst = lst_push(lst, nm);}
+		 else if (strcmp(wty, "C_PTR") == 0)
+		    {lst = lst_push(lst, C_PTR_RETURN);
+		     lst = lst_push(lst, nm);}
+		 else
+		    {lst = lst_push(lst, wty);
+		     lst = lst_push(lst, "%s(*)", nm);};
+		 break;
+	    case FP_SCALAR :
+	    default        :
+	         lst = lst_push(lst, wty);
+		 lst = lst_push(lst, nm);
+		 break;};};
 
 /* arguments */
     for (i = 0; i < na; i++)
@@ -2228,13 +2275,16 @@ static void fin_module(bindes *bd)
  *         - to make SS_args call
  */
 
-static void cs_type(char *a, int nc, farg *arg)
+static void cs_type(char *a, int nc, farg *arg, int drf)
    {fparam knd;
-    char t[MAXLINE];
-    char *ty, *sty, *dty;
+    char t[MAXLINE], ty[MAXLINE];
+    char *sty, *dty;
 
-    ty  = arg->type;
     knd = arg->knd;
+    if (drf == TRUE)
+       deref(ty, MAXLINE, arg->type);
+    else
+       nstrncpy(ty, MAXLINE, arg->type, -1);
 
     sty = lookup_type(NULL, ty, MODE_C, MODE_S);
     if (sty != NULL)
@@ -2243,8 +2293,7 @@ static void cs_type(char *a, int nc, farg *arg)
     else if (strcmp(ty, "void *") == 0)
        nstrncpy(a, nc, "SC_VOID_I", -1);
 
-    else if ((strstr(ty, "(*") != NULL) ||
-	     (strstr(ty, "PF") != NULL))
+    else if (is_func_ptr(ty, 3) == TRUE)
        nstrncpy(a, nc, "SC_POINTER_I", -1);
 
     else if (strchr(ty, '*') != NULL)
@@ -2395,8 +2444,8 @@ static void scheme_wrap_decl(FILE *fp, fdecl *dcl)
 
 static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
 				   fparam knd, char *so, int voida)
-   {int i, na, nv, voidf;
-    char s[MAXLINE], t[MAXLINE];
+   {int i, na, nv, nvl, voidf;
+    char s[MAXLINE], t[MAXLINE], dty[MAXLINE];
     char oexp[MAXLINE], nexp[MAXLINE];
     char *ty, *nm, *arg, *rty;
     farg *al;
@@ -2416,6 +2465,7 @@ static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
 	 ty  = al[i].type;
 	 nm  = al[i].name;
 	 arg = al[i].arg;
+	 nvl = al[i].nv;
 
 	 if (nv == 0)
 	    snprintf(t, MAXLINE, "   {");
@@ -2434,13 +2484,20 @@ static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
 
 /* local vars */
 	 else if (nm != '\0')
-	    {if (strstr(arg, "(*") == NULL)
-		vstrcat(t, MAXLINE, "%s _l%s;\n", ty, nm);
+
+/* multiple default values means a local array */
+	    {if (nvl > 1)
+		{deref(dty, MAXLINE, ty);
+		 vstrcat(t, MAXLINE, "%s _l%s[%d];\n", dty, nm, nvl);}
+
 	     else
-	        {snprintf(oexp, MAXLINE, "(*%s)", nm);
-		 snprintf(nexp, MAXLINE, "(*_l%s)", nm);
-		 nstrncpy(s, MAXLINE, arg, -1);
-		 vstrcat(t, MAXLINE, "%s;\n", subst(s, oexp, nexp, 1));};
+	        {if (strstr(arg, "(*") == NULL)
+		    vstrcat(t, MAXLINE, "%s _l%s;\n", ty, nm);
+		 else
+		    {snprintf(oexp, MAXLINE, "(*%s)", nm);
+		     snprintf(nexp, MAXLINE, "(*_l%s)", nm);
+		     nstrncpy(s, MAXLINE, arg, -1);
+		     vstrcat(t, MAXLINE, "%s;\n", subst(s, oexp, nexp, 1));};};
 	     nv++;};
 
 	 if (IS_NULL(t) == FALSE)
@@ -2456,9 +2513,9 @@ static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
 /* SCHEME_WRAP_LOCAL_ASSN - local variable assignments */
 
 static void scheme_wrap_local_assn(FILE *fp, fdecl *dcl, int voida)
-   {int i, na;
+   {int i, l, na, nvl;
     char a[MAXLINE], ty[MAXLINE];
-    char *val;
+    char *nm, *val, **vls;
     farg *al;
 
     if (voida == FALSE)
@@ -2467,18 +2524,30 @@ static void scheme_wrap_local_assn(FILE *fp, fdecl *dcl, int voida)
 
 /* set the default values */
 	for (i = 0; i < na; i++)
-	    {val = al[i].val;
-	     if (val[0] == '[')
-	        fprintf(fp, "    _l%-8s = NULL;\n", al[i].name);
+	    {val = al[i].val[0];
+	     nvl = al[i].nv;
+	     vls = al[i].val;
+	     if (nvl > 1)
+	        {for (l = 0; l < nvl; l++)
+		     fprintf(fp, "    _l%s[%d] = %s;\n",
+			     al[i].name, l, vls[l]);}
 	     else
-	        fprintf(fp, "    _l%-8s = %s;\n", al[i].name, al[i].val);};
+	        fprintf(fp, "    _l%-8s = %s;\n", al[i].name, val);};
 
 /* make the SS_args call */
 	a[0] = '\0';
 	for (i = 0; i < na; i++)
-	    {cs_type(ty, MAXLINE, al+i);
-	     vstrcat(a, MAXLINE, "            %s, &_l%s,\n",
-		     ty, al[i].name);};
+	    {nvl = al[i].nv;
+	     vls = al[i].val;
+	     nm  = al[i].name;
+	     if (nvl > 1)
+	        {cs_type(ty, MAXLINE, al+i, TRUE);
+		 for (l = 0; l < nvl; l++)
+		     vstrcat(a, MAXLINE, "            %s, &_l%s[%d],\n",
+			     ty, nm, l);}
+	     else
+	        {cs_type(ty, MAXLINE, al+i, FALSE);
+		  vstrcat(a, MAXLINE, "            %s, &_l%s,\n", ty, nm);};};
 
 	fprintf(fp, "    SS_args(si, argl,\n");
 	fprintf(fp, "%s", a);
