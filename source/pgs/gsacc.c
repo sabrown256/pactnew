@@ -115,10 +115,10 @@ int PG_fset_clipping(PG_device *dev, int flag ARG(TRUE))
 /* PG_FGET_CHAR_PATH - get the device char_path
  *                   - defaults to (1, 0)
  *
- * #bind PG_fget_char_path fortran() scheme()
+ * #bind PG_fget_char_path fortran() scheme(pg-get-char-path)
  */
 
-void PG_fget_char_path(PG_device *dev, double *x ARG(,out))
+void PG_fget_char_path(PG_device *dev, double *x ARG([*,*],out))
    {
 
     if (dev != NULL)
@@ -135,10 +135,10 @@ void PG_fget_char_path(PG_device *dev, double *x ARG(,out))
 
 /* PG_FSET_CHAR_PATH - set the device char_path
  *
- * #bind PG_fset_char_path fortran() scheme()
+ * #bind PG_fset_char_path fortran() scheme(pg-set-char-path!)
  */
 
-void PG_fset_char_path(PG_device *dev, double *x ARG([1.0,0.0],in))
+void PG_fset_char_path(PG_device *dev, double *x ARG([1.0,0.0],io))
    {double xo[PG_SPACEDM];
 
     if ((dev != NULL) && (dev->set_char_path != NULL))
@@ -162,10 +162,10 @@ void PG_fset_char_path(PG_device *dev, double *x ARG([1.0,0.0],in))
  *                 - the characters
  *                 - defaults to (0, 1)
  *
- * #bind PG_fget_char_up fortran() scheme()
+ * #bind PG_fget_char_up fortran() scheme(pg-get-char-up)
  */
 
-void PG_fget_char_up(PG_device *dev, double *x ARG(,out))
+void PG_fget_char_up(PG_device *dev, double *x ARG([*,*],out))
    {
 
     if (dev != NULL)
@@ -183,10 +183,10 @@ void PG_fget_char_up(PG_device *dev, double *x ARG(,out))
 /* PG_FSET_CHAR_UP - set the direction which constitutes up for
  *                 - the characters
  *
- * #bind PG_fset_char_up fortran() scheme()
+ * #bind PG_fset_char_up fortran() scheme(pg-set-char-up!)
  */
 
-void PG_fset_char_up(PG_device *dev, double *x ARG([0.0,1.0],in))
+void PG_fset_char_up(PG_device *dev, double *x ARG([0.0,1.0],io))
    {double xo[PG_SPACEDM];
 
     if ((dev != NULL) && (dev->set_char_up != NULL))

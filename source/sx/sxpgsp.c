@@ -563,32 +563,6 @@ static object *_SXI_fply(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SXI_GCPW - return the character path */
-
-static object *_SXI_gcpw(SS_psides *si, object *argl)
-   {double x[PG_SPACEDM];
-    PG_device *dev;
-    object *o;
-
-    dev = NULL;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_GCPW", SS_null);
-
-    PG_fget_char_path(dev, x);
-
-    o = SS_make_list(si, SC_DOUBLE_I, &x[0],
-		     SC_DOUBLE_I, &x[1],
-		     0);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _SXI_GCSS - return the character size in NDC */
 
 static object *_SXI_gcss(SS_psides *si, object *argl)
@@ -605,32 +579,6 @@ static object *_SXI_gcss(SS_psides *si, object *argl)
        SS_error(si, "BAD DEVICE - _SXI_GCSS", SS_null);
 
     PG_fget_char_size_n(dev, 2, NORMC, x);
-
-    o = SS_make_list(si, SC_DOUBLE_I, &x[0],
-		     SC_DOUBLE_I, &x[1],
-		     0);
-
-    return(o);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SXI_GCUW - return the character up direction */
-
-static object *_SXI_gcuw(SS_psides *si, object *argl)
-   {double x[PG_SPACEDM];
-    PG_device *dev;
-    object *o;
-
-    dev = NULL;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_GCUW", SS_null);
-
-    PG_fget_char_up(dev, x);
 
     o = SS_make_list(si, SC_DOUBLE_I, &x[0],
 		     SC_DOUBLE_I, &x[1],
@@ -928,56 +876,6 @@ static object *_SXI_qwin(SS_psides *si, object *argl)
                        0);
 
     return(ret);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_SCPW - set the character path */
-
-static object *_SXI_scpw(SS_psides *si, object *argl)
-   {double x[PG_SPACEDM];
-    PG_device *dev;
-
-    dev  = NULL;
-    x[0] = 1.0;
-    x[1] = 0.0;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_DOUBLE_I, &x[0],
-            SC_DOUBLE_I, &x[1],
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_SCPW", SS_null);
-
-    PG_fset_char_path(dev, x);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_SCUW - set the character up direction */
-
-static object *_SXI_scuw(SS_psides *si, object *argl)
-   {double x[PG_SPACEDM];
-    PG_device *dev;
-
-    dev  = NULL;
-    x[0] = 0.0;
-    x[1] = 1.0;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_DOUBLE_I, &x[0],
-            SC_DOUBLE_I, &x[1],
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_SCUW", SS_null);
-
-    PG_fset_char_path(dev, x);
-
-    return(SS_f);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1292,7 +1190,8 @@ static object *_SXI_wtos(SS_psides *si, object *argl)
     else
        PG_trans_point(dev, 2, WORLDC, x, NORMC, x);
 
-    rv = SS_make_list(si, SC_DOUBLE_I, &x[0],
+    rv = SS_make_list(si,
+		      SC_DOUBLE_I, &x[0],
 		      SC_DOUBLE_I, &x[1],
 		      0);
 
@@ -1304,7 +1203,8 @@ static object *_SXI_wtos(SS_psides *si, object *argl)
 /* _SXI_SETVA - set the view angle */
 
 static object *_SXI_setva(SS_psides *si, object *argl)
-   {PG_device *dev;
+   {double va[PG_SPACEDM];
+    PG_device *dev;
 
     dev = NULL;
     if (SX_DEVICEP(SS_car(si, argl)) == TRUE)
@@ -1320,7 +1220,10 @@ static object *_SXI_setva(SS_psides *si, object *argl)
 	    0);
 
     if (dev != NULL)
-       PG_fset_view_angle(dev, SX_theta, SX_phi, SX_chi);
+       {va[0] = SX_theta;
+	va[1] = SX_phi;
+	va[2] = SX_chi;
+	PG_fset_view_angle(dev, TRUE, &va[0], &va[1], &va[2]);};
 
     return(argl);}
 
@@ -1331,7 +1234,7 @@ static object *_SXI_setva(SS_psides *si, object *argl)
 
 static object *_SXI_getva(SS_psides *si, object *argl)
    {PG_device *dev;
-    double theta, phi, chi;
+    double va[PG_SPACEDM];
     object *rv;
 
     dev   = NULL;
@@ -1345,10 +1248,11 @@ static object *_SXI_getva(SS_psides *si, object *argl)
        SS_error(si, "BAD DEVICE - _SXI_GETVA", SS_car(si, argl));
 
     else
-       {PG_fget_view_angle(dev, TRUE, &theta, &phi, &chi);
-        rv = SS_make_list(si, SC_DOUBLE_I, &theta,
-			  SC_DOUBLE_I, &phi,
-			  SC_DOUBLE_I, &chi,
+       {PG_fget_view_angle(dev, TRUE, &va[0], &va[1], &va[2]);
+        rv = SS_make_list(si,
+			  SC_DOUBLE_I, &va[0],
+			  SC_DOUBLE_I, &va[1],
+			  SC_DOUBLE_I, &va[2],
 			  0);};
 
     return(rv);}
@@ -1360,22 +1264,22 @@ static object *_SXI_getva(SS_psides *si, object *argl)
 
 static object *_SXI_setla(SS_psides *si, object *argl)
    {PG_device *dev;
-    double theta, phi;
+    double la[PG_SPACEDM];
 
     dev   = NULL;
-    theta = 0.0;
-    phi   = 0.0;
+    la[0] = 0.0;
+    la[1] = 0.0;
     SS_args(si, argl,
             G_DEVICE, &dev,
-            SC_DOUBLE_I, &theta,
-            SC_DOUBLE_I, &phi,
+            SC_DOUBLE_I, &la[0],
+            SC_DOUBLE_I, &la[1],
             0);
 
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_SETLA", SS_car(si, argl));
 
     else
-       PG_fset_light_angle(dev, theta, phi);
+       PG_fset_light_angle(dev, TRUE, &la[0], &la[1]);
 
     return(SS_f);}
 
@@ -1385,11 +1289,11 @@ static object *_SXI_setla(SS_psides *si, object *argl)
 /* _SXI_GETLA - get the light angle */
 
 static object *_SXI_getla(SS_psides *si, object *argl)
-   {PG_device *dev;
-    double theta, phi;
+   {double la[PG_SPACEDM];
+    PG_device *dev;
     object *rv;
 
-    dev   = NULL;
+    dev = NULL;
     SS_args(si, argl,
             G_DEVICE, &dev,
             0);
@@ -1400,9 +1304,10 @@ static object *_SXI_getla(SS_psides *si, object *argl)
        SS_error(si, "BAD DEVICE - _SXI_GETLA", SS_car(si, argl));
 
     else
-       {PG_fget_light_angle(dev, TRUE, &theta, &phi);
-        rv = SS_make_list(si, SC_DOUBLE_I, &theta,
-			  SC_DOUBLE_I, &phi,
+       {PG_fget_light_angle(dev, TRUE, &la[0], &la[1]);
+        rv = SS_make_list(si,
+			  SC_DOUBLE_I, &la[0],
+			  SC_DOUBLE_I, &la[1],
 			  0);};
 
     return(rv);}
@@ -2137,20 +2042,10 @@ static object *_SXI_satst(SS_psides *si, object *argl)
 void _SX_install_pgs_primitives(SS_psides *si)
    {
 
-    SS_install(si, "pg-character-path",
-               "Return a pair specifying the character path direction on the given device",
-               SS_nargs,
-               _SXI_gcpw, SS_PR_PROC);
-
     SS_install(si, "pg-character-size-ndc",
                "Return the character size in NDC for the given device",
                SS_nargs,
                _SXI_gcss, SS_PR_PROC);
-
-    SS_install(si, "pg-character-up",
-               "Return a pair specifying the character up direction on the given device",
-               SS_nargs,
-               _SXI_gcuw, SS_PR_PROC);
 
     SS_install(si, "pg-clipping?",
                "Return #t iff clipping is on in the given device",
@@ -2306,16 +2201,6 @@ void _SX_install_pgs_primitives(SS_psides *si)
                "Set the specified attributes for the given set",
                SS_nargs,
                _SXI_satst, SS_PR_PROC);
-
-    SS_install(si, "pg-set-char-path!",
-               "Set the character path direction for the given device",
-               SS_nargs,
-               _SXI_scpw, SS_PR_PROC);
-
-    SS_install(si, "pg-set-char-up!",
-               "Set the character up direction for the given device",
-               SS_nargs,
-               _SXI_scuw, SS_PR_PROC);
 
     SS_install(si, "pg-set-clipping!",
                "Set the clipping state of the given device",
@@ -3405,6 +3290,108 @@ static object *_SXI_draw_arc(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SXI_GCPW - return the character path */
+
+static object *_SXI_gcpw(SS_psides *si, object *argl)
+   {double x[PG_SPACEDM];
+    PG_device *dev;
+    object *o;
+
+    dev = NULL;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_GCPW", SS_null);
+
+    PG_fget_char_path(dev, x);
+
+    o = SS_make_list(si, SC_DOUBLE_I, &x[0],
+		     SC_DOUBLE_I, &x[1],
+		     0);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SCPW - set the character path */
+
+static object *_SXI_scpw(SS_psides *si, object *argl)
+   {double x[PG_SPACEDM];
+    PG_device *dev;
+
+    dev  = NULL;
+    x[0] = 1.0;
+    x[1] = 0.0;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_DOUBLE_I, &x[0],
+            SC_DOUBLE_I, &x[1],
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_SCPW", SS_null);
+
+    PG_fset_char_path(dev, x);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SXI_GCUW - return the character up direction */
+
+static object *_SXI_gcuw(SS_psides *si, object *argl)
+   {double x[PG_SPACEDM];
+    PG_device *dev;
+    object *o;
+
+    dev = NULL;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_GCUW", SS_null);
+
+    PG_fget_char_up(dev, x);
+
+    o = SS_make_list(si, SC_DOUBLE_I, &x[0],
+		     SC_DOUBLE_I, &x[1],
+		     0);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SCUW - set the character up direction */
+
+static object *_SXI_scuw(SS_psides *si, object *argl)
+   {double x[PG_SPACEDM];
+    PG_device *dev;
+
+    dev  = NULL;
+    x[0] = 0.0;
+    x[1] = 1.0;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_DOUBLE_I, &x[0],
+            SC_DOUBLE_I, &x[1],
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_SCUW", SS_null);
+
+    PG_fset_char_up(dev, x);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SX_INSTALL_PGS_PRIMITIVES - install the PGS primitives */
 
 void _SX_install_pgs_primitives(SS_psides *si)
@@ -3619,6 +3606,26 @@ void _SX_install_pgs_primitives(SS_psides *si)
                "Draw a section of a circular arc on the given device",
                SS_nargs,
                _SXI_draw_arc, SS_PR_PROC);
+
+    SS_install(si, "pg-character-path",
+               "Return a pair specifying the character path direction on the given device",
+               SS_nargs,
+               _SXI_gcpw, SS_PR_PROC);
+
+    SS_install(si, "pg-set-char-path!",
+               "Set the character path direction for the given device",
+               SS_nargs,
+               _SXI_scpw, SS_PR_PROC);
+
+    SS_install(si, "pg-set-char-up!",
+               "Set the character up direction for the given device",
+               SS_nargs,
+               _SXI_scuw, SS_PR_PROC);
+
+    SS_install(si, "pg-character-up",
+               "Return a pair specifying the character up direction on the given device",
+               SS_nargs,
+               _SXI_gcuw, SS_PR_PROC);
 
     return;}
 

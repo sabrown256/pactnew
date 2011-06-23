@@ -6,10 +6,10 @@
 
 <p>
 <pre>
-<i>C Binding: </i>       int fa1(int a ARG(2,in), float b ARG(2.0,io), long c ARG(2L,out))
-<i>Fortran Binding: </i> integer fa1_f(integer a, real(4) b, integer(8) c)
-<i>SX Binding: </i>      (fa1 a b c)
-<i>Python Binding: </i>  pact.fa1(a, b, c)
+<i>C Binding: </i>       int fa1(int a ARG(2,in))
+<i>Fortran Binding: </i> integer fa1_f(integer a)
+<i>SX Binding: </i>      (fa1 a)
+<i>Python Binding: </i>  pact.fa1(a)
 </pre>
 <p>
 <p>
@@ -40,6 +40,156 @@
 <i>Fortran Binding: </i> integer fa4_f(integer a(*), integer b(*), integer c(*))
 <i>SX Binding: </i>      (fa4 a b c)
 <i>Python Binding: </i>  pact.fa4(a, b, c)
+</pre>
+<p>
+<p>
+
+<!-- -------------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------------- -->
+
+<a name="fb1"><h2>FB1</h2></a>
+
+<p>
+<pre>
+<i>C Binding: </i>       void fb1(int a,	int b ARG(1,in))
+<i>Fortran Binding: </i> fb1_f(integer a, integer b)
+<i>SX Binding: </i>      (fb1 a b)
+<i>Python Binding: </i>  pact.fb1(a, b)
+</pre>
+<p>
+<p>
+
+<!-- -------------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------------- -->
+
+<a name="fb2"><h2>FB2</h2></a>
+
+<p>
+<pre>
+<i>C Binding: </i>       void fb2(int a,	int b ARG(,in))
+<i>Fortran Binding: </i> fb2_f(integer a, integer b)
+<i>SX Binding: </i>      (fb2 a b)
+<i>Python Binding: </i>  pact.fb2(a, b)
+</pre>
+<p>
+<p>
+
+<!-- -------------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------------- -->
+
+<a name="fb3"><h2>FB3</h2></a>
+
+<p>
+<pre>
+<i>C Binding: </i>       void fb3(int a,	int b ARG(*,in))
+<i>Fortran Binding: </i> fb3_f(integer a, integer b)
+<i>SX Binding: </i>      (fb3 a b)
+<i>Python Binding: </i>  pact.fb3(a, b)
+</pre>
+<p>
+<p>
+
+<!-- -------------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------------- -->
+
+<a name="fc1"><h2>FC1</h2></a>
+
+<p>
+<pre>
+<i>C Binding: </i>       void fc1(int a, int *b ARG(NULL,in), int *c ARG(NULL,io), int *d ARG(NULL,out))
+<i>Fortran Binding: </i> fc1_f(integer a, integer b(*), integer c(*), integer d(*))
+<i>SX Binding: </i>      (fc1 a b c d)
+<i>Python Binding: </i>  pact.fc1(a, b, c, d)
+</pre>
+<p>
+<p>
+
+<!-- -------------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------------- -->
+
+<a name="fc2"><h2>FC2</h2></a>
+
+<p>
+<pre>
+<i>C Binding: </i>       void fc2(int a, int *b ARG(,in), int *c ARG(,io), int *d ARG(,out))
+<i>Fortran Binding: </i> fc2_f(integer a, integer b(*), integer c(*), integer d(*))
+<i>SX Binding: </i>      (fc2 a b c d)
+<i>Python Binding: </i>  pact.fc2(a, b, c, d)
+</pre>
+<p>
+<p>
+
+<!-- -------------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------------- -->
+
+<a name="fc3"><h2>FC3</h2></a>
+
+<p>
+<pre>
+<i>C Binding: </i>       void fc3(int a, int *b ARG(*,in), int *c ARG(*,io), int *d ARG(*,out))
+<i>Fortran Binding: </i> fc3_f(integer a, integer b(*), integer c(*), integer d(*))
+<i>SX Binding: </i>      (fc3 a b c d)
+<i>Python Binding: </i>  pact.fc3(a, b, c, d)
+</pre>
+<p>
+<p>
+
+<!-- -------------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------------- -->
+
+<a name="fc4"><h2>FC4</h2></a>
+
+<p>
+<pre>
+<i>C Binding: </i>       void fc4(int a, int *b ARG([1],in), int *c ARG([1],io), int *d ARG([1],out))
+<i>Fortran Binding: </i> fc4_f(integer a, integer b(*), integer c(*), integer d(*))
+<i>SX Binding: </i>      (fc4 a b c d)
+<i>Python Binding: </i>  pact.fc4(a, b, c, d)
+</pre>
+<p>
+<p>
+
+<!-- -------------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------------- -->
+
+<a name="fc5"><h2>FC5</h2></a>
+
+<p>
+<pre>
+<i>C Binding: </i>       void fc5(int a, int *b ARG([1,2],in), int *c ARG([1,2],io), int *d ARG([1,2],out))
+<i>Fortran Binding: </i> fc5_f(integer a, integer b(*), integer c(*), integer d(*))
+<i>SX Binding: </i>      (fc5 a b c d)
+<i>Python Binding: </i>  pact.fc5(a, b, c, d)
+</pre>
+<p>
+<p>
+
+<!-- -------------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------------- -->
+
+<a name="fc6"><h2>FC6</h2></a>
+
+<p>
+<pre>
+<i>C Binding: </i>       void fc6(int a, int *b ARG([*],in), int *c ARG([*],io), int *d ARG([*],out))
+<i>Fortran Binding: </i> fc6_f(integer a, integer b(*), integer c(*), integer d(*))
+<i>SX Binding: </i>      (fc6 a b c d)
+<i>Python Binding: </i>  pact.fc6(a, b, c, d)
+</pre>
+<p>
+<p>
+
+<!-- -------------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------------- -->
+
+<a name="fc7"><h2>FC7</h2></a>
+
+<p>
+<pre>
+<i>C Binding: </i>       void fc7(int a, int *b ARG([*,*],in), int *c ARG([*,*],io), int *d ARG([*,*],out))
+<i>Fortran Binding: </i> fc7_f(integer a, integer b(*), integer c(*), integer d(*))
+<i>SX Binding: </i>      (fc7 a b c d)
+<i>Python Binding: </i>  pact.fc7(a, b, c, d)
 </pre>
 <p>
 <p>
