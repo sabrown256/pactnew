@@ -17,13 +17,11 @@ module pact_bl6
    interface
 
 ! ... declarations for generated wrappers
-      function fa1f(a, b, c) 
+      function fa1f(a) 
          use iso_c_binding
          implicit none
          integer         :: fa1f
          integer         :: a
-         real(4)         :: b
-         integer(8)      :: c
       end function fa1f
 
       function fa3f(a, b, c) 
@@ -46,15 +44,104 @@ module pact_bl6
          integer         :: c(*)
       end function fa4f
 
+      subroutine fb1_f(a, b) 
+         use iso_c_binding
+         implicit none
+         integer         :: a
+         integer         :: b
+      end subroutine fb1_f
+
+      subroutine fb2_f(a, b) 
+         use iso_c_binding
+         implicit none
+         integer         :: a
+         integer         :: b
+      end subroutine fb2_f
+
+      subroutine fb3_f(a, b) 
+         use iso_c_binding
+         implicit none
+         integer         :: a
+         integer         :: b
+      end subroutine fb3_f
+
+      subroutine fc1_f(a, b, c, d) 
+         use iso_c_binding
+         use types_bl6
+         implicit none
+         integer         :: a
+         integer         :: b(*)
+         integer         :: c(*)
+         integer         :: d(*)
+      end subroutine fc1_f
+
+      subroutine fc2_f(a, b, c, d) 
+         use iso_c_binding
+         use types_bl6
+         implicit none
+         integer         :: a
+         integer         :: b(*)
+         integer         :: c(*)
+         integer         :: d(*)
+      end subroutine fc2_f
+
+      subroutine fc3_f(a, b, c, d) 
+         use iso_c_binding
+         use types_bl6
+         implicit none
+         integer         :: a
+         integer         :: b(*)
+         integer         :: c(*)
+         integer         :: d(*)
+      end subroutine fc3_f
+
+      subroutine fc4_f(a, b, c, d) 
+         use iso_c_binding
+         use types_bl6
+         implicit none
+         integer         :: a
+         integer         :: b(*)
+         integer         :: c(*)
+         integer         :: d(*)
+      end subroutine fc4_f
+
+      subroutine fc5_f(a, b, c, d) 
+         use iso_c_binding
+         use types_bl6
+         implicit none
+         integer         :: a
+         integer         :: b(*)
+         integer         :: c(*)
+         integer         :: d(*)
+      end subroutine fc5_f
+
+      subroutine fc6_f(a, b, c, d) 
+         use iso_c_binding
+         use types_bl6
+         implicit none
+         integer         :: a
+         integer         :: b(*)
+         integer         :: c(*)
+         integer         :: d(*)
+      end subroutine fc6_f
+
+      subroutine fc7_f(a, b, c, d) 
+         use iso_c_binding
+         use types_bl6
+         implicit none
+         integer         :: a
+         integer         :: b(*)
+         integer         :: c(*)
+         integer         :: d(*)
+      end subroutine fc7_f
+
 ! ... declarations for interoperability
-      function fa1f_i(a, b, c) &
+      function fa1f_i(a) &
                 bind(c, name='fa1')
          use iso_c_binding
          implicit none
          integer(C_INT) :: fa1f_i
          integer(C_INT), value :: a
-         real(C_FLOAT), value :: b
-         integer(C_LONG), value :: c
       end function fa1f_i
 
       function fa3f_i(a, b, c) &
@@ -76,6 +163,100 @@ module pact_bl6
          type(C_PTR), value :: b
          type(C_PTR), value :: c
       end function fa4f_i
+
+      subroutine fb1_i(a, b) &
+                bind(c, name='fb1')
+         use iso_c_binding
+         implicit none
+         integer(C_INT), value :: a
+         integer(C_INT), value :: b
+      end subroutine fb1_i
+
+      subroutine fb2_i(a, b) &
+                bind(c, name='fb2')
+         use iso_c_binding
+         implicit none
+         integer(C_INT), value :: a
+         integer(C_INT), value :: b
+      end subroutine fb2_i
+
+      subroutine fb3_i(a, b) &
+                bind(c, name='fb3')
+         use iso_c_binding
+         implicit none
+         integer(C_INT), value :: a
+         integer(C_INT), value :: b
+      end subroutine fb3_i
+
+      subroutine fc1_i(a, b, c, d) &
+                bind(c, name='fc1')
+         use iso_c_binding
+         implicit none
+         integer(C_INT), value :: a
+         type(C_PTR), value :: b
+         type(C_PTR), value :: c
+         type(C_PTR), value :: d
+      end subroutine fc1_i
+
+      subroutine fc2_i(a, b, c, d) &
+                bind(c, name='fc2')
+         use iso_c_binding
+         implicit none
+         integer(C_INT), value :: a
+         type(C_PTR), value :: b
+         type(C_PTR), value :: c
+         type(C_PTR), value :: d
+      end subroutine fc2_i
+
+      subroutine fc3_i(a, b, c, d) &
+                bind(c, name='fc3')
+         use iso_c_binding
+         implicit none
+         integer(C_INT), value :: a
+         type(C_PTR), value :: b
+         type(C_PTR), value :: c
+         type(C_PTR), value :: d
+      end subroutine fc3_i
+
+      subroutine fc4_i(a, b, c, d) &
+                bind(c, name='fc4')
+         use iso_c_binding
+         implicit none
+         integer(C_INT), value :: a
+         type(C_PTR), value :: b
+         type(C_PTR), value :: c
+         type(C_PTR), value :: d
+      end subroutine fc4_i
+
+      subroutine fc5_i(a, b, c, d) &
+                bind(c, name='fc5')
+         use iso_c_binding
+         implicit none
+         integer(C_INT), value :: a
+         type(C_PTR), value :: b
+         type(C_PTR), value :: c
+         type(C_PTR), value :: d
+      end subroutine fc5_i
+
+      subroutine fc6_i(a, b, c, d) &
+                bind(c, name='fc6')
+         use iso_c_binding
+         implicit none
+         integer(C_INT), value :: a
+         type(C_PTR), value :: b
+         type(C_PTR), value :: c
+         type(C_PTR), value :: d
+      end subroutine fc6_i
+
+      subroutine fc7_i(a, b, c, d) &
+                bind(c, name='fc7')
+         use iso_c_binding
+         implicit none
+         integer(C_INT), value :: a
+         type(C_PTR), value :: b
+         type(C_PTR), value :: c
+         type(C_PTR), value :: d
+      end subroutine fc7_i
 
    end interface
 

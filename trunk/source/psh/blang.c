@@ -64,22 +64,24 @@ struct s_bindes
     void (*fin)(bindes *bd);};
 
 struct s_farg
-   {int nv;
+   {int nv;                           /* number of default values specified */
     fparam knd;
-    fdir dir;
-    char *arg;
-    char type[MAXLINE];
-    char name[MAXLINE];
-    char **val;};
+    fdir dir;                         /* data flow direction */
+    char *arg;                        /* original C argument specification */
+    char *qualifier;                  /* ARG qualifiers on argument */
+    char type[MAXLINE];               /* argument type */
+    char name[MAXLINE];               /* argument name */
+    char **val;};                     /* default value specifications */
 
 struct s_fdecl
    {int proc;                         /* TRUE iff processed */
-    farg proto;
-    int na;
+    farg proto;                       /* farg representation of declaration */
+    int na;                           /* number of arguments */
+    int nr;                           /* number of return quantities */
     char **args;                      /* all args */
-    int nc;
+    int nc;                           /* number of char * args */
     char **cargs;                     /* char * args */
-    int ntf;
+    int ntf;                          /* number of fortran prototype pairs */
     char **tfproto;                   /* type, var fortran prototype pairs */
     farg *al;};
 
@@ -292,7 +294,7 @@ static char **split_args(char *args)
  */
 
 static int process_qualifiers(farg *arg, char *qual)
-   {int rv;
+   {int rv, ptr;
     char t[MAXLINE];
     char *val, *dir, **lst, **al;
 
@@ -302,20 +304,22 @@ static int process_qualifiers(farg *arg, char *qual)
        {nstrncpy(t, MAXLINE, qual+4, -1);
 	LAST_CHAR(t) = '\0';
 
-	al = split_args(t);
+	al  = split_args(t);
+	ptr = is_ptr(arg->type);
 
-/* get default value */
+/* get default value(s) */
 	val = al[0];
 	lst = NULL;
-	if (IS_NULL(val) == TRUE)
+	if ((IS_NULL(val) == TRUE) || (val[0] == '*'))
 	   lookup_type(&lst, arg->type, MODE_C, MODE_C);
 	else
 	   lst = tokenize(val, "[,]");
 	arg->val = lst;
 	arg->nv  = lst_length(lst);
 
-	if ((arg->nv > 1) && (is_ptr(arg->type) == FALSE))
-	   {berr("multiple values illegal with scalar '%s'", arg->arg);
+	if ((arg->nv > 1) && (ptr == FALSE))
+	   {berr("multiple values illegal with scalar '%s %s'",
+		 arg->arg, arg->qualifier);
 	    arg->nv = 0;
 	    rv = FALSE;};
 
@@ -329,6 +333,13 @@ static int process_qualifiers(farg *arg, char *qual)
 	       arg->dir = FD_OUT;
 	    else if (strcmp(dir, "io") == 0)
 	       arg->dir = FD_IN_OUT;};
+
+	if (((arg->dir == FD_OUT) || (arg->dir == FD_IN_OUT)) &&
+	    (ptr == FALSE))
+	   {berr("scalar arguments cannot be IO or OUT - '%s %s'",
+		 arg->arg, arg->qualifier);
+	    arg->nv = 0;
+	    rv = FALSE;};
 
 	free_strings(al);}
     else
@@ -357,6 +368,13 @@ static int split_decl(farg *al, char *s)
     qual = strstr(t, "ARG(");
     if (qual != NULL)
        qual[-1] = '\0';
+
+    al->arg       = STRSAVE(t);
+    al->qualifier = STRSAVE(qual);
+    al->nv        = 0;
+    al->knd       = FP_ANY;
+    al->dir       = FD_NONE;
+    al->val       = NULL;
 
     p = trim(strtok(t, "),"), BOTH, " \t");
 
@@ -407,7 +425,7 @@ static int split_decl(farg *al, char *s)
 /* PROC_ARGS - process the arg list in the declaration DCL */
 
 static farg *proc_args(fdecl *dcl)
-   {int i, na, ok;
+   {int i, na, nr, ok;
     char **args;
     farg *al;
 
@@ -416,18 +434,20 @@ static farg *proc_args(fdecl *dcl)
     
     al = MAKE_N(farg, na);
 
+    nr = 0;
     for (i = 0; i < na; i++)
-        {al[i].arg = args[i];
-	 ok = split_decl(al+i, al[i].arg);
+        {ok = split_decl(al+i, args[i]);
 	 if (ok == FALSE)
 	    {FREE(al);
 	     dcl->na = 0;
 	     break;}
 	 else
-	    fc_type(NULL, 0, al+i, TRUE, MODE_C);};
+	    {fc_type(NULL, 0, al+i, TRUE, MODE_C);
+	     nr += al[i].nv;};};
 
     if (al != NULL)
        {dcl->al = al;
+	dcl->nr = nr;
 
 /* fill in the Fortran prototype token pairs */
 	mc_proto_list(dcl);};
@@ -498,8 +518,6 @@ static fdecl *find_proto(char **cpr, char *f)
 	dcl->nc    = 0;
 	dcl->cargs = NULL;
 
-	dcl->proto.arg = pro;
-
 /* break up the prototype into the type/function name and args */
 	nstrncpy(pf, MAXLINE, pro, -1);
 	p = strchr(pf, '(');
@@ -512,6 +530,9 @@ static fdecl *find_proto(char **cpr, char *f)
 	
 	ty = tokenize(pf, " \t");
 	nt = lst_length(ty);
+
+	FREE(dcl->proto.arg);
+	dcl->proto.arg = STRSAVE(pro);
 
 /* get the function name */
 	cfn = ty[nt-1];
@@ -841,11 +862,51 @@ static char *deref(char *d, int nc, char *s)
    {
 
     nstrncpy(d, nc, s, -1);
-    LAST_CHAR(d) = '\0';
-
-    memmove(d, trim(d, BOTH, " \t"), nc);
+    if (LAST_CHAR(d) == '*')
+       {LAST_CHAR(d) = '\0';
+	memmove(d, trim(d, BOTH, " \t"), nc);};
 
     return(d);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* IDEREF - dereference S with SC_FOO_P_I to SC_FOO_I
+ *        - in place
+ */
+
+static char *ideref(char *s)
+   {char *p;
+
+    p = strstr(s, "_P_I");
+    if (p != NULL)
+       memmove(p, p+2, 3);
+
+    return(s);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* GET_DEF_VALUE - get a proper default value VL appropriate to type TY
+ *               - from the value specification SP
+ *               - proper means legal in C syntax
+ *               - the space VL is NC long
+ */
+
+static void get_def_value(char *lvl, int nc, char *sp, char *ty)
+   {char lty[MAXLINE];
+    char **dv;
+
+    nstrncpy(lvl, nc, sp, -1);
+
+/* if empty or '*' get the apropriate default for the base type */
+    if ((IS_NULL(lvl) == TRUE) || (lvl[0] == '*'))
+       {deref(lty, MAXLINE, ty);
+	lookup_type(&dv, lty, MODE_C, MODE_C);
+	nstrncpy(lvl, nc, dv[0], -1);
+	lst_free(dv);};
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1078,7 +1139,9 @@ static void fc_decl_list(char *a, int nc, fdecl *dcl)
  */
 
 static void fc_call_list(char *a, int nc, fdecl *dcl, int local)
-   {int i, na, voida;
+   {int i, na, nvl, ptr, voida;
+    fdir dir;
+    char *ty, *nm;
     farg *al;
 
     na = dcl->na;
@@ -1089,10 +1152,24 @@ static void fc_call_list(char *a, int nc, fdecl *dcl, int local)
     a[0] = '\0';
     if (voida == FALSE)
        {for (i = 0; i < na; i++)
-	    {if ((al[i].knd == FP_FNC) && (local == FALSE))
-	        vstrcat(a, MAXLINE, "%s, ", al[i].name);
+	    {nm  = al[i].name;
+	     ty  = al[i].type;
+	     nvl = al[i].nv;
+	     dir = al[i].dir;
+	     ptr = is_ptr(ty);
+
+/* pass function pointers straight thru - no local variable */
+	     if ((al[i].knd == FP_FNC) && (local == FALSE))
+	        vstrcat(a, MAXLINE, "%s, ", nm);
+
+/* scalar return values need references */
+	     else if ((ptr == TRUE) && (nvl == 1) &&
+		      (dir != FD_IN) && (local == TRUE))
+	        vstrcat(a, MAXLINE, "&_l%s, ", nm);
+
+/* all other argument go thru a local variable as declared */
 	     else
-	        vstrcat(a, MAXLINE, "_l%s, ", al[i].name);};
+	        vstrcat(a, MAXLINE, "_l%s, ", nm);};
 
 	a[strlen(a) - 2] = '\0';};
 
@@ -2445,6 +2522,7 @@ static void scheme_wrap_decl(FILE *fp, fdecl *dcl)
 static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
 				   fparam knd, char *so, int voida)
    {int i, na, nv, nvl, voidf;
+    fdir dir;
     char s[MAXLINE], t[MAXLINE], dty[MAXLINE];
     char oexp[MAXLINE], nexp[MAXLINE];
     char *ty, *nm, *arg, *rty;
@@ -2465,6 +2543,7 @@ static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
 	 ty  = al[i].type;
 	 nm  = al[i].name;
 	 arg = al[i].arg;
+	 dir = al[i].dir;
 	 nvl = al[i].nv;
 
 	 if (nv == 0)
@@ -2485,19 +2564,26 @@ static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
 /* local vars */
 	 else if (nm != '\0')
 
+/* single default values means a local scalar for a C pointer type */
+	    {if ((dir != FD_IN) && (nvl == 1))
+		{deref(dty, MAXLINE, ty);
+		 vstrcat(t, MAXLINE, "%s _l%s;\n", dty, nm);}
+
 /* multiple default values means a local array */
-	    {if (nvl > 1)
+	     else if (nvl > 1)
 		{deref(dty, MAXLINE, ty);
 		 vstrcat(t, MAXLINE, "%s _l%s[%d];\n", dty, nm, nvl);}
 
+/* function pointer */
+	     else if (strstr(arg, "(*") != NULL)
+	        {snprintf(oexp, MAXLINE, "(*%s)", nm);
+		 snprintf(nexp, MAXLINE, "(*_l%s)", nm);
+		 nstrncpy(s, MAXLINE, arg, -1);
+		 vstrcat(t, MAXLINE, "%s;\n", subst(s, oexp, nexp, 1));}
+
 	     else
-	        {if (strstr(arg, "(*") == NULL)
-		    vstrcat(t, MAXLINE, "%s _l%s;\n", ty, nm);
-		 else
-		    {snprintf(oexp, MAXLINE, "(*%s)", nm);
-		     snprintf(nexp, MAXLINE, "(*_l%s)", nm);
-		     nstrncpy(s, MAXLINE, arg, -1);
-		     vstrcat(t, MAXLINE, "%s;\n", subst(s, oexp, nexp, 1));};};
+	        vstrcat(t, MAXLINE, "%s _l%s;\n", ty, nm);
+
 	     nv++;};
 
 	 if (IS_NULL(t) == FALSE)
@@ -2510,12 +2596,75 @@ static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SCHEME_WRAP_LOCAL_ASSN_DEF - assign default values to local variable AL */
+
+static void scheme_wrap_local_assn_def(FILE *fp, farg *al)
+   {int l, nvl;
+    fdir dir;
+    char lvl[MAXLINE];
+    char *ty, *nm, **vls;
+
+    ty  = al->type;
+    nm  = al->name;
+    nvl = al->nv;
+    vls = al->val;
+    dir = al->dir;
+
+    get_def_value(lvl, MAXLINE, vls[0], ty);
+
+    if (dir != FD_OUT)
+       {if (nvl > 1)
+	   {for (l = 0; l < nvl; l++)
+	        {get_def_value(lvl, MAXLINE, vls[l], ty);
+		 fprintf(fp, "    _l%s[%d] = %s;\n", nm, l, lvl);};}
+
+	else
+	   fprintf(fp, "    _l%-8s = %s;\n", nm, lvl);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SCHEME_WRAP_LOCAL_ASSN_ARG - add AL to SS_args call argument list */
+
+static void scheme_wrap_local_assn_arg(char *a, int nc, farg *al)
+   {int l, nvl;
+    fdir dir;
+    char lty[MAXLINE];
+    char *ty, *nm, *val, **vls;
+
+    ty  = al->type;
+    nm  = al->name;
+    dir = al->dir;
+    nvl = al->nv;
+    vls = al->val;
+    val = vls[0];
+
+    if (dir != FD_OUT)
+       {cs_type(lty, MAXLINE, al, FALSE);
+	if (nvl > 1)
+	   {for (l = 0; l < nvl; l++)
+	        vstrcat(a, nc, "            %s, &_l%s[%d],\n", lty, nm, l);}
+
+	else if ((dir != FD_IN) && (nvl == 1) &&
+		 ((IS_NULL(val) == TRUE) || (val[0] == '*')))
+	   {ideref(lty);
+	    vstrcat(a, nc, "            %s, &_l%s,\n", lty, nm);}
+
+	else
+	   vstrcat(a, nc, "            %s, &_l%s,\n", lty, nm);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SCHEME_WRAP_LOCAL_ASSN - local variable assignments */
 
 static void scheme_wrap_local_assn(FILE *fp, fdecl *dcl, int voida)
-   {int i, l, na, nvl;
-    char a[MAXLINE], ty[MAXLINE];
-    char *nm, *val, **vls;
+   {int i, na;
+    char a[MAXLINE];
     farg *al;
 
     if (voida == FALSE)
@@ -2524,30 +2673,12 @@ static void scheme_wrap_local_assn(FILE *fp, fdecl *dcl, int voida)
 
 /* set the default values */
 	for (i = 0; i < na; i++)
-	    {val = al[i].val[0];
-	     nvl = al[i].nv;
-	     vls = al[i].val;
-	     if (nvl > 1)
-	        {for (l = 0; l < nvl; l++)
-		     fprintf(fp, "    _l%s[%d] = %s;\n",
-			     al[i].name, l, vls[l]);}
-	     else
-	        fprintf(fp, "    _l%-8s = %s;\n", al[i].name, val);};
+	    scheme_wrap_local_assn_def(fp, al+i);
 
 /* make the SS_args call */
 	a[0] = '\0';
 	for (i = 0; i < na; i++)
-	    {nvl = al[i].nv;
-	     vls = al[i].val;
-	     nm  = al[i].name;
-	     if (nvl > 1)
-	        {cs_type(ty, MAXLINE, al+i, TRUE);
-		 for (l = 0; l < nvl; l++)
-		     vstrcat(a, MAXLINE, "            %s, &_l%s[%d],\n",
-			     ty, nm, l);}
-	     else
-	        {cs_type(ty, MAXLINE, al+i, FALSE);
-		  vstrcat(a, MAXLINE, "            %s, &_l%s,\n", ty, nm);};};
+	    scheme_wrap_local_assn_arg(a, MAXLINE, al+i);
 
 	fprintf(fp, "    SS_args(si, argl,\n");
 	fprintf(fp, "%s", a);
@@ -2582,55 +2713,116 @@ static void scheme_wrap_local_call(FILE *fp, fdecl *dcl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SCHEME_WRAP_LOCAL_RETURN - function return */
+/* SCHEME_ARRAY_RETURN - compute possible array return from DCL */
 
-static void scheme_wrap_local_return(FILE *fp, fdecl *dcl,
-				     fparam knd, char *so)
-   {char t[MAXLINE], dty[MAXLINE];
+static void scheme_array_return(char *t, int nc, fdecl *dcl)
+   {int i, iv, na, nr, nvl;
+    fdir dir;
+    char a[MAXLINE], dty[MAXLINE];
+    char *nm;
+    farg *al;
+
+    t[0] = '\0';
+    a[0] = '\0';
+
+    nr = dcl->nr;
+
+/* make up the list arguments */
+    if (nr > 0)
+       {na = dcl->na;
+	al = dcl->al;
+        for (i = 0; i < na; i++)
+	    {nvl = al[i].nv;
+	     dir = al[i].dir;
+	     if ((nvl > 0) && ((dir == FD_OUT) || (dir == FD_IN_OUT)))
+	        {nm = al[i].name;
+		 cs_type(dty, MAXLINE, al+i, TRUE);
+	     
+		 if (nvl == 1)
+		    vstrcat(a, MAXLINE, "\t\t\t%s, &_l%s,\n", dty, nm);
+		 else
+		    {for (iv = 0; iv < nvl; iv++)
+			 vstrcat(a, MAXLINE, "\t\t\t%s, &_l%s[%d],\n",
+				 dty, nm, iv);};};};};
+
+/* if the list argument are non empty make up the call */
+    if (IS_NULL(a) == FALSE)
+       {snprintf(t, nc, "    _lo = SS_make_list(si,\n");
+	nstrcat(t, nc, a);
+	vstrcat(t, nc, "\t\t\t0);\n");};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SCHEME_SCALAR_RETURN - compute scalar return from DCL */
+
+static void scheme_scalar_return(char *t, int nc,
+				 fdecl *dcl, fparam knd, char *so)
+   {char dty[MAXLINE];
     char *ty, *sty;
+
+    t[0] = '\0';
 
     ty = dcl->proto.type;
 
     if (strcmp(ty, "void") == 0)
-       snprintf(t, MAXLINE, "    _lo = SS_f;\n");
+       snprintf(t, nc, "    _lo = SS_f;\n");
     else
        {if (IS_NULL(so) == FALSE)
 	   {switch (knd)
 	       {case FP_ANY :
 		     sty = lookup_type(NULL, ty, MODE_C, MODE_S);
 		     if (strcmp(sty, "SC_ENUM_I") == 0)
-		        snprintf(t, MAXLINE, "    _lo = SS_mk_integer(si, _rv);\n");
+		        snprintf(t, nc, "    _lo = SS_mk_integer(si, _rv);\n");
 		     else
-		        {snprintf(t, MAXLINE,
+		        {snprintf(t, nc,
 				  "\n/* no way to return '%s' */\n", ty);
-			 nstrcat(t, MAXLINE, "    _lo = SS_null;\n");};
+			 nstrcat(t, nc, "    _lo = SS_null;\n");};
 		     break;
 
 	        case FP_ARRAY :
 		     deref(dty, MAXLINE, ty);
 		     if (strcmp(dty, "void") == 0)
-		        {snprintf(t, MAXLINE,
+		        {snprintf(t, nc,
 				  "    _sz = SC_arrlen(_rv);\n");
-			 vstrcat(t, MAXLINE,
+			 vstrcat(t, nc,
 				 "    _arr = PM_make_array(\"char\", _sz, _rv);\n");}
 		     else
-		        {snprintf(t, MAXLINE,
+		        {snprintf(t, nc,
 				  "    _sz = SC_arrlen(_rv)/sizeof(%s);\n",
 				  dty);
-			 vstrcat(t, MAXLINE,
+			 vstrcat(t, nc,
 				 "    _arr = PM_make_array(\"%s\", _sz, _rv);\n",
 				 dty);};
-		     vstrcat(t, MAXLINE, "    _lo  = %s(si, _arr);\n", so);
+		     vstrcat(t, nc, "    _lo  = %s(si, _arr);\n", so);
 		     break;
 	        default :
                      if (strcmp(ty, "bool") == 0)
-		        snprintf(t, MAXLINE, "    _lo = %s(si, \"g\", (int) _rv);\n",
+		        snprintf(t, nc, "    _lo = %s(si, \"g\", (int) _rv);\n",
 				 so);
 		     else
-		        snprintf(t, MAXLINE, "    _lo = %s(si, _rv);\n", so);
+		        snprintf(t, nc, "    _lo = %s(si, _rv);\n", so);
 		     break;};}
 	else
-	   snprintf(t, MAXLINE, "    _lo = SS_null;\n");};
+	   snprintf(t, nc, "    _lo = SS_null;\n");};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SCHEME_WRAP_LOCAL_RETURN - function return */
+
+static void scheme_wrap_local_return(FILE *fp, fdecl *dcl,
+				     fparam knd, char *so)
+   {char t[MAXLINE];
+
+    scheme_array_return(t, MAXLINE, dcl);
+    if (IS_NULL(t) == TRUE)
+       scheme_scalar_return(t, MAXLINE, dcl, knd, so);
+
     fputs(t, fp);
 
     fprintf(fp, "\n");

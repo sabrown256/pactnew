@@ -21,7 +21,8 @@ int main(int argc, char **argv)
    {int i, k, l, m;
     int X_max, Y_max, Z_max;
     long n_seg, n_pts;
-    double x, y, z, dx, dy, dz, theta, phi;
+    double x, y, z, dx, dy, dz, theta, phi, chi;
+    double ltheta, lphi, lchi;
     double *r[PG_SPACEDM], *px, *py, *pz;
     char t[MAXLINE], *token, *pt;
     PG_device *SCR_dev, *SCR_dew, *PS_dev, *CGM_dev;
@@ -132,10 +133,27 @@ int main(int argc, char **argv)
            break;
         phi = ATOF(token);
 
-	PG_fset_view_angle(SCR_dev, theta, phi, 0.0);
-	PG_fset_view_angle(SCR_dew, theta, phi, 0.0);
-	PG_fset_view_angle(PS_dev, theta, phi, 0.0);
-	PG_fset_view_angle(CGM_dev, theta, phi, 0.0);
+        chi = 0.0;
+
+	ltheta = theta;
+	lphi   = phi;
+	lchi   = chi;
+	PG_fset_view_angle(SCR_dev, ltheta, lphi, lchi);
+
+	ltheta = theta;
+	lphi   = phi;
+	lchi   = chi;
+	PG_fset_view_angle(SCR_dew, ltheta, lphi, lchi);
+
+	ltheta = theta;
+	lphi   = phi;
+	lchi   = chi;
+	PG_fset_view_angle(PS_dev, ltheta, lphi, lchi);
+
+	ltheta = theta;
+	lphi   = phi;
+	lchi   = chi;
+	PG_fset_view_angle(CGM_dev, ltheta, lphi, lchi);
 
         PG_fset_line_color(SCR_dev, i, TRUE);
         PG_fset_line_color(SCR_dew, i, TRUE);

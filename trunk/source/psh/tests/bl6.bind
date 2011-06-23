@@ -10,6 +10,19 @@
 # C	Fortran	Scheme	Python
 
 fa1	fortran(fa1f)	scheme(fa1s)	python(fa1p)
-fa2	fortran(fa2f)	scheme(fa2s)	python(fa2p)
+fa1e	fortran(fa1ef)	scheme(fa1es)	python(fa1ep)
+fa2e	fortran(fa2ef)	scheme(fa2es)	python(fa2ep)
 fa3	fortran(fa3f)	scheme(fa3s)	python(fa3p)
 fa4	fortran(fa4f)	scheme(fa4s)	python(fa4p)
+
+fb1     fortran()	scheme()	python()
+fb2     fortran()	scheme()	python()
+fb3     fortran()	scheme()	python()
+
+fc1     fortran()	scheme()	python()
+fc2     fortran()	scheme()	python()
+fc3     fortran()	scheme()	python()
+fc4     fortran()	scheme()	python()
+fc5     fortran()	scheme()	python()
+fc6     fortran()	scheme()	python()
+fc7     fortran()	scheme()	python()

@@ -906,7 +906,7 @@ static void PG_surface_hand(PG_device *dev, PG_graph *g, PG_rendering pty,
 PG_picture_desc *PG_setup_picture_surface(PG_device *dev, PG_graph *data,
 					  int save, int clear)
    {int nde, nre, change;
-    double ndc[PG_BOXSZ];
+    double ndc[PG_BOXSZ], va[PG_SPACEDM];
     double *dpex, *ddex, *pdx, *rpex, *rdex, *prx;
     PG_rendering pty;
     PG_picture_desc *pd;
@@ -921,7 +921,8 @@ PG_picture_desc *PG_setup_picture_surface(PG_device *dev, PG_graph *data,
 
     pd = PG_get_rendering_properties(dev, data);
 
-    PG_fset_view_angle(dev, pd->va[0], pd->va[1], pd->va[2]);
+    PM_copy_point(PG_SPACEDM, va, pd->va);
+    PG_fset_view_angle(dev, TRUE, &va[0], &va[1], &va[2]);
 
     pd->legend_contour_fl = FALSE;
     pd->mesh_fl           = FALSE;
@@ -966,7 +967,8 @@ PG_picture_desc *PG_setup_picture_surface(PG_device *dev, PG_graph *data,
 /* GOTCHA: this isn't the only time we want 3d axes */
 	if ((pd->va[0] != HUGE) || (nde == 3))
 	   {pd->ax_type = CARTESIAN_3D;
-	    PG_fset_view_angle(dev, pd->va[0], pd->va[1], pd->va[2]);};
+	    PM_copy_point(PG_SPACEDM, va, pd->va);
+	    PG_fset_view_angle(dev, TRUE, &va[0], &va[1], &va[2]);};
 
 /* set surface plot attribute values */
 	PG_fset_clipping(dev, FALSE);};

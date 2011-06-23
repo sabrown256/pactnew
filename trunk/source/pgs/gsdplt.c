@@ -1026,8 +1026,8 @@ PG_picture_desc *PG_setup_picture_mesh(PG_device *dev, PG_graph *data,
 	PG_fset_clipping(dev, clip);};
 
     if ((th != 0.0) || (ph != 0.0) || (ch != 0.0))
-       PG_fset_view_angle(dev, th, ph, ch);
-    PG_fset_light_angle(dev, thl, phl);
+       PG_fset_view_angle(dev, TRUE, &th, &ph, &ch);
+    PG_fset_light_angle(dev, TRUE, &thl, &phl);
 
     PG_fset_palette(dev, "standard");
 
@@ -1049,6 +1049,7 @@ PG_picture_desc *PG_setup_picture_mesh(PG_device *dev, PG_graph *data,
 void PG_domain_plot(PG_device *dev, PM_set *dom, PM_set *ran)
    {int color, style;
     double width;
+    double va[PG_SPACEDM];
     PM_mapping f;
     PG_graph g, *data;
     PG_picture_desc *pd;
@@ -1084,7 +1085,8 @@ void PG_domain_plot(PG_device *dev, PM_set *dom, PM_set *ran)
     PG_fset_line_style(dev, style);
     PG_fset_clipping(dev, TRUE);
 
-    PG_fset_view_angle(dev, pd->va[0], pd->va[1], pd->va[2]);
+    PM_copy_point(PG_SPACEDM, va, pd->va);
+    PG_fset_view_angle(dev, TRUE, &va[0], &va[1], &va[2]);
 
 /* plot the domain */
     switch (dom->dimension_elem)

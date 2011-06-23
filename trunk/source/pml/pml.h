@@ -201,35 +201,35 @@
 
 /*--------------------------------------------------------------------------*/
 
-#define PM_copy_point(_nd, _x1, _x2)                                         \
-    {int _id;                                                                \
-     for (_id = 0; _id < _nd; _id++)                                         \
-         _x1[_id] = _x2[_id];}
+#define PM_copy_point(_nd, _xd, _xs)                                         \
+    {int _ld;                                                                \
+     for (_ld = 0; _ld < _nd; _ld++)                                         \
+         _xd[_ld] = _xs[_ld];}
 
-#define PM_vector_get_point(_nd, _x, _v, _i)                                 \
-    {int _id;                                                                \
-     for (_id = 0; _id < _nd; _id++)                                         \
-         _x[_id] = _v[_id][_i];}
+#define PM_vector_get_point(_nd, _xd, _vs, _is)                              \
+    {int _ld;                                                                \
+     for (_ld = 0; _ld < _nd; _ld++)                                         \
+         _xd[_ld] = _vs[_ld][_is];}
 
-#define PM_vector_put_point(_nd, _x, _v, _i)                                 \
-    {int _id;                                                                \
-     for (_id = 0; _id < _nd; _id++)                                         \
-         _v[_id][_i] = _x[_id];}
+#define PM_vector_put_point(_nd, _xs, _vd, _i)                               \
+    {int _ld;                                                                \
+     for (_ld = 0; _ld < _nd; _ld++)                                         \
+         _vd[_ld][_i] = _xs[_ld];}
 
-#define PM_vector_copy_point(_nd, _xa, _ia, _xb, _ib)                        \
-    {int _id;                                                                \
-     for (_id = 0; _id < _nd; _id++)                                         \
-         _xa[_id][_ia] = _xb[_id][_ib];}
+#define PM_vector_copy_point(_nd, _xd, _id, _xs, _is)                        \
+    {int _ld;                                                                \
+     for (_ld = 0; _ld < _nd; _ld++)                                         \
+         _xd[_ld][_id] = _xs[_ld][_is];}
 
-#define PM_polygon_get_point(_x, _py, _i)                                    \
-    {int _id;                                                                \
-     for (_id = 0; _id < _py->nd; _id++)                                     \
-         _x[_id] = _py->x[_id][_i];}
+#define PM_polygon_get_point(_xd, _ps, _i)                                   \
+    {int _ld;                                                                \
+     for (_ld = 0; _ld < _ps->nd; _ld++)                                     \
+         _xd[_ld] = _ps->x[_ld][_i];}
 
-#define PM_polygon_put_point(_x, _py, _i)                                    \
-    {int _id;                                                                \
-     for (_id = 0; _id < _py->nd; _id++)                                     \
-         _py->x[_id][_i] = _x[_id];}
+#define PM_polygon_put_point(_xs, _pd, _i)                                   \
+    {int _ld;                                                                \
+     for (_ld = 0; _ld < _pd->nd; _ld++)                                     \
+         _pd->x[_ld][_i] = _xs[_ld];}
 
 /*--------------------------------------------------------------------------*/
 

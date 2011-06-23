@@ -709,6 +709,7 @@ static void _PG_picture_axes(PG_device *dev, PG_picture_desc *pd,
 			     PG_graph *data)
    {int axty, datafl;
     double abx[PG_BOXSZ], rbx[PG_BOXSZ], ext[PG_BOXSZ], dbx[PG_BOXSZ];
+    double va[PG_SPACEDM];
     double *extr, *dextr;
     PM_set *domain;
     PG_palette *opl;
@@ -722,7 +723,8 @@ static void _PG_picture_axes(PG_device *dev, PG_picture_desc *pd,
     PG_set_axis_attributes(dev, AXIS_LINECOLOR, dev->line_color,
                                 AXIS_LABELCOLOR, dev->text_color, 0);
 
-    PG_fset_view_angle(dev, pd->va[0], pd->va[1], pd->va[2]);
+    PM_copy_point(PG_SPACEDM, va, pd->va);
+    PG_fset_view_angle(dev, TRUE, &va[0], &va[1], &va[2]);
 
     extr   = dev->range_extrema;
     axty   = pd->ax_type;

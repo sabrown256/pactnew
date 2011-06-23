@@ -2056,7 +2056,9 @@ void PG_viewport_frame(PG_device *dev, int nd, double *ndc)
  */
 
 void PG_fget_view_angle(PG_device *dev, int cnv,
-		       double *pt, double *pp, double *pc)
+			double *pt ARG(*,out),
+			double *pp ARG(*,out),
+			double *pc ARG(*,out))
    {double cf;
     PG_dev_geometry *g;
 
@@ -2082,22 +2084,36 @@ void PG_fget_view_angle(PG_device *dev, int cnv,
  * #bind PG_fset_view_angle fortran() scheme()
  */
 
-void PG_fset_view_angle(PG_device *dev,
-			double theta ARG(0.0,in),
-			double phi ARG(0.0,in),
-			double chi ARG(0.0,in))
-   {PG_dev_geometry *g;
+void PG_fset_view_angle(PG_device *dev, int cnv ARG(TRUE,in),
+			double *pt ARG(0.0,io),
+			double *pp ARG(0.0,io),
+			double *pc ARG(0.0,io))
+   {double cfi, cfo, theta, phi, chi;
+    PG_dev_geometry *g;
+
+    if (cnv == TRUE)
+       {cfi = DEG_RAD;
+	cfo = RAD_DEG;}
+    else
+       {cfi = 1.0;
+	cfo = 1.0;};
 
     g = &dev->g;
 
-    if (theta != HUGE)
-       g->view_angle[0] = DEG_RAD*theta;
+    if ((pt != NULL) && (*pt != HUGE))
+       {theta = *pt;
+	*pt   = cfo*g->view_angle[0];
+	g->view_angle[0] = cfi*theta;};
 
-    if (phi != HUGE)
-       g->view_angle[1] = DEG_RAD*phi;
+    if ((pp != NULL) && (*pp != HUGE))
+       {phi = *pp;
+	*pp = cfo*g->view_angle[1];
+	g->view_angle[1] = cfi*phi;};
 
-    if (chi != HUGE)
-       g->view_angle[2] = DEG_RAD*chi;
+    if ((pc != NULL) && (*pc != HUGE))
+       {chi = *pc;
+	*pc = cfo*g->view_angle[2];
+	g->view_angle[2] = cfi*chi;};
 
     return;}
 
@@ -2110,7 +2126,9 @@ void PG_fset_view_angle(PG_device *dev,
  * #bind PG_fget_light_angle fortran() scheme()
  */
 
-void PG_fget_light_angle(PG_device *dev, int cnv, double *pt, double *pp)
+void PG_fget_light_angle(PG_device *dev, int cnv ARG(TRUE,in),
+			 double *pt ARG(*,out),
+			 double *pp ARG(*,out))
    {double cf;
 
     cf = (cnv == TRUE) ? RAD_DEG : 1.0;
@@ -2127,20 +2145,32 @@ void PG_fget_light_angle(PG_device *dev, int cnv, double *pt, double *pp)
 /*--------------------------------------------------------------------------*/
 
 /* PG_FSET_LIGHT_ANGLE - set the light angle in degrees for DEV
+ *                     - return the old values thru the arguments
  *
  * #bind PG_fset_light_angle fortran() scheme()
  */
 
-void PG_fset_light_angle(PG_device *dev,
-			 double theta ARG(0.0,in),
-			 double phi ARG(0.0,in))
-   {
+void PG_fset_light_angle(PG_device *dev, int cnv ARG(TRUE,in),
+			 double *pt ARG(0.0,io),
+			 double *pp ARG(0.0,io))
+   {double cfi, cfo, theta, phi;
 
-    if (theta != HUGE)
-       dev->light_angle[0] = DEG_RAD*theta;
+    if (cnv == TRUE)
+       {cfi = DEG_RAD;
+	cfo = RAD_DEG;}
+    else
+       {cfi = 1.0;
+	cfo = 1.0;};
 
-    if (phi != HUGE)
-       dev->light_angle[1] = DEG_RAD*phi;
+    if ((pt != NULL) && (*pt != HUGE))
+       {theta = *pt;
+	*pt   = cfo*dev->light_angle[0];
+	dev->light_angle[0] = cfi*theta;};
+
+    if ((pp != NULL) && (*pp != HUGE))
+       {phi = *pp;
+	*pp = cfo*dev->light_angle[1];
+	dev->light_angle[1] = cfi*phi;};
 
     return;}
 

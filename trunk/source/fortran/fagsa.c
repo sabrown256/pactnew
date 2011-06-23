@@ -2044,40 +2044,6 @@ FIXNUM FF_ID(pgwtos, PGWTOS)(FIXNUM *sdid, double *sx, double *sy)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PGSVA - set the view angle */
-
-FIXNUM FF_ID(pgsva, PGSVA)(FIXNUM *sdid, double *st, double *sp, double *sc)
-   {FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-
-    PG_fset_view_angle(dev, *st, *sp, *sc);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PGSLA - set the lighting angle */
-
-FIXNUM FF_ID(pgsla, PGSLA)(FIXNUM *sdid, double *st, double *sp)
-   {FIXNUM rv;
-    PG_device *dev;
-
-    dev = SC_GET_POINTER(PG_device, *sdid);
-
-    PG_fset_light_angle(dev, *st, *sp);
-
-    rv = TRUE;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PGGVA - get the view angle */
 
 FIXNUM FF_ID(pggva, PGGVA)(FIXNUM *sdid, FIXNUM *scnv,
@@ -2096,6 +2062,24 @@ FIXNUM FF_ID(pggva, PGGVA)(FIXNUM *sdid, FIXNUM *scnv,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PGSVA - set the view angle */
+
+FIXNUM FF_ID(pgsva, PGSVA)(FIXNUM *sdid, FIXNUM *scnv,
+			   double *st, double *sp, double *sc)
+   {FIXNUM rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+
+    PG_fset_view_angle(dev, *scnv, st, sp, sc);
+
+    rv = TRUE;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PGGLA - get the lighting angle */
 
 FIXNUM FF_ID(pggla, PGGLA)(FIXNUM *sdid, FIXNUM *scnv, double *st, double *sp)
@@ -2105,6 +2089,23 @@ FIXNUM FF_ID(pggla, PGGLA)(FIXNUM *sdid, FIXNUM *scnv, double *st, double *sp)
     dev = SC_GET_POINTER(PG_device, *sdid);
 
     PG_fget_light_angle(dev, *scnv, st, sp);
+
+    rv = TRUE;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PGSLA - set the lighting angle */
+
+FIXNUM FF_ID(pgsla, PGSLA)(FIXNUM *sdid, FIXNUM *scnv, double *st, double *sp)
+   {FIXNUM rv;
+    PG_device *dev;
+
+    dev = SC_GET_POINTER(PG_device, *sdid);
+
+    PG_fset_light_angle(dev, *scnv, st, sp);
 
     rv = TRUE;
 

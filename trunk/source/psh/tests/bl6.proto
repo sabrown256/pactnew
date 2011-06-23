@@ -7,8 +7,26 @@
 # include "cpyright.h"
 #
 
-int fa1(int a ARG(2,in), float b ARG(2.0,io), long c ARG(2L,out))
-int fa2(int a ARG([1,2,3],in), int b ARG([1,2,3],io), int c ARG([1,2,3],out))
+# NOTE: scalar args cannot be io or out - only in
+# blang will report an error and omit the function
+int fa1(int a ARG(2,in))
+int fa1e(int a ARG(2,in), float b ARG(2.0,io), long c ARG(2L,out))
+
+# NOTE: scalar args cannot have array default values
+# blang will report an error and omit the function
+int fa2e(int a ARG([1,2,3],in))
+
 int fa3(int *a ARG([1,2,3],in), int *b ARG([1,2,3],io), int *c ARG([1,2,3],out))
 int fa4(int *a ARG(,in), int *b ARG(,io), int *c ARG(,out))
 
+void fb1(int a,	int b ARG(1,in))
+void fb2(int a,	int b ARG(,in))
+void fb3(int a,	int b ARG(*,in))
+
+void fc1(int a, int *b ARG(NULL,in), int *c ARG(NULL,io), int *d ARG(NULL,out))
+void fc2(int a, int *b ARG(,in), int *c ARG(,io), int *d ARG(,out))
+void fc3(int a, int *b ARG(*,in), int *c ARG(*,io), int *d ARG(*,out))
+void fc4(int a, int *b ARG([1],in), int *c ARG([1],io), int *d ARG([1],out))
+void fc5(int a, int *b ARG([1,2],in), int *c ARG([1,2],io), int *d ARG([1,2],out))
+void fc6(int a, int *b ARG([*],in), int *c ARG([*],io), int *d ARG([*],out))
+void fc7(int a, int *b ARG([*,*],in), int *c ARG([*,*],io), int *d ARG([*,*],out))

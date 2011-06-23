@@ -2953,13 +2953,15 @@ and (y1, y2) respectively.<p>
 
 <p>
 
-<I>C Binding: </I>void PG_fset_view_angle(PG_device *dev, double theta, double phi, double chi)
-<BR><I>Fortran Binding: </I>integer pgsva(integer devid, REAL theta, REAL phi, REAL chi)
-<BR><I>SX Binding: </I>(pg-set-view-angle! [dev] theta phi chi)
+<I>C Binding: </I>void PG_fset_view_angle(PG_device *dev, int cnv, double *theta, double *phi, double *chi)
+<BR><I>Fortran Binding: </I>integer pgsva(integer devid, integer cnv, REAL theta, REAL phi, REAL chi)
+<BR><I>SX Binding: </I>(pg-set-view-angle! dev cnv theta phi chi)
 <P>
 Set the view angle for the specified device. The angles are the three Euler
 angles in degrees.  The rotations are: phi about the z axis; followed by theta
 about the new x axis; and finally chi about the new z axis.
+<p>
+If CNV is TRUE the angles are in degrees, otherwise in radians.
 <p>
 The device is optional in the SX binding.  If absent the angles are stored as
 global state.
@@ -2971,28 +2973,29 @@ global state.
 <P>
 Get the view angle for the specified device. The angles are the three Euler
 angles in degrees.  The rotations are: phi about the z axis; followed by theta
-about the new x axis; and finally chi about the new z axis.<p>
-
+about the new x axis; and finally chi about the new z axis.
+<p>
+If CNV is TRUE the angles are in degrees, otherwise in radians.
 <p>
 
-<I>C Binding: </I>void PG_fset_light_angle(PG_device *dev, double theta, double phi, double chi)
-<BR><I>Fortran Binding: </I>integer pgsva(integer devid, REAL theta, REAL phi, REAL chi)
-<BR><I>SX Binding: </I>(pg-set-light-angle! [dev] theta phi chi)
+<I>C Binding: </I>void PG_fset_light_angle(PG_device *dev, int cnv, double *theta, double *phi, double *chi)
+<BR><I>Fortran Binding: </I>integer pgsva(integer devid, integer cnv, REAL theta, REAL phi, REAL chi)
+<BR><I>SX Binding: </I>(pg-set-light-angle! dev cnv theta phi chi)
 <P>
-Set the angle of light sources for the specified device. The angles are two Euler
-angles in degrees.  The angles are: phi about the z axis; and theta
-about the x axis.<p>
-
+Set the angle of light sources for the specified device.
+The angles are two Euler angles.  The angles are: phi about the z axis; and theta about the x axis.
+<p>
+If CNV is TRUE the angles are in degrees, otherwise in radians.
 <p>
 
 <I>C Binding: </I>void PG_fget_light_angle(PG_device *dev, int cnv, double *theta, double *phi, double *chi)
 <BR><I>Fortran Binding: </I>integer pggva(integer devid, integer cnv, REAL theta, REAL phi, REAL chi)
 <BR><I>SX Binding: </I>(pg-get-light-angle [dev] theta phi chi)
 <P>
-Get the angle of light sources for the specified device. The angles are two Euler
-angles in degrees.  The angles are: phi about the z axis; and theta
-about the x axis.<p>
-
+Get the angle of light sources for the specified device. The angles are two Euler angles.  The angles are: phi about the z axis; and theta
+about the x axis.
+<p>
+If CNV is TRUE the angles are in degrees, otherwise in radians.
 <p>
 
 <a name="PGS0652"></a>

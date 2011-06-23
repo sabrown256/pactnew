@@ -321,7 +321,7 @@ void PG_axis_3d(PG_device *dev, double *px, double *py, double *pz,
 
     DEPRECATED(2009-10-08);
 
-    PG_fset_view_angle(dev, theta, phi, chi);
+    PG_fset_view_angle(dev, TRUE, &theta, &phi, &chi);
 
     p[0] = px;
     p[1] = py;
