@@ -40,6 +40,7 @@ enum e_fdir
 typedef enum e_fdir fdir;
 
 typedef struct s_bindes bindes;
+typedef struct s_idecl idecl;
 typedef struct s_fdecl fdecl;
 typedef struct s_farg farg;
 typedef struct s_mtype mtype;
@@ -63,6 +64,11 @@ struct s_bindes
     int (*bind)(bindes *bd);
     void (*fin)(bindes *bd);};
 
+struct s_idecl
+   {char decl[MAXLINE];
+    char defa[MAXLINE];
+    char arg[MAXLINE];};
+
 struct s_farg
    {int nv;                           /* number of default values specified */
     fparam knd;
@@ -71,7 +77,8 @@ struct s_farg
     char *qualifier;                  /* ARG qualifiers on argument */
     char type[MAXLINE];               /* argument type */
     char name[MAXLINE];               /* argument name */
-    char **val;};                     /* default value specifications */
+    char **val;                       /* default value specifications */
+    idecl interp;};
 
 struct s_fdecl
    {int proc;                         /* TRUE iff processed */
@@ -97,7 +104,8 @@ static char
  **mc_proto_list(fdecl *dcl);
 
 static void
- fc_type(char *wty, int nc, farg *al, int afl, langmode mode);
+ fc_type(char *wty, int nc, farg *al, int afl, langmode mode),
+ cs_type(char *a, int nc, farg *arg, int drf);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -117,6 +125,66 @@ static void berr(char *fmt, ...)
 	printf("\n");};
 
     printf("Error: %s\n", s);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DEREF - dereference a pointer S
+ *       - place result in D
+ */
+
+static char *deref(char *d, int nc, char *s)
+   {
+
+    nstrncpy(d, nc, s, -1);
+    if (LAST_CHAR(d) == '*')
+       {LAST_CHAR(d) = '\0';
+	memmove(d, trim(d, BOTH, " \t"), nc);};
+
+    return(d);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* IDEREF - dereference S with SC_FOO_P_I to SC_FOO_I
+ *        - in place
+ */
+
+static char *ideref(char *s)
+   {char *p;
+
+    p = strstr(s, "_P_I");
+    if (p != NULL)
+       memmove(p, p+2, 3);
+
+    return(s);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* GET_DEF_VALUE - get a proper default value VL appropriate to type TY
+ *               - from the value specification SP
+ *               - proper means legal in C syntax
+ *               - the space VL is NC long
+ */
+
+static void get_def_value(char *lvl, int nc, char *sp, char *ty)
+   {char lty[MAXLINE];
+    char **dv;
+
+    nstrncpy(lvl, nc, sp, -1);
+
+/* if empty or '*' get the apropriate default for the base type */
+    if ((IS_NULL(lvl) == TRUE) || (lvl[0] == '*'))
+       {deref(lty, MAXLINE, ty);
+	lookup_type(&dv, lty, MODE_C, MODE_C);
+	if (dv != NULL)
+	   {nstrncpy(lvl, nc, dv[0], -1);
+	    lst_free(dv);}
+	else
+	   nstrncpy(lvl, nc, "NULL", -1);};
 
     return;}
 
@@ -289,6 +357,77 @@ static char **split_args(char *args)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PROCESS_INTERP_DEF - setup correct expressions for interpreter
+ *                    - handling of defaults
+ */
+
+static void process_interp_def(farg *al)
+   {int l, nvl;
+    fdir dir;
+    char s[MAXLINE], lty[MAXLINE], dty[MAXLINE], lvl[MAXLINE];
+    char oexp[MAXLINE], nexp[MAXLINE];
+    char *ty, *nm, *arg, *val, **vls;
+    idecl *ip;
+    static int count = 0;
+	
+    ip  = &al->interp;
+    ty  = al->type;
+    nm  = al->name;
+    dir = al->dir;
+    arg = al->arg;
+    vls = al->val;
+    nvl = al->nv;
+
+    ip->decl[0] = '\0';
+    ip->defa[0] = '\0';
+    ip->arg[0]  = '\0';
+
+    val = (nvl > 0) ? vls[0] : "*";
+
+    get_def_value(lvl, MAXLINE, val, ty);
+    cs_type(lty, MAXLINE, al, FALSE);
+
+/* single default values means a local scalar for a C pointer type */
+    if ((dir != FD_IN) && (nvl == 1))
+       {deref(dty, MAXLINE, ty);
+	ideref(lty);
+	snprintf(ip->decl, MAXLINE, "%s _l%s;\n", dty, nm);
+	snprintf(ip->defa, MAXLINE, "    _l%-8s = %s;\n", nm, lvl);
+	snprintf(ip->arg,  MAXLINE, "            %s, &_l%s,\n", lty, nm);}
+
+/* multiple default values means a local array */
+    else if (nvl > 1)
+       {deref(dty, MAXLINE, ty);
+	ideref(lty);
+	snprintf(ip->decl, MAXLINE, "%s _l%s[%d];\n", dty, nm, nvl);
+	for (l = 0; l < nvl; l++)
+	    {get_def_value(lvl, MAXLINE, vls[l], ty);
+	     vstrcat(ip->defa, MAXLINE, "    _l%s[%d] = %s;\n",
+		     nm, l, lvl);
+	     vstrcat(ip->arg, MAXLINE, "            %s, &_l%s[%d],\n",
+		     lty, nm, l);};}
+
+/* function pointer */
+    else if (strstr(arg, "(*") != NULL)
+       {snprintf(oexp, MAXLINE, "(*%s)", nm);
+	snprintf(nexp, MAXLINE, "(*_l%s)", nm);
+	nstrncpy(s, MAXLINE, arg, -1);
+	snprintf(ip->decl, MAXLINE, "%s;\n", subst(s, oexp, nexp, 1));
+	snprintf(ip->defa, MAXLINE, "    _l%-8s = %s;\n", nm, lvl);
+	snprintf(ip->arg,  MAXLINE, "            %s, &_l%s,\n", lty, nm);}
+
+    else
+       {snprintf(ip->decl, MAXLINE, "%s _l%s;\n", ty, nm);
+	snprintf(ip->defa, MAXLINE, "    _l%-8s = %s;\n", nm, lvl);
+	snprintf(ip->arg,  MAXLINE, "            %s, &_l%s,\n", lty, nm);};
+
+    count++;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PROCESS_QUALIFIERS - process argument qualifiers
  *                    - return TRUE if successful
  */
@@ -345,6 +484,10 @@ static int process_qualifiers(farg *arg, char *qual)
     else
        {lookup_type(&arg->val, arg->type, MODE_C, MODE_C);
 	arg->dir = FD_NONE;};
+
+/* setup correct default values for interpreters */
+    if (rv == TRUE)
+       process_interp_def(arg);
 
     return(rv);}
 
@@ -433,6 +576,7 @@ static farg *proc_args(fdecl *dcl)
     args = dcl->args;
     
     al = MAKE_N(farg, na);
+    memset(al, 0, na*sizeof(farg));
 
     nr = 0;
     for (i = 0; i < na; i++)
@@ -850,63 +994,6 @@ static char *map_name(char *d, int nc, char *cf, char *lf,
        memmove(d, subst(d, "_", "-", -1), nc);
 
     return(d);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DEREF - dereference a pointer S
- *       - place result in D
- */
-
-static char *deref(char *d, int nc, char *s)
-   {
-
-    nstrncpy(d, nc, s, -1);
-    if (LAST_CHAR(d) == '*')
-       {LAST_CHAR(d) = '\0';
-	memmove(d, trim(d, BOTH, " \t"), nc);};
-
-    return(d);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* IDEREF - dereference S with SC_FOO_P_I to SC_FOO_I
- *        - in place
- */
-
-static char *ideref(char *s)
-   {char *p;
-
-    p = strstr(s, "_P_I");
-    if (p != NULL)
-       memmove(p, p+2, 3);
-
-    return(s);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* GET_DEF_VALUE - get a proper default value VL appropriate to type TY
- *               - from the value specification SP
- *               - proper means legal in C syntax
- *               - the space VL is NC long
- */
-
-static void get_def_value(char *lvl, int nc, char *sp, char *ty)
-   {char lty[MAXLINE];
-    char **dv;
-
-    nstrncpy(lvl, nc, sp, -1);
-
-/* if empty or '*' get the apropriate default for the base type */
-    if ((IS_NULL(lvl) == TRUE) || (lvl[0] == '*'))
-       {deref(lty, MAXLINE, ty);
-	lookup_type(&dv, lty, MODE_C, MODE_C);
-	nstrncpy(lvl, nc, dv[0], -1);
-	lst_free(dv);};
-
-    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -2523,10 +2610,10 @@ static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
 				   fparam knd, char *so, int voida)
    {int i, na, nv, nvl, voidf;
     fdir dir;
-    char s[MAXLINE], t[MAXLINE], dty[MAXLINE];
-    char oexp[MAXLINE], nexp[MAXLINE];
+    char t[MAXLINE];
     char *ty, *nm, *arg, *rty;
     farg *al;
+    idecl *ip;
 
     na = dcl->na;
     al = dcl->al;
@@ -2545,6 +2632,7 @@ static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
 	 arg = al[i].arg;
 	 dir = al[i].dir;
 	 nvl = al[i].nv;
+	 ip  = &al[i].interp;
 
 	 if (nv == 0)
 	    snprintf(t, MAXLINE, "   {");
@@ -2563,28 +2651,8 @@ static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
 
 /* local vars */
 	 else if (nm != '\0')
-
-/* single default values means a local scalar for a C pointer type */
-	    {if ((dir != FD_IN) && (nvl == 1))
-		{deref(dty, MAXLINE, ty);
-		 vstrcat(t, MAXLINE, "%s _l%s;\n", dty, nm);}
-
-/* multiple default values means a local array */
-	     else if (nvl > 1)
-		{deref(dty, MAXLINE, ty);
-		 vstrcat(t, MAXLINE, "%s _l%s[%d];\n", dty, nm, nvl);}
-
-/* function pointer */
-	     else if (strstr(arg, "(*") != NULL)
-	        {snprintf(oexp, MAXLINE, "(*%s)", nm);
-		 snprintf(nexp, MAXLINE, "(*_l%s)", nm);
-		 nstrncpy(s, MAXLINE, arg, -1);
-		 vstrcat(t, MAXLINE, "%s;\n", subst(s, oexp, nexp, 1));}
-
-	     else
-	        vstrcat(t, MAXLINE, "%s _l%s;\n", ty, nm);
-
-	     nv++;};
+           {nstrcat(t, MAXLINE, ip->decl);
+            nv++;};
 
 	 if (IS_NULL(t) == FALSE)
 	    fputs(subst(t, "* ", "*", -1), fp);};

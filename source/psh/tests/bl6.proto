@@ -19,9 +19,9 @@ int fa2e(int a ARG([1,2,3],in))
 int fa3(int *a ARG([1,2,3],in), int *b ARG([1,2,3],io), int *c ARG([1,2,3],out))
 int fa4(int *a ARG(,in), int *b ARG(,io), int *c ARG(,out))
 
-void fb1(int a,	int b ARG(1,in))
-void fb2(int a,	int b ARG(,in))
-void fb3(int a,	int b ARG(*,in))
+void fb1(int a, int b ARG(1,in))
+void fb2(int a, int b ARG(,in))
+void fb3(int a, int b ARG(*,in))
 
 void fc1(int a, int *b ARG(NULL,in), int *c ARG(NULL,io), int *d ARG(NULL,out))
 void fc2(int a, int *b ARG(,in), int *c ARG(,io), int *d ARG(,out))
