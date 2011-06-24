@@ -91,7 +91,7 @@ static object *_SXI_fa4(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRAP |void fb1(int a,	int b ARG(1,in))| */
+/* WRAP |void fb1(int a, int b ARG(1,in))| */
 
 static object *_SXI_fb1(SS_psides *si, object *argl)
    {int _la;
@@ -113,7 +113,7 @@ static object *_SXI_fb1(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRAP |void fb2(int a,	int b ARG(,in))| */
+/* WRAP |void fb2(int a, int b ARG(,in))| */
 
 static object *_SXI_fb2(SS_psides *si, object *argl)
    {int _la;
@@ -135,7 +135,7 @@ static object *_SXI_fb2(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* WRAP |void fb3(int a,	int b ARG(*,in))| */
+/* WRAP |void fb3(int a, int b ARG(*,in))| */
 
 static object *_SXI_fb3(SS_psides *si, object *argl)
    {int _la;
