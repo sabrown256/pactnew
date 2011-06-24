@@ -513,7 +513,7 @@ static int split_decl(farg *al, char *s)
        qual[-1] = '\0';
 
     al->arg       = STRSAVE(t);
-    al->qualifier = STRSAVE(qual);
+    al->qualifier = (qual == NULL) ? qual : STRSAVE(qual);
     al->nv        = 0;
     al->knd       = FP_ANY;
     al->dir       = FD_NONE;
