@@ -269,7 +269,7 @@ void _PG_PS_set_char_line(PG_device *dev, int n)
  *                     - flag = TRUE   -->  clipping on
  */
 
-void _PG_PS_set_clipping(PG_device *dev, int flag)
+void _PG_PS_set_clipping(PG_device *dev, bool flag)
    {int idx[PG_SPACEDM];
     int pc[PG_BOXSZ];
 

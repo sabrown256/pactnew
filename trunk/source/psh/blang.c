@@ -42,30 +42,12 @@ enum e_fdir
 
 typedef enum e_fdir fdir;
 
+typedef struct s_statedes statedes;
 typedef struct s_bindes bindes;
 typedef struct s_idecl idecl;
 typedef struct s_fdecl fdecl;
 typedef struct s_farg farg;
 typedef struct s_mtype mtype;
-
-struct s_bindes
-   {int cfl;
-    int nbi;
-    int ncp;
-    int ndc;
-    int nfp;
-    int nfw;
-    char *pck;
-    char **sbi;
-    char **cdc;
-    char **cpr;
-    char **fpr;
-    char **fwr;
-    FILE *fp;
-    void (*init)(bindes *bd, char *pck, int cfl,
-		 char **sbi, char **cdc, char **cpr, char **fpr, char **fwr);
-    int (*bind)(bindes *bd);
-    void (*fin)(bindes *bd);};
 
 struct s_idecl
    {char decl[MAXLINE];    /* local variable declaration */
@@ -74,26 +56,28 @@ struct s_idecl
     char argc[MAXLINE];};  /* argument to C function call */ 
 
 struct s_farg
-   {int nv;                           /* number of default values specified */
+   {int nv;                          /* number of default values specified */
     fparam knd;
-    fdir dir;                         /* data flow direction */
-    char *arg;                        /* original C argument specification */
-    char *qualifier;                  /* ARG qualifiers on argument */
-    char type[MAXLINE];               /* argument type */
-    char name[MAXLINE];               /* argument name */
-    char **val;                       /* default value specifications */
+    fdir dir;                        /* data flow direction */
+    char *arg;                       /* original C argument specification */
+    char *qualifier;                 /* ARG qualifiers on argument */
+    char type[MAXLINE];              /* argument type */
+    char name[MAXLINE];              /* argument name */
+    char **val;                      /* default value specifications */
     idecl interp;};
 
 struct s_fdecl
-   {int proc;                         /* TRUE iff processed */
-    farg proto;                       /* farg representation of declaration */
-    int na;                           /* number of arguments */
-    int nr;                           /* number of return quantities */
-    char **args;                      /* all args */
-    int nc;                           /* number of char * args */
-    char **cargs;                     /* char * args */
-    int ntf;                          /* number of fortran prototype pairs */
-    char **tfproto;                   /* type, var fortran prototype pairs */
+   {int proc;                        /* TRUE iff processed */
+    int na;                          /* number of arguments */
+    int nr;                          /* number of return quantities */
+    int nc;                          /* number of char * args */
+    int ntf;                         /* number of fortran prototype pairs */
+    int error;                       /* TRUE if declaration is incorrect */
+    char **args;                     /* all args */
+    char **cargs;                    /* char * args */
+    char **tfproto;                  /* type, var fortran prototype pairs */
+    char **bindings;                 /* list of language bindings specified */
+    farg proto;                      /* farg representation of declaration */
     farg *al;};
 
 struct s_mtype
@@ -102,6 +86,29 @@ struct s_mtype
     char *sty;
     char *pty;
     char *defv;};
+
+struct s_statedes
+   {int cfl;                         /* fortran wrappers/modules flag */
+    int nbi;                         /* number of bindings */
+    int ncp;                         /* number of C prototype lines */
+    int ndc;                         /* number of doc lines */
+    int nfp;                         /* number of Fortran prototype lines */
+    int nfw;                         /* number of Fortran wrapper lines */
+    int ndcl;                        /* number of declarations */
+    char *pck;                       /* name of package */
+    char **sbi;
+    char **cdc;
+    char **cpr;
+    char **fpr;
+    char **fwr;
+    fdecl *dcl;};
+
+struct s_bindes
+   {statedes *st;
+    FILE *fp;
+    void (*init)(statedes *st, bindes *bd);
+    int (*bind)(bindes *bd);
+    void (*fin)(bindes *bd);};
 
 static char
  *lookup_type(char ***val, char *ty, langmode ity, langmode oty),
@@ -730,7 +737,7 @@ static int split_decl(farg *al, char *s, int isarg)
 /* PROC_ARGS - process the arg list in the declaration DCL */
 
 static farg *proc_args(fdecl *dcl)
-   {int i, na, nr, ok;
+   {int i, na, nr, ok, err;
     char **args;
     farg *al;
 
@@ -740,16 +747,22 @@ static farg *proc_args(fdecl *dcl)
     al = MAKE_N(farg, na);
     memset(al, 0, na*sizeof(farg));
 
-    nr = 0;
+    err = FALSE;
+    nr  = 0;
     for (i = 0; i < na; i++)
         {ok = split_decl(al+i, args[i], TRUE);
 	 if (ok == FALSE)
 	    {FREE(al);
-	     dcl->na = 0;
+	     free_strings(dcl->bindings);
+	     dcl->bindings = NULL;
+	     dcl->na       = 0;
+	     err           = TRUE;
 	     break;}
 	 else
 	    {fc_type(NULL, 0, al+i, TRUE, MODE_C);
 	     nr += al[i].nv;};};
+
+    dcl->error = err;
 
     if (al != NULL)
        {dcl->al = al;
@@ -759,18 +772,6 @@ static farg *proc_args(fdecl *dcl)
 	mc_proto_list(dcl);};
 
     return(al);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* FREE_ARGS - release the arg list AL */
-
-static void free_args(farg *al)
-   {
-
-    FREE(al);
-
-    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -793,13 +794,13 @@ static int find_func(char *pr, char *f)
  *            - return it iff successful
  */
 
-static fdecl *find_proto(char **cpr, char *f)
+static int find_proto(fdecl *dcl, char **cpr, char *f)
    {int ip, na, nt, ok;
     char pf[MAXLINE];
     char *p, *pa, *sp, *pro, *cfn;
     char **ty, **args;
-    fdecl *dcl;
 
+    ok  = FALSE;
     pro = NULL;
 
     for (ip = 0; cpr[ip] != NULL; ip++)
@@ -817,7 +818,10 @@ static fdecl *find_proto(char **cpr, char *f)
 	dcl = NULL;}
 
     else
-       {dcl = MAKE(fdecl);
+       {if (dcl == NULL)
+	   {dcl = MAKE(fdecl);
+	    memset(dcl, 0, sizeof(fdecl));};
+
 	dcl->proc  = FALSE;
 	dcl->na    = 0;
 	dcl->args  = NULL;
@@ -850,28 +854,11 @@ static fdecl *find_proto(char **cpr, char *f)
 	dcl->na   = na;
 	dcl->args = args;
 
-	if (proc_args(dcl) == NULL)
-	   FREE(dcl);
+	proc_args(dcl);
 
 	free_strings(ty);};
 
-    return(dcl);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* FREE_DECL - release the declaration DCL */
-
-static void free_decl(fdecl *dcl)
-   {
-
-    free_args(dcl->al);
-    free_strings(dcl->args);
-    free_strings(dcl->cargs);
-    free_strings(dcl->tfproto);
-    FREE(dcl);
-
-    return;}
+    return(ok);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1162,69 +1149,112 @@ static char *map_name(char *d, int nc, char *cf, char *lf,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SETUP_BINDER - initialize the data members of BD */
+/* FIND_BIND - generate declarations for all bindings from CPR and SBI
+ *           - return TRUE iff successful
+ */
 
-static void setup_binder(bindes *bd, char *pck, int cfl,
-			 char **sbi, char **cdc, char **cpr,
-			 char **fpr, char **fwr)
-   {
+static void find_bind(statedes *st)
+   {int i, ib, nb, nbi;
+    char t[MAXLINE];
+    char *sb, *lng, *p;
+    char **cpr, **sbi, **sa, **ta;
+    fdecl *dcl;
 
-    if (bd != NULL)
-       {bd->pck = pck;
-	bd->fp  = NULL;
-	bd->cfl = cfl;
+    nbi = st->nbi;
+    sbi = st->sbi;
+    cpr = st->cpr;
 
-	bd->sbi = sbi;
-	bd->nbi = lst_length(sbi);
+    nb  = 0;
+    dcl = MAKE_N(fdecl, nbi);
 
-	bd->cdc = cdc;
-	bd->ndc = lst_length(cdc);
+    for (ib = 0; ib < nbi; ib++)
+        {sb = sbi[ib];
+	 if (blank_line(sb) == FALSE)
+	    {nstrncpy(t, MAXLINE, sb, -1);
+	     sa = tokenize(t, " \t");
 
-	bd->cpr = cpr;
-	bd->ncp = lst_length(cpr);
+	     if ((sa != NULL) && (strcmp(sa[0], "derived") != 0))
+	        {ta = NULL;
+		 for (i = 1; sa[i] != NULL; i++)
+		     {lng = sa[i];
+		      p   = strchr(lng, '(');
+		      if (p != NULL)
+			 {*p++ = '\0';
+			  ta   = lst_push(ta, lng);
+			  p    = trim(p, BACK, ")");
+			  if (IS_NULL(p) == TRUE)
+			     ta = lst_push(ta, "yes");
+			  else
+			     ta = lst_push(ta, p);}
+		      else
+			 ta = lst_push(ta, lng);};
 
-	bd->fpr = fpr;
-	bd->nfp = lst_length(fpr);
+		 dcl[nb].bindings = ta;
 
-	bd->fwr = fwr;
-	bd->nfw = lst_length(fwr);};
+		 nb += find_proto(dcl+nb, cpr, sa[0]);
+
+		 free_strings(sa);};};};
+
+    st->dcl  = dcl;
+    st->ndcl = nb;
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PARSE_BIND - parse out the binding specifications of S for LANG */
+/* HAS_BINDING - return the LANG binding specification */
 
-static char **parse_bind(char *s, char *lang)
-   {int i, nc;
-    char t[MAXLINE];
-    char *p, **sa, **ta;
+static char *has_binding(fdecl *dcl, char *lang)
+   {int ib;
+    char *b, *spec;
+    char **bindings;
 
-    ta = NULL;
+    spec = NULL;
 
-    if ((s != NULL) && (lang != NULL))
-       {nstrncpy(t, MAXLINE, s, -1);
-	sa = tokenize(t, " \t");
+    bindings = dcl->bindings;
+    if (bindings != NULL)
+       {for (ib = 0; bindings[ib] != NULL; ib += 2)
+	    {b = bindings[ib];
+	     if (strcmp(b, lang) == 0)
+	        {spec = bindings[ib+1];
+		 break;};};};
 
-	nc = strlen(lang);
-	ta = lst_push(ta, sa[0]);
-	for (i = 1; sa[i] != NULL; i++)
-	    {if (strncmp(sa[i], lang, nc) == 0)
-	        {p = sa[i] + nc + 1;
-		 p = trim(p, BACK, ")");
-		 if (IS_NULL(p) == TRUE)
-		    ta = lst_push(ta, "yes");
-		 else
-		    ta = lst_push(ta, p);
-		 break;};};
+    return(spec);}
 
-	if (sa[i] == NULL)
-	   ta = lst_push(ta, "none");
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
-	free_strings(sa);};
+/* SETUP_BINDER - initialize the data members of BD */
 
-    return(ta);}
+static void setup_binder(statedes *st, char *pck, int cfl,
+			 char **sbi, char **cdc, char **cpr,
+			 char **fpr, char **fwr)
+   {
+
+    if (st != NULL)
+       {st->pck = pck;
+	st->cfl = cfl;
+
+	st->sbi = sbi;
+	st->nbi = lst_length(sbi);
+
+	st->cdc = cdc;
+	st->ndc = lst_length(cdc);
+
+	st->cpr = cpr;
+	st->ncp = lst_length(cpr);
+
+	st->fpr = fpr;
+	st->nfp = lst_length(fpr);
+
+	st->fwr = fwr;
+	st->nfw = lst_length(fwr);
+
+/* parse out and construct all the declarations */
+	find_bind(st);};
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 
@@ -1416,14 +1446,8 @@ static void fc_call_list(char *a, int nc, fdecl *dcl, int local)
 	        vstrcat(a, MAXLINE, "%s, ", nm);
 
 /* scalar return values need references */
-#if 0
-	     else if ((ptr == TRUE) && (nvl == 1) &&
-		      (dir != FD_IN) && (local == TRUE))
-	        vstrcat(a, MAXLINE, "&_l%s, ", nm);
-#else
 	     else if (local == TRUE)
 	        vstrcat(a, MAXLINE, "%s, ", ip->argc);
-#endif
 
 /* all other argument go thru a local variable as declared */
 	     else
@@ -1438,16 +1462,15 @@ static void fc_call_list(char *a, int nc, fdecl *dcl, int local)
 
 /* INIT_FORTRAN - initialize Fortran wrapper file */
 
-static void init_fortran(bindes *bd, char *pck, int cfl,
-			 char **sbi, char **cdc, char **cpr,
-			 char **fpr, char **fwr)
-   {int nc;
+static void init_fortran(statedes *st, bindes *bd)
+   {int nc, cfl;
     char fn[MAXLINE], hf[MAXLINE], ufn[MAXLINE], fill[MAXLINE];
+    char *pck;
     FILE *fp;
 
-    setup_binder(bd, pck, cfl, sbi, cdc, cpr, fpr, fwr);
-
-    fp = NULL;
+    fp  = NULL;
+    cfl = st->cfl;
+    pck = st->pck;
 
     if (cfl & 1)
        {snprintf(fn, MAXLINE, "gf-%s.c", pck);
@@ -1740,11 +1763,13 @@ static void fortran_wrap_local_return(FILE *fp, fdecl *dcl,
  *              - using name FFN
  */
 
-static void fortran_wrap(FILE *fp, fdecl *dcl, char *cfn, char *ffn)
+static void fortran_wrap(FILE *fp, fdecl *dcl, char *ffn)
    {int voidf;
     fparam knd;
     char rt[MAXLINE];
-    char *fn;
+    char *cfn, *fn;
+
+    cfn = dcl->proto.name;
 
     if (is_var_arg(dcl->proto.arg) == TRUE)
        {if ((strcmp(ffn, "yes") == 0) || (strcmp(ffn, "none") == 0))
@@ -1788,32 +1813,27 @@ static void fortran_wrap(FILE *fp, fdecl *dcl, char *cfn, char *ffn)
  */
 
 static int bind_fortran(bindes *bd)
-   {int ib, rv;
-    char *sb, **ta;
-    char *cfn, *ffn;
-    fdecl *dcl;
+   {int ib, rv, ndcl;
+    char *ffn, **cpr, **sbi;
+    fdecl *dcl, *dcls;
+    statedes *st;
     FILE *fp;
-    char **cpr, **sbi;
 
     rv = TRUE;
+    st = bd->st;
 
-    if (bd->cfl & 1)
+    if (st->cfl & 1)
        {fp  = bd->fp;
-	sbi = bd->sbi;
-	cpr = bd->cpr;
+	sbi = st->sbi;
+	cpr = st->cpr;
 
-	for (ib = 0; sbi[ib] != NULL; ib++)
-	    {sb = sbi[ib];
-	     if (blank_line(sb) == FALSE)
-	        {ta = parse_bind(sb, "fortran");
-		 cfn = ta[0];
-		 ffn = ta[1];
-		 dcl = find_proto(cpr, cfn);
-		 if (dcl != NULL)
-		    {fortran_wrap(fp, dcl, cfn, ffn);
-		     free_decl(dcl);};
-
-		 free_strings(ta);};};};
+	dcls = st->dcl;
+	ndcl = st->ndcl;
+	for (ib = 0; ib < ndcl; ib++)
+	    {dcl = dcls + ib;
+	     ffn = has_binding(dcl, "fortran");
+	     if (ffn != NULL)
+	        fortran_wrap(fp, dcl, ffn);};};
 
     return(rv);}
 
@@ -2120,16 +2140,16 @@ static void mc_decl_list(char *a, int nc, fdecl *dcl)
 
 /* INIT_MODULE - initialize Fortran/C interoperatbility module file */
 
-static void init_module(bindes *bd, char *pck, int cfl,
-			char **sbi, char **cdc, char **cpr,
-			char **fpr, char **fwr)
-   {int nc;
+static void init_module(statedes *st, bindes *bd)
+   {int nc, cfl;
     char fn[MAXLINE], ufn[MAXLINE], fill[MAXLINE];
+    char *pck;
     FILE *fp;
 
-    setup_binder(bd, pck, cfl, sbi, cdc, cpr, fpr, fwr);
-
     fp = NULL;
+
+    cfl = st->cfl;
+    pck = st->pck;
 
     if (cfl & 2)
        {snprintf(fn, MAXLINE, "gm-%s.f", pck);
@@ -2317,11 +2337,12 @@ static int module_itf_wrappable(fdecl *dcl)
 
 /* MODULE_ITF_WRAP_EXT - write the interface for a simple extern */
 
-static void module_itf_wrap_ext(FILE *fp, char *pck, fdecl *dcl,
-				char *cfn, char *ffn)
+static void module_itf_wrap_ext(FILE *fp, fdecl *dcl, char *pck, char *ffn)
    {char dcn[MAXLINE], fty[MAXLINE], cty[MAXLINE];
-    char *rty;
+    char *cfn, *rty;
     static int first = TRUE;
+
+    cfn = dcl->proto.name;
 
 /* declare the incomplete ones as external */
     if ((module_itf_wrappable(dcl) == FALSE) && (strcmp(ffn, "none") != 0))
@@ -2353,12 +2374,13 @@ static void module_itf_wrap_ext(FILE *fp, char *pck, fdecl *dcl,
  *                      - C function CFN
  */
 
-static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
-				 char *cfn, char *ffn)
+static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck, char *ffn)
    {int i, ns, voidf;
     char dcn[MAXLINE], a[MAXLINE], t[MAXLINE];
     char fty[MAXLINE], cty[MAXLINE];
-    char *rty, *oper, **args;
+    char *cfn, *rty, *oper, **args;
+
+    cfn = dcl->proto.name;
 
 /* emit complete declarations */
     if ((module_itf_wrappable(dcl) == TRUE) && (strcmp(ffn, "none") != 0))
@@ -2412,13 +2434,15 @@ static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck,
  *                     - C function CFN
  */
 
-static void module_interop_wrap(FILE *fp, fdecl *dcl, char *cfn, char *ffn)
+static void module_interop_wrap(FILE *fp, fdecl *dcl, char *ffn)
    {int i, na, voidf, voida;
     char dcn[MAXLINE], a[MAXLINE];
     char fty[MAXLINE], cty[MAXLINE];
     char cd[MAXLINE], cb[MAXLINE];
-    char *nm, *ty, *rty, *oper;
+    char *cfn, *nm, *ty, *rty, *oper;
     farg *al;
+
+    cfn = dcl->proto.name;
 
     if (is_var_arg(dcl->proto.arg) == TRUE)
        berr("%s is not interoperable - variable args", cfn);
@@ -2472,38 +2496,33 @@ static void module_interop_wrap(FILE *fp, fdecl *dcl, char *cfn, char *ffn)
  */
 
 static int bind_module(bindes *bd)
-   {int ib, iw, rv;
+   {int ib, iw, rv, ndcl;
     char t[MAXLINE];
-    char *sb, **ta;
-    char *cfn, *ffn;
-    fdecl *dcl;
+    char *ffn, *sb, *pck;
+    char **cpr, **fpr, **fwr, **sa, **ta;;
+    fdecl *dcl, *dcls;
+    statedes *st;
     FILE *fp;
-    char *pck, **cpr, **fpr, **sbi, **fwr, **sa;
 
     rv = TRUE;
+    st = bd->st;
 
-    if (bd->cfl & 2)
-       {fp  = bd->fp;
-	pck = bd->pck;
-	sbi = bd->sbi;
-	cpr = bd->cpr;
-	fpr = bd->fpr;
-	fwr = bd->fwr;
+    if (st->cfl & 2)
+       {fp   = bd->fp;
+	pck  = st->pck;
+	cpr  = st->cpr;
+	fpr  = st->fpr;
+	fwr  = st->fwr;
+	dcls = st->dcl;
+	ndcl = st->ndcl;
 
 /* make simple external declaration for variable argument functions */
 	fprintf(fp, "! ... external declarations for generated wrappers\n");
-	for (ib = 0; sbi[ib] != NULL; ib++)
-	    {sb = sbi[ib];
-	     if (blank_line(sb) == FALSE)
-	        {ta = parse_bind(sb, "fortran");
-		 cfn = ta[0];
-		 ffn = ta[1];
-		 dcl = find_proto(cpr, cfn);
-		 if (dcl != NULL)
-		    {module_itf_wrap_ext(fp, pck, dcl, cfn, ffn);
-		     free_decl(dcl);};
-
-		 free_strings(ta);};};
+	for (ib = 0; ib < ndcl; ib++)
+	    {dcl = dcls + ib;
+	     ffn = has_binding(dcl, "fortran");
+	     if (ffn != NULL)
+	        module_itf_wrap_ext(fp, dcl, pck, ffn);};
 
 	fprintf(fp, "\n");
 
@@ -2534,18 +2553,11 @@ static int bind_module(bindes *bd)
 
 /* make full interface for non-variable argument functions */
 	fprintf(fp, "! ... declarations for generated wrappers\n");
-	for (ib = 0; sbi[ib] != NULL; ib++)
-	    {sb = sbi[ib];
-	     if (blank_line(sb) == FALSE)
-	        {ta = parse_bind(sb, "fortran");
-		 cfn = ta[0];
-		 ffn = ta[1];
-		 dcl = find_proto(cpr, cfn);
-		 if (dcl != NULL)
-		    {module_itf_wrap_full(fp, dcl, pck, cfn, ffn);
-		     free_decl(dcl);};
-
-		 free_strings(ta);};};
+	for (ib = 0; ib < ndcl; ib++)
+	    {dcl = dcls + ib;
+	     ffn = has_binding(dcl, "fortran");
+	     if (ffn != NULL)
+	        module_itf_wrap_full(fp, dcl, pck, ffn);};
 
 /* make full interface for non-variable argument pre-wrapped functions */
 	if (fwr != NULL)
@@ -2560,18 +2572,11 @@ static int bind_module(bindes *bd)
 
 /* make full interface for non-variable argument functions */
 	fprintf(fp, "! ... declarations for interoperability\n");
-	for (ib = 0; sbi[ib] != NULL; ib++)
-	    {sb = sbi[ib];
-	     if (blank_line(sb) == FALSE)
-	        {ta = parse_bind(sb, "fortran");
-		 cfn = ta[0];
-		 ffn = ta[1];
-		 dcl = find_proto(cpr, cfn);
-		 if (dcl != NULL)
-		    {module_interop_wrap(fp, dcl, cfn, ffn);
-		     free_decl(dcl);};
-
-		 free_strings(ta);};};
+	for (ib = 0; ib < ndcl; ib++)
+	    {dcl = dcls + ib;
+	     ffn = has_binding(dcl, "fortran");
+	     if (ffn != NULL)
+	        module_interop_wrap(fp, dcl, ffn);};
 
 /* finish the interface */
 	fprintf(fp, "   end interface\n");
@@ -2586,10 +2591,12 @@ static int bind_module(bindes *bd)
 
 static void fin_module(bindes *bd)
    {char *pck;
+    statedes *st;
     FILE *fp;
 
     fp  = bd->fp;
-    pck = bd->pck;
+    st  = bd->st;
+    pck = st->pck;
 
     fprintf(fp, "end module pact_%s\n", pck);
     fprintf(fp, "\n");
@@ -2698,12 +2705,11 @@ static fparam so_type(char *a, int nc, char *ty)
 
 /* INIT_SCHEME - initialize Scheme file */
 
-static void init_scheme(bindes *bd, char *pck, int cfl,
-			char **sbi, char **cdc, char **cpr,
-			char **fpr, char **fwr)
-   {FILE *fp;
+static void init_scheme(statedes *st, bindes *bd)
+   {char *pck;
+    FILE *fp;
 
-    setup_binder(bd, pck, cfl, sbi, cdc, cpr, fpr, fwr);
+    pck = st->pck;
 
     fp = open_file("w", "gs-%s.c", pck);
 
@@ -2852,23 +2858,7 @@ static void scheme_wrap_local_assn_def(FILE *fp, farg *al)
 
     defa = ip->defa;
 
-#if 1
     fputs(defa, fp);
-#else
-    if (dir != FD_OUT)
-       {int l;
-	char lvl[MAXLINE];
-
-	get_def_value(lvl, MAXLINE, vls[0], ty);
-
-	if (nvl > 1)
-	   {for (l = 0; l < nvl; l++)
-	        {get_def_value(lvl, MAXLINE, vls[l], ty);
-		 fprintf(fp, "    _l%s[%d] = %s;\n", nm, l, lvl);};}
-
-	else
-	   fprintf(fp, "    _l%-8s = %s;\n", nm, lvl);};
-#endif
 
     return;}
 
@@ -2893,26 +2883,7 @@ static void scheme_wrap_local_assn_arg(char *a, int nc, farg *al)
 
     arg = ip->argi;
 
-#if 1
     nstrcat(a, nc, arg);
-#else
-    if (dir != FD_OUT)
-       {int l;
-	char lty[MAXLINE];
-
-	cs_type(lty, MAXLINE, al, FALSE);
-	if (nvl > 1)
-	   {for (l = 0; l < nvl; l++)
-	        vstrcat(a, nc, "            %s, &_l%s[%d],\n", lty, nm, l);}
-
-	else if ((dir != FD_IN) && (nvl == 1) &&
-		 ((IS_NULL(val) == TRUE) || (val[0] == '*')))
-	   {ideref(lty);
-	    vstrcat(a, nc, "            %s, &_l%s,\n", lty, nm);}
-
-	else
-	   vstrcat(a, nc, "            %s, &_l%s,\n", lty, nm);};
-#endif
 
     return;}
 
@@ -3109,7 +3080,9 @@ static char **scheme_wrap_install(char **fl, fdecl *dcl, char *sfn,
     map_name(ifn, MAXLINE, pi, sfn, NULL, -1, TRUE);
 
 /* prepare the function inline documenation */
-    concatenate(t, MAXLINE, com, " ");
+    t[0] = '\0';
+    if (com != NULL)
+       concatenate(t, MAXLINE, com, " ");
     if (IS_NULL(t) == TRUE)
        {sc_call_list(a, MAXLINE, dcl);
 	if (voida == FALSE)
@@ -3210,33 +3183,27 @@ static void scheme_install(FILE *fp, char *pck, char **fl)
  */
 
 static int bind_scheme(bindes *bd)
-   {int ib, rv;
-    char *sb, **ta, **fl;
-    char *cfn, *sfn;
-    fdecl *dcl;
+   {int ib, ndcl, rv;
+    char *sfn, *pck, **fl, **cpr;
+    fdecl *dcl, *dcls;
+    statedes *st;
     FILE *fp;
-    char *pck, **cpr, **sbi;
 
-    fp  = bd->fp;
-    pck = bd->pck;
-    sbi = bd->sbi;
-    cpr = bd->cpr;
+    fp   = bd->fp;
+    st   = bd->st;
+    pck  = st->pck;
+    cpr  = st->cpr;
+    dcls = st->dcl;
+    ndcl = st->ndcl;
 
     rv = TRUE;
     fl = NULL;
 
-    for (ib = 0; sbi[ib] != NULL; ib++)
-        {sb = sbi[ib];
-	 if (blank_line(sb) == FALSE)
-	    {ta = parse_bind(sb, "scheme");
-	     cfn = ta[0];
-	     sfn = ta[1];
-             dcl = find_proto(cpr, cfn);
-	     if (dcl != NULL)
-	        {fl = scheme_wrap(fp, fl, dcl, sfn, ta+4);
-		 free_decl(dcl);};
-
-	     free_strings(ta);};};
+    for (ib = 0; ib < ndcl; ib++)
+        {dcl = dcls + ib;
+	 sfn = has_binding(dcl, "scheme");
+	 if (sfn != NULL)
+	    fl = scheme_wrap(fp, fl, dcl, sfn, NULL);};
 
 /* write the routine to install the bindings */
     scheme_install(fp, pck, fl);
@@ -3268,12 +3235,11 @@ static void fin_scheme(bindes *bd)
 
 /* INIT_PYTHON - initialize Python file */
 
-static void init_python(bindes *bd, char *pck, int cfl,
-			char **sbi, char **cdc, char **cpr,
-			char **fpr, char **fwr)
-   {FILE *fp;
+static void init_python(statedes *st, bindes *bd)
+   {char *pck;
+    FILE *fp;
 
-    setup_binder(bd, pck, cfl, sbi, cdc, cpr, fpr, fwr);
+    pck = st->pck;
 
     fp = open_file("w", "gp-%s.c", pck);
 
@@ -3317,31 +3283,25 @@ static void python_wrap(FILE *fp, fdecl *dcl, char *pfn)
  */
 
 static int bind_python(bindes *bd)
-   {int ib, rv;
-    char *sb, **ta;
-    char *cfn, *pfn;
-    fdecl *dcl;
+   {int ib, ndcl, rv;
+    char *pfn, **cpr;
+    fdecl *dcl, *dcls;
+    statedes *st;
     FILE *fp;
-    char **cpr, **sbi;
 
-    fp  = bd->fp;
-    sbi = bd->sbi;
-    cpr = bd->cpr;
+    fp   = bd->fp;
+    st   = bd->st;
+    cpr  = st->cpr;
+    dcls = st->dcl;
+    ndcl = st->ndcl;
 
     rv = TRUE;
 
-    for (ib = 0; sbi[ib] != NULL; ib++)
-        {sb = sbi[ib];
-	 if (blank_line(sb) == FALSE)
-	    {ta = parse_bind(sb, "python");
-	     cfn = ta[0];
-	     pfn = ta[1];
-             dcl = find_proto(cpr, cfn);
-	     if (dcl != NULL)
-	        {python_wrap(fp, dcl, pfn);
-		 free_decl(dcl);};
-
-	     free_strings(ta);};};
+    for (ib = 0; ib < ndcl; ib++)
+        {dcl = dcls + ib;
+	 pfn = has_binding(dcl, "python");
+	 if (pfn != NULL)
+	    python_wrap(fp, dcl, pfn);};
 
     return(rv);}
 
@@ -3370,12 +3330,11 @@ static void fin_python(bindes *bd)
 
 /* INIT_DOC - initialize Doc file */
 
-static void init_doc(bindes *bd, char *pck, int cfl,
-		     char **sbi, char **cdc, char **cpr,
-		     char **fpr, char **fwr)
-   {FILE *fp;
+static void init_doc(statedes *st, bindes *bd)
+   {char *pck;
+    FILE *fp;
 
-    setup_binder(bd, pck, cfl, sbi, cdc, cpr, fpr, fwr);
+    pck = st->pck;
 
     fp = open_file("w", "gh-%s.html", pck);
 
@@ -3491,19 +3450,16 @@ static void process_doc(char *t, int nc, char **com)
 
 /* HTML_WRAP - wrap C function DCL in HTML form */
 
-static void html_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc,
-		      char *cfn, char **tok)
+static void html_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc)
    {int voidf;
     char upn[MAXLINE], lfn[MAXLINE], dcn[MAXLINE];
     char af[MAXLINE], as[MAXLINE], ap[MAXLINE];
     char fty[MAXLINE], t[MAXLINE];
-    char **args;
-    char **com;
+    char *cfn, **args, **com;
 
-    if (IS_NULL(tok[3]) == FALSE)
-       com = tok + 3;
-    else
-       com = find_comment(cfn, ndc, cdc);
+    cfn = dcl->proto.name;
+
+    com = find_comment(cfn, ndc, cdc);
 
     voidf = (strcmp(dcl->proto.type, "void") == 0);
 
@@ -3527,9 +3483,9 @@ static void html_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc,
     fprintf(fp, "<i>C Binding: </i>       %s\n", dcl->proto.arg);
 
 /* Fortran */
-    if (strstr(sb, "fortran(") == NULL)
+    if (has_binding(dcl, "fortran") == NULL)
        fprintf(fp, "<i>Fortran Binding: </i> none\n");
-    else
+    else if (dcl->bindings != NULL)
        {args = dcl->tfproto;
 
 	doc_proto_fortran(af, MAXLINE, dcl);
@@ -3542,9 +3498,9 @@ static void html_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc,
 		   args[0], dcn, af);};
 
 /* Scheme */
-    if (strcmp(sb, "scheme(") == 0)
+    if (has_binding(dcl, "scheme") == NULL)
        fprintf(fp, "<i>SX Binding: </i>      none\n");
-    else
+    else if (dcl->bindings != NULL)
        {map_name(dcn, MAXLINE, cfn, NULL, NULL, -1, TRUE);
 	doc_proto_name_only(as, MAXLINE, dcl, NULL);
 	if (IS_NULL(as) == TRUE)
@@ -3553,9 +3509,9 @@ static void html_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc,
 	   fprintf(fp, "<i>SX Binding: </i>      (%s %s)\n", dcn, as);};
 
 /* Python */
-    if (strcmp(sb, "python(") == 0)
+    if (has_binding(dcl, "python") == NULL)
        fprintf(fp, "<i>Python Binding: </i>  none\n");
-    else
+    else if (dcl->bindings != NULL)
        {map_name(dcn, MAXLINE, cfn, NULL, NULL, -1, FALSE);
 	doc_proto_name_only(ap, MAXLINE, dcl, ",");
 	fprintf(fp, "<i>Python Binding: </i>  pact.%s(%s)\n", dcn, ap);};
@@ -3580,20 +3536,18 @@ static void html_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc,
 
 /* MAN_WRAP - wrap C function DCL in MAN form */
 
-static void man_wrap(fdecl *dcl, char *sb, char *pck, int ndc, char **cdc,
-		     char *cfn, char **tok)
+static void man_wrap(fdecl *dcl, char *sb, char *pck, int ndc, char **cdc)
    {int voidf;
     char fname[MAXLINE], upk[MAXLINE];
     char upn[MAXLINE], lfn[MAXLINE], dcn[MAXLINE];
     char af[MAXLINE], as[MAXLINE], ap[MAXLINE];
     char fty[MAXLINE], t[MAXLINE];
-    char **args, **com;
+    char *cfn, **args, **com;
     FILE *fp;
 
-    if (IS_NULL(tok[3]) == FALSE)
-       com = tok + 3;
-    else
-       com = find_comment(cfn, ndc, cdc);
+    cfn = dcl->proto.name;
+
+    com = find_comment(cfn, ndc, cdc);
 
     voidf = (strcmp(dcl->proto.type, "void") == 0);
 
@@ -3629,10 +3583,10 @@ static void man_wrap(fdecl *dcl, char *sb, char *pck, int ndc, char **cdc,
     fprintf(fp, ".sp\n");
 
 /* Fortran */
-    if (strstr(sb, "fortran(") == NULL)
+    if (has_binding(dcl, "fortran") == NULL)
        {fprintf(fp, ".B Fortran Binding: none\n");
 	fprintf(fp, ".sp\n");}
-    else
+    else if (dcl->bindings != NULL)
        {args = dcl->tfproto;
 
 	doc_proto_fortran(af, MAXLINE, dcl);
@@ -3647,10 +3601,10 @@ static void man_wrap(fdecl *dcl, char *sb, char *pck, int ndc, char **cdc,
 	fprintf(fp, ".sp\n");};
 
 /* Scheme */
-    if (strcmp(sb, "scheme(") == 0)
+    if (has_binding(dcl, "scheme") == NULL)
        {fprintf(fp, ".B SX Binding:      none\n");
 	fprintf(fp, ".sp\n");}
-    else
+    else if (dcl->bindings != NULL)
        {map_name(dcn, MAXLINE, cfn, NULL, NULL, -1, TRUE);
 	doc_proto_name_only(as, MAXLINE, dcl, NULL);
 	if (IS_NULL(as) == TRUE)
@@ -3661,10 +3615,10 @@ static void man_wrap(fdecl *dcl, char *sb, char *pck, int ndc, char **cdc,
 	fprintf(fp, ".sp\n");};
 
 /* Python */
-    if (strcmp(sb, "python(") == 0)
+    if (has_binding(dcl, "python") == NULL)
        {fprintf(fp, ".B Python Binding:  none\n");
 	fprintf(fp, ".sp\n");}
-    else
+    else if (dcl->bindings != NULL)
        {map_name(dcn, MAXLINE, cfn, NULL, NULL, -1, FALSE);
 	doc_proto_name_only(ap, MAXLINE, dcl, ",");
 	fprintf(fp, ".B Python Binding:  pact.%s(%s)\n", dcn, ap);
@@ -3699,35 +3653,28 @@ static void man_wrap(fdecl *dcl, char *sb, char *pck, int ndc, char **cdc,
  */
 
 static int bind_doc(bindes *bd)
-   {int ib, ndc, rv;
-    char t[MAXLINE];
-    char *sb, *cfn, *pck;
-    char **cpr, **cdc, **sbi, **ta;
-    fdecl *dcl;
+   {int ib, ndc, ndcl, rv;
+    char *pck, **cpr, **cdc;
+    fdecl *dcl, *dcls;
+    statedes *st;
     FILE *fp;
 
-    fp  = bd->fp;
-    cpr = bd->cpr;
-    ndc = bd->ndc;
-    cdc = bd->cdc;
-    sbi = bd->sbi;
-    pck = bd->pck;
+    fp   = bd->fp;
+    st   = bd->st;
+    cpr  = st->cpr;
+    ndc  = st->ndc;
+    cdc  = st->cdc;
+    pck  = st->pck;
+    dcls = st->dcl;
+    ndcl = st->ndcl;
 
     rv = TRUE;
 
-    for (ib = 0; sbi[ib] != NULL; ib++)
-        {sb = sbi[ib];
-	 if (blank_line(sb) == FALSE)
-            {nstrncpy(t, MAXLINE, sb, -1);
-             ta = tokenize(t, " \t");
-	     cfn = ta[0];
-             dcl = find_proto(cpr, cfn);
-	     if (dcl != NULL)
-	        {html_wrap(fp, dcl, sb, ndc, cdc, cfn, ta+1);
-		 man_wrap(dcl, sb, pck, ndc, cdc, cfn, ta+1);
-		 free_decl(dcl);};
-
-	     free_strings(ta);};};
+    for (ib = 0; ib < ndcl; ib++)
+        {dcl = dcls + ib;
+	 if (dcl->error == FALSE)
+	    {html_wrap(fp, dcl, NULL, ndc, cdc);
+	      man_wrap(dcl, NULL, pck, ndc, cdc);};};
 
     return(rv);}
 
@@ -3760,16 +3707,13 @@ static int blang(char *pck, int cfl, char *fbi,
    {int ib, nb, rv;
     char **sbi, **sdc, **scp, **sfp, **swr;
     bindes *pb;
-    bindes bd[] = { {0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-		     init_fortran, bind_fortran, fin_fortran},
-		    {0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-		     init_module, bind_module, fin_module},
-		    {0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-		     init_scheme, bind_scheme, fin_scheme},
-		    {0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-		     init_python, bind_python, fin_python},
-		    {0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-		     init_doc, bind_doc, fin_doc} };
+    statedes st = {0, 0, 0, 0, 0, 0, 0,
+		   NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+    bindes bd[] = { {&st, NULL, init_fortran, bind_fortran, fin_fortran},
+		    {&st, NULL, init_module, bind_module, fin_module},
+		    {&st, NULL, init_scheme, bind_scheme, fin_scheme},
+		    {&st, NULL, init_python, bind_python, fin_python},
+		    {&st, NULL, init_doc, bind_doc, fin_doc} };
 
     rv = FALSE;
 
@@ -3792,13 +3736,18 @@ static int blang(char *pck, int cfl, char *fbi,
 	    if (scp != NULL)
 	       {nb = sizeof(bd)/sizeof(bindes);
 
-		for (pb = bd, ib = 0; ib < nb; ib++, pb++)
-		    pb->init(pb, pck, cfl, sbi, sdc, scp, sfp, swr);
+		setup_binder(&st, pck, cfl, sbi, sdc, scp, sfp, swr);
 
+/* initialize the binding constructors */
+		for (pb = bd, ib = 0; ib < nb; ib++, pb++)
+		    pb->init(&st, pb);
+
+/* make all the language bindings */
 		if (sbi != NULL)
 		   {for (pb = bd, ib = 0; ib < nb; ib++, pb++)
 		        pb->bind(pb);};
 
+/* cleanup */
 		for (pb = bd, ib = 0; ib < nb; ib++, pb++)
 		    pb->fin(pb);
 

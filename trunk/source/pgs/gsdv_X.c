@@ -78,7 +78,7 @@ extern void
  _PG_X_draw_to_abs(PG_device *dev, double x, double y),
  _PG_X_draw_to_rel(PG_device *dev, double x, double y),
  _PG_X_get_text_ext(PG_device *dev, int nd, PG_coord_sys cs, char *s, double *p),
- _PG_X_set_clipping(PG_device *dev, int flag),
+ _PG_X_set_clipping(PG_device *dev, bool flag),
  _PG_X_set_char_line(PG_device *dev, int n),
  _PG_X_set_char_path(PG_device *dev, double x, double y),
  _PG_X_set_char_precision(PG_device *dev, int p),

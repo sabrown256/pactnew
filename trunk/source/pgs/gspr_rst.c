@@ -250,7 +250,7 @@ void _PG_rst_set_char_line(PG_device *dev, int n)
  *                      - flag = TRUE   -->  clipping on
  */
 
-void _PG_rst_set_clipping(PG_device *dev, int flag)
+void _PG_rst_set_clipping(PG_device *dev, bool flag)
    {double wc[PG_BOXSZ];
 
     PG_get_viewspace(dev, WORLDC, wc);

@@ -268,7 +268,7 @@ void _PG_CGM_set_char_line(PG_device *dev, int n)
  *                      - flag = TRUE   -->  clipping on
  */
 
-void _PG_CGM_set_clipping(PG_device *dev, int flag)
+void _PG_CGM_set_clipping(PG_device *dev, bool flag)
    {int pc[PG_BOXSZ], pts[PG_BOXSZ];
 
     if (dev->cgm_page_set)
