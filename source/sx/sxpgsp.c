@@ -880,29 +880,6 @@ static object *_SXI_qwin(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* _SXI_SCLP - set the clipping state */
-
-static object *_SXI_sclp(SS_psides *si, object *argl)
-   {int c;
-    PG_device *dev;
-
-    dev = NULL;
-    c   = 1;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_INT_I, &c,
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_SCLP", SS_null);
-
-    PG_fset_clipping(dev, c);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
 /* _SXI_SMXI - set the maximum intensities */
 
 static object *_SXI_smxi(SS_psides *si, object *argl)
@@ -1200,36 +1177,6 @@ static object *_SXI_wtos(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* _SXI_SETVA - set the view angle */
-
-static object *_SXI_setva(SS_psides *si, object *argl)
-   {double va[PG_SPACEDM];
-    PG_device *dev;
-
-    dev = NULL;
-    if (SX_DEVICEP(SS_car(si, argl)) == TRUE)
-       {SS_args(si, argl,
-		G_DEVICE, &dev,
-		0);
-        argl = SS_cdr(si, argl);};
-
-    SS_args(si, argl,
-	    SC_DOUBLE_I, &SX_theta,
-	    SC_DOUBLE_I, &SX_phi,
-	    SC_DOUBLE_I, &SX_chi,
-	    0);
-
-    if (dev != NULL)
-       {va[0] = SX_theta;
-	va[1] = SX_phi;
-	va[2] = SX_chi;
-	PG_fset_view_angle(dev, TRUE, &va[0], &va[1], &va[2]);};
-
-    return(argl);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
 /* _SXI_GETVA - get the view angle */
 
 static object *_SXI_getva(SS_psides *si, object *argl)
@@ -1260,87 +1207,32 @@ static object *_SXI_getva(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* _SXI_SETLA - set the light angle */
+/* _SXI_SETVA - set the view angle */
 
-static object *_SXI_setla(SS_psides *si, object *argl)
-   {PG_device *dev;
-    double la[PG_SPACEDM];
-
-    dev   = NULL;
-    la[0] = 0.0;
-    la[1] = 0.0;
-    SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_DOUBLE_I, &la[0],
-            SC_DOUBLE_I, &la[1],
-            0);
-
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_SETLA", SS_car(si, argl));
-
-    else
-       PG_fset_light_angle(dev, TRUE, &la[0], &la[1]);
-
-    return(SS_f);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/* _SXI_GETLA - get the light angle */
-
-static object *_SXI_getla(SS_psides *si, object *argl)
-   {double la[PG_SPACEDM];
+static object *_SXI_setva(SS_psides *si, object *argl)
+   {double va[PG_SPACEDM];
     PG_device *dev;
-    object *rv;
 
     dev = NULL;
+    if (SX_DEVICEP(SS_car(si, argl)) == TRUE)
+       {SS_args(si, argl,
+		G_DEVICE, &dev,
+		0);
+        argl = SS_cdr(si, argl);};
+
     SS_args(si, argl,
-            G_DEVICE, &dev,
-            0);
+	    SC_DOUBLE_I, &SX_theta,
+	    SC_DOUBLE_I, &SX_phi,
+	    SC_DOUBLE_I, &SX_chi,
+	    0);
 
-    rv = SS_f;
+    if (dev != NULL)
+       {va[0] = SX_theta;
+	va[1] = SX_phi;
+	va[2] = SX_chi;
+	PG_fset_view_angle(dev, TRUE, &va[0], &va[1], &va[2]);};
 
-    if (dev == NULL)
-       SS_error(si, "BAD DEVICE - _SXI_GETLA", SS_car(si, argl));
-
-    else
-       {PG_fget_light_angle(dev, TRUE, &la[0], &la[1]);
-        rv = SS_make_list(si,
-			  SC_DOUBLE_I, &la[0],
-			  SC_DOUBLE_I, &la[1],
-			  0);};
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
- 
-/*
-
-SX_plcn(FIXNUM *devid, double *px, double *py, double *pa
-                                 double *pl, FIXNUM *pkx, FIXNUM *plx,
-                                 FIXNUM *pnl, FIXNUM *pli),
-SX_plln(FIXNUM *devid, double *px, double *py
-                                 FIXNUM *pn, FIXNUM *pmod, FIXNUM *paxt,
-                                 FIXNUM *pcol, double *pwid, FIXNUM *psty,
-                                 FIXNUM *psca, FIXNUM *psta, FIXNUM *pl),
-SX_plim(FIXNUM *devid, FIXNUM *pnc
-                                 char *name, FIXNUM *pnct, char *type,
-                                 double *px, double *py, double *pz,
-                                 FIXNUM *pk, FIXNUM *pl,
-                                 double *pxn, double *pxx, double *pyn,
-                                 double *pyx, double *pzn, double *pzx),
-SX_plsf(FIXNUM *devid, double *px, double *py, double *pz
-                                 FIXNUM *pn, double *pxn, double *pxx, double *pyn,
-                                 double *pyx, double *pzn, double *pzx,
-                                 FIXNUM *pkx, FIXNUM *plx, double *pth, double *pph,
-                                 FIXNUM *ptyp, FIXNUM *pcol, double *pwid,
-                                 FIXNUM *psty, FIXNUM *pnc, char *label),
-SX_plvc(FIXNUM *devid, double *px, double *py
-                                 double *pu, double *pv, FIXNUM *pn),
-SX_rvpa(FIXNUM *devid, FIXNUM *vwatid)
-SX_svpa(FIXNUM *devid, FIXNUM *pn)
-*/
+    return(argl);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -2202,11 +2094,6 @@ void _SX_install_pgs_primitives(SS_psides *si)
                SS_nargs,
                _SXI_satst, SS_PR_PROC);
 
-    SS_install(si, "pg-set-clipping!",
-               "Set the clipping state of the given device",
-               SS_nargs,
-               _SXI_sclp, SS_PR_PROC);
-
     SS_install(si, "pg-set-maximum-intensity!",
                "Set the maximum fractional intensity for colors (0.0 to 1.0) and optionally for RGB too",
                SS_nargs,
@@ -2282,20 +2169,10 @@ void _SX_install_pgs_primitives(SS_psides *si)
                SS_nargs,
                _SXI_getva, SS_PR_PROC);
 
-    SS_install(si, "pg-light-angle",
-               "Return a list of Euler angles defining the lighting angle",
-               SS_nargs,
-               _SXI_getla, SS_PR_PROC);
-
     SS_install(si, "pg-set-view-angle!",
                "Set the Euler angles defining the view angle",
                SS_nargs,
                _SXI_setva, SS_PR_PROC);
-
-    SS_install(si, "pg-set-light-angle!",
-               "Set the Euler angles defining the lighting angle",
-               SS_nargs,
-               _SXI_setla, SS_PR_PROC);
 
     SS_install(si, "pg-world-coordinate-system",
                "Return a list of numbers defining the WC system",
@@ -3391,6 +3268,84 @@ static object *_SXI_scuw(SS_psides *si, object *argl)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SETLA - set the light angle */
+
+static object *_SXI_setla(SS_psides *si, object *argl)
+   {PG_device *dev;
+    double la[PG_SPACEDM];
+
+    dev   = NULL;
+    la[0] = 0.0;
+    la[1] = 0.0;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_DOUBLE_I, &la[0],
+            SC_DOUBLE_I, &la[1],
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_SETLA", SS_car(si, argl));
+
+    else
+       PG_fset_light_angle(dev, TRUE, &la[0], &la[1]);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_GETLA - get the light angle */
+
+static object *_SXI_getla(SS_psides *si, object *argl)
+   {double la[PG_SPACEDM];
+    PG_device *dev;
+    object *rv;
+
+    dev = NULL;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            0);
+
+    rv = SS_f;
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_GETLA", SS_car(si, argl));
+
+    else
+       {PG_fget_light_angle(dev, TRUE, &la[0], &la[1]);
+        rv = SS_make_list(si,
+			  SC_DOUBLE_I, &la[0],
+			  SC_DOUBLE_I, &la[1],
+			  0);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+ 
+/* _SXI_SCLP - set the clipping state */
+
+static object *_SXI_sclp(SS_psides *si, object *argl)
+   {bool c;
+    PG_device *dev;
+
+    dev = NULL;
+    c   = 1;
+    SS_args(si, argl,
+            G_DEVICE, &dev,
+            SC_BOOL_I, &c,
+            0);
+
+    if (dev == NULL)
+       SS_error(si, "BAD DEVICE - _SXI_SCLP", SS_null);
+
+    PG_fset_clipping(dev, c);
+
+    return(SS_f);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /* _SX_INSTALL_PGS_PRIMITIVES - install the PGS primitives */
 
@@ -3626,6 +3581,21 @@ void _SX_install_pgs_primitives(SS_psides *si)
                "Return a pair specifying the character up direction on the given device",
                SS_nargs,
                _SXI_gcuw, SS_PR_PROC);
+
+    SS_install(si, "pg-light-angle",
+               "Return a list of Euler angles defining the lighting angle",
+               SS_nargs,
+               _SXI_getla, SS_PR_PROC);
+
+    SS_install(si, "pg-set-light-angle!",
+               "Set the Euler angles defining the lighting angle",
+               SS_nargs,
+               _SXI_setla, SS_PR_PROC);
+
+    SS_install(si, "pg-set-clipping!",
+               "Set the clipping state of the given device",
+               SS_nargs,
+               _SXI_sclp, SS_PR_PROC);
 
     return;}
 

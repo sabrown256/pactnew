@@ -331,7 +331,7 @@ void _PG_X_set_char_line(PG_device *dev, int n)
  *                    - flag = TRUE   -->  clipping on
  */
 
-void _PG_X_set_clipping(PG_device *dev, int flag)
+void _PG_X_set_clipping(PG_device *dev, bool flag)
    {int iw, ih;
     int pc[PG_BOXSZ];
     XRectangle cliprect[1];

@@ -275,7 +275,8 @@ static void _SS_args(SS_psides *si, object *obj, void *v, int type)
     if (SC_is_type_char(type) == TRUE)
        _SS_fix_arg(si, obj, v, type);
 
-    else if (SC_is_type_fix(type) == TRUE)
+    else if ((SC_is_type_fix(type) == TRUE) ||
+	     (type == SC_BOOL_I))
        _SS_fix_arg(si, obj, v, type);
 
     else if (SC_is_type_fp(type) == TRUE)

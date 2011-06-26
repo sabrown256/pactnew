@@ -806,7 +806,7 @@ struct s_PG_device
     double char_up[PG_SPACEDM];
     double char_width_s;
     
-    int clipping;
+    bool clipping;
 
     int data_id;
     int draw_fill_bound;
@@ -938,7 +938,7 @@ struct s_PG_device
     PFfgetc ggetc;
     PFfgets ggets;
     void (*gputs)(char *bf);
-    void (*set_clipping)(PG_device *dev, int flag);
+    void (*set_clipping)(PG_device *dev, bool flag);
     void (*set_char_line)(PG_device *dev, int n);
     void (*set_char_path)(PG_device *dev, double x, double y);
     void (*set_char_precision)(PG_device *dev, int p);
@@ -1043,7 +1043,7 @@ struct s_PG_view_attributes
 /*--------------------------------------------------------------------------*/
 
 struct s_PG_dev_attributes
-   {int clipping;
+   {bool clipping;
     double char_frac;
     int char_precision;
     double char_space;
@@ -1112,11 +1112,13 @@ extern int64_t
  PG_fget_buffer_size(void),
  PG_fset_buffer_size(int64_t sz);
 
+extern bool
+ PG_fget_clipping(PG_device *dev),
+ PG_fset_clipping(PG_device *dev, bool flag);
+
 extern int
  PG_fget_clear_mode(void),
  PG_fset_clear_mode(int i),
- PG_fget_clipping(PG_device *dev),
- PG_fset_clipping(PG_device *dev, int flag),
  PG_fget_char_precision(PG_device *dev),
  PG_fset_char_precision(PG_device *dev, int p),
  PG_fget_fill_bound(PG_device *dev),

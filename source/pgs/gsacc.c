@@ -80,11 +80,11 @@ int PG_fset_clear_mode(int i ARG(CLEAR_SCREEN))
 
 /* PG_FGET_CLIPPING - get the device clipping flag
  *
- * #bind PG_fget_clipping fortran() scheme()
+ * #bind PG_fget_clipping fortran() scheme(pg-get-clipping)
  */
 
-int PG_fget_clipping(PG_device *dev)
-   {int rv;
+bool PG_fget_clipping(PG_device *dev)
+   {bool rv;
  
     rv = (dev == NULL) ? FALSE : dev->clipping;
 
@@ -95,11 +95,11 @@ int PG_fget_clipping(PG_device *dev)
 
 /* PG_FSET_CLIPPING - set the device clipping flag
  *
- * #bind PG_fset_clipping fortran() scheme()
+ * #bind PG_fset_clipping fortran() scheme(pg-set-clipping!)
  */
 
-int PG_fset_clipping(PG_device *dev, int flag ARG(TRUE))
-   {int rv;
+bool PG_fset_clipping(PG_device *dev, bool flag ARG(TRUE))
+   {bool rv;
 
     if ((dev != NULL) && (dev->set_clipping != NULL))
        {rv = dev->clipping;

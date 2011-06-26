@@ -2123,7 +2123,7 @@ void PG_fset_view_angle(PG_device *dev, int cnv ARG(TRUE,in),
 /* PG_FGET_LIGHT_ANGLE - get the lighting angle in degrees if CNV is TRUE
  *                     - otherwise in radians
  *
- * #bind PG_fget_light_angle fortran() scheme()
+ * #bind PG_fget_light_angle fortran() scheme(pg-get-light-angle)
  */
 
 void PG_fget_light_angle(PG_device *dev, int cnv ARG(TRUE,in),
@@ -2147,7 +2147,7 @@ void PG_fget_light_angle(PG_device *dev, int cnv ARG(TRUE,in),
 /* PG_FSET_LIGHT_ANGLE - set the light angle in degrees for DEV
  *                     - return the old values thru the arguments
  *
- * #bind PG_fset_light_angle fortran() scheme()
+ * #bind PG_fset_light_angle fortran() scheme(pg-set-light-angle!)
  */
 
 void PG_fset_light_angle(PG_device *dev, int cnv ARG(TRUE,in),

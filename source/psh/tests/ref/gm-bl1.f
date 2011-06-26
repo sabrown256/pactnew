@@ -131,12 +131,6 @@ module pact_bl1
          implicit none
       end subroutine fav5_i
 
-      subroutine fav6_i() &
-                bind(c, name='fav6')
-         use iso_c_binding
-         implicit none
-      end subroutine fav6_i
-
    end interface
 
 end module pact_bl1
