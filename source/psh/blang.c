@@ -11,6 +11,9 @@
 #include "common.h"
 #include "libpsh.c"
 
+/* #define NO_DEFAULT_VALUE "NULL" */
+#define NO_DEFAULT_VALUE "----"
+
 /* #define RETURN_INTEGER */
 
 #ifdef RETURN_INTEGER
@@ -65,9 +68,10 @@ struct s_bindes
     void (*fin)(bindes *bd);};
 
 struct s_idecl
-   {char decl[MAXLINE];
-    char defa[MAXLINE];
-    char arg[MAXLINE];};
+   {char decl[MAXLINE];    /* local variable declaration */
+    char defa[MAXLINE];    /* default value assignment */
+    char argi[MAXLINE];    /* argument to call to get value */ 
+    char argc[MAXLINE];};  /* argument to C function call */ 
 
 struct s_farg
    {int nv;                           /* number of default values specified */
@@ -131,35 +135,78 @@ static void berr(char *fmt, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* IS_PTR - return TRUE if TYPE is a pointer */
+
+static int is_ptr(char *type)
+   {int rv;
+
+    rv = (strchr(type, '*') != NULL);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* IS_FUNC_PTR - return TRUE if TYPE is a function pointer */
+
+static int is_func_ptr(char *type, int wh)
+   {int rv, syn, cnv;
+
+    syn = (strstr(type, "(*") != NULL);
+    cnv = (strncmp(type, "PF", 2) == 0);
+
+    if ((wh & 1) && (syn == TRUE))
+       rv = TRUE;
+
+    else if ((wh & 2) && (cnv == TRUE))
+       rv = TRUE;
+
+    else
+       rv = FALSE;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* DEREF - dereference a pointer S
  *       - place result in D
+ *       - return TRUE iff a pointer was dereferenced
  */
 
-static char *deref(char *d, int nc, char *s)
-   {
+static int deref(char *d, int nc, char *s)
+   {int rv;
+
+    rv = FALSE;
 
     nstrncpy(d, nc, s, -1);
     if (LAST_CHAR(d) == '*')
        {LAST_CHAR(d) = '\0';
-	memmove(d, trim(d, BOTH, " \t"), nc);};
+	memmove(d, trim(d, BOTH, " \t"), nc);
+        rv = TRUE;};
 
-    return(d);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* IDEREF - dereference S with SC_FOO_P_I to SC_FOO_I
  *        - in place
+ *        - return TRUE iff a pointer was dereferenced
  */
 
-static char *ideref(char *s)
-   {char *p;
+static int ideref(char *s)
+   {int rv;
+    char *p;
+
+    rv = FALSE;
 
     p = strstr(s, "_P_I");
     if (p != NULL)
-       memmove(p, p+2, 3);
+       {memmove(p, p+2, 3);
+	rv = TRUE;};
 
-    return(s);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -174,17 +221,30 @@ static void get_def_value(char *lvl, int nc, char *sp, char *ty)
    {char lty[MAXLINE];
     char **dv;
 
-    nstrncpy(lvl, nc, sp, -1);
+    if (sp == NULL)
+       lvl[0] = '\0';
+    else
+       nstrncpy(lvl, nc, sp, -1);
 
-/* if empty or '*' get the apropriate default for the base type */
-    if ((IS_NULL(lvl) == TRUE) || (lvl[0] == '*'))
-       {deref(lty, MAXLINE, ty);
-	lookup_type(&dv, lty, MODE_C, MODE_C);
-	if (dv != NULL)
-	   {nstrncpy(lvl, nc, dv[0], -1);
-	    lst_free(dv);}
+/* if no value specified */
+    dv = NULL;
+    if ((IS_NULL(lvl) == TRUE) || (strcmp(lvl, NO_DEFAULT_VALUE) == 0))
+       {if ((is_ptr(ty) == TRUE) || (is_func_ptr(ty, 3) == TRUE))
+	   nstrncpy(lvl, nc, "NULL", -1);
 	else
-	   nstrncpy(lvl, nc, "NULL", -1);};
+	   lookup_type(&dv, ty, MODE_C, MODE_C);}
+
+/* dereference a pointer type and get its default value */
+    else if (lvl[0] == '*')
+       {if (is_ptr(ty) == TRUE)
+	   {deref(lty, MAXLINE, ty);
+	    lookup_type(&dv, lty, MODE_C, MODE_C);}
+	else
+	   lookup_type(&dv, ty, MODE_C, MODE_C);};
+
+    if (dv != NULL)
+       {nstrncpy(lvl, nc, dv[0], -1);
+	lst_free(dv);};
 
     return;}
 
@@ -242,40 +302,6 @@ static char *concatenate(char *s, int nc, char **sa, char *dlm)
     s[strlen(s) - strlen(dlm)] = '\0';
 
     return(s);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* IS_PTR - return TRUE if TYPE is a pointer */
-
-static int is_ptr(char *type)
-   {int rv;
-
-    rv = (strchr(type, '*') != NULL);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* IS_FUNC_PTR - return TRUE if TYPE is a function pointer */
-
-static int is_func_ptr(char *type, int wh)
-   {int rv, syn, cnv;
-
-    syn = (strstr(type, "(*") != NULL);
-    cnv = (strstr(type, "PF") != NULL);
-
-    if ((wh & 1) && (syn == TRUE))
-       rv = TRUE;
-
-    else if ((wh & 2) && (cnv == TRUE))
-       rv = TRUE;
-
-    else
-       rv = FALSE;
-
-    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -357,14 +383,141 @@ static char **split_args(char *args)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* ID_NO_DEFAULT - handle intepreter declarations in case
+ *               - no defaults specified
+ */
+
+static void id_no_default(idecl *ip, char *ty, char *lty, char *nm, char *val)
+   {char lvl[MAXLINE];
+
+    get_def_value(lvl, MAXLINE, val, ty);
+
+    snprintf(ip->decl, MAXLINE, "%s _l%s;\n", ty, nm);
+    snprintf(ip->defa, MAXLINE, "    _l%-8s = %s;\n", nm, lvl);
+    snprintf(ip->argi, MAXLINE, "            %s, &_l%s,\n", lty, nm);
+    snprintf(ip->argc, MAXLINE, "_l%s", nm);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* ID_FD_OUT - handle intepreter declarations in case
+ *           - of output arguments
+ */
+
+static void id_fd_out(idecl *ip, char *ty, char *nm, int nvl, char **vls)
+   {int drf;
+    char dty[MAXLINE];
+
+    drf = deref(dty, MAXLINE, ty);
+
+    if (nvl == 1)
+       {if (drf == TRUE)
+	   snprintf(ip->decl, MAXLINE, "%s _l%s;\n", ty, nm);
+	else
+	   snprintf(ip->decl, MAXLINE, "%s _l%s;\n", dty, nm);}
+    else
+       snprintf(ip->decl, MAXLINE, "%s _l%s[%d];\n", dty, nm, nvl);
+
+    if (drf == TRUE)
+       snprintf(ip->argc, MAXLINE, "_l%s", nm);
+    else
+       snprintf(ip->argc, MAXLINE, "&_l%s", nm);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* ID_FD_IN_OUT - handle intepreter declarations in case
+ *              - of input/output arguments
+ */
+
+static void id_fd_in_out(idecl *ip, char *ty, char *lty,
+			 char *nm, int nvl, char **vls)
+   {int l, drf;
+    char dty[MAXLINE], lvl[MAXLINE];
+
+    drf = ((is_ptr(ty) == FALSE) || (strcmp(vls[0], "NULL") != 0));
+
+    deref(dty, MAXLINE, ty);
+    ideref(lty);
+
+    if (nvl == 1)
+       {get_def_value(lvl, MAXLINE, NULL, dty);
+	snprintf(ip->decl, MAXLINE, "%s _l%s;\n", dty, nm);
+	snprintf(ip->defa, MAXLINE, "    _l%-8s = %s;\n", nm, lvl);
+	snprintf(ip->argi, MAXLINE, "            %s, &_l%s,\n", lty, nm);
+	snprintf(ip->argc, MAXLINE, "&_l%s", nm);}
+
+    else
+       {snprintf(ip->decl, MAXLINE, "%s _l%s[%d];\n", dty, nm, nvl);
+	for (l = 0; l < nvl; l++)
+	    {get_def_value(lvl, MAXLINE, vls[l], dty);
+	     vstrcat(ip->defa, MAXLINE, "    _l%s[%d] = %s;\n", nm, l, lvl);
+	     vstrcat(ip->argi, MAXLINE, "            %s, &_l%s[%d],\n",
+		     lty, nm, l);};
+
+	snprintf(ip->argc, MAXLINE, "_l%s", nm);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* ID_FD_IN - handle intepreter declarations in case
+ *          - of input arguments
+ */
+
+static void id_fd_in(idecl *ip, char *ty, char *lty,
+		     char *nm, int nvl, char **vls)
+   {int l, drf;
+    char dty[MAXLINE], lvl[MAXLINE];
+
+    drf = deref(dty, MAXLINE, ty);
+    ideref(lty);
+
+    if (nvl == 1)
+       {get_def_value(lvl, MAXLINE, vls[0], dty);
+
+	snprintf(ip->defa, MAXLINE, "    _l%-8s = %s;\n", nm, lvl);
+	snprintf(ip->argi, MAXLINE, "            %s, &_l%s,\n", lty, nm);
+
+	if ((drf == TRUE) &&
+	    ((is_ptr(ty) == FALSE) || (strcmp(vls[0], "NULL") != 0)))
+	   {snprintf(ip->decl, MAXLINE, "%s _l%s;\n", dty, nm);
+	    snprintf(ip->argc, MAXLINE, "&_l%s", nm);}
+	else
+	   {snprintf(ip->decl, MAXLINE, "%s _l%s;\n", ty, nm);
+	    snprintf(ip->argc, MAXLINE, "_l%s", nm);};}
+
+/* multiple default values means a local array */
+    else
+       {snprintf(ip->decl, MAXLINE, "%s _l%s[%d];\n", dty, nm, nvl);
+
+	for (l = 0; l < nvl; l++)
+	    {get_def_value(lvl, MAXLINE, vls[l], ty);
+	     vstrcat(ip->defa, MAXLINE, "    _l%s[%d] = %s;\n", nm, l, lvl);
+	     vstrcat(ip->argi, MAXLINE, "            %s, &_l%s[%d],\n",
+		     lty, nm, l);};
+
+	snprintf(ip->argc, MAXLINE, "_l%s", nm);};
+
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PROCESS_INTERP_DEF - setup correct expressions for interpreter
  *                    - handling of defaults
  */
 
 static void process_interp_def(farg *al)
-   {int l, nvl;
+   {int nvl;
     fdir dir;
-    char s[MAXLINE], lty[MAXLINE], dty[MAXLINE], lvl[MAXLINE];
+    char s[MAXLINE], lty[MAXLINE], lvl[MAXLINE];
     char oexp[MAXLINE], nexp[MAXLINE];
     char *ty, *nm, *arg, *val, **vls;
     idecl *ip;
@@ -380,46 +533,45 @@ static void process_interp_def(farg *al)
 
     ip->decl[0] = '\0';
     ip->defa[0] = '\0';
-    ip->arg[0]  = '\0';
+    ip->argi[0] = '\0';
+    ip->argc[0] = '\0';
 
-    val = (nvl > 0) ? vls[0] : "*";
+    val = (nvl > 0) ? vls[0] : NO_DEFAULT_VALUE;
 
-    get_def_value(lvl, MAXLINE, val, ty);
     cs_type(lty, MAXLINE, al, FALSE);
 
-/* single default values means a local scalar for a C pointer type */
-    if ((dir != FD_IN) && (nvl == 1))
-       {deref(dty, MAXLINE, ty);
-	ideref(lty);
-	snprintf(ip->decl, MAXLINE, "%s _l%s;\n", dty, nm);
-	snprintf(ip->defa, MAXLINE, "    _l%-8s = %s;\n", nm, lvl);
-	snprintf(ip->arg,  MAXLINE, "            %s, &_l%s,\n", lty, nm);}
-
-/* multiple default values means a local array */
-    else if (nvl > 1)
-       {deref(dty, MAXLINE, ty);
-	ideref(lty);
-	snprintf(ip->decl, MAXLINE, "%s _l%s[%d];\n", dty, nm, nvl);
-	for (l = 0; l < nvl; l++)
-	    {get_def_value(lvl, MAXLINE, vls[l], ty);
-	     vstrcat(ip->defa, MAXLINE, "    _l%s[%d] = %s;\n",
-		     nm, l, lvl);
-	     vstrcat(ip->arg, MAXLINE, "            %s, &_l%s[%d],\n",
-		     lty, nm, l);};}
-
 /* function pointer */
-    else if (strstr(arg, "(*") != NULL)
-       {snprintf(oexp, MAXLINE, "(*%s)", nm);
+    if (is_func_ptr(arg, 1) == TRUE)
+       {get_def_value(lvl, MAXLINE, val, ty);
+	snprintf(oexp, MAXLINE, "(*%s)", nm);
 	snprintf(nexp, MAXLINE, "(*_l%s)", nm);
 	nstrncpy(s, MAXLINE, arg, -1);
 	snprintf(ip->decl, MAXLINE, "%s;\n", subst(s, oexp, nexp, 1));
 	snprintf(ip->defa, MAXLINE, "    _l%-8s = %s;\n", nm, lvl);
-	snprintf(ip->arg,  MAXLINE, "            %s, &_l%s,\n", lty, nm);}
+	snprintf(ip->argi, MAXLINE, "            %s, &_l%s,\n", lty, nm);
+	snprintf(ip->argc, MAXLINE, "_l%s", nm);}
 
+    else if (nvl == 0)
+       id_no_default(ip, ty, lty, nm, val);
+
+/* single default values means a local scalar for a C pointer type */
     else
-       {snprintf(ip->decl, MAXLINE, "%s _l%s;\n", ty, nm);
-	snprintf(ip->defa, MAXLINE, "    _l%-8s = %s;\n", nm, lvl);
-	snprintf(ip->arg,  MAXLINE, "            %s, &_l%s,\n", lty, nm);};
+       {switch (dir)
+	   {case FD_OUT :
+	         id_fd_out(ip, ty, nm, nvl, vls);
+		 break;
+
+	    case FD_IN_OUT :
+	         id_fd_in_out(ip, ty, lty, nm, nvl, vls);
+		 break;
+
+	    case FD_IN :
+	         id_fd_in(ip, ty, lty, nm, nvl, vls);
+		 break;
+
+	    default :
+	         id_no_default(ip, ty, lty, nm, val);
+		 break;};};
 
     count++;
 
@@ -446,7 +598,17 @@ static int process_qualifiers(farg *arg, char *qual)
 	al  = split_args(t);
 	ptr = is_ptr(arg->type);
 
-/* get default value(s) */
+/* get default value(s)
+ *    <sspec> := "*" | <val>
+ *    <spec>  := "" | <sspec>
+ *    <list>  := <sspec> | <list> ',' <sspec>
+ *    <specs> := <spec> | '[' <list> ']'
+ *    ""       - no value specification
+ *    "*"      - any single value
+ *    <val>    - single value <val> 
+ * NOTE: to make parsing easier things like [,] are not allowed
+ * hence the <spec> <sspec> distinction
+ */
 	val = al[0];
 	lst = NULL;
 	if ((IS_NULL(val) == TRUE) || (val[0] == '*'))
@@ -463,7 +625,7 @@ static int process_qualifiers(farg *arg, char *qual)
 	    rv = FALSE;};
 
 /* get argument IN/OUT direction */
-	arg->dir = FD_NONE;
+	arg->dir = FD_IN;
 	dir = al[1];
 	if (dir != NULL)
 	   {if (strcmp(dir, "in") == 0)
@@ -485,10 +647,6 @@ static int process_qualifiers(farg *arg, char *qual)
        {lookup_type(&arg->val, arg->type, MODE_C, MODE_C);
 	arg->dir = FD_NONE;};
 
-/* setup correct default values for interpreters */
-    if (rv == TRUE)
-       process_interp_def(arg);
-
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
@@ -500,7 +658,7 @@ static int process_qualifiers(farg *arg, char *qual)
  *            - return TRUE iff successful
  */
 
-static int split_decl(farg *al, char *s)
+static int split_decl(farg *al, char *s, int isarg)
    {int nc, rv;
     char t[MAXLINE];
     char *p, *pn, *qual;
@@ -560,6 +718,10 @@ static int split_decl(farg *al, char *s)
 
     rv = process_qualifiers(al, qual);
 
+/* setup correct default values for interpreters */
+    if ((rv == TRUE) && (isarg == TRUE))
+       process_interp_def(al);
+
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
@@ -580,7 +742,7 @@ static farg *proc_args(fdecl *dcl)
 
     nr = 0;
     for (i = 0; i < na; i++)
-        {ok = split_decl(al+i, args[i]);
+        {ok = split_decl(al+i, args[i], TRUE);
 	 if (ok == FALSE)
 	    {FREE(al);
 	     dcl->na = 0;
@@ -670,7 +832,7 @@ static fdecl *find_proto(char **cpr, char *f)
 	LAST_CHAR(pa) = '\0';
 
 /* get the return type */
-        ok = split_decl(&dcl->proto, pf);
+        ok = split_decl(&dcl->proto, pf, FALSE);
 	
 	ty = tokenize(pf, " \t");
 	nt = lst_length(ty);
@@ -832,7 +994,7 @@ static char *lookup_type(char ***val, char *ty, langmode ity, langmode oty)
 	     break;};
 
     rv = NULL;
-    dv = "NULL";
+    dv = NO_DEFAULT_VALUE;
     if (l != -1)
        {dv = map[l].defv;
 	switch (oty)
@@ -847,7 +1009,9 @@ static char *lookup_type(char ***val, char *ty, langmode ity, langmode oty)
 	         break;
 	    case MODE_P :
                  rv = map[l].pty;
-	         break;};};
+	         break;};}
+    else if ((is_func_ptr(ty, 3) == TRUE) || (is_ptr(ty) == TRUE))
+       dv = "NULL";
 
     if (val != NULL)
        {lst = NULL;
@@ -1230,6 +1394,7 @@ static void fc_call_list(char *a, int nc, fdecl *dcl, int local)
     fdir dir;
     char *ty, *nm;
     farg *al;
+    idecl *ip;
 
     na = dcl->na;
     al = dcl->al;
@@ -1243,6 +1408,7 @@ static void fc_call_list(char *a, int nc, fdecl *dcl, int local)
 	     ty  = al[i].type;
 	     nvl = al[i].nv;
 	     dir = al[i].dir;
+	     ip  = &al[i].interp;
 	     ptr = is_ptr(ty);
 
 /* pass function pointers straight thru - no local variable */
@@ -1250,9 +1416,14 @@ static void fc_call_list(char *a, int nc, fdecl *dcl, int local)
 	        vstrcat(a, MAXLINE, "%s, ", nm);
 
 /* scalar return values need references */
+#if 0
 	     else if ((ptr == TRUE) && (nvl == 1) &&
 		      (dir != FD_IN) && (local == TRUE))
 	        vstrcat(a, MAXLINE, "&_l%s, ", nm);
+#else
+	     else if (local == TRUE)
+	        vstrcat(a, MAXLINE, "%s, ", ip->argc);
+#endif
 
 /* all other argument go thru a local variable as declared */
 	     else
@@ -2667,27 +2838,37 @@ static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
 /* SCHEME_WRAP_LOCAL_ASSN_DEF - assign default values to local variable AL */
 
 static void scheme_wrap_local_assn_def(FILE *fp, farg *al)
-   {int l, nvl;
+   {int nvl;
     fdir dir;
-    char lvl[MAXLINE];
-    char *ty, *nm, **vls;
+    char *defa, *ty, *nm, **vls;
+    idecl *ip;
 
     ty  = al->type;
     nm  = al->name;
     nvl = al->nv;
     vls = al->val;
     dir = al->dir;
+    ip  = &al->interp;
 
-    get_def_value(lvl, MAXLINE, vls[0], ty);
+    defa = ip->defa;
 
+#if 1
+    fputs(defa, fp);
+#else
     if (dir != FD_OUT)
-       {if (nvl > 1)
+       {int l;
+	char lvl[MAXLINE];
+
+	get_def_value(lvl, MAXLINE, vls[0], ty);
+
+	if (nvl > 1)
 	   {for (l = 0; l < nvl; l++)
 	        {get_def_value(lvl, MAXLINE, vls[l], ty);
 		 fprintf(fp, "    _l%s[%d] = %s;\n", nm, l, lvl);};}
 
 	else
 	   fprintf(fp, "    _l%-8s = %s;\n", nm, lvl);};
+#endif
 
     return;}
 
@@ -2697,10 +2878,10 @@ static void scheme_wrap_local_assn_def(FILE *fp, farg *al)
 /* SCHEME_WRAP_LOCAL_ASSN_ARG - add AL to SS_args call argument list */
 
 static void scheme_wrap_local_assn_arg(char *a, int nc, farg *al)
-   {int l, nvl;
+   {int nvl;
     fdir dir;
-    char lty[MAXLINE];
-    char *ty, *nm, *val, **vls;
+    char *arg, *ty, *nm, *val, **vls;
+    idecl *ip;
 
     ty  = al->type;
     nm  = al->name;
@@ -2708,9 +2889,18 @@ static void scheme_wrap_local_assn_arg(char *a, int nc, farg *al)
     nvl = al->nv;
     vls = al->val;
     val = vls[0];
+    ip  = &al->interp;
 
+    arg = ip->argi;
+
+#if 1
+    nstrcat(a, nc, arg);
+#else
     if (dir != FD_OUT)
-       {cs_type(lty, MAXLINE, al, FALSE);
+       {int l;
+	char lty[MAXLINE];
+
+	cs_type(lty, MAXLINE, al, FALSE);
 	if (nvl > 1)
 	   {for (l = 0; l < nvl; l++)
 	        vstrcat(a, nc, "            %s, &_l%s[%d],\n", lty, nm, l);}
@@ -2722,6 +2912,7 @@ static void scheme_wrap_local_assn_arg(char *a, int nc, farg *al)
 
 	else
 	   vstrcat(a, nc, "            %s, &_l%s,\n", lty, nm);};
+#endif
 
     return;}
 
