@@ -1257,6 +1257,38 @@ static void setup_binder(statedes *st, char *pck, int cfl,
     return;}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* IC_CALL_LIST - render the arg list of DCL into A for an
+ *              - interpreter function call
+ */
+
+static void ic_call_list(char *a, int nc, fdecl *dcl, char *dlm)
+   {int i, na, voida;
+    farg *al;
+
+    na = dcl->na;
+    al = dcl->al;
+
+    voida = no_args(dcl);
+
+    a[0] = '\0';
+    if (voida == FALSE)
+       {if (dlm == NULL)
+	   {for (i = 0; i < na; i++)
+	        vstrcat(a, MAXLINE, "%s ", al[i].name);
+
+	    a[strlen(a) - 1] = '\0';}
+
+	else
+	   {for (i = 0; i < na; i++)
+	        vstrcat(a, MAXLINE, "%s%s ", al[i].name, dlm);
+
+	    a[strlen(a) - 2] = '\0';};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
 
 /*                            FORTRAN ROUTINES                              */
 
@@ -2727,31 +2759,6 @@ static void init_scheme(statedes *st, bindes *bd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_CALL_LIST - render the arg list of DCL into A for the
- *              - SCHEME function call
- */
-
-static void sc_call_list(char *a, int nc, fdecl *dcl)
-   {int i, na, voida;
-    farg *al;
-
-    na = dcl->na;
-    al = dcl->al;
-
-    voida = no_args(dcl);
-
-    a[0] = '\0';
-    if (voida == FALSE)
-       {for (i = 0; i < na; i++)
-	    vstrcat(a, MAXLINE, "%s ", al[i].name);
-
-	a[strlen(a) - 1] = '\0';};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SCHEME_WRAP_DECL - function declaration */
 
 static void scheme_wrap_decl(FILE *fp, fdecl *dcl)
@@ -3084,7 +3091,7 @@ static char **scheme_wrap_install(char **fl, fdecl *dcl, char *sfn,
     if (com != NULL)
        concatenate(t, MAXLINE, com, " ");
     if (IS_NULL(t) == TRUE)
-       {sc_call_list(a, MAXLINE, dcl);
+       {ic_call_list(a, MAXLINE, dcl, NULL);
 	if (voida == FALSE)
 	   snprintf(t, MAXLINE, "Procedure: %s\\n     Usage: (%s %s)",
 		    ifn, ifn, a);
@@ -3233,6 +3240,111 @@ static void fin_scheme(bindes *bd)
 
 /*--------------------------------------------------------------------------*/
 
+/* PO_TYPE - return the Python object constructor for C type TY */
+
+static fparam po_type(char *a, int nc, char *ty)
+   {fparam rv;
+
+    rv = FP_SCALAR;
+
+    if (strcmp(ty, "char") == 0)
+       nstrncpy(a, nc, "SS_mk_char", -1);
+       
+    else if (strcmp(ty, "char *") == 0)
+       nstrncpy(a, nc, "SS_mk_string", -1);
+       
+    else if (strcmp(ty, "bool") == 0)
+       nstrncpy(a, nc, "SS_mk_boolean", -1);
+       
+    else if ((strcmp(ty, "short") == 0) ||
+	     (strcmp(ty, "int") == 0) ||
+	     (strcmp(ty, "long") == 0) ||
+	     (strcmp(ty, "long long") == 0) ||
+	     (strcmp(ty, "int16_t") == 0) ||
+	     (strcmp(ty, "int32_t") == 0) ||
+	     (strcmp(ty, "int64_t") == 0))
+       nstrncpy(a, nc, "SS_mk_integer", -1);
+       
+    else if ((strcmp(ty, "float") == 0) ||
+	     (strcmp(ty, "double") == 0) ||
+	     (strcmp(ty, "long double") == 0))
+       nstrncpy(a, nc, "SS_mk_float", -1);
+       
+    else if ((strcmp(ty, "float _Complex") == 0) ||
+	     (strcmp(ty, "double _Complex") == 0) ||
+	     (strcmp(ty, "long double _Complex") == 0))
+       nstrncpy(a, nc, "SS_mk_complex", -1);
+       
+    else if (is_ptr(ty) == TRUE)
+       {rv = FP_ARRAY;
+	nstrncpy(a, nc, "SX_mk_C_array", -1);}
+
+/* handle unknown types with a mostly graceful failure */
+    else
+       {rv = FP_ANY;
+	nstrncpy(a, nc, "none", -1);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PY_FORMAT - convert <itype>, <var> pairs to Python parse format string */
+
+static void py_format(char *fmt, int nc, char *spec, char *name)
+   {int i;
+    char t[MAXLINE];
+    char *pf, **ta;
+
+    nstrncpy(t, MAXLINE, spec, -1);
+    ta = tokenize(t, ", \t\n");
+
+    memset(fmt, 0, nc);
+
+    pf = fmt;
+    for (i = 0; ta[i] != NULL; i += 2)
+        {if (strcmp(ta[i], "SC_INT_I") == 0)
+	    *pf++ = 'i';
+	  else if (strcmp(ta[i], "SC_DOUBLE_I") == 0)
+	    *pf++ = 'd';
+	  else
+	    *pf++ = 'x';};
+
+    if (name != NULL)
+       vstrcat(fmt, nc, ":%s", name);
+
+    free_strings(ta);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PY_ARG - convert <itype>, <var> pairs to Python call arg list string */
+
+static void py_arg(char *arg, int nc, char *spec)
+   {int i, n;
+    char t[MAXLINE];
+    char **ta;
+
+    nstrncpy(t, MAXLINE, spec, -1);
+    ta = tokenize(t, ", \t\n");
+
+    arg[0] = '\0';
+
+    for (i = 1; ta[i] != NULL; i += 2)
+        vstrcat(arg, nc, "%s, ", ta[i]);
+
+    n = strlen(arg);
+    arg[n-2] = '\0';
+
+    free_strings(ta);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* INIT_PYTHON - initialize Python file */
 
 static void init_python(statedes *st, bindes *bd)
@@ -3244,7 +3356,8 @@ static void init_python(statedes *st, bindes *bd)
     fp = open_file("w", "gp-%s.c", pck);
 
     fprintf(fp, "\n");
-    fprintf(fp, "#include \"sx_int.h\"\n");
+    fprintf(fp, "#include <Python.h>\n");
+    fprintf(fp, "#include \"%s_int.h\"\n", pck);
     fprintf(fp, "\n");
 
     csep(fp);
@@ -3256,21 +3369,373 @@ static void init_python(statedes *st, bindes *bd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PYTHON_WRAP_DECL - function declaration */
+
+static void python_wrap_decl(FILE *fp, fdecl *dcl)
+   {int na, nc, voida;
+    char a[MAXLINE], dcn[MAXLINE], pfn[MAXLINE], s[MAXLINE], t[MAXLINE];
+    char *cfn, *pty;
+
+    na = dcl->na;
+    cfn = dcl->proto.name;
+
+    map_name(pfn, MAXLINE, cfn, NULL, NULL, -1, FALSE);
+
+    nstrncpy(dcn, MAXLINE, cfn, -1);
+    downcase(dcn);
+
+    pty = "PyObject";
+
+    fprintf(fp, "\n");
+    fprintf(fp, "/* WRAP |%s| */\n", dcl->proto.arg);
+    fprintf(fp, "\n");
+
+/* prepare the function inline documenation */
+    voida = no_args(dcl);
+    ic_call_list(a, MAXLINE, dcl, ",");
+    if (voida == FALSE)
+       snprintf(t, MAXLINE, "Procedure: %s\\n     Usage: %s(%s)",
+		pfn, pfn, a);
+    else
+       snprintf(t, MAXLINE, "Procedure: %s\\n     Usage: %s()",
+		pfn, pfn);
+
+    fprintf(fp, "static char _PYI_%s__doc__[] = \"%s\";\n", dcn, t);
+    fprintf(fp, "\n");
+
+    snprintf(t, MAXLINE, "static PyObject *_PYI_%s(", dcn);
+    nc = strlen(t);
+    memset(s, ' ', nc);
+    s[nc] = '\0';
+
+    fprintf(fp, "%s%s *self,\n", t, pty);
+    fprintf(fp, "%sPyObject *args,\n", s);
+    fprintf(fp, "%sPyObject *kwds)\n", s);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PYTHON_WRAP_LOCAL_DECL - local variable declarations */
+
+static void python_wrap_local_decl(FILE *fp, fdecl *dcl,
+				   fparam knd, char *po, int voida)
+   {int i, na, nv, nvl, voidf;
+    fdir dir;
+    char t[MAXLINE];
+    char *ty, *nm, *arg, *rty;
+    farg *al;
+    idecl *ip;
+
+    na = dcl->na;
+    al = dcl->al;
+
+    rty = dcl->proto.type;
+
+    voidf = (strcmp(dcl->proto.type, "void") == 0);
+	
+    nv = 0;
+    for (i = 0; i <= na; i++)
+        {if ((voida == TRUE) && (i == 0))
+	    continue;
+
+	 ty  = al[i].type;
+	 nm  = al[i].name;
+	 arg = al[i].arg;
+	 dir = al[i].dir;
+	 nvl = al[i].nv;
+	 ip  = &al[i].interp;
+
+	 if (nv == 0)
+	    snprintf(t, MAXLINE, "   {");
+	 else
+	    snprintf(t, MAXLINE, "    ");
+
+/* variable for return value */
+	 if (i == na)
+	    {if (voidf == FALSE)
+	        {vstrcat(t, MAXLINE, "%s _rv;\n    ", rty);
+		 if (knd == FP_ARRAY)
+		    {nstrcat(t, MAXLINE, "long _sz;\n");
+		     nstrcat(t, MAXLINE, "    C_array *_arr;\n    ");};};
+
+	     nstrcat(t, MAXLINE, "PyObject *_lo;\n");}
+
+/* local vars */
+	 else if (nm != '\0')
+           {nstrcat(t, MAXLINE, ip->decl);
+            nv++;};
+
+	 if (IS_NULL(t) == FALSE)
+	    fputs(subst(t, "* ", "*", -1), fp);};
+
+    fprintf(fp, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PYTHON_WRAP_LOCAL_ASSN_DEF - assign default values to local variable AL */
+
+static void python_wrap_local_assn_def(FILE *fp, farg *al)
+   {
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PYTHON_WRAP_LOCAL_ASSN_ARG - add AL to PyArg_ParseTupleAndKeywords call
+ *                            - argument list
+ */
+
+static void python_wrap_local_assn_arg(char *a, int nc, farg *al)
+   {int nvl;
+    fdir dir;
+    char *arg, *ty, *nm, *val, **vls;
+    idecl *ip;
+
+    ty  = al->type;
+    nm  = al->name;
+    dir = al->dir;
+    nvl = al->nv;
+    vls = al->val;
+    val = vls[0];
+    ip  = &al->interp;
+
+    arg = ip->argi;
+
+    nstrcat(a, nc, arg);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PYTHON_WRAP_LOCAL_ASSN - local variable assignments */
+
+static void python_wrap_local_assn(FILE *fp, fdecl *dcl, int voida)
+   {int i, na;
+    char a[MAXLINE], fmt[MAXLINE], arg[MAXLINE];
+    farg *al;
+
+    if (voida == FALSE)
+       {na = dcl->na;
+	al = dcl->al;
+
+/* set the default values */
+	for (i = 0; i < na; i++)
+	    python_wrap_local_assn_def(fp, al+i);
+
+/* make the PyArg_ParseTupleAndKeywords call */
+	a[0] = '\0';
+	for (i = 0; i < na; i++)
+	    python_wrap_local_assn_arg(a, MAXLINE, al+i);
+
+	py_format(fmt, MAXLINE, a, NULL);
+	fprintf(fp, "    ok = PyArg_ParseTupleAndKeywords(args, kwds,\n");
+	fprintf(fp, "                                     %s,\n", fmt);
+	fprintf(fp, "                                     kw_list,\n");
+
+	py_arg(arg, MAXLINE, a);
+	fprintf(fp, "                                     %s);\n", arg);
+
+	fprintf(fp, "    if (ok == FALSE)\n");
+	fprintf(fp, "       _lo = NULL;\n");
+	fprintf(fp, "    else\n");};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PYTHON_WRAP_LOCAL_CALL - function call */
+
+static void python_wrap_local_call(FILE *fp, fdecl *dcl)
+   {char a[MAXLINE], t[MAXLINE];
+    char *ty, *nm;
+
+    ty = dcl->proto.type;
+    nm = dcl->proto.name;
+
+    fc_call_list(a, MAXLINE, dcl, TRUE);
+
+    if (strcmp(ty, "void") == 0)
+       snprintf(t, MAXLINE, "       {%s(%s);\n", nm, a);
+    else
+       snprintf(t, MAXLINE, "       {_rv = %s(%s);\n", nm, a);
+
+    fputs(t, fp);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PYTHON_ARRAY_RETURN - compute possible array return from DCL */
+
+static void python_array_return(char *t, int nc, fdecl *dcl)
+   {int i, iv, na, nr, nvl;
+    fdir dir;
+    char a[MAXLINE], dty[MAXLINE], fmt[MAXLINE], arg[MAXLINE];
+    char *nm;
+    farg *al;
+
+    t[0] = '\0';
+    a[0] = '\0';
+
+    nr = dcl->nr;
+
+/* make up the list arguments */
+    if (nr > 0)
+       {na = dcl->na;
+	al = dcl->al;
+        for (i = 0; i < na; i++)
+	    {nvl = al[i].nv;
+	     dir = al[i].dir;
+	     if ((nvl > 0) && ((dir == FD_OUT) || (dir == FD_IN_OUT)))
+	        {nm = al[i].name;
+		 cs_type(dty, MAXLINE, al+i, TRUE);
+	     
+		 if (nvl == 1)
+		    vstrcat(a, MAXLINE, "\t\t\t%s, &_l%s,\n", dty, nm);
+		 else
+		    {for (iv = 0; iv < nvl; iv++)
+			 vstrcat(a, MAXLINE, "\t\t\t%s, &_l%s[%d],\n",
+				 dty, nm, iv);};};};};
+
+/* if the list argument are non empty make up the call */
+    if (IS_NULL(a) == FALSE)
+       {py_format(fmt, MAXLINE, a, NULL);
+	py_arg(arg, MAXLINE, a);
+	snprintf(t, nc, "        _lo = Py_BuildValue(\"%s\",\n", fmt);
+	vstrcat(t, nc,  "                            %s);};\n", arg);}
+    else
+       {snprintf(t, nc, "\n");
+	nstrcat(t, nc, "        Py_INCREF(Py_None);\n");
+	nstrcat(t, nc, "        _lo = Py_None;};\n");};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PYTHON_SCALAR_RETURN - compute scalar return from DCL */
+
+static void python_scalar_return(char *t, int nc,
+				 fdecl *dcl, fparam knd, char *po)
+   {char dty[MAXLINE];
+    char *ty, *sty;
+
+    t[0] = '\0';
+
+    ty = dcl->proto.type;
+
+    if (strcmp(ty, "void") == 0)
+       snprintf(t, nc, "    _lo = SS_f;\n");
+    else
+       {if (IS_NULL(po) == FALSE)
+	   {switch (knd)
+	       {case FP_ANY :
+		     sty = lookup_type(NULL, ty, MODE_C, MODE_S);
+		     if (strcmp(sty, "SC_ENUM_I") == 0)
+		        snprintf(t, nc, "    _lo = SS_mk_integer(si, _rv);\n");
+		     else
+		        {snprintf(t, nc,
+				  "\n/* no way to return '%s' */\n", ty);
+			 nstrcat(t, nc, "    _lo = SS_null;\n");};
+		     break;
+
+	        case FP_ARRAY :
+		     deref(dty, MAXLINE, ty);
+		     if (strcmp(dty, "void") == 0)
+		        {snprintf(t, nc,
+				  "    _sz = SC_arrlen(_rv);\n");
+			 vstrcat(t, nc,
+				 "    _arr = PM_make_array(\"char\", _sz, _rv);\n");}
+		     else
+		        {snprintf(t, nc,
+				  "    _sz = SC_arrlen(_rv)/sizeof(%s);\n",
+				  dty);
+			 vstrcat(t, nc,
+				 "    _arr = PM_make_array(\"%s\", _sz, _rv);\n",
+				 dty);};
+		     vstrcat(t, nc, "    _lo  = %s(si, _arr);\n", po);
+		     break;
+	        default :
+                     if (strcmp(ty, "bool") == 0)
+		        snprintf(t, nc, "    _lo = %s(si, \"g\", (int) _rv);\n",
+				 po);
+		     else
+		        snprintf(t, nc, "    _lo = %s(si, _rv);\n", po);
+		     break;};}
+	else
+	   snprintf(t, nc, "    _lo = SS_null;\n");};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PYTHON_WRAP_LOCAL_RETURN - function return */
+
+static void python_wrap_local_return(FILE *fp, fdecl *dcl,
+				     fparam knd, char *po)
+   {char t[MAXLINE];
+
+    python_array_return(t, MAXLINE, dcl);
+    if (IS_NULL(t) == TRUE)
+       python_scalar_return(t, MAXLINE, dcl, knd, po);
+
+    fputs(t, fp);
+
+    fprintf(fp, "\n");
+
+    fprintf(fp, "    return(_lo);}\n");
+    fprintf(fp, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PYTHON_WRAP - wrap C function DCL in PYTHON callable function
  *             - using name PFN
  */
 
 static void python_wrap(FILE *fp, fdecl *dcl, char *pfn)
-   {char upn[MAXLINE];
+   {int voida;
+    fparam knd;
+    char upn[MAXLINE];
+    char po[MAXLINE];
 
-    if (strcmp(pfn, "none") != 0)
-       {nstrncpy(upn, MAXLINE, pfn, -1);
+    if ((is_var_arg(dcl->proto.arg) == FALSE) && (strcmp(pfn, "none") != 0))
+       {voida = no_args(dcl);
+
+	nstrncpy(upn, MAXLINE, pfn, -1);
 	upcase(upn);
 
 	csep(fp);
-	fprintf(fp, "\n");
 
-	fprintf(fp, "\n");
+	knd = po_type(po, MAXLINE, dcl->proto.type);
+	
+/* function declaration */
+	python_wrap_decl(fp, dcl);
+
+/* local variable declarations */
+	python_wrap_local_decl(fp, dcl, knd, po, voida);
+
+/* local variable assignments */
+	python_wrap_local_assn(fp, dcl, voida);
+
+/* function call */
+	python_wrap_local_call(fp, dcl);
+
+/* function return */
+	python_wrap_local_return(fp, dcl, knd, po);
+
 	csep(fp);};
 
     return;}

@@ -174,10 +174,15 @@ else
 
 # compile Python wrapper
       Note $Log ""
-      Note $Log "Compile python wrapper"
       flog $Log set file = gp-$i.c
-      flog $Log ${cc} -c $file
-      @ xstatus = $status
+      if ($HavePython == FALSE) then
+         Note $Log "Not compiling python wrapper"
+         @ xstatus = 0
+      else
+         Note $Log "Compile python wrapper"
+         flog $Log ${cc} -c $file
+         @ xstatus = $status
+      endif
       if (-f $RefDir/$file) then
          flog $Log diff $file $RefDir/$file
          if ($status != 0) then
@@ -186,6 +191,7 @@ else
       else
          flog $Log cp $file $RefDir/$file
       endif
+
       if ($xstatus == 0) then
          NoteD $Log -n "."
       else
