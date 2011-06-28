@@ -1,23 +1,22 @@
 
 #include <Python.h>
 #include "bl1_int.h"
+#include "sx_int.h"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* WRAP |void fav1(void)| */
 
-static char _PYI_fav1__doc__[] = "Procedure: fav1\n     Usage: fav1()";
-
-static PyObject *_PYI_fav1(PyObject *self,
-                           PyObject *args,
-                           PyObject *kwds)
+static PyObject *_PY_fav1(PyObject *self,
+                          PyObject *args,
+                          PyObject *kwds)
    {PyObject *_lo;
+    
+    fav1();
 
-       {fav1();
-
-        Py_INCREF(Py_None);
-        _lo = Py_None;};
+    Py_INCREF(Py_None);
+    _lo = Py_None;
 
     return(_lo);}
 
@@ -26,18 +25,15 @@ static PyObject *_PYI_fav1(PyObject *self,
 
 /* WRAP |int fav2(void)| */
 
-static char _PYI_fav2__doc__[] = "Procedure: fav2\n     Usage: fav2()";
-
-static PyObject *_PYI_fav2(PyObject *self,
-                           PyObject *args,
-                           PyObject *kwds)
-   {int _rv;
-    PyObject *_lo;
-
-       {_rv = fav2();
-
-        Py_INCREF(Py_None);
-        _lo = Py_None;};
+static PyObject *_PY_fav2(PyObject *self,
+                          PyObject *args,
+                          PyObject *kwds)
+   {PyObject *_lo;
+    int _rv;
+    
+    _rv = fav2();
+    _lo = Py_BuildValue("i",
+                        &_rv);
 
     return(_lo);}
 
@@ -46,18 +42,15 @@ static PyObject *_PYI_fav2(PyObject *self,
 
 /* WRAP |double fav3(void)| */
 
-static char _PYI_fav3__doc__[] = "Procedure: fav3\n     Usage: fav3()";
-
-static PyObject *_PYI_fav3(PyObject *self,
-                           PyObject *args,
-                           PyObject *kwds)
-   {double _rv;
-    PyObject *_lo;
-
-       {_rv = fav3();
-
-        Py_INCREF(Py_None);
-        _lo = Py_None;};
+static PyObject *_PY_fav3(PyObject *self,
+                          PyObject *args,
+                          PyObject *kwds)
+   {PyObject *_lo;
+    double _rv;
+    
+    _rv = fav3();
+    _lo = Py_BuildValue("d",
+                        &_rv);
 
     return(_lo);}
 
@@ -66,18 +59,15 @@ static PyObject *_PYI_fav3(PyObject *self,
 
 /* WRAP |str fav4(void)| */
 
-static char _PYI_fav4__doc__[] = "Procedure: fav4\n     Usage: fav4()";
-
-static PyObject *_PYI_fav4(PyObject *self,
-                           PyObject *args,
-                           PyObject *kwds)
-   {str _rv;
-    PyObject *_lo;
-
-       {_rv = fav4();
-
-        Py_INCREF(Py_None);
-        _lo = Py_None;};
+static PyObject *_PY_fav4(PyObject *self,
+                          PyObject *args,
+                          PyObject *kwds)
+   {PyObject *_lo;
+    str _rv;
+    
+    _rv = fav4();
+    _lo = Py_BuildValue("s",
+                        &_rv);
 
     return(_lo);}
 
@@ -86,20 +76,15 @@ static PyObject *_PYI_fav4(PyObject *self,
 
 /* WRAP |void *favp1(void)| */
 
-static char _PYI_favp1__doc__[] = "Procedure: favp1\n     Usage: favp1()";
-
-static PyObject *_PYI_favp1(PyObject *self,
-                            PyObject *args,
-                            PyObject *kwds)
-   {void *_rv;
-    long _sz;
-    C_array *_arr;
-    PyObject *_lo;
-
-       {_rv = favp1();
-
-        Py_INCREF(Py_None);
-        _lo = Py_None;};
+static PyObject *_PY_favp1(PyObject *self,
+                           PyObject *args,
+                           PyObject *kwds)
+   {PyObject *_lo;
+    void *_rv;
+    
+    _rv = favp1();
+    _lo = Py_BuildValue("O",
+                        &_rv);
 
     return(_lo);}
 
@@ -108,20 +93,15 @@ static PyObject *_PYI_favp1(PyObject *self,
 
 /* WRAP |int *favp2(void)| */
 
-static char _PYI_favp2__doc__[] = "Procedure: favp2\n     Usage: favp2()";
-
-static PyObject *_PYI_favp2(PyObject *self,
-                            PyObject *args,
-                            PyObject *kwds)
-   {int *_rv;
-    long _sz;
-    C_array *_arr;
-    PyObject *_lo;
-
-       {_rv = favp2();
-
-        Py_INCREF(Py_None);
-        _lo = Py_None;};
+static PyObject *_PY_favp2(PyObject *self,
+                           PyObject *args,
+                           PyObject *kwds)
+   {PyObject *_lo;
+    int *_rv;
+    
+    _rv = favp2();
+    _lo = Py_BuildValue("i",
+                        &_rv);
 
     return(_lo);}
 
@@ -130,20 +110,15 @@ static PyObject *_PYI_favp2(PyObject *self,
 
 /* WRAP |double *favp3(void)| */
 
-static char _PYI_favp3__doc__[] = "Procedure: favp3\n     Usage: favp3()";
-
-static PyObject *_PYI_favp3(PyObject *self,
-                            PyObject *args,
-                            PyObject *kwds)
-   {double *_rv;
-    long _sz;
-    C_array *_arr;
-    PyObject *_lo;
-
-       {_rv = favp3();
-
-        Py_INCREF(Py_None);
-        _lo = Py_None;};
+static PyObject *_PY_favp3(PyObject *self,
+                           PyObject *args,
+                           PyObject *kwds)
+   {PyObject *_lo;
+    double *_rv;
+    
+    _rv = favp3();
+    _lo = Py_BuildValue("d",
+                        &_rv);
 
     return(_lo);}
 
@@ -152,20 +127,15 @@ static PyObject *_PYI_favp3(PyObject *self,
 
 /* WRAP |str *favp4(void)| */
 
-static char _PYI_favp4__doc__[] = "Procedure: favp4\n     Usage: favp4()";
-
-static PyObject *_PYI_favp4(PyObject *self,
-                            PyObject *args,
-                            PyObject *kwds)
-   {str *_rv;
-    long _sz;
-    C_array *_arr;
-    PyObject *_lo;
-
-       {_rv = favp4();
-
-        Py_INCREF(Py_None);
-        _lo = Py_None;};
+static PyObject *_PY_favp4(PyObject *self,
+                           PyObject *args,
+                           PyObject *kwds)
+   {PyObject *_lo;
+    str *_rv;
+    
+    _rv = favp4();
+    _lo = Py_BuildValue("s",
+                        &_rv);
 
     return(_lo);}
 
@@ -174,19 +144,41 @@ static PyObject *_PYI_favp4(PyObject *self,
 
 /* WRAP |void fav5(void)| */
 
-static char _PYI_fav5__doc__[] = "Procedure: fav5\n     Usage: fav5()";
-
-static PyObject *_PYI_fav5(PyObject *self,
-                           PyObject *args,
-                           PyObject *kwds)
+static PyObject *_PY_fav5(PyObject *self,
+                          PyObject *args,
+                          PyObject *kwds)
    {PyObject *_lo;
+    
+    fav5();
 
-       {fav5();
-
-        Py_INCREF(Py_None);
-        _lo = Py_None;};
+    Py_INCREF(Py_None);
+    _lo = Py_None;
 
     return(_lo);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+PyMethodDef
+ _PYD_fav1 = {"fav1p", (PyCFunction) _PY_fav1, METH_KEYWORDS,
+              "Procedure: fav1p\n     Usage: fav1p()"},
+ _PYD_fav2 = {"fav2p", (PyCFunction) _PY_fav2, METH_KEYWORDS,
+              "Procedure: fav2p\n     Usage: fav2p()"},
+ _PYD_fav3 = {"fav3p", (PyCFunction) _PY_fav3, METH_KEYWORDS,
+              "Procedure: fav3p\n     Usage: fav3p()"},
+ _PYD_fav4 = {"fav4p", (PyCFunction) _PY_fav4, METH_KEYWORDS,
+              "Procedure: fav4p\n     Usage: fav4p()"},
+ _PYD_favp1 = {"favp1p", (PyCFunction) _PY_favp1, METH_KEYWORDS,
+               "Procedure: favp1p\n     Usage: favp1p()"},
+ _PYD_favp2 = {"favp2p", (PyCFunction) _PY_favp2, METH_KEYWORDS,
+               "Procedure: favp2p\n     Usage: favp2p()"},
+ _PYD_favp3 = {"favp3p", (PyCFunction) _PY_favp3, METH_KEYWORDS,
+               "Procedure: favp3p\n     Usage: favp3p()"},
+ _PYD_favp4 = {"favp4p", (PyCFunction) _PY_favp4, METH_KEYWORDS,
+               "Procedure: favp4p\n     Usage: favp4p()"},
+ _PYD_fav5 = {"fav5", (PyCFunction) _PY_fav5, METH_KEYWORDS,
+              "Procedure: fav5\n     Usage: fav5()"},
+ _PYD_bl1_null;
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -383,7 +383,7 @@ struct s_sys_layer
 		  char *intype, char *outtype);};
 
 /*
- * #bind derived PDBfile character-A SC_STRING_I SC_STRING_I NULL
+ * #bind derived PDBfile character-A SC_STRING_I PP_PDBfileObject NULL
  */
 
 struct s_PDBfile

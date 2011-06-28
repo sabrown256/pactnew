@@ -180,7 +180,7 @@ else
          @ xstatus = 0
       else
          Note $Log "Compile python wrapper"
-         flog $Log ${cc} -c $file
+         flog $Log ${cc} -I$PyInc -c $file
          @ xstatus = $status
       endif
       if (-f $RefDir/$file) then

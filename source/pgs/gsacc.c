@@ -115,10 +115,11 @@ bool PG_fset_clipping(PG_device *dev, bool flag ARG(TRUE))
 /* PG_FGET_CHAR_PATH - get the device char_path
  *                   - defaults to (1, 0)
  *
- * #bind PG_fget_char_path fortran() scheme(pg-get-char-path)
+ * #bind PG_fget_char_path fortran() scheme(pg-get-char-path) python(get_char_path)
  */
 
-void PG_fget_char_path(PG_device *dev, double *x ARG([*,*],out))
+void PG_fget_char_path(PG_device *dev ARG(,in,cls),
+		       double *x ARG([*,*],out))
    {
 
     if (dev != NULL)
@@ -135,10 +136,11 @@ void PG_fget_char_path(PG_device *dev, double *x ARG([*,*],out))
 
 /* PG_FSET_CHAR_PATH - set the device char_path
  *
- * #bind PG_fset_char_path fortran() scheme(pg-set-char-path!)
+ * #bind PG_fset_char_path fortran() scheme(pg-set-char-path!) python(set_char_path)
  */
 
-void PG_fset_char_path(PG_device *dev, double *x ARG([1.0,0.0],io))
+void PG_fset_char_path(PG_device *dev ARG(,in,cls),
+		       double *x ARG([1.0,0.0],io))
    {double xo[PG_SPACEDM];
 
     if ((dev != NULL) && (dev->set_char_path != NULL))

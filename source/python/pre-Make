@@ -35,7 +35,7 @@ SaveFiles = *.c *.h
 #
 # Files to remove in directory clean (pact clean)
 #
-CleanFiles = *~
+CleanFiles = ${hdrf} ${gso} *~ core
 
 #
 # Things upon which install depends (pact install)
@@ -102,6 +102,8 @@ ArObjs = ${ArPDBO} ${ArPMLO} ${ArPPO} ${ArPGSO} ${ArBind}
 ${Objs} : ${Hdrs}
 ${ArObjs} : ${Hdrs}
 
+${LibDep} : ${Hdrs} ${gso} ${hdrf}
+
 #
 # Generated code rules
 #
@@ -111,6 +113,23 @@ ${ArObjs} : ${Hdrs}
 hdrf = 
 
 IncAction = 
+
+# language bindings
+
+gsrc = ${PACTTmpDir}/gp-score.c ${PACTTmpDir}/gp-pml.c ${PACTTmpDir}/gp-pdb.c   \
+       ${PACTTmpDir}/gp-ppc.c ${PACTTmpDir}/gp-pgs.c ${PACTTmpDir}/gp-panacea.c \
+       ${PACTTmpDir}/gp-scheme.c
+
+gso = ${PACTTmpDir}/gp-score.o ${PACTTmpDir}/gp-pml.o ${PACTTmpDir}/gp-pdb.o   \
+      ${PACTTmpDir}/gp-ppc.o ${PACTTmpDir}/gp-pgs.o ${PACTTmpDir}/gp-panacea.o \
+      ${PACTTmpDir}/gp-scheme.o
+
+${gso} : ${gsrc}
+
+%.o : %.c
+	@(echo "${CCAnnounce} -c $<" ; \
+          ${CC} -c $< -o $@ ; \
+          ${AR} ${AROpt} ${TGTLib} $@ 2>> errlog )
 
 
 TGTSPDB  = ${PyDir}/libpypdb.so

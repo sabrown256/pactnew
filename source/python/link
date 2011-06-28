@@ -109,7 +109,12 @@ flog $Log $AR ../../libpml.a
 flog $Log $AR ../../libpdb.a
 
 # remove PGS function - they do not belong with PDB module
-flog $Log $RM pgsmodule.o pgsdevice.o pgsgraph.o pgsimage.o pgspalette.o utilpgs.o
+set lrmf = ""
+set lrmf = ( $lrmf pgsmodule.o pgsdevice.o pgsgraph.o pgsimage.o )
+set lrmf = ( $lrmf pgspalette.o utilpgs.o )
+set lrmf = ( $lrmf gp-pgs.o gp-panacea.o gp-scheme.o )
+flog $Log $RM $lrmf
+unset lrmf
 
 flog $Log $LD ${CFPDB} -o $PyPact/libpypdb.so.1 *.o $Libs
 set LStat = $status
@@ -139,6 +144,12 @@ flog $Log $AR ../../libpml.a
 flog $Log $AR ../../libpdb.a
 flog $Log $AR ../../libppc.a
 flog $Log $AR ../../libpgs.a
+
+# remove unneeded objects
+set lrmf = ""
+set lrmf = ( $lrmf gp-panacea.o gp-scheme.o )
+flog $Log $RM $lrmf
+unset lrmf
 
 flog $Log $LD ${CFPGS} -o $PyPact/libpypgs.so.1 *.o $Libs
 set LStat = $status
