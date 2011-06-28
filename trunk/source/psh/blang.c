@@ -3692,7 +3692,7 @@ static void python_wrap_local_return(FILE *fp, fdecl *dcl)
 
 /* PYTHON_METHOD_DEF - method definition wrapper */
 
-static void python_method_def(FILE *fp, fdecl *dcl, char *pfn)
+static void python_method_def(FILE *fp, fdecl *dcl, char *pfn, int def)
    {int nc, voida;
     char a[MAXLINE], s[MAXLINE], t[MAXLINE];
     char fn[MAXLINE];
@@ -3701,27 +3701,32 @@ static void python_method_def(FILE *fp, fdecl *dcl, char *pfn)
     cfn   = dcl->proto.name;
     voida = dcl->voida;
 
-    map_name(fn, MAXLINE, cfn, pfn, NULL, -1, FALSE);
+    if (def == TRUE)
+       {map_name(fn, MAXLINE, cfn, pfn, NULL, -1, FALSE);
 
 /* prepare the function inline documenation */
-    if_call_list(a, MAXLINE, dcl, ",");
-    if (voida == FALSE)
-       snprintf(t, MAXLINE, "Procedure: %s\\n     Usage: %s(%s)",
-		fn, fn, a);
-    else
-       snprintf(t, MAXLINE, "Procedure: %s\\n     Usage: %s()",
-		fn, fn);
+	if_call_list(a, MAXLINE, dcl, ",");
+	if (voida == FALSE)
+	   snprintf(t, MAXLINE, "Procedure: %s\\n     Usage: %s(%s)",
+		    fn, fn, a);
+	else
+	   snprintf(t, MAXLINE, "Procedure: %s\\n     Usage: %s()",
+		    fn, fn);
 
 /* emit the method definition */
-    snprintf(s, MAXLINE, " _PYD_%s = {", cfn);
-    nc = strlen(s);
+	snprintf(s, MAXLINE, " _PYD_%s = {", cfn);
+	nc = strlen(s);
 
-    fprintf(fp, "%s\"%s\", (PyCFunction) _PY_%s, METH_KEYWORDS,\n",
-	    s, fn, cfn);
+	fprintf(fp, "%s\"%s\", (PyCFunction) _PY_%s, METH_KEYWORDS,\n",
+		s, fn, cfn);
 
-    memset(s, ' ', nc);
-    s[nc] = '\0';
-    fprintf(fp, "%s\"%s\"},\n", s, t);
+	memset(s, ' ', nc);
+	s[nc] = '\0';
+	fprintf(fp, "%s\"%s\"},\n", s, t);}
+
+/* emit the method declaration */
+    else
+       fprintf(fp, " _PYD_%s,\n", cfn);
 
     return;}
 
@@ -3765,12 +3770,58 @@ static void python_wrap(FILE *fp, fdecl *dcl, char *pfn)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PYTHON_HEADER - write the header with declarations for Python wrappers */
+
+static void python_header(bindes *bd)
+   {int ib, ndcl;
+    char name[MAXLINE], upk[MAXLINE];
+    char *pck, *pfn;
+    fdecl *dcl, *dcls;
+    statedes *st;
+    FILE *fh;
+
+    st   = bd->st;
+    pck  = st->pck;
+    dcls = st->dcl;
+    ndcl = st->ndcl;
+
+    nstrncpy(upk, MAXLINE, pck, -1);
+    upcase(upk);
+
+    snprintf(name, MAXLINE, "py-%s.h", pck);
+    fh = fopen(name, "w");
+    
+    fprintf(fh, "/*\n");
+    fprintf(fh, " * PY-%s.H - generated header for %s bindings\n", upk, pck);
+    fprintf(fh, " *\n");
+    fprintf(fh, " */\n");
+    fprintf(fh, "\n");
+    fprintf(fh, "extern PyMethodDef\n");
+
+/* method definition wrapper */
+    for (ib = 0; ib < ndcl; ib++)
+        {dcl = dcls + ib;
+	 pfn = has_binding(dcl, "python");
+	 if ((pfn != NULL) && (strcmp(pfn, "none") != 0) &&
+	     (is_var_arg(dcl->proto.arg) == FALSE))
+	    python_method_def(fh, dcl, pfn, FALSE);};
+
+    fprintf(fh, " _PYD_%s_null;\n", pck);
+    fprintf(fh, "\n");
+
+    fclose(fh);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PYTHON_INSTALL - write the routine to install the bindings */
 
 static void python_install(bindes *bd)
    {int ib, ndcl;
-    fdecl *dcl, *dcls;
     char *pck, *pfn;
+    fdecl *dcl, *dcls;
     statedes *st;
     FILE *fp;
 
@@ -3791,7 +3842,7 @@ static void python_install(bindes *bd)
 	 pfn = has_binding(dcl, "python");
 	 if ((pfn != NULL) && (strcmp(pfn, "none") != 0) &&
 	     (is_var_arg(dcl->proto.arg) == FALSE))
-	    python_method_def(fp, dcl, pfn);};
+	    python_method_def(fp, dcl, pfn, TRUE);};
 
     fprintf(fp, " _PYD_%s_null;\n", pck);
     fprintf(fp, "\n");
@@ -3829,6 +3880,9 @@ static int bind_python(bindes *bd)
 
 /* write the method definitions */
     python_install(bd);
+
+/* write the method declarations */
+    python_header(bd);
 
     return(rv);}
 
