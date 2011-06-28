@@ -299,7 +299,7 @@ Note $Log ""
          if (!(-d $ldst)) then
             flog $Log mkdir -p $ldst
          endif
-         flog $Log mv gp-$d.c $ldst
+         flog $Log mv gp-$d.c py-$d.h $ldst
       endif
    endif
 
