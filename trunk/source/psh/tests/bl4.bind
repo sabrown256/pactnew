@@ -7,7 +7,7 @@
 # include "cpyright.h"
 #
 
-derived str	character-A	SC_STRING_I	SC_STRING_I
+derived str	character-A	G_STR	PyObject
 
 fb1	fortran()	scheme()	python()
 fb2	fortran()	scheme()	python()

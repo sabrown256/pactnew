@@ -579,7 +579,7 @@ typedef struct s_RGB_color_map RGB_color_map;
 /*--------------------------------------------------------------------------*/
 
 /* palette structure
- * #bind derived PG_palette character-A SC_STRING_I SC_STRING_I NULL
+ * #bind derived PG_palette character-A SC_STRING_I PyObject NULL
  */
 
 struct s_PG_palette
@@ -731,7 +731,7 @@ struct s_PG_dev_geometry
 /*--------------------------------------------------------------------------*/
 
 /* PG_DEVICE - graphics device structure
- * #bind derived PG_device character-A G_DEVICE SC_STRING_I NULL
+ * #bind derived PG_device character-A G_DEVICE PP_deviceObject NULL
  */
 
 struct s_PG_device
@@ -989,7 +989,7 @@ struct s_PG_device
 
 /* PG_IMAGE is PD_defstr'd in PDBX.C any changes here must be reflected
  * there!!
- * #bind derived PG_image character-A G_IMAGE SC_STRING_I NULL
+ * #bind derived PG_image character-A G_IMAGE PyObject NULL
  */
 
 struct s_PG_image

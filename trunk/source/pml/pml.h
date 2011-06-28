@@ -610,7 +610,7 @@ struct s_PM_mesh_topology
  *     - is a part of flat, singly connected Euclidean N space over the
  *     - field of reals (doubles) and has a logical mesh structure 
  *
- * #bind derived PM_set character-A G_SET SC_STRING_I NULL
+ * #bind derived PM_set character-A G_SET PyObject NULL
  */
 
 struct s_PM_set
@@ -652,7 +652,7 @@ struct s_PM_map_info
 
 /* PM_MAPPING - describe mapping of domain set to range set
  *
- * #bind derived PM_mapping character-A G_MAPPING SC_STRING_I NULL
+ * #bind derived PM_mapping character-A G_MAPPING PyObject NULL
  */
 
 struct s_PM_mapping
