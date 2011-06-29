@@ -14,95 +14,10 @@
  */
 /*--------------------------------------------------------------------------*/
 #include "pgsmodule.h"
+#include "py-pgs.h"
 
 /* DO-NOT-DELETE splicer.begin(pgs.device.C_definition) UNMODIFIED */
 /* DO-NOT-DELETE splicer.end(pgs.device.C_definition) */
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-
-static char PP_device_clear_window__doc__[] = 
-""
-;
-
-static PyObject *
-PP_device_clear_window(PP_deviceObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pgs.device.method.clear_window) UNMODIFIED */
-    PG_clear_window(self->dev);
-    Py_INCREF(Py_None);
-    return Py_None;
-/* DO-NOT-DELETE splicer.end(pgs.device.method.clear_window) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-
-static char PP_device_close__doc__[] = 
-""
-;
-
-static PyObject *
-PP_device_close(PP_deviceObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pgs.device.method.close) UNMODIFIED */
-    PG_close_device(self->dev);
-    Py_INCREF(Py_None);
-    return Py_None;
-/* DO-NOT-DELETE splicer.end(pgs.device.method.close) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-
-static char PP_device_finish_plot__doc__[] = 
-""
-;
-
-static PyObject *
-PP_device_finish_plot(PP_deviceObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pgs.device.method.finish_plot) UNMODIFIED */
-    PG_finish_plot(self->dev);
-    Py_INCREF(Py_None);
-    return Py_None;
-/* DO-NOT-DELETE splicer.end(pgs.device.method.finish_plot) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-
-static char PP_device_set_char_path__doc__[] = 
-""
-;
-
-static PyObject *
-PP_device_set_char_path(PP_deviceObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pgs.device.method.set_char_path) UNMODIFIED */
-    double x[PG_SPACEDM];
-    char *kw_list[] = {"x", "y", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dd:set_char_path", kw_list,
-                                     &x[0], &x[1]))
-        return NULL;
-    PG_fset_char_path(self->dev, x);
-    Py_INCREF(Py_None);
-    return Py_None;
-/* DO-NOT-DELETE splicer.end(pgs.device.method.set_char_path) */
-}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -138,210 +53,6 @@ PP_device_set_font(PP_deviceObject *self,
     return Py_None;
 #endif
 /* DO-NOT-DELETE splicer.end(pgs.device.method.set_font) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-
-static char PP_device_set_color_line__doc__[] = 
-""
-;
-
-static PyObject *
-PP_device_set_color_line(PP_deviceObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pgs.device.method.set_color_line) UNMODIFIED */
-    int color;
-    int mapped;
-    char *kw_list[] = {"color", "mapped", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ii:set_color_line", kw_list,
-                                     &color, &mapped))
-        return NULL;
-    PG_fset_line_color(self->dev, color, mapped);
-    Py_INCREF(Py_None);
-    return Py_None;
-/* DO-NOT-DELETE splicer.end(pgs.device.method.set_color_line) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-
-static char PP_device_set_line_style__doc__[] = 
-""
-;
-
-static PyObject *
-PP_device_set_line_style(PP_deviceObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pgs.device.method.set_line_style) UNMODIFIED */
-    int style;
-    char *kw_list[] = {"style", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i:set_line_style", kw_list,
-                                     &style))
-        return NULL;
-    PG_fset_line_style(self->dev, style);
-    Py_INCREF(Py_None);
-    return Py_None;
-/* DO-NOT-DELETE splicer.end(pgs.device.method.set_line_style) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-
-static char PP_device_set_line_width__doc__[] = 
-""
-;
-
-static PyObject *
-PP_device_set_line_width(PP_deviceObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pgs.device.method.set_line_width) UNMODIFIED */
-    double width;
-    char *kw_list[] = {"width", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d:set_line_width", kw_list,
-                                     &width))
-        return NULL;
-    PG_fset_line_width(self->dev, width);
-    Py_INCREF(Py_None);
-    return Py_None;
-/* DO-NOT-DELETE splicer.end(pgs.device.method.set_line_width) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-
-static char PP_device_update_vs__doc__[] = 
-""
-;
-
-static PyObject *
-PP_device_update_vs(PP_deviceObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pgs.device.method.update_vs) UNMODIFIED */
-    PG_update_vs(self->dev);
-    Py_INCREF(Py_None);
-    return Py_None;
-/* DO-NOT-DELETE splicer.end(pgs.device.method.update_vs) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-
-static char PP_device_set_line_color__doc__[] = 
-""
-;
-
-static PyObject *
-PP_device_set_line_color(PP_deviceObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pgs.device.method.set_line_color) UNMODIFIED */
-    int color;
-    char *kw_list[] = {"color", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i:set_line_color", kw_list,
-                                     &color))
-        return NULL;
-    PG_fset_line_color(self->dev, color, TRUE);
-    Py_INCREF(Py_None);
-    return Py_None;
-/* DO-NOT-DELETE splicer.end(pgs.device.method.set_line_color) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-
-static char PP_device_set_text_color__doc__[] = 
-""
-;
-
-static PyObject *
-PP_device_set_text_color(PP_deviceObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pgs.device.method.set_text_color) UNMODIFIED */
-    int color;
-    char *kw_list[] = {"color", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i:set_text_color", kw_list,
-                                     &color))
-        return NULL;
-    PG_fset_text_color(self->dev, color, TRUE);
-    Py_INCREF(Py_None);
-    return Py_None;
-/* DO-NOT-DELETE splicer.end(pgs.device.method.set_text_color) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-
-static char PP_device_set_color_text__doc__[] = 
-""
-;
-
-static PyObject *
-PP_device_set_color_text(PP_deviceObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pgs.device.method.set_color_text) UNMODIFIED */
-    int color;
-    int mapped;
-    char *kw_list[] = {"color", "mapped", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ii:set_color_text", kw_list,
-                                     &color, &mapped))
-        return NULL;
-    PG_fset_text_color(self->dev, color, mapped);
-    Py_INCREF(Py_None);
-    return Py_None;
-/* DO-NOT-DELETE splicer.end(pgs.device.method.set_color_text) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-
-static char PP_device_turn_data_id__doc__[] = 
-""
-;
-
-static PyObject *
-PP_device_turn_data_id(PP_deviceObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pgs.device.method.turn_data_id) UNMODIFIED */
-    int t;
-    char *kw_list[] = {"t", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i:turn_data_id", kw_list,
-                                     &t))
-        return NULL;
-    PG_turn_data_id(self->dev, t);
-    Py_INCREF(Py_None);
-    return Py_None;
-/* DO-NOT-DELETE splicer.end(pgs.device.method.turn_data_id) */
 }
 
 /*--------------------------------------------------------------------------*/
@@ -519,61 +230,6 @@ PP_device_write_WC(PP_deviceObject *self,
 
     return PyInt_FromLong((long) result);
 /* DO-NOT-DELETE splicer.end(pgs.device.method.write_WC) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-
-static char PP_device_open__doc__[] = 
-""
-;
-
-static PyObject *
-PP_device_open(PP_deviceObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pgs.device.method.open) UNMODIFIED */
-    double xf;
-    double yf;
-    double dxf;
-    double dyf;
-    char *kw_list[] = {"xf", "yf", "dxf", "dyf", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dddd:open", kw_list,
-                                     &xf, &yf, &dxf, &dyf))
-        return NULL;
-    PG_open_device(self->dev, xf, yf, dxf, dyf);
-    Py_INCREF(Py_None);
-    return Py_None;
-/* DO-NOT-DELETE splicer.end(pgs.device.method.open) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-
-static char PP_device_set_palette__doc__[] = 
-""
-;
-
-static PyObject *
-PP_device_set_palette(PP_deviceObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pgs.device.method.set_palette) UNMODIFIED */
-    char *name;
-    char *kw_list[] = {"name", NULL};
-    PG_palette *result;
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s:set_palette", kw_list,
-                                     &name))
-        return NULL;
-    result = PG_fset_palette(self->dev, name);
-    return PPpalette_from_ptr(result);
-/* DO-NOT-DELETE splicer.end(pgs.device.method.set_palette) */
 }
 
 /*--------------------------------------------------------------------------*/
@@ -791,6 +447,392 @@ PP_device_draw_picture(PP_deviceObject *self,
 
 /*--------------------------------------------------------------------------*/
 
+#if 1
+
+/*--------------------------------------------------------------------------*/
+
+static PyMethodDef PP_device_methods[] = {
+ _PYD_PG_fset_char_path,
+ _PYD_PG_fset_line_style,
+ _PYD_PG_fset_line_width,
+ _PYD_PG_fset_line_color,
+ _PYD_PG_fset_text_color,
+ _PYD_PG_turn_data_id,
+ _PYD_PG_clear_window,
+ _PYD_PG_close_device,
+ _PYD_PG_finish_plot,
+ _PYD_PG_update_vs,
+ _PYD_PG_open_device,
+ _PYD_PG_fset_palette,
+{"set_font", (PyCFunction)PP_device_set_font, METH_KEYWORDS, PP_device_set_font__doc__},
+{"set_viewport", (PyCFunction)PP_device_set_viewport, METH_KEYWORDS, PP_device_set_viewport__doc__},
+{"set_window", (PyCFunction)PP_device_set_window, METH_KEYWORDS, PP_device_set_window__doc__},
+{"draw_box", (PyCFunction)PP_device_draw_box, METH_KEYWORDS, PP_device_draw_box__doc__},
+{"get_text_ext", (PyCFunction)PP_device_get_text_ext, METH_KEYWORDS, PP_device_get_text_ext__doc__},
+{"draw_line", (PyCFunction)PP_device_draw_line, METH_KEYWORDS, PP_device_draw_line__doc__},
+{"write_WC", (PyCFunction)PP_device_write_WC, METH_KEYWORDS, PP_device_write_WC__doc__},
+{"draw_graph", (PyCFunction)PP_device_draw_graph, METH_KEYWORDS, PP_device_draw_graph__doc__},
+{"draw_image", (PyCFunction)PP_device_draw_image, METH_KEYWORDS, PP_device_draw_image__doc__},
+{"contour_plot", (PyCFunction)PP_device_contour_plot, METH_KEYWORDS, PP_device_contour_plot__doc__},
+{"poly_fill_plot", (PyCFunction)PP_device_poly_fill_plot, METH_KEYWORDS, PP_device_poly_fill_plot__doc__},
+{"draw_surface", (PyCFunction)PP_device_draw_surface, METH_KEYWORDS, PP_device_draw_surface__doc__},
+{"draw_picture", (PyCFunction)PP_device_draw_picture, METH_KEYWORDS, PP_device_draw_picture__doc__},
+/* DO-NOT-DELETE splicer.begin(pgs.device.extra_mlist) UNMODIFIED */
+/* DO-NOT-DELETE splicer.end(pgs.device.extra_mlist) */
+{NULL,   (PyCFunction)NULL, 0, NULL}            /* sentinel */
+};
+
+/*--------------------------------------------------------------------------*/
+
+#else
+
+/*--------------------------------------------------------------------------*/
+
+
+static char PP_device_set_char_path__doc__[] = 
+""
+;
+
+static PyObject *
+PP_device_set_char_path(PP_deviceObject *self,
+                  PyObject *args,
+                  PyObject *kwds)
+{
+/* DO-NOT-DELETE splicer.begin(pgs.device.method.set_char_path) UNMODIFIED */
+    double x[PG_SPACEDM];
+    char *kw_list[] = {"x", "y", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dd:set_char_path", kw_list,
+                                     &x[0], &x[1]))
+        return NULL;
+    PG_fset_char_path(self->dev, x);
+    Py_INCREF(Py_None);
+    return Py_None;
+/* DO-NOT-DELETE splicer.end(pgs.device.method.set_char_path) */
+}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+
+static char PP_device_set_color_line__doc__[] = 
+""
+;
+
+static PyObject *
+PP_device_set_color_line(PP_deviceObject *self,
+                  PyObject *args,
+                  PyObject *kwds)
+{
+/* DO-NOT-DELETE splicer.begin(pgs.device.method.set_color_line) UNMODIFIED */
+    int color;
+    int mapped;
+    char *kw_list[] = {"color", "mapped", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ii:set_color_line", kw_list,
+                                     &color, &mapped))
+        return NULL;
+    PG_fset_line_color(self->dev, color, mapped);
+    Py_INCREF(Py_None);
+    return Py_None;
+/* DO-NOT-DELETE splicer.end(pgs.device.method.set_color_line) */
+}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+
+static char PP_device_set_line_color__doc__[] = 
+""
+;
+
+static PyObject *
+PP_device_set_line_color(PP_deviceObject *self,
+                  PyObject *args,
+                  PyObject *kwds)
+{
+/* DO-NOT-DELETE splicer.begin(pgs.device.method.set_line_color) UNMODIFIED */
+    int color;
+    char *kw_list[] = {"color", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i:set_line_color", kw_list,
+                                     &color))
+        return NULL;
+    PG_fset_line_color(self->dev, color, TRUE);
+    Py_INCREF(Py_None);
+    return Py_None;
+/* DO-NOT-DELETE splicer.end(pgs.device.method.set_line_color) */
+}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+
+static char PP_device_set_line_style__doc__[] = 
+""
+;
+
+static PyObject *
+PP_device_set_line_style(PP_deviceObject *self,
+                  PyObject *args,
+                  PyObject *kwds)
+{
+/* DO-NOT-DELETE splicer.begin(pgs.device.method.set_line_style) UNMODIFIED */
+    int style;
+    char *kw_list[] = {"style", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i:set_line_style", kw_list,
+                                     &style))
+        return NULL;
+    PG_fset_line_style(self->dev, style);
+    Py_INCREF(Py_None);
+    return Py_None;
+/* DO-NOT-DELETE splicer.end(pgs.device.method.set_line_style) */
+}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+
+static char PP_device_set_line_width__doc__[] = 
+""
+;
+
+static PyObject *
+PP_device_set_line_width(PP_deviceObject *self,
+                  PyObject *args,
+                  PyObject *kwds)
+{
+/* DO-NOT-DELETE splicer.begin(pgs.device.method.set_line_width) UNMODIFIED */
+    double width;
+    char *kw_list[] = {"width", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "d:set_line_width", kw_list,
+                                     &width))
+        return NULL;
+    PG_fset_line_width(self->dev, width);
+    Py_INCREF(Py_None);
+    return Py_None;
+/* DO-NOT-DELETE splicer.end(pgs.device.method.set_line_width) */
+}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+
+static char PP_device_set_text_color__doc__[] = 
+""
+;
+
+static PyObject *
+PP_device_set_text_color(PP_deviceObject *self,
+                  PyObject *args,
+                  PyObject *kwds)
+{
+/* DO-NOT-DELETE splicer.begin(pgs.device.method.set_text_color) UNMODIFIED */
+    int color;
+    char *kw_list[] = {"color", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i:set_text_color", kw_list,
+                                     &color))
+        return NULL;
+    PG_fset_text_color(self->dev, color, TRUE);
+    Py_INCREF(Py_None);
+    return Py_None;
+/* DO-NOT-DELETE splicer.end(pgs.device.method.set_text_color) */
+}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+
+static char PP_device_set_color_text__doc__[] = 
+""
+;
+
+static PyObject *
+PP_device_set_color_text(PP_deviceObject *self,
+                  PyObject *args,
+                  PyObject *kwds)
+{
+/* DO-NOT-DELETE splicer.begin(pgs.device.method.set_color_text) UNMODIFIED */
+    int color;
+    int mapped;
+    char *kw_list[] = {"color", "mapped", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ii:set_color_text", kw_list,
+                                     &color, &mapped))
+        return NULL;
+    PG_fset_text_color(self->dev, color, mapped);
+    Py_INCREF(Py_None);
+    return Py_None;
+/* DO-NOT-DELETE splicer.end(pgs.device.method.set_color_text) */
+}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+
+static char PP_device_turn_data_id__doc__[] = 
+""
+;
+
+static PyObject *
+PP_device_turn_data_id(PP_deviceObject *self,
+                  PyObject *args,
+                  PyObject *kwds)
+{
+/* DO-NOT-DELETE splicer.begin(pgs.device.method.turn_data_id) UNMODIFIED */
+    int t;
+    char *kw_list[] = {"t", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "i:turn_data_id", kw_list,
+                                     &t))
+        return NULL;
+    PG_turn_data_id(self->dev, t);
+    Py_INCREF(Py_None);
+    return Py_None;
+/* DO-NOT-DELETE splicer.end(pgs.device.method.turn_data_id) */
+}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+
+static char PP_device_clear_window__doc__[] = 
+""
+;
+
+static PyObject *
+PP_device_clear_window(PP_deviceObject *self,
+                  PyObject *args,
+                  PyObject *kwds)
+{
+/* DO-NOT-DELETE splicer.begin(pgs.device.method.clear_window) UNMODIFIED */
+    PG_clear_window(self->dev);
+    Py_INCREF(Py_None);
+    return Py_None;
+/* DO-NOT-DELETE splicer.end(pgs.device.method.clear_window) */
+}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+
+static char PP_device_close__doc__[] = 
+""
+;
+
+static PyObject *
+PP_device_close(PP_deviceObject *self,
+                  PyObject *args,
+                  PyObject *kwds)
+{
+/* DO-NOT-DELETE splicer.begin(pgs.device.method.close) UNMODIFIED */
+    PG_close_device(self->dev);
+    Py_INCREF(Py_None);
+    return Py_None;
+/* DO-NOT-DELETE splicer.end(pgs.device.method.close) */
+}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+
+static char PP_device_finish_plot__doc__[] = 
+""
+;
+
+static PyObject *
+PP_device_finish_plot(PP_deviceObject *self,
+                  PyObject *args,
+                  PyObject *kwds)
+{
+/* DO-NOT-DELETE splicer.begin(pgs.device.method.finish_plot) UNMODIFIED */
+    PG_finish_plot(self->dev);
+    Py_INCREF(Py_None);
+    return Py_None;
+/* DO-NOT-DELETE splicer.end(pgs.device.method.finish_plot) */
+}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+
+static char PP_device_update_vs__doc__[] = 
+""
+;
+
+static PyObject *
+PP_device_update_vs(PP_deviceObject *self,
+                  PyObject *args,
+                  PyObject *kwds)
+{
+/* DO-NOT-DELETE splicer.begin(pgs.device.method.update_vs) UNMODIFIED */
+    PG_update_vs(self->dev);
+    Py_INCREF(Py_None);
+    return Py_None;
+/* DO-NOT-DELETE splicer.end(pgs.device.method.update_vs) */
+}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+
+static char PP_device_open__doc__[] = 
+""
+;
+
+static PyObject *
+PP_device_open(PP_deviceObject *self,
+                  PyObject *args,
+                  PyObject *kwds)
+{
+/* DO-NOT-DELETE splicer.begin(pgs.device.method.open) UNMODIFIED */
+    double xf;
+    double yf;
+    double dxf;
+    double dyf;
+    char *kw_list[] = {"xf", "yf", "dxf", "dyf", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dddd:open", kw_list,
+                                     &xf, &yf, &dxf, &dyf))
+        return NULL;
+    PG_open_device(self->dev, xf, yf, dxf, dyf);
+    Py_INCREF(Py_None);
+    return Py_None;
+/* DO-NOT-DELETE splicer.end(pgs.device.method.open) */
+}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+
+static char PP_device_set_palette__doc__[] = 
+""
+;
+
+static PyObject *
+PP_device_set_palette(PP_deviceObject *self,
+                  PyObject *args,
+                  PyObject *kwds)
+{
+/* DO-NOT-DELETE splicer.begin(pgs.device.method.set_palette) UNMODIFIED */
+    char *name;
+    char *kw_list[] = {"name", NULL};
+    PG_palette *result;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s:set_palette", kw_list,
+                                     &name))
+        return NULL;
+    result = PG_fset_palette(self->dev, name);
+    return PPpalette_from_ptr(result);
+/* DO-NOT-DELETE splicer.end(pgs.device.method.set_palette) */
+}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 static PyMethodDef PP_device_methods[] = {
 {"clear_window", (PyCFunction)PP_device_clear_window, METH_NOARGS, PP_device_clear_window__doc__},
 {"close", (PyCFunction)PP_device_close, METH_NOARGS, PP_device_close__doc__},
@@ -823,6 +865,10 @@ static PyMethodDef PP_device_methods[] = {
 /* DO-NOT-DELETE splicer.end(pgs.device.extra_mlist) */
 {NULL,   (PyCFunction)NULL, 0, NULL}            /* sentinel */
 };
+
+/*--------------------------------------------------------------------------*/
+
+#endif
 
 /*--------------------------------------------------------------------------*/
 

@@ -13,7 +13,7 @@ Use the struct module to test the output for simple types
 
 import pact.pdb as pdb
 import unittest
-from Numeric import *
+from numpy import *
 import test_leak
 
 class ArrayMixin:

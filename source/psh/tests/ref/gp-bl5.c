@@ -8,9 +8,7 @@
 
 /* WRAP |void a_f1(PFDouble a)| */
 
-static PyObject *_PY_a_f1(PyObject *self,
-                          PyObject *args,
-                          PyObject *kwds)
+PyObject *_PY_a_f1(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     PFDouble _la;
@@ -35,9 +33,7 @@ static PyObject *_PY_a_f1(PyObject *self,
 
 /* WRAP |void a_f2(int (*b)(int *a))| */
 
-static PyObject *_PY_a_f2(PyObject *self,
-                          PyObject *args,
-                          PyObject *kwds)
+PyObject *_PY_a_f2(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int (*_lb)(int *a);
@@ -62,9 +58,7 @@ static PyObject *_PY_a_f2(PyObject *self,
 
 /* WRAP |void a_f3(PFDouble a, int (*b)(int *a))| */
 
-static PyObject *_PY_a_f3(PyObject *self,
-                          PyObject *args,
-                          PyObject *kwds)
+PyObject *_PY_a_f3(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     PFDouble _la;
@@ -90,9 +84,7 @@ static PyObject *_PY_a_f3(PyObject *self,
 
 /* WRAP |void a_f4(int (*b)(int *a), PFDouble a)| */
 
-static PyObject *_PY_a_f4(PyObject *self,
-                          PyObject *args,
-                          PyObject *kwds)
+PyObject *_PY_a_f4(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int (*_lb)(int *a);
@@ -118,9 +110,7 @@ static PyObject *_PY_a_f4(PyObject *self,
 
 /* WRAP |void B_f1(PFDouble a, int b)| */
 
-static PyObject *_PY_B_f1(PyObject *self,
-                          PyObject *args,
-                          PyObject *kwds)
+PyObject *_PY_B_f1(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     PFDouble _la;
@@ -146,9 +136,7 @@ static PyObject *_PY_B_f1(PyObject *self,
 
 /* WRAP |void B_f2(int (*a)(int *a), int b)| */
 
-static PyObject *_PY_B_f2(PyObject *self,
-                          PyObject *args,
-                          PyObject *kwds)
+PyObject *_PY_B_f2(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int (*_la)(int *a);
@@ -174,9 +162,7 @@ static PyObject *_PY_B_f2(PyObject *self,
 
 /* WRAP |void B_f3(PFDouble a, int (*b)(int *a), int c)| */
 
-static PyObject *_PY_B_f3(PyObject *self,
-                          PyObject *args,
-                          PyObject *kwds)
+PyObject *_PY_B_f3(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     PFDouble _la;
@@ -203,9 +189,7 @@ static PyObject *_PY_B_f3(PyObject *self,
 
 /* WRAP |void B_f4(int (*a)(int *a), PFDouble b, int c)| */
 
-static PyObject *_PY_B_f4(PyObject *self,
-                          PyObject *args,
-                          PyObject *kwds)
+PyObject *_PY_B_f4(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int (*_la)(int *a);
@@ -232,9 +216,7 @@ static PyObject *_PY_B_f4(PyObject *self,
 
 /* WRAP |void B_f5(int a, PFDouble b, int (*c)(int *a))| */
 
-static PyObject *_PY_B_f5(PyObject *self,
-                          PyObject *args,
-                          PyObject *kwds)
+PyObject *_PY_B_f5(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la;
@@ -261,9 +243,7 @@ static PyObject *_PY_B_f5(PyObject *self,
 
 /* WRAP |void B_f6(int a, int (*b)(int *a), PFDouble c)| */
 
-static PyObject *_PY_B_f6(PyObject *self,
-                          PyObject *args,
-                          PyObject *kwds)
+PyObject *_PY_B_f6(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la;

@@ -8,9 +8,7 @@
 
 /* WRAP |int fa1(int a ARG(2,in))| */
 
-static PyObject *_PY_fa1(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fa1(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la;
@@ -35,9 +33,7 @@ static PyObject *_PY_fa1(PyObject *self,
 
 /* WRAP |int fa3(int *a ARG([1,2,3],in), int *b ARG([1,2,3],io), int *c ARG([1,2,3],out))| */
 
-static PyObject *_PY_fa3(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fa3(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la[3];
@@ -64,9 +60,7 @@ static PyObject *_PY_fa3(PyObject *self,
 
 /* WRAP |int fa4(int *a ARG(,in), int *b ARG(,io), int *c ARG(,out))| */
 
-static PyObject *_PY_fa4(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fa4(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int *_la;
@@ -93,9 +87,7 @@ static PyObject *_PY_fa4(PyObject *self,
 
 /* WRAP |void fb1(int a, int b ARG(1,in))| */
 
-static PyObject *_PY_fb1(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fb1(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la;
@@ -121,9 +113,7 @@ static PyObject *_PY_fb1(PyObject *self,
 
 /* WRAP |void fb2(int a, int b ARG(,in))| */
 
-static PyObject *_PY_fb2(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fb2(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la;
@@ -149,9 +139,7 @@ static PyObject *_PY_fb2(PyObject *self,
 
 /* WRAP |void fb3(int a, int b ARG(*,in))| */
 
-static PyObject *_PY_fb3(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fb3(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la;
@@ -177,9 +165,7 @@ static PyObject *_PY_fb3(PyObject *self,
 
 /* WRAP |void fc1(int a, int *b ARG(NULL,in), int *c ARG(NULL,io), int *d ARG(NULL,out))| */
 
-static PyObject *_PY_fc1(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fc1(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la;
@@ -206,9 +192,7 @@ static PyObject *_PY_fc1(PyObject *self,
 
 /* WRAP |void fc2(int a, int *b ARG(,in), int *c ARG(,io), int *d ARG(,out))| */
 
-static PyObject *_PY_fc2(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fc2(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la;
@@ -235,9 +219,7 @@ static PyObject *_PY_fc2(PyObject *self,
 
 /* WRAP |void fc3(int a, int *b ARG(*,in), int *c ARG(*,io), int *d ARG(*,out))| */
 
-static PyObject *_PY_fc3(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fc3(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la;
@@ -264,9 +246,7 @@ static PyObject *_PY_fc3(PyObject *self,
 
 /* WRAP |void fc4(int a, int *b ARG([1],in), int *c ARG([1],io), int *d ARG([1],out))| */
 
-static PyObject *_PY_fc4(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fc4(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la;
@@ -293,9 +273,7 @@ static PyObject *_PY_fc4(PyObject *self,
 
 /* WRAP |void fc5(int a, int *b ARG([1,2],in), int *c ARG([1,2],io), int *d ARG([1,2],out))| */
 
-static PyObject *_PY_fc5(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fc5(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la;
@@ -322,9 +300,7 @@ static PyObject *_PY_fc5(PyObject *self,
 
 /* WRAP |void fc6(int a, int *b ARG([*],in), int *c ARG([*],io), int *d ARG([*],out))| */
 
-static PyObject *_PY_fc6(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fc6(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la;
@@ -351,9 +327,7 @@ static PyObject *_PY_fc6(PyObject *self,
 
 /* WRAP |void fc7(int a, int *b ARG([*,*],in), int *c ARG([*,*],io), int *d ARG([*,*],out))| */
 
-static PyObject *_PY_fc7(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fc7(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la;

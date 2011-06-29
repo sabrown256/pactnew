@@ -8,9 +8,7 @@
 
 /* WRAP |str *fe1(str *a1, int a2)| */
 
-static PyObject *_PY_fe1(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fe1(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     str *_la1;
@@ -36,9 +34,7 @@ static PyObject *_PY_fe1(PyObject *self,
 
 /* WRAP |void fe2(str *dev, double *x, double *y, int n, pcons *info, int l)| */
 
-static PyObject *_PY_fe2(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fe2(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     str *_ldev;
