@@ -17,7 +17,7 @@ bin toul ultra mpi-io-wrap ptime dmnz propr rpath
 bin hserve fcscan pcsh do-run
 
 lib libpanacea.a libpdb.a libpgs.a libpml.a libppc.a
-lib libpsmm.a libscheme.a libscore.a libsx.a
+lib libpsmm.a libscheme.a libscore.a libsx.a libfpact.a
 lib libpact.a
 
 inc cpyright.h iso-c.h scconfig.h scdecls.h
@@ -55,7 +55,7 @@ script update-sys update-watch plock cleanup-jobs fix-group
 script herd cover find-fnc diff-code diff-tree descend bckgr
 script broadcast check-hosts check-service all-service dot-silent
 script no-op dargs env-csh csh-subroutines merge-aix panache
-script pdbdiff pdbview pdbcp label-ps tpu tzu remod
+script pdbdiff pdbview pdbcp pdbls label-ps tpu tzu remod
 script which-cfg sys-site use-tcsh fill-string mpi-info
 script simplify-path sunrace cross-info find-comments
 
