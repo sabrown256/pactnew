@@ -1,0 +1,132 @@
+#!/bin/csh -f
+#
+# WHAT-PYTHON - analyze the platform PYTHON
+#        - PyExe       the full path to the python executable
+#        - PyVers      the version of the python executable
+#        - Python_Path addition to path in order to find python executable
+#        -             this comes from config files only
+#        - PyDirSrc    pact/dev/$arch/lib (install this to PyDirDst and PyDirPy)
+#        - PyDirDst    pact    lib/.../site-packages  (install into)
+#        - PyDirPy     python  lib/.../site-packages  (install into)
+#
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set HostOS = ( `uname -s` )
+set HavePython        = FALSE
+set HavePythonNumeric = FALSE
+set HavePythonNumpy   = FALSE
+set PyExe             = ""
+set PyVers            = ""
+set PyCC              = ""
+set PyCfg             = ""
+set PyInc             = ""
+set Python_Path       = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: what-python [-h] <python>"
+           echo "   h   this help message"
+           echo ""
+           exit(1)
+      default:
+           set PyExe =  $1
+           breaksw
+   endsw
+   shift
+end
+
+   echo -n "   Python: "
+
+   set found = FALSE
+   set Python_Path = $PyExe:h
+
+      if (-x "$PyExe") then
+         $PyExe ../python/python-cc.py >& /dev/null
+         set LStat1 = $status
+         set lpyinc = ( `$PyExe ../python/python-inc-dir.py |& cat` )
+         if (($LStat1 != 0) || !(-f "$lpyinc/Python.h")) then
+            set PyExe =  ""
+         else
+            set pyv = `$PyExe -V |& awk '{ print $2 }'`
+            if ($#pyv > 2) continue
+
+            set HavePython = TRUE
+            set PyCC  = `$PyExe ../python/python-cc.py |& awk '{ print $1 }'`
+            set PyInc = `$PyExe ../python/python-inc-dir.py`
+            set PyCfg = `$PyExe ../python/python-cfg-dir.py`
+
+            echo "$PyExe ($pyv)"
+            echo "      compiled with $PyCC"
+            echo "      has include directory $PyInc"
+            set lPyVers = `$PyExe ../python/python-version.py`
+
+            set PyPck = `echo $PyInc | sed 's/include/lib/'`/dist-packages
+            if (-d $PyInc/Numeric) then
+               echo "      has numeric extensions"
+               set HavePythonNumeric = TRUE
+            endif
+            if ((-d $PyPck/NumPy) || (-d $PyPck/numpy)) then
+               echo "      has numpy extensions"
+               set HavePythonNumpy = TRUE
+            endif
+            if (($HavePythonNumeric == FALSE) && ($HavePythonNumpy == FALSE)) then
+               echo "      does not have numeric extensions"
+            endif
+
+            if ((($HostOS == "Linux") || ($HostOS == "Darwin") || ($HostOS == "FreeBSD")) && ($PyCC == cc)) then
+               set PyCC =  gcc
+            endif
+            set found = TRUE
+         endif
+      endif
+
+   if ($found == FALSE) then
+      echo "none recognizable"
+      set HavePython        = FALSE
+      set HavePythonNumeric = FALSE
+      set HavePythonNumpy   = FALSE
+      set Python_Path       = ""
+      set PyExe             = ""
+      set PyCC              = ""
+      set PyCfg             = ""
+      set PyInc             = ""
+      set PyVers            = ""
+   endif
+
+   set RootDir = /usr/local/apps/pact
+
+   if ($HavePython == TRUE) then
+      if (`expr "$lPyVers" : '.*\..*\..*'` > 0) then
+         set lPyVers = $lPyVers:r
+      endif
+      set PyVers = $lPyVers
+      set PyRoot = $RootDir
+      set PyHead = python${PyVers}/pact
+      if ("$Python_Path" != "") then
+         set PyRoot = $PyExe
+         set PyRoot = $PyRoot:h
+         set PyRoot = $PyRoot:h
+         set PyHead = python${PyVers}/site-packages/pact
+      endif
+   endif
+
+# export the results
+echo "HavePython        = $HavePython"
+echo "HavePythonNumeric = $HavePythonNumeric"
+echo "HavePythonNumpy   = $HavePythonNumpy"
+echo "Python_Path       = $Python_Path"
+echo "PyExe             = $PyExe"
+echo "PyCC              = $PyCC"
+echo "PyCfg             = $PyCfg"
+echo "PyInc             = $PyInc"
+echo "PyVers            = $PyVers"
+
+exit(0)
+
