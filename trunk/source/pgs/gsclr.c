@@ -1615,7 +1615,7 @@ PG_palette *PG_fget_palette(PG_device *dev, char *name)
  *                 - return the named palette if successful
  *                 - return NULL otherwise
  *
- * #bind PG_fset_palette fortran() scheme()
+ * #bind PG_fset_palette fortran() scheme() python(set_palette)
  */
 
 PG_palette *PG_fset_palette(PG_device *dev, char *name)

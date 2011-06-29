@@ -8,9 +8,7 @@
 
 /* WRAP |char *fbcv1(int a, float b, double c, char d, int (*e)(void), PFInt f)| */
 
-static PyObject *_PY_fbcv1(PyObject *self,
-                           PyObject *args,
-                           PyObject *kwds)
+PyObject *_PY_fbcv1(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la;
@@ -40,9 +38,7 @@ static PyObject *_PY_fbcv1(PyObject *self,
 
 /* WRAP |char *fbmcv1(int a, float b, double c, char d)| */
 
-static PyObject *_PY_fbmcv1(PyObject *self,
-                            PyObject *args,
-                            PyObject *kwds)
+PyObject *_PY_fbmcv1(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la;
@@ -70,9 +66,7 @@ static PyObject *_PY_fbmcv1(PyObject *self,
 
 /* WRAP |char *fbmcr2(int *a, float *b, double *c, char *d)| */
 
-static PyObject *_PY_fbmcr2(PyObject *self,
-                            PyObject *args,
-                            PyObject *kwds)
+PyObject *_PY_fbmcr2(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int *_la;

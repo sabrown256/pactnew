@@ -1642,7 +1642,7 @@ void PG_get_viewspace(PG_device *dev, PG_coord_sys cs, double *box)
  *                  - if CS == WORLDC set WC
  *                  - if CS == NORMC  set NDC
  *
- * #bind PG_set_viewspace fortran() scheme()
+ * #bind PG_set_viewspace fortran() scheme() python()
  */
 
 void PG_set_viewspace(PG_device *dev, int nd, PG_coord_sys cs, double *box)

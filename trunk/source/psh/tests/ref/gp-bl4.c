@@ -8,9 +8,7 @@
 
 /* WRAP |int fb1(bool a1, bool *a2)| */
 
-static PyObject *_PY_fb1(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fb1(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     bool _la1;
@@ -36,9 +34,7 @@ static PyObject *_PY_fb1(PyObject *self,
 
 /* WRAP |int fb2(char a1, char *a2)| */
 
-static PyObject *_PY_fb2(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fb2(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     char _la1;
@@ -64,9 +60,7 @@ static PyObject *_PY_fb2(PyObject *self,
 
 /* WRAP |int fb3(short a1, short *a2)| */
 
-static PyObject *_PY_fb3(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fb3(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     short _la1;
@@ -92,9 +86,7 @@ static PyObject *_PY_fb3(PyObject *self,
 
 /* WRAP |int fb4(int a1, int *a2)| */
 
-static PyObject *_PY_fb4(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fb4(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la1;
@@ -120,9 +112,7 @@ static PyObject *_PY_fb4(PyObject *self,
 
 /* WRAP |int fb5(long a1, long *a2)| */
 
-static PyObject *_PY_fb5(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fb5(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     long _la1;
@@ -148,9 +138,7 @@ static PyObject *_PY_fb5(PyObject *self,
 
 /* WRAP |int fb6(long long a1, long long *a2)| */
 
-static PyObject *_PY_fb6(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fb6(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     long long _la1;
@@ -176,9 +164,7 @@ static PyObject *_PY_fb6(PyObject *self,
 
 /* WRAP |int fb7(float a1, float *a2)| */
 
-static PyObject *_PY_fb7(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fb7(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     float _la1;
@@ -204,9 +190,7 @@ static PyObject *_PY_fb7(PyObject *self,
 
 /* WRAP |int fb8(double a1, double *a2)| */
 
-static PyObject *_PY_fb8(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fb8(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     double _la1;
@@ -232,9 +216,7 @@ static PyObject *_PY_fb8(PyObject *self,
 
 /* WRAP |int fb10(float _Complex a1, float _Complex *a2)| */
 
-static PyObject *_PY_fb10(PyObject *self,
-                          PyObject *args,
-                          PyObject *kwds)
+PyObject *_PY_fb10(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     float _Complex _la1;
@@ -260,9 +242,7 @@ static PyObject *_PY_fb10(PyObject *self,
 
 /* WRAP |int fb11(double _Complex a1, double _Complex *a2)| */
 
-static PyObject *_PY_fb11(PyObject *self,
-                          PyObject *args,
-                          PyObject *kwds)
+PyObject *_PY_fb11(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     double _Complex _la1;
@@ -288,9 +268,7 @@ static PyObject *_PY_fb11(PyObject *self,
 
 /* WRAP |bool fr1(int a1)| */
 
-static PyObject *_PY_fr1(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fr1(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la1;
@@ -315,9 +293,7 @@ static PyObject *_PY_fr1(PyObject *self,
 
 /* WRAP |char fr2(int a1)| */
 
-static PyObject *_PY_fr2(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fr2(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la1;
@@ -342,9 +318,7 @@ static PyObject *_PY_fr2(PyObject *self,
 
 /* WRAP |short fr3(int a1)| */
 
-static PyObject *_PY_fr3(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fr3(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la1;
@@ -369,9 +343,7 @@ static PyObject *_PY_fr3(PyObject *self,
 
 /* WRAP |int fr4(int a1)| */
 
-static PyObject *_PY_fr4(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fr4(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la1;
@@ -396,9 +368,7 @@ static PyObject *_PY_fr4(PyObject *self,
 
 /* WRAP |long fr5(int a1)| */
 
-static PyObject *_PY_fr5(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fr5(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la1;
@@ -423,9 +393,7 @@ static PyObject *_PY_fr5(PyObject *self,
 
 /* WRAP |long long fr6(int a1)| */
 
-static PyObject *_PY_fr6(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fr6(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la1;
@@ -450,9 +418,7 @@ static PyObject *_PY_fr6(PyObject *self,
 
 /* WRAP |float fr7(int a1)| */
 
-static PyObject *_PY_fr7(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fr7(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la1;
@@ -477,9 +443,7 @@ static PyObject *_PY_fr7(PyObject *self,
 
 /* WRAP |double fr8(int a1)| */
 
-static PyObject *_PY_fr8(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fr8(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la1;
@@ -504,9 +468,7 @@ static PyObject *_PY_fr8(PyObject *self,
 
 /* WRAP |float _Complex fr10(int a1)| */
 
-static PyObject *_PY_fr10(PyObject *self,
-                          PyObject *args,
-                          PyObject *kwds)
+PyObject *_PY_fr10(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la1;
@@ -531,9 +493,7 @@ static PyObject *_PY_fr10(PyObject *self,
 
 /* WRAP |double _Complex fr11(int a1)| */
 
-static PyObject *_PY_fr11(PyObject *self,
-                          PyObject *args,
-                          PyObject *kwds)
+PyObject *_PY_fr11(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la1;
@@ -558,9 +518,7 @@ static PyObject *_PY_fr11(PyObject *self,
 
 /* WRAP |str fr13(int a1)| */
 
-static PyObject *_PY_fr13(PyObject *self,
-                          PyObject *args,
-                          PyObject *kwds)
+PyObject *_PY_fr13(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la1;
@@ -585,9 +543,7 @@ static PyObject *_PY_fr13(PyObject *self,
 
 /* WRAP |bool *fp1(int a1)| */
 
-static PyObject *_PY_fp1(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fp1(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la1;
@@ -612,9 +568,7 @@ static PyObject *_PY_fp1(PyObject *self,
 
 /* WRAP |char *fp2(int a1)| */
 
-static PyObject *_PY_fp2(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fp2(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la1;
@@ -639,9 +593,7 @@ static PyObject *_PY_fp2(PyObject *self,
 
 /* WRAP |short *fp3(int a1)| */
 
-static PyObject *_PY_fp3(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fp3(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la1;
@@ -666,9 +618,7 @@ static PyObject *_PY_fp3(PyObject *self,
 
 /* WRAP |int *fp4(int a1)| */
 
-static PyObject *_PY_fp4(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fp4(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la1;
@@ -693,9 +643,7 @@ static PyObject *_PY_fp4(PyObject *self,
 
 /* WRAP |long *fp5(int a1)| */
 
-static PyObject *_PY_fp5(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fp5(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la1;
@@ -720,9 +668,7 @@ static PyObject *_PY_fp5(PyObject *self,
 
 /* WRAP |long long *fp6(int a1)| */
 
-static PyObject *_PY_fp6(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fp6(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la1;
@@ -747,9 +693,7 @@ static PyObject *_PY_fp6(PyObject *self,
 
 /* WRAP |float *fp7(int a1)| */
 
-static PyObject *_PY_fp7(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fp7(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la1;
@@ -774,9 +718,7 @@ static PyObject *_PY_fp7(PyObject *self,
 
 /* WRAP |double *fp8(int a1)| */
 
-static PyObject *_PY_fp8(PyObject *self,
-                         PyObject *args,
-                         PyObject *kwds)
+PyObject *_PY_fp8(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la1;
@@ -801,9 +743,7 @@ static PyObject *_PY_fp8(PyObject *self,
 
 /* WRAP |float _Complex *fp10(int a1)| */
 
-static PyObject *_PY_fp10(PyObject *self,
-                          PyObject *args,
-                          PyObject *kwds)
+PyObject *_PY_fp10(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la1;
@@ -828,9 +768,7 @@ static PyObject *_PY_fp10(PyObject *self,
 
 /* WRAP |double _Complex *fp11(int a1)| */
 
-static PyObject *_PY_fp11(PyObject *self,
-                          PyObject *args,
-                          PyObject *kwds)
+PyObject *_PY_fp11(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la1;
@@ -855,9 +793,7 @@ static PyObject *_PY_fp11(PyObject *self,
 
 /* WRAP |str *fp13(int a1)| */
 
-static PyObject *_PY_fp13(PyObject *self,
-                          PyObject *args,
-                          PyObject *kwds)
+PyObject *_PY_fp13(PyObject *self, PyObject *args, PyObject *kwds)
    {int ok;
     PyObject *_lo;
     int _la1;

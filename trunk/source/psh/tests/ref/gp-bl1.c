@@ -8,9 +8,7 @@
 
 /* WRAP |void fav1(void)| */
 
-static PyObject *_PY_fav1(PyObject *self,
-                          PyObject *args,
-                          PyObject *kwds)
+PyObject *_PY_fav1(PyObject *self, PyObject *args, PyObject *kwds)
    {PyObject *_lo;
     
     fav1();
@@ -25,9 +23,7 @@ static PyObject *_PY_fav1(PyObject *self,
 
 /* WRAP |int fav2(void)| */
 
-static PyObject *_PY_fav2(PyObject *self,
-                          PyObject *args,
-                          PyObject *kwds)
+PyObject *_PY_fav2(PyObject *self, PyObject *args, PyObject *kwds)
    {PyObject *_lo;
     int _rv;
     
@@ -42,9 +38,7 @@ static PyObject *_PY_fav2(PyObject *self,
 
 /* WRAP |double fav3(void)| */
 
-static PyObject *_PY_fav3(PyObject *self,
-                          PyObject *args,
-                          PyObject *kwds)
+PyObject *_PY_fav3(PyObject *self, PyObject *args, PyObject *kwds)
    {PyObject *_lo;
     double _rv;
     
@@ -59,9 +53,7 @@ static PyObject *_PY_fav3(PyObject *self,
 
 /* WRAP |str fav4(void)| */
 
-static PyObject *_PY_fav4(PyObject *self,
-                          PyObject *args,
-                          PyObject *kwds)
+PyObject *_PY_fav4(PyObject *self, PyObject *args, PyObject *kwds)
    {PyObject *_lo;
     str _rv;
     
@@ -76,9 +68,7 @@ static PyObject *_PY_fav4(PyObject *self,
 
 /* WRAP |void *favp1(void)| */
 
-static PyObject *_PY_favp1(PyObject *self,
-                           PyObject *args,
-                           PyObject *kwds)
+PyObject *_PY_favp1(PyObject *self, PyObject *args, PyObject *kwds)
    {PyObject *_lo;
     void *_rv;
     
@@ -93,9 +83,7 @@ static PyObject *_PY_favp1(PyObject *self,
 
 /* WRAP |int *favp2(void)| */
 
-static PyObject *_PY_favp2(PyObject *self,
-                           PyObject *args,
-                           PyObject *kwds)
+PyObject *_PY_favp2(PyObject *self, PyObject *args, PyObject *kwds)
    {PyObject *_lo;
     int *_rv;
     
@@ -110,9 +98,7 @@ static PyObject *_PY_favp2(PyObject *self,
 
 /* WRAP |double *favp3(void)| */
 
-static PyObject *_PY_favp3(PyObject *self,
-                           PyObject *args,
-                           PyObject *kwds)
+PyObject *_PY_favp3(PyObject *self, PyObject *args, PyObject *kwds)
    {PyObject *_lo;
     double *_rv;
     
@@ -127,9 +113,7 @@ static PyObject *_PY_favp3(PyObject *self,
 
 /* WRAP |str *favp4(void)| */
 
-static PyObject *_PY_favp4(PyObject *self,
-                           PyObject *args,
-                           PyObject *kwds)
+PyObject *_PY_favp4(PyObject *self, PyObject *args, PyObject *kwds)
    {PyObject *_lo;
     str *_rv;
     
@@ -144,9 +128,7 @@ static PyObject *_PY_favp4(PyObject *self,
 
 /* WRAP |void fav5(void)| */
 
-static PyObject *_PY_fav5(PyObject *self,
-                          PyObject *args,
-                          PyObject *kwds)
+PyObject *_PY_fav5(PyObject *self, PyObject *args, PyObject *kwds)
    {PyObject *_lo;
     
     fav5();

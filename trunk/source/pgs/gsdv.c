@@ -54,7 +54,7 @@ int
  *                - all quantities are fractions of the physical device
  *                - size
  *
- * #bind PG_open_device fortran() scheme()
+ * #bind PG_open_device fortran() scheme() python(open)
  */
  
 PG_device *PG_open_device(PG_device *dev, double xf, double yf,

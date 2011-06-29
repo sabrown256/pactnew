@@ -3393,27 +3393,21 @@ static void init_python(statedes *st, bindes *bd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PYTHON_WRAP_DECL - function declaration */
+/* PYTHON_MAKE_DECL - make wrapper function declaration */
 
-static void python_wrap_decl(FILE *fp, fdecl *dcl)
-   {int i, na, nc;
-    char pfn[MAXLINE], dty[MAXLINE], s[MAXLINE], t[MAXLINE];
+static void python_make_decl(char *t, int nc, fdecl *dcl)
+   {int i, na, n;
+    char dty[MAXLINE], s[MAXLINE];
     char *cfn, *ty, *lty, *pty;
     farg *al;
 
     na  = dcl->na;
     cfn = dcl->proto.name;
 
-    map_name(pfn, MAXLINE, cfn, NULL, NULL, -1, FALSE);
-
-    fprintf(fp, "\n");
-    fprintf(fp, "/* WRAP |%s| */\n", dcl->proto.arg);
-    fprintf(fp, "\n");
-
-    snprintf(t, MAXLINE, "static PyObject *_PY_%s(", cfn);
-    nc = strlen(t);
-    memset(s, ' ', nc);
-    s[nc] = '\0';
+    snprintf(t, nc, " *_PY_%s", cfn);
+    n = strlen(t);
+    memset(s, ' ', n);
+    s[n] = '\0';
 
     pty = "PyObject";
     for (i = 0; i < na; i++)
@@ -3425,9 +3419,30 @@ static void python_wrap_decl(FILE *fp, fdecl *dcl)
 	    {pty = lty;
 	     break;};};
 
-    fprintf(fp, "%s%s *self,\n", t, pty);
-    fprintf(fp, "%sPyObject *args,\n", s);
-    fprintf(fp, "%sPyObject *kwds)\n", s);
+    vstrcat(t, nc, "(%s *self, PyObject *args, PyObject *kwds)", pty);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PYTHON_WRAP_DECL - function declaration */
+
+static void python_wrap_decl(FILE *fp, fdecl *dcl)
+   {char pfn[MAXLINE], t[MAXLINE];
+    char *cfn;
+
+    cfn = dcl->proto.name;
+
+    map_name(pfn, MAXLINE, cfn, NULL, NULL, -1, FALSE);
+
+    fprintf(fp, "\n");
+    fprintf(fp, "/* WRAP |%s| */\n", dcl->proto.arg);
+    fprintf(fp, "\n");
+
+    python_make_decl(t, MAXLINE, dcl);
+
+    fprintf(fp, "PyObject%s\n", t);
 
     return;}
 
@@ -3694,8 +3709,9 @@ static void python_wrap_local_return(FILE *fp, fdecl *dcl)
 
 /* PYTHON_METHOD_DEF - method definition wrapper */
 
-static void python_method_def(FILE *fp, fdecl *dcl, char *pfn, int def)
-   {int nc, voida;
+static void python_method_def(char *dfn, int nc, fdecl *dcl,
+			      char *pfn, int def)
+   {int n, voida;
     char a[MAXLINE], s[MAXLINE], t[MAXLINE];
     char fn[MAXLINE];
     char *cfn;
@@ -3716,19 +3732,19 @@ static void python_method_def(FILE *fp, fdecl *dcl, char *pfn, int def)
 		    fn, fn);
 
 /* emit the method definition */
-	snprintf(s, MAXLINE, " _PYD_%s = {", cfn);
-	nc = strlen(s);
+	snprintf(s, MAXLINE, " _PYD_%s = ", cfn);
+	n = strlen(s) + 1;
 
-	fprintf(fp, "%s\"%s\", (PyCFunction) _PY_%s, METH_KEYWORDS,\n",
-		s, fn, cfn);
+	snprintf(dfn, nc, "{\"%s\", (PyCFunction) _PY_%s, METH_KEYWORDS,\n",
+		 fn, cfn);
 
-	memset(s, ' ', nc);
-	s[nc] = '\0';
-	fprintf(fp, "%s\"%s\"},\n", s, t);}
+	memset(s, ' ', n);
+	s[n] = '\0';
+	vstrcat(dfn, nc, "%s\"%s\"}", s, t);}
 
 /* emit the method declaration */
     else
-       fprintf(fp, " _PYD_%s,\n", cfn);
+       snprintf(dfn, nc, " _PYD_%s", cfn);
 
     return;}
 
@@ -3776,8 +3792,8 @@ static void python_wrap(FILE *fp, fdecl *dcl, char *pfn)
 
 static void python_header(bindes *bd)
    {int ib, ndcl;
-    char name[MAXLINE], upk[MAXLINE];
-    char *pck, *pfn;
+    char name[MAXLINE], upk[MAXLINE], dfn[MAXLINE], t[MAXLINE];
+    char *pck, *cfn, *pfn;
     fdecl *dcl, *dcls;
     statedes *st;
     FILE *fh;
@@ -3798,17 +3814,32 @@ static void python_header(bindes *bd)
     fprintf(fh, " *\n");
     fprintf(fh, " */\n");
     fprintf(fh, "\n");
-    fprintf(fh, "extern PyMethodDef\n");
 
-/* method definition wrapper */
+/* extern declarations for wrappers */
+    fprintf(fh, "extern PyObject\n");
+
     for (ib = 0; ib < ndcl; ib++)
         {dcl = dcls + ib;
 	 pfn = has_binding(dcl, "python");
 	 if ((pfn != NULL) && (strcmp(pfn, "none") != 0) &&
 	     (is_var_arg(dcl->proto.arg) == FALSE))
-	    python_method_def(fh, dcl, pfn, FALSE);};
+	    {python_make_decl(t, MAXLINE, dcl);
+	     fprintf(fh, "%s,\n", t);};};
 
-    fprintf(fh, " _PYD_%s_null;\n", pck);
+    fprintf(fh, " _PY_%s_null;\n", pck);
+    fprintf(fh, "\n");
+
+/* method definition macros */
+    for (ib = 0; ib < ndcl; ib++)
+        {dcl = dcls + ib;
+	 cfn = dcl->proto.name;
+	 pfn = has_binding(dcl, "python");
+	 if ((pfn != NULL) && (strcmp(pfn, "none") != 0) &&
+	     (is_var_arg(dcl->proto.arg) == FALSE))
+	    {python_method_def(dfn, MAXLINE, dcl, pfn, TRUE);
+	     fprintf(fh, "#define _PYD_%s %s\n",
+		     cfn, subst(dfn, "\n", "\\\n", -1));};};
+
     fprintf(fh, "\n");
 
     fclose(fh);
@@ -3822,7 +3853,8 @@ static void python_header(bindes *bd)
 
 static void python_install(bindes *bd)
    {int ib, ndcl;
-    char *pck, *pfn;
+    char dfn[MAXLINE];
+    char *pck, *cfn, *pfn;
     fdecl *dcl, *dcls;
     statedes *st;
     FILE *fp;
@@ -3841,10 +3873,12 @@ static void python_install(bindes *bd)
 /* method definition wrapper */
     for (ib = 0; ib < ndcl; ib++)
         {dcl = dcls + ib;
+	 cfn = dcl->proto.name;
 	 pfn = has_binding(dcl, "python");
 	 if ((pfn != NULL) && (strcmp(pfn, "none") != 0) &&
 	     (is_var_arg(dcl->proto.arg) == FALSE))
-	    python_method_def(fp, dcl, pfn, TRUE);};
+	    {python_method_def(dfn, MAXLINE, dcl, pfn, TRUE);
+	     fprintf(fp, " _PYD_%s = %s,\n", cfn, dfn);};};
 
     fprintf(fp, " _PYD_%s_null;\n", pck);
     fprintf(fp, "\n");

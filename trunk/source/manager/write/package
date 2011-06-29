@@ -34,9 +34,15 @@ source $ldir/env-csh
 
 # must have one package per line because dmake needs it that way
     foreach i ($Pkgs)
-       if ($HavePython == TRUE) then
-          echo "$i" >>& $STDOUT
-       else if (($i != python) && ($i != pya)) then
+       if ($i == python) then
+          if ($HavePythonNumpy == TRUE) then
+             echo "$i" >>& $STDOUT
+          endif
+       else if ($i == pya) then
+          if ($HavePythonNumeric == TRUE) then
+             echo "$i" >>& $STDOUT
+          endif
+       else
           echo "$i" >>& $STDOUT
        endif
     end
