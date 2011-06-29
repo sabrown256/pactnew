@@ -72,6 +72,7 @@ if (-d ../../python) then
             flog $ALog setenv HavePython TRUE
             setenv PyCC  `$PyExe ../../python/python-cc.py |& awk '{ print $1 }'`
             setenv PyInc `$PyExe ../../python/python-inc-dir.py`
+            setenv PyLib `echo $PyInc | sed 's/include/lib/'`
             setenv PyCfg `$PyExe ../../python/python-cfg-dir.py`
 
             NoteD $ALog "$PyExe ($pyv)"
@@ -83,7 +84,8 @@ if (-d ../../python) then
                NoteD $ALog "      has numeric extensions"
                flog $ALog setenv HavePythonNumeric TRUE
             endif
-            if (-d $PyInc/NumPy) then
+            if ((-d $PyLib/site-packages/NumPy) || (-d $PyLib/site-packages/numpy) || \
+                (-d $PyLib/dist-packages/NumPy) || (-d $PyLib/dist-packages/numpy)) then
                NoteD $ALog "      has numpy extensions"
                flog $ALog setenv HavePythonNumpy TRUE
             endif

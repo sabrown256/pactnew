@@ -4,6 +4,8 @@
 #      - this is a portability hack mainly because of AIX
 #
 
+set PyPACTVers = 2.0
+
 source ../scripts/env-csh
 
 set Python = `which python`
@@ -58,7 +60,7 @@ flog $Log set MDLibs   = ( `pact +l -info MDLib | uniq` )
 flog $Log set MDGLibs  = ( `pact +l -info MDGLib | uniq` )
 flog $Log set GCCLib   = ( `pact +l -info GCCLib | uniq` )
 
-# get only libraries in DPLibs - no flags (thanks AIX)
+# get only libraries in DPLibs - no flags (AIX)
 set lst = ""
 foreach i ( `pact +l -info DPLib | uniq` )
    if ("$i" =~ \-l*) then
@@ -69,7 +71,7 @@ flog $Log set DPLibs   = ( $lst )
 
 flog $Log set LD     = ( $Link $SFLAGS )
 flog $Log set PyPath = $DevLib/python${PyVers}
-flog $Log set PyPact = $PyPath/pact
+flog $Log set PyPact = $PyPath/pact-${PyPACTVers}
 
 flog $Log set Libs   = ( $LDRPath -L$DevLib $LDPath $MDGLibs -lc -lm $ShLibs $DPLibs $MDLibs )
 if ("$GCCLib" != "") then
@@ -79,12 +81,15 @@ endif
 flog $Log set CFPDB = ""
 flog $Log set CFPGS = ""
 
-# NOTE: only IBM can make it this difficult - grrrrrrrrrrr
+# NOTE: IBM model is difficult - grrrrrrrrrrr
 if ($OS == AIX) then
    flog $Log set CFPDB = ( -bE:${SrcDir}/pypdb.exp -bI:${PyCfgDir}/python.exp -bM:SRE -bnoentry -bloadmap:pypdb.map )
    flog $Log set CFPGS = ( -bE:${SrcDir}/pypgs.exp -bI:${PyCfgDir}/python.exp -bM:SRE -bnoentry -bloadmap:pypgs.map )
 endif
 
+if (!(-d $PyPact)) then
+   flog $Log mkdir -p $PyPact
+endif
 flog $Log pushd $PyPact
 
 NoteD $Log ""

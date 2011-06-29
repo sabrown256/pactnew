@@ -784,9 +784,11 @@ static farg *proc_args(fdecl *dcl)
 static int find_func(char *pr, char *f)
    {int rv;
     char t[MAXLINE];
+    char *p;
 
     snprintf(t, MAXLINE, "%s(", f);
-    rv = (strstr(pr, t) != NULL);
+    p  = strstr(pr, t);
+    rv = ((p != NULL) && (strchr(" *\t", p[-1]) != NULL));
 
     return(rv);}
 
