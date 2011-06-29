@@ -1,0 +1,38 @@
+#!/bin/csh -f
+#
+# BASIC - PYTHON basic tests
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+#--------------------------------------------------------------------------
+
+#                           BASIC TEST
+
+#--------------------------------------------------------------------------
+
+   NoteD $Log ""
+   NoteD $Log -n "                    Basic Test ... "
+   Note $Log ""
+
+   set UTime = `$TIMER -r`
+   flog $Log $CFE $PYTHON $RootDir/python/tests/basic.py
+   set xstatus = $status
+   set ETime   = `$TIMER -b $UTime`
+   
+   if ($xstatus == 0) then
+      NoteD $Log "OK ($xstatus/$ETime)"
+   else
+      NoteD $Log "FAILED ($xstatus/$ETime)"
+      set Err = 1
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($Err)
