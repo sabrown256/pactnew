@@ -67,12 +67,13 @@ end
             echo "      has include directory $PyInc"
             set lPyVers = `$PyExe ../python/python-version.py`
 
-            set PyPck = `echo $PyInc | sed 's/include/lib/'`/dist-packages
+            set PyLib = `echo $PyInc | sed 's/include/lib/'`
             if (-d $PyInc/Numeric) then
                echo "      has numeric extensions"
                set HavePythonNumeric = TRUE
             endif
-            if ((-d $PyPck/NumPy) || (-d $PyPck/numpy)) then
+            if ((-d $PyLib/site-packages/NumPy) || (-d $PyLib/site-packages/numpy) || \
+                (-d $PyLib/dist-packages/NumPy) || (-d $PyLib/dist-packages/numpy)) then
                echo "      has numpy extensions"
                set HavePythonNumpy = TRUE
             endif

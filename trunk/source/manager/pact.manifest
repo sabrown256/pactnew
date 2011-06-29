@@ -9,7 +9,7 @@
 # except for psh and scripts, ordered by number of lines of code
 # for parallel load balancing
 pkg psh scripts
-pkg pgs score pdb pml sx python
+pkg pgs score pdb pml sx python pya
 pkg scheme panacea ultra ppc scc fortran
 
 bin atdbg do-net detect pcexec ps-diff ncpu scheme sx

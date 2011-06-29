@@ -58,7 +58,7 @@ flog $Log set MDLibs   = ( `pact +l -info MDLib | uniq` )
 flog $Log set MDGLibs  = ( `pact +l -info MDGLib | uniq` )
 flog $Log set GCCLib   = ( `pact +l -info GCCLib | uniq` )
 
-# get only libraries in DPLibs - no flags (thanks AIX)
+# get only libraries in DPLibs - no flags (AIX)
 set lst = ""
 foreach i ( `pact +l -info DPLib | uniq` )
    if ("$i" =~ \-l*) then
@@ -79,7 +79,7 @@ endif
 flog $Log set CFPDB = ""
 flog $Log set CFPGS = ""
 
-# NOTE: only IBM can make it this difficult - grrrrrrrrrrr
+# NOTE: IBM model is difficult - grrrrrrrrrrr
 if ($OS == AIX) then
    flog $Log set CFPDB = ( -bE:${SrcDir}/pypdb.exp -bI:${PyCfgDir}/python.exp -bM:SRE -bnoentry -bloadmap:pypdb.map )
    flog $Log set CFPGS = ( -bE:${SrcDir}/pypgs.exp -bI:${PyCfgDir}/python.exp -bM:SRE -bnoentry -bloadmap:pypgs.map )

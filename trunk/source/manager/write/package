@@ -36,7 +36,7 @@ source $ldir/env-csh
     foreach i ($Pkgs)
        if ($HavePython == TRUE) then
           echo "$i" >>& $STDOUT
-       else if ($i != python) then
+       else if (($i != python) && ($i != pya)) then
           echo "$i" >>& $STDOUT
        endif
     end

@@ -14,7 +14,6 @@
  */
 /*--------------------------------------------------------------------------*/
 #include "pgsmodule.h"
-#include "py-pgs.h"
 
 /* DO-NOT-DELETE splicer.begin(pgs.device.C_definition) UNMODIFIED */
 /* DO-NOT-DELETE splicer.end(pgs.device.C_definition) */
@@ -77,6 +76,32 @@ PP_device_finish_plot(PP_deviceObject *self,
     Py_INCREF(Py_None);
     return Py_None;
 /* DO-NOT-DELETE splicer.end(pgs.device.method.finish_plot) */
+}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+
+static char PP_device_set_char_path__doc__[] = 
+""
+;
+
+static PyObject *
+PP_device_set_char_path(PP_deviceObject *self,
+                  PyObject *args,
+                  PyObject *kwds)
+{
+/* DO-NOT-DELETE splicer.begin(pgs.device.method.set_char_path) UNMODIFIED */
+    double x[PG_SPACEDM];
+    char *kw_list[] = {"x", "y", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dd:set_char_path", kw_list,
+                                     &x[0], &x[1]))
+        return NULL;
+    PG_fset_char_path(self->dev, x);
+    Py_INCREF(Py_None);
+    return Py_None;
+/* DO-NOT-DELETE splicer.end(pgs.device.method.set_char_path) */
 }
 
 /*--------------------------------------------------------------------------*/
@@ -766,75 +791,6 @@ PP_device_draw_picture(PP_deviceObject *self,
 
 /*--------------------------------------------------------------------------*/
 
-#if 1
-
-/*--------------------------------------------------------------------------*/
-
-static PyMethodDef PP_device_methods[] = {
-{"clear_window", (PyCFunction)PP_device_clear_window, METH_NOARGS, PP_device_clear_window__doc__},
-{"close", (PyCFunction)PP_device_close, METH_NOARGS, PP_device_close__doc__},
-{"finish_plot", (PyCFunction)PP_device_finish_plot, METH_NOARGS, PP_device_finish_plot__doc__},
-_PYD_PG_fset_char_path,
-{"set_font", (PyCFunction)PP_device_set_font, METH_KEYWORDS, PP_device_set_font__doc__},
-{"set_color_line", (PyCFunction)PP_device_set_color_line, METH_KEYWORDS, PP_device_set_color_line__doc__},
-{"set_line_style", (PyCFunction)PP_device_set_line_style, METH_KEYWORDS, PP_device_set_line_style__doc__},
-{"set_line_width", (PyCFunction)PP_device_set_line_width, METH_KEYWORDS, PP_device_set_line_width__doc__},
-{"update_vs", (PyCFunction)PP_device_update_vs, METH_NOARGS, PP_device_update_vs__doc__},
-{"set_line_color", (PyCFunction)PP_device_set_line_color, METH_KEYWORDS, PP_device_set_line_color__doc__},
-{"set_text_color", (PyCFunction)PP_device_set_text_color, METH_KEYWORDS, PP_device_set_text_color__doc__},
-{"set_color_text", (PyCFunction)PP_device_set_color_text, METH_KEYWORDS, PP_device_set_color_text__doc__},
-{"turn_data_id", (PyCFunction)PP_device_turn_data_id, METH_KEYWORDS, PP_device_turn_data_id__doc__},
-{"set_viewport", (PyCFunction)PP_device_set_viewport, METH_KEYWORDS, PP_device_set_viewport__doc__},
-{"set_window", (PyCFunction)PP_device_set_window, METH_KEYWORDS, PP_device_set_window__doc__},
-{"draw_box", (PyCFunction)PP_device_draw_box, METH_KEYWORDS, PP_device_draw_box__doc__},
-{"get_text_ext", (PyCFunction)PP_device_get_text_ext, METH_KEYWORDS, PP_device_get_text_ext__doc__},
-{"draw_line", (PyCFunction)PP_device_draw_line, METH_KEYWORDS, PP_device_draw_line__doc__},
-{"write_WC", (PyCFunction)PP_device_write_WC, METH_KEYWORDS, PP_device_write_WC__doc__},
-{"open", (PyCFunction)PP_device_open, METH_KEYWORDS, PP_device_open__doc__},
-{"set_palette", (PyCFunction)PP_device_set_palette, METH_KEYWORDS, PP_device_set_palette__doc__},
-{"draw_graph", (PyCFunction)PP_device_draw_graph, METH_KEYWORDS, PP_device_draw_graph__doc__},
-{"draw_image", (PyCFunction)PP_device_draw_image, METH_KEYWORDS, PP_device_draw_image__doc__},
-{"contour_plot", (PyCFunction)PP_device_contour_plot, METH_KEYWORDS, PP_device_contour_plot__doc__},
-{"poly_fill_plot", (PyCFunction)PP_device_poly_fill_plot, METH_KEYWORDS, PP_device_poly_fill_plot__doc__},
-{"draw_surface", (PyCFunction)PP_device_draw_surface, METH_KEYWORDS, PP_device_draw_surface__doc__},
-{"draw_picture", (PyCFunction)PP_device_draw_picture, METH_KEYWORDS, PP_device_draw_picture__doc__},
-/* DO-NOT-DELETE splicer.begin(pgs.device.extra_mlist) UNMODIFIED */
-/* DO-NOT-DELETE splicer.end(pgs.device.extra_mlist) */
-{NULL,   (PyCFunction)NULL, 0, NULL}            /* sentinel */
-};
-
-/*--------------------------------------------------------------------------*/
-
-#else
-
-/*--------------------------------------------------------------------------*/
-
-
-static char PP_device_set_char_path__doc__[] = 
-""
-;
-
-static PyObject *
-PP_device_set_char_path(PP_deviceObject *self,
-                  PyObject *args,
-                  PyObject *kwds)
-{
-/* DO-NOT-DELETE splicer.begin(pgs.device.method.set_char_path) UNMODIFIED */
-    double x[PG_SPACEDM];
-    char *kw_list[] = {"x", "y", NULL};
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "dd:set_char_path", kw_list,
-                                     &x[0], &x[1]))
-        return NULL;
-    PG_fset_char_path(self->dev, x);
-    Py_INCREF(Py_None);
-    return Py_None;
-/* DO-NOT-DELETE splicer.end(pgs.device.method.set_char_path) */
-}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 static PyMethodDef PP_device_methods[] = {
 {"clear_window", (PyCFunction)PP_device_clear_window, METH_NOARGS, PP_device_clear_window__doc__},
 {"close", (PyCFunction)PP_device_close, METH_NOARGS, PP_device_close__doc__},
@@ -867,10 +823,6 @@ static PyMethodDef PP_device_methods[] = {
 /* DO-NOT-DELETE splicer.end(pgs.device.extra_mlist) */
 {NULL,   (PyCFunction)NULL, 0, NULL}            /* sentinel */
 };
-
-/*--------------------------------------------------------------------------*/
-
-#endif
 
 /*--------------------------------------------------------------------------*/
 
