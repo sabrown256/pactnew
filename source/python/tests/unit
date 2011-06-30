@@ -27,6 +27,7 @@ source ../../tests/common
    
    if ($xstatus == 0) then
       NoteD $Log "OK ($xstatus/$ETime)"
+      flog $Log ${RM} *.pyc
    else
       NoteD $Log "FAILED ($xstatus/$ETime)"
 #      set Err = 1
