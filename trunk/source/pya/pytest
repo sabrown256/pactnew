@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# PYTEST - test PYTHON
+# PYTEST - test PYA
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-set Package = python
+set Package = pya
 source ../scripts/test-env
 
 setenv LogF  $Log
@@ -40,7 +40,7 @@ if (-f $LPYTHON/pact/pdb.py) then
    set BeginTime = `$TIMER -r`
 
    echo ""
-   echo "PYTHON TEST ..."
+   echo "PYA TEST ......"
 
    # Clean up the test dir
    rm -f $Log
@@ -94,11 +94,11 @@ if (-f $LPYTHON/pact/pdb.py) then
    
    if ($ERROR == "TRUE") then
       NoteD $Log ""
-      NoteD $Log "PYTHON TEST ... FAILED ($ETime)"
+      NoteD $Log "PYA TEST ...... FAILED ($ETime)"
       NoteD $Log ""
       NoteD $Log "See $Log for details"
    else
-      NoteD $Log "PYTHON TEST ... PASSED ($ETime)"
+      NoteD $Log "PYA TEST ...... PASSED ($ETime)"
    endif
 
    NoteD $Log ""

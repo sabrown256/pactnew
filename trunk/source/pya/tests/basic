@@ -21,7 +21,7 @@ source ../../tests/common
    Note $Log ""
 
    set UTime = `$TIMER -r`
-   flog $Log $CFE $PYTHON $RootDir/python/tests/basic.py
+   flog $Log $CFE $PYTHON $RootDir/pya/tests/basic.py
    set xstatus = $status
    set ETime   = `$TIMER -b $UTime`
    
