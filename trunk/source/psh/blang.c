@@ -1339,6 +1339,31 @@ static void if_call_list(char *a, int nc, fdecl *dcl, char *dlm)
     return;}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* C_PROTO - make a C prototype without any ARG qualifiers */
+
+static void c_proto(char *pr, int nc, fdecl *dcl)
+   {int i, na, voida;
+    char *arg;
+    farg *al;
+
+    na    = dcl->na;
+    al    = dcl->al;
+    voida = dcl->voida;
+
+    snprintf(pr, nc, "%s %s(", dcl->proto.type, dcl->proto.name);
+    if (voida == FALSE)
+       {for (i = 0; i < na; i++)
+	    {arg = al[i].arg;
+	     vstrcat(pr, nc, "%s, ", arg);};
+	pr[strlen(pr)-2] = '\0';};
+
+    nstrcat(pr, nc, ")");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
 
 /*                            FORTRAN ROUTINES                              */
 
@@ -4155,11 +4180,11 @@ static void html_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc)
 
 static void man_wrap(fdecl *dcl, char *sb, char *pck, int ndc, char **cdc)
    {int voidf;
-    char fname[MAXLINE], upk[MAXLINE];
+    char fname[MAXLINE], upk[MAXLINE], pr[MAXLINE];
     char upn[MAXLINE], lfn[MAXLINE], dcn[MAXLINE];
     char af[MAXLINE], as[MAXLINE], ap[MAXLINE];
     char fty[MAXLINE], t[MAXLINE];
-    char *cfn, **args, **com;
+    char *cfn, *bfn, **args, **com;
     FILE *fp;
 
     cfn   = dcl->proto.name;
@@ -4195,18 +4220,20 @@ static void man_wrap(fdecl *dcl, char *sb, char *pck, int ndc, char **cdc)
     fprintf(fp, ".sp\n");
 
 /* C */
-    fprintf(fp, ".B C Binding:       %s\n", dcl->proto.arg);
+    c_proto(pr, MAXLINE, dcl);
+    fprintf(fp, ".B C Binding:       %s\n", pr);
     fprintf(fp, ".sp\n");
 
 /* Fortran */
-    if (has_binding(dcl, "fortran") == NULL)
+    bfn = has_binding(dcl, "fortran");
+    if (bfn == NULL)
        {fprintf(fp, ".B Fortran Binding: none\n");
 	fprintf(fp, ".sp\n");}
     else if (dcl->bindings != NULL)
        {args = dcl->tfproto;
 
 	doc_proto_fortran(af, MAXLINE, dcl);
-	map_name(dcn, MAXLINE, args[1], NULL, "f", -1, FALSE);
+	map_name(dcn, MAXLINE, args[1], bfn, "f", -1, FALSE);
 	if (voidf == TRUE)
 	   fprintf(fp, ".B Fortran Binding: %s(%s)\n",
 		   dcn, af);
@@ -4217,11 +4244,12 @@ static void man_wrap(fdecl *dcl, char *sb, char *pck, int ndc, char **cdc)
 	fprintf(fp, ".sp\n");};
 
 /* Scheme */
-    if (has_binding(dcl, "scheme") == NULL)
+    bfn = has_binding(dcl, "scheme");
+    if (bfn == NULL)
        {fprintf(fp, ".B SX Binding:      none\n");
 	fprintf(fp, ".sp\n");}
     else if (dcl->bindings != NULL)
-       {map_name(dcn, MAXLINE, cfn, NULL, NULL, -1, TRUE);
+       {map_name(dcn, MAXLINE, cfn, bfn, NULL, -1, TRUE);
 	doc_proto_name_only(as, MAXLINE, dcl, NULL);
 	if (IS_NULL(as) == TRUE)
 	   fprintf(fp, ".B SX Binding:      (%s)\n", dcn);
@@ -4231,13 +4259,14 @@ static void man_wrap(fdecl *dcl, char *sb, char *pck, int ndc, char **cdc)
 	fprintf(fp, ".sp\n");};
 
 /* Python */
-    if (has_binding(dcl, "python") == NULL)
+    bfn = has_binding(dcl, "python");
+    if (bfn == NULL)
        {fprintf(fp, ".B Python Binding:  none\n");
 	fprintf(fp, ".sp\n");}
     else if (dcl->bindings != NULL)
-       {map_name(dcn, MAXLINE, cfn, NULL, NULL, -1, FALSE);
+       {map_name(dcn, MAXLINE, cfn, bfn, NULL, -1, FALSE);
 	doc_proto_name_only(ap, MAXLINE, dcl, ",");
-	fprintf(fp, ".B Python Binding:  pact.%s(%s)\n", dcn, ap);
+	fprintf(fp, ".B Python Binding:  %s(%s)\n", dcn, ap);
 	fprintf(fp, ".sp\n");};
 
     process_doc(t, MAXLINE, com);
