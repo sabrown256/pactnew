@@ -1360,6 +1360,7 @@ static void c_proto(char *pr, int nc, fdecl *dcl)
 	pr[strlen(pr)-2] = '\0';};
 
     nstrcat(pr, nc, ")");
+    nstrncpy(pr, nc, subst(pr, "* ", "*", -1), -1);
 
     return;}
 
@@ -4016,6 +4017,39 @@ static void doc_proto_fortran(char *a, int nc, fdecl *dcl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* DOC_PROTO_PYTHON - render the arg list of DCL into A for the
+ *                  - Python callable C wrapper
+ */
+
+static void doc_proto_python(char *a, int nc, char *dcn, fdecl *dcl)
+   {int i, na;
+    farg *al;
+
+    na = dcl->na;
+    al = dcl->al;
+
+    a[0] = '\0';
+
+    for (i = 0; i < na; i++)
+        {if (al[i].cls == TRUE)
+	    {vstrcat(a, nc, "%s.", al[i].name);
+	     break;};};
+
+    vstrcat(a, nc, "%s(", dcn);
+    if (na != 0)
+       {for (i = 0; i < na; i++)
+	    {if (al[i].cls == FALSE)
+		vstrcat(a, MAXLINE, "%s, ", al[i].name);};
+	a[strlen(a)-2] = '\0';};
+    nstrcat(a, nc, ")");
+
+    memmove(a, trim(a, BOTH, " "), nc);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* DOC_PROTO_NAME_ONLY - render the arg list of DCL into A using
  *                     - variable names only
  */
@@ -4094,10 +4128,11 @@ static void process_doc(char *t, int nc, char **com)
 
 static void html_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc)
    {int voidf;
+    char pr[MAXLINE];
     char upn[MAXLINE], lfn[MAXLINE], dcn[MAXLINE];
     char af[MAXLINE], as[MAXLINE], ap[MAXLINE];
     char fty[MAXLINE], t[MAXLINE];
-    char *cfn, **args, **com;
+    char *cfn, *bfn, **args, **com;
 
     cfn = dcl->proto.name;
 
@@ -4122,16 +4157,18 @@ static void html_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc)
     fprintf(fp, "<pre>\n");
 
 /* C */
-    fprintf(fp, "<i>C Binding: </i>       %s\n", dcl->proto.arg);
+    c_proto(pr, MAXLINE, dcl);
+    fprintf(fp, "<i>C Binding: </i>       %s\n", pr);
 
 /* Fortran */
-    if (has_binding(dcl, "fortran") == NULL)
+    bfn = has_binding(dcl, "fortran");
+    if (bfn == NULL)
        fprintf(fp, "<i>Fortran Binding: </i> none\n");
     else if (dcl->bindings != NULL)
        {args = dcl->tfproto;
 
 	doc_proto_fortran(af, MAXLINE, dcl);
-	map_name(dcn, MAXLINE, args[1], NULL, "f", -1, FALSE);
+	map_name(dcn, MAXLINE, args[1], bfn, "f", -1, FALSE);
 	if (voidf == TRUE)
 	   fprintf(fp, "<i>Fortran Binding: </i> %s(%s)\n",
 		   dcn, af);
@@ -4140,10 +4177,11 @@ static void html_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc)
 		   args[0], dcn, af);};
 
 /* Scheme */
-    if (has_binding(dcl, "scheme") == NULL)
+    bfn = has_binding(dcl, "scheme");
+    if (bfn == NULL)
        fprintf(fp, "<i>SX Binding: </i>      none\n");
     else if (dcl->bindings != NULL)
-       {map_name(dcn, MAXLINE, cfn, NULL, NULL, -1, TRUE);
+       {map_name(dcn, MAXLINE, cfn, bfn, NULL, -1, TRUE);
 	doc_proto_name_only(as, MAXLINE, dcl, NULL);
 	if (IS_NULL(as) == TRUE)
 	   fprintf(fp, "<i>SX Binding: </i>      (%s)\n", dcn);
@@ -4151,12 +4189,13 @@ static void html_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc)
 	   fprintf(fp, "<i>SX Binding: </i>      (%s %s)\n", dcn, as);};
 
 /* Python */
-    if (has_binding(dcl, "python") == NULL)
+    bfn = has_binding(dcl, "python");
+    if (bfn == NULL)
        fprintf(fp, "<i>Python Binding: </i>  none\n");
     else if (dcl->bindings != NULL)
-       {map_name(dcn, MAXLINE, cfn, NULL, NULL, -1, FALSE);
-	doc_proto_name_only(ap, MAXLINE, dcl, ",");
-	fprintf(fp, "<i>Python Binding: </i>  pact.%s(%s)\n", dcn, ap);};
+       {map_name(dcn, MAXLINE, cfn, bfn, NULL, -1, FALSE);
+	doc_proto_python(ap, MAXLINE, dcn, dcl);
+	fprintf(fp, "<i>Python Binding: </i>  %s\n", ap);};
 
     fprintf(fp, "</pre>\n");
     fprintf(fp, "<p>\n");
@@ -4265,8 +4304,8 @@ static void man_wrap(fdecl *dcl, char *sb, char *pck, int ndc, char **cdc)
 	fprintf(fp, ".sp\n");}
     else if (dcl->bindings != NULL)
        {map_name(dcn, MAXLINE, cfn, bfn, NULL, -1, FALSE);
-	doc_proto_name_only(ap, MAXLINE, dcl, ",");
-	fprintf(fp, ".B Python Binding:  %s(%s)\n", dcn, ap);
+	doc_proto_python(ap, MAXLINE, dcn, dcl);
+	fprintf(fp, ".B Python Binding:  %s\n", ap);
 	fprintf(fp, ".sp\n");};
 
     process_doc(t, MAXLINE, com);
