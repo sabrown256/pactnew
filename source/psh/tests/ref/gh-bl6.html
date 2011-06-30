@@ -6,10 +6,10 @@
 
 <p>
 <pre>
-<i>C Binding: </i>       int fa1(int a ARG(2,in))
-<i>Fortran Binding: </i> integer fa1_f(integer a)
-<i>SX Binding: </i>      (fa1 a)
-<i>Python Binding: </i>  pact.fa1(a)
+<i>C Binding: </i>       int fa1(int a)
+<i>Fortran Binding: </i> integer fa1f(integer a)
+<i>SX Binding: </i>      (fa1s a)
+<i>Python Binding: </i>  fa1p(a)
 </pre>
 <p>
 <p>
@@ -21,10 +21,10 @@
 
 <p>
 <pre>
-<i>C Binding: </i>       int fa3(int *a ARG([1,2,3],in), int *b ARG([1,2,3],io), int *c ARG([1,2,3],out))
-<i>Fortran Binding: </i> integer fa3_f(integer a(*), integer b(*), integer c(*))
-<i>SX Binding: </i>      (fa3 a b c)
-<i>Python Binding: </i>  pact.fa3(a, b, c)
+<i>C Binding: </i>       int fa3(int *a, int *b, int *c)
+<i>Fortran Binding: </i> integer fa3f(integer a(*), integer b(*), integer c(*))
+<i>SX Binding: </i>      (fa3s a b c)
+<i>Python Binding: </i>  fa3p(a, b, c)
 </pre>
 <p>
 <p>
@@ -36,10 +36,10 @@
 
 <p>
 <pre>
-<i>C Binding: </i>       int fa4(int *a ARG(,in), int *b ARG(,io), int *c ARG(,out))
-<i>Fortran Binding: </i> integer fa4_f(integer a(*), integer b(*), integer c(*))
-<i>SX Binding: </i>      (fa4 a b c)
-<i>Python Binding: </i>  pact.fa4(a, b, c)
+<i>C Binding: </i>       int fa4(int *a, int *b, int *c)
+<i>Fortran Binding: </i> integer fa4f(integer a(*), integer b(*), integer c(*))
+<i>SX Binding: </i>      (fa4s a b c)
+<i>Python Binding: </i>  fa4p(a, b, c)
 </pre>
 <p>
 <p>
@@ -51,10 +51,10 @@
 
 <p>
 <pre>
-<i>C Binding: </i>       void fb1(int a, int b ARG(1,in))
+<i>C Binding: </i>       void fb1(int a, int b)
 <i>Fortran Binding: </i> fb1_f(integer a, integer b)
 <i>SX Binding: </i>      (fb1 a b)
-<i>Python Binding: </i>  pact.fb1(a, b)
+<i>Python Binding: </i>  fb1(a, b)
 </pre>
 <p>
 <p>
@@ -66,10 +66,10 @@
 
 <p>
 <pre>
-<i>C Binding: </i>       void fb2(int a, int b ARG(,in))
+<i>C Binding: </i>       void fb2(int a, int b)
 <i>Fortran Binding: </i> fb2_f(integer a, integer b)
 <i>SX Binding: </i>      (fb2 a b)
-<i>Python Binding: </i>  pact.fb2(a, b)
+<i>Python Binding: </i>  fb2(a, b)
 </pre>
 <p>
 <p>
@@ -81,10 +81,10 @@
 
 <p>
 <pre>
-<i>C Binding: </i>       void fb3(int a, int b ARG(*,in))
+<i>C Binding: </i>       void fb3(int a, int b)
 <i>Fortran Binding: </i> fb3_f(integer a, integer b)
 <i>SX Binding: </i>      (fb3 a b)
-<i>Python Binding: </i>  pact.fb3(a, b)
+<i>Python Binding: </i>  fb3(a, b)
 </pre>
 <p>
 <p>
@@ -96,10 +96,10 @@
 
 <p>
 <pre>
-<i>C Binding: </i>       void fc1(int a, int *b ARG(NULL,in), int *c ARG(NULL,io), int *d ARG(NULL,out))
+<i>C Binding: </i>       void fc1(int a, int *b, int *c, int *d)
 <i>Fortran Binding: </i> fc1_f(integer a, integer b(*), integer c(*), integer d(*))
 <i>SX Binding: </i>      (fc1 a b c d)
-<i>Python Binding: </i>  pact.fc1(a, b, c, d)
+<i>Python Binding: </i>  fc1(a, b, c, d)
 </pre>
 <p>
 <p>
@@ -111,10 +111,10 @@
 
 <p>
 <pre>
-<i>C Binding: </i>       void fc2(int a, int *b ARG(,in), int *c ARG(,io), int *d ARG(,out))
+<i>C Binding: </i>       void fc2(int a, int *b, int *c, int *d)
 <i>Fortran Binding: </i> fc2_f(integer a, integer b(*), integer c(*), integer d(*))
 <i>SX Binding: </i>      (fc2 a b c d)
-<i>Python Binding: </i>  pact.fc2(a, b, c, d)
+<i>Python Binding: </i>  fc2(a, b, c, d)
 </pre>
 <p>
 <p>
@@ -126,10 +126,10 @@
 
 <p>
 <pre>
-<i>C Binding: </i>       void fc3(int a, int *b ARG(*,in), int *c ARG(*,io), int *d ARG(*,out))
+<i>C Binding: </i>       void fc3(int a, int *b, int *c, int *d)
 <i>Fortran Binding: </i> fc3_f(integer a, integer b(*), integer c(*), integer d(*))
 <i>SX Binding: </i>      (fc3 a b c d)
-<i>Python Binding: </i>  pact.fc3(a, b, c, d)
+<i>Python Binding: </i>  fc3(a, b, c, d)
 </pre>
 <p>
 <p>
@@ -141,10 +141,10 @@
 
 <p>
 <pre>
-<i>C Binding: </i>       void fc4(int a, int *b ARG([1],in), int *c ARG([1],io), int *d ARG([1],out))
+<i>C Binding: </i>       void fc4(int a, int *b, int *c, int *d)
 <i>Fortran Binding: </i> fc4_f(integer a, integer b(*), integer c(*), integer d(*))
 <i>SX Binding: </i>      (fc4 a b c d)
-<i>Python Binding: </i>  pact.fc4(a, b, c, d)
+<i>Python Binding: </i>  fc4(a, b, c, d)
 </pre>
 <p>
 <p>
@@ -156,10 +156,10 @@
 
 <p>
 <pre>
-<i>C Binding: </i>       void fc5(int a, int *b ARG([1,2],in), int *c ARG([1,2],io), int *d ARG([1,2],out))
+<i>C Binding: </i>       void fc5(int a, int *b, int *c, int *d)
 <i>Fortran Binding: </i> fc5_f(integer a, integer b(*), integer c(*), integer d(*))
 <i>SX Binding: </i>      (fc5 a b c d)
-<i>Python Binding: </i>  pact.fc5(a, b, c, d)
+<i>Python Binding: </i>  fc5(a, b, c, d)
 </pre>
 <p>
 <p>
@@ -171,10 +171,10 @@
 
 <p>
 <pre>
-<i>C Binding: </i>       void fc6(int a, int *b ARG([*],in), int *c ARG([*],io), int *d ARG([*],out))
+<i>C Binding: </i>       void fc6(int a, int *b, int *c, int *d)
 <i>Fortran Binding: </i> fc6_f(integer a, integer b(*), integer c(*), integer d(*))
 <i>SX Binding: </i>      (fc6 a b c d)
-<i>Python Binding: </i>  pact.fc6(a, b, c, d)
+<i>Python Binding: </i>  fc6(a, b, c, d)
 </pre>
 <p>
 <p>
@@ -186,10 +186,10 @@
 
 <p>
 <pre>
-<i>C Binding: </i>       void fc7(int a, int *b ARG([*,*],in), int *c ARG([*,*],io), int *d ARG([*,*],out))
+<i>C Binding: </i>       void fc7(int a, int *b, int *c, int *d)
 <i>Fortran Binding: </i> fc7_f(integer a, integer b(*), integer c(*), integer d(*))
 <i>SX Binding: </i>      (fc7 a b c d)
-<i>Python Binding: </i>  pact.fc7(a, b, c, d)
+<i>Python Binding: </i>  fc7(a, b, c, d)
 </pre>
 <p>
 <p>

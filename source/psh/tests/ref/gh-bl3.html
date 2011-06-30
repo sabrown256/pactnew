@@ -7,9 +7,9 @@
 <p>
 <pre>
 <i>C Binding: </i>       str *fe1(str *a1, int a2)
-<i>Fortran Binding: </i> type(C_PTR) fe1_f(type(C_PTR) a1, integer a2)
-<i>SX Binding: </i>      (fe1 a1 a2)
-<i>Python Binding: </i>  pact.fe1(a1, a2)
+<i>Fortran Binding: </i> type(C_PTR) fe1f(type(C_PTR) a1, integer a2)
+<i>SX Binding: </i>      (fe1s a1 a2)
+<i>Python Binding: </i>  fe1p(a1, a2)
 </pre>
 <p>
 <p>
@@ -22,9 +22,9 @@
 <p>
 <pre>
 <i>C Binding: </i>       void fe2(str *dev, double *x, double *y, int n, pcons *info, int l)
-<i>Fortran Binding: </i> fe2_f(type(C_PTR) dev, real(8) x(*), real(8) y(*), integer n, type(C_PTR) info, integer l)
-<i>SX Binding: </i>      (fe2 dev x y n info l)
-<i>Python Binding: </i>  pact.fe2(dev, x, y, n, info, l)
+<i>Fortran Binding: </i> fe2f(type(C_PTR) dev, real(8) x(*), real(8) y(*), integer n, type(C_PTR) info, integer l)
+<i>SX Binding: </i>      (fe2s dev x y n info l)
+<i>Python Binding: </i>  fe2p(dev, x, y, n, info, l)
 </pre>
 <p>
 <p>
