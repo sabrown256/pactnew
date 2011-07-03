@@ -410,7 +410,7 @@ static int _PN_sizeof(char *s)
  *            - NITEMS of type, TYPE, from IN and put them in OUT
  *            - all additional information comes from OUT_CHART
  *
- * #bind PN_conv_in fortran() scheme()
+ * #bind PN_conv_in fortran() scheme() python()
  */
 
 void PN_conv_in(void *out, void *in, char *type, long nitems,
@@ -445,7 +445,7 @@ void PN_conv_in(void *out, void *in, char *type, long nitems,
  *             - NITEMS of type, TYPE, from IN and put them in OUT
  *             - all additional information comes from OUT_CHART
  *
- * #bind PN_conv_out fortran() scheme()
+ * #bind PN_conv_out fortran() scheme() python()
  */
 
 void PN_conv_out(void *out, void *in, char *type, long nitems,
@@ -479,7 +479,7 @@ void PN_conv_out(void *out, void *in, char *type, long nitems,
  *           - for the associated standard and alignment
  *           - for network PDB
  *
- * #bind PN_target fortran() scheme()
+ * #bind PN_target fortran() scheme() python()
  */
 
 hasharr *PN_target(data_standard *std, data_alignment *align)
@@ -542,7 +542,7 @@ hasharr *PN_target(data_standard *std, data_alignment *align)
  *           -
  *           - Returns NULL if member types are unknown
  *
- * #bind PN_defstr fortran() scheme()
+ * #bind PN_defstr fortran() scheme() python()
  */
 
 defstr *PN_defstr(hasharr *chart, char *name, data_alignment *align,
@@ -606,7 +606,7 @@ defstr *PN_defstr(hasharr *chart, char *name, data_alignment *align,
 /* PN_OPEN - create a special pseudo PDBfile and set all the
  *         - io hooks appropriately
  *
- * #bind PN_open fortran() scheme()
+ * #bind PN_open fortran() scheme() python()
  */
 
 PDBfile *PN_open(PDBfile *fm, char *bf)
@@ -690,7 +690,7 @@ PDBfile *PN_open(PDBfile *fm, char *bf)
 /* PN_CLOSE - close the special pseudo PDBfile and reset all the
  *          - io hooks
  *
- * #bind PN_close fortran() scheme()
+ * #bind PN_close fortran() scheme() python()
  */
 
 int PN_close(PDBfile *file)
@@ -722,7 +722,7 @@ int PN_close(PDBfile *file)
 
 /* PN_WRITE - write the given data to the special pseudo PDBfile
  *
- * #bind PN_write fortran() scheme()
+ * #bind PN_write fortran() scheme() python()
  */
 
 int PN_write(PDBfile *file, char *type, long nitems, void *vr)
@@ -742,7 +742,7 @@ int PN_write(PDBfile *file, char *type, long nitems, void *vr)
 
 /* PN_READ - read the given data from the special pseudo PDBfile
  *
- * #bind PN_read fortran() scheme()
+ * #bind PN_read fortran() scheme() python()
  */
 
 int PN_read(PDBfile *file, char *type, long nitems, void *vr)

@@ -119,10 +119,10 @@ void PG_draw_multiple_line(PG_device *dev, int nlines,
 /* PG_DRAW_LINE_N - draw ND dimensional line segment (X1, X2) in 
  *                - coordinate system CS
  *
- * #bind PG_draw_line_n fortran() scheme()
+ * #bind PG_draw_line_n fortran() scheme() python(draw_line_n)
  */
 
-void PG_draw_line_n(PG_device *dev, int nd,
+void PG_draw_line_n(PG_device *dev ARG(,,cls), int nd,
 		    PG_coord_sys cs ARG(WORLDC),
 		    double *x1 ARG([0.0,0.0,0.0]),
 		    double *x2 ARG([1.0,1.0,1.0]),
@@ -164,10 +164,10 @@ void PG_draw_line_n(PG_device *dev, int nd,
  
 /* PG_DRAW_POLYLINE_N - draw a ND polyline in CS
  *
- * #bind PG_draw_polyline_n fortran() scheme()
+ * #bind PG_draw_polyline_n fortran() scheme() python(draw_polyline_n)
  */
  
-void PG_draw_polyline_n(PG_device *dev, int nd,
+void PG_draw_polyline_n(PG_device *dev ARG(,,cls), int nd,
 			PG_coord_sys cs ARG(WORLDC),
 			long n, double **x,
 			int clip ARG(TRUE))
@@ -222,10 +222,10 @@ void PG_draw_polyline_n(PG_device *dev, int nd,
  *                             - CLIP specifies wether the set is clipped
  *                             - to the viewport limits
  *
- * #bind PG_draw_disjoint_polyline_n fortran() scheme()
+ * #bind PG_draw_disjoint_polyline_n fortran() scheme() python(draw_disjoint_poyline_n)
  */
 
-void PG_draw_disjoint_polyline_n(PG_device *dev, int nd,
+void PG_draw_disjoint_polyline_n(PG_device *dev ARG(,,cls), int nd,
 				 PG_coord_sys cs ARG(WORLDC),
 				 long n, double **x,
 				 int clip ARG(TRUE))
@@ -255,10 +255,11 @@ void PG_draw_disjoint_polyline_n(PG_device *dev, int nd,
  *             - angle units (radians or degrees) specified by UNIT
  *             - from central point (X, Y)
  *
- * #bind PG_draw_rad fortran() scheme(pg-draw-radius)
+ * #bind PG_draw_rad fortran() scheme(pg-draw-radius) python(draw_rad)
  */
 
-void PG_draw_rad(PG_device *dev, double rmin, double rmax, double a,
+void PG_draw_rad(PG_device *dev ARG(,,cls),
+		 double rmin, double rmax, double a,
 		 double x, double y,
 		 int unit ARG(DEGREE))
    {double ca, sa;
@@ -288,10 +289,11 @@ void PG_draw_rad(PG_device *dev, double rmin, double rmax, double a,
  *             - angle units (radians or degrees) specified by UNIT
  *             - from central point (X, Y)
  *
- * #bind PG_draw_arc fortran() scheme()
+ * #bind PG_draw_arc fortran() scheme() python(draw_arc)
  */
 
-void PG_draw_arc(PG_device *dev, double r, double a1, double a2,
+void PG_draw_arc(PG_device *dev ARG(,,cls),
+		 double r, double a1, double a2,
 		 double x, double y, int unit)
    {double a, da, ca, sa;
     double xr[N_ANGLES], yr[N_ANGLES];

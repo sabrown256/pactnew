@@ -29,10 +29,10 @@ int
 /* PD_CD - change the current working directory
  *       - the directory may be specified by an absolute or relative path.
  *
- * #bind PD_cd fortran() scheme() python(<file>.cd)
+ * #bind PD_cd fortran() scheme() python(cd)
  */
 
-int PD_cd(PDBfile *file, char *dirname)
+int PD_cd(PDBfile *file ARG(,,cls), char *dirname)
    {char name[MAXLINE];
     syment *ep;
     PD_smp_state *pa;
@@ -88,10 +88,10 @@ int PD_cd(PDBfile *file, char *dirname)
  *       - This function simply installs a new symbol table entry. The new
  *       - syment is a copy of an already existing one, but with a new name.
  *
- * #bind PD_ln fortran() scheme() python(<file>.ln)
+ * #bind PD_ln fortran() scheme() python(ln)
  */
 
-int PD_ln(PDBfile *file, char *oldname, char *newname)
+int PD_ln(PDBfile *file ARG(,,cls), char *oldname, char *newname)
    {syment *oldep;
     char newpath[MAXLINE], oldpath[MAXLINE], dirname[MAXLINE];
     char *nname, *s, **avl;
@@ -403,13 +403,15 @@ char **_PD_ls_extr(PDBfile *file, char *path, char *type, long size,
  *       - returned. If path is null, the root directory is searched.
  *       - Directories are terminated with a slash.
  *
- * #bind PD_ls fortran() scheme() python(<file>.ls)
+ * #bind PD_ls fortran() scheme() python(ls)
  */
 
-char **PD_ls(PDBfile *file, char *path, char *type, int *num)
-   {
+char **PD_ls(PDBfile *file ARG(,,cls), char *path, char *type, int *num)
+   {char **rv;
 
-    return(_PD_ls_extr(file, path, type, -1L, num, FALSE, NULL));}
+    rv = _PD_ls_extr(file, path, type, -1L, num, FALSE, NULL);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -422,13 +424,16 @@ char **PD_ls(PDBfile *file, char *path, char *type, int *num)
  *           -                     hidden ones (first char == &) should be 
  *           -                     returned. 
  *
- * #bind PD_ls_alt fortran() scheme()
+ * #bind PD_ls_alt fortran() scheme() python(ls_alt)
  */
 
-char **PD_ls_alt(PDBfile *file, char *path, char *type, int *num, char *flags)
-   {
+char **PD_ls_alt(PDBfile *file ARG(,,cls), char *path,
+		 char *type, int *num, char *flags)
+   {char **rv;
 
-    return(_PD_ls_extr(file, path, type, -1L, num, FALSE, flags));}
+    rv = _PD_ls_extr(file, path, type, -1L, num, FALSE, flags);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -460,10 +465,10 @@ static int _PD_wr_dir(PDBfile *file, char *name)
 /* PD_DEF_DIR - define and initialize the directory machinery for
  *            - the given FILE
  *
- * #bind PD_def_dir fortran() scheme()
+ * #bind PD_def_dir fortran() scheme() python(def_dir)
  */
 
-int PD_def_dir(PDBfile *file)
+int PD_def_dir(PDBfile *file ARG(,,cls))
    {int ret;
 
     ret = TRUE;
@@ -517,10 +522,10 @@ static int _PD_exist_path(PDBfile *file, char *path)
 
 /* PD_ISDIR - return TRUE iff DIR is a directory of FILE
  *
- * #bind PD_isdir fortran() scheme() python(<file>.isdir)
+ * #bind PD_isdir fortran() scheme() python(isdir)
  */
 
-int PD_isdir(PDBfile *file, char *dir)
+int PD_isdir(PDBfile *file ARG(,,cls), char *dir)
    {int ret;
     char name[MAXLINE];
     syment *ep;
@@ -556,10 +561,10 @@ int PD_isdir(PDBfile *file, char *dir)
 /* PD_MKDIR - create a directory
  *          - the directory may be specified by an absolute or relative path
  *
- * #bind PD_mkdir fortran() scheme() python(<file>.mkdir)
+ * #bind PD_mkdir fortran() scheme() python(mkdir)
  */
 
-int PD_mkdir(PDBfile *file, char *dir)
+int PD_mkdir(PDBfile *file ARG(,,cls), char *dir)
    {int ret;
     char name[MAXLINE];
     PD_smp_state *pa;
@@ -608,10 +613,10 @@ int PD_mkdir(PDBfile *file, char *dir)
 
 /* PD_PWD - return the current working directory
  *
- * #bind PD_pwd fortran() scheme() python(<file>.pwd)
+ * #bind PD_pwd fortran() scheme() python(pwd)
  */
 
-char *PD_pwd(PDBfile *file)
+char *PD_pwd(PDBfile *file ARG(,,cls))
    {char *cwd, *pre;
     PD_smp_state *pa;
 

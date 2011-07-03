@@ -68,7 +68,7 @@ int _PG_get_fill_contour_color(PG_device *dev, int l, int n)
 
 /* PG_CONTOUR_LEVELS - compute an array of contour levels
  *
- * #bind PG_contour_levels fortran() scheme()
+ * #bind PG_contour_levels fortran() scheme() python()
  */
 
 int PG_contour_levels(double *lev, int nlev, double fmin, double fmax,
@@ -536,10 +536,10 @@ static void _PG_iso_nc_lr_2d(PG_device *dev, double *a,
  *                   - the mesh topology is always ignored and is there
  *                   - to be call compatible with the AC version
  *
- * #bind PG_draw_iso_nc_lr fortran() scheme()
+ * #bind PG_draw_iso_nc_lr fortran() scheme() python(draw_iso_nc_lr)
  */
 
-void PG_draw_iso_nc_lr(PG_device *dev, double *a,
+void PG_draw_iso_nc_lr(PG_device *dev ARG(,,cls), double *a,
 		       int ndd, double **x, double *lev,
 		       int nlev, int id, void *cnnct, pcons *alist)
    {int method;

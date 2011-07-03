@@ -21,10 +21,10 @@
  *                  - the input value
  *                  - returns the old value
  *
- * #bind PD_mp_set_serial fortran() scheme(pd-mp-set-serial!)
+ * #bind PD_mp_set_serial fortran() scheme(pd-mp-set-serial!) python(mp_set_serial)
  */
 
-int PD_mp_set_serial(PDBfile *file, int flag)
+int PD_mp_set_serial(PDBfile *file ARG(,,cls), int flag)
    {int ret;
 
    ret = file->mpi_mode;
@@ -38,7 +38,7 @@ int PD_mp_set_serial(PDBfile *file, int flag)
 /* PD_MP_SET_COLLECTIVE - set the I/O (write right now)
  *                      - operations to be collective
  *
- * #bind PD_mp_set_collective fortran() scheme(pd-mp-set-collective!)
+ * #bind PD_mp_set_collective fortran() scheme(pd-mp-set-collective!) python()
  */
 
 int PD_mp_set_collective(int flag)
@@ -57,7 +57,7 @@ int PD_mp_set_collective(int flag)
  *              - if comm == SC_COMM_SELF the file is opened only on the
  *              - local processor
  *
- * #bind PD_mp_create fortran() scheme()
+ * #bind PD_mp_create fortran() scheme() python()
  */
 
 PDBfile *PD_mp_create(char *name, SC_communicator *comm)
@@ -82,7 +82,7 @@ PDBfile *PD_mp_create(char *name, SC_communicator *comm)
  *            - if comm == SC_COMM_SELF the file is opened only on the
  *            - local processor
  *
- * #bind PD_mp_open fortran() scheme()
+ * #bind PD_mp_open fortran() scheme() python()
  */
 
 PDBfile *PD_mp_open(char *name, char *mode, SC_communicator comm)

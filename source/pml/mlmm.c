@@ -352,7 +352,7 @@ PM_set *PM_copy_set(PM_set *s)
 /* PM_MAKE_SET_ALT - given the name, shape, and elements of a set
  *                 - build the set structure and fill it
  *
- * #bind PM_make_set_alt fortran() scheme()
+ * #bind PM_make_set_alt fortran() scheme() python()
  */
 
 PM_set *PM_make_set_alt(char *name, char *type, int cp, int nd,
@@ -546,7 +546,7 @@ PM_set *PM_mk_set(char *name, char *type, int cp, long ne,
 
 /* PM_REL_SET - release the storage associated with a set
  *
- * #bind PM_rel_set fortran() scheme()
+ * #bind PM_rel_set fortran() scheme() python()
  */
 
 void PM_rel_set(PM_set *set, int mfl)
@@ -1251,7 +1251,7 @@ void PM_promote_array(C_array *a, char *ntyp, int flag)
  *                 - all together in a freshly allocated PM_mapping
  *                 - and return a pointer to it
  *
- * #bind PM_make_mapping fortran() scheme()
+ * #bind PM_make_mapping fortran() scheme() python()
  */
 
 PM_mapping *PM_make_mapping(char *name, char *cat,
@@ -1320,7 +1320,7 @@ PM_mapping *PM_build_grotrian(char *name, char *type,
 
 /* PM_REL_MAPPING - release the given mapping and its sets
  *
- * #bind PM_rel_mapping fortran() scheme()
+ * #bind PM_rel_mapping fortran() scheme() python()
  */
 
 void PM_rel_mapping(PM_mapping *f, int rld, int rlr)

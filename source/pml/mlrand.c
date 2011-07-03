@@ -257,7 +257,7 @@ double PM_grand_48(void)
  *              - return a pseudo-random number between -1 and 1
  *              - use the linear congruential sequence function
  *
- * #bind PM_random_48 fortran() scheme()
+ * #bind PM_random_48 fortran() scheme() python()
  */
 
 double PM_random_48(double x)
@@ -273,7 +273,7 @@ double PM_random_48(double x)
 /* PM_RANDOM_S - return a random number between -1 and 1
  *             - use the system rand function
  *
- * #bind PM_random_s fortran() scheme()
+ * #bind PM_random_s fortran() scheme() python()
  */
 
 double PM_random_s(double x)

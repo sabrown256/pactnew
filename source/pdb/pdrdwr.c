@@ -160,7 +160,7 @@ int _PD_indirection(char *s)
  *                - insert '\0' in its place
  *                - return a pointer to the beginning of the string
  *
- * #bind PD_dereference fortran() scheme()
+ * #bind PD_dereference fortran() scheme() python()
  */
 
 char *PD_dereference(char *s)
@@ -383,10 +383,10 @@ long _PD_hyper_number(PDBfile *file, char *indxpr, long numb, dimdes *dims, long
  *                 - return the number of elements implied by a hyper
  *                 - index expression
  *
- * #bind PD_hyper_number fortran() scheme()
+ * #bind PD_hyper_number fortran() scheme() python(hyper_number)
  */
 
-long PD_hyper_number(PDBfile *file, char *name, syment *ep)
+long PD_hyper_number(PDBfile *file ARG(,,cls), char *name, syment *ep)
    {int c;
     long rv;
     char s[MAXLINE];
@@ -1565,10 +1565,11 @@ int _PD_hyper_read(PDBfile *file, char *name, char *outtype,
  *              -   PAN     the number of items found 
  *              -   PDATA   the data array returned
  *
- * #bind PD_read_bits fortran() scheme()
+ * #bind PD_read_bits fortran() scheme() python(read_bits)
  */
 
-int PD_read_bits(PDBfile *file, char *name, char *type, long nitems,
+int PD_read_bits(PDBfile *file ARG(,,cls),
+		 char *name, char *type, long nitems,
 		 int sgned, int nbits, int padsz, int fpp,
 		 long offs, long *pan, char **pdata)
    {int ret;

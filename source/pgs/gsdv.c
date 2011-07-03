@@ -57,7 +57,8 @@ int
  * #bind PG_open_device fortran() scheme() python(open)
  */
  
-PG_device *PG_open_device(PG_device *dev, double xf, double yf,
+PG_device *PG_open_device(PG_device *dev ARG(,,cls),
+			  double xf, double yf,
 			  double dxf, double dyf)
    {
 
@@ -122,10 +123,11 @@ void PG_device_filename(char *fname, char *raw, char *ext)
 
 /* PG_QUERY_DEVICE - query some physical device characteristics
  *
- * #bind PG_query_device fortran() scheme()
+ * #bind PG_query_device fortran() scheme() python(query_device)
  */
 
-void PG_query_device(PG_device *dev, int *pdx, int *pdy, int *pnc)
+void PG_query_device(PG_device *dev ARG(,,cls),
+		     int *pdx, int *pdy, int *pnc)
    {int dx[PG_SPACEDM];
 
     PG_query_screen_n(dev, dx, pnc);
@@ -140,10 +142,10 @@ void PG_query_device(PG_device *dev, int *pdx, int *pdy, int *pnc)
 
 /* PG_QUERY_WINDOW - query the window shape
  *
- * #bind PG_query_window fortran() scheme()
+ * #bind PG_query_window fortran() scheme() python(query_window)
  */
 
-void PG_query_window(PG_device *dev, int *pdx, int *pdy)
+void PG_query_window(PG_device *dev ARG(,,cls), int *pdx, int *pdy)
    {PG_dev_geometry *g;
 
     g = &dev->g;
@@ -251,10 +253,10 @@ void _PG_remove_device(PG_device *dev)
 /* PG_WRITE_N - print formatted output
  *            - at the specified coordinates in CS
  *
- * #bind PG_write_n fortran() scheme()
+ * #bind PG_write_n fortran() scheme() python(write_n)
  */
 
-int PG_write_n(PG_device *dev, int nd ARG(2),
+int PG_write_n(PG_device *dev ARG(,,cls), int nd ARG(2),
 	       PG_coord_sys cs ARG(NORMC),
 	       double *x ARG([0.0,0.0]),
 	       char *fmt, ...)

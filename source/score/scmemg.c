@@ -190,7 +190,7 @@ void *_SC_realloc_guarded(void *p, size_t nb)
 
 /* SC_USE_GUARDED_MEM - setup to use mprotect'd memory
  *
- * #bind SC_use_guarded_mem fortran()
+ * #bind SC_use_guarded_mem fortran() python()
  */
 
 void SC_use_guarded_mem(int on)

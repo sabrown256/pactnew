@@ -91,7 +91,7 @@ void PG_rl_all(void)
  *                  - which will describe a 1d graph and return a pointer
  *                  - to it
  *
- * #bind PG_make_graph_1d fortran() scheme()
+ * #bind PG_make_graph_1d fortran() scheme() python()
  */
 
 PG_graph *PG_make_graph_1d(int id, char *label, int cp, int n,
@@ -319,7 +319,7 @@ void PG_rl_graph(PG_graph *g, int rld, int rlr)
  *                    - to do so they must register a setup function
  *                    - under the device name
  *
- * #bind PG_register_device fortran() scheme()
+ * #bind PG_register_device fortran() scheme() python()
  */
 
 void PG_register_device(char *name, PFRDev fnc)
@@ -627,7 +627,7 @@ static PG_device *PG_make_raw_device(char *name, char *type, char *title,
  *                -        MONOCHROME - black and white display
  *                -        COLOR      - color display
  *
- * #bind PG_make_device fortran() scheme()
+ * #bind PG_make_device fortran() scheme() python()
  */
 
 PG_device *PG_make_device(char *name, char *type, char *title)
@@ -781,10 +781,11 @@ void PG_save_view_attributes(PG_view_attributes *d, PG_device *dev)
 /* PG_RESTORE_VIEW_ATTRIBUTES - restore the PG_view_attributes to the
  *                            - graphical device
  *
- * #bind PG_restore_view_attributes fortran() scheme()
+ * #bind PG_restore_view_attributes fortran() scheme() python(restore_view_attributes)
  */
 
-void PG_restore_view_attributes(PG_device *dev, PG_view_attributes *d)
+void PG_restore_view_attributes(PG_device *dev ARG(,,cls),
+				PG_view_attributes *d)
    {int id;
 
     dev->finished = d->finished;

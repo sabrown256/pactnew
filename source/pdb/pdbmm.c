@@ -172,10 +172,10 @@ void _PD_rl_pdb(PDBfile *file)
 
 /* PD_ALLOC_ENTRY - allocate memory for the variable type
  *
- * #bind PD_alloc_entry fortran() scheme()
+ * #bind PD_alloc_entry fortran() scheme() python(alloc_entry)
  */
 
-void *PD_alloc_entry(PDBfile *file, char *name)
+void *PD_alloc_entry(PDBfile *file ARG(,,cls), char *name)
    {syment *ep;
     void *ret;
 
@@ -376,7 +376,7 @@ void _PD_rl_alignment(data_alignment *align)
 
 /* PD_COPY_DIMS - make and return a copy of the given dimension list
  *
- * #bind PD_copy_dims fortran() scheme()
+ * #bind PD_copy_dims fortran() scheme() python()
  */
 
 dimdes *PD_copy_dims(dimdes *odims)
@@ -405,7 +405,7 @@ dimdes *PD_copy_dims(dimdes *odims)
 
 /* PD_COPY_SYMENT - make and return a copy of the given syment
  *
- * #bind PD_copy_syment fortran() scheme()
+ * #bind PD_copy_syment fortran() scheme() python()
  */
 
 syment *PD_copy_syment(syment *osym)
@@ -744,7 +744,7 @@ void _PD_free_tuple(multides *tuple)
 
 /* PD_COPY_MEMBERS - copy a linked list of members
  *
- * #bind PD_copy_members fortran() scheme()
+ * #bind PD_copy_members fortran() scheme() python()
  */
 
 memdes *PD_copy_members(memdes *desc)

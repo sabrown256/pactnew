@@ -475,7 +475,7 @@ void _SC_print_block_info(FILE *fp, SC_heap_des *ph, void *ptr, int flag)
  *             -    PN  allocated name
  *             - return TRUE iff P is valid
  *
- * #bind SC_mem_info fortran() python(mem_info)
+ * #bind SC_mem_info fortran() python(mem_info) python()
  */
 
 int SC_mem_info(void *p, long *pl, int *pt, int *pr, char **pn)

@@ -253,10 +253,10 @@ static int PG_write_interface_object(FILE *fp, PG_interface_object *iob,
  *                    - given file
  *                    - return TRUE iff successful
  *
- * #bind PG_write_interface fortran() scheme()
+ * #bind PG_write_interface fortran() scheme() python(write_interface)
  */
 
-int PG_write_interface(PG_device *dev, char *name)
+int PG_write_interface(PG_device *dev ARG(,,cls), char *name)
    {int i, niobs, ret;
     char indent[MAXLINE];
     PG_interface_object *iob;
@@ -628,10 +628,10 @@ static PG_interface_object *_PG_read_interface_object(PG_device *dev, FILE *fp,
  *                   - given file
  *                   - return TRUE iff successful
  *
- * #bind PG_read_interface fortran() scheme()
+ * #bind PG_read_interface fortran() scheme() python(read_interface)
  */
 
-int PG_read_interface(PG_device *dev, char *name)
+int PG_read_interface(PG_device *dev ARG(,,cls), char *name)
    {int ns;
     PG_interface_object *iob, *piob, *parent;
     FILE *fp;

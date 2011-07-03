@@ -132,7 +132,7 @@ complex *PM_uniform_complex_y(int no, double *xo,
 
 /* PM_NEXT_EXP_TWO - return the largest M such that 2^M <= N
  *
- * #bind PM_next_exp_two fortran() scheme()
+ * #bind PM_next_exp_two fortran() scheme() python()
  */
 
 int PM_next_exp_two(int n)
@@ -384,7 +384,7 @@ complex *PM_fft_sc_real(double *x, int n, int flag)
  *                     - return the number of points in the transform arrays
  *                     - if successful and 0 otherwise
  *
- * #bind PM_fft_sc_real_data fortran() scheme()
+ * #bind PM_fft_sc_real_data fortran() scheme() python()
  */
 
 int PM_fft_sc_real_data(complex **pyo, double **pxo, double *xi, double *yi,
@@ -432,7 +432,7 @@ int PM_fft_sc_real_data(complex **pyo, double **pxo, double *xi, double *yi,
  *                        - return the number of points in the transform
  *                        - arrays if successful and 0 otherwise
  *
- * #bind PM_fft_sc_complex_data fortran() scheme()
+ * #bind PM_fft_sc_complex_data fortran() scheme() python()
  */
 
 int PM_fft_sc_complex_data(complex **pyo, double **pxo, double *xi,

@@ -71,6 +71,10 @@ struct s_haelem
 	      LAST);                                               \
     PD_cast(_f, "haelem", "def", "type");}
 
+/*
+ * #bind derived hasharr character-A SS_HASHARR_I PP_hasharrObject NULL
+ */
+
 struct s_hasharr
    {int size;                /* number of buckets */
     int docp;                /* TRUE iff doc available in hash elements */

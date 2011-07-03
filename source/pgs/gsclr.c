@@ -1586,10 +1586,10 @@ int PG_select_color(PG_device *dev, int n, double *a, double *extr)
 /* PG_FGET_PALETTE - return the palette of DEV specified by NAME
  *                 - if NAME is NULL return current palette
  *
- * #bind PG_fget_palette fortran() scheme()
+ * #bind PG_fget_palette fortran() scheme() python(get_palette)
  */
 
-PG_palette *PG_fget_palette(PG_device *dev, char *name)
+PG_palette *PG_fget_palette(PG_device *dev ARG(,,cls), char *name)
    {PG_palette *pal;
 
     if (name == NULL)
@@ -1958,10 +1958,10 @@ static void _PG_pal_mouse_ev_hand(PG_device *dev, PG_event *ev)
 
 /* PG_SHOW_PALETTES - display the palettes for the given device
  *
- * #bind PG_show_palettes fortran() scheme(pg-show-palettes)
+ * #bind PG_show_palettes fortran() scheme(pg-show-palettes) python(show_palettes)
  */
 
-void PG_show_palettes(PG_device *sdev, char *type, int wbck)
+void PG_show_palettes(PG_device *sdev ARG(,,cls), char *type, int wbck)
    {int i, j, k, np, page;
     double y, dy, z, old, wd;
     double obx[PG_BOXSZ], rbx[PG_BOXSZ], p[PG_SPACEDM];

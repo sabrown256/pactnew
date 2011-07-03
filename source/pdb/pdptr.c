@@ -443,10 +443,10 @@ static long _PD_ptr_find_addr(PDBfile *file, int64_t addr)
  *                   - is re-initialized this will give the application
  *                   - some control over this process
  *
- * #bind PD_reset_ptr_list fortran() scheme()
+ * #bind PD_reset_ptr_list fortran() scheme() python(reset_ptr_list)
  */
 
-int PD_reset_ptr_list(PDBfile *file)
+int PD_reset_ptr_list(PDBfile *file ARG(,,cls))
    {long i, ni;
     PD_address *ad;
 

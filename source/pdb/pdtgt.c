@@ -65,7 +65,7 @@ data_alignment
 /* PD_TARGET_N_PLATFORMS - return the number of pre-defined target platforms
  *                       - this is mainly support for the test suite
  *
- * #bind PD_target_n_platforms fortran() scheme()
+ * #bind PD_target_n_platforms fortran() scheme() python()
  */
 
 int PD_target_n_platforms(void)
@@ -82,7 +82,7 @@ int PD_target_n_platforms(void)
  *                    - return TRUE iff platform is known
  *                    - this is mainly support for the test suite
  *
- * #bind PD_target_platform fortran() scheme()
+ * #bind PD_target_platform fortran() scheme() python()
  */
 
 int PD_target_platform(char *tgt)
@@ -109,7 +109,7 @@ int PD_target_platform(char *tgt)
  *                      - return TRUE iff platform is known
  *                      - this is mainly support for the test suite
  *
- * #bind PD_target_platform_n fortran() scheme()
+ * #bind PD_target_platform_n fortran() scheme() python()
  */
 
 int PD_target_platform_n(int np)
@@ -132,7 +132,7 @@ int PD_target_platform_n(int np)
 /* PD_TARGET_PLATFORM_NAME - return the name of the Nth target platform
  *                         - this is mainly support for the test suite
  *
- * #bind PD_target_platform_name fortran() scheme()
+ * #bind PD_target_platform_name fortran() scheme() python()
  */
 
 char *PD_target_platform_name(int np)
@@ -162,7 +162,7 @@ char *PD_target_platform_name(int np)
  *           - with PD_TARGET
  *           - (note that PD_OPEN sets file->std and file->align)
  *
- * #bind PD_target fortran() scheme()
+ * #bind PD_target fortran() scheme() python()
  */
 
 int PD_target(data_standard *data, data_alignment *align)

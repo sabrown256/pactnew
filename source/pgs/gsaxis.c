@@ -574,10 +574,10 @@ static void _PG_aux_axis(PG_device *dev, int axis_type)
 /* PG_AXIS - draw the axes
  *         - the information for this is set up by a setlimits call
  *
- * #bind PG_axis fortran() scheme()
+ * #bind PG_axis fortran() scheme() python(axis)
  */
  
-void PG_axis(PG_device *dev, int axis_type ARG(CARTESIAN_2D))
+void PG_axis(PG_device *dev ARG(,,cls), int axis_type ARG(CARTESIAN_2D))
    {PG_dev_attributes *attr;
 
     if (_PG_gattrs.axis_on == FALSE)
@@ -1289,10 +1289,11 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
  *                - would have en[0] = en[1]
  *                - This is independent of tick type!
  *
- * #bind PG_draw_axis_n fortran() scheme()
+ * #bind PG_draw_axis_n fortran() scheme() python(draw_axis_n)
  */
 
-PG_axis_def *PG_draw_axis_n(PG_device *dev, double *xl, double *xr,
+PG_axis_def *PG_draw_axis_n(PG_device *dev ARG(,,cls),
+			    double *xl, double *xr,
 			    double *tn, double *vw, double sc,
 			    char *format, int tick_type, int label_type,
 			    int flag, ...)
@@ -1380,10 +1381,11 @@ PG_axis_def *PG_draw_axis_n(PG_device *dev, double *xl, double *xr,
 
 /* PG_AXIS_3 - draw a set of axes for a surface plot
  *
- * #bind PG_axis_3 fortran() scheme()
+ * #bind PG_axis_3 fortran() scheme() python(axis_3)
  */
 
-void PG_axis_3(PG_device *dev, double **x, int np, double *databox)
+void PG_axis_3(PG_device *dev ARG(,,cls),
+	       double **x, int np, double *databox)
    {int lc, ls;
     double x1[PG_SPACEDM], x2[PG_SPACEDM];
     double **p;
@@ -1438,7 +1440,7 @@ void PG_axis_3(PG_device *dev, double **x, int np, double *databox)
 
 /* PG_FGET_AXIS_DECADES - get the number of decades for axis plotting
  *
- * #bind PG_fget_axis_decades fortran() scheme()
+ * #bind PG_fget_axis_decades fortran() scheme() python()
  */
 
 double PG_fget_axis_decades(void)
@@ -1453,7 +1455,7 @@ double PG_fget_axis_decades(void)
 
 /* PG_FSET_AXIS_DECADES - set the number of decades for axis plotting
  *
- * #bind PG_fset_axis_decades fortran() scheme()
+ * #bind PG_fset_axis_decades fortran() scheme() python()
  */
 
 double PG_fset_axis_decades(double d)

@@ -347,10 +347,10 @@ int _PD_csum_file_write(PDBfile *file)
  *           - return -1 if there is no checksum in the extras table to 
  *           - verify with 
  *
- * #bind PD_verify fortran() scheme()
+ * #bind PD_verify fortran() scheme() python(verify)
  */
 
-int PD_verify(PDBfile *file)
+int PD_verify(PDBfile *file ARG(,,cls))
    {int i, ok;
     int64_t prev, addr;
     unsigned char cso[PD_CKSUM_LEN], csn[PD_CKSUM_LEN];
@@ -402,10 +402,10 @@ int PD_verify(PDBfile *file)
  *                   - PD_MD5_RW sets variable level checksumming
  *                   - during PD_write and PD_read calls
  *
- * #bind PD_activate_cksum fortran() scheme()
+ * #bind PD_activate_cksum fortran() scheme() python(activate_cksum)
  */
 
-int PD_activate_cksum(PDBfile *file, PD_checksum_mode flag) 
+int PD_activate_cksum(PDBfile *file ARG(,,cls), PD_checksum_mode flag) 
     {int ov;
 
      ov              = file->use_cksum;

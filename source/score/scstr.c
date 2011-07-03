@@ -1301,7 +1301,7 @@ int SC_strings_file(char **sa, char *fname, char *mode)
 /* SC_FREE_STRINGS - free the an array of strings SA
  *                 - and each string in the array
  *
- * #bind SC_free_strings fortran()
+ * #bind SC_free_strings fortran() python()
  */
 
 void SC_free_strings(char **sa)
