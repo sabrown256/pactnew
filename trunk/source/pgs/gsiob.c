@@ -320,7 +320,7 @@ static void _PG_find_registered(PG_interface_object *iob, haelem **php,
  *                      - pointers which is inappropriate for this general
  *                      - purpose mechanism
  *
- * #bind PG_register_callback fortran() scheme()
+ * #bind PG_register_callback fortran() scheme() python()
  */
 
 void PG_register_callback(char *name, ...)
@@ -367,7 +367,7 @@ PFVoid PG_lookup_callback(char *name)
  *                      - this lets the read and write connect names
  *                      - with call back variables
  *
- * #bind PG_register_variable fortran() scheme()
+ * #bind PG_register_variable fortran() scheme() python()
  */
 
 void PG_register_variable(char *name, char *type,
@@ -628,10 +628,10 @@ void PG_draw_interface_object(PG_interface_object *iob)
 /* PG_DRAW_INTERFACE_OBJECTS - draw all of the visible interface objects
  *                           - which belong to the given device
  *
- * #bind PG_draw_interface_objects fortran() scheme()
+ * #bind PG_draw_interface_objects fortran() scheme() python(draw_interface_objects)
  */
 
-void PG_draw_interface_objects(PG_device *dev)
+void PG_draw_interface_objects(PG_device *dev ARG(,,cls))
    {int i, niobs;
     PG_interface_object *iob;
 

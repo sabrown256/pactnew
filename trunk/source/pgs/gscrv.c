@@ -1109,10 +1109,11 @@ void PG_polar_plot(PG_device *dev, double *x, double *y, int n, int lncol,
 
 /* PG_PLOT_CURVE - dispatch to the desired curve plotting routine
  *
- * #bind PG_plot_curve fortran() scheme()
+ * #bind PG_plot_curve fortran() scheme() python(plot_curve)
  */
 
-void PG_plot_curve(PG_device *dev, double *x, double *y, int n, pcons *info, int l)
+void PG_plot_curve(PG_device *dev ARG(,,cls),
+		   double *x, double *y, int n, pcons *info, int l)
    {int lncol, lnsty, scatter, marker, start, hiddn;
     int ofc, fcol;
     double lnwid;

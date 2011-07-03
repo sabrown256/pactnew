@@ -15,10 +15,10 @@
 
 /* PD_WRT_CURVE_ALT - write an ULTRA curve into a PDB file
  *
- * #bind PD_wrt_curve_alt fortran()
+ * #bind PD_wrt_curve_alt fortran() python(wrt_curve_alt)
  */
 
-int PD_wrt_curve_alt(PDBfile *file, char *labl,
+int PD_wrt_curve_alt(PDBfile *file ARG(,,cls), char *labl,
 		     int n, double *x, double *y, int *sic)
    {int rv;
 
@@ -35,10 +35,10 @@ int PD_wrt_curve_alt(PDBfile *file, char *labl,
 
 /* PD_WRT_CURVE_Y_ALT - write the y values for an ULTRA curve into a PDB file
  *
- * #bind PD_wrt_curve_y_alt fortran()
+ * #bind PD_wrt_curve_y_alt fortran() python(wrt_curve_y_alt)
  */
 
-int PD_wrt_curve_y_alt(PDBfile *file, char *labl,
+int PD_wrt_curve_y_alt(PDBfile *file ARG(,,cls), char *labl,
 		       int n, int ix, double *y, int *sic)
    {int rv;
 
@@ -111,10 +111,11 @@ static PM_set *_PD_build_set(int *ai, double *ad, char *sname)
  *        - dm[nde*ne] - dm[nde*ne + ne] : values of nde'th component of
  *        -                                elements
  *
- * #bind PD_wrt_set fortran()
+ * #bind PD_wrt_set fortran() python(wrt_set)
  */
 
-int PD_wrt_set(PDBfile *file, char *dname, int *adp, double *adm)
+int PD_wrt_set(PDBfile *file ARG(,,cls),
+	       char *dname, int *adp, double *adm)
    {int rv;
     PM_set *set;
 
@@ -162,10 +163,10 @@ int PD_wrt_set(PDBfile *file, char *dname, int *adp, double *adm)
  *        - dm[nde*ne] - dm[nde*ne + ne] : values of nde'th component of
  *        -                                elements
  *
- * #bind PD_wrt_map fortran()
+ * #bind PD_wrt_map fortran() python(wrt_map)
  */
 
-int PD_wrt_map(PDBfile *file,
+int PD_wrt_map(PDBfile *file ARG(,,cls),
 	       char *dname, int *adp, double *adm,
 	       char *rname, int *arp, double *arm,
 	       int *sim)
@@ -230,10 +231,10 @@ int PD_wrt_map(PDBfile *file,
  *        - rm[nde*ne] - rm[nde*ne + ne] : values of nde'th component of
  *        -                                elements
  *
- * #bind PD_wrt_map_ran fortran()
+ * #bind PD_wrt_map_ran fortran() python(wrt_map_ran)
  */
 
-int PD_wrt_map_ran(PDBfile *file, char *dname,
+int PD_wrt_map_ran(PDBfile *file ARG(,,cls), char *dname,
 		   char *rname, int *arp, double *arm,
 		   pcons *info, int *sim)
    {int i;

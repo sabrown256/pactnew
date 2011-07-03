@@ -192,10 +192,11 @@ static int _PD_ptr_sz_itags(long *pnb, PDBfile *file, void *vr,
  *           - a subsequent PD_write will use by the amount of space
  *           - for pointees already written
  *
- * #bind PD_sizeof fortran() scheme()
+ * #bind PD_sizeof fortran() scheme() python(sizeof)
  */
 
-long PD_sizeof(PDBfile *file, char *type, long nitems, void *vri)
+long PD_sizeof(PDBfile *file ARG(,,cls),
+	       char *type, long nitems, void *vri)
    {int dst, size, indir, itags;
     long i, nb;
     char bf[MAXLINE], *ltype, *vr, *svr, *ttype;
@@ -404,7 +405,7 @@ long PD_sizeof(PDBfile *file, char *type, long nitems, void *vri)
  *             - this is to cover the case of multiply referenced spaces
  *             - buffers which have been passed around
  *
- * #bind PN_relocate fortran() scheme()
+ * #bind PN_relocate fortran() scheme() python()
  */
 
 int PN_relocate(PDBfile *file, char *type, long n)

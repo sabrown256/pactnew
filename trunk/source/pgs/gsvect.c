@@ -290,10 +290,11 @@ static void _PG_draw_vct_zc_ac(PG_device *dev, double **u, double **r,
  *                  -   X base points of vectors
  *                  -   U vectors
  *
- * #bind PG_draw_vector_n fortran() scheme()
+ * #bind PG_draw_vector_n fortran() scheme() python(draw_vector_n)
  */
 
-void PG_draw_vector_n(PG_device *dev, int nd, PG_coord_sys cs, long n,
+void PG_draw_vector_n(PG_device *dev ARG(,,cls),
+		      int nd, PG_coord_sys cs, long n,
 		      double **x, double **u)
    {int i, l, id, il, iw, imx, jd, jl, nl, nsv, nw;
     double xc, xs, r, f, lscale, size, hs, sf;

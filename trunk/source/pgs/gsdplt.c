@@ -1043,10 +1043,10 @@ PG_picture_desc *PG_setup_picture_mesh(PG_device *dev, PG_graph *data,
  
 /* PG_DOMAIN_PLOT - plot the mesh of the given domain set
  *
- * #bind PG_domain_plot fortran() scheme()
+ * #bind PG_domain_plot fortran() scheme() python(domain_plot)
  */
 
-void PG_domain_plot(PG_device *dev, PM_set *dom, PM_set *ran)
+void PG_domain_plot(PG_device *dev ARG(,,cls), PM_set *dom, PM_set *ran)
    {int color, style;
     double width;
     double va[PG_SPACEDM];

@@ -337,7 +337,7 @@ void PM_enable_fpe_n(int flg, PFSignal_handler hnd, void *a)
 
 /* PM_ENABLE_FPE - enable software trapping of floating point exceptions
  *
- * #bind PM_enable_fpe fortran()
+ * #bind PM_enable_fpe fortran() python()
  */
 
 void PM_enable_fpe(int flg, PFSignal_handler hnd)
@@ -473,7 +473,7 @@ void PM_restore_fpu(void *a)
 /* PM_FIX_NAND - replace all NaNs in D with the value V
  *             - return the number of NaNs found
  *
- * #bind PM_fix_nand fortran() scheme()
+ * #bind PM_fix_nand fortran() scheme() python()
  */
 
 long PM_fix_nand(long n, double *d, int mask, double v)
@@ -496,7 +496,7 @@ long PM_fix_nand(long n, double *d, int mask, double v)
 
 /* PM_COUNT_NAND - return the number of NaNs found in D
  *
- * #bind PM_count_nand fortran() scheme()
+ * #bind PM_count_nand fortran() scheme() python()
  */
 
 long PM_count_nand(long n, double *d, int mask)
@@ -518,7 +518,7 @@ long PM_count_nand(long n, double *d, int mask)
 /* PM_FIX_NANF - replace all NaNs in F with the value V
  *            - return the number of NaNs found
  *
- * #bind PM_fix_nanf fortran() scheme()
+ * #bind PM_fix_nanf fortran() scheme() python()
  */
 
 long PM_fix_nanf(long n, float *f, int mask, float v)
@@ -540,7 +540,7 @@ long PM_fix_nanf(long n, float *f, int mask, float v)
 
 /* PM_COUNT_NANF - return the number of NaNs found in F
  *
- * #bind PM_count_nanf fortran() scheme()
+ * #bind PM_count_nanf fortran() scheme() python()
  */
 
 long PM_count_nanf(long n, float *f, int mask)
@@ -570,7 +570,7 @@ long PM_count_nanf(long n, float *f, int mask)
  *             -   16 D is an IEEE positive quiet NaN
  *             -   32 D is an IEEE negative quiet NaN
  *
- * #bind PM_fp_typed fortran() scheme()
+ * #bind PM_fp_typed fortran() scheme() python()
  */
 
 int PM_fp_typed(double d)
@@ -636,7 +636,7 @@ int PM_fp_typed(double d)
  *             -   16 F is an IEEE positive quiet NaN
  *             -   32 F is an IEEE negative quiet NaN
  *
- * #bind PM_fp_typef fortran() scheme()
+ * #bind PM_fp_typef fortran() scheme() python()
  */
 
 int PM_fp_typef(float f)

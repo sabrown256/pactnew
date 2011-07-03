@@ -515,7 +515,7 @@ int _PD_format_version(PDBfile *file, int vers)
 
 /* PD_ISFILE - return TRUE iff FNAME is a PDB file
  *
- * #bind PD_isfile fortran() scheme(pd-isfile?)
+ * #bind PD_isfile fortran() scheme(pd-isfile?) python()
  */
 
 int PD_isfile(char *fname)

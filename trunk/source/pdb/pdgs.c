@@ -158,10 +158,10 @@ static int _PD_hyper_scatter(char *dst, int id, int nd, long *dind, char *src,
  *              - of the object associated with NAME (PDBLib will
  *              - allocated space if necessary)!
  *
- * #bind PD_gather_as fortran() scheme()
+ * #bind PD_gather_as fortran() scheme() python(gather_as)
  */
 
-int PD_gather_as(PDBfile *file, char *name, char *type,
+int PD_gather_as(PDBfile *file ARG(,,cls), char *name, char *type,
 		 void *vr, long *sind, int ndst, long *dind)
    {int nr, ng, ni, bpi, mo;
     char *tv;
@@ -200,10 +200,10 @@ int PD_gather_as(PDBfile *file, char *name, char *type,
  *           - NOTE: VR must be a pointer to an object with the type
  *           - given by TYPE (PDBLib will allocated space if necessary)!
  *
- * #bind PD_gather fortran() scheme()
+ * #bind PD_gather fortran() scheme() python(gather)
  */
 
-int PD_gather(PDBfile *file, char *name, void *vr, long *sind,
+int PD_gather(PDBfile *file ARG(,,cls), char *name, void *vr, long *sind,
 	      int ndst, long *dind)
    {int rv;
 
@@ -229,10 +229,11 @@ int PD_gather(PDBfile *file, char *name, void *vr, long *sind,
  *               - NOTE: VR must be a pointer to an object with the type
  *               - given by TYPE!!!!
  *
- * #bind PD_scatter_as fortran() scheme()
+ * #bind PD_scatter_as fortran() scheme() python(scatter_as)
  */
 
-int PD_scatter_as(PDBfile *file, char *name, char *intype, char *outtype,
+int PD_scatter_as(PDBfile *file ARG(,,cls),
+		  char *name, char *intype, char *outtype,
 		  void *vr, int nsrc, long *sind, int ndst, long *dind)
    {int ni, ng, bpi, mo, ret;
     char *tv;
@@ -266,10 +267,10 @@ int PD_scatter_as(PDBfile *file, char *name, char *intype, char *outtype,
  *            - NOTE: VR must be a pointer to an object with the type
  *            - given by TYPE!!!!
  *
- * #bind PD_scatter fortran() scheme()
+ * #bind PD_scatter fortran() scheme() python(scatter)
  */
 
-int PD_scatter(PDBfile *file, char *name, char *type, void *vr,
+int PD_scatter(PDBfile *file ARG(,,cls), char *name, char *type, void *vr,
 	       int nsrc, long *sind, int ndst, long *dind)
    {int rv;
 

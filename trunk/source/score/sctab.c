@@ -230,7 +230,7 @@ static void _SC_hasharr_init(hasharr *ha, char *lm)
 
 /* SC_MAKE_HASHARR - make an inhomogeneous hasharr
  *
- * #bind SC_make_hasharr fortran()
+ * #bind SC_make_hasharr fortran() python()
  */
 
 hasharr *SC_make_hasharr(int sz, int docflag, char *lm, int flags)
@@ -297,10 +297,11 @@ static void _SC_hasharr_free_elements(hasharr *ha)
  *                  - leaves a pristine hash array
  *                  - for new installs, lookups, ...
  *
- * #bind SC_hasharr_clear fortran()
+ * #bind SC_hasharr_clear fortran() python(clear)
  */
 
-int SC_hasharr_clear(hasharr *ha, int (*f)(haelem *hp, void *a), void *a)
+int SC_hasharr_clear(hasharr *ha ARG(,,cls),
+		     int (*f)(haelem *hp, void *a), void *a)
    {int rv;
 
     rv = FALSE;
@@ -320,10 +321,11 @@ int SC_hasharr_clear(hasharr *ha, int (*f)(haelem *hp, void *a), void *a)
  *                 - like SC_hasharr_clear except that the
  *                 - hash array is freed and cannot be used again
  *
- * #bind SC_free_hasharr fortran()
+ * #bind SC_free_hasharr fortran() python(free)
  */
 
-void SC_free_hasharr(hasharr *ha, int (*f)(haelem *hp, void *a), void *a)
+void SC_free_hasharr(hasharr *ha ARG(,,cls),
+		     int (*f)(haelem *hp, void *a), void *a)
    {int rv;
 
     if (SC_safe_to_free(ha))
@@ -460,10 +462,10 @@ int SC_hasharr_next(hasharr *ha, long *pi,
 
 /* SC_HASHARR_LOOKUP - lookup the haelem for the given KEY
  *
- * #bind SC_hasharr_lookup fortran()
+ * #bind SC_hasharr_lookup fortran() python(lookup)
  */
 
-haelem *SC_hasharr_lookup(hasharr *ha, void *key)
+haelem *SC_hasharr_lookup(hasharr *ha ARG(,,cls), void *key)
    {int sz;
     long iht;
     haelem *rv, *hp, **tb;
@@ -500,7 +502,7 @@ haelem *SC_hasharr_lookup(hasharr *ha, void *key)
  * #bind SC_hasharr_def_lookup fortran() python(def_lookup)
  */
 
-void *SC_hasharr_def_lookup(hasharr *ha, void *key)
+void *SC_hasharr_def_lookup(hasharr *ha ARG(,,cls), void *key)
    {haelem *hp;
     void *obj;
   
@@ -641,10 +643,10 @@ static int _SC_splice_out_haelem(hasharr *ha, void *key,
 /* SC_HASHARR_REMOVE - remove the entry corresponding to the specified key 
  *                   - return TRUE iff successfully removed 
  *
- * #bind SC_hasharr_remove fortran()
+ * #bind SC_hasharr_remove fortran() python(remove)
  */
 
-int SC_hasharr_remove(hasharr *ha, void *key)
+int SC_hasharr_remove(hasharr *ha ARG(,,cls), void *key)
    {int sz, rv;
     long i;
     haelem *hp, *curr, **tb;

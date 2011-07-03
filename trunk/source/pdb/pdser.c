@@ -521,7 +521,7 @@ int _PD_init_state(int smpflag)
 /* PD_INIT_THREADS - initialize the library for pthreads
  *                 - must be called by only one thread.
  *
- * #bind PD_init_threads fortran()
+ * #bind PD_init_threads fortran() python()
  */
 
 int PD_init_threads(int nthreads, PFTid tid)
@@ -553,7 +553,7 @@ int PD_init_threads(int nthreads, PFTid tid)
  *                     - for a designated key in a pattern like
  *                     -  .... <key> <# threads> ...
  *
- * #bind PD_init_threads_arg fortran()
+ * #bind PD_init_threads_arg fortran() python()
  */
 
 int PD_init_threads_arg(int c, char **v, char *key, PFTid tid)

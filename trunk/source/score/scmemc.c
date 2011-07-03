@@ -103,7 +103,7 @@ void SC_mem_statb_set(uint64_t a, uint64_t f)
 
 /* SC_MEM_STATS - return memory usage statistics
  *
- * #bind SC_mem_stats fortran() scheme(memory-usage)
+ * #bind SC_mem_stats fortran() scheme(memory-usage) python()
  */
 
 void SC_mem_stats(long *al, long *fr, long *df, long *mx)
@@ -165,7 +165,7 @@ void SC_mem_stats_set(long a, long f)
  *                 -   BSZ - maximum block size requested from the system
  *                 -   R   - bin size ratio in exponential region
  *
- * #bind SC_configure_mm fortran() scheme(sc-configure-mm)
+ * #bind SC_configure_mm fortran() scheme(sc-configure-mm) python()
  */
 
 void SC_configure_mm(long mxl, long mxm, long bsz, double r)
@@ -1171,7 +1171,7 @@ int SC_free_n(void *p, ...)
  *                 -   5 : use calloc to get zeroed memory in _SC_prim_alloc
  *                 - return the original value
  *
- * #bind SC_zero_space_n fortran() scheme(set-zero-space-n!)
+ * #bind SC_zero_space_n fortran() scheme(set-zero-space-n!) python()
  */
 
 int SC_zero_space_n(int flag, int tid)

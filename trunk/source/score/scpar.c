@@ -279,7 +279,7 @@ int dtid(void)
  *                 -       once, that is you can call it all you want but
  *                 -       only the first one will allocate any threads!
  *
- * #bind SC_init_threads fortran()
+ * #bind SC_init_threads fortran() python()
  */
 
 int SC_init_threads(int nt, PFTid tid)

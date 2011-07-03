@@ -458,7 +458,7 @@ int _SC_mem_map(FILE *fp, int flag, int show, int lineno)
 
 /* SC_MEM_MAP - print out a memory map to the given FILE
  *
- * #bind SC_mem_map fortran() scheme(memory-map)
+ * #bind SC_mem_map fortran() scheme(memory-map) python()
  */
 
 int SC_mem_map(FILE *fp, int flag)

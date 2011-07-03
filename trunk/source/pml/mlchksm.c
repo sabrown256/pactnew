@@ -484,7 +484,7 @@ void PM_md5_checksum_file(FILE *file, int64_t start, int64_t stop,
  *             -        ... get next in, boff, ni, and bpi ...
  *             -      };
  *
- * #bind PM_checksum_array fortran() scheme()
+ * #bind PM_checksum_array fortran() scheme() python()
  */
 
 void PM_checksum(long *psum, int *prmdr, void *parr, int boff,
