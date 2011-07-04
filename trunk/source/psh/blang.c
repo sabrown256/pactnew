@@ -3534,7 +3534,7 @@ static void python_wrap_local_decl(FILE *fp, fdecl *dcl, char *kw)
     voidf = dcl->voidf;
     rty   = dcl->proto.type;
 	
-    if (voida == FALSE)
+    if ((voida == FALSE) && (IS_NULL(kw) == FALSE))
        {fprintf(fp, "   {int ok;\n");
 	fprintf(fp, "    PyObject *_lo;\n");}
     else
@@ -4472,7 +4472,7 @@ int main(int c, char **v)
 	 else if (strcmp(v[i], "-f") == 0)
 	    fpr = v[++i];
 	 else if (strcmp(v[i], "-h") == 0)
-            {printf("Usage: blang -b <bindings> -c <c-proto> [-d <doc>] [-f <f-proto>] [-h] [-w <f-wrapper>] [-wr] <prototypes> <bindings>\n");
+            {printf("Usage: blang -b <bindings> -c <c-proto> [-d <doc>] [-f <f-proto>] [-h] [-w <f-wrapper>] [-wr]\n");
              printf("   b    file containing binding specifications\n");
              printf("   c    file containing C prototypes\n");
              printf("   d    file containing documentation comments\n");
@@ -4481,8 +4481,6 @@ int main(int c, char **v)
              printf("   o    no interoprabilty interfaces (Fortran wrappers only)\n");
              printf("   w    file containing Fortran wrapper specifications\n");
              printf("   wr   no Fortran wrappers (interoperability only)\n");
-             printf("   <prototypes>    file containing C function prototypes\n");
-             printf("   <binding>       file specifying function bindings\n");
              printf("\n");}
 	 else if (strcmp(v[i], "-o") == 0)
             cfl &= ~2;

@@ -1,0 +1,123 @@
+.\"
+.\" Source Version: 3.0
+.\" Software Release #: LLNL-CODE-422942
+.\"
+.\" include cpyright.h
+.\"
+
+.TH BLANG 1 "05 July 2011"
+.SH NAME
+blang \- automatically generate Bindings for LANGuages
+.SH SYNOPSIS
+.B blang [-b <file>] [-c <file>] [-d <file>] [-h] [-o] [-wr]
+
+.SH DESCRIPTION
+
+blang is used to automatically generate Fortran, Scheme, and Python
+bindings for C functions.  It also generates HTML documentation and
+man pages.
+
+All the specifications to accomplish this are a part of the C function
+itself.  This locality makes the process of specifying and maintaining
+these bindings as simple and correct as possible.
+
+The specifications which blang uses to generate language bindings
+and documentation are designed to be minimal.  The PACT function
+documentation conventions alone drive the generation of documentation.
+
+The PACT conventions for function definitions and documentation are
+illustrated with the following example:
+
+/* FOO - take X and operate on it
+ *     - return the result
+ */
+
+int foo(double x)
+   {int rv;
+
+     ...
+
+    return(rv);}
+
+The function name appears in all caps in the comment preceding the
+function.  The description is offset with '-'.  References to the
+arguments and or return values are also set in all caps.
+
+This same function with blang specifications is:
+
+/* FOO - take X and operate on it
+ *     - return the result
+ *
+ * #bind fortran() scheme(foos) 
+ */
+
+int foo(double x ARG(0.0,in))
+   {int rv;
+
+     ...
+
+    return(rv);}
+
+The #bind directive causes bindings for the specified languages
+to be generated.  In this case Fortran and Scheme bindings but
+not Python bindings.  If no name is specified as is the case for
+the Fortran binding specification above, blang creates one derived
+from the C name.  If a name is specified it is used.
+
+The ARG() specification is ignored by the C compiler (it is actually
+a diadic macro with an empty body).  It has the following form:
+
+  ARG(<defaults>[,<direction>[,<method>]])
+
+  <defaults>  := <sspec> := "*" | <val>
+  <spec>      := "" | <sspec>
+  <list>      := <sspec> | <list> ',' <sspec>
+  <specs>     := <spec> | '[' <list> ']'
+  ""             no value specification
+  "*"            any single value
+  <val>          single value <val> 
+
+  <direction> := in | out | io
+
+  <method>    := cls
+
+Default values for the argument are specified first via <defaults>.
+The intent, <direction>, of the argument is input, output, or
+input/output.  For object oriented languages like python, a function
+can be bound as a method of a class specified by the argument.
+
+NOTE: to make parsing easier things like [,] are not allowed
+hence the <spec> <sspec> distinction.
+
+The script, bproto, is used to make the binding file by grepping
+for the #bind directives.  Bproto also find all the C prototypes
+to create the prototype file.  Finally, bproto runs blang over
+the results.
+
+
+.SH OPTIONS
+
+.TP
+.B \-b
+The file containing the list of functions to be bound.
+.TP
+.B \-c
+The file containing the list of C prototypes for functions
+to be bound.
+.TP
+.B \-d
+The file containing additional documentation (currently unused).
+.TP
+.B \-h
+This help message.
+.TP
+.B \-o
+Do not generate C interoperatbility interfaces for Fortran.
+.TP
+.B \-wr
+Do not generate Fortran wrappers.
+
+.SH BUGS
+.TP 
+.B None known.
+
