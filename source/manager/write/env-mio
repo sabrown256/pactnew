@@ -362,37 +362,5 @@ HAVE_SUBROUTINES
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# MPI - generate MPI configuration info
-#     - this is completely redundant and should be remove
-#     - when basis/features/mpi has Libraries += dp
-#     - instead of Libraries += lib_pact_mpi
-
-    if ("$DP_Lib" != "") then
-       Note $FOUT "# MPI specifications"
-       Note $FOUT ""
-
-       set linc = ( `echo "$DP_Inc" | sed 's/-I//g'` )
-
-       set lar = ""
-       foreach i ($DP_Lib)
-          if ("$i" =~ \-L*) then
-             continue
-          else if ("$i" =~ \-l*) then
-             set lar = ( $lar `echo "$i" | sed 's/-l//'` )
-          endif
-       end
-       Note $FOUT "Library/lib_pact_mpi {"
-       Note $FOUT "  Archives = $lar"
-       Note $FOUT "  IncPaths = $linc"
-       Note $FOUT "  LibPaths = ${DP_RPath}"
-       Note $FOUT "  RPaths   = ${DP_RPath}"
-       Note $FOUT "}"
-       Note $FOUT ""
-
-    endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
 exit(0)
 

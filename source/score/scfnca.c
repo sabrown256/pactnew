@@ -405,7 +405,7 @@ int SC_pointer_ok(void *p)
         if (SETJMP(cpu) == 0)
            {s = (char *) p;
             c = *s++;
-	    SC_ASSERT(c >= 0);
+	    SC_ASSERT(c == s[-1]);
 
             ok = TRUE;}
         else

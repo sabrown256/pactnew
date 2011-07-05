@@ -52,9 +52,9 @@ typedef struct s_mtype mtype;
 struct s_idecl
    {char decl[MAXLINE];    /* local variable declaration */
     char defa[MAXLINE];    /* default value assignment */
-    char argi[MAXLINE];    /* argument to call to get value */ 
-    char argn[MAXLINE];    /* arg names - for Python keyword list */
-    char argc[MAXLINE];};  /* argument to C function call */ 
+    char argc[MAXLINE];    /* argument to C function call */ 
+    char argi[MAXLINE];    /* argument to call to get value from arg list */ 
+    char argn[MAXLINE];};  /* arg names - for Python keyword list */
 
 struct s_farg
    {int nv;                          /* number of default values specified */
@@ -408,22 +408,33 @@ static void id_no_default(idecl *ip, char *ty, char *lty, char *nm, char *val)
 
 static void id_fd_out(idecl *ip, char *ty, char *nm, int nvl, char **vls)
    {int drf;
-    char dty[MAXLINE];
+    char dty[MAXLINE], vl[MAXLINE];
 
     drf = deref(dty, MAXLINE, ty);
-
-    if (nvl == 1)
-       {if (drf == TRUE)
-	   snprintf(ip->decl, MAXLINE, "%s _l%s;\n", ty, nm);
-	else
-	   snprintf(ip->decl, MAXLINE, "%s _l%s;\n", dty, nm);}
-    else
-       snprintf(ip->decl, MAXLINE, "%s _l%s[%d];\n", dty, nm, nvl);
 
     if (drf == TRUE)
        snprintf(ip->argc, MAXLINE, "_l%s", nm);
     else
        snprintf(ip->argc, MAXLINE, "&_l%s", nm);
+
+    if (nvl == 1)
+       {if (drf == TRUE)
+	   {if (strcmp(vls[0], "NULL") == 0)
+	       {snprintf(ip->decl, MAXLINE, "%s _l%s;\n", ty, nm);
+		snprintf(ip->defa, MAXLINE, "    _l%-8s = NULL;\n", nm);}
+	    else if (vls[0][0] == '*')
+	       {get_def_value(vl, MAXLINE, vls[0], dty);
+		snprintf(ip->decl, MAXLINE, "%s _l%s;\n", dty, nm);
+		snprintf(ip->defa, MAXLINE, "    _l%-8s = %s;\n", nm, vl);
+		snprintf(ip->argc, MAXLINE, "&_l%s", nm);}
+	    else
+	       {snprintf(ip->decl, MAXLINE, "%s _l%s;\n", dty, nm);
+		snprintf(ip->defa, MAXLINE, "    _l%-8s = %s;\n", nm, vls[0]);
+		snprintf(ip->argc, MAXLINE, "&_l%s", nm);};}
+	else
+	   snprintf(ip->decl, MAXLINE, "%s _l%s;\n", dty, nm);}
+    else
+       snprintf(ip->decl, MAXLINE, "%s _l%s[%d];\n", dty, nm, nvl);
 
     return;}
 
@@ -2686,16 +2697,16 @@ static void fin_module(bindes *bd)
  *         - to make SS_args call
  */
 
-static void cs_type(char *a, int nc, farg *arg, int drf)
+static void cs_type(char *a, int nc, farg *al, int drf)
    {fparam knd;
     char t[MAXLINE], ty[MAXLINE];
     char *sty, *dty;
 
-    knd = arg->knd;
+    knd = al->knd;
     if (drf == TRUE)
-       deref(ty, MAXLINE, arg->type);
+       deref(ty, MAXLINE, al->type);
     else
-       nstrncpy(ty, MAXLINE, arg->type, -1);
+       nstrncpy(ty, MAXLINE, al->type, -1);
 
     sty = lookup_type(NULL, ty, MODE_C, MODE_S);
     if (IS_NULL(sty) == FALSE)
@@ -2870,7 +2881,7 @@ static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
 	     nstrcat(t, MAXLINE, "object *_lo;\n");}
 
 /* local vars */
-	 else if (nm != '\0')
+	 else if (IS_NULL(ip->decl) == FALSE)
            {nstrcat(t, MAXLINE, ip->decl);
             nv++;};
 
@@ -3014,10 +3025,13 @@ static void scheme_array_return(char *t, int nc, fdecl *dcl)
 		 cs_type(dty, MAXLINE, al+i, TRUE);
 	     
 		 if (nvl == 1)
-		    vstrcat(a, MAXLINE, "\t\t\t%s, &_l%s,\n", dty, nm);
+		    vstrcat(a, MAXLINE,
+			    "                   %s, &_l%s,\n",
+			    dty, nm);
 		 else
 		    {for (iv = 0; iv < nvl; iv++)
-			 vstrcat(a, MAXLINE, "\t\t\t%s, &_l%s[%d],\n",
+			 vstrcat(a, MAXLINE,
+				 "                   %s, &_l%s[%d],\n",
 				 dty, nm, iv);};};};};
 
 /* if the list argument are non empty make up the call */

@@ -1465,8 +1465,8 @@ int PD_set_offset(PDBfile *file ARG(,,cls), int v)
  * #bind PD_get_major_order fortran() scheme() python(get_major_order)
  */
 
-int PD_get_major_order(PDBfile *file ARG(,,cls))
-   {int rv;
+PD_major_order PD_get_major_order(PDBfile *file ARG(,,cls))
+   {PD_major_order rv;
 
     if (file != NULL)
        rv = file->major_order;
@@ -1483,8 +1483,8 @@ int PD_get_major_order(PDBfile *file ARG(,,cls))
  * #bind PD_set_major_order fortran() scheme(pd-set-major_order!) python(set_major_order)
  */
 
-int PD_set_major_order(PDBfile *file ARG(,,cls), int v)
-   {int rv;
+PD_major_order PD_set_major_order(PDBfile *file ARG(,,cls), PD_major_order v)
+   {PD_major_order rv;
 
     if (file != NULL)
        {rv = file->major_order;

@@ -185,6 +185,22 @@ FIXNUM _PD_write_aux(PDBfile *file, char *name, char *typi, char *typo,
 
 /*--------------------------------------------------------------------------*/
 
+/* _PD_GET_LOCAL_SET_PARAMS - return a long version of ADP */
+
+int *_PD_get_local_set_params(FIXNUM *adp)
+   {int i, ne;
+    int *ldp;
+
+    ne = 5 + adp[2];
+    ldp = CMAKE_N(int, ne);
+    for (i = 0; i < ne; i++)
+        ldp[i] = adp[i];
+
+    return(ldp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PFGERR - FORTRAN interface routine to fetch PD_ERR */
 
 FIXNUM FF_ID(pfgerr, PFGERR)(FIXNUM *snce, char *err)
@@ -1546,6 +1562,7 @@ FIXNUM FF_ID(pfwuly, PFWULY)(FIXNUM *sfid, FIXNUM *sncl, char *labl,
 FIXNUM FF_ID(pfwset, PFWSET)(FIXNUM *sfid, char *dname,
 			     FIXNUM *adp, double *adm)
    {FIXNUM rv;
+    int *ldp;
     char s[MAXLINE];
     PDBfile *file;
 
@@ -1555,7 +1572,11 @@ FIXNUM FF_ID(pfwset, PFWSET)(FIXNUM *sfid, char *dname,
 
     SC_FORTRAN_STR_C(s, dname, adp[0]);
 
-    rv = PD_wrt_set(file, s, adp, adm);
+    ldp = _PD_get_local_set_params(adp);
+
+    rv = PD_wrt_set(file, s, ldp, adm);
+
+    CFREE(ldp);
 
     return(rv);}
 
@@ -1588,7 +1609,9 @@ FIXNUM FF_ID(pfwset, PFWSET)(FIXNUM *sfid, char *dname,
 FIXNUM FF_ID(pfwmap, PFWMAP)(FIXNUM *sfid, char *dname,
 			     FIXNUM *adp, double *adm, char *rname,
 			     FIXNUM *arp, double *arm, FIXNUM *sim)
-   {FIXNUM rv;
+   {int lsm;
+    FIXNUM rv;
+    int *ldp, *lrp;
     char d[MAXLINE], r[MAXLINE];
     PDBfile *file;
 
@@ -1597,7 +1620,15 @@ FIXNUM FF_ID(pfwmap, PFWMAP)(FIXNUM *sfid, char *dname,
     SC_FORTRAN_STR_C(d, dname, adp[0]);
     SC_FORTRAN_STR_C(r, rname, arp[0]);
 
-    rv = PD_wrt_map(file, d, adp, adm, r, arp, arm, sim);
+    ldp = _PD_get_local_set_params(adp);
+    lrp = _PD_get_local_set_params(arp);
+    lsm = *sim;
+
+    rv = PD_wrt_map(file, d, ldp, adm, r, lrp, arm, &lsm);
+
+    *sim = lsm;
+    CFREE(ldp);
+    CFREE(lrp);
 
     return(rv);}
 
@@ -1636,7 +1667,9 @@ FIXNUM FF_ID(pfwmap, PFWMAP)(FIXNUM *sfid, char *dname,
 FIXNUM FF_ID(pfwrae, PFWRAE)(FIXNUM *sfid, char *dname, FIXNUM *sncd,
 			     char *rname, FIXNUM *arp, double *arm,
 			     FIXNUM *sinf, FIXNUM *sim)
-   {FIXNUM rv;
+   {int lsm;
+    FIXNUM rv;
+    int *lrp;
     char d[MAXLINE], r[MAXLINE];
     pcons *info;
     PDBfile *file;
@@ -1650,7 +1683,13 @@ FIXNUM FF_ID(pfwrae, PFWRAE)(FIXNUM *sfid, char *dname, FIXNUM *sncd,
     SC_FORTRAN_STR_C(d, dname, *sncd);
     SC_FORTRAN_STR_C(r, rname, arp[0]);
 
-    rv = PD_wrt_map_ran(file, d, r, arp, arm, info, sim);
+    lrp = _PD_get_local_set_params(arp);
+    lsm = *sim;
+
+    rv = PD_wrt_map_ran(file, d, r, lrp, arm, info, &lsm);
+
+    *sim = lsm;
+    CFREE(lrp);
 
     return(rv);}
 
@@ -1687,7 +1726,9 @@ FIXNUM FF_ID(pfwrae, PFWRAE)(FIXNUM *sfid, char *dname, FIXNUM *sncd,
 FIXNUM FF_ID(pfwran, PFWRAN)(FIXNUM *sfid, char *dname, FIXNUM *sncd,
 			     char *rname, FIXNUM *arp, double *arm,
 			     FIXNUM *sim)
-   {FIXNUM rv;
+   {int lsm;
+    FIXNUM rv;
+    int *lrp;
     char d[MAXLINE], r[MAXLINE];
     PDBfile *file;
 
@@ -1696,7 +1737,13 @@ FIXNUM FF_ID(pfwran, PFWRAN)(FIXNUM *sfid, char *dname, FIXNUM *sncd,
     SC_FORTRAN_STR_C(d, dname, *sncd);
     SC_FORTRAN_STR_C(r, rname, arp[0]);
 
-    rv = PD_wrt_map_ran(file, d, r, arp, arm, NULL, sim);
+    lrp = _PD_get_local_set_params(arp);
+    lsm = *sim;
+
+    rv = PD_wrt_map_ran(file, d, r, lrp, arm, NULL, &lsm);
+
+    *sim = lsm;
+    CFREE(lrp);
 
     return(rv);}
 

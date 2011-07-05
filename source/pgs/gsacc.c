@@ -150,11 +150,8 @@ void PG_fset_char_path(PG_device *dev ARG(,in,cls),
 
 	dev->set_char_path(dev, x[0], x[1]);
 
-#if 0
 	x[0] = xo[0];
-	x[1] = xo[1];
-#endif
-       };
+	x[1] = xo[1];};
 
     return;}
 
@@ -199,11 +196,9 @@ void PG_fset_char_up(PG_device *dev ARG(,in,cls),
 	xo[1] = dev->char_up[1];
 
 	dev->set_char_up(dev, x[0], x[1]);
-#if 0
+
 	x[0] = xo[0];
-	x[1] = xo[1];
-#endif
-	};
+	x[1] = xo[1];};
 
     return;}
 
