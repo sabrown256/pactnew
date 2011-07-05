@@ -616,7 +616,7 @@ static void test_4_aux(PG_device *dev)
 static int test_4(PG_device *dev)
    {int i, ok;
     double an;
-    double x0[PG_SPACEDM], ndc[PG_BOXSZ], wc[PG_BOXSZ];
+    double x0[PG_SPACEDM], ox[PG_SPACEDM], ndc[PG_BOXSZ], wc[PG_BOXSZ];
 
     if (dev == NULL)
        return(FALSE);
@@ -661,7 +661,9 @@ static int test_4(PG_device *dev)
         {an = i*PI/4.0;
          x0[0] = cos(an);
          x0[1] = sin(an);
-         PG_fset_char_path(dev, x0);
+         ox[0] = x0[0];
+         ox[1] = x0[1];
+         PG_fset_char_path(dev, ox);
          PG_write_n(dev, 2, WORLDC, x0, "Sample");};
 
 /* reset for following tests */

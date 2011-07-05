@@ -256,6 +256,10 @@ enum e_PD_text_kind
 
 typedef enum e_PD_text_kind PD_text_kind;
 
+/*
+ * #bind derived PD_major_order integer SC_ENUM_I SC_ENUM_I NO_MAJOR_ORDER
+ */
+
 enum e_PD_major_order
    {NO_MAJOR_ORDER = 0,
     ROW_MAJOR_ORDER = 101,
@@ -1092,6 +1096,10 @@ extern PD_major_op
  PD_get_mode(PDBfile *file),
  PD_set_mode(PDBfile *file, PD_major_op v);
 
+extern PD_major_order
+ PD_get_major_order(PDBfile *file),
+ PD_set_major_order(PDBfile *file, PD_major_order v);
+
 extern int64_t
  PD_get_buffer_size(void),
  PD_set_buffer_size(int64_t v),
@@ -1105,8 +1113,6 @@ extern int
  PD_get_entry_info(syment *ep, char **ptyp, long *pni, int *pnd, long **pdim),
  PD_get_offset(PDBfile *file),
  PD_set_offset(PDBfile *file, int v),
- PD_get_major_order(PDBfile *file),
- PD_set_major_order(PDBfile *file, int v),
  PD_get_track_pointers(PDBfile *file),
  PD_set_track_pointers(PDBfile *file, int v),
  PD_get_fmt_version(void),

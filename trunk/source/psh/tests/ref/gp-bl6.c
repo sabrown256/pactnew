@@ -252,7 +252,7 @@ PyObject *_PY_fc4(PyObject *self, PyObject *args, PyObject *kwds)
     int _la;
     int _lb;
     int _lc;
-    int *_ld;
+    int _ld;
     char *kw_list[] = {"a", "b", "c", NULL};
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
@@ -262,7 +262,7 @@ PyObject *_PY_fc4(PyObject *self, PyObject *args, PyObject *kwds)
     if (ok == FALSE)
        return(NULL);
 
-    fc4(_la, &_lb, &_lc, _ld);
+    fc4(_la, &_lb, &_lc, &_ld);
     _lo = Py_BuildValue("ii",
                         &_lc, &_ld);
 
@@ -306,7 +306,7 @@ PyObject *_PY_fc6(PyObject *self, PyObject *args, PyObject *kwds)
     int _la;
     int _lb;
     int _lc;
-    int *_ld;
+    int _ld;
     char *kw_list[] = {"a", "b", "c", NULL};
 
     ok = PyArg_ParseTupleAndKeywords(args, kwds,
@@ -316,7 +316,7 @@ PyObject *_PY_fc6(PyObject *self, PyObject *args, PyObject *kwds)
     if (ok == FALSE)
        return(NULL);
 
-    fc6(_la, &_lb, &_lc, _ld);
+    fc6(_la, &_lb, &_lc, &_ld);
     _lo = Py_BuildValue("ii",
                         &_lc, &_ld);
 
