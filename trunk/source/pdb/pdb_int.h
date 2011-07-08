@@ -370,7 +370,6 @@ extern int
  _PD_require_conv(defstr *dpf, defstr *dph);
 
 extern void
- _PD_convert_ascii(char *out, char *in, long nitems, int bpci, int offs),
  _PD_iconvert(char **out, char **in, long nitems,
 	      long nbi, PD_byte_order ordi,
 	      long nbo, PD_byte_order ordo,

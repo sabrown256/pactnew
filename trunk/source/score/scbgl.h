@@ -61,11 +61,6 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-extern long double
- powl(long double x, long double y),
- expl(long double x),
- sqrtl(long double x);
-
 #ifdef __cplusplus
 }
 #endif

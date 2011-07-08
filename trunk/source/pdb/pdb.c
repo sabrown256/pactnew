@@ -375,7 +375,7 @@ int PD_read(PDBfile *file ARG(,,cls), char *name, void *vr)
  *            - NOTE: VR must be a pointer to an object with the type
  *            - given by TYPE (PDBLib will allocate space if necessary)!
  *
- * #bind PD_read_as fortran() scheme(read_as)
+ * #bind PD_read_as fortran() scheme() python(read_as)
  */
 
 int PD_read_as(PDBfile *file ARG(,,cls), char *name, char *type, void *vr)
@@ -1297,7 +1297,7 @@ void PD_set_io_hooks(int which)
 
 /* PD_ERROR - signal an error
  *
- * #bind PD_error fortran() scheme()
+ * #bind PD_error fortran() scheme() python()
  */
 
 void PD_error(char *s, PD_major_op n)

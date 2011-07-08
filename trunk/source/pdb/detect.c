@@ -983,6 +983,7 @@ void print_header(FILE *fp,
 
 /* print the floating point ordering info */
     fprintf(fp, "\nint\n");
+    fprintf(fp, " host_order = %s,\n", int_order);
 
     fprintf(fp, " int_ord_f[] = {%d", fb[0]);
     for (i = 1; i < size[I_FLOAT]; i++)

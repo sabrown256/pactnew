@@ -67,19 +67,19 @@ setenv OS  `uname`
 # some consolidation, especially wrt logic and control, is needed
 
 setenv TEST_ERROR_TRAPS  "YES"
+setenv TEST_MPI          "YES"
+setenv TEST_DORUN        "YES"
 
 switch ($OS)
    case "CYGWIN*":
 # NOTE: CYGWIN can't handle multi-level error trapping
         setenv TEST_ERROR_TRAPS  "NO"
         setenv TEST_MPI          "NO"
+        setenv TEST_DORUN        "NO"
         breaksw
    case "Darwin":
    case "SunOS":
         setenv TEST_MPI  "NO"
-        breaksw
-   default:
-        setenv TEST_MPI  "YES"
         breaksw
 endsw
 

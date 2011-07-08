@@ -64,24 +64,25 @@ DepLib = ${LibDir}/libpml.a \
 
 targets :
 	@echo "Targets for PDB"
-	@echo "   Cstd      : make standard tests"
 	@echo "   Apps      : make pdb2hdf   "
+	@echo "   attr      : make attribute tests"
+	@echo "   Cstd      : make standard tests"
+	@echo "   def       : make typedef and cast tests"
+	@echo "   dp        : make DP IO test"
+	@echo "   exam      : make exam utility"
+	@echo "   exambin   : make exambin utility"
+	@echo "   fd        : make file descriptor test"
 	@echo "   Gst       : make gather test"
+	@echo "   install   : install PDB headers and utilities in dev/arch"
+	@echo "   link      : link PDB utilities for public use"
 	@echo "   Lst       : make list test"
 	@echo "   net       : make net IO test"
 	@echo "   pdb2hdf   : make pdb2hdf"
-	@echo "   smp       : make SMP IO test"
-	@echo "   dp        : make DP IO test"
-	@echo "   fd        : make file descriptor test"
-	@echo "   attr      : make attribute tests"
-	@echo "   def       : make typedef and cast tests"
-	@echo "   time      : make timing test"
-	@echo "   exambin   : make exambin utility"
-	@echo "   exam      : make exam utility"
-	@echo "   link      : link PDB utilities for public use"
-	@echo "   install   : install PDB headers and utilities in dev/arch"
 	@echo "   sharedlib : build and install PDB shared libs in dev/arch"
+	@echo "   smp       : make SMP IO test"
 	@echo "   test      : run the PDB test suite"
+	@echo "   time      : make timing test"
+	@echo "   trans     : make text translation utility"
 
 #
 # Headers Files
@@ -271,6 +272,9 @@ exambin :
 
 exam :
 	${CLD} ${LdFlags} exam.c -o ${BinDir}/exam
+
+trans : ${InstallDep} ${Hdrs}
+	${CLD} ${LdFlags} pdctrns.c -o ${BinDir}/pdctrns ${Libs}
 
 # extra commands needed when building TGTLib
 LibAction = build-spokes

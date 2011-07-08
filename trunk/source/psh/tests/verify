@@ -51,7 +51,7 @@ flog $Log rehash
 flog $Log cd $TestDir
 
 # omit tests - usually in difficult CROSS_COMPILE situation
-if ($RUN_TESTS == FALSE) then
+if (($TEST_DORUN == NO) || ($RUN_TESTS == FALSE)) then
    NoteD $Log "                    VERIFY Test .................... omitted"
    NoteD $Log ""
 

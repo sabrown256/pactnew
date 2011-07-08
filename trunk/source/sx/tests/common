@@ -32,8 +32,14 @@ set BinDir = $Root/bin
 set LibDir = $Root/lib
 set MAKE   = $BinDir/pact
 set TIMER  = $BinDir/timer
-set CFE    = $BinDir/do-run
-set PFE    = $BinDir/do-run
+
+if ($OS =~ CYGWIN*) then
+   set CFE = ""
+   set PFE = ""
+else
+   set CFE = $BinDir/do-run
+   set PFE = $BinDir/do-run
+endif
 
 if ("$CFE" == "") then
    set cfe = ""

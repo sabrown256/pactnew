@@ -1254,7 +1254,7 @@ int _PG_byte_bit_map(unsigned char *bf, int nx, int ny, int complmnt)
 
 /* PG_MAKE_IMAGE_N - initialize an image
  *
- * #bind PG_make_image_n fortran() scheme()
+ * #bind PG_make_image_n fortran() scheme() python()
  */
 
 PG_image *PG_make_image_n(char *label, char *type, void *z,

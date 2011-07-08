@@ -42,6 +42,119 @@ int
  REVERSE_IN,
  REVERSE_OUT;
 
+/* Character Standards
+ *
+ * The most widely used standard character representation since 1963
+ * is 7-bit ASCII.
+ * This has been superceded by UTF-8 of which 7-bit ASCII is a subset.
+ * Text conversions are done to 7-bit ASCII currently.
+ * Values in the following tables are the ASCII equivalents.
+ *
+ * Other character standard are:
+ *    5-bit ITA2 used from ~1930 to 1963 in telegraphy
+ *               used today in TDD and RTTY applications
+ *    6-bit ASCII Iso standard, used in CDC computers
+ *    EBCDIC IBM 1963 - ?  quasi-non-standard
+ *
+ * We convert from the above to 7-bit ASCII.  There has been no
+ * request or requirement to go the other way
+ *
+ */
+
+static unsigned char
+
+/* ITA2 letter to 7-bit ASCII
+ * NOTE: 0x80 corresponds to shift to figures and 0x81 shift to letters
+ */
+ ita2l_a7[32] = { 0x00, 0x54, 0x0D, 0x4F, 0x20, 0x48, 0x4E, 0x4D,
+		  0x0A, 0x4C, 0x52, 0x47, 0x49, 0x50, 0x43, 0x56,
+
+		  0x45, 0x5A, 0x44, 0x42, 0x53, 0x59, 0x46, 0x58,
+		  0x41, 0x57, 0x4A, 0x80, 0x55, 0x51, 0x4B, 0x81 },
+
+/* 7-bit ASCII to ITA2 letter */
+ a7_ita2l[128],
+
+/* ITA2 figure to 7-bit ASCII */
+ ita2f_a7[32] = { 0x00, 0x35, 0x0D, 0x39, 0x20, 0x23, 0x2C, 0x2E,
+		  0x0A, 0x29, 0x34, 0x26, 0x38, 0x30, 0x3A, 0x3B,
+
+		  0x33, 0x22, 0x24, 0x3F, 0x7, 0x36, 0x21, 0x2F,
+		  0x2D, 0x32, 0x27, 0x80, 0x37, 0x31, 0x28, 0x81 },
+
+/* 7-bit ASCII to ITA2 figure */
+ a7_ita2f[128],
+
+/* 6-bit ASCII to 7-bit ASCII */
+ a6_a7[64] = { 0x20, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
+	       0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F,
+
+	       0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
+	       0x38, 0x39, 0x3A, 0x3B, 0x24, 0x25, 0x26, 0x27,
+
+	       0x00, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,
+	       0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F,
+
+	       0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57,
+	       0x58, 0x59, 0x5A, 0x5B, 0xA3, 0x5D, 0x1B, 0x7F },
+
+/* 7-bit ASCII to 6-bit ASCII */
+ a7_a6[128],
+
+/* US EBCDIC to 7-bit ASCII
+ * NOTE: characters with no ASCII counterpart have value 0xFF
+ */
+ e8_a7[256] =  { 0x00, 0x01, 0x02, 0x03, 0xFF, 0x09, 0xFF, 0x7F,
+		 0xFF, 0xFF, 0xFF, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
+
+		 0x10, 0x11, 0x12, 0x13, 0xFF, 0x85, 0x08, 0xFF,
+		 0x18, 0x19, 0xFF, 0xFF, 0x1C, 0x1D, 0x1E, 0x1F,
+      
+		 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x0A, 0x17, 0x1B,
+		 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x05, 0x06, 0x07,
+     
+		 0xFF, 0xFF, 0x16, 0xFF, 0xFF, 0xFF, 0xFF, 0x04,
+		 0xFF, 0xFF, 0xFF, 0xFF, 0x14, 0x15, 0xFF, 0x1A,
+     
+		 0x20, 0xA0, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+		 0xFF, 0xFF, 0xFF, 0x2E, 0x3C, 0x28, 0x2B, 0x7C,
+     
+		 0x26, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+		 0xFF, 0xFF, 0x21, 0x24, 0x2A, 0x29, 0x3B, 0xAC,
+     
+		 0x2D, 0x2F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+		 0xFF, 0xFF, 0xA6, 0x2C, 0x25, 0x5F, 0x3E, 0x3F,
+     
+		 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+		 0xFF, 0x60, 0x3A, 0x23, 0x40, 0x27, 0x3D, 0x22,
+     
+		 0xFF, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67,
+		 0x68, 0x69, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xB1,
+     
+		 0xFF, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, 0x70,
+		 0x71, 0x72, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+     
+		 0xFF, 0x7E, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78,
+		 0x79, 0x7A, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+     
+		 0x5E, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+		 0xFF, 0xFF, 0x5B, 0x5D, 0xFF, 0xFF, 0xFF, 0xFF,
+     
+		 0x7B, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,
+		 0x48, 0x49, 0xAD, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+     
+		 0x7D, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F, 0x50,
+		 0x51, 0x52, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+     
+		 0x5C, 0xFF, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58,
+		 0x59, 0x5A, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+     
+		 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
+		 0x38, 0x39, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF },
+
+/* 7-bit ASCII to US EBCDIC */
+ a7_e8[128];
+
 /*--------------------------------------------------------------------------*/
 
 /*                             DATA_STANDARDS                               */
@@ -497,6 +610,30 @@ void _PD_insert_field(long inl, int nb, char *out,
     for (n = (offs+nb+7)/8; n > 0; n--, *(out++) |= *(in++));
 
     return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_PACK_BITS - pack an array that contains a bitstream
+ *              - arguments are:
+ *              -   ITYP    the target type of the data when unpacked
+ *              -   NBITS   the number of bits per item
+ *              -   PADSZ   the number of bits of pad preceding the fields
+ *              -   FPP     the number of fields per pad
+ *              -   NITEMS  the number of items expected
+ *              -   OFFS    the bit offset of the first pad
+ */
+
+int PD_pack_bits(char *out, char *in, int ityp, int nbits,
+		 int padsz, int fpp, long nitems, long offs)
+   {long i, vl;
+
+    for (i = 0L; i < nitems; i++)
+        {SC_convert_id(SC_LONG_I, &vl, 0, 1, ityp, in, i, 1, 1, FALSE);
+	 _PD_insert_field(vl, nbits, out, offs, host_order, sizeof(long));
+	 offs += nbits;};
+
+    return(TRUE);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1095,29 +1232,160 @@ static int _PD_convert_fnc(char **pout, char **pin, long *poo, long *pio,
 
 /*--------------------------------------------------------------------------*/
 
-/* _PD_CONVERT_ASCII - translate characters from BCPI bit ASCII to
- *                   - 8-bit ASCII
- *                   - NOTE: this is only here to allow PDB to read old
- *                   -       machine data which may not be 8 bit ASCII
- *                   -
- *                   - Inputs : IN     - input buffer
- *                   -          NITEMS - number of fields to translate
- *                   -          BCPI   - bits per character on input
- *                   -          OFFS   - zero-origin bit offset from IN
- *                   -                   to start of data
- *                   - Output:  OUT    - output buffer
+/* _PD_CONV_TO_ASCII_7 - translate characters from CSTD to 7-bit ASCII
+ *                     - do translation in place
+ *                     - Inputs : BF   - character buffer
+ *                     -          NI   - number of fields to translate
+ *                     -          CSTD - character standard ID
  */
 
-void _PD_convert_ascii(char *out, char *in, long nitems,
-		       int bpci, int offs)
-   {long i;
+static void _PD_conv_to_ascii_7(char *bf, long ni, int cstd)
+   {int c, lwc;
+    long i;
+    PD_character_standard ucstd;
+    unsigned char *pcs, *ubf;
 
-/* translate chars by adding a blank (0x20) character
- * to give upper-case letters then or-ing the sum with a blank
- * to give lower-case letters
+    ubf   = (unsigned char *) bf;
+    ucstd = (PD_character_standard) abs(cstd);
+    lwc   = (cstd > 0);
+
+    if (ucstd == PD_ITA2_LOWER)
+       {pcs = ita2l_a7;
+	for (i = 0; i < ni; i++)
+	    {c = bf[i];
+	     if (c == 0x80)
+	        pcs = ita2f_a7;
+	     else if (c == 0x81)
+	        pcs = ita2l_a7;
+
+	     c = pcs[c];
+	     if (lwc == TRUE)
+	        c = tolower(c);
+
+	     bf[i] = c;};}
+
+    else if (ucstd == PD_ASCII_6_LOWER)
+       {pcs = a6_a7;
+	for (i = 0; i < ni; i++)
+	    {c = bf[i];
+
+	     c = pcs[c];
+	     if (lwc == TRUE)
+	        c = tolower(c);
+
+	     bf[i] = c;};}
+
+    else if (ucstd == PD_EBCDIC)
+       {pcs = e8_a7;
+	for (i = 0; i < ni; i++)
+	    {c = ubf[i];
+	     ubf[i] = pcs[c];};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_CONV_TO_ASCII_6 - translate characters from CSTD to ASCII_6
+ *                     - do translation in place
+ *                     - Inputs : BF   - character buffer
+ *                     -          NI   - number of fields to translate
+ *                     -          CSTD - character standard ID
  */
-    for (i = 0; i < nitems; i++)
-        out[i] = (out[i] + ' ') | ' ';
+
+static void _PD_conv_to_ascii_6(char *bf, long ni, int cstd)
+   {int c;
+    long i, nc;
+
+    ONCE_SAFE(TRUE, NULL)
+       memset(a7_a6, 0, 128);
+       nc = sizeof(a6_a7);
+       for (i = 0; i < nc; i++)
+	   {c = a6_a7[i];
+	    a7_a6[c] = i;};
+    END_SAFE;
+
+    _PD_conv_to_ascii_7(bf, ni, cstd);
+
+    for (i = 0; i < ni; i++)
+        {c = bf[i];
+	 c = toupper(c);
+	 bf[i] = a7_a6[c];};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_CONV_TO_EBCDIC - translate characters from CSTD to EBCDIC
+ *                    - do translation in place
+ *                    - Inputs : BF   - character buffer
+ *                    -          NI   - number of fields to translate
+ *                    -          CSTD - character standard ID
+ */
+
+static void _PD_conv_to_ebcdic(char *bf, long ni, int cstd)
+   {int c;
+    long i, nc;
+
+    ONCE_SAFE(TRUE, NULL)
+       memset(a7_e8, 0, 128);
+       nc = sizeof(e8_a7);
+       for (i = 0; i < nc; i++)
+           {c = e8_a7[i];
+	    a7_e8[c] = i;};
+    END_SAFE;
+
+    _PD_conv_to_ascii_7(bf, ni, cstd);
+
+    for (i = 0; i < ni; i++)
+        {c = bf[i];
+	 bf[i] = a7_e8[c];};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_CONV_TO_ITA2 - translate characters from CSTD to ITA2
+ *                  - do translation in place
+ *                  - Inputs : BF   - character buffer
+ *                  -          NI   - number of fields to translate
+ *                  -          CSTD - character standard ID
+ */
+
+static void _PD_conv_to_ita2(char *bf, long ni, int cstd)
+   {int c, cn, let, nlet;
+    long i, nc;
+
+    ONCE_SAFE(TRUE, NULL)
+       memset(a7_ita2l, 0, 128);
+       nc = sizeof(ita2l_a7);
+       for (i = 0; i < nc; i++)
+           {c = ita2l_a7[i];
+	    a7_ita2l[c] = i;};
+
+       memset(a7_ita2f, 0, 128);
+       nc = sizeof(ita2f_a7);
+       for (i = 0; i < nc; i++)
+           {c = ita2f_a7[i];
+	    a7_ita2f[c] = i;};
+    END_SAFE;
+
+    _PD_conv_to_ascii_7(bf, ni, cstd);
+
+    let = TRUE;
+    for (i = 0; i < ni; i++)
+        {c = bf[i];
+	 c = toupper(c);
+	 if (('A' <= c) && (c <= 'Z'))
+	    {cn   = a7_ita2l[c];
+	     nlet = TRUE;}
+	 else
+	    {cn   = a7_ita2f[c];
+	     nlet = FALSE;};
+	 bf[i] = cn;
+	 let   = nlet;};
 
     return;}
 
@@ -1131,7 +1399,7 @@ void _PD_convert_ascii(char *out, char *in, long nitems,
  *              - the number of bytes for each integer are given
  */
 
-void _PD_iconvert(char **out, char **in, long nitems,
+void _PD_iconvert(char **out, char **in, long ni,
 		  long nbi, PD_byte_order ordi,
 		  long nbo, PD_byte_order ordo,
 		  int onescmp, int usg)
@@ -1145,7 +1413,7 @@ void _PD_iconvert(char **out, char **in, long nitems,
 
     s_extend = usg ? 0 : 0xff;
 
-/* convert nitems integers
+/* convert ni integers
  * test sign bit to properly convert negative integers
  */
     if (nbi < nbo)
@@ -1153,14 +1421,14 @@ void _PD_iconvert(char **out, char **in, long nitems,
 	   {for (j = nbi; j < nbo; j++)
                 {po = lout + j - nbi;
                  pi = lin + nbi - 1;
-                 for (i = 0L; i < nitems; i++)
+                 for (i = 0L; i < ni; i++)
                      {*po = (*pi & 0x80) ? s_extend : 0;
                       po += nbo;
 		      pi += nbi;};};
 	    for (j = nbi; j > 0; j--)
                 {po = lout + nbo - j;
                  pi = lin + j - 1;
-                 for (i = 0L; i < nitems; i++)
+                 for (i = 0L; i < ni; i++)
                      {*po = *pi;
                       po += nbo;
 		      pi += nbi;};};}
@@ -1168,14 +1436,14 @@ void _PD_iconvert(char **out, char **in, long nitems,
 	   {for (j = nbi; j < nbo; j++)
                 {po = lout + j - nbi;
                  pi = lin;
-                 for (i = 0L; i < nitems; i++)
+                 for (i = 0L; i < ni; i++)
                      {*po = (*pi & 0x80) ? s_extend : 0;
                       po += nbo;
 		      pi += nbi;};};
 	    for (j = 0; j < nbi; j++)
                 {po = lout + j + nbo - nbi;
                  pi = lin + j;
-                 for (i = 0L; i < nitems; i++)
+                 for (i = 0L; i < ni; i++)
                      {*po = *pi;
                       po += nbo;
 		      pi += nbi;};};};}
@@ -1185,7 +1453,7 @@ void _PD_iconvert(char **out, char **in, long nitems,
            {for (j = nbo; j > 0; j--)
                 {po = lout + nbo - j;
                  pi = lin + j - 1;
-                 for (i = 0L; i < nitems; i++)
+                 for (i = 0L; i < ni; i++)
                      {*po = *pi;
                       po += nbo;
 		      pi += nbi;};};}
@@ -1193,20 +1461,20 @@ void _PD_iconvert(char **out, char **in, long nitems,
            {for (j = nbi - nbo; j < nbi; j++)
                 {po = lout + j - nbi + nbo;
                  pi = lin + j;
-                 for (i = 0L; i < nitems; i++)
+                 for (i = 0L; i < ni; i++)
                      {*po = *pi;
                       po += nbo;
 		      pi += nbi;};};};};
 
 /* if the input used ones complement arithmetic convert to twos complement */
     if (onescmp)
-       _PD_ones_complement(*out, nitems, nbo, NULL);
+       _PD_ones_complement(*out, ni, nbo, NULL);
                           
     if (ordo == REVERSE_ORDER)
-       PD_byte_reverse(*out, nbo, nitems);
+       PD_byte_reverse(*out, nbo, ni);
 
-    *in  += nitems*nbi;
-    *out += nitems*nbo;
+    *in  += ni*nbi;
+    *out += ni*nbo;
 
     return;}
 
@@ -1979,7 +2247,7 @@ void _PD_fconvert(char **out, char **in, long ni, int boffs,
 
 /* _PD_CONVERT - convert primitive types from one machine format to
  *             - another.  Guaranteed that there will be no indirects here.
- *             - Convert NITEMS of type, TYPE, from IN and
+ *             - Convert NI of type, TYPE, from IN and
  *             - put them in OUT
  *             - ISTD defines the data format of the data from IN
  *             - PIN_OFFS and POUT_OFFS are pointers to external offset
@@ -1988,7 +2256,7 @@ void _PD_fconvert(char **out, char **in, long ni, int boffs,
  *             - returns TRUE iff successful
  */
 
-static int _PD_convert(char **out, char **in, long nitems, int boffs,
+static int _PD_convert(char **out, char **in, long ni, int boffs,
 		       defstr *idp, defstr *odp,
 		       data_standard *istd, data_standard *ostd,
 		       data_standard *hstd,
@@ -2035,8 +2303,8 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
 /* sometimes this should be clear from the text (e.g. 0xfff)
  * sometimes it should be specified by the caller (e.g. 101 - binary, octal, ...?)
  */
-    nbi = inb*nitems;
-    nbo = onb*nitems;
+    nbi = inb*ni;
+    nbo = onb*ni;
 
     if (hstd->file != NULL)
        {rdx   = hstd->file->radix;
@@ -2047,7 +2315,7 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
 
 /* text to binary conversions */
     if (inord == TEXT_ORDER)
-       {_PD_text_bin(out, in, idp->type, nitems, boffs,
+       {_PD_text_bin(out, in, idp->type, ni, boffs,
 		     iknd, ifmt, inb, isord, iaord,
 		     oknd, ofmt, onb, osord, oaord,
 		     hstd, onescmp, usg,
@@ -2058,7 +2326,7 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
 
 /* binary to text conversions */
     else if (outord == TEXT_ORDER)
-       {_PD_bin_text(out, in, idp->type, nitems, boffs,
+       {_PD_bin_text(out, in, idp->type, ni, boffs,
 		     iknd, ifmt, inb, isord, iaord,
 		     oknd, ofmt, onb, osord, oaord,
 		     hstd, onescmp, usg,
@@ -2071,14 +2339,14 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
     else if ((strcmp(odp->type, idp->type) == 0) &&
 	     (odp->convert == 0) && (idp->convert == 0) &&
 	     (nbi == nbo))
-       {_PD_ncopy(out, in, nitems, inb);
+       {_PD_ncopy(out, in, ni, inb);
 
         *pin_offs  += nbi;
         *pout_offs += nbo;}
 
 /* handle floating point conversions */
     else if ((ifmt != NULL) && (ofmt != NULL))
-       {_PD_fconvert(out, in, nitems, boffs, ifmt, iaord,
+       {_PD_fconvert(out, in, ni, boffs, ifmt, iaord,
                      ofmt, oaord, lsord, lnby, onescmp);
 
         *pin_offs  += nbi;
@@ -2094,11 +2362,11 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
 
 /* unpack the bitstream into a bytestream */
 	ret = SC_unpack_bits(*out, *in, ityp, inbts,
-			     0, nitems, nitems, boffs);
+			     0, ni, ni, boffs);
 
 /* convert binary characters */
         if (strcmp(inty, SC_CHAR_S) == 0)
-	   _PD_convert_ascii(*out, *in, nitems, inbts, 0);
+	   _PD_conv_to_ascii_7(*out, ni, inbts);
 
 /* convert integers */
         else
@@ -2109,10 +2377,10 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
                for (i = 0; i < onb; intord[i] = onb - i, i++);
 
             if (usg == FALSE)
-      	        _PD_sign_extend(*out, nitems, onb, inbts, intord);
+      	        _PD_sign_extend(*out, ni, onb, inbts, intord);
 
             if (onescmp)
-               _PD_ones_complement(*out, nitems, onb, intord);
+               _PD_ones_complement(*out, ni, onb, intord);
 
             CFREE(intord);
 
@@ -2123,7 +2391,7 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
 
 /* handle integer conversions */
     else if ((isord != NO_ORDER) && (osord != NO_ORDER))
-       {_PD_iconvert(out, in, nitems,
+       {_PD_iconvert(out, in, ni,
                      (int) inb, isord,
                      (int) onb, osord, onescmp, usg);
 
@@ -2132,7 +2400,7 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
 
 /* handle character or unconverted types */
     else
-       {_PD_ncopy(out, in, nitems, inb);
+       {_PD_ncopy(out, in, ni, inb);
 
         *pin_offs  += nbi;
         *pout_offs += nbo;};
@@ -2142,7 +2410,7 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_CONVERT - convert from one machine format to another NITEMS of
+/* PD_CONVERT - convert from one machine format to another NI of
  *            - type, TYPE, from IN and put them in OUT
  *            - ISTD and OSTD are the data format standards of IN and 
  *            - OUT respectively
@@ -2151,7 +2419,7 @@ static int _PD_convert(char **out, char **in, long nitems, int boffs,
  */
 
 int PD_convert(char **out, char **in, char *typi, char *typo,
-	       long nitems, data_standard *stdi, data_standard *stdo,
+	       long ni, data_standard *stdi, data_standard *stdo,
 	       data_standard *hstd, hasharr *chi, hasharr *cho,
 	       int boffs, PD_major_op error)
    {int ret, tmp;
@@ -2183,12 +2451,12 @@ int PD_convert(char **out, char **in, char *typi, char *typo,
        {inci = _PD_align(in_offs, typi, dpi->is_indirect, chi, &tmp);
         inco = _PD_align(out_offs, typo, dpo->is_indirect, cho, &tmp);
 
-	ret = _PD_convert_ptr(out, in, &out_offs, &in_offs, nitems,
+	ret = _PD_convert_ptr(out, in, &out_offs, &in_offs, ni,
 			      cho, chi, stdo, stdi, hstd, inco, inci);}
 
 /* if members is non-NULL then it is a derived type */
     else if (dpo->members != NULL)
-       {for (i = 0L; i < nitems; i++)
+       {for (i = 0L; i < ni; i++)
             {inci = _PD_align(in_offs, typi, dpi->is_indirect, chi, &tmp);
              inco = _PD_align(out_offs, typo, dpo->is_indirect, cho, &tmp);
 
@@ -2248,13 +2516,165 @@ int PD_convert(char **out, char **in, char *typi, char *typo,
 
 /* if members is NULL then it is a primitive type */
     else
-       {ret = _PD_convert((char **) out, in, nitems, boffs, dpi, dpo,
+       {ret = _PD_convert((char **) out, in, ni, boffs, dpi, dpo,
                           stdi, stdo, hstd, &in_offs, &out_offs);
         if (ret == FALSE)
            PD_error("PRIMITIVE CONVERSION FAILED - PD_CONVERT",
                     error);};
 
     return(ret);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_N_BIT_CHAR_STD - return the bit size correspondingn to CSTD */
+
+int PD_n_bit_char_std(PD_character_standard cstd)
+   {int nb;
+
+    switch (cstd)
+        {case PD_ITA2_UPPER :
+	 case PD_ITA2_LOWER :
+	      nb = 5;
+	      break;
+	 case PD_ASCII_6_UPPER :
+	 case PD_ASCII_6_LOWER :
+	      nb = 6;
+	      break;
+	 case PD_EBCDIC :
+	 default :
+	      nb = 8;
+	      break;};
+
+     return(nb);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_CONVERT_ASCII - convert character bit-stream in IN
+ *                  - to standard 7-bit ASCII bytestream OUT
+ *                  - IN is NB bytes long (NOTE: not characters long)
+ *                  - CSTD is one of:
+ *                  -   PD_ITA2_UPPER     upper case ITA2
+ *                  -   PD_ITA2_LOWER     lower case ITA2
+ *                  -   PD_ASCII_6_UPPER  upper case 6-bit ASCII
+ *                  -   PD_ASCII_6_LOWER  lower case 6-bit ASCII
+ *                  -   PD_ASCII_7        7-bit ASCII (no-op)
+ *                  -   PD_UTF_8          8-bit UTF (no-op)
+ *                  -   PD_EBCDIC         IBM EBCDIC 8-bit
+ *
+ * #bind PD_convert_ascii fortran() scheme() python()
+ */
+
+char *PD_convert_ascii(char *out, int nc, PD_character_standard cstd,
+		       char *in, int nb)
+   {int n, ret;
+    long ni;
+
+    switch (cstd)
+       {case PD_ITA2_UPPER :
+        case PD_ITA2_LOWER :
+             n = 5;
+	     break;
+        case PD_ASCII_6_UPPER :
+        case PD_ASCII_6_LOWER :
+             n = 6;
+	     break;
+        default :
+             n = 8;
+	     break;};
+
+    ni = (8*nb)/n;
+
+/* unpack the bitstream into a bytestream */
+    ret = SC_unpack_bits(out, in, SC_INT8_I, n, 0, ni, ni, 0);
+
+    _PD_conv_to_ascii_7(out, ni, cstd);
+
+    return(out);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_CONV_FROM_ASCII - convert character bit-stream in IN
+ *                    - to standard 7-bit ASCII bytestream OUT
+ *                    - IN is NB bytes long (NOTE: not characters long)
+ *                    - CSTD is one of:
+ *                    -   PD_ITA2_UPPER     upper case ITA2
+ *                    -   PD_ITA2_LOWER     lower case ITA2
+ *                    -   PD_ASCII_6_UPPER  upper case 6-bit ASCII
+ *                    -   PD_ASCII_6_LOWER  lower case 6-bit ASCII
+ *                    -   PD_ASCII_7        7-bit ASCII (no-op)
+ *                    -   PD_UTF_8          8-bit UTF (no-op)
+ *                    -   PD_EBCDIC         IBM EBCDIC 8-bit
+ *
+ * #bind PD_conv_from_ascii fortran() scheme() python()
+ */
+
+char *PD_conv_from_ascii(char *out, int nc, PD_character_standard cstd,
+			 char *in, int nb)
+   {int n;
+    char *t;
+
+    n = min(nc, nb);
+
+    switch (cstd)
+       {case PD_ITA2_UPPER :
+        case PD_ITA2_LOWER :
+             t = CMAKE_N(char, n);
+	     memcpy(t, in, n);
+	     memset(out, 0, nc);
+             _PD_conv_to_ita2(t, n, PD_ASCII_7);
+	     PD_pack_bits(out, t, SC_CHAR_I, 6, 0, 1, n, 0);
+             CFREE(t);
+	     break;
+        case PD_ASCII_6_UPPER :
+        case PD_ASCII_6_LOWER :
+             t = CMAKE_N(char, n);
+	     memcpy(t, in, n);
+	     memset(out, 0, nc);
+             _PD_conv_to_ascii_6(t, n, PD_ASCII_7);
+	     PD_pack_bits(out, t, SC_CHAR_I, 6, 0, 1, n, 0);
+             CFREE(t);
+	     break;
+        case PD_EBCDIC :
+	     memcpy(out, in, n);
+             _PD_conv_to_ebcdic(out, n, PD_ASCII_7);
+	     break;
+        default :
+	     memcpy(out, in, n);
+	     break;};
+
+    return(out);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_CONV_ASCII_CHK - check conversions in and out of CTSD */
+
+int _PD_conv_ascii_chk(PD_character_standard cstd)
+   {int i, n, rv;
+    char *in, *im, *out;
+
+    n   = 128;
+    in  = CMAKE_N(char, n);
+    im  = CMAKE_N(char, n);
+    out = CMAKE_N(char, n);
+    for (i = 0; i < n; i++)
+        in[i] = i;
+
+    PD_conv_from_ascii(im, n, cstd, in, n);
+    PD_convert_ascii(out, n, cstd, im, n);
+
+    rv = 0;
+    for (i = 0; i < n; i++)
+        rv += (out[i] != in[i]);
+
+    CFREE(in);
+    CFREE(im);
+    CFREE(out);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

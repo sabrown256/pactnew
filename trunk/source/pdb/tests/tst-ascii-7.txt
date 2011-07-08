@@ -1,0 +1,18 @@
+0123456789
+abcdefghijklmnopqrstuvwxyz
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+`-=[]\;',./
+~!@#$%^&*()_+{}|:"<>?
+
+Test tab:
+	Four score and ...
+
+Test carriage return:
+             abcdef
+
+Test line feed:
+             uvw
+xyz
+
+end
+

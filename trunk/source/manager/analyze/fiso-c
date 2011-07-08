@@ -1,0 +1,53 @@
+#!/bin/csh -f
+#
+# FISO-C - analyze the Fortran iso_c_binding module
+#        - Computes: HaveIsoCBinding
+#        - Modifies: FC_Exe, FC_Flags, Cfg_FC_Exe, Cfg_FC_Flags,
+#        -           Cfe_FC_Exe, and Cfe_FC_Flags
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+cat << EOF >! ${Tmp}_iso.f
+program main
+  use iso_c_binding
+  stop 0
+end program main
+EOF
+
+Note $ALog "Verify working iso_c_binding module"
+flog $ALog cat ${Tmp}_iso.f
+flog $ALog $FC_Exe ${Tmp}_iso.f -c $FC_Flags
+if ($status == 0) then
+   setenv HaveIsoCBinding TRUE
+   NoteD $ALog "      has iso_c_binding module"
+else
+   setenv HaveIsoCBinding FALSE
+   NoteD $ALog "      no iso_c_binding module"
+   flog $ALog setenv FC_Exe        none
+   flog $ALog setenv FC_Flags      ""
+   flog $ALog setenv Cfe_FC_Exe    none
+   flog $ALog setenv Cfe_FC_Flags  ""
+   flog $ALog setenv Cfg_FC_Exe    none
+   flog $ALog setenv Cfg_FC_Flags  ""
+endif
+
+flog $ALog rm -f ${Tmp}_iso*
+
+# export the result
+SetParent HaveIsoCBinding
+SetParent FC_Exe
+SetParent FC_Flags
+SetParent Cfg_FC_Exe
+SetParent Cfg_FC_Flags
+SetParent Cfe_FC_Exe
+SetParent Cfe_FC_Flags
+
+
+#exit(0)

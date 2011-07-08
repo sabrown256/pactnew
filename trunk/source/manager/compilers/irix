@@ -60,7 +60,8 @@ Group PThread {
 }
 
 Group OpenMP {
-   LD_Lib = -lpthread
+   LD_Lib    = -lpthread
+   SharedFnc = yes
 }
 
 define HAVE_NO_SIGFPE

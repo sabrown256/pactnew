@@ -71,15 +71,23 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-
 #ifdef __GNUC__
 
-# ifdef ISO_C99
+/*--------------------------------------------------------------------------*/
 
-#ifndef __cplusplus
+# ifndef __cplusplus
+#  ifdef ISO_C99
+
 extern int
  getpagesize(void);
-#endif
+
+#  endif
+
+/* older compilers in the 3.x series are missing these */
+extern long double
+ powl(long double x, long double y),
+ expl(long double x),
+ sqrtl(long double x);
 
 # endif
 
@@ -94,7 +102,11 @@ extern int
 
 # endif
 
+/*--------------------------------------------------------------------------*/
+
 #endif
+
+/*--------------------------------------------------------------------------*/
 
 #ifdef __cplusplus
 }

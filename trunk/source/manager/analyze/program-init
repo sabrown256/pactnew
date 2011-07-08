@@ -64,6 +64,11 @@ Group MD {
    Pck   = ""
 }
 
+# Open MP group
+Group OpenMP {
+   SharedFnc = no
+}
+
 # distributed processing group
 Group DP {
    Inc   = ""

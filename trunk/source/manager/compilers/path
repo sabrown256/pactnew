@@ -65,9 +65,10 @@ Group PThread {
 }
 
 Group OpenMP {
-   CC_Flags = -mp
-   LD_Flags = -mp
-   LD_Lib   = -lpthread
+   CC_Flags  = -mp
+   LD_Flags  = -mp
+   LD_Lib    = -lpthread
+   SharedFnc = yes
 }
 
 include cpp-rule

@@ -3331,6 +3331,8 @@ static void py_format(char *fmt, int nc, char *spec, char *name)
 	  else if ((strcmp(ty, "SC_STRING_I") == 0) ||
 		   (strcmp(ty, "char *") == 0))
 	    *pf++ = 's';
+	  else if (strcmp(ty, "SC_ENUM_I") == 0)
+	    *pf++ = 'i';
 	  else
 	    *pf++ = 'O';};
 
@@ -3455,7 +3457,7 @@ static void python_make_decl(char *t, int nc, fdecl *dcl)
 	 ty  = al->type;
 	 deref(dty, MAXLINE, ty);
 	 lty = lookup_type(NULL, dty, MODE_C, MODE_P);
-	 if (lty != NULL)
+	 if ((lty != NULL) && (strcmp(lty, "SC_ENUM_I") != 0))
 	    {pty = lty;
 	     break;};};
 
@@ -3576,7 +3578,7 @@ static void python_wrap_local_decl(FILE *fp, fdecl *dcl, char *kw)
 	        vstrcat(t, MAXLINE, "char *kw_list[] = {%sNULL};\n", kw);}
 
 /* local vars */
-	 else if (nm != '\0')
+	 else if (IS_NULL(ip->decl) == FALSE)
 	    nstrcat(t, MAXLINE, ip->decl);
 
 	 if (IS_NULL(t) == FALSE)

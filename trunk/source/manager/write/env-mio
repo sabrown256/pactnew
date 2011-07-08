@@ -125,17 +125,17 @@ HAVE_SUBROUTINES
     Note $FOUT ""
 
     if ($PACT_CC_FAMILY == GNU) then
-       set CmpBin   = $PACT_CC_PATH/bin
-       set cmplib   = $PACT_CC_PATH/$LIB
+       set CmpBin = $PACT_CC_PATH/bin
+       set cmplib = $PACT_CC_PATH/$LIB
 
     else if ($PACT_CC_FAMILY == PGI) then
-       set cmplib   = $PACT_CC_PATH/lib
-       set lnuma    = $NUMA
+       set cmplib = $PACT_CC_PATH/lib
+       set lnuma  = $NUMA
        Note $FOUT ""
        Note $FOUT 'VMake += NUMA'
 
     else if ($PACT_CC_FAMILY == INTEL) then
-       set cmplib   = $PACT_CC_PATH/lib
+       set cmplib = $PACT_CC_PATH/lib
 
     else if ($PACT_CC_FAMILY == PATHSCALE) then
        if ("$Bits" == 32) then
@@ -169,6 +169,11 @@ HAVE_SUBROUTINES
        set proot = $InstBase
     endif
     set pvers = `cat .pact-version`
+
+    if ($OpenMP_SharedFnc == yes) then
+       Note $FOUT "define(NEED_OMP_SHARED_FUNCTION)"
+       Note $FOUT ""
+    endif
 
     Note $FOUT "CFE           = $CFE"
     Note $FOUT "PFE           = $PFE"
