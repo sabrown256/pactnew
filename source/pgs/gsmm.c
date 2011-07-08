@@ -122,7 +122,7 @@ PG_graph *PG_make_graph_1d(int id, char *label, int cp, int n,
  *                     - which will describe a mapping from R2 to R1 
  *                     - and return a pointer to it
  *
- * #bind PG_make_graph_r2_r1 fortran() scheme()
+ * #bind PG_make_graph_r2_r1 fortran() scheme() python()
  */
 
 PG_graph *PG_make_graph_r2_r1(int id, char *label, int cp,

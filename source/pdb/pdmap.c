@@ -316,10 +316,11 @@ int PD_wrt_map_ran(PDBfile *file ARG(,,cls), char *dname,
 
 /* PD_WRT_IMAGE - write a PG_image into a PDB file
  *
- * #bind PD_wrt_image fortran()
+ * #bind PD_wrt_image fortran() python(wrt_image)
  */
 
-int PD_wrt_image(PDBfile *file, char *name, double *dbx, double *lbx,
+int PD_wrt_image(PDBfile *file ARG(,,cls),
+		 char *name, double *dbx, double *lbx,
 		 double *data, int *sim)
    {int i, n, kx, lx, k, l, rv;
     double z;

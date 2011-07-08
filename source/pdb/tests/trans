@@ -1,0 +1,133 @@
+#!/bin/csh -f
+#
+# TRANS - PDB character translation test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+InitLog Log $TestDir/log.trans.$LogSfx
+
+set tst = $1
+
+NoteD $Log ""
+NoteD $Log "                    PDB Translation Test ............... "
+Note $Log ""
+
+flog $Log pushd $SrcDir
+flog $Log pact trans
+set TStatus = $status
+flog $Log popd
+
+if ($TStatus != 0) then
+   NoteD $Log ""
+   NoteD $Log "                         Can't build PDB Test Programs"
+   set ERROR = "TRUE"
+else
+
+   set TstDir = $SrcDir/tests
+   set RefDir = $TstDir/ref
+   set TFile  = $TstDir/tst-ascii-7.txt
+
+   set UTime = `$TIMER -r`
+   if ("$Valgrind" == "") then
+
+      Separator $Log
+      NoteD $Log -n "                        from ......................."
+      Note $Log ""
+      @ lerr = 0
+      set lst = ( -oe tst-ebcdic.res -o5 tst-ita2.res -o6 tst-ascii-6.res -o7 tst-ascii-7.res )
+      while ($#lst > 0)
+         set ostd = $lst[1]
+         set file = $lst[2]
+         set ref  = $RefDir/$file:r.ref
+         shift lst
+         shift lst
+         Note $Log "-------------------"
+         Note $Log "   $ostd   $file"
+         flog $Log $CFE $BinDir/pdctrns $ostd $TFile -f $file
+         if ($status != 0) then
+            @ lerr = $lerr + 1
+            NoteD $Log -n "x"
+         else if (-f $ref) then
+            flog $Log diff $file $ref
+            if ($status != 0) then
+               @ lerr = $lerr + 1
+               NoteD $Log -n "+"
+            else
+               NoteD $Log -n "."
+            endif
+         else
+            flog $Log cp $file $ref
+            NoteD $Log -n "."
+         endif
+      end
+      set xstatus = $lerr
+      if ($lerr == 0) then
+         NoteD $Log " ok"
+      else
+         NoteD $Log " ng ($lerr)"
+      endif
+
+      Separator $Log
+      NoteD $Log -n "                        to ........................."
+      Note $Log ""
+      @ lerr = 0
+      set lst = ( -ie tst-ebcdic.ref -i5 tst-ita2.ref -i6 tst-ascii-6.ref -i7 tst-ascii-7.ref )
+      while ($#lst > 0)
+         set istd = $lst[1]
+         set file = $RefDir/$lst[2]
+         set ref  = tmp.txt
+         shift lst
+         shift lst
+         Note $Log "-------------------"
+         Note $Log "   $istd   $file"
+         flog $Log $CFE $BinDir/pdctrns $istd $file -f $ref
+         if ($status != 0) then
+            @ lerr = $lerr + 1
+            NoteD $Log -n "x"
+         else if (-f $ref) then
+            flog $Log diff -i $ref $TFile
+#            flog $Log cmp -l $ref $TFile
+            if ($status != 0) then
+#               @ lerr = $lerr + 1
+               NoteD $Log -n "+"
+               flog $Log cat $ref
+            else
+               NoteD $Log -n "."
+            endif
+         else
+            flog $Log cp $file $ref
+            NoteD $Log -n "."
+         endif
+         flog $Log $RM $ref
+      end
+      set xstatus = $lerr
+      if ($lerr == 0) then
+         NoteD $Log " ok"
+      else
+         NoteD $Log " ng ($lerr)"
+      endif
+
+   else
+      flog $Log $Valgrind $BinDir/pdctrns -oe $TFile -f tst-ebcdic.txt
+      set xstatus = $status
+   endif
+   set ETime = `$TIMER -b $UTime`
+
+   if (($xstatus == 254) || ($xstatus == 255)) then
+      NoteD $Log "                    PDB Translation Test ............... OMITTED ($xstatus/$ETime)"
+   else if ($xstatus != 0) then
+      NoteD $Log "                    PDB Translation Test ............... FAILED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      NoteD $Log "                    PDB Translation Test ............... PASSED ($ETime)"
+   endif
+
+endif
+
+exit($Err)

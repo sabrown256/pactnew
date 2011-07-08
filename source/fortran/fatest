@@ -10,6 +10,7 @@
 
 set Package = fortran
 source ../scripts/test-env
+source $IncDir/env-pact.csh
 
 setenv LogF  $Log
 

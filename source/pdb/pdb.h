@@ -310,6 +310,22 @@ typedef enum e_PD_checksum_mode PD_checksum_mode;
 
 #endif
 
+/*
+ * #bind derived PD_character_standard integer SC_ENUM_I SC_ENUM_I PD_UTF_8
+ */
+
+enum e_PD_character_standard
+   {PD_ITA2_UPPER    = -5,
+    PD_ITA2_LOWER    =  5,
+    PD_ASCII_6_UPPER = -6,
+    PD_ASCII_6_LOWER =  6,
+    PD_ASCII_7       =  7,
+    PD_UTF_8         =  8,
+    PD_EBCDIC        =  157};
+
+typedef enum e_PD_character_standard PD_character_standard;
+
+
 /* NOTE: see comment in scope_io.h concerning file_io_desc and the stream member
  *       here the buffer is the analog of the FILE *
  */
@@ -1042,7 +1058,14 @@ extern int
  PD_convert(char **out, char **in, char *typi, char *typo,
 	    long nitems, data_standard *stdi, data_standard *stdo,
 	    data_standard *hstd, hasharr *chi, hasharr *cho,
-	    int boffs, PD_major_op error);
+	    int boffs, PD_major_op error),
+ PD_n_bit_char_std(PD_character_standard cstd);
+
+extern char
+ *PD_convert_ascii(char *out, int nc, PD_character_standard cstd,
+		   char *in, int nb),
+ *PD_conv_from_ascii(char *out, int nc, PD_character_standard cstd,
+		     char *in, int nb);
 
 
 /* PDGS.C declarations */

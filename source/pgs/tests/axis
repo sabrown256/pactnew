@@ -67,6 +67,9 @@ end
          endsw
 
          foreach i (gslax*.dat)
+            if ($OS =~ CYGWIN*) then
+               if ($i == gslax4.dat) continue
+            endif
             Separator $Log
             Note $Log "Test $i ($o)"
             flog $Log set bs = $i:r

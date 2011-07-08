@@ -207,11 +207,11 @@ int SC_fix_lmt(int nb, int64_t *pmn, int64_t *pmx, int64_t *pumx)
  */
 
 long SC_extract_field(char *in, int offs, int nbi, int nby, int *ord)
-   {long n, bit_field;
+   {long n, bitf;
     int offy, tgt, ind;
     unsigned char mask, bpb;
 
-    bit_field = 0L;
+    bitf = 0L;
 
 /* move past the apropriate number of bytes so that the start bit is
  * in the first byte
@@ -225,7 +225,7 @@ long SC_extract_field(char *in, int offs, int nbi, int nby, int *ord)
 /* advance the pointer past the unneeded items */
     in += n;
 
-    bpb  = 8 - offs;
+    bpb = 8 - offs;
     if (ord == NULL)
        ind = offy++;
     else
@@ -236,10 +236,10 @@ long SC_extract_field(char *in, int offs, int nbi, int nby, int *ord)
 
     tgt  = in[ind];
     mask = (1 << bpb) - 1;
-    bit_field = ((bit_field << bpb) | (tgt & mask));
+    bitf = ((bitf << bpb) | (tgt & mask));
     nbi -= bpb;
     if (nbi < 0)
-       bit_field = bit_field >> (-nbi);
+       bitf = bitf >> (-nbi);
     else
        {for (; nbi > 0; nbi -= bpb)
             {if (ord == NULL)
@@ -253,10 +253,10 @@ long SC_extract_field(char *in, int offs, int nbi, int nby, int *ord)
              tgt  = in[ind];
              bpb  = min(nbi, 8);
              mask = (1 << bpb) - 1;
-             bit_field = ((bit_field << bpb) |
-                          ((tgt >> (8 - bpb)) & mask));};};
+             bitf = ((bitf << bpb) |
+		     ((tgt >> (8 - bpb)) & mask));};};
 
-    return(bit_field);}
+    return(bitf);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -280,38 +280,9 @@ int SC_unpack_bits(char *out, char *in, int ityp, int nbits,
 	 bita = np*padsz + i*nbits + offs;
 	 fld  = SC_extract_field(in, bita, nbits, INT_MAX, NULL);
 
-#if 1
 	 if (SC_is_type_fix(ityp) == TRUE)
 	    {if (SC_unpack_bits_fnc[ityp] != NULL)
-	        SC_unpack_bits_fnc[ityp](out, i, fld);};
-#else
-	 if (ityp == SC_INT8_I)
-	    {int8_t *pv;
-	     pv = (int8_t *) out;
-	     pv[i] = (int8_t) fld;}
-
-	 else if (ityp == SC_SHORT_I)
-	    {short *pv;
-	     pv    = (short *) out;
-	     pv[i] = (short) fld;}
-
-	 else if (ityp == SC_INT_I)
-	    {int *pv;
-	     pv    = (int *) out;
-	     pv[i] = (int) fld;}
-
-	 else if (ityp == SC_LONG_I)
-	    {long *pv;
-	     pv    = (long *) out;
-	     pv[i] = (long) fld;}
-
-	 else if (ityp == SC_LONG_LONG_I)
-	    {long long *pv;
-	     pv    = (long long *) out;
-	     pv[i] = (long long) fld;};
-
-#endif
-        };
+	        SC_unpack_bits_fnc[ityp](out, i, fld);};};
 
     return(TRUE);}
 

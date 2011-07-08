@@ -775,7 +775,7 @@ extern void
 extern int
  SC_fix_lmt(int nb, int64_t *pmn, int64_t *pmx, int64_t *pumx),
  SC_unpack_bits(char *out, char *in, int ityp, int nbits,
-			     int padsz, int fpp, long nitems, long offs),
+		int padsz, int fpp, long nitems, long offs),
  SC_sizeof(char *s),
  SC_pointer_ok(void *p),
  SC_putenv(char *s);
