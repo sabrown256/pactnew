@@ -135,13 +135,7 @@
 
 #ifndef F77_ID
 
-# ifdef ANSI_F77
-#  define F77_ID(x_, x, X)  X
-# endif
-
-# ifndef F77_ID
-#  define F77_ID(x_, x, X)  x_
-# endif
+# define F77_ID(x_, x, X)  FF_ID(x, X)
 
 #endif
 
