@@ -49,7 +49,7 @@ set extra = ""
 set sys   = `system-id`
 
 if ($?DAS_ROOT == 1) then
-   set extra = ( $DAS_ROOT/pactnew/bin/pact $DAS_ROOT/pact/bin/pact )
+   set extra = ( $DAS_ROOT/pactnew/bin $DAS_ROOT/pact/bin )
 endif
 
 # GOTCHA: this is very weak logic in a do-net situation

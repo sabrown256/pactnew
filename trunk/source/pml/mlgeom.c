@@ -1411,6 +1411,9 @@ static void _PM_combine_polygons(SC_array *a,
 			 i1   = ibb;
 			 SC_SWAP_VALUE(polywalk *, wa, wb);};};};
 
+/* GOTCHA: artificial limit to avoid numerically induced infinite loops */
+             more &= (SC_array_get_n(a) < 100);
+
 	     if (more == TRUE)
 	        pc = PM_init_polygon(nd, nx);};};
 
