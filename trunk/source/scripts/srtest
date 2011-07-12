@@ -29,17 +29,28 @@ while ($#argv > 0)
    shift
 end
 
-flog $Log cd $TestDir
-
 @ Err = 0
 
-set BeginTime = `$TIMER -r`
-
-NoteD $Log ""
-NoteD $Log "SCRIPT TEST ..."
+flog $Log cd $TestDir
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+# omit tests - usually in difficult CROSS_COMPILE situation
+
+if ($RUN_TESTS == FALSE) then
+   NoteD $Log ""
+   NoteD $Log "SCRIPT TESTS ... omitted"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# run the tests
+
+else if (-e $RootDir/score/scstd.h) then
+
+   NoteD $Log ""
+   NoteD $Log "SCRIPT TEST ..."
 
    if ("$Tests" == "") then
       set Tests = ""
@@ -56,20 +67,16 @@ NoteD $Log "SCRIPT TEST ..."
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-set ETime = `$TIMER -b $BeginTime`
+# CLEAN UP - we are all done now
 
-if ($Err != 0) then
-   NoteD $Log ""
-   NoteD $Log "SCRIPT TEST ... FAILED ($ETime)"
-   NoteD $Log ""
-   NoteD $Log "See $Log for details"
-   NoteD $Log ""
-else
-   NoteD $Log "SCRIPT TEST ... PASSED ($ETime)"
+   $TEST_CHECK -n SCRIPT -e $ERROR clean
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 endif
-NoteD $Log ""
 
-NoteD $Log " --------------------------------------------------------"
+$TEST_CHECK -e $ERROR fin
 
-exit($Err)
+exit($status)
 

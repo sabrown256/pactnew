@@ -1,0 +1,119 @@
+#!/bin/csh -f
+#
+# TEST-CHECK - post test checks and reporting
+#            - handle all PACT tests consistently
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source $TestScrDir/env-csh
+
+@ err = 0
+
+set tgt  = none
+set name = ""
+set terr = "FALSE"
+set raf  = ""
+set rpf  = ""
+
+if ($?BTime == 1) then
+   set t0 = $BTime
+else
+   set t0 = 0
+endif
+
+if ($?Log == 1) then
+   set log = $Log
+else
+   set log  = /dev/null
+endif
+
+while ($#argv > 0)
+   switch ($1)
+      case -e:
+           shift
+           set terr = $1
+           breaksw
+      case -l:
+           shift
+           set log = $1
+           breaksw
+      case -n:
+           shift
+           set name = $1
+           breaksw
+      case -raf:
+           shift
+           set raf = ( $1 )
+           breaksw
+      case -rpf:
+           shift
+           set rpf = ( $1 )
+           breaksw
+      case -t0:
+           shift
+           set t0 = $1
+           breaksw
+      default:
+           set tgt = $1
+           breaksw
+   endsw
+   shift
+end
+
+# make sure it is upper case
+set name = ( `echo $name | tr "[a-z]" "[A-Z]"` )
+
+switch ($tgt)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CLEAN UP
+   case clean:
+
+        if ("$raf" != "") then
+           flog $log $RM $raf
+        endif
+
+        set dt = `$TIMER -b $t0`
+
+        NoteD $log ""
+
+        if ($terr == "TRUE") then
+           NoteD $log ""
+           NoteD $log "$name TEST ... FAILED ($dt)"
+           NoteD $log ""
+           NoteD $log "See $log for details"
+        else
+           if ("$rpf" != "") then
+              flog $log $RM $rpf
+           endif
+           NoteD $log "$name TEST ... PASSED ($dt)"
+        endif
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FINISH
+   case fin:
+
+        NoteD $Log ""
+        NoteD $Log " --------------------------------------------------------"
+
+        set err = 0
+        if ($terr == "TRUE") then
+           set err = 1
+        endif
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+endsw
+
+exit($err)
