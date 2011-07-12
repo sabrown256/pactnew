@@ -36,15 +36,21 @@ end
 
 cd $TestDir
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # omit tests - usually in difficult CROSS_COMPILE situation
+
 if ($RUN_TESTS == FALSE) then
    NoteD $Log ""
    NoteD $Log "SCORE TESTS ... omitted"
 
-# run the tests
-else if (-e $RootDir/score/scstd.h) then
-   set BeginTime = `$TIMER -r`
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
+# run the tests
+
+else if (-e $RootDir/score/scstd.h) then
    NoteD $Log ""
    NoteD $Log "SCORE TEST ..."
 
@@ -67,18 +73,6 @@ else if (-e $RootDir/score/scstd.h) then
       setenv Valgrind  "$Valgrind --suppressions=$SrcDir/tests/vg.suppress-test"
    endif
 
-   if ($?autotool == 0) then
-      Note $Log "PACT        = $PACT"
-      Note $Log "Parallel    = |$Parallel|"
-      Note $Log "MPI         = |$MPI|"
-      Note $Log "HaveDevZero = |$HaveDevZero|"
-      flog $Log ../../../manager/pwhich pact
-      flog $Log ../../../manager/pwhich cc
-   endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
    if ("$Test" == "") then
       set Test = ""
       set Test = ($Test sharp ar mk mkinfo error mpi)
@@ -99,32 +93,13 @@ else if (-e $RootDir/score/scstd.h) then
 
 # CLEAN UP - we are all done now
 
-   flog $Log $RM $Tmp
+   $TEST_CHECK -n SCORE -e $ERROR -raf "$Tmp" clean
 
-   set ETime = `$TIMER -b $BeginTime`
-
-   NoteD $Log ""
-
-   if ($ERROR == "TRUE") then
-      NoteD $Log ""
-      NoteD $Log "SCORE TEST ... FAILED ($ETime)"
-      NoteD $Log ""
-      NoteD $Log "See $Log for details"
-   else
-      NoteD $Log "SCORE TEST ... PASSED ($ETime)"
-   endif
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 endif
 
-NoteD $Log ""
-NoteD $Log " --------------------------------------------------------"
+$TEST_CHECK -e $ERROR fin
 
-set xstatus = 0
-if ($ERROR == "TRUE") then
-   set xstatus = 1
-endif
-
-Note $Log "Exiting with status $xstatus"
-
-exit($xstatus)
-
+exit($status)

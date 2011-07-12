@@ -35,16 +35,28 @@ end
 
 cd $TestDir
 
-# run the tests if Python bindings have been built
-if (-f $LPYTHON/pact/pdb.py) then
-   set BeginTime = `$TIMER -r`
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-   echo ""
-   echo "PYTHON TEST ..."
+# omit tests - usually in difficult CROSS_COMPILE situation
 
-   # Clean up the test dir
+if ($RUN_TESTS == FALSE) then
+   NoteD $Log ""
+   NoteD $Log "SCORE TESTS ... omitted"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# run the tests
+
+else if (-f $LPYTHON/pact/pdb.py) then
+
+# clean up the test dir
    rm -f $Log
    touch $Log
+
+   NoteD $Log ""
+   NoteD $Log "PYTHON TEST ......"
 
    Note $Log "BinDir     = $BinDir"
    Note $Log "path       = $path"
@@ -54,20 +66,15 @@ if (-f $LPYTHON/pact/pdb.py) then
    Note $Log "PYTHONPATH = $PYTHONPATH"
    Note $Log "python     = $PYTHON"
       
-   if ($?autotool == 0) then
-      Note $Log "PYVER       = |$PYVER|"
-      Note $Log "PYTHONBIN   = |$PYTHONBIN|"
-      Note $Log "LPYTHON     = |$LPYTHON|"
-      Note $Log "PYTHON      = |$PYTHON|"
-      Note $Log "PACT        = $PACT"
-      Note $Log "Parallel    = |$Parallel|"
-      Note $Log "MPI         = |$MPI|"
-      flog $Log ../../../manager/pwhich pact
-      flog $Log ../../../manager/pwhich cc
-   endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+   Note $Log "PYVER       = |$PYVER|"
+   Note $Log "PYTHONBIN   = |$PYTHONBIN|"
+   Note $Log "LPYTHON     = |$LPYTHON|"
+   Note $Log "PYTHON      = |$PYTHON|"
+   Note $Log "PACT        = $PACT"
+   Note $Log "Parallel    = |$Parallel|"
+   Note $Log "MPI         = |$MPI|"
+   flog $Log ../../../manager/pwhich pact
+   flog $Log ../../../manager/pwhich cc
 
    if ("$Test" == "") then
       set Test = ""
@@ -86,32 +93,14 @@ if (-f $LPYTHON/pact/pdb.py) then
 
 # CLEAN UP - we are all done now
 
-   set ETime = `$TIMER -b $BeginTime`
+   $TEST_CHECK -n PYTHON -e $ERROR -raf "../testfile" clean
 
-   NoteD $Log ""
-
-   rm -f ../testfile
-   
-   if ($ERROR == "TRUE") then
-      NoteD $Log ""
-      NoteD $Log "PYTHON TEST ... FAILED ($ETime)"
-      NoteD $Log ""
-      NoteD $Log "See $Log for details"
-   else
-      NoteD $Log "PYTHON TEST ... PASSED ($ETime)"
-   endif
-
-   NoteD $Log ""
-   NoteD $Log " --------------------------------------------------------"
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 endif
 
-set xstatus = 0
-if ($ERROR == "TRUE") then
-   set xstatus = 1
-endif
+$TEST_CHECK -e $ERROR fin
 
-Note $Log "Exiting with status $xstatus"
-
-exit($xstatus)
+exit($status)
 

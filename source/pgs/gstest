@@ -41,14 +41,21 @@ set RefDir = $RootDir/pgs/ref
 
 cd $TestDir
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # omit tests - usually in difficult CROSS_COMPILE situation
+
 if ($RUN_TESTS == FALSE) then
    NoteD $Log ""
    NoteD $Log "PGS TESTS ... omitted"
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # run the tests
+
 else if (-e $RootDir/pgs/pgs.h) then
-   set BeginTime = `$TIMER -r`
 
    NoteD $Log ""
    NoteD $Log "PGS TEST ..."
@@ -63,15 +70,10 @@ else if (-e $RootDir/pgs/pgs.h) then
       setenv Valgrind  "$Valgrind --suppressions=$RootDir/score/tests/vg.suppress"
    endif
 
-   if ( !($?autotool) ) then
-      Note $Log "PACT     = $PACT"
-      Note $Log "Parallel = |$Parallel|"
-      flog $Log ../../../manager/pwhich pact
-      flog $Log ../../../manager/pwhich cc
-   endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+   Note $Log "PACT     = $PACT"
+   Note $Log "Parallel = |$Parallel|"
+   flog $Log ../../../manager/pwhich pact
+   flog $Log ../../../manager/pwhich cc
 
    if ("$Test" == "") then
       set Test = ""
@@ -90,32 +92,14 @@ else if (-e $RootDir/pgs/pgs.h) then
 
 # CLEAN UP
 
-   flog $Log $RM $Tmp
+   $TEST_CHECK -n PGS -e $ERROR -raf "$Tmp" clean
 
-   set ETime = `$TIMER -b $BeginTime`
-
-   Separator $Log
-
-   NoteD $Log ""
-
-   if ($ERROR == "TRUE") then
-      NoteD $Log ""
-      NoteD $Log "PGS TEST ... FAILED ($ETime)"
-      NoteD $Log ""
-      NoteD $Log "See $Log for details"
-   else
-      NoteD $Log "PGS TEST ... PASSED ($ETime)"
-   endif
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 endif
 
-NoteD $Log ""
-NoteD $Log " --------------------------------------------------------"
+$TEST_CHECK -e $ERROR fin
 
-set xstatus = 0
-if ($ERROR == "TRUE") then
-   set xstatus = 1
-endif
-
-exit($xstatus)
+exit($status)
 

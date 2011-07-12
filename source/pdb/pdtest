@@ -39,14 +39,21 @@ end
 
 cd $TestDir
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # omit tests - usually in difficult CROSS_COMPILE situation
+
 if ($RUN_TESTS == FALSE) then
    NoteD $Log ""
    NoteD $Log "PDB TESTS ... omitted"
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # run the tests
+
 else if (-e $RootDir/pdb/pdb.h) then
-   set BeginTime = `$TIMER -r`
 
    echo ""
    echo "PDB TEST ..."
@@ -64,16 +71,11 @@ else if (-e $RootDir/pdb/pdb.h) then
       setenv Valgrind  "$Valgrind --suppressions=$RootDir/score/tests/vg.suppress-test"
    endif
 
-   if ($?autotool == 0) then
-      Note $Log "PACT     = $PACT"
-      Note $Log "Parallel = |$Parallel|"
-      Note $Log "MPI      = |$MPI|"
-      flog $Log ../../../manager/pwhich pact
-      flog $Log ../../../manager/pwhich cc
-   endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+   Note $Log "PACT     = $PACT"
+   Note $Log "Parallel = |$Parallel|"
+   Note $Log "MPI      = |$MPI|"
+   flog $Log ../../../manager/pwhich pact
+   flog $Log ../../../manager/pwhich cc
 
    NoteD $Log -n "                    Compiling PDB tests ..... "
    Note $Log ""
@@ -147,27 +149,14 @@ else if (-e $RootDir/pdb/pdb.h) then
 
 # CLEAN UP
 
-   flog $Log $RM $Tmp
+   $TEST_CHECK -n PDB -e $ERROR -raf "$Tmp" clean
 
-   set ETime = `$TIMER -b $BeginTime`
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-   if ($ERROR == "TRUE") then
-      NoteD $Log ""
-      NoteD $Log "PDB TEST ... FAILED ($ETime)"
-      NoteD $Log ""
-      NoteD $Log "See $Log for details"
-   else
-      NoteD $Log "PDB TEST ... PASSED ($ETime)"
-   endif
 endif
 
-   NoteD $Log ""
-   NoteD $Log " --------------------------------------------------------"
+$TEST_CHECK -e $ERROR fin
 
-set xstatus = 0
-if ($ERROR == "TRUE") then
-   set xstatus = 1
-endif
-
-exit($xstatus)
+exit($status)
 

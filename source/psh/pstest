@@ -34,57 +34,56 @@ flog $Log pact install
 
 cd $TestDir
 
-if ("$Valgrind" != "") then
-   setenv Valgrind  "$Valgrind --suppressions=$RootDir/score/tests/vg.suppress"
-endif
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-set BeginTime = `$TIMER -r`
+# omit tests - usually in difficult CROSS_COMPILE situation
 
-NoteD $Log ""
-NoteD $Log "PSH TEST ..."
+if ($RUN_TESTS == FALSE) then
+   NoteD $Log ""
+   NoteD $Log "PSH TESTS ... omitted"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-if ("$Tests" == "") then
-   set Tests = ""
-   set Tests = ($Tests do-net elide blang regx pco pcsh perdb dorun verify)
-endif
+# run the tests
 
-foreach i ($Tests)
-   $SrcDir/tests/$i
-   if ($status == 1) then
-      set ERROR = TRUE
-   endif
-end
+   else
+      NoteD $Log ""
+      NoteD $Log "PSH TEST ..."
 
+      if ("$Valgrind" != "") then
+         setenv Valgrind  "$Valgrind --suppressions=$RootDir/score/tests/vg.suppress"
+      endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+      if ("$Tests" == "") then
+         set Tests = ""
+      set Tests = ($Tests do-net elide blang regx pco pcsh perdb dorun verify)
+      endif
+
+   foreach i ($Tests)
+      $SrcDir/tests/$i
+      if ($status == 1) then
+            set ERROR = TRUE
+         endif
+   end
+   
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # CLEAN UP - we are all done now
+   
+   $TEST_CHECK -n PSH -e $ERROR clean
 
-set ETime = `$TIMER -b $BeginTime`
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-NoteD $Log ""
-
-if ($ERROR == "TRUE") then
-   NoteD $Log ""
-   NoteD $Log "PSH TEST ... FAILED ($ETime)"
-   NoteD $Log ""
-   NoteD $Log "See $Log for details"
-else
-   NoteD $Log "PSH TEST ... PASSED ($ETime)"
 endif
 
-NoteD $Log ""
-NoteD $Log " --------------------------------------------------------"
+$TEST_CHECK -e $ERROR fin
 
-set xstatus = 0
-if ($ERROR == "TRUE") then
-   set xstatus = 1
-endif
-
-Note $Log "Exiting with status $xstatus"
-
-exit($xstatus)
+exit($status)
 
