@@ -12,7 +12,7 @@
 LibName=fpact
 
 TGTLib = ${LibDir}/lib${LibName}.a
-TGTInc = none
+TGTInc = noinc
 
 OD = DefaultO
 

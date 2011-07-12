@@ -35,6 +35,8 @@ end
 
 cd $TestDir
 
+unsetenv DO_RUN_SUBMIT_ENV
+
 # PGI compilers lack some key C interoperability features
 # notably: C_NULL_PTR
 # SUN compilers have trouble with command line argument routines
