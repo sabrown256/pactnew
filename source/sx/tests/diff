@@ -35,10 +35,6 @@ source ../../tests/common
       set LErr = 0
       set UTime = `$TIMER -r`
 
-      if ($?autotool == 1) then
-         flog $Log cp -f $RootDir/sx/applications/pdbdiff $BinDir/pdbdiff
-      endif
-
 # test 1 - all mappings
       NoteD $Log -n "                       All mappings .............. "
       Note $Log ""
@@ -88,9 +84,6 @@ source ../../tests/common
          flog $Log rm -f pdbd*.dat pdbd.res pdbd*.dat.chk
       endif
    
-      if ( $?autotool ) then
-        flog $Log rm -f $BinDir/pdbdiff
-      endif
    endif
 
 #--------------------------------------------------------------------------

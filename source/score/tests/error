@@ -10,7 +10,6 @@
 
 source ../../tests/common
 
-if ("$TEST_ERROR_TRAPS" == "YES") then
    NoteD $LogF ""
    NoteD $LogF -n "                    SCORE Error Test ............ "
    NoteD $LogF ""
@@ -43,7 +42,6 @@ if ("$TEST_ERROR_TRAPS" == "YES") then
    else
       NoteD $LogF "                    SCORE Error Test ............ PASSED ($ETime)"
    endif
-endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

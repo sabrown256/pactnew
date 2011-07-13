@@ -18,11 +18,8 @@ source ../../tests/common
 
    set do_syntax = 0
 
-   if ( !($?autotool) ) then
-      grep -w Arc $IncDir/make-def >& /dev/null
-      set do_syntax = $status
-   endif
-
+   grep -w Arc $IncDir/make-def >& /dev/null
+   set do_syntax = $status
    if (($do_syntax == 0) && (-d $RootDir/scheme/syntax/c)) then
       NoteD $Log ""
       NoteD $Log "                    SCHEME C Syntax Test"

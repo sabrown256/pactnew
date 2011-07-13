@@ -20,15 +20,14 @@ if ($?LogF == 0) then
    set Root = $cwd
    popd >& /dev/null
 
-   set OS       = `uname -s`
-   set BinDir   = $Root/bin
-   set LibDir   = $Root/lib
-   set MAKE     = $BinDir/pact
-   set TIMER    = $BinDir/timer
-   set CFE      = $BinDir/do-run
-   set PFE      = $BinDir/do-run
-   set TEST_MPI = YES
-   set MPI      = `pact +l -info HAVE_MPI`
+   set OS     = `uname -s`
+   set BinDir = $Root/bin
+   set LibDir = $Root/lib
+   set MAKE   = $BinDir/pact
+   set TIMER  = $BinDir/timer
+   set CFE    = $BinDir/do-run
+   set PFE    = $BinDir/do-run
+   set MPI    = `pact +l -info HAVE_MPI`
 endif
 
 if ($?SrcDir == 0) then

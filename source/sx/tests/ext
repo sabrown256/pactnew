@@ -17,7 +17,7 @@ source ../../tests/common
 #--------------------------------------------------------------------------
 
    set ExtDir = ../../applications/extensions
-   if ((-d $ExtDir) && (-x $ExtDir/do-test) && (!($?autotool))) then
+   if ((-d $ExtDir) && (-x $ExtDir/do-test)) then
 
       NoteD $Log ""
       NoteD $Log -n "                    SX Extension Test ............ "
@@ -34,6 +34,7 @@ source ../../tests/common
          NoteD $Log "OMITTED ($xstatus/$ETime)"
       else if ($xstatus != 0) then
          NoteD $Log "FAILED ($ETime)"
+         Note $Log "Check log.ext-test for more info"
          set Err = 1
       else
          NoteD $Log "PASSED ($ETime)"

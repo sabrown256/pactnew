@@ -27,7 +27,6 @@ if ($?LogF == 0) then
    setenv CFE       $BinDir/do-run
    setenv PFE       $BinDir/do-run
    setenv MPI       `pact +l -info HAVE_MPI`
-   setenv TEST_MPI  YES
 endif
 
 set TDir   = $RootDir/score/tests
