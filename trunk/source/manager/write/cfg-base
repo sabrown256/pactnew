@@ -45,21 +45,33 @@
            echo "include compilers/xlc" >>& $Tmp
            breaksw
       case cygwin*:
+           set ladv = ""
+           set ladv = ${ladv}:psh_dorun:psh_verify
+           set ladv = ${ladv}:score_mpi:score_error
+           set ladv = ${ladv}:pml_perf:pml_nan:pml_fpe:pml_interp
            echo "include ${Bits}-bit" >>& $Tmp
            echo "include compilers/cygwin" >>& $Tmp
+           echo "setenv TEST_ADVISORY "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
+           unset ladv
            breaksw
       case darwin:
+           set ladv = ""
+           set ladv = ${ladv}:score_mpi
+           set ladv = ${ladv}:pml_perf
            switch ($lcc)
               case *pgcc*:
                    echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include compilers/pgi-osx" >>& $Tmp
+                   echo "setenv TEST_ADVISORY "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
                    breaksw
               default:
               case *gcc*:
                    echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include compilers/gnu-osx" >>& $Tmp
+                   echo "setenv TEST_ADVISORY "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
                    breaksw
            endsw
+           unset ladv
            breaksw
       case freebsd:
            echo "define FREEBSD" >>& $Tmp
@@ -84,6 +96,7 @@
            set CCRoot = $CCRoot:h
            echo "setenv PACT_CC_PATH $CCRoot" >>& $Tmp
            echo "include compilers/sol" >>& $Tmp
+           echo 'setenv TEST_ADVISORY ${TEST_ADVISORY}:score_mpi' >>& $Tmp
            breaksw
       default:
       case linux:
@@ -121,15 +134,19 @@
                    breaksw
 	      case *sun:
 	      case *suncc:
+                   set ladv = ""
+                   set ladv = ${ladv}:score_mpi
                    echo "run std/use-compiler $lcc" >>& $Tmp
 		   echo "include compilers/sun" >>& $Tmp
+                   echo "setenv TEST_ADVISORY "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
+                   unset ladv
                    breaksw
               case xlc-bgl:
                    echo "run std/use-compiler mpxlc" >>& $Tmp
                    echo "include auto-bgl-xlc" >>& $Tmp
                    breaksw
               case xlc-bgp:
-                   echo "run std/use-compiler mpixlc_r" >>& $Tmp
+                   echo "run std/use-compiler mpixlc" >>& $Tmp
                    echo "include auto-bgp-xlc" >>& $Tmp
                    breaksw
               default:

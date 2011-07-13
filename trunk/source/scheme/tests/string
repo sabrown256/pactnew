@@ -21,12 +21,6 @@ source ../../tests/common
    Note $Log ""
 
    flog $Log pwd
-   if ( $?autotool ) then
-     if ( !(-e ../shstr.scm) ) then 
-       flog $Log cp $FilesDir/shstr.scm ..
-     endif
-   endif 
-
    set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then
       flog $Log $cfe $BinDir/scheme -e -l $FilesDir/shstr.scm

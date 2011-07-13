@@ -34,21 +34,15 @@ if (-d $RootDir/panacea/abc) then
       NoteD $LogF ""
       NoteD $LogF "                    PANACEA ABC Test ....."
 
-      if ( $?autotool ) then
-        flog $LogF cp $RootDir/panacea/abc-tester .
-        abc-tester
-        set xstatus = $status
+      flog $LogF pushd $SrcDir/abc/builder
+      if ("$Valgrind" == "") then
+         ftee $LogF dsys test
+         set xstatus = $status
       else
-        flog $LogF pushd $SrcDir/abc/builder
-        if ("$Valgrind" == "") then
-           ftee $LogF dsys test
-           set xstatus = $status
-        else
-           ftee $LogF dsys test -vg
-           set xstatus = $status
-        endif
-        flog $LogF popd
+         ftee $LogF dsys test -vg
+         set xstatus = $status
       endif
+      flog $LogF popd
 
       set ETime = `$TIMER -b $UTime`
 
@@ -62,13 +56,8 @@ if (-d $RootDir/panacea/abc) then
       endif
 
       if ($xstatus == 0) then
-         if ( $?autotool ) then
-           flog $LogF pushd $BuildDir/panacea/abc/
-           flog $LogF $MAKE -s clean
-         else
-           flog $LogF pushd $SrcDir/abc/builder
-           flog $LogF dsys remove
-         endif
+         flog $LogF pushd $SrcDir/abc/builder
+         flog $LogF dsys remove
          flog $LogF popd
       endif
    endif

@@ -34,8 +34,8 @@ if ($?SrcDir == 0) then
    popd >& /dev/null
 endif
 
-setenv PYVER      `$PACT -info PyVers`
-setenv PYTHONBIN  `$PACT -info PythonPath`
+setenv PYVER      `$PACT_Exe -info PyVers`
+setenv PYTHONBIN  `$PACT_Exe -info PythonPath`
 setenv PYTHON     $PYTHONBIN/python
 setenv LPYTHON    $LibDir/python$PYVER
 

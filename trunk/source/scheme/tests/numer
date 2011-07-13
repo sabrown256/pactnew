@@ -25,11 +25,6 @@ source ../../tests/common
    flog $Log unsetenv DO_RUN_SUBMIT_ENV
 
    flog $Log pwd
-   if ( $?autotool ) then
-     if ( !(-e ../shsint.scm) ) then 
-       flog $Log cp $FilesDir/shsint.scm ..
-     endif
-   endif 
 
    set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then
@@ -65,12 +60,6 @@ source ../../tests/common
    Note $Log ""
 
    flog $Log pwd
-   if ( $?autotool ) then
-     if ( !(-e ../shnum.scm) ) then 
-       flog $Log cp $FilesDir/shnum.scm ..
-     endif
-   endif 
-
    set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then
       flog $Log $cfe $BinDir/scheme -e -l $FilesDir/shnum.scm
@@ -105,12 +94,6 @@ source ../../tests/common
    Note $Log ""
 
    flog $Log pwd
-   if ( $?autotool ) then
-     if ( !(-e ../shcpx.scm) ) then 
-       flog $Log cp $FilesDir/shcpx.scm ..
-     endif
-   endif 
-
    set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then
       flog $Log $cfe $BinDir/scheme -e -l $FilesDir/shcpx.scm

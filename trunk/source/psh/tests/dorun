@@ -48,12 +48,6 @@ InitLog Log $TestDir/log.dorun.$LogSfx
 
 @ Err = 0
 
-# omit tests - usually for Cygwin
-if ($TEST_DORUN == NO) then
-   NoteD $Log ""
-   NoteD $Log "                    DO-RUN Test .................... omitted"
-
-else
    set BTime = `$TIMER -r`
 
    NoteD $Log ""
@@ -113,7 +107,6 @@ else
       NoteD $Log "                    DO-RUN Test .................... PASSED ($ETime)"
       flog $Log rm -f run.* s*
    endif
-endif
 
 NoteD $Log ""
 

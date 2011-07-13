@@ -14,11 +14,12 @@ foreach f (../scripts ../../scripts ../../../scripts)
    if (-f $f/env-csh) then
       pushd $f >>& /dev/null
       setenv TestScrDir $cwd
-      source env-csh
       popd >>& /dev/null
       break
    endif
 end
+source $TestScrDir/env-csh
+setenv TEST_CHECK $TestScrDir/test-check
 
 set TLog = test
 set VG   = `where valgrind | head -n 1`
@@ -66,26 +67,6 @@ endsw
 unsetenv DISPLAY
 
 setenv OS  `uname`
-
-# GOTCHA: we have MPI, TEST_MPI, DPE
-# some consolidation, especially wrt logic and control, is needed
-
-setenv TEST_ERROR_TRAPS  "YES"
-setenv TEST_MPI          "YES"
-setenv TEST_DORUN        "YES"
-
-switch ($OS)
-   case "CYGWIN*":
-# NOTE: CYGWIN can't handle multi-level error trapping
-        setenv TEST_ERROR_TRAPS  "NO"
-        setenv TEST_MPI          "NO"
-        setenv TEST_DORUN        "NO"
-        breaksw
-   case "Darwin":
-   case "SunOS":
-        setenv TEST_MPI  "NO"
-        breaksw
-endsw
 
 setenv ZeroSpace  "-z 2"
 
@@ -144,15 +125,15 @@ setenv ZeroSpace  "-z 2"
    endif
    setenv PFE       $DORUN
 
-   setenv PACT  "$CFE $BinDir/pact"
+   setenv PACT_Exe  "$CFE $BinDir/pact"
 
-   setenv Parallel     `$PACT -info THREADING`
-   setenv MPI          `$PACT +l -info HAVE_MPI`
-   setenv HaveDevZero  `$PACT +l -info HAVE_DEV_ZERO`
-   setenv LARGE_FILES  `$PACT -info _LARGE_FILES`
+   setenv Parallel     `$PACT_Exe -info THREADING`
+   setenv MPI          `$PACT_Exe +l -info HAVE_MPI`
+   setenv HaveDevZero  `$PACT_Exe +l -info HAVE_DEV_ZERO`
+   setenv LARGE_FILES  `$PACT_Exe -info _LARGE_FILES`
 
-   setenv PYVER      `$PACT -info PyVers`
-   setenv PYTHONBIN  `$PACT -info Python_Path`
+   setenv PYVER      `$PACT_Exe -info PyVers`
+   setenv PYTHONBIN  `$PACT_Exe -info Python_Path`
    setenv PYTHON     $PYTHONBIN/python
    setenv LPYTHON    $LibDir/python$PYVER
 
@@ -205,5 +186,4 @@ if ("$Valgrind" != "") then
    Note $Log "Using valgrind: $VG"
 endif
 
-setenv TEST_CHECK $TestScrDir/test-check
 setenv BTime `$TIMER -r`

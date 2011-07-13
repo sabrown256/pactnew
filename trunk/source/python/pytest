@@ -70,7 +70,7 @@ else if (-f $LPYTHON/pact/pdb.py) then
    Note $Log "PYTHONBIN   = |$PYTHONBIN|"
    Note $Log "LPYTHON     = |$LPYTHON|"
    Note $Log "PYTHON      = |$PYTHON|"
-   Note $Log "PACT        = $PACT"
+   Note $Log "PACT_Exe    = |$PACT_Exe|"
    Note $Log "Parallel    = |$Parallel|"
    Note $Log "MPI         = |$MPI|"
    flog $Log ../../../manager/pwhich pact

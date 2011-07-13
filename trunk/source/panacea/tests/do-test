@@ -6,20 +6,13 @@
 set Package = panacea
 source ../../scripts/env-csh
 
-if ($?autotool) then
-   set MISrc     = $SrcDir/Makefile
-   set CCompiler = `awk '$1 == "CCConfig" { print $3 }' $MISrc`
-   set CFLAGS    = `awk '$1 == "CFLAGS" {for (i = 3; i <= NF; i++) {printf(" %s", $i);};}' $MISrc`
-   set Inc       = "-I. -I../../sx -I../../scheme -I../../panacea -I.. -I../../config -I../../pgs -I../../ppc -I../../pdb -I../../pml -I../../score"
-else
-   set DevInc    = $BuildDir/include
-   set MISrc     = $DevInc/make-def
-   set CCompiler = `pact +l -info Cfg_CC_Exe | uniq`
-   set CFLAGS    = `pact +l -info Cfg_CC_Flags | uniq`
-   set MDGInc    = `pact +l -info MDGInc | uniq`
-   set Inc       = "-I. -I$DevInc $MDGInc"
-   set CCompiler = $CCompiler[$#CCompiler]
-endif
+set DevInc    = $BuildDir/include
+set MISrc     = $DevInc/make-def
+set CCompiler = `pact +l -info Cfg_CC_Exe | uniq`
+set CFLAGS    = `pact +l -info Cfg_CC_Flags | uniq`
+set MDGInc    = `pact +l -info MDGInc | uniq`
+set Inc       = "-I. -I$DevInc $MDGInc"
+set CCompiler = $CCompiler[$#CCompiler]
 
 setenv Log $TestDir/log.test
 set Err = 0

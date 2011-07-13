@@ -16,11 +16,8 @@ source ../../tests/common
 
 #--------------------------------------------------------------------------
 
-# GOTCHA: temporarily disable this test for optimized OSX builds
-# strange FPE crash or FPE handling
    set OD = ( `pact +l -info OD` )
-   set OS = ( `uname -s` )
-   if (("$OD" == DefaultO) && ("$OS" != Darwin) && ($TEST_ERROR_TRAPS == YES)) then
+   if ("$OD" == DefaultO) then
       NoteD $Log ""
       NoteD $Log "                    PML Performance Test ... "
 

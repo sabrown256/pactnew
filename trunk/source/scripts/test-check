@@ -115,10 +115,10 @@ switch ($tgt)
 
         if ($terr == 1) then
            NoteD $log ""
-           NoteD $log "$name TEST ... FAILED ($dt)"
            if ($advise == TRUE) then
-              NoteD $log ""
-              NoteD $log ">>> FAILED AS ADVISED - ACCEPTED AS PASSED"
+              NoteD $log "$name TEST ... ACCEPTED AS PASSED ($dt)"
+           else
+              NoteD $log "$name TEST ... FAILED ($dt)"
            endif
            NoteD $log ""
            NoteD $log "See $log for details"
