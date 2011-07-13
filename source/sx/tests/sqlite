@@ -75,4 +75,6 @@ if (($HAVE_SQLITE == yes) && ($?IBM_BGP == 0)) then
 
 endif
 
-exit($Err)
+$TEST_CHECK -a sqlite -e $Err part
+
+exit($status)

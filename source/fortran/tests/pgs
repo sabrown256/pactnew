@@ -134,4 +134,6 @@ if ($LStat == 0) then
    endif
 endif
 
-exit($Err)
+$TEST_CHECK -a pgs -e $Err part
+
+exit($status)

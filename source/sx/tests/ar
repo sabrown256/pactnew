@@ -78,4 +78,6 @@ if (($THREADING == no) && ($HAVE_MPI == no)) then
 
 endif
 
-exit($Err)
+$TEST_CHECK -a ar -e $Err part
+
+exit($status)

@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-set Package = fortran
+setenv Package fortran
 source ../scripts/test-env
 source $IncDir/env-pact.csh
 

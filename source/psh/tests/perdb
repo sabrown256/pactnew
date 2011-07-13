@@ -127,7 +127,11 @@ else
    NoteD $Log "                    PERDB Test ..................... PASSED ($ETime)"
    flog $Log rm -f db*
 endif
-NoteD $Log ""
 
-exit($Err)
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+$TEST_CHECK -a perdb -e $Err part
+
+exit($status)
 

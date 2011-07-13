@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-set Package = ppc
+setenv Package ppc
 source ../scripts/test-env
 
 if ($HaveIPC == NO) then

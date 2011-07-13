@@ -90,4 +90,10 @@ source ../../tests/common
       NoteD $Log "                    SX PML Polygon Test .......... PASSED ($ETime)"
    endif
 
-exit($Err)
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+$TEST_CHECK -a iply -e $Err part
+
+exit($status)
+

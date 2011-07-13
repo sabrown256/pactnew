@@ -15,9 +15,10 @@ source $TestScrDir/env-csh
 
 set tgt  = none
 set name = ""
-set terr = "FALSE"
+set terr = 0
 set raf  = ""
 set rpf  = ""
+set adv  = $Package
 
 if ($?BTime == 1) then
    set t0 = $BTime
@@ -33,9 +34,17 @@ endif
 
 while ($#argv > 0)
    switch ($1)
+      case -a:
+           shift
+           set adv = ( $adv ${Package}_$1 )
+           breaksw
       case -e:
            shift
-           set terr = $1
+           if (("$1" == "FALSE") || ("$1" == "0")) then
+              set terr = 0
+           else
+              set terr = 1
+           endif
            breaksw
       case -l:
            shift
@@ -67,6 +76,27 @@ end
 # make sure it is upper case
 set name = ( `echo $name | tr "[a-z]" "[A-Z]"` )
 
+# check the test advisory
+set advise = FALSE
+set alst = ( `printenv TEST_ADVISORY | sed 's/:/ /g'` )
+foreach i ($alst)
+   foreach j ($adv)
+      if ($i == $j) then
+         set advise = TRUE
+         break
+      endif
+   end
+   if ($advise == TRUE) then
+      break
+   endif
+end
+
+#echo "--------"
+#echo "tgt = |$tgt|"
+#echo "adv = |$adv|"
+#echo "TEST_ADVISORY = |$TEST_ADVISORY|"
+#echo "advise = $advise"
+
 switch ($tgt)
 
 #--------------------------------------------------------------------------
@@ -83,9 +113,13 @@ switch ($tgt)
 
         NoteD $log ""
 
-        if ($terr == "TRUE") then
+        if ($terr == 1) then
            NoteD $log ""
            NoteD $log "$name TEST ... FAILED ($dt)"
+           if ($advise == TRUE) then
+              NoteD $log ""
+              NoteD $log ">>> FAILED AS ADVISED - ACCEPTED AS PASSED"
+           endif
            NoteD $log ""
            NoteD $log "See $log for details"
         else
@@ -105,9 +139,20 @@ switch ($tgt)
         NoteD $Log ""
         NoteD $Log " --------------------------------------------------------"
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# PART
+   case part:
+
         set err = 0
-        if ($terr == "TRUE") then
-           set err = 1
+        if ($terr == 1) then
+           if ($advise == TRUE) then
+              Note $Log "PASSED by advisory match ( $adv ) in ( $TEST_ADVISORY )"
+              flog $Log set err = 0
+           else
+              flog $Log set err = 1
+           endif
         endif
         breaksw
 

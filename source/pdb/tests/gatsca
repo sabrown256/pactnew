@@ -38,4 +38,9 @@ else
    NoteD $LogF "                    PDB Gather/Scatter Test ............ PASSED ($ETime)"
 endif
 
-exit($Err)
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+$TEST_CHECK -a gatsca -e $Err part
+
+exit($status)

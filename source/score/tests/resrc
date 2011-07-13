@@ -43,5 +43,10 @@ else
    NoteD $LogF "                    SCORE Resource Test ......... PASSED ($ETime)"
 endif
 
-exit($Err)
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+$TEST_CHECK -a resrc -e $Err part
+
+exit($status)
 
