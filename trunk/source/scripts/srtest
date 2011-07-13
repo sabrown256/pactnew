@@ -10,7 +10,7 @@
 
 unalias *
 
-set Package = scripts
+setenv Package scripts
 source ../scripts/test-env
 
 set Tests = ""

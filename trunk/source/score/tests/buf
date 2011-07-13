@@ -45,5 +45,10 @@ else
    NoteD $LogF "                    SCORE Buffered I/O Test ..... PASSED ($ETime)"
 endif
 
-exit($Err)
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+$TEST_CHECK -a buf -e $Err part
+
+exit($status)
 

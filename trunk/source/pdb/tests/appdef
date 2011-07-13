@@ -38,4 +38,9 @@ else
    NoteD $LogF "                    PDB Append/Defent Test ............. PASSED ($ETime)"
 endif
 
-exit($Err)
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+$TEST_CHECK -a appdef -e $Err part
+
+exit($status)

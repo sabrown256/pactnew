@@ -10,6 +10,10 @@
 
 source ../../tests/common
 
+if ($HAVE_READLINE == TRUE) then
+   setenv TEST_ADVISORY "score_mpi"
+endif
+
 # Extra SIGIOs sent during read/open calls are causing zombies on OS X again
 # and I don't have the time now to fix it.
 if ("$TEST_MPI" == "YES") then
@@ -120,12 +124,15 @@ if ("$TEST_MPI" == "YES") then
          NoteD $LogF "                    SCORE MPI Test .............. PASSED ($ETime)"
       else
          NoteD $LogF "                    SCORE MPI Test .............. FAILED ($ETime)"
-         if ($HAVE_READLINE != TRUE) then
-            set Err = 1
-         endif
+         set Err = 1
       endif
    endif
 endif
 
-exit($Err)
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+$TEST_CHECK -a mpi -e $Err part
+
+exit($status)
 

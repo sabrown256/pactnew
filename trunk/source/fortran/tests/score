@@ -141,5 +141,7 @@ else
    NoteD $LogF "                    SCORE API Test ..................... PASSED ($ETime)"
 endif
 
-exit($Err)
+$TEST_CHECK -a score -e $Err part
+
+exit($status)
 

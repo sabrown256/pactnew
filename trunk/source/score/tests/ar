@@ -117,5 +117,9 @@ else
    NoteD $LogF "                    SCORE Archive Scan Test ..... PASSED ($ETime)"
 endif
 
-exit($Err)
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
+$TEST_CHECK -a ar -e $Err part
+
+exit($status)

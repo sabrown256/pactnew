@@ -8,9 +8,10 @@
 # include "cpyright.h"
 #
 
-set Package = scc
+setenv Package scc
 source ../scripts/test-env
 
+setenv TEST_ADVISORY ${TEST_ADVISORY}:scc
 setenv LogF  $Log
 
 set Test = ""
@@ -101,6 +102,6 @@ else if (-e $RootDir/scc/scc_int.h) then
 endif
 
 $TEST_CHECK -e $ERROR fin
-set status = 0
+
 exit($status)
 

@@ -45,5 +45,11 @@ else
    NoteD $LogF "                    SCORE Smart Array Test ...... PASSED ($ETime)"
 endif
 
-exit($Err)
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+$TEST_CHECK -a array -e $Err part
+
+exit($status)
+
 

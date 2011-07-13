@@ -60,4 +60,6 @@ else
    NoteD $LogF "                    PANACEA API Test ................... PASSED ($ETime)"
 endif
 
-exit($Err)
+$TEST_CHECK -a panacea -e $Err part
+
+exit($status)

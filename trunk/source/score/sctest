@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-set Package = score
+setenv Package score
 source ../scripts/test-env
 
 setenv LogF  $Log
