@@ -73,6 +73,9 @@ Group OpenMP {
    CC_Flags = -fopenmp
    LD_Flags = -fopenmp
    LD_Lib   = -lgomp
+   SharedFnc = [ _env_ = PACT_CC_VERSION ;      # compiler version flags
+                4.6.0  <  yes ;
+                4.6.0  >= no ]
 }
 
 Group Shared {

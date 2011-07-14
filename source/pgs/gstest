@@ -70,7 +70,6 @@ else if (-e $RootDir/pgs/pgs.h) then
       setenv Valgrind  "$Valgrind --suppressions=$RootDir/score/tests/vg.suppress"
    endif
 
-   Note $Log "PACT     = $PACT"
    Note $Log "Parallel = |$Parallel|"
    flog $Log ../../../manager/pwhich pact
    flog $Log ../../../manager/pwhich cc
