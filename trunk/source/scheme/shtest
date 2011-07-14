@@ -73,7 +73,6 @@ else if (-e $BinDir/scheme) then
       setenv Valgrind  "$Valgrind --suppressions=$RootDir/score/tests/vg.suppress"
    endif
 
-   Note $Log "PACT = $PACT"
    flog $Log ../../../manager/pwhich pact
    flog $Log ../../../manager/pwhich cc
 

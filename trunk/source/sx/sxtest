@@ -73,7 +73,6 @@ else if (-e $BinDir/sx) then
       setenv Valgrind  "$Valgrind --suppressions=$RootDir/score/tests/vg.suppress"
    endif
 
-   Note $Log "PACT        = $PACT"
    Note $Log "MPI         = |$MPI|"
    Note $Log "LARGE_FILES = |$LARGE_FILES|"
    flog $Log ../../../manager/pwhich pact

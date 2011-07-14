@@ -71,7 +71,6 @@ else if (-e $RootDir/scc/scc_int.h) then
       setenv Valgrind  "$Valgrind --suppressions=$SrcDir/tests/vg.suppress-test"
    endif
 
-   Note $Log "PACT        = $PACT"
    flog $Log ../../../manager/pwhich pact
    flog $Log ../../../manager/pwhich cc
 

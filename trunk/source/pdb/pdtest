@@ -71,7 +71,6 @@ else if (-e $RootDir/pdb/pdb.h) then
       setenv Valgrind  "$Valgrind --suppressions=$RootDir/score/tests/vg.suppress-test"
    endif
 
-   Note $Log "PACT     = $PACT"
    Note $Log "Parallel = |$Parallel|"
    Note $Log "MPI      = |$MPI|"
    flog $Log ../../../manager/pwhich pact

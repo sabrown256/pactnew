@@ -35,6 +35,17 @@ source ../../tests/common
       set LErr = 0
       set UTime = `$TIMER -r`
 
+      Note $Log "PDBDiff = |$PDBDiff|"
+      Note $Log "SCHEME  = |$SCHEME|"
+      if ($?PACT == 1) then
+         Note $Log "PACT  = |$PACT|"
+      else
+         Note $Log "PACT  = undefined"
+      endif
+      if ($?DO_RUN_SUBMIT_ENV == 1) then
+         Note $Log "DO_RUN_SUBMIT_ENV = |$DO_RUN_SUBMIT_ENV|"
+      endif
+
 # test 1 - all mappings
       NoteD $Log -n "                       All mappings .............. "
       Note $Log ""
@@ -43,37 +54,44 @@ source ../../tests/common
 
       set ETime = `$TIMER -b $UTime`
 
-      if ($xstatus == 0) then
+      if (($xstatus == 254) || ($xstatus == 255)) then
+         NoteD $Log "omitted"
+      else if ($xstatus == 0) then
          NoteD $Log "FAILED ($ETime)"
          NoteD $Log "                       Erroneous agreement"
          set Err = 1
       else
          echo  "Checking for 1 different mapping" >>& pdbd.res
          grep "1 mapping out of 4 differs between pdbda.dat and pdbdb.dat:" pdbda.dat.chk >>& pdbd.res
-         if ($status != 0) then
+         if ($status == 0) then
+            NoteD $Log "ok"
+         else
             set Err = 1
             NoteD $Log "ng"
             NoteD $Log ""
-            cat pdbd.res
+            ftee $Log cat pdbd.res
             NoteD $Log ""
-         else
-            NoteD $Log "ok"
          endif
       endif
 
 # test 2 - selected mappings
       NoteD $Log -n "                       Selected mappings ......... "
       Note $Log ""
-      flog $Log $PDBDiff -v -w pdbda.dat pdbdb.dat -M 2 4
+      flog $Log ($PDBDiff -v -w pdbda.dat pdbdb.dat -M 2 4 >&! pdbd.res)
       set xstatus = $status
 
       set ETime = `$TIMER -b $UTime`
 
-      if ($xstatus != 0) then
-         NoteD $Log "ng"
-         set LErr = 1
-      else
+      if (($xstatus == 254) || ($xstatus == 255)) then
+         NoteD $LogF "omitted"
+      else if ($xstatus == 0) then
          NoteD $Log "ok"
+      else
+         set LErr = 1
+         NoteD $Log "ng"
+         NoteD $Log ""
+         ftee $Log cat pdbd.res
+         NoteD $Log ""
       endif
 
       if ($LErr == 1) then
