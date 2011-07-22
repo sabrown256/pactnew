@@ -2589,6 +2589,8 @@ char *PD_convert_ascii(char *out, int nc, PD_character_standard cstd,
 /* unpack the bitstream into a bytestream */
     ret = SC_unpack_bits(out, in, SC_INT8_I, n, 0, ni, ni, 0);
 
+    SC_ASSERT(ret == TRUE);
+
     _PD_conv_to_ascii_7(out, ni, cstd);
 
     return(out);}

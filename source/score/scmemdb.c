@@ -82,7 +82,7 @@ static long _SC_count_tagged(int flag)
  */
 
 static int _SC_list_block_info(char *s, SC_heap_des *ph, void *ptr,
-			       long sz, int flag, int show)
+			       long sz, int flag, int show, int reg)
    {int rv, valid;
     int idok, nmok, prok, nxok, ty, nc, nr;
     long mad, nb;
@@ -107,10 +107,24 @@ static int _SC_list_block_info(char *s, SC_heap_des *ph, void *ptr,
     ty   = desc->type;
     nb   = desc->length;
 	      
-    idok = SCORE_BLOCK_P(desc);
     nmok = SC_pointer_ok(name);
-    prok = SC_pointer_ok(prev);
-    nxok = SC_pointer_ok(next);
+
+/* info for registered block */
+    if (reg == TRUE)
+       {if (prev == NULL)
+	   {idok = TRUE;
+	    prok = TRUE;
+	    nxok = TRUE;}
+	else
+	   {idok = FALSE;
+	    prok = FALSE;
+	    nxok = FALSE;};}
+
+/* info for managed block */
+    else
+       {idok = SCORE_BLOCK_P(desc);
+        prok = SC_pointer_ok(prev);
+	nxok = SC_pointer_ok(next);};
 
 /* expect an active block if length is greater than 0 */
     valid = TRUE;
@@ -120,6 +134,18 @@ static int _SC_list_block_info(char *s, SC_heap_des *ph, void *ptr,
 	       name = "-- no name --";
 	    else if (!nmok)
 	       {name = "-- corrupt active block --";
+		nb   = sz;
+		ty   = -2;
+		nr   = -2;}
+	    else if (FREE_SCORE_BLOCK_P(desc))
+	       {nb = (nb == 0) ? sz : nb;
+		ty = -2;
+		nr = -2;};}
+	else if (flag & 4)
+	   {if (name == NULL)
+	       name = "-- no name --";
+	    else if (!nmok)
+	       {name = "-- corrupt registered block --";
 		nb   = sz;
 		ty   = -2;
 		nr   = -2;}
@@ -223,7 +249,7 @@ static int _SC_list_major_blocks(char *arr, int nc,
 	 for (j = 0; j < nu; j++, pn += sz)
 	     {desc = (mem_descriptor *) pn;
 	      nbl += _SC_list_block_info(MAP_ENTRY(arr, nbl), ph,
-					 desc, nb, flag, show);};};
+					 desc, nb, flag, show, FALSE);};};
 
     return(nbl);}
 
@@ -299,7 +325,7 @@ static void _SC_mem_list(int flag, int show, char **parr, int *pnbl)
 		 nb  = desc->length;
 		 if (nb > nbthr)
 		    nbl += _SC_list_block_info(MAP_ENTRY(arr, nbl), ph,
-					       space, nb, flag, show);
+					       space, nb, flag, show, FALSE);
 
 		 if (nxt == ph->latest_block)
 		    break;};};
@@ -314,7 +340,7 @@ static void _SC_mem_list(int flag, int show, char **parr, int *pnbl)
 	        {desc  = &space->block;
 		 nb    = desc->length;
 		 nbl  += _SC_list_block_info(MAP_ENTRY(arr, nbl), ph,
-					     space, nb, flag, show);};};
+					     space, nb, flag, show, TRUE);};};
 
 /* sort the entries now */
 	SC_text_sort(arr, nbl, ENTRY_SIZE);
@@ -511,7 +537,7 @@ long SC_mem_monitor(int old, int lev, char *id, char *msg)
 
     leva  = abs(lev);
     show  = FALSE;
-    actfl = 1;
+    actfl = 5;        /* look at active and registered blocks */
     prmfl = 2;
     if (leva & 4)
        {show   = TRUE;
@@ -784,6 +810,125 @@ void *SC_mem_diff(FILE *fp, void *a, void *b, size_t nb)
 	s = NULL;};
 
     return(s);}
+
+/*---------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*/
+
+/* SC_MEM_FRAG - compute and return the memory fragmentation
+ *             - the measure of memory fragmenation is:
+ *             -    (adx - adn)/nb
+ *             - where
+ *             -     adx  the highest address of any byte of managed memory
+ *             -     adn  the lowest address of any byte of managed memory
+ *             -     nb   the number of active bytes of managed memory
+ *             - thread action on TID
+ *             -   -2 : all heaps
+ *             -   -1 : current heap
+ *             -  0-N : specified heap
+ *             - NDE is the number of MSB to use as the basis for binning
+ *             - the memory
+ */
+
+double SC_mem_frag(int tid, int nde)
+   {int it, itn, itx, idv, ndv, nf, ns;
+    long i, n, nb, adr, amx, lmx;
+    long *nbt;
+    double fr;
+    double *adn, *adx;
+    SC_heap_des *ph;
+    SC_address ad;
+    mem_header *space;
+    mem_descriptor *desc;
+
+    switch (tid)
+       {case -2 :
+	     itn = 0;
+	     itx = SC_get_n_thread();
+	     itx = max(itx, SC_n_threads);
+	     itx = max(itx, 1);
+	     break;
+        case -1 :
+	     itn = SC_current_thread();
+	     itx = itn+1;
+	     break;
+	default :
+	     itn = tid;
+	     itx = itn+1;
+	     break;};
+
+    SC_LOCKON(SC_mm_lock);
+
+/* initialize the bins */
+    ndv = 1 << nde;
+    adn = CMAKE_N(double, ndv);
+    adx = CMAKE_N(double, ndv);
+    nbt = CMAKE_N(long, ndv);
+    for (i = 0; i < ndv; i++)
+        {adn[i] = HUGE;
+	 adx[i] = -HUGE;
+	 nbt[i] = 0;};
+
+/* find the largest address to compute ns */
+    amx = LONG_MIN;
+    for (it = itn; it < itx; it++)
+        {ph = _SC_get_heap(it);
+	 if ((ph != NULL) && (ph->latest_block != NULL))
+	    {n = ph->nx_mem_blocks + BLOCKS_UNIT_DELTA;
+	     for (space = ph->latest_block, i = 0L;
+		  i < n;
+		  space = space->block.next, i++)
+	         {desc = &space->block;
+		  nb   = ph->hdr_size + desc->length;
+
+		  ad.memaddr = (char *) desc;
+                  adr        = ad.diskaddr;
+
+		  amx = max(amx, adr + nb);
+
+		  if ((desc->next == ph->latest_block) || (space == NULL))
+		     break;};};};
+
+    for (ns = 0, lmx = amx; lmx > 0; ns++, lmx >>= 1);
+    ns -= nde;
+
+/* loop over the specified thread heaps */
+    for (it = itn; it < itx; it++)
+        {ph = _SC_get_heap(it);
+	 if ((ph != NULL) && (ph->latest_block != NULL))
+	    {n = ph->nx_mem_blocks + BLOCKS_UNIT_DELTA;
+	     for (space = ph->latest_block, i = 0L;
+		  i < n;
+		  space = space->block.next, i++)
+	         {desc = &space->block;
+		  nb   = ph->hdr_size + desc->length;
+
+		  ad.memaddr = (char *) desc;
+                  adr        = ad.diskaddr;
+		  idv        = adr >> ns;
+
+		  adn[idv]  = min(adn[idv], adr);
+		  adx[idv]  = max(adx[idv], adr + nb);
+		  nbt[idv] += nb;
+
+		  if ((desc->next == ph->latest_block) || (space == NULL))
+		     break;};};};
+
+/* compute average fragmentation over bins */
+    fr = 0.0;
+    nf = 0;
+    for (i = 0; i < ndv; i++)
+        {if (nbt[i] > 0)
+	    {fr += (adx[i] - adn[i])/((double) nbt[i]);
+	     nf++;};};
+    fr *= 1.0/((double) nf);
+
+    CFREE(adn);
+    CFREE(adx);
+    CFREE(nbt);
+
+    SC_LOCKOFF(SC_mm_lock);
+
+    return(fr);}
 
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/

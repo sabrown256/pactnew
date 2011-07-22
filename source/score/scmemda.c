@@ -562,8 +562,7 @@ int SC_mem_trace(void)
 		 ok = FALSE;
 		 break;};
 
-	     if ((desc->next == ph->latest_block) ||
-		 (space == NULL))
+	     if ((desc->next == ph->latest_block) || (space == NULL))
 	        break;};
 
 	if (!ok)
@@ -604,6 +603,8 @@ int SC_mem_trace(void)
 
 /* SC_REG_MEM - register a piece of memory for the purpose
  *            - of memory accounting
+ *
+ * #bind SC_reg_mem fortran()
  */
 
 int SC_reg_mem(void *p, long length, char *name)
@@ -620,7 +621,7 @@ int SC_reg_mem(void *p, long length, char *name)
     pd = CPMAKE(mem_descriptor, 3);
 
     pd->heap      = ph;
-    pd->func      = name;
+    pd->func      = strdup(name);
     pd->file      = NULL;
     pd->line      = -1;
     pd->ref_count = 1;
@@ -630,7 +631,11 @@ int SC_reg_mem(void *p, long length, char *name)
     pd->next      = (mem_header *) p;
 
     hp = SC_hasharr_install(_SC.mem_table, p, pd, "mem_descriptor", TRUE, TRUE);
-    rv = (hp != NULL);
+    if (hp != NULL)
+       {SC_mem_stats_acc(length, 0L);
+	rv = TRUE;}
+    else
+       rv = FALSE;
 
     return(rv);}
 
@@ -639,14 +644,43 @@ int SC_reg_mem(void *p, long length, char *name)
 
 /* SC_DEREG_MEM - deregister a piece of memory for the purpose
  *              - of memory accounting
+ *
+ * #bind SC_dereg_mem fortran()
  */
 
 int SC_dereg_mem(void *p)
    {int rv;
+    long nb;
+    mem_descriptor *pd;
+
+    pd = SC_hasharr_def_lookup(_SC.mem_table, p);
+    if (pd != NULL)
+       {free(pd->func);
+	nb = pd->length;}
+    else
+       nb = 0;
 
     rv = SC_hasharr_remove(_SC.mem_table, p);
+    if (rv == TRUE)
+       SC_mem_stats_acc(0L, nb);
 
     return(rv);}
+
+/*---------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*/
+
+/* SC_FREE_REG_MEM_TABLE - release the registered memory table
+ *                       - intended for cleanup at end of session
+ */
+
+void SC_free_reg_mem_table(void)
+   {
+
+    SC_free_hasharr(_SC.mem_table, NULL, NULL);
+
+    _SC.mem_table = NULL;
+
+    return;}
 
 /*---------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
