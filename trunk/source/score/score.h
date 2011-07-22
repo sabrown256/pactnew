@@ -990,7 +990,8 @@ extern void
  *SC_permanent(void *p),
  *SC_mem_attrs(void *p, int attr),
  SC_untrap_pointer(void *p),
- *SC_copy_item(void *in);
+ *SC_copy_item(void *in),
+ SC_free_reg_mem_table(void);
 
 extern char
  *SC_arrname(void *p);
@@ -1019,7 +1020,8 @@ extern char
 /* SCMEMDB.C declarations */
 
 extern void
- *SC_mem_diff(FILE *fp, void *a, void *b, size_t nb);
+ *SC_mem_diff(FILE *fp, void *a, void *b, size_t nb),
+ SC_mem_print(void *p);
 
 extern char
  *SC_mem_list(int flag, int show);
@@ -1035,8 +1037,8 @@ extern long
 		     void (*f)(char *name, char *addr, long length,
 			       int count, int type));
 
-extern void
- SC_mem_print(void *p);
+extern double
+ SC_mem_frag(int tid, int nde);
 
 
 /* SCMEMG.C declarations */

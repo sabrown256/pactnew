@@ -222,8 +222,8 @@ FIXNUM FF_ID(scmemc, SCMEMC)(FIXNUM *st)
 
 /* SCMEMS - FORTRAN interface to SC_mem_stats */
 
-FIXNUM FF_ID(scmems, SCMEMS)(FIXNUM *sal, FIXNUM *sfr,
-			     FIXNUM *sdf, FIXNUM *smx)
+FIXNUM FF_ID(scmems, SCMEMS)(double *sal, double *sfr,
+			     double *sdf, double *smx)
    {long pl, pf, pd, pm;
     FIXNUM rv;
 
