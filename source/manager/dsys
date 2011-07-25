@@ -33,6 +33,8 @@ setenv ScrDir $Base/scripts
 
 if (-f extensions/sys-site) then
    eval `extensions/sys-site`
+else if (-f local/site-signature) then
+   eval `../scripts/sys-site -f local/site-signature`
 else
    setenv DAI_ROOT /usr/share
    setenv DAS_ROOT /usr/local

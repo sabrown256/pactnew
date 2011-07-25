@@ -36,6 +36,11 @@ inc do-run-db cfg.pl
 f90 panacea.mod panaceatypes.mod pdb.mod pdbtypes.mod pgs.mod
 f90 pgstypes.mod pml.mod pmltypes.mod scheme.mod score.mod
 f90 scoretypes.mod sx.mod
+f90 pact_score.mod pact_pml.mod pact_pdb.mod pact_ppc.mod
+f90 pact_pgs.mod pact_panacea.mod pact_scheme.mod pact_fortran.mod
+f90 pact_libc.mod
+f90 types_score.mod types_pml.mod types_pdb.mod types_ppc.mod
+f90 types_pgs.mod types_panacea.mod types_scheme.mod types_fortran.mod
 
 scm annotate.scm binedit.scm compare.scm consts.scm csynt.scm
 scm fsynt.scm func.scm exec.scm help.scm lang.scm

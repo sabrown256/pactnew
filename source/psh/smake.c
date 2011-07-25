@@ -396,6 +396,12 @@ static int method_1(statedes *st, int c, char **v, char *pmname)
         snprintf(s, MAXLINE, "echo \"PACTSrcDir = %s\" ; ", st->srcdir);
 	nstrcat(cmd, MAXLINE, s);
 
+	for (i = 1; i < c; i++)
+	    {if ((strcmp(v[i], "-f") == 0) &&
+		 (strstr(v[i+1], "pre-Make") != NULL))
+	        {pmname = v[i+1];
+		 break;};};
+
         snprintf(s, MAXLINE, "cat %s ; ", pmname);
 	nstrcat(cmd, MAXLINE, s);
 

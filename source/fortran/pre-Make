@@ -127,7 +127,7 @@ ${PACTTmpDir}/gm-${LibName}.f : flibc.f
 genmod : ${PACTTmpDir}/gm-${LibName}.f
 
 IncAction = @pact genmod
-LibAction = @(cd ${PACTTmpDir} ; pact PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=\"\" -f ../../pre-Make modules)
+LibAction = @(cd ${PACTTmpDir} ; pact PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=\"\" -f ../../pre-Make Hdrs=../../fpact.h modules)
 
 SLibs = ${DPLib} ${FLib} ${MDLib}
 Libs = -lfpact ${LPDB} ${LPML} ${LSCORE} ${SLibs}
