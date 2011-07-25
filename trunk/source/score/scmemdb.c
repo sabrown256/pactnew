@@ -816,7 +816,7 @@ void *SC_mem_diff(FILE *fp, void *a, void *b, size_t nb)
 
 /* SC_MEM_FRAG - compute and return the memory fragmentation
  *             - the measure of memory fragmenation is:
- *             -    (adx - adn)/nb
+ *             -    (adx - adn - nb)/nb
  *             - where
  *             -     adx  the highest address of any byte of managed memory
  *             -     adn  the lowest address of any byte of managed memory
@@ -832,9 +832,9 @@ void *SC_mem_diff(FILE *fp, void *a, void *b, size_t nb)
 double SC_mem_frag(int tid, int nde)
    {int it, itn, itx, idv, ndv, nf, ns;
     long i, n, nb, adr, amx, lmx;
-    long *nbt;
-    double fr;
-    double *adn, *adx;
+    long *nbt, *nbl;
+    double fr, nbf, blf;
+    double *adn, *adx, *bpb, *frb;
     SC_heap_des *ph;
     SC_address ad;
     mem_header *space;
@@ -862,11 +862,17 @@ double SC_mem_frag(int tid, int nde)
     ndv = 1 << nde;
     adn = CMAKE_N(double, ndv);
     adx = CMAKE_N(double, ndv);
+    bpb = CMAKE_N(double, ndv);
+    frb = CMAKE_N(double, ndv);
     nbt = CMAKE_N(long, ndv);
+    nbl = CMAKE_N(long, ndv);
     for (i = 0; i < ndv; i++)
         {adn[i] = HUGE;
 	 adx[i] = -HUGE;
-	 nbt[i] = 0;};
+	 bpb[i] = 0.0;
+	 frb[i] = 0.0;
+	 nbt[i] = 0;
+	 nbl[i] = 0;};
 
 /* find the largest address to compute ns */
     amx = LONG_MIN;
@@ -887,6 +893,15 @@ double SC_mem_frag(int tid, int nde)
 
 		  if ((desc->next == ph->latest_block) || (space == NULL))
 		     break;};};};
+
+    for (i = 0; SC_hasharr_next(_SC.mem_table, &i, NULL, NULL, (void **) &space); i++)
+        {desc = &space->block;
+	 nb   = desc->length;
+
+	 ad.memaddr = (char *) desc;
+	 adr        = ad.diskaddr;
+
+	 amx = max(amx, adr + nb);};
 
     for (ns = 0, lmx = amx; lmx > 0; ns++, lmx >>= 1);
     ns -= nde;
@@ -909,22 +924,45 @@ double SC_mem_frag(int tid, int nde)
 		  adn[idv]  = min(adn[idv], adr);
 		  adx[idv]  = max(adx[idv], adr + nb);
 		  nbt[idv] += nb;
+		  nbl[idv]++;
 
 		  if ((desc->next == ph->latest_block) || (space == NULL))
 		     break;};};};
+
+    for (i = 0; SC_hasharr_next(_SC.mem_table, &i, NULL, NULL, (void **) &space); i++)
+        {desc = &space->block;
+	 nb   = desc->length;
+
+	 ad.memaddr = (char *) desc;
+	 adr        = ad.diskaddr;
+	 idv        = adr >> ns;
+
+	 adn[idv]  = min(adn[idv], adr);
+	 adx[idv]  = max(adx[idv], adr + nb);
+	 nbt[idv] += nb;
+	 nbl[idv]++;};
 
 /* compute average fragmentation over bins */
     fr = 0.0;
     nf = 0;
     for (i = 0; i < ndv; i++)
-        {if (nbt[i] > 0)
-	    {fr += (adx[i] - adn[i])/((double) nbt[i]);
+        {nbf = nbt[i];
+	 if (nbf > 0.0)
+	    {blf    = nbl[i];
+	     bpb[i] = nbf/blf;
+	     frb[i] = (adx[i] - adn[i] - nbf)/nbf;
+
+	     fr += frb[i];
 	     nf++;};};
+
     fr *= 1.0/((double) nf);
 
     CFREE(adn);
     CFREE(adx);
+    CFREE(bpb);
+    CFREE(frb);
     CFREE(nbt);
+    CFREE(nbl);
 
     SC_LOCKOFF(SC_mm_lock);
 
