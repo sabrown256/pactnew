@@ -1,0 +1,66 @@
+#!/bin/csh -f
+#
+# MANINSTALL - install man pages for pact link phase
+#            - gets around some marginal shells and OS
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+@ section = 3
+
+while ($#argv)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: maninstall [-h] [-s #]"
+           echo ""
+           echo "Install man pages for 'pact link'"
+           echo ""
+           echo "   h      this help message"
+           echo "   s      section (defaults to 3)"
+           echo ""
+           exit(1)
+      case -s:
+           shift
+           @ section = $1
+	   breaksw
+      default:
+           breaksw
+   endsw
+   shift
+end
+
+set arch  = ( `cfgman use` )
+set zarch = z-$arch
+
+set sdir = $zarch/obj
+set ddir = ../dev/$arch/man/man$section
+pushd $ddir >& /dev/null
+set ddir = $cwd
+popd >& /dev/null
+
+@ err = 0
+
+echo "Installing man $section pages to $ddir"
+pushd $sdir >& /dev/null
+touch foo.$section
+foreach i (*.$section)
+   if (i == foo.$section) then
+      rm -f $i
+   else
+      cp $i $ddir
+      if ($status != 0) then
+         @ err = $err + 1
+         echo "Failed to install $i"
+      endif
+   endif
+end
+
+#cp $zarch/obj/*.$section ../dev/$arch/man/man$section
+
+exit($err)
