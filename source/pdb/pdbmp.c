@@ -21,7 +21,7 @@
  *                  - the input value
  *                  - returns the old value
  *
- * #bind PD_mp_set_serial fortran() scheme(pd-mp-set-serial!) python(mp_set_serial)
+ * #bind PD_mp_set_serial fortran() scheme(pd-mp-set-serial!) python()
  */
 
 int PD_mp_set_serial(PDBfile *file ARG(,,cls), int flag)

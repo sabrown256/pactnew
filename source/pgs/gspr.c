@@ -15,7 +15,7 @@
 
 /* PG_GET_TEXT_EXT_N - return the text extent in NDC of the given string
  *
- * #bind PG_get_text_ext_n fortran() scheme() python(get_text_ext_n)
+ * #bind PG_get_text_ext_n fortran() scheme() python()
  */
 
 void PG_get_text_ext_n(PG_device *dev ARG(,,cls), int nd,
@@ -843,7 +843,7 @@ static void _PG_draw_markers_3(PG_device *dev, PG_coord_sys cs,
  
 /* PG_DRAW_MARKERS_N - draw N ND markers at CS points R
  *
- * #bind PG_draw_markers_n fortran() scheme() python(draw_markers_n)
+ * #bind PG_draw_markers_n fortran() scheme() python()
  */
  
 void PG_draw_markers_n(PG_device *dev ARG(,,cls),
@@ -868,7 +868,7 @@ void PG_draw_markers_n(PG_device *dev ARG(,,cls),
  
 /* PG_DRAW_BOX_N - draw the BOX in the specified coordinates
  *
- * #bind PG_draw_box_n fortran() scheme() python(draw_box_n)
+ * #bind PG_draw_box_n fortran() scheme() python()
  */
 
 void PG_draw_box_n(PG_device *dev ARG(,,cls),
@@ -917,7 +917,7 @@ void PG_draw_box_n(PG_device *dev ARG(,,cls),
 /* PG_FILL_POLYGON_N - draw an ND polygon with N nodes R in CS
  *                   - and fill the interior with COLOR
  *
- * #bind PG_fill_polygon_n fortran() scheme() python(fill_polygon_n)
+ * #bind PG_fill_polygon_n fortran() scheme() python()
  */
 
 void PG_fill_polygon_n(PG_device *dev ARG(,,cls), int color ARG(1),

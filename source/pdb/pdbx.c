@@ -114,7 +114,7 @@ static void _PD_rl_attribute_value(attribute_value *avl)
 
 /* PD_INQUIRE_ATTRIBUTE - look up the table entry for the named attribute
  *
- * #bind PD_inquire_attribute fortran() scheme() python(inquire_attribute)
+ * #bind PD_inquire_attribute fortran() scheme() python()
  */
 
 attribute *PD_inquire_attribute(PDBfile *file ARG(,,cls),
@@ -134,7 +134,7 @@ attribute *PD_inquire_attribute(PDBfile *file ARG(,,cls),
 /* PD_INQUIRE_ATTRIBUTE_VALUE - look up the table entry for
  *                            - the named attribute value
  *
- * #bind PD_inquire_attribute_value fortran() scheme() python(inquire_attribute_value)
+ * #bind PD_inquire_attribute_value fortran() scheme() python()
  */
 
 attribute_value *PD_inquire_attribute_value(PDBfile *file ARG(,,cls),
@@ -177,7 +177,7 @@ static int _PD_rel_attr(haelem *hp, void *a)
 /* PD_REL_ATTR_TABLE - release the attribute table of FILE
  *                   - if it exists
  *
- * #bind PD_rel_attr_table fortran() scheme() python(rel_attr_table)
+ * #bind PD_rel_attr_table fortran() scheme() python()
  */
 
 void PD_rel_attr_table(PDBfile *file ARG(,,cls))
@@ -195,7 +195,7 @@ void PD_rel_attr_table(PDBfile *file ARG(,,cls))
 /* PD_DEF_ATTRIBUTE - define an attribute by specifying its type
  *                  - return TRUE if successful and FALSE otherwise
  *
- * #bind PD_def_attribute fortran() scheme() python(def_attribute)
+ * #bind PD_def_attribute fortran() scheme() python()
  */
 
 int PD_def_attribute(PDBfile *file ARG(,,cls), char *at, char *type)
@@ -237,7 +237,7 @@ int PD_def_attribute(PDBfile *file ARG(,,cls), char *at, char *type)
  *                  -       attribute value lookup operation that the
  *                  -       attribute no longer exists
  *
- * #bind PD_rem_attribute fortran() scheme() python(rem_attribute)
+ * #bind PD_rem_attribute fortran() scheme() python()
  */
 
 int PD_rem_attribute(PDBfile *file ARG(,,cls), char *at)
@@ -262,7 +262,7 @@ int PD_rem_attribute(PDBfile *file ARG(,,cls), char *at)
  *                  - specified variable
  *                  - return TRUE if successful and FALSE otherwise
  *
- * #bind PD_set_attribute fortran() scheme(pd-set-attribute!) python(set_attribute)
+ * #bind PD_set_attribute fortran() scheme(pd-set-attribute!) python()
  */
 
 int PD_set_attribute(PDBfile *file ARG(,,cls), char *vr, char *at, void *vl)
@@ -326,7 +326,7 @@ int PD_set_attribute(PDBfile *file ARG(,,cls), char *vr, char *at, void *vl)
  *                  - return a pointer to the attribute value if successful
  *                  - and NULL otherwise
  *
- * #bind PD_get_attribute fortran() scheme() python(get_attribute)
+ * #bind PD_get_attribute fortran() scheme() python()
  */
 
 void *PD_get_attribute(PDBfile *file ARG(,,cls), char *vr, char *at)
@@ -379,7 +379,7 @@ void *PD_get_attribute(PDBfile *file ARG(,,cls), char *vr, char *at)
 
 /* PD_DEF_PDB_TYPES - define in one place PDB data types for PDB files
  *
- * #bind PD_def_pdb_types fortran() scheme() python(def_pdb_types)
+ * #bind PD_def_pdb_types fortran() scheme() python()
  */
 
 int PD_def_pdb_types(PDBfile *file ARG(,,cls))
@@ -449,7 +449,7 @@ int PD_def_pdb_types(PDBfile *file ARG(,,cls))
  *                   -  bit 1   define haelem
  *                   -  bit 2   define hasharr
  *
- * #bind PD_def_hash_types fortran() scheme() python(def_hash_types)
+ * #bind PD_def_hash_types fortran() scheme() python()
  */
 
 int PD_def_hash_types(PDBfile *file ARG(,,cls), int flag)
@@ -472,7 +472,7 @@ int PD_def_hash_types(PDBfile *file ARG(,,cls), int flag)
 /* PD_DEF_ATTR_STR - define hashing, attribute, attribute value
  *                 - structures
  *
- * #bind PD_def_attr_str fortran() scheme() python(def_attr_str)
+ * #bind PD_def_attr_str fortran() scheme() python()
  */
 
 int PD_def_attr_str(PDBfile *file ARG(,,cls))
@@ -681,7 +681,7 @@ int _PD_contains_indirections(hasharr *tab, char *type)
  *                   - fill the x and y extrema values
  *                   - fill the x and y arrays depending on value of flag
  *
- * #bind PD_read_pdb_curve fortran() scheme() python(read_pdb_curve)
+ * #bind PD_read_pdb_curve fortran() scheme() python()
  */
 
 int PD_read_pdb_curve(PDBfile *fp ARG(,,cls),
@@ -817,7 +817,7 @@ int PD_read_pdb_curve(PDBfile *fp ARG(,,cls),
  *                  - NOTE: the order of the writes is crucial for
  *                  - performance for remote files
  *
- * #bind PD_wrt_pdb_curve fortran() scheme() python(wrt_pdb_curve)
+ * #bind PD_wrt_pdb_curve fortran() scheme() python()
  */
 
 int PD_wrt_pdb_curve(PDBfile *fp ARG(,,cls), char *labl, int n,
@@ -914,7 +914,7 @@ int PD_wrt_pdb_curve(PDBfile *fp ARG(,,cls), char *labl, int n,
  *                    - NOTE: the order of the writes is crucial for
  *                    - performance for remote files
  *
- * #bind PD_wrt_pdb_curve_y fortran() scheme() python(wrt_pdb_curve_y)
+ * #bind PD_wrt_pdb_curve_y fortran() scheme() python()
  */
 
 int PD_wrt_pdb_curve_y(PDBfile *fp ARG(,,cls),
@@ -980,7 +980,7 @@ int PD_wrt_pdb_curve_y(PDBfile *fp ARG(,,cls),
 /* PD_PUT_MAPPING - write a mapping F to the PDBfile, FILE, with index
  *                - MAPPING
  *
- * #bind PD_put_mapping fortran() scheme() python(put_mapping)
+ * #bind PD_put_mapping fortran() scheme() python()
  */
 
 int PD_put_mapping(PDBfile *file ARG(,,cls), PM_mapping *f, int mapping)
@@ -1001,7 +1001,7 @@ int PD_put_mapping(PDBfile *file ARG(,,cls), PM_mapping *f, int mapping)
 /* PD_PUT_IMAGE - write an image F to the PDBfile, FILE, with index IMAGE
  *              - do a slight fudge because PG_image isn't defined
  *
- * #bind PD_put_image fortran() scheme() python(put_image)
+ * #bind PD_put_image fortran() scheme() python()
  */
 
 int PD_put_image(PDBfile *file ARG(,,cls), void *f, int image)
@@ -1022,7 +1022,7 @@ int PD_put_image(PDBfile *file ARG(,,cls), void *f, int image)
 /* PD_PUT_SET - write a set S to the PDBfile, FILE, under the name of 
  *            - the set
  *
- * #bind PD_put_set fortran() scheme() python(put_set)
+ * #bind PD_put_set fortran() scheme() python()
  */
 
 int PD_put_set(PDBfile *file ARG(,,cls), PM_set *s)
@@ -1067,7 +1067,7 @@ char *PD_process_set_name(char *dname)
 
 /* PD_MESH_STRUCT - define types for mesh generation
  *
- * #bind PD_mesh_struct fortran() scheme() python(mesh_struct)
+ * #bind PD_mesh_struct fortran() scheme() python()
  */
 
 int PD_mesh_struct(PDBfile *file ARG(,,cls))
@@ -1163,7 +1163,7 @@ int PD_mesh_struct(PDBfile *file ARG(,,cls))
  *                - a PDB file thereby preparing it for mappings
  *                - return TRUE iff successful
  *
- * #bind PD_def_mapping fortran() scheme() python(def_mapping)
+ * #bind PD_def_mapping fortran() scheme() python()
  */
 
 int PD_def_mapping(PDBfile *fp ARG(,,cls))

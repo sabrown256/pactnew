@@ -511,7 +511,7 @@ int SC_mem_map(FILE *fp, int flag)
  *                -    ID    identifier for temporary files
  *                -    MSG   user allocated space to return error message
  *
- * #bind SC_mem_monitor fortran() scheme(memory-monitor) python(mem_monitor)
+ * #bind SC_mem_monitor fortran() scheme(memory-monitor) python()
  */
 
 long SC_mem_monitor(int old, int lev, char *id, char *msg)
@@ -711,7 +711,7 @@ long SC_mem_object_trace(long nb, int type,
 
 /* SC_MEM_PRINT - print the mem_descriptor info for the given pointer
  *
- * #bind SC_mem_print fortran() python(mem_print)
+ * #bind SC_mem_print fortran() python()
  */
 
 void SC_mem_print(void *p)

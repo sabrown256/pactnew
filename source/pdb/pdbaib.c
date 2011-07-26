@@ -42,7 +42,7 @@ int PD_verify_writes(int st)
  *             - if FH == 0 write the file chart and if 1
  *             - write the host chart
  *
- * #bind PD_contents fortran() scheme() python(contents)
+ * #bind PD_contents fortran() scheme() python()
  */
 
 void PD_contents(PDBfile *file ARG(,,cls), FILE *out, int fh, int vers)
@@ -65,7 +65,7 @@ void PD_contents(PDBfile *file ARG(,,cls), FILE *out, int fh, int vers)
  *            - return a pointer to the original type's defstr if
  *            - successful and NULL otherwise
  *
- * #bind PD_typedef fortran() scheme() python(typedef)
+ * #bind PD_typedef fortran() scheme() python()
  */
 
 defstr *PD_typedef(PDBfile *file ARG(,,cls), char *oname, char *tname)
@@ -100,7 +100,7 @@ defstr *PD_typedef(PDBfile *file ARG(,,cls), char *oname, char *tname)
 /* PD_DEFNCV - define a primitive type that will not be format converted
  *           - do it in both charts
  *
- * #bind PD_defncv fortran() scheme() python(defcnv)
+ * #bind PD_defncv fortran() scheme() python()
  */
 
 defstr *PD_defncv(PDBfile *file ARG(,,cls), char *name, long bpi, int align)
@@ -125,7 +125,7 @@ defstr *PD_defncv(PDBfile *file ARG(,,cls), char *name, long bpi, int align)
  *           - this is needed in connection with TEXT
  *           - e.g. SQL date and time types
  *
- * #bind PD_defchr fortran() scheme() python(defchr)
+ * #bind PD_defchr fortran() scheme() python()
  */
 
 defstr *PD_defchr(PDBfile *file ARG(,,cls), char *name,
@@ -150,7 +150,7 @@ defstr *PD_defchr(PDBfile *file ARG(,,cls), char *name,
 
 /* PD_DEFIXNUM - define an new integer primitive type for the file chart
  *
- * #bind PD_defixnum fortran() scheme() python(defixnum)
+ * #bind PD_defixnum fortran() scheme() python()
  */
 
 defstr *PD_defixnum(PDBfile *file ARG(,,cls), char *name, long bpi,
@@ -174,7 +174,7 @@ defstr *PD_defixnum(PDBfile *file ARG(,,cls), char *name, long bpi,
 
 /* PD_DEFIX - define an new integer primitive type
  *
- * #bind PD_defix fortran() scheme() python(defix)
+ * #bind PD_defix fortran() scheme() python()
  */
 
 defstr *PD_defix(PDBfile *file ARG(,,cls), char *name, long bpi,
@@ -190,7 +190,7 @@ defstr *PD_defix(PDBfile *file ARG(,,cls), char *name, long bpi,
 
 /* PD_DEFLOAT - define an new floating point primitive type
  *
- * #bind PD_defloat fortran() scheme() python(defloat)
+ * #bind PD_defloat fortran() scheme() python()
  */
 
 defstr *PD_defloat(PDBfile *file ARG(,,cls), char *name, long bpi,
@@ -259,7 +259,7 @@ defstr *PD_defloat(PDBfile *file ARG(,,cls), char *name, long bpi,
  *           -
  *           - Returns NULL if member types are unknown
  *
- * #bind PD_defstr python(defstr)
+ * #bind PD_defstr python()
  */
 
 defstr *PD_defstr(PDBfile *file ARG(,,cls), char *name, ...)
@@ -328,7 +328,7 @@ defstr *PD_defstr(PDBfile *file ARG(,,cls), char *name, ...)
  *               - the member array elements have the same syntax as for
  *               - PD_defstr
  *
- * #bind PD_defstr_alt fortran() scheme() python(defstr_alt)
+ * #bind PD_defstr_alt fortran() scheme() python()
  */
 
 defstr *PD_defstr_alt(PDBfile *file ARG(,,cls), char *name, int nmemb,
@@ -396,7 +396,7 @@ defstr *PD_defstr_alt(PDBfile *file ARG(,,cls), char *name, int nmemb,
  *             - the text consists of semicolon delimited member specifications
  *             - as the individual members in PD_defstr
  *
- * #bind PD_defstr_s fortran() scheme() python(defstr_s)
+ * #bind PD_defstr_s fortran() scheme() python()
  */
 
 defstr *PD_defstr_s(PDBfile *file ARG(,,cls), char *name, char *members)
@@ -422,7 +422,7 @@ defstr *PD_defstr_s(PDBfile *file ARG(,,cls), char *name, char *members)
 /* PD_CHANGE_PRIMITIVE - change the description of a primitive type
  *                     - the type is known by index
  *
- * #bind PD_change_primitive fortran() scheme() python(change_primitive)
+ * #bind PD_change_primitive fortran() scheme() python()
  */
 
 int PD_change_primitive(PDBfile *file ARG(,,cls),
@@ -499,7 +499,7 @@ int PD_change_primitive(PDBfile *file ARG(,,cls),
  *             - floating point type comparisons
  *             - this is mainly test support
  *
- * #bind PD_fp_toler scheme() python(fp_toler)
+ * #bind PD_fp_toler scheme() python()
  */
 
 void PD_fp_toler(PDBfile *file ARG(,,cls), long double *fptol)

@@ -116,7 +116,7 @@ bool PG_fset_clipping(PG_device *dev ARG(,in,cls),
 /* PG_FGET_CHAR_PATH - get the device char_path
  *                   - defaults to (1, 0)
  *
- * #bind PG_fget_char_path fortran() scheme(pg-get-char-path) python(get_char_path)
+ * #bind PG_fget_char_path fortran() scheme(pg-get-char-path) python()
  */
 
 void PG_fget_char_path(PG_device *dev ARG(,in,cls),
@@ -137,7 +137,7 @@ void PG_fget_char_path(PG_device *dev ARG(,in,cls),
 
 /* PG_FSET_CHAR_PATH - set the device char_path
  *
- * #bind PG_fset_char_path fortran() scheme(pg-set-char-path!) python(set_char_path)
+ * #bind PG_fset_char_path fortran() scheme(pg-set-char-path!) python()
  */
 
 void PG_fset_char_path(PG_device *dev ARG(,in,cls),
@@ -556,7 +556,7 @@ int PG_fget_line_style(PG_device *dev ARG(,in,cls))
 /* PG_FSET_LINE_STYLE - set the device line style
  *                    - return the old value
  *
- * #bind PG_fset_line_style fortran() scheme(pg-set-line-style!) python(set_line_style)
+ * #bind PG_fset_line_style fortran() scheme(pg-set-line-style!) python()
  */
 
 int PG_fset_line_style(PG_device *dev ARG(,in,cls),
@@ -596,7 +596,7 @@ double PG_fget_line_width(PG_device *dev ARG(,in,cls))
 /* PG_FSET_LINE_WIDTH - set the device line width
  *                    - return the old value
  *
- * #bind PG_fset_line_width fortran() scheme(pg-set-line-width!) python(set_line_width)
+ * #bind PG_fset_line_width fortran() scheme(pg-set-line-width!) python()
  */
 
 double PG_fset_line_width(PG_device *dev ARG(,in,cls),
@@ -1191,7 +1191,7 @@ int PG_fget_line_color(PG_device *dev ARG(,in,cls))
 
 /* PG_FSET_LINE_COLOR - set the current line color
  *
- * #bind PG_fset_line_color fortran() scheme(pg-set-line-color!) python(set_line_color)
+ * #bind PG_fset_line_color fortran() scheme(pg-set-line-color!) python()
  */
 
 int PG_fset_line_color(PG_device *dev ARG(,in,cls),
@@ -1227,7 +1227,7 @@ int PG_fget_text_color(PG_device *dev ARG(,in,cls))
 
 /* PG_FSET_TEXT_COLOR - set the current text color
  *
- * #bind PG_fset_text_color fortran() scheme(pg-set-text-color!) python(set_text_color)
+ * #bind PG_fset_text_color fortran() scheme(pg-set-text-color!) python()
  */
 
 int PG_fset_text_color(PG_device *dev ARG(,in,cls),
@@ -1327,7 +1327,7 @@ int PG_turn_grid(PG_device *dev ARG(,in,cls),
 /* PG_TURN_DATA_ID - set the device data_id flag
  *                 - return the old value
  *
- * #bind PG_turn_data_id fortran() scheme(pg-set-data-id-flag!) python(turn_data_id)
+ * #bind PG_turn_data_id fortran() scheme(pg-set-data-id-flag!) python()
  */
 
 int PG_turn_data_id(PG_device *dev ARG(,in,cls),
@@ -1688,7 +1688,7 @@ void PG_release_current_device(PG_device *dev ARG(,in,cls))
 
 /* PG_UPDATE_VS - update the view surface of the device DEV
  *
- * #bind PG_update_vs fortran() scheme(pg-update-view-surface) python(update_vs)
+ * #bind PG_update_vs fortran() scheme(pg-update-view-surface) python()
  */
 
 void PG_update_vs(PG_device *dev ARG(,in,cls))
@@ -1705,7 +1705,7 @@ void PG_update_vs(PG_device *dev ARG(,in,cls))
 /* PG_FINISH_PLOT - declare the picture in the view surface of the device DEV
  *                - finished
  *
- * #bind PG_finish_plot fortran() scheme() python(finish_plot)
+ * #bind PG_finish_plot fortran() scheme() python()
  */
 
 void PG_finish_plot(PG_device *dev ARG(,in,cls))
@@ -1737,7 +1737,7 @@ void PG_expose_device(PG_device *dev ARG(,in,cls))
 
 /* PG_CLOSE_DEVICE - close the device DEV
  *
- * #bind PG_close_device fortran() scheme() python(close)
+ * #bind PG_close_device fortran() scheme() python()
  */
 
 void PG_close_device(PG_device *dev ARG(,in,cls))
@@ -1786,7 +1786,7 @@ void PG_clear_frame(PG_device *dev ARG(,in,cls))
 
 /* PG_CLEAR_WINDOW - clear the current window
  *
- * #bind PG_clear_window fortran() scheme() python(clear_window)
+ * #bind PG_clear_window fortran() scheme() python()
  */
 
 void PG_clear_window(PG_device *dev ARG(,in,cls))

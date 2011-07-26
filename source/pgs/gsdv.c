@@ -54,7 +54,7 @@ int
  *                - all quantities are fractions of the physical device
  *                - size
  *
- * #bind PG_open_device fortran() scheme() python(open)
+ * #bind PG_open_device fortran() scheme() python()
  */
  
 PG_device *PG_open_device(PG_device *dev ARG(,,cls),
@@ -123,7 +123,7 @@ void PG_device_filename(char *fname, char *raw, char *ext)
 
 /* PG_QUERY_DEVICE - query some physical device characteristics
  *
- * #bind PG_query_device fortran() scheme() python(query_device)
+ * #bind PG_query_device fortran() scheme() python()
  */
 
 void PG_query_device(PG_device *dev ARG(,,cls),
@@ -142,7 +142,7 @@ void PG_query_device(PG_device *dev ARG(,,cls),
 
 /* PG_QUERY_WINDOW - query the window shape
  *
- * #bind PG_query_window fortran() scheme() python(query_window)
+ * #bind PG_query_window fortran() scheme() python()
  */
 
 void PG_query_window(PG_device *dev ARG(,,cls), int *pdx, int *pdy)
@@ -253,7 +253,7 @@ void _PG_remove_device(PG_device *dev)
 /* PG_WRITE_N - print formatted output
  *            - at the specified coordinates in CS
  *
- * #bind PG_write_n fortran() scheme() python(write_n)
+ * #bind PG_write_n fortran() scheme() python()
  */
 
 int PG_write_n(PG_device *dev ARG(,,cls), int nd ARG(2),

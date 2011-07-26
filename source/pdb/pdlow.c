@@ -290,7 +290,7 @@ int _PD_safe_flush(PDBfile *file)
 
 /* PD_INQUIRE_TYPE - lookup and return the file chart entry for NAME
  *
- * #bind PD_inquire_type fortran() scheme() python(inquire_type)
+ * #bind PD_inquire_type fortran() scheme() python()
  */
 
 defstr *PD_inquire_type(PDBfile *file ARG(,,cls), char *name)
@@ -308,7 +308,7 @@ defstr *PD_inquire_type(PDBfile *file ARG(,,cls), char *name)
 
 /* PD_INQUIRE_HOST_TYPE - lookup and return the host chart entry for NAME
  *
- * #bind PD_inquire_host_type fortran() scheme() python(inquire_host_type)
+ * #bind PD_inquire_host_type fortran() scheme() python()
  */
 
 defstr *PD_inquire_host_type(PDBfile *file ARG(,,cls), char *name)
@@ -589,7 +589,7 @@ defstr *_PD_defstr_inst(PDBfile *file, char *name, PD_type_kind kind,
 /* PD_TYPEDEF_PRIMITIVE_TYPES - make typedefs for user-defined primitives
  *                            - in the file chart
  *
- * #bind PD_typedef_primitive_types fortran() scheme() python(typedef_primitive_types)
+ * #bind PD_typedef_primitive_types fortran() scheme() python()
  */
 
 void PD_typedef_primitive_types(PDBfile *file ARG(,,cls))
@@ -1080,7 +1080,7 @@ int64_t PD_set_buffer_size(int64_t v)
 
 /* PD_GET_FILE_LENGTH - return the current file length
  *
- * #bind PD_get_file_length fortran() scheme() python(get_file_length)
+ * #bind PD_get_file_length fortran() scheme() python()
  */
 
 int64_t PD_get_file_length(PDBfile *file ARG(,,cls))
@@ -1388,7 +1388,7 @@ PDBfile *_PD_open(tr_layer *tr, SC_udl *pu, char *name, char *mode, void *a)
 
 /* PD_GET_MODE - return the file mode
  *
- * #bind PD_get_mode fortran() scheme() python(get_mode)
+ * #bind PD_get_mode fortran() scheme() python()
  */
 
 PD_major_op PD_get_mode(PDBfile *file ARG(,,cls))
@@ -1406,7 +1406,7 @@ PD_major_op PD_get_mode(PDBfile *file ARG(,,cls))
 
 /* PD_SET_MODE - set the file mode and return the old file mode
  *
- * #bind PD_set_mode fortran() scheme(pd-set-mode!) python(set_mode)
+ * #bind PD_set_mode fortran() scheme(pd-set-mode!) python()
  */
 
 PD_major_op PD_set_mode(PDBfile *file ARG(,,cls), PD_major_op v)
@@ -1425,7 +1425,7 @@ PD_major_op PD_set_mode(PDBfile *file ARG(,,cls), PD_major_op v)
 
 /* PD_GET_OFFSET - return the file default offset
  *
- * #bind PD_get_offset fortran() scheme() python(get_offset)
+ * #bind PD_get_offset fortran() scheme() python()
  */
 
 int PD_get_offset(PDBfile *file ARG(,,cls))
@@ -1443,7 +1443,7 @@ int PD_get_offset(PDBfile *file ARG(,,cls))
 
 /* PD_SET_OFFSET - set the file default offset and return the old offset
  *
- * #bind PD_set_offset fortran() scheme(pd-set-offset!) python(set_offset)
+ * #bind PD_set_offset fortran() scheme(pd-set-offset!) python()
  */
 
 int PD_set_offset(PDBfile *file ARG(,,cls), int v)
@@ -1462,7 +1462,7 @@ int PD_set_offset(PDBfile *file ARG(,,cls), int v)
 
 /* PD_GET_MAJOR_ORDER - return the file major_order
  *
- * #bind PD_get_major_order fortran() scheme() python(get_major_order)
+ * #bind PD_get_major_order fortran() scheme() python()
  */
 
 PD_major_order PD_get_major_order(PDBfile *file ARG(,,cls))
@@ -1480,7 +1480,7 @@ PD_major_order PD_get_major_order(PDBfile *file ARG(,,cls))
 
 /* PD_SET_MAJOR_ORDER - set the file major_order and return the old value
  *
- * #bind PD_set_major_order fortran() scheme(pd-set-major_order!) python(set_major_order)
+ * #bind PD_set_major_order fortran() scheme(pd-set-major_order!) python()
  */
 
 PD_major_order PD_set_major_order(PDBfile *file ARG(,,cls), PD_major_order v)
@@ -1499,7 +1499,7 @@ PD_major_order PD_set_major_order(PDBfile *file ARG(,,cls), PD_major_order v)
 
 /* PD_GET_TRACK_POINTERS - return the file track_pointers
  *
- * #bind PD_get_track_pointers fortran() scheme() python(get_track_pointers)
+ * #bind PD_get_track_pointers fortran() scheme() python()
  */
 
 int PD_get_track_pointers(PDBfile *file ARG(,,cls))
@@ -1518,7 +1518,7 @@ int PD_get_track_pointers(PDBfile *file ARG(,,cls))
 /* PD_SET_TRACK_POINTERS - set the file pointer tracking flag and
  *                       - return the old value
  *
- * #bind PD_set_track_pointers fortran() scheme(pd-set-track_pointers!) python(set_track_pointers)
+ * #bind PD_set_track_pointers fortran() scheme(pd-set-track_pointers!) python()
  */
 
 int PD_set_track_pointers(PDBfile *file ARG(,,cls), int v)
@@ -1537,7 +1537,7 @@ int PD_set_track_pointers(PDBfile *file ARG(,,cls), int v)
 
 /* PD_GET_MAX_FILE_SIZE - return the file max_file_size
  *
- * #bind PD_get_max_file_size fortran() scheme() python(get_max_file_size)
+ * #bind PD_get_max_file_size fortran() scheme() python()
  */
 
 int64_t PD_get_max_file_size(PDBfile *file ARG(,,cls))
@@ -1556,7 +1556,7 @@ int64_t PD_get_max_file_size(PDBfile *file ARG(,,cls))
 /* PD_SET_MAX_FILE_SIZE - set the maximum file size and
  *                      - return the old value
  *
- * #bind PD_set_max_file_size fortran() scheme(pd-set-max_file_size!) python(set_max_file_size)
+ * #bind PD_set_max_file_size fortran() scheme(pd-set-max_file_size!) python()
  */
 
 int64_t PD_set_max_file_size(PDBfile *file ARG(,,cls), int64_t v)
@@ -1607,7 +1607,7 @@ int PD_set_fmt_version(int v)
 
 /* PD_GET_FILE_NAME - return the file name
  *
- * #bind PD_get_file_name fortran() scheme() python(get_file_name)
+ * #bind PD_get_file_name fortran() scheme() python()
  */
 
 char *PD_get_file_name(PDBfile *file ARG(,,cls))

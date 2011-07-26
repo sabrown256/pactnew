@@ -18,7 +18,7 @@
 /* PG_CENTER_LABEL - print a label centered on a line at a specified
  *                 - y value given in screen coordinates
  *
- * #bind PG_center_label fortran() scheme(pg-center-label) python(center_label)
+ * #bind PG_center_label fortran() scheme(pg-center-label) python()
  */
 
 void PG_center_label(PG_device *dev ARG(,,cls),

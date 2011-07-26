@@ -172,7 +172,7 @@ void _PD_rl_pdb(PDBfile *file)
 
 /* PD_ALLOC_ENTRY - allocate memory for the variable type
  *
- * #bind PD_alloc_entry fortran() scheme() python(alloc_entry)
+ * #bind PD_alloc_entry fortran() scheme() python()
  */
 
 void *PD_alloc_entry(PDBfile *file ARG(,,cls), char *name)

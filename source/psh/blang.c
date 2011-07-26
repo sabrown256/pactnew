@@ -262,6 +262,27 @@ static void get_def_value(char *lvl, int nc, char *sp, char *ty)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* GET_CLASS_ARG - return the argument of DCL that specifies a class
+ *               - return NULL if there is no class arg
+ */
+
+static farg *get_class_arg(fdecl *dcl)
+   {int i, na;
+    farg *al, *rv;
+
+    na = dcl->na;
+    al = dcl->al;
+    rv = NULL;
+
+    for (i = 0; (i < na) && (rv == NULL); i++)
+        {if (al[i].cls == TRUE)
+	    rv = al + i;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* FEMIT - emit lines broken apropriately for Fortran */
 
 static void femit(FILE *fp, char *t, char *trm)
@@ -1129,21 +1150,32 @@ static void add_derived_types(char **sbi)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* MAP_NAME - map the C function name CF to form target language
+/* MAP_NAME - map the C function name CF to form target language name D
  *          - unless the specified language binging name LF is non-NULL
  *          - or not "yes"
  *          - in which case return LF in D
  */
 
 static char *map_name(char *d, int nc, char *cf, char *lf,
-		      char *sfx, int cs, int us)
-   {
+		      char *sfx, int cs, int us, int cls)
+   {int i, n, ok;
+    static char *pre[] = { "SC_", "PM_", "PD_", "PC_", "PG_", "PA_" };
+
+    n = sizeof(pre)/sizeof(char *);
+    ok = FALSE;
+    for (i = 0; (i < n) && (ok == FALSE); i++)
+        {if (strncmp(cf, pre[i], 3) == 0)
+	    ok = TRUE;};
 
     if ((lf != NULL) && (strcmp(lf, "none") != 0) && (strcmp(lf, "yes") != 0))
        {if ((sfx != NULL) && (sfx[0] == 'i'))
 	   snprintf(d, nc, "%s_%s", lf, sfx);
 	else
 	   nstrncpy(d, nc, lf, -1);}
+
+    else if ((cls == TRUE) && (ok == TRUE))
+       snprintf(d, nc, "%s", cf+3);
+
     else
        {if (sfx != NULL)
 	   snprintf(d, nc, "%s_%s", cf, sfx);
@@ -1337,13 +1369,15 @@ static void if_call_list(char *a, int nc, fdecl *dcl, char *dlm)
     if (voida == FALSE)
        {if (dlm == NULL)
 	   {for (i = 0; i < na; i++)
-	        vstrcat(a, MAXLINE, "%s ", al[i].name);
+	        {if (al[i].cls == FALSE)
+		    vstrcat(a, MAXLINE, "%s ", al[i].name);};
 
 	    a[strlen(a) - 1] = '\0';}
 
 	else
 	   {for (i = 0; i < na; i++)
-	        vstrcat(a, MAXLINE, "%s%s ", al[i].name, dlm);
+	        {if (al[i].cls == FALSE)
+		    vstrcat(a, MAXLINE, "%s%s ", al[i].name, dlm);};
 
 	    a[strlen(a) - 2] = '\0';};};
 
@@ -1590,7 +1624,7 @@ static void fortran_wrap_decl(FILE *fp, fdecl *dcl,
 			      fparam knd, char *rt, char *cfn, char *ffn)
    {char ucn[MAXLINE], dcn[MAXLINE], a[MAXLINE], t[MAXLINE];
 
-    map_name(dcn, MAXLINE, cfn, ffn, "f", -1, FALSE);
+    map_name(dcn, MAXLINE, cfn, ffn, "f", -1, FALSE, FALSE);
 
     nstrncpy(ucn, MAXLINE, dcn, -1);
     upcase(ucn);
@@ -2426,7 +2460,7 @@ static void module_itf_wrap_ext(FILE *fp, fdecl *dcl, char *pck, char *ffn)
 
 /* declare the incomplete ones as external */
     if ((module_itf_wrappable(dcl) == FALSE) && (strcmp(ffn, "none") != 0))
-       {map_name(dcn, MAXLINE, cfn, ffn, "f", -1, FALSE);
+       {map_name(dcn, MAXLINE, cfn, ffn, "f", -1, FALSE, FALSE);
 
 	if (mc_need_ptr(dcl) == TRUE)
 	   {if (first == TRUE)
@@ -2464,7 +2498,7 @@ static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck, char *ffn)
 
 /* emit complete declarations */
     if ((module_itf_wrappable(dcl) == TRUE) && (strcmp(ffn, "none") != 0))
-       {map_name(dcn, MAXLINE, cfn, ffn, "f", -1, FALSE);
+       {map_name(dcn, MAXLINE, cfn, ffn, "f", -1, FALSE, FALSE);
 
 	rty   = dcl->proto.type;
 	voidf = dcl->voidf;
@@ -2528,7 +2562,7 @@ static void module_interop_wrap(FILE *fp, fdecl *dcl, char *ffn)
        berr("%s is not interoperable - variable args", cfn);
 
     else
-       {map_name(dcn, MAXLINE, cfn, ffn, "i", -1, FALSE);
+       {map_name(dcn, MAXLINE, cfn, ffn, "i", -1, FALSE, FALSE);
 
 	rty   = dcl->proto.type;
 	na    = dcl->na;
@@ -3139,7 +3173,7 @@ static char **scheme_wrap_install(char **fl, fdecl *dcl, char *sfn,
 
 /* make the scheme interpreter name */
     pi = (strcmp(sfn, "yes") == 0) ? dcl->proto.name : sfn;
-    map_name(ifn, MAXLINE, pi, sfn, NULL, -1, TRUE);
+    map_name(ifn, MAXLINE, pi, sfn, NULL, -1, TRUE, FALSE);
 
 /* prepare the function inline documenation */
     t[0] = '\0';
@@ -3453,8 +3487,8 @@ static void python_make_decl(char *t, int nc, fdecl *dcl)
 
     pty = "PyObject";
     for (i = 0; i < na; i++)
-        {al  = dcl->al + i;
-	 ty  = al->type;
+        {al = dcl->al + i;
+	 ty = al->type;
 	 deref(dty, MAXLINE, ty);
 	 lty = lookup_type(NULL, dty, MODE_C, MODE_P);
 	 if ((lty != NULL) && (strcmp(lty, "SC_ENUM_I") != 0))
@@ -3471,12 +3505,10 @@ static void python_make_decl(char *t, int nc, fdecl *dcl)
 /* PYTHON_WRAP_DECL - function declaration */
 
 static void python_wrap_decl(FILE *fp, fdecl *dcl)
-   {char pfn[MAXLINE], t[MAXLINE];
+   {char t[MAXLINE];
     char *cfn;
 
     cfn = dcl->proto.name;
-
-    map_name(pfn, MAXLINE, cfn, NULL, NULL, -1, FALSE);
 
     fprintf(fp, "\n");
     fprintf(fp, "/* WRAP |%s| */\n", dcl->proto.arg);
@@ -3625,7 +3657,7 @@ static void python_wrap_local_assn(FILE *fp, fdecl *dcl, char *pfn, char *kw)
     python_class_self(fp, dcl);
 
     if ((voida == FALSE) && (IS_NULL(kw) == FALSE))
-       {map_name(dcn, MAXLINE, cfn, pfn, "p", -1, FALSE);
+       {map_name(dcn, MAXLINE, cfn, pfn, "p", -1, FALSE, TRUE);
 
 /* make the PyArg_ParseTupleAndKeywords call */
 	a[0] = '\0';
@@ -3756,22 +3788,34 @@ static void python_method_def(char *dfn, int nc, fdecl *dcl,
    {int n, voida;
     char a[MAXLINE], s[MAXLINE], t[MAXLINE];
     char fn[MAXLINE];
-    char *cfn;
+    char *cfn, *nm;
+    farg *alc;
 
     cfn   = dcl->proto.name;
     voida = dcl->voida;
 
     if (def == TRUE)
-       {map_name(fn, MAXLINE, cfn, pfn, NULL, -1, FALSE);
+       {map_name(fn, MAXLINE, cfn, pfn, NULL, -1, FALSE, TRUE);
+
+	alc = get_class_arg(dcl);
 
 /* prepare the function inline documenation */
 	if_call_list(a, MAXLINE, dcl, ",");
-	if (voida == FALSE)
-	   snprintf(t, MAXLINE, "Procedure: %s\\n     Usage: %s(%s)",
-		    fn, fn, a);
+	if (alc != NULL)
+	   {nm = alc->name;
+	    if (voida == FALSE)
+	       snprintf(t, MAXLINE, "Method: %s\\n     Usage: %s.%s(%s)",
+			fn, nm, fn, a);
+	    else
+	       snprintf(t, MAXLINE, "Method: %s\\n     Usage: %s.%s()",
+			fn, nm, fn);}
 	else
-	   snprintf(t, MAXLINE, "Procedure: %s\\n     Usage: %s()",
-		    fn, fn);
+	   {if (voida == FALSE)
+	       snprintf(t, MAXLINE, "Procedure: %s\\n     Usage: %s(%s)",
+			fn, fn, a);
+	    else
+	       snprintf(t, MAXLINE, "Procedure: %s\\n     Usage: %s()",
+			fn, fn);};
 
 /* emit the method definition */
 	snprintf(s, MAXLINE, " _PYD_%s = ", cfn);
@@ -4038,18 +4082,27 @@ static void doc_proto_fortran(char *a, int nc, fdecl *dcl)
  */
 
 static void doc_proto_python(char *a, int nc, char *dcn, fdecl *dcl)
-   {int i, na;
+   {char t[MAXLINE];
+    farg *alc;
+
+    alc = get_class_arg(dcl);
+
+    a[0] = '\0';
+
+    if (alc != NULL)
+       vstrcat(a, nc, "%s.%s", alc->name, dcn);
+    else
+       vstrcat(a, nc, "%s", dcn);
+
+    if_call_list(t, MAXLINE, dcl, ",");
+    vstrcat(a, nc, "(%s)", t);
+
+#if 0
+    int i, na;
     farg *al;
 
     na = dcl->na;
     al = dcl->al;
-
-    a[0] = '\0';
-
-    for (i = 0; i < na; i++)
-        {if (al[i].cls == TRUE)
-	    {vstrcat(a, nc, "%s.", al[i].name);
-	     break;};};
 
     vstrcat(a, nc, "%s(", dcn);
     if (na != 0)
@@ -4058,6 +4111,7 @@ static void doc_proto_python(char *a, int nc, char *dcn, fdecl *dcl)
 		vstrcat(a, MAXLINE, "%s, ", al[i].name);};
 	a[strlen(a)-2] = '\0';};
     nstrcat(a, nc, ")");
+#endif
 
     memmove(a, trim(a, BOTH, " "), nc);
 
@@ -4184,7 +4238,7 @@ static void html_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc)
        {args = dcl->tfproto;
 
 	doc_proto_fortran(af, MAXLINE, dcl);
-	map_name(dcn, MAXLINE, args[1], bfn, "f", -1, FALSE);
+	map_name(dcn, MAXLINE, args[1], bfn, "f", -1, FALSE, FALSE);
 	if (voidf == TRUE)
 	   fprintf(fp, "<i>Fortran Binding: </i> %s(%s)\n",
 		   dcn, af);
@@ -4197,7 +4251,7 @@ static void html_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc)
     if (bfn == NULL)
        fprintf(fp, "<i>SX Binding: </i>      none\n");
     else if (dcl->bindings != NULL)
-       {map_name(dcn, MAXLINE, cfn, bfn, NULL, -1, TRUE);
+       {map_name(dcn, MAXLINE, cfn, bfn, NULL, -1, TRUE, FALSE);
 	doc_proto_name_only(as, MAXLINE, dcl, NULL);
 	if (IS_NULL(as) == TRUE)
 	   fprintf(fp, "<i>SX Binding: </i>      (%s)\n", dcn);
@@ -4209,7 +4263,7 @@ static void html_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc)
     if (bfn == NULL)
        fprintf(fp, "<i>Python Binding: </i>  none\n");
     else if (dcl->bindings != NULL)
-       {map_name(dcn, MAXLINE, cfn, bfn, NULL, -1, FALSE);
+       {map_name(dcn, MAXLINE, cfn, bfn, NULL, -1, FALSE, TRUE);
 	doc_proto_python(ap, MAXLINE, dcn, dcl);
 	fprintf(fp, "<i>Python Binding: </i>  %s\n", ap);};
 
@@ -4288,7 +4342,7 @@ static void man_wrap(fdecl *dcl, char *sb, char *pck, int ndc, char **cdc)
        {args = dcl->tfproto;
 
 	doc_proto_fortran(af, MAXLINE, dcl);
-	map_name(dcn, MAXLINE, args[1], bfn, "f", -1, FALSE);
+	map_name(dcn, MAXLINE, args[1], bfn, "f", -1, FALSE, FALSE);
 	if (voidf == TRUE)
 	   fprintf(fp, ".B Fortran Binding: %s(%s)\n",
 		   dcn, af);
@@ -4304,7 +4358,7 @@ static void man_wrap(fdecl *dcl, char *sb, char *pck, int ndc, char **cdc)
        {fprintf(fp, ".B SX Binding:      none\n");
 	fprintf(fp, ".sp\n");}
     else if (dcl->bindings != NULL)
-       {map_name(dcn, MAXLINE, cfn, bfn, NULL, -1, TRUE);
+       {map_name(dcn, MAXLINE, cfn, bfn, NULL, -1, TRUE, FALSE);
 	doc_proto_name_only(as, MAXLINE, dcl, NULL);
 	if (IS_NULL(as) == TRUE)
 	   fprintf(fp, ".B SX Binding:      (%s)\n", dcn);
@@ -4319,7 +4373,7 @@ static void man_wrap(fdecl *dcl, char *sb, char *pck, int ndc, char **cdc)
        {fprintf(fp, ".B Python Binding:  none\n");
 	fprintf(fp, ".sp\n");}
     else if (dcl->bindings != NULL)
-       {map_name(dcn, MAXLINE, cfn, bfn, NULL, -1, FALSE);
+       {map_name(dcn, MAXLINE, cfn, bfn, NULL, -1, FALSE, TRUE);
 	doc_proto_python(ap, MAXLINE, dcn, dcl);
 	fprintf(fp, ".B Python Binding:  %s\n", ap);
 	fprintf(fp, ".sp\n");};

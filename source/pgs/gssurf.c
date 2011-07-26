@@ -1339,7 +1339,7 @@ void PG_surface_plot(PG_device *dev, PG_graph *data, ...)
  *                   - rotate to view angle, plot with hidden line
  *                   - algorithm, and shade if requested
  *
- * #bind PG_draw_surface_n fortran() scheme() python(draw_surface_n)
+ * #bind PG_draw_surface_n fortran() scheme() python()
  */
 
 void PG_draw_surface_n(PG_device *dev ARG(,,cls),

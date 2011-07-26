@@ -628,7 +628,7 @@ void PG_draw_interface_object(PG_interface_object *iob)
 /* PG_DRAW_INTERFACE_OBJECTS - draw all of the visible interface objects
  *                           - which belong to the given device
  *
- * #bind PG_draw_interface_objects fortran() scheme() python(draw_interface_objects)
+ * #bind PG_draw_interface_objects fortran() scheme() python()
  */
 
 void PG_draw_interface_objects(PG_device *dev ARG(,,cls))

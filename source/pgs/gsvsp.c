@@ -836,7 +836,7 @@ void PG_trans_points(PG_device *dev, int n, int nd, PG_coord_sys ics, double **x
  *                - NOTE: vectors in PC are really integer but are
  *                - represented here as double
  *
- * #bind PG_trans_point fortran() scheme() python(trans_point)
+ * #bind PG_trans_point fortran() scheme() python()
  */
 
 void PG_trans_point(PG_device *dev ARG(,,cls),
@@ -1423,7 +1423,7 @@ void _PG_fix_wtos(PG_device *dev, int wh)
 
 /* PG_FGET_AXIS_LOG_SCALE - return the settings of the log axis flags
  *
- * #bind PG_fget_axis_log_scale fortran() scheme(pg-get-axis-log-scale) python(get_axis_log_scale)
+ * #bind PG_fget_axis_log_scale fortran() scheme(pg-get-axis-log-scale) python()
  */
 
 void PG_fget_axis_log_scale(PG_device *dev ARG(,,cls), int nd, int *iflg)
@@ -1443,7 +1443,7 @@ void PG_fget_axis_log_scale(PG_device *dev ARG(,,cls), int nd, int *iflg)
 
 /* PG_FSET_AXIS_LOG_SCALE - make sure that a log scale is handled correctly
  *
- * #bind PG_fset_axis_log_scale fortran() scheme(pg-set-axis-log-scale!) python(set_axis_log_scale)
+ * #bind PG_fset_axis_log_scale fortran() scheme(pg-set-axis-log-scale!) python()
  */
 
 void PG_fset_axis_log_scale(PG_device *dev ARG(,,cls), int nd, int *iflg)
@@ -1597,7 +1597,7 @@ static INLINE void _PG_set_space_WC(PG_device *dev, int nd, double *wc)
 
 /* PG_GET_VIEWSPACE - return the viewspace limits
  *
- * #bind PG_get_viewspace fortran() scheme() python(get_viewspace)
+ * #bind PG_get_viewspace fortran() scheme() python()
  */
 
 void PG_get_viewspace(PG_device *dev ARG(,,cls),
@@ -2055,7 +2055,7 @@ void PG_viewport_frame(PG_device *dev, int nd, double *ndc)
 /* PG_FGET_VIEW_ANGLE - get the view angle in degrees if CNV is TRUE
  *                    - otherwise in radians
  *
- * #bind PG_fget_view_angle fortran() scheme() python(get_view_angle)
+ * #bind PG_fget_view_angle fortran() scheme() python()
  */
 
 void PG_fget_view_angle(PG_device *dev ARG(,,cls), int cnv,
@@ -2084,7 +2084,7 @@ void PG_fget_view_angle(PG_device *dev ARG(,,cls), int cnv,
 
 /* PG_FSET_VIEW_ANGLE - set the view angle in degrees for DEV
  *
- * #bind PG_fset_view_angle fortran() scheme() python(set_view_angle)
+ * #bind PG_fset_view_angle fortran() scheme() python()
  */
 
 void PG_fset_view_angle(PG_device *dev ARG(,,cls), int cnv ARG(TRUE,in),
@@ -2126,7 +2126,7 @@ void PG_fset_view_angle(PG_device *dev ARG(,,cls), int cnv ARG(TRUE,in),
 /* PG_FGET_LIGHT_ANGLE - get the lighting angle in degrees if CNV is TRUE
  *                     - otherwise in radians
  *
- * #bind PG_fget_light_angle fortran() scheme(pg-get-light-angle) python(get_light_angle)
+ * #bind PG_fget_light_angle fortran() scheme(pg-get-light-angle) python()
  */
 
 void PG_fget_light_angle(PG_device *dev ARG(,,cls), int cnv ARG(TRUE,in),
@@ -2150,7 +2150,7 @@ void PG_fget_light_angle(PG_device *dev ARG(,,cls), int cnv ARG(TRUE,in),
 /* PG_FSET_LIGHT_ANGLE - set the light angle in degrees for DEV
  *                     - return the old values thru the arguments
  *
- * #bind PG_fset_light_angle fortran() scheme(pg-set-light-angle!) python(set_view_angle)
+ * #bind PG_fset_light_angle fortran() scheme(pg-set-light-angle!) python()
  */
 
 void PG_fset_light_angle(PG_device *dev ARG(,,cls),

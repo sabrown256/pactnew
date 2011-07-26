@@ -15,7 +15,7 @@
 
 /* PD_WRT_CURVE_ALT - write an ULTRA curve into a PDB file
  *
- * #bind PD_wrt_curve_alt fortran() python(wrt_curve_alt)
+ * #bind PD_wrt_curve_alt fortran() python()
  */
 
 int PD_wrt_curve_alt(PDBfile *file ARG(,,cls), char *labl,
@@ -35,7 +35,7 @@ int PD_wrt_curve_alt(PDBfile *file ARG(,,cls), char *labl,
 
 /* PD_WRT_CURVE_Y_ALT - write the y values for an ULTRA curve into a PDB file
  *
- * #bind PD_wrt_curve_y_alt fortran() python(wrt_curve_y_alt)
+ * #bind PD_wrt_curve_y_alt fortran() python()
  */
 
 int PD_wrt_curve_y_alt(PDBfile *file ARG(,,cls), char *labl,
@@ -111,7 +111,7 @@ static PM_set *_PD_build_set(int *ai, double *ad, char *sname)
  *            - dm[nde*ne] - dm[nde*ne + ne] : values of nde'th component of
  *            -                                elements
  *
- * #bind PD_wrt_set fortran() python(wrt_set)
+ * #bind PD_wrt_set fortran() python()
  */
 
 int PD_wrt_set(PDBfile *file ARG(,,cls),
@@ -163,7 +163,7 @@ int PD_wrt_set(PDBfile *file ARG(,,cls),
  *            - dm[nde*ne] - dm[nde*ne + ne] : values of nde'th component of
  *            -                                elements
  *
- * #bind PD_wrt_map fortran() python(wrt_map)
+ * #bind PD_wrt_map fortran() python()
  */
 
 int PD_wrt_map(PDBfile *file ARG(,,cls),
@@ -231,7 +231,7 @@ int PD_wrt_map(PDBfile *file ARG(,,cls),
  *                - rm[nde*ne] - rm[nde*ne + ne] : values of nde'th component of
  *                -                                elements
  *
- * #bind PD_wrt_map_ran fortran() python(wrt_map_ran)
+ * #bind PD_wrt_map_ran fortran() python()
  */
 
 int PD_wrt_map_ran(PDBfile *file ARG(,,cls), char *dname,
@@ -316,7 +316,7 @@ int PD_wrt_map_ran(PDBfile *file ARG(,,cls), char *dname,
 
 /* PD_WRT_IMAGE - write a PG_image into a PDB file
  *
- * #bind PD_wrt_image fortran() python(wrt_image)
+ * #bind PD_wrt_image fortran() python()
  */
 
 int PD_wrt_image(PDBfile *file ARG(,,cls),

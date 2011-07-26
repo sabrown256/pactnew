@@ -192,7 +192,7 @@ static int _PD_ptr_sz_itags(long *pnb, PDBfile *file, void *vr,
  *           - a subsequent PD_write will use by the amount of space
  *           - for pointees already written
  *
- * #bind PD_sizeof fortran() scheme() python(sizeof)
+ * #bind PD_sizeof fortran() scheme() python()
  */
 
 long PD_sizeof(PDBfile *file ARG(,,cls),
