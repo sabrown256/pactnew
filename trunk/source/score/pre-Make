@@ -17,6 +17,7 @@ TGTInc = ${Hdrs} sclexan.h scope_mem.h scope_proc.h \
          scope_lex.h scope_thread.h
 
 MMLib = ${LibDir}/libpsmm.a
+OMLib = ${LibDir}/libosmm.a
 
 OD = DefaultO
 
@@ -46,7 +47,7 @@ RemoveFiles = ${BinDir}/ptime ${BinDir}/ncpu \
 #
 # Things upon which install depends (pact install)
 #
-InstallDep = ${TGTLib} ${MMLib} ${hdrf}
+InstallDep = ${TGTLib} ${MMLib} ${OMLib} ${hdrf}
 BinDep =
 BinObj =
 
@@ -75,6 +76,7 @@ targets :
 	@echo "   mf           : make scmfts test program for memory mapped file functionality"
 	@echo "   mm           : make memory manager testing and performance measurement utility"
 	@echo "   mmlib        : make archive containing replacements for malloc, etc"
+	@echo "   omlib        : make archive containing overrides for malloc, etc"
 	@echo "   mpitty       : make mpi-io-wrap and sctty for MPI testing"
 	@echo "   omp          : make scompt test program for OMP functionality"
 	@echo "   print        : make scprts test program for isprint, isspace functions"
@@ -211,12 +213,25 @@ IncAction = @pact generate
 ${MMLib} : scmemr.c
 	@echo "${CCAnnounce} -c $<"
 	@(cd ${PACTTmpDir} ; \
-          ${CC} -c ${PACTSrcDir}/$< -o scmemr.o ; \
-          ${AR} ${AROpt} ${MMLib} scmemr.o 2> /dev/null ; \
-          ${RM} scmemr.o 2> /dev/null )
+          ${CC} -c ${PACTSrcDir}/$< -o $*.o ; \
+          ${AR} ${AROpt} ${MMLib} $*.o 2> /dev/null ; \
+          ${RM} $*.o 2> /dev/null )
 
 mmlib :
 	pact ${MMLib}
+
+#
+# OMLib 
+#
+${OMLib} : scmemo.c
+	@echo "${CCAnnounce} -c $<"
+	@(cd ${PACTTmpDir} ; \
+          ${CC} -c ${PACTSrcDir}/$< -o $*.o ; \
+          ${AR} ${AROpt} ${OMLib} $*.o 2> /dev/null ; \
+          ${RM} $*.o 2> /dev/null )
+
+omlib :
+	pact ${OMLib}
 
 #
 # CONFIG
@@ -344,7 +359,7 @@ ${BinDir}/scmm : scmm.c ${TGTLib}
 #
 # memory diagnostic test
 #
-memchk : ${MMLib} ${BinDir}/scmtrt ${BinDir}/scmpft
+memchk : ${MMLib} ${OMLib} ${BinDir}/scmtrt ${BinDir}/scmpft
 
 ${BinDir}/scmtrt : scmtrt.c ${TGTLib}
 	${CLD} ${LdFlags} scmtrt.c -o ${BinDir}/scmtrt ${MLibs}
