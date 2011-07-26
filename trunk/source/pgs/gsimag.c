@@ -958,7 +958,7 @@ static void _PG_render_palette(PG_device *dev, PG_palette *pal,
  *                   - place it exactly where requested iff
  *                   - EXACT is TRUE
  *
- * #bind PG_draw_palette_n fortran() scheme() python(draw_palette_n)
+ * #bind PG_draw_palette_n fortran() scheme() python()
  */
 
 void PG_draw_palette_n(PG_device *dev ARG(,,cls),

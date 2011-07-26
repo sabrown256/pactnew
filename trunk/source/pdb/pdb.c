@@ -107,7 +107,7 @@ PDBfile *PD_open(char *name, char *mode)
 /* PD_FAMILY - return the next member of the file family if the given
  *           - file exceeds its maximum size
  *
- * #bind PD_family fortran() scheme() python(family)
+ * #bind PD_family fortran() scheme() python()
  */
 
 PDBfile *PD_family(PDBfile *of ARG(,,cls), int flag)
@@ -243,11 +243,11 @@ int PD_copy_type(PDBfile *sf, PDBfile *df, char *type)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_CLOSE - close a PDB file after writing out the symbol table and
- *          - structure chart and completing the header
- *          - return TRUE if successful and FALSE otherwise
+/* PD_CLOSE - Close a PDB file after writing out the symbol table and
+ *          - structure chart.
+ *          - Return TRUE if successful and FALSE otherwise.
  *
- * #bind PD_close fortran() scheme() python(close)
+ * #bind PD_close fortran() scheme() python()
  */
 
 int PD_close(PDBfile *file ARG(,,cls))
@@ -290,7 +290,7 @@ int PD_close(PDBfile *file ARG(,,cls))
  *          - know whether we came in on a write or a close and therefore
  *          - do not know which jmpbuf to use
  *
- * #bind PD_flush fortran() scheme() python(flush)
+ * #bind PD_flush fortran() scheme() python()
  */
 
 int PD_flush(PDBfile *file ARG(,,cls))
@@ -354,7 +354,7 @@ int _PD_read(PDBfile *file, char *fullpath, char *type, syment *ep, void *vr,
  *         - NOTE: VR must be a pointer to an object with the type
  *         - given by TYPE (PDBLib will allocated space if necessary)!
  *
- * #bind PD_read fortran() scheme() python(read)
+ * #bind PD_read fortran() scheme() python()
  */
 
 int PD_read(PDBfile *file ARG(,,cls), char *name, void *vr)
@@ -375,7 +375,7 @@ int PD_read(PDBfile *file ARG(,,cls), char *name, void *vr)
  *            - NOTE: VR must be a pointer to an object with the type
  *            - given by TYPE (PDBLib will allocate space if necessary)!
  *
- * #bind PD_read_as fortran() scheme() python(read_as)
+ * #bind PD_read_as fortran() scheme() python()
  */
 
 int PD_read_as(PDBfile *file ARG(,,cls), char *name, char *type, void *vr)
@@ -428,7 +428,7 @@ int PD_read_as(PDBfile *file ARG(,,cls), char *name, char *type, void *vr)
  *                 - given by TYPE (potenitally differs from the
  *                 - conventional PDB rule)
  *
- * #bind PD_read_as_dwim fortran() scheme() python(read_as_dwim)
+ * #bind PD_read_as_dwim fortran() scheme() python()
  */
 
 int PD_read_as_dwim(PDBfile *file ARG(,,cls), char *name,
@@ -533,7 +533,7 @@ int PD_read_as_dwim(PDBfile *file ARG(,,cls), char *name,
  *             - NOTE: VR must be a pointer to an object with the type
  *             - given by TYPE (PDBLib will allocated space if necessary)!
  *
- * #bind PD_read_alt fortran() scheme() python(read_alt)
+ * #bind PD_read_alt fortran() scheme() python()
  */
 
 int PD_read_alt(PDBfile *file ARG(,,cls), char *name, void *vr, long *ind)
@@ -559,7 +559,7 @@ int PD_read_alt(PDBfile *file ARG(,,cls), char *name, void *vr, long *ind)
  *                - of the object associated with NAME (PDBLib will
  *                - allocated space if necessary)!
  *
- * #bind PD_read_as_alt fortran() scheme() python(read_as_alt)
+ * #bind PD_read_as_alt fortran() scheme() python()
  */
 
 int PD_read_as_alt(PDBfile *file ARG(,,cls), char *name, char *type,
@@ -665,7 +665,7 @@ syment *_PD_defent(PDBfile *file, char *name, char *outtype,
  *           - return the new symbol table entry if successful, and
  *           - return NULL otherwise
  *
- * #bind PD_defent fortran() scheme() python(defent)
+ * #bind PD_defent fortran() scheme() python()
  */
 
 syment *PD_defent(PDBfile *file ARG(,,cls), char *name, char *outtype)
@@ -695,7 +695,7 @@ syment *PD_defent(PDBfile *file ARG(,,cls), char *name, char *outtype)
  *               - return the new symbol table entry if successful, and
  *               - return NULL otherwise
  *
- * #bind PD_defent_alt fortran() scheme() python(defent_alt)
+ * #bind PD_defent_alt fortran() scheme() python()
  */
 
 syment *PD_defent_alt(PDBfile *file ARG(,,cls), char *name, char *outtype,
@@ -918,7 +918,7 @@ syment *_PD_write(PDBfile *file, char *name, char *intype, char *outtype,
  *          - NOTE: VR must be a pointer to an object with the type
  *          - given by TYPE!!!!
  *
- * #bind PD_write fortran() scheme() python(write)
+ * #bind PD_write fortran() scheme() python()
  */
 
 int PD_write(PDBfile *file ARG(,,cls), char *name, char *type, void *vr)
@@ -939,7 +939,7 @@ int PD_write(PDBfile *file ARG(,,cls), char *name, char *type, void *vr)
  *             - NOTE: VR must be a pointer to an object with the type
  *             - given by TYPE!!!!
  *
- * #bind PD_write_as fortran() scheme() python(write_as)
+ * #bind PD_write_as fortran() scheme() python()
  */
 
 int PD_write_as(PDBfile *file ARG(,,cls), char *name,
@@ -996,7 +996,7 @@ int PD_write_as(PDBfile *file ARG(,,cls), char *name,
  *              - NOTE: VR must be a pointer to an object with the type
  *              - given by TYPE!!!!
  *
- * #bind PD_write_alt fortran() scheme() python(write_alt)
+ * #bind PD_write_alt fortran() scheme() python()
  */
 
 int PD_write_alt(PDBfile *file ARG(,,cls), char *name, char *type, void *vr,
@@ -1021,7 +1021,7 @@ int PD_write_alt(PDBfile *file ARG(,,cls), char *name, char *type, void *vr,
  *                 - NOTE: VR must be a pointer to an object with the type
  *                 - given by TYPE!!!!
  *
- * #bind PD_write_as_alt fortran() scheme() python(write_as_alt)
+ * #bind PD_write_as_alt fortran() scheme() python()
  */
 
 int PD_write_as_alt(PDBfile *file ARG(,,cls), char *name,
@@ -1094,7 +1094,7 @@ int PD_write_as_alt(PDBfile *file ARG(,,cls), char *name,
  *           - NOTE: VR must be a pointer to an object with the type
  *           - of the existing entry
  *
- * #bind PD_append fortran() scheme() python(append)
+ * #bind PD_append fortran() scheme() python()
  */
 
 int PD_append(PDBfile *file ARG(,,cls), char *name, void *vr)
@@ -1117,7 +1117,7 @@ int PD_append(PDBfile *file ARG(,,cls), char *name, void *vr)
  *              - NOTE: VR must be a pointer to an object with the type
  *              - of the existing entry
  *
- * #bind PD_append_as fortran() scheme() python(append_as)
+ * #bind PD_append_as fortran() scheme() python()
  */
 
 int PD_append_as(PDBfile *file ARG(,,cls), char *name,
@@ -1140,7 +1140,7 @@ int PD_append_as(PDBfile *file ARG(,,cls), char *name,
  *               - NOTE: VR must be a pointer to an object with the type
  *               - of the existing entry
  *
- * #bind PD_append_alt fortran() scheme() python(append_alt)
+ * #bind PD_append_alt fortran() scheme() python()
  */
 
 int PD_append_alt(PDBfile *file ARG(,,cls), char *name,
@@ -1164,7 +1164,7 @@ int PD_append_alt(PDBfile *file ARG(,,cls), char *name,
  *                  - NOTE: VR must be a pointer to an object with the type
  *                  - of the existing entry
  *
- * #bind PD_append_as_alt fortran() scheme() python(append_as_alt)
+ * #bind PD_append_as_alt fortran() scheme() python()
  */
 
 int PD_append_as_alt(PDBfile *file ARG(,,cls), char *name, char *intype,
@@ -1188,7 +1188,7 @@ int PD_append_as_alt(PDBfile *file ARG(,,cls), char *name, char *intype,
  *         - be a character pointer). Put this information into the FILE chart.
  *         - return TRUE iff successful
  *
- * #bind PD_cast fortran() scheme() python(cast)
+ * #bind PD_cast fortran() scheme() python()
  */
 
 int PD_cast(PDBfile *file ARG(,,cls), char *type, char *memb, char *contr)
@@ -1340,7 +1340,7 @@ void PD_error(char *s, PD_major_op n)
 
 /* PD_FREE - free allocated memory recursively
  *
- * #bind PD_free fortran() scheme() python(free)
+ * #bind PD_free fortran() scheme() python()
  */
 
 int PD_free(PDBfile *file ARG(,,cls), char *type, void *var) 
@@ -1407,7 +1407,7 @@ int PD_free(PDBfile *file ARG(,,cls), char *type, void *var)
  *                 - return FALSE if the NAME'd entry does not exist
  *                 - return TRUE if successful
  *
- * #bind PD_remove_entry fortran() scheme() python(remove_entry)
+ * #bind PD_remove_entry fortran() scheme() python()
  */
 
 int PD_remove_entry(PDBfile *file ARG(,,cls), char *name) 
@@ -1441,7 +1441,7 @@ int PD_remove_entry(PDBfile *file ARG(,,cls), char *name)
  *                   - return the old flag value
  *                   - PD_read calls then call PD_fix_denorm automagically
  *
- * #bind PD_autofix_denorm fortran() scheme() python(autofix_denorm)
+ * #bind PD_autofix_denorm fortran() scheme() python()
  */
 
 int PD_autofix_denorm(PDBfile *file ARG(,,cls), int flag) 

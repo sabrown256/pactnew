@@ -383,7 +383,7 @@ long _PD_hyper_number(PDBfile *file, char *indxpr, long numb, dimdes *dims, long
  *                 - return the number of elements implied by a hyper
  *                 - index expression
  *
- * #bind PD_hyper_number fortran() scheme() python(hyper_number)
+ * #bind PD_hyper_number fortran() scheme() python()
  */
 
 long PD_hyper_number(PDBfile *file ARG(,,cls), char *name, syment *ep)
@@ -1565,7 +1565,7 @@ int _PD_hyper_read(PDBfile *file, char *name, char *outtype,
  *              -   PAN     the number of items found 
  *              -   PDATA   the data array returned
  *
- * #bind PD_read_bits fortran() scheme() python(read_bits)
+ * #bind PD_read_bits fortran() scheme() python()
  */
 
 int PD_read_bits(PDBfile *file ARG(,,cls),

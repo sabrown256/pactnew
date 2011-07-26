@@ -297,7 +297,7 @@ static void _SC_hasharr_free_elements(hasharr *ha)
  *                  - leaves a pristine hash array
  *                  - for new installs, lookups, ...
  *
- * #bind SC_hasharr_clear fortran() python(clear)
+ * #bind SC_hasharr_clear fortran() python()
  */
 
 int SC_hasharr_clear(hasharr *ha ARG(,,cls),
@@ -321,7 +321,7 @@ int SC_hasharr_clear(hasharr *ha ARG(,,cls),
  *                 - like SC_hasharr_clear except that the
  *                 - hash array is freed and cannot be used again
  *
- * #bind SC_free_hasharr fortran() python(free)
+ * #bind SC_free_hasharr fortran() python()
  */
 
 void SC_free_hasharr(hasharr *ha ARG(,,cls),
@@ -462,7 +462,7 @@ int SC_hasharr_next(hasharr *ha, long *pi,
 
 /* SC_HASHARR_LOOKUP - lookup the haelem for the given KEY
  *
- * #bind SC_hasharr_lookup fortran() python(lookup)
+ * #bind SC_hasharr_lookup fortran() python()
  */
 
 haelem *SC_hasharr_lookup(hasharr *ha ARG(,,cls), void *key)
@@ -499,7 +499,7 @@ haelem *SC_hasharr_lookup(hasharr *ha ARG(,,cls), void *key)
 
 /* SC_HASHARR_DEF_LOOKUP - lookup the actual object for the given KEY
  *
- * #bind SC_hasharr_def_lookup fortran() python(def_lookup)
+ * #bind SC_hasharr_def_lookup fortran() python()
  */
 
 void *SC_hasharr_def_lookup(hasharr *ha ARG(,,cls), void *key)
@@ -643,7 +643,7 @@ static int _SC_splice_out_haelem(hasharr *ha, void *key,
 /* SC_HASHARR_REMOVE - remove the entry corresponding to the specified key 
  *                   - return TRUE iff successfully removed 
  *
- * #bind SC_hasharr_remove fortran() python(remove)
+ * #bind SC_hasharr_remove fortran() python()
  */
 
 int SC_hasharr_remove(hasharr *ha ARG(,,cls), void *key)

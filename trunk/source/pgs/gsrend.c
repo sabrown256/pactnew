@@ -1256,7 +1256,7 @@ static void _PG_dispatch_3d(PG_device *dev, PG_graph *data, int range_dim)
  
 /* PG_DRAW_GRAPH - main graph plotting control routine
  *
- * #bind PG_draw_graph fortran() scheme() python(draw_graph)
+ * #bind PG_draw_graph fortran() scheme() python()
  */
 
 void PG_draw_graph(PG_device *dev ARG(,,cls), PG_graph *data)

@@ -29,7 +29,7 @@ int
 /* PD_CD - change the current working directory
  *       - the directory may be specified by an absolute or relative path.
  *
- * #bind PD_cd fortran() scheme() python(cd)
+ * #bind PD_cd fortran() scheme() python()
  */
 
 int PD_cd(PDBfile *file ARG(,,cls), char *dirname)
@@ -88,7 +88,7 @@ int PD_cd(PDBfile *file ARG(,,cls), char *dirname)
  *       - This function simply installs a new symbol table entry. The new
  *       - syment is a copy of an already existing one, but with a new name.
  *
- * #bind PD_ln fortran() scheme() python(ln)
+ * #bind PD_ln fortran() scheme() python()
  */
 
 int PD_ln(PDBfile *file ARG(,,cls), char *oldname, char *newname)
@@ -403,7 +403,7 @@ char **_PD_ls_extr(PDBfile *file, char *path, char *type, long size,
  *       - returned. If path is null, the root directory is searched.
  *       - Directories are terminated with a slash.
  *
- * #bind PD_ls fortran() scheme() python(ls)
+ * #bind PD_ls fortran() scheme() python()
  */
 
 char **PD_ls(PDBfile *file ARG(,,cls), char *path, char *type, int *num)
@@ -424,7 +424,7 @@ char **PD_ls(PDBfile *file ARG(,,cls), char *path, char *type, int *num)
  *           -                     hidden ones (first char == &) should be 
  *           -                     returned. 
  *
- * #bind PD_ls_alt fortran() scheme() python(ls_alt)
+ * #bind PD_ls_alt fortran() scheme() python()
  */
 
 char **PD_ls_alt(PDBfile *file ARG(,,cls), char *path,
@@ -465,7 +465,7 @@ static int _PD_wr_dir(PDBfile *file, char *name)
 /* PD_DEF_DIR - define and initialize the directory machinery for
  *            - the given FILE
  *
- * #bind PD_def_dir fortran() scheme() python(def_dir)
+ * #bind PD_def_dir fortran() scheme() python()
  */
 
 int PD_def_dir(PDBfile *file ARG(,,cls))
@@ -522,7 +522,7 @@ static int _PD_exist_path(PDBfile *file, char *path)
 
 /* PD_ISDIR - return TRUE iff DIR is a directory of FILE
  *
- * #bind PD_isdir fortran() scheme() python(isdir)
+ * #bind PD_isdir fortran() scheme() python()
  */
 
 int PD_isdir(PDBfile *file ARG(,,cls), char *dir)
@@ -561,7 +561,7 @@ int PD_isdir(PDBfile *file ARG(,,cls), char *dir)
 /* PD_MKDIR - create a directory
  *          - the directory may be specified by an absolute or relative path
  *
- * #bind PD_mkdir fortran() scheme() python(mkdir)
+ * #bind PD_mkdir fortran() scheme() python()
  */
 
 int PD_mkdir(PDBfile *file ARG(,,cls), char *dir)
@@ -613,7 +613,7 @@ int PD_mkdir(PDBfile *file ARG(,,cls), char *dir)
 
 /* PD_PWD - return the current working directory
  *
- * #bind PD_pwd fortran() scheme() python(pwd)
+ * #bind PD_pwd fortran() scheme() python()
  */
 
 char *PD_pwd(PDBfile *file ARG(,,cls))

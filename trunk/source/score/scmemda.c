@@ -475,7 +475,7 @@ void _SC_print_block_info(FILE *fp, SC_heap_des *ph, void *ptr, int flag)
  *             -    PN  allocated name
  *             - return TRUE iff P is valid
  *
- * #bind SC_mem_info fortran() python(mem_info) python()
+ * #bind SC_mem_info fortran() python()
  */
 
 int SC_mem_info(void *p, long *pl, int *pt, int *pr, char **pn)
@@ -532,7 +532,7 @@ int SC_mem_info(void *p, long *pl, int *pt, int *pr, char **pn)
  *              -           also prints name of block
  *              - allocated
  *
- * #bind SC_mem_trace fortran() scheme(memory-trace) python(mem_trace)
+ * #bind SC_mem_trace fortran() scheme(memory-trace) python()
  */
 
 int SC_mem_trace(void)
@@ -860,7 +860,7 @@ static long _SC_rgchk(void)
  *            -  -2    corrupt free pool
  *            -  -3    both pools corrupt
  *
- * #bind SC_mem_chk fortran() scheme(memory-check) python(mem_chk)
+ * #bind SC_mem_chk fortran() scheme(memory-check) python()
  */
 
 long SC_mem_chk(int typ)
@@ -900,7 +900,7 @@ long SC_mem_chk(int typ)
 /* SC_IS_SCORE_PTR - return TRUE iff the given pointer P
  *                 - points to space allocated by SCORE
  *
- * #bind SC_is_score_ptr fortran() python(is_score_ptr)
+ * #bind SC_is_score_ptr fortran() python()
  */
 
 int SC_is_score_ptr(void *p)
@@ -945,7 +945,7 @@ long SC_arrlen(void *p)
 
 /* SC_MARK - change the reference count by n
  *
- * #bind SC_mark fortran() python(mark)
+ * #bind SC_mark fortran() python()
  */
 
 int SC_mark(void *p, int n)

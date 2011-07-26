@@ -290,7 +290,7 @@ static void _PG_draw_vct_zc_ac(PG_device *dev, double **u, double **r,
  *                  -   X base points of vectors
  *                  -   U vectors
  *
- * #bind PG_draw_vector_n fortran() scheme() python(draw_vector_n)
+ * #bind PG_draw_vector_n fortran() scheme() python()
  */
 
 void PG_draw_vector_n(PG_device *dev ARG(,,cls),

@@ -30,3 +30,10 @@ void fc4(int a, int *b ARG([1],in), int *c ARG([1],io), int *d ARG([1],out))
 void fc5(int a, int *b ARG([1,2],in), int *c ARG([1,2],io), int *d ARG([1,2],out))
 void fc6(int a, int *b ARG([*],in), int *c ARG([*],io), int *d ARG([*],out))
 void fc7(int a, int *b ARG([*,*],in), int *c ARG([*,*],io), int *d ARG([*,*],out))
+
+# tests of ARG cls specifications
+void fd1(str *a ARG(,,cls), int b)
+void fd2(str *a ARG(,,cls), int b)
+void PD_fd3(str *a ARG(,,cls), int b)
+void PD_fd4(str *a ARG(,,cls), int b)
+

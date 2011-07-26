@@ -781,7 +781,7 @@ void PG_save_view_attributes(PG_view_attributes *d, PG_device *dev)
 /* PG_RESTORE_VIEW_ATTRIBUTES - restore the PG_view_attributes to the
  *                            - graphical device
  *
- * #bind PG_restore_view_attributes fortran() scheme() python(restore_view_attributes)
+ * #bind PG_restore_view_attributes fortran() scheme() python()
  */
 
 void PG_restore_view_attributes(PG_device *dev ARG(,,cls),

@@ -574,7 +574,7 @@ static void _PG_aux_axis(PG_device *dev, int axis_type)
 /* PG_AXIS - draw the axes
  *         - the information for this is set up by a setlimits call
  *
- * #bind PG_axis fortran() scheme() python(axis)
+ * #bind PG_axis fortran() scheme() python()
  */
  
 void PG_axis(PG_device *dev ARG(,,cls), int axis_type ARG(CARTESIAN_2D))
@@ -1289,7 +1289,7 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
  *                - would have en[0] = en[1]
  *                - This is independent of tick type!
  *
- * #bind PG_draw_axis_n fortran() scheme() python(draw_axis_n)
+ * #bind PG_draw_axis_n fortran() scheme() python()
  */
 
 PG_axis_def *PG_draw_axis_n(PG_device *dev ARG(,,cls),
@@ -1381,7 +1381,7 @@ PG_axis_def *PG_draw_axis_n(PG_device *dev ARG(,,cls),
 
 /* PG_AXIS_3 - draw a set of axes for a surface plot
  *
- * #bind PG_axis_3 fortran() scheme() python(axis_3)
+ * #bind PG_axis_3 fortran() scheme() python()
  */
 
 void PG_axis_3(PG_device *dev ARG(,,cls),

@@ -216,7 +216,7 @@ static void _PD_disp_data(PD_printdes *prnt, void *x,
 
 /* PD_WRITE_EXTRAS - write the extra stuff about a PDBfile
  *
- * #bind PD_write_extras fortran() scheme() python(write_extras)
+ * #bind PD_write_extras fortran() scheme() python()
  */
 
 void PD_write_extras(FILE *f0, PDBfile *file ARG(,,cls))
@@ -276,7 +276,7 @@ void PD_write_extras(FILE *f0, PDBfile *file ARG(,,cls))
 
 /* PD_PRINT_EXTRAS - print the extra stuff about a PDBfile
  *
- * #bind PD_print_extras fortran() scheme() python(print_extras)
+ * #bind PD_print_extras fortran() scheme() python()
  */
 
 void PD_print_extras(PDBfile *file ARG(,,cls))
@@ -595,7 +595,7 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
 
 /* PD_WRITE_ENTRY - write a data item from a PDB file in a formated way
  *
- * #bind PD_write_entry fortran() scheme() python(write_entry)
+ * #bind PD_write_entry fortran() scheme() python()
  */
 
 int PD_write_entry(FILE *f0, PDBfile *file ARG(,,cls),
@@ -645,7 +645,7 @@ int PD_write_entry(FILE *f0, PDBfile *file ARG(,,cls),
 
 /* PD_PRINT_ENTRY - print a data item from a PDB file in a formated way
  *
- * #bind PD_print_entry fortran() scheme() python(print_entry)
+ * #bind PD_print_entry fortran() scheme() python()
  */
 
 int PD_print_entry(PDBfile *file ARG(,,cls),

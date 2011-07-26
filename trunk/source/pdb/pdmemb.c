@@ -518,7 +518,7 @@ int64_t _PD_member_location(char *s, hasharr *tab, defstr *dp, memdes **pdesc)
 
 /* PD_INQUIRE_SYMBOL - look up the entry for the named quantity
  *
- * #bind PD_inquire_symbol fortran() scheme() python(inquire_symbol)
+ * #bind PD_inquire_symbol fortran() scheme() python()
  */
 
 haelem *PD_inquire_symbol(PDBfile *file ARG(,,cls),
@@ -563,7 +563,7 @@ haelem *PD_inquire_symbol(PDBfile *file ARG(,,cls),
 
 /* PD_QUERY_ENTRY - look up the symbol table entry for the named quantity
  *
- * #bind PD_query_entry fortran() scheme() python(query_entry)
+ * #bind PD_query_entry fortran() scheme() python()
  */
 
 syment *PD_query_entry(PDBfile *file ARG(,,cls), char *name, char *fullname)
@@ -580,7 +580,7 @@ syment *PD_query_entry(PDBfile *file ARG(,,cls), char *name, char *fullname)
 
 /* PD_INQUIRE_ENTRY - look up the symbol table entry for the named quantity
  *
- * #bind PD_inquire_entry fortran() scheme() python(inquire_entry)
+ * #bind PD_inquire_entry fortran() scheme() python()
  */
 
 syment *PD_inquire_entry(PDBfile *file ARG(,,cls), char *name,
@@ -602,7 +602,7 @@ syment *PD_inquire_entry(PDBfile *file ARG(,,cls), char *name,
  *                    -     a->b
  *                    - and all other possibilities
  *
- * #bind PD_effective_entry fortran() scheme() python(effective_entry)
+ * #bind PD_effective_entry fortran() scheme() python()
  */
 
 syment *PD_effective_entry(PDBfile *file ARG(,,cls), char *name,

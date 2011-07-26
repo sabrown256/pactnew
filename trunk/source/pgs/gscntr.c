@@ -536,7 +536,7 @@ static void _PG_iso_nc_lr_2d(PG_device *dev, double *a,
  *                   - the mesh topology is always ignored and is there
  *                   - to be call compatible with the AC version
  *
- * #bind PG_draw_iso_nc_lr fortran() scheme() python(draw_iso_nc_lr)
+ * #bind PG_draw_iso_nc_lr fortran() scheme() python()
  */
 
 void PG_draw_iso_nc_lr(PG_device *dev ARG(,,cls), double *a,

@@ -253,7 +253,7 @@ static int PG_write_interface_object(FILE *fp, PG_interface_object *iob,
  *                    - given file
  *                    - return TRUE iff successful
  *
- * #bind PG_write_interface fortran() scheme() python(write_interface)
+ * #bind PG_write_interface fortran() scheme() python()
  */
 
 int PG_write_interface(PG_device *dev ARG(,,cls), char *name)
@@ -628,7 +628,7 @@ static PG_interface_object *_PG_read_interface_object(PG_device *dev, FILE *fp,
  *                   - given file
  *                   - return TRUE iff successful
  *
- * #bind PG_read_interface fortran() scheme() python(read_interface)
+ * #bind PG_read_interface fortran() scheme() python()
  */
 
 int PG_read_interface(PG_device *dev ARG(,,cls), char *name)

@@ -7,6 +7,8 @@
 # include "cpyright.h"
 #
 
+derived str	character-A	G_STR	strO     NULL
+
 # C	Fortran	Scheme	Python
 
 fa1	fortran(fa1f)	scheme(fa1s)	python(fa1p)
@@ -26,3 +28,8 @@ fc4     fortran()	scheme()	python()
 fc5     fortran()	scheme()	python()
 fc6     fortran()	scheme()	python()
 fc7     fortran()	scheme()	python()
+
+fd1     python()
+fd2     python(nfd)
+PD_fd3  python()
+PD_fd4  python(mfd)
