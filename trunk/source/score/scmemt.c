@@ -267,9 +267,9 @@ int SC_register_thread_data(char *name, char *type, int ni, size_t bpi,
 /*--------------------------------------------------------------------------*/
 
 /* SC_REGISTER_THREAD_STATE - register common pieces of per thread state
- *                           - they will all be initialized together
- *                           - at the earliest opportunity
- *                           - this avoids race/lock/bootstrap problems
+ *                          - they will all be initialized together
+ *                          - at the earliest opportunity
+ *                          - this avoids race/lock/bootstrap problems
  */
 
 void SC_register_thread_state(void)

@@ -8,14 +8,24 @@
  */
 
 #include "cpyright.h"
+#include "score_int.h"
+#include "scope_mem.h"
 
 #ifdef LINUX
 
-#define _GNU_SOURCE
+#define __USE_GNU
 
-#include "score_int.h"
-#include "scope_mem.h"
 #include <dlfcn.h>
+
+typedef struct s_memfncs memfncs;
+
+struct s_memfncs
+   {void *(*malloc)(size_t nb);
+    void (*free)(void *p);
+    void *(*realloc)(void *p, size_t nb);};
+
+static memfncs
+  _SC_mf = { NULL, NULL, NULL };
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -24,12 +34,11 @@
 
 void *_SC_alloc_over(size_t nb)
    {void *pr;
-    static void *(*system_malloc)(size_t nb) = NULL;
 
-    if (system_malloc == NULL)
-       system_malloc = dlsym(RTLD_NEXT, "malloc");
+    if (_SC_mf.malloc == NULL)
+       _SC_mf.malloc = dlsym(RTLD_NEXT, "malloc");
 
-    pr = system_malloc(nb);
+    pr = _SC_mf.malloc(nb);
 
     return(pr);}
 
@@ -39,12 +48,12 @@ void *_SC_alloc_over(size_t nb)
 /* _SC_FREE_OVER - free memory allocated by _SC_ALLOC_OVER */
 
 void _SC_free_over(void *p)
-   {static void (*system_free)(void *p) = NULL;
+   {
 
-    if (system_free == NULL)
-       system_free = dlsym(RTLD_NEXT, "free");
+    if (_SC_mf.free == NULL)
+       _SC_mf.free = dlsym(RTLD_NEXT, "free");
 
-    system_free(p);
+    _SC_mf.free(p);
 
     return;}
 
@@ -55,12 +64,11 @@ void _SC_free_over(void *p)
 
 void *_SC_realloc_over(void *p, size_t nb)
    {void *pr;
-    static void *(*system_realloc)(void *p, size_t nb) = NULL;
 
-    if (system_realloc == NULL)
-       system_realloc = dlsym(RTLD_NEXT, "realloc");
+    if (_SC_mf.realloc == NULL)
+       _SC_mf.realloc = dlsym(RTLD_NEXT, "realloc");
 
-    pr = system_realloc(p, nb);
+    pr = _SC_mf.realloc(p, nb);
 
     return(pr);}
 
@@ -74,6 +82,15 @@ void *_SC_realloc_over(void *p, size_t nb)
 
 void SC_use_over_mem(int on)
    {
+
+    if (_SC_mf.malloc == NULL)
+       _SC_mf.malloc = dlsym(RTLD_NEXT, "malloc");
+
+    if (_SC_mf.free == NULL)
+       _SC_mf.free = dlsym(RTLD_NEXT, "free");
+
+    if (_SC_mf.realloc == NULL)
+       _SC_mf.realloc = dlsym(RTLD_NEXT, "realloc");
 
     if (on)
        {_SC.alloc   = _SC_alloc_over;
@@ -89,45 +106,71 @@ void SC_use_over_mem(int on)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _RETRACE - look up the stack */
+
+#include <execinfo.h>
+
+static void _SC_malloc_loc(char *d, int nc)
+   {int n;
+    char **out;
+    void *bf[3];
+    static int count = 0;
+
+    count++;
+
+    if (count == 1)
+       {n = backtrace(bf, 3);
+	if (n > 2)
+	   {char s[MAXLINE];
+	    char *ps, *pe;
+	    FILE *fp;
+
+	    out = backtrace_symbols(bf, n);
+
+/* get the address of the caller */
+	    ps = strchr(out[2], '[');
+	    ps++;
+	    pe = strchr(ps, ']');
+	    *pe = '\0';
+
+/* get the file and line number */
+	    snprintf(s, MAXLINE, "echo %s | addr2line -e `which scmots`", ps);
+	    fp = popen(s, "r");
+	    fgets(s, nc, fp);
+	    SC_LAST_CHAR(s) = '\0';
+	    ps = strrchr(s, '/');
+	    if (ps != NULL)
+	       snprintf(d, nc, "BARE_MALLOC:%s", ps+1);
+	    else
+	       snprintf(d, nc, "BARE_MALLOC:%s", s);
+	    pclose(fp);
+
+	    free(out);};};
+
+    count--;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* MALLOC - allocate NB bytes of memory */
 
 void *malloc(size_t nb)
-   {void *pr;
+   {char d[MAXLINE];
+    void *pr;
 
     SC_use_over_mem(TRUE);
 
-#if 1
-    pr = SC_alloc_n(nb, 1,
-		    SC_MEM_ATTR_FUNC, "BARE_MALLOC",
-		    0);
-#else
-    pr = CMAKE_N(char, nb);
-#endif
+    if (_SC_init_emu_threads == 0)
+       pr = _SC_mf.malloc(nb);
 
-    return(pr);}
+    else
+       {_SC_malloc_loc(d, MAXLINE);
 
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* CALLOC - allocate NB bytes of memory */
-
-void *calloc(size_t ni, size_t bpi)
-   {void *pr;
-
-    SC_use_over_mem(TRUE);
-
-#if 1
-    pr = SC_alloc_n(ni, bpi,
-		    SC_MEM_ATTR_FUNC, "BARE_CALLOC",
-		    SC_MEM_ATTR_ZERO_SPACE, 2,
-		    0);
-#else
-    size_t nb;
-    
-    nb = ni*bpi;
-    pr = CMAKE_N(char, nb);
-    memset(pr, 0, nb);
-#endif
+	pr = SC_alloc_n(nb, 1,
+			SC_MEM_ATTR_FUNC, d,
+			0);};
 
     return(pr);}
 
@@ -151,13 +194,13 @@ void free(void *p)
 /* REALLOC - reallocate to NB bytes of memory a pointer P */
 
 void *realloc(void *p, size_t nb)
-   {void *pr;
+   {
 
     SC_use_over_mem(TRUE);
 
     CREMAKE(p, char, nb);
 
-    return(pr);}
+    return(p);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
