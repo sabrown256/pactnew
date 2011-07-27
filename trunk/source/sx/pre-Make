@@ -99,9 +99,17 @@ ObjsY = sxshar.o
 ObjsZ = sxcmd.o sxset.o sxcont.o sxulio.o sxcrv.o sxtable.o
 Objs = ${ObjsA} ${ObjsB} ${ObjsC} ${ObjsD} ${ObjsE} ${ObjsY} ${ObjsZ}
 
-ArBind = ${TGTLib}(gs-score.o) ${TGTLib}(gs-pml.o) ${TGTLib}(gs-pdb.o)   \
-         ${TGTLib}(gs-ppc.o) ${TGTLib}(gs-pgs.o) ${TGTLib}(gs-panacea.o) \
-         ${TGTLib}(gs-scheme.o)
+gss = gs-score.c gs-pml.c gs-pdb.c   \
+      gs-ppc.c gs-pgs.c gs-panacea.c \
+      gs-scheme.c
+
+gso = gs-score.o gs-pml.o gs-pdb.o   \
+      gs-ppc.o gs-pgs.o gs-panacea.o \
+      gs-scheme.o
+
+gsa = ${TGTLib}(gs-score.o) ${TGTLib}(gs-pml.o) ${TGTLib}(gs-pdb.o)   \
+      ${TGTLib}(gs-ppc.o) ${TGTLib}(gs-pgs.o) ${TGTLib}(gs-panacea.o) \
+      ${TGTLib}(gs-scheme.o)
 
 ArObjs = ${TGTLib}(sxhook.o) ${TGTLib}(sxmm.o) ${TGTLib}(sxmode.o) \
          ${TGTLib}(sxgc.o) ${TGTLib}(sxcmd.o) \
@@ -113,12 +121,12 @@ ArObjs = ${TGTLib}(sxhook.o) ${TGTLib}(sxmm.o) ${TGTLib}(sxmode.o) \
          ${TGTLib}(sxgri.o) ${TGTLib}(sxpgs.o) ${TGTLib}(sxpgsp.o) ${TGTLib}(sxgrot.o) \
          ${TGTLib}(sxshar.o) ${TGTLib}(sxset.o) ${TGTLib}(sxcont.o)  \
          ${TGTLib}(sxulio.o) ${TGTLib}(sxcrv.o) ${TGTLib}(sxtable.o) \
-         ${ArBind}
+         ${gsa}
 
 sxmain.o : ${Hdrs}
 ${ObjsY} : ${Hdrs}
 ${Objs} : ${Hdrs}
-${LibDep} : ${Hdrs} ${gso} ${hdrf}
+${LibDep} : ${Hdrs} ${hdrf}
 
 #
 # Generated code rules
@@ -132,23 +140,11 @@ hdrf = ${IncDir}/sxpdbd.h
 
 # language bindings
 
-gsrc = ${PACTTmpDir}/gs-score.c ${PACTTmpDir}/gs-pml.c ${PACTTmpDir}/gs-pdb.c   \
-       ${PACTTmpDir}/gs-ppc.c ${PACTTmpDir}/gs-pgs.c ${PACTTmpDir}/gs-panacea.c \
-       ${PACTTmpDir}/gs-scheme.c
-
-gso = ${PACTTmpDir}/gs-score.o ${PACTTmpDir}/gs-pml.o ${PACTTmpDir}/gs-pdb.o   \
-      ${PACTTmpDir}/gs-ppc.o ${PACTTmpDir}/gs-pgs.o ${PACTTmpDir}/gs-panacea.o \
-      ${PACTTmpDir}/gs-scheme.o
-
-${gso} : ${gsrc}
-
-%.o : %.c
-	@(echo "${CCAnnounce} -c $<" ; \
-          ${CC} -c $< -o $@ ; \
-          ${AR} ${AROpt} ${TGTLib} $@ 2>> errlog )
-
 IncAction = @pact generate
-LibAction = build-ext
+
+SDir = ${PACTSrcDir}
+
+LibAction = @(echo "build-ext" ; build-ext ; cd ${PACTTmpDir} ; echo "bindings" ; pact SDir=\"${SDir}\" PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=@echo Hdrs=\"${SDir}/sx.h\" -f ../../pre-Make devlib)
 
 
 #
@@ -165,9 +161,6 @@ ${BinDir}/sxcmts : ${BinDep}
 
 command :
 	pact ${BinDir}/sxcmts
-
-# extra commands needed when building TGTLib
-LibAction = build-ext
 
 #
 # link 
