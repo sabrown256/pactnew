@@ -1,0 +1,64 @@
+#!/bin/csh -f
+#
+# MOR - malloc override test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+if ($CROSS_COMPILE == FALSE) then
+
+   NoteD $LogF ""
+   NoteD $LogF -n "                    SCORE Override Test ......... "
+   NoteD $LogF ""
+
+   set UTime = `$TIMER -r`
+
+   flog $LogF pushd $SrcDir
+   flog $LogF $MAKE memchk
+   set xstatus = $status
+   Note $LogF "make status = $xstatus"
+
+   flog $LogF popd
+
+   if ($xstatus == 0) then
+      flog $LogF setenv LD_PRELOAD       $LibDir/libosmm.so
+      flog $LogF setenv LD_LIBRARY_PATH  $LibDir
+      if ("$Valgrind" == "") then
+#         ftee $LogF $CFE $BinDir/scmots
+         set xstatus = $status
+      else
+         ftee $LogF $Valgrind $BinDir/scmots   |& \
+         grep "ERROR SUMMARY:"                 |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+         flog $LogF $RM $Tmp
+      endif
+      flog $LogF unsetenv LD_PRELOAD
+      flog $LogF unsetenv LD_LIBRARY_PATH
+   endif
+
+   set ETime = `$TIMER -b $UTime`
+
+   if (($xstatus == 254) || ($xstatus == 255)) then
+      NoteD $LogF "                    SCORE Override Test ......... OMITTED ($xstatus/$ETime)"
+   else if ($xstatus != 0) then
+      NoteD $LogF "                    SCORE Override Test ......... FAILED ($xstatus/$ETime)"
+      set Err = 1
+   else
+      NoteD $LogF "                    SCORE Override Test ......... PASSED ($ETime)"
+   endif
+
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+$TEST_CHECK -a mor -e $Err part
+
+exit($status)
+

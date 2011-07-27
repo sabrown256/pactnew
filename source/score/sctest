@@ -21,7 +21,7 @@ while ($#argv > 0)
            echo "Usage: sctest [-h] [<test>]*"
            echo "  h       this help message"
            echo "  <test>  one of: sharp ar mk mkinfo error mpi array"
-           echo "                  lookup heap mprf resrc retrc"
+           echo "                  lookup heap mor mprf resrc retrc"
            echo "                  smp mmap io buf"
            echo ""
            exit(1)
@@ -77,7 +77,7 @@ else if (-e $RootDir/score/scstd.h) then
       set Test = ""
       set Test = ($Test sharp ar mk mkinfo error mpi)
       set Test = ($Test array lookup)
-      set Test = ($Test heap mprf resrc retrc)
+      set Test = ($Test heap mor mprf resrc retrc)
       set Test = ($Test smp mmap io buf)
    endif
 
