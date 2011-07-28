@@ -468,10 +468,8 @@ static void id_fd_out(idecl *ip, char *ty, char *nm, int nvl, char **vls)
 
 static void id_fd_in_out(idecl *ip, char *ty, char *lty,
 			 char *nm, int nvl, char **vls)
-   {int l, drf;
+   {int l;
     char dty[MAXLINE], lvl[MAXLINE];
-
-    drf = ((is_ptr(ty) == FALSE) || (strcmp(vls[0], "NULL") != 0));
 
     deref(dty, MAXLINE, ty);
     ideref(lty);
@@ -1314,9 +1312,8 @@ static void setup_binder(statedes *st, char *pck, int cfl,
  */
 
 static void cf_call_list(char *a, int nc, fdecl *dcl, int local)
-   {int i, na, nvl, ptr, voida;
-    fdir dir;
-    char *ty, *nm;
+   {int i, na, voida;
+    char *nm;
     farg *al;
     idecl *ip;
 
@@ -1327,12 +1324,8 @@ static void cf_call_list(char *a, int nc, fdecl *dcl, int local)
     a[0] = '\0';
     if (voida == FALSE)
        {for (i = 0; i < na; i++)
-	    {nm  = al[i].name;
-	     ty  = al[i].type;
-	     nvl = al[i].nv;
-	     dir = al[i].dir;
-	     ip  = &al[i].interp;
-	     ptr = is_ptr(ty);
+	    {nm = al[i].name;
+	     ip = &al[i].interp;
 
 /* pass function pointers straight thru - no local variable */
 	     if ((al[i].knd == FP_FNC) && (local == FALSE))
@@ -1925,7 +1918,7 @@ static void fortran_wrap(FILE *fp, fdecl *dcl, char *ffn)
 
 static int bind_fortran(bindes *bd)
    {int ib, rv, ndcl;
-    char *ffn, **cpr, **sbi;
+    char *ffn;
     fdecl *dcl, *dcls;
     statedes *st;
     FILE *fp;
@@ -1934,9 +1927,7 @@ static int bind_fortran(bindes *bd)
     st = bd->st;
 
     if (st->cfl & 1)
-       {fp  = bd->fp;
-	sbi = st->sbi;
-	cpr = st->cpr;
+       {fp = bd->fp;
 
 	dcls = st->dcl;
 	ndcl = st->ndcl;
@@ -2116,7 +2107,7 @@ static char **mc_proto_list(fdecl *dcl)
    {int i, na, voida;
     fparam knd;
     char wty[MAXLINE];
-    char **lst, *ty, *nm;
+    char **lst, *nm;
     farg *al;
 
     lst = NULL;
@@ -2129,7 +2120,6 @@ static char **mc_proto_list(fdecl *dcl)
 
 /* function/return type */
        {mc_type(MAXLINE, NULL, NULL, wty, &dcl->proto);
-	ty  = dcl->proto.type;
 	nm  = dcl->proto.name;
 	knd = dcl->proto.knd;
 	switch (knd)
@@ -2161,7 +2151,6 @@ static char **mc_proto_list(fdecl *dcl)
 	    continue;
 
 	 mc_type(MAXLINE, NULL, NULL, wty, al+i);
-	 ty  = al[i].type;
 	 nm  = al[i].name;
 	 knd = al[i].knd;
 	 switch (knd)
@@ -2492,7 +2481,7 @@ static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck, char *ffn)
    {int i, ns, voidf;
     char dcn[MAXLINE], a[MAXLINE], t[MAXLINE];
     char fty[MAXLINE], cty[MAXLINE];
-    char *cfn, *rty, *oper, **args;
+    char *cfn, *oper, **args;
 
     cfn = dcl->proto.name;
 
@@ -2500,7 +2489,6 @@ static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck, char *ffn)
     if ((module_itf_wrappable(dcl) == TRUE) && (strcmp(ffn, "none") != 0))
        {map_name(dcn, MAXLINE, cfn, ffn, "f", -1, FALSE, FALSE);
 
-	rty   = dcl->proto.type;
 	voidf = dcl->voidf;
 	oper  = (voidf == TRUE) ? "subroutine" : "function";
 
@@ -2553,7 +2541,7 @@ static void module_interop_wrap(FILE *fp, fdecl *dcl, char *ffn)
     char dcn[MAXLINE], a[MAXLINE];
     char fty[MAXLINE], cty[MAXLINE];
     char cd[MAXLINE], cb[MAXLINE];
-    char *cfn, *nm, *ty, *rty, *oper;
+    char *cfn, *nm, *oper;
     farg *al;
 
     cfn = dcl->proto.name;
@@ -2564,7 +2552,6 @@ static void module_interop_wrap(FILE *fp, fdecl *dcl, char *ffn)
     else
        {map_name(dcn, MAXLINE, cfn, ffn, "i", -1, FALSE, FALSE);
 
-	rty   = dcl->proto.type;
 	na    = dcl->na;
 	al    = dcl->al;
 	voida = dcl->voida;
@@ -2591,7 +2578,6 @@ static void module_interop_wrap(FILE *fp, fdecl *dcl, char *ffn)
 	        continue;
 
 	     mc_type(MAXLINE, fty, cty, NULL, al+i);
-	     ty = al[i].type;
 	     nm = al[i].name;
 	     fprintf(fp, "         %s(%s), value :: %s\n",
 		     fty, cty, nm);};
@@ -2613,7 +2599,7 @@ static int bind_module(bindes *bd)
    {int ib, iw, rv, ndcl;
     char t[MAXLINE];
     char *ffn, *sb, *pck;
-    char **cpr, **fpr, **fwr, **sa, **ta;;
+    char **fpr, **fwr, **sa, **ta;;
     fdecl *dcl, *dcls;
     statedes *st;
     FILE *fp;
@@ -2624,7 +2610,6 @@ static int bind_module(bindes *bd)
     if (st->cfl & 2)
        {fp   = bd->fp;
 	pck  = st->pck;
-	cpr  = st->cpr;
 	fpr  = st->fpr;
 	fwr  = st->fwr;
 	dcls = st->dcl;
@@ -2732,11 +2717,9 @@ static void fin_module(bindes *bd)
  */
 
 static void cs_type(char *a, int nc, farg *al, int drf)
-   {fparam knd;
-    char t[MAXLINE], ty[MAXLINE];
+   {char t[MAXLINE], ty[MAXLINE];
     char *sty, *dty;
 
-    knd = al->knd;
     if (drf == TRUE)
        deref(ty, MAXLINE, al->type);
     else
@@ -2874,10 +2857,9 @@ static void scheme_wrap_decl(FILE *fp, fdecl *dcl)
 
 static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
 				   fparam knd, char *so)
-   {int i, na, nv, nvl, voida, voidf;
-    fdir dir;
+   {int i, na, nv, voida, voidf;
     char t[MAXLINE];
-    char *ty, *nm, *arg, *rty;
+    char *rty;
     farg *al;
     idecl *ip;
 
@@ -2892,12 +2874,7 @@ static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
         {if ((voida == TRUE) && (i == 0))
 	    continue;
 
-	 ty  = al[i].type;
-	 nm  = al[i].name;
-	 arg = al[i].arg;
-	 dir = al[i].dir;
-	 nvl = al[i].nv;
-	 ip  = &al[i].interp;
+	 ip = &al[i].interp;
 
 	 if (nv == 0)
 	    snprintf(t, MAXLINE, "   {");
@@ -2932,18 +2909,10 @@ static void scheme_wrap_local_decl(FILE *fp, fdecl *dcl,
 /* SCHEME_WRAP_LOCAL_ASSN_DEF - assign default values to local variable AL */
 
 static void scheme_wrap_local_assn_def(FILE *fp, farg *al)
-   {int nvl;
-    fdir dir;
-    char *defa, *ty, *nm, **vls;
+   {char *defa;
     idecl *ip;
 
-    ty  = al->type;
-    nm  = al->name;
-    nvl = al->nv;
-    vls = al->val;
-    dir = al->dir;
-    ip  = &al->interp;
-
+    ip   = &al->interp;
     defa = ip->defa;
 
     fputs(defa, fp);
@@ -2956,19 +2925,10 @@ static void scheme_wrap_local_assn_def(FILE *fp, farg *al)
 /* SCHEME_WRAP_LOCAL_ASSN_ARG - add AL to SS_args call argument list */
 
 static void scheme_wrap_local_assn_arg(char *a, int nc, farg *al)
-   {int nvl;
-    fdir dir;
-    char *arg, *ty, *nm, *val, **vls;
+   {char *arg;
     idecl *ip;
 
-    ty  = al->type;
-    nm  = al->name;
-    dir = al->dir;
-    nvl = al->nv;
-    vls = al->val;
-    val = vls[0];
     ip  = &al->interp;
-
     arg = ip->argi;
 
     nstrcat(a, nc, arg);
@@ -3277,7 +3237,7 @@ static void scheme_install(FILE *fp, char *pck, char **fl)
 
 static int bind_scheme(bindes *bd)
    {int ib, ndcl, rv;
-    char *sfn, *pck, **fl, **cpr;
+    char *sfn, *pck, **fl;
     fdecl *dcl, *dcls;
     statedes *st;
     FILE *fp;
@@ -3285,7 +3245,6 @@ static int bind_scheme(bindes *bd)
     fp   = bd->fp;
     st   = bd->st;
     pck  = st->pck;
-    cpr  = st->cpr;
     dcls = st->dcl;
     ndcl = st->ndcl;
 
@@ -3506,9 +3465,6 @@ static void python_make_decl(char *t, int nc, fdecl *dcl)
 
 static void python_wrap_decl(FILE *fp, fdecl *dcl)
    {char t[MAXLINE];
-    char *cfn;
-
-    cfn = dcl->proto.name;
 
     fprintf(fp, "\n");
     fprintf(fp, "/* WRAP |%s| */\n", dcl->proto.arg);
@@ -3569,10 +3525,9 @@ static void python_class_self(FILE *fp, fdecl *dcl)
 /* PYTHON_WRAP_LOCAL_DECL - local variable declarations */
 
 static void python_wrap_local_decl(FILE *fp, fdecl *dcl, char *kw)
-   {int i, na, nvl, voida, voidf;
-    fdir dir;
+   {int i, na, voida, voidf;
     char t[MAXLINE];
-    char *ty, *nm, *arg, *rty;
+    char *rty;
     farg *al;
     idecl *ip;
 
@@ -3592,12 +3547,7 @@ static void python_wrap_local_decl(FILE *fp, fdecl *dcl, char *kw)
         {if ((voida == TRUE) && (i == 0))
 	    continue;
 
-	 ty  = al[i].type;
-	 nm  = al[i].name;
-	 arg = al[i].arg;
-	 dir = al[i].dir;
-	 nvl = al[i].nv;
-	 ip  = &al[i].interp;
+	 ip = &al[i].interp;
 
 	 snprintf(t, MAXLINE, "    ");
 
@@ -3684,11 +3634,10 @@ static void python_wrap_local_assn(FILE *fp, fdecl *dcl, char *pfn, char *kw)
 /* PYTHON_WRAP_LOCAL_CALL - function call */
 
 static void python_wrap_local_call(FILE *fp, fdecl *dcl)
-   {int voida, voidf;
+   {int voidf;
     char a[MAXLINE], t[MAXLINE];
     char *nm;
 
-    voida = dcl->voida;
     voidf = dcl->voidf;
     nm    = dcl->proto.name;
 
@@ -3709,18 +3658,16 @@ static void python_wrap_local_call(FILE *fp, fdecl *dcl)
 /* PYTHON_VALUE_RETURN - compute return value from DCL */
 
 static void python_value_return(char *t, int nc, fdecl *dcl)
-   {int i, iv, na, nr, nvl, voida, voidf;
+   {int i, iv, na, nr, nvl, voidf;
     fdir dir;
     char a[MAXLINE], dty[MAXLINE], fmt[MAXLINE], arg[MAXLINE];
-    char *rty, *nm;
+    char *nm;
     farg *al;
 
     t[0] = '\0';
     a[0] = '\0';
 
-    rty   = dcl->proto.type;
     nr    = dcl->nr;
-    voida = dcl->voida;
     voidf = dcl->voidf;
 
     if (voidf == FALSE)
@@ -3981,14 +3928,13 @@ static void python_install(bindes *bd)
 
 static int bind_python(bindes *bd)
    {int ib, ndcl, rv;
-    char *pfn, **cpr;
+    char *pfn;
     fdecl *dcl, *dcls;
     statedes *st;
     FILE *fp;
 
     fp   = bd->fp;
     st   = bd->st;
-    cpr  = st->cpr;
     dcls = st->dcl;
     ndcl = st->ndcl;
 
@@ -4408,14 +4354,13 @@ static void man_wrap(fdecl *dcl, char *sb, char *pck, int ndc, char **cdc)
 
 static int bind_doc(bindes *bd)
    {int ib, ndc, ndcl, rv;
-    char *pck, **cpr, **cdc;
+    char *pck, **cdc;
     fdecl *dcl, *dcls;
     statedes *st;
     FILE *fp;
 
     fp   = bd->fp;
     st   = bd->st;
-    cpr  = st->cpr;
     ndc  = st->ndc;
     cdc  = st->cdc;
     pck  = st->pck;

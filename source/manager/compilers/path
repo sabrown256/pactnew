@@ -60,6 +60,12 @@ Group Cfg {
    LD_Flags = ${LD_Flags}
 }
 
+Group Shared {
+   LD_Exe    = pathcc
+   CC_Shared = -fPIC
+   LD_Shared = -shared
+}
+
 Group PThread {
    LD_Lib = -lpthread 
 }

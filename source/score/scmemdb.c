@@ -497,9 +497,9 @@ int SC_mem_map(FILE *fp, int flag)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_MEM_MONITOR - monitor memory leaks
- *                - a pair calls lets you track memory that leaks in or
- *                - out of the region between the calls
+/* SC_MEM_MONITOR - Monitor memory leaks.
+ *                - A pair calls lets you track memory that leaks in or
+ *                - out of the region between the calls.
  *                - Arguments:
  *                -    OLD   byte count from previous call
  *                -          -1 to initialize
@@ -515,15 +515,18 @@ int SC_mem_map(FILE *fp, int flag)
  */
 
 long SC_mem_monitor(int old, int lev, char *id, char *msg)
-   {int on, leva, actfl, prmfl, show, pid, st;
+   {int leva, actfl, prmfl, show, pid, st;
     long d;
     char base[MAXLINE], ta[MAXLINE], tb[MAXLINE];
     char sd[MAXLINE], td[MAXLINE], cd[MAXLINE];
     FILE *fp;
 
-    on = abs(lev);
+    leva  = abs(lev);
+    show  = FALSE;
+    actfl = 5;        /* look at active and registered blocks */
+    prmfl = 2;
 
-    if (on == 0)
+    if (leva == 0)
        return(-1);
 
     pid = SC_get_processor_number();
@@ -532,13 +535,9 @@ long SC_mem_monitor(int old, int lev, char *id, char *msg)
     snprintf(tb, MAXLINE, "%s.before", base);
     snprintf(ta, MAXLINE, "%s.after", base);
     snprintf(td, MAXLINE, "%s.diff", base);
-    snprintf(sd, MAXLINE, "diff %s %s > %s", tb, ta, td);
-    snprintf(cd, MAXLINE, "cat %s", td);
+    snprintf(sd, MAXLINE, "LD_PRELOAD= ; diff %s %s > %s", tb, ta, td);
+    snprintf(cd, MAXLINE, "LD_PRELOAD= ; cat %s", td);
 
-    leva  = abs(lev);
-    show  = FALSE;
-    actfl = 5;        /* look at active and registered blocks */
-    prmfl = 2;
     if (leva & 4)
        {show   = TRUE;
 	actfl |= 8;
@@ -548,13 +547,13 @@ long SC_mem_monitor(int old, int lev, char *id, char *msg)
 /*    SC_mem_stats(NULL, NULL, &d, NULL); */
 
     if (old == -1)
-       {if (on > 1)
+       {if (leva > 1)
 	   {fp = fopen(tb, "w");
 	    _SC_mem_map(fp, actfl, show, FALSE);
 	    fclose(fp);};}
 
     else
-       {if (on > 1)
+       {if (leva > 1)
 	   {fp = fopen(ta, "w");
 	    _SC_mem_map(fp, actfl, show, FALSE);
 	    fclose(fp);

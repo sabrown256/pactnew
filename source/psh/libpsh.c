@@ -256,6 +256,7 @@ char *fill_string(char *s, int n)
    {int i, nc, nd;
     static char fill[MAXLINE];
 
+/* GOTCHA: use memset instead */
     nc = strlen(s);
     nd = n - nc;
     strcpy(fill, s);

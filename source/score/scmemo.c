@@ -11,7 +11,7 @@
 #include "score_int.h"
 #include "scope_mem.h"
 
-#ifdef LINUX
+#ifdef HAVE_DYNAMIC_LINKER
 
 #define __USE_GNU
 
@@ -20,9 +20,9 @@
 typedef struct s_memfncs memfncs;
 
 struct s_memfncs
-   {void *(*malloc)(size_t nb);
-    void (*free)(void *p);
-    void *(*realloc)(void *p, size_t nb);};
+   {PFMalloc malloc;
+    PFFree free;
+    PFRealloc realloc;};
 
 static memfncs
   _SC_mf = { NULL, NULL, NULL };
@@ -36,7 +36,7 @@ void *_SC_alloc_over(size_t nb)
    {void *pr;
 
     if (_SC_mf.malloc == NULL)
-       _SC_mf.malloc = dlsym(RTLD_NEXT, "malloc");
+       _SC_mf.malloc = (PFMalloc) dlsym(RTLD_NEXT, "malloc");
 
     pr = _SC_mf.malloc(nb);
 
@@ -51,7 +51,7 @@ void _SC_free_over(void *p)
    {
 
     if (_SC_mf.free == NULL)
-       _SC_mf.free = dlsym(RTLD_NEXT, "free");
+       _SC_mf.free = (PFFree) dlsym(RTLD_NEXT, "free");
 
     _SC_mf.free(p);
 
@@ -66,7 +66,7 @@ void *_SC_realloc_over(void *p, size_t nb)
    {void *pr;
 
     if (_SC_mf.realloc == NULL)
-       _SC_mf.realloc = dlsym(RTLD_NEXT, "realloc");
+       _SC_mf.realloc = (PFRealloc) dlsym(RTLD_NEXT, "realloc");
 
     pr = _SC_mf.realloc(p, nb);
 
@@ -84,13 +84,13 @@ void SC_use_over_mem(int on)
    {
 
     if (_SC_mf.malloc == NULL)
-       _SC_mf.malloc = dlsym(RTLD_NEXT, "malloc");
+       _SC_mf.malloc = (PFMalloc) dlsym(RTLD_NEXT, "malloc");
 
     if (_SC_mf.free == NULL)
-       _SC_mf.free = dlsym(RTLD_NEXT, "free");
+       _SC_mf.free = (PFFree) dlsym(RTLD_NEXT, "free");
 
     if (_SC_mf.realloc == NULL)
-       _SC_mf.realloc = dlsym(RTLD_NEXT, "realloc");
+       _SC_mf.realloc = (PFRealloc) dlsym(RTLD_NEXT, "realloc");
 
     if (on)
        {_SC.alloc   = _SC_alloc_over;
@@ -106,7 +106,7 @@ void SC_use_over_mem(int on)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _RETRACE - look up the stack */
+/* _SC_MALLOC_LOC - look up the stack to see who called the malloc */
 
 #include <execinfo.h>
 
@@ -115,6 +115,11 @@ static void _SC_malloc_loc(char *d, int nc)
     char **out;
     void *bf[3];
     static int count = 0;
+#if 1
+    static int resolv = FALSE;
+#else
+    static int resolv = TRUE;
+#endif
 
     count++;
 
@@ -129,21 +134,26 @@ static void _SC_malloc_loc(char *d, int nc)
 
 /* get the address of the caller */
 	    ps = strchr(out[2], '[');
-	    ps++;
-	    pe = strchr(ps, ']');
-	    *pe = '\0';
+	    if (ps != NULL)
+	       {ps++;
+		pe = strchr(ps, ']');
+		if (pe != NULL)
+		   *pe = '\0';};
 
 /* get the file and line number */
-	    snprintf(s, MAXLINE, "echo %s | addr2line -e `which scmots`", ps);
-	    fp = popen(s, "r");
-	    fgets(s, nc, fp);
-	    SC_LAST_CHAR(s) = '\0';
-	    ps = strrchr(s, '/');
-	    if (ps != NULL)
-	       snprintf(d, nc, "BARE_MALLOC:%s", ps+1);
+            if ((ps != NULL) && (resolv == TRUE))
+	       {snprintf(s, MAXLINE, "echo %s | addr2line -e `which scmots`", ps);
+		fp = popen(s, "r");
+		fgets(s, nc, fp);
+		SC_LAST_CHAR(s) = '\0';
+		ps = strrchr(s, '/');
+		if (ps != NULL)
+		   ps++;
+		pclose(fp);}
 	    else
-	       snprintf(d, nc, "BARE_MALLOC:%s", s);
-	    pclose(fp);
+	       ps = out[2];
+
+	    snprintf(d, nc, "BARE_MALLOC:%s", ps);
 
 	    free(out);};};
 

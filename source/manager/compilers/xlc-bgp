@@ -69,6 +69,14 @@ Group Cfg {
    LD_Flags    = ${LD_Flags}
 }
 
+Group Shared {
+   LD_Exe     = mpixlc_r
+   CC_Shared  = -qpic
+   CC_Shared += [ _env_ = Bits ;              # address bit size
+                 *     = -q* ]
+   LD_Shared  = -qmkshrobj
+}
+
 Group PThread {
    CC_Exe   = mpixlc_r
    FC_Exe   = mpixlf90_r

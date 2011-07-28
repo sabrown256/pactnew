@@ -53,6 +53,12 @@ Group Cfg {
    LD_Lib   =
 }
 
+Group Shared {
+   LD_Exe    = icc
+   CC_Shared = -fpic
+   LD_Shared = -shared
+}
+
 Group PThread {
    LD_Lib = -lpthread 
 }

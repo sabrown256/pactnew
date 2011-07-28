@@ -150,6 +150,7 @@ source $ldir/env-csh
     set lhave = ( $lhave HAVE_GNU_STRERROR   HAVE_GNU_STRERROR_R )
     set lhave = ( $lhave HAVE_VSNPRINTF      HAVE_VSNPRINTF )
     set lhave = ( $lhave HAVE_GNU_LIBC_6     none )
+    set lhave = ( $lhave HAVE_DYNAMIC_LINKER none )
 
     while ($#lhave > 0)
        set lvr = $lhave[1]
