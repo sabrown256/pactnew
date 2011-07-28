@@ -1,0 +1,75 @@
+#!/bin/csh -f
+#
+# DL - analyze platform dynamic linker
+#    - Computes: HAVE_DYNAMIC_LINKER, MD_Lib
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/common
+
+Separator $ALog
+Note $ALog "Analyze: dynamic linker"
+
+SafeEnv MD_Lib              ""
+SafeEnv HAVE_DYNAMIC_LINKER FALSE
+
+cat << EOF >! $Tmp.c
+#include <stdlib.h>
+#define __USE_GNU
+#include <dlfcn.h>
+int main(int c, char **v)
+   {int rv;
+    void *(*mal)(size_t nb) = dlsym(RTLD_NEXT, "malloc");
+    rv = (mal == NULL);
+    return(rv);}
+EOF
+
+flog $ALog cat $Tmp.c
+
+# try building without -ldl
+set ok = FALSE
+flog $ALog $CC_Exe $Tmp.c -o $Tmp $CC_Flags
+if ($status == 0) then
+   flog $ALog $Tmp
+   if ($status == 0) then
+      set ok = TRUE
+   endif
+endif
+
+# try building with -ldl
+if ($ok == FALSE) then
+   flog $ALog $CC_Exe $Tmp.c -o $Tmp $CC_Flags -ldl
+   if ($status == 0) then
+      flog $ALog $Tmp
+      if ($status == 0) then
+         set ok = NEED
+      endif
+   endif
+endif
+
+flog $ALog rm -f $Tmp.c $Tmp
+
+if ($ok == FALSE) then
+   NoteD $ALog "      no dl"
+else
+   if ($ok == NEED) then
+      flog $ALog setenv MD_Lib "$MD_Lib -ldl"
+      NoteD $ALog "      need explicit dl"
+   else
+      NoteD $ALog "      has implicit dl"
+   endif
+   setenv HAVE_DYNAMIC_LINKER TRUE
+endif
+
+SetParent MD_Lib
+SetParent HAVE_DYNAMIC_LINKER
+
+Separator $ALog
+
+exit(0)
+

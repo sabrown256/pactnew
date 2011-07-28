@@ -19,27 +19,24 @@ if ($CROSS_COMPILE == FALSE) then
    set UTime = `$TIMER -r`
 
    flog $LogF pushd $SrcDir
-   flog $LogF $MAKE memchk
+   flog $LogF $MAKE memovr
    set xstatus = $status
    Note $LogF "make status = $xstatus"
 
    flog $LogF popd
 
    if ($xstatus == 0) then
-      flog $LogF setenv LD_PRELOAD       $LibDir/libosmm.so
       flog $LogF setenv LD_LIBRARY_PATH  $LibDir
+      flog $Log ldd $BinDir/scmots
       if ("$Valgrind" == "") then
-#         ftee $LogF $CFE $BinDir/scmots
+         ftee $LogF ( ( setenv LD_PRELOAD $LibDir/libosmm.so ; $CFE $BinDir/scmots ) |& grep -v "Dwarf Error" |& grep -iwv error )
          set xstatus = $status
-      else
-         ftee $LogF $Valgrind $BinDir/scmots   |& \
-         grep "ERROR SUMMARY:"                 |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         flog $LogF $RM $Tmp
       endif
       flog $LogF unsetenv LD_PRELOAD
       flog $LogF unsetenv LD_LIBRARY_PATH
+   else
+      Note $LogF "Failed to build scmots - skipping"
+      set xstatus = 0
    endif
 
    set ETime = `$TIMER -b $UTime`

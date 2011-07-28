@@ -561,6 +561,7 @@ struct s_SC_evlpdes
 
 
 typedef void *(*PFMalloc)(size_t size);
+typedef void (*PFFree)(void *p);
 typedef void *(*PFRealloc)(void *ptr, size_t size);
 
 struct s_SC_contextdes

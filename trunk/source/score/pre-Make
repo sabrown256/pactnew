@@ -57,6 +57,8 @@ BinObj =
 Libs  = ${LSCORE} ${MDLib}
 MLibs = ${LSCORE} ${LMM} ${MDLib}
 OLibs = ${LSCORE} -losmm ${MDLib}
+# GOTCHA: need this for BGP
+#OLibs = ${LSCORE} -Wl,-dynamic -losmm ${MDLib}
 
 targets :
 	@echo "Targets for SCORE"
@@ -214,9 +216,9 @@ IncAction = @pact generate
 ${MMLib} : scmemr.c
 	@echo "${CCAnnounce} -c $<"
 	@(cd ${PACTTmpDir} ; \
-          ${CC} -c ${PACTSrcDir}/$< -o $*.o ; \
-          ${AR} ${AROpt} ${MMLib} $*.o 2> /dev/null ; \
-          ${RM} $*.o 2> /dev/null )
+          ${CC} -c ${PACTSrcDir}/$< -o scmemr.o ; \
+          ${AR} ${AROpt} ${MMLib} scmemr.o 2> /dev/null ; \
+          ${RM} scmemr.o 2> /dev/null )
 
 mmlib :
 	pact ${MMLib}
@@ -224,12 +226,16 @@ mmlib :
 #
 # OMLib 
 #
+# NOTE: Use Shared Group variables because they are specific to
+# building shared objects whereas the variables ShLD and LD_Shared
+# are determined for globally shared builds
+#
 ${OMLib} : scmemo.c
 	@echo "${CCAnnounce} -c $<"
 	@(cd ${PACTTmpDir} ; \
-          ${CC} -c ${PACTSrcDir}/$< -o scmemo.o ; \
-	  echo "${ShLD} ${LD_Shared} -o $@ scmemo.o -L${LibDir} ${Libs}" ; \
-	  ${ShLD} ${LD_Shared} -o $@ scmemo.o -L${LibDir} ${Libs} ; \
+          ${CC} ${Shared_CC_Shared} -c ${PACTSrcDir}/$< -o scmemo.o ; \
+	  echo "${Shared_LD_Exe} ${Shared_LD_Shared} -o $@ scmemo.o -L${LibDir} -lscore" ; \
+	  ${Shared_LD_Exe} ${Shared_LD_Shared} -o $@ scmemo.o -L${LibDir} -lscore ; \
           ${RM} scmemo.o 2> /dev/null )
 
 omlib :
@@ -361,13 +367,15 @@ ${BinDir}/scmm : scmm.c ${TGTLib}
 #
 # memory diagnostic test
 #
-memchk : ${MMLib} ${OMLib} ${BinDir}/scmtrt ${BinDir}/scmpft ${BinDir}/scmots
+memchk : ${MMLib} ${BinDir}/scmtrt ${BinDir}/scmpft
 
 ${BinDir}/scmtrt : scmtrt.c ${TGTLib}
 	${CLD} ${LdFlags} scmtrt.c -o ${BinDir}/scmtrt ${MLibs}
 
 ${BinDir}/scmpft : scmpft.c ${TGTLib}
 	${CLD} ${LdFlags} scmpft.c -o ${BinDir}/scmpft ${Libs}
+
+memovr : ${OMLib} ${BinDir}/scmots
 
 ${BinDir}/scmots : ${TGTLib} scmots.c
 	${CLD} ${LdFlags} scmots.c -o ${BinDir}/scmots ${OLibs}

@@ -526,14 +526,22 @@ configuration specifications:
    5) Group <foo> {
       this defines and groups together related variables. For example,
 
-      Group Shared {
-         LD_Exe    = gcc
-         CC_Shared = -fPIC
-         LD_Shared = -shared
+      Group Std {
+         CC_Flags = ${CC_Flags}
+         FC_Flags = ${FC_Flags}
+         LD_Flags = ${LD_Flags}
       }
 
-      This defines the variables which control construction of shared
-      libraries.
+      This defines the variables which specify the "standard" compiles
+      and loads.
+
+       Group Cfg {
+          Use    = Std
+          CC_Exe = gcc
+       }
+
+      This defines the variables which specify the configuration time
+      compiles.
 
    6) Tool <foo> {
       this defines the variables which specify the behavior of
