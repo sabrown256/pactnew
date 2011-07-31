@@ -191,6 +191,7 @@ HAVE_SUBROUTINES
     Note $FOUT "  PACTRoot      = $proot"
     Note $FOUT "  PACTVersion   = $pvers"
     Note $FOUT "  PACTLibs      = -lpdb -lpml -lscore ${LD_Lib}"
+    Note $FOUT "  PACTMDEL      = ${MDE_Lib}"
     Note $FOUT "  PACTMDGL      = ${MDG_Lib}"
     Note $FOUT "  PACTMDL       = ${LD_Lib} ${LibM_Lib}"
     Note $FOUT "  VMake         = PACT PACTRoot PACTVersion PACTMDGL PACTMDL PACTLibs"

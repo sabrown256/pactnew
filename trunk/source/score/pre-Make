@@ -56,7 +56,7 @@ BinObj =
 #
 Libs  = ${LSCORE} ${MDLib}
 MLibs = ${LSCORE} ${LMM} ${MDLib}
-OLibs = ${LSCORE} -losmm ${MDLib}
+OLibs = ${LSCORE} -losmm ${MDLib} ${MDE_Lib}
 # GOTCHA: need this for BGP
 #OLibs = ${LSCORE} -Wl,-dynamic -losmm ${MDLib}
 
@@ -104,6 +104,8 @@ Hdrs = scstd.h scunix.h scwin32.h scbgl.h \
 #
 DObjs = scmkdp.o scmkpr.o scar.o sctar.o scfcnr.o
 
+EObjs = scexe.o
+
 MObjs = scmemc.o scmemda.o scmemdb.o scmeme.o \
         scmemg.o scmemh.o scmemt.o sctyp.o
 
@@ -119,7 +121,7 @@ TObjs = scpar.o scthn.o scthe.o scthp.o sctho.o scths.o
 OW32Objs = sclpwin32.o scwin32.o
 OUnxObjs = sclppsx.o scunix.o scaix.o scbgl.o sccyg.o
 
-Objs = ${MObjs} ${PObjs} ${TObjs} ${OSSupport} \
+Objs = ${EObjs} ${MObjs} ${PObjs} ${TObjs} ${OSSupport} \
        scctl.o scapi.o scfnca.o scfncb.o scfnct.o \
        scarrd.o scarrs.o \
        schash.o sctree.o sctab.o \
@@ -128,6 +130,8 @@ Objs = ${MObjs} ${PObjs} ${TObjs} ${OSSupport} \
 
 ArDObjs = ${TGTLib}(scmkdp.o) ${TGTLib}(scmkpr.o) ${TGTLib}(scar.o) \
           ${TGTLib}(sctar.o) ${TGTLib}(scfcnr.o)
+
+ArEObjs = ${TGTLib}(scexe.o)
 
 ArMObjs = ${TGTLib}(scmemc.o) ${TGTLib}(scmemda.o) ${TGTLib}(scmemdb.o) \
           ${TGTLib}(scmeme.o) ${TGTLib}(scmemg.o) \
@@ -152,7 +156,7 @@ ArW32Objs = ${TGTLib}(sclpwin32.o) ${TGTLib}(scwin32.o)
 ArUnxObjs = ${TGTLib}(sclppsx.o) ${TGTLib}(scunix.o) \
             ${TGTLib}(scaix.o) ${TGTLib}(scbgl.o) ${TGTLib}(sccyg.o)
 
-ArObjs = ${ArDObjs} ${ArMObjs} ${ArPObjs} \
+ArObjs = ${ArDObjs} ${ArEObjs} ${ArMObjs} ${ArPObjs} \
          ${ArSObjs} ${ArTObjs} ${OSSupport} \
          ${TGTLib}(scctl.o) ${TGTLib}(scapi.o) \
 	 ${TGTLib}(scfnca.o) ${TGTLib}(scfncb.o) ${TGTLib}(scfnct.o) \
@@ -165,6 +169,7 @@ ArObjs = ${ArDObjs} ${ArMObjs} ${ArPObjs} \
 scf77lr.o : scf77lr.l sclexan.h
 
 ${ArDObjs} : scope_make.h scope_proc.h
+${ArEObjs} : scope_exe.h
 ${ArMObjs} : scope_mem.h
 ${ArPObjs} : scope_proc.h
 ${ArSObjs} : scope_lex.h
@@ -172,6 +177,7 @@ ${ArTObjs} : scope_thread.h
 ${ArObjs}  : ${Hdrs}
 
 ${DObjs} : scope_make.h scope_proc.h
+${EObjs} : scope_exe.h
 ${MObjs} : scope_mem.h
 ${PObjs} : scope_proc.h
 ${TObjs} : scope_thread.h

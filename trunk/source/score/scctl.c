@@ -45,6 +45,7 @@ int
 SC_global_state
  SC_gs = {PACT_VERSION,
 	  0, 0, 0, 1, FALSE, FALSE, 10, TRUE, FALSE,
+	  0, NULL, NULL,
           ATOF_FUNCTION,
           STRTOD_FUNCTION,
           _SC_otol,
@@ -854,6 +855,20 @@ void SC_pause(void)
    {char s[10];
 
     GETLN(s, 9, stdin);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_SAVE_ARGV_ENV - argc, argv, and env from main call */
+
+void SC_save_argv_env(int argc, char **argv, char **env)
+   {
+
+    SC_gs.argc = argc;
+    SC_gs.argv = argv;
+    SC_gs.env  = env;
 
     return;}
 

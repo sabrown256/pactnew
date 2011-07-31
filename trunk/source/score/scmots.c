@@ -146,9 +146,11 @@ static void help(void)
 
 /* MAIN - test the malloc override */
 
-int main(int c, char **v)
+int main(int c, char **v, char **env)
    {int i, n, err;
     int zsp;
+
+    SC_save_argv_env(c, v, env);
 
     zsp = 0;
     n   = 100;
