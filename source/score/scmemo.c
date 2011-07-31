@@ -10,6 +10,7 @@
 #include "cpyright.h"
 #include "score_int.h"
 #include "scope_mem.h"
+#include "scope_exe.h"
 
 #ifdef HAVE_DYNAMIC_LINKER
 
@@ -115,7 +116,7 @@ static void _SC_malloc_loc(char *d, int nc)
     char **out;
     void *bf[3];
     static int count = 0;
-#if 1
+#if 0
     static int resolv = FALSE;
 #else
     static int resolv = TRUE;
@@ -127,13 +128,14 @@ static void _SC_malloc_loc(char *d, int nc)
        {n = backtrace(bf, 3);
 	if (n > 2)
 	   {char s[MAXLINE];
-	    char *ps, *pe;
-	    FILE *fp;
+	    char *ps, *pe, *pt;
 
 	    out = backtrace_symbols(bf, n);
 
+	    pt = out[2];
+
 /* get the address of the caller */
-	    ps = strchr(out[2], '[');
+	    ps = strchr(pt, '[');
 	    if (ps != NULL)
 	       {ps++;
 		pe = strchr(ps, ']');
@@ -141,19 +143,23 @@ static void _SC_malloc_loc(char *d, int nc)
 		   *pe = '\0';};
 
 /* get the file and line number */
-            if ((ps != NULL) && (resolv == TRUE))
-	       {snprintf(s, MAXLINE, "echo %s | addr2line -e `which scmots`", ps);
-		fp = popen(s, "r");
-		fgets(s, nc, fp);
-		SC_LAST_CHAR(s) = '\0';
-		ps = strrchr(s, '/');
-		if (ps != NULL)
-		   ps++;
-		pclose(fp);}
-	    else
-	       ps = out[2];
+            if ((ps != NULL) && (resolv == TRUE) && (SC_gs.argv != NULL))
+	       {exedes *st;
 
-	    snprintf(d, nc, "BARE_MALLOC:%s", ps);
+		st = SC_exe_open(SC_gs.argv[0], NULL, NULL,
+				 TRUE, TRUE, TRUE, TRUE);
+		if (st != NULL)
+		   {srcloc sl;
+
+		    sl = SC_exe_map_addr(st, ps);
+		    snprintf(s, MAXLINE, "%s(%s:%d)",
+			     sl.func, sl.file, sl.line);
+
+		    pt = s;
+
+		    SC_exe_close(st);};};
+
+	    snprintf(d, nc, "BARE_MALLOC:%s", pt);
 
 	    free(out);};};
 

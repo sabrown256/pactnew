@@ -412,6 +412,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "MDLib      = ${MDI_Lib} ${MD_Lib} ${LD_Lib} ${LibM_Lib}"
     Note $STDOUT "DPInc      = ${DP_Inc}"
     Note $STDOUT "DPLib      = ${DP_Lib}"
+    Note $STDOUT "MDE_Lib    = ${MDE_Lib}"
     if ($?FC_LD_Lib == 1) then
        Note $STDOUT "FLib       = ${FC_LD_Lib}"
     else

@@ -108,6 +108,7 @@ SetParent HaveRPATH
 #--------------------------------------------------------------------------
 
 source $AnaDir/dl
+source $AnaDir/bfd
 
 exit(0)
 

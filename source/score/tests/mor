@@ -56,6 +56,7 @@ endif
 #--------------------------------------------------------------------------
 
 $TEST_CHECK -a mor -e $Err part
+set status = 0
 
 exit($status)
 

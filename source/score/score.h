@@ -630,7 +630,9 @@ struct s_SC_global_state
     int radix;
     int unary_plus;
     int verify_writes;
-
+    int argc;              /* number of command line arguments from main */
+    char **argv;           /* command line arguments from main */
+    char **env;            /* environment from main */
     double (*atof)(const char *s);
     double (*strtod)(const char *s, char **endp);
     long (*otol)(char *s);
@@ -701,6 +703,7 @@ extern void
  SC_banner(char *s),
  SC_set_banner(char *fmt, ...),
  SC_pause(void),
+ SC_save_argv_env(int argc, char **argv, char **env),
  SC_init_path(int nd, ...),
  SC_advance_name(char *s),
  SC_interrupt_handler(int sig),
