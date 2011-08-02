@@ -378,9 +378,8 @@ The do-run usage is:
 <a name="pact-shared"></a>
 <H3> Building Shared Libraries</H3>
 
-The PACT libraries can now be built as shared libraries.  To do so chose
-a configuration with the "-sl" qualifier (see configs.std/README) or create
-your own config file (see SharedLibArg below).  After PACT is configured
+The PACT libraries can be built as shared libraries.  To do so chose
+a configuration with the "-sl" qualifier.  After PACT is configured
 do the following:
 <p>
 

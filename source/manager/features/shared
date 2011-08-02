@@ -10,18 +10,18 @@
 BuildSharedLibs = TRUE
 
 Tool CC {
-   Shared =? ${Shared_CC_Shared}
+   Shared =+ ${Shared_CC_Flags}
 }
 
 Tool FC {
-   Shared =? ${Shared_FC_Shared}
+   Shared =+ ${Shared_FC_Flags}
 }
 
 Tool LD {
-   Shared =? ${Shared_LD_Shared}
+   Shared += ${Shared_LD_Flags}
 }
 
 Tool Lex {
-   Flags += ${Shared_CC_Shared}
+   Flags += ${Shared_CC_Flags}
 }
 

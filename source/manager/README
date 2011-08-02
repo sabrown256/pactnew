@@ -280,8 +280,7 @@ libraries with names like, libscore.a.
 
 The PACT libraries can now be built as shared libraries.  To do so chose
 a configuration with the "-sl" qualifier (see std/README) or create
-your own config file (see CShared and LDShared below).  After PACT is
-configured do the following:
+your own config file.  After PACT is configured do the following:
 
           -> pact shared
 
@@ -753,7 +752,7 @@ ScmDir
    A directory in which to install scheme source files.  This should also be
    a subdirectory of InstBase.  Default is "scheme".
 
-ShLD
+Shared_LD_Exe
    The linker to use when building shared libraries.  This
    makes the "shared" target meaningful.  Default is "ld".
 
@@ -776,9 +775,9 @@ Yacc
 
 CC
    Specification of C compiler.
-   Variables: Exe, Linker, Flags, Version, Debug, Optimize, Shared, Inc, MDGInc, DPInc
+   Variables: Exe, Linker, Flags, Version, Debug, Optimize, Inc, MDGInc, DPInc
    Defaults are: Exe = cc, Linker = "", Flags = "", Debug = "-g", Optimize = "-O",
-                 Shared = "", Inc = "", MDGInc = "", DPInc = "".
+                 Inc = "", MDGInc = "", DPInc = "".
 
 
 FC
@@ -789,8 +788,8 @@ FC
 
 LD
    Specification of loader/linker.
-   Variables: Exe, Flags, Version, Shared, Lib, MDGLib, DPLib
-   Defaults are: Exe = ld, Flags = "", Shared = "",
+   Variables: Exe, Flags, Version, Lib, MDGLib, DPLib
+   Defaults are: Exe = ld, Flags = "",
                  Lib = "", MDGLib = "", DPLib = "".
 
 

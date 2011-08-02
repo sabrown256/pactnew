@@ -40,13 +40,39 @@ void _SC_set_demangle_style(char *opt)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_EXE_CHECK_FORMATS - report possible format matches for ET */
+/* _SC_EXE_DEMANGLE_NAME - demangle the current location name in ET */
 
-static void _SC_exe_check_formats(bfd *et)
+void _SC_exe_demangle_name(char *d, int nc, exedes *st)
    {
 
+# ifdef HAVE_BFD_DEMANGLE
+
+    char *p, *nm;
+    
+    nm = (char *) st->where.func;
+    p = bfd_demangle(st->et, nm, SC_DEMANGLE_ARG);
+    if (p != NULL)
+       {SC_strncpy(d, nc, p, -1);
+	free(fnc);}
+
+    else
+       SC_strncpy(d, nc, nm, -1);
+       
+#endif
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_EXE_CHECK_FORMATS - report possible format matches for ET */
+
+static int _SC_exe_check_formats(bfd *et)
+   {int ok;
+
+    ok = TRUE;
+
 #if 1
-    int ok;
     char **matching;
 
     if (bfd_check_format_matches(et, bfd_object, &matching) == 0)
@@ -59,7 +85,7 @@ static void _SC_exe_check_formats(bfd *et)
 	    free(matching);};};
 #endif
 
-    return;}
+    return(ok);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -101,11 +127,21 @@ static void _SC_exe_find_addr(bfd *et, asection *es, void *data)
 	if (st->pc >= vma)
 	   {sz = bfd_get_section_size(es);
 	    if (st->pc < vma + sz)
-	       st->found = bfd_find_nearest_line(et, es,
-						 st->symt, st->pc - vma,
-						 &st->where.file,
-						 &st->where.func,
-						 &st->where.line);};};
+	       {csrcloc sl;
+
+	        st->found = bfd_find_nearest_line(et, es,
+						  st->symt, st->pc - vma,
+						  &sl.file,
+						  &sl.func,
+						  &sl.line);
+		if (st->found == TRUE)
+		   {SC_strncpy(st->where.file, MAXLINE, (char *) sl.file, -1);
+		    SC_strncpy(st->where.func, MAXLINE, (char *) sl.func, -1);
+/* GOTCHA: coming up with line number 0 always
+printf("-> fz |%s| |%s| |%d|\n", sl.func, sl.file, sl.line);
+*/
+		    st->where.line = sl.line;};};};};
+
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -120,21 +156,27 @@ static void _SC_exe_find_offs(exedes *st)
 	((bfd_get_section_flags(st->et, st->es) & SEC_ALLOC) != 0))
        {sz = bfd_get_section_size(st->es);
 	if (st->pc < sz)
-	   st->found = bfd_find_nearest_line(st->et, st->es,
-					     st->symt, st->pc,
-					     &st->where.file,
-					     &st->where.func,
-					     &st->where.line);};
+	   {csrcloc sl;
+
+	    st->found = bfd_find_nearest_line(st->et, st->es,
+					      st->symt, st->pc,
+					      &sl.file,
+					      &sl.func,
+					      &sl.line);
+	    if (st->found == TRUE)
+	       {SC_strncpy(st->where.file, MAXLINE, (char *) sl.file, -1);
+		SC_strncpy(st->where.func, MAXLINE, (char *) sl.func, -1);
+		st->where.line = sl.line;};};};
+
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_EXE_MAP_ADDR - map hex address AD to a srcloc */
+/* _SC_EXE_MAP_ADDR - map hex address AD to a srcloc PSL */
 
-srcloc SC_exe_map_addr(exedes *st, char *ad)
-   {char t[MAXLINE];
-    char *fnc, *p;
+static void _SC_exe_map_addr(srcloc *psl, exedes *st, char *ad)
+   {char *fnc;
     srcloc sl;
     static char *none = "unknown";
 
@@ -153,25 +195,19 @@ srcloc SC_exe_map_addr(exedes *st, char *ad)
        bfd_map_over_sections(st->et, _SC_exe_find_addr, st);
 
     if (st->found == TRUE)
-       {do {t[0] = '\0';
+       {do
 
 /* get the function name */
-	    p   = NULL;
-	    fnc = (char *) st->where.func;
-	    if ((fnc == NULL) || (*fnc == '\0'))
-	       fnc = none;
+	   {fnc = st->where.func;
+	    if (*fnc == '\0')
+	       SC_strncpy(sl.func, MAXLINE, none, -1);
 	    else if (st->demang == TRUE)
-	       {p = bfd_demangle(st->et, fnc, DMGL_ANSI | DMGL_PARAMS);
-		if (p != NULL)
-		   fnc = p;};
-
-	    SC_strncpy(sl.func, MAXLINE, fnc, -1);
-
-	    if (p != NULL)
-	       free(p);
+	       _SC_exe_demangle_name(sl.func, MAXLINE, st);
+	    else
+	       SC_strncpy(sl.func, MAXLINE, fnc, -1);
 
 /* get the file name */
-	    if (st->where.file != NULL)
+	    if (st->where.file[0] != '\0')
 	       SC_strncpy(sl.file, MAXLINE, (char *) st->where.file, -1);
 
 /* get the line number */
@@ -180,24 +216,32 @@ srcloc SC_exe_map_addr(exedes *st, char *ad)
 	    if (st->unwin == 0)
 	       st->found = FALSE;
 	    else
-	       st->found = bfd_find_inliner_info(st->et,
-						 &st->where.file,
-						 &st->where.func,
-						 &st->where.line);}
+	       {csrcloc sl;
+
+		st->found = bfd_find_inliner_info(st->et,
+						  &sl.file,
+						  &sl.func,
+						  &sl.line);
+		if (st->found == TRUE)
+		   {SC_strncpy(st->where.file, MAXLINE, (char *) sl.file, -1);
+		    SC_strncpy(st->where.func, MAXLINE, (char *) sl.func, -1);
+		    st->where.line = sl.line;};};}
 	while (st->found == TRUE);};
 
-    return(sl);}
+    *psl = sl;
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_EXE_MAP_ADDRS - map NA hex addresses from AD
- *                  - into the form
- *                  -    [fnc ]file:line
- *                  - and print them
+/* _SC_EXE_MAP_ADDRS - map NA hex addresses from AD
+ *                   - into the form
+ *                   -    [fnc ]file:line
+ *                   - and print them
  */
 
-int SC_exe_map_addrs(exedes *st, int na, char **ad)
+static int _SC_exe_map_addrs(exedes *st, int na, char **ad)
    {int i, rv;
     char *fn, *p;
     srcloc sl;
@@ -205,7 +249,7 @@ int SC_exe_map_addrs(exedes *st, int na, char **ad)
     rv = TRUE;
 
     for (i = 0; i < na; i++)
-        {sl = SC_exe_map_addr(st, ad[i]);
+        {_SC_exe_map_addr(&sl, st, ad[i]);
 
 /* get the file name into the requested form */
 	 fn = sl.file;
@@ -224,12 +268,12 @@ int SC_exe_map_addrs(exedes *st, int na, char **ad)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_EXE_OPEN - open the named executable and return an exedes
- *             - describing its contents
+/* _SC_EXE_OPEN - open the named executable and return an exedes
+ *              - describing its contents
  */
 
-exedes *SC_exe_open(char *ename, char *sname, char *tgt,
-		    int showf, int bnm, int unw, int dem)
+static exedes *_SC_exe_open(char *ename, char *sname, char *tgt,
+			    int showf, int bnm, int unw, int dem)
    {int ok;
     bfd *et;
     asection *es;
@@ -253,7 +297,7 @@ exedes *SC_exe_open(char *ename, char *sname, char *tgt,
 	        snprintf(st->err, MAXLINE,
 			 "%s: cannot get addresses from archive", ename);};
 
-	    _SC_exe_check_formats(et);};
+	    ok = _SC_exe_check_formats(et);};
 
 	es = NULL;
 	if (sname != NULL)
@@ -270,7 +314,11 @@ exedes *SC_exe_open(char *ename, char *sname, char *tgt,
 	    st->et      = et;
 	    st->es      = es;
 
+#ifdef HAVE_BFD_DEMANGLE
 	    st->demang = dem;
+#else
+	    st->demang = FALSE;
+#endif
 	    st->showf  = showf;
 	    st->unwin  = unw;
 	    st->tailf  = bnm;
@@ -284,9 +332,9 @@ exedes *SC_exe_open(char *ename, char *sname, char *tgt,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_EXE_CLOSE - close ST and free it */
+/* _SC_EXE_CLOSE - close ST and free it */
 
-void SC_exe_close(exedes *st)
+static void _SC_exe_close(exedes *st)
    {
 
     if (st != NULL)
@@ -306,27 +354,29 @@ void SC_exe_close(exedes *st)
 
 /*--------------------------------------------------------------------------*/
 
-/* SC_EXE_MAP_ADDR - map hex address AD to a srcloc */
+/* _SC_EXE_MAP_ADDR - map hex address AD to a srcloc PSL */
 
-srcloc SC_exe_map_addr(exedes *st, char *ad)
+static void _SC_exe_map_addr(srcloc *psl, exedes *st, char *ad)
    {srcloc sl;
 
     snprintf(sl.func, MAXLINE, "@%s", ad);
     sl.file[0] = '\0';
     sl.line    = -1;
 
-    return(sl);}
+    *psl = sl;
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_EXE_MAP_ADDRS - map NA hex addresses from AD
- *                  - into the form
- *                  -    [fnc ]file:line
- *                  - and print them
+/* _SC_EXE_MAP_ADDRS - map NA hex addresses from AD
+ *                   - into the form
+ *                   -    [fnc ]file:line
+ *                   - and print them
  */
 
-int SC_exe_map_addrs(exedes *st, int na, char **ad)
+static int _SC_exe_map_addrs(exedes *st, int na, char **ad)
    {int rv;
 
     rv = FALSE;
@@ -336,12 +386,12 @@ int SC_exe_map_addrs(exedes *st, int na, char **ad)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_EXE_OPEN - open the named executable and return an exedes
- *             - describing its contents
+/* _SC_EXE_OPEN - open the named executable and return an exedes
+ *              - describing its contents
  */
 
-exedes *SC_exe_open(char *ename, char *sname, char *tgt,
-		    int showf, int bnm, int unw, int dem)
+static exedes *_SC_exe_open(char *ename, char *sname, char *tgt,
+			    int showf, int bnm, int unw, int dem)
    {exedes *st;
 
     st = NULL;
@@ -351,9 +401,9 @@ exedes *SC_exe_open(char *ename, char *sname, char *tgt,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_EXE_CLOSE - close ST and free it */
+/* _SC_EXE_CLOSE - close ST and free it */
 
-void SC_exe_close(exedes *st)
+static void _SC_exe_close(exedes *st)
    {
 
     return;}
@@ -362,4 +412,19 @@ void SC_exe_close(exedes *st)
 
 #endif
 
+/*--------------------------------------------------------------------------*/
+
+/* SC_EXE_INIT_API - setup the API calls to access executables */
+
+void SC_exe_init_api(void)
+   {
+
+    _SC.exe.open      = _SC_exe_open;
+    _SC.exe.close     = _SC_exe_close;
+    _SC.exe.map_addr  = _SC_exe_map_addr;
+    _SC.exe.map_addrs = _SC_exe_map_addrs;
+    
+    return;};
+
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

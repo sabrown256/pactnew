@@ -49,8 +49,8 @@ flog $Log set AR       = ( `pact +l -info AR | uniq` `pact +l -info ARXOpt | uni
 flog $Log set CCmp     = ( `pact +l -info PyCC` )
 flog $Log set PyVers   = ( `pact +l -info PyVers` )
 flog $Log set PyCfgDir = ( `pact +l -info PyCfgDir` )
-flog $Log set SFLAGS   = ( `pact +l -info LDShared | uniq` )
-flog $Log set Link     = ( `pact +l -info ShLD | uniq` )
+flog $Log set SFLAGS   = ( `pact +l -info Shared_LD_Flags | uniq` )
+flog $Log set Link     = ( `pact +l -info Shared_LD_Exe | uniq` )
 flog $Log set ShLibs   = ( `pact +l -info Shared_LD_Lib | uniq` )
 flog $Log set LDPath   = ( `pact +l -info LDPath | uniq` )
 flog $Log set LDRPath  = ( `pact +l -info LDRPath | uniq` )
@@ -110,6 +110,7 @@ flog $Log $AR ../../libpdb.a
 
 # remove PGS function - they do not belong with PDB module
 set lrmf = ""
+set lrmf = ( $lrmf scexe.o )
 set lrmf = ( $lrmf pgsmodule.o pgsdevice.o pgsgraph.o pgsimage.o )
 set lrmf = ( $lrmf pgspalette.o utilpgs.o )
 set lrmf = ( $lrmf gp-pgs.o gp-panacea.o gp-scheme.o )
@@ -145,8 +146,9 @@ flog $Log $AR ../../libpdb.a
 flog $Log $AR ../../libppc.a
 flog $Log $AR ../../libpgs.a
 
-# remove unneeded objects
+# remove unneeded/unwanted objects
 set lrmf = ""
+set lrmf = ( $lrmf scexe.o )
 set lrmf = ( $lrmf gp-panacea.o gp-scheme.o )
 flog $Log $RM $lrmf
 unset lrmf

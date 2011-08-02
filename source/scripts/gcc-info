@@ -162,6 +162,12 @@ if ($GNU == yes) then
       endif
    endif
 
+# cannot have empty Lib so try the most inoffensive thing possible
+# it will be there and it will not resolve anything
+   if ("$Lib" == "") then
+      set Lib = "/"
+   endif
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 

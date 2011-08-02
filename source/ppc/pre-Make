@@ -24,7 +24,7 @@ UniFlags =
 CcFlags = ${ODC} -I${IncDir} ${MDInc}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
-CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}
+CCAnnounce = ${CCompiler} ${ODC} ${Shared_CC_Flags} ${CFLAGS}
 
 #
 # Files to Save for Backup (pact save)

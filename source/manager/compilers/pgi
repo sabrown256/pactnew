@@ -55,9 +55,9 @@ Group Cfg {
 }
 
 Group Shared {
-   LD_Exe    = gcc
-   CC_Shared = -fPIC
-   LD_Shared = -shared
+   LD_Exe   = gcc
+   CC_Flags = -fPIC
+   LD_Flags = -shared
 }
 
 Group PThread {

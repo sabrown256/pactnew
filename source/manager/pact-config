@@ -142,7 +142,6 @@ set lConfigVars = ( $lConfigVars CC_Exe CC_Linker CC_Flags CC_Debug CC_Optimize 
 set lConfigVars = ( $lConfigVars CC_Inc )
 set lConfigVars = ( $lConfigVars FC_Exe FC_Linker FC_Flags FC_Debug FC_Optimize )
 set lConfigVars = ( $lConfigVars LD_Exe LD_Flags LD_Lib )
-set lConfigVars = ( $lConfigVars CC_Shared LD_Shared )
 
 # variable defaults
 

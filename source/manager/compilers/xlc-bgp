@@ -70,11 +70,11 @@ Group Cfg {
 }
 
 Group Shared {
-   LD_Exe     = mpixlc_r
-   CC_Shared  = -qpic
-   CC_Shared += [ _env_ = Bits ;              # address bit size
+   LD_Exe    = mpixlc_r
+   CC_Flags  = -qpic
+   CC_Flags += [ _env_ = Bits ;              # address bit size
                  *     = -q* ]
-   LD_Shared  = -qmkshrobj
+   LD_Flags  = -qmkshrobj
 }
 
 Group PThread {

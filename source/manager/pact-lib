@@ -59,11 +59,11 @@ echo "done"
 # make libpact.so with all the .o files
 if ($HostOS != Darwin) then
    set bshld = `pact +l -info BuildSharedLibs | tail -n 1`
-   set sld   = `pact +l -info ShLD`
-   set ldf   = `pact +l -info LDShared`
+   set sld   = `pact +l -info Shared_LD_Exe`
+   set ldf   = `pact +l -info Shared_LD_Flags`
    if ("$bshld" == TRUE) then
       echo -n "   Making libpact.so ... "
-      $sld $ldf -o libpact.so.1 *.o
+      $sld[1] $ldf[1] -o libpact.so.1 *.o
       mv libpact.so.1 ..
       pushd .. >& /dev/null
       rm -f libpact.so*

@@ -14,7 +14,7 @@ LibName=score
 TGTLib = ${LibDir}/lib${LibName}.a
 TGTInc = ${Hdrs} sclexan.h scope_mem.h scope_proc.h \
          scope_term.h scope_mpi.h scope_make.h \
-         scope_lex.h scope_thread.h
+         scope_exe.h scope_lex.h scope_thread.h
 
 MMLib = ${LibDir}/libpsmm.a
 OMLib = ${LibDir}/libosmm.so
@@ -28,7 +28,7 @@ CcFlags = ${ODC} -I. -I${PACTSrcDir} -I${IncDir} ${MDInc}
 FcFlags = ${ODF}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
-CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}
+CCAnnounce = ${CCompiler} ${ODC} ${Shared_CC_Flags} ${CFLAGS}
 
 #
 # Files to Save for Backup (make save)
@@ -57,6 +57,7 @@ BinObj =
 Libs  = ${LSCORE} ${MDLib}
 MLibs = ${LSCORE} ${LMM} ${MDLib}
 OLibs = ${LSCORE} -losmm ${MDLib} ${MDE_Lib}
+#OLibs = ${LSCORE} -losmm ${MDLib} /usr/lib64/libbfd-2.17.50.0.6-14.el5.so ${MDE_Lib}
 # GOTCHA: need this for BGP
 #OLibs = ${LSCORE} -Wl,-dynamic -losmm ${MDLib}
 
@@ -232,16 +233,12 @@ mmlib :
 #
 # OMLib 
 #
-# NOTE: Use Shared Group variables because they are specific to
-# building shared objects whereas the variables ShLD and LD_Shared
-# are determined for globally shared builds
-#
-${OMLib} : scmemo.c
+${OMLib} : scmemo.c scexe.c
 	@echo "${CCAnnounce} -c $<"
 	@(cd ${PACTTmpDir} ; \
-          ${CC} ${Shared_CC_Shared} -c ${PACTSrcDir}/$< -o scmemo.o ; \
-	  echo "${Shared_LD_Exe} ${Shared_LD_Shared} -o $@ scmemo.o -L${LibDir} -lscore" ; \
-	  ${Shared_LD_Exe} ${Shared_LD_Shared} -o $@ scmemo.o -L${LibDir} -lscore ; \
+          ${CC} ${Shared_CC_Flags} -c ${PACTSrcDir}/$< -o scmemo.o ; \
+	  echo "${Shared_LD_Exe} ${Shared_LD_Flags} -o $@ scmemo.o -L${LibDir} -lscore" ; \
+	  ${Shared_LD_Exe} ${Shared_LD_Flags} -o $@ scmemo.o ${Shared_LD_Lib} -L${LibDir} -lscore ; \
           ${RM} scmemo.o 2> /dev/null )
 
 omlib :

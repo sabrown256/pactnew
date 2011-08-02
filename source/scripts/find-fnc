@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# FIND-FNC - find the linbrary containing a function or subroutine
+# FIND-FNC - find the library containing a function or subroutine
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -15,6 +15,7 @@ set Fnc     = ""
 set GrepOpt = ""
 set Defines = ""
 set Verbose = FALSE
+set Exe     = FALSE
 
 set OS = `uname -s`
 if ($OS == AIX) then
@@ -29,20 +30,24 @@ while ($#argv > 0)
            shift
            set Defines = $1
            breaksw
-      case -i:
-      case -w:
-           set GrepOpt = ( $GrepOpt $1 )
+      case -e:
+           set Exe = TRUE
            breaksw
       case -h:
            echo ""
-           echo "Usage: find-fnc [-d <flag>] [-i] [-w] [-v] <path> <fnc>"
+           echo "Usage: find-fnc [-d <flag>] [-e] [-i] [-w] [-v] <path> <fnc>"
            echo ""
            echo "   d   - list only occurences with flag, e.g. T"
+           echo "   e   - include binary executables too"
            echo "   i   - case insenstive search"
            echo "   v   - verbose mode"
            echo "   w   - exact token search"
            echo ""
            exit(1)
+           breaksw
+      case -i:
+      case -w:
+           set GrepOpt = ( $GrepOpt $1 )
            breaksw
       case -v:
            set Verbose = TRUE
@@ -68,7 +73,23 @@ else
    exit(1)  
 endif
 
-foreach i (*.a *.so *.o *.dylib)
+foreach i (*)
+   set ok = FALSE
+   switch ($i)
+      case *.a:
+      case *.o:
+      case *.so:
+      case *.dylib:
+           set ok = TRUE
+           breaksw
+      default:
+           if (($Exe == TRUE) && (-x $i)) then
+              set ok = TRUE
+           endif
+           breaksw
+   endsw
+   if ($ok == FALSE) continue
+
    if ($Verbose == TRUE) then
       echo "$i"
    endif

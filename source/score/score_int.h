@@ -277,7 +277,10 @@ struct s_SC_state
    SC_array *process_list;
 
    JMP_BUF btt;                                                 /* scterm.c */
-   JMP_BUF srv_rstrt;};                                         /* scsysb.c */
+   JMP_BUF srv_rstrt;                                           /* scsysb.c */
+
+/* SCEXE.C */
+   exe_apides exe;};
 
 #ifdef __cplusplus
 extern "C" {
