@@ -1297,7 +1297,6 @@ static void default_var(char *base)
     push_tok(st.toolv, MAXLINE, ' ', "Version");
     push_tok(st.toolv, MAXLINE, ' ', "Debug");
     push_tok(st.toolv, MAXLINE, ' ', "Optimize");
-    push_tok(st.toolv, MAXLINE, ' ', "Shared");
     push_tok(st.toolv, MAXLINE, ' ', "Inc");
     push_tok(st.toolv, MAXLINE, ' ', "Lib");
     push_tok(st.toolv, MAXLINE, ' ', "RPath");
@@ -1321,8 +1320,6 @@ static void default_var(char *base)
     push_tok(st.cfgv, MAXLINE, ' ', "LD_RPath");
     push_tok(st.cfgv, MAXLINE, ' ', "LD_Flags");
     push_tok(st.cfgv, MAXLINE, ' ', "LD_Lib");
-    push_tok(st.cfgv, MAXLINE, ' ', "CC_Shared");
-    push_tok(st.cfgv, MAXLINE, ' ', "LD_Shared");
 
     strcpy(st.sys, path_tail(st.cfgf));
 

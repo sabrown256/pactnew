@@ -146,13 +146,9 @@ flog $Log grep "Building shared libraries" $CfgLog
 set LStat = $status
 if ($LStat == 0) then
    echo -n "   shared ....... "
-   flog $Log grep -w CShared $IncDir/make-def
-   set have_cshared = $status
-   flog $Log grep -w LDShared $IncDir/make-def
-   set have_ldshared = $status
-   flog $Log grep -w ShLD $IncDir/make-def
-   set have_shld = $status
-   if (($have_cshared == 0) || ($have_ldshared == 0) || ($have_shld == 0)) then
+   flog $Log 
+   set build_shared = ( `pact +l -info BuildSharedLibs` )
+   if (("$build_shared[$#build_shared]" == TRUE) then
       echo "yes"
    else
       echo "no"

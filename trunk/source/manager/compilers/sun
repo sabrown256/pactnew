@@ -65,9 +65,9 @@ Group Cfg {
 }
 
 Group Shared {
-   LD_Exe    = suncc
-   CC_Shared = -G
-   LD_Shared = -G
+   LD_Exe   = suncc
+   CC_Flags = -G
+   LD_Flags = -G
 }
 
 Group PThread {

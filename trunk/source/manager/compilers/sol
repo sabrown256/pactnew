@@ -39,9 +39,9 @@ Group MDG {
 }
 
 Group Shared {
-   LD_Exe    = cc
-   CC_Shared = -KPIC
-   LD_Shared = -shared
+   LD_Exe   = cc
+   CC_Flags = -KPIC
+   LD_Flags = -shared
 }
 
 Group PThread {

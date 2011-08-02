@@ -18,6 +18,7 @@
 #include "scope_io.h"
 #include "scope_array.h"
 #include "scope_lex.h"
+#include "scope_exe.h"
 
 /* version designation of CODE */
 #ifndef VERSION
@@ -633,6 +634,7 @@ struct s_SC_global_state
     int argc;              /* number of command line arguments from main */
     char **argv;           /* command line arguments from main */
     char **env;            /* environment from main */
+    void *exe_info;        /* slot for exedes if needed */
     double (*atof)(const char *s);
     double (*strtod)(const char *s, char **endp);
     long (*otol)(char *s);

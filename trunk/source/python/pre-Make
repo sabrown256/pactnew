@@ -21,11 +21,8 @@ OD = DefaultG
 UniFlags =
 CcFlags = ${ODC} -I. -I../.. -I${PyIncDir} -I${IncDir} ${MDInc} ${MDGInc}
 LdFlags = -L${LibDir} ${LDFLAGS}
-# other flags -Wl,-bhalt:4 -Wl,-bM:SRE -Wl,-T512 -Wl,-H512
-LDShared0 = -b32 -Wl,-bnoentry -Wl,-bE:/g/g14/taylor/pact/src/python/pypdb.exp -Wl,-bI:${PyCfgDir}/python.exp -Wl,-bM:SRE
 
-
-CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}
+CCAnnounce = ${CCompiler} ${ODC} ${Shared_CC_Flags} ${CFLAGS}
 
 #
 # Files to Save for Backup (pact save)
@@ -143,8 +140,8 @@ ${TGTShPDB} : ${TGTLib}
 	  ${AR} -x ../../libpml.a ; \
 	  ${AR} -x ../../libpdb.a ; \
           rm -f ${OPGSO} ; \
-	  echo "${ShLD} ${LDShared} -o $@ *.o -L${LibDir} ${Libs}" ; \
-	  ${ShLD} ${LDShared} -o $@ *.o -L${LibDir} ${Libs} ; \
+	  echo "${Shared_LD_Exe} ${Shared_LD_Flags} -o $@ *.o -L${LibDir} ${Libs}" ; \
+	  ${Shared_LD_Exe} ${Shared_LD_Flags} -o $@ *.o -L${LibDir} ${Libs} ; \
 	  ln -s ${TGTShPDB} ${TGTSPDB} ; \
 	  ln -s ${TGTShPDB} _pdb.so ; \
 	  rm -f *.o _____* )
@@ -157,8 +154,8 @@ ${TGTShPGS} : ${TGTLib}
 	  ${AR} -x ../../libpml.a ; \
 	  ${AR} -x ../../libpdb.a ; \
 	  ${AR} -x ../../libpgs.a ; \
-	  echo "${ShLD} ${LDShared} -o $@ *.o -L${LibDir} ${Libs}" ; \
-	  ${ShLD} ${LDShared} -o $@ *.o -L${LibDir} ${Libs} ; \
+	  echo "${Shared_LD_Exe} ${Shared_LD_Flags} -o $@ *.o -L${LibDir} ${Libs}" ; \
+	  ${Shared_LD_Exe} ${Shared_LD_Flags} -o $@ *.o -L${LibDir} ${Libs} ; \
 	  ln -s ${TGTShPGS} ${TGTSPGS} ; \
 	  ln -s ${TGTShPGS} _pgs.so ; \
 	  rm -f *.o _____* )

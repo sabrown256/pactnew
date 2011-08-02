@@ -77,10 +77,10 @@ Group DP {
 }
 
 Group Shared {
-   LD_Exe     = cc
-   LD_Shared  = -G
-   LD_Shared += [ _env_ = Bits ;             # address bit size
-                  *     = -q* ]
+   LD_Exe    = cc
+   LD_Flags  = -G
+   LD_Flags += [ _env_ = Bits ;             # address bit size
+                 *     = -q* ]
 }
 
 Group PThread {

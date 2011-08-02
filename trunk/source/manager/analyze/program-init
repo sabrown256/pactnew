@@ -42,6 +42,14 @@ Tool LD {
    SpokeDepLib =
 }
 
+Group Shared {
+   CC_Flags =
+   CC_Inc   =
+   LD_RPath =
+   LD_Flags =
+   LD_Lib   =
+}
+
 # define some groups for analysis
 
 # machine dependent graphics for PGS - e.g. X11
@@ -100,10 +108,17 @@ Group SQL {
 }
 
 Group HDF {
-   Inc   = ""
-   Lib   = ""
-   RPath = ""
-   Path  = ""
+   Inc   = 
+   Lib   = 
+   RPath = 
+   Path  = 
 }
 
+Group BFD {
+   Flags = 
+   Inc   =
+   Lib   = -lbfd
+   RPath = 
+   Path  = 
+}
 

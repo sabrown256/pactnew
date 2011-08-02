@@ -23,7 +23,7 @@ CcFlags = ${ODC} -I. -I${PACTSrcDir} -I${IncDir} ${MDInc} ${MDGInc}
 FcFlags = ${ODF} -I${IncDir} ${MDInc}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
-CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}
+CCAnnounce = ${CCompiler} ${ODC} ${Shared_CC_Flags} ${CFLAGS}
 FCAnnounce = ${FCompiler} ${ODC} ${FFLAGS}
 
 #

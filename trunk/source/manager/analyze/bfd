@@ -15,10 +15,18 @@ source $Me:h/common
 Separator $ALog
 Note $ALog "Analyze: exe access support"
 
-SafeEnv MDE_Lib              ""
-SafeEnv HAVE_BFD FALSE
+SafeEnv MDE_Lib      ""
+SafeEnv BFD_Lib      -lbfd
+SafeEnv HAVE_BFD     FALSE
 
-cat << EOF >! $Tmp.c
+# if we have explicitly said we do not want BFD
+# do NOT detect it
+if ("$BFD_Path" == none) then
+   NoteD $ALog "      no bfd (by request)"
+
+else
+
+   cat << EOF >! $Tmp.c
 #include <stdlib.h>
 #include <bfd.h>
 int main(int c, char **v)
@@ -30,37 +38,54 @@ int main(int c, char **v)
     return(rv);}
 EOF
 
-flog $ALog cat $Tmp.c
+   flog $ALog cat $Tmp.c
 
-# try building without -lbfd
-set ok = FALSE
-flog $ALog $CC_Exe $Tmp.c -o $Tmp $CC_Flags
-if ($status == 0) then
-   flog $ALog $Tmp
-   if ($status == 0) then
-      set ok = TRUE
-   endif
-endif
+   set libs = ""
 
-# try building with -lbfd
-if ($ok == FALSE) then
-   flog $ALog $CC_Exe $Tmp.c -o $Tmp $CC_Flags -lbfd
+# try building without $BFD_Lib
+   set ok = FALSE
+   flog $ALog $CC_Exe $Tmp.c -o $Tmp $CC_Flags
    if ($status == 0) then
       flog $ALog $Tmp
       if ($status == 0) then
-         set ok = NEED
+         set ok = TRUE
       endif
    endif
-endif
 
-flog $ALog rm -f $Tmp.c $Tmp
+# try building with $BFD_Lib
+   if ($ok == FALSE) then
+      flog $ALog $CC_Exe $Tmp.c -o $Tmp $CC_Flags $BFD_Lib
+      if ($status == 0) then
+         flog $ALog $Tmp
+         if ($status == 0) then
+            set libs = ( $libs $BFD_Lib )
+            set ok   = NEED
+         endif
+      endif
+   endif
 
-if ($ok == FALSE) then
-   NoteD $ALog "      no bfd"
-else
-   NoteD $ALog "      has bfd"
-   flog $ALog setenv MDE_Lib "$MDE_Lib -lbfd"
-   flog $ALog setenv HAVE_BFD TRUE
+# try building with $BFD_Lib and -liberty
+   if ($ok == FALSE) then
+      flog $ALog $CC_Exe $Tmp.c -o $Tmp $CC_Flags $BFD_Lib -liberty
+      if ($status == 0) then
+         flog $ALog $Tmp
+         if ($status == 0) then
+            set libs = ( $libs $BFD_Lib -liberty )
+            set ok   = NEED
+         endif
+      endif
+   endif
+
+   flog $ALog rm -f $Tmp.c $Tmp
+
+   if ($ok == FALSE) then
+      NoteD $ALog "      no bfd"
+   else
+      NoteD $ALog "      has bfd"
+      flog $ALog setenv MDE_Lib "$MDE_Lib $libs"
+      flog $ALog setenv HAVE_BFD TRUE
+   endif
+
 endif
 
 SetParent MDE_Lib

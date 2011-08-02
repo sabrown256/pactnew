@@ -97,8 +97,8 @@ Group OpenMP {
 }
 
 Group Shared {
-   LD_Shared = -bundle -flat_namespace -undefined suppress
-   LD_Lib    = ${OSX_SHARED_LIBS}
+   LD_Flags = -bundle -flat_namespace -undefined suppress
+   LD_Lib   = ${OSX_SHARED_LIBS}
 }
 
 Group Python {

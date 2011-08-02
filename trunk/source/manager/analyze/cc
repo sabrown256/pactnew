@@ -33,7 +33,6 @@ SafeEnv CC_Linker    ""
 SafeEnv CC_Flags     ""
 SafeEnv CC_Debug     "-g"
 SafeEnv CC_Optimize  "-O"
-SafeEnv CC_Shared    ""
 SafeEnv CC_Inc       ""
 SafeEnv MDG_Inc      ""
 SafeEnv DP_Inc       ""
@@ -397,7 +396,6 @@ SetParent CC_Exe
 SetParent CC_Flags
 SetParent CC_Debug
 SetParent CC_Optimize
-SetParent CC_Shared
 SetParent CC_Inc
 SetParent CC_Linker
 SetParent MDG_Inc

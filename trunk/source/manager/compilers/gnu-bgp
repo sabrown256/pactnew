@@ -72,11 +72,11 @@ Group Cfg {
 }
 
 Group Shared {
-   LD_Exe     = gcc
-   CC_Shared  = -fPIC
-   CC_Shared += [ _env_ = Bits ;                 # address bit size
-                 *     = -m* ]
-   LD_Shared  = -shared
+   LD_Exe    = gcc
+   CC_Flags  = -fPIC
+   CC_Flags += [ _env_ = Bits ;                 # address bit size
+                *     = -m* ]
+   LD_Flags  = -shared
 }
 
 Group PThread {

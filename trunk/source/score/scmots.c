@@ -150,6 +150,8 @@ int main(int c, char **v, char **env)
    {int i, n, err;
     int zsp;
 
+    SC_exe_init_api();
+
     SC_save_argv_env(c, v, env);
 
     zsp = 0;

@@ -28,6 +28,7 @@ inc scope_array.h scope_hash.h scope_io.h
 inc scope_make.h scope_mem.h scope_mpi.h scope_proc.h
 inc scope_thread.h scope_term.h scope_typeh.h scarg.h
 inc scope_lex.h sclexan.h pml.h scope_complex.h
+inc scope_exe.h
 inc pdb.h pdform.h scope_x11.h scope_cgm.h scope_raster.h ppc.h
 inc pgs.h pgs_old.h
 inc panace.h scheme.h syntax.h sx.h

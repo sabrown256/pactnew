@@ -21,12 +21,13 @@
 typedef struct s_memfncs memfncs;
 
 struct s_memfncs
-   {PFMalloc malloc;
+   {int sys;
+    PFMalloc malloc;
     PFFree free;
     PFRealloc realloc;};
 
 static memfncs
-  _SC_mf = { NULL, NULL, NULL };
+  _SC_mf = { FALSE, NULL, NULL, NULL };
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -124,8 +125,12 @@ static void _SC_malloc_loc(char *d, int nc)
 
     count++;
 
+    snprintf(d, nc, "BARE_MALLOC");
+
     if (count == 1)
-       {n = backtrace(bf, 3);
+       {_SC_mf.sys = TRUE;
+
+	n = backtrace(bf, 3);
 	if (n > 2)
 	   {char s[MAXLINE];
 	    char *ps, *pe, *pt;
@@ -146,22 +151,28 @@ static void _SC_malloc_loc(char *d, int nc)
             if ((ps != NULL) && (resolv == TRUE) && (SC_gs.argv != NULL))
 	       {exedes *st;
 
-		st = SC_exe_open(SC_gs.argv[0], NULL, NULL,
-				 TRUE, TRUE, TRUE, TRUE);
+		st = SC_gs.exe_info;
+		if (st == NULL)
+		   {st = SC_exe_open(SC_gs.argv[0], NULL, NULL,
+				    TRUE, TRUE, TRUE, TRUE);
+		    SC_gs.exe_info = st;};
+
 		if (st != NULL)
 		   {srcloc sl;
 
-		    sl = SC_exe_map_addr(st, ps);
+		    SC_exe_map_addr(&sl, st, ps);
 		    snprintf(s, MAXLINE, "%s(%s:%d)",
 			     sl.func, sl.file, sl.line);
 
 		    pt = s;
 
-		    SC_exe_close(st);};};
+/*		    SC_exe_close(st); */};};
 
 	    snprintf(d, nc, "BARE_MALLOC:%s", pt);
 
-	    free(out);};};
+	    free(out);};
+
+	_SC_mf.sys = FALSE;};
 
     count--;
 
@@ -178,11 +189,13 @@ void *malloc(size_t nb)
 
     SC_use_over_mem(TRUE);
 
-    if (_SC_init_emu_threads == 0)
+    if ((_SC_init_emu_threads == 0) || (_SC_mf.sys == TRUE))
        pr = _SC_mf.malloc(nb);
 
     else
-       {_SC_malloc_loc(d, MAXLINE);
+       {
+
+        _SC_malloc_loc(d, MAXLINE);
 
 	pr = SC_alloc_n(nb, 1,
 			SC_MEM_ATTR_FUNC, d,

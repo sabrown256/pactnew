@@ -374,9 +374,6 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "CDefDebug    = ${CDefDebug}"
     Note $STDOUT "COptimize    = ${CC_Optimize}"
     Note $STDOUT "CDefOptimize = ${CDefOptimize}"
-    Note $STDOUT "CShared      = ${CC_Shared}"
-    Note $STDOUT "LDShared     = ${LD_Shared}"
-    Note $STDOUT "ShLD         = ${Shared_LD_Exe}"
 
     Note $STDOUT "FCompiler    = ${FC_Exe}"
     Note $STDOUT "FFLAGS       = ${FC_Flags}"
@@ -425,7 +422,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "ARXOpt     = ${AR_Flags} ${AR_XFlag}"
     Note $STDOUT ""
 
-    Note $STDOUT 'CC = ${CCompiler} ${CFLAGS} ${CShared} ${UniFlags} ${CcFlags}'
+    Note $STDOUT 'CC = ${CCompiler} ${CFLAGS} ${Shared_CC_Flags} ${UniFlags} ${CcFlags}'
     Note $STDOUT 'FC = ${FCompiler} ${FFLAGS} ${UniFlags} ${FcFlags}'
     Note $STDOUT 'LX = ${CCompiler} ${LXFLAGS} ${UniFlags} ${CcFlags}'
     Note $STDOUT 'YC = ${CCompiler} ${LXFLAGS} ${UniFlags} ${CcFlags}'
@@ -433,13 +430,13 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT ""
  
     Note $STDOUT 'CLD            = ${CCmpLdr} ${CFLAGS} ${UniFlags} ${CcFlags}'
-    Note $STDOUT 'CCCfg          = ${Cfg_CC_Exe} ${Cfg_CC_Flags} ${CShared} ${UniFlags} ${CcFlags}'
+    Note $STDOUT 'CCCfg          = ${Cfg_CC_Exe} ${Cfg_CC_Flags} ${Shared_CC_Flags} ${UniFlags} ${CcFlags}'
     Note $STDOUT 'FCCfg          = ${Cfg_FC_Exe} ${Cfg_FC_Flags} ${UniFlags} ${FcFlags}'
 
-    Note $STDOUT 'CCSer          = ${Ser_CC_Exe} ${Ser_CC_Flags} ${CShared} ${UniFlags} ${CcFlags}'
+    Note $STDOUT 'CCSer          = ${Ser_CC_Exe} ${Ser_CC_Flags} ${Shared_CC_Flags} ${UniFlags} ${CcFlags}'
     Note $STDOUT 'FCSer          = ${Ser_FC_Exe} ${Ser_FC_Flags} ${UniFlags} ${FcFlags}'
 
-    Note $STDOUT 'CCCfe          = ${Cfe_CC_Exe} ${Cfe_CC_Flags} ${CShared} ${UniFlags} ${CcFlags}'
+    Note $STDOUT 'CCCfe          = ${Cfe_CC_Exe} ${Cfe_CC_Flags} ${Shared_CC_Flags} ${UniFlags} ${CcFlags}'
     Note $STDOUT 'FCCfe          = ${Cfe_FC_Exe} ${Cfe_FC_Flags} ${UniFlags} ${FcFlags}'
     Note $STDOUT 'CCCfe_LD_Flags = ${Cfe_LD_Flags}'
     Note $STDOUT 'CCCfe_LD_Lib   = ${Cfe_LD_Lib}'

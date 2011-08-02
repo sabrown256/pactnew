@@ -286,9 +286,8 @@ libraries with names like, libscore.a.
 
                          BUILDING SHARED LIBRARIES
 
-The PACT libraries can now be built as shared libraries.  To do so chose
-a configuration with the "-sl" qualifier (see configs.std/README) or create
-your own config file (see SharedLibArg below).  After PACT is configured
+The PACT libraries can be built as shared libraries.  To do so chose
+a configuration with the "-sl" qualifier.  After PACT is configured
 do the following:
 
           -> pact shared
@@ -718,7 +717,7 @@ ScmDir
    A directory in which to install scheme source files.  This should also be
    a subdirectory of InstBase.  Default is "scheme".
 
-SharedLibArg
+Shared_CC_Flags
    The arguments to the C Compiler used when building shared libraries.  This
    makes the "shared" target meaningful.  Default is "".
 
@@ -810,21 +809,10 @@ POW
    standard math library's "pow". The PACT routine PM_pow may be used
    here, or the user may provide their own.
 
-PTHREAD_DRAFT4
-   This indicates the presence of a POSIX DRAFT 4 compliant thread library
-   for the system.  This is one of the thread standards which PACT
-   can use to support shared memory parallel applications.
-
 PTHREAD_POSIX
    This indicates the presence of a POSIX compliant thread library
    for the system.  This is one of the thread standards which PACT
    can use to support shared memory parallel applications.
-
-PTHREAD_PSEUDO_SGI_SROC
-   This directs the use of the SGI sproc facility to emulate the
-   pthread functionality used by PACT.  This is one of the thread
-   "standards" which PACT can use to support shared memory parallel
-   applications.
 
 RAND_MAX
    This allows the user to set a value for the maximum value returned by

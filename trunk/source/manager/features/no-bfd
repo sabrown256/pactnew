@@ -1,0 +1,14 @@
+#
+# NO-BFD - override finding a BFD
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+Group BFD {
+   Path = none
+}
+
+
