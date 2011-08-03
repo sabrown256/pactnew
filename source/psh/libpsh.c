@@ -253,16 +253,26 @@ char *downcase(char *s)
 /* FILL_STRING - fill ragged S name with "." to column N */
 
 char *fill_string(char *s, int n)
-   {int i, nc, nd;
+   {int nc, nd;
     static char fill[MAXLINE];
 
-/* GOTCHA: use memset instead */
-    nc = strlen(s);
-    nd = n - nc;
     strcpy(fill, s);
+    nc = strlen(fill);
+    nd = n - nc;
+
+#if 0
+    int i;
+
     nstrcat(fill, MAXLINE, " ");
     for (i = 0; i < nd; i++)
         nstrcat(fill, MAXLINE, ".");
+
+#else
+
+    memset(fill+nc, '.', nd);
+    fill[nd] = '\0';
+
+#endif
 
     return(fill);}
 

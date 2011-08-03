@@ -133,22 +133,14 @@ static void _SC_malloc_loc(char *d, int nc)
 	n = backtrace(bf, 3);
 	if (n > 2)
 	   {char s[MAXLINE];
-	    char *ps, *pe, *pt;
+	    char *pt;
 
 	    out = backtrace_symbols(bf, n);
 
 	    pt = out[2];
 
-/* get the address of the caller */
-	    ps = strchr(pt, '[');
-	    if (ps != NULL)
-	       {ps++;
-		pe = strchr(ps, ']');
-		if (pe != NULL)
-		   *pe = '\0';};
-
 /* get the file and line number */
-            if ((ps != NULL) && (resolv == TRUE) && (SC_gs.argv != NULL))
+            if ((pt != NULL) && (resolv == TRUE) && (SC_gs.argv != NULL))
 	       {exedes *st;
 
 		st = SC_gs.exe_info;
@@ -160,7 +152,7 @@ static void _SC_malloc_loc(char *d, int nc)
 		if (st != NULL)
 		   {srcloc sl;
 
-		    SC_exe_map_addr(&sl, st, ps);
+		    SC_exe_map_addr(&sl, st, pt);
 		    snprintf(s, MAXLINE, "%s(%s:%d)",
 			     sl.func, sl.file, sl.line);
 

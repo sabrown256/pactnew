@@ -168,6 +168,16 @@ source $ldir/env-csh
     end
     Note $STDOUT ""
 
+    if ($HAVE_BFD == TRUE) then
+       Note $STDOUT '#define BFD_VERSION "'$BFD_Version'"'
+       set inf = ( `echo $BFD_Version | sed 's/\./ /g'` )
+       if ($#inf > 2) then
+          Note $STDOUT "#define BFD_MAJOR_VERSION $inf[1]"
+          Note $STDOUT "#define BFD_MINOR_VERSION $inf[2]"
+       endif
+       unset inf
+    endif
+
     if (($HaveVACOPY != TRUE) && ($HaveVALIST == FALSE)) then
        Note $STDOUT "#define NO_VA_LIST"
     endif

@@ -436,7 +436,7 @@ ${BinDir}/scprts : scprts.c ${TGTLib}
 retrace : ${BinDir}/scrtrt
 
 ${BinDir}/scrtrt : ${TGTLib} scrtrt.c
-	${CLD} ${LdFlags} scrtrt.c -o ${BinDir}/scrtrt ${Libs}
+	${CLD} ${LdFlags} scrtrt.c -o ${BinDir}/scrtrt ${Libs} ${MDE_Lib}
 
 #
 # large file types

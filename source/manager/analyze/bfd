@@ -17,6 +17,8 @@ Note $ALog "Analyze: exe access support"
 
 SafeEnv MDE_Lib      ""
 SafeEnv BFD_Lib      -lbfd
+SafeEnv BFD_Path     /usr/$LIB
+SafeEnv BFD_Version  0.0.0
 SafeEnv HAVE_BFD     FALSE
 
 # if we have explicitly said we do not want BFD
@@ -25,6 +27,10 @@ if ("$BFD_Path" == none) then
    NoteD $ALog "      no bfd (by request)"
 
 else
+
+   if ("$BFD_Path" == "") then
+      flog $ALog setenv BFD_Path /usr/$LIB
+   endif
 
    cat << EOF >! $Tmp.c
 #include <stdlib.h>
@@ -81,13 +87,25 @@ EOF
    if ($ok == FALSE) then
       NoteD $ALog "      no bfd"
    else
-      NoteD $ALog "      has bfd"
+      flog $ALog ls -l $BFD_Path/libbfd*.so
+      if ($status == 0) then
+         foreach i ($BFD_Path/libbfd*.so)
+            set l = $i:t
+            set inf = ( `echo $l:r | sed 's/-/ /g'` )
+            if ($#inf > 1) then
+               setenv BFD_Version  $inf[2]
+            endif
+         end      
+      endif
+
+      NoteD $ALog "      has bfd ($BFD_Version)"
       flog $ALog setenv MDE_Lib "$MDE_Lib $libs"
       flog $ALog setenv HAVE_BFD TRUE
    endif
 
 endif
 
+SetParent BFD_Version
 SetParent MDE_Lib
 SetParent HAVE_BFD
 

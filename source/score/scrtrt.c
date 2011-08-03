@@ -148,6 +148,8 @@ static int driver(int nt)
 int main(int c, char **v, char **env)
    {int i, nt, ntmx, rv;
 
+    SC_exe_init_api();
+
     nt = -1;
 
     for (i = 1; i < c; i++)
