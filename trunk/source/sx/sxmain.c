@@ -41,8 +41,10 @@ int main(int c, char **v, char **env)
  */
     SC_io_connect(SC_REMOTE);
 
-    PD_set_fmt_version(3);
+    PD_register_sql();
+    PD_register_hdf5();
 
+    PD_set_fmt_version(3);
     PD_init_threads(0, NULL);
 
     PG_IO_INTERRUPTS(FALSE);

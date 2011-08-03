@@ -1321,15 +1321,25 @@ syment *_H5_write_entry(PDBfile *fp, char *path, char *inty, char *outty,
  
 /* PD_REGISTER_HDF5 - install the HDF5 extensions to PDBLib */
  
-void PD_register_hdf5(void)
-   {int n;
+int PD_register_hdf5(void)
+   {static int n = -1;
 
-    n = PD_REGISTER(H5FILE_S, "hdf5", _H5_filep,
-		    _H5_create, _H5_open, _H5_close,
-		    _H5_write_entry, _H5_read_entry);
-    SC_ASSERT(n >= 0);
+    ONCE_SAFE(TRUE, NULL)
 
-    return;}
+/* since this is a spoke the application has to register
+ * make sure all the others are registered first
+ */
+       _PD_register_spokes();
+
+       n = PD_REGISTER(H5FILE_S, "hdf5", _H5_filep,
+		       _H5_create, _H5_open, _H5_close,
+		       _H5_write_entry, _H5_read_entry);
+
+       SC_ASSERT(n >= 0);
+
+    END_SAFE;
+
+    return(n);}
  
 /*--------------------------------------------------------------------------*/
 
@@ -1339,10 +1349,12 @@ void PD_register_hdf5(void)
  
 /* PD_REGISTER_HDF5 - install the HDF5 extensions to PDBLib */
  
-void PD_register_hdf5(void)
+int PD_register_hdf5(void)
    {
 
-    return;}
+    _PD_register_spokes();
+
+    return(-1);}
  
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

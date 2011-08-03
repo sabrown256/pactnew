@@ -250,19 +250,29 @@ syment *_SQL_write_entry(PDBfile *fp, char *path, char *inty, char *outty,
 /* PD_REGISTER_SQL - install the SQL extensions to PDBLib */
  
 int PD_register_sql(void)
-   {int n;
+   {static int nmysql = -1, nsqlite = -1;
 
-    n = PD_REGISTER(SQL_DATABASE_S, "mysql", _SQL_databasep,
-		    _SQL_create, _SQL_open, _SQL_close,
-		    _SQL_write_entry, _SQL_read_entry);
-    SC_ASSERT(n >= 0);
+    ONCE_SAFE(TRUE, NULL)
 
-    n = PD_REGISTER(SQL_DATABASE_S, "sqlite", _SQL_databasep,
-		    _SQL_create, _SQL_open, _SQL_close,
-		    _SQL_write_entry, _SQL_read_entry);
-    SC_ASSERT(n >= 0);
+/* since this is a spoke the application has to register
+ * make sure all the others are registered first
+ */
+       _PD_register_spokes();
 
-    return(TRUE);}
+       nmysql = PD_REGISTER(SQL_DATABASE_S, "mysql", _SQL_databasep,
+			    _SQL_create, _SQL_open, _SQL_close,
+			    _SQL_write_entry, _SQL_read_entry);
+       SC_ASSERT(nmysql >= 0);
+
+       nsqlite = PD_REGISTER(SQL_DATABASE_S, "sqlite", _SQL_databasep,
+			     _SQL_create, _SQL_open, _SQL_close,
+			     _SQL_write_entry, _SQL_read_entry);
+
+       SC_ASSERT(nsqlite >= 0);
+
+    END_SAFE;
+
+    return(nsqlite);}
  
 /*--------------------------------------------------------------------------*/
 
@@ -275,7 +285,9 @@ int PD_register_sql(void)
 int PD_register_sql(void)
    {
 
-    return(FALSE);}
+    _PD_register_spokes();
+
+    return(-1);}
  
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

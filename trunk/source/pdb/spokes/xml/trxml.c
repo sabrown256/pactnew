@@ -85,13 +85,16 @@ static PDBfile *_XML_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 /* PD_REGISTER_XML - install the XML extensions to PDBLib */
  
 int PD_register_xml(void)
-   {int n;
+   {static int n = -1;
 
-    n = PD_REGISTER(XML_S, "xml", _XML_filep,
-		    NULL, _XML_open, _XML_close, NULL, NULL);
-    SC_ASSERT(n >= 0);
+    ONCE_SAFE(TRUE, NULL)
+       n = PD_REGISTER(XML_S, "xml", _XML_filep,
+		       NULL, _XML_open, _XML_close, NULL, NULL);
 
-    return(TRUE);}
+       SC_ASSERT(n >= 0);
+    END_SAFE;
+
+    return(n);}
  
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
