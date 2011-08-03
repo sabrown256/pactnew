@@ -201,13 +201,18 @@ int _PD_pdbfilep(char *type)
 /* PD_REGISTER_PDB - install the basic methods for PDBLib */
  
 int PD_register_pdb(void)
-   {int n;
+   {static int n = -1;
 
-    n = PD_REGISTER(PDBFILE_S, "pdb", _PD_pdbfilep,
-		    _PD_create, _PD_open, _PD_close, _PD_write, _PD_read);
-    SC_ASSERT(n >= 0);
+    ONCE_SAFE(TRUE, NULL)
 
-    return(TRUE);}
+       n = PD_REGISTER(PDBFILE_S, "pdb", _PD_pdbfilep,
+		       _PD_create, _PD_open, _PD_close, _PD_write, _PD_read);
+
+       SC_ASSERT(n >= 0);
+
+    END_SAFE;
+
+    return(n);}
  
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

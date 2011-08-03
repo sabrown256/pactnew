@@ -18,7 +18,7 @@ OD = DefaultG
 # Compiler/Loader Options
 #
 UniFlags =
-CcFlags = ${ODC} -I. -I${IncDir} ${MDInc} ${MDGInc}
+CcFlags = ${ODC} -I. -I${IncDir} ${MDInc} ${MDI_Inc}
 LdFlags = -L${LibDir}
 
 CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}

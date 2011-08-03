@@ -13,7 +13,18 @@ unalias ls
 # find the available spokes
 pushd spokes >& /dev/null
 
-set spokes = ( `ls -1r | grep -v CVS` )
+set spokes = ""
+foreach i (`ls -1r`)
+    switch ($i)
+       case CVS:
+       case sql:
+       case hdf5:
+            breaksw
+       default:
+            set spokes = ( $spokes $i )
+            breaksw
+    endsw
+end
 
 popd >& /dev/null
 
@@ -44,19 +55,14 @@ extern SC_array
 int _PD_register_spokes(void)
    {int n;
     static int ns = 0;
+
 EOF
 
-foreach i ($spokes)
-    echo "    extern int PD_register_${i}(void);" >>& pdspoke.c
-end
-
-echo "    extern int PD_register_pdb(void);" >>& pdspoke.c
-echo "" >>& pdspoke.c
 echo "    if (ns == 0)" >>& pdspoke.c
-echo "       {ns += PD_register_pdb();" >>& pdspoke.c
+echo "       {ns += (PD_register_pdb() >= 0);" >>& pdspoke.c
 
 foreach i ($spokes)
-    echo "        ns += PD_register_${i}();" >>& pdspoke.c
+    echo "        ns += (PD_register_${i}() >= 0);" >>& pdspoke.c
 end
 
 echo "        };" >>& pdspoke.c

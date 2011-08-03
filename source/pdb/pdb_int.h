@@ -698,6 +698,12 @@ extern char
  *_PD_file_type(PDBfile *file);
 
 
+/* PDSPOKE.C declarations */
+
+extern int
+ _PD_register_spokes(void);
+
+
 #ifdef __cplusplus
 }
 #endif

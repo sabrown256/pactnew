@@ -1237,6 +1237,17 @@ extern int
  PD_init_threads_arg(int c, char **v, char *key, PFTid tid);
 
 
+/* PDSPOKE.C declarations */
+
+extern int
+ PD_register_xml(void),
+ PD_register_sql(void),
+ PD_register_nacf(void),
+ PD_register_llf(void),
+ PD_register_hdf5(void),
+ PD_register_pdb(void);
+
+
 /* PDSZOF.C declarations */
 
 extern long

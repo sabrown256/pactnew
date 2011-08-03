@@ -649,14 +649,16 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
  
 /* PD_REGISTER_NACF - install the NACF extensions to PDBLib */
  
-void PD_register_nacf(void)
-   {int n;
+int PD_register_nacf(void)
+   {static int n = -1;
 
-    n = PD_REGISTER(NACFILE_S, "nacf", _NAC_filep,
-		    NULL, _NAC_open, _NAC_close, NULL, NULL);
-    SC_ASSERT(n >= 0);
+    ONCE_SAFE(TRUE, NULL)
+       n = PD_REGISTER(NACFILE_S, "nacf", _NAC_filep,
+		       NULL, _NAC_open, _NAC_close, NULL, NULL);
+       SC_ASSERT(n >= 0);
+    END_SAFE;
 
-    return;}
+    return(n);}
  
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

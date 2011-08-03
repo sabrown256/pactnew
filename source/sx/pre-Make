@@ -69,10 +69,8 @@ BinObj = ${LdFlags} sxmain.c
 #
 # Required Libraries
 #
-#Libs = ${LSX} ${LPANACEA} ${LPGS} ${MDGLib} ${LSCHEME} ${LPPC} ${LPDB} ${LPML} ${LMM} ${LSCORE} ${MDLib}
-Libs = ${LSX} ${LPANACEA} ${LPGS} ${MDGLib} ${LSCHEME} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDLib}
-
-SPDBXLibs = ${LSCHEME} ${LPPC} ${LPDB} ${LPML} ${LMM} ${LSCORE} ${MDLib}
+#Libs = ${LSX} ${LPANACEA} ${LPGS} ${MDGLib} ${LSCHEME} ${LPPC} ${LPDB} ${LPML} ${LMM} ${LSCORE} ${MDI_Lib} ${MDLib}
+Libs = ${LSX} ${LPANACEA} ${LPGS} ${MDGLib} ${LSCHEME} ${LPPC} ${LPDB} ${LPML} ${LSCORE} ${MDI_Lib} ${MDLib}
 
 targets :
 	@echo "Targets for SX"

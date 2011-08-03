@@ -231,14 +231,16 @@ static PDBfile *_LLF_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
  
 /* PD_REGISTER_LLF - install the LLF extensions to PDBLib */
  
-void PD_register_llf(void)
-   {int n;
+int PD_register_llf(void)
+   {static int n = -1;
 
-    n = PD_REGISTER(LLFILE_S, "llf", _LLF_filep,
-		    NULL, _LLF_open, _LLF_close, NULL, NULL);
-    SC_ASSERT(n >= 0);
+    ONCE_SAFE(TRUE, NULL)
+       n = PD_REGISTER(LLFILE_S, "llf", _LLF_filep,
+		       NULL, _LLF_open, _LLF_close, NULL, NULL);
+       SC_ASSERT(n >= 0);
+    END_SAFE;
 
-    return;}
+    return(n);}
  
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

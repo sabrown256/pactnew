@@ -20,7 +20,7 @@ OD = DefaultG
 # Compiler/Loader Options
 #
 UniFlags =
-CcFlags  = ${ODC} -I. -I${IncDir} ${MDInc}
+CcFlags  = ${ODC} -I. -I${IncDir} ${MDInc} ${MDI_Inc}
 FcFlags  = ${ODF} -I. -I${IncDir}
 LdFlags  = -L${LibDir} ${LDFLAGS}
 
