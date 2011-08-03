@@ -25,7 +25,9 @@
 void _SC_set_demangle_style(char *opt)
    {
 
-#if 0
+/* NOTE: Ubuntu 10.10 has version 2.20.51 */
+
+#if BFD_MAJOR_VERSION >= 2
     enum demangling_styles style;
 
     if (opt != NULL)
@@ -45,7 +47,7 @@ void _SC_set_demangle_style(char *opt)
 void _SC_exe_demangle_name(char *d, int nc, exedes *st)
    {
 
-# ifdef HAVE_BFD_DEMANGLE
+#if BFD_MAJOR_VERSION >= 2
 
     char *p, *nm;
     
@@ -53,7 +55,7 @@ void _SC_exe_demangle_name(char *d, int nc, exedes *st)
     p = bfd_demangle(st->et, nm, SC_DEMANGLE_ARG);
     if (p != NULL)
        {SC_strncpy(d, nc, p, -1);
-	free(fnc);}
+	free(p);}
 
     else
        SC_strncpy(d, nc, nm, -1);
@@ -72,16 +74,13 @@ static int _SC_exe_check_formats(bfd *et)
 
     ok = TRUE;
 
-#if 1
+#if defined(BFD_MAJOR_VERSION)
     char **matching;
 
     if (bfd_check_format_matches(et, bfd_object, &matching) == 0)
        {ok = FALSE;
 	if (bfd_get_error() == bfd_error_file_ambiguously_recognized)
-	   {extern void list_matching_formats(char **p);
-/*
-            list_matching_formats(matching);
- */
+	   {SC_strings_print(stdout, matching, "-> ");
 	    free(matching);};};
 #endif
 
@@ -176,9 +175,26 @@ static void _SC_exe_find_offs(exedes *st)
 /* _SC_EXE_MAP_ADDR - map hex address AD to a srcloc PSL */
 
 static void _SC_exe_map_addr(srcloc *psl, exedes *st, char *ad)
-   {char *fnc;
+   {int na;
+    char s[MAXLINE];
+    char *p, *fnc, **ta;
     srcloc sl;
     static char *none = "unknown";
+
+    SC_strncpy(s, MAXLINE, ad, -1);
+
+/* address form: "file(tag+offs) [addr]" */
+    ta = SC_tokenize(s, " \t[]()");
+    SC_ptr_arr_len(na, ta);
+
+    switch (na)
+       {case 0 :
+	     break;
+        case 1 :
+	     break;
+        default :
+	     ad = ta[1];
+	     break;};
 
     memset(&st->where, 0, sizeof(csrcloc));
 
@@ -208,7 +224,14 @@ static void _SC_exe_map_addr(srcloc *psl, exedes *st, char *ad)
 
 /* get the file name */
 	    if (st->where.file[0] != '\0')
-	       SC_strncpy(sl.file, MAXLINE, (char *) st->where.file, -1);
+	       {char *fn;
+
+		fn = (char *) st->where.file;
+		if ((st->tailf == TRUE) && (fn != NULL))
+		   {p = strrchr(fn, '/');
+		    if (p != NULL)
+		       fn = p + 1;};
+		SC_strncpy(sl.file, MAXLINE, fn, -1);};
 
 /* get the line number */
 	    sl.line = st->where.line;
@@ -226,7 +249,24 @@ static void _SC_exe_map_addr(srcloc *psl, exedes *st, char *ad)
 		   {SC_strncpy(st->where.file, MAXLINE, (char *) sl.file, -1);
 		    SC_strncpy(st->where.func, MAXLINE, (char *) sl.func, -1);
 		    st->where.line = sl.line;};};}
-	while (st->found == TRUE);};
+	while (st->found == TRUE);}
+
+/* if no address found do the best possible from the address */
+    else
+       {if (na == 1)
+	   {SC_strncpy(sl.file, MAXLINE, none, -1);
+	    sl.line = SC_strtol(ta[0], NULL, 16);}
+
+	else if (na == 2)
+	   {SC_strncpy(sl.file, MAXLINE, ta[0], -1);
+	    sl.line = SC_strtol(ta[1], NULL, 16);}
+
+	else if (na > 2)
+	   {SC_strncpy(sl.file, MAXLINE, ta[0], -1);
+	    SC_strncpy(sl.func, MAXLINE, ta[1], -1);
+	    sl.line = 0;};};
+
+    SC_free_strings(ta);
 
     *psl = sl;
 
@@ -243,7 +283,6 @@ static void _SC_exe_map_addr(srcloc *psl, exedes *st, char *ad)
 
 static int _SC_exe_map_addrs(exedes *st, int na, char **ad)
    {int i, rv;
-    char *fn, *p;
     srcloc sl;
 
     rv = TRUE;
@@ -251,17 +290,10 @@ static int _SC_exe_map_addrs(exedes *st, int na, char **ad)
     for (i = 0; i < na; i++)
         {_SC_exe_map_addr(&sl, st, ad[i]);
 
-/* get the file name into the requested form */
-	 fn = sl.file;
-	 if ((st->tailf == TRUE) && (fn != NULL))
-	       {p = strrchr(fn, '/');
-		if (p != NULL)
-		   fn = p + 1;};
-
 	 if (st->showf == TRUE)
-	    printf("%s %s:%d\n", sl.func, fn, sl.line);
+	    printf("%s %s:%d\n", sl.func, sl.file, sl.line);
 	 else
-	    printf(" %s:%d\n", fn, sl.line);};
+	    printf(" %s:%d\n", sl.file, sl.line);};
 
     return(rv);}
 

@@ -12,6 +12,7 @@
 
 #include <pwd.h>
 #include <sched.h>
+#include <execinfo.h>
 
 #define SC_DBG_GDB         1
 #define SC_DBG_TOTALVIEW   2
@@ -840,6 +841,91 @@ int SC_attach_dbg(int pid)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_BACKTRACE_EXE - get the actual backtrace of PID
+ *                   - if PID == -1 use the current process
+ *                   - return an array of strings with text of backtrace
+ */
+
+static char **_SC_backtrace_exe(int pid, int to)
+   {int i, epid, rv;
+    char path[PATH_MAX];
+    char *cmd, **t;
+
+    t = NULL;
+
+    epid = (pid < 0) ? getpid() : pid;
+    rv   = SC_get_pname(path, PATH_MAX, epid);
+
+/* current process and executable access active
+ * might as well save the fork of a child process
+ */
+    if ((pid < 0) && (_SC.exe.open != NULL))
+       {int n;
+	long long ad;
+	void **bf;
+	char s[MAXLINE];
+	char **out, **ta;
+	SC_array *str;
+	srcloc sl;
+	exedes *st;
+
+	bf  = CMAKE_N(void *, 100);
+	n   = backtrace(bf, 100);
+	out = backtrace_symbols(bf, n);
+
+	if (n > 0)
+	   {str = SC_STRING_ARRAY();
+
+	    st = SC_exe_open(path, NULL, NULL, TRUE, TRUE, TRUE, TRUE);
+	    if (st != NULL)
+	       {n--;
+		for (i = 0; i < n; i++)
+		    {SC_strncpy(s, MAXLINE, out[i], -1);
+		     ta = SC_tokenize(s, " \t[]");
+		     ad = SC_strtol(ta[1], NULL, 16);
+
+		     SC_exe_map_addr(&sl, st, out[i]);
+
+		     if (sl.func[0] == '\0')
+		        SC_array_string_add_vcopy(str,
+						  "#%-3d 0x%012llx %s\n",
+						  i, ad, sl.file);
+		     else if (sl.line < 1)
+		        SC_array_string_add_vcopy(str,
+						  "#%-3d 0x%012llx %-24s(%s)\n",
+						  i, ad, sl.func, sl.file);
+		     else
+		        SC_array_string_add_vcopy(str,
+						  "#%-3d 0x%012llx %-24s(%s:%d)\n",
+						  i, ad,
+						  sl.func, sl.file, sl.line);
+		     SC_free_strings(t);};
+
+		SC_exe_close(st);};
+
+	    t = _SC_array_string_join(&str);};
+
+	CFREE(bf);
+	free(out);}
+
+/* process other than current or no executable access */
+    else
+       {if (rv == 0)
+	   {cmd = SC_dsnprintf(TRUE, "atdbg -r -p %d -e %s", epid, path);
+printf("->a |%s|\n", cmd);
+            rv = SC_exec(&t, cmd, NULL, to);
+	    CFREE(cmd);};};
+
+/* strip off newlines */
+    if (t != NULL)
+       {for (i = 0; t[i] != NULL; i++)
+	    SC_trim_right(t[i], "\n");};
+
+    return(t);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_RETRACE_EXE - attach a debugger to the process PID and return the
  *                - call stack in POUT
  *                - POUT sets a char ** pointer in the caller
@@ -852,33 +938,14 @@ int SC_attach_dbg(int pid)
  */
 
 int SC_retrace_exe(char ***pout, int pid, int to)
-   {int i, rv, local;
-    char path[PATH_MAX];
-    char *cmd, **out, **t;
+   {int i, rv;
+    char **t;
 
-    if (pid < 0)
-       pid = getpid();
-
-    rv = SC_get_pname(path, PATH_MAX, pid);
-    if (rv == 0)
-       {if (pout == NULL)
-	   {out   = NULL;
-	    t     = out;
-	    local = TRUE;}
-	else
-	   {t     = *pout;
-	    local = FALSE;};
-
-	cmd = SC_dsnprintf(TRUE, "atdbg -r -p %d -e %s", pid, path);
-	rv = SC_exec(&t, cmd, NULL, to);
-	CFREE(cmd);
-
-/* strip off newlines */
-	for (i = 0; t[i] != NULL; i++)
-	    SC_trim_right(t[i], "\n");
+    t = _SC_backtrace_exe(pid, to);
 
 /* print the strings if the caller does not want them returned */
-        if (local == TRUE)
+    if (t != NULL)
+       {if (pout == NULL)
 	   {for (i = 0; t[i] != NULL; i++)
 	        {io_printf(stdout, "%s\n", t[i]);};
 	    SC_free_strings(t);}

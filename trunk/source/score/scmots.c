@@ -154,6 +154,8 @@ int main(int c, char **v, char **env)
 
     SC_save_argv_env(c, v, env);
 
+    SC_setbuf(stdout, NULL);
+
     zsp = 0;
     n   = 100;
 

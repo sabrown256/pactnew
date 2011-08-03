@@ -243,9 +243,14 @@ char *SC_dstrcat(char *dest, char *src)
 char *SC_strncpy(char *d, size_t nd, char *s, size_t ns)
    {size_t nc;
         
-    nc = min(ns, nd-1);
-    strncpy(d, s, nc);
-    d[nc] = '\0';
+    if (s == NULL)
+       nc = 0;
+    else
+       {nc = min(ns, nd-1);
+	strncpy(d, s, nc);};
+
+    if (d != NULL)
+       d[nc] = '\0';
 
     return(d);}
 
@@ -1291,6 +1296,26 @@ int SC_strings_file(char **sa, char *fname, char *mode)
        {for (i = 0; sa[i] != NULL; i++)
 	    fputs(sa[i], fp);
 	fclose(fp);
+	rv = TRUE;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_STRINGS_PRINT - print each string of SA preceded by PRE to file FP
+ *                  - FP must be stdout, stderr, or have been opened
+ *                  - with io_open
+ */
+
+int SC_strings_print(FILE *fp, char **sa, char *pre)
+   {int i, rv;
+
+    rv = FALSE;
+
+    if (fp != NULL)
+       {for (i = 0; sa[i] != NULL; i++)
+	    io_printf(fp, "%s%s\n", pre, sa[i]);
 	rv = TRUE;};
 
     return(rv);}
