@@ -150,7 +150,7 @@ static void _SC_malloc_loc(char *d, int nc)
 		    SC_gs.exe_info = st;};
 
 		if (st != NULL)
-		   {srcloc sl;
+		   {SC_srcloc sl;
 
 		    SC_exe_map_addr(&sl, st, pt);
 		    snprintf(s, MAXLINE, "%s(%s:%d)",

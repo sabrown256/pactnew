@@ -729,7 +729,7 @@ void SC_mem_print(void *p)
 	io_printf(stdout, "  Type index     : %x\n",    desc->type);
 	io_printf(stdout, "  Reference count: %x\n",    desc->ref_count);
 	io_printf(stdout, "  Block id       : %lx\n",   desc->id);
-	io_printf(stdout, "  Next block     : 0x%lx\n", desc->func);}
+	io_printf(stdout, "  Next block     : 0x%lx\n", desc->where.func);}
 
     else if (SCORE_BLOCK_P(desc))
        {io_printf(stdout, "  Address        : 0x%lx\n", p);

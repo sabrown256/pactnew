@@ -31,9 +31,9 @@ FIXNUM _SC_make_ff(void **pm, FIXNUM *pni, FIXNUM *pnb, FIXNUM *pnc,
     opt.na   = FALSE;
     opt.zsp  = zsp;
     opt.typ  = -1;
-    opt.fnc  = pname;
-    opt.file = NULL;
-    opt.line = -1;
+    opt.where.func = pname;
+    opt.where.file = NULL;
+    opt.where.line = -1;
 
     s = _SC_alloc_n((long) *pni, (long) *pnb, &opt);
 

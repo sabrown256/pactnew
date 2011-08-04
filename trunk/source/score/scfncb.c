@@ -866,7 +866,7 @@ static char **_SC_backtrace_exe(int pid, int to)
 	char s[MAXLINE];
 	char **out, **ta;
 	SC_array *str;
-	srcloc sl;
+	SC_srcloc sl;
 	exedes *st;
 
 	bf  = CMAKE_N(void *, 100);

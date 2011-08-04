@@ -942,9 +942,9 @@ object *SS_mk_object(SS_psides *si,
     opt.na   = FALSE;
     opt.zsp  = -1;
     opt.typ  = SS_OBJECT_I;
-    opt.fnc  = __func__;
-    opt.file = __FILE__;
-    opt.line = __LINE__;
+    opt.where.func = __func__;
+    opt.where.file = __FILE__;
+    opt.where.line = __LINE__;
 
     o = _SC_alloc_n(1L, sizeof(object), &opt);
 

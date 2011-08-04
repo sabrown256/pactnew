@@ -27,9 +27,10 @@ void *_SC_alloc_w(long nitems, long bpi, char *name, int memfl, int zsp)
     opt.na   = na;
     opt.zsp  = zsp;
     opt.typ  = -1;
-    opt.fnc  = name;
-    opt.file = NULL;
-    opt.line = -1;
+
+    opt.where.func = name;
+    opt.where.file = NULL;
+    opt.where.line = -1;
 
     p = _SC_alloc_n(nitems, bpi, &opt);
 
@@ -53,9 +54,10 @@ void *_SC_nalloc_w(long nitems, long bpi, int memfl, int zsp,
     opt.na   = na;
     opt.zsp  = zsp;
     opt.typ  = -1;
-    opt.fnc  = fnc;
-    opt.file = file;
-    opt.line = line;
+
+    opt.where.func = fnc;
+    opt.where.file = file;
+    opt.where.line = line;
 
     p = _SC_alloc_n(nitems, bpi, &opt);
 
@@ -78,9 +80,10 @@ void *_SC_realloc_w(void *p, long nitems, long bpi, int memfl, int zsp)
     opt.na   = na;
     opt.zsp  = zsp;
     opt.typ  = -1;
-    opt.fnc  = NULL;
-    opt.file = NULL;
-    opt.line = -1;
+
+    opt.where.func = NULL;
+    opt.where.file = NULL;
+    opt.where.line = -1;
 
     rv = _SC_realloc_n(p, nitems, bpi, &opt);
 
@@ -99,9 +102,10 @@ int _SC_free_w(void *p, int zsp)
     opt.na   = -1;
     opt.zsp  = zsp;
     opt.typ  = -1;
-    opt.fnc  = NULL;
-    opt.file = NULL;
-    opt.line = -1;
+
+    opt.where.func = NULL;
+    opt.where.file = NULL;
+    opt.where.line = -1;
 
     rv = _SC_free_n(p, &opt);
 
@@ -173,9 +177,10 @@ static void *_SC_nalloc_chk(long nitems, long bpi, int na, int zsp,
     opt.na   = na;
     opt.zsp  = zsp;
     opt.typ  = -1;
-    opt.fnc  = fnc;
-    opt.file = file;
-    opt.line = line;
+
+    opt.where.func = fnc;
+    opt.where.file = file;
+    opt.where.line = line;
 
     space = _SC_alloc_n(nitems, bpi, &opt);
 
@@ -200,9 +205,10 @@ static void *_SC_alloc_chk(long nitems, long bpi, char *name, int na, int zsp)
     opt.na  = na;
     opt.zsp = zsp;
     opt.typ = -1;
-    opt.fnc  = name;
-    opt.file = NULL;
-    opt.line = -1;
+
+    opt.where.func = name;
+    opt.where.file = NULL;
+    opt.where.line = -1;
 
     space = _SC_alloc_n(nitems, bpi, &opt);
 
@@ -382,15 +388,15 @@ char *_SC_block_name(mem_descriptor *desc)
 
     rv = NULL;
     if (desc != NULL)
-       {if (desc->file != NULL)
-	   {p = strrchr(desc->file, '/');
+       {if (desc->where.file != NULL)
+	   {p = strrchr(desc->where.file, '/');
 	    if (p == NULL)
-	       p = desc->file;
+	       p = (char *) desc->where.file;
 	    else
 	       p++;
-	    snprintf(name, MAXLINE, "%s(%s:%d)", desc->func, p, desc->line);}
-	else if (desc->func != NULL)
-	   SC_strncpy(name, MAXLINE, desc->func, -1);
+	    snprintf(name, MAXLINE, "%s(%s:%d)", desc->where.func, p, desc->where.line);}
+	else if (desc->where.func != NULL)
+	   SC_strncpy(name, MAXLINE, (char *) desc->where.func, -1);
 	else
 	   SC_strncpy(name, MAXLINE, "-none-", -1);
 
@@ -621,14 +627,15 @@ int SC_reg_mem(void *p, long length, char *name)
     pd = CPMAKE(mem_descriptor, 3);
 
     pd->heap      = ph;
-    pd->func      = strdup(name);
-    pd->file      = NULL;
-    pd->line      = -1;
     pd->ref_count = 1;
     pd->type      = 0;
     pd->length    = length;
     pd->prev      = NULL;
     pd->next      = (mem_header *) p;
+
+    pd->where.func = strdup(name);
+    pd->where.file = NULL;
+    pd->where.line = -1;
 
     hp = SC_hasharr_install(_SC.mem_table, p, pd, "mem_descriptor", TRUE, TRUE);
     if (hp != NULL)
@@ -655,7 +662,7 @@ int SC_dereg_mem(void *p)
 
     pd = SC_hasharr_def_lookup(_SC.mem_table, p);
     if (pd != NULL)
-       {free(pd->func);
+       {free((char *) pd->where.func);
 	nb = pd->length;}
     else
        nb = 0;
@@ -734,7 +741,7 @@ void dprfree(void)
         {io_printf(stdout, "%3ld %4ld ", j, SC_BIN_SIZE(j));
          for (md  = ph->free_list[j], i = 0L;
 	      md != NULL;
-	      md  = (mem_descriptor *) md->func, i++)
+	      md  = (mem_descriptor *) md->where.func, i++)
              {io_printf(stdout, " %lx", md);
 	      fflush(stdout);};
 	 io_printf(stdout, "\n");};
@@ -758,7 +765,7 @@ void dflpr(int j)
 	  
     for (md = ph->free_list[j];
 	 md != NULL;
-	 md = (mem_descriptor *) md->func)
+	 md = (mem_descriptor *) md->where.func)
         io_printf(stdout, "%8lx\n", md);
 
     return;}
@@ -782,7 +789,7 @@ static long _SC_flchk(void)
         {hd = ph->free_list[j];
          for (k = 0L, md = hd;
 	      md != NULL;
-	      k++, md = (mem_descriptor *) md->func)
+	      k++, md = (mem_descriptor *) md->where.func)
 	     {ok = SC_pointer_ok(md);
 	      if (!ok)
 		 {io_printf(stdout,
@@ -792,7 +799,7 @@ static long _SC_flchk(void)
 		  bad++;
 		  break;};
 		
-	      ok = SC_pointer_ok(md->func);
+	      ok = SC_pointer_ok((char *) md->where.func);
  	      if (ok &&
 		  (md->ref_count == SC_MEM_MFA) &&
 		  (md->type == SC_MEM_MFB))
