@@ -15,7 +15,14 @@
 
 #ifdef HAVE_BFD
 
-#include "scope_exe.h"
+#include <bfd.h>
+
+#if BFD_MAJOR_VERSION >= 2
+# include <demangle.h>
+# define SC_DEMANGLE_ARG   (DMGL_ANSI | DMGL_PARAMS)
+#else
+# define SC_DEMANGLE_ARG   3
+#endif
 
 #define GET_ET(_st)    ((bfd *)      (_st)->et)
 #define GET_ES(_st)    ((asection *) (_st)->es)
