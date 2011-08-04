@@ -103,8 +103,10 @@ static int run_test(char *name, int n, int (*tst)(int n, double *pdt))
     char msg[MAXLINE], s[MAXLINE];
     double dt;
     static int dbg = 2;
+    static int map = FALSE;
 
-/*    cs = SC_mem_monitor(-1, dbg, "MOR", msg); */
+    if (map == TRUE)
+       cs = SC_mem_monitor(-1, dbg, "MOR", msg);
 
     ln = 28;
     snprintf(s, MAXLINE, "\t\t\t%s ", name);
@@ -118,7 +120,8 @@ static int run_test(char *name, int n, int (*tst)(int n, double *pdt))
 
     printf(" %s (%8.2e)\n", (rv == TRUE) ? "ok" : "ng", dt);
 
-/*    cs = SC_mem_monitor(cs, dbg, "MOR", msg); */
+    if (map == TRUE)
+       cs = SC_mem_monitor(cs, dbg, "MOR", msg);
 
     return(rv);}
 
