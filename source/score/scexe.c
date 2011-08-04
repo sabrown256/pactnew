@@ -126,7 +126,7 @@ static void _SC_exe_find_addr(bfd *et, asection *es, void *data)
 	if (st->pc >= vma)
 	   {sz = bfd_get_section_size(es);
 	    if (st->pc < vma + sz)
-	       {csrcloc sl;
+	       {SC_csrcloc sl;
 
 	        st->found = bfd_find_nearest_line(et, es,
 						  st->symt, st->pc - vma,
@@ -155,7 +155,7 @@ static void _SC_exe_find_offs(exedes *st)
 	((bfd_get_section_flags(st->et, st->es) & SEC_ALLOC) != 0))
        {sz = bfd_get_section_size(st->es);
 	if (st->pc < sz)
-	   {csrcloc sl;
+	   {SC_csrcloc sl;
 
 	    st->found = bfd_find_nearest_line(st->et, st->es,
 					      st->symt, st->pc,
@@ -172,13 +172,13 @@ static void _SC_exe_find_offs(exedes *st)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_EXE_MAP_ADDR - map hex address AD to a srcloc PSL */
+/* _SC_EXE_MAP_ADDR - map hex address AD to a SC_srcloc PSL */
 
-static void _SC_exe_map_addr(srcloc *psl, exedes *st, char *ad)
+static void _SC_exe_map_addr(SC_srcloc *psl, exedes *st, char *ad)
    {int na;
     char s[MAXLINE];
     char *p, *fnc, **ta;
-    srcloc sl;
+    SC_srcloc sl;
     static char *none = "unknown";
 
     SC_strncpy(s, MAXLINE, ad, -1);
@@ -196,7 +196,7 @@ static void _SC_exe_map_addr(srcloc *psl, exedes *st, char *ad)
 	     ad = ta[1];
 	     break;};
 
-    memset(&st->where, 0, sizeof(csrcloc));
+    memset(&st->where, 0, sizeof(SC_csrcloc));
 
     sl.func[0] = '\0';
     SC_strncpy(sl.file, MAXLINE, none, -1);
@@ -239,7 +239,7 @@ static void _SC_exe_map_addr(srcloc *psl, exedes *st, char *ad)
 	    if (st->unwin == 0)
 	       st->found = FALSE;
 	    else
-	       {csrcloc sl;
+	       {SC_csrcloc sl;
 
 		st->found = bfd_find_inliner_info(st->et,
 						  &sl.file,
@@ -283,7 +283,7 @@ static void _SC_exe_map_addr(srcloc *psl, exedes *st, char *ad)
 
 static int _SC_exe_map_addrs(exedes *st, int na, char **ad)
    {int i, rv;
-    srcloc sl;
+    SC_srcloc sl;
 
     rv = TRUE;
 
@@ -386,10 +386,10 @@ static void _SC_exe_close(exedes *st)
 
 /*--------------------------------------------------------------------------*/
 
-/* _SC_EXE_MAP_ADDR - map hex address AD to a srcloc PSL */
+/* _SC_EXE_MAP_ADDR - map hex address AD to a SC_srcloc PSL */
 
-static void _SC_exe_map_addr(srcloc *psl, exedes *st, char *ad)
-   {srcloc sl;
+static void _SC_exe_map_addr(SC_srcloc *psl, exedes *st, char *ad)
+   {SC_srcloc sl;
 
     snprintf(sl.func, MAXLINE, "@%s", ad);
     sl.file[0] = '\0';

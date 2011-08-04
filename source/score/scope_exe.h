@@ -10,6 +10,8 @@
 
 # define PCK_SCOPE_EXE
 
+# include "score.h"
+
 # ifdef HAVE_BFD
 
 #  include <bfd.h>
@@ -63,17 +65,17 @@
 
 /*--------------------------------------------------------------------------*/
 
-typedef struct s_srcloc srcloc;
-typedef struct s_csrcloc csrcloc;
 typedef struct s_exedes exedes;
 typedef struct s_exe_apides exe_apides;
+typedef struct s_SC_srcloc SC_srcloc;
+typedef struct s_SC_csrcloc SC_csrcloc;
 
-struct s_srcloc
+struct s_SC_srcloc
    {int line;
     char file[MAXLINE];
     char func[MAXLINE];};
 
-struct s_csrcloc
+struct s_SC_csrcloc
    {unsigned int line;
     const char *file;
     const char *func;};
@@ -89,7 +91,7 @@ struct s_exedes
    char *ename;             /* executable name */
    char *sname;             /* section name - defaults to NULL */
    char *target;            /* format target */
-   srcloc where;            /* temporary, internal use */
+   SC_srcloc where;         /* temporary, internal use */
    bfd *et;                 /* executable file info */
    asection *es;            /* section info */
    asymbol **symt;	    /* symbol table */
@@ -107,7 +109,7 @@ struct s_exedes
    char *ename;             /* executable name */
    char *sname;             /* section name - defaults to NULL */
    char *target;            /* format target */
-   srcloc where;            /* temporary, internal use */
+   SC_srcloc where;         /* temporary, internal use */
    void *et;                /* executable file info */
    void *es;                /* section info */
    void **symt;	            /* symbol table */
@@ -120,7 +122,7 @@ struct s_exe_apides
    {exedes *(*open)(char *ename, char *sname, char *tgt,
 		    int showf, int bnm, int unw, int dem);
     void (*close)(exedes *st);
-    void (*map_addr)(srcloc *sl, exedes *st, char *ad);
+    void (*map_addr)(SC_srcloc *sl, exedes *st, char *ad);
     int (*map_addrs)(exedes *st, int na, char **ad);};
 
 /*--------------------------------------------------------------------------*/

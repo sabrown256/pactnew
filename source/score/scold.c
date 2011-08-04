@@ -35,9 +35,9 @@ void *SC_alloc(long nitems, long bpi, char *name)
     opt.na   = FALSE;
     opt.zsp  = -1;
     opt.typ  = -1;
-    opt.fnc  = name;
-    opt.file = NULL;
-    opt.line = -1;
+    opt.where.func = name;
+    opt.where.file = NULL;
+    opt.where.line = -1;
 
     rv = _SC_alloc_n(nitems, bpi, &opt);
 
@@ -62,9 +62,9 @@ void *SC_alloc_na(long nitems, long bpi, char *name, int na)
     opt.na   = na;
     opt.zsp  = -1;
     opt.typ  = -1;
-    opt.fnc  = name;
-    opt.file = NULL;
-    opt.line = -1;
+    opt.where.func = name;
+    opt.where.file = NULL;
+    opt.where.line = -1;
 
     p = _SC_alloc_n(nitems, bpi, &opt);
 
@@ -91,9 +91,9 @@ void *SC_alloc_nz(long nitems, long bpi, char *name, int na, int zsp)
     opt.na   = na;
     opt.zsp  = zsp;
     opt.typ  = -1;
-    opt.fnc  = name;
-    opt.file = NULL;
-    opt.line = -1;
+    opt.where.func = name;
+    opt.where.file = NULL;
+    opt.where.line = -1;
 
     p = _SC_alloc_n(nitems, bpi, &opt);
 
@@ -116,9 +116,9 @@ void *SC_realloc(void *p, long nitems, long bpi)
     opt.na   = FALSE;
     opt.zsp  = -1;
     opt.typ  = -1;
-    opt.fnc  = NULL;
-    opt.file = NULL;
-    opt.line = -1;
+    opt.where.func = NULL;
+    opt.where.file = NULL;
+    opt.where.line = -1;
 
     rv = _SC_realloc_n(p, nitems, bpi, &opt);
 
@@ -143,9 +143,9 @@ void *SC_realloc_na(void *p, long nitems, long bpi, int na)
     opt.na   = na;
     opt.zsp  = -1;
     opt.typ  = -1;
-    opt.fnc  = NULL;
-    opt.file = NULL;
-    opt.line = -1;
+    opt.where.func = NULL;
+    opt.where.file = NULL;
+    opt.where.line = -1;
 
     rv = _SC_realloc_n(p, nitems, bpi, &opt);
 
@@ -172,9 +172,9 @@ void *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp)
     opt.na   = na;
     opt.zsp  = zsp;
     opt.typ  = -1;
-    opt.fnc  = NULL;
-    opt.file = NULL;
-    opt.line = -1;
+    opt.where.func = NULL;
+    opt.where.file = NULL;
+    opt.where.line = -1;
 
     rv = _SC_realloc_n(p, nitems, bpi, &opt);
 
@@ -198,9 +198,9 @@ int SC_free(void *p)
     opt.na   = -1;
     opt.zsp  = -1;
     opt.typ  = -1;
-    opt.fnc  = NULL;
-    opt.file = NULL;
-    opt.line = -1;
+    opt.where.func = NULL;
+    opt.where.file = NULL;
+    opt.where.line = -1;
 
     rv = _SC_free_n(p, &opt);
 
@@ -224,9 +224,9 @@ int SC_free_z(void *p, int zsp)
     opt.na   = -1;
     opt.zsp  = zsp;
     opt.typ  = -1;
-    opt.fnc  = NULL;
-    opt.file = NULL;
-    opt.line = -1;
+    opt.where.func = NULL;
+    opt.where.file = NULL;
+    opt.where.line = -1;
 
     rv = _SC_free_n(p, &opt);
 
@@ -306,9 +306,9 @@ char *SC_strsaven(char *s, char *name)
 	opt.na   = TRUE;
 	opt.zsp  = -1;
 	opt.typ  = SC_STRING_I;
-	opt.fnc  = name;
-	opt.file = NULL;
-	opt.line = -1;
+	opt.where.func = name;
+	opt.where.file = NULL;
+	opt.where.line = -1;
 
 	p = _SC_alloc_n(sz, 1, &opt);
 	if (p != NULL)
