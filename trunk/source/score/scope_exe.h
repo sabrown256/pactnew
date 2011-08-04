@@ -56,7 +56,7 @@
    {if (_SC.exe.map_addr != NULL) (_SC.exe.map_addr)(_sl, _st, _ad);}
 
 #define SC_exe_map_addrs(_st, _na, _ad)                                      \
-   ((_SC.exe.map_addrs == NULL) ? NULL :                                     \
+   ((_SC.exe.map_addrs == NULL) ? FALSE :                                    \
                                  (_SC.exe.map_addrs)(_st, _na, _ad))
 
 /*--------------------------------------------------------------------------*/
@@ -80,8 +80,6 @@ struct s_SC_csrcloc
     const char *file;
     const char *func;};
 
-#ifdef HAVE_BFD
-
 struct s_exedes
   {int unwin;               /* unwind inlined functions */
    int showf;     	    /* show function names */
@@ -91,32 +89,12 @@ struct s_exedes
    char *ename;             /* executable name */
    char *sname;             /* section name - defaults to NULL */
    char *target;            /* format target */
-   SC_srcloc where;         /* temporary, internal use */
-   bfd *et;                 /* executable file info */
-   asection *es;            /* section info */
-   asymbol **symt;	    /* symbol table */
-   bfd_vma pc;
-   char err[MAXLINE];};     /* latest error message */
-
-#else
-
-struct s_exedes
-  {int unwin;               /* unwind inlined functions */
-   int showf;     	    /* show function names */
-   int demang;	            /* demangle names */
-   int tailf;	            /* print base file names only - no dirs */
-   int found;               /* internal use */
-   char *ename;             /* executable name */
-   char *sname;             /* section name - defaults to NULL */
-   char *target;            /* format target */
-   SC_srcloc where;         /* temporary, internal use */
+   off_t pc;                /* current address */
+   SC_srcloc where;         /* srcloc of current adderss - internal use */
    void *et;                /* executable file info */
    void *es;                /* section info */
    void **symt;	            /* symbol table */
-   uint64_t pc;
    char err[MAXLINE];};     /* latest error message */
-
-#endif
 
 struct s_exe_apides
    {exedes *(*open)(char *ename, char *sname, char *tgt,
@@ -141,6 +119,7 @@ struct s_exe_apides
 /* SCEXE.C declarations */
 
 extern void
+ _SC_set_demangle_style(char *opt),
  SC_exe_init_api(void);
 
 

@@ -17,6 +17,10 @@
 
 #include "scope_exe.h"
 
+#define GET_ET(_st)    ((bfd *)      (_st)->et)
+#define GET_ES(_st)    ((asection *) (_st)->es)
+#define GET_SYMT(_st)  ((asymbol **) (_st)->symt)
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -25,7 +29,9 @@
 void _SC_set_demangle_style(char *opt)
    {
 
-/* NOTE: Ubuntu 10.10 has version 2.20.51 */
+/* NOTE: Ubuntu 10.4 has version 2.20
+ * and Ubuntu 10.10 has version 2.20.51
+ */
 
 #if BFD_MAJOR_VERSION >= 2
     enum demangling_styles style;
@@ -50,9 +56,12 @@ void _SC_exe_demangle_name(char *d, int nc, exedes *st)
 #if BFD_MAJOR_VERSION >= 2
 
     char *p, *nm;
+    bfd *et;
     
+    et = GET_ET(st);
+
     nm = (char *) st->where.func;
-    p = bfd_demangle(st->et, nm, SC_DEMANGLE_ARG);
+    p = bfd_demangle(et, nm, SC_DEMANGLE_ARG);
     if (p != NULL)
        {SC_strncpy(d, nc, p, -1);
 	free(p);}
@@ -97,12 +106,15 @@ static int _SC_exe_check_formats(bfd *et)
 static long _SC_exe_rd_symt(exedes *st)
    {unsigned int sz;
     long ns;
+    bfd *et;
+
+    et = GET_ET(st);
 
     ns = -1;
-    if ((bfd_get_file_flags(st->et) & HAS_SYMS) != 0)
-       {ns = bfd_read_minisymbols(st->et, FALSE, (void *) &st->symt, &sz);
+    if ((bfd_get_file_flags(et) & HAS_SYMS) != 0)
+       {ns = bfd_read_minisymbols(et, FALSE, (void *) &st->symt, &sz);
 	if (ns == 0)
-	   ns = bfd_read_minisymbols(st->et, TRUE, (void *) &st->symt, &sz);};
+	   ns = bfd_read_minisymbols(et, TRUE, (void *) &st->symt, &sz);};
 
     return(ns);}
 
@@ -116,9 +128,11 @@ static long _SC_exe_rd_symt(exedes *st)
 static void _SC_exe_find_addr(bfd *et, asection *es, void *data)
    {bfd_vma vma;
     bfd_size_type sz;
+    asymbol **symt;
     exedes *st;
 
-    st = (exedes *) data;
+    st   = (exedes *) data;
+    symt = GET_SYMT(st);
 
     if ((st->found == FALSE) &&
 	((bfd_get_section_flags(et, es) & SEC_ALLOC) != 0))
@@ -128,8 +142,7 @@ static void _SC_exe_find_addr(bfd *et, asection *es, void *data)
 	    if (st->pc < vma + sz)
 	       {SC_csrcloc sl;
 
-	        st->found = bfd_find_nearest_line(et, es,
-						  st->symt, st->pc - vma,
+	        st->found = bfd_find_nearest_line(et, es, symt, st->pc - vma,
 						  &sl.file,
 						  &sl.func,
 						  &sl.line);
@@ -137,7 +150,7 @@ static void _SC_exe_find_addr(bfd *et, asection *es, void *data)
 		   {SC_strncpy(st->where.file, MAXLINE, (char *) sl.file, -1);
 		    SC_strncpy(st->where.func, MAXLINE, (char *) sl.func, -1);
 /* GOTCHA: coming up with line number 0 always
-printf("-> fz |%s| |%s| |%d|\n", sl.func, sl.file, sl.line);
+printf("-> fz |%s| |%s| |%u|\n", sl.func, sl.file, sl.line);
 */
 		    st->where.line = sl.line;};};};};
 
@@ -149,16 +162,23 @@ printf("-> fz |%s| |%s| |%d|\n", sl.func, sl.file, sl.line);
 /* _SC_EXE_FIND_OFFS - look for an offset in a section */
 
 static void _SC_exe_find_offs(exedes *st)
-   {bfd_size_type sz;
+   {off_t ad;
+    bfd_size_type sz;
+    bfd *et;
+    asection *es;
+    asymbol **symt;
+    SC_csrcloc sl;
+
+    et   = GET_ET(st);
+    es   = GET_ES(st);
+    symt = GET_SYMT(st);
 
     if ((st->found == FALSE) &&
-	((bfd_get_section_flags(st->et, st->es) & SEC_ALLOC) != 0))
-       {sz = bfd_get_section_size(st->es);
-	if (st->pc < sz)
-	   {SC_csrcloc sl;
-
-	    st->found = bfd_find_nearest_line(st->et, st->es,
-					      st->symt, st->pc,
+	((bfd_get_section_flags(et, es) & SEC_ALLOC) != 0))
+       {ad = st->pc;
+	sz = bfd_get_section_size(es);
+	if (ad < sz)
+	   {st->found = bfd_find_nearest_line(et, es, symt, ad,
 					      &sl.file,
 					      &sl.func,
 					      &sl.line);
@@ -179,7 +199,12 @@ static void _SC_exe_map_addr(SC_srcloc *psl, exedes *st, char *ad)
     char s[MAXLINE];
     char *p, *fnc, **ta;
     SC_srcloc sl;
+    bfd *et;
+    asection *es;
     static char *none = "unknown";
+
+    et = GET_ET(st);
+    es = GET_ES(st);
 
     SC_strncpy(s, MAXLINE, ad, -1);
 
@@ -205,10 +230,10 @@ static void _SC_exe_map_addr(SC_srcloc *psl, exedes *st, char *ad)
     st->pc = bfd_scan_vma(ad, NULL, 16);
 
     st->found = FALSE;
-    if (st->es != NULL)
+    if (es != NULL)
        _SC_exe_find_offs(st);
     else
-       bfd_map_over_sections(st->et, _SC_exe_find_addr, st);
+       bfd_map_over_sections(et, _SC_exe_find_addr, st);
 
     if (st->found == TRUE)
        {do
@@ -241,7 +266,7 @@ static void _SC_exe_map_addr(SC_srcloc *psl, exedes *st, char *ad)
 	    else
 	       {SC_csrcloc sl;
 
-		st->found = bfd_find_inliner_info(st->et,
+		st->found = bfd_find_inliner_info(et,
 						  &sl.file,
 						  &sl.func,
 						  &sl.line);
@@ -367,14 +392,18 @@ static exedes *_SC_exe_open(char *ename, char *sname, char *tgt,
 /* _SC_EXE_CLOSE - close ST and free it */
 
 static void _SC_exe_close(exedes *st)
-   {
+   {bfd *et;
+    asymbol **symt;
 
     if (st != NULL)
-       {if (st->symt != NULL)
-	   {free(st->symt);
+       {et   = GET_ET(st);
+	symt = GET_SYMT(st);
+
+        if (symt != NULL)
+	   {free(symt);
 	    st->symt = NULL;};
 
-	bfd_close(st->et);
+	bfd_close(et);
 
 	CFREE(st);};
 
