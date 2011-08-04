@@ -10,35 +10,6 @@
 
 # define PCK_SCOPE_EXE
 
-# include "score.h"
-
-# ifdef HAVE_BFD
-
-#  include <bfd.h>
-
-#  if BFD_MAJOR_VERSION >= 2
-#   include <demangle.h>
-#   define SC_DEMANGLE_ARG   (DMGL_ANSI | DMGL_PARAMS)
-#  else
-#   define SC_DEMANGLE_ARG   3
-#  endif
-
-#  undef DYNAMIC
-#  undef VOLATILE
-#  undef PROTO
-#  undef EXFUN
-#  undef DEFUN
-#  undef DEFUN_VOID
-#  undef AND
-#  undef DOTS
-#  undef NOARGS
-#  undef PTR
-#  undef PTRCONST
-#  undef LONG_DOUBLE
-#  undef PARAMS
-
-# endif
-
 /*--------------------------------------------------------------------------*/
 
 /*                           PROCEDURAL MACROS                              */
