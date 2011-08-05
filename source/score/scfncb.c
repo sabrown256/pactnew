@@ -841,6 +841,30 @@ int SC_attach_dbg(int pid)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_PUSH_LOC - push the string version of LOC onto STR */
+
+static void _SC_push_loc(SC_array *str, int i, long long ad, SC_csrcloc* loc)
+   {
+
+    if (loc->pfunc[0] == '\0')
+       SC_array_string_add_vcopy(str,
+				 "#%-3d 0x%012llx %s\n",
+				 i, ad, loc->pfile);
+    else if (loc->line < 1)
+       SC_array_string_add_vcopy(str,
+				 "#%-3d 0x%012llx %-24s(%s)\n",
+				 i, ad, loc->pfunc, loc->pfile);
+    else
+       SC_array_string_add_vcopy(str,
+				 "#%-3d 0x%012llx %-24s(%s:%d)\n",
+				 i, ad,
+				 loc->pfunc, loc->pfile, loc->line);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_BACKTRACE_EXE - get the actual backtrace of PID
  *                   - if PID == -1 use the current process
  *                   - return an array of strings with text of backtrace
@@ -886,19 +910,8 @@ static char **_SC_backtrace_exe(int pid, int to)
 
 		     SC_exe_map_addr(&sl, st, out[i]);
 
-		     if (sl.func[0] == '\0')
-		        SC_array_string_add_vcopy(str,
-						  "#%-3d 0x%012llx %s\n",
-						  i, ad, sl.file);
-		     else if (sl.line < 1)
-		        SC_array_string_add_vcopy(str,
-						  "#%-3d 0x%012llx %-24s(%s)\n",
-						  i, ad, sl.func, sl.file);
-		     else
-		        SC_array_string_add_vcopy(str,
-						  "#%-3d 0x%012llx %-24s(%s:%d)\n",
-						  i, ad,
-						  sl.func, sl.file, sl.line);
+		     _SC_push_loc(str, i, ad, &sl.loc);
+
 		     SC_free_strings(t);};
 
 		SC_exe_close(st);};

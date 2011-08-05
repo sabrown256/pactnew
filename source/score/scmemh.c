@@ -66,7 +66,7 @@ static void _SC_mem_history(int act, void *a)
     hst->space  = space;
     hst->nb     = space->length;
     if (act == SC_MEM_ALLOC)
-       hst->name = (char *) space->where.func;
+       hst->name = (char *) space->where.pfunc;
     else
        hst->name = NULL;
 

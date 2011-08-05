@@ -263,9 +263,9 @@ static void INLINE _SC_assign_block(SC_heap_des *ph, mem_header *space,
     desc->ref_count  = 0;
     desc->type       = 0;
     desc->length     = nb;
-    desc->where.func = func;
-    desc->where.file = file;
-    desc->where.line = line;
+    desc->where.pfunc = func;
+    desc->where.pfile = file;
+    desc->where.line  = line;
 
     lb = ph->latest_block;
     if (lb != NULL)
@@ -299,9 +299,9 @@ static INLINE void _SC_deassign_block(SC_heap_des *ph, mem_descriptor *desc,
 
     desc->prev = NULL;
     desc->next = NULL;
-    desc->where.func = (char *) addr;
-    desc->where.file = NULL;
-    desc->where.line = -1;
+    desc->where.pfunc = (char *) addr;
+    desc->where.pfile = NULL;
+    desc->where.line  = -1;
 
     return;}
 
@@ -515,7 +515,7 @@ static void *_SC_prim_alloc(size_t nbp, SC_heap_des *ph, int zsp)
 	if (md != NULL)
 
 /* attach the new chunks to the free list */
-	   {ph->free_list[j] = (mem_descriptor *) (md->where.func);
+	   {ph->free_list[j] = (mem_descriptor *) (md->where.pfunc);
 
 /* take the top of the free list for this size chunk */
 	    md->initialized = FALSE;
@@ -662,8 +662,8 @@ void *_SC_alloc_n(long ni, long bpi, void *arg)
 	typ  = -1;}
     else
        {opt  = (SC_mem_opt *) arg;
-        func = (char *) opt->where.func;
-        file = (char *) opt->where.file;
+        func = (char *) opt->where.pfunc;
+        file = (char *) opt->where.pfile;
         line = opt->where.line;
 	prm  = opt->perm;
 	na   = opt->na;
@@ -761,9 +761,9 @@ void *SC_alloc_n(long ni, long bpi, ...)
     opt.zsp  = -1;
     opt.typ  = -1;
 
-    opt.where.func = NULL;
-    opt.where.file = NULL;
-    opt.where.line = -1;
+    opt.where.pfunc = NULL;
+    opt.where.pfile = NULL;
+    opt.where.line  = -1;
 
     SC_VA_START(bpi);
     for (ok = TRUE; ok == TRUE; )
@@ -782,10 +782,10 @@ void *SC_alloc_n(long ni, long bpi, ...)
                   opt.typ = SC_VA_ARG(int);
                   break;
              case SC_MEM_ATTR_FUNC :
-                  opt.where.func = SC_VA_ARG(char *);
+                  opt.where.pfunc = SC_VA_ARG(char *);
                   break;
              case SC_MEM_ATTR_FILE :
-                  opt.where.file = SC_VA_ARG(char *);
+                  opt.where.pfile = SC_VA_ARG(char *);
                   break;
              case SC_MEM_ATTR_LINE :
                   opt.where.line = SC_VA_ARG(int);
@@ -975,9 +975,9 @@ void *SC_realloc_n(void *p, long ni, long bpi, ...)
     opt.zsp  = -1;
     opt.typ  = -1;
 
-    opt.where.func = NULL;
-    opt.where.file = NULL;
-    opt.where.line = -1;
+    opt.where.pfunc = NULL;
+    opt.where.pfile = NULL;
+    opt.where.line  = -1;
 
     SC_VA_START(bpi);
     for (ok = TRUE; ok == TRUE; )
@@ -996,10 +996,10 @@ void *SC_realloc_n(void *p, long ni, long bpi, ...)
                   opt.typ = SC_VA_ARG(int);
                   break;
              case SC_MEM_ATTR_FUNC :
-                  opt.where.func = SC_VA_ARG(char *);
+                  opt.where.pfunc = SC_VA_ARG(char *);
                   break;
              case SC_MEM_ATTR_FILE :
-                  opt.where.file = SC_VA_ARG(char *);
+                  opt.where.pfile = SC_VA_ARG(char *);
                   break;
              case SC_MEM_ATTR_LINE :
                   opt.where.line = SC_VA_ARG(int);
@@ -1119,9 +1119,9 @@ int SC_free_n(void *p, ...)
     opt.zsp  = -1;
     opt.typ  = -1;
 
-    opt.where.func = NULL;
-    opt.where.file = NULL;
-    opt.where.line = -1;
+    opt.where.pfunc = NULL;
+    opt.where.pfile = NULL;
+    opt.where.line  = -1;
 
     SC_VA_START(p);
     for (ok = TRUE; ok == TRUE; )
@@ -1140,10 +1140,10 @@ int SC_free_n(void *p, ...)
                   opt.typ = SC_VA_ARG(int);
                   break;
              case SC_MEM_ATTR_FUNC :
-                  opt.where.func = SC_VA_ARG(char *);
+                  opt.where.pfunc = SC_VA_ARG(char *);
                   break;
              case SC_MEM_ATTR_FILE :
-                  opt.where.file = SC_VA_ARG(char *);
+                  opt.where.pfile = SC_VA_ARG(char *);
                   break;
              case SC_MEM_ATTR_LINE :
                   opt.where.line = SC_VA_ARG(int);
