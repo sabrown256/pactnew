@@ -151,10 +151,13 @@ static void _SC_malloc_loc(char *d, int nc)
 
 		if (st != NULL)
 		   {SC_srcloc sl;
+		    SC_csrcloc *loc;
+
+		    loc = &sl.loc;
 
 		    SC_exe_map_addr(&sl, st, pt);
 		    snprintf(s, MAXLINE, "%s(%s:%d)",
-			     sl.func, sl.file, sl.line);
+			     loc->pfunc, loc->pfile, loc->line);
 
 		    pt = s;
 

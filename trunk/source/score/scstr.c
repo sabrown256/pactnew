@@ -124,9 +124,9 @@ char *SC_strsavec(char *s, int memfl,
 	opt.zsp  = -1;
 	opt.typ  = SC_STRING_I;
 
-	opt.where.func = file;
-	opt.where.file = fnc;
-	opt.where.line = line;
+	opt.where.pfunc = file;
+	opt.where.pfile = fnc;
+	opt.where.line  = line;
 
 	p = _SC_alloc_n(sz, sizeof(char), &opt);
 	if (p != NULL)

@@ -41,15 +41,18 @@ typedef struct s_exe_apides exe_apides;
 typedef struct s_SC_srcloc SC_srcloc;
 typedef struct s_SC_csrcloc SC_csrcloc;
 
-struct s_SC_srcloc
-   {int line;
-    char file[MAXLINE];
-    char func[MAXLINE];};
-
 struct s_SC_csrcloc
    {unsigned int line;
-    const char *file;
-    const char *func;};
+    const char *pfile;
+    const char *pfunc;};
+
+/* this is like the SC_csrcloc but hold storage for the strings
+ * most usages can take the SC_csrcloc but some demand this variant
+ */
+struct s_SC_srcloc
+   {SC_csrcloc loc;
+    char file[MAXLINE];
+    char func[MAXLINE];};
 
 struct s_exedes
   {int unwin;               /* unwind inlined functions */

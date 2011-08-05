@@ -28,6 +28,11 @@
 #define GET_ES(_st)    ((asection *) (_st)->es)
 #define GET_SYMT(_st)  ((asymbol **) (_st)->symt)
 
+#define SAVE_LOC(st, sl)                                                    \
+   {SC_strncpy(st->where.file, MAXLINE, (char *) sl.pfile, -1);             \
+    SC_strncpy(st->where.func, MAXLINE, (char *) sl.pfunc, -1);             \
+    st->where.loc.line = sl.line;}
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -133,10 +138,10 @@ static long _SC_exe_rd_symt(exedes *st)
  */
 
 static void _SC_exe_find_addr(bfd *et, asection *es, void *data)
-   {bfd_vma vma;
-    bfd_size_type sz;
+   {off_t vma, adf, sz;
     asymbol **symt;
     exedes *st;
+    SC_csrcloc sl;
 
     st   = (exedes *) data;
     symt = GET_SYMT(st);
@@ -144,22 +149,16 @@ static void _SC_exe_find_addr(bfd *et, asection *es, void *data)
     if ((st->found == FALSE) &&
 	((bfd_get_section_flags(et, es) & SEC_ALLOC) != 0))
        {vma = bfd_get_section_vma(et, es);
-	if (st->pc >= vma)
+	adf = st->pc - vma;
+	if (0 <= adf)
 	   {sz = bfd_get_section_size(es);
-	    if (st->pc < vma + sz)
-	       {SC_csrcloc sl;
-
-	        st->found = bfd_find_nearest_line(et, es, symt, st->pc - vma,
-						  &sl.file,
-						  &sl.func,
+	    if (adf < sz)
+	       {st->found = bfd_find_nearest_line(et, es, symt, adf,
+						  &sl.pfile,
+						  &sl.pfunc,
 						  &sl.line);
 		if (st->found == TRUE)
-		   {SC_strncpy(st->where.file, MAXLINE, (char *) sl.file, -1);
-		    SC_strncpy(st->where.func, MAXLINE, (char *) sl.func, -1);
-/* GOTCHA: coming up with line number 0 always
-printf("-> fz |%s| |%s| |%u|\n", sl.func, sl.file, sl.line);
-*/
-		    st->where.line = sl.line;};};};};
+		   SAVE_LOC(st, sl);};};};
 
     return;}
 
@@ -169,8 +168,7 @@ printf("-> fz |%s| |%s| |%u|\n", sl.func, sl.file, sl.line);
 /* _SC_EXE_FIND_OFFS - look for an offset in a section */
 
 static void _SC_exe_find_offs(exedes *st)
-   {off_t ad;
-    bfd_size_type sz;
+   {off_t ad, sz;
     bfd *et;
     asection *es;
     asymbol **symt;
@@ -186,13 +184,31 @@ static void _SC_exe_find_offs(exedes *st)
 	sz = bfd_get_section_size(es);
 	if (ad < sz)
 	   {st->found = bfd_find_nearest_line(et, es, symt, ad,
-					      &sl.file,
-					      &sl.func,
+					      &sl.pfile,
+					      &sl.pfunc,
 					      &sl.line);
 	    if (st->found == TRUE)
-	       {SC_strncpy(st->where.file, MAXLINE, (char *) sl.file, -1);
-		SC_strncpy(st->where.func, MAXLINE, (char *) sl.func, -1);
-		st->where.line = sl.line;};};};
+	       SAVE_LOC(st, sl);};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_EXE_FIND_INLINE - find the current location for inlines */
+
+static void _SC_exe_find_inline(exedes *st)
+   {bfd *et;
+    SC_csrcloc sl;
+
+    et = GET_ET(st);
+
+    st->found = bfd_find_inliner_info(et,
+				      &sl.pfile,
+				      &sl.pfunc,
+				      &sl.line);
+    if (st->found == TRUE)
+       SAVE_LOC(st, sl);
 
     return;}
 
@@ -206,12 +222,21 @@ static void _SC_exe_map_addr(SC_srcloc *psl, exedes *st, char *ad)
     char s[MAXLINE];
     char *p, *fnc, **ta;
     SC_srcloc sl;
+    SC_csrcloc *loc;
     bfd *et;
     asection *es;
     static char *none = "unknown";
 
     et = GET_ET(st);
     es = GET_ES(st);
+
+/* setup location structs */
+    sl.func[0] = '\0';
+    SC_strncpy(sl.file, MAXLINE, none, -1);
+    loc = &sl.loc;
+    loc->line  = -1;
+    loc->pfile = sl.file;
+    loc->pfunc = sl.func;
 
     SC_strncpy(s, MAXLINE, ad, -1);
 
@@ -229,10 +254,6 @@ static void _SC_exe_map_addr(SC_srcloc *psl, exedes *st, char *ad)
 	     break;};
 
     memset(&st->where, 0, sizeof(SC_csrcloc));
-
-    sl.func[0] = '\0';
-    SC_strncpy(sl.file, MAXLINE, none, -1);
-    sl.line = -1;
 
     st->pc = bfd_scan_vma(ad, NULL, 16);
 
@@ -266,37 +287,28 @@ static void _SC_exe_map_addr(SC_srcloc *psl, exedes *st, char *ad)
 		SC_strncpy(sl.file, MAXLINE, fn, -1);};
 
 /* get the line number */
-	    sl.line = st->where.line;
+	    loc->line = st->where.loc.line;
 
 	    if (st->unwin == 0)
 	       st->found = FALSE;
 	    else
-	       {SC_csrcloc sl;
-
-		st->found = bfd_find_inliner_info(et,
-						  &sl.file,
-						  &sl.func,
-						  &sl.line);
-		if (st->found == TRUE)
-		   {SC_strncpy(st->where.file, MAXLINE, (char *) sl.file, -1);
-		    SC_strncpy(st->where.func, MAXLINE, (char *) sl.func, -1);
-		    st->where.line = sl.line;};};}
+               _SC_exe_find_inline(st);}
 	while (st->found == TRUE);}
 
 /* if no address found do the best possible from the address */
     else
        {if (na == 1)
 	   {SC_strncpy(sl.file, MAXLINE, none, -1);
-	    sl.line = SC_strtol(ta[0], NULL, 16);}
+	    loc->line = SC_strtol(ta[0], NULL, 16);}
 
 	else if (na == 2)
 	   {SC_strncpy(sl.file, MAXLINE, ta[0], -1);
-	    sl.line = SC_strtol(ta[1], NULL, 16);}
+	    loc->line = SC_strtol(ta[1], NULL, 16);}
 
 	else if (na > 2)
 	   {SC_strncpy(sl.file, MAXLINE, ta[0], -1);
 	    SC_strncpy(sl.func, MAXLINE, ta[1], -1);
-	    sl.line = 0;};};
+	    loc->line = 0;};};
 
     SC_free_strings(ta);
 
@@ -316,16 +328,19 @@ static void _SC_exe_map_addr(SC_srcloc *psl, exedes *st, char *ad)
 static int _SC_exe_map_addrs(exedes *st, int na, char **ad)
    {int i, rv;
     SC_srcloc sl;
+    SC_csrcloc *loc;
 
     rv = TRUE;
+
+    loc = &sl.loc;
 
     for (i = 0; i < na; i++)
         {_SC_exe_map_addr(&sl, st, ad[i]);
 
 	 if (st->showf == TRUE)
-	    printf("%s %s:%d\n", sl.func, sl.file, sl.line);
+	    printf("%s %s:%d\n", loc->pfunc, loc->pfile, loc->line);
 	 else
-	    printf(" %s:%d\n", sl.file, sl.line);};
+	    printf(" %s:%d\n", loc->pfile, loc->line);};
 
     return(rv);}
 
