@@ -23,6 +23,31 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_PUSH_LOC - push the string version of LOC onto STR */
+
+static void _SC_push_loc(SC_array *str, int i, long ad, SC_srcloc *loc)
+   {char fnc[MAXLINE], fnm[MAXLINE], t[MAXLINE];
+
+    SC_strncpy(fnc, MAXLINE, (char *) loc->pfunc, -1);
+    SC_strncpy(fnm, MAXLINE, (char *) loc->pfile, -1);
+
+    if (fnc[0] == '\0')
+       snprintf(t, MAXLINE, "#%-3d 0x%012lx %s\n",
+		i, ad, fnm);
+    else if (loc->line < 1)
+       snprintf(t, MAXLINE, "#%-3d 0x%012lx %-24s(%s)\n",
+		i, ad, fnc, fnm);
+    else
+       snprintf(t, MAXLINE, "#%-3d 0x%012lx %-24s(%s:%d)\n",
+		i, ad, fnc, fnm, loc->line);
+
+    SC_array_string_add_copy(str, t);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_MEM_REAL - convert the Nth token (according to DELIM) in the string S
  *              - specifying an amount of memory to a double
  *              - the string may end in g, G, m, M, k, or K
@@ -841,30 +866,6 @@ int SC_attach_dbg(int pid)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_PUSH_LOC - push the string version of LOC onto STR */
-
-static void _SC_push_loc(SC_array *str, int i, long long ad, SC_csrcloc* loc)
-   {
-
-    if (loc->pfunc[0] == '\0')
-       SC_array_string_add_vcopy(str,
-				 "#%-3d 0x%012llx %s\n",
-				 i, ad, loc->pfile);
-    else if (loc->line < 1)
-       SC_array_string_add_vcopy(str,
-				 "#%-3d 0x%012llx %-24s(%s)\n",
-				 i, ad, loc->pfunc, loc->pfile);
-    else
-       SC_array_string_add_vcopy(str,
-				 "#%-3d 0x%012llx %-24s(%s:%d)\n",
-				 i, ad,
-				 loc->pfunc, loc->pfile, loc->line);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _SC_BACKTRACE_EXE - get the actual backtrace of PID
  *                   - if PID == -1 use the current process
  *                   - return an array of strings with text of backtrace
@@ -885,12 +886,13 @@ static char **_SC_backtrace_exe(int pid, int to)
  */
     if ((pid < 0) && (_SC.exe.open != NULL))
        {int n;
-	long long ad;
+	long ad;
 	void **bf;
 	char s[MAXLINE];
 	char **out, **ta;
+	SC_storloc sl;
+	SC_srcloc *loc;
 	SC_array *str;
-	SC_srcloc sl;
 	exedes *st;
 
 	bf  = CMAKE_N(void *, 100);
@@ -902,7 +904,8 @@ static char **_SC_backtrace_exe(int pid, int to)
 
 	    st = SC_exe_open(path, NULL, NULL, TRUE, TRUE, TRUE, TRUE);
 	    if (st != NULL)
-	       {n--;
+	       {loc = &sl.loc;
+		n--;
 		for (i = 0; i < n; i++)
 		    {SC_strncpy(s, MAXLINE, out[i], -1);
 		     ta = SC_tokenize(s, " \t[]");
@@ -910,7 +913,7 @@ static char **_SC_backtrace_exe(int pid, int to)
 
 		     SC_exe_map_addr(&sl, st, out[i]);
 
-		     _SC_push_loc(str, i, ad, &sl.loc);
+		     _SC_push_loc(str, i, ad, loc);
 
 		     SC_free_strings(t);};
 
@@ -925,7 +928,6 @@ static char **_SC_backtrace_exe(int pid, int to)
     else
        {if (rv == 0)
 	   {cmd = SC_dsnprintf(TRUE, "atdbg -r -p %d -e %s", epid, path);
-printf("->a |%s|\n", cmd);
             rv = SC_exec(&t, cmd, NULL, to);
 	    CFREE(cmd);};};
 

@@ -38,19 +38,19 @@
 
 typedef struct s_exedes exedes;
 typedef struct s_exe_apides exe_apides;
+typedef struct s_SC_storloc SC_storloc;
 typedef struct s_SC_srcloc SC_srcloc;
-typedef struct s_SC_csrcloc SC_csrcloc;
 
-struct s_SC_csrcloc
+struct s_SC_srcloc
    {unsigned int line;
     const char *pfile;
     const char *pfunc;};
 
-/* this is like the SC_csrcloc but hold storage for the strings
- * most usages can take the SC_csrcloc but some demand this variant
+/* this is like the SC_srcloc but hold storage for the strings
+ * most usages can take the SC_srcloc but some demand this variant
  */
-struct s_SC_srcloc
-   {SC_csrcloc loc;
+struct s_SC_storloc
+   {SC_srcloc loc;
     char file[MAXLINE];
     char func[MAXLINE];};
 
@@ -64,7 +64,7 @@ struct s_exedes
    char *sname;             /* section name - defaults to NULL */
    char *target;            /* format target */
    off_t pc;                /* current address */
-   SC_srcloc where;         /* srcloc of current adderss - internal use */
+   SC_storloc where;         /* srcloc of current adderss - internal use */
    void *et;                /* executable file info */
    void *es;                /* section info */
    void **symt;	            /* symbol table */
@@ -74,7 +74,7 @@ struct s_exe_apides
    {exedes *(*open)(char *ename, char *sname, char *tgt,
 		    int showf, int bnm, int unw, int dem);
     void (*close)(exedes *st);
-    void (*map_addr)(SC_srcloc *sl, exedes *st, char *ad);
+    void (*map_addr)(SC_storloc *sl, exedes *st, char *ad);
     int (*map_addrs)(exedes *st, int na, char **ad);};
 
 /*--------------------------------------------------------------------------*/

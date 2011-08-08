@@ -150,8 +150,8 @@ static void _SC_malloc_loc(char *d, int nc)
 		    SC_gs.exe_info = st;};
 
 		if (st != NULL)
-		   {SC_srcloc sl;
-		    SC_csrcloc *loc;
+		   {SC_storloc sl;
+		    SC_srcloc *loc;
 
 		    loc = &sl.loc;
 

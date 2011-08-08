@@ -873,6 +873,42 @@ void SC_save_argv_env(int argc, char **argv, char **env)
     return;}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_FORMAT_LOC - format the LOC info in D */
+
+char *_SC_format_loc(char *d, int nc, SC_srcloc *loc, int sf, int tail)
+   {int filep;
+    char t[MAXLINE];
+    char *p, *fnm;
+
+    filep = ((loc->pfile != NULL) && (loc->pfile[0] != '\0'));
+
+    t[0] = '\0';
+    if (sf == TRUE)
+       {if (filep == TRUE)
+	   {fnm = (char *) loc->pfile;
+	    if (tail == TRUE)
+	       {p = strrchr(fnm, '/');
+		if (p != NULL)
+		   fnm = p + 1;};
+	    SC_strncpy(t, MAXLINE, fnm, -1);};};
+
+    if (filep == TRUE)
+       snprintf(d, nc, "%s(%s:%d)", loc->pfunc, t, loc->line);
+
+    else if (loc->pfunc != NULL)
+       {if (loc->line != -1)
+	   snprintf(d, nc, "%s (%d)", loc->pfunc, loc->line);
+	else
+	   SC_strncpy(d, nc, (char *) loc->pfunc, -1);}
+
+    else
+       SC_strncpy(d, nc, "-none-", -1);
+
+    return(d);}
+
+/*--------------------------------------------------------------------------*/
 
 /*                     ASSOCIATION LIST PRIMITIVES                          */
 
