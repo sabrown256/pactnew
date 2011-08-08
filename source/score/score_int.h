@@ -320,6 +320,12 @@ extern void
  _SC_init_error_stack(SC_array *err, int id);
 
 
+/* SCEXE.C declarations */
+
+extern char
+ *_SC_format_loc(char *d, int nc, SC_srcloc *loc, int sf, int tail);
+
+
 /* SCFIS.C declarations */
 
 extern int

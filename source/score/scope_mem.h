@@ -145,7 +145,7 @@ struct s_mem_descriptor
     char initialized;
     short ref_count;
     short type;
-    SC_csrcloc where;};
+    SC_srcloc where;};
 
 union u_mem_header
    {mem_descriptor block;
@@ -183,7 +183,7 @@ struct s_SC_mem_opt
     int na;               /* if 1 do not add block to allocated count */
     int zsp;              /* zero space flag */
     int typ;              /* set the type field to this type index */
-    SC_csrcloc where;};   /* info supplied free by C99 */
+    SC_srcloc where;};   /* info supplied free by C99 */
 
 struct s_SC_mem_hst
    {int action;

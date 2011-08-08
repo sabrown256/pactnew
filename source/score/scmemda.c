@@ -383,24 +383,12 @@ void *SC_copy_item(void *in)
 /* _SC_BLOCK_NAME - return the name associated with the object P */
 
 char *_SC_block_name(mem_descriptor *desc)
-   {char *p, *rv;
+   {char *rv;
     static char name[MAXLINE];
 
     rv = NULL;
     if (desc != NULL)
-       {if (desc->where.pfile != NULL)
-	   {p = strrchr(desc->where.pfile, '/');
-	    if (p == NULL)
-	       p = (char *) desc->where.pfile;
-	    else
-	       p++;
-	    snprintf(name, MAXLINE, "%s(%s:%d)", desc->where.pfunc, p, desc->where.line);}
-	else if (desc->where.pfunc != NULL)
-	   SC_strncpy(name, MAXLINE, (char *) desc->where.pfunc, -1);
-	else
-	   SC_strncpy(name, MAXLINE, "-none-", -1);
-
-	rv = name;};
+       rv = _SC_format_loc(name, MAXLINE, &desc->where, TRUE, TRUE);
 
     return(rv);}
 

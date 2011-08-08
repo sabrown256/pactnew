@@ -88,6 +88,43 @@ void _SC_exe_demangle_name(char *d, int nc, exedes *st)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_INIT_STORLOC - setup SL to that its SC_strloc points to its spaces */
+
+SC_srcloc *_SC_init_storloc(SC_storloc *sl)
+   {SC_srcloc *loc;
+
+    memset(sl, 0, sizeof(SC_storloc));
+
+    loc = &sl->loc;
+    loc->line  = -1;
+    loc->pfile = sl->file;
+    loc->pfunc = sl->func;
+
+    return(loc);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_COPY_STORLOC - copy SC_storloc S into D */
+
+void _SC_copy_storloc(SC_storloc *d, SC_storloc *s)
+   {int nc;
+
+    if ((d != NULL) && (s != NULL))
+       {_SC_init_storloc(d);
+
+	nc = sizeof(s->file);
+
+	d->loc.line = s->loc.line;
+
+	strncpy(d->file, s->file, nc);
+	strncpy(d->func, s->func, nc);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_EXE_CHECK_FORMATS - report possible format matches for ET */
 
 static int _SC_exe_check_formats(bfd *et)
@@ -141,7 +178,7 @@ static void _SC_exe_find_addr(bfd *et, asection *es, void *data)
    {off_t vma, adf, sz;
     asymbol **symt;
     exedes *st;
-    SC_csrcloc sl;
+    SC_srcloc sl;
 
     st   = (exedes *) data;
     symt = GET_SYMT(st);
@@ -172,7 +209,7 @@ static void _SC_exe_find_offs(exedes *st)
     bfd *et;
     asection *es;
     asymbol **symt;
-    SC_csrcloc sl;
+    SC_srcloc sl;
 
     et   = GET_ET(st);
     es   = GET_ES(st);
@@ -199,7 +236,7 @@ static void _SC_exe_find_offs(exedes *st)
 
 static void _SC_exe_find_inline(exedes *st)
    {bfd *et;
-    SC_csrcloc sl;
+    SC_srcloc sl;
 
     et = GET_ET(st);
 
@@ -215,14 +252,14 @@ static void _SC_exe_find_inline(exedes *st)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_EXE_MAP_ADDR - map hex address AD to a SC_srcloc PSL */
+/* _SC_EXE_MAP_ADDR - map hex address AD to a SC_storloc PSL */
 
-static void _SC_exe_map_addr(SC_srcloc *psl, exedes *st, char *ad)
+static void _SC_exe_map_addr(SC_storloc *psl, exedes *st, char *ad)
    {int na;
     char s[MAXLINE];
     char *p, *fnc, **ta;
-    SC_srcloc sl;
-    SC_csrcloc *loc;
+    SC_storloc sl;
+    SC_srcloc *loc;
     bfd *et;
     asection *es;
     static char *none = "unknown";
@@ -230,13 +267,8 @@ static void _SC_exe_map_addr(SC_srcloc *psl, exedes *st, char *ad)
     et = GET_ET(st);
     es = GET_ES(st);
 
-/* setup location structs */
-    sl.func[0] = '\0';
+    loc = _SC_init_storloc(&sl);
     SC_strncpy(sl.file, MAXLINE, none, -1);
-    loc = &sl.loc;
-    loc->line  = -1;
-    loc->pfile = sl.file;
-    loc->pfunc = sl.func;
 
     SC_strncpy(s, MAXLINE, ad, -1);
 
@@ -253,7 +285,7 @@ static void _SC_exe_map_addr(SC_srcloc *psl, exedes *st, char *ad)
 	     ad = ta[1];
 	     break;};
 
-    memset(&st->where, 0, sizeof(SC_csrcloc));
+    memset(&st->where, 0, sizeof(SC_srcloc));
 
     st->pc = bfd_scan_vma(ad, NULL, 16);
 
@@ -312,7 +344,7 @@ static void _SC_exe_map_addr(SC_srcloc *psl, exedes *st, char *ad)
 
     SC_free_strings(ta);
 
-    *psl = sl;
+    _SC_copy_storloc(psl, &sl);
 
     return;}
 
@@ -327,8 +359,9 @@ static void _SC_exe_map_addr(SC_srcloc *psl, exedes *st, char *ad)
 
 static int _SC_exe_map_addrs(exedes *st, int na, char **ad)
    {int i, rv;
-    SC_srcloc sl;
-    SC_csrcloc *loc;
+    char t[MAXLINE];
+    SC_storloc sl;
+    SC_srcloc *loc;
 
     rv = TRUE;
 
@@ -336,11 +369,8 @@ static int _SC_exe_map_addrs(exedes *st, int na, char **ad)
 
     for (i = 0; i < na; i++)
         {_SC_exe_map_addr(&sl, st, ad[i]);
-
-	 if (st->showf == TRUE)
-	    printf("%s %s:%d\n", loc->pfunc, loc->pfile, loc->line);
-	 else
-	    printf(" %s:%d\n", loc->pfile, loc->line);};
+	 _SC_format_loc(t, MAXLINE, loc, st->showf, st->tailf);
+	 printf("%s\n", t);};
 
     return(rv);}
 
@@ -437,16 +467,14 @@ static void _SC_exe_close(exedes *st)
 
 /*--------------------------------------------------------------------------*/
 
-/* _SC_EXE_MAP_ADDR - map hex address AD to a SC_srcloc PSL */
+/* _SC_EXE_MAP_ADDR - map hex address AD to a SC_storloc PSL */
 
-static void _SC_exe_map_addr(SC_srcloc *psl, exedes *st, char *ad)
-   {SC_srcloc sl;
+static void _SC_exe_map_addr(SC_storloc *psl, exedes *st, char *ad)
+   {
 
-    snprintf(sl.func, MAXLINE, "@%s", ad);
-    sl.file[0] = '\0';
-    sl.line    = -1;
+    _SC_init_storloc(psl);
 
-    *psl = sl;
+    snprintf(psl->func, MAXLINE, "@%s", ad);
 
     return;}
 
