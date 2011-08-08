@@ -872,7 +872,7 @@ int SC_attach_dbg(int pid)
  */
 
 static char **_SC_backtrace_exe(int pid, int to)
-   {int i, epid, rv;
+   {int i, epid, ok, rv;
     char path[PATH_MAX];
     char *cmd, **t;
 
@@ -884,6 +884,7 @@ static char **_SC_backtrace_exe(int pid, int to)
 /* current process and executable access active
  * might as well save the fork of a child process
  */
+    ok = FALSE;
     if ((pid < 0) && (_SC.exe.open != NULL))
        {int n;
 	long ad;
@@ -917,7 +918,9 @@ static char **_SC_backtrace_exe(int pid, int to)
 
 		     SC_free_strings(t);};
 
-		SC_exe_close(st);};
+		SC_exe_close(st);
+
+		ok = TRUE;};
 
 	    t = _SC_array_string_join(&str);};
 
@@ -925,11 +928,10 @@ static char **_SC_backtrace_exe(int pid, int to)
 	free(out);}
 
 /* process other than current or no executable access */
-    else
-       {if (rv == 0)
-	   {cmd = SC_dsnprintf(TRUE, "atdbg -r -p %d -e %s", epid, path);
-            rv = SC_exec(&t, cmd, NULL, to);
-	    CFREE(cmd);};};
+    if ((ok == FALSE) && (rv == 0))
+       {cmd = SC_dsnprintf(TRUE, "atdbg -r -p %d -e %s", epid, path);
+	rv = SC_exec(&t, cmd, NULL, to);
+	CFREE(cmd);};
 
 /* strip off newlines */
     if (t != NULL)

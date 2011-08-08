@@ -4,16 +4,16 @@
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
  *
- * #include "cpyright.h"
- *
  */
 
-#include <stdio.h>
-#include <stdint.h>
+#include "cpyright.h"
 
+#include "scstd.h"
+
+#undef N_DOUBLES_MD
 #define N_DOUBLES_MD 3
 
-#include "scope_thread.h"
+/* #include "scope_thread.h" */
 #include "scope_mem.h"
 
 /*---------------------------------------------------------------------------*/

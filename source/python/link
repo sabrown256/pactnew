@@ -57,6 +57,7 @@ flog $Log set ShLibs   = ( `pact +l -info Shared_LD_Lib | uniq` )
 flog $Log set LDPath   = ( `pact +l -info LDPath | uniq` )
 flog $Log set LDRPath  = ( `pact +l -info LDRPath | uniq` )
 flog $Log set MDLibs   = ( `pact +l -info MDLib | uniq` )
+flog $Log set MDILibs  = ( `pact +l -info MDI_Lib | uniq` )
 flog $Log set MDGLibs  = ( `pact +l -info MDGLib | uniq` )
 flog $Log set GCCLib   = ( `pact +l -info GCCLib | uniq` )
 
@@ -73,7 +74,7 @@ flog $Log set LD     = ( $Link $SFLAGS )
 flog $Log set PyPath = $DevLib/python${PyVers}
 flog $Log set PyPact = $PyPath/pact-${PyPACTVers}
 
-flog $Log set Libs   = ( $LDRPath -L$DevLib $LDPath $MDGLibs -lc -lm $ShLibs $DPLibs $MDLibs )
+flog $Log set Libs   = ( $LDRPath -L$DevLib $LDPath $MDGLibs $MDILibs -lc -lm $ShLibs $DPLibs $MDLibs )
 if ("$GCCLib" != "") then
    flog $Log set Libs = ( $Libs -L$GCCLib -lgcc )
 endif

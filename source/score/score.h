@@ -369,6 +369,7 @@ typedef void (*PFFileCallback)(int fd, int mask, void *a);
 typedef PROCESS *(*PFProcInit)(char **argv, char *mode, int type);
 typedef void (*PFProcExit)(PROCESS *pp, void *a);
 typedef int (*PFIVA)(void *a);
+typedef	int (*PFEVExit)(int *rv, void *a);
 
 FUNCTION_POINTER(size_t, (*PFSize_t));
 FUNCTION_POINTER(pcons, *(*PFPPcons));
@@ -915,6 +916,11 @@ extern void
  SC_remove_event_loop_callback(SC_evlpdes *pe, int type, void *p),
  SC_set_poll_masks(int accept, int reject),
  SC_get_poll_masks(int *paccept, int *preject),
+ SC_get_event_loop_callback(SC_evlpdes *pe, int type, void *p,
+			    PFSignal_handler *psigio,
+			    PFSignal_handler *psigchld,
+			    PFEVExit *pex,
+			    PFFileCallback *pacc, PFFileCallback *prej),
  SC_rl_io_callback(int fd),
  SC_rl_io_callback_file(FILE *fp),
  SC_catch_io_interrupts(int flag);
