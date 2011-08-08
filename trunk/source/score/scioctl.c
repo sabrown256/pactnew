@@ -317,6 +317,60 @@ void SC_remove_event_loop_callback(SC_evlpdes *pe, int type, void *p)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_GET_EVENT_LOOP_CALLBACK - return the callback functions associated
+ *                            - with the implied I/O descriptor
+ *                            - (TYPE and P) in the
+ *                            - event loop PE
+ */
+
+void SC_get_event_loop_callback(SC_evlpdes *pe, int type, void *p,
+				PFSignal_handler *psigio,
+				PFSignal_handler *psigchld,
+				PFEVExit *pex,
+				PFFileCallback *pacc, PFFileCallback *prej)
+   {int i, n, fd;
+    SC_poll_desc *pd;
+    PROCESS *pp;
+    FILE *fp;
+
+    if (p == NULL)
+       return;
+
+    if (type == SC_PROCESS_I)
+       {pp = (PROCESS *) p;
+	fd = pp->in;}
+
+    else if (type == SC_FILE_I)
+       {fp = (FILE *) p;
+	fd = fileno(fp);}
+
+    else
+       fd = *(int *) p;
+
+    n = SC_array_get_n(pe->fd);
+    for (i = 0; i < n; i++)
+        {pd = SC_array_get(pe->fd, i);
+	 if (pd->fd == fd)
+            {if (pacc != NULL)
+	        *pacc = SC_array_get(pe->faccpt, i);
+	     if (prej != NULL)
+	        *prej = SC_array_get(pe->frejct, i);
+             break;};};
+
+    if (psigio != NULL)
+       *psigio = pe->sigio;
+
+    if (psigchld != NULL)
+       *psigchld = pe->sigchld;
+
+    if (pex != NULL)
+       *pex = pe->exitf;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_EVENT_LOOP_POLL - poll the registered file descriptors and dispatch
  *                    - to their assigned functions
  *                    - these are registered via SC_register_event_loop_callback

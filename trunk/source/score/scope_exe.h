@@ -39,12 +39,6 @@
 typedef struct s_exedes exedes;
 typedef struct s_exe_apides exe_apides;
 typedef struct s_SC_storloc SC_storloc;
-typedef struct s_SC_srcloc SC_srcloc;
-
-struct s_SC_srcloc
-   {unsigned int line;
-    const char *pfile;
-    const char *pfunc;};
 
 /* this is like the SC_srcloc but hold storage for the strings
  * most usages can take the SC_srcloc but some demand this variant
@@ -63,8 +57,8 @@ struct s_exedes
    char *ename;             /* executable name */
    char *sname;             /* section name - defaults to NULL */
    char *target;            /* format target */
-   off_t pc;                /* current address */
-   SC_storloc where;         /* srcloc of current adderss - internal use */
+   int64_t pc;              /* current address */
+   SC_storloc where;        /* srcloc of current adderss - internal use */
    void *et;                /* executable file info */
    void *es;                /* section info */
    void **symt;	            /* symbol table */

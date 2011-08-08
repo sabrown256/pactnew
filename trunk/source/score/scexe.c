@@ -13,78 +13,6 @@
 
 #include "score_int.h"
 
-#ifdef HAVE_BFD
-
-#include <bfd.h>
-
-#if BFD_MAJOR_VERSION >= 2
-# include <demangle.h>
-# define SC_DEMANGLE_ARG   (DMGL_ANSI | DMGL_PARAMS)
-#else
-# define SC_DEMANGLE_ARG   3
-#endif
-
-#define GET_ET(_st)    ((bfd *)      (_st)->et)
-#define GET_ES(_st)    ((asection *) (_st)->es)
-#define GET_SYMT(_st)  ((asymbol **) (_st)->symt)
-
-#define SAVE_LOC(st, sl)                                                    \
-   {SC_strncpy(st->where.file, MAXLINE, (char *) sl.pfile, -1);             \
-    SC_strncpy(st->where.func, MAXLINE, (char *) sl.pfunc, -1);             \
-    st->where.loc.line = sl.line;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SC_SET_DEMANGLE_STYLE - set the C++ name demangling style */
-
-void _SC_set_demangle_style(char *opt)
-   {
-
-/* NOTE: Ubuntu 10.4 has version 2.20
- * and Ubuntu 10.10 has version 2.20.51
- */
-
-#if BFD_MAJOR_VERSION >= 2
-    enum demangling_styles style;
-
-    if (opt != NULL)
-       {style = cplus_demangle_name_to_style(opt);
-	if (style == unknown_demangling)
-	   printf("unknown demangling style '%s'\n", opt);
-	cplus_demangle_set_style(style);};
-#endif
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SC_EXE_DEMANGLE_NAME - demangle the current location name in ET */
-
-void _SC_exe_demangle_name(char *d, int nc, exedes *st)
-   {
-
-#if BFD_MAJOR_VERSION >= 2
-
-    char *p, *nm;
-    bfd *et;
-    
-    et = GET_ET(st);
-
-    nm = (char *) st->where.func;
-    p = bfd_demangle(et, nm, SC_DEMANGLE_ARG);
-    if (p != NULL)
-       {SC_strncpy(d, nc, p, -1);
-	free(p);}
-
-    else
-       SC_strncpy(d, nc, nm, -1);
-       
-#endif
-
-    return;}
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -119,6 +47,95 @@ void _SC_copy_storloc(SC_storloc *d, SC_storloc *s)
 
 	strncpy(d->file, s->file, nc);
 	strncpy(d->func, s->func, nc);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+
+#ifdef HAVE_BFD
+
+/*--------------------------------------------------------------------------*/
+
+#include <bfd.h>
+
+/* NOTE: Ubuntu 10.4 has version 2.20,
+ * Ubuntu 10.10 has version 2.20.51, and
+ * RHE 5 has 2.17.50
+ */
+
+#undef HAVE_DEMANGLE
+#if BFD_MAJOR_VERSION >= 2 && BFD_MINOR_VERSION > 17
+# define HAVE_DEMANGLE
+#endif
+
+#ifdef HAVE_DEMANGLE
+# include <demangle.h>
+# define SC_DEMANGLE_ARG   (DMGL_ANSI | DMGL_PARAMS)
+#else
+# define SC_DEMANGLE_ARG   3
+#endif
+
+/* the following macros hide the conversion from the generic
+ * pointers in the exedes to the specific BFD related ones
+ * used here
+ */
+
+#define GET_ET(_st)    ((bfd *)      (_st)->et)
+#define GET_ES(_st)    ((asection *) (_st)->es)
+#define GET_SYMT(_st)  ((asymbol **) (_st)->symt)
+
+/* SAVE_LOC - do the save location code in one place */
+
+#define SAVE_LOC(st, sl)                                                    \
+   {SC_strncpy(st->where.file, MAXLINE, (char *) sl.pfile, -1);             \
+    SC_strncpy(st->where.func, MAXLINE, (char *) sl.pfunc, -1);             \
+    st->where.loc.line = sl.line;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_SET_DEMANGLE_STYLE - set the C++ name demangling style */
+
+void _SC_set_demangle_style(char *opt)
+   {
+
+#ifdef HAVE_DEMANGLE
+    enum demangling_styles style;
+
+    if (opt != NULL)
+       {style = cplus_demangle_name_to_style(opt);
+	if (style == unknown_demangling)
+	   printf("unknown demangling style '%s'\n", opt);
+	cplus_demangle_set_style(style);};
+#endif
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_EXE_DEMANGLE_NAME - demangle the current location name in ET */
+
+void _SC_exe_demangle_name(char *d, int nc, exedes *st)
+   {
+
+#ifdef HAVE_DEMANGLE
+
+    char *p, *nm;
+    bfd *et;
+    
+    et = GET_ET(st);
+
+    nm = (char *) st->where.func;
+    p = bfd_demangle(et, nm, SC_DEMANGLE_ARG);
+    if (p != NULL)
+       {SC_strncpy(d, nc, p, -1);
+	free(p);}
+
+    else
+       SC_strncpy(d, nc, nm, -1);
+       
+#endif
 
     return;}
 

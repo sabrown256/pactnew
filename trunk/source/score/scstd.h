@@ -269,6 +269,13 @@ typedef int (*PFIntBin)(void *a, void *b);
 typedef char *CONST * CONST_STRINGS;
 
 
+typedef struct s_SC_srcloc SC_srcloc;
+
+struct s_SC_srcloc
+   {unsigned int line;
+    const char *pfile;
+    const char *pfunc;};
+
 /* Pcons definition
  *    - useful for linked lists, association lists and whatnot
  *    - the type fields are for bookkeeping that may be crucial to
