@@ -10,7 +10,12 @@
 
 source ../../tests/common
 
-if ($CROSS_COMPILE == FALSE) then
+set ok = FALSE
+if (($CROSS_COMPILE == FALSE) || ($PACT_CC_FAMILY == INTEL)) then
+   set ok = FALSE
+endif
+
+if ($ok == TRUE) then
 
    NoteD $LogF ""
    NoteD $LogF -n "                    SCORE Override Test ......... "
@@ -26,14 +31,14 @@ if ($CROSS_COMPILE == FALSE) then
    flog $LogF popd
 
    if ($xstatus == 0) then
-      flog $LogF setenv LD_LIBRARY_PATH  $LibDir
       flog $Log ldd $BinDir/scmots
       if ("$Valgrind" == "") then
-         ftee $LogF ( ( setenv LD_PRELOAD $LibDir/libosmm.so ; $CFE $BinDir/scmots ) |& grep -v "Dwarf Error" |& grep -iwv error )
+#         ftee $LogF ( ( setenv LD_PRELOAD $LibDir/libosmm.so ; $CFE $BinDir/scmots ) |& grep -v "Dwarf Error" |& grep -iwv error )
+#         ftee $LogF ( ( setenv LD_PRELOAD $LibDir/libosmm.so ; $CFE $BinDir/scmots ) |& grep -v "Dwarf Error" )
+#         ftee $LogF ( setenv LD_PRELOAD $LibDir/libosmm.so ; $CFE $BinDir/scmots )
+         ftee $LogF $CFE $BinDir/scmots
          set xstatus = $status
       endif
-      flog $LogF unsetenv LD_PRELOAD
-      flog $LogF unsetenv LD_LIBRARY_PATH
    else
       Note $LogF "Failed to build scmots - skipping"
       set xstatus = 0
@@ -56,7 +61,7 @@ endif
 #--------------------------------------------------------------------------
 
 $TEST_CHECK -a mor -e $Err part
-set status = 0
+#set status = 0
 
 exit($status)
 

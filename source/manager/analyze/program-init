@@ -8,7 +8,9 @@
 #
 
 run analyze/default-bits
-run analyze/rpath init
+
+# include PACT libraries in RPATH for the memory manager interposers
+run analyze/rpath -i init
 
 # PACT_CC_ refers to the Compiler Collection used to build PACT
 # rather than COMPILER_ which is overloaded to the extreme
@@ -61,6 +63,13 @@ Group MDG {
 
 # machine dependent I/O for PDB - e.g. SQL
 Group MDI {
+   Inc   = ""
+   Lib   = ""
+   Pck   = ""
+}
+
+# machine dependent executable access - e.g. BFD
+Group MDE {
    Inc   = ""
    Lib   = ""
    Pck   = ""

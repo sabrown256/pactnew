@@ -1073,7 +1073,7 @@ static void _SC_match_quote(char **ppi, char **ppo, int qc,
 
 /* count the characters for the target string */
     pi = *ppi;
-    for (n = 0, c = *pi++; c != qc; c = *pi++, n++)
+    for (n = 0, c = *pi++; (c != qc) && (c != '\0'); c = *pi++, n++)
         {if (c == '\\')
 	    c = *pi++;};
 
@@ -1081,7 +1081,7 @@ static void _SC_match_quote(char **ppi, char **ppo, int qc,
     s = CMAKE_N(char, n+1);
 
     pi = *ppi;
-    for (i = 0, c = *pi++; c != qc; c = *pi++, i++)
+    for (i = 0, c = *pi++; (c != qc) && (c != '\0'); c = *pi++, i++)
         {if (c == '\\')
 	    c = *pi++;
 	 s[i] = c;};
@@ -1132,7 +1132,7 @@ static int _SC_match_delim(char **ppi, char **ppo, int oc, int cc)
     po = *ppo;
 
     level = 1;
-    for (c = *pi++; level > 0; c = *pi++)
+    for (c = *pi++; (level > 0) && (c != '\0'); c = *pi++)
         {*po++ = c;
 	 if (c == '\\')
 	    c = *pi++;

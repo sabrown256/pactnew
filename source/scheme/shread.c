@@ -172,6 +172,10 @@ static int _SS_intstrp(char *s, int64_t *piv)
     else if (strchr("#+-0123456789abcdefABCDEF", (int) *s) == NULL)
        rv = FALSE;
 
+    else if (strncmp(s, "0x", 2) == 0)
+       {iv = STRTOLL(s, &pt, 16);
+        rv = TRUE;}
+
     else
        {sgn = 1;
         rdx = 10;

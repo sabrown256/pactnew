@@ -280,6 +280,8 @@ static void _SC_mem_list(int flag, int show, char **parr, int *pnbl)
 
     ph = _SC_tid_mm();
 
+    SC_mem_over_mark(1);
+
     nbthr = SC_BIN_THRESHOLD();
     nbl   = 0;
 
@@ -352,6 +354,8 @@ static void _SC_mem_list(int flag, int show, char **parr, int *pnbl)
 
     if (pnbl != NULL)
        *pnbl = nbl;
+
+    SC_mem_over_mark(-1);
 
     return;}
 
@@ -437,6 +441,8 @@ int _SC_mem_map(FILE *fp, int flag, int show, int lineno)
 
     SC_LOCKON(SC_mm_lock);
 
+    SC_mem_over_mark(1);
+
     nbl = 0;
 
     if (ph->latest_block != NULL)
@@ -475,6 +481,8 @@ int _SC_mem_map(FILE *fp, int flag, int show, int lineno)
 
 	fprintf(fp, "\n");};
 
+    SC_mem_over_mark(-1);
+
     SC_LOCKOFF(SC_mm_lock);
 
     return(nbl);}
@@ -483,6 +491,12 @@ int _SC_mem_map(FILE *fp, int flag, int show, int lineno)
 /*--------------------------------------------------------------------------*/
 
 /* SC_MEM_MAP - print out a memory map to the given FILE
+ *            - argument FLAG is a bit map determining which
+ *            - sectors are reported
+ *            -    1  active blocks
+ *            -    2  free blocks
+ *            -    4  registered blocks
+ *            -    8  non-accountable blocks reported
  *
  * #bind SC_mem_map fortran() scheme(memory-map) python()
  */
@@ -528,6 +542,8 @@ long SC_mem_monitor(int old, int lev, char *id, char *msg)
 
     if (leva == 0)
        return(-1);
+
+    SC_mem_over_mark(1);
 
     pid = SC_get_processor_number();
 
@@ -577,6 +593,8 @@ long SC_mem_monitor(int old, int lev, char *id, char *msg)
 	else
 	  *msg = '\0';};
 
+    SC_mem_over_mark(-1);
+
     return(d);}
 
 /*--------------------------------------------------------------------------*/
@@ -603,6 +621,8 @@ int SC_mem_neighbor(void *p, void *a, void *b)
     ph = _SC_tid_mm();
 
     SC_LOCKON(SC_mm_lock);
+
+    SC_mem_over_mark(1);
 
     rv = FALSE;
     pa = NULL;
@@ -643,6 +663,8 @@ int SC_mem_neighbor(void *p, void *a, void *b)
 
     ppa  = (mem_header **) b;
     *ppa = (pb == NULL) ? NULL : ((mem_header *) pb + 1);
+
+    SC_mem_over_mark(-1);
 
     SC_LOCKOFF(SC_mm_lock);
 

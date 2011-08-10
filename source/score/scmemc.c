@@ -445,7 +445,10 @@ static mem_descriptor *_SC_make_blocks(SC_heap_des *ph, long j)
 	ph->n_major_blocks  = 0;
 
 	tnb = mblsz*ph->nx_major_blocks;
+
+        SC_mem_over_mark(1);
 	pm  = (major_block_des *) malloc(tnb);
+        SC_mem_over_mark(-1);
 
 	assert(pm != NULL);
 
@@ -461,7 +464,9 @@ static mem_descriptor *_SC_make_blocks(SC_heap_des *ph, long j)
 	tnb = mblsz*ph->nx_major_blocks;
 
 	pm = ph->major_block_list;
+        SC_mem_over_mark(1);
 	pm = (major_block_des *) realloc(pm, tnb);
+        SC_mem_over_mark(-1);
 
 	assert(pm != NULL);
 
@@ -864,7 +869,11 @@ void *_SC_realloc_n(void *p, long ni, long bpi, void *arg)
 	if (na == TRUE)
 	   SC_mem_stats(&a, &f, NULL, NULL);
 
-	SAVE_LINKS(desc);
+/* get the block links */
+	prev = desc->prev;
+	next = desc->next;
+	if (space == ph->latest_block)
+	   ph->latest_block = next;
 
 	if (SC_gs.mm_debug)
 	   {osp   = space;
@@ -1248,6 +1257,22 @@ int SC_zero_on_alloc_n(int tid)
 	    rv &= ((ph->zero_space == 1) || (ph->zero_space == 2));};
 
     SC_LOCKOFF(SC_mm_lock);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_MEM_OVER_MARK - increment guard counter by N (negative to decrement)
+ *                  - use system malloc when guard counter > 0
+ */
+
+int SC_mem_over_mark(int n)
+   {int rv;
+
+    rv = _SC_mf.sys;
+
+    _SC_mf.sys += n;
 
     return(rv);}
 

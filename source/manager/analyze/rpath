@@ -24,10 +24,11 @@ source $ldir/env-csh
 source $ldir/csh-subroutines
 HAVE_SUBROUTINES
 
-set Tgt = ""
-set Dir = ""
-set Var = ""
-set Out = "parent"
+set Tgt     = ""
+set Dir     = ""
+set Var     = ""
+set Out     = "parent"
+set IncPACT = FALSE
 
 while ($#argv > 0)
    switch ($1)
@@ -51,11 +52,12 @@ while ($#argv > 0)
            breaksw
       case -h:
            echo ""
-           echo "Usage: rpath [-a <dir>] [-d <dir>] [-e <var>] [-h] [-o parent | echo | list | link | rpath]"
+           echo "Usage: rpath [-a <dir>] [-d <dir>] [-e <var>] [-h] [-i] [-o parent | echo | list | link | rpath]"
            echo "  a   add <dir> to the RPATH"
            echo "  d   remove <dir> from the RPATH"
            echo "  e   add value of <var> to the RPATH"
            echo "  h   this help message"
+           echo "  i   include the PACT library directory"
            echo "  o   return result in specified mode:"
            echo "         parent displays as parent(a:b:c)"
            echo "         echo displays as a:b:c"
@@ -65,6 +67,9 @@ while ($#argv > 0)
            echo "      default is parent"
            echo ""
            exit(1)
+      case -i:
+           set IncPACT = TRUE
+           breaksw
       case -o:
            shift
            set Out = $1
@@ -104,8 +109,21 @@ switch ($Tgt)
         breaksw
 
    case init:
-        setenv RPATH ""
-        setenv Cfg_RPATH ""
+        if ($IncPACT == TRUE) then
+           if ($InstBase == none) then
+              set ldir = $cwd
+              set ldir = $ldir:h
+              setenv RPATH      $ldir/dev/$System/lib
+              setenv Cfg_RPATH  $ldir/dev/$System/lib
+              unset ldir
+           else
+              setenv RPATH      $InstBase/lib
+              setenv Cfg_RPATH  $InstBase/lib
+           endif
+        else
+           setenv RPATH ""
+           setenv Cfg_RPATH ""
+        endif
         breaksw
 
    case intel:

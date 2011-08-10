@@ -33,7 +33,7 @@ Tool CC {
 
 Tool FC {
    Exe     = pgf90
-   Flags   = -Mfree
+   Flags   = -Mfree -Mnoref_externals
    Flags  += [ _env_ = Bits ;               # address bit size
                32    = -tp px ;
                64    = -tp k8-64 -fpic ]

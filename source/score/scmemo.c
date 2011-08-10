@@ -1,6 +1,6 @@
 /*
- * SCMEMO.C - override primitive memory allocation functions
- *          - use dynamic linker to access system functions
+ * SCMEMO.C - interpose SCORE memory manager functions
+ *          - for malloc, realloc, and free
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
@@ -18,18 +18,12 @@
 
 #include <dlfcn.h>
 
-typedef struct s_memfncs memfncs;
-
-struct s_memfncs
-   {int sys;
-    PFMalloc malloc;
-    PFFree free;
-    PFRealloc realloc;};
-
-static memfncs
-  _SC_mf = { FALSE, NULL, NULL, NULL };
+#endif
 
 /*--------------------------------------------------------------------------*/
+
+#ifdef HAVE_DYNAMIC_LINKER
+
 /*--------------------------------------------------------------------------*/
 
 /* _SC_ALLOC_OVER - allocate NB bytes of memory */
@@ -112,25 +106,24 @@ void SC_use_over_mem(int on)
 
 #include <execinfo.h>
 
-static void _SC_malloc_loc(char *d, int nc)
+static char *_SC_malloc_loc(void)
    {int n;
-    char **out;
+    char d[MAXLINE];
+    char *rv, **out;
     void *bf[3];
     static int count = 0;
-#if 0
-    static int resolv = FALSE;
-#else
     static int resolv = TRUE;
-#endif
 
     count++;
 
-    snprintf(d, nc, "BARE_MALLOC");
+    rv = NULL;
+
+    SC_mem_over_mark(1);
+
+    snprintf(d, MAXLINE, "BARE_MALLOC");
 
     if (count == 1)
-       {_SC_mf.sys = TRUE;
-
-	n = backtrace(bf, 3);
+       {n = backtrace(bf, 3);
 	if (n > 2)
 	   {char s[MAXLINE];
 	    char *pt;
@@ -141,37 +134,37 @@ static void _SC_malloc_loc(char *d, int nc)
 
 /* get the file and line number */
             if ((pt != NULL) && (resolv == TRUE) && (SC_gs.argv != NULL))
-	       {exedes *st;
+	       {char pname[PATH_MAX];
+		exedes *st;
 
 		st = SC_gs.exe_info;
 		if (st == NULL)
-		   {st = SC_exe_open(SC_gs.argv[0], NULL, NULL,
+		   {SC_full_path(SC_gs.argv[0], pname, PATH_MAX);
+		    st = SC_exe_open(pname, NULL, NULL,
 				    TRUE, TRUE, TRUE, TRUE);
 		    SC_gs.exe_info = st;};
 
 		if (st != NULL)
 		   {SC_storloc sl;
-		    SC_srcloc *loc;
-
-		    loc = &sl.loc;
 
 		    SC_exe_map_addr(&sl, st, pt);
-		    snprintf(s, MAXLINE, "%s(%s:%d)",
-			     loc->pfunc, loc->pfile, loc->line);
+		    _SC_format_loc(s, MAXLINE, &sl.loc, TRUE, TRUE);
 
 		    pt = s;
 
 /*		    SC_exe_close(st); */};};
 
-	    snprintf(d, nc, "BARE_MALLOC:%s", pt);
+	    snprintf(d, MAXLINE, "BARE_MALLOC:%s", pt);
 
-	    free(out);};
+	    free(out);};};
 
-	_SC_mf.sys = FALSE;};
+    rv = strdup(d);
+
+    SC_mem_over_mark(-1);
 
     count--;
 
-    return;}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -179,18 +172,16 @@ static void _SC_malloc_loc(char *d, int nc)
 /* MALLOC - allocate NB bytes of memory */
 
 void *malloc(size_t nb)
-   {char d[MAXLINE];
+   {char *d;
     void *pr;
 
     SC_use_over_mem(TRUE);
 
-    if ((_SC_init_emu_threads == 0) || (_SC_mf.sys == TRUE))
+    if ((_SC_init_emu_threads == 0) || (_SC_mf.sys > 0))
        pr = _SC_mf.malloc(nb);
 
     else
-       {
-
-        _SC_malloc_loc(d, MAXLINE);
+       {d = _SC_malloc_loc();
 
 	pr = SC_alloc_n(nb, 1,
 			SC_MEM_ATTR_FUNC, d,
@@ -208,7 +199,11 @@ void free(void *p)
 
     SC_use_over_mem(TRUE);
 
-    CFREE(p);
+    if ((_SC_init_emu_threads == 0) || (_SC_mf.sys > 0))
+       _SC_mf.free(p);
+
+    else
+       CFREE(p);
 
     return;}
 
@@ -222,11 +217,15 @@ void *realloc(void *p, size_t nb)
 
     SC_use_over_mem(TRUE);
 
-    CREMAKE(p, char, nb);
+    if ((_SC_init_emu_threads == 0) || (_SC_mf.sys > 0))
+       p = _SC_mf.realloc(p, nb);
+    else
+       CREMAKE(p, char, nb);
 
     return(p);}
 
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 
 #endif
+
+/*--------------------------------------------------------------------------*/

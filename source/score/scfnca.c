@@ -387,8 +387,9 @@ int SC_pointer_ok(void *p)
         SC_signal_n(SIGBUS, obus.f, obus.a);
 #endif
         SC_signal_n(SIGILL, oill.f, oill.a);}
+ 
     else
-        ok = TRUE; 
+       ok = TRUE; 
 
     return(ok);}
  
