@@ -90,14 +90,8 @@
 #define FREE_SCORE_BLOCK_P(_d)                                              \
     (((_d)->ref_count == SC_MEM_MFA) && ((_d)->type == SC_MEM_MFB))
 
-#define FF_NAME(desc)                                                      \
+#define FF_NAME(desc)                                                       \
     ((SC_FF_NAME_MASK & (desc)->id) != 0)
-
-#define SAVE_LINKS(desc)                                                    \
-   {prev = desc->prev;                                                      \
-    next = desc->next;                                                      \
-    if (space == ph->latest_block)                                          \
-       ph->latest_block = next;}
 
 /*--------------------------------------------------------------------------*/
 
@@ -123,14 +117,25 @@ enum e_SC_mem_tag
 
 typedef enum e_SC_mem_tag SC_mem_tag;
 
-
 typedef union u_mem_header mem_header;
+
+typedef void *(*PFMalloc)(size_t size);
+typedef void (*PFFree)(void *p);
+typedef void *(*PFRealloc)(void *ptr, size_t size);
+
 typedef struct s_mem_descriptor mem_descriptor;
 typedef struct s_major_block_des major_block_des;
 typedef struct s_SC_heap_des SC_heap_des;
 typedef struct s_SC_mem_opt SC_mem_opt;
 typedef struct s_SC_mem_hst SC_mem_hst;
 typedef struct s_SC_mem_state SC_mem_state;
+typedef struct s_SC_memfncs SC_memfncs;
+
+struct s_SC_memfncs
+   {int sys;
+    PFMalloc malloc;
+    PFFree free;
+    PFRealloc realloc;};
 
 /* use the mem_header struct to force alignment to that of a double
  * this solves all alignment problems (especially for RISC chips)
@@ -216,10 +221,16 @@ struct s_SC_mem_state
 SC_mem_state
  _SC_ms = {-1, NULL, 0, 0, 0, 0L, 0L, NULL};
 
+SC_memfncs
+  _SC_mf = { FALSE, NULL, NULL, NULL };
+
 #else
 
 extern SC_mem_state
  _SC_ms;
+
+extern SC_memfncs
+  _SC_mf;
 
 #endif
 
@@ -250,7 +261,8 @@ extern void
 extern int
  _SC_free_n(void *p, void *a),
  SC_free_n(void *p, ...),
- SC_is_score_space(void *p, mem_header **psp, mem_descriptor **pds);
+ SC_is_score_space(void *p, mem_header **psp, mem_descriptor **pds),
+ SC_mem_over_mark(int n);
 
 extern long
  _SC_bin_index(long n);

@@ -562,10 +562,6 @@ struct s_SC_evlpdes
     PFSignal_handler sigchld;};     /* handler for SIGCHLD */
 
 
-typedef void *(*PFMalloc)(size_t size);
-typedef void (*PFFree)(void *p);
-typedef void *(*PFRealloc)(void *ptr, size_t size);
-
 struct s_SC_contextdes
    {PFSignal_handler f;         /* function member */
     void *a;};                  /* context member */

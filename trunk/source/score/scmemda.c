@@ -540,6 +540,8 @@ int SC_mem_trace(void)
 
     SC_LOCKON(SC_mm_lock);
 
+    SC_mem_over_mark(1);
+
     ret = 0;
     if (ph->latest_block != NULL)
        {n    = ph->nx_mem_blocks + BLOCKS_UNIT_DELTA;
@@ -587,6 +589,8 @@ int SC_mem_trace(void)
 
 	    else
 	       ret = n_mf;};};
+
+    SC_mem_over_mark(-1);
 
     SC_LOCKOFF(SC_mm_lock);
 
@@ -771,6 +775,12 @@ static long _SC_flchk(void)
 
     ph = _SC_tid_mm();
 
+/* this forces allocations which will come off the current
+ * free lists at the first invocation
+ * MUST be done before the ones in the loops over the free lists
+ */
+    ok = SC_pointer_ok(ph);
+
     nf  = 0L;
     bad = 0;
     for (j = 0L; j < _SC_ms.n_bins; j++)
@@ -779,7 +789,7 @@ static long _SC_flchk(void)
 	      md != NULL;
 	      k++, md = (mem_descriptor *) md->where.pfunc)
 	     {ok = SC_pointer_ok(md);
-	      if (!ok)
+	      if (ok == FALSE)
 		 {io_printf(stdout,
 			    "   Block: Head of free list %d,%ld corrupted\n",
 			    ph->tid, j);
@@ -788,18 +798,15 @@ static long _SC_flchk(void)
 		  break;};
 		
 	      ok = SC_pointer_ok((char *) md->where.pfunc);
- 	      if (ok &&
+ 	      if ((ok == TRUE) &&
 		  (md->ref_count == SC_MEM_MFA) &&
 		  (md->type == SC_MEM_MFB))
 	         nf++;
 
 	      else
 		 {io_printf(stdout,
-			    "   Block: %12lx (corrupted free memory block ",
-			    ((mem_header *) md + 1));
-			
-		  io_printf(stdout, "- %d,%ld,%ld)\n",
-			    ph->tid, j, k);
+			    "   Block: %12lx (corrupted free memory block - %d,%ld,%ld)\n",
+			    ((mem_header *) md + 1), ph->tid, j, k);
 
 		  bad++;
 		  break;};};};
@@ -863,6 +870,8 @@ long SC_mem_chk(int typ)
 
     nb = 0L;
 
+    SC_mem_over_mark(1);
+
     if (typ & 1)
        {nt = SC_mem_trace();
 	if (nt < 0L)
@@ -883,6 +892,8 @@ long SC_mem_chk(int typ)
 	   nb = (nb < 0L) ? -3L : -2L;
 	else if (nb >= 0L)
 	   nb += nt;};
+
+    SC_mem_over_mark(-1);
 
     return(nb);}
 

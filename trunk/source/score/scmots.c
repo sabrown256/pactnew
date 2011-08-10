@@ -43,9 +43,10 @@ static int test_1(int n, double *pdt)
 /* TEST_2 - time malloc overrides */
 
 static int test_2(int n, double *pdt)
-   {int i, rv;
+   {int i, nb, rv;
     char **p;
     double t0;
+    FILE *fp;
 
     rv = TRUE;
 
@@ -54,9 +55,14 @@ static int test_2(int n, double *pdt)
     t0 = SC_wall_clock_time();
 
     for (i = 0; i < n; i++)
-        p[i] = malloc(10);
+        {nb   = 10 + i*10000/n;
+	 p[i] = malloc(nb);};
 
     *pdt = (SC_wall_clock_time() - t0)/((double) n);
+
+    fp = fopen("test_2.map", "w");
+    SC_mem_map(fp, 15);
+    fclose(fp);
 
     for (i = 0; i < n; i++)
         free(p[i]);
@@ -160,7 +166,7 @@ int main(int c, char **v, char **env)
     SC_setbuf(stdout, NULL);
 
     zsp = 0;
-    n   = 100;
+    n   = 1000;
 
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')

@@ -330,6 +330,7 @@ void SC_get_event_loop_callback(SC_evlpdes *pe, int type, void *p,
 				PFFileCallback *pacc, PFFileCallback *prej)
    {int i, n, fd;
     SC_poll_desc *pd;
+    SC_address ad;
     PROCESS *pp;
     FILE *fp;
 
@@ -352,9 +353,11 @@ void SC_get_event_loop_callback(SC_evlpdes *pe, int type, void *p,
         {pd = SC_array_get(pe->fd, i);
 	 if (pd->fd == fd)
             {if (pacc != NULL)
-	        *pacc = SC_array_get(pe->faccpt, i);
+	        {ad.memaddr = SC_array_get(pe->faccpt, i);
+		 *pacc      = (PFFileCallback) ad.funcaddr;};
 	     if (prej != NULL)
-	        *prej = SC_array_get(pe->frejct, i);
+	        {ad.memaddr = SC_array_get(pe->frejct, i);
+		 *prej      = (PFFileCallback) ad.funcaddr;};
              break;};};
 
     if (psigio != NULL)

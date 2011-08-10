@@ -18,6 +18,9 @@ Note $ALog "Analyze: dynamic linker"
 SafeEnv MDE_Lib              ""
 SafeEnv HAVE_DYNAMIC_LINKER FALSE
 
+Note $ALog "MDE_Lib             = |$MDE_Lib|"
+Note $ALog "HAVE_DYNAMIC_LINKER = |$HAVE_DYNAMIC_LINKER|"
+
 cat << EOF >! $Tmp.c
 #include <stdlib.h>
 #define __USE_GNU
