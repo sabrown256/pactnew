@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# SCSCO - check out sources whether CVS or SVN
+# SCSCO - check out sources whether GIT, CVS or SVN
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -50,7 +50,15 @@ while ($#argv > 0)
    shift
 end
 
-if (-d $lmngdir/CVS) then
+if (-d $lmngdir/.git) then
+
+   set inf  = ( `cat .git/config | grep url` )
+   set root = $inf[3]
+
+# GOTCHA: find correct repo path
+   git clone $root/../$pkg
+
+else if (-d $lmngdir/CVS) then
 
    cvs $cvsopt co -D "$srcdate" $pkg
 

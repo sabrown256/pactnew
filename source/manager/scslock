@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# SCSLOCK - lock the repository whether CVS or SVN
+# SCSLOCK - lock the repository whether GIT, CVS or SVN
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -81,9 +81,94 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+# GIT
+
+if (-d ../.git) then
+   setenv SSH  ssh
+   setenv SCP  scp
+
+   set inf      = ( `cat ../.git/config | grep url` )
+   set repodir  = $inf[3]
+   set repohost = ""
+
+# handle the LOCAL repository case
+   if ("$repohost" == "") then
+      set lock = $repodir/commit.lock
+      switch ($oper)
+         case lock:
+              touch $lock
+              chmod 660 $lock
+              echo $lmsg >> $lock
+              breaksw
+         case unlock:
+              rm -f $lock
+              breaksw
+         case status:
+              if (-e $lock) then
+                 echo "locked"
+              else
+                 echo "unlocked"
+              endif
+              breaksw
+         case cat:
+              cat $lock
+              breaksw
+      endsw
+
+# handle the REMOTE repository case
+   else
+      set lock  = "$lstage/commit.lock"
+      set rlock = "$repodir/commit.lock"
+
+      if (!(-d $lstage)) then
+         mkdir $lstage
+         chmod 770 $lstage
+      endif
+
+      switch ($oper)
+         case lock:
+              touch $lock
+              chmod 660 $lock
+              echo $lmsg >> $lock
+              $SCP $lock ${repohost}:${repodir} >& /dev/null
+              breaksw
+         case unlock:
+              rm -f $lock
+              $SSH $repohost rm -f $rlock
+              breaksw
+         case status:
+              if ($?DoingConfig == 0) then
+                 set inf   = `$SSH $repohost ls $repodir |& cat`
+                 set elock = FALSE
+                 foreach i ($inf)
+                    set entry = $i:h
+                    if ("$entry" == "commit.lock") then
+                       set elock = TRUE
+                    endif
+                 end
+                 unset inf
+                 if ($elock == TRUE) then
+                    echo "locked"
+                 else
+                    echo "unlocked"
+                 endif
+              endif
+              breaksw
+         case cat:
+              $SSH $repohost cat $rlock
+              breaksw
+      endsw
+
+      unset rlock
+
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # CVS
 
-if (-d CVS) then
+else if (-d CVS) then
 
    if ($?CVSROOT == 1) then
       if ("$CVSROOT" =~ *:*) then
