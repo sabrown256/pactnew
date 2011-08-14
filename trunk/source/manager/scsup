@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# SCSUP - update sources whether CVS or SVN
+# SCSUP - update sources whether GIT, CVS or SVN
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -34,7 +34,23 @@ while ($#argv > 0)
    shift
 end
 
-if (-d CVS) then
+if (-d .git) then
+
+   if ($unmngd == TRUE) then
+      git status -s |& egrep '^\?' | sed 's/^??/? /'
+   else
+      set inf  = ( `cat .git/config | grep url` )
+      set repo = $inf[3]
+      git pull $repo master >&! .log.sup
+      if ($status != 0) then
+         cat .log.sup
+      else
+         rm .log.sup
+      endif
+      git status -s |& egrep -v '^\?'
+   endif
+
+else if (-d CVS) then
 
    if ($unmngd == TRUE) then
       cvs update $cvsopt $args |& egrep '^\?'

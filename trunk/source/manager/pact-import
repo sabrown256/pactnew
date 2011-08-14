@@ -28,7 +28,11 @@ set MngDir = $cwd
 set SCSCom = $MngDir/scscom
 set SCSUp  = $MngDir/scsup
 set SCSCO  = $MngDir/scsco
-if (-d CVS) then
+if (-d .git) then
+   set RepoDir = `grep .git/config url | sed 's|^[ ]*url =||'`
+   set SCSAdd  = ( git add )
+   set SCSDel  = ( git rm )
+else if (-d CVS) then
    set RepoDir = `cat CVS/Root | sed 's|^.*:||'`
    set SCSAdd  = ( cvs add )
    set SCSDel  = ( cvs remove )

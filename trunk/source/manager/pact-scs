@@ -18,9 +18,25 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+# GIT - setup for GIT
+
+if (-d ../.git) then
+   set SCSExe = git
+   pushd .. >& /dev/null
+   set SCSDir = $cwd/.git
+   popd >& /dev/null
+
+   set Stage = "$MngDir/stage"
+   set Lock  = "$Stage/commit.lock"
+
+   set repohost = ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # CVS - setup for CVS
 
-if (-d CVS) then
+else if (-d CVS) then
    set SCSExe = cvs
    set SCSDir = CVS
 

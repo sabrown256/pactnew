@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# SCSTAG - tag a source version whether CVS or SVN
+# SCSTAG - tag a source version whether GIT, CVS or SVN
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -10,7 +10,11 @@
 
 unalias *
 
-if (-d CVS) then
+if (-d .git) then
+
+   git tag $argv
+
+else if (-d CVS) then
 
    cvs tag $argv
 
