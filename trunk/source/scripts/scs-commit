@@ -44,12 +44,27 @@ if (-d ../.git) then
    end
 
 # do the local commit
-   git commit $args -q -m "$msg" $files
+   echo -n "Local commit ... "
+   git commit $args -q -m "$msg" $files >&! log.commit
+   set xstatus = $status
+   if ($xstatus == 0) then
+      echo "ok"
+   else
+      echo "ng"
+   endif
 
 # push it up to the master repository
-   set inf  = ( `cat .git/config | grep url` )
-   set root = $inf[3]
-   git push $root
+   if ($xstatus == 0) then
+      echo -n "Pushing changes ... "
+      set inf  = ( `cat .git/config | grep url` )
+      set root = $inf[3]
+      git push $root >>& log.commit
+      if ($xstatus == 0) then
+         echo "ok"
+      else
+         echo "ng"
+      endif
+   endif
 
    popd >& /dev/null
 

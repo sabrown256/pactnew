@@ -64,7 +64,7 @@ script no-op dargs env-csh csh-subroutines merge-aix panache
 script pdbdiff pdbview pdbcp pdbls label-ps tpu tzu remod
 script which-cfg sys-site use-tcsh fill-string mpi-info
 script simplify-path sunrace cross-info find-comments
-script scs-update scs-commit scs-co
+script scs-update scs-commit scs-co scs-history
 
 doc pact.ps panacea.ps pdb.ps pdbdiff.ps pdbview.ps pgs.ps
 doc pml.ps ppc.ps score.ps sx.ps ultra.ps

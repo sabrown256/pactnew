@@ -1,0 +1,31 @@
+#!/bin/csh -f
+#
+# SCS-HISTORY - repository history whether GIT, CVS or SVN
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+if (-d ../.git) then
+
+   pushd .. >& /dev/null
+
+   git log $argv
+
+   popd >& /dev/null
+
+else if (-d CVS) then
+
+   cvs history $argv
+
+else if (-d .svn) then
+
+   svn history $argv
+
+endif
+
+exit($status)
