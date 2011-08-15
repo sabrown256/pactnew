@@ -10,12 +10,12 @@
 
 unalias *
 
-if ($?lmngdir == 0) then
-   set exe = `dirname $0`
-   if ("$exe" == ".") then
-      set lmngdir = $cwd
+if ($?refdir == 0) then
+   set exedir = `dirname $0`
+   if ("$exedir" == ".") then
+      set refdir = $cwd
    else
-      set lmngdir = $exe
+      set refdir = $exedir
    endif
 endif
 
@@ -24,9 +24,7 @@ set hst = ""
 set dir = ""
 set pkg = ""
 
-pushd $lmngdir >& /dev/null
-set srcdate = ( `./pact-get-tag` )
-popd >& /dev/null
+set srcdate = ""
 
 while ($#argv > 0)
    switch ($1)
@@ -47,35 +45,50 @@ while ($#argv > 0)
    shift
 end
 
-if (-d $lmngdir/../.git) then
+if (-d $refdir/../.git) then
 
-   pushd $lmngdir/.. >& /dev/null
+   pushd $refdir/.. >& /dev/null
 
+   set opt  = ( $opt $dir )
    set inf  = ( `cat .git/config | grep url` )
-   set root = $inf[3]
-
-# GOTCHA: find correct repo path
-   git clone $root/../$pkg
+   set root = $inf[3]:h
 
    popd >& /dev/null
 
-else if (-d $lmngdir/CVS) then
+   foreach p ( $pkg )
+      if ("$srcdate" != "") then
+         set dt = "$srcdate[1]"
+         git clone $root/$p
+      else
+         git clone $root/$p
+      endif
+   end
+
+else if (-d $refdir/CVS) then
 
    set opt = ( $opt -d ${hst}:$dir )
-   cvs $opt co -D "$srcdate" $pkg
+   if ("$srcdate" != "") then
+      cvs $opt co -D "$srcdate" $pkg
+   else
+      cvs $opt co $pkg
+   endif
 
-else if (-d $lmngdir/.svn) then
+else if (-d $refdir/.svn) then
 
    set opt  = ( $opt http://${hst}$dir )
-   set root = `grep manager $lmngdir/.svn/entries | sed 's|/manager$||'`
+   set root = `grep manager $refdir/.svn/entries | sed 's|/manager$||'`
 
-   set dt = "$srcdate[1]"
    foreach p ( $pkg )
-      svn co $opt -r "{${dt}}" ${root}/$p
+      if ("$srcdate" != "") then
+         set dt = "$srcdate[1]"
+         svn co $opt -r "{${dt}}" ${root}/$p
+      else
+         svn co $opt ${root}/$p
+      endif
    end
 
 endif
 
-unset lmngdir
+unset refdir
 
 exit($status)

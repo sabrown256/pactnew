@@ -36,7 +36,7 @@ end
 
 if (-d ../.git) then
 
-   pushd .. >& /deve/null
+   pushd .. >& /dev/null
 
    if ($unmngd == TRUE) then
       git status -s |& egrep '^\?' | sed 's/^??/? /'
@@ -52,7 +52,7 @@ if (-d ../.git) then
       git status -s |& egrep -v '^\?'
    endif
 
-   popd >& /deve/null
+   popd >& /dev/null
 
 else if (-d CVS) then
 
