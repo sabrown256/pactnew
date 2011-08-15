@@ -475,14 +475,15 @@ static defstr *_PD_defstr_in(hasharr *chart, char *name, PD_type_kind kind,
  *            - in the specified chart set (both hashed and non-hashed versions) 
  */
 
-defstr *_PD_defstr(PDBfile *file, int host, char *name, PD_type_kind kind,
+defstr *_PD_defstr(PDBfile *file, PD_chart_kind host,
+		   char *name, PD_type_kind kind,
 		   memdes *desc, multides *tuple,
 		   long sz, int align, PD_byte_order ord,
 		   int conv, int *ordr, long *formt, int unsgned, int onescmp)
    {defstr *dp;
     hasharr *ch;
 
-    ch = (host == TRUE) ? file->host_chart : file->chart;
+    ch = (host == PD_CHART_HOST) ? file->host_chart : file->chart;
 
     dp = _PD_defstr_in(ch, name, kind,
 		       desc, tuple, sz, align, ord, conv,
@@ -543,7 +544,7 @@ defstr *_PD_defstr_inst(PDBfile *file, char *name, PD_type_kind kind,
 						dp,
 						&memb);};
 
-    dp = _PD_defstr(file, FALSE, name, kind,
+    dp = _PD_defstr(file, PD_CHART_FILE, name, kind,
 		    desc, NULL,
 		    sz, algn, ord,
 	            conv, ordr, formt, FALSE, FALSE);
@@ -574,7 +575,7 @@ defstr *_PD_defstr_inst(PDBfile *file, char *name, PD_type_kind kind,
  *       these are for non-default primitive types which
  *       have no host representation
  */
-    sdp = _PD_defstr(file, TRUE, name, kind,
+    sdp = _PD_defstr(file, PD_CHART_HOST, name, kind,
 		     desc, NULL,
 		     sz, algn, NO_ORDER,
 		     FALSE, NULL, NULL, FALSE, FALSE);

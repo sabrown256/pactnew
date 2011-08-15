@@ -107,12 +107,12 @@ defstr *PD_defncv(PDBfile *file ARG(,,cls), char *name, long bpi, int align)
    {defstr *dp;
 
 /* install in the file chart */
-    dp = _PD_defstr(file, FALSE, name, NON_CONVERT_KIND,
+    dp = _PD_defstr(file, PD_CHART_FILE, name, NON_CONVERT_KIND,
 		    NULL, NULL, bpi, align,
 		    NO_ORDER, FALSE, NULL, NULL, FALSE, FALSE);
 
 /* install an independent copy in the host chart - garbage collection! */
-    dp = _PD_defstr(file, TRUE, name, NON_CONVERT_KIND,
+    dp = _PD_defstr(file, PD_CHART_HOST, name, NON_CONVERT_KIND,
 		    NULL, NULL, bpi, align,
 		    NO_ORDER, FALSE, NULL, NULL, FALSE, FALSE);
 
@@ -134,12 +134,12 @@ defstr *PD_defchr(PDBfile *file ARG(,,cls), char *name,
    {defstr *dp;
 
 /* file chart */
-    dp = _PD_defstr(file, FALSE, name, CHAR_KIND,
+    dp = _PD_defstr(file, PD_CHART_FILE, name, CHAR_KIND,
 		    NULL, NULL, bpi, align, ord, FALSE,
 		    NULL, NULL, unsgned, FALSE);
 
 /* host chart */
-    dp = _PD_defstr(file, TRUE, name, CHAR_KIND,
+    dp = _PD_defstr(file, PD_CHART_HOST, name, CHAR_KIND,
 		    NULL, NULL, bpi, align, ord, FALSE,
 		    NULL, NULL, unsgned, FALSE);
 
@@ -158,12 +158,12 @@ defstr *PD_defixnum(PDBfile *file ARG(,,cls), char *name, long bpi,
    {defstr *dp;
 
 /* file chart */
-    dp = _PD_defstr(file, FALSE, name, INT_KIND,
+    dp = _PD_defstr(file, PD_CHART_FILE, name, INT_KIND,
 		    NULL, NULL, bpi, align, ord, TRUE, 
                     NULL, NULL, unsgned, onescmp);
 
 /* host chart */
-    dp = _PD_defstr(file, TRUE, name, INT_KIND,
+    dp = _PD_defstr(file, PD_CHART_HOST, name, INT_KIND,
 		    NULL, NULL, bpi, align, ord, TRUE, 
                     NULL, NULL, unsgned, onescmp);
 
@@ -215,12 +215,12 @@ defstr *PD_defloat(PDBfile *file ARG(,,cls), char *name, long bpi,
     memcpy(order, ordr, sizeof(int)*bpi);
 
 /* file chart */
-    dp = _PD_defstr(file, FALSE, name, FLOAT_KIND,
+    dp = _PD_defstr(file, PD_CHART_FILE, name, FLOAT_KIND,
 		    NULL, NULL, bpi, align,
 		    NO_ORDER, TRUE, order, formt, FALSE, FALSE);
 
 /* host chart */
-    dp = _PD_defstr(file, TRUE, name, FLOAT_KIND,
+    dp = _PD_defstr(file, PD_CHART_HOST, name, FLOAT_KIND,
 		    NULL, NULL, bpi, align,
 		    NO_ORDER, TRUE, order, formt, FALSE, FALSE);
 

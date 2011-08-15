@@ -12,7 +12,10 @@
 
 #include <pwd.h>
 #include <sched.h>
-#include <execinfo.h>
+
+#if !defined(CYGWIN)
+# include <execinfo.h>
+#endif
 
 #define SC_DBG_GDB         1
 #define SC_DBG_TOTALVIEW   2
@@ -885,6 +888,8 @@ static char **_SC_backtrace_exe(int pid, int to)
  * might as well save the fork of a child process
  */
     ok = FALSE;
+
+#if !defined(CYGWIN)
     if ((pid < 0) && (_SC.exe.open != NULL))
        {int n;
 	long ad;
@@ -925,7 +930,8 @@ static char **_SC_backtrace_exe(int pid, int to)
 	    t = _SC_array_string_join(&str);};
 
 	CFREE(bf);
-	free(out);}
+	free(out);};
+#endif
 
 /* process other than current or no executable access */
     if ((ok == FALSE) && (rv == 0))
