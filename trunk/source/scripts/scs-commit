@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# SCCOM - commit sources whether GIT, CVS or SVN
+# SCS-COMMIT - commit sources whether GIT, CVS or SVN
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -9,8 +9,6 @@
 #
 
 unalias *
-
-set MngDir = `dirname $0`
 
 set args = ""
 set msg  = ""
@@ -28,9 +26,9 @@ while ($#argv > 0)
    shift
 end
 
-if (-d $MngDir/../.git) then
+if (-d ../.git) then
 
-   pushd $MngDir/.. >& /dev/null
+   pushd .. >& /dev/null
 
 # find changed files
    set inf = ( `git status -s |& egrep -v '^\?'` )
@@ -55,11 +53,11 @@ if (-d $MngDir/../.git) then
 
    popd >& /dev/null
 
-else if (-d $MngDir/CVS) then
+else if (-d CVS) then
 
    cvs commit $args -m "$msg"
 
-else if (-d $MngDir/.svn) then
+else if (-d .svn) then
 
    svn commit $args -m "$msg"
 
