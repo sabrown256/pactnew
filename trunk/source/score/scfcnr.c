@@ -91,6 +91,66 @@ void SC_free_fcontainer(fcdes *fc)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_UNKNOWN_CONTAINER - return an FCDES if the file NAME if of the form
+ *                       -    <name>~<start>:<end>
+ *                       - where <start> and <end> specify the address
+ *                       - range of the contained file
+ */
+
+fcdes *_SC_unknown_container(char *name)
+   {int nt, ok;
+    int64_t sad, ead;
+    char s[MAXLINE];
+    char **ta;
+    fcdes *fc;
+    FILE *fp;
+
+    SC_strncpy(s, MAXLINE, name, -1);
+    ta = SC_tokenize(s, "~:");
+    SC_ptr_arr_len(nt, ta);
+
+    fp = NULL;
+    ok = FALSE;
+    if (nt == 3)
+       {fp  = fopen(ta[0], "r");
+	ok  = (fp != NULL);
+	sad = SC_stoi(ta[1]);
+	ead = SC_stoi(ta[2]);
+	ok &= (ead > sad);};
+
+    SC_free_strings(ta);
+
+    fc = NULL;
+    if (ok == TRUE);
+       {fcent *ae;
+	hasharr *tab;
+
+        tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
+    
+	ae = CMAKE(fcent);
+
+	ae->name    = CSTRSAVE(name);
+	ae->date    = 0;
+	ae->uid     = -1;
+	ae->gid     = -1;
+	ae->size    = ead - sad + 1;
+	ae->address = sad;
+
+	SC_strncpy(ae->perm, 8, "0444", 8);
+
+	if (ae != NULL)
+	   SC_hasharr_install(tab, ae->name, ae, "fcent", TRUE, TRUE);
+
+	fc = CMAKE(fcdes);
+	fc->name    = CSTRSAVE(name);
+	fc->file    = fp;
+	fc->entries = tab;};
+
+    return(fc);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_OPEN_FCONTAINER - determine the type of container file NAME
  *                    - and return a handle to it
  *                    - return NULL if container file type cannot
@@ -99,7 +159,8 @@ void SC_free_fcontainer(fcdes *fc)
  *                    - the input file
  */
 
-fcontainer *SC_open_fcontainer(char *name, SC_file_type type)
+fcontainer *SC_open_fcontainer(char *name, SC_file_type type,
+			       fcdes *(*meth)(char *name, SC_file_type *pt))
    {SC_file_type ftype;
     fcontainer *cf;
     fcdes *fc;
@@ -107,14 +168,19 @@ fcontainer *SC_open_fcontainer(char *name, SC_file_type type)
     cf = NULL;
     fc = NULL;
 
-    ftype = (type == SC_UNKNOWN) ? _SC_fcontainer_type(name) : type;
+    if (meth != NULL)
+       fc = meth(name, &ftype);
 
-    if (ftype == SC_TAR)
-       fc = SC_scan_tarfile(name);
-    else if (ftype == SC_AR)
-       fc = SC_scan_archive(name);
-    else
-       fc = NULL;
+    if (fc == NULL)
+       {ftype = (type == SC_UNKNOWN) ? _SC_fcontainer_type(name) : type;
+	if (ftype == SC_TAR)
+	   fc = SC_scan_tarfile(name);
+	else if (ftype == SC_AR)
+	   fc = SC_scan_archive(name);};
+
+    if (fc == NULL)
+       {ftype = SC_OTHER;
+	fc    = _SC_unknown_container(name);};
            
     if (fc != NULL)
        cf = _SC_make_fcontainer(name, ftype, fc);

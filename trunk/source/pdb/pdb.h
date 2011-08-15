@@ -111,9 +111,11 @@
  * It matches versions 24 and earlier for forward compatibility
  * with old codes and is ignored by new versions of PDBLib. 01/21/2011
  *
+ * Version 27 support <file>~<start>:<end> container syntax. 08/15/2011
+ *
  */
 
-#define PDB_SYSTEM_VERSION  26
+#define PDB_SYSTEM_VERSION  27
 
 #define BITS_DEFAULT 8     /* default bits per byte */
 #define NSTD         6     /* number of standards currently in the system 
@@ -965,6 +967,12 @@ extern int
  PD_mkdir(PDBfile *file, char *dirname),
  PD_ln(PDBfile *file, char *oldname, char *newname),
  PD_def_dir(PDBfile *file);
+
+
+/* PDBFC.C declarations */
+
+extern PDBfile
+ *PD_open_contained(char *name, int64_t sad, int64_t ead);
 
 
 /* PDBMP.C declarations */

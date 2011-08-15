@@ -69,7 +69,7 @@ int main(int c, char **v)
             {io_printf(stdout, "Couldn't create output file writing to stdout\n");
              f = stdout;};};
 
-    fcntnr = SC_open_fcontainer(fcn, type);
+    fcntnr = SC_open_fcontainer(fcn, type, NULL);
     if (fcntnr == NULL)
        {io_printf(stdout, "Error opening fcontainer %s\n", fcn);
         exit(1);}

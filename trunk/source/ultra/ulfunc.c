@@ -555,6 +555,29 @@ static object *_ULI_range(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _ULI_CLIPPING - set the device level clipping flag */
+
+static object *_ULI_clipping(SS_psides *si, object *argl)
+   {int clp, oclp;
+    PG_device *dev;
+    object *rv;
+
+    clp = TRUE;
+    SS_args(si, argl,
+	    SC_INTEGER_I, &clp,
+	    0);
+
+    dev = _UL_get_some_device();
+
+    oclp = PG_fset_clipping(dev, clp);
+
+    rv = SS_mk_integer(si, oclp);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _ULI_DOMAIN - set the domain of the plot */
 
 static object *_ULI_domain(SS_psides *si, object *argl)
@@ -2071,6 +2094,11 @@ void UL_install_scheme_funcs(SS_psides *si)
                "Macro: Close graphics device\n     Usage: close-device ps | png | cgm | mpeg | jpeg | <name>",
                SS_sargs,
                _ULI_close_device, SS_UR_MACRO);
+
+    SS_install(si, "clipping",
+               "Procedure: Set the device level clipping flag\n     Usage: clipping on | off",
+               SS_sargs,
+               _ULI_clipping, SS_PR_PROC);
 
     SS_install(si, "domain",
                "Procedure: Set the domain for plotting\n     Usage: domain <low-lim> <high-lim> or\n     Usage: domain de",
