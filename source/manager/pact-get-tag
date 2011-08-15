@@ -37,7 +37,7 @@ if (-d .git) then
    set inf = ( `git log -a -x UP -D $dt |& grep -v cvs | sort -r | head -n 1` )
    set inf = ( $inf[2] $inf[3] )
 else if (-d CVS) then
-   set inf = ( `git log -a -x UP -D $dt |& grep -v cvs | sort -r | head -n 1` )
+   set inf = ( `cvs history -a -x UP -D $dt |& grep -v cvs | sort -r | head -n 1` )
    set inf = ( $inf[2] $inf[3] )
 else if (-d .svn) then
    set rev = ( `svn update |& grep "At revision"` )

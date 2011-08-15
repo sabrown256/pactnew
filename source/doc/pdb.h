@@ -1,5 +1,5 @@
 TXT: PDBLib User's Manual
-MOD: 05/27/2011
+MOD: 08/15/2011
 
 <CENTER>
 <P>
@@ -948,7 +948,9 @@ handled by PDBLib. Note: The function <tt>CSTRSAVE</tt> invokes the
 As of PDB version 22, PDBLib can access data from a variety of sources.
 For example, PDBLib can access PDB files in TAR files and AR archives.
 In conjunction with the translation spokes, PDBLib can access various
-other data formats such as HDF and mySQL.<p>
+other data formats such as HDF and mySQL.
+PDB version 27 adds the more general file address range capability.
+<p>
 
 In order to make sense of all the possible data sources, PDBLib is using
 a Uniform Data Locator modelled after the URL used in the World Wide Web.
@@ -960,7 +962,8 @@ The UDL syntax is as follows:<p>
    &lt;proto&gt;     := http | https | ftp |  (via curl)
                   mysql                 (via mysql)
                   webdav
-   &lt;path&gt;      := &lt;file&gt; | &lt;container&gt; '~' &lt;file&gt;
+   &lt;path&gt;      := &lt;file&gt; | &lt;container&gt; '~' &lt;file&gt; |
+                        &lt;container&gt; '~' &lt;start&gt : &lt;end&gt;
    &lt;file&gt;      := full or relative path to file
                   relative means relative to $HOME or
                   whatever the base path is as determined by
@@ -985,6 +988,7 @@ Some examples are:<p>
    "b.tar~a.pdb"            file a.pdb in TAR file b.tar in current directory
    "a.pdb,tgt=txt"          write a.pdb in TXT mode
    "mysql://server/data"    MySQL database 'data' on host 'server'
+   "a~1059:43946"           file a from address 1059 to 43946
 </pre>
 
 Note that access to some data sources depends on whether various libraries

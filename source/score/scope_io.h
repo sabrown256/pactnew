@@ -402,7 +402,8 @@ extern long
 /* SCFCNTNR.C declarations */
 
 extern fcontainer
- *SC_open_fcontainer(char *name, SC_file_type type);
+ *SC_open_fcontainer(char *name, SC_file_type type,
+		     fcdes *(*meth)(char *name, SC_file_type *pt));
 
 extern char
  **SC_fcontainer_list(fcontainer *cf, int full);

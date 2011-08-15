@@ -811,9 +811,6 @@ void PG_rect_plot(PG_device *dev, double *x, double *y, int n, int lncol,
        {PG_set_limits_n(dev, 2, WORLDC, n, r, PLOT_CARTESIAN);
         PG_axis(dev, CARTESIAN_2D);};
  
-    clp = PG_fget_clipping(dev);
-    PG_fset_clipping(dev, TRUE);
- 
 /* worst case scenario is every line between adjacent points
  * intersects domain/range boundary rectangle twice.
  */
@@ -821,6 +818,8 @@ void PG_rect_plot(PG_device *dev, double *x, double *y, int n, int lncol,
     t  = PM_make_vectors(2, tn);
 
     PG_clip_data(dev, t[0], t[1], &tn, x, y, n);
+
+/* GOTCHA: should set clipping flag here */
 
 /* fill the area under the curve - or a closed curve */
     if (dev->fill_color != dev->BLACK)
@@ -844,6 +843,14 @@ void PG_rect_plot(PG_device *dev, double *x, double *y, int n, int lncol,
 
        PG_fill_polygon_n(dev, dev->fill_color, TRUE, 2, WORLDC, np, t);};
 	
+/* GOTCHA: should set clipping above but
+ * this works around a bug in the polygon intersection code that
+ * ruins memory map plots - see ultra/applications/memmap.scm and
+ * the test_2.map from score/scmots.c
+ */
+    clp = PG_fget_clipping(dev);
+    PG_fset_clipping(dev, TRUE);
+ 
     wd = PG_fget_line_width(dev);
     st = PG_fget_line_style(dev);
  

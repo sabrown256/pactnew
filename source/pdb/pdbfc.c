@@ -274,7 +274,7 @@ static int _PD_fceof(FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_OPEN_GET_CONTAINERF - open the file in the container */
+/* _PD_OPEN_CONTAINER_FILE - open the file in the container */
 
 FILE *_PD_open_container_file(char *name, char *mode)
    {char cntr[MAXLINE];
@@ -292,7 +292,7 @@ FILE *_PD_open_container_file(char *name, char *mode)
 
     cf = CMAKE(containerf);
 
-    fc = SC_open_fcontainer(cntr, SC_UNKNOWN);
+    fc = SC_open_fcontainer(cntr, SC_UNKNOWN, NULL);
     if (fc == NULL)
        fe = NULL;
     else
@@ -325,6 +325,23 @@ FILE *_PD_open_container_file(char *name, char *mode)
 	fid->feof    = _PD_fceof;
 
 	fp = (FILE *) fid;};
+
+    return(fp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_OPEN_CONTAINED - open a PDB file contained in file NAME
+ *                   - in the address range (SAD, EAD)
+ */
+
+PDBfile *PD_open_contained(char *name, int64_t sad, int64_t ead)
+   {char fname[MAXLINE];
+    PDBfile *fp;
+
+    snprintf(fname, MAXLINE, "%s~%lld:%lld", name, sad, ead);
+
+    fp = PD_open(fname, "r");
 
     return(fp);}
 

@@ -58,18 +58,20 @@
 	   (xan (car dma))
 	   (xax (cdr dma))
 
-; current range/domain limits
+; current domain limits
 	   (dm  (domain))
 	   (xmn (car dm))
 	   (xmx (cdr dm))
-           (dx  (- xmx xmn))
+           (dxl  (- xo xmn))
+           (dxr  (- xmx xo))
 
 ; scaled width
-	   (sx  (* 0.5 (op dx zoom-factor)))
+	   (sxl (op dxl zoom-factor))
+	   (sxr (op dxr zoom-factor))
 
 ; new domain limits
-	   (xnn (max-value xan (- xo sx)))
-	   (xnx (min-value xax (+ xo sx))))
+	   (xnn (max-value xan (- xo sxl)))
+	   (xnx (min-value xax (+ xo sxr))))
 
 ;(printf nil "-> %s [%.0f,%.0f] (%.0f,%.0f) (%.0f,%.0f) (%.0f,%.0f)\n"
 ;	op xo sx
@@ -126,9 +128,19 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
+(define (mem-curve lbl x y lc fc)
+   (if (and x (> (length x) 1))
+       (let* ((crv (make-curve* (reverse x) (reverse y))))
+	     (color crv lc)
+	     (fill crv fc)
+	     (label crv lbl))))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
 ; PARSE-MAP - parse the memory map file
 
-(define (parse-map fp xp yp n)
+(define (parse-map fp xact yact xfr yfr xma yma n)
 
 ; dispose of the comment lines at the top
     (if (= n 0)
@@ -138,20 +150,45 @@
 
     (let* ((t (read-line fp)))
           (if (eof-object? t)
-	      (make-curve* (reverse xp) (reverse yp))
+	      (begin (mem-curve "Active"      xact yact dark-green green)
+		     (mem-curve "Bare malloc" xma  yma  dark-red   red)
+		     (mem-curve "Free"        xfr  yfr  dark-gray  gray)
+		     n)
 	      (let* ((s (sprintf "(%s)" t))
 		     (prt (string->port s))
 		     (lst (read prt))
 		     (ad  (list-ref lst 1))
-		     (nb  (list-ref lst 2)))
+		     (nb  (list-ref lst 2))
+		     (typ (list-ref lst 3))
+		     (rc  (list-ref lst 4))
+		     (tag (sprintf "%s" (list-tail lst 5))))
 		    (if (and (number? ad) (number? nb))
 			(let* ((ab (- ad blsz))
 			       (ae (+ ad nb))
 			       (nh blsz)
-			       (xn (append (list ae ae ad ad ab ab) xp))
-			       (yn (append (list 0 1 1 0.2 0.2 0) yp)))
-			      (parse-map fp xn yn (+ n 1)))
-			(parse-map fp xp yp (+ n 1)))))))
+                               (isf (string=? tag "(-- free --)"))
+			       (ism (string=? (substring tag 0 12) "(BARE_MALLOC"))
+			       (isa (not (or isf ism)))
+			       (xna (if isa
+					(append (list ae ae ad ad ab ab) xact)
+					xact))
+			       (yna (if isa
+					(append (list 0 1 1 0.2 0.2 0) yact)
+					yact))
+			       (xnf (if isf
+					(append (list ae ae ad ad ab ab) xfr)
+					xfr))
+			       (ynf (if isf
+					(append (list 0 1 1 0.2 0.2 0) yfr)
+					yfr))
+			       (xnm (if ism
+					(append (list ae ae ad ad ab ab) xma)
+					xma))
+			       (ynm (if ism
+					(append (list 0 1 1 0.2 0.2 0) yma)
+					yma)))
+			      (parse-map fp xna yna xnf ynf xnm ynm (+ n 1)))
+			(parse-map fp xact yact xfr yfr xma yma (+ n 1)))))))
 	   
 
 ;--------------------------------------------------------------------------
@@ -161,11 +198,13 @@
 
 (define-macro (memory-map fname)
    (let* ((fp (fopen fname "r"))
-	  (crv (parse-map fp nil nil 0)))
+	  (nl (parse-map fp nil nil nil nil nil nil 0)))
          (fclose fp)
+	 (clipping off)
+         (label-space 0.1)
+	 (label-color-flag on)
          (axis-x-format "0x%x")
 ;         (x-log-scale on)
-         (color crv gray)
 	 (data-id off)
 	 (replot)))
 
