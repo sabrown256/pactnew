@@ -1931,14 +1931,14 @@ static object *_SXI_write_defstr(SS_psides *si, object *argl)
 
     if (desc == NULL)
        {if (PD_inquire_table_type(file->chart, dp->type) == NULL)
-           _PD_defstr(file, FALSE, dp->type, dp->kind,
+           _PD_defstr(file, PD_CHART_FILE, dp->type, dp->kind,
 		      desc, NULL,
 		      dp->size, dp->alignment,
 		      dp->fix.order, dp->convert, dp->fp.order, dp->fp.format, 
 		      dp->unsgned, dp->onescmp);
 
         if (PD_inquire_table_type(file->host_chart, dp->type) == NULL)
-           _PD_defstr(file, TRUE, dp->type, dp->kind,
+           _PD_defstr(file, PD_CHART_HOST, dp->type, dp->kind,
 		      desc, NULL,
 		      dp->size, dp->alignment,
 		      dp->fix.order, dp->convert, dp->fp.order, dp->fp.format, 

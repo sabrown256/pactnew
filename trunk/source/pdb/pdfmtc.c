@@ -355,12 +355,12 @@ static int _PD_rd_prim_typ_iii(PDBfile *file, char *bf)
         else 
 	   {dp = PD_inquire_host_type(file, type);
 	    if ((conv == FALSE) && (dp == NULL))
-               _PD_defstr(file, TRUE, type, kind,
+               _PD_defstr(file, PD_CHART_HOST, type, kind,
 			  NULL, tuple,
 			  size, align, ord, FALSE,
                           ordr, formt, unsgned, onescmp);
 
-            _PD_defstr(file, FALSE, type, kind,
+            _PD_defstr(file, PD_CHART_FILE, type, kind,
 		       NULL, tuple,
 		       size, align, ord, TRUE,
 		       ordr, formt, unsgned, onescmp);}

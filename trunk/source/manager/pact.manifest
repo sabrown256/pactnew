@@ -18,7 +18,7 @@ bin hserve fcscan pcsh do-run
 
 lib libpanacea.a libpdb.a libpgs.a libpml.a libppc.a
 lib libpsmm.a libscheme.a libscore.a libsx.a libfpact.a
-lib libpact.a
+lib libpact.a libosmm.so
 
 inc cpyright.h iso-c.h scconfig.h scdecls.h
 inc f77std.h f90kinds.inc f90types.h

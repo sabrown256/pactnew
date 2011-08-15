@@ -190,6 +190,12 @@ struct s_PD_state
 
    };
 
+enum e_PD_chart_kind
+   {PD_CHART_FILE = 0,
+    PD_CHART_HOST};
+
+typedef enum e_PD_chart_kind PD_chart_kind;
+
 enum e_PD_block_type
    {PD_BLOCK_UNINIT     = -2,
     PD_BLOCK_UNVERIFIED = -1,
@@ -506,7 +512,8 @@ extern int64_t
  _PD_get_current_address(PDBfile *file, PD_major_op tag);
 
 extern defstr
- *_PD_defstr(PDBfile *file, int host, char *name, PD_type_kind kind,
+ *_PD_defstr(PDBfile *file, PD_chart_kind host,
+	     char *name, PD_type_kind kind,
 	     memdes *desc, multides *tuple,
 	     long sz, int align, PD_byte_order ord,
 	     int conv, int *ordr, long *formt, int unsgned, int onescmp),

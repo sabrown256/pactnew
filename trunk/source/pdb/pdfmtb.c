@@ -515,7 +515,7 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
        {if (*local == rec)
            break;
 
-        type  = CSTRSAVE(SC_strtok(local, delim, s));
+        type    = CSTRSAVE(SC_strtok(local, delim, s));
         bpi     = SC_stol(SC_strtok(NULL, delim, s));
         align   = SC_stol(SC_strtok(NULL, delim, s));
         ord     = (PD_byte_order) SC_stol(SC_strtok(NULL, delim, s));
@@ -619,11 +619,11 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
            {_PD_regen_std(file, type, bpi, ord);
 
 	    if (conv == FALSE)
-               _PD_defstr(file, TRUE, type, kind,
+               _PD_defstr(file, PD_CHART_HOST, type, kind,
 			  NULL, tuple, bpi, align, ord, FALSE,
                           ordr, formt, unsgned, onescmp);
 
-            _PD_defstr(file, FALSE, type, kind,
+            _PD_defstr(file, PD_CHART_FILE, type, kind,
 		       NULL, tuple, bpi, align, ord, TRUE,
 		       ordr, formt, unsgned, onescmp);}
 
