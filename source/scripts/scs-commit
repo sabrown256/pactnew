@@ -26,12 +26,22 @@ while ($#argv > 0)
    shift
 end
 
-if (-d ../.git) then
+if ((-d ../.git) || (-d .git)) then
 
-   pushd .. >& /dev/null
+   if (-d .git) then
+      set part = ""
+      pushd . >& /dev/null
+   else if (-d ../.git) then
+      set part = "$cwd:t/"
+      pushd .. >& /dev/null
+   endif
 
 # find changed files
-   set inf = ( `git status -s |& egrep -v '^\?'` )
+   if ("$part" == "") then
+      set inf = ( `git status -s |& egrep -v '^\?'` )
+   else
+      set inf = ( `git status -s |& egrep -v '^\?' | grep $part` )
+   endif
    echo "Committing:"
    set files = ""
    while ($#inf > 0)
