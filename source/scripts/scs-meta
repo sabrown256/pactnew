@@ -1,0 +1,101 @@
+#!/bin/csh -f
+#
+# SCS-META - report directories containing repository metadata
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+set tgt = ""
+
+while ($#argv > 0)
+    switch ($1)
+       case -d:
+            set tgt = directories
+            breaksw
+       case -h:
+            echo ""
+            echo "Usage: scs-meta [-d] [-h]"
+            echo "   d  list directories containing metadata"
+            echo "   h  this help message"
+            echo "   r  report location of master repository"
+            echo ""
+            exit(1)
+       case -r:
+            set tgt = repo
+            breaksw
+       default:
+            breaksw
+    endsw
+    shift
+end
+
+set gitd = ( `where-git` )
+
+set res = ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# GIT
+
+if (-d $gitd[1]) then
+
+   pushd $gitd[1] >& /dev/null
+
+   switch ($tgt)
+      case directories:
+           set res = ( $res `find $gitd[1] -name .git -type d` )
+           breaksw
+      case repo:
+           set res = ( `grep url $gitd[1]/.git/config | sed 's|^[ \t]*url =||'` )
+           breaksw
+   endsw
+
+   popd >& /dev/null
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CVS
+
+else if (-d CVS) then
+
+   switch ($tgt)
+      case directories:
+           set res = ( $res `find . -name CVS -type d` )
+           breaksw
+      case repo:
+           set res = ( `cat CVS/Root` )
+           breaksw
+   endsw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SVN
+
+else if (-d .svn) then
+
+   switch ($tgt)
+      case directories:
+           set res = ( $res `find . -name .svn -type d` )
+           breaksw
+      case repo:
+           set res = ( `cat .svn/entries |& sed 's|entries:||'` )
+           breaksw
+   endsw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+endif
+
+# print results
+echo "$res"
+
+exit($status)

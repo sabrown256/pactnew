@@ -34,9 +34,11 @@ while ($#argv > 0)
    shift
 end
 
-if (-d ../.git) then
+set gitd = ( `where-git` )
 
-   pushd .. >& /dev/null
+if (-d $gitd[1]) then
+
+   pushd $gitd[1] >& /dev/null
 
    if ($unmngd == TRUE) then
       git status -s |& egrep '^\?' | sed 's/^??/? /'

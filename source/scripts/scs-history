@@ -10,11 +10,19 @@
 
 unalias *
 
-if (-d ../.git) then
+set gitd = ( `where-git` )
 
-   pushd .. >& /dev/null
+if (-d $gitd[1]) then
 
-   git log $argv
+   pushd $gitd[1] >& /dev/null
+
+#   set opt = ( --reverse -20 )
+   set opt = ( --reverse )
+   if ($#argv > 0) then
+      set opt = ( $argv )
+   endif
+
+   git log --reverse $opt |& cat
 
    popd >& /dev/null
 
