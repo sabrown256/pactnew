@@ -65,6 +65,7 @@ script pdbdiff pdbview pdbcp pdbls label-ps tpu tzu remod
 script which-cfg sys-site use-tcsh fill-string mpi-info
 script simplify-path sunrace cross-info find-comments where-git
 script scs-update scs-commit scs-co scs-history scs-meta
+script scs-add scs-remove scs-lock
 
 doc pact.ps panacea.ps pdb.ps pdbdiff.ps pdbview.ps pgs.ps
 doc pml.ps ppc.ps score.ps sx.ps ultra.ps
@@ -76,5 +77,5 @@ mgr pact-commit pact-config cpyright.h pact-dist
 mgr pact-import pact-scs
 mgr pact-update pact.manifest
 mgr systems.unix
-mgr scscom scshist scslock scstag scsup
+
 

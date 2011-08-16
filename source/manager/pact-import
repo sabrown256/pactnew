@@ -12,8 +12,11 @@
 
 unalias *
 
-source ../scripts/env-csh
-source ../scripts/csh-subroutines
+set MngDir = $cwd
+set ScrDir = $MngDir:h/scripts
+
+source $ScrDir/env-csh
+source $ScrDir/csh-subroutines
 HAVE_SUBROUTINES
 
 if ($?USER == 0) then
@@ -24,27 +27,13 @@ if ($?USER == 0) then
    endif
 endif
 
-set MngDir = $cwd
-set SCSCom = $MngDir/scscom
-set SCSUp  = $MngDir/scsup
-set SCSCO  = $MngDir/scsco
-if (-d .git) then
-   set RepoDir = `grep .git/config url | sed 's|^[ ]*url =||'`
-   set SCSAdd  = ( git add )
-   set SCSDel  = ( git rm )
-else if (-d CVS) then
-   set RepoDir = `cat CVS/Root | sed 's|^.*:||'`
-   set SCSAdd  = ( cvs add )
-   set SCSDel  = ( cvs remove )
-else if (-d .svn) then
-   set SCSAdd  = ( svn add )
-   set SCSDel  = ( svn remove )
-   echo "Not prepared for SVN yet - exiting"
-   exit(1)
-else
-   echo "No source control system detected - exiting"
-   exit(1)
-endif
+set SCSCom  = $ScrDir/scs-commit
+set SCSUp   = $ScrDir/scs-update
+set SCSCO   = $ScrDir/scs-co
+set SCSAdd  = $ScrDir/scs-add
+set SCSDel  = $ScrDir/scs-remove
+set RepoDir = `$ScrDir/scs-meta -r`
+set RepoKnd = `$ScrDir/scs-meta -k`
 
 # remove next line when able to do FULL round trips again. <<<<<<<<
 set OneOpt	  = TRUE
@@ -55,7 +44,6 @@ set DateFile      = $RepoDir/.import-date
 set TagFile       = $RepoDir/.import-tag
 set TagID         = ( `/bin/date '+%Y-%m-%d %H:%M'` )
 set ImportingDir  = $cwd
-set SCSRepository = ""
 set SRCDate       = ""
 set Host          = `uname -n`
 set Message       = (\" $USER on "$Host", Running import.\")
@@ -145,12 +133,12 @@ endif
    flog $Log source $MngDir/pact-scs
 
 # check if repository is locked
-   set lockst = `$MngDir/scslock status`
+   set lockst = `$ScrDir/scs-lock status`
    if ($lockst == "locked") then
       NoteD $Log ""
       NoteD $Log " *** REPOSITORY IS LOCKED ***"
       NoteD $Log ""
-      $MngDir/scslock cat
+      $ScrDir/scs-lock cat
       NoteD $Log ""
       exit(1)
    endif
@@ -320,7 +308,7 @@ BACKUP:
    Note $Log ""
 
 # initiate a lock on the repository
-   $MngDir/scslock lock
+   $ScrDir/scs-lock lock
    Note $Lock $Message
    Note $Lock "Source: $SrcFile" 
 
@@ -396,7 +384,7 @@ GET_OLD:
    flog $Log cd $Old
    flog $Log set Repository = $Repository:h
 
-   flog $Log $SCSCO $SCSTag pact
+   flog $Log $SCSCO $SCSTag $RepoKnd pact
    flog $Log set ErrStat = $status
 
    flog $Log popd
@@ -445,7 +433,7 @@ PROCESS_OLD:
 
    Note $Log "process the old sources"
    flog $Log cd pact
-   flog $Log (find . -name $SCSDir -prune -o -print >! ../$TmpFile.lst)
+   flog $Log ($ScrDir/scs-meta -d >! ../$TmpFile.lst)
    flog $Log (cat ../$TmpFile.lst | $ltmp)
    flog $Log cd ..
    Note $Log ""
@@ -506,7 +494,7 @@ ADJUST_OLD_TREE:
 # list all the directories of this tree sorted from most nested to least
 # then remove them if they have no counterpart in the other tree
    flog $Log cd pact
-   flog $Log (find . -type d \! -name $SCSDir | sort -r | sed s'|\.\/||' >! ../$TmpFile.lst)
+   flog $Log ($ScrDir/scs-meta -d | sort -r | sed s'|\.\/||' >! ../$TmpFile.lst)
 
    NoteD $Log "   The following directories do not exist for import:"
    ftee $Log (cat ../$TmpFile.lst | $ltmp)
@@ -603,7 +591,7 @@ ADJUST_NEW_TREE:
 
 # list all the directories of this tree sorted from most nested to least
    flog $Log cd pact
-   flog $Log (find . -type d \! -name $SCSDir -exec $ltmp {} \; >! ../$TmpFile.lst)
+   flog $Log ($ScrDir/scs-meta -d | xargs $ltmp >! ../$TmpFile.lst)
    flog $Log cat ../$TmpFile.lst
    flog $Log @ AddNew = `wc -l ../$TmpFile.lst | awk '{print $1}'`
    Note $Log ""
@@ -845,7 +833,7 @@ FINISH:
 
 # release the lock
    NoteD $Log "The repository is unlocked"
-   $MngDir/scslock unlock
+   $ScrDir/scs-lock unlock
 
    NoteD $Log ""
    NoteD $Log "Version $CodeDate imported"

@@ -1475,23 +1475,20 @@ CFG_DONE:
                    echo ""
                    echo " Usage: dsys info [-c] [-t] [-h] [-d] [-e] [-i] [-l] [-m] [-s] [-x]"
                    echo "        display info about the installed PACT"
+                   echo "        by default display info for the sources, executables,"
+                   echo "        libraries and documents"
                    echo ""
-                   echo "    c - Display the source repository commit log"
-                   echo "        (this has suboption which may be seen with -c -h)"
-                   echo "    t - Display info for the Version Tags"
-                   echo ""
-                   echo "    h - Display the help package"
-                   echo ""
-                   echo "    d - Display info for the documents"
-                   echo "    e - Display info for the executables"
-                   echo "    i - Display info for the include (header) files"
-                   echo "    l - Display info for the libraries"
-                   echo "    m - Display info for the manager script files"
-                   echo "    s - Display info for the source files"
-                   echo "    x - report number of MBytes of source, libraries, and binaries"
-                   echo ""
-                   echo "    (default) - Display info for the sources, executables,"
-                   echo "                libraries and documents."
+                   echo "    c    display the source repository commit log"
+                   echo "         (this has suboption which may be seen with -c -h)"
+                   echo "    t    display info for the Version Tags"
+                   echo "    h    this help message"
+                   echo "    d    display info for the documents"
+                   echo "    e    display info for the executables"
+                   echo "    i    display info for the include (header) files"
+                   echo "    l    display info for the libraries"
+                   echo "    m    display info for the manager script files"
+                   echo "    s    display info for the source files"
+                   echo "    x    report number of MBytes of source, libraries, and binaries"
                    echo ""
                    exit(1)
                    breaksw
@@ -1737,7 +1734,7 @@ CFG_DONE:
         if ("$Tags" != "") then
            echo ""
            echo "PACT revision tags:"
-           eval "($MngDir/scshist $Tags | tail -n 20 )"
+           eval "($ScrDir/scs-history $Tags | tail -n 20 )"
         endif
 
         if ($ChkVer == "yes") then
@@ -1860,7 +1857,7 @@ CFG_DONE:
 
         set DO_PACT = $MngDir/do-pact
 
-        flog $LogFile $MngDir/scsup
+        flog $LogFile $ScrDir/scs-update
         Note $LogFile do-net -e $DO_PACT $DArgs $CArgs
 
         do-net -e $DO_PACT $DArgs $CArgs |& tee -ai $LogFile
@@ -2375,12 +2372,12 @@ CFG_DONE:
         if ($Sleep == "YES") then
            manager/check.lock
         else
-           set lockst = `$MngDir/scslock status`
+           set lockst = `$ScrDir/scs-lock status`
            if ($lockst == "locked") then
               echo ""
               echo " *** REPOSITORY IS LOCKED ***"
               echo ""
-              $MngDir/scslock cat
+              $ScrDir/scs-lock cat
               echo ""
               echo ""
               exit(1)
@@ -2408,7 +2405,7 @@ CFG_DONE:
         flog $Log pwd
         flog $Log printenv
 
-        flog $Log $MngDir/scsup
+        flog $Log $ScrDir/scs-update
         set ErrStat = $status
 
 # take care of conflicting changes
@@ -2833,7 +2830,7 @@ CFG_DONE:
 
         call SCS_SETUP()
 
-        $MngDir/scslock unlock
+        $ScrDir/scs-lock unlock
         set RStatus = $status
         breaksw        
 

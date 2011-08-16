@@ -444,8 +444,7 @@ switch ($SrcMode)
 
         NoteD $Log "Checking out the PACT Sources"
 
-        set SCSDir = ".svn"
-        set root   = pactnew-read-only
+        set root = pactnew-read-only
         flog $Log svn co http://pactnew.googlecode.com/svn/trunk/ $root
         if ($status != 0) then
            NoteD $Log ""
@@ -460,7 +459,7 @@ switch ($SrcMode)
 
 # remove the source control sub-directories
         NoteD $Log "Removing Source Control Information"
-        find . -name $SCSDir | xargs rm -r
+        flog $Log scripts/scs-meta -d | xargs rm -r
         NoteD $Log "PACT sources checked out"
         breaksw
 endsw
