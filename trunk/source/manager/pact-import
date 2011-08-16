@@ -27,11 +27,6 @@ if ($?USER == 0) then
    endif
 endif
 
-set SCSCom  = $ScrDir/scs-commit
-set SCSUp   = $ScrDir/scs-update
-set SCSCO   = $ScrDir/scs-co
-set SCSAdd  = $ScrDir/scs-add
-set SCSDel  = $ScrDir/scs-remove
 set RepoDir = `$ScrDir/scs-meta -r`
 set RepoKnd = `$ScrDir/scs-meta -k`
 
@@ -384,7 +379,7 @@ GET_OLD:
    flog $Log cd $Old
    flog $Log set Repository = $Repository:h
 
-   flog $Log $SCSCO $SCSTag $RepoKnd pact
+   flog $Log $ScrDir/scs-co $SCSTag $RepoKnd pact
    flog $Log set ErrStat = $status
 
    flog $Log popd
@@ -611,7 +606,7 @@ ADJUST_NEW_TREE:
          foreach dir (`cat ../$TmpFile.lst`)
             Note $Log "Adding $dir"
             flog $Log mkdir $dir
-            flog $Log $SCSAdd $dir
+            flog $Log $ScrDir/scs-add $dir
          end
          flog $Log popd
       else
@@ -660,13 +655,13 @@ RECONCILE:
    Note $STDOUT 'else if (-e $Base.new) then'
    Note $STDOUT '   cp $Base.new $Base'
    Note $STDOUT '   pushd $BaseDir >& /dev/null'
-   Note $STDOUT "   $SCSAdd" '$File'
+   Note $STDOUT "   $ScrDir/scs-add" '$File'
    Note $STDOUT '   popd >& /dev/null'
    Note $STDOUT 'else if (-e $Base.old) then'
    Note $STDOUT '   pushd $BaseDir >& /dev/null'
-   Note $STDOUT "   $SCSUp -A" '$File'
+   Note $STDOUT "   $ScrDir/scs-update -A" '$File'
    Note $STDOUT '   rm -f $File' 
-   Note $STDOUT "   $SCSDel" '$File'
+   Note $STDOUT "   $ScrDir/scs-remove" '$File'
    Note $STDOUT '   popd >& /dev/null'
    Note $STDOUT 'endif'
    Note $STDOUT 'rm -f $1'
@@ -726,10 +721,10 @@ UPDATE:
    Note $Log ""
 
    if ($SCSTag != "") then
-      flog $Log ($SCSUp -A >&! $TmpFile)
+      flog $Log ($ScrDir/scs-update -A >&! $TmpFile)
    else
       flog $Log cd pact
-      flog $Log ($SCSUp -A >&! ../$TmpFile)
+      flog $Log ($ScrDir/scs-update -A >&! ../$TmpFile)
       flog $Log cd ..
    endif
 
@@ -789,7 +784,7 @@ COMMIT:
    Note $Log "   Current Directory:    $cwd"
    Note $Log ""
 
-   flog $Log $SCSCom -m "+++++ Import from $CodeDate +++++"
+   flog $Log $ScrDir/scs-commit -m "+++++ Import from $CodeDate +++++"
    set ErrStat = $status
 
    if ($ErrStat != 0) then

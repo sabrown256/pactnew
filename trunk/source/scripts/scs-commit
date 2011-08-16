@@ -12,6 +12,7 @@ unalias *
 
 set ldir = `dirname $0`
 set gitd = ( `$ldir/where-git` )
+set repo = ( `$ldir/scs-meta -r` )
 
 set args = ""
 set msg  = ""
@@ -53,7 +54,8 @@ if (-d $gitd[1]) then
 
 # do the local commit
    echo -n "Local commit ... "
-   git commit $args -q -m "$msg" $files >&! log.commit
+   echo "git commit $args -q -m '$msg' $files" >&! log.commit
+   git commit $args -q -m "$msg" $files >>& log.commit
    set xstatus = $status
    if ($xstatus == 0) then
       echo "ok"
@@ -61,12 +63,13 @@ if (-d $gitd[1]) then
       echo "ng"
    endif
 
+   echo "---------------------" >>& log.commit
+
 # push it up to the master repository
    if ($xstatus == 0) then
       echo -n "Pushing changes ... "
-      set inf  = ( `cat .git/config | grep url` )
-      set root = $inf[3]
-      git push $root >>& log.commit
+      echo "git push $repo" >>& log.commit
+      git push $repo >>& log.commit
       if ($xstatus == 0) then
          echo "ok"
       else

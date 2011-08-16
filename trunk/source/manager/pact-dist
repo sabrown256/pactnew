@@ -252,8 +252,15 @@ GET_SOURCE:
    flog $Log pwd
    flog $Log mkdir pact
    flog $Log cd pact
+   flog $Log $ScrDir/scs-co $SCSOpt $SCSKind $SCSRepository pact
    Note $Log " " 
-   flog $Log $ScrDir/scs-co $SCSOpt $SCSKind $SCSRepository manager auto $PactList 
+
+   foreach i ( manager auto doc $PactList )
+      if (-d pact/$i) then
+         flog $Log mv pact/$i .
+      endif
+   end
+   flog $Log $RMDir pact
 
    if ($status == 0) then
       Note $Log "Sources checked out" 
@@ -275,11 +282,6 @@ GET_SOURCE:
       flog $Log cd ..
       flog $Log $RMDir auto
    endif
-
-   NoteD $Log "Getting the documents"
-   Note $Log " " 
-   flog $Log $ScrDir/scs-co $SCSOpt $SCSKind $SCSRepository doc
-   Note $Log " " 
 
    flog $Log cd ..
 

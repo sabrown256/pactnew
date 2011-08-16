@@ -15,6 +15,8 @@ if ($?SCSOpt == 0) then
    set SCSOpt = ""
 endif
 
+set repo = `$ScrDir/scs-meta -r`
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
@@ -22,14 +24,30 @@ endif
 
 if (-d ../.git) then
    set SCSExe = git
-   pushd .. >& /dev/null
-   set SCSDir = $cwd/.git
-   popd >& /dev/null
+   set SCSDir = $cwd:h/.git
 
    set Stage = "$MngDir/stage"
    set Lock  = "$Stage/commit.lock"
 
-   set repohost = ""
+   if ("$repo" =~ ssh://*) then
+      set repohost = `echo $repo | sed 's|ssh://||' | sed 's|/.*$||'`
+   else
+      set repohost = ""
+   endif
+
+# handle the LOCAL repository case
+   if ("$repohost" == "") then
+      set Lock = commit.lock
+      if ($?CVSROOT == 1) then
+         if (`expr "$CVSROOT" : '.*\(:\).*'` == "") then
+            set Lock = $CVSROOT/commit.lock
+         endif
+      endif
+   else
+      set Stage = "$MngDir/stage"
+      set Lock  = "$Stage/commit.lock"
+   endif
+
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

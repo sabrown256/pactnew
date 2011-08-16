@@ -12,6 +12,7 @@ unalias *
 
 set ldir = `dirname $0`
 set gitd = ( `$ldir/where-git` )
+set repo = ( `$ldir/scs-meta -r` )
 
 if ($?lmngdir == 0) then
    set exe = `dirname $0`
@@ -90,9 +91,13 @@ if (-d $gitd[1]) then
    setenv SSH  ssh
    setenv SCP  scp
 
-   set inf      = ( `cat $gitd[1]/config | grep url` )
-   set repodir  = $inf[3]
-   set repohost = ""
+   if ("$repo" =~ *:/*) then
+      set repohost = `echo $repo | sed 's|:/.*$||'`
+      set repodir  = `echo $repo | sed 's|^.*:||'`
+   else
+      set repohost = ""
+      set repodir  = $repo
+   endif
 
 # handle the LOCAL repository case
    if ("$repohost" == "") then
@@ -173,13 +178,13 @@ if (-d $gitd[1]) then
 
 else if (-d CVS) then
 
-   if ($?CVSROOT == 1) then
-      if ("$CVSROOT" =~ *:*) then
-         set repohost = `echo $CVSROOT | sed 's|:/.*$||' | sed 's|^.*@||'`
-         set repodir  = `echo $CVSROOT | sed 's|^.*:||'`
+   if ($?repo == 1) then
+      if ("$repo" =~ *:*) then
+         set repohost = `echo $repo | sed 's|:/.*$||' | sed 's|^.*@||'`
+         set repodir  = `echo $repo | sed 's|^.*:||'`
       else
          set repohost = `hostname`
-         set repodir  = $CVSROOT
+         set repodir  = $repo
       endif
    else
       set repohost = ""
@@ -188,9 +193,9 @@ else if (-d CVS) then
 # handle the LOCAL repository case
    if ("$repohost" == "") then
       set lock = commit.lock
-      if ($?CVSROOT) then
-         if (`expr "$CVSROOT" : '.*\(:\).*'` == "") then
-            set lock = $CVSROOT/commit.lock
+      if ($?repo) then
+         if (`expr "$repo" : '.*\(:\).*'` == "") then
+            set lock = $repo/commit.lock
          endif
       endif
 

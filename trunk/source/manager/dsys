@@ -2399,7 +2399,7 @@ CFG_DONE:
         Note $Log "  User:  $WhoIAm             Date: `date`"
         Note $Log " "  
 
-        flog $Log $RM manager/.pact-version manager/.pact-version-tag
+#        flog $Log $RM manager/.pact-version manager/.pact-version-tag
 
         Separator $Log
         flog $Log pwd

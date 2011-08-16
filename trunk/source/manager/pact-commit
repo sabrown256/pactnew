@@ -401,9 +401,8 @@ else
    flog $Log pushd manager
 endif
 
-flog $Log rm -f .pact-version .pact-version-tag
-echo $TagID > .pact-version-tag
-echo $VersionID > .pact-version
+flog $Log ( echo $TagID >! .pact-version-tag )
+flog $Log ( echo $VersionID >! .pact-version )
 
 flog $Log popd
 
