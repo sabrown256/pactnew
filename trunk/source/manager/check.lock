@@ -11,6 +11,7 @@
 unalias *
 
 set MngDir        = $cwd
+set ScrDir        = $MngDir:h/scripts
 set SCSRepository = ""
 set SRCDate       = ""
 set LockOn        = "NO"
@@ -21,12 +22,12 @@ source $MngDir/pact-scs
 #
 # check if repository is locked
 #
-set lockst = `$MngDir/scslock status`
+set lockst = `$SrcDir/scs-lock status`
 if ($lockst == "locked") then
    echo ""
    echo " *** REPOSITORY IS LOCKED ***"
    echo ""
-   $MngDir/scslock cat
+   $SrcDir/scs-lock cat
    echo ""
    set LockOn = "YES"
 endif
@@ -36,7 +37,7 @@ if ($LockOn == "NO") then
 else
    echo -n "Sleeping ZZZZZ"
 Loop:
-   set lockst = `$MngDir/scslock status`
+   set lockst = `$SrcDir/scs-lock status`
    if ($lockst == "locked") then
       echo -n "Z"
       sleep 30

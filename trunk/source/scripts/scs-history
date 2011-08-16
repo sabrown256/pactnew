@@ -10,7 +10,8 @@
 
 unalias *
 
-set gitd = ( `where-git` )
+set ldir = `dirname $0`
+set gitd = ( `$ldir/where-git` )
 
 if (-d $gitd[1]) then
 

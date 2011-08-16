@@ -1,0 +1,31 @@
+#!/bin/csh -f
+#
+# SCS-REMOVE - remove from repository whether GIT, CVS or SVN
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+set ldir = `dirname $0`
+set gitd = ( `$ldir/where-git` )
+
+if (-d $gitd[1]) then
+
+   git rm $argv
+
+else if (-d CVS) then
+
+   rm -f $argv
+   cvs remove $argv
+
+else if (-d .svn) then
+
+   svn remove $argv
+
+endif
+
+exit($status)

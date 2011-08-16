@@ -30,12 +30,13 @@ if ($?USER == 0) then
    endif
 endif
 
-setenv System `../scripts/cfgman use`
+setenv System `$ScrDir/cfgman use`
 set Manager       = manager
 set Exe           = $MngDir/$0
 set DTag          = ( `./pact-get-tag -d` )
 set DName         = "pact$DTag"
-set SCSRepository = ""
+set SCSRepository = ( -d "`$ScrDir/scs-meta -r`" )
+set SCSKind       = ( -k "`$ScrDir/scs-meta -k`" )
 set SRCDate       = ( -D "`./pact-get-tag`" )
 set WhoIAm        = $USER
 set HeaderFile    = "../pact-update"
@@ -191,17 +192,17 @@ INIT:
    source $MngDir/pact-scs
 
 # check if repository locked
-   set lockst = `$MngDir/scslock status`
+   set lockst = `$ScrDir/scs-lock status`
    if ($lockst == "locked") then
       NoteD $Log " *** REPOSITORY IS LOCKED ***"
       NoteD $Log ""
-      $MngDir/scslock cat
+      $ScrDir/scs-lock cat
       NoteD $Log ""
       exit(26)
    endif
 
 # lock repository
-   $MngDir/scslock lock
+   $ScrDir/scs-lock lock
    echo "  pact-dist in progress - " $USER  `date`>> $Lock
    Note $Lock ""
 
@@ -252,7 +253,7 @@ GET_SOURCE:
    flog $Log mkdir pact
    flog $Log cd pact
    Note $Log " " 
-   flog $Log $MngDir/scsco $SCSOpt $SCSRepository manager auto $PactList 
+   flog $Log $ScrDir/scs-co $SCSOpt $SCSKind $SCSRepository manager auto $PactList 
 
    if ($status == 0) then
       Note $Log "Sources checked out" 
@@ -262,7 +263,7 @@ GET_SOURCE:
       echo "See $Log"
 
 # release the lock
-      $MngDir/scslock unlock
+      $ScrDir/scs-lock unlock
       exit(1)
    endif
    Note $Log " " 
@@ -277,14 +278,14 @@ GET_SOURCE:
 
    NoteD $Log "Getting the documents"
    Note $Log " " 
-   flog $Log $MngDir/scsco $SCSOpt $SCSRepository doc
+   flog $Log $ScrDir/scs-co $SCSOpt $SCSKind $SCSRepository doc
    Note $Log " " 
 
    flog $Log cd ..
 
 # release the lock
-   flog $Log $MngDir/scslock unlock
-   flog $Log $MngDir/scslock status
+   flog $Log $ScrDir/scs-lock unlock
+   flog $Log $ScrDir/scs-lock status
 
    flog $Log ls -lR pact
 
@@ -328,7 +329,7 @@ PREP_TREE:
 
 # remove the source control system sub-directories
    NoteD $Log "Cleaning up the sources"
-   flog $Log set List = `find . -name $SCSDir -print`
+   flog $Log set List = ( `$ScrDir/scs-meta -d` )
    foreach i ($List)
       $RMDir $i
    end

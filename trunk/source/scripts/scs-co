@@ -10,12 +10,15 @@
 
 unalias *
 
+set ldir = `dirname $0`
+set repo = ( `$ldir/scs-meta -r` )
+
 set opt = ""
 set hst = ""
 set dir = ""
 set pkg = ""
+set knd = ""
 
-set repo    = ""
 set srcdate = ""
 
 while ($#argv > 0)
@@ -25,6 +28,10 @@ while ($#argv > 0)
            set repo = $1
            set hst  = `echo $repo | sed 's|:/.*$||'`
            set dir  = `echo $repo | sed 's|^.*:||'`
+           breaksw
+      case -k:
+           shift
+           set knd = $1
            breaksw
       case -D:
            shift
@@ -37,7 +44,12 @@ while ($#argv > 0)
    shift
 end
 
-if (-d $repo/CVSROOT) then
+#echo "repo = $repo"
+#echo "host = $hst"
+#echo "root = $dir"
+#echo "kind = $knd"
+
+if ($knd == cvs) then
 
    set opt = ( $opt -d ${hst}:$dir )
    if ("$srcdate" != "") then
@@ -46,7 +58,7 @@ if (-d $repo/CVSROOT) then
       cvs $opt co $pkg
    endif
 
-else if (-f $repo/conf/svnserve.conf) then
+else if ($knd == svn) then
 
    set opt  = ( $opt http://${hst}$dir )
    set root = `grep manager $refdir/.svn/entries | sed 's|/manager$||'`
@@ -60,7 +72,7 @@ else if (-f $repo/conf/svnserve.conf) then
       endif
    end
 
-else
+else if ($knd == git) then
 
    foreach p ( $repo/$pkg )
       if (-d $p/.git) then

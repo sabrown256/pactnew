@@ -10,6 +10,9 @@
 
 unalias *
 
+set ldir = `dirname $0`
+set gitd = ( `$ldir/where-git` )
+
 set unmngd = FALSE
 set cvsopt = ""
 set svnopt = ""
@@ -33,8 +36,6 @@ while ($#argv > 0)
    endsw
    shift
 end
-
-set gitd = ( `where-git` )
 
 if (-d $gitd[1]) then
 
