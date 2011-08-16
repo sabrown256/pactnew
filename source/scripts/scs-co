@@ -74,16 +74,19 @@ else if ($knd == svn) then
 
 else if ($knd == git) then
 
-   foreach p ( $repo/$pkg )
-      if (-d $p/.git) then
-         if ("$srcdate" != "") then
-            set dt = "$srcdate[1]"
-            git clone $p
-         else
-            git clone $p
-         endif
-      endif
-   end
+   if ($#pkg > 0) then
+      set base = $pkg[1]
+      shift pkg
+   else
+      set base = work-copy
+   endif
+
+   if ("$srcdate" != "") then
+      set dt = "$srcdate[1]"
+      git clone $repo $base
+   else
+      git clone $repo $base
+   endif
 
 endif
 

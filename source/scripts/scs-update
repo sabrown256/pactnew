@@ -42,9 +42,9 @@ if (-d $gitd[1]) then
    pushd $gitd[1] >& /dev/null
 
    if ($unmngd == TRUE) then
-      git status -s |& egrep '^\?' | sed 's/^??/? /'
+      git status -s |& egrep '^\?' | sed 's/^??/? /' | grep "$gitd[2]/"
    else
-      set inf  = ( `cat .git/config | grep url` )
+      set inf  = ( `cat $gitd[1]/.git/config | grep url` )
       set repo = $inf[3]
       git pull $repo master >&! .log.sup
       if ($status != 0) then
@@ -52,7 +52,7 @@ if (-d $gitd[1]) then
       else
          rm .log.sup
       endif
-      git status -s |& egrep -v '^\?'
+      git status -s |& egrep -v '^\?' | grep "$gitd[2]/"
    endif
 
    popd >& /dev/null

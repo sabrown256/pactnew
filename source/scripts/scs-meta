@@ -54,7 +54,7 @@ if (-d $gitd[1]) then
 
    switch ($tgt)
       case directories:
-           set res = ( $res `find $gitd[1] -name .git -type d` )
+           set res = ( $res `find $gitd[1] -name .git -type d | grep -v $gitd[1]/.git` )
            breaksw
       case repo:
            set res = ( `grep url $gitd[1]/.git/config | sed 's|^[ \t]*url =||'` )
