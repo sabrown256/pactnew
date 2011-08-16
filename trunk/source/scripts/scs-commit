@@ -26,18 +26,15 @@ while ($#argv > 0)
    shift
 end
 
-if ((-d ../.git) || (-d .git)) then
+set gitd = ( `where-git` )
 
-   if (-d .git) then
-      set part = ""
-      pushd . >& /dev/null
-   else if (-d ../.git) then
-      set part = "$cwd:t/"
-      pushd .. >& /dev/null
-   endif
+if (-d $gitd[1]) then
+
+   set part = $gitd[2]
+   pushd $gitd[1] >& /dev/null
 
 # find changed files
-   if ("$part" == "") then
+   if ("$part" == ".") then
       set inf = ( `git status -s |& egrep -v '^\?'` )
    else
       set inf = ( `git status -s |& egrep -v '^\?' | grep $part` )

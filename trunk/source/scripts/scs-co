@@ -10,20 +10,12 @@
 
 unalias *
 
-if ($?refdir == 0) then
-   set exedir = `dirname $0`
-   if ("$exedir" == ".") then
-      set refdir = $cwd
-   else
-      set refdir = $exedir
-   endif
-endif
-
 set opt = ""
 set hst = ""
 set dir = ""
 set pkg = ""
 
+set repo    = ""
 set srcdate = ""
 
 while ($#argv > 0)
@@ -45,26 +37,7 @@ while ($#argv > 0)
    shift
 end
 
-if (-d $refdir/../.git) then
-
-   pushd $refdir/.. >& /dev/null
-
-   set opt  = ( $opt $dir )
-   set inf  = ( `cat .git/config | grep url` )
-   set root = $inf[3]:h
-
-   popd >& /dev/null
-
-   foreach p ( $pkg )
-      if ("$srcdate" != "") then
-         set dt = "$srcdate[1]"
-         git clone $root/$p
-      else
-         git clone $root/$p
-      endif
-   end
-
-else if (-d $refdir/CVS) then
+if (-d $repo/CVSROOT) then
 
    set opt = ( $opt -d ${hst}:$dir )
    if ("$srcdate" != "") then
@@ -73,7 +46,7 @@ else if (-d $refdir/CVS) then
       cvs $opt co $pkg
    endif
 
-else if (-d $refdir/.svn) then
+else if (-f $repo/conf/svnserve.conf) then
 
    set opt  = ( $opt http://${hst}$dir )
    set root = `grep manager $refdir/.svn/entries | sed 's|/manager$||'`
@@ -84,6 +57,19 @@ else if (-d $refdir/.svn) then
          svn co $opt -r "{${dt}}" ${root}/$p
       else
          svn co $opt ${root}/$p
+      endif
+   end
+
+else
+
+   foreach p ( $repo/$pkg )
+      if (-d $p/.git) then
+         if ("$srcdate" != "") then
+            set dt = "$srcdate[1]"
+            git clone $p
+         else
+            git clone $p
+         endif
       endif
    end
 
