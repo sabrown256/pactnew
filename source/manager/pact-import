@@ -27,8 +27,18 @@ if ($?USER == 0) then
    endif
 endif
 
+InitLog Log $cwd/import.log
+
 set RepoDir = `$ScrDir/scs-meta -r`
-set RepoKnd = `$ScrDir/scs-meta -k`
+set RepoKnd = ( -k `$ScrDir/scs-meta -k` )
+
+if ("$RepoDir" =~ *:/*) then
+   set RepoDir = ( `echo $RepoDir | sed 's|^.*:||'` )
+   if (!(-d $RepoDir)) then
+      NoteD $Log "No such directory '$RepoDir' - exiting"
+      exit(1)
+   endif
+endif
 
 # remove next line when able to do FULL round trips again. <<<<<<<<
 set OneOpt	  = TRUE
@@ -87,8 +97,6 @@ while ($#argv >= 1)
    endsw
    shift
 end
-
-InitLog Log $cwd/import.log
 
 # Remove if test when able to do FULL round trips again.  <<<<<<<<
 if ($OneOpt == TRUE) then
@@ -379,7 +387,7 @@ GET_OLD:
    flog $Log cd $Old
    flog $Log set Repository = $Repository:h
 
-   flog $Log $ScrDir/scs-co $SCSTag $RepoKnd pact
+   flog $Log $ScrDir/scs-co $SCSTag $RepoKnd -d $RepoDir pact
    flog $Log set ErrStat = $status
 
    flog $Log popd

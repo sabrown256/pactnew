@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# SCS-ADD - add to repository whether GIT, CVS or SVN
+# SCS-MOVE - rename sources whether GIT, CVS or SVN
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -15,19 +15,25 @@ if ("$ldir" == ".") then
    set ldir = $cwd
 endif
 set gitd = ( `$ldir/where-git` )
-unset ldir
 
 if (-d $gitd[1]) then
 
-   git add $argv
+   pushd $gitd[1] >& /dev/null
+   git mv $argv
+   popd >& /dev/null
 
 else if (-d CVS) then
 
-   cvs add $argv
+   set old = $1
+   set new = $2
+
+   mv $old $new
+   cvs remove $old
+   cvs add $new
 
 else if (-d .svn) then
 
-   svn add $argv
+   svn mv $argv
 
 endif
 

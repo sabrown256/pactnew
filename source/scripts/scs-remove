@@ -11,7 +11,11 @@
 unalias *
 
 set ldir = `dirname $0`
+if ("$ldir" == ".") then
+   set ldir = $cwd
+endif
 set gitd = ( `$ldir/where-git` )
+unset ldir
 
 if (-d $gitd[1]) then
 

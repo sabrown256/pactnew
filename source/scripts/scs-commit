@@ -11,6 +11,9 @@
 unalias *
 
 set ldir = `dirname $0`
+if ("$ldir" == ".") then
+   set ldir = $cwd
+endif
 set gitd = ( `$ldir/where-git` )
 set repo = ( `$ldir/scs-meta -r` )
 
@@ -89,6 +92,7 @@ if (-d $gitd[1]) then
          echo "ok"
       else
          echo "ng"
+         echo "Need 'git config --bool core.bare true' on master"
       endif
    endif
 

@@ -11,13 +11,14 @@
 unalias *
 
 set ldir = `dirname $0`
+if ("$ldir" == ".") then
+   set ldir = $cwd
+endif
 set repo = ( `$ldir/scs-meta -r` )
+set knd  = ( `$ldir/scs-meta -k` )
 
 set opt = ""
-set hst = ""
-set dir = ""
 set pkg = ""
-set knd = ""
 
 set srcdate = ""
 
@@ -26,8 +27,6 @@ while ($#argv > 0)
       case -d:
            shift
            set repo = $1
-           set hst  = `echo $repo | sed 's|:/.*$||'`
-           set dir  = `echo $repo | sed 's|^.*:||'`
            breaksw
       case -k:
            shift
@@ -45,8 +44,6 @@ while ($#argv > 0)
 end
 
 #echo "repo = $repo"
-#echo "host = $hst"
-#echo "root = $dir"
 #echo "kind = $knd"
 
 if ($knd == cvs) then
@@ -91,7 +88,5 @@ else if ($knd == git) then
    endif
 
 endif
-
-unset refdir
 
 exit($status)
