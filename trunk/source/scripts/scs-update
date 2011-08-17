@@ -11,6 +11,9 @@
 unalias *
 
 set ldir = `dirname $0`
+if ("$ldir" == ".") then
+   set ldir = $cwd
+endif
 set gitd = ( `$ldir/where-git` )
 
 set unmngd = FALSE
@@ -45,12 +48,20 @@ if (-d $gitd[1]) then
       git status -s |& egrep '^\?' | sed 's/^??/? /' | grep "$gitd[2]/"
    else
       set repo = ( `$ldir/scs-meta -r` )
+
+# update local copy with changes from master repo
       git pull $repo master >&! .log.sup
-      if ($status == 0) then
+      set xstatus = $status
+
+# report changed files
+      grep '|' .log.sup | sed 's/|.*$//' | awk '{printf("   P %s\n", $1);}'
+      if ($xstatus == 0) then
          rm .log.sup
       else
          cat .log.sup
       endif
+
+# report status of local changes
       if ("$gitd[2]" == ".") then
          git status -s |& egrep -v '^\?'
       else

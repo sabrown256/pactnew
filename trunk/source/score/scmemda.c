@@ -388,7 +388,11 @@ char *_SC_block_name(mem_descriptor *desc)
 
     rv = NULL;
     if (desc != NULL)
-       rv = _SC_format_loc(name, MAXLINE, &desc->where, TRUE, TRUE);
+       {if (FREE_SCORE_BLOCK_P(desc))
+	   {snprintf(name, MAXLINE, "-- free --");
+	    rv = name;}
+        else
+	   rv = _SC_format_loc(name, MAXLINE, &desc->where, TRUE, TRUE);};
 
     return(rv);}
 

@@ -1,0 +1,87 @@
+#
+# PGI-OSX - define PGI compiler for MAC OS X
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+run analyze/rpath -a /usr/X11R6/${LIB}:/usr/${LIB}
+run analyze/rpath pgi
+
+WARN_PATTERN = "PGFTN-W- PGF90-W- PGC-W-"
+ERR_PATTERN  = "PGFTN-S- PGF90-S- PGC-S- PGC-F-"
+
+Tool CC {
+   Exe      = pgcc
+   Flags    = -Kieee
+   Flags   += [ _env_ = C_STD ;             # C standard flags
+                C89   = -c89 ;
+                C99   = -c99 ;
+                X89   = -c89 ;
+                X99   = -c99 ]
+   Flags   += [ _env_ = Bits ;              # address bit size
+                32    = -tp px ;
+                64    = -tp k8-64 ]
+   Flags   += [ _cmd_ = -p ;                # profiling
+	        on    = -Mprof=func ]
+   Debug    = -g
+   Optimize = -g -O1
+   Version  = -V
+}
+
+Tool FC {
+   Exe     = pgf90
+   Flags   = -Mfree -Mnoref_externals
+   Flags  += [ _env_ = Bits ;               # address bit size
+               32    = -tp px ;
+               64    = -tp k8-64 ]
+   Version = -V
+}
+
+Tool LD {
+   RPath   = -Wl,-rpath,@
+   Flags   = -Ktrap=fp ${NUMA}
+   Flags   += [ _cmd_ = -p ;                # profiling
+	        on    = -Mprof=func ]
+}
+
+Group Cfg {
+   Use      = Std
+   LD_Flags = ${LD_Flags}
+}
+
+Group Shared {
+   LD_Exe   = no-op
+   CC_Flags =
+   LD_Flags =
+   LD_Lib   =
+}
+
+Group PThread {
+   LD_Lib = -lpthread 
+}
+
+Group OpenMP {
+   CC_Flags += -mp
+   LD_Flags += -mp
+   LD_Lib    =
+}
+
+include cpp-rule
+include serial
+
+setenv PATH /sw/bin:/usr/local/bin:$PATH
+
+Group PNG {
+   Path = /sw
+}
+
+Group JPEG {
+   Path = /sw
+}
+
+Group HDF {
+   Path = /sw
+}

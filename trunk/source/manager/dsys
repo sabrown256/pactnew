@@ -2399,14 +2399,19 @@ CFG_DONE:
         Note $Log "  User:  $WhoIAm             Date: `date`"
         Note $Log " "  
 
-#        flog $Log $RM manager/.pact-version manager/.pact-version-tag
-
         Separator $Log
         flog $Log pwd
         flog $Log printenv
 
+        set TmpV = $MngDir/.tmp.$$
+        flog $Log mkdir $TmpV
+        flog $Log $MV $MngDir/.pact-version* $TmpV
+
         flog $Log $ScrDir/scs-update
         set ErrStat = $status
+
+        flog $Log $MV $TmpV/.pact-version* $MngDir
+        flog $Log $RMDir $TmpV
 
 # take care of conflicting changes
         flog $Log (awk '($1 == "C") && ($2 !~ /Makefile/) {print $2}' $Log > Confl)
