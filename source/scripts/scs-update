@@ -44,8 +44,7 @@ if (-d $gitd[1]) then
    if ($unmngd == TRUE) then
       git status -s |& egrep '^\?' | sed 's/^??/? /' | grep "$gitd[2]/"
    else
-      set inf  = ( `cat $gitd[1]/.git/config | grep url` )
-      set repo = $inf[3]
+      set repo = ( `$ldir/scs-meta -r` )
       git pull $repo master >&! .log.sup
       if ($status == 0) then
          rm .log.sup
