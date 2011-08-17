@@ -97,7 +97,9 @@ else if (-d .svn) then
            set res = ( $res `find . -name .svn -type d` )
            breaksw
       case repo:
-           set res = ( `cat .svn/entries |& sed 's|entries:||'` )
+           set base = ( `head -n 6 .svn/entries | tail -n 1` )
+           set dir  = ( `head -n 5 .svn/entries | tail -n 1` )
+           set res = $dir:h
            breaksw
       case kind:
            set res = svn

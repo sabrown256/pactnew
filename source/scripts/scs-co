@@ -51,26 +51,28 @@ end
 
 if ($knd == cvs) then
 
-   set opt = ( $opt -d ${hst}:$dir )
+   set opt = ( $opt -d $repo )
    if ("$srcdate" != "") then
-      cvs $opt co -D "$srcdate" $pkg
+      cvs -d $repo co -D "$srcdate" $pkg
    else
-      cvs $opt co $pkg
+      cvs -d $repo co $pkg
    endif
 
 else if ($knd == svn) then
 
-   set opt  = ( $opt http://${hst}$dir )
-   set root = `grep manager $refdir/.svn/entries | sed 's|/manager$||'`
+   if ($#pkg > 0) then
+      set base = $pkg[1]
+      shift pkg
+   else
+      set base = work-copy
+   endif
 
-   foreach p ( $pkg )
-      if ("$srcdate" != "") then
-         set dt = "$srcdate[1]"
-         svn co $opt -r "{${dt}}" ${root}/$p
-      else
-         svn co $opt ${root}/$p
-      endif
-   end
+   if ("$srcdate" != "") then
+      set dt = "$srcdate[1]"
+      svn co $repo -r "{${dt}}" $base
+   else
+      svn co $repo $base
+   endif
 
 else if ($knd == git) then
 
