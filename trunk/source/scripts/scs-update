@@ -47,12 +47,16 @@ if (-d $gitd[1]) then
       set inf  = ( `cat $gitd[1]/.git/config | grep url` )
       set repo = $inf[3]
       git pull $repo master >&! .log.sup
-      if ($status != 0) then
-         cat .log.sup
-      else
+      if ($status == 0) then
          rm .log.sup
+      else
+         cat .log.sup
       endif
-      git status -s |& egrep -v '^\?' | grep "$gitd[2]/"
+      if ("$gitd[2]" == ".") then
+         git status -s |& egrep -v '^\?'
+      else
+         git status -s |& egrep -v '^\?' | grep "$gitd[2]/"
+      endif
    endif
 
    popd >& /dev/null
