@@ -32,8 +32,23 @@ end
 
 if (-d $gitd[1]) then
 
+   set log = $cwd/log.commit
+   rm -f $log
+   touch $log
+
    set part = $gitd[2]
-   pushd $gitd[1] >& /dev/null
+   pushd $gitd[1] >>& $log
+
+# do a pull first
+   echo -n "Sync ... "
+   echo "git pull $repo master" >>& $log
+   git pull $repo master >>& $log
+   set xstatus = $status
+   if ($xstatus == 0) then
+      echo "ok"
+   else
+      echo "ng"
+   endif
 
 # find changed files
    if ("$part" == ".") then
@@ -54,8 +69,8 @@ if (-d $gitd[1]) then
 
 # do the local commit
    echo -n "Local commit ... "
-   echo "git commit $args -q -m '$msg' $files" >&! log.commit
-   git commit $args -q -m "$msg" $files >>& log.commit
+   echo "git commit $args -q -m '$msg' $files" >&! $log
+   git commit $args -q -m "$msg" $files >>& $log
    set xstatus = $status
    if ($xstatus == 0) then
       echo "ok"
@@ -63,13 +78,13 @@ if (-d $gitd[1]) then
       echo "ng"
    endif
 
-   echo "---------------------" >>& log.commit
+   echo "---------------------" >>& $log
 
 # push it up to the master repository
    if ($xstatus == 0) then
       echo -n "Pushing changes ... "
-      echo "git push $repo" >>& log.commit
-      git push $repo >>& log.commit
+      echo "git push $repo" >>& $log
+      git push $repo >>& $log
       if ($xstatus == 0) then
          echo "ok"
       else
