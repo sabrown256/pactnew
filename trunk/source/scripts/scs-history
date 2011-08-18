@@ -32,7 +32,29 @@ if (-d $gitd[1]) then
 
 else if (-d CVS) then
 
-   cvs history $argv
+   setenv CVS_RSH  ssh
+   set repo = `scs-meta -r`
+
+   set opt = ""
+   while ($#argv > 0)
+      switch ($1)
+         case -l:
+              if (-d $repo) then
+                 more $repo/CVSROOT/commitlog
+                 exit(0)
+              else
+                 echo "No such directory '$repo' - exiting"
+                 exit(1)
+              endif
+              breaksw
+         default:
+              set opt = ( $opt $1 )
+              breaksw
+      endsw
+      shift
+   end
+
+   cvs history $opt
 
 else if (-d .svn) then
 
