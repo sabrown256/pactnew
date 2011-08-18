@@ -16,24 +16,35 @@ if ("$ldir" == ".") then
 endif
 set gitd = ( `$ldir/where-git` )
 
-set tgt = ""
+set tgt   = ""
+set nrepo = ""
 
 while ($#argv > 0)
     switch ($1)
+       case -c:
+            shift
+            set nrepo = $1
+            set tgt   = change-repo
+            breaksw
        case -d:
             set tgt = directories
             breaksw
        case -h:
             echo ""
-            echo "Usage: scs-meta [-d] [-h] [-k]"
+            echo "Usage: scs-meta [-c <dir>] [-d] [-h] [-k] [-n] [-r]"
+            echo "   c  change metadata to point to new repo <dir>"
             echo "   d  list directories containing metadata"
             echo "   h  this help message"
             echo "   k  report system (one of git, svn, or cvs)"
+            echo "   n  report name of metadata directory (one of .git, .svn, or CVS)"
             echo "   r  report location of master repository"
             echo ""
             exit(1)
        case -k:
             set tgt = kind
+            breaksw
+       case -n:
+            set tgt = metan
             breaksw
        case -r:
             set tgt = repo
@@ -56,14 +67,21 @@ if (-d $gitd[1]) then
    pushd $gitd[1] >& /dev/null
 
    switch ($tgt)
+      case change-repo:
+           echo "Not implemented yet"
+           exit(1)
+           breaksw
       case directories:
            set res = ( $res `find $gitd[1] -name .git -type d | grep -v $gitd[1]/.git` )
            breaksw
-      case repo:
-           set res = ( `grep url $gitd[1]/.git/config | sed 's|^[ \t]*url =||'` )
-           breaksw
       case kind:
            set res = git
+           breaksw
+      case metan:
+           set res = .git
+           breaksw
+      case repo:
+           set res = ( `grep url $gitd[1]/.git/config | sed 's|^[ \t]*url =||'` )
            breaksw
    endsw
 
@@ -77,14 +95,24 @@ if (-d $gitd[1]) then
 else if (-d CVS) then
 
    switch ($tgt)
+      case change-repo:
+           foreach f (`scs-meta -d`)
+              set r = $f/Root
+              rm -f $r
+              echo $repo > $r
+           end
+           breaksw
       case directories:
            set res = ( $res `find . -name CVS -type d` )
            breaksw
-      case repo:
-           set res = ( `cat CVS/Root` )
-           breaksw
       case kind:
            set res = cvs
+           breaksw
+      case metan:
+           set res = CVS
+           breaksw
+      case repo:
+           set res = ( `cat CVS/Root` )
            breaksw
    endsw
 
@@ -96,16 +124,23 @@ else if (-d CVS) then
 else if (-d .svn) then
 
    switch ($tgt)
+      case change-repo:
+           echo "Not implemented yet"
+           exit(1)
+           breaksw
       case directories:
            set res = ( $res `find . -name .svn -type d` )
+           breaksw
+      case kind:
+           set res = svn
+           breaksw
+      case metan:
+           set res = .svn
            breaksw
       case repo:
            set base = ( `head -n 6 .svn/entries | tail -n 1` )
            set dir  = ( `head -n 5 .svn/entries | tail -n 1` )
            set res = $dir:h
-           breaksw
-      case kind:
-           set res = svn
            breaksw
    endsw
 

@@ -421,11 +421,7 @@ PROCESS_OLD:
    flog $Log touch $STDOUT
 
    Note $STDOUT "#\!/bin/csh -f"
-   Note $STDOUT 'while (1)'
-   Note $STDOUT '   set x = $<'
-   Note $STDOUT '   if (($#x < 1) || ($x == "")) then'
-   Note $STDOUT '      exit(0)'
-   Note $STDOUT '   endif'
+   Note $STDOUT 'foreach x ($argv)'
    Note $STDOUT '   if (!(-d "$x")) then'
    Note $STDOUT '      mv $x $x.old'
    Note $STDOUT '      touch $x.chk'
@@ -437,11 +433,12 @@ PROCESS_OLD:
    Note $Log "process the old sources"
    flog $Log cd pact
    flog $Log ($ScrDir/scs-meta -d >! ../$TmpFile.lst)
-   flog $Log (cat ../$TmpFile.lst | $ltmp)
-   flog $Log cd ..
+   flog $Log cat ../$TmpFile.lst
+   Note $Log ""
+   flog $Log $ltmp `cat ../$TmpFile.lst`
    Note $Log ""
 
-   Note $Log "Old directory file list: $TmpFile.lst"
+   flog $Log cd ..
    flog $Log cat $TmpFile.list
    Note $Log ""
 
@@ -496,8 +493,10 @@ ADJUST_OLD_TREE:
 
 # list all the directories of this tree sorted from most nested to least
 # then remove them if they have no counterpart in the other tree
+   set scsd = `$ScrDir/scs-meta -n`
    flog $Log cd pact
-   flog $Log ($ScrDir/scs-meta -d | sort -r | sed s'|\.\/||' >! ../$TmpFile.lst)
+   flog $Log (find . -type d \! -name $scsd | sort -r | sed s'|\.\/||' >! ../$TmpFile.lst)
+   unset scsd
 
    NoteD $Log "   The following directories do not exist for import:"
    ftee $Log (cat ../$TmpFile.lst | $ltmp)
@@ -787,6 +786,7 @@ COMMIT:
    flog $Log pushd $WDir
 
    Separator $Log
+   flog $Log cd pact
    Note $Lock -n "Committing the sources ............. " 
    NoteD $Log "Committing the new sources"
    Note $Log "   Current Directory:    $cwd"

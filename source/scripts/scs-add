@@ -23,7 +23,31 @@ if (-d $gitd[1]) then
 
 else if (-d CVS) then
 
-   cvs add $argv
+   setenv CVS_RSH  ssh
+   set repo = `scs-meta -r`
+
+# separate arguments that are directories
+   set dir = ""
+   set opt = ""
+   while ($#argv > 0)
+      if (-d $1) then
+         set dir = ( $dir $1 )
+      else
+         set opt = ( $opt $1 )
+      endif
+      shift
+   end
+
+# if there are no directories just add files
+   if ("$dir" == "") then
+      cvs add $opt
+
+# if there are directories cvs import them
+   else
+      foreach d ($dir)
+         cvs import -m "Add directory $d" $opt $d V1 R1
+      end
+   endif
 
 else if (-d .svn) then
 

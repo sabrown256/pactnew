@@ -24,6 +24,8 @@ if (-d $gitd[1]) then
 
 else if (-d CVS) then
 
+   setenv CVS_RSH  ssh
+
    set old = $1
    set new = $2
 

@@ -100,6 +100,7 @@ if (-d $gitd[1]) then
 
 else if (-d CVS) then
 
+   setenv CVS_RSH  ssh
    cvs commit $args -m "$msg"
 
 else if (-d .svn) then

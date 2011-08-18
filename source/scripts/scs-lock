@@ -181,6 +181,8 @@ if (-d $gitd[1]) then
 
 else if (-d CVS) then
 
+   setenv CVS_RSH  ssh
+
    if ($?repo == 1) then
       if ("$repo" =~ *:*) then
          set repohost = `echo $repo | sed 's|:/.*$||' | sed 's|^.*@||'`
@@ -225,13 +227,6 @@ else if (-d CVS) then
 
 # handle the REMOTE repository case
    else
-      if ($?CVS_RSH == 0) then
-         setenv CVS_RSH  ssh
-      endif
-      if ($?RCP == 0) then
-         setenv RCP scp
-      endif
-
       set lock  = "$lstage/commit.lock"
       set rlock = "$repodir/commit.lock"
 
@@ -245,7 +240,7 @@ else if (-d CVS) then
               touch $lock
               chmod 660 $lock
               echo $lmsg >> $lock
-              $RCP $lock ${repohost}:${repodir} >& /dev/null
+              scp $lock ${repohost}:${repodir} >& /dev/null
               breaksw
          case unlock:
               rm -f $lock

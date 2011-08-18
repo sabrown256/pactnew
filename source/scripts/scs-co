@@ -36,6 +36,13 @@ while ($#argv > 0)
            shift
            set srcdate = ( $1 )
            breaksw
+      case -r:
+           set opt = ( $opt $1 $2 )
+           shift
+           breaksw
+      case -*:
+           set opt = ( $opt $1 )
+           breaksw
       default:
            set pkg = ( $pkg $1 )
            breaksw
@@ -48,6 +55,7 @@ end
 
 if ($knd == cvs) then
 
+   setenv CVS_RSH  ssh
    set opt = ( $opt -d $repo )
    if ("$srcdate" != "") then
       cvs -d $repo co -D "$srcdate" $pkg

@@ -106,7 +106,8 @@ void SC_mem_statb_set(uint64_t a, uint64_t f)
  * #bind SC_mem_stats fortran() scheme(memory-usage) python()
  */
 
-void SC_mem_stats(long *al, long *fr, long *df, long *mx)
+void SC_mem_stats(long *al ARG(,out), long *fr ARG(,out),
+		  long *df ARG(,out), long *mx ARG(,out))
    {SC_heap_des *ph;
 
     ph = _SC_tid_mm();

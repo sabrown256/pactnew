@@ -23,6 +23,8 @@ if (-d $gitd[1]) then
 #   popd >& /dev/null
 
 else if (-d CVS) then
+
+   setenv CVS_RSH  ssh
    cvs diff $argv
 
 else if (-d .svn) then
