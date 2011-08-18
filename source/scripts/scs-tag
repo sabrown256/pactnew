@@ -1,0 +1,35 @@
+#!/bin/csh -f
+#
+# SCS-TAG - tag a version whether GIT, CVS or SVN
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+set ldir = `dirname $0`
+if ("$ldir" == ".") then
+   set ldir = $cwd
+endif
+set gitd = ( `$ldir/where-git` )
+unset ldir
+
+if (-d $gitd[1]) then
+
+   git tag $argv
+
+else if (-d CVS) then
+
+   cvs tag $argv
+# example: cvs rtag $TagID $codename doc test
+
+else if (-d .svn) then
+
+   svn tag $argv
+
+endif
+
+exit($status)
