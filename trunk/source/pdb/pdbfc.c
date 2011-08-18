@@ -339,7 +339,8 @@ PDBfile *PD_open_contained(char *name, int64_t sad, int64_t ead)
    {char fname[MAXLINE];
     PDBfile *fp;
 
-    snprintf(fname, MAXLINE, "%s~%lld:%lld", name, sad, ead);
+    snprintf(fname, MAXLINE, "%s~%lld:%lld", name,
+	     (long long) sad, (long long) ead);
 
     fp = PD_open(fname, "r");
 
