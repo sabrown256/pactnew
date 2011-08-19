@@ -531,6 +531,23 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* DPRSS - print memory stats */
+
+void dprss(int pid)
+   {SC_rusedes ru;
+
+    if (pid == -1)
+       pid = getpid();
+
+    SC_resource_usage(&ru, pid);
+
+    printf("RSS: %10.3e\n", ru.maxrss*1024.0*1024.0);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_SET_RESOURCE_LIMITS - set limits on resource usage
  *                        - return TRUE iff successful
  */

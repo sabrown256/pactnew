@@ -3020,19 +3020,19 @@ static void scheme_array_return(char *t, int nc, fdecl *dcl)
 	     
 		 if (nvl == 1)
 		    vstrcat(a, MAXLINE,
-			    "                   %s, &_l%s,\n",
+			    "                       %s, &_l%s,\n",
 			    dty, nm);
 		 else
 		    {for (iv = 0; iv < nvl; iv++)
 			 vstrcat(a, MAXLINE,
-				 "                   %s, &_l%s[%d],\n",
+				 "                       %s, &_l%s[%d],\n",
 				 dty, nm, iv);};};};};
 
 /* if the list argument are non empty make up the call */
     if (IS_NULL(a) == FALSE)
        {snprintf(t, nc, "    _lo = SS_make_list(si,\n");
 	nstrcat(t, nc, a);
-	vstrcat(t, nc, "\t\t\t0);\n");};
+	vstrcat(t, nc, "                       0);\n");};
 
     return;}
 

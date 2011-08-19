@@ -409,12 +409,15 @@ static object *_SSI_resource_usage(SS_psides *si, object *argl)
             SC_INT_I, &pid,
             0);
 
+    if (pid == -1)
+       pid = getpid();
+
     err = SC_resource_usage(&ru, pid);
     if (err == TRUE)
        o = SS_make_list(si, SC_INT_I, &ru.pid,      /* process id */
-			SC_INT_I, &ru.ppid,     /* process parent id */
-			SC_INT_I, &ru.uid,      /* process user id */
-			SC_INT_I, &ru.priority, /* process scheduling priority */
+			SC_INT_I,     &ru.ppid,     /* process parent id */
+			SC_INT_I,     &ru.uid,      /* process user id */
+			SC_INT_I,     &ru.priority, /* process scheduling priority */
 			SC_STRING_I,  &ru.cmd,      /* command line */
 			SC_DOUBLE_I,  &ru.ut,       /* total user time used (in sec) */
 			SC_DOUBLE_I,  &ru.st,       /* total system time used (in sec) */

@@ -29,15 +29,58 @@ SC_thread_lock
  *                   - takes pthread id as argument
  */
 
-static void _SC_mem_stats_acc(SC_heap_des *ph, long a, long f)
-   {
+static void _SC_mem_stats_acc(SC_heap_des *ph, int64_t a, int64_t f)
+   {int64_t d;
 
     ph->sp_alloc += a;
     ph->sp_free  += f;
 
-    ph->sp_diff = ph->sp_alloc - ph->sp_free;
-    ph->sp_max  = (ph->sp_max > ph->sp_diff) ?
-                     ph->sp_max : ph->sp_diff;
+    d = ph->sp_alloc - ph->sp_free;
+
+    ph->sp_diff = max(d, 0);
+    ph->sp_max  = max(ph->sp_max, ph->sp_diff);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_MEM_STATB_SET - set the memory usage to A and F */
+
+void SC_mem_statb_set(uint64_t a, uint64_t f)
+   {int64_t d;
+    SC_heap_des *ph;
+
+    ph = _SC_tid_mm();
+
+    ph->sp_alloc = a;
+    ph->sp_free  = f;
+
+    d = ph->sp_alloc - ph->sp_free;
+
+    ph->sp_diff = max(d, 0);
+    ph->sp_max  = max(ph->sp_max, ph->sp_diff);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_MEM_STATS_SET - set the memory usage to A and F */
+
+void SC_mem_stats_set(int64_t a, int64_t f)
+   {int64_t d;
+    SC_heap_des *ph;
+
+    ph = _SC_tid_mm();
+
+    ph->sp_alloc = a;
+    ph->sp_free  = f;
+
+    d = ph->sp_alloc - ph->sp_free;
+
+    ph->sp_diff = max(d, 0);
+    ph->sp_max  = max(ph->sp_max, ph->sp_diff);
 
     return;}
 
@@ -82,32 +125,13 @@ void SC_mem_statb(uint64_t *al, uint64_t *fr, uint64_t *df, uint64_t *mx)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_MEM_STATB_SET - set the memory usage to A and F */
-
-void SC_mem_statb_set(uint64_t a, uint64_t f)
-   {SC_heap_des *ph;
-
-    ph = _SC_tid_mm();
-
-    ph->sp_alloc = a;
-    ph->sp_free  = f;
-
-    ph->sp_diff = ph->sp_alloc - ph->sp_free;
-    ph->sp_max  = (ph->sp_max > ph->sp_diff) ?
-                     ph->sp_max : ph->sp_diff;
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SC_MEM_STATS - return memory usage statistics
  *
  * #bind SC_mem_stats fortran() scheme(memory-usage) python()
  */
 
-void SC_mem_stats(long *al ARG(,out), long *fr ARG(,out),
-		  long *df ARG(,out), long *mx ARG(,out))
+void SC_mem_stats(int64_t *al ARG([*],out), int64_t *fr ARG([*],out),
+		  int64_t *df ARG([*],out), int64_t *mx ARG([*],out))
    {SC_heap_des *ph;
 
     ph = _SC_tid_mm();
@@ -123,25 +147,6 @@ void SC_mem_stats(long *al ARG(,out), long *fr ARG(,out),
 
     if (mx != NULL)
        *mx = ph->sp_max;
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SC_MEM_STATS_SET - set the memory usage to A and F */
-
-void SC_mem_stats_set(long a, long f)
-   {SC_heap_des *ph;
-
-    ph = _SC_tid_mm();
-
-    ph->sp_alloc = a;
-    ph->sp_free  = f;
-
-    ph->sp_diff = ph->sp_alloc - ph->sp_free;
-    ph->sp_max  = (ph->sp_max > ph->sp_diff) ?
-                     ph->sp_max : ph->sp_diff;
 
     return;}
 
@@ -724,7 +729,7 @@ void *_SC_alloc_n(long ni, long bpi, void *arg)
 	       _SC.mem_hst(SC_MEM_ALLOC, desc);};
 
 	if (na == TRUE)
-	   SC_mem_statb_set(a, f);
+	   SC_mem_stats_set(a, f);
 
 	SC_LOCKOFF(SC_mm_lock);
 

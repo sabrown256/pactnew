@@ -51,13 +51,13 @@ static object *_SXI_fa3(SS_psides *si, object *argl)
 
     _rv = fa3(_la, _lb, _lc);
     _lo = SS_make_list(si,
-                   SC_INT_I, &_lb[0],
-                   SC_INT_I, &_lb[1],
-                   SC_INT_I, &_lb[2],
-                   SC_INT_I, &_lc[0],
-                   SC_INT_I, &_lc[1],
-                   SC_INT_I, &_lc[2],
-			0);
+                       SC_INT_I, &_lb[0],
+                       SC_INT_I, &_lb[1],
+                       SC_INT_I, &_lb[2],
+                       SC_INT_I, &_lc[0],
+                       SC_INT_I, &_lc[1],
+                       SC_INT_I, &_lc[2],
+                       0);
 
     return(_lo);}
 
@@ -83,9 +83,9 @@ static object *_SXI_fa4(SS_psides *si, object *argl)
 
     _rv = fa4(_la, &_lb, _lc);
     _lo = SS_make_list(si,
-                   SC_INT_I, &_lb,
-                   SC_INT_I, &_lc,
-			0);
+                       SC_INT_I, &_lb,
+                       SC_INT_I, &_lc,
+                       0);
 
     return(_lo);}
 
@@ -179,9 +179,9 @@ static object *_SXI_fc1(SS_psides *si, object *argl)
 
     fc1(_la, _lb, &_lc, _ld);
     _lo = SS_make_list(si,
-                   SC_INT_I, &_lc,
-                   SC_INT_I, &_ld,
-			0);
+                       SC_INT_I, &_lc,
+                       SC_INT_I, &_ld,
+                       0);
 
     return(_lo);}
 
@@ -209,9 +209,9 @@ static object *_SXI_fc2(SS_psides *si, object *argl)
 
     fc2(_la, _lb, &_lc, _ld);
     _lo = SS_make_list(si,
-                   SC_INT_I, &_lc,
-                   SC_INT_I, &_ld,
-			0);
+                       SC_INT_I, &_lc,
+                       SC_INT_I, &_ld,
+                       0);
 
     return(_lo);}
 
@@ -239,9 +239,9 @@ static object *_SXI_fc3(SS_psides *si, object *argl)
 
     fc3(_la, _lb, &_lc, _ld);
     _lo = SS_make_list(si,
-                   SC_INT_I, &_lc,
-                   SC_INT_I, &_ld,
-			0);
+                       SC_INT_I, &_lc,
+                       SC_INT_I, &_ld,
+                       0);
 
     return(_lo);}
 
@@ -269,9 +269,9 @@ static object *_SXI_fc4(SS_psides *si, object *argl)
 
     fc4(_la, &_lb, &_lc, &_ld);
     _lo = SS_make_list(si,
-                   SC_INT_I, &_lc,
-                   SC_INT_I, &_ld,
-			0);
+                       SC_INT_I, &_lc,
+                       SC_INT_I, &_ld,
+                       0);
 
     return(_lo);}
 
@@ -302,11 +302,11 @@ static object *_SXI_fc5(SS_psides *si, object *argl)
 
     fc5(_la, _lb, _lc, _ld);
     _lo = SS_make_list(si,
-                   SC_INT_I, &_lc[0],
-                   SC_INT_I, &_lc[1],
-                   SC_INT_I, &_ld[0],
-                   SC_INT_I, &_ld[1],
-			0);
+                       SC_INT_I, &_lc[0],
+                       SC_INT_I, &_lc[1],
+                       SC_INT_I, &_ld[0],
+                       SC_INT_I, &_ld[1],
+                       0);
 
     return(_lo);}
 
@@ -334,9 +334,9 @@ static object *_SXI_fc6(SS_psides *si, object *argl)
 
     fc6(_la, &_lb, &_lc, &_ld);
     _lo = SS_make_list(si,
-                   SC_INT_I, &_lc,
-                   SC_INT_I, &_ld,
-			0);
+                       SC_INT_I, &_lc,
+                       SC_INT_I, &_ld,
+                       0);
 
     return(_lo);}
 
@@ -367,11 +367,11 @@ static object *_SXI_fc7(SS_psides *si, object *argl)
 
     fc7(_la, _lb, _lc, _ld);
     _lo = SS_make_list(si,
-                   SC_INT_I, &_lc[0],
-                   SC_INT_I, &_lc[1],
-                   SC_INT_I, &_ld[0],
-                   SC_INT_I, &_ld[1],
-			0);
+                       SC_INT_I, &_lc[0],
+                       SC_INT_I, &_lc[1],
+                       SC_INT_I, &_ld[0],
+                       SC_INT_I, &_ld[1],
+                       0);
 
     return(_lo);}
 
