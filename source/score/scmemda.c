@@ -1027,7 +1027,7 @@ void *SC_mem_attrs(void *p, int attr)
 	    SC_mem_statb(&a, &f, NULL, NULL);
 	    nb = desc->length;
 	    a -= nb;
-	    SC_mem_statb_set(a, f);};};
+	    SC_mem_stats_set(a, f);};};
 
     return(p);}
 

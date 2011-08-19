@@ -235,9 +235,10 @@ static int _PD_rd_fmt_ii(PDBfile *file)
  */
 
 static int _PD_parse_symt_ii(PDBfile *file, char *buf, int flag)
-   {char *name, *type, *tmp, *pbf, *s, *local;
+   {int i;
     long mini, leng, bsz;
     int64_t addr, numb;
+    char *name, *type, *tmp, *pbf, *s, *local;
     syment *ep;
     dimdes *dims, *next, *prev;
     PD_smp_state *pa;
@@ -249,30 +250,32 @@ static int _PD_parse_symt_ii(PDBfile *file, char *buf, int flag)
 
     pbf  = buf;
     prev = NULL;
-    while (_PD_get_token(pbf, local, bsz, '\n'))
-       {pbf  = NULL;
-        name = SC_strtok(local, "\001", s);
-        if (name == NULL)
-           break;
-        type = SC_strtok(NULL, "\001", s);
-        numb = SC_stol(SC_strtok(NULL, "\001", s));
-        addr = SC_stol(SC_strtok(NULL, "\001", s));
-        dims = NULL;
-        while ((tmp = SC_strtok(NULL, "\001\n", s)) != NULL)
-           {mini = SC_stol(tmp);
-            leng = SC_stol(SC_strtok(NULL, "\001\n", s));
-            next = _PD_mk_dimensions(mini, leng);
-            if (dims == NULL)
-               dims = next;
+    for (i = 0; _PD_get_token(pbf, local, bsz, '\n') != NULL; i++)
+        {pbf  = NULL;
+	 name = SC_strtok(local, "\001", s);
+	 if (name == NULL)
+            break;
+	 type = SC_strtok(NULL, "\001", s);
+	 numb = SC_stol(SC_strtok(NULL, "\001", s));
+	 addr = SC_stol(SC_strtok(NULL, "\001", s));
+	 dims = NULL;
+	 while ((tmp = SC_strtok(NULL, "\001\n", s)) != NULL)
+            {mini = SC_stol(tmp);
+	     leng = SC_stol(SC_strtok(NULL, "\001\n", s));
+	     next = _PD_mk_dimensions(mini, leng);
+	     if (dims == NULL)
+                dims = next;
 
-            else
-               {prev->next = next;
-		SC_mark(next, 1);};
+	     else
+                {prev->next = next;
+		 SC_mark(next, 1);};
 
-            prev = next;};
+	     prev = next;};
 
-        ep = _PD_mk_syment(type, numb, addr, NULL, dims);
-        _PD_e_install(file, name, ep, flag);};
+	 ep = _PD_mk_syment(type, numb, addr, NULL, dims);
+	 _PD_e_install(file, name, ep, flag);};
+
+    SC_ASSERT(i >= 0);
 
     return(TRUE);}
 

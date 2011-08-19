@@ -221,6 +221,66 @@ static int _SC_n_blocks(SC_heap_des *ph)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_PRUNE_MAJOR_BLOCKS - release empty major blocks
+ *                        - return the number of blocks released
+ */
+ 
+int _SC_prune_major_blocks(void)
+   {int i, j, nf, nbl, nmj;
+    long nu, sz, nby;
+    char *pn;
+    mem_descriptor *desc, *md;
+    major_block_des *mbl;
+    SC_heap_des *ph;
+
+    ph = _SC_tid_mm();
+
+    nbl = 0;
+    nby = 0;
+
+    nmj = ph->n_major_blocks;
+    mbl = ph->major_block_list;
+    for (i = 0; i < nmj; i++)
+        {pn = mbl[i].block;
+	 nu = mbl[i].nunits;
+	 sz = mbl[i].size;
+
+         nf = 0;
+	 for (j = 0; j < nu; j++, pn += sz)
+	     {desc = (mem_descriptor *) pn;
+	      nf += FREE_SCORE_BLOCK_P(desc);};
+
+	 if (nf == nu)
+	    {nbl++;
+#if 0
+	     printf("Major block %d is eligible to be released\n", i);
+#else
+	     nby += nu*sz;
+
+             md = (mem_descriptor *) mbl[i].block;
+
+             for (j = 0; j < _SC_ms.n_bins; j++)
+	         {if (ph->free_list[j] == md)
+                     {ph->free_list[j] = NULL;
+		      break;};};
+
+	     _SC_FREE(md);
+
+	     mbl[i] = mbl[--nmj];
+	     mbl[nmj].index  = -1;
+	     mbl[nmj].nunits = 0;
+	     mbl[nmj].size   = 0;
+	     mbl[nmj].block  = NULL;
+#endif
+	    };};
+
+    ph->n_major_blocks = nmj;
+
+    return(nbl);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_LIST_MAJOR_BLOCKS - list selected blocks in major blocks
  *                       - this is to be done carefully so as to detect
  *                       - corrupted memory
@@ -994,15 +1054,21 @@ double SC_mem_frag(int tid, int nde)
 
 /* DPRSTATS - print memory stats for specified heap */
 
-void dprstats(int tid)
+void dprstats(int tid, int ifmt)
    {SC_heap_des *ph;
 
     ph = _SC_get_heap(tid);
 
-    printf("Allocated: %ld\n", (long) ph->sp_alloc);
-    printf("Freed:     %ld\n", (long) ph->sp_free);
-    printf("Diff:      %ld\n", (long) ph->sp_diff);
-    printf("Max Diff:  %ld\n", (long) ph->sp_max);
+    if (ifmt == TRUE)
+       {printf("Allocated: %ld\n", (long) ph->sp_alloc);
+	printf("Freed:     %ld\n", (long) ph->sp_free);
+	printf("Diff:      %ld\n", (long) ph->sp_diff);
+	printf("Max Diff:  %ld\n", (long) ph->sp_max);}
+    else
+       {printf("Allocated: %10.3e\n", (double) ph->sp_alloc);
+	printf("Freed:     %10.3e\n", (double) ph->sp_free);
+	printf("Diff:      %10.3e\n", (double) ph->sp_diff);
+	printf("Max Diff:  %10.3e\n", (double) ph->sp_max);};
 
     return;}
 
