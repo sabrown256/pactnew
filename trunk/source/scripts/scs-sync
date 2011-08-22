@@ -1,0 +1,159 @@
+#!/bin/csh -f
+#
+# SCS-SYNC - update repository B from the contents of repository A
+#          - excluding the contents of the specified sub directories
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+set ldir = `dirname $0`
+if ("$ldir" == ".") then
+   set ldir = $cwd
+endif
+set gitd = ( `$ldir/where-git` )
+set repo = ( `$ldir/scs-meta -r` )
+
+set repoa = ""
+set repob = ""
+set excd  = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -exclude:
+           shift
+           set excd = ( $excd $1 )
+           break
+           breaksw
+      default:
+           if ("$repoa" == "") then
+              set repoa = $1
+           else if ("$repob" == "") then
+              set repob = $2
+           endif
+           breaksw
+   endsw
+   shift
+end
+
+set rel = $cwd/syncb
+rm -rf synca syncb
+
+if (-d $gitd[1]) then
+
+   git clone $repoa synca
+   git clone $repob syncb
+
+   cd synca
+   git fetch $repob master
+
+# replace contents of excluded directories with
+# original contents from repob
+   foreach e ($excd)
+      foreach d (`find . -type d -name $e`)
+         rsync -av --delete $rel/$d/ $d
+      end
+   end
+
+   git add -A
+   git merge FETCH_HEAD
+   git status -s
+
+   git commit -m "Import from $repoa"
+   git push $repob master
+
+else if (-d CVS) then
+
+else if (-d .svn) then
+
+endif
+
+cd ..
+rm -rf synca syncb
+
+exit($status)
+
+# #!/bin/csh -f
+# #
+# # GIT-SYNC - copy/sync state of repoa to repob
+# #
+# 
+# source /usr/local/apps/pact/include/env-csh
+# 
+# InitLog log $cwd/log.git-sync
+# 
+# set repoa = $1
+# set repob = $2
+# 
+# set excd = ( local )
+# 
+# flog $log rm -rf synca syncb
+# 
+# #--------------------------------------------------------------------------
+# #--------------------------------------------------------------------------
+# 
+# # update the master
+# 
+# Separator $log
+# 
+# NoteD $log -n "Updating repoa ... "
+# Note $log ""
+# 
+# flog $log git clone $repoa synca
+# 
+# flog $log git clone $repob syncb
+# 
+# flog $log set rel = $cwd/syncb
+# 
+# flog $log pushd synca
+# 
+# set fm = TRUE
+# 
+# if ($fm == TRUE) then
+#    flog $log git fetch $repob master
+# 
+#    foreach e ($excd)
+#       set dirl = ( `find . -type d -name $e` )
+#       foreach d ($dirl)
+#          flog $log rm -f $d/*
+#          flog $log rsync -av --delete $rel/$d/ $d
+#          flog $log git add $d/*
+#       end
+#    end
+# 
+#    flog $log git merge FETCH_HEAD
+# else
+# 
+#    foreach e ($excd)
+#       set dirl = ( `find . -type d -name $e` )
+#       foreach d ($dirl)
+#          flog $log rm -f $d/*
+#          flog $log rsync -av --delete $rel/$d/ $d
+#          flog $log git add $d/*
+#       end
+#    end
+# 
+#    flog $log git pull $repob master
+# endif
+# 
+# flog $log ( find . -type d | grep -v '\.git' | xargs ls -la )
+# 
+# flog $log pwd
+# flog $log git commit -a -m "Import to head"
+# flog $log git status -s
+# 
+# flog $log git push $repob master
+# 
+# flog $log popd
+# 
+# NoteD $log "ok"
+# 
+# #--------------------------------------------------------------------------
+# #--------------------------------------------------------------------------
+# 
+# exit($status)
+# 
