@@ -66,7 +66,7 @@ typedef enum e_PD_instr_rdwr PD_instr_rdwr;
      continue;}
 
 #define INIT_STACKS(_t, _d)                                                  \
-    {long _a, _f;                                                            \
+    {int64_t _a, _f;                                                         \
      if (SZ_LIST_T == 0)                                                     \
         {SZ_LIST_T = _t;                                                     \
 	 SZ_LIST_D = _d;                                                     \

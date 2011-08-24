@@ -782,7 +782,7 @@ static char *_PD_wr_hyper_index(PDBfile *file, char *out, dimind *pi,
  */
 
 static void INLINE _PD_init_stacks(long t, long d)
-   {long a, f;
+   {int64_t a, f;
     PD_smp_state *pa;
 
     pa = _PD_get_state(-1);

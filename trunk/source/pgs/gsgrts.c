@@ -84,13 +84,13 @@ static int test_1(PG_device *dev)
 
 /* TEST_CHECK - begin/end memory checks for each test */
 
-static long test_check(name, which, debug_mode)
-   char *name;
-   long which;
-   int debug_mode;
-   {long bytaa, bytfa, rv = 0;
+static long test_check(char *name, long which, int debug_mode)
+   {long rv;
+    int64_t bytaa, bytfa;
     char msg[MAXLINE];
-    static long bytab, bytfb;
+    static int64_t bytab, bytfb;
+
+    rv = 0;
 
     if (debug_mode)
        rv = SC_mem_monitor(which, 2, "G", msg);
@@ -118,7 +118,7 @@ static long test_check(name, which, debug_mode)
 
 /* REGISTER_DEVICES - register the devices needed for the tests */
 
-static void register_devices()
+static void register_devices(void)
    {
 
     PG_register_device("IMAGE", PG_setup_image_device);

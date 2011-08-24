@@ -1047,7 +1047,7 @@ static void _SS_inst_const(SS_psides *si)
 /* _SS_INIT_SCHEME - initialize an interpreter state instance */
 
 static void _SS_init_scheme(SS_psides *si)
-   {long ma, mf;
+   {int64_t ma, mf;
     object *fr, *ot;
     SC_contextdes hnd;
 

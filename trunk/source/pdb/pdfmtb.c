@@ -573,19 +573,17 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
 		 if (aord[i] == -1)
 		    break;};
 	    if (aord[0] == -1)
-	       {CFREE(aord);};
+	       CFREE(aord);
 	    tuple = _PD_make_tuple(atype, ni, aord);};
 
         token = SC_strtok(NULL, delim, s);
-        if (token != NULL)
-           if ((strcmp(token, "UNSGNED") == 0))
-              {unsgned = SC_stol(SC_strtok(NULL, delim, s));
-               token   = SC_strtok(NULL, delim, s);};
+        if ((token != NULL) && (strcmp(token, "UNSGNED") == 0))
+	   {unsgned = SC_stol(SC_strtok(NULL, delim, s));
+	    token   = SC_strtok(NULL, delim, s);};
 
-        if (token != NULL)
-           if ((strcmp(token, "ONESCMP") == 0))
-              {unsgned = SC_stol(SC_strtok(NULL, delim, s));
-               token   = SC_strtok(NULL, delim, s);};
+        if ((token != NULL) && (strcmp(token, "ONESCMP") == 0))
+	   {onescmp = SC_stol(SC_strtok(NULL, delim, s));
+	    token   = SC_strtok(NULL, delim, s);};
 
 /* typedef: ignores "REAL" type at the moment for backward compat */
         if ((token != NULL) && (strcmp(type, "REAL") != 0) && 
@@ -603,7 +601,7 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
                {_PD_d_install(file,  type, _PD_defstr_copy(dp), TRUE);
                 host_empty = FALSE;}
             else
-               {host_empty = TRUE;}
+               host_empty = TRUE;
 
             dp = PD_inquire_type(file, origtype);
  
@@ -968,7 +966,7 @@ static int _PD_wr_prim_typ_ii(FILE *fp, hasharr *tab)
 
 /* write the byte order */
 	 ordr = dp->fp.order;
-	 if (ordr !=  NULL)
+	 if (ordr != NULL)
 	    {ok &= _PD_put_string(1, "ORDER%c", dc);
 	     n   = dp->size;
 	     for (j = 0L; j < n; j++)

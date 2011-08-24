@@ -580,7 +580,7 @@ long _PA_comp_size(PA_dimens *vdims)
 /* PA_MARK_SPACE - mark the current allocated space */
 
 void PA_mark_space(PA_package *pck)
-   {long lsp;
+   {int64_t lsp;
     PA_thread_state *ps;
 
     ps = PA_get_thread(-1);
@@ -597,7 +597,7 @@ void PA_mark_space(PA_package *pck)
 /* PA_ACCM_SPACE - count the space allocated since the previous MARK_SPACE */
 
 void PA_accm_space(PA_package *pck)
-   {long lsp;
+   {int64_t lsp;
     PA_thread_state *ps;
 
     ps = PA_get_thread(-1);

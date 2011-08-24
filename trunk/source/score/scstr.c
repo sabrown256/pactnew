@@ -128,7 +128,7 @@ char *SC_strsavec(char *s, int memfl,
 	opt.where.pfile = fnc;
 	opt.where.line  = line;
 
-	p = _SC_alloc_n(sz, sizeof(char), &opt);
+	p = _SC_ALLOC_N(sz, sizeof(char), &opt);
 	if (p != NULL)
 	   {strcpy(p, s);
 	    p[sz-1] = '\0';};};

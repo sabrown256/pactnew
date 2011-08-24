@@ -23,7 +23,7 @@ static int run_test(int n, PFInt tst)
    {int ret, sc;
     char msg[MAXLINE];
     double time;
-    long da, db;
+    int64_t da, db;
     static int debug = 0;
 
     sc = SC_mem_monitor(-1, debug, "A", msg);

@@ -914,9 +914,10 @@ static int run_test(char *name, PG_device *dev, int nt, gtest *tst)
 /* TEST_CHECK - begin/end memory checks for each test */
 
 static long test_check(char *name, long which, testdes *a, int st)
-   {long bytaa, bytfa, rv;
+   {long rv;
+    int64_t bytaa, bytfa;
     char msg[MAXLINE];
-    static long bytab, bytfb;
+    static int64_t bytab, bytfb;
 
     rv = 0;
 

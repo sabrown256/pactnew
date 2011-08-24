@@ -10,106 +10,15 @@
 #include "score_int.h"
 #include "scope_mem.h"
 
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
+typedef struct s_chkdes chkdes;
 
-/* _SC_ALLOC_W - wrapper for _SC_alloc_n */
-
-void *_SC_alloc_w(long nitems, long bpi, char *name, int memfl, int zsp)
-   {int prm, na;
-    void *p;
-    SC_mem_opt opt;
-
-    prm = ((memfl & 1) != 0);
-    na  = ((memfl & 2) != 0);
-
-    opt.perm = prm;
-    opt.na   = na;
-    opt.zsp  = zsp;
-    opt.typ  = -1;
-
-    opt.where.pfunc = name;
-    opt.where.pfile = NULL;
-    opt.where.line  = -1;
-
-    p = _SC_alloc_n(nitems, bpi, &opt);
-
-    return(p);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SC_NALLOC_W - wrapper for _SC_alloc_n */
-
-void *_SC_nalloc_w(long nitems, long bpi, int memfl, int zsp,
-		   const char *fnc, const char *file, int line)
-   {int prm, na;
-    void *p;
-    SC_mem_opt opt;
-
-    prm = ((memfl & 1) != 0);
-    na  = ((memfl & 2) != 0);
-
-    opt.perm = prm;
-    opt.na   = na;
-    opt.zsp  = zsp;
-    opt.typ  = -1;
-
-    opt.where.pfunc = fnc;
-    opt.where.pfile = file;
-    opt.where.line  = line;
-
-    p = _SC_alloc_n(nitems, bpi, &opt);
-
-    return(p);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SC_REALLOC_W - wrapper for _SC_realloc_n */
-
-void *_SC_realloc_w(void *p, long nitems, long bpi, int memfl, int zsp)
-   {int prm, na;
-    void *rv;
-    SC_mem_opt opt;
-
-    prm = ((memfl & 1) != 0);
-    na  = ((memfl & 2) != 0);
-
-    opt.perm = prm;
-    opt.na   = na;
-    opt.zsp  = zsp;
-    opt.typ  = -1;
-
-    opt.where.pfunc = NULL;
-    opt.where.pfile = NULL;
-    opt.where.line  = -1;
-
-    rv = _SC_realloc_n(p, nitems, bpi, &opt);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SC_FREE_W - wrapper for _SC_free_n */
-
-int _SC_free_w(void *p, int zsp)
-   {int rv;
-    SC_mem_opt opt;
-
-    opt.perm = FALSE;
-    opt.na   = -1;
-    opt.zsp  = zsp;
-    opt.typ  = -1;
-
-    opt.where.pfunc = NULL;
-    opt.where.pfile = NULL;
-    opt.where.line  = -1;
-
-    rv = _SC_free_n(p, &opt);
-
-    return(rv);}
+struct s_chkdes
+   {int na;
+    int nf;
+    int nr;
+    int nab;
+    int nfb;
+    int nrb;};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -164,7 +73,7 @@ static int _SC_free_std(void *p, int zsp)
 /*--------------------------------------------------------------------------*/
 
 /* _SC_NALLOC_CHK - wrap a check for a specific pointer value
- *                - around the _SC_alloc_n call
+ *                - around the _SC_ALLOC_N call
  *                - part of a usable API for memory debugging
  */
 
@@ -182,7 +91,7 @@ static void *_SC_nalloc_chk(long nitems, long bpi, int na, int zsp,
     opt.where.pfile = file;
     opt.where.line  = line;
 
-    space = _SC_alloc_n(nitems, bpi, &opt);
+    space = _SC_ALLOC_N(nitems, bpi, &opt);
 
     if (space == _SC_ms.trap_ptr)
        raise(_SC_ms.trap_sig);
@@ -193,7 +102,7 @@ static void *_SC_nalloc_chk(long nitems, long bpi, int na, int zsp,
 /*--------------------------------------------------------------------------*/
 
 /* _SC_ALLOC_CHK - wrap a check for a specific pointer value
- *               - around the _SC_alloc_n call
+ *               - around the _SC_ALLOC_N call
  *               - part of a usable API for memory debugging
  */
 
@@ -210,7 +119,7 @@ static void *_SC_alloc_chk(long nitems, long bpi, char *name, int na, int zsp)
     opt.where.pfile = NULL;
     opt.where.line  = -1;
 
-    space = _SC_alloc_n(nitems, bpi, &opt);
+    space = _SC_ALLOC_N(nitems, bpi, &opt);
 
     if (space == _SC_ms.trap_ptr)
        raise(_SC_ms.trap_sig);
@@ -221,7 +130,7 @@ static void *_SC_alloc_chk(long nitems, long bpi, char *name, int na, int zsp)
 /*--------------------------------------------------------------------------*/
 
 /* _SC_REALLOC_CHK - wrap a check for a specific pointer value
- *                 - around the _SC_alloc_n call
+ *                 - around the _SC_realloc_w call
  *                 - part of a usable API for memory debugging
  */
 
@@ -231,7 +140,7 @@ static void *_SC_realloc_chk(void *p, long nitems, long bpi, int na, int zsp)
     if (p == _SC_ms.trap_ptr)
        raise(_SC_ms.trap_sig);
 
-    space = _SC_realloc_w(p, nitems, bpi, na, zsp);
+    space = _SC_REALLOC_W(p, nitems, bpi, na, zsp);
 
     if (space == _SC_ms.trap_ptr)
        raise(_SC_ms.trap_sig);
@@ -252,7 +161,7 @@ static int _SC_free_chk(void *p, int zsp)
     if (p == _SC_ms.trap_ptr)
        raise(_SC_ms.trap_sig);
 
-    rv = _SC_free_w(p, zsp);
+    rv = _SC_FREE_W(p, zsp);
 
     return(rv);}
 
@@ -267,12 +176,11 @@ static int _SC_free_chk(void *p, int zsp)
 SC_mem_fnc SC_use_score_mm(void)
    {SC_mem_fnc rv;
 
-    rv = SC_gs.mm;
-
-    SC_gs.mm.nalloc  = _SC_nalloc_w;
-    SC_gs.mm.alloc   = _SC_alloc_w;
-    SC_gs.mm.realloc = _SC_realloc_w;
-    SC_gs.mm.free    = _SC_free_w;
+#ifdef USE_FULL_MM
+    rv = SC_use_full_mm();
+#else
+    rv = SC_use_reduced_mm();
+#endif
 
     return(rv);}
 
@@ -520,89 +428,6 @@ int SC_mem_info(void *p, long *pl, int *pt, int *pr, char **pn)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_MEM_TRACE - return the number of active chunks of memory managed
- *              - by the system
- *              - the given pointer must have been allocated by _SC_alloc_n
- *              - return -1 if the forward and backward counts differ
- *              - return -2 if a NULL pointer occurs in the chain
- *              - return -3 if the link count exceeds the number of blocks
- *              - return -4 if a corrupted header is detected
- *              -           also prints name of block
- *              - allocated
- *
- * #bind SC_mem_trace fortran() scheme(memory-trace) python()
- */
-
-int SC_mem_trace(void)
-   {int n_mf, n_mb, ret, ok;
-    long i, n;
-    SC_heap_des *ph;
-    mem_header *space;
-    mem_descriptor *desc;
-
-    ph = _SC_tid_mm();
-
-    SC_LOCKON(SC_mm_lock);
-
-    SC_mem_over_mark(1);
-
-    ret = 0;
-    if (ph->latest_block != NULL)
-       {n    = ph->nx_mem_blocks + BLOCKS_UNIT_DELTA;
-	n_mf = 1;
-	n_mb = 1;
-
-	ok = TRUE;
-	for (space = ph->latest_block, i = 0L;
-	     i < n;
-	     space = space->block.next, n_mf++, i++)
-	    {desc = &space->block;
-	     if (!SCORE_BLOCK_P(desc))
-	        {_SC_print_block_info(stdout, ph, (void *) space, FALSE);
-		 ok = FALSE;
-		 break;};
-
-	     if ((desc->next == ph->latest_block) || (space == NULL))
-	        break;};
-
-	if (!ok)
-	   ret = -4;
-
-	else if ((i >= n) && (ph->nx_mem_blocks != 0))
-	   ret = -3;
-
-	else if (space == NULL)
-	   ret = -2;
-
-	else
-	   {for (space = ph->latest_block, i = 0L;
-		 i < n;
-		 space = space->block.prev, n_mb++, i++)
-	        if ((space == NULL) ||
-		    (space->block.prev == ph->latest_block))
-		   break;
-
-	    if ((i >= n) && (ph->nx_mem_blocks != 0))
-	       ret = -3;
-
-	    else if (space == NULL)
-	       ret = -2;
-
-	    else if (n_mf != n_mb)
-	       ret = -1;
-
-	    else
-	       ret = n_mf;};};
-
-    SC_mem_over_mark(-1);
-
-    SC_LOCKOFF(SC_mm_lock);
-
-    return(ret);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SC_REG_MEM - register a piece of memory for the purpose
  *            - of memory accounting
  *
@@ -723,6 +548,138 @@ char *SC_mem_lookup(void *p)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_MEM_CHK_BLOCK - check a memory block for correctness */
+
+static int _SC_mem_chk_block(SC_heap_des *ph, mem_descriptor *md,
+			     mem_kind wh, void *a, long i, long j)
+   {int ok;
+    char *p;
+    chkdes *st;
+
+    ok = TRUE;
+    st = (chkdes *) a;
+
+    switch (wh)
+       {case MEM_BLOCK_ACTIVE:
+	     if (SCORE_BLOCK_P(md))
+	        st->na++;
+	     else
+	        {_SC_print_block_info(stdout, ph, (void *) md, FALSE);
+		 st->nab++;
+	         ok = FALSE;};
+	     break;
+
+	case MEM_BLOCK_FREE:
+ 	     if ((SC_pointer_ok((char *) md) == TRUE) &&
+		 (md->ref_count == SC_MEM_MFA) && (md->type == SC_MEM_MFB))
+	        st->nf++;
+
+	     else
+	        {io_printf(stdout,
+			   "   Block: %12lx (corrupted free memory block - %d,%ld,%ld)\n",
+			   ((mem_header *) md + 1), ph->tid, i, j);
+		 st->nfb++;
+	         ok = FALSE;};
+	     break;
+
+	case MEM_BLOCK_REG:
+	     p = (char *) md->next;
+	     if (SC_pointer_ok(p) == TRUE)
+	        st->nr++;
+	     else
+	        {io_printf(stdout,
+			   "   Block: %12lx (corrupted registered memory block ",
+			   p);
+
+		 io_printf(stdout,	"- %ld)\n", i);
+		 st->nrb++;};
+	     break;
+
+	default:
+	     break;};
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_MEM_CHK - check out all aspects of managed memory
+ *            - if bit #1 of TYP is 1 include the allocated memory
+ *            - if bit #2 of TYP is 1 include the freed memory
+ *            - if bit #3 of TYP is 1 include the registered memory
+ *            - return values
+ *            -   > 0  total blocks in requested memory pools
+ *            -  -1    corrupt active pool
+ *            -  -2    corrupt free pool
+ *            -  -3    both pools corrupt
+ *
+ * #bind SC_mem_chk fortran() scheme(memory-check) python()
+ */
+
+long SC_mem_chk(int typ)
+   {long nb;
+    chkdes st;
+
+    nb = 0L;
+
+    SC_mem_over_mark(1);
+
+    st.na  = 0;
+    st.nf  = 0;
+    st.nr  = 0;
+    st.nab = 0;
+    st.nfb = 0;
+    st.nrb = 0;
+
+    SC_mem_map_f(typ, _SC_mem_chk_block, &st);
+
+    if (typ & 1)
+       {if (st.nab > 0)
+	   nb = -1L;
+	else
+	   nb += st.na;};
+
+    if (typ & 2)
+       {if (st.nfb > 0)
+	   nb = (nb < 0L) ? -3L : -2L;
+	else if (nb >= 0L)
+	   nb += st.nf;};
+
+    if (typ & 4)
+       {if (st.nrb > 0)
+	   nb = (nb < 0L) ? -3L : -2L;
+	else if (nb >= 0L)
+	   nb += st.nr;};
+
+    SC_mem_over_mark(-1);
+
+    return(nb);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_MEM_TRACE - return the number of active chunks of memory managed
+ *              - by the system
+ *              - the given pointer must have been allocated by _SC_ALLOC_N
+ *              - return -1 if the forward and backward counts differ
+ *              - return -2 if a NULL pointer occurs in the chain
+ *              - return -3 if the link count exceeds the number of blocks
+ *              - return -4 if a corrupted header is detected
+ *              -           also prints name of block allocated
+ *
+ * #bind SC_mem_trace fortran() scheme(memory-trace) python()
+ */
+
+int SC_mem_trace(void)
+   {int ret;
+
+    ret = SC_mem_chk(1);
+
+    return(ret);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* DPRFREE - print the free memory lists */
 
 void dprfree(void)
@@ -767,141 +724,6 @@ void dflpr(int j)
     return;}
 
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SC_FLCHK - return the total number of free blocks */
-
-static long _SC_flchk(void)
-   {int ok, bad;
-    long j, k, nf;
-    SC_heap_des *ph;
-    mem_descriptor *md, *hd;
-
-    ph = _SC_tid_mm();
-
-/* this forces allocations which will come off the current
- * free lists at the first invocation
- * MUST be done before the ones in the loops over the free lists
- */
-    ok = SC_pointer_ok(ph);
-
-    nf  = 0L;
-    bad = 0;
-    for (j = 0L; j < _SC_ms.n_bins; j++)
-        {hd = ph->free_list[j];
-         for (k = 0L, md = hd;
-	      md != NULL;
-	      k++, md = (mem_descriptor *) md->where.pfunc)
-	     {ok = SC_pointer_ok(md);
-	      if (ok == FALSE)
-		 {io_printf(stdout,
-			    "   Block: Head of free list %d,%ld corrupted\n",
-			    ph->tid, j);
-
-		  bad++;
-		  break;};
-		
-	      ok = SC_pointer_ok((char *) md->where.pfunc);
- 	      if ((ok == TRUE) &&
-		  (md->ref_count == SC_MEM_MFA) &&
-		  (md->type == SC_MEM_MFB))
-	         nf++;
-
-	      else
-		 {io_printf(stdout,
-			    "   Block: %12lx (corrupted free memory block - %d,%ld,%ld)\n",
-			    ((mem_header *) md + 1), ph->tid, j, k);
-
-		  bad++;
-		  break;};};};
-
-    if (bad > 0)
-       nf = -1L;
-
-    return(nf);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SC_RGCHK - return the total number of registered blocks */
-
-static long _SC_rgchk(void)
-   {int bad, ok;
-    long i, nr;
-    void *p;
-    mem_descriptor *md;
-
-    nr  = 0L;
-    bad = 0;
-    if (_SC.mem_table != NULL)
-       {for (i = 0; SC_hasharr_next(_SC.mem_table, &i, NULL, NULL, (void **) &md); i++)
-	    {p  = md->next;
-	     ok = SC_pointer_ok(p);
-	     if (ok)
-	        nr++;
-	     else
-	        {io_printf(stdout,
-			   "   Block: %12lx (corrupted registered memory block ",
-			   p);
-
-		 io_printf(stdout,	"- %ld)\n", i);
-
-		 bad++;};};
-
-	if (bad > 0)
-	   nr = -1L;};
-
-    return(nr);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SC_MEM_CHK - check out all aspects of managed memory
- *            - if bit #1 of TYP is 1 include the allocated memory
- *            - if bit #2 of TYP is 1 include the freed memory
- *            - if bit #3 of TYP is 1 include the registered memory
- *            - return values
- *            -   > 0  total blocks in requested memory pools
- *            -  -1    corrupt active pool
- *            -  -2    corrupt free pool
- *            -  -3    both pools corrupt
- *
- * #bind SC_mem_chk fortran() scheme(memory-check) python()
- */
-
-long SC_mem_chk(int typ)
-   {long nb, nt;
-
-    nb = 0L;
-
-    SC_mem_over_mark(1);
-
-    if (typ & 1)
-       {nt = SC_mem_trace();
-	if (nt < 0L)
-	   nb = -1L;
-	else
-	   nb += nt;};
-
-    if (typ & 2)
-       {nt = _SC_flchk();
-	if (nt < 0L)
-	   nb = (nb < 0L) ? -3L : -2L;
-	else if (nb >= 0L)
-	   nb += nt;};
-
-    if (typ & 4)
-       {nt = _SC_rgchk();
-	if (nt < 0L)
-	   nb = (nb < 0L) ? -3L : -2L;
-	else if (nb >= 0L)
-	   nb += nt;};
-
-    SC_mem_over_mark(-1);
-
-    return(nb);}
-
-/*--------------------------------------------------------------------------*/
 
 /*                           MEMORY INFO ROUTINES                           */
 
@@ -932,7 +754,7 @@ int SC_is_score_ptr(void *p)
 /*--------------------------------------------------------------------------*/
 
 /* SC_ARRLEN - return the length of an array which was allocated
- *           - with _SC_alloc_n
+ *           - with _SC_ALLOC_N
  *           - return -1L on error
  *
  * #bind SC_arrlen fortran() python()

@@ -13,6 +13,34 @@
 #define ENTRY_SIZE          128
 #define MAP_ENTRY(_a, _i)   ((_a) + ENTRY_SIZE*(_i))
 
+typedef void (*PFOTrace)(char *name, char *addr, long length,
+			 int count, int type);
+typedef struct s_mapdes mapdes;
+
+struct s_mapdes
+   {int flag;
+    int show;
+    int reg;
+    int nbl;
+    long nc;
+    char *arr;};
+
+typedef struct s_otrdes otrdes;
+
+struct s_otrdes
+   {long nm;
+    int ty;
+    long nb;
+    PFOTrace fn;};
+
+typedef struct s_ngbdes ngbdes;
+
+struct s_ngbdes
+   {int flag;
+    mem_descriptor *a;       /* nearest block below */
+    mem_descriptor *b;       /* the candidate block */
+    mem_descriptor *c;};     /* nearest block above */
+
 /*--------------------------------------------------------------------------*/
 
 /*                             HEAP ANALYZER ROUTINES                       */
@@ -203,115 +231,25 @@ static int _SC_list_block_info(char *s, SC_heap_des *ph, void *ptr,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_N_BLOCKS - return the number of blocks contained in
- *              - major blocks
- */
+/* _SC_MEM_BLOCK_INF - get the memory block info for a memory map */
 
-static int _SC_n_blocks(SC_heap_des *ph)
-   {int i, n, nmj;
-    major_block_des *mbl;
+static int _SC_mem_block_inf(SC_heap_des *ph, mem_descriptor *md,
+			     mem_kind wh, void *a, long i, long j)
+   {int ok, nbl;
+    long nb;
+    char *arr;
+    mapdes *st;
 
-    nmj = ph->n_major_blocks;
-    mbl = ph->major_block_list;
-    for (i = 0, n = 0; i < nmj; i++)
-        n += mbl[i].nunits;
+    ok  = TRUE;
+    st  = (mapdes *) a;
+    nb  = md->length;
+    nbl = st->nbl;
+    arr = MAP_ENTRY(st->arr, nbl);
 
-    return(n);}
+    st->nbl += _SC_list_block_info(arr, ph, md, nb,
+				   st->flag, st->show, st->reg);
 
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SC_PRUNE_MAJOR_BLOCKS - release empty major blocks
- *                        - return the number of blocks released
- */
- 
-int _SC_prune_major_blocks(void)
-   {int i, j, nf, nbl, nmj;
-    long nu, sz, nby;
-    char *pn;
-    mem_descriptor *desc, *md;
-    major_block_des *mbl;
-    SC_heap_des *ph;
-
-    ph = _SC_tid_mm();
-
-    nbl = 0;
-    nby = 0;
-
-    nmj = ph->n_major_blocks;
-    mbl = ph->major_block_list;
-    for (i = 0; i < nmj; i++)
-        {pn = mbl[i].block;
-	 nu = mbl[i].nunits;
-	 sz = mbl[i].size;
-
-         nf = 0;
-	 for (j = 0; j < nu; j++, pn += sz)
-	     {desc = (mem_descriptor *) pn;
-	      nf += FREE_SCORE_BLOCK_P(desc);};
-
-	 if (nf == nu)
-	    {nbl++;
-#if 0
-	     printf("Major block %d is eligible to be released\n", i);
-#else
-	     nby += nu*sz;
-
-             md = (mem_descriptor *) mbl[i].block;
-
-             for (j = 0; j < _SC_ms.n_bins; j++)
-	         {if (ph->free_list[j] == md)
-                     {ph->free_list[j] = NULL;
-		      break;};};
-
-	     _SC_FREE(md);
-
-	     mbl[i] = mbl[--nmj];
-	     mbl[nmj].index  = -1;
-	     mbl[nmj].nunits = 0;
-	     mbl[nmj].size   = 0;
-	     mbl[nmj].block  = NULL;
-#endif
-	    };};
-
-    ph->n_major_blocks = nmj;
-
-    return(nbl);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SC_LIST_MAJOR_BLOCKS - list selected blocks in major blocks
- *                       - this is to be done carefully so as to detect
- *                       - corrupted memory
- *                       - return the number of blocks found
- */
- 
-static int _SC_list_major_blocks(char *arr, int nc, 
-			         int flag, int show, SC_heap_des *ph)
-   {int i, j, id, nbl, nmj;
-    long nu, sz, nb;
-    char *pn;
-    mem_descriptor *desc;
-    major_block_des *mbl;
-
-    nbl = 0;
-
-    nmj = ph->n_major_blocks;
-    mbl = ph->major_block_list;
-    for (i = 0; i < nmj; i++)
-        {pn = mbl[i].block;
-	 nu = mbl[i].nunits;
-	 sz = mbl[i].size;
-	 id = mbl[i].index;
-	 nb = SC_BIN_SIZE(id);
-
-	 for (j = 0; j < nu; j++, pn += sz)
-	     {desc = (mem_descriptor *) pn;
-	      nbl += _SC_list_block_info(MAP_ENTRY(arr, nbl), ph,
-					 desc, nb, flag, show, FALSE);};};
-
-    return(nbl);}
+    return(ok);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -332,79 +270,34 @@ static int _SC_list_major_blocks(char *arr, int nc,
 
 static void _SC_mem_list(int flag, int show, char **parr, int *pnbl)
    {int n, nbl;
-    long i, nb, nbthr, nt, ntc, ntx;
     char *arr;
     SC_heap_des *ph;
-    mem_header *space, *nxt;
-    mem_descriptor *desc;
 
     ph = _SC_tid_mm();
 
     SC_mem_over_mark(1);
 
-    nbthr = SC_BIN_THRESHOLD();
-    nbl   = 0;
-
-/* count the number of blocks we are going to have
- * this may significantly over count but this is for allocating space
- */
-    n = 1;
-
-/* add active block count */
-    if ((flag & 1) && (ph->latest_block != NULL))
-       {ntx = ph->nx_mem_blocks;
-	ntc = ph->n_mem_blocks;
-	nt  = min(ntx, 10*ntc);
-	n  += nt + BLOCKS_UNIT_DELTA;};
-
-/* add blocks tied up in major blocks - essentially the free blocks
- * this double count some of active blocks
- */
-    if (flag & 2)
-       n += _SC_n_blocks(ph);
-
-/* add registered block count */
-    if ((flag & 4) && (_SC.mem_table != NULL))
-       n += _SC.mem_table->size;
+    n = _SC_N_BLOCKS(ph, flag);
 
 /* NOTE: do not use the SCORE memory manager to allocate memory when
  * inspecting the state of the SCORE memory manager
  * use direct malloc call instead
  */
+    nbl = 0;
     arr = malloc(n*ENTRY_SIZE);
     if (arr != NULL)
+       {mapdes st;
 
-/* handle active blocks that are too big to be in the major blocks lists */
-       {if ((flag & 1) && (ph->latest_block != NULL))
-	   {n     = ph->nx_mem_blocks + BLOCKS_UNIT_DELTA;
-	    space = ph->latest_block;
-	    for (i = 0; (i < n) && (space != NULL); i++, space = nxt)
-	        {desc = &space->block;
-		 if (!SC_pointer_ok(desc))
-		    break;
+	st.flag = flag;
+	st.show = show;
+	st.reg  = FALSE;
+	st.nbl  = 0;
+	st.arr  = arr;
 
-		 nxt = desc->next;
-		 nb  = desc->length;
-		 if (nb > nbthr)
-		    nbl += _SC_list_block_info(MAP_ENTRY(arr, nbl), ph,
-					       space, nb, flag, show, FALSE);
-
-		 if (nxt == ph->latest_block)
-		    break;};};
-
-/* handle blocks in the major blocks lists */
-	nbl += _SC_list_major_blocks(MAP_ENTRY(arr, nbl), ENTRY_SIZE,
-				     flag, show, ph);
-
-/* report the registered memory blocks */
-	if ((flag & 4) && (_SC.mem_table != NULL))
-	   {for (i = 0; SC_hasharr_next(_SC.mem_table, &i, NULL, NULL, (void **) &space); i++)
-	        {desc  = &space->block;
-		 nb    = desc->length;
-		 nbl  += _SC_list_block_info(MAP_ENTRY(arr, nbl), ph,
-					     space, nb, flag, show, TRUE);};};
+	SC_mem_map_f(flag, _SC_mem_block_inf, &st);
 
 /* sort the entries now */
+        nbl = st.nbl;
 	SC_text_sort(arr, nbl, ENTRY_SIZE);
 
 	arr[ENTRY_SIZE*nbl] = '\0';};
@@ -493,7 +386,7 @@ int SC_mem_corrupt(int flag)
 
 int _SC_mem_map(FILE *fp, int flag, int show, int lineno)
    {int i, nbl;
-    long a, f, d;
+    int64_t a, f, d;
     char *s, *arr;
     SC_heap_des *ph;
 
@@ -511,7 +404,8 @@ int _SC_mem_map(FILE *fp, int flag, int show, int lineno)
 
 /* report the active memory blocks */
 	SC_mem_stats(&a, &f, &d, NULL);
-	fprintf(fp, "\nMemory Map (%8ld %8ld %8ld)\n", a, f, d);
+	fprintf(fp, "\nMemory Map (%8lld %8lld %8lld)\n",
+		(long long) a, (long long) f, (long long) d);
 
 	_SC_mem_list(flag, show, &arr, &nbl);
         if (arr == NULL)
@@ -660,75 +554,126 @@ long SC_mem_monitor(int old, int lev, char *id, char *msg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_MEM_NGB - determine whether MD is nearest to the B block in ST */
+
+static int _SC_mem_ngb(SC_heap_des *ph, mem_descriptor *md,
+		       mem_kind wh, void *a, long i, long j)
+   {int ok, skip;
+    char *ae, *bs, *be, *cs, *ts, *te;
+    mem_descriptor *ma, *mb, *mc;
+    ngbdes *st;
+
+    ok = TRUE;
+    st = (ngbdes *) a;
+
+    skip = ((md->ref_count == UNCOLLECT) && ((st->flag & 8) == 0));
+
+    if (SCORE_BLOCK_P(md) && (skip == FALSE))
+       {ma = st->a;
+	if (ma == NULL)
+	   ae = NULL;
+	else
+	   ae = ((char *) ma) + ma->length + ph->hdr_size;
+
+	mb = st->b;
+	bs = (char *) mb;
+	be = bs + mb->length + ph->hdr_size;
+
+	mc = st->c;
+	if (mc == NULL)
+	   cs = (char *) LONG_MAX;
+	else
+	   cs = (char *) mc;
+
+	ts = (char *) md;
+	te = ts + md->length + ph->hdr_size;
+
+/* if MD is between A and B make it the new A */
+	if ((ae - ts < 0) && (te - bs <= 0))
+	   st->a = md;
+
+/* if MD is between B and C make it the new C */
+	if ((be - ts < 0) && (te - cs <= 0))
+	   st->c = md;
+
+	ok = SC_pointer_ok((void *) md->where.pfunc);};
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_MEM_NEIGHBOR - return pointers to the managed spaces physically
- *                 - before, PPB, and after, PPA, the managed space P
+ *                 - before, B, and after, A, the managed space P
  *                 - return TRUE if at least one neighbor was found
  *                 - this is to be used to help identify spaces that
  *                 - were over-indexed (PPA) or under-indexed (PPB) to
  *                 - clobber the space P
  */
 
-int SC_mem_neighbor(void *p, void *a, void *b)
+int SC_mem_neighbor(void *p, int flag, void *b, void *a)
    {int rv;
-    long i, nu, nmj, nb, sz;
-    char *bs, *be, *pa, *pb, *pt;
-    SC_heap_des *ph;
-    major_block_des *mbl;
-    mem_descriptor *md;
-    mem_header *space;
+    mem_header *space, *pa, *pb;
     mem_header **ppa;
-
-    ph = _SC_tid_mm();
-
-    SC_LOCKON(SC_mm_lock);
-
-    SC_mem_over_mark(1);
-
+    ngbdes st;
+	
     rv = FALSE;
     pa = NULL;
     pb = NULL;
     if (p != NULL)
        {space = ((mem_header *) p) - 1;
-	md    = &space->block;
 
-	pt = (char *) md;
+	st.flag = flag;
+	st.a    = NULL;
+	st.b    = &space->block;
+	st.c    = NULL;
 
-	if (SCORE_BLOCK_P(md))
+	SC_mem_map_f(flag, _SC_mem_ngb, &st);
 
-/* check all the major blocks */
-	   {nmj = ph->n_major_blocks;
-	    mbl = ph->major_block_list;
-	    for (i = 0; i < nmj; i++)
-	        {bs = mbl[i].block;
-		 nu = mbl[i].nunits;
-		 sz = mbl[i].size;
-		 nb = nu*sz;
-		 be = bs + nb;
-
-/* if the descriptor P is in the block compute the
- * address of the one before and the one after P
- */
-		 if ((bs <= pt) && (pt < be))
-		    {rv = TRUE;
-		     pb = pt - sz;
-		     if (pb < bs)
-		        pb = NULL;
-		     pa = pt + sz;
-		     if (be <= pa)
-		        pa = NULL;
-		     break;};};};};
+	pb = (mem_header *) st.a;
+	pa = (mem_header *) st.c;};
 
     ppa  = (mem_header **) a;
-    *ppa = (pa == NULL) ? NULL : ((mem_header *) pa + 1);
+    *ppa = (pa == NULL) ? NULL : pa + 1;
 
     ppa  = (mem_header **) b;
-    *ppa = (pb == NULL) ? NULL : ((mem_header *) pb + 1);
+    *ppa = (pb == NULL) ? NULL : pb + 1;
 
     SC_mem_over_mark(-1);
 
-    SC_LOCKOFF(SC_mm_lock);
-
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_MEM_OBJ_TRACE - perform object trace on MD if it meets critera */
+
+static int _SC_mem_obj_trace(SC_heap_des *ph, mem_descriptor *md,
+			     mem_kind wh, void *a, long i, long j)
+   {int it, type, ok;
+    long ib, nb;
+    char *name;
+    mem_header *space;
+    PFOTrace fn;
+    otrdes *st;
+
+    ok = TRUE;
+
+    st   = (otrdes *) a;
+    type = st->ty;
+    nb   = st->nb;
+    fn   = st->fn;
+
+    ib = md->length;
+    it = md->type;
+
+    if (((type == -1) || (type == it)) && (nb == ib))
+       {st->nm++;
+	space = (mem_header *) md;
+	name  = _SC_block_name(md);
+	fn(name, (char *) (space + 1), ib, md->ref_count, it);};
+
+    return(ok);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -738,52 +683,19 @@ int SC_mem_neighbor(void *p, void *a, void *b)
 long SC_mem_object_trace(long nb, int type,
 			 void (*f)(char *name, char *addr, long length,
 				   int count, int type))
-   {int j, jt, it;
-    long i, l, us, nu, nmj, nm, ib;
-    char *pn, *name;
-    SC_heap_des *ph;
-    major_block_des *mbl;
-    mem_descriptor *md;
-    mem_header *space;
-
-    ph = _SC_tid_mm();
-
-    SC_LOCKON(SC_mm_lock);
-
+   {long nm;
+    otrdes st;
+	
+    nm = 0;
     if ((nb > 0) && (f != NULL))
-       {j  = SC_BIN_INDEX(nb);
-	us = ph->hdr_size + SC_BIN_SIZE(j);
-	us = ((us + _SC_ms.mem_align_pad) >> _SC_ms.mem_align_expt) <<
-	     _SC_ms.mem_align_expt;
-	nu = SC_BIN_UNITS(us);
+       {st.nb = nb;
+	st.ty = type;
+	st.nm = 0;
+        st.fn = f;
 
-/* check all the major blocks */
-	nmj = ph->n_major_blocks;
-	mbl = ph->major_block_list;
-	nm  = 0L;
-	for (i = 0; i < nmj; i++)
-	    {md = (mem_descriptor *) mbl[i].block;
+	SC_mem_map_f(7, _SC_mem_obj_trace, &st);
 
-/* check if the blocks in this major block could match the size */
-	     ib = md->length;
-	     jt = SC_BIN_INDEX(ib);
-	     if (j != jt)
-	        continue;
-
-/* scan the blocks for exact matches */
-	     pn = (char *) md;
-	     for (l = 0; l < nu; l++, pn += us)
-	         {md = (mem_descriptor *) pn;
-		  ib = md->length;
-		  it = md->type;
-		  if (((type == -1) || (type == it)) && (nb == ib))
-		     {nm++;
-		      space = (mem_header *) md;
-		      name = _SC_block_name(md);
-		      (*f)(name, (char *) (space + 1), ib,
-			   (int) md->ref_count, (int) it);};};};};
-
-    SC_LOCKOFF(SC_mm_lock);
+	nm = st.nm;};
 
     return(nm);}
 

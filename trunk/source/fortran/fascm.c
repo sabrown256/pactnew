@@ -35,7 +35,7 @@ FIXNUM _SC_make_ff(void **pm, FIXNUM *pni, FIXNUM *pnb, FIXNUM *pnc,
     opt.where.pfile = NULL;
     opt.where.line  = -1;
 
-    s = _SC_alloc_n((long) *pni, (long) *pnb, &opt);
+    s = _SC_ALLOC_N((long) *pni, (long) *pnb, &opt);
 
 /* mark this block as having been allocated to FORTRAN
  * the memory map will need to know how to interpret the
@@ -114,7 +114,7 @@ FIXNUM FF_ID(scremz, SCREMZ)(void **am, FIXNUM *sni,
    {FIXNUM rv;
     void *s;
 
-    s = _SC_realloc_w(*am, (long) *sni, (long) *snb, FALSE, (int) *szsp);
+    s = _SC_REALLOC_W(*am, (long) *sni, (long) *snb, FALSE, (int) *szsp);
 
     rv = ((*am = s) != NULL);
 
@@ -148,7 +148,7 @@ FIXNUM FF_ID(screma, SCREMA)(void **am, FIXNUM *sni, FIXNUM *snb)
 FIXNUM FF_ID(scfrez, SCFREZ)(void **am, FIXNUM *szsp)
    {FIXNUM ok;
 
-    ok = _SC_free_w(*am, (int) *szsp);
+    ok = _SC_FREE_W(*am, (int) *szsp);
     if (ok)
        *am = NULL;
 
@@ -162,7 +162,7 @@ FIXNUM FF_ID(scfrez, SCFREZ)(void **am, FIXNUM *szsp)
 FIXNUM FF_ID(scfree, SCFREE)(void **am)
    {FIXNUM ok;
 
-    ok = _SC_free_n(*am, NULL);
+    ok = _SC_FREE_N(*am, NULL);
 
     return(ok);}
 
@@ -224,7 +224,7 @@ FIXNUM FF_ID(scmemc, SCMEMC)(FIXNUM *st)
 
 FIXNUM FF_ID(scmems, SCMEMS)(double *sal, double *sfr,
 			     double *sdf, double *smx)
-   {long pl, pf, pd, pm;
+   {int64_t pl, pf, pd, pm;
     FIXNUM rv;
 
     SC_mem_stats(&pl, &pf, &pd, &pm);

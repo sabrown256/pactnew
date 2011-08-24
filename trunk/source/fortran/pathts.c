@@ -101,10 +101,10 @@ static void print_help(void)
 
 static int run_test(PFTest test, char *base, char *restart,
 		    int level, int iter, int opt, int sz)
-   {char s[MAXLINE], t[MAXLINE];
-    long bytab, bytfb, bytaa, bytfa;
-    int steps, titer;
+   {int steps, titer;
+    int64_t bytab, bytfb, bytaa, bytfa;
     double time;
+    char s[MAXLINE], t[MAXLINE];
 
     SC_mem_stats(&bytab, &bytfb, NULL, NULL);
 

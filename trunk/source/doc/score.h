@@ -1,5 +1,5 @@
 TXT: SCORE User's Manual
-MOD: 05/19/2011
+MOD: 08/24/2011
 
 <CENTER>
 <P>
@@ -1683,7 +1683,7 @@ and <em>msg</em>, a character array from the application to hold an error messag
 <p>
 
 <pre>
-<I>C Binding: </I>int SC_mem_stats(long *al, long *fr, long *df, long *mx)
+<I>C Binding: </I>int SC_mem_stats(int64_t *al, int64_t *fr, int64_t *df, int64_t *mx)
 <I>Fortran Binding: </I>integer scmems(integer al, integer fr, integer df, integer mx)
 <I>SX Binding: </I>
 <I>Python Binding: </I>
@@ -1697,7 +1697,7 @@ at one time is returned in <em>mx</em>.
 <p>
 
 <pre>
-<I>C Binding: </I>int SC_mem_stats_acc(long a, long f)
+<I>C Binding: </I>void SC_mem_stats_acc(int64_t a, int64_t f)
 <I>Fortran Binding: </I>
 <I>SX Binding: </I>
 <I>Python Binding: </I>
@@ -1709,7 +1709,7 @@ respectively.
 <p>
 
 <pre>
-<I>C Binding: </I>int SC_mem_stats_set(long a, long f)
+<I>C Binding: </I>void SC_mem_stats_set(int64_t a, int64_t f)
 <I>Fortran Binding: </I>
 <I>SX Binding: </I>
 <I>Python Binding: </I>

@@ -188,7 +188,10 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 	   {std->fp[ifp].bpi    = nb;
 	    std->fp[ifp].order  = ordr;
 	    std->fp[ifp].format = formt;
-	    align->fp[ifp]      = al;};}
+	    align->fp[ifp]      = al;
+
+	    SC_mark(ordr, 1);
+	    SC_mark(formt, 1);};}
 
 /* check for complex floating point types (proper) */
     else if (SC_is_type_cx(id) == TRUE)
@@ -200,6 +203,9 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 	    std->fp[icx].order  = ordr;
 	    std->fp[icx].format = formt;
 	    align->fp[icx]      = al;
+
+	    SC_mark(ordr, 1);
+	    SC_mark(formt, 1);
  */
 	    };}
 

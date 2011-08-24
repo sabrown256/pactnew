@@ -1,7 +1,7 @@
 #!/bin/csh -f
 #
 # BFD - analyze platform exe format access support
-#     - Computes: HAVE_BFD, MDE_Lib
+#     - Computes: HAVE_BFD, HAVE_DEMANGLE, MDE_Lib
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -15,11 +15,12 @@ source $Me:h/common
 Separator $ALog
 Note $ALog "Analyze: exe access support"
 
-SafeEnv MDE_Lib      ""
-SafeEnv BFD_Lib      -lbfd
-SafeEnv BFD_Path     /usr/$LIB
-SafeEnv BFD_Version  0.0.0
-SafeEnv HAVE_BFD     FALSE
+SafeEnv MDE_Lib        ""
+SafeEnv BFD_Lib        -lbfd
+SafeEnv BFD_Path       /usr/$LIB
+SafeEnv BFD_Version    0.0.0
+SafeEnv HAVE_BFD       FALSE
+SafeEnv HAVE_DEMANGLE  FALSE
 
 # if we have explicitly said we do not want BFD
 # do NOT detect it
@@ -31,6 +32,11 @@ else
    if ("$BFD_Path" == "") then
       flog $ALog setenv BFD_Path /usr/$LIB
    endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# BFD
 
    cat << EOF >! $Tmp.c
 #include <stdlib.h>
@@ -103,11 +109,44 @@ EOF
       flog $ALog setenv HAVE_BFD TRUE
    endif
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# DEMANGLE
+
+   cat << EOF >! $Tmp.c
+#include <stdlib.h>
+#include <demangle.h>
+int main(int c, char **v)
+   {int v, rv;
+    v  = (DMGL_ANSI | DMGL_PARAMS);
+    rv = (rv == 0);
+    return(rv);}
+EOF
+
+   flog $ALog cat $Tmp.c
+
+   set libs = ""
+
+# try building
+   set ok = FALSE
+   flog $ALog $CC_Exe $Tmp.c -o $Tmp $CC_Flags
+   if ($status == 0) then
+      NoteD $ALog "      has demangle.h"
+      setenv HAVE_DEMANGLE TRUE
+   else
+      NoteD $ALog "      no demangle.h"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 endif
 
 SetParent BFD_Version
 SetParent MDE_Lib
 SetParent HAVE_BFD
+SetParent HAVE_DEMANGLE
 
 Separator $ALog
 

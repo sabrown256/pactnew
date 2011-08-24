@@ -560,7 +560,7 @@ static int run_test(PFTest test, int n, char *host)
    {int i, m, rv, cs, debug, fail;
     char msg[MAXLINE];
     char *nm;
-    long bytaa, bytfa, bytab, bytfb;
+    int64_t bytaa, bytfa, bytab, bytfb;
     double time;
     
     debug = debug_mode ? 2 : 0;

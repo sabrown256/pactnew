@@ -78,12 +78,6 @@
 
 /*--------------------------------------------------------------------------*/
 
-#define SC_BIN_INDEX(_n)  _SC_bin_index(_n)
-#define SC_BIN_SIZE(_n)   (((_n) >= _SC_ms.n_bins) ? -1 : _SC_ms.bins[_n])
-#define SC_BIN_UNITS(_n)  (((_n) < _SC_ms.block_size) ? _SC_ms.block_size/(_n) : 1)
-
-#define SC_BIN_THRESHOLD()   _SC_ms.bins[_SC_ms.n_bins-1]
-
 #define SCORE_BLOCK_P(_d)                                                   \
     (((_d)->id) == SC_MEM_ID)
 
@@ -92,6 +86,37 @@
 
 #define FF_NAME(desc)                                                       \
     ((SC_FF_NAME_MASK & (desc)->id) != 0)
+
+
+#ifdef USE_FULL_MM
+
+# define _SC_ALLOC_N     _SC_alloc_nl
+# define _SC_REALLOC_N   _SC_realloc_nl
+# define _SC_REALLOC_W   _SC_realloc_wl
+# define _SC_FREE_N      _SC_free_nl
+# define _SC_FREE_W      _SC_free_wl
+# define _SC_N_BLOCKS    _SC_n_blocks_l
+
+# define SC_BIN_INDEX(_n)    _SC_bin_index(_n)
+# define SC_BIN_SIZE(_n)     (((_n) >= _SC_ms.n_bins) ? -1 : _SC_ms.bins[_n])
+# define SC_BIN_UNITS(_n)    (((_n) < _SC_ms.block_size) ? _SC_ms.block_size/(_n) : 1)
+# define SC_BIN_THRESHOLD()  _SC_ms.bins[_SC_ms.n_bins-1]
+
+#else
+
+# define _SC_ALLOC_N     _SC_alloc_ns
+# define _SC_REALLOC_N   _SC_realloc_ns
+# define _SC_REALLOC_W   _SC_realloc_ws
+# define _SC_FREE_N      _SC_free_ns
+# define _SC_FREE_W      _SC_free_ws
+# define _SC_N_BLOCKS    _SC_n_blocks_s
+
+# define SC_BIN_INDEX(_n)   0
+# define SC_BIN_SIZE(_n)   -1
+# define SC_BIN_UNITS(_n)   1
+# define SC_BIN_THRESHOLD() 0
+
+#endif
 
 /*--------------------------------------------------------------------------*/
 
@@ -117,11 +142,14 @@ enum e_SC_mem_tag
 
 typedef enum e_SC_mem_tag SC_mem_tag;
 
-typedef union u_mem_header mem_header;
+enum e_mem_kind
+   {MEM_BLOCK_ACTIVE,
+    MEM_BLOCK_FREE,
+    MEM_BLOCK_REG};
 
-typedef void *(*PFMalloc)(size_t size);
-typedef void (*PFFree)(void *p);
-typedef void *(*PFRealloc)(void *ptr, size_t size);
+typedef enum e_mem_kind mem_kind;
+
+typedef union u_mem_header mem_header;
 
 typedef struct s_mem_descriptor mem_descriptor;
 typedef struct s_major_block_des major_block_des;
@@ -130,6 +158,10 @@ typedef struct s_SC_mem_opt SC_mem_opt;
 typedef struct s_SC_mem_hst SC_mem_hst;
 typedef struct s_SC_mem_state SC_mem_state;
 typedef struct s_SC_memfncs SC_memfncs;
+
+typedef void *(*PFMalloc)(size_t size);
+typedef void (*PFFree)(void *p);
+typedef void *(*PFRealloc)(void *ptr, size_t size);
 
 struct s_SC_memfncs
    {int sys;
@@ -208,6 +240,9 @@ struct s_SC_mem_state
     long n_bins;
     long *bins;};
 
+typedef int (*PFMemMap)(SC_heap_des *ph, mem_descriptor *md,
+			mem_kind wh, void *a, long i, long j);
+
 # ifndef MM_CONFIG
 
 /*--------------------------------------------------------------------------*/
@@ -250,40 +285,77 @@ extern SC_heap_des
  *_SC_tid_mm(void);
 
 extern void
- *_SC_alloc_n(long ni, long bpi, void *a),
+ _SC_mem_stats_acc(SC_heap_des *ph, int64_t a, int64_t f),
+ _SC_assign_block(SC_heap_des *ph, mem_header *space,
+		  long nb, char *func, char *file, int line),
+ _SC_deassign_block(SC_heap_des *ph, mem_descriptor *desc,
+		    void *addr),
+ _SC_unassign_block(SC_heap_des *ph, mem_header *space),
+ _SC_prim_memset(void *p, long nb),
+ _SC_init_heap(SC_heap_des *ph, int id),
  *SC_alloc_n(long ni, long bpi, ...),
- *_SC_realloc_n(void *p, long nitems, long bpi, void *a),
  *SC_realloc_n(void *p, long nitems, long bpi, ...);
 
-extern void
- _SC_init_heap(SC_heap_des *ph, int id);
-
 extern int
- _SC_free_n(void *p, void *a),
  SC_free_n(void *p, ...),
  SC_is_score_space(void *p, mem_header **psp, mem_descriptor **pds),
  SC_mem_over_mark(int n);
+
+
+/* SCMEMCL.C declarations */
+
+extern SC_mem_fnc
+ SC_use_full_mm(void);
+
+extern void
+ *_SC_alloc_nl(long ni, long bpi, void *a),
+ *_SC_realloc_nl(void *p, long nitems, long bpi, void *a),
+ *_SC_nalloc_wl(long nitems, long bpi, int memfl, int zsp,
+	        const char *fnc, const char *file, int line),
+ *_SC_alloc_wl(long nitems, long bpi, char *name, int memfl, int zsp),
+ *_SC_realloc_wl(void *p, long nitems, long bpi, int memfl, int zsp);
+
+extern int
+ _SC_free_nl(void *p, void *a),
+ _SC_free_wl(void *p, int zsp),
+ _SC_n_blocks_l(SC_heap_des *ph, int flag);
 
 extern long
  _SC_bin_index(long n);
 
 
-/* SCMEMDA.C declarations */
+/* SCMEMCS.C declarations */
+
+extern SC_mem_fnc
+ SC_use_reduced_mm(void);
 
 extern void
- *_SC_nalloc_w(long nitems, long bpi, int memfl, int zsp,
-	       const char *fnc, const char *file, int line),
- *_SC_alloc_w(long nitems, long bpi, char *name, int memfl, int zsp),
- *_SC_realloc_w(void *p, long nitems, long bpi, int memfl, int zsp);
+ *_SC_alloc_ns(long ni, long bpi, void *a),
+ *_SC_realloc_ns(void *p, long nitems, long bpi, void *a),
+ *_SC_nalloc_ws(long nitems, long bpi, int memfl, int zsp,
+	        const char *fnc, const char *file, int line),
+ *_SC_alloc_ws(long nitems, long bpi, char *name, int memfl, int zsp),
+ *_SC_realloc_ws(void *p, long nitems, long bpi, int memfl, int zsp);
 
 extern int
- _SC_free_w(void *p, int zsp);
+ _SC_free_ns(void *p, void *a),
+ _SC_free_ws(void *p, int zsp),
+ _SC_n_blocks_s(SC_heap_des *ph, int flag);
+
+
+/* SCMEMDA.C declarations */
 
 extern char
  *_SC_block_name(mem_descriptor *desc);
 
 extern void
  _SC_print_block_info(FILE *fp, SC_heap_des *ph, void *ptr, int flag);
+
+
+/* SCMEMDC.C declarations */
+
+extern void
+ SC_mem_map_f(int typ, PFMemMap f, void *a);
 
 
 /* SCMEMG.C declarations */

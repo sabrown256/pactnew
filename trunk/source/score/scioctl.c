@@ -353,10 +353,10 @@ void SC_get_event_loop_callback(SC_evlpdes *pe, int type, void *p,
         {pd = SC_array_get(pe->fd, i);
 	 if (pd->fd == fd)
             {if (pacc != NULL)
-	        {ad.memaddr = SC_array_get(pe->faccpt, i);
+	        {ad.memaddr = *(void **) SC_array_get(pe->faccpt, i);
 		 *pacc      = (PFFileCallback) ad.funcaddr;};
 	     if (prej != NULL)
-	        {ad.memaddr = SC_array_get(pe->frejct, i);
+	        {ad.memaddr = *(void **) SC_array_get(pe->frejct, i);
 		 *prej      = (PFFileCallback) ad.funcaddr;};
              break;};};
 

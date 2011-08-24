@@ -114,7 +114,7 @@ static int det_test()
 
 int main()
    {int err;
-    long bytaa, bytfa, bytab, bytfb;
+    int64_t bytaa, bytfa, bytab, bytfb;
 
     SC_gs.mm_debug = TRUE;
     SC_zero_space_n(0, -2);
