@@ -142,15 +142,17 @@ int test_2(int nir, int nim)
 
 /* PRNT_3 - helper for test 3 */
 
-int prnt_3(double *f, double *fb, double *fa)
-   {int ok, rv, ty, rf;
+int prnt_3(double *fb, double *f, double *fa)
+   {int ok, oka, okb, rv, ty, rf;
     long nb;
     char *name;
     double *a, *b;
 
-    SC_mem_neighbor(f, &a, &b);
+    SC_mem_neighbor(f, 1, &b, &a);
 
-    rv = ((a == fa) && (b == fb));
+    oka = ((a == fa) || (fa == NULL));
+    okb = ((b == fb) || (fb == NULL));
+    rv  = (oka && okb);
 
     ok = SC_mem_info(b, &nb, &ty, &rf, &name);
     if (ok == TRUE)
@@ -205,10 +207,10 @@ int test_3(int nir, int nim)
 
     err = TRUE;
 
-    err &= prnt_3(f1, NULL, f2);
-    err &= prnt_3(f2,   f1, f3);
-    err &= prnt_3(f3,   f2, f4);
-    err &= prnt_3(f4,   f3, NULL);
+    err &= prnt_3(NULL, f1, f2);
+    err &= prnt_3(f1,   f2, f3);
+    err &= prnt_3(f2,   f3, f4);
+    err &= prnt_3(f3,   f4, NULL);
 
 #if 0
 

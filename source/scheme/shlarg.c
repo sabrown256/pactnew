@@ -593,7 +593,7 @@ static object *_SSI_wall_clock_time(SS_psides *si)
 /* _SSI_MEM_USG - return the memory usage info */
 
 static object *_SSI_mem_usg(SS_psides *si)
-   {long a, f, d;
+   {int64_t a, f, d;
     object *ret;
 
     SC_mem_stats(&a, &f, &d, NULL);

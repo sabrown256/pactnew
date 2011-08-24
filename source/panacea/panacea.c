@@ -241,7 +241,7 @@ double PA_advance_t(double dtmn, double dtn, double dtmx)
 
 void PA_fin_system(int nz, int nc, int silent)
    {int i;
-    long lmx;
+    int64_t lmx;
     PA_package *pck;
     PFPkgFinzer pck_fin;
     char *pck_name, bf[MAXLINE];

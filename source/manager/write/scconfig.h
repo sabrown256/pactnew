@@ -152,6 +152,7 @@ source $ldir/env-csh
     set lhave = ( $lhave HAVE_GNU_LIBC_6     none )
     set lhave = ( $lhave HAVE_DYNAMIC_LINKER none )
     set lhave = ( $lhave HAVE_BFD            none )
+    set lhave = ( $lhave HAVE_DEMANGLE       none )
 
     while ($#lhave > 0)
        set lvr = $lhave[1]

@@ -39,7 +39,7 @@ void *SC_alloc(long nitems, long bpi, char *name)
     opt.where.pfile = NULL;
     opt.where.line  = -1;
 
-    rv = _SC_alloc_n(nitems, bpi, &opt);
+    rv = _SC_ALLOC_N(nitems, bpi, &opt);
 
     return(rv);}
 
@@ -66,7 +66,7 @@ void *SC_alloc_na(long nitems, long bpi, char *name, int na)
     opt.where.pfile = NULL;
     opt.where.line  = -1;
 
-    p = _SC_alloc_n(nitems, bpi, &opt);
+    p = _SC_ALLOC_N(nitems, bpi, &opt);
 
     return(p);}
 
@@ -95,7 +95,7 @@ void *SC_alloc_nz(long nitems, long bpi, char *name, int na, int zsp)
     opt.where.pfile = NULL;
     opt.where.line  = -1;
 
-    p = _SC_alloc_n(nitems, bpi, &opt);
+    p = _SC_ALLOC_N(nitems, bpi, &opt);
 
     return(p);}
 
@@ -120,7 +120,7 @@ void *SC_realloc(void *p, long nitems, long bpi)
     opt.where.pfile = NULL;
     opt.where.line  = -1;
 
-    rv = _SC_realloc_n(p, nitems, bpi, &opt);
+    rv = _SC_REALLOC_N(p, nitems, bpi, &opt);
 
     return(rv);}
 
@@ -147,7 +147,7 @@ void *SC_realloc_na(void *p, long nitems, long bpi, int na)
     opt.where.pfile = NULL;
     opt.where.line  = -1;
 
-    rv = _SC_realloc_n(p, nitems, bpi, &opt);
+    rv = _SC_REALLOC_N(p, nitems, bpi, &opt);
 
     return(rv);}
 
@@ -176,14 +176,14 @@ void *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp)
     opt.where.pfile = NULL;
     opt.where.line  = -1;
 
-    rv = _SC_realloc_n(p, nitems, bpi, &opt);
+    rv = _SC_REALLOC_N(p, nitems, bpi, &opt);
 
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_FREE - the complementary routine for _SC_alloc_n
+/* SC_FREE - the complementary routine for _SC_ALLOC_N
  *         - free all the space including the counter
  *         - return TRUE if successful and FALSE otherwise
  */
@@ -202,7 +202,7 @@ int SC_free(void *p)
     opt.where.pfile = NULL;
     opt.where.line  = -1;
 
-    rv = _SC_free_n(p, &opt);
+    rv = _SC_FREE_N(p, &opt);
 
     return(rv);}
 
@@ -228,7 +228,7 @@ int SC_free_z(void *p, int zsp)
     opt.where.pfile = NULL;
     opt.where.line  = -1;
 
-    rv = _SC_free_n(p, &opt);
+    rv = _SC_FREE_N(p, &opt);
 
     return(rv);}
 
@@ -310,7 +310,7 @@ char *SC_strsaven(char *s, char *name)
 	opt.where.pfile = NULL;
 	opt.where.line  = -1;
 
-	p = _SC_alloc_n(sz, 1, &opt);
+	p = _SC_ALLOC_N(sz, 1, &opt);
 	if (p != NULL)
 	   {strcpy(p, s);
 	    p[sz-1] = '\0';};};

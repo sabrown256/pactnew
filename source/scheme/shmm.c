@@ -946,7 +946,7 @@ object *SS_mk_object(SS_psides *si,
     opt.where.pfile = __FILE__;
     opt.where.line  = __LINE__;
 
-    o = _SC_alloc_n(1L, sizeof(object), &opt);
+    o = _SC_ALLOC_N(1L, sizeof(object), &opt);
 
     if ((pname != NULL) && (SC_arrlen(pname) < 1))
        pname = CSTRSAVE(pname);

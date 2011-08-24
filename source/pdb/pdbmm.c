@@ -330,7 +330,9 @@ data_standard *_PD_copy_standard(data_standard *src)
  */
 
 void _PD_rl_standard(data_standard *std)
-   {if (std != NULL)
+   {
+
+    if (std != NULL)
        {CFREE(std->fp[0].format);
         CFREE(std->fp[0].order);
         CFREE(std->fp[1].format);
@@ -686,6 +688,8 @@ int _PD_ha_rl_defstr(haelem *hp, void *a)
     SC_ASSERT(ok == TRUE);
 
     _PD_rl_defstr(dp);
+
+    hp->def = NULL;
 
     return(TRUE);}
 

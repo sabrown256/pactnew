@@ -1037,7 +1037,7 @@ extern char
 extern int
  SC_mem_corrupt(int flag),
  SC_mem_map(FILE *fp, int flag),
- SC_mem_neighbor(void *p, void *pa, void *pb);
+ SC_mem_neighbor(void *p, int flag, void *b, void *a);
 
 extern long
  SC_mem_monitor(int old, int lev, char *id, char *msg),

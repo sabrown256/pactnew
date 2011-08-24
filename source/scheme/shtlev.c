@@ -122,7 +122,7 @@ PFPrintErrMsg SS_get_print_err_func(void)
 /* _SS_REPL - run a READ-EVAL-PRINT Loop */
 
 static int _SS_repl(SS_psides *si)
-   {long ba, bf, bd;
+   {int64_t ba, bf, bd;
     double evalt;
 
     SS_assign(si, si->rdobj, SS_null);

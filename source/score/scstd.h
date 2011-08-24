@@ -14,6 +14,8 @@
 
 #include "cpyright.h"
 
+#define USE_FULL_MM
+
 /*--------------------------------------------------------------------------*/
 
 /*                          STANDARD INCLUDES                               */

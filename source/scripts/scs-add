@@ -20,6 +20,13 @@ unset ldir
 if (-d $gitd[1]) then
 
    git add $argv
+   if ($status == 0) then
+      foreach i ($argv)
+         if ((-f $i) || (-d $i)) then
+            echo "A  $i"
+         endif
+      end
+   endif
 
 else if (-d CVS) then
 

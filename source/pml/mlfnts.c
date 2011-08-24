@@ -267,7 +267,7 @@ static int test_real_val(void)
 
 int main(int c, char **v)
    {int err, lerr;
-    long bytaa, bytfa, bytab, bytfb;
+    int64_t bytaa, bytfa, bytab, bytfb;
 
     SC_gs.mm_debug = TRUE;
     SC_zero_space_n(0, -2);

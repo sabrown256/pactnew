@@ -235,7 +235,7 @@ void PA_file_mon(char *edname, char *ppname, char *gfname)
  */
 
 void PA_rd_restart(char *rsname, int convs)
-   {long lsa, lsb;
+   {int64_t lsa, lsb;
     float space;
 
     SC_mem_stats(&lsb, NULL, NULL, NULL);

@@ -107,7 +107,8 @@ DObjs = scmkdp.o scmkpr.o scar.o sctar.o scfcnr.o
 
 EObjs = scexe.o
 
-MObjs = scmemc.o scmemda.o scmemdb.o scmeme.o \
+MObjs = scmemc.o scmemcl.o scmemcs.o \
+        scmemda.o scmemdb.o scmemdc.o scmeme.o \
         scmemg.o scmemh.o scmemt.o sctyp.o
 
 PObjs = scerr.o sccntx.o \
@@ -134,7 +135,8 @@ ArDObjs = ${TGTLib}(scmkdp.o) ${TGTLib}(scmkpr.o) ${TGTLib}(scar.o) \
 
 ArEObjs = ${TGTLib}(scexe.o)
 
-ArMObjs = ${TGTLib}(scmemc.o) ${TGTLib}(scmemda.o) ${TGTLib}(scmemdb.o) \
+ArMObjs = ${TGTLib}(scmemc.o) ${TGTLib}(scmemcl.o) ${TGTLib}(scmemcs.o) \
+          ${TGTLib}(scmemda.o) ${TGTLib}(scmemdb.o) ${TGTLib}(scmemdc.o) \
           ${TGTLib}(scmeme.o) ${TGTLib}(scmemg.o) \
           ${TGTLib}(scmemh.o) ${TGTLib}(scmemt.o) ${TGTLib}(sctyp.o)
 

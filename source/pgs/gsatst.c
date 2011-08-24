@@ -1273,9 +1273,10 @@ static int run_test(PG_device *dev, int nt, gtest *tst)
 /* TEST_CHECK - begin/end memory checks for each test */
 
 static long test_check(char *name, long which, int debug_mode)
-   {long bytaa, bytfa, rv;
+   {long rv;
+    int64_t bytaa, bytfa;
     char msg[MAXLINE];
-    static long bytab, bytfb;
+    static int64_t bytab, bytfb;
 
     rv = 0;
 

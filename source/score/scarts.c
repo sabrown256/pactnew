@@ -26,7 +26,7 @@ struct s_ts1
 static int run_test(int n, PFInt tst)
    {int err;
     double time;
-    long da, db;
+    int64_t da, db;
 
     SC_ENTERING;
 

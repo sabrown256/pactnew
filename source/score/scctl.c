@@ -53,7 +53,12 @@ SC_global_state
           ATOL_FUNCTION,
           STRTOL_FUNCTION,
 	  SC_type_container,
-          {_SC_nalloc_w, _SC_alloc_w, _SC_realloc_w, _SC_free_w}};
+#ifdef USE_FULL_MM
+          {_SC_nalloc_wl, _SC_alloc_wl, _SC_realloc_wl, _SC_free_wl}
+#else
+          {_SC_nalloc_ws, _SC_alloc_ws, _SC_realloc_ws, _SC_free_ws}
+#endif
+	  };
 
 SC_state
  _SC = {-1, TRUE, -1,

@@ -63,11 +63,6 @@ void _SC_copy_storloc(SC_storloc *d, SC_storloc *s)
  * RHE 5 has 2.17.50
  */
 
-#undef HAVE_DEMANGLE
-#if BFD_MAJOR_VERSION >= 2 && BFD_MINOR_VERSION > 17
-# define HAVE_DEMANGLE
-#endif
-
 #ifdef HAVE_DEMANGLE
 # include <demangle.h>
 # define SC_DEMANGLE_ARG   (DMGL_ANSI | DMGL_PARAMS)
