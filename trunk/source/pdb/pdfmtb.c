@@ -434,7 +434,7 @@ int _PD_rd_chrt_ii(PDBfile *file)
 
 /* install the type in both charts */
         _PD_defstr_inst(file, type, STRUCT_KIND, lst,
-			NO_ORDER, NULL, NULL, FALSE);};
+			NO_ORDER, NULL, NULL, PD_CHART_HOST);};
 
 /* complete the setting of the directory indicator */
     if (pa->has_dirs)
@@ -487,19 +487,19 @@ static void _PD_rd_prim_align_type(char *type, int al, data_alignment *align)
 /* _PD_RD_PRIM_TYP_II - read the primitive types from the extras table */
 
 static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
-   {int ni, align, host_empty;
+   {int ni, align;
     int dc, rec;
     int unsgned, onescmp;
     int *ordr, *aord, *tord;
     long i, bpi, conv, bsz;
     long *formt, *tfmt;
     char *token, *type, *origtype, *atype, delim[10], *s, *local;
-    defstr *dp;
     multides *tuple;
     data_standard *std;
     PD_type_kind kind;
     PD_byte_order ord;
     PD_smp_state *pa;
+static int way = 0;
 
     pa = _PD_get_state(-1);
 
@@ -514,21 +514,28 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
     if (bf != NULL)
        _PD_get_token(bf, local, bsz, '\n');
 
+#if 0
+way = 1;
+/* initialize the pdb system defs and structure chart */
+    _PD_init_chrt(file, FALSE);
+#endif
+
     while (_PD_get_token(NULL, local, bsz, '\n'))
        {if (*local == rec)
            break;
 
-        type    = CSTRSAVE(SC_strtok(local, delim, s));
-        bpi     = SC_stol(SC_strtok(NULL, delim, s));
-        align   = SC_stol(SC_strtok(NULL, delim, s));
-        ord     = (PD_byte_order) SC_stol(SC_strtok(NULL, delim, s));
-        unsgned = FALSE;
-        onescmp = FALSE;
-        conv    = TRUE;
-	kind    = INT_KIND;
-        ordr    = NULL;
-        formt   = NULL;
-	tuple   = NULL;
+        type     = CSTRSAVE(SC_strtok(local, delim, s));
+        bpi      = SC_stol(SC_strtok(NULL, delim, s));
+        align    = SC_stol(SC_strtok(NULL, delim, s));
+        ord      = (PD_byte_order) SC_stol(SC_strtok(NULL, delim, s));
+        unsgned  = FALSE;
+        onescmp  = FALSE;
+        conv     = TRUE;
+	kind     = INT_KIND;
+        ordr     = NULL;
+        formt    = NULL;
+	tuple    = NULL;
+	origtype = NULL;
 
 	_PD_rd_prim_align_type(type, align, file->align);
 
@@ -574,9 +581,13 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
 		    break;};
 	    if (aord[0] == -1)
 	       CFREE(aord);
-	    tuple = _PD_make_tuple(atype, ni, aord);};
+	    tuple = _PD_make_tuple(atype, ni, aord);
+if (way == 1)
+	    token = SC_strtok(NULL, delim, s);};
 
-        token = SC_strtok(NULL, delim, s);
+if (way == 0)
+   token = SC_strtok(NULL, delim, s);
+
         if ((token != NULL) && (strcmp(token, "UNSGNED") == 0))
 	   {unsgned = SC_stol(SC_strtok(NULL, delim, s));
 	    token   = SC_strtok(NULL, delim, s);};
@@ -585,50 +596,25 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
 	   {onescmp = SC_stol(SC_strtok(NULL, delim, s));
 	    token   = SC_strtok(NULL, delim, s);};
 
-/* typedef: ignores "REAL" type at the moment for backward compat */
+/* ignore typedef for "REAL" type at the moment for backward compat */
         if ((token != NULL) && (strcmp(type, "REAL") != 0) && 
             (strcmp(token, "TYPEDEF") == 0))
            {origtype = SC_strtok(NULL, delim, s);
-            token    = SC_strtok(NULL, delim, s);}
-        else 
-           origtype = NULL;
+            token    = SC_strtok(NULL, delim, s);};
 
-/* it is either a typedef or a normal type */
-        if (origtype != NULL) 
-           {dp = PD_inquire_host_type(file, origtype);
+	if (origtype == NULL) 
+	   _PD_regen_std(file, type, bpi, ord);
 
-            if (dp != NULL)
-               {_PD_d_install(file,  type, _PD_defstr_copy(dp), TRUE);
-                host_empty = FALSE;}
-            else
-               host_empty = TRUE;
-
-            dp = PD_inquire_type(file, origtype);
- 
-            if (dp != NULL)
-               {_PD_d_install(file, type, _PD_defstr_copy(dp), FALSE);}
-
-/* only the file chart has it - look in there */
-            if ((dp != NULL) && host_empty)
-               _PD_d_install(file,  type, _PD_defstr_copy(dp), TRUE);
-
-	    CFREE(ordr);
-	    CFREE(formt);
-	    _PD_free_tuple(tuple);}
-
-        else 
-           {_PD_regen_std(file, type, bpi, ord);
-
-	    if (conv == FALSE)
-               _PD_defstr(file, PD_CHART_HOST, type, kind,
-			  NULL, tuple, bpi, align, ord, FALSE,
-                          ordr, formt, unsgned, onescmp);
-
-            _PD_defstr(file, PD_CHART_FILE, type, kind,
-		       NULL, tuple, bpi, align, ord, TRUE,
-		       ordr, formt, unsgned, onescmp);}
+	_PD_defstr_prim_rd(file, type, origtype, kind,
+			   tuple, bpi, align, ord,
+			   ordr, formt, unsgned, onescmp, conv);
 
         CFREE(type);};
+
+#if 1
+/* initialize the pdb system defs and structure chart */
+    _PD_init_chrt(file, TRUE);
+#endif
 
     return(TRUE);}
 
@@ -1399,9 +1385,6 @@ static int _PD_open_ii(PDBfile *file)
 /* read the miscellaneous data */
     if (!_PD_rd_ext_ii(file))
        PD_error("CAN'T READ MISCELLANEOUS DATA - PD_OPEN", PD_OPEN);
-
-/* initialize the pdb system defs and structure chart */
-    _PD_init_chrt(file, TRUE);
 
 /* read the structure chart */
     if (lio_seek(fp, file->chrtaddr, SEEK_SET))

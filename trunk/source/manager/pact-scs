@@ -15,86 +15,27 @@ if ($?SCSOpt == 0) then
    set SCSOpt = ""
 endif
 
-set repo = `$ScrDir/scs-meta -r`
+set repo     = `$ScrDir/scs-meta -r`
+set repohost = ""
+set SCSDir   = `scs-meta -n`
+set SCSExe   = `scs-meta -x`
+set repohost = `scs-meta -m`
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# GIT - setup for GIT
+# handle the local repository case
+if ("$repohost" == "--local--") then
+   set Lock = commit.lock
+   if (-d $repo) then
+      set Lock = $repo/commit.lock
+   endif
 
-if (-d ../.git) then
-   set SCSExe = git
-   set SCSDir = $cwd:h/.git
-
+# handle the remote repository case
+else
    set Stage = "$MngDir/stage"
    set Lock  = "$Stage/commit.lock"
-
-   if ("$repo" =~ ssh://*) then
-      set repohost = `echo $repo | sed 's|ssh://||' | sed 's|/.*$||'`
-   else
-      set repohost = ""
-   endif
-
-# handle the LOCAL repository case
-   if ("$repohost" == "") then
-      set Lock = commit.lock
-      if ($?CVSROOT == 1) then
-         if (`expr "$CVSROOT" : '.*\(:\).*'` == "") then
-            set Lock = $CVSROOT/commit.lock
-         endif
-      endif
-   else
-      set Stage = "$MngDir/stage"
-      set Lock  = "$Stage/commit.lock"
-   endif
-
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# CVS - setup for CVS
-
-else if (-d CVS) then
-   set SCSExe = cvs
-   set SCSDir = CVS
-
-   if ($?CVSROOT == 1) then
-      set repohost = `echo $CVSROOT | sed 's|:/.*$||' | sed 's|^.*@||'`
-   else
-      set repohost = ""
-   endif
-
-# handle the LOCAL repository case
-   if ("$repohost" == "") then
-      set Lock = commit.lock
-      if ($?CVSROOT == 1) then
-         if (`expr "$CVSROOT" : '.*\(:\).*'` == "") then
-            set Lock = $CVSROOT/commit.lock
-         endif
-      endif
-   else
-      set Stage = "$MngDir/stage"
-      set Lock  = "$Stage/commit.lock"
-   endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# SVN - setup for SVN
-
-else if (-d .svn) then
-   set SCSExe = svn
-   set SCSDir = .svn
-
-   set Stage = "$MngDir/stage"
-   set Lock  = "$Stage/commit.lock"
-
-   set repohost = ""
-
 endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 # make the Message
 set Host    = `uname -n`

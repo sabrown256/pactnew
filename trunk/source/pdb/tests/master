@@ -22,7 +22,7 @@ if ("$Valgrind" == "") then
    set xstatus = $status
 else
    ftee $LogF $Valgrind $BinDir/pdbtst -v $tst |& \
-   grep "ERROR SUMMARY:"                      |& \
+   grep "ERROR SUMMARY:"                       |& \
    awk '{ print $4 }'   >&! $Tmp
    set xstatus = `cat $Tmp`
 	 flog $LogF $RM $Tmp

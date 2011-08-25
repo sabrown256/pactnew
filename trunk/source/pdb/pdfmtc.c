@@ -224,13 +224,12 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 /* _PD_RD_PRIM_TYP_III - read the primitive types from the extras table */
 
 static int _PD_rd_prim_typ_iii(PDBfile *file, char *bf)
-   {int ni, align, host_empty;
+   {int ni, align;
     int unsgned, onescmp;
     int *ordr, *aord;
-    long i, size, conv, bsz;
+    long i, bpi, conv, bsz;
     long *formt;
     char *token, *type, *origtype, *atype, *s, *local;
-    defstr *dp;
     multides *tuple;
     PD_type_kind kind;
     PD_byte_order ord, ordo;
@@ -256,7 +255,7 @@ static int _PD_rd_prim_typ_iii(PDBfile *file, char *bf)
 
         type = CSTRSAVE(SC_strtok(local, " \t", s));
 
-        size     = SC_stol(SC_strtok(NULL, " \t", s));
+        bpi      = SC_stol(SC_strtok(NULL, " \t", s));
         align    = SC_stol(SC_strtok(NULL, " \t", s));
         ord      = NO_ORDER;
 	ordo     = NO_ORDER;
@@ -266,30 +265,30 @@ static int _PD_rd_prim_typ_iii(PDBfile *file, char *bf)
         onescmp  = FALSE;
         conv     = TRUE;
 	kind     = NON_CONVERT_KIND;
-	origtype = NULL;
 	tuple    = NULL;
+	origtype = NULL;
 
         while ((token = SC_strtok(NULL, "(|;\n", s)) != NULL)
 	   {token = SC_trim_left(token, " \n");
 	    if (strncmp(token, "ORDER", 5) == 0)
-	       {ordr = CMAKE_N(int, size);
-		for (i = 0L; i < size; i++)
+	       {ordr = CMAKE_N(int, bpi);
+		for (i = 0L; i < bpi; i++)
 		    {token = SC_strtok(NULL, ",)|", s);
 		     if (token == NULL)
 		        continue;
 		     else if (strcmp(token, "text") == 0)
-		        {for (i = 0L; i < size; i++)
+		        {for (i = 0L; i < bpi; i++)
 			     ordr[i] = i + 1;
 			 ordo = TEXT_ORDER;
 			 break;}
 		     else if (strcmp(token, "big") == 0)
-		        {for (i = 0L; i < size; i++)
+		        {for (i = 0L; i < bpi; i++)
 			     ordr[i] = i + 1;
 			 ordo = NORMAL_ORDER;
 			 break;}
 		     else if (strcmp(token, "little") == 0)
-		        {for (i = 0L; i < size; i++)
-			     ordr[i] = size - i;
+		        {for (i = 0L; i < bpi; i++)
+			     ordr[i] = bpi - i;
 			 ordo = REVERSE_ORDER;
 			 break;}
 
@@ -334,42 +333,11 @@ static int _PD_rd_prim_typ_iii(PDBfile *file, char *bf)
             else if (strncmp(token, "TYPEDEF", 7) == 0)
 	       origtype = SC_strtok(NULL, ")", s);};
 
-	_PD_prim_type_iii(file, type, size, align, ord, ordr, formt);
+	_PD_prim_type_iii(file, type, bpi, align, ord, ordr, formt);
 
-/* it is either a typedef or a normal type */
-        if (origtype != NULL) 
-	   {dp = PD_inquire_host_type(file, origtype);
-            
-	    if (dp != NULL)
-               {_PD_d_install(file,  type, _PD_defstr_copy(dp), TRUE);
-                host_empty = FALSE;}
-            else
-               {host_empty = TRUE;}
-
-            dp = PD_inquire_type(file, origtype);
- 
-            if (dp != NULL)
-	       _PD_d_install(file, type, _PD_defstr_copy(dp), FALSE);
-
-/* only the file chart has it - look in there */
-            if ((dp != NULL) && host_empty)
-               _PD_d_install(file,  type, _PD_defstr_copy(dp), TRUE);
-
-	    CFREE(ordr);
-	    CFREE(formt);}
-
-        else 
-	   {dp = PD_inquire_host_type(file, type);
-	    if ((conv == FALSE) && (dp == NULL))
-               _PD_defstr(file, PD_CHART_HOST, type, kind,
-			  NULL, tuple,
-			  size, align, ord, FALSE,
-                          ordr, formt, unsgned, onescmp);
-
-            _PD_defstr(file, PD_CHART_FILE, type, kind,
-		       NULL, tuple,
-		       size, align, ord, TRUE,
-		       ordr, formt, unsgned, onescmp);}
+	_PD_defstr_prim_rd(file, type, origtype, kind,
+			   tuple, bpi, align, ord,
+			   ordr, formt, unsgned, onescmp, conv);
 
         CFREE(type);};
 
@@ -519,7 +487,7 @@ static int _PD_rd_chrt_iii(PDBfile *file)
 
 /* install the type in both charts */
         _PD_defstr_inst(file, type, STRUCT_KIND, lst,
-			NO_ORDER, NULL, NULL, FALSE);};
+			NO_ORDER, NULL, NULL, PD_CHART_HOST);};
 
     pa->cast_lst = pl;
     pa->n_casts  = icast;

@@ -31,23 +31,31 @@ while ($#argv > 0)
             breaksw
        case -h:
             echo ""
-            echo "Usage: scs-meta [-c <dir>] [-d] [-h] [-k] [-n] [-r]"
+            echo "Usage: scs-meta [-c <dir>] [-d] [-h] [-k] [-m] [-n] [-r] [-x]"
             echo "   c  change metadata to point to new repo <dir>"
             echo "   d  list directories containing metadata"
             echo "   h  this help message"
             echo "   k  report system (one of git, svn, or cvs)"
+            echo "   m  report name of host where repository resides"
             echo "   n  report name of metadata directory (one of .git, .svn, or CVS)"
             echo "   r  report location of master repository"
+            echo "   x  report the full path to the executable"
             echo ""
             exit(1)
        case -k:
             set tgt = kind
+            breaksw
+       case -m:
+            set tgt = machine
             breaksw
        case -n:
             set tgt = metan
             breaksw
        case -r:
             set tgt = repo
+            breaksw
+       case -x:
+            set tgt = exe
             breaksw
        default:
             breaksw
@@ -74,8 +82,22 @@ if (-d $gitd[1]) then
       case directories:
            set res = ( $res `find $gitd[1] -name .git -type d | grep -v $gitd[1]/.git` )
            breaksw
+      case exe:
+           set res = `which git`
+           breaksw
       case kind:
            set res = git
+           breaksw
+      case machine:
+           set repo = ( `grep url $gitd[1]/.git/config | sed 's|^[ \t]*url =||'` )
+           if ("$repo" =~ *:/*) then
+              set res = `echo $repo | sed 's|:/.*$||'`
+           else if ("$repo" =~ http*://*) then
+              set res = `echo $repo | sed 's|http*://||' | sed 's|/.*$||'`
+           else
+              set res = "--local--"
+           endif
+           unset repo
            breaksw
       case metan:
            set res = .git
@@ -105,8 +127,20 @@ else if (-d CVS) then
       case directories:
            set res = ( $res `find . -name CVS -type d` )
            breaksw
+      case exe:
+           set res = `which cvs`
+           breaksw
       case kind:
            set res = cvs
+           breaksw
+      case machine:
+           set repo = ( `cat CVS/Root` )
+           if ("$repo" =~ *:/*) then
+              set res = `echo $repo | sed 's|:/.*$||' | sed 's|^.*@||'`
+           else
+              set res = "--local--"
+           endif
+           unset repo
            breaksw
       case metan:
            set res = CVS
@@ -131,8 +165,27 @@ else if (-d .svn) then
       case directories:
            set res = ( $res `find . -name .svn -type d` )
            breaksw
+      case exe:
+           set res = `which svn`
+           breaksw
       case kind:
            set res = svn
+           breaksw
+      case machine:
+           set dir  = ( `head -n 5 .svn/entries | tail -n 1` )
+           set repo = $dir:h
+
+# expect svn+ssh://<host><path>
+# https://<host><path>
+           if ("$repo" =~ svn+ssh://*) then
+              set res = `echo $repo | sed 's|^svn+ssh://||' | sed 's|/.*$||'`
+           else if ("$repo" =~ http*://*) then
+              set res = `echo $repo | sed 's|^http.*://||' | sed 's|/.*$||'`
+           else
+              set res = "--local--"
+           endif
+           unset repo
+           unset dir
            breaksw
       case metan:
            set res = .svn

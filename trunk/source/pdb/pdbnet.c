@@ -500,8 +500,8 @@ hasharr *PN_target(data_standard *std, data_alignment *align)
 /* initialize the chart */
     chart  = SC_make_hasharr(1, NODOC, SC_HA_NAME_KEY, 0);
 
-    _PD_setup_chart(chart, std,
-		    pa->host_std, align, pa->host_align, FALSE, TRUE);
+    _PD_setup_chart(chart, std, pa->host_std, align, pa->host_align,
+		    PD_CHART_FILE, TRUE);
 
 /* special hack for jollies and to save typing */
     SC_hasharr_install(chart, "standard", std, PD_STANDARD_S, TRUE, TRUE);
@@ -590,7 +590,7 @@ defstr *PN_defstr(hasharr *chart, char *name, data_alignment *align,
 
 /* install the type in both charts */
     dp = _PD_defstr_inst(file, name, STRUCT_KIND, lst,
-			 NO_ORDER, NULL, NULL, FALSE);
+			 NO_ORDER, NULL, NULL, PD_CHART_HOST);
 
 /* free tmp PDBfile */
     CFREE(file);

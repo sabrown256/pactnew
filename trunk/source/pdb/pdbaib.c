@@ -81,7 +81,7 @@ defstr *PD_typedef(PDBfile *file ARG(,,cls), char *oname, char *tname)
 		"ERROR: HOST TYPE %s UNKNOWN - PD_TYPEDEF\n", oname);
     else
        {if (PD_inquire_host_type(file, tname) == NULL)
-           _PD_d_install(file, tname, dp, TRUE);};
+           _PD_d_install(file, tname, dp, PD_CHART_HOST);};
 
 /* setup for file chart */
     dp = PD_inquire_type(file, oname);
@@ -90,7 +90,7 @@ defstr *PD_typedef(PDBfile *file ARG(,,cls), char *oname, char *tname)
 		"ERROR: FILE TYPE %s UNKNOWN - PD_TYPEDEF\n", oname);
     else
        {if (PD_inquire_type(file, tname) == NULL)
-           _PD_d_install(file, tname, dp, FALSE);};
+           _PD_d_install(file, tname, dp, PD_CHART_FILE);};
 
     return(dp);}
 
@@ -309,7 +309,7 @@ defstr *PD_defstr(PDBfile *file ARG(,,cls), char *name, ...)
 
 /* install the type in all charts */
     dp = _PD_defstr_inst(file, name, STRUCT_KIND, lst,
-			 NO_ORDER, NULL, NULL, FALSE);
+			 NO_ORDER, NULL, NULL, PD_CHART_HOST);
 
     if (dp == NULL)
        PD_error("CAN'T HANDLE PRIMITIVE TYPE - PD_DEFSTR", PD_GENERIC);
@@ -377,7 +377,7 @@ defstr *PD_defstr_alt(PDBfile *file ARG(,,cls), char *name, int nmemb,
 
 /* install the type in all charts */
     dp = _PD_defstr_inst(file, name, STRUCT_KIND, lst,
-			 NO_ORDER, NULL, NULL, FALSE);
+			 NO_ORDER, NULL, NULL, PD_CHART_HOST);
 
     if (dp == NULL)
        PD_error("CAN'T HANDLE PRIMITIVE TYPE - PD_DEFSTR_ALT", PD_GENERIC);
@@ -478,13 +478,15 @@ int PD_change_primitive(PDBfile *file ARG(,,cls),
 	    fstd->fp[ifp].format = fpfmt;
 	    falign->fp[ifp]      = algn;};};
 
-    _PD_setup_chart(file->host_chart, hstd, NULL, halign, NULL, TRUE, TRUE);
+    _PD_setup_chart(file->host_chart, hstd, NULL, halign, NULL,
+		    PD_CHART_HOST, TRUE);
 
 /* NOTE: we must change the file chart unconditionally but this only
  * ends up changing the dp->convert flag for this type and this is
  * essential
  */
-    _PD_setup_chart(file->chart, fstd, hstd, falign, halign, FALSE, TRUE);
+    _PD_setup_chart(file->chart, fstd, hstd, falign, halign,
+		    PD_CHART_FILE, TRUE);
 
 /* if we opened the file in write mode we need to change the formats */
     if (file->mode == PD_CREATE)

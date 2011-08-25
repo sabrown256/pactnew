@@ -102,8 +102,7 @@ switch ($Phase)
            endif
 
            if ("$Repo" != "") then
-              setenv CVSROOT $Repo
-              Note $LogHost "Repository: $CVSROOT"
+              Note $LogHost "Repository: $Repo"
            endif
 
 # if syncing from the repository
@@ -134,9 +133,9 @@ switch ($Phase)
 
               if ("$Repo" != "") then
                  if ($Tag == "none") then
-                    set CO = "cvs co $Code"
+                    set CO = "scs-co -d $Repo $Code"
                  else
-                    set CO = "cvs co -D "$Tag" $Code"
+                    set CO = "scs-co -d $Repo -D "$Tag" $Code"
                  endif
 
                  flog $LogHost eval $CO

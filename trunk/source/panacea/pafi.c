@@ -751,7 +751,7 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
 
 /* install the type in both charts */
     dp = _PD_defstr_inst(PA_vif, pt->name, STRUCT_KIND, lst,
-			 NO_ORDER, NULL, NULL, FALSE);
+			 NO_ORDER, NULL, NULL, PD_CHART_HOST);
 
     PA_ERR((dp == NULL),
            "STRUCT DEFINITION FAILED - _PA_RD_DB_TAB");

@@ -1946,7 +1946,7 @@ static object *_SXI_write_defstr(SS_psides *si, object *argl)
 
     else
        _PD_defstr_inst(file, dp->type, dp->kind, desc,
-		       NO_ORDER, NULL, NULL, TRUE);
+		       NO_ORDER, NULL, NULL, PD_CHART_FILE);
 
     return(SS_f);}
 
@@ -2027,7 +2027,7 @@ static object *_SXI_make_defstr(SS_psides *si, object *argl)
 	 prev = desc;};
 
     dp = _PD_defstr_inst(file, name, STRUCT_KIND, lst,
-			 NO_ORDER, NULL, NULL, FALSE);
+			 NO_ORDER, NULL, NULL, PD_CHART_HOST);
     o  = _SX_mk_gdefstr(si, dp);
 
     return(o);}

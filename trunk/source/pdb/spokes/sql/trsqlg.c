@@ -312,7 +312,7 @@ static defstr *_SQL_rd_defstr(PDBfile *file, char *type)
 
 /* install the type in all charts */
     dp = _PD_defstr_inst(file, type, STRUCT_KIND, lst,
-			 TEXT_ORDER, NULL, NULL, FALSE);
+			 TEXT_ORDER, NULL, NULL, PD_CHART_HOST);
 
     if (dp == NULL)
        PD_error("CAN'T HANDLE PRIMITIVE TYPE - _SQL_RD_DEFSTR", PD_GENERIC);

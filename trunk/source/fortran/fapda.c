@@ -1368,7 +1368,7 @@ FIXNUM FF_ID(pfdefs, PFDEFS)(FIXNUM *sfid,
 /* install the type in both charts */
     rv = TRUE;
     dp = _PD_defstr_inst(file, lname, STRUCT_KIND, lst,
-			 NO_ORDER, NULL, NULL, FALSE);
+			 NO_ORDER, NULL, NULL, PD_CHART_HOST);
     if (dp == NULL)
        {PD_error("CAN'T HANDLE PRIMITIVE TYPE - PFDEFS", PD_GENERIC);
         rv = FALSE;};
