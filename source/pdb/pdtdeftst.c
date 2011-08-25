@@ -28,13 +28,46 @@ struct s_point
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PRINT_HELP - print a help message */
+
+static void print_help(void)
+   {
+
+    PRINT(STDOUT, "\nPDTDEFTST - run PDB typedef test\n\n");
+    PRINT(STDOUT, "Usage: pdtdeftst [-d] [-h] [-v #]\n");
+    PRINT(STDOUT, "\n");
+    PRINT(STDOUT, "       d  - turn on debug mode to display memory maps\n");
+    PRINT(STDOUT, "       h  - print this help message and exit\n");
+    PRINT(STDOUT, "       v  - use format version # (default is 2)\n");
+    PRINT(STDOUT, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 int main(int c, char **v)
-   {int err;
+   {int i, err;
     PDBfile *file;
     point *ptr;
   
     err = 0;
   
+    for (i = 1; i < c; i++)
+        {if (v[i][0] == '-')
+            {switch (v[i][1])
+                {case 'd' :
+/*		      SC_gs.mm_debug = TRUE; */
+		      break;
+                 case 'h' :
+		      print_help();
+		      return(1);
+                 case 'v' :
+                      PD_set_fmt_version(SC_stoi(v[++i]));
+		      break;};}
+         else
+            break;};
+
     file = PD_open("out.pdb", "w");
   
 #ifdef SINGLE_PRECISION

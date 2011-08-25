@@ -158,15 +158,17 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     set SynSCM = ""
     Note $STDOUT -n "SyntaxModes  ="
     if ("$Yacc_Exe" != "") then
+       set scsd = `scs-meta -n`
        pushd $Base/scheme/syntax >& /dev/null
        foreach mod (*)
           if (-d $mod) then
-             if (($mod == CVS) || ($mod == .svn)) continue
-             set SynSCM = ( $SynSCM applications/${mod}synt.scm )
-             if ($BuildStrategy == "SpaceSaving") then
-   	        Note $STDOUT -n ' ${Ar'$mod'}'
-             else
-	        Note $STDOUT -n ' ${O'$mod'}'
+             if ($mod != $scsd) then
+                set SynSCM = ( $SynSCM applications/${mod}synt.scm )
+                if ($BuildStrategy == "SpaceSaving") then
+   	           Note $STDOUT -n ' ${Ar'$mod'}'
+                else
+	           Note $STDOUT -n ' ${O'$mod'}'
+                endif
              endif
           endif
        end

@@ -58,7 +58,7 @@ else if (-d CVS) then
 
 else if (-d .svn) then
 
-   svn history $argv
+   svn log $argv
 
 endif
 

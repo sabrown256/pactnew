@@ -487,11 +487,16 @@ extern void
  _PD_set_standard(PDBfile *file, data_standard *std, data_alignment *algn),
  _PD_init_consts(void),
  _PD_init_chrt(PDBfile *file, int ftk),
- _PD_setup_chart(hasharr *chart, data_standard *fstd,
-		 data_standard *hstd, data_alignment *falign,
-		 data_alignment *halign, int ishc, int ftk),
+ _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
+		 data_alignment *falign, data_alignment *halign,
+		 PD_chart_kind chk, int ftk),
+ _PD_defstr_prim_rd(PDBfile *file, char *type, char *origtype,
+		    PD_type_kind kind, multides *tuple,
+		    long bpi, int align, PD_byte_order ord,
+		    int *ordr, long *formt,
+		    int unsgned, int onescmp, int conv),
  _PD_def_real(char *type, PDBfile *file),
- _PD_d_install(PDBfile *file, char *name, defstr *def, int host),
+ _PD_d_install(PDBfile *file, char *name, defstr *def, PD_chart_kind chk),
  _PD_e_install(PDBfile *file, char *name, syment *entr, int lookup);
 
 extern int
@@ -517,9 +522,9 @@ extern defstr
 	     memdes *desc, multides *tuple,
 	     long sz, int align, PD_byte_order ord,
 	     int conv, int *ordr, long *formt, int unsgned, int onescmp),
- *_PD_defstr_inst(PDBfile* file, char *name, PD_type_kind kind,
-		  memdes *desc, PD_byte_order ord, int *ordr,
-		  long *formt, int flag),
+ *_PD_defstr_inst(PDBfile *file, char *name, PD_type_kind kind,
+		  memdes *desc, PD_byte_order ord,
+		  int *ordr, long *formt, PD_chart_kind chk),
  *_PD_type_container(PDBfile *file, defstr *dp);
 
 extern PDBfile

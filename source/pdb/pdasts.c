@@ -615,11 +615,12 @@ static void print_help(void)
    {
 
     PRINT(STDOUT, "\nPDASTS - test user defined primitive types\n\n");
-    PRINT(STDOUT, "Usage: pdasts [-d] [-h] [-n] [-1] [-2]\n");
+    PRINT(STDOUT, "Usage: pdasts [-d] [-h] [-n] [-v #] [-1] [-2]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       d - turn on debug mode to display memory maps\n");
     PRINT(STDOUT, "       h - print this help message and exit\n");
     PRINT(STDOUT, "       n - run native mode test only\n");
+    PRINT(STDOUT, "       v  - use format version # (default is 2)\n");
     PRINT(STDOUT, "       1 - do NOT run test #1\n");
     PRINT(STDOUT, "       2 - do NOT run test #1\n");
     PRINT(STDOUT, "\n");
@@ -647,20 +648,29 @@ int main(int c, char **v)
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')
             {switch (v[i][1])
-                {case 'd' : debug_mode  = TRUE;
-		            native_only = TRUE;
-                            SC_gs.mm_debug = TRUE;
-                            break;
-                 case 'h' : print_help();
-                            return(1);
-                 case 'm' : use_mapped_files = TRUE;
-                            break;
-                 case 'n' : native_only = TRUE;
-                            break;
-                 case '1' : test_one = FALSE;
-                            break;
-                 case '2' : test_two = FALSE;
-                            break;};}
+                {case 'd' :
+		      debug_mode  = TRUE;
+		      native_only = TRUE;
+		      SC_gs.mm_debug = TRUE;
+		      break;
+                 case 'h' :
+		      print_help();
+		      return(1);
+                 case 'm' :
+		      use_mapped_files = TRUE;
+		      break;
+                 case 'n' :
+		      native_only = TRUE;
+		      break;
+                 case 'v' :
+                      PD_set_fmt_version(SC_stoi(v[++i]));
+		      break;
+                 case '1' :
+		      test_one = FALSE;
+		      break;
+                 case '2' :
+		      test_two = FALSE;
+		      break;};}
          else
             break;};
 

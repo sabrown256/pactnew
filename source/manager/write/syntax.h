@@ -49,10 +49,11 @@ source $ldir/env-csh
           flog $Log mkdir syntax
        endif
        flog $Log cd syntax
+       set scsd = `scs-meta -n`
        set Dirs = `ls`
        foreach dir ($Dirs)
           if (-d $dir) then
-             if (($dir != CVS) && ($dir != .svn)) then
+             if ($dir != $scsd) then
                 set lsm   = ( $lsm $dir )
                 @ nsyntxs = $nsyntxs + 1
              endif

@@ -155,7 +155,7 @@ PDBfile *PD_family(PDBfile *of ARG(,,cls), int flag)
 	    for (i = 0; SC_hasharr_next(of->chart, &i, NULL, NULL, (void **) &dp); i++)
 	        {lst = PD_copy_members(dp->members);
 		 _PD_defstr_inst(nf, dp->type, dp->kind, lst,
-				 NO_ORDER, NULL, NULL, FALSE);};
+				 NO_ORDER, NULL, NULL, PD_CHART_HOST);};
 
 /* copy the attributes over? */
 
@@ -232,7 +232,7 @@ int PD_copy_type(PDBfile *sf, PDBfile *df, char *type)
     else
        {lst = PD_copy_members(dp->members);
 	dp  = _PD_defstr_inst(df, type, STRUCT_KIND, lst,
-			      NO_ORDER, NULL, NULL, FALSE);
+			      NO_ORDER, NULL, NULL, PD_CHART_HOST);
 	if (dp == NULL)
 	   {snprintf(pa->err, MAXLINE,
 		     "ERROR: CANNOT CREATE TYPE %s - PD_COPY_TYPE\n", type);

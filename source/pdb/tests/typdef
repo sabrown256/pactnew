@@ -16,30 +16,35 @@ set tst = $1
 
 NoteD $LogF ""
 NoteD $LogF -n "                    PDB Typedef Test ................... "
+Note $LogF ""
 
 set UTime = `$TIMER -r`
 if ("$Valgrind" == "") then
-   $CFE $BinDir/pdtdeftst >& pdtdeftst.log
+   flog $LogF $CFE $BinDir/pdtdeftst -v $tst
    set xstatus = $status
 else
-   ftee $LogF $Valgrind $BinDir/pdtdeftst |& \
-   grep "ERROR SUMMARY:"                 |& \
+   ftee $LogF $Valgrind $BinDir/pdtdeftst -v $tst |& \
+   grep "ERROR SUMMARY:"                          |& \
    awk '{ print $4 }'   >&! $Tmp
    set xstatus = `cat $Tmp`
 	 flog $LogF $RM $Tmp
 endif
 set ETime   = `$TIMER -b $UTime`
 
-if ($xstatus == 0) then
-   set check = `tail out.pdb | grep Float | sed -e 's|Float.*double.*|pass|'`
-else
-   set check = "fail"
+if (-f out.pdb) then
+   flog $Log ls -l out.pdb
+   flog $LogF ( grep -a Float out.pdb | grep -a double )
+   if ($status == 0) then
+      Note $LogF "Result ok"
+   else
+      Note $LogF "Result ng"
+      flog $LogF set xstatus = 2
+   endif
 endif
 
 if (($xstatus == 254) || ($xstatus == 255)) then
    NoteD $LogF "OMITTED ($xstatus/$ETime)"
-else if (($xstatus != 0) || ("$check" != "pass")) then
-   NoteD $LogF ">$check<"
+else if ($xstatus != 0) then
    NoteD $LogF "FAILED ($xstatus/$ETime)"
    set Err = 1
 else

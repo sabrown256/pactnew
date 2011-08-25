@@ -1418,18 +1418,8 @@ CFG_DONE:
            switch ($1)
               case -c:
               case log:
-                   if (-d .git) then
-                      echo "Not prepared for GIT yet"
-                      exit(1)
-                   else if (-d CVS) then
-                      set RepoDir = `cat CVS/Root | sed 's|^.*:||'`/CVSROOT
-                   else if (-d .svn) then
-                      echo "Not prepared for SVN yet"
-                      exit(1)
-                   else
-                      exit(1)
-                   endif
                    shift
+                   set RepoDir = `scs-meta -r`
                    if ($#argv > 0) then
                       set Date = ""
                       while ($#argv > 0)

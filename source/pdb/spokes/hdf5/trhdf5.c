@@ -320,7 +320,7 @@ static char *_H5_handle_fixed_pt(PDBfile *file, hid_t dtid)
         DEBUG1("%s", "      conversions will NOT be done\n");};
 
 /* insert into the file charts */
-    _PD_d_install(hst->pf, typename, dp, FALSE);
+    _PD_d_install(hst->pf, typename, dp, PD_CHART_FILE);
 
     DEBUG1("  Inserted definition for %s\n", typename);
 
@@ -507,7 +507,7 @@ static char *_H5_handle_float_pt(PDBfile *file, hid_t dtid)
     DEBUG1("      alignment: %d\n", _H5_get_alignment(typename));
 
 /* insert into the file charts */
-    _PD_d_install(hst->pf, typename, dp, FALSE);
+    _PD_d_install(hst->pf, typename, dp, PD_CHART_FILE);
  
     DEBUG1("  Inserted definition for %s\n", typename);
  
@@ -827,7 +827,7 @@ static char *_H5_handle_compound(PDBfile *file, hid_t dtid)
    
 /* after fully parsing the members, construct the defstr */
         _PD_defstr_inst(hst->pf, typename, STRUCT_KIND, members,
-			NO_ORDER, NULL, NULL, FALSE);
+			NO_ORDER, NULL, NULL, PD_CHART_HOST);
 
 #if 0
         dp = _PD_mk_defstr(NULL, typename,
@@ -839,7 +839,7 @@ static char *_H5_handle_compound(PDBfile *file, hid_t dtid)
         DEBUG1("      size %ld\n", (long) H5Tget_size(dtid));
         DEBUG1("      alignment %d\n", 4);
 
-        _PD_d_install(hst->pf, typename, dp, TRUE);
+        _PD_d_install(hst->pf, typename, dp, PD_CHART_HOST);
     
 /* make a copy of dp for the file charts */
         host_entry = CMAKE(defstr);
@@ -850,7 +850,7 @@ static char *_H5_handle_compound(PDBfile *file, hid_t dtid)
     
 /* set convert just before adding to the file charts */
         host_entry->convert = convert; 
-        _PD_d_install(hst->pf, typename, host_entry, FALSE);
+        _PD_d_install(hst->pf, typename, host_entry, PD_CHART_FILE);
     
         DEBUG1("Inserted defstr for %s in both charts\n", typename); 
 #endif

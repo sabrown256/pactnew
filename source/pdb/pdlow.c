@@ -377,14 +377,16 @@ void _PD_e_install(PDBfile *file, char *name, syment *ep, int lookup)
  *                  - (should be used in this file only)
  */
 
-static void _PD_d_install_in(char *name, defstr *def, hasharr *tab, int ishc)
+static void _PD_d_install_in(char *name, defstr *def, hasharr *tab,
+			     PD_chart_kind chk)
    {char *typ;
     defstr *dp;
     haelem *hp;
     SC_kind kind;
 
 /* we can leak a lot of memory if we don't check this
- * PURIFY complains of free memory read if hp->def not nulled before SC_hasharr_remove
+ * PURIFY complains of free memory read if hp->def not
+ * nulled before SC_hasharr_remove
  */
     hp = SC_hasharr_lookup(tab, name);
     dp = (hp != NULL) ? (defstr *) hp->def : NULL;
@@ -397,7 +399,7 @@ static void _PD_d_install_in(char *name, defstr *def, hasharr *tab, int ishc)
 
 /* if this is the host chart register the type */
     typ = def->type;
-    if ((ishc == TRUE) && (strncmp(typ, "u_", 2) != 0))
+    if ((chk == PD_CHART_HOST) && (strncmp(typ, "u_", 2) != 0))
        {if (typ[0] == '*')
            kind = KIND_POINTER;
 	else if (strcmp(typ, "bool") == 0)
@@ -433,12 +435,12 @@ static void _PD_d_install_in(char *name, defstr *def, hasharr *tab, int ishc)
 
 /* _PD_D_INSTALL - install a defstr pointer in the given chart of the file */
 
-void _PD_d_install(PDBfile *file, char *name, defstr *def, int host)
+void _PD_d_install(PDBfile *file, char *name, defstr *def, PD_chart_kind chk)
    {hasharr *ch;
 
-    ch = (host == TRUE) ? file->host_chart : file->chart;
+    ch = (chk == PD_CHART_HOST) ? file->host_chart : file->chart;
 
-    _PD_d_install_in(name, def, ch, host);
+    _PD_d_install_in(name, def, ch, chk);
 
     return;}
 
@@ -454,7 +456,7 @@ static defstr *_PD_defstr_in(hasharr *chart, char *name, PD_type_kind kind,
                              long sz, int align,
 			     PD_byte_order ord, int conv,
 			     int *ordr, long *formt, int unsgned, int onescmp,
-			     int ishc)
+			     PD_chart_kind chk)
    {defstr *dp;
 
     dp = _PD_mk_defstr(chart, name, kind,
@@ -464,7 +466,7 @@ static defstr *_PD_defstr_in(hasharr *chart, char *name, PD_type_kind kind,
     if (dp == NULL)
        PD_error("DEFINITION FAILED - _PD_DEFSTR_IN", PD_GENERIC);
     else
-       _PD_d_install_in(name, dp, chart, ishc);
+       _PD_d_install_in(name, dp, chart, chk);
 
     return(dp);}
 
@@ -475,7 +477,7 @@ static defstr *_PD_defstr_in(hasharr *chart, char *name, PD_type_kind kind,
  *            - in the specified chart set (both hashed and non-hashed versions) 
  */
 
-defstr *_PD_defstr(PDBfile *file, PD_chart_kind host,
+defstr *_PD_defstr(PDBfile *file, PD_chart_kind chk,
 		   char *name, PD_type_kind kind,
 		   memdes *desc, multides *tuple,
 		   long sz, int align, PD_byte_order ord,
@@ -483,11 +485,11 @@ defstr *_PD_defstr(PDBfile *file, PD_chart_kind host,
    {defstr *dp;
     hasharr *ch;
 
-    ch = (host == PD_CHART_HOST) ? file->host_chart : file->chart;
+    ch = (chk == PD_CHART_HOST) ? file->host_chart : file->chart;
 
     dp = _PD_defstr_in(ch, name, kind,
 		       desc, tuple, sz, align, ord, conv,
-		       ordr, formt, unsgned, onescmp, host);
+		       ordr, formt, unsgned, onescmp, chk);
 
     return(dp);}
 
@@ -495,13 +497,13 @@ defstr *_PD_defstr(PDBfile *file, PD_chart_kind host,
 /*--------------------------------------------------------------------------*/
 
 /* _PD_DEFSTR_INST - install the defstr in all charts
- *                 - if FLAG is TRUE return the file defstr
- *                 - if FLAG is FALSE return the file host_chart defstr
+ *                 - if CHK is PD_CHART_FILE return the file defstr
+ *                 - if CHK is PD_CHART_HOST return the file host_chart defstr
  */
 
 defstr *_PD_defstr_inst(PDBfile *file, char *name, PD_type_kind kind,
 			memdes *desc, PD_byte_order ord,
-			int *ordr, long *formt, int flag)
+			int *ordr, long *formt, PD_chart_kind chk)
    {int algn, conv;
     long sz;
     defstr *rv, *dp, *sdp;
@@ -517,8 +519,9 @@ defstr *_PD_defstr_inst(PDBfile *file, char *name, PD_type_kind kind,
     if (desc == NULL)
        return(NULL);
 
-    dp = flag ? PD_inquire_table_type(chart, name) :
-                PD_inquire_table_type(host_chart, name);
+    dp = (chk == PD_CHART_FILE) ?
+         PD_inquire_table_type(chart, name) :
+	 PD_inquire_table_type(host_chart, name);
     if (dp != NULL)
        return(dp);
 
@@ -580,9 +583,57 @@ defstr *_PD_defstr_inst(PDBfile *file, char *name, PD_type_kind kind,
 		     sz, algn, NO_ORDER,
 		     FALSE, NULL, NULL, FALSE, FALSE);
 
-    rv = flag ? dp : sdp;
+    rv = (chk == PD_CHART_FILE) ? dp : sdp;
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_DEFSTR_PRIM_RD - define TYPE from info read from file chart */
+
+void _PD_defstr_prim_rd(PDBfile *file, char *type, char *origtype,
+			PD_type_kind kind, multides *tuple,
+			long bpi, int align, PD_byte_order ord,
+			int *ordr, long *formt,
+			int unsgned, int onescmp, int conv)
+   {int host_empty;
+    defstr *dp;
+
+/* it is either a typedef or a normal type */
+     if (origtype != NULL) 
+        {dp = PD_inquire_host_type(file, origtype);
+	 if (dp != NULL)
+	    {_PD_d_install(file,  type, _PD_defstr_copy(dp), PD_CHART_HOST);
+	     host_empty = FALSE;}
+	 else
+	    host_empty = TRUE;
+
+	 dp = PD_inquire_type(file, origtype);
+ 
+	 if (dp != NULL)
+	    _PD_d_install(file, type, _PD_defstr_copy(dp), PD_CHART_FILE);
+
+/* only the file chart has it - look in there */
+	 if ((dp != NULL) && host_empty)
+	    _PD_d_install(file, type, _PD_defstr_copy(dp), PD_CHART_HOST);
+
+	 CFREE(ordr);
+	 CFREE(formt);
+	 _PD_free_tuple(tuple);}
+
+     else 
+        {dp = PD_inquire_host_type(file, type);
+	 if ((conv == FALSE) && (dp == NULL))
+	    _PD_defstr(file, PD_CHART_HOST, type, kind,
+		       NULL, tuple, bpi, align, ord, FALSE,
+		       ordr, formt, unsgned, onescmp);
+
+	 _PD_defstr(file, PD_CHART_FILE, type, kind,
+		    NULL, tuple, bpi, align, ord, TRUE,
+		    ordr, formt, unsgned, onescmp);};
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -823,8 +874,8 @@ void _PD_init_chrt(PDBfile *file, int ftk)
     hstd   = file->host_std;
     halign = file->host_align;
 
-    _PD_setup_chart(fchrt, fstd, hstd, falign, halign, FALSE, ftk);
-    _PD_setup_chart(hchrt, hstd, NULL, halign, NULL, TRUE, ftk);
+    _PD_setup_chart(fchrt, fstd, hstd, falign, halign, PD_CHART_FILE, ftk);
+    _PD_setup_chart(hchrt, hstd, NULL, halign, NULL, PD_CHART_HOST, ftk);
 
     PD_typedef(file, SC_INT_S,                 SC_ENUM_S);
 
@@ -859,7 +910,7 @@ void _PD_init_chrt(PDBfile *file, int ftk)
 	   PD_error("FILE FUNCTION DEFINITION FAILED - _PD_INIT_CHART",
 		    PD_OPEN);
 
-	_PD_d_install(file, "function", dp, FALSE);};
+	_PD_d_install(file, "function", dp, PD_CHART_FILE);};
 
     ret = PD_inquire_host_type(file, "*");
     dp  = _PD_mk_defstr(hchrt, "function", NON_CONVERT_KIND,
@@ -870,7 +921,7 @@ void _PD_init_chrt(PDBfile *file, int ftk)
        PD_error("HOST FUNCTION DEFINITION FAILED - _PD_INIT_CHART",
 		PD_OPEN);
 
-    _PD_d_install(file, "function", dp, TRUE);
+    _PD_d_install(file, "function", dp, PD_CHART_HOST);
 
     return;}
 
@@ -883,7 +934,7 @@ void _PD_init_chrt(PDBfile *file, int ftk)
 
 void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 		     data_alignment *falign, data_alignment *halign,
-		     int ishc, int ftk)
+		     PD_chart_kind chk, int ftk)
    {int ic, id, ifx, ifp, conv, flag;
     int fcnv[N_PRIMITIVE_FP];
     char utyp[MAXLINE];
@@ -894,7 +945,7 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 
     _PD_defstr_in(chart, "*", INT_KIND, NULL, NULL, fstd->ptr_bytes, 
                   falign->ptr_alignment, fstd->fx[1].order,
-		  TRUE, NULL, NULL, 0, 0, ishc);
+		  TRUE, NULL, NULL, 0, 0, chk);
 
     if (flag == TRUE)
        {if (ftk == FALSE)
@@ -906,7 +957,7 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
     _PD_defstr_in(chart, SC_BOOL_S, INT_KIND,
 		  NULL, NULL, fstd->bool_bytes,
 		  falign->bool_alignment, NO_ORDER,
-		  conv, NULL, NULL, FALSE, FALSE, ishc);
+		  conv, NULL, NULL, FALSE, FALSE, chk);
 
 /* character types (proper) */
     for (ic = 0; ic < N_PRIMITIVE_CHAR; ic++)
@@ -919,12 +970,12 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 	 _PD_defstr_in(chart, styp, CHAR_KIND,
 		       NULL, NULL, fstd->chr[ic].bpi, 
 		       falign->chr[ic], NO_ORDER,
-		       conv, NULL, NULL, FALSE, FALSE, ishc);
+		       conv, NULL, NULL, FALSE, FALSE, chk);
 
 	 _PD_defstr_in(chart, utyp, CHAR_KIND,
 		       NULL, NULL, fstd->chr[ic].bpi, 
 		       falign->chr[ic], NO_ORDER,
-		       conv, NULL, NULL, TRUE, FALSE, ishc);};
+		       conv, NULL, NULL, TRUE, FALSE, chk);};
 
 /* fixed point types (proper) */
     for (ifx = 0; ifx < N_PRIMITIVE_FIX; ifx++)
@@ -936,12 +987,12 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 	 _PD_defstr_in(chart, styp, INT_KIND,
 		       NULL, NULL, fstd->fx[ifx].bpi, 
 		       falign->fx[ifx], fstd->fx[ifx].order,
-		       conv, NULL, NULL, FALSE, FALSE, ishc);
+		       conv, NULL, NULL, FALSE, FALSE, chk);
 
 	 _PD_defstr_in(chart, utyp, INT_KIND,
 		       NULL, NULL, fstd->fx[ifx].bpi, 
 		       falign->fx[ifx], fstd->fx[ifx].order,
-		       conv, NULL, NULL, TRUE, FALSE, ishc);};
+		       conv, NULL, NULL, TRUE, FALSE, chk);};
 
 /* floating point types (proper) */
     for (ifp = 0; ifp < N_PRIMITIVE_FP; ifp++)
@@ -953,7 +1004,7 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 		       NULL, NULL, fstd->fp[ifp].bpi, 
 		       falign->fp[ifp], NO_ORDER,
 		       fcnv[ifp], fstd->fp[ifp].order,
-		       fstd->fp[ifp].format, FALSE, FALSE, ishc);};
+		       fstd->fp[ifp].format, FALSE, FALSE, chk);};
 
 /* complex floating point types (proper) */
     for (ifp = 0; ifp < N_PRIMITIVE_FP; ifp++)
@@ -968,7 +1019,7 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 		       NULL, tup, fstd->fp[ifp].bpi, 
 		       falign->fp[ifp], NO_ORDER,
 		       fcnv[ifp], fstd->fp[ifp].order,
-		       fstd->fp[ifp].format, FALSE, FALSE, ishc);};
+		       fstd->fp[ifp].format, FALSE, FALSE, chk);};
 
     return;}
 

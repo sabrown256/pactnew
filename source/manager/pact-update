@@ -454,7 +454,7 @@ switch ($SrcMode)
         endif
 
 # delete an unnecessary directory layer */
-        flog $Log mv $root/source/{.svn,*} .
+        flog $Log mv $root/source/{.?*,*} .
         flog $Log rm -r $root
 
 # remove the source control sub-directories

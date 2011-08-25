@@ -391,7 +391,7 @@ PP_defstrObject *_PP_defstr_make_singleton(
         lst = PD_copy_members(dpobj->dp->members);
 
         dp = _PD_defstr_inst(fp, name, STRUCT_KIND, lst,
-			     -1, NULL, NULL, FALSE);
+			     -1, NULL, NULL, PD_CHART_HOST);
         if (dp == NULL) {
             PP_error_from_pdb();
             return NULL;
