@@ -55,12 +55,21 @@ end
 
 if ($knd == cvs) then
 
+   if ($#pkg > 1) then
+      set base = $pkg[1]
+      shift pkg
+   else if ("$pkg" != "") then
+      set base = $pkg
+   else
+      set base = work-copy
+   endif
+
    setenv CVS_RSH  ssh
    set opt = ( $opt -d $repo )
    if ("$srcdate" != "") then
-      cvs -d $repo co -D "$srcdate" $pkg
+      cvs -d $repo co -D "$srcdate" $base $pkg
    else
-      cvs -d $repo co $pkg
+      cvs -d $repo co $base $pkg
    endif
 
 else if ($knd == svn) then

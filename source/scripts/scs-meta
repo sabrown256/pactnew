@@ -19,6 +19,8 @@ set gitd = ( `$ldir/where-git` )
 set tgt   = ""
 set nrepo = ""
 
+set opt = ""
+
 while ($#argv > 0)
     switch ($1)
        case -c:
@@ -58,6 +60,7 @@ while ($#argv > 0)
             set tgt = exe
             breaksw
        default:
+            set opt = ( $opt $1 )
             breaksw
     endsw
     shift
@@ -80,7 +83,11 @@ if (-d $gitd[1]) then
            exit(1)
            breaksw
       case directories:
-           set res = ( $res `find $gitd[1] -name .git -type d | grep -v $gitd[1]/.git` )
+           if ("$opt" == "-a") then
+              set res = ( $res `find $gitd[1] -name .git -type d` )
+           else
+              set res = ( $res `find $gitd[1] -name .git -type d | grep -v $gitd[1]/.git` )
+           endif
            breaksw
       case exe:
            set res = `which git`
