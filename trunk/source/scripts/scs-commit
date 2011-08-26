@@ -50,7 +50,7 @@ if (-d $gitd[1]) then
    if ($xstatus == 0) then
       echo "ok"
    else
-      echo "ng"
+      echo "ng ($xstatus)"
    endif
 
 # find changed files
@@ -78,7 +78,7 @@ if (-d $gitd[1]) then
    if ($xstatus == 0) then
       echo "ok"
    else
-      echo "ng"
+      echo "ng ($xstatus)"
    endif
 
    echo "---------------------" >>& $log
@@ -91,7 +91,7 @@ if (-d $gitd[1]) then
       if ($xstatus == 0) then
          echo "ok"
       else
-         echo "ng"
+         echo "ng ($xstatus)"
          echo "Need 'git config --bool core.bare true' on master"
       endif
    endif

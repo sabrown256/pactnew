@@ -11,18 +11,23 @@
 
 unalias *
 
+alias flog      'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ >>& \!\!:1'
+alias ftee      'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ |& tee -ai \!\!:1'
+
 set ldir = `dirname $0`
 if ("$ldir" == ".") then
    set ldir = $cwd
 endif
 set gitd = ( `$ldir/where-git` )
 set repo = ( `$ldir/scs-meta -r` )
-set dirs = ( `$ldir/scs-meta -d` )
 set knd  = ( `$ldir/scs-meta -k` )
 
 set repos = ""
 set repod = ""
+set pkgs  = ""
+set pkgd  = ""
 set excd  = ""
+set dirs  = ""
 set tgt   = repo
 
 while ($#argv > 0)
@@ -30,83 +35,139 @@ while ($#argv > 0)
       case -exclude:
            shift
            set excd = ( $excd $1 )
-           break
            breaksw
       default:
            if ("$repos" == "") then
-              set repos = $1
+	      if ("$1" =~ *,*) then
+                 set repos = ( `echo $1 | sed 's|,.*$||'` )
+                 set pkgs  = ( `echo $1 | sed 's|^.*,||'` )
+              else
+                 set repos = $1
+              endif
            else if ("$repod" == "") then
-              set repod = $2
+	      if ("$1" =~ *,*) then
+                 set repod = ( `echo $1 | sed 's|,.*$||'` )
+                 set pkgd  = ( `echo $1 | sed 's|^.*,||'` )
+              else
+                 set repod = $1
+              endif
            endif
            breaksw
    endsw
    shift
 end
 
-set rel = $cwd/syncs
-rm -rf syncs syncd
+set log = $cwd/log.sync
+rm -f $log
+touch $log
 
-# write exclude patterns file
+set rel = $cwd/syncs
+flog $log rm -rf syncs syncd
+
 set excf = $cwd/tmp.excf
 rm -f $excf
 touch $excf
-foreach e ($dirs $excd)
-   Note $excf $e/'*'
-end
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # SOURCE SETUP
 
+# get a working copy of the source
+flog $log mkdir syncs
+flog $log pushd syncs
 if (("$repos" =~ *.gz) || ("$repos" =~ *.tgz)) then
-   mkdir syncs
-   pushd syncs
    tar xvzf ../$tar
-   popd
 
 else if ("$repos" =~ *.tar) then
-   mkdir syncs
-   pushd syncs
    tar xvf ../$tar
-   popd
 
 else
-   scs-co -k $knd -d $repos
+   if (-d $repos/CVSROOT) then
+      set sknd = cvs
+   else if (-d $repos/.git) then
+      set sknd = git
+   else
+      set sknd = svn
+   endif
+   flog $log scs-co -k $sknd -d $repos $pkgs
 
 endif
+flog $log popd
 
-scs-co -k $knd -d $repod
+# get a working copy of the destination repo
+flog $log mkdir syncd
+flog $log pushd syncd
+if (-d $repod/CVSROOT) then
+   set dknd = cvs
+else if (-d $repod/.git) then
+   set dknd = git
+else
+   set dknd = svn
+endif
+flog $log scs-co -k $dknd -d $repod $pkgd
+flog $log popd
+
+flog $log ls -la syncs/*
+flog $log ls -la syncd/*
+
+set pkg = `ls -1 syncs`
+
+# add exclude patterns for source and destination
+flog $log pushd syncs/$pkg
+set dirs = ( $dirs `$ldir/scs-meta -d -a` )
+flog $log popd
+
+flog $log pushd syncd/$pkg
+set dirs = ( $dirs `$ldir/scs-meta -d -a | sed 's|'$cwd'|\.|g'` )
+flog $log popd
+
+foreach e ($dirs $excd)
+   if ("$e" =~ /*) then
+      echo $e'/*' >>& $excf
+   else if ("$e" =~ ./*) then
+      echo $e | sed 's|^\./|'$pkg'/|' >>& $excf
+   else if ("$e" =~ ../*) then
+      echo $e | sed 's|^\.\./|'$pkg:h'/|' >>& $excf
+   else
+      echo $pkg'/*/'$e'/*' >>& $excf
+   endif
+end
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # MERGE
 
-pushd syncd
+flog $log pushd syncd
+
+flog $log cat $excf
 
 # rsync in the source tree files
-rsync -av --delete --exclude-from=$excf $rel/ .
+flog $log rsync -av --delete --exclude-from=$excf $rel/ .
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # ADD/REMOVE ENTRIES
 
+flog $log cd $pkg
+
 if (-d $gitd[1]) then
 
-   git add -A
+   flog $log git add -A
+   flog $log git status -s
 
 else if (-d CVS) then
 
    foreach d ($dirs)
       set sd = $d:h
-      pushd $sd
+      flog $log pushd $sd
 
 # remove entries
       foreach f ( `cat CVS/Entries ! sed 's|^/||' | sed 's|/.*//$||'` )
          if (!(-f $f)) then
-            cvs remove $f
+            flog $log cvs remove $f
          endif
       end
 
@@ -114,23 +175,23 @@ else if (-d CVS) then
       foreach f ( * )
          grep "/$f/" CVS/Entries >& /dev/null
          if ($status != 0) then
-            cvs add $f
+            flog $log cvs add $f
          endif
       end
-      popd
+      flog $log popd
    end
 
 else if (-d .svn) then
 
    foreach d ($dirs)
       set sd = $d:h
-      pushd $sd
+      flog $log pushd $sd
 
 # remove entries
       foreach e ( `cat .svn/text-base` )
          set f = $e:r
          if (!(-f $f)) then
-            svn remove $f
+            flog $log svn remove $f
          endif
       end
 
@@ -138,10 +199,10 @@ else if (-d .svn) then
       foreach e ( * )
          set f = .svn/text-base/$e.svn-base
          if (!(-f $f)) then
-            svn add $f
+            flog $log svn add $f
          endif
       end
-      popd
+      flog $log popd
    end
 
 endif
@@ -151,10 +212,12 @@ endif
 
 # COMMIT
 
-scs-commit -m "Import from $repos"
+flog $log scs-commit -m "Import from $repos"
 
-popd
-rm -f $excf
-rm -rf syncs syncd
+flog $log cat log.commit
+
+flog $log popd
+flog $log rm -f $excf
+flog $log rm -rf syncs syncd
 
 exit($status)
