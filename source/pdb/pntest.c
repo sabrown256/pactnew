@@ -18,7 +18,7 @@
 
 /* MAIN - test the PDB Library system */
 
-main()
+int main(int c, char **v)
    {hasharr *chrt;
     FILE *fp;
     size_t bpi, nitems;

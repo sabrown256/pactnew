@@ -405,7 +405,8 @@ int main(int c, char **v)
 
     PD_init_threads(0, NULL);
 
-    SC_zero_space_n(0, -2);
+/*    SC_use_reduced_mm(); */
+    SC_zero_space_n(1, -2);
     mem_dbg   = 1;
     read_only = FALSE;
     test_one  = TRUE;

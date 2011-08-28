@@ -15,13 +15,42 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-int main(int argc, char **argv)
-   {PDBfile *file;
+/* PRINT_HELP - print a help message */
+
+static void print_help(void)
+   {
+
+    PRINT(STDOUT, "\nPDNORMTST - test denormalized value handling\n\n");
+    PRINT(STDOUT, "Usage: pdnormtst [-h] [-v #]\n");
+    PRINT(STDOUT, "\n");
+    PRINT(STDOUT, "       h  - print this help message and exit\n");
+    PRINT(STDOUT, "       v  - use format version # (default is 2)\n");
+    PRINT(STDOUT, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+int main(int c, char **v)
+   {int i, status;
     float* fvalue;
     double* dvalue;
-    int status;
+    PDBfile *file;
 
     status = 0;
+
+    for (i = 1; i < c; i++)
+        {if (v[i][0] == '-')
+            {switch (v[i][1])
+                {case 'h' :
+		      print_help();
+		      return(1);
+                 case 'v' :
+                      PD_set_fmt_version(SC_stoi(v[++i]));
+		      break;};}
+         else
+            break;};
 
 /* open a file so we have a standard */
     file = PD_open(DENORM_FILE, "w");

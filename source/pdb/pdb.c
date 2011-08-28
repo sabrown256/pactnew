@@ -1348,25 +1348,32 @@ void PD_error(char *s, PD_major_op n)
  */
 
 int PD_free(PDBfile *file ARG(,,cls), char *type, void *var) 
-   {int i;
+   {int i, nr, rv;
     long nb, bpi, ni;
     char *pc, *p, *dtyp, *ityp;
     defstr *dp;
     memdes *member;
     void *pd;
 
+    rv = TRUE;
+
     if (var != NULL)
        {ityp = SC_dstrcpy(NULL, type);
 
 	pc = (char *) var;
+	nr = SC_ref_count(pc);
 	nb = SC_arrlen(pc);
 	if ((nb < 0) && (_PD_indirection(ityp)))
 	   {PD_dereference(ityp);
 	    pc = DEREF(pc);
+	    nr = SC_ref_count(pc);
 	    nb = SC_arrlen(pc);};
  
+	if (pc == NULL)
+	   return(rv);
+
 	if (nb < 0)
-	   {fprintf(stderr, "NOT SCORE ALLOCATED MEMORY - PD_FREE\n");
+	   {fprintf(stderr, "NOT SCORE ALLOCATED MEMORY %p - PD_FREE\n", pc);
 	    return(-1);};
 
 	dp = _PD_lookup_type(ityp, file->host_chart); 
@@ -1378,31 +1385,34 @@ int PD_free(PDBfile *file ARG(,,cls), char *type, void *var)
 	bpi = dp->size;
 	ni  = nb / bpi;
 	
-	dtyp = NULL;
-	for (i = 0; i < ni; i++)
-	    {p = pc + i*bpi;
+/* only free the pointees if this is the only reference to the pointer */
+	if (nr <= 1)
+	   {dtyp = NULL;
+	    for (i = 0; i < ni; i++)
+	        {p = pc + i*bpi;
 
 /* walk through each member of element p */
-	     for (member = dp->members; member != NULL; member = member->next) 
-	         {if (_PD_indirection(member->type)) 
-		     {dtyp = SC_dstrcpy(dtyp, member->type);
-		      PD_dereference(dtyp);
-		      pd = *((void **) (p + member->member_offs));
-		      PD_free(file, dtyp, pd);};};
+		 for (member = dp->members; member != NULL; member = member->next) 
+		     {if (_PD_indirection(member->type)) 
+			 {dtyp = SC_dstrcpy(dtyp, member->type);
+			  PD_dereference(dtyp);
+			  pd = *((void **) (p + member->member_offs));
+			  PD_free(file, dtyp, pd);};};
 
-	     if (_PD_indirection(ityp))
-	        {p = DEREF(p);
-		 if (SC_is_score_space(p, NULL, NULL)) 
-		    {CFREE(p);};};};
+		 if (_PD_indirection(ityp))
+		    {p = DEREF(p);
+		     if (SC_is_score_space(p, NULL, NULL)) 
+		        CFREE(p);};
+
+		 CFREE(dtyp);};};
 
 /* free array or scalar compound itself */
 	if (SC_is_score_space(pc, NULL, NULL)) 
-	   {CFREE(pc);};
+	   CFREE(pc);
 
-	CFREE(dtyp);
 	CFREE(ityp);};
 
-    return(TRUE);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

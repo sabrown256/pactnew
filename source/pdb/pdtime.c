@@ -11,23 +11,43 @@
 #include "pdb.h"
 
 #if 1
-#define PDB_TIME
+# define PDB_TIME
 #endif
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PRINT_HELP - print a help message */
+
+static void print_help(void)
+   {
+
+    PRINT(STDOUT, "\nPDTIME - performance timing test\n\n");
+    PRINT(STDOUT, "Usage: pdtime [-h] [-v #] <array-len> <n-iter> [<std> <align>]\n\n");
+    PRINT(STDOUT, "\n");
+    PRINT(STDOUT, "       h  - print this help message and exit\n");
+    PRINT(STDOUT, "       v  - use format version # (default is 2)\n");
+    PRINT(STDOUT, "\n");
+    PRINT(STDOUT, "<array-len> is the number of elements in the array\n");
+    PRINT(STDOUT, "<n-iter> is the number of times the array is written\n");
+    PRINT(STDOUT, "<std> is the pdb file data standard\n");
+    PRINT(STDOUT, "<align> is the pdb file data alignment\n\n");
+    PRINT(STDOUT, "\n");
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* MAIN - start it all here */
 
-/* To find the peak rate for a given array length, start with a number of
+/* to find the peak rate for a given array length, start with a number of
  * iterations such that the elapsed time is around 1 second and then vary it.
  * For shorter elapsed times, timing resolution effects cause noisy results.
  * For longer elapsed times, file length effects(?) cause byte rates to drop.
  */
 
-int main(argc, argv)
-   int argc;
-   char **argv;
+int main(int c, char **v)
    {int i, len, n, is, ia, size, bytes;
     char filename[20];
     double dt, *f;
@@ -38,34 +58,47 @@ int main(argc, argv)
     FILE *binf;
 #endif
 
+    len = -1;
+    n   = -1;
+    is  = -1;
+    ia  = -1;
+
+    for (i = 1; i < c; i++)
+        {if (v[i][0] == '-')
+            {switch (v[i][1])
+                {case 'h' :
+		      print_help();
+		      return(1);
+                 case 'v' :
+                      PD_set_fmt_version(SC_stoi(v[++i]));
+		      break;};}
+         else if (len == -1)
+	    len = SC_stoi(v[i]);
+         else if (n == -1)
+	    n = SC_stoi(v[i]);
+         else if (is == -1)
+	    {is = SC_stoi(v[i]);
+	     REQ_STANDARD  = PD_std_standards[is - 1];
+	     printf("Data Standard  = %d\n", is);}
+         else if (ia == -1)
+	    {ia = SC_stoi(v[i]);
+	     REQ_ALIGNMENT = PD_std_alignments[ia - 1];
+	     printf("Data Alignment = %d\n", ia);};};
+
     SC_signal(SIGINT, SIG_DFL);
 
     setvbuf(stdout, NULL, _IONBF, 0);
 
-    if (argc < 3)
-       {printf("\nUsage: pdtime <array-len> <n-iter> [<std> <align>]\n\n");
-        printf("<array-len> is the number of elements in the array\n");
-        printf("<n-iter> is the number of times the array is written\n");
-        printf("<std> is the pdb file data standard\n");
-        printf("<align> is the pdb file data alignment\n\n");
+    if (c < 3)
+       {print_help()
         exit(0);};
 
-    len = atoi(argv[1]);
-    n   = atoi(argv[2]);
-
-    if (argc == 5)
-       {is = atoi(argv[3]);
-	ia = atoi(argv[4]);
-	REQ_STANDARD  = PD_std_standards[is - 1];
-	REQ_ALIGNMENT = PD_std_alignments[ia - 1];
-	printf("Data Standard  = %d\nData Alignment = %d\n", is, ia);};
-	
 #ifdef PDB_TIME
     names = CMAKE_N(char *, n);
     for (i = 0; i < n; i++)
         {snprintf(s, 20, "f%d-%d(%d)", len, i, len);
 	 names[i] = CSTRSAVE(s);};
-    SC_zero_space_n(0, -2);
+    SC_zero_space_n(1, -2);
     strcpy(filename, "time.pdb");
     if ((pdbf = PD_open(filename, "w")) == NULL)
        {printf("Time couldn't create PDB file %s\r\n", filename);
