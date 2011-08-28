@@ -13,6 +13,23 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PRINT_HELP - print a help message */
+
+static void print_help(void)
+   {
+
+    PRINT(STDOUT, "\nPDLSTS - test listing contents\n\n");
+    PRINT(STDOUT, "Usage: pdlsts [-h] [-v #]\n");
+    PRINT(STDOUT, "\n");
+    PRINT(STDOUT, "       h  - print this help message and exit\n");
+    PRINT(STDOUT, "       v  - use format version # (default is 2)\n");
+    PRINT(STDOUT, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* MAIN - list the contents of a file */
 
 int main(int c, char **v)
@@ -24,6 +41,18 @@ int main(int c, char **v)
     syment *ep;
     PDBfile *file;
     static int debug = 0;
+
+    for (i = 1; i < c; i++)
+        {if (v[i][0] == '-')
+            {switch (v[i][1])
+                {case 'h' :
+		      print_help();
+		      return(1);
+                 case 'v' :
+                      PD_set_fmt_version(SC_stoi(v[++i]));
+		      break;};}
+         else
+            break;};
 
     cs = SC_mem_monitor(-1, debug, "LS", msg);
 

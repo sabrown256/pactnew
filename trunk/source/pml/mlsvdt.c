@@ -258,7 +258,7 @@ int test_3(int nx)
 
 	 for (j = 0; j < m; j++)
 	     {for (i = 0; i < n; i++)
-		  {k    = i*n + j;
+		  {k    = i*m + j;
 		   a[k] = i + j + 2;};};
 
 	 ok = svd_kernel(ma);
@@ -300,6 +300,7 @@ int main(int c, char **v)
     int tst[] = { TRUE, TRUE, TRUE };
     PFTFnc tf[] = { test_1, test_2, test_3 };
 
+    SC_zero_space_n(1, -2);
     PM_enable_fpe_n(TRUE, catch_fpe, NULL);
 
     nx = 5;

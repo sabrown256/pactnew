@@ -1,5 +1,5 @@
 /*
- * PDFDTS.C - test for the PDB I/O
+ * PDFDTS.C - test PDB for file descriptor leaks
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942

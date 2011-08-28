@@ -816,7 +816,7 @@ int main(int c, char **v)
 
     PD_init_threads(0, NULL);
 
-    SC_zero_space_n(0, -2);
+    SC_zero_space_n(1, -2);
     debug_mode       = FALSE;
     native_only      = FALSE;
     use_mapped_files = FALSE;

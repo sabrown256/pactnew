@@ -13,6 +13,23 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PRINT_HELP - print a help message */
+
+static void print_help(void)
+   {
+
+    PRINT(STDOUT, "\nPDXRDTS - test attribute handling\n\n");
+    PRINT(STDOUT, "Usage: pdxrdts [-h] [-v #]\n");
+    PRINT(STDOUT, "\n");
+    PRINT(STDOUT, "       h  - print this help message and exit\n");
+    PRINT(STDOUT, "       v  - use format version # (default is 2)\n");
+    PRINT(STDOUT, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 int main(int c, char **v)
    {int i, ne;
     int *rank, *center;
@@ -21,7 +38,20 @@ int main(int c, char **v)
     PDBfile *file;
     hasharr *tab;
 
-    if ((file = PD_open("xtest.dat", "r")) == NULL)
+    for (i = 1; i < c; i++)
+        {if (v[i][0] == '-')
+            {switch (v[i][1])
+                {case 'h' :
+		      print_help();
+		      return(1);
+                 case 'v' :
+                      PD_set_fmt_version(SC_stoi(v[++i]));
+		      break;};}
+         else
+            break;};
+
+    file = PD_open("xtest.dat", "r");
+    if (file == NULL)
        {printf("Error opening xtest.dat\n");
 	exit(1);};
 

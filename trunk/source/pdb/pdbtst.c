@@ -3729,7 +3729,7 @@ int main(int c, char **v)
     PD_init_threads(0, NULL);
 
     SC_bf_set_hooks();
-    SC_zero_space_n(0, -2);
+    SC_zero_space_n(1, -2);
 
     bfsz             = -1;
     bfsz             = 100000;
