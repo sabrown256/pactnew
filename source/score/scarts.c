@@ -373,14 +373,14 @@ static int test_5(void)
 	 err += (strcmp(sb[i]->c, sa[i]->c) != 0);}
     
 /* cleanup */
+    SC_free_array(as, NULL);
+
     for (i = 0; i < na; i++)
         {CFREE(sa[i]->c);
          CFREE(sa[i]);};
     CFREE(sa);
 
     CFREE(sb);
-
-    SC_free_array(as, ts_free);
 
     SC_LEAVING;
 
@@ -446,7 +446,7 @@ static int test_6(void)
 
 /* TEST_7_ADD - add N integers to IA */
 
-static void test_7_add(SC_array *ia, int n, int recy)
+static int *test_7_add(SC_array *ia, int n, int recy)
    {int i, ni;
     int *pi;
 
@@ -461,6 +461,7 @@ static void test_7_add(SC_array *ia, int n, int recy)
  * this call will grow IA and this means the original
  * pointer will be available
  */
+    pi = NULL;
     if (recy == TRUE)
        {pi = CMAKE_N(int, ni);
 	for (i = 0; i < ni; i++)
@@ -468,7 +469,7 @@ static void test_7_add(SC_array *ia, int n, int recy)
 
     SC_LEAVING;
 
-    return;}
+    return(pi);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -477,7 +478,7 @@ static void test_7_add(SC_array *ia, int n, int recy)
 
 static int test_7(void)
    {int i, ni, err;
-    int *pi;
+    int *pi, *npi;
     SC_array *ia;
 
     SC_ENTERING;
@@ -488,12 +489,13 @@ static int test_7(void)
     ni = SC_array_get_n(ia);
     pi = SC_array_array(ia);
 
+    npi = NULL;
     for (i = 0; i < ni; i++)
         {pi[i] *= -1;
 
 /* emulate an interrupt that adds to ia */
          if (i == 2)
-	    test_7_add(ia, 20, TRUE);};
+	    npi = test_7_add(ia, 20, TRUE);};
 
 /* now compare */
     err = 0;
@@ -501,10 +503,11 @@ static int test_7(void)
     for (i = 0; i < ni; i++)
         err += (pi[i] != -i);
 
-/* there should be 10 differences */
-    err = (err != 10);
+/* there should be 2 or 10 differences depending on the memory manager */
+    err = ((err != 10) && (err != 2));
 
     CFREE(pi);
+    CFREE(npi);
 
     SC_free_array(ia, NULL);
 
@@ -681,6 +684,7 @@ int main(int c, char **v)
 	    {printf("Usage: scarts [-1] [-2] [-3] [-4] [-5] [-6] [-7] [-8] [-9] [-m] [-h]\n");
              return(1);};};
 
+    SC_zero_space_n(1, -2);
     sc = SC_mem_monitor(-1, debug, "A", msg);
 
     io_printf(STDOUT, "\t\t\tTest\tLeaked Memory\tTime\tErrors\n");

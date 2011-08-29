@@ -102,18 +102,18 @@ int test_2(int nir, int nim)
 
     err = FALSE;
 
-    SC_signal_n(SIGSEGV, sigh_2, &st);
+    io_printf(stdout, "\n-----------------------------\n");
+    io_printf(stdout, "\nSimple memory allocation test\n\n");
 
-    if (SETJMP(st.cpu) == 0)
-       {io_printf(stdout, "\n-----------------------------\n");
-	io_printf(stdout, "\nSimple memory allocation test\n\n");
+    a = CMAKE_N(double *, nir);
 
-	a = CMAKE_N(double *, nir);
+    for (i = 0; i < nir; i++)
+        {jmx = (i == 3) ? nim+10 : nim;
 
-	for (i = 0; i < nir; i++)
-	    {jmx = (i == 3) ? nim+10 : nim;
+	 SC_signal_n(SIGSEGV, sigh_2, &st);
 
-	     a[i] = CMAKE_N(double, nim);
+	 if (SETJMP(st.cpu) == 0)
+	    {a[i] = CMAKE_N(double, nim);
 	     for (j = 0; j < jmx; j++)
 	         a[i][j] = (j + 1.0)*(i + 1.0);
 
@@ -123,17 +123,17 @@ int test_2(int nir, int nim)
 			  i, ok);
 	     else
 	        io_printf(STDOUT, "   Number of memory blocks on pass %d : %d\n",
-			  i, ok);};
+			  i, ok);};};
 
-	for (i = 0; i < nir; i++)
-	   CFREE(a[i]);
+    for (i = 0; i < nir; i++)
+       CFREE(a[i]);
 
-	CFREE(a);
+    CFREE(a);
 
-	if (err == FALSE)
-	   io_printf(stdout, "\nSimple memory allocation test passed\n");
-	else
-	   io_printf(stdout, "\nSimple memory allocation test failed\n");};
+    if (err == FALSE)
+       io_printf(stdout, "\nSimple memory allocation test passed\n");
+    else
+       io_printf(stdout, "\nSimple memory allocation test failed\n");
 
     return(err);}
 
@@ -185,7 +185,7 @@ int prnt_3(double *fb, double *f, double *fa)
 /* TEST_3 - test finding neighbor spaces */
 
 int test_3(int nir, int nim)
-   {int err;
+   {int err, proceed;
     long ne;
     double *f1, *f2, *f3, *f4;
 
@@ -200,6 +200,14 @@ int test_3(int nir, int nim)
     f3 = CMAKE_N(double, ne+2);
     f4 = CMAKE_N(double, ne+3);
 
+/* depending on the memory manager these spaces are right
+ * next to each other in which case we can do this test
+ */
+    proceed  = TRUE;
+    proceed &= (((f2 - f1) - ne) == 0);
+    proceed &= (((f3 - f2) - ne-4) == 0);
+    proceed &= (((f4 - f3) - ne-2) == 0);
+
     SC_set_arrtype(f1, SC_DOUBLE_I);
     SC_set_arrtype(f2, SC_DOUBLE_I);
     SC_set_arrtype(f3, SC_DOUBLE_I);
@@ -207,10 +215,11 @@ int test_3(int nir, int nim)
 
     err = TRUE;
 
-    err &= prnt_3(NULL, f1, f2);
-    err &= prnt_3(f1,   f2, f3);
-    err &= prnt_3(f2,   f3, f4);
-    err &= prnt_3(f3,   f4, NULL);
+    if (proceed == TRUE)
+       {err &= prnt_3(NULL, f1, f2);
+	err &= prnt_3(f1,   f2, f3);
+	err &= prnt_3(f2,   f3, f4);
+	err &= prnt_3(f3,   f4, NULL);};
 
 #if 0
 
