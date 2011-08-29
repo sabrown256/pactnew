@@ -34,7 +34,7 @@ double *PM_vandermonde(int n, double *x, double *b)
        a[0] = b[0];
 
     else
-       {PM_set_value(c, n, 0.0);
+       {PM_array_set(c, n, 0.0);
 
 	c[n-1] = -x[0];
 	for (i = 1; i < n; i++)

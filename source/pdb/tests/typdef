@@ -20,11 +20,11 @@ Note $LogF ""
 
 set UTime = `$TIMER -r`
 if ("$Valgrind" == "") then
-   flog $LogF $CFE $BinDir/pdtdeftst -v $tst
+   flog $LogF $CFE $BinDir/pdtdts -v $tst
    set xstatus = $status
 else
-   ftee $LogF $Valgrind $BinDir/pdtdeftst -v $tst |& \
-   grep "ERROR SUMMARY:"                          |& \
+   ftee $LogF $Valgrind $BinDir/pdtdts -v $tst |& \
+   grep "ERROR SUMMARY:"                       |& \
    awk '{ print $4 }'   >&! $Tmp
    set xstatus = `cat $Tmp`
 	 flog $LogF $RM $Tmp

@@ -100,7 +100,7 @@ void _PA_init_sources(double t, double dt)
                       PA_ERR(!PD_read(fp, token, times),
                              "CAN'T READ %s IN %s - INIT-SOURCES",
                              token, files[j]);
-                      PA_scale_array(times, n_times, unit[SEC]);
+                      PM_array_scale(times, n_times, unit[SEC]);
 
 /* install this source variable in the array, SV_List and have the
  * entry in iv_spec_lst point to it
@@ -250,7 +250,7 @@ void _PA_init_queue(PA_src_variable *svp, double t, double dt)
         pd[0] = pd[1] = pd[2] = (double *) _PA_pdb_read(fp, title, &desc,
                                                         NULL);
         ssz = desc->number;
-        PA_scale_array(pd[2], ssz, conv);
+        PM_array_scale(pd[2], ssz, conv);
         qtimes[0] = -2.0e100;
         qtimes[1] = -1.0e100;
         qtimes[2] = times[indx];
@@ -259,7 +259,7 @@ void _PA_init_queue(PA_src_variable *svp, double t, double dt)
            {snprintf(title, MAXLINE, "src%d:%d", var_indx, indx);
             pd[3] = (double *) _PA_pdb_read(fp, title, &desc, NULL);
             ssz = desc->number;
-            PA_scale_array(pd[3], ssz, conv);
+            PM_array_scale(pd[3], ssz, conv);
             qtimes[3] = times[indx];
             indx++;}
         else
@@ -283,7 +283,7 @@ void _PA_init_queue(PA_src_variable *svp, double t, double dt)
              PA_ERR((pd[i] == NULL),
                     "MISSING SOURCE DATA %s - _PA_INIT_QUEUE", title);
              ssz = desc->number;
-             PA_scale_array(pd[i], ssz, conv);
+             PM_array_scale(pd[i], ssz, conv);
              qtimes[i] = times[indx];
              indx++;};
 
@@ -385,7 +385,7 @@ void _PA_step_queue(PA_src_variable *svp, double t)
           {snprintf(title, MAXLINE, "src%d:%d", var_indx, indx);
            pd[3] = (double *) _PA_pdb_read(fp, title, &desc, NULL);
            ssz = desc->number;
-           PA_scale_array(pd[3], ssz, conv);
+           PM_array_scale(pd[3], ssz, conv);
            qtimes[3] = times[indx];
            indx++;}
        else

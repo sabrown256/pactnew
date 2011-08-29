@@ -376,8 +376,8 @@ static object *_SXI_draw_line(SS_psides *si, object *argl)
     PG_device *dev;
 
     dev = NULL;
-    PM_set_value(x1, PG_SPACEDM, 0.0);
-    PM_set_value(x2, PG_SPACEDM, 1.0);
+    PM_array_set(x1, PG_SPACEDM, 0.0);
+    PM_array_set(x2, PG_SPACEDM, 1.0);
     SS_args(si, argl,
             G_DEVICE, &dev,
             SC_DOUBLE_I, &x1[0],

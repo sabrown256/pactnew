@@ -929,7 +929,7 @@ double *PA_set_data(char *name, C_array *arr, PM_centering *pcent)
 			    id, ps, offset, maxes, strides, nd);};
 
     conv = PA_VARIABLE_EXT_UNIT(pp)/PA_VARIABLE_INT_UNIT(pp);
-    PA_scale_array(data, nitems, conv);
+    PM_array_scale(data, nitems, conv);
 
     return(data);}
 
@@ -968,7 +968,7 @@ int _PA_get_data(double *d, char *vr, long ni, long offset, long stride)
               "CAN'T HANDLE TYPE %s - _PA_GET_DATA", type);
 
     conv_fac = PA_VARIABLE_EXT_UNIT(pp)/PA_VARIABLE_INT_UNIT(pp);
-    PA_scale_array(d, ni, conv_fac);
+    PM_array_scale(d, ni, conv_fac);
 
     return(TRUE);}
 

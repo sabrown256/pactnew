@@ -415,7 +415,7 @@ double **PM_interpolate_mapping(PM_mapping *dest, PM_mapping *source,
 
     wgt = CMAKE_N(double, dne);
 
-    PM_set_value(wgt, dne, 0.0);
+    PM_array_set(wgt, dne, 0.0);
 
 /* NOTE: by construction now the range is indexed the same as the domain */
     s = PM_convert_vectors(dnde, sne, sre, sty);

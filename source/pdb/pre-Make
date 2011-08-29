@@ -38,13 +38,13 @@ CleanFiles  =
 RemoveFiles = ${BinDir}/pdbtst ${BinDir}/pdatst ${BinDir}/pdasts    \
               ${BinDir}/pdopts ${BinDir}/pdapts ${BinDir}/pdgsts    \
               ${BinDir}/pdfrts ${BinDir}/pdctst \
-              ${BinDir}/pdlsts ${BinDir}/pdnormtst ${BinDir}/pdcsts \
+              ${BinDir}/pdlsts ${BinDir}/pdnrmt ${BinDir}/pdcsts \
               ${BinDir}/pdftst ${BinDir}/pdfwts \
               ${BinDir}/pdfwts ${BinDir}/pdfhyts \
               ${BinDir}/pdntst   \
               ${BinDir}/pdb2hdf ${BinDir}/pdsmp ${BinDir}/pddpts    \
               ${BinDir}/pdfdpt ${BinDir}/pxrdts ${BinDir}/pxntst    \
-              ${BinDir}/pdrcts ${BinDir}/pdtdeftst ${BinDir}/pdtime \
+              ${BinDir}/pdrcts ${BinDir}/pdtdts ${BinDir}/pdtime \
               ${BinDir}/exambin ${BinDir}/exam
 
 #
@@ -145,8 +145,8 @@ IncAction = @pact generate
 #
 
 Cstd : ${BinDir}/pdbtst ${BinDir}/pdntst ${BinDir}/pdatst ${BinDir}/pdasts \
-       ${BinDir}/pdopts ${BinDir}/pdgsts ${BinDir}/pdlsts ${BinDir}/pdnormtst \
-       ${BinDir}/pdrcts ${BinDir}/pdtdeftst ${BinDir}/pdcsts ${BinDir}/pdapts \
+       ${BinDir}/pdopts ${BinDir}/pdgsts ${BinDir}/pdlsts ${BinDir}/pdnrmt \
+       ${BinDir}/pdrcts ${BinDir}/pdtdts ${BinDir}/pdcsts ${BinDir}/pdapts \
        ${BinDir}/pdfrts ${BinDir}/pdbfts ${BinDir}/pdfdts ${BinDir}/pdfcts \
        ${BinDir}/pdctst \
        ${DepLib}
@@ -179,8 +179,8 @@ ${BinDir}/pdgsts : pdgsts.c ${InstallDep} ${Hdrs}
 ${BinDir}/pdlsts : pdlsts.c ${InstallDep} ${Hdrs}
 	${CLD} ${LdFlags} pdlsts.c -o ${BinDir}/pdlsts ${Libs}
 
-${BinDir}/pdnormtst : pdnormtst.c ${InstallDep} ${Hdrs}
-	${CLD} ${LdFlags} pdnormtst.c -o ${BinDir}/pdnormtst ${Libs}
+${BinDir}/pdnrmt : pdnrmt.c ${InstallDep} ${Hdrs}
+	${CLD} ${LdFlags} pdnrmt.c -o ${BinDir}/pdnrmt ${Libs}
 
 ${BinDir}/pdcsts : pdcsts.c ${InstallDep} ${Hdrs}
 	${CLD} ${LdFlags} pdcsts.c -o ${BinDir}/pdcsts ${Libs}
@@ -240,13 +240,13 @@ ${BinDir}/pxntst : pxntst.c ${InstallDep} ${Hdrs}
 #
 # test cast and typedef of primitives handling
 #
-def : ${BinDir}/pdrcts ${BinDir}/pdtdeftst
+def : ${BinDir}/pdrcts ${BinDir}/pdtdts
 
 ${BinDir}/pdrcts : pdrcts.c ${InstallDep} ${Hdrs}
 	${CLD} ${LdFlags} pdrcts.c -o ${BinDir}/pdrcts ${Libs}
 
-${BinDir}/pdtdeftst : pdtdeftst.c ${InstallDep} ${Hdrs}
-	${CLD} ${LdFlags} pdtdeftst.c -o ${BinDir}/pdtdeftst ${Libs}
+${BinDir}/pdtdts : pdtdts.c ${InstallDep} ${Hdrs}
+	${CLD} ${LdFlags} pdtdts.c -o ${BinDir}/pdtdts ${Libs}
 
 #
 # test file descriptor usage

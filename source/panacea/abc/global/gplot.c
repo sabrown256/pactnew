@@ -87,13 +87,13 @@ int plotw(dev, new, name)
                     "BAD VARIABLE %s - PLOTW", token);
 
              v = CMAKE_N(double, PA_VARIABLE_SIZE(pp));
-	     PA_copy_array(v, PA_VARIABLE_DATA(pp), PA_VARIABLE_SIZE(pp));
+	     PM_array_copy(v, PA_VARIABLE_DATA(pp), PA_VARIABLE_SIZE(pp));
 
              v      = LR_map_centers(v, PA_VARIABLE_CENTERING(pp));
 	     nitems = SC_MEM_GET_N(double, v);
 
              conv = PA_VARIABLE_INT_UNIT(pp)/PA_VARIABLE_EXT_UNIT(pp);
-             PA_scale_array(v, nitems, conv);
+             PM_array_scale(v, nitems, conv);
              elem[nde++] = v;};
         CREMAKE(elem, double *, nde);};
 

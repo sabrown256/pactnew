@@ -1583,7 +1583,7 @@ void PM_compute_quad_rot_volume(double *vol, int nc, int *indx, double **x)
     double v1, v2;
     double *rz, *rr;
 
-    PM_set_value(vol, nc, 0.0);
+    PM_array_set(vol, nc, 0.0);
 
     ri = indx;
 
@@ -1631,7 +1631,7 @@ void PM_compute_hex_volume(double *vol, int nc, int *indx, double **x)
     double x5, y5, z5, x6, y6, z6, x7, y7, z7, x8, y8, z8;
     double *rx, *ry, *rz;
 
-    PM_set_value(vol, nc, 0.0);
+    PM_array_set(vol, nc, 0.0);
 
     ri = indx;
 

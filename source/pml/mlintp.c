@@ -57,8 +57,8 @@ static double *_PM_redist_nodes_lr(double *f, int km, int lm, int kmax, int lmax
     ip = CMAKE_N(double, nn);
     fp = CMAKE_N(double, nn);
     if (SC_zero_on_alloc_n(-1) == FALSE)
-       {PM_set_value(ip, nn, 0.0);
-	PM_set_value(fp, nn, 0.0);};
+       {PM_array_set(ip, nn, 0.0);
+	PM_array_set(fp, nn, 0.0);};
 
     PM_LOGICAL_ZONE(fp, fp1, fp2, fp3, fp4, kmax);
     PM_LOGICAL_ZONE(ip, ip1, ip2, ip3, ip4, kmax);
@@ -112,7 +112,7 @@ static double *_PM_redist_nodes_ac(double *f, int nz, int nn,
 
     fp = CMAKE_N(double, nn);
     if (SC_zero_on_alloc_n(-1) == FALSE)
-       PM_set_value(fp, nn, 0.0);
+       PM_array_set(fp, nn, 0.0);
 
     np = CMAKE_N(int, nn);
     if (SC_zero_on_alloc_n(-1) == FALSE)
@@ -174,8 +174,8 @@ static double *_PM_interp_nodes_lr(double *f, double *x, double *y,
     ip = CMAKE_N(double, nn);
     fp = CMAKE_N(double, nn);
     if (SC_zero_on_alloc_n(-1) == FALSE)
-       {PM_set_value(ip, nn, 0.0);
-	PM_set_value(fp, nn, 0.0);};
+       {PM_array_set(ip, nn, 0.0);
+	PM_array_set(fp, nn, 0.0);};
 
     PM_LOGICAL_ZONE(fp, fp1, fp2, fp3, fp4, kmax);
     PM_LOGICAL_ZONE(x, x1, x2, x3, x4, kmax);
@@ -267,9 +267,9 @@ static double *_PM_interp_nodes_ac(double *f, double *x, double *y, int nz, int 
     np = CMAKE_N(double, nn);
     w  = CMAKE_N(double, 20);
     if (SC_zero_on_alloc_n(-1) == FALSE)
-       {PM_set_value(fp, nn, 0.0);
-	PM_set_value(np, nn, 0.0);
-	PM_set_value(w, 20, 0.0);};
+       {PM_array_set(fp, nn, 0.0);
+	PM_array_set(np, nn, 0.0);
+	PM_array_set(w, 20, 0.0);};
 
     dm = 1.0e-20;
 
@@ -437,7 +437,7 @@ double *PM_node_zone_lr_2d(double *f, void *cnnct, pcons *alist)
 
     fp = CMAKE_N(double, npts);
     if (SC_zero_on_alloc_n(-1) == FALSE)
-       PM_set_value(fp, npts, 0.0);
+       PM_array_set(fp, npts, 0.0);
     PM_LOGICAL_ZONE(f, f1, f2, f3, f4, kmax);
 
     km = kmax - 1;

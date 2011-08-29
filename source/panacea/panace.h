@@ -139,7 +139,7 @@ typedef enum e_PA_unit_conversion PA_unit_conversion;
 #define PA_OFFSET_NUMBER  0xFFFE
 
 #define PA_scale_array   PM_array_scale
-#define PA_set_value     PM_set_value
+#define PA_array_set     PM_array_set
 #define PA_copy_array    PM_array_copy
 #define PA_index_min     PM_index_min
 #define PA_find_index    PM_find_index
