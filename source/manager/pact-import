@@ -847,3 +847,47 @@ FINISH:
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+# if (0) then
+#    set base = ...../pact
+#    source $base/scripts/env-csh
+#    InitLog log $cwd/log.new-import
+#    set src = $1
+#    if ("$src" == "") then
+#       echo "No distribution specified - exiting"
+#       exit(1)
+#    endif
+# 
+#    set repod = ( `scs-meta -r | sed 's|^.*:||'` )
+# 
+#    set excl = ""
+#    set excl = ( $excl -exclude local )
+#    set excl = ( $excl -exclude hosts )
+#    set excl = ( $excl -exclude ../config )
+#    set excl = ( $excl -exclude extensions )
+#    set excl = ( $excl -exclude applications/extensions )
+#    set excl = ( $excl -exclude spokes/xxx )
+# 
+#    flog $log rm -rf imp-test
+#    flog $log mkdir imp-test
+#    flog $log cd imp-test
+# 
+#    NoteD $log "Working repository: $repod"
+# 
+#    NoteD $log -n "Backup repository ... "
+#    Note $log ""
+#    flog $log tar czvf repos.tar.gz $repod
+#    NoteD $log "done"
+# 
+#    NoteD $log -n "Sync ................ "
+#    Note $log ""
+#    flog $log $base/scripts/scs-sync $excl $src $repod,pact
+#    flog $log cat log.sync
+#    NoteD $log "done"
+# 
+#    exit($status)
+# endif
+
+
+
+

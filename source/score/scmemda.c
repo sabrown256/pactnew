@@ -453,6 +453,7 @@ int SC_reg_mem(void *p, long length, char *name)
     pd->length    = length;
     pd->prev      = NULL;
     pd->next      = (mem_header *) p;
+    pd->id        = SC_MEM_ID;
 
     pd->where.pfunc = strdup(name);
     pd->where.pfile = NULL;

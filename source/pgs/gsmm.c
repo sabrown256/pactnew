@@ -31,9 +31,10 @@ static void _PG_rl_font_family(PG_font_family *f)
     fs = f->type_styles;
     for (i = 0; i < n; i++)
         CFREE(fs[i]);
-    CFREE(fs);
+    CFREE(f->type_styles);
 
-    f->next = NULL;
+    f->n_styles = 0;
+    f->next     = NULL;
 
     CFREE(f);
 

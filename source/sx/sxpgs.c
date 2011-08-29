@@ -871,7 +871,13 @@ static void _SX_rl_gdevice(SS_psides *si, object *obj)
    {PG_device *dev;
 
     dev = SS_GET(PG_device, obj);
+
+/* GOTCHA: in the absence of the correct reference counting
+ * assume that the device will be released only on an explicit
+ * PG_close_device not merely a GC
+ *
     PG_rl_device(dev);
+ */
 
     SS_rl_object(si, obj);
 

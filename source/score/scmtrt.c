@@ -202,6 +202,8 @@ int test_3(int nir, int nim)
 
 /* depending on the memory manager these spaces are right
  * next to each other in which case we can do this test
+ * NOTE: the full memory manager will get these in order
+ * while the reduced one will not
  */
     proceed  = TRUE;
     proceed &= (((f2 - f1) - ne) == 0);

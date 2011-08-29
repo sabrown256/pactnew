@@ -90,9 +90,10 @@ static int svd_kernel(PM_matrix *ma)
     w = mw->array;
     v = mv->array;
 
+    PM_array_set(u, mx*n, 0.0);
     for (j = 0; j < m; j++)
         {for (i = 0; i < n; i++)
-	     {k    = i*n + j;
+	     {k    = i*m + j;
 	      u[k] = a[k];};};
 
 /* pad out U with zero rows if M < N */
@@ -281,9 +282,9 @@ void help(void)
 
     printf("\n");
     printf("Usage: mlsvdt [-1] [-2] [-3] [-h] [-n #]\n");
-    printf("   1   do not run test 1\n");
-    printf("   2   do not run test 2\n");
-    printf("   3   do not run test 3\n");
+    printf("   1   do not run square matrix test\n");
+    printf("   2   do not run overdetermined matrix test\n");
+    printf("   3   do not run underdetermined matrix test\n");
     printf("   h   this help message\n");
     printf("   n   maximum number of unknowns (default 5)\n");
     printf("\n");
