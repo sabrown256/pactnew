@@ -472,7 +472,7 @@ int node_massw(double *mass, double *rho, double *rx, double *ry)
     volq = CMAKE_N(double, 4*N_nodes);
     volfrac(volq, rx, ry);
 
-    PA_set_value(mass, N_nodes, 0.0);
+    PA_array_set(mass, N_nodes, 0.0);
 
     pn.volq = volq;
     pn.mass = mass;
@@ -773,7 +773,7 @@ int init_cycle(void)
 int cspeed(double *csp, double *p, double *rho)
    {int j;
 
-    PA_set_value(csp, N_zones, 0.0);
+    PA_array_set(csp, N_zones, 0.0);
 
     for (j = frz; j <= lrz; j++)
         csp[j] = 2.0*p[j]/(rho[j] + SMALL);

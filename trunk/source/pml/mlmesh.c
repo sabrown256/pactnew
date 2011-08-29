@@ -273,7 +273,7 @@ static solver_method *_PM_mk_lin_sys(int n_unk, int n_rhs, int nd,
 	    {mb[j] = PM_create(n_unk, 1);
 	     b[j]  = mb[j]->array;};
 
-	PM_set_value(lapl->array, n_unk*n_unk, 0.0);
+	PM_array_set(lapl->array, n_unk*n_unk, 0.0);
 
 	sv->lapl  = lapl;
 	sv->mb    = mb;
@@ -725,8 +725,8 @@ static void _PM_compute_a(double *apk, double *apl, double *kra, double *lra,
     s = CMAKE_N(double, nz);
 
 /* compute apl */
-    PM_set_value(s, nz, 0.0);
-    PM_set_value(t, nz, 0.0);
+    PM_array_set(s, nz, 0.0);
+    PM_array_set(t, nz, 0.0);
 
     vecset4(lra, x1, x2, x3, x4);
     for (l = lmn+1; l <= lmx; l++)
@@ -759,8 +759,8 @@ static void _PM_compute_a(double *apk, double *apl, double *kra, double *lra,
               apl[j] = 0.5*(s[j] + t[j]) + apl[j0];};};
 
 /* compute apk */
-    PM_set_value(s, nz, 0.0);
-    PM_set_value(t, nz, 0.0);
+    PM_array_set(s, nz, 0.0);
+    PM_array_set(t, nz, 0.0);
 
     vecset4(kra, x1, x2, x3, x4);
     for (k = kmn+1; k <= kmx; k++)

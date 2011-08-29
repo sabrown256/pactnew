@@ -142,7 +142,7 @@ static void _PM_cg_cmp_Ap(double *Ax, PM_sp_lin_sys *sls, double *x)
 
     n = sls->n_ups;
 
-    PM_set_value(Ax, n, 0.0);
+    PM_array_set(Ax, n, 0.0);
 
     if (sls->symmetric)
        {for (i = 0; i < n; i++)

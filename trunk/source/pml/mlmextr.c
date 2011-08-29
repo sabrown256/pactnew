@@ -610,8 +610,8 @@ static void _PM_compute_a(double *apk, double *apl, double *kra, double *lra,
     s = CMAKE_N(double, nz);
 
 /* compute apl */
-    PM_set_value(s, nz, 0.0);
-    PM_set_value(t, nz, 0.0);
+    PM_array_set(s, nz, 0.0);
+    PM_array_set(t, nz, 0.0);
 
     vecset4(lra, x1, x2, x3, x4);
     for (l = lmn+1; l <= lmx; l++)
@@ -645,8 +645,8 @@ static void _PM_compute_a(double *apk, double *apl, double *kra, double *lra,
               apl[j] = 0.5*(s[j] + t[j]) + apl[j0];};};
 
 /* compute apk */
-    PM_set_value(s, nz, 0.0);
-    PM_set_value(t, nz, 0.0);
+    PM_array_set(s, nz, 0.0);
+    PM_array_set(t, nz, 0.0);
 
     vecset4(kra, x1, x2, x3, x4);
     for (k = kmn+1; k <= kmx; k++)
@@ -720,7 +720,7 @@ static void _PM_fill_lapl_opa(PM_matrix *lapl, int kmax, int lmax, int na,
 
     n = n_map->nrow;
 
-    PM_set_value(lapl->array, n*n, 0.0);
+    PM_array_set(lapl->array, n*n, 0.0);
 
     pnt = min(ts, 1.0);
     pnt = max(pnt, 0.0);
@@ -990,10 +990,10 @@ static void _PM_mesh_extr_nd(double *x, int *smn, int *smx, int *mn, int *mx,
     apk = CMAKE_N(double, nn);
     apl = CMAKE_N(double, nn);
 
-    PM_set_value(kra, nn, 1.0);
-    PM_set_value(lra, nn, 1.0);
-    PM_set_value(apk, nn, 1.0);
-    PM_set_value(apl, nn, 1.0);
+    PM_array_set(kra, nn, 1.0);
+    PM_array_set(lra, nn, 1.0);
+    PM_array_set(apk, nn, 1.0);
+    PM_array_set(apl, nn, 1.0);
 
     nt  = PM_ipow(3, nd);
     unt = CMAKE_N(int, nt);

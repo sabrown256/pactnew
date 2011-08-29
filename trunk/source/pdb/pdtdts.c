@@ -1,5 +1,5 @@
 /*
- * PDTDEFTST.C - test for the PDB file independent stuff
+ * PDTDTS.C - test for the PDB file independent stuff
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942
@@ -33,8 +33,8 @@ struct s_point
 static void print_help(void)
    {
 
-    PRINT(STDOUT, "\nPDTDEFTST - run PDB typedef test\n\n");
-    PRINT(STDOUT, "Usage: pdtdeftst [-d] [-h] [-v #]\n");
+    PRINT(STDOUT, "\nPDTDTS - run PDB typedef test\n\n");
+    PRINT(STDOUT, "Usage: pdtdts [-d] [-h] [-v #]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       d  - turn on debug mode to display memory maps\n");
     PRINT(STDOUT, "       h  - print this help message and exit\n");
@@ -102,7 +102,7 @@ int main(int c, char **v)
   
     PD_close(file);
   
-    if (ptr->x != 1.0 || ptr->y != 2.0)
+    if ((ptr->x != 1.0) || (ptr->y != 2.0))
        err = 1;
    
     CFREE(ptr);

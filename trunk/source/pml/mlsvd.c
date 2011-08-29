@@ -289,8 +289,8 @@ int PM_svd_decompose(double *a, int m, int n, double *w, double *v)
         {PM_err("AUGMENT A WITH ZERO ROWS - PM_SVD_DECOMPOSE");
          return(FALSE);};
 
-     PM_set_value(w, n, 0.0);
-     PM_set_value(v, n*n, 0.0);
+     PM_array_set(w, n, 0.0);
+     PM_array_set(v, n*n, 0.0);
 
 /* Householder reduction to bidiagonal form */
      _PM_svd_reduce(&rv1, &anrm, a, w, m, n);

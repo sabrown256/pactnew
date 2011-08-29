@@ -348,7 +348,7 @@ static double **_SX_extract_range(SS_psides *si,
     if (wgtfl)
        {for (i = 0; i < dnde; i++)
 	    {trc = tre[i];
-	     PM_set_value(trc, dne, 1.0);};};
+	     PM_array_set(trc, dne, 1.0);};};
 
     return(tre);}
 

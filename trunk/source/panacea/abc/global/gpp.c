@@ -479,8 +479,8 @@ static void _LR_fill_coordw(double **elem, int ne, int *pist)
                       *pyc++ = ry[i];};};
 
     conv = unit[CM]/convrsn[CM];
-    PA_scale_array(xc, ne, conv);
-    PA_scale_array(yc, ne, conv);
+    PM_array_scale(xc, ne, conv);
+    PM_array_scale(yc, ne, conv);
 
     return;}
 
@@ -802,8 +802,8 @@ static PM_set *LR_mesh_set(char *name)
              *pxc++ = rx[i];
              *pyc++ = ry[i];};
     conv = unit[CM]/convrsn[CM];
-    PA_scale_array(xc, nitems, conv);
-    PA_scale_array(yc, nitems, conv);
+    PM_array_scale(xc, nitems, conv);
+    PM_array_scale(yc, nitems, conv);
     set = PM_make_set(name, SC_DOUBLE_S, FALSE,
                             2, kmax, lmax,
                             2, xc, yc);

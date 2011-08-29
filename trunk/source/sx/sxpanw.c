@@ -40,11 +40,11 @@ object *_SXI_display_pan_object(SS_psides *si, object *obj)
             if (id == SC_DOUBLE_I)
                {ni   = PD_entry_number(ep);
                 conv = pp->conv/pp->unit;
-                PA_scale_array(pp->data, ni, conv);
+                PM_array_scale(pp->data, ni, conv);
                 PD_write_entry(stdout, SX_vif, pp->name, pp->data, ep,
 			       0, NULL);
                 conv = 1.0/conv;
-                PA_scale_array(pp->data, ni, conv);}
+                PM_array_scale(pp->data, ni, conv);}
             else
                PD_write_entry(stdout, SX_vif, pp->name, pp->data, ep,
 			      0, NULL);}
@@ -65,11 +65,11 @@ object *_SXI_display_pan_object(SS_psides *si, object *obj)
             if (id == SC_DOUBLE_I)
                {ni   = PD_entry_number(ep);
                 conv = pp->conv/pp->unit;
-                PA_scale_array(pp->data, ni, conv);
+                PM_array_scale(pp->data, ni, conv);
                 PD_write_entry(stdout, SX_vif, pp->name, pp->data, ep,
 			       0, NULL);
                 conv   = 1.0/conv;
-                PA_scale_array(pp->data, ni, conv);}
+                PM_array_scale(pp->data, ni, conv);}
             else
                PD_write_entry(stdout, SX_vif, pp->name, pp->data, ep,
 			      0, NULL);}

@@ -388,7 +388,7 @@ double *_PG_frame_z_buffer(frame *fr)
 	np = nx*ny;
 
         zb = CMAKE_N(double, np);
-        PM_set_value(zb, np, -HUGE);
+        PM_array_set(zb, np, -HUGE);
 
 	fr->zb = zb;};
 

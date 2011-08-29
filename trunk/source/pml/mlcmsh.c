@@ -1925,16 +1925,16 @@ static PM_mesh *_PM_fill_mesh(PM_part *parts, int strategy, int method,
     mesh->apl     = apl;
 
 /* initialize the nodal arrays */
-    PM_set_value(rx, n_nodes, 0.0);
-    PM_set_value(ry, n_nodes, 0.0);
-    PM_set_value(nodet, n_nodes, 0.0);
+    PM_array_set(rx, n_nodes, 0.0);
+    PM_array_set(ry, n_nodes, 0.0);
+    PM_array_set(nodet, n_nodes, 0.0);
 
 /* initialize the zonal arrays */
-    PM_set_value(zone, n_zones, 0.0);
-    PM_set_value(apk,  n_zones, 1.0);
-    PM_set_value(apl,  n_zones, 1.0);
-    PM_set_value(kra,  n_nodes, 1.0);
-    PM_set_value(lra,  n_nodes, 1.0);
+    PM_array_set(zone, n_zones, 0.0);
+    PM_array_set(apk,  n_zones, 1.0);
+    PM_array_set(apl,  n_zones, 1.0);
+    PM_array_set(kra,  n_nodes, 1.0);
+    PM_array_set(lra,  n_nodes, 1.0);
 
     _PM_map_tree(parts, base, mesh);
 

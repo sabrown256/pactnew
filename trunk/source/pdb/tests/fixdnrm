@@ -18,11 +18,11 @@ Note $LogF ""
 
 set UTime = `$TIMER -r`
 if ("$Valgrind" == "") then
-   ftee $LogF $CFE $BinDir/pdnormtst 
+   ftee $LogF $CFE $BinDir/pdnrmt 
    set xstatus = $status
 else
-   ftee $LogF $Valgrind $BinDir/pdnormtst -v $tst |& \
-   grep "ERROR SUMMARY:"                         |& \
+   ftee $LogF $Valgrind $BinDir/pdnrmt -v $tst |& \
+   grep "ERROR SUMMARY:"                       |& \
    awk '{ print $4 }'   >&! $Tmp
    set xstatus = `cat $Tmp`
 	 flog $LogF $RM $Tmp

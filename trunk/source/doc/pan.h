@@ -3661,9 +3661,9 @@ See also PA_th_wr_iattr, PA_th_def_rec, and PA_th_trans_family.<p>
 </B><B>
 </B>
 <ul>
-<li>PA_scale_array(double *p, int n, double f)
-<li>PA_set_value(double *p, int n, double f)
-<li>PA_copy_array(double *s, double *t, int n)
+<li>PM_array_scale(double *p, int n, double f)
+<li>PM_array_set(double *p, int n, double f)
+<li>PA_array_copy(double *s, double *t, int n)
 <li>PA_index_min(double *p, int n)
 <li>PA_find_index(double *p, double f, int n)
 <li>PA_max_value(double *p, int imin, int n)

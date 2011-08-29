@@ -750,7 +750,7 @@ void _PA_wrrstrt(char *rsname, int conv_flag)
 
 /* convert units before writing if requested */
 			  if (int_conv_flag)
-			     PA_scale_array(pdata, psz,
+			     PM_array_scale(pdata, psz,
 					    conv_fac);
 
 			  PA_ERR(!_PD_sys_write(pdrs, pdata,
@@ -762,7 +762,7 @@ void _PA_wrrstrt(char *rsname, int conv_flag)
 
 /* convert back so that runtime data isn't trashed */
 			  if (int_conv_flag)
-			     PA_scale_array(pdata, psz,
+			     PM_array_scale(pdata, psz,
 					    1.0/conv_fac);}
 		      else
 			 _PD_rl_syment_d(sp);
@@ -991,7 +991,7 @@ void _PA_rd_variable(PDBfile *pdrs, PA_variable *pp,
 
 /* convert the file data to the requested unit system */
         if (int_conv_flag)
-           PA_scale_array(pdata, psz, conv_fac);
+           PM_array_scale(pdata, psz, conv_fac);
 
         PA_ERR(((pdata == NULL) && (pclass == REQU)),
                "FAILED TO READ REQUIRED VARIABLE %s - _PA_RD_VARIABLE",
