@@ -341,10 +341,10 @@ static void _SS_args(SS_psides *si, object *obj, void *v, int type)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_ARGS_N - break out the C level data analogs from a Scheme
- *           - object of list of objects
- *           - this is for ease of use
- *           - return the number of Scheme arguments
+/* SS_ARGS - break out the C level data analogs from a Scheme
+ *         - object of list of objects
+ *         - this is for ease of use
+ *         - return the number of Scheme arguments
  */
 
 int SS_args(SS_psides *si, object *s, ...)

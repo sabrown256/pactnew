@@ -77,10 +77,10 @@ touch $excf
 flog $log mkdir syncs
 flog $log pushd syncs
 if (("$repos" =~ *.gz) || ("$repos" =~ *.tgz)) then
-   tar xvzf ../$tar
+   flog $log tar xvzf $repos
 
 else if ("$repos" =~ *.tar) then
-   tar xvf ../$tar
+   flog $log tar xvf $repos
 
 else
    if (-d $repos/CVSROOT) then
@@ -165,17 +165,21 @@ else if (-d CVS) then
       flog $log pushd $sd
 
 # remove entries
-      foreach f ( `cat CVS/Entries ! sed 's|^/||' | sed 's|/.*//$||'` )
-         if (!(-f $f)) then
-            flog $log cvs remove $f
+      foreach f ( `cat CVS/Entries | sed 's|^/||' | sed 's|/.*//$||'` )
+         if ($f != D) then
+            if (!(-f $f)) then
+               flog $log cvs remove $f
+            endif
          endif
       end
 
 # add entries
       foreach f ( * )
-         grep "/$f/" CVS/Entries >& /dev/null
-         if ($status != 0) then
-            flog $log cvs add $f
+         if ($f != CVS) then
+            grep "/$f/" CVS/Entries >& /dev/null
+            if ($status != 0) then
+               flog $log cvs add $f
+            endif
          endif
       end
       flog $log popd
@@ -211,6 +215,8 @@ endif
 #--------------------------------------------------------------------------
 
 # COMMIT
+
+flog $log scs-update
 
 flog $log scs-commit -m "Import from $repos"
 

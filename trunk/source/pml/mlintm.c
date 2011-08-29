@@ -495,7 +495,7 @@ int PM_interp_mesh_id(int nd, int nf, int ni, double **xi, double **fi,
 		      double *prm)
    {int i, id, ne, nxo, rv;
     double xmn, xmx, dx, xc;
-    double *xic, *xoc, *extr, *rat;
+    double *xic, *xoc, *extr, *rat, *t;
     double **tre;
     C_array sa, da;
     PM_set *sr, *sd, *dr, *dd;
@@ -534,7 +534,9 @@ int PM_interp_mesh_id(int nd, int nf, int ni, double **xi, double **fi,
 
     ne = dd->n_elements;
     for (id = 0; id < nf; id++)
-        fo[id] = CMAKE_N(double, ne);
+        {t = CMAKE_N(double, ne);
+	 PM_array_set(t, ne, 0.0);
+         fo[id] = t;};
 
     sr = PM_make_set_alt("sr", SC_DOUBLE_S, FALSE, 1, &ni, nf, (void **) fi);
     dr = PM_make_set_alt("dr", SC_DOUBLE_S, FALSE, nd, mxo, nf, (void **) fo);

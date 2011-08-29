@@ -231,6 +231,8 @@
      for (_ld = 0; _ld < _pd->nd; _ld++)                                     \
          _pd->x[_ld][_i] = _xs[_ld];}
 
+#define PM_set_value  PM_array_set
+
 /*--------------------------------------------------------------------------*/
 
 /*                         STRUCT DEFINITIONS                               */
@@ -962,7 +964,7 @@ extern void
 	       double *derx, double *dery),
  PM_array_scale(double *p, int n, double f),
  PM_array_shift(double *p, int n, double f),
- PM_set_value(double *p, int n, double f),
+ PM_array_set(double *p, int n, double f),
  PM_array_copy(double *s, double *t, int n),
  PM_err(char *fmt, ...);
 

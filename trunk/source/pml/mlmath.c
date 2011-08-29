@@ -229,9 +229,9 @@ void PM_array_shift(double *p, int n, double f)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_SET_VALUE - broadcast a value into an array */
+/* PM_ARRAY_SET - broadcast a value into an array */
 
-void PM_set_value(double *p, int n, double f)
+void PM_array_set(double *p, int n, double f)
    {int i;
 
     if (p != NULL)

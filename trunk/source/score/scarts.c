@@ -503,7 +503,10 @@ static int test_7(void)
     for (i = 0; i < ni; i++)
         err += (pi[i] != -i);
 
-/* there should be 2 or 10 differences depending on the memory manager */
+/* there should be 2 or 10 differences depending on the memory manager
+ * NOTE: the full memory manager will get 10 errors
+ * while the reduced one will get 2
+ */
     err = ((err != 10) && (err != 2));
 
     CFREE(pi);
