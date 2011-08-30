@@ -77,34 +77,40 @@ else
       NoteD $Log -n "                        to ........................."
       Note $Log ""
       @ lerr = 0
-      set lst = ( -ie tst-ebcdic.ref -i5 tst-ita2.ref -i6 tst-ascii-6.ref -i7 tst-ascii-7.ref )
+      set lst = ""
+      set lst = ( $lst -ie tst-ebcdic.ref tst-ascii-7.ref )
+      set lst = ( $lst -i5 tst-ita2.ref tst-ascii-7-5.ref )
+      set lst = ( $lst -i6 tst-ascii-6.ref tst-ascii-7-6.ref )
+      set lst = ( $lst -i7 tst-ascii-7.ref tst-ascii-7.ref )
       while ($#lst > 0)
          set istd = $lst[1]
          set file = $RefDir/$lst[2]
-         set ref  = tmp.txt
+         set ref  = $RefDir/$lst[3]
+         set res  = tmp.txt
+         shift lst
          shift lst
          shift lst
          Note $Log "-------------------"
-         Note $Log "   $istd   $file"
-         flog $Log $CFE $BinDir/pdctrns $istd $file -f $ref
+         Note $Log "   $istd   $file   $ref"
+         flog $Log $CFE $BinDir/pdctrns $istd $file -f $res
          if ($status != 0) then
             @ lerr = $lerr + 1
             NoteD $Log -n "x"
          else if (-f $ref) then
-            flog $Log diff -i $ref $TFile
-#            flog $Log cmp -l $ref $TFile
+            flog $Log diff -i $res $ref
+#            flog $Log cmp -l $res $ref
             if ($status != 0) then
 #               @ lerr = $lerr + 1
                NoteD $Log -n "+"
-               flog $Log cat $ref
+               flog $Log cat $res
             else
                NoteD $Log -n "."
             endif
          else
-            flog $Log cp $file $ref
+            flog $Log cp $res $ref
             NoteD $Log -n "."
          endif
-         flog $Log $RM $ref
+         flog $Log $RM $res
       end
       set xstatus = $lerr
       if ($lerr == 0) then
