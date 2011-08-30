@@ -23,6 +23,9 @@ enum e_PD_conv_type
 
 typedef enum e_PD_conv_type PD_conv_type;
 
+#define ITA2_FIGS  0x1B       /* FIGS character (11011) */
+#define ITA2_LTRS  0x1F       /* LTRS character (11111) */
+
 #define MBLOCKS 256
 #define MBYTES   16
 
@@ -66,7 +69,7 @@ static unsigned char
 /* ITA2 letter to 7-bit ASCII
  * NOTE: 0x80 corresponds to shift to figures and 0x81 shift to letters
  */
- ita2l_a7[32] = { 0x00, 0x54, 0x0D, 0x4F, 0x20, 0x48, 0x4E, 0x4D,
+ ita2l_a7[32] = { 0x20, 0x54, 0x0D, 0x4F, 0x20, 0x48, 0x4E, 0x4D,
 		  0x0A, 0x4C, 0x52, 0x47, 0x49, 0x50, 0x43, 0x56,
 
 		  0x45, 0x5A, 0x44, 0x42, 0x53, 0x59, 0x46, 0x58,
@@ -76,7 +79,7 @@ static unsigned char
  a7_ita2l[128],
 
 /* ITA2 figure to 7-bit ASCII */
- ita2f_a7[32] = { 0x00, 0x35, 0x0D, 0x39, 0x20, 0x23, 0x2C, 0x2E,
+ ita2f_a7[32] = { 0x20, 0x35, 0x0D, 0x39, 0x20, 0x23, 0x2C, 0x2E,
 		  0x0A, 0x29, 0x34, 0x26, 0x38, 0x30, 0x3A, 0x3B,
 
 		  0x33, 0x22, 0x24, 0x3F, 0x7, 0x36, 0x21, 0x2F,
@@ -1240,8 +1243,8 @@ static int _PD_convert_fnc(char **pout, char **pin, long *poo, long *pio,
  */
 
 static void _PD_conv_to_ascii_7(char *bf, long ni, int cstd)
-   {int c, lwc;
-    long i;
+   {int c, cn, lwc;
+    long i, l;
     PD_character_standard ucstd;
     unsigned char *pcs, *ubf;
 
@@ -1251,18 +1254,20 @@ static void _PD_conv_to_ascii_7(char *bf, long ni, int cstd)
 
     if (ucstd == PD_ITA2_LOWER)
        {pcs = ita2l_a7;
-	for (i = 0; i < ni; i++)
+	for (i = 0, l = 0; i < ni; i++)
 	    {c = bf[i];
-	     if (c == 0x80)
+	     if (c == ITA2_FIGS)
 	        pcs = ita2f_a7;
-	     else if (c == 0x81)
+	     else if (c == ITA2_LTRS)
 	        pcs = ita2l_a7;
+	     else
+	        {cn = pcs[c];
+		 if (lwc == TRUE)
+		    cn = tolower(cn);
 
-	     c = pcs[c];
-	     if (lwc == TRUE)
-	        c = tolower(c);
-
-	     bf[i] = c;};}
+		 bf[l++] = cn;};};
+       bf[l++] = '\0';
+       bf[l++] = '\0';}
 
     else if (ucstd == PD_ASCII_6_LOWER)
        {pcs = a6_a7;
@@ -1350,22 +1355,24 @@ static void _PD_conv_to_ebcdic(char *bf, long ni, int cstd)
 /* _PD_CONV_TO_ITA2 - translate characters from CSTD to ITA2
  *                  - do translation in place
  *                  - Inputs : BF   - character buffer
+ *                  -          NB   - size of BF
  *                  -          NI   - number of fields to translate
  *                  -          CSTD - character standard ID
  */
 
-static void _PD_conv_to_ita2(char *bf, long ni, int cstd)
+static int _PD_conv_to_ita2(char *bf, long nb, long ni, int cstd)
    {int c, cn, let, nlet;
-    long i, nc;
+    long i, l, nc;
+    char *nbf;
 
     ONCE_SAFE(TRUE, NULL)
-       memset(a7_ita2l, 0, 128);
+       memset(a7_ita2l, '\004', 128);
        nc = sizeof(ita2l_a7);
        for (i = 0; i < nc; i++)
            {c = ita2l_a7[i];
 	    a7_ita2l[c] = i;};
 
-       memset(a7_ita2f, 0, 128);
+       memset(a7_ita2f, '\004', 128);
        nc = sizeof(ita2f_a7);
        for (i = 0; i < nc; i++)
            {c = ita2f_a7[i];
@@ -1374,20 +1381,38 @@ static void _PD_conv_to_ita2(char *bf, long ni, int cstd)
 
     _PD_conv_to_ascii_7(bf, ni, cstd);
 
-    let = TRUE;
+    nbf = CMAKE_N(char, 2*ni);
+
+/* start with two letter shift chars */
+    l        = 0;
+    let      = ITA2_LTRS;
+    nbf[l++] = let;
+    nbf[l++] = let;
+
     for (i = 0; i < ni; i++)
         {c = bf[i];
 	 c = toupper(c);
 	 if (('A' <= c) && (c <= 'Z'))
 	    {cn   = a7_ita2l[c];
-	     nlet = TRUE;}
+	     nlet = ITA2_LTRS;}
+	 else if ((c == '\n') || (c == '\r'))
+	    {cn   = a7_ita2l[c];
+	     nlet = let;}
 	 else
 	    {cn   = a7_ita2f[c];
-	     nlet = FALSE;};
-	 bf[i] = cn;
-	 let   = nlet;};
+	     nlet = ITA2_FIGS;};
 
-    return;}
+	 if (let != nlet)
+	    nbf[l++] = nlet;
+
+	 nbf[l++] = cn;
+	 let      = nlet;};
+
+    SC_strncpy(bf, nb, nbf, l);
+
+    CFREE(nbf);
+
+    return(l);}
 
 /*--------------------------------------------------------------------------*/
 
@@ -2615,19 +2640,20 @@ char *PD_convert_ascii(char *out, int nc, PD_character_standard cstd,
 
 char *PD_conv_from_ascii(char *out, int nc, PD_character_standard cstd,
 			 char *in, int nb)
-   {int n;
+   {int n, nn, nx;
     char *t;
 
-    n = min(nc, nb);
+    n  = min(nc, nb);
+    nx = max(2*nb, nc);
 
     switch (cstd)
        {case PD_ITA2_UPPER :
         case PD_ITA2_LOWER :
-             t = CMAKE_N(char, n);
+             t = CMAKE_N(char, nx);
 	     memcpy(t, in, n);
 	     memset(out, 0, nc);
-             _PD_conv_to_ita2(t, n, PD_ASCII_7);
-	     PD_pack_bits(out, t, SC_CHAR_I, 6, 0, 1, n, 0);
+             nn = _PD_conv_to_ita2(t, nx, n, PD_ASCII_7);
+	     PD_pack_bits(out, t, SC_CHAR_I, 5, 0, 1, nn, 0);
              CFREE(t);
 	     break;
         case PD_ASCII_6_UPPER :
