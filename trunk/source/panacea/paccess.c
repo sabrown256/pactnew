@@ -703,28 +703,28 @@ void PA_init_scalar(char *s)
  *           - points to something of type TYPE
  */
 
-void *_PA_alloc(defstr *dp, char *type, long nitems, void *pval)
+void *_PA_alloc(defstr *dp, char *type, long ni, void *pval)
    {void *vr;
     char *pvr;
     long i, bpi;
 
     bpi = dp->size;
     if (_PD_indirection(type))
-       vr = CMAKE_N(char *, nitems);
+       vr = CMAKE_N(char *, ni);
 
     else
        {PA_ERR((dp == NULL),
                "BAD TYPE %s - _PA_ALLOC", type);
-        vr = CMAKE_N(char, nitems*bpi);};
+        vr = CMAKE_N(char, ni*bpi);};
 
 /* if given a non-NULL initial value, broadcast it in
  * otherwise make sure the space is filled with zeroes
  */
     if (pval == NULL)
        {if (SC_zero_on_alloc_n(-1) == FALSE)
-	   memset(vr, 0, nitems*bpi);}
+	   memset(vr, 0, ni*bpi);}
     else
-       {for (pvr = (char *) vr, i = 0L; i < nitems; i++, pvr += bpi)
+       {for (pvr = (char *) vr, i = 0L; i < ni; i++, pvr += bpi)
             memcpy(pvr, pval, bpi);};
 
     return(vr);}

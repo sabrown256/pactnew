@@ -155,7 +155,7 @@ void *_SC_realloc_ns(void *p, long ni, long bpi, void *arg)
 
     space = NULL;
     
-    if (SC_is_score_space(p, &space, &desc))
+    if (SC_is_active_space(p, &space, &desc))
        {ph  = desc->heap;
 
 	if (arg == NULL)
@@ -317,7 +317,7 @@ int _SC_free_ns(void *p, void *arg)
 
 /* _SC_ALLOC_WS - wrapper for _SC_alloc_ns */
 
-void *_SC_alloc_ws(long nitems, long bpi, char *name, int memfl, int zsp)
+void *_SC_alloc_ws(long ni, long bpi, char *name, int memfl, int zsp)
    {int prm, na;
     void *p;
     SC_mem_opt opt;
@@ -334,7 +334,7 @@ void *_SC_alloc_ws(long nitems, long bpi, char *name, int memfl, int zsp)
     opt.where.pfile = NULL;
     opt.where.line  = -1;
 
-    p = _SC_alloc_ns(nitems, bpi, &opt);
+    p = _SC_alloc_ns(ni, bpi, &opt);
 
     return(p);}
 
@@ -343,7 +343,7 @@ void *_SC_alloc_ws(long nitems, long bpi, char *name, int memfl, int zsp)
 
 /* _SC_NALLOC_WS - wrapper for _SC_alloc_ns */
 
-void *_SC_nalloc_ws(long nitems, long bpi, int memfl, int zsp,
+void *_SC_nalloc_ws(long ni, long bpi, int memfl, int zsp,
 		    const char *fnc, const char *file, int line)
    {int prm, na;
     void *p;
@@ -361,7 +361,7 @@ void *_SC_nalloc_ws(long nitems, long bpi, int memfl, int zsp,
     opt.where.pfile = file;
     opt.where.line  = line;
 
-    p = _SC_alloc_ns(nitems, bpi, &opt);
+    p = _SC_alloc_ns(ni, bpi, &opt);
 
     return(p);}
 
@@ -370,7 +370,7 @@ void *_SC_nalloc_ws(long nitems, long bpi, int memfl, int zsp,
 
 /* _SC_REALLOC_WS - wrapper for _SC_realloc_ns */
 
-void *_SC_realloc_ws(void *p, long nitems, long bpi, int memfl, int zsp)
+void *_SC_realloc_ws(void *p, long ni, long bpi, int memfl, int zsp)
    {int prm, na;
     void *rv;
     SC_mem_opt opt;
@@ -387,7 +387,7 @@ void *_SC_realloc_ws(void *p, long nitems, long bpi, int memfl, int zsp)
     opt.where.pfile = NULL;
     opt.where.line  = -1;
 
-    rv = _SC_realloc_ns(p, nitems, bpi, &opt);
+    rv = _SC_realloc_ns(p, ni, bpi, &opt);
 
     return(rv);}
 

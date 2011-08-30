@@ -483,9 +483,9 @@ struct s_PROCESS
     int (*statusp)(PROCESS *pp);
     int (*close)(PROCESS *pp);
     int (*flush)(PROCESS *pp);
-    int (*read)(void *ptr, char *type, size_t nitems,
+    int (*read)(void *ptr, char *type, size_t ni,
 		PROCESS *pp);
-    int (*write)(void *ptr, char *type, size_t nitems,
+    int (*write)(void *ptr, char *type, size_t ni,
 		 PROCESS *pp);
     int (*printf)(PROCESS *pp, char *buffer);
     int (*gets)(char *bf, int len, PROCESS *pp);
@@ -611,10 +611,10 @@ struct s_SC_rusedes
 
 
 struct s_SC_mem_fnc
-   {void *(*nalloc)(long nitems, long bpi, int na, int zsp,
+   {void *(*nalloc)(long ni, long bpi, int na, int zsp,
 		    const char *fnc, const char *file, int line);
-    void *(*alloc)(long nitems, long bpi, char *name, int na, int zsp);
-    void *(*realloc)(void *p, long nitems, long bpi, int na, int zsp);
+    void *(*alloc)(long ni, long bpi, char *name, int na, int zsp);
+    void *(*realloc)(void *p, long ni, long bpi, int na, int zsp);
     int (*free)(void *p, int zsp);};
 
 struct s_SC_global_state
@@ -778,7 +778,7 @@ extern void
 extern int
  SC_fix_lmt(int nb, int64_t *pmn, int64_t *pmx, int64_t *pumx),
  SC_unpack_bits(char *out, char *in, int ityp, int nbits,
-		int padsz, int fpp, long nitems, long offs),
+		int padsz, int fpp, long ni, long offs),
  SC_sizeof(char *s),
  SC_pointer_ok(void *p),
  SC_putenv(char *s);

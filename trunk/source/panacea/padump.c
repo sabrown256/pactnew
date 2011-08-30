@@ -899,7 +899,7 @@ static long _PA_copy_sub_select(int did, void *d, long od,
 
 double *PA_set_data(char *name, C_array *arr, PM_centering *pcent)
    {int nd, id;
-    unsigned long nitems, dims, offset;
+    unsigned long ni, dims, offset;
     unsigned long strides[50], maxes[50];
     char *type;
     double conv;
@@ -914,9 +914,9 @@ double *PA_set_data(char *name, C_array *arr, PM_centering *pcent)
     *pcent = PA_VARIABLE_CENTERING(pp);
 
 /* interactive plot requests among others will have arr = NULL */
-    PA_general_select(pp, arr, &nitems, &dims, &offset, strides, maxes);
+    PA_general_select(pp, arr, &ni, &dims, &offset, strides, maxes);
 
-    data = CMAKE_N(double, nitems);
+    data = CMAKE_N(double, ni);
 
     type = PA_VARIABLE_TYPE_S(pp);
     id   = SC_type_id(type, FALSE);
@@ -929,7 +929,7 @@ double *PA_set_data(char *name, C_array *arr, PM_centering *pcent)
 			    id, ps, offset, maxes, strides, nd);};
 
     conv = PA_VARIABLE_EXT_UNIT(pp)/PA_VARIABLE_INT_UNIT(pp);
-    PM_array_scale(data, nitems, conv);
+    PM_array_scale(data, ni, conv);
 
     return(data);}
 
@@ -937,7 +937,7 @@ double *PA_set_data(char *name, C_array *arr, PM_centering *pcent)
 /*--------------------------------------------------------------------------*/
 
 /* _PA_GET_DATA - extract a subset of data from a PANACEA variable as
- *              - defined by a number of items, NITEMS, an offset, OFFSET,
+ *              - defined by a number of items, NI, an offset, OFFSET,
  *              - from the beginning of the variable, and a stride, STRIDE,
  *              - through the variable, VR
  *              - put the data in the pre-allocated space D

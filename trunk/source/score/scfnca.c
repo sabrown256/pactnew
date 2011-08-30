@@ -267,15 +267,15 @@ long SC_extract_field(char *in, int offs, int nbi, int nby, int *ord)
  *                -   NBITS   the number of bits per item
  *                -   PADSZ   the number of bits of pad preceding the fields
  *                -   FPP     the number of fields per pad
- *                -   NITEMS  the number of items expected
+ *                -   NI      the number of items expected
  *                -   OFFS    the bit offset of the first pad
  */
 
 int SC_unpack_bits(char *out, char *in, int ityp, int nbits,
-		   int padsz, int fpp, long nitems, long offs)
+		   int padsz, int fpp, long ni, long offs)
    {long i, bita, fld, np;
 
-    for (i = 0L; i < nitems; i++)
+    for (i = 0L; i < ni; i++)
         {np   = 1 + i/fpp;
 	 bita = np*padsz + i*nbits + offs;
 	 fld  = SC_extract_field(in, bita, nbits, INT_MAX, NULL);

@@ -716,7 +716,7 @@ long _PD_ptr_wr_lookup(PDBfile *file, void *vr, int *ploc, int write)
  *                  - correctly
  */
 
-int _PD_ptr_wr_itags(PDBfile *file, void *vr, long nitems, char *type)
+int _PD_ptr_wr_itags(PDBfile *file, void *vr, long ni, char *type)
    {int rv, loc;
     long n;
     int64_t addr;
@@ -749,7 +749,7 @@ int _PD_ptr_wr_itags(PDBfile *file, void *vr, long nitems, char *type)
        n = _PD_ptr_get_n_spaces(file, TRUE);
 
 /* write the itag for the read */
-    (*file->wr_itag)(file, n, nitems, type, addr, loc);
+    (*file->wr_itag)(file, n, ni, type, addr, loc);
 
     rv = (loc == LOC_HERE);
 
@@ -766,18 +766,18 @@ int _PD_ptr_wr_itags(PDBfile *file, void *vr, long nitems, char *type)
 
 static char *_PD_ptr_alloc_space(PDBfile *file, char **vr,
 				 PD_itag *pi, int asgn)
-   {long bpi, nitems;
+   {long bpi, ni;
     char *pv, *type;
 
-    nitems = pi->nitems;
-    type   = pi->type;
+    ni   = pi->nitems;
+    type = pi->type;
 
     bpi = _PD_lookup_size(type, file->host_chart);
     if (bpi == -1)
        PD_error("CAN'T FIND NUMBER OF BYTES - _PD_PTR_ALLOC_SPACE",
                 PD_READ);
 
-    pv = CMAKE_N(char, nitems*bpi);
+    pv = CMAKE_N(char, ni*bpi);
 
     if (asgn == TRUE)
        {DEREF(vr) = pv;
@@ -977,21 +977,21 @@ int _PD_ptr_rd_itags(PDBfile *file, char **vr, PD_itag *pi)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_PTR_WR_SYMENT - make a syment for NITEMS of data with type at the
+/* _PD_PTR_WR_SYMENT - make a syment for NI of data with type at the
  *                   - current location in FILE
  */
 
 void _PD_ptr_wr_syment(PDBfile *file, long n, char *type,
-		       long nitems, int64_t addr)
+		       long ni, int64_t addr)
    {char name[MAXLINE];
     syment *ep;
     PD_address *ad;
 
-    if (nitems > 0)
+    if (ni > 0)
        {SC_LOCKON(PD_ptr_lock);
 
 	snprintf(name, MAXLINE, "%s%ld", file->ptr_base, n);
-	ep = _PD_mk_syment(type, nitems, addr, NULL, NULL);
+	ep = _PD_mk_syment(type, ni, addr, NULL, NULL);
 	_PD_e_install(file, name, ep, TRUE);
 
 	if (file->format_version > 2)

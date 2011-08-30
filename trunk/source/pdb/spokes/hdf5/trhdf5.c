@@ -68,7 +68,7 @@ static char
 
 static long
  _H5_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr),
- _H5_wr_syment(PDBfile *file, char *vr, long nitems,
+ _H5_wr_syment(PDBfile *file, char *vr, long ni,
 	       char *intype, char *outtype);
 
 static sys_layer
@@ -1279,11 +1279,11 @@ long _H5_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
 
 /* _H5_WR_SYMENT - read syment method for HDF5 spoke */
 
-long _H5_wr_syment(PDBfile *file, char *vr, long nitems,
+long _H5_wr_syment(PDBfile *file, char *vr, long ni,
 		   char *intype, char *outtype)
    {long rv;
 
-    rv = _PD_wr_syment(file, vr, nitems, intype, outtype);
+    rv = _PD_wr_syment(file, vr, ni, intype, outtype);
 
     return(rv);}
 

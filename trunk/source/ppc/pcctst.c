@@ -16,7 +16,7 @@
 
 /* SEND_BINARY - do some binary data exchanges */
 
-static void send_binary(long nitems, char *type)
+static void send_binary(long ni, char *type)
    {int did;
     long i;
     PDBfile *file;
@@ -26,7 +26,7 @@ static void send_binary(long nitems, char *type)
 
     PRINT(stdout, ":B\n");
 
-    PRINT(stdout, "%s %ld\n", type, nitems);
+    PRINT(stdout, "%s %ld\n", type, ni);
 
 /* this is a testing mode check */
     tty = SC_get_terminal_process();
@@ -45,20 +45,20 @@ static void send_binary(long nitems, char *type)
        {file = pp->vif;
 	did  = SC_type_id(type, FALSE);
 
-	src = (double *) _PD_alloc_entry(file, SC_DOUBLE_S, nitems);
-	for (i = 0L; i < nitems; i++)
+	src = (double *) _PD_alloc_entry(file, SC_DOUBLE_S, ni);
+	for (i = 0L; i < ni; i++)
 	    src[i] = (double) i;
 
 	space = SC_convert_id(did, NULL, 0, 1,
-			      SC_DOUBLE_I, src, 0, 1, nitems, TRUE);
+			      SC_DOUBLE_I, src, 0, 1, ni, TRUE);
 
-	if (PC_write(space, type, nitems, pp))
+	if (PC_write(space, type, ni, pp))
 	   printf("Binary data sent: %s %ld\n",
-		  type, nitems);
+		  type, ni);
 
 	else
 	   printf("Binary data send failed: %s %ld\n",
-		  type, nitems);
+		  type, ni);
 
 	PRINT(stdout, ":A\n");
 

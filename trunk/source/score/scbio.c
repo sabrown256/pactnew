@@ -1076,12 +1076,12 @@ static long _SC_btell(FILE *fp)
 
 /* _SC_BREAD - small file method for fread */
 
-static size_t _SC_bread(void *s, size_t bpi, size_t nitems, FILE *fp)
+static size_t _SC_bread(void *s, size_t bpi, size_t ni, FILE *fp)
    {size_t nr;
 
     ACCESS(fp);
 
-    nr = _SC_bio_in(s, bpi, nitems, bid);
+    nr = _SC_bio_in(s, bpi, ni, bid);
 
     return(nr);}
  
@@ -1090,7 +1090,7 @@ static size_t _SC_bread(void *s, size_t bpi, size_t nitems, FILE *fp)
 
 /* _SC_BWRITE - small file method for fwrite */
 
-static size_t _SC_bwrite(void *s, size_t bpi, size_t nitems, FILE *fp)
+static size_t _SC_bwrite(void *s, size_t bpi, size_t ni, FILE *fp)
    {size_t nw;
 
     ACCESS(fp);
@@ -1098,7 +1098,7 @@ static size_t _SC_bwrite(void *s, size_t bpi, size_t nitems, FILE *fp)
 /* turn off SIGIO handler */
     SC_catch_io_interrupts(FALSE);
 
-    nw = _SC_bio_out(s, bpi, nitems, bid);
+    nw = _SC_bio_out(s, bpi, ni, bid);
 
 /* turn on SIGIO handler */
     SC_catch_io_interrupts(SC_gs.io_interrupts_on);
@@ -1141,12 +1141,12 @@ static int64_t _SC_bltell(FILE *fp)
 
 /* _SC_BLREAD - large file method for fread */
 
-static uint64_t _SC_blread(void *s, size_t bpi, uint64_t nitems, FILE *fp)
+static uint64_t _SC_blread(void *s, size_t bpi, uint64_t ni, FILE *fp)
    {size_t nr;
 
     ACCESS(fp);
 
-    nr = _SC_bio_in(s, bpi, nitems, bid);
+    nr = _SC_bio_in(s, bpi, ni, bid);
 
     return(nr);}
  
@@ -1155,7 +1155,7 @@ static uint64_t _SC_blread(void *s, size_t bpi, uint64_t nitems, FILE *fp)
 
 /* _SC_BLWRITE - large file method for fwrite */
 
-static uint64_t _SC_blwrite(void *s, size_t bpi, uint64_t nitems, FILE *fp)
+static uint64_t _SC_blwrite(void *s, size_t bpi, uint64_t ni, FILE *fp)
    {size_t nw;
 
     ACCESS(fp);
@@ -1163,7 +1163,7 @@ static uint64_t _SC_blwrite(void *s, size_t bpi, uint64_t nitems, FILE *fp)
 /* turn off SIGIO handler */
     SC_catch_io_interrupts(FALSE);
 
-    nw = _SC_bio_out(s, bpi, nitems, bid);
+    nw = _SC_bio_out(s, bpi, ni, bid);
 
 /* turn on SIGIO handler */
     SC_catch_io_interrupts(SC_gs.io_interrupts_on);

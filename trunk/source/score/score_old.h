@@ -256,12 +256,12 @@ extern int
  SC_free_z(void *p, int zsp);
 
 extern void
- *SC_alloc(long nitems, long bpi, char *name),
- *SC_alloc_na(long nitems, long bpi, char *name, int na),
- *SC_alloc_nz(long nitems, long bpi, char *name, int na, int zsp),
- *SC_realloc(void *p, long nitems, long bpi),
- *SC_realloc_na(void *p, long nitems, long bpi, int na),
- *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp);
+ *SC_alloc(long ni, long bpi, char *name),
+ *SC_alloc_na(long ni, long bpi, char *name, int na),
+ *SC_alloc_nz(long ni, long bpi, char *name, int na, int zsp),
+ *SC_realloc(void *p, long ni, long bpi),
+ *SC_realloc_na(void *p, long ni, long bpi, int na),
+ *SC_realloc_nz(void *p, long ni, long bpi, int na, int zsp);
 
 
 /* former SCSTR.C declarations */

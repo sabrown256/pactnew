@@ -145,14 +145,14 @@
 #define SC_status(_p)                                                        \
    ((SC_process_alive(_p)) ? (_p)->statusp(_p) : SC_DEAD)
 
-#define SC_read(ptr, type, nitems, _p)                                       \
+#define SC_read(ptr, type, _ni, _p)                                          \
    ((((_p) != NULL) && ((_p)->read != NULL)) ?                               \
-    (_p)->read(ptr, type, nitems, _p) :                                      \
+    (_p)->read(ptr, type, _ni, _p) :                                         \
     -1)
 
-#define SC_write(ptr, type, nitems, _p)                                      \
+#define SC_write(ptr, type, _ni, _p)                                         \
    ((((_p) != NULL) && ((_p)->write != NULL)) ?                              \
-    (_p)->write(ptr, type, nitems, _p) :                                     \
+    (_p)->write(ptr, type, _ni, _p) :                                        \
     -1)
 
 

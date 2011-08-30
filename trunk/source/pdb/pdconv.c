@@ -406,12 +406,12 @@ data_alignment
 
 /*--------------------------------------------------------------------------*/
 
-/* _PD_NCOPY - copy the NITEMS of size BPI from IN to OUT */
+/* _PD_NCOPY - copy the NI of size BPI from IN to OUT */
 
-static void _PD_ncopy(char **out, char **in, long nitems, long bpi)
+static void _PD_ncopy(char **out, char **in, long ni, long bpi)
    {long nbytes;
 
-    nbytes = nitems*bpi;
+    nbytes = ni*bpi;
     memcpy(*out, *in, nbytes);
 
     *in  += nbytes;
@@ -467,7 +467,7 @@ static int _PD_get_bit(char *base, int offs, int nby, int *ord)
  *                 - sized sources
  */
 
-void _PD_sign_extend(char *out, long nitems, int nbo, int nbti, int *ord)
+void _PD_sign_extend(char *out, long ni, int nbo, int nbti, int *ord)
    {int i, j, sba, tsba, sign, indx;
     unsigned char *lout, mask;
 
@@ -480,7 +480,7 @@ void _PD_sign_extend(char *out, long nitems, int nbo, int nbti, int *ord)
        return;
 
     lout = (unsigned char *) out;
-    for (i = 0L; i < nitems; i++)
+    for (i = 0L; i < ni; i++)
         {sign = _PD_get_bit((char *) lout, sba, nbo, ord);
          tsba = sba;
          if (sign)
@@ -505,13 +505,13 @@ void _PD_sign_extend(char *out, long nitems, int nbo, int nbti, int *ord)
  *                     -       and therefore this is a one way conversion
  */
 
-void _PD_ones_complement(char *out, long nitems, int nbo, int *order)
+void _PD_ones_complement(char *out, long ni, int nbo, int *order)
    {int i, j, indx;
     unsigned int carry;
     unsigned char *lout;
 
     lout = (unsigned char *) out;
-    for (i = 0L; i < nitems; i++)
+    for (i = 0L; i < ni; i++)
         {indx = (order != NULL) ? order[0] - 1 : 0;
          if (lout[indx] & 0x80 )
 	    {carry = 1;
@@ -528,13 +528,13 @@ void _PD_ones_complement(char *out, long nitems, int nbo, int *order)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_BYTE_REVERSE - byte reverse nitems words
- *                 - each word is nb bytes long where nb is even
+/* PD_BYTE_REVERSE - byte reverse NI words
+ *                 - each word is NB bytes long where NB is even
  *
  * #bind PD_byte_reverse fortran() scheme() python()
  */
 
-void PD_byte_reverse(char *out, long nb, long nitems)
+void PD_byte_reverse(char *out, long nb, long ni)
    {long i, jl, jh, nbo2;
     char tmp;
     char *p1, *p2;
@@ -544,7 +544,7 @@ void PD_byte_reverse(char *out, long nb, long nitems)
         {jh = nb - jl - 1;
          p1 = out + jh;
          p2 = out + jl;
-	 for (i = 0L; i < nitems; i++)
+	 for (i = 0L; i < ni; i++)
              {tmp = *p1;
               *p1 = *p2;
               *p2 = tmp;
@@ -619,19 +619,19 @@ void _PD_insert_field(long inl, int nb, char *out,
 
 /* PD_PACK_BITS - pack an array that contains a bitstream
  *              - arguments are:
- *              -   ITYP    the target type of the data when unpacked
- *              -   NBITS   the number of bits per item
- *              -   PADSZ   the number of bits of pad preceding the fields
- *              -   FPP     the number of fields per pad
- *              -   NITEMS  the number of items expected
- *              -   OFFS    the bit offset of the first pad
+ *              -   ITYP   the target type of the data when unpacked
+ *              -   NBITS  the number of bits per item
+ *              -   PADSZ  the number of bits of pad preceding the fields
+ *              -   FPP    the number of fields per pad
+ *              -   NI     the number of items expected
+ *              -   OFFS   the bit offset of the first pad
  */
 
 int PD_pack_bits(char *out, char *in, int ityp, int nbits,
-		 int padsz, int fpp, long nitems, long offs)
+		 int padsz, int fpp, long ni, long offs)
    {long i, vl;
 
-    for (i = 0L; i < nitems; i++)
+    for (i = 0L; i < ni; i++)
         {SC_convert_id(SC_LONG_I, &vl, 0, 1, ityp, in, i, 1, 1, FALSE);
 	 _PD_insert_field(vl, nbits, out, offs, host_order, sizeof(long));
 	 offs += nbits;};
@@ -738,7 +738,7 @@ static void _PD_reorder(char *arr, long ni, int bpi, int *ord)
  *                - boundaries
  */
 
-static void _PD_byte_align(char *out, char *in, long nitems,
+static void _PD_byte_align(char *out, char *in, long ni,
 			   long *infor, int *inord, int boffs)
    {int chunk1, chunk2, outbytes, remainder, i;
     long nbitsin, inrem;
@@ -749,12 +749,12 @@ static void _PD_byte_align(char *out, char *in, long nitems,
 
     outbytes = (nbitsin >> 3) + 1;
  
-    memset(out, 0, nitems*outbytes);
+    memset(out, 0, ni*outbytes);
 
 /* develop logic for doing the unpack without regard to inord. */
     inptr  = (unsigned char *)in;
     outptr = (unsigned char *)out;
-    inrem  = nbitsin * nitems;
+    inrem  = nbitsin * ni;
     remainder = nbitsin % 8;
 
     chunk1 = min(8, nbitsin);
@@ -800,7 +800,7 @@ static void _PD_byte_align(char *out, char *in, long nitems,
 
 static void _PD_field_reorder(char *in, char *out, long *infor,
 			      long *outfor, int *inord, int lord,
-                              int lby, int nitems)
+                              int lby, int ni)
    {int nbi, nbo, nbi_exp, nbo_exp, bi_sign, bo_sign,
         bi_exp, bo_exp, bi_mant, bo_mant, inbytes,
         outbytes;
@@ -826,11 +826,11 @@ static void _PD_field_reorder(char *in, char *out, long *infor,
     outbytes  = (nbo + 7) >> 3;
 
 /* zero out the output buffer */
-    memset(out, 0, nitems*outbytes);
+    memset(out, 0, ni*outbytes);
 
     lout = out;
     lin  = in;
-    for (i = 0L; i < nitems; i++)
+    for (i = 0L; i < ni; i++)
 
 /* move the exponent over */
         {expn = SC_extract_field(lin, bi_exp, nbi_exp, inbytes, inord);
@@ -919,7 +919,7 @@ int _PD_prim_typep(char *memb, hasharr *chrt, PD_major_op error)
 
 /* _PD_BIN_TEXT - convert binary numbers to text */
 
-static void _PD_bin_text(char **out, char **in, char *typ, long nitems,
+static void _PD_bin_text(char **out, char **in, char *typ, long ni,
 			 int boffs,
 			 PD_type_kind kndi, long *ifmt, long nbi,
 			 PD_byte_order ordi, int *iord,
@@ -946,7 +946,7 @@ static void _PD_bin_text(char **out, char **in, char *typ, long nitems,
 
 /* convert char types */
     if (kndi == CHAR_KIND)
-       {nb = nitems*nbi;
+       {nb = ni*nbi;
 	if (delim == NULL)
 	   {snprintf(fmt, MAXLINE, "%%-%lds", nb);
 	    nc = nb;}
@@ -967,10 +967,10 @@ static void _PD_bin_text(char **out, char **in, char *typ, long nitems,
     else if (kndi == INT_KIND)
        {long *lv;
 
-	lv   = CMAKE_N(long, nitems);
+	lv   = CMAKE_N(long, ni);
 	tout = (char *) lv;
 
-	_PD_iconvert(&tout, in, nitems, nbi, ordi, nbl, ordl, onescmp, usg);
+	_PD_iconvert(&tout, in, ni, nbi, ordi, nbl, ordl, onescmp, usg);
 
 	if (delim == NULL)
 	   snprintf(fmt, MAXLINE, "%%%ldld", nbo);
@@ -978,21 +978,21 @@ static void _PD_bin_text(char **out, char **in, char *typ, long nitems,
 	   {snprintf(fmt, MAXLINE, "%%%ldld%s", nbo, delim);
 	    nbo += strlen(delim);};
 
-        for (p = lout, i = 0; i < nitems; p += nbo, i++)
+        for (p = lout, i = 0; i < ni; p += nbo, i++)
 	    snprintf(p, nbo+1, fmt, lv[i]);
 
 	CFREE(lv);
 
-	*out += nbo*nitems;}
+	*out += nbo*ni;}
 
 /* convert floating point types */
     else if (kndi == FLOAT_KIND)
        {double *dv;
 
-	dv   = CMAKE_N(double, nitems);
+	dv   = CMAKE_N(double, ni);
 	tout = (char *) dv;
 
-	_PD_fconvert(&tout, in, nitems, boffs,
+	_PD_fconvert(&tout, in, ni, boffs,
 		     ifmt, iord, hfmt, hord,
 		     ordl, nbl, onescmp);
 
@@ -1004,12 +1004,12 @@ static void _PD_bin_text(char **out, char **in, char *typ, long nitems,
 	   {snprintf(fmt, MAXLINE, "%%%d.%de%s", fl, nd, delim);
 	    nbo += strlen(delim);};
 
-        for (p = lout, i = 0; i < nitems; p += nbo, i++)
+        for (p = lout, i = 0; i < ni; p += nbo, i++)
 	    snprintf(p, nbo+1, fmt, dv[i]);
 
 	CFREE(dv);
 
-	*out += nbo*nitems;};
+	*out += nbo*ni;};
 
     return;}
 
@@ -1018,7 +1018,7 @@ static void _PD_bin_text(char **out, char **in, char *typ, long nitems,
 
 /* _PD_TEXT_BIN - convert text to binary numbers */
 
-static void _PD_text_bin(char **out, char **in, char *typ, long nitems,
+static void _PD_text_bin(char **out, char **in, char *typ, long ni,
 			 int boffs,
 			 PD_type_kind kndi, long *ifmt, long nbi,
 			 PD_byte_order ordi, int *iord,
@@ -1056,14 +1056,14 @@ static void _PD_text_bin(char **out, char **in, char *typ, long nitems,
 
 /* convert char types */
     if (kndi == CHAR_KIND)
-       {nb = nitems*nbo;
+       {nb = ni*nbo;
 	p  = strdelim(lin, delim);
 	if (p != NULL)
 	   {*p = '\0';
 	    nc = strlen(lin) + 1;
 	    ne = min(nb + 1, nc);}
 	else
-	   {nc = nitems*nbi;
+	   {nc = ni*nbi;
 	    ne = min(nb + 1, nc + 1);};
 
 	SC_strncpy(*out, ne, lin, -1);
@@ -1075,9 +1075,9 @@ static void _PD_text_bin(char **out, char **in, char *typ, long nitems,
     else if (kndi == INT_KIND)
        {long *lv;
 
-	lv = CMAKE_N(long, nitems);
+	lv = CMAKE_N(long, ni);
 
-        for (i = 0; i < nitems; i++)
+        for (i = 0; i < ni; i++)
 	    {p = strdelim(lin, delim);
 	     if (p != NULL)
 	        *p++ = '\0';
@@ -1087,7 +1087,7 @@ static void _PD_text_bin(char **out, char **in, char *typ, long nitems,
 	        lin++;};
 
 	tin = (char *) lv;
-	_PD_iconvert(out, &tin, nitems, nbl, ordl, nbo, ordo, onescmp, usg);
+	_PD_iconvert(out, &tin, ni, nbl, ordl, nbo, ordo, onescmp, usg);
 
 	CFREE(lv);}
 
@@ -1095,9 +1095,9 @@ static void _PD_text_bin(char **out, char **in, char *typ, long nitems,
     else if (kndi == FLOAT_KIND)
        {double *dv;
 
-	dv = CMAKE_N(double, nitems);
+	dv = CMAKE_N(double, ni);
 
-	for (i = 0; i < nitems; i++)
+	for (i = 0; i < ni; i++)
 	    {p = strdelim(lin, delim);
 	     if (p != NULL)
 	        *p++ = '\0';
@@ -1107,7 +1107,7 @@ static void _PD_text_bin(char **out, char **in, char *typ, long nitems,
 	        lin++;};
 
 	tin = (char *) dv;
-	_PD_fconvert(out, &tin, nitems, boffs,
+	_PD_fconvert(out, &tin, ni, boffs,
 		     hfmt, hord, ofmt, oord,
 		     ordl, nbl, onescmp);
 
@@ -1142,7 +1142,7 @@ static void _PD_text_bin(char **out, char **in, char *typ, long nitems,
  */
 
 static int _PD_convert_ptr(char **pout, char **pin, long *poo, long *pio,
-			   int nitems, hasharr *chi, hasharr *cho,
+			   int ni, hasharr *chi, hasharr *cho,
 			   data_standard *stdo, data_standard *stdi,
 			   data_standard *hstd, long iao, long iai)
    {int loc, fbpi, hbpi;
@@ -1155,7 +1155,7 @@ static int _PD_convert_ptr(char **pout, char **pin, long *poo, long *pio,
     nbo = stdo->ptr_bytes + iao;
     nbi = stdi->ptr_bytes + iai;
 
-    for (i = 0; i < nitems; i++)
+    for (i = 0; i < ni; i++)
         {n = 1L;
 	 if (hstd->file != NULL)
 	    {file = hstd->file;
@@ -1420,7 +1420,7 @@ static int _PD_conv_to_ita2(char *bf, long nb, long ni, int cstd)
 
 /*--------------------------------------------------------------------------*/
 
-/* _PD_ICONVERT - convert integers of nbi bytes to integers of nbo bytes
+/* _PD_ICONVERT - convert integers of NBI bytes to integers of NBO bytes
  *              - the number of bytes for each integer are given
  */
 

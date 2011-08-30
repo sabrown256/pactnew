@@ -387,7 +387,7 @@ unsigned char *PG_c_str_pascal(unsigned char *bf, char *s, long n, int pad)
 int PG_CGM_command(PG_device *dev, int cat, int id, int nparams, ...)
    {int i, j, ityp;
     int offs, special, morec, nitms;
-    int nitems[20], iv[20];
+    int ni[20], iv[20];
     int *piv[20];
     long abytes, nbytes, lbytes, nb;
     char *type[20], cv[20], *pcv[20], **ppcv[20];
@@ -401,12 +401,12 @@ int PG_CGM_command(PG_device *dev, int cat, int id, int nparams, ...)
     special = FALSE;
     offs    = 0;
     for (i = 0; i < nparams; i++)
-        {nitems[i] = SC_VA_ARG(int);
-         type[i]   = SC_VA_ARG(char *);
-	 lbytes    = 0;
+        {ni[i]   = SC_VA_ARG(int);
+         type[i] = SC_VA_ARG(char *);
+	 lbytes  = 0;
 
          if (type[i] == '\0')
-            {special = (nitems[i] > 0);
+            {special = (ni[i] > 0);
              break;}
 
          else
@@ -414,36 +414,36 @@ int PG_CGM_command(PG_device *dev, int cat, int id, int nparams, ...)
 
 /* fixed point types */
 	     if (ityp == SC_INT_I)
-	        {lbytes = nitems[i] << 1;
-		 if (nitems[i] == 1)
+	        {lbytes = ni[i] << 1;
+		 if (ni[i] == 1)
 		    iv[i] = SC_VA_ARG(int);
 		 else
 		    piv[i] = SC_VA_ARG(int *);}
 
 /* floating point types */
 	     else if (ityp == SC_DOUBLE_I)
-	        {lbytes = nitems[i] << 2;
-		 if (nitems[i] == 1)
+	        {lbytes = ni[i] << 2;
+		 if (ni[i] == 1)
 		    dv[i] = SC_VA_ARG(double);
 		 else
 		    pdv[i] = SC_VA_ARG(double *);}
 
 	     else if (ityp == SC_CHAR_I)
-	        {lbytes = nitems[i];
-		 if (nitems[i] == 1)
+	        {lbytes = ni[i];
+		 if (ni[i] == 1)
 		    cv[i] = SC_VA_ARG(int);
 		 else
 		    pcv[i] = SC_VA_ARG(char *);}
 
 	     else if (ityp == SC_STRING_I)
-	        {if (nitems[i] == 1)
+	        {if (ni[i] == 1)
 		    {pcv[i] = SC_VA_ARG(char *);
 		     if (pcv[i] != NULL)
 		        lbytes = strlen(pcv[i]) + 1;}
 		 else
 		    {ppcv[i] = SC_VA_ARG(char **);
 		     lbytes  = 0L;
-		     for (j = 0; j < nitems[i]; j++)
+		     for (j = 0; j < ni[i]; j++)
 		        {if (ppcv[i][j] != NULL)
 			    lbytes += strlen(ppcv[i][j]) + 1L;};};}
 
@@ -465,53 +465,53 @@ int PG_CGM_command(PG_device *dev, int cat, int id, int nparams, ...)
        abytes++;
 
 /* get the element header or partition header right */
-    nitms = special ? nitems[i] : 0;
+    nitms = special ? ni[i] : 0;
 
     PG_CGM_hdr(dev, cat, id, special, (long) nitms, nbytes);
 
     for (i = 0; i < nparams; i++)
         {morec = (i != nparams - 1);
          if (type[i] == NULL)
-            abytes -= PG_CGM_special(dev, nitems[i]);
+            abytes -= PG_CGM_special(dev, ni[i]);
 
          else
 	    {ityp = SC_type_id(type[i], FALSE);
 
 /* fixed point types */
 	     if (ityp == SC_INT_I)
-	        {if (nitems[i] == 1)
+	        {if (ni[i] == 1)
 		    abytes -= PG_CGM_word(dev, &iv[i], 1L,
 					  nbytes, morec);
 		 else
-		    abytes -= PG_CGM_word(dev, piv[i], (long) nitems[i],
+		    abytes -= PG_CGM_word(dev, piv[i], (long) ni[i],
 					  nbytes, morec);}
 
 /* floating point types */
 	     else if (ityp == SC_DOUBLE_I)
-	        {if (nitems[i] == 1)
+	        {if (ni[i] == 1)
 		    abytes -= PG_CGM_double(dev, &dv[i], 1L,
 					    nbytes, morec);
 		 else
-		    abytes -= PG_CGM_double(dev, pdv[i], (long) nitems[i],
+		    abytes -= PG_CGM_double(dev, pdv[i], (long) ni[i],
 					    nbytes, morec);}
 
 	     else if (ityp == SC_CHAR_I)
-	        {if (nitems[i] == 1)
+	        {if (ni[i] == 1)
 		    abytes -= PG_CGM_byte(dev, &cv[i], 1L,
 					  nbytes, morec);
 		 else
-		    abytes -= PG_CGM_byte(dev, pcv[i], (long) nitems[i],
+		    abytes -= PG_CGM_byte(dev, pcv[i], (long) ni[i],
 					  nbytes, morec);}
 
 	     else if (ityp == SC_STRING_I)
-	        {if (nitems[i] == 1)
+	        {if (ni[i] == 1)
 		    {nb =  PG_CGM_string(dev, &pcv[i], 1L,
 					 nbytes, morec, TRUE);
 		     if (nb == CGM_ERR)
 		        return(FALSE);
 		     abytes -= nb;}
 		 else
-		    {nb = PG_CGM_string(dev, ppcv[i], (long) nitems[i],
+		    {nb = PG_CGM_string(dev, ppcv[i], (long) ni[i],
 					nbytes, morec, TRUE);
 		     if (nb == CGM_ERR)
 		        return(FALSE);

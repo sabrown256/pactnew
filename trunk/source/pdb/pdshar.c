@@ -82,7 +82,7 @@ tr_layer *_PD_lookup(char *type)
 
 /* _PD_CONV_IN - convert some data to internal format */
 
-void _PD_conv_in(PDBfile *file, void *out, void *in, char *type, long nitems)
+void _PD_conv_in(PDBfile *file, void *out, void *in, char *type, long ni)
    {PD_smp_state *pa;
 
     pa = _PD_get_state(-1);
@@ -96,7 +96,7 @@ void _PD_conv_in(PDBfile *file, void *out, void *in, char *type, long nitems)
 	     memset(PD_err, 0, MAXLINE);
 	     break;};
 
-    PD_convert((char **) &out, (char **) &in, type, type, nitems,
+    PD_convert((char **) &out, (char **) &in, type, type, ni,
                file->std, file->host_std, file->host_std,
                file->chart, file->host_chart, 0, PD_TRACE);
 

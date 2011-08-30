@@ -62,8 +62,8 @@ extern PC_state
 /* PCBIN.C declarations */
 
 extern int
- _PC_bin_read(void *ptr, char *type, size_t nitems, PROCESS *pp),
- _PC_bin_write(void *ptr, char *type, size_t nitems, PROCESS *pp);
+ _PC_bin_read(void *ptr, char *type, size_t ni, PROCESS *pp),
+ _PC_bin_write(void *ptr, char *type, size_t ni, PROCESS *pp);
 
 
 /* PCPARC.C declarations */

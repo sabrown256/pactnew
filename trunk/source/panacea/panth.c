@@ -929,7 +929,7 @@ static char *_PA_type_mix(PDBfile *file, char *type)
 
 static int _PA_proc_rec(char *name, PDBfile *th, int ncpf, int recn)
    {int i, j, n, nc, nv, nptm;
-    long ns, na, nrd, nitems, offs, ind[3];
+    long ns, na, nrd, ni, offs, ind[3];
     int64_t addr;
     char bf[MAXLINE], rname[MAXLINE], type[MAXLINE], *rtyp, *tmix;
     double **crve;
@@ -972,8 +972,8 @@ static int _PA_proc_rec(char *name, PDBfile *th, int ncpf, int recn)
 /* find the maximum number of stripe laid out */
     ns = 0L;
     for (i = 0; i < n; i++)
-        {nitems = _PD_entry_get_number(ep, i);
-         ns     = max(ns, nitems);};
+        {ni = _PD_entry_get_number(ep, i);
+         ns = max(ns, ni);};
 
     stripe = _PD_alloc_entry(th, rtyp, ns);
 
@@ -988,16 +988,16 @@ static int _PA_proc_rec(char *name, PDBfile *th, int ncpf, int recn)
     na  = 0L;
     nrd = 0L;
     for (i = 0; i < n; i++)
-        {addr   = _PD_entry_get_address(ep, i);
-         nitems = _PD_entry_get_number(ep, i);
+        {addr = _PD_entry_get_address(ep, i);
+         ni   = _PD_entry_get_number(ep, i);
 
          if (lio_seek(fp, addr, SEEK_SET))
             {snprintf(PD_err, MAXLINE, "ERROR: SEEK FAILED - _PA_PROC_REC");
              return(FALSE);};
 
          _PD_entry_set_address(en, 0, addr);
-         _PD_entry_set_number(en, 0, nitems);
-	 en->number = nitems;
+         _PD_entry_set_number(en, 0, ni);
+	 en->number = ni;
 
          nrd += _PD_sys_read(th, en, rtyp, stripe);
 

@@ -14,12 +14,12 @@ void
  _SX_copy_indirection(SS_psides *si, PDBfile *file,
 		      char **vrin, char **vrout, char *type), 
  _SX_copy_leaf(SS_psides *si, PDBfile *file,
-	       char *vrin, char*vrout, long nitems, char *type);
+	       char *vrin, char*vrout, long ni, char *type);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_COPY_TREE - read NITEMS of TYPE from the PDBfile FILE
+/* _SX_COPY_TREE - read NI of TYPE from the PDBfile FILE
  *               - into the location pointed to by VR
  *               - return the number of items successfully read
  *               - type "char *" is special cased because we not sure
@@ -27,17 +27,17 @@ void
  */
 
 void _SX_copy_tree(SS_psides *si, PDBfile *file, char *vrin, char *vrout,
-		   long nitems, char *type)
+		   long ni, char *type)
    {long i;
     char **lvr, **lvo, *dtype;
 
     if (!_PD_indirection(type))
-       _SX_copy_leaf(si, file, vrin, vrout, nitems, type);
+       _SX_copy_leaf(si, file, vrin, vrout, ni, type);
     else
        {lvr = (char **) vrin;
         lvo = (char **) vrout;
         dtype = PD_dereference(CSTRSAVE(type));
-        for (i = 0L; i < nitems; i++)
+        for (i = 0L; i < ni; i++)
             _SX_copy_indirection(si, file, &lvr[i], &lvo[i], dtype);
         CFREE(dtype);};
 
@@ -53,7 +53,7 @@ void _SX_copy_tree(SS_psides *si, PDBfile *file, char *vrin, char *vrout,
 
 void _SX_copy_indirection(SS_psides *si, PDBfile *file,
 			  char **vrin, char **vrout, char *type)
-   {long nitems, bpi, nbytes;
+   {long ni, bpi, nbytes;
     char *pv;
 
     if (*vrin == NULL)
@@ -63,20 +63,20 @@ void _SX_copy_indirection(SS_psides *si, PDBfile *file,
         if ((bpi = _PD_lookup_size(type, file->host_chart)) == -1)
            SS_error(si, "CAN'T FIND NUMBER OF BYTES - _SX_COPY_INDIRECTION",
 		      SS_mk_string(si, type));
-        nitems = nbytes / bpi;
+        ni = nbytes / bpi;
 
-        pv = CMAKE_N(char, nitems*bpi);
+        pv = CMAKE_N(char, ni*bpi);
         DEREF(vrout) = pv;
 
         SC_arrtype(pv, SC_arrtype(*vrin, 0));
-        _SX_copy_tree(si, file, *vrin, pv, nitems, type);};
+        _SX_copy_tree(si, file, *vrin, pv, ni, type);};
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_COPY_LEAF - read NITEMS of TYPE from the PDBfile FILE
+/* _SX_COPY_LEAF - read NI of TYPE from the PDBfile FILE
  *               - into the location pointed to by VR
  *               - at this level it guaranteed that the type will
  *               - not be a pointer
@@ -84,7 +84,7 @@ void _SX_copy_indirection(SS_psides *si, PDBfile *file,
  */
 
 void _SX_copy_leaf(SS_psides *si, PDBfile *file, char *vrin, char *vrout,
-		   long nitems, char *type)
+		   long ni, char *type)
    {long i, bpi, sz, member_offs;
     char *mtype, *dtype, *svrin, *svrout;
     defstr *dp;
@@ -97,7 +97,7 @@ void _SX_copy_leaf(SS_psides *si, PDBfile *file, char *vrin, char *vrout,
        SS_error(si, "CAN'T GET NUMBER OF BYTES - _SX_COPY_LEAF",
 		  SS_mk_string(si, type));
 
-    memcpy(vrout, vrin, (int) nitems*bpi);
+    memcpy(vrout, vrin, (int) ni*bpi);
 
 /* if this was a derived type and some of its members are pointers
  * fetch in the pointered data
@@ -117,7 +117,7 @@ void _SX_copy_leaf(SS_psides *si, PDBfile *file, char *vrin, char *vrout,
 	   {sz     = dp->size;
 	    svrin  = vrin;
 	    svrout = vrout;
-	    for (i = 0L; i < nitems; i++, svrin += sz, svrout += sz)
+	    for (i = 0L; i < ni; i++, svrin += sz, svrout += sz)
 	        {for (desc = mem_lst; desc != NULL; desc = desc->next)
 		     {member_offs = desc->member_offs;
 		      SX_CAST_TYPE(si, mtype, desc,

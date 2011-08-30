@@ -15,7 +15,7 @@ static char
 
 static void
  _SX_find_data(SS_psides *si, hasharr *tytab, PDBfile *file, void *vr,
-	       long nitems, char *type);
+	       long ni, char *type);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -25,7 +25,7 @@ static void
  */
 
 static void _SX_find_leaf(SS_psides *si, hasharr *tytab, PDBfile *file,
-			  char *vr, long nitems, char *type)
+			  char *vr, long ni, char *type)
    {long i, sz;
     char *svr;
     defstr *defp;
@@ -45,7 +45,7 @@ static void _SX_find_leaf(SS_psides *si, hasharr *tytab, PDBfile *file,
 	   {SC_hasharr_install(tytab, type, TYPE, TYPE, TRUE, TRUE);
 	    sz  = defp->size;
 	    svr = vr;
-	    for (i = 0L; i < nitems; i++, svr += sz)
+	    for (i = 0L; i < ni; i++, svr += sz)
 	        {if (pdb_wr_hook != NULL)
 		    mem_lst = (*pdb_wr_hook)(file, svr, defp);
 
@@ -63,13 +63,13 @@ static void _SX_find_leaf(SS_psides *si, hasharr *tytab, PDBfile *file,
 
 static void _SX_find_indirection(SS_psides *si, hasharr *tytab,
 				 PDBfile *file,
-				 char **vr, long nitems, char *type)
+				 char **vr, long ni, char *type)
    {long i, ditems;
     char *dtype, *bf;
 
     dtype = PD_dereference(CSTRSAVE(type));
 
-    for (i = 0L; i < nitems; i++, vr++)
+    for (i = 0L; i < ni; i++, vr++)
         {ditems = _PD_number_refd(DEREF(vr), dtype, file->host_chart);
 
          if (ditems == -1L)
@@ -101,14 +101,14 @@ static void _SX_find_indirection(SS_psides *si, hasharr *tytab,
 /* _SX_FIND_DATA - locate part of a data element */
 
 static void _SX_find_data(SS_psides *si, hasharr *tytab, PDBfile *file,
-			  void *vr, long nitems, char *type)
+			  void *vr, long ni, char *type)
    {
 
 /* if the type is an indirection, follow the pointer */
     if (_PD_indirection(type))
-       _SX_find_indirection(si, tytab, file, (char **) vr, nitems, type);
+       _SX_find_indirection(si, tytab, file, (char **) vr, ni, type);
     else
-       _SX_find_leaf(si, tytab, file,  vr, nitems, type);
+       _SX_find_leaf(si, tytab, file,  vr, ni, type);
 
     return;}
 
@@ -119,7 +119,7 @@ static void _SX_find_data(SS_psides *si, hasharr *tytab, PDBfile *file,
 
 object *_SXI_find_types(SS_psides *si, object *arg)
    {char *type;
-    long nitems;
+    long ni;
     void *vr;
     hasharr *tytab;
     object *args, *obj;
@@ -129,18 +129,18 @@ object *_SXI_find_types(SS_psides *si, object *arg)
     if (!SX_PDBDATAP(arg))
        SS_error(si, "MUST BE PDBDATA - _SXI_FIND_TYPES", arg);
 
-    file   = PDBDATA_FILE(arg);
-    ep     = PDBDATA_EP(arg);
-    vr     = PDBDATA_DATA(arg);
-    type   = PD_entry_type(ep);
-    nitems = PD_entry_number(ep);
+    file = PDBDATA_FILE(arg);
+    ep   = PDBDATA_EP(arg);
+    vr   = PDBDATA_DATA(arg);
+    type = PD_entry_type(ep);
+    ni   = PD_entry_number(ep);
 
 /* create a hash table to put all of these types in */
     tytab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
     strcpy(TYPE, "type");
 
 /* fill the hash table with the types */
-    _SX_find_data(si, tytab, file, vr, nitems, type);
+    _SX_find_data(si, tytab, file, vr, ni, type);
 
 /* convert table to list */
     args = SS_mk_cons(si, SS_mk_hasharr(si, tytab), SS_null);

@@ -492,8 +492,8 @@ extern ssize_t
  SC_write_sigsafe(int fd, void *bf, size_t n);
 
 extern size_t
- SC_fread_sigsafe(void *s, size_t bpi, size_t nitems, FILE *fp),
- SC_fwrite_sigsafe(void *s, size_t bpi, size_t nitems, FILE *fp);
+ SC_fread_sigsafe(void *s, size_t bpi, size_t ni, FILE *fp),
+ SC_fwrite_sigsafe(void *s, size_t bpi, size_t ni, FILE *fp);
 
 
 /* SCMMAP.C declarations */

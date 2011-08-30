@@ -114,22 +114,22 @@ typedef enum e_PD_instr_rdwr PD_instr_rdwr;
  */
 
 long _PD_number_refd(void *vr, char *type, hasharr *tab)
-   {long bpi, nitems;
+   {long bpi, ni;
 
     if (vr == NULL)
        return(0L);
 
-    nitems = SC_arrlen(vr);
-    if (nitems <= 0)
+    ni = SC_arrlen(vr);
+    if (ni <= 0)
        return(-1L);
 
     bpi = _PD_lookup_size(type, tab);
     if (bpi == -1)
        return(-2L);
 
-    nitems /= bpi;
+    ni /= bpi;
 
-    return(nitems);}
+    return(ni);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -637,18 +637,18 @@ static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype,
 static char *_PD_write_hyper_vif(PDBfile *file, char *in, char *intype, 
 				 syment *ep, int hbyt, int fbyt,
 				 int64_t addr, int64_t stop, long step)
-   {long nitems;
+   {long ni;
     char *outtype;
 
     outtype = PD_entry_type(ep);
 
 /* items logically contiguous */
     if (step == fbyt)
-       {nitems = (stop - addr)/step + 1L;
+       {ni = (stop - addr)/step + 1L;
 
 	_PD_set_current_address(file, addr, SEEK_SET, PD_WRITE);
 
-	_PD_sys_write(file, in, nitems, intype, outtype);}
+	_PD_sys_write(file, in, ni, intype, outtype);}
 
 /* items logically discontiguous */
     else
@@ -674,7 +674,7 @@ static char *_PD_write_hyper_vif(PDBfile *file, char *in, char *intype,
 static char *_PD_write_hyper_space(PDBfile *file, char *in, char *intype, 
 				   syment *ep, int hbyt, int fbyt,
 				   int64_t addr, int64_t stop, long step)
-   {long n, nb, niw, nitems;
+   {long n, nb, niw, ni;
     int64_t eaddr;
     char *outtype;
     SC_array *bl;
@@ -687,10 +687,10 @@ static char *_PD_write_hyper_space(PDBfile *file, char *in, char *intype,
 
 /* items logically contiguous */
     if (step == fbyt)
-       {nitems = (stop - addr)/step + 1L;
+       {ni = (stop - addr)/step + 1L;
 
 /* get writes across blocks correct */
-        while (nitems > 0)
+        while (ni > 0)
            {eaddr = addr;
 
 /* adjust the address for the correct block */
@@ -705,16 +705,16 @@ static char *_PD_write_hyper_space(PDBfile *file, char *in, char *intype,
  */
             if ((eaddr == 0) || (nb == 0))
                {eaddr = addr;
-                nb    = nitems;};
+                nb    = ni;};
 
-            niw = min(nb, nitems);
+            niw = min(nb, ni);
 
             _PD_sys_write(file, in, niw, intype, outtype);
 	    _PD_block_set_valid(ep->blocks, n, PD_BLOCK_INVALID);
 
-            nitems -= niw;
-            addr   += fbyt*niw;
-            in     += hbyt*niw;};}
+            ni   -= niw;
+            addr += fbyt*niw;
+            in   += hbyt*niw;};}
 
 /* items logically discontiguous */
     else
@@ -858,7 +858,7 @@ int64_t _PD_annotate_text(PDBfile *file, syment *ep, char *name,
  *               - lists
  */
 
-long _PD_wr_syment(PDBfile *file, char *vr, long nitems,
+long _PD_wr_syment(PDBfile *file, char *vr, long ni,
 		   char *intype, char *outtype)
    {int dst, size, indir, count, itags;
     long i;
@@ -903,7 +903,7 @@ long _PD_wr_syment(PDBfile *file, char *vr, long nitems,
     START
 
     case LEAF :
-         _PD_wr_leaf_members(file, litype, lotype, nitems, vr);
+         _PD_wr_leaf_members(file, litype, lotype, ni, vr);
 
          dp = PD_inquire_host_type(file, litype);
          if (dp == NULL)
@@ -926,7 +926,7 @@ long _PD_wr_syment(PDBfile *file, char *vr, long nitems,
          i    = 0L;
 
     case LEAF_ITEM :
-         if (i >= nitems)
+         if (i >= ni)
             GO_CONT;
 
          desc = mem_lst;
@@ -947,8 +947,8 @@ long _PD_wr_syment(PDBfile *file, char *vr, long nitems,
              desc = desc->next;
              GO(LEAF_INDIR);};
 
-         SAVE_I(nitems);
-         nitems = desc->number;
+         SAVE_I(ni);
+         ni = desc->number;
 
          SAVE_I(i);
          SAVE_I(size);
@@ -966,7 +966,7 @@ long _PD_wr_syment(PDBfile *file, char *vr, long nitems,
          RESTORE_P(memdes, mem_lst);
          RESTORE_I(size);
          RESTORE_I(i);
-         RESTORE_I(nitems);
+         RESTORE_I(ni);
          RESTORE_S(litype);
 
          desc = desc->next;
@@ -986,7 +986,7 @@ long _PD_wr_syment(PDBfile *file, char *vr, long nitems,
          i = 0L;
 
     case INDIR_ITEM :
-         if (i >= nitems)
+         if (i >= ni)
             {RESTORE_S(litype);
              GO_CONT;};
 
@@ -999,22 +999,22 @@ long _PD_wr_syment(PDBfile *file, char *vr, long nitems,
              vr += sizeof(char *);
              GO(INDIR_ITEM);};
 
-         SAVE_I(nitems);
-         nitems = _PD_number_refd(vr, litype, file->host_chart);
-         if (nitems == -1L)
+         SAVE_I(ni);
+         ni = _PD_number_refd(vr, litype, file->host_chart);
+         if (ni == -1L)
             {snprintf(bf, MAXLINE,
                       "CAN'T GET POINTER LENGTH ON %s - _PD_WR_SYMENT",
                      litype);
              PD_error(bf, PD_WRITE);};
 
-         if (nitems == -2L)
+         if (ni == -2L)
             {snprintf(bf, MAXLINE,
                       "UNKNOWN TYPE %s - _PD_WR_SYMENT",
                      litype);
              PD_error(bf, PD_WRITE);};
 
-         if (_PD_ptr_wr_itags(file, vr, nitems, litype) == FALSE)
-            {RESTORE_I(nitems);
+         if (_PD_ptr_wr_itags(file, vr, ni, litype) == FALSE)
+            {RESTORE_I(ni);
              RESTORE_P(char, vr);
              i++;
              vr += sizeof(char *);
@@ -1027,7 +1027,7 @@ long _PD_wr_syment(PDBfile *file, char *vr, long nitems,
     case INDIR_RET :
          RESTORE_S(lotype);
          RESTORE_I(i);
-         RESTORE_I(nitems);
+         RESTORE_I(ni);
          RESTORE_P(char, vr);
 
          i++;
@@ -1044,7 +1044,7 @@ long _PD_wr_syment(PDBfile *file, char *vr, long nitems,
          if (_PD_IS_MASTER(file))
             file->chrtaddr = _PD_eod(file);
 
-         return(nitems);
+         return(ni);
 
     FINISH("_PD_WR_SYMENT", PD_WRITE);}
 
@@ -1151,7 +1151,7 @@ static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
 				int hbyt, int fbyt, 
                                 int64_t addr, int64_t stop, long step)
    {int nrd, nr;
-    long n, nb, nitems;
+    long n, nb, ni;
     int64_t eaddr; 
     char *intype;
     SC_array *bl, *blo;
@@ -1174,8 +1174,8 @@ static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
 	   {long niw;
 
 /* read across blocks */
-	    nitems = (stop - addr)/step + 1L;
-	    while (nitems > 0)
+	    ni = (stop - addr)/step + 1L;
+	    while (ni > 0)
 	       {eaddr = addr;
 		n = _PD_effective_addr(&eaddr, &nb, fbyt, blo);
 
@@ -1186,9 +1186,9 @@ static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
  */
 		if ((eaddr == 0) || (nb == 0))
 		   {eaddr = addr;
-		    nb    = nitems;};
+		    nb    = ni;};
 
-		niw = min(nitems, nb);
+		niw = min(ni, nb);
 
 		_PD_block_set_desc(eaddr, niw, bl, 0);
 		ep->number = niw;
@@ -1199,9 +1199,9 @@ static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
 		   nr = _PD_sys_read(file, ep, outtype, out);
 		nrd += nr;
 
-		nitems -= niw;
-		addr   += fbyt*niw;
-		out    += hbyt*niw;};}
+		ni   -= niw;
+		addr += fbyt*niw;
+		out  += hbyt*niw;};}
 
 /* items not logically contiguous */
         else
@@ -1226,13 +1226,13 @@ static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
 
 /* items logically contiguous */
 	else if (step == -dpf->size_bits)
-	   {nitems = (stop - addr)/step + 1L;
+	   {ni = (stop - addr)/step + 1L;
 
 /* NOTE: multi-block bitstreams are not supported */
-	    ep->number = nitems;
+	    ep->number = ni;
 	    PD_entry_set_address(ep, addr);
 	    nrd += _PD_sys_read(file, ep, outtype, out);
-	    out += hbyt*nitems;}
+	    out += hbyt*ni;}
 
 /* items not logically contiguous */
 	else
@@ -1315,7 +1315,7 @@ static int _PD_rd_hyper_index(PDBfile *file, char *name,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_RD_LEAF_MEMBERS - read the leaves only for NITEMS of INTYPE
+/* _PD_RD_LEAF_MEMBERS - read the leaves only for NI of INTYPE
  *                     - from the PDBfile FILE
  *                     - into the location pointed to by VR as type OUTTYPE
  *                     - at this level it guaranteed that the type
@@ -1323,7 +1323,7 @@ static int _PD_rd_hyper_index(PDBfile *file, char *name,
  *                     - return the number of items successfully read
  */
 
-static void _PD_rd_leaf_members(PDBfile *file, char *vr, long nitems, 
+static void _PD_rd_leaf_members(PDBfile *file, char *vr, long ni, 
                                 char *intype, char *outtype, int boffs)
    {int ipt, nbt, cnv;
     long bpi, nir, nia, nb;
@@ -1348,7 +1348,7 @@ static void _PD_rd_leaf_members(PDBfile *file, char *vr, long nitems,
     else
        cnv = ((dpf->convert > 0) || (strcmp(intype, outtype) != 0));
 
-    nitems *= ipt;
+    ni *= ipt;
 
     if (bpi == -1)
        PD_error("CAN'T FIND NUMBER OF BYTES - _PD_RD_LEAF_MEMBERS", PD_READ);
@@ -1356,10 +1356,10 @@ static void _PD_rd_leaf_members(PDBfile *file, char *vr, long nitems,
     else if (cnv == TRUE)
        {nbt = dpf->size_bits;
 	if (nbt != 0)
-           nia = (((nitems*nbt + boffs + SC_BITS_BYTE - 1) / 
+           nia = (((ni*nbt + boffs + SC_BITS_BYTE - 1) / 
 		   SC_BITS_BYTE) + bpi - 1)/bpi;
 	else
-	   nia = nitems;
+	   nia = ni;
 
 	nb = nia*bpi;
 
@@ -1377,7 +1377,7 @@ static void _PD_rd_leaf_members(PDBfile *file, char *vr, long nitems,
         if (nir == nia)
            {in  = bf;
             out = vr;
-            PD_convert(&out, &in, intype, outtype, nitems,
+            PD_convert(&out, &in, intype, outtype, ni,
                        file->std, file->host_std, file->host_std,
                        file->chart, file->host_chart,
 		       boffs, PD_READ);
@@ -1387,8 +1387,8 @@ static void _PD_rd_leaf_members(PDBfile *file, char *vr, long nitems,
             PD_error("FILE READ FAILED - _PD_RD_LEAF_MEMBERS", PD_READ);};}
 
     else
-       {nir = lio_read(vr, (size_t) bpi, (size_t) nitems, fp);
-        if (nir != nitems)
+       {nir = lio_read(vr, (size_t) bpi, (size_t) ni, fp);
+        if (nir != ni)
            PD_error("DATA READ FAILED - _PD_RD_LEAF_MEMBERS", PD_READ);};
 
     return;}
@@ -1556,7 +1556,7 @@ int _PD_hyper_read(PDBfile *file, char *name, char *outtype,
  *              -   FILE    the PDBfile to use
  *              -   NAME    the name of the variable in the file
  *              -   TYPE    the target type of the data when unpacked
- *              -   NITEMS  the number of items requested
+ *              -   NI      the number of items requested
  *              -   SGNED   TRUE if the data type is signed
  *              -   NBITS   the number of bits per item
  *              -   PADSZ   the number of bits of pad preceding the fields
@@ -1569,12 +1569,12 @@ int _PD_hyper_read(PDBfile *file, char *name, char *outtype,
  */
 
 int PD_read_bits(PDBfile *file ARG(,,cls),
-		 char *name, char *type, long nitems,
+		 char *name, char *type, long ni,
 		 int sgned, int nbits, int padsz, int fpp,
 		 long offs, long *pan, char **pdata)
    {int ret;
 
-    ret = _PD_rd_bits(file, name, type, nitems, sgned, nbits,
+    ret = _PD_rd_bits(file, name, type, ni, sgned, nbits,
 		      padsz, fpp, offs, pan, pdata);
 
     return(ret);}
@@ -1691,7 +1691,7 @@ int _PD_rd_bits(PDBfile *file, char *name, char *type, long nitems,
 
 long _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
    {int dst, vif, size, boffs, count, itags;
-    long i, n, nitems, bpi, nrd;
+    long i, n, ni, bpi, nrd;
     long loc;
     int64_t addr, eaddr;
     char bf[MAXLINE];
@@ -1715,7 +1715,7 @@ long _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
     litype  = NULL;
     lotype  = NULL;
     size    = 0;
-    nitems  = 0;
+    ni  = 0;
 
     vif   = file->virtual_internal;
     itags = file->use_itags;
@@ -1755,7 +1755,7 @@ long _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
          if (i >= n)
             {GO_CONT;};
 
-         _PD_block_get_desc(&addr, &nitems, bl, i);
+         _PD_block_get_desc(&addr, &ni, bl, i);
 
 /* all directories have an address of -1 which unsigned is INT_MAX */
          addr = (addr == INT_MAX) ? 0 : addr;
@@ -1783,7 +1783,7 @@ long _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
          RESTORE_I(n);
          RESTORE_I(i);
 
-         pv += nitems*bpi;
+         pv += ni*bpi;
          i++;
 
          GO(BLOCK_ITEM);
@@ -1793,17 +1793,17 @@ long _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
             {SC_address ad;
 
              ad.diskaddr = addr;
-             memcpy(pv, ad.memaddr, nitems*bpi);
+             memcpy(pv, ad.memaddr, ni*bpi);
 /*
-	     nrd += nitems;
+	     nrd += ni;
 	     GO_CONT;
 */
 	     }
 
          else
-            _PD_rd_leaf_members(file, pv, nitems, litype, lotype, boffs);
+            _PD_rd_leaf_members(file, pv, ni, litype, lotype, boffs);
 
-         nrd += nitems;
+         nrd += ni;
 
 /* the host type must be used to get the correct member offsets for the
  * in memory copy - the file ones might be wrong!!
@@ -1827,7 +1827,7 @@ long _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
          i    = 0L;
 
     case LEAF_ITEM :
-         if (i >= nitems)
+         if (i >= ni)
             GO_CONT;
 
          desc = mem_lst;
@@ -1869,9 +1869,9 @@ long _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
          i   = 0L;
 
     case INDIR_ITEM :
-         if (i >= nitems)
+         if (i >= ni)
             {RESTORE_P(char, pv);
-             nrd += nitems;
+             nrd += ni;
              GO_CONT;};
 
          SAVE_I(i);
@@ -1910,9 +1910,9 @@ long _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
 
 /* now read the data */
          SAVE_I(nrd);
-         SAVE_I(nitems);
+         SAVE_I(ni);
 
-         nitems = pi.nitems;
+         ni     = pi.nitems;
          addr   = pi.addr;
          loc    = pi.flag;
 
@@ -1930,7 +1930,7 @@ long _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
          RESTORE_I(addr);
          RESTORE_S(lotype);
          RESTORE_S(litype);
-         RESTORE_I(nitems);
+         RESTORE_I(ni);
          RESTORE_I(nrd);
 
          _PD_ptr_rd_install_addr(file, addr, loc);
