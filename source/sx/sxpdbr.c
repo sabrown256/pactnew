@@ -14,9 +14,9 @@ static void
  _SX_rd_indirection_list(SS_psides *si, object *obj, PDBfile *file,
 			 char **vr, char *type),
  _SX_rd_io_list(SS_psides *si, object *obj,
-		char *vr, long nitems, defstr *dp),
+		char *vr, long ni, defstr *dp),
  _SX_rd_leaf_list(SS_psides *si, object *obj, PDBfile *file, char *vr,
-		  long nitems, char *type, dimdes *dims);
+		  long ni, char *type, dimdes *dims);
 
 syment
  *_SX_rd_data(SS_psides *si, PDBfile *file,
@@ -26,24 +26,24 @@ syment
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_RD_TREE_LIST - read NITEMS of TYPE from the PDBfile FILE
+/* _SX_RD_TREE_LIST - read NI of TYPE from the PDBfile FILE
  *                  - into the location pointed to by VR
  *                  - return the number of items successfully read
  */
 
 void _SX_rd_tree_list(SS_psides *si, object *obj, PDBfile *file,
-		      char *vr, long nitems,
+		      char *vr, long ni,
 		      char *type, dimdes *dims)
    {long i;
     char **lvr;
     char *dtype;
 
     if (!_PD_indirection(type))
-       _SX_rd_leaf_list(si, obj, file, vr, nitems, type, dims);
+       _SX_rd_leaf_list(si, obj, file, vr, ni, type, dims);
     else
        {lvr = (char **) vr;
         dtype = PD_dereference(CSTRSAVE(type));
-        for (i = 0L; i < nitems; i++, obj = SS_cdr(si, obj))
+        for (i = 0L; i < ni; i++, obj = SS_cdr(si, obj))
             _SX_rd_indirection_list(si, SS_car(si, obj), file, &lvr[i], dtype);
         CFREE(dtype);};
 
@@ -59,12 +59,12 @@ void _SX_rd_tree_list(SS_psides *si, object *obj, PDBfile *file,
 
 static void _SX_rd_indirection_list(SS_psides *si, object *obj, PDBfile *file,
 				    char **vr, char *type)
-   {long bpi, nitems;
+   {long bpi, ni;
     char *pv;
 
-    nitems = _SS_get_object_length(si, obj);
+    ni = _SS_get_object_length(si, obj);
 
-    if (nitems == 0L)
+    if (ni == 0L)
        *vr = NULL;
     else
        {bpi = _PD_lookup_size(type, file->host_chart);
@@ -73,17 +73,17 @@ static void _SX_rd_indirection_list(SS_psides *si, object *obj, PDBfile *file,
 		      "CAN'T FIND NUMBER OF BYTES - _SX_RD_INDIRECTION_LIST",
 		      SS_null);
 
-	pv = CMAKE_N(char, nitems*bpi);
+	pv = CMAKE_N(char, ni*bpi);
         DEREF(vr) = pv;
 
-        _SX_rd_tree_list(si, obj, file, pv, nitems, type, (dimdes *) NULL);};
+        _SX_rd_tree_list(si, obj, file, pv, ni, type, (dimdes *) NULL);};
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_RD_LEAF_LIST - read NITEMS of TYPE from the PDBfile FILE
+/* _SX_RD_LEAF_LIST - read NI of TYPE from the PDBfile FILE
  *                  - into the location pointed to by VR
  *                  - at this level it guaranteed that the type will
  *                  - not be a pointer
@@ -91,7 +91,7 @@ static void _SX_rd_indirection_list(SS_psides *si, object *obj, PDBfile *file,
  */
 
 static void _SX_rd_leaf_list(SS_psides *si, object *obj, PDBfile *file,
-			     char *vr, long nitems, char *type, dimdes *dims)
+			     char *vr, long ni, char *type, dimdes *dims)
    {long i, sz;
     defstr *dp;
     memdes *desc, *mem_lst;
@@ -113,13 +113,13 @@ static void _SX_rd_leaf_list(SS_psides *si, object *obj, PDBfile *file,
 	if (mem_lst == NULL)
 
 /* use dp->type to get past typedef's */
-	   _SX_rd_io_list(si, obj, vr, nitems, dp);
+	   _SX_rd_io_list(si, obj, vr, ni, dp);
 
 /* for an array of structs write the indirects for each array element */
 	else
 	   {sz  = dp->size;
 	    svr = vr;
-	    for (i = 0L; i < nitems; i++, svr += sz, obj  = SS_cdr(si, obj))
+	    for (i = 0L; i < ni; i++, svr += sz, obj  = SS_cdr(si, obj))
 	        {obj1 = SS_car(si, obj);
 	       
 		 for (desc = mem_lst; desc != NULL; desc = desc->next)
@@ -144,12 +144,12 @@ static void _SX_rd_leaf_list(SS_psides *si, object *obj, PDBfile *file,
  */
 
 static void _SX_rd_io_list(SS_psides *si, object *obj,
-			   char *vr, long nitems, defstr *dp)
+			   char *vr, long ni, defstr *dp)
    {char *type;
 
     type = dp->type;
 
-    _SS_list_to_numtype(si, type, vr, nitems, obj);
+    _SS_list_to_numtype(si, type, vr, ni, obj);
 
     return;}
 

@@ -12,8 +12,8 @@
 #include "scope_mem.h"
 
 void
- *(*SC_make_hook)(long nitems, long bpi, char *name, int na) = SC_alloc_na,
- *(*SC_remake_hook)(void *p, long nitems, long bpi, int na)  = SC_realloc_na;
+ *(*SC_make_hook)(long ni, long bpi, char *name, int na) = SC_alloc_na,
+ *(*SC_remake_hook)(void *p, long ni, long bpi, int na)  = SC_realloc_na;
 
 int
  (*SC_sfree_hook)(void *p) = SC_free;
@@ -25,7 +25,7 @@ int
  *          - system to store extra information about the allocated spaces
  */
 
-void *SC_alloc(long nitems, long bpi, char *name)
+void *SC_alloc(long ni, long bpi, char *name)
    {void *rv;
     SC_mem_opt opt;
 
@@ -39,7 +39,7 @@ void *SC_alloc(long nitems, long bpi, char *name)
     opt.where.pfile = NULL;
     opt.where.line  = -1;
 
-    rv = _SC_ALLOC_N(nitems, bpi, &opt);
+    rv = _SC_ALLOC_N(ni, bpi, &opt);
 
     return(rv);}
 
@@ -52,7 +52,7 @@ void *SC_alloc(long nitems, long bpi, char *name)
  *             - will not show up in the bytes allocated count
  */
 
-void *SC_alloc_na(long nitems, long bpi, char *name, int na)
+void *SC_alloc_na(long ni, long bpi, char *name, int na)
    {void *p;
     SC_mem_opt opt;
 
@@ -66,7 +66,7 @@ void *SC_alloc_na(long nitems, long bpi, char *name, int na)
     opt.where.pfile = NULL;
     opt.where.line  = -1;
 
-    p = _SC_ALLOC_N(nitems, bpi, &opt);
+    p = _SC_ALLOC_N(ni, bpi, &opt);
 
     return(p);}
 
@@ -81,7 +81,7 @@ void *SC_alloc_na(long nitems, long bpi, char *name, int na)
  *             - see SC_zero_space_n for values
  */
 
-void *SC_alloc_nz(long nitems, long bpi, char *name, int na, int zsp)
+void *SC_alloc_nz(long ni, long bpi, char *name, int na, int zsp)
    {void *p;
     SC_mem_opt opt;
 
@@ -95,7 +95,7 @@ void *SC_alloc_nz(long nitems, long bpi, char *name, int na, int zsp)
     opt.where.pfile = NULL;
     opt.where.line  = -1;
 
-    p = _SC_ALLOC_N(nitems, bpi, &opt);
+    p = _SC_ALLOC_N(ni, bpi, &opt);
 
     return(p);}
 
@@ -106,7 +106,7 @@ void *SC_alloc_nz(long nitems, long bpi, char *name, int na, int zsp)
  *            - system to store extra information about the allocated spaces
  */
 
-void *SC_realloc(void *p, long nitems, long bpi)
+void *SC_realloc(void *p, long ni, long bpi)
    {void *rv;
     SC_mem_opt opt;
 
@@ -120,7 +120,7 @@ void *SC_realloc(void *p, long nitems, long bpi)
     opt.where.pfile = NULL;
     opt.where.line  = -1;
 
-    rv = _SC_REALLOC_N(p, nitems, bpi, &opt);
+    rv = _SC_REALLOC_N(p, ni, bpi, &opt);
 
     return(rv);}
 
@@ -133,7 +133,7 @@ void *SC_realloc(void *p, long nitems, long bpi)
  *               - will not show up in the bytes allocated count
  */
 
-void *SC_realloc_na(void *p, long nitems, long bpi, int na)
+void *SC_realloc_na(void *p, long ni, long bpi, int na)
    {void *rv;
     SC_mem_opt opt;
 
@@ -147,7 +147,7 @@ void *SC_realloc_na(void *p, long nitems, long bpi, int na)
     opt.where.pfile = NULL;
     opt.where.line  = -1;
 
-    rv = _SC_REALLOC_N(p, nitems, bpi, &opt);
+    rv = _SC_REALLOC_N(p, ni, bpi, &opt);
 
     return(rv);}
 
@@ -162,7 +162,7 @@ void *SC_realloc_na(void *p, long nitems, long bpi, int na)
  *               - see SC_zero_space_n for values
  */
 
-void *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp)
+void *SC_realloc_nz(void *p, long ni, long bpi, int na, int zsp)
    {void *rv;
     SC_mem_opt opt;
 
@@ -176,7 +176,7 @@ void *SC_realloc_nz(void *p, long nitems, long bpi, int na, int zsp)
     opt.where.pfile = NULL;
     opt.where.line  = -1;
 
-    rv = _SC_REALLOC_N(p, nitems, bpi, &opt);
+    rv = _SC_REALLOC_N(p, ni, bpi, &opt);
 
     return(rv);}
 

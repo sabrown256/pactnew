@@ -401,7 +401,7 @@ struct s_tr_layer
 struct s_sys_layer
    {long (*read)(PDBfile *file, syment *ep,
 		 char *outtype, void *vr);
-    long (*write)(PDBfile *file, char *vr, long nitems,
+    long (*write)(PDBfile *file, char *vr, long ni,
 		  char *intype, char *outtype);};
 
 /*
@@ -466,7 +466,7 @@ struct s_PDBfile
     int (*wr_prim_types)(FILE *fp, hasharr *tab);
     int (*rd_prim_types)(PDBfile *file, char *bf);
 
-    int (*wr_itag)(PDBfile *file, long n, long nitems, char *type,
+    int (*wr_itag)(PDBfile *file, long n, long ni, char *type,
 		   int64_t addr, int flag);
     int (*rd_itag)(PDBfile *file, char *p, PD_itag *pi);
 
@@ -910,14 +910,14 @@ extern void
 
 extern defstr
  *PD_typedef(PDBfile *file, char *oname, char *tname),
- *PD_defncv(PDBfile *file, char *name, long bytespitem, int align),
+ *PD_defncv(PDBfile *file, char *name, long bpi, int align),
  *PD_defchr(PDBfile *file, char *name, long bpi, int align,
 	    PD_byte_order ord, int unsgned),
- *PD_defix(PDBfile *file, char *name, long bytespitem, int align,
+ *PD_defix(PDBfile *file, char *name, long bpi, int align,
 	   PD_byte_order flg),
- *PD_defixnum(PDBfile *file, char *name, long bytespitem, int align,
+ *PD_defixnum(PDBfile *file, char *name, long bpi, int align,
 	      PD_byte_order ord, int unsgned, int onescmp),
- *PD_defloat(PDBfile *file, char *name, long bytespitem, int align,
+ *PD_defloat(PDBfile *file, char *name, long bpi, int align,
 	     int *ordr, long expb, long mantb, long sbs, long sbe,
 	     long sbm, long hmb, long bias),
  *PD_defstr(PDBfile *file, char *name, ...),
@@ -950,7 +950,7 @@ extern void
 
 extern void
  _PD_rl_syment_d(syment *ep),
- *_PD_alloc_entry(PDBfile *file, char *type, long nitems);
+ *_PD_alloc_entry(PDBfile *file, char *type, long ni);
 
 
 /* PDBDIR.C declarations */
@@ -989,15 +989,15 @@ extern int
 /* PDBNET.C declarations */
 
 extern void
- PN_conv_in(void *out, void *in, char *type, long nitems,
+ PN_conv_in(void *out, void *in, char *type, long ni,
 	    hasharr *in_chart),
- PN_conv_out(void *out, void *in, char *type, long nitems,
+ PN_conv_out(void *out, void *in, char *type, long ni,
           hasharr *out_chart);
 
 extern int
  PN_close(PDBfile *file),
- PN_write(PDBfile *file, char *type, long nitems, void *vr),
- PN_read(PDBfile *file, char *type, long nitems, void *vr);
+ PN_write(PDBfile *file, char *type, long ni, void *vr),
+ PN_read(PDBfile *file, char *type, long ni, void *vr);
 
 extern PDBfile
  *PN_open(PDBfile *fm, char *bf);
@@ -1060,11 +1060,11 @@ extern PD_image
 /* PDCONV.C declarations */
 
 extern void
- PD_byte_reverse(char *out, long nb, long nitems);
+ PD_byte_reverse(char *out, long nb, long ni);
 
 extern int
  PD_convert(char **out, char **in, char *typi, char *typo,
-	    long nitems, data_standard *stdi, data_standard *stdo,
+	    long ni, data_standard *stdi, data_standard *stdo,
 	    data_standard *hstd, hasharr *chi, hasharr *cho,
 	    int boffs, PD_major_op error),
  PD_n_bit_char_std(PD_character_standard cstd);
@@ -1234,7 +1234,7 @@ extern char
 
 extern int
  PD_read_bits(PDBfile *file, char *name, char *type,
-	      long nitems, int sgned, int nbits, int padsz, int fpp, long offs,
+	      long ni, int sgned, int nbits, int padsz, int fpp, long offs,
 	      long *pan, char **pdata),
  _PD_indirection(char *s);
 

@@ -790,20 +790,20 @@ object *LR_var_plot(SS_psides *si, object *argl)
 static PM_set *LR_mesh_set(char *name)
    {PM_set *set;
     double *xc, *yc, *pxc, *pyc;
-    int nitems, i, k, l;
+    int ni, i, k, l;
     double conv;
 
-    nitems = kmax*lmax;
-    pxc = xc = CMAKE_N(double, nitems);
-    pyc = yc = CMAKE_N(double, nitems);
+    ni  = kmax*lmax;
+    pxc = xc = CMAKE_N(double, ni);
+    pyc = yc = CMAKE_N(double, ni);
     for (l = 1; l <= lmax; l++)
         for (k = 1; k <= kmax; k++)
             {i = NODE_OF(k, l);
              *pxc++ = rx[i];
              *pyc++ = ry[i];};
     conv = unit[CM]/convrsn[CM];
-    PM_array_scale(xc, nitems, conv);
-    PM_array_scale(yc, nitems, conv);
+    PM_array_scale(xc, ni, conv);
+    PM_array_scale(yc, ni, conv);
     set = PM_make_set(name, SC_DOUBLE_S, FALSE,
                             2, kmax, lmax,
                             2, xc, yc);
@@ -823,7 +823,7 @@ static PM_set *LR_mesh_set(char *name)
 
 PM_set *LR_get_set(char *name, PM_centering *pcent, C_array *arr, int space)
    {int i, j, k, l;
-    long nitems;
+    long ni;
     double *data, *dp;
     PM_centering centering;
     PM_set *set;
@@ -861,9 +861,9 @@ PM_set *LR_get_set(char *name, PM_centering *pcent, C_array *arr, int space)
  * NOTE: when multidimensional sub-spaces are allowed this will change
  */
     else
-       {nitems = SC_MEM_GET_N(double, data);
+       {ni  = SC_MEM_GET_N(double, data);
         set = PM_make_set(name, SC_DOUBLE_S, FALSE,
-			  1, nitems, 1, data);};
+			  1, ni, 1, data);};
 
     return(set);}
 

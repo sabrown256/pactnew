@@ -18,7 +18,7 @@
 
 static void process_binary(PROCESS *pp)
    {char s[MAXLINE+2], type[80], *msg, *t;
-    long nitems, number;
+    long ni, number;
     PDBfile *file;
     void *space;
 
@@ -34,24 +34,24 @@ static void process_binary(PROCESS *pp)
 	    return;};
 
 	strcpy(type, msg);
-	nitems = SC_stol(SC_strtok(NULL, " \n", t));
+	ni = SC_stol(SC_strtok(NULL, " \n", t));
 
-	space = _PD_alloc_entry(file, type, nitems);
+	space = _PD_alloc_entry(file, type, ni);
 
 	printf("P> Reading binary data ... ");
-	number = PC_read(space, type, nitems, pp);
+	number = PC_read(space, type, ni, pp);
 	printf("done\n");
 
 	while (PC_gets(s, MAXLINE, pp) != NULL)
 	   printf("C> %s", s);
 
-	if (number == nitems)
+	if (number == ni)
 	   printf("P> Binary data received: %s %ld\n",
 		  type, number);
 
 	else
 	   printf("P> Binary data receive failed: %s %ld/%ld\n",
-		  type, number, nitems);
+		  type, number, ni);
 
 	CFREE(space);};
 

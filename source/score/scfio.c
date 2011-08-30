@@ -398,10 +398,10 @@ void SC_setbuf(FILE *fp, char *bf)
 
 /* _SC_FREAD - atomic worker ala _SC_fwrite */
 
-static size_t _SC_fread(void *s, size_t bpi, size_t nitems, FILE *fp)
+static size_t _SC_fread(void *s, size_t bpi, size_t ni, FILE *fp)
    {size_t nr;
 
-    nr = SC_fread_sigsafe(s, bpi, nitems, fp);
+    nr = SC_fread_sigsafe(s, bpi, ni, fp);
 
     return(nr);}
  
@@ -410,10 +410,10 @@ static size_t _SC_fread(void *s, size_t bpi, size_t nitems, FILE *fp)
 
 /* _SC_FWRITE_ATM - atomic worker for _SC_fwrite */
 
-static size_t _SC_fwrite_atm(void *s, size_t bpi, size_t nitems, FILE *fp)
+static size_t _SC_fwrite_atm(void *s, size_t bpi, size_t ni, FILE *fp)
    {size_t nw;
 
-    nw = SC_fwrite_sigsafe(s, bpi, nitems, fp);
+    nw = SC_fwrite_sigsafe(s, bpi, ni, fp);
 
     return(nw);}
  
@@ -425,7 +425,7 @@ static size_t _SC_fwrite_atm(void *s, size_t bpi, size_t nitems, FILE *fp)
  *            - NFS or other network bandwitdth
  */
 
-size_t _SC_fwrite(void *s, size_t bpi, size_t nitems, FILE *fp)
+size_t _SC_fwrite(void *s, size_t bpi, size_t ni, FILE *fp)
    {int ok, flags, rw, fd;
     int64_t i, nb;
     size_t nw, nr;
@@ -451,17 +451,17 @@ size_t _SC_fwrite(void *s, size_t bpi, size_t nitems, FILE *fp)
 	if (addr < 0)
 	   SC_strerror(errno, msg, MAXLINE);
 
-	nw = _SC_fwrite_atm(s, bpi, nitems, fp);
+	nw = _SC_fwrite_atm(s, bpi, ni, fp);
 
 /* go back and read it in
  * fseek will fail unless the file mode is read-write
  */
 	if ((addr >= 0) && (nw > 0) && (rw == TRUE))
-	   {nb = bpi*nitems;
+	   {nb = bpi*ni;
 	    t  = CMAKE_N(char, nb);
 
 	    fseek(fp, addr, SEEK_SET);
-	    nr = _SC_fread(t, bpi, nitems, fp);
+	    nr = _SC_fread(t, bpi, ni, fp);
 
 /* compare */
 	    ok = TRUE;
@@ -480,7 +480,7 @@ size_t _SC_fwrite(void *s, size_t bpi, size_t nitems, FILE *fp)
 	    CFREE(t);};}
 
     else
-       nw = _SC_fwrite_atm(s, bpi, nitems, fp);
+       nw = _SC_fwrite_atm(s, bpi, ni, fp);
 
 /* turn on SIGIO handler */
     SC_catch_io_interrupts(SC_gs.io_interrupts_on);
@@ -2758,12 +2758,12 @@ ssize_t SC_write_sigsafe(int fd, void *bf, size_t n)
 
 /* _SC_FREAD_SAFE - atomic worker for SC_FREAD_SIGSAFE */
 
-static size_t _SC_fread_safe(void *s, size_t bpi, size_t nitems, FILE *fp)
+static size_t _SC_fread_safe(void *s, size_t bpi, size_t ni, FILE *fp)
    {size_t zc, n, ns, nr;
     char *ps;
 
     zc = 0;
-    ns = nitems;
+    ns = ni;
     nr = 0;
     ps = (char *) s;
     while ((ns > 0) && (zc < 10))
@@ -2784,7 +2784,7 @@ static size_t _SC_fread_safe(void *s, size_t bpi, size_t nitems, FILE *fp)
  *                  - and to ensure that the requested number of bytes
  */
 
-size_t SC_fread_sigsafe(void *s, size_t bpi, size_t nitems, FILE *fp)
+size_t SC_fread_sigsafe(void *s, size_t bpi, size_t ni, FILE *fp)
    {size_t rv;
 
 #ifdef AIX
@@ -2794,7 +2794,7 @@ size_t SC_fread_sigsafe(void *s, size_t bpi, size_t nitems, FILE *fp)
     if (SC_gs.io_interrupts_on == TRUE)
        oh = SC_signal_action_n(SC_SIGIO, SIG_IGN, NULL, 0, -1);
 
-    rv = _SC_fread_safe(s, bpi, nitems, fp);
+    rv = _SC_fread_safe(s, bpi, ni, fp);
 
 /* turn on SIGIO handler */
     if (SC_gs.io_interrupts_on == TRUE)
@@ -2802,7 +2802,7 @@ size_t SC_fread_sigsafe(void *s, size_t bpi, size_t nitems, FILE *fp)
  
 #else
 
-    rv = _SC_fread_safe(s, bpi, nitems, fp);
+    rv = _SC_fread_safe(s, bpi, ni, fp);
 
 #endif
 
@@ -2817,12 +2817,12 @@ size_t SC_fread_sigsafe(void *s, size_t bpi, size_t nitems, FILE *fp)
  *                   - return number of bytes written or -1
  */
 
-size_t SC_fwrite_sigsafe(void *s, size_t bpi, size_t nitems, FILE *fp)
+size_t SC_fwrite_sigsafe(void *s, size_t bpi, size_t ni, FILE *fp)
    {size_t zc, n, ns, nw;
     char *ps;
 
     zc = 0;
-    ns = nitems;
+    ns = ni;
     nw = 0;
     ps = (char *) s;
     while ((ns > 0) && (zc < 10))

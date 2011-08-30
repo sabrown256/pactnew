@@ -12,7 +12,7 @@
 
 static void
  _SX_gc_data(SS_psides *si, PDBfile *file,
-	     void *vr, long nitems, char *type);
+	     void *vr, long ni, char *type);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -22,13 +22,13 @@ static void
  */
 
 static void _SX_gc_indirection(SS_psides *si, PDBfile *file,
-			       char **vr, long nitems, char *type)
+			       char **vr, long ni, char *type)
    {long i, ditems;
     char *dtype, *bf;
 
     dtype = PD_dereference(CSTRSAVE(type));
 
-    for (i = 0L; i < nitems; i++, vr++)
+    for (i = 0L; i < ni; i++, vr++)
         {ditems = _PD_number_refd(DEREF(vr), dtype, file->host_chart);
 
          if (ditems == -1L)
@@ -58,7 +58,7 @@ static void _SX_gc_indirection(SS_psides *si, PDBfile *file,
 /* _SX_GC_LEAF - GC indirect members of leaf */
 
 static void _SX_gc_leaf(SS_psides *si, PDBfile *file,
-			char *vr, long nitems, char *type)
+			char *vr, long ni, char *type)
    {long ii, sz;
     char *svr;
     defstr *defp;
@@ -73,7 +73,7 @@ static void _SX_gc_leaf(SS_psides *si, PDBfile *file,
 	if ((mem_lst = defp->members) != NULL)
 	   {sz  = defp->size;
 	    svr = vr;
-	    for (ii = 0L; ii < nitems; ii++, svr += sz)
+	    for (ii = 0L; ii < ni; ii++, svr += sz)
 	        {if (pdb_wr_hook != NULL)
 		    mem_lst = (*pdb_wr_hook)(file, svr, defp);
 
@@ -93,14 +93,14 @@ static void _SX_gc_leaf(SS_psides *si, PDBfile *file,
 /* _SX_GC_DATA - garbage collect a variable */
 
 static void _SX_gc_data(SS_psides *si, PDBfile *file,
-			void *vr, long nitems, char *type)
+			void *vr, long ni, char *type)
    {
 
 /* if the type is an indirection, follow the pointer */
     if (_PD_indirection(type))
-       _SX_gc_indirection(si, file, (char **) vr, nitems, type);
+       _SX_gc_indirection(si, file, (char **) vr, ni, type);
     else
-       _SX_gc_leaf(si, file,  vr, nitems, type);
+       _SX_gc_leaf(si, file,  vr, ni, type);
 
     return;}
 

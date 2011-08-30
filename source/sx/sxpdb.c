@@ -263,7 +263,7 @@ static object *_SXI_close_raw_file(SS_psides *si, object *argl)
 static object *_SXI_rd_raw(SS_psides *si, object *argl)
    {int ret;
     char *intype, *outtype;
-    long nitems, ni;
+    long ni, nir;
     long long addr;
     void *vr;
     PDBfile *file;
@@ -281,7 +281,7 @@ static object *_SXI_rd_raw(SS_psides *si, object *argl)
        SS_args(si, argl,
                G_FILE, &po,
                SC_LONG_LONG_I, &addr,
-               SC_LONG_I, &nitems,
+               SC_LONG_I, &ni,
                SC_STRING_I, &intype,
                SC_STRING_I, &outtype,
                0);
@@ -289,7 +289,7 @@ static object *_SXI_rd_raw(SS_psides *si, object *argl)
        {SS_args(si, argl,
                 G_FILE, &po,
                 SC_LONG_LONG_I, &addr,
-                SC_LONG_I, &nitems,
+                SC_LONG_I, &ni,
                 SC_STRING_I, &intype,
                 0);
 
@@ -317,7 +317,7 @@ static object *_SXI_rd_raw(SS_psides *si, object *argl)
 		 break;};
 	
 	addr = lio_tell(fp);
-	ep   = _PD_mk_syment(intype, nitems, addr, NULL, NULL);
+	ep   = _PD_mk_syment(intype, ni, addr, NULL, NULL);
 
 	if (ret)
 	   SS_error(si, "FSEEK FAILED TO FIND REQUESTED ADDRESS - _SXI_RD_RAW",
@@ -325,9 +325,9 @@ static object *_SXI_rd_raw(SS_psides *si, object *argl)
 
 /* pad char arrays with 2 null characters - for printing and SC_firsttok */
 	if (strcmp(outtype, SC_CHAR_S) == 0)
-	   vr = _PD_alloc_entry(file, outtype, nitems + 2L);
+	   vr = _PD_alloc_entry(file, outtype, ni + 2L);
 	else
-	   vr = _PD_alloc_entry(file, outtype, nitems);
+	   vr = _PD_alloc_entry(file, outtype, ni);
 
 	if (vr == NULL)
 	   SS_error(si, "CAN'T ALLOCATE MEMORY - _SXI_RD_RAW", SS_null);
@@ -339,8 +339,8 @@ static object *_SXI_rd_raw(SS_psides *si, object *argl)
 	         memset(PD_err, 0, MAXLINE);
 		 break;};
 
-	ni = _PD_sys_read(file, ep, outtype, vr);
-	SC_ASSERT(ni >= 0);
+	nir = _PD_sys_read(file, ep, outtype, vr);
+	SC_ASSERT(nir >= 0);
 
 	rv = _SX_mk_gpdbdata(si, "data", vr, ep, file);};
 
@@ -356,7 +356,7 @@ static object *_SXI_rd_raw(SS_psides *si, object *argl)
 
 static object *_SXI_wr_raw(SS_psides *si, object *argl)
    {int ret;
-    long nitems;
+    long ni;
     long long addr;
     char *intype, *outtype;
     void *vr;
@@ -375,7 +375,7 @@ static object *_SXI_wr_raw(SS_psides *si, object *argl)
                G_FILE, &po,
                SS_OBJECT_I, &obj,
                SC_LONG_LONG_I, &addr,
-               SC_LONG_I, &nitems,
+               SC_LONG_I, &ni,
                SC_STRING_I, &intype,
                SC_STRING_I, &outtype,
                0);
@@ -384,7 +384,7 @@ static object *_SXI_wr_raw(SS_psides *si, object *argl)
                 G_FILE, &po,
                 SS_OBJECT_I, &obj,
                 SC_LONG_LONG_I, &addr,
-                SC_LONG_I, &nitems,
+                SC_LONG_I, &ni,
                 SC_STRING_I, &intype,
                 0);
 
@@ -430,7 +430,7 @@ static object *_SXI_wr_raw(SS_psides *si, object *argl)
 	         memset(PD_err, 0, MAXLINE);
 		 break;};
 
-	_PD_sys_write(file, vr, nitems, intype, outtype);};
+	_PD_sys_write(file, vr, ni, intype, outtype);};
 
     return(SS_t);}
 
@@ -1181,7 +1181,7 @@ object *_SX_pdbfile_to_list(SS_psides *si, PDBfile *file)
 /*--------------------------------------------------------------------------*/
 
 /* _SX_SYMENT_TO_LIST - returns the syment as a list of objects
- *                    - (type nitems diskaddr dimensions)
+ *                    - (type ni diskaddr dimensions)
  */
 
 object *_SX_syment_to_list(SS_psides *si, syment *ep)
@@ -1724,34 +1724,34 @@ static object *_SXI_list_defstrs(SS_psides *si, object *argl)
 
 /* _SXI_DEF_PRIM - Scheme version of PD_DEFIX, PD_DEFLOAT, PD_DEFNCV
  *               -
- *               - (def-primitive file name "ncv" bytespitem align)
- *               - (def-primitive file name "fix" bytespitem align flg)
- *               - (def-primitive file name "fp"  bytespitem align
+ *               - (def-primitive file name "ncv" bpi align)
+ *               - (def-primitive file name "fix" bpi align flg)
+ *               - (def-primitive file name "fp"  bpi align
  *               -                order-list expb mantb sbs sbe sbm hmb bias)
  */
  
 static object *_SXI_def_prim(SS_psides *si, object *argl)
    {int n;
     char *name, *type;
-    long bytespitem;
+    long bpi;
     int align;
     PDBfile *file;
     defstr *dp;
     g_file *po;
     object *rv;
 
-    dp         = NULL;
-    po         = NULL;
-    name       = NULL;
-    type       = NULL;
-    bytespitem = 0L;
-    align      = 0;
+    dp    = NULL;
+    po    = NULL;
+    name  = NULL;
+    type  = NULL;
+    bpi   = 0L;
+    align = 0;
 
     n = SS_args(si, argl,
                 G_FILE, &po,
                 SC_STRING_I, &name,
                 SC_STRING_I, &type,
-                SC_LONG_I, &bytespitem,
+                SC_LONG_I, &bpi,
                 SC_INT_I, &align,
                 0);
 
@@ -1761,7 +1761,7 @@ static object *_SXI_def_prim(SS_psides *si, object *argl)
        file = FILE_FILE(PDBfile, po);
 
     if (strcmp(type, "ncv") == 0)
-       dp = PD_defncv(file, name, bytespitem, align);
+       dp = PD_defncv(file, name, bpi, align);
 
     else if (strcmp(type, "fix") == 0)
        {PD_byte_order ord;
@@ -1772,7 +1772,7 @@ static object *_SXI_def_prim(SS_psides *si, object *argl)
                 SC_ENUM_I, &ord,
                 0);
 
-        dp = PD_defix(file, name, bytespitem, align, ord);}
+        dp = PD_defix(file, name, bpi, align, ord);}
 
     else if (strcmp(type, "fp") == 0)
        {int *ordr;
@@ -1795,14 +1795,14 @@ static object *_SXI_def_prim(SS_psides *si, object *argl)
            SS_error(si, "BAD BYTE ORDERING - _SXI_DEF_PRIM", ord);
 
         no = SS_length(si, ord);
-        if (no != bytespitem)
+        if (no != bpi)
            SS_error(si, "INCONSISTENT SIZE - _SXI_DEF_PRIM", ord);
 
         ordr = CMAKE_N(int, no);
         for (i = 0L; i < no; i++, ord = SS_cdr(si, ord))
             ordr[i] = SS_INTEGER_VALUE(SS_car(si, ord));
 
-        dp = PD_defloat(file, name, bytespitem, align, ordr,
+        dp = PD_defloat(file, name, bpi, align, ordr,
                         expb, mantb, sbs, sbe, sbm, hmb, bias);};
 
     rv = _SX_mk_gdefstr(si, dp);
@@ -2948,7 +2948,7 @@ static object *_SXI_wrt_ultra_curve(SS_psides *si, object *argl)
 
 static object *_SXI_sizeof(SS_psides *si, object *argl)
    {int flg;
-    long bytespitem;
+    long bpi;
     char *type;
     g_file *po;
     PDBfile *file;
@@ -2970,11 +2970,11 @@ static object *_SXI_sizeof(SS_psides *si, object *argl)
        file = FILE_FILE(PDBfile, po);
 
     if (flg)
-       bytespitem = _PD_lookup_size(type, file->host_chart);
+       bpi = _PD_lookup_size(type, file->host_chart);
     else
-       bytespitem = _PD_lookup_size(type, file->chart);
+       bpi = _PD_lookup_size(type, file->chart);
 
-    o = SS_mk_integer(si, bytespitem);
+    o = SS_mk_integer(si, bpi);
 
     return(o);}
 
@@ -3585,7 +3585,7 @@ static object *_SXI_pdb_type(SS_psides *si, object *argl)
 
 static object *_SXI_unp_bitstrm(SS_psides *si, object *argl)
    {int nbits, padsz, fpp;
-    long anumb, offs, nitems;
+    long anumb, offs, ni;
     char *name, *type, *data;
     PDBfile *file;
     C_array *arr;
@@ -3605,7 +3605,7 @@ static object *_SXI_unp_bitstrm(SS_psides *si, object *argl)
             G_FILE, &po,
             SC_STRING_I, &name,
             SC_STRING_I, &type,
-            SC_LONG_I, &nitems,
+            SC_LONG_I, &ni,
             SC_INT_I, &nbits,
             SC_INT_I, &padsz,
             SC_INT_I, &fpp,
@@ -3623,7 +3623,7 @@ static object *_SXI_unp_bitstrm(SS_psides *si, object *argl)
 
     if (file != NULL)
        {arr = NULL;
-	if (!_PD_rd_bits(file, name, type, nitems, FALSE,
+	if (!_PD_rd_bits(file, name, type, ni, FALSE,
 			 nbits, padsz, fpp, offs,
 			 &anumb, &data))
 	   SS_error(si, "_PD_RD_BITS FAILED - _SXI_UNP_BITSTRM", argl);

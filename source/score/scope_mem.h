@@ -294,7 +294,7 @@ extern void
  _SC_prim_memset(void *p, long nb),
  _SC_init_heap(SC_heap_des *ph, int id),
  *SC_alloc_n(long ni, long bpi, ...),
- *SC_realloc_n(void *p, long nitems, long bpi, ...);
+ *SC_realloc_n(void *p, long ni, long bpi, ...);
 
 extern int
  SC_free_n(void *p, ...),
@@ -311,11 +311,11 @@ extern SC_mem_fnc
 
 extern void
  *_SC_alloc_nl(long ni, long bpi, void *a),
- *_SC_realloc_nl(void *p, long nitems, long bpi, void *a),
- *_SC_nalloc_wl(long nitems, long bpi, int memfl, int zsp,
+ *_SC_realloc_nl(void *p, long ni, long bpi, void *a),
+ *_SC_nalloc_wl(long ni, long bpi, int memfl, int zsp,
 	        const char *fnc, const char *file, int line),
- *_SC_alloc_wl(long nitems, long bpi, char *name, int memfl, int zsp),
- *_SC_realloc_wl(void *p, long nitems, long bpi, int memfl, int zsp);
+ *_SC_alloc_wl(long ni, long bpi, char *name, int memfl, int zsp),
+ *_SC_realloc_wl(void *p, long ni, long bpi, int memfl, int zsp);
 
 extern int
  _SC_free_nl(void *p, void *a),
@@ -333,11 +333,11 @@ extern SC_mem_fnc
 
 extern void
  *_SC_alloc_ns(long ni, long bpi, void *a),
- *_SC_realloc_ns(void *p, long nitems, long bpi, void *a),
- *_SC_nalloc_ws(long nitems, long bpi, int memfl, int zsp,
+ *_SC_realloc_ns(void *p, long ni, long bpi, void *a),
+ *_SC_nalloc_ws(long ni, long bpi, int memfl, int zsp,
 	        const char *fnc, const char *file, int line),
- *_SC_alloc_ws(long nitems, long bpi, char *name, int memfl, int zsp),
- *_SC_realloc_ws(void *p, long nitems, long bpi, int memfl, int zsp);
+ *_SC_alloc_ws(long ni, long bpi, char *name, int memfl, int zsp),
+ *_SC_realloc_ws(void *p, long ni, long bpi, int memfl, int zsp);
 
 extern int
  _SC_free_ns(void *p, void *a),

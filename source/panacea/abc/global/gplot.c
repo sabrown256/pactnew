@@ -61,7 +61,7 @@ int plotw(dev, new, name)
    {
 
 #ifndef GEN_ONLY
-    int i, nitems, nde;
+    int i, ni, nde;
     int *rvp;
     char s[MAXLINE], *token;
     double *v, conv;
@@ -89,11 +89,11 @@ int plotw(dev, new, name)
              v = CMAKE_N(double, PA_VARIABLE_SIZE(pp));
 	     PM_array_copy(v, PA_VARIABLE_DATA(pp), PA_VARIABLE_SIZE(pp));
 
-             v      = LR_map_centers(v, PA_VARIABLE_CENTERING(pp));
-	     nitems = SC_MEM_GET_N(double, v);
+             v  = LR_map_centers(v, PA_VARIABLE_CENTERING(pp));
+	     ni = SC_MEM_GET_N(double, v);
 
              conv = PA_VARIABLE_INT_UNIT(pp)/PA_VARIABLE_EXT_UNIT(pp);
-             PM_array_scale(v, nitems, conv);
+             PM_array_scale(v, ni, conv);
              elem[nde++] = v;};
         CREMAKE(elem, double *, nde);};
 

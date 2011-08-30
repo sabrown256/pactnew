@@ -217,9 +217,9 @@ static sql_table *_SQLITE_desc(FILE *fp, char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SQLITE_NITEMS - return the number of rows in table S */
+/* _SQLITE_NI - return the number of rows in table S */
 
-static int _SQLITE_nitems(FILE *fp, char *s)
+static int _SQLITE_ni(FILE *fp, char *s)
    {int nr;
     char cmd[MAXLINE];
     sql_table *tab;
@@ -254,7 +254,7 @@ static sql_table *_SQLITE_select(FILE *fp, char *s)
 
 static sql_cmd
  _SQLITE_cmd = { _SQLITE_tables, _SQLITE_desc,
-		 _SQLITE_nitems, _SQLITE_select,
+		 _SQLITE_ni, _SQLITE_select,
                  _SQLITE_oper };
 
 /*--------------------------------------------------------------------------*/

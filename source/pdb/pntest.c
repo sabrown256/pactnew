@@ -21,7 +21,7 @@
 int main(int c, char **v)
    {hasharr *chrt;
     FILE *fp;
-    size_t bpi, nitems;
+    size_t bpi, ni;
     char in[NBYTES];
     float a[1000];
     double b[1000];
@@ -55,15 +55,15 @@ int main(int c, char **v)
 
 /* read in and convert 100 floats */
     bpi = PN_sizeof("float", chrt);
-    nitems    = 100;
-    SC_fread_sigsafe(in, bpi, nitems, fp);
-    PN_conv_in(a, in, "float", nitems, chrt);
+    ni  = 100;
+    SC_fread_sigsafe(in, bpi, ni, fp);
+    PN_conv_in(a, in, "float", ni, chrt);
 
 /* read in and convert 500 doubles */
     bpi = PN_sizeof("double", chrt);
-    nitems    = 500;
-    SC_fread_sigsafe(in, bpi, nitems, fp);
-    PN_conv_in(b, in, "double", nitems, chrt);
+    ni  = 500;
+    SC_fread_sigsafe(in, bpi, ni, fp);
+    PN_conv_in(b, in, "double", ni, chrt);
 
     io_close(fp);
 

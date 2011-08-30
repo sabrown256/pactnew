@@ -58,16 +58,16 @@ static void _PD_regen_std(PDBfile *file, char *type,
  *                - for a NULL pointer do:
  *                -     _PD_wr_itag(file, -1L, 0L, type, -1L, LOC_OTHER)
  *                - for a pointer to data elsewhere do:
- *                -     _PD_wr_itag(file, n, nitems, type, addr, LOC_OTHER)
+ *                -     _PD_wr_itag(file, n, ni, type, addr, LOC_OTHER)
  *                - for a pointer to data here do:
- *                -     _PD_wr_itag(file, n, nitems, type, addr, LOC_HERE)
+ *                -     _PD_wr_itag(file, n, ni, type, addr, LOC_HERE)
  *                - for a pointer to discontiguous data do:
- *                -     _PD_wr_itag(file, n, nitems, type, addr, LOC_BLOCK)
+ *                -     _PD_wr_itag(file, n, ni, type, addr, LOC_BLOCK)
  *                -     then addr is interpreted as the address of the next
  *                -     block of data
  */
 
-static int _PD_wr_itag_ii(PDBfile *file, long n, long nitems, char *type,
+static int _PD_wr_itag_ii(PDBfile *file, long n, long ni, char *type,
 			  int64_t addr, int loc)
    {char s[MAXLINE];
     FILE *fp;
@@ -79,12 +79,12 @@ static int _PD_wr_itag_ii(PDBfile *file, long n, long nitems, char *type,
  * in order to support relocation
  */
 	snprintf(s, MAXLINE, "%ld\001%s\001%32lld\001%d\001\n",
-		 nitems, type, (long long) addr, loc);
+		 ni, type, (long long) addr, loc);
 
 	lio_printf(fp, s);
 
-	if ((nitems > 0) && (loc == LOC_HERE))
-	   _PD_ptr_wr_syment(file, n, type, nitems, addr);};
+	if ((ni > 0) && (loc == LOC_HERE))
+	   _PD_ptr_wr_syment(file, n, type, ni, addr);};
 
     return(TRUE);}
 

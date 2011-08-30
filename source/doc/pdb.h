@@ -1,5 +1,5 @@
 TXT: PDBLib User's Manual
-MOD: 08/15/2011
+MOD: 08/30/2011
 
 <CENTER>
 <P>
@@ -5276,7 +5276,7 @@ and an ASCII string error message can be retrieved through a call to
 <p>
 <pre>
 <i>C Binding: </i>  defstr *PD_defix(PDBfile *file, char *name,
-                              long bytespitem, int align, int flg)
+                              long bpi, int align, int flg)
 <i>Fortran Binding: </i>none
 <i>SX Binding: </i> none
 <i>Python Binding: </i> none
@@ -5289,7 +5289,7 @@ specified by <em>file</em>.
 Input to <tt>PD_defix</tt> is:
 <em>file</em>, a pointer to a PDBfile;
 <em>name</em>, an ASCII string containing the name of the new data type;
-<em>bytespitem</em>, the number of bytes required for 1 item of the new type;
+<em>bpi</em>, the number of bytes required for 1 item of the new type;
 <em>align</em>, the byte alignment for the type;
  and
 <em>flg</em>, a flag indicating whether the byte ordering of the type is
@@ -5338,7 +5338,7 @@ and an ASCII string error message can be retrieved through a call to
 <p>
 <pre>
 <i>C Binding: </i>  defstr *PD_defloat(PDBfile *file, char *name,
-                                long bytespitem, int align, int *ordr,
+                                long bpi, int align, int *ordr,
                                 long expb, long mantb, long sbs, long sbe,
                                 long sbm, long hmb, long bias)
 <i>Fortran Binding: </i>none
@@ -5352,9 +5352,9 @@ Input to <tt>PD_defloat</tt> is:
 <em>file</em>, a pointer to a PDBfile;
 <em>name</em>, an ASCII string containing the name of the variable
  in the PDB file;
-<em>bytespitem</em>, the number of bytes required for an item of the new type;
+<em>bpi</em>, the number of bytes required for an item of the new type;
 <em>align</em>, the byte alignment for this type;
-<em>ordr</em>, an array of bytespitem integers specifying the byte order;
+<em>ordr</em>, an array of bpi integers specifying the byte order;
 <em>expb</em>, the number of exponent bits;
 <em>mantb</em>, the number of mantissa bits;
 <em>sbs</em>, the position of the sign bit;
@@ -5403,7 +5403,7 @@ and an ASCII string error message can be retrieved through a call to
 <p>
 <pre>
 <i>C Binding: </i>  defstr *PD_defncv(PDBfile *file, char *name,
-                               long bytespitem, int align)
+                               long bpi, int align)
 <i>Fortran Binding: </i>none
 <i>SX Binding: </i> none
 <i>Python Binding: </i> none
@@ -5414,7 +5414,7 @@ Define a primitive type that will not undergo format conversion from platform to
 Input to <tt>PD_defncv</tt> is:
 <em>file</em>, a pointer to a PDBfile;
 <em>name</em>, an ASCII string containing the name of the new data type;
-<em>bytespitem</em>, the number of bytes required for 1 item of the new type;
+<em>bpi</em>, the number of bytes required for 1 item of the new type;
  and
 <em>align</em>, the byte alignment for the type.
 <p>

@@ -593,7 +593,7 @@ void _PD_block_truncate(syment *ep, long ni)
  *                    - block after the effective address
  */
 
-long _PD_effective_addr(int64_t *paddr, long *pnitems,
+long _PD_effective_addr(int64_t *paddr, long *pni,
 			int bpi, SC_array *bl)
    {long i, nb, nt; 
     int64_t addr, eaddr;
@@ -616,8 +616,8 @@ long _PD_effective_addr(int64_t *paddr, long *pnitems,
          addr  = sp->diskaddr;
          eaddr = addr + nt;};
 
-    *paddr   = eaddr;
-    *pnitems = (addr + nb - eaddr)/bpi;
+    *paddr = eaddr;
+    *pni   = (addr + nb - eaddr)/bpi;
 
     return(i);}
 

@@ -42,7 +42,7 @@ static long *_NAC_unpack_table(PDBfile *file, char *rt, char *dt,
    {int i, j, n, bit_off, n_bits, count, first;
     char *nb, *pdt;
     long *out, *prt, *ft, *pout, *pft;
-    long v, nwpe, nbpe, nitems;
+    long v, nwpe, nbpe, ni;
     int *ord;
     static int size_max = SC_BITS_BYTE*sizeof(long);
 
@@ -57,8 +57,8 @@ static long *_NAC_unpack_table(PDBfile *file, char *rt, char *dt,
          nwpe = max(nwpe, v);};
 
 /* compute the number of entries in the table, dt */
-    nitems = ndt/nwpe;
-    nbpe   = CRAY_BYTES_WORD*nwpe;
+    ni   = ndt/nwpe;
+    nbpe = CRAY_BYTES_WORD*nwpe;
 
 /* compute the byte order */
     ord = CMAKE_N(int, nbpe);
@@ -82,10 +82,10 @@ static long *_NAC_unpack_table(PDBfile *file, char *rt, char *dt,
 			   PD_OPEN);};
          nb[i] = count;};
 
-    out = CMAKE_N(long, nitems*n);
+    out = CMAKE_N(long, ni*n);
 
     first = TRUE;
-    for (i = 0; i < nitems; i++)
+    for (i = 0; i < ni; i++)
         {pout = out + i*n;
          pdt  = dt  + i*nbpe;
          for (j = 0; j < n; j++)

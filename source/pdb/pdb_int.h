@@ -249,9 +249,9 @@ extern syment
 	     long number, dimdes *dims);
 
 extern void
- _PD_sign_extend(char *out, long nitems,
+ _PD_sign_extend(char *out, long ni,
 		 int nbo, int nbti, int *ord),
- _PD_ones_complement(char *out, long nitems, int nbo, int *order),
+ _PD_ones_complement(char *out, long ni, int nbo, int *order),
  _PD_cast_insert(hasharr* chart, char* type, char* memb, char* cast);
 
 extern int
@@ -294,7 +294,7 @@ extern int
  _PD_block_csum_read(PDBfile *file);
 
 extern long
- _PD_effective_addr(int64_t *paddr, long *pnitems,
+ _PD_effective_addr(int64_t *paddr, long *pni,
 		    int bpi, SC_array *da),
  _PD_block_get_number(SC_array *bl, long n),
  _PD_block_set_number(SC_array *bl, long n, long ni),
@@ -376,11 +376,11 @@ extern int
  _PD_require_conv(defstr *dpf, defstr *dph);
 
 extern void
- _PD_iconvert(char **out, char **in, long nitems,
+ _PD_iconvert(char **out, char **in, long ni,
 	      long nbi, PD_byte_order ordi,
 	      long nbo, PD_byte_order ordo,
 	      int onescmp, int usg),
- _PD_fconvert(char **out, char **in, long nitems, int boffs,
+ _PD_fconvert(char **out, char **in, long ni, int boffs,
 	      long *infor, int *inord, long *outfor, int *outord,
 	      PD_byte_order l_order, int l_bytes, int onescmp);
 
@@ -594,7 +594,7 @@ extern char
 /* PDPRNT.C declarations */
 
 extern int
- _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, long nitems,
+ _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, long ni,
 		char *type, int irecursion, int n, long *ind);
 
 extern void
@@ -608,7 +608,7 @@ extern int
  _PD_ptr_index(void *p),
  _PD_ptr_reset(PDBfile *file, char *vr),
  _PD_ptr_entry_itag(PDBfile *file, int n, PD_itag *pi),
- _PD_ptr_wr_itags(PDBfile *file, void *vr, long nitems, char *type),
+ _PD_ptr_wr_itags(PDBfile *file, void *vr, long ni, char *type),
  _PD_ptr_rd_itags(PDBfile *file, char **vr, PD_itag *pi);
 
 extern long
@@ -624,7 +624,7 @@ extern void
  _PD_ptr_free_apl(PDBfile *file),
  _PD_index_ptr(char *p, int i),
  _PD_ptr_rd_install_addr(PDBfile *file, int64_t addr, int loc),
- _PD_ptr_wr_syment(PDBfile *file, long n, char *type, long nitems, int64_t addr),
+ _PD_ptr_wr_syment(PDBfile *file, long n, char *type, long ni, int64_t addr),
  _PD_ptr_open_setup(PDBfile *file);
 
 extern syment
@@ -644,13 +644,13 @@ extern int
  _PD_indexed_read_as(PDBfile *file, char *fullpath, char *type,
 		     void *vr, int nd, long *ind, syment *ep),
  _PD_rd_bits(PDBfile *file, char *name, char *type,
-	     long nitems, int sgned, int nbits, int padsz, int fpp, long offs,
+	     long ni, int sgned, int nbits, int padsz, int fpp, long offs,
 	     long *pan, char **pdata),
  _PD_valid_dims(dimdes *dimscheck, dimdes *vardims);
 
 extern long
  _PD_number_refd(void *vr, char *type, hasharr *tab),
- _PD_wr_syment(PDBfile *file, char *vr, long nitems, char *intype,
+ _PD_wr_syment(PDBfile *file, char *vr, long ni, char *intype,
 	       char *outtype),
  _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr);
 
@@ -693,7 +693,7 @@ extern tr_layer
 
 extern void
  _PD_install_funcs(void),
- _PD_conv_in(PDBfile *file, void *out, void *in, char *type, long nitems);
+ _PD_conv_in(PDBfile *file, void *out, void *in, char *type, long ni);
 
 extern PDBfile
  *_PD_open_bin(char *name, char *mode, void *a);

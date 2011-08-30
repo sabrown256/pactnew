@@ -1401,13 +1401,13 @@ int PD_free(PDBfile *file ARG(,,cls), char *type, void *var)
 
 		 if (_PD_indirection(ityp))
 		    {p = DEREF(p);
-		     if (SC_is_score_space(p, NULL, NULL)) 
+		     if (SC_is_active_space(p, NULL, NULL)) 
 		        CFREE(p);};
 
 		 CFREE(dtyp);};};
 
 /* free array or scalar compound itself */
-	if (SC_is_score_space(pc, NULL, NULL)) 
+	if (SC_is_active_space(pc, NULL, NULL)) 
 	   CFREE(pc);
 
 	CFREE(ityp);};

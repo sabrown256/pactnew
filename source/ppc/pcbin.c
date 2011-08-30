@@ -97,8 +97,8 @@ int PC_send_formats(void)
 
 /* _PC_BIN_READ - do binary read from a PROCESS */
 
-int _PC_bin_read(void *ptr, char *type, size_t nitems, PROCESS *pp)
-   {int ni;
+int _PC_bin_read(void *ptr, char *type, size_t ni, PROCESS *pp)
+   {int nir;
     syment *ep;
     PDBfile *file;
     PD_smp_state *pa;
@@ -113,21 +113,21 @@ int _PC_bin_read(void *ptr, char *type, size_t nitems, PROCESS *pp)
         default       : memset(PD_err, 0, MAXLINE);
                         break;};
 
-    ep = _PD_mk_syment(type, nitems, 0L, NULL, NULL);
+    ep = _PD_mk_syment(type, ni, 0L, NULL, NULL);
 
-    ni = _PD_sys_read(file, ep, type, ptr);
+    nir = _PD_sys_read(file, ep, type, ptr);
 
     _PD_rl_syment(ep);
 
-    return((int) ni);}
+    return(nir);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _PC_BIN_WRITE - do binary write to a PROCESS */
 
-int _PC_bin_write(void *ptr, char *type, size_t nitems, PROCESS *pp)
-   {int ni;
+int _PC_bin_write(void *ptr, char *type, size_t ni, PROCESS *pp)
+   {int niw;
     PDBfile *file;
     PD_smp_state *pa;
 
@@ -144,9 +144,9 @@ int _PC_bin_write(void *ptr, char *type, size_t nitems, PROCESS *pp)
 	     memset(PD_err, 0, MAXLINE);
 	     break;};
 
-    ni = _PD_sys_write(file, ptr, nitems, type, type);
+    niw = _PD_sys_write(file, ptr, ni, type, type);
 
-    return(ni);}
+    return(niw);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

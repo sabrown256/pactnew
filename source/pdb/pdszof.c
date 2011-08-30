@@ -143,7 +143,7 @@ static long _PD_sz_itag(char *type, int itags)
 
 /* _PD_SZ_LEAF_MEMBERS - write the direct leaf data */
 
-static long _PD_sz_leaf_members(PDBfile *file, char *type, long nitems,
+static long _PD_sz_leaf_members(PDBfile *file, char *type, long ni,
 				void *vr)
    {long bpi, nb;
     defstr *dpf;
@@ -153,7 +153,7 @@ static long _PD_sz_leaf_members(PDBfile *file, char *type, long nitems,
     if (bpi == -1)
        PD_error("CAN'T GET NUMBER OF BYTES - _PD_SZ_LEAF_MEMBERS", PD_TRACE);
 
-    nb = nitems*bpi;
+    nb = ni*bpi;
 
     return(nb);}
 
@@ -165,7 +165,7 @@ static long _PD_sz_leaf_members(PDBfile *file, char *type, long nitems,
  */
 
 static int _PD_ptr_sz_itags(long *pnb, PDBfile *file, void *vr,
-			    long nitems, char *type)
+			    long ni, char *type)
    {int ret, loc, itags;
     long i;
 
@@ -196,7 +196,7 @@ static int _PD_ptr_sz_itags(long *pnb, PDBfile *file, void *vr,
  */
 
 long PD_sizeof(PDBfile *file ARG(,,cls),
-	       char *type, long nitems, void *vri)
+	       char *type, long ni, void *vri)
    {int dst, size, indir, itags;
     long i, nb;
     char bf[MAXLINE], *ltype, *vr, *svr, *ttype;
@@ -256,7 +256,7 @@ long PD_sizeof(PDBfile *file ARG(,,cls),
     START
 
     case LEAF :
-         nb += _PD_sz_leaf_members(file, ltype, nitems, vr);
+         nb += _PD_sz_leaf_members(file, ltype, ni, vr);
 
          dp = PD_inquire_host_type(file, ltype);
          if (dp == NULL)
@@ -276,7 +276,7 @@ long PD_sizeof(PDBfile *file ARG(,,cls),
 	     i    = 0L;};
 
     case LEAF_ITEM :
-         if (i >= nitems)
+         if (i >= ni)
             GO_CONT;
 
          desc = mem_lst;
@@ -297,8 +297,8 @@ long PD_sizeof(PDBfile *file ARG(,,cls),
              desc = desc->next;
              GO(LEAF_INDIR);};
 
-         SAVE_I(nitems);
-         nitems = desc->number;
+         SAVE_I(ni);
+         ni = desc->number;
 
          SAVE_I(i);
          SAVE_I(size);
@@ -316,7 +316,7 @@ long PD_sizeof(PDBfile *file ARG(,,cls),
          RESTORE_P(memdes, mem_lst);
          RESTORE_I(size);
          RESTORE_I(i);
-         RESTORE_I(nitems);
+         RESTORE_I(ni);
          RESTORE_S(ltype);
 
          desc = desc->next;
@@ -336,7 +336,7 @@ long PD_sizeof(PDBfile *file ARG(,,cls),
          i = 0L;
 
     case INDIR_ITEM :
-         if (i >= nitems)
+         if (i >= ni)
             {RESTORE_S(ltype);
              GO_CONT;};
 
@@ -349,22 +349,22 @@ long PD_sizeof(PDBfile *file ARG(,,cls),
              vr += sizeof(char *);
              GO(INDIR_ITEM);};
 
-         SAVE_I(nitems);
-         nitems = _PD_number_refd(vr, ltype, file->host_chart);
-         if (nitems == -1L)
+         SAVE_I(ni);
+         ni = _PD_number_refd(vr, ltype, file->host_chart);
+         if (ni == -1L)
             {snprintf(bf, MAXLINE,
                       "CAN'T GET POINTER LENGTH ON %s - PD_SIZEOF",
                      ltype);
              PD_error(bf, PD_TRACE);};
 
-         if (nitems == -2L)
+         if (ni == -2L)
             {snprintf(bf, MAXLINE,
                       "UNKNOWN TYPE %s - PD_SIZEOF",
                      ltype);
              PD_error(bf, PD_TRACE);};
 
-         if (!_PD_ptr_sz_itags(&nb, file, vr, nitems, ltype))
-            {RESTORE_I(nitems);
+         if (!_PD_ptr_sz_itags(&nb, file, vr, ni, ltype))
+            {RESTORE_I(ni);
              RESTORE_P(char, vr);
              i++;
              vr += sizeof(char *);
@@ -377,7 +377,7 @@ long PD_sizeof(PDBfile *file ARG(,,cls),
     case INDIR_RET :
          RESTORE_S(ltype);
          RESTORE_I(i);
-         RESTORE_I(nitems);
+         RESTORE_I(ni);
          RESTORE_P(char, vr);
 
          i++;

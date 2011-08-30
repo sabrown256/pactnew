@@ -407,13 +407,13 @@ static int _PN_sizeof(char *s)
 
 /* PN_CONV_IN - convert from one machine format to another after input
  *            - from a remote host with different architecture
- *            - NITEMS of type, TYPE, from IN and put them in OUT
+ *            - NI of type, TYPE, from IN and put them in OUT
  *            - all additional information comes from OUT_CHART
  *
  * #bind PN_conv_in fortran() scheme() python()
  */
 
-void PN_conv_in(void *out, void *in, char *type, long nitems,
+void PN_conv_in(void *out, void *in, char *type, long ni,
 		hasharr *in_chart)
    {data_standard *istd;
     PD_smp_state *pa;
@@ -431,7 +431,7 @@ void PN_conv_in(void *out, void *in, char *type, long nitems,
 
     istd = (data_standard *) SC_hasharr_def_lookup(in_chart, "standard");
 
-    PD_convert((char **) &out, (char **) &in, type, type, nitems,
+    PD_convert((char **) &out, (char **) &in, type, type, ni,
                istd, pa->host_std, pa->host_std,
                in_chart, pa->host_chart, 0, PD_TRACE);
 
@@ -442,13 +442,13 @@ void PN_conv_in(void *out, void *in, char *type, long nitems,
 
 /* PN_CONV_OUT - convert from one machine format to another before output
  *             - to a remote host with different architecture
- *             - NITEMS of type, TYPE, from IN and put them in OUT
+ *             - NI of type, TYPE, from IN and put them in OUT
  *             - all additional information comes from OUT_CHART
  *
  * #bind PN_conv_out fortran() scheme() python()
  */
 
-void PN_conv_out(void *out, void *in, char *type, long nitems,
+void PN_conv_out(void *out, void *in, char *type, long ni,
 		 hasharr *out_chart)
    {data_standard *ostd;
     PD_smp_state *pa;
@@ -466,7 +466,7 @@ void PN_conv_out(void *out, void *in, char *type, long nitems,
 
     ostd = (data_standard *) SC_hasharr_def_lookup(out_chart, "standard");
 
-    PD_convert((char **) &out, (char **) &in, type, type, nitems,
+    PD_convert((char **) &out, (char **) &in, type, type, ni,
                pa->host_std, ostd, pa->host_std,
                pa->host_chart, out_chart, 0, PD_TRACE);
 
@@ -725,13 +725,13 @@ int PN_close(PDBfile *file)
  * #bind PN_write fortran() scheme() python()
  */
 
-int PN_write(PDBfile *file, char *type, long nitems, void *vr)
+int PN_write(PDBfile *file, char *type, long ni, void *vr)
    {int ret;
     char bf[MAXLINE];
 
     PD_reset_ptr_list(file);
 
-    snprintf(bf, MAXLINE, "s[%ld]", nitems);
+    snprintf(bf, MAXLINE, "s[%ld]", ni);
 
     ret = PD_write(file, bf, type, vr);
 
@@ -745,7 +745,7 @@ int PN_write(PDBfile *file, char *type, long nitems, void *vr)
  * #bind PN_read fortran() scheme() python()
  */
 
-int PN_read(PDBfile *file, char *type, long nitems, void *vr)
+int PN_read(PDBfile *file, char *type, long ni, void *vr)
    {int ret;
     int64_t addr;
     char bf[MAXLINE];
@@ -756,7 +756,7 @@ int PN_read(PDBfile *file, char *type, long nitems, void *vr)
     snprintf(bf, MAXLINE, "s");
 
     addr = _PD_get_current_address(file, PD_GENERIC);
-    ep   = _PD_mk_syment(type, nitems, addr, NULL, NULL);
+    ep   = _PD_mk_syment(type, ni, addr, NULL, NULL);
     _PD_e_install(file, bf, ep, TRUE);
 
     ret = PD_read(file, bf, vr);

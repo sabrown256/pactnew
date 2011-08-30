@@ -25,11 +25,11 @@ struct s_chkdes
 
 /* _SC_NALLOC_STD - use the C std library malloc */
 
-static void *_SC_nalloc_std(long nitems, long bpi, int na, int zsp,
+static void *_SC_nalloc_std(long ni, long bpi, int na, int zsp,
 			    const char *fnc, const char *file, int line)
    {void *space;
 
-    space = malloc(nitems*bpi);
+    space = malloc(ni*bpi);
 
     return(space);}
 
@@ -38,10 +38,10 @@ static void *_SC_nalloc_std(long nitems, long bpi, int na, int zsp,
 
 /* _SC_ALLOC_STD - use the C std library malloc */
 
-static void *_SC_alloc_std(long nitems, long bpi, char *name, int na, int zsp)
+static void *_SC_alloc_std(long ni, long bpi, char *name, int na, int zsp)
    {void *space;
 
-    space = malloc(nitems*bpi);
+    space = malloc(ni*bpi);
 
     return(space);}
 
@@ -50,10 +50,10 @@ static void *_SC_alloc_std(long nitems, long bpi, char *name, int na, int zsp)
 
 /* _SC_REALLOC_STD - use the C std library realloc */
 
-static void *_SC_realloc_std(void *p, long nitems, long bpi, int na, int zsp)
+static void *_SC_realloc_std(void *p, long ni, long bpi, int na, int zsp)
    {void *space;
 
-    space = realloc(p, nitems*bpi);
+    space = realloc(p, ni*bpi);
 
     return(space);}
 
@@ -77,7 +77,7 @@ static int _SC_free_std(void *p, int zsp)
  *                - part of a usable API for memory debugging
  */
 
-static void *_SC_nalloc_chk(long nitems, long bpi, int na, int zsp,
+static void *_SC_nalloc_chk(long ni, long bpi, int na, int zsp,
 			    const char *fnc, const char *file, int line)
    {void *space;
     SC_mem_opt opt;
@@ -91,7 +91,7 @@ static void *_SC_nalloc_chk(long nitems, long bpi, int na, int zsp,
     opt.where.pfile = file;
     opt.where.line  = line;
 
-    space = _SC_ALLOC_N(nitems, bpi, &opt);
+    space = _SC_ALLOC_N(ni, bpi, &opt);
 
     if (space == _SC_ms.trap_ptr)
        raise(_SC_ms.trap_sig);
@@ -106,7 +106,7 @@ static void *_SC_nalloc_chk(long nitems, long bpi, int na, int zsp,
  *               - part of a usable API for memory debugging
  */
 
-static void *_SC_alloc_chk(long nitems, long bpi, char *name, int na, int zsp)
+static void *_SC_alloc_chk(long ni, long bpi, char *name, int na, int zsp)
    {void *space;
     SC_mem_opt opt;
 
@@ -119,7 +119,7 @@ static void *_SC_alloc_chk(long nitems, long bpi, char *name, int na, int zsp)
     opt.where.pfile = NULL;
     opt.where.line  = -1;
 
-    space = _SC_ALLOC_N(nitems, bpi, &opt);
+    space = _SC_ALLOC_N(ni, bpi, &opt);
 
     if (space == _SC_ms.trap_ptr)
        raise(_SC_ms.trap_sig);
@@ -134,13 +134,13 @@ static void *_SC_alloc_chk(long nitems, long bpi, char *name, int na, int zsp)
  *                 - part of a usable API for memory debugging
  */
 
-static void *_SC_realloc_chk(void *p, long nitems, long bpi, int na, int zsp)
+static void *_SC_realloc_chk(void *p, long ni, long bpi, int na, int zsp)
    {void *space;
 
     if (p == _SC_ms.trap_ptr)
        raise(_SC_ms.trap_sig);
 
-    space = _SC_REALLOC_W(p, nitems, bpi, na, zsp);
+    space = _SC_REALLOC_W(p, ni, bpi, na, zsp);
 
     if (space == _SC_ms.trap_ptr)
        raise(_SC_ms.trap_sig);
@@ -773,7 +773,7 @@ long SC_arrlen(void *p)
 
     rv = -1L;
 
-    if (SC_is_score_space(p, NULL, &desc))
+    if (SC_is_active_space(p, NULL, &desc))
        {nb = desc->length;
 	rv = (nb < 0L) ? -1L : nb;};
 
@@ -808,7 +808,7 @@ int SC_mark(void *p, int n)
 int SC_set_count(void *p, int n)
    {mem_descriptor *desc;
 
-    if (SC_is_score_space(p, NULL, &desc))
+    if (SC_is_active_space(p, NULL, &desc))
        desc->ref_count = n;
     else
        n = -1;
@@ -826,7 +826,7 @@ int SC_set_count(void *p, int n)
 void *SC_permanent(void *p)
    {mem_descriptor *desc;
 
-    if (SC_is_score_space(p, NULL, &desc))
+    if (SC_is_active_space(p, NULL, &desc))
        desc->ref_count = UNCOLLECT;
 
     return(p);}
@@ -839,7 +839,7 @@ void *SC_permanent(void *p)
 void *SC_mem_attrs(void *p, int attr)
    {mem_descriptor *desc;
 
-    if (SC_is_score_space(p, NULL, &desc))
+    if (SC_is_active_space(p, NULL, &desc))
 
 /* mark the block uncollectable */
        {if (attr & 1)
@@ -887,7 +887,7 @@ int SC_ref_count(void *p)
 
     n = -1;
 
-    if (SC_is_score_space(p, NULL, &desc))
+    if (SC_is_active_space(p, NULL, &desc))
        n = desc->ref_count;
 
     return(n);}
@@ -903,7 +903,7 @@ int SC_arrtype(void *p, int type)
 
     n = -1;
 
-    if (SC_is_score_space(p, NULL, &desc))
+    if (SC_is_active_space(p, NULL, &desc))
        {if (type > 0)
 	   desc->type = type;
 
@@ -921,7 +921,7 @@ char *SC_arrname(void *p)
     mem_descriptor *desc;
 
     rv = NULL;
-    if (SC_is_score_space(p, NULL, &desc))
+    if (SC_is_active_space(p, NULL, &desc))
        rv = _SC_block_name(desc);
 
     return(rv);}
@@ -939,7 +939,7 @@ int SC_set_arrtype(void *p, int type)
 
     n = -1;
 
-    if (SC_is_score_space(p, NULL, &desc))
+    if (SC_is_active_space(p, NULL, &desc))
        {n          = desc->type;
 	desc->type = type;};
 
