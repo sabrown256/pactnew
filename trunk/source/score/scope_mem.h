@@ -299,6 +299,8 @@ extern void
 extern int
  SC_free_n(void *p, ...),
  SC_is_score_space(void *p, mem_header **psp, mem_descriptor **pds),
+ SC_is_free_space(void *p, mem_header **psp, mem_descriptor **pds),
+ SC_is_active_space(void *p, mem_header **psp, mem_descriptor **pds),
  SC_mem_over_mark(int n);
 
 

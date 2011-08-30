@@ -239,11 +239,11 @@ void _SC_assign_block(SC_heap_des *ph, mem_header *space,
 
     desc = &space->block;
 
-    desc->id         = SC_MEM_ID;
-    desc->heap       = ph;
-    desc->ref_count  = 0;
-    desc->type       = 0;
-    desc->length     = nb;
+    desc->id          = SC_MEM_ID;
+    desc->heap        = ph;
+    desc->ref_count   = 0;
+    desc->type        = 0;
+    desc->length      = nb;
     desc->where.pfunc = func;
     desc->where.pfile = file;
     desc->where.line  = line;
@@ -430,6 +430,62 @@ int SC_is_score_space(void *p, mem_header **psp, mem_descriptor **pds)
        {space = ((mem_header *) p) - 1;
 	desc  = &space->block;
 	ok    = SCORE_BLOCK_P(desc);};
+
+    if (psp != NULL)
+       *psp = space;
+
+    if (pds != NULL)
+       *pds = desc;
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_IS_FREE_SPACE - return TRUE iff the given pointer P
+ *                  - points to space allocated by SCORE which is free
+ */
+
+int SC_is_free_space(void *p, mem_header **psp, mem_descriptor **pds)
+   {int ok;
+    mem_header *space;
+    mem_descriptor *desc;
+
+    space = NULL;
+    desc  = NULL;
+    ok    = FALSE;
+    if (p != NULL)
+       {space = ((mem_header *) p) - 1;
+	desc  = &space->block;
+	ok    = (SCORE_BLOCK_P(desc) && FREE_SCORE_BLOCK_P(desc));};
+
+    if (psp != NULL)
+       *psp = space;
+
+    if (pds != NULL)
+       *pds = desc;
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_IS_ACTIVE_SPACE - return TRUE iff the given pointer P
+ *                    - points to space allocated by SCORE which is active
+ */
+
+int SC_is_active_space(void *p, mem_header **psp, mem_descriptor **pds)
+   {int ok;
+    mem_header *space;
+    mem_descriptor *desc;
+
+    space = NULL;
+    desc  = NULL;
+    ok    = FALSE;
+    if (p != NULL)
+       {space = ((mem_header *) p) - 1;
+	desc  = &space->block;
+	ok    = (SCORE_BLOCK_P(desc) && !FREE_SCORE_BLOCK_P(desc));};
 
     if (psp != NULL)
        *psp = space;

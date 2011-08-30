@@ -2450,6 +2450,7 @@ int PD_convert(char **out, char **in, char *typi, char *typo,
    {int ret, tmp;
     long i, mitems, inci, inco;
     long in_offs, out_offs;
+    char msg[MAXLINE];
     char *mtype;
     defstr *dpi, *dpo, *mdpi, *mdpo;
     memdes *desc;
@@ -2466,10 +2467,12 @@ int PD_convert(char **out, char **in, char *typi, char *typo,
 	dpo = PD_inquire_table_type(cho, typo);};
 
     if (dpi == NULL)
-       PD_error("BAD TYPE IN_CHART - PD_CONVERT", error);
+       {snprintf(msg, MAXLINE, "BAD IN TYPE, '%s' - PD_CONVERT", typi);
+	PD_error(msg, error);};
 
     if (dpo == NULL)
-       PD_error("BAD TYPE OUT_CHART - PD_CONVERT", error);
+       {snprintf(msg, MAXLINE, "BAD OUT TYPE, '%s' - PD_CONVERT", typo);
+	PD_error(msg, error);}
 
 /* convert pointers to data via /&ptrs mechanism */
     else if (dpo->is_indirect) 
@@ -2517,13 +2520,17 @@ int PD_convert(char **out, char **in, char *typi, char *typo,
                   else if (_PD_prim_typep(desc->base_type, chi, error))
                      {mdpo = PD_inquire_table_type(cho, mtype);
                       if (mdpo == NULL)
-                         PD_error("BAD OUT TYPE IN STRUCT - PD_CONVERT",
-                                  error);
+			 {snprintf(msg, MAXLINE,
+				   "BAD OUT TYPE, '%s' IN STRUCT - PD_CONVERT",
+				   mtype);
+			  PD_error(msg, error);};
 
                       mdpi = PD_inquire_table_type(chi, mtype);
                       if (mdpi == NULL)
-                         PD_error("BAD IN TYPE IN STRUCT - PD_CONVERT",
-                                  error);
+			 {snprintf(msg, MAXLINE,
+				   "BAD IN TYPE, '%s' IN STRUCT - PD_CONVERT",
+				   mtype);
+			  PD_error(msg, error);};
 
 		      ret = _PD_convert((char **) out, in, mitems, boffs,
 					mdpi, mdpo, stdi, stdo, hstd,
@@ -2536,16 +2543,20 @@ int PD_convert(char **out, char **in, char *typi, char *typo,
                                       chi, cho, boffs, error);
 
                   if (ret == FALSE)
-                     PD_error("STRUCT CONVERSION FAILED - PD_CONVERT",
-                              error);};};}
+		     {snprintf(msg, MAXLINE,
+			       "STRUCT CONVERSION FAILED FOR '%s' - PD_CONVERT",
+			       typi);
+		      PD_error(msg, error);};};};}
 
 /* if members is NULL then it is a primitive type */
     else
        {ret = _PD_convert((char **) out, in, ni, boffs, dpi, dpo,
                           stdi, stdo, hstd, &in_offs, &out_offs);
         if (ret == FALSE)
-           PD_error("PRIMITIVE CONVERSION FAILED - PD_CONVERT",
-                    error);};
+	   {snprintf(msg, MAXLINE,
+		     "PRIMITIVE CONVERSION FAILED FOR '%s' TO '%s' - PD_CONVERT",
+		     typi, typo);
+	    PD_error(msg, error);};};
 
     return(ret);}
 

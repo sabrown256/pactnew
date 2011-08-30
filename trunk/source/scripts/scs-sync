@@ -130,7 +130,7 @@ foreach e ($dirs $excd)
    else if ("$e" =~ ../*) then
       echo $e | sed 's|^\.\./|'$pkg:h'/|' >>& $excf
    else
-      echo $pkg'/*/'$e'/*' >>& $excf
+      echo $pkg'/**/'$e'/*' >>& $excf
    endif
 end
 

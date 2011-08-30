@@ -683,22 +683,28 @@ int SC_mem_trace(void)
 
 /* DPRFREE - print the free memory lists */
 
-void dprfree(void)
+void dprfree(long jmn, long jmx)
    {long i, j;
     SC_heap_des *ph;
     mem_descriptor *md;
 
     ph = _SC_tid_mm();
 
-    io_printf(stdout, "Bin  Max  Blocks\n");
-    for (j = 0L; j < _SC_ms.n_bins; j++)
-        {io_printf(stdout, "%3ld %4ld ", j, SC_BIN_SIZE(j));
+    if ((jmn < 0) || (jmx <= jmn))
+       {jmn = 0L;
+	jmx = _SC_ms.n_bins;};
+
+    for (j = jmn; j < jmx; j++)
+        {fprintf(stdout, "Bin %3ld   Max Size %4ld\n", j, SC_BIN_SIZE(j));
          for (md  = ph->free_list[j], i = 0L;
 	      md != NULL;
 	      md  = (mem_descriptor *) md->where.pfunc, i++)
-             {io_printf(stdout, " %lx", md);
+             {fprintf(stdout, " %10p", md);
+	      if (i % 6 == 5)
+		 fprintf(stdout, "\n");
 	      fflush(stdout);};
-	 io_printf(stdout, "\n");};
+	 if (i % 6 != 0)
+	    fprintf(stdout, "\n");};
 
     return;}
 
@@ -784,7 +790,7 @@ long SC_arrlen(void *p)
 int SC_mark(void *p, int n)
    {mem_descriptor *desc;
 
-    if (SC_is_score_space(p, NULL, &desc))
+    if (SC_is_active_space(p, NULL, &desc))
        {if (desc->ref_count < UNCOLLECT)
            desc->ref_count += n;
 

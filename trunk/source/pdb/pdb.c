@@ -140,7 +140,7 @@ PDBfile *PD_family(PDBfile *of ARG(,,cls), int flag)
         SC_advance_name(name);
 
 /* create the new file - being sure to get the target right */
-        pa->req_std  = of->std;
+        pa->req_std   = of->std;
         pa->req_align = of->align;
         nf = PD_open(name, "w");
 	if (nf != NULL)
