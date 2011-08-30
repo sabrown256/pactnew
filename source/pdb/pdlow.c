@@ -610,13 +610,12 @@ void _PD_defstr_prim_rd(PDBfile *file, char *type, char *origtype,
 	    host_empty = TRUE;
 
 	 dp = PD_inquire_type(file, origtype);
- 
 	 if (dp != NULL)
-	    _PD_d_install(file, type, _PD_defstr_copy(dp), PD_CHART_FILE);
+	    {_PD_d_install(file, type, _PD_defstr_copy(dp), PD_CHART_FILE);
 
-/* only the file chart has it - look in there */
-	 if ((dp != NULL) && host_empty)
-	    _PD_d_install(file, type, _PD_defstr_copy(dp), PD_CHART_HOST);
+/* only the file chart has it - better install in the host chart too */
+	     if (host_empty == TRUE)
+	        _PD_d_install(file, type, _PD_defstr_copy(dp), PD_CHART_HOST);};
 
 	 CFREE(ordr);
 	 CFREE(formt);

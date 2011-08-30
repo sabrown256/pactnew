@@ -486,6 +486,8 @@ static void _PD_rd_prim_align_type(char *type, int al, data_alignment *align)
 
 /* _PD_RD_PRIM_TYP_II - read the primitive types from the extras table */
 
+/* #define WAY */
+
 static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
    {int ni, align;
     int dc, rec;
@@ -514,7 +516,7 @@ static int way = 0;
     if (bf != NULL)
        _PD_get_token(bf, local, bsz, '\n');
 
-#if 0
+#if defined(WAY)
 way = 1;
 /* initialize the pdb system defs and structure chart */
     _PD_init_chrt(file, FALSE);
@@ -611,7 +613,7 @@ if (way == 0)
 
         CFREE(type);};
 
-#if 1
+#if !defined(WAY)
 /* initialize the pdb system defs and structure chart */
     _PD_init_chrt(file, TRUE);
 #endif
