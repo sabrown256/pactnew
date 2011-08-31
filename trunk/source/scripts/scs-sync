@@ -216,14 +216,29 @@ endif
 
 # COMMIT
 
-flog $log scs-update
+ftee $log scs-update
 
-flog $log scs-commit -m "Import from $repos"
+NoteD $log "Are these changes correct?"
+NoteD $log "Entering sub-shell to verify befor commit"
+NoteD $log "Type exit at the prompt to resume"
+flog $log set here = $cwd
+csh -f
+set xstatus = $status
+flog $log cd $here
 
-flog $log cat log.commit
+if ($xstatus == 0) then
+   flog $log scs-commit -m "Import from $repos"
+   flog $log cat log.commit
+   flog $log rm -f $excf
+   flog $log rm -rf syncs syncd
+else
+   NoteD $log ""
+   NoteD $log "Verification denied - commit not attempted"
+   NoteD $log "Examine $cwd for information"
+   NoteD $log "Also file $cwd/log.commit"
+   NoteD $log ""
+endif
 
 flog $log popd
-flog $log rm -f $excf
-flog $log rm -rf syncs syncd
 
 exit($status)
