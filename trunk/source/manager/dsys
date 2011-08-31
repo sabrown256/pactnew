@@ -94,9 +94,7 @@ shift
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-#
-# Make sure that the installation directories exist
-#
+# make sure that the installation directories exist
 
 if ("$Cmnd" != "dirs") then
    $DSYS dirs
