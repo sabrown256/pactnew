@@ -16,6 +16,12 @@ set err = 0
 set d   = $cwd
 set d   = $d:t
 
+# GOTCHA: intel compilers need the -l option to blang
+# to be technically correct - things are working without
+# it at the moment
+set opt = "-l"
+set opt = ""
+
 source ../dev/$arch/include/env-pact.csh
 source ../scripts/env-csh
 
@@ -260,7 +266,7 @@ Note $Log ""
    set zdir = z-$arch/obj
    flog $Log pushd $zdir
 
-   flog $Log blang -b $cbind:t -c $cproto:t -d $cdoc:t -f $fproto:t -w $fwrap:t
+   flog $Log blang $opt -b $cbind:t -c $cproto:t -d $cdoc:t -f $fproto:t -w $fwrap:t
    set xstatus = $status
 
 # move all fortran stuff to the fortran package

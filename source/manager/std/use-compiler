@@ -172,8 +172,13 @@ foreach c ($fname $cname)
 
    endif
 
-   set sdir = $cmp:h
-   set dirl = ( $dirl $sdir )
+# check for valid executable or else bail now
+   if (-x "$cmp") then
+      set sdir = $cmp:h
+      set dirl = ( $dirl $sdir )
+   else
+      continue
+   endif
 
 # only take lfvers and froot from Fortran compiler
    if ($c == $fname) then
@@ -219,10 +224,12 @@ endif
 
 if ($#dirl == 1) then
    setenv PATH  $dirl[1]':$PATH'
-else if ($dirl[1] == $dirl[2]) then
-   setenv PATH  $dirl[1]':$PATH'
 else
-   setenv PATH  ${dirl[1]}:${dirl[2]}':$PATH'
+   if ($dirl[1] == $dirl[2]) then
+      setenv PATH  $dirl[1]':$PATH'
+   else
+      setenv PATH  ${dirl[1]}:${dirl[2]}':$PATH'
+   endif
 endif
 setenv PACT_CC_VERSION  $lcvers
 setenv PACT_CC_PATH     $croot

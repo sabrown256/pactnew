@@ -21,7 +21,7 @@ OD = DefaultO
 #
 CcFlags = ${ODC} -I. -I${PACTSrcDir} -I${IncDir} ${MDInc} ${MDGInc}
 FcFlags = ${ODF} -I${IncDir} ${MDInc}
-LdFlags = -L${LibDir} ${LDFLAGS}
+LdFlags = -g -L${LibDir} ${LDFLAGS}
 
 CCAnnounce = ${CCompiler} ${ODC} ${Shared_CC_Flags} ${CFLAGS}
 FCAnnounce = ${FCompiler} ${ODC} ${FFLAGS}
