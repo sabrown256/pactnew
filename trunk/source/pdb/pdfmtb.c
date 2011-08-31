@@ -202,6 +202,7 @@ static int _PD_rd_fmt_ii(PDBfile *file)
 	 n     = std->fp[i].bpi;
 	 order = std->fp[i].order;
 	 CREMAKE(order, int, n);
+	 SC_mark(order, 1);
 	 std->fp[i].order = order;
 	 for (j = 0; j < n; j++, *(order++) = *(p++));};
 
@@ -486,7 +487,7 @@ static void _PD_rd_prim_align_type(char *type, int al, data_alignment *align)
 
 /* _PD_RD_PRIM_TYP_II - read the primitive types from the extras table */
 
-/* #define WAY */
+#define WAY
 
 static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
    {int ni, align;

@@ -54,49 +54,6 @@ static void
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PRINT_HELP - print a help message */
-
-static void print_help(void)
-   {PRINT(STDOUT, "\nPATHTS - run time history test suite\n");
-    PRINT(STDOUT, "           tests are:\n");
-    PRINT(STDOUT, "             1 - simple test of basic functionality\n");
-    PRINT(STDOUT, "             2 - test the use of non-double types\n");
-    PRINT(STDOUT, "             3 - test the use of multiple records\n");
-    PRINT(STDOUT, "             4 - simple test of FORTRAN API\n");
-    PRINT(STDOUT, "\n");
-
-    PRINT(STDOUT, "Usage: pathts [-c #] [-d] [-h] [-i] [-l #] [-1] [-2] [-3] [-4]\n");
-    PRINT(STDOUT, "\n");
-
-    PRINT(STDOUT, "       c - cleanup level\n");
-    PRINT(STDOUT, "           0 remove nothing\n");
-    PRINT(STDOUT, "           1 remove time history files only\n");
-    PRINT(STDOUT, "           2 remove ULTRA files and time history files\n");
-
-    PRINT(STDOUT, "       d - turn on debug mode to display memory maps\n");
-
-    PRINT(STDOUT, "       h - print this help message and exit\n");
-
-    PRINT(STDOUT, "       i - number of iterations per test (default 10)\n");
-
-    PRINT(STDOUT, "       l - testing level\n");
-    PRINT(STDOUT, "           1 basic test only\n");
-    PRINT(STDOUT, "           2 restart and basic test\n");
-    PRINT(STDOUT, "           3 backup, restart, and basic\n");
-    PRINT(STDOUT, "           4 large file, backup, restart, and basic\n");
-
-    PRINT(STDOUT, "       1 - do NOT run test #1\n");
-    PRINT(STDOUT, "       2 - do NOT run test #2\n");
-    PRINT(STDOUT, "       3 - do NOT run test #3\n");
-    PRINT(STDOUT, "       4 - do NOT run test #4\n");
-
-    PRINT(STDOUT, "\n");
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* RUN_TEST - execute a test sequence */
 
 static int run_test(PFTest test, char *base, char *restart,
@@ -891,11 +848,54 @@ static int test_4(char *base, char *seq, char *prev, char *mode,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PRINT_HELP - print a help message */
+
+static void print_help(void)
+   {
+
+    PRINT(STDOUT, "\nPATHTS - run time history test suite\n");
+    PRINT(STDOUT, "           tests are:\n");
+    PRINT(STDOUT, "             1 - simple test of basic functionality\n");
+    PRINT(STDOUT, "             2 - test the use of non-double types\n");
+    PRINT(STDOUT, "             3 - test the use of multiple records\n");
+    PRINT(STDOUT, "             4 - simple test of FORTRAN API\n");
+    PRINT(STDOUT, "\n");
+
+    PRINT(STDOUT, "Usage: pathts [-c #] [-d] [-h] [-i] [-l #] [-v #] [-1] [-2] [-3] [-4]\n");
+    PRINT(STDOUT, "\n");
+
+    PRINT(STDOUT, "       c - cleanup level\n");
+    PRINT(STDOUT, "           0 remove nothing\n");
+    PRINT(STDOUT, "           1 remove time history files only\n");
+    PRINT(STDOUT, "           2 remove ULTRA files and time history files\n");
+
+    PRINT(STDOUT, "       d - turn on debug mode to display memory maps\n");
+    PRINT(STDOUT, "       h - print this help message and exit\n");
+    PRINT(STDOUT, "       i - number of iterations per test (default 10)\n");
+
+    PRINT(STDOUT, "       l - testing level\n");
+    PRINT(STDOUT, "           1 basic test only\n");
+    PRINT(STDOUT, "           2 restart and basic test\n");
+    PRINT(STDOUT, "           3 backup, restart, and basic\n");
+    PRINT(STDOUT, "           4 large file, backup, restart, and basic\n");
+
+    PRINT(STDOUT, "       v  - use format version # (default is 2)\n");
+
+    PRINT(STDOUT, "       1 - do NOT run test #1\n");
+    PRINT(STDOUT, "       2 - do NOT run test #2\n");
+    PRINT(STDOUT, "       3 - do NOT run test #3\n");
+    PRINT(STDOUT, "       4 - do NOT run test #4\n");
+
+    PRINT(STDOUT, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* MAIN - read the restart dump and run the physics loop */
 
-int main(argc, argv)
-   int argc;
-   char **argv;
+int main(int c, char **v)
    {int i;
     int test_one, test_two, test_three, test_four;
     int iter, cleanup_level, opt;
@@ -914,28 +914,40 @@ int main(argc, argv)
     test_two      = TRUE;
     test_three    = TRUE;
     test_four     = TRUE;
-    for (i = 1; i < argc; i++)
-        {if (argv[i][0] == '-')
-            {switch (argv[i][1])
-                {case 'c' : cleanup_level = atoi(argv[++i]);
-                            break;
-                 case 'd' : debug_mode  = TRUE;
-                            SC_gs.mm_debug = TRUE;
-                            break;
-                 case 'i' : iter = atoi(argv[++i]);
-                            break;
-                 case 'h' : print_help();
-                            return(1);
-                 case 'l' : opt = atoi(argv[++i]);
-                            break;
-                 case '1' : test_one = FALSE;
-                            break;
-                 case '2' : test_two = FALSE;
-                            break;
-                 case '3' : test_three = FALSE;
-                            break;
-                 case '4' : test_four = FALSE;
-                            break;};}
+    for (i = 1; i < c; i++)
+        {if (v[i][0] == '-')
+            {switch (v[i][1])
+                {case 'c' :
+		      cleanup_level = atoi(v[++i]);
+		      break;
+                 case 'd' :
+		      debug_mode  = TRUE;
+		      SC_gs.mm_debug = TRUE;
+		      break;
+                 case 'i' :
+		      iter = atoi(v[++i]);
+		      break;
+                 case 'h' :
+		      print_help();
+		      return(1);
+                 case 'l' :
+		      opt = atoi(v[++i]);
+		      break;
+                 case 'v' :
+                      PD_set_fmt_version(SC_stoi(v[++i]));
+		      break;
+                 case '1' :
+		      test_one = FALSE;
+		      break;
+                 case '2' :
+		      test_two = FALSE;
+		      break;
+                 case '3' :
+		      test_three = FALSE;
+		      break;
+                 case '4' :
+		      test_four = FALSE;
+		      break;};}
          else
             break;};
 
