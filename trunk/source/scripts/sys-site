@@ -114,7 +114,8 @@ if (-f "$SignF") then
 # do test on status after executing any other form
          else
             unset noglob
-            $line >& /dev/null
+#            $line >& /dev/null
+            eval "$line" >& /dev/null
             if ($status == 0) set Res = TRUE
             if ($Verbose == TRUE) then
                echo "line ${iline}:      $line => $Res"

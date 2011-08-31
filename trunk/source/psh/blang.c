@@ -122,6 +122,9 @@ static void
  fc_type(char *wty, int nc, farg *al, int afl, langmode mode),
  cs_type(char *a, int nc, farg *arg, int drf);
 
+static char
+ *istrl;
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -1549,7 +1552,7 @@ static void fc_decl_list(char *a, int nc, fdecl *dcl)
 	cargs = dcl->cargs;
 	nca   = lst_length(cargs);
         for (i = 0; i < nca; i++)
-	    vstrcat(a, MAXLINE, "int snc%s, ", cargs[i]);
+	    vstrcat(a, MAXLINE, "%s snc%s, ", istrl, cargs[i]);
 	if (dcl->nc == 0)
 	   dcl->nc = nca;
 
@@ -4470,12 +4473,13 @@ int main(int c, char **v)
     char pck[MAXLINE], msg[MAXLINE];
     char *fbi, *cdc, *cpr, *fpr, *fwr;
 
-    fbi = "";
-    cpr = "";
-    cdc = "";
-    fpr = "";
-    fwr = "";
-    cfl = 3;
+    istrl = "int";
+    fbi   = "";
+    cpr   = "";
+    cdc   = "";
+    fpr   = "";
+    fwr   = "";
+    cfl   = 3;
 
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-b") == 0)
@@ -4487,16 +4491,19 @@ int main(int c, char **v)
 	 else if (strcmp(v[i], "-f") == 0)
 	    fpr = v[++i];
 	 else if (strcmp(v[i], "-h") == 0)
-            {printf("Usage: blang -b <bindings> -c <c-proto> [-d <doc>] [-f <f-proto>] [-h] [-w <f-wrapper>] [-wr]\n");
+            {printf("Usage: blang -b <bindings> -c <c-proto> [-d <doc>] [-f <f-proto>] [-h] [-l] [-w <f-wrapper>] [-wr]\n");
              printf("   b    file containing binding specifications\n");
              printf("   c    file containing C prototypes\n");
              printf("   d    file containing documentation comments\n");
              printf("   f    file containing Fortran prototypes\n");
              printf("   h    this help message\n");
+             printf("   l    use long for Fortran implicit arguments\n");
              printf("   o    no interoprabilty interfaces (Fortran wrappers only)\n");
              printf("   w    file containing Fortran wrapper specifications\n");
              printf("   wr   no Fortran wrappers (interoperability only)\n");
              printf("\n");}
+	 else if (strcmp(v[i], "-l") == 0)
+            istrl = "long";
 	 else if (strcmp(v[i], "-o") == 0)
             cfl &= ~2;
 	 else if (strcmp(v[i], "-w") == 0)
