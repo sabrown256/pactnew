@@ -592,6 +592,7 @@ defstr *_PD_mk_defstr(hasharr *chrt, char *type, PD_type_kind kind,
     SC_mark(ordr, 1);
     SC_mark(formt, 1);
     SC_mark(lst, 1);
+    SC_mark(tuple, 1);
 
     return(dp);}
 
@@ -708,6 +709,7 @@ multides *_PD_make_tuple(char *type, int ni, int *ord)
     tuple->order = ord;
 
     SC_mark(ord, 1);
+    SC_mark(type, 1);
 
     return(tuple);}
 
@@ -725,6 +727,9 @@ multides *_PD_copy_tuple(multides *tuple)
 
     ntuple->type  = CSTRSAVE(tuple->type);
     ntuple->order = SC_copy_item(tuple->order);
+
+    SC_mark(ntuple->order, 1);
+    SC_mark(ntuple->type, 1);
 
     return(ntuple);}
 

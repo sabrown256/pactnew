@@ -572,6 +572,11 @@ static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype,
     ni  = 0;
 
     dpf = _PD_lookup_type(outtype, file->chart);
+    if (dpf == NULL)
+       PD_error("CANNOT FIND TYPE IN THE FILE CHART - _PD_WR_LEAF_MEMBERS", PD_WRITE);
+    else
+       bpi = dpf->size;
+
     ipt = _PD_items_per_tuple(dpf);
 
     nitems *= ipt;
@@ -583,11 +588,6 @@ static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype,
        cnv = ((dpf->convert > 0) ||
 	      (_PD_TEXT_OUT(file) == TRUE) ||
 	      (strcmp(intype, outtype) != 0));
-
-    if (dpf == NULL)
-       PD_error("CANNOT FIND TYPE IN THE FILE CHART - _PD_WR_LEAF_MEMBERS", PD_WRITE);
-    else
-       bpi = dpf->size;
 
     if (bpi == -1)
        PD_error("CAN'T GET NUMBER OF BYTES - _PD_WR_LEAF_MEMBERS", PD_WRITE);
