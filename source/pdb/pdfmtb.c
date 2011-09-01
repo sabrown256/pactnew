@@ -491,12 +491,11 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
    {int ni, align;
     int dc, rec;
     int unsgned, onescmp;
-    int *ordr, *aord, *tord;
+    int *ordr, *aord;
     long i, bpi, conv, bsz;
-    long *formt, *tfmt;
+    long *formt;
     char *token, *type, *origtype, *atype, delim[10], *s, *local;
     multides *tuple;
-    data_standard *std;
     PD_type_kind kind;
     PD_byte_order ord;
     PD_smp_state *pa;
@@ -548,19 +547,6 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
             for (i = 0L; i < 8; i++)
                 formt[i] = SC_stol(SC_strtok(NULL, delim, s));
 
-/* NOTE: long double does not come in _PD_rd_fmt_ii the way the others do */
-	    if (strcmp(type, SC_LONG_DOUBLE_S) == 0)
-	       {std  = file->std;
-		tord = std->fp[2].order;
-		tfmt = std->fp[2].format;
-		CREMAKE(tord, int, bpi);
-		std->fp[2].order = tord;
-		for (i = 0L; i < bpi; i++)
-		    tord[i] = ordr[i];
-		for (i = 0L; i < 8; i++)
-		    tfmt[i] = formt[i];
-		std->fp[2].bpi = bpi;};
-	       
 	    kind = FLOAT_KIND;}
 
         else if ((token != NULL) && (strcmp(token, "NO-CONV") == 0))

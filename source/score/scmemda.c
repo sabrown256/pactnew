@@ -695,7 +695,7 @@ void dprfree(long jmn, long jmx)
 	jmx = _SC_ms.n_bins;};
 
     for (j = jmn; j < jmx; j++)
-        {fprintf(stdout, "Bin %3ld   Max Size %4ld\n", j, SC_BIN_SIZE(j));
+        {fprintf(stdout, "Bin %3ld   Max Size %4d\n", j, SC_BIN_SIZE(j));
          for (md  = ph->free_list[j], i = 0L;
 	      md != NULL;
 	      md  = (mem_descriptor *) md->where.pfunc, i++)
