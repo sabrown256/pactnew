@@ -487,8 +487,6 @@ static void _PD_rd_prim_align_type(char *type, int al, data_alignment *align)
 
 /* _PD_RD_PRIM_TYP_II - read the primitive types from the extras table */
 
-#define WAY
-
 static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
    {int ni, align;
     int dc, rec;
@@ -502,7 +500,6 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
     PD_type_kind kind;
     PD_byte_order ord;
     PD_smp_state *pa;
-static int way = 0;
 
     pa = _PD_get_state(-1);
 
@@ -517,11 +514,8 @@ static int way = 0;
     if (bf != NULL)
        _PD_get_token(bf, local, bsz, '\n');
 
-#if defined(WAY)
-way = 1;
 /* initialize the pdb system defs and structure chart */
     _PD_init_chrt(file, FALSE);
-#endif
 
     while (_PD_get_token(NULL, local, bsz, '\n'))
        {if (*local == rec)
@@ -585,11 +579,7 @@ way = 1;
 	    if (aord[0] == -1)
 	       CFREE(aord);
 	    tuple = _PD_make_tuple(atype, ni, aord);
-if (way == 1)
 	    token = SC_strtok(NULL, delim, s);};
-
-if (way == 0)
-   token = SC_strtok(NULL, delim, s);
 
         if ((token != NULL) && (strcmp(token, "UNSGNED") == 0))
 	   {unsgned = SC_stol(SC_strtok(NULL, delim, s));
@@ -613,11 +603,6 @@ if (way == 0)
 			   ordr, formt, unsgned, onescmp, conv);
 
         CFREE(type);};
-
-#if !defined(WAY)
-/* initialize the pdb system defs and structure chart */
-    _PD_init_chrt(file, TRUE);
-#endif
 
     return(TRUE);}
 
