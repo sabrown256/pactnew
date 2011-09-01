@@ -808,7 +808,7 @@ static int _SC_subst_strings(anadep *state, ruledes *rd, char **a)
 	if (pa != pb)
 	   {ns++;
 	    *a = pb;
-	    CFREE(pa);};};
+/*	    CFREE(pa); */};};
 
     return(ns);}
 

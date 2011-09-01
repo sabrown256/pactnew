@@ -91,12 +91,6 @@ foreach i ($alst)
    endif
 end
 
-#echo "--------"
-#echo "tgt = |$tgt|"
-#echo "adv = |$adv|"
-#echo "TEST_ADVISORY = |$TEST_ADVISORY|"
-#echo "advise = $advise"
-
 switch ($tgt)
 
 #--------------------------------------------------------------------------
@@ -149,6 +143,8 @@ switch ($tgt)
         if ($terr == 1) then
            if ($advise == TRUE) then
               Note $Log "PASSED by advisory match ( $adv ) in ( $TEST_ADVISORY )"
+              Note $Log "tgt = |$tgt|"
+
               flog $Log set err = 0
            else
               flog $Log set err = 1

@@ -274,14 +274,16 @@ void _SC_deassign_block(SC_heap_des *ph, mem_descriptor *desc,
 			void *addr)
    {
 
-    desc->id        = SC_MEM_ID;
-    desc->heap      = ph;
-    desc->ref_count = SC_MEM_MFA;
-    desc->type      = SC_MEM_MFB;
-    desc->length    = 0L;
-
     desc->prev = NULL;
     desc->next = NULL;
+    desc->heap = ph;
+
+    desc->length      = 0L;
+    desc->id          = SC_MEM_ID;
+    desc->initialized = FALSE;
+    desc->ref_count   = SC_MEM_MFA;
+    desc->type        = SC_MEM_MFB;
+
     desc->where.pfunc = (char *) addr;
     desc->where.pfile = NULL;
     desc->where.line  = -1;
@@ -400,7 +402,10 @@ SC_heap_des *_SC_tid_mm(void)
 /* _SC_PRIM_MEMSET - efficiently zero out a memory block */
 
 void _SC_prim_memset(void *p, long nb)
-   {long i, ni, nd;
+   {
+
+#ifdef USE_FULL_MM
+    long i, ni, nd;
     double *d;
 
     nd = sizeof(double);
@@ -408,6 +413,12 @@ void _SC_prim_memset(void *p, long nb)
 
     d = (double *) p;
     for (i = 0L; i < ni; i++, *d++ = 0.0);
+
+#else
+
+    memset(p, 0, nb);
+
+#endif
 
     return;}
 

@@ -297,12 +297,9 @@ int _SC_free_ns(void *p, void *arg)
 
     _SC_unassign_block(ph, space);
 
-    _SC_mem_stats_acc(ph, 0L, nbp - ph->hdr_size);
-
+    _SC_mem_stats_acc(ph, 0L, nb);
     if ((zsp == 1) || (zsp == 3))
-       _SC_prim_memset(space, nbp);
-    else
-       {_SC_deassign_block(ph, desc, NULL);};
+       _SC_prim_memset(p, nb);
 
     _SC_FREE((void *) space);
 
