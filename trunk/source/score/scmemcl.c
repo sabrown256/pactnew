@@ -13,12 +13,33 @@
 #include "score_int.h"
 #include "scope_mem.h"
 
+#define SC_BIN_UNITS(_n)  (((_n) < _SC_ms.block_size) ? _SC_ms.block_size/(_n) : 1)
+# define SC_BIN_SIZE(_n)  (((_n) >= _SC_ms.n_bins) ? -1 : _SC_ms.bins[_n])
+
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_PRIM_MEMSET_L - efficiently zero out a memory block */
+
+static void _SC_prim_memset_l(void *p, long nb)
+   {long i, ni, nd;
+    double *d;
+
+    nd = sizeof(double);
+    ni = (nb + nd - 1L) / nd;
+
+    d = (double *) p;
+    for (i = 0L; i < ni; i++, *d++ = 0.0);
+
+    return;}
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _SC_BIN_INDEX - hash a byte size to an index */
 
-long _SC_bin_index(long n)
+static long _SC_bin_index(long n)
    {long m, imn, imx, rv;
 
     m = -1L;
@@ -133,7 +154,7 @@ static void *_SC_prim_alloc(size_t nbp, SC_heap_des *ph, int zsp)
        return(NULL);
 
     nb = nbp - ph->hdr_size;
-    j  = SC_BIN_INDEX(nb);
+    j  = _SC_bin_index(nb);
 
 /* if this chunk size is within SCORE managed space handle it here */
     if (j < _SC_ms.n_bins)
@@ -155,7 +176,7 @@ static void *_SC_prim_alloc(size_t nbp, SC_heap_des *ph, int zsp)
 
 /* otherwise go out to the system for memory
  * get a doubles worth of extra bytes to guarantee that
- * _SC_prim_memset won't clobber anything
+ * _SC_prim_memset_l won't clobber anything
  */
     else
        {if (zsp == 5)
@@ -298,7 +319,7 @@ void *_SC_alloc_nl(long ni, long bpi, void *arg)
 	       {if (SC_gs.mm_debug == TRUE)
 		   memset(space, 0, nb);
 	        else if (desc->initialized == FALSE)
-		   _SC_prim_memset(space, nb);};
+		   _SC_prim_memset_l(space, nb);};
 
 /* log this entry if doing memory history */
 	    if (_SC.mem_hst != NULL)
@@ -514,7 +535,7 @@ int _SC_free_nl(void *p, void *arg)
 
     _SC_mem_stats_acc(ph, 0L, nb);
     if ((zsp == 1) || (zsp == 3))
-       _SC_prim_memset(p, nb);
+       _SC_prim_memset_l(p, nb);
 
     if (SC_gs.mm_debug)
        _SC_FREE((void *) space);
@@ -708,41 +729,54 @@ int _SC_prune_major_blocks(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_N_BLOCKS_L - return the number of blocks contained in
- *                - major blocks
- */
+/* DPRFREE - print the free memory lists */
 
-int _SC_n_blocks_l(SC_heap_des *ph, int flag)
-   {int i, n, nmj;
-    long nt, ntc, ntx;
-    major_block_des *mbl;
+void dprfree(long jmn, long jmx)
+   {long i, j;
+    SC_heap_des *ph;
+    mem_descriptor *md;
 
-/* count the number of blocks we are going to have
- * this may significantly over count but this is for allocating space
- */
-    n = 1;
+    ph = _SC_tid_mm();
 
-/* add active block count */
-    if ((flag & 1) && (ph->latest_block != NULL))
-       {ntx = ph->nx_mem_blocks;
-	ntc = ph->n_mem_blocks;
-	nt  = min(ntx, 10*ntc);
-	n  += nt + BLOCKS_UNIT_DELTA;};
+    if ((jmn < 0) || (jmx <= jmn))
+       {jmn = 0L;
+	jmx = _SC_ms.n_bins;};
 
-/* add blocks tied up in major blocks - essentially the free blocks
- * this double counts some of active blocks
- */
-    if (flag & 2)
-       {nmj = ph->n_major_blocks;
-	mbl = ph->major_block_list;
-	for (i = 0; i < nmj; i++)
-	    n += mbl[i].nunits;};
+    for (j = jmn; j < jmx; j++)
+        {fprintf(stdout, "Bin %3ld   Max Size %4d\n", j, SC_BIN_SIZE(j));
+         for (md  = ph->free_list[j], i = 0L;
+	      md != NULL;
+	      md  = (mem_descriptor *) md->where.pfunc, i++)
+             {fprintf(stdout, " %10p", md);
+	      if (i % 6 == 5)
+		 fprintf(stdout, "\n");
+	      fflush(stdout);};
+	 if (i % 6 != 0)
+	    fprintf(stdout, "\n");};
 
-/* add registered block count */
-    if ((flag & 4) && (_SC.mem_table != NULL))
-       n += _SC.mem_table->size;
+    return;}
 
-    return(n);}
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DFLPR - show the free list for the specified bin */
+
+void dflpr(int j)
+   {SC_heap_des *ph;
+    mem_descriptor *md;
+
+    ph = _SC_tid_mm();
+    
+    io_printf(stdout, "Free chunks of size %ld to %ld bytes\n",
+	  (j < 1) ? 1L : SC_BIN_SIZE(j-1) + 1L,
+	  SC_BIN_SIZE(j));
+	  
+    for (md = ph->free_list[j];
+	 md != NULL;
+	 md = (mem_descriptor *) md->where.pfunc)
+        io_printf(stdout, "%8lx\n", md);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

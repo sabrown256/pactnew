@@ -399,32 +399,6 @@ SC_heap_des *_SC_tid_mm(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_PRIM_MEMSET - efficiently zero out a memory block */
-
-void _SC_prim_memset(void *p, long nb)
-   {
-
-#ifdef USE_FULL_MM
-    long i, ni, nd;
-    double *d;
-
-    nd = sizeof(double);
-    ni = (nb + nd - 1L) / nd;
-
-    d = (double *) p;
-    for (i = 0L; i < ni; i++, *d++ = 0.0);
-
-#else
-
-    memset(p, 0, nb);
-
-#endif
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SC_IS_SCORE_SPACE - return TRUE iff the given pointer P
  *                   - points to space allocated by SCORE
  */

@@ -161,8 +161,12 @@ endif
    call BACKUP(import)
 
    if (-e $DateFile) then
+
+# use the new process using scs-sync
       if ($NewProc == TRUE) then
          call SYNC(import)
+
+# use the old process
       else
          call GET_NEW(import, new)
          call GET_OLD(import, old)
@@ -842,7 +846,11 @@ SYNC:
    set excl = ( $excl -exclude hosts )
    set excl = ( $excl -exclude ../config )
    set excl = ( $excl -exclude extensions )
-   set excl = ( $excl -exclude spokes/xxx )
+   if (-f $MngDir/local/exclusions) then
+      foreach i (`cat $MngDir/local/exclusions | grep -v '^#'`)
+         set excl = ( $excl -exclude $i )
+      end
+   endif
 
    Note $Log "Destination repository: $RepoDir"
 

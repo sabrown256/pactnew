@@ -11,6 +11,8 @@
 
 #include "score_int.h"
 
+#include <malloc.h>
+
 #ifdef HAVE_RESOURCE_USAGE
 # include <sys/resource.h>
 #endif
@@ -207,6 +209,8 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 
     if (ru == NULL)
        return(rv);
+
+    malloc_trim(0);
 
     SC_MEM_INIT(SC_rusedes, ru);
 
