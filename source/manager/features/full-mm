@@ -1,0 +1,12 @@
+#
+# FULL-MM - define the use of the full memory manager
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+setenv USE_FULL_MM
+
+
