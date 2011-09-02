@@ -254,6 +254,43 @@ static int _SC_mem_block_inf(SC_heap_des *ph, mem_descriptor *md,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_N_BLOCKS - return the number of blocks contained in PH */
+
+static int _SC_n_blocks(SC_heap_des *ph, int flag)
+   {int i, n, nmj;
+    long nt, ntc, ntx;
+    major_block_des *mbl;
+
+/* count the number of blocks we are going to have
+ * this may significantly over count but this is for allocating space
+ */
+    n = 1;
+
+/* add active block count */
+    if ((flag & 1) && (ph->latest_block != NULL))
+       {ntx = ph->nx_mem_blocks;
+	ntc = ph->n_mem_blocks;
+	nt  = min(ntx, 10*ntc);
+	n  += nt + BLOCKS_UNIT_DELTA;};
+
+/* add blocks tied up in major blocks - essentially the free blocks
+ * this double counts some of active blocks
+ */
+    if (flag & 2)
+       {nmj = ph->n_major_blocks;
+	mbl = ph->major_block_list;
+	for (i = 0; i < nmj; i++)
+	    n += mbl[i].nunits;};
+
+/* add registered block count */
+    if ((flag & 4) && (_SC.mem_table != NULL))
+       n += _SC.mem_table->size;
+
+    return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_MEM_LIST - return an array of text containing a memory map
  *              - each entry is ENTRY_SIZE characters long
  *              - done this way to limit memory allocations in case
@@ -277,7 +314,7 @@ static void _SC_mem_list(int flag, int show, char **parr, int *pnbl)
 
     SC_mem_over_mark(1);
 
-    n = _SC_N_BLOCKS(ph, flag);
+    n = _SC_n_blocks(ph, flag);
 
 /* NOTE: do not use the SCORE memory manager to allocate memory when
  * inspecting the state of the SCORE memory manager

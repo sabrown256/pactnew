@@ -112,7 +112,7 @@ void *_SC_alloc_ns(long ni, long bpi, void *arg)
 	       {if (SC_gs.mm_debug == TRUE)
 		   memset(space, 0, nb);
 	        else if (desc->initialized == FALSE)
-		   _SC_prim_memset(space, nb);};
+		   memset(space, 0, nb);};
 
 /* log this entry if doing memory history */
 	    if (_SC.mem_hst != NULL)
@@ -253,7 +253,7 @@ void *_SC_realloc_ns(void *p, long ni, long bpi, void *arg)
 
 int _SC_free_ns(void *p, void *arg)
    {int zsp;
-    long nb, nbp;
+    long nb;
     SC_mem_opt *opt;
     SC_heap_des *ph;
     mem_header *space;
@@ -290,8 +290,7 @@ int _SC_free_ns(void *p, void *arg)
     if (_SC.mem_hst != NULL)
        _SC.mem_hst(SC_MEM_FREE, desc);
 
-    nb  = desc->length;
-    nbp = nb + ph->hdr_size;
+    nb = desc->length;
 
     SC_LOCKON(SC_mm_lock);
 
@@ -299,7 +298,7 @@ int _SC_free_ns(void *p, void *arg)
 
     _SC_mem_stats_acc(ph, 0L, nb);
     if ((zsp == 1) || (zsp == 3))
-       _SC_prim_memset(p, nb);
+       memset(p, 0, nb);
 
     _SC_FREE((void *) space);
 
@@ -426,33 +425,6 @@ SC_mem_fnc SC_use_reduced_mm(void)
     SC_gs.mm.free    = _SC_free_ws;
 
     return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _SC_N_BLOCKS_S - return the number of blocks */
-
-int _SC_n_blocks_s(SC_heap_des *ph, int flag)
-   {int n;
-    long nt, ntc, ntx;
-
-/* count the number of blocks we are going to have
- * this may significantly over count but this is for allocating space
- */
-    n = 1;
-
-/* add active block count */
-    if ((flag & 1) && (ph->latest_block != NULL))
-       {ntx = ph->nx_mem_blocks;
-	ntc = ph->n_mem_blocks;
-	nt  = min(ntx, 10*ntc);
-	n  += nt + BLOCKS_UNIT_DELTA;};
-
-/* add registered block count */
-    if ((flag & 4) && (_SC.mem_table != NULL))
-       n += _SC.mem_table->size;
-
-    return(n);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

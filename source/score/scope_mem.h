@@ -95,12 +95,6 @@
 # define _SC_REALLOC_W   _SC_realloc_wl
 # define _SC_FREE_N      _SC_free_nl
 # define _SC_FREE_W      _SC_free_wl
-# define _SC_N_BLOCKS    _SC_n_blocks_l
-
-# define SC_BIN_INDEX(_n)    _SC_bin_index(_n)
-# define SC_BIN_SIZE(_n)     (((_n) >= _SC_ms.n_bins) ? -1 : _SC_ms.bins[_n])
-# define SC_BIN_UNITS(_n)    (((_n) < _SC_ms.block_size) ? _SC_ms.block_size/(_n) : 1)
-# define SC_BIN_THRESHOLD()  _SC_ms.bins[_SC_ms.n_bins-1]
 
 #else
 
@@ -109,12 +103,6 @@
 # define _SC_REALLOC_W   _SC_realloc_ws
 # define _SC_FREE_N      _SC_free_ns
 # define _SC_FREE_W      _SC_free_ws
-# define _SC_N_BLOCKS    _SC_n_blocks_s
-
-# define SC_BIN_INDEX(_n)   0
-# define SC_BIN_SIZE(_n)   -1
-# define SC_BIN_UNITS(_n)   1
-# define SC_BIN_THRESHOLD() 0
 
 #endif
 
@@ -291,7 +279,6 @@ extern void
  _SC_deassign_block(SC_heap_des *ph, mem_descriptor *desc,
 		    void *addr),
  _SC_unassign_block(SC_heap_des *ph, mem_header *space),
- _SC_prim_memset(void *p, long nb),
  _SC_init_heap(SC_heap_des *ph, int id),
  *SC_alloc_n(long ni, long bpi, ...),
  *SC_realloc_n(void *p, long ni, long bpi, ...);
@@ -319,11 +306,7 @@ extern void
 
 extern int
  _SC_free_nl(void *p, void *a),
- _SC_free_wl(void *p, int zsp),
- _SC_n_blocks_l(SC_heap_des *ph, int flag);
-
-extern long
- _SC_bin_index(long n);
+ _SC_free_wl(void *p, int zsp);
 
 
 /* SCMEMCS.C declarations */
@@ -341,8 +324,7 @@ extern void
 
 extern int
  _SC_free_ns(void *p, void *a),
- _SC_free_ws(void *p, int zsp),
- _SC_n_blocks_s(SC_heap_des *ph, int flag);
+ _SC_free_ws(void *p, int zsp);
 
 
 /* SCMEMDA.C declarations */

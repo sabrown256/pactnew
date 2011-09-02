@@ -679,58 +679,6 @@ int SC_mem_trace(void)
     return(ret);}
 
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DPRFREE - print the free memory lists */
-
-void dprfree(long jmn, long jmx)
-   {long i, j;
-    SC_heap_des *ph;
-    mem_descriptor *md;
-
-    ph = _SC_tid_mm();
-
-    if ((jmn < 0) || (jmx <= jmn))
-       {jmn = 0L;
-	jmx = _SC_ms.n_bins;};
-
-    for (j = jmn; j < jmx; j++)
-        {fprintf(stdout, "Bin %3ld   Max Size %4d\n", j, SC_BIN_SIZE(j));
-         for (md  = ph->free_list[j], i = 0L;
-	      md != NULL;
-	      md  = (mem_descriptor *) md->where.pfunc, i++)
-             {fprintf(stdout, " %10p", md);
-	      if (i % 6 == 5)
-		 fprintf(stdout, "\n");
-	      fflush(stdout);};
-	 if (i % 6 != 0)
-	    fprintf(stdout, "\n");};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DFLPR - show the free list for the specified bin */
-
-void dflpr(int j)
-   {SC_heap_des *ph;
-    mem_descriptor *md;
-
-    ph = _SC_tid_mm();
-    
-    io_printf(stdout, "Free chunks of size %ld to %ld bytes\n",
-	  (j < 1) ? 1L : SC_BIN_SIZE(j-1) + 1L,
-	  SC_BIN_SIZE(j));
-	  
-    for (md = ph->free_list[j];
-	 md != NULL;
-	 md = (mem_descriptor *) md->where.pfunc)
-        io_printf(stdout, "%8lx\n", md);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
 
 /*                           MEMORY INFO ROUTINES                           */
 
