@@ -484,10 +484,9 @@ void _PD_rl_pfile(PD_Pfile *pf)
 
     CFREE(pf->f_addr);
 
-/* GOTCHA: valgrind and ZeroFault will complain when this is a genuine
- * C library FILE
- */
+/* GOTCHA: double free
     CFREE(pf->stream);
+ */
 
     CFREE(pf);
 

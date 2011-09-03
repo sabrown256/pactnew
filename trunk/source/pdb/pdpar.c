@@ -203,7 +203,10 @@ static int _PD_pclose(FILE *stream)
 
         _PD_pfm_remove_file_t(stream);
 
-        _PD_free_pfile(pf);};
+/* GOTCHA: double free
+        _PD_free_pfile(pf);
+ */
+        };
         
     return(rv);}
 
