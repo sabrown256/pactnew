@@ -6,7 +6,7 @@
 # the same pointer may be in an array
 
 {
-   ptr-array-free8
+   ptr-array-free_a8
    Memcheck:Addr8
    fun:_SC_free_n*
    fun:_SC_free_w*
@@ -16,7 +16,7 @@
    fun:_PD_ptr_free_apl
 }
 {
-   ptr-array-free8
+   ptr-array-free_b8
    Memcheck:Addr8
    fun:SC_free_array
    fun:_PD_ptr_free_apl_item
@@ -24,7 +24,7 @@
    fun:_PD_ptr_free_apl
 }
 {
-   ptr-array-free4
+   ptr-array-free_a4
    Memcheck:Addr4
    fun:_SC_free_n*
    fun:_SC_free_w*
@@ -34,7 +34,7 @@
    fun:_PD_ptr_free_apl
 }
 {
-   ptr-array-free4
+   ptr-array-free_b4
    Memcheck:Addr4
    fun:SC_free_array
    fun:_PD_ptr_free_apl_item
@@ -42,7 +42,7 @@
    fun:_PD_ptr_free_apl
 }
 {
-   ptr-array-free2
+   ptr-array-free_a2
    Memcheck:Addr2
    fun:_SC_free_n*
    fun:_SC_free_w*
@@ -52,36 +52,12 @@
    fun:_PD_ptr_free_apl
 }
 {
-   ptr-array-free2
+   ptr-array-free_b2
    Memcheck:Addr2
    fun:SC_free_array
    fun:_PD_ptr_free_apl_item
    fun:SC_free_array
    fun:_PD_ptr_free_apl
-}
-{
-   blck-array-free8
-   Memcheck:Addr8
-   fun:_SC_free_ns
-   fun:_SC_free_ws
-   fun:_PD_block_rel
-   fun:_PD_rl_syment
-   fun:_PD_rl_syment_d
-   fun:_PD_ha_rl_syment
-   fun:SC_hasharr_foreach
-   fun:SC_free_hasharr
-}
-{
-   blck-array-free2
-   Memcheck:Addr2
-   fun:_SC_free_ns
-   fun:_SC_free_ws
-   fun:_PD_block_rel
-   fun:_PD_rl_syment
-   fun:_PD_rl_syment_d
-   fun:_PD_ha_rl_syment
-   fun:SC_hasharr_foreach
-   fun:SC_free_hasharr
 }
 {
    ha-elem-free8
@@ -105,3 +81,4 @@
    fun:_SC_hasharr_free_elements
    fun:SC_free_hasharr
 }
+
