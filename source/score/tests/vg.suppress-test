@@ -1,3 +1,22 @@
+{
+   array_test_7_4
+   Memcheck:Addr4
+   fun:test_7
+   fun:run_test
+   fun:main
+}
+
+{
+   array_test_7_2
+   Memcheck:Addr2
+   fun:test_7
+   fun:run_test
+   fun:main
+}
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 #
 # These come from testing paged memory protection where
 # we deliberately try to break things so valgrind is not

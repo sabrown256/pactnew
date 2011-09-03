@@ -1378,11 +1378,9 @@ int _PD_close(PDBfile *file)
 	   {if (lio_close(fp) != 0)
 	       PD_error("CANNOT CLOSE FILE - PD_CLOSE", PD_CLOSE);
 
-/* GOTCHA: double free
+/* GOTCHA: double free - avoid */
 	    file->stream      = NULL;
-	    file->udl->stream = NULL;
- */
-	   };
+	    file->udl->stream = NULL;};
 
 /* free the space */
 	_PD_rl_pdb(file);};
