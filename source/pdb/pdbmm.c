@@ -871,19 +871,18 @@ memdes *_PD_mk_descriptor(char *member, int defoff)
 void _PD_rl_descriptor(memdes *desc)
    {
 
-    if (desc == NULL)
-       return;
+    if (desc != NULL)
+       {if (SC_safe_to_free(desc))
+	   {CFREE(desc->member);
+	    CFREE(desc->name);
+	    CFREE(desc->type);
+	    CFREE(desc->base_type);
+	    CFREE(desc->cast_memb);
 
-    if (SC_safe_to_free(desc))
-       {CFREE(desc->member);
-        CFREE(desc->name);
-        CFREE(desc->type);
-        CFREE(desc->base_type);
-        CFREE(desc->cast_memb);
+	    _PD_rl_dimensions(desc->dimensions);
+	    desc->dimensions = NULL;};
 
-        _PD_rl_dimensions(desc->dimensions);}
-
-    CFREE(desc);
+	CFREE(desc);};
 
     return;}
 

@@ -1236,7 +1236,9 @@ int PD_cast(PDBfile *file ARG(,,cls), char *type, char *memb, char *contr)
 /* make an independent copy in case the one in the file chart is released */
 	      CFREE(desc->cast_memb);
 	      desc->cast_memb = CSTRSAVE(contr);
-	      desc->cast_offs = _PD_member_location(contr, tab, dp, &lst);};};
+	      desc->cast_offs = _PD_member_location(contr, tab, dp, &lst);
+
+	      SC_mark(contr, 1);};};
 
 /* too slow? */
 #if 0
@@ -1253,9 +1255,9 @@ int PD_cast(PDBfile *file ARG(,,cls), char *type, char *memb, char *contr)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_CAST_INSERT - tell PDBLib that the type of a particular member (which must
- *                 - be a pointer) is specified by another member (which must
- *                 - be a character pointer). 
+/* _PD_CAST_INSERT - tell PDBLib that the type of a particular member (which
+ *                 - must be a pointer) is specified by another member
+ *                 - (which must be a character pointer)
  */
 
 void _PD_cast_insert(hasharr* chart, char* type, char* memb, char* cast)
@@ -1271,7 +1273,9 @@ void _PD_cast_insert(hasharr* chart, char* type, char* memb, char* cast)
 
 /* make an independent copy in case the one passed in is released */
          desc->cast_memb = CSTRSAVE(cast);
-         desc->cast_offs = _PD_member_location(cast, chart, dp, &lst);};
+         desc->cast_offs = _PD_member_location(cast, chart, dp, &lst);
+
+	 SC_mark(cast, 1);};
 
    return;}
 

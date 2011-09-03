@@ -303,7 +303,8 @@ void _PD_check_casts_list(hasharr *chrt, char **lst, long n)
 		      {desc->cast_memb = lst[j+2];
 		       desc->cast_offs = _PD_member_location(desc->cast_memb,
 							     chrt, dp,
-							     &memb);};};};};
+							     &memb);
+		       SC_mark(lst[j+2], 1);};};};};
 
     return;}
 
@@ -330,7 +331,8 @@ void _PD_check_casts_hash(hasharr *chrt, char **lst, long n)
 		      {desc->cast_memb = lst[j+2];
 		       desc->cast_offs = _PD_member_location(desc->cast_memb,
 							     chrt, dp,
-							     &memb);};};};};
+							     &memb);
+		       SC_mark(lst[j+2], 1);};};};};
 
     return;}
 

@@ -89,7 +89,7 @@ void _PD_block_free(SC_array *bl)
 
     if (bl != NULL)
        {SC_free_array(bl, NULL);
-	CFREE(bl);};
+        bl = NULL;};
 
     return;}
 
@@ -121,7 +121,7 @@ void _PD_block_rel(syment *ep)
 
     if (ep->blocks != NULL)
        {SC_free_array(ep->blocks, NULL);
-	CFREE(ep->blocks);};
+	ep->blocks = NULL;};
 
     return;}
 
