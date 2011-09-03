@@ -148,8 +148,8 @@ FIXNUM FF_ID(screma, SCREMA)(void **am, FIXNUM *sni, FIXNUM *snb)
 FIXNUM FF_ID(scfrez, SCFREZ)(void **am, FIXNUM *szsp)
    {FIXNUM ok;
 
-    ok = _SC_FREE_W(*am, (int) *szsp);
-    if (ok)
+    ok = SC_gs.mm.free(*am, (int) *szsp);
+    if (ok == TRUE)
        *am = NULL;
 
     return(ok);}

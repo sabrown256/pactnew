@@ -87,24 +87,9 @@
 #define FF_NAME(desc)                                                       \
     ((SC_FF_NAME_MASK & (desc)->id) != 0)
 
-
-#ifdef USE_FULL_MM
-
-# define _SC_ALLOC_N     _SC_alloc_nl
-# define _SC_REALLOC_N   _SC_realloc_nl
-# define _SC_REALLOC_W   _SC_realloc_wl
-# define _SC_FREE_N      _SC_free_nl
-# define _SC_FREE_W      _SC_free_wl
-
-#else
-
-# define _SC_ALLOC_N     _SC_alloc_ns
-# define _SC_REALLOC_N   _SC_realloc_ns
-# define _SC_REALLOC_W   _SC_realloc_ws
-# define _SC_FREE_N      _SC_free_ns
-# define _SC_FREE_W      _SC_free_ws
-
-#endif
+#define _SC_ALLOC_N     SC_gs.mm.alloc_n
+#define _SC_REALLOC_N   SC_gs.mm.realloc_n
+#define _SC_FREE_N      SC_gs.mm.free_n
 
 /*--------------------------------------------------------------------------*/
 

@@ -659,10 +659,14 @@ SC_mem_fnc SC_use_full_mm(void)
 
     rv = SC_gs.mm;
 
-    SC_gs.mm.nalloc  = _SC_nalloc_wl;
-    SC_gs.mm.alloc   = _SC_alloc_wl;
-    SC_gs.mm.realloc = _SC_realloc_wl;
-    SC_gs.mm.free    = _SC_free_wl;
+    SC_gs.mm.nalloc    = _SC_nalloc_wl;
+    SC_gs.mm.alloc     = _SC_alloc_wl;
+    SC_gs.mm.realloc   = _SC_realloc_wl;
+    SC_gs.mm.free      = _SC_free_wl;
+
+    SC_gs.mm.alloc_n   = _SC_alloc_nl;
+    SC_gs.mm.realloc_n = _SC_realloc_nl;
+    SC_gs.mm.free_n    = _SC_free_nl;
 
     return(rv);}
 
@@ -743,7 +747,8 @@ void dprfree(long jmn, long jmx)
 	jmx = _SC_ms.n_bins;};
 
     for (j = jmn; j < jmx; j++)
-        {fprintf(stdout, "Bin %3ld   Max Size %4d\n", j, SC_BIN_SIZE(j));
+        {fprintf(stdout, "Bin %3ld   Max Size %4ld\n",
+		 j, (long) SC_BIN_SIZE(j));
          for (md  = ph->free_list[j], i = 0L;
 	      md != NULL;
 	      md  = (mem_descriptor *) md->where.pfunc, i++)
