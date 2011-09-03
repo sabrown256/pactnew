@@ -295,11 +295,10 @@ SC_array *_SC_string_array(char *name)
 /* SC_ARRAY_FREE_N - do CFREE for array element */
 
 int SC_array_free_n(void *a)
-   {void *t;
+   {
 
     if (a != NULL)
-       {t = *(void **) a;
-	CFREE(t);};
+       CFREE(*(void **) a);
 
     return(TRUE);}
 

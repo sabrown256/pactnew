@@ -474,7 +474,11 @@ static int *test_7_add(SC_array *ia, int n, int recy)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* TEST_7 - test asynchronous race */
+/* TEST_7 - test asynchronous race
+ *        - this is an artificial way to emulate a race
+ *        - and it will not valgrind happily - ignore valgrind complaints
+ *        - about this test
+ */
 
 static int test_7(void)
    {int i, ni, err;

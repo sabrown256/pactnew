@@ -21,10 +21,20 @@
    fun:SC_mark
 }
 {
-   pointer-free
-   Memcheck:Cond
-   fun:SC_free_z
-   fun:SC_free
+   array-free8
+   Memcheck:Addr8
+   fun:_SC_free_ns
+   fun:_SC_free_ws
+   fun:*
+   fun:SC_free_array
+}
+{
+   array-free2
+   Memcheck:Addr2
+   fun:_SC_free_ns
+   fun:_SC_free_ws
+   fun:*
+   fun:SC_free_array
 }
 
 #--------------------------------------------------------------------------
