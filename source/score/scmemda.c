@@ -140,7 +140,7 @@ static void *_SC_realloc_chk(void *p, long ni, long bpi, int na, int zsp)
     if (p == _SC_ms.trap_ptr)
        raise(_SC_ms.trap_sig);
 
-    space = _SC_REALLOC_W(p, ni, bpi, na, zsp);
+    space = SC_gs.mm.realloc(p, ni, bpi, na, zsp);
 
     if (space == _SC_ms.trap_ptr)
        raise(_SC_ms.trap_sig);
@@ -161,7 +161,7 @@ static int _SC_free_chk(void *p, int zsp)
     if (p == _SC_ms.trap_ptr)
        raise(_SC_ms.trap_sig);
 
-    rv = _SC_FREE_W(p, zsp);
+    rv = SC_gs.mm.free(p, zsp);
 
     return(rv);}
 
@@ -199,6 +199,11 @@ SC_mem_fnc SC_use_c_mm(void)
     SC_gs.mm.realloc = _SC_realloc_std;
     SC_gs.mm.free    = _SC_free_std;
 
+/* GOTCHA: add these */
+    SC_gs.mm.alloc_n   = NULL;
+    SC_gs.mm.realloc_n = NULL;
+    SC_gs.mm.free_n    = NULL;
+
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
@@ -215,7 +220,11 @@ SC_mem_fnc SC_use_mm(SC_mem_fnc *mf)
        {SC_gs.mm.nalloc  = mf->nalloc;
 	SC_gs.mm.alloc   = mf->alloc;
 	SC_gs.mm.realloc = mf->realloc;
-	SC_gs.mm.free    = mf->free;};
+	SC_gs.mm.free    = mf->free;
+
+	SC_gs.mm.alloc_n   = mf->alloc_n;
+	SC_gs.mm.realloc_n = mf->realloc_n;
+	SC_gs.mm.free_n    = mf->free_n;};
 
     return(rv);}
 
@@ -238,6 +247,11 @@ SC_mem_fnc SC_trap_pointer(void *p, int sig)
     SC_gs.mm.alloc   = _SC_alloc_chk;
     SC_gs.mm.realloc = _SC_realloc_chk;
     SC_gs.mm.free    = _SC_free_chk;
+
+/* GOTCHA: add these */
+    SC_gs.mm.alloc_n   = NULL;
+    SC_gs.mm.realloc_n = NULL;
+    SC_gs.mm.free_n    = NULL;
 
     return(rv);}
 

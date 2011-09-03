@@ -615,7 +615,11 @@ struct s_SC_mem_fnc
 		    const char *fnc, const char *file, int line);
     void *(*alloc)(long ni, long bpi, char *name, int na, int zsp);
     void *(*realloc)(void *p, long ni, long bpi, int na, int zsp);
-    int (*free)(void *p, int zsp);};
+    int (*free)(void *p, int zsp);
+
+    void *(*alloc_n)(long ni, long bpi, void *a);
+    void *(*realloc_n)(void *p, long ni, long bpi, void *a);
+    int (*free_n)(void *p, void *a);};
 
 struct s_SC_global_state
    {char version[32];

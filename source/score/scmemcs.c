@@ -419,10 +419,14 @@ SC_mem_fnc SC_use_reduced_mm(void)
 
     rv = SC_gs.mm;
 
-    SC_gs.mm.nalloc  = _SC_nalloc_ws;
-    SC_gs.mm.alloc   = _SC_alloc_ws;
-    SC_gs.mm.realloc = _SC_realloc_ws;
-    SC_gs.mm.free    = _SC_free_ws;
+    SC_gs.mm.nalloc    = _SC_nalloc_ws;
+    SC_gs.mm.alloc     = _SC_alloc_ws;
+    SC_gs.mm.realloc   = _SC_realloc_ws;
+    SC_gs.mm.free      = _SC_free_ws;
+
+    SC_gs.mm.alloc_n   = _SC_alloc_ns;
+    SC_gs.mm.realloc_n = _SC_realloc_ns;
+    SC_gs.mm.free_n    = _SC_free_ns;
 
     return(rv);}
 

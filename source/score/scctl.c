@@ -54,9 +54,11 @@ SC_global_state
           STRTOL_FUNCTION,
 	  SC_type_container,
 #ifdef USE_FULL_MM
-          {_SC_nalloc_wl, _SC_alloc_wl, _SC_realloc_wl, _SC_free_wl}
+          {_SC_nalloc_wl, _SC_alloc_wl, _SC_realloc_wl, _SC_free_wl,
+	   _SC_alloc_nl, _SC_realloc_nl, _SC_free_nl},
 #else
-          {_SC_nalloc_ws, _SC_alloc_ws, _SC_realloc_ws, _SC_free_ws}
+          {_SC_nalloc_ws, _SC_alloc_ws, _SC_realloc_ws, _SC_free_ws,
+	   _SC_alloc_ns, _SC_realloc_ns, _SC_free_ns},
 #endif
 	  };
 
