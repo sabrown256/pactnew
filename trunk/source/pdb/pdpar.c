@@ -57,19 +57,6 @@ static PD_Pfile *_PD_make_pfile(FILE *fp)
     return(pf);}
 
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PD_FREE_PFILE - free a PD_Pfile instance */
-
-static void _PD_free_pfile(PD_Pfile *pf)
-   {
-
-    CFREE(pf->f_addr);
-    CFREE(pf);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
 
 /*                  PARALLEL FILE MANAGER INTERFACE                         */
 
@@ -204,7 +191,7 @@ static int _PD_pclose(FILE *stream)
         _PD_pfm_remove_file_t(stream);
 
 /* GOTCHA: double free
-        _PD_free_pfile(pf);
+        _PD_rl_pfile(pf);
  */
         };
         

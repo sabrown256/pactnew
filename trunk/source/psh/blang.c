@@ -11,6 +11,8 @@
 #include "common.h"
 #include "libpsh.c"
 
+/* #define FORTRAN_BIND_C_ALL */
+
 /* #define NO_DEFAULT_VALUE "NULL" */
 #define NO_DEFAULT_VALUE "----"
 
@@ -1631,6 +1633,33 @@ static void fortran_wrap_decl(FILE *fp, fdecl *dcl,
     fprintf(fp, "/* WRAP |%s| */\n", dcl->proto.arg);
     fprintf(fp, "\n");
 
+#if defined(FORTRAN_BIND_C_ALL)
+    switch (knd)
+       {case FP_INDIRECT :
+
+#ifdef RETURN_INTEGER
+	     snprintf(t, MAXLINE, "FIXNUM %s(%s)\n",
+		      dcn, a);
+#else
+	     snprintf(t, MAXLINE, "void *%s(%s)\n",
+		      dcn, a);
+#endif
+	     break;
+        case FP_ARRAY :
+	     snprintf(t, MAXLINE, "%s *%s(%s)\n",
+		      rt, dcn, a);
+	     break;
+        case FP_SCALAR :
+	     snprintf(t, MAXLINE, "%s %s(%s)\n",
+		      rt, dcn, a);
+	     break;
+        default :
+	     snprintf(t, MAXLINE, "%s %s(%s)\n",
+		      rt, dcn, a);
+	     break;};
+
+#else
+
     switch (knd)
        {case FP_INDIRECT :
 
@@ -1654,6 +1683,7 @@ static void fortran_wrap_decl(FILE *fp, fdecl *dcl,
 	     snprintf(t, MAXLINE, "%s FF_ID(%s, %s)(%s)\n",
 		      rt, dcn, ucn, a);
 	     break;};
+#endif
 
     fputs(subst(t, "* ", "*", -1), fp);
 
@@ -2498,9 +2528,16 @@ static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck, char *ffn)
 	mc_type(MAXLINE, fty, cty, NULL, &dcl->proto);
 	mc_decl_list(a, MAXLINE, dcl);
 
+#if defined(FORTRAN_BIND_C_ALL)
+	snprintf(t, MAXLINE, "      %s %s(%s)", oper, dcn, a);
+	femit(fp, t, "&");
+
+	snprintf(t, MAXLINE, "bind(c)");
+	fprintf(fp, "                %s\n", t);
+#else
 	snprintf(t, MAXLINE, "      %s %s(%s)", oper, dcn, a);
 	femit(fp, t, "");
-
+#endif
 	fprintf(fp, "         use iso_c_binding\n");
 	if (mc_need_ptr(dcl) == TRUE)
 	   fprintf(fp, "         use types_%s\n", pck);

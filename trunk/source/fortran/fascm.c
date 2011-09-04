@@ -114,7 +114,7 @@ FIXNUM FF_ID(scremz, SCREMZ)(void **am, FIXNUM *sni,
    {FIXNUM rv;
     void *s;
 
-    s = _SC_REALLOC_W(*am, (long) *sni, (long) *snb, FALSE, (int) *szsp);
+    s = SC_gs.mm.realloc(*am, (long) *sni, (long) *snb, FALSE, (int) *szsp);
 
     rv = ((*am = s) != NULL);
 
