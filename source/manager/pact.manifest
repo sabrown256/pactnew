@@ -66,6 +66,7 @@ script which-cfg sys-site use-tcsh fill-string mpi-info
 script simplify-path sunrace cross-info find-comments where-git
 script scs-update scs-commit scs-co scs-history scs-meta
 script scs-add scs-remove scs-lock scs-diff scs-move scs-tag
+script scs-revert
 
 doc pact.ps panacea.ps pdb.ps pdbdiff.ps pdbview.ps pgs.ps
 doc pml.ps ppc.ps score.ps sx.ps ultra.ps

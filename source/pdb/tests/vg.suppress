@@ -81,4 +81,69 @@
    fun:_SC_hasharr_free_elements
    fun:SC_free_hasharr
 }
+{
+   bflush-check-a
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:SC_write_sigsafe
+   fun:_SC_bfr_remove
+   fun:_SC_bio_free
+   fun:_SC_bio_flush
+   fun:_SC_bflush
+}
 
+{
+   vdsnprinf-cond-a
+   Memcheck:Cond
+   fun:__printf_fp
+   fun:vfprintf
+   fun:vsnprintf
+   fun:SC_vdsnprintf
+}
+{
+   vdsnprinf-cond-b
+   Memcheck:Cond
+   fun:*
+   fun:__printf_fp
+   fun:vfprintf
+   fun:vsnprintf
+   fun:SC_vdsnprintf
+}
+{
+   vdsnprinf-cond-c
+   Memcheck:Cond
+   fun:*
+   fun:*
+   fun:__printf_fp
+   fun:vfprintf
+   fun:vsnprintf
+   fun:SC_vdsnprintf
+}
+{
+   vdsnprinf-check-a
+   Memcheck:Value8
+   fun:__printf_fp
+   fun:vfprintf
+   fun:vsnprintf
+   fun:SC_vdsnprintf
+}
+{
+   vdsnprinf-check-b
+   Memcheck:Value8
+   fun:*
+   fun:__printf_fp
+   fun:vfprintf
+   fun:vsnprintf
+   fun:SC_vdsnprintf
+}
+{
+   vdsnprinf-check-c
+   Memcheck:Value8
+   fun:*
+   fun:*
+   fun:__printf_fp
+   fun:vfprintf
+   fun:vsnprintf
+   fun:SC_vdsnprintf
+}
