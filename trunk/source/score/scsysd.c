@@ -50,6 +50,7 @@ struct s_connectdes
     int n_srv_complete;
     int n_srv_restart;        /* number of server self restarts */
     int n_srv_attempt;        /* number of attempts at server self restarts */
+    int srv_started;          /* TRUE once server has been launched */
     int srv_done;             /* TRUE for normal server completion */
     int cpu_factor;           /* CPU number use factor */
     int cpu_acc;              /* CPU recruiting accelaration factor */
@@ -230,10 +231,11 @@ static connectdes *_SC_make_connectdes(int na, char *sys,
 
     SC_init_connection(pc, na, TRUE);
 
-    pc->system = CSTRSAVE(sys);
-    pc->host   = CSTRSAVE(hst);
-    pc->shell  = CSTRSAVE(shell);
-    pc->env    = env;
+    pc->system      = CSTRSAVE(sys);
+    pc->host        = CSTRSAVE(hst);
+    pc->shell       = CSTRSAVE(shell);
+    pc->env         = env;
+    pc->srv_started = FALSE;
 
     return(pc);}
 
@@ -1796,6 +1798,7 @@ static int _SC_launch_pool_connection(conpool *cp, int ic)
 		     "connected %d to %s (%d)",
 		     ic, pco->host, pp->id);
 
+	pco->srv_started = TRUE;
 	pco->pp = pp;
 	SC_unblock(pp);
 	SC_set_attr(pp, SC_LINE, TRUE);
@@ -1815,6 +1818,8 @@ static int _SC_launch_pool_connection(conpool *cp, int ic)
         pta = (st / 100) % 100;
         nms = st % 100;
         est = st / 1000000;
+
+	pco->srv_started = FALSE;
 
 	_SC_pool_printf(as, "***>", NULL, "client", 
 			"failed to launch connection %d on %s (status=%d  signal=%d  %%time=%d  Nmsg=%d)",
@@ -2073,7 +2078,7 @@ static void _SC_check_job_time(conpool *cp)
 /* check each connection for timeouts (lost contact with server) */
     for (ic = 0; ic < nc; ic++)
         {pco = GET_CONNECTION(cp, ic);
-	 if (pco == NULL)
+	 if ((pco == NULL) || (pco->srv_started == FALSE))
 	    continue;
 
 	 thl = pco->time_contact;

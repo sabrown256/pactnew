@@ -229,13 +229,16 @@
 	   (lst nil))
 
           (define (match x)
-              (cond ((string=? d (substring x 0 n))
-		     (set! lst (cons x lst)))
+
+; do not take hidden directories - especially the pointers directory
+              (if (not (string=? (substring x 0 2) "/&"))
+		  (cond ((string=? d (substring x 0 n))
+			 (set! lst (cons x lst)))
 
 ; for files without directories
-		    ((and (not (string=? (substring x 0 1) "/"))
-			  (string=? d "/"))
-		     (set! lst (cons x lst)))))
+			((and (not (string=? (substring x 0 1) "/"))
+			      (string=? d "/"))
+			 (set! lst (cons x lst))))))
 
           (for-each match all)
 

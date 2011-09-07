@@ -1,0 +1,47 @@
+#!/bin/csh -f
+#
+# SCS-REVERT - revert changed sources whether GIT, CVS or SVN
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+set ldir = `dirname $0`
+if ("$ldir" == ".") then
+   set ldir = $cwd
+endif
+set gitd = ( `$ldir/where-git` )
+
+if (-d $gitd[1]) then
+
+# to revert changes made to your working copy:
+#    git checkout .
+# to revert changes made to the index (i.e., that you have added):
+#    git reset
+# to revert a change that you have committed:
+#    git revert ...
+
+   git checkout $argv
+
+else if (-d CVS) then
+
+   setenv CVS_RSH  ssh
+
+   foreach f ($argv)
+      if (-f $f) then
+         rm -f $f
+      endif
+   end
+   cvs update
+
+else if (-d .svn) then
+
+   svn revert $argv
+
+endif
+
+exit($status)

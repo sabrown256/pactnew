@@ -152,7 +152,7 @@ static SC_array *_PD_ptr_get_ap(PDBfile *file)
 /*--------------------------------------------------------------------------*/
 
 /* _PD_PTR_SET_AP - set the current pointer/address list
- *                  - and return the old one
+ *                - and return the old one
  */
 
 static SC_array *_PD_ptr_set_ap(PDBfile *file, SC_array *nap, int serial)

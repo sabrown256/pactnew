@@ -21,7 +21,8 @@ TGTScr = do-local do-stats do-automake distribute \
          simplify-path simplify-list gcc-info sinstall fill-string \
          mall png-diff sunrace cross-info find-comments where-git \
          scs-update scs-commit scs-co scs-history scs-meta \
-         scs-add scs-remove scs-lock scs-diff scs-move scs-tag
+         scs-add scs-remove scs-lock scs-diff scs-move scs-tag \
+         scs-revert
 
 TGTInc = env-csh csh-subroutines
 
