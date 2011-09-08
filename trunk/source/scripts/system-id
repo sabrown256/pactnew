@@ -113,12 +113,16 @@ switch ($OS[1])
                 echo "lnx-$Concise-a"
                 breaksw
            case x86_64:
+                set lhw = o
                 grep ib_core /proc/modules >& /dev/null
                 if ($status == 0) then
-                   echo "lnx-$Concise-ib"
-                else
-                   echo "lnx-$Concise-o"
+                   dpkg -l | grep mvapich2-gnu-1.5 | grep shmem >& /dev/null
+                   if ($status != 0) then
+                      set lhw = ib
+                   endif
                 endif
+                echo "lnx-$Concise-$lhw"
+                unset lhw
                 breaksw
            case ppc64:
                 echo "lnx-$Concise-ppc"

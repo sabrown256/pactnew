@@ -13,6 +13,8 @@ unalias *
 
 alias flog      'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ >>& \!\!:1'
 alias ftee      'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ |& tee -ai \!\!:1'
+alias Note      'echo \!\!:2-$ >>& \!\!:1'
+alias NoteD     'echo \!\!:2-$ >>& \!\!:1 ; echo \!\!:2-$'
 
 set ldir = `dirname $0`
 if ("$ldir" == ".") then
@@ -26,7 +28,7 @@ set repos = ""
 set repod = ""
 set pkgs  = ""
 set pkgd  = ""
-set excd  = ""
+set ignd  = ( ../.git ../.svn .svn ../CVS CVS )
 set dirs  = ""
 set tgt   = repo
 
@@ -34,8 +36,17 @@ while ($#argv > 0)
    switch ($1)
       case -exclude:
            shift
-           set excd = ( $excd $1 )
+           set ignd = ( $ignd $1 )
            breaksw
+      case -h:
+           echo ""
+           echo "Usage: scs-sync [-exclude <dir>]* [-h] <src> <dst>"
+           echo "   exclude   rsync exclude specifications"
+           echo "   h         this help message"
+           echo "   <src>     a .tar file, .gz file, or a repository"
+           echo "   <dst>     the destination repository"
+           echo ""
+           exit(1)
       default:
            if ("$repos" == "") then
 	      if ("$1" =~ *,*) then
@@ -57,9 +68,10 @@ while ($#argv > 0)
    shift
 end
 
+set excd  = ( ../.git ../.svn .svn ../CVS CVS $ignd )
+
 set log = $cwd/log.sync
-rm -f $log
-touch $log
+date >&! $log
 
 set rel = $cwd/syncs
 flog $log rm -rf syncs syncd
@@ -78,34 +90,92 @@ flog $log mkdir syncs
 flog $log pushd syncs
 if (("$repos" =~ *.gz) || ("$repos" =~ *.tgz)) then
    flog $log tar xvzf $repos
+   NoteD $log -n "Untarring compressed tarfile $repos ... "
 
 else if ("$repos" =~ *.tar) then
    flog $log tar xvf $repos
+   NoteD $log -n "Untarring tarfile $repos ... "
 
 else
-   if (-d $repos/CVSROOT) then
-      set sknd = cvs
-   else if (-d $repos/.git) then
-      set sknd = git
+
+# remote repo case - the repo path must identify the SCS kind
+# we do not want to have to authenticate and do remote queries
+   if ("$repos" =~ *:/*) then
+      if ("$repos" =~ *cvs*) then
+         set sknd = cvs
+      else if ("$repos" =~ *svn*) then
+         set sknd = svn
+      else
+         set sknd = git
+      endif
+      NoteD $log -n "Checking out remote $sknd repository $repos ... "
+
+# local repo case
    else
-      set sknd = svn
+      if (-d $repos/CVSROOT) then
+         set sknd = cvs
+      else if (-d $repos/.git) then
+         set sknd = git
+      else
+         set sknd = svn
+      endif
+      NoteD $log -n "Checking out local $sknd repository $repos ... "
+
    endif
+   Note $log ""
+
    flog $log scs-co -k $sknd -d $repos $pkgs
+   if ($status == 0) then
+      NoteD $log "ok"
+   else
+      NoteD $log "ng"
+   endif
 
 endif
 flog $log popd
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# DESTINATION SETUP
+
 # get a working copy of the destination repo
 flog $log mkdir syncd
 flog $log pushd syncd
-if (-d $repod/CVSROOT) then
-   set dknd = cvs
-else if (-d $repod/.git) then
-   set dknd = git
+
+# remote repo case - the repo path must identify the SCS kind
+# we do not want to have to authenticate and do remote queries
+if ("$repod" =~ *:/*) then
+   if ("$repod" =~ *cvs*) then
+      set dknd = cvs
+   else if ("$repod" =~ *svn*) then
+      set dknd = svn
+   else
+      set dknd = git
+   endif
+   NoteD $log -n "Checking out remote $dknd repository $repod ... "
+
+# local repo case
 else
-   set dknd = svn
+   if (-d $repod/CVSROOT) then
+      set dknd = cvs
+   else if (-d $repod/.git) then
+      set dknd = git
+   else
+      set dknd = svn
+   endif
+   NoteD $log -n "Checking out local $dknd repository $repod ... "
+
 endif
+Note $log ""
+
 flog $log scs-co -k $dknd -d $repod $pkgd
+if ($status == 0) then
+   NoteD $log "ok"
+else
+   NoteD $log "ng"
+endif
+
 flog $log popd
 
 flog $log ls -la syncs/*
@@ -144,7 +214,14 @@ flog $log pushd syncd
 flog $log cat $excf
 
 # rsync in the source tree files
+NoteD $log -n "Running rsync ... "
+Note $log ""
 flog $log rsync -av --delete --exclude-from=$excf $rel/ .
+if ($status == 0) then
+   NoteD $log "ok"
+else
+   NoteD $log "ng"
+endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -152,6 +229,26 @@ flog $log rsync -av --delete --exclude-from=$excf $rel/ .
 # ADD/REMOVE ENTRIES
 
 flog $log cd $pkg
+
+set gitd = ( `$ldir/where-git` )
+set repo = ( `$ldir/scs-meta -r` )
+set knd  = ( `$ldir/scs-meta -k` )
+set dirs = ( `$ldir/scs-meta -d -a | sed 's|'$cwd'|\.|g'` )
+Note $log "Destination repo info:"
+Note $log "   Repo = $repo"
+Note $log "   Kind = $knd"
+Note $log "   Dirs = $dirs"
+
+NoteD $log -n "Reconciling contents ... "
+Note $log ""
+
+foreach d ( $ignd )
+   set td = $d:t
+   if (("$td" != CVS) && ("$td" != .svn) && ("$td" != .git)) then
+      Note $log "Remove: $d"
+      flog $log ( find . -type d -name $td | xargs rm -r )
+   endif
+end
 
 if (-d $gitd[1]) then
 
@@ -192,7 +289,7 @@ else if (-d .svn) then
       flog $log pushd $sd
 
 # remove entries
-      foreach e ( `cat .svn/text-base` )
+      foreach e ( `ls -1 .svn/text-base` )
          set f = $e:r
          if (!(-f $f)) then
             flog $log svn remove $f
@@ -203,13 +300,15 @@ else if (-d .svn) then
       foreach e ( * )
          set f = .svn/text-base/$e.svn-base
          if (!(-f $f)) then
-            flog $log svn add $f
+            flog $log svn add $e
          endif
       end
       flog $log popd
    end
 
 endif
+
+NoteD $log "done"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -218,9 +317,13 @@ endif
 
 ftee $log scs-update
 
+NoteD $log ""
 NoteD $log "Are these changes correct?"
-NoteD $log "Entering sub-shell to verify befor commit"
-NoteD $log "Type exit at the prompt to resume"
+NoteD $log "Entering sub-shell to verify before commit"
+NoteD $log "   To accept, exit the sub-shell with status 0, e.g. exit"
+NoteD $log "   To reject, exit the sub-shell with non-zero status, e.g. exit(1)"
+NoteD $log ""
+
 flog $log set here = $cwd
 csh -f
 set xstatus = $status

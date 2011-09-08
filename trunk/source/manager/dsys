@@ -156,6 +156,7 @@ switch ($Cmnd)
         echo "          stats        - plot timing information from update logs"
         echo "          stats-update - create ultra files with timing information from update logs"
         echo "          sync         - update sources with repository "
+        echo "          sync-repo    - update one repository from another"
         echo "          tag          - tag the sources"
         echo "          test         - test the system codes"
         echo "          test-ssh     - test the SSH connections"
@@ -2449,6 +2450,97 @@ CFG_DONE:
         endif
 
         flog $Log cd $Manager
+
+        set RStatus = $ErrStat
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case sync-repo:
+        InitLog Log $LogDir/sync-repo
+
+        set rsrc = ""
+        set rdst = ""
+        set excl = ""
+
+        while ($#argv > 0)
+           switch ($1)
+              case -exclude:
+                   shift
+                   set excl = ( $excl -exclude $1 )
+                   breaksw
+
+              case -h:
+              case help:
+                   echo ""
+                   echo "Usage: dsys sync-repo [-exclude <dir>]* [-h] <src> <dst>"
+                   echo ""
+                   echo "   exclude  exclude directory dir"
+                   echo "   h        this help message"
+                   echo "   <src>    source repository"
+                   echo "   <dst>    destination repository"
+                   echo ""
+                   echo "Example:"
+                   echo "   dsys sync-repo /here/pact/repo foo:/there/pact/repo"
+                   echo ""
+                   exit(1)
+                   breaksw
+
+              default:
+                   if ("$rsrc" == "") then
+                      set rsrc = $1
+                   else if ("$rdst" == "") then
+                      set rdst = $1
+                   endif
+                   breaksw
+           endsw
+           shift
+        end
+
+        if (("$rsrc" == "") || ("$rdst" == "")) then
+           NoteD $Log "Missing repo specification - exiting"
+           exit(1)
+        endif
+
+        NoteD $Log ""
+        NoteD $Log "Updating repository"
+        NoteD $Log "   $rdst"
+        NoteD $Log "from"
+        NoteD $Log "   $rsrc"
+        NoteD $Log ""
+
+# prepare the exclusions
+        set excl = ( $excl -exclude local )
+        set excl = ( $excl -exclude hosts )
+        set excl = ( $excl -exclude ../config )
+        set excl = ( $excl -exclude extensions )
+        if (-f $MngDir/local/exclusions) then
+           foreach i (`cat $MngDir/local/exclusions | grep -v '^#'`)
+              set excl = ( $excl -exclude $i )
+           end
+        endif
+
+        flog $Log set tmp = $cwd/tmp-sync
+        flog $Log mkdir $tmp
+        flog $Log pushd $tmp
+
+        Separator $Log
+        ftee $Log scs-sync $excl $rsrc,tmp $rdst,tmp
+        set ErrStat = $status
+
+        Separator $Log
+        flog $Log cat log.sync
+        flog $Log popd
+        Separator $Log
+
+        if ($ErrStat == 0) then
+           NoteD $Log ""
+           NoteD $Log "Repository $rdst updated"
+           NoteD $Log "see $Log for details"
+           flog $Log rm -rf $tmp
+        endif
+        NoteD $Log ""
 
         set RStatus = $ErrStat
         breaksw
