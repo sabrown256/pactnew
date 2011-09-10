@@ -1,0 +1,126 @@
+#!/bin/csh -f
+#
+# MEM-STATS - profile memory usage
+#
+
+@ err = 0
+
+set map = ""
+set mth = line
+
+while ($#argv > 0)
+   switch ($1)
+      case -f:
+           set mth = file
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: mem-stat [-f] [-h] [-l] [-r] <map>"
+           echo "   f     total by file"
+           echo "   h     this help message"
+           echo "   l     total by function, file, and line (default)"
+           echo "   r     total by function and file"
+           echo "   map   output from SC_mem_map"
+           echo ""
+           exit(1)
+      case -l:
+           set mth = line
+           breaksw
+      case -r:
+           set mth = func
+           breaksw
+      default:
+           set map = $1
+           breaksw
+   endsw
+   shift
+end
+
+if ("$map" == "") then
+   echo "No map specified - exiting"
+   exit(1)
+endif
+
+echo "Origination                                Nbtot      Ncalls        Nbave"
+
+switch ($mth)
+   case line:
+        cat $map                                       | \
+        tail -n +4                                     | \
+        awk '{printf("%s %s\n", $6, $3);}'             | \
+        sort                                           | \
+        awk 'BEGIN {tag = "";                            \
+                    nb = 0;                              \
+                    ni = 0;                              \
+                    nl = 0;}                             \
+             {if (tag == "")                             \
+                 {tag = $1;                              \
+                  nb  = $2;                              \
+                  ni  = 1;}                              \
+              else if ($1 == tag)                        \
+                 {nb += $2;                              \
+                  ni++;}                                 \
+              else if ($1 != tag)                        \
+                 {printf("%-36s  %10d  %10d   %10.1f\n", \
+                         tag, nb, ni, (nb/ni));          \
+                  tag = $1;                              \
+                  nb  = $2;                              \
+                  ni  = 1;};}'                         | \
+        sort -r -n -k 2
+        breaksw
+
+   case func:
+        cat $map                                       | \
+        tail -n +4                                     | \
+        awk '{printf("%s %s\n", $6, $3);}'             | \
+        sed 's/:.*)/)/'                                | \
+        sort                                           | \
+        awk 'BEGIN {tag = "";                            \
+                    nb = 0;                              \
+                    ni = 0;                              \
+                    nl = 0;}                             \
+             {if (tag == "")                             \
+                 {tag = $1;                              \
+                  nb  = $2;                              \
+                  ni  = 1;}                              \
+              else if ($1 == tag)                        \
+                 {nb += $2;                              \
+                  ni++;}                                 \
+              else if ($1 != tag)                        \
+                 {printf("%-36s  %10d  %10d   %10.1f\n", \
+                         tag, nb, ni, (nb/ni));          \
+                  tag = $1;                              \
+                  nb  = $2;                              \
+                  ni  = 1;};}'                         | \
+        sort -r -n -k 2
+        breaksw
+
+   case file:
+        cat $map                                       | \
+        tail -n +4                                     | \
+        awk '{printf("%s %s\n", $6, $3);}'             | \
+        sed 's/^.*(//'                                 | \
+        sed 's/:.*)//'                                 | \
+        sort                                           | \
+        awk 'BEGIN {tag = "";                            \
+                    nb = 0;                              \
+                    ni = 0;                              \
+                    nl = 0;}                             \
+             {if (tag == "")                             \
+                 {tag = $1;                              \
+                  nb  = $2;                              \
+                  ni  = 1;}                              \
+              else if ($1 == tag)                        \
+                 {nb += $2;                              \
+                  ni++;}                                 \
+              else if ($1 != tag)                        \
+                 {printf("%-36s  %10d  %10d   %10.1f\n", \
+                         tag, nb, ni, (nb/ni));          \
+                  tag = $1;                              \
+                  nb  = $2;                              \
+                  ni  = 1;};}'                         | \
+        sort -r -n -k 2
+        breaksw
+endsw
+
+exit($err)
