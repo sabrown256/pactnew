@@ -37,7 +37,7 @@ SaveFiles = *.c *.h *.f
 CleanFiles  = 
 RemoveFiles = ${BinDir}/pdbtst ${BinDir}/pdatst ${BinDir}/pdasts    \
               ${BinDir}/pdopts ${BinDir}/pdapts ${BinDir}/pdgsts    \
-              ${BinDir}/pdfrts ${BinDir}/pdctst \
+              ${BinDir}/pdfrts ${BinDir}/pdctst ${BinDir}/pdptst \
               ${BinDir}/pdlsts ${BinDir}/pdnrmt ${BinDir}/pdcsts \
               ${BinDir}/pdftst ${BinDir}/pdfwts \
               ${BinDir}/pdfwts ${BinDir}/pdfhyts \
@@ -148,7 +148,7 @@ Cstd : ${BinDir}/pdbtst ${BinDir}/pdntst ${BinDir}/pdatst ${BinDir}/pdasts \
        ${BinDir}/pdopts ${BinDir}/pdgsts ${BinDir}/pdlsts ${BinDir}/pdnrmt \
        ${BinDir}/pdrcts ${BinDir}/pdtdts ${BinDir}/pdcsts ${BinDir}/pdapts \
        ${BinDir}/pdfrts ${BinDir}/pdbfts ${BinDir}/pdfdts ${BinDir}/pdfcts \
-       ${BinDir}/pdctst \
+       ${BinDir}/pdctst ${BinDir}/pdptst \
        ${DepLib}
 Apps : ${BinDir}/pdb2hdf
 
@@ -160,6 +160,9 @@ ${BinDir}/pdbtst : pdbtst.c ${InstallDep} ${Hdrs}
 
 ${BinDir}/pdctst : pdctst.c ${InstallDep} ${Hdrs}
 	${CLD} ${LdFlags} pdctst.c -o ${BinDir}/pdctst ${Libs}
+
+${BinDir}/pdptst : pdptst.c ${InstallDep} ${Hdrs}
+	${CLD} ${LdFlags} pdptst.c -o ${BinDir}/pdptst ${Libs}
 
 ${BinDir}/pdatst : pdatst.c ${InstallDep} ${Hdrs}
 	${CLD} ${LdFlags} pdatst.c -o ${BinDir}/pdatst ${Libs}
