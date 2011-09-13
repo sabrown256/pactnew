@@ -41,12 +41,13 @@ if ("$map" == "") then
    exit(1)
 endif
 
-echo "Origination                                Nbtot      Ncalls        Nbave"
+echo "Origin                                         Nbtot      Ncalls        Nbave"
 
 switch ($mth)
    case line:
         cat $map                                       | \
         tail -n +4                                     | \
+        sed 's|-- free --|--free--|'                   | \
         awk '{printf("%s %s\n", $6, $3);}'             | \
         sort                                           | \
         awk 'BEGIN {tag = "";                            \
@@ -61,7 +62,7 @@ switch ($mth)
                  {nb += $2;                              \
                   ni++;}                                 \
               else if ($1 != tag)                        \
-                 {printf("%-36s  %10d  %10d   %10.1f\n", \
+                 {printf("%-40s  %10d  %10d   %10.1f\n", \
                          tag, nb, ni, (nb/ni));          \
                   tag = $1;                              \
                   nb  = $2;                              \
@@ -72,6 +73,7 @@ switch ($mth)
    case func:
         cat $map                                       | \
         tail -n +4                                     | \
+        sed 's|-- free --|--free--|'                   | \
         awk '{printf("%s %s\n", $6, $3);}'             | \
         sed 's/:.*)/)/'                                | \
         sort                                           | \
@@ -87,7 +89,7 @@ switch ($mth)
                  {nb += $2;                              \
                   ni++;}                                 \
               else if ($1 != tag)                        \
-                 {printf("%-36s  %10d  %10d   %10.1f\n", \
+                 {printf("%-40s  %10d  %10d   %10.1f\n", \
                          tag, nb, ni, (nb/ni));          \
                   tag = $1;                              \
                   nb  = $2;                              \
@@ -98,6 +100,7 @@ switch ($mth)
    case file:
         cat $map                                       | \
         tail -n +4                                     | \
+        sed 's|-- free --|--free--|'                   | \
         awk '{printf("%s %s\n", $6, $3);}'             | \
         sed 's/^.*(//'                                 | \
         sed 's/:.*)//'                                 | \
@@ -114,7 +117,7 @@ switch ($mth)
                  {nb += $2;                              \
                   ni++;}                                 \
               else if ($1 != tag)                        \
-                 {printf("%-36s  %10d  %10d   %10.1f\n", \
+                 {printf("%-40s  %10d  %10d   %10.1f\n", \
                          tag, nb, ni, (nb/ni));          \
                   tag = $1;                              \
                   nb  = $2;                              \

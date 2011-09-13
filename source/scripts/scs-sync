@@ -242,20 +242,20 @@ Note $log "   Dirs = $dirs"
 NoteD $log -n "Reconciling contents ... "
 Note $log ""
 
-foreach d ( $ignd )
-   set td = $d:t
-   if (("$td" != CVS) && ("$td" != .svn) && ("$td" != .git)) then
-      Note $log "Remove: $d"
-      flog $log ( find . -type d -name $td | xargs rm -r )
-   endif
-end
-
 if (-d $gitd[1]) then
 
    flog $log git add -A
    flog $log git status -s
 
 else if (-d CVS) then
+
+   foreach d ( $ignd )
+      set td = $d:t
+      if (("$td" != CVS) && ("$td" != .svn) && ("$td" != .git)) then
+         Note $log "Remove: $d"
+         flog $log ( find . -type d -name $td | xargs rm -r )
+      endif
+   end
 
    foreach d ($dirs)
       set sd = $d:h
@@ -283,6 +283,14 @@ else if (-d CVS) then
    end
 
 else if (-d .svn) then
+
+   foreach d ( $ignd )
+      set td = $d:t
+      if (("$td" != CVS) && ("$td" != .svn) && ("$td" != .git)) then
+         Note $log "Remove: $d"
+         flog $log ( find . -type d -name $td | xargs rm -r )
+      endif
+   end
 
    foreach d ($dirs)
       set sd = $d:h
