@@ -28,6 +28,7 @@ struct s_statedes
     int ni;
     int debug_mode;
     int read_only;
+    int track;
     int64_t nba0;
     int64_t nbf0;
     int64_t sz0;
@@ -62,11 +63,19 @@ static void show_stat(statedes *st, char *tag)
    {int64_t nba, nbf, dna, dnf;
     double time, dt, sz, dsz;
     SC_rusedes ru;
+    static int first = TRUE;
 
     SC_mem_stats(&nba, &nbf, NULL, NULL);
     SC_resource_usage(&ru, -1);
     sz   = ru.maxrss;
     time = SC_wall_clock_time();
+
+    if (first == TRUE)
+       {first = FALSE;
+	PRINT(STDOUT, "\n");
+	PRINT(STDOUT, "\t\t                                 Memory              Time\n");
+	PRINT(STDOUT, "\t\t                                (kBytes)            (secs)\n");
+	PRINT(STDOUT, "\t\tMeasured   Na        Ni   Allocated   Resource\n");};
 
     if (tag != NULL)
        {dna   = nba  - st->nba0;
@@ -76,8 +85,8 @@ static void show_stat(statedes *st, char *tag)
 
 /* memory in kBytes */
 	PRINT(STDOUT,
-	      "\t\t     %3s  %10.2e %10.2e      %.2g\n",
-	      tag, 1.0e-3*(dna - dnf), dsz, dt);};
+	      "\t\t%-3s  %8d  %8d  %10.2e %10.2e      %.2g\n",
+	      tag, st->na, st->ni, 1.0e-3*(dna - dnf), dsz, dt);};
 
     st->nba0  = nba;
     st->nbf0  = nbf;
@@ -237,7 +246,7 @@ static int compare_test_1_data(statedes *st, PDBfile *strm, FILE *fp)
     err = TRUE;
 
     for (i = 0; i < na; i++)
-        {for (l = 0; l < ni; l++);
+        {for (l = 0; l < ni; l++)
 	     err &= (a_r[i][l] == a_w[i][l]);};
 
     if (err)
@@ -279,6 +288,8 @@ static int test_1(statedes *st, char *base, char *tgt, int n)
 	   error(1, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
 
+	PD_set_track_pointers(strm, st->track);
+
 /* write the test data */
 	write_test_1_data(st, strm);
 
@@ -294,6 +305,8 @@ static int test_1(statedes *st, char *base, char *tgt, int n)
     if (strm == NULL)
        error(1, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
+
+    PD_set_track_pointers(strm, st->track);
 
 /* dump the symbol table */
     dump_test_symbol_table(st, fp, strm->symtab, 1);
@@ -324,7 +337,7 @@ static int test_1(statedes *st, char *base, char *tgt, int n)
     if (err)
        REMOVE(fname);
 
-    show_stat(st, "fin");
+/*    show_stat(st, "fin"); */
 
     return(err);}
 
@@ -367,16 +380,15 @@ static void print_help(void)
    {
 
     PRINT(STDOUT, "\nPDPTST - run pointer scaling and efficiency tests\n\n");
-    PRINT(STDOUT, "Usage: pdctst [-b #] [-c] [-d] [-h] [-n] [-r] [-v #] [-1]\n");
+    PRINT(STDOUT, "Usage: pdctst [-b #] [-c] [-d] [-h] [-m] [-r] [-v #]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       b  - set buffer size (default no buffering)\n");
     PRINT(STDOUT, "       c  - verify low level writes\n");
     PRINT(STDOUT, "       d  - turn on debug mode to display memory maps\n");
     PRINT(STDOUT, "       h  - print this help message and exit\n");
-    PRINT(STDOUT, "       n  - run native mode test only\n");
     PRINT(STDOUT, "       r  - read only (assuming files from other run exist)\n");
+    PRINT(STDOUT, "       m  - use memory mapped files\n");
     PRINT(STDOUT, "       v  - use format version # (default is 2)\n");
-    PRINT(STDOUT, "       1  - do NOT run test #1\n");
     PRINT(STDOUT, "\n");
 
     return;}
@@ -388,7 +400,6 @@ static void print_help(void)
 
 int main(int c, char **v)
    {int i, err;
-    int test_one;
     int use_mapped_files, check_writes;
     int64_t bfsz;
     statedes st;
@@ -402,12 +413,12 @@ int main(int c, char **v)
     st.ni            = 1000;
     st.debug_mode    = FALSE;
     st.read_only     = FALSE;
+    st.track         = TRUE;
     
     bfsz             = -1;
     bfsz             = 100000;
     check_writes     = FALSE;
     use_mapped_files = FALSE;
-    test_one         = TRUE;
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-na") == 0)
 	    st.na = SC_stoi(v[++i]);
@@ -431,14 +442,14 @@ int main(int c, char **v)
                  case 'm' :
 		      use_mapped_files = TRUE;
 		      break;
+                 case 'p' :
+		      st.track = FALSE;
+		      break;
                  case 'r' :
 		      st.read_only = TRUE;
 		      break;
                  case 'v' :
                       PD_set_fmt_version(SC_stoi(v[++i]));
-		      break;
-                 case '1' :
-		      test_one = FALSE;
 		      break;};}
          else
             break;};
@@ -450,15 +461,9 @@ int main(int c, char **v)
 
     SC_signal(SIGINT, SIG_DFL);
 
-    PRINT(STDOUT, "\n");
-    PRINT(STDOUT, "\t\t                  Memory            Time\n");
-    PRINT(STDOUT, "\t\t                 (kBytes)          (secs)\n");
-    PRINT(STDOUT, "\t\tMeasured   Allocated   Resource\n");
-
     err = 0;
 
-    if (test_one)
-       err += run_test(&st, test_1, 1, DATFILE);
+    err += run_test(&st, test_1, 1, DATFILE);
 
     PRINT(STDOUT, "\n");
 
