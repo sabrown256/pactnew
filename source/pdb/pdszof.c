@@ -167,7 +167,6 @@ static long _PD_sz_leaf_members(PDBfile *file, char *type, long ni,
 static int _PD_ptr_sz_itags(long *pnb, PDBfile *file, void *vr,
 			    long ni, char *type)
    {int ret, loc, itags;
-    long i;
 
     itags = file->use_itags;
 
@@ -175,8 +174,7 @@ static int _PD_ptr_sz_itags(long *pnb, PDBfile *file, void *vr,
 
     loc = LOC_HERE;
     if ((_PD_IS_SEQUENTIAL) || (itags == FALSE))
-       {i = _PD_ptr_wr_lookup(file, vr, &loc, TRUE);
-	SC_ASSERT(i >= 0);};
+       _PD_ptr_wr_lookup(file, vr, &loc, TRUE);
 
     ret = (loc == LOC_HERE);
 

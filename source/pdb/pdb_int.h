@@ -107,7 +107,6 @@ typedef int (*PFBinRead)(PDBfile *file, char *path, char *ty,
 			 syment *ep, void *vr, int nd, long *ind);
 
 typedef struct s_PD_state PD_state;
-typedef struct s_PD_address PD_address;
 typedef struct s_PD_Pfile PD_Pfile;
 typedef struct s_PD_printdes PD_printdes;
 
@@ -123,15 +122,6 @@ struct s_PD_printdes
     dimdes *dims;
     FILE *fp;};
 
-struct s_PD_address
-   {int indx;                  /* indx for /&ptrs - possible future use */
-    int64_t addr;              /* disk address of start of data or itag */
-    int64_t reta;              /* disk address of end of data */
-    syment *entry;             /* symbol table entry */
-    char *ptr;                 /* memory address of data */
-    int written;};             /* flag--1 if data written, 0 if not */
-
- 
 /* NOTE: see comment in scope_io.h concerning file_io_desc
  * and the stream member
  */
@@ -204,13 +194,6 @@ enum e_PD_block_type
     PD_BLOCK_CORRUPT    =  3};
 
 typedef enum e_PD_block_type PD_block_type;
-
-enum e_PD_data_location
-   {LOC_OTHER,
-    LOC_HERE,
-    LOC_BLOCK};
-
-typedef enum e_PD_data_location PD_data_location;
 
 
 #ifdef __cplusplus
@@ -373,7 +356,12 @@ extern int
 /* PDCONV.C declarations */
 
 extern int
+ _PD_prim_typep(char *memb, hasharr *chrt, PD_major_op error),
  _PD_require_conv(defstr *dpf, defstr *dph);
+
+extern long
+ _PD_convert_ptr_rd(char *bfi, int fbpi, PD_byte_order ford,
+		    int hbpi, PD_byte_order hord, data_standard *hs);
 
 extern void
  _PD_iconvert(char **out, char **in, long ni,
@@ -420,12 +408,6 @@ extern int
 extern void
  _PD_convert_attrtab(PDBfile *file),
  _PD_rl_attribute(attribute *attr);
-
-
-/* PDCONV.C declarations */
-
-extern int
- _PD_prim_typep(char *memb, hasharr *chrt, PD_major_op error);
 
 
 /* PDFIA.C declarations */
@@ -605,30 +587,29 @@ extern void
 /* PDPTR.C declarations */
 
 extern int
- _PD_ptr_index(void *p),
  _PD_ptr_reset(PDBfile *file, char *vr),
- _PD_ptr_entry_itag(PDBfile *file, int n, PD_itag *pi),
+ _PD_ptr_entry_itag(PDBfile *file, PD_itag *pi, char *p),
  _PD_ptr_wr_itags(PDBfile *file, void *vr, long ni, char *type),
  _PD_ptr_rd_itags(PDBfile *file, char **vr, PD_itag *pi);
 
 extern long
- _PD_ptr_wr_lookup(PDBfile *file, void *vr, int *ploc, int write),
- _PD_ptr_get_index(PDBfile *file, char *bf),
- _PD_ptr_read(PDBfile *file, int64_t addr, int force),
- _PD_ptr_fix(PDBfile *file, long n);
+ _PD_ptr_get_index(PDBfile *file, long n, char *bfo);
 
 extern void
  _PD_ptr_save_ap(PDBfile *file, SC_array **poa, char **pob, char *base),
  _PD_ptr_restore_ap(PDBfile *file, SC_array *oa, char *ob),
  _PD_ptr_init_apl(PDBfile *file),
  _PD_ptr_free_apl(PDBfile *file),
- _PD_index_ptr(char *p, int i),
  _PD_ptr_rd_install_addr(PDBfile *file, int64_t addr, int loc),
- _PD_ptr_wr_syment(PDBfile *file, long n, char *type, long ni, int64_t addr),
+ _PD_ptr_wr_syment(PDBfile *file, PD_address *ad, char *type,
+		   long ni, int64_t addr),
  _PD_ptr_open_setup(PDBfile *file);
 
 extern syment
- *_PD_ptr_get_entry(PDBfile *file, long i);
+ *_PD_ptr_read(PDBfile *file, int64_t addr, int force);
+
+extern PD_address
+ *_PD_ptr_wr_lookup(PDBfile *file, void *vr, int *ploc, int write);
 
 
 /* PDRDWR.C declarations */
@@ -652,7 +633,8 @@ extern long
  _PD_number_refd(void *vr, char *type, hasharr *tab),
  _PD_wr_syment(PDBfile *file, char *vr, long ni, char *intype,
 	       char *outtype),
- _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr);
+ _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr),
+ _PD_rd_pointer(PDBfile *file, int64_t addr);
 
 extern int64_t
  _PD_annotate_text(PDBfile *file, syment *ep, char *name,

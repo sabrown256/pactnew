@@ -891,7 +891,7 @@ static long _PD_itag_reduce(PD_smp_state *pa)
  */
 
 static int64_t _PD_ptr_deref_addr(PD_smp_state *pa, int n)
-   {long i, numb;
+   {long numb;
     int64_t addr;
     syment *ep;
     parse_frame *fr;
@@ -914,8 +914,7 @@ static int64_t _PD_ptr_deref_addr(PD_smp_state *pa, int n)
 
 	_PD_set_current_address(file, addr, SEEK_SET, PD_TRACE);
 
-	i  = _PD_ptr_read(file, addr, TRUE);
-	ep = _PD_ptr_get_entry(file, i);
+	ep = _PD_ptr_read(file, addr, TRUE);
 	if (ep == NULL)
 	   {addr = 0;
 	    numb = 0;}

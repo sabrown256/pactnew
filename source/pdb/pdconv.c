@@ -1018,14 +1018,14 @@ static void _PD_bin_text(char **out, char **in, char *typ, long ni,
 
 /* _PD_TEXT_BIN - convert text to binary numbers */
 
-static void _PD_text_bin(char **out, char **in, char *typ, long ni,
-			 int boffs,
-			 PD_type_kind kndi, long *ifmt, long nbi,
-			 PD_byte_order ordi, int *iord,
-			 PD_type_kind kndo, long *ofmt, long nbo,
-			 PD_byte_order ordo, int *oord,
-			 data_standard *hstd,
-			 int onescmp, int usg, int rdx, char *delim)
+void _PD_text_bin(char **out, char **in, char *typ, long ni,
+		  int boffs,
+		  PD_type_kind kndi, long *ifmt, long nbi,
+		  PD_byte_order ordi, int *iord,
+		  PD_type_kind kndo, long *ofmt, long nbo,
+		  PD_byte_order ordo, int *oord,
+		  data_standard *hstd,
+		  int onescmp, int usg, int rdx, char *delim)
    {int *hord;
     long i, nb, nc, ne, nbl;
     long *hfmt;
@@ -1123,6 +1123,56 @@ static void _PD_text_bin(char **out, char **in, char *typ, long ni,
 
 /*--------------------------------------------------------------------------*/
 
+/* _PD_CONVERT_PTR_RD - convert the pointer from BF to a fixed point number
+ *                    - and return it
+ */
+
+long _PD_convert_ptr_rd(char *bfi, int fbpi, PD_byte_order ford,
+			int hbpi, PD_byte_order hord, data_standard *hs)
+   {long n;
+    char *in, *out;
+
+    in  = bfi;
+    out = (char *) &n;
+    if (ford == TEXT_ORDER)
+       _PD_text_bin(&out, &in, SC_INT_S, 1L, 0,
+		    INT_KIND, NULL, fbpi, ford, NULL,
+		    INT_KIND, NULL, hbpi, hord, NULL,
+		    hs, FALSE, FALSE, 10, NULL);
+    else
+       _PD_iconvert(&out, &in, 1L, fbpi, ford, hbpi, hord, FALSE, FALSE);
+
+    return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_CONVERT_PTR_WR - convert the pointer N to text form */
+
+static void _PD_convert_ptr_wr(char *bfo, long n, PDBfile *file,
+			       int fbpi, PD_byte_order ford,
+			       int hbpi, PD_byte_order hord,
+			       data_standard *hs)
+   {char *in, *out;
+
+    in  = (char *) &n;
+    out = bfo;
+    if (_PD_TEXT_OUT(file) == TRUE)
+       {memset(out, ' ', fbpi);
+	_PD_bin_text(&out, &in, SC_INT_S, 1L, 0,
+		     INT_KIND, NULL, hbpi, hord, NULL,
+		     INT_KIND, NULL, fbpi, ford, NULL,
+		     hs, FALSE, FALSE, 10, NULL);}
+    else
+       {memset(out, 0, fbpi);
+	_PD_iconvert(&out, &in, 1L, hbpi, hord, fbpi, ford,
+		     FALSE, FALSE);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PD_CONVERT_PTR - convert pointer in the following sense
  *                 - writing:
  *                 -    map memory address into an index <n>
@@ -1147,65 +1197,52 @@ static int _PD_convert_ptr(char **pout, char **pin, long *poo, long *pio,
 			   data_standard *hstd, long iao, long iai)
    {int loc, fbpi, hbpi;
     long i, n, nbo, nbi;
-    char *in, *out, *p;
+    char *p;
     PDBfile *file;
     data_standard *hs, *fs;
+    PD_address *ad;
     PD_byte_order ford, hord;
 
     nbo = stdo->ptr_bytes + iao;
     nbi = stdi->ptr_bytes + iai;
 
-    for (i = 0; i < ni; i++)
-        {n = 1L;
-	 if (hstd->file != NULL)
-	    {file = hstd->file;
-	     hs   = file->host_std;
-	     fs   = file->std;
-	     fbpi = fs->ptr_bytes;
-	     ford = fs->fx[PD_LONG_I].order;
-	     hbpi = hs->fx[PD_LONG_I].bpi;
-	     hord = hs->fx[PD_LONG_I].order;
-       
+    file = hstd->file;
+    if (file != NULL)
+       {hs   = file->host_std;
+	fs   = file->std;
+	fbpi = fs->ptr_bytes;
+	ford = fs->fx[PD_LONG_I].order;
+	hbpi = hs->fx[PD_LONG_I].bpi;
+	hord = hs->fx[PD_LONG_I].order;
+
+	for (i = 0; i < ni; i++)
+	    {n = 1L;
+
 /* convert pointer when writing to file */
 	     if (stdi == hstd)
-	        {p = *pin;
-		 p = DEREF(p);
-		 n = _PD_ptr_wr_lookup(file, p, &loc, FALSE);
+	        {p  = *pin;
+		 p  = DEREF(p);
+		 ad = _PD_ptr_wr_lookup(file, p, &loc, FALSE);
+		 n  = (ad == NULL) ? -1 : ad->indx;
 
-		 in  = (char *) &n;
-		 out = *pout;
-		 if (_PD_TEXT_OUT(file) == TRUE)
-		    {memset(out, ' ', fbpi);
-		     _PD_bin_text(&out, &in, SC_INT_S, 1L, 0,
-				  INT_KIND, NULL, hbpi, hord, NULL,
-				  INT_KIND, NULL, fbpi, ford, NULL,
-				  hs, FALSE, FALSE, 10, NULL);}
-		 else
-		    {memset(out, 0, fbpi);
-		     _PD_iconvert(&out, &in, 1L, hbpi, hord, fbpi, ford,
-				  FALSE, FALSE);};}
+		 _PD_convert_ptr_wr(*pout, n, file, fbpi, ford, hbpi, hord, hs);}
 
 /* convert pointer when reading from file */
 	     else if (stdo == hstd)
-	        {if (ford == TEXT_ORDER)
-		    {in  = *pin;
-		     out = (char *) &n;
-		     _PD_text_bin(&out, &in, SC_INT_S, 1L, 0,
-				  INT_KIND, NULL, fbpi, ford, NULL,
-				  INT_KIND, NULL, hbpi, hord, NULL,
-				  hs, FALSE, FALSE, 10, NULL);
-		     n = _PD_ptr_fix(file, n);}
-		 else
-		    n = _PD_ptr_get_index(file, *pin);
+	        {n = _PD_convert_ptr_rd(*pin, fbpi, ford, hbpi, hord, hs);
+		 _PD_ptr_get_index(file, n, *pout);};
 
-		 if (file->use_itags == FALSE)
-		    _PD_index_ptr(*pout, n);};};
+	     *pin  += nbi;
+	     *pio  += nbi;
+	     *pout += nbo;
+	     *poo  += nbo;};}
 
-	 *pin  += nbi;
-	 *pio  += nbi;
-	 *pout += nbo;
-	 *poo  += nbo;};
-
+    else
+       {*pin  += ni*nbi;
+	*pio  += ni*nbi;
+	*pout += ni*nbo;
+	*poo  += ni*nbo;};
+       
     return(TRUE);}
 
 /*--------------------------------------------------------------------------*/

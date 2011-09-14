@@ -975,7 +975,7 @@ long _PD_wr_syment(PDBfile *file, char *vr, long ni,
     case INDIRECT :
     
          if (vr == NULL)
-            {(*file->wr_itag)(file, -1L, 0L, litype, -1L, TRUE);
+            {(*file->wr_itag)(file, NULL, 0L, litype, -1L, TRUE);
              GO_CONT;};
 
 /* dereference a local copy of the type */
@@ -993,7 +993,7 @@ long _PD_wr_syment(PDBfile *file, char *vr, long ni,
          SAVE_P(vr);
          vr = DEREF(vr);
          if (vr == NULL)
-            {(*file->wr_itag)(file, -1L, 0L, litype, -1L, FALSE);
+            {(*file->wr_itag)(file, NULL, 0L, litype, -1L, FALSE);
              RESTORE_P(char, vr);
              i++;
              vr += sizeof(char *);
@@ -1942,6 +1942,47 @@ long _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
          return(nrd);
 
     FINISH("_PD_RD_SYMENT", PD_READ);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_RD_POINTER - read and return a pointer index from FILE at ADDR */
+
+long _PD_rd_pointer(PDBfile *file, int64_t addr)
+   {long n;
+    size_t bpi, nr;
+    char bf[MAXLINE];
+    FILE *fp;
+
+    fp  = file->stream;
+    bpi = file->std->ptr_bytes;
+
+/* set the file location */
+    _PD_set_current_address(file, addr, SEEK_SET, PD_READ);
+
+/* read the pointer value from the file location */
+    nr = lio_read(bf, bpi, 1, fp);
+    if (nr == 1)
+       {int fbpi, hbpi;
+	data_standard *hs, *fs;
+	PD_byte_order ford, hord;
+
+	hs = file->host_std;
+	fs = file->std;
+
+	fbpi = fs->ptr_bytes;
+	ford = fs->fx[PD_LONG_I].order;
+	hbpi = hs->fx[PD_LONG_I].bpi;
+	hord = hs->fx[PD_LONG_I].order;
+       
+	n = _PD_convert_ptr_rd(bf, fbpi, ford, hbpi, hord, hs);}
+    else
+       n = -1;
+
+/* restore the file location */
+    _PD_set_current_address(file, -bpi, SEEK_CUR, PD_READ);
+
+    return(n);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

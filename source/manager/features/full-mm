@@ -7,6 +7,6 @@
 # include "cpyright.h"
 #
 
-setenv USE_FULL_MM
+setenv USE_FULL_MM  TRUE
 
 

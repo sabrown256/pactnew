@@ -205,6 +205,7 @@ typedef struct s_PD_itag PD_itag;
 typedef struct s_dimind dimind;
 typedef struct s_attribute attribute;
 typedef struct s_attribute_value attribute_value;
+typedef struct s_PD_address PD_address;
 typedef struct s_PD_image PD_image;
 typedef struct s_PD_pfm_fnc PD_pfm_fnc;
 typedef memdes *(*PFPDBwrite)(PDBfile *file, char *vr, defstr *defp);
@@ -327,6 +328,13 @@ enum e_PD_character_standard
 
 typedef enum e_PD_character_standard PD_character_standard;
 
+enum e_PD_data_location
+   {LOC_OTHER,
+    LOC_HERE,
+    LOC_BLOCK};
+
+typedef enum e_PD_data_location PD_data_location;
+
 
 /* NOTE: see comment in scope_io.h concerning file_io_desc and the stream member
  *       here the buffer is the analog of the FILE *
@@ -404,6 +412,15 @@ struct s_sys_layer
     long (*write)(PDBfile *file, char *vr, long ni,
 		  char *intype, char *outtype);};
 
+struct s_PD_address
+   {int indx;                  /* indx for /&ptrs */
+    PD_data_location loc;      /* location of data wrt itag */
+    int written;               /* 1 if data written, 0 if not */
+    int64_t addr;              /* disk address of start of data or itag */
+    int64_t reta;              /* disk address of end of data */
+    char *ptr;                 /* memory address of data */
+    syment *entry;};           /* symbol table entry */
+
 /*
  * #bind derived PDBfile character-A SC_STRING_I PP_PDBfileObject NULL
  */
@@ -466,7 +483,7 @@ struct s_PDBfile
     int (*wr_prim_types)(FILE *fp, hasharr *tab);
     int (*rd_prim_types)(PDBfile *file, char *bf);
 
-    int (*wr_itag)(PDBfile *file, long n, long ni, char *type,
+    int (*wr_itag)(PDBfile *file, PD_address *ad, long ni, char *type,
 		   int64_t addr, int flag);
     int (*rd_itag)(PDBfile *file, char *p, PD_itag *pi);
 

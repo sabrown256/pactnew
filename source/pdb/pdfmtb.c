@@ -67,7 +67,7 @@ static void _PD_regen_std(PDBfile *file, char *type,
  *                -     block of data
  */
 
-static int _PD_wr_itag_ii(PDBfile *file, long n, long ni, char *type,
+static int _PD_wr_itag_ii(PDBfile *file, PD_address *ad, long ni, char *type,
 			  int64_t addr, int loc)
    {char s[MAXLINE];
     FILE *fp;
@@ -84,7 +84,7 @@ static int _PD_wr_itag_ii(PDBfile *file, long n, long ni, char *type,
 	lio_printf(fp, s);
 
 	if ((ni > 0) && (loc == LOC_HERE))
-	   _PD_ptr_wr_syment(file, n, type, ni, addr);};
+	   _PD_ptr_wr_syment(file, ad, type, ni, addr);};
 
     return(TRUE);}
 
