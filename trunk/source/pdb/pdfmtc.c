@@ -51,7 +51,7 @@
  *                 -     block of data
  */
 
-static int _PD_wr_itag_iii(PDBfile *file, long n, long ni, char *type,
+static int _PD_wr_itag_iii(PDBfile *file, PD_address *ad, long ni, char *type,
 			   int64_t addr, int loc)
    {char s[MAXLINE];
     FILE *fp;
@@ -70,7 +70,7 @@ static int _PD_wr_itag_iii(PDBfile *file, long n, long ni, char *type,
 	    lio_printf(fp, s);};
 
 	if (loc == LOC_HERE)
-	   _PD_ptr_wr_syment(file, n, type, ni, addr);};
+	   _PD_ptr_wr_syment(file, ad, type, ni, addr);};
 
     return(TRUE);}
 
@@ -81,7 +81,6 @@ static int _PD_wr_itag_iii(PDBfile *file, long n, long ni, char *type,
 
 static int _PD_rd_itag_iii(PDBfile *file, char *p, PD_itag *pi)
    {int ok;
-    long i;
     char t[MAXLINE];
     char *token, *s, *bf;
     FILE *fp;
@@ -123,8 +122,7 @@ static int _PD_rd_itag_iii(PDBfile *file, char *p, PD_itag *pi)
 	pi->length = strlen(t);}
 
     else
-       {i  = _PD_ptr_index(p);
-	ok = _PD_ptr_entry_itag(file, i, pi);
+       {ok = _PD_ptr_entry_itag(file, pi, p);
 	SC_ASSERT(ok == TRUE);};
 
     return(TRUE);}

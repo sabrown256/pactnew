@@ -76,8 +76,16 @@ static PD_address *_PD_ptr_get_ad(PDBfile *file, int n)
    {PD_address *ad;
     SC_array *ap;
 
+    SC_LOCKON(PD_ptr_lock);
+
     ap = _PD_ptr_get_ap(file);
     ad = SC_array_get(ap, n);
+#if 0
+if (n != ad->indx)
+   printf("-> %d %d\n", n, ad->indx);
+#endif
+
+    SC_LOCKOFF(PD_ptr_lock);
 
     return(ad);}
 
@@ -86,7 +94,7 @@ static PD_address *_PD_ptr_get_ad(PDBfile *file, int n)
 
 /* _PD_PTR_GET_ENTRY - return the syment associated with the Ith pointer */
 
-syment *_PD_ptr_get_entry(PDBfile *file, long i)
+static syment *_PD_ptr_get_entry(PDBfile *file, long i)
    {PD_address *ad;
     syment *ep;
 
@@ -159,20 +167,16 @@ static SC_array *_PD_ptr_set_ap(PDBfile *file, SC_array *nap, int serial)
    {int tid;
     SC_array *oap, *apl;
 
-    tid = SC_current_thread() + 1;
+    if (serial == TRUE)
+       tid = 0;
+    else
+       tid = SC_current_thread() + 1;
 
     SC_LOCKON(PD_ptr_lock);
 
     apl = file->ap;
-
-    oap = NULL;
-
-    if (serial == TRUE)
-       {oap = *(SC_array **) SC_array_get(apl, 0);
-	SC_array_set(file->ap, 0, &nap);}
-    else
-       {oap = *(SC_array **) SC_array_get(apl, tid);
-	SC_array_set(file->ap, tid, &nap);};
+    oap = *(SC_array **) SC_array_get(apl, tid);
+    SC_array_set(apl, tid, &nap);
 
     SC_LOCKOFF(PD_ptr_lock);
 
@@ -363,7 +367,7 @@ void dprapl(PDBfile *file)
  *               - extract and return the integer value
  */
 
-int _PD_ptr_index(void *p)
+static int _PD_ptr_index(void *p)
     {int i;
 
      i = *((int *) &p);
@@ -377,7 +381,7 @@ int _PD_ptr_index(void *p)
  *               - for later retrieval by _PD_ptr_index
  */
 
-void _PD_index_ptr(char *p, int i)
+static void _PD_index_ptr(char *p, int i)
     {
 
      *((int *) p) = i;
@@ -387,52 +391,205 @@ void _PD_index_ptr(char *p, int i)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_PTR_FIND_PTR - return the index of the pointer VR in the
- *                  - pointer list of FILE
- *                  - return the index of the next pointer if not found
- *                  - return -1 if there is no list or if ADDR is invalid
+/* _PD_PTR_FIND_PTR - return the PD_address associated with the pointer VR
+ *                  - in the pointer list of FILE
+ *                  - return NULL if there is none found
  */
 
-static long _PD_ptr_find_ptr(PDBfile *file, void *vr)
+static PD_address *_PD_ptr_find_ptr(PDBfile *file, void *vr)
    {long i, ni;
-    PD_address *ad;
+    PD_address *ad, *lad;
 
     ni = GET_N_AD(file);
+    ad = NULL;
 
     if ((ni > 0L) && (vr != NULL))
        {for (i = 0L; i < ni; i++)
-	    {ad = _PD_ptr_get_ad(file, i);
-	     if ((ad != NULL) && (vr == ad->ptr))
-	        break;};}
-    else
-       i = -1L;
+	    {lad = _PD_ptr_get_ad(file, i);
+	     if ((lad != NULL) && (vr == lad->ptr))
+	        {ad = lad;
+		 break;};};};
 
-    return(i);}
+    return(ad);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_PTR_FIND_ADDR - return the index of the address ADDR in the
- *                   - pointer list of FILE
- *                   - return the index of the next pointer if not found
- *                   - return -1 if there is no list or if ADDR is invalid
+/* _PD_PTR_FIND_NEXT - find the next PD_address in FILE associated with VR
+ *                   - occuring after AD
  */
 
-static long _PD_ptr_find_addr(PDBfile *file, int64_t addr)
+static PD_address *_PD_ptr_find_next(PDBfile *file, PD_address *ad, void *vr)
    {long i, ni;
-    PD_address *ad;
 
     ni = GET_N_AD(file);
+    i  = ad->indx;
+
+#if 1
+    while ((ad->written == TRUE) && (i < ni))
+       {for (i++; i < ni; i++)
+	    {ad = _PD_ptr_get_ad(file, i);
+	     if (vr == ad->ptr)
+	        break;};};
+#endif
+
+    return(ad);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PTR_FIND_ADDR - return the PD_address associated with the address ADDR
+ *                   - in the pointer list of FILE
+ *                   - return NULL if there is none found
+ */
+
+static PD_address *_PD_ptr_find_addr(PDBfile *file, int64_t addr)
+   {long i, ni;
+    PD_address *ad, *lad;
+
+    ni = GET_N_AD(file);
+    ad = NULL;
 
     if ((ni > 0L) && (addr != 0))
        {for (i = 0L; i < ni; i++)
-	    {ad = _PD_ptr_get_ad(file, i);
-	     if ((ad != NULL) && (addr == ad->addr))
-	        break;};}
-    else
-       i = -1L;
+	    {lad = _PD_ptr_get_ad(file, i);
+	     if ((lad != NULL) && (addr == lad->addr))
+	        {ad = lad;
+		 break;};};};
 
-    return(i);}
+    return(ad);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PTR_INSTALL_ADDR - install ADDR in the pointer lists of FILE
+ *                      - return the associated PD_address
+ */
+
+static PD_address *_PD_ptr_install_addr(PDBfile *file, int64_t addr)
+   {long i;
+    PD_address *ad;
+    SC_array *ap;
+
+    SC_LOCKON(PD_ptr_lock);
+
+    ap = _PD_ptr_get_ap(file);
+    i  = SC_array_inc_n(ap, 1, 1);
+    ad = SC_array_get(ap, i);
+
+    _PD_ptr_init_ad(ad);
+    ad->indx = i;
+    ad->addr = addr;
+
+    SC_LOCKOFF(PD_ptr_lock);
+
+    return(ad);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PTR_INSTALL_PTR - install VR in the pointer list of FILE
+ *                     - and mark it with the WRITE flag
+ *                     - return the associated PD_address
+ */
+
+static PD_address *_PD_ptr_install_ptr(PDBfile *file, char *vr, int write)
+   {long i;
+    PD_address *ad;
+    SC_array *ap;
+
+    ad = NULL;
+
+    if (file != NULL)
+       {SC_LOCKON(PD_ptr_lock);
+
+	ap = _PD_ptr_get_ap(file);
+	i  = SC_array_inc_n(ap, 1, 1);
+	ad = SC_array_get(ap, i);
+
+	_PD_ptr_init_ad(ad);
+	ad->indx    = i;
+	ad->ptr     = vr;
+	ad->written = write;
+
+	SC_LOCKOFF(PD_ptr_lock);};
+
+    return(ad);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PTR_INSTALL_ENTRY - install EP in the pointer list of FILE
+ *                       - return the associated PD_address
+ */
+
+static PD_address *_PD_ptr_install_entry(PDBfile *file, long i, syment *ep)
+   {long ni;
+    PD_address *ad;
+    SC_array *ap;
+
+    SC_LOCKON(PD_ptr_lock);
+
+    ap = _PD_ptr_get_ap(file);
+    ad = SC_array_get(ap, i);
+
+    ad->indx  = i;
+    ad->entry = ep;
+    ad->addr  = PD_entry_address(ep);
+
+    ni = SC_array_get_n(ap);
+    ni = max(i+1, ni);
+
+    SC_array_set_n(ap, ni);
+
+    SC_LOCKOFF(PD_ptr_lock);
+
+    return(ad);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PTR_REMOVE_ADDR - remove address indexed by I from FILE */
+
+static void _PD_ptr_remove_addr(PDBfile *file, long i, PD_address *ad)
+   {long ni;
+    PD_address *ada, *adb;
+    SC_array *ap;
+
+    SC_LOCKON(PD_ptr_lock);
+
+    ap = _PD_ptr_get_ap(file);
+    ni = SC_array_dec_n(ap, 1, 1);
+
+    ada  = SC_array_get(ap, i);
+    adb  = SC_array_get(ap, ni);
+    *ada = *adb;
+    _PD_ptr_init_ad(adb);
+
+    SC_LOCKOFF(PD_ptr_lock);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PTR_REMOVE_ENTRY - remove the Nth to last entry from FILE */
+
+static void _PD_ptr_remove_entry(PDBfile *file, int n)
+   {
+
+#if 0
+    SC_array *ap;
+
+    SC_LOCKON(PD_ptr_lock);
+
+    ap = _PD_ptr_get_ap(file);
+    SC_array_dec_n(ap, n, -1);
+
+    SC_LOCKOFF(PD_ptr_lock);
+#endif
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -466,15 +623,11 @@ int PD_reset_ptr_list(PDBfile *file ARG(,,cls))
 /* _PD_PTR_RESET - reset the pointer list element poining to VR */
 
 int _PD_ptr_reset(PDBfile *file, char *vr)
-   {long i, ni;
-    PD_address *ad;
+   {PD_address *ad;
 
-    ni = GET_N_AD(file);
-
-    i = _PD_ptr_find_ptr(file, vr);
-    if ((0 <= i) && (i < ni))
-       {ad       = _PD_ptr_get_ad(file, i);
-	ad->addr = -1;
+    ad = _PD_ptr_find_ptr(file, vr);
+    if (ad != NULL)
+       {ad->addr = -1;
         ad->ptr  = NULL;};
 
     return(TRUE);}
@@ -488,12 +641,10 @@ int _PD_ptr_reset(PDBfile *file, char *vr)
 
 static int _PD_ptr_register(haelem *hp, void *a)
    {int ok;
-    long i, nc, ni;
+    long i, nc;
     char *name;
     syment *ep;
-    PD_address *ad;
     PDBfile *file;
-    SC_array *ap;
 
     file = (PDBfile *) a;
 
@@ -503,22 +654,8 @@ static int _PD_ptr_register(haelem *hp, void *a)
     if ((file != NULL) && (ep != NULL))
        {nc = strlen(file->ptr_base);
 	if (strncmp(name, file->ptr_base, nc) == 0) 
-	   {SC_LOCKON(PD_ptr_lock);
-
-	    ap = _PD_ptr_get_ap(file);
-	    i  = SC_stoi(name+nc);
-	    ad = SC_array_get(ap, i);
-
-	    ad->indx  = i;
-	    ad->entry = ep;
-	    ad->addr  = PD_entry_address(ep);
-
-	    ni = SC_array_get_n(ap);
-	    ni = max(i+1, ni);
-
-	    SC_array_set_n(ap, ni);
-
-	    SC_LOCKOFF(PD_ptr_lock);};};
+	   {i = SC_stoi(name+nc);
+            _PD_ptr_install_entry(file, i, ep);};};
 
     return(0);}
 
@@ -566,10 +703,11 @@ static int _PD_ptr_get_n_spaces(PDBfile *file, int inc)
  *                    - return FALSE for a NULL pointer otherwise TRUE
  */
 
-int _PD_ptr_entry_itag(PDBfile *file, int n, PD_itag *pi)
-   {int rv;
+int _PD_ptr_entry_itag(PDBfile *file, PD_itag *pi, char *p)
+   {int n, rv;
     syment *ep;
 
+    n  = _PD_ptr_index(p);
     ep = _PD_ptr_get_entry(file, n);
 
     if (ep == NULL)
@@ -598,58 +736,18 @@ int _PD_ptr_entry_itag(PDBfile *file, int n, PD_itag *pi)
 
 static void _PD_ptr_remove_rd(PDBfile *file, int64_t addr)
    {long i, ni;
-    PD_address *ada, *adb;
-    SC_array *ap;
+    PD_address *ad;
 
     ni = GET_N_AD(file);
 
 /* remove addr from lists of pointers and disk addresses previously read */
     if ((ni > 0) && (addr != 0))
-       {i = _PD_ptr_find_addr(file, addr);
-	if (i < ni)
-	   {SC_LOCKON(PD_ptr_lock);
-
-	    ap = _PD_ptr_get_ap(file);
-	    ni = SC_array_dec_n(ap, 1, 1);
-
-	    ada  = SC_array_get(ap, i);
-	    adb  = SC_array_get(ap, ni);
-	    *ada = *adb;
-	    _PD_ptr_init_ad(adb);
-
-	    SC_LOCKOFF(PD_ptr_lock);};};
+       {ad = _PD_ptr_find_addr(file, addr);
+	if (ad != NULL)
+	   {i = ad->indx;
+	    _PD_ptr_remove_addr(file, i, ad);};};
 
     return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PD_PTR_ADD_ENTRY - install the pointer VR in the pointer list
- *                   - of FILE and marked with the WRITE flag
- */
-
-static long _PD_ptr_add_entry(PDBfile *file, char *vr, int write)
-   {long i;
-    PD_address *ad;
-    SC_array *ap;
-
-    i = -1;
-
-    if (file != NULL)
-       {SC_LOCKON(PD_ptr_lock);
-
-	ap = _PD_ptr_get_ap(file);
-	i  = SC_array_inc_n(ap, 1, 1);
-	ad = SC_array_get(ap, i);
-
-	_PD_ptr_init_ad(ad);
-	ad->indx    = i;
-	ad->ptr     = vr;
-	ad->written = write;
-
-	SC_LOCKOFF(PD_ptr_lock);};
-
-    return(i);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -661,44 +759,31 @@ static long _PD_ptr_add_entry(PDBfile *file, char *vr, int write)
  *                   - location is LOC_HERE, LOC_OTHER, or LOC_BLOCK
  */
 
-long _PD_ptr_wr_lookup(PDBfile *file, void *vr, int *ploc, int write)
+PD_address *_PD_ptr_wr_lookup(PDBfile *file, void *vr, int *ploc, int write)
    {int loc;
-    long i, ni;
     PD_address *ad;
 
     SC_LOCKON(PD_ptr_lock);
 
-    ni = GET_N_AD(file);
-
     loc = LOC_OTHER;
 
 /* search the pointer list to see if this pointer is known */
-    i = _PD_ptr_find_ptr(file, vr);
-
-    ad = _PD_ptr_get_ad(file, i);
+    ad = _PD_ptr_find_ptr(file, vr);
 
     if (file->track_pointers == FALSE)
        {loc = LOC_HERE;
 
-        if ((i >= ni) || (write == FALSE))
-	   i = _PD_ptr_add_entry(file, vr, write);
+        if ((ad == NULL) || (write == FALSE))
+	   ad = _PD_ptr_install_ptr(file, vr, write);
 
         else
-            {while ((ad->written == TRUE) && (i < ni))
-                {for (i++; i < ni; i++)
-		     {ad = _PD_ptr_get_ad(file, i);
-		      if (vr == ad->ptr)
-		         break;};};
-
-             if (i >= ni)
-	        i = _PD_ptr_add_entry(file, vr, write);
-             else
-	        ad->written = write;};}                 
+            {ad = _PD_ptr_find_next(file, ad, vr);
+	     ad->written = write;};}                 
 
 /* add a new pointer */
-    else if (i >= ni)
+    else if (ad == NULL)
        {loc = LOC_HERE;
-	i   = _PD_ptr_add_entry(file, vr, write);}
+	ad  = _PD_ptr_install_ptr(file, vr, write);}
 
     else if (ad->addr == -1)
        loc = LOC_HERE;
@@ -707,7 +792,7 @@ long _PD_ptr_wr_lookup(PDBfile *file, void *vr, int *ploc, int write)
 
     *ploc = loc;
 
-    return(i);}
+    return(ad);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -727,29 +812,28 @@ int _PD_ptr_wr_itags(PDBfile *file, void *vr, long ni, char *type)
  */
     addr = _PD_get_current_address(file, PD_WRITE);
     loc  = LOC_HERE;
-    n    = -1L;
+    ad   = NULL;
 
     if ((_PD_IS_SEQUENTIAL) || (file->use_itags == FALSE))
        {SC_LOCKON(PD_ptr_lock);
 
         _PD_ptr_remove_rd(file, addr);
 
-	n  = _PD_ptr_wr_lookup(file, vr, &loc, TRUE);
-	ad = _PD_ptr_get_ad(file, n);
+	ad = _PD_ptr_wr_lookup(file, vr, &loc, TRUE);
 
 	if (loc == LOC_HERE)
-	   {ad->addr = addr;
-	    ad->indx = n;}
+	   ad->addr = addr;
 	else
 	   addr = ad->addr;
 
 	SC_LOCKOFF(PD_ptr_lock);}
 
     else
-       n = _PD_ptr_get_n_spaces(file, TRUE);
+       {n  = _PD_ptr_get_n_spaces(file, TRUE);
+	ad = _PD_ptr_get_ad(file, n);};
 
-/* write the itag for the read */
-    (*file->wr_itag)(file, n, ni, type, addr, loc);
+/* write the itag to the file */
+    (*file->wr_itag)(file, ad, ni, type, addr, loc);
 
     rv = (loc == LOC_HERE);
 
@@ -794,37 +878,27 @@ static char *_PD_ptr_alloc_space(PDBfile *file, char **vr,
  *                   - return TRUE in PFRST the first time ADDR is seen
  */
 
-static long _PD_ptr_rd_lookup(PDBfile *file, int64_t addr, int *pfrst)
+static PD_address *_PD_ptr_rd_lookup(PDBfile *file, int64_t addr, int *pfrst)
    {int frst;
     long i, ni;
     PD_address *ad;
-    SC_array *ap;
 
     frst = FALSE;
 
 /* search the disk address list to see if this pointer is known */
-    i = _PD_ptr_find_addr(file, addr);
+    ad = _PD_ptr_find_addr(file, addr);
 
 /* add a new pointer */
     ni = GET_N_AD(file);
-    if ((i >= ni) || (file->track_pointers == FALSE))
-       {SC_LOCKON(PD_ptr_lock);
-
-	ap = _PD_ptr_get_ap(file);
-	i  = SC_array_inc_n(ap, 1, 1);
-	ad = SC_array_get(ap, i);
-
-	_PD_ptr_init_ad(ad);
-	ad->indx = i;
-	ad->addr = addr;
-
-	SC_LOCKOFF(PD_ptr_lock);
-
+    if ((ad == NULL) || (file->track_pointers == FALSE))
+       {ad   = _PD_ptr_install_addr(file, addr);
+	i    = ad->indx;
 	frst = TRUE;};
 
-    *pfrst = frst;
+    if (pfrst != NULL)
+       *pfrst = frst;
 
-    return(i);}
+    return(ad);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -834,16 +908,13 @@ static long _PD_ptr_rd_lookup(PDBfile *file, int64_t addr, int *pfrst)
  */
 
 void _PD_ptr_rd_install_addr(PDBfile *file, int64_t addr, int loc)
-   {int frst;
-    long i;
-    int64_t here;
+   {int64_t here;
     PD_address *ad;
 
     if ((_PD_IS_SEQUENTIAL) || (file->use_itags == FALSE))
-       {i    = _PD_ptr_rd_lookup(file, addr, &frst);
+       {ad   = _PD_ptr_rd_lookup(file, addr, NULL);
 	here = _PD_get_current_address(file, PD_READ);
 
-	ad = _PD_ptr_get_ad(file, i);
 	ad->reta = here;};
 
 /* restore the file pointer to its original location if necessary */
@@ -860,29 +931,24 @@ void _PD_ptr_rd_install_addr(PDBfile *file, int64_t addr, int loc)
  *                   - this is independent of the format version
  */
 
-static long _PD_ptr_read_push(PDBfile *file, char **vr, PD_itag *pi,
+static void _PD_ptr_read_push(PDBfile *file, char **vr, PD_itag *pi,
 			      int *pfrst)
    {int i, loc;
-    long rv;
     int64_t addr, naddr;
     PD_address *ad;
 
     if (file->use_itags == FALSE)
-       {i = _PD_ptr_index(*vr);
+       {i  = _PD_ptr_index(*vr);
+	ad = _PD_ptr_get_ad(file, i);
 	if (i == 0)
-	   {rv     = i;
-	    naddr  = -1L;
+	   {naddr  = -1L;
 	    *pfrst = FALSE;}
 	else
-	   {ad = _PD_ptr_get_ad(file, i);
-
-	    if (ad->ptr == NULL)
+	   {if (ad->ptr == NULL)
 	       {ad->ptr = _PD_ptr_alloc_space(file, vr, pi, FALSE);
-		rv     = i;
 		*pfrst = TRUE;}
 	    else
-	       {rv     = -1L;
-		*pfrst = FALSE;};
+	       *pfrst = FALSE;
 
 	    DEREF(vr) = ad->ptr;
 	    SC_mark(ad->ptr, 1);
@@ -898,9 +964,7 @@ static long _PD_ptr_read_push(PDBfile *file, char **vr, PD_itag *pi,
 	loc   = pi->flag;
 	naddr = -1L;
 
-	i = _PD_ptr_rd_lookup(file, addr, pfrst);
-
-	ad = _PD_ptr_get_ad(file, i);
+	ad = _PD_ptr_rd_lookup(file, addr, pfrst);
 
 	if (ad->ptr == NULL)
 	   ad->ptr = _PD_ptr_alloc_space(file, vr, pi, FALSE);
@@ -910,12 +974,11 @@ static long _PD_ptr_read_push(PDBfile *file, char **vr, PD_itag *pi,
 
 /* this pointer has not been seen before */
 	if (*pfrst == TRUE)
-	   {rv = i;
 
 /* GOTCHA: watch for new case of loc == LOC_BLOCK which means a
  * discontiguous block - deal with this, if and when it arises
  */
-	    if (loc != LOC_HERE)
+	   {if (loc != LOC_HERE)
 	       {pi->addr = _PD_get_current_address(file, PD_READ);
 
 /* jump to the place where the actual data starts */
@@ -923,9 +986,7 @@ static long _PD_ptr_read_push(PDBfile *file, char **vr, PD_itag *pi,
 
 /* we have seen this pointer before */
 	else
-	   {rv = -1L;
-
-	    if (loc == LOC_HERE)
+	   {if (loc == LOC_HERE)
 	       {naddr = ad->reta;
 
 /* NOTE: this is terrible - we have the data but we have to read it
@@ -940,7 +1001,7 @@ static long _PD_ptr_read_push(PDBfile *file, char **vr, PD_itag *pi,
     if (naddr != -1L)
        _PD_set_current_address(file, naddr, SEEK_SET, PD_READ);
 
-    return(rv);}
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -951,7 +1012,6 @@ static long _PD_ptr_read_push(PDBfile *file, char **vr, PD_itag *pi,
 
 int _PD_ptr_rd_itags(PDBfile *file, char **vr, PD_itag *pi)
    {int frst;
-    long i;
     char *p;
 
     if ((*file->rd_itag)(file, *vr, pi) == FALSE)
@@ -963,8 +1023,7 @@ int _PD_ptr_rd_itags(PDBfile *file, char **vr, PD_itag *pi)
 	frst = FALSE;}
 
     else if ((_PD_IS_SEQUENTIAL) || (file->use_itags == FALSE))
-       {i = _PD_ptr_read_push(file, vr, pi, &frst);
-	SC_ASSERT(i > 0);}
+       _PD_ptr_read_push(file, vr, pi, &frst);
 
     else
        {frst = TRUE;
@@ -980,22 +1039,20 @@ int _PD_ptr_rd_itags(PDBfile *file, char **vr, PD_itag *pi)
  *                   - current location in FILE
  */
 
-void _PD_ptr_wr_syment(PDBfile *file, long n, char *type,
+void _PD_ptr_wr_syment(PDBfile *file, PD_address *ad, char *type,
 		       long ni, int64_t addr)
    {char name[MAXLINE];
     syment *ep;
-    PD_address *ad;
 
     if (ni > 0)
        {SC_LOCKON(PD_ptr_lock);
 
-	snprintf(name, MAXLINE, "%s%ld", file->ptr_base, n);
+	snprintf(name, MAXLINE, "%s%ld", file->ptr_base, (long) ad->indx);
 	ep = _PD_mk_syment(type, ni, addr, NULL, NULL);
 	_PD_e_install(file, name, ep, TRUE);
 
 	if (file->format_version > 2)
-	   {ad = _PD_ptr_get_ad(file, n);
-	    if (ad != NULL)
+	   {if (ad != NULL)
 	       {ad->addr  = addr;
 		ad->entry = ep;};};
 
@@ -1010,7 +1067,7 @@ void _PD_ptr_wr_syment(PDBfile *file, long n, char *type,
  *             - any bad values are rerouted to the index for NULL
  */
 
-long _PD_ptr_fix(PDBfile *file, long n)
+static long _PD_ptr_fix(PDBfile *file, long n)
    {long ni;
 
     n  = max(n, 0L);
@@ -1026,82 +1083,53 @@ long _PD_ptr_fix(PDBfile *file, long n)
 /* _PD_PTR_GET_INDEX - extract a pointer index from BF
  *                   - according to the standards in FILE
  *                   - return the index
+ *                   - NOTE: no pointer lookups here - just conversion
+ *                   - from text
  */
 
-long _PD_ptr_get_index(PDBfile *file, char *bf)
-   {int fbpi, hbpi;
-    long n;
-    char *in, *out;
-    data_standard *hs, *fs;
-    PD_byte_order ford, hord;
-
-    hs = file->host_std;
-    fs = file->std;
-
-    fbpi = fs->ptr_bytes;
-    ford = fs->fx[PD_LONG_I].order;
-    hbpi = hs->fx[PD_LONG_I].bpi;
-    hord = hs->fx[PD_LONG_I].order;
-       
-    in  = bf;
-    out = (char *) &n;
-    _PD_iconvert(&out, &in, 1L, fbpi, ford, hbpi, hord, FALSE, FALSE);
+long _PD_ptr_get_index(PDBfile *file, long n, char *bf)
+   {
 
 /* constrain N to be a valid pointer index
  * any bad values are rerouted to the index for NULL
  */
     n = _PD_ptr_fix(file, n);
 
+    if ((bf != NULL) && (file->use_itags == FALSE))
+       _PD_index_ptr(bf, n);
+
     return(n);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_PTR_READ - read and return the index into the read pointer list
- *              - value at the current location in FILE
- *              - return -1 on failure
+/* _PD_PTR_READ - return the syment associated with ADDR
+ *              - read from FILE at ADDR if need be 
+ *              - in order to make the syment
+ *              - return NULL on failure
  */
 
-long _PD_ptr_read(PDBfile *file, int64_t addr, int force)
+syment *_PD_ptr_read(PDBfile *file, int64_t addr, int force)
    {int frst;
     long n;
-    size_t bpi, nr;
-    char bf[MAXLINE];
-    FILE *fp;
+    syment *ep;
     PD_address *ad;
-    SC_array *ap;
 
-    n = _PD_ptr_rd_lookup(file, addr, &frst);
+    ad = _PD_ptr_rd_lookup(file, addr, &frst);
+    n  = ad->indx;
 
 /* only partial reads can land here */
     if ((frst == TRUE) || (force == TRUE))
-       {SC_LOCKON(PD_ptr_lock);
+       {_PD_ptr_remove_entry(file, frst);
 
-	ap = _PD_ptr_get_ap(file);
-	ad = SC_array_get(ap, n);
-	SC_array_dec_n(ap, frst, -1);
+/*	ad->addr = 0; */
 
-	ad->addr = 0;
+	n = _PD_rd_pointer(file, addr);
+	n = _PD_ptr_fix(file, n);};
 
-	SC_LOCKOFF(PD_ptr_lock);
+    ep = _PD_ptr_get_entry(file, n);
 
-	fp  = file->stream;
-	bpi = file->std->ptr_bytes;
-
-/* set the file location */
-	_PD_set_current_address(file, addr, SEEK_SET, PD_READ);
-
-/* read the pointer value from the file location */
-	nr = lio_read(bf, bpi, 1, fp);
-	if (nr == 1)
-	   n = _PD_ptr_get_index(file, bf);
-	else
-	   n = -1;
-
-/* restore the file location */
-	_PD_set_current_address(file, -bpi, SEEK_CUR, PD_READ);};
-
-    return(n);}
+    return(ep);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

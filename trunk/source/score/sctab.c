@@ -119,7 +119,11 @@ static void _SC_free_haelem(hasharr *ha, haelem *hp)
 
     string = HA_STRING_KEY(ha->hash);
     if (string == TRUE)
+#if 1
        CFREE(hp->name);
+#else
+       hp->name = NULL;
+#endif
 
 /*    CFREE(hp->type); */
     hp->type = NULL;
