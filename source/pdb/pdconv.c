@@ -1222,7 +1222,7 @@ static int _PD_convert_ptr(char **pout, char **pin, long *poo, long *pio,
 	     if (stdi == hstd)
 	        {p  = *pin;
 		 p  = DEREF(p);
-		 ad = _PD_ptr_wr_lookup(file, p, &loc, FALSE);
+		 ad = _PD_ptr_wr_lookup(file, p, &loc, FALSE, TRUE);
 		 n  = (ad == NULL) ? -1 : ad->indx;
 
 		 _PD_convert_ptr_wr(*pout, n, file, fbpi, ford, hbpi, hord, hs);}
