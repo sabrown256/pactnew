@@ -76,7 +76,7 @@ static PD_address *_PD_ptr_get_ad(PDBfile *file, int n)
    {PD_address *ad;
     SC_array *ap;
 
-    SC_LOCKON(PD_ptr_lock);
+/*    SC_LOCKON(PD_ptr_lock); */
 
     ap = _PD_ptr_get_ap(file);
     ad = SC_array_get(ap, n);
@@ -85,7 +85,7 @@ if (n != ad->indx)
    printf("-> %d %d\n", n, ad->indx);
 #endif
 
-    SC_LOCKOFF(PD_ptr_lock);
+/*    SC_LOCKOFF(PD_ptr_lock); */
 
     return(ad);}
 
@@ -427,13 +427,13 @@ static syment *_PD_ptr_get_entry(PDBfile *file, long i)
    {PD_address *ad;
     syment *ep;
 
-/*    SC_LOCKON(PD_ptr_lock); */
+    SC_LOCKON(PD_ptr_lock);
 
     i  = _PD_ptr_fix(file, i);
     ad = _PD_ptr_get_ad(file, i);
     ep = ad->entry;
 
-/*    SC_LOCKOFF(PD_ptr_lock); */
+    SC_LOCKOFF(PD_ptr_lock);
 
     return(ep);}
 
