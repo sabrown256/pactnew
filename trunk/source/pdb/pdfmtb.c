@@ -68,7 +68,7 @@ static void _PD_regen_std(PDBfile *file, char *type,
  */
 
 static int _PD_wr_itag_ii(PDBfile *file, PD_address *ad, long ni, char *type,
-			  int64_t addr, int loc)
+			  int64_t addr, PD_data_location loc)
    {char s[MAXLINE];
     FILE *fp;
 

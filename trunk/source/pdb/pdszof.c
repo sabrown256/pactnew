@@ -166,7 +166,8 @@ static long _PD_sz_leaf_members(PDBfile *file, char *type, long ni,
 
 static int _PD_ptr_sz_itags(long *pnb, PDBfile *file, void *vr,
 			    long ni, char *type)
-   {int ret, loc, itags;
+   {int ret, itags;
+    PD_data_location loc;
 
     itags = file->use_itags;
 
@@ -201,10 +202,10 @@ long PD_sizeof(PDBfile *file ARG(,,cls),
     defstr *dp;
     memdes *desc, *mem_lst;
     PD_smp_state *pa;
-    SC_array *ap;
+    adloc *al;
 
     nb = 0L;
-    ap = NULL;
+    al = NULL;
 
     i       = -1;
     size    = 0;
@@ -233,7 +234,7 @@ long PD_sizeof(PDBfile *file ARG(,,cls),
 
 /* save the current ptr lists */
     if ((_PD_IS_SEQUENTIAL) || (itags == FALSE))
-       _PD_ptr_save_ap(file, &ap, NULL, NULL);
+       _PD_ptr_save_al(file, &al, NULL, NULL);
 
     INIT_STACKS(100L, 1000L);
 
@@ -389,7 +390,7 @@ long PD_sizeof(PDBfile *file ARG(,,cls),
 
 /* restore the initial ptr lists */
          if ((_PD_IS_SEQUENTIAL) || (itags == FALSE))
-	    _PD_ptr_restore_ap(file, ap, NULL);
+	    _PD_ptr_restore_al(file, al, NULL);
 
          return(nb);
 
