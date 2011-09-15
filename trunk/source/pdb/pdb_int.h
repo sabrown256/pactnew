@@ -609,7 +609,7 @@ extern syment
  *_PD_ptr_read(PDBfile *file, int64_t addr, int force);
 
 extern PD_address
- *_PD_ptr_wr_lookup(PDBfile *file, void *vr, int *ploc, int write);
+ *_PD_ptr_wr_lookup(PDBfile *file, void *vr, int *ploc, int write, int lck);
 
 
 /* PDRDWR.C declarations */
