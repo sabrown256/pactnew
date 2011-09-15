@@ -363,6 +363,53 @@ void dprapl(PDBfile *file)
 
 /*--------------------------------------------------------------------------*/
 
+/* _PD_PTR_ALLOC_SPACE - using PI for info allocate and prep the space
+ *                     - into which an indirect will be read
+ *                     - and assign VR to it
+ *                     - this is independent of the format version
+ */
+
+static char *_PD_ptr_alloc_space(PDBfile *file, char **vr,
+				 PD_itag *pi, int asgn)
+   {long bpi, ni;
+    char *pv, *type;
+
+    ni   = pi->nitems;
+    type = pi->type;
+
+    bpi = _PD_lookup_size(type, file->host_chart);
+    if (bpi == -1)
+       PD_error("CAN'T FIND NUMBER OF BYTES - _PD_PTR_ALLOC_SPACE",
+                PD_READ);
+
+    pv = CMAKE_N(char, ni*bpi);
+
+    if (asgn == TRUE)
+       {DEREF(vr) = pv;
+	SC_mark(pv, 1);};
+
+    return(pv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PTR_FIX - constrain N to be a valid pointer index
+ *             - any bad values are rerouted to the index for NULL
+ */
+
+static long _PD_ptr_fix(PDBfile *file, long n)
+   {long ni;
+
+    n  = max(n, 0L);
+    ni = GET_N_AD(file);
+    if (n >= ni)
+       n = 0L;
+
+    return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PD_PTR_INDEX - given a pointer P in which an integer has been stored
  *               - extract and return the integer value
  */
@@ -391,8 +438,90 @@ static void _PD_index_ptr(char *p, int i)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PD_PTR_GET_INDEX - extract a pointer index from BF
+ *                   - according to the standards in FILE
+ *                   - return the index
+ *                   - NOTE: no pointer lookups here
+ *                   - just enforcing validity and conversion to text
+ */
+
+long _PD_ptr_get_index(PDBfile *file, long n, char *bf)
+   {
+
+/* constrain N to be a valid pointer index
+ * any bad values are rerouted to the index for NULL
+ */
+    n = _PD_ptr_fix(file, n);
+
+    if ((bf != NULL) && (file->use_itags == FALSE))
+       _PD_index_ptr(bf, n);
+
+    return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PTR_GET_N_SPACES - return n_dyn_spaces in a thread safe way */
+
+static int _PD_ptr_get_n_spaces(PDBfile *file, int inc)
+   {int np;
+
+    SC_LOCKON(PD_dyn_lock);
+
+    if (inc == TRUE)
+       np = file->n_dyn_spaces++;
+    else
+       np = file->n_dyn_spaces;
+
+    SC_LOCKOFF(PD_dyn_lock);
+
+    np++;
+
+    return(np);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PTR_ENTRY_ITAG - check the ITAG PI and
+ *                    - if it indicates ITAGless operation fill it
+ *                    - with the entry data from read pointer N
+ *                    - return FALSE for a NULL pointer otherwise TRUE
+ */
+
+int _PD_ptr_entry_itag(PDBfile *file, PD_itag *pi, char *p)
+   {int n, rv;
+    syment *ep;
+
+    n  = _PD_ptr_index(p);
+    ep = _PD_ptr_get_entry(file, n);
+
+    if (ep == NULL)
+       {pi->type   = NULL;
+	pi->nitems = 0;
+	pi->addr   = 0;
+	pi->flag   = LOC_HERE;
+
+	rv = FALSE;}
+
+    else
+       {pi->type   = PD_entry_type(ep);
+	pi->nitems = PD_entry_number(ep);
+	pi->addr   = PD_entry_address(ep);
+	pi->flag   = LOC_HERE;
+	pi->length = 0;
+
+	rv = TRUE;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                        LOOKUP/INSTALL ROUTINES                           */
+
+/*--------------------------------------------------------------------------*/
+
 /* _PD_PTR_FIND_PTR - return the PD_address associated with the pointer VR
- *                  - in the pointer list of FILE
+ *                  - in the (write) pointer list of FILE
  *                  - return NULL if there is none found
  */
 
@@ -462,7 +591,7 @@ static PD_address *_PD_ptr_find_addr(PDBfile *file, int64_t addr)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_PTR_INSTALL_ADDR - install ADDR in the pointer lists of FILE
+/* _PD_PTR_INSTALL_ADDR - install ADDR in the (read) pointer lists of FILE
  *                      - return the associated PD_address
  */
 
@@ -488,7 +617,7 @@ static PD_address *_PD_ptr_install_addr(PDBfile *file, int64_t addr)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_PTR_INSTALL_PTR - install VR in the pointer list of FILE
+/* _PD_PTR_INSTALL_PTR - install VR in the (write) pointer list of FILE
  *                     - and mark it with the WRITE flag
  *                     - return the associated PD_address
  */
@@ -592,284 +721,9 @@ static void _PD_ptr_remove_entry(PDBfile *file, int n)
     return;}
 
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 
-/* PD_RESET_PTR_LIST - THREADSAFE
- *                   - reset the pointer lists for the given file
- *                   - so that indirect connectivity bookkeeping
- *                   - is re-initialized this will give the application
- *                   - some control over this process
- *
- * #bind PD_reset_ptr_list fortran() scheme() python()
- */
+/*                            READ LIST ROUTINES                            */
 
-int PD_reset_ptr_list(PDBfile *file ARG(,,cls))
-   {long i, ni;
-    PD_address *ad;
-
-    if ((_PD_IS_SEQUENTIAL) || (file->use_itags == FALSE))
-       {ni = GET_N_AD(file);
-
-	for (i = 0L; i < ni; i++)
-	    {ad       = _PD_ptr_get_ad(file, i);
-	     ad->addr = -1;
-	     ad->ptr  = NULL;};};
-
-    return(TRUE);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PD_PTR_RESET - reset the pointer list element poining to VR */
-
-int _PD_ptr_reset(PDBfile *file, char *vr)
-   {PD_address *ad;
-
-    ad = _PD_ptr_find_ptr(file, vr);
-    if (ad != NULL)
-       {ad->addr = -1;
-        ad->ptr  = NULL;};
-
-    return(TRUE);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PD_PTR_REGISTER - add a symbol table entry for a pointee to
- *                  - the read pointer list
- */
-
-static int _PD_ptr_register(haelem *hp, void *a)
-   {int ok;
-    long i, nc;
-    char *name;
-    syment *ep;
-    PDBfile *file;
-
-    file = (PDBfile *) a;
-
-    ok = SC_haelem_data(hp, &name, NULL, (void **) &ep);
-    SC_ASSERT(ok == TRUE);
-
-    if ((file != NULL) && (ep != NULL))
-       {nc = strlen(file->ptr_base);
-	if (strncmp(name, file->ptr_base, nc) == 0) 
-	   {i = SC_stoi(name+nc);
-            _PD_ptr_install_entry(file, i, ep);};};
-
-    return(0);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PD_PTR_OPEN_SETUP - scan the symbol table for pointers and initialize
- *                    - the read pointer list
- */
-
-void _PD_ptr_open_setup(PDBfile *file)
-   {
-
-    SC_hasharr_foreach(file->symtab, _PD_ptr_register, file);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PD_PTR_GET_N_SPACES - return n_dyn_spaces in a thread safe way */
-
-static int _PD_ptr_get_n_spaces(PDBfile *file, int inc)
-   {int np;
-
-    SC_LOCKON(PD_dyn_lock);
-
-    if (inc == TRUE)
-       np = file->n_dyn_spaces++;
-    else
-       np = file->n_dyn_spaces;
-
-    SC_LOCKOFF(PD_dyn_lock);
-
-    np++;
-
-    return(np);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PD_PTR_ENTRY_ITAG - check the ITAG PI and
- *                    - if it indicates ITAGless operation fill it
- *                    - with the entry data from read pointer N
- *                    - return FALSE for a NULL pointer otherwise TRUE
- */
-
-int _PD_ptr_entry_itag(PDBfile *file, PD_itag *pi, char *p)
-   {int n, rv;
-    syment *ep;
-
-    n  = _PD_ptr_index(p);
-    ep = _PD_ptr_get_entry(file, n);
-
-    if (ep == NULL)
-       {pi->type   = NULL;
-	pi->nitems = 0;
-	pi->addr   = 0;
-	pi->flag   = LOC_HERE;
-
-	rv = FALSE;}
-
-    else
-       {pi->type   = PD_entry_type(ep);
-	pi->nitems = PD_entry_number(ep);
-	pi->addr   = PD_entry_address(ep);
-	pi->flag   = LOC_HERE;
-	pi->length = 0;
-
-	rv = TRUE;};
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PD_PTR_REMOVE_RD - remove ADDR from the read pointer lists of FILE */
-
-static void _PD_ptr_remove_rd(PDBfile *file, int64_t addr)
-   {long i, ni;
-    PD_address *ad;
-
-    ni = GET_N_AD(file);
-
-/* remove addr from lists of pointers and disk addresses previously read */
-    if ((ni > 0) && (addr != 0))
-       {ad = _PD_ptr_find_addr(file, addr);
-	if (ad != NULL)
-	   {i = ad->indx;
-	    _PD_ptr_remove_addr(file, i, ad);};};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PD_PTR_WR_LOOKUP - lookup VR to see if it has been previously
- *                   - written to FILE and remember it if not
- *                   - return the index of VR in the write pointer list
- *                   - return the location of the data in PLOC
- *                   - location is LOC_HERE, LOC_OTHER, or LOC_BLOCK
- */
-
-PD_address *_PD_ptr_wr_lookup(PDBfile *file, void *vr, int *ploc, int write)
-   {int loc;
-    PD_address *ad;
-
-    SC_LOCKON(PD_ptr_lock);
-
-    loc = LOC_OTHER;
-
-/* search the pointer list to see if this pointer is known */
-    ad = _PD_ptr_find_ptr(file, vr);
-
-    if (file->track_pointers == FALSE)
-       {loc = LOC_HERE;
-
-        if ((ad == NULL) || (write == FALSE))
-	   ad = _PD_ptr_install_ptr(file, vr, write);
-
-        else
-            {ad = _PD_ptr_find_next(file, ad, vr);
-	     ad->written = write;};}                 
-
-/* add a new pointer */
-    else if (ad == NULL)
-       {loc = LOC_HERE;
-	ad  = _PD_ptr_install_ptr(file, vr, write);}
-
-    else if (ad->addr == -1)
-       loc = LOC_HERE;
-
-    SC_LOCKOFF(PD_ptr_lock);
-
-    *ploc = loc;
-
-    return(ad);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PD_PTR_WR_ITAGS - handle the memory of pointers and write the itags
- *                  - correctly
- */
-
-int _PD_ptr_wr_itags(PDBfile *file, void *vr, long ni, char *type)
-   {int rv, loc;
-    long n;
-    int64_t addr;
-    PD_address *ad;
-
-/* save the address of the itag because
- * we don't know the data address yet
- */
-    addr = _PD_get_current_address(file, PD_WRITE);
-    loc  = LOC_HERE;
-    ad   = NULL;
-
-    if ((_PD_IS_SEQUENTIAL) || (file->use_itags == FALSE))
-       {SC_LOCKON(PD_ptr_lock);
-
-        _PD_ptr_remove_rd(file, addr);
-
-	ad = _PD_ptr_wr_lookup(file, vr, &loc, TRUE);
-
-	if (loc == LOC_HERE)
-	   ad->addr = addr;
-	else
-	   addr = ad->addr;
-
-	SC_LOCKOFF(PD_ptr_lock);}
-
-    else
-       {n  = _PD_ptr_get_n_spaces(file, TRUE);
-	ad = _PD_ptr_get_ad(file, n);};
-
-/* write the itag to the file */
-    (*file->wr_itag)(file, ad, ni, type, addr, loc);
-
-    rv = (loc == LOC_HERE);
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PD_PTR_ALLOC_SPACE - using PI for info allocate and prep the space
- *                     - into which an indirect will be read
- *                     - and assign VR to it
- *                     - this is independent of the format version
- */
-
-static char *_PD_ptr_alloc_space(PDBfile *file, char **vr,
-				 PD_itag *pi, int asgn)
-   {long bpi, ni;
-    char *pv, *type;
-
-    ni   = pi->nitems;
-    type = pi->type;
-
-    bpi = _PD_lookup_size(type, file->host_chart);
-    if (bpi == -1)
-       PD_error("CAN'T FIND NUMBER OF BYTES - _PD_PTR_ALLOC_SPACE",
-                PD_READ);
-
-    pv = CMAKE_N(char, ni*bpi);
-
-    if (asgn == TRUE)
-       {DEREF(vr) = pv;
-	SC_mark(pv, 1);};
-
-    return(pv);}
-
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _PD_PTR_RD_LOOKUP - lookup ADDR to see if it has been previously
@@ -903,25 +757,31 @@ static PD_address *_PD_ptr_rd_lookup(PDBfile *file, int64_t addr, int *pfrst)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_PTR_RD_INSTALL_ADDR - install ADDR as the return address in the
- *                         - pointer list for FILE 
+/* _PD_PTR_READ - return the syment associated with ADDR
+ *              - read from FILE at ADDR if need be 
+ *              - in order to make the syment
+ *              - return NULL on failure
  */
 
-void _PD_ptr_rd_install_addr(PDBfile *file, int64_t addr, int loc)
-   {int64_t here;
+syment *_PD_ptr_read(PDBfile *file, int64_t addr, int force)
+   {int frst;
+    long n;
+    syment *ep;
     PD_address *ad;
 
-    if ((_PD_IS_SEQUENTIAL) || (file->use_itags == FALSE))
-       {ad   = _PD_ptr_rd_lookup(file, addr, NULL);
-	here = _PD_get_current_address(file, PD_READ);
+    ad = _PD_ptr_rd_lookup(file, addr, &frst);
+    n  = ad->indx;
 
-	ad->reta = here;};
+/* only partial reads can land here */
+    if ((frst == TRUE) || (force == TRUE))
+       {_PD_ptr_remove_entry(file, frst);
 
-/* restore the file pointer to its original location if necessary */
-    if (loc != LOC_HERE)
-       _PD_set_current_address(file, addr, SEEK_SET, PD_READ);
+	n = _PD_rd_pointer(file, addr);
+	n = _PD_ptr_fix(file, n);};
 
-    return;}
+    ep = _PD_ptr_get_entry(file, n);
+
+    return(ep);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1035,6 +895,32 @@ int _PD_ptr_rd_itags(PDBfile *file, char **vr, PD_itag *pi)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PD_PTR_RD_INSTALL_ADDR - install ADDR as the return address in the
+ *                         - pointer list for FILE 
+ */
+
+void _PD_ptr_rd_install_addr(PDBfile *file, int64_t addr, int loc)
+   {int64_t here;
+    PD_address *ad;
+
+    if ((_PD_IS_SEQUENTIAL) || (file->use_itags == FALSE))
+       {ad   = _PD_ptr_rd_lookup(file, addr, NULL);
+	here = _PD_get_current_address(file, PD_READ);
+
+	ad->reta = here;};
+
+/* restore the file pointer to its original location if necessary */
+    if (loc != LOC_HERE)
+       _PD_set_current_address(file, addr, SEEK_SET, PD_READ);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+
+/*                           WRITE LIST ROUTINES                            */
+
+/*--------------------------------------------------------------------------*/
+
 /* _PD_PTR_WR_SYMENT - make a syment for NI of data with type at the
  *                   - current location in FILE
  */
@@ -1063,73 +949,197 @@ void _PD_ptr_wr_syment(PDBfile *file, PD_address *ad, char *type,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_PTR_FIX - constrain N to be a valid pointer index
- *             - any bad values are rerouted to the index for NULL
+/* _PD_PTR_WR_LOOKUP - lookup VR to see if it has been previously
+ *                   - written to FILE and remember it if not
+ *                   - return the index of VR in the write pointer list
+ *                   - return the location of the data in PLOC
+ *                   - location is LOC_HERE, LOC_OTHER, or LOC_BLOCK
  */
 
-static long _PD_ptr_fix(PDBfile *file, long n)
-   {long ni;
-
-    n  = max(n, 0L);
-    ni = GET_N_AD(file);
-    if (n >= ni)
-       n = 0L;
-
-    return(n);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PD_PTR_GET_INDEX - extract a pointer index from BF
- *                   - according to the standards in FILE
- *                   - return the index
- *                   - NOTE: no pointer lookups here - just conversion
- *                   - from text
- */
-
-long _PD_ptr_get_index(PDBfile *file, long n, char *bf)
-   {
-
-/* constrain N to be a valid pointer index
- * any bad values are rerouted to the index for NULL
- */
-    n = _PD_ptr_fix(file, n);
-
-    if ((bf != NULL) && (file->use_itags == FALSE))
-       _PD_index_ptr(bf, n);
-
-    return(n);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PD_PTR_READ - return the syment associated with ADDR
- *              - read from FILE at ADDR if need be 
- *              - in order to make the syment
- *              - return NULL on failure
- */
-
-syment *_PD_ptr_read(PDBfile *file, int64_t addr, int force)
-   {int frst;
-    long n;
-    syment *ep;
+PD_address *_PD_ptr_wr_lookup(PDBfile *file, void *vr, int *ploc, int write)
+   {int loc;
     PD_address *ad;
 
-    ad = _PD_ptr_rd_lookup(file, addr, &frst);
-    n  = ad->indx;
+    SC_LOCKON(PD_ptr_lock);
 
-/* only partial reads can land here */
-    if ((frst == TRUE) || (force == TRUE))
-       {_PD_ptr_remove_entry(file, frst);
+    loc = LOC_OTHER;
 
-/*	ad->addr = 0; */
+/* search the pointer list to see if this pointer is known */
+    ad = _PD_ptr_find_ptr(file, vr);
 
-	n = _PD_rd_pointer(file, addr);
-	n = _PD_ptr_fix(file, n);};
+    if (file->track_pointers == FALSE)
+       {loc = LOC_HERE;
 
-    ep = _PD_ptr_get_entry(file, n);
+        if ((ad == NULL) || (write == FALSE))
+	   ad = _PD_ptr_install_ptr(file, vr, write);
 
-    return(ep);}
+        else
+            {ad = _PD_ptr_find_next(file, ad, vr);
+	     ad->written = write;};}                 
+
+/* add a new pointer */
+    else if (ad == NULL)
+       {loc = LOC_HERE;
+	ad  = _PD_ptr_install_ptr(file, vr, write);}
+
+    else if (ad->addr == -1)
+       loc = LOC_HERE;
+
+    SC_LOCKOFF(PD_ptr_lock);
+
+    *ploc = loc;
+
+    return(ad);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PTR_REMOVE_WR - remove ADDR from the write pointer lists of FILE */
+
+static void _PD_ptr_remove_wr(PDBfile *file, int64_t addr)
+   {long i, ni;
+    PD_address *ad;
+
+    ni = GET_N_AD(file);
+
+/* remove addr from lists of pointers and disk addresses previously read */
+    if ((ni > 0) && (addr != 0))
+       {ad = _PD_ptr_find_addr(file, addr);
+	if (ad != NULL)
+	   {i = ad->indx;
+	    _PD_ptr_remove_addr(file, i, ad);};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PTR_WR_ITAGS - handle the memory of pointers and write the itags
+ *                  - correctly
+ */
+
+int _PD_ptr_wr_itags(PDBfile *file, void *vr, long ni, char *type)
+   {int rv, loc;
+    long n;
+    int64_t addr;
+    PD_address *ad;
+
+/* save the address of the itag because
+ * we don't know the data address yet
+ */
+    addr = _PD_get_current_address(file, PD_WRITE);
+    loc  = LOC_HERE;
+    ad   = NULL;
+
+    if ((_PD_IS_SEQUENTIAL) || (file->use_itags == FALSE))
+       {SC_LOCKON(PD_ptr_lock);
+
+        _PD_ptr_remove_wr(file, addr);
+
+	ad = _PD_ptr_wr_lookup(file, vr, &loc, TRUE);
+
+	if (loc == LOC_HERE)
+	   ad->addr = addr;
+	else
+	   addr = ad->addr;
+
+	SC_LOCKOFF(PD_ptr_lock);}
+
+    else
+       {n  = _PD_ptr_get_n_spaces(file, TRUE);
+	ad = _PD_ptr_get_ad(file, n);};
+
+/* write the itag to the file */
+    (*file->wr_itag)(file, ad, ni, type, addr, loc);
+
+    rv = (loc == LOC_HERE);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                         LIST MANAGEMENT ROUTINES                         */
+
+/*--------------------------------------------------------------------------*/
+
+/* PD_RESET_PTR_LIST - THREADSAFE
+ *                   - reset the pointer lists for the given file
+ *                   - so that indirect connectivity bookkeeping
+ *                   - is re-initialized this will give the application
+ *                   - some control over this process
+ *
+ * #bind PD_reset_ptr_list fortran() scheme() python()
+ */
+
+int PD_reset_ptr_list(PDBfile *file ARG(,,cls))
+   {long i, ni;
+    PD_address *ad;
+
+    if ((_PD_IS_SEQUENTIAL) || (file->use_itags == FALSE))
+       {ni = GET_N_AD(file);
+
+	for (i = 0L; i < ni; i++)
+	    {ad       = _PD_ptr_get_ad(file, i);
+	     ad->addr = -1;
+	     ad->ptr  = NULL;};};
+
+    return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PTR_RESET - reset the pointer list element poining to VR */
+
+int _PD_ptr_reset(PDBfile *file, char *vr)
+   {PD_address *ad;
+
+    ad = _PD_ptr_find_ptr(file, vr);
+    if (ad != NULL)
+       {ad->addr = -1;
+        ad->ptr  = NULL;};
+
+    return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PTR_REGISTER - add a symbol table entry for a pointee to
+ *                  - the read pointer list
+ */
+
+static int _PD_ptr_register(haelem *hp, void *a)
+   {int ok;
+    long i, nc;
+    char *name;
+    syment *ep;
+    PDBfile *file;
+
+    file = (PDBfile *) a;
+
+    ok = SC_haelem_data(hp, &name, NULL, (void **) &ep);
+    SC_ASSERT(ok == TRUE);
+
+    if ((file != NULL) && (ep != NULL))
+       {nc = strlen(file->ptr_base);
+	if (strncmp(name, file->ptr_base, nc) == 0) 
+	   {i = SC_stoi(name+nc);
+            _PD_ptr_install_entry(file, i, ep);};};
+
+    return(0);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PTR_OPEN_SETUP - scan the symbol table for pointers and initialize
+ *                    - the read pointer list
+ */
+
+void _PD_ptr_open_setup(PDBfile *file)
+   {
+
+    SC_hasharr_foreach(file->symtab, _PD_ptr_register, file);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
