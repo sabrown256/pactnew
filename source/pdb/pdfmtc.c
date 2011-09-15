@@ -52,7 +52,7 @@
  */
 
 static int _PD_wr_itag_iii(PDBfile *file, PD_address *ad, long ni, char *type,
-			   int64_t addr, int loc)
+			   int64_t addr, PD_data_location loc)
    {char s[MAXLINE];
     FILE *fp;
 

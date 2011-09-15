@@ -548,7 +548,7 @@ int _PD_write_attrtab(PDBfile *file)
    {int ok;
     char *ob;
     syment *ep;
-    SC_array *oa;
+    adloc *oa;
 
     if (file->attrtab == NULL)
        return(TRUE);
@@ -562,11 +562,11 @@ int _PD_write_attrtab(PDBfile *file)
 
 	PD_reset_ptr_list(file);
 
-	_PD_ptr_save_ap(file, &oa, &ob, "/&etc/ia_");
+	_PD_ptr_save_al(file, &oa, &ob, "/&etc/ia_");
 
 	ok = PD_write(file, "attributes", "hasharr *", &file->attrtab);
 
-	_PD_ptr_restore_ap(file, oa, ob);
+	_PD_ptr_restore_al(file, oa, ob);
 
 	PD_cd(file, NULL);}
 
@@ -591,14 +591,14 @@ int _PD_read_attrtab_a(PDBfile *file)
    {int ok;
     char *name;
     syment *ep;
-    SC_array *oa;
+    adloc *oa;
 
     name = PDB_ATTRIBUTE_TABLE;
 
     ok = FALSE;
     ep = PD_inquire_entry(file, name, TRUE, NULL);
     if (ep != NULL)
-       {_PD_ptr_save_ap(file, &oa, NULL, NULL);
+       {_PD_ptr_save_al(file, &oa, NULL, NULL);
 
 	if (!PD_read(file, name, &file->attrtab))
            {PD_close(file);
@@ -606,7 +606,7 @@ int _PD_read_attrtab_a(PDBfile *file)
 		     PD_OPEN);};
 
 /* reset the pointer lists after reading the attribute table */
-	_PD_ptr_restore_ap(file, oa, NULL);
+	_PD_ptr_restore_al(file, oa, NULL);
 	if (file->use_itags == FALSE)
 	   _PD_ptr_open_setup(file);
 
@@ -634,14 +634,14 @@ int _PD_read_attrtab_b(PDBfile *file)
    {int ok;
     char *name, *ob;
     syment *ep;
-    SC_array *oa;
+    adloc *oa;
 
     name = "/&etc/attributes";
 
     ok = FALSE;
     ep = PD_inquire_entry(file, name, TRUE, NULL);
     if (ep != NULL)
-       {_PD_ptr_save_ap(file, &oa, &ob, "/&etc/ia_");
+       {_PD_ptr_save_al(file, &oa, &ob, "/&etc/ia_");
 
 	if (file->use_itags == FALSE)
 	   _PD_ptr_open_setup(file);
@@ -651,7 +651,7 @@ int _PD_read_attrtab_b(PDBfile *file)
             PD_error("FAILED TO READ ATTRIBUTE TABLE - _PD_READ_ATTRTAB_B",
 		     PD_OPEN);};
 
-	_PD_ptr_restore_ap(file, oa, ob);
+	_PD_ptr_restore_al(file, oa, ob);
 
 	_PD_convert_attrtab(file);
         file->chrtaddr = PD_entry_address(ep);

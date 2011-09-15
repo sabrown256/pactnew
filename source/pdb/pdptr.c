@@ -31,15 +31,15 @@
  *
  */
 
-#define GET_N_AD(_f)       SC_array_get_n(_PD_ptr_get_ap(_f))
+#define GET_N_AD(_f)       SC_array_get_n((_PD_ptr_get_al(_f))->ap)
 
 SC_thread_lock
  PD_ptr_lock = SC_LOCK_INIT_STATE,
  PD_dyn_lock = SC_LOCK_INIT_STATE;
 
-static SC_array
- *_PD_ptr_get_ap(PDBfile *file),
- *_PD_ptr_set_ap(PDBfile *file, SC_array *nap, int serial);
+static adloc
+ *_PD_ptr_get_al(PDBfile *file),
+ *_PD_ptr_set_al(PDBfile *file, adloc *nal, int serial);
 
 /*--------------------------------------------------------------------------*/
 
@@ -68,44 +68,25 @@ static void _PD_ptr_init_ad(void *a)
     return;}
 
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 
-/* _PD_PTR_GET_AD - return the N address from the current address list */
-
-static PD_address *_PD_ptr_get_ad(PDBfile *file, int n)
-   {PD_address *ad;
-    SC_array *ap;
-
-/*    SC_LOCKON(PD_ptr_lock); */
-
-    ap = _PD_ptr_get_ap(file);
-    ad = SC_array_get(ap, n);
-#if 0
-if (n != ad->indx)
-   printf("-> %d %d\n", n, ad->indx);
-#endif
-
-/*    SC_LOCKOFF(PD_ptr_lock); */
-
-    return(ad);}
+/*                                 AL ROUTINES                              */
 
 /*--------------------------------------------------------------------------*/
 
-/*                                 AP ROUTINES                              */
+/* _PD_MAKE_ADLOC - allocate and initialize a file address/pointer list */
 
-/*--------------------------------------------------------------------------*/
-
-/* _PD_PTR_MAKE_AP - allocate and initialize a file address/pointer list */
-
-SC_array *_PD_ptr_make_ap(void)
+adloc *_PD_make_adloc(void)
    {PD_address ad;
-    SC_array *a;
+    SC_array *ap;
+    hasharr *ah;
+    adloc *al;
 
 /* if uninitialized allocate them */
-    a = CMAKE_ARRAY(PD_address, _PD_ptr_init_ad, 0);
+    ap = CMAKE_ARRAY(PD_address, _PD_ptr_init_ad, 0);
+    ah = SC_make_hasharr(HSZHUGE, FALSE, SC_HA_ADDR_KEY, 0);
 
 /* grow the array to at least na elements */
-    SC_array_resize(a, _PD.ninc, -1.0);
+    SC_array_resize(ap, _PD.ninc, -1.0);
 
 /* NULL is defined to be the first pointer - always */
     ad.indx    = 0;
@@ -115,18 +96,38 @@ SC_array *_PD_ptr_make_ap(void)
     ad.ptr     = NULL;
     ad.written = -1;
 
-    SC_array_push(a, &ad);
+    SC_array_push(ap, &ad);
 
-    return(a);}
+    al = CMAKE(adloc);
+    al->ap = ap;
+    al->ah = ah;
+
+    return(al);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_PTR_GET_AP - return the current pointer/address list */
+/* _PD_FREE_ADLOC - release adloc instance AL */
 
-static SC_array *_PD_ptr_get_ap(PDBfile *file)
+void _PD_free_adloc(adloc *al)
+   {
+
+    if (al != NULL)
+       {SC_free_array(al->ap, NULL);
+	SC_free_hasharr(al->ah, NULL, NULL);
+	CFREE(al);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PTR_GET_AL - return the current pointer/address list */
+
+static adloc *_PD_ptr_get_al(PDBfile *file)
    {int tid;
-    SC_array *ap, *apl;
+    SC_array *apl;
+    adloc *al;
 
     tid = SC_current_thread() + 1;
 
@@ -134,24 +135,25 @@ static SC_array *_PD_ptr_get_ap(PDBfile *file)
 
     apl = file->ap;
 
-    ap = *(SC_array **) SC_array_get(apl, tid);
-    if (ap == NULL)
-       ap = *(SC_array **) SC_array_get(apl, 0);
+    al = *(adloc **) SC_array_get(apl, tid);
+    if (al == NULL)
+       al = *(adloc **) SC_array_get(apl, 0);
 
     SC_LOCKOFF(PD_ptr_lock);
 
-    return(ap);}
+    return(al);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_PTR_SET_AP - set the current pointer/address list
+/* _PD_PTR_SET_AL - set the current pointer/address list
  *                - and return the old one
  */
 
-static SC_array *_PD_ptr_set_ap(PDBfile *file, SC_array *nap, int serial)
+static adloc *_PD_ptr_set_al(PDBfile *file, adloc *nal, int serial)
    {int tid;
-    SC_array *oap, *apl;
+    SC_array *apl;
+    adloc *oal;
 
     if (serial == TRUE)
        tid = 0;
@@ -161,56 +163,56 @@ static SC_array *_PD_ptr_set_ap(PDBfile *file, SC_array *nap, int serial)
     SC_LOCKON(PD_ptr_lock);
 
     apl = file->ap;
-    oap = *(SC_array **) SC_array_get(apl, tid);
-    SC_array_set(apl, tid, &nap);
+    oal = *(adloc **) SC_array_get(apl, tid);
+    SC_array_set(apl, tid, &nal);
 
     SC_LOCKOFF(PD_ptr_lock);
 
-    return(oap);}
+    return(oal);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_PTR_INIT_AP - initialize a file address/pointer list */
+/* _PD_PTR_INIT_AL - initialize a file address/pointer list */
 
-static void _PD_ptr_init_ap(PDBfile *file, int serial)
-   {SC_array *a;
+static void _PD_ptr_init_al(PDBfile *file, int serial)
+   {adloc *al;
 
-    a = _PD_ptr_make_ap();
+    al = _PD_make_adloc();
 
-    _PD_ptr_set_ap(file, a, serial);
+    _PD_ptr_set_al(file, al, serial);
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_PTR_FREE_AP - release the current address/pointer list for FILE */
+/* _PD_PTR_FREE_AL - release the current address/pointer list for FILE */
 
-static void _PD_ptr_free_ap(PDBfile *file, int serial)
-   {SC_array *ap;
+static void _PD_ptr_free_al(PDBfile *file, int serial)
+   {adloc *al;
 
 /* set the current list to NULL and get the old one back */
-    ap = _PD_ptr_set_ap(file, NULL, serial);
+    al = _PD_ptr_set_al(file, NULL, serial);
 
 /* free the old one */
-    if (ap != NULL)
-       SC_free_array(ap, NULL);
+    if (al != NULL)
+       _PD_free_adloc(al);
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_PTR_SAVE_AP - return the current address list in POA and
+/* _PD_PTR_SAVE_AL - return the current address list in POA and
  *                 - initialize a new one
  */
 
-void _PD_ptr_save_ap(PDBfile *file, SC_array **poa, char **pob, char *base)
+void _PD_ptr_save_al(PDBfile *file, adloc **poa, char **pob, char *base)
    {
 
     if (poa != NULL)
-       *poa = _PD_ptr_get_ap(file);
+       *poa = _PD_ptr_get_al(file);
 
     SC_LOCKON(PD_ptr_lock);
 
@@ -222,21 +224,21 @@ void _PD_ptr_save_ap(PDBfile *file, SC_array **poa, char **pob, char *base)
 
     SC_LOCKOFF(PD_ptr_lock);
 
-    _PD_ptr_init_ap(file, FALSE);
+    _PD_ptr_init_al(file, FALSE);
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_PTR_RESTORE_AP - restore OA as the current address list
+/* _PD_PTR_RESTORE_AL - restore OA as the current address list
  *                    - the current one is freed
  */
 
-void _PD_ptr_restore_ap(PDBfile *file, SC_array *oa, char *ob)
+void _PD_ptr_restore_al(PDBfile *file, adloc *oa, char *ob)
    {
 
-    _PD_ptr_free_ap(file, FALSE);
+    _PD_ptr_free_al(file, FALSE);
 
     SC_LOCKON(PD_ptr_lock);
 
@@ -246,7 +248,7 @@ void _PD_ptr_restore_ap(PDBfile *file, SC_array *oa, char *ob)
     SC_LOCKOFF(PD_ptr_lock);
 
     if (oa != NULL)
-       _PD_ptr_set_ap(file, oa, FALSE);
+       _PD_ptr_set_al(file, oa, FALSE);
 
     return;}
 
@@ -259,10 +261,10 @@ void _PD_ptr_restore_ap(PDBfile *file, SC_array *oa, char *ob)
 /* _PD_PTR_FREE_APL_ITEM - free an SC_array from APL */
 
 static int _PD_ptr_free_apl_item(void *a)
-   {SC_array *ap;
+   {adloc *al;
 
-    ap = *(SC_array **) a;
-    SC_free_array(ap, NULL);
+    al = *(adloc **) a;
+    _PD_free_adloc(al);
 
     return(TRUE);}
 
@@ -288,9 +290,9 @@ void _PD_ptr_free_apl(PDBfile *file)
 void _PD_ptr_init_apl(PDBfile *file)
    {
 
-    file->ap = CMAKE_ARRAY(SC_array *, NULL, 0);
+    file->ap = CMAKE_ARRAY(adloc *, NULL, 0);
 
-    _PD_ptr_init_ap(file, TRUE);
+    _PD_ptr_init_al(file, TRUE);
 
     return;}
 
@@ -421,6 +423,31 @@ static int _PD_ptr_get_n_spaces(PDBfile *file, int inc)
 
 /*--------------------------------------------------------------------------*/
 
+/* _PD_PTR_GET_AD - return the N address from the current address list */
+
+static PD_address *_PD_ptr_get_ad(PDBfile *file, int n)
+   {PD_address *ad;
+    SC_array *ap;
+    adloc *al;
+
+/*    SC_LOCKON(PD_ptr_lock); */
+
+    al = _PD_ptr_get_al(file);
+    ap = al->ap;
+
+    ad = SC_array_get(ap, n);
+#if 0
+if (n != ad->indx)
+   printf("-> %d %d\n", n, ad->indx);
+#endif
+
+/*    SC_LOCKOFF(PD_ptr_lock); */
+
+    return(ad);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PD_PTR_GET_ENTRY - return the syment associated with the Ith pointer */
 
 static syment *_PD_ptr_get_entry(PDBfile *file, long i)
@@ -447,7 +474,10 @@ static syment *_PD_ptr_get_entry(PDBfile *file, long i)
 
 static PD_address *_PD_ptr_find_addr(PDBfile *file, int64_t addr, int lck)
    {long i, ni;
-    PD_address *ad, *lad;
+    PD_address *ad, *had, *lad;
+    SC_address a;
+    hasharr *ah;
+    adloc *al;
 
     ad = NULL;
 
@@ -456,7 +486,17 @@ static PD_address *_PD_ptr_find_addr(PDBfile *file, int64_t addr, int lck)
 	   SC_LOCKON(PD_ptr_lock);
 
 	if (addr != 0)
-	   {ni = GET_N_AD(file);
+	   {al = _PD_ptr_get_al(file);
+	    ah = al->ah;
+
+#if 1
+/* hasharr */
+	    a.diskaddr = addr;
+	    had = (PD_address *) SC_hasharr_def_lookup(ah, a.memaddr);
+#endif
+
+/* array */
+	    ni = GET_N_AD(file);
 	    for (i = 0L; i < ni; i++)
 	        {lad = _PD_ptr_get_ad(file, i);
 		 if ((lad != NULL) && (addr == lad->addr))
@@ -478,7 +518,9 @@ static PD_address *_PD_ptr_find_addr(PDBfile *file, int64_t addr, int lck)
 
 static PD_address *_PD_ptr_find_ptr(PDBfile *file, void *vr, int lck)
    {long i, ni;
-    PD_address *ad, *lad;
+    PD_address *ad, *had, *lad;
+    hasharr *ah;
+    adloc *al;
 
     ad = NULL;
 
@@ -487,7 +529,16 @@ static PD_address *_PD_ptr_find_ptr(PDBfile *file, void *vr, int lck)
 	   SC_LOCKON(PD_ptr_lock);
 
 	if (vr != NULL)
-	   {ni = GET_N_AD(file);
+	   {al = _PD_ptr_get_al(file);
+	    ah = al->ah;
+
+#if 1
+/* hasharr */
+	    had = (PD_address *) SC_hasharr_def_lookup(ah, vr);
+#endif
+
+/* array */
+	    ni = GET_N_AD(file);
 	    for (i = 0L; i < ni; i++)
 	        {lad = _PD_ptr_get_ad(file, i);
 		 if ((lad != NULL) && (vr == lad->ptr))
@@ -532,7 +583,10 @@ static PD_address *_PD_ptr_find_next(PDBfile *file, PD_address *ad, void *vr)
 static PD_address *_PD_ptr_install_addr(PDBfile *file, int64_t addr, int lck)
    {long i;
     PD_address *ad;
+    SC_address a;
     SC_array *ap;
+    hasharr *ah;
+    adloc *al;
 
     ad = NULL;
 
@@ -540,9 +594,17 @@ static PD_address *_PD_ptr_install_addr(PDBfile *file, int64_t addr, int lck)
        {if (lck == TRUE)
 	   SC_LOCKON(PD_ptr_lock);
 
-	ap = _PD_ptr_get_ap(file);
+	al = _PD_ptr_get_al(file);
+	ap = al->ap;
+	ah = al->ah;
+
+/* array */
 	i  = SC_array_inc_n(ap, 1, 1);
 	ad = SC_array_get(ap, i);
+
+/* hasharr */
+	a.diskaddr = addr;
+	SC_hasharr_install(ah, a.memaddr, ad, "PD_address *", FALSE, TRUE);
 
 	_PD_ptr_init_ad(ad);
 	ad->indx = i;
@@ -566,6 +628,8 @@ static PD_address *_PD_ptr_install_ptr(PDBfile *file, char *vr,
    {long i;
     PD_address *ad;
     SC_array *ap;
+    hasharr *ah;
+    adloc *al;
 
     ad = NULL;
 
@@ -573,9 +637,16 @@ static PD_address *_PD_ptr_install_ptr(PDBfile *file, char *vr,
        {if (lck == TRUE)
 	   SC_LOCKON(PD_ptr_lock);
 
-	ap = _PD_ptr_get_ap(file);
+	al = _PD_ptr_get_al(file);
+	ap = al->ap;
+	ah = al->ah;
+
+/* array */
 	i  = SC_array_inc_n(ap, 1, 1);
 	ad = SC_array_get(ap, i);
+
+/* hasharr */
+	SC_hasharr_install(ah, vr, ad, "PD_address *", FALSE, TRUE);
 
 	_PD_ptr_init_ad(ad);
 	ad->indx    = i;
@@ -599,6 +670,8 @@ static PD_address *_PD_ptr_install_entry(PDBfile *file, long i,
    {long ni;
     PD_address *ad;
     SC_array *ap;
+    hasharr *ah;
+    adloc *al;
 
     ad = NULL;
 
@@ -606,7 +679,14 @@ static PD_address *_PD_ptr_install_entry(PDBfile *file, long i,
        {if (lck == TRUE)
 	   SC_LOCKON(PD_ptr_lock);
 
-	ap = _PD_ptr_get_ap(file);
+	al = _PD_ptr_get_al(file);
+	ap = al->ap;
+	ah = al->ah;
+
+/* hasharr */
+	ad = SC_hasharr_get(ah, i);
+
+/* array */
 	ad = SC_array_get(ap, i);
 
 	ad->indx  = i;
@@ -629,25 +709,35 @@ static PD_address *_PD_ptr_install_entry(PDBfile *file, long i,
 /* _PD_PTR_REMOVE_ADDR - remove address indexed by I from FILE */
 
 static void _PD_ptr_remove_addr(PDBfile *file, PD_address *ad, int lck)
-   {long i, ni;
+   {long ni;
     PD_address *ada, *adb;
+    SC_address a;
     SC_array *ap;
+    hasharr *ah;
+    adloc *al;
 
-    if (lck == TRUE)
-       SC_LOCKON(PD_ptr_lock);
+    if (file != NULL)
+       {if (lck == TRUE)
+	   SC_LOCKON(PD_ptr_lock);
 
-    i = ad->indx;
+	al = _PD_ptr_get_al(file);
+	ap = al->ap;
+	ah = al->ah;
 
-    ap = _PD_ptr_get_ap(file);
-    ni = SC_array_dec_n(ap, 1, 1);
+#if 1
+	a.diskaddr = ad->addr;
+	SC_hasharr_remove(ah, a.memaddr);
+#endif
 
-    ada  = SC_array_get(ap, i);
-    adb  = SC_array_get(ap, ni);
-    *ada = *adb;
-    _PD_ptr_init_ad(adb);
+	ni = SC_array_dec_n(ap, 1, 1);
 
-    if (lck == TRUE)
-       SC_LOCKOFF(PD_ptr_lock);
+	ada  = SC_array_get(ap, ad->indx);
+	adb  = SC_array_get(ap, ni);
+	*ada = *adb;
+	_PD_ptr_init_ad(adb);
+
+	if (lck == TRUE)
+	   SC_LOCKOFF(PD_ptr_lock);};
 
     return;}
 
@@ -664,9 +754,9 @@ static int _PD_ptr_foreach(PDBfile *file,
 
     SC_LOCKON(PD_ptr_lock);
 
-    ni = GET_N_AD(file);
-
     rv = TRUE;
+
+    ni = GET_N_AD(file);
     for (i = 0L; i < ni; i++)
         {ad  = _PD_ptr_get_ad(file, i);
 	 rv &= f(ad, a);};
@@ -707,10 +797,8 @@ int dprad(PD_address *ad, void *a)
 
 void dprap(PDBfile *file, int n)
    {int ni;
-    SC_array *ap;
 
-    ap = SC_array_get(file->ap, n);
-    ni = SC_array_get_n(ap);
+    ni = GET_N_AD(file);
 
     if (ni > 0)
        PRINT(stdout, "  #     Addr     Reta         Ptr     Entry Info\n");
@@ -911,7 +999,8 @@ int _PD_ptr_rd_itags(PDBfile *file, char **vr, PD_itag *pi)
  *                         - pointer list for FILE 
  */
 
-void _PD_ptr_rd_install_addr(PDBfile *file, int64_t addr, int loc)
+void _PD_ptr_rd_install_addr(PDBfile *file, int64_t addr,
+			     PD_data_location loc)
    {int64_t here;
     PD_address *ad;
 
@@ -940,8 +1029,8 @@ void _PD_ptr_rd_install_addr(PDBfile *file, int64_t addr, int loc)
  *                   - location is LOC_HERE, LOC_OTHER, or LOC_BLOCK
  */
 
-PD_address *_PD_ptr_wr_lookup(PDBfile *file, void *vr, int *ploc,
-			      int write, int lck)
+PD_address *_PD_ptr_wr_lookup(PDBfile *file, void *vr,
+			      PD_data_location *ploc, int write, int lck)
    {int loc;
     PD_address *ad;
 
@@ -1012,9 +1101,10 @@ void _PD_ptr_wr_syment(PDBfile *file, PD_address *ad, char *type,
  */
 
 int _PD_ptr_wr_itags(PDBfile *file, void *vr, long ni, char *type)
-   {int rv, loc;
+   {int rv;
     long n;
     int64_t addr;
+    PD_data_location loc;
     PD_address *ad;
 
 /* save the address of the itag because

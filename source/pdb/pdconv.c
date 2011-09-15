@@ -1195,9 +1195,10 @@ static int _PD_convert_ptr(char **pout, char **pin, long *poo, long *pio,
 			   int ni, hasharr *chi, hasharr *cho,
 			   data_standard *stdo, data_standard *stdi,
 			   data_standard *hstd, long iao, long iai)
-   {int loc, fbpi, hbpi;
+   {int fbpi, hbpi;
     long i, n, nbo, nbi;
     char *p;
+    PD_data_location loc;
     PDBfile *file;
     data_standard *hs, *fs;
     PD_address *ad;

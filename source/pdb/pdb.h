@@ -484,7 +484,7 @@ struct s_PDBfile
     int (*rd_prim_types)(PDBfile *file, char *bf);
 
     int (*wr_itag)(PDBfile *file, PD_address *ad, long ni, char *type,
-		   int64_t addr, int flag);
+		   int64_t addr, PD_data_location loc);
     int (*rd_itag)(PDBfile *file, char *p, PD_itag *pi);
 
     int (*wr_fmt)(PDBfile *file);};
