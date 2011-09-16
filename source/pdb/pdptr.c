@@ -132,14 +132,7 @@ adloc *_PD_make_adloc(void)
 
 /* NULL is defined to be the first pointer - always */
     ad = _PD_make_addr(0, 0, NULL, NULL);
-#if 0
-    ad.indx    = 0;
-    ad.addr    = 0;
-    ad.reta    = -1;
-    ad.entry   = NULL;
-    ad.ptr     = NULL;
-    ad.written = -1;
-#endif
+
     SC_array_push(ap, ad);
 
     SC_hasharr_install(ah, NULL_ADDR, ad, "PD_address *", TRUE, FALSE);
@@ -592,16 +585,26 @@ static PD_address *_PD_ptr_find_ptr(PDBfile *file, void *vr, int lck)
 /*--------------------------------------------------------------------------*/
 
 /* _PD_PTR_FIND_NEXT - find the next PD_address in FILE associated with VR
- *                   - occuring after AD
+ *                   - occuring after AD that has not be written
  */
 
 static PD_address *_PD_ptr_find_next(PDBfile *file, PD_address *ad, void *vr)
    {long i, ni;
+    SC_array *ap;
+    hasharr *ah;
+    adloc *al;
 
-    ni = GET_N_AD(file);
+    al = _PD_ptr_get_al(file);
+    ap = al->ap;
+    ah = al->ah;
+
     i  = ad->indx;
 
+#if 0
 /* GOTCHA: what about hasharr here? */
+#endif
+
+    ni = SC_array_get_n(ap);
     while ((ad->written == TRUE) && (i < ni))
        {for (i++; i < ni; i++)
 	    {ad = _PD_ptr_get_ad(file, i);
@@ -646,12 +649,16 @@ static PD_address *_PD_ptr_install_addr(PDBfile *file, int64_t addr, int lck)
 
 #if 1
 /* array */
-	i  = SC_array_inc_n(ap, 1, 1);
-	ad = SC_array_get(ap, i);
+	SC_array_inc_n(ap, 1, 1);
 
+	SC_array_set(ap, i, ad);
+
+	ad = SC_array_get(ap, i);
+/*
 	_PD_ptr_init_ad(ad);
 	ad->indx = i;
 	ad->addr = addr;
+*/
 #endif
 
 	if (lck == TRUE)
@@ -698,7 +705,7 @@ static PD_address *_PD_ptr_install_ptr(PDBfile *file, char *vr,
 
 #if 1
 /* array */
-	i  = SC_array_inc_n(ap, 1, 1);
+	SC_array_inc_n(ap, 1, 1);
 	ad = SC_array_get(ap, i);
 
 	_PD_ptr_init_ad(ad);
@@ -798,15 +805,26 @@ static int _PD_ptr_foreach(PDBfile *file,
    {int rv;
     long i, ni;
     PD_address *ad;
+    SC_array *ap;
+    hasharr *ah;
+    adloc *al;
 
     SC_LOCKON(PD_ptr_lock);
 
     rv = TRUE;
 
-    ni = GET_N_AD(file);
+    al = _PD_ptr_get_al(file);
+    ap = al->ap;
+    ah = al->ah;
+
+#if 1
+    ni = SC_array_get_n(ap);
     for (i = 0L; i < ni; i++)
         {ad  = _PD_ptr_get_ad(file, i);
 	 rv &= f(ad, a);};
+#else
+    SC_hasharr_foreach(ah, f, a);
+#endif
 
     SC_LOCKOFF(PD_ptr_lock);
 
