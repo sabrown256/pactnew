@@ -11,7 +11,6 @@
 #include "pdb_int.h"
 
 #define USE_ARRAY
-#define USE_POINTER
 
 /*
  * thread safety
@@ -55,8 +54,6 @@ typedef int (*PFPtrMth)(haelem *hp, void *a);
 
 /*                                 AD ROUTINES                              */
 
-#ifdef USE_POINTER
-
 /*--------------------------------------------------------------------------*/
 
 /* _PD_PTR_INIT_NULL - initialize a PD_address */
@@ -71,31 +68,6 @@ static void _PD_ptr_init_null(void *a)
     return;}
 
 /*--------------------------------------------------------------------------*/
-
-#else
-
-/*--------------------------------------------------------------------------*/
-
-/* _PD_PTR_INIT_AD - initialize a PD_address */
-
-static void _PD_ptr_init_ad(void *a)
-   {PD_address *ad;
-
-    ad = (PD_address *) a;
-
-    ad->indx    = -1;
-    ad->addr    = -1;
-    ad->reta    = -1;
-    ad->entry   = NULL;
-    ad->ptr     = NULL;
-    ad->written = -1;
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-
-#endif
-
 /*--------------------------------------------------------------------------*/
 
 /* _PD_MAKE_ADDR - make and return a PD_address */
@@ -116,27 +88,6 @@ static PD_address *_PD_make_addr(long i, int64_t addr, char *ptr, syment *ep)
 
 /*--------------------------------------------------------------------------*/
 
-#ifndef USE_POINTER
-
-/*--------------------------------------------------------------------------*/
-
-/* _PD_FREE_ADDR - free a PD_address for SC_free_hasharr */
-
-static int _PD_free_addr(haelem *hp, void *a)
-   {PD_address *ad;
-
-    ad = (PD_address *) hp->def;
-
-/*    CFREE(ad->ptr); */
-
-    CFREE(hp->def);
-
-    return(TRUE);}
-
-/*--------------------------------------------------------------------------*/
-
-#endif
-
 /*                                 AL ROUTINES                              */
 
 /*--------------------------------------------------------------------------*/
@@ -155,15 +106,9 @@ adloc *_PD_make_adloc(void)
     ah = SC_make_hasharr(HSZHUGE, FALSE, SC_HA_ADDR_KEY, 0);
     SC_hasharr_install(ah, NULL_ADDR, ad, "PD_address *", TRUE, FALSE);
 
-#ifdef USE_POINTER
     ap = CMAKE_ARRAY(PD_address *, _PD_ptr_init_null, 0);
     SC_array_resize(ap, _PD.ninc, -1.0);
     SC_array_push(ap, &ad);
-#else
-    ap = CMAKE_ARRAY(PD_address, _PD_ptr_init_ad, 0);
-    SC_array_resize(ap, _PD.ninc, -1.0);
-    SC_array_push(ap, ad);
-#endif
 
     al = CMAKE(adloc);
     al->ap = ap;
@@ -181,11 +126,9 @@ void _PD_free_adloc(adloc *al)
 
     if (al != NULL)
        {SC_free_array(al->ap, NULL);
-#ifdef USE_POINTER
+
 	SC_free_hasharr(al->ah, NULL, NULL);
-#else
-	SC_free_hasharr(al->ah, _PD_free_addr, NULL);
-#endif
+
 	CFREE(al);};
 
     return;}
@@ -498,24 +441,68 @@ static int _PD_ptr_get_n_spaces(PDBfile *file, int inc)
 
 static PD_address *_PD_ptr_get_ad(PDBfile *file, int n)
    {PD_address *ad;
-    SC_array *ap;
     adloc *al;
 
     al = _PD_ptr_get_al(file);
+
+#ifdef USE_ARRAY
+    SC_array *ap;
+
     ap = al->ap;
 
-#ifdef USE_POINTER
     ad = *(PD_address **) SC_array_get(ap, n);
     if (ad == NULL)
        {ad = _PD_make_addr(n, -1, NULL, NULL);
 	SC_array_set(ap, n, &ad);};
+
 #else
-    ad = SC_array_get(ap, n);
+    void *key;
+    hasharr *ah;
+
+    ah = al->ah;
+
+    ad = *(PD_address **) SC_hasharr_get(ah, n);
+    if (ad == NULL)
+       {ad  = _PD_make_addr(n, -1, NULL, NULL);
+/* GOTCHA: need a real key here */
+	key = NULL;
+	SC_hasharr_install(ah, key, ad, "PD_address *", TRUE, FALSE);};
+
 #endif
 
     return(ad);}
 
 /*--------------------------------------------------------------------------*/
+
+#ifndef USE_ARRAY
+
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PTR_LOOKUP - return the N address from the current address list */
+
+static PD_address *_PD_ptr_lookup(PDBfile *file, void *vr)
+   {long n;
+    void *key;
+    PD_address *ad;
+    hasharr *ah;
+    adloc *al;
+
+    al = _PD_ptr_get_al(file);
+    ah = al->ah;
+
+    ad = (PD_address *) SC_hasharr_def_lookup(ah, vr);
+    if (ad == NULL)
+       {n   = SC_hasharr_get_n(ah);
+	ad  = _PD_make_addr(n, -1, NULL, NULL);
+	key = (vr == NULL) ? NULL_ADDR : vr;
+	SC_hasharr_install(ah, key, ad, "PD_address *", TRUE, FALSE);};
+
+    return(ad);}
+
+/*--------------------------------------------------------------------------*/
+
+#endif
+
 /*--------------------------------------------------------------------------*/
 
 /* _PD_PTR_GET_ENTRY - return the syment associated with the Ith pointer */
@@ -528,7 +515,7 @@ static syment *_PD_ptr_get_entry(PDBfile *file, long i)
 
     i  = _PD_ptr_fix(file, i);
     ad = _PD_ptr_get_ad(file, i);
-    ep = (ad == NULL) ? NULL : ad->entry;
+    ep = ad->entry;
 
     SC_LOCKOFF(PD_ptr_lock);
 
@@ -571,13 +558,10 @@ static PD_address *_PD_ptr_find_addr(PDBfile *file, int64_t addr, int lck)
 #else
 
 	    SC_address a;
-	    hasharr *ah;
 
 /* hasharr */
-	    ah = al->ah;
-
 	    a.diskaddr = addr;
-	    ad = (PD_address *) SC_hasharr_def_lookup(ah, a.memaddr);
+	    ad = _PD_ptr_lookup(file, a.memaddr);
 
 #endif
 	   };
@@ -623,11 +607,8 @@ static PD_address *_PD_ptr_find_ptr(PDBfile *file, void *vr, int lck)
 		     break;};};
 #else
 
-	    hasharr *ah;
-
 /* hasharr */
-	    ah = al->ah;
-	    ad = (PD_address *) SC_hasharr_def_lookup(ah, vr);
+	    ad = _PD_ptr_lookup(file, vr);
 
 #endif
 	   };
@@ -714,11 +695,7 @@ static PD_address *_PD_ptr_install_addr(PDBfile *file, int64_t addr, int lck)
 /* array */
 	SC_array_inc_n(ap, 1, 1);
 
-#ifdef USE_POINTER
 	SC_array_set(ap, i, &ad);
-#else
-	SC_array_set(ap, i, ad);
-#endif
 
 	ad = _PD_ptr_get_ad(file, i);
 #endif
@@ -771,11 +748,7 @@ static PD_address *_PD_ptr_install_ptr(PDBfile *file, char *vr,
 /* array */
 	SC_array_inc_n(ap, 1, 1);
 
-#ifdef USE_POINTER
 	SC_array_set(ap, i, &ad);
-#else
-	SC_array_set(ap, i, ad);
-#endif
 
 	ad = _PD_ptr_get_ad(file, i);
 #endif
@@ -812,11 +785,7 @@ static PD_address *_PD_ptr_install_entry(PDBfile *file, long i,
 
 	ap = al->ap;
 
-#ifdef USE_POINTER
 	SC_array_set(ap, i, &ad);
-#else
-	SC_array_set(ap, i, ad);
-#endif
 
 /* hasharr */
 	hasharr *ah;
