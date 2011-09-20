@@ -693,7 +693,7 @@ int SC_file_access(int log)
 		         ok = FALSE;}
 		  END_SAFE;
 
-		  if (ok == FALSE);
+		  if (ok == FALSE)
 		     return(-1);
 
                   name = SC_strtok(s+2, ",\n", t);

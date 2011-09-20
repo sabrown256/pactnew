@@ -121,7 +121,7 @@ fcdes *_SC_unknown_container(char *name)
     SC_free_strings(ta);
 
     fc = NULL;
-    if (ok == TRUE);
+    if (ok == TRUE)
        {fcent *ae;
 	hasharr *tab;
 

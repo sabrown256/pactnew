@@ -20,6 +20,9 @@
 
    set lcc = $CCompiler
    switch ($lcc)
+      case clang:
+           set lcc = clang
+           breaksw
       case gnu:
            set lcc = gcc
            breaksw
@@ -101,6 +104,12 @@
       default:
       case linux:
            switch ($lcc)
+              case clang:
+                   echo "run std/use-compiler $lcc" >>& $Tmp
+                   echo "include ${Bits}-bit" >>& $Tmp
+                   echo "include compilers/clang" >>& $Tmp
+                   unset lcc
+                   breaksw
               case gnu-bgl:
                    echo "run std/use-compiler mpgcc" >>& $Tmp
                    echo "include auto-bgl-gnu" >>& $Tmp

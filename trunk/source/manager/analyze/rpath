@@ -99,6 +99,15 @@ switch ($Tgt)
         endif
         breaksw
 
+   case clang:
+	if ($?PACT_CC_PATH == 1) then
+           if ($PACT_CC_PATH != "/usr") then
+              setenv RPATH     ${PACT_CC_PATH}/${LIB}:${RPATH}
+              setenv Cfg_RPATH ${PACT_CC_PATH}/${LIB}:${RPATH}
+           endif
+        endif
+        breaksw
+
    case gnu:
 	if ($?PACT_CC_PATH == 1) then
            if ($PACT_CC_PATH != "/usr") then

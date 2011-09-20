@@ -1,0 +1,88 @@
+#
+# CLANG - define clang compiler
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+run analyze/rpath -a /usr/X11R6/${LIB}:/usr/${LIB}
+run analyze/rpath clang
+
+WARN_PATTERN = ":+sp+warning:"
+ERR_PATTERN  = ":+sp+error:"
+
+Tool CC {
+   Exe       = clang
+   Flags     =
+   Flags    += [ _env_ = C_STD ;                # C standard flags
+                 C89   = -std=c89 ;
+                 C99   = -std=c99 ;
+                 X89   = -std=gnu89 ;           # gcc default
+                 X99   = -std=gnu99 ]
+   Debug     = -g -O0 -Wall -Wno-unused-value
+   Optimize  = -g -O2
+   Version   = -v
+}
+
+Tool FC {
+   Exe       = gfortran
+   Flags     = -ffloat-store -ffree-form
+   Flags    += [ _env_ = PACT_CC_VERSION ;      # compiler version flags
+                 4.*   = -fsignaling-nans ;
+                 4.6.* >= -fsignaling-nans -Wno-unused-dummy-argument ]
+   Flags    += [ _env_ = Bits ;                 # address bit size
+                 32    = -m32 ;
+                 64    = -m64 -fPIC ]
+   Flags    += [ _cmd_ = -p ;                   # profiling
+	         on    = -pg ]
+   Flags    += [ _cmd_ = -cov ;                 # coverage analysis
+	         on    = -fprofile-arcs -ftest-coverage ]
+   Debug     = -g -O0 -Wall
+   Optimize  = -g -O -Wunused
+   Version   = -v
+}
+
+Tool LD {
+   RPath    = -Wl,-rpath,@
+   Lib      = -lc
+}
+
+Tool Lex {
+   Flags  = -w
+}
+
+Group Std {
+   CC_Flags = ${CC_Flags}
+   FC_Flags = ${FC_Flags}
+   LD_Flags = ${LD_Flags}
+}
+
+Group Cfg {
+   Use    = Std
+   CC_Exe = clang
+}
+
+Group Shared {
+   LD_Exe   = clang
+   CC_Flags = -fPIC
+   LD_Flags = -shared
+}
+
+Group PThread {
+   LD_Lib = -lpthread 
+}
+
+Group OpenMP {
+   CC_Flags  =
+   LD_Flags  = -fopenmp
+   LD_Lib    = -lgomp
+   SharedFnc = [ _env_ = PACT_CC_VERSION ;      # compiler version flags
+                4.6.0  <  yes ;
+                4.6.0  >= no ]
+}
+
+include cpp-rule
+include serial
+
