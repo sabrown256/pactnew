@@ -699,6 +699,7 @@ switch ($Cmnd)
                    echo "                   use your PATH variable to select among multiple"
                    echo "                   installed versions of a single vendors compilers"
                    echo "                   partial list of available compilers:"
+                   echo "                      clang      CLang compiler"
                    echo "                      intel      Intel compilers"
                    echo "                      gnu        GNU compilers"
                    echo "                      gnu-bgl    GNU for IBM BG/L backend"

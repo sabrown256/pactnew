@@ -54,7 +54,7 @@ static long _SC_hasharr_addr(void *key, int size)
     v = 0L;
     n = sizeof(long);
     for (i = 0L; i < n; i++)
-        {c = (a >> 8*i) && 0xff;
+        {c = (a >> 8*i) & 0xff;
 	 v = (v << 1L) ^ c;};
 
     r = ((long) abs(v)) % m;
