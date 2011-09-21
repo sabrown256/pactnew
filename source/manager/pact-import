@@ -12,8 +12,6 @@
 
 unalias *
 
-set NewProc = FALSE
-
 set MngDir = $cwd
 set ScrDir = $MngDir:h/scripts
 
@@ -45,6 +43,7 @@ endif
 # remove next line when able to do FULL round trips again. <<<<<<<<
 set OneOpt	  = TRUE
 
+set NewProc       = TRUE
 set help          = FALSE
 set DEBUG         = FALSE
 set DateFile      = $RepoDir/.import-date
@@ -93,15 +92,15 @@ while ($#argv >= 1)
          echo "   -1  import to repository head"
          echo "   -d  DEBUG mode; prints more info to import.log"
          echo "   -h  this help message"
-         echo "   -n  use scs-sync to do the work"
+         echo "   -n  do not use scs-sync to do the work"
          echo " "
          exit(1)
          breaksw
 
       case -n:
-         set NewProc = TRUE
+         set NewProc = FALSE
          echo ""
-         echo "Using sys-sync"
+         echo "Using old procedure"
          echo ""
          breaksw
    endsw

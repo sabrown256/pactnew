@@ -11,8 +11,6 @@
 
 #include "score_int.h"
 
-#include <malloc.h>
-
 #ifdef HAVE_RESOURCE_USAGE
 # include <sys/resource.h>
 #endif
@@ -27,6 +25,9 @@
 #endif
 
 #if defined(LINUX) || defined(CYGWIN)
+
+# include <malloc.h>
+
 # define LINUX_PROC_PPID     0      /* PID of the parent */
 # define LINUX_PROC_PGID     1      /* process group ID of the process */
 # define LINUX_PROC_SESS     2      /* session ID of the process */
@@ -210,8 +211,6 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
     if (ru == NULL)
        return(rv);
 
-    malloc_trim(0);
-
     SC_MEM_INIT(SC_rusedes, ru);
 
     if (pid == -1)
@@ -230,6 +229,8 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	char *ps, *tok, *u, *fname;
 	struct stat bf;
 	static double mby = -1.0;
+
+	malloc_trim(0);
 
 	if (mby == -1.0)
 	   mby = getpagesize()/(1024.0*1024.0);

@@ -637,7 +637,6 @@ static PD_address *_PD_ptr_install_addr(adloc *al, int64_t addr, int lck)
     void *vr;
     PD_address *ad;
     SC_array *ap;
-    hasharr *ah;
 
     ad = NULL;
 
@@ -645,7 +644,6 @@ static PD_address *_PD_ptr_install_addr(adloc *al, int64_t addr, int lck)
        {if (lck == TRUE)
 	   SC_LOCKON(PD_ptr_lock);
 
-	ah = al->ah;
 	ap = al->ap;
 
 	i = SC_array_get_n(ap);
@@ -682,7 +680,6 @@ static PD_address *_PD_ptr_install_ptr(adloc *al, char *vr,
     void *key;
     PD_address *ad;
     SC_array *ap;
-    hasharr *ah;
 
     ad = NULL;
 
@@ -690,7 +687,6 @@ static PD_address *_PD_ptr_install_ptr(adloc *al, char *vr,
        {if (lck == TRUE)
 	   SC_LOCKON(PD_ptr_lock);
 
-	ah = al->ah;
 	ap = al->ap;
 
 	i = SC_array_get_n(ap);
@@ -727,7 +723,6 @@ static PD_address *_PD_ptr_install_entry(adloc *al, long i,
     void *vr;
     PD_address *ad;
     SC_array *ap;
-    hasharr *ah;
 
     ad = NULL;
 
@@ -735,7 +730,6 @@ static PD_address *_PD_ptr_install_entry(adloc *al, long i,
        {if (lck == TRUE)
 	   SC_LOCKON(PD_ptr_lock);
 
-	ah = al->ah;
 	ap = al->ap;
 
 	addr = PD_entry_address(ep);
@@ -752,6 +746,34 @@ static PD_address *_PD_ptr_install_entry(adloc *al, long i,
 	   SC_LOCKOFF(PD_ptr_lock);};
 
     return(ad);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PTR_REMOVE_ADDR - remove address indexed by I from FILE */
+
+static void _PD_ptr_remove_addr(adloc *al, PD_address *ad, int lck)
+   {
+
+#if 0
+    void *vr;
+    hasharr *ah;
+
+    if (file != NULL)
+       {if (lck == TRUE)
+	   SC_LOCKON(PD_ptr_lock);
+
+	vr = _SC_to_address(ad->addr);
+
+	ah = al->ah;
+
+	SC_hasharr_remove(ah, vr);
+
+	if (lck == TRUE)
+	   SC_LOCKOFF(PD_ptr_lock);};
+#endif
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1152,7 +1174,9 @@ int _PD_ptr_wr_itags(PDBfile *file, void *vr, long ni, char *type)
 
 /* remove addr from lists of pointers and disk addresses previously read */
        {if (addr != 0)
-	   ad = _PD_ptr_find_addr(al, addr, FALSE);
+	   {ad = _PD_ptr_find_addr(al, addr, FALSE);
+	    if (ad != NULL)
+	       _PD_ptr_remove_addr(al, ad, FALSE);};
 
 	ad = _PD_ptr_wr_lookup(file, vr, &loc, TRUE, FALSE);
 
