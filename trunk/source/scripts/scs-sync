@@ -89,12 +89,14 @@ touch $excf
 flog $log mkdir syncs
 flog $log pushd syncs
 if (("$repos" =~ *.gz) || ("$repos" =~ *.tgz)) then
-   flog $log tar xvzf $repos
    NoteD $log -n "Untarring compressed tarfile $repos ... "
+   flog $log tar xvzf $repos
+   set xstatus = $status
 
 else if ("$repos" =~ *.tar) then
-   flog $log tar xvf $repos
    NoteD $log -n "Untarring tarfile $repos ... "
+   flog $log tar xvf $repos
+   set xstatus = $status
 
 else
 
@@ -125,13 +127,15 @@ else
    Note $log ""
 
    flog $log scs-co -k $sknd -d $repos $pkgs
-   if ($status == 0) then
-      NoteD $log "ok"
-   else
-      NoteD $log "ng"
-   endif
-
+   set xstatus = $status
 endif
+
+if ($xstatus == 0) then
+   NoteD $log "ok"
+else
+   NoteD $log "ng"
+endif
+
 flog $log popd
 
 #--------------------------------------------------------------------------
@@ -259,27 +263,29 @@ else if (-d CVS) then
 
    foreach d ($dirs)
       set sd = $d:h
-      flog $log pushd $sd
+      if (-d $sd) then
+         flog $log pushd $sd
 
 # remove entries
-      foreach f ( `cat CVS/Entries | sed 's|^/||' | sed 's|/.*//$||'` )
-         if ($f != D) then
-            if (!(-f $f)) then
-               flog $log cvs remove $f
+         foreach f ( `cat CVS/Entries | sed 's|^/||' | sed 's|/.*//$||'` )
+            if ($f != D) then
+               if (!(-f $f)) then
+                  flog $log cvs remove $f
+               endif
             endif
-         endif
-      end
+         end
 
 # add entries
-      foreach f ( * )
-         if ($f != CVS) then
-            grep "/$f/" CVS/Entries >& /dev/null
-            if ($status != 0) then
-               flog $log cvs add $f
+         foreach f ( * )
+            if ($f != CVS) then
+               grep "/$f/" CVS/Entries >& /dev/null
+               if ($status != 0) then
+                  flog $log cvs add $f
+               endif
             endif
-         endif
-      end
-      flog $log popd
+         end
+         flog $log popd
+      endif
    end
 
 else if (-d .svn) then
@@ -294,24 +300,26 @@ else if (-d .svn) then
 
    foreach d ($dirs)
       set sd = $d:h
-      flog $log pushd $sd
+      if (-d $sd) then
+         flog $log pushd $sd
 
 # remove entries
-      foreach e ( `ls -1 .svn/text-base` )
-         set f = $e:r
-         if (!(-f $f)) then
-            flog $log svn remove $f
-         endif
-      end
+         foreach e ( `ls -1 .svn/text-base` )
+            set f = $e:r
+            if (!(-f $f)) then
+               flog $log svn remove $f
+            endif
+         end
 
 # add entries
-      foreach e ( * )
-         set f = .svn/text-base/$e.svn-base
-         if (!(-f $f)) then
-            flog $log svn add $e
-         endif
-      end
-      flog $log popd
+         foreach e ( * )
+            set f = .svn/text-base/$e.svn-base
+            if (!(-f $f)) then
+               flog $log svn add $e
+            endif
+         end
+         flog $log popd
+      endif
    end
 
 endif
