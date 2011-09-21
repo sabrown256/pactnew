@@ -1660,6 +1660,33 @@ int PD_set_fmt_version(int v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PD_GET_POINTER_SIZE - return the current initial size of the
+ *                     - pointer table
+ */
+
+long PD_get_pointer_size(void)
+   {long no;
+
+    no = _PD.ninc;
+
+    return(no);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_SET_POINTER_SIZE - set the initial size of the pointer table */
+
+long PD_set_pointer_size(long n)
+   {long no;
+
+    no = _PD.ninc;
+    _PD.ninc = n;
+
+    return(no);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PD_GET_FILE_NAME - return the file name
  *
  * #bind PD_get_file_name fortran() scheme() python()

@@ -470,7 +470,7 @@ int SC_hasharr_next(hasharr *ha, long *pi,
  */
 
 haelem *SC_hasharr_lookup(hasharr *ha ARG(,,cls), void *key)
-   {int sz;
+   {int sz, lck;
     long iht;
     haelem *rv, *hp, **tb;
     PFKeyHash hash;
@@ -480,7 +480,9 @@ haelem *SC_hasharr_lookup(hasharr *ha ARG(,,cls), void *key)
 
 /* sanity checks */
     if ((key != NULL) && (ha != NULL))
-       {SC_LOCKON(SC_ha_lock);
+       {lck = ((ha->memfl & 4) == 0);
+	if (lck == TRUE)
+	   SC_LOCKON(SC_ha_lock);
 
         hash = ha->hash;
 	comp = ha->comp;
@@ -494,7 +496,8 @@ haelem *SC_hasharr_lookup(hasharr *ha ARG(,,cls), void *key)
 	        {rv = hp;
 		 break;};};
 
-	SC_LOCKOFF(SC_ha_lock);};
+	if (lck == TRUE)
+	   SC_LOCKOFF(SC_ha_lock);};
 
     return(rv);}
 

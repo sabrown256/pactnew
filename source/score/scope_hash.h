@@ -73,6 +73,11 @@ struct s_haelem
 
 /*
  * #bind derived hasharr character-A SS_HASHARR_I PP_hasharrObject NULL
+ *
+ * MEMFL bits:
+ *     1  permanent memory
+ *     2  accountable memory
+ *     4  do not set thread locks on access
  */
 
 struct s_hasharr
