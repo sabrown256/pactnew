@@ -401,6 +401,7 @@ static void print_help(void)
 int main(int c, char **v)
    {int i, err;
     int use_mapped_files, check_writes;
+    long no;
     int64_t bfsz;
     statedes st;
 
@@ -453,6 +454,9 @@ int main(int c, char **v)
 		      break;};}
          else
             break;};
+
+    no = 1.013*st.na;
+    PD_set_pointer_size(no);
 
     PD_set_io_hooks(use_mapped_files);
     PD_verify_writes(check_writes);

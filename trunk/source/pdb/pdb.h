@@ -133,17 +133,6 @@
 #define PD_set_format_version        PD_set_fmt_version
 #define PD_get_format_version(_n)    (_n = PD_get_fmt_version())
 
-#if 0
-#define PD_entry_type(ep)            (ep)->type
-#define PD_entry_dimensions(ep)      (ep)->dimensions
-#define PD_entry_number(ep)          (ep)->number
-#define PD_entry_indirects(ep)       (ep)->indirects
-
-#define PD_get_major_order(file)       (((file) != NULL) ? (file)->major_order : NO_MAJOR_ORDER)
-#define PD_set_major_order(file, type) if ((file) != NULL) (file)->major_order = (type)
-#define PD_get_file_name(file)         (((file) != NULL) ? (file)->name : NULL)
-#endif
-
 #define PD_has_directories(file)                                             \
     ((file != NULL) && (file->current_prefix != NULL))
 
@@ -1156,6 +1145,10 @@ extern int64_t
  PD_get_file_length(PDBfile *file),
  PD_get_max_file_size(PDBfile *file),
  PD_set_max_file_size(PDBfile *file, int64_t v);
+
+extern long
+ PD_get_pointer_size(void),
+ PD_set_pointer_size(long n);
 
 extern int
  PD_get_entry_info(syment *ep, char **ptyp, long *pni, int *pnd, long **pdim),

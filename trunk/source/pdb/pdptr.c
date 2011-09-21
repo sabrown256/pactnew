@@ -110,12 +110,10 @@ adloc *_PD_make_adloc(void)
     hasharr *ah;
     adloc *al;
 
-/*    _PD.ninc = 1000001; */
-
 /* NULL is defined to be the first pointer - always */
     ad = _PD_make_addr(0, 0, NULL, NULL);
 
-    ah = SC_make_hasharr(_PD.ninc, FALSE, SC_HA_ADDR_KEY, 0);
+    ah = SC_make_hasharr(_PD.ninc, FALSE, SC_HA_ADDR_KEY, 4);
     ap = CMAKE_ARRAY(PD_address *, _PD_ptr_init_null, 0);
 
     al = CMAKE(adloc);
