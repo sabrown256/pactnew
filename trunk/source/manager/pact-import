@@ -835,8 +835,8 @@ COMMIT:
 
 SYNC:
 
-   set WDir = $args_[1]
-   flog $Log pushd $WDir
+   set Import = $args_[1]
+   flog $Log pushd $Import
 
    Separator $Log
 
@@ -853,14 +853,15 @@ SYNC:
 
    Note $Log "Destination repository: $RepoDir"
 
-   NoteD $Log -n "Sync ................ "
-   Note $Log ""
-   ftee $Log scs-sync $excl pact.tar $RepoDir,pact
+   NoteD $Log "Sync ................ "
+   NoteD $Log ""
+
+   ftee $Log scs-sync $excl $cwd/pact.tar $RepoDir,pact
    set xstatus = $status
    if ($xstatus == 0) then
-      NoteD $Log "ok"
+      NoteD $Log "Sync ................ ok"
    else
-      NoteD $Log "ng"
+      NoteD $Log "Sync ................ ng"
    endif
 
    flog $Log cat log.sync
