@@ -53,6 +53,8 @@ else
    endif
 endif
 
+set ETime = `$TIMER -b $UTime`
+
 if ($ERROR == TRUE) then
    NoteD $LogF "                    PANACEA API Test ................... FAILED ($xstatus/$ETime)"
    set Err = 1

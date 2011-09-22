@@ -10,21 +10,21 @@
 !--------------------------------------------------------------------------
 !--------------------------------------------------------------------------
 
-module pact_libc
-   use iso_c_binding
-
-   interface
-
-      function strlen(s) bind(C)
+      module pact_libc
          use iso_c_binding
-         implicit none
-         integer(C_SIZE_T) :: strlen
-         type(C_PTR), intent(in) :: s
-      end function strlen
 
-   end interface
+         interface
 
-end module
+            function strlen(s) bind(C)
+               use iso_c_binding
+               implicit none
+               integer(C_SIZE_T) :: strlen
+               type(C_PTR), intent(in) :: s
+            end function strlen
+
+         end interface
+
+      end module
 
 !--------------------------------------------------------------------------
 !--------------------------------------------------------------------------
@@ -37,9 +37,9 @@ end module
       use iso_c_binding
       implicit none
 
+      integer(C_INT), value, intent(in) :: m
       character(m) :: c_charp_f
       type(C_PTR), value, intent(in) :: cp
-      integer(C_INT), value, intent(in) :: m
 
 ! ... local variables
       integer :: ln(2)
@@ -67,10 +67,10 @@ end module
       use iso_c_binding
       implicit none
 
+      integer(C_INT), value, intent(in) :: m
       character(m), allocatable :: c_charpp_f(:)
       integer(C_INT), value, intent(in) :: n
       type(C_PTR), intent(in) :: cp
-      integer(C_INT), value, intent(in) :: m
 
 ! ... local variables
       integer :: i

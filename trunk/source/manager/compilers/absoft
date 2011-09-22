@@ -40,20 +40,13 @@ Tool CC {
 }
 
 Tool FC {
-   Exe       = f90
-   Flags     = 
-   Flags    += [ _env_ = PACT_CC_VERSION ;      # compiler version flags
-                 4.*   = -fsignaling-nans ;
-                 4.6.* >= -fsignaling-nans -Wno-unused-dummy-argument ]
-   Flags    += [ _env_ = Bits ;                 # address bit size
-                 32    = -m32 ;
-                 64    = -m64 -fPIC ]
+   Exe       = af90
+   Flags     = -f free
+   Flags    += -fpic -m32
    Flags    += [ _cmd_ = -p ;                   # profiling
-	         on    = -pg ]
-   Flags    += [ _cmd_ = -cov ;                 # coverage analysis
-	         on    = -fprofile-arcs -ftest-coverage ]
-   Debug     = -g -O0 -Wall
-   Optimize  = -g -O -Wunused
+	         on    = -P ]
+   Debug     = -g
+   Optimize  = -g -O3
    Version   = -v
 }
 
