@@ -229,9 +229,18 @@ endif
 # EXPORT - export the results
 
 if ($?DP_Path == 1) then
+
+# reverse DP_RPath so that RPATH gets built in correct order
+   set rlib = ""
    foreach i ( $DP_RPath )
+      set rlib = ( $i $rlib )
+   end
+
+   foreach i ( $rlib )
       setenv RPATH `analyze/rpath -a $i -o echo`
    end
+
+   unset rlib
 
    SetParent HAVE_OPENMPI
    SetParent DP_Inc

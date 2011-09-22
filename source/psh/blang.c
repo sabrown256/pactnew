@@ -117,6 +117,10 @@ struct s_bindes
     void (*fin)(bindes *bd);};
 
 static char
+ *ind = "";
+/* *ind = "      "; */
+
+static char
  *lookup_type(char ***val, char *ty, langmode ity, langmode oty),
  **mc_proto_list(fdecl *dcl);
 
@@ -2306,14 +2310,14 @@ static void init_module(statedes *st, bindes *bd)
 	fprintf(fp, "\n");
 
 /* if there are no interfaces there is no need for the types module */
-	fprintf(fp, "module types_%s\n", pck);
-	fprintf(fp, "   integer, parameter :: isizea = %d\n",
+	fprintf(fp, "%smodule types_%s\n", ind, pck);
+	fprintf(fp, "%s   integer, parameter :: isizea = %d\n", ind,
 		(int) sizeof(char *));
-	fprintf(fp, "end module types_%s\n", pck);
+	fprintf(fp, "%send module types_%s\n", ind, pck);
 	fprintf(fp, "\n");
 
-	fprintf(fp, "module pact_%s\n", pck);
-	fprintf(fp, "   use iso_c_binding\n");
+	fprintf(fp, "%smodule pact_%s\n", ind, pck);
+	fprintf(fp, "%s   use iso_c_binding\n", ind);
 	fprintf(fp, "\n");};
 
     bd->fp = fp;
@@ -2347,17 +2351,17 @@ static char **module_native_f(FILE *fp, fdecl *dcl, char **sa, char *pck)
 	     break;};
 
 	 if (i == 0)
-	    {fprintf(fp, "%s\n", p);
+	    {fprintf(fp, "%s%s\n", ind, p);
 	     voidf = (strstr(p, "subroutine") != NULL);
 	     oper  = (voidf == TRUE) ? "subroutine" : "function";
 
-	     fprintf(fp, "         use iso_c_binding\n");
-	     fprintf(fp, "         implicit none\n");}
+	     fprintf(fp, "%s         use iso_c_binding\n", ind);
+	     fprintf(fp, "%s         implicit none\n", ind);}
 	 else
-	    fprintf(fp, "   %s\n", p);};
+	    fprintf(fp, "%s   %s\n", ind, p);};
 
     if (oper != NULL)
-       fprintf(fp, "      end %s\n", oper);
+       fprintf(fp, "%s      end %s\n", ind, oper);
 
     fprintf(fp, "\n");
 
@@ -2394,9 +2398,9 @@ static void module_pre_wrap_ext(FILE *fp, char *pr, char **ta, char *pck)
 
     if ((ta != NULL) && (module_pre_wrappable(pr) == FALSE))
        {if (strcmp(ta[0], "void") == 0)
-	   fprintf(fp, "   external :: %s\n", ta[1]);
+	   fprintf(fp, "%s   external :: %s\n", ind, ta[1]);
 	else
-	   fprintf(fp, "   %s, external :: %s\n", ta[0], ta[1]);};
+	   fprintf(fp, "%s   %s, external :: %s\n", ind, ta[0], ta[1]);};
 
     return;}
 
@@ -2427,26 +2431,26 @@ static void module_pre_wrap_full(FILE *fp, char *pr, char **ta, char *pck)
 	if (nt > 2)
 	   a[strlen(a) - 2] = '\0';
 
-	snprintf(t, MAXLINE, "      %s %s(%s)", oper, dcn, a);
+	snprintf(t, MAXLINE, "%s      %s %s(%s)", ind, oper, dcn, a);
 	femit(fp, t, "");
 
-	fprintf(fp, "         use iso_c_binding\n");
-	fprintf(fp, "         use types_%s\n", pck);
-	fprintf(fp, "         implicit none\n");
+	fprintf(fp, "%s         use iso_c_binding\n", ind);
+	fprintf(fp, "%s         use types_%s\n", ind, pck);
+	fprintf(fp, "%s         implicit none\n", ind);
 	if (voidf == FALSE)
-	   fprintf(fp, "         %-12s :: %s\n", rty, dcn);
+	   fprintf(fp, "%s         %-12s :: %s\n", ind, rty, dcn);
 
 	for (i = 2; i < nt; i += 2)
 	    {if (strcmp(ta[i], "character") == 0)
-		fprintf(fp, "         %s(*) :: %s\n", ta[i], ta[i+1]);
+		fprintf(fp, "%s         %s(*) :: %s\n", ind, ta[i], ta[i+1]);
              else if (strcmp(ta[i], "integer-A") == 0)
-                fprintf(fp, "         %-12s :: %s(*)\n", "integer", ta[i+1]);
+                fprintf(fp, "%s         %-12s :: %s(*)\n", "integer", ind, ta[i+1]);
              else if (strcmp(ta[i], "real8-A") == 0)
-                fprintf(fp, "         %-12s :: %s(*)\n", "real*8", ta[i+1]);
+                fprintf(fp, "%s         %-12s :: %s(*)\n", "real*8", ind, ta[i+1]);
              else
-                fprintf(fp, "         %-12s :: %s\n", ta[i], ta[i+1]);};
+                fprintf(fp, "%s         %-12s :: %s\n", ind, ta[i], ta[i+1]);};
 
-	fprintf(fp, "      end %s %s\n", oper, dcn);
+	fprintf(fp, "%s      end %s %s\n", ind, oper, dcn);
 	fprintf(fp, "\n");};
 
     return;}
@@ -2487,19 +2491,19 @@ static void module_itf_wrap_ext(FILE *fp, fdecl *dcl, char *pck, char *ffn)
 	if (mc_need_ptr(dcl) == TRUE)
 	   {if (first == TRUE)
 	       {first = FALSE;
-		fprintf(fp, "   use types_%s\n", pck);
+		fprintf(fp, "%s   use types_%s\n", ind, pck);
 		fprintf(fp, "\n");};};
 
 	rty = dcl->proto.type;
 	mc_type(MAXLINE, fty, cty, NULL, &dcl->proto);
 	if (strcmp(rty, "void") == 0)
-	   fprintf(fp, "   external :: %s\n", dcn);
+	   fprintf(fp, "%s   external :: %s\n", ind, dcn);
         else
 	  {if ((strcmp(cty, "C_PTR") == 0) || (strcmp(cty, "C_FUNPTR") == 0))
-	      fprintf(fp, "   %s, external :: %s\n",
-		      C_PTR_RETURN, dcn);
+	      fprintf(fp, "%s   %s, external :: %s\n",
+		      ind, C_PTR_RETURN, dcn);
 	   else
-	     fprintf(fp, "   %s, external :: %s\n", fty, dcn);};};
+	     fprintf(fp, "%s   %s, external :: %s\n", ind, fty, dcn);};};
 
     return;}
 
@@ -2529,29 +2533,29 @@ static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck, char *ffn)
 	mc_decl_list(a, MAXLINE, dcl);
 
 #if defined(FORTRAN_BIND_C_ALL)
-	snprintf(t, MAXLINE, "      %s %s(%s)", oper, dcn, a);
+	snprintf(t, MAXLINE, "%s      %s %s(%s)", ind, oper, dcn, a);
 	femit(fp, t, "&");
 
 	snprintf(t, MAXLINE, "bind(c)");
-	fprintf(fp, "                %s\n", t);
+	fprintf(fp, "%s                %s\n", ind, t);
 #else
-	snprintf(t, MAXLINE, "      %s %s(%s)", oper, dcn, a);
+	snprintf(t, MAXLINE, "%s      %s %s(%s)", ind, oper, dcn, a);
 	femit(fp, t, "");
 #endif
-	fprintf(fp, "         use iso_c_binding\n");
+	fprintf(fp, "%s         use iso_c_binding\n", ind);
 	if (mc_need_ptr(dcl) == TRUE)
-	   fprintf(fp, "         use types_%s\n", pck);
+	   fprintf(fp, "%s         use types_%s\n", ind, pck);
 
-	fprintf(fp, "         implicit none\n");
+	fprintf(fp, "%s         implicit none\n", ind);
 
 /* return value declaration */
 	if (voidf == FALSE)
 	   {if ((strcmp(cty, "C_PTR") == 0) ||
 		(strcmp(cty, "C_FUNPTR") == 0))
-	       snprintf(t, MAXLINE, "         %-15s :: %s\n",
-			C_PTR_RETURN, dcn);
+	       snprintf(t, MAXLINE, "%s         %-15s :: %s\n",
+			ind, C_PTR_RETURN, dcn);
 	    else
-	       snprintf(t, MAXLINE, "         %-15s :: %s\n", fty, dcn);
+	       snprintf(t, MAXLINE, "%s         %-15s :: %s\n", ind, fty, dcn);
 
 	    fputs(t, fp);};
 
@@ -2559,11 +2563,11 @@ static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck, char *ffn)
 	args = dcl->tfproto;
 	ns   = dcl->ntf;
 	for (i = 2; i < ns; i += 2)
-	    {snprintf(t, MAXLINE, "         %-15s :: %s\n",
-		      args[i], args[i+1]);
+	    {snprintf(t, MAXLINE, "%s         %-15s :: %s\n",
+		      ind, args[i], args[i+1]);
 	     fputs(t, fp);};
 
-	fprintf(fp, "      end %s %s\n", oper, dcn);
+	fprintf(fp, "%s      end %s %s\n", ind, oper, dcn);
 
 	fprintf(fp, "\n");};
 
@@ -2601,16 +2605,16 @@ static void module_interop_wrap(FILE *fp, fdecl *dcl, char *ffn)
 	mc_type(MAXLINE, fty, cty, NULL, &dcl->proto);
 	mc_decl_list(a, MAXLINE, dcl);
 
-	snprintf(cd, MAXLINE, "      %s %s(%s)", oper, dcn, a);
+	snprintf(cd, MAXLINE, "%s      %s %s(%s)", ind, oper, dcn, a);
 	femit(fp, cd, "&");
 
 	snprintf(cb, MAXLINE, "bind(c, name='%s')", cfn);
-	fprintf(fp, "                %s\n", cb);
+	fprintf(fp, "%s                %s\n", ind, cb);
 
-	fprintf(fp, "         use iso_c_binding\n");
-	fprintf(fp, "         implicit none\n");
+	fprintf(fp, "%s         use iso_c_binding\n", ind);
+	fprintf(fp, "%s         implicit none\n", ind);
 	if (voidf == FALSE)
-	   fprintf(fp, "         %s(%s) :: %s\n", fty, cty, dcn);
+	   fprintf(fp, "%s         %s(%s) :: %s\n", ind, fty, cty, dcn);
 
 /* argument declarations */
 	for (i = 0; i < na; i++)
@@ -2619,10 +2623,10 @@ static void module_interop_wrap(FILE *fp, fdecl *dcl, char *ffn)
 
 	     mc_type(MAXLINE, fty, cty, NULL, al+i);
 	     nm = al[i].name;
-	     fprintf(fp, "         %s(%s), value :: %s\n",
-		     fty, cty, nm);};
+	     fprintf(fp, "%s         %s(%s), value :: %s\n",
+		     ind, fty, cty, nm);};
 
-	fprintf(fp, "      end %s %s\n", oper, dcn);
+	fprintf(fp, "%s      end %s %s\n", ind, oper, dcn);
 	fprintf(fp, "\n");};
 
     return;}
@@ -2679,7 +2683,7 @@ static int bind_module(bindes *bd)
 	fprintf(fp, "\n");
 
 /* start the interface */
-	fprintf(fp, "   interface\n");
+	fprintf(fp, "%s   interface\n", ind);
 	fprintf(fp, "\n");
 
 /* make interface for native Fortran functions */
@@ -2718,7 +2722,7 @@ static int bind_module(bindes *bd)
 	        module_interop_wrap(fp, dcl, ffn);};
 
 /* finish the interface */
-	fprintf(fp, "   end interface\n");
+	fprintf(fp, "%s   end interface\n", ind);
 	fprintf(fp, "\n");};
 
     return(rv);}
@@ -2737,7 +2741,7 @@ static void fin_module(bindes *bd)
     st  = bd->st;
     pck = st->pck;
 
-    fprintf(fp, "end module pact_%s\n", pck);
+    fprintf(fp, "%send module pact_%s\n", ind, pck);
     fprintf(fp, "\n");
 
     fclose(fp);

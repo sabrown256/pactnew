@@ -31,7 +31,7 @@ static char
 static int report_var(anadep *state, char *fname, char *q, char *key, int newl)
    {int i, nc, ok, doit, tst;
     int compl, litrl, quote;
-    char s[MAXLINE];
+    char s[MAX_BFSZ];
     char *tok, *txt, *ps, *p, *file;
     FILE *fp;
 
@@ -45,7 +45,7 @@ static int report_var(anadep *state, char *fname, char *q, char *key, int newl)
 
     fp = io_open(file, "r");
     if (fp != NULL)
-       {for (i = 0; io_gets(s, MAXLINE, fp) != NULL; i++)
+       {for (i = 0; io_gets(s, MAX_BFSZ, fp) != NULL; i++)
 	    {if (key != NULL)
 	        {tok  = strtok(s, " \t\r");
 		 doit = ((tok != NULL) && (strcmp(tok, key) == 0));
@@ -94,7 +94,7 @@ static int report_var(anadep *state, char *fname, char *q, char *key, int newl)
 		     else
 		        io_printf(stdout, "%s", txt);
 
-		     memset(s, 0, MAXLINE);
+		     memset(s, 0, MAX_BFSZ);
 		     ok = TRUE;
 
 		     if (newl == TRUE)
