@@ -21,11 +21,13 @@
 #define QUAD_EQUAL(d1, d2)   (PM_qvalue_compare(d1, d2, fptol[2]) == 0)
 
 typedef struct s_statedes statedes;
-typedef int (*PFTest)(statedes *st, char *base, char *tgt, int n);
+typedef int (*PFTest)(statedes *st, char *base, char *tgt, int n, int na);
 
 struct s_statedes
    {int na;
     int ni;
+    int dna;
+    int dni;
     int debug_mode;
     int read_only;
     int track;
@@ -59,9 +61,9 @@ static void test_target(char *base, int n, char *fname, char *datfile)
 
 /* SHOW_STAT - show the resource stats */
 
-static void show_stat(statedes *st, char *tag)
+static void show_stat(statedes *st, char *tag, int na)
    {int64_t nba, nbf, dna, dnf;
-    double time, dt, sz, dsz;
+    double time, dt, dnb, sz, dsz;
     SC_rusedes ru;
     static int first = TRUE;
 
@@ -80,13 +82,14 @@ static void show_stat(statedes *st, char *tag)
     if (tag != NULL)
        {dna   = nba  - st->nba0;
 	dnf   = nbf  - st->nbf0;
+	dnb   = 1.0e-3*(dna - dnf);
 	dsz   = sz   - st->sz0;
 	dt    = time - st->time0;
 
 /* memory in kBytes */
 	PRINT(STDOUT,
-	      "\t\t%-3s  %8d  %8d  %10.2e %10.2e      %.2g\n",
-	      tag, st->na, st->ni, 1.0e-3*(dna - dnf), dsz, dt);};
+	      "\t\t%-3s  %8d  %8d  %10.2e %9.0f%%      %.2g\n",
+	      tag, na, st->ni, dnb, 100.0*dsz/dnb, dt);};
 
     st->nba0  = nba;
     st->nbf0  = nbf;
@@ -143,11 +146,10 @@ static void error(int n, FILE *fp, char *fmt, ...)
 
 /* PREP_TEST_1_DATA - prepare the test data */
 
-static void prep_test_1_data(statedes *st)
-   {int i, l, ni, na;
+static void prep_test_1_data(statedes *st, int na)
+   {int i, l, ni;
     double **a;
 
-    na = st->na;
     ni = st->ni;
 
     a = PM_make_vectors(na, ni);
@@ -165,11 +167,9 @@ static void prep_test_1_data(statedes *st)
 
 /* CLEANUP_TEST_1 - free all known test data memory */
 
-static void cleanup_test_1(statedes *st)
-   {int na;
-    double **a_w, **a_r;
+static void cleanup_test_1(statedes *st, int na)
+   {double **a_w, **a_r;
 
-    na  = st->na;
     a_r = st->a_r;
     a_w = st->a_w;
 
@@ -228,14 +228,13 @@ static void print_test_1_data(statedes *st, FILE *fp)
 
 /* COMPARE_TEST_1_DATA - compare the test data */
 
-static int compare_test_1_data(statedes *st, PDBfile *strm, FILE *fp)
-   {int i, l, ni, na, err, err_tot;
+static int compare_test_1_data(statedes *st, PDBfile *strm, FILE *fp, int na)
+   {int i, l, ni, err, err_tot;
     long double fptol[N_PRIMITIVE_FP];
     double **a_r, **a_w;
 
     PD_fp_toler(strm, fptol);
 
-    na  = st->na;
     ni  = st->ni;
     a_r = st->a_r;
     a_w = st->a_w;
@@ -262,14 +261,14 @@ static int compare_test_1_data(statedes *st, PDBfile *strm, FILE *fp)
 
 /* TEST_1 - test the memory usage of pointers */
 
-static int test_1(statedes *st, char *base, char *tgt, int n)
+static int test_1(statedes *st, char *base, char *tgt, int n, int na)
    {int err;
     char datfile[MAXLINE], fname[MAXLINE];
     double time;
     PDBfile *strm;
     FILE *fp;
 
-    show_stat(st, NULL);
+    show_stat(st, NULL, na);
 
     time = SC_wall_clock_time();
 
@@ -278,7 +277,7 @@ static int test_1(statedes *st, char *base, char *tgt, int n)
 
     fp = io_open(fname, "w");
 
-    prep_test_1_data(st);
+    prep_test_1_data(st, na);
 
     if (st->read_only == FALSE)
 
@@ -298,7 +297,7 @@ static int test_1(statedes *st, char *base, char *tgt, int n)
 	   error(1, fp, "Test couldn't close file %s\r\n", datfile);
 	PRINT(fp, "File %s closed\n", datfile);};
 
-    show_stat(st, "wr");
+    show_stat(st, "wr", na);
 
 /* reopen the file */
     strm = PD_open(datfile, "r");
@@ -315,7 +314,7 @@ static int test_1(statedes *st, char *base, char *tgt, int n)
     read_test_1_data(st, strm);
 
 /* compare the original data with that read in */
-    err = compare_test_1_data(st, strm, fp);
+    err = compare_test_1_data(st, strm, fp, na);
 
 /* close the file */
     if (PD_close(strm) == FALSE)
@@ -325,10 +324,10 @@ static int test_1(statedes *st, char *base, char *tgt, int n)
 /* print it out to STDOUT */
     print_test_1_data(st, fp);
 
-    show_stat(st, "rd");
+    show_stat(st, "rd", na);
 
 /* free known test data memory */
-    cleanup_test_1(st);
+    cleanup_test_1(st, na);
 
     if (st->debug_mode)
        SC_mem_map(STDOUT, FALSE);
@@ -352,7 +351,7 @@ static int test_1(statedes *st, char *base, char *tgt, int n)
  */
 
 static int run_test(statedes *st, PFTest test, int n, char *host)
-   {int cs, fail;
+   {int ia, dna, cs, fail;
     char msg[MAXLINE];
     static int dbg = 0;
 
@@ -362,10 +361,12 @@ static int run_test(statedes *st, PFTest test, int n, char *host)
     cs = SC_mem_monitor(-1, dbg, "B", msg);
 
     fail = 0;
+    dna  = st->dna;
 
-    if ((*test)(st, host, NULL, n) == FALSE)
-       {PRINT(STDOUT, "Test #%d failed\n", n);
-	fail++;};
+    for (ia = dna; ia <= st->na; ia *= dna)
+        {if ((*test)(st, host, NULL, n, ia) == FALSE)
+	    {PRINT(STDOUT, "Test #%d failed\n", n);
+	     fail++;};};
 
     cs = SC_mem_monitor(cs, dbg, "B", msg);
 
@@ -380,15 +381,19 @@ static void print_help(void)
    {
 
     PRINT(STDOUT, "\nPDPTST - run pointer scaling and efficiency tests\n\n");
-    PRINT(STDOUT, "Usage: pdctst [-b #] [-c] [-d] [-h] [-m] [-r] [-v #]\n");
+    PRINT(STDOUT, "Usage: pdctst [-b #] [-c] [-d] [-dna #] [-dni #] [-h] [-m] [-na #] [-ni #] [-r] [-v #]\n");
     PRINT(STDOUT, "\n");
-    PRINT(STDOUT, "       b  - set buffer size (default no buffering)\n");
-    PRINT(STDOUT, "       c  - verify low level writes\n");
-    PRINT(STDOUT, "       d  - turn on debug mode to display memory maps\n");
-    PRINT(STDOUT, "       h  - print this help message and exit\n");
-    PRINT(STDOUT, "       r  - read only (assuming files from other run exist)\n");
-    PRINT(STDOUT, "       m  - use memory mapped files\n");
-    PRINT(STDOUT, "       v  - use format version # (default is 2)\n");
+    PRINT(STDOUT, "       b    set buffer size (default no buffering)\n");
+    PRINT(STDOUT, "       c    verify low level writes\n");
+    PRINT(STDOUT, "       d    turn on debug mode to display memory maps\n");
+    PRINT(STDOUT, "       dna  factor to scale NA each iteration (default 10)\n");
+    PRINT(STDOUT, "       dni  factor to scale NI each iteration (default 10)\n");
+    PRINT(STDOUT, "       h    print this help message and exit\n");
+    PRINT(STDOUT, "       m    use memory mapped files\n");
+    PRINT(STDOUT, "       na   number of dynamic arrays (default 10000)\n");
+    PRINT(STDOUT, "       ni   number of items per arrays (default 1000)\n");
+    PRINT(STDOUT, "       r    read only (assuming files from other run exist)\n");
+    PRINT(STDOUT, "       v    use format version # (default is 2)\n");
     PRINT(STDOUT, "\n");
 
     return;}
@@ -410,8 +415,10 @@ int main(int c, char **v)
     SC_bf_set_hooks();
     SC_zero_space_n(1, -2);
 
-    st.na            = 10;
+    st.na            = 10000;
+    st.dna           = 10;
     st.ni            = 1000;
+    st.dni           = 10;
     st.debug_mode    = FALSE;
     st.read_only     = FALSE;
     st.track         = TRUE;
@@ -423,8 +430,12 @@ int main(int c, char **v)
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-na") == 0)
 	    st.na = SC_stoi(v[++i]);
+	 else if (strcmp(v[i], "-dna") == 0)
+	    st.dna = SC_stoi(v[++i]);
 	 else if (strcmp(v[i], "-ni") == 0)
 	    st.ni = SC_stoi(v[++i]);
+	 else if (strcmp(v[i], "-dni") == 0)
+	    st.dni = SC_stoi(v[++i]);
  	 else if (v[i][0] == '-')
             {switch (v[i][1])
                 {case 'b' :
