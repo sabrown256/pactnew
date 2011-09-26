@@ -915,13 +915,17 @@ static char **_SC_backtrace_exe(int pid, int to)
 		for (i = 0; i < n; i++)
 		    {SC_strncpy(s, MAXLINE, out[i], -1);
 		     ta = SC_tokenize(s, " \t[]");
-		     ad = SC_strtol(ta[1], NULL, 16);
+		     if (ta[1] != NULL)
+		        {ad = SC_strtol(ta[1], NULL, 16);
 
-		     SC_exe_map_addr(&sl, st, out[i]);
+			 SC_exe_map_addr(&sl, st, out[i]);
 
-		     _SC_push_loc(str, i, ad, loc);
+			 _SC_push_loc(str, i, ad, loc);}
+		     else
+		        {snprintf(s, MAXLINE, "#%-4d[%s]\n", i, ta[0]);
+			 SC_array_string_add_copy(str, s);};
 
-		     SC_free_strings(t);};
+		     SC_free_strings(ta);};
 
 		SC_exe_close(st);
 

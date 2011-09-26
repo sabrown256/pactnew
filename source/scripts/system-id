@@ -116,7 +116,7 @@ switch ($OS[1])
                 set lhw = o
                 grep ib_core /proc/modules >& /dev/null
                 if ($status == 0) then
-                   dpkg -l | grep mvapich2-gnu-1.5 | grep shmem >& /dev/null
+                   dpkg -l |& grep mvapich2-gnu-1.5 | grep shmem >& /dev/null
                    if ($status != 0) then
                       set lhw = ib
                    endif

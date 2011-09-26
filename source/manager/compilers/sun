@@ -25,7 +25,8 @@ Tool CC {
    Flags   += [ _cmd_ = -p ;                 # profiling
 	        on    = -xinstrument=datarace ]
    Debug    = -g -v
-   Optimize = -g -xO3
+#   Optimize = -g -xO3
+   Optimize = -g -v
    Version  = -V
 }
 
@@ -56,7 +57,8 @@ Tool Lex {
 
 Tool OpenMP_Lex {
    Debug    = -xopenmp=noopt
-   Optimize = -xopenmp=parallel -xO3
+#   Optimize = -xopenmp=parallel -xO3
+   Optimize = -xopenmp=noopt
 }
 
 Group Cfg {
@@ -77,7 +79,8 @@ Group PThread {
 
 Group OpenMP {
    CC_Debug    = -xopenmp=noopt
-   CC_Optimize = -xopenmp=parallel -xO3
+#   CC_Optimize = -xopenmp=parallel -xO3
+   CC_Optimize = -xopenmp=noopt
 #   LD_Flags = -xopenmp=parallel -xO3
 #   LD_Lib   = -xopenmp=parallel -xO3
 }
