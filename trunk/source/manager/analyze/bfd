@@ -43,9 +43,13 @@ else
 #include <bfd.h>
 int main(int c, char **v)
    {int rv;
+    unsigned int ln;
+    const char *fl, *fn;
     bfd *et;
     et = bfd_openr(v[0], NULL);
     rv = (et == NULL);
+    if (rv != 0)
+       bfd_find_inliner_info(et, &fl, &fn, &ln);
     bfd_close(et);
     return(rv);}
 EOF
@@ -118,9 +122,9 @@ EOF
 #include <stdlib.h>
 #include <demangle.h>
 int main(int c, char **v)
-   {int v, rv;
-    v  = (DMGL_ANSI | DMGL_PARAMS);
-    rv = (rv == 0);
+   {int f, rv;
+    f  = (DMGL_ANSI | DMGL_PARAMS);
+    rv = (f == 0);
     return(rv);}
 EOF
 

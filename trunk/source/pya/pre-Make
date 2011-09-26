@@ -49,7 +49,7 @@ targets :
 	@echo "   test      : run the PYTHON test suite"
 
 
-PySrc = pact/pgs.py pact/pdb.py pact/__init__.py
+PySrc = pact/pgs.py pact/pdb.py
 
 Hdrs = pdbmodule.h  pdbrw.h  pgsmodule.h  pputil.h  utilpgs.h
 

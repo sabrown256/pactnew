@@ -182,7 +182,8 @@ NoteD $Log -n "   Python import ... "
 Note $Log ""
 
 # finish up
-flog $Log cp pact/pgs.py pact/pdb.py pact/__init__.py $PyPact
+flog $Log cp pact/pgs.py pact/pdb.py $PyPact
+flog $Log touch $PyPact/__init__.py
 
 flog $Log $Python -c 'import compileall;compileall.main()' $PyPact
 set LStat = $status

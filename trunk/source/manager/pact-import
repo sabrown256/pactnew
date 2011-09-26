@@ -119,16 +119,6 @@ endif
 # do an ls to wake up the automounter if one is present
 flog $Log ls $RepoDir
 
-flog $Log set Repository = `find $RepoDir -name manager | grep -v dead-packages`
-flog $Log set Repository = $Repository:h
-
-if (!(-d $Repository)) then
-   NoteD $Log ""
-   NoteD $Log "Non existent repository: $Repository"
-   NoteD $Log ""
-   exit(1)
-endif
-
 if (!(-e $MngDir/pact-scs)) then
    NoteD $Log " "
    NoteD $Log "Can't find Source Control System Information in $MngDir"
@@ -328,7 +318,7 @@ BACKUP:
    Note $Log ""
 
 # initiate a lock on the repository
-   $ScrDir/scs-lock lock
+   ftee $Log $ScrDir/scs-lock lock
    Note $Lock $Message
    Note $Lock "Source: $SrcFile" 
 
@@ -396,13 +386,12 @@ GET_OLD:
 
    Separator $Log
    Note $Lock -n "Checking out old sources ........... " 
-   NoteD $Log "Checking out sources from $Repository"
+   NoteD $Log "Checking out sources from $RepoDir"
    Note $Log "   Current Directory:    $cwd" 
    Note $Log ""
 
    flog $Log mkdir $Old
    flog $Log cd $Old
-   flog $Log set Repository = $Repository:h
 
    flog $Log $ScrDir/scs-co $SCSTag $RepoKnd -d $RepoDir pact
    flog $Log set ErrStat = $status
@@ -864,9 +853,9 @@ SYNC:
       NoteD $Log "Sync ................ ng"
    endif
 
+   Separator $Log
    flog $Log cat log.sync
-
-   flog $Log rm -f $excl
+   Separator $Log
 
    flog $Log popd
 
