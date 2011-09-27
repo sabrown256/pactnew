@@ -255,11 +255,7 @@ GET_SOURCE:
    flog $Log $ScrDir/scs-co $SCSOpt $SCSKind $SCSRepository pact
    Note $Log " " 
 
-   foreach i ( manager auto doc $PactList )
-      if (-d pact/$i) then
-         flog $Log mv pact/$i .
-      endif
-   end
+   flog $Log mv pact/* .
    flog $Log $RMDir pact
 
    if ($status == 0) then

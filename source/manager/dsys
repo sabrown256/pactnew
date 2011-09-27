@@ -2514,7 +2514,6 @@ CFG_DONE:
 # prepare the exclusions
         set excl = ( $excl -exclude local )
         set excl = ( $excl -exclude hosts )
-        set excl = ( $excl -exclude ../config )
         set excl = ( $excl -exclude extensions )
         if (-f $MngDir/local/exclusions) then
            foreach i (`cat $MngDir/local/exclusions | grep -v '^#'`)

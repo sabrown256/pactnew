@@ -1044,6 +1044,94 @@
                                           0.0        0.0        1.0))
 
 ;--------------------------------------------------------------------------
+
+;                       POINTWISE OPERATORS
+
+;--------------------------------------------------------------------------
+
+(define (pointwise-oper-list yo yn t oper)
+    (if yo
+	(let* ((yc (list-ref yo 0))
+	       (yr (list-tail yo 1))
+	       (yt (oper t yc)))
+	      (pointwise-oper-list yr (cons yt yn) yt oper))
+	(reverse yn)))
+			   
+(define (pointwise-oper crv oper ident)
+    (let* ((xy (curve->list crv))
+	   (x  (list-ref xy 0))
+	   (y  (list-ref xy 1)))
+
+	 (make-curve* x (pointwise-oper-list y nil 0.0 +))))
+
+(define (pointwise+ crv)
+    "Procedure: Make a new curve with consisting of
+     the pointwise sum of the y values of the specified curve.
+     Usage: pointwise+ <crv>"
+    (pointwise-oper crv + 0.0))
+
+(define (pointwise- crv)
+    "Procedure: Make a new curve with consisting of
+     the pointwise difference of the y values of the specified curve.
+     Usage: pointwise- <crv>"
+    (pointwise-oper crv - 0.0))
+
+(define (pointwise* crv)
+    "Procedure: Make a new curve with consisting of
+     the pointwise product of the y values of the specified curve.
+     Usage: pointwise* <crv>"
+    (pointwise-oper crv * 1.0))
+
+(define (pointwise/ crv)
+    "Procedure: Make a new curve with consisting of
+     the pointwise quotient of the y values of the specified curve.
+     Usage: pointwise/ <crv>"
+    (pointwise-oper crv / 1.0))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+(define (pairwise-oper-list yo yn oper)
+    (if (> (length yo) 1)
+	(let* ((y1 (list-ref yo 0))
+	       (y2 (list-ref yo 1))
+	       (yr (list-tail yo 1))
+	       (yt (oper y1 y2)))
+	      (pairwise-oper-list yr (cons yt yn) oper))
+	(reverse yn)))
+
+(define (pairwise-oper crv oper)
+    (let* ((xy (curve->list crv))
+	   (x  (list-ref xy 0))
+	   (y  (list-ref xy 1)))
+
+	 (make-curve* (cdr x) (pairwise-oper-list y nil oper))))
+
+(define (pairwise+ crv)
+    "Procedure: Make a new curve with one fewer points consisting of
+     the pairwise sum of the y values of the specified curve.
+     Usage: pairwise+ <crv>"
+    (pairwise-oper crv +))
+
+(define (pairwise- crv)
+    "Procedure: Make a new curve with one fewer points consisting of
+     the pairwise difference of the y values of the specified curve.
+     Usage: pairwise- <crv>"
+    (pairwise-oper crv -))
+
+(define (pairwise* crv)
+    "Procedure: Make a new curve with one fewer points consisting of
+     the pairwise product of the y values of the specified curve.
+     Usage: pairwise* <crv>"
+    (pairwise-oper crv *))
+
+(define (pairwise/ crv)
+    "Procedure: Make a new curve with one fewer points consisting of
+     the pairwise quotient of the y values of the specified curve.
+     Usage: pairwise/ <crv>"
+    (pairwise-oper crv /))
+
+;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
 ;(printf nil "done\n")
