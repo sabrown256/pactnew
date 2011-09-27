@@ -112,6 +112,7 @@ switch ($Phase)
               Note $LogHost "System id = $Arch"
 
 # clean out old builds first
+              flog $LogHost $RMDir gen
               flog $LogHost ./dsys delete -a
 
 # NOTE: if dsys sync would modify dsys itself this is a problem for

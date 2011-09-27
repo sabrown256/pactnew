@@ -141,7 +141,7 @@ EOF
    else
       flog $ALog ldd $Tmp
 
-      flog $Log $PFE -dr -v -p 2 $Tmp $BE
+      flog $ALog $PFE -dr -v -p 2 $Tmp $BE
       echo "a" | $PFE -v -p 2 $Tmp $BE >&! $Tmp.res
       set LStat = $status
       if ($LStat == 0) then
@@ -155,6 +155,7 @@ EOF
       else
          set MPIStdIO = "one process (assumed)"
       endif
+      Note $ALog "MPIStdIO = |$MPIStdIO|"
    endif
 
    flog $ALog rm -f $Tmp $Tmp.c $Tmp.res
@@ -165,6 +166,9 @@ endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+Note $ALog "lParComm    = |$lParComm|"
+Note $ALog "REQUEST_MPI = |$REQUEST_MPI|"
 
 if (("$lParComm" == no) || ($REQUEST_MPI == FALSE)) then
    setenv DP_Lib    ""
@@ -187,7 +191,7 @@ else
    NoteD $ALog "      no MPI (by request)"
 endif
 
-setenv ParComm "$lParComm"
+flog $ALog setenv ParComm "$lParComm"
 
 # export the results
 SetParent ParCommSupport

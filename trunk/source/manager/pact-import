@@ -27,7 +27,7 @@ if ($?USER == 0) then
    endif
 endif
 
-InitLog Log $cwd/import.log
+InitLog Log $cwd/log.import
 
 set RepoDir = `$ScrDir/scs-meta -r`
 set RepoKnd = ( -k `$ScrDir/scs-meta -k` )
@@ -832,7 +832,6 @@ SYNC:
    set excl = ""
    set excl = ( $excl -exclude local )
    set excl = ( $excl -exclude hosts )
-   set excl = ( $excl -exclude ../config )
    set excl = ( $excl -exclude extensions )
    if (-f $MngDir/local/exclusions) then
       foreach i (`cat $MngDir/local/exclusions | grep -v '^#'`)
