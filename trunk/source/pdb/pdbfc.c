@@ -292,7 +292,7 @@ FILE *_PD_open_container_file(char *name, char *mode)
 
     cf = CMAKE(containerf);
 
-    fc = SC_open_fcontainer(cntr, SC_UNKNOWN, NULL);
+    fc = SC_open_fcontainer(name, SC_UNKNOWN, NULL);
     if (fc == NULL)
        fe = NULL;
     else

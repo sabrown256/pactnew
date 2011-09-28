@@ -26,6 +26,7 @@ if (($THREADING == no) && ($HAVE_MPI == no)) then
 
    flog $Log tar cvf pdbvar.tar demo.d?
    flog $Log ar -rsc pdbvar.a demo.d?
+   flog $Log ( cat demo.d? >&! pdbvar.blob )
 
    set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then
