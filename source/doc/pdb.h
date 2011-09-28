@@ -1,5 +1,5 @@
 TXT: PDBLib User's Manual
-MOD: 08/30/2011
+MOD: 09/28/2011
 
 <CENTER>
 <P>
@@ -289,6 +289,9 @@ indicates functions for optional use
 
 <dt><dd><font color="#009900">o </font>
 <a href="#pd_ls_alt">PD_LS_ALT</a>
+
+<dt><dd><font color="#ff0000">o </font>
+<a href="#pfvart">PFVART</a>
 
 <dt><dd><font color="#009900">o </font>
 <a href="#pd_mkdir">PD_MKDIR</a>
@@ -7773,6 +7776,7 @@ and an ASCII string error message can be retrieved through a call to
 See also:
 <a href="#pd_ln"><tt>PD_ln</tt></a>,
 <a href="#pd_ls"><tt>PD_ls</tt></a>,
+<a href="#pd_ls_alt"><tt>PD_ls_alt</tt></a>,
 <a href="#pd_mkdir"><tt>PD_mkdir</tt></a>,
  and
 <a href="#pd_pwd"><tt>PD_pwd</tt></a>.
@@ -7905,6 +7909,7 @@ and an ASCII string error message can be retrieved through a call to
 See also:
 <a href="#pd_cd"><tt>PD_cd</tt></a>,
 <a href="#pd_ls"><tt>PD_ls</tt></a>,
+<a href="#pd_ls_alt"><tt>PD_ls_alt</tt></a>,
 <a href="#pd_mkdir"><tt>PD_mkdir</tt></a>,
  and
 <a href="#pd_pwd"><tt>PD_pwd</tt></a>.
@@ -8168,7 +8173,104 @@ See also:
 <!-- -------------------------------------------------------------------- --> 
 <!-- -------------------------------------------------------------------- --> 
 
-<a name="pd_ls_alt"><h2>PFVART</h2></a>
+<a name="pd_ls_alt"><h2>PD_LS_ALT</h2></a>
+
+
+<p>
+<pre>
+<i>C Binding: </i>  char **PD_ls_alt(PDBfile *file,
+                                     char *path, char *type, int *num,
+                                     char *flags)
+<i>Fortran Binding: </i>none
+<i>SX Binding: </i> none
+<i>Python Binding: </i> none
+</pre>
+<p>
+
+Return a list of names of entries (variables and directories) in PDB
+file file that are of type type and that are in the directory and
+match the variable name pattern specified by path. Similar to
+<tt>PD_ls</tt> but with additional control.
+<p>
+PDBLib supports an optional hierarchical directory structure inside
+PDB files. A directory or a variable in a directory may be specified
+by either a relative path or an absolute path. Slashes separate nodes
+in a path name. Absolute paths begin with a slash. Nodes consisting
+of two periods, "..", refer to the next higher level directory.
+<p>
+The arguments to <tt>PD_ls_alt</tt> are:
+<em>file</em>, a pointer to a PDBfile;
+<em>fileid</em>, an integer file identifier;
+<em>npath</em>, an integer number of characters in string path;
+<em>path</em>, an ASCII string containing the path name of the
+ directory to search and/or the variable name pattern to match;
+<em>ntype</em>, an integer number of characters in string type;
+<em>type</em>, an ASCII string containing the type of entries to return;
+and
+<em>num</em>, a pointer to an integer to contain the number of entries returned.
+<em>flags</em>, flags '-a' lists hidden entries, '-R' recursively lists
+directories.
+<p>
+The return value is a pointer to an array of strings,
+if successful; otherwise, NULL is returned 
+and an ASCII string error message can be retrieved through a call to 
+<a href="#pd_get_error"><tt>PD_get_error</tt></a>. 
+<p>
+See also:
+<a href="#pd_cd"><tt>PD_cd</tt></a>,
+<a href="#pd_ln"><tt>PD_ln</tt></a>,
+<a href="#pd_ls"><tt>PD_ls</tt></a>,
+<a href="#pd_mkdir"><tt>PD_mkdir</tt></a>,
+ and
+<a href="#pd_pwd"><tt>PD_pwd</tt></a>.
+<p>
+
+<hr>
+<b>C Example</b>
+<pre>
+ #include "pdb.h"
+ 
+    PDBfile *file;
+    char **list;
+    int num;
+          .
+          .
+          .
+
+ /* get a list of all directories in the current directory */
+     list = PD_ls_alt(file, NULL, "Directory", &amp;num, "-R");
+     if (list == NULL)
+        printf("%s", PD_get_error());
+          .
+          .
+          .
+
+     CFREE(list);
+          .
+          .
+          .
+
+ /* get a list of the variables of type char * in directory animals */
+     list = PD_ls_alt(file, "animals", "char *", &amp;num, "-a");
+     if (list == NULL)
+        printf("%s", PD_get_error());
+          .
+          .
+          .
+
+     CFREE(list);
+          .
+          .
+          .
+</pre>
+
+<hr>
+<hr>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
+<a name="pfvart"><h2>PFVART</h2></a>
 
 
 <p>
@@ -8307,6 +8409,7 @@ See also:
 <a href="#pd_cd"><tt>PD_cd</tt></a>,
 <a href="#pd_ln"><tt>PD_ln</tt></a>,
 <a href="#pd_ls"><tt>PD_ls</tt></a>,
+<a href="#pd_ls_alt"><tt>PD_ls_alt</tt></a>,
  and
 <a href="#pd_pwd"><tt>PD_pwd</tt></a>.
 <p>
@@ -8419,6 +8522,7 @@ See also:
 <a href="#pd_cd"><tt>PD_cd</tt></a>,
 <a href="#pd_ln"><tt>PD_ln</tt></a>,
 <a href="#pd_ls"><tt>PD_ls</tt></a>,
+<a href="#pd_ls_alt"><tt>PD_ls_alt</tt></a>,
  and
 <a href="#pd_mkdir"><tt>PD_mkdir</tt></a>.
 <p>
@@ -8522,6 +8626,7 @@ See also:
 <a href="#pd_cd"><tt>PD_cd</tt></a>,
 <a href="#pd_ln"><tt>PD_ln</tt></a>,
 <a href="#pd_ls"><tt>PD_ls</tt></a>,
+<a href="#pd_ls_alt"><tt>PD_ls_alt</tt></a>,
  and
 <a href="#pd_pwd"><tt>PD_pwd</tt></a>.
 <p>

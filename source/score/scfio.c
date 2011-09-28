@@ -2597,6 +2597,8 @@ int SC_io_connect(int flag)
 
 /* SC_FILE_LENGTH - return the byte length of the named file
  *                - return -1 if the file does not exist
+ *
+ * #bind SC_file_length fortran() scheme(file-length) python()
  */
 
 int64_t SC_file_length(char *name)

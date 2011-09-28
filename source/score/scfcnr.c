@@ -118,8 +118,6 @@ fcdes *_SC_unknown_container(char *name)
 	ead = SC_stoi(ta[2]);
 	ok &= (ead > sad);};
 
-    SC_free_strings(ta);
-
     fc = NULL;
     if (ok == TRUE)
        {fcent *ae;
@@ -139,12 +137,15 @@ fcdes *_SC_unknown_container(char *name)
 	SC_strncpy(ae->perm, 8, "0444", 8);
 
 	if (ae != NULL)
-	   SC_hasharr_install(tab, ae->name, ae, "fcent", TRUE, TRUE);
+	   {snprintf(s, MAXLINE, "%ld:%ld", (long) sad, (long) ead);
+	    SC_hasharr_install(tab, s, ae, "fcent", TRUE, TRUE);};
 
 	fc = CMAKE(fcdes);
 	fc->name    = CSTRSAVE(name);
 	fc->file    = fp;
 	fc->entries = tab;};
+
+    SC_free_strings(ta);
 
     return(fc);}
 
@@ -161,29 +162,36 @@ fcdes *_SC_unknown_container(char *name)
 
 fcontainer *SC_open_fcontainer(char *name, SC_file_type type,
 			       fcdes *(*meth)(char *name, SC_file_type *pt))
-   {SC_file_type ftype;
+   {char cntr[MAXLINE];
+    char *p;
+    SC_file_type ftype;
     fcontainer *cf;
     fcdes *fc;
 
     cf = NULL;
     fc = NULL;
 
+    SC_strncpy(cntr, MAXLINE, name, -1);
+    p = strchr(cntr, '~');
+    if (p != NULL)
+       *p = '\0';
+
     if (meth != NULL)
-       fc = meth(name, &ftype);
+       fc = meth(cntr, &ftype);
 
     if (fc == NULL)
-       {ftype = (type == SC_UNKNOWN) ? _SC_fcontainer_type(name) : type;
+       {ftype = (type == SC_UNKNOWN) ? _SC_fcontainer_type(cntr) : type;
 	if (ftype == SC_TAR)
-	   fc = SC_scan_tarfile(name);
+	   fc = SC_scan_tarfile(cntr);
 	else if (ftype == SC_AR)
-	   fc = SC_scan_archive(name);};
+	   fc = SC_scan_archive(cntr);};
 
     if (fc == NULL)
        {ftype = SC_OTHER;
 	fc    = _SC_unknown_container(name);};
            
     if (fc != NULL)
-       cf = _SC_make_fcontainer(name, ftype, fc);
+       cf = _SC_make_fcontainer(cntr, ftype, fc);
 
     return(cf);}
 

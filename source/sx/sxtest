@@ -21,8 +21,8 @@ while ($#argv > 0)
            echo "Usage: sxtest [-h] [-vg] [<test>]*"
            echo "  h       this help message"
            echo "  vg      run tests under valgrind"
-           echo "  <test>  one of: oper hash c99 pdb dattr text sqlite xml vif pgs"
-           echo "                  master exa iply ar shell mesh intrp diff ext"
+           echo "  <test>  one of: oper hash c99 pdb dattr ar text sqlite xml vif"
+           echo "                  pgs axis master exa iply shell mesh intrp diff ext"
            echo ""
            exit(1)
       case -*:
@@ -82,8 +82,9 @@ else if (-e $BinDir/sx) then
 
    if ("$Test" == "") then
       set Test = ""
-      set Test = ( $Test oper hash c99 pdb dattr text sqlite xml vif iply pgs axis )
-      set Test = ( $Test master exa ar shell mesh intrp diff ext )
+      set Test = ( $Test oper hash c99 pdb dattr ar text sqlite xml vif iply )
+      set Test = ( $Test pgs axis )
+      set Test = ( $Test master exa shell mesh intrp diff ext )
    endif
 
    foreach i ($Test)
