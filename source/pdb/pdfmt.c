@@ -189,27 +189,35 @@ int _PD_put_text(int reset, int ns, char *s)
     spl = pa->spl;
     bf  = pa->tbuffer;
 
-    if (bf == NULL)
-       {ncx = BUFINCR;
-	bf  = CPMAKE_N(char, ncx, 3);
-	spl = bf;
-        nc  = 0;}
+    if (reset == -1)
+       {CFREE(bf);
+	spl = NULL;
+	nc  = 0;
+	ncx = 0;
+	ok  = FALSE;}
 
-    else if (!reset)
-       {spl = bf;
-        nc  = 0;
-        memset(bf, 0, ncx);};
+    else
+       {if (bf == NULL)
+	   {ncx = BUFINCR;
+	    bf  = CMAKE_N(char, ncx);
+	    spl = bf;
+	    nc  = 0;}
+
+        else if (reset == 0)
+	   {spl = bf;
+	    nc  = 0;
+	    memset(bf, 0, ncx);};
     
-    if (nc + ns + 10 > ncx)
-       {ncx += BUFINCR;
-	CPREMAKE(bf, char, ncx, 3);
-	spl = bf + strlen(bf);};
+	if (nc + ns + 10 > ncx)
+	   {ncx += BUFINCR;
+	    CREMAKE(bf, char, ncx);
+	    spl = bf + strlen(bf);};
 
-    SC_strncpy(spl, ncx, s, ns+1);
-    ok = ((ns > 0) && (strcmp(spl, s) == 0));
+	SC_strncpy(spl, ncx, s, ns+1);
+	ok = ((ns > 0) && (strcmp(spl, s) == 0));
 
-    spl += ns;
-    nc  += ns;
+	spl += ns;
+	nc  += ns;};
 
     pa->nc      = nc;
     pa->ncx     = ncx;
@@ -231,9 +239,13 @@ int _PD_put_string(int reset, char *fmt, ...)
     long ns;
     char *s;
 
-    SC_VDSNPRINTF(FALSE, s, fmt);
+    if (reset == -1)
+       {s  = NULL;
+	ns = 0;}
+    else
+       {SC_VDSNPRINTF(FALSE, s, fmt);
 
-    ns = strlen(s);
+	ns = strlen(s);};
 
     ok = _PD_put_text(reset, ns, s);
 

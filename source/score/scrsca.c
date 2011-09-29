@@ -128,6 +128,10 @@ static int _SC_res_usage_self(SC_rusedes *ru, int whch)
 
     rv = FALSE;
 
+#if defined(LINUX) || defined(CYGWIN)
+    malloc_trim(0);
+#endif
+
     ru->pid      = getpid();
     ru->ppid     = getppid();
     ru->uid      = 0;

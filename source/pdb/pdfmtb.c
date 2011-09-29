@@ -748,7 +748,7 @@ static int64_t _PD_wr_symt_ii(PDBfile *file)
        return(-1);
 
     if (pa->tbuffer != NULL)
-       CFREE(pa->tbuffer);
+       _PD_put_string(-1, NULL);
 
     n = 0;
     for (i = 0; SC_hasharr_next(file->symtab, &i, &nm, NULL, (void **) &ep); i++)
@@ -849,7 +849,7 @@ static int64_t _PD_wr_chrt_ii(PDBfile *file, FILE *out, int fh)
        return(-1);
 
     if (pa->tbuffer != NULL)
-       CFREE(pa->tbuffer);
+       _PD_put_string(-1, NULL);
 
     if (fh == 0)
        ch = file->chart;
@@ -885,7 +885,7 @@ static int64_t _PD_wr_chrt_ii(PDBfile *file, FILE *out, int fh)
     else
        lio_write(bf, 1, strlen(bf), fp);
 
-    CFREE(pa->tbuffer);
+    _PD_put_string(-1, NULL);
 
     return(addr);}
 
@@ -1203,7 +1203,7 @@ static int _PD_wr_ext_ii(PDBfile *file, FILE *out)
 
     ok &= (nbw == nbo);
 
-    CFREE(pa->tbuffer);
+    _PD_put_string(-1, NULL);
 
     return(ok);}
 

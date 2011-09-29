@@ -512,8 +512,9 @@ int _PD_ha_rl_syment(haelem *hp, void *a)
     SC_ASSERT(ok == TRUE);
 
     _PD_rl_syment_d(ep);
+    hp->def = NULL;
 
-    CFREE(name);
+    CFREE(hp->name);
 
     return(TRUE);}
 
@@ -927,6 +928,20 @@ void _PD_rl_dimensions(dimdes *dims)
          CFREE(pp);
          if (nc > 1)
 	    break;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_FINISH - THREADSAFE
+ *           - cleanup special PDB memory
+ */
+
+void PD_finish(void)
+   {
+
+    _PD_fin_stacks();
 
     return;}
 

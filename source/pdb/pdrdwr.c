@@ -28,37 +28,37 @@ enum e_PD_instr_rdwr
 typedef enum e_PD_instr_rdwr PD_instr_rdwr;
  
 #define SAVE_S(s, t)                                                         \
-    {RW_STR_STACK[RW_STR_PTR++] = s;                                         \
+    {pa->rw_str_stack[pa->rw_str_ptr++] = s;                                 \
      s = CSTRSAVE(t);}
 
 #define RESTORE_S(s)                                                         \
     {CFREE(s);                                                               \
-     s = RW_STR_STACK[--RW_STR_PTR];}
+     s = pa->rw_str_stack[--pa->rw_str_ptr];}
 
 #define SAVE_I(val)                                                          \
-    (RW_LVAL_STACK[RW_LVAL_PTR++].diskaddr = (int64_t) val)
+    (pa->rw_lval_stack[pa->rw_lval_ptr++].diskaddr = (int64_t) val)
 
 #define RESTORE_I(val)                                                       \
-    (val = RW_LVAL_STACK[--RW_LVAL_PTR].diskaddr)
+    (val = pa->rw_lval_stack[--pa->rw_lval_ptr].diskaddr)
 
 #define SAVE_P(val)                                                          \
-    (RW_LVAL_STACK[RW_LVAL_PTR++].memaddr = (char *) val)
+    (pa->rw_lval_stack[pa->rw_lval_ptr++].memaddr = (char *) val)
 
 #define RESTORE_P(type, val)                                                 \
-    (val = (type *) RW_LVAL_STACK[--RW_LVAL_PTR].memaddr)
+    (val = (type *) pa->rw_lval_stack[--pa->rw_lval_ptr].memaddr)
 
 #define SET_CONT(ret, frce)                                                  \
-   {RW_CALL_STACK[RW_CALL_PTR++] = ret;                                      \
+   {pa->rw_call_stack[pa->rw_call_ptr++] = ret;                              \
     dst = (_PD_indirection(litype) && (frce || itags)) ? INDIRECT : LEAF;    \
     continue;}
 
 #define SET_CONT_RD(ret, branch)                                             \
-   {RW_CALL_STACK[RW_CALL_PTR++] = ret;                                      \
+   {pa->rw_call_stack[pa->rw_call_ptr++] = ret;                              \
     dst = branch;                                                            \
     continue;}
 
 #define GO_CONT                                                              \
-   {dst = RW_CALL_STACK[--RW_CALL_PTR];                                      \
+   {dst = pa->rw_call_stack[--pa->rw_call_ptr];                              \
     continue;}
 
 #define GO(lbl)                                                              \
@@ -67,18 +67,29 @@ typedef enum e_PD_instr_rdwr PD_instr_rdwr;
 
 #define DYN_STK(_t, _s, _p, _px)                                             \
     {if (_p >= _px)                                                          \
-        {_px += RW_LIST_D;                                                   \
+        {_px += pa->rw_list_d;                                               \
 	 if (_s == NULL)                                                     \
-	    {_s = CPMAKE_N(_t, _px, 3);}                                     \
+	    {_s = CMAKE_N(_t, _px);}                                         \
 	 else                                                                \
-	    CPREMAKE(_s, _t, _px, 3);};}
+	    CREMAKE(_s, _t, _px);};}
+
+#define DYN_MAKE_STACKS                                                      \
+    DYN_STK(long, pa->rw_call_stack,                                         \
+	    pa->rw_call_ptr, pa->rw_call_ptr_x);                             \
+    DYN_STK(char *, pa->rw_str_stack,                                        \
+	    pa->rw_str_ptr, pa->rw_str_ptr_x);                               \
+    DYN_STK(SC_address, pa->rw_lval_stack,                                   \
+	    pa->rw_lval_ptr, pa->rw_lval_ptr_x)
+
+#define DYN_FREE_STACKS                                                      \
+    CFREE(pa->rw_call_stack);                                                \
+    CFREE(pa->rw_str_stack);                                                 \
+    CFREE(pa->rw_lval_stack)
 
 #define START                                                                \
     count = 0;                                                               \
     while (TRUE)                                                             \
-       {DYN_STK(long, RW_CALL_STACK, RW_CALL_PTR, RW_CALL_PTR_X);            \
-	DYN_STK(char *, RW_STR_STACK, RW_STR_PTR, RW_STR_PTR_X);             \
-        DYN_STK(SC_address, RW_LVAL_STACK, RW_LVAL_PTR, RW_LVAL_PTR_X);      \
+       {DYN_MAKE_STACKS;                                                     \
 	count++;                                                             \
 	switch (dst) {
 
@@ -86,19 +97,6 @@ typedef enum e_PD_instr_rdwr PD_instr_rdwr;
     default  :                                                               \
          snprintf(bf, MAXLINE, "UNDECIDABLE CASE - %s", f);                  \
          PD_error(bf, tag);};}
-
-
-#define RW_CALL_STACK      pa->rw_call_stack
-#define RW_CALL_PTR        pa->rw_call_ptr
-#define RW_CALL_PTR_X      pa->rw_call_ptr_x
-#define RW_LVAL_STACK      pa->rw_lval_stack
-#define RW_LVAL_PTR        pa->rw_lval_ptr
-#define RW_LVAL_PTR_X      pa->rw_lval_ptr_x
-#define RW_STR_STACK       pa->rw_str_stack
-#define RW_STR_PTR         pa->rw_str_ptr
-#define RW_STR_PTR_X       pa->rw_str_ptr_x
-#define RW_LIST_T          pa->rw_list_t
-#define RW_LIST_D          pa->rw_list_d
 
 /*--------------------------------------------------------------------------*/
 
@@ -793,20 +791,33 @@ static void INLINE _PD_init_stacks(long t, long d)
 
 	SC_mem_stats(&a, &f, NULL, NULL);
 
-	DYN_STK(long, pa->rw_call_stack,
-		pa->rw_call_ptr, pa->rw_call_ptr_x);
-
-	DYN_STK(char *, pa->rw_str_stack,
-		pa->rw_str_ptr, pa->rw_str_ptr_x);
-
-	DYN_STK(SC_address, pa->rw_lval_stack,
-		pa->rw_lval_ptr, pa->rw_lval_ptr_x);
+	DYN_MAKE_STACKS;
 
 	SC_mem_stats_set(a, f);};
 
     pa->rw_call_stack[0L] = DONE;
 
     pa->rw_call_ptr = 1L;
+    pa->rw_lval_ptr = 0L;
+    pa->rw_str_ptr  = 0L;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_INIT_STACKS - setup dynamic stacks for continuation passing
+ *                 - data tree walkers
+ */
+
+void _PD_fin_stacks(void)
+   {PD_smp_state *pa;
+
+    pa = _PD_get_state(-1);
+
+    DYN_FREE_STACKS;
+
+    pa->rw_call_ptr = 0L;
     pa->rw_lval_ptr = 0L;
     pa->rw_str_ptr  = 0L;
 

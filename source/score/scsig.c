@@ -53,7 +53,8 @@ SC_contextdes SC_signal_n(int sig, PFSignal_handler fn, void *a)
 
      if ((0 < sig) && (sig < SC_NSIG) &&
 	 (sig != SIGKILL) && (sig != SIGSTOP))
-        {na.sa_flags   = SA_RESTART;
+        {/* memset(&na, 0, sizeof(na)); */
+	 na.sa_flags   = SA_RESTART;
 	 na.sa_handler = fn;
 	 sigemptyset(&na.sa_mask);
 

@@ -623,6 +623,9 @@ extern PD_address
 extern char
  *_PD_expand_hyper_name(PDBfile *file, char *name);
 
+extern void
+ _PD_fin_stacks(void);
+
 extern int
  _PD_hyper_write(PDBfile *file, char *name, syment *ep, void *vr,
 		 char *intype),

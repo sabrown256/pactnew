@@ -495,7 +495,7 @@ int _SC_mem_map(FILE *fp, int flag, int show, int lineno)
 int SC_mem_map(FILE *fp, int flag)
    {int nbl;
 
-    nbl = _SC_mem_map(fp, flag, FALSE, TRUE);
+    nbl = _SC_mem_map(fp, flag, ((flag & 8) != 0), TRUE);
 
     return(nbl);}
 
