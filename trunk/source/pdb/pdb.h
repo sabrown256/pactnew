@@ -956,7 +956,8 @@ extern void
 
 extern void
  _PD_rl_syment_d(syment *ep),
- *_PD_alloc_entry(PDBfile *file, char *type, long ni);
+ *_PD_alloc_entry(PDBfile *file, char *type, long ni),
+ PD_finish(void);
 
 
 /* PDBDIR.C declarations */
@@ -1247,6 +1248,7 @@ extern int
 	      long ni, int sgned, int nbits, int padsz, int fpp, long offs,
 	      long *pan, char **pdata),
  _PD_indirection(char *s);
+
 
 /* PDSER.C declarations */
 

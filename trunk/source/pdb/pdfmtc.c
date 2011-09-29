@@ -584,7 +584,7 @@ static int _PD_rd_symt_iii(PDBfile *file)
     _PD_set_current_address(file, addr, SEEK_SET, PD_OPEN);
 
 /* read in the symbol table and extras table as a single block */
-    nbs                   = numb - file->symtaddr;
+    nbs         = numb - file->symtaddr;
     pa->tbuffer = CMAKE_N(char, nbs + 1);
 
     bf = pa->tbuffer;
@@ -880,7 +880,7 @@ static int64_t _PD_wr_chrt_iii(PDBfile *file, FILE *out, int wc)
        return(-1);
 
     if (pa->tbuffer != NULL)
-       CFREE(pa->tbuffer);
+       _PD_put_string(-1, NULL);
 
     if (wc == 0)
        {fc = file->chart;
@@ -957,7 +957,7 @@ static int64_t _PD_wr_chrt_iii(PDBfile *file, FILE *out, int wc)
     else
        lio_write(bf, 1, strlen(bf), fp);
 
-    CFREE(pa->tbuffer);
+    _PD_put_string(-1, NULL);
 
     return(addr);}
 
@@ -1051,7 +1051,7 @@ static int64_t _PD_wr_symt_iii(PDBfile *file)
        return(-1);
 
     if (pa->tbuffer != NULL)
-       CFREE(pa->tbuffer);
+       _PD_put_string(-1, NULL);
 
     ok = TRUE;
     n  = 0;
@@ -1184,7 +1184,7 @@ static int _PD_wr_ext_iii(PDBfile *file, FILE *out)
 
     ok &= (nbw == nbo);
 
-    CFREE(pa->tbuffer);
+    _PD_put_string(-1, NULL);
 
     return(ok);}
 
