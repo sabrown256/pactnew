@@ -10,6 +10,7 @@
 #include "cpyright.h"
 
 #include "score_int.h"
+#include "scope_mem.h"
 
 #ifdef HAVE_RESOURCE_USAGE
 # include <sys/resource.h>
@@ -536,6 +537,41 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	ru->priority = getpriority(PRIO_PROCESS, pid);};
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_MEM_STATR - return memory usage statistics including system resources
+ *
+ * #bind SC_mem_statr fortran() scheme(memory-rusage) python()
+ */
+
+void SC_mem_statr(int64_t *al ARG([*],out), int64_t *fr ARG([*],out),
+		  int64_t *df ARG([*],out), int64_t *mx ARG([*],out),
+		  int64_t *rs ARG([*],out))
+   {SC_heap_des *ph;
+    SC_rusedes ru;
+
+    SC_resource_usage(&ru, -1);
+
+    ph = _SC_tid_mm();
+
+    if (al != NULL)
+       *al = ph->sp_alloc;
+
+    if (fr != NULL)
+       *fr = ph->sp_free;
+
+    if (df != NULL)
+       *df = ph->sp_diff;
+
+    if (mx != NULL)
+       *mx = ph->sp_max;
+
+    if (rs != NULL)
+       *rs = 1.0e3*ru.maxrss;
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

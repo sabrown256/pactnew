@@ -502,6 +502,40 @@ int SC_mem_map(FILE *fp, int flag)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_MEM_SS - print out memory map snapshots to a family of files
+ *           - argument FLAG is a bit map determining which
+ *            - sectors are reported
+ *            -    1  active blocks
+ *            -    2  free blocks
+ *            -    4  registered blocks
+ *            -    8  non-accountable blocks reported
+ *
+ * #bind SC_mem_ss fortran() scheme(memory-snapshot) python()
+ */
+
+int SC_mem_ss(char *base, int flag)
+   {int nbl;
+    char s[MAXLINE];
+    FILE *fp;
+    static int idx = 0;
+    static char root[MAXLINE] = "mem-ss";
+
+    if (base != NULL)
+       {SC_strncpy(root, MAXLINE, base, -1);
+	idx = 0;};
+
+    snprintf(s, MAXLINE, "%s.%03d.map", root, idx++);
+    fp = fopen(s, "w");
+
+    nbl = _SC_mem_map(fp, flag, ((flag & 8) != 0), TRUE);
+
+    fclose(fp);
+
+    return(nbl);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_MEM_MONITOR - Monitor memory leaks.
  *                - A pair calls lets you track memory that leaks in or
  *                - out of the region between the calls.

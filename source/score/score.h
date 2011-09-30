@@ -1041,6 +1041,7 @@ extern char
 extern int
  SC_mem_corrupt(int flag),
  SC_mem_map(FILE *fp, int flag),
+ SC_mem_ss(char *base, int flag),
  SC_mem_neighbor(void *p, int flag, void *b, void *a);
 
 extern long
@@ -1096,7 +1097,9 @@ extern PFTid
 /* SCRSCA.C declarations */
 
 extern void
- SC_show_resource_usage(SC_rusedes *ru);
+ SC_show_resource_usage(SC_rusedes *ru),
+ SC_mem_statr(int64_t *al, int64_t *fr, int64_t *df, int64_t *mx,
+	      int64_t *rs);
 
 extern int
  SC_resource_usage(SC_rusedes *ru, int pid),
