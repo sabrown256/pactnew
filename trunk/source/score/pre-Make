@@ -445,8 +445,16 @@ ${BinDir}/scrtrt : ${TGTLib} scrtrt.c
 #
 lf : ${BinDir}/scofft
 
-${BinDir}/scofft : scofft.c
+${BinDir}/scofft : ${TGTLib} scofft.c
 	${CLD} ${LdFlags} scofft.c -o ${BinDir}/scofft ${Libs}
+
+#
+# memory manager overhead
+#
+mmov : ${BinDir}/scmmov
+
+${BinDir}/scmmov : ${TGTLib} scmmov.c
+	${CLD} ${LdFlags} scmmov.c -o ${BinDir}/scmmov ${Libs}
 
 #
 # comprehensive test suite

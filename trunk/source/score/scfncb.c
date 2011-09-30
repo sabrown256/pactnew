@@ -214,11 +214,20 @@ int SC_free_mem(double *mem)
 
      while (io_gets(s, MAXLINE, fp) != NULL)
         {t = SC_strtok(s, ": \t\n", p);
-	 if ((t != NULL) && (strcmp(t, "Mem") == 0))
+	 if (t == NULL)
+	    break;
+	 if (strcmp(t, "Mem") == 0)
 	    {v      = SC_strtok(NULL, " \t\n", p);
 	     mem[0] = SC_stoi(v);
 	     SC_strtok(NULL, " \t\n", p);
 	     v      = SC_strtok(NULL, " \t\n", p);
+	     mem[1] = SC_stoi(v);
+	     break;}
+	 else if (strcmp(t, "MemTotal") == 0)
+	    {v      = SC_strtok(NULL, " \t\n", p);
+	     mem[0] = SC_stoi(v);}
+	 else if (strcmp(t, "MemFree") == 0)
+	    {v      = SC_strtok(NULL, " \t\n", p);
 	     mem[1] = SC_stoi(v);
 	     break;};};
 
