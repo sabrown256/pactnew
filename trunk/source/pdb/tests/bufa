@@ -10,18 +10,19 @@
 
 source ../../tests/common
 
+set msg = "PDB Buffer Test A .................. "
+set rpf = "none"
+set exe = $BinDir/pdbfts
+
 #set STRACE = ( `which strace` )
 #if ((-x "$STRACE") && ($OS != AIX)) then
 
    set tst = $1
 
    NoteD $LogF ""
-   NoteD $LogF "                    PDB Buffer Test A .................. "
+   NoteD $LogF "                    $msg"
    Note $LogF ""
 
-   set Exe = `swhich -1 pdbfts`
-
-   set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then
 
       echo -n "                       "
@@ -65,9 +66,9 @@ source ../../tests/common
 #            foreach c ( 1 4 16 )
             foreach c ( 4 )
                Separator $LogF
-               ftee $LogF $CFE $Exe -v $tst -n $n -b $m -c $c
-#               Note $LogF "Command: $STRACE $Exe -v $tst -n $n -b $m -c $c"
-#               @ nwr = ( `$STRACE $Exe -v $tst -n $n -b $m -c $c |& grep write | tee -a $LogF | wc -l` )
+               ftee $LogF $CFE $exe -v $tst -n $n -b $m -c $c
+#               Note $LogF "Command: $STRACE $exe -v $tst -n $n -b $m -c $c"
+#               @ nwr = ( `$STRACE $exe -v $tst -n $n -b $m -c $c |& grep write | tee -a $LogF | wc -l` )
 #               echo "$c $nr $mr $rat $nwr" | \
 #               awk '{printf("                       %3d      %4s  %5s %8s    %5d\n", $1, $2, $3, $4, $5);}'
             end
@@ -75,28 +76,19 @@ source ../../tests/common
       end
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $BinDir/pdbfts -v $tst |& \
+      ftee $LogF $Valgrind $exe -v $tst           |& \
       grep "ERROR SUMMARY:"                       |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $LogF $RM $Tmp
+      set rpf     = ( $rpf $Tmp )
    endif
-   set ETime   = `$TIMER -b $UTime`
 
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "                    PDB Buffer Test A .................. OMITTED ($xstatus/$ETime)"
-   else if ($xstatus != 0) then
-      NoteD $LogF "                    PDB Buffer Test A .................. FAILED ($xstatus/$ETime)"
-      set Err = 1
-   else
-      NoteD $LogF "                    PDB Buffer Test A .................. PASSED ($ETime)"
-   endif
 #endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a bufa -e $Err part
+$TEST_CHECK part -a bufa -e $xstatus -x $exe -rpf "$rpf" "$msg"
 
 exit($status)
 

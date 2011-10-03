@@ -10,47 +10,33 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           AXIS TEST
-
-#--------------------------------------------------------------------------
+set msg = "SX PGS Axis Test ............. "
+set exe = $BinDir/sx
+set rpf = none
+@ nerr  = 0
 
    NoteD $Log ""
-   NoteD $Log -n "                    SX PGS Axis Test ............. "
+   NoteD $Log -n "                    $msg"
    Note $Log ""
 
-   set UTime = `$TIMER -r`
+   set opt = ( -l $TDir/sxaxs.scm )
    if ("$Valgrind" == "") then
-      flog $Log $SX -l $TDir/sxaxs.scm
+      flog $Log $SX $opt
       set xstatus = $status
       if ($xstatus == 0) then
          flog $Log ( $CFE $PSDIFF sxaxs.ps $RefDir/sxaxs.ps > sxaxs.ps.diff )
          set xstatus = $status
       endif
    else
-      ftee $Log $Valgrind $BinDir/sx -e -r -s -l $TDir/sxaxs.scm |& \
-      grep "ERROR SUMMARY:"                                      |& \
+      ftee $Log $Valgrind $exe -e -r -s $opt     |& \
+      grep "ERROR SUMMARY:"                      |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $Log $RM $Tmp
+      set rpf     = ( $rpf $Tmp )
    endif
 
-   set ETime = `$TIMER -b $UTime`
+   set rpf = ( $rpf sxaxs.* )
 
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "OMITTED ($xstatus/$ETime)"
-   else if ($xstatus != 0) then
-      NoteD $Log "FAILED ($xstatus/$ETime)"
-      set Err = 1
-   else
-      NoteD $Log "PASSED ($ETime)"
-      flog $Log $RM sxaxs.*
-   endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a axis -e $Err part
+$TEST_CHECK part -a axis -e $xstatus -rpf "$rpf" none
 
 exit($status)

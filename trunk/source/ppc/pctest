@@ -116,14 +116,14 @@ else if (-e $BinDir/pcexec) then
 
 # Clean up
 
-   $TEST_CHECK -n PPC -e $ERROR -raf "$Tmp" clean
+   $TEST_CHECK clean -n PPC -e $ERROR -raf "$Tmp"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 endif
 
-$TEST_CHECK -e $ERROR fin
+$TEST_CHECK fin -e $ERROR
 
 exit($status)
 

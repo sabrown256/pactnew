@@ -33,8 +33,12 @@ end
 
    Separator $Log
 
+   set msg = "PGS Axis Test .......... "
+   set rpf = "none"
+   set exe = $BinDir/gslaxt
+
    NoteD $Log ""
-   NoteD $Log -n "                    PGS Axis Test .......... "
+   NoteD $Log -n "                    $msg"
    Note $Log ""
 
    flog $Log pushd $SrcDir
@@ -54,7 +58,6 @@ end
       @ nerr  = 0
       @ nomit = 0
       set first = TRUE
-      set UTime = `$TIMER -r`
 
       foreach o (lin log)
          switch ($o)
@@ -76,7 +79,7 @@ end
             flog $Log set ob = $bs.$o
             if ("$Valgrind" == "") then
 
-               flog $Log ( $CFE $BinDir/gslaxt $opt -s $DDir/$i | sed 's|e-00|e+00|g' > $ob.res )
+               flog $Log ( $CFE $exe $opt -s $DDir/$i | sed 's|e-00|e+00|g' > $ob.res )
                set xstatus = $status
                if (($xstatus == 254) || ($xstatus == 255)) then
                   @ nomit = $nomit + 1
@@ -145,36 +148,32 @@ end
                   endif
                endif
             else
-               ftee $Log $Valgrind $BinDir/gslaxt $opt -s $RootDir/pgs/$i     |& \
-               grep "ERROR SUMMARY:"                                          |& \
+               ftee $Log $Valgrind $exe $opt -s $RootDir/pgs/$i     |& \
+               grep "ERROR SUMMARY:"                                |& \
                awk '{ print $4 }'   >&! $Tmp
                set xstatus = `cat $Tmp`
-               flog $Log $RM $Tmp
+               set rpf     = ( $rpf $Tmp )
             endif
          end
       end
 
-      set ETime = `$TIMER -b $UTime`
-
-      if ($first == FALSE) then
-         NoteD $Log -n "                    "
-      endif
+      Note $Log ""
 
       if ($nomit > 0) then
-         NoteD $Log "OMITTED ($nerr/$ETime)"
-         set Err = 0
+         set xstatus = 255
       else if ($nerr > 0) then
-         NoteD $Log "FAILED ($nerr/$ETime)"
-         flog $Log set Err = 1
+         set xstatus = $nerr
       else
-         flog $Log rm -f gslax*.dat gslax*.ps gslax*.res gslax*.diff
-         NoteD $Log "PASSED ($ETime)"
+         set xstatus = 0
       endif
+
+      set rpf = ( $rpf gslax*.dat gslax*.ps gslax*.res gslax*.diff )
+
    endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a axis -e $Err part
+$TEST_CHECK part -a axis -e $Err -x $exe -rpf "$rpf" none
 
 exit($status)

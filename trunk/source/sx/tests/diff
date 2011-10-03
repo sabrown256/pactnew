@@ -10,14 +10,13 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           PDBDIFF TEST
-
-#--------------------------------------------------------------------------
+set msg = "PDBDiff Test ................. "
+set exe = $BinDir/sx
+set rpf = 0
+@ nerr  = 0
 
    NoteD $Log ""
-   NoteD $Log "                    PDBDiff Test ................. "
+   NoteD $Log "                    $msg"
    Note $Log ""
 
    flog $Log rm -f pdbd*.dat pdbd.res pdbd.res.diff
@@ -30,7 +29,7 @@ source ../../tests/common
    if ($xstatus != 0) then
       NoteD $Log " FAILED (-1)"
       NoteD $Log "                       Making data failed"
-      set Err = 1
+      @ nerr = $nerr + 1
    else
       set LErr = 0
       set UTime = `$TIMER -r`
@@ -59,18 +58,18 @@ source ../../tests/common
       else if ($xstatus == 0) then
          NoteD $Log "FAILED ($ETime)"
          NoteD $Log "                       Erroneous agreement"
-         set Err = 1
+         @ nerr = $nerr + 1
       else
          echo  "Checking for 1 different mapping" >>& pdbd.res
          grep "1 mapping out of 4 differs between pdbda.dat and pdbdb.dat:" pdbda.dat.chk >>& pdbd.res
          if ($status == 0) then
             NoteD $Log "ok"
          else
-            set Err = 1
             NoteD $Log "ng"
             NoteD $Log ""
             ftee $Log cat pdbd.res
             NoteD $Log ""
+            @ nerr = $nerr + 1
          endif
       endif
 
@@ -87,26 +86,17 @@ source ../../tests/common
       else if ($xstatus == 0) then
          NoteD $Log "ok"
       else
-         set LErr = 1
          NoteD $Log "ng"
          NoteD $Log ""
          ftee $Log cat pdbd.res
          NoteD $Log ""
+         @ nerr = $nerr + 1
       endif
 
-      if ($LErr == 1) then
-         NoteD $Log "                    PDBDiff Test ................. FAILED ($ETime)"
-         set Err = 1
-      else
-         NoteD $Log "                    PDBDiff Test ................. PASSED ($ETime)"
-         flog $Log rm -f pdbd*.dat pdbd.res pdbd*.dat.chk
-      endif
+      set rpf = ( $rpf pdbd*.dat pdbd.res pdbd*.dat.chk )
    
    endif
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a diff -e $Err part
+$TEST_CHECK part -a diff -e $nerr -rpf "$rpf" "$msg"
 
 exit($status)

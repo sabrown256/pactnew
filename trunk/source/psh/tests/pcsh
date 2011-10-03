@@ -8,19 +8,10 @@
 # include "cpyright.h"
 #
 
-set Package = psh
-if ($?Log == 0) then
-   if (-f test-env) then
-      source test-env
-      pushd $TestDir >& /dev/null
-   else
-      mv $Log $Log.tmp
-      source ../../../scripts/test-env
-      mv $Log.tmp $Log
-   endif
-else
-   source ../../../scripts/env-csh
-endif
+source ../../tests/common
+
+set msg = "PCSH Test ...................... "
+set rpf = none
 
 set PCSH = pcsh
 
@@ -45,17 +36,13 @@ end
 
 InitLog Log $TestDir/log.pcsh.$LogSfx
 
-@ Err = 0
-
-set BTime = `$TIMER -r`
-
 NoteD $Log ""
-NoteD $Log "                    PCSH Test ......................"
+NoteD $Log "                    $msg"
 
 set TstDir = $SrcDir/tests
 set RefDir = $TstDir/ref
 set List = (psh1 psh2 psh3 psh4)
-set lErr = 0
+set nerr = 0
 
 flog $Log setenv PATH $RootDir/scripts:$PATH
 
@@ -92,25 +79,17 @@ foreach t ($List)
       flog $Log rm -f $Res $Res.diff
    else
       flog $Log cat $Res.diff
-      flog $Log set lErr = 1
+      flog $Log set nerr = 1
       NoteD $Log "ng"
    endif
 end
 
-set ETime = `$TIMER -b $BTime`
-
-if ($lErr != 0) then
-   NoteD $Log "                    PCSH Test ...................... FAILED ($lErr/$ETime)"
-   @ Err = $Err + 1
-else
-   NoteD $Log "                    PCSH Test ...................... PASSED ($ETime)"
-   flog $Log rm -f run.* s*
-endif
-NoteD $Log ""
+flog $Log touch run.foo
+set rpf = ( $rpf run.* s* )
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a pcsh -e $Err part
+$TEST_CHECK part -a pcsh -e $nerr -rpf "$rpf" "$msg"
 
 exit($status)

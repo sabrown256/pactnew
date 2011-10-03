@@ -10,38 +10,31 @@
 
 source ../../tests/common
 
+set msg = "PDB User Type Test ................. "
+set rpf = "none"
+set exe = $BinDir/pdasts
+
 set tst = $1
 
 NoteD $LogF ""
-NoteD $LogF "                    PDB User Type Test ................. "
+NoteD $LogF "                    $msg"
 Note $LogF ""
 
-set UTime = `$TIMER -r`
 if ("$Valgrind" == "") then
-   ftee $LogF $CFE $BinDir/pdasts 
+   ftee $LogF $CFE $exe 
    set xstatus = $status
 else
-   ftee $LogF $Valgrind $BinDir/pdasts -v $tst |& \
+   ftee $LogF $Valgrind $exe -v $tst          |& \
    grep "ERROR SUMMARY:"                      |& \
    awk '{ print $4 }'   >&! $Tmp
    set xstatus = `cat $Tmp`
-	 flog $LogF $RM $Tmp
-endif
-set ETime   = `$TIMER -b $UTime`
-
-if (($xstatus == 254) || ($xstatus == 255)) then
-   NoteD $LogF "                    PDB User Type Test ................. OMITTED ($xstatus/$ETime)"
-else if ($xstatus != 0) then
-   NoteD $LogF "                    PDB User Type Test ................. FAILED ($xstatus/$ETime)"
-   set Err = 1
-else
-   NoteD $LogF "                    PDB User Type Test ................. PASSED ($ETime)"
+   set rpf     = ( $rpf $Tmp )
 endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a usrtyp -e $Err part
+$TEST_CHECK part -a usrtyp -e $xstatus -x $exe -rpf "$rpf" "$msg"
 
 exit($status)
 

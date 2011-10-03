@@ -20,32 +20,22 @@ source ../../tests/common
    NoteD $Log -n "                    ULTRA Annotation Test ........ "
    Note $Log ""
 
-   set UTime = `$TIMER -r`
+   set rpf = none
+  
    if ("$Valgrind" == "") then
       flog $Log ($CFE $Ultra -l $TDir/ulann.scm >& ulmmt.log)
       set xstatus = $status
    else
       ftee $Log $Valgrind $BinDir/ultra -e -r -x -q -s -l $TDir/ulann.scm  |& \
-      grep "ERROR SUMMARY:"                                                         |& \
+      grep "ERROR SUMMARY:"                                                |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $Log $RM $Tmp
-   endif
-
-   set ETime = `$TIMER -b $UTime`
-
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "OMITTED ($xstatus/$ETime)"
-   else if ($xstatus != 0) then
-      NoteD $Log "FAILED ($xstatus/$ETime)"
-      set Err = 1
-   else
-      NoteD $Log "PASSED ($ETime)"
+      set rpf     = $Tmp
    endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a annot -e $Err part
+$TEST_CHECK part -a annot -e $xstatus -rpf "$rpf" none
 
 exit($status)

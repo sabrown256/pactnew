@@ -23,7 +23,8 @@ source ../../tests/common
    set FAIL = "NO"
    flog $Log $RM ulenv.log
 
-   set UTime = `$TIMER -r`
+   set rpf = ""
+
    unsetenv SCHEME
    unsetenv ULTRA  
    setenv DO_RUN_SUBMIT_ENV
@@ -35,27 +36,15 @@ source ../../tests/common
       grep "ERROR SUMMARY:"                               |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $Log $RM $Tmp
+      set rpf     = ( $rpf $Tmp )
    endif
    
-   set ETime = `$TIMER -b $UTime`
-
-# any return status other than 0 is an error
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "OMITTED ($xstatus/$ETime)"
-   else if ($xstatus != 0) then
-      NoteD $Log "FAILED ($xstatus/$ETime)"
-      set FAIL  = "FAIL"
-      set Err = 1
-   else
-      NoteD $Log "PASSED ($ETime)"
-      flog $Log $RM ulenv.log
-   endif
+   set rpf = ( $rpf ulenv.log )
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a env -e $Err part
+$TEST_CHECK part -a env -e $xstatus -rpf "$rpf" none
 
 exit($status)
 

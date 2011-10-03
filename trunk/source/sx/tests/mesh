@@ -10,68 +10,41 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           PDBVIEW MESH TEST
-
-#--------------------------------------------------------------------------
+set msg = "PDBView Mesh Test ............ "
+set exe = $BinDir/sx
+set rpf = 0
+@ nerr  = 0
 
    NoteD $Log ""
-   NoteD $Log -n "                    PDBView Mesh Test ............ "
+   NoteD $Log -n "                    $msg"
    Note $Log ""
 
    flog $Log rm -f pdbvmesh*.diff pdbvmesh*.ps
 
-   set UTime = `$TIMER -r`
+   set opt = ( -l $RootDir/sx/tests/pdbvmesh.scm )
    if ("$Valgrind" == "") then
-      flog $Log ($PDBView -l $RootDir/sx/tests/pdbvmesh.scm >& pdbvmesh.res)
+      flog $Log ($PDBView $opt >& pdbvmesh.res)
       set xstatus = $status
+      if ($xstatus == 0) then
+         foreach i (pdbvmesh.ps)
+            if (-f $RootDir/sx/tests/ref/$i) then
+               flog $Log ($CFE $PSDIFF $i $RootDir/sx/tests/ref/$i >&! $i.diff)
+               @ st = $status
+               @ xstatus = $xstatus + $st
+               Note $Log "Test $i:r status $st"
+            endif
+         end
+      endif
    else
-      ftee $Log $Valgrind $BinDir/sx -e -p -q -l $RootDir/sx/tests/pdbvmesh.scm |& \
-      grep "ERROR SUMMARY:"                                                     |& \
+      ftee $Log $Valgrind $exe -e -p -q $opt    |& \
+      grep "ERROR SUMMARY:"                     |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $Log $RM $Tmp
+      set rpf     = ( $rpf $Tmp )
    endif
 
-   set ETime = `$TIMER -b $UTime`
+   set rpf = ( $rpf pdbvmesh.res.diff pdbvmesh.res pdbvmesh.ps pdbvmesh*.diff )
 
-   if ("$Valgrind" != "") then
-      if ($xstatus != 0) then
-         NoteD $Log "FAILED ($xstatus/$ETime)"
-         set Err = 1
-      else
-         NoteD $Log "PASSED ($ETime)"
-      endif
-   else if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $Log "OMITTED ($xstatus/$ETime)"
-      set xstatus = 0
-   else if ($xstatus != 0) then
-      NoteD $Log "CRASHED ($xstatus/$ETime)"
-      set Err = 1
-   else
-      flog $Log @ xstatus = 0
-      foreach i (pdbvmesh.ps)
-         if (-f $RootDir/sx/tests/ref/$i) then
-            flog $Log ($CFE $PSDIFF $i $RootDir/sx/tests/ref/$i >&! $i.diff)
-            @ st = $status
-            @ xstatus = $xstatus + $st
-            Note $Log "Test $i:r status $st"
-         endif
-      end
-
-      if ($xstatus != 0) then
-         NoteD $Log "FAILED ($ETime)"
-         set Err = 1
-      else
-         NoteD $Log "PASSED ($ETime)"
-         flog $Log rm -f pdbvmesh.res.diff pdbvmesh.res pdbvmesh.ps pdbvmesh*.diff
-      endif
-   endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a mesh -e $Err part
+$TEST_CHECK part -a mesh -e $xstatus -rpf "$rpf" none
 
 exit($status)

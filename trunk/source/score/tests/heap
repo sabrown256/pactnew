@@ -10,24 +10,24 @@
 
 source ../../tests/common
 
+set msg = "SCORE Heap Check Test ......... "
+set exe = $BinDir/scmtrt
+set rpf = none
+
 # NOTE: OSF1 is incapable of building this test properly when statically linked
 if (("$HaveDevZero" == "HAVE_DEV_ZERO" ) && ("$OS" != "OSF1")) then
    NoteD $LogF ""
-   NoteD $LogF -n "                    SCORE Heap Check Test ....... "
+   NoteD $LogF -n "                    $msg"
    Note $LogF ""
-
-   set UTime = `$TIMER -r`
 
    flog $LogF pushd $SrcDir
    flog $LogF $MAKE memchk
    set TStatus = $status
    flog $LogF popd
 
-   set ETime   = `$TIMER -b $UTime`
-
    if ($TStatus != 0) then
       NoteD $LogF "                         ERROR Building Heap Check Test Program"
-      NoteD $LogF "                    SCORE Heap Check Test ............. FAILED ($ETime)"
+      NoteD $LogF "                    ${msg}FAILED"
       set Err = 1
    else
 
@@ -36,35 +36,23 @@ if (("$HaveDevZero" == "HAVE_DEV_ZERO" ) && ("$OS" != "OSF1")) then
       endif
 
       if ("$Valgrind" == "") then
-         flog $LogF $CFE $BinDir/scmtrt
+         flog $LogF $CFE $exe
          set xstatus = $status
       else
-         ftee $LogF $Valgrind $BinDir/scmtrt   |& \
-         grep "ERROR SUMMARY:"                 |& \
+         ftee $LogF $Valgrind $exe      |& \
+         grep "ERROR SUMMARY:"          |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-         flog $LogF $RM $Tmp
+         set rpf     = ( $rpf $Tmp )
       endif
 
-      set ETime = `$TIMER -b $UTime`
-
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $LogF "OMITTED ($xstatus/$ETime)"
-      else if ($xstatus == 0) then
-         NoteD $LogF "PASSED ($ETime)"
-      else if (-e /dev/zero) then
-         NoteD $LogF "FAILED ($xstatus/$ETime)"
-         set Err = 1
-      else
-         NoteD $LogF "INCOMPLETE ($ETime)"
-      endif
    endif
 endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a heap -e $Err part
+$TEST_CHECK part -a heap -e $xstatus -x $exe -rpf "$rpf" none
 
 exit($status)
 

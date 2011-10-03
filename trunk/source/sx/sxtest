@@ -99,7 +99,7 @@ else if (-e $BinDir/sx) then
 
 # CLEAN UP
 
-   $TEST_CHECK -n SX -e $ERROR -raf "$Tmp" clean
+   $TEST_CHECK clean -n SX -e $ERROR -raf "$Tmp"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -109,6 +109,6 @@ else
    NoteD $Log "$BinDir/sx does not exist"
 endif
 
-$TEST_CHECK -e $ERROR fin
+$TEST_CHECK fin -e $ERROR
 
 exit($status)

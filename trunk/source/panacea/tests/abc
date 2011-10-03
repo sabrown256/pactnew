@@ -31,8 +31,11 @@ if (-d $RootDir/panacea/abc) then
    else
       NoteD $LogF " DONE"
 
+      set msg = "PANACEA ABC Test .............. "
+      set rpf = "none"
+
       NoteD $LogF ""
-      NoteD $LogF "                    PANACEA ABC Test ....."
+      NoteD $LogF "                    $msg"
 
       flog $LogF pushd $SrcDir/abc/builder
       if ("$Valgrind" == "") then
@@ -43,17 +46,6 @@ if (-d $RootDir/panacea/abc) then
          set xstatus = $status
       endif
       flog $LogF popd
-
-      set ETime = `$TIMER -b $UTime`
-
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $LogF "                    PANACEA ABC Test .............. OMITTED ($xstatus/$ETime)"
-      else if ($xstatus != 0) then
-         NoteD $LogF "                    PANACEA ABC Test .............. FAILED ($xstatus/$ETime)"
-         set Err = 1
-      else
-         NoteD $LogF "                    PANACEA ABC Test .............. PASSED ($ETime)"
-      endif
 
       if ($xstatus == 0) then
          flog $LogF pushd $SrcDir/abc/builder
@@ -66,7 +58,7 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a abc -e $Err part
+$TEST_CHECK part -a abc -e $xstatus "$msg"
 
 exit($status)
 

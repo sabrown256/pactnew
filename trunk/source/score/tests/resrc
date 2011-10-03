@@ -10,11 +10,13 @@
 
 source ../../tests/common
 
-NoteD $LogF ""
-NoteD $LogF -n "                    SCORE Resource Test ......... "
-NoteD $LogF ""
+set msg = "SCORE Resource Test ........... "
+set exe = $BinDir/scrsts
+set rpf = none
 
-set UTime = `$TIMER -r`
+NoteD $LogF ""
+NoteD $LogF -n "                    $msg"
+NoteD $LogF ""
 
 flog $LogF pushd $SrcDir
 flog $LogF $MAKE resource
@@ -22,31 +24,17 @@ set xstatus = $status
 flog $LogF popd
 
 if ("$Valgrind" == "") then
-   ftee $LogF $CFE $BinDir/scrsts
+   ftee $LogF $CFE $exe
    set xstatus = $status
 else
-   ftee $LogF $Valgrind $BinDir/scrsts     |& \
-   grep "ERROR SUMMARY:"                   |& \
+   ftee $LogF $Valgrind $exe         |& \
+   grep "ERROR SUMMARY:"             |& \
    awk '{ print $4 }'   >&! $Tmp
    set xstatus = `cat $Tmp`
-   flog $LogF $RM $Tmp
+   set rpf     = ( $rpf $Tmp )
 endif
 
-set ETime = `$TIMER -b $UTime`
-
-if (($xstatus == 254) || ($xstatus == 255)) then
-   NoteD $LogF "                    SCORE Resource Test ......... OMITTED ($xstatus/$ETime)"
-else if ($xstatus != 0) then
-   NoteD $LogF "                    SCORE Resource Test ......... FAILED ($xstatus/$ETime)"
-   set Err = 1
-else
-   NoteD $LogF "                    SCORE Resource Test ......... PASSED ($ETime)"
-endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a resrc -e $Err part
+$TEST_CHECK part -a resrc -e $xstatus -x $exe -rpf "$rpf" "$msg"
 
 exit($status)
 

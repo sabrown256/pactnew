@@ -10,14 +10,16 @@
 
 source ../../tests/common
 
+set msg = "PDB SMP Parallel Test .............. "
+set rpf = "none"
+set exe = $BinDir/pdsmp
+
 set tst = $1
 
 if ("$Parallel" != "") then
    NoteD $LogF ""
-   NoteD $LogF -n "                    PDB SMP Parallel Test .............. "
+   NoteD $LogF -n "                    $msg"
    Note $LogF ""
-
-   set UTime = `$TIMER -r`
 
    flog $LogF pushd $SrcDir
    flog $LogF $MAKE smp
@@ -30,26 +32,15 @@ if ("$Parallel" != "") then
       NoteD $LogF "                    PDB SMP Parallel Test ......... FAILED (-1)"
       set Err = 1
    else
-      set UTime = `$TIMER -r`
       if ("$Valgrind" == "") then
-         flog $LogF $CFE $BinDir/pdsmp -v $tst -m 0
+         flog $LogF $CFE $exe -v $tst -m 0
          set xstatus = $status
       else
-         ftee $LogF $Valgrind $BinDir/pdsmp -v $tst -m 0  |& \
-         grep "ERROR SUMMARY:"                |& \
+         ftee $LogF $Valgrind $exe -v $tst -m 0  |& \
+         grep "ERROR SUMMARY:"                   |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-         flog $LogF $RM $Tmp
-      endif
-      set ETime   = `$TIMER -b $UTime`
-
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $LogF "OMITTED ($xstatus/$ETime)"
-      else if ($xstatus != 0) then
-         NoteD $LogF "FAILED ($xstatus/$ETime)"
-         set Err = 1
-      else
-         NoteD $LogF "PASSED ($ETime)"
+         set rpf     = ( $rpf $Tmp )
       endif
    endif
 endif
@@ -57,7 +48,7 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a smp -e $Err part
+$TEST_CHECK part -a smp -e $xstatus -x $exe -rpf "$rpf" none
 
 exit($status)
 

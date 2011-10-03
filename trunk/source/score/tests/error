@@ -10,11 +10,13 @@
 
 source ../../tests/common
 
-   NoteD $LogF ""
-   NoteD $LogF -n "                    SCORE Error Test ............ "
-   NoteD $LogF ""
+set msg = "SCORE Error Test .............. "
+set exe = $BinDir/scerts
+set rpf = none
 
-   set UTime = `$TIMER -r`
+   NoteD $LogF ""
+   NoteD $LogF -n "                    $msg"
+   NoteD $LogF ""
 
    flog $LogF pushd $SrcDir
    flog $LogF $MAKE error
@@ -22,31 +24,17 @@ source ../../tests/common
    flog $LogF popd
 
    if ("$Valgrind" == "") then
-      ftee $LogF $CFE $BinDir/scerts
+      ftee $LogF $CFE $exe
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $BinDirscerts  |& \
-      grep "ERROR SUMMARY:"               |& \
+      ftee $LogF $Valgrind $exe       |& \
+      grep "ERROR SUMMARY:"           |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $LogF $RM $Tmp
+      set rpf     = ( $rpf $Tmp )
    endif
 
-   set ETime = `$TIMER -b $UTime`
-
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "                    SCORE Error Test ............ OMITTED ($xstatus/$ETime)"
-   else if ($xstatus != 0) then
-      NoteD $LogF "                    SCORE Error Test ............ FAILED ($xstatus/$ETime)"
-      set Err = 1
-   else
-      NoteD $LogF "                    SCORE Error Test ............ PASSED ($ETime)"
-   endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a error -e $Err part
+$TEST_CHECK part -a error -e $xstatus -x $exe -rpf "$rpf" "$msg"
 
 exit($status)
 

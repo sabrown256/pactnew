@@ -12,24 +12,26 @@ unalias *
 
 source ../../tests/common
 
+set msg = "PDB Typedef Test ................... "
+set rpf = "none"
+set exe = $BinDir/pdtdts
+
 set tst = $1
 
 NoteD $LogF ""
-NoteD $LogF -n "                    PDB Typedef Test ................... "
+NoteD $LogF -n "                    $msg"
 Note $LogF ""
 
-set UTime = `$TIMER -r`
 if ("$Valgrind" == "") then
-   flog $LogF $CFE $BinDir/pdtdts -v $tst
+   flog $LogF $CFE $exe -v $tst
    set xstatus = $status
 else
-   ftee $LogF $Valgrind $BinDir/pdtdts -v $tst |& \
+   ftee $LogF $Valgrind $exe -v $tst           |& \
    grep "ERROR SUMMARY:"                       |& \
    awk '{ print $4 }'   >&! $Tmp
    set xstatus = `cat $Tmp`
-	 flog $LogF $RM $Tmp
+   set rpf     = ( $rpf $Tmp )
 endif
-set ETime   = `$TIMER -b $UTime`
 
 if (-f out.pdb) then
    flog $Log ls -l out.pdb
@@ -42,19 +44,11 @@ if (-f out.pdb) then
    endif
 endif
 
-if (($xstatus == 254) || ($xstatus == 255)) then
-   NoteD $LogF "OMITTED ($xstatus/$ETime)"
-else if ($xstatus != 0) then
-   NoteD $LogF "FAILED ($xstatus/$ETime)"
-   set Err = 1
-else
-   NoteD $LogF "PASSED ($ETime)"
-   flog $LogF rm -f out.pdb
-endif
+set rpf = ( $rpf out.pdb )
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a typdef -e $Err part
+$TEST_CHECK part -a typdef -e $xstatus -x $exe -rpf "$rpf" none
 
 exit($status)

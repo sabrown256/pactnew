@@ -16,8 +16,11 @@ source ../../tests/common
 
 #--------------------------------------------------------------------------
 
+   set msg = "ULTRA Master Test ............"
+   set rpf = "none"
+
    NoteD $Log ""
-   NoteD $Log -n "                    ULTRA Master Test ............ "
+   NoteD $Log -n "                    $msg "
    Note $Log ""
 
    set FAIL = "NO"
@@ -35,64 +38,37 @@ source ../../tests/common
       flog $Log $RM $Tmp
    endif
  
-   set ETime = `$TIMER -b $UTime`
-
    if ("$Valgrind" != "") then
-      if ($xstatus != 0) then
-         NoteD $Log "FAILED ($xstatus/$ETime)"
-         set Err = 1
-      else
-         NoteD $Log "PASSED ($ETime)"
-      endif
 
    else if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $Log "OMITTED ($xstatus/$ETime)"
 
-# any return status other than 0 is an error
+# any return status other than 0 is a crash
    else if ($xstatus != 0) then
-      NoteD $Log "CRASHED ($ETime)"
-      set FAIL = "CRASH"
-      set Err  = 1
+      set xstatus = 253
 
    else
       flog $Log (grep -i "error" ultest.tmp > ultest.err)
       flog $Log /bin/ls -l ultest.err
       if (-z ultest.err) then
-         flog $Log rm -f ultest.err
+         set rpf = ( ultest.err )
 
          awk '(($1 != "%%CreationDate:") && !(($4 ~ /..:..:../) && ($5 ~ /199[0-9]/))) {print}' ultest.ps > ultest.ps.tmp
          flog $Log mv ultest.ps.tmp ultest.ps
 
          flog $Log $cfe $PSDIFF ultest.ps $TDir/ref/ultest.ps
-         set DiffStat = $status
-         set ETime    = `$TIMER -b $UTime`
-
-         if ($DiffStat != 0) then
-            set FAIL = "DIFFER"
-         endif
-   
-         if ($FAIL == "NO") then
-            NoteD $Log "PASSED ($ETime)"
+         if ($status != 0) then
+            set xstatus = 252
          else
-            NoteD $Log "FAILED ($ETime)"
-      
-            if ($FAIL == "CRASH") then
-               NoteD $Log "                         Executable crashed"
-            else if ($FAIL == "DIFFER") then
-               NoteD $Log "                         PS files differ"
-            endif
-      
-            set Err = 1
+            set xstatus = 0
          endif
       else
-         NoteD $Log "FAILED ($ETime)"
-         set FAIL  = "YES"
+         set xstatus = 1
       endif
    endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a master -e $Err part
+$TEST_CHECK part -a master -e $xstatus -rpf "$rpf" none
 
 exit($status)

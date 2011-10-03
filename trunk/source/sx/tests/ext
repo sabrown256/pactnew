@@ -10,40 +10,27 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
+set msg = "SX Extension Test ............ "
+set exe = $BinDir/sx
+set rpf = 0
+@ nerr  = 0
 
-#                           SX EXTENSIONS TEST
-
-#--------------------------------------------------------------------------
+NoteD $Log ""
+NoteD $Log -n "                    $msg"
+Note $Log ""
 
    set ExtDir = ../../applications/extensions
    if ((-d $ExtDir) && (-x $ExtDir/do-test)) then
 
-      NoteD $Log ""
-      NoteD $Log -n "                    SX Extension Test ............ "
-      Note $Log ""
-
       flog $Log pushd $ExtDir
-      set UTime = `$TIMER -r`
       flog $Log ./do-test
       set xstatus = $status
-      set ETime   = `$TIMER -b $UTime`
       flog $Log popd
 
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $Log "OMITTED ($xstatus/$ETime)"
-      else if ($xstatus != 0) then
-         NoteD $Log "FAILED ($ETime)"
-         Note $Log "Check log.ext-test for more info"
-         set Err = 1
-      else
-         NoteD $Log "PASSED ($ETime)"
-      endif
+   else
+      set xstatus = 0
    endif
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a ext -e $Err part
+$TEST_CHECK part -a ext -e $xstatus -rpf "$rpf" none
 
 exit($status)

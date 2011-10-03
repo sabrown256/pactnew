@@ -10,8 +10,12 @@
 
 source ../../tests/common
 
+set msg = "SCORE API Test ....................."
+
+@ err = 0
+
 NoteD $LogF ""
-NoteD $LogF "                    SCORE API Test ..................... "
+NoteD $LogF "                    $msg"
 Note $LogF ""
 
 set UTime = `$TIMER -r`
@@ -26,40 +30,34 @@ set ETime   = `$TIMER -b $UTime`
 if ($TStatus != 0) then
    NoteD $LogF ""
    NoteD $LogF "                         ERROR Building SCORE API Tests"
-   set ERROR = TRUE
 else
-   set ERROR = FALSE
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
    NoteD $LogF -n "                        lexical scan ................... "
    Note $LogF ""
+
+   set exe = $BinDir/sclsts
+   set rpf = ""
+
    if ("$Valgrind" == "") then
-      $CFE $BinDir/sclsts $TDir/sclsts.src > sclsts.res
+      $CFE $exe $TDir/sclsts.src > sclsts.res
       set xstatus = $status
       diff sclsts.res $RefDir/sclsts > sclsts.res.diff
-      set Files = `find . -name "sclsts.res.diff" -size 0 -print`
    else
-      ftee $LogF $Valgrind $BinDir/sclsts $TDir/sclsts.src          |& \
+      ftee $LogF $Valgrind $exe $TDir/sclsts.src                    |& \
       grep "ERROR SUMMARY:"                                         |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $LogF $RM $Tmp
-      set Files = ( 1 )
+      set rpf     = ( $rpf $Tmp )
    endif
 
-   set ETime = `$TIMER -b $UTime`
+   set rpf = ( $rpf sclsts.res sclsts.res.diff )
 
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "omitted ($xstatus/$ETime)"
-   else if (($xstatus != 0) || ($#Files == 0)) then
-      NoteD $LogF "ng ($xstatus/$ETime)"
-      set ERROR = TRUE
-   else
-      NoteD $LogF "ok ($ETime)"
-      flog $LogF rm -f sclsts.res sclsts.res.diff
-   endif
+   $TEST_CHECK part -a score_lex -e $xstatus -x $exe -l -rpf "$rpf" none
+
+   @ err = $err + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -71,28 +69,28 @@ else
 
    NoteD $LogF -n "                        hash ........................... "
    Note $LogF ""
+
+   set exe = $BinDir/schtst
+   set rpf = ""
+
    if ("$Valgrind" == "") then
-      flog $LogF $CFE $BinDir/schtst
+      flog $LogF $CFE $exe
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $BinDir/schtst                     |& \
+      ftee $LogF $Valgrind $exe                               |& \
       grep "ERROR SUMMARY:"                                   |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $LogF $RM $Tmp
-      set Files = ( 1 )
+      set rpf = ( $rpf $Tmp )
    endif
 
-   set ETime = `$TIMER -b $UTime`
-
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "omitted ($xstatus/$ETime)"
-   else if (($xstatus != 0) || ($#Files == 0)) then
-      NoteD $LogF "ng ($xstatus/$ETime)"
-      set ERROR = TRUE
-   else
-      NoteD $LogF "ok ($ETime)"
+   if ("$rpf" == "") then
+      set rpf = none
    endif
+
+   $TEST_CHECK part -a score_hash -e $xstatus -x $exe -l -rpf "$rpf" none
+
+   @ err = $err + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -105,28 +103,29 @@ else
 
       NoteD $LogF -n "                        omp ............................ "
       Note $LogF ""
+
+      set exe = $BinDir/scompt
+      set rpf = ""
+
       if ("$Valgrind" == "") then
-         flog $LogF ( echo 2 | $CFE $BinDir/scompt )
+         flog $LogF ( echo 2 | $CFE $exe )
          set xstatus = $status
       else
-         ftee $LogF ( echo 2 | $Valgrind $BinDir/scompt          |& \
+         ftee $LogF ( echo 2 | $Valgrind $exe                    |& \
          grep "ERROR SUMMARY:"                                   |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-         flog $LogF $RM $Tmp
-         set Files = ( 1 )
+         set rpf     = ( $rpf $Tmp )
       endif
 
-      set ETime = `$TIMER -b $UTime`
-
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $LogF "omitted ($xstatus/$ETime)"
-      else if (($xstatus != 0) || ($#Files == 0)) then
-         NoteD $LogF "ng ($xstatus/$ETime)"
-         set ERROR = TRUE
-      else
-         NoteD $LogF "ok ($ETime)"
+      if ("$rpf" == "") then
+         set rpf = none
       endif
+
+      $TEST_CHECK part -a score_omp -e $xstatus -x $exe -l -rpf "$rpf" none
+
+      @ err = $err + $status
+
    endif
 
 #--------------------------------------------------------------------------
@@ -134,14 +133,7 @@ else
 
 endif
 
-if ($ERROR == TRUE) then
-   NoteD $LogF "                    SCORE API Test ..................... FAILED ($xstatus/$ETime)"
-   set Err = 1
-else
-   NoteD $LogF "                    SCORE API Test ..................... PASSED ($ETime)"
-endif
-
-$TEST_CHECK -a score -e $Err part
+$TEST_CHECK part -a score -e $err "$msg"
 
 exit($status)
 

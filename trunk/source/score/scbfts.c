@@ -76,7 +76,7 @@ static int test_1(void)
     CFREE(iv);
 
     st = (ni == 123);
-    io_printf(stdout, "\t\t\twrite seq ............... %s\n",
+    io_printf(stdout, "\t\t\twrite seq ................. %s\n",
 	      (st == TRUE) ? "ok" : "ng");
 
     cs = SC_mem_monitor(cs, dbg, "T1", msg);
@@ -155,7 +155,7 @@ static int test_2(void)
     for (i = 0; i < ni; i++)
         st &= (iv[i] == i+1);
 
-    io_printf(stdout, "\t\t\tread seq ................ %s\n",
+    io_printf(stdout, "\t\t\tread seq .................. %s\n",
 	      (st == TRUE) ? "ok" : "ng");
 
     CFREE(iv);
@@ -208,7 +208,7 @@ static int test_3(void)
     CFREE(iv);
 
     st = (ni == nu*nw);
-    io_printf(stdout, "\t\t\twrite rnd ............... %s\n",
+    io_printf(stdout, "\t\t\twrite rnd ................. %s\n",
 	      (st == TRUE) ? "ok" : "ng");
 
     cs = SC_mem_monitor(cs, dbg, "T3", msg);
@@ -263,7 +263,7 @@ static int test_4(void)
 
     CFREE(iv);
 
-    io_printf(stdout, "\t\t\tread rnd ................ %s\n",
+    io_printf(stdout, "\t\t\tread rnd .................. %s\n",
 	      (st == TRUE) ? "ok" : "ng");
 
     cs = SC_mem_monitor(cs, dbg, "T4", msg);
@@ -324,7 +324,7 @@ static int test_5(void)
 
     CFREE(iv);
 
-    io_printf(stdout, "\t\t\tread bck ................ %s\n",
+    io_printf(stdout, "\t\t\tread bck .................. %s\n",
 	      (st == TRUE) ? "ok" : "ng");
 
     cs = SC_mem_monitor(cs, dbg, "T5", msg);

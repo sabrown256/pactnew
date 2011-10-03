@@ -32,7 +32,7 @@ int do_test(char *tst)
     char *p, *t;
     FILE *fp;
 
-    printf("                       %-7s ", tst);
+    printf("                       %-7s ..", tst);
     rv = TRUE;
 
     fp = io_open("sciots.txt", "w");
@@ -98,9 +98,9 @@ int do_test(char *tst)
     CHECK(st == 0);
 
     if (rv == TRUE)
-       printf(" OK\n");
+       printf(" ok\n");
     else
-       printf(" NG\n");
+       printf(" ng\n");
 
     return(rv);}
 

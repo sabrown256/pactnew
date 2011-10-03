@@ -256,7 +256,7 @@ static int _SC_mem_block_inf(SC_heap_des *ph, mem_descriptor *md,
 
 /* _SC_N_BLOCKS - return the number of blocks contained in PH */
 
-static int _SC_n_blocks(SC_heap_des *ph, int flag)
+int _SC_n_blocks(SC_heap_des *ph, int flag)
    {int i, n, nmj;
     long nt, ntc, ntx;
     major_block_des *mbl;

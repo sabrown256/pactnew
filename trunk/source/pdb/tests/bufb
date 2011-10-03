@@ -10,29 +10,29 @@
 
 source ../../tests/common
 
+set msg = "PDB Buffer Test B .................. "
+set rpf = "none"
+set exe = $BinDir/pdbtst
+
 set STRACE = ( `which strace` )
 if ("$Valgrind" == "") then
 
    set tst = $1
 
    NoteD $LogF ""
-   NoteD $LogF "                    PDB Buffer Test B .................. "
+   NoteD $LogF "                    $msg"
    Note $LogF ""
-
-   set Exe = `which pdbtst`
-
-   set UTime = `$TIMER -r`
 
 # scan prime number buffer sizes
    @ lerr = 0
 
    foreach n ( 3 13 127 4093 32749 )
       set fill = `fill-string -n 32 $n`
-      flog $LogF $CFE pdbtst -n -b $n
+      flog $LogF $CFE $exe -n -b $n
 
 #   foreach n ( 13 127 4093 32749 )
 #      set fill = `fill-string -n 32 $n`
-#      flog $LogF $CFE pdbtst -n -b $n -v $tst
+#      flog $LogF $CFE $exe -n -b $n -v $tst
 
       set xstatus = $status
       if (($xstatus == 254) || ($xstatus == 255)) then
@@ -44,21 +44,11 @@ if ("$Valgrind" == "") then
          @ lerr = $lerr + 1
       endif
    end
-   set ETime   = `$TIMER -b $UTime`
-
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "                    PDB Buffer Test B .................. OMITTED ($xstatus/$ETime)"
-   else if ($lerr != 0) then
-      NoteD $LogF "                    PDB Buffer Test B .................. FAILED ($xstatus/$ETime)"
-      set Err = 1
-   else
-      NoteD $LogF "                    PDB Buffer Test B .................. PASSED ($ETime)"
-   endif
 endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a bufb -e $Err part
+$TEST_CHECK part -a bufb -e $xstatus -x $exe "$msg"
 
 exit($status)

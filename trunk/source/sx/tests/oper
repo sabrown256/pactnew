@@ -10,47 +10,36 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           OPER TEST
-
-#--------------------------------------------------------------------------
+set msg = "SX OPER Test ................. "
+set exe = $BinDir/sx
+set rpf = 0
+@ nerr  = 0
 
    if ("$MPI" == "") then
       NoteD $Log ""
-      NoteD $Log -n "                    SX OPER Test ................. "
+      NoteD $Log -n "                    $msg"
       Note $Log ""
 
       flog $Log rm -f sxoper.res
 
-      set UTime = `$TIMER -r`
+      set opt = ( -l $RootDir/sx/tests/sxoper.scm )
       if ("$Valgrind" == "") then
-         flog $Log ($PDBView -l $RootDir/sx/tests/sxoper.scm > sxoper.res)
+         flog $Log ($PDBView $opt > sxoper.res)
          set xstatus = $status
       else
-         ftee $Log $Valgrind $BinDir/sx -e -p -q -l $RootDir/sx/tests/sxoper.scm |& \
-         grep "ERROR SUMMARY:"                                                   |& \
+         ftee $Log $Valgrind $exe -e -p -q $opt     |& \
+         grep "ERROR SUMMARY:"                      |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-         flog $Log $RM $Tmp
+         set rpf     = ( $rpf $Tmp )
       endif
 
-      set ETime = `$TIMER -b $UTime`
+      set rpf = ( $rpf sxoper.res arr.dat sxoper*.ps )
 
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $LogF "OMITTED ($xstatus/$ETime)"
-      else if ($xstatus != 0) then
-         NoteD $Log "FAILED ($xstatus/$ETime)"
-         set Err = 1
-      else
-         flog $Log rm -f sxoper.res arr.dat sxoper*.ps
-         NoteD $Log "PASSED ($ETime)"
-      endif
+   else
+      set xstatus = 0
    endif
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a oper -e $Err part
+$TEST_CHECK part -a oper -e $xstatus -rpf "$rpf" none
 
 exit($status)

@@ -10,45 +10,32 @@
 
 source ../../tests/common
 
-NoteD $LogF ""
-NoteD $LogF "                    SCORE Smart Array Test ...... "
+set msg = "SCORE Smart Array Test ........ "
+set exe = $BinDir/scarts
+set rpf = none
 
-set UTime = `$TIMER -r`
+NoteD $LogF ""
+NoteD $LogF "                    $msg"
+
 flog $LogF pushd $SrcDir
 flog $LogF $MAKE compre
 set xstatus = $status
 flog $LogF popd
 
 if ($xstatus == 0) then
-
    if ("$Valgrind" == "") then
-      ftee $LogF $CFE $BinDir/scarts
+      ftee $LogF $CFE $exe
       set xstatus = $status
    else
-      ftee $LogF $Valgrind scarts          |& \
-      grep "ERROR SUMMARY:"                |& \
+      ftee $LogF $Valgrind $exe          |& \
+      grep "ERROR SUMMARY:"              |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $LogF $RM $Tmp
+      set rpf     = ( $rpf $Tmp )
    endif
-
 endif
 
-set ETime   = `$TIMER -b $UTime`
-
-if (($xstatus == 254) || ($xstatus == 255)) then
-   NoteD $LogF "                    SCORE Smart Array Test ...... OMITTED ($ETime)"
-else if ($xstatus != 0) then
-   NoteD $LogF "                    SCORE Smart Array Test ...... FAILED ($ETime)"
-   set Err = 1
-else
-   NoteD $LogF "                    SCORE Smart Array Test ...... PASSED ($ETime)"
-endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a array -e $Err part
+$TEST_CHECK part -a array -e $xstatus -x $exe -rpf "$rpf" "$msg"
 
 exit($status)
 

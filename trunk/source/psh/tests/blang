@@ -8,23 +8,10 @@
 # include "cpyright.h"
 #
 
-set Package = psh
-if (-f test-env) then
-   source test-env
-   pushd $TestDir >& /dev/null
-else if ($?Log == 1) then
-   if (-f $Log) then
-      mv $Log $Log.tmp
-      source ../../../scripts/test-env
-      mv $Log.tmp $Log
-   else
-      source ../../../scripts/test-env
-   endif
-else
-   source ../../../scripts/test-env
-endif
+source ../../tests/common
 
-source $IncDir/env-pact.csh
+set msg = "BLANG Test ..................... "
+set rpf = none
 
 while ($#argv > 0)
    switch ($1)
@@ -51,14 +38,14 @@ NoteD $Log ""
 
 # omit tests - usually in difficult CROSS_COMPILE situation
 if ($RUN_TESTS == FALSE) then
-   NoteD $Log "                    BLANG Test ..................... omitted"
+   NoteD $Log "                    ${msg}omitted"
    NoteD $Log ""
 
 else
 
    set BTime = `$TIMER -r`
 
-   NoteD $Log "                    BLANG Test ..................... "
+   NoteD $Log "                    $msg"
    Note $Log ""
 
    set TstDir = $SrcDir/tests
@@ -237,22 +224,14 @@ else
 
    Separator $Log
 
-   set ETime = `$TIMER -b $BTime`
-
-   if ($nerr != 0) then
-      NoteD $Log "                    BLANG Test ..................... FAILED ($lerr/$ETime)"
-      @ Err = 1
-   else
-      NoteD $Log "                    BLANG Test ..................... PASSED ($ETime)"
-      flog $Log rm -f *.o *.mod
-   endif
+   set rpf = ( $rpf *.o *.mod )
 
 endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a blang -e $Err part
+$TEST_CHECK part -a blang -e $nerr -rpf "$rpf" "$msg"
 
 exit($status)
 

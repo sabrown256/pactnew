@@ -10,20 +10,16 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           MEMORY TESTS
-
-#--------------------------------------------------------------------------
+set msg = "SCHEME Memory Test ........... "
+set rpf = none
 
    NoteD $Log ""
-   NoteD $Log -n "                    SCHEME Memory Test ........... "
+   NoteD $Log -n "                    $mem"
    Note $Log ""
 
    flog $Log pwd
    flog $Log cp $FilesDir/mmtst.scm .
 
-   set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then
       flog $Log $cfe $BinDir/scheme -e -l $FilesDir/mmtst.scm
       set xstatus = $status
@@ -32,23 +28,14 @@ source ../../tests/common
       grep "ERROR SUMMARY:"                                         |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $Log $RM $Tmp
+      set rpf     = ( $rpf $Tmp )
    endif
-   set ETime = `$TIMER -b $UTime`
 
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "OMITTED ($xstatus/$ETime)"
-   else if ($xstatus != 0) then
-      NoteD $Log "FAILED ($xstatus/$ETime)"
-      set Err = 1
-   else
-      flog $Log rm -f '#tmp#' mmtst.scm
-      NoteD $Log "PASSED ($ETime)"
-   endif
+   set rpf = ( $rpf '#tmp#' mmtst.scm )
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a mem -e $Err part
+$TEST_CHECK part -a mem -e $xstatus -rpf "$rpf" "$msg"
 
 exit($status)

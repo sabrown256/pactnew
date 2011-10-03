@@ -10,70 +10,45 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                                XML TEST
-
-#--------------------------------------------------------------------------
+set msg = "SX PDB XML Test .............. "
+set exe = $BinDir/sx
+set rpf = none
+@ nerr  = 0
 
    NoteD $Log ""
-   NoteD $Log -n "                    SX PDB XML Test .............. "
+   NoteD $Log -n "                    $msg"
    Note $Log ""
+
+   set Ref = $RootDir/sx/tests/ref/sxxml
 
    flog $Log rm -f sxxml.log sxxml.res foo.xml
 
    flog $Log cp $TDir/txml* .
 
-   set UTime = `$TIMER -r`
+   set opt = ( -l $RootDir/sx/tests/sxxml.scm )
    if ("$Valgrind" == "") then
-      flog $Log ($PDBView -l $RootDir/sx/tests/sxxml.scm >& sxxml.res)
+      flog $Log ($PDBView $opt >& sxxml.res)
       set xstatus = $status
+      if ($xstatus == 0) then
+         if (-f $Ref) then
+            flog $Log diff sxxml.res $Ref
+            set xstatus = $status
+         else
+            flog $Log cp sxxml.res $Ref
+         endif
+      endif
    else
-      ftee $Log $Valgrind $BinDir/sx -e -p -q -l $RootDir/sx/tests/sxxml.scm |& \
-      grep "ERROR SUMMARY:"                                                  |& \
+      ftee $Log $Valgrind $exe -e -p -q $opt     |& \
+      grep "ERROR SUMMARY:"                      |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $Log $RM $Tmp
+      set rpf     = ( $rpf $Tmp )
    endif
 
-   set Ref   = $RootDir/sx/tests/ref/sxxml
-   set ETime = `$TIMER -b $UTime`
+   flog $Log touch foo.sxxml sxxml.foo
+   set rpf = ( $rpf sxxml.* *.sxxml )
 
-   if ("$Valgrind" != "") then
-      if ($xstatus != 0) then
-         NoteD $Log "FAILED ($xstatus/$ETime)"
-         set xstatus = 2
-      else
-         NoteD $Log "PASSED ($ETime)"
-      endif
-   else if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $Log "OMITTED ($xstatus/$ETime)"
-      set xstatus = 0
-   else if ($xstatus != 0) then
-      NoteD $Log "CRASHED ($xstatus/$ETime)"
-      set xstatus = 2
-   else if (-f $Ref) then
-      flog $Log diff sxxml.res $Ref
-      set xstatus = $status
-   else
-      flog $Log cp sxxml.res $Ref
-   endif
-
-   if ($xstatus == 2) then
-      set Err = 1
-   else if ($xstatus != 0) then
-      NoteD $Log "FAILED ($ETime)"
-      set Err = 1
-   else
-      NoteD $Log "PASSED ($ETime)"
-      flog $Log touch foo.sxxml sxxml.foo
-      flog $Log rm -f sxxml.* *.sxxml
-   endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a xml -e $Err part
+$TEST_CHECK part -a xml -e $xstatus -rpf "$rpf" none
 
 exit($status)
 

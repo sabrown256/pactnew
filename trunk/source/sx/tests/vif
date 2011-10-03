@@ -10,54 +10,39 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           PDB VIF TEST
-
-#--------------------------------------------------------------------------
+set msg = "SX PDB VIF Test .............. "
+set exe = $BinDir/sx
+set rpf = none
+@ nerr  = 0
 
    set sys = `uname -m`
 
    if (("$sys[1]" != "CRAY") && ("$MPI" == "")) then
       NoteD $Log ""
-      NoteD $Log -n "                    SX PDB VIF Test .............. "
+      NoteD $Log -n "                    $msg"
       Note $Log ""
 
-      set UTime = `$TIMER -r`
+      set opt = ( -l $RootDir/sx/tests/sxpdbi.scm )
       if ("$Valgrind" == "") then
-         flog $Log ($PDBView -l $RootDir/sx/tests/sxpdbi.scm > sxpdbi.res)
+         flog $Log ($PDBView $opt > sxpdbi.res)
          set xstatus = $status
          if ($xstatus == 0) then
             flog $Log (diff sxpdbi.res $RootDir/sx/tests/ref/sxpdbi > sxpdbi.res.diff)
             set xstatus = $status
-         endif
-      else
-         ftee $Log $Valgrind $BinDir/sx -e -r -s -l $RootDir/sx/tests/sxpdbi.scm |& \
-         grep "ERROR SUMMARY:"                                                   |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         flog $Log $RM $Tmp
-      endif
-
-      set ETime = `$TIMER -b $UTime`
-
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $LogF "OMITTED ($xstatus/$ETime)"
-      else if ($xstatus != 0) then
-         if ("$Valgrind" == "") then
+         else
             flog $Log cp sxpdbi.res sxpdbi.res.crash
          endif
-         NoteD $Log "FAILED ($xstatus/$ETime)"
-         set Err = 1
       else
-         NoteD $Log "PASSED ($ETime)"
-         flog $Log rm -f sxpdbi.res sxpdbi.res.diff
+         ftee $Log $Valgrind $exe -e -r -s $opt     |& \
+         grep "ERROR SUMMARY:"                      |& \
+         awk '{ print $4 }'   >&! $Tmp
+         set xstatus = `cat $Tmp`
+         set rpf     = ( $rpf $Tmp )
       endif
+
+      set rpf = ( $rpf sxpdbi.res sxpdbi.res.diff )
    endif
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a vif -e $Err part
+$TEST_CHECK part -a vif -e $xstatus -rpf "$rpf" none
 
 exit($status)

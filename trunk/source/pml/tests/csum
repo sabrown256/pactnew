@@ -10,14 +10,12 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           PML CHECKSUM TEST
-
-#--------------------------------------------------------------------------
+set msg = "PML Checksum Test ...... "
+set rpf = "none"
+set exe = $BinDir/mlckts
 
    NoteD $Log ""
-   NoteD $Log -n "                    PML Checksum Test ...... "
+   NoteD $Log -n "                    $msg"
 
    set FAIL = ok
 
@@ -36,43 +34,20 @@ source ../../tests/common
       set FAIL    = build
    else
       if ("$Valgrind" == "") then
-         flog $Log ($CFE $BinDir/mlckts $RootDir/pml/mlcmsh.c >&! checksum.res)
+         flog $Log ($CFE $exe $RootDir/pml/mlcmsh.c >&! checksum.res)
          set xstatus = $status
       else
-         flog $Log $Valgrind $BinDir/mlckts $RootDir/pml/mlcmsh.c
+         flog $Log $Valgrind $exe $RootDir/pml/mlcmsh.c
          set xstatus = $status
-      endif
-      if ($xstatus != 0) then
-         NoteD $Log ""
-         NoteD $Log "                         Error in Checksum Test Program"
-         set FAIL = ng
       endif
 
       if ((-f $Ref) && ("$Valgrind" == "") && ($xstatus == 0)) then
          flog $Log (diff checksum.res $Ref >&! checksum.diff)
          set xstatus = $status
-         if ($xstatus != 0) then
-            set FAIL = differ
-         endif
       endif
-
    endif
 
-   set ETime = `$TIMER -b $UTime`
-
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $Log "OMITTED ($xstatus/$ETime)"
-   else if ($xstatus != 0) then
-      NoteD $Log "FAILED ($xstatus/$ETime)"
-      @ Err = 1
-   else
-      NoteD $Log "PASSED ($ETime)"
-   endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a csum -e $Err part
+$TEST_CHECK part -a csum -e $xstatus -x $exe none
 
 exit($status)
 

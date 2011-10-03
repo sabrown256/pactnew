@@ -101,7 +101,7 @@ else if (-e $BinDir/ultra) then
 
    set rpf = ( ultest.ps ultest.log ultest.pdb.chk ulmmt.log ulfft.log )
 
-   $TEST_CHECK -n ULTRA -e $ERROR -raf "$Tmp" -rpf "$rpf" clean
+   $TEST_CHECK clean -n ULTRA -e $ERROR -raf "$Tmp" -rpf "$rpf"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -111,6 +111,6 @@ else
    NoteD $Log "$BinDir/ultra does not exist"
 endif
 
-$TEST_CHECK -e $ERROR fin
+$TEST_CHECK fin -e $ERROR
 
 exit($status)

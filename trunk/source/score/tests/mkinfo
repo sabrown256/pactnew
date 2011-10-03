@@ -10,13 +10,16 @@
 
 source ../../tests/common
 
+set msg = "SCORE Make Info Test .......... "
+set rpf = none
+@ nerr  = 0
+
 set ok = TRUE
 if ($ok == TRUE) then
    NoteD $LogF ""
-   NoteD $LogF -n "                    SCORE Make Info Test ........ "
+   NoteD $LogF -n "                    $msg"
    NoteD $LogF ""
 
-   set UTime = `$TIMER -r`
    flog $LogF pushd $SrcDir/tests
 
    set vars = ""
@@ -38,7 +41,8 @@ if ($ok == TRUE) then
 
    foreach m (smake dmake)
       Separator $LogF
-      NoteD $LogF -n "                       $m ......... "
+      set f = ( `fill-string -n 28 $m` )
+      NoteD $LogF -n "                       $f "
       Note $LogF ""
       @ lerr = 0
       foreach v ($vars)
@@ -54,25 +58,18 @@ if ($ok == TRUE) then
          NoteD $LogF "ok"
       else
          NoteD $LogF "ng"
-         @ Err = $Err + 1
+         @ nerr = $nerr + 1
       endif
    end
 
    flog $LogF popd
 
-   set ETime = `$TIMER -b $UTime`
-
-   if ($Err != 0) then
-      NoteD $LogF "                    SCORE Make Info Test ........ FAILED ($ETime)"
-   else
-      NoteD $LogF "                    SCORE Make Info Test ........ PASSED ($ETime)"
-   endif
 endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a mkinfo -e $Err part
+$TEST_CHECK part -a mkinfo -e $nerr -rpf "$rpf" "$msg"
 
 exit($status)
 

@@ -93,13 +93,13 @@ else if (-e $RootDir/score/scstd.h) then
 
 # CLEAN UP - we are all done now
 
-   $TEST_CHECK -n SCORE -e $ERROR -raf "$Tmp" clean
+   $TEST_CHECK clean -n SCORE -e $ERROR -raf "$Tmp"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 endif
 
-$TEST_CHECK -e $ERROR fin
+$TEST_CHECK fin -e $ERROR
 
 exit($status)

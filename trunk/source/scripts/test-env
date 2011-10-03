@@ -176,6 +176,8 @@ if (!(-d $TestDir)) then
   mkdir -p $TestDir
 endif
 
+setenv rm_cache ""
+
 InitLog Log $TestDir/log.$TLog.$LogSfx
 
 set ERROR  = "FALSE"

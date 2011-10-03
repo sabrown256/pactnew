@@ -9,19 +9,10 @@
 # include "cpyright.h"
 #
 
-set Package = psh
-if ($?Log == 0) then
-   if (-f test-env) then
-      source test-env
-      pushd $TestDir >& /dev/null
-   else
-      mv $Log $Log.tmp
-      source ../../../scripts/test-env
-      mv $Log.tmp $Log
-   endif
-else
-   source ../../../scripts/env-csh
-endif
+source ../../tests/common
+
+set msg = "DO-RUN Test .................... "
+set rpf = none
 
 set DORUN = do-run
 
@@ -51,7 +42,7 @@ InitLog Log $TestDir/log.dorun.$LogSfx
    set BTime = `$TIMER -r`
 
    NoteD $Log ""
-   NoteD $Log "                    DO-RUN Test ...................."
+   NoteD $Log "                    $msg"
 
    set List = (s1t1 s1t2 s2t1 s3t1 s4t1 s5t1 s6t1)
    set lErr = 0
@@ -98,21 +89,11 @@ InitLog Log $TestDir/log.dorun.$LogSfx
       endif
    end
 
-   set ETime = `$TIMER -b $BTime`
-
-   if ($lErr != 0) then
-      NoteD $Log "                    DO-RUN Test .................... FAILED ($lErr/$ETime)"
-      @ Err = $Err + 1
-   else
-      NoteD $Log "                    DO-RUN Test .................... PASSED ($ETime)"
-      flog $Log rm -f run.* s*
-   endif
-
-NoteD $Log ""
+   set rpf = ( $rpf run.* s* )
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a dorun -e $Err part
+$TEST_CHECK part -a dorun -e $Err -rpf "$rpf" "$msg"
 
 exit($status)

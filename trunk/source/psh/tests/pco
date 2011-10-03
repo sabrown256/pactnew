@@ -8,13 +8,10 @@
 # include "cpyright.h"
 #
 
-set Package = psh
-if (-f test-env) then
-   source test-env
-   pushd $TestDir >& /dev/null
-else
-   source ../../../scripts/test-env
-endif
+source ../../tests/common
+
+set msg = "PCO Test ....................... "
+set rpf = none
 
 while ($#argv > 0)
    switch ($1)
@@ -32,9 +29,8 @@ end
 
 @ Err = 0
 
-
 NoteD $Log ""
-NoteD $Log -n "                    PCO Test ....................... "
+NoteD $Log -n "                    $msg"
 Note $Log ""
 
 set BTime = `$TIMER -r`
@@ -46,18 +42,10 @@ flog $Log pushd ../../../manager
 set xstatus = $status
 flog $Log popd
 
-set ETime = `$TIMER -b $BTime`
-if ($xstatus == 0) then
-   NoteD $Log "PASSED ($ETime)"
-else
-   NoteD $Log "FAILED ($xstatus/$ETime)"
-   set ERROR = "TRUE"
-endif
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a pco -e $Err part
+$TEST_CHECK part -a pco -e $xstatus -rpf "$rpf" none
 
 exit($status)
 

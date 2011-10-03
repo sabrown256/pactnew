@@ -8,13 +8,10 @@
 # include "cpyright.h"
 #
 
-set Package = psh
-if (-f test-env) then
-   source test-env
-   pushd $TestDir >& /dev/null
-else
-   source ../../../scripts/test-env
-endif
+source ../../tests/common
+
+set msg = "REGX Test ...................... "
+set rpf = none
 
 while ($#argv > 0)
    switch ($1)
@@ -34,7 +31,7 @@ end
 
 
 NoteD $Log ""
-NoteD $Log -n "                    REGX Test ...................... "
+NoteD $Log -n "                    $msg"
 Note $Log ""
 
 set BTime = `$TIMER -r`
@@ -56,19 +53,11 @@ else
    set xstatus = $status
 endif
 
-flog $Log rm mats
-
-set ETime = `$TIMER -b $BTime`
-if ($xstatus == 0) then
-   NoteD $Log "PASSED ($ETime)"
-else
-   NoteD $Log "FAILED ($xstatus/$ETime)"
-   set ERROR = "TRUE"
-endif
+flog $Log set rpf = ( $rpf mats )
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a regx -e $Err part
+$TEST_CHECK part -a regx -e $xstatus -rpf "$rpf" none
 
 exit($status)

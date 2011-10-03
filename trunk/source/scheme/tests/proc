@@ -10,6 +10,10 @@
 
 source ../../tests/common
 
+set msg = "SCHEME Proc Test ............. "
+set rpf = none
+set exe = $BinDir/scheme
+
 #--------------------------------------------------------------------------
 
 #                           PROCESS TESTS
@@ -18,44 +22,25 @@ source ../../tests/common
 
    if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
       NoteD $Log ""
-      NoteD $Log -n "                    SCHEME Proc Test ............. "
+      NoteD $Log -n "                    $msg"
       Note $Log ""
 
-      set UTime = `$TIMER -r`
       if ("$Valgrind" == "") then
-         $CFE $BinDir/scheme -e -l $FilesDir/shproc.scm >! shproc.res
+         $CFE $exe -e -l $FilesDir/shproc.scm >! shproc.res
          set xstatus = $status
       else
-         ftee $Log $Valgrind $BinDir/scheme -e -l $FilesDir/shproc.scm |& \
-         grep "ERROR SUMMARY:"                                         |& \
+         ftee $Log $Valgrind $exe -e -l $FilesDir/shproc.scm     |& \
+         grep "ERROR SUMMARY:"                                   |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-         flog $Log $RM $Tmp
+         set rpf     = ( $rpf $Tmp )
       endif
-      set ETime = `$TIMER -b $UTime`
 
-# NOTE: you really cannot compare the results
-#       make it a crash test
-#      diff shproc.res $FilesDir/ref/shproc >! shproc.res.diff
-#      set Files = `find . -name "shproc.res.diff" -size 4c -print`
-#      if (($xstatus != 0) || ($#Files != 0)) then
-#         flog $Log cat shproc.res
-#         flog $Log cat shproc.res.diff
-
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $LogF "OMITTED ($xstatus/$ETime)"
-      else if ($xstatus != 0) then
-         NoteD $Log "FAILED ($xstatus/$ETime)"
-         set Err = 1
-      else
-         NoteD $Log "PASSED ($ETime)"
-         flog $Log rm -f shproc.res shproc.res.diff
-      endif
+      set rpf = ( $rpf shproc.res shproc.res.diff )
+   else
+      set xstatus = 0
    endif
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a proc -e $Err part
+$TEST_CHECK part -a proc -e $xstatus -rpf "$rpf" none
 
 exit($status)

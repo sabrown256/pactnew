@@ -24,13 +24,15 @@ if ($CROSS_COMPILE == FALSE) then
    NoteD $LogF -n "                    $fill "
    Note $LogF ""
 
+   @ err = 0
+
    set UTime = `$TIMER -r`
    flog $LogF cp $SrcDir/tests/$tst.c .
 
    scc $opt -c $tst.c >&! $tst.res
    set xstatus = $status
    if ($xstatus != 0) then
-      set err = crashed
+      @ err = 253
    endif
 
 # for tests with fiducial results
@@ -38,7 +40,7 @@ if ($CROSS_COMPILE == FALSE) then
       flog $Log diff $tst.res $refdir/$tst
       set xstatus = $status
       if ($xstatus != 0) then
-         flog $Log set err = differed
+         flog $Log @ err = 252
          flog $Log cat $tst.res
       endif
 
@@ -47,18 +49,14 @@ if ($CROSS_COMPILE == FALSE) then
       flog $Log grep "Memory Map" $tst.res
       set xstatus = $status
       if ($xstatus == 0) then
-         set err = leaked
+         @ err = 250
       endif
    endif
 
-   set ETime   = `$TIMER -b $UTime`
+   set ETime = `$TIMER -b $UTime`
 
-   if ($err == ok) then
-      NoteD $LogF "$err ($ETime)"
-   else
-      NoteD $LogF "$err ($ETime)"
-      set Err = 1
-   endif
+   $TEST_CHECK part -a scc_$tst -e $err -l -dt $ETime none
+
 endif
 
 exit($Err)

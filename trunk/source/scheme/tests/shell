@@ -10,6 +10,11 @@
 
 source ../../tests/common
 
+set msg = "SCHEME Shell Test ............ "
+set rpf = none
+set exe = $BinDir/scheme
+@ nerr  = 0
+
 #--------------------------------------------------------------------------
 
 #                           SHELL TESTS
@@ -18,7 +23,10 @@ source ../../tests/common
 
    if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
       NoteD $Log ""
-      NoteD $Log "                    SCHEME Shell Test"
+      NoteD $Log "                    $msg"
+
+# env test
+      NoteD $Log -n "                       env ....................... "
 
       set UTime = `$TIMER -r`
       $CFE $FilesDir/shenv.scm >&! shenv.res
@@ -32,13 +40,15 @@ source ../../tests/common
          flog $Log cat shenv.res.diff
          set xstatus = 1
       endif
-      if ($xstatus != 0) then
-         NoteD $Log "                       env ....................... FAILED ($xstatus/$ETime)"
-         set Err = 1
-      else
-         NoteD $Log "                       env ....................... PASSED ($ETime)"
-         flog $Log rm -f shenv.res shenv.res.diff
-      endif
+
+      set rpf = ( shenv.res* )
+
+      $TEST_CHECK part -a shell_env -e $xstatus -l -dt $ETime -rpf "$rpf" none
+
+      @ nerr = $nerr + $status
+
+# argv test
+      NoteD $Log -n "                       argv ...................... "
 
       set UTime = `$TIMER -r`
       $CFE $FilesDir/shexe.scm a 1 2.3 '"abc"' >&! shexe.res
@@ -52,19 +62,18 @@ source ../../tests/common
          flog $Log cat shexe.res.diff
          set xstatus = 1
       endif
-      if ($xstatus != 0) then
-         NoteD $Log "                       argv ...................... FAILED ($xstatus/$ETime)"
-         set Err = 1
-      else
-         NoteD $Log "                       argv ...................... PASSED ($ETime)"
-         flog $Log rm -f shexe.res shexe.res.diff
-      endif
+
+      set rpf = ( shexe.res* )
+
+      $TEST_CHECK part -a shell_argv -e $xstatus -l -dt $ETime -rpf "$rpf" none
+
+      @ nerr = $nerr + $status
 
    endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a shell -e $Err part
+$TEST_CHECK part -a shell -e $nerr "$msg"
 
 exit($status)

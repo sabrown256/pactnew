@@ -62,34 +62,32 @@ static void test_target(char *base, int n, char *fname, char *datfile)
 /* SHOW_STAT - show the resource stats */
 
 static void show_stat(statedes *st, char *tag, int na)
-   {int64_t nba, nbf, dna, dnf;
-    double time, dt, dnb, sz, dsz;
-    SC_rusedes ru;
+   {int64_t nba, nbf, dna, dnf, sz, ov;
+    double time, dt, dnb, dsz;
     static int first = TRUE;
 
-    SC_mem_stats(&nba, &nbf, NULL, NULL);
-    SC_resource_usage(&ru, -1);
-    sz   = ru.maxrss;
+    SC_mem_statr(&nba, &nbf, NULL, NULL, &sz, &ov);
     time = SC_wall_clock_time();
 
     if (first == TRUE)
        {first = FALSE;
 	PRINT(STDOUT, "\n");
-	PRINT(STDOUT, "\t\t                                 Memory              Time\n");
-	PRINT(STDOUT, "\t\t                                (kBytes)            (secs)\n");
-	PRINT(STDOUT, "\t\tMeasured   Na        Ni   Allocated   Resource\n");};
+	PRINT(STDOUT, "\t                                  Memory               Time\n");
+	PRINT(STDOUT, "\tMeasured   Na        Ni   Allocated   Res  Over\n");
+	PRINT(STDOUT, "\t                           (kBytes)                  (secs)\n");
+};
 
     if (tag != NULL)
        {dna   = nba  - st->nba0;
 	dnf   = nbf  - st->nbf0;
 	dnb   = 1.0e-3*(dna - dnf);
-	dsz   = sz   - st->sz0;
+	dsz   = 1.0e-3*(sz  - st->sz0);
 	dt    = time - st->time0;
 
 /* memory in kBytes */
 	PRINT(STDOUT,
-	      "\t\t%-3s  %8d  %8d  %10.2e %9.0f%%      %.2g\n",
-	      tag, na, st->ni, dnb, 100.0*dsz/dnb, dt);};
+	      "\t%-3s  %8d  %8d  %10.2e %4.0f%% %4.0f%%      %.2g\n",
+	      tag, na, st->ni, dnb, 100.0*dsz/dnb, 0.1*ov/dnb, dt);};
 
     st->nba0  = nba;
     st->nbf0  = nbf;

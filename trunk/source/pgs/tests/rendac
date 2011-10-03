@@ -10,59 +10,35 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           PGS AC RENDERING TEST
-
-#--------------------------------------------------------------------------
-
-      Separator $Log
+set msg = "PGS AC Map Test ........ "
+set rpf = "none"
+set exe = $BinDir/gsatst
 
       NoteD $Log ""
-      NoteD $Log -n "                    PGS AC Map Test ........"
+      NoteD $Log -n "                    $msg"
 
-      set UTime = `$TIMER -r`
       if ("$Valgrind" == "") then
-         ftee $Log $CFE $BinDir/gsatst -A -a -1 -2 -3 -4 -5 -6 -7 -8 -9 -10
+         ftee $Log $CFE $exe -A -a -1 -2 -3 -4 -5 -6 -7 -8 -9 -10
          set xstatus = $status
       else
-         ftee $Log $Valgrind $BinDir/gsatst -A -a -1 -2 -3 -4 -5 -6 -7 -8 -9 -10 |& \
-         grep "ERROR SUMMARY:"                                                   |& \
+         ftee $Log $Valgrind $exe -A -a -1 -2 -3 -4 -5 -6 -7 -8 -9 -10    |& \
+         grep "ERROR SUMMARY:"                                            |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-	 flog $Log $RM $Tmp
+         set rpf     = ( $rpf $Tmp )
       endif
 
       if ($xstatus == 0) then
 #         flog $Log $CFE $PSDIFF gspsta.ps $RefDir/gspsta.ps
-         set DiffStat = $status
-      else
-         set DiffStat = 0
+         set xstatus = $status
       endif
-      set ETime = `$TIMER -b $UTime`
+
+      flog $Log touch gsjpgta.jpg.foo
+      set rpf = ( $rpf gspsta.ps gscgmta.cgm gsjpgta.jpg.* gspngta.png.* )
 
       NoteD $Log ""
-
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $Log "                    PGS AC Map Test ........ OMITTED ($ETime)"
-         flog $Log touch gsjpgta.jpg.foo
-         flog $Log rm -f gspsta.ps gscgmta.cgm gsjpgta.jpg.* gspngta.png.*
-      else if ($xstatus != 0) then
-         NoteD $Log "                    PGS AC Map Test ........ CRASHED ($xstatus/$ETime)"
-         set Err = 1
-      else if ($DiffStat != 0) then
-         NoteD $Log "                    PGS AC Map Test ........ FAILED ($DiffStat/$ETime)"
-         set Err = 1
-      else
-         NoteD $Log "                    PGS AC Map Test ........ PASSED ($ETime)"
-         flog $Log touch gsjpgta.jpg.foo
-         flog $Log rm -f gspsta.ps gscgmta.cgm gsjpgta.jpg.* gspngta.png.*
-      endif
    endif
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a rendac -e $Err part
+$TEST_CHECK part -a rendac -e $xstatus -x $exe -rpf "$rpf" "$msg"
 
 exit($status)

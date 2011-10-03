@@ -10,14 +10,12 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                               PML NAN TEST
-
-#--------------------------------------------------------------------------
+set msg = "PML NAN Test ........... "
+set rpf = "none"
+set exe = $BinDir/mlnants
 
       NoteD $Log ""
-      NoteD $Log  -n "                    PML NAN Test ........... "
+      NoteD $Log  -n "                    $msg"
 
       flog $Log pushd $SrcDir
       flog $Log $MAKE fpe
@@ -32,33 +30,15 @@ source ../../tests/common
          set xstatus = $TStatus
       else
          if ("$Valgrind" == "") then
-            flog $LogF $cfe $BinDir/mlnants
+            flog $LogF $cfe $exe
             set xstatus = $status
          else
-            flog $Log $Valgrind $BinDir/mlnants
+            flog $Log $Valgrind $exe
             set xstatus = $status
          endif
-         if ($xstatus != 0) then
-           NoteD $Log ""
-           NoteD $Log "                         Error in NAN Test program"
-         endif
       endif
 
-      set ETime = `$TIMER -b $UTime`
-
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $Log "                    PML NAN Test ........... OMITTED ($xstatus/$ETime)"
-      else if ($xstatus != 0) then
-         NoteD $Log "                    PML NAN Test ........... FAILED ($xstatus/$ETime)"
-         @ Err = 1
-      else
-         NoteD $Log "PASSED ($ETime)"
-      endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a nan -e $Err part
+$TEST_CHECK part -a nan -e $xstatus -x $exe none
 
 exit($status)
 

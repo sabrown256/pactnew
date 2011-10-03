@@ -10,43 +10,27 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           STRING TEST
-
-#--------------------------------------------------------------------------
+set msg = "SCHEME String Test ........... "
+set rpf = none
+set exe = $BinDir/scheme
 
    NoteD $Log ""
-   NoteD $Log -n "                    SCHEME String Test ........... "
+   NoteD $Log -n "                    $msg"
    Note $Log ""
 
    flog $Log pwd
-   set UTime = `$TIMER -r`
+
    if ("$Valgrind" == "") then
-      flog $Log $cfe $BinDir/scheme -e -l $FilesDir/shstr.scm
+      flog $Log $cfe $exe -e -l $FilesDir/shstr.scm
       set xstatus = $status
    else
-      ftee $Log $Valgrind $BinDir/scheme -e -l $FilesDir/shstr.scm  |& \
-      grep "ERROR SUMMARY:"                                         |& \
+      ftee $Log $Valgrind $exe -e -l $FilesDir/shstr.scm     |& \
+      grep "ERROR SUMMARY:"                                  |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $Log $RM $Tmp
-   endif
-   set ETime = `$TIMER -b $UTime`
-
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "OMITTED ($xstatus/$ETime)"
-   else if ($xstatus != 0) then
-      NoteD $Log "FAILED ($xstatus/$ETime)"
-      set Err = 1
-   else
-      flog $Log rm -f '#tmp#'
-      NoteD $Log "PASSED ($ETime)"
+      set rpf     = ( $rpf $Tmp )
    endif
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a string -e $Err part
+$TEST_CHECK part -a string -e $xstatus -rpf "$rpf" none
 
 exit($status)

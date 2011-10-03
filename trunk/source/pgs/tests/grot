@@ -10,16 +10,12 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           PGS GROTRIAN TEST
-
-#--------------------------------------------------------------------------
-
-   Separator $Log
+set msg = "PGS Grotrian Test ...... "
+set rpf = "none"
+set exe = $BinDir/gsgrts
 
    NoteD $Log ""
-   NoteD $Log -n "                    PGS Grotrian Test ...... "
+   NoteD $Log -n "                    $msg"
 
    flog $Log pushd $SrcDir
    flog $Log $MAKE grotrian
@@ -29,42 +25,30 @@ source ../../tests/common
    if ($xstatus != 0) then
       NoteD $Log ""
       NoteD $Log "                         Can't build PGS Grotrian Test Program"
-      NoteD $Log "                    PGS Grotrian Test ...... FAILED (-1)"
+      NoteD $Log "                    ${msg}FAILED (-1)"
       set Err = 1
    else
       flog $Log rm -f gsgrts.res gsgrts.ps
 
-      set UTime = `$TIMER -r`
       if ("$Valgrind" == "") then
-         $CFE $BinDir/gsgrts -1 -d > gsgrts.res
+         $CFE $exe -1 -d > gsgrts.res
          set xstatus = $status
       else
-         ftee $Log $Valgrind $BinDir/gsgrts -1 -d     |& \
+         ftee $Log $Valgrind $exe -1 -d               |& \
          grep "ERROR SUMMARY:"                        |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-	 flog $Log $RM $Tmp
+         set rpf     = ( $rpf $Tmp )
       endif
-      set ETime = `$TIMER -b $UTime`
 
       if ($xstatus == 0) then
          mv ps_test.ps gsgrts.ps
       endif
 
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $Log "                    PGS Grotrian Test ...... OMITTED ($xstatus/$ETime)"
-      else if ($xstatus != 0) then
-         NoteD $Log "                    PGS Grotrian Test ...... FAILED ($xstatus/$ETime)"
-         set Err = 1
-      else
-         flog $Log rm -f gsgrts.ps gsgrts.res
-         NoteD $Log "PASSED ($ETime)"
-      endif
+      set rpf = ( $rpf gsgrts.ps gsgrts.res )
+
    endif
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a grot -e $Err part
+$TEST_CHECK part -a grot -e $xstatus -x $exe -rpf "$rpf" none
 
 exit($status)

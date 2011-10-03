@@ -11,6 +11,7 @@
 setenv Package psh
 source ../scripts/test-env
 
+set ERROR = FALSE
 set Tests = ""
 
 while ($#argv > 0)
@@ -48,27 +49,27 @@ if ($RUN_TESTS == FALSE) then
 
 # run the tests
 
-   else
-      NoteD $Log ""
-      NoteD $Log "PSH TEST ..."
+else
+   NoteD $Log ""
+   NoteD $Log "PSH TEST ..."
 
-      if ("$Valgrind" != "") then
-         setenv Valgrind  "$Valgrind --suppressions=$RootDir/score/tests/vg.suppress"
-      endif
+   if ("$Valgrind" != "") then
+      setenv Valgrind  "$Valgrind --suppressions=$RootDir/score/tests/vg.suppress"
+   endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-      if ("$Tests" == "") then
-         set Tests = ""
+   if ("$Tests" == "") then
+      set Tests = ""
       set Tests = ($Tests do-net elide blang regx pco pcsh perdb dorun verify)
-      endif
+   endif
 
    foreach i ($Tests)
       $SrcDir/tests/$i
       if ($status == 1) then
-            set ERROR = TRUE
-         endif
+         set ERROR = TRUE
+      endif
    end
    
 #--------------------------------------------------------------------------
@@ -76,14 +77,14 @@ if ($RUN_TESTS == FALSE) then
 
 # CLEAN UP - we are all done now
    
-   $TEST_CHECK -n PSH -e $ERROR clean
+   $TEST_CHECK clean -n PSH -e $ERROR
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 endif
 
-$TEST_CHECK -e $ERROR fin
+$TEST_CHECK fin -e $ERROR
 
 exit($status)
 

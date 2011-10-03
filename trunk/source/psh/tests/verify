@@ -8,21 +8,10 @@
 # include "cpyright.h"
 #
 
-set Package = psh
-if (-f test-env) then
-   source test-env
-   pushd $TestDir >& /dev/null
-else if ($?Log == 1) then
-   if (-f $Log) then
-      mv $Log $Log.tmp
-      source ../../../scripts/test-env
-      mv $Log.tmp $Log
-   else
-      source ../../../scripts/test-env
-   endif
-else
-   source ../../../scripts/test-env
-endif
+source ../../tests/common
+
+set msg = "VERIFY Test .................... "
+set rpf = none
 
 while ($#argv > 0)
    switch ($1)
@@ -52,14 +41,16 @@ flog $Log cd $TestDir
 
 # omit tests - usually in difficult CROSS_COMPILE situation
 if ($RUN_TESTS == FALSE) then
-   NoteD $Log "                    VERIFY Test .................... omitted"
+   NoteD $Log ""
+   NoteD $Log "                    ${msg}omitted"
    NoteD $Log ""
 
 else
 
    set BTime = `$TIMER -r`
 
-   NoteD $Log "                    VERIFY Test .................... "
+   NoteD $Log ""
+   NoteD $Log "                    $msg"
    Note $Log ""
 
    if ("$MPI" == "") then
@@ -169,23 +160,15 @@ else
 
    Separator $Log
 
-   set ETime = `$TIMER -b $BTime`
-
-   if ($lerr != 0) then
-      NoteD $Log "                    VERIFY Test .................... FAILED ($xstatus/$ETime)"
-      @ Err = 1
-   else
-      NoteD $Log "                    VERIFY Test .................... PASSED ($ETime)"
-      flog $Log rm -f *.do-run*
-   endif
-   NoteD $Log ""
+   flog $Log touch foo.do-run
+   set rpf = ( $rpf *.do-run* )
 
 endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a verify -e $Err part
+$TEST_CHECK part -a verify -e $Err -rpf "$rpf" "$msg"
 
 exit($status)
 

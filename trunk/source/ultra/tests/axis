@@ -22,36 +22,25 @@ source ../../tests/common
 
    flog $Log $RM ulaxs.log ulaxs.err
 
-   set UTime = `$TIMER -r`
+   set rpf = ""
+
    if ("$Valgrind" == "") then
       flog $Log ($CFE $Ultra -l $TDir/ulaxs.scm >& ulaxs.log)
       set xstatus = $status
       flog $Log ($CFE $PSDIFF ulaxs.ps $RefDir/ulaxs.ps >&! ulaxs.ps.diff)
-      set Files = `find . -name "ulaxs.ps.diff" -size 0c -print`
    else
       ftee $Log $Valgrind $BinDir/ultra -e -r -x -q -s -l $TDir/ulaxs.scm  |& \
-      grep "ERROR SUMMARY:"                                                         |& \
+      grep "ERROR SUMMARY:"                                                |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $Log $RM $Tmp
-      set Files = ( 1 )
+      set prf     = ( $prf $Tmp )
    endif
 
-   set ETime = `$TIMER -b $UTime`
-
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "OMITTED ($xstatus/$ETime)"
-   else if (($xstatus != 0) || ($#Files == 0)) then
-      NoteD $Log "FAILED ($xstatus/$ETime)"
-      set Err = 1
-   else
-      NoteD $Log "PASSED ($ETime)"
-      flog $Log $RM ulaxs.*
-   endif
+   set rpf = ( $rpf ulaxs.* )
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a fill -e $Err part
+$TEST_CHECK part -a fill -e $xstatus -rpf "$rpf" none
 
 exit($status)

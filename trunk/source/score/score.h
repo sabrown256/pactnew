@@ -1099,7 +1099,7 @@ extern PFTid
 extern void
  SC_show_resource_usage(SC_rusedes *ru),
  SC_mem_statr(int64_t *al, int64_t *fr, int64_t *df, int64_t *mx,
-	      int64_t *rs);
+	      int64_t *rs, int64_t *ov);
 
 extern int
  SC_resource_usage(SC_rusedes *ru, int pid),
