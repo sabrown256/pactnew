@@ -11,8 +11,12 @@
 
 source ../../tests/common
 
+set msg = "SCORE Unit Tests .............. "
+set rpf = none
+@ nerr  = 0
+
 NoteD $LogF ""
-NoteD $LogF "                    SCORE Unit Tests ............ "
+NoteD $LogF "                    $msg"
 Note $LogF ""
 
 flog $LogF pushd $SrcDir
@@ -39,137 +43,111 @@ else
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   NoteD $LogF -n "                       scctl ......... "
+   set exe = $BinDir/tscctl
+   set rpf = none
+
+   NoteD $LogF -n "                       scctl ...................... "
    Note $LogF ""
 
-   set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then
-      flog $Log $CFE $BinDir/tscctl
+      flog $Log $CFE $exe
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $BinDir/tscctl  |& \
-      grep "ERROR SUMMARY:"                |& \
+      ftee $LogF $Valgrind $exe      |& \
+      grep "ERROR SUMMARY:"          |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $LogF $RM $Tmp
+      set rpf     = ( $rpf $Tmp )
    endif
 
-   set ETime = `$TIMER -b $UTime`
+   $TEST_CHECK part -a sharp_scctl -e $xstatus -x $exe -l -rpf "$rpf" none
 
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "omitted ($ETime)"
-   else if ($xstatus == 0) then
-      NoteD $LogF "ok ($ETime)"
-   else
-      NoteD $LogF "ng ($xstatus/$ETime)"
-      set Err = 1
-   endif
+   @ nerr = $nerr + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   NoteD $LogF -n "                       string-a ...... "
+   set exe = $BinDir/tscmemc
+   set rpf = none
+
+   NoteD $LogF -n "                       string-a ................... "
    Note $LogF ""
 
-   set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then
-      flog $Log $CFE $BinDir/tscmemc
+      flog $Log $CFE $exe
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $BinDir/tscmemc  |& \
-      grep "ERROR SUMMARY:"                 |& \
+      ftee $LogF $Valgrind $exe      |& \
+      grep "ERROR SUMMARY:"          |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $LogF $RM $Tmp
+      set rpf     = ( $rpf $Tmp )
    endif
 
-   set ETime = `$TIMER -b $UTime`
+   $TEST_CHECK part -a sharp_memc -e $xstatus -x $exe -l -rpf "$rpf" none
 
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "omitted ($ETime)"
-   else if ($xstatus == 0) then
-      NoteD $LogF "ok ($ETime)"
-   else
-      NoteD $LogF "ng ($xstatus/$ETime)"
-      set Err = 1
-   endif
+   @ nerr = $nerr + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   NoteD $LogF -n "                       string-b ...... "
+   set exe = $BinDir/tscstr
+   set rpf = none
+
+   NoteD $LogF -n "                       string-b ................... "
    Note $LogF ""
 
-   set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then
-      flog $Log $CFE $BinDir/tscstr
+      flog $Log $CFE $exe
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $BinDir/tscstr  |& \
-      grep "ERROR SUMMARY:"                |& \
+      ftee $LogF $Valgrind $exe       |& \
+      grep "ERROR SUMMARY:"           |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $LogF $RM $Tmp
+      set rpf     = ( $rpf $Tmp )
    endif
 
-   set ETime = `$TIMER -b $UTime`
+   $TEST_CHECK part -a sharp_str -e $xstatus -x $exe -l -rpf "$rpf" none
 
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "omitted ($ETime)"
-   else if ($xstatus == 0) then
-      NoteD $LogF "ok ($ETime)"
-   else
-      NoteD $LogF "ng ($xstatus/$ETime)"
-      set Err = 1
-   endif
+   @ nerr = $nerr + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   NoteD $LogF -n "                       vsnprintf ..... "
+   set exe = $BinDir/scvsts
+   set rpf = none
+
+   NoteD $LogF -n "                       vsnprintf .................. "
    Note $LogF ""
 
-   set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then
-      flog $Log $CFE $BinDir/scvsts
+      flog $Log $CFE $exe
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $BinDir/scvsts  |& \
-      grep "ERROR SUMMARY:"                |& \
+      ftee $LogF $Valgrind $exe       |& \
+      grep "ERROR SUMMARY:"           |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $LogF $RM $Tmp
+      set rpf     = ( $rpf $Tmp )
    endif
 
-   set ETime = `$TIMER -b $UTime`
+   $TEST_CHECK part -a sharp_vsnprintf -e $xstatus -x $exe -l -rpf "$rpf" none
 
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "omitted ($ETime)"
-   else if ($xstatus == 0) then
-      NoteD $LogF "ok ($ETime)"
-   else
-      NoteD $LogF "ng ($xstatus/$ETime)"
-      set Err = 1
-   endif
+   @ nerr = $nerr + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   flog $LogF $RM ts*.res $DataFiles
-
-   NoteD $LogF ""
-   if ($Err == 0) then
-      NoteD $LogF "                    SCORE Unit Tests ............ PASSED"
-   else
-      NoteD $LogF "                    SCORE Unit Tests ............ FAILED"
-   endif
+   flog $Log touch tsfoo.res
+   set rpf = ( ts*.res $DataFiles )
 
 endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a sharp -e $Err part
+$TEST_CHECK part -a sharp -e $nerr -rpf "$rpf" "$msg"
 
 exit($status)
 

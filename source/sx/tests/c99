@@ -10,19 +10,17 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           PDB TEST
-
-#--------------------------------------------------------------------------
+set msg = "SX PDB C99 Test .............. "
+set exe = $BinDir/sx
+set rpf = 0
+@ nerr  = 0
 
    NoteD $Log ""
-   NoteD $Log -n "                    SX PDB C99 Test .............. "
+   NoteD $Log -n "                    $msg"
    Note $Log ""
 
    flog $Log cp $TDir/sxpdbg.scm .
 
-   set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then
       flog $Log ($SX -l $RootDir/sx/tests/sxc99.scm > sxc99.res)
       set xstatus = $status
@@ -31,28 +29,15 @@ source ../../tests/common
          set xstatus = $status
       endif
    else
-      ftee $Log $Valgrind $BinDir/sx -e -r -s -l $RootDir/sx/tests/sxc99.scm |& \
-      grep "ERROR SUMMARY:"                                                   |& \
+      ftee $Log $Valgrind $exe -e -r -s -l $RootDir/sx/tests/sxc99.scm |& \
+      grep "ERROR SUMMARY:"                                            |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $Log $RM $Tmp
+      set rpf     = ( $rpf $Tmp )
    endif
 
-   set ETime = `$TIMER -b $UTime`
+   set rpf = ( $rpf sxc99.res sxc99.res.diff )
 
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "OMITTED ($xstatus/$ETime)"
-   else if ($xstatus != 0) then
-      NoteD $Log "FAILED ($xstatus/$ETime)"
-      set Err = 1
-   else
-      NoteD $Log "PASSED ($ETime)"
-      flog $Log rm -f sxc99.res sxc99.res.diff
-   endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a c99 -e $Err part
+$TEST_CHECK part -a c99 -e $xstatus -rpf "$rpf" none
 
 exit($status)

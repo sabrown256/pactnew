@@ -18,15 +18,18 @@ source ../../tests/common
 
 # PPC Socket test
 
+      set msg = "PPC Socket Test ................"
+      set rpf = "none"
+
       NoteD $Log ""
-      NoteD $Log "                    PPC Socket Test ................ "
+      NoteD $Log "                    $msg"
 
       set FAIL = "NO"
 
       set UTime = `$TIMER -r`
       flog $Log rm -f pcexec.sockp pcexec.socki
 
-      NoteD $Log -n "                       polling ............. "
+      NoteD $Log -n "                       polling ..................... "
       set BTime = `$TIMER -r`
       if ("$Valgrind" == "") then
          $CFE $PCEXEC -c 30 -i -s $TEST > pcexec.sockp
@@ -47,7 +50,7 @@ source ../../tests/common
          set FAIL  = "YES"
       endif
 
-      NoteD $Log -n "                       interrupt ........... "
+      NoteD $Log -n "                       interrupt ................... "
       set BTime = `$TIMER -r`
       if ("$Valgrind" == "") then
          $CFE $PCEXEC -c 30 -s $TEST > pcexec.socki
@@ -68,11 +71,9 @@ source ../../tests/common
          set FAIL  = "YES"
       endif
 
-      set ETime = `$TIMER -b $UTime`
-
+      set xstatus = 0
       if ($FAIL == "YES") then
-         NoteD $Log "                    PPC Socket Test ................ FAILED ($ETime)"
-         set ERROR = "FALSE"
+         set xstatus = 1
       else
          if ("$Valgrind" == "") then
             diff pcexec.refi pcexec.socki > pcexec.diffi
@@ -83,18 +84,16 @@ source ../../tests/common
             set Files = 1
          endif
          if ($#Files == 0) then
-            NoteD $Log "                    PPC Socket Test ................ FAILED ($ETime)"
-            set Err = 1
+            set xstatus = 1
          else
-            NoteD $Log "                    PPC Socket Test ................ PASSED ($ETime)"
-            flog $Log rm pcexec.diff* pcexec.sock*
+            set rpf = ( pcexec.diff* pcexec.sock* )
          endif
       endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a socket -e $Err part
+$TEST_CHECK part -a socket -e $xstatus -rpf "$rpf" "$msg"
 
 exit($status)
 

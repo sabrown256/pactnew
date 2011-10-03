@@ -93,14 +93,14 @@ else if (-e $RootDir/scc/scc_int.h) then
 
 # CLEAN UP - we are all done now
 
-   $TEST_CHECK -n SCC -e $ERROR clean
+   $TEST_CHECK clean -n SCC -e $ERROR
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 endif
 
-$TEST_CHECK -e $ERROR fin
+$TEST_CHECK fin -e $ERROR
 
 exit($status)
 

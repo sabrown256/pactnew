@@ -10,6 +10,10 @@
 
 source ../../tests/common
 
+set msg = "SCORE Make Test ............... "
+set exe = $BinDir/dmake
+set rpf = none
+
 set ok = TRUE
 if ($?CROSS_COMPILE == 1) then
    if ($CROSS_COMPILE != FALSE) then
@@ -19,7 +23,7 @@ endif
 
 if ($ok == TRUE) then
    NoteD $LogF ""
-   NoteD $LogF -n "                    SCORE Make Test ............. "
+   NoteD $LogF -n "                    $msg"
    NoteD $LogF ""
 
    set UTime = `$TIMER -r`
@@ -27,7 +31,6 @@ if ($ok == TRUE) then
    ftee $LogF do-test $argv
    set xstatus = $status
    flog $LogF popd
-
    set ETime   = `$TIMER -b $UTime`
 
 # NOTE: exit status is sum of values for each test
@@ -40,20 +43,10 @@ if ($ok == TRUE) then
 # server and async are currently prone to race type failures
 # so do not fail the test if they do not succeed
 
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "                    SCORE Make Test ............. OMITTED ($xstatus/$ETime)"
-   else if ($xstatus > 3) then
-      NoteD $LogF "                    SCORE Make Test ............. FAILED ($ETime)"
-      set Err = 1
-   else
-      NoteD $LogF "                    SCORE Make Test ............. PASSED ($ETime)"
-   endif
-endif
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a mk -e $Err part
+$TEST_CHECK part -a mk -e $xstatus -rpf "$rpf" "$msg"
 
 exit($status)
 

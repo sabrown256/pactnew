@@ -10,39 +10,30 @@
 
 source ../../tests/common
 
+set msg = "PDB Free Test ...................... "
+set rpf = "none"
+set exe = $BinDir/pdfrts
+
 set tst = $1
 
 NoteD $LogF ""
-NoteD $LogF -n "                    PDB Free Test ...................... "
+NoteD $LogF -n "                    $msg"
 
-set UTime = `$TIMER -r`
 if ("$Valgrind" == "") then
-   flog $Log $CFE $BinDir/pdfrts
+   flog $Log $CFE $exe
    set xstatus = $status
 else
-   ftee $LogF $Valgrind $BinDir/pdfrts |& \
+   ftee $LogF $Valgrind $exe             |& \
    grep "ERROR SUMMARY:"                 |& \
    awk '{ print $4 }'   >&! $Tmp
    set xstatus = `cat $Tmp`
-	 flog $LogF $RM $Tmp
-endif
-set ETime   = `$TIMER -b $UTime`
-
-unalias grep
-
-if (($xstatus == 254) || ($xstatus == 255)) then
-   NoteD $LogF "OMITTED ($xstatus/$ETime)"
-else if ($xstatus != 0) then
-   NoteD $LogF "FAILED ($xstatus/$ETime)"
-   set Err = 1
-else
-   NoteD $LogF "PASSED ($ETime)"
+   set rpf     = ( $rpf $Tmp )
 endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a free -e $Err part
+$TEST_CHECK part -a free -e $xstatus -x $exe -rpf "$rpf" none
 
 exit($status)
 

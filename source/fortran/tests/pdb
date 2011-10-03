@@ -10,6 +10,10 @@
 
 source ../../tests/common
 
+set msg = "PDB API Test ....................... "
+
+@ err = 0
+
 set tst = $1
 
 # check for Fortran compiler before doing Fortran test
@@ -25,7 +29,7 @@ endif
 #if (($LStat == 0) && ("$MPI" == "")) then
 if ($LStat == 0) then
    NoteD $LogF ""
-   NoteD $LogF "                    PDB API Test ....................... "
+   NoteD $LogF "                    $msg"
 
    set FAIL = "NO"
 
@@ -50,23 +54,29 @@ if ($LStat == 0) then
 # test hand written wrappers
       NoteD $LogF -n "                        manual ......................... "
       Note $LogF ""
+
+      set exe = $BinDir/pdftst
+      set rpf = ""
+
       if ("$Valgrind" == "") then
-         flog $LogF ( $CFE $BinDir/pdftst -p |& cat )
+         flog $LogF ( $CFE $exe -p |& cat )
          set xstatus = $status
       else
          Note $LogF ""
-         ftee $LogF $Valgrind $BinDir/pdftst |& \
+         ftee $LogF $Valgrind $exe           |& \
          grep "ERROR SUMMARY:"               |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-         flog $LogF $RM $Tmp
+         set rpf     = ( $rpf $Tmp )
       endif
-      if ($xstatus == 0) then
-         NoteD $LogF "ok"
-      else
-         NoteD $LogF "ng"
-         set FAIL = "YES"
+
+      if ("$rpf" == "") then
+         set rpf = none
       endif
+
+      $TEST_CHECK part -a pdb_manual -e $xstatus -x $exe -l -rpf "$rpf" none
+
+      @ err = $err + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -74,23 +84,29 @@ if ($LStat == 0) then
 # test automatically generated wrappers
       NoteD $LogF -n "                        auto ........................... "
       Note $LogF ""
+
+      set exe = $BinDir/pdfgts
+      set rpf = ""
+
       if ("$Valgrind" == "") then
-         flog $LogF ( $CFE $BinDir/pdfgts -p |& cat )
+         flog $LogF ( $CFE $exe -p |& cat )
          set xstatus = $status
       else
          Note $LogF ""
-         ftee $LogF $Valgrind $BinDir/pdftts |& \
+         ftee $LogF $Valgrind $exe           |& \
          grep "ERROR SUMMARY:"               |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-         flog $LogF $RM $Tmp
+         set rpf     = ( $rpf $Tmp )
       endif
-      if ($xstatus == 0) then
-         NoteD $LogF "ok"
-      else
-         NoteD $LogF "ng"
-         set FAIL = "YES"
+
+      if ("$rpf" == "") then
+         set rpf = none
       endif
+
+      $TEST_CHECK part -a pdb_auto -e $xstatus -x $exe -l -rpf "$rpf" none
+
+      @ err = $err + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -98,26 +114,29 @@ if ($LStat == 0) then
 # hyperstride test
       NoteD $LogF -n "                        hyperstride .................... "
       Note $LogF ""
+
+      set exe = $BinDir/pdfhyts
+      set rpf = ""
+
       if ("$Valgrind" == "") then
-         flog $LogF $CFE $BinDir/pdfhyts
+         flog $LogF $CFE $exe
          set xstatus = $status
       else
          Note $LogF ""
-         ftee $LogF $Valgrind $BinDir/pdfhyts |& \
+         ftee $LogF $Valgrind $exe            |& \
          grep "ERROR SUMMARY:"                |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-         flog $LogF $RM $Tmp
+         set rpf     = ( $rpf $Tmp )
       endif
 
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $LogF "omitted"
-      else if ($xstatus == 0) then
-         NoteD $LogF "ok"
-      else
-         NoteD $LogF "ng"
-         set FAIL = "YES"
+      if ("$rpf" == "") then
+         set rpf = none
       endif
+
+      $TEST_CHECK part -a pdb_hyper -e $xstatus -x $exe -l -rpf "$rpf" none
+
+      @ err = $err + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -133,43 +152,36 @@ if ($LStat == 0) then
 
          NoteD $LogF -n "                        dp ............................. "
          Note $LogF ""
+
+         set exe = $BinDir/pdfdpt
+         set rpf = ""
+
          if ("$Valgrind" == "") then
-            flog $LogF $CFE -p 4 $BinDir/pdfdpt
+            flog $LogF $CFE -p 4 $exe
             set xstatus = $status
          else
             Note $LogF ""
-            ftee $LogF $Valgrind $BinDir/pdfdpt  |& \
+            ftee $LogF $Valgrind $exe            |& \
             grep "ERROR SUMMARY:"                |& \
             awk '{ print $4 }'   >&! $Tmp
             set xstatus = `cat $Tmp`
-            flog $LogF $RM $Tmp
+            set rpf     = ( $rpf $Tmp )
          endif
 
-         if (($xstatus == 254) || ($xstatus == 255)) then
-            NoteD $LogF "omitted"
-         else if ($xstatus == 0) then
-            NoteD $LogF "ok"
-         else
-            NoteD $LogF "ng ($xstatus)"
-            set FAIL = "YES"
+         if ("$rpf" == "") then
+            set rpf = none
          endif
+
+         $TEST_CHECK part -a pdb_dp -e $xstatus -x $exe -l -rpf "$rpf" none
+
+         @ err = $err + $status
       endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   endif
-
-   set ETime = `$TIMER -b $UTime`
-
-   if ($FAIL == "YES") then
-      NoteD $LogF "                    PDB API Test ....................... FAILED ($ETime)"
-      set Err = 1
-   else
-      NoteD $LogF "                    PDB API Test ....................... PASSED ($ETime)"
-   endif
 endif
 
-$TEST_CHECK -a pdb -e $Err part
+$TEST_CHECK part -a pdb -e $err "$msg"
 
 exit($status)

@@ -11,8 +11,12 @@
 source ../../tests/common
 
 
+set msg = "PANACEA API Test ..................."
+set rpf = "none"
+set exe = $BinDir/pathts
+
 NoteD $LogF ""
-NoteD $LogF "                    PANACEA API Test ..................."
+NoteD $LogF "                    $msg"
 
 set UTime = `$TIMER -r`
 
@@ -24,44 +28,20 @@ flog $LogF popd
 if ($xstatus != 0) then
    NoteD $LogF ""
    NoteD $LogF "                         Can't build PANACEA API Tests ($xstatus)"
-   set ERROR = "TRUE"
-else
-   set ERROR = "FALSE"
-   NoteD $LogF ""
-   NoteD $LogF "                        time history ..................."
 
+else
    if ("$Valgrind" == "") then
-      ftee $LogF $CFE ${BinDir}/pathts -c 2
+      ftee $LogF $CFE $exe -c 2
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $BinDir/pathts -c 2   |&  \
+      ftee $LogF $Valgrind $exe -c 2   |&  \
       grep "ERROR SUMMARY:"                      |&  \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-	 flog $LogF $RM $Tmp
-   endif
-
-   set ETime = `$TIMER -b $UTime`
-
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "                        time history ................... omitted"
-   else if ($xstatus != 0) then
-      NoteD $LogF "                        time history ................... ng ($xstatus/$ETime)"
-      set ERROR = "TRUE"
-   else
-      NoteD $LogF "                        time history ................... ok ($ETime)"
+      set rpf     = $Tmp
    endif
 endif
 
-set ETime = `$TIMER -b $UTime`
-
-if ($ERROR == TRUE) then
-   NoteD $LogF "                    PANACEA API Test ................... FAILED ($xstatus/$ETime)"
-   set Err = 1
-else
-   NoteD $LogF "                    PANACEA API Test ................... PASSED ($ETime)"
-endif
-
-$TEST_CHECK -a panacea -e $Err part
+$TEST_CHECK part -a panacea -e $xstatus -x $exe -rpf "$rpf" "$msg"
 
 exit($status)

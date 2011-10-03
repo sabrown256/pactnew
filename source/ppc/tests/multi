@@ -21,6 +21,9 @@ source ../../tests/common
 # keep the coding around because of the interrupt driven I/O which often
 # fails here and is not tested in SCORE
 
+set xstatus = 0
+set msg     = ""
+
 if (0) then
       NoteD $Log ""
       NoteD $Log -n "                    PPC Multiple Test .............. "
@@ -74,14 +77,11 @@ if (0) then
 # don't consider a timeout a failure
       if ((($MultipleStatI != 0) && ($MultipleStatI != 123)) || \
           (($MultipleStatP != 0) && ($MultipleStatP != 123)) || ) then
-         NoteD $Log "                    PPC Multiple Test .............. FAILED ($ETime)"
-         set Err = 1
-      else if (($MultipleStatI == 123) || ($MultipleStatP == 123)) then
-         NoteD $Log "                    PPC Multiple Test .............. PASSED ($ETime)"
+         set xstatus = 1
       else
-         NoteD $Log "PASSED ($ETime)"
-         flog $Log rm pcmtst.resi pcmtst.resp
+         set xstatus = 0
       endif
+      set msg = "PPC Multiple Test .............."
 
    endif
 endif
@@ -89,7 +89,7 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a multi -e $Err part
+$TEST_CHECK part -a multi -e $xstatus -x $BinDir/pcmtst "$msg"
 
 exit($status)
 

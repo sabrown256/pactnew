@@ -10,21 +10,17 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                               PML FPE TEST
-
-#--------------------------------------------------------------------------
+set msg = "PML FPE Test ........... "
+set rpf = "none"
+set exe = $BinDir/mlfpets
 
       NoteD $Log ""
-      NoteD $Log  -n "                    PML FPE Test ........... "
+      NoteD $Log  -n "                    $msg"
 
       flog $Log pushd $SrcDir
       flog $Log $MAKE fpe
       set TStatus = $status
       flog $Log popd
-
-      set UTime = `$TIMER -r`
 
       if ($TStatus != 0) then
          NoteD $Log ""
@@ -32,33 +28,15 @@ source ../../tests/common
          set xstatus = $TStatus
       else
          if ("$Valgrind" == "") then
-            flog $LogF $cfe $BinDir/mlfpets
+            flog $LogF $cfe $exe
             set xstatus = $status
          else
-            flog $Log $Valgrind $BinDir/mlfpets
-            set xstatus = $status
-         endif
-
-         if ("$Valgrind" != "") then
-            flog $Log set xstatus = 0
+            flog $Log $Valgrind $exe
+            set xstatus = 0
          endif
       endif
 
-      set ETime = `$TIMER -b $UTime`
-
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $Log "OMITTED ($xstatus/$ETime)"
-      else if ($xstatus != 0) then
-         NoteD $Log  "FAILED ($xstatus/$ETime)"
-         @ Err = 1
-      else
-         NoteD $Log "PASSED ($ETime)"
-      endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a fpe -e $Err part
+$TEST_CHECK part -a fpe -e $xstatus -x $exe none
 
 exit($status)
 

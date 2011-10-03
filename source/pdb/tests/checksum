@@ -10,35 +10,28 @@
 
 source ../../tests/common
 
+set msg = "PDB Checksum Test  ................. "
+set rpf = "none"
+set exe = $BinDir/pdcsts
+
 set tst = $1
 
 NoteD $LogF ""
-NoteD $LogF "                    PDB Checksum Test  ................. "
+NoteD $LogF "                    $msg"
 Note $LogF ""
 
-set UTime = `$TIMER -r`
 if ("$Valgrind" == "") then
-   ftee $LogF $CFE $BinDir/pdcsts -v $tst
+   ftee $LogF $CFE $exe -v $tst
    set xstatus = $status
 else
-   flog $LogF $Valgrind $BinDir/pdcsts -v $tst
+   flog $LogF $Valgrind $exe -v $tst
    set xstatus = $status
-endif
-set ETime = `$TIMER -b $UTime`
-
-if (($xstatus == 254) || ($xstatus == 255)) then
-   NoteD $LogF "                    PDB Checksum Test  ................. OMITTED ($xstatus/$ETime)"
-else if ($xstatus != 0) then
-   NoteD $LogF "                    PDB Checksum Test  ................. FAILED ($xstatus/$ETime)"
-   set Err = 1
-else
-   NoteD $LogF "                    PDB Checksum Test  ................. PASSED ($ETime)"
 endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a checksum -e $Err part
+$TEST_CHECK part -a checksum -e $xstatus -x $exe "$msg"
 
 exit($status)
 

@@ -95,7 +95,7 @@ else if (-e $BinDir/scheme) then
 
 # CLEAN UP 
 
-   $TEST_CHECK -n SCHEME -e $ERROR -raf "$Tmp" clean
+   $TEST_CHECK clean -n SCHEME -e $ERROR -raf "$Tmp"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -105,7 +105,7 @@ else
    NoteD $Log "$BinDir/scheme does not exist"
 endif
 
-$TEST_CHECK -e $ERROR fin
+$TEST_CHECK fin -e $ERROR
 
 exit($status)
 

@@ -10,6 +10,9 @@
 
 source ../../tests/common
 
+set msg = "SCHEME C Syntax Test ......... "
+set exe = $BinDir/scheme
+
 #--------------------------------------------------------------------------
 
 #                           C SYNTAX TESTS
@@ -17,12 +20,13 @@ source ../../tests/common
 #--------------------------------------------------------------------------
 
    set do_syntax = 0
+   @ nerr        = 0
 
    grep -w Arc $IncDir/make-def >& /dev/null
    set do_syntax = $status
    if (($do_syntax == 0) && (-d $RootDir/scheme/syntax/c)) then
       NoteD $Log ""
-      NoteD $Log "                    SCHEME C Syntax Test"
+      NoteD $Log "                    $msg"
 
       flog $Log cp $FilesDir/shctst.c $FilesDir/shcdcl.c $FilesDir/shcppts.[ch] .
 
@@ -33,33 +37,30 @@ source ../../tests/common
       NoteD $Log -n "                       C Declaration Syntax ...... "
       Note $Log ""
 
+      set rpf = none
+
       set UTime = `$TIMER -r`
       if ("$Valgrind" == "") then
-         flog $Log ( $CFE $BinDir/scheme -e -l shcdcl.c >! shcdcl.res )
+         flog $Log ( $CFE $exe -e -l shcdcl.c >! shcdcl.res )
          set xstatus = $status
          if ($xstatus == 0) then
             flog $Log ( diff shcdcl.res $FilesDir/ref/shcdcl >! shcdcl.res.diff )
             set xstatus = $status
          endif
       else
-         ftee $Log $Valgrind $BinDir/scheme -e -l shcdcl.c    |& \
+         ftee $Log $Valgrind $exe -e -l shcdcl.c    |& \
          grep "ERROR SUMMARY:"                                |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-         flog $Log $RM $Tmp
+         set rpf     = ( $rpf $Tmp )
       endif
       set ETime = `$TIMER -b $UTime`
 
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $LogF "OMITTED ($xstatus/$ETime)"
-      else if ($xstatus == 0) then
-         NoteD $Log "PASSED ($ETime)"
-         flog $Log rm -f shcdcl.res shcdcl.res.diff shcdcl.[ch]
-      else
-         NoteD $Log "FAILED ($xstatus/$ETime)"
-         flog $Log set ERROR = "TRUE"
-         flog $Log shcdcl.res
-      endif
+      set rpf = ( $rpf shcdcl.res shcdcl.res.diff shcdcl.[ch] )
+
+      $TEST_CHECK part -a csynt_decl -e $xstatus -l -dt $ETime -rpf "$rpf" none
+
+      @ nerr = $nerr + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -68,33 +69,30 @@ source ../../tests/common
       NoteD $Log -n "                       CPP Syntax ................ "
       Note $Log ""
 
+      set rpf = none
+
       set UTime = `$TIMER -r`
       if ("$Valgrind" == "") then
-         flog $Log ( $CFE $BinDir/scheme -e -l shcppts.c >! shcppts.res )
+         flog $Log ( $CFE $exe -e -l shcppts.c >! shcppts.res )
          set xstatus = $status
          if ($xstatus == 0) then
             flog $Log ( diff shcppts.res $FilesDir/ref/shcppts >! shcppts.res.diff )
             set xstatus = $status
          endif
       else
-         ftee $Log $Valgrind $BinDir/scheme -e -l shcppts.c   |& \
+         ftee $Log $Valgrind $exe -e -l shcppts.c   |& \
          grep "ERROR SUMMARY:"                                |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-         flog $Log $RM $Tmp
+         set rpf     = ( $rpf $Tmp )
       endif
       set ETime = `$TIMER -b $UTime`
 
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $LogF "OMITTED ($xstatus/$ETime)"
-      else if ($xstatus == 0) then
-         NoteD $Log "PASSED ($ETime)"
-         flog $Log rm -f shcppts.res shcppts.res.diff shcppts.[ch]
-      else
-         NoteD $Log "FAILED ($xstatus/$ETime)"
-         flog $Log set ERROR = "TRUE"
-         flog $Log cat shcppts.res
-      endif
+      set rpf = ( $rpf shcppts.res shcppts.res.diff shcppts.[ch] )
+
+      $TEST_CHECK part -a csynt_cpp -e $xstatus -l -dt $ETime -rpf "$rpf" none
+
+      @ nerr = $nerr + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -103,32 +101,28 @@ source ../../tests/common
       NoteD $Log -n "                       C Syntax .................. "
       Note $Log ""
 
+      set rpf = none
+
       set UTime = `$TIMER -r`
       if ("$Valgrind" == "") then
-         flog $Log ( $CFE $BinDir/scheme -e -l shctst.c >! shctst.res )
+         flog $Log ( $CFE $exe -e -l shctst.c >! shctst.res )
          set xstatus = $status
          if ($xstatus == 0) then
             flog $Log ( diff shctst.res $FilesDir/ref/shctst >! shctst.res.diff )
             set xstatus = $status
          endif
       else
-         ftee $Log $Valgrind $BinDir/scheme -e -l shctst.c    |& \
+         ftee $Log $Valgrind $exe -e -l shctst.c    |& \
          grep "ERROR SUMMARY:"                                |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-         flog $Log $RM $Tmp
+         set rpf     = ( $rpf $Tmp )
       endif
       set ETime = `$TIMER -b $UTime`
 
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $LogF "OMITTED ($xstatus/$ETime)"
-      else if ($xstatus == 0) then
-         NoteD $Log "PASSED ($ETime)"
-      else
-         NoteD $Log "FAILED ($xstatus/$ETime)"
-         flog $Log set ERROR = "TRUE"
-         flog $Log cat shctst.res
-      endif
+      $TEST_CHECK part -a csynt_synt -e $xstatus -l -dt $ETime -rpf "$rpf" none
+
+      @ nerr = $nerr + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -137,20 +131,18 @@ source ../../tests/common
       NoteD $Log -n "                       C Translation ............. "
       Note $Log ""
 
+      set rpf = none
+
       set UTime = `$TIMER -r`
       if ("$Valgrind" == "") then
-         Note $Log "Command: $CFE $BinDir"'/scheme -e \(translate-c-file \"shctst.c\"\) >! shctst.scm'
-         $CFE $BinDir/scheme -e \(translate-c-file \"shctst.c\"\) >! shctst.scm
+         flog $Log ( $CFE $exe -e \(translate-c-file \"shctst.c\"\) >! shctst.scm )
          set xstatus = $status
          if ($xstatus == 0) then
-            Note $Log "Command: $CFE $BinDir/scheme -e -l shctst.scm >! shctst-scm.res"
-            $CFE $BinDir/scheme -e -l shctst.scm >! shctst-scm.res
+            flog $Log ( $CFE $exe -e -l shctst.scm >! shctst-scm.res )
             set xstatus = $status
          endif
 
          if ($xstatus == 0) then
-# GOTCHA: OSF's diff does not allow "-B" option (revert this when they go away)
-#             diff -B shctst-scm.res $FilesDir/ref/shctst >! shctst-scm.res.diff
 
 # begin fix
             cat shctst-scm.res | sed -e '/^$/d' >! junk
@@ -164,33 +156,26 @@ source ../../tests/common
          endif
 
       else
-         ftee $Log $Valgrind $BinDir/scheme -e \(translate-c-file \"shctst.c\"\)  |& \
-         grep "ERROR SUMMARY:"                                                    |& \
+         ftee $Log $Valgrind $exe -e \(translate-c-file \"shctst.c\"\)  |& \
+         grep "ERROR SUMMARY:"                                          |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-         flog $Log $RM $Tmp
+         set rpf     = ( $rpf $Tmp )
       endif
 
       set ETime = `$TIMER -b $UTime`
 
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $LogF "OMITTED ($xstatus/$ETime)"
-      else if ($xstatus == 0) then
-         NoteD $Log "PASSED ($ETime)"
-         flog $Log rm -f shctst-scm.res shctst-scm.res.diff
-      else
-         NoteD $Log "FAILED ($xstatus/$ETime)"
-         flog $Log set Err = 1
-         flog $Log cat shctst.scm
-         flog $Log cat shctst-scm.res
-      endif
-      flog $Log rm -f shctst.res shctst.res.diff shctst.c
+      set rpf = ( $rpf shctst-scm.res shctst-scm.res.diff )
+      set rpf = ( $rpf shctst.res shctst.res.diff shctst.c )
+
+      $TEST_CHECK part -a csynt_trans -e $xstatus -l -dt $ETime -rpf "$rpf" none
+      @ nerr = $nerr + $status
 
    endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a csynt -e $Err part
+$TEST_CHECK part -a csynt -e $nerr "$msg"
 
 exit($status)

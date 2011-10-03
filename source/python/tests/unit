@@ -10,32 +10,18 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           UNIT TEST
-
-#--------------------------------------------------------------------------
+set msg = "Unit Test ...................... "
 
    NoteD $Log ""
-   NoteD $Log -n "                    Unit Tests ... "
+   NoteD $Log -n "                    $msg"
    Note $Log ""
 
-   set UTime = `$TIMER -r`
    flog $Log $CFE $PYTHON $RootDir/python/tests/unittests.py
    set xstatus = $status
-   set ETime   = `$TIMER -b $UTime`
-   
-   if ($xstatus == 0) then
-      NoteD $Log "OK ($xstatus/$ETime)"
-      flog $Log ${RM} *.pyc
-   else
-      NoteD $Log "FAILED ($xstatus/$ETime)"
-#      set Err = 1
-   endif
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+   flog $Log touch foo.pyc
+   set rpf = ( *.pyc )
 
-$TEST_CHECK -a unit -e $Err part
+$TEST_CHECK part -a unit -e $xstatus -rpf "$rpf" none
 
 exit($status)

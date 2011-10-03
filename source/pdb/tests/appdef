@@ -10,37 +10,30 @@
 
 source ../../tests/common
 
+set msg = "PDB Append/Defent Test ............. "
+set rpf = "none"
+set exe = $BinDir/pdapts
+
 set tst = $1
 
 NoteD $LogF ""
-NoteD $LogF "                    PDB Append/Defent Test ............. "
+NoteD $LogF "                    $msg"
 Note $LogF ""
 
-set UTime = `$TIMER -r`
 if ("$Valgrind" == "") then
-   ftee $LogF $CFE $BinDir/pdapts -v $tst
+   ftee $LogF $CFE $exe -v $tst
    set xstatus = $status
 else
-   ftee $LogF $Valgrind $BinDir/pdapts -v $tst |& \
+   ftee $LogF $Valgrind $exe -v $tst          |& \
    grep "ERROR SUMMARY:"                      |& \
    awk '{ print $4 }'   >&! $Tmp
    set xstatus = `cat $Tmp`
-	 flog $LogF $RM $Tmp
-endif
-set ETime = `$TIMER -b $UTime`
-
-if (($xstatus == 254) || ($xstatus == 255)) then
-   NoteD $LogF "                    PDB Append/Defent Test ............. OMITTED ($xstatus/$ETime)"
-else if ($xstatus != 0) then
-   NoteD $LogF "                    PDB Append/Defent Test ............. FAILED ($xstatus/$ETime)"
-   set Err = 1
-else
-   NoteD $LogF "                    PDB Append/Defent Test ............. PASSED ($ETime)"
+   set rpf     = ( $rpf $Tmp )
 endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a appdef -e $Err part
+$TEST_CHECK part -a appdef -e $xstatus -x $exe -rpf "$rpf" "$msg"
 
 exit($status)

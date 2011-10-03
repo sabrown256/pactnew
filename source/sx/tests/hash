@@ -10,22 +10,22 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           HASH TEST
-
-#--------------------------------------------------------------------------
+set msg = "SX HASH Test ................. "
+set exe = $BinDir/sx
+set rpf = 0
+@ nerr  = 0
 
    set sys = `uname`
 
    if (("$sys[1]" != "AIX") && ("$LARGE_FILES" == ""))  then
       NoteD $Log ""
-      NoteD $Log -n "                    SX HASH Test ................. "
+      NoteD $Log -n "                    $msg"
       Note $Log ""
 
       set UTime = `$TIMER -r`
+      set opt = ( -l $RootDir/sx/tests/sxhash.scm )
       if ("$Valgrind" == "") then
-         flog $Log ($SX -l $RootDir/sx/tests/sxhash.scm > sxhash.res.tmp)
+         flog $Log ($SX $opt > sxhash.res.tmp)
          set xstatus = $status
          if ($xstatus == 0) then
             cat sxhash.res.tmp          | \
@@ -46,29 +46,16 @@ source ../../tests/common
             set xstatus = $status
          endif
       else
-         ftee $Log $Valgrind $BinDir/sx -e -r -s -l $RootDir/sx/tests/sxhash.scm |& \
-         grep "ERROR SUMMARY:"                                                   |& \
+         ftee $Log $Valgrind $exe -e -r -s $opt   |& \
+         grep "ERROR SUMMARY:"                    |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-         flog $Log $RM $Tmp
+         set rpf     = ( $rpf $Tmp )
       endif
 
-      set ETime = `$TIMER -b $UTime`
-
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $LogF "OMITTED ($xstatus/$ETime)"
-      else if ($xstatus != 0) then
-         NoteD $Log "FAILED ($xstatus/$ETime)"
-         set Err = 1
-      else
-         NoteD $Log "PASSED ($ETime)"
-         flog $Log rm -f sxhash.res.tmp sxhash.res sxhash.res.diff
-      endif
+      set rpf = ( $rpf sxhash.res.tmp sxhash.res sxhash.res.diff )
    endif
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a hash -e $Err part
+$TEST_CHECK part -a hash -e $xstatus -rpf "$rpf" none
 
 exit($status)

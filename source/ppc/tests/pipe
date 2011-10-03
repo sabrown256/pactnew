@@ -18,14 +18,17 @@ source ../../tests/common
 
 # Pipe Test
 
+      set msg = "PPC Pipe Test .................."
+      set rpf = "none"
+
       NoteD $Log ""
-      NoteD $Log "                    PPC Pipe Test .................. "
+      NoteD $Log "                    $msg "
 
       set FAIL  = NO
       set UTime = `$TIMER -r`
       flog $Log rm -f pcexec.refi pcexec.refp
 
-      NoteD $Log -n "                       polling ............. "
+      NoteD $Log -n "                       polling ..................... "
       set BTime = `$TIMER -r`
       if ("$Valgrind" == "") then
          $CFE $PCEXEC -c 30 -i -p $TEST > pcexec.refp
@@ -46,7 +49,7 @@ source ../../tests/common
          set FAIL  = "YES"
       endif
 
-      NoteD $Log -n "                       interrupt ........... "
+      NoteD $Log -n "                       interrupt ................... "
       set BTime = `$TIMER -r`
       if ("$Valgrind" == "") then
          $CFE $PCEXEC -c 30 -p $TEST > pcexec.refi
@@ -67,19 +70,17 @@ source ../../tests/common
          set FAIL  = "YES"
       endif
 
-      set ETime = `$TIMER -b $UTime`
-
+      set xstatus = 0
       if ($FAIL == "YES") then
-         NoteD $Log "                    PPC Pipe Test .................. FAILED ($ETime)"
-         set Err = 1
+         set xstatus = 1
       else
-         NoteD $Log "                    PPC Pipe Test .................. PASSED ($ETime)"
+         set rpf = "none"
       endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a pipe -e $Err part
+$TEST_CHECK part -a pipe -e $xstatus -rpf "$rpf" "$msg"
 
 exit($status)
 

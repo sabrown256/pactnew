@@ -87,14 +87,14 @@ else if (-e $RootDir/pml/pml.h) then
 
 # CLEAN UP             
 
-   $TEST_CHECK -n PML -e $ERROR clean
+   $TEST_CHECK clean -n PML -e $ERROR
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 endif
 
-$TEST_CHECK -e $ERROR fin
+$TEST_CHECK fin -e $ERROR
 
 exit($status)
 

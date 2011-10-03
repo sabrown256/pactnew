@@ -10,23 +10,23 @@
 
 source ../../tests/common
 
-   NoteD $LogF ""
-   NoteD $LogF "                    SCORE Parallel Test ........."
+set msg = "SCORE Parallel Test ........... "
+set exe = $BinDir/scthrt
+set rpf = none
 
-   set UTime = `$TIMER -r`
+   NoteD $LogF ""
+   NoteD $LogF "                    $msg"
 
    flog $LogF pushd $SrcDir
    flog $LogF $MAKE smp
    set TStatus = $status
    flog $LogF popd
 
-   set ETime = `$TIMER -b $UTime`
-
    if ($TStatus != 0) then
       NoteD $LogF ""
       cat $LogF
       NoteD $LogF "                         ERROR Building Parallel Tests"
-      NoteD $LogF "                    SCORE Parallel Test ......... FAILED ($ETime)"
+      NoteD $LogF "                    ${msg}FAILED"
       set Err = 1
    else
 
@@ -86,7 +86,7 @@ source ../../tests/common
             NoteD $LogF -n "                          $Name      "
 
             foreach n ($NThrds)
-               flog $LogF $CFE $BinDir/scthrt $arg -n $n $mode -d 1 -s
+               flog $LogF $CFE $exe $arg -n $n $mode -d 1 -s
                set xstatus = $status
 
                if (($xstatus == 254) || ($xstatus == 255)) then
@@ -150,22 +150,7 @@ source ../../tests/common
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-      set ETime = `$TIMER -b $UTime`
-
-      if ($lerr != 0) then
-         NoteD $LogF ""
-         NoteD $LogF "                    SCORE Parallel Test ......... FAILED ($ETime)"
-         set Err = 1
-      else
-         NoteD $LogF ""
-         NoteD $LogF "                    SCORE Parallel Test ......... PASSED ($ETime)"
-      endif
-   endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a smp -e $Err part
+$TEST_CHECK part -a smp -e $lerr -rpf "$rpf" "$msg"
 
 exit($status)
 

@@ -10,15 +10,17 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           SHELL TESTS
-
-#--------------------------------------------------------------------------
+set msg = "PDBView Shell Test ........... "
+set exe = $BinDir/sx
+@ nerr  = 0
 
    if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
       NoteD $Log ""
-      NoteD $Log "                    PDBView Shell Test ........... "
+      NoteD $Log "                    $msg"
+
+# env test
+      NoteD $Log -n "                       env ....................... "
+      set rpf = none
 
       set UTime = `$TIMER -r`
       $CFE $FilesDir/pdbvenv.scm >&! pdbvenv.res
@@ -32,13 +34,16 @@ source ../../tests/common
          flog $Log cat pdbvenv.res.diff
          set xstatus = 1
       endif
-      if ($xstatus != 0) then
-         NoteD $Log "                       env ....................... ng ($xstatus/$ETime)"
-         set Err = 1
-      else
-         NoteD $Log "                       env ....................... ok ($ETime)"
-         flog $Log rm -f pdbvenv.res pdbvenv.res.diff
-      endif
+
+      set rpf = ( $rpf pdbvenv.res pdbvenv.res.diff )
+
+      $TEST_CHECK part -a shell_env -e $xstatus -l -rpf "$rpf" none
+
+      @ nerr = $nerr + $status
+
+# argv test
+      NoteD $Log -n "                       argv ...................... "
+      set rpf = none
 
       set UTime = `$TIMER -r`
       $CFE $FilesDir/pdbvexe.scm a 1 2.3 '"abc"' >&! pdbvexe.res
@@ -52,24 +57,18 @@ source ../../tests/common
          flog $Log cat pdbvexe.res.diff
          set xstatus = 1
       endif
-      if ($xstatus != 0) then
-         NoteD $Log "                       argv ...................... ng ($xstatus/$ETime)"
-         set Err = 1
-      else
-         NoteD $Log "                       argv ...................... ok ($ETime)"
-         flog $Log rm -f pdbvexe.res pdbvexe.res.diff
-      endif
 
-      if ($Err == 0) then
-         NoteD $Log "                    PDBView Shell Test ........... PASSED"
-      else
-         NoteD $Log "                    PDBView Shell Test ........... FAILED"
-      endif
+      set rpf = ( $rpf pdbvexe.res pdbvexe.res.diff )
+
+      $TEST_CHECK part -a shell_argv -e $xstatus -l -rpf "$rpf" none
+
+      @ nerr = $nerr + $status
+
    endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a shell -e $Err part
+$TEST_CHECK part -a shell -e $nerr "$msg"
 
 exit($status)

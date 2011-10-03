@@ -10,14 +10,12 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                             PML CG SOLVER TEST
-
-#--------------------------------------------------------------------------
+set msg = "PML CG Solver Test ..... "
+set rpf = "none"
+set exe = $BinDir/mlcgts
 
    NoteD $Log ""
-   NoteD $Log -n "                    PML CG Solver Test ..... "
+   NoteD $Log -n "                    $msg"
 
    set FAIL = "NO"
 
@@ -34,34 +32,15 @@ source ../../tests/common
       set xstatus = $TStatus
    else
       if ("$Valgrind" == "") then
-         flog $LogF $cfe $BinDir/mlcgts
+         flog $LogF $cfe $exe
          set xstatus = $status
       else
-         flog $Log $Valgrind $BinDir/mlcgts
+         flog $Log $Valgrind $exe
          set xstatus = $status
       endif
-      if ($xstatus != 0) then
-         NoteD $Log ""
-         NoteD $Log "                         Error in CG Solver Test Program"
-      endif
-
    endif
 
-   set ETime = `$TIMER -b $UTime`
-
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $Log "                    PML CG Solver Test ..... OMITTED ($xstatus/$ETime)"
-   else if ($xstatus != 0) then
-      NoteD $Log "                    PML CG Solver Test ..... FAILED ($ETime)"
-      @ Err = 1
-   else
-      NoteD $Log "PASSED ($ETime)"
-   endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a cgsolv -e $Err part
+$TEST_CHECK part -a cgsolv -e $xstatus -x $exe none
 
 exit($status)
 

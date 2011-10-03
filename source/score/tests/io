@@ -10,11 +10,13 @@
 
 source ../../tests/common
 
-NoteD $LogF ""
-NoteD $LogF -n "                    SCORE I/O Test .............. "
-NoteD $LogF ""
+set msg = "SCORE I/O Test ................ "
+set exe = $BinDir/sciots
+set rpf = none
 
-set UTime = `$TIMER -r`
+NoteD $LogF ""
+NoteD $LogF "                    $msg"
+
 flog $LogF pushd $SrcDir
 flog $LogF $MAKE io
 set xstatus = $status
@@ -22,34 +24,20 @@ flog $LogF popd
 
 if ($xstatus == 0) then
    if ("$Valgrind" == "") then
-      ftee $LogF $CFE $BinDir/sciots
+      ftee $LogF $CFE $exe
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $BinDir/sciots   |& \
-      grep "ERROR SUMMARY:"                 |& \
+      ftee $LogF $Valgrind $exe        |& \
+      grep "ERROR SUMMARY:"            |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $LogF $RM $Tmp
+      set rpf     = ( $rpf $Tmp )
    endif
 endif
 
-set ETime = `$TIMER -b $UTime`
+set rpf = ( $rpf sciots.txt )
 
-rm -f sciots.txt
-
-if (($xstatus == 254) || ($xstatus == 255)) then
-   NoteD $LogF "                    SCORE I/O Test .............. OMITTED ($xstatus/$ETime)"
-else if ($xstatus != 0) then
-   NoteD $LogF "                    SCORE I/O Test .............. FAILED ($xstatus/$ETime)"
-#   set Err = 1
-else
-   NoteD $LogF "                    SCORE I/O Test .............. PASSED ($ETime)"
-endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a io -e $Err part
+$TEST_CHECK part -a io -e $xstatus -x $exe -rpf "$rpf" "$msg"
 
 exit($status)
 

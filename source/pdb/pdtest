@@ -15,6 +15,7 @@ setenv LogF  $Log
 
 set Tests = ""
 set TestL = ""
+
 while ($#argv > 0)
    switch ($1)
       case -f:
@@ -149,14 +150,14 @@ else if (-e $RootDir/pdb/pdb.h) then
 
 # CLEAN UP
 
-   $TEST_CHECK -n PDB -e $ERROR -raf "$Tmp" clean
+   $TEST_CHECK clean -n PDB -e $ERROR -raf "$Tmp"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 endif
 
-$TEST_CHECK -e $ERROR fin
+$TEST_CHECK fin -e $ERROR
 
 exit($status)
 

@@ -10,17 +10,16 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
+set msg = "PGS Parallel Test ...... "
+set exe = $BinDir/gsatst
 
-#                           PGS PARALLEL RENDERING TEST
-
-#--------------------------------------------------------------------------
+@ err = 0
 
    if ("$Parallel" != "") then
       Separator $Log
 
       NoteD $Log ""
-      NoteD $Log "                    PGS Parallel Test ...... "
+      NoteD $Log "                    $msg"
 
       set lErr  = 0
       set BTime = `$TIMER -r`
@@ -31,74 +30,65 @@ source ../../tests/common
          set nthread = 4
       endif
 
-      set opt   = ""
-      set opt   = ( -t $nthread )
-      set opt   = ( $opt -f -A -B -D -E -F -1 -2 -3 -4 -5 -6 -7 -9 -10 -11 -12 )
-      set UTime = `$TIMER -r`
+      NoteD $Log -n "                        new ................ "
+
+      set rpf = "none"
+      set opt = ""
+      set opt = ( -t $nthread )
+      set opt = ( $opt -f -A -B -D -E -F -1 -2 -3 -4 -5 -6 -7 -9 -10 -11 -12 )
       if ("$Valgrind" == "") then
-         flog $Log $CFE $BinDir/gsatst $opt
+         flog $Log $CFE $exe $opt
          set xstatus = $status
       else
-         ftee $Log $Valgrind $BinDir/gsatst $opt |& \
+         ftee $Log $Valgrind $exe $opt           |& \
          grep "ERROR SUMMARY:"                   |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-	 flog $Log $RM $Tmp
+         set rpf     = ( $rpf $Tmp )
       endif
-      set ETime = `$TIMER -b $UTime`
+
+      set rpf = ( $rpf gscgmt.cgm )
 
       if ($xstatus == 123) then
-         NoteD $Log "                        new ....... to ($ETime)"
-         set lErr = 1
-      else if ($xstatus != 0) then
-         NoteD $Log "                        new ....... ng ($xstatus/$ETime)"
-         set lErr = 2
-      else
-         NoteD $Log "                        new ....... ok ($ETime)"
-         flog $Log rm -f gscgmt.cgm
+         set xstatus = 251
       endif
 
-      set opt   = ""
-      set opt   = ( -t $nthread )
-      set opt   = ( $opt -s -A -B -D -E -F -1 -2 -3 -4 -5 -6 -7 -9 -10 -11 -12 )
-      set UTime = `$TIMER -r`
+      $TEST_CHECK part -a smp_new -e $xstatus -l -x $exe -rpf "$rpf" none
+
+      @ err = $err + $status
+
+      NoteD $Log -n "                        pool ............... "
+
+      set rpf = "none"
+      set opt = ""
+      set opt = ( -t $nthread )
+      set opt = ( $opt -s -A -B -D -E -F -1 -2 -3 -4 -5 -6 -7 -9 -10 -11 -12 )
       if ("$Valgrind" == "") then
-         flog $Log $CFE $BinDir/gsatst $opt
+         flog $Log $CFE $exe $opt
          set xstatus = $status
       else
-         ftee $Log $Valgrind $BinDir/gsatst $opt |& \
+         ftee $Log $Valgrind $exe $opt           |& \
          grep "ERROR SUMMARY:"                   |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-	 flog $Log $RM $Tmp
+         set rpf     = ( $rpf $Tmp )
       endif
-      set ETime = `$TIMER -b $UTime`
+
+      set rpf = ( $rpf gscgmt.cgm )
 
       if ($xstatus == 123) then
-         NoteD $Log "                        pool ...... to ($ETime)"
-         set lErr = 3
-      else if ($xstatus != 0) then
-         NoteD $Log "                        pool ...... ng ($xstatus/$ETime)"
-         set lErr = 4
-      else
-         NoteD $Log "                        pool ...... ok ($ETime)"
-         flog $Log rm -f gscgmt.cgm
+         set xstatus = 251
       endif
 
-      set ETime = `$TIMER -b $BTime`
+      $TEST_CHECK part -a smp_pool -e $xstatus -l -x $exe -rpf "$rpf" none
 
-      if ($lErr == 0) then
-         NoteD $Log "                    PGS Parallel Test ...... PASSED ($ETime)"
-      else
-         NoteD $Log "                    PGS Parallel Test ...... FAILED ($ETime)"
-         set Err = 1
-      endif
+      @ err = $err + $status
 
    endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a smp -e $Err part
+$TEST_CHECK part -a smp -e $err "$msg"
 
 exit($status)

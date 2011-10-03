@@ -10,14 +10,12 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                             PML MATRIX TEST
-
-#--------------------------------------------------------------------------
+set msg = "PML Matrix Test ........ "
+set rpf = "none"
+set exe = $BinDir/mlmtrt
 
    NoteD $Log ""
-   NoteD $Log  -n "                    PML Matrix Test ........ "
+   NoteD $Log  -n "                    $msg"
 
    flog $Log pushd $SrcDir
    flog $Log $MAKE matrix
@@ -32,33 +30,15 @@ source ../../tests/common
       set xstatus = $TStatus
    else
       if ("$Valgrind" == "") then
-         flog $LogF $cfe $BinDir/mlmtrt
+         flog $LogF $cfe $exe
          set xstatus = $status
       else
-         flog $Log $Valgrind $BinDir/mlmtrt
+         flog $Log $Valgrind $exe
          set xstatus = $status
       endif
-      if ($xstatus != 0) then
-        NoteD $Log ""
-        NoteD $Log "                         Error in Matrix Test program"
-      endif
    endif
 
-   set ETime = `$TIMER -b $UTime`
-
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $Log  "                    PML Matrix Test ........ OMITTED ($xstatus/$ETime)"
-   else if ($xstatus != 0) then
-      NoteD $Log  "                    PML Matrix Test ........ FAILED ($ETime)"
-      @ Err = 1
-   else
-      NoteD $Log "PASSED ($ETime)"
-   endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a matrix -e $Err part
+$TEST_CHECK part -a matrix -e $xstatus -x $exe none
 
 exit($status)
 

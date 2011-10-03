@@ -14,11 +14,7 @@ source $TestScrDir/env-csh
 @ err = 0
 
 set tgt  = none
-set name = ""
-set terr = 0
-set raf  = ""
-set rpf  = ""
-set adv  = $Package
+set name = none
 
 if ($?BTime == 1) then
    set t0 = $BTime
@@ -32,63 +28,29 @@ else
    set log  = /dev/null
 endif
 
+set adv = $Package
+
 while ($#argv > 0)
    switch ($1)
-      case -a:
-           shift
-           set adv = ( $adv ${Package}_$1 )
-           breaksw
-      case -e:
-           shift
-           if (("$1" == "FALSE") || ("$1" == "0")) then
-              set terr = 0
-           else
-              set terr = 1
-           endif
-           breaksw
+      case -h:
+           echo "Usage: test-check [-h] [-l <log>] <tgt> [<opt>*]"
+           echo "   h     this help message"
+           echo "   l     set log file to <log>"
+           echo "   <tgt> one of  clean | fin | part"
+           echo "   <opt> target specific options"
+           echo ""
+           exit(1)
       case -l:
            shift
            set log = $1
            breaksw
-      case -n:
-           shift
-           set name = $1
-           breaksw
-      case -raf:
-           shift
-           set raf = ( $1 )
-           breaksw
-      case -rpf:
-           shift
-           set rpf = ( $1 )
-           breaksw
-      case -t0:
-           shift
-           set t0 = $1
-           breaksw
       default:
            set tgt = $1
+           shift
+           break
            breaksw
    endsw
    shift
-end
-
-# make sure it is upper case
-set name = ( `echo $name | tr "[a-z]" "[A-Z]"` )
-
-# check the test advisory
-set advise = FALSE
-set alst = ( `printenv TEST_ADVISORY | sed 's/:/ /g'` )
-foreach i ($alst)
-   foreach j ($adv)
-      if ($i == $j) then
-         set advise = TRUE
-         break
-      endif
-   end
-   if ($advise == TRUE) then
-      break
-   endif
 end
 
 switch ($tgt)
@@ -98,6 +60,90 @@ switch ($tgt)
 
 # CLEAN UP
    case clean:
+
+        set name = ""
+        set terr = 0
+        set raf  = ""
+        set rpf  = ""
+
+        while ($#argv > 0)
+           switch ($1)
+              case -a:
+                   shift
+                   set adv = ( $adv ${Package}_$1 )
+                   breaksw
+              case -e:
+                   shift
+                   if (("$1" == "FALSE") || ("$1" == "0")) then
+                      set terr = 0
+                   else
+                      set terr = 1
+                   endif
+                   breaksw
+              case -h:
+                   echo "Usage: test-check clean [-a <tst>] [-e <status>] [-h] [-n <name>] [-raf <files>] [-rpf <files>} [-t0 <time>]"
+                   echo "   a     set advisory for test <tst>"
+                   echo "   e     exit status of the test"
+                   echo "   h     this help message"
+                   echo "   n     test name"
+                   echo "   raf   files to remove unconditionally"
+                   echo "   rpf   files to remove if test passed"
+                   echo "   t0    reference time"
+                   echo ""
+                   exit(1)
+              case -n:
+                   shift
+                   set name = $1
+                   breaksw
+              case -raf:
+                   shift
+                   set raf = ( $1 )
+                   breaksw
+              case -rpf:
+                   shift
+                   set rpf = ( $1 )
+                   breaksw
+              case -t0:
+                   shift
+                   set t0 = $1
+                   breaksw
+              default:
+                   echo "Unknown option '$1'"
+                   breaksw
+           endsw
+           shift
+        end
+
+# check the test advisory
+        set advise = FALSE
+        set alst = ( `printenv TEST_ADVISORY | sed 's/:/ /g'` )
+        foreach i ($alst)
+           foreach j ($adv)
+              if ($i == $j) then
+                 set advise = TRUE
+                 break
+              endif
+           end
+           if ($advise == TRUE) then
+              break
+           endif
+        end
+        unset alst
+
+# make sure it is upper case
+        set name = ( `echo $name | tr "[a-z]" "[A-Z]"` )
+
+        if ($?rm_cache == 1) then
+#echo "----------------"
+#pwd
+#echo "rm_cache = |$rm_cache|"
+#echo "----------------"
+           if ("$rm_cache" != "") then
+              set rm_cache = ( `echo $rm_cache | sed 's|:| |g'` )
+              $RM $rm_cache
+              setenv rm_cache
+           endif
+        endif
 
         if ("$raf" != "") then
            flog $log $RM $raf
@@ -127,27 +173,263 @@ switch ($tgt)
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# FINISH
+# PART/FINISH
+
    case fin:
-
-        NoteD $Log ""
-        NoteD $Log " --------------------------------------------------------"
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# PART
    case part:
+        set dt      = -1
+        set xstatus = 0
+        set msg     = ""
+        set exe     = ""
+        set rpf     = ""
+        set mode    = major
+
+        while ($#argv > 0)
+           switch ("$1")
+              case -a:
+                   shift
+                   set adv = ( $adv ${Package}_$1 )
+                   breaksw
+              case -dt:
+                   shift
+                   set dt = $1
+                   breaksw
+              case -e:
+                   shift
+                   if ($1 == "FALSE") then
+                      set xstatus = 0
+                   else
+                      set xstatus = $1
+                   endif
+                   breaksw
+              case -h:
+                   echo "Usage: test-check $tgt [-a <tst>] [-dt <time>] [-e <status>] [-h] [-l] [-rpf <files>] [-x <exe>] <msg>"
+                   echo "   a     set advisory for test <tst>"
+                   echo "   dt    time taken for test"
+                   echo "   e     exit status of the test"
+                   echo "   h     this help message"
+                   echo "   l     print status as ok/ng rather than PASSED/FAILED"
+                   echo "   rpf   remove <files> if test passes"
+                   echo "   x     full path to test executable"
+                   echo "   <msg> test id message"
+                   echo ""
+                   exit(1)
+              case -l:
+                   set mode = minor
+                   breaksw
+              case -rpf:
+                   shift
+                   set rpf = ( $1 )
+                   breaksw
+              case -x:
+                   shift
+                   set exe = $1
+                   breaksw
+              case -*:
+                   echo "Unknown option '$1' - exiting"
+                   exit(1)
+                   breaksw
+              default:
+                   set msg = ( $argv )
+		   break
+                   breaksw
+           endsw
+           shift
+        end
+
+        if ($dt == -1) then
+           set dt = `$TIMER -b $t0`
+        endif
+
+# check the test advisory
+        set advise = FALSE
+        set alst = ( `printenv TEST_ADVISORY | sed 's/:/ /g'` )
+        foreach i ($alst)
+           foreach j ($adv)
+              if ($i == $j) then
+                 set advise = TRUE
+                 break
+              endif
+           end
+           if ($advise == TRUE) then
+              break
+           endif
+        end
+        unset alst
+
+#        if ($?rm_cache == 1) then
+#           if ("$rm_cache" != "") then
+#              set rm_cache = ( `echo $rm_cache | sed 's|:| |g'` )
+#              $RM $rm_cache
+#              setenv rm_cache
+#           endif
+#        endif
+
+        if ($tgt == fin) then
+           NoteD $log ""
+           NoteD $log " --------------------------------------------------------"
+        endif
+
+# determine and print the message
+
+# no message case
+        if ("$msg" == "none") then
+           switch ($xstatus)
+# no resources
+              case 255:
+# batch controller failed
+              case 254:
+                   if ($mode == major) then
+                      NoteD $log "OMITTED ($xstatus/$dt)"
+                   else
+                      NoteD $log "omitted ($xstatus/$dt)"
+                   endif
+                   breaksw
+# crashed
+              case 253:
+                   if ($mode == major) then
+                      NoteD $log "CRASHED ($xstatus/$dt)"
+                   else
+                      NoteD $log "crashed ($xstatus/$dt)"
+                   endif
+                   breaksw
+# results differed
+              case 252:
+                   if ($mode == major) then
+                      NoteD $log "DIFFERED ($dt)"
+                   else
+                      NoteD $log "differed ($dt)"
+                   endif
+                   breaksw
+# timeout
+              case 251:
+                   if ($mode == major) then
+                      NoteD $log "TIMEOUT ($dt)"
+                   else
+                      NoteD $log "to ($dt)"
+                   endif
+                   breaksw
+# leaked
+              case 250:
+                   if ($mode == major) then
+                      NoteD $log "LEAKED ($dt)"
+                   else
+                      NoteD $log "leaked ($dt)"
+                   endif
+                   breaksw
+              case 0:
+                   if ($mode == major) then
+                      NoteD $log "PASSED ($dt)"
+                   else
+                      NoteD $log "ok ($dt)"
+                   endif
+                   breaksw
+              default:
+                   if ($mode == major) then
+                      NoteD $log "FAILED ($xstatus/$dt)"
+                   else
+                      NoteD $log "ng ($xstatus/$dt)"
+                   endif
+                   breaksw
+           endsw
+
+# specified message case
+        else if ("$msg" != "") then
+           switch ($xstatus)
+# no resources
+              case 255:
+# batch controller failed
+              case 254:
+                   if ($mode == major) then
+                      NoteD $log "                    $msg OMITTED ($xstatus/$dt)"
+                   else
+                      NoteD $log "                    $msg omitted ($xstatus/$dt)"
+                   endif
+                   breaksw
+# crashed
+              case 253:
+                   if ($mode == major) then
+                      NoteD $log "                    $msg CRASHED ($xstatus/$dt)"
+                   else
+                      NoteD $log "                    $msg crashed ($xstatus/$dt)"
+                   endif
+                   breaksw
+# results differed
+              case 252:
+                   if ($mode == major) then
+                      NoteD $log "                    $msg DIFFERED ($dt)"
+                   else
+                      NoteD $log "                    $msg differed ($dt)"
+                   endif
+                   breaksw
+# timeout
+              case 251:
+                   if ($mode == major) then
+                      NoteD $log "                    $msg TIMEOUT ($dt)"
+                   else
+                      NoteD $log "                    $msg to ($dt)"
+                   endif
+                   breaksw
+# leaked
+              case 250:
+                   if ($mode == major) then
+                      NoteD $log "LEAKED ($dt)"
+                   else
+                      NoteD $log "leaked ($dt)"
+                   endif
+                   breaksw
+              case 0:
+                   if ($mode == major) then
+                      NoteD $log "                    $msg PASSED ($dt)"
+                   else
+                      NoteD $log "                    $msg ok ($dt)"
+                   endif
+                   breaksw
+              default:
+                   if ($mode == major) then
+                      NoteD $log "                    $msg FAILED ($xstatus/$dt)"
+                   else
+                      NoteD $log "                    $msg ng ($xstatus/$dt)"
+                   endif
+                   breaksw
+           endsw
+        endif
+
+# determine ultimate exit status
+        switch ($xstatus)
+           case 0:
+# no resources
+           case 255:
+# batch controller failed
+           case 254:
+                set terr = 0
+                RMCache $exe
+                if ("$rpf" != "none") then
+                   flog $log $RM $rpf
+                endif
+                breaksw
+# crashed
+           case 253:
+# results differed
+           case 252:
+# timeout
+           case 251:
+# leaked
+           case 250:
+           default:
+                set terr = 1
+                breaksw
+        endsw
 
         set err = 0
         if ($terr == 1) then
            if ($advise == TRUE) then
-              Note $Log "PASSED by advisory match ( $adv ) in ( $TEST_ADVISORY )"
-              Note $Log "tgt = |$tgt|"
+              Note $log "PASSED by advisory match ( $adv ) in ( $TEST_ADVISORY )"
+              Note $log "tgt = |$tgt|"
 
-              flog $Log set err = 0
+              flog $log set err = 0
            else
-              flog $Log set err = 1
+              flog $log set err = 1
            endif
         endif
         breaksw

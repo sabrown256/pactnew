@@ -321,6 +321,12 @@ extern void
  _SC_print_block_info(FILE *fp, SC_heap_des *ph, void *ptr, int flag);
 
 
+/* SCMEMDB.C declarations */
+
+extern int
+ _SC_n_blocks(SC_heap_des *ph, int flag);
+
+
 /* SCMEMDC.C declarations */
 
 extern void

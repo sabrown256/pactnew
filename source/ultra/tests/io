@@ -20,7 +20,8 @@ source ../../tests/common
    NoteD $Log -n "                    ULTRA I/O Test ............... "
    Note $Log ""
 
-   set UTime = `$TIMER -r`
+   set rpf = none
+
    if ("$Valgrind" == "") then
       flog $Log ($CFE $Ultra -l $TDir/uliot.scm >& uliot.log)
       set xstatus = $status
@@ -29,23 +30,12 @@ source ../../tests/common
       grep "ERROR SUMMARY:"                                                         |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $Log $RM $Tmp
-   endif
-
-   set ETime = `$TIMER -b $UTime`
-
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "OMITTED ($xstatus/$ETime)"
-   else if ($xstatus != 0) then
-      NoteD $Log "FAILED ($xstatus/$ETime)"
-      set Err = 1
-   else
-      NoteD $Log "PASSED ($ETime)"
+      set rpf     = $Tmp
    endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a io -e $Err part
+$TEST_CHECK part -a io -e $xstatus -rpf "$rpf" none
 
 exit($status)

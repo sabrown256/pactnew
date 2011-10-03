@@ -102,14 +102,14 @@ else if ($FC_Exe != none) then
 
 # CLEAN UP - we are all done now
 
-   $TEST_CHECK -n FORTRAN -e $ERROR -raf "$Tmp" clean
+   $TEST_CHECK clean -n FORTRAN -e $ERROR -raf "$Tmp"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 endif
 
-$TEST_CHECK -e $ERROR fin
+$TEST_CHECK fin -e $ERROR
 
 exit($status)
 

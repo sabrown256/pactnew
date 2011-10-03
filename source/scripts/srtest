@@ -69,14 +69,14 @@ else if (-e $RootDir/score/scstd.h) then
 
 # CLEAN UP - we are all done now
 
-   $TEST_CHECK -n SCRIPT -e $ERROR clean
+   $TEST_CHECK clean -n SCRIPT -e $ERROR
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 endif
 
-$TEST_CHECK -e $ERROR fin
+$TEST_CHECK fin -e $ERROR
 
 exit($status)
 

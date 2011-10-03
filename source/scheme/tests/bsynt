@@ -10,20 +10,16 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           BASIS SYNTAX TESTS
-
-#--------------------------------------------------------------------------
+set msg = "SCHEME Basis Syntax Test ..... "
+set rpf = none
 
    if (($do_syntax == 0) && (-d $RootDir/scheme/syntax/m)) then
       NoteD $Log ""
-      NoteD $Log -n "                    SCHEME Basis Syntax Test ..... "
+      NoteD $Log -n "                    $msg"
       Note $Log ""
 
       flog $Log cp $FilesDir/shmtst.m .
 
-      set UTime = `$TIMER -r`
       if ("$Valgrind" == "") then
          $CFE $BinDir/scheme -e -l shmtst.m >! shmtst.res
          set xstatus = $status
@@ -36,24 +32,9 @@ source ../../tests/common
          grep "ERROR SUMMARY:"                                |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-         flog $Log $RM $Tmp
+         set rpf     = ( $rpf $Tmp )
       endif
-      set ETime = `$TIMER -b $UTime`
 
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $LogF "OMITTED ($xstatus/$ETime)"
-      else if ($xstatus == 0) then
-         NoteD $Log "PASSED ($ETime)"
-         flog $Log rm -f shmtst.res shmtst.res.diff shmtst.m
-      else
-         NoteD $Log "FAILED ($xstatus/$ETime)"
-         set Err = 1
-      endif
-   endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a bsynt -e $Err part
+$TEST_CHECK part -a bsynt -e $xstatus -rpf "$rpf" none
 
 exit($status)

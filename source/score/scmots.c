@@ -114,7 +114,7 @@ static int run_test(char *name, int n, int (*tst)(int n, double *pdt))
     if (map == TRUE)
        cs = SC_mem_monitor(-1, dbg, "MOR", msg);
 
-    ln = 28;
+    ln = 30;
     snprintf(s, MAXLINE, "\t\t\t%s ", name);
     nc = strlen(s);
     memset(s+nc, '.', ln-nc);

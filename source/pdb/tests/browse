@@ -10,41 +10,34 @@
 
 source ../../tests/common
 
+set msg = "PDB Browse Test .................... "
+set rpf = "none"
+set exe = $BinDir/pdlsts
+
 set tst = $1
 
 NoteD $LogF ""
 NoteD $LogF -n "                    PDB Browse Test .................... "
 Note $LogF ""
 
-set UTime = `$TIMER -r`
 if ("$Valgrind" == "") then
-   $CFE $BinDir/pdlsts pdatst.db >& pdatst.lst
+   $CFE $exe pdatst.db >& pdatst.lst
    set xstatus = $status
 else
-   ftee $LogF $Valgrind $BinDir/pdlsts pdatst.db |& \
+   ftee $LogF $Valgrind $exe pdatst.db          |& \
    grep "ERROR SUMMARY:"                        |& \
    awk '{ print $4 }'   >&! $Tmp
    set xstatus = `cat $Tmp`
-	 flog $LogF $RM $Tmp
+   set rpf     = ( $rpf $Tmp )
 endif
-set ETime   = `$TIMER -b $UTime`
 
-if (($xstatus == 254) || ($xstatus == 255)) then
-   NoteD $LogF "OMITTED ($xstatus/$ETime)"
-else if ($xstatus != 0) then
-   NoteD $LogF ""
-   NoteD $LogF "FAILED ($xstatus/$ETime)"
-   set Err = 1
-else
-   NoteD $LogF "PASSED ($ETime)"
-   flog $LogF rm -f pdatst.lst
-endif
+set rpf = ( $rpf pdatst.lst )
 
 flog $LogF rm *.db? *.rs?
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a browse -e $Err part
+$TEST_CHECK part -a browse -e $xstatus -x $exe -rpf "$rpf" none
 
 exit($status)

@@ -10,9 +10,12 @@
 
 source ../../tests/common
 
+set msg = "PANACHE Test .................. "
+set rpf = "none"
+
 NoteD $LogF ""
 NoteD $LogF ""
-NoteD $LogF "                    PANACHE Test .................."
+NoteD $LogF "                    $msg"
 
 set UTime = `$TIMER -r`
 
@@ -21,21 +24,10 @@ do-test
 set xstatus = $status
 flog $LogF popd
 
-set ETime = `$TIMER -b $UTime`
-
-if (($xstatus == 254) || ($xstatus == 255)) then
-   NoteD $LogF "                    PANACHE Test .................. OMITTED ($xstatus/$ETime)"
-else if ($xstatus != 0) then
-   NoteD $LogF "                    PANACHE Test .................. FAILED ($ETime)"
-   set Err = 1
-else
-   NoteD $LogF "                    PANACHE Test .................. PASSED ($ETime)"
-endif
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a gen -e $Err part
+$TEST_CHECK part -a gen -e $xstatus "$msg"
 
 exit($status)
 

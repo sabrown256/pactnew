@@ -548,8 +548,9 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 
 void SC_mem_statr(int64_t *al ARG([*],out), int64_t *fr ARG([*],out),
 		  int64_t *df ARG([*],out), int64_t *mx ARG([*],out),
-		  int64_t *rs ARG([*],out))
-   {SC_heap_des *ph;
+		  int64_t *rs ARG([*],out), int64_t *ov ARG([*],out))
+   {int64_t nb;
+    SC_heap_des *ph;
     SC_rusedes ru;
 
     SC_resource_usage(&ru, -1);
@@ -570,6 +571,10 @@ void SC_mem_statr(int64_t *al ARG([*],out), int64_t *fr ARG([*],out),
 
     if (rs != NULL)
        *rs = 1.0e3*ru.maxrss;
+
+    if (ov != NULL)
+       {nb  = _SC_n_blocks(ph, 7);
+	*ov = nb*sizeof(mem_header);};
 
     return;}
 

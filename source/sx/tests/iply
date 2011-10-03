@@ -10,17 +10,13 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                        INTERSECTING POLYGON TEST
-
-#--------------------------------------------------------------------------
+set msg = "SX PML Polygon Test .......... "
+set exe = $BinDir/sx
+set rpf = 0
+@ nerr  = 0
 
    NoteD $Log ""
-   NoteD $Log "                    SX PML Polygon Test .......... "
-
-   @ lerr    = 0
-   set UTime = `$TIMER -r`
+   NoteD $Log "                    $msg"
 
    foreach t (iply1 iply2)
 
@@ -29,71 +25,39 @@ source ../../tests/common
 
       flog $Log rm -f $t*.diff $t*.ps
 
-      set bt = `$TIMER -r`
+      set opt = ( -l $RootDir/sx/tests/$t.scm )
       if ("$Valgrind" == "") then
-         flog $Log ($PDBView -l $RootDir/sx/tests/$t.scm >& $t.res)
+         set bt = `$TIMER -r`
+         flog $Log ($PDBView $opt >& $t.res)
          set xstatus = $status
+         if ($xstatus == 0) then
+            foreach i ($t.ps)
+               if (-f $RootDir/sx/tests/ref/$i) then
+                  flog $Log ($CFE $PSDIFF $i $RootDir/sx/tests/ref/$i >&! $i.diff)
+                  @ st = $status
+                  @ xstatus = $xstatus + $st
+                  Note $Log "Test $i:r status $st"
+               endif
+            end
+            set et = `$TIMER -b $bt`
+
+            if ($xstatus != 0) then
+               NoteD $Log "ng ($et)"
+               @ nerr = $nerr + 1
+            else
+               NoteD $Log "ok ($et)"
+            endif
+         endif
       else
-         ftee $Log $Valgrind $BinDir/sx -e -p -q -l $RootDir/sx/tests/$t.scm |& \
-         grep "ERROR SUMMARY:"                                               |& \
+         ftee $Log $Valgrind $exe -e -p -q $opt    |& \
+         grep "ERROR SUMMARY:"                     |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-         flog $Log $RM $Tmp
+         set rpf     = ( $rpf $Tmp )
       endif
-
-      set et = `$TIMER -b $bt`
-
-      if ("$Valgrind" != "") then
-         if ($xstatus != 0) then
-            NoteD $Log "ng ($xstatus/$et)"
-            set Err = 1
-         else
-            NoteD $Log "ok ($et)"
-         endif
-      else if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $Log "omitted ($xstatus/$et)"
-         set xstatus = 0
-      else if ($xstatus != 0) then
-         NoteD $Log "crashed ($xstatus/$et)"
-         @ lerr = $lerr + 1
-      else
-         flog $Log @ xstatus = 0
-         foreach i ($t.ps)
-            if (-f $RootDir/sx/tests/ref/$i) then
-               flog $Log ($CFE $PSDIFF $i $RootDir/sx/tests/ref/$i >&! $i.diff)
-               @ st = $status
-               @ xstatus = $xstatus + $st
-               Note $Log "Test $i:r status $st"
-            endif
-         end
-
-         if ($xstatus != 0) then
-            NoteD $Log "ng ($et)"
-            @ lerr = $lerr + 1
-         else
-            NoteD $Log "ok ($et)"
-            flog $Log rm -f $t.res.diff $t.res $t.ps $t*.diff
-         endif
-      endif
-
    end
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-   set ETime = `$TIMER -b $UTime`
-
-   if ($lerr != 0) then
-      NoteD $Log "                    SX PML Polygon Test .......... FAILED ($ETime)"
-      set Err = 1
-   else
-      NoteD $Log "                    SX PML Polygon Test .......... PASSED ($ETime)"
-   endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a iply -e $Err part
+$TEST_CHECK part -a iply -e $nerr -rpf "$rpf" "$msg"
 
 exit($status)
 

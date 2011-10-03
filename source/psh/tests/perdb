@@ -8,19 +8,10 @@
 # include "cpyright.h"
 #
 
-set Package = psh
-if ($?Log == 0) then
-   if (-f test-env) then
-      source test-env
-      pushd $TestDir >& /dev/null
-   else
-      mv $Log $Log.tmp
-      source ../../../scripts/test-env
-      mv $Log.tmp $Log
-   endif
-else
-   source ../../../scripts/env-csh
-endif
+source ../../tests/common
+
+set msg = "PERDB Test ..................... "
+set rpf = none
 
 set PERDB = perdb
 
@@ -53,7 +44,7 @@ InitLog Log $TestDir/log.perdb.$LogSfx
 set BTime = `$TIMER -r`
 
 NoteD $Log ""
-NoteD $Log "                    PERDB Test ....................."
+NoteD $Log "                    $msg"
 
 set TstDir = $SrcDir/tests
 set RefDir = $TstDir/ref
@@ -72,7 +63,7 @@ else
    set List = (perdb1 perdb2 perdb3 perdb4 perdb5 perdb6 perdb7 perdb8)
 endif
 
-set lErr = 0
+set nerr = 0
 
 flog $Log setenv PATH $RootDir/scripts:$PATH
 
@@ -114,24 +105,17 @@ foreach t ($List)
       flog $Log cat $Res
       flog $Log cat $Res.diff
       NoteD $Log "ng"
-      flog $Log set lErr = 1
+      flog $Log set nerr = 1
    endif
 end
 
-set ETime = `$TIMER -b $BTime`
-
-if ($lErr != 0) then
-   NoteD $Log "                    PERDB Test ..................... FAILED ($lErr/$ETime)"
-   @ Err = $Err + 1
-else
-   NoteD $Log "                    PERDB Test ..................... PASSED ($ETime)"
-   flog $Log rm -f db*
-endif
+flog $Log touch dbfoo
+set rpf = ( $rpf db* )
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a perdb -e $Err part
+$TEST_CHECK part -a perdb -e $nerr -rpf "$rpf" "$msg"
 
 exit($status)
 

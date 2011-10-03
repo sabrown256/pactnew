@@ -91,14 +91,14 @@ else if (-e $RootDir/pgs/pgs.h) then
 
 # CLEAN UP
 
-   $TEST_CHECK -n PGS -e $ERROR -raf "$Tmp" clean
+   $TEST_CHECK clean -n PGS -e $ERROR -raf "$Tmp"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 endif
 
-$TEST_CHECK -e $ERROR fin
+$TEST_CHECK fin -e $ERROR
 
 exit($status)
 

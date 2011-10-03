@@ -11,6 +11,9 @@
 set Package = scripts
 source ../../test-env
 
+set msg = "SUBROUTINE Test ................ "
+set rpf = none
+
 while ($#argv > 0)
    switch ($1)
       case -h:
@@ -27,24 +30,25 @@ end
 
 @ Err = 0
 
-set BTime = `$TIMER -r`
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # SUBROUTINE - test csh-subroutines
 
-NoteD $Log "                    SUBROUTINE Test ................"
+NoteD $Log "                    $msg"
 
 set List = (subr1 subr2 subr3 subr4)
-set lErr = 0
+@ nerr   = 0
 
 flog $Log cp $RootDir/scripts/tests/{subr*} .
 flog $Log setenv PATH $RootDir/scripts:$PATH
 
 foreach t ($List)
    Separator $Log
-   NoteD $Log -n "                        $t ... "
+
+   set f = ( `fill-string -n 28 $t` )
+
+   NoteD $Log -n "                        $f "
    Note $Log ""
 
    set Res = $t.res
@@ -57,27 +61,18 @@ foreach t ($List)
    set xstatus = $status
    if ($xstatus == 0) then
       NoteD $Log "ok"
-      flog $Log rm -f $Res $Ref
+      set rpf = ( $rpf $Res $Ref )
    else
-      flog $Log set lErr = 1
       NoteD $Log "ng"
+      flog $Log @ nerr = $nerr + 1
    endif
 end
 
-set ETime = `$TIMER -b $BTime`
-
-if ($lErr != 0) then
-   NoteD $Log "                    SUBROUTINE Test ................ FAILED"
-   @ Err = $Err + 1
-else
-   NoteD $Log "                    SUBROUTINE Test ................ PASSED"
-   flog $Log rm -f run.* s*
-endif
-NoteD $Log ""
+set rpf = ( $rpf run.* s* )
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a subr -e $Err part
+$TEST_CHECK part -a subr -e $nerr -rpf "$rpf" "$msg"
 
 exit($status)

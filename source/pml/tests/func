@@ -10,21 +10,17 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                              PML FUNCTION TEST
-
-#--------------------------------------------------------------------------
+set msg = "PML Function Test ...... "
+set rpf = "none"
+set exe = $BinDir/mlfnts
 
    NoteD $Log ""
-   NoteD $Log  -n "                    PML Function Test ...... "
+   NoteD $Log  -n "                    $msg"
 
    flog $Log pushd $SrcDir
    flog $Log $MAKE funcs
    set TStatus = $status
    flog $Log popd
-
-   set UTime = `$TIMER -r`
 
    if ($TStatus != 0) then
       NoteD $Log ""
@@ -32,33 +28,15 @@ source ../../tests/common
       set xstatus = $TStatus
    else
       if ("$Valgrind" == "") then
-         flog $LogF $cfe $BinDir/mlfnts
+         flog $LogF $cfe $exe
          set xstatus = $status
       else
-         flog $Log $Valgrind $BinDir/mlfnts
+         flog $Log $Valgrind $exe
          set xstatus = $status
       endif
-      if ($xstatus != 0) then
-        NoteD $Log ""
-        NoteD $Log "                         Error in Function Test program"
-      endif
    endif
 
-   set ETime = `$TIMER -b $UTime`
-
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $Log  "                    PML Function Test ........ OMITTED ($xstatus/$ETime)"
-   else if ($xstatus != 0) then
-      NoteD $Log  "                    PML Function Test ........ FAILED ($ETime)"
-      @ Err = 1
-   else
-      NoteD $Log "PASSED ($ETime)"
-   endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK -a func -e $Err part
+$TEST_CHECK part -a func -e $xstatus -x $exe none
 
 exit($status)
 

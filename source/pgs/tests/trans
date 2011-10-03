@@ -10,16 +10,12 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           PGS TRANSFORMATIONS TEST
-
-#--------------------------------------------------------------------------
-
-   Separator $Log
+set msg = "PGS Trans Test ......... "
+set rpf = "none"
+set exe = $BinDir/gstrts
 
    NoteD $Log ""
-   NoteD $Log "                    PGS Trans Test ........."
+   NoteD $Log "                    $msg"
 
    flog $Log pushd $SrcDir
    flog $Log $MAKE trans
@@ -29,38 +25,25 @@ source ../../tests/common
    if ($xstatus != 0) then
       NoteD $Log ""
       NoteD $Log "                         Can't build PGS Trans Test Program"
-      NoteD $Log "                    PGS Trans Test ......... FAILED"
-      set Err = 1
+      NoteD $Log "                    ${msg}FAILED"
    else
-
-      set UTime = `$TIMER -r`
       if ("$Valgrind" == "") then
-         ftee $Log $CFE $BinDir/gstrts -A
+         ftee $Log $CFE $exe -A
          set xstatus = $status
       else
-         ftee $Log $Valgrind $BinDir/gstrts -A |&  \
+         ftee $Log $Valgrind $exe -A           |& \
          grep "ERROR SUMMARY:"                 |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-	 flog $Log $RM $Tmp
+         set rpf     = ( $rpf $Tmp )
       endif
 
-      set ETime    = `$TIMER -b $UTime`
-
-      NoteD $Log ""
-
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $Log "                    PGS Trans Test ......... OMITTED ($xstatus/$ETime)"
-      else if ($xstatus != 0) then
-         NoteD $Log "                    PGS Trans Test ......... FAILED ($xstatus/$ETime)"
-         set Err = 1
-      else
-         NoteD $Log "                    PGS Trans Test ......... PASSED ($ETime)"
-      endif
+      Note $Log ""
+   endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a trans -e $Err part
+$TEST_CHECK part -a trans -e $xstatus -x $exe -rpf "$rpf" "$msg"
 
 exit($status)

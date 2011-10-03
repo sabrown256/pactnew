@@ -10,44 +10,49 @@
 
 source ../../tests/common
 
+set msg = "SCHEME Numeric Test .......... "
+set rpf = none
+set exe = $BinDir/scheme
+@ nerr  = 0
+
+NoteD $Log ""
+NoteD $Log "                    $msg"
+
+flog $Log pwd
+
 #--------------------------------------------------------------------------
 
-#                           INTEGER SYNTAX TESTS
+#                          INTEGER SYNTAX TESTS
 
 #--------------------------------------------------------------------------
 
-   NoteD $Log ""
-   NoteD $Log -n "                    SCHEME Integer Syntax Test ... "
+   set rpf = none
+
+   NoteD $Log -n "                       integer syntax ............ "
    Note $Log ""
 
 # test that the SCHEME variable can be derived from the executable path
    flog $Log unsetenv SCHEME
    flog $Log unsetenv DO_RUN_SUBMIT_ENV
 
-   flog $Log pwd
-
    set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then
-      flog $Log $cfe $BinDir/scheme -e -l $FilesDir/shsint.scm
+      flog $Log $cfe $exe -e -l $FilesDir/shsint.scm
       set xstatus = $status
    else
-      ftee $Log $Valgrind $BinDir/scheme -e -l $FilesDir/shsint.scm  |& \
-      grep "ERROR SUMMARY:"                                          |& \
+      ftee $Log $Valgrind $exe -e -l $FilesDir/shsint.scm      |& \
+      grep "ERROR SUMMARY:"                                    |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $Log $RM $Tmp
+      set rpf     = ( $rpf $Tmp )
    endif
    set ETime   = `$TIMER -b $UTime`
 
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "OMITTED ($xstatus/$ETime)"
-   else if ($xstatus != 0) then
-      NoteD $Log "FAILED ($xstatus/$ETime)"
-      set Err = 1
-   else
-      flog $Log rm -f '#tmp#'
-      NoteD $Log "PASSED ($ETime)"
-   endif
+   set rpf = ( $rpf '#tmp#' )
+
+   $TEST_CHECK part -a numer_int -e $xstatus -l -dt $ETime -rpf "$rpf" none
+
+   @ nerr = $nerr + $status
 
 #--------------------------------------------------------------------------
 
@@ -55,33 +60,29 @@ source ../../tests/common
 
 #--------------------------------------------------------------------------
 
-   NoteD $Log ""
-   NoteD $Log -n "                    SCHEME Numeric Test .......... "
+   set rpf = none
+
+   NoteD $Log -n "                       numeric ................... "
    Note $Log ""
 
-   flog $Log pwd
    set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then
-      flog $Log $cfe $BinDir/scheme -e -l $FilesDir/shnum.scm
+      flog $Log $cfe $exe -e -l $FilesDir/shnum.scm
       set xstatus = $status
    else
-      ftee $Log $Valgrind $BinDir/scheme -e -l $FilesDir/shnum.scm  |& \
-      grep "ERROR SUMMARY:"                                         |& \
+      ftee $Log $Valgrind $exe -e -l $FilesDir/shnum.scm     |& \
+      grep "ERROR SUMMARY:"                                  |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $Log $RM $Tmp
+      set rpf     = ( $rpf $Tmp )
    endif
    set ETime   = `$TIMER -b $UTime`
 
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "OMITTED ($xstatus/$ETime)"
-   else if ($xstatus != 0) then
-      NoteD $Log "FAILED ($xstatus/$ETime)"
-      set Err = 1
-   else
-      flog $Log rm -f '#tmp#'
-      NoteD $Log "PASSED ($ETime)"
-   endif
+   set rpf = ( $rpf '#tmp#' )
+
+   $TEST_CHECK part -a numer_num -e $xstatus -l -dt $ETime -rpf "$rpf" none
+
+   @ nerr = $nerr + $status
 
 #--------------------------------------------------------------------------
 
@@ -89,37 +90,33 @@ source ../../tests/common
 
 #--------------------------------------------------------------------------
 
-   NoteD $Log ""
-   NoteD $Log -n "                    SCHEME Complex Test .......... "
+   set rpf = none
+
+   NoteD $Log -n "                       complex ................... "
    Note $Log ""
 
-   flog $Log pwd
    set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then
-      flog $Log $cfe $BinDir/scheme -e -l $FilesDir/shcpx.scm
+      flog $Log $cfe $exe -e -l $FilesDir/shcpx.scm
       set xstatus = $status
    else
-      ftee $Log $Valgrind $BinDir/scheme -e -l $FilesDir/shcpx.scm  |& \
-      grep "ERROR SUMMARY:"                                         |& \
+      ftee $Log $Valgrind $exe -e -l $FilesDir/shcpx.scm     |& \
+      grep "ERROR SUMMARY:"                                  |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $Log $RM $Tmp
+      set rpf     = ( $rpf $Tmp )
    endif
    set ETime   = `$TIMER -b $UTime`
 
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "OMITTED ($xstatus/$ETime)"
-   else if ($xstatus != 0) then
-      NoteD $Log "FAILED ($xstatus/$ETime)"
-      set Err = 1
-   else
-      flog $Log rm -f '#tmp#'
-      NoteD $Log "PASSED ($ETime)"
-   endif
+   set rpf = ( $rpf '#tmp#' )
+
+   $TEST_CHECK part -a numer_complex -e $xstatus -l -dt $ETime -rpf "$rpf" none
+
+   @ nerr = $nerr + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a numer -e $Err part
+$TEST_CHECK part -a numer -e $nerr "$msg"
 
 exit($status)

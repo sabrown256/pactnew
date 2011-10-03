@@ -93,14 +93,14 @@ else if (-f $LPYTHON/pact/pdb.py) then
 
 # CLEAN UP - we are all done now
 
-   $TEST_CHECK -n PYTHON -e $ERROR -raf "../testfile" clean
+   $TEST_CHECK clean -n PYTHON -e $ERROR -raf "../testfile"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 endif
 
-$TEST_CHECK -e $ERROR fin
+$TEST_CHECK fin -e $ERROR
 
 exit($status)
 

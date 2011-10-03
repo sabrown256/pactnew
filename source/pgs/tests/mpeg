@@ -10,16 +10,12 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
+set msg = "PGS MPEG Test .......... "
 
-#                           PGS MPEG TEST
-
-#--------------------------------------------------------------------------
-
-   Separator $Log
+@ err = 0
 
    NoteD $Log ""
-   NoteD $Log "                    PGS MPEG Test .......... "
+   NoteD $Log "                    $msg"
 
    flog $Log pushd $SrcDir
    flog $Log $MAKE mpeg
@@ -34,66 +30,52 @@ source ../../tests/common
    else
       flog $Log rm -f gsmpg1.mpg gsmpg2.mpg
 
-      set UTime = `$TIMER -r`
+      set rpf = "none"
+      set exe = $BinDir/gsmpgt1
 
-      NoteD $Log -n "                        curve ..... "
+      NoteD $Log -n "                        curve .............. "
       set BTime = `$TIMER -r`
       if ("$Valgrind" == "") then
-         flog $Log $CFE $BinDir/gsmpgt1
+         flog $Log $CFE $exe
          set xstatus = $status
       else
-         ftee $Log $Valgrind $BinDir/gsmpgt1     |& \
+         ftee $Log $Valgrind $exe                |& \
          grep "ERROR SUMMARY:"                   |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-	 flog $Log $RM $Tmp
-      endif
-      set ETime = `$TIMER -b $BTime`
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $Log "omitted ($xstatus/$ETime)"
-      else if ($xstatus != 0) then
-         NoteD $Log "ng ($xstatus/$ETime)"
-      else
-         NoteD $Log "ok ($ETime)"
+         set rpf     = ( $rpf $Tmp )
       endif
 
-      NoteD $Log -n "                        fill ...... "
+      $TEST_CHECK part -a mpeg1 -e $xstatus -l -x $exe -rpf "$rpf" none
+
+      @ err = $err + $status
+
+      set rpf = "none"
+      set exe = $BinDir/gsmpgt2
+
+      NoteD $Log -n "                        fill ............... "
       set BTime = `$TIMER -r`
       if ("$Valgrind" == "") then
-         flog $Log $CFE $BinDir/gsmpgt2
+         flog $Log $CFE $exe
          set xstatus = $status
       else
-         ftee $Log $Valgrind $BinDir/gsmpgt2     |& \
+         ftee $Log $Valgrind $exe                |& \
          grep "ERROR SUMMARY:"                   |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-	 flog $Log $RM $Tmp
-      endif
-      set ETime = `$TIMER -b $BTime`
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $Log "omitted ($xstatus/$ETime)"
-      else if ($xstatus != 0) then
-         NoteD $Log "ng ($xstatus/$ETime)"
-      else
-         NoteD $Log "ok ($ETime)"
+         set rpf     = ( $rpf $Tmp )
       endif
 
-      set ETime = `$TIMER -b $UTime`
+      $TEST_CHECK part -a mpeg2 -e $xstatus -l -x $exe -rpf "$rpf" none
 
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $Log "                    PGS MPEG Test .......... OMITTED ($xstatus/$ETime)"
-      else if ($xstatus != 0) then
-         NoteD $Log "                    PGS MPEG Test .......... FAILED ($ETime)"
-         set Err = 1
-      else
-         flog $Log rm -f gsmpg1.mpg gsmpg2.mpg
-         NoteD $Log "                    PGS MPEG Test .......... PASSED ($ETime)"
-      endif
+      @ err = $err + $status
+
+      set rpf = ( $rpf gsmpg1.mpg gsmpg2.mpg )
    endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK -a mpeg -e $Err part
+$TEST_CHECK part -a mpeg -e $err -rpf "$rpf" "$msg"
 
 exit($status)
