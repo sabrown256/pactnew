@@ -15,12 +15,13 @@ set exe = $BinDir/sx
 set rpf = none
 @ nerr  = 0
 
+   NoteD $Log ""
+   NoteD $Log -n "                    $msg"
+   Note $Log ""
+
    set sys = `uname -m`
 
    if (("$sys[1]" != "CRAY") && ("$MPI" == "")) then
-      NoteD $Log ""
-      NoteD $Log -n "                    $msg"
-      Note $Log ""
 
       set opt = ( -l $RootDir/sx/tests/sxpdbi.scm )
       if ("$Valgrind" == "") then
@@ -41,6 +42,8 @@ set rpf = none
       endif
 
       set rpf = ( $rpf sxpdbi.res sxpdbi.res.diff )
+   else
+      set xstatus = 0
    endif
 
 $TEST_CHECK part -a vif -e $xstatus -rpf "$rpf" none

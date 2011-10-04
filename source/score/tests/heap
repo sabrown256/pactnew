@@ -13,13 +13,14 @@ source ../../tests/common
 set msg = "SCORE Heap Check Test ......... "
 set exe = $BinDir/scmtrt
 set rpf = none
+set xstatus = 0
+
+NoteD $LogF ""
+NoteD $LogF -n "                    $msg"
+Note $LogF ""
 
 # NOTE: OSF1 is incapable of building this test properly when statically linked
 if (("$HaveDevZero" == "HAVE_DEV_ZERO" ) && ("$OS" != "OSF1")) then
-   NoteD $LogF ""
-   NoteD $LogF -n "                    $msg"
-   Note $LogF ""
-
    flog $LogF pushd $SrcDir
    flog $LogF $MAKE memchk
    set TStatus = $status
@@ -48,9 +49,6 @@ if (("$HaveDevZero" == "HAVE_DEV_ZERO" ) && ("$OS" != "OSF1")) then
 
    endif
 endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a heap -e $xstatus -x $exe -rpf "$rpf" none
 

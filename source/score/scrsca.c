@@ -180,7 +180,15 @@ static int _SC_res_usage_self(SC_rusedes *ru, int whch)
                         (r.ru_utime.tv_usec - pr->ru_utime.tv_usec)*1.0e-6;
 	 ru->st       = (r.ru_stime.tv_sec  - pr->ru_stime.tv_sec) +
                         (r.ru_stime.tv_usec - pr->ru_stime.tv_usec)*1.0e-6;
+#ifdef MACOSX
+/* the OS X man page incorrectly states that the units are in kBytes
+ * they are in fact in bytes
+ * see http://lists.apple.com/archives/darwin-kernel/2009/Mar/msg00005.html
+ */
+	 ru->maxrss   = (r.ru_maxrss   - pr->ru_maxrss)/1024;
+#else
 	 ru->maxrss   = r.ru_maxrss   - pr->ru_maxrss;
+#endif
 	 ru->idrss    = r.ru_idrss    - pr->ru_idrss;
 	 ru->isrss    = r.ru_isrss    - pr->ru_isrss;
 	 ru->minflt   = r.ru_minflt   - pr->ru_minflt;

@@ -15,11 +15,11 @@ set exe = $BinDir/sx
 set rpf = 0
 @ nerr  = 0
 
-   if ("$MPI" == "") then
-      NoteD $Log ""
-      NoteD $Log -n "                    $msg"
-      Note $Log ""
+   NoteD $Log ""
+   NoteD $Log -n "                    $msg"
+   Note $Log ""
 
+   if ("$MPI" == "") then
       flog $Log rm -f sxoper.res
 
       set opt = ( -l $RootDir/sx/tests/sxoper.scm )
