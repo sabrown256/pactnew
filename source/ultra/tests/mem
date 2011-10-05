@@ -11,17 +11,20 @@
 source ../../tests/common
 
 set msg = "ULTRA Memory Test ............ "
+set exe = $BinDir/ultra
+set opt = ( -e -r -x -q -s $ZeroSpace -n -l $TDir/ulmmt.scm )
+set io  = flog
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
    Note $Log ""
 
    if ("$Valgrind" == "") then
-      flog $Log ($CFE $Ultra -n -l $TDir/ulmmt.scm >& ulmmt.log)
+      flog $Log ($CFE $exe $opt >& ulmmt.log)
       set xstatus = $status
    else
-      ftee $Log $Valgrind $BinDir/ultra -e -r -x -q -s -l $TDir/ulmmt.scm  |& \
-      grep "ERROR SUMMARY:"                                                         |& \
+      ftee $Log $Valgrind $exe $opt      |& \
+      grep "ERROR SUMMARY:"              |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
       set rpf     = ( $rpf $Tmp )

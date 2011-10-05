@@ -30,17 +30,10 @@ set msg = "PGS MPEG Test .......... "
       NoteD $Log -n "                        curve .............. "
       set rpf = "none"
       set exe = $BinDir/gsmpgt1
+      set opt = ""
+      set io  = flog
 
-      if ("$Valgrind" == "") then
-         flog $Log $CFE $exe
-         set xstatus = $status
-      else
-         ftee $Log $Valgrind $exe                |& \
-         grep "ERROR SUMMARY:"                   |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         set rpf     = ( $rpf $Tmp )
-      endif
+      source ../../../scripts/test-run
 
       $TEST_CHECK part -a mpeg1 -e $xstatus -l -x $exe -rpf "$rpf" none
 
@@ -49,17 +42,10 @@ set msg = "PGS MPEG Test .......... "
       NoteD $Log -n "                        fill ............... "
       set rpf = "none"
       set exe = $BinDir/gsmpgt2
+      set opt = ""
+      set io  = flog
 
-      if ("$Valgrind" == "") then
-         flog $Log $CFE $exe
-         set xstatus = $status
-      else
-         ftee $Log $Valgrind $exe                |& \
-         grep "ERROR SUMMARY:"                   |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         set rpf     = ( $rpf $Tmp )
-      endif
+      source ../../../scripts/test-run
 
       $TEST_CHECK part -a mpeg2 -e $xstatus -l -x $exe -rpf "$rpf" none
 

@@ -12,19 +12,14 @@ source ../../tests/common
 
 set msg = "PDB Checksum Test  ................. "
 set exe = $BinDir/pdcsts
+set opt = ( -v $tst )
+set io  = ftee
 
 NoteD $Log ""
 NoteD $Log "                    $msg"
 Note $Log ""
 
-set opt = ( -v $tst )
-if ("$Valgrind" == "") then
-   ftee $Log $CFE $exe $opt
-   set xstatus = $status
-else
-   flog $Log $Valgrind $exe $opt
-   set xstatus = $status
-endif
+source ../../../scripts/test-run
 
 $TEST_CHECK part -a checksum -e $xstatus -x $exe "$msg"
 

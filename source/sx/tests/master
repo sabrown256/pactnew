@@ -12,6 +12,8 @@ source ../../tests/common
 
 set msg = "PDBView Master Test .......... "
 set exe = $BinDir/sx
+set opt = ( -l $RootDir/sx/tests/pdbvtest.scm )
+set io  = flog
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
@@ -19,29 +21,29 @@ set exe = $BinDir/sx
 
    flog $Log rm -f pdbvtest.log pdbvtest.pdb pdbvtest.asc pdbvtest.err pdbvtest.tmp
 
-   set opt = ( -l $RootDir/sx/tests/pdbvtest.scm )
    if ("$Valgrind" == "") then
       flog $Log ($PDBView $opt >& pdbvtest.tmp)
       set xstatus = $status
-      if ($xstatus == 0) then
-         grep -i "error" pdbvtest.tmp > pdbvtest.err
-         set Files = `find . -name "pdbvtest.err" -size 0c -print`
-         if ($#Files == 0) then
-            set xstatus = 1
-         else
-            awk '(($1 != "%%CreationDate:") && !(($4 ~ /..:..:../) && ($5 ~ /199[0-9]/))) {print}' pdbvtest.ps > pdbvtest.ps.tmp
-            flog $Log mv pdbvtest.ps.tmp pdbvtest.ps
-
-            flog $Log $cfe $PSDIFF pdbvtest.ps $RootDir/sx/tests/ref/pdbvtest.ps
-            set xstatus = $status
-         endif
-      endif
    else
       ftee $Log $Valgrind $exe -e -p -q $opt    |& \
       grep "ERROR SUMMARY:"                     |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
       set rpf     = ( $rpf $Tmp )
+   endif
+
+   if ($xstatus == 0) then
+      grep -i "error" pdbvtest.tmp > pdbvtest.err
+      set Files = `find . -name "pdbvtest.err" -size 0c -print`
+      if ($#Files == 0) then
+         set xstatus = 1
+      else
+         awk '(($1 != "%%CreationDate:") && !(($4 ~ /..:..:../) && ($5 ~ /199[0-9]/))) {print}' pdbvtest.ps > pdbvtest.ps.tmp
+         flog $Log mv pdbvtest.ps.tmp pdbvtest.ps
+
+         flog $Log $cfe $PSDIFF pdbvtest.ps $RootDir/sx/tests/ref/pdbvtest.ps
+         set xstatus = $status
+      endif
    endif
 
    flog $Log touch pdbvtest.foo

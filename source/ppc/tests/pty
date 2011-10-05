@@ -11,8 +11,8 @@
 source ../../tests/common
 
 set DPE = ""
-
-      set msg = "PPC PTY Test ..................."
+set msg = "PPC PTY Test ..................."
+set exe = $PCEXEC
 
 # this test fails too often on DP machines so don't run there
       if ("$DPE" == "") then
@@ -23,13 +23,14 @@ set DPE = ""
 
          NoteD $Log -n "                       polling ..................... "
          set rpf = "none"
+         set opt = ( -i -c 30 -t $TEST )
 
          if ("$Valgrind" == "") then
-            $CFE $PCEXEC -c 30 -i -t $TEST | tr -d "\015" > pcexec.ptyp
+            $CFE $exe $opt | tr -d "\015" > pcexec.ptyp
             set xstatus = $status
          else
-            ftee $Log $Valgrind $PCEXEC -c 30 -i -t $TEST     |& \
-            grep "ERROR SUMMARY:"                             |& \
+            ftee $Log $Valgrind $exe $opt       |& \
+            grep "ERROR SUMMARY:"               |& \
             awk '{ print $4 }'   >&! $Tmp
             set xstatus = `cat $Tmp`
             set rpf     = ( $rpf $Tmp )
@@ -41,13 +42,14 @@ set DPE = ""
 
          NoteD $Log -n "                       interrupt ................... "
          set rpf = "none"
+         set opt = ( -c 30 -t $TEST )
 
          if ("$Valgrind" == "") then
-            $CFE $PCEXEC -c 30 -t $TEST | tr -d "\015" > pcexec.ptyi
+            $CFE $exe $opt | tr -d "\015" > pcexec.ptyi
             set xstatus = $status
          else
-            ftee $Log $Valgrind $PCEXEC -c 30 -t $TEST        |& \
-            grep "ERROR SUMMARY:"                             |& \
+            ftee $Log $Valgrind $exe $opt        |& \
+            grep "ERROR SUMMARY:"                |& \
             awk '{ print $4 }'   >&! $Tmp
             set xstatus = `cat $Tmp`
 	    set rpf     = ( $rpf $Tmp )

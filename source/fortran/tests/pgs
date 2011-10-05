@@ -51,18 +51,10 @@ if ($xstatus == 0) then
 
       set exe = $BinDir/gsftst
       set rpf = none
+      set opt = ( -s )
+      set io  = flog
 
-      if ("$Valgrind" == "") then
-         flog $Log $CFE $exe -s
-         set xstatus = $status
-      else
-         Note $Log ""
-         ftee $Log $Valgrind $exe            |& \
-         grep "ERROR SUMMARY:"               |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         set rpf     = ( $rpf $Tmp )
-      endif
+      source ../../../scripts/test-run
 
       $TEST_CHECK part -a pgs_manual -e $xstatus -x $exe -l -rpf "$rpf" none
 
@@ -77,18 +69,10 @@ if ($xstatus == 0) then
 
       set exe = $BinDir/gsfgts
       set rpf = none
+      set opt = ( -s )
+      set io  = flog
 
-      if ("$Valgrind" == "") then
-         flog $Log $CFE $exe -s
-         set xstatus = $status
-      else
-         Note $Log ""
-         ftee $Log $Valgrind $exe            |& \
-         grep "ERROR SUMMARY:"               |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         set rpf     = ( $rpf $Tmp )
-      endif
+      source ../../../scripts/test-run
 
       $TEST_CHECK part -a pgs_auto -e $xstatus -x $exe -l -rpf "$rpf" none
 
@@ -103,18 +87,10 @@ if ($xstatus == 0) then
 
       set exe = $BinDir/gsfcts
       set rpf = none
+      set opt = ( -s )
+      set io  = flog
 
-      if ("$Valgrind" == "") then
-         flog $Log $CFE $exe -s
-         set xstatus = $status
-      else
-         Note $Log ""
-         ftee $Log $Valgrind $exe -s            |& \
-         grep "ERROR SUMMARY:"                  |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         set rpf     = ( $rpf $Tmp )
-      endif
+      source ../../../scripts/test-run
 
       $TEST_CHECK part -a pgs_contour -e $xstatus -x $exe -l -rpf "$rpf" none
 

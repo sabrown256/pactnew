@@ -32,16 +32,9 @@ set exe = $BinDir/gsatst
       set opt = ""
       set opt = ( -t $nthread )
       set opt = ( $opt -f -A -B -D -E -F -1 -2 -3 -4 -5 -6 -7 -9 -10 -11 -12 )
-      if ("$Valgrind" == "") then
-         flog $Log $CFE $exe $opt
-         set xstatus = $status
-      else
-         ftee $Log $Valgrind $exe $opt           |& \
-         grep "ERROR SUMMARY:"                   |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         set rpf     = ( $rpf $Tmp )
-      endif
+      set io  = flog
+
+      source ../../../scripts/test-run
 
       set rpf = ( $rpf gscgmt.cgm )
 
@@ -60,16 +53,9 @@ set exe = $BinDir/gsatst
       set opt = ""
       set opt = ( -t $nthread )
       set opt = ( $opt -s -A -B -D -E -F -1 -2 -3 -4 -5 -6 -7 -9 -10 -11 -12 )
-      if ("$Valgrind" == "") then
-         flog $Log $CFE $exe $opt
-         set xstatus = $status
-      else
-         ftee $Log $Valgrind $exe $opt           |& \
-         grep "ERROR SUMMARY:"                   |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         set rpf     = ( $rpf $Tmp )
-      endif
+      set io  = flog
+
+      source ../../../scripts/test-run
 
       set rpf = ( $rpf gscgmt.cgm )
 

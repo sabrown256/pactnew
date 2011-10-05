@@ -12,6 +12,8 @@ source ../../tests/common
 
 set msg = "ULTRA AXIS Test .............. "
 set exe = $BinDir/ultra
+set opt = ( -l $TDir/ulaxs.scm )
+set io  = flog
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
@@ -19,11 +21,9 @@ set exe = $BinDir/ultra
 
    flog $Log $RM ulaxs.log ulaxs.err
 
-   set opt = ( -l $TDir/ulaxs.scm )
    if ("$Valgrind" == "") then
       flog $Log ($CFE $Ultra $opt >&! ulaxs.log)
       set xstatus = $status
-      flog $Log ($CFE $PSDIFF ulaxs.ps $RefDir/ulaxs.ps >&! ulaxs.ps.diff)
    else
       ftee $Log $Valgrind $exe -e -r -x -q -s $opt     |& \
       grep "ERROR SUMMARY:"                            |& \
@@ -31,6 +31,8 @@ set exe = $BinDir/ultra
       set xstatus = `cat $Tmp`
       set prf     = ( $prf $Tmp )
    endif
+
+   flog $Log ($CFE $PSDIFF ulaxs.ps $RefDir/ulaxs.ps >&! ulaxs.ps.diff)
 
    set rpf = ( $rpf ulaxs.* )
 

@@ -10,9 +10,8 @@
 
 source ../../tests/common
 
-# PPC Socket test
-
-      set msg = "PPC Socket Test ................"
+set msg = "PPC Socket Test ................"
+set exe = $PCEXEC
 
       NoteD $Log ""
       NoteD $Log "                    $msg"
@@ -21,14 +20,15 @@ source ../../tests/common
 
       NoteD $Log -n "                       polling ..................... "
       set rpf = "none"
+      set opt = ( -i -c 30 -s $TEST )
 
       set BTime = `$TIMER -r`
       if ("$Valgrind" == "") then
-         $CFE $PCEXEC -c 30 -i -s $TEST > pcexec.sockp
+         $CFE $exe $opt > pcexec.sockp
          set xstatus = $status
       else
-         ftee $Log $Valgrind $PCEXEC -c 30 -i -s $TEST     |& \
-         grep "ERROR SUMMARY:"                             |& \
+         ftee $Log $Valgrind $exe $opt        |& \
+         grep "ERROR SUMMARY:"                |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
 	 set rpf     = ( $rpf $Tmp )
@@ -40,13 +40,14 @@ source ../../tests/common
 
       NoteD $Log -n "                       interrupt ................... "
       set rpf = "none"
+      set opt = ( -c 30 -s $TEST )
 
       if ("$Valgrind" == "") then
-         $CFE $PCEXEC -c 30 -s $TEST > pcexec.socki
+         $CFE $exe $opt > pcexec.socki
          set xstatus = $status
       else
-         ftee $Log $Valgrind $PCEXEC -c 30 -s $TEST        |& \
-         grep "ERROR SUMMARY:"                             |& \
+         ftee $Log $Valgrind $exe $opt        |& \
+         grep "ERROR SUMMARY:"                |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
 	 set rpf     = ( $rpf $Tmp )

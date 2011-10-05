@@ -12,6 +12,7 @@ source ../../tests/common
 
 set msg = "SCHEME Numeric Test .......... "
 set exe = $BinDir/scheme
+set io  = flog
 
 NoteD $Log ""
 NoteD $Log "                    $msg"
@@ -27,22 +28,14 @@ flog $Log pwd
    NoteD $Log -n "                       integer syntax ............ "
    Note $Log ""
    set rpf = none
+   set opt = ( -e -l $FilesDir/shsint.scm )
 
 # test that the SCHEME variable can be derived from the executable path
    flog $Log unsetenv SCHEME
    flog $Log unsetenv DO_RUN_SUBMIT_ENV
 
    set t0 = `$TIMER -r`
-   if ("$Valgrind" == "") then
-      flog $Log $cfe $exe -e -l $FilesDir/shsint.scm
-      set xstatus = $status
-   else
-      ftee $Log $Valgrind $exe -e -l $FilesDir/shsint.scm      |& \
-      grep "ERROR SUMMARY:"                                    |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf     = ( $rpf $Tmp )
-   endif
+   source ../../../scripts/test-run
 
    set dt  = `$TIMER -b $t0`
    set rpf = ( $rpf '#tmp#' )
@@ -60,18 +53,10 @@ flog $Log pwd
    NoteD $Log -n "                       numeric ................... "
    Note $Log ""
    set rpf = none
+   set opt = ( -e -l $FilesDir/shnum.scm )
 
    set t0 = `$TIMER -r`
-   if ("$Valgrind" == "") then
-      flog $Log $cfe $exe -e -l $FilesDir/shnum.scm
-      set xstatus = $status
-   else
-      ftee $Log $Valgrind $exe -e -l $FilesDir/shnum.scm     |& \
-      grep "ERROR SUMMARY:"                                  |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf     = ( $rpf $Tmp )
-   endif
+   source ../../../scripts/test-run
 
    set dt  = `$TIMER -b $t0`
    set rpf = ( $rpf '#tmp#' )
@@ -89,18 +74,10 @@ flog $Log pwd
    NoteD $Log -n "                       complex ................... "
    Note $Log ""
    set rpf = none
+   set opt = ( -e -l $FilesDir/shcpx.scm )
 
    set t0 = `$TIMER -r`
-   if ("$Valgrind" == "") then
-      flog $Log $cfe $exe -e -l $FilesDir/shcpx.scm
-      set xstatus = $status
-   else
-      ftee $Log $Valgrind $exe -e -l $FilesDir/shcpx.scm     |& \
-      grep "ERROR SUMMARY:"                                  |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf     = ( $rpf $Tmp )
-   endif
+   source ../../../scripts/test-run
 
    set dt  = `$TIMER -b $t0`
    set rpf = ( $rpf '#tmp#' )

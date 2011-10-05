@@ -10,7 +10,8 @@
 
 source ../../tests/common
 
-      set msg = "PPC Pipe Test .................."
+set msg = "PPC Pipe Test .................."
+set exe = $PCEXEC
 
       NoteD $Log ""
       NoteD $Log "                    $msg "
@@ -19,14 +20,15 @@ source ../../tests/common
 
       NoteD $Log -n "                       polling ..................... "
       set rpf = "none"
+      set opt = ( -i -c 30 -p $TEST )
 
       set BTime = `$TIMER -r`
       if ("$Valgrind" == "") then
-         $CFE $PCEXEC -c 30 -i -p $TEST >&! pcexec.refp
+         $CFE $exe $opt >&! pcexec.refp
          set xstatus = $status
       else
-         ftee $Log $Valgrind $PCEXEC -c 30 -i -p $TEST     |& \
-         grep "ERROR SUMMARY:"                             |& \
+         ftee $Log $Valgrind $exe $opt       |& \
+         grep "ERROR SUMMARY:"               |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
 	 set rpf     = ( $rpf $Tmp )
@@ -38,14 +40,15 @@ source ../../tests/common
 
       NoteD $Log -n "                       interrupt ................... "
       set rpf = "none"
+      set opt = ( -c 30 -p $TEST )
 
       set BTime = `$TIMER -r`
       if ("$Valgrind" == "") then
-         $CFE $PCEXEC -c 30 -p $TEST >&! pcexec.refi
+         $CFE $exe $opt >&! pcexec.refi
          set xstatus = $status
       else
-         ftee $Log $Valgrind $PCEXEC -c 30 -p $TEST        |& \
-         grep "ERROR SUMMARY:"                             |& \
+         ftee $Log $Valgrind $exe $opt        |& \
+         grep "ERROR SUMMARY:"                |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
 	 set rpf     = ( $rpf $Tmp )

@@ -12,7 +12,8 @@ source ../../tests/common
 
 set msg = "SCORE Heap Check Test ......... "
 set exe = $BinDir/scmtrt
-set xstatus = 0
+set opt = ""
+set io  = flog
 
 NoteD $Log ""
 NoteD $Log -n "                    $msg"
@@ -33,16 +34,7 @@ if (("$HaveDevZero" == "HAVE_DEV_ZERO" ) && ("$OS" != "OSF1")) then
          setenv CFE   "$CFE -v"
       endif
 
-      if ("$Valgrind" == "") then
-         flog $Log $CFE $exe
-         set xstatus = $status
-      else
-         ftee $Log $Valgrind $exe       |& \
-         grep "ERROR SUMMARY:"          |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         set rpf     = ( $rpf $Tmp )
-      endif
+      source ../../../scripts/test-run
    endif
 endif
 

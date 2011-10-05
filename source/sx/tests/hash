@@ -12,6 +12,8 @@ source ../../tests/common
 
 set msg = "SX HASH Test ................. "
 set exe = $BinDir/sx
+set opt = ( -e -r -s $ZeroSpace -l $RootDir/sx/tests/sxhash.scm )
+set io  = flog
 
    set sys = `uname`
 
@@ -20,34 +22,34 @@ set exe = $BinDir/sx
       NoteD $Log -n "                    $msg"
       Note $Log ""
 
-      set opt = ( -l $RootDir/sx/tests/sxhash.scm )
       if ("$Valgrind" == "") then
-         flog $Log ($SX $opt > sxhash.res.tmp)
+         flog $Log ($exe $opt > sxhash.res.tmp)
          set xstatus = $status
-         if ($xstatus == 0) then
-            cat sxhash.res.tmp          | \
-            sed -e '/diskaddr =/d'        \
-                -e '/size =/d'            \
-                -e '/alignment =/d'       \
-                -e '/member_offs =/d'     \
-                -e '/cast_offs =/d'       \
-                -e '/number =/d'          \
-                -e '/bpi =/d'             \
-                -e '/order/d'             \
-                -e '/format/d'            \
-                -e 's/ . 0 5 7 6.98/ d 0 5 7 6.98/g'   \
-                -e 's/long_long/long/g'   \
-                -e 's/#([^A-Za-z)]*)//g' > sxhash.res
-
-            flog $Log (diff -b sxhash.res $RootDir/sx/tests/ref/sxhash > sxhash.res.diff)
-            set xstatus = $status
-         endif
       else
-         ftee $Log $Valgrind $exe -e -r -s $opt   |& \
-         grep "ERROR SUMMARY:"                    |& \
+         ftee $Log $Valgrind $exe $opt      |& \
+         grep "ERROR SUMMARY:"              |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
          set rpf     = ( $rpf $Tmp )
+      endif
+
+      if ($xstatus == 0) then
+         cat sxhash.res.tmp          | \
+         sed -e '/diskaddr =/d'        \
+             -e '/size =/d'            \
+             -e '/alignment =/d'       \
+             -e '/member_offs =/d'     \
+             -e '/cast_offs =/d'       \
+             -e '/number =/d'          \
+             -e '/bpi =/d'             \
+             -e '/order/d'             \
+             -e '/format/d'            \
+             -e 's/ . 0 5 7 6.98/ d 0 5 7 6.98/g'   \
+             -e 's/long_long/long/g'   \
+             -e 's/#([^A-Za-z)]*)//g' > sxhash.res
+
+         flog $Log (diff -b sxhash.res $RootDir/sx/tests/ref/sxhash > sxhash.res.diff)
+         set xstatus = $status
       endif
 
       set rpf = ( $rpf sxhash.res.tmp sxhash.res sxhash.res.diff )

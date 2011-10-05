@@ -12,20 +12,13 @@ source ../../tests/common
 
 set msg = "PGS AC Map Test ........ "
 set exe = $BinDir/gsatst
+set opt = ( -A -a -1 -2 -3 -4 -5 -6 -7 -8 -9 -10 )
+set io  = ftee
 
       NoteD $Log ""
       NoteD $Log -n "                    $msg"
 
-      if ("$Valgrind" == "") then
-         ftee $Log $CFE $exe -A -a -1 -2 -3 -4 -5 -6 -7 -8 -9 -10
-         set xstatus = $status
-      else
-         ftee $Log $Valgrind $exe -A -a -1 -2 -3 -4 -5 -6 -7 -8 -9 -10    |& \
-         grep "ERROR SUMMARY:"                                            |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         set rpf     = ( $rpf $Tmp )
-      endif
+      source ../../../scripts/test-run
 
       if ($xstatus == 0) then
 #         flog $Log $CFE $PSDIFF gspsta.ps $RefDir/gspsta.ps

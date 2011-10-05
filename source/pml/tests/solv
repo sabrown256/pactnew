@@ -12,6 +12,8 @@ source ../../tests/common
 
 set msg = "PML Solver Test ........ "
 set exe = $BinDir/mlicts
+set opt = ""
+set io  = flog
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
@@ -25,13 +27,7 @@ set exe = $BinDir/mlicts
       NoteD $Log ""
       NoteD $Log "                         Can't build PML Solver Test Program"
    else
-      if ("$Valgrind" == "") then
-         flog $Log $cfe $exe
-         set xstatus = $status
-      else
-         flog $Log $Valgrind $exe
-         set xstatus = $status
-      endif
+      source ../../../scripts/test-run
    endif
 
 $TEST_CHECK part -a solv -e $xstatus -x $exe none

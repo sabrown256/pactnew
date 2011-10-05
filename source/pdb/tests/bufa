@@ -12,6 +12,7 @@ source ../../tests/common
 
 set msg = "PDB Buffer Test A .................. "
 set exe = $BinDir/pdbfts
+set opt = ( -v $tst )
 
 #set STRACE = ( `which strace` )
 #if ((-x "$STRACE") && ($OS != AIX)) then
@@ -20,7 +21,6 @@ set exe = $BinDir/pdbfts
    NoteD $Log "                    $msg"
    Note $Log ""
 
-   set opt = ( -v $tst )
    if ("$Valgrind" == "") then
 
       echo -n "                       "

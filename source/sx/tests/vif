@@ -12,6 +12,8 @@ source ../../tests/common
 
 set msg = "SX PDB VIF Test .............. "
 set exe = $BinDir/sx
+set opt = ( -l $RootDir/sx/tests/sxpdbi.scm )
+set io  = flog
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
@@ -21,22 +23,22 @@ set exe = $BinDir/sx
 
    if (("$sys[1]" != "CRAY") && ("$MPI" == "")) then
 
-      set opt = ( -l $RootDir/sx/tests/sxpdbi.scm )
       if ("$Valgrind" == "") then
          flog $Log ($PDBView $opt > sxpdbi.res)
          set xstatus = $status
-         if ($xstatus == 0) then
-            flog $Log (diff sxpdbi.res $RootDir/sx/tests/ref/sxpdbi > sxpdbi.res.diff)
-            set xstatus = $status
-         else
-            flog $Log cp sxpdbi.res sxpdbi.res.crash
-         endif
       else
          ftee $Log $Valgrind $exe -e -r -s $opt     |& \
          grep "ERROR SUMMARY:"                      |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
          set rpf     = ( $rpf $Tmp )
+      endif
+
+      if ($xstatus == 0) then
+         flog $Log (diff sxpdbi.res $RootDir/sx/tests/ref/sxpdbi > sxpdbi.res.diff)
+         set xstatus = $status
+      else
+         flog $Log cp sxpdbi.res sxpdbi.res.crash
       endif
 
       set rpf = ( $rpf sxpdbi.res sxpdbi.res.diff )

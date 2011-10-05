@@ -12,6 +12,8 @@ source ../../tests/common
 
 set msg = "PDB SMP Parallel Test .............. "
 set exe = $BinDir/pdsmp
+set opt = ( -v $tst -m 0 )
+set io  = flog
 
 if ("$Parallel" != "") then
    NoteD $Log ""
@@ -28,17 +30,7 @@ if ("$Parallel" != "") then
       NoteD $Log "                         ERROR Building SMP Parallel Tests"
       NoteD $Log "                    ${msg}FAILED"
    else
-      set opt = ( -v $tst -m 0 )
-      if ("$Valgrind" == "") then
-         flog $Log $CFE $exe $opt
-         set xstatus = $status
-      else
-         ftee $Log $Valgrind $exe $opt         |& \
-         grep "ERROR SUMMARY:"                 |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         set rpf     = ( $rpf $Tmp )
-      endif
+      source ../../../scripts/test-run
    endif
 endif
 

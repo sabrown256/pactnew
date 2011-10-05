@@ -40,22 +40,15 @@ else
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   set exe = $BinDir/tscctl
-   set rpf = none
-
    NoteD $Log -n "                       scctl ...................... "
    Note $Log ""
 
-   if ("$Valgrind" == "") then
-      flog $Log $CFE $exe
-      set xstatus = $status
-   else
-      ftee $Log $Valgrind $exe       |& \
-      grep "ERROR SUMMARY:"          |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf     = ( $rpf $Tmp )
-   endif
+   set exe = $BinDir/tscctl
+   set rpf = none
+   set opt = ""
+   set io  = flog
+
+   source ../../../scripts/test-run
 
    $TEST_CHECK part -a sharp_scctl -e $xstatus -x $exe -l -rpf "$rpf" none
 
@@ -64,22 +57,15 @@ else
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   set exe = $BinDir/tscmemc
-   set rpf = none
-
    NoteD $Log -n "                       string-a ................... "
    Note $Log ""
 
-   if ("$Valgrind" == "") then
-      flog $Log $CFE $exe
-      set xstatus = $status
-   else
-      ftee $Log $Valgrind $exe       |& \
-      grep "ERROR SUMMARY:"          |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf     = ( $rpf $Tmp )
-   endif
+   set exe = $BinDir/tscmemc
+   set rpf = none
+   set opt = ""
+   set io  = flog
+
+   source ../../../scripts/test-run
 
    $TEST_CHECK part -a sharp_memc -e $xstatus -x $exe -l -rpf "$rpf" none
 
@@ -88,22 +74,15 @@ else
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   set exe = $BinDir/tscstr
-   set rpf = none
-
    NoteD $Log -n "                       string-b ................... "
    Note $Log ""
 
-   if ("$Valgrind" == "") then
-      flog $Log $CFE $exe
-      set xstatus = $status
-   else
-      ftee $Log $Valgrind $exe        |& \
-      grep "ERROR SUMMARY:"           |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf     = ( $rpf $Tmp )
-   endif
+   set exe = $BinDir/tscstr
+   set rpf = none
+   set opt = ""
+   set io  = flog
+
+   source ../../../scripts/test-run
 
    $TEST_CHECK part -a sharp_str -e $xstatus -x $exe -l -rpf "$rpf" none
 
@@ -112,22 +91,15 @@ else
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   set exe = $BinDir/scvsts
-   set rpf = none
-
    NoteD $Log -n "                       vsnprintf .................. "
    Note $Log ""
 
-   if ("$Valgrind" == "") then
-      flog $Log $CFE $exe
-      set xstatus = $status
-   else
-      ftee $Log $Valgrind $exe        |& \
-      grep "ERROR SUMMARY:"           |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf     = ( $rpf $Tmp )
-   endif
+   set exe = $BinDir/scvsts
+   set rpf = none
+   set opt = ""
+   set io  = flog
+
+   source ../../../scripts/test-run
 
    $TEST_CHECK part -a sharp_vsnprintf -e $xstatus -x $exe -l -rpf "$rpf" none
 

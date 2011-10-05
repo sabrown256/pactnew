@@ -12,6 +12,8 @@ source ../../tests/common
 
 set msg = "PDBView Mesh Test ............ "
 set exe = $BinDir/sx
+set opt = ( -l $RootDir/sx/tests/pdbvmesh.scm )
+set io  = flog
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
@@ -19,26 +21,26 @@ set exe = $BinDir/sx
 
    flog $Log rm -f pdbvmesh*.diff pdbvmesh*.ps
 
-   set opt = ( -l $RootDir/sx/tests/pdbvmesh.scm )
    if ("$Valgrind" == "") then
       flog $Log ($PDBView $opt >& pdbvmesh.res)
       set xstatus = $status
-      if ($xstatus == 0) then
-         foreach i (pdbvmesh.ps)
-            if (-f $RootDir/sx/tests/ref/$i) then
-               flog $Log ($CFE $PSDIFF $i $RootDir/sx/tests/ref/$i >&! $i.diff)
-               @ st = $status
-               @ xstatus = $xstatus + $st
-               Note $Log "Test $i:r status $st"
-            endif
-         end
-      endif
    else
       ftee $Log $Valgrind $exe -e -p -q $opt    |& \
       grep "ERROR SUMMARY:"                     |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
       set rpf     = ( $rpf $Tmp )
+   endif
+
+   if ($xstatus == 0) then
+      foreach i (pdbvmesh.ps)
+         if (-f $RootDir/sx/tests/ref/$i) then
+            flog $Log ($CFE $PSDIFF $i $RootDir/sx/tests/ref/$i >&! $i.diff)
+            @ st = $status
+            @ xstatus = $xstatus + $st
+            Note $Log "Test $i:r status $st"
+         endif
+      end
    endif
 
    set rpf = ( $rpf pdbvmesh.res.diff pdbvmesh.res pdbvmesh.ps pdbvmesh*.diff )

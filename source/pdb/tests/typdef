@@ -14,22 +14,14 @@ source ../../tests/common
 
 set msg = "PDB Typedef Test ................... "
 set exe = $BinDir/pdtdts
+set opt = ( -v $tst )
+set io  = flog
 
 NoteD $Log ""
 NoteD $Log -n "                    $msg"
 Note $Log ""
 
-set opt = ( -v $tst )
-if ("$Valgrind" == "") then
-   flog $Log $CFE $exe $opt
-   set xstatus = $status
-else
-   ftee $Log $Valgrind $exe $opt            |& \
-   grep "ERROR SUMMARY:"                    |& \
-   awk '{ print $4 }'   >&! $Tmp
-   set xstatus = `cat $Tmp`
-   set rpf     = ( $rpf $Tmp )
-endif
+source ../../../scripts/test-run
 
 if (-f out.pdb) then
    flog $Log ls -l out.pdb

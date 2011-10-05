@@ -12,6 +12,7 @@ source ../../tests/common
 
 set msg = "SCHEME C Syntax Test ......... "
 set exe = $BinDir/scheme
+set opt = ( -e -l shcdcl.c )
 
    set do_syntax = 0
 
@@ -33,17 +34,16 @@ set exe = $BinDir/scheme
       set rpf = none
 
       set t0 = `$TIMER -r`
-      set opt = ( -l shcdcl.c )
       if ("$Valgrind" == "") then
-         flog $Log ( $CFE $exe -e $opt >! shcdcl.res )
+         flog $Log ( $CFE $exe $opt >! shcdcl.res )
          set xstatus = $status
          if ($xstatus == 0) then
             flog $Log ( diff shcdcl.res $FilesDir/ref/shcdcl >! shcdcl.res.diff )
             set xstatus = $status
          endif
       else
-         ftee $Log $Valgrind $exe -e $opt      |& \
-         grep "ERROR SUMMARY:"                 |& \
+         ftee $Log $Valgrind $exe $opt      |& \
+         grep "ERROR SUMMARY:"              |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
          set rpf     = ( $rpf $Tmp )

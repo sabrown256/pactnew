@@ -12,6 +12,8 @@ source ../../tests/common
 
 set msg = "SCHEME String Test ........... "
 set exe = $BinDir/scheme
+set opt = ( -e -l $FilesDir/shstr.scm )
+set io  = flog
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
@@ -19,16 +21,7 @@ set exe = $BinDir/scheme
 
    flog $Log pwd
 
-   if ("$Valgrind" == "") then
-      flog $Log $cfe $exe -e -l $FilesDir/shstr.scm
-      set xstatus = $status
-   else
-      ftee $Log $Valgrind $exe -e -l $FilesDir/shstr.scm     |& \
-      grep "ERROR SUMMARY:"                                  |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf     = ( $rpf $Tmp )
-   endif
+   source ../../../scripts/test-run
 
 $TEST_CHECK part -a string -e $xstatus -rpf "$rpf" none
 
