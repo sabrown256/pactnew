@@ -11,13 +11,10 @@
 source ../../tests/common
 
 set msg = "PDB Attribute Test ................. "
-set rpf = "none"
 set exe = $BinDir/pdatst
 
-set tst = $1
-
 NoteD $LogF ""
-NoteD $LogF -n "                    PDB Attribute Test ................. "
+NoteD $LogF -n "                    $msg"
 Note $LogF ""
 
 if ("$Valgrind" == "") then
@@ -30,9 +27,6 @@ else
    set xstatus = `cat $Tmp`
    set rpf     = ( $rpf $Tmp )
 endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a attr -e $xstatus -x $exe -rpf "$rpf" none
 

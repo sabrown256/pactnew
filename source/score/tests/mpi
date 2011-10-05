@@ -12,8 +12,6 @@ source ../../tests/common
 
 set msg = "SCORE MPI Test ................ "
 set exe = $BinDir/sctty
-set rpf = none
-@ nerr  = 0
 
 if ($HAVE_READLINE == TRUE) then
    setenv TEST_ADVISORY "score_mpi_wrap"
@@ -22,21 +20,16 @@ endif
    NoteD $LogF ""
    NoteD $LogF "                    $msg"
 
-   set UTime = `$TIMER -r`
-
    flog $LogF pushd $SrcDir
    flog $LogF $MAKE -i mpitty
-   set TStatus = $status
+   set xstatus = $status
    flog $LogF popd
 
-   set ETime   = `$TIMER -b $UTime`
-
-   if ($TStatus != 0) then
+   if ($xstatus != 0) then
       if (!(-x $exe)) then
          NoteD $LogF ""
          NoteD $LogF "                         ERROR Building MPI Wrap Tests"
-         NoteD $LogF "                    ${msg}FAILED ($ETime)"
-         set Err = 1
+         NoteD $LogF "                    ${msg}FAILED"
       endif
    else
 

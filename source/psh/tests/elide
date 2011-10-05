@@ -11,7 +11,6 @@
 source ../../tests/common
 
 set msg = "ELIDE Test ..................... "
-set rpf = none
 
 while ($#argv > 0)
    switch ($1)
@@ -27,19 +26,10 @@ while ($#argv > 0)
    shift
 end
 
-@ Err = 0
-
-set BTime = `$TIMER -r`
-
 NoteD $Log ""
 NoteD $Log "                    $msg"
 
-set TstDir = $SrcDir/tests
-set RefDir = $TstDir/ref
-
 set List = (1 2 3)
-
-set lErr = 0
 
 flog $Log setenv PATH $RootDir/scripts:$PATH
 
@@ -48,9 +38,9 @@ Note $Log "Path = $PATH"
 foreach t (ebasic emlt echr)
    Separator $Log
 
-   flog $Log set dat = $TstDir/$t.dat
+   flog $Log set dat = $FilesDir/$t.dat
 
-   foreach i (1 2 3)
+   foreach i ($List)
       Separator $Log
 
       flog $Log set res = ${t}${i}
@@ -95,20 +85,19 @@ foreach t (ebasic emlt echr)
          flog $Log cat $res
          flog $Log cat $res.diff
          NoteD $Log "ng"
-         flog $Log set lErr = 1
       endif
+
+      @ nerr = $nerr + $xstatus
+
    end
 end
+
+Note $Log ""
 
 touch dbfoo
 set rpf = ( $rpf db* )
 
-Note $Log ""
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK part -a elide -e $Err -rpf "$rpf" "$msg"
+$TEST_CHECK part -a elide -e $nerr -rpf "$rpf" "$msg"
 
 exit($status)
 

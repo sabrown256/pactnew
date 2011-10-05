@@ -11,7 +11,6 @@
 source ../../tests/common
 
 set msg = "PML FPE Test ........... "
-set rpf = "none"
 set exe = $BinDir/mlfpets
 
       NoteD $Log ""
@@ -19,13 +18,12 @@ set exe = $BinDir/mlfpets
 
       flog $Log pushd $SrcDir
       flog $Log $MAKE fpe
-      set TStatus = $status
+      set xstatus = $status
       flog $Log popd
 
-      if ($TStatus != 0) then
+      if ($xstatus != 0) then
          NoteD $Log ""
          NoteD $Log "                         Can't build PML FPE Test Program"
-         set xstatus = $TStatus
       else
          if ("$Valgrind" == "") then
             flog $LogF $cfe $exe

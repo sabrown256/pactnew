@@ -11,7 +11,6 @@
 source ../../tests/common
 
 set msg = "DO-NET Test .................... "
-set rpf = none
 
 while ($#argv > 0)
    switch ($1)
@@ -27,20 +26,13 @@ while ($#argv > 0)
    shift
 end
 
-@ Err = 0
-
 NoteD $Log ""
 NoteD $Log -n "                    $msg"
 Note $Log ""
 
-set BTime = `$TIMER -r`
-
 # GOTCHA: fill in the place holder
 flog $Log pwd
 set xstatus = $status
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a do-net -e $xstatus -rpf "$rpf" none
 

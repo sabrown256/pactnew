@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "SCHEME Basis Syntax Test ..... "
-set rpf = none
+set exe = $BinDir/scheme
 
    if (($do_syntax == 0) && (-d $RootDir/scheme/syntax/m)) then
       NoteD $Log ""
@@ -20,16 +20,17 @@ set rpf = none
 
       flog $Log cp $FilesDir/shmtst.m .
 
+      set opt = ( -l shmtst.m )
       if ("$Valgrind" == "") then
-         $CFE $BinDir/scheme -e -l shmtst.m >! shmtst.res
+         $CFE $exe -e $opt >! shmtst.res
          set xstatus = $status
          if ($xstatus == 0) then
             diff shmtst.res $FilesDir/ref/shmtst >! shmtst.res.diff
             set xstatus = $status
          endif
       else
-         ftee $Log $Valgrind $BinDir/scheme -e -l shmtst.m    |& \
-         grep "ERROR SUMMARY:"                                |& \
+         ftee $Log $Valgrind $exe -e $opt      |& \
+         grep "ERROR SUMMARY:"                 |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
          set rpf     = ( $rpf $Tmp )

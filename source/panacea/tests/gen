@@ -11,21 +11,15 @@
 source ../../tests/common
 
 set msg = "PANACHE Test .................. "
-set rpf = "none"
 
 NoteD $LogF ""
 NoteD $LogF ""
 NoteD $LogF "                    $msg"
 
-set UTime = `$TIMER -r`
-
 flog $LogF pushd $SrcDir/tests
 do-test
 set xstatus = $status
 flog $LogF popd
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a gen -e $xstatus "$msg"
 

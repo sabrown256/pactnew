@@ -11,10 +11,7 @@
 source ../../tests/common
 
 set msg = "PDB Distributed Parallel Test ...... "
-set rpf = "none"
 set exe = $BinDir/pddpts
-
-set tst = $1
 
 if ("$MPI" != "") then
    NoteD $LogF ""
@@ -23,14 +20,13 @@ if ("$MPI" != "") then
 
    flog $LogF pushd $SrcDir
    flog $LogF $MAKE dp
-   set TStatus = $status
+   set xstatus = $status
    flog $LogF popd
 
-   if ($TStatus != 0) then
+   if ($xstatus != 0) then
       NoteD $LogF ""
       NoteD $LogF "                         ERROR Building Distributed Parallel Tests"
-      NoteD $LogF "                    PDB Distributed Parallel Test . FAILED (-1)"
-      set xstatus = 1
+      NoteD $LogF "                    ${msg}FAILED"
 
    else
       if (-x $PFE) then
@@ -46,10 +42,9 @@ if ("$MPI" != "") then
 
       $TEST_CHECK part -a dp -e $xstatus -x $exe "$msg"
 
+      set xstatus = $status
+
    endif
 endif
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-exit($status)
+exit($xstatus)

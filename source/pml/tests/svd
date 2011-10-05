@@ -11,7 +11,6 @@
 source ../../tests/common
 
 set msg = "PML SVD Test ........... "
-set rpf = "none"
 set exe = $BinDir/mlsvdt
 
    NoteD $Log ""
@@ -21,13 +20,12 @@ set exe = $BinDir/mlsvdt
 
    flog $Log pushd $SrcDir
    flog $Log $MAKE svdsolv
-   set TStatus = $status
+   set xstatus = $status
    flog $Log popd
 
-   if ($TStatus != 0) then
+   if ($xstatus != 0) then
       NoteD $Log ""
       NoteD $Log "                         Can't build PML SVD Test Program"
-      set xstatus = $TStatus
    else
       if ("$Valgrind" == "") then
          flog $LogF $cfe $exe
@@ -37,9 +35,6 @@ set exe = $BinDir/mlsvdt
          set xstatus = $status
       endif
    endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a svd -e $xstatus -x $exe none
 

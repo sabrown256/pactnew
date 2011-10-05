@@ -13,14 +13,7 @@ source ../../tests/common
 set msg = "SCHEME C Syntax Test ......... "
 set exe = $BinDir/scheme
 
-#--------------------------------------------------------------------------
-
-#                           C SYNTAX TESTS
-
-#--------------------------------------------------------------------------
-
    set do_syntax = 0
-   @ nerr        = 0
 
    grep -w Arc $IncDir/make-def >& /dev/null
    set do_syntax = $status
@@ -39,26 +32,27 @@ set exe = $BinDir/scheme
 
       set rpf = none
 
-      set UTime = `$TIMER -r`
+      set t0 = `$TIMER -r`
+      set opt = ( -l shcdcl.c )
       if ("$Valgrind" == "") then
-         flog $Log ( $CFE $exe -e -l shcdcl.c >! shcdcl.res )
+         flog $Log ( $CFE $exe -e $opt >! shcdcl.res )
          set xstatus = $status
          if ($xstatus == 0) then
             flog $Log ( diff shcdcl.res $FilesDir/ref/shcdcl >! shcdcl.res.diff )
             set xstatus = $status
          endif
       else
-         ftee $Log $Valgrind $exe -e -l shcdcl.c    |& \
-         grep "ERROR SUMMARY:"                                |& \
+         ftee $Log $Valgrind $exe -e $opt      |& \
+         grep "ERROR SUMMARY:"                 |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
          set rpf     = ( $rpf $Tmp )
       endif
-      set ETime = `$TIMER -b $UTime`
+      set dt = `$TIMER -b $t0`
 
       set rpf = ( $rpf shcdcl.res shcdcl.res.diff shcdcl.[ch] )
 
-      $TEST_CHECK part -a csynt_decl -e $xstatus -l -dt $ETime -rpf "$rpf" none
+      $TEST_CHECK part -a csynt_decl -e $xstatus -l -dt $dt -rpf "$rpf" none
 
       @ nerr = $nerr + $status
 
@@ -71,26 +65,27 @@ set exe = $BinDir/scheme
 
       set rpf = none
 
-      set UTime = `$TIMER -r`
+      set t0 = `$TIMER -r`
+      set opt = ( -l shcppts.c )
       if ("$Valgrind" == "") then
-         flog $Log ( $CFE $exe -e -l shcppts.c >! shcppts.res )
+         flog $Log ( $CFE $exe -e $opt >! shcppts.res )
          set xstatus = $status
          if ($xstatus == 0) then
             flog $Log ( diff shcppts.res $FilesDir/ref/shcppts >! shcppts.res.diff )
             set xstatus = $status
          endif
       else
-         ftee $Log $Valgrind $exe -e -l shcppts.c   |& \
-         grep "ERROR SUMMARY:"                                |& \
+         ftee $Log $Valgrind $exe -e $opt     |& \
+         grep "ERROR SUMMARY:"                |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
          set rpf     = ( $rpf $Tmp )
       endif
-      set ETime = `$TIMER -b $UTime`
+      set dt = `$TIMER -b $t0`
 
       set rpf = ( $rpf shcppts.res shcppts.res.diff shcppts.[ch] )
 
-      $TEST_CHECK part -a csynt_cpp -e $xstatus -l -dt $ETime -rpf "$rpf" none
+      $TEST_CHECK part -a csynt_cpp -e $xstatus -l -dt $dt -rpf "$rpf" none
 
       @ nerr = $nerr + $status
 
@@ -103,24 +98,25 @@ set exe = $BinDir/scheme
 
       set rpf = none
 
-      set UTime = `$TIMER -r`
+      set t0 = `$TIMER -r`
+      set opt = ( -l shctst.c )
       if ("$Valgrind" == "") then
-         flog $Log ( $CFE $exe -e -l shctst.c >! shctst.res )
+         flog $Log ( $CFE $exe -e $opt >! shctst.res )
          set xstatus = $status
          if ($xstatus == 0) then
             flog $Log ( diff shctst.res $FilesDir/ref/shctst >! shctst.res.diff )
             set xstatus = $status
          endif
       else
-         ftee $Log $Valgrind $exe -e -l shctst.c    |& \
-         grep "ERROR SUMMARY:"                                |& \
+         ftee $Log $Valgrind $exe -e $opt       |& \
+         grep "ERROR SUMMARY:"                  |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
          set rpf     = ( $rpf $Tmp )
       endif
-      set ETime = `$TIMER -b $UTime`
+      set dt = `$TIMER -b $t0`
 
-      $TEST_CHECK part -a csynt_synt -e $xstatus -l -dt $ETime -rpf "$rpf" none
+      $TEST_CHECK part -a csynt_synt -e $xstatus -l -dt $dt -rpf "$rpf" none
 
       @ nerr = $nerr + $status
 
@@ -133,7 +129,7 @@ set exe = $BinDir/scheme
 
       set rpf = none
 
-      set UTime = `$TIMER -r`
+      set t0 = `$TIMER -r`
       if ("$Valgrind" == "") then
          flog $Log ( $CFE $exe -e \(translate-c-file \"shctst.c\"\) >! shctst.scm )
          set xstatus = $status
@@ -142,9 +138,8 @@ set exe = $BinDir/scheme
             set xstatus = $status
          endif
 
+# fix results
          if ($xstatus == 0) then
-
-# begin fix
             cat shctst-scm.res | sed -e '/^$/d' >! junk
             flog $Log mv junk shctst-scm.res 
             cat $FilesDir/ref/shctst | sed -e '/^$/d' >! junk
@@ -152,7 +147,6 @@ set exe = $BinDir/scheme
 
             diff shctst-scm.res shctst >! shctst-scm.res.diff
             set xstatus = $status
-# end fix
          endif
 
       else
@@ -163,12 +157,13 @@ set exe = $BinDir/scheme
          set rpf     = ( $rpf $Tmp )
       endif
 
-      set ETime = `$TIMER -b $UTime`
+      set dt = `$TIMER -b $t0`
 
       set rpf = ( $rpf shctst-scm.res shctst-scm.res.diff )
       set rpf = ( $rpf shctst.res shctst.res.diff shctst.c )
 
-      $TEST_CHECK part -a csynt_trans -e $xstatus -l -dt $ETime -rpf "$rpf" none
+      $TEST_CHECK part -a csynt_trans -e $xstatus -l -dt $dt -rpf "$rpf" none
+
       @ nerr = $nerr + $status
 
    endif

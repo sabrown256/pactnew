@@ -10,34 +10,27 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           FILL TEST
-
-#--------------------------------------------------------------------------
+set msg = "ULTRA FILL Test .............. "
+set exe = $BinDir/ultra
 
    NoteD $Log ""
-   NoteD $Log -n "                    ULTRA FILL Test .............. "
+   NoteD $Log -n "                    $msg"
    Note $Log ""
 
    flog $Log $RM ulfill.log ulfill.err
 
-   set rpf = none
-
+   set opt = ( -l $TDir/ulfill.scm )
    if ("$Valgrind" == "") then
-      flog $Log ($CFE $Ultra -l $TDir/ulfill.scm >& ulfill.log)
+      flog $Log ($CFE $Ultra $opt >&! ulfill.log)
       set xstatus = $status
-      flog $Log (grep -i "error" ulfill.log > ulfill.err)
+      flog $Log (grep -i "error" ulfill.log >&! ulfill.err)
    else
-      ftee $Log $Valgrind $BinDir/ultra -e -r -x -q -s -l $TDir/ulfill.scm  |& \
-      grep "ERROR SUMMARY:"                                                 |& \
+      ftee $Log $Valgrind $exe -e -r -x -q -s $opt     |& \
+      grep "ERROR SUMMARY:"                            |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
       set rpf     = $Tmp
    endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a fill -e $xstatus -rpf "$rpf" none
 

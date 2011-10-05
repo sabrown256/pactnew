@@ -10,29 +10,22 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           MULTI TEST
-
-#--------------------------------------------------------------------------
-
 # NOTE: the exec tests in SCORE are a much more thorough test that this
 # so save the time and do not do this
 # keep the coding around because of the interrupt driven I/O which often
 # fails here and is not tested in SCORE
 
-set xstatus = 0
-set msg     = ""
+set msg = "PPC Multiple Test .............. "
+set exe = $BinDir/pcmtst
+
+NoteD $Log ""
+NoteD $Log -n "                    $msg"
+Note $Log ""
 
 if (0) then
-      NoteD $Log ""
-      NoteD $Log -n "                    PPC Multiple Test .............. "
-      Note $Log ""
 
-      set FAIL = "NO"
-
-      flog $Log rm -rf pcmtst.resp
-      set UTime = `$TIMER -r`
+      NoteD $Log -n "                       polling ..................... "
+      set rpf = "none"
 
       (echo "1 a" ; \
        echo "2 b" ; \
@@ -40,56 +33,39 @@ if (0) then
        echo "3 end" ; \
        echo "1 end" ; \
        echo "2 d" ; \
-       echo "2 end" ) | $CFE $BinDir/pcmtst -c 30 -i -n 3 > pcmtst.resp
-      set MultipleStatP = $status
-      if ($MultipleStatP != 0) then
-         if ($MultipleStatP != 123) then
-            NoteD $Log ""
-            NoteD $Log "                         Polling test died ($MultipleStatP)"
-         else
-            NoteD $Log ""
-            NoteD $Log "                         Polling test timed out ($MultipleStatP)"
-         endif
+       echo "2 end" ) | $CFE $exe -c 30 -i -n 3 >&! pcmtst.resp
+      set xstatus = $status
+      if ($xstatus == 123) then
+         set xstatus = 251
       endif
 
-      flog $Log rm -rf pcmtst.resi
+      $TEST_CHECK part -a multi_poll -e $xstatus -l -rpf "$rpf" none
+
+      @ nerr = $nerr + $status
+
+      NoteD $Log -n "                       interrupt ................... "
+      set rpf = "none"
+
       (echo "1 a" ; \
        echo "2 b" ; \
        echo "3 c" ; \
        echo "3 end" ; \
        echo "1 end" ; \
        echo "2 d" ; \
-       echo "2 end" ) | $CFE $BinDir/pcmtst -c 30 -n 3 > pcmtst.resi
-      set MultipleStatI = $status
-      if ($MultipleStatI != 0) then
-         if ($MultipleStatI != 123) then
-            NoteD $Log ""
-            NoteD $Log "                         Interrupt driven test died ($MultipleStatI)"
-         else
-            NoteD $Log ""
-            NoteD $Log "                         Interrupt driven test timed out ($MultipleStatI)"
-         endif
+       echo "2 end" ) | $CFE $exe -c 30 -n 3 >&! pcmtst.resi
+      set xstatus = $status
+      if ($xstatus == 123) then
+         set xstatus = 251
       endif
 
-      set ETime = `$TIMER -b $UTime`
+      $TEST_CHECK part -a multi_interrupt -e $xstatus -l -rpf "$rpf" none
 
-# NOTE: timeout = exit(123)
-# don't consider a timeout a failure
-      if ((($MultipleStatI != 0) && ($MultipleStatI != 123)) || \
-          (($MultipleStatP != 0) && ($MultipleStatP != 123)) || ) then
-         set xstatus = 1
-      else
-         set xstatus = 0
-      endif
-      set msg = "PPC Multiple Test .............."
+      @ nerr = $nerr + $status
 
    endif
 endif
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK part -a multi -e $xstatus -x $BinDir/pcmtst "$msg"
+$TEST_CHECK part -a multi -e $nerr -x $exe none
 
 exit($status)
 

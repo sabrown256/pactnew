@@ -11,7 +11,6 @@
 source ../../tests/common
 
 set msg = "BLANG Test ..................... "
-set rpf = none
 
 while ($#argv > 0)
    switch ($1)
@@ -29,9 +28,6 @@ end
 
 InitLog Log $TestDir/log.blang.$LogSfx
 
-@ Err  = 0
-@ lerr = 0
-
 flog $Log cd $TestDir
 
 NoteD $Log ""
@@ -43,21 +39,11 @@ if ($RUN_TESTS == FALSE) then
 
 else
 
-   set BTime = `$TIMER -r`
-
    NoteD $Log "                    $msg"
    Note $Log ""
 
-   set TstDir = $SrcDir/tests
-   set RefDir = $TstDir/ref
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
    flog $Log set cc = ( ${CC_Exe} ${CDefDebug} ${CC_Flags} -I${IncDir} ${MDG_Inc} ${DP_Inc} )
    flog $Log set fc = ( ${FC_Exe} ${CDefDebug} ${FC_Flags} -I${IncDir} )
-
-   @ nerr = 0
 
    foreach i (bl1 bl2 bl3 bl4 bl5 bl6)
 
@@ -69,7 +55,7 @@ else
       NoteD $Log -n "                        $f"
       Note $Log ""
 
-      flog $Log cp $TstDir/$i.* .
+      flog $Log cp $FilesDir/$i.* .
 
       flog $Log set hdr = ${i}_int.h
       flog $Log $RM $hdr
@@ -219,17 +205,11 @@ else
 
    end
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+   set rpf = ( $rpf *.o *.mod )
 
    Separator $Log
 
-   set rpf = ( $rpf *.o *.mod )
-
 endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a blang -e $nerr -rpf "$rpf" "$msg"
 

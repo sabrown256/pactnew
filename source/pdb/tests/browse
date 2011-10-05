@@ -11,13 +11,10 @@
 source ../../tests/common
 
 set msg = "PDB Browse Test .................... "
-set rpf = "none"
 set exe = $BinDir/pdlsts
 
-set tst = $1
-
 NoteD $LogF ""
-NoteD $LogF -n "                    PDB Browse Test .................... "
+NoteD $LogF -n "                    $msg"
 Note $LogF ""
 
 if ("$Valgrind" == "") then
@@ -31,12 +28,7 @@ else
    set rpf     = ( $rpf $Tmp )
 endif
 
-set rpf = ( $rpf pdatst.lst )
-
-flog $LogF rm *.db? *.rs?
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+set rpf = ( $rpf pdatst.lst *.db? *.rs? )
 
 $TEST_CHECK part -a browse -e $xstatus -x $exe -rpf "$rpf" none
 

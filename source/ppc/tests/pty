@@ -12,14 +12,7 @@ source ../../tests/common
 
 set DPE = ""
 
-#--------------------------------------------------------------------------
-
-#                           PTY TEST
-
-#--------------------------------------------------------------------------
-
       set msg = "PPC PTY Test ..................."
-      set rpf = "none"
 
 # this test fails too often on DP machines so don't run there
       if ("$DPE" == "") then
@@ -28,11 +21,11 @@ set DPE = ""
 
          set FAIL = "NO"
 
-         set UTime = `$TIMER -r`
          flog $Log rm -f pcexec.ptyi pcexec.ptyp
 
          NoteD $Log -n "                       polling ..................... "
-         set BTime = `$TIMER -r`
+         set rpf = "none"
+
          if ("$Valgrind" == "") then
             $CFE $PCEXEC -c 30 -i -t $TEST | tr -d "\015" > pcexec.ptyp
             set xstatus = $status
@@ -41,21 +34,16 @@ set DPE = ""
             grep "ERROR SUMMARY:"                             |& \
             awk '{ print $4 }'   >&! $Tmp
             set xstatus = `cat $Tmp`
-            flog $Log $RM $Tmp
+            set rpf     = ( $rpf $Tmp )
          endif
 
-         set ETime = `$TIMER -b $BTime`
-         if ($xstatus == 0) then
-            NoteD $Log "ok ($ETime)"
-         else
-            NoteD $Log "ng ($xstatus/$ETime)"
-            if ($xstatus != 123) then
-               set FAIL = "YES"
-            endif
-         endif
+         $TEST_CHECK part -a pty_poll -e $xstatus -l -rpf "$rpf" none
+
+         @ nerr = $nerr + $status
 
          NoteD $Log -n "                       interrupt ................... "
-         set BTime = `$TIMER -r`
+         set rpf = "none"
+
          if ("$Valgrind" == "") then
             $CFE $PCEXEC -c 30 -t $TEST | tr -d "\015" > pcexec.ptyi
             set xstatus = $status
@@ -64,23 +52,14 @@ set DPE = ""
             grep "ERROR SUMMARY:"                             |& \
             awk '{ print $4 }'   >&! $Tmp
             set xstatus = `cat $Tmp`
-            flog $Log $RM $Tmp
+	    set rpf     = ( $rpf $Tmp )
          endif
 
-         set ETime = `$TIMER -b $BTime`
-         if ($xstatus == 0) then
-            NoteD $Log "ok ($ETime)"
-         else
-            NoteD $Log "ng ($xstatus/$ETime)"
-            if ($xstatus != 123) then
-               set FAIL = "YES"
-            endif
-         endif
+         $TEST_CHECK part -a pty_interrupt -e $xstatus -l -rpf "$rpf" none
 
-         set xstatus = 0
-         if ($FAIL == "YES") then
-            set xstatus = 1
-         else
+         @ nerr = $nerr + $status
+
+         if ($xstatus != 0) then
             if ("$Valgrind" == "") then
                diff pcexec.refi pcexec.ptyi > pcexec.diffi
                set Files = `find . -name "pcexec.diffi" -size 0c -print`
@@ -90,16 +69,12 @@ set DPE = ""
                set Files = 1
             endif
             if ($#Files == 0) then
-               set xstatus = 1
-            else
-               set rpf = ( pcexec.diff* pcexec.pty* pcexec.ref* )
+               @ nerr = $nerr + 1
             endif
          endif
+         set rpf = ( pcexec.diff* pcexec.pty* pcexec.ref* )
 
       endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a pty -e $xstatus -rpf "$rpf" "$msg"
 

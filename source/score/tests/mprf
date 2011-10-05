@@ -12,32 +12,32 @@ source ../../tests/common
 
 set msg = "SCORE MM Performance Test ..... "
 set exe = $BinDir/scmpft
-set rpf = none
 
 NoteD $LogF ""
 NoteD $LogF "                    $msg"
 
 flog $LogF pushd $SrcDir
 flog $LogF $MAKE memchk
-set TStatus = $status
+set xstatus = $status
 flog $LogF popd
 
-if ($TStatus != 0) then
+if ($xstatus != 0) then
    NoteD $LogF "                         ERROR Building MM Performance Program"
    NoteD $LogF "                    ${mgs}FAILED"
-   set Err = 1
 else
 
+   set opt = ( -m 1 )
    if ("$Valgrind" == "") then
-      ftee $LogF $CFE $exe -m 1
+      ftee $LogF $CFE $exe $opt
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $exe -m 1      |& \
+      ftee $LogF $Valgrind $exe $opt      |& \
       grep "ERROR SUMMARY:"               |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
       set rpf     = ( $rpf $Tmp )
    endif
+endif
 
 $TEST_CHECK part -a mprf -e $xstatus -x $exe -rpf "$rpf" "$msg"
 

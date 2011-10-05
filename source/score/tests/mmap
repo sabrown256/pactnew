@@ -12,7 +12,6 @@ source ../../tests/common
 
 set msg = "SCORE Mapped File Test ........ "
 set exe = $BinDir/scmfts
-set rpf = none
 
 if ($CROSS_COMPILE == FALSE) then
 

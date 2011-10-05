@@ -12,8 +12,6 @@ source ../../tests/common
 
 set msg = "SX PDB SQLite Test ........... "
 set exe = $BinDir/sx
-set rpf = none
-@ nerr  = 0
 
 if (($HAVE_SQLITE == yes) && ($?IBM_BGP == 0)) then
 
@@ -47,8 +45,6 @@ if (($HAVE_SQLITE == yes) && ($?IBM_BGP == 0)) then
    flog $Log touch foo.sxsqlite sxsqlite.foo
    set rpf = ( $rpf sxsqlite.* *.sxsqlite )
 
-else
-   set xstatus = 0
 endif
 
 $TEST_CHECK part -a sqlite -e $xstatus -rpf "$rpf" none

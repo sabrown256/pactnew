@@ -72,7 +72,8 @@ else if (-e $RootDir/pml/pml.h) then
 
    if ("$Test" == "") then
       set Test = ""
-      set Test = ( $Test matrix eigen func interp perf fpe nan solv svd csum cgsolv )
+      set Test = ( $Test matrix eigen func interp perf )
+      set Test = ( $Test fpe nan solv svd csum cgsolv )
    endif
 
    foreach i ($Test)

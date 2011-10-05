@@ -12,13 +12,10 @@ source ../../tests/common
 
 
 set msg = "PANACEA API Test ..................."
-set rpf = "none"
 set exe = $BinDir/pathts
 
 NoteD $LogF ""
 NoteD $LogF "                    $msg"
-
-set UTime = `$TIMER -r`
 
 flog $LogF pushd $SrcDir
 flog $LogF $MAKE panacea

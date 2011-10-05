@@ -13,16 +13,11 @@ source ../../tests/common
 set msg = "PGS Parallel Test ...... "
 set exe = $BinDir/gsatst
 
-@ err = 0
-
    if ("$Parallel" != "") then
       Separator $Log
 
       NoteD $Log ""
       NoteD $Log "                    $msg"
-
-      set lErr  = 0
-      set BTime = `$TIMER -r`
 
       if ($?IBM_BGP == 1) then
          set nthread = 2
@@ -55,7 +50,7 @@ set exe = $BinDir/gsatst
 
       $TEST_CHECK part -a smp_new -e $xstatus -l -x $exe -rpf "$rpf" none
 
-      @ err = $err + $status
+      @ nerr = $nerr + $status
 
       NoteD $Log -n "                        pool ............... "
 
@@ -82,13 +77,10 @@ set exe = $BinDir/gsatst
 
       $TEST_CHECK part -a smp_pool -e $xstatus -l -x $exe -rpf "$rpf" none
 
-      @ err = $err + $status
+      @ nerr = $nerr + $status
 
    endif
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK part -a smp -e $err "$msg"
+$TEST_CHECK part -a smp -e $nerr "$msg"
 
 exit($status)

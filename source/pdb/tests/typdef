@@ -13,10 +13,7 @@ unalias *
 source ../../tests/common
 
 set msg = "PDB Typedef Test ................... "
-set rpf = "none"
 set exe = $BinDir/pdtdts
-
-set tst = $1
 
 NoteD $LogF ""
 NoteD $LogF -n "                    $msg"
@@ -45,9 +42,6 @@ if (-f out.pdb) then
 endif
 
 set rpf = ( $rpf out.pdb )
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a typdef -e $xstatus -x $exe -rpf "$rpf" none
 

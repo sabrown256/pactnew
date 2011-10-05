@@ -11,7 +11,6 @@
 source ../../tests/common
 
 set msg = "PGS Grotrian Test ...... "
-set rpf = "none"
 set exe = $BinDir/gsgrts
 
    NoteD $Log ""
@@ -26,7 +25,6 @@ set exe = $BinDir/gsgrts
       NoteD $Log ""
       NoteD $Log "                         Can't build PGS Grotrian Test Program"
       NoteD $Log "                    ${msg}FAILED (-1)"
-      set Err = 1
    else
       flog $Log rm -f gsgrts.res gsgrts.ps
 

@@ -10,31 +10,24 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           ANNOTATION TEST
-
-#--------------------------------------------------------------------------
+set msg = "ULTRA Annotation Test ........ "
+set exe = $BinDir/ultra
 
    NoteD $Log ""
-   NoteD $Log -n "                    ULTRA Annotation Test ........ "
+   NoteD $Log -n "                    $msg"
    Note $Log ""
 
-   set rpf = none
-  
+   set opt = ( -l $TDir/ulann.scm )  
    if ("$Valgrind" == "") then
-      flog $Log ($CFE $Ultra -l $TDir/ulann.scm >& ulmmt.log)
+      flog $Log ($CFE $Ultra $opt >&! ulmmt.log)
       set xstatus = $status
    else
-      ftee $Log $Valgrind $BinDir/ultra -e -r -x -q -s -l $TDir/ulann.scm  |& \
-      grep "ERROR SUMMARY:"                                                |& \
+      ftee $Log $Valgrind $exe -e -r -x -q -s $opt    |& \
+      grep "ERROR SUMMARY:"                           |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
       set rpf     = $Tmp
    endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a annot -e $xstatus -rpf "$rpf" none
 

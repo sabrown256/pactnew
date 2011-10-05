@@ -11,7 +11,6 @@
 source ../../tests/common
 
 set msg = "PGS Basic Test ......... "
-set rpf = "none"
 set exe = $BinDir/gsatst
 
    NoteD $Log ""
@@ -19,14 +18,13 @@ set exe = $BinDir/gsatst
 
    flog $Log pushd $SrcDir
    flog $Log $MAKE Cstd
-   set TStatus = $status
+   set xstatus = $status
    flog $Log popd
 
-   if ($TStatus != 0) then
+   if ($xstatus != 0) then
       NoteD $Log ""
       NoteD $Log "                         Can't build PGS Basic Test Program"
-      NoteD $Log "                    PGS Line Plot Test ..... FAILED"
-      set Err = 1
+      NoteD $Log "                    ${msg}FAILED"
    else
 
       if ("$Valgrind" == "") then

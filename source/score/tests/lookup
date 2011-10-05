@@ -10,16 +10,13 @@
 
 source ../../tests/common
 
-@ nerr = 0
-
 flog $LogF pushd $SrcDir
 flog $LogF $MAKE ha
-set TStatus = $status
+set xstatus = $status
 flog $LogF popd
 
-if ($TStatus != 0) then
+if ($xstatus != 0) then
    NoteD $LogF "                         ERROR Building HASH Test Program"
-   set Err = 1
 else
 
 #--------------------------------------------------------------------------

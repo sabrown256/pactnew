@@ -11,10 +11,7 @@
 source ../../tests/common
 
 set msg = "PDB Checksum Test  ................. "
-set rpf = "none"
 set exe = $BinDir/pdcsts
-
-set tst = $1
 
 NoteD $LogF ""
 NoteD $LogF "                    $msg"
@@ -27,9 +24,6 @@ else
    flog $LogF $Valgrind $exe -v $tst
    set xstatus = $status
 endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a checksum -e $xstatus -x $exe "$msg"
 

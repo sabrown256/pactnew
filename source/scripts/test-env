@@ -88,6 +88,10 @@ setenv ZeroSpace  "-z 2"
    setenv TestDir   $SrcDir/z-$System/test
    setenv FilesDir  $SrcDir/tests
 
+# GOTCHA: clean these up
+   set TDir   = $SrcDir/tests
+   set RefDir = $TDir/ref
+
    setenv TIMER     $BinDir/timer
    setenv MAKE      $BinDir/pact
    setenv DORUN     $BinDir/do-run
@@ -133,7 +137,7 @@ setenv ZeroSpace  "-z 2"
    setenv LARGE_FILES  `$PACT_Exe -info _LARGE_FILES`
 
    setenv PYVER      `$PACT_Exe -info PyVers`
-   setenv PYTHONBIN  `$PACT_Exe -info Python_Path`
+   setenv PYTHONBIN  `$PACT_Exe -info PythonPath`
    setenv PYTHON     $PYTHONBIN/python
    setenv LPYTHON    $LibDir/python$PYVER
 
@@ -188,4 +192,14 @@ if ("$Valgrind" != "") then
    Note $Log "Using valgrind: $VG"
 endif
 
-setenv BTime `$TIMER -r`
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# state for test-check
+
+set xstatus = 0
+set rpf     = none
+@ nerr      = 0
+
+setenv t0 `$TIMER -r`
+

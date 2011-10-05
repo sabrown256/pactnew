@@ -10,64 +10,47 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           MASTER TEST
-
-#--------------------------------------------------------------------------
-
-   set msg = "ULTRA Master Test ............"
-   set rpf = "none"
+set msg = "ULTRA Master Test ............ "
+set exe = $BinDir/ultra
 
    NoteD $Log ""
-   NoteD $Log -n "                    $msg "
+   NoteD $Log -n "                    $msg"
    Note $Log ""
 
-   set FAIL = "NO"
-   flog $Log $RM ultest.log ultest.pdb ultest.asc ultest.err ultest.tmp
+   flog $Log $RM ultest.log ultest.pdb ultest.asc
 
-   set UTime = `$TIMER -r`
+   set opt = ( -l $TDir/ultest.scm )
    if ("$Valgrind" == "") then
-      flog $Log ($CFE $Ultra -l $TDir/ultest.scm >& ultest.tmp)
+      flog $Log ($CFE $Ultra $opt >&! ultest.tmp)
       set xstatus = $status
+      if ($xstatus == 0) then
+         flog $Log (grep -i "error" ultest.tmp >&! ultest.err)
+         flog $Log /bin/ls -l ultest.err
+         if (-z ultest.err) then
+            set rpf = ( ultest.err )
+
+            awk '(($1 != "%%CreationDate:") && !(($4 ~ /..:..:../) && ($5 ~ /199[0-9]/))) {print}' ultest.ps > ultest.ps.tmp
+            flog $Log mv ultest.ps.tmp ultest.ps
+
+            flog $Log $cfe $PSDIFF ultest.ps $RefDir/ultest.ps
+            if ($status != 0) then
+               set xstatus = 252
+            else
+               set xstatus = 0
+            endif
+         else
+            set xstatus = 1
+         endif
+      endif
    else
-      ftee $Log $Valgrind $BinDir/ultra -e -r -x -q -s -l $TDir/ultest.scm  |& \
-      grep "ERROR SUMMARY:"                                                          |& \
+      ftee $Log $Valgrind $exe -e -r -x -q -s $opt    |& \
+      grep "ERROR SUMMARY:"                           |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $Log $RM $Tmp
+      set rpf     = ( $rpf $Tmp )
    endif
  
-   if ("$Valgrind" != "") then
-
-   else if (($xstatus == 254) || ($xstatus == 255)) then
-
-# any return status other than 0 is a crash
-   else if ($xstatus != 0) then
-      set xstatus = 253
-
-   else
-      flog $Log (grep -i "error" ultest.tmp > ultest.err)
-      flog $Log /bin/ls -l ultest.err
-      if (-z ultest.err) then
-         set rpf = ( ultest.err )
-
-         awk '(($1 != "%%CreationDate:") && !(($4 ~ /..:..:../) && ($5 ~ /199[0-9]/))) {print}' ultest.ps > ultest.ps.tmp
-         flog $Log mv ultest.ps.tmp ultest.ps
-
-         flog $Log $cfe $PSDIFF ultest.ps $TDir/ref/ultest.ps
-         if ($status != 0) then
-            set xstatus = 252
-         else
-            set xstatus = 0
-         endif
-      else
-         set xstatus = 1
-      endif
-   endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+   set rpf = ( $rpf ultest.log ultest.pdb ultest.asc ultest.err ultest.tmp )
 
 $TEST_CHECK part -a master -e $xstatus -rpf "$rpf" none
 

@@ -12,7 +12,6 @@
 source ../../tests/common
 
 set msg = "DO-RUN Test .................... "
-set rpf = none
 
 set DORUN = do-run
 
@@ -37,15 +36,10 @@ end
 
 InitLog Log $TestDir/log.dorun.$LogSfx
 
-@ Err = 0
-
-   set BTime = `$TIMER -r`
-
    NoteD $Log ""
    NoteD $Log "                    $msg"
 
    set List = (s1t1 s1t2 s2t1 s3t1 s4t1 s5t1 s6t1)
-   set lErr = 0
 
    flog $Log rm -f run.* s*
    flog $Log cp $SrcDir/tests/{run.*,s*} .
@@ -84,16 +78,13 @@ InitLog Log $TestDir/log.dorun.$LogSfx
          flog $Log rm -f $Res $Ref $Res.diff
       else
          flog $Log cat $Res.diff
-         flog $Log set lErr = 1
+         flog $Log @ nerr = $nerr + 1
          NoteD $Log "ng"
       endif
    end
 
    set rpf = ( $rpf run.* s* )
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK part -a dorun -e $Err -rpf "$rpf" "$msg"
+$TEST_CHECK part -a dorun -e $nerr -rpf "$rpf" "$msg"
 
 exit($status)
