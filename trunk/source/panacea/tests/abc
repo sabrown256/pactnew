@@ -10,12 +10,12 @@
 
 source ../../tests/common
 
+set msg = "PANACEA ABC Test .............. "
+
 if (-d $RootDir/panacea/abc) then
    NoteD $LogF ""
    NoteD $LogF -n "                    Building PANACEA ABC Test ....."
    Note $LogF ""
-
-   set UTime = `$TIMER -r`
 
    setenv SESSION_CONFIG `cfgman use`
    flog $LogF pushd $SrcDir/abc/builder
@@ -30,9 +30,6 @@ if (-d $RootDir/panacea/abc) then
       NoteD $LogF "                         Can't build PANACEA ABC Test"
    else
       NoteD $LogF " DONE"
-
-      set msg = "PANACEA ABC Test .............. "
-      set rpf = "none"
 
       NoteD $LogF ""
       NoteD $LogF "                    $msg"
@@ -54,9 +51,6 @@ if (-d $RootDir/panacea/abc) then
       endif
    endif
 endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a abc -e $xstatus "$msg"
 

@@ -11,13 +11,10 @@
 source ../../tests/common
 
 set msg = "PDB FD Leak ........................ "
-set rpf = "none"
 set exe = $BinDir/pdfdts
 
 if ("$OS" != AIX) then
    if ("$Valgrind" == "") then
-
-      set tst = $1
 
       NoteD $LogF ""
       NoteD $LogF -n "                    $msg"
@@ -28,10 +25,9 @@ if ("$OS" != AIX) then
 
       $TEST_CHECK part -a fd -e $xstatus -x $exe none
 
+      set xstatus = $status
+
    endif
 endif
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-exit($status)
+exit($xstatus)

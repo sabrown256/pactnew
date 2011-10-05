@@ -11,7 +11,6 @@
 source ../../tests/common
 
 set msg = "PCSH Test ...................... "
-set rpf = none
 
 set PCSH = pcsh
 
@@ -39,8 +38,6 @@ InitLog Log $TestDir/log.pcsh.$LogSfx
 NoteD $Log ""
 NoteD $Log "                    $msg"
 
-set TstDir = $SrcDir/tests
-set RefDir = $TstDir/ref
 set List = (psh1 psh2 psh3 psh4)
 set nerr = 0
 
@@ -62,7 +59,7 @@ foreach t ($List)
    flog $Log $RM ${t}*
 
    set noglob
-   $PCSH $TstDir/$t |& sed 's|/tmp/psh.*$|xxx|' | grep -v "open display" >&! $Res
+   $PCSH $FilesDir/$t |& sed 's|/tmp/psh.*$|xxx|' | grep -v "open display" >&! $Res
    set xstatus = $status
    unset noglob
 
@@ -86,9 +83,6 @@ end
 
 flog $Log touch run.foo
 set rpf = ( $rpf run.* s* )
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a pcsh -e $nerr -rpf "$rpf" "$msg"
 

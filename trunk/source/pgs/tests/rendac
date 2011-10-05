@@ -11,7 +11,6 @@
 source ../../tests/common
 
 set msg = "PGS AC Map Test ........ "
-set rpf = "none"
 set exe = $BinDir/gsatst
 
       NoteD $Log ""

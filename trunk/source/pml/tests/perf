@@ -11,7 +11,6 @@
 source ../../tests/common
 
 set msg = "PML Performance Test ... "
-set rpf = "none"
 set exe = $BinDir/mlpfts
 
    set OD = ( `pact +l -info OD` )
@@ -21,13 +20,12 @@ set exe = $BinDir/mlpfts
 
       flog $Log pushd $SrcDir
       flog $Log $MAKE perf
-      set TStatus = $status
+      set xstatus = $status
       flog $Log popd
 
-      if ($TStatus != 0) then
+      if ($xstatus != 0) then
          NoteD $Log ""
          NoteD $Log "                         Can't build PML Performance Test Program"
-         set xstatus = $TStatus
       else
          if ("$Valgrind" == "") then
             $CFE $exe
@@ -41,8 +39,6 @@ set exe = $BinDir/mlpfts
       $TEST_CHECK part -a perf -e $xstatus -x $exe none
 
       set xstatus = $status
-   else
-      set xstatus = 0
    endif
 
 exit($xstatus)

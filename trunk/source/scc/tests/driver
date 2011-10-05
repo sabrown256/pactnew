@@ -8,14 +8,13 @@
 # include "cpyright.h"
 #
 
-set tst = $1
-
 source ../../tests/common
+
+set tst = $1
 
 if ($CROSS_COMPILE == FALSE) then
    set refdir = $SrcDir/tests/ref
    set fill   = `fill-string -n 25 $tst`
-   set err    = ok
 #   set opt    = ( -check -mem )
    set opt    = ( -check )
 
@@ -24,15 +23,13 @@ if ($CROSS_COMPILE == FALSE) then
    NoteD $LogF -n "                    $fill "
    Note $LogF ""
 
-   @ err = 0
-
-   set UTime = `$TIMER -r`
+   set t0 = `$TIMER -r`
    flog $LogF cp $SrcDir/tests/$tst.c .
 
    scc $opt -c $tst.c >&! $tst.res
    set xstatus = $status
    if ($xstatus != 0) then
-      @ err = 253
+      @ nerr = 253
    endif
 
 # for tests with fiducial results
@@ -40,7 +37,7 @@ if ($CROSS_COMPILE == FALSE) then
       flog $Log diff $tst.res $refdir/$tst
       set xstatus = $status
       if ($xstatus != 0) then
-         flog $Log @ err = 252
+         flog $Log @ nerr = 252
          flog $Log cat $tst.res
       endif
 
@@ -49,15 +46,17 @@ if ($CROSS_COMPILE == FALSE) then
       flog $Log grep "Memory Map" $tst.res
       set xstatus = $status
       if ($xstatus == 0) then
-         @ err = 250
+         @ nerr = 250
       endif
    endif
 
-   set ETime = `$TIMER -b $UTime`
+   set dt = `$TIMER -b $t0`
 
-   $TEST_CHECK part -a scc_$tst -e $err -l -dt $ETime none
+   $TEST_CHECK part -a scc_$tst -e $nerr -l -dt $dt none
+
+   set xstatus = $status
 
 endif
 
-exit($Err)
+exit($xstatus)
 

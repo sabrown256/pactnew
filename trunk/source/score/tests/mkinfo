@@ -11,8 +11,6 @@
 source ../../tests/common
 
 set msg = "SCORE Make Info Test .......... "
-set rpf = none
-@ nerr  = 0
 
 set ok = TRUE
 if ($ok == TRUE) then

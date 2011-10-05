@@ -11,9 +11,7 @@
 source ../../tests/common
 
 set msg = "SCHEME Numeric Test .......... "
-set rpf = none
 set exe = $BinDir/scheme
-@ nerr  = 0
 
 NoteD $Log ""
 NoteD $Log "                    $msg"
@@ -26,16 +24,15 @@ flog $Log pwd
 
 #--------------------------------------------------------------------------
 
-   set rpf = none
-
    NoteD $Log -n "                       integer syntax ............ "
    Note $Log ""
+   set rpf = none
 
 # test that the SCHEME variable can be derived from the executable path
    flog $Log unsetenv SCHEME
    flog $Log unsetenv DO_RUN_SUBMIT_ENV
 
-   set UTime = `$TIMER -r`
+   set t0 = `$TIMER -r`
    if ("$Valgrind" == "") then
       flog $Log $cfe $exe -e -l $FilesDir/shsint.scm
       set xstatus = $status
@@ -46,11 +43,11 @@ flog $Log pwd
       set xstatus = `cat $Tmp`
       set rpf     = ( $rpf $Tmp )
    endif
-   set ETime   = `$TIMER -b $UTime`
 
+   set dt  = `$TIMER -b $t0`
    set rpf = ( $rpf '#tmp#' )
 
-   $TEST_CHECK part -a numer_int -e $xstatus -l -dt $ETime -rpf "$rpf" none
+   $TEST_CHECK part -a numer_int -e $xstatus -l -dt $dt -rpf "$rpf" none
 
    @ nerr = $nerr + $status
 
@@ -60,12 +57,11 @@ flog $Log pwd
 
 #--------------------------------------------------------------------------
 
-   set rpf = none
-
    NoteD $Log -n "                       numeric ................... "
    Note $Log ""
+   set rpf = none
 
-   set UTime = `$TIMER -r`
+   set t0 = `$TIMER -r`
    if ("$Valgrind" == "") then
       flog $Log $cfe $exe -e -l $FilesDir/shnum.scm
       set xstatus = $status
@@ -76,11 +72,11 @@ flog $Log pwd
       set xstatus = `cat $Tmp`
       set rpf     = ( $rpf $Tmp )
    endif
-   set ETime   = `$TIMER -b $UTime`
 
+   set dt  = `$TIMER -b $t0`
    set rpf = ( $rpf '#tmp#' )
 
-   $TEST_CHECK part -a numer_num -e $xstatus -l -dt $ETime -rpf "$rpf" none
+   $TEST_CHECK part -a numer_num -e $xstatus -l -dt $dt -rpf "$rpf" none
 
    @ nerr = $nerr + $status
 
@@ -90,12 +86,11 @@ flog $Log pwd
 
 #--------------------------------------------------------------------------
 
-   set rpf = none
-
    NoteD $Log -n "                       complex ................... "
    Note $Log ""
+   set rpf = none
 
-   set UTime = `$TIMER -r`
+   set t0 = `$TIMER -r`
    if ("$Valgrind" == "") then
       flog $Log $cfe $exe -e -l $FilesDir/shcpx.scm
       set xstatus = $status
@@ -106,11 +101,11 @@ flog $Log pwd
       set xstatus = `cat $Tmp`
       set rpf     = ( $rpf $Tmp )
    endif
-   set ETime   = `$TIMER -b $UTime`
 
+   set dt  = `$TIMER -b $t0`
    set rpf = ( $rpf '#tmp#' )
 
-   $TEST_CHECK part -a numer_complex -e $xstatus -l -dt $ETime -rpf "$rpf" none
+   $TEST_CHECK part -a numer_complex -e $xstatus -l -dt $dt -rpf "$rpf" none
 
    @ nerr = $nerr + $status
 

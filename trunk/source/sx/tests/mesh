@@ -12,8 +12,6 @@ source ../../tests/common
 
 set msg = "PDBView Mesh Test ............ "
 set exe = $BinDir/sx
-set rpf = 0
-@ nerr  = 0
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"

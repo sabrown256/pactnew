@@ -11,13 +11,10 @@
 source ../../tests/common
 
 set msg = "PDB Buffer Test B .................. "
-set rpf = "none"
 set exe = $BinDir/pdbtst
 
 set STRACE = ( `which strace` )
 if ("$Valgrind" == "") then
-
-   set tst = $1
 
    NoteD $LogF ""
    NoteD $LogF "                    $msg"
@@ -45,9 +42,6 @@ if ("$Valgrind" == "") then
       endif
    end
 endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a bufb -e $xstatus -x $exe "$msg"
 

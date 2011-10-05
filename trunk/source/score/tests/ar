@@ -12,7 +12,6 @@ source ../../tests/common
 
 set msg = "SCORE Archive Scan Test ....... "
 set exe = $BinDir/fcscan
-@ nerr  = 0
 
 NoteD $LogF ""
 NoteD $LogF "                    $msg"
@@ -38,7 +37,7 @@ if ($TStatus == 0) then
    NoteD $LogF -n "                       name ....................... "
    Note $LogF ""
 
-   set BTime = `$TIMER -r`
+   setenv t0 `$TIMER -r`
 
    flog $LogF $RM f*.o libar.a
 
@@ -67,9 +66,9 @@ if ($TStatus == 0) then
    flog $LogF cat libar.a
    set rpf = ( $rpf f*.o libar.a )
 
-   set ETime = `$TIMER -b $BTime`
+   set dt = `$TIMER -b $t0`
 
-   $TEST_CHECK part -a ar_name -e $xstatus -l -dt $ETime -rpf "$rpf" none
+   $TEST_CHECK part -a ar_name -e $xstatus -l -dt $dt -rpf "$rpf" none
 
    @ nerr = $nerr + $status
 
@@ -82,7 +81,7 @@ if ($TStatus == 0) then
    NoteD $LogF -n "                       working .................... "
    Note $LogF ""
 
-   set BTime = `$TIMER -r`
+   setenv t0 `$TIMER -r`
 
    if ("$Valgrind" == "") then
       flog $LogF $CFE $exe -a $LibDir/libscore.a
@@ -103,9 +102,9 @@ if ($TStatus == 0) then
    Note $LogF "fcscan count = $NL"
    Note $LogF "ar     count = $NLAr"
 
-   set ETime = `$TIMER -b $BTime`
+   set dt = `$TIMER -b $t0`
 
-   $TEST_CHECK part -a ar_work -e $xstatus -l -dt $ETime -rpf "$rpf" none
+   $TEST_CHECK part -a ar_work -e $xstatus -l -dt $dt -rpf "$rpf" none
 
    @ nerr = $nerr + $status
 

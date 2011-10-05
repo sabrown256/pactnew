@@ -10,60 +10,30 @@
 
 source ../../tests/common
 
+set msg = "PPC Binary Test ................ "
+set exe = $BinDir/pcbtst
+
 set DPE = ""
 
-#--------------------------------------------------------------------------
-
-#                           BIN TEST
-
-#--------------------------------------------------------------------------
-
-# PPC Binary test
 # this test fails too often on DP machines so don't run there
 
 # NOTE: remove this when the PPC binary stuff is rehosted on PDB Net
 if (0) then
       if ("$DPE" != "") then
          NoteD $Log ""
-         NoteD $Log -n "                    PPC Binary Test ................ "
+         NoteD $Log -n "                    $msg"
          Note $Log ""
 
-         set FAIL = "NO"
-
-         flog $Log rm -f pcbtst.res
-         set UTime = `$TIMER -r`
-         (echo "hello" ; echo "end") | $CFE $BinDir/pcbtst > pcbtst.res
-
-         set BinaryStat = $status
-         if ($BinaryStat != 0) then
-            if ($BinaryStat != 123) then
-               NoteD $Log ""
-               NoteD $Log "                         Binary test died ($BinaryStat)"
-            else
-               NoteD $Log ""
-               NoteD $Log "                         Binary test timed out ($BinaryStat)"
-            endif
+         (echo "hello" ; echo "end") | $CFE $exe >&! pcbtst.res
+         set xstatus = $status
+         if ($xstatus == 123) then
+            set xstatus = 251
          endif
    
-         set ETime = `$TIMER -b $UTime`
+         set rpf = ( $rpf pcbtst.res )
 
-# don't consider a timeout a failure
-         if ($BinaryStat != 0 && $BinaryStat != 123) then
-            NoteD $Log "                    PPC Binary Test ................ FAILED ($ETime)"
-            set Err = 1
-         else if ($BinaryStat == 123) then
-            flog $Log rm -f pcbtst.res
-            NoteD $Log "                    PPC Binary Test ................ PASSED ($ETime)"
-         else
-            flog $Log rm -f pcbtst.res
-            NoteD $Log "PASSED ($ETime)"
-         endif
+         $TEST_CHECK part -a bin -e $xstatus -x $exe -rpf "$rpf" "$msg"
       endif
 endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK part -a bin -e $Err -x $BinDir/pcbtst
 
 exit($status)

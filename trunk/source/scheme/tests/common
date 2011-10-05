@@ -8,25 +8,12 @@
 # include "cpyright.h"
 #
 
-source ../../../scripts/env-csh
-source $IncDir/env-pact.csh
+source ../../../scripts/test-env
 
 if ($?LogF == 0) then
    set TestName = "$0:t"
 
    InitLog LogF $cwd/log.$TestName.$LogSfx
-   pushd ../../../manager >& /dev/null
-   set Arch = `cfgman use`
-   cd ../dev/$Arch >& /dev/null
-   set Root = $cwd
-   popd >& /dev/null
-
-   set BinDir   = $Root/bin
-   set LibDir   = $Root/lib
-   set MAKE     = $BinDir/pact
-   set TIMER    = $BinDir/timer
-   set CFE      = $BinDir/do-run
-   set PFE      = $BinDir/do-run
 endif
 
 if ("$CFE" == "") then
@@ -35,17 +22,10 @@ else
    set cfe = ( $CFE -v )
 endif
 
-if ($?SrcDir == 0) then
-   pushd ../.. >& /dev/null
-   set SrcDir = $cwd
-   popd >& /dev/null
-endif
-
 set do_syntax = 0
 
 if ($?Log == 1) then
    Note $Log "Log file: $LogF"
 endif
 
-set Err = 0
 

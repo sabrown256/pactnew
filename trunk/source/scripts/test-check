@@ -16,10 +16,8 @@ source $TestScrDir/env-csh
 set tgt  = none
 set name = none
 
-if ($?BTime == 1) then
-   set t0 = $BTime
-else
-   set t0 = 0
+if ($?t0 == 0) then
+   setenv t0 0
 endif
 
 if ($?Log == 1) then
@@ -105,7 +103,7 @@ switch ($tgt)
                    breaksw
               case -t0:
                    shift
-                   set t0 = $1
+                   setenv t0 $1
                    breaksw
               default:
                    echo "Unknown option '$1'"

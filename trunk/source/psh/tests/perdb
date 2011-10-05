@@ -11,7 +11,6 @@
 source ../../tests/common
 
 set msg = "PERDB Test ..................... "
-set rpf = none
 
 set PERDB = perdb
 
@@ -39,15 +38,8 @@ rm -f $TestDir/db*.*
 
 InitLog Log $TestDir/log.perdb.$LogSfx
 
-@ Err = 0
-
-set BTime = `$TIMER -r`
-
 NoteD $Log ""
 NoteD $Log "                    $msg"
-
-set TstDir = $SrcDir/tests
-set RefDir = $TstDir/ref
 
 # struct tests require shell to allow things like: 'setenv a.b foo'
 # don't do them if the shell will not allow variable names of that sort
@@ -62,8 +54,6 @@ if ($too_strict == TRUE) then
 else
    set List = (perdb1 perdb2 perdb3 perdb4 perdb5 perdb6 perdb7 perdb8)
 endif
-
-set nerr = 0
 
 flog $Log setenv PATH $RootDir/scripts:$PATH
 
@@ -83,7 +73,7 @@ foreach t ($List)
   flog $Log $RM ${t}* *= *@*
 
    set noglob
-   flog $Log ( $TstDir/$t |& grep -v '\[' >&! $Res )
+   flog $Log ( $FilesDir/$t |& grep -v '\[' >&! $Res )
    set xstatus = $status
    unset noglob
 
@@ -105,15 +95,12 @@ foreach t ($List)
       flog $Log cat $Res
       flog $Log cat $Res.diff
       NoteD $Log "ng"
-      flog $Log set nerr = 1
+      flog $Log @ nerr = 1
    endif
 end
 
 flog $Log touch dbfoo
 set rpf = ( $rpf db* )
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a perdb -e $nerr -rpf "$rpf" "$msg"
 

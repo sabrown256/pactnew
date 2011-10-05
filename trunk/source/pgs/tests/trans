@@ -11,7 +11,6 @@
 source ../../tests/common
 
 set msg = "PGS Trans Test ......... "
-set rpf = "none"
 set exe = $BinDir/gstrts
 
    NoteD $Log ""
@@ -40,9 +39,6 @@ set exe = $BinDir/gstrts
 
       Note $Log ""
    endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a trans -e $xstatus -x $exe -rpf "$rpf" "$msg"
 

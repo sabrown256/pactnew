@@ -10,39 +10,31 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           ENVIRONMENT TEST
-
-#--------------------------------------------------------------------------
+set msg = "ULTRA Env Test ............... "
+set exe = $BinDir/ultra
 
    NoteD $Log ""
-   NoteD $Log -n "                    ULTRA Env Test ............... "
+   NoteD $Log -n "                    $msg"
    Note $Log ""
 
-   set FAIL = "NO"
    flog $Log $RM ulenv.log
-
-   set rpf = ""
 
    unsetenv SCHEME
    unsetenv ULTRA  
    setenv DO_RUN_SUBMIT_ENV
+
    if ("$Valgrind" == "") then
-      flog $Log ($CFE $Ultra -n \(end\) >& ulenv.log)
+      flog $Log ($CFE $Ultra -n \(end\) >&! ulenv.log)
       set xstatus = $status
    else
-      ftee $Log $Valgrind $BinDir/ultra -e -n -s \(end\)  |& \
-      grep "ERROR SUMMARY:"                               |& \
+      ftee $Log $Valgrind $exe -e -n -s \(end\)    |& \
+      grep "ERROR SUMMARY:"                        |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
       set rpf     = ( $rpf $Tmp )
    endif
    
    set rpf = ( $rpf ulenv.log )
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a env -e $xstatus -rpf "$rpf" none
 

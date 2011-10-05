@@ -12,29 +12,25 @@ source ../../tests/common
 
 set msg = "PGS MPEG Test .......... "
 
-@ err = 0
-
    NoteD $Log ""
    NoteD $Log "                    $msg"
 
    flog $Log pushd $SrcDir
    flog $Log $MAKE mpeg
-   set TStatus = $status
+   set xstatus = $status
    flog $Log popd
 
-   if ($TStatus != 0) then
+   if ($xstatus != 0) then
       NoteD $Log ""
       NoteD $Log "                         Can't build PGS MPEG Test Program"
-      NoteD $Log "                    PGS MPEG Test .......... FAILED (-1)"
-      set Err = 1
+      NoteD $Log "                    ${msg}FAILED"
    else
       flog $Log rm -f gsmpg1.mpg gsmpg2.mpg
 
+      NoteD $Log -n "                        curve .............. "
       set rpf = "none"
       set exe = $BinDir/gsmpgt1
 
-      NoteD $Log -n "                        curve .............. "
-      set BTime = `$TIMER -r`
       if ("$Valgrind" == "") then
          flog $Log $CFE $exe
          set xstatus = $status
@@ -48,13 +44,12 @@ set msg = "PGS MPEG Test .......... "
 
       $TEST_CHECK part -a mpeg1 -e $xstatus -l -x $exe -rpf "$rpf" none
 
-      @ err = $err + $status
+      @ nerr = $nerr + $status
 
+      NoteD $Log -n "                        fill ............... "
       set rpf = "none"
       set exe = $BinDir/gsmpgt2
 
-      NoteD $Log -n "                        fill ............... "
-      set BTime = `$TIMER -r`
       if ("$Valgrind" == "") then
          flog $Log $CFE $exe
          set xstatus = $status
@@ -68,14 +63,11 @@ set msg = "PGS MPEG Test .......... "
 
       $TEST_CHECK part -a mpeg2 -e $xstatus -l -x $exe -rpf "$rpf" none
 
-      @ err = $err + $status
+      @ nerr = $nerr + $status
 
       set rpf = ( $rpf gsmpg1.mpg gsmpg2.mpg )
    endif
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK part -a mpeg -e $err -rpf "$rpf" "$msg"
+$TEST_CHECK part -a mpeg -e $nerr -rpf "$rpf" "$msg"
 
 exit($status)

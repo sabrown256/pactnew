@@ -10,36 +10,29 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           AXIS TEST
-
-#--------------------------------------------------------------------------
+set msg = "ULTRA AXIS Test .............. "
+set exe = $BinDir/ultra
 
    NoteD $Log ""
-   NoteD $Log -n "                    ULTRA AXIS Test .............. "
+   NoteD $Log -n "                    $msg"
    Note $Log ""
 
    flog $Log $RM ulaxs.log ulaxs.err
 
-   set rpf = ""
-
+   set opt = ( -l $TDir/ulaxs.scm )
    if ("$Valgrind" == "") then
-      flog $Log ($CFE $Ultra -l $TDir/ulaxs.scm >& ulaxs.log)
+      flog $Log ($CFE $Ultra $opt >&! ulaxs.log)
       set xstatus = $status
       flog $Log ($CFE $PSDIFF ulaxs.ps $RefDir/ulaxs.ps >&! ulaxs.ps.diff)
    else
-      ftee $Log $Valgrind $BinDir/ultra -e -r -x -q -s -l $TDir/ulaxs.scm  |& \
-      grep "ERROR SUMMARY:"                                                |& \
+      ftee $Log $Valgrind $exe -e -r -x -q -s $opt     |& \
+      grep "ERROR SUMMARY:"                            |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
       set prf     = ( $prf $Tmp )
    endif
 
    set rpf = ( $rpf ulaxs.* )
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a fill -e $xstatus -rpf "$rpf" none
 

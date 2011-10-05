@@ -11,13 +11,10 @@
 source ../../tests/common
 
 set msg = "PDB Buffer Test A .................. "
-set rpf = "none"
 set exe = $BinDir/pdbfts
 
 #set STRACE = ( `which strace` )
 #if ((-x "$STRACE") && ($OS != AIX)) then
-
-   set tst = $1
 
    NoteD $LogF ""
    NoteD $LogF "                    $msg"
@@ -84,9 +81,6 @@ set exe = $BinDir/pdbfts
    endif
 
 #endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a bufa -e $xstatus -x $exe -rpf "$rpf" "$msg"
 

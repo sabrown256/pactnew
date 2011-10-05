@@ -11,10 +11,7 @@
 source ../../tests/common
 
 set msg = "PDB Recursive Cast Test ............ "
-set rpf = "none"
 set exe = $BinDir/pdrcts
-
-set tst = $1
 
 NoteD $LogF ""
 NoteD $LogF -n "                    $msg"
@@ -32,9 +29,6 @@ else
 endif
 
 set rpf = ( $rpf foo.pdb )
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a cast -e $xstatus -x $exe -rpf "$rpf" none
 

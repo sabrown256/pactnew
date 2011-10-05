@@ -18,20 +18,6 @@ NoteD $LogF ""
 NoteD $LogF "                    $msg"
 Note $LogF ""
 
-set UTime = `$TIMER -r`
-
-flog $LogF pushd $SrcDir
-flog $LogF $MAKE scan
-set TStatus = $status
-flog $LogF popd
-
-set ETime   = `$TIMER -b $UTime`
-
-if ($TStatus != 0) then
-   NoteD $LogF ""
-   NoteD $LogF "                         ERROR Building SCORE API Tests"
-else
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
@@ -39,15 +25,21 @@ else
    Note $LogF ""
 
    set exe = $BinDir/sclsts
-   set rpf = ""
+   set rpf = none
 
+   flog $LogF pushd $SrcDir
+   flog $LogF $MAKE scan
+   set xstatus = $status
+   flog $LogF popd
+
+   set opt = ( $TDir/sclsts.src )
    if ("$Valgrind" == "") then
-      $CFE $exe $TDir/sclsts.src > sclsts.res
+      $CFE $exe $opt >&! sclsts.res
       set xstatus = $status
       diff sclsts.res $RefDir/sclsts > sclsts.res.diff
    else
-      ftee $LogF $Valgrind $exe $TDir/sclsts.src                    |& \
-      grep "ERROR SUMMARY:"                                         |& \
+      ftee $LogF $Valgrind $exe $opt                    |& \
+      grep "ERROR SUMMARY:"                             |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
       set rpf     = ( $rpf $Tmp )
@@ -57,21 +49,21 @@ else
 
    $TEST_CHECK part -a score_lex -e $xstatus -x $exe -l -rpf "$rpf" none
 
-   @ err = $err + $status
+   @ nerr = $nerr + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-   flog $LogF pushd $SrcDir
-   flog $LogF $MAKE -na 2 fha
-   set TStatus = $status
-   flog $LogF popd
 
    NoteD $LogF -n "                        hash ........................... "
    Note $LogF ""
 
    set exe = $BinDir/schtst
-   set rpf = ""
+   set rpf = none
+
+   flog $LogF pushd $SrcDir
+   flog $LogF $MAKE -na 2 fha
+   set xstatus = $status
+   flog $LogF popd
 
    if ("$Valgrind" == "") then
       flog $LogF $CFE $exe
@@ -84,13 +76,9 @@ else
       set rpf = ( $rpf $Tmp )
    endif
 
-   if ("$rpf" == "") then
-      set rpf = none
-   endif
-
    $TEST_CHECK part -a score_hash -e $xstatus -x $exe -l -rpf "$rpf" none
 
-   @ err = $err + $status
+   @ nerr = $nerr + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -98,14 +86,14 @@ else
    if ($HAVE_OPENMP == TRUE) then
       flog $LogF pushd $SrcDir
       flog $LogF $MAKE -na 2 omp
-      set TStatus = $status
+      set xstatus = $status
       flog $LogF popd
 
       NoteD $LogF -n "                        omp ............................ "
       Note $LogF ""
 
       set exe = $BinDir/scompt
-      set rpf = ""
+      set rpf = none
 
       if ("$Valgrind" == "") then
          flog $LogF ( echo 2 | $CFE $exe )
@@ -118,22 +106,13 @@ else
          set rpf     = ( $rpf $Tmp )
       endif
 
-      if ("$rpf" == "") then
-         set rpf = none
-      endif
-
       $TEST_CHECK part -a score_omp -e $xstatus -x $exe -l -rpf "$rpf" none
 
-      @ err = $err + $status
+      @ nerr = $nerr + $status
 
    endif
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-endif
-
-$TEST_CHECK part -a score -e $err "$msg"
+$TEST_CHECK part -a score -e $nerr "$msg"
 
 exit($status)
 

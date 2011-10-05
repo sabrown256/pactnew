@@ -12,8 +12,6 @@ source ../../tests/common
 
 set msg = "SX PDB Archive Test .......... "
 set exe = $BinDir/sx
-set rpf = 0
-@ nerr  = 0
 
 NoteD $Log ""
 NoteD $Log -n "                    $msg"
@@ -28,8 +26,9 @@ if (($THREADING == no) && ($HAVE_MPI == no)) then
    flog $Log ( cat demo.d? >&! pdbvar.blob )
 
    set Ref = $RootDir/sx/tests/ref/pdbvar
+   set opt = ( -l $RootDir/sx/tests/pdbvar.scm )
    if ("$Valgrind" == "") then
-      flog $Log ($PDBView -l $RootDir/sx/tests/pdbvar.scm >& pdbvar.res)
+      flog $Log ($PDBView $opt >& pdbvar.res)
       set xstatus = $status
       if ($xstatus == 0) then
          if (-f $Ref) then
@@ -40,8 +39,8 @@ if (($THREADING == no) && ($HAVE_MPI == no)) then
          endif
       endif
    else
-      ftee $Log $Valgrind $exe -e -p -q -l $RootDir/sx/tests/pdbvar.scm |& \
-      grep "ERROR SUMMARY:"                                             |& \
+      ftee $Log $Valgrind $exe -e -p -q $opt    |& \
+      grep "ERROR SUMMARY:"                     |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
       set rpf     = ( $rpf $Tmp )
@@ -50,8 +49,6 @@ if (($THREADING == no) && ($HAVE_MPI == no)) then
    flog $Log touch pdbvar.foo
    set rpf = ( $rpf pdbvar.* )
 
-else
-   set xstatus = 0
 endif
 
 $TEST_CHECK part -a ar -e $xstatus -rpf "$rpf" none

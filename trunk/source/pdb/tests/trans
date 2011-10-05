@@ -13,10 +13,7 @@ source ../../tests/common
 InitLog Log $TestDir/log.trans.$LogSfx
 
 set msg = "PDB Translation Test ............... "
-set rpf = "none"
 set exe = $BinDir/pdctrns
-
-set tst = $1
 
 NoteD $Log ""
 NoteD $Log "                    $msg"
@@ -24,18 +21,15 @@ Note $Log ""
 
 flog $Log pushd $SrcDir
 flog $Log pact trans
-set TStatus = $status
+set xstatus = $status
 flog $Log popd
 
-if ($TStatus != 0) then
+if ($xstatus != 0) then
    NoteD $Log ""
    NoteD $Log "                         Can't build PDB Test Programs"
-   set ERROR = "TRUE"
 else
 
-   set TstDir = $SrcDir/tests
-   set RefDir = $TstDir/ref
-   set TFile  = $TstDir/tst-ascii-7.txt
+   set TFile  = $FilesDir/tst-ascii-7.txt
 
    if ("$Valgrind" == "") then
 
@@ -127,9 +121,6 @@ else
       set xstatus = $status
    endif
 endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a trans -e $xstatus -x $exe -rpf "$rpf" "$msg"
 

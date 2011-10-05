@@ -10,15 +10,15 @@
 
 source ../../tests/common
 
+set msg = "PPC Background Test ............ "
+
 set PCFGBG = $SrcDir/tests/pcfgbg
 
 set LogFB = log.fgbg.$LogSfx
 
-#--------------------------------------------------------------------------
-
-#                           BG TEST
-
-#--------------------------------------------------------------------------
+NoteD $Log ""
+NoteD $Log -n "                    $msg"
+Note $Log ""
 
 # PPC Background test
       set ok = TRUE
@@ -30,36 +30,25 @@ set LogFB = log.fgbg.$LogSfx
 
       set TCSH = `which tcsh`
       if (($ok == TRUE) && ($?CROSS_COMPILE == 0) && (-x "$TCSH")) then
-         NoteD $Log ""
-         NoteD $Log "                    PPC Background Test ............ "
-         Note $Log ""
-
-         set FAIL  = "NO"
-         set LStat = 0
 
 # do foreground part
          NoteD $Log "                       foreground .......... "
-         set UTime = `$TIMER -r`
          Note $Log "( $CFE tcsh -f $PCFGBG -fg ) >&! res.fg"
          $CFE tcsh -f $PCFGBG -fg >&! res.fg
-         set lStat = $status
-         set ETime = `$TIMER -b $UTime`
+         set xstatus = $status
 
          cat res.fg
          flog $Log cat $LogFB
-         if ($lStat != 0) then
-            NoteD $Log "                       foreground .......... ng ($ETime)"
-            set LStat = 1
-         else
-            NoteD $Log "                       foreground .......... ok ($ETime)"
-         endif
+
+         $TEST_CHECK part -a bg_foreground -e $xstatus -l -rpf "$rpf" none
+
+         @ nerr = $nerr + $status
 
 # do background part
          NoteD $Log "                       background .......... "
-         set UTime = `$TIMER -r`
          Note $Log "( $CFE tcsh -f $PCFGBG -bg & ) >&! res.bg"
          ( $CFE tcsh -f $PCFGBG -bg & ) >&! res.bg
-         set lStat = $status
+         set xstatus = $status
 
          @ count = 0
          while ($count < 20)
@@ -70,31 +59,18 @@ set LogFB = log.fgbg.$LogSfx
          end
          flog $Log sign pcfgbg
 
-         set ETime = `$TIMER -b $UTime`
-
          cat res.bg
          flog $Log cat $LogFB
-         if ($lStat != 0) then
-            NoteD $Log "                       background .......... ng ($ETime)"
-            set LStat = 2
-         else
-            NoteD $Log "                       background .......... ok ($ETime)"
-         endif
 
-         if ($LStat != 0) then
-            NoteD $Log "                    PPC Background Test ............ FAILED ($ETime)"
-            set Err = 1
-         else
-            NoteD $Log "                    PPC Background Test ............ PASSED ($ETime)"
-            flog $Log $RM res.fg res.bg
-         endif
+         $TEST_CHECK part -a bg_background -e $xstatus -l -rpf "$rpf" none
+
+         @ nerr = $nerr + $status
+
+         set rpf = ( $rpf res.fg res.bg )
 
       endif
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK part -a bg -e $Err
+$TEST_CHECK part -a bg -e $nerr -rpf "$rpf" none
 
 exit($status)
 

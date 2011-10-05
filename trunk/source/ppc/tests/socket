@@ -10,26 +10,20 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           SOCKET TEST
-
-#--------------------------------------------------------------------------
-
 # PPC Socket test
 
       set msg = "PPC Socket Test ................"
-      set rpf = "none"
 
       NoteD $Log ""
       NoteD $Log "                    $msg"
 
       set FAIL = "NO"
 
-      set UTime = `$TIMER -r`
       flog $Log rm -f pcexec.sockp pcexec.socki
 
       NoteD $Log -n "                       polling ..................... "
+      set rpf = "none"
+
       set BTime = `$TIMER -r`
       if ("$Valgrind" == "") then
          $CFE $PCEXEC -c 30 -i -s $TEST > pcexec.sockp
@@ -39,19 +33,16 @@ source ../../tests/common
          grep "ERROR SUMMARY:"                             |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-	 flog $Log $RM $Tmp
+	 set rpf     = ( $rpf $Tmp )
       endif
 
-      set ETime = `$TIMER -b $BTime`
-      if ($xstatus == 0) then
-         NoteD $Log "ok ($ETime)"
-      else
-         NoteD $Log "ng ($xstatus/$ETime)"
-         set FAIL  = "YES"
-      endif
+      $TEST_CHECK part -a socket_poll -e $xstatus -l -rpf "$rpf" none
+
+      @ nerr = $nerr + $status
 
       NoteD $Log -n "                       interrupt ................... "
-      set BTime = `$TIMER -r`
+      set rpf = "none"
+
       if ("$Valgrind" == "") then
          $CFE $PCEXEC -c 30 -s $TEST > pcexec.socki
          set xstatus = $status
@@ -60,21 +51,14 @@ source ../../tests/common
          grep "ERROR SUMMARY:"                             |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-	 flog $Log $RM $Tmp
+	 set rpf     = ( $rpf $Tmp )
       endif
 
-      set ETime = `$TIMER -b $BTime`
-      if ($xstatus == 0) then
-         NoteD $Log "ok ($ETime)"
-      else
-         NoteD $Log "ng ($xstatus/$ETime)"
-         set FAIL  = "YES"
-      endif
+      $TEST_CHECK part -a socket_interrupt -e $xstatus -l -rpf "$rpf" none
 
-      set xstatus = 0
-      if ($FAIL == "YES") then
-         set xstatus = 1
-      else
+      @ nerr = $nerr + $status
+
+      if ($xstatus != 0) then
          if ("$Valgrind" == "") then
             diff pcexec.refi pcexec.socki > pcexec.diffi
             set Files = `find . -name "pcexec.diffi" -size 0c -print`
@@ -84,14 +68,10 @@ source ../../tests/common
             set Files = 1
          endif
          if ($#Files == 0) then
-            set xstatus = 1
-         else
-            set rpf = ( pcexec.diff* pcexec.sock* )
+            @ nerr = $nerr + 1
          endif
       endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+      set rpf = ( pcexec.diff* pcexec.sock* )
 
 $TEST_CHECK part -a socket -e $xstatus -rpf "$rpf" "$msg"
 

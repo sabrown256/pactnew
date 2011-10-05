@@ -12,7 +12,6 @@ set Package = scripts
 source ../../test-env
 
 set msg = "SUBROUTINE Test ................ "
-set rpf = none
 
 while ($#argv > 0)
    switch ($1)
@@ -28,8 +27,6 @@ while ($#argv > 0)
    shift
 end
 
-@ Err = 0
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
@@ -38,7 +35,6 @@ end
 NoteD $Log "                    $msg"
 
 set List = (subr1 subr2 subr3 subr4)
-@ nerr   = 0
 
 flog $Log cp $RootDir/scripts/tests/{subr*} .
 flog $Log setenv PATH $RootDir/scripts:$PATH

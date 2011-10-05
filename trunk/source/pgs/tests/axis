@@ -10,6 +10,9 @@
 
 source ../../tests/common
 
+set msg = "PGS Axis Test .......... "
+set exe = $BinDir/gslaxt
+
 set DDir = $RootDir/pgs/tests
 
 set Replace = FALSE
@@ -25,17 +28,7 @@ while ($#argv > 0)
    shift
 end
 
-#--------------------------------------------------------------------------
-
-#                           PGS AXIS TEST
-
-#--------------------------------------------------------------------------
-
    Separator $Log
-
-   set msg = "PGS Axis Test .......... "
-   set rpf = "none"
-   set exe = $BinDir/gslaxt
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
@@ -49,8 +42,7 @@ end
    if ($xstatus != 0) then
       NoteD $Log ""
       NoteD $Log "                         Can't build PGS Log Axis Test Program"
-      NoteD $Log "                    PGS Axis Test .......... FAILED (-1)"
-      set Err = 1
+      NoteD $Log "                    ${msg}FAILED"
    else
       flog $Log rm -f gslax*.res gslax*.ps
       flog $Log cp $SrcDir/tests/gslax*.dat .
@@ -171,9 +163,6 @@ end
 
    endif
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK part -a axis -e $Err -x $exe -rpf "$rpf" none
+$TEST_CHECK part -a axis -e $xstatus -x $exe -rpf "$rpf" none
 
 exit($status)

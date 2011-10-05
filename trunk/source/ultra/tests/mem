@@ -10,17 +10,12 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           MEMORY TEST
-
-#--------------------------------------------------------------------------
+set msg = "ULTRA Memory Test ............ "
 
    NoteD $Log ""
-   NoteD $Log -n "                    ULTRA Memory Test ............ "
+   NoteD $Log -n "                    $msg"
    Note $Log ""
 
-   set UTime = `$TIMER -r`
    if ("$Valgrind" == "") then
       flog $Log ($CFE $Ultra -n -l $TDir/ulmmt.scm >& ulmmt.log)
       set xstatus = $status
@@ -29,23 +24,9 @@ source ../../tests/common
       grep "ERROR SUMMARY:"                                                         |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      flog $Log $RM $Tmp
+      set rpf     = ( $rpf $Tmp )
    endif
 
-   set ETime = `$TIMER -b $UTime`
-
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $LogF "OMITTED ($xstatus/$ETime)"
-   else if ($xstatus != 0) then
-      NoteD $Log "FAILED ($xstatus/$ETime)"
-      set Err = 1
-   else
-      NoteD $Log "PASSED ($ETime)"
-   endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK part -a mem -e $Err
+$TEST_CHECK part -a mem -e $xstatus -rpf "$rpf" none
 
 exit($status)

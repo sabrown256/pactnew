@@ -8,12 +8,7 @@
 # include "cpyright.h"
 #
 
-setenv Package sx
-
-source ../../../scripts/env-csh
-if ($?Log == 0) then
-   source ../../../scripts/test-env
-endif
+source ../../../scripts/test-env
 
 #if ($?LogF == 0) then
 #   InitLog LogF $cwd/log.$TestName.$LogSfx
@@ -22,68 +17,37 @@ endif
 set TestName = "$0"
 set TestName = "$TestName:t"
 
-pushd ../../../manager >& /dev/null
-set Arch = `cfgman use`
-cd ../dev/$Arch >& /dev/null
-set Root = $cwd
-popd >& /dev/null
-
-set BinDir = $Root/bin
-set LibDir = $Root/lib
-set MAKE   = $BinDir/pact
-set TIMER  = $BinDir/timer
-
-if ($OS =~ CYGWIN*) then
-   set CFE = ""
-   set PFE = ""
-else
-   set CFE = $BinDir/do-run
-   set PFE = $BinDir/do-run
-endif
-
 if ("$CFE" == "") then
    set cfe = ""
 else
    set cfe = ( $CFE -v )
 endif
 
-grep '#define THREADING' $Root/include/scconfig.h >& /dev/null
+grep '#define THREADING' $IncDir/scconfig.h >& /dev/null
 if ($status == 0) then
    setenv THREADING yes
 else
    setenv THREADING no
 endif
 
-grep '#define HAVE_MPI' $Root/include/scconfig.h >& /dev/null
+grep '#define HAVE_MPI' $IncDir/scconfig.h >& /dev/null
 if ($status == 0) then
    setenv HAVE_MPI yes
 else
    setenv HAVE_MPI no
 endif
 
-grep '#define HAVE_SQLITE' $Root/include/scconfig.h >& /dev/null
+grep '#define HAVE_SQLITE' $IncDir/scconfig.h >& /dev/null
 if ($status == 0) then
    setenv HAVE_SQLITE yes
 else
    setenv HAVE_SQLITE no
 endif
 
-set TDir    = $RootDir/sx/tests
-set RefDir  = $RootDir/sx/tests/ref
-set Ultra   = "$CFE $BinDir/ultra -e -r -x -q -s $ZeroSpace"
-set SX      = "$CFE $BinDir/sx -e -r -s $ZeroSpace"
-set PDBView = "$CFE $BinDir/sx -e -p -q $ZeroSpace"
-set PDBDiff = "$BinDir/pdbdiff -e -x -q $ZeroSpace"
-
-if ($?SrcDir == 0) then
-   pushd ../.. >& /dev/null
-   set SrcDir = $cwd
-   popd >& /dev/null
-endif
+#set PDBDiff = "$BinDir/pdbdiff -e -x -q $ZeroSpace"
 
 if ($?Log == 1) then
    Note $Log "Log file: $LogF"
 endif
 
-set Err = 0
 

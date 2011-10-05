@@ -12,22 +12,19 @@ source ../../tests/common
 
 set msg = "SCORE Parallel Test ........... "
 set exe = $BinDir/scthrt
-set rpf = none
 
    NoteD $LogF ""
    NoteD $LogF "                    $msg"
 
    flog $LogF pushd $SrcDir
    flog $LogF $MAKE smp
-   set TStatus = $status
+   set xstatus = $status
    flog $LogF popd
 
-   if ($TStatus != 0) then
+   if ($xstatus != 0) then
       NoteD $LogF ""
-      cat $LogF
       NoteD $LogF "                         ERROR Building Parallel Tests"
       NoteD $LogF "                    ${msg}FAILED"
-      set Err = 1
    else
 
       if ($?TEST_MAX_THREADS == 1) then
@@ -117,7 +114,6 @@ set rpf = none
 
       NoteD $LogF ""
       NoteD $LogF "                       Thread Lock Test"
-
       NoteD $LogF "                          # Items   # Threads ($NThrds)"
 
       foreach mode (10 100 1000)
@@ -147,8 +143,7 @@ set rpf = none
          NoteD $LogF "   ($LETime)"
       end
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+   endif
 
 $TEST_CHECK part -a smp -e $lerr -rpf "$rpf" "$msg"
 

@@ -10,44 +10,36 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           FUNCTION TEST
-
-#--------------------------------------------------------------------------
+set msg = "ULTRA FNC Test ............... "
+set exe = $BinDir/ultra
 
    NoteD $Log ""
-   NoteD $Log -n "                    ULTRA FNC Test ............... "
+   NoteD $Log -n "                    $msg"
    Note $Log ""
 
-   set rpf = none
+   flog $Log $RM ultest.err ulfnc.log
 
-   flog $Log $RM ulfnc.log ultest.err
-
-   set UTime = `$TIMER -r`
+   set opt = ( -l $TDir/ulfnc.scm )
    if ("$Valgrind" == "") then
 
 # CYGWIN 1.5 simply will not write output to ulfnc.log
 # the other tests are fine
       if ($OS =~ CYGWIN*) then
-         flog $Log $cfe $Ultra -l $TDir/ulfnc.scm
+         flog $Log $cfe $Ultra $opt
          set xstatus = $status
       else
-         flog $Log ($CFE $Ultra -l $TDir/ulfnc.scm >& ulfnc.log)
+         flog $Log ($CFE $Ultra $opt >&! ulfnc.log)
          set xstatus = $status
-         flog $Log (grep -i "error" ulfnc.log > ultest.err)
+         flog $Log (grep -i "error" ulfnc.log >&! ultest.err)
          set Files = `find . -name "ultest.err" -size 0c -print`
       endif
    else
-      ftee $Log $Valgrind $BinDir/ultra -e -r -x -q -s -l $TDir/ulfnc.scm  |& \
-      grep "ERROR SUMMARY:"                                                         |& \
+      ftee $Log $Valgrind $exe -e -r -x -q -s $opt     |& \
+      grep "ERROR SUMMARY:"                            |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
       set rpf     = $Tmp
    endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a fnc -e $xstatus -rpf "$rpf" none
 

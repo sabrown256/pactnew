@@ -10,77 +10,52 @@
 
 source ../../tests/common
 
-#--------------------------------------------------------------------------
-
-#                           PIPE TEST
-
-#--------------------------------------------------------------------------
-
-# Pipe Test
-
       set msg = "PPC Pipe Test .................."
-      set rpf = "none"
 
       NoteD $Log ""
       NoteD $Log "                    $msg "
 
-      set FAIL  = NO
-      set UTime = `$TIMER -r`
       flog $Log rm -f pcexec.refi pcexec.refp
 
       NoteD $Log -n "                       polling ..................... "
+      set rpf = "none"
+
       set BTime = `$TIMER -r`
       if ("$Valgrind" == "") then
-         $CFE $PCEXEC -c 30 -i -p $TEST > pcexec.refp
+         $CFE $PCEXEC -c 30 -i -p $TEST >&! pcexec.refp
          set xstatus = $status
       else
          ftee $Log $Valgrind $PCEXEC -c 30 -i -p $TEST     |& \
          grep "ERROR SUMMARY:"                             |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-	 flog $Log $RM $Tmp
+	 set rpf     = ( $rpf $Tmp )
       endif
 
-      set ETime = `$TIMER -b $BTime`
-      if ($xstatus == 0) then
-         NoteD $Log "ok ($ETime)"
-      else
-         NoteD $Log "ng ($xstatus/$ETime)"
-         set FAIL  = "YES"
-      endif
+      $TEST_CHECK part -a pipe_poll -e $xstatus -l -rpf "$rpf" none
+
+      @ nerr = $nerr + $status
 
       NoteD $Log -n "                       interrupt ................... "
+      set rpf = "none"
+
       set BTime = `$TIMER -r`
       if ("$Valgrind" == "") then
-         $CFE $PCEXEC -c 30 -p $TEST > pcexec.refi
+         $CFE $PCEXEC -c 30 -p $TEST >&! pcexec.refi
          set xstatus = $status
       else
          ftee $Log $Valgrind $PCEXEC -c 30 -p $TEST        |& \
          grep "ERROR SUMMARY:"                             |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
-	 flog $Log $RM $Tmp
+	 set rpf     = ( $rpf $Tmp )
       endif
 
-      set ETime = `$TIMER -b $BTime`
-      if ($xstatus == 0) then
-         NoteD $Log "ok ($ETime)"
-      else
-         NoteD $Log "ng ($xstatus/$ETime)"
-         set FAIL  = "YES"
-      endif
+      $TEST_CHECK part -a pipe_interrupt -e $xstatus -l -rpf "$rpf" none
 
-      set xstatus = 0
-      if ($FAIL == "YES") then
-         set xstatus = 1
-      else
-         set rpf = "none"
-      endif
+      @ nerr = $nerr + $status
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-$TEST_CHECK part -a pipe -e $xstatus -rpf "$rpf" "$msg"
+$TEST_CHECK part -a pipe -e $nerr "$msg"
 
 exit($status)
 

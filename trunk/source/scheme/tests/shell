@@ -11,15 +11,7 @@
 source ../../tests/common
 
 set msg = "SCHEME Shell Test ............ "
-set rpf = none
 set exe = $BinDir/scheme
-@ nerr  = 0
-
-#--------------------------------------------------------------------------
-
-#                           SHELL TESTS
-
-#--------------------------------------------------------------------------
 
    if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
       NoteD $Log ""
@@ -28,12 +20,12 @@ set exe = $BinDir/scheme
 # env test
       NoteD $Log -n "                       env ....................... "
 
-      set UTime = `$TIMER -r`
+      set t0 = `$TIMER -r`
       $CFE $FilesDir/shenv.scm >&! shenv.res
       set xstatus = $status
       diff shenv.res $FilesDir/ref/shenv >&! shenv.res.diff
       set dstatus = $status
-      set ETime = `$TIMER -b $UTime`
+      set dt = `$TIMER -b $t0`
 
       if (($xstatus != 0) || ($dstatus != 0)) then
          flog $Log cat shenv.res
@@ -43,19 +35,19 @@ set exe = $BinDir/scheme
 
       set rpf = ( shenv.res* )
 
-      $TEST_CHECK part -a shell_env -e $xstatus -l -dt $ETime -rpf "$rpf" none
+      $TEST_CHECK part -a shell_env -e $xstatus -l -dt $dt -rpf "$rpf" none
 
       @ nerr = $nerr + $status
 
 # argv test
       NoteD $Log -n "                       argv ...................... "
 
-      set UTime = `$TIMER -r`
+      set t0 = `$TIMER -r`
       $CFE $FilesDir/shexe.scm a 1 2.3 '"abc"' >&! shexe.res
       set xstatus = $status
       diff shexe.res $FilesDir/ref/shexe >&! shexe.res.diff
       set dstatus = $status
-      set ETime = `$TIMER -b $UTime`
+      set dt = `$TIMER -b $t0`
 
       if (($xstatus != 0) || ($dstatus != 0)) then
          flog $Log cat shexe.res
@@ -65,14 +57,11 @@ set exe = $BinDir/scheme
 
       set rpf = ( shexe.res* )
 
-      $TEST_CHECK part -a shell_argv -e $xstatus -l -dt $ETime -rpf "$rpf" none
+      $TEST_CHECK part -a shell_argv -e $xstatus -l -dt $dt -rpf "$rpf" none
 
       @ nerr = $nerr + $status
 
    endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a shell -e $nerr "$msg"
 

@@ -12,8 +12,6 @@ source ../../tests/common
 
 set msg = "SX PDB XML Test .............. "
 set exe = $BinDir/sx
-set rpf = none
-@ nerr  = 0
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"

@@ -11,7 +11,6 @@
 source ../../tests/common
 
 set msg = "SCHEME String Test ........... "
-set rpf = none
 set exe = $BinDir/scheme
 
    NoteD $Log ""

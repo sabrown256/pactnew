@@ -11,10 +11,7 @@
 source ../../tests/common
 
 set msg = "PDB Master Test .................... "
-set rpf = "none"
 set exe = $BinDir/pdbtst
-
-set tst = $1
 
 NoteD $LogF ""
 NoteD $LogF "                    $msg"
@@ -30,9 +27,6 @@ else
    set xstatus = `cat $Tmp`
    set rpf     = ( $rpf $Tmp )
 endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a master -e $xstatus -x $exe -rpf "$rpf" "$msg"
 
