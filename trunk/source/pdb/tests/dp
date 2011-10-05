@@ -14,29 +14,29 @@ set msg = "PDB Distributed Parallel Test ...... "
 set exe = $BinDir/pddpts
 
 if ("$MPI" != "") then
-   NoteD $LogF ""
-   NoteD $LogF "                    $msg"
-   NoteD $LogF ""
+   NoteD $Log ""
+   NoteD $Log "                    $msg"
+   NoteD $Log ""
 
-   flog $LogF pushd $SrcDir
-   flog $LogF $MAKE dp
+   flog $Log pushd $SrcDir
+   flog $Log $MAKE dp
    set xstatus = $status
-   flog $LogF popd
+   flog $Log popd
 
    if ($xstatus != 0) then
-      NoteD $LogF ""
-      NoteD $LogF "                         ERROR Building Distributed Parallel Tests"
-      NoteD $LogF "                    ${msg}FAILED"
+      NoteD $Log ""
+      NoteD $Log "                         ERROR Building Distributed Parallel Tests"
+      NoteD $Log "                    ${msg}FAILED"
 
    else
       if (-x $PFE) then
 
-         flog $LogF $PFE -dr -p 2 -t 0 $exe -v $tst
-         ftee $LogF ( $PFE -p 2 -t 0 $exe -v $tst |& awk '$1 !~ /MPI/ && $1 !~ /ERROR/ && $1 !~ /srun/ {print}' | grep -v filenoexist | grep -v salloc )
+         flog $Log $PFE -dr -p 2 -t 0 $exe -v $tst
+         ftee $Log ( $PFE -p 2 -t 0 $exe -v $tst |& awk '$1 !~ /MPI/ && $1 !~ /ERROR/ && $1 !~ /srun/ {print}' | grep -v filenoexist | grep -v salloc )
          set xstatus = $status
 
       else
-         Note $LogF "No MPI - test omitted"
+         Note $Log "No MPI - test omitted"
          set xstatus = 255
       endif
 

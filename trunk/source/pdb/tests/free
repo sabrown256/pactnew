@@ -13,14 +13,14 @@ source ../../tests/common
 set msg = "PDB Free Test ...................... "
 set exe = $BinDir/pdfrts
 
-NoteD $LogF ""
-NoteD $LogF -n "                    $msg"
+NoteD $Log ""
+NoteD $Log -n "                    $msg"
 
 if ("$Valgrind" == "") then
    flog $Log $CFE $exe
    set xstatus = $status
 else
-   ftee $LogF $Valgrind $exe             |& \
+   ftee $Log $Valgrind $exe              |& \
    grep "ERROR SUMMARY:"                 |& \
    awk '{ print $4 }'   >&! $Tmp
    set xstatus = `cat $Tmp`

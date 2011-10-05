@@ -12,14 +12,14 @@ source ../../tests/common
 
 set msg = "PANACHE Test .................. "
 
-NoteD $LogF ""
-NoteD $LogF ""
-NoteD $LogF "                    $msg"
+NoteD $Log ""
+NoteD $Log ""
+NoteD $Log "                    $msg"
 
-flog $LogF pushd $SrcDir/tests
+flog $Log pushd $SrcDir/tests
 do-test
 set xstatus = $status
-flog $LogF popd
+flog $Log popd
 
 $TEST_CHECK part -a gen -e $xstatus "$msg"
 

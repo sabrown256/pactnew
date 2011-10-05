@@ -16,10 +16,11 @@ set exe = $BinDir/pdbfts
 #set STRACE = ( `which strace` )
 #if ((-x "$STRACE") && ($OS != AIX)) then
 
-   NoteD $LogF ""
-   NoteD $LogF "                    $msg"
-   Note $LogF ""
+   NoteD $Log ""
+   NoteD $Log "                    $msg"
+   Note $Log ""
 
+   set opt = ( -v $tst )
    if ("$Valgrind" == "") then
 
       echo -n "                       "
@@ -62,10 +63,10 @@ set exe = $BinDir/pdbfts
 
 #            foreach c ( 1 4 16 )
             foreach c ( 4 )
-               Separator $LogF
-               ftee $LogF $CFE $exe -v $tst -n $n -b $m -c $c
-#               Note $LogF "Command: $STRACE $exe -v $tst -n $n -b $m -c $c"
-#               @ nwr = ( `$STRACE $exe -v $tst -n $n -b $m -c $c |& grep write | tee -a $LogF | wc -l` )
+               Separator $Log
+               ftee $Log $CFE $exe $opt -n $n -b $m -c $c
+#               Note $Log "Command: $STRACE $exe $opt -n $n -b $m -c $c"
+#               @ nwr = ( `$STRACE $exe $opt -n $n -b $m -c $c |& grep write | tee -a $Log | wc -l` )
 #               echo "$c $nr $mr $rat $nwr" | \
 #               awk '{printf("                       %3d      %4s  %5s %8s    %5d\n", $1, $2, $3, $4, $5);}'
             end
@@ -73,8 +74,8 @@ set exe = $BinDir/pdbfts
       end
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $exe -v $tst           |& \
-      grep "ERROR SUMMARY:"                       |& \
+      ftee $Log $Valgrind $exe $opt            |& \
+      grep "ERROR SUMMARY:"                    |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
       set rpf     = ( $rpf $Tmp )

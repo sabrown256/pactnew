@@ -15,36 +15,31 @@ set exe = $BinDir/scrtrt
 
 if ($CROSS_COMPILE == FALSE) then
 
-   NoteD $LogF ""
-   NoteD $LogF -n "                    $msg"
-   Note $LogF ""
+   NoteD $Log ""
+   NoteD $Log -n "                    $msg"
+   Note $Log ""
 
-   flog $LogF pushd $SrcDir
-   flog $LogF $MAKE retrace
+   flog $Log pushd $SrcDir
+   flog $Log $MAKE retrace
    set xstatus = $status
-   flog $LogF popd
+   flog $Log popd
 
    if ("$CFE" != "") then
       setenv CFE   "$CFE -v"
    endif
 
    if ("$Valgrind" == "") then
-      flog $LogF $CFE $exe
+      flog $Log $CFE $exe
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $exe        |& \
+      ftee $Log $Valgrind $exe         |& \
       grep "ERROR SUMMARY:"            |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
       set rpf     = ( $rpf $Tmp )
    endif
 
-else
-   set xstatus = 0
 endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a retrc -e $xstatus -x $exe -rpf "$rpf" none
 

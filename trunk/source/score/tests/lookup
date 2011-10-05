@@ -10,13 +10,13 @@
 
 source ../../tests/common
 
-flog $LogF pushd $SrcDir
-flog $LogF $MAKE ha
+flog $Log pushd $SrcDir
+flog $Log $MAKE ha
 set xstatus = $status
-flog $LogF popd
+flog $Log popd
 
 if ($xstatus != 0) then
-   NoteD $LogF "                         ERROR Building HASH Test Program"
+   NoteD $Log "                         ERROR Building HASH Test Program"
 else
 
 #--------------------------------------------------------------------------
@@ -28,16 +28,16 @@ else
    set exe = $BinDir/scatst
    set rpf = none
 
-   NoteD $LogF ""
-   NoteD $LogF "                    $msg"
-   Note $LogF ""
+   NoteD $Log ""
+   NoteD $Log "                    $msg"
+   Note $Log ""
 
    if ("$Valgrind" == "") then
-      ftee $LogF $CFE $exe
+      ftee $Log $CFE $exe
       set xstatus = $status
    else
-      NoteD $LogF ""
-      ftee $LogF $Valgrind $exe      |& \
+      NoteD $Log ""
+      ftee $Log $Valgrind $exe       |& \
       grep "ERROR SUMMARY:"          |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
@@ -57,15 +57,15 @@ else
    set exe = $BinDir/sctrts
    set rpf = none
 
-   NoteD $LogF ""
-   NoteD $LogF -n "                    $msg"
-   Note $LogF ""
+   NoteD $Log ""
+   NoteD $Log -n "                    $msg"
+   Note $Log ""
 
    if ("$Valgrind" == "") then
-      flog $LogF $CFE $exe
+      flog $Log $CFE $exe
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $exe       |& \
+      ftee $Log $Valgrind $exe        |& \
       grep "ERROR SUMMARY:"           |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
@@ -76,10 +76,10 @@ else
 
    @ nerr = $nerr + $status
 
-endif
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+endif
 
 $TEST_CHECK part -a lookup -e $nerr
 

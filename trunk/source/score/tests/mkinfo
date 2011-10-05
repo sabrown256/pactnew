@@ -14,11 +14,11 @@ set msg = "SCORE Make Info Test .......... "
 
 set ok = TRUE
 if ($ok == TRUE) then
-   NoteD $LogF ""
-   NoteD $LogF -n "                    $msg"
-   NoteD $LogF ""
+   NoteD $Log ""
+   NoteD $Log -n "                    $msg"
+   NoteD $Log ""
 
-   flog $LogF pushd $SrcDir/tests
+   flog $Log pushd $SrcDir/tests
 
    set vars = ""
 
@@ -38,34 +38,31 @@ if ($ok == TRUE) then
    set vars = ( $vars LIB Bits SUFFIXES NUMA CList )
 
    foreach m (smake dmake)
-      Separator $LogF
+      Separator $Log
       set f = ( `fill-string -n 28 $m` )
-      NoteD $LogF -n "                       $f "
-      Note $LogF ""
+      NoteD $Log -n "                       $f "
+      Note $Log ""
       @ lerr = 0
       foreach v ($vars)
-         flog $LogF $m -info $v
+         flog $Log $m -info $v
          if ($status != 0) then
-            Note $LogF "Test $v failed for $m"
+            Note $Log "Test $v failed for $m"
             @ lerr = $lerr + 1
          else
-            Note $LogF "Test $v passed for $m"
+            Note $Log "Test $v passed for $m"
          endif
       end
       if ($lerr == 0) then
-         NoteD $LogF "ok"
+         NoteD $Log "ok"
       else
-         NoteD $LogF "ng"
+         NoteD $Log "ng"
          @ nerr = $nerr + 1
       endif
    end
 
-   flog $LogF popd
+   flog $Log popd
 
 endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a mkinfo -e $nerr -rpf "$rpf" "$msg"
 

@@ -13,35 +13,30 @@ source ../../tests/common
 set msg = "SCORE Override Test ........... "
 set exe = $BinDir/scmots
 
-set ok = TRUE
-if (($CROSS_COMPILE == TRUE) || ($PACT_CC_FAMILY == INTEL)) then
-   set ok = FALSE
-endif
+if (($CROSS_COMPILE == FALSE) && ($PACT_CC_FAMILY != INTEL)) then
 
-if ($ok == TRUE) then
+   NoteD $Log ""
+   NoteD $Log -n "                    $msg"
+   NoteD $Log ""
 
-   NoteD $LogF ""
-   NoteD $LogF -n "                    $msg"
-   NoteD $LogF ""
-
-   flog $LogF pushd $SrcDir
-   flog $LogF $MAKE memovr
+   flog $Log pushd $SrcDir
+   flog $Log $MAKE memovr
    set xstatus = $status
-   Note $LogF "make status = $xstatus"
+   Note $Log "make status = $xstatus"
 
-   flog $LogF popd
+   flog $Log popd
 
    if ($xstatus == 0) then
       flog $Log ldd $exe
       if ("$Valgrind" == "") then
-#         ftee $LogF ( ( setenv LD_PRELOAD $LibDir/libosmm.so ; $CFE $exe ) |& grep -v "Dwarf Error" |& grep -iwv error )
-#         ftee $LogF ( ( setenv LD_PRELOAD $LibDir/libosmm.so ; $CFE $exe ) |& grep -v "Dwarf Error" )
-#         ftee $LogF ( setenv LD_PRELOAD $LibDir/libosmm.so ; $CFE $exe )
-         ftee $LogF $CFE $exe
+#         ftee $Log ( ( setenv LD_PRELOAD $LibDir/libosmm.so ; $CFE $exe ) |& grep -v "Dwarf Error" |& grep -iwv error )
+#         ftee $Log ( ( setenv LD_PRELOAD $LibDir/libosmm.so ; $CFE $exe ) |& grep -v "Dwarf Error" )
+#         ftee $Log ( setenv LD_PRELOAD $LibDir/libosmm.so ; $CFE $exe )
+         ftee $Log $CFE $exe
          set xstatus = $status
       endif
    else
-      Note $LogF "Failed to build scmots - skipping"
+      Note $Log "Failed to build scmots - skipping"
       set xstatus = 0
    endif
 
@@ -49,14 +44,7 @@ if ($ok == TRUE) then
 
    set xstatus = $status
 
-else
-
-   set xstatus = 0
-
 endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 exit($xstatus)
 

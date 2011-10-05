@@ -16,11 +16,11 @@ set exe = $BinDir/pdfdts
 if ("$OS" != AIX) then
    if ("$Valgrind" == "") then
 
-      NoteD $LogF ""
-      NoteD $LogF -n "                    $msg"
-      Note $LogF ""
+      NoteD $Log ""
+      NoteD $Log -n "                    $msg"
+      Note $Log ""
 
-      flog $LogF $CFE $exe
+      flog $Log $CFE $exe
       set xstatus = $status
 
       $TEST_CHECK part -a fd -e $xstatus -x $exe none

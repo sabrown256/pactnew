@@ -15,16 +15,17 @@ source ../../tests/common
 set msg = "PDB Typedef Test ................... "
 set exe = $BinDir/pdtdts
 
-NoteD $LogF ""
-NoteD $LogF -n "                    $msg"
-Note $LogF ""
+NoteD $Log ""
+NoteD $Log -n "                    $msg"
+Note $Log ""
 
+set opt = ( -v $tst )
 if ("$Valgrind" == "") then
-   flog $LogF $CFE $exe -v $tst
+   flog $Log $CFE $exe $opt
    set xstatus = $status
 else
-   ftee $LogF $Valgrind $exe -v $tst           |& \
-   grep "ERROR SUMMARY:"                       |& \
+   ftee $Log $Valgrind $exe $opt            |& \
+   grep "ERROR SUMMARY:"                    |& \
    awk '{ print $4 }'   >&! $Tmp
    set xstatus = `cat $Tmp`
    set rpf     = ( $rpf $Tmp )
@@ -32,12 +33,12 @@ endif
 
 if (-f out.pdb) then
    flog $Log ls -l out.pdb
-   flog $LogF ( grep -a Float out.pdb | grep -a double )
+   flog $Log ( grep -a Float out.pdb | grep -a double )
    if ($status == 0) then
-      Note $LogF "Result ok"
+      Note $Log "Result ok"
    else
-      Note $LogF "Result ng"
-      flog $LogF set xstatus = 2
+      Note $Log "Result ng"
+      flog $Log set xstatus = 2
    endif
 endif
 

@@ -9,11 +9,10 @@
 #
 
 setenv Package sx
+setenv Test    ""
 source ../scripts/test-env
 
-setenv LogF  $Log
-
-set Test = ""
+set Tests = ""
 
 while ($#argv > 0)
    switch ($1)
@@ -28,7 +27,7 @@ while ($#argv > 0)
       case -*:
            breaksw
       default:
-           set Test = ( $Test $1 )
+           set Tests = ( $Tests $1 )
            breaksw
    endsw
    shift
@@ -80,24 +79,19 @@ else if (-e $BinDir/sx) then
 
    flog $Log pwd
 
-   if ("$Test" == "") then
-      set Test = ""
-      set Test = ( $Test oper hash c99 pdb dattr ar text sqlite xml vif iply )
-      set Test = ( $Test pgs axis )
-      set Test = ( $Test master exa shell mesh intrp diff ext )
+   if ("$Tests" == "") then
+      set Tests = ""
+      set Tests = ( $Tests oper hash c99 pdb dattr ar text sqlite xml vif iply )
+      set Tests = ( $Tests pgs axis )
+      set Tests = ( $Tests master exa shell mesh intrp diff ext )
    endif
 
-   foreach i ($Test)
+   foreach i ($Tests)
       $SrcDir/tests/$i
       if ($status == 1) then
          set ERROR = TRUE
       endif
    end
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# CLEAN UP
 
    $TEST_CHECK clean -n SX -e $ERROR -raf "$Tmp"
 

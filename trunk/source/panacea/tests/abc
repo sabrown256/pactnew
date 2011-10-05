@@ -13,41 +13,41 @@ source ../../tests/common
 set msg = "PANACEA ABC Test .............. "
 
 if (-d $RootDir/panacea/abc) then
-   NoteD $LogF ""
-   NoteD $LogF -n "                    Building PANACEA ABC Test ....."
-   Note $LogF ""
+   NoteD $Log ""
+   NoteD $Log -n "                    Building PANACEA ABC Test ....."
+   Note $Log ""
 
    setenv SESSION_CONFIG `cfgman use`
-   flog $LogF pushd $SrcDir/abc/builder
-   flog $LogF dsys remove
-   flog $LogF dsys config
-   flog $LogF dsys build
+   flog $Log pushd $SrcDir/abc/builder
+   flog $Log dsys remove
+   flog $Log dsys config
+   flog $Log dsys build
    set xstatus = $status
-   flog $LogF popd
+   flog $Log popd
 
    if ($xstatus != 0) then
-      NoteD $LogF ""
-      NoteD $LogF "                         Can't build PANACEA ABC Test"
+      NoteD $Log ""
+      NoteD $Log "                         Can't build PANACEA ABC Test"
    else
-      NoteD $LogF " DONE"
+      NoteD $Log " DONE"
 
-      NoteD $LogF ""
-      NoteD $LogF "                    $msg"
+      NoteD $Log ""
+      NoteD $Log "                    $msg"
 
-      flog $LogF pushd $SrcDir/abc/builder
+      flog $Log pushd $SrcDir/abc/builder
       if ("$Valgrind" == "") then
-         ftee $LogF dsys test
+         ftee $Log dsys test
          set xstatus = $status
       else
-         ftee $LogF dsys test -vg
+         ftee $Log dsys test -vg
          set xstatus = $status
       endif
-      flog $LogF popd
+      flog $Log popd
 
       if ($xstatus == 0) then
-         flog $LogF pushd $SrcDir/abc/builder
-         flog $LogF dsys remove
-         flog $LogF popd
+         flog $Log pushd $SrcDir/abc/builder
+         flog $Log dsys remove
+         flog $Log popd
       endif
    endif
 endif

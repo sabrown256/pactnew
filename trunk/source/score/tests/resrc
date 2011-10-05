@@ -13,20 +13,20 @@ source ../../tests/common
 set msg = "SCORE Resource Test ........... "
 set exe = $BinDir/scrsts
 
-NoteD $LogF ""
-NoteD $LogF -n "                    $msg"
-NoteD $LogF ""
+NoteD $Log ""
+NoteD $Log -n "                    $msg"
+NoteD $Log ""
 
-flog $LogF pushd $SrcDir
-flog $LogF $MAKE resource
+flog $Log pushd $SrcDir
+flog $Log $MAKE resource
 set xstatus = $status
-flog $LogF popd
+flog $Log popd
 
 if ("$Valgrind" == "") then
-   ftee $LogF $CFE $exe
+   ftee $Log $CFE $exe
    set xstatus = $status
 else
-   ftee $LogF $Valgrind $exe         |& \
+   ftee $Log $Valgrind $exe          |& \
    grep "ERROR SUMMARY:"             |& \
    awk '{ print $4 }'   >&! $Tmp
    set xstatus = `cat $Tmp`

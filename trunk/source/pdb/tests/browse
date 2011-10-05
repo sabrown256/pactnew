@@ -13,15 +13,15 @@ source ../../tests/common
 set msg = "PDB Browse Test .................... "
 set exe = $BinDir/pdlsts
 
-NoteD $LogF ""
-NoteD $LogF -n "                    $msg"
-Note $LogF ""
+NoteD $Log ""
+NoteD $Log -n "                    $msg"
+Note $Log ""
 
 if ("$Valgrind" == "") then
    $CFE $exe pdatst.db >& pdatst.lst
    set xstatus = $status
 else
-   ftee $LogF $Valgrind $exe pdatst.db          |& \
+   ftee $Log $Valgrind $exe pdatst.db           |& \
    grep "ERROR SUMMARY:"                        |& \
    awk '{ print $4 }'   >&! $Tmp
    set xstatus = `cat $Tmp`

@@ -13,25 +13,25 @@ source ../../tests/common
 set msg = "SCORE MM Performance Test ..... "
 set exe = $BinDir/scmpft
 
-NoteD $LogF ""
-NoteD $LogF "                    $msg"
+NoteD $Log ""
+NoteD $Log "                    $msg"
 
-flog $LogF pushd $SrcDir
-flog $LogF $MAKE memchk
+flog $Log pushd $SrcDir
+flog $Log $MAKE memchk
 set xstatus = $status
-flog $LogF popd
+flog $Log popd
 
 if ($xstatus != 0) then
-   NoteD $LogF "                         ERROR Building MM Performance Program"
-   NoteD $LogF "                    ${mgs}FAILED"
+   NoteD $Log "                         ERROR Building MM Performance Program"
+   NoteD $Log "                    ${mgs}FAILED"
 else
 
    set opt = ( -m 1 )
    if ("$Valgrind" == "") then
-      ftee $LogF $CFE $exe $opt
+      ftee $Log $CFE $exe $opt
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $exe $opt      |& \
+      ftee $Log $Valgrind $exe $opt       |& \
       grep "ERROR SUMMARY:"               |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`

@@ -13,20 +13,20 @@ source ../../tests/common
 set msg = "SCORE Error Test .............. "
 set exe = $BinDir/scerts
 
-   NoteD $LogF ""
-   NoteD $LogF -n "                    $msg"
-   NoteD $LogF ""
+   NoteD $Log ""
+   NoteD $Log -n "                    $msg"
+   NoteD $Log ""
 
-   flog $LogF pushd $SrcDir
-   flog $LogF $MAKE error
+   flog $Log pushd $SrcDir
+   flog $Log $MAKE error
    set xstatus = $status
-   flog $LogF popd
+   flog $Log popd
 
    if ("$Valgrind" == "") then
-      ftee $LogF $CFE $exe
+      ftee $Log $CFE $exe
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $exe       |& \
+      ftee $Log $Valgrind $exe        |& \
       grep "ERROR SUMMARY:"           |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`

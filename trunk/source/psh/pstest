@@ -9,6 +9,7 @@
 #
 
 setenv Package psh
+setenv Test    ""
 source ../scripts/test-env
 
 set ERROR = FALSE
@@ -71,11 +72,6 @@ else
          set ERROR = TRUE
       endif
    end
-   
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# CLEAN UP - we are all done now
    
    $TEST_CHECK clean -n PSH -e $ERROR
 

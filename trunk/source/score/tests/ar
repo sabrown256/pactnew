@@ -13,16 +13,16 @@ source ../../tests/common
 set msg = "SCORE Archive Scan Test ....... "
 set exe = $BinDir/fcscan
 
-NoteD $LogF ""
-NoteD $LogF "                    $msg"
-Note $LogF ""
+NoteD $Log ""
+NoteD $Log "                    $msg"
+Note $Log ""
 
-flog $LogF pushd $SrcDir
-flog $LogF $MAKE fcscan
-set TStatus = $status
-flog $LogF popd
+flog $Log pushd $SrcDir
+flog $Log $MAKE fcscan
+set xstatus = $status
+flog $Log popd
 
-if ($TStatus == 0) then
+if ($xstatus == 0) then
 
    if ("$CFE" != "") then
       setenv CFE   "$CFE -v"
@@ -32,14 +32,14 @@ if ($TStatus == 0) then
 #--------------------------------------------------------------------------
 
 # test long or space-filled names
+
+   NoteD $Log -n "                       name ....................... "
+   Note $Log ""
+
    set rpf = none
-
-   NoteD $LogF -n "                       name ....................... "
-   Note $LogF ""
-
    setenv t0 `$TIMER -r`
 
-   flog $LogF $RM f*.o libar.a
+   flog $Log $RM f*.o libar.a
 
    echo "text 1" >! fx123.o
    echo "text 2" >! fabcdefghijklmnopqrstuvwxyz.o 
@@ -49,21 +49,21 @@ if ($TStatus == 0) then
    set AR    = `pact +l -info AR`
    set AROpt = `pact +l -info AROpt`
 
-   flog $LogF $AR $AROpt libar.a f*.o
-   flog $LogF $AR -t libar.a
+   flog $Log $AR $AROpt libar.a f*.o
+   flog $Log $AR -t libar.a
 
    if ("$Valgrind" == "") then
-      flog $LogF $CFE $exe libar.a
+      flog $Log $CFE $exe libar.a
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $exe libar.a    |& \
+      ftee $Log $Valgrind $exe libar.a     |& \
       grep "ERROR SUMMARY:"                |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
       set rpf     = ( $rpf $Tmp )
    endif
 
-   flog $LogF cat libar.a
+   flog $Log cat libar.a
    set rpf = ( $rpf f*.o libar.a )
 
    set dt = `$TIMER -b $t0`
@@ -76,18 +76,18 @@ if ($TStatus == 0) then
 #--------------------------------------------------------------------------
 
 # test working archive
+
+   NoteD $Log -n "                       working .................... "
+   Note $Log ""
+
    set rpf = none
-
-   NoteD $LogF -n "                       working .................... "
-   Note $LogF ""
-
    setenv t0 `$TIMER -r`
 
    if ("$Valgrind" == "") then
-      flog $LogF $CFE $exe -a $LibDir/libscore.a
+      flog $Log $CFE $exe -a $LibDir/libscore.a
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $exe -a $LibDir/libscore.a  |& \
+      ftee $Log $Valgrind $exe -a $LibDir/libscore.a   |& \
       grep "ERROR SUMMARY:"                            |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
@@ -96,11 +96,11 @@ if ($TStatus == 0) then
    @ NL = `$CFE $exe -a $LibDir/libscore.a | sort | wc -l`
    @ NL = $NL
 
-   flog $LogF ar -t $LibDir/libscore.a
+   flog $Log ar -t $LibDir/libscore.a
    @ NLAr = `ar -t $LibDir/libscore.a | sort | wc -l`
 
-   Note $LogF "fcscan count = $NL"
-   Note $LogF "ar     count = $NLAr"
+   Note $Log "fcscan count = $NL"
+   Note $Log "ar     count = $NLAr"
 
    set dt = `$TIMER -b $t0`
 

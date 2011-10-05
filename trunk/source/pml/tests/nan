@@ -21,14 +21,12 @@ set exe = $BinDir/mlnants
       set xstatus = $status
       flog $Log popd
 
-      set UTime = `$TIMER -r`
-
       if ($xstatus != 0) then
          NoteD $Log ""
          NoteD $Log "                         Can't build PML NAN Test Program"
       else
          if ("$Valgrind" == "") then
-            flog $LogF $cfe $exe
+            flog $Log $cfe $exe
             set xstatus = $status
          else
             flog $Log $Valgrind $exe

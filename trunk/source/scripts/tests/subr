@@ -8,8 +8,7 @@
 # include "cpyright.h"
 #
 
-set Package = scripts
-source ../../test-env
+source ../../tests/common
 
 set msg = "SUBROUTINE Test ................ "
 
@@ -65,9 +64,6 @@ foreach t ($List)
 end
 
 set rpf = ( $rpf run.* s* )
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a subr -e $nerr -rpf "$rpf" "$msg"
 

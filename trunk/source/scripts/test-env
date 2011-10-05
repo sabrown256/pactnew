@@ -21,7 +21,16 @@ end
 source $TestScrDir/env-csh
 setenv TEST_CHECK $TestScrDir/test-check
 
+# settle log file base
+# at package level Test should be ""
+# at test level Test should be name of test script
 set TLog = test
+if ($?Test == 1) then
+   if ("$Test" != "") then
+      set TLog = $Test
+   endif
+endif
+
 set VG   = `where valgrind | head -n 1`
 if (-x "$VG") then
    set largs = ( $argv )
@@ -180,16 +189,26 @@ if (!(-d $TestDir)) then
   mkdir -p $TestDir
 endif
 
-setenv rm_cache ""
-
 InitLog Log $TestDir/log.$TLog.$LogSfx
+Note $Log "Package: $Package"
+Note $Log "Test:    $Test"
+Note $Log "Log:     $Log"
+Note $Log ""
 
-set ERROR  = "FALSE"
-set FAIL   = "NO"
-set status = 0
+Separator $Log
+
+set ERROR = "FALSE"
 
 if ("$Valgrind" != "") then
    Note $Log "Using valgrind: $VG"
+endif
+
+if ($?TEST_RM_EXE == 1) then
+   Note $Log "Removing test executables tests that pass"
+   setenv rm_cache $TestDir/rm-cache
+   if ($?rm_cache == 1) then
+      flog $Log $RM $rm_cache
+   endif
 endif
 
 #--------------------------------------------------------------------------

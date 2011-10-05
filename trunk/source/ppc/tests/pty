@@ -19,8 +19,6 @@ set DPE = ""
          NoteD $Log ""
          NoteD $Log "                    $msg "
 
-         set FAIL = "NO"
-
          flog $Log rm -f pcexec.ptyi pcexec.ptyp
 
          NoteD $Log -n "                       polling ..................... "

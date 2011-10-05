@@ -9,9 +9,8 @@
 #
 
 setenv Package pdb
+setenv Test    ""
 source ../scripts/test-env
-
-setenv LogF  $Log
 
 set Tests = ""
 set TestL = ""
@@ -144,11 +143,6 @@ else if (-e $RootDir/pdb/pdb.h) then
          NoteD $Log ""
       end
    endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# CLEAN UP
 
    $TEST_CHECK clean -n PDB -e $ERROR -raf "$Tmp"
 

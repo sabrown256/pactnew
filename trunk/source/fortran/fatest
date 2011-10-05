@@ -9,12 +9,11 @@
 #
 
 setenv Package fortran
+setenv Test    ""
 source ../scripts/test-env
-source $IncDir/env-pact.csh
+#source $IncDir/env-pact.csh
 
-setenv LogF  $Log
-
-set Test = ""
+set Tests = ""
 
 while ($#argv > 0)
    switch ($1)
@@ -27,7 +26,7 @@ while ($#argv > 0)
       case -*:
            breaksw
       default:
-           set Test = ( $Test $1 )
+           set Tests = ( $Tests $1 )
            breaksw
    endsw
    shift
@@ -85,22 +84,17 @@ else if ($FC_Exe != none) then
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   if ("$Test" == "") then
-      set Test = ""
-      set Test = ($Test score pdb pgs panacea)
+   if ("$Tests" == "") then
+      set Tests = ""
+      set Tests = ($Tests score pdb pgs panacea)
    endif
 
-   foreach i ($Test)
+   foreach i ($Tests)
       $SrcDir/tests/$i
       if ($status == 1) then
          set ERROR = TRUE
       endif
    end
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# CLEAN UP - we are all done now
 
    $TEST_CHECK clean -n FORTRAN -e $ERROR -raf "$Tmp"
 

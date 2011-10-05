@@ -16,8 +16,6 @@ set exe = $BinDir/mlcgts
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
 
-   set FAIL = "NO"
-
    flog $Log pushd $SrcDir
    flog $Log $MAKE cgsolv
    set xstatus = $status
@@ -28,7 +26,7 @@ set exe = $BinDir/mlcgts
       NoteD $Log "                         Can't build PML CG Solver Test Program"
    else
       if ("$Valgrind" == "") then
-         flog $LogF $cfe $exe
+         flog $Log $cfe $exe
          set xstatus = $status
       else
          flog $Log $Valgrind $exe

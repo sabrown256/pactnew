@@ -558,7 +558,7 @@ switch ($Phase)
 
                  set UTime = `$TIMER -r`
 
-                 flog $LogHost ./dsys test -na 3 $ParOpt
+                 flog $LogHost ./dsys test -na 3 -r $ParOpt
                  set ErrStat = $status
 
                  set ETime = `$TIMER -b $UTime`

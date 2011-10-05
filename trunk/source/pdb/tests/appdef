@@ -13,16 +13,17 @@ source ../../tests/common
 set msg = "PDB Append/Defent Test ............. "
 set exe = $BinDir/pdapts
 
-NoteD $LogF ""
-NoteD $LogF "                    $msg"
-Note $LogF ""
+NoteD $Log ""
+NoteD $Log "                    $msg"
+Note $Log ""
 
+set opt = ( -v $tst )
 if ("$Valgrind" == "") then
-   ftee $LogF $CFE $exe -v $tst
+   ftee $Log $CFE $exe $opt
    set xstatus = $status
 else
-   ftee $LogF $Valgrind $exe -v $tst          |& \
-   grep "ERROR SUMMARY:"                      |& \
+   ftee $Log $Valgrind $exe $opt           |& \
+   grep "ERROR SUMMARY:"                   |& \
    awk '{ print $4 }'   >&! $Tmp
    set xstatus = `cat $Tmp`
    set rpf     = ( $rpf $Tmp )

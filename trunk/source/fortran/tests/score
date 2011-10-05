@@ -14,23 +14,23 @@ set msg = "SCORE API Test ....................."
 
 @ err = 0
 
-NoteD $LogF ""
-NoteD $LogF "                    $msg"
-Note $LogF ""
+NoteD $Log ""
+NoteD $Log "                    $msg"
+Note $Log ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   NoteD $LogF -n "                        lexical scan ................... "
-   Note $LogF ""
+   NoteD $Log -n "                        lexical scan ................... "
+   Note $Log ""
 
    set exe = $BinDir/sclsts
    set rpf = none
 
-   flog $LogF pushd $SrcDir
-   flog $LogF $MAKE scan
+   flog $Log pushd $SrcDir
+   flog $Log $MAKE scan
    set xstatus = $status
-   flog $LogF popd
+   flog $Log popd
 
    set opt = ( $TDir/sclsts.src )
    if ("$Valgrind" == "") then
@@ -38,7 +38,7 @@ Note $LogF ""
       set xstatus = $status
       diff sclsts.res $RefDir/sclsts > sclsts.res.diff
    else
-      ftee $LogF $Valgrind $exe $opt                    |& \
+      ftee $Log $Valgrind $exe $opt                     |& \
       grep "ERROR SUMMARY:"                             |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
@@ -54,22 +54,22 @@ Note $LogF ""
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   NoteD $LogF -n "                        hash ........................... "
-   Note $LogF ""
+   NoteD $Log -n "                        hash ........................... "
+   Note $Log ""
 
    set exe = $BinDir/schtst
    set rpf = none
 
-   flog $LogF pushd $SrcDir
-   flog $LogF $MAKE -na 2 fha
+   flog $Log pushd $SrcDir
+   flog $Log $MAKE -na 2 fha
    set xstatus = $status
-   flog $LogF popd
+   flog $Log popd
 
    if ("$Valgrind" == "") then
-      flog $LogF $CFE $exe
+      flog $Log $CFE $exe
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $exe                               |& \
+      ftee $Log $Valgrind $exe                                |& \
       grep "ERROR SUMMARY:"                                   |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
@@ -84,22 +84,22 @@ Note $LogF ""
 #--------------------------------------------------------------------------
 
    if ($HAVE_OPENMP == TRUE) then
-      flog $LogF pushd $SrcDir
-      flog $LogF $MAKE -na 2 omp
+      flog $Log pushd $SrcDir
+      flog $Log $MAKE -na 2 omp
       set xstatus = $status
-      flog $LogF popd
+      flog $Log popd
 
-      NoteD $LogF -n "                        omp ............................ "
-      Note $LogF ""
+      NoteD $Log -n "                        omp ............................ "
+      Note $Log ""
 
       set exe = $BinDir/scompt
       set rpf = none
 
       if ("$Valgrind" == "") then
-         flog $LogF ( echo 2 | $CFE $exe )
+         flog $Log ( echo 2 | $CFE $exe )
          set xstatus = $status
       else
-         ftee $LogF ( echo 2 | $Valgrind $exe                    |& \
+         ftee $Log ( echo 2 | $Valgrind $exe                     |& \
          grep "ERROR SUMMARY:"                                   |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`

@@ -26,6 +26,7 @@ set exe = $BinDir/gsatst
       endif
 
       NoteD $Log -n "                        new ................ "
+      Note $Log ""
 
       set rpf = "none"
       set opt = ""
@@ -53,6 +54,7 @@ set exe = $BinDir/gsatst
       @ nerr = $nerr + $status
 
       NoteD $Log -n "                        pool ............... "
+      Note $Log ""
 
       set rpf = "none"
       set opt = ""

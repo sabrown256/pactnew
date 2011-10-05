@@ -14,25 +14,26 @@ source ../../tests/common
 set msg = "PANACEA API Test ..................."
 set exe = $BinDir/pathts
 
-NoteD $LogF ""
-NoteD $LogF "                    $msg"
+NoteD $Log ""
+NoteD $Log "                    $msg"
 
-flog $LogF pushd $SrcDir
-flog $LogF $MAKE panacea
+flog $Log pushd $SrcDir
+flog $Log $MAKE panacea
 set xstatus = $status
-flog $LogF popd
+flog $Log popd
 
 if ($xstatus != 0) then
-   NoteD $LogF ""
-   NoteD $LogF "                         Can't build PANACEA API Tests ($xstatus)"
+   NoteD $Log ""
+   NoteD $Log "                         Can't build PANACEA API Tests ($xstatus)"
 
 else
+   set opt = ( -c 2 )
    if ("$Valgrind" == "") then
-      ftee $LogF $CFE $exe -c 2
+      ftee $Log $CFE $exe $opt
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $exe -c 2   |&  \
-      grep "ERROR SUMMARY:"                      |&  \
+      ftee $Log $Valgrind $exe $opt         |&  \
+      grep "ERROR SUMMARY:"                 |&  \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
       set rpf     = $Tmp
