@@ -12,8 +12,8 @@ source ../../tests/common
 
 set msg = "ULTRA Master Test ............ "
 set exe = $BinDir/ultra
-set opt = ( -l $TDir/ultest.scm )
-set io  = flog
+set opt = ( -e -r -x -q -s $ZeroSpace -l $TDir/ultest.scm )
+set io  = ultest.tmp
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
@@ -21,23 +21,12 @@ set io  = flog
 
    flog $Log $RM ultest.log ultest.pdb ultest.asc
 
-   if ("$Valgrind" == "") then
-      flog $Log ($CFE $Ultra $opt >&! ultest.tmp)
-      set xstatus = $status
-   else
-      ftee $Log $Valgrind $exe -e -r -x -q -s $opt    |& \
-      grep "ERROR SUMMARY:"                           |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf     = ( $rpf $Tmp )
-   endif
+   source ../../../scripts/test-run
  
    if ($xstatus == 0) then
       flog $Log (grep -i "error" ultest.tmp >&! ultest.err)
       flog $Log /bin/ls -l ultest.err
       if (-z ultest.err) then
-         set rpf = ( ultest.err )
-
          awk '(($1 != "%%CreationDate:") && !(($4 ~ /..:..:../) && ($5 ~ /199[0-9]/))) {print}' ultest.ps > ultest.ps.tmp
          flog $Log mv ultest.ps.tmp ultest.ps
 

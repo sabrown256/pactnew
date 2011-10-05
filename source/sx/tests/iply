@@ -12,7 +12,6 @@ source ../../tests/common
 
 set msg = "SX PML Polygon Test .......... "
 set exe = $BinDir/sx
-set io  = flog
 
    NoteD $Log ""
    NoteD $Log "                    $msg"
@@ -22,21 +21,13 @@ set io  = flog
       NoteD $Log -n "                       $t ..................... "
       Note $Log ""
 
-      set opt = ( -l $RootDir/sx/tests/$t.scm )
+      set opt = ( -p -e -q $ZeroSpace -l $RootDir/sx/tests/$t.scm )
+      set io  = $t.res
 
       flog $Log rm -f $t*.diff $t*.ps
 
       set bt = `$TIMER -r`
-      if ("$Valgrind" == "") then
-         flog $Log ($PDBView $opt >& $t.res)
-         set xstatus = $status
-      else
-         ftee $Log $Valgrind $exe -e -p -q $opt    |& \
-         grep "ERROR SUMMARY:"                     |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         set rpf     = ( $rpf $Tmp )
-      endif
+      source ../../../scripts/test-run
 
       if ($xstatus == 0) then
          foreach i ($t.ps)

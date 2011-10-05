@@ -13,22 +13,13 @@ source ../../tests/common
 set msg = "SX PGS Test .................. "
 set exe = $BinDir/sx
 set opt = ( -e -r -s $ZeroSpace -l $RootDir/sx/tests/sxpgs.scm )
-set io  = flog
+set io  = sxpgs.res
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
    Note $Log ""
 
-   if ("$Valgrind" == "") then
-      flog $Log ($exe $opt > sxpgs.res)
-      set xstatus = $status
-   else
-      ftee $Log $Valgrind $exe $opt    |& \
-      grep "ERROR SUMMARY:"            |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf     = ( $rpf $Tmp )
-   endif
+   source ../../../scripts/test-run
 
    if ($xstatus == 0) then
       flog $Log $cfe $PSDIFF sxpgs.ps $RootDir/sx/tests/ref/sxpgs.ps

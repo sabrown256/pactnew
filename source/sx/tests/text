@@ -12,31 +12,21 @@ source ../../tests/common
 
 set msg = "SX PDB Text Test ............. "
 set exe = $BinDir/sx
-set opt = ( -l $RootDir/sx/tests/sxpdbt.scm )
-set io  = flog
+set opt = ( -p -e -q $ZeroSpace -l $RootDir/sx/tests/sxpdbt.scm )
+set io  = sxpdbt.res
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
    Note $Log ""
 
-   set Ref = $RootDir/sx/tests/ref/sxpdbt
-
    flog $Log rm -f sxpdbt.log sxpdbt.ttx sxpdbt.a sxpdbt.res
 
    flog $Log cp $TDir/sxpdbg.scm .
 
-   if ("$Valgrind" == "") then
-      flog $Log ($PDBView $opt >& sxpdbt.res)
-      set xstatus = $status
-   else
-      ftee $Log $Valgrind $exe -e -p -q $opt     |& \
-      grep "ERROR SUMMARY:"                      |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf     = ( $rpf $Tmp )
-   endif
+   source ../../../scripts/test-run
 
    if ($xstatus == 0) then
+      set Ref = $RootDir/sx/tests/ref/sxpdbt
       if (-f $Ref) then
          flog $Log diff sxpdbt.res $Ref
          set xstatus = $status

@@ -12,23 +12,14 @@ source ../../tests/common
 
 set msg = "ULTRA Annotation Test ........ "
 set exe = $BinDir/ultra
-set opt = ( -l $TDir/ulann.scm )  
-set io  = flog
+set opt = ( -e -r -x -q -s $ZeroSpace -l $TDir/ulann.scm )  
+set io  = ulmmt.log
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
    Note $Log ""
 
-   if ("$Valgrind" == "") then
-      flog $Log ($CFE $Ultra $opt >&! ulmmt.log)
-      set xstatus = $status
-   else
-      ftee $Log $Valgrind $exe -e -r -x -q -s $opt    |& \
-      grep "ERROR SUMMARY:"                           |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf     = $Tmp
-   endif
+   source ../../../scripts/test-run
 
 $TEST_CHECK part -a annot -e $xstatus -rpf "$rpf" none
 

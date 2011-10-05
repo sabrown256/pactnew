@@ -13,7 +13,7 @@ source ../../tests/common
 set msg = "SX HASH Test ................. "
 set exe = $BinDir/sx
 set opt = ( -e -r -s $ZeroSpace -l $RootDir/sx/tests/sxhash.scm )
-set io  = flog
+set io  = sxhash.res.tmp
 
    set sys = `uname`
 
@@ -22,16 +22,7 @@ set io  = flog
       NoteD $Log -n "                    $msg"
       Note $Log ""
 
-      if ("$Valgrind" == "") then
-         flog $Log ($exe $opt > sxhash.res.tmp)
-         set xstatus = $status
-      else
-         ftee $Log $Valgrind $exe $opt      |& \
-         grep "ERROR SUMMARY:"              |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         set rpf     = ( $rpf $Tmp )
-      endif
+      source ../../../scripts/test-run
 
       if ($xstatus == 0) then
          cat sxhash.res.tmp          | \

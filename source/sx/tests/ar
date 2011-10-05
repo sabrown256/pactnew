@@ -12,6 +12,8 @@ source ../../tests/common
 
 set msg = "SX PDB Archive Test .......... "
 set exe = $BinDir/sx
+set opt = ( -e -p -q $ZeroSpace -l $RootDir/sx/tests/pdbvar.scm )
+set io  = pdbvar.res
 
 NoteD $Log ""
 NoteD $Log -n "                    $msg"
@@ -25,25 +27,16 @@ if (($THREADING == no) && ($HAVE_MPI == no)) then
    flog $Log ar -rsc pdbvar.a demo.d?
    flog $Log ( cat demo.d? >&! pdbvar.blob )
 
-   set Ref = $RootDir/sx/tests/ref/pdbvar
-   set opt = ( -l $RootDir/sx/tests/pdbvar.scm )
-   if ("$Valgrind" == "") then
-      flog $Log ($PDBView $opt >& pdbvar.res)
-      set xstatus = $status
-      if ($xstatus == 0) then
-         if (-f $Ref) then
-            flog $Log diff pdbvar.res $Ref
-            set xstatus = $status
-         else
-            flog $Log cp pdbvar.res $Ref
-         endif
+   source ../../../scripts/test-run
+
+   if ($xstatus == 0) then
+      set Ref = $RootDir/sx/tests/ref/pdbvar
+      if (-f $Ref) then
+         flog $Log diff pdbvar.res $Ref
+         set xstatus = $status
+      else
+         flog $Log cp pdbvar.res $Ref
       endif
-   else
-      ftee $Log $Valgrind $exe -e -p -q $opt    |& \
-      grep "ERROR SUMMARY:"                     |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf     = ( $rpf $Tmp )
    endif
 
    flog $Log touch pdbvar.foo

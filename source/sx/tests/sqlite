@@ -12,8 +12,8 @@ source ../../tests/common
 
 set msg = "SX PDB SQLite Test ........... "
 set exe = $BinDir/sx
-set opt = ( -l $RootDir/sx/tests/sxsqlite.scm )
-set io  = flog
+set opt = ( -p -e -q $ZeroSpace -l $RootDir/sx/tests/sxsqlite.scm )
+set io  = sxsqlite.res
 
 if (($HAVE_SQLITE == yes) && ($?IBM_BGP == 0)) then
 
@@ -21,21 +21,12 @@ if (($HAVE_SQLITE == yes) && ($?IBM_BGP == 0)) then
    NoteD $Log -n "                    $msg"
    Note $Log ""
 
-   set Ref = $RootDir/sx/tests/ref/sxsqlite
    flog $Log rm -f sxsqlite.log sxsqlite.res foo.sqlite
 
-   if ("$Valgrind" == "") then
-      flog $Log ($PDBView $opt >& sxsqlite.res)
-      set xstatus = $status
-   else
-      ftee $Log $Valgrind $exe -e -p -q $opt     |& \
-      grep "ERROR SUMMARY:"                      |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf     = ( $rpf $Tmp )
-   endif
+   source ../../../scripts/test-run
 
    if ($xstatus == 0) then
+      set Ref = $RootDir/sx/tests/ref/sxsqlite
       if (-f $Ref) then
          flog $Log diff sxsqlite.res $Ref
          set xstatus = $status

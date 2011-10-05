@@ -12,8 +12,8 @@ source ../../tests/common
 
 set msg = "PDBView Mesh Test ............ "
 set exe = $BinDir/sx
-set opt = ( -l $RootDir/sx/tests/pdbvmesh.scm )
-set io  = flog
+set opt = ( -p -e -q $ZeroSpace -l $RootDir/sx/tests/pdbvmesh.scm )
+set io  = pdbvmesh.res
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
@@ -21,16 +21,7 @@ set io  = flog
 
    flog $Log rm -f pdbvmesh*.diff pdbvmesh*.ps
 
-   if ("$Valgrind" == "") then
-      flog $Log ($PDBView $opt >& pdbvmesh.res)
-      set xstatus = $status
-   else
-      ftee $Log $Valgrind $exe -e -p -q $opt    |& \
-      grep "ERROR SUMMARY:"                     |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf     = ( $rpf $Tmp )
-   endif
+   source ../../../scripts/test-run
 
    if ($xstatus == 0) then
       foreach i (pdbvmesh.ps)

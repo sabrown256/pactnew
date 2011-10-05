@@ -12,6 +12,8 @@ source ../../tests/common
 
 set msg = "ULTRA FNC Test ............... "
 set exe = $BinDir/ultra
+set opt = ( -e -r -x -q -s $ZeroSpace -l $TDir/ulfnc.scm )
+set io  = ulfnc.log
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
@@ -19,27 +21,16 @@ set exe = $BinDir/ultra
 
    flog $Log $RM ultest.err ulfnc.log
 
-   set opt = ( -l $TDir/ulfnc.scm )
-   if ("$Valgrind" == "") then
-
 # CYGWIN 1.5 simply will not write output to ulfnc.log
 # the other tests are fine
-      if ($OS =~ CYGWIN*) then
-         flog $Log $cfe $Ultra $opt
-         set xstatus = $status
-      else
-         flog $Log ($CFE $Ultra $opt >&! ulfnc.log)
-         set xstatus = $status
-         flog $Log (grep -i "error" ulfnc.log >&! ultest.err)
-         set Files = `find . -name "ultest.err" -size 0c -print`
-      endif
+   if ($OS =~ CYGWIN*) then
+      flog $Log $cfe $exe $opt
+      set xstatus = $status
    else
-      ftee $Log $Valgrind $exe -e -r -x -q -s $opt     |& \
-      grep "ERROR SUMMARY:"                            |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf     = $Tmp
+      source ../../../scripts/test-run
    endif
+
+   flog $Log (grep -i "error" ulfnc.log >&! ultest.err)
 
 $TEST_CHECK part -a fnc -e $xstatus -rpf "$rpf" none
 

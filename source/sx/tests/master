@@ -12,8 +12,8 @@ source ../../tests/common
 
 set msg = "PDBView Master Test .......... "
 set exe = $BinDir/sx
-set opt = ( -l $RootDir/sx/tests/pdbvtest.scm )
-set io  = flog
+set opt = ( -p -e -q $ZeroSpace -l $RootDir/sx/tests/pdbvtest.scm )
+set io  = pdbvtest.tmp
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
@@ -21,16 +21,7 @@ set io  = flog
 
    flog $Log rm -f pdbvtest.log pdbvtest.pdb pdbvtest.asc pdbvtest.err pdbvtest.tmp
 
-   if ("$Valgrind" == "") then
-      flog $Log ($PDBView $opt >& pdbvtest.tmp)
-      set xstatus = $status
-   else
-      ftee $Log $Valgrind $exe -e -p -q $opt    |& \
-      grep "ERROR SUMMARY:"                     |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf     = ( $rpf $Tmp )
-   endif
+   source ../../../scripts/test-run
 
    if ($xstatus == 0) then
       grep -i "error" pdbvtest.tmp > pdbvtest.err

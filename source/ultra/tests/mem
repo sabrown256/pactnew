@@ -13,22 +13,13 @@ source ../../tests/common
 set msg = "ULTRA Memory Test ............ "
 set exe = $BinDir/ultra
 set opt = ( -e -r -x -q -s $ZeroSpace -n -l $TDir/ulmmt.scm )
-set io  = flog
+set io  = ulmmt.log
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
    Note $Log ""
 
-   if ("$Valgrind" == "") then
-      flog $Log ($CFE $exe $opt >& ulmmt.log)
-      set xstatus = $status
-   else
-      ftee $Log $Valgrind $exe $opt      |& \
-      grep "ERROR SUMMARY:"              |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf     = ( $rpf $Tmp )
-   endif
+   source ../../../scripts/test-run
 
 $TEST_CHECK part -a mem -e $xstatus -rpf "$rpf" none
 
