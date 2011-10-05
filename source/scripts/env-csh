@@ -113,9 +113,5 @@ setenv MV     "mv -f"
 setenv RM     "rm -f"
 setenv RMDir  "rm -rf"
 
-# this is to allow files (especially test executables) to be cached
-# for removal at the end of testing in the test-check script
-# doing 'setenv rm_cache' before invoking it initializes it
-alias RMCache 'if ($?rm_cache == 1) setenv rm_cache "$rm_cache \!*"'
 
 

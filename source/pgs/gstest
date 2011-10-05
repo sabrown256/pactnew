@@ -9,11 +9,10 @@
 #
 
 setenv Package pgs
+setenv Test    ""
 source ../scripts/test-env
 
-setenv LogF  $Log
-
-set Test = ""
+set Tests = ""
 
 while ($#argv > 0)
    switch ($1)
@@ -26,12 +25,12 @@ while ($#argv > 0)
            echo ""
            exit(1)
       case -*:
-           if ("$Test" != "") then
+           if ("$Tests" != "") then
               break
            endif
            breaksw
       default:
-           set Test = ( $Test $1 )
+           set Tests = ( $Tests $1 )
            breaksw
    endsw
    shift
@@ -74,22 +73,17 @@ else if (-e $RootDir/pgs/pgs.h) then
    flog $Log ../../../manager/pwhich pact
    flog $Log ../../../manager/pwhich cc
 
-   if ("$Test" == "") then
-      set Test = ""
-      set Test = ( $Test trans axis rendlr rendac grot mpeg smp )
+   if ("$Tests" == "") then
+      set Tests = ""
+      set Tests = ( $Tests trans axis rendlr rendac grot mpeg smp )
    endif
 
-   foreach i ($Test)
+   foreach i ($Tests)
       $SrcDir/tests/$i $argv
       if ($status == 1) then
          set ERROR = TRUE
       endif
    end
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# CLEAN UP
 
    $TEST_CHECK clean -n PGS -e $ERROR -raf "$Tmp"
 

@@ -13,16 +13,17 @@ source ../../tests/common
 set msg = "PDB Recursive Cast Test ............ "
 set exe = $BinDir/pdrcts
 
-NoteD $LogF ""
-NoteD $LogF -n "                    $msg"
-Note $LogF ""
+NoteD $Log ""
+NoteD $Log -n "                    $msg"
+Note $Log ""
 
+set opt = ( -v $tst foo.pdb )
 if ("$Valgrind" == "") then
-   ftee $LogF $CFE $exe -v $tst foo.pdb
+   ftee $Log $CFE $exe $opt
    set xstatus = $status
 else
-   ftee $LogF $Valgrind $exe -v $tst foo.pdb          |& \
-   grep "ERROR SUMMARY:"                              |& \
+   ftee $Log $Valgrind $exe $opt           |& \
+   grep "ERROR SUMMARY:"                   |& \
    awk '{ print $4 }'   >&! $Tmp
    set xstatus = `cat $Tmp`
    set rpf     = ( $rpf $Tmp )

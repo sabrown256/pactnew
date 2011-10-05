@@ -17,8 +17,6 @@ source ../../tests/common
       NoteD $Log ""
       NoteD $Log "                    $msg"
 
-      set FAIL = "NO"
-
       flog $Log rm -f pcexec.sockp pcexec.socki
 
       NoteD $Log -n "                       polling ..................... "

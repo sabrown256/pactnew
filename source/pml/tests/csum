@@ -16,15 +16,11 @@ set exe = $BinDir/mlckts
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
 
-   set FAIL = ok
-
    flog $Log pushd $SrcDir
    flog $Log $MAKE checksum
    set xstatus = $status
    set Ref     = $cwd/tests/ref/checksum
    flog $Log popd
-
-   set UTime = `$TIMER -r`
 
    if ($xstatus != 0) then
       NoteD $Log ""

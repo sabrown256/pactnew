@@ -8,20 +8,7 @@
 #
 
 set Package = psh
-if (-f test-env) then
-   source test-env
-   pushd $TestDir >& /dev/null
-else if ($?Log == 1) then
-   if (-f $Log) then
-      mv $Log $Log.tmp
-      source ../../../scripts/test-env
-      mv $Log.tmp $Log
-   else
-      source ../../../scripts/test-env
-   endif
-else
-   source ../../../scripts/test-env
-endif
-
-source $IncDir/env-pact.csh
+setenv Package  psh
+setenv Test     $0:t
+source ../../../scripts/test-env
 

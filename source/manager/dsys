@@ -2570,11 +2570,12 @@ CFG_DONE:
                    breaksw
               case -h :
                    echo ""
-                   echo "Usage: dsys test [-h] [-na #] [-p #] [-vg] [tgts]*"
+                   echo "Usage: dsys test [-h] [-na #] [-p #] [-r] [-vg] [tgts]*"
                    echo ""
                    echo "     h  - this help message"
                    echo "     na - number of attempts for each test (default is 1)"
                    echo "     p  - number of nodes to use"
+                   echo "     r  - remove test executables of passing tests"
                    echo "     vg - run most tests under valgrind"
                    echo ""
                    exit(1)
@@ -2582,6 +2583,9 @@ CFG_DONE:
               case -na :
                    shift
                    set NA = ( -na $1 )
+                   breaksw
+              case -r :
+                   setenv TEST_RM_EXE TRUE
                    breaksw
               case -p :
                    shift

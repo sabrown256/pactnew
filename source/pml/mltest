@@ -9,11 +9,10 @@
 #
 
 setenv Package pml
+setenv Test    ""
 source ../scripts/test-env
 
-setenv LogF  $Log
-
-set Test = ""
+set Tests = ""
 
 while ($#argv > 0)
    switch ($1)
@@ -29,7 +28,7 @@ while ($#argv > 0)
       case -*:
            breaksw
       default:
-           set Test = ( $Test $1 )
+           set Tests = ( $Tests $1 )
            breaksw
    endsw
    shift
@@ -70,23 +69,18 @@ else if (-e $RootDir/pml/pml.h) then
    flog $Log ../../../manager/pwhich pact
    flog $Log ../../../manager/pwhich cc
 
-   if ("$Test" == "") then
-      set Test = ""
-      set Test = ( $Test matrix eigen func interp perf )
-      set Test = ( $Test fpe nan solv svd csum cgsolv )
+   if ("$Tests" == "") then
+      set Tests = ""
+      set Tests = ( $Tests matrix eigen func interp perf )
+      set Tests = ( $Tests fpe nan solv svd csum cgsolv )
    endif
 
-   foreach i ($Test)
+   foreach i ($Tests)
       $SrcDir/tests/$i
       if ($status == 1) then
          set ERROR = TRUE
       endif
    end
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# CLEAN UP             
 
    $TEST_CHECK clean -n PML -e $ERROR
 

@@ -13,18 +13,18 @@ source ../../tests/common
 set msg = "SCORE Parallel Test ........... "
 set exe = $BinDir/scthrt
 
-   NoteD $LogF ""
-   NoteD $LogF "                    $msg"
+   NoteD $Log ""
+   NoteD $Log "                    $msg"
 
-   flog $LogF pushd $SrcDir
-   flog $LogF $MAKE smp
+   flog $Log pushd $SrcDir
+   flog $Log $MAKE smp
    set xstatus = $status
-   flog $LogF popd
+   flog $Log popd
 
    if ($xstatus != 0) then
-      NoteD $LogF ""
-      NoteD $LogF "                         ERROR Building Parallel Tests"
-      NoteD $LogF "                    ${msg}FAILED"
+      NoteD $Log ""
+      NoteD $Log "                         ERROR Building Parallel Tests"
+      NoteD $Log "                    ${msg}FAILED"
    else
 
       if ($?TEST_MAX_THREADS == 1) then
@@ -52,18 +52,18 @@ set exe = $BinDir/scthrt
 # THREAD - test thread execution
 
       foreach arg (" " "-m 100")
-         NoteD $LogF ""
+         NoteD $Log ""
 
          switch ("$arg")
             case "-m*" :
-              NoteD $LogF "                       Parallel Memory Test"
+              NoteD $Log "                       Parallel Memory Test"
               breaksw
             default :
-              NoteD $LogF "                       Simple Parallel Test"
+              NoteD $Log "                       Simple Parallel Test"
               breaksw
          endsw
 
-         NoteD $LogF "                          Mode    # Threads ($NThrds)"
+         NoteD $Log "                          Mode    # Threads ($NThrds)"
 
          foreach mode ("  " "-t" "-p")
             set LUTime = `$TIMER -r`
@@ -80,30 +80,30 @@ set exe = $BinDir/scthrt
                  breaksw
             endsw
 
-            NoteD $LogF -n "                          $Name      "
+            NoteD $Log -n "                          $Name      "
 
             foreach n ($NThrds)
-               flog $LogF $CFE $exe $arg -n $n $mode -d 1 -s
+               flog $Log $CFE $exe $arg -n $n $mode -d 1 -s
                set xstatus = $status
 
                if (($xstatus == 254) || ($xstatus == 255)) then
-                  NoteD $LogF -n "o"
-                  Note $LogF ""
+                  NoteD $Log -n "o"
+                  Note $Log ""
                else if ($xstatus == 123) then
-                  NoteD $LogF -n "*"
-                  Note $LogF ""
+                  NoteD $Log -n "*"
+                  Note $Log ""
                else if ($xstatus != 0) then
                   set lerr = 1
-                  NoteD $LogF -n "x"
-                  Note $LogF ""
+                  NoteD $Log -n "x"
+                  Note $Log ""
                else
-                  NoteD $LogF -n "."
-                  Note $LogF ""
+                  NoteD $Log -n "."
+                  Note $Log ""
                endif
             end
 
             set LETime = `$TIMER -b $LUTime`
-            NoteD $LogF "   ($LETime)"
+            NoteD $Log "   ($LETime)"
          end
       end
 
@@ -112,36 +112,39 @@ set exe = $BinDir/scthrt
 
 # LOCK - test thread locking
 
-      NoteD $LogF ""
-      NoteD $LogF "                       Thread Lock Test"
-      NoteD $LogF "                          # Items   # Threads ($NThrds)"
+      NoteD $Log ""
+      NoteD $Log "                       Thread Lock Test"
+      NoteD $Log "                          # Items   # Threads ($NThrds)"
 
       foreach mode (10 100 1000)
          set LUTime = `$TIMER -r`
 
-         NoteD $LogF -n "                          "
+         NoteD $Log -n "                          "
          echo $mode | awk '{printf("%-4s      ", $1);}'
 
          foreach n ($NThrds)
-            flog $LogF $CFE $BinDir/sctlts -nd $mode -nt $n
+            flog $Log $CFE $BinDir/sctlts -nd $mode -nt $n
             set xstatus = $status
 
             if (($xstatus == 123) || ($xstatus == 255) || ($xstatus == 254)) then
-               NoteD $LogF -n "*"
-               Note $LogF ""
+               NoteD $Log -n "*"
+               Note $Log ""
             else if ($xstatus != 0) then
-               NoteD $LogF -n "x"
+               NoteD $Log -n "x"
                set lerr = 1
-               Note $LogF ""
+               Note $Log ""
             else
-               NoteD $LogF -n "."
-               Note $LogF ""
+               NoteD $Log -n "."
+               Note $Log ""
             endif
          end
 
          set LETime   = `$TIMER -b $LUTime`
-         NoteD $LogF "   ($LETime)"
+         NoteD $Log "   ($LETime)"
       end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
    endif
 

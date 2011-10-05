@@ -8,17 +8,9 @@
 # include "cpyright.h"
 #
 
+setenv Package  ppc
+setenv Test     $0:t
 source ../../../scripts/test-env
 
-if ($?LogF == 0) then
-   set TestName = "$0:t"
-
-   InitLog LogF $cwd/log.$TestName.$LogSfx
-endif
-
 set TEST = "cat $RootDir/ppc/DISCLAIMER"
-
-if ($?Log == 1) then
-   Note $Log "Log file: $LogF"
-endif
 

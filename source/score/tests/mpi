@@ -17,20 +17,21 @@ if ($HAVE_READLINE == TRUE) then
    setenv TEST_ADVISORY "score_mpi_wrap"
 endif
 
-   NoteD $LogF ""
-   NoteD $LogF "                    $msg"
+   NoteD $Log ""
+   NoteD $Log "                    $msg"
 
-   flog $LogF pushd $SrcDir
-   flog $LogF $MAKE -i mpitty
+   flog $Log pushd $SrcDir
+   flog $Log $MAKE -i mpitty
    set xstatus = $status
-   flog $LogF popd
+   flog $Log popd
 
    if ($xstatus != 0) then
       if (!(-x $exe)) then
-         NoteD $LogF ""
-         NoteD $LogF "                         ERROR Building MPI Wrap Tests"
-         NoteD $LogF "                    ${msg}FAILED"
+         NoteD $Log ""
+         NoteD $Log "                         ERROR Building MPI Wrap Tests"
+         NoteD $Log "                    ${msg}FAILED"
       endif
+
    else
 
 #--------------------------------------------------------------------------
@@ -38,21 +39,21 @@ endif
 
 # STDIN
 
-      Separator $LogF
-      NoteD $LogF -n "                       stdin ...................... "
-      Note $LogF ""
+      Separator $Log
+      NoteD $Log -n "                       stdin ...................... "
+      Note $Log ""
       if ("$MPI" != "") then
          set lTime = `$TIMER -r`
          flog $Log $PFE -dr -p 2 $exe -t
          @ NOut = `echo "a" | $PFE -p 2 $exe -t |& grep "Proc" |& wc -l`
          set lTime = `$TIMER -b $lTime`
          if ($NOut < 2) then
-            NoteD $LogF "one process only ($lTime)"
+            NoteD $Log "one process only ($lTime)"
          else
-            NoteD $LogF "all processes ($lTime)"
+            NoteD $Log "all processes ($lTime)"
          endif
       else
-         NoteD $LogF "not MPI (0)"
+         NoteD $Log "not MPI (0)"
       endif
 
 #--------------------------------------------------------------------------
@@ -60,22 +61,22 @@ endif
 
 # WRAP
 
-      Separator $LogF
-      NoteD $LogF -n "                       wrap ....................... "
-      Note $LogF ""
+      Separator $Log
+      NoteD $Log -n "                       wrap ....................... "
+      Note $Log ""
 
       if ("$MPI" == "") then
          if (-x $BinDir/mpi-io-wrap) then
-            Note $LogF "Running non-MPI version of test"
-            flog $LogF ( (echo "a"; echo "b"; echo "end") | $BinDir/mpi-io-wrap $exe -q >& scmpiwrap.res )
+            Note $Log "Running non-MPI version of test"
+            flog $Log ( (echo "a"; echo "b"; echo "end") | $BinDir/mpi-io-wrap $exe -q >& scmpiwrap.res )
             set xstatus = $status
          else
-            Note $LogF "Running non-MPI version of test (without mpi-io-wrap)"
-            flog $LogF ( (echo "a"; echo "b"; echo "end") | $DORUN -m $exe -q >& scmpiwrap.res )
+            Note $Log "Running non-MPI version of test (without mpi-io-wrap)"
+            flog $Log ( (echo "a"; echo "b"; echo "end") | $DORUN -m $exe -q >& scmpiwrap.res )
             set xstatus = $status
          endif
       else
-         Note $LogF "Running MPI version of test"
+         Note $Log "Running MPI version of test"
          flog $Log  ( (echo "a"; echo "b"; echo "end") | $PFE -f -p 1 $exe -q >&! scmpiwrap.res )
          set xstatus = $status
          flog $Log grep 'ATTENTION:' scmpiwrap.res 
@@ -108,10 +109,10 @@ endif
 
       @ nerr = $nerr + $status
 
-   endif
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+   endif
 
 $TEST_CHECK part -a mpi -e $nerr "$msg"
 

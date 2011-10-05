@@ -11,9 +11,11 @@
 unalias *
 
 setenv Package scripts
+setenv Test    ""
 source ../scripts/test-env
 
 set Tests = ""
+
 while ($#argv > 0)
    switch ($1)
       case -h:
@@ -28,8 +30,6 @@ while ($#argv > 0)
    endsw
    shift
 end
-
-@ Err = 0
 
 flog $Log cd $TestDir
 
@@ -63,11 +63,6 @@ else if (-e $RootDir/score/scstd.h) then
          set ERROR = TRUE
       endif
    end
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# CLEAN UP - we are all done now
 
    $TEST_CHECK clean -n SCRIPT -e $ERROR
 

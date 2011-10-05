@@ -21,12 +21,12 @@ set exe = $BinDir/sx
       NoteD $Log -n "                       env ....................... "
       set rpf = none
 
-      set UTime = `$TIMER -r`
+      set t0 = `$TIMER -r`
       $CFE $FilesDir/pdbvenv.scm >&! pdbvenv.res
       set xstatus = $status
       diff pdbvenv.res $FilesDir/ref/pdbvenv >&! pdbvenv.res.diff
       set dstatus = $status
-      set ETime = `$TIMER -b $UTime`
+      set dt = `$TIMER -b $t0`
 
       if (($xstatus != 0) || ($dstatus != 0)) then
          flog $Log cat pdbvenv.res
@@ -36,7 +36,7 @@ set exe = $BinDir/sx
 
       set rpf = ( $rpf pdbvenv.res pdbvenv.res.diff )
 
-      $TEST_CHECK part -a shell_env -e $xstatus -l -rpf "$rpf" none
+      $TEST_CHECK part -a shell_env -e $xstatus -l -dt $dt -rpf "$rpf" none
 
       @ nerr = $nerr + $status
 
@@ -44,12 +44,12 @@ set exe = $BinDir/sx
       NoteD $Log -n "                       argv ...................... "
       set rpf = none
 
-      set UTime = `$TIMER -r`
+      set t0 = `$TIMER -r`
       $CFE $FilesDir/pdbvexe.scm a 1 2.3 '"abc"' >&! pdbvexe.res
       set xstatus = $status
       diff pdbvexe.res $FilesDir/ref/pdbvexe >&! pdbvexe.res.diff
       set dstatus = $status
-      set ETime = `$TIMER -b $UTime`
+      set dt = `$TIMER -b $t0`
 
       if (($xstatus != 0) || ($dstatus != 0)) then
          flog $Log cat pdbvexe.res
@@ -59,7 +59,7 @@ set exe = $BinDir/sx
 
       set rpf = ( $rpf pdbvexe.res pdbvexe.res.diff )
 
-      $TEST_CHECK part -a shell_argv -e $xstatus -l -rpf "$rpf" none
+      $TEST_CHECK part -a shell_argv -e $xstatus -l -dt $dt -rpf "$rpf" none
 
       @ nerr = $nerr + $status
 

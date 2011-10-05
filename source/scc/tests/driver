@@ -19,12 +19,12 @@ if ($CROSS_COMPILE == FALSE) then
    set opt    = ( -check )
 
    Separator $Log
-   Note $LogF ""
-   NoteD $LogF -n "                    $fill "
-   Note $LogF ""
+   Note $Log ""
+   NoteD $Log -n "                    $fill "
+   Note $Log ""
 
    set t0 = `$TIMER -r`
-   flog $LogF cp $SrcDir/tests/$tst.c .
+   flog $Log cp $SrcDir/tests/$tst.c .
 
    scc $opt -c $tst.c >&! $tst.res
    set xstatus = $status

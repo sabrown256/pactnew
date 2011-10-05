@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# COMMON - support for PML test scripts
+# COMMON - support for PYA test scripts
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -8,15 +8,7 @@
 # include "cpyright.h"
 #
 
+setenv Package  pya
+setenv Test     $0:t
 source ../../../scripts/test-env
-
-if ($?LogF == 0) then
-   set TestName = "$0:t"
-
-   InitLog LogF $cwd/log.$TestName.$LogSfx
-endif
- 
-if ($?Log == 1) then
-   Note $Log "Log file: $LogF"
-endif
 

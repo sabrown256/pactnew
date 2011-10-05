@@ -8,14 +8,9 @@
 # include "cpyright.h"
 #
 
+setenv Package  sx
+setenv Test     $0:t
 source ../../../scripts/test-env
-
-#if ($?LogF == 0) then
-#   InitLog LogF $cwd/log.$TestName.$LogSfx
-#endif
-
-set TestName = "$0"
-set TestName = "$TestName:t"
 
 if ("$CFE" == "") then
    set cfe = ""
@@ -43,11 +38,4 @@ if ($status == 0) then
 else
    setenv HAVE_SQLITE no
 endif
-
-#set PDBDiff = "$BinDir/pdbdiff -e -x -q $ZeroSpace"
-
-if ($?Log == 1) then
-   Note $Log "Log file: $LogF"
-endif
-
 

@@ -14,18 +14,18 @@ set msg = "SCHEME Memory Test ........... "
 set exe = $BinDir/scheme
 
    NoteD $Log ""
-   NoteD $Log -n "                    $mem"
+   NoteD $Log -n "                    $msg"
    Note $Log ""
 
    flog $Log pwd
    flog $Log cp $FilesDir/mmtst.scm .
 
-   set opt = ( -l $FilesDir/mmtst.scm )
+   set opt = ( -e -l $FilesDir/mmtst.scm )
    if ("$Valgrind" == "") then
-      flog $Log $cfe $exe -e $opt
+      flog $Log $cfe $exe $opt
       set xstatus = $status
    else
-      ftee $Log $Valgrind $exe -e $opt     |& \
+      ftee $Log $Valgrind $exe $opt        |& \
       grep "ERROR SUMMARY:"                |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
@@ -34,6 +34,6 @@ set exe = $BinDir/scheme
 
    set rpf = ( $rpf '#tmp#' mmtst.scm )
 
-$TEST_CHECK part -a mem -e $xstatus -rpf "$rpf" "$msg"
+$TEST_CHECK part -a mem -e $xstatus -rpf "$rpf" none
 
 exit($status)

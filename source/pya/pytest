@@ -9,11 +9,10 @@
 #
 
 setenv Package pya
+setenv Test    ""
 source ../scripts/test-env
 
-setenv LogF  $Log
-
-set Test = ""
+set Tests = ""
 
 while ($#argv > 0)
    switch ($1)
@@ -27,7 +26,7 @@ while ($#argv > 0)
       case -*:
            breaksw
       default:
-           set Test = ( $Test $1 )
+           set Tests = ( $Tests $1 )
            breaksw
    endsw
    shift
@@ -42,7 +41,7 @@ cd $TestDir
 
 if ($RUN_TESTS == FALSE) then
    NoteD $Log ""
-   NoteD $Log "SCORE TESTS ... omitted"
+   NoteD $Log "PYA TESTS ... omitted"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -76,22 +75,17 @@ else if (-f $LPYTHON/pact/pdb.py) then
    flog $Log ../../../manager/pwhich pact
    flog $Log ../../../manager/pwhich cc
 
-   if ("$Test" == "") then
-      set Test = ""
-      set Test = ( $Test basic unit )
+   if ("$Tests" == "") then
+      set Tests = ""
+      set Tests = ( $Tests basic unit )
    endif
 
-   foreach i ($Test)
+   foreach i ($Tests)
       $SrcDir/tests/$i
       if ($status == 1) then
          set ERROR = TRUE
       endif
    end
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# CLEAN UP - we are all done now
 
    $TEST_CHECK clean -n PYA -e $ERROR -raf "../testfile"
 

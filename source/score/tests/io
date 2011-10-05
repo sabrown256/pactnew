@@ -13,20 +13,20 @@ source ../../tests/common
 set msg = "SCORE I/O Test ................ "
 set exe = $BinDir/sciots
 
-NoteD $LogF ""
-NoteD $LogF "                    $msg"
+NoteD $Log ""
+NoteD $Log "                    $msg"
 
-flog $LogF pushd $SrcDir
-flog $LogF $MAKE io
+flog $Log pushd $SrcDir
+flog $Log $MAKE io
 set xstatus = $status
-flog $LogF popd
+flog $Log popd
 
 if ($xstatus == 0) then
    if ("$Valgrind" == "") then
-      ftee $LogF $CFE $exe
+      ftee $Log $CFE $exe
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $exe        |& \
+      ftee $Log $Valgrind $exe         |& \
       grep "ERROR SUMMARY:"            |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`

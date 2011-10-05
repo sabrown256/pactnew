@@ -13,18 +13,18 @@ source ../../tests/common
 
 set msg = "SCORE Unit Tests .............. "
 
-NoteD $LogF ""
-NoteD $LogF "                    $msg"
-Note $LogF ""
+NoteD $Log ""
+NoteD $Log "                    $msg"
+Note $Log ""
 
-flog $LogF pushd $SrcDir
-flog $LogF $MAKE compre
+flog $Log pushd $SrcDir
+flog $Log $MAKE compre
 set xstatus = $status
-flog $LogF popd
+flog $Log popd
 
 if ($xstatus != 0) then
-   NoteD $LogF ""
-   NoteD $LogF "                         Can't build SCORE Test Programs"
+   NoteD $Log ""
+   NoteD $Log "                         Can't build SCORE Test Programs"
 else
 
    if ("$CFE" != "") then
@@ -34,7 +34,7 @@ else
    set DataFiles = ( fltfil intfil regxfil tokfil )
 
    foreach i ($DataFiles)
-      flog $LogF cp $TDir/$i .
+      flog $Log cp $TDir/$i .
    end
 
 #--------------------------------------------------------------------------
@@ -43,14 +43,14 @@ else
    set exe = $BinDir/tscctl
    set rpf = none
 
-   NoteD $LogF -n "                       scctl ...................... "
-   Note $LogF ""
+   NoteD $Log -n "                       scctl ...................... "
+   Note $Log ""
 
    if ("$Valgrind" == "") then
       flog $Log $CFE $exe
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $exe      |& \
+      ftee $Log $Valgrind $exe       |& \
       grep "ERROR SUMMARY:"          |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
@@ -67,14 +67,14 @@ else
    set exe = $BinDir/tscmemc
    set rpf = none
 
-   NoteD $LogF -n "                       string-a ................... "
-   Note $LogF ""
+   NoteD $Log -n "                       string-a ................... "
+   Note $Log ""
 
    if ("$Valgrind" == "") then
       flog $Log $CFE $exe
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $exe      |& \
+      ftee $Log $Valgrind $exe       |& \
       grep "ERROR SUMMARY:"          |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
@@ -91,14 +91,14 @@ else
    set exe = $BinDir/tscstr
    set rpf = none
 
-   NoteD $LogF -n "                       string-b ................... "
-   Note $LogF ""
+   NoteD $Log -n "                       string-b ................... "
+   Note $Log ""
 
    if ("$Valgrind" == "") then
       flog $Log $CFE $exe
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $exe       |& \
+      ftee $Log $Valgrind $exe        |& \
       grep "ERROR SUMMARY:"           |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
@@ -115,14 +115,14 @@ else
    set exe = $BinDir/scvsts
    set rpf = none
 
-   NoteD $LogF -n "                       vsnprintf .................. "
-   Note $LogF ""
+   NoteD $Log -n "                       vsnprintf .................. "
+   Note $Log ""
 
    if ("$Valgrind" == "") then
       flog $Log $CFE $exe
       set xstatus = $status
    else
-      ftee $LogF $Valgrind $exe       |& \
+      ftee $Log $Valgrind $exe        |& \
       grep "ERROR SUMMARY:"           |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`

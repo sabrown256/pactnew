@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# COMMON - support for PYTHON test scripts
+# COMMON - support for SCRIPTS test scripts
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -8,6 +8,7 @@
 # include "cpyright.h"
 #
 
-setenv Package  python
+setenv Package  scripts
 setenv Test     $0:t
 source ../../../scripts/test-env
+

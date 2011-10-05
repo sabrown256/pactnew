@@ -9,12 +9,12 @@
 #
 
 setenv Package scc
+setenv Test    ""
 source ../scripts/test-env
 
 setenv TEST_ADVISORY ${TEST_ADVISORY}:scc
-setenv LogF  $Log
 
-set Test = ""
+set Tests = ""
 
 while ($#argv > 0)
    switch ($1)
@@ -29,7 +29,7 @@ while ($#argv > 0)
       case -*:
            breaksw
       default:
-           set Test = ( $Test $1 )
+           set Tests = ( $Tests $1 )
            breaksw
    endsw
    shift
@@ -74,24 +74,19 @@ else if (-e $RootDir/scc/scc_int.h) then
    flog $Log ../../../manager/pwhich pact
    flog $Log ../../../manager/pwhich cc
 
-   if ("$Test" == "") then
-      set Test = ""
-      set Test = ( $Test t1 t2 )
-      set Test = ( $Test ttype tenum tstruct tunion ttypdef )
-      set Test = ( $Test tfunc tinc tdepa tdepb tdepc tdepd )
+   if ("$Tests" == "") then
+      set Tests = ""
+      set Tests = ( $Tests t1 t2 )
+      set Tests = ( $Tests ttype tenum tstruct tunion ttypdef )
+      set Tests = ( $Tests tfunc tinc tdepa tdepb tdepc tdepd )
    endif
 
-   foreach i ($Test)
+   foreach i ($Tests)
       $SrcDir/tests/driver $i
       if ($status == 1) then
          set ERROR = TRUE
       endif
    end
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# CLEAN UP - we are all done now
 
    $TEST_CHECK clean -n SCC -e $ERROR
 

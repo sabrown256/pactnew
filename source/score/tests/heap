@@ -14,30 +14,30 @@ set msg = "SCORE Heap Check Test ......... "
 set exe = $BinDir/scmtrt
 set xstatus = 0
 
-NoteD $LogF ""
-NoteD $LogF -n "                    $msg"
-Note $LogF ""
+NoteD $Log ""
+NoteD $Log -n "                    $msg"
+Note $Log ""
 
 # NOTE: OSF1 is incapable of building this test properly when statically linked
 if (("$HaveDevZero" == "HAVE_DEV_ZERO" ) && ("$OS" != "OSF1")) then
-   flog $LogF pushd $SrcDir
-   flog $LogF $MAKE memchk
+   flog $Log pushd $SrcDir
+   flog $Log $MAKE memchk
    set xstatus = $status
-   flog $LogF popd
+   flog $Log popd
 
    if ($xstatus != 0) then
-      NoteD $LogF "                         ERROR Building Heap Check Test Program"
-      NoteD $LogF "                    ${msg}FAILED"
+      NoteD $Log "                         ERROR Building Heap Check Test Program"
+      NoteD $Log "                    ${msg}FAILED"
    else
       if ("$CFE" != "") then
          setenv CFE   "$CFE -v"
       endif
 
       if ("$Valgrind" == "") then
-         flog $LogF $CFE $exe
+         flog $Log $CFE $exe
          set xstatus = $status
       else
-         ftee $LogF $Valgrind $exe      |& \
+         ftee $Log $Valgrind $exe       |& \
          grep "ERROR SUMMARY:"          |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`

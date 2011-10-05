@@ -14,30 +14,33 @@ set msg = "PDB Buffer Test B .................. "
 set exe = $BinDir/pdbtst
 
 set STRACE = ( `which strace` )
+
+#set opt = ( -n -v $tst )
+set opt = ( -n )
 if ("$Valgrind" == "") then
 
-   NoteD $LogF ""
-   NoteD $LogF "                    $msg"
-   Note $LogF ""
+   NoteD $Log ""
+   NoteD $Log "                    $msg"
+   Note $Log ""
 
 # scan prime number buffer sizes
    @ lerr = 0
 
    foreach n ( 3 13 127 4093 32749 )
       set fill = `fill-string -n 32 $n`
-      flog $LogF $CFE $exe -n -b $n
+      flog $Log $CFE $exe $opt -b $n
 
 #   foreach n ( 13 127 4093 32749 )
 #      set fill = `fill-string -n 32 $n`
-#      flog $LogF $CFE $exe -n -b $n -v $tst
+#      flog $Log $CFE $exe -b $n $opt
 
       set xstatus = $status
       if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $LogF "                        $fill (omitted)"
+         NoteD $Log "                        $fill (omitted)"
       else if ($xstatus == 0) then
-         NoteD $LogF "                        $fill (ok)"
+         NoteD $Log "                        $fill (ok)"
       else
-         NoteD $LogF "                        $fill (ng)"
+         NoteD $Log "                        $fill (ng)"
          @ lerr = $lerr + 1
       endif
    end

@@ -9,15 +9,14 @@
 #
 
 setenv Package ppc
+setenv Test    ""
 source ../scripts/test-env
 
 if ($HaveIPC == NO) then
    exit(0)
 endif
 
-setenv LogF  $Log
-
-set Test = ""
+set Tests = ""
 
 while ($#argv > 0)
    switch ($1)
@@ -32,7 +31,7 @@ while ($#argv > 0)
       case -*:
            breaksw
       default:
-           set Test = ( $Test $1 )
+           set Tests = ( $Tests $1 )
            breaksw
    endsw
    shift
@@ -98,23 +97,18 @@ else if (-e $BinDir/pcexec) then
 
       set TEST = "cat $RootDir/ppc/DISCLAIMER"
 
-      if ("$Test" == "") then
-         set Test = ""
-         set Test = ( $Test pipe socket pty bg bin multi )
+      if ("$Tests" == "") then
+         set Tests = ""
+         set Tests = ( $Tests pipe socket pty bg bin multi )
       endif
 
-      foreach i ($Test)
+      foreach i ($Tests)
          $SrcDir/tests/$i
          if ($status == 1) then
             set ERROR = TRUE
          endif
       end
    endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# Clean up
 
    $TEST_CHECK clean -n PPC -e $ERROR -raf "$Tmp"
 

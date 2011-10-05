@@ -9,11 +9,10 @@
 #
 
 setenv Package panacea
+setenv Test    ""
 source ../scripts/test-env
 
-setenv LogF  $Log
-
-set Test = ""
+set Tests = ""
 
 while ($#argv > 0)
    switch ($1)
@@ -26,7 +25,7 @@ while ($#argv > 0)
       case -*:
            breaksw
       default:
-           set Test = ( $Test $1 )
+           set Tests = ( $Tests $1 )
            breaksw
    endsw
    shift
@@ -67,21 +66,16 @@ else if (-e $RootDir/panacea/panace.h) then
    flog $Log ../../../manager/pwhich pact
    flog $Log ../../../manager/pwhich cc
 
-   if ("$Test" == "") then
-      set Test = (gen abc)
+   if ("$Tests" == "") then
+      set Tests = (gen abc)
    endif
 
-   foreach i ($Test)
+   foreach i ($Tests)
       $SrcDir/tests/$i
       if ($status == 1) then
          set ERROR = TRUE
       endif
    end
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# CLEAN UP - we are all done now
 
    $TEST_CHECK clean -n PANACEA -e $ERROR -raf "$Tmp"
 

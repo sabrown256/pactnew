@@ -13,22 +13,15 @@ source ../../tests/common
 set msg = "SCORE Make Test ............... "
 set exe = $BinDir/dmake
 
-set ok = TRUE
-if ($?CROSS_COMPILE == 1) then
-   if ($CROSS_COMPILE != FALSE) then
-      set ok = FALSE
-   endif
-endif
+if ($CROSS_COMPILE == FALSE) then
+   NoteD $Log ""
+   NoteD $Log -n "                    $msg"
+   NoteD $Log ""
 
-if ($ok == TRUE) then
-   NoteD $LogF ""
-   NoteD $LogF -n "                    $msg"
-   NoteD $LogF ""
-
-   flog $LogF pushd $SrcDir/tests
-   ftee $LogF do-test $argv
+   flog $Log pushd $SrcDir/tests
+   ftee $Log do-test $argv
    set xstatus = $status
-   flog $LogF popd
+   flog $Log popd
 
 # NOTE: exit status is sum of values for each test
 #   basic  fails -> 32
@@ -39,6 +32,8 @@ if ($ok == TRUE) then
 #   async  fails -> 1
 # server and async are currently prone to race type failures
 # so do not fail the test if they do not succeed
+
+endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

@@ -29,8 +29,7 @@ set exe = $BinDir/sx
       NoteD $Log "                       Making data failed"
       @ nerr = $nerr + 1
    else
-      set LErr = 0
-      set UTime = `$TIMER -r`
+      set t0 = `$TIMER -r`
 
       Note $Log "PDBDiff = |$PDBDiff|"
       Note $Log "SCHEME  = |$SCHEME|"
@@ -49,12 +48,12 @@ set exe = $BinDir/sx
       flog $Log ($PDBDiff -v -w pdbda.dat pdbdb.dat >>& pdbd.res)
       set xstatus = $status
 
-      set ETime = `$TIMER -b $UTime`
+      set dt = `$TIMER -b $t0`
 
       if (($xstatus == 254) || ($xstatus == 255)) then
          NoteD $Log "omitted"
       else if ($xstatus == 0) then
-         NoteD $Log "FAILED ($ETime)"
+         NoteD $Log "FAILED ($dt)"
          NoteD $Log "                       Erroneous agreement"
          @ nerr = $nerr + 1
       else
@@ -76,11 +75,8 @@ set exe = $BinDir/sx
       Note $Log ""
       flog $Log ($PDBDiff -v -w pdbda.dat pdbdb.dat -M 2 4 >&! pdbd.res)
       set xstatus = $status
-
-      set ETime = `$TIMER -b $UTime`
-
       if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $LogF "omitted"
+         NoteD $Log "omitted"
       else if ($xstatus == 0) then
          NoteD $Log "ok"
       else

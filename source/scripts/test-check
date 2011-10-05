@@ -132,14 +132,11 @@ switch ($tgt)
         set name = ( `echo $name | tr "[a-z]" "[A-Z]"` )
 
         if ($?rm_cache == 1) then
-#echo "----------------"
-#pwd
-#echo "rm_cache = |$rm_cache|"
-#echo "----------------"
-           if ("$rm_cache" != "") then
-              set rm_cache = ( `echo $rm_cache | sed 's|:| |g'` )
-              $RM $rm_cache
-              setenv rm_cache
+           if (-f $rm_cache) then
+              foreach i (`cat $rm_cache`)
+                 flog $Log $RM $i
+              end
+              flog $Log $RM $rm_cache
            endif
         endif
 
@@ -221,7 +218,7 @@ switch ($tgt)
                    breaksw
               case -x:
                    shift
-                   set exe = $1
+                   set exe = ( $1 )
                    breaksw
               case -*:
                    echo "Unknown option '$1' - exiting"
@@ -255,17 +252,9 @@ switch ($tgt)
         end
         unset alst
 
-#        if ($?rm_cache == 1) then
-#           if ("$rm_cache" != "") then
-#              set rm_cache = ( `echo $rm_cache | sed 's|:| |g'` )
-#              $RM $rm_cache
-#              setenv rm_cache
-#           endif
-#        endif
-
         if ($tgt == fin) then
-           NoteD $log ""
-           NoteD $log " --------------------------------------------------------"
+            NoteD $log ""
+            NoteD $log " --------------------------------------------------------"
         endif
 
 # determine and print the message
@@ -401,10 +390,19 @@ switch ($tgt)
 # batch controller failed
            case 254:
                 set terr = 0
-                RMCache $exe
-                if ("$rpf" != "none") then
+                if (("$rpf" != "") && ("$rpf" != "none")) then
+                   Note $log "Removing files on passing tests"
                    flog $log $RM $rpf
                 endif
+
+                if ($?rm_cache == 1) then
+                   Note $log "Marking test executables for removal"
+                   touch $rm_cache
+                   foreach i ($exe)
+                      echo $i >>& $rm_cache
+                   end
+                endif
+                Note $log ""
                 breaksw
 # crashed
            case 253:
@@ -423,13 +421,15 @@ switch ($tgt)
         if ($terr == 1) then
            if ($advise == TRUE) then
               Note $log "PASSED by advisory match ( $adv ) in ( $TEST_ADVISORY )"
-              Note $log "tgt = |$tgt|"
-
               flog $log set err = 0
            else
               flog $log set err = 1
            endif
         endif
+
+        Note $log "Exit status for $Test ${tgt}: $err"
+        Separator $log
+
         breaksw
 
 #--------------------------------------------------------------------------
