@@ -12,6 +12,8 @@ source ../../tests/common
 
 set msg = "SCORE Retrace Test ............ "
 set exe = $BinDir/scrtrt
+set opt = ""
+set io  = flog
 
 if ($CROSS_COMPILE == FALSE) then
 
@@ -28,16 +30,7 @@ if ($CROSS_COMPILE == FALSE) then
       setenv CFE   "$CFE -v"
    endif
 
-   if ("$Valgrind" == "") then
-      flog $Log $CFE $exe
-      set xstatus = $status
-   else
-      ftee $Log $Valgrind $exe         |& \
-      grep "ERROR SUMMARY:"            |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf     = ( $rpf $Tmp )
-   endif
+   source ../../../scripts/test-run
 
 endif
 

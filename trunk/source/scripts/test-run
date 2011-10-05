@@ -1,0 +1,37 @@
+#
+# TEST-RUN - run the test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+switch ($io)
+   case ftee:
+        if ("$Valgrind" == "") then
+           ftee $Log $CFE $exe $opt
+           set xstatus = $status
+        else
+           ftee $Log $Valgrind $exe $opt           |& \
+           grep "ERROR SUMMARY:"                   |& \
+           awk '{ print $4 }'   >&! $Tmp
+           set xstatus = `cat $Tmp`
+           set rpf     = ( $rpf $Tmp )
+        endif
+        breaksw
+
+   case flog:
+        if ("$Valgrind" == "") then
+           flog $Log $CFE $exe $opt
+           set xstatus = $status
+        else
+           flog $Log $Valgrind $exe $opt           |& \
+           grep "ERROR SUMMARY:"                   |& \
+           awk '{ print $4 }'   >&! $Tmp
+           set xstatus = `cat $Tmp`
+           set rpf     = ( $rpf $Tmp )
+        endif
+        breaksw
+endsw
+

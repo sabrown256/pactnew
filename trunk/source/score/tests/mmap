@@ -12,6 +12,8 @@ source ../../tests/common
 
 set msg = "SCORE Mapped File Test ........ "
 set exe = $BinDir/scmfts
+set opt = ""
+set io  = ftee
 
 if ($CROSS_COMPILE == FALSE) then
 
@@ -25,16 +27,7 @@ if ($CROSS_COMPILE == FALSE) then
    flog $Log popd
 
    if ($xstatus == 0) then
-      if ("$Valgrind" == "") then
-         ftee $Log $CFE $exe
-         set xstatus = $status
-      else
-         ftee $Log $Valgrind $exe        |& \
-         grep "ERROR SUMMARY:"           |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         set rpf     = ( $rpf $Tmp )
-      endif
+      source ../../../scripts/test-run
    endif
 
    set rpf = ( $rpf mft.* )

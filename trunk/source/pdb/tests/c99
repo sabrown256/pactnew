@@ -12,22 +12,14 @@ source ../../tests/common
 
 set msg = "PDB C99 Test ....................... "
 set exe = $BinDir/pdctst
+set opt = ( -v $tst )
+set io  = ftee
 
 NoteD $Log ""
 NoteD $Log "                    $msg"
 Note $Log ""
 
-set opt = ( -v $tst )
-if ("$Valgrind" == "") then
-   ftee $Log $CFE $exe $opt
-   set xstatus = $status
-else
-   ftee $Log $Valgrind $exe $opt           |& \
-   grep "ERROR SUMMARY:"                   |& \
-   awk '{ print $4 }'   >&! $Tmp
-   set xstatus = `cat $Tmp`
-   set rpf     = ( $rpf $Tmp )
-endif
+source ../../../scripts/test-run
 
 $TEST_CHECK part -a c99 -e $xstatus -x $exe -rpf "$rpf" "$msg"
 

@@ -37,7 +37,8 @@ if ($xstatus == 0) then
    Note $Log ""
 
    set rpf = none
-   setenv t0 `$TIMER -r`
+   set opt = ( libar.a )
+   set io  = flog
 
    flog $Log $RM f*.o libar.a
 
@@ -52,21 +53,12 @@ if ($xstatus == 0) then
    flog $Log $AR $AROpt libar.a f*.o
    flog $Log $AR -t libar.a
 
-   if ("$Valgrind" == "") then
-      flog $Log $CFE $exe libar.a
-      set xstatus = $status
-   else
-      ftee $Log $Valgrind $exe libar.a     |& \
-      grep "ERROR SUMMARY:"                |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf     = ( $rpf $Tmp )
-   endif
+   setenv t0 `$TIMER -r`
+   source ../../../scripts/test-run
 
-   flog $Log cat libar.a
+   set dt  = `$TIMER -b $t0`
    set rpf = ( $rpf f*.o libar.a )
-
-   set dt = `$TIMER -b $t0`
+   flog $Log cat libar.a
 
    $TEST_CHECK part -a ar_name -e $xstatus -l -dt $dt -rpf "$rpf" none
 
@@ -81,19 +73,13 @@ if ($xstatus == 0) then
    Note $Log ""
 
    set rpf = none
-   setenv t0 `$TIMER -r`
+   set opt = ( -a $LibDir/libscore.a )
+   set io  = flog
 
-   if ("$Valgrind" == "") then
-      flog $Log $CFE $exe -a $LibDir/libscore.a
-      set xstatus = $status
-   else
-      ftee $Log $Valgrind $exe -a $LibDir/libscore.a   |& \
-      grep "ERROR SUMMARY:"                            |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf     = ( $rpf $Tmp )
-   endif
-   @ NL = `$CFE $exe -a $LibDir/libscore.a | sort | wc -l`
+   setenv t0 `$TIMER -r`
+   source ../../../scripts/test-run
+
+   @ NL = `$CFE $exe $opt | sort | wc -l`
    @ NL = $NL
 
    flog $Log ar -t $LibDir/libscore.a

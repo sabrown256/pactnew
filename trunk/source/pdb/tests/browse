@@ -12,17 +12,19 @@ source ../../tests/common
 
 set msg = "PDB Browse Test .................... "
 set exe = $BinDir/pdlsts
+set opt = ( pdatst.db )
+set io  = ftee
 
 NoteD $Log ""
 NoteD $Log -n "                    $msg"
 Note $Log ""
 
 if ("$Valgrind" == "") then
-   $CFE $exe pdatst.db >& pdatst.lst
+   $CFE $exe $opt >& pdatst.lst
    set xstatus = $status
 else
-   ftee $Log $Valgrind $exe pdatst.db           |& \
-   grep "ERROR SUMMARY:"                        |& \
+   ftee $Log $Valgrind $exe $opt           |& \
+   grep "ERROR SUMMARY:"                   |& \
    awk '{ print $4 }'   >&! $Tmp
    set xstatus = `cat $Tmp`
    set rpf     = ( $rpf $Tmp )

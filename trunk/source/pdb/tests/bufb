@@ -12,11 +12,11 @@ source ../../tests/common
 
 set msg = "PDB Buffer Test B .................. "
 set exe = $BinDir/pdbtst
+#set opt = ( -n -v $tst )
+set opt = ( -n )
 
 set STRACE = ( `which strace` )
 
-#set opt = ( -n -v $tst )
-set opt = ( -n )
 if ("$Valgrind" == "") then
 
    NoteD $Log ""

@@ -12,6 +12,8 @@ source ../../tests/common
 
 set msg = "SX PDB C99 Test .............. "
 set exe = $BinDir/sx
+set opt = ( -e -r -s $ZeroSpace -l $RootDir/sx/tests/sxc99.scm )
+set io  = flog
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
@@ -19,20 +21,20 @@ set exe = $BinDir/sx
 
    flog $Log cp $TDir/sxpdbg.scm .
 
-   set opt = ( -l $RootDir/sx/tests/sxc99.scm )
    if ("$Valgrind" == "") then
-      flog $Log ($SX $opt > sxc99.res)
+      flog $Log ($exe $opt > sxc99.res)
       set xstatus = $status
-      if ($xstatus == 0) then
-         flog $Log (diff sxc99.res $RootDir/sx/tests/ref/sxc99 > sxc99.res.diff)
-         set xstatus = $status
-      endif
    else
-      ftee $Log $Valgrind $exe -e -r -s $opt     |& \
-      grep "ERROR SUMMARY:"                      |& \
+      ftee $Log $Valgrind $exe $opt       |& \
+      grep "ERROR SUMMARY:"               |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
       set rpf     = ( $rpf $Tmp )
+   endif
+
+   if ($xstatus == 0) then
+      flog $Log (diff sxc99.res $RootDir/sx/tests/ref/sxc99 > sxc99.res.diff)
+      set xstatus = $status
    endif
 
    set rpf = ( $rpf sxc99.res sxc99.res.diff )

@@ -12,6 +12,7 @@ source ../../tests/common
 
 set msg = "SX PML Polygon Test .......... "
 set exe = $BinDir/sx
+set io  = flog
 
    NoteD $Log ""
    NoteD $Log "                    $msg"
@@ -21,31 +22,14 @@ set exe = $BinDir/sx
       NoteD $Log -n "                       $t ..................... "
       Note $Log ""
 
+      set opt = ( -l $RootDir/sx/tests/$t.scm )
+
       flog $Log rm -f $t*.diff $t*.ps
 
-      set opt = ( -l $RootDir/sx/tests/$t.scm )
+      set bt = `$TIMER -r`
       if ("$Valgrind" == "") then
-         set bt = `$TIMER -r`
          flog $Log ($PDBView $opt >& $t.res)
          set xstatus = $status
-         if ($xstatus == 0) then
-            foreach i ($t.ps)
-               if (-f $RootDir/sx/tests/ref/$i) then
-                  flog $Log ($CFE $PSDIFF $i $RootDir/sx/tests/ref/$i >&! $i.diff)
-                  @ st = $status
-                  @ xstatus = $xstatus + $st
-                  Note $Log "Test $i:r status $st"
-               endif
-            end
-            set et = `$TIMER -b $bt`
-
-            if ($xstatus != 0) then
-               NoteD $Log "ng ($et)"
-               @ nerr = $nerr + 1
-            else
-               NoteD $Log "ok ($et)"
-            endif
-         endif
       else
          ftee $Log $Valgrind $exe -e -p -q $opt    |& \
          grep "ERROR SUMMARY:"                     |& \
@@ -53,6 +37,26 @@ set exe = $BinDir/sx
          set xstatus = `cat $Tmp`
          set rpf     = ( $rpf $Tmp )
       endif
+
+      if ($xstatus == 0) then
+         foreach i ($t.ps)
+            if (-f $RootDir/sx/tests/ref/$i) then
+               flog $Log ($CFE $PSDIFF $i $RootDir/sx/tests/ref/$i >&! $i.diff)
+               @ st = $status
+               @ xstatus = $xstatus + $st
+               Note $Log "Test $i:r status $st"
+            endif
+         end
+         set et = `$TIMER -b $bt`
+
+         if ($xstatus != 0) then
+            NoteD $Log "ng ($et)"
+            @ nerr = $nerr + 1
+         else
+            NoteD $Log "ok ($et)"
+         endif
+      endif
+
    end
 
 $TEST_CHECK part -a iply -e $nerr -rpf "$rpf" "$msg"

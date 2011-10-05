@@ -12,6 +12,8 @@ source ../../tests/common
 
 set msg = "SCORE Resource Test ........... "
 set exe = $BinDir/scrsts
+set opt = ""
+set io  = ftee
 
 NoteD $Log ""
 NoteD $Log -n "                    $msg"
@@ -22,16 +24,7 @@ flog $Log $MAKE resource
 set xstatus = $status
 flog $Log popd
 
-if ("$Valgrind" == "") then
-   ftee $Log $CFE $exe
-   set xstatus = $status
-else
-   ftee $Log $Valgrind $exe          |& \
-   grep "ERROR SUMMARY:"             |& \
-   awk '{ print $4 }'   >&! $Tmp
-   set xstatus = `cat $Tmp`
-   set rpf     = ( $rpf $Tmp )
-endif
+source ../../../scripts/test-run
 
 $TEST_CHECK part -a resrc -e $xstatus -x $exe -rpf "$rpf" "$msg"
 

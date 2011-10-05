@@ -103,18 +103,10 @@ if ($xstatus == 0) then
 
       set exe = $BinDir/pdfhyts
       set rpf = none
+      set opt = ""
+      set io  = flog
 
-      if ("$Valgrind" == "") then
-         flog $Log $CFE $exe
-         set xstatus = $status
-      else
-         Note $Log ""
-         ftee $Log $Valgrind $exe             |& \
-         grep "ERROR SUMMARY:"                |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         set rpf     = ( $rpf $Tmp )
-      endif
+      source ../../../scripts/test-run
 
       $TEST_CHECK part -a pdb_hyper -e $xstatus -x $exe -l -rpf "$rpf" none
 
@@ -137,18 +129,10 @@ if ($xstatus == 0) then
 
          set exe = $BinDir/pdfdpt
          set rpf = none
+         set opt = ( -p 4 $exe )
+         set io  = flog
 
-         if ("$Valgrind" == "") then
-            flog $Log $CFE -p 4 $exe
-            set xstatus = $status
-         else
-            Note $Log ""
-            ftee $Log $Valgrind $exe             |& \
-            grep "ERROR SUMMARY:"                |& \
-            awk '{ print $4 }'   >&! $Tmp
-            set xstatus = `cat $Tmp`
-            set rpf     = ( $rpf $Tmp )
-         endif
+         source ../../../scripts/test-run
 
          $TEST_CHECK part -a pdb_dp -e $xstatus -x $exe -l -rpf "$rpf" none
 

@@ -12,6 +12,8 @@ source ../../tests/common
 
 set msg = "PGS Trans Test ......... "
 set exe = $BinDir/gstrts
+set opt = ( -A )
+set io  = ftee
 
    NoteD $Log ""
    NoteD $Log "                    $msg"
@@ -26,18 +28,7 @@ set exe = $BinDir/gstrts
       NoteD $Log "                         Can't build PGS Trans Test Program"
       NoteD $Log "                    ${msg}FAILED"
    else
-      if ("$Valgrind" == "") then
-         ftee $Log $CFE $exe -A
-         set xstatus = $status
-      else
-         ftee $Log $Valgrind $exe -A           |& \
-         grep "ERROR SUMMARY:"                 |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         set rpf     = ( $rpf $Tmp )
-      endif
-
-      Note $Log ""
+      source ../../../scripts/test-run
    endif
 
 $TEST_CHECK part -a trans -e $xstatus -x $exe -rpf "$rpf" "$msg"

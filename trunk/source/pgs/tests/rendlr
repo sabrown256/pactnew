@@ -12,6 +12,8 @@ source ../../tests/common
 
 set msg = "PGS Basic Test ......... "
 set exe = $BinDir/gsatst
+set opt = ( -A -3 -8 -11 -12 -r 500 )
+set io  = ftee
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
@@ -27,16 +29,7 @@ set exe = $BinDir/gsatst
       NoteD $Log "                    ${msg}FAILED"
    else
 
-      if ("$Valgrind" == "") then
-         ftee $Log $CFE $exe -A -3 -8 -11 -12 -r 500
-         set xstatus = $status
-      else
-         ftee $Log $Valgrind $exe -A -3 -8 -11 -12 -r 500           |& \
-         grep "ERROR SUMMARY:"                                      |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         set rpf     = ( $rpf $Tmp )
-      endif
+      source ../../../scripts/test-run
 
       if ($xstatus == 0) then
          flog $Log $CFE $PSDIFF gspsts.ps $RefDir/gspsts.ps

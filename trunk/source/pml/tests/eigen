@@ -12,6 +12,8 @@ source ../../tests/common
 
 set msg = "PML Eigen Test ......... "
 set exe = $BinDir/mlevts
+set opt = ""
+set io  = flog
 
    NoteD $Log ""
    NoteD $Log  -n "                    $msg"
@@ -25,13 +27,7 @@ set exe = $BinDir/mlevts
       NoteD $Log ""
       NoteD $Log "                         Can't build PML Eigen Test Program"
    else
-      if ("$Valgrind" == "") then
-         flog $Log $cfe $exe
-         set xstatus = $status
-      else
-         flog $Log $Valgrind $exe
-         set xstatus = $status
-      endif
+      source ../../../scripts/test-run
    endif
 
 $TEST_CHECK part -a eigen -e $xstatus -x $exe none

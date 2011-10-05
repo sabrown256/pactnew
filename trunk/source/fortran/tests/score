@@ -59,22 +59,15 @@ Note $Log ""
 
    set exe = $BinDir/schtst
    set rpf = none
+   set opt = ""
+   set io  = flog
 
    flog $Log pushd $SrcDir
    flog $Log $MAKE -na 2 fha
    set xstatus = $status
    flog $Log popd
 
-   if ("$Valgrind" == "") then
-      flog $Log $CFE $exe
-      set xstatus = $status
-   else
-      ftee $Log $Valgrind $exe                                |& \
-      grep "ERROR SUMMARY:"                                   |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf = ( $rpf $Tmp )
-   endif
+   source ../../../scripts/test-run
 
    $TEST_CHECK part -a score_hash -e $xstatus -x $exe -l -rpf "$rpf" none
 
