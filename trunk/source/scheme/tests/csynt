@@ -12,7 +12,6 @@ source ../../tests/common
 
 set msg = "SCHEME C Syntax Test ......... "
 set exe = $BinDir/scheme
-set opt = ( -e -l shcdcl.c )
 
    set do_syntax = 0
 
@@ -32,23 +31,17 @@ set opt = ( -e -l shcdcl.c )
       Note $Log ""
 
       set rpf = none
+      set opt = ( -e -l shcdcl.c )
+      set io  = shcdcl.res
 
       set t0 = `$TIMER -r`
-      if ("$Valgrind" == "") then
-         flog $Log ( $CFE $exe $opt >! shcdcl.res )
-         set xstatus = $status
-         if ($xstatus == 0) then
-            flog $Log ( diff shcdcl.res $FilesDir/ref/shcdcl >! shcdcl.res.diff )
-            set xstatus = $status
-         endif
-      else
-         ftee $Log $Valgrind $exe $opt      |& \
-         grep "ERROR SUMMARY:"              |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         set rpf     = ( $rpf $Tmp )
-      endif
+      source ../../../scripts/test-run
       set dt = `$TIMER -b $t0`
+
+      if ($xstatus == 0) then
+         flog $Log ( diff shcdcl.res $FilesDir/ref/shcdcl >! shcdcl.res.diff )
+         set xstatus = $status
+      endif
 
       set rpf = ( $rpf shcdcl.res shcdcl.res.diff shcdcl.[ch] )
 
@@ -64,24 +57,17 @@ set opt = ( -e -l shcdcl.c )
       Note $Log ""
 
       set rpf = none
+      set opt = ( -e -l shcppts.c )
+      set io  = shcppts.res
 
       set t0 = `$TIMER -r`
-      set opt = ( -l shcppts.c )
-      if ("$Valgrind" == "") then
-         flog $Log ( $CFE $exe -e $opt >! shcppts.res )
-         set xstatus = $status
-         if ($xstatus == 0) then
-            flog $Log ( diff shcppts.res $FilesDir/ref/shcppts >! shcppts.res.diff )
-            set xstatus = $status
-         endif
-      else
-         ftee $Log $Valgrind $exe -e $opt     |& \
-         grep "ERROR SUMMARY:"                |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         set rpf     = ( $rpf $Tmp )
-      endif
+      source ../../../scripts/test-run
       set dt = `$TIMER -b $t0`
+
+      if ($xstatus == 0) then
+         flog $Log ( diff shcppts.res $FilesDir/ref/shcppts >! shcppts.res.diff )
+         set xstatus = $status
+      endif
 
       set rpf = ( $rpf shcppts.res shcppts.res.diff shcppts.[ch] )
 
@@ -97,24 +83,17 @@ set opt = ( -e -l shcdcl.c )
       Note $Log ""
 
       set rpf = none
+      set opt = ( -e -l shctst.c )
+      set io  = shctst.res
 
       set t0 = `$TIMER -r`
-      set opt = ( -l shctst.c )
-      if ("$Valgrind" == "") then
-         flog $Log ( $CFE $exe -e $opt >! shctst.res )
-         set xstatus = $status
-         if ($xstatus == 0) then
-            flog $Log ( diff shctst.res $FilesDir/ref/shctst >! shctst.res.diff )
-            set xstatus = $status
-         endif
-      else
-         ftee $Log $Valgrind $exe -e $opt       |& \
-         grep "ERROR SUMMARY:"                  |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         set rpf     = ( $rpf $Tmp )
-      endif
+      source ../../../scripts/test-run
       set dt = `$TIMER -b $t0`
+
+      if ($xstatus == 0) then
+         flog $Log ( diff shctst.res $FilesDir/ref/shctst >! shctst.res.diff )
+         set xstatus = $status
+      endif
 
       $TEST_CHECK part -a csynt_synt -e $xstatus -l -dt $dt -rpf "$rpf" none
 
@@ -128,36 +107,38 @@ set opt = ( -e -l shcdcl.c )
       Note $Log ""
 
       set rpf = none
+      set opt = ( -e )
+      set io  = shctst.scm
 
       set t0 = `$TIMER -r`
       if ("$Valgrind" == "") then
-         flog $Log ( $CFE $exe -e \(translate-c-file \"shctst.c\"\) >! shctst.scm )
+         flog $Log ( $CFE $exe $opt \(translate-c-file \"shctst.c\"\) >! shctst.scm )
          set xstatus = $status
-         if ($xstatus == 0) then
-            flog $Log ( $CFE $exe -e -l shctst.scm >! shctst-scm.res )
-            set xstatus = $status
-         endif
-
-# fix results
-         if ($xstatus == 0) then
-            cat shctst-scm.res | sed -e '/^$/d' >! junk
-            flog $Log mv junk shctst-scm.res 
-            cat $FilesDir/ref/shctst | sed -e '/^$/d' >! junk
-            flog $Log mv junk shctst 
-
-            diff shctst-scm.res shctst >! shctst-scm.res.diff
-            set xstatus = $status
-         endif
-
       else
-         ftee $Log $Valgrind $exe -e \(translate-c-file \"shctst.c\"\)  |& \
-         grep "ERROR SUMMARY:"                                          |& \
+         ftee $Log $Valgrind $exe $opt \(translate-c-file \"shctst.c\"\)  |& \
+         grep "ERROR SUMMARY:"                                            |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
          set rpf     = ( $rpf $Tmp )
       endif
 
       set dt = `$TIMER -b $t0`
+
+      if ($xstatus == 0) then
+         flog $Log ( $CFE $exe $opt -l shctst.scm >! shctst-scm.res )
+         set xstatus = $status
+      endif
+
+# fix results
+      if ($xstatus == 0) then
+         cat shctst-scm.res | sed -e '/^$/d' >! junk
+         flog $Log mv junk shctst-scm.res 
+         cat $FilesDir/ref/shctst | sed -e '/^$/d' >! junk
+         flog $Log mv junk shctst 
+
+         diff shctst-scm.res shctst >! shctst-scm.res.diff
+         set xstatus = $status
+      endif
 
       set rpf = ( $rpf shctst-scm.res shctst-scm.res.diff )
       set rpf = ( $rpf shctst.res shctst.res.diff shctst.c )

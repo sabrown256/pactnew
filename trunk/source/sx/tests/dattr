@@ -13,22 +13,13 @@ source ../../tests/common
 set msg = "SX PDB Attribute Test ........ "
 set exe = $BinDir/sx
 set opt = ( -e -r -s $ZeroSpace -l $RootDir/sx/tests/sxpdba.scm )
-set io  = flog
+set io  = sxpdba.res
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
    Note $Log ""
 
-   if ("$Valgrind" == "") then
-      flog $Log ($exe $opt > sxpdba.res)
-      set xstatus = $status
-   else
-      ftee $Log $Valgrind $exe $opt      |& \
-      grep "ERROR SUMMARY:"              |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf     = ( $rpf $Tmp )
-   endif
+   source ../../../scripts/test-run
 
    if ($xstatus == 0) then
       flog $Log (diff sxpdba.res $RootDir/sx/tests/ref/sxpdba > sxpdba.res.diff)

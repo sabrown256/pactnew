@@ -33,5 +33,18 @@ switch ($io)
            set rpf     = ( $rpf $Tmp )
         endif
         breaksw
+
+   default:
+        if ("$Valgrind" == "") then
+           flog $Log ($CFE $exe $opt >&! $io)
+           set xstatus = $status
+        else
+           flog $Log $Valgrind $exe $opt           |& \
+           grep "ERROR SUMMARY:"                   |& \
+           awk '{ print $4 }'   >&! $Tmp
+           set xstatus = `cat $Tmp`
+           set rpf     = ( $rpf $Tmp )
+        endif
+        breaksw
 endsw
 

@@ -12,27 +12,16 @@ source ../../tests/common
 
 set msg = "SX OPER Test ................. "
 set exe = $BinDir/sx
-set opt = ( -l $RootDir/sx/tests/sxoper.scm )
-set io  = flog
+set opt = ( -p -e -q $ZeroSpace -l $RootDir/sx/tests/sxoper.scm )
+set io  = sxoper.res
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
    Note $Log ""
 
    if ("$MPI" == "") then
-      if ("$Valgrind" == "") then
-         flog $Log ($PDBView $opt >&! sxoper.res)
-         set xstatus = $status
-      else
-         ftee $Log $Valgrind $exe -e -p -q $opt     |& \
-         grep "ERROR SUMMARY:"                      |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         set rpf     = ( $rpf $Tmp )
-      endif
-
+      source ../../../scripts/test-run
       set rpf = ( $rpf sxoper.res arr.dat sxoper*.ps )
-
    endif
 
 $TEST_CHECK part -a oper -e $xstatus -rpf "$rpf" none
