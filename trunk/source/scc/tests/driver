@@ -24,10 +24,15 @@ if ($CROSS_COMPILE == FALSE) then
    Note $Log ""
 
    set t0 = `$TIMER -r`
+
    flog $Log cp $SrcDir/tests/$tst.c .
 
    scc $opt -c $tst.c >&! $tst.res
    set xstatus = $status
+
+   set dt = `$TIMER -b $t0`
+   unset t0
+
    if ($xstatus != 0) then
       @ nerr = 253
    endif
@@ -49,8 +54,6 @@ if ($CROSS_COMPILE == FALSE) then
          @ nerr = 250
       endif
    endif
-
-   set dt = `$TIMER -b $t0`
 
    $TEST_CHECK part -a scc_$tst -e $nerr -l -dt $dt none
 

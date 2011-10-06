@@ -44,6 +44,6 @@ if (($THREADING == no) && ($HAVE_MPI == no)) then
 
 endif
 
-$TEST_CHECK part -a ar -e $xstatus -rpf "$rpf" none
+$TEST_CHECK part -a ar -e $xstatus -dt $dt -rpf "$rpf" none
 
 exit($status)

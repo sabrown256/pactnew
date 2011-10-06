@@ -39,7 +39,7 @@ set exe = $BinDir/pcexec
 #            set rpf     = ( $rpf $Tmp )
 #         endif
 
-         $TEST_CHECK part -a pty_poll -e $xstatus -l -rpf "$rpf" none
+         $TEST_CHECK part -a pty_poll -e $xstatus -dt $dt -l -rpf "$rpf" none
 
          @ nerr = $nerr + $status
 
@@ -61,7 +61,7 @@ set exe = $BinDir/pcexec
 #	    set rpf     = ( $rpf $Tmp )
 #         endif
 
-         $TEST_CHECK part -a pty_interrupt -e $xstatus -l -rpf "$rpf" none
+         $TEST_CHECK part -a pty_interrupt -e $xstatus -dt $dt -l -rpf "$rpf" none
 
          @ nerr = $nerr + $status
 

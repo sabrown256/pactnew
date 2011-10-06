@@ -34,10 +34,8 @@ flog $Log pwd
    flog $Log unsetenv SCHEME
    flog $Log unsetenv DO_RUN_SUBMIT_ENV
 
-   set t0 = `$TIMER -r`
    source ../../../scripts/test-run
 
-   set dt  = `$TIMER -b $t0`
    set rpf = ( $rpf '#tmp#' )
 
    $TEST_CHECK part -a numer_int -e $xstatus -l -dt $dt -rpf "$rpf" none
@@ -55,10 +53,8 @@ flog $Log pwd
    set rpf = none
    set opt = ( -e -l $FilesDir/shnum.scm )
 
-   set t0 = `$TIMER -r`
    source ../../../scripts/test-run
 
-   set dt  = `$TIMER -b $t0`
    set rpf = ( $rpf '#tmp#' )
 
    $TEST_CHECK part -a numer_num -e $xstatus -l -dt $dt -rpf "$rpf" none
@@ -76,10 +72,8 @@ flog $Log pwd
    set rpf = none
    set opt = ( -e -l $FilesDir/shcpx.scm )
 
-   set t0 = `$TIMER -r`
    source ../../../scripts/test-run
 
-   set dt  = `$TIMER -b $t0`
    set rpf = ( $rpf '#tmp#' )
 
    $TEST_CHECK part -a numer_complex -e $xstatus -l -dt $dt -rpf "$rpf" none

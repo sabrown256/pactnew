@@ -36,6 +36,6 @@ set io  = pdbvmesh.res
 
    set rpf = ( $rpf pdbvmesh.res.diff pdbvmesh.res pdbvmesh.ps pdbvmesh*.diff )
 
-$TEST_CHECK part -a mesh -e $xstatus -rpf "$rpf" none
+$TEST_CHECK part -a mesh -e $xstatus -dt $dt -rpf "$rpf" none
 
 exit($status)

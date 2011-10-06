@@ -120,19 +120,19 @@ else if (-e $SrcDir/pdb.h) then
             set Vers = "III"
          endif
          NoteD $Log "      Version $Vers Series"
-         set VTime = `$TIMER -r`
+         set vtime = `$TIMER -r`
 
          foreach i ($TestL)
             $SrcDir/tests/$i $vrs
             @ nerr = $nerr + $status
          end
 
-         set VTime = `$TIMER -b $VTime`
+         set vtime = `$TIMER -b $vtime`
          NoteD $Log ""
          if ($nerr == 0) then
-            NoteD $Log "      Version $Vers ... OK ($VTime)"
+            NoteD $Log "      Version $Vers ... OK ($vtime)"
          else
-            NoteD $Log "      Version $Vers ... FAIL ($VTime)"
+            NoteD $Log "      Version $Vers ... FAIL ($vtime)"
          endif
          NoteD $Log ""
       end

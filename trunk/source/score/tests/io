@@ -29,7 +29,7 @@ endif
 
 set rpf = ( $rpf sciots.txt )
 
-$TEST_CHECK part -a io -e $xstatus -x $exe -rpf "$rpf" "$msg"
+$TEST_CHECK part -a io -e $xstatus -dt $dt -x $exe -rpf "$rpf" "$msg"
 
 exit($status)
 

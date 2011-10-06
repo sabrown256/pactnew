@@ -26,7 +26,6 @@ set exe = $BinDir/sx
 
       flog $Log rm -f $t*.diff $t*.ps
 
-      set bt = `$TIMER -r`
       source ../../../scripts/test-run
 
       if ($xstatus == 0) then
@@ -38,19 +37,18 @@ set exe = $BinDir/sx
                Note $Log "Test $i:r status $st"
             endif
          end
-         set et = `$TIMER -b $bt`
 
          if ($xstatus != 0) then
-            NoteD $Log "ng ($et)"
+            NoteD $Log "ng ($dt)"
             @ nerr = $nerr + 1
          else
-            NoteD $Log "ok ($et)"
+            NoteD $Log "ok ($dt)"
          endif
       endif
 
    end
 
-$TEST_CHECK part -a iply -e $nerr -rpf "$rpf" "$msg"
+$TEST_CHECK part -a iply -e $nerr -dt $dt -rpf "$rpf" "$msg"
 
 exit($status)
 

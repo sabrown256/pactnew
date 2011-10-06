@@ -27,7 +27,7 @@ if ($xstatus == 0) then
    source ../../../scripts/test-run
 endif
 
-$TEST_CHECK part -a array -e $xstatus -x $exe -rpf "$rpf" "$msg"
+$TEST_CHECK part -a array -e $xstatus -dt $dt -x $exe -rpf "$rpf" "$msg"
 
 exit($status)
 

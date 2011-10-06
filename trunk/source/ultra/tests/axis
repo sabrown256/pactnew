@@ -27,6 +27,6 @@ set io  = ulaxs.log
 
    set rpf = ( $rpf ulaxs.* )
 
-$TEST_CHECK part -a fill -e $xstatus -rpf "$rpf" none
+$TEST_CHECK part -a fill -e $xstatus -dt $dt -rpf "$rpf" none
 
 exit($status)

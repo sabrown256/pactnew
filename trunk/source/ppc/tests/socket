@@ -25,7 +25,7 @@ set exe = $BinDir/pcexec
 
       source ../../../scripts/test-run
 
-      $TEST_CHECK part -a socket_poll -e $xstatus -l -rpf "$rpf" none
+      $TEST_CHECK part -a socket_poll -e $xstatus -dt $dt -l -rpf "$rpf" none
 
       @ nerr = $nerr + $status
 
@@ -36,7 +36,7 @@ set exe = $BinDir/pcexec
 
       source ../../../scripts/test-run
 
-      $TEST_CHECK part -a socket_interrupt -e $xstatus -l -rpf "$rpf" none
+      $TEST_CHECK part -a socket_interrupt -e $xstatus -dt $dt -l -rpf "$rpf" none
 
       @ nerr = $nerr + $status
 

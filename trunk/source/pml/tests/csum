@@ -36,7 +36,7 @@ set io  = checksum.res
       endif
    endif
 
-$TEST_CHECK part -a csum -e $xstatus -x $exe none
+$TEST_CHECK part -a csum -e $xstatus -dt $dt -x $exe none
 
 exit($status)
 

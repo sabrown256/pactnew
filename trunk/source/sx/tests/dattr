@@ -28,6 +28,6 @@ set io  = sxpdba.res
 
    set rpf = ( $rpf sxpdba.res sxpdba.res.diff )
 
-$TEST_CHECK part -a dattr -e $xstatus -rpf "$rpf" none
+$TEST_CHECK part -a dattr -e $xstatus -dt $dt -rpf "$rpf" none
 
 exit($status)

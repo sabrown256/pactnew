@@ -43,6 +43,6 @@ set io  = ultest.tmp
 
    set rpf = ( $rpf ultest.log ultest.pdb ultest.asc ultest.err ultest.tmp )
 
-$TEST_CHECK part -a master -e $xstatus -rpf "$rpf" none
+$TEST_CHECK part -a master -e $xstatus -dt $dt -rpf "$rpf" none
 
 exit($status)

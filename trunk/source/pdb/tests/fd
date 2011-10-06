@@ -23,7 +23,7 @@ if ("$OS" != AIX) then
 
    source ../../../scripts/test-run
 
-   $TEST_CHECK part -a fd -e $xstatus -x $exe none
+   $TEST_CHECK part -a fd -e $xstatus -dt $dt -x $exe none
 
    set xstatus = $status
 

@@ -45,7 +45,7 @@ set io  = flog
          endif
       endif
 
-$TEST_CHECK part -a interp -e $xstatus -x $exe none
+$TEST_CHECK part -a interp -e $xstatus -dt $dt -x $exe none
 
 exit($status)
 

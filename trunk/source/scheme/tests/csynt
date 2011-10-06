@@ -34,9 +34,7 @@ set exe = $BinDir/scheme
       set opt = ( -e -l shcdcl.c )
       set io  = shcdcl.res
 
-      set t0 = `$TIMER -r`
       source ../../../scripts/test-run
-      set dt = `$TIMER -b $t0`
 
       if ($xstatus == 0) then
          flog $Log ( diff shcdcl.res $FilesDir/ref/shcdcl >! shcdcl.res.diff )
@@ -60,9 +58,7 @@ set exe = $BinDir/scheme
       set opt = ( -e -l shcppts.c )
       set io  = shcppts.res
 
-      set t0 = `$TIMER -r`
       source ../../../scripts/test-run
-      set dt = `$TIMER -b $t0`
 
       if ($xstatus == 0) then
          flog $Log ( diff shcppts.res $FilesDir/ref/shcppts >! shcppts.res.diff )
@@ -86,9 +82,7 @@ set exe = $BinDir/scheme
       set opt = ( -e -l shctst.c )
       set io  = shctst.res
 
-      set t0 = `$TIMER -r`
       source ../../../scripts/test-run
-      set dt = `$TIMER -b $t0`
 
       if ($xstatus == 0) then
          flog $Log ( diff shctst.res $FilesDir/ref/shctst >! shctst.res.diff )
@@ -123,6 +117,7 @@ set exe = $BinDir/scheme
       endif
 
       set dt = `$TIMER -b $t0`
+      unset t0
 
       if ($xstatus == 0) then
          flog $Log ( $CFE $exe $opt -l shctst.scm >! shctst-scm.res )

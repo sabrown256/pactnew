@@ -31,6 +31,6 @@ set io  = ftee
       NoteD $Log ""
    endif
 
-$TEST_CHECK part -a rendac -e $xstatus -x $exe -rpf "$rpf" "$msg"
+$TEST_CHECK part -a rendac -e $xstatus -dt $dt -x $exe -rpf "$rpf" "$msg"
 
 exit($status)

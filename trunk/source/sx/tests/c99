@@ -30,6 +30,6 @@ set io  = sxc99.res
 
    set rpf = ( $rpf sxc99.res sxc99.res.diff )
 
-$TEST_CHECK part -a c99 -e $xstatus -rpf "$rpf" none
+$TEST_CHECK part -a c99 -e $xstatus -dt $dt -rpf "$rpf" none
 
 exit($status)

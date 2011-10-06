@@ -28,7 +28,8 @@ set io  = shmtst.res
          diff shmtst.res $FilesDir/ref/shmtst >! shmtst.res.diff
          set xstatus = $status
       endif
+   endif
 
-$TEST_CHECK part -a bsynt -e $xstatus -rpf "$rpf" none
+$TEST_CHECK part -a bsynt -e $xstatus -dt $dt -rpf "$rpf" none
 
 exit($status)

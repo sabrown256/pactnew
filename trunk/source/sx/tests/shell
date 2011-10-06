@@ -22,11 +22,15 @@ set exe = $BinDir/sx
       set rpf = none
 
       set t0 = `$TIMER -r`
+
       $CFE $FilesDir/pdbvenv.scm >&! pdbvenv.res
       set xstatus = $status
+
+      set dt = `$TIMER -b $t0`
+      unset t0
+
       diff pdbvenv.res $FilesDir/ref/pdbvenv >&! pdbvenv.res.diff
       set dstatus = $status
-      set dt = `$TIMER -b $t0`
 
       if (($xstatus != 0) || ($dstatus != 0)) then
          flog $Log cat pdbvenv.res
@@ -47,9 +51,12 @@ set exe = $BinDir/sx
       set t0 = `$TIMER -r`
       $CFE $FilesDir/pdbvexe.scm a 1 2.3 '"abc"' >&! pdbvexe.res
       set xstatus = $status
+
+      set dt = `$TIMER -b $t0`
+      unset t0
+
       diff pdbvexe.res $FilesDir/ref/pdbvexe >&! pdbvexe.res.diff
       set dstatus = $status
-      set dt = `$TIMER -b $t0`
 
       if (($xstatus != 0) || ($dstatus != 0)) then
          flog $Log cat pdbvexe.res

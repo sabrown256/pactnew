@@ -21,6 +21,6 @@ Note $Log ""
 
 source ../../../scripts/test-run
 
-$TEST_CHECK part -a c99 -e $xstatus -x $exe -rpf "$rpf" "$msg"
+$TEST_CHECK part -a c99 -e $xstatus -dt $dt -x $exe -rpf "$rpf" "$msg"
 
 exit($status)

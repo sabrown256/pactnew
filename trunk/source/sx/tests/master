@@ -40,7 +40,7 @@ set io  = pdbvtest.tmp
    flog $Log touch pdbvtest.foo
    set rpf = ( $rpf foofoo pdbvtest.* )
 
-$TEST_CHECK part -a master -e $xstatus -rpf "$rpf" none
+$TEST_CHECK part -a master -e $xstatus -dt $dt -rpf "$rpf" none
 
 exit($status)
 

@@ -37,6 +37,6 @@ set io  = sxpdbi.res
       set xstatus = 0
    endif
 
-$TEST_CHECK part -a vif -e $xstatus -rpf "$rpf" none
+$TEST_CHECK part -a vif -e $xstatus -dt $dt -rpf "$rpf" none
 
 exit($status)
