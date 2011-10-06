@@ -13,6 +13,7 @@ source ../../tests/common
 set msg = "PML Checksum Test ...... "
 set exe = $BinDir/mlckts
 set opt = ( $RootDir/pml/mlcmsh.c )
+set io  = checksum.res
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
@@ -27,13 +28,7 @@ set opt = ( $RootDir/pml/mlcmsh.c )
       NoteD $Log ""
       NoteD $Log "                         Can't build PML Checksum Test Program"
    else
-      if ("$Valgrind" == "") then
-         flog $Log ($CFE $exe $opt >&! checksum.res)
-         set xstatus = $status
-      else
-         flog $Log $Valgrind $exe $opt
-         set xstatus = $status
-      endif
+      source ../../../scripts/test-run
 
       if ((-f $Ref) && ("$Valgrind" == "") && ($xstatus == 0)) then
          flog $Log (diff checksum.res $Ref >&! checksum.diff)

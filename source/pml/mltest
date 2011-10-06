@@ -10,6 +10,7 @@
 
 setenv Package pml
 setenv Test    ""
+set vgdirs = ( score )
 source ../scripts/test-env
 
 set Tests = ""
@@ -60,10 +61,6 @@ else if (-e $RootDir/pml/pml.h) then
    Note $Log "BinDir = $BinDir"
    Note $Log "path   = $path"  
    Note $Log "MAKE   = $MAKE"
-
-   if ("$Valgrind" != "") then
-      setenv Valgrind  "$Valgrind --suppressions=$RootDir/score/tests/vg.suppress"
-   endif
 
    Note $Log "Parallel = |$Parallel|"
    flog $Log ../../../manager/pwhich pact

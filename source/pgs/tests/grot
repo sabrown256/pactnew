@@ -13,6 +13,7 @@ source ../../tests/common
 set msg = "PGS Grotrian Test ...... "
 set exe = $BinDir/gsgrts
 set opt = ( -1 -d )
+set io  = gsgrts.res
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
@@ -29,16 +30,7 @@ set opt = ( -1 -d )
    else
       flog $Log rm -f gsgrts.res gsgrts.ps
 
-      if ("$Valgrind" == "") then
-         $CFE $exe $opt > gsgrts.res
-         set xstatus = $status
-      else
-         ftee $Log $Valgrind $exe $opt               |& \
-         grep "ERROR SUMMARY:"                       |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         set rpf     = ( $rpf $Tmp )
-      endif
+      source ../../../scripts/test-run
 
       if ($xstatus == 0) then
          mv ps_test.ps gsgrts.ps

@@ -26,7 +26,20 @@ switch ($io)
            flog $Log $CFE $exe $opt
            set xstatus = $status
         else
-           flog $Log $Valgrind $exe $opt           |& \
+           ftee $Log $Valgrind $exe $opt           |& \
+           grep "ERROR SUMMARY:"                   |& \
+           awk '{ print $4 }'   >&! $Tmp
+           set xstatus = `cat $Tmp`
+           set rpf     = ( $rpf $Tmp )
+        endif
+        breaksw
+
+   case none:
+        if ("$Valgrind" == "") then
+           $exe $opt
+           set xstatus = $status
+        else
+           $Valgrind $exe $opt                     |& \
            grep "ERROR SUMMARY:"                   |& \
            awk '{ print $4 }'   >&! $Tmp
            set xstatus = `cat $Tmp`

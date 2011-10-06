@@ -384,6 +384,8 @@ int main(int c, char **v)
 
     PRINT(STDOUT, "\n");
 
+    ret = 0;
+
 /* process the command line arguments */
     t1    = 0.0;
     t2    = 1.0;

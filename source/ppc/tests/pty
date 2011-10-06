@@ -24,17 +24,20 @@ set exe = $PCEXEC
          NoteD $Log -n "                       polling ..................... "
          set rpf = "none"
          set opt = ( -i -c 30 -t $TEST )
+         set io  = pcexec.ptyp
 
-         if ("$Valgrind" == "") then
-            $CFE $exe $opt | tr -d "\015" > pcexec.ptyp
-            set xstatus = $status
-         else
-            ftee $Log $Valgrind $exe $opt       |& \
-            grep "ERROR SUMMARY:"               |& \
-            awk '{ print $4 }'   >&! $Tmp
-            set xstatus = `cat $Tmp`
-            set rpf     = ( $rpf $Tmp )
-         endif
+         source ../../../scripts/test-run
+
+#         if ("$Valgrind" == "") then
+#            $CFE $exe $opt | tr -d "\015" > pcexec.ptyp
+#            set xstatus = $status
+#         else
+#            ftee $Log $Valgrind $exe $opt       |& \
+#            grep "ERROR SUMMARY:"               |& \
+#            awk '{ print $4 }'   >&! $Tmp
+#            set xstatus = `cat $Tmp`
+#            set rpf     = ( $rpf $Tmp )
+#         endif
 
          $TEST_CHECK part -a pty_poll -e $xstatus -l -rpf "$rpf" none
 
@@ -43,17 +46,20 @@ set exe = $PCEXEC
          NoteD $Log -n "                       interrupt ................... "
          set rpf = "none"
          set opt = ( -c 30 -t $TEST )
+         set io  = pcexec.ptyi
 
-         if ("$Valgrind" == "") then
-            $CFE $exe $opt | tr -d "\015" > pcexec.ptyi
-            set xstatus = $status
-         else
-            ftee $Log $Valgrind $exe $opt        |& \
-            grep "ERROR SUMMARY:"                |& \
-            awk '{ print $4 }'   >&! $Tmp
-            set xstatus = `cat $Tmp`
-	    set rpf     = ( $rpf $Tmp )
-         endif
+         source ../../../scripts/test-run
+
+#         if ("$Valgrind" == "") then
+#            $CFE $exe $opt | tr -d "\015" > pcexec.ptyi
+#            set xstatus = $status
+#         else
+#            ftee $Log $Valgrind $exe $opt        |& \
+#            grep "ERROR SUMMARY:"                |& \
+#            awk '{ print $4 }'   >&! $Tmp
+#            set xstatus = `cat $Tmp`
+#	    set rpf     = ( $rpf $Tmp )
+#         endif
 
          $TEST_CHECK part -a pty_interrupt -e $xstatus -l -rpf "$rpf" none
 

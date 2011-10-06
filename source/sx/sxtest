@@ -10,6 +10,7 @@
 
 setenv Package sx
 setenv Test    ""
+set vgdirs = ( pgs score )
 source ../scripts/test-env
 
 set Tests = ""
@@ -67,10 +68,6 @@ else if (-e $BinDir/sx) then
    Note $Log "Ultra  = $Ultra" 
 
    setenv Tmp $cwd/.tmp.$$
-   if ("$Valgrind" != "") then
-      setenv Valgrind  "$Valgrind --suppressions=$RootDir/pgs/vg.suppress"
-      setenv Valgrind  "$Valgrind --suppressions=$RootDir/score/tests/vg.suppress"
-   endif
 
    Note $Log "MPI         = |$MPI|"
    Note $Log "LARGE_FILES = |$LARGE_FILES|"

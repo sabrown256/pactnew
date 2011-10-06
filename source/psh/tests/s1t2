@@ -8,14 +8,16 @@
 # include "cpyright.h"
 #
 
-set Code = do-run
-set Opt  = ans
+set exe = do-run
+set tgt = ans
+set opt = ( -level 2 -dr -dbg bar -mpi foo -s run.s1 s1t2
+set io  = none
 
 while ($#argv > 0)
    switch ($1)
       case -c:
            shift
-           set Code = $1
+           set exe = $1
            breaksw
       case '-h':
            echo "Usage: $0 [-c <code>] [-h] run | ans"
@@ -26,20 +28,14 @@ while ($#argv > 0)
            echo ""
            exit(1)
       default:
-           set Opt = $1
+           set tgt = $1
            breaksw
    endsw
    shift
 end
 
-if ($Opt == run) then
-   if ("$Valgrind" == "") then
-      $Code -level 2 -dr -dbg bar -mpi foo -s run.s1 s1t2
-      set xstatus = $status
-   else
-      $Valgrind $Code -level 2 -dr -dbg bar -mpi foo -s run.s1 s1t2
-      set xstatus = $status
-   endif
+if ($tgt == run) then
+   source ../../../scripts/test-run
 
 # print the fiducial answer for this test
 else
