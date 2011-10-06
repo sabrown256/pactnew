@@ -211,6 +211,24 @@ if ($?TEST_RM_EXE == 1) then
    endif
 endif
 
+if ("$Test" == "") then
+   if ("$Valgrind" != "") then
+      foreach i ($vgdirs)
+         if ("$i" == ".") then
+            set base = $FilesDir/vg.suppress
+         else
+            set base = $RootDir/$i/tests/vg.suppress
+         endif
+         if (-f $base) then
+            setenv Valgrind  "$Valgrind --suppressions=$base"
+         endif
+         if (-f ${base}-test) then
+            setenv Valgrind  "$Valgrind --suppressions=${base}-test"
+         endif
+      end
+   endif
+endif
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 

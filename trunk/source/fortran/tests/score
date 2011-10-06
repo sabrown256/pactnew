@@ -24,26 +24,19 @@ Note $Log ""
    NoteD $Log -n "                        lexical scan ................... "
    Note $Log ""
 
-   set exe = $BinDir/sclsts
-   set rpf = none
-
    flog $Log pushd $SrcDir
    flog $Log $MAKE scan
    set xstatus = $status
    flog $Log popd
 
+   set exe = $BinDir/sclsts
+   set rpf = none
    set opt = ( $TDir/sclsts.src )
-   if ("$Valgrind" == "") then
-      $CFE $exe $opt >&! sclsts.res
-      set xstatus = $status
-      diff sclsts.res $RefDir/sclsts > sclsts.res.diff
-   else
-      ftee $Log $Valgrind $exe $opt                     |& \
-      grep "ERROR SUMMARY:"                             |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      set rpf     = ( $rpf $Tmp )
-   endif
+   set io  = sclsts.res
+
+   source ../../../scripts/test-run
+
+   diff sclsts.res $RefDir/sclsts > sclsts.res.diff
 
    set rpf = ( $rpf sclsts.res sclsts.res.diff )
 
@@ -57,15 +50,15 @@ Note $Log ""
    NoteD $Log -n "                        hash ........................... "
    Note $Log ""
 
-   set exe = $BinDir/schtst
-   set rpf = none
-   set opt = ""
-   set io  = flog
-
    flog $Log pushd $SrcDir
    flog $Log $MAKE -na 2 fha
    set xstatus = $status
    flog $Log popd
+
+   set exe = $BinDir/schtst
+   set rpf = none
+   set opt = ""
+   set io  = flog
 
    source ../../../scripts/test-run
 
@@ -92,8 +85,8 @@ Note $Log ""
          flog $Log ( echo 2 | $CFE $exe )
          set xstatus = $status
       else
-         ftee $Log ( echo 2 | $Valgrind $exe                     |& \
-         grep "ERROR SUMMARY:"                                   |& \
+         ftee $Log ( echo 2 | $Valgrind $exe )           |& \
+         grep "ERROR SUMMARY:"                           |& \
          awk '{ print $4 }'   >&! $Tmp
          set xstatus = `cat $Tmp`
          set rpf     = ( $rpf $Tmp )

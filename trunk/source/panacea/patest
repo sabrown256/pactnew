@@ -10,6 +10,7 @@
 
 setenv Package panacea
 setenv Test    ""
+set vgdirs = ( score )
 source ../scripts/test-env
 
 set Tests = ""
@@ -57,9 +58,6 @@ else if (-e $RootDir/panacea/panace.h) then
    Note $Log "MAKE   = $MAKE"  
 
    setenv Tmp $cwd/.tmp.$$
-   if ("$Valgrind" != "") then
-      setenv Valgrind  "$Valgrind --suppressions=$RootDir/score/tests/vg.suppress"
-   endif
 
    Note $Log "Parallel = |$Parallel|"
    Note $Log "MPI      = |$MPI|"

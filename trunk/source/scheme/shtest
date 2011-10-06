@@ -10,6 +10,7 @@
 
 setenv Package scheme
 setenv Test    ""
+set vgdirs = ( score )
 source ../scripts/test-env
 
 set Tests = ""
@@ -68,9 +69,6 @@ else if (-e $BinDir/scheme) then
    Note $Log "SCHEME   = $SCHEME"
 
    setenv Tmp $cwd/.tmp.$$
-   if ("$Valgrind" != "") then
-      setenv Valgrind  "$Valgrind --suppressions=$RootDir/score/tests/vg.suppress"
-   endif
 
    flog $Log ../../../manager/pwhich pact
    flog $Log ../../../manager/pwhich cc

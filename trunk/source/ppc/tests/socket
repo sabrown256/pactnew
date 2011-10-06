@@ -21,18 +21,9 @@ set exe = $PCEXEC
       NoteD $Log -n "                       polling ..................... "
       set rpf = "none"
       set opt = ( -i -c 30 -s $TEST )
+      set io  = pcexec.sockp
 
-      set BTime = `$TIMER -r`
-      if ("$Valgrind" == "") then
-         $CFE $exe $opt > pcexec.sockp
-         set xstatus = $status
-      else
-         ftee $Log $Valgrind $exe $opt        |& \
-         grep "ERROR SUMMARY:"                |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-	 set rpf     = ( $rpf $Tmp )
-      endif
+      source ../../../scripts/test-run
 
       $TEST_CHECK part -a socket_poll -e $xstatus -l -rpf "$rpf" none
 
@@ -41,17 +32,9 @@ set exe = $PCEXEC
       NoteD $Log -n "                       interrupt ................... "
       set rpf = "none"
       set opt = ( -c 30 -s $TEST )
+      set io  = pcexec.socki
 
-      if ("$Valgrind" == "") then
-         $CFE $exe $opt > pcexec.socki
-         set xstatus = $status
-      else
-         ftee $Log $Valgrind $exe $opt        |& \
-         grep "ERROR SUMMARY:"                |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-	 set rpf     = ( $rpf $Tmp )
-      endif
+      source ../../../scripts/test-run
 
       $TEST_CHECK part -a socket_interrupt -e $xstatus -l -rpf "$rpf" none
 

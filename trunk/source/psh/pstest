@@ -10,6 +10,7 @@
 
 setenv Package psh
 setenv Test    ""
+set vgdirs = ( score )
 source ../scripts/test-env
 
 set ERROR = FALSE
@@ -53,13 +54,6 @@ if ($RUN_TESTS == FALSE) then
 else
    NoteD $Log ""
    NoteD $Log "PSH TEST ..."
-
-   if ("$Valgrind" != "") then
-      setenv Valgrind  "$Valgrind --suppressions=$RootDir/score/tests/vg.suppress"
-   endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
    if ("$Tests" == "") then
       set Tests = ""

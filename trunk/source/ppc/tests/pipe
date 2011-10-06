@@ -21,18 +21,9 @@ set exe = $PCEXEC
       NoteD $Log -n "                       polling ..................... "
       set rpf = "none"
       set opt = ( -i -c 30 -p $TEST )
+      set io  = pcexec.refp
 
-      set BTime = `$TIMER -r`
-      if ("$Valgrind" == "") then
-         $CFE $exe $opt >&! pcexec.refp
-         set xstatus = $status
-      else
-         ftee $Log $Valgrind $exe $opt       |& \
-         grep "ERROR SUMMARY:"               |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-	 set rpf     = ( $rpf $Tmp )
-      endif
+      source ../../../scripts/test-run
 
       $TEST_CHECK part -a pipe_poll -e $xstatus -l -rpf "$rpf" none
 
@@ -41,18 +32,9 @@ set exe = $PCEXEC
       NoteD $Log -n "                       interrupt ................... "
       set rpf = "none"
       set opt = ( -c 30 -p $TEST )
+      set io  = pcexec.refi
 
-      set BTime = `$TIMER -r`
-      if ("$Valgrind" == "") then
-         $CFE $exe $opt >&! pcexec.refi
-         set xstatus = $status
-      else
-         ftee $Log $Valgrind $exe $opt        |& \
-         grep "ERROR SUMMARY:"                |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-	 set rpf     = ( $rpf $Tmp )
-      endif
+      source ../../../scripts/test-run
 
       $TEST_CHECK part -a pipe_interrupt -e $xstatus -l -rpf "$rpf" none
 
