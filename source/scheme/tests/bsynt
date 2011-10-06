@@ -15,7 +15,7 @@ set exe = $BinDir/scheme
 set opt = ( -e -l shmtst.m )
 set io  = shmtst.res
 
-   if (($do_syntax == 0) && (-d $RootDir/scheme/syntax/m)) then
+   if (($do_syntax == 0) && (-d $SrcDir/syntax/m)) then
       NoteD $Log ""
       NoteD $Log -n "                    $msg"
       Note $Log ""

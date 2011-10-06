@@ -17,7 +17,7 @@ set exe = $BinDir/scheme
 
    grep -w Arc $IncDir/make-def >& /dev/null
    set do_syntax = $status
-   if (($do_syntax == 0) && (-d $RootDir/scheme/syntax/c)) then
+   if (($do_syntax == 0) && (-d $SrcDir/syntax/c)) then
       NoteD $Log ""
       NoteD $Log "                    $msg"
 

@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "SX PDB VIF Test .............. "
 set exe = $BinDir/sx
-set opt = ( -p -e -q $ZeroSpace -l $RootDir/sx/tests/sxpdbi.scm )
+set opt = ( -p -e -q $ZeroSpace -l $FilesDir/sxpdbi.scm )
 set io  = sxpdbi.res
 
    NoteD $Log ""
@@ -26,7 +26,7 @@ set io  = sxpdbi.res
       source ../../../scripts/test-run
 
       if ($xstatus == 0) then
-         flog $Log (diff sxpdbi.res $RootDir/sx/tests/ref/sxpdbi > sxpdbi.res.diff)
+         flog $Log (diff sxpdbi.res $FilesDir/ref/sxpdbi > sxpdbi.res.diff)
          set xstatus = $status
       else
          flog $Log cp sxpdbi.res sxpdbi.res.crash

@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "PDBView Mesh Test ............ "
 set exe = $BinDir/sx
-set opt = ( -p -e -q $ZeroSpace -l $RootDir/sx/tests/pdbvmesh.scm )
+set opt = ( -p -e -q $ZeroSpace -l $FilesDir/pdbvmesh.scm )
 set io  = pdbvmesh.res
 
    NoteD $Log ""
@@ -25,8 +25,8 @@ set io  = pdbvmesh.res
 
    if ($xstatus == 0) then
       foreach i (pdbvmesh.ps)
-         if (-f $RootDir/sx/tests/ref/$i) then
-            flog $Log ($CFE $PSDIFF $i $RootDir/sx/tests/ref/$i >&! $i.diff)
+         if (-f $FilesDir/ref/$i) then
+            flog $Log ($CFE $PSDIFF $i $FilesDir/ref/$i >&! $i.diff)
             @ st = $status
             @ xstatus = $xstatus + $st
             Note $Log "Test $i:r status $st"

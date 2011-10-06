@@ -37,8 +37,6 @@ while ($#argv > 0)
    shift
 end
 
-set RefDir = $RootDir/pgs/ref
-
 cd $TestDir
 
 #--------------------------------------------------------------------------
@@ -55,7 +53,7 @@ if ($RUN_TESTS == FALSE) then
 
 # run the tests
 
-else if (-e $RootDir/pgs/pgs.h) then
+else if (-e $SrcDir/pgs.h) then
 
    NoteD $Log ""
    NoteD $Log "PGS TEST ..."
@@ -77,19 +75,19 @@ else if (-e $RootDir/pgs/pgs.h) then
 
    foreach i ($Tests)
       $SrcDir/tests/$i $argv
-      if ($status == 1) then
-         set ERROR = TRUE
-      endif
+      @ nerr = $nerr + $status
    end
 
-   $TEST_CHECK clean -n PGS -e $ERROR -raf "$Tmp"
+   $TEST_CHECK clean -n PGS -e $nerr -raf "$Tmp"
+
+   set xstatus = $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 endif
 
-$TEST_CHECK fin -e $ERROR
+$TEST_CHECK fin -e $xstatus
 
 exit($status)
 

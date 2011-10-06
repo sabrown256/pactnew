@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "PPC Pipe Test .................."
-set exe = $PCEXEC
+set exe = $BinDir/pcexec
 
       NoteD $Log ""
       NoteD $Log "                    $msg "

@@ -51,7 +51,7 @@ if ($RUN_TESTS == FALSE) then
 
 # run the tests
 
-else if (-e $RootDir/pml/pml.h) then
+else if (-e $SrcDir/pml.h) then
    echo ""
    echo "PML TEST ..."
 
@@ -74,19 +74,16 @@ else if (-e $RootDir/pml/pml.h) then
 
    foreach i ($Tests)
       $SrcDir/tests/$i
-      if ($status == 1) then
-         set ERROR = TRUE
-      endif
+      @ nerr = $nerr + $status
    end
 
-   $TEST_CHECK clean -n PML -e $ERROR
+   $TEST_CHECK clean -n PML -e $nerr
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+   set xstatus = $status
 
 endif
 
-$TEST_CHECK fin -e $ERROR
+$TEST_CHECK fin -e $xstatus
 
 exit($status)
 

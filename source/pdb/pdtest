@@ -54,7 +54,7 @@ if ($RUN_TESTS == FALSE) then
 
 # run the tests
 
-else if (-e $RootDir/pdb/pdb.h) then
+else if (-e $SrcDir/pdb.h) then
 
    echo ""
    echo "PDB TEST ..."
@@ -84,7 +84,6 @@ else if (-e $RootDir/pdb/pdb.h) then
    if ($TStatus != 0) then
       NoteD $Log ""
       NoteD $Log "                         Can't build PDB Test Programs"
-      set ERROR = "TRUE"
    else
       NoteD $Log "DONE"
       NoteD $Log ""
@@ -125,14 +124,12 @@ else if (-e $RootDir/pdb/pdb.h) then
 
          foreach i ($TestL)
             $SrcDir/tests/$i $vrs
-            if ($status == 1) then
-               set ERROR = TRUE
-            endif
+            @ nerr = $nerr + $status
          end
 
          set VTime = `$TIMER -b $VTime`
          NoteD $Log ""
-         if ($ERROR == FALSE) then
+         if ($nerr == 0) then
             NoteD $Log "      Version $Vers ... OK ($VTime)"
          else
             NoteD $Log "      Version $Vers ... FAIL ($VTime)"
@@ -141,14 +138,13 @@ else if (-e $RootDir/pdb/pdb.h) then
       end
    endif
 
-   $TEST_CHECK clean -n PDB -e $ERROR -raf "$Tmp"
+   $TEST_CHECK clean -n PDB -e $nerr -raf "$Tmp"
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+   set xstatus = $status
 
 endif
 
-$TEST_CHECK fin -e $ERROR
+$TEST_CHECK fin -e $xstatus
 
 exit($status)
 

@@ -31,7 +31,7 @@ Note $Log ""
 
    set exe = $BinDir/sclsts
    set rpf = none
-   set opt = ( $TDir/sclsts.src )
+   set opt = ( $FilesDir/sclsts.src )
    set io  = sclsts.res
 
    source ../../../scripts/test-run

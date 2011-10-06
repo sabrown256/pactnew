@@ -39,12 +39,8 @@ NoteD $Log ""
 NoteD $Log "                    $msg"
 
 set List = (psh1 psh2 psh3 psh4)
-set nerr = 0
-
-flog $Log setenv PATH $RootDir/scripts:$PATH
 
 Note $Log "Using $PCSH"
-Note $Log "Path = $PATH"
 
 foreach t ($List)
    Separator $Log

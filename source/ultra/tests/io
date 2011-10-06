@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "ULTRA I/O Test ............... "
 set exe = $BinDir/ultra
-set opt = ( -e -r -x -q -s $ZeroSpace -l $TDir/uliot.scm )
+set opt = ( -e -r -x -q -s $ZeroSpace -l $FilesDir/uliot.scm )
 set io  = uliot.log
 
    NoteD $Log ""

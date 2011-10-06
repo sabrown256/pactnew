@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "ULTRA AXIS Test .............. "
 set exe = $BinDir/ultra
-set opt = ( -e -r -x -q -s $ZeroSpace -l $TDir/ulaxs.scm )
+set opt = ( -e -r -x -q -s $ZeroSpace -l $FilesDir/ulaxs.scm )
 set io  = ulaxs.log
 
    NoteD $Log ""

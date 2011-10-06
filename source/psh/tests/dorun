@@ -43,7 +43,6 @@ InitLog Log $TestDir/log.dorun.$LogSfx
 
    flog $Log rm -f run.* s*
    flog $Log cp $SrcDir/tests/{run.*,s*} .
-   flog $Log setenv PATH $RootDir/scripts:$PATH
 
    Note $Log "Using $DORUN"
    Note $Log "Path = $PATH"

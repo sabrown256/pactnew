@@ -13,8 +13,6 @@ source ../../tests/common
 set msg = "PGS Axis Test .......... "
 set exe = $BinDir/gslaxt
 
-set DDir = $RootDir/pgs/tests
-
 set Replace = FALSE
 
 Note $Log "Args = $argv"
@@ -70,7 +68,7 @@ end
             flog $Log set bs = $i:r
             flog $Log set ob = $bs.$o
 
-            set opt = ( $lnlg -s $RootDir/pgs/tests/$i )
+            set opt = ( $lnlg -s $FilesDir/$i )
             set io  = $ob.res
 
             source ../../../scripts/test-run

@@ -12,7 +12,7 @@ source ../../tests/common
 
 set DPE = ""
 set msg = "PPC PTY Test ..................."
-set exe = $PCEXEC
+set exe = $BinDir/pcexec
 
 # this test fails too often on DP machines so don't run there
       if ("$DPE" == "") then

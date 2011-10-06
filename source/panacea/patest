@@ -48,7 +48,7 @@ if ($RUN_TESTS == FALSE) then
 
 # run the tests
 
-else if (-e $RootDir/panacea/panace.h) then
+else if (-e $SrcDir/panace.h) then
 
    NoteD $Log ""
    NoteD $Log "PANACEA TEST ..."
@@ -70,19 +70,16 @@ else if (-e $RootDir/panacea/panace.h) then
 
    foreach i ($Tests)
       $SrcDir/tests/$i
-      if ($status == 1) then
-         set ERROR = TRUE
-      endif
+      @ nerr = $nerr + $status
    end
 
-   $TEST_CHECK clean -n PANACEA -e $ERROR -raf "$Tmp"
+   $TEST_CHECK clean -n PANACEA -e $nerr -raf "$Tmp"
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+   set xstatus = $status
 
 endif
 
-$TEST_CHECK fin -e $ERROR
+$TEST_CHECK fin -e $xstatus
 
 exit($status)
 

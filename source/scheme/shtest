@@ -62,7 +62,6 @@ else if (-e $BinDir/scheme) then
    Note $Log "cwd      = $cwd"
    Note $Log "path     = $path"  
    Note $Log "BuildDir = $BuildDir"
-   Note $Log "RootDir  = $RootDir"
    Note $Log "BinDir   = $BinDir"
    Note $Log "TestDir  = $TestDir"
    Note $Log "FilesDir = $FilesDir"
@@ -82,22 +81,19 @@ else if (-e $BinDir/scheme) then
 
    foreach i ($Tests)
       $SrcDir/tests/$i
-      if ($status == 1) then
-         set ERROR = TRUE
-      endif
+      @ nerr = $nerr + $status
    end
 
-   $TEST_CHECK clean -n SCHEME -e $ERROR -raf "$Tmp"
+   $TEST_CHECK clean -n SCHEME -e $nerr -raf "$Tmp"
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+   set xstatus = $status
 
 else
    NoteD $Log ""
    NoteD $Log "$BinDir/scheme does not exist"
 endif
 
-$TEST_CHECK fin -e $ERROR
+$TEST_CHECK fin -e $xstatus
 
 exit($status)
 

@@ -13,6 +13,9 @@ source ../../tests/common
 set msg = "PDBDiff Test ................. "
 set exe = $BinDir/sx
 
+set Ultra   = "$CFE $BinDir/ultra -e -r -x -q -s $ZeroSpace"
+set PDBDiff = "$CFE $BinDir/pdbdiff -e -x -q $ZeroSpace"
+
    NoteD $Log ""
    NoteD $Log "                    $msg"
    Note $Log ""
@@ -21,7 +24,7 @@ set exe = $BinDir/sx
 
    flog $Log touch pdbd.res
 
-   flog $Log $Ultra -l $RootDir/sx/tests/pdbdtu.scm
+   flog $Log $Ultra -l $FilesDir/pdbdtu.scm
    set xstatus = $status
 
    if ($xstatus != 0) then

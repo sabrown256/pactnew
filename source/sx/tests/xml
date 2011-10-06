@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "SX PDB XML Test .............. "
 set exe = $BinDir/sx
-set opt = ( -p -e -q $ZeroSpace -l $RootDir/sx/tests/sxxml.scm )
+set opt = ( -p -e -q $ZeroSpace -l $FilesDir/sxxml.scm )
 set io  = sxxml.res
 
    NoteD $Log ""
@@ -21,12 +21,12 @@ set io  = sxxml.res
 
    flog $Log rm -f sxxml.log sxxml.res foo.xml
 
-   flog $Log cp $TDir/txml* .
+   flog $Log cp $FilesDir/txml* .
 
    source ../../../scripts/test-run
 
    if ($xstatus == 0) then
-      set Ref = $RootDir/sx/tests/ref/sxxml
+      set Ref = $FilesDir/ref/sxxml
       if (-f $Ref) then
          flog $Log diff sxxml.res $Ref
          set xstatus = $status

@@ -12,5 +12,5 @@ setenv Package  ppc
 setenv Test     $0:t
 source ../../../scripts/test-env
 
-set TEST = "cat $RootDir/ppc/DISCLAIMER"
+set TEST = "cat $SrcDir/DISCLAIMER"
 

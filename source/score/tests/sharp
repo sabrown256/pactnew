@@ -34,7 +34,7 @@ else
    set DataFiles = ( fltfil intfil regxfil tokfil )
 
    foreach i ($DataFiles)
-      flog $Log cp $TDir/$i .
+      flog $Log cp $FilesDir/$i .
    end
 
 #--------------------------------------------------------------------------

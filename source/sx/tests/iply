@@ -21,7 +21,7 @@ set exe = $BinDir/sx
       NoteD $Log -n "                       $t ..................... "
       Note $Log ""
 
-      set opt = ( -p -e -q $ZeroSpace -l $RootDir/sx/tests/$t.scm )
+      set opt = ( -p -e -q $ZeroSpace -l $FilesDir/$t.scm )
       set io  = $t.res
 
       flog $Log rm -f $t*.diff $t*.ps
@@ -31,8 +31,8 @@ set exe = $BinDir/sx
 
       if ($xstatus == 0) then
          foreach i ($t.ps)
-            if (-f $RootDir/sx/tests/ref/$i) then
-               flog $Log ($CFE $PSDIFF $i $RootDir/sx/tests/ref/$i >&! $i.diff)
+            if (-f $FilesDir/ref/$i) then
+               flog $Log ($CFE $PSDIFF $i $FilesDir/ref/$i >&! $i.diff)
                @ st = $status
                @ xstatus = $xstatus + $st
                Note $Log "Test $i:r status $st"

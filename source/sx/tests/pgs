@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "SX PGS Test .................. "
 set exe = $BinDir/sx
-set opt = ( -e -r -s $ZeroSpace -l $RootDir/sx/tests/sxpgs.scm )
+set opt = ( -e -r -s $ZeroSpace -l $FilesDir/sxpgs.scm )
 set io  = sxpgs.res
 
    NoteD $Log ""
@@ -22,7 +22,7 @@ set io  = sxpgs.res
    source ../../../scripts/test-run
 
    if ($xstatus == 0) then
-      flog $Log $cfe $PSDIFF sxpgs.ps $RootDir/sx/tests/ref/sxpgs.ps
+      flog $Log $cfe $PSDIFF sxpgs.ps $FilesDir/ref/sxpgs.ps
       set xstatus = $status
    endif
 

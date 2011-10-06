@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "PDBView Master Test .......... "
 set exe = $BinDir/sx
-set opt = ( -p -e -q $ZeroSpace -l $RootDir/sx/tests/pdbvtest.scm )
+set opt = ( -p -e -q $ZeroSpace -l $FilesDir/pdbvtest.scm )
 set io  = pdbvtest.tmp
 
    NoteD $Log ""
@@ -32,7 +32,7 @@ set io  = pdbvtest.tmp
          awk '(($1 != "%%CreationDate:") && !(($4 ~ /..:..:../) && ($5 ~ /199[0-9]/))) {print}' pdbvtest.ps > pdbvtest.ps.tmp
          flog $Log mv pdbvtest.ps.tmp pdbvtest.ps
 
-         flog $Log $cfe $PSDIFF pdbvtest.ps $RootDir/sx/tests/ref/pdbvtest.ps
+         flog $Log $cfe $PSDIFF pdbvtest.ps $FilesDir/ref/pdbvtest.ps
          set xstatus = $status
       endif
    endif

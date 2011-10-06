@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "SX PDB Attribute Test ........ "
 set exe = $BinDir/sx
-set opt = ( -e -r -s $ZeroSpace -l $RootDir/sx/tests/sxpdba.scm )
+set opt = ( -e -r -s $ZeroSpace -l $FilesDir/sxpdba.scm )
 set io  = sxpdba.res
 
    NoteD $Log ""
@@ -22,7 +22,7 @@ set io  = sxpdba.res
    source ../../../scripts/test-run
 
    if ($xstatus == 0) then
-      flog $Log (diff sxpdba.res $RootDir/sx/tests/ref/sxpdba > sxpdba.res.diff)
+      flog $Log (diff sxpdba.res $FilesDir/ref/sxpdba > sxpdba.res.diff)
       set xstatus = $status
    endif
 

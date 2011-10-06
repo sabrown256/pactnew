@@ -50,14 +50,13 @@ if ($RUN_TESTS == FALSE) then
 
 # run the tests
 
-else if (-e $RootDir/score/scstd.h) then
+else if (-e $SrcDir/scstd.h) then
    NoteD $Log ""
    NoteD $Log "SCORE TEST ..."
 
    Note $Log "BinDir           = $BinDir"
    Note $Log "path             = $path"
    Note $Log "MAKE             = $MAKE"
-   Note $Log "RootDir          = $RootDir"
    Note $Log "SrcDir           = $SrcDir"
    Note $Log "DORUN            = $DORUN"
    if ($?CFE == 1) then
@@ -79,18 +78,15 @@ else if (-e $RootDir/score/scstd.h) then
 
    foreach i ($Tests)
       $SrcDir/tests/$i
-      if ($status == 1) then
-         set ERROR = TRUE
-      endif
+      @ nerr = $nerr + $status
    end
 
-   $TEST_CHECK clean -n SCORE -e $ERROR -raf "$Tmp"
+   $TEST_CHECK clean -n SCORE -e $nerr -raf "$Tmp"
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+   set xstatus = $status
 
 endif
 
-$TEST_CHECK fin -e $ERROR
+$TEST_CHECK fin -e $xstatus
 
 exit($status)

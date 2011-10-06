@@ -31,10 +31,6 @@ NoteD $Log "                    $msg"
 
 set List = (1 2 3)
 
-flog $Log setenv PATH $RootDir/scripts:$PATH
-
-Note $Log "Path = $PATH"
-
 foreach t (ebasic emlt echr)
    Separator $Log
 

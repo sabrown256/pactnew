@@ -65,7 +65,6 @@ else if ($FC_Exe != none) then
    Note $Log "BinDir           = $BinDir"
    Note $Log "path             = $path"
    Note $Log "MAKE             = $MAKE"
-   Note $Log "RootDir          = $RootDir"
    Note $Log "SrcDir           = $SrcDir"
    Note $Log "DORUN            = $DORUN"
    if ($?CFE == 1) then
@@ -84,19 +83,16 @@ else if ($FC_Exe != none) then
 
    foreach i ($Tests)
       $SrcDir/tests/$i
-      if ($status == 1) then
-         set ERROR = TRUE
-      endif
+      @ nerr = $nerr + $status
    end
 
-   $TEST_CHECK clean -n FORTRAN -e $ERROR -raf "$Tmp"
+   $TEST_CHECK clean -n FORTRAN -e $nerr -raf "$Tmp"
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+   set xstatus = $status
 
 endif
 
-$TEST_CHECK fin -e $ERROR
+$TEST_CHECK fin -e $xstatus
 
 exit($status)
 
