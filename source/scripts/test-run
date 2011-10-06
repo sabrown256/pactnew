@@ -7,6 +7,8 @@
 # include "cpyright.h"
 #
 
+set t0 = `$TIMER -r`
+
 switch ($io)
    case ftee:
         if ("$Valgrind" == "") then
@@ -60,4 +62,8 @@ switch ($io)
         endif
         breaksw
 endsw
+
+setenv dt `$TIMER -b $t0`
+
+unset t0
 

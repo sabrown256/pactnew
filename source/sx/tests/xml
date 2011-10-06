@@ -38,7 +38,7 @@ set io  = sxxml.res
    flog $Log touch foo.sxxml sxxml.foo
    set rpf = ( $rpf sxxml.* *.sxxml )
 
-$TEST_CHECK part -a xml -e $xstatus -rpf "$rpf" none
+$TEST_CHECK part -a xml -e $xstatus -dt $dt -rpf "$rpf" none
 
 exit($status)
 

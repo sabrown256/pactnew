@@ -34,7 +34,7 @@ if ($CROSS_COMPILE == FALSE) then
 
 endif
 
-$TEST_CHECK part -a mmap -e $xstatus -x $exe -rpf "$rpf" "$msg"
+$TEST_CHECK part -a mmap -e $xstatus -dt $dt -x $exe -rpf "$rpf" "$msg"
 
 exit($status)
 

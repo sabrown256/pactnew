@@ -30,7 +30,7 @@ set io  = flog
          source ../../../scripts/test-run
       endif
 
-$TEST_CHECK part -a nan -e $xstatus -x $exe none
+$TEST_CHECK part -a nan -e $xstatus -dt $dt -x $exe none
 
 exit($status)
 

@@ -26,6 +26,7 @@ set io  = ulenv.log
    setenv DO_RUN_SUBMIT_ENV
 
 #   source ../../../scripts/test-run
+   set t0 = `$TIMER -r`
    if ("$Valgrind" == "") then
       flog $Log ($CFE $exe $opt \(end\) >&! ulenv.log)
       set xstatus = $status
@@ -36,10 +37,12 @@ set io  = ulenv.log
       set xstatus = `cat $Tmp`
       set rpf     = ( $rpf $Tmp )
    endif
+   set dt = `$TIMER -b $t0`
+   unset t0
    
    set rpf = ( $rpf ulenv.log )
 
-$TEST_CHECK part -a env -e $xstatus -rpf "$rpf" none
+$TEST_CHECK part -a env -e $xstatus -dt $dt -rpf "$rpf" none
 
 exit($status)
 

@@ -40,7 +40,7 @@ Note $Log ""
 
    set rpf = ( $rpf sclsts.res sclsts.res.diff )
 
-   $TEST_CHECK part -a score_lex -e $xstatus -x $exe -l -rpf "$rpf" none
+   $TEST_CHECK part -a score_lex -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 
    @ nerr = $nerr + $status
 
@@ -62,7 +62,7 @@ Note $Log ""
 
    source ../../../scripts/test-run
 
-   $TEST_CHECK part -a score_hash -e $xstatus -x $exe -l -rpf "$rpf" none
+   $TEST_CHECK part -a score_hash -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 
    @ nerr = $nerr + $status
 
@@ -81,6 +81,8 @@ Note $Log ""
       set exe = $BinDir/scompt
       set rpf = none
 
+      set t0 = `$TIMER -r`
+
       if ("$Valgrind" == "") then
          flog $Log ( echo 2 | $CFE $exe )
          set xstatus = $status
@@ -92,7 +94,10 @@ Note $Log ""
          set rpf     = ( $rpf $Tmp )
       endif
 
-      $TEST_CHECK part -a score_omp -e $xstatus -x $exe -l -rpf "$rpf" none
+      set dt = `$TIMER -b $t0`
+      unset t0
+
+      $TEST_CHECK part -a score_omp -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 
       @ nerr = $nerr + $status
 

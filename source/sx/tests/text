@@ -38,6 +38,6 @@ set io  = sxpdbt.res
    flog $Log touch sxpdbt.foo
    set rpf = ( $rpf sxpdbt.* )
 
-$TEST_CHECK part -a text -e $xstatus -rpf "$rpf" none
+$TEST_CHECK part -a text -e $xstatus -dt $dt -rpf "$rpf" none
 
 exit($status)

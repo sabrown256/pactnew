@@ -28,6 +28,6 @@ set io  = sxpgs.res
 
    set rpf = ( $rpf sxpgs.ps )
 
-$TEST_CHECK part -a pgs -e $xstatus -rpf "$rpf" none
+$TEST_CHECK part -a pgs -e $xstatus -dt $dt -rpf "$rpf" none
 
 exit($status)

@@ -228,4 +228,5 @@ set rpf     = none
 @ nerr      = 0
 
 setenv t0 `$TIMER -r`
+setenv dt -1
 

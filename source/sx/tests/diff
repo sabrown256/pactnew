@@ -32,7 +32,6 @@ set PDBDiff = "$CFE $BinDir/pdbdiff -e -x -q $ZeroSpace"
       NoteD $Log "                       Making data failed"
       @ nerr = $nerr + 1
    else
-      set t0 = `$TIMER -r`
 
       Note $Log "PDBDiff = |$PDBDiff|"
       Note $Log "SCHEME  = |$SCHEME|"
@@ -48,10 +47,14 @@ set PDBDiff = "$CFE $BinDir/pdbdiff -e -x -q $ZeroSpace"
 # test 1 - all mappings
       NoteD $Log -n "                       All mappings .............. "
       Note $Log ""
+
+      set t0 = `$TIMER -r`
+
       flog $Log ($PDBDiff -v -w pdbda.dat pdbdb.dat >>& pdbd.res)
       set xstatus = $status
 
       set dt = `$TIMER -b $t0`
+      unset t0
 
       if (($xstatus == 254) || ($xstatus == 255)) then
          NoteD $Log "omitted"

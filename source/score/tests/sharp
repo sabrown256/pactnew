@@ -50,7 +50,7 @@ else
 
    source ../../../scripts/test-run
 
-   $TEST_CHECK part -a sharp_scctl -e $xstatus -x $exe -l -rpf "$rpf" none
+   $TEST_CHECK part -a sharp_scctl -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 
    @ nerr = $nerr + $status
 
@@ -67,7 +67,7 @@ else
 
    source ../../../scripts/test-run
 
-   $TEST_CHECK part -a sharp_memc -e $xstatus -x $exe -l -rpf "$rpf" none
+   $TEST_CHECK part -a sharp_memc -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 
    @ nerr = $nerr + $status
 
@@ -84,7 +84,7 @@ else
 
    source ../../../scripts/test-run
 
-   $TEST_CHECK part -a sharp_str -e $xstatus -x $exe -l -rpf "$rpf" none
+   $TEST_CHECK part -a sharp_str -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 
    @ nerr = $nerr + $status
 
@@ -101,7 +101,7 @@ else
 
    source ../../../scripts/test-run
 
-   $TEST_CHECK part -a sharp_vsnprintf -e $xstatus -x $exe -l -rpf "$rpf" none
+   $TEST_CHECK part -a sharp_vsnprintf -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 
    @ nerr = $nerr + $status
 

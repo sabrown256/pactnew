@@ -23,6 +23,6 @@ source ../../../scripts/test-run
 
 set rpf = ( $rpf foo.pdb )
 
-$TEST_CHECK part -a cast -e $xstatus -x $exe -rpf "$rpf" none
+$TEST_CHECK part -a cast -e $xstatus -dt $dt -x $exe -rpf "$rpf" none
 
 exit($status)

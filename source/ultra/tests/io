@@ -21,6 +21,6 @@ set io  = uliot.log
 
    source ../../../scripts/test-run
 
-$TEST_CHECK part -a io -e $xstatus -rpf "$rpf" none
+$TEST_CHECK part -a io -e $xstatus -dt $dt -rpf "$rpf" none
 
 exit($status)

@@ -25,6 +25,6 @@ set io  = shproc.res
       set rpf = ( $rpf shproc.res shproc.res.diff )
    endif
 
-$TEST_CHECK part -a proc -e $xstatus -rpf "$rpf" none
+$TEST_CHECK part -a proc -e $xstatus -dt $dt -rpf "$rpf" none
 
 exit($status)

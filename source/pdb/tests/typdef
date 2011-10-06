@@ -36,6 +36,6 @@ endif
 
 set rpf = ( $rpf out.pdb )
 
-$TEST_CHECK part -a typdef -e $xstatus -x $exe -rpf "$rpf" none
+$TEST_CHECK part -a typdef -e $xstatus -dt $dt -x $exe -rpf "$rpf" none
 
 exit($status)

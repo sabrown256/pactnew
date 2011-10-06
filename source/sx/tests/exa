@@ -51,6 +51,6 @@ set io  = pdbvbatch.res
       set rpf = ( $rpf A.ps B.ps C.ps plots.ps )
    endif
 
-$TEST_CHECK part -a exa -e $xstatus -rpf "$rpf" none
+$TEST_CHECK part -a exa -e $xstatus -dt $dt -rpf "$rpf" none
 
 exit($status)

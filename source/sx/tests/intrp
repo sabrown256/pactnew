@@ -37,6 +37,6 @@ set io  = pdbvinterp.tmp
    set rpf = ( $rpf pdbvinterp.err pdbvinterp.tmp )
    set rpf = ( $rpf 3x1.ps )
 
-$TEST_CHECK part -a intrp -e $xstatus -rpf "$rpf" none
+$TEST_CHECK part -a intrp -e $xstatus -dt $dt -rpf "$rpf" none
 
 exit($status)

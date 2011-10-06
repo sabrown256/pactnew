@@ -35,7 +35,7 @@ set msg = "PGS MPEG Test .......... "
 
       source ../../../scripts/test-run
 
-      $TEST_CHECK part -a mpeg1 -e $xstatus -l -x $exe -rpf "$rpf" none
+      $TEST_CHECK part -a mpeg1 -e $xstatus -dt $dt -l -x $exe -rpf "$rpf" none
 
       @ nerr = $nerr + $status
 
@@ -47,7 +47,7 @@ set msg = "PGS MPEG Test .......... "
 
       source ../../../scripts/test-run
 
-      $TEST_CHECK part -a mpeg2 -e $xstatus -l -x $exe -rpf "$rpf" none
+      $TEST_CHECK part -a mpeg2 -e $xstatus -dt $dt -l -x $exe -rpf "$rpf" none
 
       @ nerr = $nerr + $status
 

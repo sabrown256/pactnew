@@ -46,6 +46,6 @@ set io  = sxhash.res.tmp
       set rpf = ( $rpf sxhash.res.tmp sxhash.res sxhash.res.diff )
    endif
 
-$TEST_CHECK part -a hash -e $xstatus -rpf "$rpf" none
+$TEST_CHECK part -a hash -e $xstatus -dt $dt -rpf "$rpf" none
 
 exit($status)

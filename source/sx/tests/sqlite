@@ -40,6 +40,6 @@ if (($HAVE_SQLITE == yes) && ($?IBM_BGP == 0)) then
 
 endif
 
-$TEST_CHECK part -a sqlite -e $xstatus -rpf "$rpf" none
+$TEST_CHECK part -a sqlite -e $xstatus -dt $dt -rpf "$rpf" none
 
 exit($status)

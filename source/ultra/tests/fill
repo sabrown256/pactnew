@@ -25,7 +25,7 @@ set io  = ulfill.log
 
    flog $Log (grep -i "error" ulfill.log >&! ulfill.err)
 
-$TEST_CHECK part -a fill -e $xstatus -rpf "$rpf" none
+$TEST_CHECK part -a fill -e $xstatus -dt $dt -rpf "$rpf" none
 
 exit($status)
 

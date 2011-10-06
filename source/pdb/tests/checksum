@@ -21,7 +21,7 @@ Note $Log ""
 
 source ../../../scripts/test-run
 
-$TEST_CHECK part -a checksum -e $xstatus -x $exe "$msg"
+$TEST_CHECK part -a checksum -e $xstatus -dt $dt -x $exe "$msg"
 
 exit($status)
 

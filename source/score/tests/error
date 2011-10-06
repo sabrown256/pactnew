@@ -26,7 +26,7 @@ set io  = ftee
 
    source ../../../scripts/test-run
 
-$TEST_CHECK part -a error -e $xstatus -x $exe -rpf "$rpf" "$msg"
+$TEST_CHECK part -a error -e $xstatus -dt $dt -x $exe -rpf "$rpf" "$msg"
 
 exit($status)
 

@@ -56,7 +56,7 @@ if ($xstatus == 0) then
 
       source ../../../scripts/test-run
 
-      $TEST_CHECK part -a pdb_manual -e $xstatus -x $exe -l -rpf "$rpf" none
+      $TEST_CHECK part -a pdb_manual -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 
       @ nerr = $nerr + $status
 
@@ -74,7 +74,7 @@ if ($xstatus == 0) then
 
       source ../../../scripts/test-run
 
-      $TEST_CHECK part -a pdb_auto -e $xstatus -x $exe -l -rpf "$rpf" none
+      $TEST_CHECK part -a pdb_auto -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 
       @ nerr = $nerr + $status
 
@@ -92,7 +92,7 @@ if ($xstatus == 0) then
 
       source ../../../scripts/test-run
 
-      $TEST_CHECK part -a pdb_hyper -e $xstatus -x $exe -l -rpf "$rpf" none
+      $TEST_CHECK part -a pdb_hyper -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 
       @ nerr = $nerr + $status
 
@@ -118,7 +118,7 @@ if ($xstatus == 0) then
 
          source ../../../scripts/test-run
 
-         $TEST_CHECK part -a pdb_dp -e $xstatus -x $exe -l -rpf "$rpf" none
+         $TEST_CHECK part -a pdb_dp -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 
          @ nerr = $nerr + $status
       endif

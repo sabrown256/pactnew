@@ -26,6 +26,6 @@ set io  = flog
 
    set rpf = ( $rpf '#tmp#' mmtst.scm )
 
-$TEST_CHECK part -a mem -e $xstatus -rpf "$rpf" none
+$TEST_CHECK part -a mem -e $xstatus -dt $dt -rpf "$rpf" none
 
 exit($status)

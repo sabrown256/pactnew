@@ -53,10 +53,8 @@ if ($xstatus == 0) then
    flog $Log $AR $AROpt libar.a f*.o
    flog $Log $AR -t libar.a
 
-   setenv t0 `$TIMER -r`
    source ../../../scripts/test-run
 
-   set dt  = `$TIMER -b $t0`
    set rpf = ( $rpf f*.o libar.a )
    flog $Log cat libar.a
 
@@ -76,7 +74,6 @@ if ($xstatus == 0) then
    set opt = ( -a $LibDir/libscore.a )
    set io  = flog
 
-   setenv t0 `$TIMER -r`
    source ../../../scripts/test-run
 
    @ NL = `$CFE $exe $opt | sort | wc -l`
@@ -87,8 +84,6 @@ if ($xstatus == 0) then
 
    Note $Log "fcscan count = $NL"
    Note $Log "ar     count = $NLAr"
-
-   set dt = `$TIMER -b $t0`
 
    $TEST_CHECK part -a ar_work -e $xstatus -l -dt $dt -rpf "$rpf" none
 
