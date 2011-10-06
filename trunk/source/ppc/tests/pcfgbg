@@ -15,8 +15,8 @@
 # include "cpyright.h"
 #
 
-set Exe    = `which pact`
-set Root   = $Exe:h
+set exe    = `which pact`
+set Root   = $exe:h
 set Root   = $Root:h
 set BinDir = $Root/bin
 set IncDir = $Root/include
@@ -52,9 +52,9 @@ InitLog Log $cwd/log.fgbg.$LogSfx
 
 Note $Log "Mode = $Mode"
 
-set PCEXEC = pcexec
-set DMNZ   = ( dmnz -i 5 -n 1 )
-set InF    = $SrcDir/tests/pcfgbg.inp
+set exe  = $BinDir/pcexec
+set DMNZ = ( dmnz -i 5 -n 1 )
+set InF  = $SrcDir/tests/pcfgbg.inp
 
 flog $Log pushd $SrcDir
 flog $Log pact proc
@@ -140,7 +140,7 @@ while ($iline <= $nlines)
 # run via pipe, socket, and pty
    foreach i ("-p" "-s" "-t")
       Separator $Log
-      flog $Log $CFE $DMNZ $PCEXEC -q -d $i /bin/csh -cf "$c"
+      flog $Log $CFE $DMNZ $exe -q -d $i /bin/csh -cf "$c"
       set LStat = $status
       if (($LStat == 0) || ("$ct" =~ stty*)) then
          Note $Log "passed"

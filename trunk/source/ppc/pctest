@@ -60,9 +60,7 @@ else if (-e $BinDir/pcexec) then
    NoteD $Log "PPC TEST ..."
 
    Note $Log "BinDir = $BinDir"
-   Note $Log "path   = $path"  
    Note $Log "MAKE   = $MAKE"
-   Note $Log "PCEXEC = $PCEXEC"
 
    setenv Tmp $cwd/.tmp.$$
 
@@ -70,7 +68,7 @@ else if (-e $BinDir/pcexec) then
    flog $Log ../../../manager/pwhich pact
    flog $Log ../../../manager/pwhich cc
 
-# Build PPC tests
+# build PPC tests
 
    NoteD $Log ""
    NoteD $Log -n "                    Building PPC Test Programs ..... "
@@ -82,17 +80,16 @@ else if (-e $BinDir/pcexec) then
 
    flog $Log pushd $SrcDir
    flog $Log $MAKE Cstd
-   set TStatus = $status
+   set xstatus = $status
    flog $Log popd
 
-   if ($TStatus != 0) then
+   if ($xstatus != 0) then
       NoteD $Log ""
       NoteD $Log "                    Can't build Standard PPC Test Programs"
-      set ERROR = "TRUE"
    else
       NoteD $Log "DONE"
 
-      set TEST = "cat $RootDir/ppc/DISCLAIMER"
+      set TEST = "cat $SrcDir/DISCLAIMER"
 
       if ("$Tests" == "") then
          set Tests = ""
@@ -101,20 +98,17 @@ else if (-e $BinDir/pcexec) then
 
       foreach i ($Tests)
          $SrcDir/tests/$i
-         if ($status == 1) then
-            set ERROR = TRUE
-         endif
+         @ nerr = $nerr + $status
       end
+
+      $TEST_CHECK clean -n PPC -e $nerr -raf "$Tmp"
+
+      set xstatus = $status
+
    endif
-
-   $TEST_CHECK clean -n PPC -e $ERROR -raf "$Tmp"
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
 endif
 
-$TEST_CHECK fin -e $ERROR
+$TEST_CHECK fin -e $xstatus
 
 exit($status)
 

@@ -35,8 +35,7 @@ NoteD $Log "                    $msg"
 
 set List = (subr1 subr2 subr3 subr4)
 
-flog $Log cp $RootDir/scripts/tests/{subr*} .
-flog $Log setenv PATH $RootDir/scripts:$PATH
+flog $Log cp $SrcDir/tests/{subr*} .
 
 foreach t ($List)
    Separator $Log

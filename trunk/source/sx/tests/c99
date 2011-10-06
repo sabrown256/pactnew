@@ -12,19 +12,19 @@ source ../../tests/common
 
 set msg = "SX PDB C99 Test .............. "
 set exe = $BinDir/sx
-set opt = ( -e -r -s $ZeroSpace -l $RootDir/sx/tests/sxc99.scm )
+set opt = ( -e -r -s $ZeroSpace -l $FilesDir/sxc99.scm )
 set io  = sxc99.res
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"
    Note $Log ""
 
-   flog $Log cp $TDir/sxpdbg.scm .
+   flog $Log cp $FilesDir/sxpdbg.scm .
 
    source ../../../scripts/test-run
 
    if ($xstatus == 0) then
-      flog $Log (diff sxc99.res $RootDir/sx/tests/ref/sxc99 > sxc99.res.diff)
+      flog $Log (diff sxc99.res $FilesDir/ref/sxc99 > sxc99.res.diff)
       set xstatus = $status
    endif
 

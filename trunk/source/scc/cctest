@@ -54,7 +54,7 @@ if ($RUN_TESTS == FALSE) then
 
 # run the tests
 
-else if (-e $RootDir/scc/scc_int.h) then
+else if (-e $SrcDir/scc_int.h) then
 
    NoteD $Log ""
    NoteD $Log "SCC TEST ....."
@@ -62,7 +62,6 @@ else if (-e $RootDir/scc/scc_int.h) then
    Note $Log "BinDir  = $BinDir"
    Note $Log "path    = $path"
    Note $Log "MAKE    = $MAKE"
-   Note $Log "RootDir = $RootDir"
    Note $Log "SrcDir  = $SrcDir"
    Note $Log "DORUN   = $DORUN"
 
@@ -80,19 +79,16 @@ else if (-e $RootDir/scc/scc_int.h) then
 
    foreach i ($Tests)
       $SrcDir/tests/driver $i
-      if ($status == 1) then
-         set ERROR = TRUE
-      endif
+      @ nerr = $nerr + $status
    end
 
-   $TEST_CHECK clean -n SCC -e $ERROR
+   $TEST_CHECK clean -n SCC -e $nerr
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+   set xstatus = $status
 
 endif
 
-$TEST_CHECK fin -e $ERROR
+$TEST_CHECK fin -e $xstatus
 
 exit($status)
 

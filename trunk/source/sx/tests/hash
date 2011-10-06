@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "SX HASH Test ................. "
 set exe = $BinDir/sx
-set opt = ( -e -r -s $ZeroSpace -l $RootDir/sx/tests/sxhash.scm )
+set opt = ( -e -r -s $ZeroSpace -l $FilesDir/sxhash.scm )
 set io  = sxhash.res.tmp
 
    set sys = `uname`
@@ -39,7 +39,7 @@ set io  = sxhash.res.tmp
              -e 's/long_long/long/g'   \
              -e 's/#([^A-Za-z)]*)//g' > sxhash.res
 
-         flog $Log (diff -b sxhash.res $RootDir/sx/tests/ref/sxhash > sxhash.res.diff)
+         flog $Log (diff -b sxhash.res $FilesDir/ref/sxhash > sxhash.res.diff)
          set xstatus = $status
       endif
 

@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "SX PDB Archive Test .......... "
 set exe = $BinDir/sx
-set opt = ( -e -p -q $ZeroSpace -l $RootDir/sx/tests/pdbvar.scm )
+set opt = ( -e -p -q $ZeroSpace -l $FilesDir/pdbvar.scm )
 set io  = pdbvar.res
 
 NoteD $Log ""
@@ -30,7 +30,7 @@ if (($THREADING == no) && ($HAVE_MPI == no)) then
    source ../../../scripts/test-run
 
    if ($xstatus == 0) then
-      set Ref = $RootDir/sx/tests/ref/pdbvar
+      set Ref = $FilesDir/ref/pdbvar
       if (-f $Ref) then
          flog $Log diff pdbvar.res $Ref
          set xstatus = $status

@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "PML Checksum Test ...... "
 set exe = $BinDir/mlckts
-set opt = ( $RootDir/pml/mlcmsh.c )
+set opt = ( $SrcDir/mlcmsh.c )
 set io  = checksum.res
 
    NoteD $Log ""
@@ -21,7 +21,6 @@ set io  = checksum.res
    flog $Log pushd $SrcDir
    flog $Log $MAKE checksum
    set xstatus = $status
-   set Ref     = $cwd/tests/ref/checksum
    flog $Log popd
 
    if ($xstatus != 0) then
@@ -30,6 +29,7 @@ set io  = checksum.res
    else
       source ../../../scripts/test-run
 
+      set Ref = $RefDir/checksum
       if ((-f $Ref) && ("$Valgrind" == "") && ($xstatus == 0)) then
          flog $Log (diff checksum.res $Ref >&! checksum.diff)
          set xstatus = $status

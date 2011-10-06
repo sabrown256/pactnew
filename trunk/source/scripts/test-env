@@ -7,6 +7,7 @@
 # include "cpyright.h"
 #
 
+unalias *
 umask 007
 
 setenv TestScrDir $cwd
@@ -96,10 +97,7 @@ setenv ZeroSpace  "-z 2"
 
    setenv TestDir   $SrcDir/z-$System/test
    setenv FilesDir  $SrcDir/tests
-
-# GOTCHA: clean these up
-   set TDir   = $SrcDir/tests
-   set RefDir = $TDir/ref
+   setenv RefDir    $FilesDir/ref
 
    setenv TIMER     $BinDir/timer
    setenv MAKE      $BinDir/pact
@@ -156,14 +154,7 @@ setenv ZeroSpace  "-z 2"
       setenv HaveIPC  YES
    endif
 
-   set Ultra = "$CFE $BinDir/ultra -e -r -x -q -s $ZeroSpace"
-
 set path = ( . $BinDir $path )
-
-set PCEXEC  = "$BinDir/pcexec"
-set SX      = "$CFE $BinDir/sx -e -r -s $ZeroSpace"
-set PDBView = "$CFE $BinDir/sx -e -p -q $ZeroSpace"
-set PDBDiff = "$CFE $BinDir/pdbdiff -e -x -q $ZeroSpace"
 
 setenv SCHEME $RootDir/scheme/applications
 setenv SCHEME $RootDir/scheme/applications/extensions:${SCHEME}
@@ -196,8 +187,6 @@ Note $Log "Log:     $Log"
 Note $Log ""
 
 Separator $Log
-
-set ERROR = "FALSE"
 
 if ("$Valgrind" != "") then
    Note $Log "Using valgrind: $VG"

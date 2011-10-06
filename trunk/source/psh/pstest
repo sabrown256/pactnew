@@ -13,7 +13,6 @@ setenv Test    ""
 set vgdirs = ( score )
 source ../scripts/test-env
 
-set ERROR = FALSE
 set Tests = ""
 
 while ($#argv > 0)
@@ -62,19 +61,16 @@ else
 
    foreach i ($Tests)
       $SrcDir/tests/$i
-      if ($status == 1) then
-         set ERROR = TRUE
-      endif
+      @ nerr = $nerr + $status
    end
    
-   $TEST_CHECK clean -n PSH -e $ERROR
+   $TEST_CHECK clean -n PSH -e $nerr
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+   set xstatus = $status
 
 endif
 
-$TEST_CHECK fin -e $ERROR
+$TEST_CHECK fin -e $xstatus
 
 exit($status)
 

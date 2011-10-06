@@ -16,7 +16,7 @@ set msg = "Basic Test ..................... "
    NoteD $Log -n "                    $msg"
    Note $Log ""
 
-   flog $Log $CFE $PYTHON $RootDir/pya/tests/basic.py
+   flog $Log $CFE $PYTHON $FilesDir/basic.py
    set xstatus = $status
 
    flog $Log touch foo.pyc

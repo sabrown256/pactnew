@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "ULTRA Memory Test ............ "
 set exe = $BinDir/ultra
-set opt = ( -e -r -x -q -s $ZeroSpace -n -l $TDir/ulmmt.scm )
+set opt = ( -e -r -x -q -s $ZeroSpace -n -l $FilesDir/ulmmt.scm )
 set io  = ulmmt.log
 
    NoteD $Log ""

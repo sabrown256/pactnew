@@ -60,7 +60,6 @@ else if (-f $LPYTHON/pact/pdb.py) then
    Note $Log "BinDir     = $BinDir"
    Note $Log "path       = $path"
    Note $Log "MAKE       = $MAKE"
-   Note $Log "RootDir    = $RootDir"
    Note $Log "SrcDir     = $SrcDir"
    Note $Log "PYTHONPATH = $PYTHONPATH"
    Note $Log "python     = $PYTHON"
@@ -82,19 +81,16 @@ else if (-f $LPYTHON/pact/pdb.py) then
 
    foreach i ($Tests)
       $SrcDir/tests/$i
-      if ($status == 1) then
-         set ERROR = TRUE
-      endif
+      @ nerr = $nerr + $status
    end
 
-   $TEST_CHECK clean -n PYTHON -e $ERROR -raf "../testfile"
+   $TEST_CHECK clean -n PYTHON -e $nerr -raf "../testfile"
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+   set xstatus = $status
 
 endif
 
-$TEST_CHECK fin -e $ERROR
+$TEST_CHECK fin -e $xstatus
 
 exit($status)
 

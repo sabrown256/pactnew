@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "PANACEA ABC Test .............. "
 
-if (-d $RootDir/panacea/abc) then
+if (-d $SrcDir/abc) then
    NoteD $Log ""
    NoteD $Log -n "                    Building PANACEA ABC Test ....."
    Note $Log ""

@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "SX PDB Text Test ............. "
 set exe = $BinDir/sx
-set opt = ( -p -e -q $ZeroSpace -l $RootDir/sx/tests/sxpdbt.scm )
+set opt = ( -p -e -q $ZeroSpace -l $FilesDir/sxpdbt.scm )
 set io  = sxpdbt.res
 
    NoteD $Log ""
@@ -21,12 +21,12 @@ set io  = sxpdbt.res
 
    flog $Log rm -f sxpdbt.log sxpdbt.ttx sxpdbt.a sxpdbt.res
 
-   flog $Log cp $TDir/sxpdbg.scm .
+   flog $Log cp $FilesDir/sxpdbg.scm .
 
    source ../../../scripts/test-run
 
    if ($xstatus == 0) then
-      set Ref = $RootDir/sx/tests/ref/sxpdbt
+      set Ref = $FilesDir/ref/sxpdbt
       if (-f $Ref) then
          flog $Log diff sxpdbt.res $Ref
          set xstatus = $status
