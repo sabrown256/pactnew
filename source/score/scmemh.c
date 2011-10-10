@@ -39,11 +39,11 @@ static void _SC_mem_history(int act, void *a)
     double t[2], dt;
     SC_heap_des *ph;
     SC_mem_hst *hst;
-    mem_descriptor *space;
+    mem_descriptor *desc;
 
-    space = (mem_descriptor *) a;
+    desc = (mem_descriptor *) a;
 
-    ph = space->heap;
+    ph = desc->heap;
     if (ph->ring == NULL)
        _SC_mem_hst_init(ph);
 
@@ -63,10 +63,10 @@ static void _SC_mem_history(int act, void *a)
     hst->ncall++;
     hst->action = act;
     hst->time   = dt;
-    hst->space  = space;
-    hst->nb     = space->length;
+    hst->space  = desc;
+    hst->nb     = desc->length;
     if (act == SC_MEM_ALLOC)
-       hst->name = (char *) space->where.pfunc;
+       hst->name = (char *) desc->desc.info.pfunc;
     else
        hst->name = NULL;
 

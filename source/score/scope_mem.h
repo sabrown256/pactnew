@@ -78,14 +78,18 @@
 
 /*--------------------------------------------------------------------------*/
 
+#define SC_SET_BLOCK_ID(_d, _v)   ((_d)->desc.info.idt = _v)
+#define SC_GET_BLOCK_ID(_d)       ((_d)->desc.info.idt)
+
 #define SCORE_BLOCK_P(_d)                                                   \
-    (((_d)->id) == SC_MEM_ID)
+    (SC_GET_BLOCK_ID(_d) == SC_MEM_ID)
 
 #define FREE_SCORE_BLOCK_P(_d)                                              \
-    (((_d)->ref_count == SC_MEM_MFA) && ((_d)->type == SC_MEM_MFB))
+    (((_d)->desc.info.ref_count == SC_MEM_MFA) &&                           \
+     ((_d)->desc.info.type == SC_MEM_MFB))
 
-#define FF_NAME(desc)                                                       \
-    ((SC_FF_NAME_MASK & (desc)->id) != 0)
+#define FF_NAME(_d)                                                         \
+    ((SC_FF_NAME_MASK & SC_GET_BLOCK_ID(_d)) != 0)
 
 #define _SC_ALLOC_N     SC_gs.mm.alloc_n
 #define _SC_REALLOC_N   SC_gs.mm.realloc_n
@@ -142,6 +146,38 @@ struct s_SC_memfncs
     PFFree free;
     PFRealloc realloc;};
 
+typedef struct s_mem_inf mem_inf;
+
+struct s_mem_inf
+   {const char *pfile;
+    const char *pfunc;
+    unsigned int line;
+#if 0
+#if 0
+    unsigned int ida : 2;
+    unsigned int initialized : 1;
+    unsigned int ref_count : 15;
+    unsigned int idb : 2;
+    int type : 10;
+    unsigned int idc : 2;
+#else
+    unsigned int initialized : 1;
+    unsigned int ref_count : 15;
+    int type : 16;
+#endif
+#else
+    char initialized;
+    short ref_count;
+    short type;
+#endif
+    long idt;};
+
+typedef union u_mem_infu mem_infu;
+
+union u_mem_infu
+   {mem_inf info;
+    SC_srcloc where;};
+
 /* use the mem_header struct to force alignment to that of a double
  * this solves all alignment problems (especially for RISC chips)
  */
@@ -151,11 +187,7 @@ struct s_mem_descriptor
     mem_header *next;
     SC_heap_des *heap;
     long length;
-    long id;
-    char initialized;
-    short ref_count;
-    short type;
-    SC_srcloc where;};
+    mem_infu desc;};
 
 union u_mem_header
    {mem_descriptor block;

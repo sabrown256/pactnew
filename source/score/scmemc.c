@@ -236,17 +236,21 @@ void _SC_assign_block(SC_heap_des *ph, mem_header *space,
 		      long nb, char *func, char *file, int line)
    {mem_descriptor *desc;
     mem_header *prev, *next, *lb;
+    mem_inf *info;
 
     desc = &space->block;
+    info = &desc->desc.info;
 
-    desc->id          = SC_MEM_ID;
     desc->heap        = ph;
-    desc->ref_count   = 0;
-    desc->type        = 0;
     desc->length      = nb;
-    desc->where.pfunc = func;
-    desc->where.pfile = file;
-    desc->where.line  = line;
+
+    info->pfunc     = func;
+    info->pfile     = file;
+    info->line      = line;
+    info->ref_count = 0;
+    info->type      = 0;
+
+    SC_SET_BLOCK_ID(desc, SC_MEM_ID);
 
     lb = ph->latest_block;
     if (lb != NULL)
@@ -272,21 +276,23 @@ void _SC_assign_block(SC_heap_des *ph, mem_header *space,
 
 void _SC_deassign_block(SC_heap_des *ph, mem_descriptor *desc,
 			void *addr)
-   {
+   {mem_inf *info;
 
-    desc->prev = NULL;
-    desc->next = NULL;
-    desc->heap = ph;
+    info = &desc->desc.info;
 
-    desc->length      = 0L;
-    desc->id          = SC_MEM_ID;
-    desc->initialized = FALSE;
-    desc->ref_count   = SC_MEM_MFA;
-    desc->type        = SC_MEM_MFB;
+    desc->prev   = NULL;
+    desc->next   = NULL;
+    desc->heap   = ph;
+    desc->length = 0L;
 
-    desc->where.pfunc = (char *) addr;
-    desc->where.pfile = NULL;
-    desc->where.line  = -1;
+    info->pfunc       = (char *) addr;
+    info->pfile       = NULL;
+    info->line        = -1;
+    info->initialized = FALSE;
+    info->ref_count   = SC_MEM_MFA;
+    info->type        = SC_MEM_MFB;
+
+    SC_SET_BLOCK_ID(desc, SC_MEM_ID);
 
     return;}
 
@@ -435,6 +441,7 @@ int SC_is_free_space(void *p, mem_header **psp, mem_descriptor **pds)
    {int ok;
     mem_header *space;
     mem_descriptor *desc;
+    mem_inf *info;
 
     space = NULL;
     desc  = NULL;
@@ -442,6 +449,7 @@ int SC_is_free_space(void *p, mem_header **psp, mem_descriptor **pds)
     if (p != NULL)
        {space = ((mem_header *) p) - 1;
 	desc  = &space->block;
+	info  = &desc->desc.info;
 	ok    = (SCORE_BLOCK_P(desc) && FREE_SCORE_BLOCK_P(desc));};
 
     if (psp != NULL)
@@ -463,6 +471,7 @@ int SC_is_active_space(void *p, mem_header **psp, mem_descriptor **pds)
    {int ok;
     mem_header *space;
     mem_descriptor *desc;
+    mem_inf *info;
 
     space = NULL;
     desc  = NULL;
@@ -470,6 +479,7 @@ int SC_is_active_space(void *p, mem_header **psp, mem_descriptor **pds)
     if (p != NULL)
        {space = ((mem_header *) p) - 1;
 	desc  = &space->block;
+	info  = &desc->desc.info;
 	ok    = (SCORE_BLOCK_P(desc) && !FREE_SCORE_BLOCK_P(desc));};
 
     if (psp != NULL)

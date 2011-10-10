@@ -59,6 +59,7 @@ static long _SC_count_tagged(int flag)
     SC_heap_des *ph;
     mem_header *space;
     mem_descriptor *desc;
+    mem_inf *info;
 
     ph = _SC_tid_mm();
 
@@ -72,7 +73,8 @@ static long _SC_count_tagged(int flag)
 	     space = space->block.next, i++)
 	    {desc = &space->block;
 	     if (SCORE_BLOCK_P(desc))
-	        {acc = ((flag & 8) || (desc->ref_count != UNCOLLECT));
+	        {info = &desc->desc.info;
+	         acc  = ((flag & 8) || (info->ref_count != UNCOLLECT));
 		 if (acc == TRUE)
 		    {nb   = desc->length;
 		     name = _SC_block_name(desc);
@@ -116,8 +118,9 @@ static int _SC_list_block_info(char *s, SC_heap_des *ph, void *ptr,
     long mad, nb;
     char t[MAXLINE];
     char *name;
-    mem_descriptor *desc;
     mem_header *space, *prev, *next;
+    mem_descriptor *desc;
+    mem_inf *info;
     SC_address ad;
 
     rv = FALSE;
@@ -127,13 +130,14 @@ static int _SC_list_block_info(char *s, SC_heap_des *ph, void *ptr,
     mad        = ad.mdiskaddr;
 
     desc = &space->block;
+    info = &desc->desc.info;
 
+    name = _SC_block_name(desc);
     prev = desc->prev;
     next = desc->next;
-    name = _SC_block_name(desc);
-    nr   = desc->ref_count;
-    ty   = desc->type;
     nb   = desc->length;
+    nr   = info->ref_count;
+    ty   = info->type;
 	      
     nmok = SC_pointer_ok(name);
 
@@ -627,19 +631,21 @@ long SC_mem_monitor(int old, int lev, char *id, char *msg)
 
 /* _SC_MEM_NGB - determine whether MD is nearest to the B block in ST */
 
-static int _SC_mem_ngb(SC_heap_des *ph, mem_descriptor *md,
+static int _SC_mem_ngb(SC_heap_des *ph, mem_descriptor *desc,
 		       mem_kind wh, void *a, long i, long j)
    {int ok, skip;
     char *ae, *bs, *be, *cs, *ts, *te;
     mem_descriptor *ma, *mb, *mc;
+    mem_inf *info;
     ngbdes *st;
 
     ok = TRUE;
     st = (ngbdes *) a;
 
-    skip = ((md->ref_count == UNCOLLECT) && ((st->flag & 8) == 0));
+    info = &desc->desc.info;
+    skip = ((info->ref_count == UNCOLLECT) && ((st->flag & 8) == 0));
 
-    if (SCORE_BLOCK_P(md) && (skip == FALSE))
+    if (SCORE_BLOCK_P(desc) && (skip == FALSE))
        {ma = st->a;
 	if (ma == NULL)
 	   ae = NULL;
@@ -656,18 +662,18 @@ static int _SC_mem_ngb(SC_heap_des *ph, mem_descriptor *md,
 	else
 	   cs = (char *) mc;
 
-	ts = (char *) md;
-	te = ts + md->length + ph->hdr_size;
+	ts = (char *) desc;
+	te = ts + desc->length + ph->hdr_size;
 
-/* if MD is between A and B make it the new A */
+/* if DESC is between A and B make it the new A */
 	if ((ae - ts < 0) && (te - bs <= 0))
-	   st->a = md;
+	   st->a = desc;
 
-/* if MD is between B and C make it the new C */
+/* if DESC is between B and C make it the new C */
 	if ((be - ts < 0) && (te - cs <= 0))
-	   st->c = md;
+	   st->c = desc;
 
-	ok = SC_pointer_ok((void *) md->where.pfunc);};
+	ok = SC_pointer_ok((void *) info->pfunc);};
 
     return(ok);}
 
@@ -717,14 +723,15 @@ int SC_mem_neighbor(void *p, int flag, void *b, void *a)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_MEM_OBJ_TRACE - perform object trace on MD if it meets critera */
+/* _SC_MEM_OBJ_TRACE - perform object trace on DESC if it meets critera */
 
-static int _SC_mem_obj_trace(SC_heap_des *ph, mem_descriptor *md,
+static int _SC_mem_obj_trace(SC_heap_des *ph, mem_descriptor *desc,
 			     mem_kind wh, void *a, long i, long j)
    {int it, type, ok;
     long ib, nb;
     char *name;
     mem_header *space;
+    mem_inf *info;
     PFOTrace fn;
     otrdes *st;
 
@@ -735,14 +742,16 @@ static int _SC_mem_obj_trace(SC_heap_des *ph, mem_descriptor *md,
     nb   = st->nb;
     fn   = st->fn;
 
-    ib = md->length;
-    it = md->type;
+    info = &desc->desc.info;
+
+    ib = desc->length;
+    it = info->type;
 
     if (((type == -1) || (type == it)) && (nb == ib))
        {st->nm++;
-	space = (mem_header *) md;
-	name  = _SC_block_name(md);
-	fn(name, (char *) (space + 1), ib, md->ref_count, it);};
+	space = (mem_header *) desc;
+	name  = _SC_block_name(desc);
+	fn(name, (char *) (space + 1), ib, info->ref_count, it);};
 
     return(ok);}
 
@@ -779,31 +788,37 @@ long SC_mem_object_trace(long nb, int type,
  */
 
 void SC_mem_print(void *p)
-   {mem_descriptor *desc;
+   {long id;
+    mem_descriptor *desc;
     mem_header *space;
+    mem_inf *info;
 
     if (p == NULL)
        return;
 
     space = ((mem_header *) p) - 1;
     desc  = &space->block;
+    info  = &desc->desc.info;
+
+    id = SC_GET_BLOCK_ID(desc);
+
     if (FREE_SCORE_BLOCK_P(desc))
        {io_printf(stdout, "  Address        : 0x%lx\n", p);
 	io_printf(stdout, "  Active         : free\n");
 	io_printf(stdout, "  Number of bytes: %ld\n",   desc->length);
-	io_printf(stdout, "  Type index     : %x\n",    desc->type);
-	io_printf(stdout, "  Reference count: %x\n",    desc->ref_count);
-	io_printf(stdout, "  Block id       : %lx\n",   desc->id);
-	io_printf(stdout, "  Next block     : 0x%lx\n", desc->where.pfunc);}
+	io_printf(stdout, "  Type index     : %x\n",    info->type);
+	io_printf(stdout, "  Reference count: %x\n",    info->ref_count);
+	io_printf(stdout, "  Block id       : %lx\n",   id);
+	io_printf(stdout, "  Next block     : 0x%lx\n", info->pfunc);}
 
     else if (SCORE_BLOCK_P(desc))
        {io_printf(stdout, "  Address        : 0x%lx\n", p);
 	io_printf(stdout, "  Active         : yes\n");
 	io_printf(stdout, "  Associated name: %s\n",    _SC_block_name(desc));
 	io_printf(stdout, "  Number of bytes: %ld\n",   desc->length);
-	io_printf(stdout, "  Type index     : %d\n",    desc->type);
-	io_printf(stdout, "  Reference count: %d\n",    desc->ref_count);
-	io_printf(stdout, "  Block id       : %lx\n",   desc->id);
+	io_printf(stdout, "  Type index     : %d\n",    info->type);
+	io_printf(stdout, "  Reference count: %d\n",    info->ref_count);
+	io_printf(stdout, "  Block id       : %lx\n",   id);
 	io_printf(stdout, "  Previous block : 0x%lx\n", desc->prev);
 	io_printf(stdout, "  Next block     : 0x%lx\n", desc->next);}
 

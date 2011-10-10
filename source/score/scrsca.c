@@ -589,17 +589,27 @@ void SC_mem_statr(int64_t *al ARG([*],out), int64_t *fr ARG([*],out),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DPRSS - print memory stats */
+/* DPRSTATR - print memory stats including overhead */
 
-void dprss(int pid)
-   {SC_rusedes ru;
+void dprstatr(int ifmt)
+   {int64_t al, fr, df, mx, rs, ov;
 
-    if (pid == -1)
-       pid = getpid();
+    SC_mem_statr(&al, &fr, &df, &mx, &rs, &ov);
 
-    SC_resource_usage(&ru, pid);
-
-    printf("RSS: %10.3e\n", ru.maxrss*1024.0*1024.0);
+    if (ifmt == TRUE)
+       {printf("Allocated: %ld\n", (long) al);
+	printf("Freed:     %ld\n", (long) fr);
+	printf("Diff:      %ld\n", (long) df);
+	printf("Max Diff:  %ld\n", (long) mx);
+	printf("RSS:       %ld\n", (long) rs);
+	printf("Overhead:  %ld\n", (long) ov);}
+    else
+       {printf("Allocated: %10.3e\n", (double) al);
+	printf("Freed:     %10.3e\n", (double) fr);
+	printf("Diff:      %10.3e\n", (double) df);
+	printf("Max Diff:  %10.3e\n", (double) mx);
+	printf("RSS:       %10.3e\n", (double) rs);
+	printf("Overhead:  %10.3e\n", (double) ov);};
 
     return;}
 

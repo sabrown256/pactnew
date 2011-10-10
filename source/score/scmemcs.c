@@ -39,6 +39,7 @@ void *_SC_alloc_ns(long ni, long bpi, void *arg)
     SC_heap_des *ph;
     mem_header *space;
     mem_descriptor *desc;
+    mem_inf *info;
     void *p, *rv;
 
     ph = _SC_tid_mm();
@@ -82,14 +83,16 @@ void *_SC_alloc_ns(long ni, long bpi, void *arg)
 		assert(p != NULL);
 
 		desc = (mem_descriptor *) p;
-		desc->initialized = TRUE;}
+		info = &desc->desc.info;
+		info->initialized = TRUE;}
 	    else
 	       {p = _SC_ALLOC((size_t) (nbp + sizeof(double)));
 
 		assert(p != NULL);
 
 		desc = (mem_descriptor *) p;
-		desc->initialized = FALSE;};};
+		info = &desc->desc.info;
+		info->initialized = FALSE;};};
 
 	space = (mem_header *) desc;
 	if (space != NULL)
@@ -100,18 +103,19 @@ void *_SC_alloc_ns(long ni, long bpi, void *arg)
 	    ph->nx_mem_blocks++;
 	    ph->n_mem_blocks++;
 
-	    space->block.type = typ;
-
 	    space++;
 
+	    info = &desc->desc.info;
+	    info->type = typ;
+
 	    if (prm == TRUE)
-	       desc->ref_count = UNCOLLECT;
+	       info->ref_count = UNCOLLECT;
 
 /* zero out the space */
 	    if ((zsp == 1) || (zsp == 2) || (zsp == 5))
 	       {if (SC_gs.mm_debug == TRUE)
 		   memset(space, 0, nb);
-	        else if (desc->initialized == FALSE)
+	        else if (info->initialized == FALSE)
 		   memset(space, 0, nb);};
 
 /* log this entry if doing memory history */
@@ -149,6 +153,7 @@ void *_SC_realloc_ns(void *p, long ni, long bpi, void *arg)
     mem_header *space;
     mem_header *prev, *next, *osp;
     mem_descriptor *desc;
+    mem_inf *info;
     SC_mem_opt *opt;
     SC_heap_des *ph;
     void *rv;
@@ -168,7 +173,9 @@ void *_SC_realloc_ns(void *p, long ni, long bpi, void *arg)
 	    na  = opt->na;
 	    zsp = (opt->zsp == -1) ? ph->zero_space : opt->zsp;};
 
-	prm |= (desc->ref_count == UNCOLLECT);
+	info = &desc->desc.info;
+
+	prm |= (info->ref_count == UNCOLLECT);
 
 	nb  = ni*bpi;
 	nbp = nb + ph->hdr_size;
@@ -211,15 +218,16 @@ void *_SC_realloc_ns(void *p, long ni, long bpi, void *arg)
 
 	if (space != NULL)
 	   {desc = &space->block;
+	    info = &desc->desc.info;
 
 	    if (prm == TRUE)
-	       desc->ref_count = UNCOLLECT;
+	       info->ref_count = UNCOLLECT;
 
 /* reset the reference count - nobody is pointing to this space
  * GOTCHA: should we allow a realloc with multiple references
  */
 	    else
-	       {desc->ref_count = 0;
+	       {info->ref_count = 0;
 		_SC_mem_stats_acc(ph, db, 0L);};
 
 	    desc->length = nb;
@@ -258,6 +266,7 @@ int _SC_free_ns(void *p, void *arg)
     SC_heap_des *ph;
     mem_header *space;
     mem_descriptor *desc;
+    mem_inf *info;
 
     if (p == NULL)
        return(TRUE);
@@ -267,13 +276,15 @@ int _SC_free_ns(void *p, void *arg)
     if (!SCORE_BLOCK_P(desc))
        return(FALSE);
 
-    if (desc->ref_count == UNCOLLECT)
+    info = &desc->desc.info;
+
+    if (info->ref_count == UNCOLLECT)
        return(TRUE);
 
     if (FREE_SCORE_BLOCK_P(desc))
        return(TRUE);
 
-    if (--(desc->ref_count) > 0)
+    if (--(info->ref_count) > 0)
        return(TRUE);
 
     ph = desc->heap;

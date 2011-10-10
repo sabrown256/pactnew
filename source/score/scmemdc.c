@@ -53,13 +53,13 @@ static void _SC_mem_map_act(SC_heap_des *ph, PFMemMap f, void *a)
 static void _SC_mem_map_fr(SC_heap_des *ph, PFMemMap f, void *a)
    {int ok;
     long i, j;
-    mem_descriptor *md;
+    mem_descriptor *desc;
 
     for (j = 0L; j < _SC_ms.n_bins; j++)
-        {for (i = 0L, md = ph->free_list[j];
-	      md != NULL;
-	      i++, md = (mem_descriptor *) md->where.pfunc)
-	     {ok = f(ph, md, MEM_BLOCK_FREE, a, j, i);
+        {for (i = 0L, desc = ph->free_list[j];
+	      desc != NULL;
+	      i++, desc = (mem_descriptor *) desc->desc.info.pfunc)
+	     {ok = f(ph, desc, MEM_BLOCK_FREE, a, j, i);
 	      if (ok == FALSE)
 	         break;};};
 
@@ -74,13 +74,13 @@ static void _SC_mem_map_fr(SC_heap_des *ph, PFMemMap f, void *a)
 
 static void _SC_mem_map_reg(SC_heap_des *ph, PFMemMap f, void *a)
    {long i;
-    mem_descriptor *md;
+    mem_descriptor *desc;
 
     if (_SC.mem_table != NULL)
        {for (i = 0;
-	     SC_hasharr_next(_SC.mem_table, &i, NULL, NULL, (void **) &md);
+	     SC_hasharr_next(_SC.mem_table, &i, NULL, NULL, (void **) &desc);
 	     i++)
-	    f(ph, md, MEM_BLOCK_REG, a, i, -1);};
+	    f(ph, desc, MEM_BLOCK_REG, a, i, -1);};
 
     return;}
 
