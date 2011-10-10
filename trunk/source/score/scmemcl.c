@@ -148,6 +148,7 @@ static mem_descriptor *_SC_make_blocks(SC_heap_des *ph, long j)
 static void *_SC_prim_alloc(size_t nbp, SC_heap_des *ph, int zsp)
    {long j, nb;
     mem_descriptor *md;
+    mem_inf *info;
     void *p;
 
     if (nbp <= 0)
@@ -166,12 +167,13 @@ static void *_SC_prim_alloc(size_t nbp, SC_heap_des *ph, int zsp)
 
 	p = NULL;
 	if (md != NULL)
+	   {info = &md->desc.info;
 
 /* attach the new chunks to the free list */
-	   {ph->free_list[j] = (mem_descriptor *) (md->where.pfunc);
+	    ph->free_list[j] = (mem_descriptor *) (info->pfunc);
 
 /* take the top of the free list for this size chunk */
-	    md->initialized = FALSE;
+	    info->initialized = FALSE;
 	    p = (void *) md;};}
 
 /* otherwise go out to the system for memory
@@ -185,14 +187,18 @@ static void *_SC_prim_alloc(size_t nbp, SC_heap_des *ph, int zsp)
 	    assert(p != NULL);
 
 	    md = (mem_descriptor *) p;
-	    md->initialized = TRUE;}
+
+	    info = &md->desc.info;
+	    info->initialized = TRUE;}
         else
            {p = _SC_ALLOC((size_t) (nbp + sizeof(double)));
 
 	    assert(p != NULL);
 
 	    md = (mem_descriptor *) p;
-	    md->initialized = FALSE;};};
+
+	    info = &md->desc.info;
+	    info->initialized = FALSE;};};
 
     return(p);}
 
@@ -256,6 +262,7 @@ void *_SC_alloc_nl(long ni, long bpi, void *arg)
     SC_mem_opt *opt;
     SC_heap_des *ph;
     mem_header *space;
+    mem_inf *info;
     void *rv;
 
     ph = _SC_tid_mm();
@@ -306,19 +313,21 @@ void *_SC_alloc_nl(long ni, long bpi, void *arg)
 	    ph->nx_mem_blocks++;
 	    ph->n_mem_blocks++;
 
-	    space->block.type = typ;
-
 	    desc = (mem_descriptor *) space;
 	    space++;
 
+	    info = &desc->desc.info;
+	    
+	    info->type = typ;
+
 	    if (prm == TRUE)
-	       desc->ref_count = UNCOLLECT;
+	       info->ref_count = UNCOLLECT;
 
 /* zero out the space */
 	    if ((zsp == 1) || (zsp == 2) || (zsp == 5))
 	       {if (SC_gs.mm_debug == TRUE)
 		   memset(space, 0, nb);
-	        else if (desc->initialized == FALSE)
+	        else if (info->initialized == FALSE)
 		   _SC_prim_memset_l(space, nb);};
 
 /* log this entry if doing memory history */
@@ -356,6 +365,7 @@ void *_SC_realloc_nl(void *p, long ni, long bpi, void *arg)
     mem_header *space, *tmp;
     mem_header *prev, *next, *osp;
     mem_descriptor *desc;
+    mem_inf *info;
     SC_mem_opt *opt;
     SC_heap_des *ph;
     void *rv;
@@ -375,7 +385,9 @@ void *_SC_realloc_nl(void *p, long ni, long bpi, void *arg)
 	    na  = opt->na;
 	    zsp = (opt->zsp == -1) ? ph->zero_space : opt->zsp;};
 
-	prm |= (desc->ref_count == UNCOLLECT);
+	info = &desc->desc.info;
+
+	prm |= (info->ref_count == UNCOLLECT);
 
 	nb  = ni*bpi;
 	nbp = nb + ph->hdr_size;
@@ -447,15 +459,16 @@ void *_SC_realloc_nl(void *p, long ni, long bpi, void *arg)
     
 	if (space != NULL)
 	   {desc = &space->block;
+	    info = &desc->desc.info;
 
 	    if (prm == TRUE)
-	       desc->ref_count = UNCOLLECT;
+	       info->ref_count = UNCOLLECT;
 
 /* reset the reference count - nobody is pointing to this space
  * GOTCHA: should we allow a realloc with multiple references
  */
 	    else
-	       {desc->ref_count = 0;
+	       {info->ref_count = 0;
 		_SC_mem_stats_acc(ph, db, 0L);};
 
 	    desc->length = nb;
@@ -494,6 +507,7 @@ int _SC_free_nl(void *p, void *arg)
     SC_heap_des *ph;
     mem_header *space;
     mem_descriptor *desc;
+    mem_inf *info;
 
     if (p == NULL)
        return(TRUE);
@@ -503,13 +517,14 @@ int _SC_free_nl(void *p, void *arg)
     if (!SCORE_BLOCK_P(desc))
        return(FALSE);
 
-    if (desc->ref_count == UNCOLLECT)
+    info = &desc->desc.info;
+    if (info->ref_count == UNCOLLECT)
        return(TRUE);
 
     if (FREE_SCORE_BLOCK_P(desc))
        return(TRUE);
 
-    if (--(desc->ref_count) > 0)
+    if (--(info->ref_count) > 0)
        return(TRUE);
 
     ph = desc->heap;
@@ -751,7 +766,7 @@ void dprfree(long jmn, long jmx)
 		 j, (long) SC_BIN_SIZE(j));
          for (md  = ph->free_list[j], i = 0L;
 	      md != NULL;
-	      md  = (mem_descriptor *) md->where.pfunc, i++)
+	      md  = (mem_descriptor *) md->desc.info.pfunc, i++)
              {fprintf(stdout, " %10p", md);
 	      if (i % 6 == 5)
 		 fprintf(stdout, "\n");
@@ -778,7 +793,7 @@ void dflpr(int j)
 	  
     for (md = ph->free_list[j];
 	 md != NULL;
-	 md = (mem_descriptor *) md->where.pfunc)
+	 md = (mem_descriptor *) md->desc.info.pfunc)
         io_printf(stdout, "%8lx\n", md);
 
     return;}

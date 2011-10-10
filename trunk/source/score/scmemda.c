@@ -314,7 +314,7 @@ char *_SC_block_name(mem_descriptor *desc)
 	   {snprintf(name, MAXLINE, "-- free --");
 	    rv = name;}
         else
-	   rv = _SC_format_loc(name, MAXLINE, &desc->where, TRUE, TRUE);};
+	   rv = _SC_format_loc(name, MAXLINE, &desc->desc.where, TRUE, TRUE);};
 
     return(rv);}
 
@@ -332,11 +332,13 @@ void _SC_print_block_info(FILE *fp, SC_heap_des *ph, void *ptr, int flag)
     char *name, *ps, *pc;
     mem_descriptor *desc;
     mem_header *space;
+    mem_inf *info;
 
     space = (mem_header *) ptr;
     desc  = &space->block;
+    info  = &desc->desc.info;
     nb    = desc->length;
-    nr    = desc->ref_count;
+    nr    = info->ref_count;
     name  = _SC_block_name(desc);
     if (name == NULL)
        {if (flag == 0)
@@ -359,7 +361,7 @@ void _SC_print_block_info(FILE *fp, SC_heap_des *ph, void *ptr, int flag)
 	    SC_strncpy(bf, MAXLINE, name, nc);
 	    name = bf;};
 		     
-	acc  = ((flag & 8) || (desc->ref_count != UNCOLLECT));
+	acc  = ((flag & 8) || (info->ref_count != UNCOLLECT));
 	if ((name != NULL) && (acc == TRUE))
 	   {if (sizeof(char *) == 4)
 	       io_printf(fp, "   0x%012lx %9ld %3d\t%s",
@@ -369,7 +371,7 @@ void _SC_print_block_info(FILE *fp, SC_heap_des *ph, void *ptr, int flag)
 			 space+1, nb, nr, name);
 
 	    if ((strncmp(name, "char*:", 6) == 0) ||
-		(desc->type == SC_STRING_I))
+		(info->type == SC_STRING_I))
 	       {io_printf(fp, " = \"");
 		pc = (char *) (space + 1);
 		for (j = 0; j < nb; j++)
@@ -404,6 +406,7 @@ int SC_mem_info(void *p, long *pl, int *pt, int *pr, char **pn)
     char *nm;
     mem_descriptor *desc;
     mem_header *space;
+    mem_inf *info;
     static char *fr = "-- free block --";
 
     rv = FALSE;
@@ -411,6 +414,7 @@ int SC_mem_info(void *p, long *pl, int *pt, int *pr, char **pn)
     if (p != NULL)
        {space = ((mem_header *) p) - 1;
 	desc  = &space->block;
+	info  = &desc->desc.info;
 	if (SCORE_BLOCK_P(desc))
 	   {if (FREE_SCORE_BLOCK_P(desc))
 	       {ln = 0L;
@@ -419,8 +423,8 @@ int SC_mem_info(void *p, long *pl, int *pt, int *pr, char **pn)
 		nm = fr;}
 	    else
 	       {ln = desc->length;
-		ty = desc->type;
-		rf = desc->ref_count;
+		ty = info->type;
+		rf = info->ref_count;
 		nm = _SC_block_name(desc);};
 	    
 	    if (pl != NULL)
@@ -451,7 +455,8 @@ int SC_mem_info(void *p, long *pl, int *pt, int *pr, char **pn)
 int SC_reg_mem(void *p, long length, char *name)
    {int rv;
     SC_heap_des *ph;
-    mem_descriptor *pd;
+    mem_descriptor *desc;
+    mem_inf *info;
     haelem *hp;
 
     if (_SC.mem_table == NULL)
@@ -459,21 +464,23 @@ int SC_reg_mem(void *p, long length, char *name)
 
     ph = _SC_tid_mm();
 
-    pd = CPMAKE(mem_descriptor, 3);
+    desc = CPMAKE(mem_descriptor, 3);
+    info = &desc->desc.info;
 
-    pd->heap      = ph;
-    pd->ref_count = 1;
-    pd->type      = 0;
-    pd->length    = length;
-    pd->prev      = NULL;
-    pd->next      = (mem_header *) p;
-    pd->id        = SC_MEM_ID;
+    desc->heap      = ph;
+    desc->length    = length;
+    desc->prev      = NULL;
+    desc->next      = (mem_header *) p;
 
-    pd->where.pfunc = strdup(name);
-    pd->where.pfile = NULL;
-    pd->where.line  = -1;
+    info->pfunc     = strdup(name);
+    info->pfile     = NULL;
+    info->line      = -1;
+    info->ref_count = 1;
+    info->type      = 0;
 
-    hp = SC_hasharr_install(_SC.mem_table, p, pd, "mem_descriptor", TRUE, TRUE);
+    SC_SET_BLOCK_ID(desc, SC_MEM_ID);
+
+    hp = SC_hasharr_install(_SC.mem_table, p, desc, "mem_descriptor", TRUE, TRUE);
     if (hp != NULL)
        {SC_mem_stats_acc(length, 0L);
 	rv = TRUE;}
@@ -494,12 +501,12 @@ int SC_reg_mem(void *p, long length, char *name)
 int SC_dereg_mem(void *p)
    {int rv;
     long nb;
-    mem_descriptor *pd;
+    mem_descriptor *desc;
 
-    pd = SC_hasharr_def_lookup(_SC.mem_table, p);
-    if (pd != NULL)
-       {free((char *) pd->where.pfunc);
-	nb = pd->length;}
+    desc = SC_hasharr_def_lookup(_SC.mem_table, p);
+    if (desc != NULL)
+       {free((char *) desc->desc.where.pfunc);
+	nb = desc->length;}
     else
        nb = 0;
 
@@ -565,40 +572,43 @@ char *SC_mem_lookup(void *p)
 
 /* _SC_MEM_CHK_BLOCK - check a memory block for correctness */
 
-static int _SC_mem_chk_block(SC_heap_des *ph, mem_descriptor *md,
+static int _SC_mem_chk_block(SC_heap_des *ph, mem_descriptor *desc,
 			     mem_kind wh, void *a, long i, long j)
    {int ok;
     char *p;
     chkdes *st;
+    mem_inf *info;
 
     ok = TRUE;
     st = (chkdes *) a;
 
+    info = &desc->desc.info;
+
     switch (wh)
        {case MEM_BLOCK_ACTIVE:
-	     if (SCORE_BLOCK_P(md))
+	     if (SCORE_BLOCK_P(desc))
 	        st->na++;
 	     else
-	        {_SC_print_block_info(stdout, ph, (void *) md, FALSE);
+	        {_SC_print_block_info(stdout, ph, (void *) desc, FALSE);
 		 st->nab++;
 	         ok = FALSE;};
 	     break;
 
 	case MEM_BLOCK_FREE:
- 	     if ((SC_pointer_ok((char *) md) == TRUE) &&
-		 (md->ref_count == SC_MEM_MFA) && (md->type == SC_MEM_MFB))
+ 	     if ((SC_pointer_ok((char *) desc) == TRUE) &&
+		 (info->ref_count == SC_MEM_MFA) && (info->type == SC_MEM_MFB))
 	        st->nf++;
 
 	     else
 	        {io_printf(stdout,
 			   "   Block: %12lx (corrupted free memory block - %d,%ld,%ld)\n",
-			   ((mem_header *) md + 1), ph->tid, i, j);
+			   ((mem_header *) desc + 1), ph->tid, i, j);
 		 st->nfb++;
 	         ok = FALSE;};
 	     break;
 
 	case MEM_BLOCK_REG:
-	     p = (char *) md->next;
+	     p = (char *) desc->next;
 	     if (SC_pointer_ok(p) == TRUE)
 	        st->nr++;
 	     else
@@ -751,12 +761,15 @@ long SC_arrlen(void *p)
 
 int SC_mark(void *p, int n)
    {mem_descriptor *desc;
+    mem_inf *info;
 
     if (SC_is_active_space(p, NULL, &desc))
-       {if (desc->ref_count < UNCOLLECT)
-           desc->ref_count += n;
+       {info = &desc->desc.info;
 
-        n = desc->ref_count;}
+	if (info->ref_count < UNCOLLECT)
+           info->ref_count += n;
+
+        n = info->ref_count;}
     else
        n = -1;
 
@@ -769,9 +782,11 @@ int SC_mark(void *p, int n)
 
 int SC_set_count(void *p, int n)
    {mem_descriptor *desc;
+    mem_inf *info;
 
     if (SC_is_active_space(p, NULL, &desc))
-       desc->ref_count = n;
+       {info = &desc->desc.info;
+	info->ref_count = n;}
     else
        n = -1;
 
@@ -787,9 +802,11 @@ int SC_set_count(void *p, int n)
 
 void *SC_permanent(void *p)
    {mem_descriptor *desc;
+    mem_inf *info;
 
     if (SC_is_active_space(p, NULL, &desc))
-       desc->ref_count = UNCOLLECT;
+       {info = &desc->desc.info;
+	info->ref_count = UNCOLLECT;};
 
     return(p);}
 
@@ -800,12 +817,14 @@ void *SC_permanent(void *p)
 
 void *SC_mem_attrs(void *p, int attr)
    {mem_descriptor *desc;
+    mem_inf *info;
 
     if (SC_is_active_space(p, NULL, &desc))
+       {info = &desc->desc.info;
 
 /* mark the block uncollectable */
-       {if (attr & 1)
-	   desc->ref_count = UNCOLLECT;
+	if (attr & 1)
+	   info->ref_count = UNCOLLECT;
 
 /* remove this block from the memory accounting
  * decrement the total bytes allocated by the size of the block
@@ -846,11 +865,13 @@ int SC_safe_to_free(void *p)
 int SC_ref_count(void *p)
    {int n;
     mem_descriptor *desc;
+    mem_inf *info;
 
     n = -1;
 
     if (SC_is_active_space(p, NULL, &desc))
-       n = desc->ref_count;
+       {info = &desc->desc.info;
+	n = info->ref_count;};
 
     return(n);}
 
@@ -862,14 +883,16 @@ int SC_ref_count(void *p)
 int SC_arrtype(void *p, int type)
    {int n;
     mem_descriptor *desc;
+    mem_inf *info;
 
     n = -1;
 
     if (SC_is_active_space(p, NULL, &desc))
-       {if (type > 0)
-	   desc->type = type;
+       {info = &desc->desc.info;
+	if (type > 0)
+	   info->type = type;
 
-	n = desc->type;};
+	n = info->type;};
 
     return(n);}
 
@@ -898,12 +921,14 @@ char *SC_arrname(void *p)
 int SC_set_arrtype(void *p, int type)
    {int n;
     mem_descriptor *desc;
+    mem_inf *info;
 
     n = -1;
 
     if (SC_is_active_space(p, NULL, &desc))
-       {n          = desc->type;
-	desc->type = type;};
+       {info = &desc->desc.info;
+	n          = info->type;
+	info->type = type;};
 
     return(n);}
 
@@ -915,10 +940,12 @@ int SC_set_arrtype(void *p, int type)
 void dprblk(void *p)
    {mem_header *space;
     mem_descriptor *desc;
+    mem_inf *info;
 
     if (p != NULL)
        {space = ((mem_header *) p) - 1;
 	desc  = &space->block;
+	info  = &desc->desc.info;
 	if (!SCORE_BLOCK_P(desc))
            printf("%p is not a SCORE allocated block\n", p);
 	else
@@ -928,8 +955,8 @@ void dprblk(void *p)
 	    else
 	       {printf("Name: %s\n",       _SC_block_name(desc));
 		printf("Length: %ld\n",    desc->length);
-		printf("Type: %d\n",       desc->type);
-		printf("References: %d\n", desc->ref_count);};
+		printf("Type: %d\n",       info->type);
+		printf("References: %d\n", info->ref_count);};
 
 	    printf("Next Block: %p\n",     desc->next);
 	    printf("Previous Block: %p\n", desc->prev);

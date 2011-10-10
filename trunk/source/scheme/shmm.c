@@ -863,6 +863,7 @@ int _SS_object_map(SS_psides *si, FILE *fp, int flag)
     SC_heap_des *ph;
     mem_header *space;
     mem_descriptor *desc;
+    mem_inf *info;
     obj_map *map;
 
     ph = _SC_tid_mm();
@@ -883,8 +884,9 @@ int _SS_object_map(SS_psides *si, FILE *fp, int flag)
 	space = ph->latest_block;
 	for (i = 0; (i < n) && (space != NULL); space = desc->next, i++)
             {desc = &space->block;
-	     nr   = desc->ref_count;
-	     ityp = desc->type;
+	     info = &desc->desc.info;
+	     nr   = info->ref_count;
+	     ityp = info->type;
 	     if ((ityp >= SS_OBJECT_I) && (nr != UNCOLLECT))
 	        {map[no].indep = TRUE;
 		 map[no].type  = ityp;
