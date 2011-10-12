@@ -274,11 +274,10 @@ static int _SC_host_server_rel(haelem *hp, void *a)
 	    CFREE(hst[i]);
 
 	CFREE(hst);
-	CFREE(rng);}
+	CFREE(hp->def);}
 
     else if (strcmp(type, SC_STRING_S) == 0)
-       {type = (char *) v;
-	CFREE(type);};
+       CFREE(hp->def);
 
     return(TRUE);}
 

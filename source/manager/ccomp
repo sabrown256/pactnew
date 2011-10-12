@@ -50,7 +50,7 @@ set prenv = FALSE
 set vrb   = FALSE
 set args  = ""
 while ($#argv > 0)
-   switch ($1)
+   switch ("$1")
       case -cwexe:
            shift
            set comp = $1
@@ -93,7 +93,7 @@ while ($#argv > 0)
            set vrb = TRUE
            breaksw
       default:
-           set args = ( $args $1 )
+           set args = ( $args "$1" )
            breaksw
    endsw
    shift

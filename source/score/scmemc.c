@@ -441,7 +441,6 @@ int SC_is_free_space(void *p, mem_header **psp, mem_descriptor **pds)
    {int ok;
     mem_header *space;
     mem_descriptor *desc;
-    mem_inf *info;
 
     space = NULL;
     desc  = NULL;
@@ -449,7 +448,6 @@ int SC_is_free_space(void *p, mem_header **psp, mem_descriptor **pds)
     if (p != NULL)
        {space = ((mem_header *) p) - 1;
 	desc  = &space->block;
-	info  = &desc->desc.info;
 	ok    = (SCORE_BLOCK_P(desc) && FREE_SCORE_BLOCK_P(desc));};
 
     if (psp != NULL)
@@ -471,7 +469,6 @@ int SC_is_active_space(void *p, mem_header **psp, mem_descriptor **pds)
    {int ok;
     mem_header *space;
     mem_descriptor *desc;
-    mem_inf *info;
 
     space = NULL;
     desc  = NULL;
@@ -479,7 +476,6 @@ int SC_is_active_space(void *p, mem_header **psp, mem_descriptor **pds)
     if (p != NULL)
        {space = ((mem_header *) p) - 1;
 	desc  = &space->block;
-	info  = &desc->desc.info;
 	ok    = (SCORE_BLOCK_P(desc) && !FREE_SCORE_BLOCK_P(desc));};
 
     if (psp != NULL)
@@ -816,6 +812,22 @@ int SC_mem_over_mark(int n)
     rv = _SC_mf.sys;
 
     _SC_mf.sys += n;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_MEM_TRIM - hand memory pages back to system
+ *             - return TRUE if memory is returned to the system
+ */
+
+int SC_mem_trim(size_t pad)
+   {int rv;
+
+#if defined(LINUX) || defined(CYGWIN)
+    rv = malloc_trim(pad);
+#endif
 
     return(rv);}
 

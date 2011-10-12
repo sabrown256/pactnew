@@ -38,7 +38,7 @@ flog $ALog cat $Tmp.c
 set ok = FALSE
 flog $ALog $CC_Exe $Tmp.c -o $Tmp $CC_Flags
 if ($status == 0) then
-   flog $ALog $Tmp
+   flog $ALog $CFE $Tmp
    if ($status == 0) then
       set ok = TRUE
    endif
@@ -48,7 +48,7 @@ endif
 if ($ok == FALSE) then
    flog $ALog $CC_Exe $Tmp.c -o $Tmp $CC_Flags -ldl
    if ($status == 0) then
-      flog $ALog $Tmp
+      flog $ALog $CFE $Tmp
       if ($status == 0) then
          set ok = NEED
       endif

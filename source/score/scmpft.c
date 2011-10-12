@@ -22,23 +22,13 @@
 #define SM_MAX   4096                /* upper bound of small memory store */
 
 #define ALLOC(_p, _t, _n)                                                  \
-   {if (mm == SCORE)                                                       \
-       _p = CMAKE_N(char, (_n)*sizeof(_t));                                \
-    else                                                                   \
-       _p = (_t *) malloc((_n)*sizeof(_t));}
+    _p = CMAKE_N(char, (_n)*sizeof(_t))
 
 #define REALLOC(_p, _sz)                                                   \
-   {if (mm == SCORE)                                                       \
-       CREMAKE(_p, char, _sz);                                             \
-    else                                                                   \
-       _p = realloc(_p, (size_t) _sz);}
+    CREMAKE(_p, char, _sz)
 
 #define FREE(_p)                                                           \
-   {if (mm == SCORE)                                                       \
-       {CFREE(_p);}                                                        \
-    else                                                                   \
-       {free(_p);                                                          \
-        _p = NULL;};}
+    CFREE(_p)
 
 typedef int (*PFTest)(double *tf, double *nif, int nir);
 
@@ -262,6 +252,54 @@ int sm_free(double *ptf, double *pnif, int nir)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SM_ARRLEN - time arrlen calls on small chunks of memory
+ *           - examine performance of small memory blocks
+ */
+
+int sm_arrlen(double *ptf, double *pnif, int nir)
+   {int i, n, m, ni, nb, err;
+    char **p;
+    double tf, tr;
+
+    err = FALSE;
+
+    p = (char **) malloc(SM_MAX*sizeof(char *));
+    if (p == NULL)
+       return(TRUE);
+
+    tf = 0.0;
+    ni = 0;
+
+    for (m = 0; m < nir; m++)
+        {n = SM_MAX;
+
+	 for (i = 1; i < n; i++)
+	     {nb = SC_random_int(1, SM_MAX);
+	      ALLOC(p[i], char, nb);};
+
+	 tr = SC_wall_clock_time();
+
+	 for (i = 1; i < n; i++)
+	     nb = SC_arrlen(p[i]);
+
+	 tf += (SC_wall_clock_time() - tr);
+
+	 for (i = 1; i < n; i++, ni++)
+	     {FREE(p[i]);};
+
+	 if (tf > 2.0)
+	    break;};
+
+    free(p);
+
+    *ptf  = tf;
+    *pnif = ni;
+
+    return(err);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* LR_RAND_ALLOC - allocate random sized large chunks of memory */
 
 static void lr_rand_alloc(int *pl, int *pni, char **p, int n)
@@ -428,7 +466,7 @@ int core(int nir, PFTest tst, char *s, double *pdt)
 
     dt = tf/nif;
 
-    io_printf(stdout, "\t\t%-18s %8d  %7.2f%s  %.2e\n",
+    printf("\t\t%-18s %8d  %7.2f%s  %.2e\n",
 	      s, (int) nif, nmby, r, dt);
 
     *pdt = dt;
@@ -443,18 +481,18 @@ int core(int nir, PFTest tst, char *s, double *pdt)
 static void help(void)
    {
 
-    io_printf(STDOUT, "\n");
+    printf("\n");
 
-    io_printf(STDOUT, "Usage: scmpft [-d #] [-h] [-l <# loops>] [-m #] [-s] [-z #]\n");
-    io_printf(STDOUT, "   d    - run with memory history\n");
-    io_printf(STDOUT, "   h    - this help message\n");
-    io_printf(STDOUT, "   l    - # iterations\n");
-    io_printf(STDOUT, "   m    - 1 for SCORE, 2 for system, 3 for both\n");
-    io_printf(STDOUT, "   s    - no small block store for SCORE MM\n");
-    io_printf(STDOUT, "   z    - reset memory\n");
-    io_printf(STDOUT, "        - 0 none, 1 on both, 2 on alloc, 3 on free\n");
+    printf("Usage: scmpft [-d #] [-h] [-l <# loops>] [-m #] [-s] [-z #]\n");
+    printf("   d    - run with memory history\n");
+    printf("   h    - this help message\n");
+    printf("   l    - # iterations\n");
+    printf("   m    - 1 for SCORE, 2 for system, 3 for both\n");
+    printf("   s    - no small block store for SCORE MM\n");
+    printf("   z    - reset memory\n");
+    printf("        - 0 none, 1 on both, 2 on alloc, 3 on free\n");
 
-    io_printf(STDOUT, "\n");
+    printf("\n");
 
     return;}
 
@@ -466,11 +504,12 @@ static void help(void)
 int main(int c, char **v)
    {int i, err, whc, nt;
     int nir, zsp;
-    double tsc[6], tsy[6];
-    static char *tn[]  = {"Small alloc", "Small free",
+    double tsc[8], tsy[8];
+    SC_mem_fnc mmp;
+    static char *tn[]  = {"Small alloc", "Small free", "Small arrlen",
 			  "Large alloc", "Large free",
 			  "Downsizing realloc", "Upsizing realloc"};
-    static PFTest tl[] = {sm_alloc, sm_free, lr_alloc, lr_free,
+    static PFTest tl[] = {sm_alloc, sm_free, sm_arrlen, lr_alloc, lr_free,
 		          ds_realloc, us_realloc};
 
     whc = SCORE | SYS;
@@ -513,39 +552,47 @@ int main(int c, char **v)
 /* turn this on to test the efficient memset replacement */
     SC_zero_space_n(zsp, -2);
 
-    io_printf(stdout, "\n");
-    io_printf(stdout, "\t\tTest                # calls      Mem  Time/Call\n");
+    printf("\n");
+    printf("\t\tTest                # calls      Mem  Time/Call\n");
 
     err = FALSE;
     
     if (whc & SCORE)
        {mm = SCORE;
 
-        io_printf(stdout, "\tScore MM\n");
+	mmp = SC_use_score_mm();
+
+        printf("\tScore MM\n");
         for (i = 0; i < nt; i++)
 	    {if (tl[i] != NULL)
 	        err |= core(nir, tl[i], tn[i], &tsc[i]);};
 
-	io_printf(stdout, "\n");};
+	printf("\n");
+
+	mmp = SC_use_mm(&mmp);};
 
     if (whc & SYS)
        {mm = SYS;
 
-        io_printf(stdout, "\tSystem MM\n");
+	mmp = SC_use_c_mm();
+
+        printf("\tSystem MM\n");
         for (i = 0; i < nt; i++)
 	    {if (tl[i] != NULL)
 	        err |= core(nir, tl[i], tn[i], &tsy[i]);};
 
-	io_printf(stdout, "\n");};
+	printf("\n");
+
+	mmp = SC_use_mm(&mmp);};
 
     if ((whc & SCORE) && (whc & SYS))
-       {io_printf(stdout, "\tPerformance Comparison\n");
-        io_printf(stdout, "\t\tTest\t\t       SCORE    System   Ratio\n");
+       {printf("\tPerformance Comparison\n");
+        printf("\t\tTest\t\t       SCORE    System   Ratio\n");
         for (i = 0; i < nt; i++)
-	    io_printf(stdout, "\t\t%-18s %9.2e %9.2e %7.2f\n",
+	    printf("\t\t%-18s %9.2e %9.2e %7.2f\n",
 		      tn[i], tsc[i], tsy[i], tsc[i]/tsy[i]);
 
-	io_printf(stdout, "\n");};
+	printf("\n");};
 
     SC_mem_history_out(NULL, -1);
 

@@ -36,28 +36,7 @@ cd $TestDir
 
 unsetenv DO_RUN_SUBMIT_ENV
 
-# PGI compilers lack some key C interoperability features
-# notably: C_NULL_PTR
-# SUN compilers have trouble with command line argument routines
-if (("$PACT_CC_FAMILY" == PGI) || ("$PACT_CC_FAMILY" == SUN)) then
-   set RUN_TESTS = FALSE
-endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# omit tests - usually in difficult CROSS_COMPILE situation
-
-if ($RUN_TESTS == FALSE) then
-   NoteD $Log ""
-   NoteD $Log "FORTRAN TESTS ... omitted"
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# run the tests
-
-else if ($FC_Exe != none) then
+if ($FC_Exe != none) then
 
    NoteD $Log ""
    NoteD $Log "FORTRAN TEST ..."

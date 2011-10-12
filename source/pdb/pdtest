@@ -141,7 +141,6 @@ else if (-e $SrcDir/pdb.h) then
    $TEST_CHECK clean -n PDB -e $nerr -raf "$Tmp"
 
    set xstatus = $status
-
 endif
 
 $TEST_CHECK fin -e $xstatus

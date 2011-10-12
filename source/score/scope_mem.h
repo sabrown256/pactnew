@@ -37,6 +37,10 @@
 # include "cpyright.h"
 # include "score.h"
 
+# if defined(LINUX) || defined(CYGWIN)
+#  include <malloc.h>
+# endif
+
 #endif
 
 /*--------------------------------------------------------------------------*/
@@ -57,9 +61,14 @@
 
 /* memory manager constants */
 
-#define SC_MEM_MFA        ((short) 0xF0E1)
-#define	SC_MEM_MFB        ((short) 0xD2C3)
 #define SC_MEM_ID         0xCAFEFEED
+#define UNCOLLECT         SHRT_MAX
+
+/* used in ref_count member of mem_inf */
+#define SC_MEM_MFA        ((short) 0x0FE1)
+/* used in type member of mem_inf */
+#define	SC_MEM_MFB        ((short) 0x0DC3)
+
 #define SC_BLOCK_ID_MASK  0xEFFFFF00
 #define SC_FF_NAME_MASK   0x10000000
 #define HEAPS_UNIT_DELTA  1000L
@@ -127,7 +136,9 @@ enum e_mem_kind
 typedef enum e_mem_kind mem_kind;
 
 typedef union u_mem_header mem_header;
+typedef union u_mem_infu mem_infu;
 
+typedef struct s_mem_inf mem_inf;
 typedef struct s_mem_descriptor mem_descriptor;
 typedef struct s_major_block_des major_block_des;
 typedef struct s_SC_heap_des SC_heap_des;
@@ -146,33 +157,21 @@ struct s_SC_memfncs
     PFFree free;
     PFRealloc realloc;};
 
-typedef struct s_mem_inf mem_inf;
+/* define the mem_inf so that a union with an SC_srcloc
+ * will give the tightest memory packing of the overall
+ * mem_descriptor - saves 20% with GLIBC
+ * NOTE: must be careful since several compilers do not
+ * support signed bit fields (e.g. PGCC 11.1)
+ */
 
 struct s_mem_inf
    {const char *pfile;
     const char *pfunc;
     unsigned int line;
-#if 0
-#if 0
-    unsigned int ida : 2;
     unsigned int initialized : 1;
-    unsigned int ref_count : 15;
-    unsigned int idb : 2;
-    int type : 10;
-    unsigned int idc : 2;
-#else
-    unsigned int initialized : 1;
-    unsigned int ref_count : 15;
-    int type : 16;
-#endif
-#else
-    char initialized;
+    int type : 15;
     short ref_count;
-    short type;
-#endif
     long idt;};
-
-typedef union u_mem_infu mem_infu;
 
 union u_mem_infu
    {mem_inf info;
@@ -186,8 +185,8 @@ struct s_mem_descriptor
    {mem_header *prev;
     mem_header *next;
     SC_heap_des *heap;
-    long length;
-    mem_infu desc;};
+    mem_infu desc;
+    long length;};
 
 union u_mem_header
    {mem_descriptor block;
@@ -305,7 +304,8 @@ extern int
  SC_is_score_space(void *p, mem_header **psp, mem_descriptor **pds),
  SC_is_free_space(void *p, mem_header **psp, mem_descriptor **pds),
  SC_is_active_space(void *p, mem_header **psp, mem_descriptor **pds),
- SC_mem_over_mark(int n);
+ SC_mem_over_mark(int n),
+ SC_mem_trim(size_t pad);
 
 
 /* SCMEMCL.C declarations */
@@ -325,6 +325,9 @@ extern int
  _SC_free_nl(void *p, void *a),
  _SC_free_wl(void *p, int zsp);
 
+extern int64_t
+ _SC_arrlen_wl(void *p);
+
 
 /* SCMEMCS.C declarations */
 
@@ -342,6 +345,9 @@ extern void
 extern int
  _SC_free_ns(void *p, void *a),
  _SC_free_ws(void *p, int zsp);
+
+extern int64_t
+ _SC_arrlen_ws(void *p);
 
 
 /* SCMEMDA.C declarations */

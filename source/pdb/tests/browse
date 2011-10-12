@@ -21,7 +21,11 @@ Note $Log ""
 
 source ../../../scripts/test-run
 
-set rpf = ( $rpf pdatst.lst *.db? *.rs? )
+# cleanout all previous test files
+# no further tests will need them
+flog $Log $RM *.db* *.rs*
+
+set rpf = ( $rpf pdatst.lst )
 
 $TEST_CHECK part -a browse -e $xstatus -dt $dt -x $exe -rpf "$rpf" none
 

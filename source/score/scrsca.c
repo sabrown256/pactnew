@@ -27,8 +27,6 @@
 
 #if defined(LINUX) || defined(CYGWIN)
 
-# include <malloc.h>
-
 # define LINUX_PROC_PPID     0      /* PID of the parent */
 # define LINUX_PROC_PGID     1      /* process group ID of the process */
 # define LINUX_PROC_SESS     2      /* session ID of the process */
@@ -129,9 +127,7 @@ static int _SC_res_usage_self(SC_rusedes *ru, int whch)
 
     rv = FALSE;
 
-#if defined(LINUX) || defined(CYGWIN)
-    malloc_trim(0);
-#endif
+    SC_mem_trim(0);
 
     ru->pid      = getpid();
     ru->ppid     = getppid();
@@ -243,7 +239,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	struct stat bf;
 	static double mby = -1.0;
 
-	malloc_trim(0);
+	SC_mem_trim(0);
 
 	if (mby == -1.0)
 	   mby = getpagesize()/(1024.0*1024.0);

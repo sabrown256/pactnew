@@ -337,6 +337,11 @@ static int _PD_rd_prim_typ_iii(PDBfile *file, char *bf)
 			   tuple, bpi, align, ord,
 			   ordr, formt, unsgned, onescmp, conv);
 
+/* if these have a reference do not free them */
+	if ((origtype != NULL)  && (SC_ref_count(formt) == 0))
+	   {CFREE(ordr);
+	    CFREE(formt);};
+
         CFREE(type);};
 
 /* get global type qualifier information */
