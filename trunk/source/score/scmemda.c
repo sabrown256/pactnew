@@ -72,6 +72,23 @@ static int _SC_free_std(void *p, int zsp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_ARRLEN_STD - use the C std library free */
+
+
+static int64_t _SC_arrlen_std(void *p)
+   {int64_t rv;
+
+    rv = -1;
+
+#if defined(LINUX) || defined(CYGWIN)
+    rv = malloc_usable_size(p);
+#endif
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_NALLOC_CHK - wrap a check for a specific pointer value
  *                - around the _SC_ALLOC_N call
  *                - part of a usable API for memory debugging
@@ -166,6 +183,24 @@ static int _SC_free_chk(void *p, int zsp)
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_ARRLEN_CHK - wrap a check for a specific pointer value
+ *                - around an SC_arrlen
+ *                - part of a usable API for memory debugging
+ */
+
+static int64_t _SC_arrlen_chk(void *p)
+   {int64_t rv;
+
+    if (p == _SC_ms.trap_ptr)
+       raise(_SC_ms.trap_sig);
+
+    rv = SC_gs.mm.arrlen(p);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
 
 /*                        MEMORY MANAGER COLLECTIONS                        */
 
@@ -198,6 +233,7 @@ SC_mem_fnc SC_use_c_mm(void)
     SC_gs.mm.alloc   = _SC_alloc_std;
     SC_gs.mm.realloc = _SC_realloc_std;
     SC_gs.mm.free    = _SC_free_std;
+    SC_gs.mm.arrlen  = _SC_arrlen_std;
 
 /* GOTCHA: add these */
     SC_gs.mm.alloc_n   = NULL;
@@ -221,6 +257,7 @@ SC_mem_fnc SC_use_mm(SC_mem_fnc *mf)
 	SC_gs.mm.alloc   = mf->alloc;
 	SC_gs.mm.realloc = mf->realloc;
 	SC_gs.mm.free    = mf->free;
+	SC_gs.mm.arrlen  = mf->arrlen;
 
 	SC_gs.mm.alloc_n   = mf->alloc_n;
 	SC_gs.mm.realloc_n = mf->realloc_n;
@@ -247,6 +284,7 @@ SC_mem_fnc SC_trap_pointer(void *p, int sig)
     SC_gs.mm.alloc   = _SC_alloc_chk;
     SC_gs.mm.realloc = _SC_realloc_chk;
     SC_gs.mm.free    = _SC_free_chk;
+    SC_gs.mm.arrlen  = _SC_arrlen_chk;
 
 /* GOTCHA: add these */
     SC_gs.mm.alloc_n   = NULL;
@@ -740,14 +778,12 @@ int SC_is_score_ptr(void *p)
  */
 
 long SC_arrlen(void *p)
-   {long nb, rv;
-    mem_descriptor *desc;
+   {long rv;
 
-    rv = -1L;
-
-    if (SC_is_active_space(p, NULL, &desc))
-       {nb = desc->length;
-	rv = (nb < 0L) ? -1L : nb;};
+    if (SC_gs.mm.arrlen != NULL)
+       rv = SC_gs.mm.arrlen(p);
+    else
+       rv = -1L;
 
     return(rv);}
 

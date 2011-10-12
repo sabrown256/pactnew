@@ -122,6 +122,8 @@ else
    endif
 endif
 
+set rpf = ( $rpf tst-*)
+
 $TEST_CHECK part -a trans -e $xstatus -x $exe -rpf "$rpf" "$msg"
 
 exit($status)

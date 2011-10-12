@@ -20,6 +20,8 @@ NoteD $Log -n "                    $msg"
 
 source ../../../scripts/test-run
 
+set rpf = ( $rpf nat-nat.db1 )
+
 $TEST_CHECK part -a free -e $xstatus -dt $dt -x $exe -rpf "$rpf" none
 
 exit($status)

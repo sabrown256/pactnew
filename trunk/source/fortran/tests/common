@@ -12,3 +12,14 @@ setenv Package  fortran
 setenv Test     $0:t
 source ../../../scripts/test-env
 
+# lots of compilers have trouble with this one
+setenv TEST_ADVISORY ${TEST_ADVISORY}:fortran_pdb_auto
+
+# Sun has trouble with this one
+setenv TEST_ADVISORY ${TEST_ADVISORY}:fortran_pdb_dp
+
+# Intel fails this one
+setenv TEST_ADVISORY ${TEST_ADVISORY}:fortran_pgs_auto
+
+# PathScale is so old it cannot even build this one
+setenv TEST_ADVISORY ${TEST_ADVISORY}:fortran_pgs

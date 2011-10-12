@@ -31,8 +31,6 @@
 
 /*--------------------------------------------------------------------------*/
 
-#define UNCOLLECT       SHRT_MAX
-
 #define ERRDEV  stderr                /* device to dump diagnostic messages */
 
 #define SC_NSIG 65
@@ -616,6 +614,7 @@ struct s_SC_mem_fnc
     void *(*alloc)(long ni, long bpi, char *name, int na, int zsp);
     void *(*realloc)(void *p, long ni, long bpi, int na, int zsp);
     int (*free)(void *p, int zsp);
+    int64_t (*arrlen)(void *p);
 
     void *(*alloc_n)(long ni, long bpi, void *a);
     void *(*realloc_n)(void *p, long ni, long bpi, void *a);

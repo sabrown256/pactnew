@@ -65,5 +65,9 @@ endsw
 
 setenv dt `$TIMER -b $t0`
 
+# GOTCHA: Note ends up not being defined in psh/tests/s1t1 et al
+# because of alias inheritance issues
+#Note $Log "test-run: $exe exit status = $xstatus"
+
 unset t0
 

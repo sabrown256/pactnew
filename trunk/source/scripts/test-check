@@ -28,6 +28,7 @@ endif
 
 set adv = $Package
 
+set larg = ( $argv )
 while ($#argv > 0)
    switch ($1)
       case -h:
@@ -50,6 +51,8 @@ while ($#argv > 0)
    endsw
    shift
 end
+
+Note $log "test-check $tgt ($#larg) |$larg|"
 
 switch ($tgt)
 
@@ -154,6 +157,7 @@ switch ($tgt)
               NoteD $log "$name TEST ... ACCEPTED AS PASSED ($dt)"
            else
               NoteD $log "$name TEST ... FAILED ($dt)"
+              set err = 1
            endif
            NoteD $log ""
            NoteD $log "See $log for details"

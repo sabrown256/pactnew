@@ -26,7 +26,7 @@ Tool CC {
                 64    = -tp k8-64 -fpic ]
    Flags   += [ _cmd_ = -p ;                # profiling
 	        on    = -Mprof=func ]
-   Debug    = -g
+   Debug    = -g -O0
    Optimize = -g -O1
    Version  = -V
 }
@@ -37,14 +37,15 @@ Tool FC {
    Flags  += [ _env_ = Bits ;               # address bit size
                32    = -tp px ;
                64    = -tp k8-64 -fpic ]
-   Debug    = -g
+   Debug    = -g -O0
    Optimize = -g -O
    Version  = -V
 }
 
 Tool LD {
    RPath   = -Wl,-rpath,@
-   Flags   = -Ktrap=fp ${NUMA}
+#   Flags   = -Ktrap=fp ${NUMA}
+   Flags   = -Ktrap=fp
    Flags   += [ _cmd_ = -p ;                # profiling
 	        on    = -Mprof=func ]
 }

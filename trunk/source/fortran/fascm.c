@@ -26,7 +26,6 @@ FIXNUM _SC_make_ff(void **pm, FIXNUM *pni, FIXNUM *pnb, FIXNUM *pnc,
     FIXNUM ok;
     mem_header *space;
     mem_descriptor *desc;
-    mem_inf *info;
     SC_mem_opt opt;
 
     opt.perm = FALSE;
@@ -46,7 +45,6 @@ FIXNUM _SC_make_ff(void **pm, FIXNUM *pni, FIXNUM *pnb, FIXNUM *pnc,
     if (s != NULL)
        {space = ((mem_header *) s) - 1;
 	desc  = &space->block;
-	info  = &desc->desc.info;
 	
 	id  = SC_GET_BLOCK_ID(desc);
 	id &= ~SC_FF_NAME_MASK;

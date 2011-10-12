@@ -588,6 +588,10 @@ static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
 			   tuple, bpi, align, ord,
 			   ordr, formt, unsgned, onescmp, conv);
 
+	if (origtype != NULL) 
+	   {CFREE(ordr);
+	    CFREE(formt);};
+
         CFREE(type);};
 
     return(TRUE);}

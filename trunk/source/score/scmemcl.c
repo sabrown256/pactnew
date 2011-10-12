@@ -667,6 +667,26 @@ int _SC_free_wl(void *p, int zsp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_ARRLEN_WL - return the length of an array which was allocated
+ *               - with _SC_ALLOC_N
+ *               - return -1L on error
+ */
+
+int64_t _SC_arrlen_wl(void *p)
+   {long nb, rv;
+    mem_descriptor *desc;
+
+    rv = -1L;
+
+    if (SC_is_active_space(p, NULL, &desc))
+       {nb = desc->length;
+	rv = (nb < 0L) ? -1L : nb;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_USE_FULL_MM - use the SCORE memory manager */
 
 SC_mem_fnc SC_use_full_mm(void)
@@ -678,6 +698,7 @@ SC_mem_fnc SC_use_full_mm(void)
     SC_gs.mm.alloc     = _SC_alloc_wl;
     SC_gs.mm.realloc   = _SC_realloc_wl;
     SC_gs.mm.free      = _SC_free_wl;
+    SC_gs.mm.arrlen    = _SC_arrlen_wl;
 
     SC_gs.mm.alloc_n   = _SC_alloc_nl;
     SC_gs.mm.realloc_n = _SC_realloc_nl;

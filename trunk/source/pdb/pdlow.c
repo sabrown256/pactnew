@@ -617,8 +617,6 @@ void _PD_defstr_prim_rd(PDBfile *file, char *type, char *origtype,
 	     if (host_empty == TRUE)
 	        _PD_d_install(file, type, _PD_defstr_copy(dp), PD_CHART_HOST);};
 
-	 CFREE(ordr);
-	 CFREE(formt);
 	 _PD_free_tuple(tuple);}
 
      else 

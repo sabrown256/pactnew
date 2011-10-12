@@ -110,7 +110,7 @@ EOF
 COMPILE:
 
 flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
-eval `$Tmp`
+eval `$CFE $Tmp`
 
 Note $ALog ""
 Note $ALog "Integer size info:"
