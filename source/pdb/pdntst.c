@@ -117,6 +117,7 @@ static int
  test_two    = TRUE,
  test_three  = TRUE,
  test_four   = TRUE,
+ mlt_cnnct   = TRUE,
  is_w,
  is_r,
  ia_w[N_INT],
@@ -285,8 +286,11 @@ long in_out(PDBfile *file, char *type, long n, void *vi, void *vo)
 
     nb = PD_sizeof(file, type, n, vi);
 
-    bo = CMAKE_N(char, nb);
-    bi = CMAKE_N(char, nb);
+    bo = CMAKE_N(char, nb+1);
+    bi = CMAKE_N(char, nb+1);
+
+    memset(bo, 0, nb+1);
+    memset(bi, 0, nb+1);
 
 /* write in to the buffer */
     outf = PN_open(file, bo);
@@ -318,7 +322,6 @@ long in_out(PDBfile *file, char *type, long n, void *vi, void *vo)
 
 static void prep_test_1_data(void)
    {int i, k;
-    static int mlt_cnnct = TRUE;
 
 /* set scalars */
     cs_r    = 0;
@@ -446,7 +449,8 @@ static void cleanup_test_1(void)
 
     CFREE(cap_w[0]);
     CFREE(cap_w[1]);
-    CFREE(cap_w[2]);
+    if (mlt_cnnct == FALSE)
+       CFREE(cap_w[2]);
 
     CFREE(cap_r[0]);
     CFREE(cap_r[1]);

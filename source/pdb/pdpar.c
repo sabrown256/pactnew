@@ -52,7 +52,7 @@ static PD_Pfile *_PD_make_pfile(FILE *fp)
     pf->bf_len = 0L;
     pf->comm   = 0;
     pf->mp_id  = 0;
-    pf->id     = 0;
+    pf->id     = -1;
 
     return(pf);}
 
@@ -76,9 +76,9 @@ static void _PD_pfm_init_t(void)
 	pm        = CPMAKE_N(pfmanager, _PD.nfilesx, 3);
 	_PD_pfman = pm;
 
-        for(i = 0; i < _PD.nfilesx; i++, pm++)
-           {pm->available = TRUE;
-            pm->addr      = 0;};};
+        for (i = 0; i < _PD.nfilesx; i++, pm++)
+            {pm->available = TRUE;
+             pm->addr      = 0;};};
 
      SC_LOCKOFF(pfmanager_lock_t);
 
@@ -136,8 +136,9 @@ static void _PD_pfm_remove_file_t(FILE *fp)
 
     SC_LOCKON(pfmanager_lock_t);
 
-    _PD_pfman[id].available = TRUE;
-    _PD_pfman[id].addr      = 0;
+    if (id > -1)
+       {_PD_pfman[id].available = TRUE;
+	 _PD_pfman[id].addr      = 0;};
 
     SC_LOCKOFF(pfmanager_lock_t);
  

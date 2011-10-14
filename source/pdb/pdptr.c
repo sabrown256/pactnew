@@ -136,9 +136,9 @@ void _PD_free_adloc(adloc *al)
    {
 
     if (al != NULL)
-       {SC_free_array(al->ap, _PD_free_addr);
-
-	SC_free_hasharr(al->ah, NULL, NULL);
+       {if (SC_safe_to_free(al) == TRUE)
+	   {SC_free_array(al->ap, _PD_free_addr);
+	    SC_free_hasharr(al->ah, NULL, NULL);};
 
 	CFREE(al);};
 
@@ -191,6 +191,9 @@ static adloc *_PD_ptr_set_al(PDBfile *file, adloc *nal, int serial)
     oal = *(adloc **) SC_array_get(apl, tid);
     SC_array_set(apl, tid, &nal);
 
+    SC_mark(oal, -1);
+    SC_mark(nal, 1);
+
     SC_LOCKOFF(PD_ptr_lock);
 
     return(oal);}
@@ -234,10 +237,12 @@ static void _PD_ptr_free_al(PDBfile *file, int serial)
  */
 
 void _PD_ptr_save_al(PDBfile *file, adloc **poa, char **pob, char *base)
-   {
+   {adloc *al;
 
     if (poa != NULL)
-       *poa = _PD_ptr_get_al(file);
+       {al = _PD_ptr_get_al(file);
+	SC_mark(al, 1);
+	*poa = al;};
 
     SC_LOCKON(PD_ptr_lock);
 
@@ -265,6 +270,8 @@ void _PD_ptr_restore_al(PDBfile *file, adloc *oa, char *ob)
 
     _PD_ptr_free_al(file, FALSE);
 
+    SC_mark(oa, -1);
+
     SC_LOCKON(PD_ptr_lock);
 
     if (ob != NULL)
@@ -286,9 +293,12 @@ void _PD_ptr_restore_al(PDBfile *file, adloc *oa, char *ob)
 /* _PD_PTR_FREE_APL_ITEM - free an SC_array from APL */
 
 static int _PD_ptr_free_apl_item(void *a)
-   {adloc *al;
+   {adloc *al, **pal;
 
-    al = *(adloc **) a;
+    pal  = (adloc **) a;
+    al   = *pal;
+    *pal = NULL;
+
     _PD_free_adloc(al);
 
     return(TRUE);}
