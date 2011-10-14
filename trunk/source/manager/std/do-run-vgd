@@ -12,7 +12,7 @@
 
 DBG : vgd {
    Exe   = valgrind
-   Flags = --tool=memcheck --db-attach=yes
+   Flags = --tool=memcheck --track-origins=yes --db-attach=yes
    Delim = 
    Cmd   = $Wrap $MPI_Exe $MPI_Flags $DBG_Exe $DBG_Flags $Code $CArgs
 }

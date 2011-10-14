@@ -165,7 +165,7 @@ static int _PN_bseek(FILE *stream, int64_t addr, int offset)
 
 static uint64_t _PN_bread(void *s, size_t nbi, uint64_t ni, FILE *stream)
    {BF_FILE *fb;
-    size_t nbw;
+    size_t nbw, nr;
 
     fb = _PD_GET_FILE_PTR(stream);
 
@@ -174,7 +174,10 @@ static uint64_t _PN_bread(void *s, size_t nbi, uint64_t ni, FILE *stream)
        nbw = 0;
 
     else
-       {memcpy(s, MEM(fb), nbw);
+       {nr  = fb->length - (fb->addr.memaddr - fb->bf.memaddr);
+	nbw = min(nbw, nr);
+
+	memcpy(s, MEM(fb), nbw);
 
 /* adjust the current address */
         DISK(fb) += nbw;};
