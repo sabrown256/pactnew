@@ -74,18 +74,23 @@ switch ($OS[1])
         breaksw
 
    case "linux" :
-        set Concise = unk
-        foreach i (/lib*/libc*.so*)
-           set ve = `echo $i | sed 's/-/ /' | sed 's/\./ /g'`
-           if (($ve[1] == /lib/libc) && ($#ve > 3)) then
-              set Concise = "$ve[2].$ve[3]"
-              break
-           endif
-        end
+        set inf = ( `ldd --version |& head -n 1 | awk '{print $NF}' | sed 's/\./ /g'` )
+        set Concise = "$inf[1].$inf[2]"
+        unset inf
+        if ("$Concise" == "") then
+           set Concise = unk
+           foreach i (/lib*/libc*.so*)
+              set ve = `echo $i | sed 's/-/ /' | sed 's/\./ /g'`
+              if (($ve[1] == /lib/libc) && ($#ve > 3)) then
+                 set Concise = "$ve[2].$ve[3]"
+                 break
+              endif
+           end
+        endif
 
         if ($Concise == unk) then
-           foreach i (/lib/libc*.so*)
-              @ ni = `nm $i | grep -w T | grep "@@GLIBC_2.1" | wc -l`
+           foreach i (/lib/libc*.so* /lib/x86_64-linux-gnu/libc*.so*)
+              @ ni = `nm $i |& grep -w T | grep "@@GLIBC_2.1" | wc -l`
               if ($ni > 50) then
                  set Concise = "2.3"
                  break

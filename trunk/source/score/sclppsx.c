@@ -391,6 +391,7 @@ static int _SC_posix_close(PROCESS *pp)
 	    if ((pid > 0) && (SC_status(pp) == SC_RUNNING))
 	       {st = SC_child_kill(pid);
 		SC_ASSERT(st == TRUE);
+
 		SC_process_state(pp, SC_PROC_SIG);};
 
 /* close the communications pipe */
