@@ -487,6 +487,7 @@ extern int
  SC_child_kill(int pid),
  SC_child_status(int pid, int *pcnd, int *psts),
  SC_process_status(PROCESS *pp),
+ SC_process_state(PROCESS *pp, int ev),
  SC_check_children(void),
  SC_running_children(void);
 
@@ -495,7 +496,6 @@ extern void
  _SC_set_process_status(PROCESS *pp, int sts, int rsn, char *tm),
  _SC_manage_process(PROCESS *pp),
  SC_save_exited_children(void),
- SC_process_state(PROCESS *pp, int ev),
  SC_handle_sigchld(int signo);
 
 

@@ -321,9 +321,11 @@ PROCESS *SC_lookup_process(int pid)
  *                - the I/O may or may not have been checked (SC_PROC_IO)
  */
 
-void _SC_delete_pid(int pid)
-   {int i, n, fl;
+int _SC_delete_pid(int pid)
+   {int i, n, fl, fr;
     PROCESS *pp;
+
+    fr = FALSE;
 
     n = SC_array_get_n(_SC.process_list);
 
@@ -341,7 +343,7 @@ void _SC_delete_pid(int pid)
 
 	     _SC_mark_exited_child(pp);
 
-             SC_process_state(pp, SC_PROC_RM | SC_PROC_SIG);
+             fr = SC_process_state(pp, SC_PROC_RM | SC_PROC_SIG);
 
 	     n = SC_array_remove(_SC.process_list, i);
 	     if (i < n)
@@ -354,7 +356,7 @@ void _SC_delete_pid(int pid)
 
     SC_array_set_n(_SC.process_list, n);
 
-    return;}
+    return(fr);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -412,10 +414,9 @@ static void _SC_rl_process(PROCESS *pp)
 	pp->gets     = NULL;
 	pp->in_ready = NULL;
 	pp->lost     = NULL;
-	pp->setup    = NULL;};
+	pp->setup    = NULL;
 
-    CFREE(pp);
-
+	CFREE(pp);};
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -424,14 +425,16 @@ static void _SC_rl_process(PROCESS *pp)
 /* SC_PROCESS_STATE - add EV to the PP flags member
  *                  - if all of the criteria are met then
  *                  - and only then free the PROCESS
+ *                  - return TRUE iff PROCESS released
  *                  - NOTE: always free a child PROCESS
  */
 
-void SC_process_state(PROCESS *pp, int ev)
-   {int fl, chld;
+int SC_process_state(PROCESS *pp, int ev)
+   {int fl, fr, chld, rv;
 
     pp->flags |= ev;
 
+    fr   = FALSE;
     fl   = pp->flags;
     chld = pp->ischild;
 
@@ -452,15 +455,18 @@ void SC_process_state(PROCESS *pp, int ev)
 	    else
 	       _SC_set_process_status(pp, 0, -100, NULL);
 
-	    _SC_delete_pid(pp->id);};
+	    fr = _SC_delete_pid(pp->id);};
 
 	if (_SC.debug_proc)
 	   drproc(ev, pp->id);};
 
-    if ((fl == 0xf) || ((fl & SC_PROC_EXEC) == 0) || (chld == TRUE))
-       _SC_rl_process(pp);
+    rv = fr;
+    if ((fr == FALSE) &&
+	((fl == 0xf) || ((fl & SC_PROC_EXEC) == 0) || (chld == TRUE)))
+       {rv = TRUE;
+       _SC_rl_process(pp);};
 
-    return;}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
