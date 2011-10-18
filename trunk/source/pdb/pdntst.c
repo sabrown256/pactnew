@@ -280,17 +280,22 @@ static int run_test(PFTest test, int n, char *host)
 /* IN_OUT - write and read an object into a buffer for later comparison */
 
 long in_out(PDBfile *file, char *type, long n, void *vi, void *vo)
-   {long nb;
+   {long nb, nba;
     char *bo, *bi;
     PDBfile *inf, *outf;
 
     nb = PD_sizeof(file, type, n, vi);
 
-    bo = CMAKE_N(char, nb+1);
-    bi = CMAKE_N(char, nb+1);
+/* make the space too big to turn up in the intermediate allocations
+ * this saves the test on some 32 bit platforms
+ */
+    nba = nb + 100;
 
-    memset(bo, 0, nb+1);
-    memset(bi, 0, nb+1);
+    bo = CMAKE_N(char, nba);
+    bi = CMAKE_N(char, nba);
+
+    memset(bo, 0, nba);
+    memset(bi, 0, nba);
 
 /* write in to the buffer */
     outf = PN_open(file, bo);
