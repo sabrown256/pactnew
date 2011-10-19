@@ -36,7 +36,21 @@ cd $TestDir
 
 unsetenv DO_RUN_SUBMIT_ENV
 
-if ($FC_Exe != none) then
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# omit tests - usually in difficult CROSS_COMPILE situation
+
+if ($RUN_TESTS == FALSE) then
+   NoteD $Log ""
+   NoteD $Log "FORTRAN TESTS ... omitted"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# run the tests
+
+else if ($FC_Exe != none) then
 
    NoteD $Log ""
    NoteD $Log "FORTRAN TEST ..."

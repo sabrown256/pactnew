@@ -96,16 +96,15 @@ endif
          flog $Log set xstatus = 255
       endif
 
-      if (($xstatus != -1) && ($xstatus != 255) && ($xstatus != 254)) then
+      if ($xstatus == 0) then
          flog $Log ( diff scmpiwrap.res $RefDir/scmpiwrap >! scmpiwrap.res.diff )
-         flog $Log cat scmpiwrap.res.diff
-         set Files = `find . -name "scmpiwrap.res.diff" -size 0 -print`
-         if ($#Files == 0) then
+         if ($status != 0) then
+            flog $Log cat scmpiwrap.res.diff
             set xstatus = 252
-         else
-            set rpf = ( $rpf scmpiwrap.res scmpiwrap.res.diff )
          endif
       endif
+
+      set rpf = ( $rpf scmpiwrap.res scmpiwrap.res.diff )
 
       $TEST_CHECK part -a mpi_wrap -e $xstatus -l -rpf "$rpf" none
 

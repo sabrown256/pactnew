@@ -1228,31 +1228,32 @@ CFG_DONE:
            switch ($1)
               case -a:
                    foreach i ($BaseDev/*)
-                      set c    = $i:t
-                      set spec = `echo $c | sed 's/+/ /'`
-                      Note $Log "spec = $spec"
-                      if ($#spec > 1) then
-                         set hst   = $spec[1]
-                         set cfg   = $spec[2]
-                         set ishst = `host $hst | awk '{ print $1 }'`
-                         set iscfg = `find . -name $cfg`
-                         Note $Log "   Host: |$hst| |$ishst| |$Host|"
-                         Note $Log "   Cfg : |$cfg| |$iscfg|"
-                         if ("$cfg" == "none") then
-                            set Cfgs = ( $Cfgs $c )
-                         else if (("$ishst" != "Host") && ("$iscfg" != "")) then
-                            set Cfgs = ( $Cfgs $c )
-                         else if ("$c" == "$hst+$hst") then
-                            set Cfgs = ( $Cfgs $c )
-			 else
-                            set ishst = `host $hst-pub | awk '{ print $1 }'`
-                            set iscfg = `find . -name $cfg`
-                            if (("$ishst" != "Host") && ("$iscfg" != "")) then
-                               set Cfgs = ( $Cfgs $c )
-	   		    endif
-                         endif
-                      else if (($c =~ *+none) || ($c =~ *-none)) then
+                      set c = $i:t
+                      if ("$c" =~ *+*) then
                          set Cfgs = ( $Cfgs $c )
+                      else if ($c =~ *none*) then
+                         set Cfgs = ( $Cfgs $c )
+                      else
+                         set spec = `echo $c | sed 's/+/ /'`
+                         Note $Log "spec = $spec"
+                         if ($#spec > 1) then
+                            set cfg   = $spec[2]
+                            set iscfg = `find . -name $cfg`
+                            Note $Log "   Cfg : |$cfg| |$iscfg|"
+                            if ("$iscfg" != "") then
+                               set hst   = $spec[1]
+                               set ishst = `host $hst | awk '{ print $1 }'`
+                               Note $Log "   Host: |$hst| |$ishst| |$Host|"
+                               if ("$ishst" != "Host") then
+                                  set Cfgs = ( $Cfgs $c )
+	                       else
+                                  set ishst = `host $hst-pub | awk '{ print $1 }'`
+                                  if ("$ishst" != "Host") then
+                                     set Cfgs = ( $Cfgs $c )
+                                  endif
+                               endif
+                            endif
+                         endif
                       endif
                    end
 # NOTE: we are about to wipe out the log file and directory if this
@@ -2695,10 +2696,28 @@ CFG_DONE:
         if ($RStatus == 0) then
            NoteD $Log "All tests passed ($RStatus/$ETime)"
         else
-           NoteD $Log "At least one test failed ($RStatus/$ETime)"
 
 # NOTE: NFS may prevent this from always working
            set Failed = ( `grep 'TEST ... FAILED' $Log |& sed 's/^.*|//' |& awk '{ print $1 }' | tr "[A-Z]" "[a-z]" | sort | uniq` )
+           set Passed = ( `grep 'TEST ... PASSED' $Log |& sed 's/^.*|//' |& awk '{ print $1 }' | tr "[A-Z]" "[a-z]" | sort | uniq` )
+           set lfail = ""
+           foreach f ($Failed)
+              set lok = TRUE
+              foreach p ($Passed)
+                 if ($f == $p) then
+                    set lok = FALSE
+                    break
+                 endif
+              end
+              if ($lok == TRUE) then
+                 set lfail = ( $lfail $f )
+              endif
+           end
+           set Failed = ( $lfail )
+           unset lfail
+           unset lok
+
+           NoteD $Log "$#Failed test(s) failed ($RStatus/$ETime)"
            NoteD $Log "   $Failed"
         endif
         NoteD $Log ""

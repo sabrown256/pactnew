@@ -117,13 +117,14 @@ setenv ZeroSpace  "-z 2"
       setenv CROSS_COMPILE FALSE
    endif
 
-   setenv CFE ""
+# control when to use do-run
+   setenv PFE   $DORUN
+   setenv CFE   ""
    if ($CROSS_COMPILE != FALSE) then
       setenv CFE $DORUN
 
 # make up the list of environment variable to pass through submit
       set lenv = ""
-#      foreach i (SCHEME ULTRA)
       foreach i (SCHEME)
          printenv $i >& /dev/null
          if ($status == 0) then
@@ -134,7 +135,6 @@ setenv ZeroSpace  "-z 2"
       setenv DO_RUN_SUBMIT_ENV "$lenv"
       unset lenv
    endif
-   setenv PFE       $DORUN
 
    setenv PACT_Exe  "$CFE $BinDir/pact"
 

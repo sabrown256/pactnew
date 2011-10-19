@@ -11,7 +11,6 @@
 source ../../tests/common
 
 set msg = "PDB Distributed Parallel Test ...... "
-set exe = $BinDir/pddpts
 
 if ("$MPI" != "") then
    NoteD $Log ""
@@ -29,12 +28,13 @@ if ("$MPI" != "") then
       NoteD $Log "                    ${msg}FAILED"
 
    else
+      set exe = $BinDir/pddpts
+      set opt = ( -v $tst )
+
       if (-x $PFE) then
-
-         flog $Log $PFE -dr -p 2 -t 0 $exe -v $tst
-         ftee $Log ( $PFE -p 2 -t 0 $exe -v $tst |& awk '$1 !~ /MPI/ && $1 !~ /ERROR/ && $1 !~ /srun/ {print}' | grep -v filenoexist | grep -v salloc )
+         flog $Log $PFE -dr -p 2 -t 0 $exe $opt
+         ftee $Log ( $PFE -p 2 -t 0 $exe $opt )
          set xstatus = $status
-
       else
          Note $Log "No MPI - test omitted"
          set xstatus = 255
