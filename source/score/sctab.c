@@ -182,9 +182,12 @@ static void _SC_insert_haelem(hasharr *ha, haelem *hp)
 
 /* SC_HAELEM_DATA - return the name and object from a hash element
  *                - return TRUE iff successful
+ *                - if SVR is TRUE an PO is non-NULL set hp->def to NULL
+ *                - severing the connection between *PO and hp->def
  */
 
-int SC_haelem_data(haelem *hp, char **pname, char **ptype, void **po)
+int SC_haelem_data(haelem *hp, char **pname, char **ptype, void **po,
+		   int svr)
    {int rv;
 
     rv = FALSE;
@@ -197,7 +200,9 @@ int SC_haelem_data(haelem *hp, char **pname, char **ptype, void **po)
 	   *ptype = hp->type;
 
 	if (po != NULL)
-	   *po = hp->def;
+	   {*po = hp->def;
+	    if (svr == TRUE)
+	       hp->def = NULL;};
 
 	rv = TRUE;};
 

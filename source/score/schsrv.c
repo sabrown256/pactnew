@@ -262,7 +262,7 @@ static int _SC_host_server_rel(haelem *hp, void *a)
     void *v;
     hrng *rng;
 
-    ok = SC_haelem_data(hp, NULL, &type, &v);
+    ok = SC_haelem_data(hp, NULL, &type, &v, TRUE);
     SC_ASSERT(ok == TRUE);
 
     if (strcmp(type, "hrng") == 0)
@@ -274,10 +274,10 @@ static int _SC_host_server_rel(haelem *hp, void *a)
 	    CFREE(hst[i]);
 
 	CFREE(hst);
-	CFREE(hp->def);}
+	CFREE(v);}
 
     else if (strcmp(type, SC_STRING_S) == 0)
-       CFREE(hp->def);
+       CFREE(v);
 
     return(TRUE);}
 

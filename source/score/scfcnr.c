@@ -58,7 +58,7 @@ static int _SC_rel_entry(haelem *hp, void *a)
    {int ok;
     fcent *ae;
 
-    ok = SC_haelem_data(hp, NULL, NULL, (void **) &ae);
+    ok = SC_haelem_data(hp, NULL, NULL, (void **) &ae, TRUE);
     SC_ASSERT(ok == TRUE);
 
     if (ae != NULL)

@@ -199,7 +199,7 @@ static int _CC_var_exist(haelem *hp, void *a)
     expr *v;
 
     n  = *(int *) a;
-    ok = SC_haelem_data(hp, &name, NULL, (void **) &v);
+    ok = SC_haelem_data(hp, &name, NULL, (void **) &v, FALSE);
     pd = _CC.all[n];
     SC_ASSERT(pd != NULL);
 

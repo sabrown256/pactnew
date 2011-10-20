@@ -134,13 +134,14 @@ static int _CC_rel_expr(haelem *hp, void *a)
     char *name;
     expr *e;
 
-    ok = SC_haelem_data(hp, &name, NULL, (void **) &e);
+    ok = SC_haelem_data(hp, &name, NULL, (void **) &e, TRUE);
     SC_ASSERT(ok == TRUE);
 
     if (e != NULL)
        {CFREE(e->name);
 	CFREE(e->type);
-        CFREE(e->ptr);};
+        CFREE(e->ptr);
+	CFREE(e);};
 
     return(TRUE);}
 
@@ -225,13 +226,14 @@ static int _CC_rel_type(haelem *hp, void *a)
     char *name;
     expr *e;
 
-    ok = SC_haelem_data(hp, &name, NULL, (void **) &e);
+    ok = SC_haelem_data(hp, &name, NULL, (void **) &e, TRUE);
     SC_ASSERT(ok == TRUE);
 
     if (e != NULL)
        {CFREE(e->type);
 	CFREE(e->name);
-        CFREE(e->ptr);};
+        CFREE(e->ptr);
+        CFREE(e);};
 
     return(TRUE);}
 

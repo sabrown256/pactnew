@@ -55,7 +55,7 @@ static int _PP_extra_defstr_delete(haelem *hp, void *arg)
     defstr *dp;
     PDBfile *fp = arg;
 
-    ok = SC_haelem_data(hp, NULL, NULL, (void **) &dp);
+    ok = SC_haelem_data(hp, NULL, NULL, (void **) &dp, FALSE);
     SC_ASSERT(ok == TRUE);
 
     if (SC_safe_to_free(dp)) {

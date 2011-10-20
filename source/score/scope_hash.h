@@ -126,7 +126,7 @@ extern void
  *SC_hasharr_get(hasharr *ha, long n);
 
 extern int
- SC_haelem_data(haelem *hp, char **pname, char **ptype, void **po),
+ SC_haelem_data(haelem *hp, char **pname, char **ptype, void **po, int svr),
  SC_hasharr_remove(hasharr *ha, void *key),
  SC_hasharr_free_n(void *d, void *a),
  SC_hasharr_foreach(hasharr *ha, int (*f)(haelem *hp, void *a), void *a),

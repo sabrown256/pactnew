@@ -1065,7 +1065,7 @@ static int _PP_extra_defstr_mark(haelem *hp, void *arg)
    {int ok;
     defstr *dp;
 
-    ok = SC_haelem_data(hp, NULL, NULL, (void **) &dp);
+    ok = SC_haelem_data(hp, NULL, NULL, (void **) &dp, FALSE);
     SC_ASSERT(ok == TRUE);
 
     SC_mark(dp, 1);

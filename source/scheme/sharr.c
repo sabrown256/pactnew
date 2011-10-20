@@ -237,10 +237,9 @@ static int _SS_rl_ha_elem(haelem *hp, void *a)
 
     si = (SS_psides *) a;
 
-    ok = SC_haelem_data(hp, NULL, NULL, (void **) &o);
+    ok = SC_haelem_data(hp, NULL, NULL, (void **) &o, TRUE);
     if (ok == TRUE)
-       {SS_gc(si, o);
-	hp->def = NULL;};
+       SS_gc(si, o);
 
     return(TRUE);}
 
