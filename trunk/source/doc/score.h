@@ -1,5 +1,5 @@
 TXT: SCORE User's Manual
-MOD: 08/24/2011
+MOD: 10/20/2011
 
 <CENTER>
 <P>
@@ -350,7 +350,7 @@ Return the number of elements in the hash array <tt>ha</tt>.
 <p>
 
 <pre>
-<i>C Binding: </i>int SC_haelem_data(haelem *hp, char **pname, char **ptype, void **po)
+<i>C Binding: </i>int SC_haelem_data(haelem *hp, char **pname, char **ptype, void **po, int svr)
 <i>Fortran Binding: </i>
 <i>SX Binding: </i>
 <i>Python Binding: </i>

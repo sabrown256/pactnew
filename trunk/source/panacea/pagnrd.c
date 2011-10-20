@@ -581,7 +581,7 @@ static int _PA_ha_rl_variable(haelem *hp, void *a)
     PA_variable *v;
     hasharr *ha;
 
-    ok = SC_haelem_data(hp, &name, &type, (void **) &v);
+    ok = SC_haelem_data(hp, &name, &type, (void **) &v, TRUE);
     if (ok == TRUE)
        {ha = (hasharr *) a;
 	if (strcmp(type, PAN_VARIABLE) == 0)

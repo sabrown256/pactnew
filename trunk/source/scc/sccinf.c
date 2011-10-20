@@ -800,7 +800,7 @@ static int _CC_dep_local(haelem *hp, void *a)
     expr *v;
     decl *pd;
 
-    ok = SC_haelem_data(hp, &name, NULL, (void **) &v);
+    ok = SC_haelem_data(hp, &name, NULL, (void **) &v, FALSE);
     SC_ASSERT(ok == TRUE);
 
     dl = _CC.cur->dep;

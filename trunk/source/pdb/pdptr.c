@@ -1321,7 +1321,7 @@ static int _PD_ptr_register(haelem *hp, void *a)
     file = (PDBfile *) a;
     al   = _PD_ptr_get_al(file);
 
-    ok = SC_haelem_data(hp, &name, NULL, (void **) &ep);
+    ok = SC_haelem_data(hp, &name, NULL, (void **) &ep, FALSE);
     SC_ASSERT(ok == TRUE);
 
     if ((file != NULL) && (ep != NULL))

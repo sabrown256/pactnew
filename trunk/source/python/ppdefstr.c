@@ -633,7 +633,7 @@ static int _PP_clr_defstr(haelem *hp, void *arg)
     PP_defstrObject *self;
     PDBfile *fp = arg;
     
-    ok = SC_haelem_data(hp, NULL, NULL, (void **) &self);
+    ok = SC_haelem_data(hp, NULL, NULL, (void **) &self, FALSE);
     if ((ok == TRUE) && (self->fileinfo->file == fp)) {
         Py_DECREF(self);
     }

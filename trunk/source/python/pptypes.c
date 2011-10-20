@@ -919,7 +919,7 @@ int PP_rl_type_entry(haelem *hp, void *a)
     int n, ok;
     PP_type_entry *entry;
 
-    ok = SC_haelem_data(hp, NULL, NULL, (void **) &entry);
+    ok = SC_haelem_data(hp, NULL, NULL, (void **) &entry, FALSE);
     SC_ASSERT(ok == TRUE);
 
     n = SC_mark(entry, 0);
@@ -1013,7 +1013,7 @@ int _PP_rl_class_descr(haelem *hp, void *a)
     int n, ok;
     PP_class_descr *cdescr;
 
-    ok = SC_haelem_data(hp, NULL, NULL, (void **) &cdescr);
+    ok = SC_haelem_data(hp, NULL, NULL, (void **) &cdescr, FALSE);
     SC_ASSERT(ok == TRUE);
 
     n = SC_mark(cdescr, 0);
@@ -2376,7 +2376,7 @@ int _PP_decref_object(haelem *hp, void *a)
     int ok;
     PyObject *obj;
 
-    ok = SC_haelem_data(hp, NULL, NULL, (void **) &obj);
+    ok = SC_haelem_data(hp, NULL, NULL, (void **) &obj, FALSE);
     SC_ASSERT(ok == TRUE);
 
     Py_DECREF(obj);
