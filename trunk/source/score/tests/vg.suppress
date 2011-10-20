@@ -11,31 +11,36 @@
    fun:SC_is_score_space
 }
 {
+   pointer-check-c
+   Memcheck:Cond
+   fun:SC_pointer_ok
+}
+{
    pointer-check
    Memcheck:Addr1
    fun:SC_pointer_ok
 }
-{
-   pointer-mark
-   Memcheck:Cond
-   fun:SC_mark
-}
-{
-   array-free8
-   Memcheck:Addr8
-   fun:_SC_free_ns
-   fun:_SC_free_ws
-   fun:*
-   fun:SC_free_array
-}
-{
-   array-free2
-   Memcheck:Addr2
-   fun:_SC_free_ns
-   fun:_SC_free_ws
-   fun:*
-   fun:SC_free_array
-}
+# {
+#    pointer-mark
+#    Memcheck:Cond
+#    fun:SC_mark
+# }
+# {
+#    array-free8
+#    Memcheck:Addr8
+#    fun:_SC_free_ns
+#    fun:_SC_free_ws
+#    fun:*
+#    fun:SC_free_array
+# }
+# {
+#    array-free2
+#    Memcheck:Addr2
+#    fun:_SC_free_ns
+#    fun:_SC_free_ws
+#    fun:*
+#    fun:SC_free_array
+# }
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
