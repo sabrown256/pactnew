@@ -29,6 +29,8 @@ static void sig_handler(int sig)
 
     err = SC_retrace_exe(NULL, -1, 60000);
 
+    SC_ASSERT(err == TRUE);
+
     LONGJMP(cpu, TRUE);
 
     SC_LOCKOFF(tlock);
@@ -47,6 +49,8 @@ static void busy(void)
     for (i = 0; i < 10000000; i++)
         c = cos((double) (i % 12));
 
+    SC_ASSERT(c != -HUGE);
+
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -56,17 +60,14 @@ static void busy(void)
 
 static void *work(void *a)
    {int tid, nt;
-    char *s;
     void *rv;
 
     tid = SC_current_thread();
     nt  = SC_get_n_thread();
 
     rv = NULL;
-    s  = NULL;
     if ((tid == nt-1) || (nt < 2))
        raise(SIGSEGV);
-/*       *s = '\0'; */
     else
        busy();
 

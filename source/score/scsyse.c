@@ -49,13 +49,15 @@ static FILE *lgf = NULL;
  */
 
 int _SC_reset_stdin(int wh)
-   {int fd, rv;
-
-    fd = fileno(stdin);
+   {int rv;
 
     rv = TRUE;
 
 #ifdef HAVE_READLINE
+
+    int fd;
+
+    fd = fileno(stdin);
 
     if (wh == FALSE)
        {SC_unblock_fd(fd);

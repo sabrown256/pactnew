@@ -39,15 +39,15 @@ if (-x "$VG") then
       switch ($largs[1])
          case -vg:
               set TLog = test-vg
-              setenv Valgrind  "valgrind --tool=memcheck --gen-suppressions=all"
+              setenv Valgrind  "valgrind --tool=memcheck --track-origins=yes --gen-suppressions=all"
               breaksw
          case -vgd:
               set TLog = test-vg
-              setenv Valgrind  "valgrind --tool=memcheck --db-attach=yes"
+              setenv Valgrind  "valgrind --tool=memcheck --track-origins=yes --db-attach=yes"
               breaksw
          case -vgs:
               set TLog = test-vgs
-              setenv Valgrind  "valgrind --tool=memcheck"
+              setenv Valgrind  "valgrind --tool=memcheck --track-origins=yes"
               breaksw
       endsw
       shift largs

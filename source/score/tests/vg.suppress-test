@@ -1,5 +1,31 @@
 {
-   array_test_7_4
+   scarts_7_8_a
+   Memcheck:Addr8
+   fun:_SC_free_ns
+   fun:_SC_free_ws
+   fun:test_7
+   fun:run_test
+   fun:main
+}
+{
+   scarts_7_8_b
+   Memcheck:Addr8
+   fun:test_7
+   fun:run_test
+   fun:main
+}
+
+{
+   scarts_7_4_a
+   Memcheck:Addr4
+   fun:_SC_free_ns
+   fun:_SC_free_ws
+   fun:test_7
+   fun:run_test
+   fun:main
+}
+{
+   scarts_7_4_b
    Memcheck:Addr4
    fun:test_7
    fun:run_test
@@ -7,10 +33,26 @@
 }
 
 {
-   array_test_7_2
+   scarts_7_2_a
+   Memcheck:Addr2
+   fun:_SC_free_ns
+   fun:_SC_free_ws
+   fun:test_7
+   fun:run_test
+   fun:main
+}
+{
+   scarts_7_2_b
    Memcheck:Addr2
    fun:test_7
    fun:run_test
+   fun:main
+}
+
+{
+   scmtrt_1
+   Memcheck:Addr8
+   fun:test_2
    fun:main
 }
 

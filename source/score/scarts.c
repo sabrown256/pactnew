@@ -168,13 +168,19 @@ static int test_2(void)
     for (i = 0; i < na; i++)
         {SC_array_set(ac, na-i-1, &ca[i]);
 	 SC_array_set(ai, na-i-1, &ia[i]);
-         SC_array_set(ad, na-i-1, &da[i]);};
+         SC_array_set(ad, na-i-1, &da[i]);
+	 SC_mark(ca[i], 1);
+	 SC_mark(ia[i], 1);
+	 SC_mark(da[i], 1);};
     
 /* test array push */
     for (i = 0; i < na; i++)
         {SC_array_push(ac, &ca[i]);
 	 SC_array_push(ai, &ia[i]);
-         SC_array_push(ad, &da[i]);};
+         SC_array_push(ad, &da[i]);
+	 SC_mark(ca[i], 1);
+	 SC_mark(ia[i], 1);
+	 SC_mark(da[i], 1);};
     
     cb = SC_array_array(ac);
     ib = SC_array_array(ai);
@@ -289,11 +295,13 @@ static int test_4(void)
 
 /* test array set */
     for (i = 0; i < na; i++)
-        SC_array_set(as, i, &sa[i]);
+        {SC_array_set(as, i, &sa[i]);
+	 SC_mark(sa[i].c, 1);};
     
 /* test array push */
     for (i = 0; i < na; i++)
-        SC_array_push(as, &sa[i]);
+        {SC_array_push(as, &sa[i]);
+	 SC_mark(sa[i].c, 1);};
     
     ns = SC_array_get_n(as);
     sb = SC_array_array(as);

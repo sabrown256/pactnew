@@ -2595,8 +2595,8 @@ CFG_DONE:
                    endif
                    breaksw
               case -vg :
-#                   setenv Valgrind  "valgrind --tool=memcheck"
-                   setenv Valgrind  "valgrind --tool=memcheck --gen-suppressions=all"
+#                   setenv Valgrind  "valgrind --tool=memcheck --track-origins=yes"
+                   setenv Valgrind  "valgrind --tool=memcheck --track-origins=yes --gen-suppressions=all"
                    breaksw
               case -* :
                    breaksw
@@ -2617,8 +2617,8 @@ CFG_DONE:
 # allow a do-net to activate valgrind testing by doing
 # 'var DoValgrind yes' in the host file
         if ($?DoValgrind == 1) then
-#           setenv Valgrind  "valgrind --tool=memcheck"
-           setenv Valgrind  "valgrind --tool=memcheck --gen-suppressions=all"
+#           setenv Valgrind  "valgrind --tool=memcheck --track-origins=yes"
+           setenv Valgrind  "valgrind --tool=memcheck --track-origins=yes --gen-suppressions=all"
         endif
 
 # verify that valgrind exists before trying to use it
