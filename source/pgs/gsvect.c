@@ -390,6 +390,7 @@ void PG_draw_vector_n(PG_device *dev ARG(,,cls),
     nsv = 1 + nw;
     nl  = nsv*n;
     t   = PM_make_vectors(nd, 2*nl);
+    PM_init_vectors(nd, 2*nl, t, 0.0);
 
 /* compute the vectors */
     for (i = 0, il = 0; i < n; ++i, il += 2*nsv)

@@ -515,6 +515,8 @@ void _PG_PS_draw_disjoint_polyline_2(PG_device *dev, double **r,
 
     _PG_find_clip_region(dev, pc, dev->clipping, TRUE);
 
+    box[4] = 0.0;
+    box[5] = 0.0;
     for (i = 0; i < n; i++)
         {box[0] = *px++;
          box[2] = *py++;
