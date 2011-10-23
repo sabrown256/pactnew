@@ -62,23 +62,13 @@ else if (-e $BinDir/sx) then
    NoteD $Log ""
    NoteD $Log "SX TEST ..."
 
-   Note $Log "BinDir = $BinDir"
-   Note $Log "path   = $path"  
-   Note $Log "SCHEME = $SCHEME"
-
-   setenv Tmp $cwd/.tmp.$$
-
-   Note $Log "MPI         = |$MPI|"
-   Note $Log "LARGE_FILES = |$LARGE_FILES|"
-   flog $Log ../../../manager/pwhich pact
-   flog $Log ../../../manager/pwhich cc
-
    flog $Log pwd
 
    if ("$Tests" == "") then
       set Tests = ""
-      set Tests = ( $Tests oper hash c99 pdb dattr ar text sqlite xml vif iply )
-      set Tests = ( $Tests pgs axis )
+      set Tests = ( $Tests oper hash c99 )
+      set Tests = ( $Tests pdb dattr ar text sqlite xml vif )
+      set Tests = ( $Tests pgs axis iply )
       set Tests = ( $Tests master exa shell mesh intrp diff ext )
    endif
 

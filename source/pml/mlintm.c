@@ -397,6 +397,9 @@ double **PM_interpolate_mapping(PM_mapping *dest, PM_mapping *source,
 
     ta = _PM_find_overlap_margin(dnde, dd, sd, prm);
 
+    for (j = 0; j < dnde; j++)
+        PM_array_set(tre[j], dne, 0.0);
+
     nn = 1;
     for (j = 0; j < snde; j++)
         nn *= ta[j];

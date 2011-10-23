@@ -55,17 +55,6 @@ else if (-e $SrcDir/pml.h) then
    echo ""
    echo "PML TEST ..."
 
-   rm -f $Log
-   touch $Log
-
-   Note $Log "BinDir = $BinDir"
-   Note $Log "path   = $path"  
-   Note $Log "MAKE   = $MAKE"
-
-   Note $Log "Parallel = |$Parallel|"
-   flog $Log ../../../manager/pwhich pact
-   flog $Log ../../../manager/pwhich cc
-
    if ("$Tests" == "") then
       set Tests = ""
       set Tests = ( $Tests matrix eigen func interp perf )

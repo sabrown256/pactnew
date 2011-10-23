@@ -56,26 +56,8 @@ else if (-e $BinDir/scheme) then
    NoteD $Log ""
    NoteD $Log "SCHEME TEST ..."
 
-   rm -f $Log
-   touch $Log
-
-   Note $Log "cwd      = $cwd"
-   Note $Log "path     = $path"  
-   Note $Log "BuildDir = $BuildDir"
-   Note $Log "BinDir   = $BinDir"
-   Note $Log "TestDir  = $TestDir"
-   Note $Log "FilesDir = $FilesDir"
-   Note $Log "SCHEME   = $SCHEME"
-
-   setenv Tmp $cwd/.tmp.$$
-
-   flog $Log ../../../manager/pwhich pact
-   flog $Log ../../../manager/pwhich cc
-
    if ("$Tests" == "") then
       set Tests = ""
-#      set Tests = ( $Tests string numer proc shell csynt bsynt )
-# GOTCHA: restore memory tests after hasharr conversion
       set Tests = ( $Tests mem string numer proc shell csynt bsynt )
    endif
 

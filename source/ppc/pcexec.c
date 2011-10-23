@@ -70,7 +70,7 @@ static void tty_has_txt(int fd, int mask, void *a)
  */
 
 static int process_end(int *prv, void *a)
-   {int status, reason, quiet, ex;
+   {int status, reason, quiet, ex, rv;
     char *name;
     PROCESS *pp;
     descriptors *pd;
@@ -94,8 +94,9 @@ static int process_end(int *prv, void *a)
 /* get anything remaining from the child */
         child_has_txt(pp->in, 0, a);
 
-        PC_close(pp);
-	CFREE(pp);
+        rv = PC_close(pp);
+	if (rv == FALSE)
+	   CFREE(pp);
 
         if (!quiet)
            PRINT(stdout, "\nProcess %s terminated (%d %d)\n",

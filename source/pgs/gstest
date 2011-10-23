@@ -58,16 +58,6 @@ else if (-e $SrcDir/pgs.h) then
    NoteD $Log ""
    NoteD $Log "PGS TEST ..."
 
-   Note $Log "BinDir = $BinDir"
-   Note $Log "path   = $path"  
-   Note $Log "MAKE   = $MAKE"
-
-   setenv Tmp $cwd/.tmp.$$
-
-   Note $Log "Parallel = |$Parallel|"
-   flog $Log ../../../manager/pwhich pact
-   flog $Log ../../../manager/pwhich cc
-
    if ("$Tests" == "") then
       set Tests = ""
       set Tests = ( $Tests trans axis rendlr rendac grot mpeg smp )

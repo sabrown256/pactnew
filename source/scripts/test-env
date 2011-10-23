@@ -180,6 +180,8 @@ if (!(-d $TestDir)) then
   mkdir -p $TestDir
 endif
 
+setenv Tmp $TestDir/.tmp.$$
+
 InitLog Log $TestDir/log.$TLog.$LogSfx
 Note $Log "Package: $Package"
 Note $Log "Test:    $Test"
@@ -217,6 +219,79 @@ if ("$Test" == "") then
       end
    endif
 endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# log test environment
+
+Separator $Log
+
+Note $Log "Test environment"
+
+Note $Log ""
+Note $Log "Directories:"
+Note $Log "RootDir    = |$RootDir|"
+Note $Log "System     = |$System|"
+Note $Log "BuildDir   = |$BuildDir|"
+Note $Log "SrcDir     = |$SrcDir|"
+Note $Log "IncDir     = |$IncDir|"
+Note $Log "LibDir     = |$LibDir|"
+Note $Log "BinDir     = |$BinDir|"
+Note $Log "TestDir    = |$TestDir|"
+Note $Log "FilesDir   = |$FilesDir|"
+Note $Log "RefDir     = |$RefDir|"
+Note $Log "TestScrDir = |$TestScrDir|"
+
+Note $Log ""
+Note $Log "Executables:"
+Note $Log "TIMER    = |$TIMER|"
+Note $Log "MAKE     = |$MAKE|"
+Note $Log "DORUN    = |$DORUN|"
+Note $Log "PX       = |$PX|"
+Note $Log "PFE      = |$PFE|"
+Note $Log "CFE      = |$CFE|"
+Note $Log "PACT_Exe = |$PACT_Exe|"
+Note $Log "PSDIFF   = |$PSDIFF|"
+Note $Log "Valgrind = |$Valgrind|"
+
+Note $Log ""
+Note $Log "State:"
+Note $Log "OS                = |$OS|"
+Note $Log "HaveIPC           = |$HaveIPC|"
+Note $Log "Parallel          = |$Parallel|"
+Note $Log "MPI               = |$MPI|"
+Note $Log "HaveDevZero       = |$HaveDevZero|"
+Note $Log "LARGE_FILES       = |$LARGE_FILES|"
+Note $Log "LogSfx            = |$LogSfx|"
+Note $Log "ZeroSpace         = |$ZeroSpace|"
+Note $Log "RUN_TESTS         = |$RUN_TESTS|"
+Note $Log "CROSS_COMPILE     = |$CROSS_COMPILE|"
+Note $Log "SCHEME            = |$SCHEME|"
+Note $Log "TEST_CHECK        = |$TEST_CHECK|"
+Note $Log "Tmp               = |$Tmp|"
+if ($?rm_cache == 1) then
+   Note $Log "rm_cache          = |$rm_cache|"
+endif
+if ($?DO_RUN_SUBMIT_ENV == 1) then
+   Note $Log "DO_RUN_SUBMIT_ENV = |$DO_RUN_SUBMIT_ENV|"
+endif
+if ($?RUN_SIGNATURE_DB == 1) then
+   Note $Log "RUN_SIGNATURE_DB  = $RUN_SIGNATURE_DB"
+endif
+
+Note $Log ""
+Note $Log "Python:"
+Note $Log "PYVER      = |$PYVER|"
+Note $Log "PYTHONBIN  = |$PYTHONBIN|"
+Note $Log "PYTHON     = |$PYTHON|"
+Note $Log "LPYTHON    = |$LPYTHON|"
+Note $Log "PYTHONPATH = |$PYTHONPATH|"
+
+flog $Log ../../../manager/pwhich pact
+flog $Log ../../../manager/pwhich cc
+
+Separator $Log
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

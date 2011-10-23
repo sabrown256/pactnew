@@ -53,17 +53,6 @@ else if (-e $SrcDir/panace.h) then
    NoteD $Log ""
    NoteD $Log "PANACEA TEST ..."
 
-   Note $Log "BinDir = $BinDir"
-   Note $Log "path   = $path"  
-   Note $Log "MAKE   = $MAKE"  
-
-   setenv Tmp $cwd/.tmp.$$
-
-   Note $Log "Parallel = |$Parallel|"
-   Note $Log "MPI      = |$MPI|"
-   flog $Log ../../../manager/pwhich pact
-   flog $Log ../../../manager/pwhich cc
-
    if ("$Tests" == "") then
       set Tests = (gen abc)
    endif
