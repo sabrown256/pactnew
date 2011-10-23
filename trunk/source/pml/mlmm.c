@@ -44,6 +44,19 @@ double **PM_make_vectors(int nd, int n)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PM_INIT_VECTORS - initialize the vector values */
+
+void PM_init_vectors(int nd, int n, double **x, double v)
+   {int id;
+
+    for (id = 0; id < nd; id++)
+	PM_array_set(x[id], n, v);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PM_COPY_VECTORS - copy a set of  arrays */
 
 double **PM_copy_vectors(int nd, int n, double **x)

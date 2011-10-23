@@ -1080,6 +1080,7 @@ extern PM_polygon
  *PM_copy_polygon(PM_polygon *py);
 
 extern void
+ PM_init_vectors(int nd, int n, double **x, double v),
  PM_free_vectors(int nd, double **x),
  PM_free_polygon(PM_polygon *py),
  PM_polygon_copy_points(PM_polygon *pa, PM_polygon *pb),
