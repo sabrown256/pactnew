@@ -2101,6 +2101,9 @@ static void prep_test_4_data(void)
     *pd = -1.0e-30;
     hp = SC_hasharr_install(tab4_w, "pd", pd, DOUBLE_S, TRUE, TRUE);
 
+/* mark to keep reference count right and valgrind clean */
+    SC_mark(hp, 1);
+
     SC_hasharr_install(tab4_w, "ph", hp, HASHEL_S, TRUE, TRUE);
 
     tab4_r = NULL;
@@ -2216,6 +2219,9 @@ static void print_test_4_data(FILE *fp)
     pf = (float *) SC_hasharr_def_lookup(tab4_r, "pf");
     pd = (double *) SC_hasharr_def_lookup(tab4_r, "pd");
     ph = (haelem *) SC_hasharr_def_lookup(tab4_r, "ph");
+
+/* mark to keep reference count right and valgrind clean */
+    SC_mark(ph, 1);
 
     PRINT(fp, "Table values:\n");
     PRINT(fp, "   pc = %c %s\n", *pc, CHAR_S);

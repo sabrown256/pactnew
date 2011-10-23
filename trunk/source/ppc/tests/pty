@@ -44,22 +44,11 @@ set exe = $BinDir/pcexec
          @ nerr = $nerr + $status
 
          NoteD $Log -n "                       interrupt ................... "
-         set rpf = "none"
+         set rpf = none
          set opt = ( -c 30 -t $TEST )
          set io  = pcexec.ptyi
 
          source ../../../scripts/test-run
-
-#         if ("$Valgrind" == "") then
-#            $CFE $exe $opt | tr -d "\015" > pcexec.ptyi
-#            set xstatus = $status
-#         else
-#            ftee $Log $Valgrind $exe $opt        |& \
-#            grep "ERROR SUMMARY:"                |& \
-#            awk '{ print $4 }'   >&! $Tmp
-#            set xstatus = `cat $Tmp`
-#	    set rpf     = ( $rpf $Tmp )
-#         endif
 
          $TEST_CHECK part -a pty_interrupt -e $xstatus -dt $dt -l -rpf "$rpf" none
 
@@ -71,6 +60,7 @@ set exe = $BinDir/pcexec
                set Files = `find . -name "pcexec.diffi" -size 0c -print`
                diff pcexec.refp pcexec.ptyp > pcexec.diffp
                set Files = `find . -name "pcexec.diffp" -size 0c -print`
+               set rpf = ( $rpf pcexec.diff* pcexec.pty* pcexec.ref* )
             else
                set Files = 1
             endif
@@ -78,7 +68,6 @@ set exe = $BinDir/pcexec
                @ nerr = $nerr + 1
             endif
          endif
-         set rpf = ( pcexec.diff* pcexec.pty* pcexec.ref* )
 
       endif
 

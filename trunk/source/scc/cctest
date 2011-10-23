@@ -59,17 +59,6 @@ else if (-e $SrcDir/scc_int.h) then
    NoteD $Log ""
    NoteD $Log "SCC TEST ....."
 
-   Note $Log "BinDir  = $BinDir"
-   Note $Log "path    = $path"
-   Note $Log "MAKE    = $MAKE"
-   Note $Log "SrcDir  = $SrcDir"
-   Note $Log "DORUN   = $DORUN"
-
-   setenv Tmp $cwd/.tmp.$$
-
-   flog $Log ../../../manager/pwhich pact
-   flog $Log ../../../manager/pwhich cc
-
    if ("$Tests" == "") then
       set Tests = ""
       set Tests = ( $Tests t1 t2 )

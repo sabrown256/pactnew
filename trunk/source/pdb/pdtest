@@ -62,17 +62,6 @@ else if (-e $SrcDir/pdb.h) then
    rm -f $Log $Log
    touch $Log
 
-   Note $Log "BinDir = $BinDir"
-   Note $Log "path   = $path"  
-   Note $Log "MAKE   = $MAKE"
-
-   setenv Tmp $cwd/.tmp.$$
-
-   Note $Log "Parallel = |$Parallel|"
-   Note $Log "MPI      = |$MPI|"
-   flog $Log ../../../manager/pwhich pact
-   flog $Log ../../../manager/pwhich cc
-
    NoteD $Log -n "                    Compiling PDB tests ..... "
    Note $Log ""
 

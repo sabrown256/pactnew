@@ -46,6 +46,7 @@ set exe = $BinDir/pcexec
             set Files = `find . -name "pcexec.diffi" -size 0c -print`
             diff pcexec.refp pcexec.sockp > pcexec.diffp
             set Files = `find . -name "pcexec.diffp" -size 0c -print`
+            set rpf   = ( $rpf pcexec.diff* pcexec.sock* )
          else
             set Files = 1
          endif
@@ -53,7 +54,6 @@ set exe = $BinDir/pcexec
             @ nerr = $nerr + 1
          endif
       endif
-      set rpf = ( pcexec.diff* pcexec.sock* )
 
 $TEST_CHECK part -a socket -e $xstatus -rpf "$rpf" "$msg"
 

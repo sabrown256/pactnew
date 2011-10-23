@@ -67,15 +67,6 @@ else if (-e $BinDir/ultra) then
 
    flog $Log $RM $files
 
-   Note $Log "BinDir = $BinDir"
-   Note $Log "path   = $path"  
-   Note $Log "SCHEME = $SCHEME"
-
-   setenv Tmp $cwd/.tmp.$$
-
-   flog $Log ../../../manager/pwhich pact
-   flog $Log ../../../manager/pwhich cc
-
    if ("$Tests" == "") then
       set Tests = ""
       set Tests = ( $Tests master io fnc fft fill axis annot env )

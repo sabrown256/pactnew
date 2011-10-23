@@ -55,20 +55,6 @@ else if ($FC_Exe != none) then
    NoteD $Log ""
    NoteD $Log "FORTRAN TEST ..."
 
-   Note $Log "BinDir           = $BinDir"
-   Note $Log "path             = $path"
-   Note $Log "MAKE             = $MAKE"
-   Note $Log "SrcDir           = $SrcDir"
-   Note $Log "DORUN            = $DORUN"
-   if ($?CFE == 1) then
-      Note $Log "CFE              = $CFE"
-   endif
-   if ($?RUN_SIGNATURE_DB == 1) then
-      Note $Log "RUN_SIGNATURE_DB = $RUN_SIGNATURE_DB"
-   endif
-
-   setenv Tmp $cwd/.tmp.$$
-
    if ("$Tests" == "") then
       set Tests = ""
       set Tests = ($Tests score pdb pgs panacea)
