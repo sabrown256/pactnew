@@ -1252,7 +1252,7 @@ static void _PM_combine_polygons(SC_array *a,
 				 PM_polygon *p1, PM_polygon *p2,
 				 PM_binary_operation op)
    {int i, i1, ib, iba, ibb, id, l, na, nd, nx, nra, nrb;
-    int add, same, more, closed, nin, nout, inc, ok;
+    int add, same, more, closed, nin, nout, np, npx, inc, ok;
     int *bnd;
     signed char *wh;
     double x1[PM_SPACEDM], xt[PM_SPACEDM];
@@ -1274,6 +1274,8 @@ static void _PM_combine_polygons(SC_array *a,
 	 wh[i]  = PM_boundary_nd(x1, pb, &ib);
          bnd[i] = (wh[i] == 0) ? ib-1 : 0;};
 
+    npx = (nx - 2);
+
 /* compute WB info wrt WA */
     nx  = pb->nn;
     wh  = wb->where;
@@ -1282,6 +1284,9 @@ static void _PM_combine_polygons(SC_array *a,
         {PM_polygon_get_point(x1, pb, i);
 	 wh[i]  = PM_boundary_nd(x1, pa, &ib);
          bnd[i] = (wh[i] == 0) ? ib-1 : 0;};
+
+/* upper bound on number of polygons is (Nasides-1)*(Nbsides-1) */
+    npx *= (nx - 2);
 
 /* setup initial polygon */
     nd = pa->nd;
@@ -1380,8 +1385,8 @@ static void _PM_combine_polygons(SC_array *a,
 	 if (closed == TRUE)
 	    {PM_polygon_push(a, pc);
 
-	     closed = FALSE;
 	     more   = FALSE;
+	     closed = FALSE;
 	     nin    = 0;
 	     nout   = 0;
 
@@ -1411,8 +1416,9 @@ static void _PM_combine_polygons(SC_array *a,
 			 i1   = ibb;
 			 SC_SWAP_VALUE(polywalk *, wa, wb);};};};
 
-/* GOTCHA: artificial limit to avoid numerically induced infinite loops */
-             more &= (SC_array_get_n(a) < 100);
+/* limit number of polygons be less than npx - a realistic upper bound */
+	     np    = SC_array_get_n(a);
+             more &= (np < npx);
 
 	     if (more == TRUE)
 	        pc = PM_init_polygon(nd, nx);};};

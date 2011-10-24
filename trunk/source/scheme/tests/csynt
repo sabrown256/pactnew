@@ -36,7 +36,7 @@ set exe = $BinDir/scheme
 
       source ../../../scripts/test-run
 
-      if ($xstatus == 0) then
+      if (($xstatus == 0) && (-f shcdcl.res)) then
          flog $Log ( diff shcdcl.res $FilesDir/ref/shcdcl >! shcdcl.res.diff )
          set xstatus = $status
       endif
@@ -60,7 +60,7 @@ set exe = $BinDir/scheme
 
       source ../../../scripts/test-run
 
-      if ($xstatus == 0) then
+      if (($xstatus == 0) && (-f shcppts.res)) then
          flog $Log ( diff shcppts.res $FilesDir/ref/shcppts >! shcppts.res.diff )
          set xstatus = $status
       endif
@@ -84,7 +84,7 @@ set exe = $BinDir/scheme
 
       source ../../../scripts/test-run
 
-      if ($xstatus == 0) then
+      if (($xstatus == 0) && (-f shctst.res)) then
          flog $Log ( diff shctst.res $FilesDir/ref/shctst >! shctst.res.diff )
          set xstatus = $status
       endif

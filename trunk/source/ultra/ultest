@@ -10,7 +10,7 @@
 
 setenv Package ultra
 setenv Test    ""
-set vgdirs = ( pgs score )
+set vgdirs = ( scheme pgs score )
 source ../scripts/test-env
 
 set Tests = ""

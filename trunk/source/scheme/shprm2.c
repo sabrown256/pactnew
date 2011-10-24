@@ -502,8 +502,9 @@ object *SS_bin_comp(SS_psides *si, C_procedure *cp, object *argl)
     PFIntdd fnc;
     object *rv;
 
-    c1 = 0.0;
-    c2 = 0.0;
+    type = 0;
+    c1   = 0.0;
+    c2   = 0.0;
 
     if (SS_length(si, argl) != 2)
        SS_error(si, "WRONG NUMBER OF ARGUMENTS - SS_BIN_COMP", argl);

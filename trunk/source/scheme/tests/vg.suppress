@@ -1,0 +1,21 @@
+
+# avoid funny reference counting situation between procedures
+# and their environments
+
+{
+   scheme_proc_env_2
+   Memcheck:Addr2
+   fun:_SC_free_ns
+   fun:_SC_free_ws
+   fun:_SS_rl_procedure
+   fun:SS_gc
+}
+{
+   scheme_proc_env_8
+   Memcheck:Addr8
+   fun:_SC_free_ns
+   fun:_SC_free_ws
+   fun:_SS_rl_procedure
+   fun:SS_gc
+}
+

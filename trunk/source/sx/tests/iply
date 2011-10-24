@@ -32,18 +32,18 @@ set exe = $BinDir/sx
          foreach i ($t.ps)
             if (-f $FilesDir/ref/$i) then
                flog $Log ($CFE $PSDIFF $i $FilesDir/ref/$i >&! $i.diff)
-               @ st = $status
+               @ st      = $status
                @ xstatus = $xstatus + $st
                Note $Log "Test $i:r status $st"
             endif
          end
+      endif
 
-         if ($xstatus != 0) then
-            NoteD $Log "ng ($dt)"
-            @ nerr = $nerr + 1
-         else
-            NoteD $Log "ok ($dt)"
-         endif
+      if ($xstatus != 0) then
+         NoteD $Log "ng ($dt)"
+         @ nerr = $nerr + $1
+      else
+         NoteD $Log "ok ($dt)"
       endif
 
    end

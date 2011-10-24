@@ -10,7 +10,7 @@
 
 setenv Package scheme
 setenv Test    ""
-set vgdirs = ( score )
+set vgdirs = ( scheme score )
 source ../scripts/test-env
 
 set Tests = ""
