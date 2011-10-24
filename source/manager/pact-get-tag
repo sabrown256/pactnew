@@ -33,8 +33,6 @@ end
 set yr = `date +%Y`
 set dt = "$yr-01-01"
 
-
-
 if (-d CVS) then
    set inf = ( `cvs history -a -x UP -D $dt |& grep -v cvs | sort -r | head -n 1` )
    set inf = ( $inf[2] $inf[3] )
@@ -47,7 +45,10 @@ else if (-d .svn) then
 #   set inf = ( `svn info .pact-version |& grep "Text Last Updated" | head -n 1` )
 #   set inf = ( $inf[4] $inf[5] )
 else if (-d ../.git) then
-   set inf = ( `git log --reverse -1 |& tail -n 1 | sed 's/^.*| D//' | sed 's/_/ /g'` )
+   set inf = ( `git log --reverse -1 |& grep Date: | sed 's/^Date: *//'` )
+   set inf[$#inf] = ""
+   set inf = ( `date -d "$inf" '+%y %m %d %H %M %S'` )
+#   set inf = ( `git log --reverse -1 |& tail -n 1 | sed 's/^.*| D//' | sed 's/_/ /g'` )
    set inf = ( $inf[1]-$inf[2]-$inf[3] ${inf[4]}:${inf[5]} )
 else
    echo "none"

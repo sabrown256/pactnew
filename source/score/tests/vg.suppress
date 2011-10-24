@@ -290,7 +290,6 @@
    Memcheck:Param
    write(buf)
    fun:__write_nocancel
-   fun:_IO_file_write@@GLIBC_2.2.5
 }
 
 {
@@ -441,7 +440,7 @@
 {
    gnu-64-fprintf-17
    Memcheck:Value8
-   fun:hack_digit.12286
+   fun:hack_digit.12269
    fun:__printf_fp
    fun:vfprintf
 }
@@ -450,7 +449,7 @@
    gnu-64-fprintf-18
    Memcheck:Value8
    fun:__mpn_mul_1
-   fun:hack_digit.12286
+   fun:hack_digit.12269
    fun:__printf_fp
    fun:vfprintf
 }
@@ -458,7 +457,7 @@
 {
    gnu-64-fprintf-19
    Memcheck:Cond
-   fun:hack_digit.12286
+   fun:hack_digit.12269
    fun:__printf_fp
    fun:vfprintf
 }
@@ -467,7 +466,7 @@
    gnu-64-fprintf-20
    Memcheck:Value8
    fun:__mpn_divrem
-   fun:hack_digit.12286
+   fun:hack_digit.12269
    fun:__printf_fp
    fun:vfprintf
 }
@@ -476,7 +475,7 @@
    gnu-64-fprintf-21
    Memcheck:Cond
    fun:__mpn_divrem
-   fun:hack_digit.12286
+   fun:hack_digit.12269
    fun:__printf_fp
    fun:vfprintf
 }

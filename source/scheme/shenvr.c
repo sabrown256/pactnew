@@ -629,8 +629,9 @@ void _SS_rem_varc(SS_psides *si, char *name, object *penv)
     b = _SS_search_frames(si, name, penv, under, &tab);
 
     if (b != NULL)
-       {SS_gc(si, b);
-	SC_hasharr_remove(tab, under);};
+       {SC_mark(b, 1);
+	SC_hasharr_remove(tab, under);
+	SS_gc(si, b);};
 
     return;}
 
