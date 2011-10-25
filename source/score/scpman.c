@@ -346,7 +346,7 @@ int _SC_delete_pid(int pid)
              fr = SC_process_state(pp, SC_PROC_RM | SC_PROC_SIG);
 
 	     n = SC_array_remove(_SC.process_list, i);
-	     if (i < n)
+	     if ((i < n) && (fr == FALSE))
 	        pp->index = i;
 
 	     break;};};
@@ -417,6 +417,7 @@ static void _SC_rl_process(PROCESS *pp)
 	pp->setup    = NULL;
 
 	CFREE(pp);};
+
     return;}
 
 /*--------------------------------------------------------------------------*/

@@ -469,7 +469,7 @@ int SC_exec_async_s(char *shell, char **env,
 		    char **sysl, char **cmnds, char **dirs,
 		    int to, char *fname, int na, int show, int ignore)
    {int ic, id, is, nc, nd, ns;
-    int st, jid, ioi;
+    int ok, st, jid, ioi;
     char hst[MAXLINE];
     char *ldir[1], *pc, *sys, *cm;
     SC_evlpdes *pe;
@@ -533,8 +533,9 @@ int SC_exec_async_s(char *shell, char **env,
 		       job = SC_make_taskdesc(&state, jid++,
 					      hst, shell, NULL, cm);
 		       if (job != NULL)
-			  {job->start(job, NULL, TRUE);
-			   SC_array_push(state.tasks, &job);};
+			  {ok = job->start(job, NULL, TRUE);
+			   if (ok == TRUE)
+			      SC_array_push(state.tasks, &job);};
 
 		       CFREE(cm);};};};};
 
@@ -582,7 +583,7 @@ int SC_exec_async_h(char *shell, char **env,
 		    char **hstl, char **cmnds, char **dirs,
 		    int to, char *fname, int na, int show, int ignore)
    {int ic, id, ih, nc, nd, nh;
-    int st, jid, ioi, ln;
+    int ok, st, jid, ioi, ln;
     char *ldir[1], *pc, *hst, *cm;
     SC_evlpdes *pe;
     fspec *filter;
@@ -645,8 +646,9 @@ int SC_exec_async_h(char *shell, char **env,
 		   job = SC_make_taskdesc(&state, jid++,
 					  hst, shell, NULL, cm);
 		   if (job != NULL)
-		      {job->start(job, NULL, TRUE);
-		       SC_array_push(state.tasks, &job);};
+		      {ok = job->start(job, NULL, TRUE);
+		       if (ok == TRUE)
+			  SC_array_push(state.tasks, &job);};
 
                    CFREE(cm);};};};
 
@@ -685,7 +687,7 @@ int SC_exec_async_h(char *shell, char **env,
 
 static int _SC_exec(SC_array *out, char *cmnd, char *shell,
 		    char **env, int to, int na, int dbg)
-   {int ns, rv, ioi, sto, st, nf;
+   {int ns, rv, ioi, sto, st, nf, ok;
     char *cwd;
     SC_evlpdes *pe;
     taskdesc *job;
@@ -728,7 +730,7 @@ static int _SC_exec(SC_array *out, char *cmnd, char *shell,
 /* launch command */
     job = SC_make_taskdesc(&state, 0, NULL, shell, NULL, cmnd);
     if (job != NULL)
-       {job->start(job, as, TRUE);
+       {ok = job->start(job, as, TRUE);
 
 	state.done = TRUE;
 

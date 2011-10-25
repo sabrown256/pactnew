@@ -607,10 +607,14 @@ int _SC_strerr_gnu(int err, char *msg, size_t nc)
     int ln;
     char *s;
 
-    s  = strerror_r(errno, msg, nc);
-    ln = strlen(s);
+/* NOTE: some old versions will return NULL even though MSG
+ * has been filled with the correct string
+ */
+    s = strerror_r(errno, msg, nc);
 
-    SC_strncpy(msg, nc, s, ln);
+    if (s != NULL)
+       {ln = strlen(s);
+	SC_strncpy(msg, nc, s, ln);};
 
 #endif
 

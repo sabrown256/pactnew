@@ -8,16 +8,7 @@
 
 set Package = score
 
-#source ../../scripts/test-env
-source ../../scripts/env-csh
-
-if ($?TestDir == 0) then
-   pushd .. >& /dev/null
-   setenv System `../scripts/cfgman use`
-   setenv TestDir $cwd/z-$System/test
-   setenv TIMER timer
-   popd >& /dev/null
-endif
+source ../../scripts/test-env
 
 set Tests   = ""
 set KillSrv = ""
@@ -83,22 +74,27 @@ setenv SC_EXEC_CPU_FACTOR   1024
 setenv SC_EXEC_TIME_LIMIT     64
 setenv SC_EXEC_TIME_FACTOR    16
 
-@ Err = 0
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 foreach tst ($Tests)
 
-   ./$tst $KillSrv
+   set exe = ./$tst
+   set rpf = none
+   set opt = $KillSrv
+   set io  = ftee
 
-   @ LErr = $status
-   @ Err  = $Err + $LErr
+   source ../../../scripts/test-run
+
+   $TEST_CHECK part -a mk_$tst -e $xstatus -l -rpf "$rpf" ""
+
+   @ lerr = $status
+   @ nerr = $nerr + $lerr
 
    flog $Log cat log.$tst
 
    Note $Log ""
-   Note $Log "Test $tst exited with status $LErr"
+   Note $Log "Test $tst exited with status $lerr"
    Note $Log ""
 
    flog $Log rm log.$tst
@@ -112,5 +108,5 @@ flog $Log rm -f $TMFiles $Tests
 flog $Log popd
 NoteD $Log ""
 
-exit($Err)
+exit($nerr)
 
