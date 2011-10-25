@@ -275,7 +275,9 @@ static int _SC_free_taskdesc(void *a)
 	    CFREE(inf->directory);
 	    CFREE(inf->shell);
 	    CFREE(job->host);
-	    CFREE(job);};};
+	    CFREE(job);
+
+	    *(taskdesc **) a = NULL;};};
 
     return(TRUE);}
 
@@ -290,6 +292,7 @@ static void _SC_exec_free_tasks(parstate *state)
     SC_START_ACTIVITY(state, STATE_FREE_TASKS);
 
     SC_free_array(state->tasks, _SC_free_taskdesc);
+    state->tasks = NULL;
 
     SC_END_ACTIVITY(state);
 
@@ -306,6 +309,7 @@ static void _SC_exec_free_logs(parstate *state)
     SC_START_ACTIVITY(state, STATE_FREE_LOG);
 
     SC_free_array(state->log, SC_array_free_n);
+    state->log = NULL;
 
     SC_END_ACTIVITY(state);
 
@@ -1579,6 +1583,8 @@ static int _SC_run_next_task(taskdesc *job, int sigp)
 	    if (st != 0)
 	       break;};}
 
+    rv = !job->finished;
+
     if ((tl->nl >= tl->nt) && (st != NOT_FINISHED))
        {if (state->finish != NULL)
 	   rtry = state->finish(job, _SC_EXEC_COMPLETE);
@@ -1586,14 +1592,13 @@ static int _SC_run_next_task(taskdesc *job, int sigp)
 	   rtry = job->close(job, TRUE);
 
 	if (rtry == TRUE)
-	   {job->finished = FALSE;
+	   {rv            = TRUE;
+	    job->finished = FALSE;
 	    job->exec(job, sigp);}
 	else
-	   job->finished = TRUE;};
+	   rv = FALSE;};
 
     SC_END_ACTIVITY(state);
-
-    rv = !job->finished;
 
     return(rv);}
 
@@ -1947,10 +1952,12 @@ static int _SC_fin_job(taskdesc *job, asyncstate *as, int srv)
  *               - this is a server side routine
  */
 
-static void _SC_start_job(taskdesc *job, asyncstate *as, int launch)
+static int _SC_start_job(taskdesc *job, asyncstate *as, int launch)
    {int ok;
     jobinfo *inf;
     parstate *state;
+
+    ok = FALSE;
 
     if (job != NULL)
        {state = job->context;
@@ -1961,15 +1968,15 @@ static void _SC_start_job(taskdesc *job, asyncstate *as, int launch)
 
 	if (launch == TRUE)
 	   {ok = job->launch(job, as);
-	    SC_ASSERT(ok == TRUE);
 	    if (ok == FALSE)
 	       CFREE(job);}
 	else
-	   _SC_setup_output(inf, "_SC_START_JOB");
+	   {_SC_setup_output(inf, "_SC_START_JOB");
+	    ok = TRUE;};
 
 	SC_END_ACTIVITY(state);};
 
-    return;}
+    return(ok);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -2152,24 +2159,28 @@ static void _SC_add_job(taskdesc *job)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_REMOVE_JOB - remove a JOB from an array of jobs TA */
+/* _SC_REMOVE_JOB - remove a JOB from an array of jobs TA
+ *                - return TRUE if JOB was freed
+ */
 
-static void _SC_remove_job(taskdesc *job)
-   {int i, n;
+static int _SC_remove_job(taskdesc *job)
+   {int i, n, ok;
     taskdesc *tsk;
     SC_array *ta;
 
+    ok = FALSE;
     ta = job->context->tasks;
     n  = SC_array_get_n(ta);
     for (i = 0; i < n; i++)
         {tsk = *(taskdesc **) SC_array_get(ta, i);
 	 if (tsk == job)
 	    {SC_array_set(ta, i, NULL);
+	     CFREE(job);
+	     SC_array_set(ta, i, &job);
+	     ok = TRUE;
 	     break;};};
 
-    CFREE(tsk);
-
-    return;}
+    return(ok);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -2208,6 +2219,7 @@ taskdesc *SC_make_taskdesc(parstate *state, int jid,
 	job->pp       = NULL;
 	job->filter   = state->filter;
 	job->context  = state;
+	job->nzip     = 0;
 
 	job->start    = _SC_start_job;
 	job->launch   = _SC_launch_job;

@@ -83,6 +83,8 @@ static int _SC_free_vardes(haelem *hp, void *a)
     CFREE(vd->text);
     CFREE(vd);
 
+    hp->def = NULL;
+
     return(TRUE);}
 
 /*--------------------------------------------------------------------------*/

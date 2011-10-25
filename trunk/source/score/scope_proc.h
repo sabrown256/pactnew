@@ -331,8 +331,8 @@ struct s_taskdesc
     PROCESS *pp;
     fspec *filter;
     parstate *context;
-    void (*start)(taskdesc *job, asyncstate *as, int launch);
     void (*check)(taskdesc *job, asyncstate *as, int *pnr, int *pnc);
+    int (*start)(taskdesc *job, asyncstate *as, int launch);
     int (*launch)(taskdesc *job, asyncstate *as);
     int (*exec)(taskdesc *job, int sigp);
     int (*done)(taskdesc *job, int setst);
@@ -345,7 +345,7 @@ struct s_taskdesc
     int (*finish)(taskdesc *job, asyncstate *as, int srv);
     int (*close)(taskdesc *job, int setst);
     void (*add)(taskdesc *job);
-    void (*remove)(taskdesc *job);};
+    int (*remove)(taskdesc *job);};
 
 enum e_SC_proc_kind
    {SC_CHILD,

@@ -18,7 +18,7 @@ if ($CROSS_COMPILE == FALSE) then
    NoteD $Log -n "                    $msg"
    NoteD $Log ""
 
-   flog $Log pushd $SrcDir/tests
+   flog $Log pushd $FilesDir
    ftee $Log do-test $argv
    set xstatus = $status
    flog $Log popd

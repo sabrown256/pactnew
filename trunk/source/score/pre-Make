@@ -497,7 +497,7 @@ dmake : ${hdrf}
 
 dmt : ${hdrf}
 	${BinDir}/smake ${BinDir}/dmake
-	(cd tests ; do-test)
+	sctest mk
 
 #
 # link 
