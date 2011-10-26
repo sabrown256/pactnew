@@ -31,7 +31,8 @@ set io  = ftee
 
       source ../../../scripts/test-run
 
-      if ($xstatus == 0) then
+      if (($xstatus == 0) && ("$Valgrind" == "")) then
+         flog $Log ls -l gspsts.ps $RefDir/gspsts.ps
          flog $Log $CFE $PSDIFF gspsts.ps $RefDir/gspsts.ps
          set xstatus = $status
       endif
