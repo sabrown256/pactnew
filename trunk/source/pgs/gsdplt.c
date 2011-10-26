@@ -1394,7 +1394,7 @@ void PG_ref_mesh(PG_device *dev, PG_graph *data, int ndims,
 
 	if (ndc == NULL)
 	   {PG_rem_attrs_graph(data, "VIEW-PORT", NULL);
-	    CFREE(pv);};
+/*	    CFREE(pv); */};
 
 	if (pc == NULL)
 	   PG_rem_attrs_set(domain, "LINE-COLOR", NULL);

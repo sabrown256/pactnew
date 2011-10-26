@@ -21,8 +21,9 @@ set io  = ftee
       source ../../../scripts/test-run
 
       if ($xstatus == 0) then
+         flog $Log ls -l gspsta.ps $RefDir/gspsta.ps
 #         flog $Log $CFE $PSDIFF gspsta.ps $RefDir/gspsta.ps
-         set xstatus = $status
+#         set xstatus = $status
       endif
 
       flog $Log touch gsjpgta.jpg.foo

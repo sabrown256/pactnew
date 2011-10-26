@@ -936,7 +936,7 @@ static int test_8(PG_device *dev)
     PM_free_vectors(3, r);
     CFREE(rs);
     CFREE(ext);
-    CFREE(emap);
+/*    CFREE(emap); */
     SC_free_alist(alist, 3);
 
     return(TRUE);}
