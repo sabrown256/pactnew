@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
 
-#include "pdb.h"
+#include "pdbtfr.h"
 
 #define DATFILE "nat"
 
@@ -154,93 +154,14 @@ static l_frame
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PRINT_HELP - print a help message */
-
-void print_help(void)
-   {
-
-    PRINT(STDOUT, "\nPDNTST - run PDB net test suite\n\n");
-    PRINT(STDOUT, "Usage: pdntst [-d] [-h] [-n] [-v #] [-1] [-2] [-3] [-4]\n");
-    PRINT(STDOUT, "\n");
-    PRINT(STDOUT, "       d - turn on debug mode to display memory maps\n");
-    PRINT(STDOUT, "       h - print this help message and exit\n");
-    PRINT(STDOUT, "       n - run native mode test only\n");
-    PRINT(STDOUT, "       v - use specified format version (default 2)\n");
-    PRINT(STDOUT, "       1 - do NOT run test #1\n");
-    PRINT(STDOUT, "       2 - do NOT run test #2\n");
-    PRINT(STDOUT, "       3 - do NOT run test #3\n");
-    PRINT(STDOUT, "       4 - do NOT run test #4\n");
-    PRINT(STDOUT, "\n");
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* TEST_TARGET - set up the target for the data file */
-
-static void test_target(char *tgt, char *base, int n,
-		        char *fname, char *datfile)
-   {int rv;
-
-    if (tgt != NULL)
-       {rv = PD_target_platform(tgt);
-	SC_ASSERT(rv == TRUE);
-
-        sprintf(fname, "%s-%s.rs%d", base, tgt, n);
-        sprintf(datfile, "%s-%s.db%d", base, tgt, n);}
-
-    else
-       {sprintf(fname, "%s-nat.rs%d", base, n);
-        sprintf(datfile, "%s-nat.db%d", base, n);};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DUMP_TEST_SYMBOL_TABLE - dump the symbol table */
-
-void dump_test_symbol_table(FILE *fp, hasharr *tab, int n)
-   {int i, ne;
-    char **names;
-
-    PRINT(fp, "\nTest %d Symbol table:\n", n);
-
-    ne    = SC_hasharr_get_n(tab);
-    names = SC_hasharr_dump(tab, NULL, NULL, FALSE);
-    for (i = 0; i < ne; i++)
-        PRINT(fp, "%s\n", names[i]);
-    SC_free_strings(names);
-
-    PRINT(fp, "\n");
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* RUN_TEST - run a particular test through all targeting modes */
 
 static int run_test(PFTest test, int n, char *host)
-   {int i, m, rv, cs, fail;
-    int64_t bytaa, bytfa, bytab, bytfb;
-    char msg[MAXLINE];
+   {int i, m, rv, fail;
     char *nm;
-    double time;
-    static int dbg = 0;
+    tframe st;
 
-    if (debug_mode)
-       dbg = 2;
-
-/* NOTE: under the debugger set dbg to 1 or 2 for additional
- *       memory leak monitoring
- */
-    cs = SC_mem_monitor(-1, dbg, "N", msg);
-
-    SC_mem_stats(&bytab, &bytfb, NULL, NULL);
-
-    time = SC_wall_clock_time();
+    pre_test(&st, debug_mode);
 
     fail = 0;
 
@@ -260,17 +181,7 @@ static int run_test(PFTest test, int n, char *host)
        {PRINT(STDOUT, "Test #%d native failed\n", n);
 	fail++;};
 
-    SC_mem_stats(&bytaa, &bytfa, NULL, NULL);
-
-    bytaa -= bytab;
-    bytfa -= bytfb;
-    time   = SC_wall_clock_time() - time;
-
-    cs = SC_mem_monitor(cs, dbg, "N", msg);
-
-    PRINT(STDOUT,
-          "\t\t     %3d    %8d  %8d   %7d     %.2g\n",
-          n, bytaa, bytfa, bytaa - bytfa, time);
+    post_test(&st, n);
 
     return(fail);}
 
@@ -1609,6 +1520,29 @@ static int test_4(char *base, char *tgt, int n)
 
 /*                         GENERAL PURPOSE ROUTINES                         */
 
+/*--------------------------------------------------------------------------*/
+
+/* PRINT_HELP - print a help message */
+
+void print_help(void)
+   {
+
+    PRINT(STDOUT, "\nPDNTST - run PDB net test suite\n\n");
+    PRINT(STDOUT, "Usage: pdntst [-d] [-h] [-n] [-v #] [-1] [-2] [-3] [-4]\n");
+    PRINT(STDOUT, "\n");
+    PRINT(STDOUT, "       d - turn on debug mode to display memory maps\n");
+    PRINT(STDOUT, "       h - print this help message and exit\n");
+    PRINT(STDOUT, "       n - run native mode test only\n");
+    PRINT(STDOUT, "       v - use specified format version (default 2)\n");
+    PRINT(STDOUT, "       1 - do NOT run test #1\n");
+    PRINT(STDOUT, "       2 - do NOT run test #2\n");
+    PRINT(STDOUT, "       3 - do NOT run test #3\n");
+    PRINT(STDOUT, "       4 - do NOT run test #4\n");
+    PRINT(STDOUT, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* MAIN - test the PDB Library system */
