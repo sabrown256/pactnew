@@ -162,7 +162,7 @@ static object *_SX_mk_boolean(SS_psides *si, bool b)
 /* _SX_MAKE_LIST_IO - convert a primitive type into a list */
 
 object *_SX_make_list_io(SS_psides *si, PDBfile *file,
-			 char *vr, long ni, char *type)
+			 char *vr, inti ni, char *type)
    {int id, offset;
     object *obj;
 
@@ -227,7 +227,8 @@ object *_SX_make_list_io(SS_psides *si, PDBfile *file,
  * type size make a vector of that type
  */
     else
-       {long bpi, nb;
+       {inti nb;
+        intb bpi;
 	char *d;
 
 	d   = (char *) vr;

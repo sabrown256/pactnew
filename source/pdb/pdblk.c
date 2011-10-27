@@ -423,7 +423,8 @@ static int _PD_consistent_dims(PDBfile *file, syment *ep, dimdes *ndims)
 
 int _PD_block_add(PDBfile *file, syment *ep, dimdes *dims, int64_t addr)
    {int n, rv;
-    long bpi, ni, nb;
+    inti ni, nb;
+    intb bpi;
     SC_array *bl;
 
     if (file == NULL)
@@ -462,8 +463,8 @@ int _PD_block_add(PDBfile *file, syment *ep, dimdes *dims, int64_t addr)
  */
 
 long _PD_block_find(PDBfile *file, syment *ep, int64_t addr)
-   {long i, n, bpi;
-    int64_t start, stop;
+   {inti i, n, start, stop;
+    intb bpi;
     SC_array *bl;
     symblock *sp;
 
@@ -492,7 +493,7 @@ long _PD_block_find(PDBfile *file, syment *ep, int64_t addr)
 /* _PD_BLOCK_COPY_SEG - make a copy of part of the block list BL */
 
 SC_array *_PD_block_copy_seg(SC_array *bl, long imn, long imx)
-   {long i, n;
+   {inti i, n;
     SC_array *nbl;
     symblock *sp;
 
@@ -594,9 +595,8 @@ void _PD_block_truncate(syment *ep, long ni)
  */
 
 long _PD_effective_addr(int64_t *paddr, long *pni,
-			int bpi, SC_array *bl)
-   {long i, nb, nt; 
-    int64_t addr, eaddr;
+			intb bpi, SC_array *bl)
+   {inti i, nb, nt, addr, eaddr;
     symblock *sp;
 
     eaddr = *paddr;

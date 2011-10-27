@@ -16,8 +16,9 @@
 
 /* _PD_N_ELEMENTS - return the number of elements in the whole array */
 
-long _PD_n_elements(long *ind, int mn, int mx)
-   {long i, j, ne;
+inti _PD_n_elements(long *ind, int mn, int mx)
+   {int i, j;
+    inti ne;
 
     ne = 1;
     for (i = mn; i < mx; i++)
@@ -31,9 +32,10 @@ long _PD_n_elements(long *ind, int mn, int mx)
 
 /* _PD_N_SPEC_ELEMENTS - return the number of elements specified */
 
-long _PD_n_spec_elements(int n, long *ind)
-   {long i, j, ne;
+inti _PD_n_spec_elements(int n, long *ind)
+   {long i, j;
     long ia, ib, di;
+    inti ne;
 
     ne = 1;
     for (i = 0; i < n; i++)
@@ -53,11 +55,11 @@ long _PD_n_spec_elements(int n, long *ind)
  *                  - return the number of contiguous items
  */
 
-static int _PD_hyper_gather(char *dst, char *src,
-			    int is, int ns, long *sind, int bpi, int mo)
-   {int ng, mn, mx;
-    long i, j;
-    long offset, stride, start, stop, step;
+static inti _PD_hyper_gather(char *dst, char *src,
+			     int is, int ns, long *sind, intb bpi, int mo)
+   {int mn, mx;
+    inti i, j, ng;
+    inti offset, stride, start, stop, step;
     char *pd, *ps;
 
     if (mo == COLUMN_MAJOR_ORDER)
@@ -100,11 +102,11 @@ static int _PD_hyper_gather(char *dst, char *src,
  *                   - return the number of items moved
  */
 
-static int _PD_hyper_scatter(char *dst, int id, int nd, long *dind, char *src,
-			     int bpi, int mo)
-   {int ng, mn, mx;
-    long i, j;
-    long offset, stride, start, stop, step;
+static inti _PD_hyper_scatter(char *dst, int id, int nd, long *dind, char *src,
+			      intb bpi, int mo)
+   {int mn, mx;
+    inti i, j, ng;
+    inti offset, stride, start, stop, step;
     char *pd, *ps;
 
     if (mo == COLUMN_MAJOR_ORDER)
@@ -161,9 +163,10 @@ static int _PD_hyper_scatter(char *dst, int id, int nd, long *dind, char *src,
  * #bind PD_gather_as fortran() scheme() python()
  */
 
-int PD_gather_as(PDBfile *file ARG(,,cls), char *name, char *type,
-		 void *vr, long *sind, int ndst, long *dind)
-   {int nr, ng, ni, bpi, mo;
+int64_t PD_gather_as(PDBfile *file ARG(,,cls), char *name, char *type,
+		     void *vr, long *sind, int ndst, long *dind)
+   {inti nr, ng, ni, mo;
+    intb bpi;
     char *tv;
     syment *ep;
 
@@ -203,9 +206,9 @@ int PD_gather_as(PDBfile *file ARG(,,cls), char *name, char *type,
  * #bind PD_gather fortran() scheme() python()
  */
 
-int PD_gather(PDBfile *file ARG(,,cls), char *name, void *vr, long *sind,
-	      int ndst, long *dind)
-   {int rv;
+int64_t PD_gather(PDBfile *file ARG(,,cls), char *name, void *vr, long *sind,
+		  int ndst, long *dind)
+   {int64_t rv;
 
     rv = PD_gather_as(file, name, NULL, vr, sind, ndst, dind);
 
@@ -220,11 +223,9 @@ int PD_gather(PDBfile *file ARG(,,cls), char *name, void *vr, long *sind,
 /* PD_SCATTER_AS - scatter an entry of type INTYPE to the PDB file, FILE
  *               - as type OUTTYPE
  *               - make an entry in the file's symbol table
- *               - return TRUE iff successful
  *               - the entry has name, NAME, ND dimensions, and the ranges
  *               - of the dimensions are given (min, max) pairwise in IND
- *               - if successful and otherwise
- *               - return FALSE
+ *               - return TRUE iff successful
  *               -
  *               - NOTE: VR must be a pointer to an object with the type
  *               - given by TYPE!!!!
@@ -235,7 +236,9 @@ int PD_gather(PDBfile *file ARG(,,cls), char *name, void *vr, long *sind,
 int PD_scatter_as(PDBfile *file ARG(,,cls),
 		  char *name, char *intype, char *outtype,
 		  void *vr, int nsrc, long *sind, int ndst, long *dind)
-   {int ni, ng, bpi, mo, ret;
+   {int ret, mo;
+    inti ni, ng;
+    intb bpi;
     char *tv;
 
     ret = FALSE;
@@ -246,7 +249,7 @@ int PD_scatter_as(PDBfile *file ARG(,,cls),
 	tv  = CMAKE_N(char, ni*bpi);
 
 	ng = _PD_hyper_gather((char *) tv, (char *) vr, 0, nsrc, sind, bpi, mo);
-	SC_ASSERT(ng == TRUE);
+	SC_ASSERT(ng > -1);
 
 	ret = PD_write_as_alt(file, name, intype, outtype, tv, ndst, dind);
 
@@ -262,7 +265,7 @@ int PD_scatter_as(PDBfile *file ARG(,,cls),
  *            - the entry is named by NAME has ND dimensions and IND
  *            - contains the min and max (pairwise) of each dimensions
  *            - range
- *            - return the new syment if successful and NULL otherwise
+ *            - return TRUE iff successful
  *            -
  *            - NOTE: VR must be a pointer to an object with the type
  *            - given by TYPE!!!!

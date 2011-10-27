@@ -361,10 +361,11 @@ static void _PD_block_deref_addr(PD_smp_state *pa, PDBfile *file,
  */
 
 static SC_array *_PD_block_index_deref(locator *stck, long n,
-					       hasharr *tab, char *type,
-					       symindir *iloc,
-					       int64_t *paddr, long *pnumb)
-   {long i, bpi, nbk, nib, nbb, nit, ni;
+				       hasharr *tab, char *type,
+				       symindir *iloc,
+				       int64_t *paddr, long *pnumb)
+   {inti i, nbk, nib, nbb, nit, ni;
+    intb bpi;
     int64_t addr;
     defstr *dp;
     SC_array *nbl, *bl;
@@ -440,7 +441,7 @@ static SC_array *_PD_block_index_deref(locator *stck, long n,
 
 int64_t _PD_skip_over(PDBfile *file, long skip, int noind)
    {int indir;
-    long bpi;
+    intb bpi;
     int64_t addr;
     hasharr *tab;
     PD_itag itag;
@@ -503,7 +504,8 @@ int64_t _PD_skip_over(PDBfile *file, long skip, int noind)
  */
 
 static int64_t _PD_itag_deref_addr(PD_smp_state *pa, int n)
-   {long numb, bpi;
+   {inti numb;
+    intb bpi;
     int64_t addr;
     char *type;
     hasharr *tab;
@@ -563,7 +565,8 @@ static int64_t _PD_itag_deref_addr(PD_smp_state *pa, int n)
 
 static int64_t _PD_itag_index_deref(PD_smp_state *pa, int n,
 				  dimdes **pdims, long *pnumb)
-   {long indx, numb, naitems, bpi, fn;
+   {inti indx, numb, naitems, fn;
+    intb bpi;
     int64_t addr;
     char *type, *typc, *typp;
     SC_array *nbl;
@@ -720,7 +723,8 @@ static int64_t _PD_itag_member_deref(PD_smp_state *pa, int n)
 /* handle file members */
     else
        {int indir, cmmnd;
-        long bpi, numb;
+        inti numb;
+        intb bpi;
 
 	cmmnd = stck[n-1].cmmnd;
 	indir = _PD_indirection(stck[n].intype);
@@ -1444,7 +1448,8 @@ static void _PD_do_member(PD_smp_state *pa, char *name, int deref_flag)
 
 static void _PD_do_index(PD_smp_state *pa, char *expr)
    {int indr;
-    long bpi, start, stop, step, numb, doff; 
+    intb bpi;
+    inti start, stop, step, numb, doff; 
     int64_t addr;
     char t[MAXLINE], s[MAXLINE];
     char *type, *tok, *pt;
@@ -1468,7 +1473,7 @@ static void _PD_do_index(PD_smp_state *pa, char *expr)
     if (dims != NULL)
        {strcpy(t, type);
         PD_dereference(t);
-        numb = _PD_hyper_number(file, expr, 1L, dims, &start);
+        numb = _PD_hyper_number(file, expr, dims, &start);
         indr = FALSE;}
 
     else if (_PD_indirection(type))

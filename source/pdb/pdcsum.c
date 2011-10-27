@@ -69,7 +69,9 @@ int _PD_csum_close(PDBfile *file)
  
 int _PD_csum_var_read(PDBfile *file, char *name, char *type,
 		      syment *ep, void *vr)
-   {int rv, ni, bpi, len, ok;
+   {int rv, ok;
+    inti ni, len;
+    intb bpi;
     unsigned char rdig[PD_CKSUM_LEN], cdig[PD_CKSUM_LEN];
     char *path;
             
@@ -126,7 +128,7 @@ int _PD_csum_var_read(PDBfile *file, char *name, char *type,
 
 int _PD_csum_var_write(PDBfile *file, char *name, syment *ef)
    {int rv;
-    long i, nb, n, ni;
+    inti i, nb, n, ni;
     int64_t addr;
     char bf[MAXLINE];
     char *s;
@@ -177,10 +179,10 @@ int _PD_csum_var_write(PDBfile *file, char *name, syment *ef)
  */ 
  
 int _PD_csum_block_read(PDBfile *file, char *name, syment *ep, long n)
-   {int rv, st, bpi;
-    long i, mn, mx, ni, nb;
-    int64_t start, stop;
-    int64_t addr;
+   {int rv, st;
+    inti i, mn, mx, ni, nb;
+    intb bpi;
+    int64_t start, stop, addr;
     unsigned char cdig[PD_CKSUM_LEN], rdig[PD_CKSUM_LEN];
     char bf[MAXLINE];
     char *lname, *type;
@@ -247,10 +249,10 @@ int _PD_csum_block_read(PDBfile *file, char *name, syment *ep, long n)
  */ 
  
 int _PD_csum_block_write(PDBfile *file, syment *ep, long n)
-   {int rv, bpi;
-    long ni;
-    int64_t start, stop;
-    int64_t addr;
+   {int rv;
+    inti ni;
+    intb bpi;
+    int64_t start, stop, addr;
     char *type;
     unsigned char cdig[PD_CKSUM_LEN];
     SC_array *bl;

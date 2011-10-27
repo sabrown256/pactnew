@@ -448,8 +448,8 @@ PyObject *_PP_unpack_hasharr(void *p, long nitems)
 /* PyObject *PP_unpack_hasharr_haelem(haelem *hp)*/
 PyObject *PP_unpack_hasharr_haelem(char *type, void *vr)
 {
-    int bpi;
-    long nitems;
+    intb bpi;
+    inti nitems;
     dimdes *dims;
     PyObject *rv;
     PP_form form;

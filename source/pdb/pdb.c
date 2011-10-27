@@ -475,7 +475,7 @@ int PD_read_as_dwim(PDBfile *file ARG(,,cls), char *name,
     if (_PD_indirection(intype))
        {void *vr;
 	char *ps, *pv;
-	long bpi;
+	intb bpi;
 	data_standard *std;
 	hasharr *chrt;
 
@@ -609,7 +609,7 @@ int PD_read_as_alt(PDBfile *file ARG(,,cls), char *name, char *type,
 
 syment *_PD_defent(PDBfile *file, char *name, char *outtype,
 		   long number, dimdes *dims)
-   {long bpi;
+   {intb bpi;
     int64_t addr;
     char bf[MAXLINE];
     char *lname;
@@ -1352,8 +1352,9 @@ void PD_error(char *s, PD_major_op n)
  */
 
 int PD_free(PDBfile *file ARG(,,cls), char *type, void *var) 
-   {int i, nr, rv;
-    long nb, bpi, ni;
+   {int rv;
+    inti i, nb, nr, ni;
+    intb bpi;
     char *pc, *p, *dtyp, *ityp;
     defstr *dp;
     memdes *member;

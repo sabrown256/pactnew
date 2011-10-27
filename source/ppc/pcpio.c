@@ -251,8 +251,9 @@ static int _PC_setup_children(char **argv, char *mode)
  */
 
 static int _PC_get_msg(int i)
-   {int nbo, nbe, bpi;
-    int ni, *nis, data;
+   {inti ni, nbo, nbe;
+    intb bpi;
+    int *nis, data;
     char *type, **msg, **typ, *pbf;
     PROCESS *pi;
     PDBfile *pf;
@@ -273,10 +274,10 @@ static int _PC_get_msg(int i)
 	       {fprintf(_PC_diag, "   Read");
 		fflush(_PC_diag);};
 
-	    PC_printf(pi, "%d,%s\n", ni, type);
+	    PC_printf(pi, "%lld,%s\n", (long long ) ni, type);
 
 	    if (_SC_debug)
-	       {fprintf(_PC_diag, " Put(%d,%s)", ni, type);
+	       {fprintf(_PC_diag, " Put(%lld,%s)", (long long) ni, type);
 		fflush(_PC_diag);};
 
 	    bpi = PN_sizeof(type, pf->host_chart);
@@ -287,15 +288,15 @@ static int _PC_get_msg(int i)
                 if (nbe < 0)
                    continue;
 		else if (_SC_debug)
-		   {fprintf(_PC_diag, ".%d", nbe);
+		   {fprintf(_PC_diag, ".%lld", (long long) nbe);
 		    fflush(_PC_diag);};
 
 		pbf += nbe;
 		nbo -= nbe;};
 
 	    if (_SC_debug)
-	       {fprintf(_PC_diag, " Sent(%d,%s,%d)\n",
-			(ni - nbo/bpi), type, i);
+	       {fprintf(_PC_diag, " Sent(%lld,%s,%d)\n",
+			(long long ) (ni - nbo/bpi), type, i);
 		fflush(_PC_diag);};
 
             PC_pop_message(i);
@@ -311,8 +312,9 @@ static int _PC_get_msg(int i)
 
 /* _PC_PUT_MSG - get the message from the specified node */
 
-static int _PC_put_msg(PROCESS *pi, char *type, int ni, int indx)
-   {int nbi, nbt, nir, bpi;
+static int _PC_put_msg(PROCESS *pi, char *type, inti ni, int indx)
+   {inti nbi, nbt, nir;
+    intb bpi;
     char *bf;
     PDBfile *pf;
 
@@ -322,7 +324,8 @@ static int _PC_put_msg(PROCESS *pi, char *type, int ni, int indx)
     nbi = ni*bpi;
     bf  = CMAKE_N(char, nbi);
     if (_SC_debug)
-       {fprintf(_PC_diag, "   Write Get(%d,%s,%d)", ni, type, pi->acpu);
+       {fprintf(_PC_diag, "   Write Get(%lld,%s,%d)",
+		(long long) ni, type, pi->acpu);
 	fflush(_PC_diag);};
 
     nbt = PC_buffer_data_out(pi, bf, nbi, TRUE);
@@ -331,7 +334,8 @@ static int _PC_put_msg(PROCESS *pi, char *type, int ni, int indx)
     PC_push_message(PC_procs.m + indx, indx, ni, type, bf);
 
     if (_SC_debug)
-       {fprintf(_PC_diag, " Recv(%d,%s,%d)\n", nir, type, indx);
+       {fprintf(_PC_diag, " Recv(%lld,%s,%d)\n",
+		(long long) nir, type, indx);
 	fflush(_PC_diag);};
 
     PC_printf(pi, "%d,%s,%d\n", nir, type, indx);

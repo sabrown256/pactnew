@@ -195,7 +195,8 @@ void *PD_alloc_entry(PDBfile *file ARG(,,cls), char *name)
 
 void *_PD_alloc_entry(PDBfile *file, char *type, long ni)
    {int ipt;
-    long len, bpi;
+    inti len;
+    intb bpi;
     void *vr;
     defstr *dp;
     PD_smp_state *pa;
@@ -203,7 +204,7 @@ void *_PD_alloc_entry(PDBfile *file, char *type, long ni)
     pa = _PD_get_state(-1);
 
     if (_PD_indirection(type))
-       {vr = (char *) CMAKE_N(char *, ni);}
+       vr = (char *) CMAKE_N(char *, ni);
     else
        {dp = PD_inquire_host_type(file, type);
         if (dp == NULL)

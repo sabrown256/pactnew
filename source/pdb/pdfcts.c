@@ -17,9 +17,10 @@ typedef int (*PFtfc)(PDBfile *vif);
 
 /* FCNV - do floating point conversions */
 
-static void fcnv(char *out, char *in, long ni,
+static void fcnv(char *out, char *in, inti ni,
 		 int dir, PDBfile *vif, char *type)
-   {int lnby, onescmp;
+   {int onescmp;
+    intb lnby;
     int *iaord, *oaord;
     long *ifmt, *ofmt;
     defstr *idp, *odp;
@@ -58,8 +59,9 @@ static void fcnv(char *out, char *in, long ni,
 
 /* FCMP - do buffer comparisons */
 
-static int fcmp(char *bfa, char *bfb, int nb)
-   {int i, rv;
+static int fcmp(char *bfa, char *bfb, inti nb)
+   {int rv;
+    inti i;
 
     rv = TRUE;
     for (i = 0; (i < nb) && (rv == TRUE); i++)
@@ -125,7 +127,7 @@ static int t8(PDBfile *vif)
 
 static int t16(PDBfile *vif)
    {int rv, err;
-    long ni;
+    inti ni;
     long double s, a[4];
     char out[MAXLINE], res[MAXLINE];
     char *in;

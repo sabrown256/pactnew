@@ -594,7 +594,7 @@ defstr *_PD_defstr_inst(PDBfile *file, char *name, PD_type_kind kind,
 
 void _PD_defstr_prim_rd(PDBfile *file, char *type, char *origtype,
 			PD_type_kind kind, multides *tuple,
-			long bpi, int align, PD_byte_order ord,
+			intb bpi, int align, PD_byte_order ord,
 			int *ordr, long *formt,
 			int unsgned, int onescmp, int conv)
    {int host_empty;

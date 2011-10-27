@@ -143,9 +143,10 @@ static long _PD_sz_itag(char *type, int itags)
 
 /* _PD_SZ_LEAF_MEMBERS - write the direct leaf data */
 
-static long _PD_sz_leaf_members(PDBfile *file, char *type, long ni,
+static inti _PD_sz_leaf_members(PDBfile *file, char *type, inti ni,
 				void *vr)
-   {long bpi, nb;
+   {inti nb;
+    intb bpi;
     defstr *dpf;
 
     dpf = _PD_lookup_type(type, file->chart);
@@ -165,7 +166,7 @@ static long _PD_sz_leaf_members(PDBfile *file, char *type, long ni,
  */
 
 static int _PD_ptr_sz_itags(long *pnb, PDBfile *file, void *vr,
-			    long ni, char *type)
+			    inti ni, char *type)
    {int ret, itags;
     PD_data_location loc;
 

@@ -112,7 +112,8 @@ typedef enum e_PD_instr_rdwr PD_instr_rdwr;
  */
 
 long _PD_number_refd(void *vr, char *type, hasharr *tab)
-   {long bpi, ni;
+   {intb bpi;
+    inti ni;
 
     if (vr == NULL)
        return(0L);
@@ -181,7 +182,7 @@ char *PD_dereference(char *s)
 
 static void _PD_init_dimind(dimind *pi, long offset, long stride, char *expr)
    {char s[MAXLINE], *token, *t;
-    long start, stop, step;
+    inti start, stop, step;
 
     if (expr != NULL)
        strcpy(s, expr);
@@ -225,7 +226,7 @@ static void _PD_init_dimind(dimind *pi, long offset, long stride, char *expr)
 static dimind  *_PD_compute_hyper_strides(PDBfile *file, char *ind,
 					  dimdes *dims, int *pnd)
    {int i, nd, max_nd, off;
-    long maxs, old_start, old_stop;
+    inti maxs, old_start, old_stop;
     dimdes *pd, *curr_dim;
     dimind *pi;
 
@@ -281,51 +282,57 @@ static dimind  *_PD_compute_hyper_strides(PDBfile *file, char *ind,
             {curr_dim = curr_dim->next; }; }; 
 
 /* while the inner dimensions are contiguous, back out one dimension */
-    while ( (nd-1) > 0 && pi[nd-1].start == (curr_dim->index_min - off) &&
-                          pi[nd-1].stop  == (curr_dim->index_max - off) &&
-                          pi[nd-1].step  == 1) 
-       {nd--;  /* Step back one dimension */
+    while (((nd-1) > 0) &&
+	   (pi[nd-1].start == (curr_dim->index_min - off)) &&
+	   (pi[nd-1].stop  == (curr_dim->index_max - off)) &&
+	   (pi[nd-1].step  == 1))
+
+/* step back one dimension */
+       {nd--;
 
 /* find the proper next dimension descriptor */
         if (file->major_order == COLUMN_MAJOR_ORDER) 
-           {curr_dim = curr_dim->next; }
+           curr_dim = curr_dim->next;
+
         else if (file->major_order == ROW_MAJOR_ORDER)
            {curr_dim = dims;
 
-            for (i = 0 ; i < (nd-1) ; i++ )
-                {curr_dim = curr_dim->next; }; }; };
+            for (i = 0 ; i < (nd-1) ; i++)
+                curr_dim = curr_dim->next;};};
 
 /* if stepsize is not 1 at this dimension, no contiguity is 
  * possible here and we should then optimize just the next dimension in
  * if the next dimension in exists 
  */
-    if (pi[nd-1].step != 1 && (nd+1) <= max_nd)
-       {nd++; };
+    if ((pi[nd-1].step != 1) && ((nd+1) <= max_nd))
+       nd++;
  
- /* optimize the dimind by extending the current start..stop to
-  * encompass all inner contiguous regions
-  *
-  * This optimization works for the case where the entire index  
-  * expression is contiguous as well as just partial contiguity
-  *
-  * Note that if nd == max_nd, then no optimizations are done 
-  * because there are no inner dimensions that are contiguous
-  *
-  * Note that we are optimizing the destination dim descriptor
-  * and _not_ the source dim descriptor because the source
-  * is assumed to always be contiguous
-  */ 
-    if ( (nd-1) >= 0 && nd < max_nd )
+/* optimize the dimind by extending the current start..stop to
+ * encompass all inner contiguous regions
+ *
+ * This optimization works for the case where the entire index  
+ * expression is contiguous as well as just partial contiguity
+ *
+ * Note that if nd == max_nd, then no optimizations are done 
+ * because there are no inner dimensions that are contiguous
+ *
+ * Note that we are optimizing the destination dim descriptor
+ * and _not_ the source dim descriptor because the source
+ * is assumed to always be contiguous
+ */ 
+    if (((nd-1) >= 0) && (nd < max_nd))
        {old_start = pi[nd-1].start;
         old_stop  = pi[nd-1].stop;
 
 /* scale up start */
-        pi[nd-1].start  = (old_start * pi[nd-1].stride);
+        pi[nd-1].start = (old_start * pi[nd-1].stride);
 
-/* scale up stop pt and set it w.r.t. start pt */
-        pi[nd-1].stop   = (((old_stop - old_start) + 1) /* length is */
-                                  * pi[nd-1].stride)    /* expanded by contiguous stride */
-                                  + pi[nd-1].start - 1; /* and reset by offset */
+/* scale up stop pt and set it w.r.t. start pt
+ * length is expanded by contiguous stride
+ * and reset by offset
+ */
+        pi[nd-1].stop  = (((old_stop - old_start) + 1)*pi[nd-1].stride) +
+	                 pi[nd-1].start - 1;
 
 /* make _PD_wr/rd_hyper_index stop recursing here */
         pi[nd-1].stride = 1;};
@@ -351,9 +358,10 @@ static dimind  *_PD_compute_hyper_strides(PDBfile *file, char *ind,
  *                  -
  */
 
-long _PD_hyper_number(PDBfile *file, char *indxpr, long numb, dimdes *dims, long *poff)
-   {int nd;
-    long i, maxs, sum, offs;
+int64_t _PD_hyper_number(PDBfile *file, char *indxpr,
+			 dimdes *dims, long *poff)
+   {int i, nd;
+    inti maxs, sum, offs;
     char s[MAXLINE];
     dimind *pi;
 
@@ -397,9 +405,7 @@ long PD_hyper_number(PDBfile *file ARG(,,cls), char *name, syment *ep)
     if (strchr("0123456789-.", c) == NULL)
        SC_firsttok(s, "([");
 
-    rv = _PD_hyper_number(file, s,
-			  PD_entry_number(ep),
-			  PD_entry_dimensions(ep), NULL);
+    rv = _PD_hyper_number(file, s, PD_entry_dimensions(ep), NULL);
 
     return(rv);}
 
@@ -411,8 +417,8 @@ long PD_hyper_number(PDBfile *file ARG(,,cls), char *name, syment *ep)
  */
 
 int _PD_valid_dims(dimdes *dimscheck, dimdes *vardims)
-   {dimdes *od, *nd;
-    int nndims, nodims;
+   {int nndims, nodims;
+    dimdes *od, *nd;
 
 /* count the dimensions */
     for (nodims = 0, od = vardims;
@@ -447,10 +453,10 @@ int _PD_valid_dims(dimdes *dimscheck, dimdes *vardims)
  */
 
 dimdes *_PD_hyper_dims(PDBfile *file, char *name, dimdes *dims)
-   {dimdes *ndims, *prev, *next, *dp;
+   {inti n, start, stop, step;
     char s[MAXLINE];
     char *t;
-    long n, start, stop, step;
+    dimdes *ndims, *prev, *next, *dp;
 
     ndims = NULL;
 
@@ -488,9 +494,9 @@ dimdes *_PD_hyper_dims(PDBfile *file, char *name, dimdes *dims)
 
 char *_PD_expand_hyper_name(PDBfile *file, char *name)
    {int err;
+    inti start, stop, step;
     syment *ep;
     dimdes *dims, *pd;
-    long start, stop, step;
     char s[MAXLINE], lname[MAXLINE], index[MAXLINE];
     char *t, *rv;
 
@@ -557,17 +563,17 @@ char *_PD_expand_hyper_name(PDBfile *file, char *name)
 /* _PD_WR_LEAF_MEMBERS - write the direct leaf data */
 
 static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype, 
-                                long nitems, void *vr)
+                                inti ni, void *vr)
    {int cnv, ipt;
-    long bpi;
-    size_t ni, nb;
+    intb bpi;
+    inti niw, nb;
     char *in, *out, *bf;
     FILE *fp;
     defstr *dpf, *dph;
 
     fp  = file->stream;
     bpi = -1;
-    ni  = 0;
+    niw  = 0;
 
     dpf = _PD_lookup_type(outtype, file->chart);
     if (dpf == NULL)
@@ -577,7 +583,7 @@ static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype,
 
     ipt = _PD_items_per_tuple(dpf);
 
-    nitems *= ipt;
+    ni *= ipt;
        
     if (dpf->convert == -1)
        {dph = _PD_lookup_type(intype, file->host_chart);
@@ -592,7 +598,7 @@ static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype,
 
 /* dispatch all other writes */
     else if (cnv == TRUE)
-       {nb = nitems*bpi;
+       {nb = ni*bpi;
 
 /* add 100 extra bytes in case we are in TEXT mode and need quotes
  * terminating nulls and maybe a newline
@@ -606,15 +612,15 @@ static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype,
 
         out = bf;
         in  = vr;
-        PD_convert(&out, &in, intype, outtype, nitems,
+        PD_convert(&out, &in, intype, outtype, ni,
                    file->host_std, file->std, file->host_std,
                    file->host_chart, file->chart, 0, PD_WRITE);
-        ni = lio_write(bf, (size_t) bpi, (size_t) nitems, fp);
+        niw = lio_write(bf, (size_t) bpi, (size_t) ni, fp);
         CFREE(bf);}
     else
-       ni = lio_write(vr, (size_t) bpi, (size_t) nitems, fp);
+       niw = lio_write(vr, (size_t) bpi, (size_t) ni, fp);
 
-    if (ni != nitems)
+    if (niw != ni)
        PD_error("BYTE WRITE FAILED - _PD_WR_LEAF_MEMBERS", PD_WRITE);
 
     return;}
@@ -626,22 +632,20 @@ static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype,
  *                     - ADDR is the starting address
  *                     - STOP is the upper bound on the address
  *                     - STEP is the increment of the address for each entry
- *                     - FBYT is the number of bytes in the file for each
- *                     - item to be written
- *                     - HBYT is the number of bytes in memory for each
- *                     - item to be written
+ *                     - FBPI is the bytes per item in the file
+ *                     - HBPI is the bytes per item in memory
  */
 
 static char *_PD_write_hyper_vif(PDBfile *file, char *in, char *intype, 
-				 syment *ep, int hbyt, int fbyt,
-				 int64_t addr, int64_t stop, long step)
-   {long ni;
+				 syment *ep, intb hbpi, intb fbpi,
+				 int64_t addr, inti stop, inti step)
+   {inti ni;
     char *outtype;
 
     outtype = PD_entry_type(ep);
 
 /* items logically contiguous */
-    if (step == fbyt)
+    if (step == fbpi)
        {ni = (stop - addr)/step + 1L;
 
 	_PD_set_current_address(file, addr, SEEK_SET, PD_WRITE);
@@ -650,7 +654,7 @@ static char *_PD_write_hyper_vif(PDBfile *file, char *in, char *intype,
 
 /* items logically discontiguous */
     else
-       {for (; addr <= stop; addr += step, in += hbyt)
+       {for (; addr <= stop; addr += step, in += hbpi)
 	    {_PD_set_current_address(file, addr, SEEK_SET, PD_WRITE);
              _PD_sys_write(file, in, 1L, intype, outtype);};};
 
@@ -663,16 +667,14 @@ static char *_PD_write_hyper_vif(PDBfile *file, char *in, char *intype,
  *                       - ADDR is the starting address
  *                       - STOP is the upper bound on the address
  *                       - STEP is the increment of the address for each entry
- *                       - FBYT is the number of bytes in the file for each
- *                       - item to be written
- *                       - HBYT is the number of bytes in memory for each
- *                       - item to be written
+ *                       - FBPI is the bytes per item in the file
+ *                       - HBPI is the bytes per item in memory
  */
 
 static char *_PD_write_hyper_space(PDBfile *file, char *in, char *intype, 
-				   syment *ep, int hbyt, int fbyt,
-				   int64_t addr, int64_t stop, long step)
-   {long n, nb, niw, ni;
+				   syment *ep, intb hbpi, intb fbpi,
+				   int64_t addr, inti stop, inti step)
+   {inti n, nb, niw, ni;
     int64_t eaddr;
     char *outtype;
     SC_array *bl;
@@ -684,7 +686,7 @@ static char *_PD_write_hyper_space(PDBfile *file, char *in, char *intype,
     bl      = ep->blocks;
 
 /* items logically contiguous */
-    if (step == fbyt)
+    if (step == fbpi)
        {ni = (stop - addr)/step + 1L;
 
 /* get writes across blocks correct */
@@ -692,7 +694,7 @@ static char *_PD_write_hyper_space(PDBfile *file, char *in, char *intype,
            {eaddr = addr;
 
 /* adjust the address for the correct block */
-            n = _PD_effective_addr(&eaddr, &nb, fbyt, bl);
+            n = _PD_effective_addr(&eaddr, &nb, fbpi, bl);
 
 	    _PD_set_current_address(file, eaddr, SEEK_SET, PD_WRITE);
 
@@ -711,14 +713,14 @@ static char *_PD_write_hyper_space(PDBfile *file, char *in, char *intype,
 	    _PD_block_set_valid(ep->blocks, n, PD_BLOCK_INVALID);
 
             ni   -= niw;
-            addr += fbyt*niw;
-            in   += hbyt*niw;};}
+            addr += fbpi*niw;
+            in   += hbpi*niw;};}
 
 /* items logically discontiguous */
     else
-       {for (; addr <= stop; addr += step, in += hbyt)
+       {for (; addr <= stop; addr += step, in += hbpi)
             {eaddr = addr;
-             n = _PD_effective_addr(&eaddr, &nb, fbyt, bl);
+             n = _PD_effective_addr(&eaddr, &nb, fbpi, bl);
 	     _PD_set_current_address(file, eaddr, SEEK_SET, PD_WRITE);
 
              _PD_sys_write(file, in, 1L, intype, outtype);
@@ -736,20 +738,18 @@ static char *_PD_write_hyper_space(PDBfile *file, char *in, char *intype,
  *                    - largest
  *                    - the offset is specified by the starting address
  *                    - which is ADDR
- *                    - FBYT is the number of bytes in the file for each item
- *                    - to be read
- *                    - HBYT is the number of bytes in memory for each item
- *                    - to be read
+ *                    - FBPI is the bytes per item in the file
+ *                    - HBPI is the bytes per item in memory
  */
 
 static char *_PD_wr_hyper_index(PDBfile *file, char *out, dimind *pi, 
                                 char *intype, int64_t addr,
-				syment *ep, int hbyt, int fbyt)
-   {long stride, step;
-    int64_t offset, start, stop;
+				syment *ep, intb hbpi, intb fbpi)
+   {inti stride, step;
+    inti offset, start, stop;
 
 /* for each index specification compute the range and recurse */
-    stride = fbyt*pi->stride;
+    stride = fbpi*pi->stride;
     start  = stride*pi->start;
     stop   = stride*pi->stop;
     step   = stride*pi->step;
@@ -758,17 +758,17 @@ static char *_PD_wr_hyper_index(PDBfile *file, char *out, dimind *pi,
     start = addr;
 
 /* at the bottom of the recursion do the actual operations */
-    if (stride <= (long) fbyt)
+    if (stride <= (long) fbpi)
        {if (file->virtual_internal == TRUE)
 	   out = _PD_write_hyper_vif(file, out, intype, ep,
-				     hbyt, fbyt, start, stop, step);
+				     hbpi, fbpi, start, stop, step);
 	else
 	   out = _PD_write_hyper_space(file, out, intype, ep,
-				       hbyt, fbyt, start, stop, step);}
+				       hbpi, fbpi, start, stop, step);}
     else
        {for (offset = start; offset <= stop; offset += step)
 	    out = _PD_wr_hyper_index(file, out, pi + 1, intype, offset,
-				     ep, hbyt, fbyt);};
+				     ep, hbpi, fbpi);};
 
     return(out);}
 
@@ -829,7 +829,7 @@ void _PD_fin_stacks(void)
 /* _PD_ANNOTATE_TEXT - for text files annotate the output */
 
 int64_t _PD_annotate_text(PDBfile *file, syment *ep, char *name,
-			int64_t addr, void *vr)
+			  int64_t addr, void *vr)
    {long ni, nc;
     int64_t na, pa;
     char s[MAXLINE];
@@ -869,10 +869,11 @@ int64_t _PD_annotate_text(PDBfile *file, syment *ep, char *name,
  *               - lists
  */
 
-long _PD_wr_syment(PDBfile *file, char *vr, long ni,
+long _PD_wr_syment(PDBfile *file, char *vr, int64_t ni,
 		   char *intype, char *outtype)
-   {int dst, size, indir, count, itags;
-    long i;
+   {int dst, indir, count, itags;
+    inti i;
+    intb size;
     char bf[MAXLINE];
     char *litype, *lotype, *svr, *ttype;
     defstr *dp;
@@ -1078,7 +1079,8 @@ long _PD_wr_syment(PDBfile *file, char *vr, long ni,
 
 int _PD_hyper_write(PDBfile *file, char *name, syment *ep,
 		    void *vr, char *intype)
-   {int nc, nd, c, hbyt, fbyt, rv;
+   {int nc, nd, c, rv;
+    intb hbpi, fbpi;
     char s[MAXLINE], *expr;
     dimdes *dims;
     dimind *pi;
@@ -1121,18 +1123,18 @@ int _PD_hyper_write(PDBfile *file, char *name, syment *ep,
 	if (pi == NULL)
 	   PD_error("CAN'T FIND HYPER INDICES - _PD_HYPER_WRITE", PD_WRITE);
 
-	fbyt = _PD_lookup_size(PD_entry_type(ep), file->chart);
-	if (fbyt == -1)
+	fbpi = _PD_lookup_size(PD_entry_type(ep), file->chart);
+	if (fbpi == -1)
 	   PD_error("CAN'T FIND NUMBER OF FILE BYTES - _PD_HYPER_WRITE",
 		    PD_WRITE);
 
-	hbyt = _PD_lookup_size(intype, file->host_chart);
-	if (hbyt == -1)
+	hbpi = _PD_lookup_size(intype, file->host_chart);
+	if (hbpi == -1)
 	   PD_error("CAN'T FIND NUMBER OF HOST BYTES - _PD_HYPER_WRITE",
 		    PD_WRITE);
 
 	_PD_wr_hyper_index(file, vr, pi, intype, PD_entry_address(ep),
-			   ep, hbyt, fbyt);
+			   ep, hbpi, fbpi);
 
 	CFREE(pi);};
 
@@ -1148,9 +1150,9 @@ int _PD_hyper_write(PDBfile *file, char *name, syment *ep,
  *                      - ADDR is the starting address
  *                      - STOP is the upper bound on the address
  *                      - STEP is the increment of the address for each entry
- *                      - FBYT is the number of bytes in the file for each
+ *                      - FBPI is the number of bytes in the file for each
  *                      - item to be read
- *                      - HBYT is the number of bytes in memory for each
+ *                      - HBPI is the number of bytes in memory for each
  *                      - item to be read
  *                      - EP is a scratch syment for temporary use
  *                      - EPO is the originating syment
@@ -1159,10 +1161,10 @@ int _PD_hyper_write(PDBfile *file, char *name, syment *ep,
 
 static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
 				char *out, syment *epo, char *outtype,
-				int hbyt, int fbyt, 
-                                int64_t addr, int64_t stop, long step)
+				intb hbpi, intb fbpi, 
+                                int64_t addr, inti stop, inti step)
    {int nrd, nr;
-    long n, nb, ni;
+    inti n, nb, ni;
     int64_t eaddr; 
     char *intype;
     SC_array *bl, *blo;
@@ -1181,14 +1183,14 @@ static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
     if (addr >= 0)
 
 /* items logically contiguous */
-       {if (step == fbyt)
-	   {long niw;
+       {if (step == fbpi)
+	   {inti niw;
 
 /* read across blocks */
 	    ni = (stop - addr)/step + 1L;
 	    while (ni > 0)
 	       {eaddr = addr;
-		n = _PD_effective_addr(&eaddr, &nb, fbyt, blo);
+		n = _PD_effective_addr(&eaddr, &nb, fbpi, blo);
 
 /* NOTE: this subverts _PD_effective_addr in part, but because _PD_effective_ep
  * cannot be modified to build an effective syment for indirectly referenced data
@@ -1211,15 +1213,15 @@ static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
 		nrd += nr;
 
 		ni   -= niw;
-		addr += fbyt*niw;
-		out  += hbyt*niw;};}
+		addr += fbpi*niw;
+		out  += hbpi*niw;};}
 
 /* items not logically contiguous */
         else
 	   {ep->number = 1L;
-	    for (; addr <= stop; addr += step, out += hbyt)
+	    for (; addr <= stop; addr += step, out += hbpi)
 	        {eaddr = addr;
-		 n = _PD_effective_addr(&eaddr, &nb, fbyt, blo);
+		 n = _PD_effective_addr(&eaddr, &nb, fbpi, blo);
 		 _PD_block_set_address(bl, 0, eaddr);
 		 if (_PD_csum_block_read(file, name, epo, n) == FALSE)
 		    nr = 0;
@@ -1243,12 +1245,12 @@ static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
 	    ep->number = ni;
 	    PD_entry_set_address(ep, addr);
 	    nrd += _PD_sys_read(file, ep, outtype, out);
-	    out += hbyt*ni;}
+	    out += hbpi*ni;}
 
 /* items not logically contiguous */
 	else
 	   {ep->number = 1L;
-	    for (; addr >= stop; addr += step, out += hbyt)
+	    for (; addr >= stop; addr += step, out += hbpi)
 	        {PD_entry_set_address(ep, addr);
 		 nrd += _PD_sys_read(file, ep, outtype, out);};};};
 
@@ -1266,9 +1268,9 @@ static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
  *                    - largest
  *                    - the offset is specified by the starting address
  *                    - which is ADDR
- *                    - FBYT is the number of bytes in the file for each item
+ *                    - FBPI is the number of bytes in the file for each item
  *                    - to be read
- *                    - HBYT is the number of bytes in memory for each item
+ *                    - HBPI is the number of bytes in memory for each item
  *                    - to be read
  *                    - return the number of item successfully read
  */
@@ -1276,16 +1278,16 @@ static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
 static int _PD_rd_hyper_index(PDBfile *file, char *name,
 			      syment *ep, char *out,
 			      dimind *pi, syment *epo, char *outtype,
-			      int64_t addr, int hbyt, int fbyt)
+			      int64_t addr, intb hbpi, intb fbpi)
    {int nrd, nir;
-    long stride, step;
-    int64_t offset, start, stop;
+    inti stride, step;
+    inti offset, start, stop;
     char *intype;
 
     intype = PD_entry_type(epo);
 
 /* for each index specification compute the range and recurse */
-    stride = fbyt*pi->stride;
+    stride = fbpi*pi->stride;
     start  = stride*pi->start;
     stop   = stride*pi->stop;
     step   = stride*pi->step;
@@ -1297,29 +1299,29 @@ static int _PD_rd_hyper_index(PDBfile *file, char *name,
         if (dpf == NULL)
            PD_error("CANNOT FIND TYPE IN THE FILE CHART - _PD_RD_HYPER_INDEX", PD_READ);
 	else
-	   {stop = addr - dpf->size_bits*((stop - start)/fbyt);
-	    step = -dpf->size_bits*(step/fbyt);};}
+	   {stop = addr - dpf->size_bits*((stop - start)/fbpi);
+	    step = -dpf->size_bits*(step/fbpi);};}
 
     else
        stop = addr + (stop - start);
 
 /* at the bottom of the recursion do the actual reads */
     nrd = 0;
-    if (stride <= (long) fbyt)
+    if (stride <= (long) fbpi)
        nrd += _PD_read_hyper_space(file, name, ep, out, epo, outtype, 
-				   hbyt, fbyt, addr, stop, step);
+				   hbpi, fbpi, addr, stop, step);
     else if (addr < 0)
        {for (offset = -addr; offset <= -stop; offset -= step)
             {nir = _PD_rd_hyper_index(file, name, ep, out, pi + 1, epo,
-				      outtype, -offset, hbyt, fbyt);
+				      outtype, -offset, hbpi, fbpi);
 	     nrd += nir;
-             out += nir*hbyt; };}
+             out += nir*hbpi; };}
     else
        {for (offset = addr; offset <= stop; offset += step)
 	    {nir = _PD_rd_hyper_index(file, name, ep, out, pi + 1, epo,
-				      outtype, offset, hbyt, fbyt);
+				      outtype, offset, hbpi, fbpi);
 	     nrd += nir;
-             out += nir*hbyt; };};
+             out += nir*hbpi; };};
 
     return(nrd);}
 
@@ -1334,10 +1336,11 @@ static int _PD_rd_hyper_index(PDBfile *file, char *name,
  *                     - return the number of items successfully read
  */
 
-static void _PD_rd_leaf_members(PDBfile *file, char *vr, long ni, 
+static void _PD_rd_leaf_members(PDBfile *file, char *vr, inti ni, 
                                 char *intype, char *outtype, int boffs)
    {int ipt, nbt, cnv;
-    long bpi, nir, nia, nb;
+    inti nir, nia, nb;
+    intb bpi;
     char *bf, *in, *out;
     defstr *dpf, *dph;
     FILE *fp;
@@ -1418,7 +1421,7 @@ static void _PD_rd_leaf_members(PDBfile *file, char *vr, long ni,
 int _PD_indexed_read_as(PDBfile *file, char *fullpath, char *type, void *vr, 
                         int nd, long *ind, syment *ep)
    {int i, err;
-    long start, stop, step;
+    inti start, stop, step;
     char index[MAXLINE], hname[MAXLINE];
     PD_smp_state *pa;
 
@@ -1492,7 +1495,8 @@ int _PD_indexed_read_as(PDBfile *file, char *fullpath, char *type, void *vr,
 
 int _PD_hyper_read(PDBfile *file, char *name, char *outtype,
 		   syment *ep, void *vr)
-   {int nc, nd, c, nrd, hbyt, fbyt;
+   {int nc, nd, c, nrd;
+    intb hbpi, fbpi;
     char s[MAXLINE], *expr;
     dimdes *dims;
     dimind *pi;
@@ -1536,13 +1540,13 @@ int _PD_hyper_read(PDBfile *file, char *name, char *outtype,
 	    if (pi == NULL)
 	       PD_error("CAN'T FIND HYPER INDICES - _PD_HYPER_READ", PD_READ);
 
-	    fbyt = _PD_lookup_size(PD_entry_type(ep), file->chart);
-	    if (fbyt == -1)
+	    fbpi = _PD_lookup_size(PD_entry_type(ep), file->chart);
+	    if (fbpi == -1)
 	       PD_error("CAN'T FIND NUMBER OF FILE BYTES - _PD_HYPER_READ",
 			PD_READ);
 
-	    hbyt = _PD_lookup_size(outtype, file->host_chart);
-	    if (hbyt == -1)
+	    hbpi = _PD_lookup_size(outtype, file->host_chart);
+	    if (hbpi == -1)
 	       PD_error("CAN'T FIND NUMBER OF HOST BYTES - _PD_HYPER_READ",
 			PD_READ);
 
@@ -1551,7 +1555,7 @@ int _PD_hyper_read(PDBfile *file, char *name, char *outtype,
 
 	    nrd = _PD_rd_hyper_index(file, name, tep, vr, pi, ep,
 				     outtype, PD_entry_address(ep),
-				     hbyt, fbyt);
+				     hbpi, fbpi);
 
 	    _PD_rl_syment(tep);
 
@@ -1608,12 +1612,13 @@ int PD_read_bits(PDBfile *file ARG(,,cls),
  *             -   PDATA   the data array returned
  */
 
-int _PD_rd_bits(PDBfile *file, char *name, char *type, long nitems,
-		int sgned, int nbits, int padsz, int fpp,
-		long offs, long *pan, char **pdata)
+int _PD_rd_bits(PDBfile *file, char *name, char *type, inti ni,
+		int sgned, intb nbits, int padsz, int fpp,
+		inti offs, long *pan, char **pdata)
    {int i, ityp, out_flag, onescmp;
     int *ord;
-    long nitemsin, enumb, ebyte, obyte, ni;
+    inti nii, nie, nir;
+    intb bpie, bpio;
     char *etype, *in, *out;
     syment *ep;
     defstr *dp1, *dp2;
@@ -1622,8 +1627,8 @@ int _PD_rd_bits(PDBfile *file, char *name, char *type, long nitems,
     if (ep == NULL)
        return(FALSE);
 
-    nitemsin = PD_entry_number(ep);
-    etype  = PD_entry_type(ep);
+    nii   = PD_entry_number(ep);
+    etype = PD_entry_type(ep);
 
     dp1 = PD_inquire_type(file, etype);
     if (dp1 == NULL)
@@ -1637,48 +1642,48 @@ int _PD_rd_bits(PDBfile *file, char *name, char *type, long nitems,
 
     out_flag = dp2->fix.order;
 
-    ebyte = _PD_lookup_size(etype, file->chart);
-    enumb = nitemsin * ebyte;
+    bpie = _PD_lookup_size(etype, file->chart);
+    nie  = nii*bpie;
 
-    in = CMAKE_N(char, enumb);
+    in = CMAKE_N(char, nie);
 
     CFREE(etype);
 
     ep->type   = CSTRSAVE(SC_CHAR_S);
-    ep->number = enumb;
-    ni = _PD_sys_read(file, ep, SC_CHAR_S, in);
-    if (ni != enumb)
+    ep->number = nie;
+    nir = _PD_sys_read(file, ep, SC_CHAR_S, in);
+    if (nir != nie)
        {CFREE(in);
 	_PD_rl_syment_d(ep);
 	return(FALSE);};
 
-    obyte = _PD_lookup_size(type, file->host_chart);
-    out   = _PD_alloc_entry(file, type, nitems);
-    ityp  = SC_type_id(type, FALSE);
+    bpio = _PD_lookup_size(type, file->host_chart);
+    out  = _PD_alloc_entry(file, type, ni);
+    ityp = SC_type_id(type, FALSE);
 
     if ((SC_is_type_char(ityp) == FALSE) && (SC_is_type_fix(ityp) == FALSE))
        return(FALSE);
 
-    SC_unpack_bits(out, in, ityp, nbits, padsz, fpp, nitems, offs);
+    SC_unpack_bits(out, in, ityp, nbits, padsz, fpp, ni, offs);
 
 /* convert integers */
     if (SC_is_type_char(ityp) == FALSE)
-       {ord = CMAKE_N(int, obyte);
+       {ord = CMAKE_N(int, bpio);
 
         if (out_flag == NORMAL_ORDER)
-           for (i = 0; i < obyte; ord[i] = i + 1, i++);
+           for (i = 0; i < bpio; ord[i] = i + 1, i++);
         else                         
-           for (i = 0; i < obyte; ord[i] = obyte - i, i++);
+           for (i = 0; i < bpio; ord[i] = bpio - i, i++);
 
         if (sgned)
-           _PD_sign_extend(out, nitems, obyte, nbits, ord);
+           _PD_sign_extend(out, ni, bpio, nbits, ord);
 
         if (onescmp)
-           _PD_ones_complement(out, nitems, obyte, ord);
+           _PD_ones_complement(out, ni, bpio, ord);
 
         CFREE(ord);};
 
-    *pan   = nitems;
+    *pan   = ni;
     *pdata = out;
 
     CFREE(in);
@@ -1701,10 +1706,11 @@ int _PD_rd_bits(PDBfile *file, char *name, char *type, long nitems,
  */
 
 long _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
-   {int dst, vif, size, boffs, count, itags;
-    long i, n, ni, bpi, nrd;
-    long loc;
+   {int dst, vif, count, itags;
+    inti i, n, ni, nrd, size;
+    intb bpi, boffs;
     int64_t addr, eaddr;
+    PD_data_location loc;
     char bf[MAXLINE];
     char *pv, *litype, *lotype, *svr, **lvr;
     symindir iloc;
@@ -1726,7 +1732,7 @@ long _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
     litype  = NULL;
     lotype  = NULL;
     size    = 0;
-    ni  = 0;
+    ni      = 0;
 
     vif   = file->virtual_internal;
     itags = file->use_itags;
@@ -1960,8 +1966,8 @@ long _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
 /* _PD_RD_POINTER - read and return a pointer index from FILE at ADDR */
 
 long _PD_rd_pointer(PDBfile *file, int64_t addr)
-   {long n;
-    size_t bpi, nr;
+   {inti n, nr;
+    intb bpi;
     char bf[MAXLINE];
     FILE *fp;
 
@@ -1974,7 +1980,7 @@ long _PD_rd_pointer(PDBfile *file, int64_t addr)
 /* read the pointer value from the file location */
     nr = lio_read(bf, bpi, 1, fp);
     if (nr == 1)
-       {int fbpi, hbpi;
+       {intb fbpi, hbpi;
 	data_standard *hs, *fs;
 	PD_byte_order ford, hord;
 

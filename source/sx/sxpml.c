@@ -90,7 +90,8 @@ static object *_SXI_mk_array(SS_psides *si, object *argl)
  */
 
 static object *_SXI_resz_array(SS_psides *si, object *argl)
-   {long os, size, bpi;
+   {long os, size;
+    intb bpi;
     C_array *arr;
     void *d;
     object *o;
@@ -124,7 +125,8 @@ static object *_SXI_resz_array(SS_psides *si, object *argl)
 
 static object *_SXI_sub_array(SS_psides *si, object *argl)
    {int i, nd, nr;
-    long n, length, rlength, bpi;
+    long n, length, rlength;
+    intb bpi;
     long *idims, *ireg, *pd, *pr;
     char typ[MAXLINE];
     void *d;

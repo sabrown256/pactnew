@@ -238,7 +238,8 @@ static void _PA_load_space(PA_variable *pp, long psz)
            PA_VARIABLE_INIT_FUNC(pp) = NULL;}
 
     else if (pval != NULL)
-       {long i, bpi;
+       {inti i;
+	intb bpi;
         char *pvr;
 
         psz = max(1, psz);
@@ -703,10 +704,11 @@ void PA_init_scalar(char *s)
  *           - points to something of type TYPE
  */
 
-void *_PA_alloc(defstr *dp, char *type, long ni, void *pval)
-   {void *vr;
+void *_PA_alloc(defstr *dp, char *type, inti ni, void *pval)
+   {inti i;
+    intb bpi;
     char *pvr;
-    long i, bpi;
+    void *vr;
 
     bpi = dp->size;
     if (_PD_indirection(type))

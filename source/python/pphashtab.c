@@ -74,7 +74,7 @@ PyObject *_PP_unpack_hashtab(void *p, long nitems)
 /* PyObject *PP_unpack_hashtab_haelem(haelem *hp)*/
 PyObject *PP_unpack_hashtab_haelem(char *type, void *vr)
 {
-    int bpi;
+    intb bpi;
     long nitems;
     dimdes *dims;
     PyObject *rv;
@@ -136,7 +136,7 @@ void _PP_hashtab_entry(PP_file *fileinfo)
     descr = PP_make_descr(
         PP_UNKNOWN_I,                   /* typecode */
         "hasharr",                      /* type */
-        sizeof(hasharr)                     /* bpi */
+        sizeof(hasharr)                 /* bpi */
         );
 
     entry = PP_make_type_entry(

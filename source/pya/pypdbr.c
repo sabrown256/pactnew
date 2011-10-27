@@ -52,7 +52,7 @@ long _PP_rd_syment(PyObject *obj, PP_file *fileinfo,
     long ii;                    /* index of current structure member */
     Py_ssize_t nmembers;        /* number of members in struct */
     Py_ssize_t i;
-    long bpi;
+    intb bpi;
     char *pv, *litype, *ttype, *svr, **lvr;
     defstr *dp;
     memdes *desc, *mem_lst;
