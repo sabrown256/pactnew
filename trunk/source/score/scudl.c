@@ -172,8 +172,11 @@ void _SC_rel_udl(SC_udl *pu)
 
     if (pu != NULL)
        {if (pu->stream != NULL)
-	   io_close(pu->stream);
-	CFREE(pu->stream);
+	   {io_close(pu->stream);
+	    pu->stream = NULL;}
+	else
+	  CFREE(pu->stream);
+
 	CFREE(pu->buffer);
 	CFREE(pu->mode);
         CFREE(pu->udl);

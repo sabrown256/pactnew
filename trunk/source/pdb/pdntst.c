@@ -1297,13 +1297,13 @@ static int test_3(char *base, char *tgt, int n)
 
 /* PREP_TEST_4_DATA - prepare the test data */
 
-void prep_test_4_data(void)
-   {char *pc;
+static void prep_test_4_data(void)
+   {int *pi;
     short *ps;
-    int *pi;
     long *pl;
     float *pf;
     double *pd;
+    char *pc;
     haelem *hp;
 
     tab4_w = SC_make_hasharr(3, NODOC, SC_HA_NAME_KEY, 0);
@@ -1340,6 +1340,9 @@ void prep_test_4_data(void)
     *pd = -1.0e-30;
     hp = SC_hasharr_install(tab4_w, "pd", pd, DOUBLE_S, TRUE, TRUE);
 
+/* mark to keep reference count right and valgrind clean */
+    SC_mark(hp, 1);
+
     SC_hasharr_install(tab4_w, "ph", hp, HASHEL_S, TRUE, TRUE);
 
     tab4_r = NULL;
@@ -1374,7 +1377,7 @@ static int cleanup_ha_test_4(haelem *hp, void *a)
 
 /* CLEANUP_TEST_4 - free all known test data memory */
 
-void cleanup_test_4(void)
+static void cleanup_test_4(void)
    {
 
     SC_free_hasharr(tab4_w, NULL, NULL);
@@ -1415,10 +1418,10 @@ static void send_test_4_data(PDBfile *strm)
 
 /* PRINT_TEST_4_DATA - print it out to the file */
 
-void print_test_4_data(FILE *fp)
+static void print_test_4_data(FILE *fp)
    {int i, ne, *pi;
-    short *ps;
     long *pl;
+    short *ps;
     float *pf;
     double *pd;
     char *pc, **names;
@@ -1439,6 +1442,9 @@ void print_test_4_data(FILE *fp)
     pf = (float *) SC_hasharr_def_lookup(tab4_r, "pf");
     pd = (double *) SC_hasharr_def_lookup(tab4_r, "pd");
     ph = (haelem *) SC_hasharr_def_lookup(tab4_r, "ph");
+
+/* mark to keep reference count right and valgrind clean */
+    SC_mark(ph, 1);
 
     PRINT(fp, "Table values:\n");
     PRINT(fp, "   pc = %c %s\n", *pc, CHAR_S);
@@ -1544,16 +1550,14 @@ static int compare_test_4_data(PDBfile *strm, FILE *fp)
 /*--------------------------------------------------------------------------*/
 
 /* TEST_4 - test the PDBLib functions handling indirections
- *        -
  *        - read and write structures with alignment difficulties
- *        -
  *        - tests can be targeted
  */
 
 static int test_4(char *base, char *tgt, int n)
-   {PDBfile *strm;
+   {int err;
     char datfile[MAXLINE], fname[MAXLINE];
-    int err;
+    PDBfile *strm;
     FILE *fp;
 
 /* target the file as asked */

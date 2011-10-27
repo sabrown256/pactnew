@@ -94,6 +94,12 @@
 
 /*--------------------------------------------------------------------------*/
 
+/* inti to be used for quantities that are numbers of items long */
+typedef int64_t inti;
+
+/* intb to be used for quantities that are bytes per item long */
+typedef int32_t intb;
+
 typedef int (*PFBinType)(char *type);
 typedef PDBfile *(*PFBinCreate)(tr_layer *tr, SC_udl *pu, char *name, void *a);
 typedef PDBfile *(*PFBinOpen)(tr_layer *tr, SC_udl *pu, char *name,
@@ -237,9 +243,6 @@ extern syment
 	     long number, dimdes *dims);
 
 extern void
- _PD_sign_extend(char *out, long ni,
-		 int nbo, int nbti, int *ord),
- _PD_ones_complement(char *out, long ni, int nbo, int *order),
  _PD_cast_insert(hasharr* chart, char* type, char* memb, char* cast);
 
 extern int
@@ -361,6 +364,8 @@ extern int
 /* PDCONV.C declarations */
 
 extern int
+ _PD_pack_bits(char *out, char *in, int ityp, intb nbits,
+	       intb padsz, int fpp, inti ni, intb offs),
  _PD_prim_typep(char *memb, hasharr *chrt, PD_major_op error),
  _PD_require_conv(defstr *dpf, defstr *dph);
 
@@ -369,13 +374,18 @@ extern long
 		    int hbpi, PD_byte_order hord, data_standard *hs);
 
 extern void
- _PD_iconvert(char **out, char **in, long ni,
-	      long nbi, PD_byte_order ordi,
-	      long nbo, PD_byte_order ordo,
+ _PD_sign_extend(char *out, inti ni,
+		 intb nbo, intb nbti, int *ord),
+ _PD_ones_complement(char *out, inti ni, intb nbo, int *order),
+ _PD_insert_field(long inl, intb nb, char *out,
+		  intb offs, int lord, intb lby),
+ _PD_iconvert(char **out, char **in, inti ni,
+	      intb nbi, PD_byte_order ordi,
+	      intb nbo, PD_byte_order ordo,
 	      int onescmp, int usg),
- _PD_fconvert(char **out, char **in, long ni, int boffs,
+ _PD_fconvert(char **out, char **in, inti ni, int boffs,
 	      long *infor, int *inord, long *outfor, int *outord,
-	      PD_byte_order l_order, int l_bytes, int onescmp);
+	      PD_byte_order ordl, intb bpl, int onescmp);
 
 
 /* PDCSUM.C declarations */

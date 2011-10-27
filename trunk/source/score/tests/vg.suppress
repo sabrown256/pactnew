@@ -42,105 +42,41 @@
 #    fun:SC_free_array
 # }
 
+{
+   io-printf-1a
+   Memcheck:Cond
+   fun:strcpy
+   fun:SC_strsavec
+   fun:SC_vdsnprintf
+   fun:_SC_bprintf
+   fun:io_printf
+}
+{
+   io-printf-1b
+   Memcheck:Cond
+   fun:SC_strsavec
+   fun:SC_vdsnprintf
+   fun:_SC_bprintf
+   fun:io_printf
+}
+{
+   io-printf-2a
+   Memcheck:Cond
+   fun:strlen
+   fun:_SC_bout
+   fun:_SC_bprintf
+   fun:io_printf
+}
+{
+   io-printf-2b
+   Memcheck:Cond
+   fun:_SC_bout
+   fun:_SC_bprintf
+   fun:io_printf
+}
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-{
-   aix-32-malloc-1
-   Memcheck:Addr4
-   fun:malloc_y
-   fun:malloc_common_80_63
-   fun:_lib_spinlock_create
-   fun:_rec_mutex_init_19_13
-   fun:_rec_mutex_alloc
-}
-
-{
-   aix-32-malloc-2
-   Memcheck:Addr1
-   fun:malloc_y
-   fun:malloc_common_80_63
-   fun:_lib_spinlock_create
-   fun:_rec_mutex_init_19_13
-   fun:_rec_mutex_alloc
-}
-
-{
-   aix-32-malloc-3
-   Memcheck:Addr4
-   fun:leftmost
-   fun:malloc_y
-   fun:_lib_spinlock_create
-   fun:_rec_mutex_init_19_13
-   fun:_rec_mutex_alloc
-}
-
-{
-   aix-32-malloc-4
-   Memcheck:Addr2
-   fun:malloc_y
-   fun:malloc_common_80_63
-   fun:_lib_spinlock_create
-   fun:_rec_mutex_init_19_13
-   fun:_rec_mutex_alloc
-}
-
-{
-   aix-32-malloc-5
-   Memcheck:Addr4
-   fun:malloc_y
-   fun:malloc_common_80_63
-}
-
-{
-   aix-32-malloc-6
-   Memcheck:Addr2
-   fun:malloc_y
-   fun:malloc_common_80_63
-}
-
-{
-   aix-32-malloc-7
-   Memcheck:Addr1
-   fun:malloc_y
-   fun:malloc_common_80_63
-}
-
-{
-   aix-32-malloc-8
-   Memcheck:Addr4
-   fun:leftmost
-   fun:malloc_y
-}
-
-{
-   aix-32-thread-1
-   Memcheck:Addr4
-   fun:_spinlock_init
-   fun:_lib_spinlock_create
-   fun:_rec_mutex_alloc
-}
-
-{
-   aix-32-thread-2
-   Memcheck:Addr4
-   obj:*
-   fun:_rec_mutex_trylock
-}
-
-{
-   aix-32-thread-3
-   Memcheck:Addr4
-   fun:global_unlock_ppc_mp
-   fun:_rec_mutex_unlock
-}
-
-{
-   aix-32-thread-4
-   Memcheck:Addr4
-   fun:global_lock_ppc_mp
-   fun:_rec_mutex_lock
-}
 
 {
    linux-32-write-1

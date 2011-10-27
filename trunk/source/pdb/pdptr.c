@@ -466,11 +466,12 @@ static int _PD_ptr_get_n_spaces(PDBfile *file, int inc)
 /* _PD_PTR_GET_AD - return the N address from the current address list */
 
 static PD_address *_PD_ptr_get_ad(adloc *al, int n)
-   {PD_address *ad;
+   {PD_address *ad, **pad;
     SC_array *ap;
 
-    ap = al->ap;
-    ad = *(PD_address **) SC_array_get(ap, n);
+    ap  = al->ap;
+    pad = (PD_address **) SC_array_get(ap, n);
+    ad  = (pad != NULL) ? *pad : NULL;
 
     if (ad == NULL)
        {ad = _PD_make_addr(n, -1, NULL, NULL);

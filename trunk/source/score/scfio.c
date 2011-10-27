@@ -1839,14 +1839,9 @@ int io_close(FILE *fp)
 /* IO_PRINTF - wrapper for fprintf method of file FP */
 
 int io_printf(FILE *fp, char *fmt, ...)
-   {int rv, st;
+   {int rv;
     char *s;
     file_io_desc *fid;
-
-/* fix valgrind complaint by allocating 8 bytes off stack for rv and st
- * rather than 4 bytes for rv only
- */
-    st = 0;
 
     rv = 0;
     if (fp != NULL)
@@ -1871,8 +1866,6 @@ int io_printf(FILE *fp, char *fmt, ...)
 		SC_VA_END;};
 
 	    IO_OPER_ACCUM_TIME(fid, IO_OPER_FPRINTF);};};
-
-    SC_ASSERT(st == 0);
 
     return(rv);}
 

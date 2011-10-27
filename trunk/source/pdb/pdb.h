@@ -1067,20 +1067,20 @@ extern PD_image
 /* PDCONV.C declarations */
 
 extern void
- PD_byte_reverse(char *out, long nb, long ni);
+ PD_byte_reverse(char *out, int32_t nb, int64_t ni);
 
 extern int
  PD_convert(char **out, char **in, char *typi, char *typo,
-	    long ni, data_standard *stdi, data_standard *stdo,
+	    int64_t ni, data_standard *stdi, data_standard *stdo,
 	    data_standard *hstd, hasharr *chi, hasharr *cho,
 	    int boffs, PD_major_op error),
  PD_n_bit_char_std(PD_character_standard cstd);
 
 extern char
  *PD_convert_ascii(char *out, int nc, PD_character_standard cstd,
-		   char *in, int nb),
+		   char *in, int64_t nb),
  *PD_conv_from_ascii(char *out, int nc, PD_character_standard cstd,
-		     char *in, int nb);
+		     char *in, int64_t nb);
 
 
 /* PDGS.C declarations */

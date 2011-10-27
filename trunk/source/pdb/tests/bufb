@@ -44,8 +44,11 @@ if ("$Valgrind" == "") then
          @ lerr = $lerr + 1
       endif
    end
+
+   $TEST_CHECK part -a bufb -e $xstatus -x $exe "$msg"
+
+   set xstatus = $status
+
 endif
 
-$TEST_CHECK part -a bufb -e $xstatus -x $exe "$msg"
-
-exit($status)
+exit($xstatus)

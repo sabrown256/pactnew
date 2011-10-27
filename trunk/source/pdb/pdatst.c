@@ -96,6 +96,7 @@ static int write_test(FILE *fp)
 
 	rank  = CMAKE(int);
 	*rank = 1;
+	SC_mark(rank, 1);
 
 	pc  = CMAKE(int *);
 	*pc = center = CMAKE_N (int, 2);
@@ -113,6 +114,7 @@ static int write_test(FILE *fp)
 	err &= print_info(file, fp, file->attrtab, "d", "Attribute Table");
 
 	PD_close(file);
+
 	CFREE(rank);
 	CFREE(center);};
 

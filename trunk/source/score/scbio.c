@@ -1506,6 +1506,7 @@ FILE *SC_lbopen(char *name, char *mode)
 	    bid->nhr   = 0;
 	    bid->nhw   = 0;
 	    bid->nbfmx = 0;
+            memset(bid->nhits, 0, sizeof(bid->nhits));
 
 #ifndef USE_C_BUFFERED_IO
 

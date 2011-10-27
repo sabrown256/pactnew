@@ -170,7 +170,7 @@ static void _SC_array_acc_method(SC_array *a)
 
 /* _SC_ARRAY_GROW - grow the array A */
 
-static void _SC_array_grow(SC_array *a, long nn)
+static void _SC_array_grow(SC_array *a, long nn, long ng)
    {int chg;
     long i, n, nx, bpi;
     double gf, fc;
@@ -182,9 +182,10 @@ static void _SC_array_grow(SC_array *a, long nn)
     bpi = a->bpi;
     chg = FALSE;
 
-/* if new size not specified - grow exponentially from the old size */
-    if (nn < 0)
+/* if growth size not specified - grow exponentially from the old size */
+    if (ng < 0)
        {n  = max(nx, a->n);
+	n  = max(n, nn);
 	gf = a->gf;
 	fc = pow(2.0, -gf*n);
 	nn = (n + 1)*(1.0 + fc);};
@@ -401,7 +402,7 @@ long SC_array_resize(SC_array *a, long n, double g)
     if (0.0 <= g)
        a->gf = GROWTH_FACTOR(g);
 
-    _SC_array_grow(a, n);
+    _SC_array_grow(a, n, n);
 
     return(nn);}
 
@@ -423,7 +424,7 @@ long SC_array_frac_resize(SC_array *a, double f)
        {n  = a->n;
 	nn = (1.0 + f)*n;
 
-	_SC_array_grow(a, nn);};
+	_SC_array_grow(a, nn, nn);};
 
     return(nn);}
 
@@ -453,7 +454,7 @@ void *SC_array_set(SC_array *a, long n, void *v)
 	 a->n = max(a->n, m);
 
 	 if ((m >= a->nx) || (a->array == NULL))
-	    _SC_array_grow(a, -1);
+	    _SC_array_grow(a, m, -1);
 
 	 _SC_array_err(a, "set array %s %ld", a->name, n);
 
@@ -487,7 +488,7 @@ void *SC_array_get(SC_array *a, long n)
 	     n = max(n, 0);};
 
 	 if (n >= a->nx)
-	    _SC_array_grow(a, -1);
+	    _SC_array_grow(a, n, -1);
 
 	 _SC_array_err(a, "get array %s %ld", a->name, n);
 
@@ -512,7 +513,7 @@ void *SC_array_array(SC_array *a)
 
      if (a != NULL)
         {if (a->array == NULL)
-	    _SC_array_grow(a, -1);
+	    _SC_array_grow(a, -1, -1);
 
 	 rv = a->array;
 
@@ -554,7 +555,7 @@ long SC_array_set_n(SC_array *a, long n)
 	    {n = a->n + n;
 	     n = max(n, 0);};
 
-	 _SC_array_grow(a, n);
+	 _SC_array_grow(a, n, n);
 
 	 a->n = n;};
 
@@ -578,7 +579,7 @@ long SC_array_inc_n(SC_array *a, long n, int wh)
 	 nn = no + n;
 	 rv = (wh < 0) ? nn : no;
 
-	 _SC_array_grow(a, nn);
+	 _SC_array_grow(a, nn, nn);
 
 	 a->n = nn;};
 
@@ -960,7 +961,7 @@ int SC_array_sort(SC_array *a, PFIntBin pred)
  * be used in swaps
  */
 	if (n >= nx-1)
-	   _SC_array_grow(a, -1);
+	   _SC_array_grow(a, n, -1);
 
 	rv = _SC_array_sort(a, pred, 0, n-1);
         SC_array_set_n(a, n);};
