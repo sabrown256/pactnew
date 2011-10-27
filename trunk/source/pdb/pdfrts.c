@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
 
-#include "pdb.h"
+#include "pdbtfr.h"
 
 #define DATFILE "nat"
 
@@ -64,6 +64,7 @@ static char
 
 /*--------------------------------------------------------------------------*/
 
+#if 0
 /* TEST_TARGET - set up the target for the data file */
 
 static void test_target(char *tgt, char *base, int n,
@@ -74,6 +75,7 @@ static void test_target(char *tgt, char *base, int n,
     sprintf(datfile, "%s-nat.db%d", base, n);
 
     return;}
+#endif
 
 /*--------------------------------------------------------------------------*/
 
@@ -342,16 +344,10 @@ static int test_1(char *base, char *tgt, int n)
  */
 
 static int run_test(PFTest test, int n, char *host, int dbg)
-   {int cs, fail;
-    int64_t bytaa, bytfa, bytab, bytfb;
-    char msg[MAXLINE];
-    double time;
+   {int fail;
+    tframe st;
 
-    cs = SC_mem_monitor(-1, dbg, "B", msg);
-
-    SC_mem_stats(&bytab, &bytfb, NULL, NULL);
-
-    time = SC_wall_clock_time();
+    pre_test(&st, dbg);
 
     fail = 0;
 
@@ -359,17 +355,7 @@ static int run_test(PFTest test, int n, char *host, int dbg)
        {PRINT(STDOUT, "Test #%d failed\n", n);
 	fail++;};
 
-    SC_mem_stats(&bytaa, &bytfa, NULL, NULL);
-
-    bytaa -= bytab;
-    bytfa -= bytfb;
-    time   = SC_wall_clock_time() - time;
-
-    cs = SC_mem_monitor(cs, dbg, "B", msg);
-
-    PRINT(STDOUT,
-          "\t\t     %3d     %7d   %7d   %7d     %.2g\n",
-          n, bytaa, bytfa, bytaa - bytfa, time);
+    post_test(&st, n);
 
     return(fail);}
 

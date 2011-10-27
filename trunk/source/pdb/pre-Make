@@ -155,46 +155,46 @@ Apps : ${BinDir}/pdb2hdf
 Gst : ${BinDir}/pdgsts
 Lst : ${BinDir}/pdlsts
 
-${BinDir}/pdbtst : pdbtst.c ${InstallDep} ${Hdrs}
+${BinDir}/pdbtst : pdbtst.c ${InstallDep} ${Hdrs} pdbtfr.h
 	${CLD} ${LdFlags} pdbtst.c -o ${BinDir}/pdbtst ${Libs}
 
-${BinDir}/pdctst : pdctst.c ${InstallDep} ${Hdrs}
+${BinDir}/pdctst : pdctst.c ${InstallDep} ${Hdrs} pdbtfr.h
 	${CLD} ${LdFlags} pdctst.c -o ${BinDir}/pdctst ${Libs}
 
-${BinDir}/pdptst : pdptst.c ${InstallDep} ${Hdrs}
+${BinDir}/pdptst : pdptst.c ${InstallDep} ${Hdrs} pdbtfr.h
 	${CLD} ${LdFlags} pdptst.c -o ${BinDir}/pdptst ${Libs}
 
-${BinDir}/pdatst : pdatst.c ${InstallDep} ${Hdrs}
+${BinDir}/pdatst : pdatst.c ${InstallDep} ${Hdrs} pdbtfr.h
 	${CLD} ${LdFlags} pdatst.c -o ${BinDir}/pdatst ${Libs}
 
-${BinDir}/pdasts : pdasts.c ${InstallDep} ${Hdrs}
+${BinDir}/pdasts : pdasts.c ${InstallDep} ${Hdrs} pdbtfr.h
 	${CLD} ${LdFlags} pdasts.c -o ${BinDir}/pdasts ${Libs}
 
-${BinDir}/pdopts : pdopts.c ${InstallDep} ${Hdrs}
+${BinDir}/pdopts : pdopts.c ${InstallDep} ${Hdrs} pdbtfr.h
 	${CLD} ${LdFlags} pdopts.c -o ${BinDir}/pdopts ${Libs}
 
-${BinDir}/pdapts : pdapts.c ${InstallDep} ${Hdrs}
+${BinDir}/pdapts : pdapts.c ${InstallDep} ${Hdrs} pdbtfr.h
 	${CLD} ${LdFlags} pdapts.c -o ${BinDir}/pdapts ${Libs}
 
-${BinDir}/pdgsts : pdgsts.c ${InstallDep} ${Hdrs}
+${BinDir}/pdgsts : pdgsts.c ${InstallDep} ${Hdrs} pdbtfr.h
 	${CLD} ${LdFlags} pdgsts.c -o ${BinDir}/pdgsts ${Libs}
 
-${BinDir}/pdlsts : pdlsts.c ${InstallDep} ${Hdrs}
+${BinDir}/pdlsts : pdlsts.c ${InstallDep} ${Hdrs} pdbtfr.h
 	${CLD} ${LdFlags} pdlsts.c -o ${BinDir}/pdlsts ${Libs}
 
-${BinDir}/pdnrmt : pdnrmt.c ${InstallDep} ${Hdrs}
+${BinDir}/pdnrmt : pdnrmt.c ${InstallDep} ${Hdrs} pdbtfr.h
 	${CLD} ${LdFlags} pdnrmt.c -o ${BinDir}/pdnrmt ${Libs}
 
-${BinDir}/pdcsts : pdcsts.c ${InstallDep} ${Hdrs}
+${BinDir}/pdcsts : pdcsts.c ${InstallDep} ${Hdrs} pdbtfr.h
 	${CLD} ${LdFlags} pdcsts.c -o ${BinDir}/pdcsts ${Libs}
         
-${BinDir}/pdfrts : pdfrts.c ${InstallDep} ${Hdrs}
+${BinDir}/pdfrts : pdfrts.c ${InstallDep} ${Hdrs} pdbtfr.h
 	${CLD} ${LdFlags} pdfrts.c -o ${BinDir}/pdfrts ${Libs}
         
-${BinDir}/pdbfts : pdbfts.c ${InstallDep} ${Hdrs}
+${BinDir}/pdbfts : pdbfts.c ${InstallDep} ${Hdrs} pdbtfr.h
 	${CLD} ${LdFlags} pdbfts.c -o ${BinDir}/pdbfts ${Libs}
         
-${BinDir}/pdfcts : pdfcts.c ${InstallDep} ${Hdrs}
+${BinDir}/pdfcts : pdfcts.c ${InstallDep} ${Hdrs} pdbtfr.h
 	${CLD} ${LdFlags} pdfcts.c -o ${BinDir}/pdfcts ${Libs}
         
 #

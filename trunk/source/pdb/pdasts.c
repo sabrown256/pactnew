@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
 
-#include "pdb.h"
+#include "pdbtfr.h"
 
 #define DATFILE "nat"
 
@@ -57,52 +57,6 @@ static int
  native_only = FALSE,
  ord_int8[]  = {1},
  ord_int24[] = {1, 3, 2};
-
-/*--------------------------------------------------------------------------*/
-
-/*                         GENERAL PURPOSE ROUTINES                         */
-
-/*--------------------------------------------------------------------------*/
-
-/* TEST_TARGET - set up the target for the data file */
-
-static void test_target(char *tgt, char *base, int n,
-		        char *fname, char *datfile)
-   {int rv;
-
-    if (tgt != NULL)
-       {rv = PD_target_platform(tgt);
-	SC_ASSERT(rv == TRUE);
-
-        sprintf(fname, "%s-%s.rs%d", base, tgt, n);
-        sprintf(datfile, "%s-%s.db%d", base, tgt, n);}
-
-    else
-       {sprintf(fname, "%s-nat.rs%d", base, n);
-        sprintf(datfile, "%s-nat.db%d", base, n);};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DUMP_TEST_SYMBOL_TABLE - dump the symbol table */
-
-static void dump_test_symbol_table(FILE *fp, hasharr *tab, int n)
-   {int i, ne;
-    char **names;
-
-    PRINT(fp, "\nTest %d Symbol table:\n", n);
-
-    ne    = SC_hasharr_get_n(tab);
-    names = SC_hasharr_dump(tab, NULL, NULL, FALSE);
-    for (i = 0; i < ne; i++)
-        PRINT(fp, "%s\n", names[i]);
-    SC_free_strings(names);
-
-    PRINT(fp, "\n");
-
-    return;}
 
 /*--------------------------------------------------------------------------*/
 
@@ -557,22 +511,11 @@ static int test_2(char *base, char *tgt, int n)
 /* RUN_TEST - run a particular test through all targeting modes */
 
 static int run_test(PFTest test, int n, char *host)
-   {int i, m, rv, cs, debug, fail;
-    char msg[MAXLINE];
+   {int i, m, rv, fail;
     char *nm;
-    int64_t bytaa, bytfa, bytab, bytfb;
-    double time;
-    
-    debug = debug_mode ? 2 : 0;
+    tframe st;
 
-/* NOTE: under the debugger set debug to 1 or 2 for additional
- *       memory leak monitoring
- */
-    cs = SC_mem_monitor(-1, debug, "B", msg);
-
-    SC_mem_stats(&bytab, &bytfb, NULL, NULL);
-
-    time = SC_wall_clock_time();
+    pre_test(&st, debug_mode);
 
     fail = 0;
 
@@ -592,17 +535,7 @@ static int run_test(PFTest test, int n, char *host)
 	        {PRINT(STDOUT, "Test #%d %s failed\n", n, nm);
 		 fail++;};};};
 
-    SC_mem_stats(&bytaa, &bytfa, NULL, NULL);
-
-    bytaa -= bytab;
-    bytfa -= bytfb;
-    time   = SC_wall_clock_time() - time;
-
-    cs = SC_mem_monitor(cs, debug, "B", msg);
-
-    PRINT(STDOUT,
-          "\t\t     %3d     %7d   %7d   %7d     %.2g\n",
-          n, bytaa, bytfa, bytaa - bytfa, time);
+    post_test(&st, n);
 
     return(fail);}
 

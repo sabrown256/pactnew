@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
 
-#include "pdb.h"
+#include "pdbtfr.h"
 
 #define DATFILE "gst"
 
@@ -27,28 +27,6 @@ double
  da_w[12],
  db_w[12],
  db_r[12];
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* TEST_TARGET - set up the target for the data file */
-
-static void test_target(char *tgt, char *base, int n,
-		        char *fname, char *datfile)
-   {int rv;
-
-    if (tgt != NULL)
-       {rv = PD_target_platform(tgt);
-	SC_ASSERT(rv == TRUE);
-
-        sprintf(fname, "%s-%s.rs%d", base, tgt, n);
-        sprintf(datfile, "%s-%s.db%d", base, tgt, n);}
-
-    else
-       {sprintf(fname, "%s-nat.rs%d", base, n);
-        sprintf(datfile, "%s-nat.db%d", base, n);};
-
-    return;}
 
 /*--------------------------------------------------------------------------*/
 
@@ -733,21 +711,11 @@ static int test_4(char *base, char *tgt, int n)
 /* RUN_TEST - run a particular test through all targeting modes */
 
 static int run_test(PFTest test, int n, char *host)
-   {int i, m, rv, cs, fail;
-    int64_t bytaa, bytfa, bytab, bytfb;
-    char msg[MAXLINE];
+   {int i, m, rv, fail;
     char *nm;
-    double time;
-    static int debug = 0;
+    tframe st;
 
-/* NOTE: under the debugger set debug to 1 or 2 for additional
- *       memory leak monitoring
- */
-    cs = SC_mem_monitor(-1, debug, "B", msg);
-
-    SC_mem_stats(&bytab, &bytfb, NULL, NULL);
-
-    time = SC_wall_clock_time();
+    pre_test(&st, debug_mode);
 
     fail = 0;
 
@@ -767,17 +735,7 @@ static int run_test(PFTest test, int n, char *host)
        {PRINT(STDOUT, "Test #%d native failed\n", n);
 	fail++;};
 
-    SC_mem_stats(&bytaa, &bytfa, NULL, NULL);
-
-    bytaa -= bytab;
-    bytfa -= bytfb;
-    time   = SC_wall_clock_time() - time;
-
-    cs = SC_mem_monitor(cs, debug, "B", msg);
-
-    PRINT(STDOUT,
-          "\t\t     %3d     %7d   %7d   %7d     %.2g\n",
-          n, bytaa, bytfa, bytaa - bytfa, time);
+    post_test(&st, n);
 
     return(fail);}
 
