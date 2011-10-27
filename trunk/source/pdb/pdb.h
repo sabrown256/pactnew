@@ -398,7 +398,7 @@ struct s_tr_layer
 struct s_sys_layer
    {long (*read)(PDBfile *file, syment *ep,
 		 char *outtype, void *vr);
-    long (*write)(PDBfile *file, char *vr, long ni,
+    long (*write)(PDBfile *file, char *vr, int64_t ni,
 		  char *intype, char *outtype);};
 
 struct s_PD_address
@@ -1085,11 +1085,13 @@ extern char
 
 /* PDGS.C declarations */
 
-extern int
+extern int64_t
  PD_gather_as(PDBfile *file, char *name, char *type,
 	      void *vr, long *sind, int ndst, long *dind),
  PD_gather(PDBfile *file, char *name, void *vr, long *sind,
-	   int ndst, long *dind),
+	   int ndst, long *dind);
+
+extern int
  PD_scatter_as(PDBfile *file, char *name, char *intype, char *outtype,
 	       void *vr, int nsrc, long *sind, int ndst, long *dind),
  PD_scatter(PDBfile *file, char *name, char *type, void *vr,

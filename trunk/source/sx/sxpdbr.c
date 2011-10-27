@@ -59,7 +59,8 @@ void _SX_rd_tree_list(SS_psides *si, object *obj, PDBfile *file,
 
 static void _SX_rd_indirection_list(SS_psides *si, object *obj, PDBfile *file,
 				    char **vr, char *type)
-   {long bpi, ni;
+   {inti ni;
+    intb bpi;
     char *pv;
 
     ni = _SS_get_object_length(si, obj);
@@ -91,8 +92,8 @@ static void _SX_rd_indirection_list(SS_psides *si, object *obj, PDBfile *file,
  */
 
 static void _SX_rd_leaf_list(SS_psides *si, object *obj, PDBfile *file,
-			     char *vr, long ni, char *type, dimdes *dims)
-   {long i, sz;
+			     char *vr, inti ni, char *type, dimdes *dims)
+   {inti i, sz;
     defstr *dp;
     memdes *desc, *mem_lst;
     object *obj1;
@@ -144,7 +145,7 @@ static void _SX_rd_leaf_list(SS_psides *si, object *obj, PDBfile *file,
  */
 
 static void _SX_rd_io_list(SS_psides *si, object *obj,
-			   char *vr, long ni, defstr *dp)
+			   char *vr, inti ni, defstr *dp)
    {char *type;
 
     type = dp->type;
@@ -163,7 +164,7 @@ static void _SX_rd_io_list(SS_psides *si, object *obj,
  */
 
 object *_SXI_read_numeric_data(SS_psides *si, object *argl)
-   {long sz;
+   {inti sz;
     char *name, *s, *dtype;
     object *ret, *name_obj;
     PDBfile *file;
@@ -250,7 +251,7 @@ object *_SXI_read_numeric_data(SS_psides *si, object *argl)
 
 syment *_SX_rd_data(SS_psides *si, PDBfile *file, char *name, syment *ep,
 		    SC_address *addr, object *name_obj)
-   {long n;
+   {inti n;
     char *type, *dtype;
     defstr *dpf, *odp;
     syment *cp;

@@ -489,7 +489,7 @@ extern void
 		 PD_chart_kind chk, int ftk),
  _PD_defstr_prim_rd(PDBfile *file, char *type, char *origtype,
 		    PD_type_kind kind, multides *tuple,
-		    long bpi, int align, PD_byte_order ord,
+		    intb bpi, int align, PD_byte_order ord,
 		    int *ordr, long *formt,
 		    int unsgned, int onescmp, int conv),
  _PD_def_real(char *type, PDBfile *file),
@@ -575,13 +575,13 @@ extern int
 /* PDPATH.C declarations */
 
 extern long
- _PD_hyper_number(PDBfile *file, char *indxpr, long numb, dimdes *dims, long *poff),
  _PD_parse_index_expr(char *expr, dimdes *dim,
 		      long *pstart, long *pstop, long *pstep),
  _PD_num_indirects(char *type, hasharr *tab),
  _PD_member_items(char *s);
 
 extern int64_t
+ _PD_hyper_number(PDBfile *file, char *indxpr, dimdes *dims, long *poff),
  _PD_skip_over(PDBfile *file, long skip, int noind);
 
 extern char
@@ -644,13 +644,13 @@ extern int
  _PD_indexed_read_as(PDBfile *file, char *fullpath, char *type,
 		     void *vr, int nd, long *ind, syment *ep),
  _PD_rd_bits(PDBfile *file, char *name, char *type,
-	     long ni, int sgned, int nbits, int padsz, int fpp, long offs,
+	     inti ni, int sgned, intb nbits, int padsz, int fpp, inti offs,
 	     long *pan, char **pdata),
  _PD_valid_dims(dimdes *dimscheck, dimdes *vardims);
 
 extern long
  _PD_number_refd(void *vr, char *type, hasharr *tab),
- _PD_wr_syment(PDBfile *file, char *vr, long ni, char *intype,
+ _PD_wr_syment(PDBfile *file, char *vr, inti ni, char *intype,
 	       char *outtype),
  _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr),
  _PD_rd_pointer(PDBfile *file, int64_t addr);

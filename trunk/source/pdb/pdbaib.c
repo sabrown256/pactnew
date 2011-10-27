@@ -211,7 +211,7 @@ defstr *PD_defloat(PDBfile *file ARG(,,cls), char *name, long bpi,
     formt[6] = hmb;
     formt[7] = bias;
 
-    order    = CMAKE_N(int, bpi);
+    order = CMAKE_N(int, bpi);
     memcpy(order, ordr, sizeof(int)*bpi);
 
 /* file chart */

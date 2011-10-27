@@ -977,8 +977,8 @@ FIXNUM FF_ID(pfrptr, PFRPTR)(FIXNUM *sfid, FIXNUM *sncn, char *name,
        {type = PD_entry_type(ep);
 	if ((type != NULL) && _PD_indirection(type))
 	   {void *vr;
-	    size_t nb;
-	    long nir, nis, bpi;
+	    inti nir, nis, nb;
+	    intb bpi;
 
 	    rv = _PD_hyper_read(file, fullpath, type, ep, &vr);
 
@@ -2228,8 +2228,9 @@ FIXNUM FF_ID(pfrdbt, PFRDBT)(FIXNUM *sfid, FIXNUM *sncn, char *name,
 			     FIXNUM *ssgn, FIXNUM *snb, FIXNUM *sadsz,
 			     FIXNUM *sfpp, FIXNUM *soffs, FIXNUM *pan,
 			     void *pdata)
-   {int id, bpi;
-    long ni, nb;
+   {int id;
+    inti ni, nb;
+    intb bpi;
     FIXNUM rv;
     char s[MAXLINE], t[MAXLINE];
     char *dataout;

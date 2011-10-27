@@ -33,7 +33,7 @@
  */
 
 static void _PD_regen_std(PDBfile *file, char *type,
-			  long bpi, PD_byte_order ord)
+			  intb bpi, PD_byte_order ord)
    {int i, id;
     data_standard *std;
 
@@ -488,11 +488,10 @@ static void _PD_rd_prim_align_type(char *type, int al, data_alignment *align)
 /* _PD_RD_PRIM_TYP_II - read the primitive types from the extras table */
 
 static int _PD_rd_prim_typ_ii(PDBfile *file, char *bf)
-   {int ni, align;
-    int dc, rec;
-    int unsgned, onescmp;
+   {int ni, align, dc, rec;
+    int unsgned, onescmp, conv;
     int *ordr, *aord;
-    long i, bpi, conv, bsz;
+    intb i, bpi, bsz;
     long *formt;
     char *token, *type, *origtype, *atype, delim[10], *s, *local;
     multides *tuple;

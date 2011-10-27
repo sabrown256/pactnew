@@ -453,13 +453,14 @@ static void _PD_init_thread(PD_smp_state *pa, int id)
  */
 
 PD_smp_state *_PD_get_state(int id)
-   {size_t bpi;
+   {intb bpi;
     PD_smp_state *pa;
 
     if (_PD.ita < 0)
-       {bpi = sizeof(PD_smp_state);
+       {bpi     = sizeof(PD_smp_state);
 	_PD.ita = SC_register_thread_data("pdb-state", "PD_smp_state",
-				      1, bpi, (PFTinit) _PD_init_thread);};
+					  1, bpi,
+					  (PFTinit) _PD_init_thread);};
 
     if (id < 0)
        id = SC_current_thread();

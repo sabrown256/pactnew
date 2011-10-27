@@ -334,7 +334,8 @@ static char *_H5_handle_fixed_pt(PDBfile *file, hid_t dtid)
  */
 
 static char *_H5_handle_float_pt(PDBfile *file, hid_t dtid) 
-   {int i, bpif, bpid;
+   {int i;
+    intb bpif, bpid;
     short precision;
     size_t spos, epos, esize, mpos, msize;
     long *format;
@@ -365,19 +366,19 @@ static char *_H5_handle_float_pt(PDBfile *file, hid_t dtid)
     if (H5Tget_order(dtid)) 
        {DEBUG1("%s", "      big endian float\n");
 
-        for (i = 0 ; i < bpif; i++)
+        for (i = 0; i < bpif; i++)
             fstd->fp[0].order[i] = i + 1;
 
-        for (i = 0 ; i < bpid; i++)
+        for (i = 0; i < bpid; i++)
             fstd->fp[1].order[i] = i + 1;}
 
     else 
        {DEBUG1("%s", "      little endian float\n");
 
-        for (i = 0 ; i < bpif; i++)
+        for (i = 0; i < bpif; i++)
 	    fstd->fp[0].order[i] = bpif - i;
 
-        for (i = 0 ; i < bpid; i++)
+        for (i = 0; i < bpid; i++)
             fstd->fp[1].order[i] = bpid - i;};
 
 /* grab the precision of this float pt value */

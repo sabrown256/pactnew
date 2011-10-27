@@ -621,9 +621,9 @@ static int _SX_diff_structs(SS_psides *si,
 /* _SX_RD_LEAF_T - read a leaf into a temporary space passed in */
 
 static int _SX_rd_leaf_t(PDBfile *pf, syment *ep, char *vr, char *in_type, 
-			 long ni, long bpi, char *out_type)
+			 inti ni, intb bpi, char *out_type)
    {int convert;
-    long i, n, nrd, nib;
+    inti i, n, nrd, nib;
     int64_t addr;
     char *buf, *vbuf, *svr;
     defstr *dpf;
@@ -694,7 +694,8 @@ static int _SX_diff_leaf(SS_psides *si, char *nma, char *nmb,
 			 PDBfile *pfa, PDBfile *pfb, 
 			 syment *epa, syment *epb)
    {int ret;
-    long na, nb, bpi, bpa, bpb;
+    inti na, nb;
+    intb bpi, bpa, bpb;
     char *ta, *tb, *tc, *bfa, *bfb;
     memdes *mem_lst;
     defstr *dp;
@@ -799,7 +800,7 @@ static int _SX_diff_leaf(SS_psides *si, char *nma, char *nmb,
 static int _SX_diff_tree(SS_psides *si, char *nma, char *nmb, 
 			 PDBfile *pfa, PDBfile *pfb, 
 			 syment *epa, syment *epb, int flag)
-   {long i, ni;
+   {inti i, ni;
     char lnma[MAXLINE], lnmb[MAXLINE];
     int ret;
 

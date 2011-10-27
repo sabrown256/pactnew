@@ -1733,7 +1733,7 @@ static object *_SXI_list_defstrs(SS_psides *si, object *argl)
 static object *_SXI_def_prim(SS_psides *si, object *argl)
    {int n;
     char *name, *type;
-    long bpi;
+    intb bpi;
     int align;
     PDBfile *file;
     defstr *dp;
@@ -2948,7 +2948,7 @@ static object *_SXI_wrt_ultra_curve(SS_psides *si, object *argl)
 
 static object *_SXI_sizeof(SS_psides *si, object *argl)
    {int flg;
-    long bpi;
+    intb bpi;
     char *type;
     g_file *po;
     PDBfile *file;

@@ -223,9 +223,9 @@ static void _PD_prim_type_iii(PDBfile *file, char *type, int nb, int al,
 
 static int _PD_rd_prim_typ_iii(PDBfile *file, char *bf)
    {int ni, align;
-    int unsgned, onescmp;
+    int unsgned, onescmp, conv;
     int *ordr, *aord;
-    long i, bpi, conv, bsz;
+    intb i, bpi, bsz;
     long *formt;
     char *token, *type, *origtype, *atype, *s, *local;
     multides *tuple;

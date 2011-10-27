@@ -1440,7 +1440,8 @@ static void _PD_pfm_setup_mp_file_d(PDBfile *file, SC_communicator comm)
 static int64_t _PD_next_address_d(PDBfile *file, char *type, long number,
 				void *vr, int seekf, int tellf, int colf)
    {int flag, ipt;
-    size_t nb, bpi;
+    inti nb;
+    intb bpi;
     int64_t addr;
     defstr *dpf;
 

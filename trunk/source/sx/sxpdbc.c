@@ -53,17 +53,19 @@ void _SX_copy_tree(SS_psides *si, PDBfile *file, char *vrin, char *vrout,
 
 void _SX_copy_indirection(SS_psides *si, PDBfile *file,
 			  char **vrin, char **vrout, char *type)
-   {long ni, bpi, nbytes;
+   {inti ni, nb;
+    intb bpi;
     char *pv;
 
     if (*vrin == NULL)
        *vrout = NULL;
     else
-       {nbytes = (long) SC_arrlen(*vrin);
-        if ((bpi = _PD_lookup_size(type, file->host_chart)) == -1)
+       {nb  = (long) SC_arrlen(*vrin);
+	bpi = _PD_lookup_size(type, file->host_chart);
+        if (bpi == -1)
            SS_error(si, "CAN'T FIND NUMBER OF BYTES - _SX_COPY_INDIRECTION",
-		      SS_mk_string(si, type));
-        ni = nbytes / bpi;
+		    SS_mk_string(si, type));
+        ni = nb / bpi;
 
         pv = CMAKE_N(char, ni*bpi);
         DEREF(vrout) = pv;
@@ -84,8 +86,9 @@ void _SX_copy_indirection(SS_psides *si, PDBfile *file,
  */
 
 void _SX_copy_leaf(SS_psides *si, PDBfile *file, char *vrin, char *vrout,
-		   long ni, char *type)
-   {long i, bpi, sz, member_offs;
+		   inti ni, char *type)
+   {inti i;
+    intb bpi, member_offs, sz;
     char *mtype, *dtype, *svrin, *svrout;
     defstr *dp;
     memdes *desc, *mem_lst;
