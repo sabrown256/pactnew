@@ -2071,7 +2071,7 @@ static void prep_test_4_data(void)
 
     CHAR_S   = CSTRSAVE("char *");
     SHORT_S  = CSTRSAVE("short *");
-    INT_S    = CSTRSAVE("integer *");
+    INT_S    = CSTRSAVE("int *");
     LONG_S   = CSTRSAVE("long *");
     FLOAT_S  = CSTRSAVE("float *");
     DOUBLE_S = CSTRSAVE("double *");
@@ -3681,8 +3681,8 @@ static int run_test(PFTest test, int n, char *host, int native)
     cs = SC_mem_monitor(cs, dbg, "B", msg);
 
     PRINT(STDOUT,
-          "\t\t     %3d    %8d  %8d   %7d     %.2g\n",
-          n, bytaa, bytfa, bytaa - bytfa, time);
+          "\t\t     %3d    %8ld  %8ld   %7ld     %.2g\n",
+          n, (long) bytaa, (long) bytfa, (long) (bytaa - bytfa), time);
 
     return(fail);}
 

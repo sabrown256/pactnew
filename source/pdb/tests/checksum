@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PDB Checksum Test  ................. "
+set msg = "PDB Checksum Test .................. "
 set exe = $BinDir/pdcsts
 set opt = ( -v $tst )
 set io  = ftee

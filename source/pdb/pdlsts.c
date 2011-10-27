@@ -82,6 +82,8 @@ int main(int c, char **v)
     for (i = 0; i < ne; i++)
 	{if (names[i] != NULL)
             {ep = PD_query_entry(file, names[i], NULL);
+	     SC_mark(ep, 1);
+
 	     rv = PD_get_entry_info(ep, &type, &ni, &nd, &dims);
 	     if (rv)
 	        {printf("%20s %10s %8ld %2d (%p)\n",

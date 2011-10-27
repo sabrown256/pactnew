@@ -408,8 +408,8 @@ data_alignment
 
 /* _PD_NCOPY - copy the NI of size BPI from IN to OUT */
 
-static void _PD_ncopy(char **out, char **in, long ni, long bpi)
-   {long nbytes;
+static void _PD_ncopy(char **out, char **in, inti ni, intb bpi)
+   {inti nbytes;
 
     nbytes = ni*bpi;
     memcpy(*out, *in, nbytes);
@@ -424,8 +424,8 @@ static void _PD_ncopy(char **out, char **in, long ni, long bpi)
 
 /* _PD_SET_BIT - set the bit specified as on offset from the given pointer */
 
-static void _PD_set_bit(char *base, int offs)
-   {int nbytes, mask;
+static void _PD_set_bit(char *base, inti offs)
+   {inti nbytes, mask;
 
     nbytes  = offs >> 3;
     base   += nbytes;
@@ -443,8 +443,9 @@ static void _PD_set_bit(char *base, int offs)
  *             - from the given pointer
  */
 
-static int _PD_get_bit(char *base, int offs, int nby, int *ord)
-   {int nbytes, mask, n;
+static int _PD_get_bit(char *base, inti offs, intb nby, int *ord)
+   {inti n;
+    intb nbytes, mask;
 
     n      = offs >> 3;
     nbytes = n % nby;
@@ -467,8 +468,10 @@ static int _PD_get_bit(char *base, int offs, int nby, int *ord)
  *                 - sized sources
  */
 
-void _PD_sign_extend(char *out, long ni, int nbo, int nbti, int *ord)
-   {int i, j, sba, tsba, sign, indx;
+void _PD_sign_extend(char *out, inti ni, intb nbo, intb nbti, int *ord)
+   {int sign, indx;
+    inti i;
+    intb j, sba, tsba;
     unsigned char *lout, mask;
 
     sba = 8*nbo - nbti;
@@ -505,8 +508,10 @@ void _PD_sign_extend(char *out, long ni, int nbo, int nbti, int *ord)
  *                     -       and therefore this is a one way conversion
  */
 
-void _PD_ones_complement(char *out, long ni, int nbo, int *order)
-   {int i, j, indx;
+void _PD_ones_complement(char *out, inti ni, intb nbo, int *order)
+   {int indx;
+    inti i;
+    intb j;
     unsigned int carry;
     unsigned char *lout;
 
@@ -516,10 +521,10 @@ void _PD_ones_complement(char *out, long ni, int nbo, int *order)
          if (lout[indx] & 0x80 )
 	    {carry = 1;
 	     for (j = nbo-1; (j >= 0) && (carry > 0); j--)
-	         {indx = (order != NULL) ? order[j] - 1 : j;
-                  carry  += lout[indx];
+	         {indx   = (order != NULL) ? order[j] - 1 : j;
+                  carry += lout[indx];
 		  lout[indx] = carry & 0xFF;
-		  carry   = (carry > 0xFF);};};
+		  carry  = (carry > 0xFF);};};
 
 	 lout += nbo;};
 
@@ -534,8 +539,9 @@ void _PD_ones_complement(char *out, long ni, int nbo, int *order)
  * #bind PD_byte_reverse fortran() scheme() python()
  */
 
-void PD_byte_reverse(char *out, long nb, long ni)
-   {long i, jl, jh, nbo2;
+void PD_byte_reverse(char *out, int32_t nb, int64_t ni)
+   {inti i;
+    intb jl, jh, nbo2;
     char tmp;
     char *p1, *p2;
 
@@ -564,8 +570,8 @@ void PD_byte_reverse(char *out, long nb, long ni)
  *                  - to all zeros after offs
  */
 
-void _PD_insert_field(long inl, int nb, char *out,
-		      int offs, int lord, int lby)
+void _PD_insert_field(long inl, intb nb, char *out,
+		      intb offs, int lord, intb lby)
    {int mi, n, dm;
     long longmask;
     static int MaxBits = 8*sizeof(long);
@@ -617,19 +623,20 @@ void _PD_insert_field(long inl, int nb, char *out,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_PACK_BITS - pack an array that contains a bitstream
- *              - arguments are:
- *              -   ITYP   the target type of the data when unpacked
- *              -   NBITS  the number of bits per item
- *              -   PADSZ  the number of bits of pad preceding the fields
- *              -   FPP    the number of fields per pad
- *              -   NI     the number of items expected
- *              -   OFFS   the bit offset of the first pad
+/* _PD_PACK_BITS - pack an array that contains a bitstream
+ *               - arguments are:
+ *               -   ITYP   the target type of the data when unpacked
+ *               -   NBITS  the number of bits per item
+ *               -   PADSZ  the number of bits of pad preceding the fields
+ *               -   FPP    the number of fields per pad
+ *               -   NI     the number of items expected
+ *               -   OFFS   the bit offset of the first pad
  */
 
-int PD_pack_bits(char *out, char *in, int ityp, int nbits,
-		 int padsz, int fpp, long ni, long offs)
-   {long i, vl;
+int _PD_pack_bits(char *out, char *in, int ityp, intb nbits,
+		  intb padsz, int fpp, inti ni, intb offs)
+   {inti i;
+    long vl;
 
     for (i = 0L; i < ni; i++)
         {SC_convert_id(SC_LONG_I, &vl, 0, 1, ityp, in, i, 1, 1, FALSE);
@@ -647,7 +654,7 @@ int PD_pack_bits(char *out, char *in, int ityp, int nbits,
 
 int _PD_require_conv(defstr *dpf, defstr *dph)
    {int i, ni, lreorder, lreformat, ltuple, cnv;
-    int bpif, bpih;
+    intb bpif, bpih;
     int *ordf, *ordh;
     long *fmtf, *fmth;
     multides *tupf, *tuph;
@@ -710,8 +717,9 @@ int _PD_require_conv(defstr *dpf, defstr *dph)
  *             - put them in the order defined by ORD
  */
 
-static void _PD_reorder(char *arr, long ni, int bpi, int *ord)
-   {int i, lreorder;
+static void _PD_reorder(char *arr, inti ni, intb bpi, int *ord)
+   {int lreorder;
+    inti i;
     char local[MAXLINE];
 
     lreorder = FALSE;
@@ -719,7 +727,7 @@ static void _PD_reorder(char *arr, long ni, int bpi, int *ord)
     for (i = 0; i < bpi; i++)
         if (ord[i] != (i+1))
            {lreorder = TRUE;
-             break;}
+	    break;}
 
     if (lreorder == TRUE)
        {for (; ni > 0; ni--)
@@ -738,10 +746,10 @@ static void _PD_reorder(char *arr, long ni, int bpi, int *ord)
  *                - boundaries
  */
 
-static void _PD_byte_align(char *out, char *in, long ni,
-			   long *infor, int *inord, int boffs)
-   {int chunk1, chunk2, outbytes, remainder, i;
-    long nbitsin, inrem;
+static void _PD_byte_align(char *out, char *in, inti ni,
+			   long *infor, int *inord, intb boffs)
+   {intb chunk1, chunk2, outbytes, remainder, nbitsin;
+    inti i, inrem;
     unsigned char *inptr, *outptr;
     unsigned char mask1, mask2;
  
@@ -752,39 +760,43 @@ static void _PD_byte_align(char *out, char *in, long ni,
     memset(out, 0, ni*outbytes);
 
 /* develop logic for doing the unpack without regard to inord. */
-    inptr  = (unsigned char *)in;
-    outptr = (unsigned char *)out;
+    inptr  = (unsigned char *) in;
+    outptr = (unsigned char *) out;
     inrem  = nbitsin * ni;
     remainder = nbitsin % 8;
 
-    chunk1 = min(8, nbitsin);
+    chunk1  = min(8, nbitsin);
     chunk1 -= boffs;
-    chunk2 =  (boffs == 0) ? 0 : 8 - chunk1;
-    mask1  = (1 << chunk1) - 1;
-    mask2  = (1 << chunk2) - 1;
+    chunk2  = (boffs == 0) ? 0 : 8 - chunk1;
+    mask1   = (1 << chunk1) - 1;
+    mask2   = (1 << chunk2) - 1;
 
     while (inrem)
-          {for (i=0; i<outbytes-1; i++, inptr++, outptr++, inrem -= 8)
-               {*outptr = ((*inptr & mask1) << chunk2) |    
-                          ((*(inptr + 1)  >> chunk1) & mask2);}
+       {for (i = 0; i < outbytes-1; i++, inptr++, outptr++, inrem -= 8)
+	    {*outptr = ((*inptr & mask1) << chunk2) |    
+		       ((*(inptr + 1)  >> chunk1) & mask2);};
            
-           if (remainder <= chunk1)
-              {*outptr++ = (*inptr << chunk2) & 
-                           (((1 << remainder) - 1)  << (8 - remainder));
-               if (remainder == chunk1) inptr++;
-               chunk1 -= remainder;
-               if (chunk1 == 0) chunk1 = 8;
-               chunk2  = 8 - chunk1;}
-            else
-              {*outptr =    ((*inptr << chunk2) &
-                            (((1 << chunk1) - 1) << chunk2));
-               *outptr++ |= ((*(++inptr) >> chunk1) &
-                            (((1 << (remainder - chunk1)) - 1) << (8 - (remainder - chunk1) - chunk1)));
-               chunk1 = 8 - (remainder - chunk1);
-               chunk2 = 8 - chunk1;}
-           mask1 = (1 << chunk1) - 1;
-           mask2 = (1 << chunk2) - 1;
-           inrem -= remainder;}
+	if (remainder <= chunk1)
+	   {*outptr++ = (*inptr << chunk2) & 
+	                (((1 << remainder) - 1)  << (8 - remainder));
+	    if (remainder == chunk1)
+	       inptr++;
+	    chunk1 -= remainder;
+	    if (chunk1 == 0)
+	       chunk1 = 8;
+	    chunk2  = 8 - chunk1;}
+
+	else
+	   {*outptr =    ((*inptr << chunk2) &
+			  (((1 << chunk1) - 1) << chunk2));
+	    *outptr++ |= ((*(++inptr) >> chunk1) &
+			  (((1 << (remainder - chunk1)) - 1) << (8 - (remainder - chunk1) - chunk1)));
+	    chunk1 = 8 - (remainder - chunk1);
+	    chunk2 = 8 - chunk1;};
+
+	mask1 = (1 << chunk1) - 1;
+	mask2 = (1 << chunk2) - 1;
+	inrem -= remainder;};
     
     return;}
 
@@ -800,15 +812,17 @@ static void _PD_byte_align(char *out, char *in, long ni,
 
 static void _PD_field_reorder(char *in, char *out, long *infor,
 			      long *outfor, int *inord, int lord,
-                              int lby, int ni)
-   {int nbi, nbo, nbi_exp, nbo_exp, bi_sign, bo_sign,
-        bi_exp, bo_exp, bi_mant, bo_mant, inbytes,
-        outbytes;
-    int inrem, outrem, indxin, indxout, nbits, sign;
-    long i, expn, mant;
+                              intb lby, inti ni)
+   {int sign;
+    intb nbi, nbo, nbi_exp, nbo_exp;
+    intb inrem, outrem, indxin, indxout, nbits;
+    intb byi, byo;
+    inti i;
+    inti bi_exp, bi_mant, bi_sign;
+    inti bo_exp, bo_mant, bo_sign;
+    long expn, mant;
     char *lout, *lin;
     static int BitsMax = 8*sizeof(long);
-
 
     nbi     = infor[0];
     nbo     = outfor[0];
@@ -822,46 +836,42 @@ static void _PD_field_reorder(char *in, char *out, long *infor,
     bi_mant = infor[5];
     bo_mant = outfor[5];
 
-    inbytes   = (nbi + 7) >> 3;
-    outbytes  = (nbo + 7) >> 3;
+    byi = (nbi + 7) >> 3;
+    byo = (nbo + 7) >> 3;
 
 /* zero out the output buffer */
-    memset(out, 0, ni*outbytes);
+    memset(out, 0, ni*byo);
 
     lout = out;
     lin  = in;
     for (i = 0L; i < ni; i++)
 
 /* move the exponent over */
-        {expn = SC_extract_field(lin, bi_exp, nbi_exp, inbytes, inord);
-         sign = _PD_get_bit(lin, bi_sign, inbytes, inord);
+        {expn = SC_extract_field(lin, bi_exp, nbi_exp, byi, inord);
+         sign = _PD_get_bit(lin, bi_sign, byi, inord);
 
-
-         _PD_insert_field(expn, nbo_exp, lout, bo_exp,
-                          lord, lby);
+         _PD_insert_field(expn, nbo_exp, lout, bo_exp, lord, lby);
 
          if (sign)
-             _PD_set_bit(lout, bo_sign);
+	    _PD_set_bit(lout, bo_sign);
 
          indxin  = bi_mant;
-         inrem   = infor[2];
          indxout = bo_mant;
+         inrem   = infor[2];
          outrem  = outfor[2];
 
 /* move the mantissa over in sizeof(long) packets */
          while ((inrem > 0) && (outrem > 0))
-               {nbits = min(BitsMax, inrem);
-                nbits = min(nbits, outrem);
-                mant  = SC_extract_field(lin, indxin, nbits,
-					  inbytes, inord);
+	    {nbits = min(BitsMax, inrem);
+	     nbits = min(nbits, outrem);
+	     mant  = SC_extract_field(lin, indxin, nbits, byi, inord);
 
-                _PD_insert_field(mant, nbits, lout, indxout,
-                                 lord, lby);
+	     _PD_insert_field(mant, nbits, lout, indxout, lord, lby);
 
-                indxin  += nbits;
-                indxout += nbits;
-                inrem   -= nbits;
-                outrem  -= nbits;}
+	     indxin  += nbits;
+	     indxout += nbits;
+	     inrem   -= nbits;
+	     outrem  -= nbits;};
 
 	 bi_sign += nbi;
 	 bi_exp  += nbi;
@@ -882,7 +892,7 @@ static void _PD_field_reorder(char *in, char *out, long *infor,
  *                  - otherwise, return FALSE
  */
 
-int _PD_null_pointer(char *in, int nb)
+int _PD_null_pointer(char *in, intb nb)
    {int i;
 
     for (i = 0; i < nb; i++)
@@ -919,17 +929,18 @@ int _PD_prim_typep(char *memb, hasharr *chrt, PD_major_op error)
 
 /* _PD_BIN_TEXT - convert binary numbers to text */
 
-static void _PD_bin_text(char **out, char **in, char *typ, long ni,
-			 int boffs,
-			 PD_type_kind kndi, long *ifmt, long nbi,
+static void _PD_bin_text(char **out, char **in, char *typ, inti ni,
+			 intb boffs,
+			 PD_type_kind kndi, long *ifmt, intb nbi,
 			 PD_byte_order ordi, int *iord,
-			 PD_type_kind kndo, long *ofmt, long nbo,
+			 PD_type_kind kndo, long *ofmt, intb nbo,
 			 PD_byte_order ordo, int *oord,
 			 data_standard *hstd,
 			 int onescmp, int usg, int rdx, char *delim)
-   {int fl, nc, nd;
+   {int fl, nd;
     int *hord;
-    long i, nb, ne, nbl;
+    inti i, nb, ne;
+    intb nc, nbl;
     long *hfmt;
     char fmt[MAXLINE];
     char *lout, *lin, *tout, *p;
@@ -948,16 +959,18 @@ static void _PD_bin_text(char **out, char **in, char *typ, long ni,
     if (kndi == CHAR_KIND)
        {nb = ni*nbi;
 	if (delim == NULL)
-	   {snprintf(fmt, MAXLINE, "%%-%lds", nb);
+	   {snprintf(fmt, MAXLINE, "%%-%llds", (long long) nb);
 	    nc = nb;}
 	else
 	   {ne = strlen(lin);
 	    ne = min(ne, nb);
 	    nc = ne + strlen(delim) + 2;
 	    if (strchr(lin, '\'') == NULL)
-	       snprintf(fmt, MAXLINE, "'%%-%lds'%s", ne, delim);
+	       snprintf(fmt, MAXLINE, "'%%-%llds'%s",
+			(long long) ne, delim);
 	    else
-	       snprintf(fmt, MAXLINE, "\"%%-%lds\"%s", ne, delim);};
+	       snprintf(fmt, MAXLINE, "\"%%-%llds\"%s",
+			(long long) ne, delim);};
 	snprintf(lout, nc+1, fmt, lin);
 
 	*in  += nb;
@@ -973,9 +986,9 @@ static void _PD_bin_text(char **out, char **in, char *typ, long ni,
 	_PD_iconvert(&tout, in, ni, nbi, ordi, nbl, ordl, onescmp, usg);
 
 	if (delim == NULL)
-	   snprintf(fmt, MAXLINE, "%%%ldld", nbo);
+	   snprintf(fmt, MAXLINE, "%%%ldld", (long) nbo);
 	else
-	   {snprintf(fmt, MAXLINE, "%%%ldld%s", nbo, delim);
+	   {snprintf(fmt, MAXLINE, "%%%ldld%s", (long) nbo, delim);
 	    nbo += strlen(delim);};
 
         for (p = lout, i = 0; i < ni; p += nbo, i++)
@@ -1018,16 +1031,17 @@ static void _PD_bin_text(char **out, char **in, char *typ, long ni,
 
 /* _PD_TEXT_BIN - convert text to binary numbers */
 
-void _PD_text_bin(char **out, char **in, char *typ, long ni,
-		  int boffs,
-		  PD_type_kind kndi, long *ifmt, long nbi,
+void _PD_text_bin(char **out, char **in, char *typ, inti ni,
+		  intb boffs,
+		  PD_type_kind kndi, long *ifmt, intb nbi,
 		  PD_byte_order ordi, int *iord,
-		  PD_type_kind kndo, long *ofmt, long nbo,
+		  PD_type_kind kndo, long *ofmt, intb nbo,
 		  PD_byte_order ordo, int *oord,
 		  data_standard *hstd,
 		  int onescmp, int usg, int rdx, char *delim)
    {int *hord;
-    long i, nb, nc, ne, nbl;
+    inti i, nb, ne;
+    intb nc, nbl;
     long *hfmt;
     char *lout, *lin, *tin, *p;
     PD_byte_order ordl;
@@ -1127,8 +1141,8 @@ void _PD_text_bin(char **out, char **in, char *typ, long ni,
  *                    - and return it
  */
 
-long _PD_convert_ptr_rd(char *bfi, int fbpi, PD_byte_order ford,
-			int hbpi, PD_byte_order hord, data_standard *hs)
+long _PD_convert_ptr_rd(char *bfi, intb fbpi, PD_byte_order ford,
+			intb hbpi, PD_byte_order hord, data_standard *hs)
    {long n;
     char *in, *out;
 
@@ -1150,8 +1164,8 @@ long _PD_convert_ptr_rd(char *bfi, int fbpi, PD_byte_order ford,
 /* _PD_CONVERT_PTR_WR - convert the pointer N to text form */
 
 static void _PD_convert_ptr_wr(char *bfo, long n, PDBfile *file,
-			       int fbpi, PD_byte_order ford,
-			       int hbpi, PD_byte_order hord,
+			       intb fbpi, PD_byte_order ford,
+			       intb hbpi, PD_byte_order hord,
 			       data_standard *hs)
    {char *in, *out;
 
@@ -1191,12 +1205,12 @@ static void _PD_convert_ptr_wr(char *bfo, long n, PDBfile *file,
  *                 - NBi is the input size (possibly plus alignment)
  */
 
-static int _PD_convert_ptr(char **pout, char **pin, long *poo, long *pio,
-			   int ni, hasharr *chi, hasharr *cho,
+static int _PD_convert_ptr(char **pout, char **pin, inti *poo, inti *pio,
+			   inti ni, hasharr *chi, hasharr *cho,
 			   data_standard *stdo, data_standard *stdi,
-			   data_standard *hstd, long iao, long iai)
-   {int fbpi, hbpi;
-    long i, n, nbo, nbi;
+			   data_standard *hstd, inti iao, inti iai)
+   {intb fbpi, hbpi;
+    inti i, n, nbo, nbi;
     char *p;
     PD_data_location loc;
     PDBfile *file;
@@ -1253,8 +1267,8 @@ static int _PD_convert_ptr(char **pout, char **pin, long *poo, long *pio,
  *                 - this is a no-op which skips over the space
  */
 
-static int _PD_convert_fnc(char **pout, char **pin, long *poo, long *pio,
-			   long nbo, long nbi)
+static int _PD_convert_fnc(char **pout, char **pin, inti *poo, inti *pio,
+			   inti nbo, inti nbi)
    {
 
     if (_PD_null_pointer(*pin, nbi) == FALSE)
@@ -1280,9 +1294,9 @@ static int _PD_convert_fnc(char **pout, char **pin, long *poo, long *pio,
  *                     -          CSTD - character standard ID
  */
 
-static void _PD_conv_to_ascii_7(char *bf, long ni, int cstd)
+static void _PD_conv_to_ascii_7(char *bf, inti ni, int cstd)
    {int c, cn, lwc;
-    long i, l;
+    inti i, l;
     PD_character_standard ucstd;
     unsigned char *pcs, *ubf;
 
@@ -1336,9 +1350,9 @@ static void _PD_conv_to_ascii_7(char *bf, long ni, int cstd)
  *                     -          CSTD - character standard ID
  */
 
-static void _PD_conv_to_ascii_6(char *bf, long ni, int cstd)
-   {int c;
-    long i, nc;
+static void _PD_conv_to_ascii_6(char *bf, inti ni, int cstd)
+   {int c, nc;
+    inti i;
 
     ONCE_SAFE(TRUE, NULL)
        memset(a7_a6, 0, 128);
@@ -1367,9 +1381,9 @@ static void _PD_conv_to_ascii_6(char *bf, long ni, int cstd)
  *                    -          CSTD - character standard ID
  */
 
-static void _PD_conv_to_ebcdic(char *bf, long ni, int cstd)
-   {int c;
-    long i, nc;
+static void _PD_conv_to_ebcdic(char *bf, inti ni, int cstd)
+   {int c, nc;
+    inti i;
 
     ONCE_SAFE(TRUE, NULL)
        memset(a7_e8, 0, 128);
@@ -1398,9 +1412,9 @@ static void _PD_conv_to_ebcdic(char *bf, long ni, int cstd)
  *                  -          CSTD - character standard ID
  */
 
-static int _PD_conv_to_ita2(char *bf, long nb, long ni, int cstd)
-   {int c, cn, let, nlet;
-    long i, l, nc;
+static int _PD_conv_to_ita2(char *bf, inti nb, inti ni, int cstd)
+   {int c, cn, nc, let, nlet;
+    inti i, l;
     char *nbf;
 
     ONCE_SAFE(TRUE, NULL)
@@ -1458,20 +1472,20 @@ static int _PD_conv_to_ita2(char *bf, long nb, long ni, int cstd)
 
 /*--------------------------------------------------------------------------*/
 
-/* _PD_ICONVERT - convert integers of NBI bytes to integers of NBO bytes
+/* _PD_ICONVERT - convert NI integers of NBI bytes to integers of NBO bytes
  *              - the number of bytes for each integer are given
  */
 
-void _PD_iconvert(char **out, char **in, long ni,
-		  long nbi, PD_byte_order ordi,
-		  long nbo, PD_byte_order ordo,
+void _PD_iconvert(char **out, char **in, inti ni,
+		  intb nbi, PD_byte_order ordi,
+		  intb nbo, PD_byte_order ordo,
 		  int onescmp, int usg)
-   {long i;
-    int j;
+   {inti i;
+    intb j;
     char *lout, *lin, *po, *pi;
     char s_extend;
 
-    lin = *in;
+    lin  = *in;
     lout = *out;
 
     s_extend = usg ? 0 : 0xff;
@@ -1609,16 +1623,16 @@ void _PD_iconvert(char **out, char **in, long ni,
  */
 
 #define XFER2(_obf, _ni, _ibf, _ibo, _obo, _bpi)                             \
-   {int _i;                                                                  \
-    int _ibo0, _ibo1;                                                        \
-    int _obo0, _obo1;                                                        \
-    _ibo0   = _ibo[0] - 1;                                                   \
-    _ibo1   = _ibo[1] - 1;                                                   \
-    _obo0  = _obo[0] - 1;                                                    \
-    _obo1  = _obo[1] - 1;                                                    \
+   {inti _i;                                                                 \
+    intb _ibo0, _ibo1;                                                       \
+    intb _obo0, _obo1;                                                       \
+    _ibo0 = _ibo[0] - 1;                                                     \
+    _ibo1 = _ibo[1] - 1;                                                     \
+    _obo0 = _obo[0] - 1;                                                     \
+    _obo1 = _obo[1] - 1;                                                     \
     for (_i = 0; _i < _ni; _i++, _obf += _bpi, _ibf += _bpi)                 \
-        {_obf[_obo0]  = _ibf[_ibo0];                                         \
-	 _obf[_obo1]  = _ibf[_ibo1];};}
+        {_obf[_obo0] = _ibf[_ibo0];                                          \
+	 _obf[_obo1] = _ibf[_ibo1];};}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1628,22 +1642,22 @@ void _PD_iconvert(char **out, char **in, long ni,
  */
 
 #define XFER4(_obf, _ni, _ibf, _ibo, _obo, _bpi)                             \
-   {int _i;                                                                  \
-    int _ibo0, _ibo1, _ibo2, _ibo3;                                          \
-    int _obo0, _obo1, _obo2, _obo3;                                          \
-    _ibo0   = _ibo[0] - 1;                                                   \
-    _ibo1   = _ibo[1] - 1;                                                   \
-    _ibo2   = _ibo[2] - 1;                                                   \
-    _ibo3   = _ibo[3] - 1;                                                   \
-    _obo0  = _obo[0] - 1;                                                    \
-    _obo1  = _obo[1] - 1;                                                    \
-    _obo2  = _obo[2] - 1;                                                    \
-    _obo3  = _obo[3] - 1;                                                    \
+   {inti _i;                                                                 \
+    intb _ibo0, _ibo1, _ibo2, _ibo3;                                         \
+    intb _obo0, _obo1, _obo2, _obo3;                                         \
+    _ibo0 = _ibo[0] - 1;                                                     \
+    _ibo1 = _ibo[1] - 1;                                                     \
+    _ibo2 = _ibo[2] - 1;                                                     \
+    _ibo3 = _ibo[3] - 1;                                                     \
+    _obo0 = _obo[0] - 1;                                                     \
+    _obo1 = _obo[1] - 1;                                                     \
+    _obo2 = _obo[2] - 1;                                                     \
+    _obo3 = _obo[3] - 1;                                                     \
     for (_i = 0; _i < _ni; _i++, _obf += _bpi, _ibf += _bpi)                 \
-        {_obf[_obo0]  = _ibf[_ibo0];                                         \
-	 _obf[_obo1]  = _ibf[_ibo1];                                         \
-	 _obf[_obo2]  = _ibf[_ibo2];                                         \
-	 _obf[_obo3]  = _ibf[_ibo3];};}
+        {_obf[_obo0] = _ibf[_ibo0];                                          \
+	 _obf[_obo1] = _ibf[_ibo1];                                          \
+	 _obf[_obo2] = _ibf[_ibo2];                                          \
+	 _obf[_obo3] = _ibf[_ibo3];};}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1653,34 +1667,34 @@ void _PD_iconvert(char **out, char **in, long ni,
  */
 
 #define XFER8(_obf, _ni, _ibf, _ibo, _obo, _bpi)                             \
-   {int _i;                                                                  \
-    int _ibo0, _ibo1, _ibo2, _ibo3, _ibo4, _ibo5, _ibo6, _ibo7;              \
-    int _obo0, _obo1, _obo2, _obo3, _obo4, _obo5, _obo6, _obo7;              \
-    _ibo0   = _ibo[0] - 1;                                                   \
-    _ibo1   = _ibo[1] - 1;                                                   \
-    _ibo2   = _ibo[2] - 1;                                                   \
-    _ibo3   = _ibo[3] - 1;                                                   \
-    _ibo4   = _ibo[4] - 1;                                                   \
-    _ibo5   = _ibo[5] - 1;                                                   \
-    _ibo6   = _ibo[6] - 1;                                                   \
-    _ibo7   = _ibo[7] - 1;                                                   \
-    _obo0  = _obo[0] - 1;                                                    \
-    _obo1  = _obo[1] - 1;                                                    \
-    _obo2  = _obo[2] - 1;                                                    \
-    _obo3  = _obo[3] - 1;                                                    \
-    _obo4  = _obo[4] - 1;                                                    \
-    _obo5  = _obo[5] - 1;                                                    \
-    _obo6  = _obo[6] - 1;                                                    \
-    _obo7  = _obo[7] - 1;                                                    \
+   {inti _i;                                                                 \
+    intb _ibo0, _ibo1, _ibo2, _ibo3, _ibo4, _ibo5, _ibo6, _ibo7;             \
+    intb _obo0, _obo1, _obo2, _obo3, _obo4, _obo5, _obo6, _obo7;             \
+    _ibo0 = _ibo[0] - 1;                                                     \
+    _ibo1 = _ibo[1] - 1;                                                     \
+    _ibo2 = _ibo[2] - 1;                                                     \
+    _ibo3 = _ibo[3] - 1;                                                     \
+    _ibo4 = _ibo[4] - 1;                                                     \
+    _ibo5 = _ibo[5] - 1;                                                     \
+    _ibo6 = _ibo[6] - 1;                                                     \
+    _ibo7 = _ibo[7] - 1;                                                     \
+    _obo0 = _obo[0] - 1;                                                     \
+    _obo1 = _obo[1] - 1;                                                     \
+    _obo2 = _obo[2] - 1;                                                     \
+    _obo3 = _obo[3] - 1;                                                     \
+    _obo4 = _obo[4] - 1;                                                     \
+    _obo5 = _obo[5] - 1;                                                     \
+    _obo6 = _obo[6] - 1;                                                     \
+    _obo7 = _obo[7] - 1;                                                     \
     for (_i = 0; _i < _ni; _i++, _obf += _bpi, _ibf += _bpi)                 \
-        {_obf[_obo0]  = _ibf[_ibo0];                                         \
-	 _obf[_obo1]  = _ibf[_ibo1];                                         \
-	 _obf[_obo2]  = _ibf[_ibo2];                                         \
-	 _obf[_obo3]  = _ibf[_ibo3];                                         \
-	 _obf[_obo4]  = _ibf[_ibo4];                                         \
-	 _obf[_obo5]  = _ibf[_ibo5];                                         \
-	 _obf[_obo6]  = _ibf[_ibo6];                                         \
-	 _obf[_obo7]  = _ibf[_ibo7];};}
+        {_obf[_obo0] = _ibf[_ibo0];                                          \
+	 _obf[_obo1] = _ibf[_ibo1];                                          \
+	 _obf[_obo2] = _ibf[_ibo2];                                          \
+	 _obf[_obo3] = _ibf[_ibo3];                                          \
+	 _obf[_obo4] = _ibf[_ibo4];                                          \
+	 _obf[_obo5] = _ibf[_ibo5];                                          \
+	 _obf[_obo6] = _ibf[_ibo6];                                          \
+	 _obf[_obo7] = _ibf[_ibo7];};}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1690,27 +1704,27 @@ void _PD_iconvert(char **out, char **in, long ni,
  */
 
 #define XFER16(_obf, _ni, _ibf, _ibo, _obo, _bpi)                            \
-   {int _i;                                                                  \
-    int _ibo0, _ibo1, _ibo2, _ibo3, _ibo4, _ibo5, _ibo6, _ibo7;              \
-    int _ibo8, _ibo9, _ibo10, _ibo11, _ibo12, _ibo13, _ibo14, _ibo15;        \
-    int _obo0, _obo1, _obo2, _obo3, _obo4, _obo5, _obo6, _obo7;              \
-    int _obo8, _obo9, _obo10, _obo11, _obo12, _obo13, _obo14, _obo15;        \
-    _ibo0   = _ibo[0] - 1;                                                   \
-    _ibo1   = _ibo[1] - 1;                                                   \
-    _ibo2   = _ibo[2] - 1;                                                   \
-    _ibo3   = _ibo[3] - 1;                                                   \
-    _ibo4   = _ibo[4] - 1;                                                   \
-    _ibo5   = _ibo[5] - 1;                                                   \
-    _ibo6   = _ibo[6] - 1;                                                   \
-    _ibo7   = _ibo[7] - 1;                                                   \
-    _ibo8   = _ibo[8] - 1;                                                   \
-    _ibo9   = _ibo[9] - 1;                                                   \
-    _ibo10  = _ibo[10] - 1;                                                  \
-    _ibo11  = _ibo[11] - 1;                                                  \
-    _ibo12  = _ibo[12] - 1;                                                  \
-    _ibo13  = _ibo[13] - 1;                                                  \
-    _ibo14  = _ibo[14] - 1;                                                  \
-    _ibo15  = _ibo[15] - 1;                                                  \
+   {inti _i;                                                                 \
+    intb _ibo0, _ibo1, _ibo2, _ibo3, _ibo4, _ibo5, _ibo6, _ibo7;             \
+    intb _ibo8, _ibo9, _ibo10, _ibo11, _ibo12, _ibo13, _ibo14, _ibo15;       \
+    intb _obo0, _obo1, _obo2, _obo3, _obo4, _obo5, _obo6, _obo7;             \
+    intb _obo8, _obo9, _obo10, _obo11, _obo12, _obo13, _obo14, _obo15;       \
+    _ibo0  = _ibo[0] - 1;                                                    \
+    _ibo1  = _ibo[1] - 1;                                                    \
+    _ibo2  = _ibo[2] - 1;                                                    \
+    _ibo3  = _ibo[3] - 1;                                                    \
+    _ibo4  = _ibo[4] - 1;                                                    \
+    _ibo5  = _ibo[5] - 1;                                                    \
+    _ibo6  = _ibo[6] - 1;                                                    \
+    _ibo7  = _ibo[7] - 1;                                                    \
+    _ibo8  = _ibo[8] - 1;                                                    \
+    _ibo9  = _ibo[9] - 1;                                                    \
+    _ibo10 = _ibo[10] - 1;                                                   \
+    _ibo11 = _ibo[11] - 1;                                                   \
+    _ibo12 = _ibo[12] - 1;                                                   \
+    _ibo13 = _ibo[13] - 1;                                                   \
+    _ibo14 = _ibo[14] - 1;                                                   \
+    _ibo15 = _ibo[15] - 1;                                                   \
     _obo0  = _obo[0] - 1;                                                    \
     _obo1  = _obo[1] - 1;                                                    \
     _obo2  = _obo[2] - 1;                                                    \
@@ -1764,24 +1778,26 @@ void _PD_iconvert(char **out, char **in, long ni,
  *              -   format[7] = bias of exponent
  */
 
-void _PD_fconvert(char **out, char **in, long ni, int boffs,
+void _PD_fconvert(char **out, char **in, inti ni, intb boffs,
 		  long *infor, int *inord, long *outfor, int *outord,
-		  PD_byte_order l_order, int l_bytes, int onescmp)
-   {int nbits, bpii, bpio;
-    int indxout, inrem, outrem;
-    int bi_sign, bo_sign, bi_exp, bo_exp, bi_mant, bo_mant;
-    int bo_sign_save, bo_exp_save, bo_mant_save;
-    int nbi_exp, nbo_exp, nbi_man, nbo_man, nbi, nbo;
-    int mbiti, mbito, nbitsout;
-    int sbit, ebit, hmbit, dhmb, dmbit, rshift;
-    int numleft, nb_mant_rem, remainder, k, nleft;
+		  PD_byte_order ordl, intb bpl, int onescmp)
+   {int loverflow, lunderflow, lreorder, lreformat;
+    int out_freorder;
     int ssave[MBLOCKS];
-    long i, j, l, emax, hexpn, dbias, hmbo, hmbi;
-    long ls, le, sbyt, ebyt;
-    long lbpi, lbpo, lbpir;
-    long hmbyt, mbyti, mbyto;
-    long loverflow, lunderflow, lreorder, lreformat;
-    long out_freorder;
+    inti i, j, l, ls, le;
+    inti bi_sign, bo_sign, bi_exp, bo_exp, bi_mant, bo_mant;
+    inti bo_sign_save, bo_exp_save, bo_mant_save;
+    inti lbpi, lbpo, lbpir;
+    intb hexpn, dbias, hmbo, hmbi;
+    intb nbits, bpii, bpio;
+    intb indxout, inrem, outrem, nleft, numleft;
+    intb mbiti, mbito, nbitsout;
+    intb nbi_exp, nbo_exp, nbi_man, nbo_man, nbi, nbo;
+    intb hmbyt, mbyti, mbyto;
+    intb sbit, ebit, hmbit, dhmb, dmbit, rshift;
+    intb sbyt, ebyt;
+    intb nb_mant_rem, remainder, k;
+    long emax;
     long esave[MBLOCKS], tformat[8];
     char mask, mask1, mask2, cmask;
     char inreorder[MBLOCKS*MBYTES];
@@ -1894,7 +1910,7 @@ void _PD_fconvert(char **out, char **in, long ni, int boffs,
         tformat[4] = bi_exp  = 1L;
         tformat[5] = bi_mant = tformat[4] + tformat[1];
         _PD_field_reorder(*in, freorder, infor, tformat, inord,
-                          l_order, l_bytes, ni);
+                          ordl, bpl, ni);
         inrsave = *in;
         *in     = freorder;}
 
@@ -1989,10 +2005,10 @@ void _PD_fconvert(char **out, char **in, long ni, int boffs,
 
 	 inrem  = nbi_exp;
 	 nbits  = 8 - ebit;
-	 mask   = (1 << nbits) - 1;
 	 rshift = 0;
+	 mask   = (1 << nbits) - 1;
 	 if (inrem < 7)
-	    {mask   = ((unsigned char)mask >> (7 - inrem));
+	    {mask   = ((unsigned char) mask >> (7 - inrem));
 	     rshift = 7 - inrem;}
 
 	 SC_MEM_INIT_N(long, esave, le-ls);
@@ -2004,7 +2020,7 @@ void _PD_fconvert(char **out, char **in, long ni, int boffs,
 /* get the exponent */ 
 	    {for (i = ls; i < le; i++, peb += bpii )
 	         {esave[i] = (esave[i] << nbits) |
-		                 ((*peb >> rshift) & mask);};
+		             ((*peb >> rshift) & mask);};
 
 	     inrem  -= nbits;
 	     nbits   = min(8, inrem);
@@ -2023,20 +2039,20 @@ void _PD_fconvert(char **out, char **in, long ni, int boffs,
 /* add the bias and store the exponent */
 	 loverflow  = FALSE;
 	 lunderflow = FALSE;
-	 for (i = ls; i < le; i++, bo_exp  += nbo, bo_sign += nbo)
+	 for (i = ls; i < le; i++, bo_exp += nbo, bo_sign += nbo)
 	     {if (esave[i] != 0)
 		 esave[i] += dbias;
 
 	      if ((0 < esave[i]) && (esave[i] < emax))
 		 {_PD_insert_field(esave[i], nbo_exp, lout, bo_exp,
-				   l_order, l_bytes);
+				   ordl, bpl);
 		  if (ssave[i]) 
 		     _PD_set_bit(lout, bo_sign);}
 
 	      else if (emax <= esave[i])
 		 {loverflow = TRUE;
 		  _PD_insert_field(emax, nbo_exp, lout, bo_exp,
-				   l_order, l_bytes);
+				   ordl, bpl);
 		  if (ssave[i])
 		     _PD_set_bit(lout, bo_sign);}
 
@@ -2292,7 +2308,7 @@ void _PD_fconvert(char **out, char **in, long ni, int boffs,
         tformat[4] = bo_exp_save;
         tformat[5] = bo_mant_save;
         _PD_field_reorder(*out, freorder, tformat, outfor, outord,
-                          l_order, l_bytes, ni);
+                          ordl, bpl, ni);
         memcpy(*out, freorder, ni*bpio);
         CFREE(freorder);};
 
@@ -2308,10 +2324,9 @@ void _PD_fconvert(char **out, char **in, long ni, int boffs,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_CONVERT - convert primitive types from one machine format to
- *             - another.  Guaranteed that there will be no indirects here.
- *             - Convert NI of type, TYPE, from IN and
- *             - put them in OUT
+/* _PD_CONVERT - convert primitive types from one machine format to another
+ *             - guaranteed that there will be no indirects here
+ *             - convert NI items of type, TYPE, from IN and put them in OUT
  *             - ISTD defines the data format of the data from IN
  *             - PIN_OFFS and POUT_OFFS are pointers to external offset
  *             - counters and they are incremented to account for
@@ -2319,15 +2334,16 @@ void _PD_fconvert(char **out, char **in, long ni, int boffs,
  *             - returns TRUE iff successful
  */
 
-static int _PD_convert(char **out, char **in, long ni, int boffs,
+static int _PD_convert(char **out, char **in, inti ni, int boffs,
 		       defstr *idp, defstr *odp,
 		       data_standard *istd, data_standard *ostd,
 		       data_standard *hstd,
-		       long *pin_offs, long *pout_offs)
-   {int i, lnby, inbts, onescmp, usg;
+		       inti *pin_offs, inti *pout_offs)
+   {int onescmp, usg;
     int iusg, ousg, ret, rdx;
     int *intord, *iaord, *oaord;
-    long inb, onb, nbi, nbo;
+    inti i, inb, onb, nbi, nbo;
+    intb inbts, lnby;
     long *ifmt, *ofmt;
     char *inty, *outty, *delim;
     PD_type_kind iknd, oknd;
@@ -2477,17 +2493,18 @@ static int _PD_convert(char **out, char **in, long ni, int boffs,
  *            - type, TYPE, from IN and put them in OUT
  *            - ISTD and OSTD are the data format standards of IN and 
  *            - OUT respectively
+ *            - return TRUE iff successful
  *
  * #bind PD_convert fortran() scheme() python()
  */
 
 int PD_convert(char **out, char **in, char *typi, char *typo,
-	       long ni, data_standard *stdi, data_standard *stdo,
+	       int64_t ni, data_standard *stdi, data_standard *stdo,
 	       data_standard *hstd, hasharr *chi, hasharr *cho,
 	       int boffs, PD_major_op error)
    {int ret, tmp;
-    long i, mitems, inci, inco;
-    long in_offs, out_offs;
+    inti i, mitems, inci, inco;
+    inti in_offs, out_offs;
     char msg[MAXLINE];
     char *mtype;
     defstr *dpi, *dpo, *mdpi, *mdpo;
@@ -2641,9 +2658,9 @@ int PD_n_bit_char_std(PD_character_standard cstd)
  */
 
 char *PD_convert_ascii(char *out, int nc, PD_character_standard cstd,
-		       char *in, int nb)
+		       char *in, int64_t nb)
    {int n, ret;
-    long ni;
+    inti ni;
 
     switch (cstd)
        {case PD_ITA2_UPPER :
@@ -2688,8 +2705,8 @@ char *PD_convert_ascii(char *out, int nc, PD_character_standard cstd,
  */
 
 char *PD_conv_from_ascii(char *out, int nc, PD_character_standard cstd,
-			 char *in, int nb)
-   {int n, nn, nx;
+			 char *in, int64_t nb)
+   {inti n, nn, nx;
     char *t;
 
     n  = min(nc, nb);
@@ -2702,7 +2719,7 @@ char *PD_conv_from_ascii(char *out, int nc, PD_character_standard cstd,
 	     memcpy(t, in, n);
 	     memset(out, 0, nc);
              nn = _PD_conv_to_ita2(t, nx, n, PD_ASCII_7);
-	     PD_pack_bits(out, t, SC_CHAR_I, 5, 0, 1, nn, 0);
+	     _PD_pack_bits(out, t, SC_CHAR_I, 5, 0, 1, nn, 0);
              CFREE(t);
 	     break;
         case PD_ASCII_6_UPPER :
@@ -2711,7 +2728,7 @@ char *PD_conv_from_ascii(char *out, int nc, PD_character_standard cstd,
 	     memcpy(t, in, n);
 	     memset(out, 0, nc);
              _PD_conv_to_ascii_6(t, n, PD_ASCII_7);
-	     PD_pack_bits(out, t, SC_CHAR_I, 6, 0, 1, n, 0);
+	     _PD_pack_bits(out, t, SC_CHAR_I, 6, 0, 1, n, 0);
              CFREE(t);
 	     break;
         case PD_EBCDIC :

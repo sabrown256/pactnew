@@ -444,6 +444,8 @@ static int _PD_id_file(FILE *fp)
    {int vers, nb;
     char str[MAXLINE];
 
+    memset(str, 0, MAXLINE);
+
 /* attempt to read an ASCII header */
     if (lio_seek(fp, (int64_t) 0, SEEK_SET))
        PD_error("FSEEK FAILED TO FIND ORIGIN - _PD_IDENTIFY_FILE", PD_OPEN);
@@ -667,11 +669,11 @@ int _PD_read_attrtab_b(PDBfile *file)
 
 	_PD_convert_attrtab(file);
         file->chrtaddr = PD_entry_address(ep);
-        _PD_rl_syment(ep);
     
 	_PD_MARK_AS_FLUSHED(file, FALSE);
 
-        if (!SC_hasharr_remove(file->symtab, _PD_fixname(file, name)))
+        ok = SC_hasharr_remove(file->symtab, _PD_fixname(file, name));
+        if (ok == FALSE)
 	   SC_hasharr_remove(file->symtab, name);
 
 	ok = TRUE;};
