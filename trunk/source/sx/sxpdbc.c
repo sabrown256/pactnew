@@ -14,7 +14,7 @@ void
  _SX_copy_indirection(SS_psides *si, PDBfile *file,
 		      char **vrin, char **vrout, char *type), 
  _SX_copy_leaf(SS_psides *si, PDBfile *file,
-	       char *vrin, char*vrout, long ni, char *type);
+	       char *vrin, char*vrout, inti ni, char *type);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -27,8 +27,8 @@ void
  */
 
 void _SX_copy_tree(SS_psides *si, PDBfile *file, char *vrin, char *vrout,
-		   long ni, char *type)
-   {long i;
+		   inti ni, char *type)
+   {inti i;
     char **lvr, **lvo, *dtype;
 
     if (!_PD_indirection(type))

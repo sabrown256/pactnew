@@ -762,7 +762,7 @@ int _PD_set_current_address(PDBfile *file, int64_t addr, int wh,
 /*--------------------------------------------------------------------------*/
 
 /* _PD_GET_NEXT_ADDRESS - reserve the appropriate amount of space in FILE
- *                      - defined by TYPE, NUMBER, and VR
+ *                      - defined by TYPE, NI, and VR
  *                      - and return the starting address of it
  *                      - in threaded mode seek to the appropriate
  *                      - place in the file iff SEEKF is TRUE
@@ -771,15 +771,15 @@ int _PD_set_current_address(PDBfile *file, int64_t addr, int wh,
  *                      - in MPI mode get collective space iff COLF is TRUE
  */
 
-int64_t _PD_get_next_address(PDBfile *file, char *type, long number,
+int64_t _PD_get_next_address(PDBfile *file, char *type, inti ni,
 			     void *vr, int seekf, int tellf, int colf)
    {int64_t addr;
 
-    if (number == 0)
+    if (ni == 0)
        addr = -1;
 
     else
-       addr = _PD_NEXT_ADDRESS(file, type, number, vr, seekf, tellf, colf);
+       addr = _PD_NEXT_ADDRESS(file, type, ni, vr, seekf, tellf, colf);
 
     return(addr);}
 

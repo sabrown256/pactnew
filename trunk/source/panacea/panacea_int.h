@@ -136,7 +136,7 @@ extern PA_state
 
 extern void
  *_PA_init_space(PA_variable *pp, long psz),
- *_PA_alloc(defstr *dp, char *type, long ni, void *pval);
+ *_PA_alloc(defstr *dp, char *type, inti ni, void *pval);
 
 
 /* PADSYS.C declarations */
@@ -149,7 +149,7 @@ extern void
 /* PADUMP.C declarations */
 
 extern int
- _PA_get_data(double *d, char *vr, long ni, long offset, long stride);
+ _PA_get_data(double *d, char *vr, inti ni, long offset, long stride);
 
 extern void
  _PA_init_pp(char *ppname, char *gfname),

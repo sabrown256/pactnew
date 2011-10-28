@@ -144,8 +144,8 @@ static void _PD_block_check(SC_array *bl, long n)
 
 /* _PD_BLOCK_GET_ADDRESS - return the address of the Nth block of EP */
 
-int64_t _PD_block_get_address(SC_array *bl, long n)
-   {long nb;
+int64_t _PD_block_get_address(SC_array *bl, inti n)
+   {inti nb;
     int64_t addr;
     symblock *sp;
 
@@ -163,7 +163,7 @@ int64_t _PD_block_get_address(SC_array *bl, long n)
 
 /* _PD_BLOCK_SET_ADDRESS - set the address of the Nth block of EP */
 
-int64_t _PD_block_set_address(SC_array *bl, long n, int64_t addr)
+int64_t _PD_block_set_address(SC_array *bl, inti n, int64_t addr)
    {symblock *sp;
 
     _PD_block_check(bl, n+1);
@@ -178,8 +178,8 @@ int64_t _PD_block_set_address(SC_array *bl, long n, int64_t addr)
 
 /* _PD_BLOCK_GET_NUMBER - return the number of items in the Nth block of EP */
 
-long _PD_block_get_number(SC_array *bl, long n)
-   {long ni, nb;
+inti _PD_block_get_number(SC_array *bl, inti n)
+   {inti ni, nb;
     symblock *sp;
 
     nb = SC_array_get_n(bl);
@@ -196,7 +196,7 @@ long _PD_block_get_number(SC_array *bl, long n)
 
 /* _PD_BLOCK_SET_NUMBER - set the number of items in the Nth block of EP */
 
-long _PD_block_set_number(SC_array *bl, long n, long ni)
+inti _PD_block_set_number(SC_array *bl, inti n, inti ni)
    {symblock *sp;
 
     _PD_block_check(bl, n+1);
@@ -213,8 +213,8 @@ long _PD_block_set_number(SC_array *bl, long n, long ni)
  *                    - in the Nth block of BL
  */
 
-void _PD_block_get_desc(int64_t *paddr, long *pni, SC_array *bl, long n)
-   {long ni, nb;
+void _PD_block_get_desc(int64_t *paddr, inti *pni, SC_array *bl, inti n)
+   {inti ni, nb;
     int64_t addr;
     symblock *sp;
 
@@ -243,7 +243,7 @@ void _PD_block_get_desc(int64_t *paddr, long *pni, SC_array *bl, long n)
  *                    - in the Nth block of BL
  */
 
-void _PD_block_set_desc(int64_t addr, long ni, SC_array *bl, long n)
+void _PD_block_set_desc(int64_t addr, inti ni, SC_array *bl, inti n)
    {symblock *sp;
 
     _PD_block_check(bl, n+1);
@@ -260,8 +260,8 @@ void _PD_block_set_desc(int64_t addr, long ni, SC_array *bl, long n)
 
 /* _PD_BLOCK_GET_VALID - return the valid of items in the Nth block of EP */
 
-PD_block_type _PD_block_get_valid(SC_array *bl, long n)
-   {long nb;
+PD_block_type _PD_block_get_valid(SC_array *bl, inti n)
+   {inti nb;
     PD_block_type vl;
     symblock *sp;
 
@@ -279,7 +279,7 @@ PD_block_type _PD_block_get_valid(SC_array *bl, long n)
 
 /* _PD_BLOCK_SET_VALID - set the valid of items in the Nth block of EP */
 
-int _PD_block_set_valid(SC_array *bl, long n, PD_block_type vl)
+int _PD_block_set_valid(SC_array *bl, inti n, PD_block_type vl)
    {symblock *sp;
 
     _PD_block_check(bl, n+1);
@@ -294,8 +294,8 @@ int _PD_block_set_valid(SC_array *bl, long n, PD_block_type vl)
 
 /* _PD_N_BLOCKS - return the number of blocks for the entry EP */
 
-long _PD_n_blocks(syment *ep)
-   {long n;
+inti _PD_n_blocks(syment *ep)
+   {inti n;
 
     n = SC_array_get_n(ep->blocks);
 
@@ -308,7 +308,7 @@ long _PD_n_blocks(syment *ep)
  *                    - return TRUE iff successful
  */
 
-int _PD_block_get_csum(SC_array *bl, long n, unsigned char *dig)
+int _PD_block_get_csum(SC_array *bl, inti n, unsigned char *dig)
    {int rv;
     symblock *sp;
 
@@ -331,7 +331,7 @@ int _PD_block_get_csum(SC_array *bl, long n, unsigned char *dig)
  *                    - return TRUE iff successful
  */
 
-int _PD_block_set_csum(SC_array *bl, long n, unsigned char *dig)
+int _PD_block_set_csum(SC_array *bl, inti n, unsigned char *dig)
    {int rv;
     symblock *sp;
 
@@ -462,7 +462,7 @@ int _PD_block_add(PDBfile *file, syment *ep, dimdes *dims, int64_t addr)
  *                - contains the address ADDR
  */
 
-long _PD_block_find(PDBfile *file, syment *ep, int64_t addr)
+inti _PD_block_find(PDBfile *file, syment *ep, int64_t addr)
    {inti i, n, start, stop;
     intb bpi;
     SC_array *bl;
@@ -528,7 +528,7 @@ void _PD_block_copy(syment *epn, syment *epo)
 /* _PD_BLOCK_SWITCH - replace the block list of EP with SP */
 
 void _PD_block_switch(syment *ep, SC_array *bln)
-   {long nb;
+   {inti nb;
     symblock *spn;
     SC_array *bl;
     
@@ -558,8 +558,8 @@ void _PD_block_switch(syment *ep, SC_array *bln)
  *                    - in the slowest varying dimension
  */
 
-void _PD_block_truncate(syment *ep, long ni)
-   {long i, n, nib;
+void _PD_block_truncate(syment *ep, inti ni)
+   {inti i, n, nib;
     symblock *sp;
 
     if (ep != NULL)
@@ -594,7 +594,7 @@ void _PD_block_truncate(syment *ep, long ni)
  *                    - block after the effective address
  */
 
-long _PD_effective_addr(int64_t *paddr, long *pni,
+inti _PD_effective_addr(int64_t *paddr, inti *pni,
 			intb bpi, SC_array *bl)
    {inti i, nb, nt, addr, eaddr;
     symblock *sp;
@@ -647,8 +647,8 @@ int _PD_block_define(PDBfile *file)
  */
 
 int _PD_block_csum_write(PDBfile *file, syment *ep, char *name)
-   {int ok, st, n, ne;
-    long j;
+   {int ok, st, ne;
+    inti j, n;
     unsigned char dig[PD_CKSUM_LEN];
     symblock *sp;
     SC_array *bl;

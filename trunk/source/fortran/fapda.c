@@ -914,7 +914,7 @@ FIXNUM FF_ID(pfrdas, PFRDAS)(FIXNUM *sfid, FIXNUM *sncn, char *name,
 FIXNUM FF_ID(pfrdai, PFRDAI)(FIXNUM *sfid, FIXNUM *sncn, char *name,
 			     FIXNUM *snct, char *type,
 			     FIXNUM *sni, void *space)
-   {long ni;
+   {inti ni;
     FIXNUM rv;
     char s[MAXLINE], t[MAXLINE];
     PDBfile *file;
@@ -922,7 +922,7 @@ FIXNUM FF_ID(pfrdai, PFRDAI)(FIXNUM *sfid, FIXNUM *sncn, char *name,
     SC_FORTRAN_STR_C(s, name, *sncn);
     SC_FORTRAN_STR_C(t, type, *snct);
 
-    ni   = (long) *sni;
+    ni   = (inti) *sni;
     file = SC_GET_POINTER(PDBfile, *sfid);
 
     rv = PD_read_as_dwim(file, s, t, ni, space);

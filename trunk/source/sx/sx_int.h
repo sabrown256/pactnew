@@ -365,7 +365,7 @@ extern syment
 
 extern void
  _SX_copy_tree(SS_psides *si, PDBfile *file, char *vrin, char *vrout,
-	       long ni, char *type);
+	       inti ni, char *type);
 
 
 /* SXPDBD.C declarations */
@@ -388,14 +388,14 @@ extern object
 
 extern object
  *_SX_make_list_syment(SS_psides *si, PDBfile *file,
-		       void *vr, long ni, char *type);
+		       void *vr, inti ni, char *type);
 
 
 /* SXPDBR.C declarations */
 
 extern void
  _SX_rd_tree_list(SS_psides *si, object *obj, PDBfile *file, char *vr,
-		  long ni, char *type, dimdes *dims);
+		  inti ni, char *type, dimdes *dims);
 
 extern object
  *_SXI_read_numeric_data(SS_psides *si, object *argl);

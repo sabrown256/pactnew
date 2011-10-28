@@ -264,7 +264,7 @@ static object *_SXI_rd_raw(SS_psides *si, object *argl)
    {int ret;
     char *intype, *outtype;
     long ni, nir;
-    long long addr;
+    int64_t addr;
     void *vr;
     PDBfile *file;
     PD_smp_state *pa;
@@ -2262,7 +2262,7 @@ static SC_array *_SX_make_blocks(SS_psides *si, object *alst, long numb)
         for (i = 0; i < n; i++)
             {SS_args(si, alst,
                      SC_LONG_LONG_I, &addr,
-                     SC_LONG_I, &ni,
+                     SC_LONG_LONG_I, &ni,
                      0);
 	     _PD_block_set_desc(addr, ni, bl, i);
 

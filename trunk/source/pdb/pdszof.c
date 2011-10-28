@@ -165,7 +165,7 @@ static inti _PD_sz_leaf_members(PDBfile *file, char *type, inti ni,
  *                  - correctly
  */
 
-static int _PD_ptr_sz_itags(long *pnb, PDBfile *file, void *vr,
+static int _PD_ptr_sz_itags(inti *pnb, PDBfile *file, void *vr,
 			    inti ni, char *type)
    {int ret, itags;
     PD_data_location loc;
@@ -196,9 +196,9 @@ static int _PD_ptr_sz_itags(long *pnb, PDBfile *file, void *vr,
  */
 
 long PD_sizeof(PDBfile *file ARG(,,cls),
-	       char *type, long ni, void *vri)
+	       char *type, int64_t ni, void *vri)
    {int dst, size, indir, itags;
-    long i, nb;
+    inti i, nb;
     char bf[MAXLINE], *ltype, *vr, *svr, *ttype;
     defstr *dp;
     memdes *desc, *mem_lst;

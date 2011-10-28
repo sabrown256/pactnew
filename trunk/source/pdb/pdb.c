@@ -608,7 +608,7 @@ int PD_read_as_alt(PDBfile *file ARG(,,cls), char *name, char *type,
  */
 
 syment *_PD_defent(PDBfile *file, char *name, char *outtype,
-		   long number, dimdes *dims)
+		   inti number, dimdes *dims)
    {intb bpi;
     int64_t addr;
     char bf[MAXLINE];

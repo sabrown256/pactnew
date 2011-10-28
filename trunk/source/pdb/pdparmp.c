@@ -523,7 +523,7 @@ static uint64_t _PD_mpwritec(void *s, size_t nbi, uint64_t ni, FILE *stream)
 
 static int _PD_mpprintf(FILE *stream, char *fmt, va_list a)
    {int rv;
-    size_t ni, nw;
+    inti ni, nw;
     char *bf;
 
     nw = 0;
@@ -544,7 +544,7 @@ static int _PD_mpprintf(FILE *stream, char *fmt, va_list a)
 
 static int _PD_mpputs(const char *s, FILE *stream)
    {int nwritten, fstatus, fail;
-    size_t ni;
+    inti ni;
     PD_Pfile *pf;
     MPI_Offset offs;
     MPI_File *fh;

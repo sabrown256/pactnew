@@ -11,7 +11,7 @@
 #include "sx_int.h"
 
 #define	ARRAY_VECTOR(_o, _d, _fnc, _n, _off)                                 \
-   {long _i;                                                                 \
+   {inti _i;                                                                 \
     if ((_n == 1) && (_off == 0))                                            \
        _o = _fnc(si, *_d);                                                   \
     else                                                                     \
@@ -23,11 +23,11 @@
 
 object
  *_SX_make_list_indirection(SS_psides *si, PDBfile *file,
-			    char **vr, long ni, char *type),
+			    char **vr, inti ni, char *type),
  *_SX_make_list_leaf(SS_psides *si, PDBfile *file,
-		     char *vr, long ni, char *type),
+		     char *vr, inti ni, char *type),
  *_SX_make_list_io(SS_psides *si, PDBfile *file,
-		   char *vr, long ni, char *type);
+		   char *vr, inti ni, char *type);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -35,7 +35,7 @@ object
 /* _SX_MAKE_LIST_SYMENT - convert a syment into a list */
 
 object *_SX_make_list_syment(SS_psides *si, PDBfile *file,
-			     void *vr, long ni, char *type)
+			     void *vr, inti ni, char *type)
    {object *obj;
 
 /* if the type is an indirection, follow the pointer */
@@ -62,8 +62,8 @@ object *_SX_make_list_syment(SS_psides *si, PDBfile *file,
  */
 
 object *_SX_make_list_indirection(SS_psides *si, PDBfile *file, char **vr,
-				  long ni, char *type)
-   {long i, ditems;
+				  inti ni, char *type)
+   {inti i, ditems;
     char *dtype;
     object *obj, *obj1, *o;
 
@@ -100,8 +100,9 @@ object *_SX_make_list_indirection(SS_psides *si, PDBfile *file, char **vr,
  */
 
 object *_SX_make_list_leaf(SS_psides *si, PDBfile *file,
-			   char *vr, long ni, char *type)
-   {long ii, sz, member_offs;
+			   char *vr, inti ni, char *type)
+   {inti ii;
+    intb sz, member_offs;
     defstr *defp;
     memdes *desc, *mem_lst;
     char *mtype, *svr;
@@ -137,7 +138,7 @@ object *_SX_make_list_leaf(SS_psides *si, PDBfile *file,
                   obj1 = SS_mk_cons(si, obj2, obj1);};
 
              obj1 = SS_reverse(si, obj1);
-	     obj = SS_mk_cons(si, obj1, obj);};
+	     obj  = SS_mk_cons(si, obj1, obj);};
 
         if (ni > 1L)
            obj = SS_reverse(si, obj);};

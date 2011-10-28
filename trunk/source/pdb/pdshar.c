@@ -82,7 +82,7 @@ tr_layer *_PD_lookup(char *type)
 
 /* _PD_CONV_IN - convert some data to internal format */
 
-void _PD_conv_in(PDBfile *file, void *out, void *in, char *type, long ni)
+void _PD_conv_in(PDBfile *file, void *out, void *in, char *type, inti ni)
    {PD_smp_state *pa;
 
     pa = _PD_get_state(-1);
@@ -126,8 +126,8 @@ int _PD_close_bin(PDBfile *file)
 
 /* _PD_WRITE_BIN - write an entry to the specified binary file */
 
-long _PD_write_bin(PDBfile *file)
-   {long ni;
+inti _PD_write_bin(PDBfile *file)
+   {inti ni;
     PFBinWrite fun;
     tr_layer *tr;
     
@@ -145,8 +145,8 @@ long _PD_write_bin(PDBfile *file)
 
 /* _PD_READ_BIN - read an entry from the specified binary file */
 
-long PD_read_bin(PDBfile *file)
-   {long ni;
+inti PD_read_bin(PDBfile *file)
+   {inti ni;
     PFBinRead fun;
     tr_layer *tr;
 

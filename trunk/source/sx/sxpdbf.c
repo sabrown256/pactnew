@@ -15,7 +15,7 @@ static char
 
 static void
  _SX_find_data(SS_psides *si, hasharr *tytab, PDBfile *file, void *vr,
-	       long ni, char *type);
+	       inti ni, char *type);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -25,8 +25,8 @@ static void
  */
 
 static void _SX_find_leaf(SS_psides *si, hasharr *tytab, PDBfile *file,
-			  char *vr, long ni, char *type)
-   {long i, sz;
+			  char *vr, inti ni, char *type)
+   {inti i, sz;
     char *svr;
     defstr *defp;
     hasharr *tab;
@@ -63,8 +63,8 @@ static void _SX_find_leaf(SS_psides *si, hasharr *tytab, PDBfile *file,
 
 static void _SX_find_indirection(SS_psides *si, hasharr *tytab,
 				 PDBfile *file,
-				 char **vr, long ni, char *type)
-   {long i, ditems;
+				 char **vr, inti ni, char *type)
+   {inti i, ditems;
     char *dtype, *bf;
 
     dtype = PD_dereference(CSTRSAVE(type));
@@ -101,7 +101,7 @@ static void _SX_find_indirection(SS_psides *si, hasharr *tytab,
 /* _SX_FIND_DATA - locate part of a data element */
 
 static void _SX_find_data(SS_psides *si, hasharr *tytab, PDBfile *file,
-			  void *vr, long ni, char *type)
+			  void *vr, inti ni, char *type)
    {
 
 /* if the type is an indirection, follow the pointer */
@@ -118,8 +118,8 @@ static void _SX_find_data(SS_psides *si, hasharr *tytab, PDBfile *file,
 /* _SXI_FIND_TYPES - find all types used by this variable */
 
 object *_SXI_find_types(SS_psides *si, object *arg)
-   {char *type;
-    long ni;
+   {inti ni;
+    char *type;
     void *vr;
     hasharr *tytab;
     object *args, *obj;

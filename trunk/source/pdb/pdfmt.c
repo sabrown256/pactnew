@@ -301,8 +301,9 @@ char *_PD_get_tbuffer(void)
  *                      - the casts in the given chart
  */
 
-void _PD_check_casts_list(hasharr *chrt, char **lst, long n)
-   {long i, j;
+void _PD_check_casts_list(hasharr *chrt, char **lst, inti n)
+   {long i;
+    inti j;
     memdes *memb, *desc;
     defstr *dp;
 
@@ -327,8 +328,9 @@ void _PD_check_casts_list(hasharr *chrt, char **lst, long n)
  *                      - in the given chart
  */
 
-void _PD_check_casts_hash(hasharr *chrt, char **lst, long n)
-   {long i, j;
+void _PD_check_casts_hash(hasharr *chrt, char **lst, inti n)
+   {long i;
+    inti j;
     defstr *dp;
     memdes *memb, *desc;
 

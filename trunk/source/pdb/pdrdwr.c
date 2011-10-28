@@ -359,7 +359,7 @@ static dimind  *_PD_compute_hyper_strides(PDBfile *file, char *ind,
  */
 
 int64_t _PD_hyper_number(PDBfile *file, char *indxpr,
-			 dimdes *dims, long *poff)
+			 dimdes *dims, inti *poff)
    {int i, nd;
     inti maxs, sum, offs;
     char s[MAXLINE];
@@ -830,7 +830,8 @@ void _PD_fin_stacks(void)
 
 int64_t _PD_annotate_text(PDBfile *file, syment *ep, char *name,
 			  int64_t addr, void *vr)
-   {long ni, nc;
+   {long nc;
+    inti ni;
     int64_t na, pa;
     char s[MAXLINE];
     char *typ;
@@ -841,7 +842,8 @@ int64_t _PD_annotate_text(PDBfile *file, syment *ep, char *name,
        {ni  = PD_entry_number(ep);
 	typ = PD_entry_type(ep);
 	if (ni > 1)
-	   snprintf(s, MAXLINE, "\n# %s %s[%ld]\n", typ, name, ni);
+	   snprintf(s, MAXLINE, "\n# %s %s[%lld]\n",
+		    typ, name, (long long) ni);
 	else
 	   snprintf(s, MAXLINE, "\n# %s %s\n", typ, name);
 
@@ -869,8 +871,8 @@ int64_t _PD_annotate_text(PDBfile *file, syment *ep, char *name,
  *               - lists
  */
 
-long _PD_wr_syment(PDBfile *file, char *vr, int64_t ni,
-		   char *intype, char *outtype)
+int64_t _PD_wr_syment(PDBfile *file, char *vr, int64_t ni,
+		      char *intype, char *outtype)
    {int dst, indir, count, itags;
     inti i;
     intb size;
@@ -1279,7 +1281,7 @@ static int _PD_rd_hyper_index(PDBfile *file, char *name,
 			      syment *ep, char *out,
 			      dimind *pi, syment *epo, char *outtype,
 			      int64_t addr, intb hbpi, intb fbpi)
-   {int nrd, nir;
+   {inti nrd, nir;
     inti stride, step;
     inti offset, start, stop;
     char *intype;
@@ -1584,9 +1586,9 @@ int _PD_hyper_read(PDBfile *file, char *name, char *outtype,
  */
 
 int PD_read_bits(PDBfile *file ARG(,,cls),
-		 char *name, char *type, long ni,
+		 char *name, char *type, int64_t ni,
 		 int sgned, int nbits, int padsz, int fpp,
-		 long offs, long *pan, char **pdata)
+		 int64_t offs, long *pan, char **pdata)
    {int ret;
 
     ret = _PD_rd_bits(file, name, type, ni, sgned, nbits,
@@ -1602,7 +1604,7 @@ int PD_read_bits(PDBfile *file ARG(,,cls),
  *             -   FILE    the PDBfile to use
  *             -   NAME    the name of the variable in the file
  *             -   TYPE    the target type of the data when unpacked
- *             -   NITEMS  the number of items requested
+ *             -   NI      the number of items requested
  *             -   SGNED   TRUE if the data type is signed
  *             -   NBITS   the number of bits per item
  *             -   PADSZ   the number of bits of pad preceding the fields
@@ -1705,7 +1707,7 @@ int _PD_rd_bits(PDBfile *file, char *name, char *type, inti ni,
  *               - lists
  */
 
-long _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
+int64_t _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
    {int dst, vif, count, itags;
     inti i, n, ni, nrd, size;
     intb bpi, boffs;

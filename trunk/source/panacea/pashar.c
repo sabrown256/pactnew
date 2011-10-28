@@ -711,7 +711,7 @@ void _PA_wrrstrt(char *rsname, int conv_flag)
 	    int_conv_flag = FALSE;
 
 	 if ((pscope == RESTART) || (pscope == DEFN) || (pscope == DMND))
-	    {long ni;
+	    {inti ni;
 
 	     sp = PD_copy_syment(PA_VARIABLE_DESC(pp));
 

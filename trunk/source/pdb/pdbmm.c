@@ -193,7 +193,7 @@ void *PD_alloc_entry(PDBfile *file ARG(,,cls), char *name)
 
 /* _PD_ALLOC_ENTRY - allocate memory for the variable type */
 
-void *_PD_alloc_entry(PDBfile *file, char *type, long ni)
+void *_PD_alloc_entry(PDBfile *file, char *type, inti ni)
    {int ipt;
     inti len;
     intb bpi;
@@ -443,7 +443,7 @@ syment *PD_copy_syment(syment *osym)
  *               - for the symbol table
  */
 
-syment *_PD_mk_syment(char *type, long ni, int64_t addr, symindir *indr,
+syment *_PD_mk_syment(char *type, inti ni, int64_t addr, symindir *indr,
 		      dimdes *dims)
    {syment *ep;
     char *t;
