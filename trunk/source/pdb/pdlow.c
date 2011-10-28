@@ -506,7 +506,7 @@ defstr *_PD_defstr_inst(PDBfile *file, char *name, PD_type_kind kind,
 			int *ordr, long *formt, PD_chart_kind chk)
    {int algn, conv;
     long sz;
-    defstr *rv, *dp, *sdp;
+    defstr *rv, *dpf, *dph;
     memdes *pd, *memb;
     hasharr *chart, *host_chart;
     data_alignment *align, *host_align;
@@ -519,24 +519,24 @@ defstr *_PD_defstr_inst(PDBfile *file, char *name, PD_type_kind kind,
     if (desc == NULL)
        return(NULL);
 
-    dp = (chk == PD_CHART_FILE) ?
-         PD_inquire_table_type(chart, name) :
-	 PD_inquire_table_type(host_chart, name);
-    if (dp != NULL)
-       return(dp);
+    dpf = (chk == PD_CHART_FILE) ?
+          PD_inquire_table_type(chart, name) :
+	  PD_inquire_table_type(host_chart, name);
+    if (dpf != NULL)
+       return(dpf);
 
 /* install the type in the file->chart */
     sz   = _PD_str_size(desc, chart);
     conv = FALSE;
     algn = align->struct_alignment;
     for (pd = desc; pd != NULL; pd = pd->next)
-        {dp = PD_inquire_table_type(chart, pd->base_type);
-         if (_PD_indirection(pd->type) || (dp == NULL))
+        {dpf = PD_inquire_table_type(chart, pd->base_type);
+         if (_PD_indirection(pd->type) || (dpf == NULL))
             {algn = max(algn, align->ptr_alignment);
 	     conv = TRUE;}
          else
-            {algn  = max(algn, dp->alignment);
-             conv |= (dp->convert > 0);};
+            {algn  = max(algn, dpf->alignment);
+             conv |= (dpf->convert != 0);};
 
 /* in case we are installing this defstr having read it from
  * another file (as in a copy type operation) redo the cast offsets
@@ -544,10 +544,10 @@ defstr *_PD_defstr_inst(PDBfile *file, char *name, PD_type_kind kind,
          if (pd->cast_memb != NULL)
             pd->cast_offs = _PD_member_location(pd->cast_memb,
 						chart,
-						dp,
+						dpf,
 						&memb);};
 
-    dp = _PD_defstr(file, PD_CHART_FILE, name, kind,
+    dpf = _PD_defstr(file, PD_CHART_FILE, name, kind,
 		    desc, NULL,
 		    sz, algn, ord,
 	            conv, ordr, formt, FALSE, FALSE);
@@ -558,11 +558,11 @@ defstr *_PD_defstr_inst(PDBfile *file, char *name, PD_type_kind kind,
 
     algn = host_align->struct_alignment;
     for (pd = desc; pd != NULL; pd = pd->next)
-        {dp = PD_inquire_table_type(host_chart, pd->base_type);
-         if (_PD_indirection(pd->type) || (dp == NULL))
+        {dph = PD_inquire_table_type(host_chart, pd->base_type);
+         if (_PD_indirection(pd->type) || (dph == NULL))
             algn = max(algn, host_align->ptr_alignment);
          else
-            algn = max(algn, dp->alignment);
+            algn = max(algn, dph->alignment);
 
 /* in case we are installing this defstr having read it from
  * another file (as in a copy type operation) redo the cast offsets
@@ -570,7 +570,7 @@ defstr *_PD_defstr_inst(PDBfile *file, char *name, PD_type_kind kind,
          if (pd->cast_memb != NULL)
             pd->cast_offs = _PD_member_location(pd->cast_memb,
 						host_chart,
-						dp,
+						dph,
 						&memb);};
 
 /* NOTE: ordr, formt, and conv apply only to the file chart
@@ -578,12 +578,12 @@ defstr *_PD_defstr_inst(PDBfile *file, char *name, PD_type_kind kind,
  *       these are for non-default primitive types which
  *       have no host representation
  */
-    sdp = _PD_defstr(file, PD_CHART_HOST, name, kind,
+    dph = _PD_defstr(file, PD_CHART_HOST, name, kind,
 		     desc, NULL,
 		     sz, algn, NO_ORDER,
 		     FALSE, NULL, NULL, FALSE, FALSE);
 
-    rv = (chk == PD_CHART_FILE) ? dp : sdp;
+    rv = (chk == PD_CHART_FILE) ? dpf : dph;
 
     return(rv);}
 
@@ -597,7 +597,7 @@ void _PD_defstr_prim_rd(PDBfile *file, char *type, char *origtype,
 			intb bpi, int align, PD_byte_order ord,
 			int *ordr, long *formt,
 			int unsgned, int onescmp, int conv)
-   {int host_empty;
+   {int cnv, host_empty;
     defstr *dp;
 
 /* it is either a typedef or a normal type */
@@ -621,13 +621,15 @@ void _PD_defstr_prim_rd(PDBfile *file, char *type, char *origtype,
 
      else 
         {dp = PD_inquire_host_type(file, type);
-	 if ((conv == FALSE) && (dp == NULL))
+	 if ((conv == 0) && (dp == NULL))
 	    _PD_defstr(file, PD_CHART_HOST, type, kind,
-		       NULL, tuple, bpi, align, ord, FALSE,
+		       NULL, tuple, bpi, align, ord, 0,
 		       ordr, formt, unsgned, onescmp);
 
+	 cnv = (_PD.force == TRUE) ? 1 : -1;
+
 	 _PD_defstr(file, PD_CHART_FILE, type, kind,
-		    NULL, tuple, bpi, align, ord, TRUE,
+		    NULL, tuple, bpi, align, ord, cnv,
 		    ordr, formt, unsgned, onescmp);};
 
     return;}

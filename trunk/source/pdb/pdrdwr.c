@@ -170,6 +170,29 @@ char *PD_dereference(char *s)
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_INDEX_STR - conver the triple IND to a string and return it in S */
+
+static void _PD_index_str(char *s, int nc, inti *ind)
+   {long long start, stop, step;
+
+   start = ind[0];
+   stop  = ind[1];
+   step  = ind[2];
+
+   if (start == stop)
+      SC_vstrcat(s, nc, "%lld,", start);
+
+   else if (step <= 1L)
+      SC_vstrcat(s, nc, "%lld:%lld,", start, stop);
+            
+   else
+      SC_vstrcat(s, nc, "%lld:%lld:%lld,", start, stop, step);
+
+   return;}
+
+/*--------------------------------------------------------------------------*/
 
 /*                           HYPER INDEX SUPPORT                            */
 
@@ -494,7 +517,7 @@ dimdes *_PD_hyper_dims(PDBfile *file, char *name, dimdes *dims)
 
 char *_PD_expand_hyper_name(PDBfile *file, char *name)
    {int err;
-    inti start, stop, step;
+    inti ind[3];
     syment *ep;
     dimdes *dims, *pd;
     char s[MAXLINE], lname[MAXLINE], index[MAXLINE];
@@ -531,18 +554,11 @@ char *_PD_expand_hyper_name(PDBfile *file, char *name)
 	    {err = TRUE;
 	     break;};
 
-	 if (_PD_parse_index_expr(t, pd, &start, &stop, &step) == 0)
+	 if (_PD_parse_index_expr(t, pd, &ind[0], &ind[1], &ind[2]) == 0)
 	    {err = TRUE;
 	     break;};
 
-         if (start == stop)
-            SC_vstrcat(index, MAXLINE, "%ld,", start);
-
-         else if (step <= 1L)
-            SC_vstrcat(index, MAXLINE, "%ld:%ld,", start, stop);
-
-         else
-            SC_vstrcat(index, MAXLINE, "%ld:%ld:%ld,", start, stop, step);};
+	 _PD_index_str(index, MAXLINE, ind);};
     
     _PD_rl_syment_d(ep);
 
@@ -1340,9 +1356,9 @@ static int _PD_rd_hyper_index(PDBfile *file, char *name,
 
 static void _PD_rd_leaf_members(PDBfile *file, char *vr, inti ni, 
                                 char *intype, char *outtype, int boffs)
-   {int ipt, nbt, cnv;
+   {int ipt, cnv;
     inti nir, nia, nb;
-    intb bpi;
+    intb bpi, nbt;
     char *bf, *in, *out;
     defstr *dpf, *dph;
     FILE *fp;
@@ -1422,8 +1438,8 @@ static void _PD_rd_leaf_members(PDBfile *file, char *vr, inti ni,
 
 int _PD_indexed_read_as(PDBfile *file, char *fullpath, char *type, void *vr, 
                         int nd, long *ind, syment *ep)
-   {int i, err;
-    inti start, stop, step;
+   {int i, j, err;
+    inti indl[3];
     char index[MAXLINE], hname[MAXLINE];
     PD_smp_state *pa;
 
@@ -1442,18 +1458,10 @@ int _PD_indexed_read_as(PDBfile *file, char *fullpath, char *type, void *vr,
 
     strcpy(index, "(");
     for (i = 0; i < nd; i++)
-        {start = ind[0];
-         stop  = ind[1];
-         step  = ind[2];
-         ind  += 3;
-         if (start == stop)
-            SC_vstrcat(index, MAXLINE, "%ld,", start);
+        {for (j = 0; j < 3; j++)
+	     indl[j] = *ind++;
 
-         else if (step <= 1L)
-            SC_vstrcat(index, MAXLINE, "%ld:%ld,", start, stop);
-            
-         else
-            SC_vstrcat(index, MAXLINE, "%ld:%ld:%ld,", start, stop, step);};
+	 _PD_index_str(index, MAXLINE, indl);};
 
     if (strlen(index) > 1)
        {SC_LAST_CHAR(index) = ')';

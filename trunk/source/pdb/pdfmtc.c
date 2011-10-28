@@ -51,7 +51,7 @@
  *                 -     block of data
  */
 
-static int _PD_wr_itag_iii(PDBfile *file, PD_address *ad, long ni, char *type,
+static int _PD_wr_itag_iii(PDBfile *file, PD_address *ad, inti ni, char *type,
 			   int64_t addr, PD_data_location loc)
    {char s[MAXLINE];
     FILE *fp;
@@ -64,8 +64,8 @@ static int _PD_wr_itag_iii(PDBfile *file, PD_address *ad, long ni, char *type,
 /* must have a definite large number of digits in address field
  * in order to support relocation
  */
-	   {snprintf(s, MAXLINE, "\n%s(%ld) %32lld %d;\n",
-		     type, ni, (long long) addr, loc);
+	   {snprintf(s, MAXLINE, "\n%s(%lld) %32lld %d;\n",
+		     type, (long long) ni, (long long) addr, loc);
 
 	    lio_printf(fp, s);};
 
@@ -116,8 +116,9 @@ static int _PD_rd_itag_iii(PDBfile *file, char *p, PD_itag *pi)
 	    else
 	       pi->flag = atoi(token);};
 
-	snprintf(t, MAXLINE, "\n%ld %s %32lld %d;\n",
-		 pi->nitems, pi->type, (long long) pi->addr, pi->flag);
+	snprintf(t, MAXLINE, "\n%lld %s %32lld %d;\n",
+		 (long long) pi->nitems, pi->type,
+		 (long long) pi->addr, pi->flag);
 
 	pi->length = strlen(t);}
 
@@ -996,7 +997,8 @@ static int _PD_wr_blocks_iii(PDBfile *file)
 
 		  _PD_block_get_desc(&addr, &ni, bl, j);
 
-		  ok &= _PD_put_string(1, " %lld %ld", (int64_t) addr, ni);};
+		  ok &= _PD_put_string(1, " %lld %lld",
+				       (int64_t) addr, (long long) ni);};
 
 	     ok &= _PD_put_string(1, "\n");};};
 
@@ -1040,7 +1042,8 @@ static int _PD_wr_csum_iii(PDBfile *file)
 
 static int64_t _PD_wr_symt_iii(PDBfile *file)
    {int n, nd, flag, ok;
-    long i, nt, nb, ni, stride, mn, mx;
+    long i, stride;
+    inti nb, ni, nt, mn, mx;
     int64_t addr, ad;
     char *ty, *nm;
     syment *ep;
@@ -1100,16 +1103,18 @@ static int64_t _PD_wr_symt_iii(PDBfile *file)
 	      mn = lst->index_min;
 	      mx = mn + ni - 1;
 	      if (nd == 0)
-		 _PD_put_string(n++, "[%ld:%ld", mn, mx);
+		 _PD_put_string(n++, "[%lld:%lld",
+				(long long) mn, (long long) mx);
 	      else
-		 _PD_put_string(n++, ",%ld:%ld", mn, mx);};
+		 _PD_put_string(n++, ",%lld:%lld",
+				(long long) mn, (long long) mx);};
 
 	 if (nd > 0)
 	    _PD_put_string(n++, "]");
 
 	 _PD_put_string(n++, 
-			" @ %lld (%ld);\n",
-			(int64_t) ad, nb);};
+			" @ %lld (%lld);\n",
+			(int64_t) ad, (long long) nb);};
 
 /* pad an extra newline to mark the end of the symbol table for _PD_rd_symt */
     _PD_put_string(n++, "\n");

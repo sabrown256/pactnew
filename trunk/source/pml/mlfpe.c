@@ -24,6 +24,7 @@ void
 #if defined(HAVE_ANSI_C9X_FENV)
 
 # if defined(HAVE_GNU_FENV)
+#  undef __USE_GNU
 #  define __USE_GNU
 # endif
 

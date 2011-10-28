@@ -626,13 +626,13 @@ static int _SX_diff_structs(SS_psides *si,
 
 /* _SX_RD_LEAF_T - read a leaf into a temporary space passed in */
 
-static int _SX_rd_leaf_t(PDBfile *pf, syment *ep, char *vr, char *in_type, 
-			 inti ni, intb bpi, char *out_type)
-   {int convert;
+static int _SX_rd_leaf_t(PDBfile *pf, syment *ep, char *vr, char *intype, 
+			 inti ni, intb bpi, char *outtype)
+   {int ipt, cnv, rv;
     inti i, n, nrd, nib;
     int64_t addr;
     char *buf, *vbuf, *svr;
-    defstr *dpf;
+    defstr *dpf, *dph;
     FILE *fp;
     PD_smp_state *pa;
 
@@ -647,18 +647,22 @@ static int _SX_rd_leaf_t(PDBfile *pf, syment *ep, char *vr, char *in_type,
 	     memset(PD_err, 0, MAXLINE);
 	     break;};
 
-    dpf = _PD_lookup_type(out_type, pf->chart);
     fp  = pf->stream;
 
     n = _PD_n_blocks(ep);
     if (n == 1)
        _PD_entry_set_number(ep, 0, PD_entry_number(ep));
 
-    convert = FALSE;
-    if ((dpf->convert > 0) || (strcmp(in_type, out_type) != 0))
-       convert = TRUE;
+    dpf = _PD_lookup_type(outtype, pf->chart);
+    ipt = _PD_items_per_tuple(dpf);
 
-    if (convert)
+    if (dpf->convert == -1)
+       {dph = _PD_lookup_type(outtype, pf->host_chart);
+	cnv = _PD_require_conv(dpf, dph);}
+    else
+       cnv = ((dpf->convert > 0) || (strcmp(intype, outtype) != 0));
+
+    if (cnv == TRUE)
        {buf = CMAKE_N(char, ni*bpi);
         if (buf == NULL)
            return(FALSE);}
@@ -676,20 +680,22 @@ static int _SX_rd_leaf_t(PDBfile *pf, syment *ep, char *vr, char *in_type,
 	     if (lio_seek(fp, addr, SEEK_SET))
                 break;};};
 
-    if (nrd != ni)
-       {if (convert)
-          CFREE(buf);
-        return(FALSE);}
+    rv = TRUE;
 
-    if (convert)
+    if (nrd != ni)
+       {if (cnv == TRUE)
+          CFREE(buf);
+        rv = FALSE;}
+
+    else if (cnv == TRUE)
        {vbuf = buf;
         svr  = vr;
-        PD_convert(&svr, &vbuf, in_type, out_type, ni, 
+        PD_convert(&svr, &vbuf, intype, outtype, ni, 
                    pf->std, pf->host_std, pf->host_std, 
                    pf->chart, pf->host_chart, 0, PD_TRACE);
-        CFREE(buf);}
+        CFREE(buf);};
 
-    return(TRUE);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

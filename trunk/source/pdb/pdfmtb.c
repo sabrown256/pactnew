@@ -67,7 +67,7 @@ static void _PD_regen_std(PDBfile *file, char *type,
  *                -     block of data
  */
 
-static int _PD_wr_itag_ii(PDBfile *file, PD_address *ad, long ni, char *type,
+static int _PD_wr_itag_ii(PDBfile *file, PD_address *ad, inti ni, char *type,
 			  int64_t addr, PD_data_location loc)
    {char s[MAXLINE];
     FILE *fp;
@@ -78,8 +78,8 @@ static int _PD_wr_itag_ii(PDBfile *file, PD_address *ad, long ni, char *type,
 /* must have a definite large number of digits in address field
  * in order to support relocation
  */
-	snprintf(s, MAXLINE, "%ld\001%s\001%32lld\001%d\001\n",
-		 ni, type, (long long) addr, loc);
+	snprintf(s, MAXLINE, "%lld\001%s\001%32lld\001%d\001\n",
+		 (long long) ni, type, (long long) addr, loc);
 
 	lio_printf(fp, s);
 
@@ -126,8 +126,9 @@ static int _PD_rd_itag_ii(PDBfile *file, char *p, PD_itag *pi)
         else
            pi->flag = atoi(token);};
 
-    snprintf(t, MAXLINE, "%ld\001%s\001%32lld\001%d\001\n",
-	     pi->nitems, pi->type, (long long) pi->addr, pi->flag);
+    snprintf(t, MAXLINE, "%lld\001%s\001%32lld\001%d\001\n",
+	     (long long) pi->nitems, pi->type,
+	     (long long) pi->addr, pi->flag);
 
     pi->length = strlen(t);
 
@@ -734,7 +735,8 @@ int _PD_rd_ext_ii(PDBfile *file)
 
 static int64_t _PD_wr_symt_ii(PDBfile *file)
    {int n, flag;
-    long i, nt, nb, ni, stride;
+    long i, stride;
+    inti nb, ni, nt;
     int64_t addr, ad;
     char *ty, *nm;
     syment *ep;
@@ -770,8 +772,8 @@ static int64_t _PD_wr_symt_ii(PDBfile *file)
 		 return(-1L);};};
 
 	 _PD_put_string(n++, 
-			"%s\001%s\001%ld\001%lld\001",
-			nm, ty, nb, (int64_t) ad);
+			"%s\001%s\001%lld\001%lld\001",
+			nm, ty, (long long) nb, (int64_t) ad);
 
 /* adjust the slowest varying dimension to reflect only the first block */
 	 flag = PD_get_major_order(file);
@@ -787,8 +789,8 @@ static int64_t _PD_wr_symt_ii(PDBfile *file)
 	      else
 		 ni = lst->number;
 
-	      _PD_put_string(n++, "%ld\001%ld\001",
-			     lst->index_min, ni);};
+	      _PD_put_string(n++, "%ld\001%lld\001",
+			     lst->index_min, (long long) ni);};
 
 	 _PD_put_string(n++, "\n");};
 
@@ -866,7 +868,7 @@ static int64_t _PD_wr_chrt_ii(PDBfile *file, FILE *out, int fh)
     for (i = 0; SC_hasharr_next(ch, &i, &nm, NULL, (void **) &dp); i++)
 
 /* use np->name instead of dp->type or PD_typedef's will not work */
-        {_PD_put_string(n++, "%s\001%ld\001", nm, dp->size);
+        {_PD_put_string(n++, "%s\001%ld\001", nm, (long) dp->size);
 
 	 for (desc = dp->members; desc != NULL; desc = desc->next)
 	     _PD_put_string(n++, "%s\001", desc->member);
@@ -923,7 +925,7 @@ static int _PD_wr_prim_typ_ii(FILE *fp, hasharr *tab)
 /* use nm instead of dp->type or PD_typedef's won't work!!! */
 	 ok &= _PD_put_string(1, "%s%c%ld%c%d%c%d%c",
 			      nm, dc,
-			      dp->size, dc,
+			      (long) dp->size, dc,
 			      dp->alignment, dc,
 			      dp->fix.order, dc);
 
@@ -991,7 +993,8 @@ static int _PD_wr_prim_typ_ii(FILE *fp, hasharr *tab)
 
 static int _PD_wr_blocks_ii(PDBfile *file)
    {int ok;
-    long i, j, n, ni;
+    long i, j, n;
+    inti ni;
     int64_t addr;
     char *nm;
     syment *ep;
@@ -1012,7 +1015,8 @@ static int _PD_wr_blocks_ii(PDBfile *file)
 		  addr = _PD_entry_get_address(ep, j);
 		  ni   = _PD_entry_get_number(ep, j);
 
-		  ok &= _PD_put_string(1, " %lld %ld", (int64_t) addr, ni);};
+		  ok &= _PD_put_string(1, " %lld %lld",
+				       (int64_t) addr, (long long) ni);};
 
 	     ok &= _PD_put_string(1, "\n");};};
 

@@ -181,6 +181,9 @@ struct s_PD_state
 /* PDSZOF.C */
     long szl;
 
+/* PDCONV.C */
+    int force;                          /* force conversions if TRUE */
+
 /* PDBDIR.C */
     int dir_num;
 

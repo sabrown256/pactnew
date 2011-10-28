@@ -43,7 +43,7 @@ if (-d $gitd[1]) then
    pushd $gitd[1] >>& $log
 
 # do a pull first
-   echo -n "Sync ... "
+   echo -n "Sync .............. "
    echo "git pull $repo master" >>& $log
    git pull $repo master >>& $log
    set xstatus = $status
@@ -71,7 +71,7 @@ if (-d $gitd[1]) then
    end
 
 # do the local commit
-   echo -n "Local commit ... "
+   echo -n "Local commit ...... "
    echo "git commit $args -q -m '$msg' $files" >&! $log
    git commit $args -q -m "$msg" $files >>& $log
    set xstatus = $status
@@ -93,6 +93,23 @@ if (-d $gitd[1]) then
       else
          echo "ng ($xstatus)"
          echo "Need 'git config --bool core.bare true' on master"
+      endif
+   endif
+
+   echo "---------------------" >>& $log
+
+# do final pull back from the master repository
+# so that git status does not show being ahead of origin/master
+   if ($xstatus == 0) then
+      echo -n "Pulling back ...... "
+      echo "git pull" >>& $log
+      git pull >>& $log
+#      echo "git pull $repo" >>& $log
+#      git pull $repo >>& $log
+      if ($xstatus == 0) then
+         echo "ok"
+      else
+         echo "ng ($xstatus)"
       endif
    endif
 
