@@ -14,9 +14,9 @@ static void
  _SX_rd_indirection_list(SS_psides *si, object *obj, PDBfile *file,
 			 char **vr, char *type),
  _SX_rd_io_list(SS_psides *si, object *obj,
-		char *vr, long ni, defstr *dp),
+		char *vr, inti ni, defstr *dp),
  _SX_rd_leaf_list(SS_psides *si, object *obj, PDBfile *file, char *vr,
-		  long ni, char *type, dimdes *dims);
+		  inti ni, char *type, dimdes *dims);
 
 syment
  *_SX_rd_data(SS_psides *si, PDBfile *file,
@@ -32,9 +32,9 @@ syment
  */
 
 void _SX_rd_tree_list(SS_psides *si, object *obj, PDBfile *file,
-		      char *vr, long ni,
+		      char *vr, inti ni,
 		      char *type, dimdes *dims)
-   {long i;
+   {inti i;
     char **lvr;
     char *dtype;
 

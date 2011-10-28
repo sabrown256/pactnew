@@ -973,7 +973,8 @@ static int64_t _PD_wr_chrt_iii(PDBfile *file, FILE *out, int wc)
 
 static int _PD_wr_blocks_iii(PDBfile *file)
    {int ok;
-    long i, j, n, ni;
+    long i, j, n;
+    inti ni;
     int64_t addr;
     char *nm;
     syment *ep;

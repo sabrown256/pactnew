@@ -30,11 +30,11 @@ static int
  _PD_print_data(FILE *f0,
 		char *prefix, char *before, char *after,
 		char *nodename, PDBfile *file, void *vr,
-		long ni, char *type, dimdes *dims,
+		inti ni, char *type, dimdes *dims,
 		int mjr, int def_off, int irecursion,
 		int n, long *ind),
  _PD_print_indirection(PD_printdes *prnt, PDBfile *file, char **vr,
-		       long ni, char *type, int irecursion,
+		       inti ni, char *type, int irecursion,
 		       int n, long *ind);
 
 static int
@@ -100,8 +100,8 @@ static void _PD_disp_mode_1(PD_printdes *prnt, void *x, int tid)
  *                 - where NI is less than the number of items per line
  */
 
-static void _PD_disp_mode_2(PD_printdes *prnt, void *x, long ni, int tid)
-   {long i, j;
+static void _PD_disp_mode_2(PD_printdes *prnt, void *x, inti ni, int tid)
+   {inti i, j;
     char bf[MAXLINE];
     FILE *fp;
 
@@ -149,9 +149,9 @@ static void _PD_disp_mode_2(PD_printdes *prnt, void *x, long ni, int tid)
  *                 - the number of items per line
  */
 
-static void _PD_disp_mode_3(PD_printdes *prnt, void *x, long ni, int tid)
+static void _PD_disp_mode_3(PD_printdes *prnt, void *x, inti ni, int tid)
    {int nn;
-    long i, j, k;
+    inti i, j, k;
     char bf[MAXLINE], s[MAXLINE];
     FILE *fp;
 
@@ -194,7 +194,7 @@ static void _PD_disp_mode_3(PD_printdes *prnt, void *x, long ni, int tid)
 /* _PD_DISP_DATA - print NI values from X of type indexed by TID */
 
 static void _PD_disp_data(PD_printdes *prnt, void *x,
-			  long ni, int tid, long n, long *ind)
+			  inti ni, int tid, long n, long *ind)
    {
 
     if ((n > 0L) && (ind != NULL))
@@ -407,11 +407,11 @@ static int _PD_test_recursion(char *type, char *mtype)
 
 /* _PD_PRINT_CHAR_KIND - print an entry of CHAR_KIND */
 
-static void _PD_print_char_kind(PD_printdes *prnt, char *vr, long ni,
+static void _PD_print_char_kind(PD_printdes *prnt, char *vr, inti ni,
 				char *type, int quo, int idx,
 				int n, long *ind)
    {int max1, max2;
-    long i, offset;
+    inti i, offset;
     char bf[MAXLINE];
     char *cp, *prefix, *before, *after, *nodename;
     FILE *f0;
@@ -501,10 +501,10 @@ static void _PD_print_char_kind(PD_printdes *prnt, char *vr, long ni,
  */
 
 static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
-			long ni, char *type, int n, long *ind)
+			inti ni, char *type, int n, long *ind)
    {int k, m, idx, nn, isz, status, quo;
     int id, ifx, ifp, icx;
-    long offset, i, j;
+    inti i, j, offset;
     char bf[MAXLINE], s[MAXLINE];
     defstr *pd;
     FILE *f0;
@@ -662,7 +662,7 @@ int PD_print_entry(PDBfile *file ARG(,,cls),
 /* _PD_PRINT_DATA - print out variables in a nicely formatted way  */
 
 static int _PD_print_data(FILE *f0, char *prefix, char *before, char *after, 
-                          char *nodename, PDBfile *file, void *vr, long ni,
+                          char *nodename, PDBfile *file, void *vr, inti ni,
                           char *type, dimdes *dims, int mjr, int def_off, 
                           int irecursion, int n, long *ind)
    {int status;
@@ -697,11 +697,11 @@ static int _PD_print_data(FILE *f0, char *prefix, char *before, char *after,
 /* _PD_PRINT_INDIRECTION - handle the indirects for the print process */
 
 static int _PD_print_indirection(PD_printdes *prnt, PDBfile *file, char **vr,
-				 long ni, char *type,
+				 inti ni, char *type,
                                  int irecursion, int n, long *ind)
    {int min_index, status;
     int def_off;
-    long i, ditems;
+    inti i, ditems;
     char field[80], bf[MAXLINE];
     char *dtype, *s;
     char *prefix, *before, *after, *nodename;
@@ -730,7 +730,7 @@ static int _PD_print_indirection(PD_printdes *prnt, PDBfile *file, char **vr,
 
     for (i = 0L; i < ni; i++, vr++)
         {if (ni > 1)
-            sprintf(s, "(%ld)", i + min_index);
+            sprintf(s, "(%lld)", (long long) (i + min_index));
 
          ditems = _PD_number_refd(DEREF(vr), dtype, file->host_chart);
 
@@ -833,7 +833,7 @@ static int _PD_print_member(FILE *f0, char *prefix,
  *                - otherwise, lookup the type, and display each member.
  */
 
-int _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, long ni,
+int _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, inti ni,
 		   char *type, int irecursion, int n, long *ind)
    {int mjr, def_off;
     int size, min_index, nchars, status;

@@ -215,7 +215,7 @@ static uint64_t _PN_bwrite(void *s, size_t nbi, uint64_t ni, FILE *stream)
 /* _PN_BPRINTF - do an fprintf on the pseudo file */
 
 static int _PN_bprintf(FILE *fp, char *fmt, va_list a)
-   {size_t ni, nw;
+   {inti ni, nw;
     char *bf;
 
     nw = 0;
@@ -416,7 +416,7 @@ static int _PN_sizeof(char *s)
  * #bind PN_conv_in fortran() scheme() python()
  */
 
-void PN_conv_in(void *out, void *in, char *type, long ni,
+void PN_conv_in(void *out, void *in, char *type, int64_t ni,
 		hasharr *in_chart)
    {data_standard *istd;
     PD_smp_state *pa;
@@ -451,7 +451,7 @@ void PN_conv_in(void *out, void *in, char *type, long ni,
  * #bind PN_conv_out fortran() scheme() python()
  */
 
-void PN_conv_out(void *out, void *in, char *type, long ni,
+void PN_conv_out(void *out, void *in, char *type, int64_t ni,
 		 hasharr *out_chart)
    {data_standard *ostd;
     PD_smp_state *pa;
@@ -728,7 +728,7 @@ int PN_close(PDBfile *file)
  * #bind PN_write fortran() scheme() python()
  */
 
-int PN_write(PDBfile *file, char *type, long ni, void *vr)
+int PN_write(PDBfile *file, char *type, int64_t ni, void *vr)
    {int ret;
     char bf[MAXLINE];
 
@@ -748,7 +748,7 @@ int PN_write(PDBfile *file, char *type, long ni, void *vr)
  * #bind PN_read fortran() scheme() python()
  */
 
-int PN_read(PDBfile *file, char *type, long ni, void *vr)
+int PN_read(PDBfile *file, char *type, int64_t ni, void *vr)
    {int ret;
     int64_t addr;
     char bf[MAXLINE];

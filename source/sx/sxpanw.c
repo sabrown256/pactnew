@@ -16,7 +16,8 @@
 /* _SXI_DISPLAY_PAN_OBJECT - display a PANACEA object */
 
 object *_SXI_display_pan_object(SS_psides *si, object *obj)
-   {int id, ni;
+   {int id;
+    inti ni;
     char *name;
     syment *ep;
     PA_variable *pp;

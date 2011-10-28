@@ -236,10 +236,11 @@ object *_SXI_display_diff(SS_psides *si, object *argl)
 
 static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb, 
 				   char *pva, char *pvb, char *indx, 
-				   long ni, char *type, dimdes *dims, 
+				   inti ni, char *type, dimdes *dims, 
 				   int mjr)
    {int id, nn, def_off, samen, lna, lnb;
-    long i, isz, msz;
+    inti i;
+    long isz, msz;
     char sa[MAXLINE], sb[MAXLINE];
     char bf[LINE_SIZE+1], bfa[LINE_SIZE], bfb[LINE_SIZ2+1];
     char tmp[LINE_SIZE];
@@ -455,7 +456,7 @@ static int _SX_diff_leaf_indirects(SS_psides *si,
 
 static int _SX_display_diff(PDBfile *pf, char *nma, char *nmb, 
 			    char *pva, char *pvb, char *indx, 
-			    long ni, char *type, dimdes *dims)
+			    inti ni, char *type, dimdes *dims)
    {int mjr, def_off;
     PD_printdes prnt;
 
@@ -500,7 +501,7 @@ static int _SX_display_diff(PDBfile *pf, char *nma, char *nmb,
 
 static int _SX_diff_primitives(PDBfile *pf, char *nma, char *nmb, 
 			       char *bfa, char *bfb, char *type, 
-			       long ni, dimdes *dims)
+			       inti ni, dimdes *dims)
    {int id, ret;
     char *indx;
     precisionfp *fp_pre;
@@ -562,9 +563,10 @@ static int _SX_diff_structs(SS_psides *si,
 			    PDBfile *pfa, PDBfile *pfb, 
 			    char *nma, char *nmb, 
                             char *bfa, char *bfb, 
-			    char *typa, char *typb, long ni)
+			    char *typa, char *typb, inti ni)
    {int ret;
-    long i, mitems, sza, szb;
+    inti i;
+    long mitems, sza, szb;
     memdes *desca, *descb;
     char *sva, *svb, *tva, *tvb, mnma[MAXLINE], mnmb[MAXLINE];
     defstr *dpa, *dpb;
@@ -593,10 +595,14 @@ static int _SX_diff_structs(SS_psides *si,
 
 		  mitems = desca->number;
 
-		  snprintf(mnma, MAXLINE, "%s[%ld].%s", 
-			   nma, i + pfa->default_offset, desca->name);
-		  snprintf(mnmb, MAXLINE, "%s[%ld].%s", 
-			   nmb, i + pfb->default_offset, descb->name);
+		  snprintf(mnma, MAXLINE, "%s[%lld].%s", 
+			   nma,
+			   (long long) (i + pfa->default_offset),
+			   desca->name);
+		  snprintf(mnmb, MAXLINE, "%s[%lld].%s", 
+			   nmb,
+			   (long long) (i + pfb->default_offset),
+			   descb->name);
 
 		  mdims = desca->dimensions;
 
@@ -812,10 +818,10 @@ static int _SX_diff_tree(SS_psides *si, char *nma, char *nmb,
         ret = TRUE;
         for (i = 0L; i < ni; i++)
 	    {if (flag)
-	        {snprintf(lnma, MAXLINE, "%s[%ld]", 
-			  nma, i + pfa->default_offset);
-		 snprintf(lnmb, MAXLINE, "%s[%ld]", 
-			  nmb, i + pfb->default_offset);}
+	        {snprintf(lnma, MAXLINE, "%s[%lld]", 
+			  nma, (long long) (i + pfa->default_offset));
+		 snprintf(lnmb, MAXLINE, "%s[%lld]", 
+			  nmb, (long long) (i + pfb->default_offset));}
 	     else
 		{snprintf(lnma, MAXLINE, "%s", nma);
 		 snprintf(lnmb, MAXLINE, "%s", nmb);};

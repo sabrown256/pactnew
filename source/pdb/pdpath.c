@@ -300,8 +300,8 @@ static void _PD_restore_stack(PD_smp_state *pa)
  *                   - includes the indirections of children too
  */
 
-long _PD_num_indirects(char *type, hasharr *tab)
-   {long rv;
+intb _PD_num_indirects(char *type, hasharr *tab)
+   {intb rv;
     char *mtype;
     defstr *dp;
 
@@ -1720,9 +1720,10 @@ static int _PD_lex(PD_smp_state *pa)
  *                      - and return a start, stop, step triple
  */
 
-long _PD_parse_index_expr(char *expr, dimdes *dim, long *pstart,
-			  long *pstop, long *pstep)
+inti _PD_parse_index_expr(char *expr, dimdes *dim, inti *pstart,
+			  inti *pstop, inti *pstep)
    {int i, j, tv, nc;
+    int rv;
     long tr[3];
     PD_smp_state *pa;
     SC_THREAD_ID(tid);
@@ -1781,7 +1782,9 @@ long _PD_parse_index_expr(char *expr, dimdes *dim, long *pstart,
 
     _PD_rl_frames(pa);
 
-    return((tr[1] - tr[0])/tr[2] + 1);}
+    rv = (tr[1] - tr[0])/tr[2] + 1;
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

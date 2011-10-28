@@ -345,7 +345,8 @@ void _PD_ptr_init_apl(PDBfile *file)
 
 static char *_PD_ptr_alloc_space(PDBfile *file, char **vr,
 				 PD_itag *pi, int asgn)
-   {long bpi, ni;
+   {inti ni;
+    intb bpi;
     char *pv, *type;
 
     ni   = pi->nitems;
@@ -372,7 +373,7 @@ static char *_PD_ptr_alloc_space(PDBfile *file, char **vr,
  */
 
 static long _PD_ptr_fix(adloc *al, long n)
-   {long ni;
+   {inti ni;
     SC_array *ap;
 
     ap = al->ap;
@@ -620,7 +621,7 @@ static PD_address *_PD_ptr_find_ptr(adloc *al, void *vr, int lck)
  */
 
 static PD_address *_PD_ptr_find_next(adloc *al, PD_address *ad, void *vr)
-   {long i, ni;
+   {inti i, ni;
     SC_array *ap;
 
     ap = al->ap;
@@ -793,7 +794,7 @@ static void _PD_ptr_remove_addr(adloc *al, PD_address *ad, int lck)
 
 static int _PD_ptr_foreach(adloc *al, PFPtrMth f, void *a)
    {int rv;
-    long i, ni;
+    inti i, ni;
     PD_address *ad;
     SC_array *ap;
 
@@ -843,7 +844,7 @@ int dprad(PD_address *ad, void *a)
 /* DPRAP - diagnostic print of address lists */
 
 void dprap(adloc *al, int n)
-   {long ni;
+   {inti ni;
 
     ni = SC_array_get_n(al->ap);
 
@@ -1139,7 +1140,7 @@ PD_address *_PD_ptr_wr_lookup(PDBfile *file, void *vr,
  */
 
 void _PD_ptr_wr_syment(PDBfile *file, PD_address *ad, char *type,
-		       long ni, int64_t addr)
+		       inti ni, int64_t addr)
    {char name[MAXLINE];
     syment *ep;
 
@@ -1162,7 +1163,7 @@ void _PD_ptr_wr_syment(PDBfile *file, PD_address *ad, char *type,
  *                  - correctly
  */
 
-int _PD_ptr_wr_itags(PDBfile *file, void *vr, long ni, char *type)
+int _PD_ptr_wr_itags(PDBfile *file, void *vr, inti ni, char *type)
    {int rv;
     long n;
     int64_t addr;

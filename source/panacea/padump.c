@@ -858,12 +858,12 @@ PM_mapping *PA_build_mapping(PA_plot_request *pr, PM_set *(*build_ran)(PA_plot_r
  *                     - target array
  */
 
-static long _PA_copy_sub_select(int did, void *d, long od,
+static inti _PA_copy_sub_select(int did, void *d, long od,
 				int sid, void *s, long os,
 				unsigned long *sshp, unsigned long *sstr,
 				int dm)
    {int bpi;
-    long i, n, ss, ni, nb, m;
+    inti i, n, ss, ni, nb, m;
     char *ps;
 
     ss = sstr[0];
@@ -945,7 +945,7 @@ double *PA_set_data(char *name, C_array *arr, PM_centering *pcent)
  *              - return TRUE iff successful
  */
 
-int _PA_get_data(double *d, char *vr, long ni, long offset, long stride)
+int _PA_get_data(double *d, char *vr, inti ni, long offset, long stride)
    {int id;
     char *type;
     void *pv;

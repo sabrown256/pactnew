@@ -366,7 +366,7 @@ static uint64_t _PD_pwrite(void *s, size_t nbi, uint64_t ni, FILE *stream)
 
 static int _PD_pprintf(FILE *stream, char *fmt, va_list a)
    {int rv;
-    size_t ni, nw;
+    inti ni, nw;
     char *bf;
 
     nw = 0;

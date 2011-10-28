@@ -396,10 +396,10 @@ struct s_tr_layer
 		     int appnd, int *pnew);};
 
 struct s_sys_layer
-   {long (*read)(PDBfile *file, syment *ep,
-		 char *outtype, void *vr);
-    long (*write)(PDBfile *file, char *vr, int64_t ni,
-		  char *intype, char *outtype);};
+   {int64_t (*read)(PDBfile *file, syment *ep,
+		    char *outtype, void *vr);
+    int64_t (*write)(PDBfile *file, char *vr, int64_t ni,
+		     char *intype, char *outtype);};
 
 struct s_PD_address
    {int indx;                  /* indx for /&ptrs */
@@ -956,7 +956,6 @@ extern void
 
 extern void
  _PD_rl_syment_d(syment *ep),
- *_PD_alloc_entry(PDBfile *file, char *type, long ni),
  PD_finish(void);
 
 
