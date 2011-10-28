@@ -472,7 +472,7 @@ struct s_PDBfile
     int (*wr_prim_types)(FILE *fp, hasharr *tab);
     int (*rd_prim_types)(PDBfile *file, char *bf);
 
-    int (*wr_itag)(PDBfile *file, PD_address *ad, long ni, char *type,
+    int (*wr_itag)(PDBfile *file, PD_address *ad, int64_t ni, char *type,
 		   int64_t addr, PD_data_location loc);
     int (*rd_itag)(PDBfile *file, char *p, PD_itag *pi);
 
@@ -609,11 +609,11 @@ struct s_defstr
 
 /* indirect reference tag */
 struct s_PD_itag
-   {long nitems;                              /* number of items pointed to */
-    char *type;                                  /* type of item pointed to */
-    int64_t addr;                          /* address of the itag owning data */
-    int flag;                            /* TRUE if this itag owns the data */
-    int length;};          /* byte length of the itag - not written to file */
+   {int64_t nitems;                              /* number of items pointed to */
+    char *type;                                     /* type of item pointed to */
+    int64_t addr;                           /* address of the itag owning data */
+    int flag;                               /* TRUE if this itag owns the data */
+    int length;};             /* byte length of the itag - not written to file */
 
 /* hyper-index support structure */
 struct s_dimind
@@ -995,15 +995,15 @@ extern int
 /* PDBNET.C declarations */
 
 extern void
- PN_conv_in(void *out, void *in, char *type, long ni,
+ PN_conv_in(void *out, void *in, char *type, int64_t ni,
 	    hasharr *in_chart),
- PN_conv_out(void *out, void *in, char *type, long ni,
+ PN_conv_out(void *out, void *in, char *type, int64_t ni,
           hasharr *out_chart);
 
 extern int
  PN_close(PDBfile *file),
- PN_write(PDBfile *file, char *type, long ni, void *vr),
- PN_read(PDBfile *file, char *type, long ni, void *vr);
+ PN_write(PDBfile *file, char *type, int64_t ni, void *vr),
+ PN_read(PDBfile *file, char *type, int64_t ni, void *vr);
 
 extern PDBfile
  *PN_open(PDBfile *fm, char *bf);
@@ -1246,8 +1246,8 @@ extern char
 
 extern int
  PD_read_bits(PDBfile *file, char *name, char *type,
-	      long ni, int sgned, int nbits, int padsz, int fpp, long offs,
-	      long *pan, char **pdata),
+	      int64_t ni, int sgned, int nbits, int padsz, int fpp,
+	      int64_t offs, long *pan, char **pdata),
  _PD_indirection(char *s);
 
 
@@ -1272,7 +1272,7 @@ extern int
 /* PDSZOF.C declarations */
 
 extern long
- PD_sizeof(PDBfile *file, char *type, long n, void *vri);
+ PD_sizeof(PDBfile *file, char *type, int64_t n, void *vri);
 
 extern int
  PN_relocate(PDBfile *file, char *type, long n);

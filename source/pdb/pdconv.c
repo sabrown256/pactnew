@@ -700,7 +700,7 @@ int _PD_require_conv(defstr *dpf, defstr *dph)
 	cnv |= (dpf->is_indirect != dph->is_indirect);
 	cnv |= (dpf->onescmp     != dph->onescmp);
 	cnv |= (dpf->unsgned     != dph->unsgned);
-	cnv |= (dpf->fix.order  != dph->fix.order);
+	cnv |= (dpf->fix.order   != dph->fix.order);
 
 	cnv |= lreorder;
 	cnv |= lreformat;

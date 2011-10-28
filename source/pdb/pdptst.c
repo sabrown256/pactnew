@@ -379,7 +379,7 @@ static void print_help(void)
    {
 
     PRINT(STDOUT, "\nPDPTST - run pointer scaling and efficiency tests\n\n");
-    PRINT(STDOUT, "Usage: pdctst [-b #] [-c] [-d] [-dna #] [-dni #] [-h] [-m] [-na #] [-ni #] [-r] [-v #]\n");
+    PRINT(STDOUT, "Usage: pdptst [-b #] [-c] [-d] [-dna #] [-dni #] [-h] [-m] [-na #] [-ni #] [-r] [-v #]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       b    set buffer size (default no buffering)\n");
     PRINT(STDOUT, "       c    verify low level writes\n");

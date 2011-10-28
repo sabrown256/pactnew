@@ -671,8 +671,8 @@ switch ($Cmnd)
                    echo ""
                    echo "Usage: dsys config [-a <sid>] [-b 32 | 64] [-c]"
                    echo "                   [-f <directory>] [-F] [-feature <feature>] [-g]"
-                   echo "                   [-gsys <opt>] [-h] [-i <directory>] [-llp] [-os <sys-id>] [-p]"
-                   echo "                   [-cc <C compiler>] [-py] [-s] [-sl] [-t] [-v] [<config>]"
+                   echo "                   [-gsys <opt>] [-h] [-i <directory>] [-llp] [-o] [-O] [-os <sys-id>]"
+                   echo "                   [-p] [-cc <C compiler>] [-py] [-s] [-sl] [-t] [-v] [<config>]"
                    echo ""
                    echo "        -a         set the system id for this config"
                    echo "        -c         create missing directories for -i option"
@@ -685,6 +685,8 @@ switch ($Cmnd)
                    echo "        -i         base installation directory (default /usr/local)"
                    echo "                   to omit installation use "-i none""
                    echo "        -llp       use LD_LIBRARY_PATH when analyzing compilers"
+                   echo "        -o         build an absolutely optimizied version"
+                   echo "        -O         build an mixed debuggable/optimizied version"
                    echo "        -os        explicitly set the hardware/OS/release system id"
                    echo "        -p         build a profiling version"
                    echo "        -v         display the Version of the Source Control System"
@@ -2394,15 +2396,15 @@ CFG_DONE:
         flog $Log pwd
         flog $Log printenv
 
-        set TmpV = $MngDir/.tmp.$$
-        flog $Log mkdir $TmpV
-        flog $Log $MV $MngDir/.pact-version* $TmpV
+#        set TmpV = $MngDir/.tmp.$$
+#        flog $Log mkdir $TmpV
+#        flog $Log $MV $MngDir/.pact-version* $TmpV
 
         flog $Log $ScrDir/scs-update
         set ErrStat = $status
 
-        flog $Log $MV $TmpV/.pact-version* $MngDir
-        flog $Log $RMDir $TmpV
+#        flog $Log $MV $TmpV/.pact-version* $MngDir
+#        flog $Log $RMDir $TmpV
 
 # take care of conflicting changes
         flog $Log (awk '($1 == "C") && ($2 !~ /Makefile/) {print $2}' $Log > Confl)

@@ -198,6 +198,14 @@ ${BinDir}/pdfcts : pdfcts.c ${InstallDep} ${Hdrs} pdbtfr.h
 	${CLD} ${LdFlags} pdfcts.c -o ${BinDir}/pdfcts ${Libs}
         
 #
+# ascii vs binary performance
+#
+ascii : ${BinDir}/pddtst
+
+${BinDir}/pddtst : pddtst.c ${InstallDep} ${Hdrs}
+	${CLD} ${LdFlags} pddtst.c -o ${BinDir}/pddtst ${Libs}
+
+#
 # net io test
 #
 net : ${BinDir}/pdntst

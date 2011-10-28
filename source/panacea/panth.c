@@ -1024,7 +1024,7 @@ static int _PA_proc_rec(char *name, PDBfile *th, int ncpf, int recn)
 /* write out the time plot range data */
     for (i = 0; i < nc; i++)
         {j = i + 1;
-         snprintf(bf, MAXLINE, "yval%d", i);
+         snprintf(bf, MAXLINE, "yval%lld", (long long) i);
          PD_write_alt(pduf, bf, type, crve[j], 1, ind);
          CFREE(crve[j]);};
 

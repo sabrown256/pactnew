@@ -734,7 +734,7 @@ int PN_write(PDBfile *file, char *type, int64_t ni, void *vr)
 
     PD_reset_ptr_list(file);
 
-    snprintf(bf, MAXLINE, "s[%ld]", ni);
+    snprintf(bf, MAXLINE, "s[%lld]", (long long) ni);
 
     ret = PD_write(file, bf, type, vr);
 

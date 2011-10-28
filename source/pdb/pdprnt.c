@@ -302,13 +302,14 @@ void PD_write_syment(FILE *f0, syment *ep)
        {PRINT(f0, "Dimensions: (");
 
         for (dim = PD_entry_dimensions(ep); dim != NULL; dim = dim->next)
-            {PRINT(f0, "%ld:%ld", dim->index_min, dim->index_max);
+            {PRINT(f0, "%lld:%lld",
+		   (long long) dim->index_min, (long long) dim->index_max);
 	     if (dim->next != NULL)
 	        PRINT(f0, ", ");};
 
 	PRINT(f0, ")\n");};
 
-    PRINT(f0, "Length: %ld\n", PD_entry_number(ep));
+    PRINT(f0, "Length: %lld\n", (long long) PD_entry_number(ep));
     PRINT(f0, "Address: %lld\n", (int64_t) PD_entry_address(ep));
 
     return;}
@@ -837,7 +838,7 @@ int _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, inti ni,
 		   char *type, int irecursion, int n, long *ind)
    {int mjr, def_off;
     int size, min_index, nchars, status;
-    long ii;
+    inti ii;
     char field[80], mfield[80];
     char *prefix, *before, *after, *nodename;
     char *s, *s2, *svr;
@@ -896,7 +897,8 @@ int _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, inti ni,
                  else
                     min_index = def_off;
 
-                 snprintf(field, 80, "%s(%ld)", nodename, ii + min_index);}
+                 snprintf(field, 80, "%s(%lld)",
+			  nodename, (long long) (ii + min_index));}
              else
                 strcpy(field, nodename);
 

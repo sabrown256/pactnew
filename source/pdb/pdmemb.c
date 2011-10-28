@@ -224,7 +224,8 @@ dimdes *_PD_ex_dims(char *memb, int defoff, int *pde)
 
 int _PD_adj_dimensions(PDBfile *file, char *name, syment *ep)
    {int id;
-    long imin, imax, istep, i;
+    long i;
+    inti imin, imax, istep;
     char head[MAXLINE], expr[MAXLINE], tail[MAXLINE], bf[MAXLINE];
     char expr2[MAXLINE];
     char *token, *smax, *sinc;
@@ -267,7 +268,9 @@ int _PD_adj_dimensions(PDBfile *file, char *name, syment *ep)
 		 imin += i;
 		 imax += i;};};
 
-	 snprintf(expr, MAXLINE, "%s%ld:%ld:%ld,", expr2, imin, imax, istep);
+	 snprintf(expr, MAXLINE, "%s%lld:%lld:%lld,",
+		  expr2, (long long) imin, (long long) imax,
+		  (long long) istep);
 	 strcpy(expr2, expr);
 	 dims = dims->next;};
 
@@ -623,13 +626,13 @@ syment *PD_effective_entry(PDBfile *file ARG(,,cls), char *name,
  *                    - assume ROW_MAJOR_ORDER
  */
 
-static char *_PD_row_major_expr(char *bf, dimdes *pd, long indx, int def_off)
+static char *_PD_row_major_expr(char *bf, dimdes *pd, inti indx, int def_off)
    {char tmp[MAXLINE];
-    long ix, m, stride;
+    inti ix, m, stride;
     dimdes *pt;
 
     if (pd == NULL)
-       sprintf(bf, "%ld", indx + def_off);
+       sprintf(bf, "%lld", (long long) (indx + def_off));
 
     else
        {bf[0] = '\0';
@@ -644,7 +647,7 @@ static char *_PD_row_major_expr(char *bf, dimdes *pd, long indx, int def_off)
             m  = indx / stride;
             ix = m + pd->index_min;
 
-            snprintf(tmp, MAXLINE, "%ld,", ix);
+            snprintf(tmp, MAXLINE, "%lld,", (long long) ix);
             strcat(bf, tmp);
 
             indx -= m*stride;
@@ -664,12 +667,12 @@ static char *_PD_row_major_expr(char *bf, dimdes *pd, long indx, int def_off)
  *                    - assume COLUMN_MAJOR_ORDER
  */
 
-static char *_PD_col_major_expr(char *bf, dimdes *pd, long indx, int def_off)
+static char *_PD_col_major_expr(char *bf, dimdes *pd, inti indx, int def_off)
    {char tmp[MAXLINE];
-    long ix, m, stride;
+    inti ix, m, stride;
 
     if (pd == NULL)
-       sprintf(bf, "%ld", indx + def_off);
+       sprintf(bf, "%lld", (long long) (indx + def_off));
     else
        {bf[0] = '\0';
 
@@ -677,7 +680,7 @@ static char *_PD_col_major_expr(char *bf, dimdes *pd, long indx, int def_off)
            {stride = pd->number;
             m  = indx - (indx/stride)*stride;
             ix = m + pd->index_min;
-            snprintf(tmp, MAXLINE, "%ld,", ix);
+            snprintf(tmp, MAXLINE, "%lld,", (long long) ix);
             strcat(bf, tmp);
 
             indx = (indx - m)/stride;
