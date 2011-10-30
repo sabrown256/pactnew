@@ -24,7 +24,7 @@ set io  = sxhash.res.tmp
 
       source ../../../scripts/test-run
 
-      if ($xstatus == 0) then
+      if (($xstatus == 0) && ("$Valgrind" == "")) then
          cat sxhash.res.tmp          | \
          sed -e '/diskaddr =/d'        \
              -e '/size =/d'            \

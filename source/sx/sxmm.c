@@ -327,6 +327,8 @@ void _SX_rel_open_file(SS_psides *si, g_file *po)
        SS_error(si, "CAN'T PROPERLY CLOSE FILE - _SX_REL_OPEN_FILE", 
 		  po->file_object);
 
+    po->file = NULL;
+
     _SX_rl_file(po);
 
     return;}

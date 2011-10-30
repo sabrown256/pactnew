@@ -23,7 +23,7 @@ set io  = sxpdb.res
 
    source ../../../scripts/test-run
 
-   if ($xstatus == 0) then
+   if (($xstatus == 0) && ("$Valgrind" == "")) then
       flog $Log (diff sxpdb.res $FilesDir/ref/sxpdb > sxpdb.res.diff)
       set xstatus = $status
    endif

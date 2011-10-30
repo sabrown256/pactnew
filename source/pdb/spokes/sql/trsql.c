@@ -57,8 +57,13 @@ static int _SQL_close(PDBfile *file)
 
 #ifdef HAVE_SQLITE
     if (fp != NULL)
-       lio_close(fp);
+       {lio_close(fp);
+	fp = NULL;};
 #endif
+
+    if (fp == NULL)
+       {file->stream      = NULL;
+	file->udl->stream = NULL;};
 
 /* free the space */
     _PD_rl_pdb(file);

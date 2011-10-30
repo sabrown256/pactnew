@@ -25,7 +25,7 @@ if (($HAVE_SQLITE == yes) && ($?IBM_BGP == 0)) then
 
    source ../../../scripts/test-run
 
-   if ($xstatus == 0) then
+   if (($xstatus == 0) && ("$Valgrind" == "")) then
       set Ref = $FilesDir/ref/sxsqlite
       if (-f $Ref) then
          flog $Log diff sxsqlite.res $Ref
