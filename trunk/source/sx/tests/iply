@@ -12,6 +12,7 @@ source ../../tests/common
 
 set msg = "SX PML Polygon Test .......... "
 set exe = $BinDir/sx
+set rpf = none
 
    NoteD $Log ""
    NoteD $Log "                    $msg"

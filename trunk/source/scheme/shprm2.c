@@ -19,6 +19,7 @@ typedef object *(*PFBINOBJ)(SS_psides *si, object *argl);
      _num  = SS_car(si, _arg);                                               \
      _arg  = SS_cdr(si, _arg);                                               \
      _ityp = SC_arrtype(_num, -1);                                           \
+     _typ  = SC_INT_I;                                                       \
      if (_ityp == SC_INT_I)                                                  \
         _oper = SS_INTEGER_VALUE(_num);                                      \
      else if (_ityp == SC_FLOAT_I)                                           \

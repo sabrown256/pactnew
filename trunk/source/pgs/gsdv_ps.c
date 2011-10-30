@@ -71,22 +71,23 @@ static void _PG_PS_release_current_device(PG_device *dev)
 /* _PG_PS_QUERY - query some PostScript device characteristics */
 
 static void _PG_PS_query(PG_device *dev, int *pdx, int *pdy, int *pnc)
-   {int dx, dy, nc;
+   {int nc;
+    int dx[PG_SPACEDM];
 
     if (dev->ps_color)
        nc = 256;
     else
        nc = 2;
 
-    dx = (int) (8.5*_PG_gattrs.ps_dots_inch);
-    dy = (int) (11.0*_PG_gattrs.ps_dots_inch);
+    dx[0] = (int) (8.5*_PG_gattrs.ps_dots_inch);
+    dx[1] = (int) (11.0*_PG_gattrs.ps_dots_inch);
 
-    dev->g.phys_width  = dx;
-    dev->g.phys_height = dy;
+    dev->g.phys_width  = dx[0];
+    dev->g.phys_height = dx[1];
     dev->phys_n_colors = nc;
 
-    *pdx = dx;
-    *pdy = dy;
+    *pdx = dx[0];
+    *pdy = dx[1];
     *pnc = nc;
 
     return;}
@@ -98,9 +99,9 @@ static void _PG_PS_query(PG_device *dev, int *pdx, int *pdy, int *pnc)
  
 static PG_device *_PG_PS_open(PG_device *dev,
 			      double xf, double yf, double dxf, double dyf)
-   {int w, h;
-    int display_width, display_height, n_colors, mode;
+   {int n_colors, mode;
     int Lightest, Light, Light_Gray, Dark_Gray, Dark, Darkest;
+    int xscr[PG_SPACEDM], xdsp[PG_SPACEDM];
     char ltype[MAXLINE], fname[MAXLINE], lname[MAXLINE];
     char *name, *token, *type, *modes, *date, *s;
     double intensity, scale, dpis;
@@ -184,50 +185,50 @@ static PG_device *_PG_PS_open(PG_device *dev,
     switch (mode)
        {default :
 	case PORTRAIT_MODE :
-	     _PG_PS_query(dev, &display_width, &display_height, &n_colors);
+	     _PG_PS_query(dev, &xdsp[0], &xdsp[1], &n_colors);
 
-	     w = display_width*dxf;
-	     h = display_width*dyf;
+	     xscr[0] = xdsp[0]*dxf;
+	     xscr[1] = xdsp[0]*dyf;
 
-	     g->cpc[0] = dpis*SHRT_MIN + display_width;
-	     g->cpc[1] = dpis*SHRT_MAX - display_width;
-	     g->cpc[2] = dpis*SHRT_MIN + display_height;
-       	     g->cpc[3] = dpis*SHRT_MAX - display_height;
+	     g->cpc[0] = dpis*SHRT_MIN + xdsp[0];
+	     g->cpc[1] = dpis*SHRT_MAX - xdsp[0];
+	     g->cpc[2] = dpis*SHRT_MIN + xdsp[1];
+       	     g->cpc[3] = dpis*SHRT_MAX - xdsp[1];
 	     g->cpc[4] = dpis*SHRT_MIN;
 	     g->cpc[5] = dpis*SHRT_MAX;
  
-	     g->hwin[0] = display_width*xf;
-	     g->hwin[1] = g->hwin[0] + w;
-	     g->hwin[2] = display_height*(1.0 - yf);
-	     g->hwin[3] = g->hwin[2] + h;
+	     g->hwin[0] = xdsp[0]*xf;
+	     g->hwin[1] = g->hwin[0] + xscr[0];
+	     g->hwin[2] = xdsp[1]*(1.0 - yf);
+	     g->hwin[3] = g->hwin[2] + xscr[1];
 
 	     SET_PC_FROM_HWIN(g);
 
 	     dev->window_x[0] = g->hwin[0];
-	     dev->window_x[2] = g->hwin[2] - h;
+	     dev->window_x[2] = g->hwin[2] - xscr[1];
 
 	     break;
 
 	case LANDSCAPE_MODE :
-	     _PG_PS_query(dev, &display_height, &display_width, &n_colors);
+	     _PG_PS_query(dev, &xdsp[1], &xdsp[0], &n_colors);
 
-	     w = display_width*dxf;
-	     h = display_width*dyf;
+	     xscr[0] = xdsp[0]*dxf;
+	     xscr[1] = xdsp[0]*dyf;
 
-	     g->cpc[0] = dpis*SHRT_MIN + display_width;
-	     g->cpc[1] = dpis*SHRT_MAX - display_width;
-	     g->cpc[2] = dpis*SHRT_MIN + display_height;
-       	     g->cpc[3] = dpis*SHRT_MAX - display_height;
+	     g->cpc[0] = dpis*SHRT_MIN + xdsp[0];
+	     g->cpc[1] = dpis*SHRT_MAX - xdsp[0];
+	     g->cpc[2] = dpis*SHRT_MIN + xdsp[1];
+       	     g->cpc[3] = dpis*SHRT_MAX - xdsp[1];
  
-	     g->hwin[0] = display_width*xf;
-	     g->hwin[1] = g->hwin[0] + w;
-	     g->hwin[2] = display_height*(1.0 - yf);
-	     g->hwin[3] = g->hwin[2] + h;
+	     g->hwin[0] = xdsp[0]*xf;
+	     g->hwin[1] = g->hwin[0] + xscr[0];
+	     g->hwin[2] = xdsp[1]*(1.0 - yf);
+	     g->hwin[3] = g->hwin[2] + xscr[1];
 
 	     SET_PC_FROM_HWIN(g);
 
 	     dev->window_x[0] = g->hwin[0];
-	     dev->window_x[2] = g->hwin[2] - h;
+	     dev->window_x[2] = g->hwin[2] - xscr[1];
  
 	     break;};
 
@@ -676,8 +677,9 @@ static void _PG_PS_expose_device(PG_device *dev)
 /* _PG_PS_WRITE_TEXT - write out text to the appropriate device */
  
 static void _PG_PS_write_text(PG_device *dev, FILE *fp, char *s)
-   {int nlrp, fl, h, w;
-    double x, y;
+   {int nlrp, fl;
+    int xd[PG_SPACEDM];
+    double x[PG_SPACEDM];
     char *t;
     FILE *file;
     PG_dev_geometry *g;
@@ -701,42 +703,42 @@ static void _PG_PS_write_text(PG_device *dev, FILE *fp, char *s)
  
     file = dev->file;
 
-    x = dev->char_path[0];
-    y = dev->char_path[1];
-    fl = !(PM_CLOSETO_ABS(x, 1.0) && PM_CLOSETO_ABS(y, 0.0));
+    x[0] = dev->char_path[0];
+    x[1] = dev->char_path[1];
+    fl   = !(PM_CLOSETO_ABS(x[0], 1.0) && PM_CLOSETO_ABS(x[1], 0.0));
 
 /* if the char path is not oriented along the x axis do the rotation
  * and translation of the coordinate system
  */
-    if (fl)
-       {int ix, iy;
-	double an, r, ca, sa, dx, dy;
-	double x0[PG_SPACEDM];
+    if (fl == TRUE)
+       {int ix[PG_SPACEDM];
+	double an, r, ca, sa;
+	double x0[PG_SPACEDM], dx[PG_SPACEDM];
 
-	an = RAD_DEG*PM_atan(x, y);
-        r  = sqrt(x*x + y*y) + SMALL;
-	ca = x/r;
-	sa = y/r;
+	an = RAD_DEG*PM_atan(x[0], x[1]);
+        r  = sqrt(x[0]*x[0] + x[1]*x[1]) + SMALL;
+	ca = x[0]/r;
+	sa = x[1]/r;
 
 /* compute the displacement induced by the rotation about the origin */
 	x0[0] = dev->tcur[0]*g->w_nd[1];
         x0[1] = dev->tcur[1]*g->w_nd[3];
 
-        dx = (1.0 - ca)*x0[0] + sa*x0[1];
-        dy = -sa*x0[0] + (1.0 - ca)*x0[1];
+        dx[0] = (1.0 - ca)*x0[0] + sa*x0[1];
+        dx[1] = -sa*x0[0] + (1.0 - ca)*x0[1];
 
-	w = PG_window_width(dev);
-        h = PG_window_height(dev);
+	xd[0] = PG_window_width(dev);
+        xd[1] = PG_window_height(dev);
 
-	ix = floor(dx*w + 0.5);
-	iy = floor(dy*h + 0.5);
+	ix[0] = floor(dx[0]*xd[0] + 0.5);
+	ix[1] = floor(dx[1]*xd[1] + 0.5);
 
-        io_printf(file, "%7.2f %d %d RotTxt\n", an, ix, iy);};
+        io_printf(file, "%7.2f %d %d RotTxt\n", an, ix[0], ix[1]);};
 
     io_printf(file, "(%s) Tx\n", t);
 
 /* restore the original matrix */
-    if (fl)
+    if (fl == TRUE)
        io_printf(file, "grestore\n");
 
     if (nlrp > 0)

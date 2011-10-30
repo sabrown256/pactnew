@@ -59,6 +59,7 @@ int PG_setup_mpeg_device(PG_device *d)
  
 static void _PG_MP_finish_plot(PG_device *dev)
    {     
+
     PG_make_device_current(dev);
 
     save_image2file(dev);

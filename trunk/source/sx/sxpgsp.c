@@ -555,8 +555,11 @@ static object *_SXI_fply(SS_psides *si, object *argl)
 
 	PG_fill_polygon_n(dev, clr, TRUE, 2, WORLDC, n, r);
 
+/* GOTCHA: freed by PM_free_vectors called in PG_fill_polygon_n
 	CFREE(r[0]);
-	CFREE(r[1]);};
+	CFREE(r[1]);
+ */
+        };
 
     return(SS_f);}
 

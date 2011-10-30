@@ -476,7 +476,8 @@ int _PD_valid_dims(dimdes *dimscheck, dimdes *vardims)
  */
 
 dimdes *_PD_hyper_dims(PDBfile *file, char *name, dimdes *dims)
-   {inti n, start, stop, step;
+   {int nc;
+    inti n, start, stop, step;
     char s[MAXLINE];
     char *t;
     dimdes *ndims, *prev, *next, *dp;
@@ -485,7 +486,9 @@ dimdes *_PD_hyper_dims(PDBfile *file, char *name, dimdes *dims)
 
     strcpy(s, name);
     t = SC_lasttok(s, "[]()");
-    strcpy(s, t);
+    nc = strlen(t);
+    memmove(s, t, nc);
+    s[nc] = '\0';
 
     for (dp = dims; dp != NULL; dp = dims->next)
        {t = SC_firsttok(s, " ,()[]\n\r");
@@ -516,7 +519,7 @@ dimdes *_PD_hyper_dims(PDBfile *file, char *name, dimdes *dims)
  */
 
 char *_PD_expand_hyper_name(PDBfile *file, char *name)
-   {int err;
+   {int err, nc;
     inti ind[3];
     syment *ep;
     dimdes *dims, *pd;
@@ -544,7 +547,9 @@ char *_PD_expand_hyper_name(PDBfile *file, char *name)
 	return(CSTRSAVE(s));};
 
     t = SC_lasttok(s, "[]()");
-    strcpy(s, t);
+    nc = strlen(t);
+    memmove(s, t, nc);
+    s[nc] = '\0';
 
     err = FALSE;
     strcpy(index, "[");

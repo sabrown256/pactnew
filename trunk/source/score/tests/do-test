@@ -74,6 +74,9 @@ setenv SC_EXEC_CPU_FACTOR   1024
 setenv SC_EXEC_TIME_LIMIT     64
 setenv SC_EXEC_TIME_FACTOR    16
 
+# because of the extra layer of scripts we cannot valgrind this test
+setenv Valgrind
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 

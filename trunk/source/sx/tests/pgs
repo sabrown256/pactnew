@@ -21,7 +21,7 @@ set io  = sxpgs.res
 
    source ../../../scripts/test-run
 
-   if ($xstatus == 0) then
+   if (($xstatus == 0) && ("$Valgrind" == "")) then
       flog $Log $cfe $PSDIFF sxpgs.ps $FilesDir/ref/sxpgs.ps
       set xstatus = $status
    endif

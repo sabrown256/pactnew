@@ -25,7 +25,7 @@ set io  = sxxml.res
 
    source ../../../scripts/test-run
 
-   if ($xstatus == 0) then
+   if (($xstatus == 0) && ("$Valgrind" == "")) then
       set Ref = $FilesDir/ref/sxxml
       if (-f $Ref) then
          flog $Log diff sxxml.res $Ref

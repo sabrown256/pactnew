@@ -977,6 +977,8 @@ int SC_retrace_exe(char ***pout, int pid, int to)
    {int i, rv;
     char **t;
 
+    rv = FALSE;
+
     t = _SC_backtrace_exe(pid, to);
 
 /* print the strings if the caller does not want them returned */
@@ -988,10 +990,9 @@ int SC_retrace_exe(char ***pout, int pid, int to)
 
 /* otherwise return the strings */
 	else
-	   *pout = t;}
+	   *pout = t;
 
-    else
-       rv = -1;
+	 rv = TRUE;};
 
     return(rv);}
 
