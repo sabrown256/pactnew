@@ -601,6 +601,8 @@ static void _SX_read_pdb(SS_psides *si, PDBfile *fp, char *fname)
 		 SX_dataset[j].file_info = (void *) ppi;
 		 SX_dataset[j].file_type = SC_PDB;
 
+		 SC_mark(fp, 1);
+
 /* put this curve's data in a cache somewhere (let's us defer the question
  * about memory management) and also handle all curve sources the same way
  */
@@ -1469,13 +1471,16 @@ void SX_uncache_curve(SS_psides *si, curve *crv)
  */
 
 static int SX_file_open(FILE *fp)
-   {pcons *lst;
+   {int rv;
+    pcons *lst;
 
+    rv = FALSE;
     for (lst = _SX.file_list; lst != NULL; lst = (pcons *) (lst->cdr))
         if (fp == (FILE *) (lst->car))
-           return(TRUE);
+           {rv = TRUE;
+	    break;};
 
-    return(FALSE);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1485,7 +1490,10 @@ static int SX_file_open(FILE *fp)
  */
 
 static int SX_remove_file(FILE *fp)
-   {pcons *lst, *nxt;
+   {int rv;
+    pcons *lst, *nxt;
+
+    rv = FALSE;
 
 /* if the first file on the list is the one, take care of it */
     if (fp == (FILE *) (_SX.file_list->car))
@@ -1501,9 +1509,10 @@ static int SX_remove_file(FILE *fp)
         if (fp == (FILE *) (nxt->car))
            {lst->cdr = nxt->cdr;
             SC_rl_pcons(nxt, 0);
-            return(TRUE);};
+	    rv = TRUE;
+	    break;};
 
-    return(FALSE);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1530,10 +1539,10 @@ void SX_push_open_file(FILE *fp)
  */
 
 void SX_close_open_files(void)
-   {pdb_info *ppi;
+   {int i;
+    pdb_info *ppi;
     bin_info *pbi;
     FILE *fp;
-    int i;
 
     for (i = 0; i < SX_N_Curves; i++)
         {switch (SX_dataset[i].file_type)
@@ -1550,15 +1559,22 @@ void SX_close_open_files(void)
 	          {PDBfile *file;
                    FILE *fp;
 
-		   ppi = (pdb_info *) SX_dataset[i].file_info;
+		   ppi  = (pdb_info *) SX_dataset[i].file_info;
 		   file = ppi->file;
+/* printf("a> %d %p %p %d\n", i, ppi, file, SC_ref_count(file)); */
 		   if (file != NULL)
-		     {fp = file->stream;
-		      if (SX_file_open(fp))
-			 {SX_remove_file(fp);
-			  PD_close(file);
-			  if (file == _SX.cache_file)
-                             _SX.cache_file = NULL;};
+		      {fp = file->stream;
+		       if (SX_file_open(fp))
+		 	  {SX_remove_file(fp);
+			   if (SC_safe_to_free(file) == TRUE)
+			      PD_close(file);
+			   else
+			      SC_mark(file, -1);
+			   if (file == _SX.cache_file)
+                              _SX.cache_file = NULL;
+			   ppi->file = NULL;}
+		       else
+			  SC_mark(file, -1);
 
 		      CFREE(ppi->curve_name);
 		      CFREE(ppi);};};
