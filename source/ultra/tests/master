@@ -23,7 +23,7 @@ set io  = ultest.tmp
 
    source ../../../scripts/test-run
  
-   if ($xstatus == 0) then
+   if (($xstatus == 0) && ("$Valgrind" == "")) then
       flog $Log (grep -i "error" ultest.tmp >&! ultest.err)
       flog $Log /bin/ls -l ultest.err
       if (-z ultest.err) then

@@ -229,7 +229,7 @@ switch ($tgt)
                    exit(1)
                    breaksw
               default:
-                   set msg = ( $argv )
+                   set msg = ( "$argv" )
 		   break
                    breaksw
            endsw

@@ -15,6 +15,7 @@ foreach f (../scripts ../../scripts ../../../scripts)
    if (-f $f/env-csh) then
       pushd $f >>& /dev/null
       setenv TestScrDir $cwd
+      setenv RootDir $cwd:h
       popd >>& /dev/null
       break
    endif
@@ -32,21 +33,21 @@ if ($?Test == 1) then
    endif
 endif
 
-set VG   = `where valgrind | head -n 1`
+set VG = `where valgrind | head -n 1`
 if (-x "$VG") then
    set largs = ( $argv )
    while ($#largs > 0)
       switch ($largs[1])
          case -vg:
-              set TLog = test-vg
+              set TLog = ${TLog}-vg
               setenv Valgrind  "valgrind --tool=memcheck --track-origins=yes --gen-suppressions=all"
               breaksw
          case -vgd:
-              set TLog = test-vg
+              set TLog = ${TLog}-vgd
               setenv Valgrind  "valgrind --tool=memcheck --track-origins=yes --db-attach=yes"
               breaksw
          case -vgs:
-              set TLog = test-vgs
+              set TLog = ${TLog}-vgs
               setenv Valgrind  "valgrind --tool=memcheck --track-origins=yes"
               breaksw
       endsw
@@ -80,12 +81,12 @@ setenv OS  `uname`
 
 setenv ZeroSpace  "-z 2"
 
-   pushd .. >& /dev/null
-   while (!(-d dev) && !(-d manager))
-      cd .. >& /dev/null
-   end
-   setenv RootDir  $cwd
-   popd >& /dev/null
+#   pushd .. >& /dev/null
+#   while (!(-d dev) && !(-d manager))
+#      cd .. >& /dev/null
+#   end
+#   setenv RootDir  $cwd
+#   popd >& /dev/null
 
    setenv System    `$RootDir/scripts/cfgman use`
    setenv BuildDir  $RootDir/dev/$System
@@ -288,8 +289,8 @@ Note $Log "PYTHON     = |$PYTHON|"
 Note $Log "LPYTHON    = |$LPYTHON|"
 Note $Log "PYTHONPATH = |$PYTHONPATH|"
 
-flog $Log ../../../manager/pwhich pact
-flog $Log ../../../manager/pwhich cc
+flog $Log ( where pact | head -n 1 )
+flog $Log ( where cc   | head -n 1 )
 
 Separator $Log
 

@@ -384,6 +384,8 @@ static void _SX_read_bin(SS_psides *si, FILE *fp, char *fname)
         SX_dataset[j].file_info = (void *) pbi;
         SX_dataset[j].file_type = SC_BINARY;
 
+	SC_mark(pbi, 1);
+
         if (io_read((char *) SX_dataset[j].x[0], sizeof(double), n, fp) != n)
            {PRINT(stdout, "WARNING: INCOMPLETE CURVE %d IN BINARY FILE",
                           icurve + 1);
@@ -601,6 +603,7 @@ static void _SX_read_pdb(SS_psides *si, PDBfile *fp, char *fname)
 		 SX_dataset[j].file_info = (void *) ppi;
 		 SX_dataset[j].file_type = SC_PDB;
 
+		 SC_mark(ppi, 1);
 		 SC_mark(fp, 1);
 
 /* put this curve's data in a cache somewhere (let's us defer the question
@@ -1406,6 +1409,9 @@ static void _SX_cache_curve(SS_psides *si, curve *crv, SC_file_type type)
 	     crv->file_info = (void *) ppi;
 	     crv->file_type = SC_PDB;
 
+	     SC_mark(_SX.cache_file, 1);
+	     SC_mark(ppi, 1);
+
 	     _SX_wrt_pdb_curve(si, _SX.cache_file, crv, _SX.icc++);
 
         case SC_BINARY :
@@ -1436,7 +1442,7 @@ void SX_uncache_curve(SS_psides *si, curve *crv)
 
     switch (crv->file_type)
        {case SC_BINARY :
-	     pbi = (bin_info *) (crv->file_info);
+	     pbi    = (bin_info *) crv->file_info;
 	     stream = pbi->stream;
 	     io_seek(stream, pbi->fileaddr, SEEK_SET);
 	     n = crv->n;
@@ -1449,7 +1455,7 @@ void SX_uncache_curve(SS_psides *si, curve *crv)
 
         default  :
         case SC_PDB :
-	     ppi = (pdb_info *) (crv->file_info);
+	     ppi  = (pdb_info *) crv->file_info;
 	     file = ppi->file;
 	     if (SX_read_pdb_curve(file, (void *) NULL,
 				   ppi->curve_name, crv, X_AND_Y) == FALSE)
@@ -1548,10 +1554,11 @@ void SX_close_open_files(void)
         {switch (SX_dataset[i].file_type)
             {case SC_BINARY :
 	          pbi = (bin_info *) SX_dataset[i].file_info;
-		  fp = pbi->stream;
-		  if (SX_file_open(fp))
-		     {SX_remove_file(fp);
-		      io_close(fp);};
+		  if (SC_safe_to_free(ppi) == TRUE)
+		     {fp = pbi->stream;
+		      if (SX_file_open(fp))
+			 {SX_remove_file(fp);
+			  io_close(fp);};};
 		  CFREE(pbi);
 		  break;
 
@@ -1559,25 +1566,19 @@ void SX_close_open_files(void)
 	          {PDBfile *file;
                    FILE *fp;
 
-		   ppi  = (pdb_info *) SX_dataset[i].file_info;
-		   file = ppi->file;
-/* printf("a> %d %p %p %d\n", i, ppi, file, SC_ref_count(file)); */
-		   if (file != NULL)
-		      {fp = file->stream;
-		       if (SX_file_open(fp))
-		 	  {SX_remove_file(fp);
-			   if (SC_safe_to_free(file) == TRUE)
-			      PD_close(file);
-			   else
-			      SC_mark(file, -1);
+		   ppi = (pdb_info *) SX_dataset[i].file_info;
+		   if (SC_safe_to_free(ppi) == TRUE)
+		      {file = ppi->file;
+		       if (SC_safe_to_free(file) == TRUE)
+			  {fp = file->stream;
+			   if (SX_file_open(fp))
+			      SX_remove_file(fp);
+			   PD_close(file);
 			   if (file == _SX.cache_file)
-                              _SX.cache_file = NULL;
-			   ppi->file = NULL;}
-		       else
-			  SC_mark(file, -1);
-
-		      CFREE(ppi->curve_name);
-		      CFREE(ppi);};};
+			      _SX.cache_file = NULL;};
+		       CFREE(ppi->file);
+		       CFREE(ppi->curve_name);};
+		   CFREE(ppi);};
 
 		  break;
 

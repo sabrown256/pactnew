@@ -8,189 +8,93 @@
 # include "cpyright.h"
 #
 
-while ($#argv > 0)
-   switch ($1)
-      case -vg:
-           setenv Valgrind  "valgrind --tool=memcheck --gen-suppressions=all"
-           breaksw
-      case -vgd:
-           setenv Valgrind  "valgrind --tool=memcheck --db-attach=yes"
-           breaksw
-      case -vgs:
-           setenv Valgrind  "valgrind --tool=memcheck"
-           breaksw
-   endsw
-   shift
-end
+setenv Test abc
+source ../../../scripts/test-env
 
-if ($?Valgrind == 0) then
-   setenv Valgrind ""
-endif
+set PIncDir  = $IncDir
+set PBinDir  = $BinDir
 
 set Base     = $cwd
 set Base     = $Base:h
 set RootDir  = $Base/dev
 
-set PBase    = $Base:h
-set PBase    = $PBase:h
-set PRootDir = $PBase/dev
-
-set System   = `$PBase/scripts/cfgman use`
 set RootDir  = $RootDir/$System
 set BinDir   = $RootDir/bin
 set IncDir   = $RootDir/include
-set PIncDir  = $PRootDir/$System/include
-set PBinDir  = $PRootDir/$System/bin
-set TstDir   = z-$System
-set Log      = log.test
-set err      = 0
-set abcerr   = FALSE
-set FAIL     = "NO"
-set status   = 0
 
-set PACT = $PBinDir/pact
-
-source $PIncDir/env-csh
-source $PIncDir/env-pact.csh
-
-set CFE = ""
-if ($?CROSS_COMPILE) then
-   if ($CROSS_COMPILE == TRUE) then
-      set CFE = "$PBinDir/do-run"
-   endif
-endif
-set DPE = `which pact-dpe`
-if ("$DPE" != "") then
-   if (-e "$DPE[1]") then
-      source $DPE
-   endif
-endif
-
-if (!(-d $TstDir)) then
-   mkdir $TstDir
-endif
-
-cd $TstDir
-rm -f $Log
-touch $Log
-
-Note $Log `where pact | head -n 1`
-Note $Log `where cc | head -n 1`
-Note $Log "BinDir = $BinDir"
-
-set Tmp = $cwd/.tmp.$$
-if ("$Valgrind" != "") then
-   setenv Valgrind  "$Valgrind --suppressions=$PBase/score/tests/vg.suppress"
-   setenv Valgrind  "$Valgrind --suppressions=$PBase/pdb/vg.suppress"
-   setenv Valgrind  "$Valgrind --suppressions=$PBase/pgs/vg.suppress"
-endif
+cd z-$System
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+   set msg = "   S ... "
 
    cp ../tsrc1 .
-   Note $Log "Running source preprocessor S ... "
+   Note $Log "Running source preprocessor $msg"
 
-   if ("$Valgrind" == "") then
-      flog $Log $CFE $BinDir/s tsrc1
-      set xstatus = $status
-   else
-      ftee $Log $Valgrind $BinDir/s tsrc1     |& \
-      grep "ERROR SUMMARY:"                   |& \
-      awk '{ print $4 }'   >&! $Tmp
-      set xstatus = `cat $Tmp`
-      flog $Log $RM $Tmp
-   endif
+   set exe = $BinDir/s
+   set rpf = tsrc1
+   set opt = tsrc1
+   set io  = flog
 
-   flog $Log rm tsrc1
+   source ../../../../scripts/test-run
 
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $Log "                       S ..... OMITTED ($xstatus)"
-      set err    = $xstatus
-      set abcerr = TRUE
-   else if ($xstatus != 0) then
-      NoteD $Log "                       S ..... FAILED ($xstatus)"
-      set err = 2
-      if ("$Valgrind" == "") then
-         set abcerr = TRUE
-      endif
-   else
-      NoteD $Log "                       S ..... PASSED"
-   endif
+   $TEST_CHECK part -a abc_s -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" "$msg"
+
+   @ nerr = $nerr + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   if ($abcerr == FALSE) then
+   if ($nerr == 0) then
 
-      Note $Log "Running generator code A ... "
+      set msg = "   A ... "
 
-      if ("$Valgrind" == "") then
-         flog $Log $CFE $BinDir/a ../st.g
-         set xstatus = $status
-      else
-         ftee $Log $Valgrind $BinDir/a ../st.g    |& \
-         grep "ERROR SUMMARY:"                    |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         flog $Log $RM $Tmp
-      endif
+      Note $Log "Running generator code $msg"
 
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $Log "                       A ..... OMITTED ($xstatus)"
-         set err    = $xstatus
-         set abcerr = TRUE
-      else if ($xstatus != 0) then
-         NoteD $Log "                       A ..... FAILED ($xstatus)"
-         set err = 3
-         if ("$Valgrind" == "") then
-            set abcerr = TRUE
-         endif
-      else
-         NoteD $Log "                       A ..... PASSED"
-      endif
+      set exe = $BinDir/a
+      set rpf = none
+      set opt = ../st.g
+      set io  = flog
+
+      source ../../../../scripts/test-run
+
+      $TEST_CHECK part -a abc_a -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" "$msg"
+
+      @ nerr = $nerr + $status
+
    endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   if ($abcerr == FALSE) then
+   if ($nerr == 0) then
 
-      Note $Log "Running simulation code B ... "
-      if ("$Valgrind" == "") then
-         flog $Log $CFE $BinDir/b st.r00
-         set xstatus = $status
-      else
-         ftee $Log $Valgrind $BinDir/b st.r00    |& \
-         grep "ERROR SUMMARY:"                   |& \
-         awk '{ print $4 }'   >&! $Tmp
-         set xstatus = `cat $Tmp`
-         flog $Log $RM $Tmp
-      endif
+      set msg = "   B ... "
 
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $Log "                       B ..... OMITTED ($xstatus)"
-         set err    = $xstatus
-         set abcerr = TRUE
-      else if ($xstatus != 0) then
-         NoteD $Log "                       B ..... FAILED ($xstatus)"
-         set err    = 4
-         set abcerr = TRUE
-      else
-         NoteD $Log "                       B ..... PASSED"
-      endif
+      Note $Log "Running simulation code $msg"
+
+      set exe = $BinDir/b
+      set rpf = none
+      set opt = st.r00
+      set io  = flog
+
+      source ../../../../scripts/test-run
+
+      $TEST_CHECK part -a abc_b -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" "$msg"
+
+      @ nerr = $nerr + $status
+
    endif
-
-endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 flog $Log $RM $Tmp
 
-if ($err == 0) then
+if ($nerr == 0) then
    flog $Log rm st.* test.* tsrc1.*
 endif
 
-exit($err)
+exit($nerr)
 

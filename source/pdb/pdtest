@@ -10,7 +10,7 @@
 
 setenv Package pdb
 setenv Test    ""
-set vgdirs = ( score )
+set vgdirs = ( score pdb )
 source ../scripts/test-env
 
 set Tests = ""

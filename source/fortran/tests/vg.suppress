@@ -1,0 +1,9 @@
+{
+   mpi_init_f90_a
+   Memcheck:Cond
+   fun:intra_Allgather
+   fun:PMPI_Allgather
+   fun:create_2level_comm
+   fun:MPIR_Init
+   fun:mpi_init_
+}

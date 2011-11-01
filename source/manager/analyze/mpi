@@ -22,6 +22,7 @@ SafeEnv ParCommSupport  PARC
 SafeEnv MPIGoodIO       FALSE
 SafeEnv MPIAllStdin     FALSE
 SafeEnv HAVE_OPENMPI    FALSE
+SafeEnv HAVE_MPI_2      FALSE
 SafeEnv DP_Lib          ""
 SafeEnv DP_Inc          ""
 SafeEnv DP_Lib          ""
@@ -167,6 +168,44 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+# MPI II
+
+set vrs = ""
+
+if ("$lParComm" != no) then
+
+# test compile program with MPI 2 calls
+
+   cat << EOF >! $Tmp.c
+#include <stdio.h>
+#include <mpi.h>
+#define MAXLINE 255
+int main(int c, char **v)
+   {printf("%d.%d\n", MPI_VERSION, MPI_SUBVERSION);
+    return(0);}
+EOF
+
+   flog $ALog cat $Tmp.c
+
+   set opt = ""
+   set opt = ( $opt $CC_Flags $DP_Inc )
+   set opt = ( $opt $LD_Flags $lrpath )
+   set opt = ( $opt $lLib )
+   flog $ALog $Save_CC $Tmp.c -o $Tmp $opt
+   if ($status == 0) then
+      set vrs = ( `$PFE $Tmp` )
+      if ("$vrs" =~ 2.*) then
+         setenv HAVE_MPI_2 TRUE
+      endif
+   endif
+
+   flog $ALog rm -f $Tmp $Tmp.c
+
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 Note $ALog "lParComm    = |$lParComm|"
 Note $ALog "REQUEST_MPI = |$REQUEST_MPI|"
 
@@ -178,7 +217,11 @@ if (("$lParComm" == no) || ($REQUEST_MPI == FALSE)) then
    NoteD $ALog "      no MPI"
 
 else if (("$lParComm" != "") && ($REQUEST_MPI == TRUE)) then
-   NoteD $ALog "      has MPI"
+   if ($HAVE_MPI_2 == TRUE) then
+      NoteD $ALog "      has MPI 2 ($vrs)"
+   else
+      NoteD $ALog "      has MPI ($vrs)"
+   endif
    NoteD $ALog "         $DP_Lib"
    NoteD $ALog "         stdin $MPIStdIO"
    flog $ALog setenv MD_Pck   "DP $MD_Pck"
@@ -198,6 +241,7 @@ SetParent ParCommSupport
 SetParent MPIAllStdin
 SetParent MPIGoodIO
 SetParent HAVE_OPENMPI
+SetParent HAVE_MPI_2
 SetParent DP_Lib
 SetParent DP_Inc
 SetParent DP_Lib

@@ -590,7 +590,7 @@ static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype,
     inti niw, nb;
     char *in, *out, *bf;
     FILE *fp;
-    defstr *dpf, *dph;
+    defstr *dpf;
 
     fp  = file->stream;
     bpi = -1;
@@ -603,16 +603,21 @@ static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype,
        bpi = dpf->size;
 
     ipt = _PD_items_per_tuple(dpf);
-
     ni *= ipt;
        
+#if 1
+    cnv = _PD_requires_conversion(file, dpf, intype, outtype);
+    cnv |= (_PD_TEXT_OUT(file) == TRUE);
+#else
     if (dpf->convert == -1)
-       {dph = _PD_lookup_type(intype, file->host_chart);
+       {defstr *dph;
+        dph = _PD_lookup_type(intype, file->host_chart);
 	cnv = _PD_require_conv(dpf, dph);}
     else
        cnv = ((dpf->convert > 0) ||
 	      (_PD_TEXT_OUT(file) == TRUE) ||
 	      (strcmp(intype, outtype) != 0));
+#endif
 
     if (bpi == -1)
        PD_error("CAN'T GET NUMBER OF BYTES - _PD_WR_LEAF_MEMBERS", PD_WRITE);
@@ -1365,7 +1370,7 @@ static void _PD_rd_leaf_members(PDBfile *file, char *vr, inti ni,
     inti nir, nia, nb;
     intb bpi, nbt;
     char *bf, *in, *out;
-    defstr *dpf, *dph;
+    defstr *dpf;
     FILE *fp;
 
     bpi = -1;
@@ -1379,11 +1384,7 @@ static void _PD_rd_leaf_members(PDBfile *file, char *vr, inti ni,
     else
        bpi = dpf->size;
 
-    if (dpf->convert == -1)
-       {dph = _PD_lookup_type(outtype, file->host_chart);
-	cnv = _PD_require_conv(dpf, dph);}
-    else
-       cnv = ((dpf->convert > 0) || (strcmp(intype, outtype) != 0));
+    cnv = _PD_requires_conversion(file, dpf, outtype, intype);
 
     ni *= ipt;
 

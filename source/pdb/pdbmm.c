@@ -493,6 +493,7 @@ void _PD_rl_syment_d(syment *ep)
 
     if (ep != NULL)
        {_PD_rl_dimensions(PD_entry_dimensions(ep));
+	ep->dimensions = NULL;
 	_PD_rl_syment(ep);};
 
     return;}

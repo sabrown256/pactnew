@@ -12,6 +12,7 @@
 source ../../tests/common
 
 set msg = "DO-RUN Test .................... "
+set rpf = none
 
 set DORUN = do-run
 

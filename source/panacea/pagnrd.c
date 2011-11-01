@@ -844,9 +844,9 @@ int PA_function_form(char *t, PA_set_spec *spec)
  */
 
 PA_set_spec *_PA_proc_set_spec(char *s, PA_set_spec *lst)
-   {PA_set_spec *spec;
-    char t[MAXLINE], *token;
+   {char t[MAXLINE], *token;
     double vc;
+    PA_set_spec *spec;
 
     strcpy(t, s);
 
