@@ -776,13 +776,16 @@ char *SC_itoa(int n, int radix, int nc)
 
 int SC_query_file(char *name, char *mode, char *type)
    {int i, n, nt, c, ret;
+    int null_lines;
+    char bf[MAXLINE+1];
     FILE *fp;
 
     ret = SC_QUERY_MODE(name, mode);
     if (ret == TRUE)
        {if (type != NULL)
-           {char bf[MAXLINE];
-            int null_lines = 0;
+           {null_lines = 0;
+
+	    memset(bf, 0, MAXLINE+1);
 
 /* type may be const char * and will die when SC_str_lower
  * attempts to change values
@@ -792,6 +795,7 @@ int SC_query_file(char *name, char *mode, char *type)
             if (strcmp(bf, "ascii") == 0)
                {fp = io_open(name, "r");
 
+		n = 0;
                 for (nt = 0; nt < 2048; nt += n)
                     {if (io_gets(bf, MAXLINE, fp) == NULL)
                         break;

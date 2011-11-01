@@ -10,6 +10,7 @@
 
 setenv Package pya
 setenv Test    ""
+set vgdirs = ( . )
 source ../scripts/test-env
 
 set Tests = ""

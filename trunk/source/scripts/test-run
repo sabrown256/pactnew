@@ -1,5 +1,13 @@
 #
 # TEST-RUN - run the test
+#          - input variables (shell variables):
+#          -    exe      the name of the executable to be run
+#          -    opt      command line options for EXE
+#          -    io       the I/O mode for the run
+#          -    rpf      list of files to be removed on test passing
+#          - sets variables
+#          -    xstatus  the exit status of the executable
+#          -    dt       the run time in seconds
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942

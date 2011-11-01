@@ -628,11 +628,11 @@ static int _SX_diff_structs(SS_psides *si,
 
 static int _SX_rd_leaf_t(PDBfile *pf, syment *ep, char *vr, char *intype, 
 			 inti ni, intb bpi, char *outtype)
-   {int ipt, cnv, rv;
+   {int cnv, rv;
     inti i, n, nrd, nib;
     int64_t addr;
     char *buf, *vbuf, *svr;
-    defstr *dpf, *dph;
+    defstr *dpf;
     FILE *fp;
     PD_smp_state *pa;
 
@@ -654,13 +654,7 @@ static int _SX_rd_leaf_t(PDBfile *pf, syment *ep, char *vr, char *intype,
        _PD_entry_set_number(ep, 0, PD_entry_number(ep));
 
     dpf = _PD_lookup_type(outtype, pf->chart);
-    ipt = _PD_items_per_tuple(dpf);
-
-    if (dpf->convert == -1)
-       {dph = _PD_lookup_type(outtype, pf->host_chart);
-	cnv = _PD_require_conv(dpf, dph);}
-    else
-       cnv = ((dpf->convert > 0) || (strcmp(intype, outtype) != 0));
+    cnv = _PD_requires_conversion(pf, dpf, outtype, intype);
 
     if (cnv == TRUE)
        {buf = CMAKE_N(char, ni*bpi);

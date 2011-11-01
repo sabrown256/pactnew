@@ -74,407 +74,517 @@
    fun:_SC_bprintf
    fun:io_printf
 }
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
 {
-   linux-32-write-1
+   ha-elem-free8
+   Memcheck:Addr8
+   fun:_SC_free_ns
+   fun:_SC_free_ws
+   fun:_SC_free_haelem
+   fun:_SC_free_ha_elem
+   fun:SC_hasharr_foreach
+   fun:_SC_hasharr_free_elements
+   fun:SC_free_hasharr
+}
+{
+   ha-elem-free2
+   Memcheck:Addr2
+   fun:_SC_free_ns
+   fun:_SC_free_ws
+   fun:_SC_free_haelem
+   fun:_SC_free_ha_elem
+   fun:SC_hasharr_foreach
+   fun:_SC_hasharr_free_elements
+   fun:SC_free_hasharr
+}
+{
+   bflush-check-a
    Memcheck:Param
    write(buf)
    fun:__write_nocancel
-   fun:_IO_do_write@@GLIBC_2.1
-   fun:_IO_file_overflow@@GLIBC_2.1
+   fun:SC_write_sigsafe
+   fun:_SC_bfr_remove
+   fun:_SC_bio_free
+   fun:_SC_bio_flush
+   fun:_SC_bflush
 }
 
 {
-   gnu-32-printf-1
+   vdsnprinf-cond-a
    Memcheck:Cond
    fun:__printf_fp
    fun:vfprintf
+   fun:vsnprintf
+   fun:SC_vdsnprintf
 }
-
 {
-   gnu-32-printf-2
+   vdsnprinf-cond-b
    Memcheck:Cond
-   fun:__mpn_extract_double
+   fun:*
    fun:__printf_fp
    fun:vfprintf
+   fun:vsnprintf
+   fun:SC_vdsnprintf
 }
-
 {
-   gnu-32-printf-3
+   vdsnprinf-cond-c
    Memcheck:Cond
-   fun:_IO_file_overflow@@GLIBC_2.1
-   fun:__overflow
+   fun:*
+   fun:*
    fun:__printf_fp
    fun:vfprintf
+   fun:vsnprintf
+   fun:SC_vdsnprintf
 }
-
 {
-   gnu-32-printf-5
-   Memcheck:Value4
+   vdsnprinf-check-a
+   Memcheck:Value8
    fun:__printf_fp
    fun:vfprintf
+   fun:vsnprintf
+   fun:SC_vdsnprintf
 }
-
 {
-   gnu-32-printf-6
-   Memcheck:Value4
-   fun:__mpn_lshift
-   fun:vfprintf
-}
-
-{
-   gnu-32-printf-7
-   Memcheck:Value4
-   fun:__mpn_cmp
+   vdsnprinf-check-b
+   Memcheck:Value8
+   fun:*
    fun:__printf_fp
    fun:vfprintf
+   fun:vsnprintf
+   fun:SC_vdsnprintf
 }
-
 {
-   gnu-32-printf-8
-   Memcheck:Cond
-   fun:__mpn_cmp
+   vdsnprinf-check-c
+   Memcheck:Value8
+   fun:*
+   fun:*
    fun:__printf_fp
    fun:vfprintf
-}
-
-{
-   gnu-32-float-1
-   Memcheck:Value4
-   fun:__mpn_mul_1
-}
-
-{
-   gnu-32-float-2
-   Memcheck:Cond
-   fun:__mpn_mul_1
-}
-
-{
-   intel-32-mmap-sync-2
-   Memcheck:Param
-   msync(start)
-   obj:/lib/tls/libpthread-2.3.4.so
-}
-
-{
-   pathscale-32-1
-   Memcheck:Addr4
-   obj:*/pathscale-eko-compilers-2.5/Fedora/tar/pathscale-compilers-fedora1-2.5-95.13191/lib/2.5/32/libopenmp.so.1
-}
-
-{
-   pathscale-32-exit-1
-   Memcheck:Param
-   write(buf)
-   obj:/lib/tls/libc-2.3.4.so
-   fun:_IO_do_write@@GLIBC_2.1
-   fun:_IO_file_overflow@@GLIBC_2.1
-}
-
-{
-   pathscale-32-exit-2
-   Memcheck:Addr4
-   fun:_IO_cleanup
-   fun:exit
-   fun:timeout_graphics
-   obj:/lib/tls/libpthread-2.3.4.so
-   fun:sigwait
-   obj:*/pathscale-eko-compilers-2.5/Fedora/tar/pathscale-compilers-fedora1-2.5-95.13191/lib/2.5/32/libopenmp.so.1
-   obj:*
-}
-
-{
-   pathscale-32-fputs-1
-   Memcheck:Param
-   write(buf)
-   obj:/lib/tls/libc-2.3.4.so
-   fun:_IO_file_xsputn@@GLIBC_2.1
-   fun:fputs
-}
-
-{
-   pgi-32-mth-1
-   Memcheck:Cond
-   fun:__mth_i_kcmp
-   fun:malloc
-}
-
-{
-   pgi-32-mth-2
-   Memcheck:Cond
-   fun:__mth_i_kcmp
-   fun:_SC_prim_alloc
-}
-
-{
-   pgi-32-mmap-sync-1
-   Memcheck:Param
-   msync(start)
-   fun:__msync_nocancel
-   fun:_SC_mf_unmap
+   fun:vsnprintf
+   fun:SC_vdsnprintf
 }
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-{
-   linux-64-write-1
-   Memcheck:Param
-   write(buf)
-   fun:__write_nocancel
-}
+# LINUX suppressions
 
-{
-   linux-64-write-pathscale
-   Memcheck:Param
-   write(buf)
-   obj:/lib64/tls/libc-2.3.4.so
-   fun:_IO_file_write@@GLIBC_2.2.5
-   fun:_IO_do_write@@GLIBC_2.2.5
-}
+# {
+#    linux-32-write-1
+#    Memcheck:Param
+#    write(buf)
+#    fun:__write_nocancel
+#    fun:_IO_do_write@@GLIBC_2.1
+#    fun:_IO_file_overflow@@GLIBC_2.1
+# }
+# 
+# {
+#    linux-64-write-1
+#    Memcheck:Param
+#    write(buf)
+#    fun:__write_nocancel
+# }
+# 
 
-{
-   gnu-64-mpi-proc-1
-   Memcheck:Cond
-   fun:strlen
-   fun:_SC_mpi_proc_str
-   fun:SC_mpi_fputs
-}
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-{
-   gnu-64-mpi-proc-2
-   Memcheck:Cond
-   fun:strlen
-   fun:fputs
-   fun:SC_mpi_fputs
-}
+# GNU suppressions
 
-{
-   gnu-64-fprintf-1
-   Memcheck:Value8
-   fun:__printf_fp
-   fun:vfprintf
-}
+# {
+#    gnu-32-printf-1
+#    Memcheck:Cond
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-32-printf-2
+#    Memcheck:Cond
+#    fun:__mpn_extract_double
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-32-printf-3
+#    Memcheck:Cond
+#    fun:_IO_file_overflow@@GLIBC_2.1
+#    fun:__overflow
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-32-printf-5
+#    Memcheck:Value4
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-32-printf-6
+#    Memcheck:Value4
+#    fun:__mpn_lshift
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-32-printf-7
+#    Memcheck:Value4
+#    fun:__mpn_cmp
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-32-printf-8
+#    Memcheck:Cond
+#    fun:__mpn_cmp
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-32-float-1
+#    Memcheck:Value4
+#    fun:__mpn_mul_1
+# }
+# 
+# {
+#    gnu-32-float-2
+#    Memcheck:Cond
+#    fun:__mpn_mul_1
+# }
+# {
+#    gnu-64-mpi-proc-1
+#    Memcheck:Cond
+#    fun:strlen
+#    fun:_SC_mpi_proc_str
+#    fun:SC_mpi_fputs
+# }
+# 
+# {
+#    gnu-64-mpi-proc-2
+#    Memcheck:Cond
+#    fun:strlen
+#    fun:fputs
+#    fun:SC_mpi_fputs
+# }
+# 
+# {
+#    gnu-64-fprintf-1
+#    Memcheck:Value8
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-64-fprintf-2
+#    Memcheck:Value8
+#    fun:__mpn_lshift
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-64-fprintf-3
+#    Memcheck:Value8
+#    fun:__mpn_mul_1
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-64-fprintf-4
+#    Memcheck:Cond
+#    fun:__mpn_divrem
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-64-fprintf-5
+#    Memcheck:Value8
+#    fun:__mpn_divrem
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-64-fprintf-6
+#    Memcheck:Value8
+#    fun:__mpn_rshift
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-64-fprintf-7
+#    Memcheck:Value8
+#    fun:__mpn_mul
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-64-fprintf-8
+#    Memcheck:Cond
+#    fun:__mpn_rshift
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-64-fprintf-9
+#    Memcheck:Value8
+#    fun:__mpn_mul_1
+#    fun:__mpn_mul
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-64-fprintf-10
+#    Memcheck:Value8
+#    fun:memcpy
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-64-fprintf-11
+#    Memcheck:Cond
+#    fun:memcpy
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-64-fprintf-12
+#    Memcheck:Value8
+#    fun:__mpn_lshift
+#    obj:*
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-64-fprintf-13
+#    Memcheck:Cond
+#    fun:_IO_file_overflow@@GLIBC_2.2.5
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-64-fprintf-14
+#    Memcheck:Value8
+#    fun:__mpn_lshift
+#    obj:*
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-64-fprintf-15
+#    Memcheck:Value8
+#    fun:__mpn_cmp
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-64-fprintf-17
+#    Memcheck:Value8
+#    fun:hack_digit.12269
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-64-fprintf-18
+#    Memcheck:Value8
+#    fun:__mpn_mul_1
+#    fun:hack_digit.12269
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-64-fprintf-19
+#    Memcheck:Cond
+#    fun:hack_digit.12269
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-64-fprintf-20
+#    Memcheck:Value8
+#    fun:__mpn_divrem
+#    fun:hack_digit.12269
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-64-fprintf-21
+#    Memcheck:Cond
+#    fun:__mpn_divrem
+#    fun:hack_digit.12269
+#    fun:__printf_fp
+#    fun:vfprintf
+# }
+# 
+# {
+#    gnu-64-fprintf-22
+#    Memcheck:Cond
+#    fun:strlen
+#    fun:vfprintf
+#    fun:buffered_vfprintf
+#    fun:vfprintf
+# }
+# 
 
-{
-   gnu-64-fprintf-2
-   Memcheck:Value8
-   fun:__mpn_lshift
-   fun:__printf_fp
-   fun:vfprintf
-}
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-{
-   gnu-64-fprintf-3
-   Memcheck:Value8
-   fun:__mpn_mul_1
-   fun:__printf_fp
-   fun:vfprintf
-}
+# PGI suppressions
 
-{
-   gnu-64-fprintf-4
-   Memcheck:Cond
-   fun:__mpn_divrem
-   fun:__printf_fp
-   fun:vfprintf
-}
+# {
+#    pgi-32-mth-1
+#    Memcheck:Cond
+#    fun:__mth_i_kcmp
+#    fun:malloc
+# }
+# 
+# {
+#    pgi-32-mth-2
+#    Memcheck:Cond
+#    fun:__mth_i_kcmp
+#    fun:_SC_prim_alloc
+# }
+# 
+# {
+#    pgi-32-mmap-sync-1
+#    Memcheck:Param
+#    msync(start)
+#    fun:__msync_nocancel
+#    fun:_SC_mf_unmap
+# }
+# 
+# {
+#    pgi-64-mmap-sync-2
+#    Memcheck:Param
+#    msync(start)
+#    fun:__msync_nocancel
+#    fun:_SC_mf_flush
+# }
+# 
 
-{
-   gnu-64-fprintf-5
-   Memcheck:Value8
-   fun:__mpn_divrem
-   fun:__printf_fp
-   fun:vfprintf
-}
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-{
-   gnu-64-fprintf-6
-   Memcheck:Value8
-   fun:__mpn_rshift
-   fun:__printf_fp
-   fun:vfprintf
-}
+# INTEL suppressions
 
-{
-   gnu-64-fprintf-7
-   Memcheck:Value8
-   fun:__mpn_mul
-   fun:__printf_fp
-   fun:vfprintf
-}
+# {
+#    intel-32-mmap-sync-2
+#    Memcheck:Param
+#    msync(start)
+#    obj:/lib/tls/libpthread-2.3.4.so
+# }
+# 
 
-{
-   gnu-64-fprintf-8
-   Memcheck:Cond
-   fun:__mpn_rshift
-   fun:__printf_fp
-   fun:vfprintf
-}
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-{
-   gnu-64-fprintf-9
-   Memcheck:Value8
-   fun:__mpn_mul_1
-   fun:__mpn_mul
-   fun:__printf_fp
-   fun:vfprintf
-}
+# PATHSCALE suppressions
 
-{
-   gnu-64-fprintf-10
-   Memcheck:Value8
-   fun:memcpy
-   fun:__printf_fp
-   fun:vfprintf
-}
-
-{
-   gnu-64-fprintf-11
-   Memcheck:Cond
-   fun:memcpy
-   fun:__printf_fp
-   fun:vfprintf
-}
-
-{
-   gnu-64-fprintf-12
-   Memcheck:Value8
-   fun:__mpn_lshift
-   obj:*
-   fun:vfprintf
-}
-
-{
-   gnu-64-fprintf-13
-   Memcheck:Cond
-   fun:_IO_file_overflow@@GLIBC_2.2.5
-   fun:__printf_fp
-   fun:vfprintf
-}
-
-{
-   gnu-64-fprintf-14
-   Memcheck:Value8
-   fun:__mpn_lshift
-   obj:*
-   fun:vfprintf
-}
-
-{
-   gnu-64-fprintf-15
-   Memcheck:Value8
-   fun:__mpn_cmp
-   fun:__printf_fp
-   fun:vfprintf
-}
-
-{
-   gnu-64-fprintf-17
-   Memcheck:Value8
-   fun:hack_digit.12269
-   fun:__printf_fp
-   fun:vfprintf
-}
-
-{
-   gnu-64-fprintf-18
-   Memcheck:Value8
-   fun:__mpn_mul_1
-   fun:hack_digit.12269
-   fun:__printf_fp
-   fun:vfprintf
-}
-
-{
-   gnu-64-fprintf-19
-   Memcheck:Cond
-   fun:hack_digit.12269
-   fun:__printf_fp
-   fun:vfprintf
-}
-
-{
-   gnu-64-fprintf-20
-   Memcheck:Value8
-   fun:__mpn_divrem
-   fun:hack_digit.12269
-   fun:__printf_fp
-   fun:vfprintf
-}
-
-{
-   gnu-64-fprintf-21
-   Memcheck:Cond
-   fun:__mpn_divrem
-   fun:hack_digit.12269
-   fun:__printf_fp
-   fun:vfprintf
-}
-
-{
-   gnu-64-fprintf-22
-   Memcheck:Cond
-   fun:strlen
-   fun:vfprintf
-   fun:buffered_vfprintf
-   fun:vfprintf
-}
-
-{
-   pathscale-64-1
-   Memcheck:Addr4
-   obj:*/pathscale-eko-compilers-2.5/Fedora/tar/pathscale-compilers-fedora1-2.5-95.13191/lib/2.5/libopenmp.so.1
-   obj:*
-}
-
-{
-   pathscale-64-2
-   Memcheck:Addr8
-   obj:*/pathscale-eko-compilers-2.5/Fedora/tar/pathscale-compilers-fedora1-2.5-95.13191/lib/2.5/libopenmp.so.1
-}
-
-{
-   pathscale-64-3
-   Memcheck:Param
-   msync(start)
-   obj:/lib64/tls/libpthread-2.3.4.so
-}
-
-{
-   pathscale-64-4
-   Memcheck:Addr8
-   fun:_SC_free_guarded
-   fun:free
-   fun:__pmp_manager_fini
-}
-
-{
-   pathscale-64-5
-   Memcheck:Addr8
-   fun:_SC_free_guarded
-   fun:free
-   fun:__pmp_team_fini
-}
-
-{
-   pathscale-64-6
-   Memcheck:Param
-   timer_gettime(value)
-   fun:syscall
-   fun:__pmp_thread_create_main
-   obj:*
-}
-
-{
-   pgi-64-mmap-sync-2
-   Memcheck:Param
-   msync(start)
-   fun:__msync_nocancel
-   fun:_SC_mf_flush
-}
-
+# {
+#    pathscale-32-1
+#    Memcheck:Addr4
+#    obj:*/pathscale-eko-compilers-2.5/Fedora/tar/pathscale-compilers-fedora1-2.5-95.13191/lib/2.5/32/libopenmp.so.1
+# }
+# 
+# {
+#    pathscale-32-exit-1
+#    Memcheck:Param
+#    write(buf)
+#    obj:/lib/tls/libc-2.3.4.so
+#    fun:_IO_do_write@@GLIBC_2.1
+#    fun:_IO_file_overflow@@GLIBC_2.1
+# }
+# 
+# {
+#    pathscale-32-exit-2
+#    Memcheck:Addr4
+#    fun:_IO_cleanup
+#    fun:exit
+#    fun:timeout_graphics
+#    obj:/lib/tls/libpthread-2.3.4.so
+#    fun:sigwait
+#    obj:*/pathscale-eko-compilers-2.5/Fedora/tar/pathscale-compilers-fedora1-2.5-95.13191/lib/2.5/32/libopenmp.so.1
+#    obj:*
+# }
+# 
+# {
+#    pathscale-32-fputs-1
+#    Memcheck:Param
+#    write(buf)
+#    obj:/lib/tls/libc-2.3.4.so
+#    fun:_IO_file_xsputn@@GLIBC_2.1
+#    fun:fputs
+# }
+# 
+# {
+#    linux-64-write-pathscale
+#    Memcheck:Param
+#    write(buf)
+#    obj:/lib64/tls/libc-2.3.4.so
+#    fun:_IO_file_write@@GLIBC_2.2.5
+#    fun:_IO_do_write@@GLIBC_2.2.5
+# }
+# 
+# {
+#    pathscale-64-1
+#    Memcheck:Addr4
+#    obj:*/pathscale-eko-compilers-2.5/Fedora/tar/pathscale-compilers-fedora1-2.5-95.13191/lib/2.5/libopenmp.so.1
+#    obj:*
+# }
+# 
+# {
+#    pathscale-64-2
+#    Memcheck:Addr8
+#    obj:*/pathscale-eko-compilers-2.5/Fedora/tar/pathscale-compilers-fedora1-2.5-95.13191/lib/2.5/libopenmp.so.1
+# }
+# 
+# {
+#    pathscale-64-3
+#    Memcheck:Param
+#    msync(start)
+#    obj:/lib64/tls/libpthread-2.3.4.so
+# }
+# 
+# {
+#    pathscale-64-4
+#    Memcheck:Addr8
+#    fun:_SC_free_guarded
+#    fun:free
+#    fun:__pmp_manager_fini
+# }
+# 
+# {
+#    pathscale-64-5
+#    Memcheck:Addr8
+#    fun:_SC_free_guarded
+#    fun:free
+#    fun:__pmp_team_fini
+# }
+# 
+# {
+#    pathscale-64-6
+#    Memcheck:Param
+#    timer_gettime(value)
+#    fun:syscall
+#    fun:__pmp_thread_create_main
+#    obj:*
+# }
+# 

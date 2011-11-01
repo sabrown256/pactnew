@@ -785,24 +785,24 @@ static char *_H5_handle_compound(PDBfile *file, hid_t dtid)
              mnxt->dimensions  = dimensions;
 
              if (dimensions == NULL)
-                {mnxt->number = 1;}
+                mnxt->number = 1;
              else
-                {mnxt->number = _PD_comp_num(dimensions);};
+	        mnxt->number = _PD_comp_num(dimensions);
     
 /* a struct needs conversion if one of its members needs conversion */
              dpr = (defstr*) SC_hasharr_def_lookup(hst->pf->chart, type);
 
              if (dpr != NULL)
-                {convert = convert || dpr->convert;}
+                convert = convert || dpr->convert;
              else
-                {convert = FALSE;};
+                convert = FALSE;
 
 /* continue to link the memdes members as we loop over the entries */
              if ((i + 1) < nm)
                 {mnxt->next = CMAKE(memdes); 
                  mnxt = mnxt->next;}
              else
-                {mnxt = NULL;}; 
+                mnxt = NULL;
 
              free(mname);
              H5Tclose(idtid);

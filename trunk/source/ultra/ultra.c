@@ -596,14 +596,16 @@ object *UL_copy_curve(SS_psides *si, int j)
     SX_assign_next_id(si, i, UL_plot);
 
     SX_dataset[i].text      = CSTRSAVE(SX_dataset[j].text);
-    SX_dataset[i].wc[0]      = SX_dataset[j].wc[0];
-    SX_dataset[i].wc[1]      = SX_dataset[j].wc[1];
-    SX_dataset[i].wc[2]      = SX_dataset[j].wc[2];
-    SX_dataset[i].wc[3]      = SX_dataset[j].wc[3];
+    SX_dataset[i].wc[0]     = SX_dataset[j].wc[0];
+    SX_dataset[i].wc[1]     = SX_dataset[j].wc[1];
+    SX_dataset[i].wc[2]     = SX_dataset[j].wc[2];
+    SX_dataset[i].wc[3]     = SX_dataset[j].wc[3];
     SX_dataset[i].n         = SX_dataset[j].n;
     SX_dataset[i].file_info = SX_dataset[j].file_info;
     SX_dataset[i].file_type = SX_dataset[j].file_type;
     SX_dataset[i].modified  = FALSE;
+
+    SC_mark(SX_dataset[i].file_info, 1);
 
     if (SX_dataset[j].file != NULL)
        SX_dataset[i].file = CSTRSAVE(SX_dataset[j].file);
@@ -766,6 +768,8 @@ object *UL_xindex_curve(SS_psides *si, int j)
     SX_dataset[i].file_info = SX_dataset[j].file_info;
     SX_dataset[i].file_type = SX_dataset[j].file_type;
     SX_dataset[i].modified  = FALSE;
+
+    SC_mark(SX_dataset[i].file_info, 1);
 
     if (SX_dataset[j].file != NULL)
        SX_dataset[i].file = CSTRSAVE(SX_dataset[j].file);

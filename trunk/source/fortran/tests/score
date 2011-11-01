@@ -36,9 +36,11 @@ Note $Log ""
 
    source ../../../scripts/test-run
 
-   diff sclsts.res $RefDir/sclsts > sclsts.res.diff
-
-   set rpf = ( $rpf sclsts.res sclsts.res.diff )
+   if ("$Valgrind" == "") then
+      diff sclsts.res $RefDir/sclsts > sclsts.res.diff
+      set rpf = ( $rpf sclsts.res.diff )
+   endif
+   set rpf = ( $rpf sclsts.res )
 
    $TEST_CHECK part -a score_lex -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 

@@ -262,7 +262,6 @@ syment *_SX_rd_data(SS_psides *si, PDBfile *file, char *name, syment *ep,
     type = PD_entry_type(cp);
 
     if (!_PD_indirection(type))
-
        {if (!_PD_prim_typep(type, file->host_chart, PD_READ))
 	   SS_error(si, "MUST BE PRIMITIVE TYPE - _SX_RD_DATA", name_obj);
 
@@ -287,7 +286,6 @@ syment *_SX_rd_data(SS_psides *si, PDBfile *file, char *name, syment *ep,
 		    cp->type = CSTRSAVE(odp->type);};};};}
 
     else
-
        {dtype = PD_dereference(CSTRSAVE(type));
 
 	if (!_PD_prim_typep(dtype, file->host_chart, PD_READ))

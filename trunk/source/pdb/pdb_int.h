@@ -371,7 +371,9 @@ extern int
  _PD_pack_bits(char *out, char *in, int ityp, intb nbits,
 	       intb padsz, int fpp, inti ni, intb offs),
  _PD_prim_typep(char *memb, hasharr *chrt, PD_major_op error),
- _PD_require_conv(defstr *dpf, defstr *dph);
+ _PD_require_conv(defstr *dpf, defstr *dph),
+ _PD_requires_conversion(PDBfile *file, defstr *dpf,
+			 char *outtype, char *intype);
 
 extern long
  _PD_convert_ptr_rd(char *bfi, intb fbpi, PD_byte_order ford,

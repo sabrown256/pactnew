@@ -713,6 +713,29 @@ int _PD_require_conv(defstr *dpf, defstr *dph)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PD_REQUIRES_CONVERSION - return TRUE iff defstr DPF of type
+ *                         - OUTTYPE requires conversion from INTYPE
+ */
+
+int _PD_requires_conversion(PDBfile *file, defstr *dpf,
+			    char *outtype, char *intype)
+   {int cnv;
+    defstr *dph;
+
+    if (dpf == NULL)
+       dpf = _PD_lookup_type(intype, file->chart);
+
+    if (dpf->convert == -1)
+       {dph = _PD_lookup_type(outtype, file->host_chart);
+	cnv = _PD_require_conv(dpf, dph);}
+    else
+       cnv = ((dpf->convert > 0) || (strcmp(intype, outtype) != 0));
+
+    return(cnv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PD_REORDER - given a pointer to an array ARR with NI items of BPI each
  *             - put them in the order defined by ORD
  */
