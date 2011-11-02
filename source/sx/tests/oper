@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "SX OPER Test ................. "
+set msg = "SX OPER Test ................."
 set exe = $BinDir/sx
 set opt = ( -p -e -q $ZeroSpace -l $FilesDir/sxoper.scm )
 set io  = sxoper.res

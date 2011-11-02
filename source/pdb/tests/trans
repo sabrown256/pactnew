@@ -12,7 +12,7 @@ source ../../tests/common
 
 InitLog Log $TestDir/log.trans.$LogSfx
 
-set msg = "PDB Translation Test ............... "
+set msg = "PDB Translation Test ..............."
 set exe = $BinDir/pdctrns
 
 NoteD $Log ""

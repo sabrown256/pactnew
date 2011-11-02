@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PCO Test ....................... "
+set msg = "PCO Test ......................."
 
 while ($#argv > 0)
    switch ($1)

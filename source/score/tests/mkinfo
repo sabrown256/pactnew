@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "SCORE Make Info Test .......... "
+set msg = "SCORE Make Info Test .........."
 
 set ok = TRUE
 if ($ok == TRUE) then

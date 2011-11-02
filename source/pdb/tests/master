@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PDB Master Test .................... "
+set msg = "PDB Master Test ...................."
 set exe = $BinDir/pdbtst
 set opt = ( -v $tst )
 set io  = ftee

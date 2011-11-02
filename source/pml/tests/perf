@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PML Performance Test ... "
+set msg = "PML Performance Test ..."
 set exe = $BinDir/mlpfts
 set opt = ""
 set io  = flog

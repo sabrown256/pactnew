@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "SCHEME Shell Test ............ "
+set msg = "SCHEME Shell Test ............"
 set exe = $BinDir/scheme
 
    if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
@@ -18,7 +18,7 @@ set exe = $BinDir/scheme
       NoteD $Log "                    $msg"
 
 # env test
-      NoteD $Log -n "                       env ....................... "
+      NoteD $Log -n "                       env ......................."
 
       set t0 = `$TIMER -r`
 
@@ -43,7 +43,7 @@ set exe = $BinDir/scheme
       @ nerr = $nerr + $status
 
 # argv test
-      NoteD $Log -n "                       argv ...................... "
+      NoteD $Log -n "                       argv ......................"
 
       set t0 = `$TIMER -r`
 

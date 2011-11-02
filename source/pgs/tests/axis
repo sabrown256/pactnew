@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PGS Axis Test .......... "
+set msg = "PGS Axis Test .........."
 set exe = $BinDir/gslaxt
 
 set Replace = FALSE

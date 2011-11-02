@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PDBView Master Test .......... "
+set msg = "PDBView Master Test .........."
 set exe = $BinDir/sx
 set opt = ( -p -e -q $ZeroSpace -l $FilesDir/pdbvtest.scm )
 set io  = pdbvtest.tmp

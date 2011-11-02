@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PML Eigen Test ......... "
+set msg = "PML Eigen Test ........."
 set exe = $BinDir/mlevts
 set opt = ""
 set io  = flog

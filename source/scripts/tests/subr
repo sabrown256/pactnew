@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "SUBROUTINE Test ................ "
+set msg = "SUBROUTINE Test ................"
 
 while ($#argv > 0)
    switch ($1)

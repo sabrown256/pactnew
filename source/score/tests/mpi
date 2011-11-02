@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "SCORE MPI Test ................ "
+set msg = "SCORE MPI Test ................"
 set exe = $BinDir/sctty
 
 if ($HAVE_READLINE == TRUE) then

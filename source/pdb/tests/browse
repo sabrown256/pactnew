@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PDB Browse Test .................... "
+set msg = "PDB Browse Test ...................."
 set exe = $BinDir/pdlsts
 set opt = ( pdatst.db )
 set io  = pdatst.lst

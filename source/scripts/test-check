@@ -259,128 +259,68 @@ switch ($tgt)
         if ($tgt == fin) then
             NoteD $log ""
             NoteD $log " --------------------------------------------------------"
-        endif
 
 # determine and print the message
+        else if (("$msg" != "none") && ("$msg" != "")) then
+           NoteD $log -n "                    $msg"
+        endif
 
-# no message case
-        if ("$msg" == "none") then
+	if ("$msg" != "") then
            switch ($xstatus)
 # no resources
               case 255:
 # batch controller failed
               case 254:
                    if ($mode == major) then
-                      NoteD $log "OMITTED ($xstatus/$dt)"
+                      NoteD $log " OMITTED ($xstatus/$dt)"
                    else
-                      NoteD $log "omitted ($xstatus/$dt)"
+                      NoteD $log " omitted ($xstatus/$dt)"
                    endif
                    breaksw
 # crashed
               case 253:
                    if ($mode == major) then
-                      NoteD $log "CRASHED ($xstatus/$dt)"
+                      NoteD $log " CRASHED ($xstatus/$dt)"
                    else
-                      NoteD $log "crashed ($xstatus/$dt)"
+                      NoteD $log " crashed ($xstatus/$dt)"
                    endif
                    breaksw
 # results differed
               case 252:
                    if ($mode == major) then
-                      NoteD $log "DIFFERED ($dt)"
+                      NoteD $log " DIFFERED ($dt)"
                    else
-                      NoteD $log "differed ($dt)"
+                      NoteD $log " differed ($dt)"
                    endif
                    breaksw
 # timeout
               case 251:
                    if ($mode == major) then
-                      NoteD $log "TIMEOUT ($dt)"
+                      NoteD $log " TIMEOUT ($dt)"
                    else
-                      NoteD $log "to ($dt)"
+                      NoteD $log " to ($dt)"
                    endif
                    breaksw
 # leaked
               case 250:
                    if ($mode == major) then
-                      NoteD $log "LEAKED ($dt)"
+                      NoteD $log " LEAKED ($dt)"
                    else
-                      NoteD $log "leaked ($dt)"
+                      NoteD $log " leaked ($dt)"
                    endif
                    breaksw
               case 0:
                    if ($mode == major) then
-                      NoteD $log "PASSED ($dt)"
+                      NoteD $log " PASSED ($dt)"
                    else
-                      NoteD $log "ok ($dt)"
+                      NoteD $log " ok ($dt)"
                    endif
                    breaksw
               default:
                    if ($mode == major) then
-                      NoteD $log "FAILED ($xstatus/$dt)"
+                      NoteD $log " FAILED ($xstatus/$dt)"
                    else
-                      NoteD $log "ng ($xstatus/$dt)"
-                   endif
-                   breaksw
-           endsw
-
-# specified message case
-        else if ("$msg" != "") then
-           switch ($xstatus)
-# no resources
-              case 255:
-# batch controller failed
-              case 254:
-                   if ($mode == major) then
-                      NoteD $log "                    $msg OMITTED ($xstatus/$dt)"
-                   else
-                      NoteD $log "                    $msg omitted ($xstatus/$dt)"
-                   endif
-                   breaksw
-# crashed
-              case 253:
-                   if ($mode == major) then
-                      NoteD $log "                    $msg CRASHED ($xstatus/$dt)"
-                   else
-                      NoteD $log "                    $msg crashed ($xstatus/$dt)"
-                   endif
-                   breaksw
-# results differed
-              case 252:
-                   if ($mode == major) then
-                      NoteD $log "                    $msg DIFFERED ($dt)"
-                   else
-                      NoteD $log "                    $msg differed ($dt)"
-                   endif
-                   breaksw
-# timeout
-              case 251:
-                   if ($mode == major) then
-                      NoteD $log "                    $msg TIMEOUT ($dt)"
-                   else
-                      NoteD $log "                    $msg to ($dt)"
-                   endif
-                   breaksw
-# leaked
-              case 250:
-                   if ($mode == major) then
-                      NoteD $log "LEAKED ($dt)"
-                   else
-                      NoteD $log "leaked ($dt)"
-                   endif
-                   breaksw
-              case 0:
-                   if ($mode == major) then
-                      NoteD $log "                    $msg PASSED ($dt)"
-                   else
-                      NoteD $log "                    $msg ok ($dt)"
-                   endif
-                   breaksw
-              default:
-                   if ($mode == major) then
-                      NoteD $log "                    $msg FAILED ($xstatus/$dt)"
-                   else
-                      NoteD $log "                    $msg ng ($xstatus/$dt)"
+                      NoteD $log " ng ($xstatus/$dt)"
                    endif
                    breaksw
            endsw

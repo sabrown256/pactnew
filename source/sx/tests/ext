@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "SX Extension Test ............ "
+set msg = "SX Extension Test ............"
 set exe = $BinDir/sx
 
 NoteD $Log ""

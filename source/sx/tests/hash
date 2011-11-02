@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "SX HASH Test ................. "
+set msg = "SX HASH Test ................."
 set exe = $BinDir/sx
 set opt = ( -e -r -s $ZeroSpace -l $FilesDir/sxhash.scm )
 set io  = sxhash.res.tmp

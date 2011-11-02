@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PDBView Example Test ......... "
+set msg = "PDBView Example Test ........."
 set exe = $BinDir/sx
 set opt = ( -p -e -q $ZeroSpace -l $SrcDir/applications/pdbvbatch.scm )
 set io  = pdbvbatch.res

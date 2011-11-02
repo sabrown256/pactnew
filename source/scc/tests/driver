@@ -20,7 +20,7 @@ if ($CROSS_COMPILE == FALSE) then
 
    Separator $Log
    Note $Log ""
-   NoteD $Log -n "                    $fill "
+   NoteD $Log -n "                    $fill"
    Note $Log ""
 
    set t0 = `$TIMER -r`

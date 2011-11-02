@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "SCORE MM Performance Test ..... "
+set msg = "SCORE MM Performance Test ....."
 set exe = $BinDir/scmpft
 set opt = ( -m 1 )
 set io  = ftee

@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "ELIDE Test ..................... "
+set msg = "ELIDE Test ....................."
 
 while ($#argv > 0)
    switch ($1)

@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PPC Background Test ............ "
+set msg = "PPC Background Test ............"
 
 set PCFGBG = $SrcDir/tests/pcfgbg
 
@@ -32,7 +32,7 @@ Note $Log ""
       if (($ok == TRUE) && ($?CROSS_COMPILE == 0) && (-x "$TCSH")) then
 
 # do foreground part
-         NoteD $Log "                       foreground .......... "
+         NoteD $Log "                       foreground .........."
          Note $Log "( $CFE tcsh -f $PCFGBG -fg ) >&! res.fg"
          $CFE tcsh -f $PCFGBG -fg >&! res.fg
          set xstatus = $status
@@ -45,7 +45,7 @@ Note $Log ""
          @ nerr = $nerr + $status
 
 # do background part
-         NoteD $Log "                       background .......... "
+         NoteD $Log "                       background .........."
          Note $Log "( $CFE tcsh -f $PCFGBG -bg & ) >&! res.bg"
          ( $CFE tcsh -f $PCFGBG -bg & ) >&! res.bg
          set xstatus = $status

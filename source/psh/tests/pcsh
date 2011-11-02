@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PCSH Test ...................... "
+set msg = "PCSH Test ......................"
 
 set PCSH = pcsh
 

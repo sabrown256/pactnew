@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "SCORE Override Test ........... "
+set msg = "SCORE Override Test ..........."
 set exe = $BinDir/scmots
 set opt = ""
 set io  = ftee

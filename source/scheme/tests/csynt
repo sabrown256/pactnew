@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "SCHEME C Syntax Test ......... "
+set msg = "SCHEME C Syntax Test ........."
 set exe = $BinDir/scheme
 
    set do_syntax = 0
@@ -27,7 +27,7 @@ set exe = $BinDir/scheme
 #--------------------------------------------------------------------------
 
       Separator $Log 
-      NoteD $Log -n "                       C Declaration Syntax ...... "
+      NoteD $Log -n "                       C Declaration Syntax ......"
       Note $Log ""
 
       set rpf = none
@@ -51,7 +51,7 @@ set exe = $BinDir/scheme
 #--------------------------------------------------------------------------
 
       Separator $Log 
-      NoteD $Log -n "                       CPP Syntax ................ "
+      NoteD $Log -n "                       CPP Syntax ................"
       Note $Log ""
 
       set rpf = none
@@ -75,7 +75,7 @@ set exe = $BinDir/scheme
 #--------------------------------------------------------------------------
 
       Separator $Log 
-      NoteD $Log -n "                       C Syntax .................. "
+      NoteD $Log -n "                       C Syntax .................."
       Note $Log ""
 
       set rpf = none
@@ -97,7 +97,7 @@ set exe = $BinDir/scheme
 #--------------------------------------------------------------------------
 
       Separator $Log 
-      NoteD $Log -n "                       C Translation ............. "
+      NoteD $Log -n "                       C Translation ............."
       Note $Log ""
 
       set rpf = none

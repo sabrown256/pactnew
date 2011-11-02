@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "SCORE Parallel Test ........... "
+set msg = "SCORE Parallel Test ..........."
 set exe = $BinDir/scthrt
 
    NoteD $Log ""

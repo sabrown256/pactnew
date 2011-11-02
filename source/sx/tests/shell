@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PDBView Shell Test ........... "
+set msg = "PDBView Shell Test ..........."
 set exe = $BinDir/sx
 
    if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
@@ -18,7 +18,7 @@ set exe = $BinDir/sx
       NoteD $Log "                    $msg"
 
 # env test
-      NoteD $Log -n "                       env ....................... "
+      NoteD $Log -n "                       env ......................."
       set rpf = none
 
       set t0 = `$TIMER -r`
@@ -45,7 +45,7 @@ set exe = $BinDir/sx
       @ nerr = $nerr + $status
 
 # argv test
-      NoteD $Log -n "                       argv ...................... "
+      NoteD $Log -n "                       argv ......................"
       set rpf = none
 
       set t0 = `$TIMER -r`

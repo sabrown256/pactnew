@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PDBView Mesh Test ............ "
+set msg = "PDBView Mesh Test ............"
 set exe = $BinDir/sx
 set opt = ( -p -e -q $ZeroSpace -l $FilesDir/pdbvmesh.scm )
 set io  = pdbvmesh.res

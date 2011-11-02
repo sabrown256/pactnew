@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PANACEA ABC Test .............. "
+set msg = "PANACEA ABC Test .............."
 
 if (-d $SrcDir/abc) then
    NoteD $Log ""

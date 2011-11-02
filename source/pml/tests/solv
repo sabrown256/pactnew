@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PML Solver Test ........ "
+set msg = "PML Solver Test ........"
 set exe = $BinDir/mlicts
 set opt = ""
 set io  = flog

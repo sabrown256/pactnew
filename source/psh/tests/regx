@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "REGX Test ...................... "
+set msg = "REGX Test ......................"
 
 while ($#argv > 0)
    switch ($1)

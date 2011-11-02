@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "SX PDB Attribute Test ........ "
+set msg = "SX PDB Attribute Test ........"
 set exe = $BinDir/sx
 set opt = ( -e -r -s $ZeroSpace -l $FilesDir/sxpdba.scm )
 set io  = sxpdba.res
