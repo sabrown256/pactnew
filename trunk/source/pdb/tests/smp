@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "PDB SMP Parallel Test .............."
-set exe = $BinDir/pdsmp
+set exe = $BinDir/tpdsmp
 set opt = ( -v $tst -m 0 )
 set io  = flog
 

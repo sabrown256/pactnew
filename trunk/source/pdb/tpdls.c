@@ -1,5 +1,5 @@
 /*
- * PDLSTS.C - test to list contents of PDB file
+ * TPDLS.C - test to list contents of PDB file
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942
@@ -18,8 +18,8 @@
 static void print_help(void)
    {
 
-    PRINT(STDOUT, "\nPDLSTS - test listing contents\n\n");
-    PRINT(STDOUT, "Usage: pdlsts [-h] [-v #]\n");
+    PRINT(STDOUT, "\nTPDLS - test listing contents\n\n");
+    PRINT(STDOUT, "Usage: tpdls [-h] [-v #]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       h  - print this help message and exit\n");
     PRINT(STDOUT, "       v  - use format version # (default is 2)\n");

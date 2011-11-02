@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "PDB User Type Test ................."
-set exe = $BinDir/pdasts
+set exe = $BinDir/tpdas
 set opt = ( -v $tst )
 set io  = ftee
 

@@ -1,5 +1,5 @@
 /*
- * PDATST.C - Test attribute features of PDB
+ * TPDA.C - test attribute features of PDB
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942
@@ -76,12 +76,12 @@ static int write_test(FILE *fp)
         d[i] = (float) i;
 
     if (read_only == FALSE)
-       {file = PD_open("pdatst.db", "w");
+       {file = PD_open("tpda.db", "w");
 	if ((file == NULL) || (fp == NULL))
-	   {PRINT(stderr, "Error creating pdatst.db\n");
+	   {PRINT(stderr, "Error creating tpda.db\n");
 	    err = FALSE;
 	    return(err);};
-	PRINT(fp, "\nCreated pdatst.db\n\n");
+	PRINT(fp, "\nCreated tpda.db\n\n");
 
 	PD_write(file, "d(10)", "float", d);
 
@@ -132,8 +132,8 @@ static int hash_test(FILE *fp)
 
     err = TRUE;
 
-    file = PD_open("pdatst.db", "a");
-    PRINT(fp, "\nRe-opened pdatst.db\n\n");
+    file = PD_open("tpda.db", "a");
+    PRINT(fp, "\nRe-opened tpda.db\n\n");
 
     err &= print_info(file, fp, file->attrtab, "d", "Attribute Table");
 
@@ -170,8 +170,8 @@ static int hash_test(FILE *fp)
 void print_help(void)
    {
 
-    PRINT(STDOUT, "\nPDATST - run PDB attribute tests\n\n");
-    PRINT(STDOUT, "Usage: pdatst [-d] [-h] [-r] [-v #]\n");
+    PRINT(STDOUT, "\nTPDA - run PDB attribute tests\n\n");
+    PRINT(STDOUT, "Usage: tpda [-d] [-h] [-r] [-v #]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       d - turn on debug mode to display memory maps\n");
     PRINT(STDOUT, "       h - print this help message and exit\n");
@@ -215,7 +215,7 @@ int main(int c, char **v)
 
     err = TRUE;
 
-    fp = io_open("pdatst.rs", "w");
+    fp = io_open("tpda.rs", "w");
 
     err &= write_test(fp);
     err &= hash_test(fp);

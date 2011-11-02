@@ -1,5 +1,5 @@
 /*
- * PNTEST.C - test for the PDB file independent stuff
+ * TPDNC.C - test for the PDB file independent stuff
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942

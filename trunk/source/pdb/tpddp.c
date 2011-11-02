@@ -1,5 +1,5 @@
 /*
- * PDDPTS.C - Test DP I/O in PDBLib
+ * TPDDP.C - Test DP I/O in PDBLib
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942
@@ -718,7 +718,7 @@ static int run_tests(char *path, int rank, int numprocs)
     char fname[MAXLINE];
     FILE *log;
 
-    snprintf(fname, MAXLINE, "pddpts.log");
+    snprintf(fname, MAXLINE, "tpddp.log");
 
 /* remove any old files */
     REMOVE(fname);

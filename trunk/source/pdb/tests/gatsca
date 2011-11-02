@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "PDB Gather/Scatter Test ............"
-set exe = $BinDir/pdgsts
+set exe = $BinDir/tpdgs
 set opt = ( -v $tst )
 set io  = ftee
 

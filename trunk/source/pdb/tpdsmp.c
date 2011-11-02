@@ -1,5 +1,5 @@
 /*
- * PDSMP.C - Test SMP I/O in PDBLib
+ * TPDSMP.C - Test SMP I/O in PDBLib
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942
@@ -437,8 +437,8 @@ void *readits(void *arg)
 void print_help(void)
    {
 
-    PRINT(STDOUT, "\nPDSMP - run basic PDB smp test\n\n");
-    PRINT(STDOUT, "Usage: pdsmp [-h] [-i n] [-m #] [-t #] [-v #]\n");
+    PRINT(STDOUT, "\nTPDSMP - run basic PDB smp test\n\n");
+    PRINT(STDOUT, "Usage: tpdsmp [-h] [-i n] [-m #] [-t #] [-v #]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       h - print this help message and exit\n");
     PRINT(STDOUT, "       i - set number of iterations in reading and writing loops to n\n");

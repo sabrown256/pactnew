@@ -1,5 +1,5 @@
 /*
- * PDOPTS.C - test optimized hyper stride features of PDB
+ * TPDOP.C - test optimized hyper stride features of PDB
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942
@@ -23,8 +23,8 @@ static int
 static void print_help(void)
    {
 
-    PRINT(STDOUT, "\nPDOPTS - run PDB optimized hyperstride tests\n\n");
-    PRINT(STDOUT, "Usage: pdopts [-d] [-h] [-v #]\n");
+    PRINT(STDOUT, "\nTPDOP - run PDB optimized hyperstride tests\n\n");
+    PRINT(STDOUT, "Usage: tpdop [-d] [-h] [-v #]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       d - turn on debug mode to display memory maps\n");
     PRINT(STDOUT, "       h - print this help message and exit\n");

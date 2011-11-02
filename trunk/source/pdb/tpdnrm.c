@@ -1,5 +1,5 @@
 /*
- * PDNRMT.C - test floating point denormalized value fix
+ * TPDNRM.C - test floating point denormalized value fix
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942
@@ -10,7 +10,7 @@
 
 #include "pdb_int.h"
 
-#define DENORM_FILE "pdnrmt.pdb"
+#define DENORM_FILE "tpdnrm.pdb"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -20,8 +20,8 @@
 static void print_help(void)
    {
 
-    PRINT(STDOUT, "\nPDNRMT - test denormalized value handling\n\n");
-    PRINT(STDOUT, "Usage: pdnrmt [-h] [-v #]\n");
+    PRINT(STDOUT, "\nTPDNRM - test denormalized value handling\n\n");
+    PRINT(STDOUT, "Usage: tpdnrm [-h] [-v #]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       h  - print this help message and exit\n");
     PRINT(STDOUT, "       v  - use format version # (default is 2)\n");

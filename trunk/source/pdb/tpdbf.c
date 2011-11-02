@@ -1,5 +1,5 @@
 /*
- * PDBFTS.C - test for the PDB I/O buffering
+ * TPDBF.C - test for the PDB I/O buffering
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942

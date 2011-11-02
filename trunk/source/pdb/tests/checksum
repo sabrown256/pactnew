@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "PDB Checksum Test .................."
-set exe = $BinDir/pdcsts
+set exe = $BinDir/tpdcs
 set opt = ( -v $tst )
 set io  = ftee
 

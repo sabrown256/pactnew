@@ -1,5 +1,5 @@
 /*
- * PDCSTS.C - checksum test
+ * TPDCS.C - checksum test
  *
  * Source Version: 3.0
  * Software Release: LLNL-CODE-422942
@@ -1138,8 +1138,8 @@ static int run_test(PFTest test, int n, char *host)
 static void print_help(void)
    {
 
-    PRINT(STDOUT, "\nPDCSTS - run PDB defent/append test suite\n\n");
-    PRINT(STDOUT, "Usage: pdcsts [-d] [-h] [-n] [-r] [-v #] [-1] [-2] [-3] [-4] [-5] [-6]\n");
+    PRINT(STDOUT, "\nTPDCS - run PDB defent/append test suite\n\n");
+    PRINT(STDOUT, "Usage: tpdcs [-d] [-h] [-n] [-r] [-v #] [-1] [-2] [-3] [-4] [-5] [-6]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       d - turn on debug mode to display memory maps\n");
     PRINT(STDOUT, "       h - print this help message and exit\n");
