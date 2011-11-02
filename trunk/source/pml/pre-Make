@@ -39,7 +39,7 @@ CleanFiles =
 #
 # Things upon which install depends (pact install)
 #
-InstallDep = ${TGTLib} ${BinDir}/mlcsum
+InstallDep = ${TGTLib} ${BinDir}/tmlcsm
 BinDep =
 BinObj =
 
@@ -121,124 +121,124 @@ LibAction = pact patch-fpe
 #
 # make new test executable
 #
-matrix : ${BinDir}/mlmtrt
+matrix : ${BinDir}/tmlmtx
 
-${BinDir}/mlmtrt : mlmtrt.c ${TGTLib}
-	${CLD} ${LdFlags} mlmtrt.c -o ${BinDir}/mlmtrt ${Libs}
+${BinDir}/tmlmtx : tmlmtx.c ${TGTLib}
+	${CLD} ${LdFlags} tmlmtx.c -o ${BinDir}/tmlmtx ${Libs}
 
 #
 # test functions
 #
-funcs : ${BinDir}/mlfnts
+funcs : ${BinDir}/tmlfn
 
-${BinDir}/mlfnts : mlfnts.c ${TGTLib}
-	${CLD} ${LdFlags} mlfnts.c -o ${BinDir}/mlfnts ${Libs}
+${BinDir}/tmlfn : tmlfn.c ${TGTLib}
+	${CLD} ${LdFlags} tmlfn.c -o ${BinDir}/tmlfn ${Libs}
 
 #
 # test LR to AC mapping
 #
-lrac : ${BinDir}/mlacts
+lrac : ${BinDir}/tmlac
 
-${BinDir}/mlacts : mlacts.c ${TGTLib}
-	${CLD} ${LdFlags} mlacts.c -o ${BinDir}/mlacts ${Libs}
+${BinDir}/tmlac : tmlac.c ${TGTLib}
+	${CLD} ${LdFlags} tmlac.c -o ${BinDir}/tmlac ${Libs}
 
 #
 # test topological sort
 #
-topsort : ${BinDir}/mlstst
+topsort : ${BinDir}/tmlstp
 
-${BinDir}/mlstst : mlstst.c ${TGTLib}
-	${CLD} ${LdFlags} mlstst.c -o ${BinDir}/mlstst ${Libs}
+${BinDir}/tmlstp : tmlstp.c ${TGTLib}
+	${CLD} ${LdFlags} tmlstp.c -o ${BinDir}/tmlstp ${Libs}
 
 #
 # test matrix ICG solvers
 #
-icsolv : ${BinDir}/mlicts ${BinDir}/mlicst ${BinDir}/mlcgts
+icsolv : ${BinDir}/tmlic ${BinDir}/tmlics ${BinDir}/tmlcg
 
-${BinDir}/mlicts : mlicts.c ${TGTLib}
-	${CLD} ${LdFlags} mlicts.c -o ${BinDir}/mlicts ${Libs}
+${BinDir}/tmlic : tmlic.c ${TGTLib}
+	${CLD} ${LdFlags} tmlic.c -o ${BinDir}/tmlic ${Libs}
 
-${BinDir}/mlicst : mlicst.c ${TGTLib}
-	${CLD} ${LdFlags} mlicst.c -o ${BinDir}/mlicst ${Libs}
+${BinDir}/tmlics : tmlics.c ${TGTLib}
+	${CLD} ${LdFlags} tmlics.c -o ${BinDir}/tmlics ${Libs}
 
 #
 # test sparse linear CG solvers
 #
-cgsolv : ${BinDir}/mlcgts
+cgsolv : ${BinDir}/tmlcg
 
-${BinDir}/mlcgts : mlcgts.c ${TGTLib}
-	${CLD} ${LdFlags} mlcgts.c -o ${BinDir}/mlcgts ${Libs}
+${BinDir}/tmlcg : tmlcg.c ${TGTLib}
+	${CLD} ${LdFlags} tmlcg.c -o ${BinDir}/tmlcg ${Libs}
 
 #
 # test SVD solvers
 #
-svdsolv : ${BinDir}/mlsvdt
+svdsolv : ${BinDir}/tmlsvd
 
-${BinDir}/mlsvdt : mlsvdt.c ${TGTLib}
-	${CLD} ${LdFlags} mlsvdt.c -o ${BinDir}/mlsvdt ${Libs}
+${BinDir}/tmlsvd : tmlsvd.c ${TGTLib}
+	${CLD} ${LdFlags} tmlsvd.c -o ${BinDir}/tmlsvd ${Libs}
 
 #
 # test EIGEN systems
 #
-eigen : ${BinDir}/mlevts
+eigen : ${BinDir}/tmlev
 
-${BinDir}/mlevts : mlevts.c ${TGTLib}
-	${CLD} ${LdFlags} mlevts.c -o ${BinDir}/mlevts ${Libs}
+${BinDir}/tmlev : tmlev.c ${TGTLib}
+	${CLD} ${LdFlags} tmlev.c -o ${BinDir}/tmlev ${Libs}
 
 #
 # test polygon intersection
 #
-ipoly : ${BinDir}/mlipts
+ipoly : ${BinDir}/tmlip
 
-${BinDir}/mlipts : mlipts.c ${TGTLib}
-	${CLD} ${LdFlags} mlipts.c -o ${BinDir}/mlipts ${Libs}
+${BinDir}/tmlip : tmlip.c ${TGTLib}
+	${CLD} ${LdFlags} tmlip.c -o ${BinDir}/tmlip ${Libs}
 
 #
 # test interpolation
 #
-interp : ${BinDir}/mlitst
+interp : ${BinDir}/tmli
 
-${BinDir}/mlitst : mlitst.c ${TGTLib}
-	${CLD} ${LdFlags} mlitst.c -o ${BinDir}/mlitst ${Libs}
+${BinDir}/tmli : tmli.c ${TGTLib}
+	${CLD} ${LdFlags} tmli.c -o ${BinDir}/tmli ${Libs}
 
 #
 # test ln norm
 #
-lnnorm : ${BinDir}/mllnnmts
+lnnorm : ${BinDir}/tmllnnm
 
-${BinDir}/mllnnmts : mllnnmts.c ${TGTLib}
-	${CLD} ${LdFlags} mllnnmts.c -o ${BinDir}/mllnnmts ${Libs}
+${BinDir}/tmllnnm : tmllnnm.c ${TGTLib}
+	${CLD} ${LdFlags} tmllnnm.c -o ${BinDir}/tmllnnm ${Libs}
 
 #
 # test checksum routines
 #
-checksum : ${BinDir}/mlckts ${BinDir}/mlcsum
+checksum : ${BinDir}/tmlck ${BinDir}/tmlcsm
 
-${BinDir}/mlckts : mlckts.c ${TGTLib}
-	${CLD} ${LdFlags} mlckts.c -o ${BinDir}/mlckts ${Libs}
+${BinDir}/tmlck : tmlck.c ${TGTLib}
+	${CLD} ${LdFlags} tmlck.c -o ${BinDir}/tmlck ${Libs}
 
-${BinDir}/mlcsum : mlcsum.c ${TGTLib}
-	${CLD} ${LdFlags} mlcsum.c -o ${BinDir}/mlcsum ${Libs}
+${BinDir}/tmlcsm : tmlcsm.c ${TGTLib}
+	${CLD} ${LdFlags} tmlcsm.c -o ${BinDir}/tmlcsm ${Libs}
 
 #
 # test FPE
 #
-fpe : ${BinDir}/mlfpets ${BinDir}/mlnants
+fpe : ${BinDir}/tmlfpe ${BinDir}/tmlnan
 
-${BinDir}/mlfpets : mlfpets.c ${TGTLib}
-	${CLD} ${LdFlags} mlfpets.c -o ${BinDir}/mlfpets ${Libs}
+${BinDir}/tmlfpe : tmlfpe.c ${TGTLib}
+	${CLD} ${LdFlags} tmlfpe.c -o ${BinDir}/tmlfpe ${Libs}
 
-${BinDir}/mlnants : mlnants.c ${TGTLib}
-	${CC} -c mlnants.c -o ${PACTTmpDir}/mlnants.o
-	${CLD} ${LdFlags} ${PACTTmpDir}/mlnants.o -o ${BinDir}/mlnants ${Libs}
+${BinDir}/tmlnan : tmlnan.c ${TGTLib}
+	${CC} -c tmlnan.c -o ${PACTTmpDir}/tmlnan.o
+	${CLD} ${LdFlags} ${PACTTmpDir}/tmlnan.o -o ${BinDir}/tmlnan ${Libs}
 
 #
 # test performance
 #
-perf : ${BinDir}/mlpfts ${BinDir}/mlnants
+perf : ${BinDir}/tmlpf ${BinDir}/tmlnan
 
-${BinDir}/mlpfts : mlpfts.c ${TGTLib}
-	${CLD} ${LdFlags} mlpfts.c -o ${BinDir}/mlpfts ${Libs}
+${BinDir}/tmlpf : tmlpf.c ${TGTLib}
+	${CLD} ${LdFlags} tmlpf.c -o ${BinDir}/tmlpf ${Libs}
 
 #
 # link 

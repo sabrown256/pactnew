@@ -1,5 +1,5 @@
 /*
- * MLPFTS.C - test the relative performance of long doubles and doubles
+ * TMLPF.C - test the relative performance of long doubles and doubles
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942

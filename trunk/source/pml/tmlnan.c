@@ -1,5 +1,5 @@
 /*
- * MLNANTS.C - test PM_fix_nan
+ * TMLNAN.C - test PM_fix_nan
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942

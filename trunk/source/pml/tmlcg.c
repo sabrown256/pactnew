@@ -1,5 +1,5 @@
 /*
- * MLCGTS.C - test Conjugate Gradient solvers
+ * TMLCG.C - test Conjugate Gradient solvers
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
@@ -501,10 +501,10 @@ int main(int c, char **v)
 		      dscg = FALSE;
 		      break;
 		 case 'd':
-		      fp = fopen("mlcgts.dat", "w");
+		      fp = fopen("tmlcg.dat", "w");
 		      break;
 		 case 'h':
-		      PRINT(stdout, "Usgae: mlcgts [-b] [-c] [-d] [-h] [-i] [-l] [-s]\n");
+		      PRINT(stdout, "Usgae: tmlcg [-b] [-c] [-d] [-h] [-i] [-l] [-s]\n");
 		      PRINT(stdout, "       b - suppress biconjugate gradient solve\n");
 		      PRINT(stdout, "       c - suppress conjugate gradient solve\n");
                       PRINT(stdout, "       d - do debug plotting\n");

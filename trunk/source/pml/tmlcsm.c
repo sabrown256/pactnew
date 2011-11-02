@@ -1,5 +1,5 @@
 /*
- * MLCKTS.C - test the checksum routines
+ * TMLCSM.C - test the checksum routines
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942

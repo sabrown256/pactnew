@@ -1,5 +1,5 @@
 /*
- * MLEVST.C - test eigen value/vector routines
+ * TMLEV.C - test eigen value/vector routines
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
@@ -195,7 +195,7 @@ int main(int c, char **v)
 
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-h") == 0)
-            {printf("Usage: mlevts [-h] [-1] [-2] [-3]\n");
+            {printf("Usage: tmlev [-h] [-1] [-2] [-3]\n");
 	     printf("   h   this help message\n");
 	     printf("   1   omit eigenvalue test\n");
 	     printf("   2   omit eigenvector test\n");

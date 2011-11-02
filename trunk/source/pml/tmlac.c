@@ -1,5 +1,5 @@
 /*
- * MLACTS.C - test the mapping from LR to AC meshes
+ * TMLAC.C - test the mapping from LR to AC meshes
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942

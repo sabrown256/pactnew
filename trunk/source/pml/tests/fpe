@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "PML FPE Test ..........."
-set exe = $BinDir/mlfpets
+set exe = $BinDir/tmlfpe
 set opt = ""
 set io  = flog
 

@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "PML Checksum Test ......"
-set exe = $BinDir/mlckts
+set exe = $BinDir/tmlck
 set opt = ( $SrcDir/mlcmsh.c )
 set io  = checksum.res
 

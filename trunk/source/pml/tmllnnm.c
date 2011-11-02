@@ -1,5 +1,5 @@
 /*
- * MLLNNMTS.C - test the ln norm function
+ * TMLLNNM.C - test the ln norm function
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942

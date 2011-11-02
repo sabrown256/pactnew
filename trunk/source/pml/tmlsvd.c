@@ -1,5 +1,5 @@
 /*
- * MLSVDT.C - test SVD solver
+ * TMLSVD.C - test SVD solver
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
@@ -281,7 +281,7 @@ void help(void)
    {
 
     printf("\n");
-    printf("Usage: mlsvdt [-1] [-2] [-3] [-h] [-n #]\n");
+    printf("Usage: tmlsvd [-1] [-2] [-3] [-h] [-n #]\n");
     printf("   1   do not run square matrix test\n");
     printf("   2   do not run overdetermined matrix test\n");
     printf("   3   do not run underdetermined matrix test\n");

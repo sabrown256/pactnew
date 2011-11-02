@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "PML NAN Test ..........."
-set exe = $BinDir/mlnants
+set exe = $BinDir/tmlnan
 set opt = ""
 set io  = flog
 

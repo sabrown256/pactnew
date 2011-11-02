@@ -10,7 +10,7 @@
 
 #include "pdb_int.h"
 
-#define N       6
+#define N       8
 #define DATFILE "io"
 
 typedef struct s_statedes statedes;
@@ -36,12 +36,8 @@ struct s_statedes
 
 static void show_stat(statedes *st, char *tag)
    {int i, ir;
-    int64_t nba, nbf, sz, ov;
-    double time, rs, rt;
+    double rs, rt;
     static int first = TRUE;
-
-    SC_mem_statr(&nba, &nbf, NULL, NULL, &sz, &ov);
-    time = SC_wall_clock_time();
 
     if (first == TRUE)
        {first = FALSE;
@@ -274,6 +270,8 @@ static int test_3(statedes *st)
 
     fclose(fp);
 
+    SC_ASSERT(rv > 0);
+
     return(err);}
 
 /*--------------------------------------------------------------------------*/
@@ -331,6 +329,8 @@ static int test_4(statedes *st)
     st->sz[st->i] += ftell(fp);
 
     fclose(fp);
+
+    SC_ASSERT(rv > 0);
 
     return(err);}
 
@@ -394,6 +394,8 @@ static int test_5(statedes *st)
 
     st->sz[st->i] += SC_file_length(fname);
 
+    SC_ASSERT(rv > 0);
+
     return(err);}
 
 /*--------------------------------------------------------------------------*/
@@ -452,7 +454,136 @@ static int test_6(statedes *st)
 
     st->sz[st->i] += SC_file_length(fname);
 
+    SC_ASSERT(rv > 0);
+
     return(err);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                            TEST #7 ROUTINES                              */
+
+/*--------------------------------------------------------------------------*/
+
+#ifdef HAVE_HDF5
+
+#include <hdf5.h>
+#include <hdf5_hl.h>
+
+/* TEST_7 - write HDF5 data */
+
+static int test_7(statedes *st)
+   {int err;
+    inti i, n;
+    long ind[3];
+    char fname[MAXLINE];
+    float *fa;
+    double time;
+    double *da;
+    long double *la;
+    hid_t fp;
+    herr_t rv;
+
+    err = TRUE;
+
+    snprintf(fname, MAXLINE, "%s-hdf5.dat", DATFILE);
+
+    n = st->n;
+    ind[0] = n;
+
+    fa = CMAKE_N(float, n);
+    da = CMAKE_N(double, n);
+    la = CMAKE_N(long double, n);
+
+    for (i = 0; i < n; i++)
+        {fa[i] = i;
+	 da[i] = i;
+	 la[i] = i;};
+
+    fp = H5Fcreate(fname, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+
+    time = SC_wall_clock_time();
+
+/* float */
+    rv = H5LTmake_dataset(fp, "/fa", 1, ind, H5T_NATIVE_FLOAT, fa);
+
+/* double */
+    rv = H5LTmake_dataset(fp, "/da", 1, ind, H5T_NATIVE_DOUBLE, fa);
+
+/* long double */
+    rv = H5LTmake_dataset(fp, "/la", 1, ind, H5T_NATIVE_LDOUBLE, fa);
+
+    st->t[st->i] += (SC_wall_clock_time() - time);
+
+    CFREE(fa);
+    CFREE(da);
+    CFREE(la);
+
+    rv = H5Fclose(fp);
+
+    st->sz[st->i] += SC_file_length(fname);
+
+    return(err);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                            TEST #8 ROUTINES                              */
+
+/*--------------------------------------------------------------------------*/
+
+/* TEST_8 - read HDF5 data */
+
+static int test_8(statedes *st)
+   {int err;
+    inti i, n;
+    char fname[MAXLINE];
+    float *fa;
+    double time;
+    double *da;
+    long double *la;
+    hid_t fp;
+    herr_t rv;
+
+    err = TRUE;
+
+    snprintf(fname, MAXLINE, "%s-hdf5.dat", DATFILE);
+
+    n = st->n;
+
+    fa = CMAKE_N(float, n);
+    da = CMAKE_N(double, n);
+    la = CMAKE_N(long double, n);
+
+    for (i = 0; i < n; i++)
+        {fa[i] = 0;
+	 da[i] = 0;
+	 la[i] = 0;};
+
+    fp = H5Fopen(fname, H5F_ACC_RDONLY, H5P_DEFAULT);
+
+    time = SC_wall_clock_time();
+
+/* float */
+    rv = H5LTread_dataset_int(fp, "/fa", fa);
+
+/* double */
+    rv = H5LTread_dataset_int(fp, "/da", da);
+
+/* long double */
+    rv = H5LTread_dataset_int(fp, "/la", la);
+
+    st->t[st->i] += (SC_wall_clock_time() - time);
+
+    CFREE(fa);
+    CFREE(da);
+    CFREE(la);
+
+    rv = H5Fclose(fp);
+
+    st->sz[st->i] += SC_file_length(fname);
+
+    return(err);}
+
+#endif
 
 /*--------------------------------------------------------------------------*/
 
@@ -569,6 +700,10 @@ int main(int c, char **v)
     err += run_test(&st, test_6, "read-pdb");
     err += run_test(&st, test_3, "write-binary");
     err += run_test(&st, test_4, "read-binary");
+#ifdef HAVE_HDF5
+    err += run_test(&st, test_7, "write-hdf5");
+    err += run_test(&st, test_8, "read-hdf5");
+#endif
 
     PRINT(STDOUT, "\n");
 

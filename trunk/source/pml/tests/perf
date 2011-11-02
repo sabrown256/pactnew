@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "PML Performance Test ..."
-set exe = $BinDir/mlpfts
+set exe = $BinDir/tmlpf
 set opt = ""
 set io  = flog
 

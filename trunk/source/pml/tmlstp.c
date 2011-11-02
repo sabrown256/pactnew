@@ -1,5 +1,5 @@
 /*
- * MLSTST.C - test the topological sort routine
+ * TMLSTP.C - test the topological sort routine
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
