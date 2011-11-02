@@ -1,5 +1,5 @@
 /*
- * PCCHLD.C - small program to report process info
+ * TPCCH.C - small program to report process info
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942

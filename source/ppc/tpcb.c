@@ -1,5 +1,5 @@
 /*
- * PCBTST.C - test binary connections - parent side
+ * TPCB.C - test binary connections - parent side
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
@@ -86,9 +86,9 @@ int main(int argc, char **argv)
     prog = argv[0];
     to   = 30;
     if (argc < 2)
-       {printf("\nRunning PCCTST by default\n\n");
+       {printf("\nRunning TPCC by default\n\n");
         argl = CMAKE_N(char *, 3);
-        argl[0] = CSTRSAVE("pcctst");
+        argl[0] = CSTRSAVE("tpcc");
         argl[1] = CSTRSAVE("-b");
         argl[2] = NULL;}
     else
