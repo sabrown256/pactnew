@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "PDB Recursive Cast Test ............"
-set exe = $BinDir/pdrcts
+set exe = $BinDir/tpdrc
 set opt = ( -v $tst foo.pdb )
 set io  = ftee
 

@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "PDB FD Leak ........................"
-set exe = $BinDir/pdfdts
+set exe = $BinDir/tpdfd
 set opt = ""
 set io  = flog
 

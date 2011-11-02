@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "PDB Hyperstride Test ..............."
-set exe = $BinDir/pdopts
+set exe = $BinDir/tpdop
 set opt = ( -v $tst )
 set io  = ftee
 

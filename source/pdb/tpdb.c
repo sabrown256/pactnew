@@ -1,5 +1,5 @@
 /*
- * PDBTST.C - test for the PDB I/O
+ * TPDB.C - test for the PDB I/O
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942
@@ -3607,8 +3607,8 @@ static int run_test(PFTest test, int n, char *host, int native)
 static void print_help(void)
    {
 
-    PRINT(STDOUT, "\nPDBTST - run basic PDB test suite\n\n");
-    PRINT(STDOUT, "Usage: pdbtst [-b #] [-c] [-d] [-h] [-n] [-r] [-v #] [-0] [-1] [-2] [-3] [-4] [-5] [-6] [-7] [-8] [-9] [-10]\n");
+    PRINT(STDOUT, "\nTPDB - run basic PDB test suite\n\n");
+    PRINT(STDOUT, "Usage: tpdb [-b #] [-c] [-d] [-h] [-n] [-r] [-v #] [-0] [-1] [-2] [-3] [-4] [-5] [-6] [-7] [-8] [-9] [-10]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       b  - set buffer size (default no buffering)\n");
     PRINT(STDOUT, "       c  - verify low level writes\n");

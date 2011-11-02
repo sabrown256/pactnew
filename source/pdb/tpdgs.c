@@ -1,5 +1,5 @@
 /*
- * PDAPTS.C - append tests for the PDB I/O
+ * TPDGS.C - gather/scatter test for the PDB I/O
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942
@@ -10,7 +10,7 @@
 
 #include "pdbtfr.h"
 
-#define DATFILE "apd"
+#define DATFILE "gst"
 
 typedef int (*PFTest)(char *base, char *tgt, int n);
 
@@ -19,36 +19,57 @@ int
  debug_mode = FALSE;
 
 int
- ia_w0[5],
- ia_w1[5],
- ia_w2[5],
- ia_r[15];
+ ia_w[30],
+ ib_w[6],
+ ib_r[6];
+
+double
+ da_w[12],
+ db_w[12],
+ db_r[12];
 
 /*--------------------------------------------------------------------------*/
+
+/*                          TEST GATHER ROUTINES                            */
+
 /*--------------------------------------------------------------------------*/
 
-/* PREP_TEST_DATA - prepare the test data */
+/* PREP_TEST_GATHER_DATA - prepare the test data */
 
-static void prep_test_data(void)
-   {int i;
+static void prep_test_gather_data(void)
+   {int i, j, k, l;
+    int imx, jmx, kmx;
 
 /* set int array */
-    for (i = 0; i < 5; i++)
-        {ia_w0[i] = i;
-	 ia_w1[i] = 10*i;
-	 ia_w2[i] = 100*i;};
+    imx = 2;
+    jmx = 3;
+    kmx = 5;
+    for (i = 0; i < imx; i++)
+        for (j = 0; j < jmx; j++)
+	    for (k = 0; k < kmx; k++)
+	        {l = k + kmx*(j + jmx*i);
+		 ia_w[l] = 100*i + 10*j + k;};
 
-    for (i = 0; i < 15; i++)
-        ia_r[i] = -1;
+    for (i = 0; i < 6; i++)
+         ib_r[i] = 0;;
+
+/* set double array */
+    imx = 4;
+    jmx = 3;
+    for (i = 0; i < imx; i++)
+        for (j = 0; j < jmx; j++)
+	    {l = j + jmx*i;
+	     da_w[l] = 10.0*i + j;
+	     db_r[l] = 0.0;};
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* CLEANUP_TEST - free all known test data memory */
+/* CLEANUP_TEST_GATHER - free all known test data memory */
 
-static void cleanup_test(void)
+static void cleanup_test_gather(void)
    {
 
     return;}
@@ -56,33 +77,96 @@ static void cleanup_test(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* READ_TEST_DATA - read the test data from the file */
+/* WRITE_TEST_GATHER_DATA - write out the data into the PDB file */
 
-static int read_test_data(PDBfile *strm)
+static void write_test_gather_data(PDBfile *strm)
+   {
+
+/* write primitive arrays into the file */
+    if (!PD_write(strm, "ia(2,3,5)", "integer", ia_w))
+       {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_GATHER_DATA\n");
+        exit(1);};
+
+    if (!PD_write(strm, "da(4,3)", "double", da_w))
+       {PRINT(STDOUT, "DA WRITE FAILED - WRITE_TEST_GATHER_DATA\n");
+        exit(1);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* READ_TEST_GATHER_DATA - read the test data from the file */
+
+static int read_test_gather_data(PDBfile *strm)
    {int err;
+    long sind[9], dind[8];
 
-    err = PD_read(strm, "ia", &ia_r);
+/* gather ia(1,0:2,3) into ib(1,0:2) */
+    sind[0] = 1;
+    sind[1] = 1;
+    sind[2] = 1;
+
+    sind[3] = 0;
+    sind[4] = 2;
+    sind[5] = 1;
+
+    sind[6] = 3;
+    sind[7] = 3;
+    sind[8] = 1;
+
+    dind[0] = 1;
+    dind[1] = 1;
+    dind[2] = 1;
+    dind[3] = 2;
+
+    dind[4] = 0;
+    dind[5] = 2;
+    dind[6] = 1;
+    dind[7] = 3;
+
+    err = PD_gather(strm, "ia", &ib_r, sind, 2, dind);
+
+/* gather da(0:3,1) into db(0:3,0) */
+    sind[0] = 0;
+    sind[1] = 3;
+    sind[2] = 1;
+
+    sind[3] = 1;
+    sind[4] = 1;
+    sind[5] = 1;
+
+    dind[0] = 0;
+    dind[1] = 3;
+    dind[2] = 1;
+    dind[3] = 4;
+
+    dind[4] = 0;
+    dind[5] = 0;
+    dind[6] = 1;
+    dind[7] = 3;
+
+    err = PD_gather(strm, "da", &db_r, sind, 2, dind);
 
     return(err);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PRINT_TEST_DATA - print it out to STDOUT */
+/* PRINT_TEST_GATHER_DATA - print it out to STDOUT */
 
-static void print_test_data(FILE *fp)
+static void print_test_gather_data(FILE *fp)
    {int i;
 
 /* print int array */
     PRINT(fp, "integer array:\n");
-    for (i = 0; i < 5; i++)
-        PRINT(fp, "  ia(%d,1) = %d\n", i, ia_r[i]);
+    for (i = 0; i < 6; i++)
+        PRINT(fp, "  ib[%d] = %d\n", i, ib_r[i]);
 
-    for (i = 0; i < 5; i++)
-        PRINT(fp, "  ia(%d,2) = %d\n", i, ia_r[i+5]);
-
-    for (i = 0; i < 5; i++)
-        PRINT(fp, "  ia(%d,3) = %d\n", i, ia_r[i+10]);
+/* print double array */
+    PRINT(fp, "double array:\n");
+    for (i = 0; i < 12; i++)
+        PRINT(fp, "  db[%d] = %14.6e\n", i, db_r[i]);
 
     PRINT(fp, "\n");
 
@@ -91,23 +175,43 @@ static void print_test_data(FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* COMPARE_TEST_DATA - compare the test data */
+/* COMPARE_TEST_GATHER_DATA - compare the test data */
 
-static int compare_test_data(PDBfile *strm, FILE *fp)
+static int compare_test_gather_data(PDBfile *strm, FILE *fp)
    {int i, err, err_tot;
+    int ia, ib, mo, rmj;
+    long double fptol[N_PRIMITIVE_FP];
+
+    if (strm == NULL)
+       return(FALSE);
+
+    PD_fp_toler(strm, fptol);
 
     err_tot = TRUE;
 
-/* compare ia */
+    mo  = PD_get_major_order(strm);
+    rmj = (mo == ROW_MAJOR_ORDER);
+
+/* compare ia(1,0:2,3) with ib(1,0:2) */
     err = TRUE;
-    for (i = 0; i < 5; i++)
-        {err &= (ia_w0[i] == ia_r[i]);};
+    for (i = 0; i < 3; i++)
+        {if (rmj)
+	    {ia = 15*1 + 5*i + 3;
+	     ib = 3*1 + i;}
+	 else
+	    {ia = 1 + 2*i + 3*6;
+	     ib = 1 + 2*i;};
+	 err &= (ia_w[ia] == ib_r[ib]);};
 
-    for (i = 0; i < 5; i++)
-        {err &= (ia_w1[i] == ia_r[i+5]);};
-
-    for (i = 0; i < 5; i++)
-        {err &= (ia_w2[i] == ia_r[i+10]);};
+/* compare da(0:3,1) with db(0:3,0) */
+    for (i = 0; i < 4; i++)
+        {if (rmj)
+	    {ia = 3*i + 1;
+	     ib = 3*i + 0;}
+	 else
+	    {ia = 4*1 + i;
+	     ib = 4*0 + i;};
+	 err &= (da_w[ia] == db_r[ib]);};
 
     if (err)
        PRINT(fp, "Arrays compare\n");
@@ -117,35 +221,6 @@ static int compare_test_data(PDBfile *strm, FILE *fp)
     err_tot &= err;
 
     return(err_tot);}
-
-/*--------------------------------------------------------------------------*/
-
-/*                              TEST 1 ROUTINES                             */
-
-/*--------------------------------------------------------------------------*/
-
-/* WRITE_TEST_1_DATA - write out the data into the PDB file
- *                   - this is write, append, append
- *                   - row major order
- */
-
-static void write_test_1_data(PDBfile *strm)
-   {
-
-/* write primitive arrays into the file */
-    if (!PD_write(strm, "ia(1,5)", "int", ia_w0))
-       {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_1_DATA\n");
-        exit(1);};
-
-    if (!PD_append(strm, "ia(1:1,0:4)", ia_w1))
-       {PRINT(STDOUT, "IA APPEND 1 FAILED - WRITE_TEST_1_DATA\n");
-        exit(1);};
-
-    if (!PD_append(strm, "ia(2:2,0:4)", ia_w2))
-       {PRINT(STDOUT, "IA APPEND 2 FAILED - WRITE_TEST_1_DATA\n");
-        exit(1);};
-
-    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -172,10 +247,10 @@ static int test_1(char *base, char *tgt, int n)
         exit(1);};
     PRINT(fp, "File %s created\n", datfile);
 
-    prep_test_data();
+    prep_test_gather_data();
 
 /* write the test data */
-    write_test_1_data(strm);
+    write_test_gather_data(strm);
 
 /* close the file */
     if (!PD_close(strm))
@@ -191,10 +266,10 @@ static int test_1(char *base, char *tgt, int n)
     PRINT(fp, "File %s opened\n", datfile);
 
 /* read the data from the file */
-    read_test_data(strm);
+    read_test_gather_data(strm);
 
 /* compare the original data with that read in */
-    err = compare_test_data(strm, fp);
+    err = compare_test_gather_data(strm, fp);
 
 /* close the file */
     if (!PD_close(strm))
@@ -203,10 +278,10 @@ static int test_1(char *base, char *tgt, int n)
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print it out to STDOUT */
-    print_test_data(fp);
+    print_test_gather_data(fp);
 
 /* free known test data memory */
-    cleanup_test();
+    cleanup_test_gather();
 
     if (debug_mode)
        SC_mem_map(STDOUT, FALSE);
@@ -218,38 +293,9 @@ static int test_1(char *base, char *tgt, int n)
     return(err);}
 
 /*--------------------------------------------------------------------------*/
-
-/*                              TEST 2 ROUTINES                             */
-
 /*--------------------------------------------------------------------------*/
 
-/* WRITE_TEST_2_DATA - write out the data into the PDB file
- *                   - this is write, append, append
- *                   - column major order
- */
-
-static void write_test_2_data(PDBfile *strm)
-   {
-
-/* write primitive arrays into the file */
-    if (!PD_write(strm, "ia(5,1)", "int", ia_w0))
-       {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_2_DATA\n");
-        exit(1);};
-
-    if (!PD_append(strm, "ia(0:4,1:1)", ia_w1))
-       {PRINT(STDOUT, "IA APPEND 1 FAILED - WRITE_TEST_2_DATA\n");
-        exit(1);};
-
-    if (!PD_append(strm, "ia(0:4,2:2)", ia_w2))
-       {PRINT(STDOUT, "IA APPEND 2 FAILED - WRITE_TEST_2_DATA\n");
-        exit(1);};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* TEST_2 - test the PDBLib append functions in COLUMN_MAJOR order
+/* TEST_2 - test the PDBLib gather functions in COLUMN_MAJOR order
  *        - tests can be targeted
  */
 
@@ -273,10 +319,10 @@ static int test_2(char *base, char *tgt, int n)
 
     PD_set_major_order(strm, COLUMN_MAJOR_ORDER);
 
-    prep_test_data();
+    prep_test_gather_data();
 
 /* write the test data */
-    write_test_2_data(strm);
+    write_test_gather_data(strm);
 
 /* close the file */
     if (!PD_close(strm))
@@ -292,10 +338,10 @@ static int test_2(char *base, char *tgt, int n)
     PRINT(fp, "File %s opened\n", datfile);
 
 /* read the data from the file */
-    read_test_data(strm);
+    read_test_gather_data(strm);
 
 /* compare the original data with that read in */
-    err = compare_test_data(strm, fp);
+    err = compare_test_gather_data(strm, fp);
 
 /* close the file */
     if (!PD_close(strm))
@@ -304,10 +350,10 @@ static int test_2(char *base, char *tgt, int n)
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print it out to STDOUT */
-    print_test_data(fp);
+    print_test_gather_data(fp);
 
 /* free known test data memory */
-    cleanup_test();
+    cleanup_test_gather();
 
     if (debug_mode)
        SC_mem_map(STDOUT, FALSE);
@@ -320,36 +366,202 @@ static int test_2(char *base, char *tgt, int n)
 
 /*--------------------------------------------------------------------------*/
 
-/*                              TEST 3 ROUTINES                             */
+/*                         TEST SCATTER ROUTINES                            */
 
 /*--------------------------------------------------------------------------*/
 
-/* WRITE_TEST_3_DATA - write out the data into the PDB file
- *                   - this is defent, write, append, append
- *                   - row major order
- */
+/* PREP_TEST_SCATTER_DATA - prepare the test data */
 
-static void write_test_3_data(PDBfile *strm)
+static void prep_test_scatter_data(void)
+   {int i, j, k, l;
+    int imx, jmx, kmx;
+
+/* set int array */
+    imx = 2;
+    jmx = 3;
+    kmx = 5;
+    for (i = 0; i < imx; i++)
+        for (j = 0; j < jmx; j++)
+	    for (k = 0; k < kmx; k++)
+	        {l = k + kmx*(j + jmx*i);
+		 ia_w[l] = 100*i + 10*j + k;};
+
+    for (i = 0; i < 6; i++)
+        {ib_r[i] = 0;
+	 ib_w[i] = i;};
+
+/* set double array */
+    imx = 4;
+    jmx = 3;
+    for (i = 0; i < imx; i++)
+        for (j = 0; j < jmx; j++)
+	    {l = j + jmx*i;
+	     da_w[l] = 10.0*i + j;
+	     db_r[l] = 0.0;
+	     db_w[l] = 50.0*i + j;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* CLEANUP_TEST_SCATTER - free all known test data memory */
+
+static void cleanup_test_scatter(void)
+   {
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* WRITE_TEST_SCATTER_DATA - write out the data into the PDB file */
+
+static void write_test_scatter_data(PDBfile *strm)
    {
 
 /* write primitive arrays into the file */
-    if (!PD_defent(strm, "ia(1,5)", "int"))
-       {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_3_DATA\n");
+    if (!PD_write(strm, "ib(2,3)", "integer", ib_w))
+       {PRINT(STDOUT, "IB WRITE FAILED - WRITE_TEST_SCATTER_DATA\n");
         exit(1);};
 
-    if (!PD_write(strm, "ia(0:0,0:4)", "int", ia_w0))
-       {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_3_DATA\n");
-        exit(1);};
-
-    if (!PD_append(strm, "ia(1:1,0:4)", ia_w1))
-       {PRINT(STDOUT, "IA APPEND 1 FAILED - WRITE_TEST_3_DATA\n");
-        exit(1);};
-
-    if (!PD_append(strm, "ia(2:2,0:4)", ia_w2))
-       {PRINT(STDOUT, "IA APPEND 2 FAILED - WRITE_TEST_3_DATA\n");
+    if (!PD_write(strm, "db(4,3)", "double", db_w))
+       {PRINT(STDOUT, "DA WRITE FAILED - WRITE_TEST_SCATTER_DATA\n");
         exit(1);};
 
     return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* READ_TEST_SCATTER_DATA - read the test data from the file */
+
+static int read_test_scatter_data(PDBfile *strm)
+   {int err;
+    long sind[12], dind[6];
+
+/* scatter ia(1,0:2,3) into ib(1,0:2) */
+    sind[0]  = 1;
+    sind[1]  = 1;
+    sind[2]  = 1;
+    sind[3]  = 2;
+
+    sind[4]  = 0;
+    sind[5]  = 2;
+    sind[6]  = 1;
+    sind[7]  = 3;
+
+    sind[8]  = 3;
+    sind[9]  = 3;
+    sind[10] = 1;
+    sind[11] = 5;
+
+    dind[0] = 1;
+    dind[1] = 1;
+    dind[2] = 1;
+
+    dind[3] = 0;
+    dind[4] = 2;
+    dind[5] = 1;
+
+    err  = PD_scatter(strm, "ib", "integer", &ia_w, 3, sind, 2, dind);
+    err &= PD_read(strm, "ib", &ib_r);
+
+/* scatter da(0:3,1) into db(0:3,0) */
+    sind[0] = 0;
+    sind[1] = 3;
+    sind[2] = 1;
+    sind[3] = 4;
+
+    sind[4] = 1;
+    sind[5] = 1;
+    sind[6] = 1;
+    sind[7] = 3;
+
+    dind[0] = 0;
+    dind[1] = 3;
+    dind[2] = 1;
+
+    dind[3] = 0;
+    dind[4] = 0;
+    dind[5] = 1;
+
+    err &= PD_scatter(strm, "db", "double", &da_w, 2, sind, 2, dind);
+    err &= PD_read(strm, "db", &db_r);
+
+    return(err);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PRINT_TEST_SCATTER_DATA - print it out to STDOUT */
+
+static void print_test_scatter_data(FILE *fp)
+   {int i;
+
+/* print int array */
+    PRINT(fp, "integer array:\n");
+    for (i = 0; i < 6; i++)
+        PRINT(fp, "  ib[%d] = %d\n", i, ib_r[i]);
+
+/* print double array */
+    PRINT(fp, "double array:\n");
+    for (i = 0; i < 12; i++)
+        PRINT(fp, "  db[%d] = %14.6e\n", i, db_r[i]);
+
+    PRINT(fp, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* COMPARE_TEST_SCATTER_DATA - compare the test data */
+
+static int compare_test_scatter_data(PDBfile *strm, FILE *fp)
+   {int i, err, err_tot;
+    int ia, ib, mo, rmj;
+    long double fptol[3];
+
+    if (strm == NULL)
+       return(FALSE);
+
+    PD_fp_toler(strm, fptol);
+
+    err_tot = TRUE;
+
+    mo  = PD_get_major_order(strm);
+    rmj = (mo == ROW_MAJOR_ORDER);
+
+/* compare ia(1,0:2,3) with ib(1,0:2) */
+    err = TRUE;
+    for (i = 0; i < 3; i++)
+        {if (rmj)
+	    {ia = 15*1 + 5*i + 3;
+	     ib = 3*1 + i;}
+	 else
+	    {ia = 1 + 2*i + 3*6;
+	     ib = 1 + 2*i;};
+	 err &= (ia_w[ia] == ib_r[ib]);};
+
+/* compare da(0:3,1) with db(0:3,0) */
+    for (i = 0; i < 4; i++)
+        {if (rmj)
+	    {ia = 3*i + 1;
+	     ib = 3*i + 0;}
+	 else
+	    {ia = 4*1 + i;
+	     ib = 4*0 + i;};
+	 err &= (da_w[ia] == db_r[ib]);};
+
+    if (err)
+       PRINT(fp, "Arrays compare\n");
+    else
+       PRINT(fp, "Arrays differ\n");
+
+    err_tot &= err;
+
+    return(err_tot);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -376,10 +588,10 @@ static int test_3(char *base, char *tgt, int n)
         exit(1);};
     PRINT(fp, "File %s created\n", datfile);
 
-    prep_test_data();
+    prep_test_scatter_data();
 
 /* write the test data */
-    write_test_3_data(strm);
+    write_test_scatter_data(strm);
 
 /* close the file */
     if (!PD_close(strm))
@@ -395,10 +607,10 @@ static int test_3(char *base, char *tgt, int n)
     PRINT(fp, "File %s opened\n", datfile);
 
 /* read the data from the file */
-    read_test_data(strm);
+    read_test_scatter_data(strm);
 
 /* compare the original data with that read in */
-    err = compare_test_data(strm, fp);
+    err = compare_test_scatter_data(strm, fp);
 
 /* close the file */
     if (!PD_close(strm))
@@ -407,10 +619,10 @@ static int test_3(char *base, char *tgt, int n)
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print it out to STDOUT */
-    print_test_data(fp);
+    print_test_scatter_data(fp);
 
 /* free known test data memory */
-    cleanup_test();
+    cleanup_test_scatter();
 
     if (debug_mode)
        SC_mem_map(STDOUT, FALSE);
@@ -420,39 +632,6 @@ static int test_3(char *base, char *tgt, int n)
        REMOVE(fname);
 
     return(err);}
-
-/*--------------------------------------------------------------------------*/
-
-/*                              TEST 4 ROUTINES                             */
-
-/*--------------------------------------------------------------------------*/
-
-/* WRITE_TEST_4_DATA - write out the data into the PDB file
- *                   - this is defent, write, append, append
- *                   - column major order
- */
-
-static void write_test_4_data(PDBfile *strm)
-   {
-
-/* write primitive arrays into the file */
-    if (!PD_defent(strm, "ia(5,1)", "int"))
-       {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_4_DATA\n");
-        exit(1);};
-
-    if (!PD_write(strm, "ia(0:4,0:0)", "int", ia_w0))
-       {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_4_DATA\n");
-        exit(1);};
-
-    if (!PD_append(strm, "ia(0:4,1:1)", ia_w1))
-       {PRINT(STDOUT, "IA APPEND 1 FAILED - WRITE_TEST_4_DATA\n");
-        exit(1);};
-
-    if (!PD_append(strm, "ia(0:4,2:2)", ia_w2))
-       {PRINT(STDOUT, "IA APPEND 2 FAILED - WRITE_TEST_4_DATA\n");
-        exit(1);};
-
-    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -481,10 +660,10 @@ static int test_4(char *base, char *tgt, int n)
 
     PD_set_major_order(strm, COLUMN_MAJOR_ORDER);
 
-    prep_test_data();
+    prep_test_scatter_data();
 
 /* write the test data */
-    write_test_4_data(strm);
+    write_test_scatter_data(strm);
 
 /* close the file */
     if (!PD_close(strm))
@@ -500,10 +679,10 @@ static int test_4(char *base, char *tgt, int n)
     PRINT(fp, "File %s opened\n", datfile);
 
 /* read the data from the file */
-    read_test_data(strm);
+    read_test_scatter_data(strm);
 
 /* compare the original data with that read in */
-    err = compare_test_data(strm, fp);
+    err = compare_test_scatter_data(strm, fp);
 
 /* close the file */
     if (!PD_close(strm))
@@ -512,226 +691,10 @@ static int test_4(char *base, char *tgt, int n)
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print it out to STDOUT */
-    print_test_data(fp);
+    print_test_scatter_data(fp);
 
 /* free known test data memory */
-    cleanup_test();
-
-    if (debug_mode)
-       SC_mem_map(STDOUT, FALSE);
-
-    io_close(fp);
-    if (err)
-       REMOVE(fname);
-
-    return(err);}
-
-/*--------------------------------------------------------------------------*/
-
-/*                              TEST 5 ROUTINES                             */
-
-/*--------------------------------------------------------------------------*/
-
-/* WRITE_TEST_5_DATA - write out the data into the PDB file
- *                   - this is defent, write, defent, write, write
- *                   - row major order
- */
-
-static void write_test_5_data(PDBfile *strm)
-   {
-
-/* write primitive arrays into the file */
-    if (!PD_defent(strm, "ia(1,5)", "int"))
-       {PRINT(STDOUT, "IA DEFENT 1 FAILED - WRITE_TEST_5_DATA\n");
-        exit(1);};
-
-    if (!PD_write(strm, "ia(0:0,0:4)", "int", ia_w0))
-       {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_5_DATA\n");
-        exit(1);};
-
-    if (!PD_defent(strm, "ia(1:2,0:4)", "int"))
-       {PRINT(STDOUT, "IA DEFENT 2 FAILED - WRITE_TEST_5_DATA\n");
-        exit(1);};
-
-    if (!PD_write(strm, "ia(1:1,0:4)", "int", ia_w1))
-       {PRINT(STDOUT, "IA APPEND 1 FAILED - WRITE_TEST_5_DATA\n");
-        exit(1);};
-
-    if (!PD_write(strm, "ia(2:2,0:4)", "int", ia_w2))
-       {PRINT(STDOUT, "IA APPEND 2 FAILED - WRITE_TEST_5_DATA\n");
-        exit(1);};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* TEST_5 - test the PDBLib scatter functions in COLUMN_MAJOR order
- *        - tests can be targeted
- */
-
-static int test_5(char *base, char *tgt, int n)
-   {PDBfile *strm;
-    char datfile[MAXLINE], fname[MAXLINE];
-    int err;
-    FILE *fp;
-
-/* target the file as asked */
-    test_target(tgt, base, n, fname, datfile);
-
-    fp = io_open(fname, "w");
-
-/* create the named file */
-    strm = PD_create(datfile);
-    if (strm == NULL)
-       {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-        exit(1);};
-    PRINT(fp, "File %s created\n", datfile);
-
-    prep_test_data();
-
-/* write the test data */
-    write_test_5_data(strm);
-
-/* close the file */
-    if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
-    PRINT(fp, "File %s closed\n", datfile);
-
-/* reopen the file */
-    strm = PD_open(datfile, "a");
-    if (strm == NULL)
-       {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(1);};
-    PRINT(fp, "File %s opened\n", datfile);
-
-/* read the data from the file */
-    read_test_data(strm);
-
-/* compare the original data with that read in */
-    err = compare_test_data(strm, fp);
-
-/* close the file */
-    if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
-    PRINT(fp, "File %s closed\n", datfile);
-
-/* print it out to STDOUT */
-    print_test_data(fp);
-
-/* free known test data memory */
-    cleanup_test();
-
-    if (debug_mode)
-       SC_mem_map(STDOUT, FALSE);
-
-    io_close(fp);
-    if (err)
-       REMOVE(fname);
-
-    return(err);}
-
-/*--------------------------------------------------------------------------*/
-
-/*                              TEST 6 ROUTINES                             */
-
-/*--------------------------------------------------------------------------*/
-
-/* WRITE_TEST_6_DATA - write out the data into the PDB file
- *                   - this is defent, write, defent, write, write
- *                   - column major order
- */
-
-static void write_test_6_data(PDBfile *strm)
-   {
-
-/* write primitive arrays into the file */
-    if (!PD_defent(strm, "ia(5,1)", "int"))
-       {PRINT(STDOUT, "IA DEFENT 1 FAILED - WRITE_TEST_6_DATA\n");
-        exit(1);};
-
-    if (!PD_write(strm, "ia(0:4,0:0)", "int", ia_w0))
-       {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_6_DATA\n");
-        exit(1);};
-
-    if (!PD_defent(strm, "ia(0:4,1:2)", "int"))
-       {PRINT(STDOUT, "IA DEFENT 2 FAILED - WRITE_TEST_6_DATA\n");
-        exit(1);};
-
-    if (!PD_write(strm, "ia(0:4,1:1)", "int", ia_w1))
-       {PRINT(STDOUT, "IA APPEND 1 FAILED - WRITE_TEST_6_DATA\n");
-        exit(1);};
-
-    if (!PD_write(strm, "ia(0:4,2:2)", "int", ia_w2))
-       {PRINT(STDOUT, "IA APPEND 2 FAILED - WRITE_TEST_6_DATA\n");
-        exit(1);};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* TEST_6 - test the PDBLib scatter functions in COLUMN_MAJOR order
- *        - tests can be targeted
- */
-
-static int test_6(char *base, char *tgt, int n)
-   {PDBfile *strm;
-    char datfile[MAXLINE], fname[MAXLINE];
-    int err;
-    FILE *fp;
-
-/* target the file as asked */
-    test_target(tgt, base, n, fname, datfile);
-
-    fp = io_open(fname, "w");
-
-/* create the named file */
-    strm = PD_create(datfile);
-    if (strm == NULL)
-       {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-        exit(1);};
-    PRINT(fp, "File %s created\n", datfile);
-
-    PD_set_major_order(strm, COLUMN_MAJOR_ORDER);
-
-    prep_test_data();
-
-/* write the test data */
-    write_test_6_data(strm);
-
-/* close the file */
-    if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
-    PRINT(fp, "File %s closed\n", datfile);
-
-/* reopen the file */
-    strm = PD_open(datfile, "a");
-    if (strm == NULL)
-       {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(1);};
-    PRINT(fp, "File %s opened\n", datfile);
-
-/* read the data from the file */
-    read_test_data(strm);
-
-/* compare the original data with that read in */
-    err = compare_test_data(strm, fp);
-
-/* close the file */
-    if (!PD_close(strm))
-       {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
-    PRINT(fp, "File %s closed\n", datfile);
-
-/* print it out to STDOUT */
-    print_test_data(fp);
-
-/* free known test data memory */
-    cleanup_test();
+    cleanup_test_scatter();
 
     if (debug_mode)
        SC_mem_map(STDOUT, FALSE);
@@ -784,8 +747,8 @@ static int run_test(PFTest test, int n, char *host)
 static void print_help(void)
    {
 
-    PRINT(STDOUT, "\nPDAPTS - run PDB defent/append test suite\n\n");
-    PRINT(STDOUT, "Usage: pdapts [-d] [-h] [-n] [-v #] [-1] [-2] [-3] [-4] [-5] [-6]\n");
+    PRINT(STDOUT, "\nTPDGS - run PDB scatter/gather test suite\n\n");
+    PRINT(STDOUT, "Usage: tpdgs [-d] [-h] [-n] [-v #] [-1] [-2] [-3] [-4]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       d - turn on debug mode to display memory maps\n");
     PRINT(STDOUT, "       h - print this help message and exit\n");
@@ -795,8 +758,6 @@ static void print_help(void)
     PRINT(STDOUT, "       2 - do NOT run test #2\n");
     PRINT(STDOUT, "       3 - do NOT run test #3\n");
     PRINT(STDOUT, "       4 - do NOT run test #4\n");
-    PRINT(STDOUT, "       5 - do NOT run test #5\n");
-    PRINT(STDOUT, "       6 - do NOT run test #6\n");
     PRINT(STDOUT, "\n");
 
     return;}
@@ -804,11 +765,11 @@ static void print_help(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* MAIN - test the various append scenarios */
+/* MAIN - test the gather/scatter functionality */
 
 int main(int c, char **v)
    {int i, err;
-    int test_one, test_two, test_three, test_four, test_five, test_six;
+    int test_one, test_two, test_three, test_four;
     int use_mapped_files;
 
     PD_init_threads(0, NULL);
@@ -821,8 +782,6 @@ int main(int c, char **v)
     test_two         = TRUE;
     test_three       = TRUE;
     test_four        = TRUE;
-    test_five        = TRUE;
-    test_six         = TRUE;
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')
             {switch (v[i][1])
@@ -853,12 +812,6 @@ int main(int c, char **v)
 		      break;
                  case '4' :
 		      test_four = FALSE;
-		      break;
-                 case '5' :
-		      test_five = FALSE;
-		      break;
-                 case '6' :
-		      test_six = FALSE;
 		      break;};}
          else
             break;};
@@ -882,10 +835,6 @@ int main(int c, char **v)
        err += run_test(test_3, 3, DATFILE);
     if (test_four)
        err += run_test(test_4, 4, DATFILE);
-    if (test_five)
-       err += run_test(test_5, 5, DATFILE);
-    if (test_six)
-       err += run_test(test_6, 6, DATFILE);
 
     PRINT(STDOUT, "\n");
 

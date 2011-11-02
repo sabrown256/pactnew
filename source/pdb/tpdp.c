@@ -1,5 +1,5 @@
 /*
- * PDPTST.C - test for the PDB pointer handling scaling and performance
+ * TPDP.C - test for the PDB pointer handling scaling and performance
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942
@@ -262,13 +262,10 @@ static int compare_test_1_data(statedes *st, PDBfile *strm, FILE *fp, int na)
 static int test_1(statedes *st, char *base, char *tgt, int n, int na)
    {int err;
     char datfile[MAXLINE], fname[MAXLINE];
-    double time;
     PDBfile *strm;
     FILE *fp;
 
     show_stat(st, NULL, na);
-
-    time = SC_wall_clock_time();
 
 /* target the file as asked */
     test_target(base, n, fname, datfile);
@@ -378,8 +375,8 @@ static int run_test(statedes *st, PFTest test, int n, char *host)
 static void print_help(void)
    {
 
-    PRINT(STDOUT, "\nPDPTST - run pointer scaling and efficiency tests\n\n");
-    PRINT(STDOUT, "Usage: pdptst [-b #] [-c] [-d] [-dna #] [-dni #] [-h] [-m] [-na #] [-ni #] [-r] [-v #]\n");
+    PRINT(STDOUT, "\nTPDP - run pointer scaling and efficiency tests\n\n");
+    PRINT(STDOUT, "Usage: tpdp [-b #] [-c] [-d] [-dna #] [-dni #] [-h] [-m] [-na #] [-ni #] [-r] [-v #]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       b    set buffer size (default no buffering)\n");
     PRINT(STDOUT, "       c    verify low level writes\n");

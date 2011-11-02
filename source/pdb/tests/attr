@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "PDB Attribute Test ................."
-set exe = $BinDir/pdatst
+set exe = $BinDir/tpda
 set opt = ( -v $tst )
 set io  = ftee
 

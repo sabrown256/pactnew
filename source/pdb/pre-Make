@@ -35,16 +35,14 @@ SaveFiles = *.c *.h *.f
 # Files to remove in directory clean (pact clean)
 #
 CleanFiles  = 
-RemoveFiles = ${BinDir}/pdbtst ${BinDir}/pdatst ${BinDir}/pdasts    \
-              ${BinDir}/pdopts ${BinDir}/pdapts ${BinDir}/pdgsts    \
-              ${BinDir}/pdfrts ${BinDir}/pdctst ${BinDir}/pdptst \
-              ${BinDir}/pdlsts ${BinDir}/pdnrmt ${BinDir}/pdcsts \
-              ${BinDir}/pdftst ${BinDir}/pdfwts \
-              ${BinDir}/pdfwts ${BinDir}/pdfhyts \
-              ${BinDir}/pdntst   \
-              ${BinDir}/pdb2hdf ${BinDir}/pdsmp ${BinDir}/pddpts    \
-              ${BinDir}/pdfdpt ${BinDir}/pxrdts ${BinDir}/pxntst    \
-              ${BinDir}/pdrcts ${BinDir}/pdtdts ${BinDir}/pdtime \
+RemoveFiles = ${BinDir}/tpdb  ${BinDir}/tpda   ${BinDir}/tpdas      \
+              ${BinDir}/tpdop ${BinDir}/tpdap  ${BinDir}/tpdgs      \
+              ${BinDir}/tpdfr ${BinDir}/tpdc   ${BinDir}/tpdp       \
+              ${BinDir}/tpdls ${BinDir}/tpdnrm ${BinDir}/tpdcs      \
+              ${BinDir}/tpdn  ${BinDir}/tpdsmp ${BinDir}/tpddp      \
+              ${BinDir}/tpdrc ${BinDir}/tpdtd                       \
+              ${BinDir}/tpdxrd ${BinDir}/tpdxn                      \
+              ${BinDir}/pdtime ${BinDir}/pdb2hdf                    \
               ${BinDir}/exambin ${BinDir}/exam
 
 #
@@ -144,74 +142,74 @@ IncAction = @pact generate
 # standard tests
 #
 
-Cstd : ${BinDir}/pdbtst ${BinDir}/pdntst ${BinDir}/pdatst ${BinDir}/pdasts \
-       ${BinDir}/pdopts ${BinDir}/pdgsts ${BinDir}/pdlsts ${BinDir}/pdnrmt \
-       ${BinDir}/pdrcts ${BinDir}/pdtdts ${BinDir}/pdcsts ${BinDir}/pdapts \
-       ${BinDir}/pdfrts ${BinDir}/pdbfts ${BinDir}/pdfdts ${BinDir}/pdfcts \
-       ${BinDir}/pdctst ${BinDir}/pdptst \
+Cstd : ${BinDir}/tpdb ${BinDir}/tpdn ${BinDir}/tpda ${BinDir}/tpdas \
+       ${BinDir}/tpdop ${BinDir}/tpdgs ${BinDir}/tpdls ${BinDir}/tpdnrm \
+       ${BinDir}/tpdrc ${BinDir}/tpdtd ${BinDir}/tpdcs ${BinDir}/tpdap \
+       ${BinDir}/tpdfr ${BinDir}/tpdbf ${BinDir}/tpdfd ${BinDir}/tpdfc \
+       ${BinDir}/tpdc ${BinDir}/tpdp \
        ${DepLib}
 Apps : ${BinDir}/pdb2hdf
 
-Gst : ${BinDir}/pdgsts
-Lst : ${BinDir}/pdlsts
+Gst : ${BinDir}/tpdgs
+Lst : ${BinDir}/tpdls
 
-${BinDir}/pdbtst : pdbtst.c ${InstallDep} ${Hdrs} pdbtfr.h
-	${CLD} ${LdFlags} pdbtst.c -o ${BinDir}/pdbtst ${Libs}
+${BinDir}/tpdb : tpdb.c ${InstallDep} ${Hdrs} pdbtfr.h
+	${CLD} ${LdFlags} tpdb.c -o ${BinDir}/tpdb ${Libs}
 
-${BinDir}/pdctst : pdctst.c ${InstallDep} ${Hdrs} pdbtfr.h
-	${CLD} ${LdFlags} pdctst.c -o ${BinDir}/pdctst ${Libs}
+${BinDir}/tpdc : tpdc.c ${InstallDep} ${Hdrs} pdbtfr.h
+	${CLD} ${LdFlags} tpdc.c -o ${BinDir}/tpdc ${Libs}
 
-${BinDir}/pdptst : pdptst.c ${InstallDep} ${Hdrs} pdbtfr.h
-	${CLD} ${LdFlags} pdptst.c -o ${BinDir}/pdptst ${Libs}
+${BinDir}/tpdp : tpdp.c ${InstallDep} ${Hdrs} pdbtfr.h
+	${CLD} ${LdFlags} tpdp.c -o ${BinDir}/tpdp ${Libs}
 
-${BinDir}/pdatst : pdatst.c ${InstallDep} ${Hdrs} pdbtfr.h
-	${CLD} ${LdFlags} pdatst.c -o ${BinDir}/pdatst ${Libs}
+${BinDir}/tpda : tpda.c ${InstallDep} ${Hdrs} pdbtfr.h
+	${CLD} ${LdFlags} tpda.c -o ${BinDir}/tpda ${Libs}
 
-${BinDir}/pdasts : pdasts.c ${InstallDep} ${Hdrs} pdbtfr.h
-	${CLD} ${LdFlags} pdasts.c -o ${BinDir}/pdasts ${Libs}
+${BinDir}/tpdas : tpdas.c ${InstallDep} ${Hdrs} pdbtfr.h
+	${CLD} ${LdFlags} tpdas.c -o ${BinDir}/tpdas ${Libs}
 
-${BinDir}/pdopts : pdopts.c ${InstallDep} ${Hdrs} pdbtfr.h
-	${CLD} ${LdFlags} pdopts.c -o ${BinDir}/pdopts ${Libs}
+${BinDir}/tpdop : tpdop.c ${InstallDep} ${Hdrs} pdbtfr.h
+	${CLD} ${LdFlags} tpdop.c -o ${BinDir}/tpdop ${Libs}
 
-${BinDir}/pdapts : pdapts.c ${InstallDep} ${Hdrs} pdbtfr.h
-	${CLD} ${LdFlags} pdapts.c -o ${BinDir}/pdapts ${Libs}
+${BinDir}/tpdap : tpdap.c ${InstallDep} ${Hdrs} pdbtfr.h
+	${CLD} ${LdFlags} tpdap.c -o ${BinDir}/tpdap ${Libs}
 
-${BinDir}/pdgsts : pdgsts.c ${InstallDep} ${Hdrs} pdbtfr.h
-	${CLD} ${LdFlags} pdgsts.c -o ${BinDir}/pdgsts ${Libs}
+${BinDir}/tpdgs : tpdgs.c ${InstallDep} ${Hdrs} pdbtfr.h
+	${CLD} ${LdFlags} tpdgs.c -o ${BinDir}/tpdgs ${Libs}
 
-${BinDir}/pdlsts : pdlsts.c ${InstallDep} ${Hdrs} pdbtfr.h
-	${CLD} ${LdFlags} pdlsts.c -o ${BinDir}/pdlsts ${Libs}
+${BinDir}/tpdls : tpdls.c ${InstallDep} ${Hdrs} pdbtfr.h
+	${CLD} ${LdFlags} tpdls.c -o ${BinDir}/tpdls ${Libs}
 
-${BinDir}/pdnrmt : pdnrmt.c ${InstallDep} ${Hdrs} pdbtfr.h
-	${CLD} ${LdFlags} pdnrmt.c -o ${BinDir}/pdnrmt ${Libs}
+${BinDir}/tpdnrm : tpdnrm.c ${InstallDep} ${Hdrs} pdbtfr.h
+	${CLD} ${LdFlags} tpdnrm.c -o ${BinDir}/tpdnrm ${Libs}
 
-${BinDir}/pdcsts : pdcsts.c ${InstallDep} ${Hdrs} pdbtfr.h
-	${CLD} ${LdFlags} pdcsts.c -o ${BinDir}/pdcsts ${Libs}
+${BinDir}/tpdcs : tpdcs.c ${InstallDep} ${Hdrs} pdbtfr.h
+	${CLD} ${LdFlags} tpdcs.c -o ${BinDir}/tpdcs ${Libs}
         
-${BinDir}/pdfrts : pdfrts.c ${InstallDep} ${Hdrs} pdbtfr.h
-	${CLD} ${LdFlags} pdfrts.c -o ${BinDir}/pdfrts ${Libs}
+${BinDir}/tpdfr : tpdfr.c ${InstallDep} ${Hdrs} pdbtfr.h
+	${CLD} ${LdFlags} tpdfr.c -o ${BinDir}/tpdfr ${Libs}
         
-${BinDir}/pdbfts : pdbfts.c ${InstallDep} ${Hdrs} pdbtfr.h
-	${CLD} ${LdFlags} pdbfts.c -o ${BinDir}/pdbfts ${Libs}
+${BinDir}/tpdbf : tpdbf.c ${InstallDep} ${Hdrs} pdbtfr.h
+	${CLD} ${LdFlags} tpdbf.c -o ${BinDir}/tpdbf ${Libs}
         
-${BinDir}/pdfcts : pdfcts.c ${InstallDep} ${Hdrs} pdbtfr.h
-	${CLD} ${LdFlags} pdfcts.c -o ${BinDir}/pdfcts ${Libs}
+${BinDir}/tpdfc : tpdfc.c ${InstallDep} ${Hdrs} pdbtfr.h
+	${CLD} ${LdFlags} tpdfc.c -o ${BinDir}/tpdfc ${Libs}
         
 #
 # ascii vs binary performance
 #
-ascii : ${BinDir}/pddtst
+ascii : ${BinDir}/tpdd
 
-${BinDir}/pddtst : pddtst.c ${InstallDep} ${Hdrs}
-	${CLD} ${LdFlags} pddtst.c -o ${BinDir}/pddtst ${Libs}
+${BinDir}/tpdd : tpdd.c ${InstallDep} ${Hdrs}
+	${CLD} ${LdFlags} tpdd.c -o ${BinDir}/tpdd ${Libs}
 
 #
 # net io test
 #
-net : ${BinDir}/pdntst
+net : ${BinDir}/tpdn
 
-${BinDir}/pdntst : pdntst.c ${InstallDep} ${Hdrs}
-	${CLD} ${LdFlags} pdntst.c -o ${BinDir}/pdntst ${Libs}
+${BinDir}/tpdn : tpdn.c ${InstallDep} ${Hdrs}
+	${CLD} ${LdFlags} tpdn.c -o ${BinDir}/tpdn ${Libs}
 
 #
 # pdb to hdf converter
@@ -224,48 +222,48 @@ ${BinDir}/pdb2hdf : applications/pdb2hdf.c ${InstallDep} ${Hdrs}
 #
 # smp i/o test
 #
-smp : ${BinDir}/pdsmp
+smp : ${BinDir}/tpdsmp
 
-${BinDir}/pdsmp : pdsmp.c ${InstallDep} ${Hdrs}
-	${CLD} ${LdFlags} pdsmp.c -o ${BinDir}/pdsmp ${Libs}
+${BinDir}/tpdsmp : tpdsmp.c ${InstallDep} ${Hdrs}
+	${CLD} ${LdFlags} tpdsmp.c -o ${BinDir}/tpdsmp ${Libs}
 
 #
 # distributed mp i/o test
 #
-dp : ${BinDir}/pddpts
+dp : ${BinDir}/tpddp
 
-${BinDir}/pddpts : pddpts.c ${InstallDep} ${Hdrs}
-	${CC} ${LdFlags} pddpts.c -o ${BinDir}/pddpts ${Libs} ${DPLib}
+${BinDir}/tpddp : tpddp.c ${InstallDep} ${Hdrs}
+	${CC} ${LdFlags} tpddp.c -o ${BinDir}/tpddp ${Libs} ${DPLib}
 
 #
 # test attribute handling
 #
-attr : ${BinDir}/pdatst ${BinDir}/pxrdts ${BinDir}/pxntst
+attr : ${BinDir}/tpda ${BinDir}/tpdxrd ${BinDir}/tpdxn
 
-${BinDir}/pxrdts : pxrdts.c ${InstallDep} ${Hdrs}
-	${CLD} ${LdFlags} pxrdts.c -o ${BinDir}/pxrdts ${Libs}
+${BinDir}/tpdxrd : tpdxrd.c ${InstallDep} ${Hdrs}
+	${CLD} ${LdFlags} tpdxrd.c -o ${BinDir}/tpdxrd ${Libs}
 
-${BinDir}/pxntst : pxntst.c ${InstallDep} ${Hdrs}
-	${CLD} ${LdFlags} pxntst.c -o ${BinDir}/pxntst ${Libs}
+${BinDir}/tpdxn : tpdxn.c ${InstallDep} ${Hdrs}
+	${CLD} ${LdFlags} tpdxn.c -o ${BinDir}/tpdxn ${Libs}
 
 #
 # test cast and typedef of primitives handling
 #
-def : ${BinDir}/pdrcts ${BinDir}/pdtdts
+def : ${BinDir}/tpdrc ${BinDir}/tpdtd
 
-${BinDir}/pdrcts : pdrcts.c ${InstallDep} ${Hdrs}
-	${CLD} ${LdFlags} pdrcts.c -o ${BinDir}/pdrcts ${Libs}
+${BinDir}/tpdrc : tpdrc.c ${InstallDep} ${Hdrs}
+	${CLD} ${LdFlags} tpdrc.c -o ${BinDir}/tpdrc ${Libs}
 
-${BinDir}/pdtdts : pdtdts.c ${InstallDep} ${Hdrs}
-	${CLD} ${LdFlags} pdtdts.c -o ${BinDir}/pdtdts ${Libs}
+${BinDir}/tpdtd : tpdtd.c ${InstallDep} ${Hdrs}
+	${CLD} ${LdFlags} tpdtd.c -o ${BinDir}/tpdtd ${Libs}
 
 #
 # test file descriptor usage
 #
-fd : ${BinDir}/pdfdts
+fd : ${BinDir}/tpdfd
 
-${BinDir}/pdfdts : pdfdts.c ${InstallDep} ${Hdrs}
-	${CLD} ${LdFlags} pdfdts.c -o ${BinDir}/pdfdts ${Libs}
+${BinDir}/tpdfd : tpdfd.c ${InstallDep} ${Hdrs}
+	${CLD} ${LdFlags} tpdfd.c -o ${BinDir}/tpdfd ${Libs}
 
 #
 # timing test

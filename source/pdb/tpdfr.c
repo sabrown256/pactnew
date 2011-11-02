@@ -1,5 +1,5 @@
 /*
- * PDFRTS.C - test PD_free
+ * TPDFR.C - test PD_free
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942
@@ -367,8 +367,8 @@ static int run_test(PFTest test, int n, char *host, int dbg)
 static void print_help(void)
    {
 
-    PRINT(STDOUT, "\nPDFRTS - test PD_free\n\n");
-    PRINT(STDOUT, "Usage: pdfrts [-d #] [-h] [-r] [-v #] [-w] [-1]\n");
+    PRINT(STDOUT, "\nTPDFR - test PD_free\n\n");
+    PRINT(STDOUT, "Usage: tpdfr [-d #] [-h] [-r] [-v #] [-w] [-1]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       d - memory debug level (default is 1)\n");
     PRINT(STDOUT, "       h - print this help message and exit\n");

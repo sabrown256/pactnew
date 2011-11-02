@@ -1,5 +1,5 @@
 /*
- * PDDTST.C - measure ASCII vs binary I/O performance
+ * TPDD.C - measure ASCII vs binary I/O performance
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942
@@ -499,8 +499,8 @@ static int run_test(statedes *st, PFTest test, char *tag)
 static void print_help(void)
    {
 
-    PRINT(STDOUT, "\nPDDTST - measure ASCII vs binary I/O performance\n\n");
-    PRINT(STDOUT, "Usage: pddtst [-b #] [-d] [-h] [-m] [-n #]\n");
+    PRINT(STDOUT, "\nTPDD - measure ASCII vs binary I/O performance\n\n");
+    PRINT(STDOUT, "Usage: tpdd [-b #] [-d] [-h] [-m] [-n #]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       b    set buffer size (default no buffering)\n");
     PRINT(STDOUT, "       d    turn on debug mode to display memory maps\n");

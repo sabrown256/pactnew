@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "PDB Free Test ......................"
-set exe = $BinDir/pdfrts
+set exe = $BinDir/tpdfr
 set opt = ""
 set io  = flog
 

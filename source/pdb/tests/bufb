@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "PDB Buffer Test B .................."
-set exe = $BinDir/pdbtst
+set exe = $BinDir/tpdb
 #set opt = ( -n -v $tst )
 set opt = ( -n )
 

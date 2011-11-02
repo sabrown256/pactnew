@@ -1,5 +1,5 @@
 /*
- * PDFCTS.C - test floating point conversions in PDB
+ * TPDFC.C - test floating point conversions in PDB
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942
@@ -222,8 +222,8 @@ static int run_test(PFtfc tst, int fl)
 static void print_help(void)
    {
 
-    PRINT(STDOUT, "\nPDFCTS - test floating point conversions\n\n");
-    PRINT(STDOUT, "Usage: pdfcts [-h]\n");
+    PRINT(STDOUT, "\nTPDFC - test floating point conversions\n\n");
+    PRINT(STDOUT, "Usage: tpdfc [-h]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       h  - print this help message and exit\n");
     PRINT(STDOUT, "\n");

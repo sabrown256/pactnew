@@ -11,9 +11,9 @@
 source ../../tests/common
 
 set msg = "PDB Browse Test ...................."
-set exe = $BinDir/pdlsts
-set opt = ( pdatst.db )
-set io  = pdatst.lst
+set exe = $BinDir/tpdls
+set opt = ( tpda.db )
+set io  = tpda.lst
 
 NoteD $Log ""
 NoteD $Log -n "                    $msg"
@@ -25,7 +25,7 @@ source ../../../scripts/test-run
 # no further tests will need them
 flog $Log $RM *.db* *.rs*
 
-set rpf = ( $rpf pdatst.lst )
+set rpf = ( $rpf tpda.lst )
 
 $TEST_CHECK part -a browse -e $xstatus -dt $dt -x $exe -rpf "$rpf" none
 

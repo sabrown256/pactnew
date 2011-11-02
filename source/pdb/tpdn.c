@@ -1,5 +1,5 @@
 /*
- * PDNTST.C - test for PDB net I/O
+ * TPDN.C - test for PDB net I/O
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942
@@ -1527,8 +1527,8 @@ static int test_4(char *base, char *tgt, int n)
 void print_help(void)
    {
 
-    PRINT(STDOUT, "\nPDNTST - run PDB net test suite\n\n");
-    PRINT(STDOUT, "Usage: pdntst [-d] [-h] [-n] [-v #] [-1] [-2] [-3] [-4]\n");
+    PRINT(STDOUT, "\nTPDN - run PDB net test suite\n\n");
+    PRINT(STDOUT, "Usage: tpdn [-d] [-h] [-n] [-v #] [-1] [-2] [-3] [-4]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       d - turn on debug mode to display memory maps\n");
     PRINT(STDOUT, "       h - print this help message and exit\n");

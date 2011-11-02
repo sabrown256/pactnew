@@ -1,5 +1,5 @@
 /*
- * PDASTS.C - type definition tests for the PDB I/O
+ * TPDAS.C - type definition tests for the PDB I/O
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942
@@ -547,8 +547,8 @@ static int run_test(PFTest test, int n, char *host)
 static void print_help(void)
    {
 
-    PRINT(STDOUT, "\nPDASTS - test user defined primitive types\n\n");
-    PRINT(STDOUT, "Usage: pdasts [-d] [-h] [-n] [-v #] [-1] [-2]\n");
+    PRINT(STDOUT, "\nTPDAS - test user defined primitive types\n\n");
+    PRINT(STDOUT, "Usage: tpdas [-d] [-h] [-n] [-v #] [-1] [-2]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       d - turn on debug mode to display memory maps\n");
     PRINT(STDOUT, "       h - print this help message and exit\n");

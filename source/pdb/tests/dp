@@ -28,7 +28,7 @@ if ("$MPI" != "") then
       NoteD $Log "                    ${msg}FAILED"
 
    else
-      set exe = $BinDir/pddpts
+      set exe = $BinDir/tpddp
       set opt = ( -v $tst )
 
       if (-x $PFE) then

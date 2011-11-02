@@ -1,5 +1,5 @@
 /*
- * PDFDTS.C - test PDB for file descriptor leaks
+ * TPDFD.C - test PDB for file descriptor leaks
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942
@@ -127,7 +127,7 @@ static int pdb_file(void)
 static void print_help(void)
    {
 
-    PRINT(STDOUT, "Usage: pdfdts [-h]\n");
+    PRINT(STDOUT, "Usage: tpdfd [-h]\n");
     PRINT(STDOUT, "       h - print this help message and exit\n");
     PRINT(STDOUT, "\n");
 

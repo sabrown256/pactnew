@@ -1,5 +1,5 @@
 /*
- * PDRCTS.C - test recursive casts
+ * TPDRC.C - test recursive casts
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942
@@ -37,8 +37,8 @@ static int
 void print_help(void)
    {
 
-    PRINT(STDOUT, "\nPDRCTS - run PDB recursive cast tests\n\n");
-    PRINT(STDOUT, "Usage: pdrcts [-d] [-h] [-r] [-v #]\n");
+    PRINT(STDOUT, "\nTPDRC - run PDB recursive cast tests\n\n");
+    PRINT(STDOUT, "Usage: tpdrc [-d] [-h] [-r] [-v #]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       d - turn on debug mode to display memory maps\n");
     PRINT(STDOUT, "       h - print this help message and exit\n");
