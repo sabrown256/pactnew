@@ -1,5 +1,5 @@
 /*
- * MLITST.C - driver to study the interpolation routines
+ * TMLI.C - driver to study the interpolation routines
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942

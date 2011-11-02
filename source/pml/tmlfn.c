@@ -1,5 +1,5 @@
 /*
- * MLFNTS.C - test the PML math functions
+ * TMLFN.C - test the PML math functions
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942

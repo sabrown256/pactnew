@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "PML Matrix Test ........"
-set exe = $BinDir/mlmtrt
+set exe = $BinDir/tmlmtx
 set opt = ""
 set io  = flog
 

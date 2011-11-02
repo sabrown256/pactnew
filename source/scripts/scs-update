@@ -86,7 +86,7 @@ else if (-d .svn) then
    if ($unmngd == TRUE) then
       svn status $svnopt |& egrep '^\?'
    else
-      svn status $svnopt |& egrep -v '^\?'
+      svn status $svnopt |& egrep -v '^\?' | sed 's|+| |'
    endif
 
 endif

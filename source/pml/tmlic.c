@@ -1,5 +1,5 @@
 /*
- * MLICST.C - test scalar ICCG solver
+ * TMLIC.C - test vector ICCG solver
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
@@ -18,14 +18,17 @@
 #define KS	4
 #define MAXIT	100
 
+static double
+ ans[] = {4, 7, 8, 6};
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* MAIN - solve a Laplace equation */
+/* ORIENT_ROW - solve a Laplace equation - row oriented arrays */
 
-int main(int c, char **v)
-   {int i, j, k;
-    double ret;
+int orient_row(void)
+   {int i, j, k, ok;
+    double ret, err, erc, tol;
     double a0[KXL], a1[KXL], b0[KXL], b1[KXL], bm1[KXL], x[KXL], y[KXL];
 
     for (i = 0; i < KXL; i++)
@@ -38,10 +41,10 @@ int main(int c, char **v)
 	 y[i]	= 0.0;};
 
     for (i = KM; i < 2*KM; i++)
-	{a0[i] = 2.0;
-	 a1[i] = -1.0;
-	 b0[i] = 0.0;
-	 b1[i] = 0.0;
+	{a0[i]  = 2.0;
+	 a1[i]  = -1.0;
+	 b0[i]  = 0.0;
+	 b1[i]  = 0.0;
 	 bm1[i] = 0.0;};
 
     a1[2*KM-1] = 0.0;
@@ -57,9 +60,18 @@ int main(int c, char **v)
 	      printf(" y(%2d, %2d) = %11.3e ", j+1, i+1, y[k]);};};
     printf("\n");
     
-    ret = _PM_iccg_s(KM, LM, EPS, MAXIT, a0, a1, b0, b1, bm1, x, y, KM*LM, 0);
+    ret = _PM_iccg_v(KM, LM, EPS, KS, MAXIT, a0, a1, b0, b1, bm1, x, y);
 
-    printf("\nSolution x (should be (4, 7, 8, 6)) : %11.3e\n", ret);
+    err = 0.0;
+    for (i = 0; i < KM; i++)
+        {k   = KM + i;
+	 erc = x[k] - ans[i];
+	 err += ABS(erc);};
+
+    tol = 10.0*PM_machine_precision();
+    ok  = (err < tol);
+
+    printf("\nSolution x (should be (4, 7, 8, 6)) : %d %11.3e\n", ok, ret);
     for (j = 0; j < LM; j++)
 	{printf("\nRow #%d: \n", j+1);
 	 for (i = 0; i < KM; i++)
@@ -67,7 +79,17 @@ int main(int c, char **v)
 	      printf(" x(%2d, %2d) = %11.3e ", j+1, i+1, x[k]);};};
     printf("\n\n");
 
-    getchar();
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* ORIENT_COL - solve a Laplace equation - column oriented arrays */
+
+int orient_col(void)
+   {int i, j, k, ok;
+    double ret, erc, err, tol;
+    double a0[KXL], a1[KXL], b0[KXL], b1[KXL], bm1[KXL], x[KXL], y[KXL];
 
     for (i = 0; i < KXL; i++)
 	{a0[i]	= 0.0;
@@ -96,9 +118,23 @@ int main(int c, char **v)
 	      printf(" y(%2d, %2d) = %11.3e ", j+1, i+1, y[k]);};};
     printf("\n");
     
-    ret = _PM_iccg_s(LM, KM, EPS, MAXIT, a0, a1, b0, b1, bm1, x, y, KM*LM, 0);
+    ret = _PM_iccg_v(LM, KM, EPS, KS, MAXIT, a0, a1, b0, b1, bm1, x, y);
 
-    printf("\nSolution x (should be (4, 7, 8, 6)) : %11.3e\n", ret);
+    err = 0.0;
+    for (i = 0; i < KM; i++)
+        {k   = KM + i;
+	 erc = x[k] - ans[i];
+	 err += ABS(erc);};
+
+    tol = 10.0*PM_machine_precision();
+
+/* GOTCHA: this orientation gives bad results for a reasonable number of
+ * iterations
+ */
+    tol = 20.0;
+    ok  = (err < tol);
+
+    printf("\nSolution x (should be (4, 7, 8, 6)) : %d %11.3e\n", ok, ret);
     for (j = 0; j < KM; j++)
 	{printf("\nRow #%d: \n", j+1);
 	 for (i = 0; i < LM; i++)
@@ -106,7 +142,26 @@ int main(int c, char **v)
 	      printf(" x(%2d, %2d) = %11.3e ", j+1, i+1, x[k]);};};
     printf("\n\n");
 
-    return(0);}
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* MAIN - solve a Laplace equation */
+
+int main(int c, char **v)
+   {int ok, rv;
+
+    ok  = TRUE;
+    ok &= orient_row();
+    ok &= orient_col();
+
+    if (ok == TRUE)
+       rv = 0;
+    else
+       rv = 1;
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

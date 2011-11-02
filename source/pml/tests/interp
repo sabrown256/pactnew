@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "PML Interp Test ........"
-set exe = $BinDir/mlitst
+set exe = $BinDir/tmli
 set opt = ""
 set io  = flog
 

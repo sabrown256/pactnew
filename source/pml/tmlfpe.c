@@ -1,5 +1,5 @@
 /*
- * MLFPETS.C - test SIGFPE routines for PML
+ * TMLFPE.C - test SIGFPE routines for PML
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942

@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "PML CG Solver Test ....."
-set exe = $BinDir/mlcgts
+set exe = $BinDir/tmlcg
 set opt = ""
 set io  = flog
 

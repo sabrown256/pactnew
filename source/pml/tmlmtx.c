@@ -1,5 +1,5 @@
 /*
- * MLTEST.C - a main routine to test the matrix package
+ * TMLMTX.C - a main routine to test the matrix package
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
