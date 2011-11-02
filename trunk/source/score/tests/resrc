@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "SCORE Resource Test ........... "
+set msg = "SCORE Resource Test ..........."
 set exe = $BinDir/scrsts
 set opt = ""
 set io  = ftee

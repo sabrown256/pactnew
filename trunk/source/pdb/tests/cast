@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PDB Recursive Cast Test ............ "
+set msg = "PDB Recursive Cast Test ............"
 set exe = $BinDir/pdrcts
 set opt = ( -v $tst foo.pdb )
 set io  = ftee

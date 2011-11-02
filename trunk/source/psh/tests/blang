@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "BLANG Test ..................... "
+set msg = "BLANG Test ....................."
 
 while ($#argv > 0)
    switch ($1)

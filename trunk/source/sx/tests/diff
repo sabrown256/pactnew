@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PDBDiff Test ................. "
+set msg = "PDBDiff Test ................."
 set exe = $BinDir/sx
 
 set Ultra   = "$CFE $BinDir/ultra -e -r -x -q -s $ZeroSpace"

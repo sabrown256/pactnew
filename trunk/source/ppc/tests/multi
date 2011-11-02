@@ -15,7 +15,7 @@ source ../../tests/common
 # keep the coding around because of the interrupt driven I/O which often
 # fails here and is not tested in SCORE
 
-set msg = "PPC Multiple Test .............. "
+set msg = "PPC Multiple Test .............."
 set exe = $BinDir/pcmtst
 
 NoteD $Log ""
@@ -24,7 +24,7 @@ Note $Log ""
 
 if (0) then
 
-      NoteD $Log -n "                       polling ..................... "
+      NoteD $Log -n "                       polling ....................."
       set rpf = "none"
 
       (echo "1 a" ; \
@@ -43,7 +43,7 @@ if (0) then
 
       @ nerr = $nerr + $status
 
-      NoteD $Log -n "                       interrupt ................... "
+      NoteD $Log -n "                       interrupt ..................."
       set rpf = "none"
 
       (echo "1 a" ; \

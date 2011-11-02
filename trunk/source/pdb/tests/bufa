@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PDB Buffer Test A .................. "
+set msg = "PDB Buffer Test A .................."
 set exe = $BinDir/pdbfts
 set opt = ( -v $tst )
 

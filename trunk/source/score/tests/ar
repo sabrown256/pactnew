@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "SCORE Archive Scan Test ....... "
+set msg = "SCORE Archive Scan Test ......."
 set exe = $BinDir/fcscan
 
 NoteD $Log ""
@@ -33,7 +33,7 @@ if ($xstatus == 0) then
 
 # test long or space-filled names
 
-   NoteD $Log -n "                       name ....................... "
+   NoteD $Log -n "                       name ......................."
    Note $Log ""
 
    set rpf = none
@@ -67,7 +67,7 @@ if ($xstatus == 0) then
 
 # test working archive
 
-   NoteD $Log -n "                       working .................... "
+   NoteD $Log -n "                       working ...................."
    Note $Log ""
 
    set rpf = none

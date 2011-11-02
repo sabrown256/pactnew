@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "SCORE I/O Test ................ "
+set msg = "SCORE I/O Test ................"
 set exe = $BinDir/sciots
 set opt = ""
 set io  = ftee

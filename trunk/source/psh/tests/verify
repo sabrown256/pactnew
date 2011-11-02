@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "VERIFY Test .................... "
+set msg = "VERIFY Test ...................."
 
 while ($#argv > 0)
    switch ($1)

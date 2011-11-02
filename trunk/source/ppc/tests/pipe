@@ -18,7 +18,7 @@ set exe = $BinDir/pcexec
 
       flog $Log rm -f pcexec.refi pcexec.refp
 
-      NoteD $Log -n "                       polling ..................... "
+      NoteD $Log -n "                       polling ....................."
       set rpf = "none"
       set opt = ( -i -c 30 -p $TEST )
       set io  = pcexec.refp
@@ -29,7 +29,7 @@ set exe = $BinDir/pcexec
 
       @ nerr = $nerr + $status
 
-      NoteD $Log -n "                       interrupt ................... "
+      NoteD $Log -n "                       interrupt ..................."
       set rpf = "none"
       set opt = ( -c 30 -p $TEST )
       set io  = pcexec.refi

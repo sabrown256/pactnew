@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "ULTRA Env Test ............... "
+set msg = "ULTRA Env Test ..............."
 set exe = $BinDir/ultra
 set opt = ( -e -r -x -q -s $ZeroSpace -n )
 set io  = ulenv.log

@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "ULTRA Annotation Test ........ "
+set msg = "ULTRA Annotation Test ........"
 set exe = $BinDir/ultra
 set opt = ( -e -r -x -q -s $ZeroSpace -l $FilesDir/ulann.scm )  
 set io  = ulmmt.log

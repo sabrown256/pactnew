@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PML NAN Test ........... "
+set msg = "PML NAN Test ..........."
 set exe = $BinDir/mlnants
 set opt = ""
 set io  = flog

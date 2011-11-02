@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PDB Distributed Parallel Test ...... "
+set msg = "PDB Distributed Parallel Test ......"
 
 if ("$MPI" != "") then
    NoteD $Log ""

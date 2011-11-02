@@ -27,7 +27,7 @@ cd z-$System
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   set msg = "   S ... "
+   set msg = "   S ..."
 
    cp ../tsrc1 .
    Note $Log "Running source preprocessor $msg"
@@ -48,7 +48,7 @@ cd z-$System
 
    if ($nerr == 0) then
 
-      set msg = "   A ... "
+      set msg = "   A ..."
 
       Note $Log "Running generator code $msg"
 
@@ -70,7 +70,7 @@ cd z-$System
 
    if ($nerr == 0) then
 
-      set msg = "   B ... "
+      set msg = "   B ..."
 
       Note $Log "Running simulation code $msg"
 

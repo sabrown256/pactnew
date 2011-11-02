@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PML SVD Test ........... "
+set msg = "PML SVD Test ..........."
 set exe = $BinDir/mlsvdt
 set opt = ""
 set io  = flog

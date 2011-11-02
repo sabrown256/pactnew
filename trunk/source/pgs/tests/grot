@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PGS Grotrian Test ...... "
+set msg = "PGS Grotrian Test ......"
 set exe = $BinDir/gsgrts
 set opt = ( -1 -d )
 set io  = gsgrts.res

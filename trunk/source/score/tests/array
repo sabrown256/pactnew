@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "SCORE Smart Array Test ........ "
+set msg = "SCORE Smart Array Test ........"
 set exe = $BinDir/scarts
 set opt = ""
 set io  = ftee

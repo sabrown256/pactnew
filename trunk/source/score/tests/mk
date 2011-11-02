@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "SCORE Make Test ............... "
+set msg = "SCORE Make Test ..............."
 set exe = $BinDir/dmake
 
 if ($CROSS_COMPILE == FALSE) then

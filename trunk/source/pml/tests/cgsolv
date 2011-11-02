@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PML CG Solver Test ..... "
+set msg = "PML CG Solver Test ....."
 set exe = $BinDir/mlcgts
 set opt = ""
 set io  = flog

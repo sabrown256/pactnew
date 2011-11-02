@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PDB Fix Denorm Test ................ "
+set msg = "PDB Fix Denorm Test ................"
 set exe = $BinDir/pdnrmt
 set opt = ( -v $tst )
 set io  = flog

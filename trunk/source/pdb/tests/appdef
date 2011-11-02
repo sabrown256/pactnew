@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PDB Append/Defent Test ............. "
+set msg = "PDB Append/Defent Test ............."
 set exe = $BinDir/pdapts
 set opt = ( -v $tst )
 set io  = ftee

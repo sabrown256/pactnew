@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PANACHE Test .................. "
+set msg = "PANACHE Test .................."
 
 NoteD $Log ""
 NoteD $Log ""

@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "SCHEME Numeric Test .......... "
+set msg = "SCHEME Numeric Test .........."
 set exe = $BinDir/scheme
 set io  = flog
 
@@ -25,7 +25,7 @@ flog $Log pwd
 
 #--------------------------------------------------------------------------
 
-   NoteD $Log -n "                       integer syntax ............ "
+   NoteD $Log -n "                       integer syntax ............"
    Note $Log ""
    set rpf = none
    set opt = ( -e -l $FilesDir/shsint.scm )
@@ -48,7 +48,7 @@ flog $Log pwd
 
 #--------------------------------------------------------------------------
 
-   NoteD $Log -n "                       numeric ................... "
+   NoteD $Log -n "                       numeric ..................."
    Note $Log ""
    set rpf = none
    set opt = ( -e -l $FilesDir/shnum.scm )
@@ -67,7 +67,7 @@ flog $Log pwd
 
 #--------------------------------------------------------------------------
 
-   NoteD $Log -n "                       complex ................... "
+   NoteD $Log -n "                       complex ..................."
    Note $Log ""
    set rpf = none
    set opt = ( -e -l $FilesDir/shcpx.scm )

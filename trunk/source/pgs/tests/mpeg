@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PGS MPEG Test .......... "
+set msg = "PGS MPEG Test .........."
 
    NoteD $Log ""
    NoteD $Log "                    $msg"
@@ -27,7 +27,7 @@ set msg = "PGS MPEG Test .......... "
    else
       flog $Log rm -f gsmpg1.mpg gsmpg2.mpg
 
-      NoteD $Log -n "                        curve .............. "
+      NoteD $Log -n "                        curve .............."
       set rpf = "none"
       set exe = $BinDir/gsmpgt1
       set opt = ""
@@ -39,7 +39,7 @@ set msg = "PGS MPEG Test .......... "
 
       @ nerr = $nerr + $status
 
-      NoteD $Log -n "                        fill ............... "
+      NoteD $Log -n "                        fill ..............."
       set rpf = "none"
       set exe = $BinDir/gsmpgt2
       set opt = ""

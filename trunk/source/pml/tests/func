@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PML Function Test ...... "
+set msg = "PML Function Test ......"
 set exe = $BinDir/mlfnts
 set opt = ""
 set io  = flog

@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "ULTRA Master Test ............ "
+set msg = "ULTRA Master Test ............"
 set exe = $BinDir/ultra
 set opt = ( -e -r -x -q -s $ZeroSpace -l $FilesDir/ultest.scm )
 set io  = ultest.tmp

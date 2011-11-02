@@ -12,7 +12,7 @@ unalias *
 
 source ../../tests/common
 
-set msg = "PDB Typedef Test ................... "
+set msg = "PDB Typedef Test ..................."
 set exe = $BinDir/pdtdts
 set opt = ( -v $tst )
 set io  = flog

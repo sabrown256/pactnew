@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PML Matrix Test ........ "
+set msg = "PML Matrix Test ........"
 set exe = $BinDir/mlmtrt
 set opt = ""
 set io  = flog

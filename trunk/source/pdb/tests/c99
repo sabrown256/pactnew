@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "PDB C99 Test ....................... "
+set msg = "PDB C99 Test ......................."
 set exe = $BinDir/pdctst
 set opt = ( -v $tst )
 set io  = ftee

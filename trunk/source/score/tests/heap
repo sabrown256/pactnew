@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "SCORE Heap Check Test ......... "
+set msg = "SCORE Heap Check Test ........."
 set exe = $BinDir/scmtrt
 set opt = ""
 set io  = flog

@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "SCHEME String Test ........... "
+set msg = "SCHEME String Test ..........."
 set exe = $BinDir/scheme
 set opt = ( -e -l $FilesDir/shstr.scm )
 set io  = flog

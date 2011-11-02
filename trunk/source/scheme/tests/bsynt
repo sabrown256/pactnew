@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "SCHEME Basis Syntax Test ..... "
+set msg = "SCHEME Basis Syntax Test ....."
 set exe = $BinDir/scheme
 set opt = ( -e -l shmtst.m )
 set io  = shmtst.res

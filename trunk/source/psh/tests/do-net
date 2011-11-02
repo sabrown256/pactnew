@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "DO-NET Test .................... "
+set msg = "DO-NET Test ...................."
 
 while ($#argv > 0)
    switch ($1)

@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "SCHEME Proc Test ............. "
+set msg = "SCHEME Proc Test ............."
 set exe = $BinDir/scheme
 set opt = ( -e -l $FilesDir/shproc.scm )
 set io  = shproc.res
