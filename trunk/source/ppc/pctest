@@ -66,7 +66,7 @@ else if (-e $BinDir/pcexec) then
    Note $Log ""
 
    flog $Log pushd $BinDir
-   flog $Log rm pcmtst pcbsts pcctst
+   flog $Log rm tpcm pcbsts tpcc
    flog $Log popd
 
    flog $Log pushd $SrcDir

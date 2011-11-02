@@ -1,5 +1,5 @@
 /*
- * PCMTST.C - multiple children tests for PPC
+ * TPCM.C - multiple children tests for PPC
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
@@ -270,7 +270,7 @@ int main(int argc, char **argv, char **envp)
                 {case 'c' : to = SC_stoi(argv[++i]);
                             break;
 	         case 'h' :
-		      printf("\nUsage: pcmtst [-pst] [-c n] [-h] [-i] [-n <#>] [<prog> [<arg1> ...]]\n");
+		      printf("\nUsage: tpcm [-pst] [-c n] [-h] [-i] [-n <#>] [<prog> [<arg1> ...]]\n");
 		      printf("   Options:\n");
 		      printf("      c - timeout after n seconds\n");
 		      printf("      h - print this help message\n");
@@ -305,9 +305,9 @@ int main(int argc, char **argv, char **envp)
 
     argc -= i;
     if (argc < 1)
-       {prog = CSTRSAVE("pcctst");
+       {prog = CSTRSAVE("tpcc");
         argl = CMAKE_N(char *, 2);
-        argl[0] = CSTRSAVE("pcctst");
+        argl[0] = CSTRSAVE("tpcc");
         argl[1] = NULL;}
     else
        {prog = argv[i];

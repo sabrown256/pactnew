@@ -103,32 +103,32 @@ hdrf =
 IncAction = @pact generate
 
 
-Cstd : ${BinDir}/pcexec ${BinDir}/pcmtst \
-       ${BinDir}/pcbtst ${BinDir}/pcctst
+Cstd : ${BinDir}/pcexec ${BinDir}/tpcm \
+       ${BinDir}/tpcb ${BinDir}/tpcc
 
-parallel : ${BinDir}/pcptst ${BinDir}/pcexec
+parallel : ${BinDir}/tpcp ${BinDir}/pcexec
 
 web : ${BinDir}/pcweb
 
 #
 # binary data tests
 #
-${BinDir}/pcbtst : ${TGTLib} pcbtst.c
-	${CLD} ${LdFlags} pcbtst.c -o ${BinDir}/pcbtst ${Libs}
+${BinDir}/tpcb : ${TGTLib} tpcb.c
+	${CLD} ${LdFlags} tpcb.c -o ${BinDir}/tpcb ${Libs}
 
-${BinDir}/pcctst : ${TGTLib} pcctst.c
-	${CLD} ${LdFlags} pcctst.c -o ${BinDir}/pcctst ${Libs}
+${BinDir}/tpcc : ${TGTLib} tpcc.c
+	${CLD} ${LdFlags} tpcc.c -o ${BinDir}/tpcc ${Libs}
 
 #
 # multiple process tests
 #
-${BinDir}/pcmtst : ${TGTLib} pcmtst.c
-	${CLD} ${LdFlags} pcmtst.c -o ${BinDir}/pcmtst ${Libs}
+${BinDir}/tpcm : ${TGTLib} tpcm.c
+	${CLD} ${LdFlags} tpcm.c -o ${BinDir}/tpcm ${Libs}
 #
 # parallel process tests
 #
-${BinDir}/pcptst : ${TGTLib} pcptst.c
-	${CLD} ${LdFlags} pcptst.c -o ${BinDir}/pcptst ${Libs}
+${BinDir}/tpcp : ${TGTLib} tpcp.c
+	${CLD} ${LdFlags} tpcp.c -o ${BinDir}/tpcp ${Libs}
 #
 # http reader
 #
@@ -139,10 +139,10 @@ ${BinDir}/pcweb : ${TGTLib} pcweb.c
 # process report
 #
 
-proc : ${BinDir}/pcchld
+proc : ${BinDir}/tpcch
 
-${BinDir}/pcchld : ${TGTLib} pcchld.c
-	${CCCfe} ${LdFlags} pcchld.c -o ${BinDir}/pcchld ${Libs}
+${BinDir}/tpcch : ${TGTLib} tpcch.c
+	${CCCfe} ${LdFlags} tpcch.c -o ${BinDir}/tpcch ${Libs}
 
 #
 # make the executable

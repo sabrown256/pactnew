@@ -1,5 +1,5 @@
 /*
- * PCCTST.C - test connections child side
+ * TPCC.C - test connections child side
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
@@ -85,7 +85,7 @@ int main(int argc, char **argv)
                       binary = TRUE;
 		      break;
 		 case 'h' :
-		      printf("\nUsage: pcctst [-b]\n");
+		      printf("\nUsage: tpcc [-b]\n");
                       printf("   Simple program which prints prompts and echos input\n");
                       printf("   In binary mode sends 100 longs and 10 doubles first\n");
 		      printf("   Options:\n");
