@@ -81,8 +81,11 @@ if ($?DP_RPath == 0) then
    setenv DP_RPath /usr/$LibT
 endif
 
+set lrpath = `../analyze/rpath -o rpath`
+
 Note $ALog "DP_RPath = $DP_RPath"
 Note $ALog "lParComm = $lParComm"
+Note $ALog "lrpath   = $lrpath"
 
 if ("$lParComm" =~ *mpi*) then
 
@@ -112,8 +115,6 @@ int main(int c, char **v)
     return(0);}
 EOF
 
-   set lrpath = `../analyze/rpath -o rpath`
-
 # NOTE: we have so far gone to extraordinary lengths to avoid using
 # the compiler requested in the config file during configuration
 # this is mainly to avoid MPI complications
@@ -126,7 +127,6 @@ EOF
    Note $ALog "DP_Inc   = $DP_Inc"
    Note $ALog "DP_Lib   = $DP_Lib"
    Note $ALog "lLib     = $lLib"
-   Note $ALog "lrpath   = $lrpath"
 
    flog $ALog cat $Tmp.c
 
@@ -172,7 +172,7 @@ endif
 
 set vrs = ""
 
-if ("$lParComm" != no) then
+if ("$lParComm" =~ *mpi*) then
 
 # test compile program with MPI 2 calls
 
