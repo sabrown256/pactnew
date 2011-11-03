@@ -1,5 +1,5 @@
 #
-# AUTO-BGL-GNU - 32 bit BG/L configuration with GNU
+# AUTO-XLC-BGL - 32 bit BG/L configuration with XLC
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -9,16 +9,12 @@
 
 setenv PATH  ${PATH}:/usr/local/bin
 
+run std/use-compiler mpxlc
+
 run analyze/locate-mpi ibm bgl
 
-include compilers/gnu-bgl
+include compilers/xlc-bgl
 include no-jpeg
 include no-png
 include no-libz
-
-setenv DO_RUN_MPI     "salloc.bgl"
-setenv DO_RUN_CROSS   "no-op"
-setenv IBM_BGL
-define IBM_BGL
-define GETSOCKNAME_LONG
 

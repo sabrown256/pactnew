@@ -1,5 +1,5 @@
 #
-# AUTO-BGP-GNU - 32-bit BGP back end configuration with GCC
+# AUTO-GNU-BGP - 32-bit BGP back end configuration with GCC
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -9,7 +9,11 @@
 
 setenv PATH  ${PATH}:/usr/local/bin:/bgsys/drivers/ppcfloor/bin
 
-run analyze/locate-mpi ibm bgp any
+setenv RootInc /bgsys/drivers/ppctoolchain.gomp/gnu-linux/powerpc-bgp-linux/sys-include
+
+run std/use-compiler /usr/local/tools/compilers/ibm/mpicc-4.3.2
+
+run analyze/locate-mpi mpich bgp gnu
 
 include 32-bit
 include compilers/gnu-bgp
@@ -25,5 +29,12 @@ setenv DO_RUN_CROSS   "submit"
 setenv IBM_BGP
 define IBM_BGP
 define GETSOCKNAME_LONG
+
+setenv TEST_MAX_THREADS 2
+
+Group BFD {
+   Flags = -Wl,-dynamic
+}
+
 
 

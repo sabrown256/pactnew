@@ -201,7 +201,7 @@ ${BinDir}/tpdfc : tpdfc.c ${InstallDep} ${Hdrs} pdbtfr.h
 ascii : ${BinDir}/tpdd
 
 ${BinDir}/tpdd : tpdd.c ${InstallDep} ${Hdrs}
-	${CLD} ${LdFlags} tpdd.c -o ${BinDir}/tpdd ${Libs}
+	${CLD} ${LdFlags} tpdd.c -o ${BinDir}/tpdd ${Libs} ${MDI_Lib}
 
 #
 # net io test

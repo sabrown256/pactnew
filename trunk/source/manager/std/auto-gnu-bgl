@@ -1,0 +1,26 @@
+#
+# AUTO-GNU-BGL - 32 bit BG/L configuration with GNU
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+setenv PATH  ${PATH}:/usr/local/bin
+
+run std/use-compiler mpgcc
+
+run analyze/locate-mpi ibm bgl
+
+include compilers/gnu-bgl
+include no-jpeg
+include no-png
+include no-libz
+
+setenv DO_RUN_MPI     "salloc.bgl"
+setenv DO_RUN_CROSS   "no-op"
+setenv IBM_BGL
+define IBM_BGL
+define GETSOCKNAME_LONG
+
