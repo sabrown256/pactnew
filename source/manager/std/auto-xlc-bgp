@@ -1,5 +1,5 @@
 #
-# AUTO-BGP-XLC - 32-bit BGP back end configuration with XLC
+# AUTO-XLC-BGP - 32-bit BGP back end configuration with XLC
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -10,6 +10,8 @@
 setenv PATH  ${PATH}:/usr/local/bin:/bgsys/drivers/ppcfloor/bin
 
 setenv RootInc /opt/ibmcmp/vac/bg/9.0/include
+
+run std/use-compiler mpixlc
 
 run analyze/locate-mpi mpich bgp xlc
 

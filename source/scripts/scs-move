@@ -18,9 +18,9 @@ set gitd = ( `$ldir/where-git` )
 
 if (-d $gitd[1]) then
 
-   pushd $gitd[1] >& /dev/null
+#   pushd $gitd[1] >& /dev/null
    git mv $argv
-   popd >& /dev/null
+#   popd >& /dev/null
 
 else if (-d CVS) then
 

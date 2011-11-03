@@ -10,7 +10,7 @@
 
 #include "pdb_int.h"
 
-#define N       8
+#define N       10
 #define DATFILE "io"
 
 typedef struct s_statedes statedes;
@@ -42,8 +42,8 @@ static void show_stat(statedes *st, char *tag)
     if (first == TRUE)
        {first = FALSE;
 	PRINT(STDOUT, "\n");
-	PRINT(STDOUT, "\tTest                 Ni   FileSize    Ratio       Time   SpeedUp\n");
-	PRINT(STDOUT, "\t                          (kBytes)              (secs)\n");
+	PRINT(STDOUT, "\tTest                   Ni   FileSize    Ratio       Time   SpeedUp\n");
+	PRINT(STDOUT, "\t                            (kBytes)              (secs)\n");
 };
 
     i  = st->i;
@@ -56,20 +56,20 @@ static void show_stat(statedes *st, char *tag)
        {rs = st->sz[i]/st->sz[ir];
 	rt = st->t[ir]/st->t[i];};
 
-    printf("\t%-12s %10lld %10.2e %8.2f %10.2e %9.2e\n",
+    printf("\t%-14s %10lld %10.2e %8.2f %10.2e %9.2e\n",
 	   tag, (long long) st->n, 1.0e-3*st->sz[i], rs, st->t[i], rt);
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 
-/*                            TEST #1 ROUTINES                              */
+/*                            WFA TEST ROUTINES                             */
 
 /*--------------------------------------------------------------------------*/
 
-/* TEST_1 - write ASCII data */
+/* TEST_WFA - write ASCII data */
 
-static int test_1(statedes *st)
+static int test_wfa(statedes *st)
    {int npl, err;
     inti i, n;
     char fname[MAXLINE], fmt[3][20];
@@ -137,13 +137,13 @@ static int test_1(statedes *st)
 
 /*--------------------------------------------------------------------------*/
 
-/*                            TEST #2 ROUTINES                              */
+/*                            RFA TEST ROUTINES                             */
 
 /*--------------------------------------------------------------------------*/
 
-/* TEST_2 - read ASCII data */
+/* TEST_RFA - read ASCII data */
 
-static int test_2(statedes *st)
+static int test_rfa(statedes *st)
    {int j, npl, err;
     inti i, n;
     char fname[MAXLINE], s[MAXLINE];
@@ -216,13 +216,13 @@ static int test_2(statedes *st)
 
 /*--------------------------------------------------------------------------*/
 
-/*                            TEST #3 ROUTINES                              */
+/*                            WFB TEST ROUTINES                             */
 
 /*--------------------------------------------------------------------------*/
 
-/* TEST_3 - write binary data */
+/* TEST_WFB - write binary data with fwrite */
 
-static int test_3(statedes *st)
+static int test_wfb(statedes *st)
    {int err;
     inti i, n, rv;
     char fname[MAXLINE];
@@ -276,13 +276,13 @@ static int test_3(statedes *st)
 
 /*--------------------------------------------------------------------------*/
 
-/*                            TEST #4 ROUTINES                              */
+/*                            RFB TEST ROUTINES                             */
 
 /*--------------------------------------------------------------------------*/
 
-/* TEST_4 - read binary data */
+/* TEST_RFB - read binary data with fread */
 
-static int test_4(statedes *st)
+static int test_rfb(statedes *st)
    {int err;
     inti i, n, rv;
     char fname[MAXLINE];
@@ -336,13 +336,133 @@ static int test_4(statedes *st)
 
 /*--------------------------------------------------------------------------*/
 
-/*                            TEST #5 ROUTINES                              */
+/*                            WSB TEST ROUTINES                             */
 
 /*--------------------------------------------------------------------------*/
 
-/* TEST_5 - write PDB data */
+/* TEST_WSB - write binary data with write */
 
-static int test_5(statedes *st)
+static int test_wsb(statedes *st)
+   {int err;
+    inti i, n, rv;
+    char fname[MAXLINE];
+    float *fa;
+    double time;
+    double *da;
+    long double *la;
+    FILE *fp;
+
+    err = TRUE;
+
+    snprintf(fname, MAXLINE, "%s-bin.dat", DATFILE);
+
+    n = st->n;
+
+    fa = CMAKE_N(float, n);
+    da = CMAKE_N(double, n);
+    la = CMAKE_N(long double, n);
+
+    for (i = 0; i < n; i++)
+        {fa[i] = i;
+	 da[i] = i;
+	 la[i] = i;};
+
+    fp = fopen(fname, "wb");
+
+    time = SC_wall_clock_time();
+
+/* float */
+    rv = fwrite(fa, sizeof(float), n, fp);
+
+/* double */
+    rv = fwrite(da, sizeof(double), n, fp);
+
+/* long double */
+    rv = fwrite(la, sizeof(long double), n, fp);
+
+    st->t[st->i] += (SC_wall_clock_time() - time);
+
+    CFREE(fa);
+    CFREE(da);
+    CFREE(la);
+
+    st->sz[st->i] += ftell(fp);
+
+    fclose(fp);
+
+    SC_ASSERT(rv > 0);
+
+    return(err);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                            RSB TEST ROUTINES                             */
+
+/*--------------------------------------------------------------------------*/
+
+/* TEST_RSB - read binary data with read */
+
+static int test_rsb(statedes *st)
+   {int err;
+    inti i, n, rv;
+    char fname[MAXLINE];
+    float *fa;
+    double time;
+    double *da;
+    long double *la;
+    FILE *fp;
+
+    err = TRUE;
+
+    snprintf(fname, MAXLINE, "%s-bin.dat", DATFILE);
+
+    n = st->n;
+
+    fa = CMAKE_N(float, n);
+    da = CMAKE_N(double, n);
+    la = CMAKE_N(long double, n);
+
+    for (i = 0; i < n; i++)
+        {fa[i] = 0;
+	 da[i] = 0;
+	 la[i] = 0;};
+
+    fp = fopen(fname, "rb");
+
+    time = SC_wall_clock_time();
+
+/* float */
+    rv = fread(fa, sizeof(float), n, fp);
+
+/* double */
+    rv = fread(da, sizeof(double), n, fp);
+
+/* long double */
+    rv = fread(la, sizeof(long double), n, fp);
+
+    st->t[st->i] += (SC_wall_clock_time() - time);
+
+    CFREE(fa);
+    CFREE(da);
+    CFREE(la);
+
+    st->sz[st->i] += ftell(fp);
+
+    fclose(fp);
+
+    SC_ASSERT(rv > 0);
+
+    return(err);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                           WPDB TEST ROUTINES                             */
+
+/*--------------------------------------------------------------------------*/
+
+/* TEST_WPDB - write PDB data */
+
+static int test_wpdb(statedes *st)
    {int err;
     inti i, n, rv;
     long ind[3];
@@ -400,13 +520,13 @@ static int test_5(statedes *st)
 
 /*--------------------------------------------------------------------------*/
 
-/*                            TEST #6 ROUTINES                              */
+/*                           RPDB TEST ROUTINES                             */
 
 /*--------------------------------------------------------------------------*/
 
-/* TEST_6 - read PDB data */
+/* TEST_RPDB - read PDB data */
 
-static int test_6(statedes *st)
+static int test_rpdb(statedes *st)
    {int err;
     inti i, n, rv;
     char fname[MAXLINE];
@@ -460,7 +580,7 @@ static int test_6(statedes *st)
 
 /*--------------------------------------------------------------------------*/
 
-/*                            TEST #7 ROUTINES                              */
+/*                           WHDF TEST ROUTINES                             */
 
 /*--------------------------------------------------------------------------*/
 
@@ -468,13 +588,14 @@ static int test_6(statedes *st)
 
 #include <hdf5.h>
 #include <hdf5_hl.h>
+#include "H5LTpublic.h"
 
-/* TEST_7 - write HDF5 data */
+/* TEST_WHDF - write HDF5 data */
 
-static int test_7(statedes *st)
+static int test_whdf(statedes *st)
    {int err;
     inti i, n;
-    long ind[3];
+    hsize_t ind[3];
     char fname[MAXLINE];
     float *fa;
     double time;
@@ -526,13 +647,13 @@ static int test_7(statedes *st)
 
 /*--------------------------------------------------------------------------*/
 
-/*                            TEST #8 ROUTINES                              */
+/*                           RHDF TEST ROUTINES                             */
 
 /*--------------------------------------------------------------------------*/
 
-/* TEST_8 - read HDF5 data */
+/* TEST_RHDF - read HDF5 data */
 
-static int test_8(statedes *st)
+static int test_rhdf(statedes *st)
    {int err;
     inti i, n;
     char fname[MAXLINE];
@@ -563,13 +684,13 @@ static int test_8(statedes *st)
     time = SC_wall_clock_time();
 
 /* float */
-    rv = H5LTread_dataset_int(fp, "/fa", fa);
+    rv = H5LTread_dataset(fp, "/fa", H5T_NATIVE_FLOAT, fa);
 
 /* double */
-    rv = H5LTread_dataset_int(fp, "/da", da);
+    rv = H5LTread_dataset(fp, "/da", H5T_NATIVE_DOUBLE, da);
 
 /* long double */
-    rv = H5LTread_dataset_int(fp, "/la", la);
+    rv = H5LTread_dataset(fp, "/la", H5T_NATIVE_LDOUBLE, la);
 
     st->t[st->i] += (SC_wall_clock_time() - time);
 
@@ -694,16 +815,22 @@ int main(int c, char **v)
 
     err = 0;
 
-    err += run_test(&st, test_1, "write-ascii");
-    err += run_test(&st, test_2, "read-ascii");
-    err += run_test(&st, test_5, "write-pdb");
-    err += run_test(&st, test_6, "read-pdb");
-    err += run_test(&st, test_3, "write-binary");
-    err += run_test(&st, test_4, "read-binary");
+    err += run_test(&st, test_wfa, "write-ascii");
+    err += run_test(&st, test_rfa, "read-ascii");
+
+    err += run_test(&st, test_wpdb, "write-pdb");
+    err += run_test(&st, test_rpdb, "read-pdb");
+
 #ifdef HAVE_HDF5
-    err += run_test(&st, test_7, "write-hdf5");
-    err += run_test(&st, test_8, "read-hdf5");
+    err += run_test(&st, test_whdf, "write-hdf5");
+    err += run_test(&st, test_rhdf, "read-hdf5");
 #endif
+
+    err += run_test(&st, test_wfb, "fwrite-binary");
+    err += run_test(&st, test_rfb, "fread-binary");
+
+    err += run_test(&st, test_wsb, "write-binary");
+    err += run_test(&st, test_rsb, "read-binary");
 
     PRINT(STDOUT, "\n");
 

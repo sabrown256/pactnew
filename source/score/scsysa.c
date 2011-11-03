@@ -732,6 +732,8 @@ static int _SC_exec(SC_array *out, char *cmnd, char *shell,
     if (job != NULL)
        {ok = job->start(job, as, TRUE);
 
+	SC_ASSERT(ok >= 0);
+
 	state.done = TRUE;
 
 	job->add(job);

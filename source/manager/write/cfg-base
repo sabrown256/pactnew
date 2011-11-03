@@ -111,15 +111,13 @@
                    unset lcc
                    breaksw
               case gnu-bgl:
-                   echo "run std/use-compiler mpgcc" >>& $Tmp
-                   echo "include auto-bgl-gnu" >>& $Tmp
+                   echo "include auto-gnu-bgl" >>& $Tmp
                    breaksw
               case gnu-bgp:
-                   echo "run std/use-compiler mpicc" >>& $Tmp
-                   echo "include auto-bgp-gnu" >>& $Tmp
+                   echo "include auto-gnu-bgp" >>& $Tmp
                    breaksw
               case gnu-cxe:
-                   echo "include auto-cxe-gnu" >>& $Tmp
+                   echo "include auto-gnu-cxe" >>& $Tmp
                    breaksw
               case *icc:
                    echo "run std/use-compiler $lcc" >>& $Tmp
@@ -133,7 +131,7 @@
                    echo "include compilers/path" >>& $Tmp
                    breaksw
               case pgi-cxe:
-                   echo "include auto-cxe-pgi" >>& $Tmp
+                   echo "include auto-pgi-cxe" >>& $Tmp
                    breaksw
               case *pgi:
               case *pgcc:
@@ -151,12 +149,10 @@
                    unset ladv
                    breaksw
               case xlc-bgl:
-                   echo "run std/use-compiler mpxlc" >>& $Tmp
-                   echo "include auto-bgl-xlc" >>& $Tmp
+                   echo "include auto-xlc-bgl" >>& $Tmp
                    breaksw
               case xlc-bgp:
-                   echo "run std/use-compiler mpixlc" >>& $Tmp
-                   echo "include auto-bgp-xlc" >>& $Tmp
+                   echo "include auto-xlc-bgp" >>& $Tmp
                    breaksw
               default:
               case *gnu:

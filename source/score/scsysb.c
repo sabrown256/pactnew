@@ -206,7 +206,9 @@ static int _SC_server_complete(taskdesc *job, char *msg)
 	       _SC_exec_printf(as, "[Job %2d %s]: %s %d %d %.3f\n",
 			       pid, stm+11, msg, sgn, sts, dt);
 
-	    ok = job->remove(job);};
+	    ok = job->remove(job);
+
+	    SC_ASSERT(ok >= 0);};
 
 	SC_END_ACTIVITY(state);};
 
@@ -577,18 +579,20 @@ static void _SC_server_job(parstate *state, char *t)
 	job = SC_make_taskdesc(state, jid, NULL, shell, dir, cmd);
 	if (job != NULL)
 	   {ok = job->start(job, as, FALSE);
-/*            if (ok == TRUE) */
-	       {inf = &job->inf;
 
-		job->tag(job, tag, MAXLINE, NULL);
-		state->print(state, "%s command %s -c 'cd %s ; %s'\n",
-			     tag, shell, dir, cmd);
+	    SC_ASSERT(ok >= 0);
 
-		job->add(job);
+	    inf = &job->inf;
 
-		_SC_chg_dir(dir, &inf->directory);
+	    job->tag(job, tag, MAXLINE, NULL);
+	    state->print(state, "%s command %s -c 'cd %s ; %s'\n",
+			 tag, shell, dir, cmd);
 
-		job->exec(job, FALSE);};};};
+	    job->add(job);
+
+	    _SC_chg_dir(dir, &inf->directory);
+
+	    job->exec(job, FALSE);};};
 
     SC_END_ACTIVITY(state);
 

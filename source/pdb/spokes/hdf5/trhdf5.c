@@ -189,9 +189,9 @@ static void _H5_register(PDBfile *file, hid_t id, char *type)
              free(tempname);
 
              if ((i+1) < iter->num_members)
-                {info->next = CMAKE(compound_member_info);}
+                info->next = CMAKE(compound_member_info);
              else
-                {info->next = NULL;}; 
+                info->next = NULL;
              
              info = info->next;};
 
@@ -218,6 +218,55 @@ static int _H5_get_alignment(PDBfile *file, char *type)
     return(result);}
 
 /*--------------------------------------------------------------------------*/
+
+/*                             WRITE ROUTINES                               */
+
+/*--------------------------------------------------------------------------*/
+
+/* _H5_WRITE_DATA - after H5LT_make_dataset_numerical
+ *                - return TRUE iff successful
+ */
+
+int _H5_write_data(hid_t fid, char *fullpath,
+		   int rank, hsize_t *dims,
+		   hid_t tid, void *data)
+   {int rv;
+    hid_t did, sid;
+
+    rv = TRUE;
+
+/* create the data space for the dataset */
+    sid = H5Screate_simple(rank, dims, NULL);
+    if (sid < 0)
+       rv = FALSE;
+
+    else
+
+/* create the dataset */
+       {did = H5Dcreate2(fid, fullpath, tid, sid,
+			 H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+	if (did < 0)
+	   rv = FALSE;
+
+/* write the dataset only if there is data to write */
+	else if (data != NULL)
+	   {if (H5Dwrite(did, tid, H5S_ALL, H5S_ALL, H5P_DEFAULT, data) < 0)
+	       rv = FALSE;};
+
+/* end access to the dataset and release resources used by it */
+	if (H5Dclose(did) < 0)
+	   rv = FALSE;
+
+/* terminate access to the data space */
+	else if (H5Sclose(sid) < 0)
+	   rv = FALSE;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                              READ ROUTINES                               */
+
 /*--------------------------------------------------------------------------*/
 
 /* _H5_HANDLE_FIXED_PT - parse the binary representation of a fixed   
@@ -249,30 +298,30 @@ static char *_H5_handle_fixed_pt(PDBfile *file, hid_t dtid)
  */
     if (H5Tget_sign(dtid)) 
        {if (precision == 8)
-           {typename = CSTRSAVE(SC_CHAR_S);}
+           typename = CSTRSAVE(SC_CHAR_S);
         else if (precision == 16)
-           {typename = CSTRSAVE(SC_SHORT_S);}
+           typename = CSTRSAVE(SC_SHORT_S);
         else if (precision == 32)
-           {typename = CSTRSAVE(SC_INT_S);}
+           typename = CSTRSAVE(SC_INT_S);
         else if (precision == 64)
-           {typename = CSTRSAVE(SC_LONG_S);}
+           typename = CSTRSAVE(SC_LONG_S);
         else if (precision >  64)
-           {typename = CSTRSAVE(SC_LONG_LONG_S);}
+           typename = CSTRSAVE(SC_LONG_LONG_S);
         else
-           {typename = CSTRSAVE("UNKNOWN");};}
+           typename = CSTRSAVE("UNKNOWN");}
     else
        {if (precision == 8)
-           {typename = CSTRSAVE("u_char");}
+           typename = CSTRSAVE("u_char");
         else if (precision == 16)
-           {typename = CSTRSAVE("u_short");}
+           typename = CSTRSAVE("u_short");
         else if (precision == 32)
-           {typename = CSTRSAVE("u_int");}
+           typename = CSTRSAVE("u_int");
         else if (precision == 64)
-           {typename = CSTRSAVE("u_long");}
+           typename = CSTRSAVE("u_long");
         else if (precision >  64)
-           {typename = CSTRSAVE("u_long_long");}
+           typename = CSTRSAVE("u_long_long");
         else
-           {typename = CSTRSAVE("UNKNOWN");};};
+           typename = CSTRSAVE("UNKNOWN");};
 
 /* handle byte ordering */ 
     if (H5Tget_order(dtid) == H5T_ORDER_BE) 
@@ -950,7 +999,7 @@ static herr_t H5_read_group_node(hid_t group_id, const char *mname, void *a)
         case H5G_DATASET :
              DEBUG1("Parsing H5G_DATASET: %s\n", mname);
 
-	     dt_id   = H5Dopen(group_id, mname, H5P_DEFAULT);
+	     dt_id = H5Dopen(group_id, mname, H5P_DEFAULT);
 	     dp_id = H5Dget_space(dt_id);
 	     dtid  = H5Dget_type(dt_id);    
 	     addr         = H5Dget_offset(dt_id);
