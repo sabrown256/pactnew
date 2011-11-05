@@ -37,9 +37,9 @@ if ($xstatus == 0) then
    if ($xstatus != 0) then
       NoteD $Log ""
       NoteD $Log "                         Cannot build PDB FORTRAN Test Program"
-      flog $Log rm -f $BinDir/pdftst
-      flog $Log rm -f $BinDir/pdfgts
-      flog $Log rm -f $BinDir/pdfhyts
+      flog $Log rm -f $BinDir/tpdf
+      flog $Log rm -f $BinDir/tpdfg
+      flog $Log rm -f $BinDir/tpdfhy
    else
 
 #--------------------------------------------------------------------------
@@ -49,7 +49,7 @@ if ($xstatus == 0) then
       NoteD $Log -n "                        manual ......................... "
       Note $Log ""
 
-      set exe = $BinDir/pdftst
+      set exe = $BinDir/tpdf
       set rpf = none
       set opt = ( -p )
       set io  = flog
@@ -67,7 +67,7 @@ if ($xstatus == 0) then
       NoteD $Log -n "                        auto ........................... "
       Note $Log ""
 
-      set exe = $BinDir/pdfgts
+      set exe = $BinDir/tpdfg
       set rpf = none
       set opt = ( -p )
       set io  = flog
@@ -85,7 +85,7 @@ if ($xstatus == 0) then
       NoteD $Log -n "                        hyperstride .................... "
       Note $Log ""
 
-      set exe = $BinDir/pdfhyts
+      set exe = $BinDir/tpdfhy
       set rpf = none
       set opt = ""
       set io  = flog
@@ -111,7 +111,7 @@ if ($xstatus == 0) then
          NoteD $Log -n "                        dp ............................. "
          Note $Log ""
 
-         set exe = $BinDir/pdfdpt
+         set exe = $BinDir/tpdfd
          set rpf = none
          set opt = ( -p 4 $exe )
          set io  = flog

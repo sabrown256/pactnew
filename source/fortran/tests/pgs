@@ -37,9 +37,9 @@ if ($xstatus == 0) then
    if ($xstatus != 0) then
       NoteD $Log ""
       NoteD $Log "                         Cannot build PGS FORTRAN Test Program"
-      flog $Log rm -f $BinDir/pdftst
-      flog $Log rm -f $BinDir/pdfgts
-      flog $Log rm -f $BinDir/pdfhyts
+      flog $Log rm -f $BinDir/tpdf
+      flog $Log rm -f $BinDir/tpdfg
+      flog $Log rm -f $BinDir/tpdfhy
    else
 
 #--------------------------------------------------------------------------
@@ -49,7 +49,7 @@ if ($xstatus == 0) then
       NoteD $Log -n "                        manual ......................... "
       Note $Log ""
 
-      set exe = $BinDir/gsftst
+      set exe = $BinDir/tgsf
       set rpf = none
       set opt = ( -s )
       set io  = flog
@@ -67,7 +67,7 @@ if ($xstatus == 0) then
       NoteD $Log -n "                        auto ........................... "
       Note $Log ""
 
-      set exe = $BinDir/gsfgts
+      set exe = $BinDir/tgsfg
       set rpf = none
       set opt = ( -s )
       set io  = flog
@@ -85,7 +85,7 @@ if ($xstatus == 0) then
       NoteD $Log -n "                        contour ........................ "
       Note $Log ""
 
-      set exe = $BinDir/gsfcts
+      set exe = $BinDir/tgsfc
       set rpf = none
       set opt = ( -s )
       set io  = flog

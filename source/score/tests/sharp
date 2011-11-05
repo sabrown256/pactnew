@@ -94,7 +94,7 @@ else
    NoteD $Log -n "                       vsnprintf .................."
    Note $Log ""
 
-   set exe = $BinDir/scvsts
+   set exe = $BinDir/tscvs
    set rpf = none
    set opt = ""
    set io  = flog

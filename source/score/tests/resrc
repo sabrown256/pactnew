@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "SCORE Resource Test ..........."
-set exe = $BinDir/scrsts
+set exe = $BinDir/tscrs
 set opt = ""
 set io  = ftee
 

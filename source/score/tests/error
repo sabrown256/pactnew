@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "SCORE Error Test .............."
-set exe = $BinDir/scerts
+set exe = $BinDir/tscer
 set opt = ""
 set io  = ftee
 

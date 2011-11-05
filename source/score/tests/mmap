@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "SCORE Mapped File Test ........"
-set exe = $BinDir/scmfts
+set exe = $BinDir/tscmf
 set opt = ""
 set io  = ftee
 

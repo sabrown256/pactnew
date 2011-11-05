@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "SCORE Heap Check Test ........."
-set exe = $BinDir/scmtrt
+set exe = $BinDir/tscmtr
 set opt = ""
 set io  = flog
 

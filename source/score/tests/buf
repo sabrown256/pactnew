@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "SCORE Buffered I/O Test ......."
-set exe = $BinDir/scbfts
+set exe = $BinDir/tscbf
 set opt = ""
 set io  = ftee
 

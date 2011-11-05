@@ -139,74 +139,74 @@ NGLibs = -lfpact ${LPANACEA} ${LPGS} ${MDGLib} ${LPPC} ${LPDB} ${LPML} ${LSCORE}
 # SCORE tests
 #
 
-fha : ${BinDir}/schtst
+fha : ${BinDir}/tscfh
 
-${BinDir}/schtst : schtst.f ${InstallDep}
-	${FC} ${LdFlags} schtst.f -o ${BinDir}/schtst ${Libs}
+${BinDir}/tscfh : tscfh.f ${InstallDep}
+	${FC} ${LdFlags} tscfh.f -o ${BinDir}/tscfh ${Libs}
 
-omp : ${BinDir}/scompt
+omp : ${BinDir}/tscfomp
 
-${BinDir}/scompt : scompt.f ${InstallDep}
-	${FC} ${LdFlags} scompt.f -o ${BinDir}/scompt ${Libs}
+${BinDir}/tscfomp : tscfomp.f ${InstallDep}
+	${FC} ${LdFlags} tscfomp.f -o ${BinDir}/tscfomp ${Libs}
 
-scan : ${BinDir}/sclsts
+scan : ${BinDir}/tscls
 
-${BinDir}/sclsts : sclsts.c ${InstallDep}
-	${CLD} ${LdFlags} sclsts.c -o ${BinDir}/sclsts ${Libs}
+${BinDir}/tscls : tscls.c ${InstallDep}
+	${CLD} ${LdFlags} tscls.c -o ${BinDir}/tscls ${Libs}
 
 # PDB tests
 
-pdb : ${BinDir}/pdftst ${BinDir}/pdfwts ${BinDir}/pdfgts ${BinDir}/pdfhyts
+pdb : ${BinDir}/tpdf ${BinDir}/tpdfw ${BinDir}/tpdfg ${BinDir}/tpdfhy
 
-${BinDir}/pdftst : pdftst.f ${InstallDep}
-	${FC} ${LdFlags} pdftst.f -o ${BinDir}/pdftst ${Libs}
+${BinDir}/tpdf : tpdf.f ${InstallDep}
+	${FC} ${LdFlags} tpdf.f -o ${BinDir}/tpdf ${Libs}
 
-${BinDir}/pdfwts : pdfwts.f ${InstallDep}
-	${FC} ${LdFlags} pdfwts.f -o ${BinDir}/pdfwts ${Libs}
+${BinDir}/tpdfw : tpdfw.f ${InstallDep}
+	${FC} ${LdFlags} tpdfw.f -o ${BinDir}/tpdfw ${Libs}
 
-${BinDir}/pdfgts : pdfgts.f ${InstallDep}
-	${FC} ${LdFlags} pdfgts.f -o ${BinDir}/pdfgts ${Libs}
+${BinDir}/tpdfg : tpdfg.f ${InstallDep}
+	${FC} ${LdFlags} tpdfg.f -o ${BinDir}/tpdfg ${Libs}
 
-${BinDir}/pdfhyts : pdfhyts.f ${InstallDep}
-	${FC} ${LdFlags} pdfhyts.f -o ${BinDir}/pdfhyts ${Libs}
+${BinDir}/tpdfhy : tpdfhy.f ${InstallDep}
+	${FC} ${LdFlags} tpdfhy.f -o ${BinDir}/tpdfhy ${Libs}
 
-fdp : ${BinDir}/pdfdpt
+fdp : ${BinDir}/tpdfd
 
-${BinDir}/pdfdpt : pdfdpt.f ${InstallDep}
-	${FC} ${LdFlags} pdfdpt.f -o ${BinDir}/pdfdpt ${Libs}
+${BinDir}/tpdfd : tpdfd.f ${InstallDep}
+	${FC} ${LdFlags} tpdfd.f -o ${BinDir}/tpdfd ${Libs}
 
 # PPC tests
 
-ppc : ${BinDir}/pcftst
+ppc : ${BinDir}/tpcf
 
-${BinDir}/pcftst : pcftst.f ${InstallDep}
-	${FC} ${LdFlags} pcftst.f -o ${BinDir}/pcftst ${Libs}
+${BinDir}/tpcf : tpcf.f ${InstallDep}
+	${FC} ${LdFlags} tpcf.f -o ${BinDir}/tpcf ${Libs}
 
 # PGS tests
 
-pgs : ${BinDir}/gsftst ${BinDir}/gsfgts ${BinDir}/gsfcts
+pgs : ${BinDir}/tgsf ${BinDir}/tgsfg ${BinDir}/tgsfc
 
-${BinDir}/gsftst : gsftst.f ${InstallDep}
-	${FC} ${LdFlags} gsftst.f -o ${BinDir}/gsftst ${NGLibs}
+${BinDir}/tgsf : tgsf.f ${InstallDep}
+	${FC} ${LdFlags} tgsf.f -o ${BinDir}/tgsf ${NGLibs}
 
-${BinDir}/gsfgts : gsfgts.f ${InstallDep}
-	${FC} ${LdFlags} gsfgts.f -o ${BinDir}/gsfgts ${NGLibs}
+${BinDir}/tgsfg : tgsfg.f ${InstallDep}
+	${FC} ${LdFlags} tgsfg.f -o ${BinDir}/tgsfg ${NGLibs}
 
-contour : ${BinDir}/gsfcts
+contour : ${BinDir}/tgsfc
 
-${BinDir}/gsfcts : gsfcts.f ${InstallDep}
-	${FC} ${LdFlags} gsfcts.f -o ${BinDir}/gsfcts ${NGLibs}
+${BinDir}/tgsfc : tgsfc.f ${InstallDep}
+	${FC} ${LdFlags} tgsfc.f -o ${BinDir}/tgsfc ${NGLibs}
 
 #
 # PANACEA tests
 #
-panacea : ${BinDir}/pathts ${BinDir}/pathft
+panacea : ${BinDir}/tpath ${BinDir}/tpafth
 
-${BinDir}/pathts : pathts.c ${InstallDep}
-	${CLD} ${LdFlags} pathts.c -o ${BinDir}/pathts ${NGLibs}
+${BinDir}/tpath : tpath.c ${InstallDep}
+	${CLD} ${LdFlags} tpath.c -o ${BinDir}/tpath ${NGLibs}
 
-${BinDir}/pathft : pathft.f ${InstallDep}
-	${FC} ${LdFlags} pathft.f -o ${BinDir}/pathft ${NGLibs}
+${BinDir}/tpafth : tpafth.f ${InstallDep}
+	${FC} ${LdFlags} tpafth.f -o ${BinDir}/tpafth ${NGLibs}
 
 #
 # link 

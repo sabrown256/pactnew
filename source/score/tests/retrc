@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "SCORE Retrace Test ............"
-set exe = $BinDir/scrtrt
+set exe = $BinDir/tscrtr
 set opt = ""
 set io  = flog
 

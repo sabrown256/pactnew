@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "PGS Trans Test ........."
-set exe = $BinDir/gstrts
+set exe = $BinDir/tgstr
 set opt = ( -A )
 set io  = ftee
 
