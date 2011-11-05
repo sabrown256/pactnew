@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "SCORE Override Test ..........."
-set exe = $BinDir/scmots
+set exe = $BinDir/tscmo
 set opt = ""
 set io  = ftee
 
@@ -38,7 +38,7 @@ if (($CROSS_COMPILE == FALSE) && ($PACT_CC_FAMILY != INTEL)) then
          set xstatus = $status
       endif
    else
-      Note $Log "Failed to build scmots - skipping"
+      Note $Log "Failed to build tscmo - skipping"
       set xstatus = 0
    endif
 

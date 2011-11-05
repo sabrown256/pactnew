@@ -174,142 +174,142 @@ sharedlib:
 #
 # Basic drawing test
 #
-Cstd : ${BinDir}/gsatst
+Cstd : ${BinDir}/tgsa
 
-${BinDir}/gsatst : gsatst.c ${TGTLib}
-	${CLD} ${LdFlags} gsatst.c -o ${BinDir}/gsatst ${Libs}
+${BinDir}/tgsa : tgsa.c ${TGTLib}
+	${CLD} ${LdFlags} tgsa.c -o ${BinDir}/tgsa ${Libs}
 
 #
 # event handling test
 #
 
-event : ${BinDir}/gsevts
+event : ${BinDir}/tgsev
 
-${BinDir}/gsevts : ${TGTLib} gsevts.c
-	${CLD} ${LdFlags} gsevts.c -o ${BinDir}/gsevts ${Libs}
+${BinDir}/tgsev : ${TGTLib} tgsev.c
+	${CLD} ${LdFlags} tgsev.c -o ${BinDir}/tgsev ${Libs}
 
 #
 # line drawing test
 #
-line : ${BinDir}/gsclts
+line : ${BinDir}/tgscl
 
-${BinDir}/gsclts : gsclts.c ${TGTLib}
-	${CLD} ${LdFlags} gsclts.c -o ${BinDir}/gsclts ${Libs}
+${BinDir}/tgscl : tgscl.c ${TGTLib}
+	${CLD} ${LdFlags} tgscl.c -o ${BinDir}/tgscl ${Libs}
 
 #
 # poly segment test
 #
-polyseg : ${BinDir}/gsmlts
+polyseg : ${BinDir}/tgsml
 
-${BinDir}/gsmlts : gsmlts.c ${TGTLib}
-	${CLD} ${LdFlags} gsmlts.c -o ${BinDir}/gsmlts ${Libs}
+${BinDir}/tgsml : tgsml.c ${TGTLib}
+	${CLD} ${LdFlags} tgsml.c -o ${BinDir}/tgsml ${Libs}
 
 #
 # text handling test
 #
-text : ${BinDir}/gstxts
+text : ${BinDir}/tgstx
 
-${BinDir}/gstxts : gstxts.c ${TGTLib}
-	${CLD} ${LdFlags} gstxts.c -o ${BinDir}/gstxts ${Libs}
+${BinDir}/tgstx : tgstx.c ${TGTLib}
+	${CLD} ${LdFlags} tgstx.c -o ${BinDir}/tgstx ${Libs}
 
 #
 # transformation test
 #
-trans : ${BinDir}/gstrts
+trans : ${BinDir}/tgstr
 
-${BinDir}/gstrts : gstrts.c ${TGTLib}
-	${CLD} ${LdFlags} gstrts.c -o ${BinDir}/gstrts ${Libs}
+${BinDir}/tgstr : tgstr.c ${TGTLib}
+	${CLD} ${LdFlags} tgstr.c -o ${BinDir}/tgstr ${Libs}
 
 #
 # curve drawing test
 #
-curve : ${BinDir}/gsltst
+curve : ${BinDir}/tgsln
 
-${BinDir}/gsltst : gsltst.c ${TGTLib}
-	${CLD} ${LdFlags} gsltst.c -o ${BinDir}/gsltst ${Libs}
+${BinDir}/tgsln : tgsln.c ${TGTLib}
+	${CLD} ${LdFlags} tgsln.c -o ${BinDir}/tgsln ${Libs}
 
 #
 # surface test
 #
-surface : ${BinDir}/gssfts
+surface : ${BinDir}/tgssf
 
-${BinDir}/gssfts : gssfts.c ${TGTLib}
-	${CLD} ${LdFlags} gssfts.c -o ${BinDir}/gssfts ${Libs}
+${BinDir}/tgssf : tgssf.c ${TGTLib}
+	${CLD} ${LdFlags} tgssf.c -o ${BinDir}/tgssf ${Libs}
 
 #
 # fill-poly test
 #
-fillpoly: ${BinDir}/gsfpts
+fillpoly: ${BinDir}/tgsfp
 
-${BinDir}/gsfpts : gsfpts.c ${TGTLib}
-	${CLD} ${LdFlags} gsfpts.c -o ${BinDir}/gsfpts ${Libs}
+${BinDir}/tgsfp : tgsfp.c ${TGTLib}
+	${CLD} ${LdFlags} tgsfp.c -o ${BinDir}/tgsfp ${Libs}
 
 #
 # contour test
 #
-contour : ${BinDir}/gsctst
+contour : ${BinDir}/tgscn
 
-${BinDir}/gsctst : gsctst.c ${TGTLib}
-	${CLD} ${LdFlags} gsctst.c -o ${BinDir}/gsctst ${Libs}
+${BinDir}/tgscn : tgscn.c ${TGTLib}
+	${CLD} ${LdFlags} tgscn.c -o ${BinDir}/tgscn ${Libs}
 
 #
 # simple contour test
 #
-scontour : ${BinDir}/gssctst
+scontour : ${BinDir}/tgscnb
 
-${BinDir}/gssctst : gssctst.c ${TGTLib}
-	${CLD} ${LdFlags} gssctst.c -o ${BinDir}/gssctst ${Libs}
+${BinDir}/tgscnb : tgscnb.c ${TGTLib}
+	${CLD} ${LdFlags} tgscnb.c -o ${BinDir}/tgscnb ${Libs}
 
 #
 # vector test
 #
-vector : ${BinDir}/gsvtst
+vector : ${BinDir}/tgsvc
 
-${BinDir}/gsvtst : gsvtst.c ${TGTLib}
-	${CLD} ${LdFlags} gsvtst.c -o ${BinDir}/gsvtst ${Libs}
+${BinDir}/tgsvc : tgsvc.c ${TGTLib}
+	${CLD} ${LdFlags} tgsvc.c -o ${BinDir}/tgsvc ${Libs}
 
 #
 # image test
 #
-image : ${BinDir}/gsimts
+image : ${BinDir}/tgsim
 
-${BinDir}/gsimts : gsimts.c ${TGTLib}
-	${CLD} ${LdFlags} gsimts.c -o ${BinDir}/gsimts ${Libs}
+${BinDir}/tgsim : tgsim.c ${TGTLib}
+	${CLD} ${LdFlags} tgsim.c -o ${BinDir}/tgsim ${Libs}
 
 #
 # show colormap
 #
-colormap : ${BinDir}/gsshcm
+colormap : ${BinDir}/tgsscm
 
-${BinDir}/gsshcm : gsshcm.c ${TGTLib}
-	${CLD} ${LdFlags} gsshcm.c -o ${BinDir}/gsshcm ${Libs}
+${BinDir}/tgsscm : tgsscm.c ${TGTLib}
+	${CLD} ${LdFlags} tgsscm.c -o ${BinDir}/tgsscm ${Libs}
 
-${BinDir}/gscmts : gscmts.c ${TGTLib}
-	${CLD} ${LdFlags} gscmts.c -o ${BinDir}/gscmts ${Libs}
+${BinDir}/tgscm : tgscm.c ${TGTLib}
+	${CLD} ${LdFlags} tgscm.c -o ${BinDir}/tgscm ${Libs}
 
 #
 # Raster test
 #
-raster : ${BinDir}/gsrstt
+raster : ${BinDir}/tgsrst
 
-${BinDir}/gsrstt : gsrstt.c ${TGTLib}
-	${CLD} ${LdFlags} gsrstt.c -o ${BinDir}/gsrstt ${Libs}
+${BinDir}/tgsrst : tgsrst.c ${TGTLib}
+	${CLD} ${LdFlags} tgsrst.c -o ${BinDir}/tgsrst ${Libs}
 
 #
 # axis test
 #
-axis : ${BinDir}/gslaxt
+axis : ${BinDir}/tgslax
 
-${BinDir}/gslaxt : gslaxt.c ${TGTLib}
-	${CLD} ${LdFlags} gslaxt.c -o ${BinDir}/gslaxt ${Libs}
+${BinDir}/tgslax : tgslax.c ${TGTLib}
+	${CLD} ${LdFlags} tgslax.c -o ${BinDir}/tgslax ${Libs}
 
 #
 # grotrian test
 #
-grotrian : ${BinDir}/gsgrts
+grotrian : ${BinDir}/tgsgrt
 
-${BinDir}/gsgrts : gsgrts.c ${TGTLib}
-	${CLD} ${LdFlags} gsgrts.c -o ${BinDir}/gsgrts ${Libs}
+${BinDir}/tgsgrt : tgsgrt.c ${TGTLib}
+	${CLD} ${LdFlags} tgsgrt.c -o ${BinDir}/tgsgrt ${Libs}
 
 #
 # inform
@@ -327,11 +327,11 @@ test :
 #
 # MPEG test
 #
-mpeg : ${BinDir}/gsmpgt1 ${BinDir}/gsmpgt2
+mpeg : ${BinDir}/tgsmpg1 ${BinDir}/tgsmpg2
 
-${BinDir}/gsmpgt1 : gsmpgt1.c ${TGTLib}
-	${CLD} ${LdFlags} gsmpgt1.c -o ${BinDir}/gsmpgt1 ${Libs}
+${BinDir}/tgsmpg1 : tgsmpg1.c ${TGTLib}
+	${CLD} ${LdFlags} tgsmpg1.c -o ${BinDir}/tgsmpg1 ${Libs}
 
-${BinDir}/gsmpgt2 : gsmpgt2.c ${TGTLib}
-	${CLD} ${LdFlags} gsmpgt2.c -o ${BinDir}/gsmpgt2 ${Libs}
+${BinDir}/tgsmpg2 : tgsmpg2.c ${TGTLib}
+	${CLD} ${LdFlags} tgsmpg2.c -o ${BinDir}/tgsmpg2 ${Libs}
 

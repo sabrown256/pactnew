@@ -25,7 +25,7 @@ else
 # HASH test
 
    set msg = "SCORE HASH Test ..............."
-   set exe = $BinDir/scatst
+   set exe = $BinDir/tsca
    set rpf = none
    set opt = ""
    set io  = ftee
@@ -46,7 +46,7 @@ else
 # TREE test
 
    set msg = "SCORE TREE Test ..............."
-   set exe = $BinDir/sctrts
+   set exe = $BinDir/tsctr
    set rpf = none
    set opt = ""
    set io  = flog

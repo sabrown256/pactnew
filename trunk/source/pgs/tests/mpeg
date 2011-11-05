@@ -29,7 +29,7 @@ set msg = "PGS MPEG Test .........."
 
       NoteD $Log -n "                        curve .............."
       set rpf = "none"
-      set exe = $BinDir/gsmpgt1
+      set exe = $BinDir/tgsmpg1
       set opt = ""
       set io  = flog
 
@@ -41,7 +41,7 @@ set msg = "PGS MPEG Test .........."
 
       NoteD $Log -n "                        fill ..............."
       set rpf = "none"
-      set exe = $BinDir/gsmpgt2
+      set exe = $BinDir/tgsmpg2
       set opt = ""
       set io  = flog
 

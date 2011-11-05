@@ -70,26 +70,26 @@ targets :
 	@echo "   error        : make test program for error handling routines in SCORE"
 	@echo "   exec         : make test program for SC_exec_server"
 	@echo "   fcscan       : make simple utility to scan containers such as tar files"
-	@echo "   ha           : make scatst and sctrts test programs for hash and alist functionality"
+	@echo "   ha           : make tsca and tsctr test programs for hash and alist functionality"
 	@echo "   install      : install SCORE headers and utilities in dev/arch"
 	@echo "   io           : make test programs for I/O functionality"
 	@echo "   latency      : make simple utility to measure file system latencies"
-	@echo "   lf           : make scofft test program for large file access functionality"
+	@echo "   lf           : make tscoff test program for large file access functionality"
 	@echo "   link         : link SCORE utilities for public use"
-	@echo "   memchk       : make the scmtrt and scmpft memory management testing programs"
-	@echo "   mf           : make scmfts test program for memory mapped file functionality"
+	@echo "   memchk       : make the tscmtr and tscmpf memory management testing programs"
+	@echo "   mf           : make tscmf test program for memory mapped file functionality"
 	@echo "   mm           : make memory manager testing and performance measurement utility"
 	@echo "   mmlib        : make archive containing replacements for malloc, etc"
 	@echo "   omlib        : make archive containing overrides for malloc, etc"
 	@echo "   mpitty       : make mpi-io-wrap and sctty for MPI testing"
 	@echo "   omp          : make scompt test program for OMP functionality"
-	@echo "   print        : make scprts test program for isprint, isspace functions"
-	@echo "   resource     : make scrsts test program for resource usage functionality"
-	@echo "   retrace      : make scrtrt test program for debug/retrace functionality"
+	@echo "   print        : make tscpr test program for isprint, isspace functions"
+	@echo "   resource     : make tscrs test program for resource usage functionality"
+	@echo "   retrace      : make tscrtr test program for debug/retrace functionality"
 	@echo "   scan         : make test program for lexical scanner functionality"
 	@echo "   score-config : make SCORE memory manager configuration utility"
 	@echo "   sharedlib    : build and install SCORE shared libs in dev/arch"
-	@echo "   smp          : make scthrt scsmp and scsmpb for SMP parallel testing"
+	@echo "   smp          : make tscthr tscsmp and tscsmpb for SMP parallel testing"
 	@echo "   test         : run the SCORE test suite"
 
 #
@@ -320,19 +320,19 @@ ${BinDir}/dspace : scdsk.c ${TGTLib}
 #
 # ERROR
 #
-error : ${BinDir}/scerts
+error : ${BinDir}/tscer
 
-${BinDir}/scerts : ${TGTLib} scerts.c
-	${CCCfe} ${LdFlags} scerts.c -o ${BinDir}/scerts ${Libs}
+${BinDir}/tscer : ${TGTLib} tscer.c
+	${CCCfe} ${LdFlags} tscer.c -o ${BinDir}/tscer ${Libs}
 
 #
 # EXEC SERVER
 #
 
-exec : ${BinDir}/scexts
+exec : ${BinDir}/tscex
 
-${BinDir}/scexts : ${TGTLib} scexts.c
-	${CCCfe} ${LdFlags} scexts.c -o ${BinDir}/scexts ${Libs}
+${BinDir}/tscex : ${TGTLib} tscex.c
+	${CCCfe} ${LdFlags} tscex.c -o ${BinDir}/tscex ${Libs}
 
 #
 # MPI
@@ -348,19 +348,19 @@ ${BinDir}/sctty : ${TGTLib} sctty.c
 #
 # shared memory parallel test
 #
-smp : ${BinDir}/scthrt ${BinDir}/sctlts ${BinDir}/scsmp ${BinDir}/scsmpb
+smp : ${BinDir}/tscthr ${BinDir}/tsctl ${BinDir}/tscsmp ${BinDir}/tscsmpb
 
-${BinDir}/scthrt : scthrt.c ${TGTLib}
-	${CLD} ${LdFlags} scthrt.c -o ${BinDir}/scthrt ${Libs}
+${BinDir}/tscthr : tscthr.c ${TGTLib}
+	${CLD} ${LdFlags} tscthr.c -o ${BinDir}/tscthr ${Libs}
 
-${BinDir}/sctlts : sctlts.c ${TGTLib}
-	${CLD} ${LdFlags} sctlts.c -o ${BinDir}/sctlts ${Libs}
+${BinDir}/tsctl : tsctl.c ${TGTLib}
+	${CLD} ${LdFlags} tsctl.c -o ${BinDir}/tsctl ${Libs}
 
-${BinDir}/scsmp : scsmp.c ${TGTLib}
-	${CLD} ${LdFlags} scsmp.c -o ${BinDir}/scsmp ${Libs}
+${BinDir}/tscsmp : tscsmp.c ${TGTLib}
+	${CLD} ${LdFlags} tscsmp.c -o ${BinDir}/tscsmp ${Libs}
 
-${BinDir}/scsmpb : scsmpb.c ${TGTLib}
-	${CLD} ${LdFlags} scsmpb.c -o ${BinDir}/scsmpb ${Libs}
+${BinDir}/tscsmpb : tscsmpb.c ${TGTLib}
+	${CLD} ${LdFlags} tscsmpb.c -o ${BinDir}/tscsmpb ${Libs}
 
 #
 # memory management test
@@ -372,95 +372,95 @@ ${BinDir}/scmm : scmm.c ${TGTLib}
 #
 # memory diagnostic test
 #
-memchk : ${MMLib} ${BinDir}/scmtrt ${BinDir}/scmpft
+memchk : ${MMLib} ${BinDir}/tscmtr ${BinDir}/tscmpf
 
-${BinDir}/scmtrt : scmtrt.c ${TGTLib}
-	${CLD} ${LdFlags} scmtrt.c -o ${BinDir}/scmtrt ${MLibs}
+${BinDir}/tscmtr : tscmtr.c ${TGTLib}
+	${CLD} ${LdFlags} tscmtr.c -o ${BinDir}/tscmtr ${MLibs}
 
-${BinDir}/scmpft : scmpft.c ${TGTLib}
-	${CLD} ${LdFlags} scmpft.c -o ${BinDir}/scmpft ${Libs}
+${BinDir}/tscmpf : tscmpf.c ${TGTLib}
+	${CLD} ${LdFlags} tscmpf.c -o ${BinDir}/tscmpf ${Libs}
 
-memovr : ${OMLib} ${BinDir}/scmots
+memovr : ${OMLib} ${BinDir}/tscmo
 
-${BinDir}/scmots : ${TGTLib} scmots.c
-	${CLD} ${LdFlags} scmots.c -o ${BinDir}/scmots ${OLibs}
+${BinDir}/tscmo : ${TGTLib} tscmo.c
+	${CLD} ${LdFlags} tscmo.c -o ${BinDir}/tscmo ${OLibs}
 
 #
 # hash/alist test
 #
-ha : ${BinDir}/scatst ${BinDir}/sctrts
+ha : ${BinDir}/tsca ${BinDir}/tsctr
 
-${BinDir}/scatst : ${TGTLib} scatst.c
-	${CLD} ${LdFlags} scatst.c -o ${BinDir}/scatst ${Libs}
+${BinDir}/tsca : ${TGTLib} tsca.c
+	${CLD} ${LdFlags} tsca.c -o ${BinDir}/tsca ${Libs}
 
-${BinDir}/sctrts : ${TGTLib} sctrts.c
-	${CLD} ${LdFlags} sctrts.c -o ${BinDir}/sctrts ${Libs}
+${BinDir}/tsctr : ${TGTLib} tsctr.c
+	${CLD} ${LdFlags} tsctr.c -o ${BinDir}/tsctr ${Libs}
 
 #
 # resource usage test
 #
-resource : ${BinDir}/scrsts
+resource : ${BinDir}/tscrs
 
-${BinDir}/scrsts : ${TGTLib} scrsts.c
-	${CLD} ${LdFlags} scrsts.c -o ${BinDir}/scrsts ${Libs}
+${BinDir}/tscrs : ${TGTLib} tscrs.c
+	${CLD} ${LdFlags} tscrs.c -o ${BinDir}/tscrs ${Libs}
 
 #
 # io file test
 #
-io : ${BinDir}/sciots ${BinDir}/scbfts
+io : ${BinDir}/tscio ${BinDir}/tscbf
 
-${BinDir}/sciots : sciots.c ${TGTLib}
-	${CLD} ${LdFlags} sciots.c -o ${BinDir}/sciots ${Libs}
+${BinDir}/tscio : tscio.c ${TGTLib}
+	${CLD} ${LdFlags} tscio.c -o ${BinDir}/tscio ${Libs}
 
-${BinDir}/scbfts : scbfts.c ${TGTLib}
-	${CLD} ${LdFlags} scbfts.c -o ${BinDir}/scbfts ${Libs}
+${BinDir}/tscbf : tscbf.c ${TGTLib}
+	${CLD} ${LdFlags} tscbf.c -o ${BinDir}/tscbf ${Libs}
 
 #
 # mapped file test
 #
-mf : ${BinDir}/scmfts
+mf : ${BinDir}/tscmf
 
-${BinDir}/scmfts : scmfts.c ${TGTLib}
-	${CLD} ${LdFlags} scmfts.c -o ${BinDir}/scmfts ${Libs}
+${BinDir}/tscmf : tscmf.c ${TGTLib}
+	${CLD} ${LdFlags} tscmf.c -o ${BinDir}/tscmf ${Libs}
 
 #
 # isprint test
 #
-print : ${BinDir}/scprts
+print : ${BinDir}/tscpr
 
-${BinDir}/scprts : scprts.c ${TGTLib}
-	${CLD} ${LdFlags} scprts.c -o ${BinDir}/scprts ${Libs}
+${BinDir}/tscpr : tscpr.c ${TGTLib}
+	${CLD} ${LdFlags} tscpr.c -o ${BinDir}/tscpr ${Libs}
 
 #
 # retrace test
 #
 
-retrace : ${BinDir}/scrtrt
+retrace : ${BinDir}/tscrtr
 
-${BinDir}/scrtrt : ${TGTLib} scrtrt.c
-	${CLD} ${LdFlags} scrtrt.c -o ${BinDir}/scrtrt ${Libs} ${MDE_Lib}
+${BinDir}/tscrtr : ${TGTLib} tscrtr.c
+	${CLD} ${LdFlags} tscrtr.c -o ${BinDir}/tscrtr ${Libs} ${MDE_Lib}
 
 #
 # large file types
 #
-lf : ${BinDir}/scofft
+lf : ${BinDir}/tscoff
 
-${BinDir}/scofft : ${TGTLib} scofft.c
-	${CLD} ${LdFlags} scofft.c -o ${BinDir}/scofft ${Libs}
+${BinDir}/tscoff : ${TGTLib} tscoff.c
+	${CLD} ${LdFlags} tscoff.c -o ${BinDir}/tscoff ${Libs}
 
 #
 # memory manager overhead
 #
-mmov : ${BinDir}/scmmov
+mmov : ${BinDir}/tscmov
 
-${BinDir}/scmmov : ${TGTLib} scmmov.c
-	${CLD} ${LdFlags} scmmov.c -o ${BinDir}/scmmov ${Libs}
+${BinDir}/tscmov : ${TGTLib} tscmov.c
+	${CLD} ${LdFlags} tscmov.c -o ${BinDir}/tscmov ${Libs}
 
 #
 # comprehensive test suite
 #
 compre : ${BinDir}/tscstr ${BinDir}/tscctl ${BinDir}/tscmemc \
-         ${BinDir}/interact ${BinDir}/scvsts ${BinDir}/scarts
+         ${BinDir}/interact ${BinDir}/tscvs ${BinDir}/tscar
 
 ${BinDir}/tscstr : ${TGTLib} tscstr.c
 	${CLD} ${LdFlags} tscstr.c -o ${BinDir}/tscstr ${Libs}
@@ -474,14 +474,14 @@ ${BinDir}/tscmemc : ${TGTLib} tscmemc.c
 ${BinDir}/interact : ${TGTLib} interact.c
 	${CLD} ${LdFlags} interact.c -o ${BinDir}/interact ${Libs}
 
-${BinDir}/scvsts : ${TGTLib} scvsts.c
-	${CLD} ${LdFlags} scvsts.c -o ${BinDir}/scvsts ${Libs}
+${BinDir}/tscvs : ${TGTLib} tscvs.c
+	${CLD} ${LdFlags} tscvs.c -o ${BinDir}/tscvs ${Libs}
 
 ${BinDir}/dmake : ${TGTLib} scmkut.c
 	${CLD} ${LdFlags} scmkut.c -o ${BinDir}/dmake ${Libs}
 
-${BinDir}/scarts : ${TGTLib} scarts.c
-	${CLD} ${LdFlags} scarts.c -o ${BinDir}/scarts ${Libs}
+${BinDir}/tscar : ${TGTLib} tscar.c
+	${CLD} ${LdFlags} tscar.c -o ${BinDir}/tscar ${Libs}
 
 foo : ${TGTLib} foo.c
 	${CC} -c foo.c -o foo.o

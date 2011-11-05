@@ -1,5 +1,5 @@
 {
-   scarts_7_8_a
+   tscar_7_8_a
    Memcheck:Addr8
    fun:_SC_free_ns
    fun:_SC_free_ws
@@ -8,7 +8,7 @@
    fun:main
 }
 {
-   scarts_7_8_b
+   tscar_7_8_b
    Memcheck:Addr8
    fun:test_7
    fun:run_test
@@ -16,7 +16,7 @@
 }
 
 {
-   scarts_7_4_a
+   tscar_7_4_a
    Memcheck:Addr4
    fun:_SC_free_ns
    fun:_SC_free_ws
@@ -25,7 +25,7 @@
    fun:main
 }
 {
-   scarts_7_4_b
+   tscar_7_4_b
    Memcheck:Addr4
    fun:test_7
    fun:run_test
@@ -33,7 +33,7 @@
 }
 
 {
-   scarts_7_2_a
+   tscar_7_2_a
    Memcheck:Addr2
    fun:_SC_free_ns
    fun:_SC_free_ws
@@ -42,7 +42,7 @@
    fun:main
 }
 {
-   scarts_7_2_b
+   tscar_7_2_b
    Memcheck:Addr2
    fun:test_7
    fun:run_test
@@ -50,7 +50,7 @@
 }
 
 {
-   scmtrt_1
+   tscmtr_1
    Memcheck:Addr8
    fun:test_2
    fun:main

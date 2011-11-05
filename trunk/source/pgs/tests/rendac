@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "PGS AC Map Test ........"
-set exe = $BinDir/gsatst
+set exe = $BinDir/tgsa
 set opt = ( -A -a -1 -2 -3 -4 -5 -6 -7 -8 -9 -10 )
 set io  = ftee
 

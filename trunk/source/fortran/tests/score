@@ -29,18 +29,18 @@ Note $Log ""
    set xstatus = $status
    flog $Log popd
 
-   set exe = $BinDir/sclsts
+   set exe = $BinDir/tscls
    set rpf = none
-   set opt = ( $FilesDir/sclsts.src )
-   set io  = sclsts.res
+   set opt = ( $FilesDir/tscls.src )
+   set io  = tscls.res
 
    source ../../../scripts/test-run
 
    if ("$Valgrind" == "") then
-      diff sclsts.res $RefDir/sclsts > sclsts.res.diff
-      set rpf = ( $rpf sclsts.res.diff )
+      diff tscls.res $RefDir/tscls > tscls.res.diff
+      set rpf = ( $rpf tscls.res.diff )
    endif
-   set rpf = ( $rpf sclsts.res )
+   set rpf = ( $rpf tscls.res )
 
    $TEST_CHECK part -a score_lex -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 
@@ -57,7 +57,7 @@ Note $Log ""
    set xstatus = $status
    flog $Log popd
 
-   set exe = $BinDir/schtst
+   set exe = $BinDir/tscfh
    set rpf = none
    set opt = ""
    set io  = flog
@@ -80,7 +80,7 @@ Note $Log ""
       NoteD $Log -n "                        omp ............................ "
       Note $Log ""
 
-      set exe = $BinDir/scompt
+      set exe = $BinDir/tscfomp
       set rpf = none
 
       set t0 = `$TIMER -r`

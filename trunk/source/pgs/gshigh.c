@@ -597,7 +597,7 @@ void PG_clip_line(int *pfl, double *x1, double *x2, double *wc, int *lgf)
 
     PG_box_copy(3, lwc, wc);
 
-/* NOTE: it is possible that the box can be inverted - e.g. gslaxt
+/* NOTE: it is possible that the box can be inverted - e.g. tgslax
  * but for clipping purposes make the box have the standard
  * orientation
  */

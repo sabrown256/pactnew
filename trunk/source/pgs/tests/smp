@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "PGS Parallel Test ......"
-set exe = $BinDir/gsatst
+set exe = $BinDir/tgsa
 
    if ("$Parallel" != "") then
       Separator $Log

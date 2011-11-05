@@ -12,7 +12,7 @@ source ../../tests/common
 
 
 set msg = "PANACEA API Test ..................."
-set exe = $BinDir/pathts
+set exe = $BinDir/tpath
 set opt = ( -c 2 )
 set io  = ftee
 

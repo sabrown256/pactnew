@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "SCORE I/O Test ................"
-set exe = $BinDir/sciots
+set exe = $BinDir/tscio
 set opt = ""
 set io  = ftee
 
@@ -27,7 +27,7 @@ if ($xstatus == 0) then
    source ../../../scripts/test-run
 endif
 
-set rpf = ( $rpf sciots.txt )
+set rpf = ( $rpf tscio.txt )
 
 $TEST_CHECK part -a io -e $xstatus -dt $dt -x $exe -rpf "$rpf" "$msg"
 

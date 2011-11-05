@@ -43,16 +43,16 @@ pact image >& /dev/null
 
 echo "-----------------------------------------------------------------------------"
 echo "Image Test"
-(echo "" ; echo "") | gsimts
+(echo "" ; echo "") | tgsim
 echo "-----------------------------------------------------------------------------" >>& graphics.log
 echo "Image Test" >>& graphics.log
 if ($PSView != "") then
-   echo quit | $PSView gsimts-m.ps >>& graphics.log
-   echo quit | $PSView gsimts-c.ps >>& graphics.log
+   echo quit | $PSView tgsim-m.ps >>& graphics.log
+   echo quit | $PSView tgsim-c.ps >>& graphics.log
 endif
 if ($CGMView != "") then
-   echo quit | $CGMView gsimts-m.cgm >>& graphics.log
-   echo quit | $CGMView gsimts-c.cgm >>& graphics.log
+   echo quit | $CGMView tgsim-m.cgm >>& graphics.log
+   echo quit | $CGMView tgsim-c.cgm >>& graphics.log
 endif
 echo "" >>& graphics.log
 echo "-----------------------------------------------------------------------------" >>& graphics.log
@@ -62,16 +62,16 @@ pact fillpoly >& /dev/null
 
 echo "-----------------------------------------------------------------------------"
 echo "Polygon Fill Test"
-(echo "" ; echo "") | gsfpts
+(echo "" ; echo "") | tgsfp
 echo "-----------------------------------------------------------------------------" >>& graphics.log
 echo "Polygon Fill Test" >>& graphics.log
 if ($PSView != "") then
-   echo quit | $PSView gsfpts-m.ps >>& graphics.log
-   echo quit | $PSView gsfpts-c.ps >>& graphics.log
+   echo quit | $PSView tgsfp-m.ps >>& graphics.log
+   echo quit | $PSView tgsfp-c.ps >>& graphics.log
 endif
 if ($CGMView != "") then
-   echo quit | $CGMView gsfpts-m.cgm >>& graphics.log
-   echo quit | $CGMView gsfpts-c.cgm >>& graphics.log
+   echo quit | $CGMView tgsfp-m.cgm >>& graphics.log
+   echo quit | $CGMView tgsfp-c.cgm >>& graphics.log
 endif
 echo "" >>& graphics.log
 echo "-----------------------------------------------------------------------------" >>& graphics.log
@@ -81,16 +81,16 @@ pact surface >& /dev/null
 
 echo "-----------------------------------------------------------------------------"
 echo "Wire Frame Test"
-(echo "0 10" ; echo "") | gssfts -f > /dev/null
+(echo "0 10" ; echo "") | tgssf -f > /dev/null
 echo "-----------------------------------------------------------------------------" >>& graphics.log
 echo "Wire Frame Test" >>& graphics.log
 if ($PSView != "") then
-   echo quit | $PSView gssfts-m.ps >>& graphics.log
-   echo quit | $PSView gssfts-c.ps >>& graphics.log
+   echo quit | $PSView tgssf-m.ps >>& graphics.log
+   echo quit | $PSView tgssf-c.ps >>& graphics.log
 endif
 if ($CGMView != "") then
-   echo quit | $CGMView gssfts-m.cgm >>& graphics.log
-   echo quit | $CGMView gssfts-c.cgm >>& graphics.log
+   echo quit | $CGMView tgssf-m.cgm >>& graphics.log
+   echo quit | $CGMView tgssf-c.cgm >>& graphics.log
 endif
 echo "" >>& graphics.log
 echo "-----------------------------------------------------------------------------" >>& graphics.log
@@ -98,16 +98,16 @@ echo "--------------------------------------------------------------------------
 
 echo "-----------------------------------------------------------------------------"
 echo "Surface Test"
-(echo "0 10" ; echo "") | gssfts -f -s > /dev/null
+(echo "0 10" ; echo "") | tgssf -f -s > /dev/null
 echo "-----------------------------------------------------------------------------" >>& graphics.log
 echo "Surface Test" >>& graphics.log
 if ($PSView != "") then
-   echo quit | $PSView gssfts-m.ps >>& graphics.log
-   echo quit | $PSView gssfts-c.ps >>& graphics.log
+   echo quit | $PSView tgssf-m.ps >>& graphics.log
+   echo quit | $PSView tgssf-c.ps >>& graphics.log
 endif
 if ($CGMView != "") then
-   echo quit | $CGMView gssfts-m.cgm >>& graphics.log
-   echo quit | $CGMView gssfts-c.cgm >>& graphics.log
+   echo quit | $CGMView tgssf-m.cgm >>& graphics.log
+   echo quit | $CGMView tgssf-c.cgm >>& graphics.log
 endif
 echo "" >>& graphics.log
 echo "-----------------------------------------------------------------------------" >>& graphics.log

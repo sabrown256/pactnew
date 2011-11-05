@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "PGS Basic Test ........."
-set exe = $BinDir/gsatst
+set exe = $BinDir/tgsa
 set opt = ( -A -3 -8 -11 -12 -r 500 )
 set io  = ftee
 
