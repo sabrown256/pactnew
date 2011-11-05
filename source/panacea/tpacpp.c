@@ -1,5 +1,5 @@
 /*
- * PACPPT.C - test PACPP.C functions
+ * TPACPP.C - test PACPP.C functions
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942

@@ -112,25 +112,19 @@ hdrf = ${IncDir}/pasrc.h
 IncAction = @pact generate
 
 #
-# pata
-#
-${BinDir}/pata : pata.c ${TGTLib}
-	${CLD} ${LdFlags} pata.c -o ${BinDir}/pata ${NGLibs}
-
-#
 # preprocessing test
 #
-prep : ${BinDir}/pacppt
+prep : ${BinDir}/tpacpp
 
-${BinDir}/pacppt : pacppt.c ${TGTLib}
-	${CLD} ${LdFlags} pacppt.c -o ${BinDir}/pacppt ${NGLibs}
+${BinDir}/tpacpp : tpacpp.c ${TGTLib}
+	${CLD} ${LdFlags} tpacpp.c -o ${BinDir}/tpacpp ${NGLibs}
 #
 # test new variable definition
 #
-defvar : ${BinDir}/padeft
+defvar : ${BinDir}/tpadef
 
-${BinDir}/padeft : padeft.c ${TGTLib}
-	${CLD} ${LdFlags} padeft.c -o ${BinDir}/padeft ${NGLibs}
+${BinDir}/tpadef : tpadef.c ${TGTLib}
+	${CLD} ${LdFlags} tpadef.c -o ${BinDir}/tpadef ${NGLibs}
 
 #
 # make the executable

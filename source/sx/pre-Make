@@ -154,11 +154,11 @@ ${TGTExe} : ${BinDep}
 #
 # make the command test wrapper
 #
-${BinDir}/sxcmts : ${BinDep}
-	${CLD} ${LdFlags} sxcmts.c -o ${BinDir}/sxcmts ${Libs}
+${BinDir}/tsxcmd : ${BinDep}
+	${CLD} ${LdFlags} tsxcmd.c -o ${BinDir}/tsxcmd ${Libs}
 
 command :
-	pact ${BinDir}/sxcmts
+	pact ${BinDir}/tsxcmd
 
 #
 # link 
