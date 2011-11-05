@@ -1,5 +1,5 @@
 /*
- * PADEFT.C - test the functionality of file PADEF.C
+ * TPADEF.C - test the functionality of file PADEF.C
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942

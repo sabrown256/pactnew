@@ -1,5 +1,5 @@
 /*
- * SXCMTS.C - test SX_command
+ * TSXCMD.C - test SX_command
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
