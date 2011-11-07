@@ -266,6 +266,8 @@ static void _PG_JP_close_device(PG_device *dev)
 
     GET_RAST_DEVICE(dev, rdv);
 
+    SC_ASSERT(rdv != NULL);
+
 /* clean up the device */
     PG_rl_device(dev);
 
