@@ -63,6 +63,9 @@ struct s_hdf_state
 static char
  *H5FILE_S = "HDF5file";        /* identifier string */
 
+static hid_t
+ _H5_enc_compound(PDBfile *file, defstr *dp, intb nb);
+
 static char
  *_H5_dec_compound(PDBfile *file, hid_t htyp);
 
@@ -87,7 +90,7 @@ static sys_layer
 
 static char *_H5_is_registered(PDBfile *file, hid_t dtid)
    {int i, matches;
-    char *verdict, *tempname;
+    char *verdict, *mname;
     compound_desc *iter;
     compound_member_info *info;
     H5T_class_t type_class;
@@ -116,21 +119,23 @@ static char *_H5_is_registered(PDBfile *file, hid_t dtid)
 
 /* if anything does NOT match, remember this */
 	    for (i = 0 ; i < iter->num_members ; i++)
-                {tempname = H5Tget_member_name(dtid, i);
+                {mname = H5Tget_member_name(dtid, i);
                 
-		 if ((strcmp(info->member_name, tempname) != 0) ||
+		 if ((strcmp(info->member_name, mname) != 0) ||
                      (info->member_offset != H5Tget_member_offset(dtid, i)))
                     {matches = FALSE; 
-		     free(tempname);
+		     free(mname);
 		     break;}; 
 
-		 free(tempname);
+		 free(mname);
                 
 		 info = info->next;};
 
 /* only if everything matches do we assume this is the one */
 	    if (matches)
-               verdict = iter->compound_name;}
+               verdict = iter->compound_name;
+	    else
+	       iter = iter->next;}
        else
 	  iter = iter->next;};
 
@@ -146,7 +151,7 @@ static char *_H5_is_registered(PDBfile *file, hid_t dtid)
 
 static void _H5_register(PDBfile *file, hid_t hfp, char *type)
    {int i;
-    char *verdict, *tempname;
+    char *verdict, *mname;
     compound_desc *iter, *prev;
     compound_member_info *info;
     hdf_state *hst;
@@ -166,11 +171,11 @@ static void _H5_register(PDBfile *file, hid_t hfp, char *type)
 
 /* grow a compound_desc there (or at registry itself if it is empty) */
         if (prev == NULL)
-          {hst->registry = CMAKE(compound_desc); 
-           iter         = hst->registry;}
+           {hst->registry = CMAKE(compound_desc); 
+            iter          = hst->registry;}
         else 
-          {prev->next = CMAKE(compound_desc);  
-           iter       = prev->next;};
+           {prev->next = CMAKE(compound_desc);  
+            iter       = prev->next;};
 
 /* insert the data into the new compound_desc */
         iter->compound_name = CSTRSAVE(type);
@@ -181,12 +186,12 @@ static void _H5_register(PDBfile *file, hid_t hfp, char *type)
         info = iter->info;
 
         for (i = 0 ; i < iter->num_members ; i++)
-            {tempname = H5Tget_member_name(hfp, i);
+            {mname = H5Tget_member_name(hfp, i);
 
              info->member_offset = H5Tget_member_offset(hfp, i); 
-             info->member_name   = CSTRSAVE(tempname);
+             info->member_name   = CSTRSAVE(mname);
 
-             free(tempname);
+             free(mname);
 
              if ((i+1) < iter->num_members)
                 info->next = CMAKE(compound_member_info);
@@ -230,7 +235,9 @@ static int _H5_get_alignment(PDBfile *file, char *type)
 
 static hid_t _H5_enc_type(PDBfile *file, char *ptyp)
    {int tid;
+    intb nb;
     hid_t htyp;
+    defstr *dp;
 
     tid = SC_type_id(ptyp, FALSE);
 
@@ -243,6 +250,9 @@ static hid_t _H5_enc_type(PDBfile *file, char *ptyp)
     else if (tid == SC_LONG_I)
        htyp = H5T_NATIVE_LONG;
 
+    else if (tid == SC_LONG_LONG_I)
+       htyp = H5T_NATIVE_LLONG;
+
     else if (tid == SC_FLOAT_I)
        htyp = H5T_NATIVE_FLOAT;
 
@@ -252,13 +262,21 @@ static hid_t _H5_enc_type(PDBfile *file, char *ptyp)
     else if (tid == SC_LONG_DOUBLE_I)
        htyp = H5T_NATIVE_LDOUBLE;
 
+    else if (tid == SC_CHAR_I)
+       htyp = H5T_NATIVE_SCHAR;
+
+    else if (tid == SC_BOOL_I)
+       htyp = H5T_NATIVE_HBOOL;
+
+    else
+       {dp = PD_inquire_host_type(file, ptyp);
+	if (dp != NULL)
+	   {nb   = _PD_lookup_size(ptyp, file->host_chart);
+	    htyp = _H5_enc_compound(file, dp, nb);}
+        else
+	   {DEBUG1("Unknown type %d\n", tid);};};
+
 #if 0
-        case H5T_FLOAT :   /* FLOATING-PT NUMBERS */
-             typename = _H5_handle_float_pt(file, htyp);
-	     break;
-        case H5T_COMPOUND :   /* COMPOUND TYPES */
-             typename = _H5_dec_compound(file, htyp);
-	     break;
         case H5T_STRING :   /* NULL-TERMINATED STRINGS */
              typename = _H5_handle_fixed_pt(file, htyp);
 	     break;  
@@ -287,15 +305,33 @@ static hid_t _H5_enc_type(PDBfile *file, char *ptyp)
              break;
 #endif
 
-    else
-       {DEBUG1("Unknown type %d\n", tid);};
+    return(htyp);}
 
-#if 0
-    char type_class;
-    type_class = H5Tget_class(htyp);
-    DEBUG1("      class %d\n", type_class);
-    DEBUG1("Determined type to be %d\n", type_class);
-#endif
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _H5_ENC_COMPOUND - encode the PDB representation of a struct into HDF form
+ *                  - may recurse if necessary
+ *                  - DP is the PDB type
+ */
+
+static hid_t _H5_enc_compound(PDBfile *file, defstr *dp, intb nb)
+   {memdes *mbr;
+    hid_t mtyp, htyp;
+    hdf_state *hst;
+
+    hst  = file->meta;
+    htyp = -1;
+
+    if ((dp != NULL) && (dp->members != NULL) &&
+	(PD_type_n_indirects(dp) == 0))
+       {htyp = H5Tcreate(H5T_COMPOUND, nb);
+
+	for (mbr = dp->members; mbr != NULL ; mbr = mbr->next)
+	    {mtyp = _H5_enc_type(file, mbr->type);
+	     H5Tinsert(htyp, mbr->name, mbr->member_offs, mtyp);};
+
+	_H5_register(file, htyp, dp->type);};
 
     return(htyp);}
 
@@ -304,20 +340,19 @@ static hid_t _H5_enc_type(PDBfile *file, char *ptyp)
 
 /* _H5_ENC_DIMS - encode PDB dimensions in HDF form */
 
-static hsize_t *_H5_enc_dims(PDBfile *file, int *prank,
-			     hid_t htyp, hid_t dsid,
-			     dimdes *pdims)
-   {int rank, status;
-    H5S_class_t scid;
+static hsize_t *_H5_enc_dims(PDBfile *file, int *pnd,
+			     hid_t htyp, dimdes *pdims, inti ni)
+   {int nd, status;
     H5T_class_t tcid;
     hsize_t *hdims;
-    hid_t nativetype_id, tempType;
 
     hdims = NULL;
     tcid  = H5Tget_class(htyp);
 
     if (tcid == H5T_ARRAY)
-       {rank = H5Tget_array_ndims(htyp);
+       {hid_t nativetype_id, tempType;
+
+        nd = H5Tget_array_ndims(htyp);
 
         nativetype_id = H5Tcopy(htyp);
 
@@ -329,10 +364,10 @@ static hsize_t *_H5_enc_dims(PDBfile *file, int *prank,
 
         if (H5Tget_class(nativetype_id) == H5T_STRING) 
            {DEBUG1("_H5_enc_dims: careful -- %s\n", "string array");
-            rank++;}
+            nd++;}
 
-        DEBUG1("      H5T_ARRAY rank(%d)\n", rank);
-        hdims = (hsize_t*) calloc(rank, sizeof(hsize_t));
+        DEBUG1("      H5T_ARRAY rank(%d)\n", nd);
+        hdims = (hsize_t*) calloc(nd, sizeof(hsize_t));
 #if (H5_VERS_RELEASE < 4)
         status = H5Tget_array_dims(htyp, hdims); 
 #else
@@ -340,87 +375,41 @@ static hsize_t *_H5_enc_dims(PDBfile *file, int *prank,
 #endif
 
         if (H5Tget_class(nativetype_id) == H5T_STRING)
-           hdims[rank-1] = H5Tget_size(nativetype_id);
+           hdims[nd-1] = H5Tget_size(nativetype_id);
 
         H5Tclose(nativetype_id);}
 
     else if (tcid == H5T_STRING)
-       {rank = 1;
+       {DEBUG1("      H5T_STRING nd(%d)\n", nd);
 
-        DEBUG1("      H5T_STRING rank(%d)\n", rank);
-
-        hdims    = (hsize_t*) calloc(rank, sizeof(hsize_t));
+        nd       = 1;
+        hdims    = (hsize_t*) calloc(nd, sizeof(hsize_t));
         hdims[0] = H5Tget_size(htyp);}
 
     else 
-       {scid = H5Sget_simple_extent_type(dsid);
+       {long id;
+	dimdes *lst;
 
-/* either we have a scalar space or an array (simple) space */
-       switch(scid)
-          {case H5S_SCALAR :
+	if (ni > 0)
+	   {nd       = 1;
+	    hdims    = (hsize_t *) calloc(nd, sizeof(hsize_t)); 
+	    hdims[0] = ni;}
 
-/* assume dimensionality info is NULL for scalars */
-	        DEBUG1("%s\n", "      H5S_SCALAR");
+        else
+	   {for (nd = 0, lst = pdims; lst != NULL; lst = lst->next, nd++);
 
-		rank  = -1;
-		hdims = NULL;
-		break;
+	    if (nd == 0)
+	       {nd       = 1;
+		hdims    = (hsize_t *) calloc(nd, sizeof(hsize_t)); 
+		hdims[0] = 1;}
+	    else
+	       {hdims = (hsize_t *) calloc(nd, sizeof(hsize_t)); 
 
-	   case H5S_SIMPLE :
+		for (id = 0, lst = pdims; lst != NULL; lst = lst->next, id++)
+		    hdims[id] = (long) lst->number;};};};
 
-/* obtain the rank of this simple data space */
-		rank = H5Sget_simple_extent_ndims(dsid);
-   
-		if (rank < 0) 
-		   {fprintf(stderr, "_H5_enc_dims: error obtaining rank\n");
-		    return(NULL);};
- 
-		DEBUG1("      H5S_SIMPLE rank = %d\n", rank);    
-
-/* get the sizes of each dimension */ 
-		hdims  = (hsize_t *) calloc(rank, sizeof(hsize_t)); 
-		status = H5Sget_simple_extent_dims(dsid, hdims, NULL);
-
-		if (status < 0)
-		   {fprintf(stderr, "_H5_enc_dims: error obtaining dims\n");
-		    free(hdims);
-		    hdims = NULL;};
-		break;
-       
-	   default :
-		break;};};
-
-#if 0
-    int i;
-    dimdes *dim;
-
-/* construct the dimensionality information */
-     if (rank > 0)
-        {pdims = CMAKE(dimdes);
-         dim   = pdims;}
-     else 
-        pdims = NULL;
-
-     for (i = 0; i < rank; i++) 
-
-/* HDF5 files assume 0 based counting */
-         {dim->number    = (long) hdims[i];
-          dim->index_min = 0L;
-          dim->index_max = dim->number - 1L; 
-
-          DEBUG1("      dim %d:", rank);
-          DEBUG1(" 0:%ld\n", dim->index_max);    
-
-/* are we going around again? */
-         if (i+1 < rank)
-            {dim->next = CMAKE(dimdes);
-             dim = dim->next;}
-         else
-            dim->next = NULL;};
-#endif
-
-    if (prank != NULL)
-       *prank = rank;
+    if (pnd != NULL)
+       *pnd = nd;
 
     return(hdims);}
 
@@ -432,36 +421,30 @@ static hsize_t *_H5_enc_dims(PDBfile *file, int *prank,
  */
 
 int _H5_write_data(hid_t fid, char *fullpath,
-		   int rank, hsize_t *dims,
-		   hid_t htyp, void *data)
-   {int rv;
+		   int nd, hsize_t *dims,
+		   hid_t htyp, void *vr)
+   {int rv, st;
     hid_t did, sid;
 
     rv = TRUE;
 
-/* create the data space for the dataset */
-    sid = H5Screate_simple(rank, dims, NULL);
+    sid = H5Screate_simple(nd, dims, NULL);
     if (sid < 0)
        rv = FALSE;
 
     else
-
-/* create the dataset */
        {did = H5Dcreate2(fid, fullpath, htyp, sid,
 			 H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 	if (did < 0)
 	   rv = FALSE;
 
-/* write the dataset only if there is data to write */
-	else if (data != NULL)
-	   {if (H5Dwrite(did, htyp, H5S_ALL, H5S_ALL, H5P_DEFAULT, data) < 0)
-	       rv = FALSE;};
+	else if (vr != NULL)
+	   {st = H5Dwrite(did, htyp, H5S_ALL, H5S_ALL, H5P_DEFAULT, vr);
+	    rv = (st >= 0);};
 
-/* end access to the dataset and release resources used by it */
 	if (H5Dclose(did) < 0)
 	   rv = FALSE;
 
-/* terminate access to the data space */
 	else if (H5Sclose(sid) < 0)
 	   rv = FALSE;};
 
@@ -474,31 +457,49 @@ int _H5_write_data(hid_t fid, char *fullpath,
 
 syment *_H5_write_entry(PDBfile *fp, char *path, char *inty, char *outty,
 			void *vr, dimdes *pdims)
-   {int rv, rank;
-    hid_t hfp, htyp, dsid;
+   {int rv, nd, ptr;
+    inti ni;
+    void *pvr;
+    hid_t hfp, htyp;
     hsize_t *hdims;
     syment *ep;
     hdf_state *hst;
 
+    ep = NULL;
+
     hst = fp->meta;
     hfp = hst->hf;
 
-    htyp  = _H5_enc_type(fp, outty);
-    dsid  = -1;
-    hdims = _H5_enc_dims(fp, &rank, htyp, dsid, pdims);
+    ptr = SC_is_type_ptr_a(outty);
 
-    rv = _H5_write_data(hfp, path, rank, hdims, htyp, vr);
+/* dereference pointers - only scalar pointers will ultimately succeed */
+    if (ptr == TRUE)
+       {char pty[MAXLINE];
 
-    ep = NULL;
+	SC_strncpy(pty, MAXLINE, outty, -1);
+	SC_dereference(pty);
 
-#if 0
-    int new;
+	pvr   = DEREF(vr);
+	ni    = SC_arrlen(pvr)/SC_type_size_a(pty);
+        htyp  = _H5_enc_type(fp, pty);
+	hdims = _H5_enc_dims(fp, &nd, htyp, NULL, ni);}
+        
+/* handle non pointered data */
+    else
+       {htyp  = _H5_enc_type(fp, outty);
+	hdims = _H5_enc_dims(fp, &nd, htyp, pdims, 0);
+        pvr   = vr;};
 
-    ep = fp->tr->write(fp, path, inty, outty, vr, dims, FALSE, &new);
+    ni = _PD_comp_num(pdims);
+    ep = _PD_mk_syment(outty, ni, 0, NULL, pdims);
 
-    if ((ep != NULL) && (new == TRUE))
-       ep = PD_copy_syment(ep);
-#endif
+/* complain about pointers that cannot be mapped into arrays */
+    if ((ptr == TRUE) && (pdims != NULL))
+       printf("Cannot represent '%s[%lld]' of type '%s' to HDF\n",
+	      path, (long long) ni, outty);
+    else
+       {rv = _H5_write_data(hfp, path, nd, hdims, htyp, pvr);
+	SC_ASSERT(rv == TRUE);};
 
     return(ep);}
 
@@ -515,14 +516,14 @@ syment *_H5_write_entry(PDBfile *fp, char *path, char *inty, char *outty,
 static char *_H5_dec_fixed_pt(PDBfile *file, hid_t htyp) 
    {int i;
     short precision;
-    char *typename;
+    char *typ;
     PD_byte_order order;
     defstr *dp;
     hdf_state *hst;
 
-    hst      = file->meta;
-    typename = NULL;
-    dp       = CMAKE(defstr);
+    hst = file->meta;
+    typ = NULL;
+    dp  = CMAKE(defstr);
 
     precision = (short) H5Tget_precision(htyp);
 
@@ -537,30 +538,30 @@ static char *_H5_dec_fixed_pt(PDBfile *file, hid_t htyp)
  */
     if (H5Tget_sign(htyp)) 
        {if (precision == 8)
-           typename = CSTRSAVE(SC_CHAR_S);
+           typ = CSTRSAVE(SC_CHAR_S);
         else if (precision == 16)
-           typename = CSTRSAVE(SC_SHORT_S);
+           typ = CSTRSAVE(SC_SHORT_S);
         else if (precision == 32)
-           typename = CSTRSAVE(SC_INT_S);
+           typ = CSTRSAVE(SC_INT_S);
         else if (precision == 64)
-           typename = CSTRSAVE(SC_LONG_S);
+           typ = CSTRSAVE(SC_LONG_S);
         else if (precision >  64)
-           typename = CSTRSAVE(SC_LONG_LONG_S);
+           typ = CSTRSAVE(SC_LONG_LONG_S);
         else
-           typename = CSTRSAVE("UNKNOWN");}
+           typ = CSTRSAVE("UNKNOWN");}
     else
        {if (precision == 8)
-           typename = CSTRSAVE("u_char");
+           typ = CSTRSAVE("u_char");
         else if (precision == 16)
-           typename = CSTRSAVE("u_short");
+           typ = CSTRSAVE("u_short");
         else if (precision == 32)
-           typename = CSTRSAVE("u_int");
+           typ = CSTRSAVE("u_int");
         else if (precision == 64)
-           typename = CSTRSAVE("u_long");
+           typ = CSTRSAVE("u_long");
         else if (precision >  64)
-           typename = CSTRSAVE("u_long_long");
+           typ = CSTRSAVE("u_long_long");
         else
-           typename = CSTRSAVE("UNKNOWN");};
+           typ = CSTRSAVE("UNKNOWN");};
 
 /* decode byte ordering */ 
     if (H5Tget_order(htyp) == H5T_ORDER_BE) 
@@ -578,12 +579,12 @@ static char *_H5_dec_fixed_pt(PDBfile *file, hid_t htyp)
  * NOTE: as far as we know -- HDF5 does not support 1's comp
  */
     dp->onescmp   = FALSE;
-    dp->type      = CSTRSAVE(typename);
+    dp->type      = CSTRSAVE(typ);
     dp->size_bits = 0;
     dp->size      = precision / 8;
 
 /* GOTCHA: we have no alignment info from the file; so we guess */
-    dp->alignment   = _H5_get_alignment(file, typename);
+    dp->alignment   = _H5_get_alignment(file, typ);
 
 /* HDF5 files do not currently support indirection */
     dp->n_indirects = 0;
@@ -593,9 +594,9 @@ static char *_H5_dec_fixed_pt(PDBfile *file, hid_t htyp)
     dp->fp.format   = NULL;
     dp->members     = NULL; 
 
-    DEBUG1("      type name: %s\n", typename);
+    DEBUG1("      type name: %s\n", typ);
     DEBUG1("      size: %d\n", (precision / 8));
-    DEBUG1("      alignment: %d\n", _H5_get_alignment(typename));
+    DEBUG1("      alignment: %d\n", _H5_get_alignment(typ));
 
 /* does not matter which one */
     if (order != hst->pf->host_std->fx[1].order)
@@ -608,11 +609,11 @@ static char *_H5_dec_fixed_pt(PDBfile *file, hid_t htyp)
         DEBUG1("%s", "      conversions will NOT be done\n");};
 
 /* insert into the file charts */
-    _PD_d_install(hst->pf, typename, dp, PD_CHART_FILE);
+    _PD_d_install(hst->pf, typ, dp, PD_CHART_FILE);
 
-    DEBUG1("  Inserted definition for %s\n", typename);
+    DEBUG1("  Inserted definition for %s\n", typ);
 
-    return(typename);}
+    return(typ);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -627,16 +628,16 @@ static char *_H5_dec_float_pt(PDBfile *file, hid_t htyp)
     short precision;
     size_t spos, epos, esize, mpos, msize;
     long *format;
-    char *typename;
+    char *typ;
     defstr *dp;
     data_standard *fstd, *hstd;
     herr_t status;
     hdf_state *hst;
 
-    hst      = file->meta;
-    hstd     = hst->pf->host_std;
-    fstd     = hst->pf->std;
-    typename = NULL;
+    hst  = file->meta;
+    hstd = hst->pf->host_std;
+    fstd = hst->pf->std;
+    typ  = NULL;
 
     dp = CMAKE(defstr);
 
@@ -680,16 +681,16 @@ static char *_H5_dec_float_pt(PDBfile *file, hid_t htyp)
  * this is required because HDF5 does not maintain type names
  */
     if (precision <= 32) 
-       {format   = fstd->fp[0].format;
-        typename = CSTRSAVE(SC_FLOAT_S);
+       {format       = fstd->fp[0].format;
+        typ          = CSTRSAVE(SC_FLOAT_S);
         dp->fp.order = CMAKE_N(int, bpif);
 
         for (i = 0; i < bpif; i++) 
             dp->fp.order[i] = fstd->fp[0].order[i];}
 
     else 
-       {format   = fstd->fp[1].format;
-        typename = CSTRSAVE(SC_DOUBLE_S);
+       {format       = fstd->fp[1].format;
+        typ          = CSTRSAVE(SC_DOUBLE_S);
         dp->fp.order = CMAKE_N(int, bpid);
 
         for (i = 0; i < bpid; i++) 
@@ -779,28 +780,28 @@ static char *_H5_dec_float_pt(PDBfile *file, hid_t htyp)
 /* NOTE: as far as we know -- HDF5 does not support 1's comp */
     dp->onescmp   = FALSE;
     dp->fix.order = NO_ORDER;
-    dp->type      = CSTRSAVE(typename);
+    dp->type      = CSTRSAVE(typ);
     dp->size_bits = 0;  /* format[0]; */
     dp->size      = format[0] / 8;
 
 /* GOTCHA: we have no alignment info from the file; so we guess */
-    dp->alignment  = _H5_get_alignment(file, typename);
+    dp->alignment  = _H5_get_alignment(file, typ);
 
 /* HDF5 files do not currently support indirection */
     dp->n_indirects = 0;
     dp->unsgned     = FALSE;
     dp->members     = NULL;
 
-    DEBUG1("      type name: %s\n", typename);
+    DEBUG1("      type name: %s\n", typ);
     DEBUG1("      size: %d\n", (format[0] / 8));
-    DEBUG1("      alignment: %d\n", _H5_get_alignment(typename));
+    DEBUG1("      alignment: %d\n", _H5_get_alignment(typ));
 
 /* insert into the file charts */
-    _PD_d_install(hst->pf, typename, dp, PD_CHART_FILE);
+    _PD_d_install(hst->pf, typ, dp, PD_CHART_FILE);
  
-    DEBUG1("  Inserted definition for %s\n", typename);
+    DEBUG1("  Inserted definition for %s\n", typ);
  
-    return(typename);}
+    return(typ);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -811,26 +812,26 @@ static char *_H5_dec_float_pt(PDBfile *file, hid_t htyp)
  */
 
 static char *_H5_dec_type(PDBfile *file, hid_t htyp) 
-   {char type_class;
-    char *typename;
-    hid_t supertype_id;
+   {char tcls;
+    char *typ;
+    hid_t styp;
 
-    typename   = NULL;
-    type_class = H5Tget_class(htyp);
-    DEBUG1("      class %d\n", type_class);
+    typ  = NULL;
+    tcls = H5Tget_class(htyp);
+    DEBUG1("      class %d\n", tcls);
   
-    switch (type_class) 
+    switch (tcls) 
        {case H5T_INTEGER :   /* FIXED-PT NUMBERS */
-             typename = _H5_dec_fixed_pt(file, htyp);
+             typ = _H5_dec_fixed_pt(file, htyp);
 	     break;
         case H5T_FLOAT :   /* FLOATING-PT NUMBERS */
-             typename = _H5_dec_float_pt(file, htyp);
+             typ = _H5_dec_float_pt(file, htyp);
 	     break;
         case H5T_COMPOUND :   /* COMPOUND TYPES */
-             typename = _H5_dec_compound(file, htyp);
+             typ = _H5_dec_compound(file, htyp);
 	     break;
         case H5T_STRING :   /* NULL-TERMINATED STRINGS */
-             typename = _H5_dec_fixed_pt(file, htyp);
+             typ = _H5_dec_fixed_pt(file, htyp);
 	     break;  
         case H5T_BITFIELD :   /* BIT FIELDS */
 /* IGNORE this case? */
@@ -845,8 +846,8 @@ static char *_H5_dec_type(PDBfile *file, hid_t htyp)
 /* IGNORE this case? */
              break;
         case H5T_ARRAY  :  /* ARRAYS */
-             supertype_id = H5Tget_super(htyp);
-	     typename     = _H5_dec_type(file, supertype_id); 
+             styp = H5Tget_super(htyp);
+	     typ  = _H5_dec_type(file, styp); 
 	     break;
         case H5T_REFERENCE :  /* REFERENCE ? */
 /* IGNORE this case? */
@@ -855,12 +856,12 @@ static char *_H5_dec_type(PDBfile *file, hid_t htyp)
 /* IGNORE this case? */
              break;
         default :   /* NO SUCH TYPE CLASS */
-	     DEBUG1("Unknown type class %d\n", type_class);
+	     DEBUG1("Unknown type class %d\n", tcls);
 	     break;};
 
-    DEBUG1("Determined type to be %s\n", typename);
+    DEBUG1("Determined type to be %s\n", typ);
 
-    return(typename);}
+    return(typ);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -871,7 +872,7 @@ static char *_H5_dec_type(PDBfile *file, hid_t htyp)
  */
 
 static dimdes *_H5_dec_dims(PDBfile *file, hid_t htyp, hid_t hdim) 
-   {int rank, status, i;
+   {int nd, status, i;
     dimdes *pdims, *dim;
     H5S_class_t scid;
     H5T_class_t tcid;
@@ -882,7 +883,7 @@ static dimdes *_H5_dec_dims(PDBfile *file, hid_t htyp, hid_t hdim)
     tcid  = H5Tget_class(htyp);
 
     if (tcid == H5T_ARRAY)
-       {rank = H5Tget_array_ndims(htyp);
+       {nd = H5Tget_array_ndims(htyp);
 
         nativetype_id = H5Tcopy(htyp);
 
@@ -894,10 +895,10 @@ static dimdes *_H5_dec_dims(PDBfile *file, hid_t htyp, hid_t hdim)
 
         if (H5Tget_class(nativetype_id) == H5T_STRING) 
            {DEBUG1("_H5_dec_dims: careful -- %s\n", "string array");
-            rank++;}
+            nd++;}
 
-        DEBUG1("      H5T_ARRAY rank(%d)\n", rank);
-        hdims = (hsize_t*) calloc(rank, sizeof(hsize_t));
+        DEBUG1("      H5T_ARRAY rank(%d)\n", nd);
+        hdims = (hsize_t*) calloc(nd, sizeof(hsize_t));
 #if (H5_VERS_RELEASE < 4)
         status = H5Tget_array_dims(htyp, hdims); 
 #else
@@ -905,16 +906,16 @@ static dimdes *_H5_dec_dims(PDBfile *file, hid_t htyp, hid_t hdim)
 #endif
 
         if (H5Tget_class(nativetype_id) == H5T_STRING)
-           {hdims[rank-1] = H5Tget_size(nativetype_id);}
+           {hdims[nd-1] = H5Tget_size(nativetype_id);}
 
         H5Tclose(nativetype_id);}
 
     else if (tcid == H5T_STRING)
-       {rank = 1;
+       {nd = 1;
 
-        DEBUG1("      H5T_STRING rank(%d)\n", rank);
+        DEBUG1("      H5T_STRING rank(%d)\n", nd);
 
-        hdims    = (hsize_t*) calloc(rank, sizeof(hsize_t));
+        hdims    = (hsize_t*) calloc(nd, sizeof(hsize_t));
         hdims[0] = H5Tget_size(htyp);}
 
     else 
@@ -927,24 +928,24 @@ static dimdes *_H5_dec_dims(PDBfile *file, hid_t htyp, hid_t hdim)
 /* assume dimensionality info is NULL for scalars */
 	        DEBUG1("%s\n", "      H5S_SCALAR");
 
-		rank  = -1;
+		nd    = -1;
 		hdims = NULL;
 		break;
 
 	   case H5S_SIMPLE :
 
 /* obtain the rank of this simple data space */
-		rank = H5Sget_simple_extent_ndims(hdim);
+		nd = H5Sget_simple_extent_ndims(hdim);
    
-		if (rank < 0) 
+		if (nd < 0) 
 		   {fprintf(stderr, "_H5_dec_dims: error obtaining rank\n");
 		    return(NULL);};
  
-		DEBUG1("      H5S_SIMPLE rank = %d\n", rank);    
+		DEBUG1("      H5S_SIMPLE rank = %d\n", nd);    
 
 /* get the sizes of each dimension */ 
-		hdims = (hsize_t *) calloc(rank, sizeof(hsize_t)); 
-		status   = H5Sget_simple_extent_dims(hdim, hdims, NULL);
+		hdims  = (hsize_t *) calloc(nd, sizeof(hsize_t)); 
+		status = H5Sget_simple_extent_dims(hdim, hdims, NULL);
 
 		if (status < 0)
 		   {fprintf(stderr, "_H5_dec_dims: error obtaining dims\n");
@@ -955,24 +956,24 @@ static dimdes *_H5_dec_dims(PDBfile *file, hid_t htyp, hid_t hdim)
 		return(NULL);};};
 
 /* construct the dimensionality information */
-     if (rank > 0)
+     if (nd > 0)
         {pdims = CMAKE(dimdes);
          dim   = pdims;}
      else 
         pdims = NULL;
 
-     for (i = 0; i < rank; i++) 
+     for (i = 0; i < nd; i++) 
 
 /* HDF5 files assume 0 based counting */
          {dim->number    = (long) hdims[i];
           dim->index_min = 0L;
           dim->index_max = dim->number - 1L; 
 
-          DEBUG1("      dim %d:", rank);
+          DEBUG1("      dim %d:", nd);
           DEBUG1(" 0:%ld\n", dim->index_max);    
 
 /* are we going around again? */
-         if (i+1 < rank)
+         if (i+1 < nd)
             {dim->next = CMAKE(dimdes);
              dim       = dim->next;}
          else
@@ -993,7 +994,7 @@ static char *_H5_dec_compound(PDBfile *file, hid_t htyp)
     off_t moffs;
     char t[BUFFER_SIZE];
     char *mname, *regName;
-    char *typename, *type;
+    char *typ, *type;
     defstr *dpr;
     memdes *members, *mnxt;
     hid_t mtyp;
@@ -1010,8 +1011,8 @@ static char *_H5_dec_compound(PDBfile *file, hid_t htyp)
     regName = _H5_is_registered(file, htyp);
 
     if (regName == NULL)
-       {typename = NULL;
-        convert  = FALSE;
+       {typ     = NULL;
+        convert = FALSE;
     
 /* begin creating a defstr for the charts */
         members = CMAKE(memdes);
@@ -1028,8 +1029,8 @@ static char *_H5_dec_compound(PDBfile *file, hid_t htyp)
 /* create a unique type name placeholder */ 
         snprintf(t, BUFFER_SIZE, "%s%d", PD_TYPE_PLACEHOLDER, hst->nstr);
         hst->nstr++;
-        typename = CSTRSAVE(t);
-        _H5_register(file, htyp, typename);
+        typ = CSTRSAVE(t);
+        _H5_register(file, htyp, typ);
     
 /* begin creating a memdes for the defstr */ 
         mnxt = members;
@@ -1106,7 +1107,7 @@ static char *_H5_dec_compound(PDBfile *file, hid_t htyp)
 	defstr *dp;
 
         dp = CMAKE(defstr);
-        dp->type        = CSTRSAVE(typename);
+        dp->type        = CSTRSAVE(typ);
         dp->size_bits   = dp->size * 8; 
         dp->size        = H5Tget_size(htyp);
 /* GOTCHA: we have no alignment info from the file; so we guess */
@@ -1121,20 +1122,20 @@ static char *_H5_dec_compound(PDBfile *file, hid_t htyp)
 #endif
    
 /* after fully parsing the members, construct the defstr */
-        _PD_defstr_inst(hst->pf, typename, STRUCT_KIND, members,
+        _PD_defstr_inst(hst->pf, typ, STRUCT_KIND, members,
 			NO_ORDER, NULL, NULL, PD_CHART_HOST);
 
 #if 0
-        dp = _PD_mk_defstr(NULL, typename,
+        dp = _PD_mk_defstr(NULL, typ,
 				     members, NULL,
 				     H5Tget_size(htyp), 0, -1, FALSE, 
 				     NULL, NULL, FALSE, FALSE);
 
-        DEBUG1("      type name %s\n", typename);
+        DEBUG1("      type name %s\n", typ);
         DEBUG1("      size %ld\n", (long) H5Tget_size(htyp));
         DEBUG1("      alignment %d\n", 4);
 
-        _PD_d_install(hst->pf, typename, dp, PD_CHART_HOST);
+        _PD_d_install(hst->pf, typ, dp, PD_CHART_HOST);
     
 /* make a copy of dp for the file charts */
         host_entry = CMAKE(defstr);
@@ -1145,17 +1146,45 @@ static char *_H5_dec_compound(PDBfile *file, hid_t htyp)
     
 /* set convert just before adding to the file charts */
         host_entry->convert = convert; 
-        _PD_d_install(hst->pf, typename, host_entry, PD_CHART_FILE);
+        _PD_d_install(hst->pf, typ, host_entry, PD_CHART_FILE);
     
-        DEBUG1("Inserted defstr for %s in both charts\n", typename); 
+        DEBUG1("Inserted defstr for %s in both charts\n", typ); 
 #endif
        }
 
     else
        {DEBUG1("Compound type for %s already defined\n", regName);
-        typename = CSTRSAVE(regName);};
+        typ = CSTRSAVE(regName);};
 
-    return(typename);}
+    return(typ);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _H5_READ_DATA - after H5LT_read_dataset_numerical
+ *               - return TRUE iff successful
+ */
+
+int _H5_read_data(hid_t fid, const char *fullpath, hid_t htyp, void *vr)
+   {int rv, st;
+    hid_t did;
+
+    rv = TRUE;
+
+    did = H5Dopen2(fid, fullpath, H5P_DEFAULT);
+    if (did < 0)
+       rv = FALSE;
+
+    else
+       {st = H5Dread(did, htyp, H5S_ALL, H5S_ALL, H5P_DEFAULT, vr);
+	if (st < 0)
+	   {H5Dclose(did);
+	    rv = FALSE;}
+
+	else if (H5Dclose(did))
+	   rv = FALSE;};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1167,7 +1196,7 @@ static char *_H5_dec_compound(PDBfile *file, hid_t htyp)
 static herr_t H5_read_group_node(hid_t hgr, const char *mname, void *a)
    {int nc;
     int64_t addr;
-    char *typename, *prev_group, *temp_prefix, *fullname;
+    char *typ, *pgr, *temp_prefix, *fullname;
     herr_t status;
     hid_t hds, hdim, htyp;
     syment *ep;
@@ -1176,12 +1205,12 @@ static herr_t H5_read_group_node(hid_t hgr, const char *mname, void *a)
     PDBfile *file;
     hdf_state *hst;
 
-    file       = (PDBfile *) a;
-    hst        = file->meta;
-    status     = (herr_t) 0;
-    typename   = NULL; 
-    prev_group = hst->group_prefix;
-    pdims      = NULL;
+    file   = (PDBfile *) a;
+    hst    = file->meta;
+    status = (herr_t) 0;
+    typ    = NULL; 
+    pgr    = hst->group_prefix;
+    pdims  = NULL;
 
     ep = CMAKE(syment);
 
@@ -1235,7 +1264,7 @@ static herr_t H5_read_group_node(hid_t hgr, const char *mname, void *a)
 				 &H5_read_group_node, a);
 
 /* return the group prefix to what it was before */
-	     hst->group_prefix = prev_group;
+	     hst->group_prefix = pgr;
 	     CFREE(temp_prefix);
 	     break;
  
@@ -1255,12 +1284,12 @@ static herr_t H5_read_group_node(hid_t hgr, const char *mname, void *a)
 		 return(-1);};
 
 	     pdims    = _H5_dec_dims(file, htyp, hdim);
-	     typename = _H5_dec_type(file, htyp); 
+	     typ = _H5_dec_type(file, htyp); 
 
-	     DEBUG1("TYPE is %s\n", typename);
+	     DEBUG1("TYPE is %s\n", typ);
  
 /* create another entry in the symbol table */
-	     ep->type = CSTRSAVE(typename);
+	     ep->type = CSTRSAVE(typ);
 
 /* setup the dimensionality */
 	     if (pdims != NULL)
@@ -1294,14 +1323,14 @@ static herr_t H5_read_group_node(hid_t hgr, const char *mname, void *a)
 	     _PD_e_install(hst->pf, fullname, ep, FALSE);
 
 	     DEBUG1("    Inserted syment for %s", fullname);
-	     DEBUG1(" with type %s\n", typename);   
+	     DEBUG1(" with type %s\n", typ);   
 
 /* free up some space */
 	     H5Tclose(htyp);
 	     H5Sclose(hdim);
 	     H5Dclose(hds);
 	     CFREE(fullname);
-	     CFREE(typename);
+	     CFREE(typ);
 	     break;
 
         case H5G_LINK :
@@ -1414,7 +1443,8 @@ static PDBfile *_H5_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
     if (file == NULL)
        return(NULL);
 
-    hst->pf = file;
+    hst->pf    = file;
+    file->meta = hst;
 
 /* fill in the host's std with default values */
     file->host_std   = _PD_copy_standard(pa->int_std);
@@ -1542,6 +1572,9 @@ static PDBfile *_H5_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 /* init the group/directory prefix to the root dir */
     hst->group_prefix = CSTRSAVE("/");
 
+    ep = _PD_mk_syment("Directory", 1, 0, NULL, NULL);
+
+#if 0
     ep = CMAKE(syment);
     ep->type                 = CSTRSAVE("Directory");
     ep->number               = 1; 
@@ -1553,6 +1586,7 @@ static PDBfile *_H5_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
     _PD_block_init(ep, TRUE);
     _PD_entry_set_address(ep, 0, 0);
     _PD_entry_set_number(ep, 0, 0);
+#endif
          
     _PD_e_install(file, hst->group_prefix, ep, FALSE);
 

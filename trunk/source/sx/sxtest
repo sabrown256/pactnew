@@ -21,7 +21,7 @@ while ($#argv > 0)
            echo "Usage: sxtest [-h] [-vg] [<test>]*"
            echo "  h       this help message"
            echo "  vg      run tests under valgrind"
-           echo "  <test>  one of: oper hash c99 pdb dattr ar text sqlite xml vif"
+           echo "  <test>  one of: oper hash c99 pdb dattr ar text sqlite xml hdf vif"
            echo "                  pgs axis master exa iply shell mesh intrp diff ext"
            echo ""
            exit(1)
@@ -67,7 +67,7 @@ else if (-e $BinDir/sx) then
    if ("$Tests" == "") then
       set Tests = ""
       set Tests = ( $Tests oper hash c99 )
-      set Tests = ( $Tests pdb dattr ar text sqlite xml vif )
+      set Tests = ( $Tests pdb dattr ar text sqlite xml hdf vif )
       set Tests = ( $Tests pgs axis iply )
       set Tests = ( $Tests master exa shell mesh intrp diff ext )
    endif

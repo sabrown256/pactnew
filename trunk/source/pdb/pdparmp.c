@@ -1439,7 +1439,7 @@ static void _PD_pfm_setup_mp_file_d(PDBfile *file, SC_communicator comm)
 
 static int64_t _PD_next_address_d(PDBfile *file, char *type, long number,
 				void *vr, int seekf, int tellf, int colf)
-   {int flag, ipt;
+   {int flag, ipt, sk;
     inti nb;
     intb bpi;
     int64_t addr;
@@ -1453,18 +1453,25 @@ static int64_t _PD_next_address_d(PDBfile *file, char *type, long number,
     dpf = _PD_lookup_type(type, file->chart);
     ipt = _PD_items_per_tuple(dpf);
 
-    if (vr == NULL)
-       {bpi  = _PD_lookup_size(type, file->chart);
-	nb   = number*ipt*bpi;
-	addr = _PD_GETSPACE(file, nb, flag, colf);
+    if (dpf->n_indirects == 0)
+       {bpi = dpf->size;
+	nb  = number*ipt*bpi;
+	sk  = TRUE;}
 
-	if (seekf)
-	   _PD_set_current_address(file, addr+nb, SEEK_SET, PD_GENERIC);}
+    else if (vr == NULL)
+       {bpi = _PD_lookup_size(type, file->chart);
+	nb  = number*bpi;
+	sk  = TRUE;}
 
     else
-       {nb   = PD_sizeof(file, type, number, vr);
-	nb  *= ipt;
-	addr = _PD_GETSPACE(file, nb, flag, colf);};
+       {nb  = PD_sizeof(file, type, number, vr);
+	nb *= ipt;
+        sk  = FALSE;};
+
+    addr = _PD_GETSPACE(file, nb, flag, colf);
+
+    if ((seekf) && (sk == TRUE))
+       _PD_set_current_address(file, addr+nb, SEEK_SET, PD_GENERIC);
 
     DBG("- _PD_next_address_d");
 

@@ -42,7 +42,7 @@ set rpf = none
 
       if ($xstatus != 0) then
          NoteD $Log "ng ($dt)"
-         @ nerr = $nerr + $1
+         @ nerr = $nerr + 1
       else
          NoteD $Log "ok ($dt)"
       endif

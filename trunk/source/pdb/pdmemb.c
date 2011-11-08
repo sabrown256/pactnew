@@ -461,12 +461,12 @@ defstr *_PD_lookup_type(char *s, hasharr *tab)
  */
 
 long _PD_lookup_size(char *s, hasharr *tab)
-   {long rv;
+   {long bpi;
     char *token, bf[MAXLINE], *t;
     defstr *dp;
     multides *tuple;
 
-    rv = -1L;
+    bpi = -1L;
 
 /* if it's a POINTER handle it now */
     if (strchr(s, '*') != NULL)
@@ -477,12 +477,12 @@ long _PD_lookup_size(char *s, hasharr *tab)
     token = SC_strtok(bf, " ", t);
     dp    = PD_inquire_table_type(tab, token);
     if (dp != NULL)
-       {rv    = dp->size;
+       {bpi   = dp->size;
 	tuple = dp->tuple;
 	if (tuple != NULL)
-	   rv *= tuple->ni;};
+	   bpi *= tuple->ni;};
 
-    return(rv);}
+    return(bpi);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

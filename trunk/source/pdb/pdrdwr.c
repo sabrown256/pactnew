@@ -1384,9 +1384,9 @@ static void _PD_rd_leaf_members(PDBfile *file, char *vr, inti ni,
     else
        bpi = dpf->size;
 
-    cnv = _PD_requires_conversion(file, dpf, outtype, intype);
-
     ni *= ipt;
+
+    cnv = _PD_requires_conversion(file, dpf, outtype, intype);
 
     if (bpi == -1)
        PD_error("CAN'T FIND NUMBER OF BYTES - _PD_RD_LEAF_MEMBERS", PD_READ);
