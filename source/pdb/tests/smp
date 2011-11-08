@@ -33,9 +33,12 @@ if ("$Parallel" != "") then
       source ../../../scripts/test-run
       set rpf = ( $rpf ptest.pdb wrn.pdb )
    endif
+
+   $TEST_CHECK part -a smp -e $xstatus -dt $dt -x $exe -rpf "$rpf" none
+
+   set xstatus = $status
+
 endif
 
-$TEST_CHECK part -a smp -e $xstatus -dt $dt -x $exe -rpf "$rpf" none
-
-exit($status)
+exit($xstatus)
 

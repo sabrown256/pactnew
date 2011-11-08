@@ -524,6 +524,18 @@ int SC_is_type_ptr(int id)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_IS_TYPE_PTR_A - return TRUE if NAME is a pointer type */
+
+int SC_is_type_ptr_a(char *name)
+   {int rv;
+
+    rv = (strchr(name, '*') != NULL);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_IS_TYPE_PRIM - return TRUE if ID is a primitive type */
 
 int SC_is_type_prim(int id)

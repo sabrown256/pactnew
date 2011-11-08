@@ -1,0 +1,50 @@
+#!/bin/csh -f
+#
+# HDF - SX HDF test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set msg = "SX PDB HDF5 Test ............."
+set exe = $BinDir/sx
+set opt = ( -p -e -q $ZeroSpace -l $FilesDir/sxhdf.scm )
+set io  = sxhdf.res
+
+if ($HAVE_HDF5 == yes) then
+
+   NoteD $Log ""
+   NoteD $Log -n "                    $msg"
+   Note $Log ""
+
+   flog $Log rm -f sxhdf.log sxhdf.res foo.hdf
+
+   source ../../../scripts/test-run
+
+   if (($xstatus == 0) && ("$Valgrind" == "")) then
+      set ref = $FilesDir/ref/sxhdf
+      if (-f $ref) then
+         grep -v Address $io  | grep -v Date >& $io.cmp
+         grep -v Address $ref | grep -v Date >& sxhdf.ref.cmp
+         set rpf = ( $rpf *.cmp )
+         flog $Log diff $io.cmp sxhdf.ref.cmp
+         set xstatus = $status
+      else
+         flog $Log cp $io $ref
+      endif
+   endif
+
+   flog $Log touch foo.sxhdf sxhdf.foo
+   set rpf = ( $rpf sxhdf.* *.sxhdf )
+
+   $TEST_CHECK part -a hdf -e $xstatus -dt $dt -rpf "$rpf" none
+
+   set xstatus = $status
+
+endif
+
+exit($xstatus)

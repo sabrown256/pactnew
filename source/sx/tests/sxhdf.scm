@@ -16,7 +16,7 @@
 (define set (pdb-data-gen))
 
 (printf nil "Creating file foofoo\n")
-(define file1 (open-pdbfile "foofoo.hdf5,fmt=hdf5" "w"))
+(define file1 (open-pdbfile "foofoo,fmt=hdf5" "w"))
 (pdb-data-write vars set file1 #t)
 (io-stats file1)
 (close-pdbfile file1)

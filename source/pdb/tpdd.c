@@ -10,20 +10,31 @@
 
 #include "pdb_int.h"
 
-#define N       10
+#define N       12
 #define DATFILE "io"
 
+#define SET_FORMAT(fmt)                                                     \
+    snprintf(fmt[0], 20, " %%14.7e");                                       \
+    snprintf(fmt[1], 20, " %%23.16e");                                      \
+    snprintf(fmt[2], 20, " %%41.34e")
+
+enum
+   {IREAD, IWRITE, IFREE};
+
 typedef struct s_statedes statedes;
-typedef int (*PFTest)(statedes *st);
+typedef int (*PFTest)(statedes *st, int iv, int it);
 
 struct s_statedes
    {int i;                /* test number */
+    int nv;               /* number of triplets to write */
+    int meta;             /* include metadata for std I/O */
+    int quiet;
     inti n;
     int debug_mode;
     int64_t nba0;
     int64_t nbf0;
     int64_t sz0;
-    double t[N];           /* total time */
+    double t[N][10];       /* total time */
     double sz[N];};        /* file size */
 
 /*--------------------------------------------------------------------------*/
@@ -35,9 +46,12 @@ struct s_statedes
 /* SHOW_STAT - show the resource stats */
 
 static void show_stat(statedes *st, char *tag)
-   {int i, ir;
-    double rs, rt;
+   {int i, ir, it, nt, nv;
+    double nrm, rs, rt, tave, tref;
     static int first = TRUE;
+
+    if (st->quiet == TRUE)
+       first = FALSE;
 
     if (first == TRUE)
        {first = FALSE;
@@ -47,17 +61,97 @@ static void show_stat(statedes *st, char *tag)
 };
 
     i  = st->i;
+    nv = st->nv;
     ir = i & 1;
+
+    nt   = (st->n >= 1000000) ? 3 : 10;
+    tave = 0.0;
+    tref = 0.0;
+    for (it = 0; it < nt; it++)
+        {tave += st->t[i][it];
+	 tref += st->t[ir][it];};
+
+    nrm   = 1.0/(nt*nv);
+    tave *= nrm;
+    tref *= nrm;
 
     if (i < 2)
        {rs = 1.0;
 	rt = 1.0;}
     else
        {rs = st->sz[i]/st->sz[ir];
-	rt = st->t[ir]/st->t[i];};
+	rt = tref/tave;};
 
     printf("\t%-14s %10lld %10.2e %8.2f %10.2e %9.2e\n",
-	   tag, (long long) st->n, 1.0e-3*st->sz[i], rs, st->t[i], rt);
+	   tag, (long long) st->n, 1.0e-3*st->sz[i], rs, tave, rt);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SETUP_FILE - setup standard I/O files */
+
+FILE *setup_file(char *fname, char *mode)
+   {int rv;
+    char s[MAXLINE];
+    FILE *fp;
+
+    fp = fopen(fname, mode);
+
+/* emulate reading metadata from file end */
+    if (mode[0] == 'r')
+       {rv = fseek(fp, -100, SEEK_END);
+	fgets(s, MAXLINE, fp);
+	rv = fseek(fp, 0, SEEK_SET);
+
+	SC_ASSERT(rv == 0);};
+
+    return(fp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SETUP_DATA - setup the data for writing/reading */
+
+void setup_data(int wh, float **pf, double **pd, long double **pl,
+		int iv, inti n)
+   {inti i;
+    float *fa;
+    double *da;
+    long double *la;
+
+    if (wh == IWRITE)
+       {fa = CMAKE_N(float, n);
+	da = CMAKE_N(double, n);
+	la = CMAKE_N(long double, n);
+
+	for (i = 0; i < n; i++)
+	    {fa[i] = i + 0.01*iv;
+	     da[i] = i + 0.01*iv;;
+	     la[i] = i + 0.01*iv;};}
+
+    else if (wh == IREAD)
+       {fa = CMAKE_N(float, n);
+	da = CMAKE_N(double, n);
+	la = CMAKE_N(long double, n);
+
+	for (i = 0; i < n; i++)
+	    {fa[i] = 0.0;
+	     da[i] = 0.0;
+	     la[i] = 0.0;};}
+
+    else if (wh == IFREE)
+       {fa = *pf;
+	da = *pd;
+	la = *pl;
+	CFREE(fa);
+	CFREE(da);
+	CFREE(la);};
+
+    *pf = fa;
+    *pd = da;
+    *pl = la;
 
     return;}
 
@@ -67,9 +161,43 @@ static void show_stat(statedes *st, char *tag)
 
 /*--------------------------------------------------------------------------*/
 
+/* EPRINTF - efficient ASCII fprintf */
+
+static int eprintf(FILE *fp, char *fmt, ...)
+   {int rv;
+    static int ib = 0;
+    static int64_t n = -10;
+    static char *bf = NULL;
+
+    if (n == -10)
+       n = PD_get_buffer_size();
+    if (n < 0)
+       n = 4096;
+
+    if (bf == NULL)
+       bf = CMAKE_N(char, n);
+
+    if (fmt == NULL)
+       {fwrite(bf, 1, ib, fp);
+	ib = 0;}
+
+    else
+       {SC_VA_START(fmt);
+	ib += vsnprintf(bf+ib, n-ib, fmt, __a__);
+	SC_VA_END;
+
+	if (ib + 256 > n)
+	   {fwrite(bf, 1, ib, fp);
+	    ib = 0;};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* TEST_WFA - write ASCII data */
 
-static int test_wfa(statedes *st)
+static int test_wfa(statedes *st, int iv, int it)
    {int npl, err;
     inti i, n;
     char fname[MAXLINE], fmt[3][20];
@@ -77,32 +205,96 @@ static int test_wfa(statedes *st)
     double time;
     double *da;
     long double *la;
-    FILE *fp;
+    static FILE *fp = NULL;
 
     err = TRUE;
 
-    snprintf(fmt[0], 20, " %%15.7e");
-    snprintf(fmt[1], 20, " %%23.16e");
-    snprintf(fmt[2], 20, " %%41.33e");
+    SET_FORMAT(fmt);
 
     n   = st->n;
     npl = 4;
     snprintf(fname, MAXLINE, "%s-asc.dat", DATFILE);
 
-    fa = CMAKE_N(float, n);
-    da = CMAKE_N(double, n);
-    la = CMAKE_N(long double, n);
+    setup_data(IWRITE, &fa, &da, &la, iv, n);
 
-    for (i = 0; i < n; i++)
-        {fa[i] = i;
-	 da[i] = i;
-	 la[i] = i;};
-
-    fp = fopen(fname, "w");
+    if (fp == NULL)
+       fp = fopen(fname, "w");
 
     time = SC_wall_clock_time();
 
 /* float */
+    if (st->meta == TRUE)
+       eprintf(fp, "# float fa%08d[%ld]\n", iv, (long) n);
+    for (i = 0; i < n; i++)
+        {eprintf(fp, fmt[0], fa[i]);
+         if ((i+1) % npl == 0)
+	    eprintf(fp, "\n");};
+    eprintf(fp, "\n");
+
+/* double */
+    if (st->meta == TRUE)
+       eprintf(fp, "# double da%08d[%ld]\n", iv, (long) n);
+    for (i = 0; i < n; i++)
+        {eprintf(fp, fmt[1], da[i]);
+         if ((i+1) % npl == 0)
+	    eprintf(fp, "\n");};
+    eprintf(fp, "\n");
+
+/* long double */
+    if (st->meta == TRUE)
+       eprintf(fp, "# double la%08d[%ld]\n", iv, (long) n);
+    for (i = 0; i < n; i++)
+        {eprintf(fp, fmt[2], la[i]);
+         if ((i+1) % npl == 0)
+	    eprintf(fp, "\n");};
+    eprintf(fp, "\n");
+
+    eprintf(fp, NULL);
+
+    st->t[st->i][it] += (SC_wall_clock_time() - time);
+
+    setup_data(IFREE, &fa, &da, &la, iv, n);
+
+    if (iv+1 == st->nv)
+       {fclose(fp);
+	st->sz[st->i] = SC_file_length(fname);
+	fp = NULL;};
+
+    return(err);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TEST_WFAI - write ASCII data inefficiently */
+
+static int test_wfai(statedes *st, int iv, int it)
+   {int npl, err;
+    inti i, n;
+    char fname[MAXLINE], fmt[3][20];
+    float *fa;
+    double time;
+    double *da;
+    long double *la;
+    static FILE *fp = NULL;
+
+    err = TRUE;
+
+    SET_FORMAT(fmt);
+
+    n   = st->n;
+    npl = 4;
+    snprintf(fname, MAXLINE, "%s-asc.dat", DATFILE);
+
+    setup_data(IWRITE, &fa, &da, &la, iv, n);
+
+    if (fp == NULL)
+       fp = fopen(fname, "w");
+
+    time = SC_wall_clock_time();
+
+/* float */
+    if (st->meta == TRUE)
+       fprintf(fp, "# float fa%08d[%ld]\n", iv, (long) n);
     for (i = 0; i < n; i++)
         {fprintf(fp, fmt[0], fa[i]);
          if ((i+1) % npl == 0)
@@ -110,6 +302,8 @@ static int test_wfa(statedes *st)
     fprintf(fp, "\n");
 
 /* double */
+    if (st->meta == TRUE)
+       fprintf(fp, "# double da%08d[%ld]\n", iv, (long) n);
     for (i = 0; i < n; i++)
         {fprintf(fp, fmt[1], da[i]);
          if ((i+1) % npl == 0)
@@ -117,21 +311,22 @@ static int test_wfa(statedes *st)
     fprintf(fp, "\n");
 
 /* long double */
+    if (st->meta == TRUE)
+       fprintf(fp, "# double la%08d[%ld]\n", iv, (long) n);
     for (i = 0; i < n; i++)
         {fprintf(fp, fmt[2], la[i]);
          if ((i+1) % npl == 0)
 	    fprintf(fp, "\n");};
     fprintf(fp, "\n");
 
-    st->t[st->i] += (SC_wall_clock_time() - time);
+    st->t[st->i][it] += (SC_wall_clock_time() - time);
 
-    CFREE(fa);
-    CFREE(da);
-    CFREE(la);
+    setup_data(IFREE, &fa, &da, &la, iv, n);
 
-    st->sz[st->i] += ftell(fp);
-
-    fclose(fp);
+    if (iv+1 == st->nv)
+       {fclose(fp);
+	st->sz[st->i] = SC_file_length(fname);
+	fp = NULL;};
 
     return(err);}
 
@@ -143,7 +338,7 @@ static int test_wfa(statedes *st)
 
 /* TEST_RFA - read ASCII data */
 
-static int test_rfa(statedes *st)
+static int test_rfa(statedes *st, int iv, int it)
    {int j, npl, err;
     inti i, n;
     char fname[MAXLINE], s[MAXLINE];
@@ -152,7 +347,7 @@ static int test_rfa(statedes *st)
     double time;
     double *da;
     long double *la;
-    FILE *fp;
+    static FILE *fp = NULL;
 
     err = TRUE;
 
@@ -160,22 +355,18 @@ static int test_rfa(statedes *st)
 
     n = st->n;
 
-    fa = CMAKE_N(float, n);
-    da = CMAKE_N(double, n);
-    la = CMAKE_N(long double, n);
+    setup_data(IREAD, &fa, &da, &la, iv, n);
 
-    for (i = 0; i < n; i++)
-        {fa[i] = 0;
-	 da[i] = 0;
-	 la[i] = 0;};
-
-    fp = fopen(fname, "r");
+    if (fp == NULL)
+       fp = setup_file(fname, "r");
 
     time = SC_wall_clock_time();
 
     npl = 4;
 
 /* float */
+    if (st->meta == TRUE)
+       p = fgets(s, MAXLINE, fp);
     for (i = 0; i < n; )
         {p = fgets(s, MAXLINE, fp);
 	 if (p == NULL)
@@ -185,6 +376,8 @@ static int test_rfa(statedes *st)
 	      fa[i++] = SC_stof(t);};};
 
 /* double */
+    if (st->meta == TRUE)
+       p = fgets(s, MAXLINE, fp);
     for (i = 0; i < n; )
         {p = fgets(s, MAXLINE, fp);
 	 if (p == NULL)
@@ -194,6 +387,8 @@ static int test_rfa(statedes *st)
 	      fa[i++] = SC_stof(t);};};
 
 /* long double */
+    if (st->meta == TRUE)
+       p = fgets(s, MAXLINE, fp);
     for (i = 0; i < n; )
         {p = fgets(s, MAXLINE, fp);
 	 if (p == NULL)
@@ -202,15 +397,14 @@ static int test_rfa(statedes *st)
 	     {t = SC_strtok(ps, " \n", r);
 	      fa[i++] = SC_stof(t);};};
 
-    st->t[st->i] += (SC_wall_clock_time() - time);
+    st->t[st->i][it] += (SC_wall_clock_time() - time);
 
-    CFREE(fa);
-    CFREE(da);
-    CFREE(la);
+    setup_data(IFREE, &fa, &da, &la, iv, n);
 
-    st->sz[st->i] += ftell(fp);
-
-    fclose(fp);
+    if (iv+1 == st->nv)
+       {fclose(fp);
+	st->sz[st->i] = SC_file_length(fname);
+	fp = NULL;};
 
     return(err);}
 
@@ -222,53 +416,52 @@ static int test_rfa(statedes *st)
 
 /* TEST_WFB - write binary data with fwrite */
 
-static int test_wfb(statedes *st)
+static int test_wfb(statedes *st, int iv, int it)
    {int err;
-    inti i, n, rv;
+    inti n, rv;
     char fname[MAXLINE];
     float *fa;
     double time;
     double *da;
     long double *la;
-    FILE *fp;
+    static FILE *fp = NULL;
 
     err = TRUE;
 
-    snprintf(fname, MAXLINE, "%s-bin.dat", DATFILE);
+    snprintf(fname, MAXLINE, "%s-binf.dat", DATFILE);
 
     n = st->n;
 
-    fa = CMAKE_N(float, n);
-    da = CMAKE_N(double, n);
-    la = CMAKE_N(long double, n);
+    setup_data(IWRITE, &fa, &da, &la, iv, n);
 
-    for (i = 0; i < n; i++)
-        {fa[i] = i;
-	 da[i] = i;
-	 la[i] = i;};
-
-    fp = fopen(fname, "wb");
+    if (fp == NULL)
+       fp = setup_file(fname, "wb");
 
     time = SC_wall_clock_time();
 
 /* float */
+    if (st->meta == TRUE)
+       fprintf(fp, "# float fa%08d[%ld]\n", iv, (long) n);
     rv = fwrite(fa, sizeof(float), n, fp);
 
 /* double */
+    if (st->meta == TRUE)
+       fprintf(fp, "# double da%08d[%ld]\n", iv, (long) n);
     rv = fwrite(da, sizeof(double), n, fp);
 
 /* long double */
+    if (st->meta == TRUE)
+       fprintf(fp, "# double la%08d[%ld]\n", iv, (long) n);
     rv = fwrite(la, sizeof(long double), n, fp);
 
-    st->t[st->i] += (SC_wall_clock_time() - time);
+    st->t[st->i][it] += (SC_wall_clock_time() - time);
 
-    CFREE(fa);
-    CFREE(da);
-    CFREE(la);
+    setup_data(IFREE, &fa, &da, &la, iv, n);
 
-    st->sz[st->i] += ftell(fp);
-
-    fclose(fp);
+    if (iv+1 == st->nv)
+       {fclose(fp);
+	st->sz[st->i] = SC_file_length(fname);
+	fp = NULL;};
 
     SC_ASSERT(rv > 0);
 
@@ -282,53 +475,53 @@ static int test_wfb(statedes *st)
 
 /* TEST_RFB - read binary data with fread */
 
-static int test_rfb(statedes *st)
+static int test_rfb(statedes *st, int iv, int it)
    {int err;
-    inti i, n, rv;
-    char fname[MAXLINE];
+    inti n, rv;
+    char fname[MAXLINE], s[MAXLINE];
+    char *p;
     float *fa;
     double time;
     double *da;
     long double *la;
-    FILE *fp;
+    static FILE *fp = NULL;
 
     err = TRUE;
 
-    snprintf(fname, MAXLINE, "%s-bin.dat", DATFILE);
+    snprintf(fname, MAXLINE, "%s-binf.dat", DATFILE);
 
     n = st->n;
 
-    fa = CMAKE_N(float, n);
-    da = CMAKE_N(double, n);
-    la = CMAKE_N(long double, n);
+    setup_data(IREAD, &fa, &da, &la, iv, n);
 
-    for (i = 0; i < n; i++)
-        {fa[i] = 0;
-	 da[i] = 0;
-	 la[i] = 0;};
-
-    fp = fopen(fname, "rb");
+    if (fp == NULL)
+       fp = setup_file(fname, "rb");
 
     time = SC_wall_clock_time();
 
 /* float */
+    if (st->meta == TRUE)
+       p = fgets(s, MAXLINE, fp);
     rv = fread(fa, sizeof(float), n, fp);
 
 /* double */
+    if (st->meta == TRUE)
+       p = fgets(s, MAXLINE, fp);
     rv = fread(da, sizeof(double), n, fp);
 
 /* long double */
+    if (st->meta == TRUE)
+       p = fgets(s, MAXLINE, fp);
     rv = fread(la, sizeof(long double), n, fp);
 
-    st->t[st->i] += (SC_wall_clock_time() - time);
+    st->t[st->i][it] += (SC_wall_clock_time() - time);
 
-    CFREE(fa);
-    CFREE(da);
-    CFREE(la);
+    setup_data(IFREE, &fa, &da, &la, iv, n);
 
-    st->sz[st->i] += ftell(fp);
-
-    fclose(fp);
+    if (iv+1 == st->nv)
+       {fclose(fp);
+	st->sz[st->i] = SC_file_length(fname);
+	fp = NULL;};
 
     SC_ASSERT(rv > 0);
 
@@ -342,53 +535,52 @@ static int test_rfb(statedes *st)
 
 /* TEST_WSB - write binary data with write */
 
-static int test_wsb(statedes *st)
+static int test_wsb(statedes *st, int iv, int it)
    {int err;
-    inti i, n, rv;
+    inti n, rv;
     char fname[MAXLINE];
     float *fa;
     double time;
     double *da;
     long double *la;
-    FILE *fp;
+    static FILE *fp = NULL;
 
     err = TRUE;
 
-    snprintf(fname, MAXLINE, "%s-bin.dat", DATFILE);
+    snprintf(fname, MAXLINE, "%s-bins.dat", DATFILE);
 
     n = st->n;
 
-    fa = CMAKE_N(float, n);
-    da = CMAKE_N(double, n);
-    la = CMAKE_N(long double, n);
+    setup_data(IWRITE, &fa, &da, &la, iv, n);
 
-    for (i = 0; i < n; i++)
-        {fa[i] = i;
-	 da[i] = i;
-	 la[i] = i;};
-
-    fp = fopen(fname, "wb");
+    if (fp == NULL)
+       fp = setup_file(fname, "wb");
 
     time = SC_wall_clock_time();
 
 /* float */
+    if (st->meta == TRUE)
+       fprintf(fp, "# float fa%08d[%ld]\n", iv, (long) n);
     rv = fwrite(fa, sizeof(float), n, fp);
 
 /* double */
+    if (st->meta == TRUE)
+       fprintf(fp, "# double da%08d[%ld]\n", iv, (long) n);
     rv = fwrite(da, sizeof(double), n, fp);
 
 /* long double */
+    if (st->meta == TRUE)
+       fprintf(fp, "# double la%08d[%ld]\n", iv, (long) n);
     rv = fwrite(la, sizeof(long double), n, fp);
 
-    st->t[st->i] += (SC_wall_clock_time() - time);
+    st->t[st->i][it] += (SC_wall_clock_time() - time);
 
-    CFREE(fa);
-    CFREE(da);
-    CFREE(la);
+    setup_data(IFREE, &fa, &da, &la, iv, n);
 
-    st->sz[st->i] += ftell(fp);
-
-    fclose(fp);
+    if (iv+1 == st->nv)
+       {fclose(fp);
+	st->sz[st->i] = SC_file_length(fname);
+	fp = NULL;};
 
     SC_ASSERT(rv > 0);
 
@@ -402,53 +594,53 @@ static int test_wsb(statedes *st)
 
 /* TEST_RSB - read binary data with read */
 
-static int test_rsb(statedes *st)
+static int test_rsb(statedes *st, int iv, int it)
    {int err;
-    inti i, n, rv;
-    char fname[MAXLINE];
+    inti n, rv;
+    char fname[MAXLINE], s[MAXLINE];
+    char *p;
     float *fa;
     double time;
     double *da;
     long double *la;
-    FILE *fp;
+    static FILE *fp = NULL;
 
     err = TRUE;
 
-    snprintf(fname, MAXLINE, "%s-bin.dat", DATFILE);
+    snprintf(fname, MAXLINE, "%s-bins.dat", DATFILE);
 
     n = st->n;
 
-    fa = CMAKE_N(float, n);
-    da = CMAKE_N(double, n);
-    la = CMAKE_N(long double, n);
+    setup_data(IREAD, &fa, &da, &la, iv, n);
 
-    for (i = 0; i < n; i++)
-        {fa[i] = 0;
-	 da[i] = 0;
-	 la[i] = 0;};
-
-    fp = fopen(fname, "rb");
+    if (fp == NULL)
+       fp = setup_file(fname, "rb");
 
     time = SC_wall_clock_time();
 
 /* float */
+    if (st->meta == TRUE)
+       p = fgets(s, MAXLINE, fp);
     rv = fread(fa, sizeof(float), n, fp);
 
 /* double */
+    if (st->meta == TRUE)
+       p = fgets(s, MAXLINE, fp);
     rv = fread(da, sizeof(double), n, fp);
 
 /* long double */
+    if (st->meta == TRUE)
+       p = fgets(s, MAXLINE, fp);
     rv = fread(la, sizeof(long double), n, fp);
 
-    st->t[st->i] += (SC_wall_clock_time() - time);
+    st->t[st->i][it] += (SC_wall_clock_time() - time);
 
-    CFREE(fa);
-    CFREE(da);
-    CFREE(la);
+    setup_data(IFREE, &fa, &da, &la, iv, n);
 
-    st->sz[st->i] += ftell(fp);
-
-    fclose(fp);
+    if (iv+1 == st->nv)
+       {fclose(fp);
+	st->sz[st->i] = SC_file_length(fname);
+	fp = NULL;};
 
     SC_ASSERT(rv > 0);
 
@@ -462,57 +654,49 @@ static int test_rsb(statedes *st)
 
 /* TEST_WPDB - write PDB data */
 
-static int test_wpdb(statedes *st)
+static int test_wpdb(statedes *st, int iv, int it)
    {int err;
-    inti i, n, rv;
-    long ind[3];
-    char fname[MAXLINE];
+    inti n, rv;
+    char fname[MAXLINE], s[MAXLINE];
     float *fa;
     double time;
     double *da;
     long double *la;
-    PDBfile *fp;
+    static PDBfile *fp = NULL;
 
     err = TRUE;
 
     snprintf(fname, MAXLINE, "%s-pdb.dat", DATFILE);
 
     n = st->n;
-    ind[0] = 0;
-    ind[1] = n-1;
-    ind[2] = 1;
 
-    fa = CMAKE_N(float, n);
-    da = CMAKE_N(double, n);
-    la = CMAKE_N(long double, n);
+    setup_data(IWRITE, &fa, &da, &la, iv, n);
 
-    for (i = 0; i < n; i++)
-        {fa[i] = i;
-	 da[i] = i;
-	 la[i] = i;};
-
-    fp = PD_open(fname, "w");
+    if (fp == NULL)
+       fp = PD_open(fname, "w");
 
     time = SC_wall_clock_time();
 
 /* float */
-    rv = PD_write_alt(fp, "fa", "float", fa, 1, ind);
+    snprintf(s, MAXLINE, "fa%08d[%ld]", iv, (long) n);
+    rv = PD_write(fp, s, "float", fa);
 
 /* double */
-    rv = PD_write_alt(fp, "da", "double", da, 1, ind);
+    snprintf(s, MAXLINE, "da%08d[%ld]", iv, (long) n);
+    rv = PD_write(fp, s, "double", da);
 
 /* long double */
-    rv = PD_write_alt(fp, "la", "long_double", la, 1, ind);
+    snprintf(s, MAXLINE, "la%08d[%ld]", iv, (long) n);
+    rv = PD_write(fp, s, "long_double", la);
 
-    st->t[st->i] += (SC_wall_clock_time() - time);
+    st->t[st->i][it] += (SC_wall_clock_time() - time);
 
-    CFREE(fa);
-    CFREE(da);
-    CFREE(la);
+    setup_data(IFREE, &fa, &da, &la, iv, n);
 
-    PD_close(fp);
-
-    st->sz[st->i] += SC_file_length(fname);
+    if (iv+1 == st->nv)
+       {PD_close(fp);
+	st->sz[st->i] = SC_file_length(fname);
+	fp = NULL;};
 
     SC_ASSERT(rv > 0);
 
@@ -526,15 +710,15 @@ static int test_wpdb(statedes *st)
 
 /* TEST_RPDB - read PDB data */
 
-static int test_rpdb(statedes *st)
+static int test_rpdb(statedes *st, int iv, int it)
    {int err;
-    inti i, n, rv;
-    char fname[MAXLINE];
+    inti n, rv;
+    char fname[MAXLINE], s[MAXLINE];
     float *fa;
     double time;
     double *da;
     long double *la;
-    PDBfile *fp;
+    static PDBfile *fp = NULL;
 
     err = TRUE;
 
@@ -542,37 +726,33 @@ static int test_rpdb(statedes *st)
 
     n = st->n;
 
-    fa = CMAKE_N(float, n);
-    da = CMAKE_N(double, n);
-    la = CMAKE_N(long double, n);
+    setup_data(IREAD, &fa, &da, &la, iv, n);
 
-    for (i = 0; i < n; i++)
-        {fa[i] = 0;
-	 da[i] = 0;
-	 la[i] = 0;};
-
-    fp = PD_open(fname, "r");
+    if (fp == NULL)
+       fp = PD_open(fname, "r");
 
     time = SC_wall_clock_time();
 
 /* float */
-    rv = PD_read(fp, "fa", fa);
+    snprintf(s, MAXLINE, "fa%08d", iv);
+    rv = PD_read(fp, s, fa);
 
 /* double */
-    rv = PD_read(fp, "da", da);
+    snprintf(s, MAXLINE, "da%08d", iv);
+    rv = PD_read(fp, s, da);
 
 /* long double */
-    rv = PD_read(fp, "la", la);
+    snprintf(s, MAXLINE, "la%08d", iv);
+    rv = PD_read(fp, s, la);
 
-    st->t[st->i] += (SC_wall_clock_time() - time);
+    st->t[st->i][it] += (SC_wall_clock_time() - time);
 
-    CFREE(fa);
-    CFREE(da);
-    CFREE(la);
+    setup_data(IFREE, &fa, &da, &la, iv, n);
 
-    PD_close(fp);
-
-    st->sz[st->i] += SC_file_length(fname);
+    if (iv+1 == st->nv)
+       {PD_close(fp);
+	st->sz[st->i] = SC_file_length(fname);
+	fp = NULL;};
 
     SC_ASSERT(rv > 0);
 
@@ -587,22 +767,23 @@ static int test_rpdb(statedes *st)
 #ifdef HAVE_HDF5
 
 #include <hdf5.h>
-#include <hdf5_hl.h>
-#include "H5LTpublic.h"
 
 /* TEST_WHDF - write HDF5 data */
 
-static int test_whdf(statedes *st)
+static int test_whdf(statedes *st, int iv, int it)
    {int err;
-    inti i, n;
+    inti n;
     hsize_t ind[3];
-    char fname[MAXLINE];
+    char fname[MAXLINE], s[MAXLINE];
     float *fa;
     double time;
     double *da;
     long double *la;
-    hid_t fp;
     herr_t rv;
+    static hid_t fp = -1;
+    extern int _H5_write_data(hid_t fid, char *fullpath,
+			      int nd, hsize_t *dims,
+			      hid_t htyp, void *data);
 
     err = TRUE;
 
@@ -611,37 +792,33 @@ static int test_whdf(statedes *st)
     n = st->n;
     ind[0] = n;
 
-    fa = CMAKE_N(float, n);
-    da = CMAKE_N(double, n);
-    la = CMAKE_N(long double, n);
+    setup_data(IWRITE, &fa, &da, &la, iv, n);
 
-    for (i = 0; i < n; i++)
-        {fa[i] = i;
-	 da[i] = i;
-	 la[i] = i;};
-
-    fp = H5Fcreate(fname, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    if (fp == -1)
+       fp = H5Fcreate(fname, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
     time = SC_wall_clock_time();
 
 /* float */
-    rv = H5LTmake_dataset(fp, "/fa", 1, ind, H5T_NATIVE_FLOAT, fa);
+    snprintf(s, MAXLINE, "/fa%08d", iv);
+    rv = _H5_write_data(fp, s, 1, ind, H5T_NATIVE_FLOAT, fa);
 
 /* double */
-    rv = H5LTmake_dataset(fp, "/da", 1, ind, H5T_NATIVE_DOUBLE, fa);
+    snprintf(s, MAXLINE, "/da%08d", iv);
+    rv = _H5_write_data(fp, s, 1, ind, H5T_NATIVE_DOUBLE, fa);
 
 /* long double */
-    rv = H5LTmake_dataset(fp, "/la", 1, ind, H5T_NATIVE_LDOUBLE, fa);
+    snprintf(s, MAXLINE, "/la%08d", iv);
+    rv = _H5_write_data(fp, s, 1, ind, H5T_NATIVE_LDOUBLE, fa);
 
-    st->t[st->i] += (SC_wall_clock_time() - time);
+    st->t[st->i][it] += (SC_wall_clock_time() - time);
 
-    CFREE(fa);
-    CFREE(da);
-    CFREE(la);
+    setup_data(IFREE, &fa, &da, &la, iv, n);
 
-    rv = H5Fclose(fp);
-
-    st->sz[st->i] += SC_file_length(fname);
+    if (iv+1 == st->nv)
+       {rv = H5Fclose(fp);
+	st->sz[st->i] = SC_file_length(fname);
+	fp = -1;};
 
     return(err);}
 
@@ -653,16 +830,17 @@ static int test_whdf(statedes *st)
 
 /* TEST_RHDF - read HDF5 data */
 
-static int test_rhdf(statedes *st)
+static int test_rhdf(statedes *st, int iv, int it)
    {int err;
-    inti i, n;
-    char fname[MAXLINE];
+    inti n;
+    char fname[MAXLINE], s[MAXLINE];
     float *fa;
     double time;
     double *da;
     long double *la;
-    hid_t fp;
     herr_t rv;
+    static hid_t fp = -1;
+    extern int _H5_read_data(hid_t fid, const char *fullpath, hid_t htyp, void *vr);
 
     err = TRUE;
 
@@ -670,37 +848,33 @@ static int test_rhdf(statedes *st)
 
     n = st->n;
 
-    fa = CMAKE_N(float, n);
-    da = CMAKE_N(double, n);
-    la = CMAKE_N(long double, n);
+    setup_data(IREAD, &fa, &da, &la, iv, n);
 
-    for (i = 0; i < n; i++)
-        {fa[i] = 0;
-	 da[i] = 0;
-	 la[i] = 0;};
-
-    fp = H5Fopen(fname, H5F_ACC_RDONLY, H5P_DEFAULT);
+    if (fp == -1)
+       fp = H5Fopen(fname, H5F_ACC_RDONLY, H5P_DEFAULT);
 
     time = SC_wall_clock_time();
 
 /* float */
-    rv = H5LTread_dataset(fp, "/fa", H5T_NATIVE_FLOAT, fa);
+    snprintf(s, MAXLINE, "/fa%08d", iv);
+    rv = _H5_read_data(fp, s, H5T_NATIVE_FLOAT, fa);
 
 /* double */
-    rv = H5LTread_dataset(fp, "/da", H5T_NATIVE_DOUBLE, da);
+    snprintf(s, MAXLINE, "/da%08d", iv);
+    rv = _H5_read_data(fp, s, H5T_NATIVE_DOUBLE, da);
 
 /* long double */
-    rv = H5LTread_dataset(fp, "/la", H5T_NATIVE_LDOUBLE, la);
+    snprintf(s, MAXLINE, "/la%08d", iv);
+    rv = _H5_read_data(fp, s, H5T_NATIVE_LDOUBLE, la);
 
-    st->t[st->i] += (SC_wall_clock_time() - time);
+    st->t[st->i][it] += (SC_wall_clock_time() - time);
 
-    CFREE(fa);
-    CFREE(da);
-    CFREE(la);
+    setup_data(IFREE, &fa, &da, &la, iv, n);
 
-    rv = H5Fclose(fp);
-
-    st->sz[st->i] += SC_file_length(fname);
+    if (iv+1 == st->nv)
+       {rv = H5Fclose(fp);
+	st->sz[st->i] = SC_file_length(fname);
+	fp = -1;};
 
     return(err);}
 
@@ -717,9 +891,10 @@ static int test_rhdf(statedes *st)
  */
 
 static int run_test(statedes *st, PFTest test, char *tag)
-   {int cs, fail;
+   {int it, iv, nt, nv, cs, fail, dbg;
     char msg[MAXLINE];
-    static int dbg = 0;
+
+    dbg = (st->debug_mode == TRUE) ? -2 : 0;
 
 /* NOTE: under the debugger set dbg to 1 or 2 for additional
  *       memory leak monitoring
@@ -728,12 +903,18 @@ static int run_test(statedes *st, PFTest test, char *tag)
 
     fail = 0;
 
-    st->t[st->i]  = 0.0;
+    nt = (st->n >= 1000000) ? 3 : 10;
+    nv = st->nv;
     st->sz[st->i] = 0.0;
 
-    if ((*test)(st) == FALSE)
-       {PRINT(STDOUT, "Test #%d failed\n", st->i);
-	fail++;};
+/* iterate to smooth out timiing noise */
+    for (it = 0; it < nt; it++)
+        {st->t[st->i][it]  = 0.0;
+
+	 for (iv = 0; iv < nv; iv++)
+	     {if ((*test)(st, iv, it) == FALSE)
+		 {PRINT(STDOUT, "Test #%d failed\n", st->i);
+		  fail++;};};};
 
     show_stat(st, tag);
 
@@ -752,13 +933,22 @@ static void print_help(void)
    {
 
     PRINT(STDOUT, "\nTPDD - measure ASCII vs binary I/O performance\n\n");
-    PRINT(STDOUT, "Usage: tpdd [-b #] [-d] [-h] [-m] [-n #]\n");
+    PRINT(STDOUT, "Usage: tpdd [-asc] [-b #] [-bin] [-d] [-h] [-hdf] [-m] [-md]\n");
+    PRINT(STDOUT, "            [-n #] [-nv #] [-pdb] [-q] [-v #]\n");
     PRINT(STDOUT, "\n");
+    PRINT(STDOUT, "       asc  do not do ASCII set\n");
     PRINT(STDOUT, "       b    set buffer size (default no buffering)\n");
+    PRINT(STDOUT, "       bin  do not do binary set\n");
     PRINT(STDOUT, "       d    turn on debug mode to display memory maps\n");
     PRINT(STDOUT, "       h    print this help message and exit\n");
+    PRINT(STDOUT, "       hdf  do not do HDF5 set\n");
     PRINT(STDOUT, "       m    use memory mapped files\n");
+    PRINT(STDOUT, "       md   do not write metadata for C std I/O methods\n");
     PRINT(STDOUT, "       n    number of items per arrays (default 1000)\n");
+    PRINT(STDOUT, "       nv   number of triplets (default 1)\n");
+    PRINT(STDOUT, "       pdb  do not do PDB set\n");
+    PRINT(STDOUT, "       q    quiet mode\n");
+    PRINT(STDOUT, "       v    PDB format version (default 2)\n");
     PRINT(STDOUT, "\n");
 
     return;}
@@ -769,7 +959,7 @@ static void print_help(void)
 /* MAIN - measure ASCII vs binary I/O performance */
 
 int main(int c, char **v)
-   {int i, err;
+   {int i, err, asc, bin, eff, hdf, pdb;
     int use_mapped_files;
     int64_t bfsz;
     statedes st;
@@ -779,16 +969,37 @@ int main(int c, char **v)
     SC_bf_set_hooks();
     SC_zero_space_n(1, -2);
 
+    memset(&st, 0, sizeof(st));
+    st.nv            = 1;
     st.i             = 0;
     st.n             = 100000;
+    st.meta          = TRUE;
+    st.quiet         = FALSE;
     st.debug_mode    = FALSE;
     
+    eff              = FALSE;
+    asc              = TRUE;
+    bin              = TRUE;
+    hdf              = TRUE;
+    pdb              = TRUE;
     bfsz             = -1;
     bfsz             = 100000;
     use_mapped_files = FALSE;
     for (i = 1; i < c; i++)
-        {if (strcmp(v[i], "-n") == 0)
+        {if (strcmp(v[i], "-asc") == 0)
+	    asc = FALSE;
+	 else if (strcmp(v[i], "-bin") == 0)
+	    bin = FALSE;
+	 else if (strcmp(v[i], "-hdf") == 0)
+	    hdf = FALSE;
+	 else if (strcmp(v[i], "-md") == 0)
+	    st.meta = FALSE;
+	 else if (strcmp(v[i], "-n") == 0)
 	    st.n = SC_stoi(v[++i]);
+	 else if (strcmp(v[i], "-nv") == 0)
+	    st.nv = SC_stoi(v[++i]);
+	 else if (strcmp(v[i], "-pdb") == 0)
+	    pdb = FALSE;
  	 else if (v[i][0] == '-')
             {switch (v[i][1])
                 {case 'b' :
@@ -803,6 +1014,12 @@ int main(int c, char **v)
 		      return(1);
                  case 'm' :
 		      use_mapped_files = TRUE;
+		      break;
+                 case 'q' :
+		      st.quiet = TRUE;
+		      break;
+                 case 'v' :
+                      PD_set_fmt_version(SC_stoi(v[++i]));
 		      break;};}
          else
             break;};
@@ -815,22 +1032,31 @@ int main(int c, char **v)
 
     err = 0;
 
-    err += run_test(&st, test_wfa, "write-ascii");
-    err += run_test(&st, test_rfa, "read-ascii");
+    if (asc == TRUE)
+       {err += run_test(&st, test_wfai, "write-asci");
+	err += run_test(&st, test_rfa,  "read-asci");};
 
-    err += run_test(&st, test_wpdb, "write-pdb");
-    err += run_test(&st, test_rpdb, "read-pdb");
+    if (eff == TRUE)
+       {err += run_test(&st, test_wfa, "write-asce");
+	err += run_test(&st, test_rfa, "read-asce");};
 
 #ifdef HAVE_HDF5
-    err += run_test(&st, test_whdf, "write-hdf5");
-    err += run_test(&st, test_rhdf, "read-hdf5");
+    if (hdf == TRUE)
+       {err += run_test(&st, test_whdf, "write-hdf5");
+	err += run_test(&st, test_rhdf, "read-hdf5");};
 #endif
 
-    err += run_test(&st, test_wfb, "fwrite-binary");
-    err += run_test(&st, test_rfb, "fread-binary");
+    if (pdb == TRUE)
+       {err += run_test(&st, test_wpdb, "write-pdb");
+	err += run_test(&st, test_rpdb, "read-pdb");};
 
-    err += run_test(&st, test_wsb, "write-binary");
-    err += run_test(&st, test_rsb, "read-binary");
+    if (eff == TRUE)
+       {err += run_test(&st, test_wfb, "fwrite-binary");
+	err += run_test(&st, test_rfb, "fread-binary");};
+
+    if (bin == TRUE)
+       {err += run_test(&st, test_wsb, "write-binary");
+	err += run_test(&st, test_rsb, "read-binary");};
 
     PRINT(STDOUT, "\n");
 

@@ -18,24 +18,12 @@ else
    set cfe = ( $CFE -v )
 endif
 
-grep '#define THREADING' $IncDir/scconfig.h >& /dev/null
-if ($status == 0) then
-   setenv THREADING yes
-else
-   setenv THREADING no
-endif
-
-grep '#define HAVE_MPI' $IncDir/scconfig.h >& /dev/null
-if ($status == 0) then
-   setenv HAVE_MPI yes
-else
-   setenv HAVE_MPI no
-endif
-
-grep '#define HAVE_SQLITE' $IncDir/scconfig.h >& /dev/null
-if ($status == 0) then
-   setenv HAVE_SQLITE yes
-else
-   setenv HAVE_SQLITE no
-endif
+foreach v (THREADING HAVE_MPI HAVE_SQLITE HAVE_HDF5)
+   grep "#define $v" $IncDir/scconfig.h >& /dev/null
+   if ($status == 0) then
+      setenv $v yes
+   else
+      setenv $v no
+   endif
+end
 

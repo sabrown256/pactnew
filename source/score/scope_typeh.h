@@ -375,6 +375,7 @@ extern int
  SC_is_type_qut(int id),
  SC_is_type_num(int id),
  SC_is_type_ptr(int id),
+ SC_is_type_ptr_a(char *name),
  SC_is_type_prim(int id),
  SC_is_type_struct(int id),
  SC_type_size_i(int id),
