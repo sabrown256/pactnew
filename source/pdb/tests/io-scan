@@ -1,0 +1,44 @@
+#!/bin/csh -f
+#
+# IO-SCAN - check I/O timings in various situations
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+foreach iv (1 10 100 1000 10000)
+
+   if ($iv == 1) then
+      set nil = (1 10 100 1000 10000 100000 1000000 10000000)
+   else if ($iv < 11) then
+      set nil = (1 10 100 1000 10000 100000 1000000)
+   else if ($iv < 101) then
+      set nil = (1 10 100 1000 10000 100000)
+   else if ($iv < 1001) then
+      set nil = (1 10 100 1000 10000)
+   else if ($iv < 10001) then
+      set nil = (1 10 100 1000)
+   else
+      set nil = (1 10 100)
+   endif
+
+   set dat = io-$iv.dat
+   rm -f $dat
+   touch $dat
+
+   echo "   $iv packs"
+
+   set bt = `timer -r`
+   echo -n "      "
+   foreach i ($nil)
+      echo $i | awk '{printf(" %7.1e", $1);}'
+      tpdd -q -n $i -nv $iv >>& $dat
+   end
+   set et = `timer -b $bt`
+   echo "done ($et)"
+
+end
+
+exit($status)
