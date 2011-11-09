@@ -104,7 +104,7 @@ source $ldir/env-csh
 # if we have no syntax modes we still have work to do
     else
 
-       Note $STDOUT "#define DEF_SYNTAX_MODES()"
+       Note $STDOUT "#define DEF_SYNTAX_MODES(_si)"
 
     endif
    
