@@ -1072,3 +1072,36 @@ void dprstats(int tid, int ifmt)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* DPRDSTATS - print memory change stats for specified heap */
+
+void dprdstats(int tid, int ifmt)
+   {SC_heap_des *ph;
+    int64_t da, df, dd;
+    static int64_t a = 0, f = 0, dx = 0;
+
+    ph = _SC_get_heap(tid);
+
+    da = ph->sp_alloc - a;
+    df = ph->sp_free - f;
+    dd = da - df;
+    dx = max(dx, dd);
+
+    if (ifmt == TRUE)
+       {printf("Allocated: %ld\n", (long) da);
+	printf("Freed:     %ld\n", (long) df);
+	printf("Diff:      %ld\n", (long) dd);
+	printf("Max Diff:  %ld\n", (long) dx);}
+    else
+       {printf("Allocated: %10.3e\n", (double) da);
+	printf("Freed:     %10.3e\n", (double) df);
+	printf("Diff:      %10.3e\n", (double) dd);
+	printf("Max Diff:  %10.3e\n", (double) dx);};
+
+    a = ph->sp_alloc;
+    f = ph->sp_free;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
