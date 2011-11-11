@@ -461,14 +461,43 @@ static defstr *_PD_lookup_type(char *s, hasharr *tab)
 
 defstr *_PD_type_lookup(PDBfile *file, PD_chart_kind ch, char *s)
    {defstr *dp;
+    io_request *req;
 
     switch (ch)
        {case PD_CHART_FILE :
+
+#ifdef USE_REQUESTS
+             req = &file->req;
+	     if ((req->base_type != NULL) && 
+		 (strcmp(s, req->base_type) == 0) &&
+		 (req->ftype != NULL))
+	        dp = file->req.ftype;
+	     else
+	        {dp = _PD_lookup_type(s, file->chart);
+		 SC_mark(file->req.ftype, -1);
+		 file->req.ftype = dp;
+		 SC_mark(dp, 1);};
+#else
 	     dp = _PD_lookup_type(s, file->chart);
+#endif
 	     break;
 
 	case PD_CHART_HOST :
+
+#ifdef USE_REQUESTS
+             req = &file->req;
+	     if ((req->base_type != NULL) && 
+		 (strcmp(s, req->base_type) == 0) &&
+		 (req->htype != NULL))
+	        dp = file->req.htype;
+	     else
+	        {dp = _PD_lookup_type(s, file->host_chart);
+		 SC_mark(file->req.htype, -1);
+		 file->req.htype = dp;
+		 SC_mark(dp, 1);};
+#else
 	     dp = _PD_lookup_type(s, file->host_chart);
+#endif
 	     break;
 
 	default :

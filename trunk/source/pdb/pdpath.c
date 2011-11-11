@@ -2113,6 +2113,13 @@ syment *_PD_effective_ep(PDBfile *file, char *name, int flag, char *fullname)
     if (s != NULL)
        *s = '\0';
 	
+#ifdef USE_REQUESTS
+/*
+    CFREE(file->req.base_name);
+    file->req.base_name = CSTRSAVE(lname);
+*/
+#endif
+
     ep = PD_inquire_entry(file, lname, flag, fullname);
     if ((ep == NULL) ||
 	((PD_entry_dimensions(ep) == NULL) && (ep->blocks == NULL)))
