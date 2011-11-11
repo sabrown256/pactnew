@@ -517,7 +517,8 @@ extern int
  _PD_items_per_tuple(defstr *dp),
  _PD_set_current_address(PDBfile *file, int64_t addr, int wh, PD_major_op tag),
  _PD_init_s(void),
- _PD_close(PDBfile *file);
+ _PD_close(PDBfile *file),
+ _PD_rd_symt(PDBfile *file, char *acc, char *rej);
 
 extern int64_t
  _PD_eod(PDBfile *file),

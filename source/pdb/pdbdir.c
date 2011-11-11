@@ -33,7 +33,8 @@ int
  */
 
 int PD_cd(PDBfile *file ARG(,,cls), char *dirname)
-   {char name[MAXLINE];
+   {int rv;
+    char name[MAXLINE];
     syment *ep;
     PD_smp_state *pa;
 
@@ -79,7 +80,15 @@ int PD_cd(PDBfile *file ARG(,,cls), char *dirname)
            CFREE(file->current_prefix);
         file->current_prefix = CSTRSAVE(name);}
 
-    return(TRUE);}
+    rv = TRUE;
+
+    if (file->eager_sym == FALSE)
+       {char acc[MAXLINE];
+
+	snprintf(acc, MAXLINE, "/&ptrs/ia_*#%s", file->current_prefix);
+	rv = _PD_rd_symt(file, acc, NULL);};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

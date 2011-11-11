@@ -76,6 +76,7 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
 
 	file->use_itags      = TRUE;
 	file->track_pointers = TRUE;
+	file->eager_sym      = TRUE;
 
 	file->std        = NULL;
 	file->align      = NULL;

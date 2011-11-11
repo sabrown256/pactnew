@@ -469,6 +469,7 @@ struct s_PDBfile
     PD_checksum_mode use_cksum;       /* session use of checksums */
     PD_checksum_mode file_cksum;      /* file use of checksums */
     int fix_denorm;
+    int eager_sym;
 
     sys_layer *sys;
     tr_layer *tr;
@@ -482,7 +483,8 @@ struct s_PDBfile
     int (*flush)(PDBfile *file);
 
     int64_t (*wr_symt)(PDBfile *file);
-    int (*parse_symt)(PDBfile *file, char *bf, int flag);
+    int (*rd_symt)(PDBfile *file, char *acc, char *rej);
+    int (*parse_symt)(PDBfile *file, char *bf, int flag, char *acc, char *rej);
 
     int (*wr_meta)(PDBfile *file, FILE *out, int fh);
     int (*wr_prim_types)(FILE *fp, hasharr *tab);
