@@ -1350,13 +1350,14 @@ static void _PD_pfm_service_req(int id, int request)
     return;}
 
 /*--------------------------------------------------------------------------*/
+
+#if 0
+
 /*--------------------------------------------------------------------------*/
 
 /* _PD_PFM_MASTER_THREAD - control thread for mpi file management
  *                       - in threaded environment
  */
-
-#if 0
 
 static void *_PD_pfm_master_thread(void *x)
    {int rv;
@@ -1378,6 +1379,8 @@ static void *_PD_pfm_master_thread(void *x)
         if (rv == PFM_TERM_MASTER)
            {DBG("- _PD_pfm_master_thread");
             return(NULL);};};}
+
+/*--------------------------------------------------------------------------*/
 
 #endif
 

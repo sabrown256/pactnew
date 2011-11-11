@@ -275,7 +275,6 @@ int PD_close(PDBfile *file ARG(,,cls))
 	tr  = file->tr;
 	fun = tr->close;
 	ret = fun(file);};
-
 /*
     _SC_prune_major_blocks();
 */
@@ -330,7 +329,7 @@ int _PD_read(PDBfile *file, char *fullpath, char *type, syment *ep, void *vr,
 
     file->req.oper = PD_READ;
 
-#if 0
+#ifdef USE_REQUESTS
     CFREE(file->req.base_type);
     file->req.base_type = CSTRSAVE(type);
 #endif
@@ -841,6 +840,11 @@ syment *_PD_write(PDBfile *file, char *name, char *intype, char *outtype,
 
     ep = _PD_effective_ep(file, fullpath, FALSE, NULL);
 
+#ifdef USE_REQUESTS
+    CFREE(file->req.base_type);
+    file->req.base_type = CSTRSAVE(intype);
+#endif
+
 /* if the variable already exists use the existing file info */
     if (ep != NULL)
 
@@ -1255,44 +1259,7 @@ int PD_cast(PDBfile *file ARG(,,cls), char *type, char *memb, char *contr)
 
 	      SC_mark(contr, 1);};};
 
-/* too slow? */
-#if 0
-    _PD_cast_insert(file->host_chart, type, memb, contr);
-#endif
-
-/* we don't need to add it to the charts to pass the tests - odd */
-#if 0
-    _PD_cast_insert(file->chart, type, memb, contr);
-#endif
-
     return(TRUE);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PD_CAST_INSERT - tell PDBLib that the type of a particular member (which
- *                 - must be a pointer) is specified by another member
- *                 - (which must be a character pointer)
- */
-
-void _PD_cast_insert(hasharr* chart, char* type, char* memb, char* cast)
-   {memdes *desc, *lst;
-    defstr *dp;
-
-/* the calculation of the hash may be a bit slow? */
-    dp = (defstr *) SC_hasharr_def_lookup(chart, type);
-    
-    for (desc = dp->members; desc != NULL; desc = desc->next)
-        {if (strcmp(memb, desc->name) != 0)
-             continue;
-
-/* make an independent copy in case the one passed in is released */
-         desc->cast_memb = CSTRSAVE(cast);
-         desc->cast_offs = _PD_member_location(cast, chart, dp, &lst);
-
-	 SC_mark(cast, 1);};
-
-   return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1496,6 +1463,22 @@ int PD_autofix_denorm(PDBfile *file ARG(,,cls), int flag)
  *               - return TRUE iff successful
  *               - return FALSE if not a floating point type
  *
+ * Infinities          32 bit                        64 bit
+ * Positive Inf:     7f80 0000                7ff0 0000 0000 0000
+ * Negative Inf:     ff80 0000                fff0 0000 0000 0000
+ *
+ * NaNs                      32 bit
+ * Signalling Nan:   7f80 0001 - 7fbf ffff
+ *     or            ff80 0001 - ffbf ffff
+ * Quiet Nan:        7fc0 0000 - 7fff ffff
+ *     or            ffc0 0000 - ffff ffff
+ *
+ * NaNs                                64 bit
+ * Signalling Nan:   7ff0 0000 0000 0001 - 7ff7 ffff ffff ffff
+ *     or            fff0 0000 0000 0001 - fff7 ffff ffff ffff
+ * Quiet Nan:        7ff8 0000 0000 0000 - 7fff ffff ffff ffff
+ *     or            fff8 0000 0000 0000 - ffff ffff ffff ffff
+ *
  * #bind PD_fix_denorm fortran() scheme() python()
  */
 
@@ -1635,23 +1618,6 @@ int PD_fix_denorm(data_standard* std, char *type, int64_t ni, void *vr)
 	   {CFREE(buf);};};
 
     return(st);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-#if 0
-
-Infinities          32 bit                        64 bit
-Positive Inf:     7f80 0000                7ff0 0000 0000 0000
-Negative Inf:     ff80 0000                fff0 0000 0000 0000
-
-NaNs                      32 bit                             64 bit
-Signalling Nan:   7f80 0001 - 7fbf ffff    7ff0 0000 0000 0001 - 7ff7 ffff ffff ffff
-    or            ff80 0001 - ffbf ffff    fff0 0000 0000 0001 - fff7 ffff ffff ffff
-Quiet Nan:        7fc0 0000 - 7fff ffff    7ff8 0000 0000 0000 - 7fff ffff ffff ffff
-    or            ffc0 0000 - ffff ffff    fff8 0000 0000 0000 - ffff ffff ffff ffff
-
-#endif
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

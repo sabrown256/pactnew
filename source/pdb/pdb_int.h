@@ -24,6 +24,8 @@
 
 #define N_CASTS_INCR 30
 
+/* #define USE_REQUESTS */
+
 /* type indeces for long and double */
 #define PD_LONG_I         SC_TYPE_FIX(SC_LONG_I)
 #define PD_DOUBLE_I       SC_TYPE_FP(SC_DOUBLE_I)

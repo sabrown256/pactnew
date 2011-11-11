@@ -1447,17 +1447,19 @@ void _PD_request_unset(PDBfile *file)
        {req = &file->req;
 
 	req->oper = -1;
-#if 0
+
+#ifdef USE_REQUESTS
+/*
 	SC_mark(req->ftype, -1);
 	req->ftype = NULL;
 
 	SC_mark(req->htype, -1);
 	req->htype = NULL;
+*/
+#endif
 	
 	CFREE(req->base_name);
-	CFREE(req->base_type);
-#endif
-       };
+	CFREE(req->base_type);};
 
     return;}
 
