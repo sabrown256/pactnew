@@ -12,6 +12,8 @@ setenv Package  scheme
 setenv Test     $0:t
 source ../../../scripts/test-env
 
+set shopt = ( -e )
+
 if ("$CFE" == "") then
    set cfe = ""
 else

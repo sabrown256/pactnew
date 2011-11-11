@@ -89,6 +89,12 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
 	file->mpi_mode = 0;              /* 1: serial, 0: parallel */
 	file->mpi_file = FALSE;
 
+	file->req.oper      = PD_OPEN;
+	file->req.base_name = NULL;
+	file->req.base_type = NULL;
+	file->req.ftype     = NULL;
+	file->req.htype     = NULL;
+
 	file->symtaddr = 0;
 	file->chrtaddr = 0;
 	file->headaddr = 0;

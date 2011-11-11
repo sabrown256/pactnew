@@ -1216,11 +1216,11 @@ static void _PD_do_goto(PD_smp_state *pa, char *name)
 	dims = PD_entry_dimensions(ep);
 	bl   = ep->blocks;
 
-	dp = _PD_lookup_type(type, file->chart);
+	dp = _PD_type_lookup(file, PD_CHART_FILE, type);
 	if (dp == NULL)
 	   PD_error("UNDEFINED TYPE - _PD_DO_GOTO", PD_TRACE);
 
-	else if (dp->size_bits && (addr > 0))
+	else if ((dp->size_bits != 0) && (addr > 0))
 	   addr *= -SC_BITS_BYTE;
 
 /* indirect does NOT mean that the type is indirect but that the

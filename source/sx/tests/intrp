@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "PDBView Interpolation Test ..."
 set exe = $BinDir/sx
-set opt = ( -p -e -q $ZeroSpace -l $FilesDir/pdbvinterp.scm )
+set opt = ( $pvopt -l $FilesDir/pdbvinterp.scm )
 set io  = pdbvinterp.tmp
 
    NoteD $Log ""

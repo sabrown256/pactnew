@@ -1145,12 +1145,9 @@ void _PD_ptr_wr_syment(PDBfile *file, PD_address *ad, char *type,
     syment *ep;
 
     if (ni > 0)
-       {snprintf(name, MAXLINE, "%s%ld",
-		 file->ptr_base, (long) ad->indx);
-/*
        {snprintf(name, MAXLINE, "%s%ld#%s",
 		 file->ptr_base, (long) ad->indx, file->current_prefix);
-*/
+
 	ep = _PD_mk_syment(type, ni, addr, NULL, NULL);
 	_PD_e_install(file, name, ep, TRUE);
 

@@ -12,6 +12,9 @@ setenv Package  sx
 setenv Test     $0:t
 source ../../../scripts/test-env
 
+set sxopt = ( -e -r -s $ZeroSpace )
+set pvopt = ( -p -e -r -q $ZeroSpace )
+
 if ("$CFE" == "") then
    set cfe = ""
 else

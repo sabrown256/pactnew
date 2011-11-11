@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "SX PDB VIF Test .............."
 set exe = $BinDir/sx
-set opt = ( -p -e -q $ZeroSpace -l $FilesDir/sxpdbi.scm )
+set opt = ( $pvopt -l $FilesDir/sxpdbi.scm )
 set io  = sxpdbi.res
 
    NoteD $Log ""

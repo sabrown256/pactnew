@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "SCHEME Memory Test ..........."
 set exe = $BinDir/scheme
-set opt = ( -e -l $FilesDir/mmtst.scm )
+set opt = ( $shopt -l $FilesDir/mmtst.scm )
 set io  = flog
 
    NoteD $Log ""

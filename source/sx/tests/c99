@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "SX PDB C99 Test .............."
 set exe = $BinDir/sx
-set opt = ( -e -r -s $ZeroSpace -l $FilesDir/sxc99.scm )
+set opt = ( $sxopt -l $FilesDir/sxc99.scm )
 set io  = sxc99.res
 
    NoteD $Log ""

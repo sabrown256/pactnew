@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "ULTRA FNC Test ..............."
 set exe = $BinDir/ultra
-set opt = ( -e -r -x -q -s $ZeroSpace -l $FilesDir/ulfnc.scm )
+set opt = ( $ulopt -l $FilesDir/ulfnc.scm )
 set io  = ulfnc.log
 
    NoteD $Log ""

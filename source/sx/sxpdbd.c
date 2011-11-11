@@ -653,7 +653,7 @@ static int _SX_rd_leaf_t(PDBfile *pf, syment *ep, char *vr, char *intype,
     if (n == 1)
        _PD_entry_set_number(ep, 0, PD_entry_number(ep));
 
-    dpf = _PD_lookup_type(outtype, pf->chart);
+    dpf = _PD_type_lookup(pf, PD_CHART_FILE, outtype);
     cnv = _PD_requires_conversion(pf, dpf, outtype, intype);
 
     if (cnv == TRUE)

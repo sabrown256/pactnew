@@ -64,7 +64,7 @@ static PP_descr *_PP_get_defstr_descr(PP_file *fileinfo, PyObject *obj)
     PP_defstrObject *self = (PP_defstrObject *) obj;
     defstr *dp;
 
-    dp = _PD_lookup_type("DEFSTR", PP_vif->host_chart); 
+    dp = _PD_type_lookup(PP_vif, PD_CHART_HOST, "DEFSTR");
 
     descr = CMAKE(PP_descr);
     descr->typecode = PP_UNKNOWN_I;

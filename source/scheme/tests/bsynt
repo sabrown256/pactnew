@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "SCHEME Basis Syntax Test ....."
 set exe = $BinDir/scheme
-set opt = ( -e -l shmtst.m )
+set opt = ( $shopt -l shmtst.m )
 set io  = shmtst.res
 
    if (($do_syntax == 0) && (-d $SrcDir/syntax/m)) then

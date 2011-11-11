@@ -2364,7 +2364,7 @@ static int _SX_pseudo_suitable(PDBfile *file, syment *et)
     type = PD_entry_type(et);
 
     ok = !_PD_indirection(type);
-    dp = _PD_lookup_type(type, file->host_chart);
+    dp = _PD_type_lookup(file, PD_CHART_HOST, type);
     for (dm = dp->members; dm != NULL && ok; dm = dm->next)
         ok &= !_PD_indirection(dm->type);
 

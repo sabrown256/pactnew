@@ -711,7 +711,7 @@ static int64_t _PD_next_address_t(PDBfile *file, char *type, long number,
     flag = ((file->mpi_mode == TRUE)  ||
             (!file->mpi_file)) ? FALSE : TRUE;
 
-    dpf = _PD_lookup_type(type, file->chart);
+    dpf = _PD_type_lookup(file, PD_CHART_FILE, type);
     ipt = _PD_items_per_tuple(dpf);
 
     if (dpf->n_indirects == 0)

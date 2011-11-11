@@ -102,16 +102,14 @@ PyObject *PP_unpack_hashtab_haelem(char *type, void *vr)
 /*--------------------------------------------------------------------------*/
 
 static PP_descr *_PP_get_hashtab_descr(PP_file *fileinfo, PyObject *obj)
-{
-    PP_descr *descr;
+   {PP_descr *descr;
     PP_hashtabObject *self = (PP_hashtabObject *) obj;
     defstr *dp;
 
-    dp = _PD_lookup_type("hasharr", PP_vif->host_chart);
-    if (dp == NULL) {
-        PP_error_set_user(NULL, "PD_lookup_type failed with hasharr");
-        return NULL;
-    }
+    dp = _PD_type_lookup(PP_vif, PD_CHART_HOST, "hasharr");
+    if (dp == NULL)
+       {PP_error_set_user(NULL, "PD_lookup_type failed with hasharr");
+        return(NULL);};
 
     descr = CMAKE(PP_descr);
     descr->typecode = PP_UNKNOWN_I;
@@ -122,8 +120,7 @@ static PP_descr *_PP_get_hashtab_descr(PP_file *fileinfo, PyObject *obj)
     SC_mark(descr->type, 1);
     SC_mark(descr, 1);
 
-    return descr;
-}
+    return(descr);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
