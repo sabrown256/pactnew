@@ -1222,7 +1222,7 @@ static int _PD_pfm_remote_flush(char *buf)
 
     file = _PD_pflst->elem[req.id].file;
 
-    rv = (*file->parse_symt)(file, req.buf, TRUE);
+    rv = (*file->parse_symt)(file, req.buf, TRUE, "*", NULL);
     SC_ASSERT(rv == TRUE);
 
 /* if everyone has checked in actually flush the file to disk */
@@ -1571,7 +1571,7 @@ static int _PD_mp_flush(PDBfile *file)
     lio_flush(fp);
 
 /* we can be doing a flush unrelated to a write or close
- * and this could go nowhere - e.g. pddpts
+ * and this could go nowhere - e.g. tpddp
     if (lio_flush(fp) != 0)
        PD_error("FLUSH FAILED - _PD_MP_FLUSH", PD_WRITE);
 */
@@ -1588,7 +1588,8 @@ static int _PD_mp_flush(PDBfile *file)
         flush_req.buf = buf;
         nbuf = _PD_pfm_buffer_mp_req("PD_MP_FLUSH_req", &flush_req, &mpbuf);
 
-        MPI_Send(mpbuf, nbuf, MPI_BYTE, _PD.mp_master_proc, PD_MP_FLUSH, mcomm);
+        MPI_Send(mpbuf, nbuf, MPI_BYTE, _PD.mp_master_proc,
+		 PD_MP_FLUSH, mcomm);
 
         CFREE(buf);
         CFREE(mpbuf);
@@ -1600,19 +1601,20 @@ static int _PD_mp_flush(PDBfile *file)
         if (lio_flush(fp) != 0)
            PD_error("FLUSH FAILED - _PD_MP_FLUSH", PD_WRITE);
 
-        MPI_Recv(&rv, 1, MPI_INT, _PD.mp_master_proc, PD_MP_FLUSH, mcomm, &stat);
+        MPI_Recv(&rv, 1, MPI_INT, _PD.mp_master_proc, PD_MP_FLUSH,
+		 mcomm, &stat);
 
 /* sync the in-memory symbol table amongst all processes */
-        MPI_Recv(&len, 1, MPI_INT, _PD.mp_master_proc, PD_MP_SYNC, mcomm, &stat);
+        MPI_Recv(&len, 1, MPI_INT, _PD.mp_master_proc, PD_MP_SYNC,
+		 mcomm, &stat);
         symtab_buf = CMAKE_N(char, len); 
 
         MPI_Bcast(symtab_buf, len, MPI_BYTE, _PD.mp_master_proc, mcomm);
-        (*file->parse_symt)(file, symtab_buf, TRUE);
+        (*file->parse_symt)(file, symtab_buf, TRUE, "*", NULL);
 
         CFREE(symtab_buf);}
 
     else
-
        {
 #ifndef USE_THREAD_SAFE_MPI
         _PD_pfm_service_req(id, PD_MP_FLUSH);

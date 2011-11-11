@@ -511,7 +511,8 @@ static int _PD_rd_chrt_iii(PDBfile *file)
  *
  */
 
-static int _PD_parse_symt_iii(PDBfile *file, char *buf, int flag)
+static int _PD_parse_symt_iii(PDBfile *file, char *buf, int flag,
+			      char *acc, char *rej)
    {long bsz;
     char *name, *type, *var, *adr, *s, *local;
     int64_t addr, numb;
@@ -571,7 +572,7 @@ static int _PD_parse_symt_iii(PDBfile *file, char *buf, int flag)
  *                 - return FALSE on error
  */
 
-static int _PD_rd_symt_iii(PDBfile *file)
+static int _PD_rd_symt_iii(PDBfile *file, char *acc, char *rej)
    {int rv;
     long nbs;
     int64_t addr, numb;
@@ -601,7 +602,7 @@ static int _PD_rd_symt_iii(PDBfile *file)
 
     bf[nbs] = (char) EOF;
 
-    rv = _PD_parse_symt_iii(file, bf, FALSE);
+    rv = _PD_parse_symt_iii(file, bf, FALSE, acc, rej);
 
     return(rv);}
 
@@ -1223,7 +1224,8 @@ static int _PD_wr_fmt_iii(PDBfile *file)
 static int _PD_open_iii(PDBfile *file)
    {int nb;
     char str[MAXLINE], key[MAXLINE];
-    char *s, *ps;
+    char sr[MAXLINE];
+    char *acc, *rej, *s, *ps;
     FILE *fp;
     PD_smp_state *pa;
 
@@ -1232,6 +1234,12 @@ static int _PD_open_iii(PDBfile *file)
     fp = pa->ofp;
 
     file->use_itags = ITAGS;
+
+    acc = NULL;
+    rej = NULL;
+    if (file->eager_sym == FALSE)
+       {snprintf(sr, MAXLINE, "/&ptrs/ia_*#/");
+	rej = sr;};
 
 /* read the trailer */
     nb = MAXLINE - 1;
@@ -1276,7 +1284,7 @@ static int _PD_open_iii(PDBfile *file)
     if (lio_seek(fp, file->symtaddr, SEEK_SET))
        PD_error("FSEEK FAILED SYMBOL TABLE - _PD_OPEN_III", PD_OPEN);
 
-    if (!_PD_rd_symt_iii(file))
+    if (!_PD_rd_symt(file, acc, rej))
        PD_error("CAN'T READ SYMBOL TABLE - _PD_OPEN_III", PD_OPEN);
 
 /* read the miscellaneous data */
@@ -1455,6 +1463,7 @@ int _PD_set_format_iii(PDBfile *file)
 
     file->wr_meta       = _PD_write_meta_iii;
     file->wr_symt       = _PD_wr_symt_iii;
+    file->rd_symt       = _PD_rd_symt_iii;
     file->parse_symt    = _PD_parse_symt_iii;
     file->wr_prim_types = _PD_wr_prim_typ_iii;
     file->rd_prim_types = _PD_rd_prim_typ_iii;

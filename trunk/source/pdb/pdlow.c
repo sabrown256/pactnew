@@ -288,6 +288,28 @@ int _PD_safe_flush(PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PD_RD_SYMT - read entries from the symbol table
+ *             - entries are checked first against REJ
+ *             - if they match they are not entered in the symbol table
+ *             - if not rejected they are checked against ACC
+ *             - if they match they are entered in the symbol table
+ *             - if REJ is NULL everything goes to the ACC filter
+ *             - if ACC is NULL everything passing the REJ filter is accepted
+ *             - regular expressions are interpreted in the glob sense
+ *             - in particular '*' does not extend beyond directories
+ *             - return TRUE iff successful
+ */
+
+int _PD_rd_symt(PDBfile *file, char *acc, char *rej)
+   {int rv;
+
+    rv = (*file->rd_symt)(file, acc, rej);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PD_INQUIRE_TYPE - lookup and return the file chart entry for NAME
  *
  * #bind PD_inquire_type fortran() scheme() python()

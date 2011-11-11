@@ -236,7 +236,8 @@ static int _PD_rd_fmt_ii(PDBfile *file)
  *
  */
 
-static int _PD_parse_symt_ii(PDBfile *file, char *buf, int flag)
+static int _PD_parse_symt_ii(PDBfile *file, char *buf, int flag,
+			     char *acc, char *rej)
    {int i;
     long mini, leng, bsz;
     int64_t addr, numb;
@@ -290,7 +291,7 @@ static int _PD_parse_symt_ii(PDBfile *file, char *buf, int flag)
  *                - return FALSE on error
  */
 
-int _PD_rd_symt_ii(PDBfile *file)
+int _PD_rd_symt_ii(PDBfile *file, char *acc, char *rej)
    {int rv;
     long symt_sz;
     int64_t addr, numb;
@@ -320,7 +321,7 @@ int _PD_rd_symt_ii(PDBfile *file)
 
     bf[symt_sz] = (char) EOF;
 
-    rv = _PD_parse_symt_ii(file, bf, FALSE);
+    rv = _PD_parse_symt_ii(file, bf, FALSE, acc, rej);
 
     if (file->use_itags == FALSE)
        _PD_ptr_open_setup(file);
@@ -1360,7 +1361,7 @@ static int _PD_open_ii(PDBfile *file)
 /* read the symbol table */
     if (lio_seek(fp, file->symtaddr, SEEK_SET))
        PD_error("FSEEK FAILED SYMBOL TABLE - PD_OPEN", PD_OPEN);
-    if (!_PD_rd_symt_ii(file))
+    if (!_PD_rd_symt(file, NULL, NULL))
        PD_error("CAN'T READ SYMBOL TABLE - PD_OPEN", PD_OPEN);
 
 /* read the miscellaneous data */
@@ -1578,6 +1579,7 @@ int _PD_set_format_ii(PDBfile *file)
 
     file->wr_meta       = _PD_write_meta_ii;
     file->wr_symt       = _PD_wr_symt_ii;
+    file->rd_symt       = _PD_rd_symt_ii;
     file->parse_symt    = _PD_parse_symt_ii;
     file->wr_prim_types = _PD_wr_prim_typ_ii;
     file->rd_prim_types = _PD_rd_prim_typ_ii;

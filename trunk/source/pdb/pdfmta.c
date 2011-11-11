@@ -36,7 +36,7 @@ typedef enum e_PD_data_std PD_data_std;
 extern int
  _PD_rd_chrt_ii(PDBfile *file),
  _PD_rd_ext_ii(PDBfile *file),
- _PD_rd_symt_ii(PDBfile *file);
+ _PD_rd_symt_ii(PDBfile *file, char *acc, char *rej);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -138,7 +138,7 @@ static int _PD_open_i(PDBfile *file)
 /* read the symbol table */
     if (lio_seek(fp, file->symtaddr, SEEK_SET))
        PD_error("FSEEK FAILED SYMBOL TABLE - PD_OPEN", PD_OPEN);
-    if (!_PD_rd_symt_ii(file))
+    if (!_PD_rd_symt_ii(file, "*", NULL))
        PD_error("CAN'T READ SYMBOL TABLE - PD_OPEN", PD_OPEN);
 
 /* read the miscellaneous data */
