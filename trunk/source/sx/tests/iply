@@ -22,7 +22,7 @@ set rpf = none
       NoteD $Log -n "                       $t ..................... "
       Note $Log ""
 
-      set opt = ( -p -e -q $ZeroSpace -l $FilesDir/$t.scm )
+      set opt = ( $pvopt -l $FilesDir/$t.scm )
       set io  = $t.res
 
       flog $Log rm -f $t*.diff $t*.ps

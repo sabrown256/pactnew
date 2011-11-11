@@ -28,7 +28,7 @@ flog $Log pwd
    NoteD $Log -n "                       integer syntax ............"
    Note $Log ""
    set rpf = none
-   set opt = ( -e -l $FilesDir/shsint.scm )
+   set opt = ( $shopt -l $FilesDir/shsint.scm )
 
 # test that the SCHEME variable can be derived from the executable path
    flog $Log unsetenv SCHEME
@@ -51,7 +51,7 @@ flog $Log pwd
    NoteD $Log -n "                       numeric ..................."
    Note $Log ""
    set rpf = none
-   set opt = ( -e -l $FilesDir/shnum.scm )
+   set opt = ( $shopt -l $FilesDir/shnum.scm )
 
    source ../../../scripts/test-run
 
@@ -70,7 +70,7 @@ flog $Log pwd
    NoteD $Log -n "                       complex ..................."
    Note $Log ""
    set rpf = none
-   set opt = ( -e -l $FilesDir/shcpx.scm )
+   set opt = ( $shopt -l $FilesDir/shcpx.scm )
 
    source ../../../scripts/test-run
 

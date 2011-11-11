@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "ULTRA FFT Test ..............."
 set exe = $BinDir/ultra
-set opt = ( -e -r -x -q -s $ZeroSpace -l $FilesDir/ulfft.scm )
+set opt = ( $ulopt -l $FilesDir/ulfft.scm )
 set io  = ulfft.log
 
    NoteD $Log ""

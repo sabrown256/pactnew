@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "SX PDB HDF5 Test ............."
 set exe = $BinDir/sx
-set opt = ( -p -e -q $ZeroSpace -l $FilesDir/sxhdf.scm )
+set opt = ( $pvopt -l $FilesDir/sxhdf.scm )
 set io  = sxhdf.res
 
 if ($HAVE_HDF5 == yes) then

@@ -149,7 +149,7 @@ static inti _PD_sz_leaf_members(PDBfile *file, char *type, inti ni,
     intb bpi;
     defstr *dpf;
 
-    dpf = _PD_lookup_type(type, file->chart);
+    dpf = _PD_type_lookup(file, PD_CHART_FILE, type);
     bpi = dpf->size;
     if (bpi == -1)
        PD_error("CAN'T GET NUMBER OF BYTES - _PD_SZ_LEAF_MEMBERS", PD_TRACE);

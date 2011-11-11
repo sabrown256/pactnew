@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "SCHEME Proc Test ............."
 set exe = $BinDir/scheme
-set opt = ( -e -l $FilesDir/shproc.scm )
+set opt = ( $shopt -l $FilesDir/shproc.scm )
 set io  = shproc.res
 
    if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then

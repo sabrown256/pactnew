@@ -31,7 +31,7 @@ set exe = $BinDir/scheme
       Note $Log ""
 
       set rpf = none
-      set opt = ( -e -l shcdcl.c )
+      set opt = ( $shopt -l shcdcl.c )
       set io  = shcdcl.res
 
       source ../../../scripts/test-run
@@ -55,7 +55,7 @@ set exe = $BinDir/scheme
       Note $Log ""
 
       set rpf = none
-      set opt = ( -e -l shcppts.c )
+      set opt = ( $shopt -l shcppts.c )
       set io  = shcppts.res
 
       source ../../../scripts/test-run
@@ -79,7 +79,7 @@ set exe = $BinDir/scheme
       Note $Log ""
 
       set rpf = none
-      set opt = ( -e -l shctst.c )
+      set opt = ( $shopt -l shctst.c )
       set io  = shctst.res
 
       source ../../../scripts/test-run
@@ -101,7 +101,7 @@ set exe = $BinDir/scheme
       Note $Log ""
 
       set rpf = none
-      set opt = ( -e )
+      set opt = ( $shopt )
       set io  = shctst.scm
 
       set t0 = `$TIMER -r`

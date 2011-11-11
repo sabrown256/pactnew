@@ -278,7 +278,7 @@ syment *_SX_rd_data(SS_psides *si, PDBfile *file, char *name, syment *ep,
  * on the name to do an unwarranted conversion!!!!!!!
  * The question is where in PDB this really ought to go
  */
-	    dpf = _PD_lookup_type(type, file->chart);
+	    dpf = _PD_type_lookup(file, PD_CHART_FILE, type);
 	    if (dpf->convert)
 	       {odp = PD_inquire_table_type(file->host_chart, type);
 		if (strcmp(type, odp->type) != 0)

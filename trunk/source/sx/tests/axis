@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "SX PGS Axis Test ............."
 set exe = $BinDir/sx
-set opt = ( -e -r -s $ZeroSpace -l $FilesDir/sxaxs.scm )
+set opt = ( $sxopt -l $FilesDir/sxaxs.scm )
 set io  = flog
 
    NoteD $Log ""

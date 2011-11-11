@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "ULTRA FILL Test .............."
 set exe = $BinDir/ultra
-set opt = ( -e -r -x -q -s $ZeroSpace -l $FilesDir/ulfill.scm )
+set opt = ( $ulopt -l $FilesDir/ulfill.scm )
 set io  = ulfill.log
 
    NoteD $Log ""

@@ -113,9 +113,16 @@
  *
  * Version 27 support <file>~<start>:<end> container syntax. 08/15/2011
  *
+ * Version 28 add path to name of pointer entries in the symbol table
+ * A pointer path name is /&ptrs/ia_<n>#<path>
+ * If <path> is a directory it must end in a '/', e.g. /a/b/c/
+ * otherwise it is names a variable.  In the first case the pointer
+ * is associated with some variable in the directory.  In the
+ * second it is associated with a specific variable.  11/10/2011
+ *
  */
 
-#define PDB_SYSTEM_VERSION  27
+#define PDB_SYSTEM_VERSION  28
 
 #define BITS_DEFAULT 8     /* default bits per byte */
 #define NSTD         6     /* number of standards currently in the system 
@@ -180,6 +187,7 @@ typedef struct s_fixdes fixdes;
 typedef struct s_fpdes fpdes;
 typedef struct s_data_alignment data_alignment;
 typedef struct s_data_standard data_standard;
+typedef struct s_io_request io_request;
 typedef struct s_PD_smp_state PD_smp_state;
 typedef struct s_PDBfile PDBfile;
 typedef struct s_multides multides;
@@ -372,6 +380,13 @@ struct s_fpdes
               "int *order",                \
               LAST)
 
+struct s_io_request
+   {PD_major_op oper;       /* requested operation */
+    char *base_name;        /* base path name - no member or index expr */
+    char *base_type;        /* base variable type - pointers ok */
+    defstr *ftype;          /* file type of base */
+    defstr *htype;};        /* host type of base */
+
 struct s_data_standard
    {int bits_byte;
     int ptr_bytes;
@@ -443,22 +458,23 @@ struct s_PDBfile
     int track_pointers;
     int use_itags;
     char *date;
-    SC_array *ap;                    /* address/pointer list */
+    SC_array *ap;                     /* address/pointer list */
     long n_dyn_spaces;
     int mpi_file;
-    int mpi_mode;                        /* serial (1) parallel (0) */
-    int64_t maximum_size;                  /* for file family bookkeeping */
+    int mpi_mode;                     /* serial (1) parallel (0) */
+    int64_t maximum_size;             /* for file family bookkeeping */
     int64_t headaddr;
     int64_t symtaddr;
     int64_t chrtaddr;
-    PD_checksum_mode use_cksum;          /* session use of checksums */
-    PD_checksum_mode file_cksum;         /* file use of checksums */
+    PD_checksum_mode use_cksum;       /* session use of checksums */
+    PD_checksum_mode file_cksum;      /* file use of checksums */
     int fix_denorm;
 
     sys_layer *sys;
     tr_layer *tr;
 
-    void *meta;                          /* container for metadata in the tr layer */
+    void *meta;                       /* container for metadata in the tr layer */
+    io_request req;
     
 /* the db_layer methods */
     int (*create)(PDBfile *file, int mst);

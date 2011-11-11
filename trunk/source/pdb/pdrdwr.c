@@ -596,28 +596,18 @@ static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype,
     bpi = -1;
     niw  = 0;
 
-    dpf = _PD_lookup_type(outtype, file->chart);
+    dpf = _PD_type_lookup(file, PD_CHART_FILE, outtype);
     if (dpf == NULL)
-       PD_error("CANNOT FIND TYPE IN THE FILE CHART - _PD_WR_LEAF_MEMBERS", PD_WRITE);
+       PD_error("CANNOT FIND TYPE IN THE FILE CHART - _PD_WR_LEAF_MEMBERS",
+		PD_WRITE);
     else
        bpi = dpf->size;
 
     ipt = _PD_items_per_tuple(dpf);
     ni *= ipt;
        
-#if 1
     cnv = _PD_requires_conversion(file, dpf, intype, outtype);
     cnv |= (_PD_TEXT_OUT(file) == TRUE);
-#else
-    if (dpf->convert == -1)
-       {defstr *dph;
-        dph = _PD_lookup_type(intype, file->host_chart);
-	cnv = _PD_require_conv(dpf, dph);}
-    else
-       cnv = ((dpf->convert > 0) ||
-	      (_PD_TEXT_OUT(file) == TRUE) ||
-	      (strcmp(intype, outtype) != 0));
-#endif
 
     if (bpi == -1)
        PD_error("CAN'T GET NUMBER OF BYTES - _PD_WR_LEAF_MEMBERS", PD_WRITE);
@@ -1261,9 +1251,10 @@ static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
     else
        {defstr* dpf;
 
-	dpf = _PD_lookup_type(intype, file->chart);
+	dpf = _PD_type_lookup(file, PD_CHART_FILE, intype);
 	if (dpf == NULL)
-	   PD_error("CANNOT FIND TYPE IN THE FILE CHART - _PD_READ_HYPER_SPACE", PD_READ);
+	   PD_error("CANNOT FIND TYPE IN THE FILE CHART - _PD_READ_HYPER_SPACE",
+		    PD_READ);
 
 /* items logically contiguous */
 	else if (step == -dpf->size_bits)
@@ -1323,9 +1314,10 @@ static int _PD_rd_hyper_index(PDBfile *file, char *name,
     if (addr < 0)
        {defstr* dpf;
 
-        dpf = _PD_lookup_type(intype, file->chart);
+	dpf = _PD_type_lookup(file, PD_CHART_FILE, intype);
         if (dpf == NULL)
-           PD_error("CANNOT FIND TYPE IN THE FILE CHART - _PD_RD_HYPER_INDEX", PD_READ);
+           PD_error("CANNOT FIND TYPE IN THE FILE CHART - _PD_RD_HYPER_INDEX",
+		    PD_READ);
 	else
 	   {stop = addr - dpf->size_bits*((stop - start)/fbpi);
 	    step = -dpf->size_bits*(step/fbpi);};}
@@ -1376,11 +1368,12 @@ static void _PD_rd_leaf_members(PDBfile *file, char *vr, inti ni,
     bpi = -1;
     fp  = file->stream;
 
-    dpf = _PD_lookup_type(intype, file->chart);
+    dpf = _PD_type_lookup(file, PD_CHART_FILE, intype);
     ipt = _PD_items_per_tuple(dpf);
 
     if (dpf == NULL)
-       PD_error("CANNOT FIND TYPE IN THE FILE CHART - _PD_RD_LEAF_MEMBERS", PD_READ);
+       PD_error("CANNOT FIND TYPE IN THE FILE CHART - _PD_RD_LEAF_MEMBERS",
+		PD_READ);
     else
        bpi = dpf->size;
 

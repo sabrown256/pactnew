@@ -725,10 +725,10 @@ int _PD_requires_conversion(PDBfile *file, defstr *dpf,
     defstr *dph;
 
     if (dpf == NULL)
-       dpf = _PD_lookup_type(intype, file->chart);
+       dpf = _PD_type_lookup(file, PD_CHART_FILE, intype);
 
     if (dpf->convert == -1)
-       {dph = _PD_lookup_type(outtype, file->host_chart);
+       {dph = _PD_type_lookup(file, PD_CHART_HOST, outtype);
 	cnv = _PD_require_conv(dpf, dph);}
     else
        cnv = ((dpf->convert > 0) || (strcmp(intype, outtype) != 0));

@@ -270,6 +270,8 @@ int PD_close(PDBfile *file ARG(,,cls))
 	         memset(pa->err, 0, MAXLINE);
 		 break;};
 
+	file->req.oper = PD_CLOSE;
+
 	tr  = file->tr;
 	fun = tr->close;
 	ret = fun(file);};
@@ -326,6 +328,13 @@ int _PD_read(PDBfile *file, char *fullpath, char *type, syment *ep, void *vr,
     char *typ;
     defstr *dp;
 
+    file->req.oper = PD_READ;
+
+#if 0
+    CFREE(file->req.base_type);
+    file->req.base_type = CSTRSAVE(type);
+#endif
+
 /* figure out information needed to call PD_fix_denorm later if needed */
     nf  = 0;
     typ = (type == NULL) ? PD_entry_type(ep) : type;
@@ -345,6 +354,8 @@ int _PD_read(PDBfile *file, char *fullpath, char *type, syment *ep, void *vr,
 /* if requested, set denorm float pt vars to zero */
     if (nf > 0)
        PD_fix_denorm(NULL, typ, nf, vr);
+
+    _PD_request_unset(file);
 
     return(rv);}
 
@@ -784,6 +795,8 @@ syment *_PD_write(PDBfile *file, char *name, char *intype, char *outtype,
     if (file->mode == PD_OPEN)
        PD_error("FILE OPENED IN READ-ONLY MODE - _PD_WRITE", PD_WRITE);
     
+    file->req.oper = PD_WRITE;
+
 /* append a new block to an existing entry if TRUE */
     if (appnd)
        {strcpy(bf, name);
@@ -904,6 +917,8 @@ syment *_PD_write(PDBfile *file, char *name, char *intype, char *outtype,
 /* if the variable didn't previously exist we're at the end of the file */
 	if (new)
 	   file->chrtaddr = _PD_get_current_address(file, PD_WRITE);};
+
+    _PD_request_unset(file);
 
     *pnew = new;
 
@@ -1381,7 +1396,7 @@ int PD_free(PDBfile *file ARG(,,cls), char *type, void *var)
 	   {fprintf(stderr, "NOT SCORE ALLOCATED MEMORY %p - PD_FREE\n", pc);
 	    return(-1);};
 
-	dp = _PD_lookup_type(ityp, file->host_chart); 
+	dp = _PD_type_lookup(file, PD_CHART_HOST, ityp);
  
 	if (dp == NULL) 
 	   {fprintf(stderr, "CANNOT LOOKUP %s IN FILE - PD_FREE\n", ityp);

@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "SX PDB SQLite Test ..........."
 set exe = $BinDir/sx
-set opt = ( -p -e -q $ZeroSpace -l $FilesDir/sxsqlite.scm )
+set opt = ( $pvopt -l $FilesDir/sxsqlite.scm )
 set io  = sxsqlite.res
 
 if (($HAVE_SQLITE == yes) && ($?IBM_BGP == 0)) then

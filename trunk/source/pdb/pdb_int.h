@@ -503,7 +503,8 @@ extern void
 		    int unsgned, int onescmp, int conv),
  _PD_def_real(char *type, PDBfile *file),
  _PD_d_install(PDBfile *file, char *name, defstr *def, PD_chart_kind chk),
- _PD_e_install(PDBfile *file, char *name, syment *entr, int lookup);
+ _PD_e_install(PDBfile *file, char *name, syment *entr, int lookup),
+ _PD_request_unset(PDBfile *file);
 
 extern int
  _PD_compare_std(data_standard *a, data_standard *b,
@@ -550,7 +551,7 @@ extern dimdes
  *_PD_ex_dims(char *memb, int defoff, int *pde);
 
 extern defstr
- *_PD_lookup_type(char *s, hasharr *tab);
+ *_PD_type_lookup(PDBfile *file, PD_chart_kind ch, char *s);
 
 extern long
  _PD_member_items(char *s),

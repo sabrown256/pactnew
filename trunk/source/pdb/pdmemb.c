@@ -436,7 +436,7 @@ int _PD_align(long n, char *type, int is_indirect, hasharr *tab, int *palign)
  *                 - return the defstr
  */
 
-defstr *_PD_lookup_type(char *s, hasharr *tab)
+static defstr *_PD_lookup_type(char *s, hasharr *tab)
    {char bf[MAXLINE];
     char *token, *t;
     defstr *dp;
@@ -449,6 +449,31 @@ defstr *_PD_lookup_type(char *s, hasharr *tab)
 
     token = SC_strtok(bf, " ", t);
     dp    = PD_inquire_table_type(tab, token);
+
+    return(dp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_TYPE_LOOKUP - look up the type given in structure chart and
+ *                 - return the defstr
+ */
+
+defstr *_PD_type_lookup(PDBfile *file, PD_chart_kind ch, char *s)
+   {defstr *dp;
+
+    switch (ch)
+       {case PD_CHART_FILE :
+	     dp = _PD_lookup_type(s, file->chart);
+	     break;
+
+	case PD_CHART_HOST :
+	     dp = _PD_lookup_type(s, file->host_chart);
+	     break;
+
+	default :
+	     dp = NULL;
+	     break;};
 
     return(dp);}
 
@@ -547,12 +572,16 @@ haelem *PD_inquire_symbol(PDBfile *file ARG(,,cls),
  */
     if ((hp == NULL) &&
 	(PD_has_directories(file)) &&
+#if 0
+	(*s != '/'))
+#else
 	(strcmp(s, "/") != 0))
+#endif
        {p = strrchr(s, '/');
 
 /* if s already begins with '/' then try again WITHOUT the prefixed '/' */
 	if (p == s)
-	   {hp = SC_hasharr_lookup(tab, s + 1);}
+	   hp = SC_hasharr_lookup(tab, s + 1);
 
 /* if s does NOT begin with '/' then try again WITH the prefixed '/' */
         else if ((p == NULL) || (strcmp(p, "/") == 0))

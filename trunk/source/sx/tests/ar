@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "SX PDB Archive Test .........."
 set exe = $BinDir/sx
-set opt = ( -e -p -q $ZeroSpace -l $FilesDir/pdbvar.scm )
+set opt = ( $pvopt -l $FilesDir/pdbvar.scm )
 set io  = pdbvar.res
 
 NoteD $Log ""

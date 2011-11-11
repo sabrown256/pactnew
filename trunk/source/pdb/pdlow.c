@@ -1436,6 +1436,32 @@ PDBfile *_PD_open(tr_layer *tr, SC_udl *pu, char *name, char *mode, void *a)
     return(file);}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_REQUEST_UNSET - reset I/O request in FILE */
+
+void _PD_request_unset(PDBfile *file)
+   {io_request *req;
+
+    if (file != NULL)
+       {req = &file->req;
+
+	req->oper = -1;
+#if 0
+	SC_mark(req->ftype, -1);
+	req->ftype = NULL;
+
+	SC_mark(req->htype, -1);
+	req->htype = NULL;
+	
+	CFREE(req->base_name);
+	CFREE(req->base_type);
+#endif
+       };
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
 
 /*                            FILE INFO ROUTINES                            */
 

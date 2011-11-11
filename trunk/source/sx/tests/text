@@ -12,7 +12,7 @@ source ../../tests/common
 
 set msg = "SX PDB Text Test ............."
 set exe = $BinDir/sx
-set opt = ( -p -e -q $ZeroSpace -l $FilesDir/sxpdbt.scm )
+set opt = ( $pvopt -l $FilesDir/sxpdbt.scm )
 set io  = sxpdbt.res
 
    NoteD $Log ""
