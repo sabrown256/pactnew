@@ -553,7 +553,6 @@ haelem *PD_inquire_symbol(PDBfile *file ARG(,,cls),
 			  char *name, int flag,
 			  char *fullname, hasharr *tab)
    {char s[MAXLINE], t[MAXLINE];
-    char *p;
     haelem *hp;
 
     if (flag)
@@ -565,26 +564,20 @@ haelem *PD_inquire_symbol(PDBfile *file ARG(,,cls),
        strcpy(fullname, s);
 
     hp = SC_hasharr_lookup(tab, s);
+    if (hp == NULL)
 
-/* if the file has directories and the entry is not "/",
- * treat entry with and without initial slash as equivalent, 
- * NOTE: if there is no '/' anywhere it is a var, or if s ends in "/" it is a dir
+/* check case where S begins with '/'
+ * it might be under 'foo' rather than '/foo'
  */
-    if ((hp == NULL) &&
-	(PD_has_directories(file)) &&
-#if 0
-	(*s != '/'))
-#else
-	(strcmp(s, "/") != 0))
-#endif
-       {p = strrchr(s, '/');
+       {if (*s == '/')
+	   {if ((s[1] != '\0') && (s[1] != '&'))
+	       {snprintf(t, MAXLINE, "%s", s+1);
+		hp = SC_hasharr_lookup(tab, t);};}
 
-/* if s already begins with '/' then try again WITHOUT the prefixed '/' */
-	if (p == s)
-	   hp = SC_hasharr_lookup(tab, s + 1);
-
-/* if s does NOT begin with '/' then try again WITH the prefixed '/' */
-        else if ((p == NULL) || (strcmp(p, "/") == 0))
+/* check case where S does not begin with '/'
+ * it might be under '/foo' rather than 'foo'
+ */
+	else
 	   {snprintf(t, MAXLINE, "/%s", s);
 	    hp = SC_hasharr_lookup(tab, t);};};
 

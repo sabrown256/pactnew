@@ -8,6 +8,7 @@
 # include "cpyright.h"
 #
 
+setenv Package panacea
 setenv Test abc
 source ../../../scripts/test-env
 
