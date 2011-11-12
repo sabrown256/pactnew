@@ -222,6 +222,7 @@
 (safe-load "consts.scm")     ; load the constants
 (safe-load "pdbvio.scm")     ; load the I/O commands
 (safe-load "pdbvcmd.scm")    ; load the non-I/O commands
+(safe-load "pdbvar.scm")     ; load the user level variable commands
 (safe-load "synon.scm")      ; load the aliases
 (safe-load "help.scm")       ; load the help package
 (safe-load "ezn.scm")        ; load the Basis EZN interface

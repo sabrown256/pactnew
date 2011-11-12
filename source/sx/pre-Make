@@ -16,7 +16,7 @@ TGTInc = sx.h sx_int.h
 ExtDir = ${ScmDir}/extensions
 
 TGTScm = applications/sxview.scm applications/sxcomp.scm applications/sxdm.scm \
-         applications/pdbvcmd.scm \
+         applications/pdbvcmd.scm applications/pdbvar.scm \
          applications/pdbvdat.scm applications/pdbview.rc applications/pdbvio.scm \
          applications/pdbview.scm applications/pdbvplt.scm \
          applications/pdbvthemes.scm applications/binedit.scm \

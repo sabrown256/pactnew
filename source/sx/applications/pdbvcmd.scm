@@ -439,44 +439,6 @@
 	      (print-index-range file pa imn imn imx pb inc tm indl))))
 
 ;--------------------------------------------------------------------------
-;--------------------------------------------------------------------------
-
-; PRINT-AUX - the auxiliary print procedure
-
-(define (print-aux nm indx)
-    (let* ((name (sprintf "%s%s%s" (che) nm (cta)))
-	   (indl (if indx (car indx) nil)))
-      
-         (plot-flag off)
-	 (newline)
-	 (if (null? name)
-	     (printf nil "No variable name specified\n")
-	     (let* ((data (cond ((pdbdata? name)
-				 name)
-				((pm-mapping? name)
-				 (pm-mapping->pdbdata name))
-				((pm-set? name)
-				 (pm-set->pdbdata name))
-				((pm-array? name)
-				 (pm-array->pdbdata name))
-				((pg-graph? name)
-				 (pg-graph->pdbdata name))
-				((pg-image? name)
-				 (pg-image->pdbdata name))
-
-; last arg is #f so index expr errors
-; can be reported as such
-				((file-variable? current-file name #f)
-				 (print-file-variable current-file
-						      (print-name name)
-						      indl))
-				(else
-				 (printf nil "Variable %s unknown\n" name)))))
-	       (if data
-		   (print-pdb nil (list data display-precision)))))
-	 #f))
-
-;--------------------------------------------------------------------------
 
 ;                           FIND AUXILLIARIES
 
@@ -691,112 +653,9 @@
 	((io-function current-file "cd") current-file (car rest))
 	((io-function current-file "cd") current-file)))
 
-;--------------------------------------------------------------------------
-;--------------------------------------------------------------------------
-
-; CHANGE - change values in the named variable or structure member
-
-(define-macro (change name . val)
-    "CHANGE - Reset values in a variable or member.
-              If fewer values are supplied than elements referenced,
-              the last value is repeated. If more values are supplied
-              than elements referenced, the extra values are ignored.
-              Note that the command keyword, change, may be omitted.
-     Usage: [change] <expr> <values>
-            <expr>       :=  <variable> | <structure-member> | <find-expr>
-            <find-expr>  :=  <arr> [<predicate> [<conjunction>]]*
-            <arr>        :=  a pm-array of values
-            <predicate>  :=  = | != | <= | < | >= | >
-            <conjuntion> :=  and | or
-     Examples: change a[10,15] 3.2
-                  Reset the value of a[10,15] to 3.5
-               change time 0.0
-                  Reset the value of time to 0.0
-               x[1:2] 1 2
-                  Reset the values x[1] and x[2] to 1 and 2 respectively
-               a[5,10,3] 5.7e4
-                  Reset the value of a[5,10,3] to 5.7e4
-               dir1/jkl.k 2
-                  Reset the value of the k member of struct instance
-                  jkl in directory dir1 to 2
-               a  (1 2 3)
-                 Suppose a is an array of 5 integers.  This sets a[0]
-                 to 1, a[1] to 2, and a[2], a[3], and a[4] to 3.  This is
-                 why you must NOT refer array elements using parentheses.
-                 An expression such as:
-                    a(2)
-                 would be interpreted as a request to set all values of a to 2!"
-
-
-  (change-aux name val))
-
-; the change procedure
-(define (change* name . val)
-    "Procedure version of change macro"
-    (change-aux name val))
-
-; the auxiliary change procedure
-(define (change-aux name val)
-    (plot-flag off)
-    (newline)
-    (if (null? name)
-	(printf nil "No variable name specified\n")
-	(if (not (file-variable? current-file name #f))
-	    (printf nil "Variable %s does not exist\n" name)
-	    (let* ((ep       (read-syment current-file name))
-		   (var-type (syment-type ep))
-		   (var-addr (syment-address ep))
-		   (var-dims (syment-dimensions ep))
-		   (splt     (split-off-find-expression val nil)))
-
-	      (define commlist nil)
-	      (set! commlist (append (list current-file) commlist))
-	      (set! commlist (append (list name) commlist))
-	      (set! commlist (append (list (append (list type var-type) var-dims))
-				     commlist))
-	      (define (do-one x)
-		      (set! commlist (append (list x) commlist)))
-
-	      (if (not (null? (car splt)))
-		  (let* ((fexpr (list-ref splt 0))
-			 (vals  (list-ref splt 1))
-			 (indl  (apply find (cons "yval0" fexpr))))
-			(change-scatter commlist indl vals))
-		  (begin (for-each do-one val)
-			 (set! commlist (reverse commlist))
-			 (print-pdb nil (list (apply write-pdbdata commlist)
-					      display-precision)))))))
-    #f)
-
-;--------------------------------------------------------------------------
-;--------------------------------------------------------------------------
-
-; CHANGE-DIMENSION - change the dimensions of the named variable in memory
-;                     
-
-(define-macro (change-dimension name . rest)
-    "CHANGE-DIMENSION - Change the dimensions of a variable in memory.
-
-     Usage: change-dimension name dimension_list
-     Examples: change-dimension foo 20
-               change-dimension bar 10 10
-               change-dimension foobar (2 . 10) (3 . 5)"
-
-    (define (change-dim rest)
-        (let* ((syment  (read-syment current-file name))
-	       (symlist (pdb->list syment))
-	       (address (cadr symlist))
-	       (type    (car symlist))
-	       (symout  (list address type name current-file)))
-	  (if rest
-	      (begin (set! symout (append (reverse rest) symout))
-		     (set! symout (reverse symout))
-		     (apply write-syment symout)
-		     (file-mode current-file "r")))))
-
-    (plot-flag off)
-    (if rest
-        (change-dim rest)))
+(define (cd* . args)
+    "Procedure version of cd macro"
+    (apply cd args))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -2304,15 +2163,20 @@
         (set! flags (car flags)))
 
     (let* ((ls-fnc (io-function current-file "ls")))
-      (if (pair? newrest)
-	  (if (pair? (cdr newrest))
-	      (cond ((= (length newrest) 2)
-		     (ls-fnc current-file flags (car newrest) (cadr newrest)))
-		    ((= (length newrest) 3)
-		     (ls-fnc current-file flags (car newrest) (cadr newrest) (caddr newrest))))
-	      (ls-fnc current-file flags (car newrest)))
-	  (ls-fnc current-file flags))
-      #t))
+          (if (pair? newrest)
+	      (if (pair? (cdr newrest))
+		  (cond ((= (length newrest) 2)
+			 (ls-fnc current-file flags
+				 (car newrest)
+				 (cadr newrest)))
+			((= (length newrest) 3)
+			 (ls-fnc current-file flags
+				 (car newrest)
+				 (cadr newrest)
+				 (caddr newrest))))
+		  (ls-fnc current-file flags (car newrest)))
+	      (ls-fnc current-file flags))
+	  #t))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -2482,6 +2346,10 @@
     (if (null? rest)
 	(printf nil "\nNo directory name\n")
 	((io-function current-file "mkdir") current-file (car rest))))
+
+(define (mkdir* . args)
+    "Procedure version of mkdir macro"
+    (apply mkdir args))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -2759,36 +2627,6 @@
 					  "n_nodes"
 					  cnnct)))
       (ac vars dom zone)))
-
-;--------------------------------------------------------------------------
-;--------------------------------------------------------------------------
-
-; PRINT - print all or part of the named variable or structure member
-
-(define-macro (print name . indl)
-    "PRINT - Print out all or part of a variable or member.
-             Note that the command keyword may be omitted.
-             To print part of a variable or member qualify
-             the name with index expressions whose parts
-             are in one of the three forms:
-               <index>
-               <index-min>:<index-max>
-               <index-min>:<index-max>:<increment>
-             Only the first form may be used to qualify
-             variables or terminal structure members with
-             embedded pointers and non-terminal members.
-     Usage: [print] <variable> | <structure-member>
-     Examples: Mapping2
-               print Mapping4.domain.elements
-               print Mapping2.range.elements[1]
-               a[5,10:20,1:8:3]
-               print a.b[3].c[5,10:20,1:8:3]"
-    (print-aux name indl))
-
-; the print procedure
-(define (print* name . indl)
-    "Procedure version of print macro"
-    (print-aux name indl))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
