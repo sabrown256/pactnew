@@ -7,6 +7,10 @@
 ; include "cpyright.h"
 ;
 
+(define current-file nil)
+
+(load "pdbvar.scm")
+
 (set-format "short"   "%4d")
 (set-format "integer" "%6d")
 (set-format "long"    "%8d")
@@ -62,28 +66,70 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
+; PDB-DATA-PRIMH - generate primitives using the high level interface
+;                - using var 
+
+(define (pdb-data-primh)
+
+; variations on char
+   (var char c (10) "bar")
+   (var char *a "foo")
+   (var char *e (3) "Foo" () "Bar")
+   (var char **s ("Hello" "world"))
+
+; variations on short
+   (var short cs (10) 1 2 3 4 5 6 7 8 9 10)
+   (var short *as (1 2 3 4))
+   (var short *es (3) (-1 -2 -3) (4 5) (6 7 8 9))
+   (var short **ss ((1 2 3 4 5) (6 7 8 9)))
+
+; variations on integer
+   (var int cn (10) 1 2 3 4 5 6 7 8 9 10)
+   (var int *an (1 2 3 4))
+   (var int *en (3) (-1 -2 -3) (4 5) (6 7 8 9))
+   (var int **sn ((1 2 3 4 5) (6 7 8 9)))
+
+   #t)
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; PDB-DATA-PRIML - generate primitives using the low level interface
+;                - using write-pdbdata directly
+
+(define (pdb-data-priml)
+
+; variations on char
+   (define-global c (write-pdbdata nil "c" (type "char" 10) "bar"))
+   (define-global a (write-pdbdata nil "a" (type "char *") "foo"))
+   (define-global e (write-pdbdata nil "e" (type "char *" 3) "Foo" () "Bar"))
+   (define-global s (write-pdbdata nil "s" (type "char **") '("Hello" "world")))
+
+; variations on short
+   (define-global cs (write-pdbdata nil "cs" (type "short" 10) 1 2 3 4 5 6 7 8 9 10))
+   (define-global as (write-pdbdata nil "as" (type "short *") '(1 2 3 4)))
+   (define-global es (write-pdbdata nil "es" (type "short *" 3) '(-1 -2 -3) '(4 5) '(6 7 8 9)))
+   (define-global ss (write-pdbdata nil "ss" (type "short **") '((1 2 3 4 5) (6 7 8 9))))
+
+; variations on integer
+   (define-global cn (write-pdbdata nil "cn" (type "integer" 10) 1 2 3 4 5 6 7 8 9 10))
+   (define-global an (write-pdbdata nil "an" (type "integer *") '(1 2 3 4)))
+   (define-global en (write-pdbdata nil "en" (type "integer *" 3) '(-1 -2 -3) '(4 5) '(6 7 8 9)))
+   (define-global sn (write-pdbdata nil "sn" (type "integer **") '((1 2 3 4 5) (6 7 8 9))))
+
+   #t)
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
 ; PDB-DATA-GEN - generate and return list of PDBDATA objects written
 ;              - to the internal file
 
 (define (pdb-data-gen)
 
-; variations on char
-    (define c (write-pdbdata nil "c" (type "char" 10) "bar"))
-    (define a (write-pdbdata nil "a" (type "char *") "foo"))
-    (define e (write-pdbdata nil "e" (type "char *" 3) "Foo" () "Bar"))
-    (define s (write-pdbdata nil "s" (type "char **") '("Hello" "world")))
-
-; variations on short
-    (define cs (write-pdbdata nil "cs" (type "short" 10) 1 2 3 4 5 6 7 8 9 10))
-    (define as (write-pdbdata nil "as" (type "short *") '(1 2 3 4)))
-    (define es (write-pdbdata nil "es" (type "short *" 3) '(-1 -2 -3) '(4 5 6) '(7 8 9)))
-    (define ss (write-pdbdata nil "ss" (type "short **") '((1 2 3 4 5) (6 7 8 9))))
-
-; variations on integer
-    (define cn (write-pdbdata nil "cn" (type "integer" 10) 1 2 3 4 5 6 7 8 9 10))
-    (define an (write-pdbdata nil "an" (type "integer *") '(1 2 3 4)))
-    (define en (write-pdbdata nil "en" (type "integer *" 3) '(-1 -2 -3) '(4 5 6) '(7 8 9)))
-    (define sn (write-pdbdata nil "sn" (type "integer **") '((1 2 3 4 5) (6 7 8 9))))
+    (if #t
+	(pdb-data-primh)
+	(pdb-data-priml))
 
 ; simple struct without pointers
     (make-defstr* nil "cat" (def-member integer i)
