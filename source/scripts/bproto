@@ -84,14 +84,16 @@ Note $Log ""
 #
 #              - the transformations are:
 #   grep '#bind'                        find the #bind directives
-#   sed 's/^.*#bind[ \t]*//'            remove the #bind token, anything
+#   tr "\t" " "                         remove tabs (BSD sed brain damage)
+#   sed 's/^.*#bind *//'                remove the #bind token, anything
 #                                       preceeding it, and whitespace after
 
    flog $Log set cbind = z-$arch/obj/$d.bind
 
    if ("$Cfiles" != "") then
       grep '#bind' $Hfiles $Cfiles  | \
-      sed 's/^.*#bind[ \t]*//'      | \
+      tr "\t" " "                   | \
+      sed 's/^.*#bind *//'          | \
       cat >&! $cbind
    else
       flog $Log rm -f $cbind
@@ -111,11 +113,12 @@ Note $Log ""
 #   sed 's/\\/ /g'                                 remove embedded \
 #   elide '#if' '#endif' -                         remove conditionals
 #   grep -v '#'                                    remove #include, #define
-#   sed 's/[ \t][ \t]*/ /g'                        compress whitespace
-#   awk '$0 ~ /,[ \t]*$/   { printf("%s", $0) }    
-#        $0 !~ /,[ \t]*$/  { printf("%s\n", $0) }' combine lines ending in ,
-#   sed '/^[ \t]*$/d'                              remove blank lines
-#   sed '/;[ \t]*$/d'                              remove lines ending in ;
+#   tr "\t" " "                                    remove tabs (BSD sed brain damage)
+#   sed 's/  */ /g'                                compress whitespace
+#   awk '$0 ~ /, *$/  { printf("%s", $0) }    
+#        $0 !~ /, *$/ { printf("%s\n", $0) }'      combine lines ending in ,
+#   sed '/^ *$/d'                                  remove blank lines
+#   sed '/; *$/d'                                  remove lines ending in ;
 #   grep -v '='                                    remove lines with assignments
 #
 
@@ -129,11 +132,12 @@ Note $Log ""
       sed 's/\\/ /g'                                  | \
       elide '#if' '#endif' -                          | \
       grep -v '#'                                     | \
-      sed 's/[ \t][ \t]*/ /g'                         | \
-      awk '$0 ~ /,[ \t]*$/   { printf("%s", $0) }       \
-           $0 !~ /,[ \t]*$/  { printf("%s\n", $0) }'  | \
-      sed '/^[ \t]*$/d'                               | \
-      sed '/;[ \t]*$/d'                               | \
+      tr "\t" " "                                     | \
+      sed 's/  */ /g'                                 | \
+      awk '$0 ~ /, *$/   { printf("%s", $0) }           \
+           $0 !~ /, *$/  { printf("%s\n", $0) }'      | \
+      sed '/^ *$/d'                                   | \
+      sed '/; *$/d'                                   | \
       grep -v '='                                     | \
       grep -v 'FIXNUM'                                | \
       grep -v 'static'                                | \
@@ -176,9 +180,10 @@ Note $Log ""
 #                 -    <type> *axxx    is an array
 #                 - the transformations are:
 #
-#   sed 's/[ \t][ \t]*/ /g'               compress white space
-#   awk '$0 ~ /,[ \t]*$/   { printf("%s", $0) }     join lines ending in ','
-#        $0 !~ /,[ \t]*$/  { printf("%s\n", $0) }'
+#   tr "\t" " "                           remove tabs (BSD sed brain damage)
+#   sed 's/  */ /g'                       compress white space
+#   awk '$0 ~ /, *$/  { printf("%s", $0) }     join lines ending in ','
+#        $0 !~ /, *$/ { printf("%s\n", $0) }'
 #   grep 'FF_ID('                    
 #   grep -v "#"                           suppress #define FF_ID
 #   grep -v ";"                           suppress ... FF_ID(x,X)(...);
@@ -209,9 +214,10 @@ Note $Log ""
 
    if ("$Cfiles" != "") then
       cat $Cfiles                                    | \
-      sed 's/[ \t][ \t]*/ /g'                        | \
-      awk '$0 ~ /,[ \t]*$/   { printf("%s", $0) }      \
-           $0 !~ /,[ \t]*$/  { printf("%s\n", $0) }' | \
+      tr "\t" " "                                    | \
+      sed 's/  */ /g'                                | \
+      awk '$0 ~ /, *$/   { printf("%s", $0) }          \
+           $0 !~ /, *$/  { printf("%s\n", $0) }'     | \
       grep 'FF_ID('                                  | \
       grep -v "#"                                    | \
       grep -v ";"                                    | \
@@ -220,7 +226,7 @@ Note $Log ""
       sed 's/FF_ID(//'                               | \
       sed 's/(void)/()/'                             | \
       sed 's/(/ /'                                   | \
-      sed 's/)[ \t]*$//'                             | \
+      sed 's/) *$//'                                 | \
       sed 's/FIXNUM/integer/g'                       | \
       sed 's/char *\*/character /g'                  | \
       sed 's/void *\*/integer(isizea) /g'            | \
