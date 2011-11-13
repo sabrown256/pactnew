@@ -513,7 +513,8 @@ static int _PD_rd_chrt_iii(PDBfile *file)
 
 static int _PD_parse_symt_iii(PDBfile *file, char *buf, int flag,
 			      char *acc, char *rej)
-   {long bsz;
+   {int skip;
+    long bsz;
     char *name, *type, *var, *adr, *s, *local;
     int64_t addr, numb;
     syment *ep;
@@ -546,20 +547,26 @@ static int _PD_parse_symt_iii(PDBfile *file, char *buf, int flag,
 
 	desc = _PD_mk_descriptor(var, file->default_offset);
 
-	type = desc->type;
         name = SC_strtok(desc->name, " \t", s);
-	dims = desc->dimensions;
 
-        addr = SC_stol(SC_strtok(adr, " \t", s));
-        numb = SC_stol(SC_strtok(NULL, " \t()", s));
+	skip = ((rej != NULL) && (SC_regx_match(name, rej) == TRUE));
+	if (skip == TRUE)
+	   skip = ((acc == NULL) || (SC_regx_match(name, acc) == FALSE));
+
+	if (skip == FALSE)
+	   {type = desc->type;
+	    dims = desc->dimensions;
+
+	    addr = SC_stol(SC_strtok(adr, " \t", s));
+	    numb = SC_stol(SC_strtok(NULL, " \t()", s));
+
+	    ep = _PD_mk_syment(type, numb, addr, NULL, dims);
+	    _PD_e_install(file, name, ep, flag);};
+
+	_PD_rl_descriptor(desc);
 
 /* end of expression */
-        _PD_get_token(NULL, local, bsz, '\n');
-
-        ep = _PD_mk_syment(type, numb, addr, NULL, dims);
-        _PD_e_install(file, name, ep, flag);
-
-	_PD_rl_descriptor(desc);};
+	_PD_get_token(NULL, local, bsz, '\n');};
 
     return(TRUE);}
 
@@ -588,7 +595,6 @@ static int _PD_rd_symt_iii(PDBfile *file, char *acc, char *rej)
     addr = _PD_get_current_address(file, PD_OPEN);
     _PD_set_current_address(file, 0, SEEK_END, PD_OPEN);
     numb = _PD_get_current_address(file, PD_OPEN);
-    _PD_set_current_address(file, addr, SEEK_SET, PD_OPEN);
 
 /* read in the symbol table and extras table as a single block */
     nbs         = numb - file->symtaddr;
@@ -596,6 +602,7 @@ static int _PD_rd_symt_iii(PDBfile *file, char *acc, char *rej)
 
     bf = pa->tbuffer;
 
+    _PD_set_current_address(file, file->symtaddr, SEEK_SET, PD_OPEN);
     numb = lio_read(bf, 1, nbs, fp);
     if (numb != nbs)
        return(FALSE);
@@ -603,6 +610,8 @@ static int _PD_rd_symt_iii(PDBfile *file, char *acc, char *rej)
     bf[nbs] = (char) EOF;
 
     rv = _PD_parse_symt_iii(file, bf, FALSE, acc, rej);
+
+    _PD_set_current_address(file, addr, SEEK_SET, PD_OPEN);
 
     return(rv);}
 
@@ -1238,7 +1247,7 @@ static int _PD_open_iii(PDBfile *file)
     acc = NULL;
     rej = NULL;
     if (file->eager_sym == FALSE)
-       {snprintf(sr, MAXLINE, "/&ptrs/ia_*#/");
+       {snprintf(sr, MAXLINE, "/&ptrs/ia_*#/*");
 	rej = sr;};
 
 /* read the trailer */

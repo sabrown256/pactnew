@@ -13,7 +13,7 @@
 #include <pwd.h>
 #include <sched.h>
 
-#if !defined(CYGWIN)
+#ifdef HAVE_BFD
 # include <execinfo.h>
 #endif
 
@@ -24,6 +24,9 @@
 #define LOAD_AVE_CMND   "(w | head -n 1)"
 
 /*--------------------------------------------------------------------------*/
+
+#ifdef HAVE_BFD
+
 /*--------------------------------------------------------------------------*/
 
 /* _SC_PUSH_LOC - push the string version of LOC onto STR */
@@ -49,6 +52,9 @@ static void _SC_push_loc(SC_array *str, int i, long ad, SC_srcloc *loc)
     return;}
 
 /*--------------------------------------------------------------------------*/
+
+#endif
+
 /*--------------------------------------------------------------------------*/
 
 /* _SC_MEM_REAL - convert the Nth token (according to DELIM) in the string S
@@ -898,7 +904,7 @@ static char **_SC_backtrace_exe(int pid, int to)
  */
     ok = FALSE;
 
-#if !defined(CYGWIN)
+#ifdef HAVE_BFD
     if ((pid < 0) && (_SC.exe.open != NULL))
        {int n;
 	long ad;

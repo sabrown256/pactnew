@@ -96,7 +96,7 @@ targets :
 # Headers Files
 #
 Hdrs = scstd.h scunix.h scwin32.h scbgl.h \
-       sclnx.h scosx.h sccyg.h scaix.h scsol.h schpux.h scirix.h \
+       sclnx.h scosx.h sccyg.h scbsd.h scaix.h scsol.h schpux.h scirix.h \
        score.h score_int.h score_old.h \
        scope_hash.h scope_typeh.h scope_io.h scope_array.h
 

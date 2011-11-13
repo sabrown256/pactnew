@@ -22,6 +22,8 @@
 # include <dirent.h>
 #elif defined(SOLARIS)
 # include <dirent.h>
+#elif defined(FREEBSD)
+# include <dirent.h>
 #elif defined(MACOSX)
 # include <sys/sysctl.h>
 # include <mach/task.h>
@@ -98,7 +100,7 @@ int *SC_process_ids(void)
     nid = 0;
     ids = NULL;
 
-#if defined(LINUX) || defined(CYGWIN) || defined(SOLARIS) || defined(AIX)
+#if defined(LINUX) || defined(CYGWIN) || defined(SOLARIS) || defined(AIX) || defined(FREEBSD)
 
        {DIR *dir;
 	struct dirent *dp;

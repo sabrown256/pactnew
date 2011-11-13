@@ -28,6 +28,7 @@ Note $Tmp.make ""
 Note $Tmp.make $Tmp'.a : '$Tmp'.a('$Tmp'.o)'
 Note $Tmp.make ""
 
+Note $ALog "Path = $PATH"
 flog $ALog gmake --version
 if ($status == 0) then
    NoteD $ALog -n "`$Which gmake`"

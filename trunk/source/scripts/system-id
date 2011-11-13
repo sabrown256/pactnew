@@ -139,9 +139,22 @@ switch ($OS[1])
         breaksw
 
    case "freebsd*" :
-        set lvs = `expr "$RL" : '\(.*\)-RELEASE'`
-        echo "freebsd-$lvs"
-        unset lvs
+        set Concise = `expr "$RL" : '\(.*\)-RELEASE'`
+
+        set HW = `uname -m | tr "[A-Z]" "[a-z]"`
+        switch ($HW)
+           case *86:
+                echo "bsd-$Concise"
+                breaksw
+           case x86_64:
+                set lhw = o
+                echo "bsd-$Concise-$lhw"
+                unset lhw
+                breaksw
+           default:
+                echo "bsd-$Concise-$HW"
+                breaksw
+        endsw
         breaksw
 
    case "osf*" :

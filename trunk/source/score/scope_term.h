@@ -51,7 +51,6 @@
 
 #ifdef FREEBSD
 # include <term.h>
-# include <sys/ioctl_compat.h>
 # undef tab
 #endif
 
@@ -82,8 +81,9 @@ typedef int socklen_t;
 
 #ifdef HAVE_SOCKETS_P
 # include <sys/socket.h>
-# include <netinet/in.h>
 # include <arpa/inet.h>
+# include <netinet/in.h>
+# include <netinet/ip.h>
 # include <netdb.h>
 #endif
 

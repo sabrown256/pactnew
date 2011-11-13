@@ -7,8 +7,6 @@
 ; #include <cpyright.h>
 ;
 
-;(eager-pdb-pointers off)
-
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
@@ -39,24 +37,24 @@ close pdptr.pdb
 
 ; open the file
 
-cf pdptr.pdb
+cf pdptr.pdb "rp"
 
 ls
 
 ; these should not work with eager pointers off
 
-printf nil "---------------------------------------\n"
-printf nil "  full path\n"
-
-/ints/cn
-/ints/an
-/ints/en
-/ints/sn
-
-/floats/cs
-/floats/as
-/floats/es
-/floats/ss
+; printf nil "---------------------------------------\n"
+; printf nil "  full path\n"
+; 
+; /ints/cn
+; /ints/an
+; /ints/en
+; /ints/sn
+; 
+; /floats/cs
+; /floats/as
+; /floats/es
+; /floats/ss
 
 ; these should work in all cases
 
