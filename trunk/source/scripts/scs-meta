@@ -96,7 +96,7 @@ if (-d $gitd[1]) then
            set res = git
            breaksw
       case machine:
-           set repo = ( `grep url $gitd[1]/.git/config | sed 's|^[ \t]*url =||'` )
+           set repo = ( `grep url $gitd[1]/.git/config | tr "\t" " " | sed 's|^ *url =||'` )
            if ("$repo" =~ *:/*) then
               set res = `echo $repo | sed 's|:/.*$||'`
            else if ("$repo" =~ http*://*) then
@@ -110,7 +110,7 @@ if (-d $gitd[1]) then
            set res = .git
            breaksw
       case repo:
-           set res = ( `grep url $gitd[1]/.git/config | sed 's|^[ \t]*url =||'` )
+           set res = ( `grep url $gitd[1]/.git/config | tr "\t" " " | sed 's|^ *url =||'` )
            breaksw
    endsw
 
