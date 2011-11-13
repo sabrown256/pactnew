@@ -121,7 +121,7 @@ PObjs = scerr.o sccntx.o \
 TObjs = scpar.o scthn.o scthe.o scthp.o sctho.o scths.o
 
 OW32Objs = sclpwin32.o scwin32.o
-OUnxObjs = sclppsx.o scunix.o scaix.o scbgl.o sccyg.o
+OUnxObjs = sclppsx.o scunix.o scaix.o scbgl.o sccyg.o scbsd.o
 
 Objs = ${EObjs} ${MObjs} ${PObjs} ${TObjs} ${OSSupport} \
        scctl.o scapi.o scfnca.o scfncb.o scfnct.o \
@@ -157,7 +157,8 @@ ArTObjs = ${TGTLib}(scpar.o) ${TGTLib}(scthn.o) ${TGTLib}(scthe.o) \
 
 ArW32Objs = ${TGTLib}(sclpwin32.o) ${TGTLib}(scwin32.o)
 ArUnxObjs = ${TGTLib}(sclppsx.o) ${TGTLib}(scunix.o) \
-            ${TGTLib}(scaix.o) ${TGTLib}(scbgl.o) ${TGTLib}(sccyg.o)
+            ${TGTLib}(scaix.o) ${TGTLib}(scbgl.o) \
+            ${TGTLib}(sccyg.o) ${TGTLib}(scbsd.o)
 
 ArObjs = ${ArDObjs} ${ArEObjs} ${ArMObjs} ${ArPObjs} \
          ${ArSObjs} ${ArTObjs} ${OSSupport} \
