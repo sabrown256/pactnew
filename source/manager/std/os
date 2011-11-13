@@ -11,6 +11,7 @@
 Linux		LINUX		sclnx.h
 CYGWIN		CYGWIN		sccyg.h
 Darwin		MACOSX		scosx.h
+FreeBSD		FREEBSD		scbsd.h
 AIX		AIX		scaix.h
 SunOS		SOLARIS		scsol.h
 IRIX64		SGI		scirix.h

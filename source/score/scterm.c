@@ -1367,7 +1367,7 @@ int SC_set_term_size(int fd, int nr, int nc, int pw, int ph)
 static void _SC_is_background(int sig)
    {
 
-    longjmp(_SC.btt, 1);}
+    LONGJMP(_SC.btt, 1);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

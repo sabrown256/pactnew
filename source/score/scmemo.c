@@ -104,19 +104,26 @@ void SC_use_over_mem(int on)
 
 /* _SC_MALLOC_LOC - look up the stack to see who called the malloc */
 
+#ifdef HAVE_BFD
+
 #include <execinfo.h>
 
+#endif
+
 static char *_SC_malloc_loc(void)
-   {int n;
+   {char *rv;
+
+    rv = NULL;
+
+#ifdef HAVE_BFD
+    int n;
     char d[MAXLINE];
-    char *rv, **out;
+    char **out;
     void *bf[3];
     static int count = 0;
     static int resolv = TRUE;
 
     count++;
-
-    rv = NULL;
 
     SC_mem_over_mark(1);
 
@@ -163,6 +170,7 @@ static char *_SC_malloc_loc(void)
     SC_mem_over_mark(-1);
 
     count--;
+#endif
 
     return(rv);}
 

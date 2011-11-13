@@ -759,7 +759,7 @@ static object *_SXI_create_pdbfile(SS_psides *si, object *arg)
 /* _SXI_OPEN_PDBFILE - open up the named PDBFile */
 
 static object *_SXI_open_pdbfile(SS_psides *si, object *argl)
-   {char mode[3], *md;
+   {char mode[10], *md;
     object *obj, *o;
 
     strcpy(mode, "r");
@@ -768,8 +768,7 @@ static object *_SXI_open_pdbfile(SS_psides *si, object *argl)
         argl = SS_cdr(si, argl);
         if (SS_consp(argl))
            {md      = SS_get_string(SS_car(si, argl));
-            mode[0] = *md;
-            mode[1] = '\0';};}
+	    SC_strncpy(mode, 10, md, -1);};}
     else
        obj = argl;
 

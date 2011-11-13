@@ -347,7 +347,7 @@ reading file foofoo
     x(3) =     15
 I/O stats:
    Operation       # Hits   Tave (sec)
-      lfseek           81   0.000e+00
+      lfseek           82   0.000e+00
       lfread           77   0.000e+00
 testing pdb->list
 /c = "bar"

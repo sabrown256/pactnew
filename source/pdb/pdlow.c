@@ -1440,6 +1440,10 @@ PDBfile *_PD_open(tr_layer *tr, SC_udl *pu, char *name, char *mode, void *a)
     else
        file->mode = PD_OPEN;
 
+/* if file mode is "rp" do NOT use the default eager_sym mode */
+    if (strchr(mode, 'p') != NULL)
+       file->eager_sym = FALSE;
+
     _PD_MARK_AS_FLUSHED(file, TRUE);
 
     if (a != NULL)
