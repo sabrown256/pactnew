@@ -47,9 +47,10 @@ source $ldir/env-csh
 
 # use the C Shell to expand and print unique environment variable settings
 # in Bourne Shell syntax
-    /bin/csh -fc '(source clearenv ; source '$tmpF' ; env)' |&   \
-    awk '{printf("export %s\"\n", $0);}'                    |    \
-    sed 's/=[ \t]*/=/'                                      |    \
+    /bin/csh -fc '(source clearenv ; source '$tmpF' ; env)' |& \
+    awk '{printf("export %s\"\n", $0);}'                    |  \
+    tr "\t" " "                                             |  \
+    sed 's/= */=/'                                          |  \
     sed 's/=/="/' >&! $EnvSh
 
 # reprocess to get C Shell settings
