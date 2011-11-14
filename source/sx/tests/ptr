@@ -1,0 +1,50 @@
+#!/bin/csh -f
+#
+# PTR - tests of PDB pointer capabilities
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set msg = "SX PDB Pointer Test .........."
+set exe = $BinDir/sx
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# deferred pointer test
+
+   set opt = ( $pvopt -l $FilesDir/pdptr.scm )
+   set io  = pdptr.res
+
+   NoteD $Log ""
+   NoteD $Log -n "                    $msg"
+   Note $Log ""
+
+   set ref = $FilesDir/ref/pdptr
+
+   source ../../../scripts/test-run
+
+   if (($xstatus == 0) && ("$Valgrind" == "")) then
+      if (-f $ref) then
+         flog $Log (diff pdptr.res $ref > pdptr.res.diff)
+         set xstatus = $status
+      else
+         flog $Log cp pdptr.res $ref
+      endif
+   endif
+
+   set rpf = ( $rpf pdptr.res pdptr.res.diff )
+
+   $TEST_CHECK part -a pdb -e $xstatus -dt $dt -rpf "$rpf" none
+
+   @ nerr = $nerr + $status
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($nerr)

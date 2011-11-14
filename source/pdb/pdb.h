@@ -114,7 +114,8 @@
  * Version 27 support <file>~<start>:<end> container syntax. 08/15/2011
  *
  * Version 28 add path to name of pointer entries in the symbol table
- * A pointer path name is /&ptrs/ia_<n>#<path>
+ * A pointer path name is <base><n>#<path>
+ * where <base> is the file->ptr_base string
  * If <path> is a directory it must end in a '/', e.g. /a/b/c/
  * otherwise it is names a variable.  In the first case the pointer
  * is associated with some variable in the directory.  In the

@@ -219,6 +219,7 @@ int SC_haelem_data(haelem *hp, char **pname, char **ptype, void **po,
 static void _SC_hasharr_init(hasharr *ha, char *lm)
    {int i, sz;
     haelem **tb;
+    SC_array *a;
 
     sz = ha->size;
     tb = ha->table;
@@ -229,7 +230,10 @@ static void _SC_hasharr_init(hasharr *ha, char *lm)
     for (i = 0; i < sz; i++)
         tb[i] = NULL;
 
-    ha->a  = CMAKE_ARRAY(haelem *, NULL, ha->memfl);
+    a = CMAKE_ARRAY(haelem *, NULL, ha->memfl);
+    SC_array_resize(a, sz, -1.0);
+
+    ha->a  = a;
     ha->ne = 0L;
 
     return;}

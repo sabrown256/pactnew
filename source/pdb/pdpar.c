@@ -700,8 +700,8 @@ static int _PD_pfm_extend_file_t(PDBfile *file, long nb)
  *                    - this a worker for _PD_get_next_address
  */
 
-static int64_t _PD_next_address_t(PDBfile *file, char *type, long number,
-				  void *vr, int seekf, int tellf, int colf)
+int64_t _PD_next_address_t(PDBfile *file, char *type, long number,
+			   void *vr, int seekf, int tellf, int colf)
    {int flag, ipt, sk;
     inti nb;
     intb bpi;
