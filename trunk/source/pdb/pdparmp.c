@@ -1446,7 +1446,7 @@ static int64_t _PD_next_address_d(PDBfile *file, char *type, long number,
 
     DBG("+ _PD_next_address_d");
 
-    addr = _PD_next_address_t(file, type, number vr, seekf, tellf, colf);
+    addr = _PD_next_address_t(file, type, number, vr, seekf, tellf, colf);
 
     DBG("- _PD_next_address_d");
 

@@ -619,7 +619,8 @@ extern int
  _PD_ptr_reset(PDBfile *file, char *vr),
  _PD_ptr_entry_itag(PDBfile *file, PD_itag *pi, char *p),
  _PD_ptr_wr_itags(PDBfile *file, void *vr, inti ni, char *type),
- _PD_ptr_rd_itags(PDBfile *file, char **vr, PD_itag *pi);
+ _PD_ptr_rd_itags(PDBfile *file, char **vr, PD_itag *pi),
+ _PD_ptr_register_entry(PDBfile *fp, char *name, syment *ep);
 
 extern long
  _PD_ptr_get_index(PDBfile *file, long n, char *bfo);
@@ -695,6 +696,10 @@ extern PD_smp_state
 
 extern int
  _PD_init_t(void);
+
+extern int64_t
+ _PD_next_address_t(PDBfile *file, char *type, long number,
+		    void *vr, int seekf, int tellf, int colf);
 
 
 /* PDSHAR.C declarations */

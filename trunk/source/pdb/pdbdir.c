@@ -85,7 +85,8 @@ int PD_cd(PDBfile *file ARG(,,cls), char *dirname)
     if (file->eager_sym == FALSE)
        {char acc[MAXLINE];
 
-	snprintf(acc, MAXLINE, "/&ptrs/ia_*#%s", file->current_prefix);
+	snprintf(acc, MAXLINE, "%s*#%s",
+		 file->ptr_base, file->current_prefix);
 	rv = _PD_rd_symt(file, acc, "*");};
 
     return(rv);}

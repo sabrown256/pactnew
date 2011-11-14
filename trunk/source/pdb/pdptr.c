@@ -511,7 +511,12 @@ static long _PD_ptr_install(adloc *al, long i, void *vr)
     pi  = CMAKE(long);
     *pi = i;
 
+/* used to do this but saved memory trying to reuse any existing entry
+ * no test found a problem - changed 11/14/2011
+ * remove if no problems arise by 06/2012
     SC_hasharr_install(ah, vr, pi, SC_LONG_S, TRUE, FALSE);
+ */
+    SC_hasharr_install(ah, vr, pi, SC_LONG_S, TRUE, TRUE);
 
     return(i);}
 
@@ -1306,6 +1311,29 @@ int _PD_ptr_reset(PDBfile *file, char *vr)
     rv = _PD_ptr_reset_ad(ad, NULL);
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PTR_REGISTER_ENTRY - add a symbol table entry for a pointee to
+ *                        - the read pointer list
+ */
+
+int _PD_ptr_register_entry(PDBfile *file, char *name, syment *ep)
+   {int ok;
+    long i, nc;
+    adloc *al;
+
+    ok = 0;
+
+    if ((file != NULL) && (ep != NULL))
+       {al = _PD_ptr_get_al(file);
+        nc = strlen(file->ptr_base);
+	if (strncmp(name, file->ptr_base, nc) == 0) 
+	   {i = SC_stoi(name+nc);
+            _PD_ptr_install_entry(al, i, ep, TRUE);};};
+
+    return(ok);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

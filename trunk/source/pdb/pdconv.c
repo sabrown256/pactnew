@@ -1215,12 +1215,14 @@ static void _PD_convert_ptr_wr(char *bfo, long n, PDBfile *file,
 /* _PD_CONVERT_PTR - convert pointer in the following sense
  *                 - writing:
  *                 -    map memory address into an index <n>
- *                 -    which, under the name /&ptrs/ia_<n>, the
+ *                 -    which, under the name <base><n>, the
  *                 -    pointee is written
+ *                 -    where <base> is the file->ptr_base string
  *                 - reading:
  *                 -    read the index <n>
- *                 -    which, under the name /&ptrs/ia_<n>, the
+ *                 -    which, under the name <base><n>, the
  *                 -    pointee may be read
+ *                 -    where <base> is the file->ptr_base string
  *                 -    set the memory address to point to the
  *                 -    space into which is allocated by PDBLib
  *                 -    to recieve the pointee

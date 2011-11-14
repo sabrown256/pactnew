@@ -514,9 +514,10 @@ static int _PD_rd_chrt_iii(PDBfile *file)
 static int _PD_parse_symt_iii(PDBfile *file, char *buf, int flag,
 			      char *acc, char *rej)
    {int skip;
-    long bsz;
-    char *name, *type, *var, *adr, *s, *local;
+    long bsz, nc;
     int64_t addr, numb;
+    char *name, *type, *var, *adr, *s, *local;
+    char *base;
     syment *ep;
     memdes *desc;
     dimdes *dims;
@@ -534,6 +535,9 @@ static int _PD_parse_symt_iii(PDBfile *file, char *buf, int flag,
 
     _PD_get_token(buf, local, bsz, '\n');
 
+    base = file->ptr_base;
+    nc   = strlen(base);
+
     while (_PD_get_token(NULL, local, bsz, ';'))
        {if (local[0] == '\0')
 	   break;
@@ -549,6 +553,7 @@ static int _PD_parse_symt_iii(PDBfile *file, char *buf, int flag,
 
         name = SC_strtok(desc->name, " \t", s);
 
+/* check to see whether or not so skip this entry */
 	skip = ((rej != NULL) && (SC_regx_match(name, rej) == TRUE));
 	if (skip == TRUE)
 	   skip = ((acc == NULL) || (SC_regx_match(name, acc) == FALSE));
@@ -560,8 +565,13 @@ static int _PD_parse_symt_iii(PDBfile *file, char *buf, int flag,
 	    addr = SC_stol(SC_strtok(adr, " \t", s));
 	    numb = SC_stol(SC_strtok(NULL, " \t()", s));
 
+/* make and install the entry in the symbol table */
 	    ep = _PD_mk_syment(type, numb, addr, NULL, dims);
-	    _PD_e_install(file, name, ep, flag);};
+	    _PD_e_install(file, name, ep, flag);
+
+/* if it is a pointer register it in the pointer array */
+	    if (strncmp(name, base, nc) == 0)
+	       _PD_ptr_register_entry(file, name, ep);};
 
 	_PD_rl_descriptor(desc);
 
@@ -1247,7 +1257,7 @@ static int _PD_open_iii(PDBfile *file)
     acc = NULL;
     rej = NULL;
     if (file->eager_sym == FALSE)
-       {snprintf(sr, MAXLINE, "/&ptrs/ia_*#/*");
+       {snprintf(sr, MAXLINE, "%s*#/*", file->ptr_base);
 	rej = sr;};
 
 /* read the trailer */
@@ -1301,9 +1311,6 @@ static int _PD_open_iii(PDBfile *file)
        PD_error("CAN'T READ MISCELLANEOUS DATA - _PD_OPEN_III", PD_OPEN);
 
     _PD_read_attrtab(file);
-
-    if (file->use_itags == FALSE)
-       _PD_ptr_open_setup(file);
 
 /* position the file pointer to the location of the structure chart */
     if (lio_seek(fp, file->chrtaddr, SEEK_SET))

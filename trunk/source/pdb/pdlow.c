@@ -295,8 +295,13 @@ int _PD_safe_flush(PDBfile *file)
  *             - if they match they are entered in the symbol table
  *             - if REJ is NULL everything goes to the ACC filter
  *             - if ACC is NULL everything passing the REJ filter is accepted
- *             - regular expressions are interpreted in the glob sense
- *             - in particular '*' does not extend beyond directories
+ *             - regular expressions are interpreted as follows:
+ *             -   <base>*#/a/b* matches all of:
+ *             -      <base>*#/a/b
+ *             -      <base>*#/a/b/c
+ *             -      <base>*#/a/b/c/
+ *             -      <base>*#/a/b/c/d
+ *             - where <base> is the file->ptr_base string
  *             - return TRUE iff successful
  */
 

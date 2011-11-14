@@ -540,28 +540,27 @@ int SC_mem_ss(char *base, int flag)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_MEM_MONITOR - Monitor memory leaks.
- *                - A pair calls lets you track memory that leaks in or
- *                - out of the region between the calls.
- *                - Arguments:
- *                -    OLD   byte count from previous call
- *                -          -1 to initialize
- *                -    LEV   level of monitoring
- *                -          0 - off
- *                -          1 - total byte measure only
- *                -          2 - give detailed map of leaked blocks
- *                -          4 - non-accountable blocks included
- *                -    ID    identifier for temporary files
- *                -    MSG   user allocated space to return error message
+/* _SC_MEM_MONITOR - monitor memory leaks
+ *                 - a pair calls lets you track memory that leaks in or
+ *                 - out of the region between the calls.
+ *                 - Arguments:
+ *                 -    OLD   byte count from previous call
+ *                 -          -1 to initialize
+ *                 -    LEV   level of monitoring
+ *                 -          0 - off
+ *                 -          1 - total byte measure only
+ *                 -          2 - give detailed map of leaked blocks
+ *                 -          4 - non-accountable blocks included
+ *                 -    ID    identifier for temporary files
+ *                 -    MSG   user allocated space to return error message
  *
- * #bind SC_mem_monitor fortran() scheme(memory-monitor) python()
  */
 
-long SC_mem_monitor(int old, int lev, char *id, char *msg)
+static long _SC_mem_monitor(int old, int lev, char *id, char *msg, int dif)
    {int leva, actfl, prmfl, show, pid, st;
     long d;
     char base[MAXLINE], ta[MAXLINE], tb[MAXLINE];
-    char sd[MAXLINE], td[MAXLINE], cd[MAXLINE];
+    char sd[MAXLINE], td[MAXLINE];
     FILE *fp;
 
     leva  = abs(lev);
@@ -581,7 +580,6 @@ long SC_mem_monitor(int old, int lev, char *id, char *msg)
     snprintf(ta, MAXLINE, "%s.after", base);
     snprintf(td, MAXLINE, "%s.diff", base);
     snprintf(sd, MAXLINE, "LD_PRELOAD= ; diff %s %s > %s", tb, ta, td);
-    snprintf(cd, MAXLINE, "LD_PRELOAD= ; cat %s", td);
 
     if (leva & 4)
        {show   = TRUE;
@@ -589,7 +587,6 @@ long SC_mem_monitor(int old, int lev, char *id, char *msg)
 	prmfl |= 8;};
 
     d = _SC_count_tagged(prmfl);
-/*    SC_mem_stats(NULL, NULL, &d, NULL); */
 
     if (old == -1)
        {if (leva > 1)
@@ -607,24 +604,91 @@ long SC_mem_monitor(int old, int lev, char *id, char *msg)
 
 	    if (old != d)
 	       {st = SYSTEM(sd);
-		SC_ASSERT(st == 0);
-
-		st = SYSTEM(cd);
 		SC_ASSERT(st == 0);};
 
 	    REMOVE(tb);
-	    REMOVE(ta);};
+	    if (dif == FALSE)
+	       REMOVE(ta);
+	    else
+	       rename(ta, tb);};
 
-	if (old != d)
-	   sprintf(msg,
-		   "LEAKED %ld BYTES MEMORY - SC_MEM_MONITOR",
-		   d - old);
-	else
-	  *msg = '\0';};
+	if (msg != NULL)
+	   {if (old != d)
+	       sprintf(msg,
+		       "LEAKED %ld BYTES MEMORY - SC_MEM_MONITOR",
+		       d - old);
+	    else
+	       *msg = '\0';};};
 
     SC_mem_over_mark(-1);
 
     return(d);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_MEM_MONITOR - Monitor memory leaks.
+ *                - A pair calls lets you track memory that leaks in or
+ *                - out of the region between the calls.
+ *                - Arguments:
+ *                -    OLD   byte count from previous call
+ *                -          -1 to initialize
+ *                -    LEV   level of monitoring
+ *                -          0 - off
+ *                -          1 - total byte measure only
+ *                -          2 - give detailed map of leaked blocks
+ *                -          4 - non-accountable blocks included
+ *                -    ID    identifier for temporary files
+ *                -    MSG   user allocated space to return error message
+ *
+ * #bind SC_mem_monitor fortran() scheme(memory-monitor) python()
+ */
+
+long SC_mem_monitor(int old, int lev, char *id, char *msg)
+   {long rv;
+
+    rv = _SC_mem_monitor(old, lev, id, msg, FALSE);
+
+    if (old != rv)
+       {int pid, st;
+	char cd[MAXLINE];
+
+	pid = SC_get_processor_number();
+	snprintf(cd, MAXLINE, "LD_PRELOAD= ; mem-%d-%s.diff", pid, id);
+
+	st = SYSTEM(cd);
+	SC_ASSERT(st == 0);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DPRMON - debugging memory monitor aide */
+
+long dprmon(int lev)
+   {long rv;
+    char *id;
+    static int old = -1;
+
+    id = "dprmon";
+    rv = _SC_mem_monitor(old, lev, id, NULL, TRUE);
+
+    if ((old != rv) && (old != -1))
+       {int pid, st;
+	char cd[MAXLINE];
+
+	pid = SC_get_processor_number();
+	snprintf(cd, MAXLINE,
+                 "LD_PRELOAD= ; mem-stats -l mem-%d-%s.diff",
+		 pid, id);
+
+	st = SYSTEM(cd);
+	SC_ASSERT(st == 0);};
+
+    old = rv;
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
