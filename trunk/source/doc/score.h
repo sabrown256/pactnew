@@ -1,5 +1,5 @@
 TXT: SCORE User's Manual
-MOD: 10/20/2011
+MOD: 11/15/2011
 
 <CENTER>
 <P>
@@ -230,7 +230,7 @@ sorted according the C library function STRCMP.
 <p>
 
 <pre>
-<i>C Binding: </i>int SC_hasharr_install(hasharr *ha, void *key, void *obj, char *type, int mark, int lookup)
+<i>C Binding: </i>int SC_hasharr_install(hasharr *ha, void *key, void *obj, char *type, int flags, int lookup)
 <i>Fortran Binding: </i>integer schins(integer nk, char *key, obj, integer nt,
                                    char *type, integer cp, integer ha)
 <i>SX Binding: </i>
@@ -238,7 +238,13 @@ sorted according the C library function STRCMP.
 </pre>
 
 Insert an object, <i>obj</i>, of type <i>type</i> in the hash array and associate it
-with key <i>key</i>. 
+with key <i>key</i>. The <i>flags</i> argument is a bit array with the following
+meanings if set:
+<pre>
+    bit 1   increment the reference count of <i>obj</i>
+    bit 2   lookup existing entry and reuse
+    bit 4   free an existing object in the entry before replacing with <i>obj</i>
+</pre>
 <p>
 The procedure is an adaptation of the function described in
 Kernighan and Ritchie in <U>The C Programming Language</U>. 

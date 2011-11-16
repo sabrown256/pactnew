@@ -117,7 +117,7 @@ extern hasharr
 
 extern haelem
  *SC_hasharr_install(hasharr *ha, void *key, void *obj, char *type,
-		     int mark, int lookup),
+		     int64_t flags, int lookup),
  *SC_hasharr_lookup(hasharr *ha, void *key);
 
 extern void

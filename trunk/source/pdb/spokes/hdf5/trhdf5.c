@@ -318,9 +318,7 @@ static hid_t _H5_enc_type(PDBfile *file, char *ptyp)
 static hid_t _H5_enc_compound(PDBfile *file, defstr *dp, intb nb)
    {memdes *mbr;
     hid_t mtyp, htyp;
-    hdf_state *hst;
 
-    hst  = file->meta;
     htyp = -1;
 
     if ((dp != NULL) && (dp->members != NULL) &&
@@ -368,11 +366,13 @@ static hsize_t *_H5_enc_dims(PDBfile *file, int *pnd,
 
         DEBUG1("      H5T_ARRAY rank(%d)\n", nd);
         hdims = (hsize_t*) calloc(nd, sizeof(hsize_t));
+
 #if (H5_VERS_RELEASE < 4)
         status = H5Tget_array_dims(htyp, hdims); 
 #else
 	status = H5Tget_array_dims(htyp, hdims, NULL);
 #endif
+        SC_ASSERT(status != -1);
 
         if (H5Tget_class(nativetype_id) == H5T_STRING)
            hdims[nd-1] = H5Tget_size(nativetype_id);
