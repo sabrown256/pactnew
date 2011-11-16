@@ -101,7 +101,8 @@ static haelem *_SC_make_haelem(hasharr *ha, void *key)
 	hp->iht  = ha->hash(lkey, ha->size);
 	hp->iar  = SC_array_get_n(ha->a);
 	hp->next = ha->table[hp->iht];
-	hp->name = lkey;};
+	hp->name = lkey;
+        hp->def  = NULL;};
 
     return(hp);}
 
@@ -142,17 +143,25 @@ static void _SC_free_haelem(hasharr *ha, haelem *hp)
 
 /* _SC_HAELEM_RESET - reset the contents of HP */
 
-static void _SC_haelem_reset(haelem *hp, char *type, void *obj, int mark)
-   {
+static void _SC_haelem_reset(haelem *hp, char *type, void *obj,
+			     int64_t flags)
+   {int mark, rel;
+
+    mark = ((flags & 1) != 0);
+    rel  = ((flags & 4) != 0);
 
     hp->type = type;
-    hp->def  = obj;
 
 /* do any marking (reference counting) for the new obj */
     if (mark == FALSE)
-       hp->free = FALSE;
+       {hp->def  = obj;
+	hp->free = FALSE;}
+	
     else
-       hp->free = (SC_mark(obj, 1) != -1);
+       {if (rel == TRUE)
+	   CFREE(hp->def);
+	hp->def  = obj;
+	hp->free = (SC_mark(obj, 1) != -1);};
 
     return;}
 
@@ -243,7 +252,7 @@ static void _SC_hasharr_init(hasharr *ha, char *lm)
 
 /* SC_MAKE_HASHARR - make an inhomogeneous hasharr
  *
- * #bind SC_make_hasharr fortran() python()
+ * #bind SC_make_hasharr fortran() scheme() python()
  */
 
 hasharr *SC_make_hasharr(int sz, int docflag, char *lm, int flags)
@@ -310,7 +319,7 @@ static void _SC_hasharr_free_elements(hasharr *ha)
  *                  - leaves a pristine hash array
  *                  - for new installs, lookups, ...
  *
- * #bind SC_hasharr_clear fortran() python()
+ * #bind SC_hasharr_clear fortran() scheme() python()
  */
 
 int SC_hasharr_clear(hasharr *ha ARG(,,cls),
@@ -334,7 +343,7 @@ int SC_hasharr_clear(hasharr *ha ARG(,,cls),
  *                 - like SC_hasharr_clear except that the
  *                 - hash array is freed and cannot be used again
  *
- * #bind SC_free_hasharr fortran() python()
+ * #bind SC_free_hasharr fortran() scheme() python()
  */
 
 void SC_free_hasharr(hasharr *ha ARG(,,cls),
@@ -357,11 +366,21 @@ void SC_free_hasharr(hasharr *ha ARG(,,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_HASHARR_INSTALL - install OBJ of type TYPE in HA under KEY */
+/* SC_HASHARR_INSTALL - install OBJ of type TYPE in HA under KEY
+ *                    - FLAGS is a bit array with the following meanings:
+ *                    -   bit 1   mark OBJ if TRUE
+ *                    -   bit 2   lookup existing entry and reuse
+ *                    -   bit 4   free existing hp->def before assigning
+ *
+ * #bind SC_hasharr_install fortran() scheme() python()
+ */
 
 haelem *SC_hasharr_install(hasharr *ha, void *key, void *obj, char *type,
-			   int mark, int lookup)
+			   int64_t flags, int lookup)
    {haelem *hp;
+
+    if ((flags > 1) || (lookup < 0))
+       lookup = ((flags & 2) != 0);
 
     hp = NULL;
 
@@ -380,7 +399,7 @@ haelem *SC_hasharr_install(hasharr *ha, void *key, void *obj, char *type,
 
 /* update valid hash elements inserted or looked-up */
 	if (hp != NULL)
-	   _SC_haelem_reset(hp, type, obj, mark);
+	   _SC_haelem_reset(hp, type, obj, flags);
 
 	SC_LOCKOFF(SC_ha_lock);};
 
@@ -475,7 +494,7 @@ int SC_hasharr_next(hasharr *ha, long *pi,
 
 /* SC_HASHARR_LOOKUP - lookup the haelem for the given KEY
  *
- * #bind SC_hasharr_lookup fortran() python()
+ * #bind SC_hasharr_lookup fortran() scheme() python()
  */
 
 haelem *SC_hasharr_lookup(hasharr *ha ARG(,,cls), void *key)
@@ -515,7 +534,7 @@ haelem *SC_hasharr_lookup(hasharr *ha ARG(,,cls), void *key)
 
 /* SC_HASHARR_DEF_LOOKUP - lookup the actual object for the given KEY
  *
- * #bind SC_hasharr_def_lookup fortran() python()
+ * #bind SC_hasharr_def_lookup fortran() scheme() python()
  */
 
 void *SC_hasharr_def_lookup(hasharr *ha ARG(,,cls), void *key)
@@ -533,7 +552,10 @@ void *SC_hasharr_def_lookup(hasharr *ha ARG(,,cls), void *key)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_HASHARR_GET - return the Nth element of HA */
+/* SC_HASHARR_GET - return the Nth element of HA
+ *
+ * #bind SC_hasharr_get fortran() scheme() python()
+ */
 
 void *SC_hasharr_get(hasharr *ha, long n)
    {void *rv;
@@ -547,7 +569,10 @@ void *SC_hasharr_get(hasharr *ha, long n)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_HASHARR_GET_N - return the number of elements in HA */
+/* SC_HASHARR_GET_N - return the number of elements in HA
+ *
+ * #bind SC_hasharr_get_n fortran() scheme() python()
+ */
 
 long SC_hasharr_get_n(hasharr *ha)
    {long ne;
@@ -659,7 +684,7 @@ static int _SC_splice_out_haelem(hasharr *ha, void *key,
 /* SC_HASHARR_REMOVE - remove the entry corresponding to the specified key 
  *                   - return TRUE iff successfully removed 
  *
- * #bind SC_hasharr_remove fortran() python()
+ * #bind SC_hasharr_remove fortran() scheme() python()
  */
 
 int SC_hasharr_remove(hasharr *ha ARG(,,cls), void *key)
@@ -705,6 +730,8 @@ int SC_hasharr_remove(hasharr *ha ARG(,,cls), void *key)
  *                 - no sorting is done but holes are compressed out
  *                 - the return array is terminated by a NULL entry
  *                 - caller should do SC_free_strings on result when done
+ *
+ * #bind SC_hasharr_dump fortran() scheme() python()
  */
 
 char **SC_hasharr_dump(hasharr *ha, char *patt, char *type, int sort)

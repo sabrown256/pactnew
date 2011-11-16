@@ -649,12 +649,12 @@ long SC_mem_monitor(int old, int lev, char *id, char *msg)
 
     rv = _SC_mem_monitor(old, lev, id, msg, FALSE);
 
-    if (old != rv)
+    if ((old != rv) && (old != -1))
        {int pid, st;
 	char cd[MAXLINE];
 
 	pid = SC_get_processor_number();
-	snprintf(cd, MAXLINE, "LD_PRELOAD= ; mem-%d-%s.diff", pid, id);
+	snprintf(cd, MAXLINE, "LD_PRELOAD= ; cat mem-%d-%s.diff", pid, id);
 
 	st = SYSTEM(cd);
 	SC_ASSERT(st == 0);};

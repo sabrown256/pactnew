@@ -2418,15 +2418,15 @@ CFG_DONE:
         flog $Log $RM Confl
 
 # report changed files
-        flog $Log (awk '/^ *[PUMARD] +.*/ {print $1 " " $2}' $Log | grep -v manager/.pact-version > Files.OK)
-        flog $Log set Files = `cat Files.OK`
-        while ($#Files > 1)
-           NoteD $Log "   $Files[1] $Files[2]"
-           shift Files
-           shift Files
-        end
-
-        flog $Log $RM Files.OK
+        ftee $Log (awk '/^ *[PUMARD] +.*/ {print $1 " " $2}' $Log | grep -v manager/.pact-version)
+#        flog $Log (awk '/^ *[PUMARD] +.*/ {print $1 " " $2}' $Log | grep -v manager/.pact-version > Files.OK)
+#        flog $Log set Files = `cat Files.OK`
+#        while ($#Files > 1)
+#           NoteD $Log "   $Files[1] $Files[2]"
+#           shift Files
+#           shift Files
+#        end
+#        flog $Log $RM Files.OK
 
         Separator $Log
 

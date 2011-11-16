@@ -38,12 +38,14 @@ struct s_statedes
     int quiet;
     inti n;
     int debug_mode;
+    int mmap;             /* use memory mapped files */
+    int64_t bfsz;         /* buffer size */
     int64_t nba0;
     int64_t nbf0;
     int64_t sz0;
-    int nt[N];             /* number of iterations */
-    double t[N];           /* total time */
-    double sz[N];          /* file size */
+    int nt[N];            /* number of iterations */
+    double t[N];          /* total time */
+    double sz[N];         /* file size */
     triplet tr;};
 
 /*--------------------------------------------------------------------------*/
@@ -100,12 +102,14 @@ static void show_stat(statedes *st, char *tag)
 
 /* SETUP_FILE - setup standard I/O files */
 
-FILE *setup_file(char *fname, char *mode)
+FILE *setup_file(statedes *st, char *fname, char *mode)
    {int rv;
     char s[MAXLINE];
     FILE *fp;
 
     fp = fopen(fname, mode);
+    if (st->bfsz != -1)
+       setvbuf(fp, NULL, _IOFBF, st->bfsz);
 
 /* emulate reading metadata from file end */
     if (mode[0] == 'r')
@@ -252,7 +256,9 @@ static int test_wfa(statedes *st, int iv, int it)
     la = tr->la;
 
     if (fp == NULL)
-       fp = fopen(fname, "w");
+       {fp = fopen(fname, "w");
+	if (st->bfsz != -1)
+	   setvbuf(fp, NULL, _IOFBF, st->bfsz);};
 
     time = SC_wall_clock_time();
 
@@ -326,7 +332,9 @@ static int test_wfai(statedes *st, int iv, int it)
     la = tr->la;
 
     if (fp == NULL)
-       fp = fopen(fname, "w");
+       {fp = fopen(fname, "w");
+	if (st->bfsz != -1)
+	   setvbuf(fp, NULL, _IOFBF, st->bfsz);};
 
     time = SC_wall_clock_time();
 
@@ -400,7 +408,7 @@ static int test_rfa(statedes *st, int iv, int it)
     la = tr->la;
 
     if (fp == NULL)
-       fp = setup_file(fname, "r");
+       fp = setup_file(st, fname, "r");
 
     time = SC_wall_clock_time();
 
@@ -484,7 +492,7 @@ static int test_wfb(statedes *st, int iv, int it)
     la = tr->la;
 
     if (fp == NULL)
-       fp = setup_file(fname, "wb");
+       fp = setup_file(st, fname, "wb");
 
     time = SC_wall_clock_time();
 
@@ -547,7 +555,7 @@ static int test_rfb(statedes *st, int iv, int it)
     la = tr->la;
 
     if (fp == NULL)
-       fp = setup_file(fname, "rb");
+       fp = setup_file(st, fname, "rb");
 
     time = SC_wall_clock_time();
 
@@ -587,13 +595,14 @@ static int test_rfb(statedes *st, int iv, int it)
 static int test_wsb(statedes *st, int iv, int it)
    {int err;
     inti n, rv;
-    char fname[MAXLINE];
+    char fname[MAXLINE], s[MAXLINE];
     float *fa;
     double time;
     double *da;
     long double *la;
     triplet *tr;
     static FILE *fp = NULL;
+    static int fd = -1;
 
     err = TRUE;
 
@@ -607,24 +616,28 @@ static int test_wsb(statedes *st, int iv, int it)
     la = tr->la;
 
     if (fp == NULL)
-       fp = setup_file(fname, "wb");
+       {fp = setup_file(st, fname, "wb");
+	fd = fileno(fp);};
 
     time = SC_wall_clock_time();
 
 /* float */
     if (st->meta == TRUE)
-       fprintf(fp, "# float fa%08d[%ld]\n", iv, (long) n);
-    rv = fwrite(fa, sizeof(float), n, fp);
+       {snprintf(s, MAXLINE, "# float fa%08d[%ld]\n", iv, (long) n);
+	rv = write(fd, s, strlen(s));};
+    rv = write(fd, fa, n*sizeof(float));
 
 /* double */
     if (st->meta == TRUE)
-       fprintf(fp, "# double da%08d[%ld]\n", iv, (long) n);
-    rv = fwrite(da, sizeof(double), n, fp);
+       {snprintf(s, MAXLINE, "# double da%08d[%ld]\n", iv, (long) n);
+	rv = write(fd, s, strlen(s));};
+    rv = write(fd, da, n*sizeof(double));
 
 /* long double */
     if (st->meta == TRUE)
-       fprintf(fp, "# double la%08d[%ld]\n", iv, (long) n);
-    rv = fwrite(la, sizeof(long double), n, fp);
+       {snprintf(s, MAXLINE, "# double la%08d[%ld]\n", iv, (long) n);
+	rv = write(fd, s, strlen(s));};
+    rv = write(fd, la, n*sizeof(long double));
 
     st->t[st->i] += (SC_wall_clock_time() - time);
 
@@ -633,7 +646,8 @@ static int test_wsb(statedes *st, int iv, int it)
     if (iv+1 == st->nv)
        {fclose(fp);
 	st->sz[st->i] = SC_file_length(fname);
-	fp = NULL;};
+	fp = NULL;
+	fd = -1;};
 
     SC_ASSERT(rv > 0);
 
@@ -657,6 +671,7 @@ static int test_rsb(statedes *st, int iv, int it)
     long double *la;
     triplet *tr;
     static FILE *fp = NULL;
+    static int fd = -1;
 
     err = TRUE;
 
@@ -670,21 +685,22 @@ static int test_rsb(statedes *st, int iv, int it)
     la = tr->la;
 
     if (fp == NULL)
-       fp = setup_file(fname, "rb");
+       {fp = setup_file(st, fname, "rb");
+	fd = fileno(fp);};
 
     time = SC_wall_clock_time();
 
 /* float */
     get_var_name(st, fp);
-    rv = fread(fa, sizeof(float), n, fp);
+    rv = read(fd, fa, n*sizeof(float));
 
 /* double */
     get_var_name(st, fp);
-    rv = fread(da, sizeof(double), n, fp);
+    rv = read(fd, da, n*sizeof(double));
 
 /* long double */
     get_var_name(st, fp);
-    rv = fread(la, sizeof(long double), n, fp);
+    rv = read(fd, la, n*sizeof(long double));
 
     st->t[st->i] += (SC_wall_clock_time() - time);
 
@@ -693,7 +709,8 @@ static int test_rsb(statedes *st, int iv, int it)
     if (iv+1 == st->nv)
        {fclose(fp);
 	st->sz[st->i] = SC_file_length(fname);
-	fp = NULL;};
+	fp = NULL;
+	fd = -1;};
 
     SC_ASSERT(rv > 0);
 
@@ -730,7 +747,10 @@ static int test_wpdb(statedes *st, int iv, int it)
     la = tr->la;
 
     if (fp == NULL)
-       fp = PD_open(fname, "w");
+       {PD_set_io_hooks(st->mmap);
+	PD_set_buffer_size(st->bfsz);
+
+	fp = PD_open(fname, "w");};
 
     time = SC_wall_clock_time();
 
@@ -788,7 +808,10 @@ static int test_rpdb(statedes *st, int iv, int it)
     la = tr->la;
 
     if (fp == NULL)
-       fp = PD_open(fname, "r");
+       {PD_set_io_hooks(st->mmap);
+	PD_set_buffer_size(st->bfsz);
+
+	fp = PD_open(fname, "r");};
 
     time = SC_wall_clock_time();
 
@@ -1042,8 +1065,6 @@ static void print_help(void)
 
 int main(int c, char **v)
    {int i, err, asc, bin, eff, pdb;
-    int use_mapped_files;
-    int64_t bfsz;
     statedes st;
 
 #ifdef HAVE_HDF5
@@ -1064,14 +1085,13 @@ int main(int c, char **v)
     st.meta          = TRUE;
     st.quiet         = FALSE;
     st.debug_mode    = FALSE;
+    st.bfsz          = -1;
+    st.mmap          = FALSE;
     
     eff              = FALSE;
     asc              = TRUE;
     bin              = TRUE;
     pdb              = TRUE;
-    bfsz             = -1;
-    bfsz             = 100000;
-    use_mapped_files = FALSE;
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-asc") == 0)
 	    asc = FALSE;
@@ -1092,7 +1112,7 @@ int main(int c, char **v)
  	 else if (v[i][0] == '-')
             {switch (v[i][1])
                 {case 'b' :
-		      bfsz = SC_stoi(v[++i]);
+		      st.bfsz = SC_stoi(v[++i]);
 		      break;
 		 case 'd' :
 		      st.debug_mode  = TRUE;
@@ -1102,7 +1122,7 @@ int main(int c, char **v)
 		      print_help();
 		      return(1);
                  case 'm' :
-		      use_mapped_files = TRUE;
+		      st.mmap = TRUE;
 		      break;
                  case 'q' :
 		      st.quiet = TRUE;
@@ -1112,10 +1132,6 @@ int main(int c, char **v)
 		      break;};}
          else
             break;};
-
-    PD_set_io_hooks(use_mapped_files);
-
-    PD_set_buffer_size(bfsz);
 
     SC_signal(SIGINT, SIG_DFL);
 

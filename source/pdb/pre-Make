@@ -153,46 +153,46 @@ Apps : ${BinDir}/pdb2hdf
 Gst : ${BinDir}/tpdgs
 Lst : ${BinDir}/tpdls
 
-${BinDir}/tpdb : tpdb.c ${InstallDep} ${Hdrs} pdbtfr.h
+${BinDir}/tpdb : tpdb.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 	${CLD} ${LdFlags} tpdb.c -o ${BinDir}/tpdb ${Libs}
 
-${BinDir}/tpdc : tpdc.c ${InstallDep} ${Hdrs} pdbtfr.h
+${BinDir}/tpdc : tpdc.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 	${CLD} ${LdFlags} tpdc.c -o ${BinDir}/tpdc ${Libs}
 
-${BinDir}/tpdp : tpdp.c ${InstallDep} ${Hdrs} pdbtfr.h
+${BinDir}/tpdp : tpdp.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 	${CLD} ${LdFlags} tpdp.c -o ${BinDir}/tpdp ${Libs}
 
-${BinDir}/tpda : tpda.c ${InstallDep} ${Hdrs} pdbtfr.h
+${BinDir}/tpda : tpda.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 	${CLD} ${LdFlags} tpda.c -o ${BinDir}/tpda ${Libs}
 
-${BinDir}/tpdas : tpdas.c ${InstallDep} ${Hdrs} pdbtfr.h
+${BinDir}/tpdas : tpdas.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 	${CLD} ${LdFlags} tpdas.c -o ${BinDir}/tpdas ${Libs}
 
-${BinDir}/tpdop : tpdop.c ${InstallDep} ${Hdrs} pdbtfr.h
+${BinDir}/tpdop : tpdop.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 	${CLD} ${LdFlags} tpdop.c -o ${BinDir}/tpdop ${Libs}
 
-${BinDir}/tpdap : tpdap.c ${InstallDep} ${Hdrs} pdbtfr.h
+${BinDir}/tpdap : tpdap.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 	${CLD} ${LdFlags} tpdap.c -o ${BinDir}/tpdap ${Libs}
 
-${BinDir}/tpdgs : tpdgs.c ${InstallDep} ${Hdrs} pdbtfr.h
+${BinDir}/tpdgs : tpdgs.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 	${CLD} ${LdFlags} tpdgs.c -o ${BinDir}/tpdgs ${Libs}
 
-${BinDir}/tpdls : tpdls.c ${InstallDep} ${Hdrs} pdbtfr.h
+${BinDir}/tpdls : tpdls.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 	${CLD} ${LdFlags} tpdls.c -o ${BinDir}/tpdls ${Libs}
 
-${BinDir}/tpdnrm : tpdnrm.c ${InstallDep} ${Hdrs} pdbtfr.h
+${BinDir}/tpdnrm : tpdnrm.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 	${CLD} ${LdFlags} tpdnrm.c -o ${BinDir}/tpdnrm ${Libs}
 
-${BinDir}/tpdcs : tpdcs.c ${InstallDep} ${Hdrs} pdbtfr.h
+${BinDir}/tpdcs : tpdcs.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 	${CLD} ${LdFlags} tpdcs.c -o ${BinDir}/tpdcs ${Libs}
         
-${BinDir}/tpdfr : tpdfr.c ${InstallDep} ${Hdrs} pdbtfr.h
+${BinDir}/tpdfr : tpdfr.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 	${CLD} ${LdFlags} tpdfr.c -o ${BinDir}/tpdfr ${Libs}
         
-${BinDir}/tpdbf : tpdbf.c ${InstallDep} ${Hdrs} pdbtfr.h
+${BinDir}/tpdbf : tpdbf.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 	${CLD} ${LdFlags} tpdbf.c -o ${BinDir}/tpdbf ${Libs}
         
-${BinDir}/tpdfc : tpdfc.c ${InstallDep} ${Hdrs} pdbtfr.h
+${BinDir}/tpdfc : tpdfc.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 	${CLD} ${LdFlags} tpdfc.c -o ${BinDir}/tpdfc ${Libs}
         
 #
@@ -200,7 +200,7 @@ ${BinDir}/tpdfc : tpdfc.c ${InstallDep} ${Hdrs} pdbtfr.h
 #
 ascii : ${BinDir}/tpdd
 
-${BinDir}/tpdd : tpdd.c ${InstallDep} ${Hdrs}
+${BinDir}/tpdd : tpdd.c ${InstallDep} ${Hdrs} ${DepLib}
 	${CLD} ${LdFlags} tpdd.c -o ${BinDir}/tpdd ${Libs} ${MDI_Lib}
 
 #
@@ -208,7 +208,7 @@ ${BinDir}/tpdd : tpdd.c ${InstallDep} ${Hdrs}
 #
 net : ${BinDir}/tpdn
 
-${BinDir}/tpdn : tpdn.c ${InstallDep} ${Hdrs}
+${BinDir}/tpdn : tpdn.c ${InstallDep} ${Hdrs} ${DepLib}
 	${CLD} ${LdFlags} tpdn.c -o ${BinDir}/tpdn ${Libs}
 
 #
@@ -216,7 +216,7 @@ ${BinDir}/tpdn : tpdn.c ${InstallDep} ${Hdrs}
 #
 pdb2hdf :
 
-${BinDir}/pdb2hdf : applications/pdb2hdf.c ${InstallDep} ${Hdrs}
+${BinDir}/pdb2hdf : applications/pdb2hdf.c ${InstallDep} ${Hdrs} ${DepLib}
 	${CLD} ${LdFlags} pdb2hdf.c -o ${BinDir}/pdb2hdf ${Libs}
 
 #
@@ -224,7 +224,7 @@ ${BinDir}/pdb2hdf : applications/pdb2hdf.c ${InstallDep} ${Hdrs}
 #
 smp : ${BinDir}/tpdsmp
 
-${BinDir}/tpdsmp : tpdsmp.c ${InstallDep} ${Hdrs}
+${BinDir}/tpdsmp : tpdsmp.c ${InstallDep} ${Hdrs} ${DepLib}
 	${CLD} ${LdFlags} tpdsmp.c -o ${BinDir}/tpdsmp ${Libs}
 
 #
@@ -232,7 +232,7 @@ ${BinDir}/tpdsmp : tpdsmp.c ${InstallDep} ${Hdrs}
 #
 dp : ${BinDir}/tpddp
 
-${BinDir}/tpddp : tpddp.c ${InstallDep} ${Hdrs}
+${BinDir}/tpddp : tpddp.c ${InstallDep} ${Hdrs} ${DepLib}
 	${CC} ${LdFlags} tpddp.c -o ${BinDir}/tpddp ${Libs} ${DPLib}
 
 #
@@ -240,10 +240,10 @@ ${BinDir}/tpddp : tpddp.c ${InstallDep} ${Hdrs}
 #
 attr : ${BinDir}/tpda ${BinDir}/tpdxrd ${BinDir}/tpdxn
 
-${BinDir}/tpdxrd : tpdxrd.c ${InstallDep} ${Hdrs}
+${BinDir}/tpdxrd : tpdxrd.c ${InstallDep} ${Hdrs} ${DepLib}
 	${CLD} ${LdFlags} tpdxrd.c -o ${BinDir}/tpdxrd ${Libs}
 
-${BinDir}/tpdxn : tpdxn.c ${InstallDep} ${Hdrs}
+${BinDir}/tpdxn : tpdxn.c ${InstallDep} ${Hdrs} ${DepLib}
 	${CLD} ${LdFlags} tpdxn.c -o ${BinDir}/tpdxn ${Libs}
 
 #
@@ -251,10 +251,10 @@ ${BinDir}/tpdxn : tpdxn.c ${InstallDep} ${Hdrs}
 #
 def : ${BinDir}/tpdrc ${BinDir}/tpdtd
 
-${BinDir}/tpdrc : tpdrc.c ${InstallDep} ${Hdrs}
+${BinDir}/tpdrc : tpdrc.c ${InstallDep} ${Hdrs} ${DepLib}
 	${CLD} ${LdFlags} tpdrc.c -o ${BinDir}/tpdrc ${Libs}
 
-${BinDir}/tpdtd : tpdtd.c ${InstallDep} ${Hdrs}
+${BinDir}/tpdtd : tpdtd.c ${InstallDep} ${Hdrs} ${DepLib}
 	${CLD} ${LdFlags} tpdtd.c -o ${BinDir}/tpdtd ${Libs}
 
 #
@@ -262,7 +262,7 @@ ${BinDir}/tpdtd : tpdtd.c ${InstallDep} ${Hdrs}
 #
 fd : ${BinDir}/tpdfd
 
-${BinDir}/tpdfd : tpdfd.c ${InstallDep} ${Hdrs}
+${BinDir}/tpdfd : tpdfd.c ${InstallDep} ${Hdrs} ${DepLib}
 	${CLD} ${LdFlags} tpdfd.c -o ${BinDir}/tpdfd ${Libs}
 
 #
@@ -270,7 +270,7 @@ ${BinDir}/tpdfd : tpdfd.c ${InstallDep} ${Hdrs}
 #
 time : ${BinDir}/pdtime
 
-${BinDir}/pdtime : pdtime.c ${InstallDep} ${Hdrs}
+${BinDir}/pdtime : pdtime.c ${InstallDep} ${Hdrs} ${DepLib}
 	${CLD} ${LdFlags} pdtime.c -o ${BinDir}/pdtime ${Libs}
 
 #
@@ -282,7 +282,7 @@ exambin :
 exam :
 	${CLD} ${LdFlags} exam.c -o ${BinDir}/exam
 
-trans : ${InstallDep} ${Hdrs}
+trans : ${InstallDep} ${Hdrs} ${DepLib}
 	${CLD} ${LdFlags} pdctrns.c -o ${BinDir}/pdctrns ${Libs}
 
 # extra commands needed when building TGTLib
