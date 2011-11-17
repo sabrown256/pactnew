@@ -2015,32 +2015,32 @@ static void prep_test_4_data(void)
 
     pc  = CMAKE(char);
     *pc = 'A';   
-    SC_hasharr_install(tab4_w, "pc", pc, CHAR_S, TRUE, TRUE);
+    SC_hasharr_install(tab4_w, "pc", pc, CHAR_S, 3, -1);
 
     ps  = CMAKE(short);
     *ps = -1024;
-    SC_hasharr_install(tab4_w, "ps", ps, SHORT_S, TRUE, TRUE);
+    SC_hasharr_install(tab4_w, "ps", ps, SHORT_S, 3, -1);
 
     pi  = CMAKE(int);
     *pi = 16384;
-    SC_hasharr_install(tab4_w, "pi", pi, INT_S, TRUE, TRUE);
+    SC_hasharr_install(tab4_w, "pi", pi, INT_S, 3, -1);
 
     pl  = CMAKE(long);
     *pl = -1048576;
-    SC_hasharr_install(tab4_w, "pl", pl, LONG_S, TRUE, TRUE);
+    SC_hasharr_install(tab4_w, "pl", pl, LONG_S, 3, -1);
 
     pf  = CMAKE(float);
     *pf = 3.141596;
-    SC_hasharr_install(tab4_w, "pf", pf, FLOAT_S, TRUE, TRUE);
+    SC_hasharr_install(tab4_w, "pf", pf, FLOAT_S, 3, -1);
 
     pd  = CMAKE(double);
     *pd = -1.0e-30;
-    hp = SC_hasharr_install(tab4_w, "pd", pd, DOUBLE_S, TRUE, TRUE);
+    hp = SC_hasharr_install(tab4_w, "pd", pd, DOUBLE_S, 3, -1);
 
 /* mark to keep reference count right and valgrind clean */
     SC_mark(hp, 1);
 
-    SC_hasharr_install(tab4_w, "ph", hp, HASHEL_S, TRUE, TRUE);
+    SC_hasharr_install(tab4_w, "ph", hp, HASHEL_S, 3, -1);
 
     tab4_r = NULL;
 

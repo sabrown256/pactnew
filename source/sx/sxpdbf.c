@@ -42,7 +42,7 @@ static void _SX_find_leaf(SS_psides *si, hasharr *tytab, PDBfile *file,
     else
        {mem_lst = defp->members;
 	if (mem_lst != NULL)
-	   {SC_hasharr_install(tytab, type, TYPE, TYPE, TRUE, TRUE);
+	   {SC_hasharr_install(tytab, type, TYPE, TYPE, 3, -1);
 	    sz  = defp->size;
 	    svr = vr;
 	    for (i = 0L; i < ni; i++, svr += sz)

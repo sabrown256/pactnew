@@ -1281,7 +1281,7 @@ object *SX_write_data(SS_psides *si, object *argl)
 		     SS_error(si, "FILE ALREADY EXISTS - SX_WRITE_DATA", fobj);
 		     break;};};
 
-	SC_hasharr_install(_SX.files, fname, mode, SC_STRING_S, TRUE, TRUE);}
+	SC_hasharr_install(_SX.files, fname, mode, SC_STRING_S, 3, -1);}
 
     else
        {if (strcmp(type, mode) != 0)

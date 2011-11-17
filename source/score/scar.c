@@ -121,7 +121,7 @@ fcdes *SC_scan_archive(char *arf)
 					   hdr.ar_size, hdr.ar_mode,
 					   &pos);
 
-		    SC_hasharr_install(tab, ae->name, ae, "fcent", TRUE, TRUE);
+		    SC_hasharr_install(tab, ae->name, ae, "fcent", 3, -1);
 
 		    ad = SC_stol(hdr.ar_nxtmem);
 		    if (ad == 0)
@@ -155,7 +155,7 @@ fcdes *SC_scan_archive(char *arf)
 					   hdr.ar_size, hdr.ar_mode,
 					   &pos);
 
-		    SC_hasharr_install(tab, ae->name, ae, "fcent", TRUE, TRUE);
+		    SC_hasharr_install(tab, ae->name, ae, "fcent", 3, -1);
 
 		    ad = SC_stol(hdr.ar_nxtmem);
 		    if (ad == 0)
@@ -235,7 +235,7 @@ fcdes *SC_scan_archive(char *arf)
 				       hdr.ar_size, hdr.ar_mode,
 				       &pos);
 
-		SC_hasharr_install(tab, ae->name, ae, "fcent", TRUE, TRUE);
+		SC_hasharr_install(tab, ae->name, ae, "fcent", 3, -1);
 
 		fseek(fp, pos, SEEK_SET);};};
 
@@ -310,7 +310,7 @@ fcdes *SC_scan_archive(char *arf)
 		ae->size   -= nc;
 /*		ae->address = pos; */
 
-		SC_hasharr_install(tab, ae->name, ae, "fcent", TRUE, TRUE);
+		SC_hasharr_install(tab, ae->name, ae, "fcent", 3, -1);
 
 		fseek(fp, pos, SEEK_SET);};};
 
@@ -387,7 +387,7 @@ fcdes *SC_scan_archive(char *arf)
 				       hdr.ar_size, hdr.ar_mode,
 				       &pos);
 
-		SC_hasharr_install(tab, ae->name, ae, "fcent", TRUE, TRUE);
+		SC_hasharr_install(tab, ae->name, ae, "fcent", 3, -1);
 
 		fseek(fp, pos, SEEK_SET);};};
 

@@ -515,7 +515,7 @@ static int _PM_chck_curves(PM_part *ipart, hasharr *curves)
              if (cp == NULL)
                 {s = _PM_nxt_name();
                  cp = PM_mk_cline(s, 0.0, 0.0, 0.0, ax, ay, ac);
-                 SC_hasharr_install(curves, s, cp, MESH_CURVE, TRUE, TRUE);};
+                 SC_hasharr_install(curves, s, cp, MESH_CURVE, 3, -1);};
              ib->crve = cp;};
 
          _PM_fit_curve(ib);

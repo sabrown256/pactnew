@@ -393,7 +393,7 @@ void _PD_e_install(PDBfile *file, char *name, syment *ep, int lookup)
     if (lookup)
        PD_remove_entry(file, name);
 
-    SC_hasharr_install(tab, name, ep, SYMENT_P_S, TRUE, FALSE);
+    SC_hasharr_install(tab, name, ep, SYMENT_P_S, 1, -1);
 
     return;}
 
@@ -422,7 +422,7 @@ static void _PD_d_install_in(char *name, defstr *def, hasharr *tab,
 	hp->def = NULL;
 	SC_hasharr_remove(tab, name);};
 
-    SC_hasharr_install(tab, name, def, PD_DEFSTR_S, TRUE, TRUE);
+    SC_hasharr_install(tab, name, def, PD_DEFSTR_S, 3, -1);
 
 /* if this is the host chart register the type */
     typ = def->type;

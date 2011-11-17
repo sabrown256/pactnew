@@ -248,7 +248,8 @@ void _PP_init_numpy(void)
 
     for (nentry = entries; nentry->name != NULL; nentry++) {
         tc_to_entry[nentry->typecode] = nentry;
-        SC_hasharr_install(_numpy_map, nentry->name, nentry, XX_FOO_MAP, TRUE, TRUE);
+        SC_hasharr_install(_numpy_map, nentry->name, nentry,
+			   XX_FOO_MAP, 3, -1);
     }
 
 #endif    

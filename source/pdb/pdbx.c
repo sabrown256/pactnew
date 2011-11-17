@@ -222,7 +222,7 @@ int PD_def_attribute(PDBfile *file ARG(,,cls), char *at, char *type)
         PD_rem_attribute(file, path);};
 
     attr = PD_mk_attribute(path, atype);
-    SC_hasharr_install(file->attrtab, path, attr, ATTRIBUTE, TRUE, TRUE);
+    SC_hasharr_install(file->attrtab, path, attr, ATTRIBUTE, 3, -1);
 
     return(TRUE);}
 
@@ -314,7 +314,8 @@ int PD_set_attribute(PDBfile *file ARG(,,cls), char *vr, char *at, void *vl)
 	if (ATTRIBUTE_VALUE == NULL)
 	   ATTRIBUTE_VALUE = CSTRSAVE("attribute_value *");
 
-        SC_hasharr_install(file->attrtab, fullname, avl, ATTRIBUTE_VALUE, TRUE, TRUE);};
+        SC_hasharr_install(file->attrtab, fullname, avl,
+			   ATTRIBUTE_VALUE, 3, -1);};
 
     return(TRUE);}
 

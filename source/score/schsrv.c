@@ -322,7 +322,7 @@ static void _SC_read_host_server_db(char *file)
          
         if (net != NULL)
 	   {net = CSTRSAVE(net);
-	    SC_hasharr_install(_SC.hsst, ".net", net, SC_STRING_S, TRUE, TRUE);};
+	    SC_hasharr_install(_SC.hsst, ".net", net, SC_STRING_S, 3, -1);};
 
 	s  = NULL;
 	nb = 0;
@@ -338,7 +338,7 @@ static void _SC_read_host_server_db(char *file)
 	    else if ((strncmp(s, ".net ", 5) == 0) && (net == NULL))
 	       {net = SC_strtok(s+5, " \t\n", u);
 	        net = CSTRSAVE(net);
-		SC_hasharr_install(_SC.hsst, ".net", net, SC_STRING_S, TRUE, TRUE);}
+		SC_hasharr_install(_SC.hsst, ".net", net, SC_STRING_S, 3, -1);}
 
 	    else if (strncmp(s, ".noping ", 8) == 0)
 	       {pnglst = SC_strtok(s+8, " \t\n", u);
@@ -362,7 +362,7 @@ static void _SC_read_host_server_db(char *file)
 
 		   rng->noping = _SC_unpingable(type, pnglst);
 
-		   SC_hasharr_install(_SC.hsst, type, rng, "hrng", TRUE, TRUE);};};};
+		   SC_hasharr_install(_SC.hsst, type, rng, "hrng", 3, -1);};};};
 
 	io_close(fp);};
 
@@ -405,7 +405,7 @@ int SC_host_server_init(char *file, int reset, int vrb)
 	    SC_hostname(t, MAXLINE);
 	    r   = SC_dsnprintf(FALSE, "(%s)", t);
 	    rng = _SC_list(r);
-	    SC_hasharr_install(_SC.hsst, SYSTEM_ID, rng, "hrng", TRUE, TRUE);};};
+	    SC_hasharr_install(_SC.hsst, SYSTEM_ID, rng, "hrng", 3, -1);};};
 
     rv = (_SC.hsst != NULL);
 

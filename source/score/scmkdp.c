@@ -103,7 +103,7 @@ static int _SC_is_newer_archive(char *fa, char *fb, time_t tb, anadep *state)
     if (ar == NULL)
        {ar = SC_scan_archive(arf);
 	if (ar != NULL)
-	   SC_hasharr_install(state->archives, arf, ar, "archive", TRUE, TRUE);};
+	   SC_hasharr_install(state->archives, arf, ar, "archive", 3, -1);};
 
     rv = TRUE;
     if (ar != NULL)

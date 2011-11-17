@@ -117,7 +117,7 @@ void PA_cpp_add_group(char *name, int itype, char *type)
     node->type  = type;
     node->data  = NULL;
 
-    SC_hasharr_install(PA_cpp_value_tab, name, node, PAN_CPP_NODE, TRUE, TRUE);
+    SC_hasharr_install(PA_cpp_value_tab, name, node, PAN_CPP_NODE, 3, -1);
   
     return;}
 
@@ -191,10 +191,10 @@ void PA_cpp_add_name(char *name, char *group, ...)
     SC_VA_END;
 
 /* install into hash table */
-    SC_hasharr_install(PA_cpp_name_tab, name, node, PAN_CPP_NODE, TRUE, TRUE);
+    SC_hasharr_install(PA_cpp_name_tab, name, node, PAN_CPP_NODE, 3, -1);
 
 /* build cross reference from value to name */
-    SC_hasharr_install(PA_cpp_value_tab, name0, node, PAN_CPP_NODE, TRUE, TRUE);
+    SC_hasharr_install(PA_cpp_value_tab, name0, node, PAN_CPP_NODE, 3, -1);
 
     return;}
 

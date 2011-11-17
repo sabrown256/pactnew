@@ -337,7 +337,7 @@ void PG_register_callback(char *name, ...)
     ip  = CMAKE(long);
     *ip = addr.mdiskaddr;
 
-    SC_hasharr_install(_PG.callback_tab, name, ip, "procedure", TRUE, TRUE);
+    SC_hasharr_install(_PG.callback_tab, name, ip, "procedure", 3, -1);
 
     return;}
 
@@ -382,7 +382,7 @@ void PG_register_variable(char *name, char *type,
     s[1] = (char *) vn;
     s[2] = (char *) vx;
 
-    SC_hasharr_install(_PG.callback_tab, name, s, type, TRUE, TRUE);
+    SC_hasharr_install(_PG.callback_tab, name, s, type, 3, -1);
 
     return;}
 

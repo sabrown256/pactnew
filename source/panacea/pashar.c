@@ -496,7 +496,7 @@ void _PA_install_var(char *vname, PA_variable *pp)
     else
        strcpy(s, vname);
 
-    SC_hasharr_install(PA_variable_tab, s, pp, PAN_VARIABLE, TRUE, TRUE);
+    SC_hasharr_install(PA_variable_tab, s, pp, PAN_VARIABLE, 3, -1);
 
     return;}
 

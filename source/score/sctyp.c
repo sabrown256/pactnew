@@ -287,7 +287,7 @@ int SC_type_register(char *name, SC_kind kind, int bpi, ...)
 			  ok = FALSE;
 			  break;};};};
 
-	SC_hasharr_install(ha, name, t, "SC_TYPE", TRUE, TRUE);};
+	SC_hasharr_install(ha, name, t, "SC_TYPE", 3, -1);};
 
     SC_VA_END;
 
@@ -315,7 +315,7 @@ int SC_type_alias(char *name, int id)
 
     t->type = CSTRDUP(name, 3);
 
-    SC_hasharr_install(ha, name, t, "SC_TYPE", TRUE, TRUE);
+    SC_hasharr_install(ha, name, t, "SC_TYPE", 3, -1);
 
     return(id);}
 

@@ -11,9 +11,9 @@
 
 #include "pgs_int.h"
 
-#define ATTR_STR(_n, _v) SC_hasharr_install(_PG.attr_table, _n, _v, SC_STRING_S, TRUE, TRUE)
-#define ATTR_INT(_n, _v) SC_hasharr_install(_PG.attr_table, _n, _v, SC_INT_S,    TRUE, TRUE)
-#define ATTR_DBL(_n, _v) SC_hasharr_install(_PG.attr_table, _n, _v, SC_DOUBLE_S, TRUE, TRUE)
+#define ATTR_STR(_n, _v) SC_hasharr_install(_PG.attr_table, _n, _v, SC_STRING_S, 3, -1)
+#define ATTR_INT(_n, _v) SC_hasharr_install(_PG.attr_table, _n, _v, SC_INT_S,    3, -1)
+#define ATTR_DBL(_n, _v) SC_hasharr_install(_PG.attr_table, _n, _v, SC_DOUBLE_S, 3, -1)
 
 gattrdes
  _PG_gattrs;

@@ -45,7 +45,7 @@ int SC_register_context(void *f, void *a)
     rv = FALSE;
     ha = _SC_init_context_table();
 
-    hp = SC_hasharr_install(ha, f, a, SC_POINTER_S, FALSE, TRUE);
+    hp = SC_hasharr_install(ha, f, a, SC_POINTER_S, 2, -1);
     if (hp != NULL)
        rv = TRUE;
 

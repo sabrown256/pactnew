@@ -944,7 +944,8 @@ void PP_register_type(PP_file *fileinfo, PP_type_entry *entry)
 {
     if (entry->descr == NULL)
         printf("XXXX - error");
-    SC_hasharr_install(fileinfo->type_map, entry->descr->type, entry, XX_OBJECT_MAP_S, TRUE, TRUE);
+    SC_hasharr_install(fileinfo->type_map, entry->descr->type, entry,
+		       XX_OBJECT_MAP_S, 3, -1);
 
 #if 0
     _tc_to_entry[entry->typecode] = entry;
@@ -971,7 +972,8 @@ PP_type_entry *PP_inquire_type(PP_file *fileinfo, char *ctype)
 
 void PP_register_object(PP_file *fileinfo, PP_type_entry *entry)
 {
-    SC_hasharr_install(fileinfo->object_map, entry->ob_type, entry, XX_OBJECT_MAP_S, TRUE, TRUE);
+    SC_hasharr_install(fileinfo->object_map, entry->ob_type, entry,
+		       XX_OBJECT_MAP_S, 3, -1);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -1280,9 +1282,11 @@ void PP_init_type_map_instance(PP_file *fileinfo, PP_class_descr *cdescr)
 
     entry->cdescr = cdescr;
 
-    SC_hasharr_install(fileinfo->class_map, cdescr->cls, cdescr, XX_CLASS_DESCR_S, TRUE, TRUE);
+    SC_hasharr_install(fileinfo->class_map, cdescr->cls, cdescr,
+		       XX_CLASS_DESCR_S, 3, -1);
 
-    SC_hasharr_install(fileinfo->type_map, cdescr->type, entry, XX_OBJECT_MAP_S, TRUE, TRUE);
+    SC_hasharr_install(fileinfo->type_map, cdescr->type, entry,
+		       XX_OBJECT_MAP_S, 3, -1);
 
     return;
 }

@@ -608,7 +608,7 @@ static void _PA_rd_dd_tab(PA_package *pck, FILE *fp)
               
          snprintf(vname, MAXLINE, "%s", key);
 
-         SC_hasharr_install(ddtab, vname, alist, _PA.alist, TRUE, TRUE);};
+         SC_hasharr_install(ddtab, vname, alist, _PA.alist, 3, -1);};
 
     PA_WARN((ne > 0) && (ne != ne_read),
             "TABLE %s, EXPECTED %d ENTRIES FOUND %d - _PA_RD_DD_TAB",
@@ -825,8 +825,7 @@ void PA_install_function(char *s, PFVoid fnc)
     if (PA_symbol_tab == NULL)
        PA_symbol_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
-    SC_hasharr_install(PA_symbol_tab, s, addr.memaddr,
-		       "procedure", FALSE, TRUE);
+    SC_hasharr_install(PA_symbol_tab, s, addr.memaddr, "procedure", 2, -1);
 
     return;}
 
@@ -846,7 +845,7 @@ void PA_install_identifier(char *s, void *vr)
 /* GOTCHA: The variable may or may not be dynamic, so don't mark it.
  *         It's up to the caller to be aware of the reference count.
  */
-    SC_hasharr_install(PA_symbol_tab, s, vr, "variable", FALSE, TRUE);
+    SC_hasharr_install(PA_symbol_tab, s, vr, "variable", 2, -1);
 
     return;}
 
@@ -862,8 +861,7 @@ void PA_add_hook(char *name, void *fnc)
        PA_symbol_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
     ad.funcaddr = (PFInt) fnc;
-    SC_hasharr_install(PA_symbol_tab, name, ad.memaddr, 
-		       SC_POINTER_S, FALSE, TRUE);
+    SC_hasharr_install(PA_symbol_tab, name, ad.memaddr, SC_POINTER_S, 2, -1);
 
     return;}
 

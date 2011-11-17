@@ -38,7 +38,7 @@ PP_hasharr_install(PP_hasharrObject *self,
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "sss:install", kw_list,
                                      &key, &obj, &type))
         return NULL;
-    SC_hasharr_install(self->data, key, obj, type, TRUE, TRUE);
+    SC_hasharr_install(self->data, key, obj, type, 3, -1);
     Py_INCREF(Py_None);
     return Py_None;
 /* DO-NOT-DELETE splicer.end(pdb.hasharr.method.install) */
@@ -525,7 +525,7 @@ int PP_update_hasharr(hasharr *tab, PyObject *dict)
         }
 
         /* SC_hasharr_install will SC_mark vr */
-        entry = SC_hasharr_install(tab, keyname, vr, ptype, TRUE, TRUE);
+        entry = SC_hasharr_install(tab, keyname, vr, ptype, 3, -1);
         if (entry == NULL) {
             err = -1;
             break;
@@ -650,7 +650,7 @@ PP_hasharr_mp_ass_subscript(PyObject *_self, PyObject *key, PyObject *v)
         if (ptype == NULL)
             return -1;
 
-        hp = SC_hasharr_install(hasharr, name, vr, ptype, TRUE, TRUE);
+        hp = SC_hasharr_install(hasharr, name, vr, ptype, 3, -1);
 
         /* XXX release vr as well */
         _PP_rl_descr(descr);

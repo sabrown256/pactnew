@@ -222,7 +222,7 @@ fcdes *SC_scan_tarfile(char *tarf)
 
             tae = _SC_process_tarhdr(fp, &p); 
             if (tae != NULL)
-	       SC_hasharr_install(tab, tae->name, tae, "fcent", TRUE, TRUE);};
+	       SC_hasharr_install(tab, tae->name, tae, "fcent", 3, -1);};
      
         fc = _SC_make_tarfile(tarf, fp, tab);};
 
