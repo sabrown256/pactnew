@@ -64,10 +64,10 @@ printf nil "  /ints directory\n"
 
 cd /ints
 
-print cn
-print an
-print en
-print sn
+varprint cn
+varprint an
+varprint en
+varprint sn
 
 ; these should work in all cases
 
@@ -77,10 +77,10 @@ printf nil "  /floats directory\n"
 
 cd /floats
 
-print cs
-print as
-print es
-print ss
+varprint cs
+varprint as
+varprint es
+varprint ss
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------

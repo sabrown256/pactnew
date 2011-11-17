@@ -114,9 +114,9 @@
 
   (-varset name val))
 
-; the change procedure
+; the varset! procedure
 (define (varset!* name . val)
-    "Procedure version of change macro"
+    "Procedure version of varset! macro"
     (-varset name val))
 
 ;--------------------------------------------------------------------------
@@ -152,9 +152,9 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; -PRINT - the auxiliary print procedure
+; -VARPRINT - the auxiliary varprint procedure
 
-(define (-print nm indx)
+(define (-varprint nm indx)
     (let* ((name (sprintf "%s%s%s" (che) nm (cta)))
 	   (indl (if indx (car indx) nil)))
       
@@ -190,10 +190,10 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; PRINT - print all or part of the named variable or structure member
+; VARPRINT - print all or part of the named variable or structure member
 
-(define-macro (print name . indl)
-    "PRINT - Print out all or part of a variable or member.
+(define-macro (varprint name . indl)
+    "VARPRINT - Print out all or part of a variable or member.
              Note that the command keyword may be omitted.
              To print part of a variable or member qualify
              the name with index expressions whose parts
@@ -206,16 +206,16 @@
              embedded pointers and non-terminal members.
      Usage: [print] <variable> | <structure-member>
      Examples: Mapping2
-               print Mapping4.domain.elements
-               print Mapping2.range.elements[1]
+               varprint Mapping4.domain.elements
+               varprint Mapping2.range.elements[1]
                a[5,10:20,1:8:3]
-               print a.b[3].c[5,10:20,1:8:3]"
-    (-print name indl))
+               varprint a.b[3].c[5,10:20,1:8:3]"
+    (-varprint name indl))
 
-; the print procedure
-(define (print* name . indl)
-    "Procedure version of print macro"
-    (-print name indl))
+; the varprint procedure
+(define (varprint* name . indl)
+    "Procedure version of varprint macro"
+    (-varprint name indl))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -277,7 +277,7 @@
 
 ;(synonym vardef   var)
 (synonym varset!  change)
-;(synonym varprint print)
+(synonym varprint print)
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -295,17 +295,17 @@
 ; (vardef char **s ("Hello" "world"))
 ; 
 ; ls
-; print cn
-; print an
-; print en
-; print sn
+; varprint cn
+; varprint an
+; varprint en
+; varprint sn
 ; 
-; print c
-; print a
-; print e
-; print s
+; varprint c
+; varprint a
+; varprint e
+; varprint s
 ; 
-; print cs
+; varprint cs
 ; 
 ; (quit)
 
