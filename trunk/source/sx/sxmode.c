@@ -212,47 +212,60 @@ static void _SX_parse(SS_psides *si, object *strm)
 static void _SX_read(SS_psides *si, object *strm)
    {char *s, *ptr, *t, *bf;
     g_file *po;
+    object *o;
     PDBfile *file;
 
     s = NULL;
-    SS_args(si, si->rdobj,
+    o = si->rdobj;
+    SS_args(si, o,
             SC_STRING_I, &s,
             0);
+
+    bf = NULL;
 
 /* anything without a print name generates a replot */
     if ((s != NULL) && strcmp(s, "- no print name -") == 0)
        {t = SS_BUFFER(strm);
 
-        bf = SC_dsnprintf(FALSE, "(wu)");
-        strcpy(t, bf);
+        bf = SC_dsnprintf(FALSE, "(wu)");}
 
-        SS_PTR(strm) = t;
-        SS_assign(si, si->rdobj, SS_read(si, strm));}
-
-/* if it is an unbound variable check to see if it is a file variable
- * in which case print or change it
+/* check for variables and special actions for certain cases depending
+ * on the name and the namespace it is found in
  */
-    else if (SS_variablep(si->rdobj) &&
-	     !SS_bind_env(si, si->rdobj, si->env))
+    else if (SS_variablep(o))
        {SS_var_value(si, "current-file", G_FILE, &po, TRUE);
 	if (po == NULL)
 	   file = SX_vif;
-	else
+        else
 	   file = FILE_FILE(PDBfile, po);
 
-	if (_SX_file_varp(file, s, FALSE))
-	   {t   = SS_BUFFER(strm);
-	    ptr = SS_PTR(strm);
-	    if ((*ptr != '\0') && (strchr("!<>=", *ptr) != NULL))
-	       bf = SC_dsnprintf(FALSE, "find %s", t);
-	    else if ((*ptr != '\0') && (*ptr != '\n'))
-	       bf = SC_dsnprintf(FALSE, "change %s", t);
-	    else
-	       bf = SC_dsnprintf(FALSE, "print %s", t);
+	t   = SS_BUFFER(strm);
+	ptr = SS_PTR(strm);
 
-	    strcpy(t, bf);
-	    SS_PTR(strm) = t;
-	    SS_assign(si, si->rdobj, SS_read(si, strm));};};
+/* look for file variable expression */
+	if (SS_bind_env(si, o, si->env) == NULL)
+	   {if (_SX_file_varp(file, s, FALSE))
+
+/* find case */
+	       {if ((*ptr != '\0') && (strchr("!<>=", *ptr) != NULL))
+		   bf = SC_dsnprintf(FALSE, "find %s", t);
+
+/* change case */
+		else if ((*ptr != '\0') && (*ptr != '\n'))
+		   bf = SC_dsnprintf(FALSE, "change %s", t);
+
+/* print case */
+		else
+		   bf = SC_dsnprintf(FALSE, "print %s", t);};}
+
+/* look for type name - define case */
+	else if ((strcmp(s, "struct") != 0) && (SC_type_id(s, FALSE) != -1))
+	   bf = SC_dsnprintf(FALSE, "var %s", t);};
+
+    if (bf != NULL)
+       {strcpy(t, bf);
+        SS_PTR(strm) = t;
+        SS_assign(si, si->rdobj, SS_read(si, strm));};
 
     CFREE(s);
 
