@@ -260,7 +260,7 @@ static void _SX_read(SS_psides *si, object *strm)
 
 /* look for type name - define case */
 	else if ((strcmp(s, "struct") != 0) && (SC_type_id(s, FALSE) != -1))
-	   bf = SC_dsnprintf(FALSE, "var %s", t);};
+	   bf = SC_dsnprintf(FALSE, "vardef %s", t);};
 
     if (bf != NULL)
        {strcpy(t, bf);
