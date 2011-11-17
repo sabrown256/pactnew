@@ -9,6 +9,36 @@
 ;
 
 ;--------------------------------------------------------------------------
+
+;                           CHANGE AUXILLIARIES
+
+;--------------------------------------------------------------------------
+
+(define (split-off-find-expression lst fex)
+    (let* ((x   (list-ref lst 0))
+	   (rst (list-tail lst 1)))
+          (cond ((or (and (procedure? x) (memv x (list = != <= < >= >)))
+		     (memv x '(= != <= < >= >)))
+		 (split-off-find-expression (cdr rst)
+					    (cons (car rst) (cons x fex))))
+		((memv x (list and or))
+		 (split-off-find-expression rst
+					    (cons x fex)))
+		(else
+		 (list (reverse fex) lst)))))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+(define (change-scatter cmd indl vals)
+    (define (do-one x)
+        (set! cmd (append (list x) cmd)))
+    (set! cmd (cons indl cmd))
+    (for-each do-one vals)
+    (set! cmd (reverse cmd))
+    (print-pdb nil (list (apply scatter-pdbdata cmd))))
+
+;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
 ; -CHANGE - the auxiliary change procedure
@@ -245,17 +275,24 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; (var short cs (10) 1 2 3 4 5 6 7 8 9 10)
+;(synonym vardef   var)
+;(synonym varset!  change)
+;(synonym varprint print)
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; (vardef short cs (10) 1 2 3 4 5 6 7 8 9 10)
 ; 
-; (var int cn (10) 1 2 3 4 5 6 7 8 9 10)
-; (var int *an (1 2 3 4))
-; (var int *en (3) (-1 -2 -3) (4 5) (6 7 8 9))
-; (var int **sn ((1 2 3 4 5) (6 7 8 9)))
+; (vardef int cn (10) 1 2 3 4 5 6 7 8 9 10)
+; (vardef int *an (1 2 3 4))
+; (vardef int *en (3) (-1 -2 -3) (4 5) (6 7 8 9))
+; (vardef int **sn ((1 2 3 4 5) (6 7 8 9)))
 ; 
-; (var char c (10) "bar")
-; (var char *a "foo")
-; (var char *e (3) "Foo" () "Bar")
-; (var char **s ("Hello" "world"))
+; (vardef char c (10) "bar")
+; (vardef char *a "foo")
+; (vardef char *e (3) "Foo" () "Bar")
+; (vardef char **s ("Hello" "world"))
 ; 
 ; ls
 ; print cn

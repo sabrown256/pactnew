@@ -538,36 +538,6 @@
 
 ;--------------------------------------------------------------------------
 
-;                           CHANGE AUXILLIARIES
-
-;--------------------------------------------------------------------------
-
-(define (split-off-find-expression lst fex)
-    (let* ((x   (list-ref lst 0))
-	   (rst (list-tail lst 1)))
-          (cond ((or (and (procedure? x) (memv x (list = != <= < >= >)))
-		     (memv x '(= != <= < >= >)))
-		 (split-off-find-expression (cdr rst)
-					    (cons (car rst) (cons x fex))))
-		((memv x (list and or))
-		 (split-off-find-expression rst
-					    (cons x fex)))
-		(else
-		 (list (reverse fex) lst)))))
-
-;--------------------------------------------------------------------------
-;--------------------------------------------------------------------------
-
-(define (change-scatter cmd indl vals)
-    (define (do-one x)
-        (set! cmd (append (list x) cmd)))
-    (set! cmd (cons indl cmd))
-    (for-each do-one vals)
-    (set! cmd (reverse cmd))
-    (print-pdb nil (list (apply scatter-pdbdata cmd))))
-
-;--------------------------------------------------------------------------
-
 ;                         USER LEVEL COMMANDS
 
 ;--------------------------------------------------------------------------
