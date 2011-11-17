@@ -254,17 +254,17 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; FIND - find indices of arrays for which values match specified criteria
+; VARFIND - find indices of arrays for which values match specified criteria
 
-(define-macro (find var . expr)
-    "FIND - find indices of arrays for which values match
+(define-macro (varfind var . expr)
+    "VARFIND - find indices of arrays for which values match
             specified criteria
-     Usage: find <arr> [<predicate> # [<conjunction>]]*
+     Usage: varfind <arr> [<predicate> # [<conjunction>]]*
             <arr>        :=  a pm-array of values
             <predicate>  :=  = | != | <= | < | >= | >
             <conjuntion> :=  and | or
-     Examples: find foo < 3.1
-               find foo < 3.1 and > -1.2 and != 0"
+     Examples: varfind foo < 3.1
+               varfind foo < 3.1 and > -1.2 and != 0"
 
     (let* ((arr (pdbdata->pm-array (read-pdbdata current-file var)))
 	   (dms (variable-dimensions var))
@@ -481,8 +481,9 @@
 ;--------------------------------------------------------------------------
 
 (synonym vardef   var)
-(synonym varset!  change)
+(synonym varfind  find)
 (synonym varprint print)
+(synonym varset!  change)
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
