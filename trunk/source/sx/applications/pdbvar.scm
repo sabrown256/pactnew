@@ -194,16 +194,16 @@
 
 (define-macro (varprint name . indl)
     "VARPRINT - Print out all or part of a variable or member.
-             Note that the command keyword may be omitted.
-             To print part of a variable or member qualify
-             the name with index expressions whose parts
-             are in one of the three forms:
-               <index>
-               <index-min>:<index-max>
-               <index-min>:<index-max>:<increment>
-             Only the first form may be used to qualify
-             variables or terminal structure members with
-             embedded pointers and non-terminal members.
+                Note that the command keyword may be omitted.
+                To print part of a variable or member qualify
+                the name with index expressions whose parts
+                are in one of the three forms:
+                  <index>
+                  <index-min>:<index-max>
+                  <index-min>:<index-max>:<increment>
+                Only the first form may be used to qualify
+                variables or terminal structure members with
+                embedded pointers and non-terminal members.
      Usage: [print] <variable> | <structure-member>
      Examples: Mapping2
                varprint Mapping4.domain.elements
@@ -220,11 +220,11 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; -VAR-PTR - hopefully hidden helper for VAR
-;          - return a string containing all '*' from S
-;          - kind of like strtok(s, "[a-z][A-Z][0-9]")
+; -VARDEF-PTR - hopefully hidden helper for VARDEF
+;             - return a string containing all '*' from S
+;             - kind of like strtok(s, "[a-z][A-Z][0-9]")
 
-(define (-var-ptr s)
+(define (-vardef-ptr s)
     (let* ((sl (string->list s))
 	   (p  (map (lambda (x) (if (char=? x #\*) x nil)) sl)))
           (list->string p)))
@@ -232,17 +232,17 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; VAR - define a variable in the Scheme variable space
-;     - and in the VIF
-;     - gives a more useful user API for variable creation
+; VARDEF - define a variable in the Scheme variable space
+;        - and in the VIF
+;        - gives a more useful user API for variable creation
 
-(define-macro (var xtype xname . x)
-    "VAR - define a variable in the current file.
-     Usage: var <type> <name> [<shape>] <vals>
-     Examples: var int cn (10) 1 2 3 4 5 6 7 8 9 10
-               var int *an (1 2 3 4)
-               var int *en (3) (-1 -2 -3) (4 5) (6 7 8 9)
-               var int **sn ((1 2 3 4 5) (6 7 8 9))"
+(define-macro (vardef xtype xname . x)
+    "VARDEF - define a variable in the current file.
+     Usage: [vardef] <type> <name> [<shape>] <vals>
+     Examples: vardef int cn (10) 1 2 3 4 5 6 7 8 9 10
+               int *an (1 2 3 4)
+               int *en(3) (-1 -2 -3) (4 5) (6 7 8 9)
+               int **sn ((1 2 3 4 5) (6 7 8 9))"
     (let* ((n      (length x))
 	   (stype  (sprintf "%s" xtype))
 	   (sname  (sprintf "%s" xname))
@@ -256,7 +256,7 @@
 		       (if (> n 1)
 			   (list-tail x 1)
 			   x1)))
-           (ptrs   (-var-ptr sname))
+           (ptrs   (-vardef-ptr sname))
 	   (vname  (strtok sname "*"))
 	   (vtype  (if (string=? ptrs "")
 		       stype
@@ -275,7 +275,7 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-;(synonym vardef   var)
+(synonym vardef   var)
 (synonym varset!  change)
 (synonym varprint print)
 

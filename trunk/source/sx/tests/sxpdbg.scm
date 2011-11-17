@@ -67,27 +67,27 @@
 ;--------------------------------------------------------------------------
 
 ; PDB-DATA-PRIMH - generate primitives using the high level interface
-;                - using var 
+;                - using vardef 
 
 (define (pdb-data-primh)
 
 ; variations on char
-   (var char c (10) "bar")
-   (var char *a "foo")
-   (var char *e (3) "Foo" () "Bar")
-   (var char **s ("Hello" "world"))
+   (vardef char c (10) "bar")
+   (vardef char *a "foo")
+   (vardef char *e (3) "Foo" () "Bar")
+   (vardef char **s ("Hello" "world"))
 
 ; variations on short
-   (var short cs (10) 1 2 3 4 5 6 7 8 9 10)
-   (var short *as (1 2 3 4))
-   (var short *es (3) (-1 -2 -3) (4 5) (6 7 8 9))
-   (var short **ss ((1 2 3 4 5) (6 7 8 9)))
+   (vardef short cs (10) 1 2 3 4 5 6 7 8 9 10)
+   (vardef short *as (1 2 3 4))
+   (vardef short *es (3) (-1 -2 -3) (4 5) (6 7 8 9))
+   (vardef short **ss ((1 2 3 4 5) (6 7 8 9)))
 
 ; variations on integer
-   (var int cn (10) 1 2 3 4 5 6 7 8 9 10)
-   (var int *an (1 2 3 4))
-   (var int *en (3) (-1 -2 -3) (4 5) (6 7 8 9))
-   (var int **sn ((1 2 3 4 5) (6 7 8 9)))
+   (vardef int cn (10) 1 2 3 4 5 6 7 8 9 10)
+   (vardef int *an (1 2 3 4))
+   (vardef int *en (3) (-1 -2 -3) (4 5) (6 7 8 9))
+   (vardef int **sn ((1 2 3 4 5) (6 7 8 9)))
 
    #t)
 
