@@ -8,9 +8,13 @@
 ; include "cpyright.h"
 ;
 
+(define index-only      1)
+(define index+value     2)
+(define find-mode-flag  index-only)
+
 ;--------------------------------------------------------------------------
 
-;                           CHANGE AUXILLIARIES
+;                           CHANGE ROUTINES
 
 ;--------------------------------------------------------------------------
 
@@ -30,7 +34,7 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-(define (change-scatter cmd indl vals)
+(define (-varset-scatter cmd indl vals)
     (define (do-one x)
         (set! cmd (append (list x) cmd)))
     (set! cmd (cons indl cmd))
@@ -68,7 +72,7 @@
 		  (let* ((fexpr (list-ref splt 0))
 			 (vals  (list-ref splt 1))
 			 (indl  (apply find (cons "yval0" fexpr))))
-			(change-scatter commlist indl vals))
+			(-varset-scatter commlist indl vals))
 		  (begin (for-each do-one val)
 			 (set! commlist (reverse commlist))
 			 (print-pdb nil (list (apply write-pdbdata commlist)
@@ -150,6 +154,207 @@
         (change-dim rest)))
 
 ;--------------------------------------------------------------------------
+
+;                           FIND ROUTINES
+
+;--------------------------------------------------------------------------
+
+(define (-varfind-expr msg var expr)
+    (let* ((tst (cons var expr)))
+          (printf nil "%s matching:" msg)
+
+	  (define-macro (print-cond x)
+	      (printf nil " %s" x))
+
+	  (for-each print-cond tst)
+	  (printf nil "\n")))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+(define (-varfind-index-only file var lst n)
+    (if lst
+	(let* ((tuple (index->tuple-string file var
+					   (list-ref lst 0))))
+              (printf nil "   (%s)" tuple)
+	      (if (= (remainder n 4) 0)
+		  (printf nil "\n"))
+	      (-varfind-index-only file var (cdr lst) (+ n 1)))))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+(define (-varfind-index file var expr ind n)
+    (if lst
+	(cond ((eqv? find-mode-flag index+value)
+	       (-varfind-expr "Values" var expr)
+	       (varprint* var ind))
+	      (else
+	       (-varfind-expr "Indices of values" var expr)
+	       (printf nil "\n")
+	       (-varfind-index-only file var (pm-array->list ind) n)
+	       (printf nil "\n")))))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+(define (-varfind-and var arr prd val rst indl)
+    (-varfind var arr rst
+	      (find-index arr prd val indl)))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+(define (-varfind-or var arr prd val rst indl)
+    (let* ((aid (find-index arr prd val indl))
+	   (bid (-varfind var arr rst))
+	   (ai  (pm-array->list aid))
+	   (bi  (pm-array->list bid)))
+      (apply list->pm-array
+	     (append ai bi))))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+(define (-varfind var arr expr indl)
+    (let* ((nargs (length expr)))
+          (if (and expr (= (remainder nargs 3) 2))
+	      (cond ((= nargs 2)
+		     (let* ((fnc (list-ref expr 0))
+			    (prd (if (procedure? fnc) fnc (eval fnc)))
+			    (val (list-ref expr 1))
+			    (oid (find-index arr prd val indl)))
+		       oid))
+		    (else
+		     (let* ((fnc (list-ref expr 0))
+			    (prd (if (procedure? fnc) fnc (eval fnc)))
+			    (val (list-ref expr 1))
+			    (cnj (list-ref expr 2))
+			    (rst (list-tail expr 3)))
+		       (cond ((eqv? cnj 'and)
+			      (-varfind-and var arr prd val rst indl))
+			     ((eqv? cnj 'or)
+			      (-varfind-or var arr prd val rst indl))
+			     (else
+			      (printf nil
+				      "Bad search criteria: %s\n"
+				      expr)))))))))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+(define (find-mode . val)
+    (if val
+	(set! find-mode-flag (car val))
+	find-mode-flag)
+    (if (interactive?)
+        (printf nil "   %s\n" find-mode-flag))
+    find-mode-flag)
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; FIND - find indices of arrays for which values match specified criteria
+
+(define-macro (find var . expr)
+    "FIND - find indices of arrays for which values match
+            specified criteria
+     Usage: find <arr> [<predicate> # [<conjunction>]]*
+            <arr>        :=  a pm-array of values
+            <predicate>  :=  = | != | <= | < | >= | >
+            <conjuntion> :=  and | or
+     Examples: find foo < 3.1
+               find foo < 3.1 and > -1.2 and != 0"
+
+    (let* ((arr (pdbdata->pm-array (read-pdbdata current-file var)))
+	   (dms (variable-dimensions var))
+	   (oid (-varfind var arr expr nil)))
+
+          (if (interactive?)
+	      (begin (-varfind-index current-file var expr oid 1)
+		     (printf nil "\n")))
+	  oid))
+
+;--------------------------------------------------------------------------
+
+;                         VARPRINT ROUTINES
+
+;--------------------------------------------------------------------------
+
+; -VARPRINT-INDEX-RANGE-EXPR - scan the string NAME for patterns like
+;                            - .*[d]*:[d]*.*
+;                            - where .* means match zero or more characters
+;                            - and [d]* means match one or more digits
+;                            - return a list consisting of
+;                            - ( <the number corresponding to the first [d]*>
+;                            -   <the match for the first .*>
+;                            -   <the number corresponding to the second [d]*>
+;                            -   <the match for the second .*> )
+
+(define (-varprint-index-range-expr name)
+    (let* ((nm (sprintf name))
+	   (sa (strtok nm ":"))
+           (sinc (strchr nm ":"))
+	   (sb (if (string? sinc)
+                   (strtok nm ":")
+                   (strtok nm "\n")))
+           (si (if (string? sinc)
+                   (strtok nm "\n")
+                   1)))
+          (if (string=? sa name)
+	      (list 0 name 0 "" si)
+              (if (string? sinc)
+                  (append (strip-last-token sa)
+                          (list (string->number sb) (cadr (strip-first-token si))
+                                   (car (strip-first-token si))))
+                  (append (strip-last-token sa)
+		          (list (car (strip-first-token sb)) 
+                                (cadr (strip-first-token sb)) si))))))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; -VARPRINT-INDEX-RANGE - reduce non-terminal index range to loop over
+;                   - single values and recurse on the printing of
+;                   - the reduced expression
+
+(define (-varprint-index-range file pa imn i imx pb inc tm indl)
+   (if (and (<= imn i) (<= i imx))
+       (let* ((name (sprintf "%s%d%s%s"
+			     pa i
+			     (if pb pb "")
+			     (if tm tm ""))))
+	     (-varprint-file-variable file name indl)
+	     (-varprint-index-range file pa imn (+ i inc) imx pb inc tm))))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; -VARPRINT-FILE-VARIABLE - recursively handle the printing of file variable
+;                     - specification with non-terminal index ranges
+;                     - which PDBLib will not handle
+
+(define (-varprint-file-variable file name indl)
+    (let* ((nm      (split-name-at-terminal name))
+           (nosplit (string=? name (car nm)))
+	   (nt      (car nm))
+	   (tm      (cdr nm))
+	   (wrk     (if nosplit
+; if nosplit then generate a dummy list to handle the x[:] case
+                       (list 0 1 2 3 4)
+                       (-varprint-index-range-expr nt)))
+	   (imn     (list-ref wrk 0))
+	   (pa      (list-ref wrk 1))
+	   (imx     (list-ref wrk 2))
+	   (pb      (list-ref wrk 3))
+           (inc     (list-ref wrk 4)))
+          (if (or nosplit (= imn imx))
+	      (let* ((data (read-pdbdata file name)))
+		    (if data
+			(print-pdb nil (list data display-precision indl))))
+	      (-varprint-index-range file pa imn imn imx pb inc tm indl))))
+
+;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
 ; -VARPRINT - the auxiliary varprint procedure
@@ -178,7 +383,7 @@
 ; last arg is #f so index expr errors
 ; can be reported as such
 				((file-variable? current-file name #f)
-				 (print-file-variable current-file
+				 (-varprint-file-variable current-file
 						      (print-name name)
 						      indl))
 				(else
