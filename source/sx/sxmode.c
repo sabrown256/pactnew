@@ -248,7 +248,7 @@ static void _SX_read(SS_psides *si, object *strm)
 
 /* find case */
 	       {if ((*ptr != '\0') && (strchr("!<>=", *ptr) != NULL))
-		   bf = SC_dsnprintf(FALSE, "find %s", t);
+		   bf = SC_dsnprintf(FALSE, "varfind %s", t);
 
 /* change case */
 		else if ((*ptr != '\0') && (*ptr != '\n'))
