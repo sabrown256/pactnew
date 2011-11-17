@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# IO-SCAN - check I/O timings in various situations
+# BF-SCAN - check I/O timings in various situations
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -8,25 +8,22 @@
 # include "cpyright.h"
 #
 
+if ($#argv > 0) then
+   set n = $1
+else
+   set n = 1000000
+endif
+
 set ldir = `dirname $0`
 
-foreach iv (1 10 100 1000 10000)
+foreach iv (1 10)
 
-   if ($iv == 1) then
-      set nil = (1 10 100 1000 10000 100000 1000000 10000000)
-   else if ($iv < 11) then
-      set nil = (1 10 100 1000 10000 100000 1000000)
-   else if ($iv < 101) then
-      set nil = (1 10 100 1000 10000 100000)
-   else if ($iv < 1001) then
-      set nil = (1 10 100 1000 10000)
-   else if ($iv < 10001) then
-      set nil = (1 10 100 1000)
-   else
-      set nil = (1 10 100)
-   endif
+   set bsl = ( -1 10 100 1000 10000 100000 1000000 )
+   set bsl = ( $bsl 10000000 27000000 29000000 )
+   set bsl = ( $bsl 100000000 270000000 290000000 )
+   set bsl = ( $bsl 1000000000 )
 
-   set dat = io-$iv.dat
+   set dat = bf-$iv.dat
    rm -f $dat
    touch $dat
 
@@ -34,10 +31,13 @@ foreach iv (1 10 100 1000 10000)
 
    set bt = `timer -r`
    echo -n "      "
-   foreach i ($nil)
+   foreach i ($bsl)
       echo $i | awk '{printf(" %7.1e", $1);}'
-      do-run tpdd -q -n $i -nv $iv >>& $dat
-      rm -f io-asc.dat io-bins.dat io-hdf5.dat io-pdb.dat
+      do-run tpdd -q -b $i -n $n -nv $iv                                    |& \
+      awk '$0 ~ /-/ {printf("      %-12s %10d %10.2e %8.2e %10.2e %10.2e\n",   \
+                            $1, '$i', $3, $4, $5, $6);}'                    |  \
+      sed 's/ -1 /  1 /' >>& $dat
+      rm -f bf-asc.dat bf-bins.dat bf-hdf5.dat bf-pdb.dat
    end
 
    set et = `timer -b $bt`
@@ -60,6 +60,6 @@ foreach iv (1 10 100 1000 10000)
 end
 
 # GOTCHA: using -s loses the annotations (should fix that)
-do-run ultra -e -l $ldir/io-scan.scm
+do-run ultra -e -l $ldir/bf-scan.scm
 
 exit($status)
