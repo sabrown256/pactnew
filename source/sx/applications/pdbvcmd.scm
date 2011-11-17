@@ -473,7 +473,7 @@
     (if lst
 	(cond ((eqv? find-mode-flag index+value)
 	       (print-find-expr "Values" var expr)
-	       (print* var ind))
+	       (varprint* var ind))
 	      (else
 	       (print-find-expr "Indices of values" var expr)
 	       (printf nil "\n")
@@ -2631,7 +2631,7 @@
     "Procedure version of table macro"
     (table-aux name))
 
-; the auxiliary print procedure
+; the auxiliary table procedure
 (define (table-aux name)
     (if (null? name)
 	(printf nil "No variable name specified\n")

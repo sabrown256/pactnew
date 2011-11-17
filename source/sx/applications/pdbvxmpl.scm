@@ -353,7 +353,7 @@
 (interactive on)
 
 (printf nil "-> xval0\n")
-(print xval0)
+(varprint xval0)
 
 (printf nil "-> find xval0 < 1 and > 0.5\n")
 (find xval0 < 1 and > 0.5)

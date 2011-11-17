@@ -162,7 +162,7 @@
       ("desc"        desc-pdb)
       ("ls"          ls-pdb)
       ("n-entries"   n-entries-pdb)
-      ("print"       print)))
+      ("print"       varprint)))
 
 (install-file-option "SCHEME-coded" open-netcdf-file "NETCDF" NETCDF-functions)
 
