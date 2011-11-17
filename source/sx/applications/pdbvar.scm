@@ -41,9 +41,9 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; -CHANGE - the auxiliary change procedure
+; -VARSET - the auxiliary change procedure
 
-(define (-change name val)
+(define (-varset name val)
     (plot-flag off)
     (newline)
     (if (null? name)
@@ -78,23 +78,23 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; CHANGE - change values in the named variable or structure member
+; VARSET! - change values in the named variable or structure member
 
-(define-macro (change name . val)
-    "CHANGE - Reset values in a variable or member.
-              If fewer values are supplied than elements referenced,
-              the last value is repeated. If more values are supplied
-              than elements referenced, the extra values are ignored.
-              Note that the command keyword, change, may be omitted.
-     Usage: [change] <expr> <values>
+(define-macro (varset! name . val)
+    "VARSET! - Reset values in a variable or member.
+               If fewer values are supplied than elements referenced,
+               the last value is repeated. If more values are supplied
+               than elements referenced, the extra values are ignored.
+               Note that the command keyword, varset!, may be omitted.
+     Usage: [varset!] <expr> <values>
             <expr>       :=  <variable> | <structure-member> | <find-expr>
             <find-expr>  :=  <arr> [<predicate> [<conjunction>]]*
             <arr>        :=  a pm-array of values
             <predicate>  :=  = | != | <= | < | >= | >
             <conjuntion> :=  and | or
-     Examples: change a[10,15] 3.2
+     Examples: varset! a[10,15] 3.2
                   Reset the value of a[10,15] to 3.5
-               change time 0.0
+               varset! time 0.0
                   Reset the value of time to 0.0
                x[1:2] 1 2
                   Reset the values x[1] and x[2] to 1 and 2 respectively
@@ -112,12 +112,12 @@
                  would be interpreted as a request to set all values of a to 2!"
 
 
-  (-change name val))
+  (-varset name val))
 
 ; the change procedure
-(define (change* name . val)
+(define (varset!* name . val)
     "Procedure version of change macro"
-    (-change name val))
+    (-varset name val))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -276,7 +276,7 @@
 ;--------------------------------------------------------------------------
 
 ;(synonym vardef   var)
-;(synonym varset!  change)
+(synonym varset!  change)
 ;(synonym varprint print)
 
 ;--------------------------------------------------------------------------
