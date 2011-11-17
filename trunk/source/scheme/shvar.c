@@ -165,7 +165,7 @@ object *SS_install_cf(SS_psides *si, char *name, char *doc, ...)
     vp = SS_mk_variable(si, name, op);
     SS_UNCOLLECT(vp);
 
-    SC_hasharr_install(si->symtab, name, vp, SS_POBJECT_S, TRUE, TRUE);
+    SC_hasharr_install(si->symtab, name, vp, SS_POBJECT_S, 3, -1);
 
     return(vp);}
 
@@ -229,7 +229,7 @@ object *SS_install_cv(SS_psides *si, char *name, void *pval, int ityp)
  *         replaced by SS_POBJECT_S if one wants to conform to the rules
  *         for such things
  */
-    if (SC_hasharr_install(si->symtab, name, var, typ, TRUE, TRUE) == NULL)
+    if (SC_hasharr_install(si->symtab, name, var, typ, 3, -1) == NULL)
        SS_error(si, "INSTALL FAILED - SS_INSTALL_CV", var);
 
     return(var);}

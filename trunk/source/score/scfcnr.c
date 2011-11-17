@@ -138,7 +138,7 @@ fcdes *_SC_unknown_container(char *name)
 
 	if (ae != NULL)
 	   {snprintf(s, MAXLINE, "%ld:%ld", (long) sad, (long) ead);
-	    SC_hasharr_install(tab, s, ae, "fcent", TRUE, TRUE);};
+	    SC_hasharr_install(tab, s, ae, "fcent", 3, -1);};
 
 	fc = CMAKE(fcdes);
 	fc->name    = CSTRSAVE(name);

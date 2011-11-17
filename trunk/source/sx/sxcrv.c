@@ -179,13 +179,13 @@ void SX_enlarge_dataset(SS_psides *si, PFVoid eval)
          _SX.crv_varbl[i] = v;
 
          if (i < 26)
-            {if (SC_hasharr_install(si->symtab, s1, o, SS_OBJECT_S, TRUE, TRUE) == NULL)
+            {if (SC_hasharr_install(si->symtab, s1, o, SS_OBJECT_S, 3, -1) == NULL)
                 LONGJMP(SC_gs.cpu, ABORT);};
 
-         if (SC_hasharr_install(si->symtab, s, o, SS_OBJECT_S, TRUE, TRUE) == NULL)
+         if (SC_hasharr_install(si->symtab, s, o, SS_OBJECT_S, 3, -1) == NULL)
             LONGJMP(SC_gs.cpu, ABORT);
 
-         if (SC_hasharr_install(si->symtab, t, o, SS_OBJECT_S, TRUE, TRUE) == NULL)
+         if (SC_hasharr_install(si->symtab, t, o, SS_OBJECT_S, 3, -1) == NULL)
             LONGJMP(SC_gs.cpu, ABORT);};
 
     return;}

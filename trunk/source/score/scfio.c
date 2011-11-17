@@ -1417,7 +1417,7 @@ static FILE *_SC_ropen(char *name, char *mode)
                 return(NULL);};
 
             SC_block(pp);
-            SC_hasharr_install(_SC.hosts, host, pp, "PROCESS", TRUE, TRUE);
+            SC_hasharr_install(_SC.hosts, host, pp, "PROCESS", 3, -1);
 
             get_data_line = TRUE;};
 

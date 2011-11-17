@@ -60,8 +60,8 @@ static int test_1_hash(void)
     sb = CSTRSAVE("string-b");
 
     tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
-    hpa = SC_hasharr_install(tab, "a", sa, SC_STRING_S, TRUE, TRUE);
-    hpb = SC_hasharr_install(tab, "b", sb, SC_STRING_S, TRUE, TRUE);
+    hpa = SC_hasharr_install(tab, "a", sa, SC_STRING_S, 3, -1);
+    hpb = SC_hasharr_install(tab, "b", sb, SC_STRING_S, 3, -1);
 
     err += (hpa == NULL);
     err += (hpb == NULL);
@@ -103,8 +103,8 @@ static int test_1_ha(void)
     sb = CSTRSAVE("string-b");
 
     ha = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
-    hpa = SC_hasharr_install(ha, "a", sa, SC_STRING_S, TRUE, TRUE);
-    hpb = SC_hasharr_install(ha, "b", sb, SC_STRING_S, TRUE, TRUE);
+    hpa = SC_hasharr_install(ha, "a", sa, SC_STRING_S, 3, -1);
+    hpb = SC_hasharr_install(ha, "b", sb, SC_STRING_S, 3, -1);
 
     err += (hpa == NULL);
     err += (hpb == NULL);
@@ -313,8 +313,8 @@ static int test_5(void)
     tab = SC_make_hasharr(1, NODOC, SC_HA_NAME_KEY, 0);
     err += (tab == NULL);
 
-    err += (SC_hasharr_install(tab, type, "foo", NULL, TRUE, TRUE) == NULL);
-    err += (SC_hasharr_install(tab, type, "bar", NULL, TRUE, TRUE) == NULL);
+    err += (SC_hasharr_install(tab, type, "foo", NULL, 3, -1) == NULL);
+    err += (SC_hasharr_install(tab, type, "bar", NULL, 3, -1) == NULL);
 
     err += (SC_hasharr_foreach(tab, test_5_callback, NULL) < 0);
 

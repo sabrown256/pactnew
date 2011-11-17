@@ -724,7 +724,7 @@ PM_conic_curve *rd_cline(char *s)
 
     cur = PM_mk_cline(s, axx, ayy, axy, ax, ay, ac);
     norm_cline(cur);
-    SC_hasharr_install(curves, s, cur, MESH_CURVE, TRUE, TRUE);
+    SC_hasharr_install(curves, s, cur, MESH_CURVE, 3, -1);
 
     return(cur);}
 

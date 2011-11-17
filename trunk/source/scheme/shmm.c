@@ -169,7 +169,7 @@ void _SS_install(SS_psides *si, char* pname, char *pdoc, PFPHand phand,
     vp = SS_mk_variable(si, pname, op);
     SS_UNCOLLECT(vp);
 
-    SC_hasharr_install(si->symtab, pname, vp, SS_POBJECT_S, TRUE, TRUE);
+    SC_hasharr_install(si->symtab, pname, vp, SS_POBJECT_S, 3, -1);
 
     return;}
 

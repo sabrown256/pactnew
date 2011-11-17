@@ -185,7 +185,7 @@ object *SS_add_type_synt(SS_psides *si, char *name)
 
     else
        {typ = SS_mk_string(si, name);
-        SC_hasharr_install(si->types, name, typ, SS_POBJECT_S, TRUE, TRUE);};
+        SC_hasharr_install(si->types, name, typ, SS_POBJECT_S, 3, -1);};
 
     return(typ);}
 

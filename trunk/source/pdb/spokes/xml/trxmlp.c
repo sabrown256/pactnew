@@ -65,7 +65,7 @@ static void _XML_init_parse(void)
     _XML.parse = SC_make_hasharr(HSZSMALL, FALSE, SC_HA_NAME_KEY, 0);
 
     SC_hasharr_install(_XML.parse, "<!--", (void *) _XML_parse_comment,
-		       "PFXMLParse", TRUE, TRUE);
+		       "PFXMLParse", 3, -1);
 
     _XML_init_dtd(_XML.parse);
 

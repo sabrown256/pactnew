@@ -37,7 +37,7 @@ void _SC_var_install(anadep *state, char *name, char *val, int line)
 	vd->line = line;
 	vd->text = CSTRSAVE(val);
 
-	SC_hasharr_install(state->variables, name, vd, "vardes", TRUE, TRUE);};
+	SC_hasharr_install(state->variables, name, vd, "vardes", 3, -1);};
 
     if (state->show_vars)
        {switch (line)
@@ -364,7 +364,7 @@ static void _SC_end_rule(ruledef *a, anadep *state)
 
 	else
 	   {rd = _SC_make_rule(name, a->name, a->line, dep, act);
-	    SC_hasharr_install(state->rules, name, rd, "ruledes", TRUE, TRUE);};
+	    SC_hasharr_install(state->rules, name, rd, "ruledes", 3, -1);};
 
 	CFREE(a->text);
 	a->nc   = 0;
@@ -856,7 +856,7 @@ static int _SC_do_subst_name(haelem *hp, void *a)
 	     else
                 nrd = _SC_copy_rule(t, rd);
 
-	     SC_hasharr_install(state->temp, t, nrd, "ruledes", TRUE, TRUE);}
+	     SC_hasharr_install(state->temp, t, nrd, "ruledes", 3, -1);}
 	 else
 	    _SC_merge_rule(t, rd->depend, rd->act, enr, state);};
 

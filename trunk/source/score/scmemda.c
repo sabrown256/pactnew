@@ -518,7 +518,7 @@ int SC_reg_mem(void *p, long length, char *name)
 
     SC_SET_BLOCK_ID(desc, SC_MEM_ID);
 
-    hp = SC_hasharr_install(_SC.mem_table, p, desc, "mem_descriptor", TRUE, TRUE);
+    hp = SC_hasharr_install(_SC.mem_table, p, desc, "mem_descriptor", 3, -1);
     if (hp != NULL)
        {SC_mem_stats_acc(length, 0L);
 	rv = TRUE;}

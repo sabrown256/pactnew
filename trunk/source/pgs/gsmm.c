@@ -359,7 +359,7 @@ void PG_register_device(char *name, PFRDev fnc)
 
     if ((name != NULL) && (fnc != NULL))
        {f = (void *) fnc;
-	SC_hasharr_install(_PG.device_table, name, f, type, FALSE, TRUE);};
+	SC_hasharr_install(_PG.device_table, name, f, type, 2, -1);};
 
     return;}
 

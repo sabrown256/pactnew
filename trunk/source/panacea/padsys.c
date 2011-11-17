@@ -103,7 +103,7 @@ PA_package *PA_gen_package(char *name, PFPkgGencmd cmd, PFPkgDfstrc dfs,
     _PA.last_gen = pck;
 
 /* install the package in the data base */
-    SC_hasharr_install(PA_variable_tab, name, pck, PAN_PACKAGE, TRUE, TRUE);
+    SC_hasharr_install(PA_variable_tab, name, pck, PAN_PACKAGE, 3, -1);
 
     return(pck);}
 
@@ -161,7 +161,7 @@ void PA_run_time_package(char *name, PFPkgDfstrc dfs, PFPkgDefun dfu,
     _PA.last_run = pck;
 
 /* install the package in the data base */
-    SC_hasharr_install(PA_variable_tab, name, pck, PAN_PACKAGE, TRUE, TRUE);
+    SC_hasharr_install(PA_variable_tab, name, pck, PAN_PACKAGE, 3, -1);
 
     return;}
 

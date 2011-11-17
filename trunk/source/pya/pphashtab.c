@@ -203,7 +203,7 @@ int PP_update_hashtab(hasharr *hashtab, PyObject *dict)
         }
 
         /* SC_hasharr_install will SC_mark vr */
-        entry = SC_hasharr_install(hashtab, keyname, vr, ptype, TRUE, TRUE);
+        entry = SC_hasharr_install(hashtab, keyname, vr, ptype, 3, -1);
         if (entry == NULL) {
             err = -1;
             break;

@@ -148,7 +148,7 @@ void PA_inst_c(char *cname, void *cvar, int ctype, int cnum,
     cp->handler = chand;
     cp->vr      = (int *) cvar;
  
-    SC_hasharr_install(PA_commands, cname, cp, PAN_COMMAND, TRUE, TRUE);
+    SC_hasharr_install(PA_commands, cname, cp, PAN_COMMAND, 3, -1);
 
     return;}
  
@@ -167,7 +167,7 @@ void PA_def_alias(char *name, char *type, void *pv)
     else
        v = SC_convert_id(id, NULL, 0, 1, id, pv, 0, 1, 1, FALSE);
 
-    SC_hasharr_install(PA_alias_tab, name, v, type, TRUE, TRUE);
+    SC_hasharr_install(PA_alias_tab, name, v, type, 3, -1);
 
     return;}
 

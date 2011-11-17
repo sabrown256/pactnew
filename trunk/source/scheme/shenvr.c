@@ -342,7 +342,7 @@ static void SS_add_to_frame(SS_psides *si, char *vr, object *vl, hasharr *tab)
    {int nc, ok;
     char *s, *t;
 
-    SC_hasharr_install(tab, vr, vl, SS_OBJECT_P_S, TRUE, TRUE);
+    SC_hasharr_install(tab, vr, vl, SS_OBJECT_P_S, 3, -1);
 
     if ((si->know_env) && (vr[0] == '$'))
        {t = _SS_sprintf(si, "%s", vl);
@@ -940,7 +940,7 @@ static object *_SS_make_ext_boolean(SS_psides *si, char *name, int val)
 
     o = SS_mk_boolean(si, name, val);
 
-    SC_hasharr_install(si->symtab, name, o, SS_POBJECT_S, TRUE, TRUE);
+    SC_hasharr_install(si->symtab, name, o, SS_POBJECT_S, 3, -1);
 
     SS_UNCOLLECT(o);
 

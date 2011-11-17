@@ -435,7 +435,7 @@ static void _NAC_build_name_table(PDBfile *file, char *names,
 
         ep = _PD_mk_syment(type, numb, addr, 0L, dims);
 
-        SC_hasharr_install(nt, name, ep, SYMENT_S, TRUE, TRUE);};
+        SC_hasharr_install(nt, name, ep, SYMENT_S, 3, -1);};
 
     return;}
 

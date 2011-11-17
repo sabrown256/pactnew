@@ -38,7 +38,7 @@ PP_hashtab_install(PP_hashtabObject *self,
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "sss:install", kw_list,
                                      &key, &obj, &type))
         return NULL;
-    SC_hasharr_install(self->data, key, obj, type, TRUE, TRUE);
+    SC_hasharr_install(self->data, key, obj, type, 3, -1);
     Py_INCREF(Py_None);
     return Py_None;
 /* DO-NOT-DELETE splicer.end(pdb.hashtab.method.install) */
@@ -496,7 +496,7 @@ PP_hashtab_mp_ass_subscript(PyObject *_self, PyObject *key, PyObject *v)
         if (ptype == NULL)
             return -1;
 
-        hp = SC_hasharr_install(hashtab, name, vr, ptype, TRUE, TRUE);
+        hp = SC_hasharr_install(hashtab, name, vr, ptype, 3, -1);
 
         /* XXX release vr as well */
         _PP_rl_descr(descr);

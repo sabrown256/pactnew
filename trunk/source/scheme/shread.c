@@ -615,7 +615,7 @@ object *SS_add_variable(SS_psides *si, char *name)
 
     op = SS_mk_variable(si, name, SS_null);
     SS_UNCOLLECT(op);
-    hp = SC_hasharr_install(si->symtab, name, op, SS_POBJECT_S, TRUE, TRUE);
+    hp = SC_hasharr_install(si->symtab, name, op, SS_POBJECT_S, 3, -1);
     if (hp == NULL)
        LONGJMP(SC_gs.cpu, ABORT);
 
@@ -640,7 +640,7 @@ void SS_add_parser(char *ext, object *(*prs)(SS_psides *si))
 	SS_add_parser(".scm", _SSI_scheme_mode);};
 
     ad.funcaddr = (PFInt) prs;
-    SC_hasharr_install(_SS.parser_tab, ext, ad.memaddr, "PFPObject", FALSE, TRUE);
+    SC_hasharr_install(_SS.parser_tab, ext, ad.memaddr, "PFPObject", 2, -1);
 
     return;}
 

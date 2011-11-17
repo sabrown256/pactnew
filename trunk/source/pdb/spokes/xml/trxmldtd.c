@@ -85,10 +85,10 @@ static char *_XML_parse_enddoc(FILE *fp, char *s)
 void _XML_init_dtd(hasharr *tab)
    {
 
-    SC_hasharr_install(tab, "<!ELEMENT", (void *) _XML_parse_element, "PFXMLParse", TRUE, TRUE);
-    SC_hasharr_install(tab, "<!ATTLIST", (void *) _XML_parse_attlist, "PFXMLParse", TRUE, TRUE);
-    SC_hasharr_install(tab, "<!DOCTYPE", (void *) _XML_parse_doctype, "PFXMLParse", TRUE, TRUE);
-    SC_hasharr_install(tab, "]>",        (void *) _XML_parse_enddoc,  "PFXMLParse", TRUE, TRUE);
+    SC_hasharr_install(tab, "<!ELEMENT", (void *) _XML_parse_element, "PFXMLParse", 3, -1);
+    SC_hasharr_install(tab, "<!ATTLIST", (void *) _XML_parse_attlist, "PFXMLParse", 3, -1);
+    SC_hasharr_install(tab, "<!DOCTYPE", (void *) _XML_parse_doctype, "PFXMLParse", 3, -1);
+    SC_hasharr_install(tab, "]>",        (void *) _XML_parse_enddoc,  "PFXMLParse", 3, -1);
 
     return;}
 

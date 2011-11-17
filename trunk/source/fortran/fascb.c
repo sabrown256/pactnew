@@ -191,7 +191,7 @@ FIXNUM FF_ID(schins, SCHINS)(FIXNUM *sha, FIXNUM *sncn, char *pname,
         ptr = s;};
 
     t  = CSTRSAVE(type),
-    hp = SC_hasharr_install(ha, name, ptr, t, FALSE, TRUE);
+    hp = SC_hasharr_install(ha, name, ptr, t, 2, -1);
 
     rv = _SC_to_number(hp);
 

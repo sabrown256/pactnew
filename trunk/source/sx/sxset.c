@@ -152,7 +152,7 @@ SS_psides *SX_init(char *code, char *vers, int c, char **v, char **env)
     _SX_var_tab = SS_mk_hasharr(si, PA_variable_tab);
     SS_UNCOLLECT(_SX_var_tab);
     if (SC_hasharr_install(si->symtab, "pa-variable-table", _SX_var_tab,
-			   SS_POBJECT_S, TRUE, TRUE) == NULL)
+			   SS_POBJECT_S, 3, -1) == NULL)
        SS_error(si, "CAN'T INSTALL PANACEA DATA BASE - SX_INIT_SYSTEM",
                 _SX_var_tab);
 

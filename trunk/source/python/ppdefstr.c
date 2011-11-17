@@ -325,7 +325,7 @@ PyTypeObject *PP_defstr_mk_ctor(PP_defstrObject *dpobj)
         return NULL;
 
     hp = SC_hasharr_install(_PP_defstr_tab, ctor, dpobj,
-			    "PP_defstrObject", TRUE, TRUE); 
+			    "PP_defstrObject", 3, -1); 
     if (hp == NULL) {
         return NULL;
     }
@@ -412,7 +412,8 @@ PP_defstrObject *_PP_defstr_make_singleton(
 
     /* Install object into the file's table */
     if (self != NULL) {
-        SC_hasharr_install(fileinfo->deftypes, dp->type, self, "PP_defstrObject", FALSE, TRUE);
+        SC_hasharr_install(fileinfo->deftypes, dp->type, self,
+			   "PP_defstrObject", 2, -1);
     }
 
     return self;
@@ -446,7 +447,7 @@ PP_defstrObject *_PP_defstr_find_singleton(
         if (rv != NULL) {
             /* This will use the new reference to install the item */
 	   SC_hasharr_install(fileinfo->deftypes,
-			      dp->type, rv, "PP_defstrObject", FALSE, TRUE);
+			      dp->type, rv, "PP_defstrObject", 2, -1);
         }
     }
 

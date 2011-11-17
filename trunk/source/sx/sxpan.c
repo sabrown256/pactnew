@@ -599,7 +599,7 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
 
     PA_VARIABLE_DATA(pp) = NULL;
 
-    SC_hasharr_install(PA_variable_tab, vname, pp, PAN_VARIABLE, TRUE, TRUE);
+    SC_hasharr_install(PA_variable_tab, vname, pp, PAN_VARIABLE, 3, -1);
 
 /* install scalars as implicit commands */
     if ((pp->n_dimensions == 0) && (PA_commands != NULL))
@@ -641,7 +641,7 @@ static object *_SXI_list_pan_pck(SS_psides *si)
          else
             {obj = SS_mk_variable(si, name, SS_null);
              SS_UNCOLLECT(obj);
-             if (SC_hasharr_install(si->symtab, name, obj, SS_POBJECT_S, TRUE, TRUE) == NULL)
+             if (SC_hasharr_install(si->symtab, name, obj, SS_POBJECT_S, 3, -1) == NULL)
                 SS_error(si, "CAN'T INSTALL PACKAGE - SX_INTERN_PACKAGE", obj);};
 
 /* put these in the top level environment frame
@@ -678,7 +678,7 @@ static object *_SXI_intern_packages(SS_psides *si)
          else
             {obj = SS_mk_variable(si, name, SS_null);
              SS_UNCOLLECT(obj);
-             if (SC_hasharr_install(si->symtab, name, obj, SS_POBJECT_S, TRUE, TRUE) == NULL)
+             if (SC_hasharr_install(si->symtab, name, obj, SS_POBJECT_S, 3, -1) == NULL)
                 SS_error(si, "CAN'T INSTALL PACKAGE - SX_INTERN_PACKAGE", obj);};
 
 /* put these in the top level environment frame

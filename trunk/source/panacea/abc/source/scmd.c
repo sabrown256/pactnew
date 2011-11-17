@@ -246,7 +246,7 @@ static void record_entry(char *name, double time, double *data)
     hp = SC_hasharr_lookup(srctab, name);
     if (hp == NULL)
        {tp = mk_time_list();
-        hp = SC_hasharr_install(srctab, name, tp, PAN_SOURCE, TRUE, TRUE);};
+        hp = SC_hasharr_install(srctab, name, tp, PAN_SOURCE, 3, -1);};
 
 /* cons the new time onto the list of times */
     tp       = (time_list *) (hp->def);
