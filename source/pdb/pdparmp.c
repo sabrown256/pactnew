@@ -1441,7 +1441,7 @@ static void _PD_pfm_setup_mp_file_d(PDBfile *file, SC_communicator comm)
  */
 
 static int64_t _PD_next_address_d(PDBfile *file, char *type, long number,
-				void *vr, int seekf, int tellf, int colf)
+				  void *vr, int seekf, int tellf, int colf)
    {int64_t addr;
 
     DBG("+ _PD_next_address_d");
