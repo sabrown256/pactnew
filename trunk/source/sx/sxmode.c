@@ -252,7 +252,7 @@ static void _SX_read(SS_psides *si, object *strm)
 
 /* change case */
 		else if ((*ptr != '\0') && (*ptr != '\n'))
-		   bf = SC_dsnprintf(FALSE, "change %s", t);
+		   bf = SC_dsnprintf(FALSE, "varset! %s", t);
 
 /* print case */
 		else
