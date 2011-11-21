@@ -47,9 +47,9 @@ scm annotate.scm binedit.scm compare.scm consts.scm csynt.scm
 scm fsynt.scm func.scm exec.scm help.scm lang.scm
 scm msynt.scm netcdf.scm panabgc.scm
 scm panache.scm panagc.scm panbgc.scm panint.scm panpgc.scm
-scm ezn.scm pdbvbatch.scm pdbvcmd.scm pdbvdat.scm pdbvdemo.scm
+scm ezn.scm pdbvbatch.scm pdbvcmd.scm pdbvar.scm pdbvdat.scm
 scm pdbview.pui pdbview.rc pdbview.scm pdbvio.scm pdbvplt.scm
-scm pdbvxmpl.scm pdbvthemes.scm nature.scm
+scm pdbvdemo.scm pdbvxmpl.scm pdbvthemes.scm nature.scm
 scm gcel.scm vcel.scm runt.scm rmath.scm slib.scm spokes.scm
 scm sxcomp.scm sxdm.scm sxview.scm synon.scm toolbox.scm
 scm tpu.scm trig.scm ultra.ini ultra.pui ultra.scm mouse.scm
