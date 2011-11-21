@@ -702,37 +702,9 @@ static int _PD_pfm_extend_file_t(PDBfile *file, long nb)
 
 int64_t _PD_next_address_t(PDBfile *file, char *type, long number,
 			   void *vr, int seekf, int tellf, int colf)
-   {int flag, ipt, sk;
-    inti nb;
-    intb bpi;
-    int64_t addr;
-    defstr *dpf;
+   {int64_t addr;
 
-    flag = ((file->mpi_mode == TRUE)  ||
-            (!file->mpi_file)) ? FALSE : TRUE;
-
-    dpf = _PD_type_lookup(file, PD_CHART_FILE, type);
-    ipt = _PD_items_per_tuple(dpf);
-
-    if (dpf->n_indirects == 0)
-       {bpi = dpf->size;
-	nb  = number*ipt*bpi;
-	sk  = TRUE;}
-
-    else if (vr == NULL)
-       {bpi = _PD_lookup_size(type, file->chart);
-	nb  = number*bpi;
-	sk  = TRUE;}
-
-    else
-       {nb  = PD_sizeof(file, type, number, vr);
-	nb *= ipt;
-	sk  = FALSE;};
-
-    addr = _PD_GETSPACE(file, nb, flag, colf);
-
-    if ((seekf) && (sk == TRUE))
-       _PD_set_current_address(file, addr+nb, SEEK_SET, PD_GENERIC);
+    addr = _PD_next_address_pf(file, type, number, vr, seekf, tellf, colf);
 
     return(addr);}
 
