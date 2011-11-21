@@ -691,15 +691,15 @@ extern int
 extern PD_smp_state
  *_PD_get_state(int id);
 
+extern int64_t
+ _PD_next_address_pf(PDBfile *file, char *type, long number,
+		     void *vr, int seekf, int tellf, int colf);
+
 
 /* PDPAR.C declarations */
 
 extern int
  _PD_init_t(void);
-
-extern int64_t
- _PD_next_address_t(PDBfile *file, char *type, long number,
-		    void *vr, int seekf, int tellf, int colf);
 
 
 /* PDSHAR.C declarations */

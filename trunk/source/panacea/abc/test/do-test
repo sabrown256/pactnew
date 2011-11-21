@@ -23,6 +23,10 @@ set RootDir  = $RootDir/$System
 set BinDir   = $RootDir/bin
 set IncDir   = $RootDir/include
 
+if (!(-d z-$System)) then
+   mkdir z-$System
+endif
+
 cd z-$System
 
 #--------------------------------------------------------------------------
