@@ -85,6 +85,11 @@ end
 
 # CHECK - verify that we can run netstat to get info
 
+if ($OS == "FreeBSD") then
+# traceroute never finishes
+   exit(1)
+endif
+
 set NETSTAT = `where netstat | head -n 1`
 if (!(-x $NETSTAT)) then
    exit(1)
