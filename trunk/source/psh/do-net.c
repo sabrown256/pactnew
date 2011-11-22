@@ -2191,11 +2191,12 @@ static void readhost(donetdes *st, int log)
           {nstrncpy(ml, MAXLINE, cwhich("mail"), -1);
 	   if (strcmp(ml, "none") == 0)
 	      {printf("\n");
-	       printf("Can't determine the mail program to be used\n");
+	       printf("No mail program found - no mail sent\n");
 	       printf("\n");
-	       exit(5);};};
+	       ml[0] = '\0';};};
 
-       st->mailer = STRSAVE(ml);};
+       if (ml[0] != '\0')
+	  st->mailer = STRSAVE(ml);};
 
 /* setup the log files names */
     snprintf(st->uplog, MAXLINE, "%s/%s", st->logdir, st->stamp);
