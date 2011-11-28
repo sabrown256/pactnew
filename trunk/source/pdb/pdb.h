@@ -334,6 +334,14 @@ enum e_PD_data_location
 typedef enum e_PD_data_location PD_data_location;
 
 
+enum e_PD_delay_mode
+   {PD_DELAY_NONE,
+    PD_DELAY_PTRS,
+    PD_DELAY_ALL};
+
+typedef enum e_PD_delay_mode PD_delay_mode;
+
+
 /* NOTE: see comment in scope_io.h concerning file_io_desc and the stream member
  *       here the buffer is the analog of the FILE *
  */
@@ -470,7 +478,7 @@ struct s_PDBfile
     PD_checksum_mode use_cksum;       /* session use of checksums */
     PD_checksum_mode file_cksum;      /* file use of checksums */
     int fix_denorm;
-    int eager_sym;
+    PD_delay_mode delay_sym;
 
     sys_layer *sys;
     tr_layer *tr;

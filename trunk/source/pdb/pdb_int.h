@@ -517,8 +517,7 @@ extern int
  _PD_items_per_tuple(defstr *dp),
  _PD_set_current_address(PDBfile *file, int64_t addr, int wh, PD_major_op tag),
  _PD_init_s(void),
- _PD_close(PDBfile *file),
- _PD_rd_symt(PDBfile *file, char *acc, char *rej);
+ _PD_close(PDBfile *file);
 
 extern int64_t
  _PD_eod(PDBfile *file),
@@ -577,6 +576,42 @@ extern char
  *_PD_var_name(char *s),
  *_PD_hyper_type(char *name, char *type),
  *_PD_var_namef(PDBfile *file, char *name, char *bf);
+
+
+/* PDPAR.C declarations */
+
+extern int
+ _PD_init_t(void);
+
+
+/* PDSHAR.C declarations */
+
+extern int
+ _PD_register(char *type, char *fmt, PFBinType hook,
+	      PFBinCreate creat, PFBinOpen open, PFBinClose close,
+	      PFBinWrite write, PFBinRead read),
+ _PD_pdbfilep(char *type);
+
+extern tr_layer
+ *_PD_lookup(char *type);
+
+extern void
+ _PD_install_funcs(void),
+ _PD_conv_in(PDBfile *file, void *out, void *in, char *type, inti ni);
+
+extern PDBfile
+ *_PD_open_bin(char *name, char *mode, void *a);
+
+extern inti
+ _PD_write_bin(PDBfile *file),
+ _PD_read_bin(PDBfile *file);
+
+extern int
+ _PD_close_bin(PDBfile *file),
+ _PD_spokep(char *type);
+
+extern char
+ *_PD_file_type(PDBfile *file);
 
 
 /* PDPARMP.C declarations */
@@ -696,46 +731,22 @@ extern int64_t
 		     void *vr, int seekf, int tellf, int colf);
 
 
-/* PDPAR.C declarations */
-
-extern int
- _PD_init_t(void);
-
-
-/* PDSHAR.C declarations */
-
-extern int
- _PD_register(char *type, char *fmt, PFBinType hook,
-	      PFBinCreate creat, PFBinOpen open, PFBinClose close,
-	      PFBinWrite write, PFBinRead read),
- _PD_pdbfilep(char *type);
-
-extern tr_layer
- *_PD_lookup(char *type);
-
-extern void
- _PD_install_funcs(void),
- _PD_conv_in(PDBfile *file, void *out, void *in, char *type, inti ni);
-
-extern PDBfile
- *_PD_open_bin(char *name, char *mode, void *a);
-
-extern inti
- _PD_write_bin(PDBfile *file),
- _PD_read_bin(PDBfile *file);
-
-extern int
- _PD_close_bin(PDBfile *file),
- _PD_spokep(char *type);
-
-extern char
- *_PD_file_type(PDBfile *file);
-
-
 /* PDSPOKE.C declarations */
 
 extern int
  _PD_register_spokes(void);
+
+
+/* PDSYMT.C declarations */
+
+extern int
+ _PD_add_entryp(char *name, char *acc, char *rej),
+ _PD_symt_delay_rules(PDBfile *file, int when, char **pa, char **pr),
+ _PD_pare_symt(PDBfile *file),
+ _PD_rd_symt(PDBfile *file, char *acc, char *rej);
+
+extern PD_delay_mode
+ _PD_symt_set_delay_mode(PDBfile *file, char *mode);
 
 
 #ifdef __cplusplus

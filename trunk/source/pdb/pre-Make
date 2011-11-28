@@ -90,7 +90,7 @@ Hdrs = pdb.h pdb_int.h
 #
 # Object Files
 #
-Objs = pdb.o pdbaib.o pdbmp.o pdser.o pdlow.o pdblk.o \
+Objs = pdb.o pdbaib.o pdbmp.o pdser.o pdlow.o pdsymt.o pdblk.o \
        pdrdwr.o pdptr.o pdprnt.o pdmemb.o \
        pdbmm.o pdconv.o pdpath.o pdbfc.o pdbnet.o pdshar.o \
        pdcsum.o pdbx.o pdmap.o pdszof.o pdbdir.o pdpar.o pdcomm.o \
@@ -98,7 +98,7 @@ Objs = pdb.o pdbaib.o pdbmp.o pdser.o pdlow.o pdblk.o \
 
 ArObjs = ${TGTLib}(pdb.o) ${TGTLib}(pdbaib.o)                        \
          ${TGTLib}(pdfmt.o) ${TGTLib}(pdfmta.o)                      \
-         ${TGTLib}(pdfmtb.o) ${TGTLib}(pdfmtc.o)                     \
+         ${TGTLib}(pdfmtb.o) ${TGTLib}(pdfmtc.o) ${TGTLib}(pdsymt.o) \
          ${TGTLib}(pdcomm.o) ${TGTLib}(pdbmp.o) ${TGTLib}(pdser.o)   \
          ${TGTLib}(pdlow.o) ${TGTLib}(pdrdwr.o) ${TGTLib}(pdptr.o)   \
          ${TGTLib}(pdmemb.o) ${TGTLib}(pdgs.o) ${TGTLib}(pdcsum.o)   \
