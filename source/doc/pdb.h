@@ -1,5 +1,5 @@
 TXT: PDBLib User's Manual
-MOD: 09/28/2011
+MOD: 11/28/2011
 
 <CENTER>
 <P>
@@ -31,6 +31,8 @@ MOD: 09/28/2011
 <a href="#pdb_mm"><dt><dd>Memory Management Considerations</a>
 
 <a href="#pdb_udl"><dt><dd>PDB Universal Data Locators</a>
+
+<a href="#pdb_dsy"><dt><dd>Delayed Symbol Table Management</a>
 
 <a href="#pdb_txt"><dt><dd>Binary and Text Data</a>
 
@@ -1018,6 +1020,65 @@ standard kinds of files have the following types:
 <tr><td align="center" width="100">XML</td><td align="center" width="100">XMLfile</td></tr>
 </table>
 </center>
+
+<!-- -------------------------------------------------------------------- --> 
+<!-- -------------------------------------------------------------------- --> 
+
+<a name="pdb_dsy"><h2>Delayed Symbol Table Management</h2></a>
+
+As of PDB version 28, PDBLib has additional options for reading and
+managing the symbol table of a PDB file.  By default when you open
+a PDB file, PDBLib reads the entire symbol table and constructs a
+hash array of the entries for optimimum lookup speed.  For very large
+databases where it may be prohibitive to hold the entire symbol table
+in memory, there are now options for keeping only part of the
+symbol table in memory at any given time.
+<p>
+Making symbol table entries that PDBLib can lookup is delayed until
+you call PD_cd to enter a directory.  At that time, the symbol
+table is read in and only the entries for the directory and its
+sub-directories are added to the symbol table.  When you call
+<a href="#pd_cd"><tt>PD_cd</tt></a>
+to enter another directory the current entries are purged
+from the hash array before adding the new entries.  In this way
+only the entries for the current directory tree are available.
+<p>
+This give users a way to manage very large database files with
+a smaller footprint in main memory.  It should be clear that
+this comes at the expense of re-reading the entire symbol table on the
+disk file when you change directories.  PDBLib just does not keep
+entries that are not in the current directory tree.  The memory
+savings can be very large.  As with all database operations, it
+depends on your database.
+<p>
+Doing delays at the directory level is a compromise.  If the
+delay were at the variable level, re-reading the symbol table from
+the file for every variable would be ruinously expensive. Also
+navigating or browsing the file would be practically impossible.
+At the directory level, you have a chance to access several
+entries for each symbol table read.
+<p>
+In order for this to be a useful mechanism there is a key exception.
+All of the entries for directories are added to the hash array.
+This permits you do use
+<a href="#pd_ls"><tt>PD_ls</tt></a>
+in combination with
+<a href="#pd_cd"><tt>PD_cd</tt></a>
+ to navigate around the file.
+<p>
+There are two delayed modes.  In the first, all entries are delayed.
+are delayed. While in the second, only the pointers are delayed.
+Remember that the pointee of every pointer has its own entry in
+the symbol table.  They are pretty much invisible to the user, but
+they may constitute a substantial percentage of the symbol table
+and the in memory hash array.  Delaying adding such entries may
+give a big memory savings.
+<p>
+The delay mode is specified when you open the file.  The file
+mode "rp" causes the file to be opened in delayed pointer mode,
+and the mode "rs" cause the file to be opened in delayed symbol
+mode (all entries delayed).
+<p>
 
 <!-- -------------------------------------------------------------------- --> 
 <!-- -------------------------------------------------------------------- --> 

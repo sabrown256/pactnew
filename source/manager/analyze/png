@@ -28,9 +28,11 @@ SafeEnv HAVE_PNGLIB  FALSE
 # do NOT detect it
 if ("$PNG_Path" == none) then
    NoteD $ALog "      no PNG (by request)"
+   setenv HAVE_PNGLIB  FALSE
 
 else if ($Z_Path == none) then
    NoteD $ALog "      has PNG (no libz)"
+   setenv HAVE_PNGLIB  FALSE
 
 else
 

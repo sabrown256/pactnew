@@ -33,8 +33,9 @@ int
  */
 
 int PD_cd(PDBfile *file ARG(,,cls), char *dirname)
-   {int rv;
+   {int rv, ok;
     char name[MAXLINE];
+    char *acc, *rej;
     syment *ep;
     PD_smp_state *pa;
 
@@ -76,18 +77,19 @@ int PD_cd(PDBfile *file ARG(,,cls), char *dirname)
         return(FALSE);}
 
     else
-       {if (file->current_prefix != NULL)
+       {_PD_pare_symt(file);
+	if (file->current_prefix != NULL)
            CFREE(file->current_prefix);
         file->current_prefix = CSTRSAVE(name);}
 
     rv = TRUE;
 
-    if (file->eager_sym == FALSE)
-       {char acc[MAXLINE];
+    ok = _PD_symt_delay_rules(file, 1, &acc, &rej);
+    if (ok == TRUE)
+       rv = _PD_rd_symt(file, acc, "*");
 
-	snprintf(acc, MAXLINE, "%s*#%s",
-		 file->ptr_base, file->current_prefix);
-	rv = _PD_rd_symt(file, acc, "*");};
+    CFREE(acc);
+    CFREE(rej);
 
     return(rv);}
 

@@ -28,6 +28,7 @@ SafeEnv HAVE_JPEGLIB  FALSE
 # do NOT detect it
 if ("$JPEG_Path" == none) then
    NoteD $ALog "      no JPEG (by request)"
+   setenv HAVE_JPEGLIB  FALSE
 
 else
 

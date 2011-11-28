@@ -10,6 +10,14 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
+(define-macro (var? x)
+    (printf nil "%s %s a file variable\n"
+	    x
+	    (if (file-variable? current-file x) "is" "is not")))
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
 ; create data file
 
 cf pdptr.pdb "w"
@@ -35,16 +43,16 @@ close pdptr.pdb
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; open the file
+; open the file in delay pointer mode
 
 cf pdptr.pdb "rp"
 
 ls
 
-; these should not work with eager pointers off
+; these should not work with delayed pointers
 
 printf nil "---------------------------------------\n"
-printf nil "  full path\n"
+printf nil "  full path, delay pointers mode\n"
 
 /ints/cn
 /ints/an
@@ -60,7 +68,7 @@ printf nil "  full path\n"
 
 printf nil "\n"
 printf nil "---------------------------------------\n"
-printf nil "  /ints directory\n"
+printf nil "  /ints directory, delay pointers mode\n"
 
 cd /ints
 
@@ -73,7 +81,7 @@ varprint sn
 
 printf nil "\n"
 printf nil "---------------------------------------\n"
-printf nil "  /floats directory\n"
+printf nil "  /floats directory, delay pointers mode\n"
 
 cd /floats
 
@@ -82,6 +90,70 @@ varprint as
 varprint es
 varprint ss
 
+close pdptr.pdb
+
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
+
+; open the file in delay all mode
+
+cf pdptr.pdb "rs"
+
+ls
+
+; these should not work with delayed symbols
+
+printf nil "---------------------------------------\n"
+printf nil "  full path, delay all mode\n"
+printf nil "\n"
+
+var? /ints/cn
+var? /ints/an
+var? /ints/en
+var? /ints/sn
+
+var? /floats/cs
+var? /floats/as
+var? /floats/es
+var? /floats/ss
+
+; these should work in all cases
+
+printf nil "\n"
+printf nil "---------------------------------------\n"
+printf nil "  /ints directory, delay all mode\n"
+printf nil "\n"
+
+cd /ints
+
+var? /ints/cn
+var? /floats/cs
+
+varprint cn
+varprint an
+varprint en
+varprint sn
+
+; these should work in all cases
+
+printf nil "\n"
+printf nil "---------------------------------------\n"
+printf nil "  /floats directory, delay all mode\n"
+printf nil "\n"
+
+cd /floats
+
+var? /ints/cn
+var? /floats/cs
+
+varprint cs
+varprint as
+varprint es
+varprint ss
+
+close pdptr.pdb
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
 end

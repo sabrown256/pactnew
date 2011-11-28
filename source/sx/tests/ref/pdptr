@@ -1,7 +1,7 @@
 
 floats/   ints/
 ---------------------------------------
-  full path
+  full path, delay pointers mode
 
 /ints/cn(0,0) =          1
 /ints/cn(0,1) =          2
@@ -42,7 +42,7 @@ floats/   ints/
 /floats/ss = (nil)
 
 ---------------------------------------
-  /ints directory
+  /ints directory, delay pointers mode
 
 /ints/cn(0,0) =          1
 /ints/cn(0,1) =          2
@@ -81,7 +81,104 @@ floats/   ints/
 /ints/sn(1)(3) =          9
 
 ---------------------------------------
-  /floats directory
+  /floats directory, delay pointers mode
+
+/floats/cs(0,0) =  1.0000000e+00
+/floats/cs(0,1) =  2.0000000e+00
+/floats/cs(1,0) =  3.0000000e+00
+/floats/cs(1,1) =  4.0000000e+00
+/floats/cs(2,0) =  5.0000000e+00
+/floats/cs(2,1) =  6.0000000e+00
+/floats/cs(3,0) =  7.0000000e+00
+/floats/cs(3,1) =  8.0000000e+00
+/floats/cs(4,0) =  9.0000000e+00
+/floats/cs(4,1) =  1.0000000e+01
+
+/floats/as(0) =  1.0000000e+00
+/floats/as(1) =  2.0000000e+00
+/floats/as(2) =  3.0000000e+00
+/floats/as(3) =  4.0000000e+00
+
+/floats/es(0)(0) = -1.0000000e+00
+/floats/es(0)(1) = -2.0000000e+00
+/floats/es(0)(2) = -3.0000000e+00
+/floats/es(1)(0) =  4.0000000e+01
+/floats/es(1)(1) =  5.0000000e+01
+/floats/es(2)(0) =  6.0000000e+00
+/floats/es(2)(1) =  7.0000000e+00
+/floats/es(2)(2) =  8.0000000e+00
+/floats/es(2)(3) =  9.0000000e+00
+
+/floats/ss(0)(0) =  1.0000000e+00
+/floats/ss(0)(1) =  2.0000000e+00
+/floats/ss(0)(2) =  3.0000000e+00
+/floats/ss(0)(3) =  4.0000000e+00
+/floats/ss(0)(4) =  5.0000000e+00
+/floats/ss(1)(0) =  6.0000000e+00
+/floats/ss(1)(1) =  7.0000000e+00
+/floats/ss(1)(2) =  8.0000000e+00
+/floats/ss(1)(3) =  9.0000000e+00
+
+floats/   ints/
+---------------------------------------
+  full path, delay all mode
+
+/ints/cn is not a file variable
+/ints/an is not a file variable
+/ints/en is not a file variable
+/ints/sn is not a file variable
+/floats/cs is not a file variable
+/floats/as is not a file variable
+/floats/es is not a file variable
+/floats/ss is not a file variable
+
+---------------------------------------
+  /ints directory, delay all mode
+
+/ints/cn is a file variable
+/floats/cs is not a file variable
+
+/ints/cn(0,0) =          1
+/ints/cn(0,1) =          2
+/ints/cn(0,2) =          3
+/ints/cn(0,3) =          4
+/ints/cn(0,4) =          5
+/ints/cn(1,0) =          6
+/ints/cn(1,1) =          7
+/ints/cn(1,2) =          8
+/ints/cn(1,3) =          9
+/ints/cn(1,4) =         10
+
+/ints/an(0) =          1
+/ints/an(1) =          2
+/ints/an(2) =          3
+/ints/an(3) =          4
+
+/ints/en(0)(0) =         -1
+/ints/en(0)(1) =         -2
+/ints/en(0)(2) =         -3
+/ints/en(1)(0) =         40
+/ints/en(1)(1) =         50
+/ints/en(2)(0) =          6
+/ints/en(2)(1) =          7
+/ints/en(2)(2) =          8
+/ints/en(2)(3) =          9
+
+/ints/sn(0)(0) =          1
+/ints/sn(0)(1) =          2
+/ints/sn(0)(2) =          3
+/ints/sn(0)(3) =          4
+/ints/sn(0)(4) =          5
+/ints/sn(1)(0) =          6
+/ints/sn(1)(1) =          7
+/ints/sn(1)(2) =          8
+/ints/sn(1)(3) =          9
+
+---------------------------------------
+  /floats directory, delay all mode
+
+/ints/cn is not a file variable
+/floats/cs is a file variable
 
 /floats/cs(0,0) =  1.0000000e+00
 /floats/cs(0,1) =  2.0000000e+00

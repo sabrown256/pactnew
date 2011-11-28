@@ -513,7 +513,7 @@ static int _PD_rd_chrt_iii(PDBfile *file)
 
 static int _PD_parse_symt_iii(PDBfile *file, char *buf, int flag,
 			      char *acc, char *rej)
-   {int skip;
+   {int ok;
     long bsz, nc;
     int64_t addr, numb;
     char *name, *type, *var, *adr, *s, *local;
@@ -554,11 +554,8 @@ static int _PD_parse_symt_iii(PDBfile *file, char *buf, int flag,
         name = SC_strtok(desc->name, " \t", s);
 
 /* check to see whether or not so skip this entry */
-	skip = ((rej != NULL) && (SC_regx_match(name, rej) == TRUE));
-	if (skip == TRUE)
-	   skip = ((acc == NULL) || (SC_regx_match(name, acc) == FALSE));
-
-	if (skip == FALSE)
+	ok = _PD_add_entryp(name, acc, rej);
+	if (ok == TRUE)
 	   {type = desc->type;
 	    dims = desc->dimensions;
 
@@ -1243,7 +1240,6 @@ static int _PD_wr_fmt_iii(PDBfile *file)
 static int _PD_open_iii(PDBfile *file)
    {int nb;
     char str[MAXLINE], key[MAXLINE];
-    char sr[MAXLINE];
     char *acc, *rej, *s, *ps;
     FILE *fp;
     PD_smp_state *pa;
@@ -1254,11 +1250,7 @@ static int _PD_open_iii(PDBfile *file)
 
     file->use_itags = ITAGS;
 
-    acc = NULL;
-    rej = NULL;
-    if (file->eager_sym == FALSE)
-       {snprintf(sr, MAXLINE, "%s*#/*", file->ptr_base);
-	rej = sr;};
+    _PD_symt_delay_rules(file, 0, &acc, &rej);
 
 /* read the trailer */
     nb = MAXLINE - 1;
@@ -1322,6 +1314,9 @@ static int _PD_open_iii(PDBfile *file)
 /* if this file already contains a valid checksum, default file checksums to on */
     if (PD_verify(file) == TRUE)
        PD_activate_cksum(file, PD_MD5_FILE);
+
+    CFREE(acc);
+    CFREE(rej);
 
     return(TRUE);}
 

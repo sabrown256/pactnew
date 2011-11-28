@@ -238,7 +238,7 @@ static int _PD_rd_fmt_ii(PDBfile *file)
 
 static int _PD_parse_symt_ii(PDBfile *file, char *buf, int flag,
 			     char *acc, char *rej)
-   {int i;
+   {int i, ok;
     long mini, leng, bsz;
     int64_t addr, numb;
     char *name, *type, *tmp, *pbf, *s, *local;
@@ -258,25 +258,28 @@ static int _PD_parse_symt_ii(PDBfile *file, char *buf, int flag,
 	 name = SC_strtok(local, "\001", s);
 	 if (name == NULL)
             break;
-	 type = SC_strtok(NULL, "\001", s);
-	 numb = SC_stol(SC_strtok(NULL, "\001", s));
-	 addr = SC_stol(SC_strtok(NULL, "\001", s));
-	 dims = NULL;
-	 while ((tmp = SC_strtok(NULL, "\001\n", s)) != NULL)
-            {mini = SC_stol(tmp);
-	     leng = SC_stol(SC_strtok(NULL, "\001\n", s));
-	     next = _PD_mk_dimensions(mini, leng);
-	     if (dims == NULL)
-                dims = next;
 
-	     else
-                {prev->next = next;
-		 SC_mark(next, 1);};
+	ok = _PD_add_entryp(name, acc, rej);
+	if (ok == TRUE)
+	   {type = SC_strtok(NULL, "\001", s);
+	    numb = SC_stol(SC_strtok(NULL, "\001", s));
+	    addr = SC_stol(SC_strtok(NULL, "\001", s));
+	    dims = NULL;
+	    while ((tmp = SC_strtok(NULL, "\001\n", s)) != NULL)
+	       {mini = SC_stol(tmp);
+		leng = SC_stol(SC_strtok(NULL, "\001\n", s));
+		next = _PD_mk_dimensions(mini, leng);
+		if (dims == NULL)
+		   dims = next;
 
-	     prev = next;};
+		else
+		   {prev->next = next;
+		    SC_mark(next, 1);};
 
-	 ep = _PD_mk_syment(type, numb, addr, NULL, dims);
-	 _PD_e_install(file, name, ep, flag);};
+		prev = next;};
+
+	    ep = _PD_mk_syment(type, numb, addr, NULL, dims);
+	    _PD_e_install(file, name, ep, flag);};};
 
     SC_ASSERT(i >= 0);
 
@@ -1317,7 +1320,7 @@ static int _PD_wr_fmt_ii(PDBfile *file)
 
 static int _PD_open_ii(PDBfile *file)
    {char str[MAXLINE];
-    char *token, *s;
+    char *acc, *rej, *token, *s;
     FILE *fp;
     PD_smp_state *pa;
 
@@ -1326,6 +1329,8 @@ static int _PD_open_ii(PDBfile *file)
     fp = pa->ofp;
 
     file->use_itags = TRUE;
+
+    _PD_symt_delay_rules(file, 0, &acc, &rej);
 
 /* read the primitive data type formats which set the standard */
     if (!_PD_rd_fmt_ii(file))
@@ -1361,7 +1366,7 @@ static int _PD_open_ii(PDBfile *file)
 /* read the symbol table */
     if (lio_seek(fp, file->symtaddr, SEEK_SET))
        PD_error("FSEEK FAILED SYMBOL TABLE - PD_OPEN", PD_OPEN);
-    if (!_PD_rd_symt(file, NULL, NULL))
+    if (!_PD_rd_symt(file, acc, rej))
        PD_error("CAN'T READ SYMBOL TABLE - PD_OPEN", PD_OPEN);
 
 /* read the miscellaneous data */
@@ -1390,6 +1395,9 @@ static int _PD_open_ii(PDBfile *file)
 /* if this file already contains a valid checksum, default file checksums to on */
     if (PD_verify(file) == TRUE)
        PD_activate_cksum(file, PD_MD5_FILE);
+
+    CFREE(acc);
+    CFREE(rej);
 
     return(TRUE);}
 
