@@ -61,13 +61,15 @@ static int _SX_get_line_length(FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_SETUP_CLABELS - Set up SX_current_table_labels--an array of column
- *                  - label strings.  The input is label, the string containing
- *                  - potential column labels, and nc, the number of columns.
- *                  - The input string will be cracked into tokens, and if there
- *                  - are nc or nc+1 of them they will be stored as nc column
- *                  - labels.  If there are nc+1 tokens the first will be assumed
- *                  - to be a comment character and disregarded.
+/* _SX_SETUP_CLABELS - set up SX_current_table_labels
+ *                   - an array of column label strings
+ *                   - the input is label, the string containing
+ *                   - potential column labels, and nc, the number of columns
+ *                   - the input string will be cracked into tokens, and if there
+ *                   - are nc or nc+1 of them they will be stored as nc column
+ *                   - labels
+ *                   - if there are nc+1 tokens the first will be assumed
+ *                   - to be a comment character and disregarded
  */                    
 
 static int _SX_setup_clabels(char *label, int nc, int linelen)  

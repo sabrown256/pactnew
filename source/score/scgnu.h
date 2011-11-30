@@ -20,19 +20,25 @@
 
 /*--------------------------------------------------------------------------*/
 
-/* for GNU C versions before 4.x when full C99 support came along
- * this was done for 3.4.3
+/* handle the cases:
+ *   1) GNU C versions before 4.x when full C99 support came along
+ *      e.g. Solaris 11 with GCC 3.4.3
+ *   2) an incomplete installation of 4.x with no complex.h
+ *      e.g. Cygwin 1.7
  */
 
 #if (__GNUC__ < 4)
-# include <complex.h>
+# undef complex
 # undef I
-# ifndef I
-#  define I 	(__extension__ 1.0iF)
-# endif
-
 typedef unsigned int u_int32_t;
+#endif
 
+#ifndef complex
+# define complex _Complex
+#endif
+
+#ifndef I
+# define I 	(__extension__ 1.0iF)
 #endif
 
 #define _FORTIFY_SOURCE 2
