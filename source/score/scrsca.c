@@ -77,6 +77,10 @@
 # include <sys/sysctl.h>
 # include <mach/task.h>
 # include <mach/mach_init.h>
+
+#elif defined(FREEBSD)
+# include <sys/sysctl.h>
+# include <sys/user.h>
 #endif
 
 /*--------------------------------------------------------------------------*/
@@ -505,6 +509,91 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	    ru->nvcsw  = tei.csw;      /* voluntary context switches */
 	    ru->nivcsw = tei.csw;      /* involuntary context switches */
 	    ru->nsysc  = scm + scu;};  /* system calls */
+
+	rv = TRUE;};
+
+#elif defined(FREEBSD)
+
+       {int i, na, nr, nc, st;
+	int mib[4];
+	size_t sz;
+	char *pc, *ps, *pd, *pe;
+	double ust, syt;
+	struct timeval *us, *sy;
+	struct kinfo_proc *kp;
+	struct rusage *kru;
+	static double mby = 1.0/(1024.0*1024.0);
+
+	sz = 0;
+
+/* get pid and parent pid info */
+	mib[0] = CTL_KERN;
+	mib[1] = KERN_PROC;
+	mib[2] = KERN_PROC_PID;
+	mib[3] = pid;
+
+	st = sysctl(mib, 4, NULL, &sz, NULL, 0);
+	if (st == 0)
+	   {kp = (struct kinfo_proc *) CMAKE_N(char, sz);
+
+	    st = sysctl(mib, 4, kp, &sz, NULL, 0);
+	    if (st == 0)
+	       {kru = &kp->ki_rusage;
+
+		us = &kru->ru_utime;
+		sy = &kru->ru_stime;
+
+		ust = us->tv_sec + us->tv_usec*1.0e-6;
+		syt = sy->tv_sec + sy->tv_usec*1.0e-6;
+
+		ru->uid    = kp->ki_ruid;
+		ru->ppid   = kp->ki_ppid;
+		ru->ut     = ust;
+		ru->st     = syt;
+		ru->maxrss = kru->ru_maxrss*mby;
+		ru->majflt = kru->ru_majflt;      /* major faults */
+		ru->msgsnd = kru->ru_msgsnd;      /* IPC messages sent */
+		ru->msgrcv = kru->ru_msgrcv;      /* IPC messages received */
+		ru->nvcsw  = kru->ru_nvcsw;       /* voluntary context switches */
+		ru->nivcsw = kru->ru_nivcsw;      /* involuntary context switches */
+		ru->nsysc  = 0;};                 /* system calls */
+
+	    CFREE(kp);};
+
+/* get command line */
+	mib[0] = CTL_KERN;
+	mib[1] = KERN_ARGMAX;
+
+	sz = sizeof(na);
+
+	st = sysctl(mib, 2, &na, &sz, NULL, 0);
+	if (st == 0)
+	   {if (na > MAX_BFSZ)
+	       {pc = CMAKE_N(char,  na);
+
+		mib[0] = CTL_KERN;
+		mib[1] = KERN_PROC_ARGS;
+		mib[2] = pid;
+
+		sz = na;
+		st = sysctl(mib, 3, pc, &sz, NULL, 0);
+		if (st == 0)
+		   {ps = pc;
+		    pe = pc + sz;
+		    pd = ru->cmd;
+		    nr = sizeof(ru->cmd);
+		    *pd = '\0';
+		    for (i = 0; (ps < pe); i++)
+		        {nc = strlen(ps);
+
+			 if ((i != 1) || (strncmp(ps, pd, nc) != 0))
+			    SC_vstrcat(pd, nr, "%s ", ps);
+
+		         ps += nc;
+			 while ((ps - pe < 0) && (*ps == '\0'))
+			    ps++;};};
+			     
+		CFREE(pc);};};
 
 	rv = TRUE;};
 
