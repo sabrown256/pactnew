@@ -143,7 +143,7 @@ source $ldir/env-csh
 #            Note $STDOUT '# endif'
 #            Note $STDOUT ''
 
-            if ($HostOS != FreeBSD) then
+            if (($HostOS != FreeBSD) && ($HostOS != SunOS)) then
                Note $STDOUT '# ifndef _XOPEN_SOURCE'
                Note $STDOUT "#  define _XOPEN_SOURCE     ${XOPEN_STD}"
                Note $STDOUT '# endif'

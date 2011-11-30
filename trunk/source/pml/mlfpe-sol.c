@@ -27,6 +27,7 @@ extern long
 void _PM_enable_fpe(int flg, PFSignal_handler hnd)
    {
 
+#ifndef __GNUC__
     if (flg)
        {nonstandard_arithmetic();
 	if (ieee_handler("set", "common", hnd) != 0)
@@ -35,6 +36,7 @@ void _PM_enable_fpe(int flg, PFSignal_handler hnd)
        {standard_arithmetic();
 	if (ieee_handler("clear", "common", NULL) != 0)
            PRINT(stdout, "CAN'T CLEAR FPE HANDLING - _PM_ENABLE_FPE");};
+#endif
 
     return;}
 

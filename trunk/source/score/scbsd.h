@@ -51,41 +51,6 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-#ifdef __GNUC__
-
-/*--------------------------------------------------------------------------*/
-
-# ifndef __cplusplus
-#  ifdef ISO_C99
-
-extern int
- getpagesize(void);
-
-#  endif
-
-/* older compilers in the 3.x series are missing these */
-extern long double
- powl(long double x, long double y),
- expl(long double x),
- sqrtl(long double x);
-
-# endif
-
-# ifdef HAVE_GNU_LIBC_6
-
-#  include <sys/wait.h>
-
-# else
-
-extern int
- bsd_ioctl(int fildes, int request, ...);
-
-# endif
-
-/*--------------------------------------------------------------------------*/
-
-#endif
-
 /*--------------------------------------------------------------------------*/
 
 #ifdef __cplusplus
