@@ -334,7 +334,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 
 #elif defined(SOLARIS)
 
-       {int i, fd, nb, nc;
+       {int fd, nb, nc;
 	char *fname;
 	double ut, st;
 	pstatus_t sp;
@@ -660,7 +660,7 @@ int SC_set_resource_limits(int64_t mem, int64_t cpu, int64_t fsz,
 	rv |= setrlimit(RLIMIT_NOFILE, &rl);};
 
 /* set number of processes limit */
-#if !defined(AIX) && !defined(CYGWIN)
+#if !defined(AIX) && !defined(CYGWIN) && !defined(SOLARIS)
     if (nprc == -1)
        nprc = SC_stoi(getenv("SC_EXEC_RLIMIT_NPROC"));
     if (nprc > 0)
@@ -722,7 +722,7 @@ int SC_get_resource_limits(int64_t *pmem, int64_t *pcpu, int64_t *pfsz,
 	   *pnfd = -1;};
 
 /* get number of processes limit */
-#if !defined(AIX) && !defined(CYGWIN)
+#if !defined(AIX) && !defined(CYGWIN) && !defined(SOLARIS)
     if (pnprc != NULL)
        {rv |= getrlimit(RLIMIT_NPROC, &rl);
 	if (rv == 0)

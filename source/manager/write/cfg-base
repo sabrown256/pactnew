@@ -94,11 +94,19 @@
            echo "include compilers/osf" >>& $Tmp
            breaksw
       case sunos:
-           set CCRoot = `$Which cc`
-           set CCRoot = $CCRoot:h
+           set CCSys = `$Which cc`
+           set CCRoot = $CCSys:h
            set CCRoot = $CCRoot:h
            echo "setenv PACT_CC_PATH $CCRoot" >>& $Tmp
-           echo "include compilers/sol" >>& $Tmp
+           echo "setenv PACT_FC_PATH $CCRoot" >>& $Tmp
+           if (-x "$CCSys") then
+              $CCSys -v |& grep gcc >& /dev/null
+              if ($status == 0) then
+                 echo "include compilers/gnu-sol" >>& $Tmp
+              else
+                 echo "include compilers/sol" >>& $Tmp
+              endif
+           endif
            echo 'setenv TEST_ADVISORY ${TEST_ADVISORY}:score_mpi' >>& $Tmp
            breaksw
       default:

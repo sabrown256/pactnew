@@ -19,15 +19,12 @@
 
 #ifdef AIX
 # include <termios.h>
-#else
-# include <sys/termios.h>
-#endif
-
-#ifdef AIX
 # ifdef HAVE_SELECT_P
 #  include <sys/select.h>
 # endif
 # define BAD_FLUSH_SEMANTICS
+#else
+# include <sys/termios.h>
 #endif
 
 #ifdef MACOSX
