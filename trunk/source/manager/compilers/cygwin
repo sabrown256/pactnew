@@ -26,3 +26,7 @@ Group Cfg {
    LD_Flags = ${LD_Flags}
 }
 
+Group Shared {
+   CC_Flags = 
+}
+
