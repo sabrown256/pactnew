@@ -239,6 +239,43 @@ int SC_free_mem(double *mem)
 
      io_close(fp);}
 
+#elif defined(MACOSX)
+    {int ok;
+     char path[PATH_MAX];
+     char *cmd;
+
+     ok = SC_full_path("pcexec", path, PATH_MAX);
+     if (ok == 0)
+        {cmd = "(pcexec -c 1 top | head -n 10 | awk '($1 ~ /PhysMem/) { print }')";
+	 st  = SC_exec(&res, cmd, NULL, -1);
+	 if (st == 0)
+	    {mem[0] = _SC_mem_real(res[0], 8,  " \t\n\r");
+	     mem[1] = _SC_mem_real(res[0], 10, " \t\n\r");
+
+	     mem[0] += mem[1];};}
+     else
+        {mem[0] = 1.0;
+	 mem[1] = 1.0;};}
+
+#elif defined(FREEBSD)
+    char *cmd;
+
+    cmd = "(top -b -n 1 | head -n 10 | awk '($1 ~ /Mem/) { print }')";
+    st  = SC_exec(&res, cmd, NULL, -1);
+    if (st == 0)
+       {mem[0]  = _SC_mem_real(res[0], 2, " \t\n\r");    /* active */
+	mem[1]  = _SC_mem_real(res[0], 12, " \t\n\r");   /* free */
+	mem[0] += mem[1];};
+
+#elif defined(SOLARIS)
+    char *cmd;
+
+    cmd = "(top -b -n 1 | head -n 10 | awk '($1 ~ /Memory/) { print }')";
+    st  = SC_exec(&res, cmd, NULL, -1);
+    if (st == 0)
+       {mem[0] = _SC_mem_real(res[0], 2, " \t\n\r");
+	mem[1] = _SC_mem_real(res[0], 4, " \t\n\r");};
+
 #elif defined(AIX)
     char *cmd;
 
@@ -271,42 +308,6 @@ int SC_free_mem(double *mem)
        {mem[0] = _SC_mem_real(res[0], 2, " \t\n\r");
 	mem[1] = _SC_mem_real(res[0], 6, " \t\n\r");};
 
-#elif defined(FREEBSD)
-    char *cmd;
-
-    cmd = "(top -b -n 1 | head -n 10 | awk '($1 ~ /Mem/) { print }')";
-    st  = SC_exec(&res, cmd, NULL, -1);
-    if (st == 0)
-       {mem[0]  = _SC_mem_real(res[0], 2, " \t\n\r");    /* active */
-	mem[1]  = _SC_mem_real(res[0], 12, " \t\n\r");   /* free */
-	mem[0] += mem[1];};
-
-#elif defined(SOLARIS)
-    char *cmd;
-
-    cmd = "(top -b -n 1 | head -n 10 | awk '($1 ~ /Memory/) { print }')";
-    st  = SC_exec(&res, cmd, NULL, -1);
-    if (st == 0)
-       {mem[0] = _SC_mem_real(res[0], 2, " \t\n\r");
-	mem[1] = _SC_mem_real(res[0], 4, " \t\n\r");};
-
-#elif defined(MACOSX)
-    {int ok;
-     char path[PATH_MAX];
-     char *cmd;
-
-     ok = SC_full_path("pcexec", path, PATH_MAX);
-     if (ok == 0)
-        {cmd = "(pcexec -c 1 top | head -n 10 | awk '($1 ~ /PhysMem/) { print }')";
-	 st  = SC_exec(&res, cmd, NULL, -1);
-	 if (st == 0)
-	    {mem[0] = _SC_mem_real(res[0], 8,  " \t\n\r");
-	     mem[1] = _SC_mem_real(res[0], 10, " \t\n\r");
-
-	     mem[0] += mem[1];};}
-     else
-        {mem[0] = 1.0;
-	 mem[1] = 1.0;};}
 #endif
 
     SC_free_strings(res);
