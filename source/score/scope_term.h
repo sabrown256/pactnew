@@ -17,7 +17,7 @@
 
 #include <sys/ioctl.h>
 
-#ifdef AIX
+#if defined(AIX)
 # include <termios.h>
 # ifdef HAVE_SELECT_P
 #  include <sys/select.h>
@@ -27,7 +27,7 @@
 # include <sys/termios.h>
 #endif
 
-#ifdef MACOSX
+#if defined(MACOSX)
 # include <term.h>
 # include <sys/ioctl_compat.h>
 # define DISABLE_STROPTS
@@ -42,21 +42,21 @@
 # undef tab
 #endif
 
-#ifdef CYGWIN
+#if defined(CYGWIN)
 # define DISABLE_STROPTS
 #endif
 
-#ifdef FREEBSD
+#if defined(FREEBSD)
 # include <term.h>
 # undef tab
 #endif
 
-#ifdef SOLARIS
+#if defined(SOLARIS)
 # include <sys/file.h>
 # define BAD_FLUSH_SEMANTICS
 #endif
 
-#ifdef SGI
+#if defined(SGI)
 # define _SOCKLEN_T
 typedef int socklen_t;
 #endif

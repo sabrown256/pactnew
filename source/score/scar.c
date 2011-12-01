@@ -298,7 +298,7 @@ fcdes *SC_scan_archive(char *arf)
 		   {nc = 0;
 		    strncpy(lname, hdr.ar_name, na);
 		    lname[na] = '\0';
-		    SC_trim_right(lname, " ");
+		    SC_trim_right(lname, " /");
 		    name = lname;};
 
 		ae = _SC_make_ar_entry(fp, FALSE, name, hdr.ar_date,

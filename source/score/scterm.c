@@ -781,7 +781,7 @@ void *SC_get_term_state(int fd, int size)
        return(NULL);
 
 /* Mac OS X does not implement this and complains only at runtime! */
-#  ifndef MACOSX
+#  if !defined(MACOSX)
     if (ioctl(fd, TIOCGETD, &t->discipline) < 0)
        return(NULL);
 #  endif
@@ -1042,7 +1042,7 @@ int SC_mpi_suppress(int st)
 
 /*--------------------------------------------------------------------------*/
 
-#ifndef MACOSX
+#if !defined(MACOSX)
 
 /*--------------------------------------------------------------------------*/
 
@@ -1145,7 +1145,7 @@ void _SC_get_term_resp(int fd, int c, int *pw, int *ph)
 int SC_get_term_attr(char *cmd, char *rsp, int n, int *val)
    {int rv;
 
-#ifdef MACOSX
+#if defined(MACOSX)
 
     rv  = FALSE;
 
@@ -1210,7 +1210,7 @@ int SC_get_term_attr(char *cmd, char *rsp, int n, int *val)
 int SC_get_term_size(int *pcr, int *pcc, int *ppr, int *ppc)
    {int rv;
 
-#ifdef MACOSX
+#if defined(MACOSX)
 
     rv  = FALSE;
 

@@ -9,7 +9,7 @@
 /* MACOSX predefines __APPLE__ */
 #ifdef __APPLE__
 
-#ifndef PCK_MACOSX
+#if !defined(PCK_MACOSX)
 
 #define PCK_MACOSX
 

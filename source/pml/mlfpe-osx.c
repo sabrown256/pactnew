@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
 
-#ifdef MACOSX
+#if defined(MACOSX)
 
 #if (FPU_TYPE == ppc)
 # include <architecture/ppc/fp_regs.h>
