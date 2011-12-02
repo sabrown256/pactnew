@@ -206,7 +206,7 @@ source $ldir/env-csh
        flog $Log touch $IncDir/noipc
     endif
 
-    if ("$NEED_ALT_LARGE_FILE" == "TRUE") then
+    if (("$NEED_ALT_LARGE_FILE" == "TRUE") && ($HostOS != FreeBSD)) then
        Note $STDOUT "#define NEED_ALT_LARGE_FILE"
        Note $STDOUT "#define HAVE_ALT_LARGE_FILE"
     endif
