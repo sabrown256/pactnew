@@ -38,7 +38,7 @@ static int run_test(int n, PFInt tst)
     time = SC_wall_clock_time() - time;
     SC_mem_stats(NULL, NULL, &da, NULL);
 
-    io_printf(STDOUT, "\t\t\t%2d\t%8ld\t%.2f\t%d\n", n, da - db, time, err);
+    io_printf(STDOUT, "\t\t\t%2d\t%8ld\t%.2f\t%d\n", n, (long) (da - db), time, err);
 
     SC_LEAVING;
 
