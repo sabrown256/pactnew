@@ -47,6 +47,12 @@
            echo "include ${Bits}-bit" >>& $Tmp
            echo "include compilers/xlc" >>& $Tmp
            breaksw
+      case beos:
+      case haiku:
+           set cfg = "$cfg-$Bits"
+           echo "include ${Bits}-bit" >>& $Tmp
+           echo "include compilers/gnu" >>& $Tmp
+           breaksw
       case cygwin*:
            set ladv = ""
            set ladv = ${ladv}:psh_dorun:psh_verify

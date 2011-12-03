@@ -32,7 +32,7 @@ char *expand(char *expr, int nc, char *varn, int rnull)
 	     nstrncpy(var, MAXLINE, p, n);
 
 	     if (var[1] == '$')
-	        {snprintf(t, MAXLINE, "%d", getpid());
+	        {snprintf(t, MAXLINE, "%d", (int) getpid());
 		 val = t;}
 	     else if (var[1] == '{')
 	        {nstrncpy(t, MAXLINE, var, -1);

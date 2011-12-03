@@ -142,7 +142,8 @@ static void invoke_script(char **vo, char *shell, char *pact,
 
     sname = v[k];
 
-    snprintf(fname, MAXLINE, "/tmp/%s.%d", path_tail(sname), getpid());
+    snprintf(fname, MAXLINE, "/tmp/%s.%d",
+	     path_tail(sname), (int) getpid());
 
 /* read the first line of the shell script */
     fi = fopen(sname, "r");
@@ -273,7 +274,7 @@ static void invoke_session(char **vo, char *shell, char *pact,
     snprintf(cshrc, MAXLINE, "%s/.cshrc", home);
 
 /* make a temporary home directory */
-    snprintf(dname, MAXLINE, "/tmp/%s.%d", user, getpid());
+    snprintf(dname, MAXLINE, "/tmp/%s.%d", user, (int) getpid());
     run(FALSE, "mkdir -p %s", dname);
 
 /* write a temporary .cshrc */

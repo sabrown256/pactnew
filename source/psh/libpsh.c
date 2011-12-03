@@ -2002,7 +2002,7 @@ void log_activity(char *flog, int ilog, char *oper, char *fmt, ...)
 	VA_START(fmt);
 	VSNPRINTF(msg, MAXLINE, fmt);
 	VA_END;
-	fprintf(log, "%s\t(%d)\t: %s\n", oper, getpid(), msg);
+	fprintf(log, "%s\t(%d)\t: %s\n", oper, (int) getpid(), msg);
         fclose(log);};
 
     return;}

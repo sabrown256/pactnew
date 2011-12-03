@@ -23,6 +23,8 @@
 #  include <sys/select.h>
 # endif
 # define BAD_FLUSH_SEMANTICS
+#elif defined(BEOS)
+# include <termios.h>
 #else
 # include <sys/termios.h>
 #endif
@@ -200,7 +202,7 @@ typedef int socklen_t;
 # ifdef GETSOCKNAME_LONG
 typedef unsigned long socklen_t;
 # else
-#  ifndef SGI
+#  if !defined(SGI) && !defined(BEOS)
 typedef int socklen_t;
 #  endif
 # endif

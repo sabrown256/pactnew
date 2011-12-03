@@ -156,10 +156,10 @@ static void mp_hostfile(char *s, int nc, rundes *st)
    {
 
     if (cdefenv("DORUN_HOST_DIR") == 0)
-       snprintf(s, nc, ".dp-aix.%s.%d", st->host, getpid());
+       snprintf(s, nc, ".dp-aix.%s.%d", st->host, (int) getpid());
     else
        snprintf(s, nc, "%s/.dp-aix.%s.%d",
-		cgetenv(TRUE, "DORUN_HOST_DIR"), st->host, getpid());
+		cgetenv(TRUE, "DORUN_HOST_DIR"), st->host, (int) getpid());
 
     return;}
 

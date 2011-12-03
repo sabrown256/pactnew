@@ -515,7 +515,7 @@ static int session(atdbgdes *st)
 
 /* open the log file if requested */
     if (IS_NULL(st->logname) == FALSE)
-       {snprintf(fname, MAXLINE, "%s.%d", st->logname, getpid());
+       {snprintf(fname, MAXLINE, "%s.%d", st->logname, (int) getpid());
 	log = fopen(fname, "w");
 	if (log != NULL)
 	   setbuf(log, NULL);
@@ -525,7 +525,7 @@ static int session(atdbgdes *st)
        printf("\n");
 
     if (st->mode == TRACE)
-       snprintf(fname, MAXLINE, "/tmp/dbg.%d", getpid());
+       snprintf(fname, MAXLINE, "/tmp/dbg.%d", (int) getpid());
 
     if ((IS_NULL(st->pname) == TRUE) &&
         ((IS_NULL(st->exe) == FALSE) || (st->spid >= 0)))
