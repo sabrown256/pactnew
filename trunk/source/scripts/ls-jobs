@@ -156,6 +156,14 @@ else if ($OSType =~ CYGWIN*) then
    set LOADAVE = ( echo "No load info available" )
    set CLEAR   = ( echo $CED$Home )
 
+# BeOS has nonstandard ps
+else if ($OSType =~ Haiku*) then
+   set PS      = "/bin/ps"
+   set CED     = "[2J"    # clear all
+   set Home    = "[1;1H"
+   set LOADAVE = ( echo "No load info available" )
+   set CLEAR   = ( echo $CED$Home )
+
 else
    set PSOpt = ""
    if ($OSType == "Linux") then
@@ -180,7 +188,9 @@ if ($OSType == "Darwin") then
 endif
 
 # define the filter
-if ("$USER" == "") then
+if ($OSType =~ Haiku*) then
+   set Prog = '($1 != "Team") && ($0 !~ /ls-jobs/) && ($0 !~ /\bin\/ps/) && ($0 !~ /cut -b 1-256/)'
+else if ("$USER" == "") then
    set Prog = '($1 != "USER") && ($2 != '$$') && ($3 != '$$')'
 else
    set Prog = '($1 == "'$USER'") && ($2 != '$$') && ($3 != '$$')'
@@ -209,7 +219,11 @@ if ("$Pids" != "") then
    endif
 endif
 
-set Prog = ( $Prog '{ print }' )
+if ($OSType =~ Haiku*) then
+   set Prog = ( $Prog '{printf("%6d  ", $(NF-3)); for (i = 1; i < NF-3; i++) printf(" %s", $i); ; printf("\n");}' )
+else
+   set Prog = ( $Prog '{ print }' )
+endif
 
 # define the sort
 if ($SORT > 1) then

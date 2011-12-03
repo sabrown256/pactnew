@@ -19,6 +19,10 @@
 #define REAL double
 #define HUGE_REAL 1.0e100
 
+#if defined(BEOS)
+typedef long long int64_t;
+#endif
+
 #ifndef HAVE_FIXED_WIDTH_FLOAT
 typedef float       float32_t;
 typedef double      float64_t;
