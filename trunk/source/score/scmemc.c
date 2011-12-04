@@ -825,6 +825,8 @@ int SC_mem_over_mark(int n)
 int SC_mem_trim(size_t pad)
    {int rv;
 
+    rv = FALSE;
+
 #if defined(LINUX) || defined(CYGWIN)
     rv = malloc_trim(pad);
 #endif

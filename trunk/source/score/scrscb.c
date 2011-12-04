@@ -146,6 +146,11 @@ int *SC_process_ids(void)
 	        for (i = 0; i < nid; i++)
 		    ids[i] = kp[i].kp_proc.p_pid;};};};
 
+#elif defined(BEOS)
+
+	ids = NULL;
+	nid = 0;
+
 #else
 
        {int i, ns, st;
