@@ -97,7 +97,7 @@ targets :
 #
 Hdrs = scstd.h scunix.h scwin32.h scbgl.h \
        scgnu.h sclnx.h scosx.h sccyg.h scbsd.h \
-       scaix.h scsol.h schpux.h scirix.h \
+       scaix.h scsol.h schpux.h scirix.h scbeos.h \
        score.h score_int.h score_old.h \
        scope_hash.h scope_typeh.h scope_io.h scope_array.h
 
@@ -122,7 +122,7 @@ PObjs = scerr.o sccntx.o \
 TObjs = scpar.o scthn.o scthe.o scthp.o sctho.o scths.o
 
 OW32Objs = sclpwin32.o scwin32.o
-OUnxObjs = sclppsx.o scunix.o scaix.o scbgl.o sccyg.o scbsd.o
+OUnxObjs = sclppsx.o scunix.o scaix.o scbgl.o sccyg.o scbsd.o scbeos.o
 
 Objs = ${EObjs} ${MObjs} ${PObjs} ${TObjs} ${OSSupport} \
        scctl.o scapi.o scfnca.o scfncb.o scfnct.o \

@@ -53,6 +53,10 @@
 # undef tab
 #endif
 
+#if defined(BEOS)
+# define SIGIO SIGPOLL
+#endif
+
 #if defined(SOLARIS)
 # include <sys/file.h>
 # define BAD_FLUSH_SEMANTICS

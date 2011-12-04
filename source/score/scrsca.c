@@ -624,10 +624,14 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 
 #endif
 
+#if !defined(BEOS)
+
 /* if we got other information successfully then fill in the rest */
     if (rv == TRUE)
        {ru->pid      = pid;
 	ru->priority = getpriority(PRIO_PROCESS, pid);};
+
+#endif
 
     return(rv);}
 
@@ -749,7 +753,7 @@ int SC_set_resource_limits(int64_t mem, int64_t cpu, int64_t fsz,
 	rv |= setrlimit(RLIMIT_NOFILE, &rl);};
 
 /* set number of processes limit */
-#if !defined(AIX) && !defined(CYGWIN) && !defined(SOLARIS)
+#if !defined(AIX) && !defined(CYGWIN) && !defined(SOLARIS) && !defined(BEOS)
     if (nprc == -1)
        nprc = SC_stoi(getenv("SC_EXEC_RLIMIT_NPROC"));
     if (nprc > 0)
@@ -811,7 +815,7 @@ int SC_get_resource_limits(int64_t *pmem, int64_t *pcpu, int64_t *pfsz,
 	   *pnfd = -1;};
 
 /* get number of processes limit */
-#if !defined(AIX) && !defined(CYGWIN) && !defined(SOLARIS)
+#if !defined(AIX) && !defined(CYGWIN) && !defined(SOLARIS) && !defined(BEOS)
     if (pnprc != NULL)
        {rv |= getrlimit(RLIMIT_NPROC, &rl);
 	if (rv == 0)
