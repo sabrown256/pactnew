@@ -162,7 +162,6 @@ double SC_cpu_time(void)
 
 #else
 
-    int lckd;
     double dtwc;
     time_t syst;
     static double dtref;

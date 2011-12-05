@@ -64,10 +64,12 @@ void PA_signal_handler(int sig)
              break;
 #endif
 
+#if !defined(BEOS)
 #ifdef SIGBUS
         case SIGBUS  :
              PA_ERR(TRUE, "BUS ERROR");
              break;
+#endif
 #endif
 
 #ifdef SIGFPE

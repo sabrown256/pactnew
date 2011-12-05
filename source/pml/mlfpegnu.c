@@ -27,10 +27,12 @@
 void PM_enable_fpe_gnu(int flg)
    {
 
+#if !defined(BEOS)
     if (flg == TRUE)
        feenableexcept(FE_DIVBYZERO | FE_OVERFLOW | FE_INVALID);
     else
        fedisableexcept(FE_DIVBYZERO | FE_OVERFLOW | FE_INVALID);
+#endif
 
     return;}
 
