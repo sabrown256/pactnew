@@ -201,7 +201,11 @@ struct sockaddr_in *_SC_tcp_address(char *host, int port)
  * things like OpenDNS give you a special address for unknown hosts
  * which will not match your original host
  */
+#if defined(BEOS)
+	    hea = gethostbyaddr((const char *) &nad, sizeof(nad), AF_INET);
+#else
 	    hea = gethostbyaddr(&nad, sizeof(nad), AF_INET);
+#endif
 	    if (strcmp(hea->h_name, hen->h_name) == 0)
 	       haddr = nad;};};
 #endif

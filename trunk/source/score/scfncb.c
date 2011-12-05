@@ -658,6 +658,10 @@ SC_proc_info *SC_get_processes(int uid)
     cmd = "ps -W";
     pi  = _SC_get_cygwin_processes(cmd, uid);
 
+# elif defined(BEOS)
+    cmd = "ps";
+    pi  = NULL;
+
 #else
 
 # if defined(SGI) || defined(AIX) || defined(OSF) || defined(SOLARIS)
