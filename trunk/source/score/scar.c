@@ -312,6 +312,10 @@ fcdes *SC_scan_archive(char *arf)
 
 		SC_hasharr_install(tab, ae->name, ae, "fcent", 3, -1);
 
+#ifdef FREEBSD
+                pos++;
+#endif
+
 		fseek(fp, pos, SEEK_SET);};};
 
 	fc = _SC_make_archive(arf, fp, nb, tab);};

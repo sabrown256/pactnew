@@ -23,7 +23,7 @@ static int run_test(int n, PFInt tst)
    {int ret, sc;
     char msg[MAXLINE];
     double time;
-    int64_t da, db;
+    int64_t da, db, d;
     static int debug = 0;
 
     sc = SC_mem_monitor(-1, debug, "A", msg);
@@ -36,7 +36,9 @@ static int run_test(int n, PFInt tst)
     time  = SC_wall_clock_time() - time;
     SC_mem_stats(NULL, NULL, &da, NULL);
 
-    io_printf(STDOUT, "\t\t\t%2d\t%8ld\t%.2f\n", n, da - db, time);
+    d = da - db;
+
+    io_printf(STDOUT, "\t\t\t%2d\t%8lld\t%.2f\n", n, (long long) d, time);
 
     sc = SC_mem_monitor(sc, debug, "A", msg);
 

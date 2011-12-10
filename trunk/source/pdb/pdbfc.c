@@ -228,7 +228,7 @@ static int _PD_fcflush(FILE *fp)
 
     rv = fflush(fl);
 
-#if defined(MACOSX)
+#if defined(MACOSX) || defined(FREEBSD)
 /* on OSX the fflush sometimes fails for the last file in a container
  * with "Bad file descriptor" errno 9
  */

@@ -236,10 +236,10 @@ struct s_SC_mapped_file
     int extend;
     int page;                     /* pagesize */
                                   /* logical file description members */
-    int64_t lcpos;                 /* current file position (LC) */
-    int64_t lclen;                 /* total file length (LC) */
-    int64_t lcposx;                /* truncate to this length (LC) */
-    int64_t lcoff;                 /* offset of the current stripe (LC) */
+    int64_t lcpos;                /* current file position (LC) */
+    int64_t lclen;                /* total file length (LC) */
+    int64_t lcposx;               /* truncate to this length (LC) */
+    int64_t lcoff;                /* offset of the current stripe (LC) */
 
                                   /* physical stripe description members */
     size_t scsize;                /* size of the current stripe (SC) */

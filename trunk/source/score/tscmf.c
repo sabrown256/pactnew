@@ -36,6 +36,7 @@ static int test_1(void)
 
     m  = 3*msa[n-1]/2;
     bf = CMAKE_N(char, m);
+    memset(bf, 0, m);
 
     io_printf(stdout, "                       Mapped write    ");
 
