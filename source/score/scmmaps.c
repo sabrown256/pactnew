@@ -1663,6 +1663,7 @@ int _SC_mf_flush(FILE *fp)
     p   = mf->scp;
     nbp = mf->page;
     len = (len + nbp - 1) & ~(nbp - 1);
+    len = min(len, mf->scsize);
 
     ret = msync(p, len, MS_SYNC);
     if (ret != 0)
