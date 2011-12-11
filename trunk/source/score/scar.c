@@ -260,7 +260,7 @@ fcdes *SC_scan_archive(char *arf)
  */
 
 fcdes *SC_scan_archive(char *arf)
-   {int nr, nb, nc, ne, na;
+   {int i, nr, nb, nc, ne, na, round;
     int64_t pos;
     char s[MAXLINE], lname[MAXLINE];
     FILE *fp;
@@ -279,44 +279,46 @@ fcdes *SC_scan_archive(char *arf)
     if (fp != NULL)
        {nr = fread(s, 1, 8, fp);
 
+#ifdef FREEBSD
+	round = TRUE;
+#else
+	round = FALSE;
+#endif
+
 	if (nr == 8)
 	   {nb = sizeof(struct ar_hdr);
 	    p  = (char *) &hdr;
 
 	    tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 
-	    while (TRUE)
-	       {nr = fread(p, nb, 1, fp);
-		if (nr != 1)
-		   break;
+	    for (i = 0; i < INT_MAX; i++)
+	        {nr = fread(p, nb, 1, fp);
+		 if (nr != 1)
+		    break;
 
-		if (strncmp(hdr.ar_name, AR_EFMT1, ne) == 0)
-		   {nc = SC_stoi(hdr.ar_name + ne);
-		    fread(lname, nc, 1, fp);
-		    name = lname;}
-		else
-		   {nc = 0;
-		    strncpy(lname, hdr.ar_name, na);
-		    lname[na] = '\0';
-		    SC_trim_right(lname, " /");
-		    name = lname;};
+		 if (strncmp(hdr.ar_name, AR_EFMT1, ne) == 0)
+		    {nc = SC_stoi(hdr.ar_name + ne);
+		     fread(lname, nc, 1, fp);
+		     name = lname;}
+		 else
+		    {nc = 0;
+		     strncpy(lname, hdr.ar_name, na);
+		     lname[na] = '\0';
+		     SC_trim_right(lname, " /");
+		     name = lname;};
 
-		ae = _SC_make_ar_entry(fp, FALSE, name, hdr.ar_date,
-				       hdr.ar_uid, hdr.ar_gid,
-				       hdr.ar_size, hdr.ar_mode,
-				       &pos);
+		 ae = _SC_make_ar_entry(fp, round, name, hdr.ar_date,
+					hdr.ar_uid, hdr.ar_gid,
+					hdr.ar_size, hdr.ar_mode,
+					&pos);
 
-		pos        -= nc;
-		ae->size   -= nc;
-/*		ae->address = pos; */
+		 pos        -= nc;
+		 ae->size   -= nc;
+/*		 ae->address = pos; */
 
-		SC_hasharr_install(tab, ae->name, ae, "fcent", 3, -1);
+		 SC_hasharr_install(tab, ae->name, ae, "fcent", 3, -1);
 
-#ifdef FREEBSD
-                pos++;
-#endif
-
-		fseek(fp, pos, SEEK_SET);};};
+		 fseek(fp, pos, SEEK_SET);};};
 
 	fc = _SC_make_archive(arf, fp, nb, tab);};
 
