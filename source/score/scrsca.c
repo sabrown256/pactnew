@@ -572,11 +572,12 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	       {pc = CMAKE_N(char,  na);
 
 		mib[0] = CTL_KERN;
-		mib[1] = KERN_PROC_ARGS;
-		mib[2] = pid;
+		mib[1] = KERN_PROC;
+		mib[2] = KERN_PROC_ARGS;
+		mib[3] = pid;
 
 		sz = na;
-		st = sysctl(mib, 3, pc, &sz, NULL, 0);
+		st = sysctl(mib, 4, pc, &sz, NULL, 0);
 		if (st == 0)
 		   {ps = pc;
 		    pe = pc + sz;

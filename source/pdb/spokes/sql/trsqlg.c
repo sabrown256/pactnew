@@ -43,9 +43,10 @@ sql_table *_SQL_mk_table(int nr, int nf)
 void _SQL_rl_table(sql_table *tab)
    {
 
-    SC_free_strings(tab->table);
+    if (tab != NULL)
+       {SC_free_strings(tab->table);
 
-    CFREE(tab);
+	CFREE(tab);};
 
     return;}
 

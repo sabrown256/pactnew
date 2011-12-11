@@ -87,6 +87,7 @@
            echo "run std/use-compiler $lcc" >>& $Tmp
            echo "include ${Bits}-bit" >>& $Tmp
            echo "include compilers/gnu-freebsd" >>& $Tmp
+           echo "include features/no-sql" >>& $Tmp
            breaksw
       case hp-ux*:
            echo "include compilers/hpux" >>& $Tmp
