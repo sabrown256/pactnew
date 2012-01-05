@@ -10,8 +10,7 @@
 
 #include "pdb_int.h"
 
-#define DASHA       ((int)0x01)
-#define DASHR       ((int)0x02)
+enum {DASHA = 1, DASHR = 2, DASHF = 4};
 
 #define INCR(x)                                                              \
     {SC_LOCKON(PD_dir_lock);                                                 \
@@ -188,7 +187,9 @@ static int _PD_setup_flags(char *flags)
                 {if (token[i] == 'a')
                     iflags |= DASHA;
                  else if (token[i] == 'R')
-                    iflags |= DASHR;};};
+                    iflags |= DASHR;
+                 else if (token[i] == 'f')
+                    iflags |= DASHF;};};
 
         token = SC_strtok(NULL, " \t", t);};
 
@@ -246,9 +247,9 @@ static int _PD_is_hidden(char *pattern, char *entry)
 char **_PD_ls_extr(PDBfile *file, char *path, char *type, long size,
 		   int *num, int all, char *flags)
    {int nc, ne, nvars, i, has_dirs, head, pass; 
-    int iflags;
+    int iflags, psx;
     char **varlist, **outlist;
-    char *name, *tp;
+    char *name, *tp, *p;
     char pattern[MAXLINE];
     syment *ep;
     PD_smp_state *pa;
@@ -321,13 +322,15 @@ char **_PD_ls_extr(PDBfile *file, char *path, char *type, long size,
  * the requested directory. In other words, all names which BEGIN with the
  * requested pattern are returned.
  */
-    nvars = 0;
+    nvars   = 0;
     outlist = CMAKE_N(char *, ne + 1);
      
 /* the second pass is in case variables were written to the file before
  * the first directory was created. Such variables lack an initial slash.
+ * if we have directories 2 passes might double count entries
  */
-    for (pass = 1; pass <= 2; pass++)
+    psx = 1 + (has_dirs == FALSE);
+    for (pass = 1; pass <= psx; pass++)
         {if (pass == 2)
             {if (has_dirs && (strchr(pattern + 1, '/') == NULL))
                 memmove(pattern, pattern + 1, strlen(pattern));
@@ -343,11 +346,17 @@ char **_PD_ls_extr(PDBfile *file, char *path, char *type, long size,
  */
 	 ep = NULL;
          for (i = 0; (i < ne) && (varlist[i] != NULL); i++)
+
+/* with two passes it is possible to double count so exit if we have
+ * everything already
+ */
+	     {if (nvars >= ne)
+		 break;
           
 /* the entry '/' (the root directory) is a special case. It
  * is not a child of any directory, so should be ignored.
  */
-             {if (strcmp("/", varlist[i]) == 0)
+              if (strcmp("/", varlist[i]) == 0)
                  continue;
 
 /* check to see if type of this variable matches request */
@@ -369,7 +378,7 @@ char **_PD_ls_extr(PDBfile *file, char *path, char *type, long size,
  * is not a leaf element. NOTE: if directories are not used, slashes are
  * valid charcters in file names.
  */
-              if (has_dirs)
+              if ((has_dirs) && !(iflags & DASHF))
                  {if (pattern[0] != '/')
                      head = 0;
                   else
@@ -377,14 +386,14 @@ char **_PD_ls_extr(PDBfile *file, char *path, char *type, long size,
 		      nc   = (tp != NULL) ? strlen(tp) : 0;
 		      head = strlen(pattern) - nc + 1;};
                   name = &(varlist[i])[head];
+                  nc   = strlen(name);
 
-                  if ((strlen(name) == 0) ||
-                      ((pass == 2) && (name[0] == '/')))
+                  if ((nc == 0) || ((pass == 2) && (name[0] == '/')))
                      continue;
 
+		  p = strchr(name, '/');
                   if ((!(iflags & DASHR)) &&
-                     ((strchr(name, '/') != NULL) &&
-                       (strchr(name, '/') != ((name + strlen(name) - 1)))))
+		      (p != NULL) && (p != (name + nc - 1)))
                      continue;}
               else
                  name = varlist[i];
@@ -411,8 +420,8 @@ char **_PD_ls_extr(PDBfile *file, char *path, char *type, long size,
 /*--------------------------------------------------------------------------*/
 
 /* PD_LS - return a list of all variables and directories of the specified
- *       - type in the specified directory. If type is null, all types are
- *       - returned. If path is null, the root directory is searched.
+ *       - type in the specified directory. If TYPE is NULL, all types are
+ *       - returned. If PATH is NULL, the root directory is searched.
  *       - Directories are terminated with a slash.
  *
  * #bind PD_ls fortran() scheme() python()
@@ -429,8 +438,8 @@ char **PD_ls(PDBfile *file ARG(,,cls), char *path, char *type, int *num)
 /*--------------------------------------------------------------------------*/
 
 /* PD_LS_ALT - return a list of all variables and directories of the specified
- *           - type in the specified directory. If type is null, all types are
- *           - returned. If path is null, the root directory is searched.
+ *           - type in the specified directory. If TYPE is NULL, all types are
+ *           - returned. If PATH is NULL, the root directory is searched.
  *           - Directories are terminated with a slash.  
  *           - Flags argument: -a  specifies that all entries, including
  *           -                     hidden ones (first char == &) should be 

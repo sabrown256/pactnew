@@ -669,7 +669,7 @@ static int _SC_splice_out_haelem(hasharr *ha, void *key,
 /* remove from array */
 	SC_array_set(ha->a, ths->iar, &v);
 
-/* remove from array */
+/* remove from haelem list */
 	*prv = ths->next;
 
 	_SC_free_haelem(ha, ths);

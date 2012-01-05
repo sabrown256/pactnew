@@ -61,6 +61,15 @@ if (-d $gitd[1]) then
          cat .log.sup
       endif
 
+# update this way
+# if this is not done then you eventually get messages like:
+#    On branch master
+#    Your branch is ahead of 'origin/master' by 17 commits.
+# from git status
+# what is the difference between the two pulls?
+      git pull >&! .log.sup
+      set xstatus = $status
+
 # report status of local changes
       if ("$gitd[2]" == ".") then
          git status -s |& egrep -v '^\?'

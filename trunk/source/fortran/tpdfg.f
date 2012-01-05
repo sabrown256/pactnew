@@ -1176,7 +1176,7 @@
 
       cp   = pd_ls_f(fileid, "/", "*", nvd)
       nvar = nvd(1)
-      call c_f_pointer(cp, fcp, [nvar])
+      call c_f_pointer(cp, fcp, (/nvar/))
       do n = 1, nvar
          call c_f_pointer(fcp(n), vnm)
          nc = c_strlenf(vnm)
@@ -1202,7 +1202,7 @@
 
          cp   = pd_ls_f(fileid, "/dir1", "*", nvd)
          nvar = nvd(1)
-         call c_f_pointer(cp, fcp, [nvar])
+         call c_f_pointer(cp, fcp, (/nvar/))
          do n = 1, nvar
             call c_f_pointer(fcp(n), vnm)
             nc = c_strlenf(vnm)
@@ -1251,7 +1251,7 @@
       logical :: PRINT, DIR, TARGET, ATTR
 
       integer :: is, st
-      integer :: narg, iarg, iargc
+      integer :: narg, iarg
       integer :: nout, err
 
       integer*8 :: bufsiz1, bufsiz2, bufsiz3
@@ -1283,16 +1283,19 @@
       nout    = 6
       outtype = 'double'
        
-      narg = iargc()
+!      narg = iargc()
+      narg = command_argument_count()
       iarg = 1
 
  10   if (iarg .le. narg) then
-         call getarg(iarg, arg)
+!         call getarg(iarg, arg)
+         call get_command_argument(iarg, arg)
          if (arg .eq. "-a") then
             ATTR = .true.
          elseif (arg .eq. "-as") then
             iarg = iarg + 1
-            call getarg(iarg, arg)
+!            call getarg(iarg, arg)
+            call get_command_argument(iarg, arg)
             if (arg .eq. "d") then
                nout    = 6
                outtype = 'double'
@@ -1324,7 +1327,8 @@
             stop 1
          elseif (arg .eq. "-o") then
             iarg = iarg + 1
-            call getarg(iarg, arg)
+!            call getarg(iarg, arg)
+            call get_command_argument(iarg, arg)
             OPTION = arg
          elseif (arg .eq. "-p") then
             PRINT = .true.

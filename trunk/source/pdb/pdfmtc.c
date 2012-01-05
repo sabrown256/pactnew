@@ -587,7 +587,7 @@ static int _PD_parse_symt_iii(PDBfile *file, char *buf, int flag,
  */
 
 static int _PD_rd_symt_iii(PDBfile *file, char *acc, char *rej)
-   {int rv;
+   {int rv, alloc;
     long nbs;
     int64_t addr, numb;
     char *bf;
@@ -600,15 +600,19 @@ static int _PD_rd_symt_iii(PDBfile *file, char *acc, char *rej)
 
 /* find the overall file length */
     addr = _PD_get_current_address(file, PD_OPEN);
-    _PD_set_current_address(file, 0, SEEK_END, PD_OPEN);
-    numb = _PD_get_current_address(file, PD_OPEN);
+
+    alloc = (file->bfsz == 0);
+    if (alloc == TRUE)
+       {_PD_set_current_address(file, 0, SEEK_END, PD_OPEN);
+	numb       = _PD_get_current_address(file, PD_OPEN);
+	file->bfsz = numb - file->symtaddr;};
+
+    nbs = file->bfsz;
+    bf  = CMAKE_N(char, nbs + 1);
+
+    pa->tbuffer = bf;
 
 /* read in the symbol table and extras table as a single block */
-    nbs         = numb - file->symtaddr;
-    pa->tbuffer = CMAKE_N(char, nbs + 1);
-
-    bf = pa->tbuffer;
-
     _PD_set_current_address(file, file->symtaddr, SEEK_SET, PD_OPEN);
     numb = lio_read(bf, 1, nbs, fp);
     if (numb != nbs)
@@ -619,6 +623,9 @@ static int _PD_rd_symt_iii(PDBfile *file, char *acc, char *rej)
     rv = _PD_parse_symt_iii(file, bf, FALSE, acc, rej);
 
     _PD_set_current_address(file, addr, SEEK_SET, PD_OPEN);
+
+    if (alloc == FALSE)
+       CFREE(pa->tbuffer);
 
     return(rv);}
 

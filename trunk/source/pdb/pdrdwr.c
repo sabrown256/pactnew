@@ -822,8 +822,8 @@ static void INLINE _PD_init_stacks(long t, long d)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_INIT_STACKS - setup dynamic stacks for continuation passing
- *                 - data tree walkers
+/* _PD_FIN_STACKS - free dynamic stacks for continuation passing
+ *                - data tree walkers
  */
 
 void _PD_fin_stacks(void)

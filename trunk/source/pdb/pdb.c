@@ -1357,16 +1357,19 @@ int PD_free(PDBfile *file ARG(,,cls), char *type, void *var)
 	    nb = SC_arrlen(pc);};
  
 	if (pc == NULL)
-	   return(rv);
+	   {CFREE(ityp);
+	    return(rv);};
 
 	if (nb < 0)
-	   {fprintf(stderr, "NOT SCORE ALLOCATED MEMORY %p - PD_FREE\n", pc);
+	   {CFREE(ityp);
+	    fprintf(stderr, "NOT SCORE ALLOCATED MEMORY %p - PD_FREE\n", pc);
 	    return(-1);};
 
 	dp = _PD_type_lookup(file, PD_CHART_HOST, ityp);
  
 	if (dp == NULL) 
-	   {fprintf(stderr, "CANNOT LOOKUP %s IN FILE - PD_FREE\n", ityp);
+	   {CFREE(ityp);
+	    fprintf(stderr, "CANNOT LOOKUP %s IN FILE - PD_FREE\n", ityp);
 	    return(-1);};
 
 	bpi = dp->size;
