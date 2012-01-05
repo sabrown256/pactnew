@@ -475,6 +475,7 @@ struct s_PDBfile
     int64_t headaddr;
     int64_t symtaddr;
     int64_t chrtaddr;
+    int64_t bfsz;                     /* buffer size for chart, symtab, ... */
     PD_checksum_mode use_cksum;       /* session use of checksums */
     PD_checksum_mode file_cksum;      /* file use of checksums */
     int fix_denorm;

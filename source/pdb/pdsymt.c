@@ -115,23 +115,37 @@ PD_delay_mode _PD_symt_set_delay_mode(PDBfile *file, char *mode)
  */
 
 int _PD_pare_symt(PDBfile *file)
-   {int i, nr;
+   {int nr, wh;
+    long i;
     char s[MAXLINE];
-    char **ent;
+    char *nm, **ent;
+    syment *ep;
 
     nr = 0;
 
+    wh = 0;
     if ((file->delay_sym != PD_DELAY_NONE) &&
 	(strcmp(file->current_prefix, "/") != 0))
        {snprintf(s, MAXLINE, "*%s*", file->current_prefix);
-	ent = SC_hasharr_dump(file->symtab, s, NULL, FALSE);
 
-	for (i = 0; ent[i] != NULL; i++)
-	    {if (SC_LAST_CHAR(ent[i]) != '/')
-	        {SC_hasharr_remove(file->symtab, ent[i]);
-	         nr++;};};
+/* deep remove including the syment */
+        if (wh == 1)
+	   {for (i = 0; SC_hasharr_next(file->symtab, &i, &nm, NULL, (void **) &ep); i++)
+	        {if (SC_LAST_CHAR(nm) != '/')
+		    {_PD_rl_syment_d(ep);
+		     SC_hasharr_remove(file->symtab, nm);
+		     nr++;};};}
 
-        SC_free_strings(ent);};
+/* shallow remove excluding the syment */
+        else
+	   {ent = SC_hasharr_dump(file->symtab, s, NULL, FALSE);
+
+	    for (i = 0; ent[i] != NULL; i++)
+	        {if (SC_LAST_CHAR(ent[i]) != '/')
+		    {SC_hasharr_remove(file->symtab, ent[i]);
+		     nr++;};};
+
+	    SC_free_strings(ent);};};
 
     return(nr);}
 

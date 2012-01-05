@@ -63,15 +63,15 @@ void print_log(FILE *log, char *s, int st)
 
     if (st == TRUE)
        {PRINT(STDOUT,
-	      "                       %-12s ................ ok\n",
+	      "                       %-12s .................... ok\n",
 	      s);
         PRINT(log, "%s ... ok\n", s);}
 
     else
-      {PRINT(STDOUT,
-	     "                        %-12s ................ ng\n",
-	     s);
-       PRINT(log, "%s ... ng\n", s);};
+       {PRINT(STDOUT,
+	      "                        %-12s ................... ng\n",
+	      s);
+        PRINT(log, "%s ... ng\n", s);};
 
     return;}
 

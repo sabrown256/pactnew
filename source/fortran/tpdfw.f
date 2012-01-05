@@ -1232,7 +1232,7 @@
 
       integer is, ia, st
       integer bufsiz1, bufsiz2, bufsiz3
-      integer narg, iarg, iargc
+      integer narg, iarg
       integer nout, err, LAST
 
       real*8 TOLERANCE
@@ -1265,18 +1265,21 @@
       nout    = 6
       outtype = 'double'
        
-      narg = iargc()
+!      narg = iargc()
+      narg = command_argument_count()
       iarg = 1
 
  10   if (iarg .le. narg) then
-         call getarg(iarg, arg)
+!         call getarg(iarg, arg)
+         call get_command_argument(iarg, arg)
          if (arg .eq. "-p") then
             PRINT = .true.
          elseif (arg .eq. "-a") then
             ATTR = .true.
          elseif (arg .eq. "-o") then
             iarg = iarg + 1
-            call getarg(iarg, arg)
+!            call getarg(iarg, arg)
+            call get_command_argument(iarg, arg)
             OPTION = arg
          elseif (arg .eq. "-d") then
             DIR = .true.
@@ -1284,7 +1287,8 @@
             TARGET = .true.
          elseif (arg .eq. "-as") then
             iarg = iarg + 1
-            call getarg(iarg, arg)
+!            call getarg(iarg, arg)
+            call get_command_argument(iarg, arg)
             if (arg .eq. "d") then
                nout    = 6
                outtype = 'double'

@@ -39,6 +39,7 @@ ERR_PATTERN     =
 SchemeSpokes    = netcdf
 CSpokes         =
 ThreadLibExt    =
+F90_MOD_FLAG    = -I
 
 Tool LD {
    SpokeDepLib =

@@ -79,8 +79,15 @@ if (-d $gitd[1]) then
 
    switch ($tgt)
       case change-repo:
-           echo "Not implemented yet"
-           exit(1)
+           pushd .git >& /dev/null
+           set orepo = ( `grep -w url config |& grep = | sed 's/^[ \t]*url[ \t]*=[ \t]*//'` )
+           echo -n "Change '$orepo' to '$nrepo'? "
+           set resp = ( $< )
+           if ("$resp" =~ [yY]*) then
+              cat config | sed "s|$orepo|$nrepo|" >&! config.$$
+              mv config.$$ config
+           endif
+           popd >& /dev/null
            breaksw
       case directories:
            if ("$opt" == "-a") then

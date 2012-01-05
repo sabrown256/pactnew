@@ -192,17 +192,19 @@
       implicit none
 
       logical :: psf, scrf
-      integer :: narg, iarg, iargc
+      integer :: narg, iarg
       character*8 :: arg
 
-      narg = iargc()
+!      narg = iargc()
+      narg = command_argument_count()
       iarg = 1
 
       psf  = .true.
       scrf = .true.
 
  10   if (iarg .le. narg) then
-         call getarg(iarg, arg)
+!         call getarg(iarg, arg)
+         call get_command_argument(iarg, arg)
          if (arg .eq. "-h" .or. arg .eq. "help") then
             write(6, *) 'Usage: tgsfg [-p] [-s]'
             write(6, *) '    -h   this help message'

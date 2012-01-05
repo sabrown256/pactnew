@@ -69,24 +69,15 @@ unset scrd
 set cc = ( `which $cname` )
 switch ($cname)
 
-# XLC
-   case *xlc*:
-        setenv PACT_CC_FAMILY   XLC
-        setenv PACT_FC_FAMILY   XLF
-        set opt   = ( -qversion )
-        set pat   = ( IBM XL C )
-        set prog  = ( '$0 ~ /'$pat'/ { print $NF } $0 ~ /Compile line:/ { print $3 }' )
-        set fname = ( `echo $cname | sed 's|xlc|xlf90|'` )
-        breaksw
-
-# PGI
-   case pgcc*:
-        setenv PACT_CC_FAMILY   PGI
-        setenv PACT_FC_FAMILY   PGI
-        set opt   = ( -V )
-        set pat   = ( target on )
-        set prog  = ( '$0 ~ /'$pat'/ { print $2 } $0 ~ /Compile line:/ { print $3 }' )
-        set fname = pgf90
+# ABSOFT
+   case af90*:
+        setenv PACT_CC_FAMILY   GNU
+        setenv PACT_FC_FAMILY   ABSOFT
+        set cname = gcc
+        set fname = af90
+        set opt   = ( --version )
+        set pat   = ( Absoft )
+        set prog  = ( '$0 ~ /'$pat'/ { print $5 } $0 ~ /Compile line:/ { print $3 }' )
         breaksw
 
 # INTEL
@@ -109,6 +100,16 @@ switch ($cname)
         set fname = pathf90
         breaksw
 
+# PGI
+   case pgcc*:
+        setenv PACT_CC_FAMILY   PGI
+        setenv PACT_FC_FAMILY   PGI
+        set opt   = ( -V )
+        set pat   = ( target on )
+        set prog  = ( '$0 ~ /'$pat'/ { print $2 } $0 ~ /Compile line:/ { print $3 }' )
+        set fname = pgf90
+        breaksw
+
 # SUN
    case suncc*:
         setenv PACT_CC_FAMILY   SUN
@@ -117,6 +118,16 @@ switch ($cname)
         set pat   = ( cc: Sun C )
         set prog  = ( '$0 ~ /'$pat'/ { print $4 } $0 ~ /Compile line:/ { print $3 }' )
         set fname = sunf90
+        breaksw
+
+# XLC
+   case *xlc*:
+        setenv PACT_CC_FAMILY   XLC
+        setenv PACT_FC_FAMILY   XLF
+        set opt   = ( -qversion )
+        set pat   = ( IBM XL C )
+        set prog  = ( '$0 ~ /'$pat'/ { print $NF } $0 ~ /Compile line:/ { print $3 }' )
+        set fname = ( `echo $cname | sed 's|xlc|xlf90|'` )
         breaksw
 
 # GNU is default

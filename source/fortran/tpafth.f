@@ -131,12 +131,14 @@
       use pact_pdb
       implicit none
 
+      integer pfgerr
+
       character*(256) err
       integer nchr
 
-      call pfgerr(nchr, err)
-
-      write(*, *)err
+      if (pfgerr(nchr, err) .eq. 1) then
+         write(*, *) err
+      endif
 
       end
 
