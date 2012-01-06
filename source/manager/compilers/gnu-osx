@@ -9,6 +9,9 @@
 
 run analyze/osx-evolution
 
+# there is a libbfd in /opt/local/lib but it does not seem to work
+#run analyze/rpath -a /opt/local/${LIB}
+
 WARN_PATTERN = ":+sp+warning:"
 ERR_PATTERN  = ":+sp+error:"
 

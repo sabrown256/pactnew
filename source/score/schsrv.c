@@ -545,7 +545,7 @@ int SC_host_server_query(char *out, int nc, char *fmt, ...)
 
 int SC_verify_host(char *hst, int to)
    {int i, is, it, nc, np, ok, pr;
-    int dt, ta, pt, done;
+    int dt, ta, pt, done, st;
     char s[MAXLINE];
     char *ca[20], *tc, *tk, *prompt, *swd, *p;
     PROCESS *pp;
@@ -601,7 +601,7 @@ int SC_verify_host(char *hst, int to)
 /* choose a good sampling interval */
        {if (to < 100)
 	   dt = to / 16;
-	else if (to < 10000)
+	else if (to < 20000)
 	   dt = 100;
 	else
 	   dt = 1000;
@@ -611,6 +611,12 @@ int SC_verify_host(char *hst, int to)
 /* allow TO seconds to receive all relevant output */
 	done = FALSE;
 	is   = 0;
+
+/* NOTE: consider using SC_exec_job here because this loop
+ * does not handle the case where the child finishes before
+ * message are delivered for SC_gets
+ * SC_exec_job handles that more correctly because of the polling
+ */
 	for (it = 0, ta = 0; ta < to; ta += dt, it++)
 	    {if (SC_gets(s, MAXLINE, pp) != NULL)
 	        {is++;
@@ -636,8 +642,10 @@ int SC_verify_host(char *hst, int to)
 	     else if (done == TRUE)
 	        break;
 
-	     else if (SC_process_status(pp) != SC_RUNNING)
-	        done = TRUE;
+	     else
+	        {st = SC_process_status(pp);
+		 if (st != SC_RUNNING)
+		    done = TRUE;};
 
 	     memset(s, 0, MAXLINE);
 	     SC_sleep(dt);};

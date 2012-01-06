@@ -29,8 +29,29 @@ if ("$BFD_Path" == none) then
 
 else
 
+# try to find a usable libbfd
+   if ("$BFD_Path" == "") then
+      set ldir = ( `../analyze/rpath -o list` )
+      Note $ALog "Searching for libbfd in:"
+      Note $ALog "   $ldir"
+      foreach d ($ldir)
+         set lfil = ( `ls $d/libbfd*.so $d/libbfd*.la $d/libbfd* |& cat` )
+         if ("$lfil" != "") then
+            set lbfd = $lfil[1]
+            if (-f $lbfd) then
+               flog $ALog setenv BFD_Path $d
+               flog $ALog setenv BFD_Lib $lbfd
+               break
+            endif
+         endif
+      end
+      unset ldir
+      unset lbfd
+   endif
+
    if ("$BFD_Path" == "") then
       flog $ALog setenv BFD_Path /usr/$LIB
+      flog $ALog setenv BFD_Lib  $BFD_Path/libbfd.a
    endif
 
 #--------------------------------------------------------------------------
@@ -148,6 +169,8 @@ EOF
 endif
 
 SetParent BFD_Version
+SetParent BFD_Lib
+SetParent BFD_Path
 SetParent MDE_Lib
 SetParent HAVE_BFD
 SetParent HAVE_DEMANGLE
