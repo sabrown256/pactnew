@@ -11,7 +11,7 @@ unalias *
 umask 007
 
 setenv TestScrDir $cwd
-foreach f (../scripts ../../scripts ../../../scripts)
+foreach f (../scripts ../../scripts ../../../scripts ../../../../scripts)
    if (-f $f/env-csh) then
       pushd $f >>& /dev/null
       setenv TestScrDir $cwd
