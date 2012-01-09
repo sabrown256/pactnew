@@ -68,8 +68,7 @@ static void show_stat(statedes *st, char *tag)
        {first = FALSE;
 	PRINT(STDOUT, "\n");
 	PRINT(STDOUT, "\tTest                   Ni   FileSize    Ratio       Time   SpeedUp\n");
-	PRINT(STDOUT, "\t                            (kBytes)              (secs)\n");
-};
+	PRINT(STDOUT, "\t                            (kBytes)              (secs)\n");};
 
     i  = st->i;
     nv = st->nv;

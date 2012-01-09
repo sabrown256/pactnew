@@ -204,6 +204,14 @@ ${BinDir}/tpdd : tpdd.c ${InstallDep} ${Hdrs} ${DepLib}
 	${CLD} ${LdFlags} tpdd.c -o ${BinDir}/tpdd ${Libs} ${MDI_Lib}
 
 #
+# large file test
+#
+lf : ${BinDir}/tpdlf
+
+${BinDir}/tpdlf : tpdlf.c ${InstallDep} ${Hdrs} ${DepLib}
+	${CLD} ${LdFlags} tpdlf.c -o ${BinDir}/tpdlf ${Libs} ${MDI_Lib}
+
+#
 # net io test
 #
 net : ${BinDir}/tpdn
