@@ -17,9 +17,9 @@ set Builder = manager
 set Which = "$WrkDir/$Builder/pwhich"
 set RSYNC = `$Which rsync`
 if (-x "$RSYNC")  then
-   set UsingRSYNC = TRUE
+   set use_rsync = TRUE
 else
-   set UsingRSYNC = FALSE
+   set use_rsync = FALSE
 endif
 
 setenv Err  0
@@ -81,7 +81,7 @@ switch ($Phase)
 
         call GET_NET_ARG($LogHost)
 
-	if ($MultiConfig == yes) then
+        if ($MultiConfig == yes) then
            setenv SESSION_CONFIG $UHost+$Cfg
            Note $LogHost "Using multiconfig name $SESSION_CONFIG"
         endif
@@ -128,7 +128,7 @@ switch ($Phase)
            else
    
               set TmpDir = _foo_$Code
-	      set TBase  = $cwd:h
+              set TBase  = $cwd:h
               flog $LogHost mkdir $TBase/$TmpDir
               flog $LogHost cd $TBase/$TmpDir
 
@@ -153,7 +153,7 @@ switch ($Phase)
               endif
 
               if ($Err == 0) then
-	         set Prnt = $cwd:h
+                 set Prnt = $cwd:h
                  if (!(-d $Prnt/repository)) then
                     flog $LogHost $RMDir $Prnt/$Base
                  endif
@@ -175,7 +175,7 @@ switch ($Phase)
         flog $LogHost dsys delete -a
         flog $LogHost rm -rf gen/*
 
-        if ($UsingRSYNC == FALSE) then
+        if ($use_rsync == FALSE) then
            if ($?TmpTar) then
               if ($TmpTar == yes) then
                  flog $LogHost cd $WrkDir
@@ -315,7 +315,7 @@ switch ($Phase)
 
               set IErr = 0
               set dbgchar = `echo $dbgopt | sed 's/-//' | tr "[A-Z]" "[a-z]"`
-	      set Opt     = ( $CfgOptions "$dbgopt" )
+              set Opt     = ( $CfgOptions "$dbgopt" )
 
 # sequential
               if ("$spopt" == "-none") then
@@ -324,7 +324,7 @@ switch ($Phase)
 # parallel
               else
                  set CfgQual = "$tCfg$spopt"
-   	         set Opt     = ( $Opt "$spopt" )
+                 set Opt     = ( $Opt "$spopt" )
               endif
 
               set StatQual = "${dbgchar}_$CfgQual"
@@ -636,33 +636,40 @@ switch ($Phase)
 
         if (($InstBase != none) && ($Cancel == FALSE)) then
 
-       	   flog $LogHost set WhichType = $InstBase:t
-	   if ($WhichType == "pactnew") then
-	      flog $LogHost set SrcType = "new_sources"
-	   else if ($WhichType == "pact") then
-	      flog $LogHost set SrcType = "std_sources"
-	   else
-	      flog $LogHost set SrcType = "othr_sources"
-	   endif
+           flog $LogHost set WhichType = $InstBase:t
+           if ($WhichType == "pactnew") then
+              flog $LogHost set SrcType = "new_sources"
+           else if ($WhichType == "pact") then
+              flog $LogHost set SrcType = "std_sources"
+           else
+              flog $LogHost set SrcType = "othr_sources"
+           endif
 
-	   flog $LogHost set FooDir = $WrkDir:h
-	   flog $LogHost set SrcDir = $FooDir/$SrcType
+           flog $LogHost set FooDir = $WrkDir:h
+           flog $LogHost set SrcDir = $FooDir/$SrcType
 
-           flog $LogHost cp -R $WrkDir/* $SrcDir
-           set xstatus = $status
+           if ($use_rsync == TRUE) then
+              set opt = ""
+              set opt = ( $opt -auvC )
+              set opt = ( $opt --del )
+              flog $LogHost rsync $opt --exclude 'z-*' --exclude dev --exclude manager --exclude panacea/abc --exclude tests $WrkDir/ $SrcDir
+              set xstatus = $status
+           else
 
-           source $SrcDir/$Builder/pact-scs
+              flog $LogHost cp -R $WrkDir/* $SrcDir
+              set xstatus = $status
 
-	   flog $LogHost $RMDir $SrcDir/$SCSDir
-	   flog $LogHost $RMDir $SrcDir/*/$SCSDir
+              source $SrcDir/$Builder/pact-scs
 
-	   flog $LogHost $RMDir $SrcDir/z-*
-	   flog $LogHost $RMDir $SrcDir/dev
-	   flog $LogHost $RMDir $SrcDir/manager/*
-	   flog $LogHost $RMDir $SrcDir/panacea/abc/*
+              flog $LogHost $RMDir $SrcDir/$SCSDir
+              flog $LogHost $RMDir $SrcDir/*/$SCSDir
 
-	   flog $LogHost $RMDir $SrcDir/*/z-*
-	   flog $LogHost $RMDir $SrcDir/*/tests
+              flog $LogHost $RMDir $SrcDir/z-*
+              flog $LogHost $RMDir $SrcDir/dev
+              flog $LogHost $RMDir $SrcDir/manager/*
+              flog $LogHost $RMDir $SrcDir/panacea/abc/*
+              flog $LogHost $RMDir $SrcDir/*/tests
+           endif
 
            if ($xstatus == 0) then
               setenv Err  0
@@ -673,7 +680,7 @@ switch ($Phase)
 # send netinstall log to update file
            tlog "(LOG)" cat $DevDir/log/netinstall
 
-	endif
+        endif
 
         set QuotaDB = /usr/global/etc/gapps-quota-report
         if (-e $QuotaDB) then
@@ -787,11 +794,11 @@ GET_NET_ARG:
                if ($#argv > 0) then 
                   flog $LogHost set InstBase = $1
                   flog $LogHost shift
-	       endif
+               endif
                if ($#argv > 0) then 
                   flog $LogHost set Cfg = $1
                   flog $LogHost shift
-	       endif
+               endif
 
 # anything else
                set larg = ( `echo "$argv" | sed 's/=/ /g'` )
@@ -879,7 +886,7 @@ GET_HOST_ARG:
                shift
                if ($#argv == 0) break
                flog $lFile set InstBase = $1
-	       shift
+               shift
 
 # anything else
                set larg = ( `echo "$argv" | sed 's/=/ /g'` )
@@ -962,7 +969,7 @@ TOTMP:
       flog $LogHost set TmpActive = TRUE
       flog $LogHost touch $SemDir/loading
 
-      if ($UsingRSYNC == TRUE) then
+      if ($use_rsync == TRUE) then
          flog $LogHost $RSYNC -arclp --exclude=doc/ --exclude=dev/ --exclude=$SCSDir/ '--exclude=z-*/' $TrueWrkDir $WrkDir:h
          flog $LogHost $MV $WrkDir:h/$TrueWrkDir:t $WrkDir
          flog $LogHost pushd $WrkDir/$Builder
@@ -1008,7 +1015,7 @@ FROMTMP:
    Note $LogHost "NF = |$NF|"
 
    if ($NF == 0) then
-      if ($UsingRSYNC == TRUE) then
+      if ($use_rsync == TRUE) then
          flog $LogHost $RSYNC -arclp $WrkDir/dev $TrueWrkDir
          flog $LogHost cd ../..
       else
