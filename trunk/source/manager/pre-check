@@ -22,6 +22,7 @@ set Requ = ( $Requ awk cat expr grep sed sort tail tee tr wc )
 set Requ = ( $Requ find gzip tar )
 set Requ = ( $Requ date dirname env nm ps sleep uname )
 set Requ = ( $Requ csh make ar )
+set Requ = ( $Requ git svn )
 
 set Missing = ""
 foreach i ($Requ)

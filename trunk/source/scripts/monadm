@@ -1,0 +1,401 @@
+#!/bin/csh -f
+#
+# MONADM - monitor conditions the admins should have found
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set fs  = ""
+set cmp = ""
+set exe = ""
+set lib = ""
+
+@ err = 0
+
+set vrb  = FALSE
+set cvfy = TRUE
+set cmnt = TRUE
+set ccmp = TRUE
+set cexe = TRUE
+set clib = TRUE
+
+set bindir = `dirname $0`
+
+while ($#argv > 0)
+   switch ($1)
+      case -cmp:
+           set ccmp = FALSE
+           breaksw
+      case -exe:
+           set cexe = FALSE
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: monadm [-cmp] [-exe] [-h] [-lib] [-mnt] [-v] [-vfy]"
+           echo "   cmp  do not check compilers"
+           echo "   exe  do not check utilities"
+           echo "   h    this help message"
+           echo "   lib  do not check libraries and shared objects"
+           echo "   mnt  do not check mounted file systems"
+           echo "   v    verbose mode"
+           echo "   vfy  do not verify that hosts are up"
+           echo ""
+           exit(1)
+      case -lib:
+           set clib = FALSE
+           breaksw
+      case -mnt:
+           set cmnt = FALSE
+           breaksw
+      case -v:
+           set vrb = TRUE
+           breaksw
+      case -vfy:
+           set cvfy = FALSE
+           breaksw
+   endsw
+   shift
+end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SETUP
+
+date
+if ($?HOST_SERVER_DB == 0) then
+   setenv HOST_SERVER_DB /usr/gapps/pact/db/host-server-db
+endif
+echo "HOST_SERVER_DB = $HOST_SERVER_DB"
+
+set dat = ( `grep '\.net' $HOST_SERVER_DB` )
+set net = $dat[2]
+unset dat
+echo "Default net = $net"
+echo ""
+
+set ADM = $HOME/.monadm
+
+if (-f ${ADM}rc) then
+   source ${ADM}rc
+endif
+
+if (!(-d $ADM)) then
+   mkdir $ADM
+endif
+
+cp $bindir/check-exe $ADM
+chmod 770 $ADM/check-exe
+
+cat >&! $ADM/hello.c << EOF
+#include <stdio.h>
+int main(int c, char **v)
+   {printf("hello world\n");
+    return(0);}
+EOF
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# HOSTS - verify hosts
+
+if ($cvfy == TRUE) then
+   echo "Checking hosts"
+
+   set log = log.vfy.$$
+   rm -f $log
+
+   hserve -q -t @$net -vfy |& sed 's/denied/ng    /' | tee $log
+
+   @ nd = `grep -v ok $log | wc -l`
+   if ($nd == 1) then
+      echo "$nd host is down"
+   else if ($nd > 0) then
+      echo "$nd hosts are down"
+   else
+      echo "All hosts are up"
+   endif
+   echo ""
+
+   @ err = $err + $nd
+
+   rm -f $log
+
+   unset log
+   unset dat
+   unset net
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# MOUNTS - check mounted file systems
+
+if (($cmnt == TRUE) && ("$fs" != "")) then
+   echo "Checking mounted/linked file systems"
+   @ xstatus = 0
+   while ($#fs > 0)
+      set hl  = $fs[1]
+      set dir = $fs[2]
+      shift fs
+      shift fs
+
+      set bad = ( `hserve -q -t $hl -exh "(cd $dir > /dev/null; pwd)" |& grep "No such" | sed 's~|.*$~~' ` )
+      if ("$bad" != "") then
+         set st = ng
+         @ xstatus = $xstatus + 1
+      else
+         set st = ok
+      endif
+
+# print results
+      echo $hl $st $dir                                    | \
+      awk '{printf("   %-16s %2s  %s", $1, $2, $3);}'
+      if ("$bad" != "") then
+         echo -n " - $bad"
+      endif
+      echo ""
+   end
+   unset bad
+   @ err = $err + $xstatus
+   if ($xstatus == 0) then
+      echo "All file systems mounted/linked"
+   else
+      echo "$xstatus file systems not mounted/linked"
+   endif
+   echo ""
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# COMPILERS - check compilers
+
+if (($ccmp == TRUE) && ("$cmp" != "")) then
+   echo "Checking compilers"
+   @ xstatus = 0
+   while ($#cmp > 0)
+      set hl  = $cmp[1]
+      set cc  = $cmp[2]
+      set vr  = $cmp[3]
+      set vc  = $cmp[4]
+      shift cmp
+      shift cmp
+      shift cmp
+      shift cmp
+
+      set log = log.${cc}-${vr}-${hl}
+
+      set st    = ok
+      set use   = ""
+      set bad   = ""
+      set issue = ""
+
+      hserve -q -t $hl -exh '(cd '$ADM' ; set hst = `uname -n` ; rm -f hello.$hst ; /usr/gapps/pact/scripts/'$cc' -cwvrb -cwvers '$vr' hello.c -o hello.$hst ; hello.$hst)' >&! $log
+
+      @ nwe = `awk '{print $1}' $log | sort | uniq | wc -l`
+
+      @ nlp = `grep "LICENSE MANAGER PROBLEM" $log | wc -l`
+      @ nnc = `grep "Command not found" $log | wc -l`
+      @ nwf = `grep "hello world" $log | wc -l`
+      @ nvf = `grep $vr $log | wc -l`
+      @ nve = $nwe * $vc
+      if (($nve != $nvf) || ($nwe != $nwf) || ($nlp != 0) || ($nnc != 0)) then
+         set st = ng
+
+# license problems
+         if ($nlp != 0) then
+            set issue = "License manager problem"
+            set bad   = ( `grep "LICENSE MANAGER PROBLEM" $log |& sed 's~|.*$~~' | uniq` )
+
+# missing compiler or test executable
+         else if ($nnc != 0) then
+            set bad = ( `grep "Command not found" $log |& grep $cc | sed 's~|.*$~~' | uniq` )
+            if ("$bad" != "") then
+               set issue = "Missing compiler exe"
+               set bad   = ( `grep "Root" $log |& sed 's~|.*$~~' | uniq` )
+            else
+               set bad = ( `grep "Command not found" $log |& grep -v $cc | sed 's~|.*$~~' | uniq` )
+               if ("$bad" != "") then
+                  set issue = "Compiler failed"
+               endif
+            endif
+
+# missing compiler version
+         else if ($nve != $nvf) then
+            set issue = "Missing compiler version"
+            set bad   = ( `grep "Root" $log |& grep -v $vr | sed 's~|.*$~~' | uniq` )
+            set use   = ( `grep "Root" $log |& grep -v $vr | sed 's~^.*|.*Root:~~' | uniq` )
+
+# compiled test code failures
+         else if ($nwe != $nwf) then
+            set issue = "Compiled test failed"
+         else
+            set issue = "Unknown failure"
+         endif
+
+         @ xstatus = $xstatus + 1
+      endif
+
+# print results
+      echo $hl $st $cc $vr                                           | \
+      awk '{printf("   %-16s %2s  %-8s %-8s   ", $1, $2, $3, $4);}'
+
+      if ("$issue" != "") then
+         echo -n "$issue"
+      endif
+      if ("$bad" != "") then
+         echo -n " - $bad"
+      endif
+      echo ""
+
+      if ("$use" != "") then
+         echo "                    Used $cc in: $use"
+      endif
+
+      if (($vrb == TRUE) && ($st == ng)) then
+         cat $log
+      endif
+
+      rm -rf $log
+   end
+   unset issue
+   unset bad
+   unset use
+   unset hl
+   unset cc
+   unset vr
+   unset log
+
+   @ err = $err + $xstatus
+   if ($xstatus == 0) then
+      echo "All compilers ready"
+   else
+      echo "$xstatus compilers not ready"
+   endif
+   echo ""
+
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# EXE - check utilities
+
+if (($cexe == TRUE) && ("$exe" != "")) then
+   echo "Checking utilities"
+   @ xstatus = 0
+   while ($#exe > 0)
+      set hl   = $exe[1]
+      set util = $exe[2]
+      set res  = "$exe[3]"
+      shift exe
+      shift exe
+      shift exe
+
+      set log = log.exe-$hl
+      set bad = ""
+
+      hserve -q -t $hl -exh "(.monadm/check-exe -v -vers $res $util |& sed 's~|~ ~')" >&! $log
+      set bad = ( `grep " ng " $log | sed 's~|.*$~~'` )
+      if ("$bad" == "") then
+         set st = ok
+      else
+         set st = ng
+         @ xstatus = $xstatus + 1
+      endif
+
+# print results
+      echo $hl $st $util $res                                           | \
+      awk '{printf("   %-16s %2s  %-8s %-8s   ", $1, $2, $3, $4);}'
+      if ("$bad" != "") then
+         echo -n " - $bad"
+      endif
+      echo ""
+
+      if (($vrb == TRUE) && ($st == ng)) then
+         cat $log
+      endif
+
+      rm -rf $log
+   end
+   unset hl
+   unset res
+
+   @ err = $err + $xstatus
+   if ($xstatus == 0) then
+      echo "All utilies consistent"
+   else
+      echo "Some utilies inconsistent"
+   endif
+   echo ""
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# LIB - check libs and shared objects
+
+if (($clib == TRUE) && ("$lib" != "")) then
+   echo "Checking libraries and shared objects"
+   @ xstatus = 0
+   while ($#lib > 0)
+      set hl  = $lib[1]
+      set lb  = $lib[2]
+      set res = $lib[3]
+      shift lib
+      shift lib
+      shift lib
+
+      set log = log.lib-$hl
+      set bad = ""
+
+      hserve -q -t $hl -exh "file $lb" | sed 's~|.*/~ | ~' | sed 's~.$~~' | sed 's~|.*\.so\.~ | ~' >&! $log
+
+      if ("$res" == any) then
+         set bad = ""
+      else if ("$res" =~ *+) then
+         set rs  = `echo $res | sed 's/+$//'`
+         set bad = ( `awk '$3 < '$rs' {print $1}' $log` )
+         unset rs
+      else
+         set bad = ( `awk '$3 !~ /'$res'/ {print $1}' $log` )
+      endif
+      if ("$bad" == "") then
+         set st = ok
+      else
+         set st = ng
+         @ xstatus = $xstatus + 1
+      endif
+
+# print results
+      echo $hl $st $lb $res                                           | \
+      awk '{printf("   %-16s %2s  %-8s %-8s   ", $1, $2, $3, $4);}'
+      if ("$bad" != "") then
+         echo -n " - $bad"
+      endif
+      echo ""
+
+      if (($vrb == TRUE) && ($st == ng)) then
+         cat $log
+      endif
+
+      rm -rf $log
+   end
+
+   @ err = $err + $xstatus
+   if ($xstatus == 0) then
+      echo "All libraries consistent"
+   else
+      echo "Some libraries inconsistent"
+   endif
+   echo ""
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($status)

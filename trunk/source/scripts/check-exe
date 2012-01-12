@@ -1,0 +1,164 @@
+#!/bin/csh -f
+#
+# CHECK-EXE - check that the specified utility is correct
+#           - this will not catch things like compilers
+#           - which may give a version without a license
+#           - but will not compile a file
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+@ err = 0
+set vers = ""
+set util = ""
+set vrb  = FALSE
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: check-exe [-h] [-v] [-vers <vers>] <utility>"
+           echo "   h    this help message"
+           echo "   v    run in verbose mode"
+           echo "   vers check for match of version specification"
+           echo ""
+           exit(1)
+      case -v:
+           set vrb = TRUE
+           breaksw
+      case -vers:
+           shift
+           set vers = $1
+           breaksw
+      default:
+           set util = ( $util $1 )
+           breaksw
+   endsw
+   shift
+end
+
+if ("$util" == "") then
+   echo "No utility specified - exiting"
+   exit(1)
+endif
+
+foreach u ($util)
+   if ($u !~ /*) then
+      set u = `which $u`
+   endif
+
+   set ok = TRUE
+
+# check executable
+   if (!(-x "$u")) then
+      if ($vrb == TRUE) then
+         echo "$u[1] ng - no executable"
+      endif
+      @ err = $err + 1
+      set ok = FALSE
+   endif
+
+# check version
+   if (($ok == TRUE) && ("$vers" != "")) then
+      set un = $u:t
+      set v  = unknown
+      switch ($un)
+
+# try things with specific signatures
+         case smake:
+         case dmake:
+         case pact:
+              set v = `pact -v`
+              breaksw
+
+         case make:
+         case gmake:
+              set v = `$un --version |& grep Make | awk '{print $3}'`
+              breaksw
+
+         case cvs:
+              set v = `cvs --version |& grep Versions | awk '{print $5}'`
+              breaksw
+
+         case gs:
+              set v = `gs -help |& grep Ghostscript | awk '{print $3}'`
+              breaksw
+
+         case g++:
+         case g77:
+         case gcc:
+         case gfortran:
+              set v = `$un -v |& grep version | awk '{print $3}'`
+              breaksw
+
+# try everything that does not have a specific signature
+         default:
+              foreach m (-V -v --version -version)
+
+# check for .... version xxxx ....
+                 set dat = ( `$u $m |& tr "[A-Z]" "[a-z]" | grep -v usage | grep -iw version && echo "got-it"` )
+                 if ("$dat" =~ *got-it) then
+                    if ($#dat == 2) then
+                       set v = $dat[1]
+                    else
+                       set v = `echo "$dat" | awk '{for (i = 1; i <= NF; i++) {if ($i == "version") {printf("%s\n", $++i); break;};};}'`
+                    endif
+                    if ("$v" != "") then
+                       break
+                    endif
+                 endif
+
+# check for .... $un xxxx ....
+                 set dat = ( `$u $m |& tr "[A-Z]" "[a-z]" | grep -v usage | grep -i $un && echo "got-it"` )
+                 if ("$dat" =~ *got-it) then
+                    if ($#dat == 2) then
+                       set v = $dat[1]
+                    else
+                       set v = `echo "$dat" | awk '{for (i = 1; i <= NF; i++) {if ($i == "'$un'") {printf("%s\n", $++i); break;};};}'`
+                    endif
+                    if ("$v" != "") then
+                       break
+                    endif
+                 endif
+              end
+              breaksw
+      endsw
+
+      if ("$vers" =~ *+) then
+         set lv = `echo $vers | sed 's~+$~~'`
+         set st = `echo $v | awk '$1 < '$lv' {print "ng"}'`
+      else
+         set st = `echo $v | awk '$1 !~ /'$vers'/ {print "ng"}'`
+      endif
+
+      if ("$v" != "") then
+         if ("$vers" == any) then
+            if ($vrb == TRUE) then
+               echo "$u ok - $v"
+            endif
+         else if ("$st" == "ng") then
+            @ err = $err + 1
+            if ($vrb == TRUE) then
+               echo "$u ng - $v does not match $vers"
+            endif
+         else
+            if ($vrb == TRUE) then
+               echo "$u ok - $v matches $vers"
+            endif
+         endif
+      else
+         @ err = $err + 1
+         if ($vrb == TRUE) then
+            echo "$u ng - no version found"
+         endif
+      endif
+
+   endif
+end
+
+exit($err)
