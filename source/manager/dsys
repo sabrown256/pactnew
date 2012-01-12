@@ -127,41 +127,42 @@ switch ($Cmnd)
         echo " "
         echo "Usage: dsys <command> <options> "
         echo " "
-        echo "Commands: analyze      - analyze the current platform"
-        echo "          build        - compile and load the system codes"
-        echo "          clean        - clean out the source directories"
-        echo "          commit       - commit source/builder/doc changes into repository"
-        echo "                       - commit message is built from remaining args"
-        echo "          config       - configure the sources for the current platform"
-        echo "          configured   - report the current configuration"
-        echo "          delete       - remove all subdirectories and ancillary files"
-        echo "                         pertaining to a specified architecture"
-        echo "                         (Type 'dsys delete -h' for options.)"
-        echo "          diff-hdrs    - diff the headers against the repository"
-        echo "          dist         - make a distribution file"
-        echo "          import       - import sources (repository to repository)"
-        echo "          info         - print info about PACT including"
-        echo "                         log - review commit log"
-        echo "                         tags - list revision tags"
-        echo "                         space - find size of bins, libs, and includes"
-        echo "          install      - install the system codes in public"
-        echo "          net-update   - run a do-net without some bootstrapping problems"
-        echo "          pact         - control the pact link to either smake or dmake"
-        echo "          reconfig     - re-configure according to last configuration"
-        echo "          remove       - remove the binaries in ../dev"
-        echo "          post         - post a new distribution"
-        echo "          select       - change configuration when using multiple"
-        echo "                         configurations per platform"
-        echo "          shared       - build PACT and its shared libraries"
-        echo "          stats        - plot timing information from update logs"
-        echo "          stats-update - create ultra files with timing information from update logs"
-        echo "          sync         - update sources with repository "
-        echo "          sync-repo    - update one repository from another"
-        echo "          tag          - tag the sources"
-        echo "          test         - test the system codes"
-        echo "          test-ssh     - test the SSH connections"
-        echo "          update-sys   - update PACT versions at all sites using"
-        echo "                         the update-sys utility"
+        echo "Commands: analyze       - analyze the current platform"
+        echo "          build         - compile and load the system codes"
+        echo "          clean         - clean out the source directories"
+        echo "          commit        - commit source/builder/doc changes into repository"
+        echo "                        - commit message is built from remaining args"
+        echo "          config        - configure the sources for the current platform"
+        echo "          configured    - report the current configuration"
+        echo "          delete        - remove all subdirectories and ancillary files"
+        echo "                          pertaining to a specified architecture"
+        echo "                          (Type 'dsys delete -h' for options.)"
+        echo "          diff-hdrs     - diff the headers against the repository"
+        echo "          dist          - make a distribution file"
+        echo "          force-install - force install for specified configuration"
+        echo "          import        - import sources (repository to repository)"
+        echo "          info          - print info about PACT including"
+        echo "                          log - review commit log"
+        echo "                          tags - list revision tags"
+        echo "                          space - find size of bins, libs, and includes"
+        echo "          install       - install the system codes in public"
+        echo "          net-update    - run a do-net without some bootstrapping problems"
+        echo "          pact          - control the pact link to either smake or dmake"
+        echo "          reconfig      - re-configure according to last configuration"
+        echo "          remove        - remove the binaries in ../dev"
+        echo "          post          - post a new distribution"
+        echo "          select        - change configuration when using multiple"
+        echo "                          configurations per platform"
+        echo "          shared        - build PACT and its shared libraries"
+        echo "          stats         - plot timing information from update logs"
+        echo "          stats-update  - create ultra files with timing information from update logs"
+        echo "          sync          - update sources with repository "
+        echo "          sync-repo     - update one repository from another"
+        echo "          tag           - tag the sources"
+        echo "          test          - test the system codes"
+        echo "          test-ssh      - test the SSH connections"
+        echo "          update-sys    - update PACT versions at all sites using"
+        echo "                          the update-sys utility"
 
         if ($HaveTicket == TRUE) then
            echo "          ticket       - interact with the issue ticket tracker"
@@ -1380,6 +1381,23 @@ CFG_DONE:
    case dist:
         $Time ./pact-dist $argv
         set RStatus = $status
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   case force-install:
+        setenv SESSION_CONFIG $1
+        source ../dev/$SESSION_CONFIG/include/env-pact.csh
+        rehash
+        install-pact >& /dev/null
+        set RStatus = $status
+        if ($RStatus == 0) then
+           echo "Installation for $SESSION_CONFIG succeeded"
+        else
+           echo "Installation for $SESSION_CONFIG failed"
+        endif
+
         breaksw
 
 #--------------------------------------------------------------------------
