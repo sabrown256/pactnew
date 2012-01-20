@@ -29,17 +29,17 @@ static void SX_set_graphics_state(PG_device *d)
 
     g = &d->g;
 
-    d->autodomain             = SX_autodomain;
-    d->autoplot               = SX_autoplot;
-    d->autorange              = SX_autorange;
-    d->background_color_white = SX_background_color_white;
+    d->autodomain             = SX_gs.autodomain;
+    d->autoplot               = SX_gs.autoplot;
+    d->autorange              = SX_gs.autorange;
+    d->background_color_white = SX_gs.background_color_white;
 
     out = SX_match_device(d);
     if (out != NULL)
        {if (out->background_color != -1)
 	   d->background_color_white = out->background_color;};
 
-    d->border_width = SX_border_width;
+    d->border_width = SX_gs.border_width;
     d->data_id      = SX_data_id;
     d->gprint_flag  = TRUE;
     d->grid         = SX_grid;
@@ -47,13 +47,13 @@ static void SX_set_graphics_state(PG_device *d)
 /* view width and height are set by users so push it
  * into the view_x box
  */
-    SX_view_x[1] = SX_view_x[0] + SX_view_width;
-    SX_view_x[3] = SX_view_x[2] + SX_view_height;
+    SX_gs.view_x[1] = SX_gs.view_x[0] + SX_gs.view_width;
+    SX_gs.view_x[3] = SX_gs.view_x[2] + SX_gs.view_height;
 
-    d->view_aspect  = SX_view_aspect;
+    d->view_aspect  = SX_gs.view_aspect;
 
     for (i = 0; i < PG_BOXSZ; i++)
-        {d->view_x[i] = SX_view_x[i];
+        {d->view_x[i] = SX_gs.view_x[i];
 
 /* viewport limits in WC */
          g->wc[i] = SX_gwc[i];
@@ -72,11 +72,11 @@ static void SX_set_graphics_state(PG_device *d)
     PG_fset_marker_orientation(d, SX_marker_orientation);
 
     if (!POSTSCRIPT_DEVICE(d))
-       {g->hwin[0] = SX_window_P[0];
-        g->hwin[2] = SX_window_P[1];};
+       {g->hwin[0] = SX_gs.window_P[0];
+        g->hwin[2] = SX_gs.window_P[1];};
 
-    g->hwin[1] = g->hwin[0] + SX_window_width_P;
-    g->hwin[3] = g->hwin[2] + SX_window_height_P;
+    g->hwin[1] = g->hwin[0] + SX_gs.window_width_P;
+    g->hwin[3] = g->hwin[2] + SX_gs.window_height_P;
 
     return;}
 
@@ -163,8 +163,8 @@ static char *_SX_reproc_in(SS_psides *si, char *line)
 
         SX_wrap_paren("(", _SX.command, ")", MAXLINE);
 
-        if (SX_command_log != NULL)
-           PRINT(SX_command_log, "%s\n", _SX.command);
+        if (SX_gs.command_log != NULL)
+           PRINT(SX_gs.command_log, "%s\n", _SX.command);
 
         rv = _SX.command;};
 
@@ -235,7 +235,7 @@ static void _SX_read(SS_psides *si, object *strm)
     else if (SS_variablep(o))
        {SS_var_value(si, "current-file", G_FILE, &po, TRUE);
 	if (po == NULL)
-	   file = SX_vif;
+	   file = SX_gs.vif;
         else
 	   file = FILE_FILE(PDBfile, po);
 
@@ -296,9 +296,9 @@ object *SX_mode_text(SS_psides *si)
    {object *ret;
 
     if (PG_console_device == NULL)
-       PG_open_console("PDBView", SX_console_type, SX_background_color_white,
-                       SX_console_x, SX_console_y,
-                       SX_console_width, SX_console_height);
+       PG_open_console("PDBView", SX_gs.console_type, SX_gs.background_color_white,
+                       SX_gs.console_x, SX_gs.console_y,
+                       SX_gs.console_width, SX_gs.console_height);
 
     if (SX_graphics_device != NULL)
        {PG_clear_window(SX_graphics_device);
@@ -354,7 +354,7 @@ void SX_setup_viewspace(PG_device *dev, double mh)
  * otherwise label-space 0.5 followed by label-space 0.0 goes bad
  */
     if (obx[0] == -HUGE)
-       PG_box_copy(3, obx, SX_view_x);
+       PG_box_copy(3, obx, SX_gs.view_x);
 
     PG_get_attrs_glb(TRUE,
 		     "label-space", &labsp,
@@ -362,39 +362,39 @@ void SX_setup_viewspace(PG_device *dev, double mh)
 
 /* this way respects the user controls in ULTRA and PDBView
  * such as view-height and label-space
- * it does this by preserving SX_view_x
+ * it does this by preserving SX_gs.view_x
  */
     if (traditional == TRUE)
-       {nvh  = SX_view_height/(1.0 + labsp);
+       {nvh  = SX_gs.view_height/(1.0 + labsp);
 	nvoy = (obx[2] + labsp)/(1.0 + labsp);
 
-	SX_view_x[2] = nvoy;
-	SX_view_x[3] = nvoy + nvh;
+	SX_gs.view_x[2] = nvoy;
+	SX_gs.view_x[3] = nvoy + nvh;
 
 	dev->view_x[2] = nvoy;
 	dev->view_x[3] = nvoy + nvh;
 
 /* set the old school state */
-/*        SX_view_height    = nvh; */
-	SX_window_height *= mh;}
+/*        SX_gs.view_height    = nvh; */
+	SX_gs.window_height *= mh;}
 
 /* this way make better use of space as the window is
  * made larger or smaller
- * it does this by modifying SX_view_x
+ * it does this by modifying SX_gs.view_x
  */
     else
        {nvh  = (obx[3] - obx[2])/(1.0 + labsp);
 	nvoy = (obx[2] + labsp)/(1.0 + labsp);
 
-	SX_view_x[2] = nvoy;
-	SX_view_x[3] = nvoy + nvh;
+	SX_gs.view_x[2] = nvoy;
+	SX_gs.view_x[3] = nvoy + nvh;
 
 	dev->view_x[2] = nvoy;
 	dev->view_x[3] = nvoy + nvh;
 
 /* set the old school state */
-	SX_view_height    = nvh;
-	SX_window_height *= mh;};
+	SX_gs.view_height    = nvh;
+	SX_gs.window_height *= mh;};
 
     return;}
 
@@ -410,10 +410,10 @@ object *SX_mode_graphics(SS_psides *si)
    {object *ret;
 
     if (PG_console_device == NULL)
-       {if (!PG_open_console("PDBView", SX_console_type,
-                             SX_background_color_white,
-                             SX_console_x, SX_console_y,
-                             SX_console_width, SX_console_height))
+       {if (!PG_open_console("PDBView", SX_gs.console_type,
+                             SX_gs.background_color_white,
+                             SX_gs.console_x, SX_gs.console_y,
+                             SX_gs.console_width, SX_gs.console_height))
            {if (!SX_qflag)
                PRINT(STDOUT, "\nCannot connect to display\n");};}
 
@@ -472,10 +472,10 @@ object *SX_mode_graphics(SS_psides *si)
 	    SC_REGISTER_CONTEXT(SX_update_event_handler,  si);
 
 /* remember the window size and position in pixels */
-	    SX_window_height_P = PG_window_height(SX_graphics_device);
-	    SX_window_width_P  = PG_window_width(SX_graphics_device);
-	    SX_window_P[0]     = SX_graphics_device->g.hwin[0];
-	    SX_window_P[1]     = SX_graphics_device->g.hwin[2];
+	    SX_gs.window_height_P = PG_window_height(SX_graphics_device);
+	    SX_gs.window_width_P  = PG_window_width(SX_graphics_device);
+	    SX_gs.window_P[0]     = SX_graphics_device->g.hwin[0];
+	    SX_gs.window_P[1]     = SX_graphics_device->g.hwin[2];
 	    
 	    if (PG_console_device != NULL)
 	       PG_expose_device(PG_console_device);};

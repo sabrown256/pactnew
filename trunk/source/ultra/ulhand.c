@@ -736,7 +736,7 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
                     tmp = _UL_make_ln(si, 0.0, value,
                                       gxmin,
                                       gxmax,
-                                      SX_default_npts);
+                                      SX_gs.default_npts);
 
                     i   = SX_get_crv_index_i(tmp);
                     lbl = SC_dsnprintf(FALSE, "%s %g",

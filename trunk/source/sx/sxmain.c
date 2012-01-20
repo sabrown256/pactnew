@@ -160,12 +160,12 @@ int main(int c, char **v, char **env)
 /* initialize SX
  * the following variables must be initialized before SX_init
  */
-    SX_console_type     = CSTRSAVE("MONOCHROME");
-    SX_console_x        = 0.0;
-    SX_console_y        = 0.0;
-    SX_console_width    = 0.33;
-    SX_console_height   = 0.33;
-    SX_background_color_white = TRUE;
+    SX_gs.console_type     = CSTRSAVE("MONOCHROME");
+    SX_gs.console_x        = 0.0;
+    SX_gs.console_y        = 0.0;
+    SX_gs.console_width    = 0.33;
+    SX_gs.console_height   = 0.33;
+    SX_gs.background_color_white = TRUE;
 
 /* run in PDBView mode */
     if (pvflag)

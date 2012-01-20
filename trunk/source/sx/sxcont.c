@@ -13,15 +13,7 @@
 #define EOE(str) ((*SS_PTR(str) == '\n') || (*SS_PTR(str) == '\0'))
 
 int
- SX_autorange,
- SX_autodomain,
- SX_autoplot,
- SX_background_color_white,
- SX_border_width,
  SX_data_id,
- *SX_data_index,
- SX_default_color,
- SX_default_npts,
  SX_gr_mode,
  SX_grid,
  SX_N_Curves,
@@ -29,15 +21,12 @@ int
  SX_plot_flag,
  SX_plot_type_size,
  SX_qflag = FALSE,
- SX_show_mouse_location,
  SX_log_scale[PG_SPACEDM];
 
 double
  SX_chi,
  SX_marker_orientation,
  SX_phi,
- SX_show_mouse_location_x,
- SX_show_mouse_location_y,
  SX_theta;
 
 char
@@ -62,10 +51,6 @@ curve
 
 object
  *SX_curfile;
-
-SX_state
- _SX = { 3, 1.0e-15, 1.0e-3, 2.0, 'a', LITERAL, 1, 1, '@', "curves.a",
-         TRUE, };
 
 SX_file_action
  SX_file_exist_action = FAIL;
@@ -578,7 +563,7 @@ void SX_parse(SS_psides *si,
                    si->interactive = OFF;};
 
                 if (SX_plot_flag && (strcmp(s, "replot") != 0) &&
-                    (SX_autoplot == ON) &&
+                    (SX_gs.autoplot == ON) &&
                     (replot != NULL))
                    replot(si);};};};
 
@@ -1112,13 +1097,13 @@ void SX_install_global_vars(SS_psides *si)
     *axslyf = CSTRSAVE("%10.2g");
     *axstf  = CSTRSAVE("helvetica");
 
-    SX_autodomain             = TRUE;
-    SX_autoplot               = ON;
-    SX_autorange              = TRUE;
-    SX_border_width           = 2;
+    SX_gs.autodomain             = TRUE;
+    SX_gs.autoplot               = ON;
+    SX_gs.autorange              = TRUE;
+    SX_gs.border_width           = 2;
     SX_chi                    = 0.0;
     SX_data_id                = TRUE,
-    SX_default_color          = -1;
+    SX_gs.default_color          = -1;
     SX_GRI_x                  = 0.5;
     SX_GRI_y                  = 0.01;
     SX_GRI_dx                 = 0.0;
@@ -1136,9 +1121,9 @@ void SX_install_global_vars(SS_psides *si)
     SX_render_2d_1d           = PLOT_CONTOUR;
     SX_render_2d_2d           = PLOT_VECTOR;
     SX_render_3d_1d           = PLOT_MESH;
-    SX_show_mouse_location    = FALSE;
-    SX_show_mouse_location_x  = 0.025;
-    SX_show_mouse_location_y  = 0.955;
+    SX_gs.show_mouse_location    = FALSE;
+    SX_gs.show_mouse_location_x  = 0.025;
+    SX_gs.show_mouse_location_y  = 0.955;
     SX_smooth_method          = CSTRSAVE("averaging");
     SX_theta                  = 0.0;
 
@@ -1173,17 +1158,17 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "autorange",
                   "Variable: Turns on or off autoranging\n     Usage: autorange on | off",
                   SS_acc_int,
-                  &SX_autorange);
+                  &SX_gs.autorange);
 
     SS_install_cf(si, "autodomain",
                   "Variable: Turns on or off autodomain\n     Usage: autodomain on | off",
                   SS_acc_int,
-                  &SX_autodomain);
+                  &SX_gs.autodomain);
 
     SS_install_cf(si, "autoplot",
                   "Variable: Controls autoploting of graphs\n     Usage: autoplot on | off",
                   SS_acc_int,
-                  &SX_autoplot);
+                  &SX_gs.autoplot);
 
     SS_install_cf(si, "axis",
                   "Variable: Controls drawing the axes\n     Usage: axis on | off ",
@@ -1275,12 +1260,12 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "background-color-flag",
                   "Variable: Background color - white or black\n     Usage: background-color-flag black | white",
                   SS_acc_int,
-                  &SX_background_color_white);
+                  &SX_gs.background_color_white);
 
     SS_install_cf(si, "border-width",
                   "Variable: Window border width in pixels\n     Usage: border-width <integer>",
                   SS_acc_int,
-                  &SX_border_width);
+                  &SX_gs.border_width);
 
     SS_install_cf(si, "botspace",
                   "Variable: Fractional space at bottom of screen\n     Usage: botspace <real>",
@@ -1300,27 +1285,27 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "console-type",
                   "Variable: Controls console mode\n     Usage: console-type <string>",
                   SS_acc_ptr,
-                  &SX_console_type);
+                  &SX_gs.console_type);
 
     SS_install_cf(si, "console-origin-x",
                   "Variable: X comp of console origin (frac of screen width)\n     Usage: console-origin-x <real>",
                   SS_acc_double,
-                  &SX_console_x);
+                  &SX_gs.console_x);
 
     SS_install_cf(si, "console-origin-y",
                   "Variable: Y comp of console origin (frac of screen width)\n     Usage: console-origin-y <real>",
                   SS_acc_double,
-                  &SX_console_y);
+                  &SX_gs.console_y);
 
     SS_install_cf(si, "console-width",
                   "Variable: Console width in fraction of screen width\n     Usage: console-width <real>",
                   SS_acc_double,
-                  &SX_console_width);
+                  &SX_gs.console_width);
 
     SS_install_cf(si, "console-height",
                   "Variable: Console height in fraction of screen width\n     Usage: console-height <real>",
                   SS_acc_double,
-                  &SX_console_height);
+                  &SX_gs.console_height);
 
     SS_install_cf(si, "contour-n-levels",
                   "Variable: Default number of contour levels to plot\n     Usage: contour-n-levels <int>",
@@ -1345,12 +1330,12 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "default-color",
                   "Variable: The default line color\n     Usage: default-color <color>",
                   SS_acc_int,
-                  &SX_default_color);
+                  &SX_gs.default_color);
 
     SS_install_cf(si, "default-npts",
                   "Variable: The default number of points used to make new curves.\n     Used by SPAN, LINE, etc.",
                   SS_acc_int,
-                  &SX_default_npts);
+                  &SX_gs.default_npts);
 
     SS_install_cf(si, "display-name",
                   "Variable: Display-name - <host>:<display>.<screen>\n     Usage: display-name <string>",
@@ -1447,22 +1432,22 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "interpolation-method",
                   "Variable: interpolation method: inverse distance or multi-quadric\n     Usage: interpolation-method idw | mq",
                   SS_acc_int,
-                  &SX_interp_method);
+                  &SX_gs.interp_method);
 
     SS_install_cf(si, "interpolation-power",
                   "Variable: exponent which defines distance measure used in interpolation\n     Usage: interpolation-power #",
                   SS_acc_double,
-                  &SX_interp_power);
+                  &SX_gs.interp_power);
 
     SS_install_cf(si, "interpolation-scale",
                   "Variable: multiplier on scale ratio used in interpolation\n     Usage: interpolation-scale #",
                   SS_acc_double,
-                  &SX_interp_scale);
+                  &SX_gs.interp_scale);
 
     SS_install_cf(si, "interpolation-strength",
                   "Variable: power of distance used in interpolation\n     Usage: interpolation-strength #",
                   SS_acc_double,
-                  &SX_interp_strength);
+                  &SX_gs.interp_strength);
 
 /* KLMN */
     SS_install_cf(si, "labels",
@@ -1669,17 +1654,17 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "show-mouse-location",
                   "Variable: Controls display of mouse posision\n     Usage: show-mouse-location on | off",
                   SS_acc_int,
-                  &SX_show_mouse_location);
+                  &SX_gs.show_mouse_location);
 
     SS_install_cf(si, "show-mouse-location-x",
                   "Variable: Controls location of mouse posision display\n     Usage: show-mouse-location-x <real>",
                   SS_acc_double,
-                  &SX_show_mouse_location_x);
+                  &SX_gs.show_mouse_location_x);
 
     SS_install_cf(si, "show-mouse-location-y",
                   "Variable: Controls location of mouse posision display\n     Usage: show-mouse-location-y <real>",
                   SS_acc_double,
-                  &SX_show_mouse_location_y);
+                  &SX_gs.show_mouse_location_y);
 
     SS_install_cf(si, "smooth-method",
                   "Variable: Method for smooth functions\n     Usage: smooth-method \"fft\" | \"averaging\" | \"tchebyshev\" | \"least-sqr\"",
@@ -1729,27 +1714,27 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "view-aspect",
                   "Variable: Viewport aspect ratio\n     Usage: view-aspect <real>",
                   SS_acc_double,
-                  &SX_view_aspect);
+                  &SX_gs.view_aspect);
 
     SS_install_cf(si, "view-height",
                   "Variable: Viewport height in fraction of screen height\n     Usage: view-height <real>",
                   SS_acc_double,
-                  &SX_view_height);
+                  &SX_gs.view_height);
 
     SS_install_cf(si, "view-origin-x",
                   "Variable: X comp of viewport origin (frac of window width)\n     Usage: view-origin-x <real>",
                   SS_acc_double,
-                  &SX_view_x[0]);
+                  &SX_gs.view_x[0]);
 
     SS_install_cf(si, "view-origin-y",
                   "Variable: Y comp of viewport origin (frac of window width)\n     Usage: view-origin-y <real>",
                   SS_acc_double,
-                  &SX_view_x[2]);
+                  &SX_gs.view_x[2]);
 
     SS_install_cf(si, "view-width",
                   "Variable: Viewport width in fraction of screen width\n     Usage: view-width <real>",
                   SS_acc_double,
-                  &SX_view_width);
+                  &SX_gs.view_width);
 
 
 /* UVWXYZ */
@@ -1757,22 +1742,22 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "window-height",
                   "Variable: Window height in fraction of screen width\n     Usage: window-height <real>",
                   SS_acc_double,
-                  &SX_window_height);
+                  &SX_gs.window_height);
 
     SS_install_cf(si, "window-origin-x",
                   "Variable: X comp of window origin (frac of screen width)\n     Usage: window-origin-x <real>",
                   SS_acc_double,
-                  &SX_window_x[0]);
+                  &SX_gs.window_x[0]);
 
     SS_install_cf(si, "window-origin-y",
                   "Variable: Y comp of window origin (frac of screen width)\n     Usage: window-origin-y <real>",
                   SS_acc_double,
-                  &SX_window_x[1]);
+                  &SX_gs.window_x[1]);
 
     SS_install_cf(si, "window-width",
                   "Variable: Window width in fraction of screen width\n     Usage: window-width <real>",
                   SS_acc_double,
-                  &SX_window_width);
+                  &SX_gs.window_width);
 
     SS_install_cf(si, "x-log-scale",
                   "Variable: Controls log scale on x axis\n     Usage: x-log-scale on | off",

@@ -4206,21 +4206,21 @@ level routines to be used by the interpreter.<p>
 
 <BLOCKQUOTE>
 <TABLE>
-<TR><TD>SX_autorange</TD>
+<TR><TD>SX_gs.autorange</TD>
 <TD>	flag controlling auto ranging of plots </TD></TR>
-<TR><TD>SX_autodomain</TD>
+<TR><TD>SX_gs.autodomain</TD>
 <TD>	flag controlling auto domaining of plots </TD></TR>
-<TR><TD>SX_autoplot</TD>
+<TR><TD>SX_gs.autoplot</TD>
 <TD>	flag controlling replotting </TD></TR>
-<TR><TD>SX_background_color_white</TD>
+<TR><TD>SX_gs.background_color_white</TD>
 <TD>	flag controlling white backgrounds for screens </TD></TR>
-<TR><TD>SX_border_width</TD>
+<TR><TD>SX_gs.border_width</TD>
 <TD>	window border width in pixels </TD></TR>
 <TR><TD>SX_cgm_background_color</TD>
 <TD>	flag controlling white backgrounds for CGM </TD></TR>
 <TR><TD>SX_cgm_flag</TD>
 <TD>	CGM flag </TD></TR>
-<TR><TD>SX_default_color</TD>
+<TR><TD>SX_gs.default_color</TD>
 <TD>	default color to use </TD></TR>
 <TR><TD>SX_grid</TD>
 <TD>	flag controlling grids on plots </TD></TR>
@@ -4242,7 +4242,7 @@ level routines to be used by the interpreter.<p>
 <TD>	default 2d domain vs 1d range plot rendering </TD></TR>
 <TR><TD>SX_render_2d_2d</TD>
 <TD>	default 2d domain vs 2d range plot rendering </TD></TR>
-<TR><TD>SX_show_mouse_location</TD>
+<TR><TD>SX_gs.show_mouse_location</TD>
 <TD>	flag controlling display of mouse location </TD></TR>
 <TR><TD>SX_squeeze_labels</TD>
 <TD>	flag controlling whitespace compression in labels </TD></TR>
@@ -4263,8 +4263,8 @@ SX_botspace
 <P>SX_marker_orientation
 <P>SX_phi
 <P>SX_rightspace
-<P>SX_show_mouse_location_x
-<P>SX_show_mouse_location_y
+<P>SX_gs.show_mouse_location_x
+<P>SX_gs.show_mouse_location_y
 <P>SX_theta
 <P>SX_topspace
 </BLOCKQUOTE>

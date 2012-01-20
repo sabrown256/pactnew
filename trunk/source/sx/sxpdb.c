@@ -610,7 +610,7 @@ object *SX_get_pdbfile(SS_psides *si, object *argl,
     g_file *po;
     object *fo;
 
-    pf = SX_vif;
+    pf = SX_gs.vif;
     po = SX_gvif;
 
     fo = SS_car(si, argl);
@@ -814,7 +814,7 @@ static object *_SXI_def_common_types(SS_psides *si, object *arg)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -842,7 +842,7 @@ static object *_SXI_entry_number(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -869,7 +869,7 @@ static object *_SXI_reset_ptrs(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -896,7 +896,7 @@ static object *_SXI_family_file(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -934,7 +934,7 @@ static object *_SXI_file_content(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -982,7 +982,7 @@ static object *_SXI_file_info(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -1065,7 +1065,7 @@ static object *_SXI_default_offset(SS_psides *si, object *arg)
                     0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -1095,7 +1095,7 @@ static object *_SXI_major_order(SS_psides *si, object *arg)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -1128,7 +1128,7 @@ static object *_SXI_file_mode(SS_psides *si, object *arg)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -1286,7 +1286,7 @@ static object *_SXI_pdb_to_list(SS_psides *si, object *arg)
 	     if (SX_ipdbfilep(arg))
 	        obj = _SX_pdbfile_to_list(si, FILE_STREAM(PDBfile, arg));
 	     else
-	        obj = _SX_pdbfile_to_list(si, SX_vif);
+	        obj = _SX_pdbfile_to_list(si, SX_gs.vif);
 	     break;
         case G_DEFSTR :
 	     obj = _SX_defstr_to_list(si, SS_GET(defstr, arg));
@@ -1463,7 +1463,7 @@ static object *_SXI_list_symtab(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -1514,7 +1514,7 @@ static object *_SXI_list_variables(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -1553,7 +1553,7 @@ static object *_SXI_change_directory(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -1588,7 +1588,7 @@ static object *_SXI_make_directory(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -1623,7 +1623,7 @@ static object *_SXI_file_dirp(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -1647,7 +1647,7 @@ static object *_SXI_current_directory(SS_psides *si, object *arg)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -1676,7 +1676,7 @@ static object *_SXI_create_link(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -1705,7 +1705,7 @@ static object *_SXI_list_defstrs(SS_psides *si, object *argl)
             0);
 
     if ((po == NULL) || (po == SX_gvif))
-       strm = SX_vif;
+       strm = SX_gs.vif;
     else
        strm = FILE_FILE(PDBfile, po);
 
@@ -1755,7 +1755,7 @@ static object *_SXI_def_prim(SS_psides *si, object *argl)
                 0);
 
     if ((po == NULL) || (po == SX_gvif))
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -1846,7 +1846,7 @@ static object *_SXI_chg_prim(SS_psides *si, object *argl)
 	    0);
 
     if ((po == NULL) || (po == SX_gvif))
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -1889,7 +1889,7 @@ static object *_SXI_read_defstr(SS_psides *si, object *argl)
             0);
 
     if ((po == NULL) || (po == SX_gvif))
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -1922,7 +1922,7 @@ static object *_SXI_write_defstr(SS_psides *si, object *argl)
             0);
 
     if ((po == NULL) || (po == SX_gvif))
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -1976,7 +1976,7 @@ static object *_SXI_make_defstr(SS_psides *si, object *argl)
             0);
 
     if ((po == NULL) || (po == SX_gvif))
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -2055,7 +2055,7 @@ static object *_SXI_make_typedef(SS_psides *si, object *argl)
             0);
 
     if ((po == NULL) || (po == SX_gvif))
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -2089,7 +2089,7 @@ static object *_SXI_make_cast(SS_psides *si, object *argl)
             0);
 
     if ((po == NULL) || (po == SX_gvif))
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -2121,7 +2121,7 @@ static object *_SXI_file_varp(SS_psides *si, object *argl)
             0);
 
     if ((po == NULL) || (po == SX_gvif))
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -2203,7 +2203,7 @@ static object *_SXI_rd_syment(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -2324,7 +2324,7 @@ static object *_SXI_wr_syment(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -2643,7 +2643,7 @@ static object *_SXI_remove_entry(SS_psides *si, object *argl)
 	    0);
 
     if ((po == NULL) || (po == SX_gvif))
-       file = SX_vif;
+       file = SX_gs.vif;
 
     else if (strcmp(po->type, PDBFILE_S) == 0)
        file = FILE_FILE(PDBfile, po);
@@ -2822,7 +2822,7 @@ static object *_SX_read_filedata(SS_psides *si, object *argl)
     type   = PD_entry_type(ep);
     number = PD_entry_number(ep);
 
-    if (file == SX_vif)
+    if (file == SX_gs.vif)
 
 /* GOTCHA: this protects against problems with pointers into the middle
  *         of SCORE allocated arrays - which are fierce
@@ -2930,7 +2930,7 @@ static object *_SXI_wrt_ultra_curve(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -2964,7 +2964,7 @@ static object *_SXI_sizeof(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -3004,7 +3004,7 @@ static object *_SX_write_pdb(SS_psides *si, FILE *f0, object *argl)
              if (SX_ipdbfilep(obj))
                 PD_write_extras(f0, FILE_STREAM(PDBfile, obj));
 	     else
-	        PD_write_extras(f0, SX_vif);
+	        PD_write_extras(f0, SX_gs.vif);
              break;
 
         case G_DEFSTR :
@@ -3099,7 +3099,7 @@ static object *_SXI_to_pdbdata(SS_psides *si, object *argl)
     syment *ep;
     object *rv;
 
-    ep = _SX_spec_instance(si, SX_vif, FALSE, argl);
+    ep = _SX_spec_instance(si, SX_gs.vif, FALSE, argl);
 
     val.diskaddr = PD_entry_address(ep);
 
@@ -3312,7 +3312,7 @@ static object *_SXI_set_max_size(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -3338,7 +3338,7 @@ static object *_SXI_set_track_pointers(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -3366,7 +3366,7 @@ static object *_SXI_set_activate_checksum(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -3612,7 +3612,7 @@ static object *_SXI_unp_bitstrm(SS_psides *si, object *argl)
             0);
 
     if ((po == NULL) || (po == SX_gvif))
-       file = SX_vif;
+       file = SX_gs.vif;
 
     else if (strcmp(po->type, PDBFILE_S) == 0)
        file = FILE_FILE(PDBfile, po);
@@ -3654,7 +3654,7 @@ void _SX_type_container(char *dtype, char *stype)
 	    0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -3697,7 +3697,7 @@ static object *_SXI_index_to_expr(SS_psides *si, object *argl)
 	    0);
 
     if ((po == NULL) || (po == SX_gvif))
-       file = SX_vif;
+       file = SX_gs.vif;
 
     else if (strcmp(po->type, PDBFILE_S) == 0)
        file = FILE_FILE(PDBfile, po);
@@ -4170,7 +4170,7 @@ void SX_install_pdb_funcs(SS_psides *si)
     SS_install_cf(si, "display-individual-differences",
 		  "Variable: Difference display mode flag",
 		  SS_acc_int,
-                  &SX_disp_individ_diff);
+                  &SX_gs.disp_individ_diff);
 
     SS_install_cf(si, "format-version",
 		  "Variable: PDB metadata format version",

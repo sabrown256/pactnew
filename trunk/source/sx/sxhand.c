@@ -48,7 +48,7 @@ object *SX_display_map(SS_psides *si, object *mo)
    {PM_mapping *h;
     PG_graph *g;
 
-    if (SX_plot_flag && SX_autoplot)
+    if (SX_plot_flag && SX_gs.autoplot)
        {h  = SS_GET(PM_mapping, mo);
 	g  = PG_make_graph_from_mapping(h,
 					SC_PCONS_P_S, NULL,

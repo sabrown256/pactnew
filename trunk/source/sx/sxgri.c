@@ -564,11 +564,11 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 
 /* mouse location controls */
 	PG_register_variable("Mouse", SC_INT_S, 
-			     &SX_show_mouse_location, NULL, NULL);
+			     &SX_gs.show_mouse_location, NULL, NULL);
 	PG_register_variable("X Location", SC_DOUBLE_S,
-			     &SX_show_mouse_location_x, NULL, NULL);
+			     &SX_gs.show_mouse_location_x, NULL, NULL);
 	PG_register_variable("Y Location", SC_DOUBLE_S,
-			     &SX_show_mouse_location_y, NULL, NULL);
+			     &SX_gs.show_mouse_location_y, NULL, NULL);
 
 /* output controls */
         for (i = 0; i < N_OUTPUT_DEVICES; i++)
@@ -602,11 +602,11 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 	PG_register_variable("Theta", SC_DOUBLE_S,
 			     &SX_theta, &_SX.th_mn, &_SX.th_mx);
 	PG_register_variable("Default Color", SC_INT_S,
-			     &SX_default_color, NULL, NULL);
+			     &SX_gs.default_color, NULL, NULL);
 
 /* window controls */
 	PG_register_variable("Border Width", SC_INT_S,
-			     &SX_border_width, NULL, NULL);
+			     &SX_gs.border_width, NULL, NULL);
 	PG_register_variable("Clear Mode", SC_INT_S,
 			     clrmd, NULL, NULL);
 

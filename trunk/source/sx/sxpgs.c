@@ -15,17 +15,7 @@
 
 double
  SX_gwc[PG_BOXSZ],
- SX_gpad[PG_BOXSZ],
- SX_window_x[PG_SPACEDM],
- SX_window_P[PG_SPACEDM],
- SX_window_width,
- SX_window_width_P,
- SX_window_height,
- SX_window_height_P,
- SX_view_x[PG_BOXSZ],
- SX_view_width,
- SX_view_height,
- SX_view_aspect;
+ SX_gpad[PG_BOXSZ];
 
 PG_device
  *SX_graphics_device;
@@ -58,7 +48,7 @@ static object *_SXI_def_file_graph(SS_psides *si, object *obj)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
 
     else
        {if (strcmp(po->type, PDBFILE_S) != 0)
@@ -137,7 +127,7 @@ static object *_SX_pdbdata_graph(SS_psides *si, PDBfile *file,
     object *o;
 
 /* read the mapping */
-    if (file == SX_vif)
+    if (file == SX_gs.vif)
        {data.diskaddr = PD_entry_address(ep);
         f = *(PM_mapping **) data.memaddr;}
     else
@@ -566,7 +556,7 @@ static object *_SXI_pdbdata_image(SS_psides *si, object *argl)
 	   SS_error(si, "VARIABLE NOT IMAGE - _SXI_PDBDATA_IMAGE", obj);
 
 /* read the mapping */
-	if (file == SX_vif)
+	if (file == SX_gs.vif)
 	   {data.diskaddr = PD_entry_address(ep);
 	    im = *(PG_image **) data.memaddr;}
 	else
@@ -650,7 +640,7 @@ static object *_SXI_graph_pdbcurve(SS_psides *si, object *argl)
             0);
 
     if ((po == NULL) || (po == SX_gvif))
-       file = SX_vif;
+       file = SX_gs.vif;
     else if (strcmp(po->type, PDBFILE_S) == 0)
        file = FILE_FILE(PDBfile, po);
     else
@@ -701,7 +691,7 @@ static object *_SXI_image_pdbdata(SS_psides *si, object *argl)
 
     if ((file == NULL) || (file == SX_gvif))
        {file = SX_gvif;
-	strm = SX_vif;}
+	strm = SX_gs.vif;}
     else if (strcmp(file->type, PDBFILE_S) == 0)
        strm = (PDBfile *) file->file;
     else
@@ -809,7 +799,7 @@ static object *_SXI_make_device(SS_psides *si, object *argl)
  
     dev = PG_make_device(name, type, title);
 
-    dev->background_color_white = SX_background_color_white;
+    dev->background_color_white = SX_gs.background_color_white;
 
     o = SX_mk_graphics_device(si, dev);
 
@@ -959,10 +949,10 @@ void SX_expose_event_handler(PG_device *dev, PG_event *ev)
 void SX_motion_event_handler(PG_device *dev, PG_event *ev)
    {
 
-    if (SX_show_mouse_location)
+    if (SX_gs.show_mouse_location)
        PG_print_pointer_location(dev,
-                                 SX_show_mouse_location_x,
-                                 SX_show_mouse_location_y,
+                                 SX_gs.show_mouse_location_x,
+                                 SX_gs.show_mouse_location_y,
                                  TRUE);
     return;}
 
@@ -978,19 +968,19 @@ void SX_update_event_handler(PG_device *dev, PG_event *ev)
     if (dev != NULL)
        {PG_make_device_current(dev);
 
-	SX_window_height_P = PG_window_height(dev);
-	SX_window_width_P  = PG_window_width(dev);
-	SX_window_P[0]     = dev->g.hwin[0];
-	SX_window_P[1]     = dev->g.hwin[2];
+	SX_gs.window_height_P = PG_window_height(dev);
+	SX_gs.window_width_P  = PG_window_width(dev);
+	SX_gs.window_P[0]     = dev->g.hwin[0];
+	SX_gs.window_P[1]     = dev->g.hwin[2];
 
 	PG_query_screen_n(dev, dx, &ncol);
 	min_dim = min(dx[0], dx[1]);
 
-	SX_window_width  = SX_window_width_P/min_dim;
-	SX_window_height = SX_window_height_P/min_dim; 
+	SX_gs.window_width  = SX_gs.window_width_P/min_dim;
+	SX_gs.window_height = SX_gs.window_height_P/min_dim; 
 
-	SX_window_x[0] = SX_window_P[0]/min_dim;
-	SX_window_x[1] = SX_window_P[1]/min_dim;};
+	SX_gs.window_x[0] = SX_gs.window_P[0]/min_dim;
+	SX_gs.window_x[1] = SX_gs.window_P[1]/min_dim;};
 
     return;}
 
@@ -1119,11 +1109,11 @@ static object *_SXI_open_device(SS_psides *si, object *argl)
 int SX_next_color(PG_device *dev)
    {int rv;
 
-    if (SX_default_color != -1)
+    if (SX_gs.default_color != -1)
        {if (dev == NULL)
-           rv = _PG_trans_color(PG_console_device, SX_default_color);
+           rv = _PG_trans_color(PG_console_device, SX_gs.default_color);
         else
-           rv = _PG_trans_color(dev, SX_default_color);}
+           rv = _PG_trans_color(dev, SX_gs.default_color);}
 
     else
        {_SX.color = max(_SX.color + 1, 1);

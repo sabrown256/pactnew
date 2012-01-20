@@ -62,7 +62,6 @@ struct s_differr
     JMP_BUF cpu;};
 
 int
- SX_disp_individ_diff = FALSE, 
  SX_promote_flag      = 0, 
  SX_promote_fixed     = FALSE, 
  SX_promote_float     = FALSE;
@@ -473,7 +472,7 @@ static int _SX_display_diff(PDBfile *pf, char *nma, char *nmb,
     prnt.dims     = dims;
     prnt.fp       = stdout;
 
-    if (!SX_disp_individ_diff)
+    if (!SX_gs.disp_individ_diff)
        {PRINT(stdout, "\nValues from the first file:\n");
 
         if (pva != NULL)
@@ -508,7 +507,7 @@ static int _SX_diff_primitives(PDBfile *pf, char *nma, char *nmb,
 
     fp_pre = _SC.types.fp_precision;
 
-    if (SX_disp_individ_diff == TRUE)
+    if (SX_gs.disp_individ_diff == TRUE)
        indx = CMAKE_N(char, ni);
     else
        indx = NULL;
@@ -545,7 +544,7 @@ static int _SX_diff_primitives(PDBfile *pf, char *nma, char *nmb,
     if (ret == FALSE)
        _SX_display_diff(pf, nma, nmb, bfa, bfb, indx, ni, type, dims);
 
-    if (SX_disp_individ_diff == TRUE)
+    if (SX_gs.disp_individ_diff == TRUE)
        CFREE(indx);
 
     return(ret);}
@@ -994,7 +993,7 @@ object *_SXI_diff_var(SS_psides *si, object *argl)
                                  "FIFTH ARGUMENT NOT INTEGER - _SXI_DIFF_VAR");};
 
     if (SS_consp(argl))
-       {SX_GET_INTEGER_FROM_LIST(si, SX_disp_individ_diff, argl, 
+       {SX_GET_INTEGER_FROM_LIST(si, SX_gs.disp_individ_diff, argl, 
                                  "SIXTH ARGUMENT NOT INTEGER - _SXI_DIFF_VAR");};
 
     if (SS_consp(argl))

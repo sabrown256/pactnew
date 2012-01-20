@@ -61,8 +61,8 @@ void SX_quit(int i)
     SC_exit_all();
 
 /* check the need to close the command log */
-    if (SX_command_log != NULL)
-       io_close(SX_command_log);
+    if (SX_gs.command_log != NULL)
+       io_close(SX_gs.command_log);
 
     exit(i);}
 
@@ -90,9 +90,9 @@ static object *_SXI_quit(SS_psides *si, object *arg)
 static object *_SXI_toggle_log(SS_psides *si, object *argl)
    {object *obj;
 
-    if (SX_command_log != NULL)
-       {io_close(SX_command_log);
-	SX_command_log = NULL;};
+    if (SX_gs.command_log != NULL)
+       {io_close(SX_gs.command_log);
+	SX_gs.command_log = NULL;};
 
     if (SS_consp(argl))
        {obj       = SS_car(si, argl);
@@ -100,18 +100,18 @@ static object *_SXI_toggle_log(SS_psides *si, object *argl)
         if (strcmp(_SX.fname, "off") == 0)
            *_SX.fname = '\0';
         else if (strcmp(_SX.fname, "on") == 0)
-           _SX.fname = SC_dsnprintf(FALSE, SX_command_log_name);}
+           _SX.fname = SC_dsnprintf(FALSE, SX_gs.command_log_name);}
     else
-       _SX.fname = SC_dsnprintf(FALSE, SX_command_log_name);
+       _SX.fname = SC_dsnprintf(FALSE, SX_gs.command_log_name);
 
     if ((_SX.fname != NULL) && (*_SX.fname != '\0'))
-       {SX_command_log = io_open(_SX.fname, "a");
-        if (SX_command_log == NULL)
+       {SX_gs.command_log = io_open(_SX.fname, "a");
+        if (SX_gs.command_log == NULL)
            SS_error(si, "CANNOT OPEN LOG FILE - _SXI_TOGGLE_LOG", SS_null);
         else
-           SC_setbuf(SX_command_log, NULL);};
+           SC_setbuf(SX_gs.command_log, NULL);};
 
-    obj = (SX_command_log == NULL) ? SS_f : SS_t;
+    obj = (SX_gs.command_log == NULL) ? SS_f : SS_t;
 
     return(obj);}
 

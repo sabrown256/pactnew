@@ -69,10 +69,10 @@ static object *_SXI_mk_array(SS_psides *si, object *argl)
             SC_LONG_I, &size,
             0);
 
-    if (SX_vif != NULL)
+    if (SX_gs.vif != NULL)
        {defstr *dp;
 
-	dp = PD_inquire_host_type(SX_vif, type);
+	dp = PD_inquire_host_type(SX_gs.vif, type);
 	if (dp != NULL)
 	   type = dp->type;
 
@@ -234,10 +234,10 @@ static object *_SXI_array_ref(SS_psides *si, object *argl)
 	   PD_dereference(type);
 
 /* in case the type is a typedef resolve it to a native type */
-        if (SX_vif != NULL)
+        if (SX_gs.vif != NULL)
            {defstr *dp;
 
-            dp = PD_inquire_host_type(SX_vif, type);
+            dp = PD_inquire_host_type(SX_gs.vif, type);
             if (dp != NULL)
                strcpy(type, dp->type);};
 
@@ -269,10 +269,10 @@ static object *_SXI_array_set(SS_psides *si, object *argl)
        {char type[MAXLINE];
 
         strcpy(type, arr->type);
-        if (SX_vif != NULL)
+        if (SX_gs.vif != NULL)
            {defstr *dp;
 
-            dp = PD_inquire_host_type(SX_vif, type);
+            dp = PD_inquire_host_type(SX_gs.vif, type);
             if (dp != NULL)
                strcpy(type, dp->type);};
 
@@ -448,7 +448,7 @@ static object *_SXI_set_pdbdata(SS_psides *si, object *argl)
             0);
 
     if ((po == NULL) || (po == SX_gvif))
-       file = SX_vif;
+       file = SX_gs.vif;
 
     else if (strcmp(po->type, PDBFILE_S) == 0)
        file = FILE_FILE(PDBfile, po);
@@ -506,7 +506,7 @@ static object *_SXI_pdbdata_set(SS_psides *si, object *argl)
     else
 
 /* read the set */
-       {if (file == SX_vif)
+       {if (file == SX_gs.vif)
 	   {data.diskaddr = PD_entry_address(ep);
 	    s = *(PM_set **) data.memaddr;}
         else
@@ -907,7 +907,7 @@ static object *_SXI_mapping_pdbdata(SS_psides *si, object *argl)
 
     if ((po == NULL) || (po == SX_gvif))
        {po   = SX_gvif;
-        file = SX_vif;}
+        file = SX_gs.vif;}
 
     else if (strcmp(po->type, PDBFILE_S) == 0)
        file = FILE_FILE(PDBfile, po);
@@ -992,7 +992,7 @@ static object *_SXI_pdbdata_mapping(SS_psides *si, object *argl)
        return(SS_null);
 
 /* read the mapping */
-    if (file == SX_vif)
+    if (file == SX_gs.vif)
        {data.diskaddr = PD_entry_address(ep);
         data.memaddr  = DEREF(data.memaddr);}
     else
@@ -1381,7 +1381,7 @@ static object *_SXI_array_pdbdata(SS_psides *si, object *argl)
             0);
 
     if ((po == NULL) || (po == SX_gvif))
-       file = SX_vif;
+       file = SX_gs.vif;
 
     else if (strcmp(po->type, PDBFILE_S) == 0)
        file = FILE_FILE(PDBfile, po);
@@ -1433,7 +1433,7 @@ static object *_SXI_array_pdbdata_i(SS_psides *si, object *argl)
             0);
 
     if ((po == NULL) || (po == SX_gvif))
-       file = SX_vif;
+       file = SX_gs.vif;
 
     else if (strcmp(po->type, PDBFILE_S) == 0)
        file = FILE_FILE(PDBfile, po);
@@ -1667,7 +1667,7 @@ static object *_SXI_rep_ac_domain(SS_psides *si, object *argl)
 	    LAST);
 
     if ((po == NULL) || (po == SX_gvif))
-       file = SX_vif;
+       file = SX_gs.vif;
 
     else if (strcmp(po->type, PDBFILE_S) == 0)
        file = FILE_FILE(PDBfile, po);

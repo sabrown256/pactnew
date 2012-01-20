@@ -22,7 +22,7 @@ int _SX_diff_primitives(char *indx, void *bfa, void *bfb, long n,
      ret = TRUE;
 
      ne = ipt*n;
-     if (SX_disp_individ_diff == TRUE)
+     if (SX_gs.disp_individ_diff == TRUE)
         {for (i = 0L; i < ne; i++)
              {PM_CLOSETO_FIX(ok, a[i], b[i]);
               if (ok == TRUE)
@@ -50,7 +50,7 @@ int _SX_diff_primitives(char *indx, void *bfa, void *bfb, long n,
      ret = TRUE;
 
      ne = ipt*n;
-     if (SX_disp_individ_diff == TRUE)
+     if (SX_gs.disp_individ_diff == TRUE)
         {for (i = 0L; i < ne; i++)
              {PM_CLOSETO_FLOAT(ok, a[i], b[i], tol);
               if (ok == TRUE)

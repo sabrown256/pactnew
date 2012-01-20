@@ -448,7 +448,7 @@ static object *_ULI_fit(SS_psides *si, object *obj, object *tok)
          ret = SS_mk_cons(si, SS_mk_float(si, cf[i]), ret);};
         
 /* create curve of fit */
-    p = PM_lsq_polynomial(SX_default_npts, order, cf, wc);
+    p = PM_lsq_polynomial(SX_gs.default_npts, order, cf, wc);
 
     if ((SX_dataset[i].id >= 'A') &&
         (SX_dataset[i].id <= 'Z'))
@@ -457,7 +457,7 @@ static object *_ULI_fit(SS_psides *si, object *obj, object *tok)
         {lbl = SC_dsnprintf(FALSE, "Fit @%d %d", SX_dataset[j].id, order);}
 
     ret = SS_mk_cons(si, SS_reverse(si, ret),
-                     SX_mk_curve(si, SX_default_npts, p[0], p[1],
+                     SX_mk_curve(si, SX_gs.default_npts, p[0], p[1],
 				 lbl, NULL, UL_plot));
 
     CFREE(cf);
@@ -721,8 +721,8 @@ static void UL_mark_curve_points(double **x, int n, char *indx)
     while (ok == TRUE)
        {PG_query_pointer(dev, ir, &btn, &mod);
 	PG_print_pointer_location(dev,
-				  SX_show_mouse_location_x,
-				  SX_show_mouse_location_y,
+				  SX_gs.show_mouse_location_x,
+				  SX_gs.show_mouse_location_y,
 				  TRUE);
         if (btn)
 	   {im[0] = ir[0];

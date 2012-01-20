@@ -78,35 +78,35 @@ static int UL_rd_scm(SS_psides *si, char *name)
 void UL_init_view(SS_psides *si)
    {int j;
 
-    SX_default_npts      = 100;
+    SX_gs.default_npts      = 100;
     SX_gr_mode           = TRUE;
     SX_plot_flag         = TRUE;
 
     PG_box_init(3, SX_gwc, 0.0, 1.0);
 
-    SX_view_x[0]       = 0.18;
-    SX_view_x[1]       = 0.93;
-    SX_view_x[2]       = 0.18;
-    SX_view_x[3]       = 0.93;
-    SX_view_x[4]       = 0.0;
-    SX_view_x[5]       = 1.0;
+    SX_gs.view_x[0]       = 0.18;
+    SX_gs.view_x[1]       = 0.93;
+    SX_gs.view_x[2]       = 0.18;
+    SX_gs.view_x[3]       = 0.93;
+    SX_gs.view_x[4]       = 0.0;
+    SX_gs.view_x[5]       = 1.0;
 
-    SX_view_width        = 0.75;
-    SX_view_height       = 0.75;
-    SX_view_aspect       = 1.0;
-    SX_window_x[0]       = 0.5;
-    SX_window_x[1]       = 0.1;
-    SX_window_width      = 0.4;
-    SX_window_height     = 0.4;
-    SX_window_width_P    = 1.0;
-    SX_window_height_P   = 1.0;
+    SX_gs.view_width        = 0.75;
+    SX_gs.view_height       = 0.75;
+    SX_gs.view_aspect       = 1.0;
+    SX_gs.window_x[0]       = 0.5;
+    SX_gs.window_x[1]       = 0.1;
+    SX_gs.window_width      = 0.4;
+    SX_gs.window_height     = 0.4;
+    SX_gs.window_width_P    = 1.0;
+    SX_gs.window_height_P   = 1.0;
 
-    SX_console_x         = 0.0;
-    SX_console_y         = 0.0;
-    SX_console_width     = 0.33;
-    SX_console_height    = 0.33;
+    SX_gs.console_x         = 0.0;
+    SX_gs.console_y         = 0.0;
+    SX_gs.console_width     = 0.33;
+    SX_gs.console_height    = 0.33;
 
-    SX_console_type     = CSTRSAVE("MONOCHROME");
+    SX_gs.console_type     = CSTRSAVE("MONOCHROME");
     SX_text_output_format = CSTRSAVE("%13.6e");
 
     SX_display_name  = CSTRSAVE("WINDOW");
@@ -120,10 +120,10 @@ void UL_init_view(SS_psides *si)
     si->print_flag  = FALSE;
     si->stat_flag   = FALSE;
 
-    SX_command_log_name = CSTRSAVE("ultra.log");
+    SX_gs.command_log_name = CSTRSAVE("ultra.log");
 
     for (j = 0; j < SX_N_Curves; j++)
-        SX_data_index[j] = -1;
+        SX_gs.data_index[j] = -1;
 
     return;}
 
@@ -196,7 +196,7 @@ static void _UL_expand_prefix(char *s)
 
     while ((tp = SC_firsttokq(t, " \t\n\r","\"")) != NULL)
        {if ((*tp >= 'a') && (*tp <= 'z')
-            && (SX_prefix_list[*tp - 'a'] > 0)
+            && (SX_gs.prefix_list[*tp - 'a'] > 0)
             && (*(tp+1) == '.'))
            {if ((rp = strchr(tp+2, ')')))
                *rp = '\0';
@@ -247,8 +247,8 @@ static char *_UL_reproc_in(SS_psides *si, char *line)
         if (command[0] != '(')
 	   {SX_wrap_paren("(", command, ")", MAXLINE);
 
-	    if (SX_command_log != NULL)
-	       PRINT(SX_command_log, "%s\n", command);
+	    if (SX_gs.command_log != NULL)
+	       PRINT(SX_gs.command_log, "%s\n", command);
 
 	    rv = command;};};
 
@@ -820,7 +820,7 @@ static void UL_init_env(SS_psides *si)
 
 /* initialize the prefix list */
     for (i = 0; i < NPREFIX; i++)
-        SX_prefix_list[i] = 0;
+        SX_gs.prefix_list[i] = 0;
 
     SX_pui_file  = CSTRSAVE("ultra.pui");
     SX_GRI_title = CSTRSAVE("ULTRA Controls");
@@ -862,9 +862,9 @@ object *UL_mode_text(SS_psides *si)
    {object *ret;
 
     if (PG_console_device == NULL)
-       PG_open_console("ULTRA II", SX_console_type, SX_background_color_white,
-                       SX_console_x, SX_console_y,
-                       SX_console_width, SX_console_height);
+       PG_open_console("ULTRA II", SX_gs.console_type, SX_gs.background_color_white,
+                       SX_gs.console_x, SX_gs.console_y,
+                       SX_gs.console_width, SX_gs.console_height);
 
     if (SX_graphics_device != NULL)
        {PG_clear_window(SX_graphics_device);
@@ -912,10 +912,10 @@ object *UL_mode_graphics(SS_psides *si)
     static object *scrwin = NULL;
 
     if (PG_console_device == NULL)
-       {if (!PG_open_console("ULTRA II", SX_console_type,
-                             SX_background_color_white,
-                             SX_console_x, SX_console_y,
-                             SX_console_width, SX_console_height))
+       {if (!PG_open_console("ULTRA II", SX_gs.console_type,
+                             SX_gs.background_color_white,
+                             SX_gs.console_x, SX_gs.console_y,
+                             SX_gs.console_width, SX_gs.console_height))
            {PRINT(STDOUT, "\nCannot connect to display\n\n");};}
 
     if (SX_graphics_device == NULL)
@@ -952,15 +952,15 @@ object *UL_mode_graphics(SS_psides *si)
 
 /* open the device now */
 	    PG_open_device(SX_graphics_device,
-			   SX_window_x[0], SX_window_x[1],
-			   SX_window_width, SX_window_height);
+			   SX_gs.window_x[0], SX_gs.window_x[1],
+			   SX_gs.window_width, SX_gs.window_height);
 
             if (SX_current_palette != NULL)
                {SX_graphics_device->current_palette = 
                    PG_rd_palette(SX_graphics_device, SX_current_palette);}
             
 	    PG_make_device_current(SX_graphics_device);
-	    SX_border_width = SX_graphics_device->border_width;
+	    SX_gs.border_width = SX_graphics_device->border_width;
 	    PG_set_viewspace(SX_graphics_device, 2, WORLDC, NULL);
 	    PG_release_current_device(SX_graphics_device);
 
@@ -989,10 +989,10 @@ object *UL_mode_graphics(SS_psides *si)
 	    SC_REGISTER_CONTEXT(SX_update_event_handler,  si);
 
 /* remember the window size and position in pixels */
-	    SX_window_height_P = PG_window_height(SX_graphics_device);
-	    SX_window_width_P  = PG_window_width(SX_graphics_device);
-	    SX_window_P[0]     = SX_graphics_device->g.hwin[0];
-	    SX_window_P[1]     = SX_graphics_device->g.hwin[2];
+	    SX_gs.window_height_P = PG_window_height(SX_graphics_device);
+	    SX_gs.window_width_P  = PG_window_width(SX_graphics_device);
+	    SX_gs.window_P[0]     = SX_graphics_device->g.hwin[0];
+	    SX_gs.window_P[1]     = SX_graphics_device->g.hwin[2];
 
 	    if (PG_console_device != NULL)
 	       PG_expose_device(PG_console_device);};
@@ -1023,25 +1023,25 @@ void UL_set_graphics_state(PG_device *d)
     if (d != NULL)
        {g = &d->g;
 
-	d->autodomain             = SX_autodomain;
-	d->autoplot               = SX_autoplot;
-	d->autorange              = SX_autorange;
-	d->background_color_white = SX_background_color_white;
+	d->autodomain             = SX_gs.autodomain;
+	d->autoplot               = SX_gs.autoplot;
+	d->autorange              = SX_gs.autorange;
+	d->background_color_white = SX_gs.background_color_white;
 
 	out = SX_match_device(d);
 	if (out != NULL)
 	   {if (out->background_color != -1)
 	       d->background_color_white = out->background_color;};
 
-	d->border_width = SX_border_width;
+	d->border_width = SX_gs.border_width;
 	d->data_id      = SX_data_id;
 	d->gprint_flag  = TRUE;
 	d->grid         = SX_grid;
 
-	d->view_aspect  = SX_view_aspect;
+	d->view_aspect  = SX_gs.view_aspect;
 
 	for (i = 0; i < PG_BOXSZ; i++)
-	    {d->view_x[i] = SX_view_x[i];
+	    {d->view_x[i] = SX_gs.view_x[i];
 
 /* viewport limits in WC */
 	     g->wc[i] = SX_gwc[i];
@@ -1060,10 +1060,10 @@ void UL_set_graphics_state(PG_device *d)
 	PG_fset_marker_orientation(d, SX_marker_orientation);
 
 	if (!POSTSCRIPT_DEVICE(d))
-	   {g->hwin[0] = SX_window_P[0];
-	    g->hwin[1] = g->hwin[0] + SX_window_width_P;
-	    g->hwin[2] = SX_window_P[1];
-	    g->hwin[3] = g->hwin[2] + SX_window_height_P;}
+	   {g->hwin[0] = SX_gs.window_P[0];
+	    g->hwin[1] = g->hwin[0] + SX_gs.window_width_P;
+	    g->hwin[2] = SX_gs.window_P[1];
+	    g->hwin[3] = g->hwin[2] + SX_gs.window_height_P;}
 	else
 	   {PG_query_screen_n(d, dx, &nc);   
 	    g->hwin[1] = g->hwin[0] + dx[0];
@@ -1239,14 +1239,14 @@ int main(int c, char **v, char **env)
        UL_print_banner();
 #endif
 
-    SX_autoplot = OFF;
+    SX_gs.autoplot = OFF;
     if (load_init)
        SX_load_rc(si, "ultra.scm", load_rc, ".ultrarc", "ultra.ini");
 
     if (track)
        SC_send_tracker("ultra", VERSION, 0, NULL);
 
-    SX_autoplot = ON;
+    SX_gs.autoplot = ON;
     if (SX_gr_mode)
        UL_mode_graphics(si);
     else

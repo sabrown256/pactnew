@@ -33,7 +33,7 @@ static object *_SXI_def_attr(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -64,7 +64,7 @@ static object *_SXI_rem_attr(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -105,7 +105,7 @@ static object *_SXI_set_attr_val(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -209,7 +209,7 @@ static object *_SXI_get_attr_val(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
@@ -256,7 +256,7 @@ static object *_SXI_lst_attr(SS_psides *si, object *argl)
             0);
 
     if (po == NULL)
-       file = SX_vif;
+       file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
 
