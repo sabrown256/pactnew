@@ -15,29 +15,10 @@
        *((typ *) (var->val)) =  *((typ *) val)
 
 char
- *SX_current_palette = NULL,
- *SX_console_type;
-
-double
- SX_console_x,
- SX_console_y,
- SX_console_width,
- SX_console_height;
+ *SX_current_palette = NULL;
 
 object
  *(*SX_plot_hook)(SS_psides *si);
-
-FILE
- *SX_command_log = NULL;
-
-char
- *SX_command_log_name = NULL;
-
-int
- SX_prefix_list[NPREFIX];
-
-PDBfile
- *SX_vif;
 
 g_file
  *SX_gvif;
@@ -47,6 +28,14 @@ object
 
 char
  SX_err[MAXLINE];
+
+SX_state
+ _SX = { 3, 1.0e-15, 1.0e-3, 2.0, 'a', LITERAL, 1, 1, '@', "curves.a",
+         TRUE, };
+
+SX_global_state
+ SX_gs = {100, -1,
+          0, 0.0, 1.1, 0.0, };
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -130,24 +119,24 @@ SS_psides *SX_init(char *code, char *vers, int c, char **v, char **env)
 /* SX initializations depending on scheme */
     SX_install_funcs(si);
 
-    SX_vif  = PD_open_vif("SX_vif");
-    SX_gvif = _SX_mk_file("virtual-internal", PDBFILE_S, SX_vif);
+    SX_gs.vif  = PD_open_vif("SX_gs.vif");
+    SX_gvif = _SX_mk_file("virtual-internal", PDBFILE_S, SX_gs.vif);
     SX_ovif = SX_mk_gfile(si, SX_gvif);
 
 /* PDB initializations */
     pdb_wr_hook = _SX_hash_hook;
     SC_REGISTER_CONTEXT(_SX_hash_hook, si);
 
-    _SX_init_hash_objects(si, SX_vif);
+    _SX_init_hash_objects(si, SX_gs.vif);
 
 /* default formats */
-    _PD_set_digits(SX_vif);
+    _PD_set_digits(SX_gs.vif);
     _SC_set_format_defaults();
 
 #ifndef SPDBX_ONLY
 
 /* PANACEA initializations */
-    PA_def_str(SX_vif);
+    PA_def_str(SX_gs.vif);
 
     _SX_var_tab = SS_mk_hasharr(si, PA_variable_tab);
     SS_UNCOLLECT(_SX_var_tab);
@@ -231,7 +220,7 @@ int SX_next_prefix(void)
    {int i;
 
     for (i = 0; i < NPREFIX; i++)
-        if (SX_prefix_list[i] == 0)
+        if (SX_gs.prefix_list[i] == 0)
            return(i);
 
     i = NPREFIX - 1;
@@ -247,7 +236,7 @@ void SX_reset_prefix(void)
    {int i;
 
     for (i = 0; i < NPREFIX; i++)
-        SX_prefix_list[i] = 0;
+        SX_gs.prefix_list[i] = 0;
 
     return;}
 
@@ -297,7 +286,7 @@ int _SX_get_input(SS_psides *si, object *str)
 
 /* the \r check is for the benefit of those non-UNIX systems who use it */
 	else if ((*p == '\n') || (*p == '\r'))
-	   {if ((SX_autoplot == ON) && (SX_plot_hook != NULL))
+	   {if ((SX_gs.autoplot == ON) && (SX_plot_hook != NULL))
 	       SX_plot_hook(si);
 	    rv = -1;};}
 

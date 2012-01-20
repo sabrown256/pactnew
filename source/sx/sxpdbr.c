@@ -222,7 +222,7 @@ object *_SXI_read_numeric_data(SS_psides *si, object *argl)
     else
        {dtype = PD_dereference(PD_entry_type(cp));
 
-	if (file == SX_vif)
+	if (file == SX_gs.vif)
 	   sz = SC_arrlen(addr.memaddr)/
 	        _PD_lookup_size(dtype, file->chart);
 	else
@@ -265,7 +265,7 @@ syment *_SX_rd_data(SS_psides *si, PDBfile *file, char *name, syment *ep,
        {if (!_PD_prim_typep(type, file->host_chart, PD_READ))
 	   SS_error(si, "MUST BE PRIMITIVE TYPE - _SX_RD_DATA", name_obj);
 
-	if (file == SX_vif)
+	if (file == SX_gs.vif)
 	   addr->diskaddr = PD_entry_address(cp);
 
 	else
@@ -291,7 +291,7 @@ syment *_SX_rd_data(SS_psides *si, PDBfile *file, char *name, syment *ep,
 	if (!_PD_prim_typep(dtype, file->host_chart, PD_READ))
 	   SS_error(si, "MUST BE PRIMITIVE TYPE - _SX_RD_DATA", name_obj);
 
-	if (file == SX_vif)
+	if (file == SX_gs.vif)
 	   {addr->diskaddr = PD_entry_address(cp);
 	    addr->memaddr  = DEREF(addr->memaddr);}
 

@@ -96,26 +96,26 @@ void SX_init_view(SS_psides *si)
 
 /*    SX_gr_mode         = TRUE; */
     SX_plot_flag       = TRUE;
-    SX_default_npts    = 100;
+    SX_gs.default_npts    = 100;
 
     PG_box_init(3, SX_gwc, 0.0, 1.0);
 
-    SX_view_x[0]       = 0.18;
-    SX_view_x[1]       = 0.95;
-    SX_view_x[2]       = 0.2;
-    SX_view_x[3]       = 0.95;
-    SX_view_x[4]       = 0.0;
-    SX_view_x[5]       = 1.0;
+    SX_gs.view_x[0]       = 0.18;
+    SX_gs.view_x[1]       = 0.95;
+    SX_gs.view_x[2]       = 0.2;
+    SX_gs.view_x[3]       = 0.95;
+    SX_gs.view_x[4]       = 0.0;
+    SX_gs.view_x[5]       = 1.0;
 
-    SX_view_width      = 0.75;
-    SX_view_height     = 0.75;
-    SX_view_aspect     = 1.0;
-    SX_window_x[0]     = 0.5;
-    SX_window_x[1]     = 0.1;
-    SX_window_width    = 0.4;
-    SX_window_height   = 0.4;
-    SX_window_width_P  = 1.0;
-    SX_window_height_P = 1.0;
+    SX_gs.view_width      = 0.75;
+    SX_gs.view_height     = 0.75;
+    SX_gs.view_aspect     = 1.0;
+    SX_gs.window_x[0]     = 0.5;
+    SX_gs.window_x[1]     = 0.1;
+    SX_gs.window_width    = 0.4;
+    SX_gs.window_height   = 0.4;
+    SX_gs.window_width_P  = 1.0;
+    SX_gs.window_height_P = 1.0;
 
     SX_text_output_format = CSTRSAVE("%13.6e");
 
@@ -127,7 +127,7 @@ void SX_init_view(SS_psides *si)
     si->print_flag  = FALSE;
     si->stat_flag   = FALSE;
 
-    SX_command_log_name = CSTRSAVE("pdbview.log");
+    SX_gs.command_log_name = CSTRSAVE("pdbview.log");
 
     SX_enlarge_dataset(si, NULL);
 
@@ -527,12 +527,12 @@ int SX_command(SS_psides *si, char *file, char *cmd)
 /* initialize SX
  * the following variables must be initialized before SX_init
  */
-	SX_console_type     = CSTRSAVE("MONOCHROME");
-	SX_console_x        = 0.0;
-	SX_console_y        = 0.0;
-	SX_console_width    = 0.33;
-	SX_console_height   = 0.33;
-	SX_background_color_white = TRUE;
+	SX_gs.console_type     = CSTRSAVE("MONOCHROME");
+	SX_gs.console_x        = 0.0;
+	SX_gs.console_y        = 0.0;
+	SX_gs.console_width    = 0.33;
+	SX_gs.console_height   = 0.33;
+	SX_gs.background_color_white = TRUE;
 
 	SX_init(PCODE, VERSION, 0, NULL, NULL);
 	si->trap_error = FALSE;

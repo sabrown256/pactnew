@@ -293,7 +293,7 @@ static object *_ULI_erase(SS_psides *si)
    {int j;
 
     for (j = 0; j < SX_N_Curves; j++)
-        {if (SX_data_index[j] != -1)
+        {if (SX_gs.data_index[j] != -1)
             SX_rl_curve(j);};
 
     return(SS_f);}
@@ -521,7 +521,7 @@ static object *_ULI_range(SS_psides *si, object *argl)
 
 	if (!SS_numbp(s))
 	   {if (SC_str_icmp(SS_get_string(s), "de") == 0)
-	       {SX_autorange = TRUE;
+	       {SX_gs.autorange = TRUE;
 		UL_plot_limits(dev, FALSE, wc);}
 	    else
 	       SS_error(si, "BAD ARGUMENTS - _ULI_RANGE", s);}
@@ -546,7 +546,7 @@ static object *_ULI_range(SS_psides *si, object *argl)
 
 	    SX_gwc[2] = wc[2];
 	    SX_gwc[3] = wc[3];
-	    SX_autorange = FALSE;};};
+	    SX_gs.autorange = FALSE;};};
 
     rv = SS_mk_cons(si, SS_mk_float(si, wc[2]), SS_mk_float(si, wc[3]));
 
@@ -603,7 +603,7 @@ static object *_ULI_domain(SS_psides *si, object *argl)
 
 	if (!SS_numbp(s))
 	   {if (SC_str_icmp(SS_get_string(s), "de") == 0)
-	       {SX_autodomain = TRUE;
+	       {SX_gs.autodomain = TRUE;
 		UL_plot_limits(dev, FALSE, wc);}
 	    else
 	       SS_error(si, "BAD ARGUMENTS - _ULI_DOMAIN", s);}
@@ -628,7 +628,7 @@ static object *_ULI_domain(SS_psides *si, object *argl)
 
 	    SX_gwc[0] = wc[0];
 	    SX_gwc[1] = wc[1];
-	    SX_autodomain = FALSE;};};
+	    SX_gs.autodomain = FALSE;};};
 
     rv = SS_mk_cons(si, SS_mk_float(si, wc[0]), SS_mk_float(si, wc[1]));
 
@@ -737,8 +737,8 @@ void _UL_quit(SS_psides *si, int sts)
     UL_mode_text(si);
 
 /* check the need to close the command log */
-    if (SX_command_log != NULL)
-       io_close(SX_command_log);
+    if (SX_gs.command_log != NULL)
+       io_close(SX_gs.command_log);
 
 /* check the need to close the ascii output file */
     if (SX_out_text != NULL)
@@ -930,10 +930,10 @@ static object *_ULI_prefix(SS_psides *si, object *argl)
 	    mindex = max(mindex, 0);
 	    mindex = min(mindex, SX_n_curves_read - 1);
 	    fname  = SX_dataset[SX_number[mindex]].file;
-            SX_prefix_list[pre - 'a'] = mindex;}
+            SX_gs.prefix_list[pre - 'a'] = mindex;}
 
         else
-           {if ((mindex = SX_prefix_list[pre - 'a']) > 0)
+           {if ((mindex = SX_gs.prefix_list[pre - 'a']) > 0)
                {if (mindex <= SX_n_curves_read)
                     fname = SX_dataset[SX_number[mindex]].file;
                 if (si->interactive == ON)
@@ -949,7 +949,7 @@ static object *_ULI_prefix(SS_psides *si, object *argl)
                                                     ret))));};}
     else
        {for (i = 0; i < NPREFIX; i++)
-            if ((mindex = SX_prefix_list[i]) > 0)
+            if ((mindex = SX_gs.prefix_list[i]) > 0)
                {pre = 'a' + i;
                 fname = "";
                 if (mindex <= SX_n_curves_read)
@@ -989,7 +989,7 @@ static object *_ULI_list_curves(SS_psides *si, object *argl)
             SC_STRING_I, &pf,
             0);
 
-    ret = UL_print_labels(si, SX_data_index, SX_N_Curves,
+    ret = UL_print_labels(si, SX_gs.data_index, SX_N_Curves,
 			  pr, pf, 2, NULL, FALSE);
     SX_plot_flag = FALSE;
 
@@ -1003,7 +1003,7 @@ static object *_ULI_list_curves(SS_psides *si, object *argl)
 object *UL_get_crv_list(SS_psides *si)
    {object *ret;
 
-    ret = UL_print_labels(si, SX_data_index, SX_N_Curves,
+    ret = UL_print_labels(si, SX_gs.data_index, SX_N_Curves,
 			  NULL, NULL, 2, NULL, TRUE);
 
     return(ret);}
@@ -1282,8 +1282,8 @@ static object *_ULI_label(SS_psides *si, object *argl)
 static void UL_plot_off(void)
    {
 
-    _SX.old_autoplot = SX_autoplot;
-    SX_autoplot  = OFF;
+    _SX.old_autoplot = SX_gs.autoplot;
+    SX_gs.autoplot  = OFF;
 
     return;}
 
@@ -1295,7 +1295,7 @@ static void UL_plot_off(void)
 static void UL_restore_plot(void)
    {
 
-    SX_autoplot = _SX.old_autoplot;
+    SX_gs.autoplot = _SX.old_autoplot;
 
     return;}
 
@@ -1775,10 +1775,10 @@ static object *_ULI_append(SS_psides *si, object *argl)
     object *b, *acc, *target, *tmp;
 
     SX_prep_arg(si, argl);
-    SX_autoplot = OFF;
+    SX_gs.autoplot = OFF;
 
     if (SS_nullobjp(argl))
-       {SX_autoplot = ON;
+       {SX_gs.autoplot = ON;
         return(SS_null);};
 
 /* get out the first curve and make two copies:
@@ -1818,7 +1818,7 @@ static object *_ULI_append(SS_psides *si, object *argl)
     CFREE(SX_dataset[i].text);
     SX_dataset[i].text = CSTRSAVE(lbl);
 
-    SX_autoplot = ON;
+    SX_gs.autoplot = ON;
 
     return(target);}
 
@@ -1902,7 +1902,7 @@ static object *_ULI_make_ln(SS_psides *si, object *argl)
     interc = 0.0;
     first  = 0.0;
     last   = 1.0;
-    n      = SX_default_npts;
+    n      = SX_gs.default_npts;
     SS_args(si, argl,
             SC_DOUBLE_I, &slope,
             SC_DOUBLE_I, &interc,

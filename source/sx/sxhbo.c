@@ -10,14 +10,6 @@
  
 #include "sx_int.h"
 
-int
- SX_interp_method   = 0;
-
-double
- SX_interp_scale    = 1.1,
- SX_interp_strength = 0.0,
- SX_interp_power    = 0.0;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -287,9 +279,9 @@ static double **_SX_interpolate_mapping(PM_mapping *dest, PM_mapping *source,
    {double prm[3];
     double **tre;
 
-    prm[0] = SX_interp_scale;
-    prm[1] = SX_interp_strength;
-    prm[2] = SX_interp_power;
+    prm[0] = SX_gs.interp_scale;
+    prm[1] = SX_gs.interp_strength;
+    prm[2] = SX_gs.interp_power;
 
     tre = PM_interpolate_mapping(dest, source, wgtfl, prm);
 
@@ -856,7 +848,7 @@ PM_mapping *_SXI_refine_mapping(SS_psides *si, PM_mapping *h, object **pargl)
 
 /* build the return mapping */
     fd = _SX_build_lr_domain(si, hd, obj);
-    f  = SX_build_return_mapping(si, h, lbl, fd, TRUE, SX_interp_method);
+    f  = SX_build_return_mapping(si, h, lbl, fd, TRUE, SX_gs.interp_method);
 
     PM_find_extrema(f->range);
 

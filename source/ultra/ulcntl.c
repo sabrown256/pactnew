@@ -328,7 +328,7 @@ static void _UL_draw_plot(PG_device *dev)
 	PG_axis(dev, axsty);};
 
     if (pltlb == TRUE)
-       _UL_print_curve_labels(dev, SX_data_index);
+       _UL_print_curve_labels(dev, SX_gs.data_index);
 
     return;}
 
@@ -474,14 +474,14 @@ void UL_plot_limits(PG_device *dev, int pflg, double *box)
         box[3] = 1.0;}
 
     if (dev == NULL)
-       {if (SX_autorange == TRUE)
+       {if (SX_gs.autorange == TRUE)
 	   {wc[3] = box[3];
 	    wc[2] = box[2];}
 	else
 	   {wc[3] = SX_gwc[3];
 	    wc[2] = SX_gwc[2];};
 
-	if (SX_autodomain == TRUE)
+	if (SX_gs.autodomain == TRUE)
 	   {wc[1] = box[1];
 	    wc[0] = box[0];}
 	else
@@ -491,11 +491,11 @@ void UL_plot_limits(PG_device *dev, int pflg, double *box)
     else
        {PG_get_viewspace(dev, WORLDC, wc);
 
-	if (SX_autorange == TRUE)
+	if (SX_gs.autorange == TRUE)
 	   {wc[3] = box[3];
 	    wc[2] = box[2];};
 
-	if (SX_autodomain == TRUE)
+	if (SX_gs.autodomain == TRUE)
 	   {wc[1] = box[1];
 	    wc[0] = box[0];};};
 

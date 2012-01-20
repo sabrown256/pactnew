@@ -481,6 +481,7 @@ typedef struct s_SX_object SX_object;
 typedef struct s_SX_menu_item SX_menu_item;
 typedef struct s_g_file g_file;
 typedef struct s_out_device out_device;
+typedef struct s_SX_global_state SX_global_state;
 
 typedef union u_SX_pointer SX_pointer;
 
@@ -528,6 +529,115 @@ struct s_out_device
     char *type;
     PG_device *dev;};
 
+
+struct s_SX_global_state
+
+/* non-zero default value */
+   {int default_npts;
+    int default_color;
+
+    int interp_method;          /* interpolation controls */
+    double interp_power;
+    double interp_scale;
+    double interp_strength;
+
+/* zero default value */
+    int autorange;
+    int autodomain;
+    int autoplot;
+    int *data_index;
+    int disp_individ_diff;
+    int prefix_list[NPREFIX];
+    int background_color_white;
+    int border_width;
+    int SX_data_id;
+    int SX_GRI_type_size;
+    int SX_gr_mode;
+    int SX_grid;
+    int *SX_number;
+    int SX_N_Curves;
+    int SX_n_curves_read;
+    int _SX_next_available_number;
+    int SX_plot_flag;
+    int SX_plot_type_size;
+    int SX_qflag;
+    int show_mouse_location;
+    int SX_log_scale[PG_SPACEDM];
+
+    double SX_chi;
+    double console_x;
+    double console_y;
+    double console_width;
+    double console_height;
+    double SX_gwc[PG_BOXSZ];
+    double SX_gpad[PG_BOXSZ];
+    double window_x[PG_SPACEDM];
+    double window_P[PG_SPACEDM];
+    double window_width;
+    double window_width_P;
+    double window_height;
+    double window_height_P;
+    double SX_GRI_x;
+    double SX_GRI_y;
+    double SX_GRI_dx;
+    double SX_GRI_dy;
+    double SX_marker_orientation;
+    double SX_phi;
+    double show_mouse_location_x;
+    double show_mouse_location_y;
+    double SX_theta;
+    double view_x[PG_BOXSZ];
+    double view_width;
+    double view_height;
+    double view_aspect;
+
+    char *SX_text_output_format;
+    char *command_log_name;
+    char *console_type;
+    char *SX_current_palette;
+    char SX_data_directory[MAXLINE];
+    char *SX_display_name;
+    char *SX_display_type;
+    char *SX_display_title;
+    char SX_err[MAXLINE];       /* global buffer for certain error messages */
+    char *SX_GRI_title;
+    char *SX_GRI_type_face;
+    char *SX_GRI_type_style;
+    char *SX_plot_type_style;
+    char *SX_promotion_type;
+    char *SX_pui_file;
+    char *SX_smooth_method;
+
+    PG_rendering SX_render_def;
+    PG_rendering SX_render_1d_1d;
+    PG_rendering SX_render_2d_1d;
+    PG_rendering SX_render_2d_2d;
+    PG_rendering SX_render_3d_1d;
+
+    data_standard *PDB_STANDARD;
+
+    PFInt SX_pan_data_hook;
+
+    curve *SX_dataset;
+
+    object *_SX_var_tab;
+    object *SX_curfile;
+    object *SX_ovif;
+    object *(*SX_plot_hook)(SS_psides *si);
+
+    FILE *SX_out_text;
+    FILE *SX_out_bin;
+    FILE *command_log;
+
+    PDBfile *SX_out_pdb;
+    PDBfile *vif;
+
+    g_file *SX_file_list;
+    g_file *SX_gvif;
+
+    PG_device *SX_graphics_device;};
+
+
 /* SCHEME object type designations */
 
 enum e_SX_object_type
@@ -567,14 +677,8 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-extern data_standard
- *PDB_STANDARD;
-
-extern FILE
- *SX_command_log;
-
-extern PDBfile
- *SX_vif;
+extern SX_global_state
+ SX_gs;
 
 extern curve
  *SX_dataset;
@@ -595,18 +699,7 @@ extern PFInt
  SX_pan_data_hook;
 
 extern int
- *SX_data_index,
- SX_interp_method,
- SX_disp_individ_diff,
- SX_default_npts,
- SX_prefix_list[],
- SX_autorange,
- SX_autodomain,
- SX_autoplot,
- SX_background_color_white,
- SX_border_width,
  SX_data_id,
- SX_default_color,
  SX_GRI_type_size,
  SX_gr_mode,
  SX_grid,
@@ -617,44 +710,22 @@ extern int
  SX_plot_flag,
  SX_plot_type_size,
  SX_qflag,
- SX_show_mouse_location,
  SX_log_scale[];
 
 extern double
  SX_chi,
- SX_console_x,
- SX_console_y,
- SX_console_width,
- SX_console_height,
  SX_gwc[],
  SX_gpad[],
- SX_interp_power,
- SX_interp_strength,
- SX_interp_scale,
- SX_window_x[],
- SX_window_P[],
- SX_window_width,
- SX_window_width_P,
- SX_window_height,
- SX_window_height_P,
  SX_GRI_x,
  SX_GRI_y,
  SX_GRI_dx,
  SX_GRI_dy,
  SX_marker_orientation,
  SX_phi,
- SX_show_mouse_location_x,
- SX_show_mouse_location_y,
- SX_theta,
- SX_view_x[],
- SX_view_width,
- SX_view_height,
- SX_view_aspect;
+ SX_theta;
 
 extern char
  *SX_text_output_format,
- *SX_command_log_name,
- *SX_console_type,
  *SX_current_palette,
  SX_data_directory[],
  *SX_display_name,

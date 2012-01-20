@@ -556,7 +556,7 @@ object *SX_read_ver1(SS_psides *si, object *obj)
  */
        {_SX_read_bin(si, fp, path);
 	k = SX_next_prefix();
-	SX_prefix_list[k] = j;};
+	SX_gs.prefix_list[k] = j;};
 
     CFREE(path);
 
@@ -645,7 +645,7 @@ object *SX_read_data(SS_psides *si, object *obj)
         fp = pfp->stream;
         SX_push_open_file(fp);
         k = SX_next_prefix();
-        SX_prefix_list[k] = j;
+        SX_gs.prefix_list[k] = j;
 
         rv = SS_t;}
 
@@ -659,7 +659,7 @@ object *SX_read_data(SS_psides *si, object *obj)
 	if (SX_ultra_binary_filep(fp))
 	   {_SX_read_bin(si, fp, fname);
 	    k = SX_next_prefix();
-	    SX_prefix_list[k] = j;
+	    SX_gs.prefix_list[k] = j;
 	    rv = SS_t;}
 
 	else
@@ -669,7 +669,7 @@ object *SX_read_data(SS_psides *si, object *obj)
 	     if (_SX_ultra_text_filep(fp, '#'))
 	        {_SX_read_text(si, fp, fname);
 		 k = SX_next_prefix();
-		 SX_prefix_list[k] = j;
+		 SX_gs.prefix_list[k] = j;
 		 rv = SS_t;}
 
 	     else

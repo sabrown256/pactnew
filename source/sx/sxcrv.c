@@ -120,7 +120,7 @@ void SX_enlarge_dataset(SS_psides *si, PFVoid eval)
     if (nc == 0)
        {SX_dataset    = CMAKE_N(curve, NCURVE);
         SX_number     = CMAKE_N(int, NCURVE);
-        SX_data_index = CMAKE_N(int, NCURVE);
+        SX_gs.data_index = CMAKE_N(int, NCURVE);
 	_SX.crv_obj   = CMAKE_N(object *, NCURVE);
 	_SX.crv_proc  = CMAKE_N(object *, NCURVE);
 	_SX.crv_varbl = CMAKE_N(object *, NCURVE);
@@ -131,7 +131,7 @@ void SX_enlarge_dataset(SS_psides *si, PFVoid eval)
        {SX_N_Curves += NCURVE;
         CREMAKE(SX_dataset, curve, SX_N_Curves);
         CREMAKE(SX_number, int, SX_N_Curves);
-        CREMAKE(SX_data_index, int, SX_N_Curves);
+        CREMAKE(SX_gs.data_index, int, SX_N_Curves);
         CREMAKE(_SX.crv_obj, object *, SX_N_Curves);
         CREMAKE(_SX.crv_proc, object *, SX_N_Curves);
         CREMAKE(_SX.crv_varbl, object *, SX_N_Curves);};
@@ -147,7 +147,7 @@ void SX_enlarge_dataset(SS_psides *si, PFVoid eval)
 						   LINE_SOLID, FALSE, 0, 0,
 						   0, 0.0);
          SX_number[i]           = -1;
-	 SX_data_index[i]       = -1;
+	 SX_gs.data_index[i]       = -1;
 
 /* initialize the curve reference variables, procedures, and objects */
 
@@ -199,10 +199,10 @@ void SX_assign_next_id(SS_psides *si, int i, object *(*plt)(SS_psides *si))
    {int j;
 
     for (j = 0; j < SX_N_Curves; j++)
-        {if (SX_data_index[j] == -1)
+        {if (SX_gs.data_index[j] == -1)
 	    {if (j >= 0)
 	        {SX_dataset[i].id = 'A' + j;
-		 SX_data_index[j] = i;};
+		 SX_gs.data_index[j] = i;};
 
 	     return;};};
 
@@ -244,7 +244,7 @@ int SX_get_data_index(char *s)
    {int i, j;
 
     j = _SX_curve_id(s);
-    i = SX_data_index[j];
+    i = SX_gs.data_index[j];
 
     return(i);}
 
@@ -273,7 +273,7 @@ int SX_get_crv_index_i(object *obj)
 /*--------------------------------------------------------------------------*/
 
 /* SX_GET_CURVE_ID - return the curve id
- *                 - this means an index in SX_data_index (i.e. J) space
+ *                 - this means an index in SX_gs.data_index (i.e. J) space
  */
 
 int SX_get_curve_id(char *s)
@@ -288,7 +288,7 @@ int SX_get_curve_id(char *s)
 
 /* SX_GET_CRV_INDEX_J - return the index if the object is a curve that is
  *                    - currently visible
- *                    - this means an index in SX_data_index (i.e. J) space
+ *                    - this means an index in SX_gs.data_index (i.e. J) space
  *                    - otherwise return -1
  */
 
@@ -444,7 +444,7 @@ object *SX_rl_curve(int j)
    {int i;
     object *obj, *v;
 
-    i = SX_data_index[j];
+    i = SX_gs.data_index[j];
 
 /* release the curve data points */
     CFREE(SX_dataset[i].x[0]);
@@ -461,7 +461,7 @@ object *SX_rl_curve(int j)
 
 /* re-initialize the curve and mark */
     SX_zero_curve(i);
-    SX_data_index[j] = -1;
+    SX_gs.data_index[j] = -1;
 
     return(obj);}
 
@@ -473,7 +473,7 @@ object *SX_rl_curve(int j)
  *               - variables beginning with J are logical indeces
  *               - variables beginning with I are "physical" indeces
  *               - and must be derived from J type variables via
- *               - SX_data_index
+ *               - SX_gs.data_index
  */
 
 object *SX_set_crv_id(int j, char *id)
@@ -483,9 +483,9 @@ object *SX_set_crv_id(int j, char *id)
 /* get the correct entry in SX_dataset for the
  * curve whose id is to be changed
  */
-    i = SX_data_index[j];
+    i = SX_gs.data_index[j];
 
-/* compute the index of the new id in SX_data_index */
+/* compute the index of the new id in SX_gs.data_index */
     if (id[0] == '@')
        jn = SC_stoi(id+1) - 1;
     else
@@ -499,12 +499,12 @@ object *SX_set_crv_id(int j, char *id)
     v   = SX_get_curve_var(j);
     SS_VARIABLE_VALUE(obj) = v;
     SS_VARIABLE_NAME(obj)  = SS_VARIABLE_NAME(v);
-    SX_data_index[j]  = -1;
+    SX_gs.data_index[j]  = -1;
 
 /* make the connection with the new id using JN */
     SX_dataset[i].id  = jn + 'A';
     obj               = SX_mk_curve_proc(i);
-    SX_data_index[jn] = i;
+    SX_gs.data_index[jn] = i;
 
     return(obj);}
 
@@ -523,7 +523,7 @@ object *SX_re_id(SS_psides *si)
     memset(id, 0, 10);
 
     for (j = 0; j < SX_N_Curves; j++)
-        {if (SX_data_index[j] != -1)
+        {if (SX_gs.data_index[j] != -1)
 	    {id[0] = 'A' + i;
              if (j != i)
 	        {obj = SX_set_crv_id(j, id);
@@ -602,7 +602,7 @@ int SX_curvep(char *s)
 
     j = _SX_curve_id(s);
     if ((0 <= j) && (j < SX_N_Curves) && SC_is_print_char(*s, 4))
-       {i = SX_data_index[j];
+       {i = SX_gs.data_index[j];
         if ((-1 < i) && (i < SX_N_Curves))
            if (SX_dataset[i].n > 0)
               rv = TRUE;};

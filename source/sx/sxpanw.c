@@ -42,12 +42,12 @@ object *_SXI_display_pan_object(SS_psides *si, object *obj)
                {ni   = PD_entry_number(ep);
                 conv = pp->conv/pp->unit;
                 PM_array_scale(pp->data, ni, conv);
-                PD_write_entry(stdout, SX_vif, pp->name, pp->data, ep,
+                PD_write_entry(stdout, SX_gs.vif, pp->name, pp->data, ep,
 			       0, NULL);
                 conv = 1.0/conv;
                 PM_array_scale(pp->data, ni, conv);}
             else
-               PD_write_entry(stdout, SX_vif, pp->name, pp->data, ep,
+               PD_write_entry(stdout, SX_gs.vif, pp->name, pp->data, ep,
 			      0, NULL);}
         else
            PRINT(stdout, "\n%s not connected to any data\n\n", pp->name);}
@@ -67,12 +67,12 @@ object *_SXI_display_pan_object(SS_psides *si, object *obj)
                {ni   = PD_entry_number(ep);
                 conv = pp->conv/pp->unit;
                 PM_array_scale(pp->data, ni, conv);
-                PD_write_entry(stdout, SX_vif, pp->name, pp->data, ep,
+                PD_write_entry(stdout, SX_gs.vif, pp->name, pp->data, ep,
 			       0, NULL);
                 conv   = 1.0/conv;
                 PM_array_scale(pp->data, ni, conv);}
             else
-               PD_write_entry(stdout, SX_vif, pp->name, pp->data, ep,
+               PD_write_entry(stdout, SX_gs.vif, pp->name, pp->data, ep,
 			      0, NULL);}
         else
            PRINT(stdout, "\n%s not connected to any data\n\n", pp->name);};
