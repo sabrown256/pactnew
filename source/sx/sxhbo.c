@@ -10,6 +10,9 @@
  
 #include "sx_int.h"
 
+int
+ SX_interp_method   = 0;
+
 double
  SX_interp_scale    = 1.1,
  SX_interp_strength = 0.0,
@@ -853,7 +856,7 @@ PM_mapping *_SXI_refine_mapping(SS_psides *si, PM_mapping *h, object **pargl)
 
 /* build the return mapping */
     fd = _SX_build_lr_domain(si, hd, obj);
-    f  = SX_build_return_mapping(si, h, lbl, fd, TRUE, FALSE);
+    f  = SX_build_return_mapping(si, h, lbl, fd, TRUE, SX_interp_method);
 
     PM_find_extrema(f->range);
 

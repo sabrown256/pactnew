@@ -16,6 +16,10 @@
 (define auto -1)
 (define de  'de)
 
+; interpolation methods
+(define idw  0)
+(define mq  -1)
+
 ;
 ; PGS graphics related constants
 ;

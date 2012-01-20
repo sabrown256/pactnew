@@ -53,6 +53,7 @@ set TmpFile    = tmp-file
 set TmpDir     = tmp-dir
 set Host       = `uname -n`
 set OS         = `uname -s | tr "[A-Z]" "[a-z]"`
+set Force      = ""
 
 set Name = $0
 set Name = $Name:t
@@ -63,11 +64,11 @@ else
    set SrcMode = "self"
 endif
 
-# --------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 #                       HANDLE COMMAND LINE ARGUMENTS
 
-# --------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 set Opt = "$Name  $argv"
 
@@ -77,18 +78,21 @@ while ($#argv > 0)
       case -cfg:
            set ConfigOnly = TRUE
            breaksw
+      case -force:
+           set Force = "-force"
+           breaksw
       case -h:
            echo ""
            if ($Name == "pact-update") then
               echo "Usage:"
-              echo "       pact-update [-cfg] [-extr] [-h] [-keep] [-lst]"
+              echo "       pact-update [-cfg] [-extr] [-force] [-h] [-keep] [-lst]"
               echo "                   [+-net <host>] | [-src] | [-tar <tar-file>] [-vers]"
               echo "                   ..."
               echo ""
               echo "update the PACT installation on this machine"
            else
               echo "Usage:"
-              echo "       pact-src [-c] [-cc <C Compiler>] [-cfg] [-extr] [-g]"
+              echo "       pact-src [-c] [-cc <C Compiler>] [-cfg] [-force] [-extr] [-g]"
               echo "                [-h] [-i <dir>] [-keep] [-vers] [-t]"
               echo "                ..."
               echo ""
@@ -100,6 +104,7 @@ while ($#argv > 0)
            echo ""
            echo "    -cfg       stop after configuring the distribution"
            echo "    -extr      setup/extract sources only"
+           echo "    -force     force install if tests fail"
            echo "    -h         this help package"
            echo "    -keep      keep existing PACT distribution, ie. keep 'pact/'"
            echo "               in directory where new distribution being built"
@@ -236,11 +241,11 @@ Note $Log "User: $WhoIAm		Date: `date`"
 Note $Log ""				 
 Note $Log ""				 
 
-# --------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 #                                 OBTAIN SOURCES
 
-# --------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 switch ($SrcMode)
 
@@ -392,11 +397,11 @@ if ($LstCfg == TRUE) then
    exit(1)
 endif
 
-# --------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 #                                 SETUP SOURCES
 
-# --------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 if ($KEEP == "FALSE") then
    if (-d pact) then
@@ -470,11 +475,11 @@ endif
 
 Note $Log "Current directory after source setup $cwd"
 
-# --------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 #                              CONFIGURE DISTRIBUTION
 
-# --------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 NoteD $Log "Changing to manager directory: $Manager"
 flog $Log cd $Manager
@@ -524,17 +529,17 @@ else
    exit(1)
 endif
 
-# --------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 #                               COMPILE DISTRIBUTION
 
-# --------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
    NoteD $Log "Compiling the PACT distribution"
 
    set DName = `cat ./.pact-date`
 
-   flog $Log ./dsys update
+   flog $Log ./dsys update $Force
    set upresult = $status
    Note $Log "Host: $Host"
    Note $Log "Date: `date`"
@@ -562,8 +567,8 @@ endif
 
    NoteD $Log "See the log file $Nodename.BUILD"
 
-# --------------------------------------------------------------------------
-# --------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 flog $Log cd $Base
 echo ""

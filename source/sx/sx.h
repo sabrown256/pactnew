@@ -596,6 +596,7 @@ extern PFInt
 
 extern int
  *SX_data_index,
+ SX_interp_method,
  SX_disp_individ_diff,
  SX_default_npts,
  SX_prefix_list[],
