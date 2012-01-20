@@ -21,8 +21,8 @@ while ($#argv > 0)
            echo "Usage: sxtest [-h] [-vg] [<test>]*"
            echo "  h       this help message"
            echo "  vg      run tests under valgrind"
-           echo "  <test>  one of: oper hash c99 pdb ptr dattr ar text sqlite xml hdf vif"
-           echo "                  pgs axis master exa iply shell mesh intrp diff ext"
+           echo "  <test>  one of: oper hash c99 pdb ptr dattr text sqlite xml hdf vif"
+           echo "                  pgs axis master exa iply shell mesh intrp ar diff ext"
            echo ""
            exit(1)
       case -*:
@@ -65,11 +65,13 @@ else if (-e $BinDir/sx) then
    flog $Log pwd
 
    if ("$Tests" == "") then
+# NOTE: tests like ar that depend on demo.d* must come after the
+# exa test which creates these files
       set Tests = ""
       set Tests = ( $Tests oper hash c99 )
-      set Tests = ( $Tests pdb ptr dattr ar text sqlite xml hdf vif )
+      set Tests = ( $Tests pdb ptr dattr text sqlite xml hdf vif )
       set Tests = ( $Tests pgs axis iply )
-      set Tests = ( $Tests master exa shell mesh intrp diff ext )
+      set Tests = ( $Tests master exa shell mesh intrp ar diff ext )
    endif
 
    foreach i ($Tests)

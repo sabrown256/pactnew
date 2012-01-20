@@ -1444,6 +1444,11 @@ void SX_install_global_vars(SS_psides *si)
                   SS_acc_int,
                   intf);
 
+    SS_install_cf(si, "interpolation-method",
+                  "Variable: interpolation method: inverse distance or multi-quadric\n     Usage: interpolation-method idw | mq",
+                  SS_acc_int,
+                  &SX_interp_method);
+
     SS_install_cf(si, "interpolation-power",
                   "Variable: exponent which defines distance measure used in interpolation\n     Usage: interpolation-power #",
                   SS_acc_double,

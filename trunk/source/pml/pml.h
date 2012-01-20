@@ -893,6 +893,10 @@ extern double
 /* MLINTM.C declarations */
 
 extern double
+ **PM_interpolate_mapping_id(PM_mapping *dest, PM_mapping *source,
+			     int wgtfl, double *prm),
+ **PM_interpolate_mapping_mq(PM_mapping *dest, PM_mapping *source,
+			     int wgtfl, double *prm),
  **PM_interpolate_mapping(PM_mapping *dest, PM_mapping *source,
 			  int wgtfl, double *prm);
 

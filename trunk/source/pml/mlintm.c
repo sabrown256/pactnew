@@ -348,18 +348,19 @@ static void _PM_inv_dist_wgt(SC_array *pwd, int *nof,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_INTERPOLATE_MAPPING - interpolate the range of the mapping SOURCE
- *                        - onto an intermediate vector of arrays TRE
- *                        - centered on the mapping DEST
- *                        - return TRE
- *                        - NOTE: works very well until the destination
- *                        - mesh is about 4 times finer than the source
- *                        - when the relative granularity of the source
- *                        - leaks into the interpolated values
+/* PM_INTERPOLATE_MAPPING_ID - interpolate the range of the mapping SOURCE
+ *                           - onto an intermediate vector of arrays TRE
+ *                           - centered on the mapping DEST
+ *                           - return TRE
+ *                           - uses inverse distance weighted interpolation
+ *                           - NOTE: works very well until the destination
+ *                           - mesh is about 4 times finer than the source
+ *                           - when the relative granularity of the source
+ *                           - leaks into the interpolated values
  */
 
-double **PM_interpolate_mapping(PM_mapping *dest, PM_mapping *source,
-				int wgtfl, double *prm)
+double **PM_interpolate_mapping_id(PM_mapping *dest, PM_mapping *source,
+				   int wgtfl, double *prm)
    {int i, j, id, is, in, nn, ina, inb;
     int sne, dne, snde, snre, dnde;
     int *ddix, *nof, *ta;
@@ -547,7 +548,7 @@ int PM_interp_mesh_id(int nd, int nf, int ni, double **xi, double **fi,
     src = PM_make_mapping("src", PM_LR_S, sd, sr, N_CENT, NULL);
     dst = PM_make_mapping("dst", PM_LR_S, dd, dr, N_CENT, NULL);
 
-    tre = PM_interpolate_mapping(dst, src, FALSE, prm);
+    tre = PM_interpolate_mapping_id(dst, src, 0, prm);
 
     sa.length = ne;
     sa.type   = SC_DOUBLE_P_S;
@@ -746,6 +747,75 @@ int PM_interp_mesh_mq(int nd, int nf, int ni, double **xi, double **fi,
 	     rv = TRUE;};};
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_INTERPOLATE_MAPPING_MQ - interpolate the range of the mapping SOURCE
+ *                           - onto an intermediate vector of arrays TRE
+ *                           - centered on the mapping DEST
+ *                           - return TRE
+ *                           - uses multi-quadric interpolation
+ */
+
+double **PM_interpolate_mapping_mq(PM_mapping *dest, PM_mapping *source,
+				   int wgtfl, double *prm)
+   {int j;
+    int sne, dne, snde, snre, dnde;
+    int *ddix;
+    double **sde, **sre, **dde, **tre;
+    PM_set *sr, *sd, *dr, *dd;
+
+    sd   = source->domain;
+    sde  = (double **) sd->elements;
+    snde = sd->dimension_elem;
+    sne  = sd->n_elements;
+
+    sr   = source->range;
+    sre  = (double **) sr->elements;
+    snre = sr->n_elements;
+
+    dd   = dest->domain;
+    dne  = dd->n_elements;
+    dde  = dd->elements;
+
+    dr   = dest->range;
+    dnde = dr->dimension_elem;
+
+    ddix = dd->max_index;
+
+    tre = PM_make_vectors(dnde, dne);
+
+    for (j = 0; j < dnde; j++)
+        PM_array_set(tre[j], dne, 0.0);
+
+    PM_interp_mesh_mq(snde, dnde, sne, sde, sre, ddix, dde, tre, prm);
+
+    return(tre);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_INTERPOLATE_MAPPING - interpolate the range of the mapping SOURCE
+ *                        - onto an intermediate vector of arrays TRE
+ *                        - centered on the mapping DEST
+ *                        - return TRE
+ *                        - the value of WGTFL determines method:
+ *                        -   -1 use multi-quadric interpolation
+ *                        -    0 use inverse distance weighting
+ *                        -    1 return inverse distance weighting weights
+ */
+
+double **PM_interpolate_mapping(PM_mapping *dest, PM_mapping *source,
+				int wgtfl, double *prm)
+   {double **tre;
+
+    if (wgtfl == -1)
+       tre = PM_interpolate_mapping_mq(dest, source, wgtfl, prm);
+    else
+       tre = PM_interpolate_mapping_id(dest, source, wgtfl, prm);
+
+    return(tre);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

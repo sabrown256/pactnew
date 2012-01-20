@@ -30,7 +30,13 @@ if (($CROSS_COMPILE == FALSE) && ($PACT_CC_FAMILY != INTEL)) then
 
    if ($xstatus == 0) then
       flog $Log ldd $exe
-      if ("$Valgrind" == "") then
+
+# RPATH may be to where it will be installed
+# so do not run the test if libosmm.so is not there yet
+# GOTCHA: bad chicken and egg logic because of the way make-def works
+      set lom = ( `ldd $exe |& grep libosmm | awk '{print $3}'` )
+      Note $Log "Full path to libosmm.so is $lom"
+      if (("$Valgrind" == "") && (-f "$lom")) then
 #         ftee $Log ( ( setenv LD_PRELOAD $LibDir/libosmm.so ; $CFE $exe ) |& grep -v "Dwarf Error" |& grep -iwv error )
 #         ftee $Log ( ( setenv LD_PRELOAD $LibDir/libosmm.so ; $CFE $exe ) |& grep -v "Dwarf Error" )
 #         ftee $Log ( setenv LD_PRELOAD $LibDir/libosmm.so ; $CFE $exe )

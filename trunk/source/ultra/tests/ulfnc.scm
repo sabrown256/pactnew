@@ -387,6 +387,28 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
+; Page #15 - convolb
+
+(printf nil "Tests #15  Convolb\n")
+
+(label (sin (span 0.0 6.28 100)) "sin(x)")
+(delta -10 0 10 100)
+(convolb a b 100)
+
+(color (thru a c) blue)
+
+(set! page (+ page 1))
+(set! xOff (+ xOff .05))
+(annot (sprintf "%s" page) black xOff (+ xOff .05) .95 .98)
+
+(replot)
+(hardcopy)
+(ran de)
+(era)
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
 (printf nil "Tests Concluded\n")
 (command-log off)
 (end)
