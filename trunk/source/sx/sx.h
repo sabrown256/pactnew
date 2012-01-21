@@ -547,10 +547,8 @@ struct s_SX_global_state
 
     int gri_type_size;       /* GUI controls */
 
-    double SX_GRI_x;
-    double SX_GRI_y;
-    double SX_GRI_dx;
-    double SX_GRI_dy;
+    double gri_x[PG_SPACEDM];
+    double gri_dx[PG_SPACEDM];
 
 /* zero default value */
     int autorange;
@@ -680,12 +678,6 @@ extern "C" {
 
 extern SX_global_state
  SX_gs;
-
-extern double
- SX_GRI_x,
- SX_GRI_y,
- SX_GRI_dx,
- SX_GRI_dy;
 
 /*--------------------------------------------------------------------------*/
 

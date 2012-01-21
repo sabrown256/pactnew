@@ -10,12 +10,6 @@
  
 #include "sx_int.h"
 
-double
- SX_GRI_x  = 0.5,
- SX_GRI_y  = 0.01,
- SX_GRI_dx = 0.0,
- SX_GRI_dy = 0.0;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -467,13 +461,13 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 	_SX.gri = PG_make_device("WINDOW", "COLOR", SX_gs.gri_title);
 
 	PG_query_screen_n(PG_console_device, sdx, &nc);
-        if (SX_GRI_dx == 0.0)
-           SX_GRI_dx = 30.0*SX_gs.gri_type_size/((double) sdx[0]);
+        if (SX_gs.gri_dx[0] == 0.0)
+           SX_gs.gri_dx[0] = 30.0*SX_gs.gri_type_size/((double) sdx[0]);
 
-        if (SX_GRI_dy == 0.0)
-           SX_GRI_dy = 15.0*SX_gs.gri_type_size/((double) sdx[1]);
+        if (SX_gs.gri_dx[1] == 0.0)
+           SX_gs.gri_dx[1] = 15.0*SX_gs.gri_type_size/((double) sdx[1]);
 
-	PG_open_device(_SX.gri, SX_GRI_x, SX_GRI_y, SX_GRI_dx, SX_GRI_dy);
+	PG_open_device(_SX.gri, SX_gs.gri_x[0], SX_gs.gri_x[1], SX_gs.gri_dx[0], SX_gs.gri_dx[1]);
 
 	ndc[0] = 0.01;
 	ndc[1] = 0.99;
