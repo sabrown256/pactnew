@@ -478,15 +478,15 @@ void UL_plot_limits(PG_device *dev, int pflg, double *box)
 	   {wc[3] = box[3];
 	    wc[2] = box[2];}
 	else
-	   {wc[3] = SX_gwc[3];
-	    wc[2] = SX_gwc[2];};
+	   {wc[3] = SX_gs.gwc[3];
+	    wc[2] = SX_gs.gwc[2];};
 
 	if (SX_gs.autodomain == TRUE)
 	   {wc[1] = box[1];
 	    wc[0] = box[0];}
 	else
-	   {wc[1] = SX_gwc[1];
-	    wc[0] = SX_gwc[0];};}
+	   {wc[1] = SX_gs.gwc[1];
+	    wc[0] = SX_gs.gwc[0];};}
 
     else
        {PG_get_viewspace(dev, WORLDC, wc);

@@ -524,13 +524,13 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 			     axslyf, NULL, NULL);
 
 	PG_register_variable("Left Offset", SC_DOUBLE_S,
-			     &SX_gpad[0], NULL, NULL);
+			     &SX_gs.gpad[0], NULL, NULL);
 	PG_register_variable("Right Offset", SC_DOUBLE_S,
-			     &SX_gpad[1], NULL, NULL);
+			     &SX_gs.gpad[1], NULL, NULL);
 	PG_register_variable("Bottom Offset", SC_DOUBLE_S,
-			     &SX_gpad[2], NULL, NULL);
+			     &SX_gs.gpad[2], NULL, NULL);
 	PG_register_variable("Top Offset", SC_DOUBLE_S,
-			     &SX_gpad[3], NULL, NULL);
+			     &SX_gs.gpad[3], NULL, NULL);
 
 /* font controls */
 	PG_register_variable("Type Face", SC_STRING_S,
@@ -554,7 +554,7 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 	PG_register_variable("Marker Index", SC_INT_S,
 			     mrki, NULL, NULL);
 	PG_register_variable("Orientation", SC_DOUBLE_S,
-			     &SX_marker_orientation, NULL, NULL);
+			     &SX_gs.marker_orientation, NULL, NULL);
 	PG_register_variable("Marker Scale", SC_DOUBLE_S,
 			     mrks, NULL, NULL);
 
