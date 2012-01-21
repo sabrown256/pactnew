@@ -577,10 +577,9 @@ struct s_SX_global_state
     double gpad[PG_BOXSZ];
     double window_x[PG_SPACEDM];
     double window_P[PG_SPACEDM];
-    double window_width;
-    double window_width_P;
-    double window_height;
-    double window_height_P;
+    double window_dx[PG_SPACEDM];
+    double window_dx_P[PG_SPACEDM];
+
     double marker_orientation;
     double show_mouse_location_x;
     double show_mouse_location_y;

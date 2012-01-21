@@ -1702,7 +1702,7 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "window-height",
                   "Variable: Window height in fraction of screen width\n     Usage: window-height <real>",
                   SS_acc_double,
-                  &SX_gs.window_height);
+                  &SX_gs.window_dx[1]);
 
     SS_install_cf(si, "window-origin-x",
                   "Variable: X comp of window origin (frac of screen width)\n     Usage: window-origin-x <real>",
@@ -1717,7 +1717,7 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "window-width",
                   "Variable: Window width in fraction of screen width\n     Usage: window-width <real>",
                   SS_acc_double,
-                  &SX_gs.window_width);
+                  &SX_gs.window_dx[0]);
 
     SS_install_cf(si, "x-log-scale",
                   "Variable: Controls log scale on x axis\n     Usage: x-log-scale on | off",

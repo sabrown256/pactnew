@@ -961,19 +961,19 @@ void SX_update_event_handler(PG_device *dev, PG_event *ev)
     if (dev != NULL)
        {PG_make_device_current(dev);
 
-	SX_gs.window_height_P = PG_window_height(dev);
-	SX_gs.window_width_P  = PG_window_width(dev);
-	SX_gs.window_P[0]     = dev->g.hwin[0];
-	SX_gs.window_P[1]     = dev->g.hwin[2];
+	SX_gs.window_dx_P[0] = PG_window_width(dev);
+	SX_gs.window_dx_P[1] = PG_window_height(dev);
+	SX_gs.window_P[0]    = dev->g.hwin[0];
+	SX_gs.window_P[1]    = dev->g.hwin[2];
 
 	PG_query_screen_n(dev, dx, &ncol);
 	min_dim = min(dx[0], dx[1]);
 
-	SX_gs.window_width  = SX_gs.window_width_P/min_dim;
-	SX_gs.window_height = SX_gs.window_height_P/min_dim; 
+	SX_gs.window_dx[0] = SX_gs.window_dx_P[0]/min_dim;
+	SX_gs.window_dx[1] = SX_gs.window_dx_P[1]/min_dim; 
 
-	SX_gs.window_x[0] = SX_gs.window_P[0]/min_dim;
-	SX_gs.window_x[1] = SX_gs.window_P[1]/min_dim;};
+	SX_gs.window_x[0]  = SX_gs.window_P[0]/min_dim;
+	SX_gs.window_x[1]  = SX_gs.window_P[1]/min_dim;};
 
     return;}
 

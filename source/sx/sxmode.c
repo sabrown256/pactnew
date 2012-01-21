@@ -75,8 +75,8 @@ static void SX_set_graphics_state(PG_device *d)
        {g->hwin[0] = SX_gs.window_P[0];
         g->hwin[2] = SX_gs.window_P[1];};
 
-    g->hwin[1] = g->hwin[0] + SX_gs.window_width_P;
-    g->hwin[3] = g->hwin[2] + SX_gs.window_height_P;
+    g->hwin[1] = g->hwin[0] + SX_gs.window_dx_P[0];
+    g->hwin[3] = g->hwin[2] + SX_gs.window_dx_P[1];
 
     return;}
 
@@ -376,7 +376,7 @@ void SX_setup_viewspace(PG_device *dev, double mh)
 
 /* set the old school state */
 /*        SX_gs.view_height    = nvh; */
-	SX_gs.window_height *= mh;}
+	SX_gs.window_dx[1] *= mh;}
 
 /* this way make better use of space as the window is
  * made larger or smaller
@@ -394,7 +394,7 @@ void SX_setup_viewspace(PG_device *dev, double mh)
 
 /* set the old school state */
 	SX_gs.view_height    = nvh;
-	SX_gs.window_height *= mh;};
+	SX_gs.window_dx[1] *= mh;};
 
     return;}
 
@@ -472,10 +472,10 @@ object *SX_mode_graphics(SS_psides *si)
 	    SC_REGISTER_CONTEXT(SX_update_event_handler,  si);
 
 /* remember the window size and position in pixels */
-	    SX_gs.window_height_P = PG_window_height(SX_gs.graphics_device);
-	    SX_gs.window_width_P  = PG_window_width(SX_gs.graphics_device);
-	    SX_gs.window_P[0]     = SX_gs.graphics_device->g.hwin[0];
-	    SX_gs.window_P[1]     = SX_gs.graphics_device->g.hwin[2];
+	    SX_gs.window_dx_P[0] = PG_window_width(SX_gs.graphics_device);
+	    SX_gs.window_dx_P[1] = PG_window_height(SX_gs.graphics_device);
+	    SX_gs.window_P[0]    = SX_gs.graphics_device->g.hwin[0];
+	    SX_gs.window_P[1]    = SX_gs.graphics_device->g.hwin[2];
 	    
 	    if (PG_console_device != NULL)
 	       PG_expose_device(PG_console_device);};

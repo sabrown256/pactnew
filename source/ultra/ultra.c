@@ -96,10 +96,10 @@ void UL_init_view(SS_psides *si)
     SX_gs.view_aspect       = 1.0;
     SX_gs.window_x[0]       = 0.5;
     SX_gs.window_x[1]       = 0.1;
-    SX_gs.window_width      = 0.4;
-    SX_gs.window_height     = 0.4;
-    SX_gs.window_width_P    = 1.0;
-    SX_gs.window_height_P   = 1.0;
+    SX_gs.window_dx[0]      = 0.4;
+    SX_gs.window_dx[1]      = 0.4;
+    SX_gs.window_dx_P[0]    = 1.0;
+    SX_gs.window_dx_P[1]    = 1.0;
 
     SX_gs.console_x         = 0.0;
     SX_gs.console_y         = 0.0;
@@ -953,7 +953,7 @@ object *UL_mode_graphics(SS_psides *si)
 /* open the device now */
 	    PG_open_device(SX_gs.graphics_device,
 			   SX_gs.window_x[0], SX_gs.window_x[1],
-			   SX_gs.window_width, SX_gs.window_height);
+			   SX_gs.window_dx[0], SX_gs.window_dx[1]);
 
             if (SX_gs.current_palette != NULL)
                {SX_gs.graphics_device->current_palette = 
@@ -989,10 +989,10 @@ object *UL_mode_graphics(SS_psides *si)
 	    SC_REGISTER_CONTEXT(SX_update_event_handler,  si);
 
 /* remember the window size and position in pixels */
-	    SX_gs.window_height_P = PG_window_height(SX_gs.graphics_device);
-	    SX_gs.window_width_P  = PG_window_width(SX_gs.graphics_device);
-	    SX_gs.window_P[0]     = SX_gs.graphics_device->g.hwin[0];
-	    SX_gs.window_P[1]     = SX_gs.graphics_device->g.hwin[2];
+	    SX_gs.window_dx_P[0] = PG_window_width(SX_gs.graphics_device);
+	    SX_gs.window_dx_P[1] = PG_window_height(SX_gs.graphics_device);
+	    SX_gs.window_P[0]    = SX_gs.graphics_device->g.hwin[0];
+	    SX_gs.window_P[1]    = SX_gs.graphics_device->g.hwin[2];
 
 	    if (PG_console_device != NULL)
 	       PG_expose_device(PG_console_device);};
@@ -1061,9 +1061,9 @@ void UL_set_graphics_state(PG_device *d)
 
 	if (!POSTSCRIPT_DEVICE(d))
 	   {g->hwin[0] = SX_gs.window_P[0];
-	    g->hwin[1] = g->hwin[0] + SX_gs.window_width_P;
+	    g->hwin[1] = g->hwin[0] + SX_gs.window_dx_P[0];
 	    g->hwin[2] = SX_gs.window_P[1];
-	    g->hwin[3] = g->hwin[2] + SX_gs.window_height_P;}
+	    g->hwin[3] = g->hwin[2] + SX_gs.window_dx_P[1];}
 	else
 	   {PG_query_screen_n(d, dx, &nc);   
 	    g->hwin[1] = g->hwin[0] + dx[0];

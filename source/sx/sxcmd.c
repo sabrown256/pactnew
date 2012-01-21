@@ -112,10 +112,10 @@ void SX_init_view(SS_psides *si)
     SX_gs.view_aspect     = 1.0;
     SX_gs.window_x[0]     = 0.5;
     SX_gs.window_x[1]     = 0.1;
-    SX_gs.window_width    = 0.4;
-    SX_gs.window_height   = 0.4;
-    SX_gs.window_width_P  = 1.0;
-    SX_gs.window_height_P = 1.0;
+    SX_gs.window_dx[0]    = 0.4;
+    SX_gs.window_dx[1]    = 0.4;
+    SX_gs.window_dx_P[0]  = 1.0;
+    SX_gs.window_dx_P[1]  = 1.0;
 
     SX_gs.text_output_format = CSTRSAVE("%13.6e");
 
