@@ -18,9 +18,6 @@ typedef syment *(*PDBFileWrite)(PDBfile *fp, char *path,
 typedef int (*PDBFileRead)(PDBfile *fp, char *path, char *ty,
 			   syment *ep, void *vr);
 
-g_file
- *SX_file_list = NULL;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -611,7 +608,7 @@ object *SX_get_pdbfile(SS_psides *si, object *argl,
     object *fo;
 
     pf = SX_gs.vif;
-    po = SX_gvif;
+    po = SX_gs.gvif;
 
     fo = SS_car(si, argl);
     if (SX_FILEP(fo))
@@ -645,7 +642,7 @@ object *SX_get_file(SS_psides *si, object *argl, g_file **pfile)
 
     else if (SS_nullobjp(fo))
        {argl   = SS_cdr(si, argl);
-        *pfile = SX_gvif;};
+        *pfile = SX_gs.gvif;};
        
     return(argl);}
 
@@ -653,7 +650,7 @@ object *SX_get_file(SS_psides *si, object *argl, g_file **pfile)
 /*--------------------------------------------------------------------------*/
 
 /* _SX_OPEN_FILE - open up the named G_FILE and
- *               - cons its object to SX_file_list.
+ *               - cons its object to SX_gs.file_list.
  */
 
 object *_SX_open_file(SS_psides *si, object *arg, char *type, char *mode)
@@ -670,7 +667,7 @@ object *_SX_open_file(SS_psides *si, object *arg, char *type, char *mode)
        SS_error(si, "BAD FILE NAME - _SX_OPEN_FILE", arg);
 
 /* search for an existing file by this name */
-    for (po = SX_file_list; po != NULL; po = po->next)
+    for (po = SX_gs.file_list; po != NULL; po = po->next)
         {if (strcmp(name, po->name) == 0)
 	    {o = po->file_object;
              return(o);};};
@@ -683,9 +680,9 @@ object *_SX_open_file(SS_psides *si, object *arg, char *type, char *mode)
        o = SS_f;
 
     else
-       {SX_file_list = pn;
+       {SX_gs.file_list = pn;
 
-	o = SX_file_list->file_object;};
+	o = SX_gs.file_list->file_object;};
 
     return(o);}
 
@@ -1336,7 +1333,7 @@ static object *_SXI_parse_type(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 
 /* _SX_CLOSE_FILE - close a G_FILE and
- *                - remove the object from SX_file_list
+ *                - remove the object from SX_gs.file_list
  */
 
 static object *_SX_close_file(SS_psides *si, object *arg)
@@ -1351,12 +1348,12 @@ static object *_SX_close_file(SS_psides *si, object *arg)
        return(SS_f);
 
 /* remove from list */
-    if (po == SX_file_list)
-       SX_file_list = SX_file_list->next;
+    if (po == SX_gs.file_list)
+       SX_gs.file_list = SX_gs.file_list->next;
 
 /* find the link preceding this one */
     else
-       {for (prev = SX_file_list; prev != NULL; prev = prev->next)
+       {for (prev = SX_gs.file_list; prev != NULL; prev = prev->next)
             if (prev->next == po)
                break;
 
@@ -1371,7 +1368,7 @@ static object *_SX_close_file(SS_psides *si, object *arg)
 /*--------------------------------------------------------------------------*/
 
 /* _SXI_CLOSE_PDBFILE - close a PDBFile and
- *                    - remove the object from SX_file_list
+ *                    - remove the object from SX_gs.file_list
  */
 
 static object *_SXI_close_pdbfile(SS_psides *si, object *arg)
@@ -1391,7 +1388,7 @@ static object *_SXI_list_file(SS_psides *si)
     object *obj;
 
     obj = SS_null;
-    for (po = SX_file_list; po != NULL; po = po->next)
+    for (po = SX_gs.file_list; po != NULL; po = po->next)
         obj = SS_mk_cons(si, po->file_object, obj);
 
     return(obj);}
@@ -1704,7 +1701,7 @@ static object *_SXI_list_defstrs(SS_psides *si, object *argl)
 	    SS_OBJECT_I, &sort,
             0);
 
-    if ((po == NULL) || (po == SX_gvif))
+    if ((po == NULL) || (po == SX_gs.gvif))
        strm = SX_gs.vif;
     else
        strm = FILE_FILE(PDBfile, po);
@@ -1754,7 +1751,7 @@ static object *_SXI_def_prim(SS_psides *si, object *argl)
                 SC_INT_I, &align,
                 0);
 
-    if ((po == NULL) || (po == SX_gvif))
+    if ((po == NULL) || (po == SX_gs.gvif))
        file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
@@ -1845,7 +1842,7 @@ static object *_SXI_chg_prim(SS_psides *si, object *argl)
 	    SC_LONG_I, fmt + 6,
 	    0);
 
-    if ((po == NULL) || (po == SX_gvif))
+    if ((po == NULL) || (po == SX_gs.gvif))
        file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
@@ -1888,7 +1885,7 @@ static object *_SXI_read_defstr(SS_psides *si, object *argl)
             SC_STRING_I, &name,
             0);
 
-    if ((po == NULL) || (po == SX_gvif))
+    if ((po == NULL) || (po == SX_gs.gvif))
        file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
@@ -1921,7 +1918,7 @@ static object *_SXI_write_defstr(SS_psides *si, object *argl)
             G_DEFSTR, &dp,
             0);
 
-    if ((po == NULL) || (po == SX_gvif))
+    if ((po == NULL) || (po == SX_gs.gvif))
        file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
@@ -1975,7 +1972,7 @@ static object *_SXI_make_defstr(SS_psides *si, object *argl)
             SC_STRING_I, &name,
             0);
 
-    if ((po == NULL) || (po == SX_gvif))
+    if ((po == NULL) || (po == SX_gs.gvif))
        file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
@@ -2054,7 +2051,7 @@ static object *_SXI_make_typedef(SS_psides *si, object *argl)
             SC_STRING_I, &ntype,
             0);
 
-    if ((po == NULL) || (po == SX_gvif))
+    if ((po == NULL) || (po == SX_gs.gvif))
        file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
@@ -2088,7 +2085,7 @@ static object *_SXI_make_cast(SS_psides *si, object *argl)
             SC_STRING_I, &contr,
             0);
 
-    if ((po == NULL) || (po == SX_gvif))
+    if ((po == NULL) || (po == SX_gs.gvif))
        file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
@@ -2120,7 +2117,7 @@ static object *_SXI_file_varp(SS_psides *si, object *argl)
             SS_OBJECT_I, &fobj,
             0);
 
-    if ((po == NULL) || (po == SX_gvif))
+    if ((po == NULL) || (po == SX_gs.gvif))
        file = SX_gs.vif;
     else
        file = FILE_FILE(PDBfile, po);
@@ -2642,7 +2639,7 @@ static object *_SXI_remove_entry(SS_psides *si, object *argl)
 	    SC_STRING_I, &name,
 	    0);
 
-    if ((po == NULL) || (po == SX_gvif))
+    if ((po == NULL) || (po == SX_gs.gvif))
        file = SX_gs.vif;
 
     else if (strcmp(po->type, PDBFILE_S) == 0)
@@ -3611,7 +3608,7 @@ static object *_SXI_unp_bitstrm(SS_psides *si, object *argl)
             SC_LONG_I, &offs,
             0);
 
-    if ((po == NULL) || (po == SX_gvif))
+    if ((po == NULL) || (po == SX_gs.gvif))
        file = SX_gs.vif;
 
     else if (strcmp(po->type, PDBFILE_S) == 0)
@@ -3649,7 +3646,7 @@ void _SX_type_container(char *dtype, char *stype)
     dtype[0] = '\0';
 
     po = NULL;
-    SS_args(si, SS_lk_var_val(si, SX_curfile),
+    SS_args(si, SS_lk_var_val(si, SX_gs.curfile),
 	    G_FILE, &po,
 	    0);
 
@@ -3696,7 +3693,7 @@ static object *_SXI_index_to_expr(SS_psides *si, object *argl)
 	    SC_LONG_I, &indx,
 	    0);
 
-    if ((po == NULL) || (po == SX_gvif))
+    if ((po == NULL) || (po == SX_gs.gvif))
        file = SX_gs.vif;
 
     else if (strcmp(po->type, PDBFILE_S) == 0)

@@ -17,9 +17,6 @@ double
  SX_gwc[PG_BOXSZ],
  SX_gpad[PG_BOXSZ];
 
-PG_device
- *SX_graphics_device;
-
 static PG_rendering
  *rendering_mode[4][6] =
     {{&SX_render_def, &SX_render_def,   &SX_render_def,
@@ -639,7 +636,7 @@ static object *_SXI_graph_pdbcurve(SS_psides *si, object *argl)
             G_FILE, &po,
             0);
 
-    if ((po == NULL) || (po == SX_gvif))
+    if ((po == NULL) || (po == SX_gs.gvif))
        file = SX_gs.vif;
     else if (strcmp(po->type, PDBFILE_S) == 0)
        file = FILE_FILE(PDBfile, po);
@@ -689,8 +686,8 @@ static object *_SXI_image_pdbdata(SS_psides *si, object *argl)
             G_FILE, &file,
             0);
 
-    if ((file == NULL) || (file == SX_gvif))
-       {file = SX_gvif;
+    if ((file == NULL) || (file == SX_gs.gvif))
+       {file = SX_gs.gvif;
 	strm = SX_gs.vif;}
     else if (strcmp(file->type, PDBFILE_S) == 0)
        strm = (PDBfile *) file->file;

@@ -356,7 +356,7 @@ static object *_ULI_toggle_logical_op(SS_psides *si)
 
     for (i = -1; i < N_OUTPUT_DEVICES; i++)
         {if (i == -1)
-	    dev = SX_graphics_device;
+	    dev = SX_gs.graphics_device;
 	 else
 	    {out = SX_get_device(i);
 	     if (out->active)
@@ -484,8 +484,8 @@ static PG_device *_UL_get_some_device(void)
     out_device *out;
 
     dev = NULL;
-    if (SX_graphics_device != NULL)
-       dev = SX_graphics_device;
+    if (SX_gs.graphics_device != NULL)
+       dev = SX_gs.graphics_device;
     else
        {for (i = 0; i < N_OUTPUT_DEVICES; i++)
 	    {out = SX_get_device(i);
@@ -717,9 +717,9 @@ static object *_ULI_close_device(SS_psides *si, object *arg)
 		     break;};};};};
 
     if ((strcmp(name, "WINDOW") == 0) || (strcmp(name, "SCREEN") == 0))
-       {if (SX_graphics_device != NULL)
-           {PG_close_device(SX_graphics_device);
-            SX_graphics_device = NULL;};};
+       {if (SX_gs.graphics_device != NULL)
+           {PG_close_device(SX_gs.graphics_device);
+            SX_gs.graphics_device = NULL;};};
 
     CFREE(name);
 
@@ -741,16 +741,16 @@ void _UL_quit(SS_psides *si, int sts)
        io_close(SX_gs.command_log);
 
 /* check the need to close the ascii output file */
-    if (SX_out_text != NULL)
-       io_close(SX_out_text);
+    if (SX_gs.out_text != NULL)
+       io_close(SX_gs.out_text);
 
 /* check the need to close the binary output file */
-    if (SX_out_bin != NULL)
-       io_close(SX_out_bin);
+    if (SX_gs.out_bin != NULL)
+       io_close(SX_gs.out_bin);
 
 /* check the need to close the PDB output file */
-    if (SX_out_pdb != NULL)
-       PD_close(SX_out_pdb);
+    if (SX_gs.out_pdb != NULL)
+       PD_close(SX_gs.out_pdb);
 
 /* close the cache file and any open data files */
     SX_close_open_files();
@@ -888,7 +888,7 @@ static object *_ULI_menu(SS_psides *si, object *argl)
 
     ret = UL_print_labels(si, SX_number, SX_N_Curves,
 			  pr, pf, 1, pn, FALSE);
-    SX_plot_flag = FALSE;
+    SX_gs.plot_flag = FALSE;
 
     return(ret);}
 
@@ -991,7 +991,7 @@ static object *_ULI_list_curves(SS_psides *si, object *argl)
 
     ret = UL_print_labels(si, SX_gs.data_index, SX_N_Curves,
 			  pr, pf, 2, NULL, FALSE);
-    SX_plot_flag = FALSE;
+    SX_gs.plot_flag = FALSE;
 
     return(ret);}
 
@@ -1847,7 +1847,7 @@ static object *UL_show(SS_psides *si, int j)
 
     SC_CHANGE_VALUE_ALIST(SX_dataset[j].info, int, SC_INT_P_S,
 			  "LINE-COLOR",
-			  SX_next_color(SX_graphics_device));
+			  SX_next_color(SX_gs.graphics_device));
 
     o = (object *) SX_dataset[j].obj;
 

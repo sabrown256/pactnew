@@ -350,7 +350,7 @@ static void UL_draw_plot(PG_device *dev)
  * devices - I got lazy and let the read/write interface routines
  * do it at the cost of a temporary file
  */
-    if (dev != SX_graphics_device)
+    if (dev != SX_gs.graphics_device)
        {int i, niobs;
 	PG_interface_object *piob, *iob;
 	PG_text_box *b, *pb;
@@ -359,13 +359,13 @@ static void UL_draw_plot(PG_device *dev)
 	PG_clear_interface_objects(dev);
         
 /* GOTCHA: this has to be reworked for annot to work in -s mode */
-        if (SX_graphics_device != NULL)
-	   {PG_copy_interface_objects(dev, SX_graphics_device, FALSE);
+        if (SX_gs.graphics_device != NULL)
+	   {PG_copy_interface_objects(dev, SX_gs.graphics_device, FALSE);
 
 	    niobs = SC_array_get_n(dev->iobjs);
 	    for (i = 0; i < niobs; i++)
 	        {iob  = IOB(dev->iobjs, i);
-		 piob = IOB(SX_graphics_device->iobjs, i);
+		 piob = IOB(SX_gs.graphics_device->iobjs, i);
                  if (strcmp(iob->type, PG_TEXT_OBJECT_S) == 0)
 		    {b  = (PG_text_box *) iob->obj;
                      pb = (PG_text_box *) piob->obj;
@@ -402,15 +402,15 @@ object *UL_plot(SS_psides *si)
 		     "label-space", &labsp,
 		     NULL);
 
-    if (SX_graphics_device != NULL)
+    if (SX_gs.graphics_device != NULL)
        {if (_SX.last_state != labsp)
            {UL_window_height_factor = (1.0 + labsp)/(1.0 + _SX.last_state);
             _SX.last_state = labsp;
             UL_mode_text(si);
             UL_mode_graphics(si);};
 
-        UL_set_graphics_state(SX_graphics_device);
-        UL_draw_plot(SX_graphics_device);};
+        UL_set_graphics_state(SX_gs.graphics_device);
+        UL_draw_plot(SX_gs.graphics_device);};
 
     PG_make_device_current(PG_console_device);
 
@@ -537,7 +537,7 @@ void UL_pause(SS_psides *si, int pf)
    {
 
     if (pf)
-       SX_plot_flag = FALSE;
+       SX_gs.plot_flag = FALSE;
 
     if (si->interactive == ON)
        PRINT(stdout, "\n");

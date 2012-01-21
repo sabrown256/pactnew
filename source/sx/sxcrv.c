@@ -429,7 +429,7 @@ object *SX_mk_curve(SS_psides *si, int na, double *xa, double *ya,
 
     PG_set_line_info(SX_dataset[i].info, PLOT_CARTESIAN, CARTESIAN_2D,
 		     LINE_SOLID,
-		     FALSE, 0, SX_next_color(SX_graphics_device), 0, 0.0);
+		     FALSE, 0, SX_next_color(SX_gs.graphics_device), 0, 0.0);
 
     o = SX_mk_curve_proc(i);
 

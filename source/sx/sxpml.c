@@ -447,7 +447,7 @@ static object *_SXI_set_pdbdata(SS_psides *si, object *argl)
             SC_STRING_I, &mn,
             0);
 
-    if ((po == NULL) || (po == SX_gvif))
+    if ((po == NULL) || (po == SX_gs.gvif))
        file = SX_gs.vif;
 
     else if (strcmp(po->type, PDBFILE_S) == 0)
@@ -905,8 +905,8 @@ static object *_SXI_mapping_pdbdata(SS_psides *si, object *argl)
             SC_STRING_I, &mn,
             0);
 
-    if ((po == NULL) || (po == SX_gvif))
-       {po   = SX_gvif;
+    if ((po == NULL) || (po == SX_gs.gvif))
+       {po   = SX_gs.gvif;
         file = SX_gs.vif;}
 
     else if (strcmp(po->type, PDBFILE_S) == 0)
@@ -1380,7 +1380,7 @@ static object *_SXI_array_pdbdata(SS_psides *si, object *argl)
             SC_STRING_I, &mn,
             0);
 
-    if ((po == NULL) || (po == SX_gvif))
+    if ((po == NULL) || (po == SX_gs.gvif))
        file = SX_gs.vif;
 
     else if (strcmp(po->type, PDBFILE_S) == 0)
@@ -1432,7 +1432,7 @@ static object *_SXI_array_pdbdata_i(SS_psides *si, object *argl)
             SC_STRING_I, &mn,
             0);
 
-    if ((po == NULL) || (po == SX_gvif))
+    if ((po == NULL) || (po == SX_gs.gvif))
        file = SX_gs.vif;
 
     else if (strcmp(po->type, PDBFILE_S) == 0)
@@ -1666,7 +1666,7 @@ static object *_SXI_rep_ac_domain(SS_psides *si, object *argl)
             G_NUM_ARRAY, &connct,
 	    LAST);
 
-    if ((po == NULL) || (po == SX_gvif))
+    if ((po == NULL) || (po == SX_gs.gvif))
        file = SX_gs.vif;
 
     else if (strcmp(po->type, PDBFILE_S) == 0)

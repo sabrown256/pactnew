@@ -18,8 +18,6 @@ int
  SX_grid,
  SX_N_Curves,
  *SX_number,
- SX_plot_flag,
- SX_plot_type_size,
  SX_qflag = FALSE,
  SX_log_scale[PG_SPACEDM];
 
@@ -35,7 +33,6 @@ char
  *SX_display_name,
  *SX_display_type,
  *SX_display_title,
- *SX_plot_type_style,
  *SX_promotion_type,
  *SX_smooth_method;
 
@@ -48,9 +45,6 @@ PG_rendering
 
 curve
  *SX_dataset;
-
-object
- *SX_curfile;
 
 SX_file_action
  SX_file_exist_action = FAIL;
@@ -83,7 +77,7 @@ void _SX_args(SS_psides *si, object *obj, void *v, int type)
                 SS_error(si, "OBJECT NOT FILE - _SX_ARGS", obj);
 
              if (SS_nullobjp(obj))
-                *pv = (void *) SX_gvif;
+                *pv = (void *) SX_gs.gvif;
              else
                 *pv = (void *) SS_GET(g_file, obj);
              break;
@@ -191,7 +185,7 @@ object *_SX_call_args(SS_psides *si, int type, void *v)
     switch (type)
        {case G_FILE :
              if (v == NULL)
-                obj = SX_ovif;
+                obj = SX_gs.ovif;
              else
                 obj = SX_mk_gfile(si, (g_file *) v);
              break;
@@ -558,11 +552,11 @@ void SX_parse(SS_psides *si,
                    SS_PTR(strm) = SS_BUFFER(strm);
                    SS_assign(si, si->rdobj, SS_read(si, strm));
                    si->interactive = ON;
-                   SX_plot_flag   = TRUE;
+                   SX_gs.plot_flag   = TRUE;
                    SS_assign(si, si->evobj, SS_eval(si, si->rdobj));
                    si->interactive = OFF;};
 
-                if (SX_plot_flag && (strcmp(s, "replot") != 0) &&
+                if (SX_gs.plot_flag && (strcmp(s, "replot") != 0) &&
                     (SX_gs.autoplot == ON) &&
                     (replot != NULL))
                    replot(si);};};};
@@ -1113,8 +1107,8 @@ void SX_install_global_vars(SS_psides *si)
 
 /*    SX_palette              = CSTRSAVE("spectrum"); */
     SX_phi                    = 0.0;
-    SX_plot_type_size         = 12;
-    SX_plot_type_style        = CSTRSAVE("medium");
+    SX_gs.plot_type_size         = 12;
+    SX_gs.plot_type_style        = CSTRSAVE("medium");
     SX_promotion_type         = CSTRSAVE("none");
     SX_render_def             = PLOT_MESH;
     SX_render_1d_1d           = *ppty;
@@ -1561,7 +1555,7 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "plot-flag",
                   "Variable: Flag that controls whether or not a handler plots\n     Usage: plot-flag on | off",
                   SS_acc_int,
-                  &SX_plot_flag);
+                  &SX_gs.plot_flag);
 
     SS_install_cf(si, "plot-labels",
                   "Variable: Print curve labels if TRUE\n     Usage: plot-labels on | off",
@@ -1704,12 +1698,12 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "type-size",
                   "Variable: Font type size for plot\n     Usage: type-size <integer>",
                   SS_acc_int,
-                  &SX_plot_type_size);
+                  &SX_gs.plot_type_size);
 
     SS_install_cf(si, "type-style",
                   "Variable: Font type style for plot\n     Usage: type-style medium | italic | bold | bold-italic",
                   SS_acc_ptr,
-                  &SX_plot_type_style);
+                  &SX_gs.plot_type_style);
 
     SS_install_cf(si, "view-aspect",
                   "Variable: Viewport aspect ratio\n     Usage: view-aspect <real>",
