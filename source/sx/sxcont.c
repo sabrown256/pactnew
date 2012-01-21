@@ -1064,10 +1064,10 @@ void SX_install_global_vars(SS_psides *si)
     SX_gs.view_angle[2]                    = 0.0;
     SX_gs.data_id                = TRUE,
     SX_gs.default_color          = -1;
-    SX_GRI_x                  = 0.5;
-    SX_GRI_y                  = 0.01;
-    SX_GRI_dx                 = 0.0;
-    SX_GRI_dy                 = 0.0;
+    SX_gs.gri_x[0]                  = 0.5;
+    SX_gs.gri_x[1]                  = 0.01;
+    SX_gs.gri_dx[0]                 = 0.0;
+    SX_gs.gri_dx[1]                 = 0.0;
     SX_gs.grid                   = OFF;
     SX_gs.marker_orientation     = 0.0;
 
@@ -1352,22 +1352,22 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "gri-x",
                   "Variable: Graphical interface window x origin\n     Usage: gri-x <real>",
                   SS_acc_double,
-                  &SX_GRI_x);
+                  &SX_gs.gri_x[0]);
 
     SS_install_cf(si, "gri-y",
                   "Variable: Graphical interface window y origin\n     Usage: gri-y <real>",
                   SS_acc_double,
-                  &SX_GRI_y);
+                  &SX_gs.gri_x[1]);
 
     SS_install_cf(si, "gri-width",
                   "Variable: Graphical interface window width\n     Usage: gri-width <real>",
                   SS_acc_double,
-                  &SX_GRI_dx);
+                  &SX_gs.gri_dx[0]);
 
     SS_install_cf(si, "gri-height",
                   "Variable: Graphical interface window height\n     Usage: gri-height <real>",
                   SS_acc_double,
-                  &SX_GRI_dy);
+                  &SX_gs.gri_dx[1]);
 
     SS_install_cf(si, "grid",
                   "Variable: Controls display of grid lines in graph\n     Usage: grid on | off",
