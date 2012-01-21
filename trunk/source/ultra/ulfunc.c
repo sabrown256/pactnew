@@ -37,7 +37,7 @@ static object *UL_select(SS_psides *si, object *s)
             SC_INT_I, &j,
             0);
 
-    if ((j < 1) || (j > SX_n_curves_read))
+    if ((j < 1) || (j > SX_gs.n_curves_read))
        return(SS_t);
 
     i = SX_number[j];
@@ -145,7 +145,7 @@ static object *_ULI_menui(SS_psides *si, object *s)
             SC_INT_I, &j,
             0);
 
-    if ((0 < j) && (j <= SX_n_curves_read))
+    if ((0 < j) && (j <= SX_gs.n_curves_read))
        {i = SX_number[j];
 
 /* this indicates that there is no curve */
@@ -176,11 +176,11 @@ static object *UL_compress_numbers(void)
    {int i, lasti;
 
     lasti = -1;
-    for (i = 1; i < SX_N_Curves; i++)
+    for (i = 1; i < SX_gs.n_curves; i++)
         {if ((SX_number[i] != -1) && (lasti != -1))
             {SX_number[lasti] = SX_number[i];
              SX_number[i] = -1;
-             for (; (SX_number[lasti] != -1) && (lasti < SX_N_Curves);
+             for (; (SX_number[lasti] != -1) && (lasti < SX_gs.n_curves);
                   lasti++);}
 
          else if ((SX_number[i] == -1) && (lasti == -1))
@@ -201,7 +201,7 @@ static int UL_expunge(int j)
 /* if the requested curve number is zero, kill them all */
     if (j == 0)
        {SX_close_open_files();
-        for (j = 0; j < SX_N_Curves; j++)
+        for (j = 0; j < SX_gs.n_curves; j++)
             {i = SX_number[j];
              if (i != -1)
                 {if (SX_gs.dataset[i].x[0] != NULL)
@@ -211,7 +211,7 @@ static int UL_expunge(int j)
 
                  SX_zero_curve(i);
                  SX_number[j] = -1;};};
-	SX_n_curves_read = 0;
+	SX_gs.n_curves_read = 0;
         SX_reset_prefix();}
 
     else
@@ -224,7 +224,7 @@ static int UL_expunge(int j)
 
             SX_zero_curve(i);
             SX_number[j] = -1;
-            SX_n_curves_read--;};}
+            SX_gs.n_curves_read--;};}
 
     return(TRUE);}
 
@@ -241,7 +241,7 @@ static object *_ULI_expunge_macro(SS_psides *si, object *argl)
 
     SX_prep_arg(si, argl);
 
-    limit = SX_n_curves_read;
+    limit = SX_gs.n_curves_read;
     if (!SS_nullobjp(SS_car(si, argl)))
        {for (s = argl;
              SS_consp(s) && !SS_nullobjp(SS_car(si, s));
@@ -292,7 +292,7 @@ object *UL_delete(SS_psides *si, object *s)
 static object *_ULI_erase(SS_psides *si)
    {int j;
 
-    for (j = 0; j < SX_N_Curves; j++)
+    for (j = 0; j < SX_gs.n_curves; j++)
         {if (SX_gs.data_index[j] != -1)
             SX_rl_curve(j);};
 
@@ -886,7 +886,7 @@ static object *_ULI_menu(SS_psides *si, object *argl)
             SC_STRING_I, &pn,
             0);
 
-    ret = UL_print_labels(si, SX_number, SX_N_Curves,
+    ret = UL_print_labels(si, SX_number, SX_gs.n_curves,
 			  pr, pf, 1, pn, FALSE);
     SX_gs.plot_flag = FALSE;
 
@@ -928,13 +928,13 @@ static object *_ULI_prefix(SS_psides *si, object *argl)
                    SS_error(si, "BAD INDEX - _ULI_PREFIX", arg2);};
 
 	    mindex = max(mindex, 0);
-	    mindex = min(mindex, SX_n_curves_read - 1);
+	    mindex = min(mindex, SX_gs.n_curves_read - 1);
 	    fname  = SX_gs.dataset[SX_number[mindex]].file;
             SX_gs.prefix_list[pre - 'a'] = mindex;}
 
         else
            {if ((mindex = SX_gs.prefix_list[pre - 'a']) > 0)
-               {if (mindex <= SX_n_curves_read)
+               {if (mindex <= SX_gs.n_curves_read)
                     fname = SX_gs.dataset[SX_number[mindex]].file;
                 if (si->interactive == ON)
                    PRINT(stdout, " %c%6d    %s\n", pre, mindex, fname);}
@@ -952,7 +952,7 @@ static object *_ULI_prefix(SS_psides *si, object *argl)
             if ((mindex = SX_gs.prefix_list[i]) > 0)
                {pre = 'a' + i;
                 fname = "";
-                if (mindex <= SX_n_curves_read)
+                if (mindex <= SX_gs.n_curves_read)
                    fname = SX_gs.dataset[SX_number[mindex]].file;
                 if (si->interactive == ON)
                    PRINT(stdout, " %c%6d    %s\n", pre, mindex, fname);
@@ -989,7 +989,7 @@ static object *_ULI_list_curves(SS_psides *si, object *argl)
             SC_STRING_I, &pf,
             0);
 
-    ret = UL_print_labels(si, SX_gs.data_index, SX_N_Curves,
+    ret = UL_print_labels(si, SX_gs.data_index, SX_gs.n_curves,
 			  pr, pf, 2, NULL, FALSE);
     SX_gs.plot_flag = FALSE;
 
@@ -1003,7 +1003,7 @@ static object *_ULI_list_curves(SS_psides *si, object *argl)
 object *UL_get_crv_list(SS_psides *si)
    {object *ret;
 
-    ret = UL_print_labels(si, SX_gs.data_index, SX_N_Curves,
+    ret = UL_print_labels(si, SX_gs.data_index, SX_gs.n_curves,
 			  NULL, NULL, 2, NULL, TRUE);
 
     return(ret);}
@@ -1539,14 +1539,14 @@ static object *_ULI_smooth(SS_psides *si, int l, object *argl)
 
     n = SX_gs.dataset[l].n;
 
-    if (SC_str_icmp(SX_smooth_method, "fft") == 0)
+    if (SC_str_icmp(SX_gs.smooth_method, "fft") == 0)
 
 /* in the future let the user specify the filter function */
        {for (i = 0; i < ntimes; i++)
             PM_smooth_fft(SX_gs.dataset[l].x[0], SX_gs.dataset[l].x[1],
                           n, pts, PM_smooth_filter);}
 
-    else if (SC_str_icmp(SX_smooth_method, "averaging") == 0)
+    else if (SC_str_icmp(SX_gs.smooth_method, "averaging") == 0)
        {for (i = 0; i < ntimes; i++)
             PM_smooth_int_ave(SX_gs.dataset[l].x[0], SX_gs.dataset[l].x[1],
                               n, pts);}
@@ -1554,10 +1554,10 @@ static object *_ULI_smooth(SS_psides *si, int l, object *argl)
     else
        {C_array *arr;
 
-        obj = SS_INQUIRE_OBJECT(si, SX_smooth_method);
+        obj = SS_INQUIRE_OBJECT(si, SX_gs.smooth_method);
         if (obj == NULL)
            {bf = SC_dsnprintf(FALSE, "NO FILTER NAMED %s EXISTS - _ULI_SMOOTH",
-			      SX_smooth_method);
+			      SX_gs.smooth_method);
 	    SS_error(si, bf, SS_null);};
 
         SS_args(si, SS_lk_var_val(si, obj),
@@ -1566,7 +1566,7 @@ static object *_ULI_smooth(SS_psides *si, int l, object *argl)
 
         if (arr == NULL)
            {bf = SC_dsnprintf(FALSE, "%s IS NOT A FILTER - _ULI_SMOOTH",
-			      SX_smooth_method);
+			      SX_gs.smooth_method);
 	    SS_error(si, bf, SS_null);};
 
 	SX_filter_coeff(si, SX_gs.dataset[l].x[1], SX_gs.dataset[l].n,

@@ -107,7 +107,7 @@ void UL_init_view(SS_psides *si)
     SX_gs.console_height    = 0.33;
 
     SX_gs.console_type     = CSTRSAVE("MONOCHROME");
-    SX_text_output_format = CSTRSAVE("%13.6e");
+    SX_gs.text_output_format = CSTRSAVE("%13.6e");
 
     SX_display_name  = CSTRSAVE("WINDOW");
     SX_display_type  = CSTRSAVE("COLOR");
@@ -122,7 +122,7 @@ void UL_init_view(SS_psides *si)
 
     SX_gs.command_log_name = CSTRSAVE("ultra.log");
 
-    for (j = 0; j < SX_N_Curves; j++)
+    for (j = 0; j < SX_gs.n_curves; j++)
         SX_gs.data_index[j] = -1;
 
     return;}
@@ -265,7 +265,7 @@ int _UL_re_id_crv(object *c)
 
     s[1] = '\0';
 
-    for (idn = 0; idn < SX_N_Curves; idn++)
+    for (idn = 0; idn < SX_gs.n_curves; idn++)
         if (SX_gs.dataset[idn].n == 0)
 	   break;
 
@@ -416,7 +416,7 @@ static int _UL_print(SS_psides *si)
 void UL_init_curves(SS_psides *si)
    {
 
-    SX_N_Curves = 0;
+    SX_gs.n_curves = 0;
     SX_enlarge_dataset(si, (PFVoid) UL_curve_eval);
 
     return;}
@@ -955,9 +955,9 @@ object *UL_mode_graphics(SS_psides *si)
 			   SX_gs.window_x[0], SX_gs.window_x[1],
 			   SX_gs.window_width, SX_gs.window_height);
 
-            if (SX_current_palette != NULL)
+            if (SX_gs.current_palette != NULL)
                {SX_gs.graphics_device->current_palette = 
-                   PG_rd_palette(SX_gs.graphics_device, SX_current_palette);}
+                   PG_rd_palette(SX_gs.graphics_device, SX_gs.current_palette);}
             
 	    PG_make_device_current(SX_gs.graphics_device);
 	    SX_gs.border_width = SX_gs.graphics_device->border_width;

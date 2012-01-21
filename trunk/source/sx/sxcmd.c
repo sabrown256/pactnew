@@ -117,7 +117,7 @@ void SX_init_view(SS_psides *si)
     SX_gs.window_width_P  = 1.0;
     SX_gs.window_height_P = 1.0;
 
-    SX_text_output_format = CSTRSAVE("%13.6e");
+    SX_gs.text_output_format = CSTRSAVE("%13.6e");
 
     SX_display_name  = CSTRSAVE("WINDOW");
     SX_display_type  = CSTRSAVE("COLOR");
@@ -418,7 +418,7 @@ char *_SX_mapping_id(int c)
 
 #if 0
     if (islower(c))
-       rv = min(toupper(c)-'A', SX_N_Curves);
+       rv = min(toupper(c)-'A', SX_gs.n_curves);
     else
        rv = c - 'A';
 #endif

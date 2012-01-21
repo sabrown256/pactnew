@@ -25,7 +25,6 @@ struct s_pdb_info
    char *curve_name;};                            /* curve name in PDB file */
 
 int
- SX_n_curves_read = 0,
  _SX_next_available_number = 1;
 
 static char
@@ -47,7 +46,7 @@ static void
 static int _SX_next_number(SS_psides *si, int flag)
    {int i;
 
-    for (i = _SX_next_available_number; i < SX_N_Curves; i++)
+    for (i = _SX_next_available_number; i < SX_gs.n_curves; i++)
         if (SX_number[i] == -1)
            {if (flag)
                _SX_next_available_number = i + 1;
@@ -408,7 +407,7 @@ static void _SX_read_bin(SS_psides *si, FILE *fp, char *fname)
         c = io_getc(fp);                                    /* look for eof */
         io_ungetc(c, fp);};
 
-    SX_n_curves_read += icurve;
+    SX_gs.n_curves_read += icurve;
 
     return;}
 
@@ -513,7 +512,7 @@ static void _SX_read_text(SS_psides *si, FILE *fp, char *fname)
        PRINT(stdout, "%s FILE HAS NO LEGAL CURVES - SX_READ_TEXT: %s\n\n",
 	     "WARNING:", fname);
 
-    SX_n_curves_read += icurve;
+    SX_gs.n_curves_read += icurve;
 
     return;}
 
@@ -607,7 +606,7 @@ static void _SX_read_pdb(SS_psides *si, PDBfile *fp, char *fname)
 		 k = _SX_next_number(si, TRUE);
 		 SX_number[k] = j;};};
 
-	SX_n_curves_read += icurve;
+	SX_gs.n_curves_read += icurve;
 	CFREE(names);};
 
     return;}
@@ -1088,7 +1087,7 @@ static void _SX_wrt_pdb(SS_psides *si, PDBfile *fp, object *argl)
 
          if (SS_numbp(obj))
             {i = SS_INTEGER_VALUE(obj);
-             if ((i >= 1) && (i <= SX_n_curves_read))
+             if ((i >= 1) && (i <= SX_gs.n_curves_read))
                 j = SX_number[i];
              if ((j != -1) && (SX_gs.dataset[j].x[0] == NULL))
                 {uncached = TRUE;
@@ -1133,7 +1132,7 @@ static void _SX_wrt_bin(SS_psides *si, FILE *fp, object *argl)
 
          if (SS_numbp(obj))
             {i = (int) *SS_GET(int64_t, obj);
-             if ((i >= 1) && (i <= SX_n_curves_read))
+             if ((i >= 1) && (i <= SX_gs.n_curves_read))
                 j = SX_number[i];
              if ((j != -1) && (SX_gs.dataset[j].x[0] == NULL))
                 {uncached = TRUE;
@@ -1180,7 +1179,7 @@ static void _SX_wrt_text(SS_psides *si, FILE *fp, object *argl)
 
          if (SS_numbp(obj))
             {i = (int) *SS_GET(int64_t, obj);
-             if ((i >= 1) && (i <= SX_n_curves_read))
+             if ((i >= 1) && (i <= SX_gs.n_curves_read))
                 j = SX_number[i];
              if ((j != -1) && (SX_gs.dataset[j].x[0] == NULL))
                 {uncached = TRUE;
@@ -1198,9 +1197,9 @@ static void _SX_wrt_text(SS_psides *si, FILE *fp, object *argl)
 
              io_printf(fp, "%s\n", SX_gs.dataset[j].text);
              for (i = 0; i < n; i++)
-                 {io_printf(fp, SX_text_output_format, x[i]);
+                 {io_printf(fp, SX_gs.text_output_format, x[i]);
                   io_printf(fp, " ");
-                  io_printf(fp, SX_text_output_format, y[i]);
+                  io_printf(fp, SX_gs.text_output_format, y[i]);
                   io_printf(fp, "\n");};};
 
          if (uncached)
@@ -1543,7 +1542,7 @@ void SX_close_open_files(void)
     bin_info *pbi;
     FILE *fp;
 
-    for (i = 0; i < SX_N_Curves; i++)
+    for (i = 0; i < SX_gs.n_curves; i++)
         {switch (SX_gs.dataset[i].file_type)
             {case SC_BINARY :
 	          pbi = (bin_info *) SX_gs.dataset[i].file_info;

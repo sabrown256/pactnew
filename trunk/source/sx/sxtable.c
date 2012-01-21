@@ -11,19 +11,19 @@
 #include "sx_int.h"
 
 int
- _SX_table_n = 0;
+ _SX_table_n;
 
 long
- _SX_table_ln = 0;
+ _SX_table_ln;
 
 char
- *SX_table_name = NULL;
+ *SX_table_name;
 
 static PM_matrix
- *SX_current_table = NULL;
+ *SX_current_table;
 
 static char
- **SX_current_table_labels = NULL;
+ **SX_current_table_labels;
 
 /*--------------------------------------------------------------------------*/
 
@@ -722,7 +722,7 @@ static object *SX_wrt_current_table(SS_psides *si, object *argl)
     k = 0;
     for (i = 0; i < nr; i++)
         for (j = 0; j < nc; j++)
-            {io_printf(fp, SX_text_output_format, ap[k++]);
+            {io_printf(fp, SX_gs.text_output_format, ap[k++]);
              if (j == (nc-1))
                 io_printf(fp, "\n");
              else

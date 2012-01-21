@@ -536,10 +536,21 @@ struct s_SX_global_state
    {int default_npts;
     int default_color;
 
+    int n_curves;               /* curve controls */
+    int n_curves_read;
+    int _SX_next_available_number;
+
     int interp_method;          /* interpolation controls */
     double interp_power;
     double interp_scale;
     double interp_strength;
+
+    int SX_GRI_type_size;       /* GUI controls */
+
+    double SX_GRI_x;
+    double SX_GRI_y;
+    double SX_GRI_dx;
+    double SX_GRI_dy;
 
 /* zero default value */
     int autorange;
@@ -551,13 +562,9 @@ struct s_SX_global_state
     int background_color_white;
     int border_width;
     int SX_data_id;
-    int SX_GRI_type_size;
     int gr_mode;
     int grid;
     int *SX_number;
-    int SX_N_Curves;
-    int SX_n_curves_read;
-    int _SX_next_available_number;
     int plot_flag;
     int plot_type_size;
     int SX_qflag;
@@ -577,10 +584,6 @@ struct s_SX_global_state
     double window_width_P;
     double window_height;
     double window_height_P;
-    double SX_GRI_x;
-    double SX_GRI_y;
-    double SX_GRI_dx;
-    double SX_GRI_dy;
     double SX_marker_orientation;
     double SX_phi;
     double show_mouse_location_x;
@@ -591,22 +594,22 @@ struct s_SX_global_state
     double view_height;
     double view_aspect;
 
-    char *SX_text_output_format;
+    char *text_output_format;
     char *command_log_name;
     char *console_type;
-    char *SX_current_palette;
+    char *current_palette;
     char SX_data_directory[MAXLINE];
     char *SX_display_name;
     char *SX_display_type;
     char *SX_display_title;
-    char SX_err[MAXLINE];       /* global buffer for certain error messages */
+    char err[MAXLINE];         /* global buffer for certain error messages */
     char *SX_GRI_title;
     char *SX_GRI_type_face;
     char *SX_GRI_type_style;
     char *plot_type_style;
     char *SX_promotion_type;
     char *SX_pui_file;
-    char *SX_smooth_method;
+    char *smooth_method;
 
     PG_rendering render_def;
     PG_rendering render_1d_1d;
@@ -684,8 +687,6 @@ extern int
  SX_data_id,
  SX_GRI_type_size,
  *SX_number,
- SX_N_Curves,
- SX_n_curves_read,
  _SX_next_available_number,
  SX_qflag,
  SX_log_scale[];
@@ -703,19 +704,15 @@ extern double
  SX_theta;
 
 extern char
- *SX_text_output_format,
- *SX_current_palette,
  SX_data_directory[],
  *SX_display_name,
  *SX_display_type,
  *SX_display_title,
- SX_err[],                      /* global buffer for certain error messages */
  *SX_GRI_title,
  *SX_GRI_type_face,
  *SX_GRI_type_style,
  *SX_promotion_type,
- *SX_pui_file,
- *SX_smooth_method;
+ *SX_pui_file;
 
 /*--------------------------------------------------------------------------*/
 

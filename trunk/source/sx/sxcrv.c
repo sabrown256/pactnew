@@ -80,7 +80,7 @@ static int _SX_curve_id(char *s)
            id = c - 'A';}
 
     id = max(id, 0);
-    id = min(id, SX_N_Curves-1);
+    id = min(id, SX_gs.n_curves-1);
 
     return(id);}
 
@@ -112,7 +112,7 @@ void SX_enlarge_dataset(SS_psides *si, PFVoid eval)
     procedure *pp;
     object *o, *v, *p;
 
-    nc = SX_N_Curves;
+    nc = SX_gs.n_curves;
 
     if (_SX.cproc == NULL)
        _SX.cproc = _SS_mk_C_proc_va(SS_sargs, 1, eval);
@@ -125,19 +125,19 @@ void SX_enlarge_dataset(SS_psides *si, PFVoid eval)
 	_SX.crv_proc  = CMAKE_N(object *, NCURVE);
 	_SX.crv_varbl = CMAKE_N(object *, NCURVE);
 
-        SX_N_Curves += NCURVE;}
+        SX_gs.n_curves += NCURVE;}
 
     else
-       {SX_N_Curves += NCURVE;
-        CREMAKE(SX_gs.dataset, curve, SX_N_Curves);
-        CREMAKE(SX_number, int, SX_N_Curves);
-        CREMAKE(SX_gs.data_index, int, SX_N_Curves);
-        CREMAKE(_SX.crv_obj, object *, SX_N_Curves);
-        CREMAKE(_SX.crv_proc, object *, SX_N_Curves);
-        CREMAKE(_SX.crv_varbl, object *, SX_N_Curves);};
+       {SX_gs.n_curves += NCURVE;
+        CREMAKE(SX_gs.dataset, curve, SX_gs.n_curves);
+        CREMAKE(SX_number, int, SX_gs.n_curves);
+        CREMAKE(SX_gs.data_index, int, SX_gs.n_curves);
+        CREMAKE(_SX.crv_obj, object *, SX_gs.n_curves);
+        CREMAKE(_SX.crv_proc, object *, SX_gs.n_curves);
+        CREMAKE(_SX.crv_varbl, object *, SX_gs.n_curves);};
 
 /* initialize the new curves */
-    for (i = nc; i < SX_N_Curves; i++)
+    for (i = nc; i < SX_gs.n_curves; i++)
         {SX_gs.dataset[i].id       = ' ';
          SX_gs.dataset[i].obj      = (void *) SS_null;
          SX_gs.dataset[i].n        = 0;
@@ -198,7 +198,7 @@ void SX_enlarge_dataset(SS_psides *si, PFVoid eval)
 void SX_assign_next_id(SS_psides *si, int i, object *(*plt)(SS_psides *si))
    {int j;
 
-    for (j = 0; j < SX_N_Curves; j++)
+    for (j = 0; j < SX_gs.n_curves; j++)
         {if (SX_gs.data_index[j] == -1)
 	    {if (j >= 0)
 	        {SX_gs.dataset[i].id = 'A' + j;
@@ -222,7 +222,7 @@ void SX_assign_next_id(SS_psides *si, int i, object *(*plt)(SS_psides *si))
 int SX_next_space(SS_psides *si)
    {int i;
 
-    for (i = _SX.next_avail; i < SX_N_Curves; i++)
+    for (i = _SX.next_avail; i < SX_gs.n_curves; i++)
         if (SX_gs.dataset[i].n == 0)
            {_SX.next_avail = i + 1;
             return(i);};
@@ -492,7 +492,7 @@ object *SX_set_crv_id(int j, char *id)
        jn = id[0] - 'A';
 
     jn = max(jn, 0);
-    jn = min(jn, SX_N_Curves-1);
+    jn = min(jn, SX_gs.n_curves-1);
 
 /* sever the connection with the old id using J */
     obj = SX_get_curve_obj(j);
@@ -522,7 +522,7 @@ object *SX_re_id(SS_psides *si)
 
     memset(id, 0, 10);
 
-    for (j = 0; j < SX_N_Curves; j++)
+    for (j = 0; j < SX_gs.n_curves; j++)
         {if (SX_gs.data_index[j] != -1)
 	    {id[0] = 'A' + i;
              if (j != i)
@@ -601,9 +601,9 @@ int SX_curvep(char *s)
     rv = FALSE;
 
     j = _SX_curve_id(s);
-    if ((0 <= j) && (j < SX_N_Curves) && SC_is_print_char(*s, 4))
+    if ((0 <= j) && (j < SX_gs.n_curves) && SC_is_print_char(*s, 4))
        {i = SX_gs.data_index[j];
-        if ((-1 < i) && (i < SX_N_Curves))
+        if ((-1 < i) && (i < SX_gs.n_curves))
            if (SX_gs.dataset[i].n > 0)
               rv = TRUE;};
 

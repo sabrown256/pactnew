@@ -14,6 +14,7 @@ MOD: 05/05/2011
 <HR>
 
 <h2><a href="#SXscheme">The PACT SCHEME Language</a></h2>
+<ul>
 <li><a href="#SXintro">Introduction</a>
 <li><a href="#SXlang">SCHEME Language Guide</a>
 <ul>
@@ -4280,7 +4281,7 @@ SX_cgm_name
 <P>SX_gs.plot_type_style
 <P>SX_ps_name
 <P>SX_ps_type
-<P>SX_smooth_method
+<P>SX_gs.smooth_method
 </BLOCKQUOTE>
 
 <a name="540589"></a>
