@@ -82,7 +82,7 @@ void UL_init_view(SS_psides *si)
     SX_gs.gr_mode           = TRUE;
     SX_gs.plot_flag         = TRUE;
 
-    PG_box_init(3, SX_gwc, 0.0, 1.0);
+    PG_box_init(3, SX_gs.gwc, 0.0, 1.0);
 
     SX_gs.view_x[0]       = 0.18;
     SX_gs.view_x[1]       = 0.93;
@@ -109,9 +109,9 @@ void UL_init_view(SS_psides *si)
     SX_gs.console_type     = CSTRSAVE("MONOCHROME");
     SX_gs.text_output_format = CSTRSAVE("%13.6e");
 
-    SX_display_name  = CSTRSAVE("WINDOW");
-    SX_display_type  = CSTRSAVE("COLOR");
-    SX_display_title = CSTRSAVE("ULTRA II");
+    SX_gs.display_name  = CSTRSAVE("WINDOW");
+    SX_gs.display_type  = CSTRSAVE("COLOR");
+    SX_gs.display_title = CSTRSAVE("ULTRA II");
 
     UL_derivative_tolerance = 2.0e-2;
     UL_window_height_factor = 1.0;
@@ -934,8 +934,8 @@ object *UL_mode_graphics(SS_psides *si)
 	   SC_set_get_line(PG_wind_fgets);
 
         SX_gs.gr_mode         = TRUE;
-        SX_gs.graphics_device = PG_make_device(SX_display_name, SX_display_type,
-                                            SX_display_title);
+        SX_gs.graphics_device = PG_make_device(SX_gs.display_name, SX_gs.display_type,
+                                            SX_gs.display_title);
 
 	if (SX_gs.graphics_device != NULL)
 	   {if (scrwin == NULL)
@@ -1044,10 +1044,10 @@ void UL_set_graphics_state(PG_device *d)
 	    {d->view_x[i] = SX_gs.view_x[i];
 
 /* viewport limits in WC */
-	     g->wc[i] = SX_gwc[i];
+	     g->wc[i] = SX_gs.gwc[i];
 
 /* WC to BND pad */
-	     g->pad[i] = SX_gpad[i];};
+	     g->pad[i] = SX_gs.gpad[i];};
 
 	PG_get_attrs_glb(TRUE,
 			 "axis-type-face", &axstf,
@@ -1057,7 +1057,7 @@ void UL_set_graphics_state(PG_device *d)
 	PG_fset_axis_log_scale(d, 2, SX_gs.log_scale);
 	PG_fset_font(d, axstf, SX_gs.plot_type_style, SX_gs.plot_type_size);
 	PG_fset_marker_scale(d, mrks);
-	PG_fset_marker_orientation(d, SX_marker_orientation);
+	PG_fset_marker_orientation(d, SX_gs.marker_orientation);
 
 	if (!POSTSCRIPT_DEVICE(d))
 	   {g->hwin[0] = SX_gs.window_P[0];

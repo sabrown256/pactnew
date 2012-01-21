@@ -576,15 +576,15 @@ struct s_SX_global_state
     double console_y;
     double console_width;
     double console_height;
-    double SX_gwc[PG_BOXSZ];
-    double SX_gpad[PG_BOXSZ];
+    double gwc[PG_BOXSZ];
+    double gpad[PG_BOXSZ];
     double window_x[PG_SPACEDM];
     double window_P[PG_SPACEDM];
     double window_width;
     double window_width_P;
     double window_height;
     double window_height_P;
-    double SX_marker_orientation;
+    double marker_orientation;
     double SX_phi;
     double show_mouse_location_x;
     double show_mouse_location_y;
@@ -599,9 +599,9 @@ struct s_SX_global_state
     char *console_type;
     char *current_palette;
     char data_directory[MAXLINE];
-    char *SX_display_name;
-    char *SX_display_type;
-    char *SX_display_title;
+    char *display_name;
+    char *display_type;
+    char *display_title;
     char err[MAXLINE];         /* global buffer for certain error messages */
     char *SX_GRI_title;
     char *SX_GRI_type_face;
@@ -688,20 +688,14 @@ extern int
 
 extern double
  SX_chi,
- SX_gwc[],
- SX_gpad[],
  SX_GRI_x,
  SX_GRI_y,
  SX_GRI_dx,
  SX_GRI_dy,
- SX_marker_orientation,
  SX_phi,
  SX_theta;
 
 extern char
- *SX_display_name,
- *SX_display_type,
- *SX_display_title,
  *SX_GRI_title,
  *SX_GRI_type_face,
  *SX_GRI_type_style,

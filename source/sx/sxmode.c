@@ -56,10 +56,10 @@ static void SX_set_graphics_state(PG_device *d)
         {d->view_x[i] = SX_gs.view_x[i];
 
 /* viewport limits in WC */
-         g->wc[i] = SX_gwc[i];
+         g->wc[i] = SX_gs.gwc[i];
 
 /* WC to BND pad */
-	 g->pad[i] = SX_gpad[i];};
+	 g->pad[i] = SX_gs.gpad[i];};
 
     PG_get_attrs_glb(TRUE,
 		     "axis-type-face", &axstf,
@@ -69,7 +69,7 @@ static void SX_set_graphics_state(PG_device *d)
     PG_fset_axis_log_scale(d, 2, SX_gs.log_scale);
     PG_fset_font(d, axstf, SX_gs.plot_type_style, SX_gs.plot_type_size);
     PG_fset_marker_scale(d, mrks);
-    PG_fset_marker_orientation(d, SX_marker_orientation);
+    PG_fset_marker_orientation(d, SX_gs.marker_orientation);
 
     if (!POSTSCRIPT_DEVICE(d))
        {g->hwin[0] = SX_gs.window_P[0];
@@ -434,8 +434,8 @@ object *SX_mode_graphics(SS_psides *si)
 	   SC_set_get_line(PG_wind_fgets);
 
         SX_gs.gr_mode         = TRUE;
-        SX_gs.graphics_device = PG_make_device(SX_display_name, SX_display_type,
-                                            SX_display_title);
+        SX_gs.graphics_device = PG_make_device(SX_gs.display_name, SX_gs.display_type,
+                                            SX_gs.display_title);
 
 /* map the PDBView graphics state onto the device */
 	if (SX_gs.graphics_device != NULL)

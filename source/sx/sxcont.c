@@ -14,14 +14,10 @@
 
 double
  SX_chi,
- SX_marker_orientation,
  SX_phi,
  SX_theta;
 
 char
- *SX_display_name,
- *SX_display_type,
- *SX_display_title,
  *SX_promotion_type;
 
 SX_file_action
@@ -1081,7 +1077,7 @@ void SX_install_global_vars(SS_psides *si)
     SX_GRI_dx                 = 0.0;
     SX_GRI_dy                 = 0.0;
     SX_gs.grid                   = OFF;
-    SX_marker_orientation     = 0.0;
+    SX_gs.marker_orientation     = 0.0;
 
 /*    SX_palette              = CSTRSAVE("spectrum"); */
     SX_phi                    = 0.0;
@@ -1113,7 +1109,7 @@ void SX_install_global_vars(SS_psides *si)
 
 /* WC to BND offset */
     for (i = 0; i < PG_BOXSZ; i++)
-        SX_gpad[i] = 0.01;
+        SX_gs.gpad[i] = 0.01;
 
 /* A */
 
@@ -1242,7 +1238,7 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "botspace",
                   "Variable: Fractional space at bottom of screen\n     Usage: botspace <real>",
                   SS_acc_double,
-                  &SX_gpad[2]);
+                  &SX_gs.gpad[2]);
 
     SS_install_cf(si, "bracket-flag",
                   "Variable: Remove blanks within square bracket enclosed fields\n     Usage: bracket-flag on | off",
@@ -1312,17 +1308,17 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "display-name",
                   "Variable: Display-name - <host>:<display>.<screen>\n     Usage: display-name <string>",
                   SS_acc_ptr,
-                  &SX_display_name);
+                  &SX_gs.display_name);
 
     SS_install_cf(si, "display-type",
                   "Variable: Controls display mode\n     Usage: display-type <string>",
                   SS_acc_ptr,
-                  &SX_display_type);
+                  &SX_gs.display_type);
 
     SS_install_cf(si, "display-title",
                   "Variable: Controls display title\n     Usage: display-title <string>",
                   SS_acc_ptr,
-                  &SX_display_title);
+                  &SX_gs.display_title);
 
 /* EFGHIJ */
 
@@ -1455,7 +1451,7 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "leftspace",
                   "Variable: Fractional space at left of screen\n     Usage: leftspace <real>",
                   SS_acc_double,
-                  &SX_gpad[0]);
+                  &SX_gs.gpad[0]);
 
     SS_install_cf(si, "line-color",
                   "Variable: Default line color for new curves\n     Usage: line-color [<integer>] ",
@@ -1495,7 +1491,7 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "marker-orientation",
                   "Variable: The marker orientation angle\n     Usage: marker-orientation <real>",
                   SS_acc_double,
-                  &SX_marker_orientation);
+                  &SX_gs.marker_orientation);
 
     SS_install_cf(si, "n-curves",
                   "Variable: Total number of curves in the system\n     Usage: n-curves",
@@ -1613,7 +1609,7 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "rightspace",
                   "Variable: Fractional space at right of screen\n     Usage: rightspace <real>",
                   SS_acc_double,
-                  &SX_gpad[1]);
+                  &SX_gs.gpad[1]);
 
 
 /* STUV */
@@ -1666,7 +1662,7 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "topspace",
                   "Variable: Fractional space at top of screen\n     Usage: topspace <real>",
                   SS_acc_double,
-                  &SX_gpad[3]);
+                  &SX_gs.gpad[3]);
 
     SS_install_cf(si, "type-face",
                   "Variable: Font type face for plot\n     Usage: type-face helvetica | times | courier",

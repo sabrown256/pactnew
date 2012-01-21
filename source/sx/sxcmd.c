@@ -98,7 +98,7 @@ void SX_init_view(SS_psides *si)
     SX_gs.plot_flag       = TRUE;
     SX_gs.default_npts    = 100;
 
-    PG_box_init(3, SX_gwc, 0.0, 1.0);
+    PG_box_init(3, SX_gs.gwc, 0.0, 1.0);
 
     SX_gs.view_x[0]       = 0.18;
     SX_gs.view_x[1]       = 0.95;
@@ -119,9 +119,9 @@ void SX_init_view(SS_psides *si)
 
     SX_gs.text_output_format = CSTRSAVE("%13.6e");
 
-    SX_display_name  = CSTRSAVE("WINDOW");
-    SX_display_type  = CSTRSAVE("COLOR");
-    SX_display_title = CSTRSAVE("PDBView");
+    SX_gs.display_name  = CSTRSAVE("WINDOW");
+    SX_gs.display_type  = CSTRSAVE("COLOR");
+    SX_gs.display_title = CSTRSAVE("PDBView");
 
     si->interactive = FALSE;
     si->print_flag  = FALSE;

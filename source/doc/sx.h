@@ -4260,7 +4260,7 @@ level routines to be used by the interpreter.<p>
 SX_botspace
 <P>SX_label_space
 <P>SX_leftspace
-<P>SX_marker_orientation
+<P>SX_gs.marker_orientation
 <P>SX_phi
 <P>SX_rightspace
 <P>SX_gs.show_mouse_location_x

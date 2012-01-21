@@ -13,10 +13,6 @@
 
 #define LABEL_TEXT_SIZE 30
 
-double
- SX_gwc[PG_BOXSZ],
- SX_gpad[PG_BOXSZ];
-
 static PG_rendering
  *rendering_mode[4][6] =
     {{&SX_gs.render_def, &SX_gs.render_def,   &SX_gs.render_def,

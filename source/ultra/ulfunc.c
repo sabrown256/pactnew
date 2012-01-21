@@ -544,8 +544,8 @@ static object *_ULI_range(SS_psides *si, object *argl)
 		wc[2] = wc[3];
 		wc[3] = t;};
 
-	    SX_gwc[2] = wc[2];
-	    SX_gwc[3] = wc[3];
+	    SX_gs.gwc[2] = wc[2];
+	    SX_gs.gwc[3] = wc[3];
 	    SX_gs.autorange = FALSE;};};
 
     rv = SS_mk_cons(si, SS_mk_float(si, wc[2]), SS_mk_float(si, wc[3]));
@@ -626,8 +626,8 @@ static object *_ULI_domain(SS_psides *si, object *argl)
 		wc[0] = wc[1];
 		wc[1] = t;};
 
-	    SX_gwc[0] = wc[0];
-	    SX_gwc[1] = wc[1];
+	    SX_gs.gwc[0] = wc[0];
+	    SX_gs.gwc[1] = wc[1];
 	    SX_gs.autodomain = FALSE;};};
 
     rv = SS_mk_cons(si, SS_mk_float(si, wc[0]), SS_mk_float(si, wc[1]));
@@ -677,14 +677,14 @@ static object *_ULI_open_device(SS_psides *si, object *argl)
 		 break;};};};
 
     if (i >= N_OUTPUT_DEVICES)
-       {CFREE(SX_display_type);
-        SX_display_type = type;
+       {CFREE(SX_gs.display_type);
+        SX_gs.display_type = type;
 
-        CFREE(SX_display_title);   
-        SX_display_title = title;
+        CFREE(SX_gs.display_title);   
+        SX_gs.display_title = title;
 
-        CFREE(SX_display_name);
-        SX_display_name = name;
+        CFREE(SX_gs.display_name);
+        SX_gs.display_name = name;
 
         if (SX_gs.gr_mode)
            UL_mode_graphics(si);};
