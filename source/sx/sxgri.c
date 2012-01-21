@@ -505,7 +505,7 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 	PG_register_variable("Axis", SC_INT_S,
 			     axson, NULL, NULL);
 	PG_register_variable("Grid", SC_INT_S,
-			     &SX_grid, NULL, NULL);
+			     &SX_gs.grid, NULL, NULL);
 	PG_register_variable("Max Major Ticks", SC_INT_S,
 			     axsmjt, NULL, NULL);
 	PG_register_variable("# Minor Ticks", SC_INT_S,
@@ -586,11 +586,11 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 
 /* rendering controls */
 	PG_register_variable("1D->1D", SC_INT_S,
-			     &SX_render_1d_1d, NULL, NULL);
+			     &SX_gs.render_1d_1d, NULL, NULL);
 	PG_register_variable("2D->1D", SC_INT_S,
-			     &SX_render_2d_1d, NULL, NULL);
+			     &SX_gs.render_2d_1d, NULL, NULL);
 	PG_register_variable("2D->2D", SC_INT_S,
-			     &SX_render_2d_2d, NULL, NULL);
+			     &SX_gs.render_2d_2d, NULL, NULL);
 	PG_register_variable("# Contour Levels", SC_INT_S,
 			     nlev, NULL, NULL);
 	PG_register_variable("Contour Ratio", SC_DOUBLE_S,

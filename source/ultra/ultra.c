@@ -79,7 +79,7 @@ void UL_init_view(SS_psides *si)
    {int j;
 
     SX_gs.default_npts      = 100;
-    SX_gr_mode           = TRUE;
+    SX_gs.gr_mode           = TRUE;
     SX_gs.plot_flag         = TRUE;
 
     PG_box_init(3, SX_gwc, 0.0, 1.0);
@@ -266,7 +266,7 @@ int _UL_re_id_crv(object *c)
     s[1] = '\0';
 
     for (idn = 0; idn < SX_N_Curves; idn++)
-        if (SX_dataset[idn].n == 0)
+        if (SX_gs.dataset[idn].n == 0)
 	   break;
 
     idn--;
@@ -595,37 +595,37 @@ object *UL_copy_curve(SS_psides *si, int j)
 
     SX_assign_next_id(si, i, UL_plot);
 
-    SX_dataset[i].text      = CSTRSAVE(SX_dataset[j].text);
-    SX_dataset[i].wc[0]     = SX_dataset[j].wc[0];
-    SX_dataset[i].wc[1]     = SX_dataset[j].wc[1];
-    SX_dataset[i].wc[2]     = SX_dataset[j].wc[2];
-    SX_dataset[i].wc[3]     = SX_dataset[j].wc[3];
-    SX_dataset[i].n         = SX_dataset[j].n;
-    SX_dataset[i].file_info = SX_dataset[j].file_info;
-    SX_dataset[i].file_type = SX_dataset[j].file_type;
-    SX_dataset[i].modified  = FALSE;
+    SX_gs.dataset[i].text      = CSTRSAVE(SX_gs.dataset[j].text);
+    SX_gs.dataset[i].wc[0]     = SX_gs.dataset[j].wc[0];
+    SX_gs.dataset[i].wc[1]     = SX_gs.dataset[j].wc[1];
+    SX_gs.dataset[i].wc[2]     = SX_gs.dataset[j].wc[2];
+    SX_gs.dataset[i].wc[3]     = SX_gs.dataset[j].wc[3];
+    SX_gs.dataset[i].n         = SX_gs.dataset[j].n;
+    SX_gs.dataset[i].file_info = SX_gs.dataset[j].file_info;
+    SX_gs.dataset[i].file_type = SX_gs.dataset[j].file_type;
+    SX_gs.dataset[i].modified  = FALSE;
 
-    SC_mark(SX_dataset[i].file_info, 1);
+    SC_mark(SX_gs.dataset[i].file_info, 1);
 
-    if (SX_dataset[j].file != NULL)
-       SX_dataset[i].file = CSTRSAVE(SX_dataset[j].file);
+    if (SX_gs.dataset[j].file != NULL)
+       SX_gs.dataset[i].file = CSTRSAVE(SX_gs.dataset[j].file);
     else
-       SX_dataset[i].file = NULL;
+       SX_gs.dataset[i].file = NULL;
 
-    xpj = SX_dataset[j].x[0];
-    ypj = SX_dataset[j].x[1];
-    xpi = SX_dataset[i].x[0] = CMAKE_N(double, SX_dataset[j].n);
-    ypi = SX_dataset[i].x[1] = CMAKE_N(double, SX_dataset[j].n);
+    xpj = SX_gs.dataset[j].x[0];
+    ypj = SX_gs.dataset[j].x[1];
+    xpi = SX_gs.dataset[i].x[0] = CMAKE_N(double, SX_gs.dataset[j].n);
+    ypi = SX_gs.dataset[i].x[1] = CMAKE_N(double, SX_gs.dataset[j].n);
     if (xpi == NULL || ypi == NULL)
        SS_error(si, "INSUFFICIENT MEMORY - UL_COPY_CURVE", SS_null);
 
 /* copy data if it is already in memory */
     if ((xpj != NULL) && (ypj != NULL))
-       for (k = 0; k < SX_dataset[j].n; k++)
+       for (k = 0; k < SX_gs.dataset[j].n; k++)
            {*xpi++ = *xpj++;
             *ypi++ = *ypj++;};
 
-    PG_set_line_info(SX_dataset[i].info, PLOT_CARTESIAN, CARTESIAN_2D,
+    PG_set_line_info(SX_gs.dataset[i].info, PLOT_CARTESIAN, CARTESIAN_2D,
                      LINE_SOLID,
 		     FALSE, 0, SX_next_color(SX_gs.graphics_device), 0, 0.0);
 
@@ -663,22 +663,22 @@ object *_ULI_extract_curve(SS_psides *si, object *argl)
     i = SX_next_space(si);
     n = 1 + (1.0 + TOLERANCE)*ABS(xstop - xstart)/xstep;
 
-    xpj = SX_dataset[j].x[0];
-    ypj = SX_dataset[j].x[1];
+    xpj = SX_gs.dataset[j].x[0];
+    ypj = SX_gs.dataset[j].x[1];
 
-    if ((SX_dataset[j].wc[0] == xpj[SX_dataset[j].n - 1]) &&
-        (SX_dataset[j].wc[1] == xpj[0]))
-       {xpjtmp = CMAKE_N(double, SX_dataset[j].n);
-        ypjtmp = CMAKE_N(double, SX_dataset[j].n);
-        for (l = 0; l < SX_dataset[j].n; l++)
-            {xpjtmp[l] = xpj[SX_dataset[j].n - l - 1];
-             ypjtmp[l] = ypj[SX_dataset[j].n - l - 1];}
+    if ((SX_gs.dataset[j].wc[0] == xpj[SX_gs.dataset[j].n - 1]) &&
+        (SX_gs.dataset[j].wc[1] == xpj[0]))
+       {xpjtmp = CMAKE_N(double, SX_gs.dataset[j].n);
+        ypjtmp = CMAKE_N(double, SX_gs.dataset[j].n);
+        for (l = 0; l < SX_gs.dataset[j].n; l++)
+            {xpjtmp[l] = xpj[SX_gs.dataset[j].n - l - 1];
+             ypjtmp[l] = ypj[SX_gs.dataset[j].n - l - 1];}
         xpj = xpjtmp;
         ypj = ypjtmp;
         irev = TRUE;}
 
-    xpi = SX_dataset[i].x[0] = CMAKE_N(double, n);
-    ypi = SX_dataset[i].x[1] = CMAKE_N(double, n);
+    xpi = SX_gs.dataset[i].x[0] = CMAKE_N(double, n);
+    ypi = SX_gs.dataset[i].x[1] = CMAKE_N(double, n);
     if (xpi == NULL || ypi == NULL)
        SS_error(si, "INSUFFICIENT MEMORY - _ULI_EXTRACT_CURVE", SS_null);
 
@@ -703,8 +703,8 @@ object *_ULI_extract_curve(SS_psides *si, object *argl)
              *ypi++ = yv;};}
 
     if (irev)
-       {xpi = SX_dataset[i].x[0];
-        ypi = SX_dataset[i].x[1];
+       {xpi = SX_gs.dataset[i].x[0];
+        ypi = SX_gs.dataset[i].x[1];
 
         for (l = 0; l < n/2; l++)
             {tmp = xpi[l];
@@ -718,22 +718,22 @@ object *_ULI_extract_curve(SS_psides *si, object *argl)
         CFREE(ypjtmp);}
 
     snprintf(s, MAXLINE, "Extract %c (%e to %e by %e)",
-            SX_dataset[j].id, xstart, xstop, xstep);
+            SX_gs.dataset[j].id, xstart, xstop, xstep);
 
     SX_assign_next_id(si, i, UL_plot);
 
-    SX_dataset[i].text      = CSTRSAVE(s);
-    SX_dataset[i].file      = NULL;
-    SX_dataset[i].wc[0]      = xstart;
-    SX_dataset[i].wc[1]      = xstop;
-    SX_dataset[i].wc[2]      = ymn;
-    SX_dataset[i].wc[3]      = ymx;
-    SX_dataset[i].n         = n;
-    SX_dataset[i].file_info = NULL;
-    SX_dataset[i].file_type = SC_NO_FILE;
-    SX_dataset[i].modified  = FALSE;
+    SX_gs.dataset[i].text      = CSTRSAVE(s);
+    SX_gs.dataset[i].file      = NULL;
+    SX_gs.dataset[i].wc[0]      = xstart;
+    SX_gs.dataset[i].wc[1]      = xstop;
+    SX_gs.dataset[i].wc[2]      = ymn;
+    SX_gs.dataset[i].wc[3]      = ymx;
+    SX_gs.dataset[i].n         = n;
+    SX_gs.dataset[i].file_info = NULL;
+    SX_gs.dataset[i].file_type = SC_NO_FILE;
+    SX_gs.dataset[i].modified  = FALSE;
 
-    PG_set_line_info(SX_dataset[i].info, PLOT_CARTESIAN, CARTESIAN_2D,
+    PG_set_line_info(SX_gs.dataset[i].info, PLOT_CARTESIAN, CARTESIAN_2D,
                      LINE_SOLID,
 		     FALSE, 0, SX_next_color(SX_gs.graphics_device), 0, 0.0);
 
@@ -755,31 +755,31 @@ object *UL_xindex_curve(SS_psides *si, int j)
     object *o;
 
     i = SX_next_space(si);
-    n = SX_dataset[j].n;
+    n = SX_gs.dataset[j].n;
 
     SX_assign_next_id(si, i, UL_plot);
 
-    SX_dataset[i].text      = CSTRSAVE(SX_dataset[j].text);
-    SX_dataset[i].wc[0]     = 1.0;
-    SX_dataset[i].wc[1]     = (double) n;
-    SX_dataset[i].wc[2]     = SX_dataset[j].wc[2];
-    SX_dataset[i].wc[3]     = SX_dataset[j].wc[3];
-    SX_dataset[i].n         = n;
-    SX_dataset[i].file_info = SX_dataset[j].file_info;
-    SX_dataset[i].file_type = SX_dataset[j].file_type;
-    SX_dataset[i].modified  = FALSE;
+    SX_gs.dataset[i].text      = CSTRSAVE(SX_gs.dataset[j].text);
+    SX_gs.dataset[i].wc[0]     = 1.0;
+    SX_gs.dataset[i].wc[1]     = (double) n;
+    SX_gs.dataset[i].wc[2]     = SX_gs.dataset[j].wc[2];
+    SX_gs.dataset[i].wc[3]     = SX_gs.dataset[j].wc[3];
+    SX_gs.dataset[i].n         = n;
+    SX_gs.dataset[i].file_info = SX_gs.dataset[j].file_info;
+    SX_gs.dataset[i].file_type = SX_gs.dataset[j].file_type;
+    SX_gs.dataset[i].modified  = FALSE;
 
-    SC_mark(SX_dataset[i].file_info, 1);
+    SC_mark(SX_gs.dataset[i].file_info, 1);
 
-    if (SX_dataset[j].file != NULL)
-       SX_dataset[i].file = CSTRSAVE(SX_dataset[j].file);
+    if (SX_gs.dataset[j].file != NULL)
+       SX_gs.dataset[i].file = CSTRSAVE(SX_gs.dataset[j].file);
     else
-       SX_dataset[i].file = NULL;
+       SX_gs.dataset[i].file = NULL;
 
-    xpj = SX_dataset[j].x[0];
-    ypj = SX_dataset[j].x[1];
-    xpi = SX_dataset[i].x[0] = CMAKE_N(double, n);
-    ypi = SX_dataset[i].x[1] = CMAKE_N(double, n);
+    xpj = SX_gs.dataset[j].x[0];
+    ypj = SX_gs.dataset[j].x[1];
+    xpi = SX_gs.dataset[i].x[0] = CMAKE_N(double, n);
+    ypi = SX_gs.dataset[i].x[1] = CMAKE_N(double, n);
     if (xpi == NULL || ypi == NULL)
        SS_error(si, "INSUFFICIENT MEMORY - UL_XINDEX_CURVE", SS_null);
 
@@ -789,7 +789,7 @@ object *UL_xindex_curve(SS_psides *si, int j)
            {*xpi++ = (double) (k+1);
             *ypi++ = *ypj++;};
 
-    PG_set_line_info(SX_dataset[i].info, PLOT_CARTESIAN, CARTESIAN_2D,
+    PG_set_line_info(SX_gs.dataset[i].info, PLOT_CARTESIAN, CARTESIAN_2D,
                      LINE_SOLID,
 		     FALSE, 0, SX_next_color(SX_gs.graphics_device), 0, 0.0);
 
@@ -871,7 +871,7 @@ object *UL_mode_text(SS_psides *si)
         PG_close_device(SX_gs.graphics_device);
         SX_gs.graphics_device = NULL;
 
-        SX_gr_mode   = FALSE;
+        SX_gs.gr_mode   = FALSE;
         SX_gs.plot_flag = FALSE;
 
         ret = SS_t;}
@@ -933,7 +933,7 @@ object *UL_mode_graphics(SS_psides *si)
 	else
 	   SC_set_get_line(PG_wind_fgets);
 
-        SX_gr_mode         = TRUE;
+        SX_gs.gr_mode         = TRUE;
         SX_gs.graphics_device = PG_make_device(SX_display_name, SX_display_type,
                                             SX_display_title);
 
@@ -1036,7 +1036,7 @@ void UL_set_graphics_state(PG_device *d)
 	d->border_width = SX_gs.border_width;
 	d->data_id      = SX_data_id;
 	d->gprint_flag  = TRUE;
-	d->grid         = SX_grid;
+	d->grid         = SX_gs.grid;
 
 	d->view_aspect  = SX_gs.view_aspect;
 
@@ -1205,14 +1205,14 @@ int main(int c, char **v, char **env)
                      load_rc   = FALSE;
                      break;
                 case 's' :                                   /* Scheme mode */
-                     SX_gr_mode = FALSE;
+                     SX_gs.gr_mode = FALSE;
 		     PG_IO_INTERRUPTS(FALSE);
                      break;
                 case 't' :                                /* time the loads */
                      tflag = TRUE;
                      break;
                 case 'u' :                                    /* Ultra mode */
-                     SX_gr_mode = TRUE;
+                     SX_gs.gr_mode = TRUE;
                      break;
                 case 'w' :                       /* use X window for drawing */
                                                  /* not pixmap               */
@@ -1247,7 +1247,7 @@ int main(int c, char **v, char **env)
        SC_send_tracker("ultra", VERSION, 0, NULL);
 
     SX_gs.autoplot = ON;
-    if (SX_gr_mode)
+    if (SX_gs.gr_mode)
        UL_mode_graphics(si);
     else
        UL_mode_text(si);

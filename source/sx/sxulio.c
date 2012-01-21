@@ -83,10 +83,10 @@ static int _SX_termdata(SS_psides *si, int *aryptr,
     j = *aryptr;
 
     CREMAKE(xbuff, double, _SX.dataptr);
-    x[0] = SX_dataset[j].x[0] = xbuff;
+    x[0] = SX_gs.dataset[j].x[0] = xbuff;
 
     CREMAKE(ybuff, double, _SX.dataptr);
-    x[1] = SX_dataset[j].x[1] = ybuff;
+    x[1] = SX_gs.dataset[j].x[1] = ybuff;
 
 /* bail out if not enough memory */
     if ((x[0] == NULL) || (x[1] == NULL))
@@ -95,15 +95,15 @@ static int _SX_termdata(SS_psides *si, int *aryptr,
     if ((xbuff[_SX.dataptr-1] == -999) && (ybuff[_SX.dataptr-1] == -999))
        --_SX.dataptr;
 
-    PM_maxmin(SX_dataset[j].x[0], &wc[0], &wc[1], _SX.dataptr);
-    PM_maxmin(SX_dataset[j].x[1], &wc[2], &wc[3], _SX.dataptr);
+    PM_maxmin(SX_gs.dataset[j].x[0], &wc[0], &wc[1], _SX.dataptr);
+    PM_maxmin(SX_gs.dataset[j].x[1], &wc[2], &wc[3], _SX.dataptr);
 
-    SX_dataset[j].id = ' ';
-    SX_dataset[j].n  = _SX.dataptr;
+    SX_gs.dataset[j].id = ' ';
+    SX_gs.dataset[j].n  = _SX.dataptr;
 
-    PG_box_copy(2, SX_dataset[j].wc, wc);
+    PG_box_copy(2, SX_gs.dataset[j].wc, wc);
 
-    SC_CHANGE_VALUE_ALIST(SX_dataset[j].info,
+    SC_CHANGE_VALUE_ALIST(SX_gs.dataset[j].info,
 			  int, SC_INT_P_S,
 			  "LINE-COLOR", 0);
 
@@ -111,7 +111,7 @@ static int _SX_termdata(SS_psides *si, int *aryptr,
  * about memory management and also to handle all curve sources the same
  * way
  */
-    _SX_cache_curve(si, &SX_dataset[j], SC_ASCII);
+    _SX_cache_curve(si, &SX_gs.dataset[j], SC_ASCII);
 
     _SX.dataptr  = 0;
     i            = _SX_next_number(si, TRUE);
@@ -358,15 +358,15 @@ static void _SX_read_bin(SS_psides *si, FILE *fp, char *fname)
            break;
         bf[len] = '\0';
 
-        SX_dataset[j].text = CSTRSAVE(bf);
-        SX_dataset[j].file = CSTRSAVE(fname);
+        SX_gs.dataset[j].text = CSTRSAVE(bf);
+        SX_gs.dataset[j].file = CSTRSAVE(fname);
                 
         read_int(n, fp);
 
-        SX_dataset[j].n = n;
-        SX_dataset[j].x[0] = CMAKE_N(double, n);
-        SX_dataset[j].x[1] = CMAKE_N(double, n);
-        if ((SX_dataset[j].x[0] == NULL) || (SX_dataset[j].x[1] == NULL))
+        SX_gs.dataset[j].n = n;
+        SX_gs.dataset[j].x[0] = CMAKE_N(double, n);
+        SX_gs.dataset[j].x[1] = CMAKE_N(double, n);
+        if ((SX_gs.dataset[j].x[0] == NULL) || (SX_gs.dataset[j].x[1] == NULL))
            SS_error(si, "INSUFFICIENT MEMORY - READ_BIN", SS_null);
 
 /* set up the file info for this curve */
@@ -374,32 +374,32 @@ static void _SX_read_bin(SS_psides *si, FILE *fp, char *fname)
         pbi->stream = fp;
         pbi->fileaddr = io_tell(fp);
 
-        SX_dataset[j].file_info = (void *) pbi;
-        SX_dataset[j].file_type = SC_BINARY;
+        SX_gs.dataset[j].file_info = (void *) pbi;
+        SX_gs.dataset[j].file_type = SC_BINARY;
 
 	SC_mark(pbi, 1);
 
-        if (io_read((char *) SX_dataset[j].x[0], sizeof(double), n, fp) != n)
+        if (io_read((char *) SX_gs.dataset[j].x[0], sizeof(double), n, fp) != n)
            {PRINT(stdout, "WARNING: INCOMPLETE CURVE %d IN BINARY FILE",
                           icurve + 1);
             break;};
-        if (io_read((char *) SX_dataset[j].x[1], sizeof(double), n, fp) != n)
+        if (io_read((char *) SX_gs.dataset[j].x[1], sizeof(double), n, fp) != n)
            {PRINT(stdout, "WARNING: INCOMPLETE CURVE %d IN BINARY FILE",
                           icurve + 1);
             break;};
                 
-        PM_maxmin(SX_dataset[j].x[0], &wc[0], &wc[1], n);
-        PM_maxmin(SX_dataset[j].x[1], &wc[2], &wc[3], n);
+        PM_maxmin(SX_gs.dataset[j].x[0], &wc[0], &wc[1], n);
+        PM_maxmin(SX_gs.dataset[j].x[1], &wc[2], &wc[3], n);
 
-        SX_dataset[j].id   = ' ';
-        SX_dataset[j].n    = n;
+        SX_gs.dataset[j].id   = ' ';
+        SX_gs.dataset[j].n    = n;
 
-	PG_box_copy(2, SX_dataset[j].wc, wc);
+	PG_box_copy(2, SX_gs.dataset[j].wc, wc);
 
 /* put this curve's data in a cache somewhere (let's us defer the question
  * about memory management) and also handle all curve sources the same way
  */
-        _SX_cache_curve(si, &SX_dataset[j], SC_BINARY);
+        _SX_cache_curve(si, &SX_gs.dataset[j], SC_BINARY);
 
         icurve++;
 
@@ -462,10 +462,10 @@ static void _SX_read_text(SS_psides *si, FILE *fp, char *fname)
 /* get rid of \n */
 	     text = SC_strtok(pin, "\n\r", s);
 	     if (text == NULL)
-	        SX_dataset[j].text = CSTRSAVE("");
+	        SX_gs.dataset[j].text = CSTRSAVE("");
 	     else
-	        SX_dataset[j].text = CSTRSAVE(text);
-	     SX_dataset[j].file = CSTRSAVE(fname);
+	        SX_gs.dataset[j].text = CSTRSAVE(text);
+	     SX_gs.dataset[j].file = CSTRSAVE(fname);
 
 /* allocate space for buffer */
 	     csz = MAXPTS;
@@ -582,7 +582,7 @@ static void _SX_read_pdb(SS_psides *si, PDBfile *fp, char *fname)
 	    {j = SX_next_space(si);
 
 	     if (SX_read_pdb_curve(fp, fname, names[i],
-				   &SX_dataset[j], NOR_X_Y) == FALSE)
+				   &SX_gs.dataset[j], NOR_X_Y) == FALSE)
 	        PRINT(stdout,
 		      "WARNING: NO DATA READ FOR CURVE %s - SKIPPED\n",
 		      names[i]);
@@ -593,8 +593,8 @@ static void _SX_read_pdb(SS_psides *si, PDBfile *fp, char *fname)
 		 ppi = CMAKE(pdb_info);
 		 ppi->file = fp;
 		 ppi->curve_name = CSTRSAVE(names[i]);
-		 SX_dataset[j].file_info = (void *) ppi;
-		 SX_dataset[j].file_type = SC_PDB;
+		 SX_gs.dataset[j].file_info = (void *) ppi;
+		 SX_gs.dataset[j].file_type = SC_PDB;
 
 		 SC_mark(ppi, 1);
 		 SC_mark(fp, 1);
@@ -602,7 +602,7 @@ static void _SX_read_pdb(SS_psides *si, PDBfile *fp, char *fname)
 /* put this curve's data in a cache somewhere (let's us defer the question
  * about memory management) and also handle all curve sources the same way
  */
-		 _SX_cache_curve(si, &SX_dataset[j], SC_PDB);
+		 _SX_cache_curve(si, &SX_gs.dataset[j], SC_PDB);
 
 		 k = _SX_next_number(si, TRUE);
 		 SX_number[k] = j;};};
@@ -1090,19 +1090,19 @@ static void _SX_wrt_pdb(SS_psides *si, PDBfile *fp, object *argl)
             {i = SS_INTEGER_VALUE(obj);
              if ((i >= 1) && (i <= SX_n_curves_read))
                 j = SX_number[i];
-             if ((j != -1) && (SX_dataset[j].x[0] == NULL))
+             if ((j != -1) && (SX_gs.dataset[j].x[0] == NULL))
                 {uncached = TRUE;
-                 SX_uncache_curve(si, &SX_dataset[j]);};}
+                 SX_uncache_curve(si, &SX_gs.dataset[j]);};}
          else
             j = SX_get_crv_index_i(obj);
 
          if (j >= 0)
-            _SX_wrt_pdb_curve(si, fp, &SX_dataset[j], _SX.icw++);
+            _SX_wrt_pdb_curve(si, fp, &SX_gs.dataset[j], _SX.icw++);
 
          if (uncached)
             {uncached = FALSE;
-             CFREE(SX_dataset[j].x[0]);
-             CFREE(SX_dataset[j].x[1]);
+             CFREE(SX_gs.dataset[j].x[0]);
+             CFREE(SX_gs.dataset[j].x[1]);
              SX_zero_curve(j);};};
 
     PD_flush(fp);
@@ -1135,26 +1135,26 @@ static void _SX_wrt_bin(SS_psides *si, FILE *fp, object *argl)
             {i = (int) *SS_GET(int64_t, obj);
              if ((i >= 1) && (i <= SX_n_curves_read))
                 j = SX_number[i];
-             if ((j != -1) && (SX_dataset[j].x[0] == NULL))
+             if ((j != -1) && (SX_gs.dataset[j].x[0] == NULL))
                 {uncached = TRUE;
-                 SX_uncache_curve(si, &SX_dataset[j]);};}
+                 SX_uncache_curve(si, &SX_gs.dataset[j]);};}
          else
             j = SX_get_crv_index_i(obj);
 
          if (j >= 0)
-            {n = SX_dataset[j].n;
-             i = strlen(SX_dataset[j].text);
+            {n = SX_gs.dataset[j].n;
+             i = strlen(SX_gs.dataset[j].text);
 
              write_int(i, fp);  
-             err = io_write(SX_dataset[j].text, sizeof(char), i, fp);
+             err = io_write(SX_gs.dataset[j].text, sizeof(char), i, fp);
              write_int(n, fp);  
-             err = io_write((char *) SX_dataset[j].x[0], sizeof(double), n, fp);
-             err = io_write((char *) SX_dataset[j].x[1], sizeof(double), n, fp);};
+             err = io_write((char *) SX_gs.dataset[j].x[0], sizeof(double), n, fp);
+             err = io_write((char *) SX_gs.dataset[j].x[1], sizeof(double), n, fp);};
 
          if (uncached)
             {uncached = FALSE;
-             CFREE(SX_dataset[j].x[0]);
-             CFREE(SX_dataset[j].x[1]);
+             CFREE(SX_gs.dataset[j].x[0]);
+             CFREE(SX_gs.dataset[j].x[1]);
              SX_zero_curve(j);};};
 
     err = io_flush(fp);
@@ -1182,21 +1182,21 @@ static void _SX_wrt_text(SS_psides *si, FILE *fp, object *argl)
             {i = (int) *SS_GET(int64_t, obj);
              if ((i >= 1) && (i <= SX_n_curves_read))
                 j = SX_number[i];
-             if ((j != -1) && (SX_dataset[j].x[0] == NULL))
+             if ((j != -1) && (SX_gs.dataset[j].x[0] == NULL))
                 {uncached = TRUE;
-                 SX_uncache_curve(si, &SX_dataset[j]);};}
+                 SX_uncache_curve(si, &SX_gs.dataset[j]);};}
          else
             j = SX_get_crv_index_i(obj);
 
          if (j >= 0)
-            {n = SX_dataset[j].n;
-             x = SX_dataset[j].x[0];
-             y = SX_dataset[j].x[1];
+            {n = SX_gs.dataset[j].n;
+             x = SX_gs.dataset[j].x[0];
+             y = SX_gs.dataset[j].x[1];
 
-             if (SX_dataset[j].text[0] != '#')
+             if (SX_gs.dataset[j].text[0] != '#')
                 io_printf(fp, "# ");
 
-             io_printf(fp, "%s\n", SX_dataset[j].text);
+             io_printf(fp, "%s\n", SX_gs.dataset[j].text);
              for (i = 0; i < n; i++)
                  {io_printf(fp, SX_text_output_format, x[i]);
                   io_printf(fp, " ");
@@ -1205,8 +1205,8 @@ static void _SX_wrt_text(SS_psides *si, FILE *fp, object *argl)
 
          if (uncached)
             {uncached = FALSE;
-             CFREE(SX_dataset[j].x[0]);
-             CFREE(SX_dataset[j].x[1]);
+             CFREE(SX_gs.dataset[j].x[0]);
+             CFREE(SX_gs.dataset[j].x[1]);
              SX_zero_curve(j);};};
 
     io_flush(fp);
@@ -1544,9 +1544,9 @@ void SX_close_open_files(void)
     FILE *fp;
 
     for (i = 0; i < SX_N_Curves; i++)
-        {switch (SX_dataset[i].file_type)
+        {switch (SX_gs.dataset[i].file_type)
             {case SC_BINARY :
-	          pbi = (bin_info *) SX_dataset[i].file_info;
+	          pbi = (bin_info *) SX_gs.dataset[i].file_info;
 		  if (SC_safe_to_free(ppi) == TRUE)
 		     {fp = pbi->stream;
 		      if (SX_file_open(fp))
@@ -1559,7 +1559,7 @@ void SX_close_open_files(void)
 	          {PDBfile *file;
                    FILE *fp;
 
-		   ppi = (pdb_info *) SX_dataset[i].file_info;
+		   ppi = (pdb_info *) SX_gs.dataset[i].file_info;
 		   if (SC_safe_to_free(ppi) == TRUE)
 		      {file = ppi->file;
 		       if (SC_safe_to_free(file) == TRUE)
@@ -1579,8 +1579,8 @@ void SX_close_open_files(void)
              case SC_ASCII : 
 	          break;};
 
-       SX_dataset[i].file_info = NULL;
-       SX_dataset[i].file_type = SC_NO_FILE;};
+       SX_gs.dataset[i].file_info = NULL;
+       SX_gs.dataset[i].file_type = SC_NO_FILE;};
 
     return;}
 

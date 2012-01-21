@@ -56,7 +56,7 @@ int main(int c, char **v, char **env)
     tflag       = FALSE;
     load_init   = TRUE;
     trap_error  = TRUE;
-    SX_gr_mode  = TRUE;
+    SX_gs.gr_mode  = TRUE;
     load_rc     = TRUE;
     zsp         = 2;
 
@@ -116,7 +116,7 @@ int main(int c, char **v, char **env)
                      load_rc = FALSE;
                      break;
                 case 's' :                                       /* SX mode */
-                     SX_gr_mode = FALSE;
+                     SX_gs.gr_mode = FALSE;
 		     PG_IO_INTERRUPTS(FALSE);
                      break;
                 case 't' :                                /* time the loads */
@@ -177,7 +177,7 @@ int main(int c, char **v, char **env)
         SX_init_env(si);
 
 #ifndef NO_SHELL
-        if (SX_gr_mode && !SX_qflag)
+        if (SX_gs.gr_mode && !SX_qflag)
 	   SS_banner(si, SS_mk_string(si, PCODE));
 #endif
 
@@ -193,7 +193,7 @@ int main(int c, char **v, char **env)
     SS_load_scm(si, "nature.scm");
 
     if (pvflag)
-       {if (SX_gr_mode)
+       {if (SX_gs.gr_mode)
 	   SX_mode_graphics(si);
         else
            SX_mode_text(si);
@@ -202,7 +202,7 @@ int main(int c, char **v, char **env)
 
 #ifdef NO_SHELL
 
-    if (SX_gr_mode)
+    if (SX_gs.gr_mode)
         SS_banner(SS_mk_string(si, PCODE));
 
 #endif
@@ -226,7 +226,7 @@ int main(int c, char **v, char **env)
        ret = !SS_run(si, cmd);
 
     else
-       {if (SX_gr_mode && !SX_qflag)
+       {if (SX_gs.gr_mode && !SX_qflag)
 	   SS_banner(si, SS_mk_string(si, SCODE));
 	SS_repl(si);
 

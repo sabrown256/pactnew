@@ -19,14 +19,14 @@ double
 
 static PG_rendering
  *rendering_mode[4][6] =
-    {{&SX_render_def, &SX_render_def,   &SX_render_def,
-      &SX_render_def, &SX_render_def,   &SX_render_def},
-     {&SX_render_def, &SX_render_1d_1d, &SX_render_def,
-      &SX_render_def, &SX_render_def,   &SX_render_def},
-     {&SX_render_def, &SX_render_2d_1d, &SX_render_2d_2d,
-      &SX_render_def, &SX_render_def,   &SX_render_def},
-     {&SX_render_def, &SX_render_def,   &SX_render_def,
-      &SX_render_def, &SX_render_def,   &SX_render_def}};
+    {{&SX_gs.render_def, &SX_gs.render_def,   &SX_gs.render_def,
+      &SX_gs.render_def, &SX_gs.render_def,   &SX_gs.render_def},
+     {&SX_gs.render_def, &SX_gs.render_1d_1d, &SX_gs.render_def,
+      &SX_gs.render_def, &SX_gs.render_def,   &SX_gs.render_def},
+     {&SX_gs.render_def, &SX_gs.render_2d_1d, &SX_gs.render_2d_2d,
+      &SX_gs.render_def, &SX_gs.render_def,   &SX_gs.render_def},
+     {&SX_gs.render_def, &SX_gs.render_def,   &SX_gs.render_def,
+      &SX_gs.render_def, &SX_gs.render_def,   &SX_gs.render_def}};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1061,7 +1061,7 @@ static object *_SXI_open_device(SS_psides *si, object *argl)
     else
 
 /* PG_open_device set dev->hard_copy_device so we can't query it here */
-       {if (!SX_gr_mode &&
+       {if (!SX_gs.gr_mode &&
 	    (dev->type_index != PS_DEVICE) &&
 	    (dev->type_index != MPEG_DEVICE) &&
 	    (dev->type_index != CGMF_DEVICE))
@@ -1587,7 +1587,7 @@ static object *_SXI_draw_plot(SS_psides *si, object *argl)
 			     NULL);};
 
     PG_fset_axis_log_scale(dev, 2, SX_log_scale);
-    PG_turn_grid(dev, SX_grid);
+    PG_turn_grid(dev, SX_gs.grid);
 
     data->rendering = pty;
 

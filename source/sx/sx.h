@@ -157,7 +157,7 @@
 
 /* SX_OK_TO_DRAW - TRUE iff in graphics mode or is a hardcopy device */
 
-#define SX_OK_TO_DRAW(dev) (SX_gr_mode || HARDCOPY_DEVICE(dev))
+#define SX_OK_TO_DRAW(dev) (SX_gs.gr_mode || HARDCOPY_DEVICE(dev))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -552,8 +552,8 @@ struct s_SX_global_state
     int border_width;
     int SX_data_id;
     int SX_GRI_type_size;
-    int SX_gr_mode;
-    int SX_grid;
+    int gr_mode;
+    int grid;
     int *SX_number;
     int SX_N_Curves;
     int SX_n_curves_read;
@@ -608,17 +608,17 @@ struct s_SX_global_state
     char *SX_pui_file;
     char *SX_smooth_method;
 
-    PG_rendering SX_render_def;
-    PG_rendering SX_render_1d_1d;
-    PG_rendering SX_render_2d_1d;
-    PG_rendering SX_render_2d_2d;
-    PG_rendering SX_render_3d_1d;
+    PG_rendering render_def;
+    PG_rendering render_1d_1d;
+    PG_rendering render_2d_1d;
+    PG_rendering render_2d_2d;
+    PG_rendering render_3d_1d;
 
     data_standard *PDB_STANDARD;
 
     PFInt pan_data_hook;
 
-    curve *SX_dataset;
+    curve *dataset;
 
     object *var_tab;
     object *curfile;
@@ -680,14 +680,9 @@ extern "C" {
 extern SX_global_state
  SX_gs;
 
-extern curve
- *SX_dataset;
-
 extern int
  SX_data_id,
  SX_GRI_type_size,
- SX_gr_mode,
- SX_grid,
  *SX_number,
  SX_N_Curves,
  SX_n_curves_read,
@@ -721,13 +716,6 @@ extern char
  *SX_promotion_type,
  *SX_pui_file,
  *SX_smooth_method;
-
-extern PG_rendering
- SX_render_def,
- SX_render_1d_1d,
- SX_render_2d_1d,
- SX_render_2d_2d,
- SX_render_3d_1d;
 
 /*--------------------------------------------------------------------------*/
 

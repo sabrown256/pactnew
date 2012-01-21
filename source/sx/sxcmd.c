@@ -94,7 +94,7 @@ void SX_init_view(SS_psides *si)
 		     "restore-viewport", TRUE,
 		     NULL);
 
-/*    SX_gr_mode         = TRUE; */
+/*    SX_gs.gr_mode         = TRUE; */
     SX_gs.plot_flag       = TRUE;
     SX_gs.default_npts    = 100;
 
@@ -268,7 +268,7 @@ object *SX_mk_mapping_proc(int i)
 /*
     object *p;
 
-    s[0] = SX_dataset[i].id;
+    s[0] = SX_gs.dataset[i].id;
     s[1] = '\0';
     
     j = _SX_mapping_id(s[0]);
@@ -277,11 +277,11 @@ object *SX_mk_mapping_proc(int i)
 
     p = SX_get_curve_proc(j);
 
-    SS_PROCEDURE_DOC(p)    = SX_dataset[i].text;
+    SS_PROCEDURE_DOC(p)    = SX_gs.dataset[i].text;
     SS_VARIABLE_VALUE(obj) = p;
     SS_VARIABLE_NAME(obj)  = SS_PROCEDURE_NAME(p);
 
-    SX_dataset[i].obj = (void *) obj;
+    SX_gs.dataset[i].obj = (void *) obj;
 */
 
     return(obj);}
@@ -518,7 +518,7 @@ int SX_command(SS_psides *si, char *file, char *cmd)
 
 	PG_IO_INTERRUPTS(FALSE);
 
-	SX_gr_mode = TRUE;
+	SX_gs.gr_mode = TRUE;
 	SX_qflag   = TRUE;
 	zsp        = 2;
 
@@ -549,7 +549,7 @@ int SX_command(SS_psides *si, char *file, char *cmd)
 /* initialize the available syntax modes */
 	DEF_SYNTAX_MODES(si);
 
-	if (SX_gr_mode)
+	if (SX_gs.gr_mode)
 	   SX_mode_graphics(si);
 	else
 	   SX_mode_text(si);
