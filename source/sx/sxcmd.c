@@ -454,7 +454,7 @@ void SX_init_env(SS_psides *si)
 /* initialize the prefix list */
     SX_reset_prefix();
 
-    SX_pui_file  = CSTRSAVE("pdbview.pui");
+    SX_gs.pui_file  = CSTRSAVE("pdbview.pui");
 
 /* initialize the some global objects */
 

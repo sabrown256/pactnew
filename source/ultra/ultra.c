@@ -822,8 +822,8 @@ static void UL_init_env(SS_psides *si)
     for (i = 0; i < NPREFIX; i++)
         SX_gs.prefix_list[i] = 0;
 
-    SX_pui_file  = CSTRSAVE("ultra.pui");
-    SX_GRI_title = CSTRSAVE("ULTRA Controls");
+    SX_gs.pui_file  = CSTRSAVE("ultra.pui");
+    SX_gs.gri_title = CSTRSAVE("ULTRA Controls");
 
     PG_register_callback("Replot", UL_plot);
 

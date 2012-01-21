@@ -1356,9 +1356,9 @@ static object *_SXI_draw_domain(SS_psides *si, object *argl)
        {data->info = PG_set_plot_type((pcons *) data->info, pty, CARTESIAN_2D);
 
 	PG_set_attrs_set(data,
-			 "THETA", SC_DOUBLE_I, FALSE, SX_theta,
-			 "PHI",   SC_DOUBLE_I, FALSE, SX_phi,
-			 "CHI",   SC_DOUBLE_I, FALSE, SX_chi,
+			 "THETA", SC_DOUBLE_I, FALSE, SX_gs.view_angle[0],
+			 "PHI",   SC_DOUBLE_I, FALSE, SX_gs.view_angle[1],
+			 "CHI",   SC_DOUBLE_I, FALSE, SX_gs.view_angle[2],
 			 NULL);
 
 	PG_domain_plot(dev, data, NULL);
@@ -1572,14 +1572,14 @@ static object *_SXI_draw_plot(SS_psides *si, object *argl)
         (pty == PLOT_WIRE_MESH) ||
         (pty == PLOT_MESH))
        {PG_set_attrs_graph(data,
-			   "THETA", SC_DOUBLE_I,  FALSE, SX_theta,
-			   "PHI",   SC_DOUBLE_I,  FALSE, SX_phi,
-			   "CHI",   SC_DOUBLE_I,  FALSE, SX_chi,
+			   "THETA", SC_DOUBLE_I,  FALSE, SX_gs.view_angle[0],
+			   "PHI",   SC_DOUBLE_I,  FALSE, SX_gs.view_angle[1],
+			   "CHI",   SC_DOUBLE_I,  FALSE, SX_gs.view_angle[2],
 			   NULL);
 	PG_set_attrs_mapping(data->f,
-			     "THETA", SC_DOUBLE_I,  FALSE, SX_theta,
-			     "PHI",   SC_DOUBLE_I,  FALSE, SX_phi,
-			     "CHI",   SC_DOUBLE_I,  FALSE, SX_chi,
+			     "THETA", SC_DOUBLE_I,  FALSE, SX_gs.view_angle[0],
+			     "PHI",   SC_DOUBLE_I,  FALSE, SX_gs.view_angle[1],
+			     "CHI",   SC_DOUBLE_I,  FALSE, SX_gs.view_angle[2],
 			     NULL);};
 
     PG_fset_axis_log_scale(dev, 2, SX_gs.log_scale);

@@ -10,15 +10,6 @@
  
 #include "sx_int.h"
 
-char
- *SX_pui_file = NULL,
- *SX_GRI_title = NULL,
- *SX_GRI_type_face = NULL,
- *SX_GRI_type_style = NULL;
-
-int
- SX_GRI_type_size = 12;
-
 double
  SX_GRI_x  = 0.5,
  SX_GRI_y  = 0.01,
@@ -112,8 +103,8 @@ static void _SX_save_gri(void *d, PG_event *ev)
    {PG_device *dev;
 
     dev = PG_handle_button_press(d, ev);
-    if ((dev != NULL) && (SX_pui_file != NULL))
-       PG_write_interface(dev, SX_pui_file);
+    if ((dev != NULL) && (SX_gs.pui_file != NULL))
+       PG_write_interface(dev, SX_gs.pui_file);
 
     return;}
 
@@ -454,14 +445,14 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
         _SX.th_mn  =    0.0;
         _SX.th_mx  =  180.0;
 
-	if (SX_GRI_type_face == NULL)
-	   SX_GRI_type_face = CSTRSAVE("helvetica");
+	if (SX_gs.gri_type_face == NULL)
+	   SX_gs.gri_type_face = CSTRSAVE("helvetica");
 
-	if (SX_GRI_type_style == NULL)
-	   SX_GRI_type_style = CSTRSAVE("medium");
+	if (SX_gs.gri_type_style == NULL)
+	   SX_gs.gri_type_style = CSTRSAVE("medium");
 
-	if (SX_GRI_title == NULL)
-	   SX_GRI_title = CSTRSAVE("PDBView Controls");
+	if (SX_gs.gri_title == NULL)
+	   SX_gs.gri_title = CSTRSAVE("PDBView Controls");
 
 	if (*axslxf == NULL)
 	   *axslxf = CSTRSAVE("%10.2g");
@@ -473,14 +464,14 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 	   *axstf = CSTRSAVE("helvetica");
 
 /* connect the I/O functions */
-	_SX.gri = PG_make_device("WINDOW", "COLOR", SX_GRI_title);
+	_SX.gri = PG_make_device("WINDOW", "COLOR", SX_gs.gri_title);
 
 	PG_query_screen_n(PG_console_device, sdx, &nc);
         if (SX_GRI_dx == 0.0)
-           SX_GRI_dx = 30.0*SX_GRI_type_size/((double) sdx[0]);
+           SX_GRI_dx = 30.0*SX_gs.gri_type_size/((double) sdx[0]);
 
         if (SX_GRI_dy == 0.0)
-           SX_GRI_dy = 15.0*SX_GRI_type_size/((double) sdx[1]);
+           SX_GRI_dy = 15.0*SX_gs.gri_type_size/((double) sdx[1]);
 
 	PG_open_device(_SX.gri, SX_GRI_x, SX_GRI_y, SX_GRI_dx, SX_GRI_dy);
 
@@ -596,11 +587,11 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 	PG_register_variable("Contour Ratio", SC_DOUBLE_S,
 			     cntrat, NULL, NULL);
 	PG_register_variable("Chi", SC_DOUBLE_S,
-			     &SX_chi, &_SX.chi_mn, &_SX.chi_mx);
+			     &SX_gs.view_angle[2], &_SX.chi_mn, &_SX.chi_mx);
 	PG_register_variable("Phi", SC_DOUBLE_S,
-			     &SX_phi, &_SX.phi_mn, &_SX.phi_mx);
+			     &SX_gs.view_angle[1], &_SX.phi_mn, &_SX.phi_mx);
 	PG_register_variable("Theta", SC_DOUBLE_S,
-			     &SX_theta, &_SX.th_mn, &_SX.th_mx);
+			     &SX_gs.view_angle[0], &_SX.th_mn, &_SX.th_mx);
 	PG_register_variable("Default Color", SC_INT_S,
 			     &SX_gs.default_color, NULL, NULL);
 
@@ -616,9 +607,9 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 	PG_register_variable("prompt", SC_STRING_S,
 			     si->prompt, NULL, NULL);
 
-	name = SC_search_file(NULL, SX_pui_file);
+	name = SC_search_file(NULL, SX_gs.pui_file);
 	if (name == NULL)
-	   {PRINT(stderr, "Can't find %s\n", SX_pui_file);};
+	   {PRINT(stderr, "Can't find %s\n", SX_gs.pui_file);};
 
 	PG_read_interface(_SX.gri, name);
 
