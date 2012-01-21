@@ -14,7 +14,6 @@ MOD: 05/05/2011
 <HR>
 
 <h2><a href="#SXscheme">The PACT SCHEME Language</a></h2>
-<ul>
 <li><a href="#SXintro">Introduction</a>
 <li><a href="#SXlang">SCHEME Language Guide</a>
 <ul>
@@ -4222,7 +4221,7 @@ level routines to be used by the interpreter.<p>
 <TD>	CGM flag </TD></TR>
 <TR><TD>SX_gs.default_color</TD>
 <TD>	default color to use </TD></TR>
-<TR><TD>SX_grid</TD>
+<TR><TD>SX_gs.grid</TD>
 <TD>	flag controlling grids on plots </TD></TR>
 <TR><TD>SX_label_length</TD>
 <TD>	number of label characters to print </TD></TR>
@@ -4236,11 +4235,11 @@ level routines to be used by the interpreter.<p>
 <TD>	size in points of plot related fonts </TD></TR>
 <TR><TD>SX_ps_flag</TD>
 <TD>	PostScript flag </TD></TR>
-<TR><TD>SX_render_1d_1d</TD>
+<TR><TD>SX_gs.render_1d_1d</TD>
 <TD>	default 1d domain vs 1d range plot rendering </TD></TR>
-<TR><TD>SX_render_2d_1d</TD>
+<TR><TD>SX_gs.render_2d_1d</TD>
 <TD>	default 2d domain vs 1d range plot rendering </TD></TR>
-<TR><TD>SX_render_2d_2d</TD>
+<TR><TD>SX_gs.render_2d_2d</TD>
 <TD>	default 2d domain vs 2d range plot rendering </TD></TR>
 <TR><TD>SX_gs.show_mouse_location</TD>
 <TD>	flag controlling display of mouse location </TD></TR>

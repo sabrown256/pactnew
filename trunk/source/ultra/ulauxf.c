@@ -40,8 +40,8 @@ static object *_UL_fft(SS_psides *si, object *argl,
     if ((jr < 0) || (ji < 0))
        SS_error(si, "BAD CURVES - _UL_FFT", argl);
 
-    crvr = &SX_dataset[jr];
-    crvi = &SX_dataset[ji];
+    crvr = &SX_gs.dataset[jr];
+    crvi = &SX_gs.dataset[ji];
 
     xmn = crvr->wc[0];
     xmx = crvr->wc[1];
@@ -101,7 +101,7 @@ object *UL_fft(SS_psides *si, int j)
     curve *crv;
     object *cre, *cim, *rv;
 
-    crv = &SX_dataset[j];
+    crv = &SX_gs.dataset[j];
     xmn = crv->wc[0];
     xmx = crv->wc[1];
 
@@ -218,8 +218,8 @@ static object *_ULI_convlv(SS_psides *si, object *argl)
     if ((jg < 0) || (jh < 0))
        SS_error(si, "BAD CURVES - _ULI_CONVLV", argl);
 
-    crvg = &SX_dataset[jg];
-    crvh = &SX_dataset[jh];
+    crvg = &SX_gs.dataset[jg];
+    crvh = &SX_gs.dataset[jh];
 
     gx = crvg->x[0];
     gy = crvg->x[1];
@@ -312,8 +312,8 @@ object *UL_curve_eval(SS_psides *si, object *arg)
     else
        value = (double) *SS_GET(double, arg);
 
-    ret = _UL_get_value(si, SX_dataset[i].x[0], SX_dataset[i].x[1], value,
-			SX_dataset[i].n, SX_dataset[i].id);
+    ret = _UL_get_value(si, SX_gs.dataset[i].x[0], SX_gs.dataset[i].x[1], value,
+			SX_gs.dataset[i].n, SX_gs.dataset[i].id);
     SS_mark(ret);
 
     UL_pause(si, FALSE);
@@ -341,8 +341,8 @@ object *UL_getx(SS_psides *si, object *obj, object *tok)
     else
        value = (double) *SS_GET(double, tok);
 
-    tmp = _UL_get_value(si, SX_dataset[i].x[1], SX_dataset[i].x[0], value,
-			SX_dataset[i].n, SX_dataset[i].id);
+    tmp = _UL_get_value(si, SX_gs.dataset[i].x[1], SX_gs.dataset[i].x[0], value,
+			SX_gs.dataset[i].n, SX_gs.dataset[i].id);
 
     o = SS_make_list(si, SS_OBJECT_I, obj,
 		     SS_OBJECT_I, tok,
@@ -367,8 +367,8 @@ object *UL_gety(SS_psides *si, object *obj, object *tok)
     else
        value = (double) *SS_GET(double, tok);
 
-    tmp = _UL_get_value(si, SX_dataset[i].x[0], SX_dataset[i].x[1], value,
-			SX_dataset[i].n, SX_dataset[i].id);
+    tmp = _UL_get_value(si, SX_gs.dataset[i].x[0], SX_gs.dataset[i].x[1], value,
+			SX_gs.dataset[i].n, SX_gs.dataset[i].id);
 
     o = SS_make_list(si, SS_OBJECT_I, obj,
 		     SS_OBJECT_I, tok,
@@ -422,21 +422,21 @@ static object *_ULI_fit(SS_psides *si, object *obj, object *tok)
     aord = abs(order) + 1;
     j    = SX_get_crv_index_i(obj);
 
-    n     = SX_dataset[j].n;
-    x[0]  = SX_dataset[j].x[0];
-    x[1]  = SX_dataset[j].x[1];
-    wc[0] = SX_dataset[j].wc[0];
-    wc[1] = SX_dataset[j].wc[1];
+    n     = SX_gs.dataset[j].n;
+    x[0]  = SX_gs.dataset[j].x[0];
+    x[1]  = SX_gs.dataset[j].x[1];
+    wc[0] = SX_gs.dataset[j].wc[0];
+    wc[1] = SX_gs.dataset[j].wc[1];
 
     cf = PM_lsq_fit(2, n, x, wc, order);
 
 /* display coefficients and cons up the return list */
     if (si->interactive == ON)
-       {if ((SX_dataset[j].id >= 'A') &&
-            (SX_dataset[j].id <= 'Z'))
-           {PRINT(stdout, "\nCurve %c\n", SX_dataset[j].id);}
+       {if ((SX_gs.dataset[j].id >= 'A') &&
+            (SX_gs.dataset[j].id <= 'Z'))
+           {PRINT(stdout, "\nCurve %c\n", SX_gs.dataset[j].id);}
         else
-           {PRINT(stdout, "\nCurve @%d\n", SX_dataset[j].id);};}
+           {PRINT(stdout, "\nCurve @%d\n", SX_gs.dataset[j].id);};}
 
     ret = SS_null;
     sgn = (order < 0) ? -1 : 1;
@@ -450,11 +450,11 @@ static object *_ULI_fit(SS_psides *si, object *obj, object *tok)
 /* create curve of fit */
     p = PM_lsq_polynomial(SX_gs.default_npts, order, cf, wc);
 
-    if ((SX_dataset[i].id >= 'A') &&
-        (SX_dataset[i].id <= 'Z'))
-        {lbl = SC_dsnprintf(FALSE, "Fit %c %d", SX_dataset[j].id, order);}
+    if ((SX_gs.dataset[i].id >= 'A') &&
+        (SX_gs.dataset[i].id <= 'Z'))
+        {lbl = SC_dsnprintf(FALSE, "Fit %c %d", SX_gs.dataset[j].id, order);}
     else
-        {lbl = SC_dsnprintf(FALSE, "Fit @%d %d", SX_dataset[j].id, order);}
+        {lbl = SC_dsnprintf(FALSE, "Fit @%d %d", SX_gs.dataset[j].id, order);}
 
     ret = SS_mk_cons(si, SS_reverse(si, ret),
                      SX_mk_curve(si, SX_gs.default_npts, p[0], p[1],
@@ -487,7 +487,7 @@ static object *_ULI_fit_curve(SS_psides *si, object *argl)
 
     if (j < 0)
        SS_error(si, "BAD CURVE - _ULI_FIT_CURVE", argl);
-    n = SX_dataset[j].n;
+    n = SX_gs.dataset[j].n;
 
     argl  = SS_cdr(si, argl);
     order = SS_length(si, argl);
@@ -499,14 +499,14 @@ static object *_ULI_fit_curve(SS_psides *si, object *argl)
     ay = PM_create(n, 1);
     a  = PM_create(n, order);
 
-    xp0 = SX_dataset[j].x[0] - 1;
-    yp0 = SX_dataset[j].x[1] - 1;
+    xp0 = SX_gs.dataset[j].x[0] - 1;
+    yp0 = SX_gs.dataset[j].x[1] - 1;
     for (i = 1; i <= n; i++)
         PM_element(ay, i, 1) = yp0[i];
 
     for (k = 1; k < aord; k++)
-        {x[0] = SX_dataset[curid[k-1]].x[0];
-         x[1] = SX_dataset[curid[k-1]].x[1];
+        {x[0] = SX_gs.dataset[curid[k-1]].x[0];
+         x[1] = SX_gs.dataset[curid[k-1]].x[1];
          for (i = 1; i <= n; i++)
              {while (xp0[i] > x[0][1])
                  {x[0]++;
@@ -520,9 +520,9 @@ static object *_ULI_fit_curve(SS_psides *si, object *argl)
     solution = UL_lsq(a, ay);
 
 /* display coefficients */
-    id = SX_dataset[j].id;
-    alpha_id = ((SX_dataset[i].id >= 'A') &&
-                (SX_dataset[i].id <= 'Z'));
+    id = SX_gs.dataset[j].id;
+    alpha_id = ((SX_gs.dataset[i].id >= 'A') &&
+                (SX_gs.dataset[i].id <= 'Z'));
 
     if (si->interactive == ON)
        {if (alpha_id)
@@ -536,9 +536,9 @@ static object *_ULI_fit_curve(SS_psides *si, object *argl)
        {snprintf(local, MAXLINE, "Fit(%c ;", id);}
 
     for (i = 1; i <= order; i++)
-        {id = SX_dataset[curid[i-1]].id;
-         alpha_id = ((SX_dataset[i].id >= 'A') &&
-                     (SX_dataset[i].id <= 'Z'));
+        {id = SX_gs.dataset[curid[i-1]].id;
+         alpha_id = ((SX_gs.dataset[i].id >= 'A') &&
+                     (SX_gs.dataset[i].id <= 'Z'));
 	 if (si->interactive == ON)
 	    {PRINT(stdout, "    ");
 	     PRINT(stdout, SX_text_output_format, PM_element(solution, i, 1));
@@ -565,7 +565,7 @@ static object *_ULI_fit_curve(SS_psides *si, object *argl)
     if (si->interactive == ON)
        PRINT(stdout, "\n");
 
-    ch = SX_mk_curve(si, SX_dataset[j].n, SX_dataset[j].x[0], UL_buf1y,
+    ch = SX_mk_curve(si, SX_gs.dataset[j].n, SX_gs.dataset[j].x[0], UL_buf1y,
 		     local, NULL, UL_plot);
 
 /* clean up */
@@ -601,18 +601,18 @@ static object *_ULI_error_plot(SS_psides *si, object *argl)
 	    0);
 
     xpc[0] = ((xp[0] == NULL) || SS_nullobjp(xp[0])) ?
-             NULL : (void *) (SX_dataset + SX_get_crv_index_i(xp[0]))->x[1];
+             NULL : (void *) (SX_gs.dataset + SX_get_crv_index_i(xp[0]))->x[1];
 
     xpc[1] = ((xp[1] == NULL) || SS_nullobjp(xp[1])) ?
-             NULL : (void *) (SX_dataset + SX_get_crv_index_i(xp[1]))->x[1];
+             NULL : (void *) (SX_gs.dataset + SX_get_crv_index_i(xp[1]))->x[1];
 
     xmc[0] = ((xm[0] == NULL) || SS_nullobjp(xm[0])) ?
-             NULL : (void *) (SX_dataset + SX_get_crv_index_i(xm[0]))->x[1];
+             NULL : (void *) (SX_gs.dataset + SX_get_crv_index_i(xm[0]))->x[1];
 
     xmc[1] = ((xm[1] == NULL) || SS_nullobjp(xm[1])) ?
-             NULL : (void *) (SX_dataset + SX_get_crv_index_i(xm[1]))->x[1];
+             NULL : (void *) (SX_gs.dataset + SX_get_crv_index_i(xm[1]))->x[1];
 
-    crv  = SX_dataset + SX_get_crv_index_i(c);
+    crv  = SX_gs.dataset + SX_get_crv_index_i(c);
     info = crv->info;
 
     info = PG_set_plot_type(info, PLOT_ERROR_BAR, CARTESIAN_2D);
@@ -770,9 +770,9 @@ static object *_ULI_edit(SS_psides *si, int ie)
 
     dev = SX_gs.graphics_device;
 
-    ocv  = SX_dataset + ie;
+    ocv  = SX_gs.dataset + ie;
 
-    crv  = SX_dataset + SX_get_crv_index_i(UL_copy_curve(si, ie));
+    crv  = SX_gs.dataset + SX_get_crv_index_i(UL_copy_curve(si, ie));
     n    = crv->n;
     x[0]   = crv->x[0];
     x[1]   = crv->x[1];
@@ -844,13 +844,13 @@ object *UL_dupx(SS_psides *si, int j)
    {char *lbl;
    object *o;
 
-    if ((SX_dataset[j].id >= 'A') && (SX_dataset[j].id <= 'Z'))
-       lbl = SC_dsnprintf(FALSE, "Dupx %c", SX_dataset[j].id);
+    if ((SX_gs.dataset[j].id >= 'A') && (SX_gs.dataset[j].id <= 'Z'))
+       lbl = SC_dsnprintf(FALSE, "Dupx %c", SX_gs.dataset[j].id);
     else
-       lbl = SC_dsnprintf(FALSE, "Dupx @%d", SX_dataset[j].id);
+       lbl = SC_dsnprintf(FALSE, "Dupx @%d", SX_gs.dataset[j].id);
 
-    o = SX_mk_curve(si, SX_dataset[j].n, SX_dataset[j].x[0],
-		    SX_dataset[j].x[0], lbl, NULL, UL_plot);
+    o = SX_mk_curve(si, SX_gs.dataset[j].n, SX_gs.dataset[j].x[0],
+		    SX_gs.dataset[j].x[0], lbl, NULL, UL_plot);
         
     return(o);}
 
@@ -865,15 +865,15 @@ static object *_UL_stat(SS_psides *si, int j)
     object *ret;
 
     if (si->interactive == ON)
-       {if ((SX_dataset[j].id >= 'A') &&
-            (SX_dataset[j].id <= 'Z'))
-           {PRINT(stdout, "\nCurve %c\n", SX_dataset[j].id);}
+       {if ((SX_gs.dataset[j].id >= 'A') &&
+            (SX_gs.dataset[j].id <= 'Z'))
+           {PRINT(stdout, "\nCurve %c\n", SX_gs.dataset[j].id);}
         else
-           {PRINT(stdout, "\nCurve @%d\n", SX_dataset[j].id);};}
+           {PRINT(stdout, "\nCurve @%d\n", SX_gs.dataset[j].id);};}
 
-    n = SX_dataset[j].n;
-    PM_stats_mean(n, SX_dataset[j].x[0], &xmean, NULL, NULL, &xstd);
-    PM_stats_mean(n, SX_dataset[j].x[1], &ymean, NULL, NULL, &ystd);
+    n = SX_gs.dataset[j].n;
+    PM_stats_mean(n, SX_gs.dataset[j].x[0], &xmean, NULL, NULL, &xstd);
+    PM_stats_mean(n, SX_gs.dataset[j].x[1], &ymean, NULL, NULL, &ystd);
 
     ret = SS_make_list(si, SC_DOUBLE_I, &xmean,
                        SC_DOUBLE_I, &xstd,
@@ -930,15 +930,15 @@ static object *_ULI_disp(SS_psides *si, int j, double xmin, double xmax)
     double *x[PG_SPACEDM];
     object *o;
 
-    x[0]   = SX_dataset[j].x[0];
-    x[1]   = SX_dataset[j].x[1];
-    n    = SX_dataset[j].n;
+    x[0]   = SX_gs.dataset[j].x[0];
+    x[1]   = SX_gs.dataset[j].x[1];
+    n    = SX_gs.dataset[j].n;
 
-    if ((SX_dataset[j].id >= 'A') &&
-        (SX_dataset[j].id <= 'Z'))
-       {PRINT(stdout, "\n Curve %c (%s) from ", SX_dataset[j].id, SX_dataset[j].text);}
+    if ((SX_gs.dataset[j].id >= 'A') &&
+        (SX_gs.dataset[j].id <= 'Z'))
+       {PRINT(stdout, "\n Curve %c (%s) from ", SX_gs.dataset[j].id, SX_gs.dataset[j].text);}
     else
-       {PRINT(stdout, "\n Curve @%d (%s) from ", SX_dataset[j].id, SX_dataset[j].text);}
+       {PRINT(stdout, "\n Curve @%d (%s) from ", SX_gs.dataset[j].id, SX_gs.dataset[j].text);}
 
     PRINT(stdout, SX_text_output_format, xmin);
     PRINT(stdout, " to ");
@@ -955,7 +955,7 @@ static object *_ULI_disp(SS_psides *si, int j, double xmin, double xmax)
 
     PRINT(stdout, "\n");
         
-    o = (object *) SX_dataset[j].obj;
+    o = (object *) SX_gs.dataset[j].obj;
                 
     return(o);}
                 
@@ -978,8 +978,8 @@ static object *_ULI_crv_label(SS_psides *si, object *obj)
     i = SX_get_crv_index_i(obj);
     if (i != -1)
        {if (si->interactive == ON)
-           PRINT(stdout, "\n Label: %s\n\n", SX_dataset[i].text);
-        o = SS_mk_string(si, SX_dataset[i].text);};
+           PRINT(stdout, "\n Label: %s\n\n", SX_gs.dataset[i].text);
+        o = SS_mk_string(si, SX_gs.dataset[i].text);};
 
     return(o);}
 
@@ -1003,13 +1003,13 @@ static object *_ULI_crv_domain(SS_psides *si, object *obj)
     if (j != -1)
        {if (si->interactive == ON)
            {PRINT(stdout, "\n Domain: (");
-            PRINT(stdout, SX_text_output_format, SX_dataset[j].wc[0]);
+            PRINT(stdout, SX_text_output_format, SX_gs.dataset[j].wc[0]);
             PRINT(stdout, " . ");
-            PRINT(stdout, SX_text_output_format, SX_dataset[j].wc[1]);
+            PRINT(stdout, SX_text_output_format, SX_gs.dataset[j].wc[1]);
             PRINT(stdout, ")\n\n");};
 
-        o = SS_mk_cons(si, SS_mk_float(si, SX_dataset[j].wc[0]),
-		       SS_mk_float(si, SX_dataset[j].wc[1]));};
+        o = SS_mk_cons(si, SS_mk_float(si, SX_gs.dataset[j].wc[0]),
+		       SS_mk_float(si, SX_gs.dataset[j].wc[1]));};
 
     return(o);}
 
@@ -1033,13 +1033,13 @@ static object *_ULI_crv_range(SS_psides *si, object *obj)
     if (j != -1)
        {if (si->interactive == ON)
            {PRINT(stdout, "\n Range: (");
-            PRINT(stdout, SX_text_output_format, SX_dataset[j].wc[2]);
+            PRINT(stdout, SX_text_output_format, SX_gs.dataset[j].wc[2]);
             PRINT(stdout, " . ");
-            PRINT(stdout, SX_text_output_format, SX_dataset[j].wc[3]);
+            PRINT(stdout, SX_text_output_format, SX_gs.dataset[j].wc[3]);
             PRINT(stdout, ")\n\n");};
 
-        o = SS_mk_cons(si, SS_mk_float(si, SX_dataset[j].wc[2]),
-		       SS_mk_float(si, SX_dataset[j].wc[3]));};
+        o = SS_mk_cons(si, SS_mk_float(si, SX_gs.dataset[j].wc[2]),
+		       SS_mk_float(si, SX_gs.dataset[j].wc[3]));};
 
     return(o);}
 
@@ -1061,9 +1061,9 @@ static object *_ULI_crv_npts(SS_psides *si, object *obj)
 
     if (j != -1)
        {if (si->interactive == ON)
-           PRINT(stdout, "\n Number of points: %ld\n\n", SX_dataset[j].n);
+           PRINT(stdout, "\n Number of points: %ld\n\n", SX_gs.dataset[j].n);
 
-        o = SS_mk_integer(si, SX_dataset[j].n);};
+        o = SS_mk_integer(si, SX_gs.dataset[j].n);};
 
     return(o);}
 
@@ -1088,7 +1088,7 @@ static object *_ULI_crv_attr(SS_psides *si, object *obj)
     o = SS_null;
 
     if (j != -1)
-       {info  = SX_dataset[j].info;
+       {info  = SX_gs.dataset[j].info;
 	dfcol = (SX_gs.graphics_device == NULL) ? 4 : SX_gs.graphics_device->BLUE;
 	   
 	PG_get_attrs_alist(info,

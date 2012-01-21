@@ -118,7 +118,7 @@ void SX_enlarge_dataset(SS_psides *si, PFVoid eval)
        _SX.cproc = _SS_mk_C_proc_va(SS_sargs, 1, eval);
 
     if (nc == 0)
-       {SX_dataset    = CMAKE_N(curve, NCURVE);
+       {SX_gs.dataset    = CMAKE_N(curve, NCURVE);
         SX_number     = CMAKE_N(int, NCURVE);
         SX_gs.data_index = CMAKE_N(int, NCURVE);
 	_SX.crv_obj   = CMAKE_N(object *, NCURVE);
@@ -129,7 +129,7 @@ void SX_enlarge_dataset(SS_psides *si, PFVoid eval)
 
     else
        {SX_N_Curves += NCURVE;
-        CREMAKE(SX_dataset, curve, SX_N_Curves);
+        CREMAKE(SX_gs.dataset, curve, SX_N_Curves);
         CREMAKE(SX_number, int, SX_N_Curves);
         CREMAKE(SX_gs.data_index, int, SX_N_Curves);
         CREMAKE(_SX.crv_obj, object *, SX_N_Curves);
@@ -138,11 +138,11 @@ void SX_enlarge_dataset(SS_psides *si, PFVoid eval)
 
 /* initialize the new curves */
     for (i = nc; i < SX_N_Curves; i++)
-        {SX_dataset[i].id       = ' ';
-         SX_dataset[i].obj      = (void *) SS_null;
-         SX_dataset[i].n        = 0;
-         SX_dataset[i].modified = FALSE;
-         SX_dataset[i].info     = PG_set_line_info(NULL,
+        {SX_gs.dataset[i].id       = ' ';
+         SX_gs.dataset[i].obj      = (void *) SS_null;
+         SX_gs.dataset[i].n        = 0;
+         SX_gs.dataset[i].modified = FALSE;
+         SX_gs.dataset[i].info     = PG_set_line_info(NULL,
 						   PLOT_CARTESIAN, CARTESIAN_2D,
 						   LINE_SOLID, FALSE, 0, 0,
 						   0, 0.0);
@@ -201,7 +201,7 @@ void SX_assign_next_id(SS_psides *si, int i, object *(*plt)(SS_psides *si))
     for (j = 0; j < SX_N_Curves; j++)
         {if (SX_gs.data_index[j] == -1)
 	    {if (j >= 0)
-	        {SX_dataset[i].id = 'A' + j;
+	        {SX_gs.dataset[i].id = 'A' + j;
 		 SX_gs.data_index[j] = i;};
 
 	     return;};};
@@ -223,7 +223,7 @@ int SX_next_space(SS_psides *si)
    {int i;
 
     for (i = _SX.next_avail; i < SX_N_Curves; i++)
-        if (SX_dataset[i].n == 0)
+        if (SX_gs.dataset[i].n == 0)
            {_SX.next_avail = i + 1;
             return(i);};
 
@@ -237,7 +237,7 @@ int SX_next_space(SS_psides *si)
 /*--------------------------------------------------------------------------*/
 
 /* SX_GET_DATA_INDEX - return the curve index
- *                   - this means an index in SX_dataset (i.e. I) space
+ *                   - this means an index in SX_gs.dataset (i.e. I) space
  */
 
 int SX_get_data_index(char *s)
@@ -253,7 +253,7 @@ int SX_get_data_index(char *s)
 
 /* SX_GET_CRV_INDEX_I - return the curve index if the object is a curve
  *                    - that is currently visible
- *                    - this means an index in SX_dataset (i.e. I) space
+ *                    - this means an index in SX_gs.dataset (i.e. I) space
  *                    - otherwise return -1
  */
 
@@ -312,7 +312,7 @@ int SX_get_crv_index_j(object *obj)
 void SX_zero_curve(int i)
    {curve *crv;
 
-    crv = SX_dataset + i;
+    crv = SX_gs.dataset + i;
 
     crv->id       = ' ';
     crv->obj      = (void *) SS_null;
@@ -350,26 +350,26 @@ object *SX_mk_curve_proc(int i)
 		     "numeric-data-id", &ndi,
 		     NULL);
 
-    if ((SX_dataset[i].id >= 'A') && (SX_dataset[i].id <= 'Z'))
-       {s[0] = SX_dataset[i].id;
+    if ((SX_gs.dataset[i].id >= 'A') && (SX_gs.dataset[i].id <= 'Z'))
+       {s[0] = SX_gs.dataset[i].id;
         s[1] = '\0';}
 
     else if (ndi == TRUE)
-       {snprintf(s, MAXLINE, "@%d", SX_dataset[i].id);}
+       {snprintf(s, MAXLINE, "@%d", SX_gs.dataset[i].id);}
 
     else
-       {snprintf(s, MAXLINE, "@%d", SX_dataset[i].id - 'A' + 1);};
+       {snprintf(s, MAXLINE, "@%d", SX_gs.dataset[i].id - 'A' + 1);};
     
     j = _SX_curve_id(s);
 
     obj = SX_get_curve_obj(j);
     p   = SX_get_curve_proc(j);
 
-    SS_PROCEDURE_DOC(p)    = SX_dataset[i].text;
+    SS_PROCEDURE_DOC(p)    = SX_gs.dataset[i].text;
     SS_VARIABLE_VALUE(obj) = p;
     SS_VARIABLE_NAME(obj)  = SS_PROCEDURE_NAME(p);
 
-    SX_dataset[i].obj = (void *) obj;
+    SX_gs.dataset[i].obj = (void *) obj;
 
     return(obj);}
 
@@ -391,13 +391,13 @@ object *SX_mk_curve(SS_psides *si, int na, double *xa, double *ya,
     SX_zero_curve(i);
     SX_assign_next_id(si, i, plt);
 
-    SX_dataset[i].text     = CSTRSAVE(label);
-    SX_dataset[i].modified = FALSE;
+    SX_gs.dataset[i].text     = CSTRSAVE(label);
+    SX_gs.dataset[i].modified = FALSE;
 
     if (filename != NULL)
-       SX_dataset[i].file = CSTRSAVE(filename);
+       SX_gs.dataset[i].file = CSTRSAVE(filename);
     else
-       SX_dataset[i].file = NULL;
+       SX_gs.dataset[i].file = NULL;
 
     PG_box_init(2, wc, HUGE, -HUGE);
 
@@ -411,14 +411,14 @@ object *SX_mk_curve(SS_psides *si, int na, double *xa, double *ya,
          wc[2] = (tmp < wc[2]) ? tmp : wc[2];
          wc[3] = (tmp > wc[3]) ? tmp : wc[3];};
 
-    PG_box_copy(2, SX_dataset[i].wc, wc);
+    PG_box_copy(2, SX_gs.dataset[i].wc, wc);
 
-    SX_dataset[i].n = na;
+    SX_gs.dataset[i].n = na;
 
     xj[0] = xa;
     xj[1] = ya;
-    xi[0] = SX_dataset[i].x[0] = CMAKE_N(double, na);
-    xi[1] = SX_dataset[i].x[1] = CMAKE_N(double, na);
+    xi[0] = SX_gs.dataset[i].x[0] = CMAKE_N(double, na);
+    xi[1] = SX_gs.dataset[i].x[1] = CMAKE_N(double, na);
     if (xi[0] == NULL || xi[1] == NULL)
        SS_error(si, "OUT OF MEMORY - CREATE_CURVE", SS_null);
 
@@ -427,7 +427,7 @@ object *SX_mk_curve(SS_psides *si, int na, double *xa, double *ya,
         {*xi[0]++ = *xj[0]++;
          *xi[1]++ = *xj[1]++;};
 
-    PG_set_line_info(SX_dataset[i].info, PLOT_CARTESIAN, CARTESIAN_2D,
+    PG_set_line_info(SX_gs.dataset[i].info, PLOT_CARTESIAN, CARTESIAN_2D,
 		     LINE_SOLID,
 		     FALSE, 0, SX_next_color(SX_gs.graphics_device), 0, 0.0);
 
@@ -447,8 +447,8 @@ object *SX_rl_curve(int j)
     i = SX_gs.data_index[j];
 
 /* release the curve data points */
-    CFREE(SX_dataset[i].x[0]);
-    CFREE(SX_dataset[i].x[1]);
+    CFREE(SX_gs.dataset[i].x[0]);
+    CFREE(SX_gs.dataset[i].x[1]);
 
 /* make the curve object a simple variable for the benefit of objects
  * still pointing to it
@@ -480,7 +480,7 @@ object *SX_set_crv_id(int j, char *id)
    {int jn, i;
     object *obj, *v;
 
-/* get the correct entry in SX_dataset for the
+/* get the correct entry in SX_gs.dataset for the
  * curve whose id is to be changed
  */
     i = SX_gs.data_index[j];
@@ -502,7 +502,7 @@ object *SX_set_crv_id(int j, char *id)
     SX_gs.data_index[j]  = -1;
 
 /* make the connection with the new id using JN */
-    SX_dataset[i].id  = jn + 'A';
+    SX_gs.dataset[i].id  = jn + 'A';
     obj               = SX_mk_curve_proc(i);
     SX_gs.data_index[jn] = i;
 
@@ -551,9 +551,9 @@ object *SX_get_data_domain(SS_psides *si, object *argl)
         {s = SS_car(si, ch);
 	 if (SX_curvep_a(s))
 	    {i   = SX_get_crv_index_i(s);
-	     xt  = SX_dataset[i].wc[0];
+	     xt  = SX_gs.dataset[i].wc[0];
 	     xmn = min(xmn, xt);
-	     xt  = SX_dataset[i].wc[1];
+	     xt  = SX_gs.dataset[i].wc[1];
 	     xmx = max(xmx, xt);};};
 
     o = SS_mk_cons(si, SS_mk_float(si, xmn), SS_mk_float(si, xmx));
@@ -578,9 +578,9 @@ object *SX_get_data_range(SS_psides *si, object *argl)
         {s = SS_car(si, ch);
 	 if (SX_curvep_a(s))
 	    {i   = SX_get_crv_index_i(s);
-	     yt  = SX_dataset[i].wc[2];
+	     yt  = SX_gs.dataset[i].wc[2];
 	     ymn = min(ymn, yt);
-	     yt  = SX_dataset[i].wc[3];
+	     yt  = SX_gs.dataset[i].wc[3];
 	     ymx = max(ymx, yt);};};
 
     o = SS_mk_cons(si, SS_mk_float(si, ymn), SS_mk_float(si, ymx));
@@ -604,7 +604,7 @@ int SX_curvep(char *s)
     if ((0 <= j) && (j < SX_N_Curves) && SC_is_print_char(*s, 4))
        {i = SX_gs.data_index[j];
         if ((-1 < i) && (i < SX_N_Curves))
-           if (SX_dataset[i].n > 0)
+           if (SX_gs.dataset[i].n > 0)
               rv = TRUE;};
 
     return(rv);}

@@ -14,8 +14,6 @@
 
 int
  SX_data_id,
- SX_gr_mode,
- SX_grid,
  SX_N_Curves,
  *SX_number,
  SX_qflag = FALSE,
@@ -35,16 +33,6 @@ char
  *SX_display_title,
  *SX_promotion_type,
  *SX_smooth_method;
-
-PG_rendering
- SX_render_def,
- SX_render_1d_1d,
- SX_render_2d_1d,
- SX_render_2d_2d,
- SX_render_3d_1d;
-
-curve
- *SX_dataset;
 
 SX_file_action
  SX_file_exist_action = FAIL;
@@ -1102,7 +1090,7 @@ void SX_install_global_vars(SS_psides *si)
     SX_GRI_y                  = 0.01;
     SX_GRI_dx                 = 0.0;
     SX_GRI_dy                 = 0.0;
-    SX_grid                   = OFF;
+    SX_gs.grid                   = OFF;
     SX_marker_orientation     = 0.0;
 
 /*    SX_palette              = CSTRSAVE("spectrum"); */
@@ -1110,11 +1098,11 @@ void SX_install_global_vars(SS_psides *si)
     SX_gs.plot_type_size         = 12;
     SX_gs.plot_type_style        = CSTRSAVE("medium");
     SX_promotion_type         = CSTRSAVE("none");
-    SX_render_def             = PLOT_MESH;
-    SX_render_1d_1d           = *ppty;
-    SX_render_2d_1d           = PLOT_CONTOUR;
-    SX_render_2d_2d           = PLOT_VECTOR;
-    SX_render_3d_1d           = PLOT_MESH;
+    SX_gs.render_def             = PLOT_MESH;
+    SX_gs.render_1d_1d           = *ppty;
+    SX_gs.render_2d_1d           = PLOT_CONTOUR;
+    SX_gs.render_2d_2d           = PLOT_VECTOR;
+    SX_gs.render_3d_1d           = PLOT_MESH;
     SX_gs.show_mouse_location    = FALSE;
     SX_gs.show_mouse_location_x  = 0.025;
     SX_gs.show_mouse_location_y  = 0.955;
@@ -1361,7 +1349,7 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "graphics-mode",
                   "Variable: Graphics mode\n     Usage: graphics-mode [on|off]",
                   SS_acc_int,
-                  &SX_gr_mode);
+                  &SX_gs.gr_mode);
 
     SS_install_cf(si, "gri-title",
                   "Variable: Graphical interface window title\n     Usage: gri-title <string>",
@@ -1406,7 +1394,7 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "grid",
                   "Variable: Controls display of grid lines in graph\n     Usage: grid on | off",
                   SS_acc_int,
-                  &SX_grid);
+                  &SX_gs.grid);
 
     SS_install_cf(si, "hide-rescale",
                   "Variable: Allows plot to rescale when hiding curves\n     Usage: hide-rescale on | off",
@@ -1610,22 +1598,22 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "render-1d-1d",
                   "Variable: Render 1D vs 1D plots\n     Usage: render-1d-1d <int>",
                   SS_acc_int,
-                  &SX_render_1d_1d);
+                  &SX_gs.render_1d_1d);
 
     SS_install_cf(si, "render-2d-1d",
                   "Variable: Render 2D vs 1D plots\n     Usage: render-2d-1d <int>",
                   SS_acc_int,
-                  &SX_render_2d_1d);
+                  &SX_gs.render_2d_1d);
 
     SS_install_cf(si, "render-2d-2d",
                   "Variable: Render 2D vs 2D plots\n     Usage: render-2d-2d <int>",
                   SS_acc_int,
-                  &SX_render_2d_2d);
+                  &SX_gs.render_2d_2d);
 
     SS_install_cf(si, "render-3d-1d",
                   "Variable: Render 3D vs 1D plots\n     Usage: render-3d-1d <int>",
                   SS_acc_int,
-                  &SX_render_3d_1d);
+                  &SX_gs.render_3d_1d);
 
     SS_install_cf(si, "restore-viewport",
                   "Variable: Restore viewport after plots\n     Usage: restore-viewport <int>",

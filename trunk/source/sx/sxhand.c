@@ -292,7 +292,7 @@ object *_SX_m11_x(SS_psides *si, C_procedure *cp, object *argl)
                 *xp = fn(*xp);
 
 /* for later
-            SX_dataset[j].modified = TRUE;
+            SX_gs.dataset[j].modified = TRUE;
  */
 
             SS_assign(si, ret, SS_mk_cons(si, obj, ret));
@@ -395,7 +395,7 @@ object *_SX_m11_b_mrs(SS_psides *si, C_procedure *cp, object *argl)
 	    _SX_cmp_b_set(cp->proc[0], set, a, -1);
 
 /* for later
-            SX_dataset[j].modified = TRUE;
+            SX_gs.dataset[j].modified = TRUE;
  */
             SS_assign(si, ret, SS_mk_cons(si, obj, ret));
             PM_find_extrema(set);};};
@@ -436,7 +436,7 @@ object *_SX_m11_b_mds(SS_psides *si, C_procedure *cp, object *argl)
 	    _SX_cmp_b_set(cp->proc[0], set, a, -1);
 
 /* for later
-            SX_dataset[j].modified = TRUE;
+            SX_gs.dataset[j].modified = TRUE;
  */
             SS_assign(si, ret, SS_mk_cons(si, obj, ret));
             PM_find_extrema(set);};};
@@ -484,7 +484,7 @@ object *_SX_mij_b_mrs(SS_psides *si, C_procedure *cp, object *argl)
 	    _SX_cmp_b_set(cp->proc[0], set, a, i);
 
 /* for later
-            SX_dataset[j].modified = TRUE;
+            SX_gs.dataset[j].modified = TRUE;
  */
             SS_assign(si, ret, SS_mk_cons(si, obj, ret));
             PM_find_extrema(set);};};
@@ -532,7 +532,7 @@ object *_SX_mij_b_mds(SS_psides *si, C_procedure *cp, object *argl)
 	    _SX_cmp_b_set(cp->proc[0], set, a, i);
 
 /* for later
-            SX_dataset[j].modified = TRUE;
+            SX_gs.dataset[j].modified = TRUE;
  */
             SS_assign(si, ret, SS_mk_cons(si, obj, ret));
             PM_find_extrema(set);};};

@@ -212,7 +212,7 @@ static void _UL_print_curve_labels(PG_device *dev, int *mark)
 
         extr     = CMAKE_N(double, 4 * SX_N_Curves);
                         
-	data  = SX_dataset;
+	data  = SX_gs.dataset;
 	nlabs = 0;
 	ne    = 0;
 	yo    = HUGE;
@@ -295,7 +295,7 @@ static void _UL_draw_plot(PG_device *dev)
     PG_set_viewspace(dev, 2, WORLDC, wc);
 
 /* plot all of the current curves */
-    data = SX_dataset;
+    data = SX_gs.dataset;
     for (i = 0; i < SX_N_Curves; i++)
         {if (data[i].id != ' ')
             {info = data[i].info;
@@ -439,7 +439,7 @@ void UL_plot_limits(PG_device *dev, int pflg, double *box)
 		     "plot-type",    &pty,
 		     NULL);
 
-    data = SX_dataset;
+    data = SX_gs.dataset;
     for (i = 0; i < SX_N_Curves; i++)
         {if (data[i].id != ' ')
 	    {info = (pcons *) data[i].info;

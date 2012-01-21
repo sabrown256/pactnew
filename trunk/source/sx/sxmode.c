@@ -42,7 +42,7 @@ static void SX_set_graphics_state(PG_device *d)
     d->border_width = SX_gs.border_width;
     d->data_id      = SX_data_id;
     d->gprint_flag  = TRUE;
-    d->grid         = SX_grid;
+    d->grid         = SX_gs.grid;
 
 /* view width and height are set by users so push it
  * into the view_x box
@@ -326,7 +326,7 @@ object *SX_mode_text(SS_psides *si)
         SC_set_get_line(io_gets);
 #endif
 
-        SX_gr_mode   = FALSE;
+        SX_gs.gr_mode   = FALSE;
         SX_gs.plot_flag = FALSE;
 
         ret = SS_t;}
@@ -433,7 +433,7 @@ object *SX_mode_graphics(SS_psides *si)
 	else
 	   SC_set_get_line(PG_wind_fgets);
 
-        SX_gr_mode         = TRUE;
+        SX_gs.gr_mode         = TRUE;
         SX_gs.graphics_device = PG_make_device(SX_display_name, SX_display_type,
                                             SX_display_title);
 
