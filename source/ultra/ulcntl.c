@@ -204,19 +204,19 @@ static void _UL_print_curve_labels(PG_device *dev, int *mark)
 		     NULL);
 
     if (HARDCOPY_DEVICE(dev) || (labsp > 0.0))
-       {labels   = CMAKE_N(char *, SX_N_Curves);
-	files    = CMAKE_N(char *, SX_N_Curves);
-	dataid   = CMAKE_N(int, SX_N_Curves);
-	modified = CMAKE_N(int, SX_N_Curves);
-	clr      = CMAKE_N(int, SX_N_Curves);
+       {labels   = CMAKE_N(char *, SX_gs.n_curves);
+	files    = CMAKE_N(char *, SX_gs.n_curves);
+	dataid   = CMAKE_N(int, SX_gs.n_curves);
+	modified = CMAKE_N(int, SX_gs.n_curves);
+	clr      = CMAKE_N(int, SX_gs.n_curves);
 
-        extr     = CMAKE_N(double, 4 * SX_N_Curves);
+        extr     = CMAKE_N(double, 4 * SX_gs.n_curves);
                         
 	data  = SX_gs.dataset;
 	nlabs = 0;
 	ne    = 0;
 	yo    = HUGE;
-	for (j = 0; j < SX_N_Curves; j++)
+	for (j = 0; j < SX_gs.n_curves; j++)
 	    {if (mark[j] >= 0)
 	        {i = mark[j];
 
@@ -296,7 +296,7 @@ static void _UL_draw_plot(PG_device *dev)
 
 /* plot all of the current curves */
     data = SX_gs.dataset;
-    for (i = 0; i < SX_N_Curves; i++)
+    for (i = 0; i < SX_gs.n_curves; i++)
         {if (data[i].id != ' ')
             {info = data[i].info;
 	     PG_get_attrs_alist(info,
@@ -440,7 +440,7 @@ void UL_plot_limits(PG_device *dev, int pflg, double *box)
 		     NULL);
 
     data = SX_gs.dataset;
-    for (i = 0; i < SX_N_Curves; i++)
+    for (i = 0; i < SX_gs.n_curves; i++)
         {if (data[i].id != ' ')
 	    {info = (pcons *) data[i].info;
 	     PG_get_attrs_alist(info,
@@ -502,7 +502,7 @@ void UL_plot_limits(PG_device *dev, int pflg, double *box)
     if (pflg && (pty == PLOT_POLAR))
        {PG_box_init(2, box, HUGE_REAL, -HUGE_REAL);
 
-        for (i = 0; i < SX_N_Curves; i++)
+        for (i = 0; i < SX_gs.n_curves; i++)
             {if (data[i].id != ' ')
                 {pc[1] = data[i].x[1];
                  pc[0] = data[i].x[0];

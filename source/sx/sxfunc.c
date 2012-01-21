@@ -799,11 +799,11 @@ static PM_mapping *_SXI_smooth(SS_psides *si, PM_mapping *h, object *argl)
 	    SC_INT_I, &ntimes,
 	    0);
 
-    if (SC_str_icmp(SX_smooth_method, "fft") == 0)
+    if (SC_str_icmp(SX_gs.smooth_method, "fft") == 0)
        {for (i = 0; i < ntimes; i++)
 	    PM_smooth_fft(x[0], x[1], n, pts, PM_smooth_filter);}
 
-    else if (SC_str_icmp(SX_smooth_method, "averaging") == 0)
+    else if (SC_str_icmp(SX_gs.smooth_method, "averaging") == 0)
        {for (i = 0; i < ntimes; i++)
 	    PM_smooth_int_ave(x[0], x[1], n, pts);}
 
@@ -812,10 +812,10 @@ static PM_mapping *_SXI_smooth(SS_psides *si, PM_mapping *h, object *argl)
 	char *bf;
 	object *obj;
 
-        obj = SS_INQUIRE_OBJECT(si, SX_smooth_method);
+        obj = SS_INQUIRE_OBJECT(si, SX_gs.smooth_method);
         if (obj == NULL)
            {bf = SC_dsnprintf(FALSE, "NO FILTER NAMED %s EXISTS - _SXI_SMOOTH",
-			      SX_smooth_method);
+			      SX_gs.smooth_method);
 	    SS_error(si, bf, SS_null);};
 
         SS_args(si, SS_lk_var_val(si, obj),
@@ -824,7 +824,7 @@ static PM_mapping *_SXI_smooth(SS_psides *si, PM_mapping *h, object *argl)
 
         if (arr == NULL)
            {bf = SC_dsnprintf(FALSE, "%s IS NOT A FILTER - _SXI_SMOOTH",
-			      SX_smooth_method);
+			      SX_gs.smooth_method);
 	    SS_error(si, bf, SS_null);};
 
 	SX_filter_coeff(si, x[1], n, arr, ntimes);};

@@ -14,9 +14,8 @@
 
 int
  SX_data_id,
- SX_N_Curves,
  *SX_number,
- SX_qflag = FALSE,
+ SX_qflag,
  SX_log_scale[PG_SPACEDM];
 
 double
@@ -26,13 +25,11 @@ double
  SX_theta;
 
 char
- *SX_text_output_format,
- SX_data_directory[MAXLINE] = "",
+ SX_data_directory[MAXLINE],
  *SX_display_name,
  *SX_display_type,
  *SX_display_title,
- *SX_promotion_type,
- *SX_smooth_method;
+ *SX_promotion_type;
 
 SX_file_action
  SX_file_exist_action = FAIL;
@@ -1106,7 +1103,7 @@ void SX_install_global_vars(SS_psides *si)
     SX_gs.show_mouse_location    = FALSE;
     SX_gs.show_mouse_location_x  = 0.025;
     SX_gs.show_mouse_location_y  = 0.955;
-    SX_smooth_method          = CSTRSAVE("averaging");
+    SX_gs.smooth_method          = CSTRSAVE("averaging");
     SX_theta                  = 0.0;
 
     SX_GRI_title            = CSTRSAVE("PDBView Controls");
@@ -1135,7 +1132,7 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "ascii-output-format",
                   "Variable: Controls format for ASCII output of floating point numbers\n     Usage: ascii-output-format <format>",
                   SS_acc_ptr,
-                  &SX_text_output_format);
+                  &SX_gs.text_output_format);
 
     SS_install_cf(si, "autorange",
                   "Variable: Turns on or off autoranging\n     Usage: autorange on | off",
@@ -1510,12 +1507,12 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "n-curves",
                   "Variable: Total number of curves in the system\n     Usage: n-curves",
                   SS_acc_int,
-                  &SX_N_Curves);
+                  &SX_gs.n_curves);
 
     SS_install_cf(si, "n-curves-read",
                   "Variable: Total number of curves read from files\n     Usage: n-curves-read",
                   SS_acc_int,
-                  &SX_n_curves_read);
+                  &SX_gs.n_curves_read);
 
     SS_install_cf(si, "numeric-data-ids",
                   "Variable: Flag for drawing numeric data ids\n     Usage: numeric-data-ids",
@@ -1651,7 +1648,7 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "smooth-method",
                   "Variable: Method for smooth functions\n     Usage: smooth-method \"fft\" | \"averaging\" | \"tchebyshev\" | \"least-sqr\"",
                   SS_acc_ptr,
-                  &SX_smooth_method);
+                  &SX_gs.smooth_method);
 
     SS_install_cf(si, "squeeze-labels",
                   "Variable: Controls squeezing of extra blanks from labels\n     Usage: squeeze-labels on | off",

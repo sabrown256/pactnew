@@ -696,10 +696,10 @@ object *LR_var_plot(SS_psides *si, object *argl)
             else
                {range = LR_get_set(name, &centering, arr, space);
                 if (range == NULL)
-                   {snprintf(SX_err, MAXLINE,
+                   {snprintf(SX_gs.err, MAXLINE,
 			     "CAN'T HANDLE %s - LR_VAR_PLOT",
 			     name);
-                    SS_error(si, SX_err, sobj);};
+                    SS_error(si, SX_gs.err, sobj);};
                 lcolor = color;
                 lstyle = style;
                 lwidth = width;
@@ -740,10 +740,10 @@ object *LR_var_plot(SS_psides *si, object *argl)
             else
                {range = LR_get_set(name, &centering, arr, space);
                 if (range == NULL)
-                   {snprintf(SX_err, MAXLINE,
+                   {snprintf(SX_gs.err, MAXLINE,
                             "CAN'T HANDLE %s - LR_VAR_PLOT",
                             name);
-                    SS_error(si, SX_err, sobj);};
+                    SS_error(si, SX_gs.err, sobj);};
 
 /* check the domain */
                 if (domain == NULL)

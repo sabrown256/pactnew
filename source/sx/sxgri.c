@@ -560,7 +560,7 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 
 /* math controls */
 	PG_register_variable("Smooth Method", SC_STRING_S,
-			     &SX_smooth_method, NULL, NULL);
+			     &SX_gs.smooth_method, NULL, NULL);
 
 /* mouse location controls */
 	PG_register_variable("Mouse", SC_INT_S, 
