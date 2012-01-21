@@ -624,8 +624,8 @@ static object *_SXI_make_pml_set(SS_psides *si, object *argl)
 	        SS_error(si, "BAD ELEMENT ARRAY - _SXI_MAKE_PML_SET", obj);
 
 	     if (arr != NULL)
-	        {if (strcmp(SX_promotion_type, "none") != 0)
-		    {PM_promote_array(arr, SX_promotion_type, TRUE);
+	        {if (strcmp(SX_gs.promotion_type, "none") != 0)
+		    {PM_promote_array(arr, SX_gs.promotion_type, TRUE);
 		     type = arr->type;};
 
 		 *pe++ = arr->data;};};

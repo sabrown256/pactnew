@@ -1224,15 +1224,15 @@ static object *_SXI_setva(SS_psides *si, object *argl)
         argl = SS_cdr(si, argl);};
 
     SS_args(si, argl,
-	    SC_DOUBLE_I, &SX_theta,
-	    SC_DOUBLE_I, &SX_phi,
-	    SC_DOUBLE_I, &SX_chi,
+	    SC_DOUBLE_I, &SX_gs.view_angle[0],
+	    SC_DOUBLE_I, &SX_gs.view_angle[1],
+	    SC_DOUBLE_I, &SX_gs.view_angle[2],
 	    0);
 
     if (dev != NULL)
-       {va[0] = SX_theta;
-	va[1] = SX_phi;
-	va[2] = SX_chi;
+       {va[0] = SX_gs.view_angle[0];
+	va[1] = SX_gs.view_angle[1];
+	va[2] = SX_gs.view_angle[2];
 	PG_fset_view_angle(dev, TRUE, &va[0], &va[1], &va[2]);};
 
     return(argl);}

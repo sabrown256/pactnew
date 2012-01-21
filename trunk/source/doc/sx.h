@@ -4261,11 +4261,11 @@ SX_botspace
 <P>SX_label_space
 <P>SX_leftspace
 <P>SX_gs.marker_orientation
-<P>SX_phi
+<P>SX_gs.view_angle[1]
 <P>SX_rightspace
 <P>SX_gs.show_mouse_location_x
 <P>SX_gs.show_mouse_location_y
-<P>SX_theta
+<P>SX_gs.view_angle[0]
 <P>SX_topspace
 </BLOCKQUOTE>
 

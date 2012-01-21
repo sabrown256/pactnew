@@ -545,7 +545,7 @@ struct s_SX_global_state
     double interp_scale;
     double interp_strength;
 
-    int SX_GRI_type_size;       /* GUI controls */
+    int gri_type_size;       /* GUI controls */
 
     double SX_GRI_x;
     double SX_GRI_y;
@@ -571,7 +571,6 @@ struct s_SX_global_state
     int show_mouse_location;
     int log_scale[PG_SPACEDM];
 
-    double SX_chi;
     double console_x;
     double console_y;
     double console_width;
@@ -585,14 +584,13 @@ struct s_SX_global_state
     double window_height;
     double window_height_P;
     double marker_orientation;
-    double SX_phi;
     double show_mouse_location_x;
     double show_mouse_location_y;
-    double SX_theta;
     double view_x[PG_BOXSZ];
     double view_width;
     double view_height;
     double view_aspect;
+    double view_angle[PG_SPACEDM];
 
     char *text_output_format;
     char *command_log_name;
@@ -603,12 +601,12 @@ struct s_SX_global_state
     char *display_type;
     char *display_title;
     char err[MAXLINE];         /* global buffer for certain error messages */
-    char *SX_GRI_title;
-    char *SX_GRI_type_face;
-    char *SX_GRI_type_style;
+    char *gri_title;
+    char *gri_type_face;
+    char *gri_type_style;
     char *plot_type_style;
-    char *SX_promotion_type;
-    char *SX_pui_file;
+    char *promotion_type;
+    char *pui_file;
     char *smooth_method;
 
     PG_rendering render_def;
@@ -683,24 +681,11 @@ extern "C" {
 extern SX_global_state
  SX_gs;
 
-extern int
- SX_GRI_type_size;
-
 extern double
- SX_chi,
  SX_GRI_x,
  SX_GRI_y,
  SX_GRI_dx,
- SX_GRI_dy,
- SX_phi,
- SX_theta;
-
-extern char
- *SX_GRI_title,
- *SX_GRI_type_face,
- *SX_GRI_type_style,
- *SX_promotion_type,
- *SX_pui_file;
+ SX_GRI_dy;
 
 /*--------------------------------------------------------------------------*/
 

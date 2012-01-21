@@ -12,14 +12,6 @@
 
 #define EOE(str) ((*SS_PTR(str) == '\n') || (*SS_PTR(str) == '\0'))
 
-double
- SX_chi,
- SX_phi,
- SX_theta;
-
-char
- *SX_promotion_type;
-
 SX_file_action
  SX_file_exist_action = FAIL;
 
@@ -1069,7 +1061,7 @@ void SX_install_global_vars(SS_psides *si)
     SX_gs.autoplot               = ON;
     SX_gs.autorange              = TRUE;
     SX_gs.border_width           = 2;
-    SX_chi                    = 0.0;
+    SX_gs.view_angle[2]                    = 0.0;
     SX_gs.data_id                = TRUE,
     SX_gs.default_color          = -1;
     SX_GRI_x                  = 0.5;
@@ -1080,10 +1072,10 @@ void SX_install_global_vars(SS_psides *si)
     SX_gs.marker_orientation     = 0.0;
 
 /*    SX_palette              = CSTRSAVE("spectrum"); */
-    SX_phi                    = 0.0;
+    SX_gs.view_angle[1]                    = 0.0;
     SX_gs.plot_type_size         = 12;
     SX_gs.plot_type_style        = CSTRSAVE("medium");
-    SX_promotion_type         = CSTRSAVE("none");
+    SX_gs.promotion_type         = CSTRSAVE("none");
     SX_gs.render_def             = PLOT_MESH;
     SX_gs.render_1d_1d           = *ppty;
     SX_gs.render_2d_1d           = PLOT_CONTOUR;
@@ -1093,12 +1085,12 @@ void SX_install_global_vars(SS_psides *si)
     SX_gs.show_mouse_location_x  = 0.025;
     SX_gs.show_mouse_location_y  = 0.955;
     SX_gs.smooth_method          = CSTRSAVE("averaging");
-    SX_theta                  = 0.0;
+    SX_gs.view_angle[0]                  = 0.0;
 
-    SX_GRI_title            = CSTRSAVE("PDBView Controls");
-    SX_GRI_type_face        = CSTRSAVE("helvetica");
-    SX_GRI_type_style       = CSTRSAVE("medium");
-    SX_GRI_type_size        = 12;
+    SX_gs.gri_title            = CSTRSAVE("PDBView Controls");
+    SX_gs.gri_type_face        = CSTRSAVE("helvetica");
+    SX_gs.gri_type_style       = CSTRSAVE("medium");
+    SX_gs.gri_type_size        = 12;
 
     si->interactive = FALSE;
     si->print_flag  = FALSE;
@@ -1248,7 +1240,7 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "chi",
                   "Variable: Default chi view angle\n     Usage: chi <real>",
                   SS_acc_double,
-                  &SX_chi);
+                  &SX_gs.view_angle[2]);
 
     SS_install_cf(si, "console-type",
                   "Variable: Controls console mode\n     Usage: console-type <string>",
@@ -1340,22 +1332,22 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "gri-title",
                   "Variable: Graphical interface window title\n     Usage: gri-title <string>",
                   SS_acc_ptr,
-                  &SX_GRI_type_face);
+                  &SX_gs.gri_type_face);
 
     SS_install_cf(si, "gri-type-face",
                   "Variable: Graphical interface type face\n     Usage: gri-type-face medium | italic | bold | bold-italic",
                   SS_acc_ptr,
-                  &SX_GRI_type_face);
+                  &SX_gs.gri_type_face);
 
     SS_install_cf(si, "gri-type-size",
                   "Variable: Graphical interface type size\n     Usage: gri-type-size [<integer>]",
                   SS_acc_int,
-                  &SX_GRI_type_size);
+                  &SX_gs.gri_type_size);
 
     SS_install_cf(si, "gri-type-style",
                   "Variable: Graphical interface type style\n     Usage: gri-type-style medium | italic | bold | bold-italic",
                   SS_acc_ptr,
-                  &SX_GRI_type_style);
+                  &SX_gs.gri_type_style);
 
     SS_install_cf(si, "gri-x",
                   "Variable: Graphical interface window x origin\n     Usage: gri-x <real>",
@@ -1519,7 +1511,7 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "phi",
                   "Variable: Default phi view angle\n     Usage: phi <real>",
                   SS_acc_double,
-                  &SX_phi);
+                  &SX_gs.view_angle[1]);
 
     SS_install_cf(si, "plot-date",
                   "Variable: Print date and time on hardcopy if TRUE\n     Usage: plot-date on | off",
@@ -1564,7 +1556,7 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "promotion-type",
                   "Variable: Data type for promotion of sets and arrays (default none)\n     Usage: promotion-type <string>",
                   SS_acc_ptr,
-                  &SX_promotion_type);
+                  &SX_gs.promotion_type);
 
     SS_install_cf(si, "ps-dots-inch",
                   "Variable: PostScript dots/inch for 8.5 x 11 page\n     Usage: ps-dots-inch <real>",
@@ -1657,7 +1649,7 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "theta",
                   "Variable: Default theta view angle\n     Usage: theta <real>",
                   SS_acc_double,
-                  &SX_theta);
+                  &SX_gs.view_angle[0]);
 
     SS_install_cf(si, "topspace",
                   "Variable: Fractional space at top of screen\n     Usage: topspace <real>",
