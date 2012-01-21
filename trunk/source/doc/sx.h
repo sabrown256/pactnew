@@ -4246,7 +4246,7 @@ level routines to be used by the interpreter.<p>
 <TD>	flag controlling display of mouse location </TD></TR>
 <TR><TD>SX_squeeze_labels</TD>
 <TD>	flag controlling whitespace compression in labels </TD></TR>
-<TR><TD>SX_log_scale[id]</TD>
+<TR><TD>SX_gs.log_scale[id]</TD>
 <TD>	flag controlling log scale in ID direction (1d-1d only) </TD></TR>
 </TABLE>
 </BLOCKQUOTE>

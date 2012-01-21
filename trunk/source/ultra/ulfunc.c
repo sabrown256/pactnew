@@ -40,7 +40,7 @@ static object *UL_select(SS_psides *si, object *s)
     if ((j < 1) || (j > SX_gs.n_curves_read))
        return(SS_t);
 
-    i = SX_number[j];
+    i = SX_gs.number[j];
 
 /* this indicates that there is no curve */
     if (i == -1)
@@ -146,7 +146,7 @@ static object *_ULI_menui(SS_psides *si, object *s)
             0);
 
     if ((0 < j) && (j <= SX_gs.n_curves_read))
-       {i = SX_number[j];
+       {i = SX_gs.number[j];
 
 /* this indicates that there is no curve */
 	if (i != -1)
@@ -177,16 +177,16 @@ static object *UL_compress_numbers(void)
 
     lasti = -1;
     for (i = 1; i < SX_gs.n_curves; i++)
-        {if ((SX_number[i] != -1) && (lasti != -1))
-            {SX_number[lasti] = SX_number[i];
-             SX_number[i] = -1;
-             for (; (SX_number[lasti] != -1) && (lasti < SX_gs.n_curves);
+        {if ((SX_gs.number[i] != -1) && (lasti != -1))
+            {SX_gs.number[lasti] = SX_gs.number[i];
+             SX_gs.number[i] = -1;
+             for (; (SX_gs.number[lasti] != -1) && (lasti < SX_gs.n_curves);
                   lasti++);}
 
-         else if ((SX_number[i] == -1) && (lasti == -1))
+         else if ((SX_gs.number[i] == -1) && (lasti == -1))
             lasti = i;};
 
-    _SX_next_available_number = max(1, lasti);
+    SX_gs.next_available_number = max(1, lasti);
 
     return(SS_t);}
 
@@ -202,7 +202,7 @@ static int UL_expunge(int j)
     if (j == 0)
        {SX_close_open_files();
         for (j = 0; j < SX_gs.n_curves; j++)
-            {i = SX_number[j];
+            {i = SX_gs.number[j];
              if (i != -1)
                 {if (SX_gs.dataset[i].x[0] != NULL)
                     {CFREE(SX_gs.dataset[i].x[0]);};
@@ -210,12 +210,12 @@ static int UL_expunge(int j)
                     {CFREE(SX_gs.dataset[i].x[1]);};
 
                  SX_zero_curve(i);
-                 SX_number[j] = -1;};};
+                 SX_gs.number[j] = -1;};};
 	SX_gs.n_curves_read = 0;
         SX_reset_prefix();}
 
     else
-       {i = SX_number[j];
+       {i = SX_gs.number[j];
         if (i != -1)
            {if (SX_gs.dataset[i].x[0] != NULL)
                {CFREE(SX_gs.dataset[i].x[0]);};
@@ -223,7 +223,7 @@ static int UL_expunge(int j)
                {CFREE(SX_gs.dataset[i].x[1]);};
 
             SX_zero_curve(i);
-            SX_number[j] = -1;
+            SX_gs.number[j] = -1;
             SX_gs.n_curves_read--;};}
 
     return(TRUE);}
@@ -886,7 +886,7 @@ static object *_ULI_menu(SS_psides *si, object *argl)
             SC_STRING_I, &pn,
             0);
 
-    ret = UL_print_labels(si, SX_number, SX_gs.n_curves,
+    ret = UL_print_labels(si, SX_gs.number, SX_gs.n_curves,
 			  pr, pf, 1, pn, FALSE);
     SX_gs.plot_flag = FALSE;
 
@@ -929,13 +929,13 @@ static object *_ULI_prefix(SS_psides *si, object *argl)
 
 	    mindex = max(mindex, 0);
 	    mindex = min(mindex, SX_gs.n_curves_read - 1);
-	    fname  = SX_gs.dataset[SX_number[mindex]].file;
+	    fname  = SX_gs.dataset[SX_gs.number[mindex]].file;
             SX_gs.prefix_list[pre - 'a'] = mindex;}
 
         else
            {if ((mindex = SX_gs.prefix_list[pre - 'a']) > 0)
                {if (mindex <= SX_gs.n_curves_read)
-                    fname = SX_gs.dataset[SX_number[mindex]].file;
+                    fname = SX_gs.dataset[SX_gs.number[mindex]].file;
                 if (si->interactive == ON)
                    PRINT(stdout, " %c%6d    %s\n", pre, mindex, fname);}
             else
@@ -953,7 +953,7 @@ static object *_ULI_prefix(SS_psides *si, object *argl)
                {pre = 'a' + i;
                 fname = "";
                 if (mindex <= SX_gs.n_curves_read)
-                   fname = SX_gs.dataset[SX_number[mindex]].file;
+                   fname = SX_gs.dataset[SX_gs.number[mindex]].file;
                 if (si->interactive == ON)
                    PRINT(stdout, " %c%6d    %s\n", pre, mindex, fname);
                 arg1 = SS_mk_char(si, (int) pre);

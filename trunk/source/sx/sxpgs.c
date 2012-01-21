@@ -1586,7 +1586,7 @@ static object *_SXI_draw_plot(SS_psides *si, object *argl)
 			     "CHI",   SC_DOUBLE_I,  FALSE, SX_chi,
 			     NULL);};
 
-    PG_fset_axis_log_scale(dev, 2, SX_log_scale);
+    PG_fset_axis_log_scale(dev, 2, SX_gs.log_scale);
     PG_turn_grid(dev, SX_gs.grid);
 
     data->rendering = pty;

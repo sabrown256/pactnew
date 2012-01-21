@@ -40,7 +40,7 @@ static void SX_set_graphics_state(PG_device *d)
 	   d->background_color_white = out->background_color;};
 
     d->border_width = SX_gs.border_width;
-    d->data_id      = SX_data_id;
+    d->data_id      = SX_gs.data_id;
     d->gprint_flag  = TRUE;
     d->grid         = SX_gs.grid;
 
@@ -66,7 +66,7 @@ static void SX_set_graphics_state(PG_device *d)
                      "marker-scale",   &mrks,
 		     NULL);
 
-    PG_fset_axis_log_scale(d, 2, SX_log_scale);
+    PG_fset_axis_log_scale(d, 2, SX_gs.log_scale);
     PG_fset_font(d, axstf, SX_gs.plot_type_style, SX_gs.plot_type_size);
     PG_fset_marker_scale(d, mrks);
     PG_fset_marker_orientation(d, SX_marker_orientation);
@@ -414,7 +414,7 @@ object *SX_mode_graphics(SS_psides *si)
                              SX_gs.background_color_white,
                              SX_gs.console_x, SX_gs.console_y,
                              SX_gs.console_width, SX_gs.console_height))
-           {if (!SX_qflag)
+           {if (!SX_gs.qflag)
                PRINT(STDOUT, "\nCannot connect to display\n");};}
 
     if (SX_gs.graphics_device == NULL)

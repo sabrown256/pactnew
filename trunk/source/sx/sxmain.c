@@ -79,7 +79,7 @@ int main(int c, char **v, char **env)
 #endif
 
     if (SS_exe_script(c, v) != NULL)
-       {SX_qflag    = TRUE;
+       {SX_gs.qflag    = TRUE;
 	script_file = TRUE;
 	trap_error  = FALSE;};
 
@@ -110,7 +110,7 @@ int main(int c, char **v, char **env)
                      break;
                 case 'q' :               /* quite mode suppress version and */
                                          /* cannot connect to display       */
-                     SX_qflag = TRUE;
+                     SX_gs.qflag = TRUE;
                      break;
                 case 'r' :                    /* don't load .pdbviewrc file */
                      load_rc = FALSE;
@@ -177,7 +177,7 @@ int main(int c, char **v, char **env)
         SX_init_env(si);
 
 #ifndef NO_SHELL
-        if (SX_gs.gr_mode && !SX_qflag)
+        if (SX_gs.gr_mode && !SX_gs.qflag)
 	   SS_banner(si, SS_mk_string(si, PCODE));
 #endif
 
@@ -226,7 +226,7 @@ int main(int c, char **v, char **env)
        ret = !SS_run(si, cmd);
 
     else
-       {if (SX_gs.gr_mode && !SX_qflag)
+       {if (SX_gs.gr_mode && !SX_gs.qflag)
 	   SS_banner(si, SS_mk_string(si, SCODE));
 	SS_repl(si);
 

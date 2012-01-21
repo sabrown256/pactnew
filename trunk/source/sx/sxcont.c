@@ -12,12 +12,6 @@
 
 #define EOE(str) ((*SS_PTR(str) == '\n') || (*SS_PTR(str) == '\0'))
 
-int
- SX_data_id,
- *SX_number,
- SX_qflag,
- SX_log_scale[PG_SPACEDM];
-
 double
  SX_chi,
  SX_marker_orientation,
@@ -25,7 +19,6 @@ double
  SX_theta;
 
 char
- SX_data_directory[MAXLINE],
  *SX_display_name,
  *SX_display_type,
  *SX_display_title,
@@ -537,7 +530,7 @@ void SX_parse(SS_psides *si,
                    SS_PTR(strm) = SS_BUFFER(strm);
                    SS_assign(si, si->rdobj, SS_read(si, strm));
                    si->interactive = ON;
-                   SX_gs.plot_flag   = TRUE;
+                   SX_gs.plot_flag = TRUE;
                    SS_assign(si, si->evobj, SS_eval(si, si->rdobj));
                    si->interactive = OFF;};
 
@@ -1081,7 +1074,7 @@ void SX_install_global_vars(SS_psides *si)
     SX_gs.autorange              = TRUE;
     SX_gs.border_width           = 2;
     SX_chi                    = 0.0;
-    SX_data_id                = TRUE,
+    SX_gs.data_id                = TRUE,
     SX_gs.default_color          = -1;
     SX_GRI_x                  = 0.5;
     SX_GRI_y                  = 0.01;
@@ -1116,7 +1109,7 @@ void SX_install_global_vars(SS_psides *si)
     si->stat_flag   = FALSE;
 
     for (i = 0; i < PG_SPACEDM; i++)
-        SX_log_scale[i] = FALSE;
+        SX_gs.log_scale[i] = FALSE;
 
 /* WC to BND offset */
     for (i = 0; i < PG_BOXSZ; i++)
@@ -1299,12 +1292,12 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "data-directory",
                   "Variable: Sets the default data directory\n     Usage: data-directory <path-name>",
                   SS_acc_string,
-                  SX_data_directory);
+                  SX_gs.data_directory);
 
     SS_install_cf(si, "data-id",
                   "Variable: Controls display of curve identifiers on graph\n     Usage: data-id on | off",
                   SS_acc_int,
-                  &SX_data_id);
+                  &SX_gs.data_id);
 
     SS_install_cf(si, "default-color",
                   "Variable: The default line color\n     Usage: default-color <color>",
@@ -1741,12 +1734,12 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "x-log-scale",
                   "Variable: Controls log scale on x axis\n     Usage: x-log-scale on | off",
                   SS_acc_int,
-                  &SX_log_scale[0]);
+                  &SX_gs.log_scale[0]);
 
     SS_install_cf(si, "y-log-scale",
                   "Variable: Controls log scale on y axis\n     Usage: y-log-scale on | off",
                   SS_acc_int,
-                  &SX_log_scale[1]);
+                  &SX_gs.log_scale[1]);
 
     SX_register_devices();
     _SX_install_device_vars(si);
