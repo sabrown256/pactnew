@@ -143,7 +143,7 @@ static void _UL_args(SS_psides *si, object *obj, void *v, int type)
                  *pi = SX_get_crv_index_i(obj);}
              else if (SS_integerp(obj))
                 {pi = (int *) v;
-                 *pi = SX_number[*SS_GET(int, obj)];}
+                 *pi = SX_gs.number[*SS_GET(int, obj)];}
              else
                 SS_error(si, "OBJECT NOT CURVE - _UL_ARGS", obj);
              break;
@@ -154,7 +154,7 @@ static void _UL_args(SS_psides *si, object *obj, void *v, int type)
                  *pi = SX_get_crv_index_j(obj);}
              else if (SS_integerp(obj))
                 {pi = (int *) v;
-                 *pi = SX_number[*SS_GET(int, obj)];}
+                 *pi = SX_gs.number[*SS_GET(int, obj)];}
              else
                 SS_error(si, "OBJECT NOT CURVE - _UL_ARGS", obj);
              break;
@@ -1034,7 +1034,7 @@ void UL_set_graphics_state(PG_device *d)
 	       d->background_color_white = out->background_color;};
 
 	d->border_width = SX_gs.border_width;
-	d->data_id      = SX_data_id;
+	d->data_id      = SX_gs.data_id;
 	d->gprint_flag  = TRUE;
 	d->grid         = SX_gs.grid;
 
@@ -1054,7 +1054,7 @@ void UL_set_graphics_state(PG_device *d)
 			 "marker-scale",   &mrks,
 			 NULL);
 
-	PG_fset_axis_log_scale(d, 2, SX_log_scale);
+	PG_fset_axis_log_scale(d, 2, SX_gs.log_scale);
 	PG_fset_font(d, axstf, SX_gs.plot_type_style, SX_gs.plot_type_size);
 	PG_fset_marker_scale(d, mrks);
 	PG_fset_marker_orientation(d, SX_marker_orientation);

@@ -538,7 +538,7 @@ struct s_SX_global_state
 
     int n_curves;               /* curve controls */
     int n_curves_read;
-    int _SX_next_available_number;
+    int next_available_number;
 
     int interp_method;          /* interpolation controls */
     double interp_power;
@@ -561,15 +561,15 @@ struct s_SX_global_state
     int prefix_list[NPREFIX];
     int background_color_white;
     int border_width;
-    int SX_data_id;
+    int data_id;
     int gr_mode;
     int grid;
-    int *SX_number;
+    int *number;
     int plot_flag;
     int plot_type_size;
-    int SX_qflag;
+    int qflag;
     int show_mouse_location;
-    int SX_log_scale[PG_SPACEDM];
+    int log_scale[PG_SPACEDM];
 
     double SX_chi;
     double console_x;
@@ -598,7 +598,7 @@ struct s_SX_global_state
     char *command_log_name;
     char *console_type;
     char *current_palette;
-    char SX_data_directory[MAXLINE];
+    char data_directory[MAXLINE];
     char *SX_display_name;
     char *SX_display_type;
     char *SX_display_title;
@@ -684,12 +684,7 @@ extern SX_global_state
  SX_gs;
 
 extern int
- SX_data_id,
- SX_GRI_type_size,
- *SX_number,
- _SX_next_available_number,
- SX_qflag,
- SX_log_scale[];
+ SX_GRI_type_size;
 
 extern double
  SX_chi,
@@ -704,7 +699,6 @@ extern double
  SX_theta;
 
 extern char
- SX_data_directory[],
  *SX_display_name,
  *SX_display_type,
  *SX_display_title,

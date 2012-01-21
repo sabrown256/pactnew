@@ -18,14 +18,11 @@ typedef struct s_pdb_info pdb_info;
 
 struct s_bin_info
   {FILE *stream;                            /* file pointer for binary file */
-   int64_t fileaddr;};                                /* disk address of data */
+   int64_t fileaddr;};                      /* disk address of data */
 
 struct s_pdb_info
   {PDBfile *file;                           /* file pointer for binary file */
-   char *curve_name;};                            /* curve name in PDB file */
-
-int
- _SX_next_available_number = 1;
+   char *curve_name;};                      /* curve name in PDB file */
 
 static char
  Ultra_Hdr[] = "ULTRA II - BINARY FILE";
@@ -46,10 +43,10 @@ static void
 static int _SX_next_number(SS_psides *si, int flag)
    {int i;
 
-    for (i = _SX_next_available_number; i < SX_gs.n_curves; i++)
-        if (SX_number[i] == -1)
+    for (i = SX_gs.next_available_number; i < SX_gs.n_curves; i++)
+        if (SX_gs.number[i] == -1)
            {if (flag)
-               _SX_next_available_number = i + 1;
+               SX_gs.next_available_number = i + 1;
             return(i);};
 
     SX_enlarge_dataset(si, NULL);
@@ -114,7 +111,7 @@ static int _SX_termdata(SS_psides *si, int *aryptr,
 
     _SX.dataptr  = 0;
     i            = _SX_next_number(si, TRUE);
-    SX_number[i] = j;
+    SX_gs.number[i] = j;
     *aryptr      = SX_next_space(si);
 
     return(TRUE);}
@@ -403,7 +400,7 @@ static void _SX_read_bin(SS_psides *si, FILE *fp, char *fname)
         icurve++;
 
         i = _SX_next_number(si, TRUE);
-        SX_number[i] = j;
+        SX_gs.number[i] = j;
         c = io_getc(fp);                                    /* look for eof */
         io_ungetc(c, fp);};
 
@@ -604,7 +601,7 @@ static void _SX_read_pdb(SS_psides *si, PDBfile *fp, char *fname)
 		 _SX_cache_curve(si, &SX_gs.dataset[j], SC_PDB);
 
 		 k = _SX_next_number(si, TRUE);
-		 SX_number[k] = j;};};
+		 SX_gs.number[k] = j;};};
 
 	SX_gs.n_curves_read += icurve;
 	CFREE(names);};
@@ -1088,7 +1085,7 @@ static void _SX_wrt_pdb(SS_psides *si, PDBfile *fp, object *argl)
          if (SS_numbp(obj))
             {i = SS_INTEGER_VALUE(obj);
              if ((i >= 1) && (i <= SX_gs.n_curves_read))
-                j = SX_number[i];
+                j = SX_gs.number[i];
              if ((j != -1) && (SX_gs.dataset[j].x[0] == NULL))
                 {uncached = TRUE;
                  SX_uncache_curve(si, &SX_gs.dataset[j]);};}
@@ -1133,7 +1130,7 @@ static void _SX_wrt_bin(SS_psides *si, FILE *fp, object *argl)
          if (SS_numbp(obj))
             {i = (int) *SS_GET(int64_t, obj);
              if ((i >= 1) && (i <= SX_gs.n_curves_read))
-                j = SX_number[i];
+                j = SX_gs.number[i];
              if ((j != -1) && (SX_gs.dataset[j].x[0] == NULL))
                 {uncached = TRUE;
                  SX_uncache_curve(si, &SX_gs.dataset[j]);};}
@@ -1180,7 +1177,7 @@ static void _SX_wrt_text(SS_psides *si, FILE *fp, object *argl)
          if (SS_numbp(obj))
             {i = (int) *SS_GET(int64_t, obj);
              if ((i >= 1) && (i <= SX_gs.n_curves_read))
-                j = SX_number[i];
+                j = SX_gs.number[i];
              if ((j != -1) && (SX_gs.dataset[j].x[0] == NULL))
                 {uncached = TRUE;
                  SX_uncache_curve(si, &SX_gs.dataset[j]);};}

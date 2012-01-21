@@ -519,7 +519,7 @@ int SX_command(SS_psides *si, char *file, char *cmd)
 	PG_IO_INTERRUPTS(FALSE);
 
 	SX_gs.gr_mode = TRUE;
-	SX_qflag   = TRUE;
+	SX_gs.qflag   = TRUE;
 	zsp        = 2;
 
 	SC_zero_space_n(zsp, -2);

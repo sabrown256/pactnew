@@ -119,7 +119,7 @@ void SX_enlarge_dataset(SS_psides *si, PFVoid eval)
 
     if (nc == 0)
        {SX_gs.dataset    = CMAKE_N(curve, NCURVE);
-        SX_number     = CMAKE_N(int, NCURVE);
+        SX_gs.number     = CMAKE_N(int, NCURVE);
         SX_gs.data_index = CMAKE_N(int, NCURVE);
 	_SX.crv_obj   = CMAKE_N(object *, NCURVE);
 	_SX.crv_proc  = CMAKE_N(object *, NCURVE);
@@ -130,7 +130,7 @@ void SX_enlarge_dataset(SS_psides *si, PFVoid eval)
     else
        {SX_gs.n_curves += NCURVE;
         CREMAKE(SX_gs.dataset, curve, SX_gs.n_curves);
-        CREMAKE(SX_number, int, SX_gs.n_curves);
+        CREMAKE(SX_gs.number, int, SX_gs.n_curves);
         CREMAKE(SX_gs.data_index, int, SX_gs.n_curves);
         CREMAKE(_SX.crv_obj, object *, SX_gs.n_curves);
         CREMAKE(_SX.crv_proc, object *, SX_gs.n_curves);
@@ -146,7 +146,7 @@ void SX_enlarge_dataset(SS_psides *si, PFVoid eval)
 						   PLOT_CARTESIAN, CARTESIAN_2D,
 						   LINE_SOLID, FALSE, 0, 0,
 						   0, 0.0);
-         SX_number[i]           = -1;
+         SX_gs.number[i]           = -1;
 	 SX_gs.data_index[i]       = -1;
 
 /* initialize the curve reference variables, procedures, and objects */
