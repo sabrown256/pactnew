@@ -489,7 +489,7 @@ void B_init(void)
 	       SS_nargs,
 	       LR_def_domain, SS_PR_PROC);
 
-    SX_pan_data_hook = (PFInt) LR_get_data;
+    SX_gs.pan_data_hook = (PFInt) LR_get_data;
 
     PRINT(stdout, "\n");
     strcpy(si->prompt, "B-> ");

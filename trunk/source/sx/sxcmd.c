@@ -95,7 +95,7 @@ void SX_init_view(SS_psides *si)
 		     NULL);
 
 /*    SX_gr_mode         = TRUE; */
-    SX_plot_flag       = TRUE;
+    SX_gs.plot_flag       = TRUE;
     SX_gs.default_npts    = 100;
 
     PG_box_init(3, SX_gwc, 0.0, 1.0);
@@ -147,7 +147,7 @@ static object *_SX_mapping_ref(SS_psides *si, char *fname,
     object *ret;
 
     if (strcmp(fname, "#t") == 0)
-       {for (po = SX_file_list; po != NULL; po = po->next)
+       {for (po = SX_gs.file_list; po != NULL; po = po->next)
             {_SX_get_menu(si, po);
 
              ret = SX_get_ref_map(si, po, indx, dtype);
@@ -158,7 +158,7 @@ static object *_SX_mapping_ref(SS_psides *si, char *fname,
 	   return(SS_null);}
 
     else if ((strcmp(fname, "nil") == 0) || (strcmp(fname, "#f") == 0))
-       {po = SX_gvif;
+       {po = SX_gs.gvif;
         _SX_get_menu(si, po);
 
         ret = SX_get_ref_map(si, po, indx, dtype);
@@ -166,7 +166,7 @@ static object *_SX_mapping_ref(SS_psides *si, char *fname,
           return(ret);}
 
     else
-       {for (po = SX_file_list; po != NULL; po = po->next)
+       {for (po = SX_gs.file_list; po != NULL; po = po->next)
             {if (strcmp(fname, po->name) == 0)
                 break;};
 
@@ -340,7 +340,7 @@ static object *_SXI_thru(SS_psides *si, object *argl)
 /* GOTCHA: in general, when processing something like "f1.1:4",
            f1 will not refer to the current input file */
 
-	SS_args(si, SS_lk_var_val(si, SX_curfile),
+	SS_args(si, SS_lk_var_val(si, SX_gs.curfile),
 		G_FILE, &po,
 		0);
 
@@ -458,7 +458,7 @@ void SX_init_env(SS_psides *si)
 
 /* initialize the some global objects */
 
-    SX_curfile = SS_install_cv(si, "current-file", SS_null, SS_OBJECT_I);
+    SX_gs.curfile = SS_install_cv(si, "current-file", SS_null, SS_OBJECT_I);
 
     SS_install(si, "describe*",
                "Procedure: Describe an SX function or variable\n     Usage: describe* <function-list> <variable-list>",

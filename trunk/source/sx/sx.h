@@ -558,8 +558,8 @@ struct s_SX_global_state
     int SX_N_Curves;
     int SX_n_curves_read;
     int _SX_next_available_number;
-    int SX_plot_flag;
-    int SX_plot_type_size;
+    int plot_flag;
+    int plot_type_size;
     int SX_qflag;
     int show_mouse_location;
     int SX_log_scale[PG_SPACEDM];
@@ -603,7 +603,7 @@ struct s_SX_global_state
     char *SX_GRI_title;
     char *SX_GRI_type_face;
     char *SX_GRI_type_style;
-    char *SX_plot_type_style;
+    char *plot_type_style;
     char *SX_promotion_type;
     char *SX_pui_file;
     char *SX_smooth_method;
@@ -616,26 +616,26 @@ struct s_SX_global_state
 
     data_standard *PDB_STANDARD;
 
-    PFInt SX_pan_data_hook;
+    PFInt pan_data_hook;
 
     curve *SX_dataset;
 
-    object *_SX_var_tab;
-    object *SX_curfile;
-    object *SX_ovif;
-    object *(*SX_plot_hook)(SS_psides *si);
+    object *var_tab;
+    object *curfile;
+    object *ovif;
+    object *(*plot_hook)(SS_psides *si);
 
-    FILE *SX_out_text;
-    FILE *SX_out_bin;
     FILE *command_log;
+    FILE *out_text;
+    FILE *out_bin;
 
-    PDBfile *SX_out_pdb;
+    PDBfile *out_pdb;
     PDBfile *vif;
 
-    g_file *SX_file_list;
-    g_file *SX_gvif;
+    g_file *gvif;
+    g_file *file_list;
 
-    PG_device *SX_graphics_device;};
+    PG_device *graphics_device;};
 
 
 /* SCHEME object type designations */
@@ -683,21 +683,6 @@ extern SX_global_state
 extern curve
  *SX_dataset;
 
-extern g_file
- *SX_file_list,
- *SX_gvif;
-
-extern object
- *_SX_var_tab,
- *SX_curfile,
- *SX_ovif;
-
-extern object
- *(*SX_plot_hook)(SS_psides *si);
-
-extern PFInt
- SX_pan_data_hook;
-
 extern int
  SX_data_id,
  SX_GRI_type_size,
@@ -707,8 +692,6 @@ extern int
  SX_N_Curves,
  SX_n_curves_read,
  _SX_next_available_number,
- SX_plot_flag,
- SX_plot_type_size,
  SX_qflag,
  SX_log_scale[];
 
@@ -735,7 +718,6 @@ extern char
  *SX_GRI_title,
  *SX_GRI_type_face,
  *SX_GRI_type_style,
- *SX_plot_type_style,
  *SX_promotion_type,
  *SX_pui_file,
  *SX_smooth_method;
@@ -746,16 +728,6 @@ extern PG_rendering
  SX_render_2d_1d,
  SX_render_2d_2d,
  SX_render_3d_1d;
-
-extern FILE
- *SX_out_text,
- *SX_out_bin;
-
-extern PDBfile
- *SX_out_pdb;
-    
-extern PG_device
- *SX_graphics_device;
 
 /*--------------------------------------------------------------------------*/
 

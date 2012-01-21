@@ -649,7 +649,7 @@ static object *_ULI_mk_palette(SS_psides *si, object *argl)
             SC_INT_I, &wbck,
             0);
 
-    dev = SX_graphics_device;
+    dev = SX_gs.graphics_device;
     pal = PG_make_palette(dev, name, nc, wbck);
 
 /* write the palette for future reference */
@@ -678,7 +678,7 @@ static object *_ULI_rd_palette(SS_psides *si, object *argl)
             SC_STRING_I, &name,
             0);
 
-    dev = SX_graphics_device;
+    dev = SX_gs.graphics_device;
     if (dev != NULL)
 
 /* write the palette for future reference */
@@ -707,7 +707,7 @@ static void UL_mark_curve_points(double **x, int n, char *indx)
     PG_device *dev;
     PM_polygon *py;
 
-    dev = SX_graphics_device;
+    dev = SX_gs.graphics_device;
     if (dev == NULL)
        return;
 
@@ -768,7 +768,7 @@ static object *_ULI_edit(SS_psides *si, int ie)
     curve *crv, *ocv;
     object *o;
 
-    dev = SX_graphics_device;
+    dev = SX_gs.graphics_device;
 
     ocv  = SX_dataset + ie;
 
@@ -1089,7 +1089,7 @@ static object *_ULI_crv_attr(SS_psides *si, object *obj)
 
     if (j != -1)
        {info  = SX_dataset[j].info;
-	dfcol = (SX_graphics_device == NULL) ? 4 : SX_graphics_device->BLUE;
+	dfcol = (SX_gs.graphics_device == NULL) ? 4 : SX_gs.graphics_device->BLUE;
 	   
 	PG_get_attrs_alist(info,
 			   "LINE-COLOR", SC_INT_I, &lncol, dfcol,
@@ -1129,7 +1129,7 @@ static object *_ULI_write_abs(SS_psides *si, object *argl)
             SC_STRING_I, &text,
             0);
 
-    PG_write_n(SX_graphics_device, 2, NORMC, x, text);
+    PG_write_n(SX_gs.graphics_device, 2, NORMC, x, text);
    
     return(SS_f);}
     

@@ -28,13 +28,6 @@ int
  SX_n_curves_read = 0,
  _SX_next_available_number = 1;
 
-FILE
- *SX_out_text,
- *SX_out_bin;
-
-PDBfile
- *SX_out_pdb;
- 
 static char
  Ultra_Hdr[] = "ULTRA II - BINARY FILE";
 

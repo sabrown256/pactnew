@@ -98,7 +98,7 @@ object *UL_us(SS_psides *si, C_procedure *cp, object *argl)
     SX_prep_arg(si, argl);
 
 /* set plot flag on so that for example (select (menu)) causes replot */
-    SX_plot_flag = TRUE;
+    SX_gs.plot_flag = TRUE;
 
     ret = SS_null;
     for (t = argl; !SS_nullobjp(t); t = SS_cdr(si, t))
@@ -129,7 +129,7 @@ object *UL_uc(SS_psides *si, C_procedure *cp, object *argl)
     SX_prep_arg(si, argl);
 
 /* set plot flag on so that for example (copy (lst)) causes replot */
-    SX_plot_flag = TRUE;
+    SX_gs.plot_flag = TRUE;
 
     ret = SS_null;
     for (t = argl ; !SS_nullobjp(t); t = SS_cdr(si, t))
@@ -172,7 +172,7 @@ object *UL_opxc(SS_psides *si, C_procedure *cp, object *argl)
     SS_assign(si, tok, SS_null);
 
 /* set plot flag on so that for example (dx (lst)) causes replot */
-    SX_plot_flag = TRUE;
+    SX_gs.plot_flag = TRUE;
 
     ret = SS_null;
     for (t = argl ; SS_consp(t); t = SS_cdr(si, t))
@@ -223,7 +223,7 @@ object *UL_opyc(SS_psides *si, C_procedure *cp, object *argl)
     SS_assign(si, tok, SS_null);
 
 /* set plot flag on so that for example (dy (lst)) causes replot */
-    SX_plot_flag = TRUE;
+    SX_gs.plot_flag = TRUE;
 
     ret = SS_null;
     for (t = argl ; SS_consp(t); t = SS_cdr(si, t))
@@ -302,7 +302,7 @@ static object *_UL_ul2toc(SS_psides *si, C_procedure *cp,
              SS_assign(si, ret,
                        SS_mk_cons(si, fun(si, i, d1, d2), ret));};};
 
-    SX_plot_flag = replot_flag;
+    SX_gs.plot_flag = replot_flag;
 
     SS_assign(si, argl, SS_null);
 
@@ -358,7 +358,7 @@ object *UL_ulntoc(SS_psides *si, C_procedure *cp, object *argl)
             break;};
 
 /* set plot flag on so that for example (filter (lst) dp rp) causes replot */
-    SX_plot_flag = TRUE;
+    SX_gs.plot_flag = TRUE;
 
     for (ret = SS_null, u = crvs; SS_consp(u); u = SS_cdr(si, u))
         {tok = SS_car(si, u);
@@ -391,7 +391,7 @@ object *UL_uopxc(SS_psides *si, C_procedure *cp, object *argl)
     SX_prep_arg(si, argl);
 
 /* set plot flag on so that for example (expx (lst)) causes replot */
-    SX_plot_flag = TRUE;
+    SX_gs.plot_flag = TRUE;
 
     ret = SS_null;
     for (t = argl ; SS_consp(t); t = SS_cdr(si, t))
@@ -429,7 +429,7 @@ object *UL_uopyc(SS_psides *si, C_procedure *cp, object *argl)
     SX_prep_arg(si, argl);
 
 /* set plot flag on so that for example (expx (lst)) causes replot */
-    SX_plot_flag = TRUE;
+    SX_gs.plot_flag = TRUE;
 
     ret = SS_null;
     for (t = argl ; SS_consp(t); t = SS_cdr(si, t))
@@ -484,7 +484,7 @@ object *UL_bftoc(SS_psides *si, C_procedure *cp, object *argl)
     SX_prep_arg(si, argl);
 
 /* set plot flag on so that for example (op param (lst)) causes replot */
-    SX_plot_flag = TRUE;
+    SX_gs.plot_flag = TRUE;
 
     tok  = SS_car(si, argl);
     argl = SS_cdr(si, argl);
@@ -524,7 +524,7 @@ object *UL_bltoc(SS_psides *si, C_procedure *cp, object *argl)
     SX_prep_arg(si, argl);
 
 /* set plot flag on so that for example (color (lst) red) causes replot */
-    SX_plot_flag = TRUE;
+    SX_gs.plot_flag = TRUE;
 
     ret = SS_null;
     for (t = argl ; SS_consp(t); t = SS_cdr(si, t))
@@ -689,7 +689,7 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
     SX_prep_arg(si, argl);
 
 /* set plot flag on so that for example (+ (lst) red) causes replot */
-    SX_plot_flag = TRUE;
+    SX_gs.plot_flag = TRUE;
 
     if (SS_nullobjp(argl))
        return(argl);
@@ -899,7 +899,7 @@ object *UL_bcxl(SS_psides *si, C_procedure *cp, object *argl)
        SS_error(si, "BAD LAST ARGUMENT - UL_BCXL", SS_reverse(si, argl));
 
 /* set plot flag on so that for example (compose (lst)) causes replot */
-    SX_plot_flag = TRUE;
+    SX_gs.plot_flag = TRUE;
 
     x[0] = SX_dataset[i].x[0];
     x[1] = SX_dataset[i].x[1];

@@ -48,7 +48,7 @@ object *SX_display_map(SS_psides *si, object *mo)
    {PM_mapping *h;
     PG_graph *g;
 
-    if (SX_plot_flag && SX_gs.autoplot)
+    if (SX_gs.plot_flag && SX_gs.autoplot)
        {h  = SS_GET(PM_mapping, mo);
 	g  = PG_make_graph_from_mapping(h,
 					SC_PCONS_P_S, NULL,
@@ -211,7 +211,7 @@ object *_SX_mh_u_s(SS_psides *si, C_procedure *cp, object *argl)
     PFDoubleR fn;
     PM_set *set;
 
-    SX_plot_flag = TRUE;
+    SX_gs.plot_flag = TRUE;
 
     ret   = SS_null;
     first = _SX_resolve_mapping(si, argl);
@@ -277,7 +277,7 @@ object *_SX_m11_x(SS_psides *si, C_procedure *cp, object *argl)
     PM_set *set;
     PM_mapping *f;
 
-    SX_plot_flag = TRUE;
+    SX_gs.plot_flag = TRUE;
 
     ret = SS_null;
     while (SS_consp(argl))
@@ -314,7 +314,7 @@ object *_SX_m11_b_mro(SS_psides *si, C_procedure *cp, object *argl)
     PF_PPM_mapping_1 op;
     object *al, *obj, *ret;
         
-    SX_plot_flag = TRUE;
+    SX_gs.plot_flag = TRUE;
 
     op   = (PF_PPM_mapping_1) cp->proc[0];
     al   = SS_car(si, argl);
@@ -376,7 +376,7 @@ object *_SX_m11_b_mrs(SS_psides *si, C_procedure *cp, object *argl)
     PM_mapping *f;
     object *obj, *ret;
         
-    SX_plot_flag = TRUE;
+    SX_gs.plot_flag = TRUE;
 
     a = HUGE;
     SS_args(si, argl,
@@ -417,7 +417,7 @@ object *_SX_m11_b_mds(SS_psides *si, C_procedure *cp, object *argl)
     PM_set *set;
     PM_mapping *f;
         
-    SX_plot_flag = TRUE;
+    SX_gs.plot_flag = TRUE;
 
     a = HUGE;
     SS_args(si, argl,
@@ -460,7 +460,7 @@ object *_SX_mij_b_mrs(SS_psides *si, C_procedure *cp, object *argl)
     PM_mapping *f;
     object *obj, *ret;
         
-    SX_plot_flag = TRUE;
+    SX_gs.plot_flag = TRUE;
 
     i = -1;
     a = HUGE;
@@ -508,7 +508,7 @@ object *_SX_mij_b_mds(SS_psides *si, C_procedure *cp, object *argl)
     PM_set *set;
     PM_mapping *f;
         
-    SX_plot_flag = TRUE;
+    SX_gs.plot_flag = TRUE;
 
     i = -1;
     a = HUGE;
@@ -552,7 +552,7 @@ object *_SX_mh_u_m(SS_psides *si, C_procedure *cp, object *argl)
     PF_PPM_mapping_2 op;
     object *ret, *mo;
 
-    SX_plot_flag = TRUE;
+    SX_gs.plot_flag = TRUE;
 
     op  = (PF_PPM_mapping_2) cp->proc[0];
     plf = SX_have_display_list(si);

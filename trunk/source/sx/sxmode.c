@@ -67,7 +67,7 @@ static void SX_set_graphics_state(PG_device *d)
 		     NULL);
 
     PG_fset_axis_log_scale(d, 2, SX_log_scale);
-    PG_fset_font(d, axstf, SX_plot_type_style, SX_plot_type_size);
+    PG_fset_font(d, axstf, SX_gs.plot_type_style, SX_gs.plot_type_size);
     PG_fset_marker_scale(d, mrks);
     PG_fset_marker_orientation(d, SX_marker_orientation);
 
@@ -300,10 +300,10 @@ object *SX_mode_text(SS_psides *si)
                        SX_gs.console_x, SX_gs.console_y,
                        SX_gs.console_width, SX_gs.console_height);
 
-    if (SX_graphics_device != NULL)
-       {PG_clear_window(SX_graphics_device);
-        PG_close_device(SX_graphics_device);
-        SX_graphics_device = NULL;
+    if (SX_gs.graphics_device != NULL)
+       {PG_clear_window(SX_gs.graphics_device);
+        PG_close_device(SX_gs.graphics_device);
+        SX_gs.graphics_device = NULL;
 
 /* give default values to the lisp package interface variables */
         si->post_read  = NULL;
@@ -327,7 +327,7 @@ object *SX_mode_text(SS_psides *si)
 #endif
 
         SX_gr_mode   = FALSE;
-        SX_plot_flag = FALSE;
+        SX_gs.plot_flag = FALSE;
 
         ret = SS_t;}
     else
@@ -417,7 +417,7 @@ object *SX_mode_graphics(SS_psides *si)
            {if (!SX_qflag)
                PRINT(STDOUT, "\nCannot connect to display\n");};}
 
-    if (SX_graphics_device == NULL)
+    if (SX_gs.graphics_device == NULL)
        {SS_set_prompt(si, "\n-> ");
         strcpy(si->ans_prompt, "");
 
@@ -434,35 +434,35 @@ object *SX_mode_graphics(SS_psides *si)
 	   SC_set_get_line(PG_wind_fgets);
 
         SX_gr_mode         = TRUE;
-        SX_graphics_device = PG_make_device(SX_display_name, SX_display_type,
+        SX_gs.graphics_device = PG_make_device(SX_display_name, SX_display_type,
                                             SX_display_title);
 
 /* map the PDBView graphics state onto the device */
-	if (SX_graphics_device != NULL)
-	   {SX_set_graphics_state(SX_graphics_device);
+	if (SX_gs.graphics_device != NULL)
+	   {SX_set_graphics_state(SX_gs.graphics_device);
 
-	    SX_setup_viewspace(SX_graphics_device, 1.0);
+	    SX_setup_viewspace(SX_gs.graphics_device, 1.0);
 
-	    PG_make_device_current(SX_graphics_device);
-	    PG_set_viewspace(SX_graphics_device, 2, WORLDC, NULL);
-	    PG_release_current_device(SX_graphics_device);
+	    PG_make_device_current(SX_gs.graphics_device);
+	    PG_set_viewspace(SX_gs.graphics_device, 2, WORLDC, NULL);
+	    PG_release_current_device(SX_gs.graphics_device);
 
-	    PG_set_default_event_handler(SX_graphics_device,
+	    PG_set_default_event_handler(SX_gs.graphics_device,
 					 SX_default_event_handler);
 
-	    PG_set_motion_event_handler(SX_graphics_device,
+	    PG_set_motion_event_handler(SX_gs.graphics_device,
 					SX_motion_event_handler);
 
-	    PG_set_mouse_down_event_handler(SX_graphics_device,
+	    PG_set_mouse_down_event_handler(SX_gs.graphics_device,
 					    SX_mouse_event_handler);
 
-	    PG_set_mouse_up_event_handler(SX_graphics_device,
+	    PG_set_mouse_up_event_handler(SX_gs.graphics_device,
 					  SX_mouse_event_handler);
 
-	    PG_set_expose_event_handler(SX_graphics_device,
+	    PG_set_expose_event_handler(SX_gs.graphics_device,
 					SX_expose_event_handler);
 
-	    PG_set_update_event_handler(SX_graphics_device,
+	    PG_set_update_event_handler(SX_gs.graphics_device,
 					SX_update_event_handler);
 
 	    SC_REGISTER_CONTEXT(SX_default_event_handler, si);
@@ -472,10 +472,10 @@ object *SX_mode_graphics(SS_psides *si)
 	    SC_REGISTER_CONTEXT(SX_update_event_handler,  si);
 
 /* remember the window size and position in pixels */
-	    SX_gs.window_height_P = PG_window_height(SX_graphics_device);
-	    SX_gs.window_width_P  = PG_window_width(SX_graphics_device);
-	    SX_gs.window_P[0]     = SX_graphics_device->g.hwin[0];
-	    SX_gs.window_P[1]     = SX_graphics_device->g.hwin[2];
+	    SX_gs.window_height_P = PG_window_height(SX_gs.graphics_device);
+	    SX_gs.window_width_P  = PG_window_width(SX_gs.graphics_device);
+	    SX_gs.window_P[0]     = SX_gs.graphics_device->g.hwin[0];
+	    SX_gs.window_P[1]     = SX_gs.graphics_device->g.hwin[2];
 	    
 	    if (PG_console_device != NULL)
 	       PG_expose_device(PG_console_device);};

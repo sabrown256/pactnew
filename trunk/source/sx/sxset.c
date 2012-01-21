@@ -17,15 +17,6 @@
 char
  *SX_current_palette = NULL;
 
-object
- *(*SX_plot_hook)(SS_psides *si);
-
-g_file
- *SX_gvif;
-
-object
- *SX_ovif;
-
 char
  SX_err[MAXLINE];
 
@@ -120,8 +111,8 @@ SS_psides *SX_init(char *code, char *vers, int c, char **v, char **env)
     SX_install_funcs(si);
 
     SX_gs.vif  = PD_open_vif("SX_gs.vif");
-    SX_gvif = _SX_mk_file("virtual-internal", PDBFILE_S, SX_gs.vif);
-    SX_ovif = SX_mk_gfile(si, SX_gvif);
+    SX_gs.gvif = _SX_mk_file("virtual-internal", PDBFILE_S, SX_gs.vif);
+    SX_gs.ovif = SX_mk_gfile(si, SX_gs.gvif);
 
 /* PDB initializations */
     pdb_wr_hook = _SX_hash_hook;
@@ -138,12 +129,12 @@ SS_psides *SX_init(char *code, char *vers, int c, char **v, char **env)
 /* PANACEA initializations */
     PA_def_str(SX_gs.vif);
 
-    _SX_var_tab = SS_mk_hasharr(si, PA_variable_tab);
-    SS_UNCOLLECT(_SX_var_tab);
-    if (SC_hasharr_install(si->symtab, "pa-variable-table", _SX_var_tab,
+    SX_gs.var_tab = SS_mk_hasharr(si, PA_variable_tab);
+    SS_UNCOLLECT(SX_gs.var_tab);
+    if (SC_hasharr_install(si->symtab, "pa-variable-table", SX_gs.var_tab,
 			   SS_POBJECT_S, 3, -1) == NULL)
        SS_error(si, "CAN'T INSTALL PANACEA DATA BASE - SX_INIT_SYSTEM",
-                _SX_var_tab);
+                SX_gs.var_tab);
 
 #endif
 
@@ -286,8 +277,8 @@ int _SX_get_input(SS_psides *si, object *str)
 
 /* the \r check is for the benefit of those non-UNIX systems who use it */
 	else if ((*p == '\n') || (*p == '\r'))
-	   {if ((SX_gs.autoplot == ON) && (SX_plot_hook != NULL))
-	       SX_plot_hook(si);
+	   {if ((SX_gs.autoplot == ON) && (SX_gs.plot_hook != NULL))
+	       SX_gs.plot_hook(si);
 	    rv = -1;};}
 
     else

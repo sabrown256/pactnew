@@ -183,7 +183,7 @@ g_file *_SX_mk_file(char *name, char *type, void *file)
     po->file        = file;
     po->file_object = NULL;
     po->menu_lst    = CMAKE_ARRAY(SX_menu_item, NULL, 0);
-    po->next        = SX_file_list;
+    po->next        = SX_gs.file_list;
 
     return(po);}
 

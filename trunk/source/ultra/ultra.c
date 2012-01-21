@@ -80,7 +80,7 @@ void UL_init_view(SS_psides *si)
 
     SX_gs.default_npts      = 100;
     SX_gr_mode           = TRUE;
-    SX_plot_flag         = TRUE;
+    SX_gs.plot_flag         = TRUE;
 
     PG_box_init(3, SX_gwc, 0.0, 1.0);
 
@@ -627,7 +627,7 @@ object *UL_copy_curve(SS_psides *si, int j)
 
     PG_set_line_info(SX_dataset[i].info, PLOT_CARTESIAN, CARTESIAN_2D,
                      LINE_SOLID,
-		     FALSE, 0, SX_next_color(SX_graphics_device), 0, 0.0);
+		     FALSE, 0, SX_next_color(SX_gs.graphics_device), 0, 0.0);
 
     o = SX_mk_curve_proc(i);
 
@@ -735,7 +735,7 @@ object *_ULI_extract_curve(SS_psides *si, object *argl)
 
     PG_set_line_info(SX_dataset[i].info, PLOT_CARTESIAN, CARTESIAN_2D,
                      LINE_SOLID,
-		     FALSE, 0, SX_next_color(SX_graphics_device), 0, 0.0);
+		     FALSE, 0, SX_next_color(SX_gs.graphics_device), 0, 0.0);
 
     o = SX_mk_curve_proc(i);
 
@@ -791,7 +791,7 @@ object *UL_xindex_curve(SS_psides *si, int j)
 
     PG_set_line_info(SX_dataset[i].info, PLOT_CARTESIAN, CARTESIAN_2D,
                      LINE_SOLID,
-		     FALSE, 0, SX_next_color(SX_graphics_device), 0, 0.0);
+		     FALSE, 0, SX_next_color(SX_gs.graphics_device), 0, 0.0);
 
     o = SX_mk_curve_proc(i);
 
@@ -838,7 +838,7 @@ static void UL_init_env(SS_psides *si)
 /* these lisp package special variables are initialized in all modes */
     SS_set_print_err_func(NULL, TRUE);
     si->get_arg  = _UL_args;
-    SX_plot_hook = UL_plot;
+    SX_gs.plot_hook = UL_plot;
 
     SC_gs.atof   = SC_atof;
     SC_gs.strtod = SC_strtod;
@@ -866,13 +866,13 @@ object *UL_mode_text(SS_psides *si)
                        SX_gs.console_x, SX_gs.console_y,
                        SX_gs.console_width, SX_gs.console_height);
 
-    if (SX_graphics_device != NULL)
-       {PG_clear_window(SX_graphics_device);
-        PG_close_device(SX_graphics_device);
-        SX_graphics_device = NULL;
+    if (SX_gs.graphics_device != NULL)
+       {PG_clear_window(SX_gs.graphics_device);
+        PG_close_device(SX_gs.graphics_device);
+        SX_gs.graphics_device = NULL;
 
         SX_gr_mode   = FALSE;
-        SX_plot_flag = FALSE;
+        SX_gs.plot_flag = FALSE;
 
         ret = SS_t;}
     else
@@ -918,7 +918,7 @@ object *UL_mode_graphics(SS_psides *si)
                              SX_gs.console_width, SX_gs.console_height))
            {PRINT(STDOUT, "\nCannot connect to display\n\n");};}
 
-    if (SX_graphics_device == NULL)
+    if (SX_gs.graphics_device == NULL)
        {SS_set_prompt(si, "U-> ");
         strcpy(si->ans_prompt, "");
 
@@ -934,52 +934,52 @@ object *UL_mode_graphics(SS_psides *si)
 	   SC_set_get_line(PG_wind_fgets);
 
         SX_gr_mode         = TRUE;
-        SX_graphics_device = PG_make_device(SX_display_name, SX_display_type,
+        SX_gs.graphics_device = PG_make_device(SX_display_name, SX_display_type,
                                             SX_display_title);
 
-	if (SX_graphics_device != NULL)
+	if (SX_gs.graphics_device != NULL)
 	   {if (scrwin == NULL)
-	       {scrwin = SX_mk_graphics_device(si, SX_graphics_device);
+	       {scrwin = SX_mk_graphics_device(si, SX_gs.graphics_device);
 		SS_install_cv(si, "screen-window", scrwin, SS_OBJECT_I);
 		SS_UNCOLLECT(scrwin);}
  	    else
-	       scrwin->val = (void *) SX_graphics_device;
+	       scrwin->val = (void *) SX_gs.graphics_device;
 
 /* map the ultra graphics state onto the device */
-	    UL_set_graphics_state(SX_graphics_device);
+	    UL_set_graphics_state(SX_gs.graphics_device);
 
-	    SX_setup_viewspace(SX_graphics_device, UL_window_height_factor);
+	    SX_setup_viewspace(SX_gs.graphics_device, UL_window_height_factor);
 
 /* open the device now */
-	    PG_open_device(SX_graphics_device,
+	    PG_open_device(SX_gs.graphics_device,
 			   SX_gs.window_x[0], SX_gs.window_x[1],
 			   SX_gs.window_width, SX_gs.window_height);
 
             if (SX_current_palette != NULL)
-               {SX_graphics_device->current_palette = 
-                   PG_rd_palette(SX_graphics_device, SX_current_palette);}
+               {SX_gs.graphics_device->current_palette = 
+                   PG_rd_palette(SX_gs.graphics_device, SX_current_palette);}
             
-	    PG_make_device_current(SX_graphics_device);
-	    SX_gs.border_width = SX_graphics_device->border_width;
-	    PG_set_viewspace(SX_graphics_device, 2, WORLDC, NULL);
-	    PG_release_current_device(SX_graphics_device);
+	    PG_make_device_current(SX_gs.graphics_device);
+	    SX_gs.border_width = SX_gs.graphics_device->border_width;
+	    PG_set_viewspace(SX_gs.graphics_device, 2, WORLDC, NULL);
+	    PG_release_current_device(SX_gs.graphics_device);
 
-	    PG_set_default_event_handler(SX_graphics_device,
+	    PG_set_default_event_handler(SX_gs.graphics_device,
 					 SX_default_event_handler);
 
-	    PG_set_motion_event_handler(SX_graphics_device,
+	    PG_set_motion_event_handler(SX_gs.graphics_device,
 					SX_motion_event_handler);
 	    
-	    PG_set_mouse_down_event_handler(SX_graphics_device,
+	    PG_set_mouse_down_event_handler(SX_gs.graphics_device,
 					    SX_mouse_event_handler);
 
-	    PG_set_mouse_up_event_handler(SX_graphics_device,
+	    PG_set_mouse_up_event_handler(SX_gs.graphics_device,
 					  SX_mouse_event_handler);
 
-	    PG_set_expose_event_handler(SX_graphics_device,
+	    PG_set_expose_event_handler(SX_gs.graphics_device,
 					SX_expose_event_handler);
 
-	    PG_set_update_event_handler(SX_graphics_device,
+	    PG_set_update_event_handler(SX_gs.graphics_device,
 					SX_update_event_handler);
 
 	    SC_REGISTER_CONTEXT(SX_default_event_handler, si);
@@ -989,10 +989,10 @@ object *UL_mode_graphics(SS_psides *si)
 	    SC_REGISTER_CONTEXT(SX_update_event_handler,  si);
 
 /* remember the window size and position in pixels */
-	    SX_gs.window_height_P = PG_window_height(SX_graphics_device);
-	    SX_gs.window_width_P  = PG_window_width(SX_graphics_device);
-	    SX_gs.window_P[0]     = SX_graphics_device->g.hwin[0];
-	    SX_gs.window_P[1]     = SX_graphics_device->g.hwin[2];
+	    SX_gs.window_height_P = PG_window_height(SX_gs.graphics_device);
+	    SX_gs.window_width_P  = PG_window_width(SX_gs.graphics_device);
+	    SX_gs.window_P[0]     = SX_gs.graphics_device->g.hwin[0];
+	    SX_gs.window_P[1]     = SX_gs.graphics_device->g.hwin[2];
 
 	    if (PG_console_device != NULL)
 	       PG_expose_device(PG_console_device);};
@@ -1055,7 +1055,7 @@ void UL_set_graphics_state(PG_device *d)
 			 NULL);
 
 	PG_fset_axis_log_scale(d, 2, SX_log_scale);
-	PG_fset_font(d, axstf, SX_plot_type_style, SX_plot_type_size);
+	PG_fset_font(d, axstf, SX_gs.plot_type_style, SX_gs.plot_type_size);
 	PG_fset_marker_scale(d, mrks);
 	PG_fset_marker_orientation(d, SX_marker_orientation);
 

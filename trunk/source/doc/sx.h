@@ -4168,7 +4168,7 @@ level routines to be used by the interpreter.<p>
 <TD>TRUE iff x is a PA_source_variabl</TD></TR>
 <TR><TD>SX_IV_SPECIFICATIONP(x)</TD>
 <TD>TRUE iff x is a PA_iv_specificatio</TD></TR>
-<TR><TD>SX_PLOT_REQUESTP(x)</TD>
+<TR><TD>SX_gs.plot_REQUESTP(x)</TD>
 <TD>TRUE iff x is a PA_plot_reques</TD></TR>
 </TABLE>
 </BLOCKQUOTE>
@@ -4230,9 +4230,9 @@ level routines to be used by the interpreter.<p>
 <TD>	size in points of label font </TD></TR>
 <TR><TD>SX_lines_page</TD>
 <TD>	number of lines per page in window </TD></TR>
-<TR><TD>SX_plot_flag</TD>
+<TR><TD>SX_gs.plot_flag</TD>
 <TD>	flag controlling plottting </TD></TR>
-<TR><TD>SX_plot_type_size</TD>
+<TR><TD>SX_gs.plot_type_size</TD>
 <TD>	size in points of plot related fonts </TD></TR>
 <TR><TD>SX_ps_flag</TD>
 <TD>	PostScript flag </TD></TR>
@@ -4278,7 +4278,7 @@ SX_botspace
 SX_cgm_name
 <P>SX_cgm_type
 <P>SX_palette
-<P>SX_plot_type_style
+<P>SX_gs.plot_type_style
 <P>SX_ps_name
 <P>SX_ps_type
 <P>SX_smooth_method

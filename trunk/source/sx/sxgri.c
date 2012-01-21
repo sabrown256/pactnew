@@ -329,7 +329,7 @@ static object *_SXI_add_annot(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       dev = SX_graphics_device;
+       dev = SX_gs.graphics_device;
 
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_ADD_ANNOT", SS_null);
@@ -358,7 +358,7 @@ static object *_SXI_free_iobs(SS_psides *si, object *argl)
             0);
 
     if (dev == NULL)
-       dev = SX_graphics_device;
+       dev = SX_gs.graphics_device;
 
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_FREE_IOBS", argl);
@@ -536,9 +536,9 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 	PG_register_variable("Type Face", SC_STRING_S,
 			     axstf, NULL, NULL);
 	PG_register_variable("Type Size", SC_INT_S,
-			     &SX_plot_type_size, NULL, NULL);
+			     &SX_gs.plot_type_size, NULL, NULL);
 	PG_register_variable("Type Style", SC_STRING_S,
-			     &SX_plot_type_style, NULL, NULL);
+			     &SX_gs.plot_type_style, NULL, NULL);
 
 /* label controls */
 	PG_register_variable("Label Color Flag", SC_INT_S,
