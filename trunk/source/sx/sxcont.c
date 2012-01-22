@@ -858,15 +858,15 @@ static void _SX_install_device_vars(SS_psides *si)
 
 /* SX_INIT_DEVICE_VARS - set initial values for device variables */
 
-void SX_init_device_vars(int idev, double xf, double yf, double wd, double hg)
+void SX_init_device_vars(int idev, double *xf, double *dxf)
    {out_device *out;
     
     out = SX_get_device(idev);
     if (out != NULL)
-       {out->x0[0]  = xf;
-	out->x0[1]  = yf;
-	out->dx0[0] = wd;
-	out->dx0[1] = hg;};
+       {out->x0[0]  = xf[0];
+	out->x0[1]  = xf[1];
+	out->dx0[0] = dxf[0];
+	out->dx0[1] = dxf[1];};
 
     return;}
 
@@ -878,7 +878,7 @@ void SX_init_device_vars(int idev, double xf, double yf, double wd, double hg)
 void SX_register_devices(void)
    {int i, nd;
     char lname[MAXLINE], uname[MAXLINE];
-    double xf, yf, wd, hg;
+    double xf[PG_SPACEDM], dxf[PG_SPACEDM];
     PG_device *dev;
     out_device *out;
     static char *devs[] = {"ps", "png", "jpeg", "cgm", "mpeg"};
@@ -904,16 +904,16 @@ void SX_register_devices(void)
 	 PG_close_device(dev);
 
 	 if (out->exist)
-	    {xf = 0.0;
-	     yf = 0.0;
+	    {xf[0] = 0.0;
+	     xf[1] = 0.0;
 	     if ((strcmp(devs[i], "ps") == 0) ||
 		 (strcmp(devs[i], "cgm") == 0))
-	        {wd = 0.0;
-		 hg = 0.0;}
+	        {dxf[0] = 0.0;
+		 dxf[1] = 0.0;}
 	     else
-	        {wd = 512.0;
-		 hg = 512.0;};
-	     SX_init_device_vars(i, xf, yf, wd, hg);};
+	        {dxf[0] = 512.0;
+		 dxf[1] = 512.0;};
+	     SX_init_device_vars(i, xf, dxf);};
 
 	 out->background_color = -1;};
 

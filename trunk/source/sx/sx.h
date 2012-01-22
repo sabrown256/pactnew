@@ -707,7 +707,7 @@ extern void
 	  object *(*replot)(SS_psides *si),
 	  char *(*reproc)(SS_psides *si, char *s),
 	  object *strm),
- SX_init_device_vars(int idev, double xf, double yf, double wd, double hg),
+ SX_init_device_vars(int idev, double *xf, double *dxf),
  SX_install_global_vars(SS_psides *si);
 
 extern out_device
