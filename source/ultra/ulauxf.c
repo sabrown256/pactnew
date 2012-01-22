@@ -558,21 +558,21 @@ static object *_ULI_fit_curve(SS_psides *si, object *argl)
     PM_destroy(ay);
     ay = PM_times(a, solution);
 
-    UL_buf1y = CMAKE_N(double, n);
+    UL_gs.bfa[1] = CMAKE_N(double, n);
     for (i = 1; i <= n; i++)
-        UL_buf1y[i-1] = PM_element(ay, i, 1);
+        UL_gs.bfa[1][i-1] = PM_element(ay, i, 1);
 
     if (si->interactive == ON)
        PRINT(stdout, "\n");
 
-    ch = SX_mk_curve(si, SX_gs.dataset[j].n, SX_gs.dataset[j].x[0], UL_buf1y,
+    ch = SX_mk_curve(si, SX_gs.dataset[j].n, SX_gs.dataset[j].x[0], UL_gs.bfa[1],
 		     local, NULL, UL_plot);
 
 /* clean up */
     PM_destroy(a);
     PM_destroy(ay);
     PM_destroy(solution);
-    CFREE(UL_buf1y);
+    CFREE(UL_gs.bfa[1]);
     CFREE(curid);
         
     return(ch);}

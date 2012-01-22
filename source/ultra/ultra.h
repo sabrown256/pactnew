@@ -37,6 +37,29 @@ enum e_UL_hist_mode
 
 typedef enum e_UL_hist_mode UL_hist_mode;
 
+typedef struct s_UL_global_state UL_global_state;
+
+struct s_UL_global_state
+   {
+    int simple_append;
+    int save_intermediate;
+
+    double derivative_tolerance;
+    double window_height_factor;
+    double *bfa[2];
+    double *bfb[2];};
+
+typedef struct s_UL_state UL_state;
+
+struct s_UL_state
+   {
+
+/* ULTRA.C */
+    object *crva;
+    object *crvb;
+    char bf[MAXLINE];
+
+};
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,22 +71,11 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-extern int
- UL_simple_append,
- UL_save_intermediate;
+extern UL_global_state
+ UL_gs;
 
-extern double
- UL_derivative_tolerance;
-
-extern double
- UL_window_height_factor,
- *UL_buf1x,
- *UL_buf1y,
- *UL_buf2x,
- *UL_buf2y;
-
-extern object
- *UL_ann_lst;
+extern UL_state
+ _UL;
 
 /*--------------------------------------------------------------------------*/
 

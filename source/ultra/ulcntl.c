@@ -11,10 +11,6 @@
 #include "ultra.h"
 #include "scope_raster.h"
 
-int
- UL_simple_append     = FALSE,
- UL_save_intermediate = TRUE;
-
 static void
  UL_draw_plot(PG_device *dev);
 
@@ -404,7 +400,7 @@ object *UL_plot(SS_psides *si)
 
     if (SX_gs.graphics_device != NULL)
        {if (_SX.last_state != labsp)
-           {UL_window_height_factor = (1.0 + labsp)/(1.0 + _SX.last_state);
+           {UL_gs.window_height_factor = (1.0 + labsp)/(1.0 + _SX.last_state);
             _SX.last_state = labsp;
             UL_mode_text(si);
             UL_mode_graphics(si);};
@@ -557,7 +553,7 @@ void UL_install_global_vars(SS_psides *si)
     SS_install_cf(si, "derivative-tolerance",
                   "Variable: Threshold for first derivative change.\n     Usage: derivative-tolerance <double>",
                   SS_acc_double,
-                  &UL_derivative_tolerance);
+                  &UL_gs.derivative_tolerance);
 
     SS_install_cf(si, "igamma-tolerance",
 		  "Procedure: Set the tolerance to which incomplete gamma functions are computed\n     Usage: igamma-tolerance <tol>",
@@ -573,12 +569,12 @@ void UL_install_global_vars(SS_psides *si)
     SS_install_cf(si, "save-intermediate",
                   "Variable: Save intermediate curves iff ON\n     Usage: save-intermediate [ on | off]",
                   SS_acc_int,
-                  &UL_save_intermediate);
+                  &UL_gs.save_intermediate);
 
     SS_install_cf(si, "simple-append",
                   "Variable: Do simple concatenations with append-curves\n     Usage: simple-append [ on | off]",
                   SS_acc_int,
-                  &UL_simple_append);
+                  &UL_gs.simple_append);
 
 
 /* WXYZ */
