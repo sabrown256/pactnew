@@ -1061,18 +1061,18 @@ void SX_install_global_vars(SS_psides *si)
     SX_gs.autoplot               = ON;
     SX_gs.autorange              = TRUE;
     SX_gs.border_width           = 2;
-    SX_gs.view_angle[2]                    = 0.0;
+    SX_gs.view_angle[2]          = 0.0;
     SX_gs.data_id                = TRUE,
     SX_gs.default_color          = -1;
-    SX_gs.gri_x[0]                  = 0.5;
-    SX_gs.gri_x[1]                  = 0.01;
-    SX_gs.gri_dx[0]                 = 0.0;
-    SX_gs.gri_dx[1]                 = 0.0;
+    SX_gs.gri_x[0]               = 0.5;
+    SX_gs.gri_x[1]               = 0.01;
+    SX_gs.gri_dx[0]              = 0.0;
+    SX_gs.gri_dx[1]              = 0.0;
     SX_gs.grid                   = OFF;
     SX_gs.marker_orientation     = 0.0;
 
-/*    SX_palette              = CSTRSAVE("spectrum"); */
-    SX_gs.view_angle[1]                    = 0.0;
+/*    SX_palette                 = CSTRSAVE("spectrum"); */
+    SX_gs.view_angle[1]          = 0.0;
     SX_gs.plot_type_size         = 12;
     SX_gs.plot_type_style        = CSTRSAVE("medium");
     SX_gs.promotion_type         = CSTRSAVE("none");
@@ -1082,10 +1082,10 @@ void SX_install_global_vars(SS_psides *si)
     SX_gs.render_2d_2d           = PLOT_VECTOR;
     SX_gs.render_3d_1d           = PLOT_MESH;
     SX_gs.show_mouse_location    = FALSE;
-    SX_gs.show_mouse_location_x  = 0.025;
-    SX_gs.show_mouse_location_y  = 0.955;
+    SX_gs.show_mouse_x[0]        = 0.025;
+    SX_gs.show_mouse_x[1]        = 0.955;
     SX_gs.smooth_method          = CSTRSAVE("averaging");
-    SX_gs.view_angle[0]                  = 0.0;
+    SX_gs.view_angle[0]          = 0.0;
 
     SX_gs.gri_title            = CSTRSAVE("PDBView Controls");
     SX_gs.gri_type_face        = CSTRSAVE("helvetica");
@@ -1250,22 +1250,22 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "console-origin-x",
                   "Variable: X comp of console origin (frac of screen width)\n     Usage: console-origin-x <real>",
                   SS_acc_double,
-                  &SX_gs.console_x);
+                  &SX_gs.console_x[0]);
 
     SS_install_cf(si, "console-origin-y",
                   "Variable: Y comp of console origin (frac of screen width)\n     Usage: console-origin-y <real>",
                   SS_acc_double,
-                  &SX_gs.console_y);
+                  &SX_gs.console_x[1]);
 
     SS_install_cf(si, "console-width",
                   "Variable: Console width in fraction of screen width\n     Usage: console-width <real>",
                   SS_acc_double,
-                  &SX_gs.console_width);
+                  &SX_gs.console_dx[0]);
 
     SS_install_cf(si, "console-height",
                   "Variable: Console height in fraction of screen width\n     Usage: console-height <real>",
                   SS_acc_double,
-                  &SX_gs.console_height);
+                  &SX_gs.console_dx[1]);
 
     SS_install_cf(si, "contour-n-levels",
                   "Variable: Default number of contour levels to plot\n     Usage: contour-n-levels <int>",
@@ -1619,12 +1619,12 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "show-mouse-location-x",
                   "Variable: Controls location of mouse posision display\n     Usage: show-mouse-location-x <real>",
                   SS_acc_double,
-                  &SX_gs.show_mouse_location_x);
+                  &SX_gs.show_mouse_x[0]);
 
     SS_install_cf(si, "show-mouse-location-y",
                   "Variable: Controls location of mouse posision display\n     Usage: show-mouse-location-y <real>",
                   SS_acc_double,
-                  &SX_gs.show_mouse_location_y);
+                  &SX_gs.show_mouse_x[1]);
 
     SS_install_cf(si, "smooth-method",
                   "Variable: Method for smooth functions\n     Usage: smooth-method \"fft\" | \"averaging\" | \"tchebyshev\" | \"least-sqr\"",
@@ -1679,7 +1679,7 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "view-height",
                   "Variable: Viewport height in fraction of screen height\n     Usage: view-height <real>",
                   SS_acc_double,
-                  &SX_gs.view_height);
+                  &SX_gs.view_dx[1]);
 
     SS_install_cf(si, "view-origin-x",
                   "Variable: X comp of viewport origin (frac of window width)\n     Usage: view-origin-x <real>",
@@ -1694,7 +1694,7 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "view-width",
                   "Variable: Viewport width in fraction of screen width\n     Usage: view-width <real>",
                   SS_acc_double,
-                  &SX_gs.view_width);
+                  &SX_gs.view_dx[0]);
 
 
 /* UVWXYZ */

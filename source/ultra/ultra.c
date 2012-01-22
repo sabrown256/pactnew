@@ -91,8 +91,8 @@ void UL_init_view(SS_psides *si)
     SX_gs.view_x[4]       = 0.0;
     SX_gs.view_x[5]       = 1.0;
 
-    SX_gs.view_width        = 0.75;
-    SX_gs.view_height       = 0.75;
+    SX_gs.view_dx[0]        = 0.75;
+    SX_gs.view_dx[1]        = 0.75;
     SX_gs.view_aspect       = 1.0;
     SX_gs.window_x[0]       = 0.5;
     SX_gs.window_x[1]       = 0.1;
@@ -101,12 +101,12 @@ void UL_init_view(SS_psides *si)
     SX_gs.window_dx_P[0]    = 1.0;
     SX_gs.window_dx_P[1]    = 1.0;
 
-    SX_gs.console_x         = 0.0;
-    SX_gs.console_y         = 0.0;
-    SX_gs.console_width     = 0.33;
-    SX_gs.console_height    = 0.33;
+    SX_gs.console_x[0]      = 0.0;
+    SX_gs.console_x[1]      = 0.0;
+    SX_gs.console_dx[0]     = 0.33;
+    SX_gs.console_dx[1]     = 0.33;
 
-    SX_gs.console_type     = CSTRSAVE("MONOCHROME");
+    SX_gs.console_type       = CSTRSAVE("MONOCHROME");
     SX_gs.text_output_format = CSTRSAVE("%13.6e");
 
     SX_gs.display_name  = CSTRSAVE("WINDOW");
@@ -862,9 +862,10 @@ object *UL_mode_text(SS_psides *si)
    {object *ret;
 
     if (PG_console_device == NULL)
-       PG_open_console("ULTRA II", SX_gs.console_type, SX_gs.background_color_white,
-                       SX_gs.console_x, SX_gs.console_y,
-                       SX_gs.console_width, SX_gs.console_height);
+       PG_open_console("ULTRA II", SX_gs.console_type,
+		       SX_gs.background_color_white,
+                       SX_gs.console_x[0], SX_gs.console_x[1],
+                       SX_gs.console_dx[0], SX_gs.console_dx[1]);
 
     if (SX_gs.graphics_device != NULL)
        {PG_clear_window(SX_gs.graphics_device);
@@ -914,8 +915,8 @@ object *UL_mode_graphics(SS_psides *si)
     if (PG_console_device == NULL)
        {if (!PG_open_console("ULTRA II", SX_gs.console_type,
                              SX_gs.background_color_white,
-                             SX_gs.console_x, SX_gs.console_y,
-                             SX_gs.console_width, SX_gs.console_height))
+                             SX_gs.console_x[0], SX_gs.console_x[1],
+                             SX_gs.console_dx[0], SX_gs.console_dx[1]))
            {PRINT(STDOUT, "\nCannot connect to display\n\n");};}
 
     if (SX_gs.graphics_device == NULL)

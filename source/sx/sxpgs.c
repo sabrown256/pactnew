@@ -944,8 +944,8 @@ void SX_motion_event_handler(PG_device *dev, PG_event *ev)
 
     if (SX_gs.show_mouse_location)
        PG_print_pointer_location(dev,
-                                 SX_gs.show_mouse_location_x,
-                                 SX_gs.show_mouse_location_y,
+                                 SX_gs.show_mouse_x[0],
+                                 SX_gs.show_mouse_x[1],
                                  TRUE);
     return;}
 

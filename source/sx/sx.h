@@ -569,10 +569,8 @@ struct s_SX_global_state
     int show_mouse_location;
     int log_scale[PG_SPACEDM];
 
-    double console_x;
-    double console_y;
-    double console_width;
-    double console_height;
+    double console_x[PG_SPACEDM];
+    double console_dx[PG_SPACEDM];
     double gwc[PG_BOXSZ];
     double gpad[PG_BOXSZ];
     double window_x[PG_SPACEDM];
@@ -581,12 +579,10 @@ struct s_SX_global_state
     double window_dx_P[PG_SPACEDM];
 
     double marker_orientation;
-    double show_mouse_location_x;
-    double show_mouse_location_y;
-    double view_x[PG_BOXSZ];
-    double view_width;
-    double view_height;
+    double show_mouse_x[PG_SPACEDM];
     double view_aspect;
+    double view_x[PG_BOXSZ];
+    double view_dx[PG_SPACEDM];
     double view_angle[PG_SPACEDM];
 
     char *text_output_format;
