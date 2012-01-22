@@ -551,9 +551,9 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 	PG_register_variable("Mouse", SC_INT_S, 
 			     &SX_gs.show_mouse_location, NULL, NULL);
 	PG_register_variable("X Location", SC_DOUBLE_S,
-			     &SX_gs.show_mouse_location_x, NULL, NULL);
+			     &SX_gs.show_mouse_x[0], NULL, NULL);
 	PG_register_variable("Y Location", SC_DOUBLE_S,
-			     &SX_gs.show_mouse_location_y, NULL, NULL);
+			     &SX_gs.show_mouse_x[1], NULL, NULL);
 
 /* output controls */
         for (i = 0; i < N_OUTPUT_DEVICES; i++)

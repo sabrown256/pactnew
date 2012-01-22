@@ -107,8 +107,8 @@ void SX_init_view(SS_psides *si)
     SX_gs.view_x[4]       = 0.0;
     SX_gs.view_x[5]       = 1.0;
 
-    SX_gs.view_width      = 0.75;
-    SX_gs.view_height     = 0.75;
+    SX_gs.view_dx[0]      = 0.75;
+    SX_gs.view_dx[1]      = 0.75;
     SX_gs.view_aspect     = 1.0;
     SX_gs.window_x[0]     = 0.5;
     SX_gs.window_x[1]     = 0.1;
@@ -527,11 +527,11 @@ int SX_command(SS_psides *si, char *file, char *cmd)
 /* initialize SX
  * the following variables must be initialized before SX_init
  */
-	SX_gs.console_type     = CSTRSAVE("MONOCHROME");
-	SX_gs.console_x        = 0.0;
-	SX_gs.console_y        = 0.0;
-	SX_gs.console_width    = 0.33;
-	SX_gs.console_height   = 0.33;
+	SX_gs.console_type           = CSTRSAVE("MONOCHROME");
+	SX_gs.console_x[0]           = 0.0;
+	SX_gs.console_x[1]           = 0.0;
+	SX_gs.console_dx[0]          = 0.33;
+	SX_gs.console_dx[1]          = 0.33;
 	SX_gs.background_color_white = TRUE;
 
 	SX_init(PCODE, VERSION, 0, NULL, NULL);

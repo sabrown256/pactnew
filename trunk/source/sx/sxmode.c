@@ -47,8 +47,8 @@ static void SX_set_graphics_state(PG_device *d)
 /* view width and height are set by users so push it
  * into the view_x box
  */
-    SX_gs.view_x[1] = SX_gs.view_x[0] + SX_gs.view_width;
-    SX_gs.view_x[3] = SX_gs.view_x[2] + SX_gs.view_height;
+    SX_gs.view_x[1] = SX_gs.view_x[0] + SX_gs.view_dx[0];
+    SX_gs.view_x[3] = SX_gs.view_x[2] + SX_gs.view_dx[1];
 
     d->view_aspect  = SX_gs.view_aspect;
 
@@ -296,9 +296,10 @@ object *SX_mode_text(SS_psides *si)
    {object *ret;
 
     if (PG_console_device == NULL)
-       PG_open_console("PDBView", SX_gs.console_type, SX_gs.background_color_white,
-                       SX_gs.console_x, SX_gs.console_y,
-                       SX_gs.console_width, SX_gs.console_height);
+       PG_open_console("PDBView", SX_gs.console_type,
+		       SX_gs.background_color_white,
+                       SX_gs.console_x[0], SX_gs.console_x[1],
+                       SX_gs.console_dx[0], SX_gs.console_dx[1]);
 
     if (SX_gs.graphics_device != NULL)
        {PG_clear_window(SX_gs.graphics_device);
@@ -365,7 +366,7 @@ void SX_setup_viewspace(PG_device *dev, double mh)
  * it does this by preserving SX_gs.view_x
  */
     if (traditional == TRUE)
-       {nvh  = SX_gs.view_height/(1.0 + labsp);
+       {nvh  = SX_gs.view_dx[1]/(1.0 + labsp);
 	nvoy = (obx[2] + labsp)/(1.0 + labsp);
 
 	SX_gs.view_x[2] = nvoy;
@@ -375,7 +376,7 @@ void SX_setup_viewspace(PG_device *dev, double mh)
 	dev->view_x[3] = nvoy + nvh;
 
 /* set the old school state */
-/*        SX_gs.view_height    = nvh; */
+/*        SX_gs.view_dx[1]    = nvh; */
 	SX_gs.window_dx[1] *= mh;}
 
 /* this way make better use of space as the window is
@@ -393,7 +394,7 @@ void SX_setup_viewspace(PG_device *dev, double mh)
 	dev->view_x[3] = nvoy + nvh;
 
 /* set the old school state */
-	SX_gs.view_height    = nvh;
+	SX_gs.view_dx[1]    = nvh;
 	SX_gs.window_dx[1] *= mh;};
 
     return;}
@@ -412,8 +413,8 @@ object *SX_mode_graphics(SS_psides *si)
     if (PG_console_device == NULL)
        {if (!PG_open_console("PDBView", SX_gs.console_type,
                              SX_gs.background_color_white,
-                             SX_gs.console_x, SX_gs.console_y,
-                             SX_gs.console_width, SX_gs.console_height))
+                             SX_gs.console_x[0], SX_gs.console_x[1],
+                             SX_gs.console_dx[1], SX_gs.console_dx[1]))
            {if (!SX_gs.qflag)
                PRINT(STDOUT, "\nCannot connect to display\n");};}
 

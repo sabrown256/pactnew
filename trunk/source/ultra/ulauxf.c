@@ -721,8 +721,8 @@ static void UL_mark_curve_points(double **x, int n, char *indx)
     while (ok == TRUE)
        {PG_query_pointer(dev, ir, &btn, &mod);
 	PG_print_pointer_location(dev,
-				  SX_gs.show_mouse_location_x,
-				  SX_gs.show_mouse_location_y,
+				  SX_gs.show_mouse_x[0],
+				  SX_gs.show_mouse_x[1],
 				  TRUE);
         if (btn)
 	   {im[0] = ir[0];
