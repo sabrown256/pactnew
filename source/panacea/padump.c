@@ -20,16 +20,7 @@ typedef struct s_PA_domain_spec PA_domain_spec;
 
 int
  max_domains,
- n_domains,
- N_time_plots,
- N_unique_variables;
-
-double
- *t_data;
-
-char
- *PAN_EDIT = NULL,
- *PAN_PLOT_REQ = NULL;
+ n_domains;
 
 PA_domain_spec
  *domain_list;
@@ -93,11 +84,11 @@ PA_plot_request *_PA_splice_out_request(PA_plot_request *pr,
    {PA_plot_request *ths, *prv, *nxt;
 
     prv = NULL;
-    for (ths = plot_reqs; ths != NULL; ths = nxt)
+    for (ths = PA_gs.plot_reqs; ths != NULL; ths = nxt)
         {nxt = ths->next;
          if (ths == pr)
             {if (prv == NULL)
-                plot_reqs = nxt;
+                PA_gs.plot_reqs = nxt;
              else
                 prv->next = nxt;
              break;};
@@ -184,11 +175,11 @@ static int _PA_init_time_plot(PA_plot_request *pr,
 
     pp = PA_inquire_variable(pr->range_name);
 
-/* if it's not in PA_variable_tab skip it or has no data pointer attached */
+/* if it's not in PA_gs.variable_tab skip it or has no data pointer attached */
     if ((pp == NULL) && (pr->data == NULL))
        return(itu);
 
-/* this is a way of handling the unit problem in the post-processor */
+/* this is a way of handling the PA_gs.units problem in the post-processor */
     if (pp != NULL)
        {dtype = pp->desc->type;
         pr->data_type = SC_type_id(dtype, FALSE);
@@ -205,7 +196,7 @@ static int _PA_init_time_plot(PA_plot_request *pr,
 
 /* splice the PSEUDO variable time plots into the package pseudo lists
  * this must be done before the package initializers are called because
- * they are supposed to have the opportunity to work over the PSEUDO
+ * they are supposed to have the opportPA_gs.unitsy to work over the PSEUDO
  * plot requests before anything is plotted
  */
        {pp = PA_inquire_variable(pr->range_name);
@@ -239,65 +230,65 @@ static void _PA_init_time_plots(char *ppname)
     PA_package *pck;
 
 /* count the number of time plots */
-    for (pr = plot_reqs; pr != NULL; pr = pr->next)
+    for (pr = PA_gs.plot_reqs; pr != NULL; pr = pr->next)
         {if (_PA_time_plotp(pr))
-            {N_time_plots++;
+            {PA_gs.n_time_plots++;
              pr->time_plot = TRUE;};};             
 
 /* count the number of time plots on the packages (restart has this) */
-    for (pck = Packages; pck != NULL; pck = pck->next)
+    for (pck = PA_gs.packages; pck != NULL; pck = pck->next)
         for (pr = pck->pseudo_pr; pr != NULL; pr = pr->next)
 	    {if (_PA_time_plotp(pr))
-	        {N_time_plots++;
+	        {PA_gs.n_time_plots++;
 		 pr->time_plot = TRUE;};};             
 
-    if (N_time_plots <= 0)
+    if (PA_gs.n_time_plots <= 0)
        return;
 
     if (ppname != NULL)
-       {PA_pp_file = PD_open(ppname, "w");
+       {PA_gs.pp_file = PD_open(ppname, "w");
 	PRINT(stdout, "Post processor file %s opened\n", ppname);
 
-	PD_set_offset(PA_pp_file, PA_get_default_offset());}
+	PD_set_offset(PA_gs.pp_file, PA_get_default_offset());}
     else
-       PA_pp_file = NULL;
+       PA_gs.pp_file = NULL;
 
-    PA_current_pp_cycle = -1;
+    PA_gs.current_pp_cycle = -1;
 
 /* allow for t in the data stripe */
     n_dom = 1;
-    labels  = CMAKE_N(char *, N_time_plots);
-    members = CMAKE_N(char *, N_time_plots+1);
+    labels  = CMAKE_N(char *, PA_gs.n_time_plots);
+    members = CMAKE_N(char *, PA_gs.n_time_plots+1);
 
     itu = n_dom;
     snprintf(bf, MAXLINE, "t");
     members[0] = CSTRSAVE(bf);
 
 /* finish the curve arrays for the packages */
-    for (pck = Packages; pck != NULL; pck = pck->next)
+    for (pck = PA_gs.packages; pck != NULL; pck = pck->next)
         for (pr = pck->pseudo_pr; pr != NULL; pr = pr->next)
 	    {if (pr->time_plot)
 	        itu = _PA_init_time_plot(pr, members, labels, itu, FALSE);};
 
 /* finish the curve arrays and fill in the name and number arrays */
-    for (pr = plot_reqs; pr != NULL; pr = nxt)
+    for (pr = PA_gs.plot_reqs; pr != NULL; pr = nxt)
         {nxt = pr->next;
          if (pr->time_plot)
 	    itu = _PA_init_time_plot(pr, members, labels, itu, TRUE);};
 
-    if (PA_pp_file != NULL)
-       PA_th_def_rec(PA_pp_file, "time_data", "time_stripe",
+    if (PA_gs.pp_file != NULL)
+       PA_th_def_rec(PA_gs.pp_file, "time_data", "time_stripe",
                      itu, members, labels);
 
     CFREE(labels);
 
-    for (i = 0; i < N_time_plots; i++)
+    for (i = 0; i < PA_gs.n_time_plots; i++)
         CFREE(members[i]);
     CFREE(members);
 
-    if (N_time_plots > 0)
-       {N_unique_variables = itu;
-        t_data = CMAKE_N(double, N_unique_variables);};
+    if (PA_gs.n_time_plots > 0)
+       {PA_gs.n_unique_variables = itu;
+        PA_gs.t_data = CMAKE_N(double, PA_gs.n_unique_variables);};
 
     return;}
 
@@ -336,18 +327,18 @@ static void _PA_dump_time_plots(double tc, double dtc, int cycle)
     void *pv;
     PA_plot_request *pr;
 
-    if (PA_pp_file == NULL)
+    if (PA_gs.pp_file == NULL)
        return;
 
-    if (PA_current_pp_cycle == -1)
-       PD_write(PA_pp_file, "first-cycle", SC_INT_S, &cycle);
+    if (PA_gs.current_pp_cycle == -1)
+       PD_write(PA_gs.pp_file, "first-cycle", SC_INT_S, &cycle);
 
-    PA_current_pp_cycle = cycle;
+    PA_gs.current_pp_cycle = cycle;
 
-    t_data[0] = tc*convrsn[SEC]/unit[SEC];
+    PA_gs.t_data[0] = tc*PA_gs.convrsns[SEC]/PA_gs.units[SEC];
 
 /* write the time plot data */
-    for (pr = plot_reqs; pr != NULL; pr = pr->next)
+    for (pr = PA_gs.plot_reqs; pr != NULL; pr = pr->next)
         {if ((pr->time_plot) && (pr->status != PSEUDO))
             {pv = (void *) pr->data;
              if (pv == NULL)
@@ -358,15 +349,15 @@ static void _PA_dump_time_plots(double tc, double dtc, int cycle)
 
              d = _PA_array_ref_i(pv, pr->data_index, pr->data_type);
 
-             t_data[pr->str_index] = pr->conv*d;};};
+             PA_gs.t_data[pr->str_index] = pr->conv*d;};};
 
 /* if appropriate append to the time history data */
-    if (N_unique_variables > 0)
-       PA_th_write(PA_pp_file, "time_data", "time_stripe", cycle, 1, t_data);
+    if (PA_gs.n_unique_variables > 0)
+       PA_th_write(PA_gs.pp_file, "time_data", "time_stripe", cycle, 1, PA_gs.t_data);
 
 /* zero out the time data stripe */
-    for (i = 0; i < N_unique_variables; i++)
-        t_data[i] = 0.0;
+    for (i = 0; i < PA_gs.n_unique_variables; i++)
+        PA_gs.t_data[i] = 0.0;
 
     return;}
 
@@ -479,11 +470,11 @@ static void _PA_dump_mappings(double tc, double dtc, int cycle)
              if (s == NULL)
                 continue;
 
-             PA_put_set(PA_pva_file, s);
+             PA_put_set(PA_gs.pva_file, s);
              PM_rel_set(s, FALSE);};};
 
     if (_PA.build_mapping != NULL)
-       {for (pr = plot_reqs; pr != NULL; pr = pr->next)
+       {for (pr = PA_gs.plot_reqs; pr != NULL; pr = pr->next)
             {if ((pr->status == PSEUDO) || pr->time_plot)
                 continue;
 
@@ -491,7 +482,7 @@ static void _PA_dump_mappings(double tc, double dtc, int cycle)
                 continue;
 
              f = (*_PA.build_mapping)(pr, tc);
-             PA_put_mapping(NULL, PA_pva_file, f, PLOT_NONE);};};
+             PA_put_mapping(NULL, PA_gs.pva_file, f, PLOT_NONE);};};
 
     return;}
 
@@ -530,7 +521,7 @@ void _PA_dump_package_mappings(PA_package *pck, double t, double dt,
          f = build_mapping(pr, t);
          if (f != NULL)
             {PM_find_extrema(f->range);
-             PA_put_mapping(NULL, PA_pva_file, f, PLOT_NONE);};
+             PA_put_mapping(NULL, PA_gs.pva_file, f, PLOT_NONE);};
 
          PM_rel_set(pr->data, FALSE);
          pr->data = NULL;};
@@ -1289,8 +1280,8 @@ static void _PA_init_mappings(char *ppname)
    {PA_plot_request *pr, *nxt;
     PFPreMap hook;
 
-    PAN_EDIT     = CSTRDUP("edit_variable", 3);
-    PAN_PLOT_REQ = CSTRDUP("PA_plot_reqest", 3);
+    PA_gs.edit     = CSTRDUP("edit_variable", 3);
+    PA_gs.plot_req = CSTRDUP("PA_plot_reqest", 3);
 
     _PA_init_time_plots(ppname);
 
@@ -1298,7 +1289,7 @@ static void _PA_init_mappings(char *ppname)
     if (hook == NULL)
        hook = _PA_begin_premap;
 
-    for (pr = plot_reqs; pr != NULL; pr = nxt)
+    for (pr = PA_gs.plot_reqs; pr != NULL; pr = nxt)
         {nxt = pr->next;
          if (pr->time_plot)
             continue;
@@ -1331,21 +1322,21 @@ void _PA_init_pp(char *ppname, char *gfname)
     if (_PA.build_mapping == NULL)
        _PA.build_mapping = _PA_build_mapping;
 
-    N_time_plots       = 0;
-    N_unique_variables = 0;
+    PA_gs.n_time_plots       = 0;
+    PA_gs.n_unique_variables = 0;
     n_maps = 0;
 
 /* count the number of plot requests */
-    for (pr = plot_reqs; pr != NULL; pr = pr->next, n_maps++);
+    for (pr = PA_gs.plot_reqs; pr != NULL; pr = pr->next, n_maps++);
 
 /* count the number of plot requests on the packages (restart has this) */
-    for (pck = Packages; pck != NULL; pck = pck->next)
+    for (pck = PA_gs.packages; pck != NULL; pck = pck->next)
         for (pr = pck->pseudo_pr; pr != NULL; pr = pr->next, n_maps++);
 
     if (n_maps > 0)
        {_PA_init_mappings(ppname);
 
-        n_maps -= N_time_plots;
+        n_maps -= PA_gs.n_time_plots;
         if ((gfname != NULL) && (n_maps > 0))
 	   {hook = PA_GET_FUNCTION(PFNeedPVA, "need-pva-file");
 	    if (hook != NULL)
@@ -1354,8 +1345,8 @@ void _PA_init_pp(char *ppname, char *gfname)
 	       ok = TRUE;
 
 	    if (ok)
-	       {PA_pva_file = PA_open(gfname, "w", FALSE);
-		PA_ERR(!PD_def_mapping(PA_pva_file),
+	       {PA_gs.pva_file = PA_open(gfname, "w", FALSE);
+		PA_ERR(!PD_def_mapping(PA_gs.pva_file),
 		       "CAN`T DEFINE MAPPINGS - _PA_INIT_PP");
 		PRINT(stdout, "PVA file %s opened\n", gfname);};};};
 
@@ -1381,7 +1372,7 @@ void _PA_init_pp(char *ppname, char *gfname)
 void _PA_scan_pp(void)
    {PA_plot_request *pr;
 
-    for (pr = plot_reqs; pr != NULL; pr = pr->next)
+    for (pr = PA_gs.plot_reqs; pr != NULL; pr = pr->next)
         PA_get_range_info(pr);
 
     return;}
@@ -1394,14 +1385,14 @@ void _PA_scan_pp(void)
 void PA_dump_pp(double t, double dt, int cycle)
    {double conv_fac, tc, dtc;
 
-    conv_fac = convrsn[SEC]/unit[SEC];
+    conv_fac = PA_gs.convrsns[SEC]/PA_gs.units[SEC];
     tc       = t*conv_fac;
     dtc      = dt*conv_fac;
 
-    if (N_time_plots > 0)
+    if (PA_gs.n_time_plots > 0)
        _PA_dump_time_plots(tc, dtc, cycle);
 
-    if (plot_reqs != NULL)
+    if (PA_gs.plot_reqs != NULL)
        _PA_dump_mappings(tc, dtc, cycle);
 
     return;}

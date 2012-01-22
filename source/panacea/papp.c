@@ -13,12 +13,9 @@
 #define NCURVE 100
 
 PDBfile
- *PA_pva_file,
- *PA_pp_file,
  *pduf;
 
 int
- PA_current_pp_cycle = -1,
  first_cycle = 0,
  last_cycle = 0,
  n_curve = 0,
@@ -53,12 +50,12 @@ static void _PA_next_uf(char *ufname, int flag)
 
 /* find the first cycle number */
     first_cycle = 0;
-    if (!PD_read(PA_pp_file, "first-cycle", &first_cycle))
+    if (!PD_read(PA_gs.pp_file, "first-cycle", &first_cycle))
        return;
 
 /* find the last cycle number */
     last_cycle = 0;
-    if (!PD_read(PA_pp_file, "last-cycle", &last_cycle))
+    if (!PD_read(PA_gs.pp_file, "last-cycle", &last_cycle))
        return;
 
     return;}
@@ -78,12 +75,12 @@ void PA_transpose_pp(char *ppname, int ntp, int nuv)
        return;
 
 /* close the pp file */
-    if (PA_pp_file != NULL)
-       {PD_write(PA_pp_file, "n-time-plots",  SC_INT_S, &ntp);
-        PD_write(PA_pp_file, "n-time-arrays", SC_INT_S, &nuv);
-        PD_write(PA_pp_file, "last-cycle",    SC_INT_S, &PA_current_pp_cycle);
+    if (PA_gs.pp_file != NULL)
+       {PD_write(PA_gs.pp_file, "n-time-plots",  SC_INT_S, &ntp);
+        PD_write(PA_gs.pp_file, "n-time-arrays", SC_INT_S, &nuv);
+        PD_write(PA_gs.pp_file, "last-cycle",    SC_INT_S, &PA_gs.current_pp_cycle);
 
-        PA_ERR(!PD_close(PA_pp_file),
+        PA_ERR(!PD_close(PA_gs.pp_file),
                "TROUBLE CLOSING POST PROCESSOR FILE %s - PA_TRANSPOSE_PP",
                ppname);};
 
@@ -98,8 +95,8 @@ void PA_transpose_pp(char *ppname, int ntp, int nuv)
     ufname = CSTRSAVE(s);
 
 /* open the pp file */
-    PA_pp_file = PD_open(ppname, "r");
-    PA_ERR((PA_pp_file == NULL),
+    PA_gs.pp_file = PD_open(ppname, "r");
+    PA_ERR((PA_gs.pp_file == NULL),
            "CAN'T OPEN THE POST PROCESSOR FILE %s - PA_TRANSPOSE_PP",
            ppname);
 
@@ -113,11 +110,11 @@ void PA_transpose_pp(char *ppname, int ntp, int nuv)
            "TROUBLE CLOSING ULTRA FILE %s - PA_TRANSPOSE_PP", ufname);
     printf("Ultra file %s closed\n", ufname);
 
-    PA_ERR(!PD_close(PA_pp_file),
+    PA_ERR(!PD_close(PA_gs.pp_file),
            "TROUBLE CLOSING POST PROCESSOR FILE %s - PA_TRANSPOSE_PP",
            ppname);
 
-    PA_pp_file = NULL;
+    PA_gs.pp_file = NULL;
     pduf = NULL;
 
     return;}
@@ -160,14 +157,14 @@ static void _PA_t_wr_data(int fcyc, int nfirst, int nlast, int n_dom)
 /* read in the domain data */
         {if (n_dom > 0)
             {snprintf(_PA.pp_title, MAXLINE, "td%d[0:%d]", i+fcyc, n_dom);
-             PA_ERR(!PD_read(PA_pp_file, _PA.pp_title, stripe),
+             PA_ERR(!PD_read(PA_gs.pp_file, _PA.pp_title, stripe),
                     "EXPECTED DOMAIN DATA UNDER %s - _PA_T_WR_DATA",
                     _PA.pp_title);};
 
 /* read in the range data */
          snprintf(_PA.pp_title, MAXLINE, "td%d[%d:%d]",
                  i+fcyc, nfirst + n_dom, nlast + n_dom);
-         PA_ERR(!PD_read(PA_pp_file, _PA.pp_title, stripe + n_dom),
+         PA_ERR(!PD_read(PA_gs.pp_file, _PA.pp_title, stripe + n_dom),
                 "EXPECTED TIME PLOT DATA UNDER %s - _PA_T_WR_DATA",
                 _PA.pp_title);
 
@@ -226,18 +223,18 @@ void _PA_proc_time(char *ufname)
     long ind[3];
 
 /* find the number of time plots */
-    if (!PD_read(PA_pp_file, "n-time-plots", &nt))
+    if (!PD_read(PA_gs.pp_file, "n-time-plots", &nt))
        return;
     if (nt < 1)
        return;
 
 /* find the number of time data arrays */
-    if (!PD_read(PA_pp_file, "n-time-arrays", &ntu))
+    if (!PD_read(PA_gs.pp_file, "n-time-arrays", &ntu))
        return;
 
 /* find the number of time domain data arrays */
     nd = 0;
-    if (!PD_read(PA_pp_file, "n-time-domains", &n_dom))
+    if (!PD_read(PA_gs.pp_file, "n-time-domains", &n_dom))
        n_dom = 2;
 
 /* process the time plot tags */
@@ -247,7 +244,7 @@ void _PA_proc_time(char *ufname)
     for (it = 0; it < nt; it++)
         {snprintf(_PA.pp_title, MAXLINE, "tt%d", it);                     /* read the tag */
 
-         PA_ERR(!PD_read(PA_pp_file, _PA.pp_title, _PA.pp_bf),
+         PA_ERR(!PD_read(PA_gs.pp_file, _PA.pp_title, _PA.pp_bf),
                 "EXPECTED TIME PLOT %s - PROC-TIME", _PA.pp_title);
 
 /* enter the ultra tag */
@@ -264,7 +261,7 @@ void _PA_proc_time(char *ufname)
             break;
 
 /* copy the label */
-         PA_ERR(!PD_read(PA_pp_file, labl, _PA.pp_ubf),
+         PA_ERR(!PD_read(PA_gs.pp_file, labl, _PA.pp_ubf),
                 "BAD LABEL - PROC-TIME");
          ind[1] = strlen(_PA.pp_ubf) + 1;
          PD_write_alt(pduf, labl, SC_CHAR_S, _PA.pp_ubf, 1, ind);

@@ -54,7 +54,7 @@ void PA_gencmd(void)
     PA_inst_c("package",    none, FALSE, 0, (PFVoid) PA_packh,  PA_zargs);
     PA_inst_c("switch",     none, FALSE, 0, (PFVoid) PA_pshand, PA_sargs);
     PA_inst_c("parameter",  none, FALSE, 0, (PFVoid) PA_pshand, PA_sargs);
-    PA_inst_c("unit",       none, FALSE, 0, (PFVoid) PA_pshand, PA_sargs);
+    PA_inst_c("PA_gs.units",       none, FALSE, 0, (PFVoid) PA_pshand, PA_sargs);
     PA_inst_c("conversion", none, FALSE, 0, (PFVoid) PA_pshand, PA_sargs);
     PA_inst_c("name",       none, FALSE, 0, (PFVoid) PA_pshand, PA_sargs);
 
@@ -63,23 +63,23 @@ void PA_gencmd(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PA_DEFUN - define units for PANACEA */
+/* PA_DEFUN - define PA_gs.unitss for PANACEA */
 
 void PA_defunc(void )
    {
 
-    PA_radian          = PA_def_unit(1.0, UNITS);
-    PA_steradian       = PA_def_unit(1.0, UNITS);
-    PA_mole            = PA_def_unit(1.0, UNITS);
-    PA_electric_charge = PA_def_unit(1.0, UNITS);
-    PA_cm              = PA_def_unit(1.0, UNITS);
-    PA_sec             = PA_def_unit(1.0, UNITS);
-    PA_gram            = PA_def_unit(1.0, UNITS);
-    PA_eV              = PA_def_unit(1.0, UNITS);
-    PA_kelvin          = PA_def_unit(1.0, UNITS);
+    PA_gs.radian          = PA_def_unit(1.0, UNITS);
+    PA_gs.steradian       = PA_def_unit(1.0, UNITS);
+    PA_gs.mole            = PA_def_unit(1.0, UNITS);
+    PA_gs.electric_charge = PA_def_unit(1.0, UNITS);
+    PA_gs.cm              = PA_def_unit(1.0, UNITS);
+    PA_gs.sec             = PA_def_unit(1.0, UNITS);
+    PA_gs.gram            = PA_def_unit(1.0, UNITS);
+    PA_gs.eV              = PA_def_unit(1.0, UNITS);
+    PA_gs.kelvin          = PA_def_unit(1.0, UNITS);
   
-    PA_erg             = PA_def_unit(1.0, G, CM, CM, PER, SEC, SEC, UNITS);
-    PA_cc              = PA_def_unit(1.0, CM, CM, CM, UNITS);
+    PA_gs.erg             = PA_def_unit(1.0, G, CM, CM, PER, SEC, SEC, UNITS);
+    PA_gs.cc              = PA_def_unit(1.0, CM, CM, CM, UNITS);
 
     return;}
 

@@ -211,8 +211,8 @@ static object *_SXI_pan_simulate(SS_psides *si, object *argl)
             SC_STRING_I, &_SX.gfname,
             0);
 
-    ti *= unit[SEC]/convrsn[SEC];
-    tf *= unit[SEC]/convrsn[SEC];
+    ti *= PA_gs.units[SEC]/PA_gs.convrsns[SEC];
+    tf *= PA_gs.units[SEC]/PA_gs.convrsns[SEC];
 
     pt  = (double *) SS_var_reference(si, "current-time");
     pdt = (double *) SS_var_reference(si, "current-timestep");
@@ -329,27 +329,27 @@ static object *_SXI_advance_time(SS_psides *si, object *argl)
                     SC_DOUBLE_I, &t3,
                     0);
 
-    tconv = unit[SEC]/convrsn[SEC];
+    tconv = PA_gs.units[SEC]/PA_gs.convrsns[SEC];
     t1   *= tconv;
     t2   *= tconv;
     t3   *= tconv;
     switch (nargs)
        {case 0  : dt = HUGE;
-                  for (pck = Packages; pck != NULL; pck = pck->next)
+                  for (pck = PA_gs.packages; pck != NULL; pck = pck->next)
                       {pck_dt = pck->dt;
                        dt = min(pck_dt, dt);};
                   break;
         case 1  : dt = t1;
                   break;
         case 2  : dt = HUGE;
-                  for (pck = Packages; pck != NULL; pck = pck->next)
+                  for (pck = PA_gs.packages; pck != NULL; pck = pck->next)
                       {pck_dt = pck->dt;
                        dt = min(pck_dt, dt);};
                   dt = min(dt, t1);
                   dt = max(dt, t2);
                   break;
         default : dt = t1;
-                  for (pck = Packages; pck != NULL; pck = pck->next)
+                  for (pck = PA_gs.packages; pck != NULL; pck = pck->next)
                       {pck_dt = pck->dt;
                        dt = min(pck_dt, dt);};
                   dt = min(dt, t2);
@@ -366,8 +366,8 @@ static object *_SXI_advance_time(SS_psides *si, object *argl)
 /* _SX_INDEX_PTR - get the next dimension index pointer from the list
  *               - return special values if the dimension name matches
  *               -   "dimension"     - NULL
- *               -   "upper-lower"   - PA_DUL
- *               -   "offset-number" - PA_DON
+ *               -   "upper-lower"   - PA_gs.dul
+ *               -   "offset-number" - PA_gs.don
  *               - also return NULL on error
  */
 
@@ -382,13 +382,13 @@ static int *_SX_index_ptr(SS_psides *si, object **pargl, char *msg)
        rv = NULL;
 
     else if (strcmp(ds, "upper-lower") == 0)
-       rv = PA_DUL;
+       rv = PA_gs.dul;
 
     else if (strcmp(ds, "offset-number") == 0)
-       rv = PA_DON;
+       rv = PA_gs.don;
 
     else
-       {hp = SC_hasharr_lookup(PA_symbol_tab, ds);
+       {hp = SC_hasharr_lookup(PA_gs.symbol_tab, ds);
 	if (hp != NULL)
 	   {if (strcmp(hp->type, "variable") == 0)
 	       rv = (int *) hp->def;
@@ -408,14 +408,14 @@ static int *_SX_index_ptr(SS_psides *si, object **pargl, char *msg)
  *              - (define-variable <name> <type> <init_val> <init_func>
  *              -            <attrribute_spec> ... ATTRIBUTE
  *              -            <dimension_spec> ... DIMENSION
- *              -            <unit_spec> ... UNITS
+ *              -            <PA_gs.units_spec> ... UNITS
  *              -            [<ptr to data>])
  *              -
  *              - <attribute_spec> := <attribute_id> <attribute_val>
  *              - <dimension_spec> := <ptr to # values> |
- *              -                     PA_DUL <ptr to lower> <ptr to upper> |
- *              -                     PA_DON <ptr to offset> <ptr to # elem>
- *              - <unit_spec>      := <unit_index> | PER
+ *              -                     PA_gs.dul <ptr to lower> <ptr to upper> |
+ *              -                     PA_gs.don <ptr to offset> <ptr to # elem>
+ *              - <PA_gs.units_spec>      := <PA_gs.units_index> | PER
  *              -
  *              - The valid attribute_id's are:
  *              -      SCOPE, CLASS, PERSIST, CENTER, ALLOCATION
@@ -435,7 +435,7 @@ static int *_SX_index_ptr(SS_psides *si, object **pargl, char *msg)
  *              - The valid ALLOCATION's are:
  *              -      STATIC, DYNAMIC
  *              -
- *              - The pre-defined unit_index's are:
+ *              - The pre-defined PA_gs.units_index's are:
  *              -      RAD, STER, MOLE, Q, CM, SEC, G, EV, K, ERG, CC
  *              -
  *              - No attributes are required to be set (ATTRIBUTE must appear
@@ -473,20 +473,20 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
     if (!SS_nullobjp(oviv))
        {if (!SS_numbp(oviv))
            {s = SS_get_string(oviv);
-            hp = SC_hasharr_lookup(PA_symbol_tab, s);
+            hp = SC_hasharr_lookup(PA_gs.symbol_tab, s);
             if (strcmp(hp->type, "variable") == 0)
                viv = hp->def;};};
 
     if (!SS_nullobjp(ovif))
        {s = SS_get_string(ovif);
-        hp = SC_hasharr_lookup(PA_symbol_tab, s);
+        hp = SC_hasharr_lookup(PA_gs.symbol_tab, s);
         if (strcmp(hp->type, "procedure") == 0)
            {addr.memaddr = hp->def;
             vif          = (void (*)(void *p, long sz, char *s)) addr.funcaddr;};};
 
 /* make the variable hash table if it doesn't exist yet */
-    if (PA_variable_tab == NULL)
-       PA_variable_tab = SC_make_hasharr(HSZLARGE, DOC, SC_HA_NAME_KEY, 0);
+    if (PA_gs.variable_tab == NULL)
+       PA_gs.variable_tab = SC_make_hasharr(HSZLARGE, DOC, SC_HA_NAME_KEY, 0);
 
     vattr[0] = RUNTIME;
     vattr[1] = OPTL;
@@ -533,19 +533,19 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
         if (maxi == NULL)
            break;
 
-        if (maxi == PA_DUL)
+        if (maxi == PA_gs.dul)
            {mini = _SX_index_ptr(si, &argl, "BAD LOWER INDEX - _SXI_DEF_VAR");
             maxi = _SX_index_ptr(si, &argl, "BAD UPPER INDEX - _SXI_DEF_VAR");
-            meth = *PA_DUL;}
+            meth = *PA_gs.dul;}
 
-        else if (maxi == PA_DON)
+        else if (maxi == PA_gs.don)
            {mini = _SX_index_ptr(si, &argl, "BAD OFFSET - _SXI_DEF_VAR");
             maxi = _SX_index_ptr(si, &argl, "BAD NUMBER - _SXI_DEF_VAR");
-            meth = *PA_DON;}
+            meth = *PA_gs.don;}
 
         else
            {mini = &Zero_I;
-            meth = *PA_DON;};
+            meth = *PA_gs.don;};
 
         next = _PA_mk_dimens(mini, maxi, meth);
         if (vdims == NULL)
@@ -554,7 +554,7 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
            prev->next = next;
         prev = next;};
 
-/* get the units */
+/* get the PA_gs.unitss */
     nu = NULL;
     while (TRUE)
        {SX_GET_INTEGER_FROM_LIST(si, dm, argl,
@@ -593,10 +593,10 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
 
     PA_VARIABLE_DATA(pp) = NULL;
 
-    SC_hasharr_install(PA_variable_tab, vname, pp, PAN_VARIABLE, 3, -1);
+    SC_hasharr_install(PA_gs.variable_tab, vname, pp, PA_gs.variable, 3, -1);
 
 /* install scalars as implicit commands */
-    if ((pp->n_dimensions == 0) && (PA_commands != NULL))
+    if ((pp->n_dimensions == 0) && (PA_gs.command_tab != NULL))
        {void *vaddr;
         int itype;
 
@@ -628,7 +628,7 @@ static object *_SXI_list_pan_pck(SS_psides *si)
 
     lst     = SS_null;
     lst_nxt = SS_null;
-    for (pck = Packages; pck != NULL; pck = pck->next)
+    for (pck = PA_gs.packages; pck != NULL; pck = pck->next)
         {name = pck->name;
          if ((hp = SC_hasharr_lookup(si->symtab, name)) != NULL)
             obj = (object *) hp->def;
@@ -665,7 +665,7 @@ static object *_SXI_intern_packages(SS_psides *si)
 
     lst     = SS_null;
     lst_nxt = SS_null;
-    for (pck = Packages; pck != NULL; pck = pck->next)
+    for (pck = PA_gs.packages; pck != NULL; pck = pck->next)
         {name = pck->name;
          if ((hp = SC_hasharr_lookup(si->symtab, name)) != NULL)
             obj = (object *) hp->def;
@@ -718,7 +718,7 @@ static object *_SXI_pan_cmmnd(SS_psides *si, object *argl)
     o     = SS_f;
     token = SC_strtok(s, " \n\r\t/(", t);
     if (token != NULL)
-       {hp = SC_hasharr_lookup(PA_commands, token);
+       {hp = SC_hasharr_lookup(PA_gs.command_tab, token);
         if (hp != NULL)
            {cp = (PA_command *) hp->def;
             (*(cp->handler))(cp);};
@@ -908,7 +908,7 @@ void SX_install_panacea_funcs(SS_psides *si)
                        "dimension",     SC_STRING_I, "dimension",
                        "upper-lower",   SC_STRING_I, "upper-lower",
                        "offset-number", SC_STRING_I, "offset-number",
-                       "units",         SC_INT_I, -1,
+                       "PA_gs.unitss",         SC_INT_I, -1,
                        "per",           SC_INT_I, -2,
                        "attribute",     SC_INT_I, 102,
                        NULL);
@@ -952,17 +952,17 @@ void SX_install_panacea_funcs(SS_psides *si)
                        "dynamic",       SC_INT_I, -101,
                        NULL);
 
-    SS_install_cv(si, "radian",    &PA_radian,          SC_INT_I);
-    SS_install_cv(si, "steradian", &PA_steradian,       SC_INT_I);
-    SS_install_cv(si, "mole",      &PA_mole,            SC_INT_I);
-    SS_install_cv(si, "Q",         &PA_electric_charge, SC_INT_I);
-    SS_install_cv(si, "cm",        &PA_cm,              SC_INT_I);
-    SS_install_cv(si, "sec",       &PA_sec,             SC_INT_I);
-    SS_install_cv(si, "g",         &PA_gram,            SC_INT_I);
-    SS_install_cv(si, "eV",        &PA_eV,              SC_INT_I);
-    SS_install_cv(si, "K",         &PA_kelvin,          SC_INT_I);
-    SS_install_cv(si, "erg",       &PA_erg,             SC_INT_I);
-    SS_install_cv(si, "cc",        &PA_cc,              SC_INT_I);
+    SS_install_cv(si, "radian",    &PA_gs.radian,          SC_INT_I);
+    SS_install_cv(si, "steradian", &PA_gs.steradian,       SC_INT_I);
+    SS_install_cv(si, "mole",      &PA_gs.mole,            SC_INT_I);
+    SS_install_cv(si, "Q",         &PA_gs.electric_charge, SC_INT_I);
+    SS_install_cv(si, "cm",        &PA_gs.cm,              SC_INT_I);
+    SS_install_cv(si, "sec",       &PA_gs.sec,             SC_INT_I);
+    SS_install_cv(si, "g",         &PA_gs.gram,            SC_INT_I);
+    SS_install_cv(si, "eV",        &PA_gs.eV,              SC_INT_I);
+    SS_install_cv(si, "K",         &PA_gs.kelvin,          SC_INT_I);
+    SS_install_cv(si, "erg",       &PA_gs.erg,             SC_INT_I);
+    SS_install_cv(si, "cc",        &PA_gs.cc,              SC_INT_I);
 
     return;}
 

@@ -10,26 +10,8 @@
  
 #include "panacea_int.h"
  
-hasharr
- *PA_alias_tab,
- *PA_commands;
- 
-PA_plot_request
- *plot_reqs = NULL;
-
-PA_iv_specification
- *iv_spec_lst;
-
-char
- *PA_input_prompt = NULL,
- *PA_strtok_p,
- *PAN_COMMAND;
- 
 int
- ivnum,
- N_graphs,
- N_plots,
- STAND_ALONE;
+ ivnum;
 
 double
  PA_alias_value(char *s);
@@ -49,7 +31,7 @@ void PA_inst_pck_gen_cmmnds(void)
     PFPkgGencmd pck_cmd;
 
 /* loop over all packages */
-    for (pck = Packages; pck != NULL; pck = pck->next)
+    for (pck = PA_gs.packages; pck != NULL; pck = pck->next)
         {pck_cmd  = pck->gencmd;
 
 /* execute the package generator command installers */
@@ -74,7 +56,7 @@ void PA_intern_pck_db(void)
     PFPkgIntrn pck_intrn;
 
 /* loop over all packages */
-    for (pck = Packages; pck != NULL; pck = pck->next)
+    for (pck = PA_gs.packages; pck != NULL; pck = pck->next)
         {pck_intrn = pck->intrn;
 
 /* execute the package variable interners */
@@ -101,8 +83,8 @@ void PA_intern_pck_db(void)
 hasharr *PA_inst_com(void)
    {
 
-    PA_alias_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
-    PAN_COMMAND  = CSTRSAVE("PA_command");
+    PA_gs.alias_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
+    PA_gs.command  = CSTRSAVE("PA_command");
 
 /* this call should be moved into PA_inst_pck_gen_cmmnds */
     PA_gencmd();
@@ -114,7 +96,7 @@ hasharr *PA_inst_com(void)
     PA_definitions();
     PA_variables(FALSE);
 
-    return(PA_commands);}
+    return(PA_gs.command_tab);}
  
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -137,8 +119,8 @@ void PA_inst_c(char *cname, void *cvar, int ctype, int cnum,
 	       PFVoid cproc, PFPanHand chand)
    {PA_command *cp;
  
-    if (PA_commands == NULL)
-       PA_commands  = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
+    if (PA_gs.command_tab == NULL)
+       PA_gs.command_tab  = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
     cp          = CMAKE(PA_command);
     cp->name    = CSTRSAVE(cname);
@@ -148,7 +130,7 @@ void PA_inst_c(char *cname, void *cvar, int ctype, int cnum,
     cp->handler = chand;
     cp->vr      = (int *) cvar;
  
-    SC_hasharr_install(PA_commands, cname, cp, PAN_COMMAND, 3, -1);
+    SC_hasharr_install(PA_gs.command_tab, cname, cp, PA_gs.command, 3, -1);
 
     return;}
  
@@ -167,7 +149,7 @@ void PA_def_alias(char *name, char *type, void *pv)
     else
        v = SC_convert_id(id, NULL, 0, 1, id, pv, 0, 1, 1, FALSE);
 
-    SC_hasharr_install(PA_alias_tab, name, v, type, 3, -1);
+    SC_hasharr_install(PA_gs.alias_tab, name, v, type, 3, -1);
 
     return;}
 
@@ -186,7 +168,7 @@ double PA_alias_value(char *s)
     d = -2.0*HUGE;
 
     if (s != NULL)
-       {hp = SC_hasharr_lookup(PA_alias_tab, s);
+       {hp = SC_hasharr_lookup(PA_gs.alias_tab, s);
 	if (hp == NULL)
 	   {if (SC_numstrp(s))
 	       d = SC_stof(s);}
@@ -221,10 +203,10 @@ void PA_defh(void)
     var = PA_get_field("NAME", "DEFINE", REQU);
 
 /* save the tokenizing delimiter */
-    delim = PA_token_delimiters;
+    delim = PA_gs.token_delimiters;
 
 /* change the tokenizing delimiter for an indefinite string field */
-    PA_token_delimiters = "\n";
+    PA_gs.token_delimiters = "\n";
     val = PA_get_field("BODY", "DEFINE", REQU);
 
 /* strip off leading white space */
@@ -234,7 +216,7 @@ void PA_defh(void)
     val--;
 
 /* restore the tokenizing delimiter */
-    PA_token_delimiters = delim;
+    PA_gs.token_delimiters = delim;
 
     if (SC_fltstrp(val))
        {dv = SC_stof(val);
@@ -318,8 +300,8 @@ void PA_specifyh(void)
             prev = _PA.ivlst;
             ivnum++;};};
     
-    iv_spec_lst = PA_mk_spec(ivident, ivtype, ivfn, ivnum, interp,
-			     first, iv_spec_lst);
+    PA_gs.iv_spec_lst = PA_mk_spec(ivident, ivtype, ivfn, ivnum, interp,
+			     first, PA_gs.iv_spec_lst);
 
     return;}
 
@@ -339,16 +321,16 @@ void PA_sh(void)
         *nxtp = nxt;
         next = SC_mk_pcons(SC_DOUBLE_P_S, nxtp, SC_PCONS_P_S, NULL);
         if (_PA.ivlst == NULL)
-           iv_spec_lst->spec = next;
+           PA_gs.iv_spec_lst->spec = next;
         else
            _PA.ivlst->cdr = (void *) next;
         _PA.ivlst = next;
         ivnum++;};
 
-    PA_ERR((iv_spec_lst == NULL),
+    PA_ERR((PA_gs.iv_spec_lst == NULL),
            "%s", "NO SPECIFICY COMMAND BEFORE SPECIFICATION");
 
-    iv_spec_lst->num = ivnum;
+    PA_gs.iv_spec_lst->num = ivnum;
 
     return;}
 
@@ -458,10 +440,10 @@ void PA_get_commands(FILE *fp, PFGenErr errfnc)
 
     old_stream          = _PA.input_stream;
     _PA.input_stream = fp;
-    if (PA_input_prompt == NULL)
+    if (PA_gs.input_prompt == NULL)
        strcpy(prompt, "-> ");
     else
-       strcpy(prompt, PA_input_prompt);
+       strcpy(prompt, PA_gs.input_prompt);
 
 /* dispatch on commands from the deck */
     while (TRUE)
@@ -480,7 +462,7 @@ void PA_get_commands(FILE *fp, PFGenErr errfnc)
 
 	token = PA_get_field("COMMAND", "PARSE", REQU);
         if (token != NULL)
-           {hp = SC_hasharr_lookup(PA_commands, token);
+           {hp = SC_hasharr_lookup(PA_gs.command_tab, token);
             if (hp != NULL)
                {cp = (PA_command *) hp->def;
                 (*(cp->handler))(cp);}
@@ -519,7 +501,7 @@ char *PA_get_field(char *s, char *t, int optp)
 
     b = (_PA.input_flag) ? _PA.input_bf : NULL;
 
-    token = SC_strtok(b, PA_token_delimiters, PA_strtok_p);
+    token = SC_strtok(b, PA_gs.token_delimiters, PA_gs.strtok_p);
     PA_ERR(((token == NULL) && (optp == REQU)),
            "Bad %s field in %s command\n", s, t);
 
@@ -560,7 +542,7 @@ void _PA_init_cont(void)
     PFPkgDefcnt pck_defcnt;
 
 /* initialize the package controls */
-    for (pck = Packages; pck != NULL; pck = pck->next)
+    for (pck = PA_gs.packages; pck != NULL; pck = pck->next)
         {pck_defcnt = pck->defcnt;
          if (pck_defcnt != NULL)
             (*pck_defcnt)(pck);};
@@ -584,7 +566,7 @@ static int _PA_ha_rl_variable(haelem *hp, void *a)
     ok = SC_haelem_data(hp, &name, &type, (void **) &v, TRUE);
     if (ok == TRUE)
        {ha = (hasharr *) a;
-	if (strcmp(type, PAN_VARIABLE) == 0)
+	if (strcmp(type, PA_gs.variable) == 0)
 	   _PA_rl_variable(v);
         SC_hasharr_remove(ha, name);};
 
@@ -598,13 +580,13 @@ static int _PA_ha_rl_variable(haelem *hp, void *a)
 void PA_clear(void)
    {
 
-    SC_hasharr_foreach(PA_variable_tab, _PA_ha_rl_variable, PA_variable_tab);
+    SC_hasharr_foreach(PA_gs.variable_tab, _PA_ha_rl_variable, PA_gs.variable_tab);
 
-    _PA_rl_spec(iv_spec_lst);
-    _PA_rl_request(plot_reqs);
+    _PA_rl_spec(PA_gs.iv_spec_lst);
+    _PA_rl_request(PA_gs.plot_reqs);
 
-    plot_reqs   = NULL;
-    iv_spec_lst = NULL;
+    PA_gs.plot_reqs   = NULL;
+    PA_gs.iv_spec_lst = NULL;
 
     _PA_init_cont();
 
@@ -654,18 +636,18 @@ void PA_pshand(PA_command *cp)
 
     else if (strcmp(cp->name, "name") == 0)
        {i    = SC_stoi(PA_get_field("INDEX", "NAME", REQU));
-        sval = SC_strtok(NULL, "\n\r", PA_strtok_p);
+        sval = SC_strtok(NULL, "\n\r", PA_gs.strtok_p);
         NAME[i] = CSTRSAVE(sval);}
 
-    else if (strcmp(cp->name, "unit") == 0)
+    else if (strcmp(cp->name, "PA_gs.units") == 0)
        {i    = SC_stoi(PA_get_field("INDEX", "UNIT", REQU));
         fval = PA_alias_value(PA_get_field("VALUE", "UNIT", REQU));
-        unit[i] = fval;}
+        PA_gs.units[i] = fval;}
 
     else if (strcmp(cp->name, "conversion") == 0)
        {i    = SC_stoi(PA_get_field("INDEX", "CONVERSION", REQU));
         fval = PA_alias_value(PA_get_field("VALUE", "CONVERSION", REQU));
-        convrsn[i] = fval;}
+        PA_gs.convrsns[i] = fval;}
 
     else
        {int did;
@@ -693,22 +675,22 @@ void PA_nploth(void)
    {char *spec, *ran, *dom, text[MAXLINE];
     PA_set_spec *range, *domain;
 
-    N_graphs++;
+    PA_gs.n_graphs++;
 
-    spec = SC_strtok(NULL, "\n", PA_strtok_p);
+    spec = SC_strtok(NULL, "\n", PA_gs.strtok_p);
     if (spec != NULL)
        strcpy(text, spec);
 
-    ran = SC_strtok(spec, "{(", PA_strtok_p);
-    dom = SC_strtok(NULL, "\n", PA_strtok_p);
+    ran = SC_strtok(spec, "{(", PA_gs.strtok_p);
+    dom = SC_strtok(NULL, "\n", PA_gs.strtok_p);
 
     range = NULL;
-    while ((spec = SC_strtok(ran, "{,}", PA_strtok_p)) != NULL)
+    while ((spec = SC_strtok(ran, "{,}", PA_gs.strtok_p)) != NULL)
        {range = _PA_proc_set_spec(spec, range);
         ran   = NULL;};
 
     domain = NULL;
-    while ((spec = SC_strtok(dom, ",)", PA_strtok_p)) != NULL)
+    while ((spec = SC_strtok(dom, ",)", PA_gs.strtok_p)) != NULL)
        {domain = _PA_proc_set_spec(spec, domain);
         dom    = NULL;};
 
@@ -718,7 +700,7 @@ void PA_nploth(void)
 /* reverse the order of the domain specifications */
     SC_REVERSE_LIST(PA_set_spec, domain, next);
 
-    plot_reqs = _PA_mk_plot_request(range, domain, text, plot_reqs);
+    PA_gs.plot_reqs = _PA_mk_plot_request(range, domain, text, PA_gs.plot_reqs);
 
     return;}
 
@@ -731,16 +713,16 @@ void PA_time_plot(char *rname, void *vr)
    {char text[MAXLINE];
     PA_set_spec *range, *domain;
 
-    N_graphs++;
+    PA_gs.n_graphs++;
 
     snprintf(text, MAXLINE, "%s->{t}", rname);
     range     = _PA_proc_set_spec(rname, NULL);
     domain    = _PA_proc_set_spec("t", NULL);
-    plot_reqs = _PA_mk_plot_request(range, domain, text, plot_reqs);
+    PA_gs.plot_reqs = _PA_mk_plot_request(range, domain, text, PA_gs.plot_reqs);
 
-    plot_reqs->data       = (PM_set *) vr;
-    plot_reqs->data_index = 0;
-    plot_reqs->conv       = 1.0;
+    PA_gs.plot_reqs->data       = (PM_set *) vr;
+    PA_gs.plot_reqs->data_index = 0;
+    PA_gs.plot_reqs->conv       = 1.0;
 
     return;}
 
@@ -895,22 +877,22 @@ void PA_wrrstrth(void)
    {PFRegSetup db_hook;
 
 /* reverse the order of the new plot requests */
-    SC_REVERSE_LIST(PA_plot_request, plot_reqs, next);
+    SC_REVERSE_LIST(PA_plot_request, PA_gs.plot_reqs, next);
 
     PA_proc_units();
 
 /* intern the controls */
-    PA_INTERN(unit, "unit");
-    PA_INTERN(convrsn, "convrsn");
+    PA_INTERN(PA_gs.units, "PA_gs.units");
+    PA_INTERN(PA_gs.convrsns, "PA_gs.convrsns");
 
 /* intern the plot requests */
-    PA_INTERN(plot_reqs, "plot-requests");
+    PA_INTERN(PA_gs.plot_reqs, "plot-requests");
 
 /* intern the initial value data list after the package data have been
  * interned
  */
-    PA_proc_iv_spec(iv_spec_lst);
-    PA_INTERN(iv_spec_lst, "initial-value-specifications");
+    PA_proc_iv_spec(PA_gs.iv_spec_lst);
+    PA_INTERN(PA_gs.iv_spec_lst, "initial-value-specifications");
 
 /* an extra hook for anything which does NOT fall under the control of
  * intern_pck_db
@@ -928,12 +910,12 @@ void PA_wrrstrth(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PA_DONE - gracefully leave the generator */
+/* PA_gs.donE - gracefully leave the generator */
 
 void PA_done(void)
    {
 
-    PC_close_member(PA_pp);
+    PC_close_member(PA_gs.pp);
 
     LONGJMP(SC_gs.cpu, ERR_FREE);}
 

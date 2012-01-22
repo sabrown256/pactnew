@@ -10,18 +10,10 @@
  
 #include "panacea_int.h"
 
-#define PA_info_name(tag)  PA_cpp_value_to_name(PA_CPP_INFO, tag)
+#define PA_info_name(tag)  PA_cpp_value_to_name(PA_gs.cpp_info, tag)
 
 int
  PA_def_error;
-
-char
- *PAN_ATTRIBUTE = NULL,
- *PAN_DIMENSION = NULL,
- *PAN_DOMAIN = NULL,
- *PAN_EDIT_REQUEST = NULL,
- *PAN_EDIT_OUT = NULL,
- *PAN_UNIT = NULL;
 
 char
  *PA_INFO_TYPE_S,
@@ -35,8 +27,8 @@ char
  *PA_INFO_FILE_NAME_S,
  *PA_INFO_INIT_VAL_S,
  *PA_INFO_INIT_FNC_S,
- *PA_INFO_CONV_S,   /* ext_unit */
- *PA_INFO_UNIT_S,   /* int_unit */
+ *PA_INFO_CONV_S,   /* ext_PA_gs.units */
+ *PA_INFO_UNIT_S,   /* int_PA_gs.units */
  *PA_INFO_KEY_S,
  *PA_INFO_ATTRIBUTE_S,
  *PA_INFO_UNITS_S,
@@ -52,13 +44,6 @@ char
  *PA_INFO_DOMAIN_NAME_S,
  *PA_INFO_MAP_DOMAIN_S,
  *PA_INFO_BUILD_DOMAIN_S;
-
-hasharr
- *PA_var_att_tab = NULL,
- *PA_var_def_tab = NULL,
- *PA_var_dim_tab = NULL,
- *PA_var_domain_tab = NULL,
- *PA_var_unit_tab = NULL;
 
 PA_variable
  *_PA_default_variable = NULL;
@@ -83,9 +68,9 @@ PA_variable *PA_def_variable(char *name, ...)
 		"VARIABLE %s IS STATIC AND PA_INFO_DATA_PTR IS NOT DEFINED",
 		PA_VARIABLE_NAME(pp));};
 
-    PA_variable_tab = PA_install_table(name, pp,
-				       PAN_VARIABLE,
-				       PA_variable_tab);
+    PA_gs.variable_tab = PA_install_table(name, pp,
+				       PA_gs.variable,
+				       PA_gs.variable_tab);
 
     return(pp);}
 
@@ -106,9 +91,9 @@ PA_variable *PA_def_var_default(char *name, ...)
     pp = _PA_process_def_var(name, &SC_VA_VAR);
     SC_VA_END;
 
-    PA_var_def_tab = PA_install_table(name, pp,
-				      PAN_VARIABLE,
-				      PA_var_def_tab);
+    PA_gs.var_def_tab = PA_install_table(name, pp,
+				      PA_gs.variable,
+				      PA_gs.var_def_tab);
 
     return(pp);}
 
@@ -158,9 +143,9 @@ pcons *PA_def_var_attribute(char *name, ...)
 /* check if att_alist is null, no fields */
 
 /* store in table */
-    PA_var_att_tab = PA_install_table(name, att_alist,
-				      PAN_ATTRIBUTE,
-				      PA_var_att_tab);
+    PA_gs.var_att_tab = PA_install_table(name, att_alist,
+				      PA_gs.attribute,
+				      PA_gs.var_att_tab);
 
     return(att_alist);}
 
@@ -177,16 +162,16 @@ PA_dimens *PA_def_var_dimension(char *name, ...)
     SC_VA_END;
 
 /* store in table */
-    PA_var_dim_tab = PA_install_table(name, vdims,
-				      PAN_DIMENSION,
-				      PA_var_dim_tab);
+    PA_gs.var_dim_tab = PA_install_table(name, vdims,
+				      PA_gs.dimension,
+				      PA_gs.var_dim_tab);
 
     return(vdims);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PA_DEF_VAR_UNIT - define variable units */
+/* PA_DEF_VAR_UNIT - define variable PA_gs.unitss */
 
 pcons *PA_def_var_units(char *name, ...)
    {pcons *unit_alist;
@@ -197,9 +182,9 @@ pcons *PA_def_var_units(char *name, ...)
     SC_VA_END;
     
 /* store in table */
-    PA_var_unit_tab = PA_install_table(name, unit_alist,
-				       PAN_UNIT,
-				       PA_var_unit_tab);
+    PA_gs.var_unit_tab = PA_install_table(name, unit_alist,
+					  PA_gs.unit,
+					  PA_gs.var_unit_tab);
 
     return(unit_alist);}
 
@@ -213,7 +198,7 @@ void PA_def_var_domain(char *name, ...)
 
    SC_VA_START(name);
 
-/* PA_var_dom_tab = PA_install_table(name, pp, PAN_DOMAIN, PA_var_dom_tab); */
+/* PA_var_dom_tab = PA_install_table(name, pp, PA_gs.domain, PA_var_dom_tab); */
 
    SC_VA_END;
 
@@ -255,8 +240,8 @@ void PA_def_var_init(void)
 			     vattr, vtype,
 			     conv_fact, unit_fact, nu, du, alist);
 
-	PA_var_def_tab = PA_install_table("default-variable", pp,
-					  PAN_VARIABLE, PA_var_def_tab);
+	PA_gs.var_def_tab = PA_install_table("default-variable", pp,
+					  PA_gs.variable, PA_gs.var_def_tab);
 
 	_PA_default_variable = pp;};
 
@@ -341,7 +326,7 @@ PA_variable *_PA_process_def_var(char *vname, va_list *lst)
 	    case PA_INFO_DEFAULT :
 	         name = SC_VA_ARG(char *);
 		 if (tag == PA_INFO_DEFAULT)
-		    pp = (PA_variable *) SC_hasharr_def_lookup(PA_var_def_tab,
+		    pp = (PA_variable *) SC_hasharr_def_lookup(PA_gs.var_def_tab,
 							       name);
 		 else
 		    pp = PA_inquire_variable(name);
@@ -394,7 +379,7 @@ PA_variable *_PA_process_def_var(char *vname, va_list *lst)
 	         vdims = _PA_process_dimension(&SC_VA_VAR);
 		 alist1 = SC_add_alist(alist1,
 				       tag_name,
-				       PAN_DIMENSION,
+				       PA_gs.dimension,
 				       vdims);
 		 break;
 
@@ -408,7 +393,7 @@ PA_variable *_PA_process_def_var(char *vname, va_list *lst)
       
 	    case PA_INFO_ATT_NAME :
 	         name = SC_VA_ARG(char *);
-		 att_alist = (pcons *) SC_hasharr_def_lookup(PA_var_att_tab, name);
+		 att_alist = (pcons *) SC_hasharr_def_lookup(PA_gs.var_att_tab, name);
 		 if (att_alist == NULL)
 		    {PA_def_error = 1;
 		     PA_WARN(PA_def_error,
@@ -421,7 +406,7 @@ PA_variable *_PA_process_def_var(char *vname, va_list *lst)
 
 	    case PA_INFO_DIM_NAME :
 	         name = SC_VA_ARG(char *);
-		 vdims = (PA_dimens *) SC_hasharr_def_lookup(PA_var_dim_tab, name);
+		 vdims = (PA_dimens *) SC_hasharr_def_lookup(PA_gs.var_dim_tab, name);
 		 if (vdims == NULL)
 		    {PA_def_error = 1;
 		     PA_WARN(PA_def_error,
@@ -430,7 +415,7 @@ PA_variable *_PA_process_def_var(char *vname, va_list *lst)
 		 else
 		    alist2 = SC_add_alist(alist2,
 					  PA_info_name(PA_INFO_DIMS),
-					  PAN_DIMENSION,
+					  PA_gs.dimension,
 					  vdims);
 		 break;
 
@@ -444,7 +429,7 @@ PA_variable *_PA_process_def_var(char *vname, va_list *lst)
 
 	    case PA_INFO_UNITS_NAME:
 		 name = SC_VA_ARG(char *);
-		 unit_alist = (pcons *) SC_hasharr_def_lookup(PA_var_unit_tab, name);
+		 unit_alist = (pcons *) SC_hasharr_def_lookup(PA_gs.var_unit_tab, name);
 		 if (unit_alist == NULL)
 		    {PA_def_error = 1;
 		     PA_WARN(PA_def_error,
@@ -540,23 +525,23 @@ pcons *_PA_process_att(int tag, va_list *list, pcons *alist)
 
      switch (tag)
         {case PA_INFO_ALLOCATION:
-	      group = PA_CPP_ALLOCATION;
+	      group = PA_gs.cpp_allocation;
 	      break;
 
  	 case PA_INFO_CENTER:
-	      group = PA_CPP_CENTER;
+	      group = PA_gs.cpp_center;
 	      break;
 
          case PA_INFO_CLASS:
-	      group = PA_CPP_CLASS;
+	      group = PA_gs.cpp_class;
 	      break;
 
 	 case PA_INFO_PERSISTENCE:
-	      group = PA_CPP_PERSISTENCE;
+	      group = PA_gs.cpp_persistence;
 	      break;
 
          case PA_INFO_SCOPE:
-	      group = PA_CPP_SCOPE;
+	      group = PA_gs.cpp_scope;
 	      break;
 
 	 default:
@@ -570,7 +555,7 @@ pcons *_PA_process_att(int tag, va_list *list, pcons *alist)
 	ival = SC_VA_ARG(int);
 	SC_VA_RESTORE(list);
 
-	tag_name   = PA_cpp_value_to_name(PA_CPP_INFO, tag);
+	tag_name   = PA_cpp_value_to_name(PA_gs.cpp_info, tag);
 	value_name = PA_cpp_value_to_name(group, ival);
 
 	if (value_name != NULL)
@@ -604,19 +589,19 @@ PA_dimens *_PA_process_dimension(va_list *list)
 /* get the dimensions */
     vdims = NULL;
     while ((maxi = SC_VA_ARG(int *)) != LAST)
-       {if (maxi == PA_DUL)
+       {if (maxi == PA_gs.dul)
 	  {mini = SC_VA_ARG(int *);
 	   maxi = SC_VA_ARG(int *);
-	   meth = *PA_DUL;}
+	   meth = *PA_gs.dul;}
 	
-       else if (maxi == PA_DON)
+       else if (maxi == PA_gs.don)
 	  {mini = SC_VA_ARG(int *);
 	   maxi = SC_VA_ARG(int *);
-	   meth = *PA_DON;}
+	   meth = *PA_gs.don;}
 	
        else
 	  {mini = &Zero_I;
-	   meth = *PA_DON;};
+	   meth = *PA_gs.don;};
 
 	next = _PA_mk_dimens(mini, maxi, meth);
 	if (vdims == NULL)

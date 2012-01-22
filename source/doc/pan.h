@@ -474,7 +474,7 @@ edits, dumps, etc.).<p>
 Variables in PANACEA are carefully defined, including such information as
 name, type, array dimensions, units, and various categories of scope. This
 imposes an important discipline on the developer and permits PANACEA to
-provide some additional services relating to unit conversion, and subset
+provide some additional services relating to units conversion, and subset
 extraction for I/O (see Figure 3).<p>
 
 	The database manager is the main mechanism for regulating data
@@ -710,7 +710,7 @@ cont_hydro(pck)
     swtch[1]   = TRUE;              /* hydro switch */
     swtch[2]   = 0;
     swtch[3]   = 0;
-    swtch[4]   = global_swtch[12];
+    swtch[4]   = PA_gs.global_swtch[12];
     swtch[5]   = 0;
     swtch[6]   = 1;
     swtch[7]   = 0;
@@ -754,12 +754,12 @@ initial value problem generator, A, by the hydrodynamics package.
 
 intern_hydro()
 
-   {swtch[2]   = global_swtch[1];
-    swtch[3]   = global_swtch[2];
-    swtch[4]   = global_swtch[12];
+   {swtch[2]   = PA_gs.global_swtch[1];
+    swtch[3]   = PA_gs.global_swtch[2];
+    swtch[4]   = PA_gs.global_swtch[12];
 
-    param[12]  *= (global_param[3] - global_param[2]);
-    param[13]  *= (global_param[3] - global_param[2]);
+    param[12]  *= (PA_gs.global_param[3] - PA_gs.global_param[2]);
+    param[13]  *= (PA_gs.global_param[3] - PA_gs.global_param[2]);
 
     PA_INTERN(n, "n", double);
     PA_INTERN(p, "P", double);
@@ -1606,12 +1606,12 @@ defined pointer, DIMENSION.<p>
 Another feature of dimension specification in PANACEA is that a dimension can be
 specified in three ways. First a single pointer indicates to PANACEA that the
 dimension scalar represents the number of elements in that dimension. Second, each
-time the PANACEA provided pointer, PA_DON, occurs in the dimension list, the next
+time the PANACEA provided pointer, PA_gs.don, occurs in the dimension list, the next
 two integer pointers in the argument list are interpreted to be a pointer to the
 value of the minimum index value of the dimension and a pointer to the value of
 the number of elements in the dimension of the variable, respectively (i.e. DON
 means Dimension, Offset, and Number). Third, each time the PANACEA provided
-pointer, PA_DUL, occurs in the dimension list, the next two integer pointers in
+pointer, PA_gs.dul, occurs in the dimension list, the next two integer pointers in
 the argument list are interpreted to be a pointer to the value of the minimum index
 value of the dimension and a pointer to the value of the maximum index value of the
 dimension of the variable, respectively (i.e. DUL means Dimension, Upper, and
@@ -1642,17 +1642,17 @@ PANACEA goes further by providing the following constants as the index values:<p
 <TABLE>
 <TR><TD WIDTH="90"><U>Macro</U>	</TD><TD><U>Variable</U>	</TD>
 <TD><U>Unit</U></TD></TR>
-<TR><TD>RAD	</TD><TD>PA_radian	</TD><TD>angle</TD></TR>
-<TR><TD>STER	</TD><TD>PA_steradian	</TD><TD>solid angle</TD></TR>
-<TR><TD>MOLE	</TD><TD>PA_mole	</TD><TD>number</TD></TR>
-<TR><TD>Q	</TD><TD>PA_electric_charge	</TD><TD>Coulomb</TD></TR>
-<TR><TD>CM	</TD><TD>PA_cm		</TD><TD>length</TD></TR>
-<TR><TD>SEC	</TD><TD>PA_sec		</TD><TD>time</TD></TR>
-<TR><TD>G	</TD><TD>PA_gram	</TD><TD>mass</TD></TR>
-<TR><TD>EV	</TD><TD>PA_eV		</TD><TD>energy</TD></TR>
-<TR><TD>K	</TD><TD>PA_kelvin	</TD><TD>temperature</TD></TR>
-<TR><TD>ERG	</TD><TD>PA_erg		</TD><TD>energy</TD></TR>
-<TR><TD>CC	</TD><TD>PA_cc		</TD><TD>volume</TD></TR>
+<TR><TD>RAD	</TD><TD>PA_gs.radian	</TD><TD>angle</TD></TR>
+<TR><TD>STER	</TD><TD>PA_gs.steradian	</TD><TD>solid angle</TD></TR>
+<TR><TD>MOLE	</TD><TD>PA_gs.mole	</TD><TD>number</TD></TR>
+<TR><TD>Q	</TD><TD>PA_gs.electric_charge	</TD><TD>Coulomb</TD></TR>
+<TR><TD>CM	</TD><TD>PA_gs.cm		</TD><TD>length</TD></TR>
+<TR><TD>SEC	</TD><TD>PA_gs.sec		</TD><TD>time</TD></TR>
+<TR><TD>G	</TD><TD>PA_gs.gram	</TD><TD>mass</TD></TR>
+<TR><TD>EV	</TD><TD>PA_gs.eV		</TD><TD>energy</TD></TR>
+<TR><TD>K	</TD><TD>PA_gs.kelvin	</TD><TD>temperature</TD></TR>
+<TR><TD>ERG	</TD><TD>PA_gs.erg		</TD><TD>energy</TD></TR>
+<TR><TD>CC	</TD><TD>PA_gs.cc		</TD><TD>volume</TD></TR>
 </TABLE>
 </BLOCKQUOTE>
 
@@ -1683,7 +1683,7 @@ The syntax for PA_def_var is:<p>
 
    attribute_val(CENTER)    := Z_CENT | N_CENT | F_CENT | E_CENT | U_CENT
 
-   dimension_spec           := n_elements_ptr | PA_DUL, lower_bnd_ptr, upper_bnd_ptr | PA_DON, offset_ptr, n_elements_ptr
+   dimension_spec           := n_elements_ptr | PA_gs.dul, lower_bnd_ptr, upper_bnd_ptr | PA_gs.don, offset_ptr, n_elements_ptr
 
    unit_spec                := unit_index | PER
 
@@ -2117,8 +2117,8 @@ conversions to do. The conversion options are:<p>
 </TABLE>
 </BLOCKQUOTE>
 
-The internal system of units is defined by the unit array. The external
-system of units is defined by the convrsn array.<p>
+The internal system of units is defined by the PA_gs.units array. The external
+system of units is defined by the PA_gs.convrsns array.<p>
 
 The system of units of the data in the state file is under the control of the
 code developer, but it must be consistent.<p>
@@ -2386,7 +2386,7 @@ This function returns nothing.<p>
 <li>PA_dump_time(PA_set_spec *pi, double tc, double dtc, int cycle)<br><br>
 <li>PA_put_set(PDBfile *file, PM_set *s)<br><br>
 <li>PA_put_mapping(PG_device *dev, PDBfile *file, PM_mapping *f, int plot_type)<br><br>
-<li>PA_set_data(char *name, C_array *arr, int *pcent)<br><br>
+<li>PA_sePA_gs.t_data(char *name, C_array *arr, int *pcent)<br><br>
 <li>PA_fill_component(double *data, int len, int *pist, int ne)<br><br>
 <li>PA_build_mapping(PA_plot_request *pr, PFPPM_set build_ran, double t)<br><br>
 <li>PA_non_time_domain(PA_plot_request *pr)<br><br>
@@ -5436,17 +5436,17 @@ requires. PANACEA starts with a reasonable set of physical units:<p>
 <BLOCKQUOTE>
 <TABLE>
 <TR><TD>Type		</TD><TD>Macro	</TD><TD>Variable</TD></TR>
-<TR><TD>angle		</TD><TD>RAD	</TD><TD>PA_radian</TD></TR>
-<TR><TD>		</TD><TD>STER	</TD><TD>PA_steradian</TD></TR>
-<TR><TD>charge		</TD><TD>Q	</TD><TD>PA_electric_charge</TD></TR>
-<TR><TD>energy		</TD><TD>EV	</TD><TD>PA_eV</TD></TR>
-<TR><TD>		</TD><TD>ERG	</TD><TD>PA_erg</TD></TR>
-<TR><TD>length		</TD><TD>CM	</TD><TD>PA_cm</TD></TR>
-<TR><TD>mass		</TD><TD>G	</TD><TD>PA_gram</TD></TR>
-<TR><TD>number		</TD><TD>MOLE	</TD><TD>PA_mole</TD></TR>
-<TR><TD>temperature	</TD><TD>K	</TD><TD>PA_kelvin</TD></TR>
-<TR><TD>time		</TD><TD>SEC	</TD><TD>PA_sec</TD></TR>
-<TR><TD>volume		</TD><TD>CC	</TD><TD>PA_cc</TD></TR>
+<TR><TD>angle		</TD><TD>RAD	</TD><TD>PA_gs.radian</TD></TR>
+<TR><TD>		</TD><TD>STER	</TD><TD>PA_gs.steradian</TD></TR>
+<TR><TD>charge		</TD><TD>Q	</TD><TD>PA_gs.electric_charge</TD></TR>
+<TR><TD>energy		</TD><TD>EV	</TD><TD>PA_gs.eV</TD></TR>
+<TR><TD>		</TD><TD>ERG	</TD><TD>PA_gs.erg</TD></TR>
+<TR><TD>length		</TD><TD>CM	</TD><TD>PA_gs.cm</TD></TR>
+<TR><TD>mass		</TD><TD>G	</TD><TD>PA_gs.gram</TD></TR>
+<TR><TD>number		</TD><TD>MOLE	</TD><TD>PA_gs.mole</TD></TR>
+<TR><TD>temperature	</TD><TD>K	</TD><TD>PA_gs.kelvin</TD></TR>
+<TR><TD>time		</TD><TD>SEC	</TD><TD>PA_gs.sec</TD></TR>
+<TR><TD>volume		</TD><TD>CC	</TD><TD>PA_gs.cc</TD></TR>
 </TABLE>
 </BLOCKQUOTE>
 
@@ -5457,16 +5457,16 @@ defined as: <p>
 
 <BLOCKQUOTE>
 <TABLE>
-<TR><TD>PA_cm</TD>
+<TR><TD>PA_gs.cm</TD>
 <TD>= PA_def_unit(1.0, UNITS);</TD></TR>
 <P>
-<TR><TD>PA_sec</TD>
+<TR><TD>PA_gs.sec</TD>
 <TD>= PA_def_unit(1.0, UNITS);</TD></TR>
 <P>
-<TR><TD>PA_erg</TD>
+<TR><TD>PA_gs.erg</TD>
 <TD>= PA_def_unit(1.0, G, CM, CM, PER, SEC, SEC, UNITS);</TD></TR>
 <P>
-<TR><TD>PA_cc</TD>
+<TR><TD>PA_gs.cc</TD>
 <TD>= PA_def_unit(1.0, CM, CM, CM, UNITS);</TD></TR>
 </TABLE>
 </BLOCKQUOTE>
@@ -5485,13 +5485,13 @@ In the case of the above example:<p>
 
 <BLOCKQUOTE>
 <TABLE>
-<TR><TD> #define CM </TD><TD> PA_cm </TD></TR>
+<TR><TD> #define CM </TD><TD> PA_gs.cm </TD></TR>
 <P>
-<TR><TD> #define SEC </TD><TD> PA_sec </TD></TR>
+<TR><TD> #define SEC </TD><TD> PA_gs.sec </TD></TR>
 <P>
-<TR><TD> #define ERG </TD><TD> PA_erg </TD></TR>
+<TR><TD> #define ERG </TD><TD> PA_gs.erg </TD></TR>
 <P>
-<TR><TD> #define CC </TD><TD> PA_cc </TD></TR>
+<TR><TD> #define CC </TD><TD> PA_gs.cc </TD></TR>
 </TABLE>
 </BLOCKQUOTE>
 
@@ -5504,8 +5504,8 @@ system. In the simulation routines quantities are expressed in the internal
 system of units.<p>
 
 There are two arrays of double precision floating point numbers which keep
-the conversion factors for each of the defined units. The array unit keeps
-the conversion factors between CGS and internal units. The array convrsn
+the conversion factors for each of the defined units. The array PA_gs.units keeps
+the conversion factors between CGS and internal units. The array PA_gs.convrsns
 keeps the conversion factors between CGS and external units. For example,
 suppose a code function needs a length in the three systems of units and
 these are held in the variables: length_internal, length_cgs, and
@@ -5513,9 +5513,9 @@ length_external. The values of length_internal and length_external can be
 obtained from length_cgs as follows:<p>
 
 <UL>
-length_internal = length_cgs*unit[CM]
+length_internal = length_cgs*PA_gs.units[CM]
 <P>
-length_external = length_cgs*convrsn[CM]
+length_external = length_cgs*PA_gs.convrsns[CM]
 </UL>
 
 The two situations in which this is most useful is during initial value problem
@@ -5553,10 +5553,10 @@ Hbar and c both 1 or a modified CGS system with temperatures in eV.<p>
         */
 
            if (def_unit_flag)
-              {unit[G]   = g_icm;
-               unit[SEC] = c;
-               unit[K]   = eV_icm*(kBoltz/eV_erg);
-               unit[EV]  = eV_icm*unit[Q]*unit[Q]/unit[CM];}
+              {PA_gs.units[G]   = g_icm;
+               PA_gs.units[SEC] = c;
+               PA_gs.units[K]   = eV_icm*(kBoltz/eV_erg);
+               PA_gs.units[EV]  = eV_icm*PA_gs.units[Q]*PA_gs.units[Q]/PA_gs.units[CM];}
 
        /* the alternate internal system of units is the modified CGS system
         * with temperatures in eV
@@ -5564,11 +5564,11 @@ Hbar and c both 1 or a modified CGS system with temperatures in eV.<p>
 
            else
 
-              unit[K] = kBoltz/eV_erg;
+              PA_gs.units[K] = kBoltz/eV_erg;
 
        /* define the external units to be modified CGS with temperatures in eV */
 
-           convrsn[K] = kBoltz/eV_erg;
+           PA_gs.convrsns[K] = kBoltz/eV_erg;
 
        /* make the conversion factors consistent with these changes */
 
@@ -5586,9 +5586,9 @@ Hbar and c both 1 or a modified CGS system with temperatures in eV.<p>
 In the above example, pay special attention to the calls to PA_def_units,
 PA_physical_constants_cgs, PA_set_conversions, and PA_physical_constants_ext.
 The call to PA_def_units causes PANACEA to define all of its units and initialize
-the unit and convrsn arrays. The call to PA_physical_constants_cgs initializes
+the PA_gs.units and PA_gs.convrsns arrays. The call to PA_physical_constants_cgs initializes
 the physical constants in CGS units. The call to PA_set_conversions passes over
-unit and convrsn and makes the entire set of units consistent with the changes
+PA_gs.units and PA_gs.convrsns and makes the entire set of units consistent with the changes
 made between the PA_def_units call and the PA_set_conversions call. Lastly, the
 call to PA_physical_constants_ext converts the physical constants to the
 external system of units.<p>
@@ -6667,7 +6667,7 @@ The global package in the PANACEA model has a special place in that it may provi
 	 integer 1 0 "dimensionality - 0, 1, 2, 3"
 	 integer 2 0 "geometry - 0 none, 1 slab, 2 cylinder, 3 sphere"
 	 integer 3 0 "current cycle number (INTERNAL)"
-	 integer 4 0 "N_plots, number of plot requests (INTERNAL)"
+	 integer 4 0 "PA_gs.n_plots, number of plot requests (INTERNAL)"
 	 integer 5 0 "N_regs, number of regions (INTERNAL)"
 	 integer 6 0 "N_nodes, number of logical points (INTERNAL)"
 	 integer 7 0 "lrz, index of last real zone (INTERNAL)"

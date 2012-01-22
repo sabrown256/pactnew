@@ -35,17 +35,17 @@
 
 #define N_ATTRIBUTES 10
 
-#define RAD       PA_radian
-#define STER      PA_steradian
-#define MOLE      PA_mole
-#define Q         PA_electric_charge
-#define CM        PA_cm
-#define SEC       PA_sec
-#define G         PA_gram
-#define EV        PA_eV
-#define K         PA_kelvin
-#define ERG       PA_erg
-#define CC        PA_cc
+#define RAD       PA_gs.radian
+#define STER      PA_gs.steradian
+#define MOLE      PA_gs.mole
+#define Q         PA_gs.electric_charge
+#define CM        PA_gs.cm
+#define SEC       PA_gs.sec
+#define G         PA_gs.gram
+#define EV        PA_gs.eV
+#define K         PA_gs.kelvin
+#define ERG       PA_gs.erg
+#define CC        PA_gs.cc
 
 /*--------------------------------------------------------------------------*/
 
@@ -110,7 +110,7 @@ typedef enum e_PA_allocation_kind PA_allocation_kind;
 #define ALLOCATION 'e'
 
 /*
- * #bind derived PA_unit_conversion integer SC_ENUM_I SC_ENUM_I INT_CGS
+ * #bind derived PA_PA_gs.units_conversion integer SC_ENUM_I SC_ENUM_I INT_CGS
  */
 
 #undef NONE
@@ -155,8 +155,8 @@ typedef enum e_PA_unit_conversion PA_unit_conversion;
 
 #define PA_complete_premap PA_get_range_info
 
-#define PA_ERR    (*PA_error_hook)
-#define PA_WARN   (*PA_warn_hook)
+#define PA_ERR    (*PA_gs.error_hook)
+#define PA_WARN   (*PA_gs.warn_hook)
 
 enum e_PA_medium
    {PA_FILE     = -1,
@@ -173,7 +173,7 @@ typedef enum e_PA_medium PA_medium;
 /* PA_GET_FUNCTION - return a pointer to the named function */
 
 #define PA_GET_FUNCTION(type, name)                                          \
-    SC_HASHARR_LOOKUP_FUNCTION(PA_symbol_tab, type, name)
+    SC_HASHARR_LOOKUP_FUNCTION(PA_gs.symbol_tab, type, name)
     
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -309,7 +309,7 @@ typedef enum e_PA_medium PA_medium;
 
 #define PA_STASH_TV_SCALAR(name, val)                                        \
     if (strcmp(vr, name) == 0)                                               \
-       {t_data[pr->str_index] += (val)*pr->conv;                             \
+       {PA_gs.t_data[pr->str_index] += (val)*pr->conv;                       \
         continue;}
 
 /*--------------------------------------------------------------------------*/
@@ -372,7 +372,7 @@ typedef enum e_PA_medium PA_medium;
 /* PA_STORE_TV - save away the given time value data */
 
 #define PA_STORE_TV(pr, val)                                                 \
-   t_data[pr->str_index] = (val)*pr->conv
+   PA_gs.t_data[pr->str_index] = (val)*pr->conv
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -388,26 +388,26 @@ typedef enum e_PA_medium PA_medium;
 /*--------------------------------------------------------------------------*/
 
 /* PA_INQUIRE_VARIABLE - return a PA_variable pointer from
- *                     - the PA_variable_tab
+ *                     - the PA_gs.variable_tab
  */
 
 #define PA_INQUIRE_VARIABLE(x)                                               \
-    ((PA_variable *) SC_hasharr_def_lookup(PA_variable_tab, (x)))
+    ((PA_variable *) SC_hasharr_def_lookup(PA_gs.variable_tab, (x)))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* PA_INQUIRE_PACKAGE - return a PA_package pointer from
- *                    - the PA_variable_tab
+ *                    - the PA_gs.variable_tab
  */
 
 #define PA_INQUIRE_PACKAGE(x)                                                \
-    ((PA_package *) SC_hasharr_def_lookup(PA_variable_tab, (x)))
+    ((PA_package *) SC_hasharr_def_lookup(PA_gs.variable_tab, (x)))
 
 /*--------------------------------------------------------------------------*/
 
-#define PA_SET_MAX_NAME_SPACE(f)   PA_name_spaces = f
-#define PA_GET_MAX_NAME_SPACE(f)   f = PA_name_spaces
+#define PA_SET_MAX_NAME_SPACE(f)   PA_gs.name_spaces = f
+#define PA_GET_MAX_NAME_SPACE(f)   f = PA_gs.name_spaces
 
 #define PA_VARIABLE_NAME(x)             ((x)->name)
 #define PA_VARIABLE_FILE(x)             ((x)->file)
@@ -742,6 +742,145 @@ enum e_PA_info_tag
 
 typedef enum e_PA_info_tag PA_info_tag;
 
+typedef struct s_PA_global_state PA_global_state;
+
+struct s_PA_global_state
+   {
+
+/* variables with non-zero value initialization */
+    int current_pp_cycle;
+
+    char *token_delimiters;
+
+    PFErrHand error_hook;
+    PFErrHand warn_hook;
+
+/* variables with zero value initialization */
+    int n_graphs;
+    int n_plots;
+    int n_packages;
+    int n_switches;
+    int n_parameters;
+    int n_names;
+    int n_units;
+    int n_variables;
+    int n_time_plots;
+    int n_unique_variables;
+    int name_spaces;
+    int _PA_ul_print_flag;
+    int _PA_n_state_files;
+    int _PA_halt_fl;
+    int *dul;
+    int *don;
+    int radian;
+    int steradian;
+    int mole;
+    int electric_charge;
+    int cm;
+    int sec;
+    int gram;
+    int eV;
+    int kelvin;
+    int erg;
+    int cc;
+    int stand_alone;                             /* stand alone flag */
+    int *global_swtch;
+    
+    double *convrsns;
+    double *global_param;
+    double *t_data;
+    double *units;
+
+    char errbuf[MAXLINE];       /* global buffer for certain error messages */
+    char err[MAXLINE];
+    char *input_prompt;
+    char **global_name;
+    char _PA_base_name[MAXLINE];
+    char *_PA_rsname;
+    char *strtok_p;
+    char *command;
+    char *cpp_node;
+    char *edit;
+    char *plot_req;
+    char *package;
+    char *source;
+    char *variable;
+    char *attribute;
+    char *dimension;
+    char *domain;
+    char *edit_REQUEST;
+    char *edit_OUT;
+    char *unit;
+    char *PA_SET_INDEX_S;
+    char *PA_SET_INDEX_P_S;
+
+    char *PA_INFO_TYPE_S;
+    char *PA_INFO_N_DIMS_S;
+    char *PA_INFO_DIMS_S;
+    char *PA_INFO_SCOPE_S;
+    char *PA_INFO_CLASS_S;
+    char *PA_INFO_CENTER_S;
+    char *PA_INFO_PERSISTENCE_S;
+    char *PA_INFO_ALLOCATION_S;
+    char *PA_INFO_FILE_NAME_S;
+    char *PA_INFO_INIT_VAL_S;
+    char *PA_INFO_INIT_FNC_S;
+    char *PA_INFO_CONV_S;
+    char *PA_INFO_UNIT_S;
+    char *PA_INFO_KEY_S;
+    char *PA_INFO_ATTRIBUTE_S;
+    char *PA_INFO_UNITS_S;
+    char *PA_INFO_DATA_PTR_S;
+    char *PA_INFO_UNIT_NUMER_S;
+    char *PA_INFO_UNIT_DENOM_S;
+    char *PA_INFO_APPL_ATTR_S;
+    char *PA_INFO_DEFAULT_S;
+    char *PA_INFO_SHARE_S;
+    char *PA_INFO_ATT_NAME_S;
+    char *PA_INFO_DIM_NAME_S;
+    char *PA_INFO_UNITS_NAME_S;
+    char *PA_INFO_DOMAIN_NAME_S;
+    char *PA_INFO_MAP_DOMAIN_S;
+    char *PA_INFO_BUILD_DOMAIN_S;
+    char *cpp_info;
+    char *cpp_allocation;
+    char *cpp_scope;
+    char *cpp_class;
+    char *cpp_center;
+    char *cpp_persistence;
+    char *cpp_units;
+    char *cpp_type;
+    char *cpp_type_SC;
+    char *cpp_type_S;
+
+    hasharr *alias_tab;
+    hasharr *command_tab;
+    hasharr *symbol_tab;
+    hasharr *variable_tab;
+    hasharr *var_att_tab;
+    hasharr *var_def_tab;
+    hasharr *var_dim_tab;
+    hasharr *var_domain_tab;
+    hasharr *var_unit_tab;
+    hasharr *cpp_name_tab;
+    hasharr *cpp_value_tab;
+
+    PDBfile *cache_file;
+    PDBfile **_PA_state_files;
+    PDBfile *vif;
+    PDBfile *pva_file;
+    PDBfile *pp_file;
+
+    PA_iv_specification *iv_spec_lst;
+    PA_package *packages;
+    PA_variable *_PA_default_variable;
+    PA_plot_request *plot_reqs;
+    PA_src_variable **sv_list;
+
+    PROCESS *pp;
+    FILE *edit_file;};
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -752,73 +891,18 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-extern PFErrHand
- PA_error_hook,
- PA_warn_hook;
-
-extern PA_iv_specification
- *iv_spec_lst;
-
-extern PA_package
- *Packages;
+PA_global_state
+ PA_gs;
 
 extern PA_variable
  *_PA_default_variable;
 
-extern PA_plot_request
- *plot_reqs;
-
-extern PROCESS
- *PA_pp;
-
-extern hasharr
- *PA_alias_tab,
- *PA_commands,
- *PA_symbol_tab,
- *PA_variable_tab,
- *PA_var_att_tab,
- *PA_var_def_tab,
- *PA_var_dim_tab,
- *PA_var_domain_tab,
- *PA_var_unit_tab,
- *PA_cpp_name_tab,
- *PA_cpp_value_tab;
-
 extern PDBfile
- *PA_cache_file,
- **_PA_state_files,
- *PA_vif,
- *PA_pva_file,
- *PA_pp_file;
-
-extern FILE
- *PA_edit_file;
-
-extern PA_src_variable
- **SV_List;
+ **_PA_state_files;
 
 extern char
- errbuf[],                      /* global buffer for certain error messages */
- PA_err[],
- *PA_input_prompt,
- **global_name,
  _PA_base_name[],
  *_PA_rsname,
- *PA_strtok_p,
- *PA_token_delimiters,
- *PAN_COMMAND,
- *PAN_CPP_NODE,
- *PAN_EDIT,
- *PAN_PLOT_REQ,
- *PAN_PACKAGE,
- *PAN_SOURCE,
- *PAN_VARIABLE,
- *PAN_ATTRIBUTE,
- *PAN_DIMENSION,
- *PAN_DOMAIN,
- *PAN_EDIT_REQUEST,
- *PAN_EDIT_OUT,
- *PAN_UNIT,
  *PA_SET_INDEX_S,
  *PA_SET_INDEX_P_S;
 
@@ -850,55 +934,13 @@ extern char
  *PA_INFO_UNITS_NAME_S,
  *PA_INFO_DOMAIN_NAME_S,
  *PA_INFO_MAP_DOMAIN_S,
- *PA_INFO_BUILD_DOMAIN_S,
- *PA_CPP_INFO,
- *PA_CPP_ALLOCATION,
- *PA_CPP_SCOPE,
- *PA_CPP_CLASS,
- *PA_CPP_CENTER,
- *PA_CPP_PERSISTENCE,
- *PA_CPP_UNITS,
- *PA_CPP_TYPE,
- *PA_CPP_TYPE_SC,
- *PA_CPP_TYPE_S;
+ *PA_INFO_BUILD_DOMAIN_S;
 
 extern int
- *global_swtch,
- N_graphs,
- N_plots,
- N_Packages,
- N_Switches,
- N_Parameters,
- N_Names,
- N_Units,
- N_Variables,
- N_time_plots,
- N_unique_variables,
- PA_name_spaces,
- PA_current_pp_cycle,
  _PA_ul_print_flag,
  _PA_n_state_files,
- _PA_halt_fl,
- *PA_DUL,
- *PA_DON,
- PA_radian,
- PA_steradian,
- PA_mole,
- PA_electric_charge,
- PA_cm,
- PA_sec,
- PA_gram,
- PA_eV,
- PA_kelvin,
- PA_erg,
- PA_cc,
- STAND_ALONE;                                           /* stand alone flag */
+ _PA_halt_fl;
 
-extern double
- *convrsn,
- *global_param,
- *t_data,
- *unit;
 
 /* CODE UNITS VARIABLES AND CONSTANTS */
 

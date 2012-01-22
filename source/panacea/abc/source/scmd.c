@@ -21,7 +21,6 @@ double
 
 char
  in_deck[MAXLINE],                                /* global input deck name */
- *PAN_SOURCE = NULL,
  varname[MAXLINE];
 
 static double
@@ -124,7 +123,7 @@ static int write_var(PDBfile *pdsf, char *name, double *tp, double **dp,
     char svname[MAXLINE], title[MAXLINE];
     static int count = 0;
 
-    N_Variables++;
+    PA_gs.n_variables++;
 
     ind[0] = 0L;
     ind[2] = 1L;
@@ -219,7 +218,7 @@ static void makeh(void)
              CFREE(data);};
 
 /* finish up */
-    PD_write(pdsf, "N_Variables", "integer", &N_var);
+    PD_write(pdsf, "n_variables", "integer", &N_var);
     PD_close(pdsf);
     pdsf = NULL;    
 
@@ -246,7 +245,7 @@ static void record_entry(char *name, double time, double *data)
     hp = SC_hasharr_lookup(srctab, name);
     if (hp == NULL)
        {tp = mk_time_list();
-        hp = SC_hasharr_install(srctab, name, tp, PAN_SOURCE, 3, -1);};
+        hp = SC_hasharr_install(srctab, name, tp, PA_gs.source, 3, -1);};
 
 /* cons the new time onto the list of times */
     tp       = (time_list *) (hp->def);
@@ -354,15 +353,15 @@ void readh(char *str)
         if (SC_blankp(s, "c;#"))
            continue;
 
-        token = SC_strtok(s, " \n\r\t/(", PA_strtok_p);
+        token = SC_strtok(s, " \n\r\t/(", PA_gs.strtok_p);
         if (token != NULL)
-           {hp = SC_hasharr_lookup(PA_commands, token);
+           {hp = SC_hasharr_lookup(PA_gs.command_tab, token);
             if (hp != NULL)
                {conversion_s = 1.0;
                 cp = (PA_command *) hp->def;
                 (*(cp->handler))(cp);}
 
-            else if ((hp = SC_hasharr_lookup(PA_variable_tab, token)) != NULL)
+            else if ((hp = SC_hasharr_lookup(PA_gs.variable_tab, token)) != NULL)
                {pp = (PA_variable *) hp->def;
                 varh(pp);}
 
@@ -411,7 +410,7 @@ static void doneh(void)
 void inst_s(void)
    {
 
-    PAN_COMMAND = CSTRSAVE("command");
+    PA_gs.command = CSTRSAVE("command");
 
     PA_inst_c("end", NULL, FALSE, 0, doneh, SRC_zargs);
     PA_inst_c("clear", NULL, FALSE, 0, clear_sys, SRC_zargs);
@@ -429,7 +428,7 @@ void S_gen(char *s)
    {PA_variable *pp;
     haelem *hp;
 
-    hp = SC_hasharr_lookup(PA_variable_tab, s);
+    hp = SC_hasharr_lookup(PA_gs.variable_tab, s);
     if (hp != NULL)
        {pp = (PA_variable *) hp->def;
         varh(pp);}

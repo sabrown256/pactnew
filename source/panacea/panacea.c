@@ -20,8 +20,8 @@ void _PA_init_files(char *edname, char *ppname, char *gfname)
 
 /* make the name of the first edit file */
     if (edname != NULL)
-       {PA_edit_file = io_open(edname, "w");
-	PA_ERR((PA_edit_file == NULL),
+       {PA_gs.edit_file = io_open(edname, "w");
+	PA_ERR((PA_gs.edit_file == NULL),
 	       "CAN'T OPEN FILE %s - _PA_INIT_FILES", edname);
 	PRINT(stdout, "Edit file %s opened\n", edname);};
 
@@ -63,7 +63,7 @@ void PA_simulate(double tc, int nc, int nz,
     _PA_halt_fl = FALSE;
 
 /* initialize the time-cycle loop */
-    tconv  = convrsn[SEC]/unit[SEC];
+    tconv  = PA_gs.convrsns[SEC]/PA_gs.units[SEC];
     deltat = tf - ti;
     dt     = dtf_init*deltat;
     dtmn   = dtf_min*deltat;
@@ -126,8 +126,8 @@ void PA_init_system(double t, double dt, int nc,
 
     SC_sizeof_hook = PA_sizeof;
 
-    t  *= unit[SEC]/convrsn[SEC];
-    dt *= unit[SEC]/convrsn[SEC];
+    t  *= PA_gs.units[SEC]/PA_gs.convrsns[SEC];
+    dt *= PA_gs.units[SEC]/PA_gs.convrsns[SEC];
 
     PA_init_strings();
     PA_cpp_init();
@@ -141,7 +141,7 @@ void PA_init_system(double t, double dt, int nc,
     _PA_init_files(edname, ppname, gfname);
 
 /* initialize the packages */
-    for (pck = Packages; pck != NULL; pck = pck->next)
+    for (pck = PA_gs.packages; pck != NULL; pck = pck->next)
         {pck_init = pck->inizer;
          if (pck_init != NULL)
             {PA_control_set(pck->name);
@@ -156,7 +156,7 @@ void PA_init_system(double t, double dt, int nc,
     PA_control_set("global");
 
     hook = PA_GET_FUNCTION(PFBuildMap, "build_mapping");
-    PA_ERR(((PA_pva_file != NULL) && (hook == NULL)),
+    PA_ERR(((PA_gs.pva_file != NULL) && (hook == NULL)),
            "CAN`T BUILD GRAPHS WITHOUT HOOK - PA_INIT_SYSTEM");
 
 /* reprocess plots after the package initializers and the source files
@@ -183,7 +183,7 @@ void PA_run_packages(double t, double dt, int cycle)
     char *pck_name;
 
 /* loop over all packages */
-    for (pck = Packages; pck != NULL; pck = pck->next)
+    for (pck = PA_gs.packages; pck != NULL; pck = pck->next)
         {pck_entry = pck->main;
          pck_name  = pck->name;
 
@@ -221,7 +221,7 @@ double PA_advance_t(double dtmn, double dtn, double dtmx)
     PA_package *pck;
 
 /* get the new time step */
-    for (dt = dtn, pck = Packages; pck != NULL; pck = pck->next)
+    for (dt = dtn, pck = PA_gs.packages; pck != NULL; pck = pck->next)
         {pck_dt = pck->dt;
          dt = min(pck_dt, dt);};
 
@@ -250,7 +250,7 @@ void PA_fin_system(int nz, int nc, int silent)
 /* finalize the packages and dump the statistics */
     if (!silent)
        {smx = 0.0;
-	for (pck = Packages; pck != NULL; pck = pck->next)
+	for (pck = PA_gs.packages; pck != NULL; pck = pck->next)
 	    {pck_s = pck->space;
 	     smx = max(smx, pck_s);};
 
@@ -297,7 +297,7 @@ void PA_fin_system(int nz, int nc, int silent)
     else
        izc = (1.0e6)/((double) nz*nc);
 
-    for (prb_t = 0.0, pck = Packages; pck != NULL; pck = pck->next)
+    for (prb_t = 0.0, pck = PA_gs.packages; pck != NULL; pck = pck->next)
         {pck_fin  = pck->finzer;
          pck_name = pck->name;
          pck_t    = pck->time;
@@ -367,20 +367,20 @@ void PA_fin_system(int nz, int nc, int silent)
 void PA_terminate(char *edname, char *ppname, char *gfname, int cycle)
    {int i;
 
-    if (PA_edit_file != NULL)
-       PA_ERR(io_close(PA_edit_file),
+    if (PA_gs.edit_file != NULL)
+       PA_ERR(io_close(PA_gs.edit_file),
               "TROUBLE CLOSING EDIT FILE %s - PA_TERMINATE", edname);
 
 /* save the number of time plots and the number of points (cycles) */
-    if (PA_pp_file != NULL)
+    if (PA_gs.pp_file != NULL)
        PA_close_pp();
 
-    if (PA_pva_file != NULL)
-        PA_ERR(!PD_close(PA_pva_file),
+    if (PA_gs.pva_file != NULL)
+        PA_ERR(!PD_close(PA_gs.pva_file),
                "TROUBLE CLOSING PVA FILE %s - PA_TERMINATE", gfname);
      
-    if (PA_cache_file != NULL)
-        PA_ERR(!PD_close(PA_cache_file),
+    if (PA_gs.cache_file != NULL)
+        PA_ERR(!PD_close(PA_gs.cache_file),
                "TROUBLE CLOSING CACHE FILE - PA_TERMINATE");
      
 /* close open state files */
@@ -391,9 +391,9 @@ void PA_terminate(char *edname, char *ppname, char *gfname, int cycle)
 
     CFREE(_PA_state_files);
 
-    PA_pva_file   = NULL;
-    PA_edit_file  = NULL;
-    PA_cache_file = NULL;
+    PA_gs.pva_file   = NULL;
+    PA_gs.edit_file  = NULL;
+    PA_gs.cache_file = NULL;
 
     return;}
 

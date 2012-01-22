@@ -127,7 +127,7 @@
       (printf file "    PRINT(STDOUT, \"\\n\");\n\n")
     
       (comment file "close the parallel message passing system down")
-      (printf file "    PC_close_member(PA_pp);\n\n")
+      (printf file "    PC_close_member(PA_gs.pp);\n\n")
     
       (printf file "    LONGJMP(SC_gs.cpu, ERR_FREE);}\n")
       (printf file "\n")

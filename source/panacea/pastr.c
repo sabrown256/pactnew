@@ -11,9 +11,6 @@
  
 #include "panacea_int.h"
 
-char 
- *PA_token_delimiters = " \t\r\n";
-
 /*--------------------------------------------------------------------------*/
 
 /*                            STRUCTURE FUNCTIONS                           */
@@ -31,7 +28,7 @@ syment *PA_int_instance(char *name, char *type, long n, void *data)
     addr.memaddr = data;
 
     ep = _PD_mk_syment(type, n, addr.diskaddr, NULL, NULL);
-    _PD_e_install(PA_vif, name, ep, TRUE);
+    _PD_e_install(PA_gs.vif, name, ep, TRUE);
 
     return(ep);}
 
@@ -47,12 +44,12 @@ void *PA_mk_instance(char *name, char *type, long n)
     syment *ep;
     SC_address addr;
 
-    data = _PD_alloc_entry(PA_vif, type, n);
+    data = _PD_alloc_entry(PA_gs.vif, type, n);
 
     addr.memaddr = data;
 
     ep = _PD_mk_syment(type, n, addr.diskaddr, NULL, NULL);
-    _PD_e_install(PA_vif, name, ep, TRUE);
+    _PD_e_install(PA_gs.vif, name, ep, TRUE);
 
     return(data);}
 
@@ -67,7 +64,7 @@ void PA_rl_instance(char *name)
    {syment *ep;
     SC_address addr;
 
-    ep = PD_inquire_entry(PA_vif, name, FALSE, NULL);
+    ep = PD_inquire_entry(PA_gs.vif, name, FALSE, NULL);
     if (ep == NULL)
        return;
 
@@ -75,7 +72,7 @@ void PA_rl_instance(char *name)
     CFREE(addr.memaddr);
 
     _PD_rl_syment_d(ep);
-    SC_hasharr_remove(PA_vif->symtab, name);
+    SC_hasharr_remove(PA_gs.vif->symtab, name);
 
     return;}
 
@@ -93,7 +90,7 @@ void PA_set_member(char *name, void *data, char *member)
     SC_address addr;
 
     snprintf(s, MAXLINE, "%s.%s", name, member);
-    ep = _PD_effective_ep(PA_vif, s, FALSE, NULL);
+    ep = _PD_effective_ep(PA_gs.vif, s, FALSE, NULL);
 
     addr.diskaddr = PD_entry_address(ep);
 
@@ -123,7 +120,7 @@ void *PA_get_member(char *name, char *member)
     SC_address addr;
 
     snprintf(s, MAXLINE, "%s.%s", name, member);
-    ep = _PD_effective_ep(PA_vif, s, FALSE, NULL);
+    ep = _PD_effective_ep(PA_gs.vif, s, FALSE, NULL);
 
     addr.diskaddr = PD_entry_address(ep);
     rv            = addr.memaddr;

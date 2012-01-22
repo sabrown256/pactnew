@@ -116,7 +116,7 @@ void PA_interrupt_handler(int sig)
     fflush(stdout);
 
     pck  = PA_current_package();
-    tcon = convrsn[SEC]/unit[SEC];
+    tcon = PA_gs.convrsns[SEC]/PA_gs.units[SEC];
     name = pck->name;
     t    = pck->p_t*tcon;
     dt   = pck->p_dt*tcon;
@@ -153,25 +153,25 @@ void PA_file_mon(char *edname, char *ppname, char *gfname)
    {int64_t curpos;
     
 /* check on the edit file */
-    if (PA_edit_file != NULL)
+    if (PA_gs.edit_file != NULL)
        {if (_PA.edstr == 0L)
-           _PA.edstr = io_tell(PA_edit_file);
-        curpos = io_tell(PA_edit_file);
+           _PA.edstr = io_tell(PA_gs.edit_file);
+        curpos = io_tell(PA_gs.edit_file);
 
         if (curpos+_PA.edstr >= MAXSIZE)
-           {io_close(PA_edit_file);
+           {io_close(PA_gs.edit_file);
             PA_advance_name(edname);
-            PA_edit_file = io_open(edname, "w");
-            PA_ERR((PA_edit_file == NULL),
+            PA_gs.edit_file = io_open(edname, "w");
+            PA_ERR((PA_gs.edit_file == NULL),
                    "CAN'T OPEN FILE %s - PA_FILE_MON", edname);
             PRINT(stdout, "Edit file %s opened\n", edname);
             _PA.edstr = 0L;};};
 
 /* check on the post processor */
-    if (PA_pp_file != NULL)
+    if (PA_gs.pp_file != NULL)
        {FILE *str;
 
-	str = PA_pp_file->stream;
+	str = PA_gs.pp_file->stream;
 
         if (_PA.ppstr == 0L)
            _PA.ppstr = lio_tell(str);
@@ -180,25 +180,25 @@ void PA_file_mon(char *edname, char *ppname, char *gfname)
         if (curpos+_PA.ppstr >= MAXSIZE)
            {PA_close_pp();
             PA_advance_name(ppname);
-            PA_pp_file = PA_open(ppname, "w", FALSE);
+            PA_gs.pp_file = PA_open(ppname, "w", FALSE);
             PRINT(stdout, "Post processor file %s opened\n", ppname);
             _PA.ppstr = 0L;};};
 
 /* check on the PVA file */
-    if (PA_pva_file != NULL)
+    if (PA_gs.pva_file != NULL)
        {FILE *str;
 
-	str = PA_pva_file->stream;
+	str = PA_gs.pva_file->stream;
 
         if (_PA.ppstr == 0L)
            _PA.ppstr = lio_tell(str);
         curpos = lio_tell(str);
 
         if (curpos+_PA.ppstr >= MAXSIZE)
-           {PD_close(PA_pva_file);
+           {PD_close(PA_gs.pva_file);
             PA_advance_name(gfname);
-            PA_pva_file = PA_open(gfname, "w", FALSE);
-            PA_ERR(!PD_def_mapping(PA_pva_file),
+            PA_gs.pva_file = PA_open(gfname, "w", FALSE);
+            PA_ERR(!PD_def_mapping(PA_gs.pva_file),
                    "CAN`T DEFINE MAPPINGS - PA_FILE_MON");
             PRINT(stdout, "PVA file %s opened\n", gfname);
             _PA.ppstr = 0L;};};
@@ -217,19 +217,19 @@ void PA_file_mon(char *edname, char *ppname, char *gfname)
  *               -
  *               - Options:
  *               -   NONE    - perform no conversions
- *               -   INT_CGS - convert from internal units to CGS units
- *               -   INT_EXT - convert from internal units to external units
- *               -   EXT_CGS - convert from external units to CGS units
- *               -   EXT_INT - convert from external units to internal units
- *               -   CGS_INT - convert from CGS units to internal units
- *               -   CGS_EXT - convert from CGS units to external units
+ *               -   INT_CGS - convert from internal PA_gs.unitss to CGS PA_gs.unitss
+ *               -   INT_EXT - convert from internal PA_gs.unitss to external PA_gs.unitss
+ *               -   EXT_CGS - convert from external PA_gs.unitss to CGS PA_gs.unitss
+ *               -   EXT_INT - convert from external PA_gs.unitss to internal PA_gs.unitss
+ *               -   CGS_INT - convert from CGS PA_gs.unitss to internal PA_gs.unitss
+ *               -   CGS_EXT - convert from CGS PA_gs.unitss to external PA_gs.unitss
  *               -
- *               - The internal system of units is defined by the "unit"
+ *               - The internal system of PA_gs.unitss is defined by the "PA_gs.units"
  *               - array.
- *               - The external system of units is defined by the "convrsn"
+ *               - The external system of PA_gs.unitss is defined by the "PA_gs.convrsns"
  *               - array.
  *               -
- *               - The system of units of the data in the restart dump is
+ *               - The system of PA_gs.unitss of the data in the restart dump is
  *               - under the control of the code developer, but it must
  *               - be consistent.
  *
@@ -279,14 +279,14 @@ void PA_wr_restart(char *rsname ARG("state.tmp",in))
 void PA_close_pp(void)
    {int err;
 
-    err = !PD_close(PA_pp_file);
+    err = !PD_close(PA_gs.pp_file);
 
     PA_ERR(err, "TROUBLE CLOSING POST PROCESSOR FILE %s - PA_CLOSE_PP",
-           (err) ? PA_pp_file->name : NULL);
+           (err) ? PA_gs.pp_file->name : NULL);
 
-    PA_current_pp_cycle = -1;
+    PA_gs.current_pp_cycle = -1;
 
-    PA_pp_file = NULL;
+    PA_gs.pp_file = NULL;
 
     return;}
 
@@ -405,7 +405,7 @@ void PA_def_str(PDBfile *pdrs)
        (*hook)(pdrs);
 
 /* poll the packages */
-    for (pck = Packages; pck != NULL; pck = pck->next)
+    for (pck = PA_gs.packages; pck != NULL; pck = pck->next)
         {pck_dfstrc = pck->dfstrc;
          if (pck_dfstrc != NULL)
             (*pck_dfstrc)(pdrs);};
@@ -539,7 +539,7 @@ static void *_PA_realloc(PA_variable *pp, dimdes *olddm, int flag)
 /*--------------------------------------------------------------------------*/
 
 /* PA_CHANGE_DIM - store a new value in the given variable and reallocate
- *               - every variable in PA_variable_tab which uses the
+ *               - every variable in PA_gs.variable_tab which uses the
  *               - given variable address to find dimension values
  */
 
@@ -556,7 +556,7 @@ void PA_change_dim(int *pdm, int val)
     *pdm = val;
 
 /* check every variable's dimension list for a match to this address */
-    for (i = 0; SC_hasharr_next(PA_variable_tab, &i, NULL, &ty, (void **) &pp); i++)
+    for (i = 0; SC_hasharr_next(PA_gs.variable_tab, &i, NULL, &ty, (void **) &pp); i++)
         {if (ty[3] == 'p')                   /* skip the packages */
 	    continue;
 
@@ -646,8 +646,8 @@ void *PA_intern(void *vr, char *name)
 int PA_sizeof(char *s)
    {int rv;
 
-    if (PA_vif != NULL)
-       rv = _PD_lookup_size(s, PA_vif->chart);
+    if (PA_gs.vif != NULL)
+       rv = _PD_lookup_size(s, PA_gs.vif->chart);
 
     else
        rv = SC_sizeof(s);

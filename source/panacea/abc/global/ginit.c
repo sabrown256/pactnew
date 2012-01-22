@@ -98,11 +98,11 @@ static void init_prob(char *s)
 
     N_parts  = 0;
     N_regs   = 0;
-    N_plots  = 0;
-    N_graphs = 0;
+    PA_gs.n_plots  = 0;
+    PA_gs.n_graphs = 0;
 
-    plot_reqs   = NULL;
-    iv_spec_lst = NULL;
+    PA_gs.plot_reqs   = NULL;
+    PA_gs.iv_spec_lst = NULL;
     parts       = NULL;
 
     return;}
@@ -178,7 +178,7 @@ char *gen_args(int c, char **v)
 /* INIT_UNIT - initialize the units */
 
 int init_unit(void)
-   {STAND_ALONE = TRUE;
+   {PA_gs.stand_alone = TRUE;
 
     PA_def_units(FALSE);
 
@@ -187,7 +187,7 @@ int init_unit(void)
  * unit defines the internal system of units (default is physicist units)
  * multiplying by a unit converts a quantity from CGS to the internal system
  *
- * e.g. length_internal = length_cgs*unit[CM]
+ * e.g. length_internal = length_cgs*PA_gs.units[CM]
  */
 
 /* set up the physical constants in CGS units */
@@ -197,26 +197,26 @@ int init_unit(void)
  * is "natural units" with Hbar = c = 1
  */
     if (def_unit_flag)
-       {unit[G]   = g_icm;
-        unit[SEC] = c;
-        unit[K]   = eV_icm*(kBoltz/eV_erg);
-        unit[EV]  = eV_icm*unit[Q]*unit[Q]/unit[CM];}
+       {PA_gs.units[G]   = g_icm;
+        PA_gs.units[SEC] = c;
+        PA_gs.units[K]   = eV_icm*(kBoltz/eV_erg);
+        PA_gs.units[EV]  = eV_icm*PA_gs.units[Q]*PA_gs.units[Q]/PA_gs.units[CM];}
 
 /* the alternate default system of units is the modified CGS system
  * these values should be used in the generator deck if desired
  */
     else
-       unit[K] = kBoltz/eV_erg;
+       PA_gs.units[K] = kBoltz/eV_erg;
 
 /* CONVERSIONS
  *
- * convrsn defines the external system of units (default is CGS)
- * multiplying by a convrsn converts a quantity from CGS to the external system
+ * PA_gs.convrsns defines the external system of units (default is CGS)
+ * multiplying by a PA_gs.convrsns converts a quantity from CGS to the external system
  *
- * e.g. length_external = length_cgs*convrsn[CM]
+ * e.g. length_external = length_cgs*PA_gs.convrsns[CM]
  */
 
-    convrsn[K] = kBoltz/eV_erg;
+    PA_gs.convrsns[K] = kBoltz/eV_erg;
 
 /* make the conversion factors consistent with these changes */
     PA_set_conversions(TRUE);
@@ -357,7 +357,7 @@ static object *B_variables(SS_psides *si)
     SS_install_cf(si, "number-of-zones",
 		  "Number of zones in the current problem",
 		  SS_acc_int,
-                  &global_swtch[12]);		  
+                  &PA_gs.global_swtch[12]);		  
 
     SS_install_cf(si, "current-cycle",
 		  "Current problem cycle",
@@ -377,43 +377,43 @@ static object *B_variables(SS_psides *si)
     SS_install_cf(si, "state-file-name",
 		  "Current state file name",
 		  SS_acc_ptr,
-                  &global_name[2]);
+                  &PA_gs.global_name[2]);
 
     SS_install_cf(si, "edit-file-name",
 		  "Current ASCII edit file name",
 		  SS_acc_ptr,
-                  &global_name[3]);
+                  &PA_gs.global_name[3]);
 
     SS_install_cf(si, "pp-file-name",
 		  "Current post processor file name",
 		  SS_acc_ptr,
-                  &global_name[4]);
+                  &PA_gs.global_name[4]);
 
     SS_install_cf(si, "PVA-file-name",
 		  "Current PVA file name",
 		  SS_acc_ptr,
-                  &global_name[5]);
+                  &PA_gs.global_name[5]);
 
 /* these are not required */
     SS_install_cf(si, "initial-dtf",
 		  "Initial time step fraction",
 		  SS_acc_double,
-                  &global_param[4]);
+                  &PA_gs.global_param[4]);
 
     SS_install_cf(si, "minimum-dtf",
 		  "Minimum time step fraction",
 		  SS_acc_double,
-                  &global_param[5]);
+                  &PA_gs.global_param[5]);
 
     SS_install_cf(si, "maximum-dtf",
 		  "Maximum time step fraction",
 		  SS_acc_double,
-                  &global_param[6]);
+                  &PA_gs.global_param[6]);
 
     SS_install_cf(si, "increment-dtf",
 		  "Maximum time step increment factor",
 		  SS_acc_double,
-                  &global_param[7]);
+                  &PA_gs.global_param[7]);
 
     return(SS_f);}
 
@@ -428,16 +428,16 @@ static object *B_variables(SS_psides *si)
 static object *B_files(SS_psides *si)
    {object *o;
 
-    if ((global_name[2] == NULL) || (global_name[3] == NULL) ||
-	(global_name[4] == NULL) || (global_name[5] == NULL))
+    if ((PA_gs.global_name[2] == NULL) || (PA_gs.global_name[3] == NULL) ||
+	(PA_gs.global_name[4] == NULL) || (PA_gs.global_name[5] == NULL))
        o = SS_null;
 
     else
        o = SS_make_list(si,
-			SC_STRING_I, global_name[2],
-			SC_STRING_I, global_name[5],
-			SC_STRING_I, global_name[3],
-			SC_STRING_I, global_name[4],
+			SC_STRING_I, PA_gs.global_name[2],
+			SC_STRING_I, PA_gs.global_name[5],
+			SC_STRING_I, PA_gs.global_name[3],
+			SC_STRING_I, PA_gs.global_name[4],
 			0);
 
     return(o);}

@@ -37,18 +37,18 @@ void PA_print_variable(PA_variable *pp)
     printf("Name   : %s\n", PA_VARIABLE_NAME(pp));
     printf("Type   : %s\n", PA_VARIABLE_TYPE_S(pp));
     printf("Scope  : %s\n",
-	   PA_cpp_value_to_name(PA_CPP_SCOPE, PA_VARIABLE_SCOPE(pp)));
+	   PA_cpp_value_to_name(PA_gs.cpp_scope, PA_VARIABLE_SCOPE(pp)));
     printf("Class  : %s\n",
-	   PA_cpp_value_to_name(PA_CPP_CLASS, PA_VARIABLE_CLASS(pp)));
+	   PA_cpp_value_to_name(PA_gs.cpp_class, PA_VARIABLE_CLASS(pp)));
     printf("Persist: %s\n",
-	   PA_cpp_value_to_name(PA_CPP_PERSISTENCE, PA_VARIABLE_PERSISTENCE(pp)));
+	   PA_cpp_value_to_name(PA_gs.cpp_persistence, PA_VARIABLE_PERSISTENCE(pp)));
     printf("Center : %s\n",
-	   PA_cpp_value_to_name(PA_CPP_CENTER, PA_VARIABLE_CENTERING(pp)));
+	   PA_cpp_value_to_name(PA_gs.cpp_center, PA_VARIABLE_CENTERING(pp)));
     printf("Alloc  : %s\n",
-	   PA_cpp_value_to_name(PA_CPP_ALLOCATION, PA_VARIABLE_ALLOCATION(pp)));
+	   PA_cpp_value_to_name(PA_gs.cpp_allocation, PA_VARIABLE_ALLOCATION(pp)));
 
     PA_print_var_dim(PA_VARIABLE_DIMS(pp));
-    PA_print_var_units(pp);
+    PA_print_var_PA_gs.unitss(pp);
 
     printf("\n");
 
@@ -107,14 +107,14 @@ void PA_print_var_dim(PA_dimens *vdims)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-void PA_print_var_units(PA_variable *pp)
+void PA_print_var_PA_gs.unitss(PA_variable *pp)
    {int id;
     pcons *pc, *pd, *pn;
 
     pn = PA_VARIABLE_UNIT_NUMER(pp);
     pd = PA_VARIABLE_UNIT_DENOM(pp);
 
-    printf("unit   :");
+    printf("PA_gs.units   :");
 
     if (pn == NULL && pd == NULL)
        printf(" NULL\n");
@@ -122,13 +122,13 @@ void PA_print_var_units(PA_variable *pp)
        {if (pn != NULL)
 	   {for (pc = pn; pc != NULL; pc = (pcons *) pc->cdr)
 	        {id = PA_LST_VAL(pc);
-		 printf(" %s", PA_cpp_value_to_name(PA_CPP_UNITS, id));};};
+		 printf(" %s", PA_cpp_value_to_name(PA_gs.cpp_units, id));};};
 
 	if (pd != NULL)
 	   {printf(" PER");
 	    for (pc = pd; pc != NULL; pc = (pcons *) pc->cdr)
 	        {id = PA_LST_VAL(pc);
-		 printf(" %s", PA_cpp_value_to_name(PA_CPP_UNITS, id));};};
+		 printf(" %s", PA_cpp_value_to_name(PA_gs.cpp_units, id));};};
 
 	printf("\n");};
 
@@ -196,28 +196,28 @@ void _PA_print_info_sym(char *field, int *data)
 
     if (data != NULL)
        {if (strcmp(field, PA_INFO_CENTER_S) == 0)
-	   {name = PA_cpp_value_to_name(PA_CPP_CENTER, *data);
+	   {name = PA_cpp_value_to_name(PA_gs.cpp_center, *data);
 	    printf("\t(%s)", name);}
         else if (strcmp(field, PA_INFO_ALLOCATION_S) == 0)
-	   {name = PA_cpp_value_to_name(PA_CPP_ALLOCATION, *data);
+	   {name = PA_cpp_value_to_name(PA_gs.cpp_allocation, *data);
 	    printf("\t(%s)", name);}
 	else if (strcmp(field, PA_INFO_SCOPE_S) == 0)
-	   {name = PA_cpp_value_to_name(PA_CPP_SCOPE, *data);
+	   {name = PA_cpp_value_to_name(PA_gs.cpp_scope, *data);
 	    printf("\t(%s)", name);}
 	else if (strcmp(field, PA_INFO_PERSISTENCE_S) == 0)
-	   {name = PA_cpp_value_to_name(PA_CPP_PERSISTENCE, *data);
+	   {name = PA_cpp_value_to_name(PA_gs.cpp_persistence, *data);
 	    printf("\t(%s)", name);}
 	else if (strcmp(field, PA_INFO_UNITS_S) == 0)
-	   {name = PA_cpp_value_to_name(PA_CPP_UNITS, *data);
+	   {name = PA_cpp_value_to_name(PA_gs.cpp_units, *data);
 	    printf("\t(%s)", name);}
 	else if (strcmp(field, PA_INFO_UNIT_DENOM_S) == 0)
-	   {name = PA_cpp_value_to_name(PA_CPP_UNITS, *data);
+	   {name = PA_cpp_value_to_name(PA_gs.cpp_units, *data);
 	    printf("\t(%s)", name);}
 	else if (strcmp(field, PA_INFO_UNIT_NUMER_S) == 0)
-	   {name = PA_cpp_value_to_name(PA_CPP_UNITS, *data);
+	   {name = PA_cpp_value_to_name(PA_gs.cpp_units, *data);
 	    printf("\t(%s)", name);}
 	else if (strcmp(field, PA_INFO_TYPE_S) == 0)
-	   {name = PA_cpp_value_to_name(PA_CPP_TYPE, *data);
+	   {name = PA_cpp_value_to_name(PA_gs.cpp_type, *data);
 	    printf("\t(%s)", name);};};
     
     return;}
@@ -229,7 +229,7 @@ int main(int c, char **v)
    {int len1, len2, len3, len4;
     int foo3_data;
     PA_dimens *vdims;
-    pcons *att_alist, *unit_alist;
+    pcons *att_alist, *PA_gs.units_alist;
     PA_variable *pp;
 
 /* initialize some stuff */
@@ -240,22 +240,22 @@ int main(int c, char **v)
     PA_cpp_default();
     PA_def_var_init();
 
-/* ------- test units --------------- */
-    PA_def_var_units("1/cm", PER, CM, UNITS);
-    unit_alist = (pcons *) SC_hasharr_def_lookup(PA_var_unit_tab, "1/cm", "1/cm");
+/* ------- test PA_gs.unitss --------------- */
+    PA_def_var_PA_gs.unitss("1/cm", PER, CM, UNITS);
+    PA_gs.units_alist = (pcons *) SC_hasharr_def_lookup(PA_var_PA_gs.units_tab, "1/cm", "1/cm");
     printf("1/cm -\n");
-    PA_print_alist(unit_alist);
+    PA_print_alist(PA_gs.units_alist);
 
 /* ------- test attributes --------------- */
     PA_def_var_attribute("foo_att", PA_INFO_ALLOCATION, STATIC,
 			 PA_INFO_PERSISTENCE, CACHE_F, PA_INFO_CENTER, Z_CENT, 0);
-    att_alist = (pcons *) SC_hasharr_def_lookup(PA_var_att_tab, "foo_att", "foo_att");
+    att_alist = (pcons *) SC_hasharr_def_lookup(PA_gs.var_att_tab, "foo_att", "foo_att");
     printf("foo_att -\n");
     PA_print_alist(att_alist);
 
 /* ------- test dimensions --------------- */
     PA_def_var_dimension("dim1", &len1, LAST);
-    vdims = (PA_dimens *) SC_hasharr_def_lookup(PA_var_dim_tab, "dim1", "dim1");
+    vdims = (PA_dimens *) SC_hasharr_def_lookup(PA_gs.var_dim_tab, "dim1", "dim1");
     printf("\ndim1 - ");
     PA_print_var_dim(vdims);
 
@@ -267,17 +267,17 @@ int main(int c, char **v)
     len3 = 40;
     len4 = 50;
 
-    vdims = PA_def_var_dimension("dim2", PA_DON, &len1, &len2, LAST);
+    vdims = PA_def_var_dimension("dim2", PA_gs.don, &len1, &len2, LAST);
     printf("\ndim2 - ");
     PA_print_var_dim(vdims);
 
-    vdims = PA_def_var_dimension("dim3", PA_DUL, &len3, &len4, LAST);
+    vdims = PA_def_var_dimension("dim3", PA_gs.dul, &len3, &len4, LAST);
     printf("\ndim3 - ");
     PA_print_var_dim(vdims);
 
     PA_def_var_dimension("dim4", &len1, &len2, &len3, 
-			 PA_DON, &len1, &len2, PA_DUL, &len3, &len4, LAST);
-    vdims = (PA_dimens *) SC_hasharr_def_lookup(PA_var_dim_tab, "dim4", "dim4");
+			 PA_gs.don, &len1, &len2, PA_gs.dul, &len3, &len4, LAST);
+    vdims = (PA_dimens *) SC_hasharr_def_lookup(PA_gs.var_dim_tab, "dim4", "dim4");
     printf("\ndim4 - ");
     PA_print_var_dim(vdims);
 
@@ -323,15 +323,15 @@ int main(int c, char **v)
     pp = PA_def_variable("foo7", PA_INFO_SHARE, "foo6", PA_INFO_PERSISTENCE, CACHE_F, 0);
     PA_print_variable(pp);
 
-    printf("with units PER 1/cm\n");
+    printf("with PA_gs.unitss PER 1/cm\n");
     pp = PA_def_variable("foo8", PA_INFO_UNITS_NAME, "1/cm", 0);
     PA_print_variable(pp);
 
-    printf("with units MOLE Q PER CC K\n");
+    printf("with PA_gs.unitss MOLE Q PER CC K\n");
     pp = PA_def_variable("foo9", PA_INFO_UNITS, MOLE, Q, PER, CC, K, UNITS, 0);
     PA_print_variable(pp);
 
-    printf("with units RAD\n");
+    printf("with PA_gs.unitss RAD\n");
     pp = PA_def_variable("foo10", PA_INFO_UNITS, RAD, UNITS, 0);
     PA_print_variable(pp);
 
@@ -341,10 +341,10 @@ int main(int c, char **v)
 
     pp = PA_def_variable("foo12", PA_INFO_ATT_NAME, "bad_add",
 			 PA_INFO_DIM_NAME, "bad_dim",
-			 PA_INFO_UNITS_NAME, "bad_units",
+			 PA_INFO_UNITS_NAME, "bad_PA_gs.unitss",
 			 0);
 
-/*  PA_print_var_tab(PA_variable_tab); */
+/*  PA_print_var_tab(PA_gs.variable_tab); */
 
     return(0);}
 

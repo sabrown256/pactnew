@@ -15,7 +15,7 @@
 
 int main(int c, char **v)
    {int itype, itype1, i;
-    int iunits[11];
+    int iPA_gs.unitss[11];
     char *type, *type1, *name;
     char **s_index;
 
@@ -56,7 +56,7 @@ int main(int c, char **v)
     itype  = *(int *) PA_cpp_name_to_value(SC_DOUBLE_S);
     itype1 = *(int *) PA_cpp_name_to_value("SC_DOUBLE_I");
     type   = (char *) PA_cpp_name_to_value("SC_DOUBLE_S");
-    type1  = (char *) PA_cpp_value_to_name(PA_CPP_TYPE, 1);
+    type1  = (char *) PA_cpp_value_to_name(PA_gs.cpp_type, 1);
     printf("PA_cpp_name_to_value - %d %d %s %s\n", itype, itype1, type, type1);
 
     itype = SC_type_id(SC_DOUBLE_S, FALSE);
@@ -65,28 +65,28 @@ int main(int c, char **v)
     printf("6 is %s\n", type);
 
     for (i = 0; type_ilist[i] != -100; i++)
-        {name = PA_cpp_value_to_name(PA_CPP_TYPE, type_ilist[i]);
-	 printf("  %d of %s is a %s\n", type_ilist[i], PA_CPP_TYPE, name);};
+        {name = PA_cpp_value_to_name(PA_gs.cpp_type, type_ilist[i]);
+	 printf("  %d of %s is a %s\n", type_ilist[i], PA_gs.cpp_type, name);};
   
-    iunits[0] = RAD;
-    iunits[1] = STER;
-    iunits[2] = MOLE;
-    iunits[3] = Q;
-    iunits[4] = CM;
-    iunits[5] = SEC;
-    iunits[6] = G;
-    iunits[7] = EV;
-    iunits[8] = K;
-    iunits[9] = ERG;
-    iunits[10] = CC;
+    iPA_gs.unitss[0] = RAD;
+    iPA_gs.unitss[1] = STER;
+    iPA_gs.unitss[2] = MOLE;
+    iPA_gs.unitss[3] = Q;
+    iPA_gs.unitss[4] = CM;
+    iPA_gs.unitss[5] = SEC;
+    iPA_gs.unitss[6] = G;
+    iPA_gs.unitss[7] = EV;
+    iPA_gs.unitss[8] = K;
+    iPA_gs.unitss[9] = ERG;
+    iPA_gs.unitss[10] = CC;
 
     printf("\nUnits\n");
     for (i = 0; i < 11; i++)
-        {name = PA_cpp_value_to_name(PA_CPP_UNITS, iunits[i]);
-	 printf("  %d of %s is a %s\n", iunits[i], PA_CPP_UNITS, name);};
+        {name = PA_cpp_value_to_name(PA_gs.cpp_units, iPA_gs.unitss[i]);
+	 printf("  %d of %s is a %s\n", iPA_gs.unitss[i], PA_gs.cpp_units, name);};
 
-    name = PA_cpp_value_to_name(PA_CPP_INFO, PA_INFO_SCOPE);
-    printf("  %d of PA_CPP_INFO is a %s\n", PA_INFO_SCOPE, name);
+    name = PA_cpp_value_to_name(PA_gs.cpp_info, PA_INFO_SCOPE);
+    printf("  %d of PA_gs.cpp_info is a %s\n", PA_INFO_SCOPE, name);
 
     return(0);}
 

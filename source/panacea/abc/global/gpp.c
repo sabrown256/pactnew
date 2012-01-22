@@ -478,7 +478,7 @@ static void _LR_fill_coordw(double **elem, int ne, int *pist)
                      {*pxc++ = rx[i];
                       *pyc++ = ry[i];};};
 
-    conv = unit[CM]/convrsn[CM];
+    conv = PA_gs.units[CM]/PA_gs.convrsns[CM];
     PM_array_scale(xc, ne, conv);
     PM_array_scale(yc, ne, conv);
 
@@ -550,7 +550,7 @@ int LR_flatten_space(PA_plot_request *pr)
 int LR_flatten_plots(void)
    {PA_plot_request *pr;
 
-    for (pr = plot_reqs; pr != NULL; pr = pr->next)
+    for (pr = PA_gs.plot_reqs; pr != NULL; pr = pr->next)
         LR_flatten_space(pr);
 
     return(TRUE);}
@@ -801,7 +801,7 @@ static PM_set *LR_mesh_set(char *name)
             {i = NODE_OF(k, l);
              *pxc++ = rx[i];
              *pyc++ = ry[i];};
-    conv = unit[CM]/convrsn[CM];
+    conv = PA_gs.units[CM]/PA_gs.convrsns[CM];
     PM_array_scale(xc, ni, conv);
     PM_array_scale(yc, ni, conv);
     set = PM_make_set(name, SC_DOUBLE_S, FALSE,
@@ -878,7 +878,7 @@ PM_set *LR_get_set(char *name, PM_centering *pcent, C_array *arr, int space)
 object *LR_get_time_data(SS_psides *si)
    {double tconv, tc, dtc;
 
-    tconv = convrsn[SEC]/unit[SEC];
+    tconv = PA_gs.convrsns[SEC]/PA_gs.units[SEC];
     tc    = tconv*t;
     dtc   = tconv*dt;
     return(SS_make_list(si,
@@ -896,16 +896,16 @@ int LR_get_data(double *pnz, double *pnc, double *pt, double *pdt,
 	        char **prs, char **ped, char **ppp, char **pgf)
    {
 
-    *pnz = (double) global_swtch[12];
+    *pnz = (double) PA_gs.global_swtch[12];
     *pnc = (double) cycle;
 
-    *pt  = global_param[1];
-    *pdt = global_param[4]*(global_param[3] - global_param[2]);
+    *pt  = PA_gs.global_param[1];
+    *pdt = PA_gs.global_param[4]*(PA_gs.global_param[3] - PA_gs.global_param[2]);
 
-    *prs = global_name[2];
-    *ped = global_name[3];
-    *ppp = global_name[4];
-    *pgf = global_name[5];
+    *prs = PA_gs.global_name[2];
+    *ped = PA_gs.global_name[3];
+    *ppp = PA_gs.global_name[4];
+    *pgf = PA_gs.global_name[5];
 
     return(TRUE);}
 

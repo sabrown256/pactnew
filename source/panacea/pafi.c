@@ -13,9 +13,6 @@
 char
  bf[MAXLINE];
 
-PDBfile
- *PA_vif = NULL;
-
 hasharr
  *ddtab = NULL;
 
@@ -71,7 +68,7 @@ static void _PA_proc_dd_tab(PA_package *pck, hasharr *tab)
 
 /* count the number of scalar integers, reals, and strings */
     for (i = 0; SC_hasharr_next(tab, &i, NULL, &type, (void **) &pp); i++)
-        {if (strcmp(type, PAN_PACKAGE) == 0)
+        {if (strcmp(type, PA_gs.package) == 0)
 	    continue;
 
 	 pt = PA_VARIABLE_TYPE_S(pp);
@@ -202,7 +199,7 @@ static void _PA_get_alist_dims(PA_package *pck, PA_variable *pp, hasharr *tab)
 
              leng = pv->data;}
 
-         next = _PA_mk_dimens(&One_I, (int *) leng, *PA_DUL);
+         next = _PA_mk_dimens(&One_I, (int *) leng, *PA_gs.dul);
          if (vdims == NULL)
             vdims = next;
          else
@@ -387,7 +384,7 @@ static int _PA_proc_info(PA_variable *pp, int req, void *vr)
 /* the initializing function of the variable */
         case PA_INFO_INIT_FNC :
              token = PA_assoc(alist, "PROC");
-	     *pfnc = SC_HASHARR_LOOKUP_FUNCTION(PA_symbol_tab, PFVoid, token);
+	     *pfnc = SC_HASHARR_LOOKUP_FUNCTION(PA_gs.symbol_tab, PFVoid, token);
              break;
 
 /* the conversion factor CGS->external of the variable */
@@ -427,7 +424,7 @@ static void _PA_proc_db_tab(PA_package *pck, hasharr *tab)
 
 /* set up the variable except for the dimensions */
     for (i = 0; SC_hasharr_next(tab, &i, NULL, &ty, (void **) &pp); i++)
-        {if (strcmp(ty, PAN_PACKAGE) == 0)
+        {if (strcmp(ty, PA_gs.package) == 0)
 	    continue;
 
 	 if ((PA_VARIABLE_DIMS(pp) == NULL) &&
@@ -453,7 +450,7 @@ static void _PA_proc_db_tab(PA_package *pck, hasharr *tab)
     for (i = 0; SC_hasharr_next(tab, &i, NULL, &ty, (void **) &pp); i++)
 
 /* allocate the scalars now */
-        {if (strcmp(ty, PAN_PACKAGE) == 0)
+        {if (strcmp(ty, PA_gs.package) == 0)
 	    continue;
 
 	 if (PA_VARIABLE_N_DIMS(pp) == 0)
@@ -463,7 +460,7 @@ static void _PA_proc_db_tab(PA_package *pck, hasharr *tab)
 
 /* now the arrays can be safely set up */
     for (i = 0; SC_hasharr_next(tab, &i, NULL, &ty, (void **) &pp); i++)
-        {if (strcmp(ty, PAN_PACKAGE) == 0)
+        {if (strcmp(ty, PA_gs.package) == 0)
 	    continue;
 
 	 if ((PA_VARIABLE_DIMS(pp) == NULL) &&
@@ -518,7 +515,7 @@ static PA_tab_head *_PA_rd_tab_head(FILE *fp, char *fn)
     keys = NULL;
     pb   = bf;
     for (j = 0; j < 100000; j++)
-        {key = SC_strtok(pb, PA_token_delimiters, s);
+        {key = SC_strtok(pb, PA_gs.token_delimiters, s);
          if (key == NULL)
             break;
 
@@ -556,9 +553,9 @@ static void _PA_rd_dd_tab(PA_package *pck, FILE *fp)
     if (ddtab == NULL)
        ddtab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
-    old_delim = PA_token_delimiters;
+    old_delim = PA_gs.token_delimiters;
 
-    PA_token_delimiters = _PA.delim;
+    PA_gs.token_delimiters = _PA.delim;
 
     pt = _PA_rd_tab_head(fp, "_PA_RD_DD_TAB");
     
@@ -584,7 +581,7 @@ static void _PA_rd_dd_tab(PA_package *pck, FILE *fp)
          pk    = pt->entries;
          pb    = bf;
          for (j = 0; j < nf; j++)
-             {token = SC_strtok(pb, PA_token_delimiters, s);
+             {token = SC_strtok(pb, PA_gs.token_delimiters, s);
               PA_ERR((token == NULL),
                      "BAD FIELD %d IN ENTRY %d - _PA_RD_DD_TAB", j, i);
 
@@ -614,7 +611,7 @@ static void _PA_rd_dd_tab(PA_package *pck, FILE *fp)
             "TABLE %s, EXPECTED %d ENTRIES FOUND %d - _PA_RD_DD_TAB",
              pt->name, ne, ne_read);
 
-    PA_token_delimiters = old_delim;
+    PA_gs.token_delimiters = old_delim;
 
     return;}
 
@@ -638,12 +635,12 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
     memdes *desc, *lst, *prv;
     defstr *dp;
 
-    if (PA_vif == NULL)
-       PA_vif = PA_open("PA_vif", "r+", TRUE);
+    if (PA_gs.vif == NULL)
+       PA_gs.vif = PA_open("PA_gs.vif", "r+", TRUE);
 
-    old_delim = PA_token_delimiters;
+    old_delim = PA_gs.token_delimiters;
 
-    PA_token_delimiters = _PA.delim;
+    PA_gs.token_delimiters = _PA.delim;
 
     vattr[0] = RUNTIME;
     vattr[1] = OPTL;
@@ -660,7 +657,7 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
     ne = pt->n_entries;
     nf = pt->n_fields;
 
-    fc  = PA_vif->chart;
+    fc  = PA_gs.vif->chart;
     prv = NULL;
     lst = NULL;
 
@@ -683,7 +680,7 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
          pk    = pt->entries;
          alist = NULL;
          for (j = 0; j < nf; j++)
-             {token = SC_strtok(pb, PA_token_delimiters, s);
+             {token = SC_strtok(pb, PA_gs.token_delimiters, s);
               PA_ERR((token == NULL),
                      "BAD FIELD %d IN ENTRY %d - _PA_RD_DB_TAB", j, i);
               pb = NULL;
@@ -721,9 +718,9 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
 
 /* while we're here with the actual type fix the pp type */
          if (_PD_indirection(type))
-            dp = PD_inquire_host_type(PA_vif, "*");
+            dp = PD_inquire_host_type(PA_gs.vif, "*");
          else
-            dp = PD_inquire_host_type(PA_vif, type);
+            dp = PD_inquire_host_type(PA_gs.vif, type);
          PA_ERR((dp == NULL),
                 "TYPE %s NOT DEFINED - _PA_RD_DB_TAB", type);
 
@@ -750,7 +747,7 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
          prv = desc;};
 
 /* install the type in both charts */
-    dp = _PD_defstr_inst(PA_vif, pt->name, STRUCT_KIND, lst,
+    dp = _PD_defstr_inst(PA_gs.vif, pt->name, STRUCT_KIND, lst,
 			 NO_ORDER, NULL, NULL, PD_CHART_HOST);
 
     PA_ERR((dp == NULL),
@@ -760,7 +757,7 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
             "TABLE %s, EXPECTED %d ENTRIES FOUND %d - _PA_RD_DB_TAB",
             pt->name, ne, ne_read);
 
-    PA_token_delimiters = old_delim;
+    PA_gs.token_delimiters = old_delim;
 
 /* cons this dictionary name onto the list */
     pck->db_list = SC_mk_pcons(SC_STRING_S, CSTRSAVE(pt->name),
@@ -822,10 +819,10 @@ void PA_install_function(char *s, PFVoid fnc)
 
     addr.funcaddr = (PFInt) fnc;
 
-    if (PA_symbol_tab == NULL)
-       PA_symbol_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
+    if (PA_gs.symbol_tab == NULL)
+       PA_gs.symbol_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
-    SC_hasharr_install(PA_symbol_tab, s, addr.memaddr, "procedure", 2, -1);
+    SC_hasharr_install(PA_gs.symbol_tab, s, addr.memaddr, "procedure", 2, -1);
 
     return;}
 
@@ -839,13 +836,13 @@ void PA_install_function(char *s, PFVoid fnc)
 void PA_install_identifier(char *s, void *vr)
    {
 
-    if (PA_symbol_tab == NULL)
-       PA_symbol_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
+    if (PA_gs.symbol_tab == NULL)
+       PA_gs.symbol_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
 /* GOTCHA: The variable may or may not be dynamic, so don't mark it.
  *         It's up to the caller to be aware of the reference count.
  */
-    SC_hasharr_install(PA_symbol_tab, s, vr, "variable", 2, -1);
+    SC_hasharr_install(PA_gs.symbol_tab, s, vr, "variable", 2, -1);
 
     return;}
 
@@ -857,11 +854,11 @@ void PA_install_identifier(char *s, void *vr)
 void PA_add_hook(char *name, void *fnc)
    {SC_address ad;
 
-    if (PA_symbol_tab == NULL)
-       PA_symbol_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
+    if (PA_gs.symbol_tab == NULL)
+       PA_gs.symbol_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
     ad.funcaddr = (PFInt) fnc;
-    SC_hasharr_install(PA_symbol_tab, name, ad.memaddr, SC_POINTER_S, 2, -1);
+    SC_hasharr_install(PA_gs.symbol_tab, name, ad.memaddr, SC_POINTER_S, 2, -1);
 
     return;}
 

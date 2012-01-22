@@ -259,7 +259,7 @@ static int c_properties(material *mat, int m)
     double conv;
     component *cmp;
 
-    conv = kBoltz/convrsn[K];
+    conv = kBoltz/PA_gs.convrsns[K];
 
     rhl = mat->rho;
     al  = mat->a;
