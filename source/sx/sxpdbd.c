@@ -61,11 +61,6 @@ struct s_differr
    {int fpe;
     JMP_BUF cpu;};
 
-int
- SX_promote_flag      = 0, 
- SX_promote_fixed     = FALSE, 
- SX_promote_float     = FALSE;
-
 static int
  _SX_diff_tree(SS_psides *si, char *nma, char *nmb, 
 	       PDBfile *pfa, PDBfile *pfb, 
@@ -176,12 +171,12 @@ int _SX_type_equal(PDBfile *pfa, PDBfile *pfb, char *typa, char *typb)
     if ((dpa->members == NULL) && (dpb->members == NULL))
 
 /* type promotion SHORT-CIRCUITS */
-       {if (SX_promote_flag)
-           {if (SX_promote_float && (dpa->fp.format != NULL) &&
+       {if (_SX.promote_flag)
+           {if (_SX.promote_float && (dpa->fp.format != NULL) &&
 		(dpb->fp.format != NULL))
                return(TRUE);
 
-            if (SX_promote_fixed &&
+            if (_SX.promote_fixed &&
 		(dpa->fp.format == NULL) && (dpb->fp.format == NULL) &&
                 (dpa->fix.order != NO_ORDER) && (dpb->fix.order != NO_ORDER))
                return(TRUE);};}
@@ -997,18 +992,18 @@ object *_SXI_diff_var(SS_psides *si, object *argl)
                                  "SIXTH ARGUMENT NOT INTEGER - _SXI_DIFF_VAR");};
 
     if (SS_consp(argl))
-       {SX_GET_INTEGER_FROM_LIST(si, SX_promote_flag, argl, 
+       {SX_GET_INTEGER_FROM_LIST(si, _SX.promote_flag, argl, 
                                  "SEVENTH ARGUMENT NOT INTEGER - _SXI_DIFF_VAR");};
     
-    if ((SX_promote_flag == 1) || (SX_promote_flag == 3))
-       SX_promote_fixed = TRUE;
+    if ((_SX.promote_flag == 1) || (_SX.promote_flag == 3))
+       _SX.promote_fixed = TRUE;
     else
-       SX_promote_fixed = FALSE;
+       _SX.promote_fixed = FALSE;
 
-    if ((SX_promote_flag == 2) || (SX_promote_flag == 3))
-       SX_promote_float = TRUE;
+    if ((_SX.promote_flag == 2) || (_SX.promote_flag == 3))
+       _SX.promote_float = TRUE;
     else
-       SX_promote_float = FALSE;
+       _SX.promote_float = FALSE;
 
     ret = _SX_diff_var(si, pfa, pfb, nma, nmb, &sza, &szb);
 

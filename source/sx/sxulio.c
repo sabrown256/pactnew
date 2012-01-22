@@ -1257,7 +1257,7 @@ object *SX_write_data(SS_psides *si, object *argl)
     type = (char *) SC_hasharr_def_lookup(_SX.files, fname);
     if (type == NULL)
        {if (SC_isfile(fname))
-           {switch (SX_file_exist_action)
+           {switch (_SX.file_exist_action)
                {case DESTROY :
 		     SC_remove(fname);
 		     break;
