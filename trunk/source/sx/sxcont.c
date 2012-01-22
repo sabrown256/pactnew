@@ -12,9 +12,6 @@
 
 #define EOE(str) ((*SS_PTR(str) == '\n') || (*SS_PTR(str) == '\0'))
 
-SX_file_action
- SX_file_exist_action = FAIL;
-
 static char
  *SX_MAPPING_S = "PM_mapping *",
  *SX_IMAGE_S = "PG_image *",
@@ -818,22 +815,22 @@ static void _SX_install_device_vars(SS_psides *si)
 	     doc  = SC_dsnprintf(TRUE, "Variable: %s window height in fraction of screen width\n     Usage: window-height-%s <real>",
 				 dupp, dname);
 	     name = SC_dsnprintf(FALSE, "window-height-%s", dname);
-	     SS_install_cf(si, name, doc, SS_acc_double, &out->height);
+	     SS_install_cf(si, name, doc, SS_acc_double, &out->dx0[1]);
 
 	     doc  = SC_dsnprintf(TRUE,  "Variable: %s X comp of window origin (frac of screen width)\n     Usage: window-origin-x-%s <real>",
 				 dupp, dname);
 	     name = SC_dsnprintf(FALSE, "window-origin-x-%s", dname);
-	     SS_install_cf(si, name, doc, SS_acc_double, &out->x0);
+	     SS_install_cf(si, name, doc, SS_acc_double, &out->x0[0]);
 
 	     doc  = SC_dsnprintf(TRUE, "Variable: %s Y comp of window origin (frac of screen width)\n     Usage: window-origin-y-%s <real>",
 				 dupp, dname);
 	     name = SC_dsnprintf(FALSE, "window-origin-y-%s", dname);
-	     SS_install_cf(si, name, doc, SS_acc_double, &out->y0);
+	     SS_install_cf(si, name, doc, SS_acc_double, &out->x0[1]);
 
 	     doc  = SC_dsnprintf(TRUE, "Variable: %s window width in fraction of screen width\n     Usage: window-width-%s <real>",
 				 dupp, dname);
 	     name = SC_dsnprintf(FALSE, "window-width-%s", dname);
-	     SS_install_cf(si, name, doc, SS_acc_double, &out->width);}
+	     SS_install_cf(si, name, doc, SS_acc_double, &out->dx0[0]);}
 
 	 else
 	    {doc  = SC_dsnprintf(TRUE,  "%s-flag is not supported as configured",
@@ -866,10 +863,10 @@ void SX_init_device_vars(int idev, double xf, double yf, double wd, double hg)
     
     out = SX_get_device(idev);
     if (out != NULL)
-       {out->x0     = xf;
-	out->y0     = yf;
-	out->width  = wd;
-	out->height = hg;};
+       {out->x0[0]  = xf;
+	out->x0[1]  = yf;
+	out->dx0[0] = wd;
+	out->dx0[1] = hg;};
 
     return;}
 
@@ -1322,7 +1319,7 @@ void SX_install_global_vars(SS_psides *si)
     SS_install_cf(si, "file-exist-action",
                   "Variable: Control action when opening existing files for append\n     Usage: file-exist-action <integer>",
                   SS_acc_int,
-                  (int *) &SX_file_exist_action);
+                  (int *) &_SX.file_exist_action);
 
     SS_install_cf(si, "graphics-mode",
                   "Variable: Graphics mode\n     Usage: graphics-mode [on|off]",

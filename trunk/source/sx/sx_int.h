@@ -118,6 +118,9 @@ struct s_SX_state
 
 /* initializes to non-zero values */
 
+/* SXCONT.C */
+    SX_file_action file_exist_action;
+
 /* SXPGS.C */
     int color;
 
@@ -140,7 +143,7 @@ struct s_SX_state
     char cache_filename[32];
 
 /* ULAUXF.C */
-     int fft_order;
+    int fft_order;
 
 /* initializes to 0 bytes */
 
@@ -179,6 +182,11 @@ struct s_SX_state
 /* SXPDB.C */
     int iwcu;
 
+/* SXPDBD.C */
+    int promote_flag;
+    int promote_fixed;
+    int promote_float;
+
 /* SXPML.C */
     int ap;
     int api;
@@ -214,9 +222,6 @@ struct s_SX_state
 
 extern SX_state
  _SX;
-
-extern SX_file_action
- SX_file_exist_action;
 
 /*--------------------------------------------------------------------------*/
 

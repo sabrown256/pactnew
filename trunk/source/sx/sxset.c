@@ -15,7 +15,9 @@
        *((typ *) (var->val)) =  *((typ *) val)
 
 SX_state
- _SX = { 3, 1.0e-15, 1.0e-3, 2.0, 'a', LITERAL, 1, 1, '@', "curves.a",
+ _SX = { FAIL, 3,
+	 1.0e-15, 1.0e-3, 2.0,
+	 'a', LITERAL, 1, 1, '@', "curves.a",
          TRUE, };
 
 SX_global_state
@@ -156,7 +158,7 @@ SS_psides *SX_init(char *code, char *vers, int c, char **v, char **env)
 
     SC_REGISTER_CONTEXT(_SX_type_container, si);
 
-    SX_file_exist_action = FAIL;
+    _SX.file_exist_action = FAIL;
 
     return(si);}
 

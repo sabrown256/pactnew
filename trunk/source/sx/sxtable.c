@@ -10,20 +10,17 @@
  
 #include "sx_int.h"
 
-int
- _SX_table_n;
+typedef struct s_tabdesc tabdesc;
 
-long
- _SX_table_ln;
+struct s_tabdesc
+   {int n;
+    long ln;
+    char *name;
+    char **labels;
+    PM_matrix *current;};
 
-char
- *SX_table_name;
-
-static PM_matrix
- *SX_current_table;
-
-static char
- **SX_current_table_labels;
+static tabdesc
+ _SX_table;
 
 /*--------------------------------------------------------------------------*/
 
@@ -61,7 +58,7 @@ static int _SX_get_line_length(FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_SETUP_CLABELS - set up SX_current_table_labels
+/* _SX_SETUP_CLABELS - set up _SX_table.labels
  *                   - an array of column label strings
  *                   - the input is label, the string containing
  *                   - potential column labels, and nc, the number of columns
@@ -75,31 +72,31 @@ static int _SX_get_line_length(FILE *fp)
 static int _SX_setup_clabels(char *label, int nc, int linelen)  
    {int ntokens, i, rv;
 
-    if (SX_current_table_labels != NULL)
-       {SC_free_strings(SX_current_table_labels);
-        SX_current_table_labels = NULL;};
+    if (_SX_table.labels != NULL)
+       {SC_free_strings(_SX_table.labels);
+        _SX_table.labels = NULL;};
 
     if ((label == NULL) || (label[0] == '\0'))
        rv = FALSE;
 
     else
-       {SX_current_table_labels = SC_tokenize(label, " \t\n\r");
+       {_SX_table.labels = SC_tokenize(label, " \t\n\r");
 
-	for (ntokens = 0; SX_current_table_labels[ntokens] != NULL; ntokens++);
+	for (ntokens = 0; _SX_table.labels[ntokens] != NULL; ntokens++);
 
 	if (ntokens == (nc+1))
 /* Assume first token is comment char and take it out of list */
-	   {CFREE(SX_current_table_labels[0]);
+	   {CFREE(_SX_table.labels[0]);
 
 	    for (i = 0; i < nc; i++)
-	        SX_current_table_labels[i] = SX_current_table_labels[i+1];
+	        _SX_table.labels[i] = _SX_table.labels[i+1];
 
-	    SX_current_table_labels[nc] = NULL;}
+	    _SX_table.labels[nc] = NULL;}
 
 /* Anything other than nc tokens means we can't interpret label as column labels */
 	else if (ntokens != nc)
-	   {SC_free_strings(SX_current_table_labels);
-	    SX_current_table_labels = NULL;};
+	   {SC_free_strings(_SX_table.labels);
+	    _SX_table.labels = NULL;};
 
 	rv = TRUE;};
 
@@ -267,9 +264,9 @@ static object *_SXI_read_text_table(SS_psides *si, object *argl)
     FILE *fp;
     object *rv;
 
-    if (SX_current_table != NULL)
-       {PM_destroy(SX_current_table);
-        SX_current_table = NULL;};
+    if (_SX_table.current != NULL)
+       {PM_destroy(_SX_table.current);
+        _SX_table.current = NULL;};
 
     name   = NULL;
     n      = 1;
@@ -282,9 +279,9 @@ static object *_SXI_read_text_table(SS_psides *si, object *argl)
             SC_INT_I, &nl,
             0);
 
-    SX_table_name = CSTRSAVE(name);
+    _SX_table.name = CSTRSAVE(name);
 
-    name = SC_search_file(NULL, SX_table_name);
+    name = SC_search_file(NULL, _SX_table.name);
     if (name == NULL)
        SS_error(si, "CAN'T FIND FILE - _SXI_READ_TEXT_TABLE", argl);
 
@@ -309,7 +306,7 @@ static object *_SXI_read_text_table(SS_psides *si, object *argl)
         SS_error(si, "REQUESTED TABLE NOT FOUND - _SXI_READ_TEXT_TABLE",
 		   argl);}
 
-    SX_current_table = PM_create(nr, nc);
+    _SX_table.current = PM_create(nr, nc);
 
     if (addrl != -1)
        {if (io_seek(fp, addrl, SEEK_SET))
@@ -334,7 +331,7 @@ static object *_SXI_read_text_table(SS_psides *si, object *argl)
               if ((j == 1) && !fn)
                  token = SC_firsttok(linein, " \t\n\r");
 
-              PM_element(SX_current_table, i, j) = ATOF(token);};};
+              PM_element(_SX_table.current, i, j) = ATOF(token);};};
 
     io_close(fp);
 
@@ -354,8 +351,8 @@ static object *_SXI_read_text_table(SS_psides *si, object *argl)
     CFREE(linein);
     CFREE(label);
 
-    _SX_table_n = n;
-    _SX_table_ln = nl;
+    _SX_table.n = n;
+    _SX_table.ln = nl;
 
     rv = SS_make_list(si, SC_INT_I, &nr,
 		      SC_INT_I, &nc,
@@ -453,8 +450,8 @@ static PM_set *_SX_lr_zc_domain(char *name)
 
     nd = 2;
     maxes = CMAKE_N(int, nd);
-    maxes[0] = SX_current_table->ncol + 1;
-    maxes[1] = SX_current_table->nrow + 1;
+    maxes[0] = _SX_table.current->ncol + 1;
+    maxes[1] = _SX_table.current->nrow + 1;
 
     set = PM_make_lr_index_domain(name, SC_DOUBLE_S, nd, nd,
 				  maxes, NULL, NULL);
@@ -524,8 +521,8 @@ static PM_set *_SX_table_set(SS_psides *si, object *specs)
 	for (i = 0; comps != SS_null; comps = SS_cdr(si, comps), i++)
 	    {sp = SS_car(si, comps);
 	     start = 0L;
-	     npts  = SX_current_table->nrow;
-	     step  = SX_current_table->ncol;
+	     npts  = _SX_table.current->nrow;
+	     step  = _SX_table.current->ncol;
 	     SS_args(si, sp,
 		     SC_LONG_I, &start,
 		     SC_LONG_I, &npts,
@@ -535,7 +532,7 @@ static PM_set *_SX_table_set(SS_psides *si, object *specs)
 	     if ((i > 0) && (npts != ne))
 	        SS_error(si, "BAD SPECIFICATION - _SX_TABLE_SET", sp);
 
-	     elem[i] = SX_extract_vector(SX_current_table, start, step, npts);
+	     elem[i] = SX_extract_vector(_SX_table.current, start, step, npts);
 	     ne = npts;};
 
 	set = PM_mk_set(name, SC_DOUBLE_S, FALSE, ne, nd, nde,
@@ -690,7 +687,7 @@ static object *SX_wrt_current_table(SS_psides *si, object *argl)
     FILE *fp;
 
 
-    if (SX_current_table == NULL)
+    if (_SX_table.current == NULL)
        return(SS_f);    
 
     fname = NULL;
@@ -705,19 +702,19 @@ static object *SX_wrt_current_table(SS_psides *si, object *argl)
 		      SS_mk_string(si, fname));}
 
 /* write the labels if any */
-    if (SX_current_table_labels != NULL)
+    if (_SX_table.labels != NULL)
        {io_printf(fp, "#\t");
 
         i = 0;
-        while (SX_current_table_labels[i] != NULL)
-           {io_printf(fp, "%s\t", SX_current_table_labels[i]);
+        while (_SX_table.labels[i] != NULL)
+           {io_printf(fp, "%s\t", _SX_table.labels[i]);
             i++;};
         io_printf(fp, "\n");};
 
 /* write the numbers */
-    nr = SX_current_table->nrow;
-    nc = SX_current_table->ncol;
-    ap = SX_current_table->array;
+    nr = _SX_table.current->nrow;
+    nc = _SX_table.current->ncol;
+    ap = _SX_table.current->array;
 
     k = 0;
     for (i = 0; i < nr; i++)
@@ -746,7 +743,7 @@ static object *SX_print_column(SS_psides *si, object *argl)
 
     rv = SS_null;
 
-    if (SX_current_table == NULL)
+    if (_SX_table.current == NULL)
        SS_error(si, "NO CURRENT TABLE EXISTS - USE read-table TO CREATE",
 		  argl);
 
@@ -755,15 +752,15 @@ static object *SX_print_column(SS_psides *si, object *argl)
 		SC_LONG_I, &col,
 		0);
  
-	nr = SX_current_table->nrow;
-	nc = SX_current_table->ncol;
+	nr = _SX_table.current->nrow;
+	nc = _SX_table.current->ncol;
 
 	if ((col < 0) || (col >= nc))
 	  SS_error(si,
 		     "COLUMN NUMBER OUT OF RANGE--COLUMN NUMBERING IS 0 BASED",
 		     argl);
 
-	val = SX_extract_vector(SX_current_table, col, nc, nr);
+	val = SX_extract_vector(_SX_table.current, col, nc, nr);
 
 	PRINT(stdout, "\n");
 	for (j = 0L; j < nr; j++)
@@ -789,20 +786,20 @@ static int _SX_del_label(long *cols, long ncol)
     long *scols, ndcol;
     char **temp;
 
-    nc = SX_current_table->ncol;
+    nc = _SX_table.current->ncol;
     temp = CMAKE_N(char *, nc);
 
     for (i = 0, j = 0, scols = cols, ndcol = 0; i < nc; i++)
         {if (i != *scols)
-            temp[j++] = SX_current_table_labels[i];
+            temp[j++] = _SX_table.labels[i];
          else
-            {CFREE(SX_current_table_labels[i]);
+            {CFREE(_SX_table.labels[i]);
              if (ndcol < ncol)
                 {scols++;
                  ndcol++;};};}
 
-    CFREE(SX_current_table_labels);
-    SX_current_table_labels = temp;
+    CFREE(_SX_table.labels);
+    _SX_table.labels = temp;
 
     return(TRUE);}
  
@@ -820,7 +817,7 @@ static object *SX_delete_column(SS_psides *si, object *argl)
     done = 0;
     rv   = SS_null;
 
-    if (SX_current_table == NULL)
+    if (_SX_table.current == NULL)
        SS_error(si, "NO CURRENT TABLE EXISTS - USE read-table TO CREATE",
 		  argl);
 
@@ -851,12 +848,12 @@ static object *SX_delete_column(SS_psides *si, object *argl)
                 {sdata[j++] = data[i];};}
 
 	_SX_del_label(sdata, j);
-	PM_del_col(SX_current_table, sdata, j);
+	PM_del_col(_SX_table.current, sdata, j);
 
         CFREE(sdata);
 
-	nr = SX_current_table->nrow;
-	nc = SX_current_table->ncol;
+	nr = _SX_table.current->nrow;
+	nc = _SX_table.current->ncol;
 
 	if (si->interactive == ON)
 	   PRINT(stdout,
@@ -880,7 +877,7 @@ static object *SX_sort_on_column(SS_psides *si, object *argl)
 
     rv = SS_null;
 
-    if (SX_current_table == NULL)
+    if (_SX_table.current == NULL)
        SS_error(si, "NO CURRENT TABLE EXISTS - USE read-table TO CREATE",
 		  argl);
 
@@ -889,10 +886,10 @@ static object *SX_sort_on_column(SS_psides *si, object *argl)
 		SC_INT_I, &col,
 		0);
 
-	PM_sort_on_col(SX_current_table, col);
+	PM_sort_on_col(_SX_table.current, col);
 
-	nr = SX_current_table->nrow;
-	nc = SX_current_table->ncol;
+	nr = _SX_table.current->nrow;
+	nc = _SX_table.current->ncol;
 
 	if (si->interactive == ON)
 	   PRINT(stdout,
@@ -916,15 +913,15 @@ static object *SX_cnormalize_table(SS_psides *si)
 
     rv = SS_null;
 
-    if (SX_current_table == NULL)
+    if (_SX_table.current == NULL)
        SS_error(si, "NO CURRENT TABLE EXISTS - USE read-table TO CREATE",
 		  SS_null);
 
     else
-       {_SX_cnormalize_table(SX_current_table);
+       {_SX_cnormalize_table(_SX_table.current);
 
-	nr = SX_current_table->nrow;
-	nc = SX_current_table->ncol;
+	nr = _SX_table.current->nrow;
+	nc = _SX_table.current->ncol;
 
 	if (si->interactive == ON)
 	   PRINT(stdout,
@@ -949,14 +946,14 @@ static object *SX_col_labels(SS_psides *si)
     obj = SS_null;
     lst = SS_null;
 
-    if (SX_current_table != NULL)
-       {nc = SX_current_table->ncol;
+    if (_SX_table.current != NULL)
+       {nc = _SX_table.current->ncol;
 
-	if ((SX_current_table != NULL) && (SX_current_table_labels != NULL))
+	if ((_SX_table.current != NULL) && (_SX_table.labels != NULL))
 	   {for (i = nc-1; i >= 0; i--)
-	        {if (SX_current_table_labels[i] == NULL)
+	        {if (_SX_table.labels[i] == NULL)
 		    break;
-		 obj = SS_mk_string(si, SX_current_table_labels[i]);
+		 obj = SS_mk_string(si, _SX_table.labels[i]);
 		 lst = SS_mk_cons(si, obj, lst);};};};
 
     return(lst);}

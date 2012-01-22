@@ -521,10 +521,8 @@ struct s_out_device
     int background_color;
     char *dname;               /* device name lower case */
     char *dupp;                /* device name upper case */
-    double x0;
-    double y0;
-    double width;
-    double height;
+    double x0[PG_SPACEDM];
+    double dx0[PG_SPACEDM];
     char *fname;               /* file name */
     char *type;
     PG_device *dev;};

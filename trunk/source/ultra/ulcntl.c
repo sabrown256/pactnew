@@ -84,7 +84,7 @@ object *_ULI_apropos(SS_psides *si, object *obj)
 /* _UL_PRINT_OUT_DEVICE - print to the specified output device */
 
 static void _UL_print_out_device(SS_psides *si, int idev)
-   {int width, height;
+   {int dx[PG_SPACEDM];
     PG_device *dev;
     PG_dev_geometry *g;
     out_device *out;
@@ -104,8 +104,8 @@ static void _UL_print_out_device(SS_psides *si, int idev)
 			  SS_null);
             dev = PG_make_device(out->dupp, out->type, out->fname);
             UL_set_graphics_state(dev);
-            dev = PG_open_device(dev, out->x0, out->y0,
-				 out->width, out->height);
+            dev = PG_open_device(dev, out->x0[0], out->x0[1],
+				 out->dx0[0], out->dx0[1]);
 
             if (dev == NULL)
                SS_error(si,
@@ -120,13 +120,13 @@ static void _UL_print_out_device(SS_psides *si, int idev)
 	if (dev != NULL)
 	   {g = &dev->g;
 
-	    width  = PG_window_width(dev);
-	    height = PG_window_height(dev);
+	    dx[0] = PG_window_width(dev);
+	    dx[1] = PG_window_height(dev);
 
 	    UL_set_graphics_state(dev);
 
-	    g->hwin[1] = g->hwin[0] + width;
-	    g->hwin[3] = g->hwin[2] + height;
+	    g->hwin[1] = g->hwin[0] + dx[0];
+	    g->hwin[3] = g->hwin[2] + dx[1];
 
 	    UL_draw_plot(dev);};};
 
