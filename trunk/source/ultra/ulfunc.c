@@ -14,11 +14,8 @@
 #define advance(j)           (j < (SX_gs.dataset[l].n-1)) ? j++ : j 
 
 #ifndef TOO_MANY_POINTS
-#define TOO_MANY_POINTS 1000000
+# define TOO_MANY_POINTS 1000000
 #endif
-
-char
- macro_line[MAXLINE];
 
 /*--------------------------------------------------------------------------*/
 
@@ -1059,10 +1056,10 @@ static object *UL_derivative(SS_psides *si, int j)
     n  = SX_gs.dataset[j].n;
     x[0] = SX_gs.dataset[j].x[0];
     x[1] = SX_gs.dataset[j].x[1];
-    UL_buf1x = CMAKE_N(double, n+5);
-    UL_buf1y = CMAKE_N(double, n+5);
+    UL_gs.bfa[0] = CMAKE_N(double, n+5);
+    UL_gs.bfa[1] = CMAKE_N(double, n+5);
 
-    PM_derivative(n, x[0], x[1], UL_buf1x, UL_buf1y);
+    PM_derivative(n, x[0], x[1], UL_gs.bfa[0], UL_gs.bfa[1]);
 
     if ((SX_gs.dataset[j].id >= 'A') &&
         (SX_gs.dataset[j].id <= 'Z'))
@@ -1072,14 +1069,14 @@ static object *UL_derivative(SS_psides *si, int j)
 
     if (n == 2)
        {n = 3;
-	UL_buf1x[0] = x[0][0];
-	UL_buf1x[1] = x[0][1];
-	UL_buf1y[1] = UL_buf1y[0];};
+	UL_gs.bfa[0][0] = x[0][0];
+	UL_gs.bfa[0][1] = x[0][1];
+	UL_gs.bfa[1][1] = UL_gs.bfa[1][0];};
 
-    ch = SX_mk_curve(si, n-1, UL_buf1x, UL_buf1y, lbl, NULL, UL_plot);
+    ch = SX_mk_curve(si, n-1, UL_gs.bfa[0], UL_gs.bfa[1], lbl, NULL, UL_plot);
 
-    CFREE(UL_buf1x);
-    CFREE(UL_buf1y);      
+    CFREE(UL_gs.bfa[0]);
+    CFREE(UL_gs.bfa[1]);      
 
     return(ch);}
 
@@ -1105,14 +1102,14 @@ static object *_ULI_thin(SS_psides *si, int j, object *argl)
     n  = SX_gs.dataset[j].n;
     x[0] = SX_gs.dataset[j].x[0];
     x[1] = SX_gs.dataset[j].x[1];
-    UL_buf1x = CMAKE_N(double, n);
-    UL_buf1y = CMAKE_N(double, n);
+    UL_gs.bfa[0] = CMAKE_N(double, n);
+    UL_gs.bfa[1] = CMAKE_N(double, n);
     toler = (toler < n) ? toler : n;
 
     if (strncmp(type, "int", 3) == 0)
-       m = PM_thin_1d_int(n, x[0], x[1], UL_buf1x, UL_buf1y, toler);
+       m = PM_thin_1d_int(n, x[0], x[1], UL_gs.bfa[0], UL_gs.bfa[1], toler);
     else
-       m = PM_thin_1d_der(n, x[0], x[1], UL_buf1x, UL_buf1y, toler);
+       m = PM_thin_1d_der(n, x[0], x[1], UL_gs.bfa[0], UL_gs.bfa[1], toler);
 
     if (m < 1)
        SS_error(si, "THIN FAILED - _ULI_THIN", argl);
@@ -1123,10 +1120,10 @@ static object *_ULI_thin(SS_psides *si, int j, object *argl)
     else
         {lbl = SC_dsnprintf(FALSE, "Thinned @%d", SX_gs.dataset[j].id);}
 
-    ch = SX_mk_curve(si, m, UL_buf1x, UL_buf1y, lbl, NULL, UL_plot);
+    ch = SX_mk_curve(si, m, UL_gs.bfa[0], UL_gs.bfa[1], lbl, NULL, UL_plot);
 
-    CFREE(UL_buf1x);
-    CFREE(UL_buf1y);      
+    CFREE(UL_gs.bfa[0]);
+    CFREE(UL_gs.bfa[1]);      
 
     return(ch);}
 
@@ -1158,8 +1155,8 @@ static object *_ULI_filter(SS_psides *si, int j, object *argl)
     n  = SX_gs.dataset[j].n;
     x[0] = SX_gs.dataset[j].x[0];
     x[1] = SX_gs.dataset[j].x[1];
-    UL_buf1x = CMAKE_N(double, n);
-    UL_buf1y = CMAKE_N(double, n);
+    UL_gs.bfa[0] = CMAKE_N(double, n);
+    UL_gs.bfa[1] = CMAKE_N(double, n);
 
     xexpr = SS_null;
     yexpr = SS_null;
@@ -1174,20 +1171,20 @@ static object *_ULI_filter(SS_psides *si, int j, object *argl)
 				       0));
          if ((SS_true(SS_exp_eval(si, xexpr))) &&
 	     (SS_true(SS_exp_eval(si, yexpr))))
-            {UL_buf1x[k] = x[0][i];
-             UL_buf1y[k] = x[1][i];
+            {UL_gs.bfa[0][k] = x[0][i];
+             UL_gs.bfa[1][k] = x[1][i];
              k++;};};
     SS_assign(si, xexpr, SS_null);
     SS_assign(si, yexpr, SS_null);
 
     if (k < 2)
-       {CFREE(UL_buf1x);
-        CFREE(UL_buf1y);
+       {CFREE(UL_gs.bfa[0]);
+        CFREE(UL_gs.bfa[1]);
         SS_error(si, "FEWER THAN TWO POINTS REMAIN - _ULI_FILTER", SS_null);};
 
     SX_gs.dataset[j].n  = k;
-    SX_gs.dataset[j].x[0] = UL_buf1x;
-    SX_gs.dataset[j].x[1] = UL_buf1y;
+    SX_gs.dataset[j].x[0] = UL_gs.bfa[0];
+    SX_gs.dataset[j].x[1] = UL_gs.bfa[1];
     PM_maxmin(SX_gs.dataset[j].x[0], &wc[0], &wc[1], k);
     PM_maxmin(SX_gs.dataset[j].x[1], &wc[2], &wc[3], k);
     SX_gs.dataset[j].wc[0] = wc[0];
@@ -1215,8 +1212,8 @@ static object *_ULI_integrate(SS_psides *si, int j, double d1, double d2)
 
     n = SX_gs.dataset[j].n;
 
-    UL_buf1x = CMAKE_N(double, n+5);
-    UL_buf1y = CMAKE_N(double, n+5);
+    UL_gs.bfa[0] = CMAKE_N(double, n+5);
+    UL_gs.bfa[1] = CMAKE_N(double, n+5);
 
     x[0] = SX_gs.dataset[j].x[0];
     x[1] = SX_gs.dataset[j].x[1];
@@ -1225,7 +1222,7 @@ static object *_ULI_integrate(SS_psides *si, int j, double d1, double d2)
     if ((SX_gs.dataset[j].wc[0] >= d2) || (SX_gs.dataset[j].wc[1] <= d1))
        SS_error(si, "XMIN GREATER THAN XMAX - _UL__INTEGRATE", SS_null);
 
-    PM_integrate_tzr(d1, d2, &n, x[0], x[1], UL_buf1x, UL_buf1y);
+    PM_integrate_tzr(d1, d2, &n, x[0], x[1], UL_gs.bfa[0], UL_gs.bfa[1]);
 
     if ((SX_gs.dataset[j].id >= 'A') &&
         (SX_gs.dataset[j].id <= 'Z'))
@@ -1233,10 +1230,10 @@ static object *_ULI_integrate(SS_psides *si, int j, double d1, double d2)
     else
         {lbl = SC_dsnprintf(FALSE, "Integrate @%d", SX_gs.dataset[j].id);}
 
-    ch = SX_mk_curve(si, n, UL_buf1x, UL_buf1y, lbl, NULL, UL_plot);
+    ch = SX_mk_curve(si, n, UL_gs.bfa[0], UL_gs.bfa[1], lbl, NULL, UL_plot);
 
-    CFREE(UL_buf1x);
-    CFREE(UL_buf1y);
+    CFREE(UL_gs.bfa[0]);
+    CFREE(UL_gs.bfa[1]);
         
     return(ch);}
         
@@ -1400,8 +1397,8 @@ static object *_ULI_xmm(SS_psides *si, int j, double d1, double d2)
     k = 0;
     decreasing = FALSE;
 
-    UL_buf1x = CMAKE_N(double, SX_gs.dataset[j].n+1);
-    UL_buf1y = CMAKE_N(double, SX_gs.dataset[j].n+1);
+    UL_gs.bfa[0] = CMAKE_N(double, SX_gs.dataset[j].n+1);
+    UL_gs.bfa[1] = CMAKE_N(double, SX_gs.dataset[j].n+1);
     x[0]       = SX_gs.dataset[j].x[0];
     x[1]       = SX_gs.dataset[j].x[1];
 
@@ -1423,24 +1420,24 @@ static object *_ULI_xmm(SS_psides *si, int j, double d1, double d2)
 
 /* first point */
     if (d1 < *x[0])
-       {UL_buf1x[k] = *x[0];
-        UL_buf1y[k++] = *x[1];
+       {UL_gs.bfa[0][k] = *x[0];
+        UL_gs.bfa[1][k++] = *x[1];
         i++;}
     else
        {while ((x[0][i] <= d1) && (i < SX_gs.dataset[j].n))
            ++i;
-        UL_buf1x[k] = d1;
-        PM_interp(UL_buf1y[k++], d1, x[0][i-1], x[1][i-1], x[0][i], x[1][i]);};
+        UL_gs.bfa[0][k] = d1;
+        PM_interp(UL_gs.bfa[1][k++], d1, x[0][i-1], x[1][i-1], x[0][i], x[1][i]);};
 
 /* all the rest */
     while ((i < SX_gs.dataset[j].n) && (x[0][i] < d2))
-       {UL_buf1x[k] = x[0][i];
-        UL_buf1y[k++] = x[1][i];
+       {UL_gs.bfa[0][k] = x[0][i];
+        UL_gs.bfa[1][k++] = x[1][i];
         i++;};
 
     if ((d2 <= x[0][i]) && (i < SX_gs.dataset[j].n))
-       {UL_buf1x[k] = d2;
-        PM_interp(UL_buf1y[k++], d2, x[0][i-1], x[1][i-1], x[0][i], x[1][i]);};
+       {UL_gs.bfa[0][k] = d2;
+        PM_interp(UL_gs.bfa[1][k++], d2, x[0][i-1], x[1][i-1], x[0][i], x[1][i]);};
 
     if ((SX_gs.dataset[j].id >= 'A') &&
         (SX_gs.dataset[j].id <= 'Z'))
@@ -1451,17 +1448,17 @@ static object *_ULI_xmm(SS_psides *si, int j, double d1, double d2)
 /* reverse points if decreasing */
     if (decreasing)
        {for (l = 0; l < k/2; l++)
-            {tempx           = UL_buf1x[l];
-             tempy           = UL_buf1y[l];
-             UL_buf1x[l]     = UL_buf1x[k-l-1];
-             UL_buf1y[l]     = UL_buf1y[k-l-1];
-             UL_buf1x[k-l-1] = tempx;
-             UL_buf1y[k-l-1] = tempy;};}
+            {tempx           = UL_gs.bfa[0][l];
+             tempy           = UL_gs.bfa[1][l];
+             UL_gs.bfa[0][l]     = UL_gs.bfa[0][k-l-1];
+             UL_gs.bfa[1][l]     = UL_gs.bfa[1][k-l-1];
+             UL_gs.bfa[0][k-l-1] = tempx;
+             UL_gs.bfa[1][k-l-1] = tempy;};}
              
-    ch = SX_mk_curve(si, k, UL_buf1x, UL_buf1y, lbl, NULL, UL_plot);
+    ch = SX_mk_curve(si, k, UL_gs.bfa[0], UL_gs.bfa[1], lbl, NULL, UL_plot);
 
-    CFREE(UL_buf1x);
-    CFREE(UL_buf1y);      
+    CFREE(UL_gs.bfa[0]);
+    CFREE(UL_gs.bfa[1]);      
 
     if (decreasing)
        {CFREE(xrev);
@@ -1631,22 +1628,22 @@ static object *UL_smp_append(SS_psides *si, object *a, object *b)
     nb = SX_gs.dataset[j].n;
     n  = na + nb;
 
-    UL_buf1x = CMAKE_N(double, n);
-    UL_buf1y = CMAKE_N(double, n);
+    UL_gs.bfa[0] = CMAKE_N(double, n);
+    UL_gs.bfa[1] = CMAKE_N(double, n);
 
 /* insert the first curve */
     x[0] = SX_gs.dataset[i].x[0];
     x[1] = SX_gs.dataset[i].x[1];
     for (l = 0, n = 0; l < na; l++, n++)
-        {UL_buf1x[n] = *x[0]++;
-	 UL_buf1y[n] = *x[1]++;};
+        {UL_gs.bfa[0][n] = *x[0]++;
+	 UL_gs.bfa[1][n] = *x[1]++;};
 
 /* insert the second curve */
     x[0] = SX_gs.dataset[j].x[0];
     x[1] = SX_gs.dataset[j].x[1];
     for (l = 0; l < nb; l++, n++)
-        {UL_buf1x[n] = *x[0]++;
-	 UL_buf1y[n] = *x[1]++;};
+        {UL_gs.bfa[0][n] = *x[0]++;
+	 UL_gs.bfa[1][n] = *x[1]++;};
 
     if ((SX_gs.dataset[i].id >= 'A') &&
         (SX_gs.dataset[i].id <= 'Z'))
@@ -1654,10 +1651,10 @@ static object *UL_smp_append(SS_psides *si, object *a, object *b)
     else
        {lbl = SC_dsnprintf(FALSE, "Append @%d @%d", SX_gs.dataset[i].id, SX_gs.dataset[j].id);}
 
-    c = SX_mk_curve(si, n, UL_buf1x, UL_buf1y, lbl, NULL, UL_plot);
+    c = SX_mk_curve(si, n, UL_gs.bfa[0], UL_gs.bfa[1], lbl, NULL, UL_plot);
 
-    CFREE(UL_buf1x);
-    CFREE(UL_buf1y);      
+    CFREE(UL_gs.bfa[0]);
+    CFREE(UL_gs.bfa[1]);      
 
     return(c);}
 
@@ -1699,29 +1696,29 @@ static object *UL_pr_append(SS_psides *si, object *a, object *b)
     xmx = SX_gs.dataset[k].wc[1];
 
     n = na + nb + nc + 10;
-    UL_buf1x = CMAKE_N(double, n);
-    UL_buf1y = CMAKE_N(double, n);
+    UL_gs.bfa[0] = CMAKE_N(double, n);
+    UL_gs.bfa[1] = CMAKE_N(double, n);
 
 /* insert region of A less than averaged region */
     x[0] = SX_gs.dataset[i].x[0];
     x[1] = SX_gs.dataset[i].x[1];
     for (n = 0; *x[0] < xmn; n++)
-        {UL_buf1x[n] = *x[0]++;
-	 UL_buf1y[n] = *x[1]++;};
+        {UL_gs.bfa[0][n] = *x[0]++;
+	 UL_gs.bfa[1][n] = *x[1]++;};
 
 /* insert region of B less than averaged region */
     x[0] = SX_gs.dataset[j].x[0];
     x[1] = SX_gs.dataset[j].x[1];
     for (; *x[0] < xmn; n++)
-        {UL_buf1x[n] = *x[0]++;
-	 UL_buf1y[n] = *x[1]++;};
+        {UL_gs.bfa[0][n] = *x[0]++;
+	 UL_gs.bfa[1][n] = *x[1]++;};
 
 /* insert averaged region */
     x[0] = SX_gs.dataset[k].x[0];
     x[1] = SX_gs.dataset[k].x[1];
     for (l = 0; l < nc; l++, n++)
-        {UL_buf1x[n] = *x[0]++;
-         UL_buf1y[n] = *x[1]++;};
+        {UL_gs.bfa[0][n] = *x[0]++;
+         UL_gs.bfa[1][n] = *x[1]++;};
 
 /* insert region of A greater than averaged region */
     x[0] = SX_gs.dataset[i].x[0];
@@ -1730,8 +1727,8 @@ static object *UL_pr_append(SS_psides *si, object *a, object *b)
         {xv = *x[0]++;
          yv = *x[1]++;
 	 if (xv > xmx)
-            {UL_buf1x[n] = xv;
-             UL_buf1y[n] = yv;
+            {UL_gs.bfa[0][n] = xv;
+             UL_gs.bfa[1][n] = yv;
              n++;};};
 
 /* insert region of B greater than averaged region */
@@ -1741,8 +1738,8 @@ static object *UL_pr_append(SS_psides *si, object *a, object *b)
         {xv = *x[0]++;
          yv = *x[1]++;
 	 if (xv > xmx)
-            {UL_buf1x[n] = xv;
-             UL_buf1y[n] = yv;
+            {UL_gs.bfa[0][n] = xv;
+             UL_gs.bfa[1][n] = yv;
              n++;};};
 
     UL_delete(si, c);
@@ -1753,10 +1750,10 @@ static object *UL_pr_append(SS_psides *si, object *a, object *b)
     else
        {lbl = SC_dsnprintf(FALSE, "Append @%d @%d", SX_gs.dataset[i].id, SX_gs.dataset[j].id);}
 
-    c = SX_mk_curve(si, n, UL_buf1x, UL_buf1y, lbl, NULL, UL_plot);
+    c = SX_mk_curve(si, n, UL_gs.bfa[0], UL_gs.bfa[1], lbl, NULL, UL_plot);
 
-    CFREE(UL_buf1x);
-    CFREE(UL_buf1y);      
+    CFREE(UL_gs.bfa[0]);
+    CFREE(UL_gs.bfa[1]);      
 
     return(c);}
 
@@ -1803,7 +1800,7 @@ static object *_ULI_append(SS_psides *si, object *argl)
              {lbl = SC_dsnprintf(FALSE, "%s @%d", local, id);}
 
          if (SX_curvep_a(b))
-            {if (UL_simple_append)
+            {if (UL_gs.simple_append == TRUE)
 	        tmp = UL_smp_append(si, acc, b);
              else
 	        tmp = UL_pr_append(si, acc, b);
@@ -1868,10 +1865,10 @@ object *_UL_make_ln(SS_psides *si, double slope, double interc,
     int i;
    
     step = (last - first)/(n-1);
-    UL_buf1x = CMAKE_N(double, n);
-    UL_buf1y = CMAKE_N(double, n);
-    x[0] = UL_buf1x;
-    x[1] = UL_buf1y;
+    UL_gs.bfa[0] = CMAKE_N(double, n);
+    UL_gs.bfa[1] = CMAKE_N(double, n);
+    x[0] = UL_gs.bfa[0];
+    x[1] = UL_gs.bfa[1];
     for (xo = first, i = 0; i < n; i++, xo += step, x[0]++, x[1]++)
         {*x[0] = xo;
          *x[1] = slope*xo + interc;};
@@ -1880,11 +1877,11 @@ object *_UL_make_ln(SS_psides *si, double slope, double interc,
     *(x[0] - 1) = last;
     *(x[1] - 1) = slope*last + interc;
 
-    ch = SX_mk_curve(si, i, UL_buf1x, UL_buf1y,
+    ch = SX_mk_curve(si, i, UL_gs.bfa[0], UL_gs.bfa[1],
 		     "Straight line", NULL, UL_plot);
 
-    CFREE(UL_buf1x);
-    CFREE(UL_buf1y);      
+    CFREE(UL_gs.bfa[0]);
+    CFREE(UL_gs.bfa[1]);      
 
     return(ch);}
 
@@ -1942,9 +1939,9 @@ static object *_ULI_mk_curve(SS_psides *si, object *argl)
 
     n = min(SS_length(si, xvals), SS_length(si, yvals));
 
-    UL_buf1x = CMAKE_N(double, n);
-    UL_buf1y = CMAKE_N(double, n);
-    for (x[0] = UL_buf1x, x[1] = UL_buf1y;
+    UL_gs.bfa[0] = CMAKE_N(double, n);
+    UL_gs.bfa[1] = CMAKE_N(double, n);
+    for (x[0] = UL_gs.bfa[0], x[1] = UL_gs.bfa[1];
          SS_consp(xvals) && SS_consp(yvals);
          xvals = SS_cdr(si, xvals), yvals = SS_cdr(si, yvals))
         {xo = SS_car(si, xvals);
@@ -1963,10 +1960,10 @@ static object *_ULI_mk_curve(SS_psides *si, object *argl)
          else
             *x[1]++ = SS_FLOAT_VALUE(yo);};
 
-    ch = SX_mk_curve(si, n, UL_buf1x, UL_buf1y, labls, NULL, UL_plot);
+    ch = SX_mk_curve(si, n, UL_gs.bfa[0], UL_gs.bfa[1], labls, NULL, UL_plot);
 
-    CFREE(UL_buf1x);
-    CFREE(UL_buf1y);
+    CFREE(UL_gs.bfa[0]);
+    CFREE(UL_gs.bfa[1]);
 
     return(ch);}
 

@@ -14,33 +14,11 @@
 
 typedef void (*PFReplot)(void);
 
-#ifdef DEBUG
+UL_global_state
+ UL_gs = { FALSE, TRUE, };
 
-int
- heapch;
-
-#endif
-
-double
- UL_window_height_factor,
- *UL_buf1x,
- *UL_buf1y,
- *UL_buf2x,
- *UL_buf2y;
-
-double
- UL_derivative_tolerance;
-
-object
- *UL_ann_lst,
- *UL_window;
-
-static object
- *crva,
- *crvb;
-
-static char
- _UL_bf[MAXLINE];
+UL_state
+ _UL;
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -51,7 +29,7 @@ static int _UL_rd_scm(SS_psides *si)
    {
 
     SS_call_scheme(si, "rd",
-                   SC_STRING_I, _UL_bf,
+                   SC_STRING_I, _UL.bf,
                    0);
 
     return(TRUE);}
@@ -64,7 +42,7 @@ static int _UL_rd_scm(SS_psides *si)
 static int UL_rd_scm(SS_psides *si, char *name)
    {int rv;
 
-    strcpy(_UL_bf, name);
+    strcpy(_UL.bf, name);
 
     rv = SS_err_catch(si, _UL_rd_scm, NULL);
 
@@ -113,8 +91,8 @@ void UL_init_view(SS_psides *si)
     SX_gs.display_type  = CSTRSAVE("COLOR");
     SX_gs.display_title = CSTRSAVE("ULTRA II");
 
-    UL_derivative_tolerance = 2.0e-2;
-    UL_window_height_factor = 1.0;
+    UL_gs.derivative_tolerance = 2.0e-2;
+    UL_gs.window_height_factor = 1.0;
 
     si->interactive = FALSE;
     si->print_flag  = FALSE;
@@ -360,22 +338,22 @@ static void _UL_parse(SS_psides *si, object *strm)
     SX_parse(si, UL_plot, _UL_reproc_in, strm);
 
 /* get the list of curves after evaluating the latest expression */
-    SS_assign(si, crva, UL_get_crv_list(si));
+    SS_assign(si, _UL.crva, UL_get_crv_list(si));
 
 /* identify intermediate results for elimination */
-    if (UL_save_intermediate == OFF)
-       {na = SS_length(si, crva);
-	nb = SS_length(si, crvb);
+    if (UL_gs.save_intermediate == OFF)
+       {na = SS_length(si, _UL.crva);
+	nb = SS_length(si, _UL.crvb);
 	nr = SS_length(si, si->evobj);
 	if (na > nb+nr)
-	   {if (SS_consp(crvb) == TRUE)
-	       _UL_del_intermediate(si, crva, crvb, si->val, NULL);
+	   {if (SS_consp(_UL.crvb) == TRUE)
+	       _UL_del_intermediate(si, _UL.crva, _UL.crvb, si->val, NULL);
 	    else
-	       _UL_del_intermediate(si, crva, si->val, NULL);};};
+	       _UL_del_intermediate(si, _UL.crva, si->val, NULL);};};
 
 /* free the curve lists */
-    SS_assign(si, crva, SS_null);
-    SS_assign(si, crvb, SS_null);
+    SS_assign(si, _UL.crva, SS_null);
+    SS_assign(si, _UL.crvb, SS_null);
 
     return;}
 
@@ -388,7 +366,7 @@ static void _UL_read(SS_psides *si, object *strm)
    {
 
 /* get the list of curves before evaluating the latest expression */
-    SS_assign(si, crvb, UL_get_crv_list(si));
+    SS_assign(si, _UL.crvb, UL_get_crv_list(si));
 
     return;}
     
@@ -949,7 +927,7 @@ object *UL_mode_graphics(SS_psides *si)
 /* map the ultra graphics state onto the device */
 	    UL_set_graphics_state(SX_gs.graphics_device);
 
-	    SX_setup_viewspace(SX_gs.graphics_device, UL_window_height_factor);
+	    SX_setup_viewspace(SX_gs.graphics_device, UL_gs.window_height_factor);
 
 /* open the device now */
 	    PG_open_device(SX_gs.graphics_device,

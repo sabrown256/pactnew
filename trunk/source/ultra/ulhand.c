@@ -772,14 +772,14 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
 		return(ch);};};
 
         n1 = SX_gs.dataset[i].n;
-        UL_buf1x = CMAKE_N(double, n1);
-        UL_buf1y = CMAKE_N(double, n1);
+        UL_gs.bfa[0] = CMAKE_N(double, n1);
+        UL_gs.bfa[1] = CMAKE_N(double, n1);
 
 /* copy the curve data into the buffer
  * this protects against hacking the curve
  */
-        xp1 = UL_buf1x;
-        yp1 = UL_buf1y;
+        xp1 = UL_gs.bfa[0];
+        yp1 = UL_gs.bfa[1];
         xp2 = SX_gs.dataset[i].x[0];
         yp2 = SX_gs.dataset[i].x[1];
         UL_check_order(si, xp2, n1, i);
@@ -787,11 +787,11 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
             {*xp1++ = *xp2++;
              *yp1++ = *yp2++;};
 
-        xp1 = UL_buf1x;
-        yp1 = UL_buf1y;};
+        xp1 = UL_gs.bfa[0];
+        yp1 = UL_gs.bfa[1];};
         
-    UL_buf2x = CMAKE_N(double, 1);
-    UL_buf2y = CMAKE_N(double, 1);
+    UL_gs.bfb[0] = CMAKE_N(double, 1);
+    UL_gs.bfb[1] = CMAKE_N(double, 1);
 
     na = n1;
     xa = xp1;
@@ -831,21 +831,21 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
 
 /* set/reset the accumulator */
              n1 = na;
-             if (af == UL_buf2x)
-                {xp1 = UL_buf2x;
-                 yp1 = UL_buf2y;
-                 CREMAKE(UL_buf1x, double, n1+2+n2);
-                 CREMAKE(UL_buf1y, double, n1+2+n2);
-                 xa = af = UL_buf1x;
-                 ya = UL_buf1y;}
+             if (af == UL_gs.bfb[0])
+                {xp1 = UL_gs.bfb[0];
+                 yp1 = UL_gs.bfb[1];
+                 CREMAKE(UL_gs.bfa[0], double, n1+2+n2);
+                 CREMAKE(UL_gs.bfa[1], double, n1+2+n2);
+                 xa = af = UL_gs.bfa[0];
+                 ya = UL_gs.bfa[1];}
              else
-                {xp1 = UL_buf1x;
+                {xp1 = UL_gs.bfa[0];
 
-                 yp1 = UL_buf1y;
-                 CREMAKE(UL_buf2x, double, n1+2+n2);
-                 CREMAKE(UL_buf2y, double, n1+2+n2);
-                 xa = af = UL_buf2x;
-                 ya = UL_buf2y;};
+                 yp1 = UL_gs.bfa[1];
+                 CREMAKE(UL_gs.bfb[0], double, n1+2+n2);
+                 CREMAKE(UL_gs.bfb[1], double, n1+2+n2);
+                 xa = af = UL_gs.bfb[0];
+                 ya = UL_gs.bfb[1];};
 
              na = _UL_bc_operate(cp->proc[0], xa, ya,
 				 xp1, xp2, yp1, yp2, n1, n2);
@@ -861,10 +861,10 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
 /* create new curve with data in the accumulator */
     ch = SX_mk_curve(si, na, xa, ya, lbl, NULL, UL_plot);
 
-    CFREE(UL_buf1x);
-    CFREE(UL_buf1y);
-    CFREE(UL_buf2x);
-    CFREE(UL_buf2y);
+    CFREE(UL_gs.bfa[0]);
+    CFREE(UL_gs.bfa[1]);
+    CFREE(UL_gs.bfb[0]);
+    CFREE(UL_gs.bfb[1]);
 
     return(ch);}
         
@@ -911,13 +911,13 @@ object *UL_bcxl(SS_psides *si, C_procedure *cp, object *argl)
     else
        {snprintf(local, MAXLINE, "@%d", SX_gs.dataset[i].id);}
 
-    UL_buf1x = CMAKE_N(double, n);
-    UL_buf1y = CMAKE_N(double, n);
+    UL_gs.bfa[0] = CMAKE_N(double, n);
+    UL_gs.bfa[1] = CMAKE_N(double, n);
     for (j = 0; j < n; j++)                          /* copy to accumulator */
-        {UL_buf1x[j] = x[0][j];
-         UL_buf1y[j] = x[1][j];};
-    x[0] = UL_buf1x;
-    x[1] = UL_buf1y;
+        {UL_gs.bfa[0][j] = x[0][j];
+         UL_gs.bfa[1][j] = x[1][j];};
+    x[0] = UL_gs.bfa[0];
+    x[1] = UL_gs.bfa[1];
     strcpy(local2, local);
 
     for (t = SS_cdr(si, argl); SS_consp(t); t = SS_cdr(si, t))
@@ -942,8 +942,8 @@ object *UL_bcxl(SS_psides *si, C_procedure *cp, object *argl)
 
     SS_assign(si, argl, SS_null);
 
-    CFREE(UL_buf1x);
-    CFREE(UL_buf1y);           
+    CFREE(UL_gs.bfa[0]);
+    CFREE(UL_gs.bfa[1]);           
 
     return(ch);}
                 
