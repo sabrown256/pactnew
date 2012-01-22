@@ -164,13 +164,8 @@ struct s_SX_state
     char *fname;
 
 /* SXGRI.C */
-    double chi_mn;
-    double chi_mx;
-    double phi_mn;
-    double phi_mx;
-    double th_mn;
-    double th_mx;
-
+    double ea_mn[PG_SPACEDM];
+    double ea_mx[PG_SPACEDM];
     PG_device *gri;
 
 /* SXPAN.C */

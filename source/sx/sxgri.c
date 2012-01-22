@@ -432,12 +432,13 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 	mrki   = PG_ptr_attr_glb("marker-index");
 	mrks   = PG_ptr_attr_glb("marker-scale");
 
-        _SX.chi_mn = -180.0;
-        _SX.chi_mx =  180.0;
-        _SX.phi_mn = -180.0;
-        _SX.phi_mx =  180.0;
-        _SX.th_mn  =    0.0;
-        _SX.th_mx  =  180.0;
+/* setup the euler angles for viewing */
+        _SX.ea_mn[0] =    0.0;
+        _SX.ea_mx[0] =  180.0;
+        _SX.ea_mn[1] = -180.0;
+        _SX.ea_mx[1] =  180.0;
+        _SX.ea_mn[2] = -180.0;
+        _SX.ea_mx[2] =  180.0;
 
 	if (SX_gs.gri_type_face == NULL)
 	   SX_gs.gri_type_face = CSTRSAVE("helvetica");
@@ -581,11 +582,11 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 	PG_register_variable("Contour Ratio", SC_DOUBLE_S,
 			     cntrat, NULL, NULL);
 	PG_register_variable("Chi", SC_DOUBLE_S,
-			     &SX_gs.view_angle[2], &_SX.chi_mn, &_SX.chi_mx);
+			     &SX_gs.view_angle[2], &_SX.ea_mn[2], &_SX.ea_mx[2]);
 	PG_register_variable("Phi", SC_DOUBLE_S,
-			     &SX_gs.view_angle[1], &_SX.phi_mn, &_SX.phi_mx);
+			     &SX_gs.view_angle[1], &_SX.ea_mn[1], &_SX.ea_mx[1]);
 	PG_register_variable("Theta", SC_DOUBLE_S,
-			     &SX_gs.view_angle[0], &_SX.th_mn, &_SX.th_mx);
+			     &SX_gs.view_angle[0], &_SX.ea_mn[0], &_SX.ea_mx[0]);
 	PG_register_variable("Default Color", SC_INT_S,
 			     &SX_gs.default_color, NULL, NULL);
 
