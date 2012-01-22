@@ -156,7 +156,7 @@ int main(int argc, char **argv)
 	   ret = PA_th_trans_family(names[0], order, ncpf);
 
 	if (ret == 0)
-	   {PRINT(stdout, "%s\nNo transposable files found\n", PA_err);
+	   {PRINT(stdout, "%s\nNo transposable files found\n", PA_gs.err);
 	    return(1);};}
 
     if (do_merge)
@@ -180,7 +180,7 @@ int main(int argc, char **argv)
 	   ret = 0;
 
 	if (ret == 0)
-	   {PRINT(stdout, "%s\nNo mergeable files found\n", PA_err);
+	   {PRINT(stdout, "%s\nNo mergeable files found\n", PA_gs.err);
 	    return(1);};}
 
     return(0);}

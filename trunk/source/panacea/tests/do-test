@@ -14,7 +14,7 @@ set MDGInc    = `pact +l -info MDGInc | uniq`
 set Inc       = "-I. -I$DevInc $MDGInc"
 set CCompiler = $CCompiler[$#CCompiler]
 
-setenv Log $TestDir/log.test
+InitLog Log $TestDir/log.panache
 set Err = 0
 
 Note $Log "CCompiler = |$CCompiler|"

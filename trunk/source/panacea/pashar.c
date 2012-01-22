@@ -31,49 +31,27 @@
 
 /*--------------------------------------------------------------------------*/
 
-PA_state
- _PA = { -1, 0, 0, 0, 1, FALSE, 0, 0, 0, 
-         ", \t\n\r", "dictionary", "dimension table",
-	 "ALIST", "SIZE", "heterogeneous", NULL, };
-
 char
  _PA_base_name[MAXLINE],
  *_PA_rsname;
 
 
-PFErrHand
- PA_error_hook = PA_error_handler,
- PA_warn_hook  = PA_warning_handler;
-
-hasharr
- *PA_symbol_tab,
- *PA_variable_tab;
-
-PROCESS
- *PA_pp = NULL;
-
-FILE
- *PA_edit_file;
-
 PDBfile
- *PA_cache_file = NULL,
  **_PA_state_files = NULL;
 
 int
- *global_swtch,
  _PA_n_state_files = 0,
- _PA_max_state_files = 10,
- PA_name_spaces = FALSE,            /* flag controlling name space handling */
- *PA_DUL,
- *PA_DON;
+ _PA_max_state_files = 10;
 
-double
- *global_param;
+PA_state
+ _PA = { -1, 0, 0, 0, 1, FALSE, 0, 0, 0, 
+         ", \t\n\r", "dictionary", "dimension table",
+	 "ALIST", "SIZE", "heterogeneous", NULL, };
 
-char
- errbuf[MAXLINE],
- **global_name,
- *PAN_VARIABLE = NULL;
+PA_global_state
+ PA_gs = { -1, " \t\r\n",
+	   PA_error_handler, PA_warning_handler,
+         };
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -89,8 +67,8 @@ char
  *            -
  *            - <attribute_spec> := <attribute_id>, <attribute_val>
  *            - <dimension_spec> := <ptr to # values> |
- *            -                     PA_DUL, <ptr to lower>, <ptr to upper> |
- *            -                     PA_DON, <ptr to offset>, <ptr to # elem>
+ *            -                     PA_gs.dul, <ptr to lower>, <ptr to upper> |
+ *            -                     PA_gs.don, <ptr to offset>, <ptr to # elem>
  *            - <unit_spec>      := <unit_index> | PER
  *            -
  *            - The valid attribute_id's are:
@@ -129,8 +107,8 @@ void PA_def_var(char *vname, char *vtype, void *viv,
     pcons *nu, *du, *nxt, *prv;
 
 /* make the variable hash table if it doesn't exist yet */
-    if (PA_variable_tab == NULL)
-       PA_variable_tab = SC_make_hasharr(HSZLARGE, DOC, SC_HA_NAME_KEY, 0);
+    if (PA_gs.variable_tab == NULL)
+       PA_gs.variable_tab = SC_make_hasharr(HSZLARGE, DOC, SC_HA_NAME_KEY, 0);
 
     SC_VA_START(vif);
 
@@ -162,19 +140,19 @@ void PA_def_var(char *vname, char *vtype, void *viv,
 /* get the dimensions */
     vdims = NULL;
     while ((maxi = SC_VA_ARG(int *)) != DIMENSION)
-       {if (maxi == PA_DUL)
+       {if (maxi == PA_gs.dul)
            {mini = SC_VA_ARG(int *);
             maxi = SC_VA_ARG(int *);
-            meth = *PA_DUL;}
+            meth = *PA_gs.dul;}
 
-        else if (maxi == PA_DON)
+        else if (maxi == PA_gs.don)
            {mini = SC_VA_ARG(int *);
             maxi = SC_VA_ARG(int *);
-            meth = *PA_DON;}
+            meth = *PA_gs.don;}
 
         else
            {mini = &Zero_I;
-            meth = *PA_DON;};
+            meth = *PA_gs.don;};
 
         next = _PA_mk_dimens(mini, maxi, meth);
         if (vdims == NULL)
@@ -222,7 +200,7 @@ void PA_def_var(char *vname, char *vtype, void *viv,
     SC_VA_END;
  
 /* install primitive scalars as implicit commands */
-    if ((pp->n_dimensions == 0) && (PA_commands != NULL) &&
+    if ((pp->n_dimensions == 0) && (PA_gs.command_tab != NULL) &&
 	(PA_VARIABLE_CLASS(pp) != PSEUDO))
        {void *vaddr;
         int itype;
@@ -268,8 +246,8 @@ void PA_inst_var(char *vname, char *vtype, void *viv,
     pcons *nu, *du, *nxt, *prv;
 
 /* make the variable hash table if it doesn't exist yet */
-    if (PA_variable_tab == NULL)
-       PA_variable_tab = SC_make_hasharr(HSZLARGE, DOC, SC_HA_NAME_KEY, 0);
+    if (PA_gs.variable_tab == NULL)
+       PA_gs.variable_tab = SC_make_hasharr(HSZLARGE, DOC, SC_HA_NAME_KEY, 0);
 
     SC_VA_START(vif);
 
@@ -308,19 +286,19 @@ void PA_inst_var(char *vname, char *vtype, void *viv,
 /* get the dimensions */
     vdims = NULL;
     while ((maxi = SC_VA_ARG(int *)) != DIMENSION)
-       {if (maxi == PA_DUL)
+       {if (maxi == PA_gs.dul)
            {mini = SC_VA_ARG(int *);
             maxi = SC_VA_ARG(int *);
-            meth = *PA_DUL;}
+            meth = *PA_gs.dul;}
 
-        else if (maxi == PA_DON)
+        else if (maxi == PA_gs.don)
            {mini = SC_VA_ARG(int *);
             maxi = SC_VA_ARG(int *);
-            meth = *PA_DON;}
+            meth = *PA_gs.don;}
 
         else
            {mini = &Zero_I;
-            meth = *PA_DON;};
+            meth = *PA_gs.don;};
 
         next = _PA_mk_dimens(mini, maxi, meth);
         if (vdims == NULL)
@@ -398,8 +376,8 @@ void PA_inst_scalar(char *vname, char *vtype, void *vaddr, void *viv,
     pcons *nu, *du, *next, *prev;
 
 /* make the variable hash table if it doesn't exist yet */
-    if (PA_variable_tab == NULL)
-       PA_variable_tab = SC_make_hasharr(HSZLARGE, DOC, SC_HA_NAME_KEY, 0);
+    if (PA_gs.variable_tab == NULL)
+       PA_gs.variable_tab = SC_make_hasharr(HSZLARGE, DOC, SC_HA_NAME_KEY, 0);
 
     SC_VA_START(vif);
 
@@ -473,7 +451,7 @@ void PA_inst_scalar(char *vname, char *vtype, void *vaddr, void *viv,
        PA_ERR(TRUE,
               "TYPE %s UNSUPPORTED FOR SCALARS - PA_INST_SCALAR");
 
-    if (PA_commands != NULL)
+    if (PA_gs.command_tab != NULL)
        PA_inst_c(vname, vaddr, itype, 0, (PFVoid) PA_pshand, PA_sargs);
 
     return;}
@@ -489,14 +467,14 @@ void _PA_install_var(char *vname, PA_variable *pp)
    {char *name, s[MAXLINE];
     PA_package *pck;
 
-    if (PA_name_spaces)
+    if (PA_gs.name_spaces)
        {pck  = PA_current_package();
         name = pck->name;
 	snprintf(s, MAXLINE, "%s-%s", name, vname);}
     else
        strcpy(s, vname);
 
-    SC_hasharr_install(PA_variable_tab, s, pp, PAN_VARIABLE, 3, -1);
+    SC_hasharr_install(PA_gs.variable_tab, s, pp, PA_gs.variable, 3, -1);
 
     return;}
 
@@ -562,14 +540,14 @@ void *_PA_pdb_read(PDBfile *file, char *name, syment **psp, long *indx)
 PDBfile *PA_open(char *name, char *mode, int flag)
    {PDBfile *fp;
 
-    if (strcmp(name, "PA_vif") == 0)
-       {if ((PA_pp != NULL) && (PA_pp->vif != NULL))
-           fp = PA_pp->vif;
+    if (strcmp(name, "PA_gs.vif") == 0)
+       {if ((PA_gs.pp != NULL) && (PA_gs.pp->vif != NULL))
+           fp = PA_gs.pp->vif;
         else
-	   {fp = PD_open_vif("PA_vif");
+	   {fp = PD_open_vif("PA_gs.vif");
 	    PD_mkdir(fp, "/&ptrs");};
 
-        PA_vif = fp;}
+        PA_gs.vif = fp;}
     else
        {fp = PD_open(name, mode);
 	PD_mkdir(fp, "/&ptrs");};
@@ -604,7 +582,7 @@ static void _PA_wr_pseudo_plot_requests(PDBfile *pdrs)
     PA_plot_request *pr;
     char bf[MAXLINE];
 
-    for (pck = Packages; pck != NULL; pck = pck->next)
+    for (pck = PA_gs.packages; pck != NULL; pck = pck->next)
         {pr = pck->pseudo_pr;
          if (pr != NULL)
             {snprintf(bf, MAXLINE, "%s-pseudo-plots", pck->name);
@@ -624,7 +602,7 @@ static void _PA_rd_pseudo_plot_requests(PDBfile *pdrs)
    {PA_package *pck;
     char bf[MAXLINE];
 
-    for (pck = Packages; pck != NULL; pck = pck->next)
+    for (pck = PA_gs.packages; pck != NULL; pck = pck->next)
         {snprintf(bf, MAXLINE, "%s-pseudo-plots", pck->name);
          PD_read(pdrs, bf, &pck->pseudo_pr);};
 
@@ -676,10 +654,10 @@ void _PA_wrrstrt(char *rsname, int conv_flag)
     fp = pdrs->stream;
 
 /* save the definition constants */
-    PD_write(pdrs, "N_Units", SC_INT_S, &N_Units);
+    PD_write(pdrs, "PA_gs.n_units", SC_INT_S, &PA_gs.n_units);
     _PA_wr_pseudo_plot_requests(pdrs);
 
-/* check every element of PA_variable_tab to find the RESTART variables */
+/* check every element of PA_gs.variable_tab to find the RESTART variables */
     switch (SETJMP(pa->write_err))
        {case ABORT :
 	     PRINT(stdout, "\n\n%s \n\n", PD_err);
@@ -692,7 +670,7 @@ void _PA_wrrstrt(char *rsname, int conv_flag)
         default :
 	     break;};
 
-    for (i = 0; SC_hasharr_next(PA_variable_tab, &i, NULL, &ty, (void **) &pp); i++)
+    for (i = 0; SC_hasharr_next(PA_gs.variable_tab, &i, NULL, &ty, (void **) &pp); i++)
         {if (ty[3] == 'p')                   /* skip the packages */
 	    continue;
 
@@ -830,8 +808,8 @@ void _PA_rdrstrt(char *fname, int conv_flag)
     if (tok != NULL)
        strcpy(_PA_base_name, tok);
 
-    if (PA_vif == NULL)
-       PA_vif = PA_open("PA_vif", "w+", TRUE);
+    if (PA_gs.vif == NULL)
+       PA_gs.vif = PA_open("PA_gs.vif", "w+", TRUE);
 
 /* open the restart dump */
     pdrs = PA_open(_PA_rsname, "r", FALSE);
@@ -839,20 +817,20 @@ void _PA_rdrstrt(char *fname, int conv_flag)
            "CAN'T OPEN RSTART FILE - %s", _PA_rsname);
 
 /* read the definition constants */
-    PD_read(pdrs, "N_Units", &N_Units);
+    PD_read(pdrs, "PA_gs.n_units", &PA_gs.n_units);
 
 /* define the problem definition variables */
     PA_definitions();
 
 /* read in the definition variables */
-    for (i = 0; SC_hasharr_next(PA_variable_tab, &i, NULL, &ty, (void **) &pp); i++)
+    for (i = 0; SC_hasharr_next(PA_gs.variable_tab, &i, NULL, &ty, (void **) &pp); i++)
         {if (ty[3] == 'p')                   /* skip the packages */
 	    continue;
 
 	 _PA_rd_variable(pdrs, pp, conv_flag, DEFN);};
 
 /* connect all of the package control variables */
-    for (pck = Packages; pck != NULL; pck = pck->next)
+    for (pck = PA_gs.packages; pck != NULL; pck = pck->next)
         {pck_name = pck->name;
          snprintf(bf, MAXLINE, "%s-names", pck_name);
          CFREE(pck->ascii);
@@ -874,23 +852,23 @@ void _PA_rdrstrt(char *fname, int conv_flag)
 
 /* connect all of the global control variables */
     PA_control_set("global");
-    global_swtch = SWTCH;
-    global_param = PARAM;
-    global_name  = NAME;
+    PA_gs.global_swtch = SWTCH;
+    PA_gs.global_param = PARAM;
+    PA_gs.global_name  = NAME;
 
 /* connect the internal and extern unit definition variables */
-    PA_CONNECT(unit,    "unit",    TRUE);
-    PA_CONNECT(convrsn, "convrsn", TRUE);
+    PA_CONNECT(PA_gs.units,    "PA_gs.units",    TRUE);
+    PA_CONNECT(PA_gs.convrsns, "PA_gs.convrsns", TRUE);
 
 /* define the variables - and leave the unit conversions alone */
     PA_variables(NONE);  
     PA_proc_units();
 
-/* check every element of PA_variable_tab to find the
+/* check every element of PA_gs.variable_tab to find the
  * RESTART and DMND variables
  */
     n_dmnd = 0;
-    for (i = 0; SC_hasharr_next(PA_variable_tab, &i, NULL, &ty, (void **) &pp); i++)
+    for (i = 0; SC_hasharr_next(PA_gs.variable_tab, &i, NULL, &ty, (void **) &pp); i++)
         {if (ty[3] == 'p')                   /* skip the packages */
 	    continue;
 
@@ -903,10 +881,10 @@ void _PA_rdrstrt(char *fname, int conv_flag)
 	    _PA_rd_variable(pdrs, pp, conv_flag, RESTART);};
 
 /* connect the initial value specifications */
-    PA_CONNECT(iv_spec_lst, "initial-value-specifications", TRUE);
+    PA_CONNECT(PA_gs.iv_spec_lst, "initial-value-specifications", TRUE);
 
 /* connect the plot requests now */
-    PA_CONNECT(plot_reqs, "plot-requests", TRUE);
+    PA_CONNECT(PA_gs.plot_reqs, "plot-requests", TRUE);
     _PA_rd_pseudo_plot_requests(pdrs);
 
 /* give the application a chance to read anything special from the state dump */
@@ -1020,11 +998,11 @@ void PA_error_handler(int test, char *fmt, ...)
 
        hook = PA_GET_FUNCTION(PFErrHand, "error_handler");
        if (hook != NULL)
-          {PA_error_hook = hook;
+          {PA_gs.error_hook = hook;
 	   SC_VA_START(fmt);
-	   SC_VSNPRINTF(errbuf, MAXLINE, fmt);
+	   SC_VSNPRINTF(PA_gs.errbuf, MAXLINE, fmt);
 	   SC_VA_END;
-           PA_ERR(test, errbuf);};}
+           PA_ERR(test, PA_gs.errbuf);};}
     END_SAFE;
 
     if (!test)
@@ -1032,10 +1010,10 @@ void PA_error_handler(int test, char *fmt, ...)
 
     PRINT(stdout,"\nERROR: ");
     SC_VA_START(fmt);
-    SC_VSNPRINTF(errbuf, MAXLINE, fmt);
+    SC_VSNPRINTF(PA_gs.errbuf, MAXLINE, fmt);
     SC_VA_END;
 
-    PA_error(errbuf);}
+    PA_error(PA_gs.errbuf);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1053,11 +1031,11 @@ void PA_warning_handler(int test, char *fmt, ...)
 
        hook = PA_GET_FUNCTION(PFErrHand, "warning_handler");
        if (hook != NULL)
-          {PA_warn_hook = hook;
+          {PA_gs.warn_hook = hook;
 	   SC_VA_START(fmt);
-	   SC_VSNPRINTF(errbuf, MAXLINE, fmt);
+	   SC_VSNPRINTF(PA_gs.errbuf, MAXLINE, fmt);
 	   SC_VA_END;
-           PA_WARN(test, errbuf);};}
+           PA_WARN(test, PA_gs.errbuf);};}
     END_SAFE;
 
     if (!test)
@@ -1065,9 +1043,9 @@ void PA_warning_handler(int test, char *fmt, ...)
 
     PRINT(stdout,"\nWARNING: ");
     SC_VA_START(fmt);
-    SC_VSNPRINTF(errbuf, MAXLINE, fmt);
+    SC_VSNPRINTF(PA_gs.errbuf, MAXLINE, fmt);
     SC_VA_END;
-    PRINT(stdout, "%s \n\n", errbuf);
+    PRINT(stdout, "%s \n\n", PA_gs.errbuf);
 
     return;}
 

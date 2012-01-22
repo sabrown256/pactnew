@@ -82,7 +82,7 @@ object *_SXI_display_pan_object(SS_psides *si, object *obj)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_DESC_PAN_VARIABLE - display the description of a PANACEA variable */
+/* _SX_DESC_PA_gs.variable - display the description of a PANACEA variable */
 
 static object *_SX_desc_pan_variable(SS_psides *si, object *obj)
    {PA_variable *pp;
@@ -95,7 +95,7 @@ static object *_SX_desc_pan_variable(SS_psides *si, object *obj)
             0);
 
     if (pp == NULL)
-       SS_error(si, "BAD PANACEA VARIABLE - _SX_DESC_PAN_VARIABLE", obj);
+       SS_error(si, "BAD PANACEA VARIABLE - _SX_DESC_PA_gs.variable", obj);
 
     else
  
@@ -207,7 +207,7 @@ static object *_SX_desc_pan_variable(SS_psides *si, object *obj)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SX_DESC_PAN_PACKAGE - display the description of a PANACEA package */
+/* _SX_DESC_PA_gs.package - display the description of a PANACEA package */
 
 static object *_SX_desc_pan_package(SS_psides *si, object *obj)
    {PA_package *pck;
@@ -218,7 +218,7 @@ static object *_SX_desc_pan_package(SS_psides *si, object *obj)
             0);
 
     if (pck == NULL)
-       SS_error(si, "BAD PANACEA PACKAGE - _SX_DESC_PAN_PACKAGE", obj);
+       SS_error(si, "BAD PANACEA PACKAGE - _SX_DESC_PA_gs.package", obj);
 
     else
 
@@ -262,7 +262,7 @@ object *_SXI_desc_pan(SS_psides *si, object *obj)
 
     else
        {s  = SS_get_string(obj);
-        hp = SC_hasharr_lookup(PA_variable_tab, s);
+        hp = SC_hasharr_lookup(PA_gs.variable_tab, s);
         if (hp == NULL)
            SS_error(si, "BAD ENTITY - _SXI_DESC_PAN", obj);
 

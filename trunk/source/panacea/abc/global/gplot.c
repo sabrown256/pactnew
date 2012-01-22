@@ -176,9 +176,9 @@ int newframew(PG_device *dev, int new)
 
 /* print some useful problem information around the mesh plot */
         PG_set_clipping(dev, FALSE);
-        dt = unit[SEC]*PARAM[4]*(PARAM[3] - PARAM[2]);
+        dt = PA_gs.units[SEC]*PARAM[4]*(PARAM[3] - PARAM[2]);
         PG_write_abs(dev, 0.20, 0.92, "%s", NAME[8]);
-        PG_write_abs(dev, 0.55, 0.92, "Time = %9.2e", unit[SEC]*PARAM[1]);
+        PG_write_abs(dev, 0.55, 0.92, "Time = %9.2e", PA_gs.units[SEC]*PARAM[1]);
         PG_write_abs(dev, 0.20, 0.88, "Cycle = %d", SWTCH[3]);
         PG_write_abs(dev, 0.55, 0.88, "Dt = %9.2e", dt);
 
@@ -421,11 +421,11 @@ int make_frame()
     if (!graphics_init)
        {graphics_init = TRUE;
 
-        if (global_name[7] == NULL)
-           global_name[7] = CSTRSAVE("COLOR");
+        if (PA_gs.global_name[7] == NULL)
+           PA_gs.global_name[7] = CSTRSAVE("COLOR");
 
-        mesh_display = PG_make_device("WINDOW", global_name[7],
-                                      global_name[8]);
+        mesh_display = PG_make_device("WINDOW", PA_gs.global_name[7],
+                                      PA_gs.global_name[8]);
 
         PG_open_device(mesh_display, 0.4, 0.1, 0.5, 0.5);
         mesh_set_graphics_state(mesh_display);};
@@ -585,7 +585,7 @@ void turn()
 void viewh()
    {char *s;
 
-    s = SC_strtok(NULL, "\n", PA_strtok_p);
+    s = SC_strtok(NULL, "\n", PA_gs.strtok_p);
     plot(TRUE, s);
 
     return;}
@@ -623,7 +623,7 @@ void plot(new, name)
 void printh()
    {char *s;
 
-    s = SC_strtok(NULL, "\n", PA_strtok_p);
+    s = SC_strtok(NULL, "\n", PA_gs.strtok_p);
     printscr(TRUE, s);
 
     return;}
@@ -640,7 +640,7 @@ void printscr(new, name)
     char bf[MAXLINE];
 
     if (mesh_PS_display == NULL)
-       {snprintf(bf, MAXLINE, "%s %s", global_name[8], global_name[9]);
+       {snprintf(bf, MAXLINE, "%s %s", PA_gs.global_name[8], PA_gs.global_name[9]);
         mesh_PS_display = PG_make_device("PS", "MONOCHROME", bf);
         PA_ERR(mesh_PS_display == NULL,
                "CAN'T OPEN POST-SCRIPT DEVICE - PRINTSCR");

@@ -18,7 +18,7 @@ SC_thread_lock
 /*--------------------------------------------------------------------------*/
 
 /* PA_INQUIRE_VARIABLE - return a PA_variable pointer from
- *                     - the PA_variable_tab
+ *                     - the PA_gs.variable_tab
  */
 
 PA_variable *PA_inquire_variable(char *x)
@@ -26,14 +26,14 @@ PA_variable *PA_inquire_variable(char *x)
     PA_package *pck;
     PA_variable *vr;
 
-    if (PA_name_spaces)
+    if (PA_gs.name_spaces)
        {pck  = PA_current_package();
 	name = pck->name;
 	snprintf(s, MAXLINE, "%s-%s", name, x);}
     else
        strcpy(s, x);
 
-    vr = (PA_variable *) SC_hasharr_def_lookup(PA_variable_tab, s);
+    vr = (PA_variable *) SC_hasharr_def_lookup(PA_gs.variable_tab, s);
 
     return(vr);}
 
@@ -202,13 +202,13 @@ static void _PA_load_space(PA_variable *pp, long psz)
     pall  = PA_VARIABLE_ALLOCATION(pp);
 
     if ((ppers == CACHE_F) && (pfn != NULL))
-       {if (PA_cache_file == NULL)
-           {PA_cache_file = PD_open(pfn, "r");
-            ret = PD_read(PA_cache_file, pname, pdata),
-            PD_close(PA_cache_file);
-            PA_cache_file = NULL;}
+       {if (PA_gs.cache_file == NULL)
+           {PA_gs.cache_file = PD_open(pfn, "r");
+            ret = PD_read(PA_gs.cache_file, pname, pdata),
+            PD_close(PA_gs.cache_file);
+            PA_gs.cache_file = NULL;}
         else
-           ret = PD_read(PA_cache_file, pname, pdata),
+           ret = PD_read(PA_gs.cache_file, pname, pdata),
 
         PA_ERR(!ret,
 	       "FAILED TO READ CACHED VARIABLE %s - _PA_LOAD_SPACE", pname);}
@@ -243,7 +243,7 @@ static void _PA_load_space(PA_variable *pp, long psz)
         char *pvr;
 
         psz = max(1, psz);
-        bpi = _PD_lookup_size(PA_VARIABLE_TYPE(pp)->type, PA_vif->host_chart);
+        bpi = _PD_lookup_size(PA_VARIABLE_TYPE(pp)->type, PA_gs.vif->host_chart);
         for (pvr = (char *) pdata, i = 0L; i < psz; i++, pvr += bpi)
             memcpy(pvr, pval, bpi);
 
@@ -382,19 +382,19 @@ static void _PA_cache_group(PA_variable *pp)
     ps = PA_get_thread(-1);
     s  = ps->cache_fname;
 
-    if (PA_cache_file == NULL)
+    if (PA_gs.cache_file == NULL)
        {snprintf(s, MAXLINE, "%s.c00", _PA_base_name);
         REMOVE(s);
-        PA_cache_file = PD_open(s, "w");
-        PA_ERR((PA_cache_file == NULL),
+        PA_gs.cache_file = PD_open(s, "w");
+        PA_ERR((PA_gs.cache_file == NULL),
                "CAN'T OPEN CACHE FILE - _PA_CACHE_GROUP");};
 
-    wr = PA_cache_file->tr->write;
+    wr = PA_gs.cache_file->tr->write;
 
     ep   = PA_VARIABLE_DESC(pp);
     type = ep->type;
     dims = ep->dimensions;
-    ep   = wr(PA_cache_file,
+    ep   = wr(PA_gs.cache_file,
 	      PA_VARIABLE_NAME(pp),
 	      type, type,
 	      PA_VARIABLE_DATA(pp), dims, FALSE, &new);
@@ -444,7 +444,7 @@ static void _PA_cache_individ(PA_variable *pp)
     type = ep->type;
     dims = ep->dimensions;
 
-    wr = PA_cache_file->tr->write;
+    wr = PA_gs.cache_file->tr->write;
     ep = wr(fp,
 	    PA_VARIABLE_NAME(pp),
 	    type, type,

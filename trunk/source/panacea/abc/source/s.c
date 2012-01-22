@@ -113,12 +113,12 @@ int main(int c, char **v)
 /* define the code system for which we are building sources */
     gen_system();
     init_unit();
-    PA_def_str(PA_vif);
+    PA_def_str(PA_gs.vif);
     PA_variables(TRUE);
     PA_proc_units();
     inst_s();
     srctab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
-    PAN_SOURCE = CSTRSAVE("source");
+    PA_gs.source = CSTRSAVE("source");
  
 /* create the pdb file */
     strcpy(s, fname);

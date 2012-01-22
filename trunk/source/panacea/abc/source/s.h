@@ -75,13 +75,9 @@ extern hasharr
 extern double
  conversion_s;
 
-extern int
- N_Variables;
-
 extern char
  in_deck[],                                       /* global input deck name */
- msg[],                                  /* global temporary string storage */
- *PAN_SOURCE;
+ msg[];                                  /* global temporary string storage */
 
 /*--------------------------------------------------------------------------*/
 

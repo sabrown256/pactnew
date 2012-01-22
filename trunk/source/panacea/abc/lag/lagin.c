@@ -72,7 +72,7 @@ static int fix_bcw(double *rx, double *ry, double *dvxdt, double *dvydt)
  * These were all specified in the form:
  *    specify bc <name> <k1> <l1> <k2> <l2>
  */
-    for (sp = iv_spec_lst; sp != NULL; sp = sp->next)
+    for (sp = PA_gs.iv_spec_lst; sp != NULL; sp = sp->next)
         {iv_name = sp->name;
          if ((iv_data = sp->data) == NULL)
             continue;
@@ -624,10 +624,10 @@ int intern_lag(void)
 
     PA_control_set("lag");
 
-    SWTCH[4]   = global_swtch[12];
+    SWTCH[4]   = PA_gs.global_swtch[12];
 
-    PARAM[12]  *= (global_param[3] - global_param[2]);
-    PARAM[13]  *= (global_param[3] - global_param[2]);
+    PARAM[12]  *= (PA_gs.global_param[3] - PA_gs.global_param[2]);
+    PARAM[13]  *= (PA_gs.global_param[3] - PA_gs.global_param[2]);
 
     PA_INTERN(n,   "n");
     PA_INTERN(p,   "p");

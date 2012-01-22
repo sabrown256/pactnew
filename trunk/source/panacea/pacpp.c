@@ -62,25 +62,6 @@ struct s_PA_cpp_node
 
 typedef struct s_PA_cpp_node PA_cpp_node;
 
-char
- *PA_CPP_INFO,
- *PA_CPP_ALLOCATION,
- *PA_CPP_SCOPE,
- *PA_CPP_CLASS,
- *PA_CPP_CENTER,
- *PA_CPP_PERSISTENCE,
- *PA_CPP_UNITS,
- *PA_CPP_TYPE,
- *PA_CPP_TYPE_SC,
- *PA_CPP_TYPE_S;
-
-char
- *PAN_CPP_NODE = NULL;
-
-hasharr
- *PA_cpp_name_tab  = NULL,
- *PA_cpp_value_tab = NULL;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -89,11 +70,11 @@ hasharr
 void PA_cpp_init(void)
    {
 
-    PA_cpp_name_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
+    PA_gs.cpp_name_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
-    PA_cpp_value_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
+    PA_gs.cpp_value_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
-    PAN_CPP_NODE = CSTRDUP("PA_cpp_node", 3);
+    PA_gs.cpp_node = CSTRDUP("PA_cpp_node", 3);
 
     return;}
 
@@ -117,7 +98,7 @@ void PA_cpp_add_group(char *name, int itype, char *type)
     node->type  = type;
     node->data  = NULL;
 
-    SC_hasharr_install(PA_cpp_value_tab, name, node, PAN_CPP_NODE, 3, -1);
+    SC_hasharr_install(PA_gs.cpp_value_tab, name, node, PA_gs.cpp_node, 3, -1);
   
     return;}
 
@@ -174,7 +155,7 @@ void PA_cpp_add_name(char *name, char *group, ...)
     PA_cpp_node *g_node, *node;
 
 /* find the type for this group */
-    g_node = (PA_cpp_node *) SC_hasharr_def_lookup(PA_cpp_value_tab, group);
+    g_node = (PA_cpp_node *) SC_hasharr_def_lookup(PA_gs.cpp_value_tab, group);
     PA_ERR((g_node == NULL),
 	   "NO SUCH CPP GROUP %s", group);
 
@@ -191,10 +172,10 @@ void PA_cpp_add_name(char *name, char *group, ...)
     SC_VA_END;
 
 /* install into hash table */
-    SC_hasharr_install(PA_cpp_name_tab, name, node, PAN_CPP_NODE, 3, -1);
+    SC_hasharr_install(PA_gs.cpp_name_tab, name, node, PA_gs.cpp_node, 3, -1);
 
 /* build cross reference from value to name */
-    SC_hasharr_install(PA_cpp_value_tab, name0, node, PAN_CPP_NODE, 3, -1);
+    SC_hasharr_install(PA_gs.cpp_value_tab, name0, node, PA_gs.cpp_node, 3, -1);
 
     return;}
 
@@ -207,7 +188,7 @@ void *PA_cpp_name_to_value(char *name)
    {void *data;
     PA_cpp_node *node;
 
-    node = (PA_cpp_node *) SC_hasharr_def_lookup(PA_cpp_name_tab, name);
+    node = (PA_cpp_node *) SC_hasharr_def_lookup(PA_gs.cpp_name_tab, name);
 
     if (node != NULL)
        data = node->data;
@@ -227,7 +208,7 @@ int PA_cpp_name_itype(char *name)
    {int itype;
     PA_cpp_node *node;
 
-    node = (PA_cpp_node *) SC_hasharr_def_lookup(PA_cpp_name_tab, name);
+    node = (PA_cpp_node *) SC_hasharr_def_lookup(PA_gs.cpp_name_tab, name);
 
     if (node != NULL)
        itype = node->itype;
@@ -249,7 +230,7 @@ char *PA_cpp_value_to_name(char *group, ...)
     PA_cpp_node *g_node, *cpp_node;
 
 /* find the type for this group */
-    g_node = (PA_cpp_node *) SC_hasharr_def_lookup(PA_cpp_value_tab, group);
+    g_node = (PA_cpp_node *) SC_hasharr_def_lookup(PA_gs.cpp_value_tab, group);
 
     if (g_node != NULL)
        {SC_VA_START(group);
@@ -257,7 +238,7 @@ char *PA_cpp_value_to_name(char *group, ...)
 	SC_VA_END;
 
 /* look up value */
-	cpp_node = (PA_cpp_node *) SC_hasharr_def_lookup(PA_cpp_value_tab, name0);
+	cpp_node = (PA_cpp_node *) SC_hasharr_def_lookup(PA_gs.cpp_value_tab, name0);
 
 	if (cpp_node != NULL)
 	   cpp_name = cpp_node->name;};
@@ -268,23 +249,23 @@ char *PA_cpp_value_to_name(char *group, ...)
 /*--------------------------------------------------------------------------*/
 
 /* PA_CPP_DEFAULT - install panacea cpp names into tables
- *                - must be called after PA_defun (defines units) and
- *                - PA_init_strings (defines units)
+ *                - must be called after PA_defun (defines PA_gs.unitss) and
+ *                - PA_init_strings (defines PA_gs.unitss)
  */
 
 void PA_cpp_default(void)
    {
 
-    PA_CPP_INFO        = CSTRDUP("INFO", 3);
-    PA_CPP_ALLOCATION  = CSTRDUP("ALLOCATION", 3);
-    PA_CPP_SCOPE       = CSTRDUP("SCOPE", 3);
-    PA_CPP_CLASS       = CSTRDUP("CLASS", 3);
-    PA_CPP_CENTER      = CSTRDUP("CENTER", 3);
-    PA_CPP_PERSISTENCE = CSTRDUP("PERSISTENCE", 3);
-    PA_CPP_UNITS       = CSTRDUP("UNITS", 3);
-    PA_CPP_TYPE        = CSTRDUP("TYPE", 3);
-    PA_CPP_TYPE_SC     = CSTRDUP("TYPE_SC", 3);
-    PA_CPP_TYPE_S      = CSTRDUP("TYPE_S", 3);
+    PA_gs.cpp_info        = CSTRDUP("INFO", 3);
+    PA_gs.cpp_allocation  = CSTRDUP("ALLOCATION", 3);
+    PA_gs.cpp_scope       = CSTRDUP("SCOPE", 3);
+    PA_gs.cpp_class       = CSTRDUP("CLASS", 3);
+    PA_gs.cpp_center      = CSTRDUP("CENTER", 3);
+    PA_gs.cpp_persistence = CSTRDUP("PERSISTENCE", 3);
+    PA_gs.cpp_units       = CSTRDUP("UNITS", 3);
+    PA_gs.cpp_type        = CSTRDUP("TYPE", 3);
+    PA_gs.cpp_type_SC     = CSTRDUP("TYPE_SC", 3);
+    PA_gs.cpp_type_S      = CSTRDUP("TYPE_S", 3);
 
     PA_INFO_TYPE_S         = CSTRDUP("PA_INFO_TYPE", 3);
     PA_INFO_N_DIMS_S       = CSTRDUP("PA_INFO_N_DIMS", 3);
@@ -315,16 +296,16 @@ void PA_cpp_default(void)
     PA_INFO_MAP_DOMAIN_S   = CSTRDUP("PA_INFO_MAP_DOMAIN", 3);
     PA_INFO_BUILD_DOMAIN_S = CSTRDUP("PA_INFO_BUILD_DOMAIN", 3);
 
-    PA_cpp_add_group(PA_CPP_INFO,        SC_INT_I, NULL);
-    PA_cpp_add_group(PA_CPP_ALLOCATION,  SC_INT_I, NULL);
-    PA_cpp_add_group(PA_CPP_SCOPE,       SC_INT_I, NULL);
-    PA_cpp_add_group(PA_CPP_CLASS,       SC_INT_I, NULL);
-    PA_cpp_add_group(PA_CPP_CENTER,      SC_INT_I, NULL);
-    PA_cpp_add_group(PA_CPP_PERSISTENCE, SC_INT_I, NULL);
-    PA_cpp_add_group(PA_CPP_UNITS,       SC_INT_I, NULL);
-    PA_cpp_add_group(PA_CPP_TYPE,        SC_INT_I, NULL);
-    PA_cpp_add_group(PA_CPP_TYPE_SC,     SC_INT_I, NULL);
-    PA_cpp_add_group(PA_CPP_TYPE_S,      SC_STRING_I,  NULL);
+    PA_cpp_add_group(PA_gs.cpp_info,        SC_INT_I, NULL);
+    PA_cpp_add_group(PA_gs.cpp_allocation,  SC_INT_I, NULL);
+    PA_cpp_add_group(PA_gs.cpp_scope,       SC_INT_I, NULL);
+    PA_cpp_add_group(PA_gs.cpp_class,       SC_INT_I, NULL);
+    PA_cpp_add_group(PA_gs.cpp_center,      SC_INT_I, NULL);
+    PA_cpp_add_group(PA_gs.cpp_persistence, SC_INT_I, NULL);
+    PA_cpp_add_group(PA_gs.cpp_units,       SC_INT_I, NULL);
+    PA_cpp_add_group(PA_gs.cpp_type,        SC_INT_I, NULL);
+    PA_cpp_add_group(PA_gs.cpp_type_SC,     SC_INT_I, NULL);
+    PA_cpp_add_group(PA_gs.cpp_type_S,      SC_STRING_I,  NULL);
 
 /* install types in several ways so that the following will work:
  *   #define SC_DOUBLE_I   6
@@ -336,138 +317,138 @@ void PA_cpp_default(void)
  */
 
 /* install the actual types */
-    PA_cpp_add_name(SC_CHAR_S,      PA_CPP_TYPE_SC, SC_CHAR_I);
-    PA_cpp_add_name(SC_SHORT_S,     PA_CPP_TYPE_SC, SC_SHORT_I);
-    PA_cpp_add_name(SC_INT_S,       PA_CPP_TYPE_SC, SC_INT_I);
-    PA_cpp_add_name(SC_LONG_S,      PA_CPP_TYPE_SC, SC_LONG_I);
-    PA_cpp_add_name(SC_FLOAT_S,     PA_CPP_TYPE_SC, SC_FLOAT_I);
-    PA_cpp_add_name(SC_DOUBLE_S,    PA_CPP_TYPE_SC, SC_DOUBLE_I);
-    PA_cpp_add_name(SC_STRING_S,    PA_CPP_TYPE_SC, SC_STRING_I);
-    PA_cpp_add_name(SC_POINTER_S,   PA_CPP_TYPE_SC, SC_POINTER_I);
-    PA_cpp_add_name(SC_PCONS_P_S,   PA_CPP_TYPE_SC, SC_PCONS_P_I);
-    PA_cpp_add_name(SC_VOID_S,      PA_CPP_TYPE_SC, SC_VOID_I);
-    PA_cpp_add_name(SC_SHORT_P_S,   PA_CPP_TYPE_SC, SC_SHORT_I);
-    PA_cpp_add_name(SC_INT_P_S,     PA_CPP_TYPE_SC, SC_INT_P_I);
-    PA_cpp_add_name(SC_LONG_P_S,    PA_CPP_TYPE_SC, SC_LONG_P_I);
-    PA_cpp_add_name(SC_FLOAT_P_S,   PA_CPP_TYPE_SC, SC_FLOAT_P_I);
-    PA_cpp_add_name(SC_DOUBLE_P_S,  PA_CPP_TYPE_SC, SC_DOUBLE_P_I);
-    PA_cpp_add_name(SC_PCONS_S,     PA_CPP_TYPE_SC, SC_PCONS_I);
-    PA_cpp_add_name(SC_STRUCT_S,    PA_CPP_TYPE_SC, SC_STRUCT_I);
-    PA_cpp_add_name(SC_UNKNOWN_S,   PA_CPP_TYPE_SC, SC_UNKNOWN_I);
+    PA_cpp_add_name(SC_CHAR_S,      PA_gs.cpp_type_SC, SC_CHAR_I);
+    PA_cpp_add_name(SC_SHORT_S,     PA_gs.cpp_type_SC, SC_SHORT_I);
+    PA_cpp_add_name(SC_INT_S,       PA_gs.cpp_type_SC, SC_INT_I);
+    PA_cpp_add_name(SC_LONG_S,      PA_gs.cpp_type_SC, SC_LONG_I);
+    PA_cpp_add_name(SC_FLOAT_S,     PA_gs.cpp_type_SC, SC_FLOAT_I);
+    PA_cpp_add_name(SC_DOUBLE_S,    PA_gs.cpp_type_SC, SC_DOUBLE_I);
+    PA_cpp_add_name(SC_STRING_S,    PA_gs.cpp_type_SC, SC_STRING_I);
+    PA_cpp_add_name(SC_POINTER_S,   PA_gs.cpp_type_SC, SC_POINTER_I);
+    PA_cpp_add_name(SC_PCONS_P_S,   PA_gs.cpp_type_SC, SC_PCONS_P_I);
+    PA_cpp_add_name(SC_VOID_S,      PA_gs.cpp_type_SC, SC_VOID_I);
+    PA_cpp_add_name(SC_SHORT_P_S,   PA_gs.cpp_type_SC, SC_SHORT_I);
+    PA_cpp_add_name(SC_INT_P_S,     PA_gs.cpp_type_SC, SC_INT_P_I);
+    PA_cpp_add_name(SC_LONG_P_S,    PA_gs.cpp_type_SC, SC_LONG_P_I);
+    PA_cpp_add_name(SC_FLOAT_P_S,   PA_gs.cpp_type_SC, SC_FLOAT_P_I);
+    PA_cpp_add_name(SC_DOUBLE_P_S,  PA_gs.cpp_type_SC, SC_DOUBLE_P_I);
+    PA_cpp_add_name(SC_PCONS_S,     PA_gs.cpp_type_SC, SC_PCONS_I);
+    PA_cpp_add_name(SC_STRUCT_S,    PA_gs.cpp_type_SC, SC_STRUCT_I);
+    PA_cpp_add_name(SC_UNKNOWN_S,   PA_gs.cpp_type_SC, SC_UNKNOWN_I);
 
-    PA_cpp_add_name("SC_CHAR_I",      PA_CPP_TYPE, SC_CHAR_I);
-    PA_cpp_add_name("SC_SHORT_I",     PA_CPP_TYPE, SC_SHORT_I);
-    PA_cpp_add_name("SC_INT_I",       PA_CPP_TYPE, SC_INT_I);
-    PA_cpp_add_name("SC_LONG_I",      PA_CPP_TYPE, SC_LONG_I);
-    PA_cpp_add_name("SC_FLOAT_I",     PA_CPP_TYPE, SC_FLOAT_I);
-    PA_cpp_add_name("SC_DOUBLE_I",    PA_CPP_TYPE, SC_DOUBLE_I);
-    PA_cpp_add_name("SC_REAL_I",      PA_CPP_TYPE, SC_REAL_I);
-    PA_cpp_add_name("SC_STRING_I",    PA_CPP_TYPE, SC_STRING_I);
-    PA_cpp_add_name("SC_POINTER_I",   PA_CPP_TYPE, SC_POINTER_I);
-    PA_cpp_add_name("SC_PCONS_P_I",   PA_CPP_TYPE, SC_PCONS_P_I);
-    PA_cpp_add_name("SC_VOID_I",      PA_CPP_TYPE, SC_VOID_I);
-    PA_cpp_add_name("SC_SHORT_P_I",   PA_CPP_TYPE, SC_SHORT_P_I);
-    PA_cpp_add_name("SC_INT_P_I",     PA_CPP_TYPE, SC_INT_P_I);
-    PA_cpp_add_name("SC_LONG_P_I",    PA_CPP_TYPE, SC_LONG_P_I);
-    PA_cpp_add_name("SC_FLOAT_P_I",   PA_CPP_TYPE, SC_FLOAT_P_I);
-    PA_cpp_add_name("SC_REAL_P_I",    PA_CPP_TYPE, SC_REAL_P_I);
-    PA_cpp_add_name("SC_DOUBLE_P_I",  PA_CPP_TYPE, SC_DOUBLE_P_I);
-    PA_cpp_add_name("SC_PCONS_I",     PA_CPP_TYPE, SC_PCONS_I);
-    PA_cpp_add_name("SC_STRUCT_I",    PA_CPP_TYPE, SC_STRUCT_I);
-    PA_cpp_add_name("SC_UNKNOWN_I",   PA_CPP_TYPE, SC_UNKNOWN_I);
+    PA_cpp_add_name("SC_CHAR_I",      PA_gs.cpp_type, SC_CHAR_I);
+    PA_cpp_add_name("SC_SHORT_I",     PA_gs.cpp_type, SC_SHORT_I);
+    PA_cpp_add_name("SC_INT_I",       PA_gs.cpp_type, SC_INT_I);
+    PA_cpp_add_name("SC_LONG_I",      PA_gs.cpp_type, SC_LONG_I);
+    PA_cpp_add_name("SC_FLOAT_I",     PA_gs.cpp_type, SC_FLOAT_I);
+    PA_cpp_add_name("SC_DOUBLE_I",    PA_gs.cpp_type, SC_DOUBLE_I);
+    PA_cpp_add_name("SC_REAL_I",      PA_gs.cpp_type, SC_REAL_I);
+    PA_cpp_add_name("SC_STRING_I",    PA_gs.cpp_type, SC_STRING_I);
+    PA_cpp_add_name("SC_POINTER_I",   PA_gs.cpp_type, SC_POINTER_I);
+    PA_cpp_add_name("SC_PCONS_P_I",   PA_gs.cpp_type, SC_PCONS_P_I);
+    PA_cpp_add_name("SC_VOID_I",      PA_gs.cpp_type, SC_VOID_I);
+    PA_cpp_add_name("SC_SHORT_P_I",   PA_gs.cpp_type, SC_SHORT_P_I);
+    PA_cpp_add_name("SC_INT_P_I",     PA_gs.cpp_type, SC_INT_P_I);
+    PA_cpp_add_name("SC_LONG_P_I",    PA_gs.cpp_type, SC_LONG_P_I);
+    PA_cpp_add_name("SC_FLOAT_P_I",   PA_gs.cpp_type, SC_FLOAT_P_I);
+    PA_cpp_add_name("SC_REAL_P_I",    PA_gs.cpp_type, SC_REAL_P_I);
+    PA_cpp_add_name("SC_DOUBLE_P_I",  PA_gs.cpp_type, SC_DOUBLE_P_I);
+    PA_cpp_add_name("SC_PCONS_I",     PA_gs.cpp_type, SC_PCONS_I);
+    PA_cpp_add_name("SC_STRUCT_I",    PA_gs.cpp_type, SC_STRUCT_I);
+    PA_cpp_add_name("SC_UNKNOWN_I",   PA_gs.cpp_type, SC_UNKNOWN_I);
 
 /* install the types as strings */
-    PA_cpp_add_name("SC_CHAR_S",      PA_CPP_TYPE_S, SC_CHAR_S);
-    PA_cpp_add_name("SC_SHORT_S",     PA_CPP_TYPE_S, SC_SHORT_S);
-    PA_cpp_add_name("SC_INT_S",       PA_CPP_TYPE_S, SC_INT_S);
-    PA_cpp_add_name("SC_LONG_S",      PA_CPP_TYPE_S, SC_LONG_S);
-    PA_cpp_add_name("SC_FLOAT_S",     PA_CPP_TYPE_S, SC_FLOAT_S);
-    PA_cpp_add_name("SC_DOUBLE_S",    PA_CPP_TYPE_S, SC_DOUBLE_S);
-    PA_cpp_add_name("SC_REAL_S",      PA_CPP_TYPE_S, SC_REAL_S);
-    PA_cpp_add_name("SC_STRING_S",    PA_CPP_TYPE_S, SC_STRING_S);
-    PA_cpp_add_name("SC_POINTER_S",   PA_CPP_TYPE_S, SC_POINTER_S);
-    PA_cpp_add_name("SC_PCONS_P_S",   PA_CPP_TYPE_S, SC_PCONS_P_S);
-    PA_cpp_add_name("SC_VOID_S",      PA_CPP_TYPE_S, SC_VOID_S);
-    PA_cpp_add_name("SC_SHORT_P_S",   PA_CPP_TYPE_S, SC_SHORT_S);
-    PA_cpp_add_name("SC_INT_P_S",     PA_CPP_TYPE_S, SC_INT_P_S);
-    PA_cpp_add_name("SC_LONG_P_S",    PA_CPP_TYPE_S, SC_LONG_P_S);
-    PA_cpp_add_name("SC_FLOAT_P_S",   PA_CPP_TYPE_S, SC_FLOAT_P_S);
-    PA_cpp_add_name("SC_REAL_P_S",    PA_CPP_TYPE_S, SC_REAL_P_S);
-    PA_cpp_add_name("SC_DOUBLE_P_S",  PA_CPP_TYPE_S, SC_DOUBLE_P_S);
-    PA_cpp_add_name("SC_PCONS_S",     PA_CPP_TYPE_S, SC_PCONS_S);
-    PA_cpp_add_name("SC_STRUCT_S",    PA_CPP_TYPE_S, SC_STRUCT_S);
-    PA_cpp_add_name("SC_UNKNOWN_S",   PA_CPP_TYPE_S, SC_UNKNOWN_S);
+    PA_cpp_add_name("SC_CHAR_S",      PA_gs.cpp_type_S, SC_CHAR_S);
+    PA_cpp_add_name("SC_SHORT_S",     PA_gs.cpp_type_S, SC_SHORT_S);
+    PA_cpp_add_name("SC_INT_S",       PA_gs.cpp_type_S, SC_INT_S);
+    PA_cpp_add_name("SC_LONG_S",      PA_gs.cpp_type_S, SC_LONG_S);
+    PA_cpp_add_name("SC_FLOAT_S",     PA_gs.cpp_type_S, SC_FLOAT_S);
+    PA_cpp_add_name("SC_DOUBLE_S",    PA_gs.cpp_type_S, SC_DOUBLE_S);
+    PA_cpp_add_name("SC_REAL_S",      PA_gs.cpp_type_S, SC_REAL_S);
+    PA_cpp_add_name("SC_STRING_S",    PA_gs.cpp_type_S, SC_STRING_S);
+    PA_cpp_add_name("SC_POINTER_S",   PA_gs.cpp_type_S, SC_POINTER_S);
+    PA_cpp_add_name("SC_PCONS_P_S",   PA_gs.cpp_type_S, SC_PCONS_P_S);
+    PA_cpp_add_name("SC_VOID_S",      PA_gs.cpp_type_S, SC_VOID_S);
+    PA_cpp_add_name("SC_SHORT_P_S",   PA_gs.cpp_type_S, SC_SHORT_S);
+    PA_cpp_add_name("SC_INT_P_S",     PA_gs.cpp_type_S, SC_INT_P_S);
+    PA_cpp_add_name("SC_LONG_P_S",    PA_gs.cpp_type_S, SC_LONG_P_S);
+    PA_cpp_add_name("SC_FLOAT_P_S",   PA_gs.cpp_type_S, SC_FLOAT_P_S);
+    PA_cpp_add_name("SC_REAL_P_S",    PA_gs.cpp_type_S, SC_REAL_P_S);
+    PA_cpp_add_name("SC_DOUBLE_P_S",  PA_gs.cpp_type_S, SC_DOUBLE_P_S);
+    PA_cpp_add_name("SC_PCONS_S",     PA_gs.cpp_type_S, SC_PCONS_S);
+    PA_cpp_add_name("SC_STRUCT_S",    PA_gs.cpp_type_S, SC_STRUCT_S);
+    PA_cpp_add_name("SC_UNKNOWN_S",   PA_gs.cpp_type_S, SC_UNKNOWN_S);
 
-    PA_cpp_add_name("PA_INFO_TYPE",         PA_CPP_INFO, PA_INFO_TYPE);
-    PA_cpp_add_name("PA_INFO_N_DIMS",       PA_CPP_INFO, PA_INFO_N_DIMS);
-    PA_cpp_add_name("PA_INFO_DIMS",         PA_CPP_INFO, PA_INFO_DIMS);
-    PA_cpp_add_name("PA_INFO_SCOPE",        PA_CPP_INFO, PA_INFO_SCOPE);
-    PA_cpp_add_name("PA_INFO_CLASS",        PA_CPP_INFO, PA_INFO_CLASS);
-    PA_cpp_add_name("PA_INFO_CENTER",       PA_CPP_INFO, PA_INFO_CENTER);
-    PA_cpp_add_name("PA_INFO_PERSISTENCE",  PA_CPP_INFO, PA_INFO_PERSISTENCE);
-    PA_cpp_add_name("PA_INFO_ALLOCATION",   PA_CPP_INFO, PA_INFO_ALLOCATION);
-    PA_cpp_add_name("PA_INFO_FILE_NAME",    PA_CPP_INFO, PA_INFO_FILE_NAME);
-    PA_cpp_add_name("PA_INFO_INIT_VAL",     PA_CPP_INFO, PA_INFO_INIT_VAL);
-    PA_cpp_add_name("PA_INFO_INIT_FNC",     PA_CPP_INFO, PA_INFO_INIT_FNC);
-    PA_cpp_add_name("PA_INFO_CONV",         PA_CPP_INFO, PA_INFO_CONV);
-    PA_cpp_add_name("PA_INFO_UNIT",         PA_CPP_INFO, PA_INFO_UNIT);
-    PA_cpp_add_name("PA_INFO_KEY",          PA_CPP_INFO, PA_INFO_KEY);
-    PA_cpp_add_name("PA_INFO_ATTRIBUTE",    PA_CPP_INFO, PA_INFO_ATTRIBUTE);
-    PA_cpp_add_name("PA_INFO_UNITS",        PA_CPP_INFO, PA_INFO_UNITS);
-    PA_cpp_add_name("PA_INFO_DATA_PTR",     PA_CPP_INFO, PA_INFO_DATA_PTR);
-    PA_cpp_add_name("PA_INFO_UNIT_NUMER",   PA_CPP_INFO, PA_INFO_UNIT_NUMER);
-    PA_cpp_add_name("PA_INFO_UNIT_DENOM",   PA_CPP_INFO, PA_INFO_UNIT_DENOM);
-    PA_cpp_add_name("PA_INFO_APPL_ATTR",    PA_CPP_INFO, PA_INFO_APPL_ATTR);
-    PA_cpp_add_name("PA_INFO_DEFAULT",      PA_CPP_INFO, PA_INFO_DEFAULT);
-    PA_cpp_add_name("PA_INFO_SHARE",        PA_CPP_INFO, PA_INFO_SHARE);
-    PA_cpp_add_name("PA_INFO_ATT_NAME",     PA_CPP_INFO, PA_INFO_ATT_NAME);
-    PA_cpp_add_name("PA_INFO_DIM_NAME",     PA_CPP_INFO, PA_INFO_DIM_NAME);
-    PA_cpp_add_name("PA_INFO_UNITS_NAME",   PA_CPP_INFO, PA_INFO_UNITS_NAME);
-    PA_cpp_add_name("PA_INFO_DOMAIN_NAME",  PA_CPP_INFO, PA_INFO_DOMAIN_NAME);
-    PA_cpp_add_name("PA_INFO_MAP_DOMAIN",   PA_CPP_INFO, PA_INFO_MAP_DOMAIN);
-    PA_cpp_add_name("PA_INFO_BUILD_DOMAIN", PA_CPP_INFO, PA_INFO_BUILD_DOMAIN);
+    PA_cpp_add_name("PA_INFO_TYPE",         PA_gs.cpp_info, PA_INFO_TYPE);
+    PA_cpp_add_name("PA_INFO_N_DIMS",       PA_gs.cpp_info, PA_INFO_N_DIMS);
+    PA_cpp_add_name("PA_INFO_DIMS",         PA_gs.cpp_info, PA_INFO_DIMS);
+    PA_cpp_add_name("PA_INFO_SCOPE",        PA_gs.cpp_info, PA_INFO_SCOPE);
+    PA_cpp_add_name("PA_INFO_CLASS",        PA_gs.cpp_info, PA_INFO_CLASS);
+    PA_cpp_add_name("PA_INFO_CENTER",       PA_gs.cpp_info, PA_INFO_CENTER);
+    PA_cpp_add_name("PA_INFO_PERSISTENCE",  PA_gs.cpp_info, PA_INFO_PERSISTENCE);
+    PA_cpp_add_name("PA_INFO_ALLOCATION",   PA_gs.cpp_info, PA_INFO_ALLOCATION);
+    PA_cpp_add_name("PA_INFO_FILE_NAME",    PA_gs.cpp_info, PA_INFO_FILE_NAME);
+    PA_cpp_add_name("PA_INFO_INIT_VAL",     PA_gs.cpp_info, PA_INFO_INIT_VAL);
+    PA_cpp_add_name("PA_INFO_INIT_FNC",     PA_gs.cpp_info, PA_INFO_INIT_FNC);
+    PA_cpp_add_name("PA_INFO_CONV",         PA_gs.cpp_info, PA_INFO_CONV);
+    PA_cpp_add_name("PA_INFO_UNIT",         PA_gs.cpp_info, PA_INFO_UNIT);
+    PA_cpp_add_name("PA_INFO_KEY",          PA_gs.cpp_info, PA_INFO_KEY);
+    PA_cpp_add_name("PA_INFO_ATTRIBUTE",    PA_gs.cpp_info, PA_INFO_ATTRIBUTE);
+    PA_cpp_add_name("PA_INFO_UNITS",        PA_gs.cpp_info, PA_INFO_UNITS);
+    PA_cpp_add_name("PA_INFO_DATA_PTR",     PA_gs.cpp_info, PA_INFO_DATA_PTR);
+    PA_cpp_add_name("PA_INFO_UNIT_NUMER",   PA_gs.cpp_info, PA_INFO_UNIT_NUMER);
+    PA_cpp_add_name("PA_INFO_UNIT_DENOM",   PA_gs.cpp_info, PA_INFO_UNIT_DENOM);
+    PA_cpp_add_name("PA_INFO_APPL_ATTR",    PA_gs.cpp_info, PA_INFO_APPL_ATTR);
+    PA_cpp_add_name("PA_INFO_DEFAULT",      PA_gs.cpp_info, PA_INFO_DEFAULT);
+    PA_cpp_add_name("PA_INFO_SHARE",        PA_gs.cpp_info, PA_INFO_SHARE);
+    PA_cpp_add_name("PA_INFO_ATT_NAME",     PA_gs.cpp_info, PA_INFO_ATT_NAME);
+    PA_cpp_add_name("PA_INFO_DIM_NAME",     PA_gs.cpp_info, PA_INFO_DIM_NAME);
+    PA_cpp_add_name("PA_INFO_UNITS_NAME",   PA_gs.cpp_info, PA_INFO_UNITS_NAME);
+    PA_cpp_add_name("PA_INFO_DOMAIN_NAME",  PA_gs.cpp_info, PA_INFO_DOMAIN_NAME);
+    PA_cpp_add_name("PA_INFO_MAP_DOMAIN",   PA_gs.cpp_info, PA_INFO_MAP_DOMAIN);
+    PA_cpp_add_name("PA_INFO_BUILD_DOMAIN", PA_gs.cpp_info, PA_INFO_BUILD_DOMAIN);
 
-    PA_cpp_add_name("DEFN",    PA_CPP_SCOPE, DEFN);
-    PA_cpp_add_name("RESTART", PA_CPP_SCOPE, RESTART);
-    PA_cpp_add_name("DMND",    PA_CPP_SCOPE, DMND);
-    PA_cpp_add_name("RUNTIME", PA_CPP_SCOPE, RUNTIME);
-    PA_cpp_add_name("EDIT",    PA_CPP_SCOPE, EDIT);
-    PA_cpp_add_name("SCRATCH", PA_CPP_SCOPE, SCRATCH);
+    PA_cpp_add_name("DEFN",    PA_gs.cpp_scope, DEFN);
+    PA_cpp_add_name("RESTART", PA_gs.cpp_scope, RESTART);
+    PA_cpp_add_name("DMND",    PA_gs.cpp_scope, DMND);
+    PA_cpp_add_name("RUNTIME", PA_gs.cpp_scope, RUNTIME);
+    PA_cpp_add_name("EDIT",    PA_gs.cpp_scope, EDIT);
+    PA_cpp_add_name("SCRATCH", PA_gs.cpp_scope, SCRATCH);
 
-    PA_cpp_add_name("REQU",    PA_CPP_CLASS, REQU);
-    PA_cpp_add_name("OPTL",    PA_CPP_CLASS, OPTL);
-    PA_cpp_add_name("DMND",    PA_CPP_CLASS, DMND);
-    PA_cpp_add_name("PSEUDO",  PA_CPP_CLASS, PSEUDO);
+    PA_cpp_add_name("REQU",    PA_gs.cpp_class, REQU);
+    PA_cpp_add_name("OPTL",    PA_gs.cpp_class, OPTL);
+    PA_cpp_add_name("DMND",    PA_gs.cpp_class, DMND);
+    PA_cpp_add_name("PSEUDO",  PA_gs.cpp_class, PSEUDO);
 
-    PA_cpp_add_name("U_CENT",  PA_CPP_CENTER, U_CENT);
-    PA_cpp_add_name("N_CENT",  PA_CPP_CENTER, N_CENT);
-    PA_cpp_add_name("E_CENT",  PA_CPP_CENTER, E_CENT);
-    PA_cpp_add_name("F_CENT",  PA_CPP_CENTER, F_CENT);
-    PA_cpp_add_name("Z_CENT",  PA_CPP_CENTER, Z_CENT);
+    PA_cpp_add_name("U_CENT",  PA_gs.cpp_center, U_CENT);
+    PA_cpp_add_name("N_CENT",  PA_gs.cpp_center, N_CENT);
+    PA_cpp_add_name("E_CENT",  PA_gs.cpp_center, E_CENT);
+    PA_cpp_add_name("F_CENT",  PA_gs.cpp_center, F_CENT);
+    PA_cpp_add_name("Z_CENT",  PA_gs.cpp_center, Z_CENT);
 
-    PA_cpp_add_name("REL",     PA_CPP_PERSISTENCE, REL);
-    PA_cpp_add_name("KEEP",    PA_CPP_PERSISTENCE, KEEP);
-    PA_cpp_add_name("CACHE_F", PA_CPP_PERSISTENCE, CACHE_F);
-    PA_cpp_add_name("CACHE_R", PA_CPP_PERSISTENCE, CACHE_R);
+    PA_cpp_add_name("REL",     PA_gs.cpp_persistence, REL);
+    PA_cpp_add_name("KEEP",    PA_gs.cpp_persistence, KEEP);
+    PA_cpp_add_name("CACHE_F", PA_gs.cpp_persistence, CACHE_F);
+    PA_cpp_add_name("CACHE_R", PA_gs.cpp_persistence, CACHE_R);
 
-    PA_cpp_add_name("STATIC",  PA_CPP_ALLOCATION, STATIC);
-    PA_cpp_add_name("DYNAMIC", PA_CPP_ALLOCATION, DYNAMIC);
+    PA_cpp_add_name("STATIC",  PA_gs.cpp_allocation, STATIC);
+    PA_cpp_add_name("DYNAMIC", PA_gs.cpp_allocation, DYNAMIC);
 
-/* the units macros are actually references to variables,
+/* the PA_gs.unitss macros are actually references to variables,
  * If the variable were to change values, (which it shouldn't)
  * These names would be wrong.
  */
-    PA_cpp_add_name("RAD",     PA_CPP_UNITS, RAD);   /* PA_radian          */
-    PA_cpp_add_name("STER",    PA_CPP_UNITS, STER);  /* PA_steradian       */
-    PA_cpp_add_name("MOLE",    PA_CPP_UNITS, MOLE);  /* PA_mole            */
-    PA_cpp_add_name("Q",       PA_CPP_UNITS, Q);     /* PA_electric_charge */
-    PA_cpp_add_name("CM",      PA_CPP_UNITS, CM);    /* PA_cm              */
-    PA_cpp_add_name("SEC",     PA_CPP_UNITS, SEC);   /* PA_sec             */
-    PA_cpp_add_name("G",       PA_CPP_UNITS, G);     /* PA_gram            */
-    PA_cpp_add_name("EV",      PA_CPP_UNITS, EV);    /* PA_eV              */
-    PA_cpp_add_name("K",       PA_CPP_UNITS, K);     /* PA_kelvin          */
-    PA_cpp_add_name("ERG",     PA_CPP_UNITS, ERG);   /* PA_erg             */
-    PA_cpp_add_name("CC",      PA_CPP_UNITS, CC);    /* PA_cc              */
+    PA_cpp_add_name("RAD",     PA_gs.cpp_units, RAD);   /* PA_gs.radian          */
+    PA_cpp_add_name("STER",    PA_gs.cpp_units, STER);  /* PA_gs.steradian       */
+    PA_cpp_add_name("MOLE",    PA_gs.cpp_units, MOLE);  /* PA_gs.mole            */
+    PA_cpp_add_name("Q",       PA_gs.cpp_units, Q);     /* PA_gs.electric_charge */
+    PA_cpp_add_name("CM",      PA_gs.cpp_units, CM);    /* PA_gs.cm              */
+    PA_cpp_add_name("SEC",     PA_gs.cpp_units, SEC);   /* PA_gs.sec             */
+    PA_cpp_add_name("G",       PA_gs.cpp_units, G);     /* PA_gs.gram            */
+    PA_cpp_add_name("EV",      PA_gs.cpp_units, EV);    /* PA_gs.eV              */
+    PA_cpp_add_name("K",       PA_gs.cpp_units, K);     /* PA_gs.kelvin          */
+    PA_cpp_add_name("ERG",     PA_gs.cpp_units, ERG);   /* PA_gs.erg             */
+    PA_cpp_add_name("CC",      PA_gs.cpp_units, CC);    /* PA_gs.cc              */
 
     return;}
 
@@ -500,7 +481,7 @@ int convert_type_s_i(char *type_name)
 char *convert_type_i_s(int type)
    {char *type_name;
 
-    type_name = PA_cpp_value_to_name(PA_CPP_TYPE, type);
+    type_name = PA_cpp_value_to_name(PA_gs.cpp_type, type);
     if (type_name == NULL)
        type_name = SC_UNKNOWN_S;
 

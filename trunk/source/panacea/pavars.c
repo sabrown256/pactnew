@@ -10,27 +10,6 @@
  
 #include "panacea_int.h"
 
-int
- N_Switches,
- N_Parameters,
- N_Names,
- N_Units,
- PA_radian,
- PA_steradian,
- PA_mole,
- PA_electric_charge,
- PA_cm,
- PA_sec,
- PA_gram,
- PA_eV,
- PA_kelvin,
- PA_erg,
- PA_cc;
-
-double
- *convrsn,
- *unit;
-
 /* physical constants */
 
 double
@@ -194,21 +173,21 @@ void PA_general_select(PA_variable *pp, C_array *arr, unsigned long *pitems,
 void PA_definitions(void)
    {int *P_Units;
 
-    P_Units = &N_Units;
+    P_Units = &PA_gs.n_units;
 
 /* this is the first time that this can be called with a guarantee that
  * all packages have been defined
  */
-    if (PA_vif == NULL)
-       PA_vif = PA_open("PA_vif", "w+", TRUE);
+    if (PA_gs.vif == NULL)
+       PA_gs.vif = PA_open("PA_gs.vif", "w+", TRUE);
 
-    PA_def_str(PA_vif);
+    PA_def_str(PA_gs.vif);
 
 /* global problem definition variables */
-    PA_inst_var("unit", SC_DOUBLE_S, NULL, NULL,
+    PA_inst_var("PA_gs.units", SC_DOUBLE_S, NULL, NULL,
                 SCOPE, DEFN, CLASS, REQU, ATTRIBUTE,
                 P_Units, DIMENSION, UNITS);
-    PA_inst_var("convrsn", SC_DOUBLE_S, NULL, NULL,
+    PA_inst_var("PA_gs.convrsns", SC_DOUBLE_S, NULL, NULL,
                 SCOPE, DEFN, CLASS, REQU, ATTRIBUTE,
                 P_Units, DIMENSION, UNITS);
 
@@ -264,7 +243,7 @@ void PA_variables(int flag)
                 DIMENSION, UNITS);
 
 /* have the package definers install their variables */
-    for (pck = Packages; pck != NULL; pck = pck->next)
+    for (pck = PA_gs.packages; pck != NULL; pck = pck->next)
         {if (pck->db_file != NULL)
             continue;
          pck_def = pck->defvar;
@@ -293,7 +272,7 @@ void PA_proc_units(void)
     PA_variable *pp;
     pcons *pn, *pd, *pc, *nxt;
 
-    for (i = 0; SC_hasharr_next(PA_variable_tab, &i, NULL, &ty, (void **) &pp); i++)
+    for (i = 0; SC_hasharr_next(PA_gs.variable_tab, &i, NULL, &ty, (void **) &pp); i++)
         {if (ty[3] == 'p')                   /* skip the packages */
 	    continue;
 
@@ -307,8 +286,8 @@ void PA_proc_units(void)
 	 unit_fac = 1.0;
 	 for (pc = pd; pc != NULL; pc = nxt)
 	     {id = PA_LST_VAL(pc);
-	      conv_fac *= convrsn[id];
-	      unit_fac *= unit[id];
+	      conv_fac *= PA_gs.convrsns[id];
+	      unit_fac *= PA_gs.units[id];
 
 	      nxt = (pcons *) pc->cdr;
 	      SC_rl_pcons(pc, 1);};
@@ -317,8 +296,8 @@ void PA_proc_units(void)
 	 unit_fac = 1.0/conv_fac;
 	 for (pc = pn; pc != NULL; pc = nxt)
 	     {id = PA_LST_VAL(pc);
-	      conv_fac *= convrsn[id];
-	      unit_fac *= unit[id];
+	      conv_fac *= PA_gs.convrsns[id];
+	      unit_fac *= PA_gs.units[id];
 
 	      nxt = (pcons *) pc->cdr;
 	      SC_rl_pcons(pc, 1);};
@@ -346,7 +325,7 @@ void PA_def_units(int flag)
 /* set the physical constants in CGS units */
        PA_physical_constants_cgs();
 
-       N_Units      = 0;
+       PA_gs.n_units      = 0;
        _PA.units = NULL;
 
 /* once panacea is defined as a package,
@@ -355,7 +334,7 @@ void PA_def_units(int flag)
        PA_defunc();
 
 /* have the package defuns install their units */
-       for (pck = Packages; pck != NULL; pck = pck->next)
+       for (pck = PA_gs.packages; pck != NULL; pck = pck->next)
 	   {pck_def = pck->defun;
 	    if (pck_def != NULL)
 	       {PA_control_set(pck->name);
@@ -399,7 +378,7 @@ int PA_def_unit(double fac, ...)
     per_flag = FALSE;
     while (TRUE)
        {dm = SC_VA_ARG(int);
-        PA_ERR((dm >= N_Units),
+        PA_ERR((dm >= PA_gs.n_units),
                "ILLEGAL UNIT SPECIFIER - PA_DEF_UNIT");
         if (dm == PER)
            {pa = den;
@@ -454,7 +433,7 @@ int PA_def_unit(double fac, ...)
 /* add a unit to the list */
     unit = CMAKE(PA_unit_spec);
 
-    unit->index       = N_Units++;
+    unit->index       = PA_gs.n_units++;
     unit->factor      = fac;
     unit->fundamental = fundamental;
     unit->n_num       = nn;
@@ -506,17 +485,17 @@ void PA_set_conversions(int flag)
     PA_unit_spec *pu;
 
     ONCE_SAFE(TRUE, NULL)
-       if ((unit == NULL) || (convrsn == NULL))
-	  {unit    = CMAKE_N(double, N_Units);
-	   convrsn = CMAKE_N(double, N_Units);};
+       if ((PA_gs.units == NULL) || (PA_gs.convrsns == NULL))
+	  {PA_gs.units    = CMAKE_N(double, PA_gs.n_units);
+	   PA_gs.convrsns = CMAKE_N(double, PA_gs.n_units);};
     END_SAFE;
 
     for (pu = _PA.units; pu != NULL; pu = pu->next)
         {indx = pu->index;
 
          if (flag)
-            {uf = unit[indx];
-             cf = convrsn[indx];}
+            {uf = PA_gs.units[indx];
+             cf = PA_gs.convrsns[indx];}
          else
             {uf = pu->factor;
              cf = uf;};
@@ -525,23 +504,23 @@ void PA_set_conversions(int flag)
          nd = pu->n_den;
 
          if (pu->fundamental)
-            {unit[indx]    = uf;
-             convrsn[indx] = cf;}
+            {PA_gs.units[indx]    = uf;
+             PA_gs.convrsns[indx] = cf;}
          else
             {pa = pu->numerator;
              for (j = 0; j < nn; j++)
                  {i   = pa[j];
-                  uf *= unit[i];
-                  cf *= convrsn[i];};
+                  uf *= PA_gs.units[i];
+                  cf *= PA_gs.convrsns[i];};
 
              pa = pu->denominator;
              for (j = 0; j < nd; j++)
                  {i   = pa[j];
-                  uf /= unit[i];
-                  cf /= convrsn[i];};
+                  uf /= PA_gs.units[i];
+                  cf /= PA_gs.convrsns[i];};
 
-             unit[indx]    = uf;
-             convrsn[indx] = cf;};};
+             PA_gs.units[indx]    = uf;
+             PA_gs.convrsns[indx] = cf;};};
 
     return;}    
 
@@ -550,7 +529,7 @@ void PA_set_conversions(int flag)
 
 /* PA_PHYSICAL_CONSTANTS_INT - set up the physical constants in the internal
  *                            - system of units as defined by the unit array
- *                            - e.g. length_internal = length_cgs*unit[CM]
+ *                            - e.g. length_internal = length_cgs*wPA_gs.units[CM]
  */
 
 void PA_physical_constants_int(void)
@@ -558,17 +537,17 @@ void PA_physical_constants_int(void)
 
     PA_physical_constants_cgs();
 
-    Hbar    *= (unit[ERG]*unit[SEC]);                    /* Hbar in erg-sec */
-    HbarC   *= (unit[EV]*unit[CM]);                      /* Hbar*C in eV-cm */
-    eV_erg  *= (unit[ERG]/unit[EV]);                           /* eV to erg */
-    N0      *= unit[MOLE];                             /* Avagadro's number */
-    c       *= (unit[CM]/unit[SEC]);             /* speed of light (cm/sec) */
-    M_e_eV  *= unit[EV];                             /* electron mass in eV */
-    M_e     *= unit[G];                               /* electron mass in g */
-    M_a     *= unit[G];                            /* atomic mass unit in g */
-    kBoltz  *= (unit[ERG]/unit[K]);            /* Boltzman constant (erg/K) */
-    e       *= unit[Q];                           /* electron charge in esu */
-    Ryd     *= unit[EV];                                   /* Rydberg in eV */
+    Hbar    *= (PA_gs.units[ERG]*PA_gs.units[SEC]);                    /* Hbar in erg-sec */
+    HbarC   *= (PA_gs.units[EV]*PA_gs.units[CM]);                      /* Hbar*C in eV-cm */
+    eV_erg  *= (PA_gs.units[ERG]/PA_gs.units[EV]);                           /* eV to erg */
+    N0      *= PA_gs.units[MOLE];                             /* Avagadro's number */
+    c       *= (PA_gs.units[CM]/PA_gs.units[SEC]);             /* speed of light (cm/sec) */
+    M_e_eV  *= PA_gs.units[EV];                             /* electron mass in eV */
+    M_e     *= PA_gs.units[G];                               /* electron mass in g */
+    M_a     *= PA_gs.units[G];                            /* atomic mass PA_gs.units in g */
+    kBoltz  *= (PA_gs.units[ERG]/PA_gs.units[K]);            /* Boltzman constant (erg/K) */
+    e       *= PA_gs.units[Q];                           /* electron charge in esu */
+    Ryd     *= PA_gs.units[EV];                                   /* Rydberg in eV */
 
     return;}
 
@@ -576,9 +555,9 @@ void PA_physical_constants_int(void)
 /*--------------------------------------------------------------------------*/
 
 /* PA_PHYSICAL_CONSTANTS_EXT - set up the physical constants in the external
- *                            - system of units as defined by the convrsn
+ *                            - system of PA_gs.unitss as defined by the PA_gs.convrsns
  *                            - array
- *                            - e.g. length_external = length_cgs*convrsn[CM]
+ *                            - e.g. length_external = length_cgs*PA_gs.convrsns[CM]
  */
 
 void PA_physical_constants_ext(void)
@@ -586,17 +565,17 @@ void PA_physical_constants_ext(void)
 
     PA_physical_constants_cgs();
 
-    Hbar    *= (convrsn[ERG]*convrsn[SEC]);              /* Hbar in erg-sec */
-    HbarC   *= (convrsn[EV]*convrsn[CM]);                /* Hbar*C in eV-cm */
-    eV_erg  *= (convrsn[ERG]/convrsn[EV]);                     /* eV to erg */
-    N0      *= convrsn[MOLE];                          /* Avagadro's number */
-    c       *= (convrsn[CM]/convrsn[SEC]);       /* speed of light (cm/sec) */
-    M_e_eV  *= convrsn[EV];                          /* electron mass in eV */
-    M_e     *= convrsn[G];                            /* electron mass in g */
-    M_a     *= convrsn[G];                         /* atomic mass unit in g */
-    kBoltz  *= (convrsn[ERG]/convrsn[K]);      /* Boltzman constant (erg/K) */
-    e       *= convrsn[Q];                        /* electron charge in esu */
-    Ryd     *= convrsn[EV];                                /* Rydberg in eV */
+    Hbar    *= (PA_gs.convrsns[ERG]*PA_gs.convrsns[SEC]);              /* Hbar in erg-sec */
+    HbarC   *= (PA_gs.convrsns[EV]*PA_gs.convrsns[CM]);                /* Hbar*C in eV-cm */
+    eV_erg  *= (PA_gs.convrsns[ERG]/PA_gs.convrsns[EV]);                     /* eV to erg */
+    N0      *= PA_gs.convrsns[MOLE];                          /* Avagadro's number */
+    c       *= (PA_gs.convrsns[CM]/PA_gs.convrsns[SEC]);       /* speed of light (cm/sec) */
+    M_e_eV  *= PA_gs.convrsns[EV];                          /* electron mass in eV */
+    M_e     *= PA_gs.convrsns[G];                            /* electron mass in g */
+    M_a     *= PA_gs.convrsns[G];                         /* atomic mass PA_gs.units in g */
+    kBoltz  *= (PA_gs.convrsns[ERG]/PA_gs.convrsns[K]);      /* Boltzman constant (erg/K) */
+    e       *= PA_gs.convrsns[Q];                        /* electron charge in esu */
+    Ryd     *= PA_gs.convrsns[EV];                                /* Rydberg in eV */
 
     return;}
 

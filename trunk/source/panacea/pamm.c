@@ -28,8 +28,8 @@ PA_variable *_PA_mk_variable(char *vname, PA_dimens *vdims, void *iv,
     PA_variable *pp;
     PA_dimens *pvd;
     
-    if (PA_vif == NULL)
-       PA_vif = PA_open("PA_vif", "r+", TRUE);
+    if (PA_gs.vif == NULL)
+       PA_gs.vif = PA_open("PA_gs.vif", "r+", TRUE);
 
     pp = CMAKE(PA_variable);
 
@@ -42,9 +42,9 @@ PA_variable *_PA_mk_variable(char *vname, PA_dimens *vdims, void *iv,
         for (pvd = vdims; pvd != NULL; pvd = pvd->next, nd++);};
 
     if (_PD_indirection(vtype))
-       dp = PD_inquire_host_type(PA_vif, "*");
+       dp = PD_inquire_host_type(PA_gs.vif, "*");
     else
-       dp = PD_inquire_host_type(PA_vif, vtype);
+       dp = PD_inquire_host_type(PA_gs.vif, vtype);
 
     PA_ERR((dp == NULL),
            "TYPE %s NOT DEFINED - _PA_MK_VARIABLE", vtype);

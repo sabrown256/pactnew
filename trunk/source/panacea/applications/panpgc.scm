@@ -318,9 +318,9 @@
 
 	  (if (strcmp? pckname "global")
 	      (begin
-		(printf file "    global_swtch = SWTCH;\n")
-		(printf file "    global_param = PARAM;\n")
-		(printf file "    global_name  = NAME;\n")
+		(printf file "    PA_gs.global_swtch = SWTCH;\n")
+		(printf file "    PA_gs.global_param = PARAM;\n")
+		(printf file "    PA_gs.global_name  = NAME;\n")
 		(printf file "\n")))
 
 	  (function-return file #f)

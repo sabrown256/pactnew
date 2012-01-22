@@ -28,9 +28,6 @@ struct s_th_info
 int
  _PA_ul_print_flag = FALSE;
 
-char
- PA_err[MAXLINE];
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -531,7 +528,7 @@ int PA_th_family_list(char *name, int c, char ***pfiles)
     for (n = 0; TRUE; n++)
         {snprintf(bf, MAXLINE, "%s.%c%s", name, c, SC_itoa(n, 36, 2));
          if (!SC_isfile(bf))
-            {snprintf(PA_err, MAXLINE, "ERROR: Cannot open file %s", bf);
+            {snprintf(PA_gs.err, MAXLINE, "ERROR: Cannot open file %s", bf);
 	     break;};
 	 SC_array_string_add_copy(fa, bf);};
 
@@ -590,7 +587,7 @@ int PA_th_name_list(int n, char **names, char ***pthfiles)
     for (i = 0; i < n; i++)
         {fp = PD_open(names[i], "r");
          if (fp == NULL)
-            {snprintf(PA_err, MAXLINE, "ERROR: Cannot open file %s",
+            {snprintf(PA_gs.err, MAXLINE, "ERROR: Cannot open file %s",
                      names[i]);
              break;}
 	 SC_array_string_add_copy(fa, names[i]);
@@ -657,7 +654,7 @@ int PA_th_link_list(int n, char **names, char ***pthfiles)
 	 while (TRUE)
             {fp = PD_open(bf, "r");
              if (fp == NULL)
-                {snprintf(PA_err, MAXLINE, "ERROR: Cannot open file %s", bf);
+                {snprintf(PA_gs.err, MAXLINE, "ERROR: Cannot open file %s", bf);
                  break;}
 	     SC_array_string_add_copy(fa, bf);
              if (fp->previous_file != NULL)

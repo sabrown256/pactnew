@@ -162,14 +162,14 @@ FIXNUM FF_ID(palloc, PALLOC)(void **av, FIXNUM *sncn,
     pvd   = vdims;
     while (pvd != NULL)
        {pdima = (int *) SC_VA_ARG(FIXNUM *);
-        if (pdima == PA_DUL)
+        if (pdima == PA_gs.dul)
            {pvd->index_min = (int *) SC_VA_ARG(FIXNUM *);
             pvd->index_max = (int *) SC_VA_ARG(FIXNUM *);
             pd->index_min  = *pvd->index_min;
             pd->index_max  = *pvd->index_max;
             pd->number     = pd->index_max - pd->index_min + 1L;}
 
-        else if (pdima == PA_DON)
+        else if (pdima == PA_gs.don)
            {pvd->index_min = (int *) SC_VA_ARG(FIXNUM *);
             pvd->index_max = (int *) SC_VA_ARG(FIXNUM *);
             pd->index_min  = *pvd->index_min;

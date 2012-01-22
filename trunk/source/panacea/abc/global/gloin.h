@@ -123,7 +123,6 @@ extern double
 
 extern int
  N_parts,
- N_plots,
  N_regs;
 
 extern char
@@ -186,7 +185,7 @@ extern int
 
 extern int
  LR_get_data(double *pnz, double *pnc, double *pt, double *pdt,
-		       char **prs, char **ped, char **ppp, char **pgf),
+	     char **prs, char **ped, char **ppp, char **pgf),
  part_reg(char *s);
 
 extern void

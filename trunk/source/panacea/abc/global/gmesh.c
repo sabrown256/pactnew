@@ -334,7 +334,7 @@ int gen_dumpw(hasharr *curves)
     FILE *fp;
     PM_conic_curve *cp;
 
-    length = 1.0/unit[CM];
+    length = 1.0/PA_gs.units[CM];
 
     edname = NAME[3];
 
@@ -448,10 +448,10 @@ void make_mesh(void)
            node[i] = 1.0;
 
 /* reprocess the plot requests now that the mesh is known */
-    SWTCH[4] = N_plots;
+    SWTCH[4] = PA_gs.n_plots;
 
 /* do some conversions and set up */
-    conv = unit[SEC]/convrsn[SEC];                /* time to internal units */
+    conv = PA_gs.units[SEC]/PA_gs.convrsns[SEC];                /* time to internal PA_gs.unitss */
     PARAM[2]  *= conv;                                        /* start time */
     PARAM[3]  *= conv;                                         /* stop time */
     PARAM[1]  = PARAM[2];                                   /* current time */

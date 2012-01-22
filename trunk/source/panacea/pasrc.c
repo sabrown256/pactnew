@@ -17,16 +17,10 @@
 
 #include "pasrc.h"
 
-PA_src_variable
- **SV_List;
-
-int
- N_Variables;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PA_INIT_SOURCES - scan the iv_spec_lst for source files and initialize the
+/* _PA_INIT_SOURCES - scan the PA_gs.iv_spec_lst for source files and initialize the
  *                  - various buffers for each of the source variables
  */
 
@@ -42,14 +36,14 @@ void _PA_init_sources(double t, double dt)
 /* count up the number of source files to be managed and the
  * number of source variables
  */
-    for (N_sf = 0, ivs = iv_spec_lst;
+    for (N_sf = 0, ivs = PA_gs.iv_spec_lst;
          ivs != NULL;
          ivs = ivs->next, N_sf++);
 
     files = CMAKE_N(char *, N_sf);
-    N_Variables = 0;
+    PA_gs.n_variables = 0;
     N_sf = 0;
-    for (ivs = iv_spec_lst; ivs != NULL; ivs = ivs->next)
+    for (ivs = PA_gs.iv_spec_lst; ivs != NULL; ivs = ivs->next)
         {iv_file = ivs->file;
          if (iv_file == NULL)
             continue;
@@ -65,22 +59,22 @@ void _PA_init_sources(double t, double dt)
          fp = PD_open(iv_file, "r");
          PA_ERR((fp == NULL),
                 "MISSING SOURCE FILE - %s", iv_file);
-         PA_ERR(!PD_read(fp, "N_Variables", &n_vars),
+         PA_ERR(!PD_read(fp, "n_variables", &n_vars),
                 "N_VARIABLES MISSING FROM %s", iv_file);
-         N_Variables += n_vars;
+         PA_gs.n_variables += n_vars;
          PD_close(fp);};
 
 /* loop over all source files and make a list of PA_src_variables */
-    SV_List = CMAKE_N(PA_src_variable *, N_Variables);
+    PA_gs.sv_list = CMAKE_N(PA_src_variable *, PA_gs.n_variables);
     n_vars  = 0;
     for (j = 0; j < N_sf; j++)
         {fp = PD_open(files[j], "r");
 
-/* NOTE: this has N_Variables greater than the number actually referenced
+/* NOTE: this has PA_gs.n_variables greater than the number actually referenced
  *       this give more efficiency but one has to be careful when
- *       checking SV_List for NULL entries
+ *       checking PA_gs.sv_list for NULL entries
  */
-         for (ivs = iv_spec_lst; ivs != NULL; ivs = ivs->next)
+         for (ivs = PA_gs.iv_spec_lst; ivs != NULL; ivs = ivs->next)
              {if (ivs->file == NULL)
                  continue;
 
@@ -100,25 +94,25 @@ void _PA_init_sources(double t, double dt)
                       PA_ERR(!PD_read(fp, token, times),
                              "CAN'T READ %s IN %s - INIT-SOURCES",
                              token, files[j]);
-                      PM_array_scale(times, n_times, unit[SEC]);
+                      PM_array_scale(times, n_times, PA_gs.units[SEC]);
 
-/* install this source variable in the array, SV_List and have the
- * entry in iv_spec_lst point to it
+/* install this source variable in the array, PA_gs.sv_list and have the
+ * entry in PA_gs.iv_spec_lst point to it
  */
-                      SV_List[n_vars] = _PA_mk_src_variable(name,
+                      PA_gs.sv_list[n_vars] = _PA_mk_src_variable(name,
                                                             count, n_times,
                                                             times, fp);
                       ivs->index = n_vars;
 
-                      SV_List[n_vars]->interpolate = ivs->interpolate;
+                      PA_gs.sv_list[n_vars]->interpolate = ivs->interpolate;
 
 /* initialize the queue buffer for this PA_src_variable */
-                      _PA_init_queue(SV_List[n_vars], t, dt);
+                      _PA_init_queue(PA_gs.sv_list[n_vars], t, dt);
 
 /* the iv_spec needs to know about the size of the source variable
  * for inits in PA_CONNECT
  */
-                      ivs->num = SV_List[n_vars]->size;
+                      ivs->num = PA_gs.sv_list[n_vars]->size;
 
                       n_vars++;};
                   count++;};};};
@@ -145,12 +139,12 @@ PA_src_variable *PA_get_source(char *s, int start_flag)
     if (start_flag)
        i = 0;
 
-/* NOTE: N_Variables is greater than the number actually referenced
+/* NOTE: PA_gs.n_variables is greater than the number actually referenced
  *       this give more efficiency but one has to be careful when
- *       checking SV_List for NULL entries
+ *       checking PA_gs.sv_list for NULL entries
  */
-    for (rv = NULL; i < N_Variables; i++)
-        {svp = SV_List[i];
+    for (rv = NULL; i < PA_gs.n_variables; i++)
+        {svp = PA_gs.sv_list[i];
          if (svp == NULL)
             continue;
 
@@ -187,7 +181,7 @@ PA_iv_specification *PA_find_iv_source(char *name, int off)
     double *data;
 
 /* check for the named iv_spec in the given zone/region */
-    for (sp = iv_spec_lst; sp != NULL; sp = sp->next)
+    for (sp = PA_gs.iv_spec_lst; sp != NULL; sp = sp->next)
         {data = sp->data;
          if (data == NULL)
             continue;
@@ -225,7 +219,7 @@ void _PA_init_queue(PA_src_variable *svp, double t, double dt)
     pd       = svp->queue;
     
 /* lookup up the PA_variable that this PA_src_variable is controlling
- * and set the conversion from CGS units to INTERNAL units
+ * and set the conversion from CGS PA_gs.unitss to INTERNAL PA_gs.unitss
  */
     strcpy(var_name, svp->name);
     token = SC_strtok(var_name, "(", s);
@@ -413,12 +407,12 @@ void PA_source_variables(double t, double dt)
 /* check all source specifications which are
  * tied to variables in the data base
  *
- * NOTE: N_Variables is greater than the number actually referenced
+ * NOTE: PA_gs.n_variables is greater than the number actually referenced
  *       this gives more efficiency but one has to be careful when
- *       checking SV_List for NULL entries
+ *       checking PA_gs.sv_list for NULL entries
  */
-    for (i = 0; i < N_Variables; i++)
-        {svp = SV_List[i];
+    for (i = 0; i < PA_gs.n_variables; i++)
+        {svp = PA_gs.sv_list[i];
          if (svp == NULL)
             continue;
 

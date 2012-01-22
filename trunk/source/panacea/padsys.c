@@ -10,15 +10,6 @@
 
 #include "panacea_int.h"
 
-PA_package
- *Packages;
-
-int
- N_Packages = 0;
-
-char
- *PAN_PACKAGE = NULL;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -29,22 +20,22 @@ void _PA_internal_init(void)
 
     PA_set_n_threads(1);
 
-    PA_variable_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
+    PA_gs.variable_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
-    PAN_VARIABLE     = CSTRDUP("PA_variable", 3);
-    PAN_PACKAGE      = CSTRDUP("PA_package", 3);
-    PAN_ATTRIBUTE    = CSTRDUP(SC_PCONS_P_S, 3);
-    PAN_UNIT         = CSTRDUP(SC_PCONS_P_S, 3);
-    PAN_DIMENSION    = CSTRDUP("PA_dimens", 3);
-    PAN_DOMAIN       = CSTRDUP("PA_edit_domain", 3);
-    PAN_EDIT_REQUEST = CSTRDUP("PA_edit_request", 3);
-    PAN_EDIT_OUT     = CSTRDUP("PA_edit_out", 3);
+    PA_gs.variable     = CSTRDUP("PA_variable", 3);
+    PA_gs.package      = CSTRDUP("PA_package", 3);
+    PA_gs.attribute    = CSTRDUP(SC_PCONS_P_S, 3);
+    PA_gs.unit         = CSTRDUP(SC_PCONS_P_S, 3);
+    PA_gs.dimension    = CSTRDUP("PA_dimens", 3);
+    PA_gs.domain       = CSTRDUP("PA_edit_domain", 3);
+    PA_gs.edit_REQUEST = CSTRDUP("PA_edit_request", 3);
+    PA_gs.edit_OUT     = CSTRDUP("PA_edit_out", 3);
 
-    PA_DUL = CMAKE(int);
-    PA_DON = CMAKE(int);
+    PA_gs.dul = CMAKE(int);
+    PA_gs.don = CMAKE(int);
 
-    *PA_DUL = PA_UPPER_LOWER;
-    *PA_DON = PA_OFFSET_NUMBER;
+    *PA_gs.dul = PA_UPPER_LOWER;
+    *PA_gs.don = PA_OFFSET_NUMBER;
 
     return;}
 
@@ -61,18 +52,18 @@ PA_package *PA_gen_package(char *name, PFPkgGencmd cmd, PFPkgDfstrc dfs,
                            PFPkgIntrn inr, char *fname)
    {PA_package *pck;
 
-    N_Packages++;
+    PA_gs.n_packages++;
 
     pck = CMAKE(PA_package);
     SC_MEM_INIT(PA_package, pck);
 
 /* make the variable hash table if it doesn't exist yet */
-    if (PA_variable_tab == NULL)
+    if (PA_gs.variable_tab == NULL)
        _PA_internal_init();
 
-/* if this is the first package set Packages to it */
+/* if this is the first package set PA_gs.packages to it */
     if (_PA.last_gen == NULL)
-       Packages = pck;
+       PA_gs.packages = pck;
 
     pck->name    = CSTRSAVE(name);
     pck->gencmd  = cmd;
@@ -103,7 +94,7 @@ PA_package *PA_gen_package(char *name, PFPkgGencmd cmd, PFPkgDfstrc dfs,
     _PA.last_gen = pck;
 
 /* install the package in the data base */
-    SC_hasharr_install(PA_variable_tab, name, pck, PAN_PACKAGE, 3, -1);
+    SC_hasharr_install(PA_gs.variable_tab, name, pck, PA_gs.package, 3, -1);
 
     return(pck);}
 
@@ -121,16 +112,16 @@ void PA_run_time_package(char *name, PFPkgDfstrc dfs, PFPkgDefun dfu,
                          char *fname)
    {PA_package *pck;
 
-    N_Packages++;
+    PA_gs.n_packages++;
     pck = CMAKE(PA_package);
 
 /* make the variable hash table if it doesn't exist yet */
-    if (PA_variable_tab == NULL)
+    if (PA_gs.variable_tab == NULL)
        _PA_internal_init();
 
-/* if this is the first package set Packages to it */
+/* if this is the first package set PA_gs.packages to it */
     if (_PA.last_run == NULL)
-       Packages = pck;
+       PA_gs.packages = pck;
 
     pck->name    = CSTRSAVE(name);
     pck->gencmd  = NULL;
@@ -161,7 +152,7 @@ void PA_run_time_package(char *name, PFPkgDfstrc dfs, PFPkgDefun dfu,
     _PA.last_run = pck;
 
 /* install the package in the data base */
-    SC_hasharr_install(PA_variable_tab, name, pck, PAN_PACKAGE, 3, -1);
+    SC_hasharr_install(PA_gs.variable_tab, name, pck, PA_gs.package, 3, -1);
 
     return;}
 
