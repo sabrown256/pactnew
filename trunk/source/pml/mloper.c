@@ -23,10 +23,13 @@ PM_field
  _int_opers     = {(PFByte) PM_iplus,  (PFByte) PM_iminus,   NULL, 
 	 	   (PFByte) PM_itimes, (PFByte) PM_idivide},
  _long_opers    = {(PFByte) PM_lplus,  (PFByte) PM_lminus,   NULL, 
-                   (PFByte) PM_ltimes, (PFByte) PM_ldivide},
- *PM_fp_opers   = &_fp_opers,
- *PM_int_opers  = &_int_opers,
- *PM_long_opers = &_long_opers;
+                   (PFByte) PM_ltimes, (PFByte) PM_ldivide};
+
+PM_global_state
+ PM_gs = { &_fp_opers, &_int_opers, &_long_opers, };
+
+PM_state
+ _PM = { -1, 0.05, -1.0, -1.0, 3.0e-8 };
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

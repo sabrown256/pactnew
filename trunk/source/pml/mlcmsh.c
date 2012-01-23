@@ -49,18 +49,6 @@
 
 #define PM_MESH_ERR(x) if (x) LONGJMP(_PM.mesh_err, ABORT) 
 
-static char
- *MESH_CURVE = NULL;
-
-double
- _PM_wherein(PM_side *base, double x, double y);
-
-float
- _PM_inter_pts(PM_side *basea, PM_side *baseb, PM_side *basec);
- 
-int
- _PM_chck_part(PM_part *parts);
- 
 /*--------------------------------------------------------------------------*/
 
 /*                          MEMORY MANAGEMENT ROUTINES                      */
@@ -72,9 +60,6 @@ int
 PM_conic_curve *PM_mk_cline(char *type, double axx, double ayy, double axy,
 			    double ax, double ay, double ac)
    {PM_conic_curve *cp;
-
-    if (MESH_CURVE == NULL)
-       MESH_CURVE = CSTRSAVE("PM_conic_curve");
 
     cp       = CMAKE(PM_conic_curve);
     cp->type = CSTRSAVE(type);
@@ -515,7 +500,7 @@ static int _PM_chck_curves(PM_part *ipart, hasharr *curves)
              if (cp == NULL)
                 {s = _PM_nxt_name();
                  cp = PM_mk_cline(s, 0.0, 0.0, 0.0, ax, ay, ac);
-                 SC_hasharr_install(curves, s, cp, MESH_CURVE, 3, -1);};
+                 SC_hasharr_install(curves, s, cp, "PM_conic_curve", 3, -1);};
              ib->crve = cp;};
 
          _PM_fit_curve(ib);

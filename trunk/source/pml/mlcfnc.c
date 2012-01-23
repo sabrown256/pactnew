@@ -58,7 +58,7 @@
      d     = 1.0/(br*brovu + bi*biovu);                                     \
      _rc   = PM_COMPLEX(d*(ar*brovu + ai*biovu), d*(ai*brovu - ar*biovu));}
 
-complex
+static complex
  CPHUGE = HUGE,
  CMHUGE = -HUGE,
  Cone   = 1.0,

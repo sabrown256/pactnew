@@ -81,7 +81,7 @@ static PM_set *_PD_build_set(int *ai, double *ad, char *sname)
 
     set = PM_mk_set(sname, SC_DOUBLE_S, FALSE,
 		    ne, nd, nde, maxes, elem,
-		    PM_fp_opers, NULL,
+		    PM_gs.fp_opers, NULL,
 		    NULL, NULL, NULL, NULL, NULL, NULL,
 		    NULL);
 

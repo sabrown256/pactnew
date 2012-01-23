@@ -58,7 +58,7 @@
 
 #define PM_qabs PM_qnorm
 
-quaternion
+static quaternion
  QPHUGE = { HUGE, 0.0, 0.0, 0.0 },
  QMHUGE = { -HUGE, 0.0, 0.0, 0.0 },
  Qone   = { 1.0, 0.0, 0.0, 0.0 },

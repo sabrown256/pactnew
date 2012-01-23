@@ -22,9 +22,6 @@ char
  *PM_MESH_TOPOLOGY_P_S = "PM_mesh_topology *",
  *PM_SET_S             = "PM_set";
 
-PM_state
- _PM = { -1, 0.05, -1.0, -1.0, 3.0e-8 };
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -386,7 +383,7 @@ PM_set *PM_make_set_alt(char *name, char *type, int cp, int nd,
         elem[i] = elml[i];
 
     set = PM_mk_set(name, type, cp,
-		    ne, nd, nde, maxes, elem, PM_fp_opers,
+		    ne, nd, nde, maxes, elem, PM_gs.fp_opers,
 		    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
     return(set);}
@@ -420,7 +417,7 @@ PM_set *PM_make_set(char *name, char *type, int cp, int nd, ...)
     SC_VA_END;
 
     set = PM_mk_set(name, type, cp,
-		    ne, nd, nde, maxes, elem, PM_fp_opers,
+		    ne, nd, nde, maxes, elem, PM_gs.fp_opers,
 		    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
     return(set);}
@@ -499,7 +496,7 @@ PM_set *PM_mk_set(char *name, char *type, int cp, long ne,
     set->dimension_elem = nde;
     set->max_index      = maxes;
     set->elements       = (void *) elem;
-    set->opers          = PM_fp_opers;
+    set->opers          = PM_gs.fp_opers;
     set->metric         = metric;
     set->symmetry_type  = CSTRSAVE(symtype);
     set->symmetry       = sym;

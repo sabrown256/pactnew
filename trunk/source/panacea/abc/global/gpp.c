@@ -180,7 +180,7 @@ PM_set *_LR_get_n_set(PA_plot_request *pr, char *name)
     set->es_type        = CSTRSAVE("double *");
     set->extrema        = (byte *) CMAKE_N(double, 2*nde);
     set->scales         = (byte *) CMAKE_N(double, nde);
-    set->opers          = PM_fp_opers;
+    set->opers          = PM_gs.fp_opers;
     set->metric         = NULL;
     set->symmetry_type  = NULL;
     set->symmetry       = NULL;
@@ -443,7 +443,7 @@ PM_set *LR_build_domain(char *base_name, C_array *arr, double t)
     set->es_type        = CSTRSAVE("double *");
     set->extrema        = (byte *) CMAKE_N(double, 2*nde);
     set->scales         = (byte *) CMAKE_N(double, nde);
-    set->opers          = PM_fp_opers;
+    set->opers          = PM_gs.fp_opers;
     set->metric         = NULL;
     set->symmetry_type  = NULL;
     set->symmetry       = NULL;

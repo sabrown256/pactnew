@@ -92,6 +92,19 @@ double
 int
  _PM_use_pml_bessel = TRUE;
 
+/* you cannot trust vendors to handle these declarations in <math.h>
+ * some regard them as special extensions which must be specifically
+ * asked for - phooey
+ */
+
+double
+ j0(double x),
+ j1(double x),
+ jn(int n, double x),
+ y0(double x),
+ y1(double x),
+ yn(int n, double x);
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 

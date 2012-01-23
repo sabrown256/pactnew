@@ -11,45 +11,6 @@
 
 #include "pml_int.h"
 
-char
- PM_error[MAXLINE];
-
-#ifdef PCK_COMPLEX
-
-double
- cx_ttr = 0.0,
- cx_tti = 0.0,
- cx_ttm = 0.0,
- cx_ttac = 0.0,
- cx_ttbd = 0.0;
-
-complex
- cx_reg;
-
-#endif
-
-/* you cannot trust vendors to handle these declarations in <math.h>
- * some regard them as special extensions which must be specifically
- * asked for - phooey
- */
-
-double
- j0(double x),
- j1(double x),
- jn(int n, double x),
- y0(double x),
- y1(double x),
- yn(int n, double x);
-
-int
- *PM_fft_index(int n),
- _PM_fold(int sgn, int na, double *xa, double *ya, int nb,
-	  double *xb, double *yb, double **pxf, double **pyf);
-
-double
- _PM_jn(int n, double x),
- _PM_yn(int n, double x);
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -78,11 +39,11 @@ int PM_set_opers(PM_set *set)
 	else
 	   {id = SC_type_id(token, FALSE);
 	    if (id == SC_INT_I)
-	       set->opers = PM_int_opers;
+	       set->opers = PM_gs.int_opers;
 	    else if (id == SC_LONG_I)
-	       set->opers = PM_long_opers;
+	       set->opers = PM_gs.long_opers;
 	    else if (id == SC_DOUBLE_I)
-	       set->opers = PM_fp_opers;
+	       set->opers = PM_gs.fp_opers;
 	    else
 	       ret = FALSE;};};
 
@@ -1020,7 +981,7 @@ void PM_err(char *fmt, ...)
    {
 
     SC_VA_START(fmt);
-    SC_VSNPRINTF(PM_error, MAXLINE, fmt);
+    SC_VSNPRINTF(PM_gs.error, MAXLINE, fmt);
     SC_VA_END;
 
     return;}
