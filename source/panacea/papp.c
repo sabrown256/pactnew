@@ -12,15 +12,6 @@
 
 #define NCURVE 100
 
-PDBfile
- *pduf;
-
-int
- first_cycle = 0,
- last_cycle = 0,
- n_curve = 0,
- npt;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -29,9 +20,11 @@ int
  */
 
 static void _PA_next_uf(char *ufname, int flag)
-   {if (flag)
-       {if (pduf != NULL)
-           PA_ERR(!PD_close(pduf),
+   {
+
+    if (flag)
+       {if (_PA.pduf != NULL)
+           PA_ERR(!PD_close(_PA.pduf),
                   "TROUBLE CLOSING ULTRA FILE %s", ufname);
 
         PRINT(stdout, "Ultra file %s closed\n", ufname);
@@ -40,22 +33,22 @@ static void _PA_next_uf(char *ufname, int flag)
         PA_advance_name(ufname);};
 
 /* create the ultra file */
-    pduf = PD_open(ufname, "w");
-    PA_ERR((pduf == NULL),
+    _PA.pduf = PD_open(ufname, "w");
+    PA_ERR((_PA.pduf == NULL),
            "CAN'T CREATE THE ULTRA FILE %s - _PA_NEXT_UF", ufname);
 
     PRINT(stdout, "Ultra file %s opened\n", ufname);
 
-    n_curve = 0;
+    _PA.n_curve = 0;
 
 /* find the first cycle number */
-    first_cycle = 0;
-    if (!PD_read(PA_gs.pp_file, "first-cycle", &first_cycle))
+    _PA.first_cycle = 0;
+    if (!PD_read(PA_gs.pp_file, "first-cycle", &_PA.first_cycle))
        return;
 
 /* find the last cycle number */
-    last_cycle = 0;
-    if (!PD_read(PA_gs.pp_file, "last-cycle", &last_cycle))
+    _PA.last_cycle = 0;
+    if (!PD_read(PA_gs.pp_file, "last-cycle", &_PA.last_cycle))
        return;
 
     return;}
@@ -106,7 +99,7 @@ void PA_transpose_pp(char *ppname, int ntp, int nuv)
 /* process the pp file */
     _PA_proc_time(ufname);
 
-    PA_ERR(!PD_close(pduf),
+    PA_ERR(!PD_close(_PA.pduf),
            "TROUBLE CLOSING ULTRA FILE %s - PA_TRANSPOSE_PP", ufname);
     printf("Ultra file %s closed\n", ufname);
 
@@ -115,7 +108,7 @@ void PA_transpose_pp(char *ppname, int ntp, int nuv)
            ppname);
 
     PA_gs.pp_file = NULL;
-    pduf = NULL;
+    _PA.pduf = NULL;
 
     return;}
 
@@ -133,10 +126,10 @@ void PA_transpose_pp(char *ppname, int ntp, int nuv)
 
 static void _PA_t_wr_data(int fcyc, int nfirst, int nlast, int n_dom)
    {int i, j, n_arrays, nptm;
+    long ind[3];
+    char type[10];
     double *stripe;
     double **crve;
-    char type[10];
-    long ind[3];
 
 /* allocate the data arrays */
     n_arrays = nlast - nfirst + 1 + n_dom;
@@ -146,7 +139,7 @@ static void _PA_t_wr_data(int fcyc, int nfirst, int nlast, int n_dom)
     strcpy(type, SC_DOUBLE_S);
 
 /* find the maximum possible curve length */
-    nptm = last_cycle - first_cycle + 1;
+    nptm = _PA.last_cycle - _PA.first_cycle + 1;
 
     for (i = 0; i < n_arrays; i++)
         crve[i] = CMAKE_N(double, nptm);
@@ -181,7 +174,7 @@ static void _PA_t_wr_data(int fcyc, int nfirst, int nlast, int n_dom)
 
          snprintf(_PA.pp_title, MAXLINE, "td%d", i);
 
-         PD_write_alt(pduf, _PA.pp_title, type, crve[i], 1, ind);
+         PD_write_alt(_PA.pduf, _PA.pp_title, type, crve[i], 1, ind);
          CFREE(crve[i]);};
 
 /* write out the time plot range data */
@@ -192,10 +185,10 @@ static void _PA_t_wr_data(int fcyc, int nfirst, int nlast, int n_dom)
          ind[1] = nptm;
 
          snprintf(_PA.pp_title, MAXLINE, "tn%d", i);
-         PD_write(pduf, _PA.pp_title, SC_INT_S, &nptm);
+         PD_write(_PA.pduf, _PA.pp_title, SC_INT_S, &nptm);
 
          snprintf(_PA.pp_title, MAXLINE, "td%d", i + n_dom);
-         PD_write_alt(pduf, _PA.pp_title, type, crve[j], 1, ind);
+         PD_write_alt(_PA.pduf, _PA.pp_title, type, crve[j], 1, ind);
 
          CFREE(crve[j]);};
 
@@ -219,8 +212,8 @@ static void _PA_t_wr_data(int fcyc, int nfirst, int nlast, int n_dom)
 
 void _PA_proc_time(char *ufname)
    {int it, nt, ntu, nfirst, n_dom, nd;
-    char *labl, *npts, *s;
     long ind[3];
+    char *labl, *npts, *s;
 
 /* find the number of time plots */
     if (!PD_read(PA_gs.pp_file, "n-time-plots", &nt))
@@ -248,9 +241,9 @@ void _PA_proc_time(char *ufname)
                 "EXPECTED TIME PLOT %s - PROC-TIME", _PA.pp_title);
 
 /* enter the ultra tag */
-         snprintf(_PA.pp_title, MAXLINE, "curve%04d", n_curve++);
+         snprintf(_PA.pp_title, MAXLINE, "curve%04d", _PA.n_curve++);
          ind[1] = strlen(_PA.pp_bf) + 1;
-         PD_write_alt(pduf, _PA.pp_title, SC_CHAR_S, _PA.pp_bf, 1, ind);
+         PD_write_alt(_PA.pduf, _PA.pp_title, SC_CHAR_S, _PA.pp_bf, 1, ind);
 
 /* extract the names of the label, x array, y array and number of points */
          labl = SC_strtok(_PA.pp_bf, "|", s);
@@ -264,19 +257,19 @@ void _PA_proc_time(char *ufname)
          PA_ERR(!PD_read(PA_gs.pp_file, labl, _PA.pp_ubf),
                 "BAD LABEL - PROC-TIME");
          ind[1] = strlen(_PA.pp_ubf) + 1;
-         PD_write_alt(pduf, labl, SC_CHAR_S, _PA.pp_ubf, 1, ind);
+         PD_write_alt(_PA.pduf, labl, SC_CHAR_S, _PA.pp_ubf, 1, ind);
 
 /* if the maximum number of curves is reached
  * write out the curves and start a new file
  */
-         if (n_curve >= NCURVE)
-            {_PA_t_wr_data(first_cycle, nfirst, it, nd);
+         if (_PA.n_curve >= NCURVE)
+            {_PA_t_wr_data(_PA.first_cycle, nfirst, it, nd);
              nfirst = it + 1;
              nd     = n_dom;
              _PA_next_uf(ufname, TRUE);};};
 
 /* write out the remaining curves */
-    _PA_t_wr_data(first_cycle, nfirst, ntu, nd);
+    _PA_t_wr_data(_PA.first_cycle, nfirst, ntu, nd);
 
     return;}
 

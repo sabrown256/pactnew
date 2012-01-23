@@ -10,9 +10,6 @@
  
 #include "panacea_int.h"
 
-int
- *none;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -29,7 +26,7 @@ void PA_defcnt(void)
 /* PA_GENCMD - install PANACEA commands */
 
 void PA_gencmd(void)
-   {
+   {static int *none = NULL;
 
 /* install the commands which control the generator */
     PA_inst_c("end",    none,     FALSE,     0, (PFVoid) PA_done,     PA_zargs);
@@ -44,17 +41,12 @@ void PA_gencmd(void)
 
 /* install the commands for plot requests */
     PA_inst_c("graph",      none, FALSE, 0, (PFVoid) PA_nploth,      PA_zargs);
-/*
-    PA_inst_c("edit",       none, FALSE, 0, PA_edith,       PA_zargs);
-    PA_inst_c("plot",       none, FALSE, 0, PA_edith,       PA_zargs);
-    PA_inst_c("begin_edit", none, FALSE, 0, PA_begin_edith, PA_zargs);
-    PA_inst_c("end_edit",   none, FALSE, 0, PA_end_edith,   PA_zargs);
-*/
+
 /* install the commands which specify the runtime controls */
     PA_inst_c("package",    none, FALSE, 0, (PFVoid) PA_packh,  PA_zargs);
     PA_inst_c("switch",     none, FALSE, 0, (PFVoid) PA_pshand, PA_sargs);
     PA_inst_c("parameter",  none, FALSE, 0, (PFVoid) PA_pshand, PA_sargs);
-    PA_inst_c("PA_gs.units",       none, FALSE, 0, (PFVoid) PA_pshand, PA_sargs);
+    PA_inst_c("unit",       none, FALSE, 0, (PFVoid) PA_pshand, PA_sargs);
     PA_inst_c("conversion", none, FALSE, 0, (PFVoid) PA_pshand, PA_sargs);
     PA_inst_c("name",       none, FALSE, 0, (PFVoid) PA_pshand, PA_sargs);
 

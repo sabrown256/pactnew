@@ -761,7 +761,7 @@ int PM_interp_mesh_mq(int nd, int nf, int ni, double **xi, double **fi,
 double **PM_interpolate_mapping_mq(PM_mapping *dest, PM_mapping *source,
 				   int wgtfl, double *prm)
    {int j;
-    int sne, dne, snde, snre, dnde;
+    int sne, dne, snde, dnde;
     int *ddix;
     double **sde, **sre, **dde, **tre;
     PM_set *sr, *sd, *dr, *dd;
@@ -773,7 +773,6 @@ double **PM_interpolate_mapping_mq(PM_mapping *dest, PM_mapping *source,
 
     sr   = source->range;
     sre  = (double **) sr->elements;
-    snre = sr->n_elements;
 
     dd   = dest->domain;
     dne  = dd->n_elements;

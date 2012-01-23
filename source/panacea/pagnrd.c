@@ -10,15 +10,6 @@
  
 #include "panacea_int.h"
  
-int
- ivnum;
-
-double
- PA_alias_value(char *s);
-
-void
- _PA_init_cont(void);
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -257,7 +248,7 @@ void PA_specifyh(void)
     first  = NULL;
     _PA.ivlst  = NULL;
     ivfn   = NULL;
-    ivnum  = 0;
+    _PA.ivnum  = 0;
     interp = TRUE;
     while ((s = PA_get_field("SPECIFICATION", "PA_SPECIFY", OPTL)) != NULL)
        {if (strcmp(s, "from") == 0)
@@ -298,9 +289,9 @@ void PA_specifyh(void)
             else
                prev->cdr = (void *) _PA.ivlst;
             prev = _PA.ivlst;
-            ivnum++;};};
+            _PA.ivnum++;};};
     
-    PA_gs.iv_spec_lst = PA_mk_spec(ivident, ivtype, ivfn, ivnum, interp,
+    PA_gs.iv_spec_lst = PA_mk_spec(ivident, ivtype, ivfn, _PA.ivnum, interp,
 			     first, PA_gs.iv_spec_lst);
 
     return;}
@@ -325,12 +316,12 @@ void PA_sh(void)
         else
            _PA.ivlst->cdr = (void *) next;
         _PA.ivlst = next;
-        ivnum++;};
+        _PA.ivnum++;};
 
     PA_ERR((PA_gs.iv_spec_lst == NULL),
            "%s", "NO SPECIFICY COMMAND BEFORE SPECIFICATION");
 
-    PA_gs.iv_spec_lst->num = ivnum;
+    PA_gs.iv_spec_lst->num = _PA.ivnum;
 
     return;}
 

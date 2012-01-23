@@ -18,12 +18,27 @@ struct s_PA_domain_spec
 
 typedef struct s_PA_domain_spec PA_domain_spec;
 
-int
- max_domains,
- n_domains;
-
-PA_domain_spec
+static PA_domain_spec
  *domain_list;
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PA_GET_DOMAIN_LIST - manage a static domain list */
+
+PA_domain_spec *PA_get_domain_list(void)
+   {static PA_domain_spec *domain_list = NULL;
+
+    if (domain_list == NULL)
+       {domain_list = CMAKE_N(PA_domain_spec, 10);
+        _PA.n_domains   = 0;
+        _PA.max_domains = 10;};
+
+    if (_PA.n_domains >= _PA.max_domains)
+       {_PA.max_domains += 10;
+	CREMAKE(domain_list, PA_domain_spec, _PA.max_domains);};
+
+    return(domain_list);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -459,7 +474,7 @@ static void _PA_dump_mappings(double tc, double dtc, int cycle)
     C_array *arr;
 
     if (_PA.build_domain != NULL)
-       {for (i = 0; i < n_domains; i++)
+       {for (i = 0; i < _PA.n_domains; i++)
             {name = domain_list[i].name;
              arr  = domain_list[i].map;
 
@@ -570,16 +585,16 @@ C_array *PA_get_domain_info(PA_plot_request *pr, char *dname, int nc)
 
     if (domain_list == NULL)
        {domain_list = CMAKE_N(PA_domain_spec, 10);
-        n_domains   = 0;
-        max_domains = 10;};
+        _PA.n_domains   = 0;
+        _PA.max_domains = 10;};
 
 /* check to see if this domain is known already */
-    for (i = 0; i < n_domains; i++)
+    for (i = 0; i < _PA.n_domains; i++)
         if (strcmp(dname, domain_list[i].name) == 0)
            break;
 
 /* if so return the map */
-    if (i < n_domains)
+    if (i < _PA.n_domains)
        {arr = domain_list[i].map;
         return(arr);};
 
@@ -596,11 +611,11 @@ C_array *PA_get_domain_info(PA_plot_request *pr, char *dname, int nc)
 	domain_list[i].name = PD_process_set_name(nm);
         domain_list[i].map  = arr;
         domain_list[i].time = pr->domain;
-        n_domains++;
+        _PA.n_domains++;
 
-        if (n_domains >= max_domains)
-           {max_domains += 10;
-            CREMAKE(domain_list, PA_domain_spec, max_domains);};};
+        if (_PA.n_domains >= _PA.max_domains)
+           {_PA.max_domains += 10;
+            CREMAKE(domain_list, PA_domain_spec, _PA.max_domains);};};
 
 /* initialize the map */
     size = 1L;
@@ -1034,7 +1049,7 @@ static void _PA_connect_domain(PM_mapping *f)
     strcpy(dname, f->name);
     PD_process_set_name(dname);
 
-    for (i = 0; i < n_domains; i++)
+    for (i = 0; i < _PA.n_domains; i++)
         {if (strcmp(dname, domain_list[i].name) == 0)
             {f->domain = domain_list[i].data;
              return;};};

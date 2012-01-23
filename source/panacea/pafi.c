@@ -10,12 +10,6 @@
 
 #include "panacea_int.h"
 
-char
- bf[MAXLINE];
-
-hasharr
- *ddtab = NULL;
-
 /*--------------------------------------------------------------------------*/
 
 /*                          DATABASE ACCESSORS                              */
@@ -550,8 +544,8 @@ static void _PA_rd_dd_tab(PA_package *pck, FILE *fp)
     pcons *pk, *alist, *next, *prev;
     PA_tab_head *pt;
 
-    if (ddtab == NULL)
-       ddtab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
+    if (_PA.ddtab == NULL)
+       _PA.ddtab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
     old_delim = PA_gs.token_delimiters;
 
@@ -605,7 +599,7 @@ static void _PA_rd_dd_tab(PA_package *pck, FILE *fp)
               
          snprintf(vname, MAXLINE, "%s", key);
 
-         SC_hasharr_install(ddtab, vname, alist, _PA.alist, 3, -1);};
+         SC_hasharr_install(_PA.ddtab, vname, alist, _PA.alist, 3, -1);};
 
     PA_WARN((ne > 0) && (ne != ne_read),
             "TABLE %s, EXPECTED %d ENTRIES FOUND %d - _PA_RD_DD_TAB",
@@ -788,7 +782,7 @@ void PA_read_def(PA_package *pck, char *name)
     io_close(fp);
 
 /* re-process the database definitions */
-    _PA_proc_db_tab(pck, ddtab);
+    _PA_proc_db_tab(pck, _PA.ddtab);
 
     return;}
 

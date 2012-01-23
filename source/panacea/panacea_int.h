@@ -78,6 +78,7 @@ struct s_PA_state
     int64_t edstr;
     int64_t ppstr;
 
+/* zero initial value variables */
     char *delim;
     char *dict;
     char *dimtab;
@@ -111,7 +112,27 @@ struct s_PA_state
     char input_line[MAXLINE];
     char input_bf[MAXLINE];
 
-/* variable formerly in panace.h */
+/* PADEF.C */
+    int def_error;
+
+/* PADUMP.C */
+    int max_domains;
+    int n_domains;
+
+/* PAFI.C */
+    hasharr *ddtab;
+
+/* PAGNRD.C */
+    int ivnum;
+
+/* PAPP.C */
+    int first_cycle;
+    int last_cycle;
+    int n_curve;
+
+    PDBfile *pduf;
+
+/* variables formerly in panace.h */
     int ul_print_flag;
     int n_state_files;
     int halt_fl;
