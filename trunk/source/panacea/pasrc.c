@@ -20,15 +20,15 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PA_INIT_SOURCES - scan the PA_gs.iv_spec_lst for source files and initialize the
- *                  - various buffers for each of the source variables
+/* _PA_INIT_SOURCES - scan the iv_spec_lst for source files and initialize
+ *                  - the various buffers for each of the source variables
  */
 
 void _PA_init_sources(double t, double dt)
-   {int j, N_sf, n_vars, count;
+   {int j, nsf, nv, count;
     int n_times;
-    char *name, *token, *iv_file, **files, *s, *tok;
-    char title[MAXLINE], title_name[MAXLINE];
+    char *name, *token, *ivfile, **files, *s, *tok;
+    char title[MAXLINE], tname[MAXLINE];
     double *times;
     PA_iv_specification *ivs;
     PDBfile *fp;
@@ -36,38 +36,38 @@ void _PA_init_sources(double t, double dt)
 /* count up the number of source files to be managed and the
  * number of source variables
  */
-    for (N_sf = 0, ivs = PA_gs.iv_spec_lst;
+    for (nsf = 0, ivs = PA_gs.iv_spec_lst;
          ivs != NULL;
-         ivs = ivs->next, N_sf++);
+         ivs = ivs->next, nsf++);
 
-    files = CMAKE_N(char *, N_sf);
+    files = CMAKE_N(char *, nsf);
     PA_gs.n_variables = 0;
-    N_sf = 0;
+    nsf = 0;
     for (ivs = PA_gs.iv_spec_lst; ivs != NULL; ivs = ivs->next)
-        {iv_file = ivs->file;
-         if (iv_file == NULL)
+        {ivfile = ivs->file;
+         if (ivfile == NULL)
             continue;
-         if (*(iv_file) == '\0')
+         if (*(ivfile) == '\0')
             continue;
-         for (j = 0; j < N_sf; j++)
-             if (strcmp(iv_file, files[j]) == 0)
+         for (j = 0; j < nsf; j++)
+             if (strcmp(ivfile, files[j]) == 0)
                 break;
-         if ((j < N_sf) && (N_sf > 0))
+         if ((j < nsf) && (nsf > 0))
             continue;
-         files[N_sf++] = iv_file;
+         files[nsf++] = ivfile;
 
-         fp = PD_open(iv_file, "r");
+         fp = PD_open(ivfile, "r");
          PA_ERR((fp == NULL),
-                "MISSING SOURCE FILE - %s", iv_file);
-         PA_ERR(!PD_read(fp, "n_variables", &n_vars),
-                "N_VARIABLES MISSING FROM %s", iv_file);
-         PA_gs.n_variables += n_vars;
+                "MISSING SOURCE FILE - %s", ivfile);
+         PA_ERR(!PD_read(fp, "n_variables", &nv),
+                "N_VARIABLES MISSING FROM %s", ivfile);
+         PA_gs.n_variables += nv;
          PD_close(fp);};
 
 /* loop over all source files and make a list of PA_src_variables */
     PA_gs.sv_list = CMAKE_N(PA_src_variable *, PA_gs.n_variables);
-    n_vars  = 0;
-    for (j = 0; j < N_sf; j++)
+    nv  = 0;
+    for (j = 0; j < nsf; j++)
         {fp = PD_open(files[j], "r");
 
 /* NOTE: this has PA_gs.n_variables greater than the number actually referenced
@@ -80,8 +80,8 @@ void _PA_init_sources(double t, double dt)
 
               count = 0;
               while (TRUE)
-                 {snprintf(title_name, MAXLINE, "src%d", count);
-                  if (PD_read(fp, title_name, title) == FALSE)
+                 {snprintf(tname, MAXLINE, "src%d", count);
+                  if (PD_read(fp, tname, title) == FALSE)
                      break;
 
                   tok  = SC_strtok(title, "|", s);
@@ -99,22 +99,22 @@ void _PA_init_sources(double t, double dt)
 /* install this source variable in the array, PA_gs.sv_list and have the
  * entry in PA_gs.iv_spec_lst point to it
  */
-                      PA_gs.sv_list[n_vars] = _PA_mk_src_variable(name,
+                      PA_gs.sv_list[nv] = _PA_mk_src_variable(name,
                                                             count, n_times,
                                                             times, fp);
-                      ivs->index = n_vars;
+                      ivs->index = nv;
 
-                      PA_gs.sv_list[n_vars]->interpolate = ivs->interpolate;
+                      PA_gs.sv_list[nv]->interpolate = ivs->interpolate;
 
 /* initialize the queue buffer for this PA_src_variable */
-                      _PA_init_queue(PA_gs.sv_list[n_vars], t, dt);
+                      _PA_init_queue(PA_gs.sv_list[nv], t, dt);
 
 /* the iv_spec needs to know about the size of the source variable
  * for inits in PA_CONNECT
  */
-                      ivs->num = PA_gs.sv_list[n_vars]->size;
+                      ivs->num = PA_gs.sv_list[nv]->size;
 
-                      n_vars++;};
+                      nv++;};
                   count++;};};};
 
     return;}
@@ -342,17 +342,17 @@ void _PA_init_queue(PA_src_variable *svp, double t, double dt)
 
 void _PA_step_queue(PA_src_variable *svp, double t)
    {syment *desc;
-    int indx, i, n_times, var_indx, ssz;
+    int indx, i, nt, ivar, ssz;
     double *times, **pd, *qtimes, conv;
     PDBfile *fp;
     char title[MAXLINE];
 
-    var_indx = svp->var_index;
-    indx     = svp->index;
-    n_times  = svp->n_times;
-    times    = svp->times;
-    qtimes   = svp->queue_times;
-    conv     = svp->conv_fact;
+    ivar   = svp->var_index;
+    indx   = svp->index;
+    nt     = svp->n_times;
+    times  = svp->times;
+    qtimes = svp->queue_times;
+    conv   = svp->conv_fact;
 
     fp = svp->file;
     pd = svp->queue;
@@ -375,8 +375,8 @@ void _PA_step_queue(PA_src_variable *svp, double t)
             qtimes[i-1] = qtimes[i];};
 
 /* read the next entry into the queue */
-       if (indx < n_times)
-          {snprintf(title, MAXLINE, "src%d:%d", var_indx, indx);
+       if (indx < nt)
+          {snprintf(title, MAXLINE, "src%d:%d", ivar, indx);
            pd[3] = (double *) _PA_pdb_read(fp, title, &desc, NULL);
            ssz = desc->number;
            PM_array_scale(pd[3], ssz, conv);

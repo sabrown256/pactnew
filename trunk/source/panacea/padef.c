@@ -12,9 +12,6 @@
 
 #define PA_info_name(tag)  PA_cpp_value_to_name(PA_gs.cpp_info, tag)
 
-int
- PA_def_error;
-
 char
  *PA_INFO_TYPE_S,
  *PA_INFO_N_DIMS_S,
@@ -130,8 +127,8 @@ pcons *PA_def_var_attribute(char *name, ...)
 		 break;
 
             default:
-                 PA_def_error = 1;
-	         PA_WARN(PA_def_error,
+                 _PA.def_error = 1;
+	         PA_WARN(_PA.def_error,
 			 "ILLEGAL TAG IN PA_DEF_VAR_ATTRIBUTE %s (%d = %s)",
 			 name, tag, PA_info_name(tag));};};
 
@@ -393,8 +390,8 @@ PA_variable *_PA_process_def_var(char *vname, va_list *lst)
 	         name = SC_VA_ARG(char *);
 		 att_alist = (pcons *) SC_hasharr_def_lookup(PA_gs.var_att_tab, name);
 		 if (att_alist == NULL)
-		    {PA_def_error = 1;
-		     PA_WARN(PA_def_error,
+		    {_PA.def_error = 1;
+		     PA_WARN(_PA.def_error,
 			     "UNDEFINED ATTR - PA_PROCESS_DEF_VAR\n%s\t%s = %s",
 			     vname, tag_name, name);}
 		 else
@@ -406,8 +403,8 @@ PA_variable *_PA_process_def_var(char *vname, va_list *lst)
 	         name = SC_VA_ARG(char *);
 		 vdims = (PA_dimens *) SC_hasharr_def_lookup(PA_gs.var_dim_tab, name);
 		 if (vdims == NULL)
-		    {PA_def_error = 1;
-		     PA_WARN(PA_def_error,
+		    {_PA.def_error = 1;
+		     PA_WARN(_PA.def_error,
 			     "UNDEFINED DIM - PA_PROCESS_DEF_VAR\n%s\t%s = %s",
 			     vname, tag_name, name);}
 		 else
@@ -419,8 +416,8 @@ PA_variable *_PA_process_def_var(char *vname, va_list *lst)
 
 	    case PA_INFO_DOMAIN_NAME :
 	         if (att_alist == NULL)
-		    {PA_def_error = 1;
-		     PA_WARN(PA_def_error,
+		    {_PA.def_error = 1;
+		     PA_WARN(_PA.def_error,
 			     "UNDEFINED DOMAIN - PA_PROCESS_DEF_VAR\n%s\t%s = %s",
 			     vname, tag_name, name);};
 		 break;
@@ -429,8 +426,8 @@ PA_variable *_PA_process_def_var(char *vname, va_list *lst)
 		 name = SC_VA_ARG(char *);
 		 unit_alist = (pcons *) SC_hasharr_def_lookup(PA_gs.var_unit_tab, name);
 		 if (unit_alist == NULL)
-		    {PA_def_error = 1;
-		     PA_WARN(PA_def_error,
+		    {_PA.def_error = 1;
+		     PA_WARN(_PA.def_error,
 			     "UNDEFINED UNIT - PA_PROCESS_DEF_VAR\n%s\t%s = %s",
 			     vname, tag_name, name);}
 		 else
@@ -446,8 +443,8 @@ PA_variable *_PA_process_def_var(char *vname, va_list *lst)
 
 		  fnc = PA_GET_FUNCTION(PFUserAttr, "user_defined_attribute");
 		  if (fnc == NULL)
-		     {PA_def_error = 1;
-		      PA_WARN(PA_def_error,
+		     {_PA.def_error = 1;
+		      PA_WARN(_PA.def_error,
 			      "UNKNOWN TAG - PA_PROCESS_DEF_VAR\n%s (%d)",
 			      vname, tag);
 
@@ -565,9 +562,9 @@ pcons *_PA_process_att(int tag, va_list *list, pcons *alist)
 				 pival);}
 	else
 	   {alist = NULL;
-	    PA_def_error = 1;
+	    _PA.def_error = 1;
 
-	    PA_WARN(PA_def_error,
+	    PA_WARN(_PA.def_error,
 		    "ILLEGAL TAG PAIR IN _PA_PROCESS_ATT\n\t %s=%d",
 		    tag_name, ival);};};
 
