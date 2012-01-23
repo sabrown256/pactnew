@@ -9,14 +9,19 @@
 ; include "cpyright.h"
 ;
 
-(cw "A")
+(define win-name "intp")
+;(cw win-name)
+(cw win-name "COLOR" "PS" 0.0 0.0 1.0 1.0)
+(plot-date off)
 (label-space 0.2)
 (grid on)
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; 1D test
+; 1D test - inverse distance weighted interpolation
+
+(interpolation-method idw)
 
 (define nd 1)
 (define ni 5)
@@ -46,76 +51,66 @@ hyper-plane 0 (list 1 0 1.5 ni)
 (lncolor blue 1)
 (lsv)
 (wu)
-(pause)
+
 (dl)
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-; 2D test
-
-(define nd  2)
-(define nxi 5)
-(define nyi 6)
-(define nxr 11)
-(define nyr 13)
-;(define nxr 47)
-;(define nyr 53)
-;(define nxr 97)
-;(define nyr 103)
-;(define nxr 491)
-;(define nyr 503)
-
-(interpolation-method idw)
-
-(nxm 2 1)
-hyper-plane 0 (list 1 1 nxi nxi) (list 1 1 nyi nyi)
-
-(label-drawable "plane scatter" (sqr 1))
-(scatter triangle 1)
-(lncolor dark-green 1)
-(label-drawable "plane" (copy-map 1))
-(lncolor dark-green 1)
-(lsv)
-
-(move "V1" "A" (copy-map 1))
-
-(label-drawable "refine scatter" (refine 1 (list nxr nyr)))
-(scatter star 1)
-(lncolor red 1)
-(label-drawable "refine" (copy-map 1))
-(lncolor red 1)
-(lsv)
-
-(cv "V1")
-(label-drawable "weights" (interpolation-weights 1 (list nxr nyr)))
-(dl 2)
-
-(dr 1 (render fill-poly))
-(lsv)
-
-(wu)
-(pause)
-
-;--------------------------------------------------------------------------
-;--------------------------------------------------------------------------
-
-; 2D test
-
-(define nd  2)
-(define nxi 5)
-(define nyi 6)
-(define nxr 11)
-(define nyr 13)
-;(define nxr 47)
-;(define nyr 53)
-;(define nxr 97)
-;(define nyr 103)
-;(define nxr 491)
-;(define nyr 503)
+; 1D test - multiquadric interpolation
 
 (interpolation-method mq)
 
+(define nd 1)
+(define ni 5)
+(define nr 12)
+(define nr 23)
+;(interpolation-strength (* nd nd))
+
+hyper-plane 0 (list 1 0 1.5 ni)
+(label-drawable "line scatter" (sqr 1))
+(scatter triangle 1)
+(lncolor dark-green 1)
+(label-drawable "line" (copy-map 1))
+(lncolor dark-green 1)
+(lsv)
+
+(label-drawable "refined scatter" (refine 1 (list nr)))
+(scatter star 1)
+(lncolor gray 1)
+(label-drawable "refined line" (copy-map 1))
+(lncolor gray 1)
+(lsv)
+
+(label-drawable "weights scatter" (interpolation-weights 1 (list nr)))
+(scatter star 1)
+(lncolor blue 1)
+(label-drawable "weights line" (copy-map 1))
+(lncolor blue 1)
+(lsv)
+(wu)
+
+(dl)
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; 2D test - inverse distance weighted interpolation
+
+(interpolation-method idw)
+
+(define nd  2)
+(define nxi 5)
+(define nyi 6)
+(define nxr 11)
+(define nyr 13)
+;(define nxr 47)
+;(define nyr 53)
+;(define nxr 97)
+;(define nyr 103)
+;(define nxr 491)
+;(define nyr 503)
+
 (nxm 2 1)
 hyper-plane 0 (list 1 1 nxi nxi) (list 1 1 nyi nyi)
 
@@ -126,7 +121,7 @@ hyper-plane 0 (list 1 1 nxi nxi) (list 1 1 nyi nyi)
 (lncolor dark-green 1)
 (lsv)
 
-(move "V1" "A" (copy-map 1))
+(move "V1" win-name (copy-map 1))
 
 (label-drawable "refine scatter" (refine 1 (list nxr nyr)))
 (scatter star 1)
@@ -143,7 +138,55 @@ hyper-plane 0 (list 1 1 nxi nxi) (list 1 1 nyi nyi)
 (lsv)
 
 (wu)
-(pause)
+(dl)
+(cv "V0")
+(dl)
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; 2D test - multiquadric interpolation
+
+(interpolation-method mq)
+
+(define nd  2)
+(define nxi 5)
+(define nyi 6)
+(define nxr 11)
+(define nyr 13)
+;(define nxr 47)
+;(define nyr 53)
+;(define nxr 97)
+;(define nyr 103)
+;(define nxr 491)
+;(define nyr 503)
+
+hyper-plane 0 (list 1 1 nxi nxi) (list 1 1 nyi nyi)
+
+(label-drawable "plane scatter" (sqr 1))
+(scatter triangle 1)
+(lncolor dark-green 1)
+(label-drawable "plane" (copy-map 1))
+(lncolor dark-green 1)
+(lsv)
+
+(move "V1" win-name (copy-map 1))
+
+(label-drawable "refine scatter" (refine 1 (list nxr nyr)))
+(scatter star 1)
+(lncolor red 1)
+(label-drawable "refine" (copy-map 1))
+(lncolor red 1)
+(lsv)
+
+(cv "V1")
+(label-drawable "weights" (interpolation-weights 1 (list nxr nyr)))
+(dl 2)
+
+(dr 1 (render fill-poly))
+(lsv)
+
+(wu)
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------

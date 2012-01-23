@@ -14,6 +14,25 @@
 #define MSTRENGTH  prm[1]
 #define MPOWER     prm[2]
 
+/* compute MQ basis function from the distance between
+ * ND point XI[K] and XO[IP[1,...,ND]]
+ *
+ *   D = sqrt( D0 + SUM(ID, XI[ID][K] - XO[ID][IP[ID]]) )
+ */
+
+#define BASIS_MQ(_d, _nd, _xi, _k, _xo, _ip, _d0)                             \
+   {int _l, _id;                                                              \
+    double _dx;                                                               \
+    double *_xic, *_xoc;                                                      \
+    _d = _d0;                                                                 \
+    for (_id = 0; _id < _nd; _id++)                                           \
+        {_l   = _ip[_id];                                                     \
+	 _xic = _xi[_id];                                                     \
+	 _xoc = _xo[_id];                                                     \
+	 _dx  = (_xic[_k] - _xoc[_l]);                                        \
+	 _d  += _dx*_dx;};                                                    \
+    _d = sqrt(_d);}
+
 typedef struct s_weight weight;
 typedef union u_dmask dmask;
 
@@ -657,30 +676,29 @@ static double *_PM_mq_coef(int nd, int n, double **x, double *f, double rs)
 
 static void _PM_mq_eval(int nd, int n, double **xi, double rs, double *coef,
 			int *mx, double **xo, double *f)
-   {int i, j, k, l, ic, id;
-    double dc, fc, dx;
-    double *xic, *xoc;
+   {int i, j, k, l, ic;
+    int ip[PM_SPACEDM], lmx[PM_SPACEDM];
+    double dc, fc;
 
-    for (i = 0; i < mx[0]; i++)
-        {for (j = 0; j < mx[1]; j++)
-	     {ic  = j*mx[0] + i;
-	      fc = 0.0;
-	      for (k = 0; k < n; k++)
-		  {dc = rs;
-		   for (id = 0; id < nd; id++)
-		       {l = (id == 0) ? i : j;   /* GOTCHA: 2d only */
-			xic = xi[id];
-			xoc = xo[id];
-			dx  = (xic[k] - xoc[l]);
-			dc += dx*dx;};
-		   fc += coef[k]*sqrt(dc);};
-/*
-		  {xc = x[k] - xo[i];
-		   yc = y[k] - yp[j];
+    for (i = 0; i < PM_SPACEDM; i++)
+        lmx[i] = 1;
+    for (i = 0; i < nd; i++)
+        lmx[i] = mx[i];
 
-		   fc += coef[k]*sqrt(xc*xc + yc*yc + rs);};
-*/
-	      f[ic] = fc;};};
+    for (i = 0; i < lmx[0]; i++)
+        {ip[0] = i;
+	 for (j = 0; j < lmx[1]; j++)
+	     {ip[1] = j;
+	      for (k = 0; k < lmx[2]; k++)
+		  {ip[2] = k;
+		   ic    = (k*lmx[1] + j)*lmx[0] + i;
+		   fc    = 0.0;
+		   for (l = 0; l < n; l++)
+		       {BASIS_MQ(dc, nd, xi, l, xo, ip, rs);
+
+			fc += coef[l]*dc;};
+
+		   f[ic] = fc;};};};
 
     return;}
 
@@ -763,7 +781,7 @@ double **PM_interpolate_mapping_mq(PM_mapping *dest, PM_mapping *source,
    {int j;
     int sne, dne, snde, dnde;
     int *ddix;
-    double **sde, **sre, **dde, **tre;
+    double **sde, **sre, **tde, **tre;
     PM_set *sr, *sd, *dr, *dd;
 
     sd   = source->domain;
@@ -776,7 +794,6 @@ double **PM_interpolate_mapping_mq(PM_mapping *dest, PM_mapping *source,
 
     dd   = dest->domain;
     dne  = dd->n_elements;
-    dde  = dd->elements;
 
     dr   = dest->range;
     dnde = dr->dimension_elem;
@@ -788,7 +805,13 @@ double **PM_interpolate_mapping_mq(PM_mapping *dest, PM_mapping *source,
     for (j = 0; j < dnde; j++)
         PM_array_set(tre[j], dne, 0.0);
 
-    PM_interp_mesh_mq(snde, dnde, sne, sde, sre, ddix, dde, tre, prm);
+    tde = CMAKE_N(double *, snde);
+
+    PM_interp_mesh_mq(snde, dnde, sne, sde, sre, ddix, tde, tre, prm);
+
+    for (j = 0; j < snde; j++)
+        CFREE(tde[j]);
+    CFREE(tde);
 
     return(tre);}
 

@@ -1,0 +1,42 @@
+#!/bin/csh -f
+#
+# INTP - SX PDBView mesh interpolation test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set msg = "PDBView Mesh Intp Test ......."
+set exe = $BinDir/sx
+set opt = ( $pvopt -l $FilesDir/intp.scm )
+set io  = intp.res
+
+   NoteD $Log ""
+   NoteD $Log -n "                    $msg"
+   Note $Log ""
+
+   flog $Log rm -f intp*.diff intp*.ps
+
+   source ../../../scripts/test-run
+
+   if ($xstatus == 0) then
+      foreach i (intp.ps)
+         if (-f $FilesDir/ref/$i) then
+            flog $Log ($CFE $PSDIFF $i $FilesDir/ref/$i >&! $i.diff)
+            @ st = $status
+            @ xstatus = $xstatus + $st
+            Note $Log "Test $i:r status $st"
+         endif
+      end
+   endif
+
+   touch intp_junk_.diff
+   set rpf = ( $rpf intp.res.diff intp.res intp.ps intp*.diff )
+
+$TEST_CHECK part -a mesh -e $xstatus -dt $dt -rpf "$rpf" none
+
+exit($status)
