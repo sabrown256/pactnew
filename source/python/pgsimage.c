@@ -168,16 +168,17 @@ static PyObject *
 PP_image_im_buffer_get(PP_imageObject *self, void *context)
 {
 /* DO-NOT-DELETE splicer.begin(pgs.image.descriptor.im.buffer_get) */
+    PyObject *rv;
+
+#ifdef HAVE_PYTHON_NUMERIC
     int dims[2];
     PG_image *im;
-    PyObject *rv;
 
     im = self->im;
 
     dims[0] = im->kmax;
     dims[1] = im->lmax;
 
-#ifdef HAVE_PYTHON_NUMERIC
     rv = PyArray_FromDimsAndData(2, dims, 'b', (char *) im->buffer);
 #else
     rv = NULL;

@@ -4,7 +4,7 @@
 #      - this is a portability hack mainly because of AIX
 #
 
-set PyPACTVers = 2.0
+set PyPACTVers = 2
 
 source ../scripts/env-csh
 
@@ -72,7 +72,7 @@ flog $Log set DPLibs   = ( $lst )
 
 flog $Log set LD     = ( $Link $SFLAGS )
 flog $Log set PyPath = $DevLib/python${PyVers}
-flog $Log set PyPact = $PyPath/pact-${PyPACTVers}
+flog $Log set PyPact = $PyPath/pact_${PyPACTVers}
 
 flog $Log set Libs   = ( $LDRPath -L$DevLib $LDPath $MDGLibs $MDILibs -lc -lm $ShLibs $DPLibs $MDLibs )
 if ("$GCCLib" != "") then
