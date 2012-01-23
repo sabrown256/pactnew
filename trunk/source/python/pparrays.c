@@ -24,7 +24,9 @@ struct s_PP_numpy_map {
 
 typedef struct s_PP_numpy_map PP_numpy_map;
 
+#ifdef HAVE_PYTHON_NUMERIC
 static PP_numpy_map *tc_to_entry[PP_NUM_TYPES];
+#endif
 
 static hasharr *_numpy_map;
 
@@ -189,25 +191,26 @@ int array_pack(void *vr, PyObject *obj, long nitems, PP_types tc)
 
 PyObject *PP_array_unpack(void *vr, long nitems, PP_types tc)
 {
-    int ndims, dimensions[MAXDIM];
-    PP_numpy_map *entry;
     PyObject *rv;
+
+    rv = NULL;
+
+#ifdef HAVE_PYTHON_NUMERIC
+    PP_numpy_map *entry;
 
     if (tc > 0 && tc < PP_NUM_TYPES)
        entry = tc_to_entry[tc];
     else
        entry = NULL;
 
-    rv = NULL;
-
     if (entry != NULL)
-       {ndims = 1;
+       {int ndims, dimensions[MAXDIM];
+
+        ndims = 1;
 	dimensions[0] = nitems;
 
-#ifdef HAVE_PYTHON_NUMERIC
-	rv = PyArray_FromDimsAndData(ndims, dimensions, entry->type_num, vr);
+	rv = PyArray_FromDimsAndData(ndims, dimensions, entry->type_num, vr);};
 #endif
-       };
 
     return rv;
 }

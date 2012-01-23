@@ -85,7 +85,8 @@ if (-d ../../python) then
                flog $ALog setenv HavePythonNumeric TRUE
             endif
             if ((-d $PyLib/site-packages/NumPy) || (-d $PyLib/site-packages/numpy) || \
-                (-d $PyLib/dist-packages/NumPy) || (-d $PyLib/dist-packages/numpy)) then
+                (-d $PyLib/dist-packages/NumPy) || (-d $PyLib/dist-packages/numpy) || \
+                (-d $PyInc/numpy)) then
                NoteD $ALog "      has numpy extensions"
                flog $ALog setenv HavePythonNumpy TRUE
             endif
