@@ -73,6 +73,7 @@ struct s_PA_state
     int imap;
     int input_flag;
     int ndom;
+    int max_state_files;
 
     int64_t edstr;
     int64_t ppstr;
@@ -108,7 +109,16 @@ struct s_PA_state
     char pp_bf[MAXLINE];
     char pp_ubf[MAXLINE];
     char input_line[MAXLINE];
-    char input_bf[MAXLINE];};
+    char input_bf[MAXLINE];
+
+/* variable formerly in panace.h */
+    int ul_print_flag;
+    int n_state_files;
+    int halt_fl;
+
+    char base_name[MAXLINE];
+    PDBfile **state_files;
+    PA_variable *default_variable;};
 
 /*--------------------------------------------------------------------------*/
 

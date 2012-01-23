@@ -383,7 +383,7 @@ static void _PA_cache_group(PA_variable *pp)
     s  = ps->cache_fname;
 
     if (PA_gs.cache_file == NULL)
-       {snprintf(s, MAXLINE, "%s.c00", _PA_base_name);
+       {snprintf(s, MAXLINE, "%s.c00", _PA.base_name);
         REMOVE(s);
         PA_gs.cache_file = PD_open(s, "w");
         PA_ERR((PA_gs.cache_file == NULL),
@@ -428,7 +428,7 @@ static void _PA_cache_individ(PA_variable *pp)
 
     pfn = PA_VARIABLE_CACHE_FILE_NAME(pp);
     if (pfn == NULL)
-       {snprintf(s, MAXLINE, "%s.c%02d", _PA_base_name, ps->ic++);
+       {snprintf(s, MAXLINE, "%s.c%02d", _PA.base_name, ps->ic++);
         pfn = CSTRSAVE(s);
         REMOVE(pfn);
         PA_VARIABLE_CACHE_FILE_NAME(pp) = pfn;};

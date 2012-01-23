@@ -60,7 +60,7 @@ void PA_simulate(double tc, int nc, int nz,
     int cycle;
 
 /* clear the halt flag */
-    _PA_halt_fl = FALSE;
+    _PA.halt_fl = FALSE;
 
 /* initialize the time-cycle loop */
     tconv  = PA_gs.convrsns[SEC]/PA_gs.units[SEC];
@@ -87,7 +87,7 @@ void PA_simulate(double tc, int nc, int nz,
          PA_file_mon(edname, ppname, gfname);
 
 /* if a halt has been called to the simulation clean up and exit */
-         if (_PA_halt_fl)
+         if (_PA.halt_fl)
             {PRINT(stdout, "Halting computation: t = %10.3e\n\n",
                            t*tconv);
              break;};
@@ -384,12 +384,12 @@ void PA_terminate(char *edname, char *ppname, char *gfname, int cycle)
                "TROUBLE CLOSING CACHE FILE - PA_TERMINATE");
      
 /* close open state files */
-    for (i = 0; i < _PA_n_state_files; i++)
-        {PA_ERR(!PD_close(_PA_state_files[i]),
+    for (i = 0; i < _PA.n_state_files; i++)
+        {PA_ERR(!PD_close(_PA.state_files[i]),
                 "TROUBLE CLOSING STATE FILE %d - PA_TERMINATE", i);
-         _PA_state_files[i] = NULL;};
+         _PA.state_files[i] = NULL;};
 
-    CFREE(_PA_state_files);
+    CFREE(_PA.state_files);
 
     PA_gs.pva_file   = NULL;
     PA_gs.edit_file  = NULL;

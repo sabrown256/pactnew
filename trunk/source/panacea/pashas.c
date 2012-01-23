@@ -17,9 +17,6 @@ char
  *PA_SET_INDEX_P_S = NULL,
  *PA_SET_INDEX_S = NULL;
 
-int
- _PA_halt_fl = FALSE;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -126,7 +123,7 @@ void PA_interrupt_handler(int sig)
        {case 'c' : PA_get_commands(stdin, NULL);
                    break;
 
-        case 'f' : _PA_halt_fl = TRUE;
+        case 'f' : _PA.halt_fl = TRUE;
                    break;
 
         case 'p' : PRINT(stdout, "Running %s\n", name);

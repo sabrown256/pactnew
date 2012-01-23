@@ -767,9 +767,6 @@ struct s_PA_global_state
     int n_time_plots;
     int n_unique_variables;
     int name_spaces;
-    int _PA_ul_print_flag;
-    int _PA_n_state_files;
-    int _PA_halt_fl;
     int *dul;
     int *don;
     int radian;
@@ -795,8 +792,6 @@ struct s_PA_global_state
     char err[MAXLINE];
     char *input_prompt;
     char **global_name;
-    char _PA_base_name[MAXLINE];
-    char *_PA_rsname;
     char *strtok_p;
     char *command;
     char *cpp_node;
@@ -866,14 +861,12 @@ struct s_PA_global_state
     hasharr *cpp_value_tab;
 
     PDBfile *cache_file;
-    PDBfile **_PA_state_files;
     PDBfile *vif;
     PDBfile *pva_file;
     PDBfile *pp_file;
 
     PA_iv_specification *iv_spec_lst;
     PA_package *packages;
-    PA_variable *_PA_default_variable;
     PA_plot_request *plot_reqs;
     PA_src_variable **sv_list;
 
@@ -894,19 +887,9 @@ extern "C" {
 PA_global_state
  PA_gs;
 
-extern PA_variable
- *_PA_default_variable;
-
-extern PDBfile
- **_PA_state_files;
-
 extern char
- _PA_base_name[],
- *_PA_rsname,
  *PA_SET_INDEX_S,
- *PA_SET_INDEX_P_S;
-
-extern char
+ *PA_SET_INDEX_P_S,
  *PA_INFO_TYPE_S,
  *PA_INFO_N_DIMS_S,
  *PA_INFO_DIMS_S,
@@ -935,11 +918,6 @@ extern char
  *PA_INFO_DOMAIN_NAME_S,
  *PA_INFO_MAP_DOMAIN_S,
  *PA_INFO_BUILD_DOMAIN_S;
-
-extern int
- _PA_ul_print_flag,
- _PA_n_state_files,
- _PA_halt_fl;
 
 
 /* CODE UNITS VARIABLES AND CONSTANTS */

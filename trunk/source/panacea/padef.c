@@ -27,8 +27,8 @@ char
  *PA_INFO_FILE_NAME_S,
  *PA_INFO_INIT_VAL_S,
  *PA_INFO_INIT_FNC_S,
- *PA_INFO_CONV_S,   /* ext_PA_gs.units */
- *PA_INFO_UNIT_S,   /* int_PA_gs.units */
+ *PA_INFO_CONV_S,   /* ext_unit */
+ *PA_INFO_UNIT_S,   /* int_unit */
  *PA_INFO_KEY_S,
  *PA_INFO_ATTRIBUTE_S,
  *PA_INFO_UNITS_S,
@@ -44,9 +44,6 @@ char
  *PA_INFO_DOMAIN_NAME_S,
  *PA_INFO_MAP_DOMAIN_S,
  *PA_INFO_BUILD_DOMAIN_S;
-
-PA_variable
- *_PA_default_variable = NULL;
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -69,8 +66,8 @@ PA_variable *PA_def_variable(char *name, ...)
 		PA_VARIABLE_NAME(pp));};
 
     PA_gs.variable_tab = PA_install_table(name, pp,
-				       PA_gs.variable,
-				       PA_gs.variable_tab);
+					  PA_gs.variable,
+					  PA_gs.variable_tab);
 
     return(pp);}
 
@@ -92,8 +89,8 @@ PA_variable *PA_def_var_default(char *name, ...)
     SC_VA_END;
 
     PA_gs.var_def_tab = PA_install_table(name, pp,
-				      PA_gs.variable,
-				      PA_gs.var_def_tab);
+					 PA_gs.variable,
+					 PA_gs.var_def_tab);
 
     return(pp);}
 
@@ -144,8 +141,8 @@ pcons *PA_def_var_attribute(char *name, ...)
 
 /* store in table */
     PA_gs.var_att_tab = PA_install_table(name, att_alist,
-				      PA_gs.attribute,
-				      PA_gs.var_att_tab);
+					 PA_gs.attribute,
+					 PA_gs.var_att_tab);
 
     return(att_alist);}
 
@@ -163,8 +160,8 @@ PA_dimens *PA_def_var_dimension(char *name, ...)
 
 /* store in table */
     PA_gs.var_dim_tab = PA_install_table(name, vdims,
-				      PA_gs.dimension,
-				      PA_gs.var_dim_tab);
+					 PA_gs.dimension,
+					 PA_gs.var_dim_tab);
 
     return(vdims);}
 
@@ -220,7 +217,7 @@ void PA_def_var_init(void)
     PA_variable *pp;
     
 /* setup defaults */
-    if (_PA_default_variable == NULL)
+    if (_PA.default_variable == NULL)
        {vattr[0]  = RUNTIME;
 	vattr[1]  = OPTL;
 	vattr[2]  = REL;
@@ -241,9 +238,10 @@ void PA_def_var_init(void)
 			     conv_fact, unit_fact, nu, du, alist);
 
 	PA_gs.var_def_tab = PA_install_table("default-variable", pp,
-					  PA_gs.variable, PA_gs.var_def_tab);
+					     PA_gs.variable,
+					     PA_gs.var_def_tab);
 
-	_PA_default_variable = pp;};
+	_PA.default_variable = pp;};
 
     return;}
 
@@ -293,18 +291,18 @@ PA_variable *_PA_process_def_var(char *vname, va_list *lst)
     attr_name[3] = PA_INFO_CENTER_S;
     attr_name[4] = PA_INFO_ALLOCATION_S;
 
-    vattr[0]  = PA_VARIABLE_SCOPE(_PA_default_variable);
-    vattr[1]  = PA_VARIABLE_CLASS(_PA_default_variable);
-    vattr[2]  = PA_VARIABLE_PERSISTENCE(_PA_default_variable);
-    vattr[3]  = PA_VARIABLE_CENTERING(_PA_default_variable);
-    vattr[4]  = PA_VARIABLE_ALLOCATION(_PA_default_variable);
-    vdims     = PA_VARIABLE_DIMS(_PA_default_variable);
-    iv        = PA_VARIABLE_INIT_VAL(_PA_default_variable);
-    ifn       = PA_VARIABLE_INIT_FUNC(_PA_default_variable);
-    vtype     = PA_VARIABLE_TYPE_S(_PA_default_variable);
-    nu        = PA_VARIABLE_UNIT_NUMER(_PA_default_variable);
-    du        = PA_VARIABLE_UNIT_DENOM(_PA_default_variable);
-    alist     = PA_VARIABLE_ATTR(_PA_default_variable);
+    vattr[0]  = PA_VARIABLE_SCOPE(_PA.default_variable);
+    vattr[1]  = PA_VARIABLE_CLASS(_PA.default_variable);
+    vattr[2]  = PA_VARIABLE_PERSISTENCE(_PA.default_variable);
+    vattr[3]  = PA_VARIABLE_CENTERING(_PA.default_variable);
+    vattr[4]  = PA_VARIABLE_ALLOCATION(_PA.default_variable);
+    vdims     = PA_VARIABLE_DIMS(_PA.default_variable);
+    iv        = PA_VARIABLE_INIT_VAL(_PA.default_variable);
+    ifn       = PA_VARIABLE_INIT_FUNC(_PA.default_variable);
+    vtype     = PA_VARIABLE_TYPE_S(_PA.default_variable);
+    nu        = PA_VARIABLE_UNIT_NUMER(_PA.default_variable);
+    du        = PA_VARIABLE_UNIT_DENOM(_PA.default_variable);
+    alist     = PA_VARIABLE_ATTR(_PA.default_variable);
     data_ptr  = NULL;
 
 /* make two alists, one for each precedence level */

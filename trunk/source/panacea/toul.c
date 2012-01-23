@@ -8,7 +8,7 @@
 
 #include "cpyright.h"
  
-#include "panace.h"
+#include "panacea_int.h"
 
 #undef CODE
 #define CODE "TOUL"
@@ -85,7 +85,7 @@ int main(int argc, char **argv)
     use_names         = FALSE;
     use_links         = FALSE;
     use_family        = FALSE;
-    _PA_ul_print_flag = TRUE;
+    _PA.ul_print_flag = TRUE;
 
     for (i = 1; i < argc; i++)
         {if (argv[i][0] == '-')
