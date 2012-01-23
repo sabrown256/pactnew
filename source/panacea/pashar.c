@@ -11,8 +11,6 @@
  
 #include "panacea_int.h"
 
-/*--------------------------------------------------------------------------*/
-
 #define COMPUTE_CONVERSION_FACTOR(flag, fac, conv, unit)                   \
     switch (flag)                                                          \
        {case INT_CGS : fac = 1.0/unit;                                     \
@@ -29,22 +27,9 @@
                        break;                                              \
         default      : fac = 1.0;}
 
-/*--------------------------------------------------------------------------*/
-
-char
- _PA_base_name[MAXLINE],
- *_PA_rsname;
-
-
-PDBfile
- **_PA_state_files = NULL;
-
-int
- _PA_n_state_files = 0,
- _PA_max_state_files = 10;
 
 PA_state
- _PA = { -1, 0, 0, 0, 1, FALSE, 0, 0, 0, 
+ _PA = { -1, 0, 0, 0, 1, FALSE, 0, 10, 0, 0, 
          ", \t\n\r", "dictionary", "dimension table",
 	 "ALIST", "SIZE", "heterogeneous", NULL, };
 
@@ -801,20 +786,20 @@ void _PA_rdrstrt(char *fname, int conv_flag)
 
     PA_control_set("global");
 
-/* set the _PA_rsname to this name to be able to CONNECT DeMaND variables */
-    _PA_rsname = fname;
+/* set the rsname to this name to be able to CONNECT DeMaND variables */
+    _PA.rsname = fname;
     strcpy(bf, fname);
     tok = SC_strtok(bf, ". \r\n\t", s);
     if (tok != NULL)
-       strcpy(_PA_base_name, tok);
+       strcpy(_PA.base_name, tok);
 
     if (PA_gs.vif == NULL)
        PA_gs.vif = PA_open("PA_gs.vif", "w+", TRUE);
 
 /* open the restart dump */
-    pdrs = PA_open(_PA_rsname, "r", FALSE);
+    pdrs = PA_open(_PA.rsname, "r", FALSE);
     PA_ERR((pdrs == NULL),
-           "CAN'T OPEN RSTART FILE - %s", _PA_rsname);
+           "CAN'T OPEN RSTART FILE - %s", _PA.rsname);
 
 /* read the definition constants */
     PD_read(pdrs, "PA_gs.n_units", &PA_gs.n_units);
@@ -873,7 +858,7 @@ void _PA_rdrstrt(char *fname, int conv_flag)
 	    continue;
 
 	 if (PA_VARIABLE_SCOPE(pp) == DMND)
-	    {PA_VARIABLE_FILE_NAME(pp)    = CSTRSAVE(_PA_rsname);
+	    {PA_VARIABLE_FILE_NAME(pp)    = CSTRSAVE(_PA.rsname);
 	     PA_VARIABLE_FILE_CONVERS(pp) = conv_flag;
 	     PA_VARIABLE_FILE(pp)         = pdrs;
 	     n_dmnd++;}
@@ -893,16 +878,16 @@ void _PA_rdrstrt(char *fname, int conv_flag)
        (*hook)(pdrs);
 
 /* advance the state file name */
-    PA_advance_name(_PA_rsname);
+    PA_advance_name(_PA.rsname);
 
-    if (_PA_state_files == NULL)
-       {_PA_state_files = CMAKE_N(PDBfile *, _PA_max_state_files);}
+    if (_PA.state_files == NULL)
+       {_PA.state_files = CMAKE_N(PDBfile *, _PA.max_state_files);}
 
-    else if (_PA_n_state_files >= _PA_max_state_files)
-       {_PA_max_state_files += 10;
-        CREMAKE(_PA_state_files, PDBfile *, _PA_max_state_files);};
+    else if (_PA.n_state_files >= _PA.max_state_files)
+       {_PA.max_state_files += 10;
+        CREMAKE(_PA.state_files, PDBfile *, _PA.max_state_files);};
 
-    _PA_state_files[_PA_n_state_files++] = pdrs;
+    _PA.state_files[_PA.n_state_files++] = pdrs;
 
     return;}
 
@@ -928,7 +913,7 @@ void _PA_rd_variable(PDBfile *pdrs, PA_variable *pp,
     if (sp == NULL)
        {PA_ERR(((pscope == scope) && (pclass == REQU)),
                "REQUIRED VARIABLE %s NOT IN %s - _PA_RD_VARIABLE",
-               pname, _PA_rsname);
+               pname, _PA.rsname);
         return;};
 
 /* recompute the size of all variables now that the defining parameters

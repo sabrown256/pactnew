@@ -25,9 +25,6 @@ struct s_th_info
    {PDBfile *file;
     int rec_count;};
 
-int
- _PA_ul_print_flag = FALSE;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -766,7 +763,7 @@ static int _PA_setup_uf_family(char *name, char **thfiles,
          if (puf == NULL)
             return(FALSE);
 
-         if (flag || _PA_ul_print_flag)
+         if (flag || _PA.ul_print_flag)
             PRINT(stdout, "Creating ULTRA file %s\n", bf);
 
          _PA.uf[i] = puf;
