@@ -256,6 +256,7 @@ typedef struct s_PM_mesh_map PM_mesh_map;
 typedef struct s_PM_set PM_set;
 typedef struct s_PM_map_info PM_map_info;
 typedef struct s_PM_mapping PM_mapping;
+typedef struct s_PM_global_state PM_global_state;
 typedef struct s_sort_link sort_link;
 
 FUNCTION_POINTER(PM_set, *(*PFPPM_set));
@@ -684,6 +685,17 @@ struct s_sort_link
    {int count;
     struct s_sort_link *next;};
 
+struct s_PM_global_state
+   {
+
+/* non-zero initial value variables */
+    PM_field *fp_opers;
+    PM_field *int_opers;
+    PM_field *long_opers;
+
+/* zero initial value variables */
+    char error[MAXLINE];};
+    
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -693,6 +705,9 @@ extern "C" {
 /*                          VARIABLE DECLARATIONS                           */
 
 /*--------------------------------------------------------------------------*/
+
+PM_global_state
+ PM_gs;
 
 extern char
  *PM_AC_S,
@@ -704,13 +719,7 @@ extern char
  *PM_MAPPING_P_S,
  *PM_MESH_TOPOLOGY_S,
  *PM_MESH_TOPOLOGY_P_S,
- *PM_SET_P_S,
- PM_error[];
-
-extern PM_field
- *PM_fp_opers,
- *PM_int_opers,
- *PM_long_opers;
+ *PM_SET_P_S;
 
 /*--------------------------------------------------------------------------*/
 
