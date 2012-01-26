@@ -48,7 +48,7 @@ void PA_print_variable(PA_variable *pp)
 	   PA_cpp_value_to_name(PA_gs.cpp_allocation, PA_VARIABLE_ALLOCATION(pp)));
 
     PA_print_var_dim(PA_VARIABLE_DIMS(pp));
-    PA_print_var_PA_gs.unitss(pp);
+    PA_print_var_units(pp);
 
     printf("\n");
 
@@ -107,14 +107,14 @@ void PA_print_var_dim(PA_dimens *vdims)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-void PA_print_var_PA_gs.unitss(PA_variable *pp)
+void PA_print_var_units(PA_variable *pp)
    {int id;
     pcons *pc, *pd, *pn;
 
     pn = PA_VARIABLE_UNIT_NUMER(pp);
     pd = PA_VARIABLE_UNIT_DENOM(pp);
 
-    printf("PA_gs.units   :");
+    printf("unit   :");
 
     if (pn == NULL && pd == NULL)
        printf(" NULL\n");
@@ -229,7 +229,7 @@ int main(int c, char **v)
    {int len1, len2, len3, len4;
     int foo3_data;
     PA_dimens *vdims;
-    pcons *att_alist, *PA_gs.units_alist;
+    pcons *att_alist, *unit_alist;
     PA_variable *pp;
 
 /* initialize some stuff */
@@ -240,11 +240,11 @@ int main(int c, char **v)
     PA_cpp_default();
     PA_def_var_init();
 
-/* ------- test PA_gs.unitss --------------- */
-    PA_def_var_PA_gs.unitss("1/cm", PER, CM, UNITS);
-    PA_gs.units_alist = (pcons *) SC_hasharr_def_lookup(PA_var_PA_gs.units_tab, "1/cm", "1/cm");
+/* ------- test units --------------- */
+    PA_def_var_units("1/cm", PER, CM, UNITS);
+    unit_alist = (pcons *) SC_hasharr_def_lookup(PA_var_unit_tab, "1/cm", "1/cm");
     printf("1/cm -\n");
-    PA_print_alist(PA_gs.units_alist);
+    PA_print_alist(unit_alist);
 
 /* ------- test attributes --------------- */
     PA_def_var_attribute("foo_att", PA_INFO_ALLOCATION, STATIC,
@@ -323,15 +323,15 @@ int main(int c, char **v)
     pp = PA_def_variable("foo7", PA_INFO_SHARE, "foo6", PA_INFO_PERSISTENCE, CACHE_F, 0);
     PA_print_variable(pp);
 
-    printf("with PA_gs.unitss PER 1/cm\n");
+    printf("with units PER 1/cm\n");
     pp = PA_def_variable("foo8", PA_INFO_UNITS_NAME, "1/cm", 0);
     PA_print_variable(pp);
 
-    printf("with PA_gs.unitss MOLE Q PER CC K\n");
+    printf("with units MOLE Q PER CC K\n");
     pp = PA_def_variable("foo9", PA_INFO_UNITS, MOLE, Q, PER, CC, K, UNITS, 0);
     PA_print_variable(pp);
 
-    printf("with PA_gs.unitss RAD\n");
+    printf("with units RAD\n");
     pp = PA_def_variable("foo10", PA_INFO_UNITS, RAD, UNITS, 0);
     PA_print_variable(pp);
 
@@ -341,7 +341,7 @@ int main(int c, char **v)
 
     pp = PA_def_variable("foo12", PA_INFO_ATT_NAME, "bad_add",
 			 PA_INFO_DIM_NAME, "bad_dim",
-			 PA_INFO_UNITS_NAME, "bad_PA_gs.unitss",
+			 PA_INFO_UNITS_NAME, "bad_units",
 			 0);
 
 /*  PA_print_var_tab(PA_gs.variable_tab); */

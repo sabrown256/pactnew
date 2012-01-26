@@ -340,7 +340,7 @@ static double **_SX_extract_range(SS_psides *si,
     PM_free_vectors(dnde, s);
 
 /* just return the inverse weights */
-    if (wgtfl)
+    if (wgtfl > 0)
        {for (i = 0; i < dnde; i++)
 	    {trc = tre[i];
 	     PM_array_set(trc, dne, 1.0);};};
@@ -591,7 +591,7 @@ static void _SX_accumulate_range(SS_psides *si, PM_mapping *d,
 	 SX_determine_drw_obj(si, &ps, &obj, &al);
 
 	 if (ps != NULL)
-	    tre = _SX_accumulate_mapping(si, d, ps, FALSE);
+	    tre = _SX_accumulate_mapping(si, d, ps, SX_gs.interp_method);
 
 	 else
 	    {id = SC_arrtype(obj, -1);
@@ -660,7 +660,8 @@ object *_SX_mh_b_s(SS_psides *si, C_procedure *cp, object *argl)
 
 /* build the return mapping */
 	h = _SX_link_mappings(si, argl);
-	f = SX_build_return_mapping(si, h, label, NULL, FALSE, FALSE);
+	f = SX_build_return_mapping(si, h, label, NULL,
+				    FALSE, SX_gs.interp_method);
 	_SX_unlink_mappings(h);
 
 	_SX_accumulate_range(si, f, argl, proc);

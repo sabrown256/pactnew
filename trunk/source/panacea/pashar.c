@@ -514,11 +514,11 @@ void *_PA_pdb_read(PDBfile *file, char *name, syment **psp, long *indx)
 PDBfile *PA_open(char *name, char *mode, int flag)
    {PDBfile *fp;
 
-    if (strcmp(name, "PA_gs.vif") == 0)
+    if (strcmp(name, "vif") == 0)
        {if ((PA_gs.pp != NULL) && (PA_gs.pp->vif != NULL))
            fp = PA_gs.pp->vif;
         else
-	   {fp = PD_open_vif("PA_gs.vif");
+	   {fp = PD_open_vif("vif");
 	    PD_mkdir(fp, "/&ptrs");};
 
         PA_gs.vif = fp;}
@@ -628,7 +628,7 @@ void _PA_wrrstrt(char *rsname, int conv_flag)
     fp = pdrs->stream;
 
 /* save the definition constants */
-    PD_write(pdrs, "PA_gs.n_units", SC_INT_S, &PA_gs.n_units);
+    PD_write(pdrs, "n_units", SC_INT_S, &PA_gs.n_units);
     _PA_wr_pseudo_plot_requests(pdrs);
 
 /* check every element of PA_gs.variable_tab to find the RESTART variables */
@@ -783,7 +783,7 @@ void _PA_rdrstrt(char *fname, int conv_flag)
        strcpy(_PA.base_name, tok);
 
     if (PA_gs.vif == NULL)
-       PA_gs.vif = PA_open("PA_gs.vif", "w+", TRUE);
+       PA_gs.vif = PA_open("vif", "w+", TRUE);
 
 /* open the restart dump */
     pdrs = PA_open(_PA.rsname, "r", FALSE);
@@ -791,7 +791,7 @@ void _PA_rdrstrt(char *fname, int conv_flag)
            "CAN'T OPEN RSTART FILE - %s", _PA.rsname);
 
 /* read the definition constants */
-    PD_read(pdrs, "PA_gs.n_units", &PA_gs.n_units);
+    PD_read(pdrs, "n_units", &PA_gs.n_units);
 
 /* define the problem definition variables */
     PA_definitions();
@@ -831,8 +831,8 @@ void _PA_rdrstrt(char *fname, int conv_flag)
     PA_gs.global_name  = NAME;
 
 /* connect the internal and extern unit definition variables */
-    PA_CONNECT(PA_gs.units,    "PA_gs.units",    TRUE);
-    PA_CONNECT(PA_gs.convrsns, "PA_gs.convrsns", TRUE);
+    PA_CONNECT(PA_gs.units,    "unit",    TRUE);
+    PA_CONNECT(PA_gs.convrsns, "convrsn", TRUE);
 
 /* define the variables - and leave the unit conversions alone */
     PA_variables(NONE);  

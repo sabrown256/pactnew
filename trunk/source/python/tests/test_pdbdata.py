@@ -11,7 +11,7 @@ Use the struct module to test the output for simple types
 
 """
 
-import pact.pdb as pdb
+import pact_2.pdb as pdb
 import unittest
 import struct
 import test_leak

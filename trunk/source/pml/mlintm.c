@@ -628,9 +628,11 @@ static INLINE void MASK(double *d)
 
 static double *_PM_mq_coef(int nd, int n, double **x, double *f, double rs)
    {int i, j, id;
-    double dx[2], dc;
-    double *xc, *coef;
+    double dc;
+    double *xc, *dx, *coef;
     PM_matrix *a, *b;
+
+    dx = CMAKE_N(double, nd);
 
     a = PM_create(n, n);
     b = PM_create(n, 1);
@@ -663,6 +665,8 @@ static double *_PM_mq_coef(int nd, int n, double **x, double *f, double rs)
 
     PM_destroy(a);
     PM_destroy(b);
+
+    CFREE(dx);
 
     return(coef);}
  

@@ -4,7 +4,7 @@
 # Software Release #: LLNL-CODE-422942
 #
 
-import pact.pdb as pdb
+import pact_2.pdb as pdb
 import os
 import sys
 

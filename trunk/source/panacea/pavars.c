@@ -179,15 +179,15 @@ void PA_definitions(void)
  * all packages have been defined
  */
     if (PA_gs.vif == NULL)
-       PA_gs.vif = PA_open("PA_gs.vif", "w+", TRUE);
+       PA_gs.vif = PA_open("vif", "w+", TRUE);
 
     PA_def_str(PA_gs.vif);
 
 /* global problem definition variables */
-    PA_inst_var("PA_gs.units", SC_DOUBLE_S, NULL, NULL,
+    PA_inst_var("unit", SC_DOUBLE_S, NULL, NULL,
                 SCOPE, DEFN, CLASS, REQU, ATTRIBUTE,
                 P_Units, DIMENSION, UNITS);
-    PA_inst_var("PA_gs.convrsns", SC_DOUBLE_S, NULL, NULL,
+    PA_inst_var("convrsn", SC_DOUBLE_S, NULL, NULL,
                 SCOPE, DEFN, CLASS, REQU, ATTRIBUTE,
                 P_Units, DIMENSION, UNITS);
 
@@ -325,8 +325,8 @@ void PA_def_units(int flag)
 /* set the physical constants in CGS units */
        PA_physical_constants_cgs();
 
-       PA_gs.n_units      = 0;
-       _PA.units = NULL;
+       PA_gs.n_units = 0;
+       _PA.units     = NULL;
 
 /* once panacea is defined as a package,
  * this call will be done in the following loop
@@ -529,7 +529,7 @@ void PA_set_conversions(int flag)
 
 /* PA_PHYSICAL_CONSTANTS_INT - set up the physical constants in the internal
  *                            - system of units as defined by the unit array
- *                            - e.g. length_internal = length_cgs*wPA_gs.units[CM]
+ *                            - e.g. length_internal = length_cgs*unit[CM]
  */
 
 void PA_physical_constants_int(void)
@@ -537,17 +537,17 @@ void PA_physical_constants_int(void)
 
     PA_physical_constants_cgs();
 
-    Hbar    *= (PA_gs.units[ERG]*PA_gs.units[SEC]);                    /* Hbar in erg-sec */
-    HbarC   *= (PA_gs.units[EV]*PA_gs.units[CM]);                      /* Hbar*C in eV-cm */
-    eV_erg  *= (PA_gs.units[ERG]/PA_gs.units[EV]);                           /* eV to erg */
-    N0      *= PA_gs.units[MOLE];                             /* Avagadro's number */
-    c       *= (PA_gs.units[CM]/PA_gs.units[SEC]);             /* speed of light (cm/sec) */
-    M_e_eV  *= PA_gs.units[EV];                             /* electron mass in eV */
-    M_e     *= PA_gs.units[G];                               /* electron mass in g */
-    M_a     *= PA_gs.units[G];                            /* atomic mass PA_gs.units in g */
-    kBoltz  *= (PA_gs.units[ERG]/PA_gs.units[K]);            /* Boltzman constant (erg/K) */
-    e       *= PA_gs.units[Q];                           /* electron charge in esu */
-    Ryd     *= PA_gs.units[EV];                                   /* Rydberg in eV */
+    Hbar    *= (PA_gs.units[ERG]*PA_gs.units[SEC]);         /* Hbar in erg-sec */
+    HbarC   *= (PA_gs.units[EV]*PA_gs.units[CM]);           /* Hbar*C in eV-cm */
+    eV_erg  *= (PA_gs.units[ERG]/PA_gs.units[EV]);                /* eV to erg */
+    N0      *= PA_gs.units[MOLE];                         /* Avagadro's number */
+    c       *= (PA_gs.units[CM]/PA_gs.units[SEC]);  /* speed of light (cm/sec) */
+    M_e_eV  *= PA_gs.units[EV];                         /* electron mass in eV */
+    M_e     *= PA_gs.units[G];                           /* electron mass in g */
+    M_a     *= PA_gs.units[G];                 /* atomic mass PA_gs.units in g */
+    kBoltz  *= (PA_gs.units[ERG]/PA_gs.units[K]); /* Boltzman constant (erg/K) */
+    e       *= PA_gs.units[Q];                       /* electron charge in esu */
+    Ryd     *= PA_gs.units[EV];                               /* Rydberg in eV */
 
     return;}
 
@@ -565,17 +565,17 @@ void PA_physical_constants_ext(void)
 
     PA_physical_constants_cgs();
 
-    Hbar    *= (PA_gs.convrsns[ERG]*PA_gs.convrsns[SEC]);              /* Hbar in erg-sec */
-    HbarC   *= (PA_gs.convrsns[EV]*PA_gs.convrsns[CM]);                /* Hbar*C in eV-cm */
-    eV_erg  *= (PA_gs.convrsns[ERG]/PA_gs.convrsns[EV]);                     /* eV to erg */
-    N0      *= PA_gs.convrsns[MOLE];                          /* Avagadro's number */
-    c       *= (PA_gs.convrsns[CM]/PA_gs.convrsns[SEC]);       /* speed of light (cm/sec) */
-    M_e_eV  *= PA_gs.convrsns[EV];                          /* electron mass in eV */
-    M_e     *= PA_gs.convrsns[G];                            /* electron mass in g */
-    M_a     *= PA_gs.convrsns[G];                         /* atomic mass PA_gs.units in g */
-    kBoltz  *= (PA_gs.convrsns[ERG]/PA_gs.convrsns[K]);      /* Boltzman constant (erg/K) */
-    e       *= PA_gs.convrsns[Q];                        /* electron charge in esu */
-    Ryd     *= PA_gs.convrsns[EV];                                /* Rydberg in eV */
+    Hbar    *= (PA_gs.convrsns[ERG]*PA_gs.convrsns[SEC]);         /* Hbar in erg-sec */
+    HbarC   *= (PA_gs.convrsns[EV]*PA_gs.convrsns[CM]);           /* Hbar*C in eV-cm */
+    eV_erg  *= (PA_gs.convrsns[ERG]/PA_gs.convrsns[EV]);                /* eV to erg */
+    N0      *= PA_gs.convrsns[MOLE];                            /* Avagadro's number */
+    c       *= (PA_gs.convrsns[CM]/PA_gs.convrsns[SEC]);  /* speed of light (cm/sec) */
+    M_e_eV  *= PA_gs.convrsns[EV];                            /* electron mass in eV */
+    M_e     *= PA_gs.convrsns[G];                              /* electron mass in g */
+    M_a     *= PA_gs.convrsns[G];                    /* atomic mass PA_gs.units in g */
+    kBoltz  *= (PA_gs.convrsns[ERG]/PA_gs.convrsns[K]); /* Boltzman constant (erg/K) */
+    e       *= PA_gs.convrsns[Q];                          /* electron charge in esu */
+    Ryd     *= PA_gs.convrsns[EV];                                  /* Rydberg in eV */
 
     return;}
 

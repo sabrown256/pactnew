@@ -669,7 +669,13 @@ object *SX_plane(SS_psides *si, object *argl)
              {v += coeff[j+1]*delem[j][i];};
 	 *pr++ = v;};
 
-    ran = PM_make_set("Plane", SC_DOUBLE_S, FALSE, 1, ne, 1, r);
+/* make the range having the same dimension as the domain */
+    ran = PM_make_set_alt("Plane", SC_DOUBLE_S, FALSE, nd,
+			  dom->max_index, 1, (void **) &r);
+/* we used to make a simple 1d range
+ * that gets into incommensurate range trouble when doing arithmetic
+    ran = PM_make_set("Plane", SC_DOUBLE_S, FALSE, nd, ne, 1, r);
+ */
 
 /* make the mapping */
     name = SC_dsnprintf(FALSE, "%s->%s", dom->name, ran->name);

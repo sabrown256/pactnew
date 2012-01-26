@@ -968,7 +968,8 @@
                      mesh
             for 3d domain
             <info> - mesh   |
-                     shaded
+                     shaded |
+                     contour [<n-levels>]
      Examples: default-viewport-rendering \"A\" \"A\" polar
                default-viewport-rendering contour
                default-viewport-rendering contour 15

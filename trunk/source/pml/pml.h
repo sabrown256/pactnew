@@ -706,7 +706,7 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-PM_global_state
+extern PM_global_state
  PM_gs;
 
 extern char

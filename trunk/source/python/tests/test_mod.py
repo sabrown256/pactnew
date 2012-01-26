@@ -10,7 +10,7 @@ Test module level functions
 
 """
 
-import pact.pdb as pdb
+import pact_2.pdb as pdb
 import unittest
 
 class Mod(unittest.TestCase):

@@ -8,7 +8,7 @@
 
 """
 
-import pact.pdb as pdb
+import pact_2.pdb as pdb
 import unittest
 import test_leak
 

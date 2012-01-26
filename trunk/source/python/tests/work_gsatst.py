@@ -6,7 +6,7 @@
 
 """ Routine from gsatst.c
 """
-import pact.pgs as pgs
+import pact_2.pgs as pgs
 pdb = pgs
 
 import Numeric

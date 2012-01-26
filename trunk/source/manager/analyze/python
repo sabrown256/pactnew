@@ -83,13 +83,18 @@ if (-d ../../python) then
             if (-d $PyInc/Numeric) then
                NoteD $ALog "      has numeric extensions"
                flog $ALog setenv HavePythonNumeric TRUE
+            else
+               flog $ALog setenv HavePythonNumeric FALSE
             endif
             if ((-d $PyLib/site-packages/NumPy) || (-d $PyLib/site-packages/numpy) || \
                 (-d $PyLib/dist-packages/NumPy) || (-d $PyLib/dist-packages/numpy) || \
                 (-d $PyInc/numpy)) then
                NoteD $ALog "      has numpy extensions"
                flog $ALog setenv HavePythonNumpy TRUE
+            else
+               flog $ALog setenv HavePythonNumpy FALSE
             endif
+
             if (($HavePythonNumeric == FALSE) && ($HavePythonNumpy == FALSE)) then
                NoteD $ALog "      does not have numeric extensions"
 # NOTE: if we can build sensibly without any numeric extensions delete these
