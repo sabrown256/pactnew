@@ -472,8 +472,9 @@
 
 (remarks "Generate a hyper-plane of data")
 
-(printf nil "-> hyper-plane 0 '(1 0 1 20) '(1 0 1 30)\n")
-hyper-plane 0 '(1 0 1 20) '(1 0 1 30)
+(data-id off)
+(printf nil "-> hyper-plane 0 '(1 0.5 1.5 20) '(1 0.5 1.5 30)\n")
+hyper-plane 0 '(1 0.5 1.5 20) '(1 0.5 1.5 30)
 
 (remarks "Make a copy of the hyperplane")
 (printf nil "-> copy-map 1\n")
@@ -484,16 +485,16 @@ hyper-plane 0 '(1 0 1 20) '(1 0 1 30)
 (move "V1" "C" 2)
 
 (remarks "Refine the hyper plane to a different resolution")
-(printf nil "-> refine 1 '(25 25)\n")
-(refine 1 '(25 25))
+(printf nil "-> refine 1 '(24 24)\n")
+(refine 1 '(24 24))
 (printf nil "-> dl 2\n")
 (dl 2)
 
 (remarks "Go to the other frame, compute and plot the interpolation weights")
 (printf nil "-> cv \"V1\"\n")
 (cv "V1")
-(printf nil "-> interpolation-weights 1 '(25 25)\n")
-(interpolation-weights 1 '(25 25))
+(printf nil "-> interpolation-weights 1 '(24 24)\n")
+(interpolation-weights 1 '(24 24))
 (printf nil "-> dl 2\n")
 (dl 2)
 

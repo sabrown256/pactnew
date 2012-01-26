@@ -285,6 +285,7 @@ switch ($1)
 	Note $LogFile "Building $CODENAME distribution"
 	flog $LogFile touch ../main/$codename.c
         time for-sys -l $LogFile pact $Opt install
+	flog $LogFile rm -f ../main/$codename.c
 	Note $LogFile "$CODENAME built"
 
         breaksw

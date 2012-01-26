@@ -170,7 +170,7 @@ Values matching: xval0 < 0.15 or > 0.75 and < 1.25 or > 1.75
 
 
 (BATCH) Generate a hyper-plane of data
--> hyper-plane 0 '(1 0 1 20) '(1 0 1 30)
+-> hyper-plane 0 '(1 0.5 1.5 20) '(1 0.5 1.5 30)
 
 
 (BATCH) Make a copy of the hyperplane
@@ -182,13 +182,13 @@ Values matching: xval0 < 0.15 or > 0.75 and < 1.25 or > 1.75
 
 
 (BATCH) Refine the hyper plane to a different resolution
--> refine 1 '(25 25)
+-> refine 1 '(24 24)
 -> dl 2
 
 
 (BATCH) Go to the other frame, compute and plot the interpolation weights
 -> cv "V1"
--> interpolation-weights 1 '(25 25)
+-> interpolation-weights 1 '(24 24)
 -> dl 2
 -> wu
 

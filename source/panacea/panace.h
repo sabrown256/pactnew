@@ -884,7 +884,7 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-PA_global_state
+extern PA_global_state
  PA_gs;
 
 extern char

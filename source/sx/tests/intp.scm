@@ -13,182 +13,271 @@
 ;(cw win-name)
 (cw win-name "COLOR" "PS" 0.0 0.0 1.0 1.0)
 (plot-date off)
-(label-space 0.2)
 (grid on)
+
+(define nxi 5)
+(define nyi 6)
+(define nzi 3)
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; 1D test - setup
+
+(printf nil "---------------------------------------------------------------\n")
+(printf nil "1D interpolations\n")
+
+(label-space 0.2)
+
+(define nd 1)
+(define nr '(12))
+(define nr '(23))
+;(interpolation-strength (* nd nd))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
 ; 1D test - inverse distance weighted interpolation
 
+(printf nil "inverse distance weight\n")
 (interpolation-method idw)
 
-(define nd 1)
-(define ni 5)
-(define nr 12)
-(define nr 23)
-;(interpolation-strength (* nd nd))
-
-hyper-plane 0 (list 1 0 1.5 ni)
-(label-drawable "line scatter" (sqr 1))
+hyper-plane 0 (list 1 0 1.5 nxi)
+(label-drawable "line" (sqr 1))
+(label-drawable "line scatter" (copy-map 1))
 (scatter triangle 1)
-(lncolor dark-green 1)
-(label-drawable "line" (copy-map 1))
-(lncolor dark-green 1)
+(lncolor dark-green 1 2)
 (lsv)
 
-(label-drawable "refined scatter" (refine 1 (list nr)))
+(label-drawable "refined" (refine 1 nr))
+(label-drawable "refined scatter" (copy-map 1))
 (scatter star 1)
-(lncolor gray 1)
-(label-drawable "refined line" (copy-map 1))
-(lncolor gray 1)
+(lncolor gray 1 2)
 (lsv)
 
-(label-drawable "weights scatter" (interpolation-weights 1 (list nr)))
+(label-drawable "weights" (interpolation-weights 1 nr))
+(label-drawable "weights scatter" (copy-map 1))
 (scatter star 1)
-(lncolor blue 1)
-(label-drawable "weights line" (copy-map 1))
-(lncolor blue 1)
+(lncolor blue 1 2)
 (lsv)
 (wu)
-
-(dl)
+;(pause)
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
 ; 1D test - multiquadric interpolation
 
+(dl)
+(printf nil "multiquadric\n")
 (interpolation-method mq)
 
-(define nd 1)
-(define ni 5)
-(define nr 12)
-(define nr 23)
-;(interpolation-strength (* nd nd))
-
-hyper-plane 0 (list 1 0 1.5 ni)
-(label-drawable "line scatter" (sqr 1))
+hyper-plane 0 (list 1 0 1.5 nxi)
+(label-drawable "line" (sqr 1))
+(label-drawable "line scatter" (copy-map 1))
 (scatter triangle 1)
-(lncolor dark-green 1)
-(label-drawable "line" (copy-map 1))
-(lncolor dark-green 1)
+(lncolor dark-green 1 2)
 (lsv)
 
-(label-drawable "refined scatter" (refine 1 (list nr)))
+(label-drawable "refined" (refine 1 nr))
+(label-drawable "refined scatter" (copy-map 1))
 (scatter star 1)
-(lncolor gray 1)
-(label-drawable "refined line" (copy-map 1))
-(lncolor gray 1)
+(lncolor gray 1 2)
 (lsv)
 
-(label-drawable "weights scatter" (interpolation-weights 1 (list nr)))
+(label-drawable "weights" (interpolation-weights 1 nr))
+(label-drawable "weights scatter" (copy-map 1))
 (scatter star 1)
-(lncolor blue 1)
-(label-drawable "weights line" (copy-map 1))
-(lncolor blue 1)
+(lncolor blue 1 2)
 (lsv)
 (wu)
+;(pause)
 
-(dl)
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; 2D test - setup
+
+(printf nil "---------------------------------------------------------------\n")
+(printf nil "2D interpolations\n")
+
+(label-space 0)
+
+(define nd  2)
+(define nr '(11 13))
+;(define nr '(47 53))
+;(define nr '(97 103))
+;(define nr '(491 503))
+
+(nxm 2 1)
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
 ; 2D test - inverse distance weighted interpolation
 
+(dl)
+(printf nil "inverse distance weight\n")
 (interpolation-method idw)
 
-(define nd  2)
-(define nxi 5)
-(define nyi 6)
-(define nxr 11)
-(define nyr 13)
-;(define nxr 47)
-;(define nyr 53)
-;(define nxr 97)
-;(define nyr 103)
-;(define nxr 491)
-;(define nyr 503)
-
-(nxm 2 1)
 hyper-plane 0 (list 1 1 nxi nxi) (list 1 1 nyi nyi)
 
-(label-drawable "plane scatter" (sqr 1))
+(label-drawable "plane" (sqr 1))
+(label-drawable "plane scatter" (copy-map 1))
 (scatter triangle 1)
-(lncolor dark-green 1)
-(label-drawable "plane" (copy-map 1))
-(lncolor dark-green 1)
+(lncolor dark-green 1 2)
 (lsv)
 
 (move "V1" win-name (copy-map 1))
 
-(label-drawable "refine scatter" (refine 1 (list nxr nyr)))
+(label-drawable "refine" (refine 1 nr))
+(label-drawable "refine scatter" (copy-map 1))
 (scatter star 1)
-(lncolor red 1)
-(label-drawable "refine" (copy-map 1))
-(lncolor red 1)
+(lncolor red 1 2)
 (lsv)
 
 (cv "V1")
-(label-drawable "weights" (interpolation-weights 1 (list nxr nyr)))
+(label-drawable "weights" (interpolation-weights 1 nr))
 (dl 2)
 
 (dr 1 (render fill-poly))
 (lsv)
 
 (wu)
-(dl)
-(cv "V0")
-(dl)
+;(pause)
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
 ; 2D test - multiquadric interpolation
 
+(dl)
+(cv "V0")
+(dl)
+(printf nil "multiquadric\n")
 (interpolation-method mq)
-
-(define nd  2)
-(define nxi 5)
-(define nyi 6)
-(define nxr 11)
-(define nyr 13)
-;(define nxr 47)
-;(define nyr 53)
-;(define nxr 97)
-;(define nyr 103)
-;(define nxr 491)
-;(define nyr 503)
 
 hyper-plane 0 (list 1 1 nxi nxi) (list 1 1 nyi nyi)
 
-(label-drawable "plane scatter" (sqr 1))
+(label-drawable "plane" (sqr 1))
+(label-drawable "plane scatter" (copy-map 1))
 (scatter triangle 1)
-(lncolor dark-green 1)
-(label-drawable "plane" (copy-map 1))
-(lncolor dark-green 1)
+(lncolor dark-green 1 2)
 (lsv)
 
 (move "V1" win-name (copy-map 1))
 
-(label-drawable "refine scatter" (refine 1 (list nxr nyr)))
+(label-drawable "refine" (refine 1 nr))
+(label-drawable "refine scatter" (copy-map 1))
 (scatter star 1)
-(lncolor red 1)
-(label-drawable "refine" (copy-map 1))
-(lncolor red 1)
+(lncolor red 1 2)
 (lsv)
 
 (cv "V1")
-(label-drawable "weights" (interpolation-weights 1 (list nxr nyr)))
+(label-drawable "weights" (interpolation-weights 1 nr))
 (dl 2)
 
 (dr 1 (render fill-poly))
 (lsv)
 
 (wu)
+;(pause)
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
+; 3D test - setup
+
+(printf nil "---------------------------------------------------------------\n")
+(printf nil "3D interpolations\n")
+
+;(refmeshcolor gray)
+;(refmesh on)
+;(overlay on)
+
+(define nd  3)
+(define nr '(11 13 7))
+;(define nr '(47 53 43))
+;(define nr '(97 103 101))
+;(define nr '(491 503 487))
+
+;(nxm 1 1)
+(view-angle 60 30)
+(vr contour)
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; 3D test - inverse distance weighted interpolation
+
+(dl)
+(cv "V0")
+(dl)
+(printf nil "inverse distance weight\n")
+(interpolation-method idw)
+
+hyper-plane 0 (list 1 1 10 nxi) (list 1 1 11 nyi) (list 1 1 12 nzi)
+(label-drawable "plane" (sqr 1))
+(label-drawable "refine" (refine 1 nr))
+(lsv)
+
+(move "V1" win-name (copy-map 1))
+
+(wu)
+;(pause)
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; 3D test - multiquadric interpolation
+
+(cv "V1")
+(dl)
+(cv "V0")
+(dl)
+(printf nil "multiquadric\n")
+(interpolation-method mq)
+
+hyper-plane 0 (list 1 1 10 nxi) (list 1 1 11 nyi) (list 1 1 12 nzi)
+
+(label-drawable "plane" (sqr 1))
+(label-drawable "refine" (refine 1 nr))
+(lsv)
+
+(move "V1" win-name 1)
+
+(wu)
+;(pause)
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+; 3D test - multiquadric interpolation
+
+;(cv "V1")
+;(dl)
+;(cv "V0")
+;(dl)
+;(printf nil "multiquadric\n")
+;(interpolation-method mq)
+
+;hyper-plane 0 (list 1 1 10 nxi) (list 1 1 11 nyi) (list 1 1 12 nzi)
+
+;(label-drawable "plane" (sqr 1))
+;(label-drawable "refine" (refine 1 nr))
+;(label-drawable "weights" (interpolation-weights 1 nr))
+;(lsv)
+
+;(move "V1" win-name 1)
+
+;(wu)
+;(pause)
+
+;--------------------------------------------------------------------------
+;--------------------------------------------------------------------------
+
+(cv "V1")
+(dl)
+(cv "V0")
+(dl)
 (end)

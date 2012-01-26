@@ -29,7 +29,7 @@ PA_variable *_PA_mk_variable(char *vname, PA_dimens *vdims, void *iv,
     PA_dimens *pvd;
     
     if (PA_gs.vif == NULL)
-       PA_gs.vif = PA_open("PA_gs.vif", "r+", TRUE);
+       PA_gs.vif = PA_open("vif", "r+", TRUE);
 
     pp = CMAKE(PA_variable);
 

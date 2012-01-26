@@ -630,7 +630,7 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
     defstr *dp;
 
     if (PA_gs.vif == NULL)
-       PA_gs.vif = PA_open("PA_gs.vif", "r+", TRUE);
+       PA_gs.vif = PA_open("vif", "r+", TRUE);
 
     old_delim = PA_gs.token_delimiters;
 

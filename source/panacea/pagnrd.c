@@ -630,7 +630,7 @@ void PA_pshand(PA_command *cp)
         sval = SC_strtok(NULL, "\n\r", PA_gs.strtok_p);
         NAME[i] = CSTRSAVE(sval);}
 
-    else if (strcmp(cp->name, "PA_gs.units") == 0)
+    else if (strcmp(cp->name, "unit") == 0)
        {i    = SC_stoi(PA_get_field("INDEX", "UNIT", REQU));
         fval = PA_alias_value(PA_get_field("VALUE", "UNIT", REQU));
         PA_gs.units[i] = fval;}
@@ -873,8 +873,8 @@ void PA_wrrstrth(void)
     PA_proc_units();
 
 /* intern the controls */
-    PA_INTERN(PA_gs.units, "PA_gs.units");
-    PA_INTERN(PA_gs.convrsns, "PA_gs.convrsns");
+    PA_INTERN(PA_gs.units, "unit");
+    PA_INTERN(PA_gs.convrsns, "convrsn");
 
 /* intern the plot requests */
     PA_INTERN(PA_gs.plot_reqs, "plot-requests");

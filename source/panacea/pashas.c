@@ -214,19 +214,19 @@ void PA_file_mon(char *edname, char *ppname, char *gfname)
  *               -
  *               - Options:
  *               -   NONE    - perform no conversions
- *               -   INT_CGS - convert from internal PA_gs.unitss to CGS PA_gs.unitss
- *               -   INT_EXT - convert from internal PA_gs.unitss to external PA_gs.unitss
- *               -   EXT_CGS - convert from external PA_gs.unitss to CGS PA_gs.unitss
- *               -   EXT_INT - convert from external PA_gs.unitss to internal PA_gs.unitss
- *               -   CGS_INT - convert from CGS PA_gs.unitss to internal PA_gs.unitss
- *               -   CGS_EXT - convert from CGS PA_gs.unitss to external PA_gs.unitss
+ *               -   INT_CGS - convert from internal units to CGS units
+ *               -   INT_EXT - convert from internal units to external units
+ *               -   EXT_CGS - convert from external units to CGS units
+ *               -   EXT_INT - convert from external units to internal units
+ *               -   CGS_INT - convert from CGS units to internal units
+ *               -   CGS_EXT - convert from CGS units to external units
  *               -
- *               - The internal system of PA_gs.unitss is defined by the "PA_gs.units"
+ *               - The internal system of units is defined by the "PA_gs.units"
  *               - array.
- *               - The external system of PA_gs.unitss is defined by the "PA_gs.convrsns"
+ *               - The external system of units is defined by the "PA_gs.convrsns"
  *               - array.
  *               -
- *               - The system of PA_gs.unitss of the data in the restart dump is
+ *               - The system of units of the data in the restart dump is
  *               - under the control of the code developer, but it must
  *               - be consistent.
  *

@@ -117,7 +117,8 @@ switch ($Phase)
 
 # NOTE: if dsys sync would modify dsys itself this is a problem for
 # platforms like cygwin - so do a source update first
-              flog $LogHost ../scripts/scs-update
+              flog $LogHost set path = ( $path ../scripts )
+              flog $LogHost scs-update
               flog $LogHost ./dsys sync
               setenv Err $status
 
@@ -178,11 +179,19 @@ switch ($Phase)
         if ($use_rsync == FALSE) then
            if ($?TmpTar) then
               if ($TmpTar == yes) then
-                 flog $LogHost cd $WrkDir
+                 flog $LogHost pushd $WrkDir
                  flog $LogHost tar cf pact-tmp.tar [mpsu]*
+                 flog $LogHost popd
               endif
            endif
         endif
+
+# clean out panacea/abc to force clean build and test
+        flog $LogHost pushd $WrkDir/panacea/abc
+        flog $LogHost rm -rf dev
+        flog $LogHost rm -f *.[ch] main/abc.c
+        flog $LogHost ( find . -type d -name 'z-*' -exec rm -rf {} \; )
+        flog $LogHost popd
 
         breaksw
 

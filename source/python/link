@@ -5,6 +5,7 @@
 #
 
 set PyPACTVers = 2
+set PyPACTLib  = libpy_$PyPACTVers
 
 source ../scripts/env-csh
 
@@ -109,7 +110,7 @@ NoteD $Log -n "   Linking pdb ..... "
 Note $Log ""
 
 flog $Log $RM $PyPact/libpypdb.so $PyPact/libpypdb.so.1 _pdb.so
-flog $Log $AR ../../libpy.a
+flog $Log $AR ../../${PyPACTLib}.a
 flog $Log $AR ../../libscore.a
 flog $Log $AR ../../libpml.a
 flog $Log $AR ../../libpdb.a
@@ -145,7 +146,7 @@ NoteD $Log -n "   Linking pgs ..... "
 Note $Log ""
 
 flog $Log $RM $PyPact/libpypgs.so $PyPact/libpypgs.so.1 _pgs.so
-flog $Log $AR ../../libpy.a
+flog $Log $AR ../../${PyPACTLib}.a
 flog $Log $AR ../../libscore.a
 flog $Log $AR ../../libpml.a
 flog $Log $AR ../../libpdb.a

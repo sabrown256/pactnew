@@ -9,7 +9,7 @@
 
 # if Py_DEBUG is set, then sys.gettotalrefcount exists
 
-import pact.pdb as pdb
+import pact_2.pdb as pdb
 #import gc
 import unittest
 

@@ -9,7 +9,8 @@
 # include "cpyright.h"
 #
 
-LibName=py-2.0
+PyPACTVers = 2
+LibName=py_${PyPACTVers}
 PyDir  = ${LibDir}/python${PyVers}/pact
 TGTLib = ${LibDir}/lib${LibName}.a
 
