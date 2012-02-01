@@ -270,12 +270,12 @@ static void _PG_tick_div_dec(PG_axis_tick_def *td, double *vo,
 /* compute the number of divisions NA - corresponds to minor tick spacings
  * add extra decades to get minor ticks above and below the extremal major ticks
  */
-    da = 0;                               /* above */
+    da = 1;                               /* above */
     db = 1;                               /* below */
     na = dlv + 1 + da + db;
     na = max(2, na);
     if (na > _PG_gattrs.axis_max_major_ticks)
-       dexp = na/_PG_gattrs.axis_max_major_ticks;
+       dexp = na/(_PG_gattrs.axis_max_major_ticks + 1);
     else
        dexp = 1;
 

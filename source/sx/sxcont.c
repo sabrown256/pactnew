@@ -1406,6 +1406,11 @@ void SX_install_global_vars(SS_psides *si)
                   SS_acc_double,
                   &SX_gs.interp_strength);
 
+    SS_install_cf(si, "interpolation-mq-scale",
+                  "Variable: multiplier on scale factor used in MQ interpolation\n     Usage: interpolation-mq-scale #",
+                  SS_acc_double,
+                  &SX_gs.interp_mq_scale);
+
 /* KLMN */
     SS_install_cf(si, "labels",
                   "Variable: Controls drawing plot labels\n    Usage: labels on | off ",

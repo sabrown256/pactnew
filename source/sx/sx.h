@@ -542,6 +542,7 @@ struct s_SX_global_state
     double interp_power;
     double interp_scale;
     double interp_strength;
+    double interp_mq_scale;
 
     int gri_type_size;       /* GUI controls */
 

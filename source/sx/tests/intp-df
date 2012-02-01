@@ -1,0 +1,95 @@
+#!/bin/csh -f
+#
+# INTP-DF - SX PDBView mesh interpolation test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set make_ps = FALSE
+
+set msg = "PDBView Mesh Intp Test ......."
+set exe = $BinDir/sx
+set opt = ( $pvopt -l $FilesDir/intp.scm )
+set io  = intp-df.res
+
+@ err = 0
+
+if ($?OMIT_INTERP == 1) then
+   NoteD $Log "                    $msg omitted"
+else
+
+   NoteD $Log ""
+   NoteD $Log "                    $msg"
+   Note $Log ""
+
+   flog $Log pwd
+
+   if ($err == 0) then
+      NoteD $Log -n "                       Running test .............. "
+      Note $Log ""
+      set lt = `timer -r`
+      flog $Log ( pdbview -q -e -l intp-df.scm >&! intp-df.dat )
+      @ err = $err + $status
+      set lt = `timer -b $lt`
+      if ($err == 0) then
+         NoteD $Log "ok ($lt)"
+      else
+         NoteD $Log "ng ($err/$lt)"
+      endif
+   endif
+
+   if ($err == 0) then
+      NoteD $Log -n "                       Converting tables ......... "
+      Note $Log ""
+      set lt = `timer -r`
+      flog $Log ultra -q -e -s -l intp-df-proc.scm
+      @ err = $err + $status
+      set lt = `timer -b $lt`
+      if ($err == 0) then
+         NoteD $Log "ok ($lt)"
+      else
+         NoteD $Log "ng ($err/$lt)"
+      endif
+   endif
+
+   if ($err == 0) then
+      set ref = $RefDir/intp-df.u
+      NoteD $Log -n "                       Comparing curves .......... "
+      Note $Log ""
+      set lt = `timer -r`
+
+# 0.75 is one horrid tolerance but the MQ seems to be
+# pretty unstable against round off
+      flog $Log pdbdiff -q -e -v -w -t 0.75 intp-df.u $ref -M 1 2 7 8 9 10 15 16 17 18 23 24 25 26 31
+      @ err = $err + $status
+      set lt = `timer -b $lt`
+      if ($err == 0) then
+         NoteD $Log "ok ($lt)"
+      else
+         NoteD $Log "ng ($err/$lt)"
+      endif
+   endif
+
+   if (($err == 0) && ($make_ps == TRUE)) then
+      NoteD $Log -n "                       Making plots .............. "
+      Note $Log ""
+      set lt = `timer -r`
+      flog $Log ultra -q -e -l intp-df-plot.scm
+      @ err = $err + $status
+      set lt = `timer -b $lt`
+      if ($err == 0) then
+         NoteD $Log "ok ($lt)"
+      else
+         NoteD $Log "ng ($err/$lt)"
+      endif
+   endif
+
+   $TEST_CHECK part -a intp-df -e $err -dt $dt -rpf "$rpf" $msg
+endif
+
+exit($status)

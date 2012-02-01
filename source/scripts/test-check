@@ -240,13 +240,16 @@ switch ($tgt)
            set dt = `$TIMER -b $t0`
         endif
 
+        Note $log "Advisory      = $adv"
+        Note $log "TEST_ADVISORY = $TEST_ADVISORY"
+
 # check the test advisory
         set advise = FALSE
         set alst = ( `printenv TEST_ADVISORY | sed 's/:/ /g'` )
         foreach i ($alst)
            foreach j ($adv)
               if ($i == $j) then
-                 set advise = TRUE
+                 flog $log set advise = TRUE
                  break
               endif
            end

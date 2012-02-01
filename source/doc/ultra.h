@@ -1,5 +1,5 @@
 TXT: ULTRA User's Manual
-MOD: 10/27/2009
+MOD: 2/1/2012
 
 <CENTER>
 <P>
@@ -142,13 +142,8 @@ or<p>
 
 This notation is shorthand for the thru procedure.<p>
 
-To start up ULTRA II either type &#147;ultra&#148; at a command line prompt
-or double click on the ULTRA II application icon. ULTRA II will start up
-and print a banner. (Before using ULTRA II on UNIX systems, you must define
-an ULTRA environment variable. This variable tells ULTRA II to look in the
-specified directory or directories for various configuration and extension
-files. See the <a href="#Uinst">Installation/Availability section</a> for
-details.)<p>
+To start up ULTRA II type &#147;ultra&#148; at a command line prompt.
+ULTRA II will start up and print a banner.<p>
 
 <BLOCKQUOTE>
 ULTRA II - 11.22.91
@@ -3158,7 +3153,7 @@ functionality; however, the user can change the SCHEME level functionality simpl
 editing certain files and restarting ULTRA II.<p>
 
 When ULTRA II starts up it loads in the SCHEME level functions and variables and
-then loads in the user&#146;s configuration file. The environment defined by theseo
+then loads in the user&#146;s configuration file. The environment defined by these
 two parts makes ULTRA II easier to use for most people. This mechanism also gives
 sites a convenient way of extending and customizing their environment. The part of
 the environment created by the SCHEME level functions and variables can be examined
@@ -3265,8 +3260,7 @@ are found back with the other ULTRA II functions. This list is given for
 completeness and to help users to see what kinds of functions can be written
 at the SCHEME level. The hope is that this will enable new users of ULTRA II
 to see how to extend ULTRA II to meet the needs of their particular application.
-The user may look at the coding for these functions by looking in the
-directory pointed to by their SCHEME environment variable for the files
+Users may look at the coding for these functions by looking at the files
 func.scm or help.scm<p>
 
 <p>
@@ -3653,8 +3647,8 @@ loaded into an ULTRA II session with the ld command by typing<p>
 
 Suppose you want ULTRA II to generate a gaussian function given an amplitude, a
 half-width, and a center point (this is in fact the code for the gaussian command
-and can be found in func.scm in the directory pointed to by the SCHEME
-environment variable). The following function accomplishes this:<p>
+and can be found in func.scm in the scheme directory). The following function
+accomplishes this:<p>
 
 <BLOCKQUOTE>
 <PRE> ; 
@@ -3769,8 +3763,8 @@ ULTRA II to your needs.<p>
 ULTRA II is built as a part of the PACT distribution and installation process.
 The PACT User&#146;s Guide (see the <a href="#Udocs2">Related Documentation</a>
 section) describes how to build and install the entire PACT distribution. When
-the distribution is built, ULTRA II users must configure their environment to
-run ULTRA II. In the following steps you will need to know where the default
+the distribution is built, ULTRA II users may customize their environment before
+running ULTRA II. In the following steps you will need to know where the default
 configuration file is kept (see your system administrator or the person who
 installed the PACT distribution). For the sake of example, suppose that the
 default configuration file is kept in the directory, /usr/local/scheme. It is
@@ -3788,22 +3782,15 @@ the source directory into your home directory.</B>
 <B>3. Make desired changes to .ultrarc to customize your configuration file.</B>
 <P>
 
-<B>4. Add the ULTRA environment variable to your .cshrc file.</B>
-<UL> setenv ULTRA /usr/local/scheme </UL>
-
-<B>5. For X Windows sites, verify your DISPLAY environment variable.</B>
-<P>
-
-<B>6. Run ULTRA II.</B>
+<B>4. Run ULTRA II.</B>
 <UL> ultra </UL>
 
 <P>
 
 If the custom configuration file, .ultrarc, exists in your home directory, ULTRA
 will load its contents; otherwise, ULTRA will load the contents of the default
-configuration file, ultra.ini, located in the directory indicated by the ULTRA
-environment variable. If you wish to use the default configuration file, omit
-steps 2 and 3.<p>
+configuration file, ultra.ini, located in the scheme directory. If you wish
+to use the default configuration file, omit steps 2 and 3.<p>
 
 <a name="Udocs1"></a>
 <h1 ALIGN="CENTER">Internal Documentation</h1>

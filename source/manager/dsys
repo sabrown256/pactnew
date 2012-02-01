@@ -1387,16 +1387,37 @@ CFG_DONE:
 #--------------------------------------------------------------------------
 
    case force-install:
-        setenv SESSION_CONFIG $1
-        source ../dev/$SESSION_CONFIG/include/env-pact.csh
-        rehash
-        install-pact >& /dev/null
-        set RStatus = $status
-        if ($RStatus == 0) then
-           echo "Installation for $SESSION_CONFIG succeeded"
-        else
-           echo "Installation for $SESSION_CONFIG failed"
-        endif
+
+        set cfgs = ""
+        while ($#argv > 0)
+           switch ($1)
+              case -h:
+              case help:
+                   echo ""
+                   echo "Usage: dsys force-install -h <cfg>*"
+                   echo "    h   - this help message"
+                   exit(1)
+                   breaksw
+              default:
+                   set cfgs = ( $cfgs $1 )
+                   breaksw
+           endsw
+           shift
+        end
+
+        foreach c ($cfgs)
+           echo -n "   $c ... "
+           setenv SESSION_CONFIG $c
+           source ../dev/$SESSION_CONFIG/include/env-pact.csh
+           rehash
+           install-pact >& /dev/null
+           set RStatus = $status
+           if ($RStatus == 0) then
+              echo "ok"
+           else
+              echo "ng"
+           endif
+        end
 
         breaksw
 
