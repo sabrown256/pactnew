@@ -13,6 +13,7 @@
 #define MSCALE     prm[0]
 #define MSTRENGTH  prm[1]
 #define MPOWER     prm[2]
+#define MQSCALE    prm[3]
 
 /* compute MQ basis function from the distance between
  * ND point XI[K] and XO[IP[1,...,ND]]
@@ -680,29 +681,40 @@ static double *_PM_mq_coef(int nd, int n, double **x, double *f, double rs)
 
 static void _PM_mq_eval(int nd, int n, double **xi, double rs, double *coef,
 			int *mx, double **xo, double *f)
-   {int i, j, k, l, ic;
-    int ip[PM_SPACEDM], lmx[PM_SPACEDM];
+   {int l, lc, id, ic, io, is, no;
+    int *ip, *str;
     double dc, fc;
 
-    for (i = 0; i < PM_SPACEDM; i++)
-        lmx[i] = 1;
-    for (i = 0; i < nd; i++)
-        lmx[i] = mx[i];
+    ip  = CMAKE_N(int, nd);
+    str = CMAKE_N(int, nd+1);
 
-    for (i = 0; i < lmx[0]; i++)
-        {ip[0] = i;
-	 for (j = 0; j < lmx[1]; j++)
-	     {ip[1] = j;
-	      for (k = 0; k < lmx[2]; k++)
-		  {ip[2] = k;
-		   ic    = (k*lmx[1] + j)*lmx[0] + i;
-		   fc    = 0.0;
-		   for (l = 0; l < n; l++)
-		       {BASIS_MQ(dc, nd, xi, l, xo, ip, rs);
+    no = 1;
+    for (id = 0; id < nd; id++)
+        {ip[id]  = 0;
+	 str[id] = no;
+	 no     *= mx[id];};
+    str[nd] = no;
 
-			fc += coef[l]*dc;};
+    for (io = 0; io < no; io++)
 
-		   f[ic] = fc;};};};
+/* get the index coordinates for io because xo is a Cartesian product mesh */
+        {lc = io;
+	 for (id = nd-1; id >= 0; id--)
+	     {is = str[id];
+	      ic = lc / is;
+	      lc = lc - ic*is;
+	      ip[id] = ic;};
+
+/* evaluate the function at io */
+	 fc = 0.0;
+	 for (l = 0; l < n; l++)
+	     {BASIS_MQ(dc, nd, xi, l, xo, ip, rs);
+	      fc += coef[l]*dc;};
+
+	 f[io] = fc;};
+
+    CFREE(ip);
+    CFREE(str);
 
     return;}
 
@@ -723,7 +735,7 @@ int PM_interp_mesh_mq(int nd, int nf, int ni, double **xi, double **fi,
     double xc, dx, xmn, xmx, rs, rsc;
     double *xic, *xoc, *coef;
 
-    rs = MSCALE;
+    rs = MQSCALE;
 
     no = 1;
     for (id = 0; id < nd; id++)
@@ -826,20 +838,30 @@ double **PM_interpolate_mapping_mq(PM_mapping *dest, PM_mapping *source,
  *                        - onto an intermediate vector of arrays TRE
  *                        - centered on the mapping DEST
  *                        - return TRE
- *                        - the value of WGTFL determines method:
- *                        -   -1 use multi-quadric interpolation
+ *                        - the value of MTH determines method:
+ *                        -   -N use IWD if more than N points
+ *                        -      otherwise use MQ
+ *                        -   -1 use MQ interpolation
  *                        -    0 use inverse distance weighting
- *                        -    1 return inverse distance weighting weights
+ *                        -    1 return IWD weights
  */
 
 double **PM_interpolate_mapping(PM_mapping *dest, PM_mapping *source,
-				int wgtfl, double *prm)
-   {double **tre;
+				int mth, double *prm)
+   {int np;
+    double **tre;
 
-    if (wgtfl == -1)
-       tre = PM_interpolate_mapping_mq(dest, source, wgtfl, prm);
+/* -N option gives a way to automatically get away from O(N^2)
+ * MQ method when the number of points gets big - user defined big at that
+ */
+    np = source->domain->n_elements;
+    if (mth < -1)
+       mth = (-mth < np) ? 0 : -1;
+
+    if (mth < 0)
+       tre = PM_interpolate_mapping_mq(dest, source, mth, prm);
     else
-       tre = PM_interpolate_mapping_id(dest, source, wgtfl, prm);
+       tre = PM_interpolate_mapping_id(dest, source, mth, prm);
 
     return(tre);}
 

@@ -471,6 +471,8 @@
 ;--------------------------------------------------------------------------
 
 (remarks "Generate a hyper-plane of data")
+(interpolation-method idw)
+(interpolation-scale 1.1)
 
 (data-id off)
 (printf nil "-> hyper-plane 0 '(1 0.5 1.5 20) '(1 0.5 1.5 30)\n")

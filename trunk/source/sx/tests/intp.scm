@@ -41,6 +41,7 @@
 
 (printf nil "inverse distance weight\n")
 (interpolation-method idw)
+(interpolation-scale 1.1)
 
 hyper-plane 0 (list 1 0 1.5 nxi)
 (label-drawable "line" (sqr 1))
@@ -71,6 +72,7 @@ hyper-plane 0 (list 1 0 1.5 nxi)
 (dl)
 (printf nil "multiquadric\n")
 (interpolation-method mq)
+(interpolation-mq-scale 1.0e-10)
 
 hyper-plane 0 (list 1 0 1.5 nxi)
 (label-drawable "line" (sqr 1))
@@ -119,6 +121,7 @@ hyper-plane 0 (list 1 0 1.5 nxi)
 (dl)
 (printf nil "inverse distance weight\n")
 (interpolation-method idw)
+(interpolation-scale 1.1)
 
 hyper-plane 0 (list 1 1 nxi nxi) (list 1 1 nyi nyi)
 
@@ -156,6 +159,7 @@ hyper-plane 0 (list 1 1 nxi nxi) (list 1 1 nyi nyi)
 (dl)
 (printf nil "multiquadric\n")
 (interpolation-method mq)
+(interpolation-mq-scale 1.0e-10)
 
 hyper-plane 0 (list 1 1 nxi nxi) (list 1 1 nyi nyi)
 
@@ -215,6 +219,7 @@ hyper-plane 0 (list 1 1 nxi nxi) (list 1 1 nyi nyi)
 (dl)
 (printf nil "inverse distance weight\n")
 (interpolation-method idw)
+(interpolation-scale 1.1)
 
 hyper-plane 0 (list 1 1 10 nxi) (list 1 1 11 nyi) (list 1 1 12 nzi)
 (label-drawable "plane" (sqr 1))
@@ -237,6 +242,7 @@ hyper-plane 0 (list 1 1 10 nxi) (list 1 1 11 nyi) (list 1 1 12 nzi)
 (dl)
 (printf nil "multiquadric\n")
 (interpolation-method mq)
+(interpolation-mq-scale 1.0e-10)
 
 hyper-plane 0 (list 1 1 10 nxi) (list 1 1 11 nyi) (list 1 1 12 nzi)
 
@@ -247,30 +253,6 @@ hyper-plane 0 (list 1 1 10 nxi) (list 1 1 11 nyi) (list 1 1 12 nzi)
 (move "V1" win-name 1)
 
 (wu)
-;(pause)
-
-;--------------------------------------------------------------------------
-;--------------------------------------------------------------------------
-
-; 3D test - multiquadric interpolation
-
-;(cv "V1")
-;(dl)
-;(cv "V0")
-;(dl)
-;(printf nil "multiquadric\n")
-;(interpolation-method mq)
-
-;hyper-plane 0 (list 1 1 10 nxi) (list 1 1 11 nyi) (list 1 1 12 nzi)
-
-;(label-drawable "plane" (sqr 1))
-;(label-drawable "refine" (refine 1 nr))
-;(label-drawable "weights" (interpolation-weights 1 nr))
-;(lsv)
-
-;(move "V1" win-name 1)
-
-;(wu)
 ;(pause)
 
 ;--------------------------------------------------------------------------

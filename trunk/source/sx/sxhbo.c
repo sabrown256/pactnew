@@ -276,12 +276,13 @@ static void _SX_map_list_label(SS_psides *si, char *label, object *argl)
 
 static double **_SX_interpolate_mapping(PM_mapping *dest, PM_mapping *source,
 					int wgtfl)
-   {double prm[3];
+   {double prm[4];
     double **tre;
 
     prm[0] = SX_gs.interp_scale;
     prm[1] = SX_gs.interp_strength;
     prm[2] = SX_gs.interp_power;
+    prm[3] = SX_gs.interp_mq_scale;
 
     tre = PM_interpolate_mapping(dest, source, wgtfl, prm);
 

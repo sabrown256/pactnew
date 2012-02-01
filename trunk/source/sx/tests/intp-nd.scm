@@ -15,6 +15,9 @@
 (plot-date off)
 (grid on)
 
+(interpolation-scale     1.1)
+(interpolation-mq-scale  1.0e-10)
+
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
@@ -61,6 +64,7 @@
 	       (zo  (sqr (plane nd xmn xmx nrl nil))))
 
               (interpolation-method idw)
+
 	      (label-drawable "plane-i" zi)
 	      (label-drawable "plane-o" zo)
 

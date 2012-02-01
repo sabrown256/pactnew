@@ -278,7 +278,7 @@ int test_4(void)
    {int i, j, l, nd, nf, nl, nx, ny, rv, ok;
     int mxo[2];
     double inl;
-    double prm[3];
+    double prm[4];
     double **f, **r, **fo, **xo;
     FILE *out;
 
@@ -306,6 +306,7 @@ int test_4(void)
     prm[0] = 0.0;
     prm[1] = 0.0;
     prm[2] = 0.0;
+    prm[3] = 0.0;
     ok = PM_interp_mesh_mq(nd, nf, nl, r, f, mxo, xo, fo, prm);
     SC_ASSERT(ok == TRUE);
 
@@ -345,13 +346,13 @@ int test_4(void)
 
 /*--------------------------------------------------------------------------*/
 
-/* TEST_5 - test 2d multi-quadric */
+/* TEST_5 - test 2d inverse distance weighting */
 
 int test_5(void)
    {int i, j, l, nd, nf, nl, nx, ny, rv, ok;
     int mxo[2];
     double inl;
-    double prm[3];
+    double prm[4];
     double **f, **r, **fo, **xo;
     FILE *out;
 
@@ -379,6 +380,7 @@ int test_5(void)
     prm[0] = 0.2;
     prm[1] = 2.0;
     prm[2] = 2.0;
+    prm[3] = 0.2;
     ok = PM_interp_mesh_id(nd, nf, nl, r, f, mxo, xo, fo, prm);
     SC_ASSERT(ok == TRUE);
 
