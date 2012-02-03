@@ -182,6 +182,8 @@ static void _SX_unop(PFDoubleR fn, char *t, void *d,
     PM_array_real(type, d, n, w);
 
 /* operate on the data */
+
+#pragma omp parallel for
     for (i = 0; i < n; i++)
         w[i] = fn(w[i]);
 
@@ -288,8 +290,10 @@ object *_SX_m11_x(SS_psides *si, C_procedure *cp, object *argl)
             xp = *(double **) set->elements;
             n  = set->n_elements;
             fn = (PFDoubleR) cp->proc[0];
-            for (i = 0; i < n; xp++, i++)
-                *xp = fn(*xp);
+
+#pragma omp parallel for
+            for (i = 0; i < n; i++)
+                xp[i] = fn(xp[i]);
 
 /* for later
             SX_gs.dataset[j].modified = TRUE;
@@ -356,8 +360,10 @@ void _SX_cmp_b_set(PFVoid oper, PM_set *set, double a, int cmp)
 
          fnc = (PFDoubleRR) oper;
 	 yp = ya[id];
-	 for (i = 0; i < n; yp++, i++)
-	     *yp = fnc(*yp, a);};
+
+#pragma omp parallel for
+	 for (i = 0; i < n; i++)
+	     yp[i] = fnc(yp[i], a);};
 
     PM_find_extrema(set);
 

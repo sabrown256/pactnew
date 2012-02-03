@@ -1085,7 +1085,7 @@ extern void
 
 extern int
  SC_init_threads(int np, PFTid tid), 
- SC_init_omp(void),
+ SC_init_omp(int c, char **v),
  SC_using_tpool(void),
  SC_current_thread(void),
  SC_queue_next_item(int ng);
