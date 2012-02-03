@@ -63,6 +63,8 @@ static INLINE double DISTANCE(double **a, int ia, double **b,
     double xa, xb, dx, d;
 
     d = 0.0;
+
+#pragma omp parallel for private(xa, xb, dx)
     for (j = 0; j < nd; j++)
         {xa = a[j][ia];
 	 xb = b[j][ib];
@@ -104,6 +106,7 @@ static int *_PM_find_overlap_margin(int nc, PM_set *dd, PM_set *sd,
     dty  = dd->es_type;
     PM_array_real(dty, dd->scales, dnde, dsc);
 
+#pragma omp parallel for private(rc, dc, sc, ic, lc, tc)
     for (id = 0; id < dnde; id++)
         {rc = ssc[id]/dsc[id] - 1.0;
 	 rc = max(rc, 0.0);
@@ -154,6 +157,7 @@ static void _PM_find_overlap_point(int *tb, int *ta, PM_set *dd, double *ds,
     dty  = dd->es_type;
     PM_array_real(dty, dd->scales, nd, dsc);
 
+#pragma omp parallel for private(dc, rc, lc, gc, tc)
     for (id = 0; id < nd; id++)
         {dc = ddix[id];
 
@@ -185,6 +189,7 @@ void _PM_coord_interp_param(double *ad, double *bd, int nd,
    {int j, ld;
     double xn, xx, inx;
 
+#pragma omp parallel for private(xn, xx, ld, inx)
     for (j = 0; j < nd; j++)
         {xn  = extr[2*j];
 	 xx  = extr[2*j + 1];
@@ -251,6 +256,7 @@ static void _PM_inv_dist_wgt(SC_array *pwd, int *nof,
        pw = MPOWER;
 
     im = 0;
+
     for (is = 0; is < sne; is++)
 
 /* compute the point ID nearest IS but closer to the index space origin */
@@ -469,6 +475,8 @@ double **PM_interpolate_mapping_id(PM_mapping *dest, PM_mapping *source,
     PM_free_vectors(dnde, s);
 
 /* invert the weights taking care with zero values */
+
+#pragma omp parallel for private(wgc)
     for (i = 0; i < dne; i++)
         {wgc = wgt[i];
 	 wgt[i] = (wgc == 0.0) ? 0.0 : 1.0/wgc;};
@@ -478,17 +486,27 @@ double **PM_interpolate_mapping_id(PM_mapping *dest, PM_mapping *source,
 	
 /* just return the inverse weights */
 	 if (wgtfl)
-	    {for (i = 0; i < dne; i++)
+	    {
+
+#pragma omp parallel for private(iwc)
+	     for (i = 0; i < dne; i++)
 	         {iwc    = wgt[i];
-		  trc[i] = iwc;};}
+		  trc[i] = iwc;};
+
+	     }
 
 /* normalize the destination values by the inverse weights */
 	 else
-	    {for (i = 0; i < dne; i++)
+	    {
+
+#pragma omp parallel for private(iwc, tc)
+	     for (i = 0; i < dne; i++)
 	         {iwc    = wgt[i];
 		  tc     = trc[i]*iwc;
 		  tc     = (ABS(tc) <= SMALL) ? 0.0 : tc;
-		  trc[i] = tc;};};};
+		  trc[i] = tc;};
+
+	    };};
 
     SC_free_array(wda, NULL);
 
@@ -530,7 +548,12 @@ int PM_interp_mesh_id(int nd, int nf, int ni, double **xi, double **fi,
     extr = CMAKE_N(double, 2*nd);
     rat  = CMAKE_N(double, nd);
 
+    for (id = 0; id < nd; id++)
+        xo[id] = CMAKE_N(double, mxo[id]);
+
 /* compute the output cartesian product mesh */
+
+#pragma omp parallel for private(nxo, xic, xmn, xmx, dx, xoc)
     for (id = 0; id < nd; id++)
         {nxo = mxo[id];
 	 xic = xi[id];
@@ -548,8 +571,7 @@ int PM_interp_mesh_id(int nd, int nf, int ni, double **xi, double **fi,
 	 extr[2*id+1] = xmx;
 	 rat[id]      = 1.0;
 
-	 xoc    = CMAKE_N(double, nxo);
-	 xo[id] = xoc;
+	 xoc = xo[id];
 	 for (i = 0; i < nxo; i++)
 	     xoc[i] = xmn + i*dx;};
 
@@ -629,23 +651,23 @@ static INLINE void MASK(double *d)
 
 static double *_PM_mq_coef(int nd, int n, double **x, double *f, double rs)
    {int i, j, id;
-    double dc;
-    double *xc, *dx, *coef;
+    double dc, dxc;
+    double *xc, *coef;
     PM_matrix *a, *b;
-
-    dx = CMAKE_N(double, nd);
 
     a = PM_create(n, n);
     b = PM_create(n, 1);
 
 /* set up the real, symmetric matrix that is used in solving for coef */
+
+#pragma omp parallel for private(i, dc, xc, dxc)
     for (j = 2; j <= n; j++)
         {for (i = 1; i <= j; i++)
 	     {dc = 0.0;
 	      for (id = 0; id < nd; id++)
-		  {xc = x[id];
-		   dx[id] = xc[i-1] - xc[j-1];
-		   dc += dx[id]*dx[id];};
+		  {xc  = x[id];
+		   dxc = xc[i-1] - xc[j-1];
+		   dc += dxc*dxc;};
 
 	      MASK(&dc);
 	      dc = sqrt(dc + rs);
@@ -653,6 +675,7 @@ static double *_PM_mq_coef(int nd, int n, double **x, double *f, double rs)
 	      PM_element(a, i, j) = dc;
 	      PM_element(a, j, i) = dc;};};
 
+#pragma omp parallel for
     for (i = 1; i <= n; i++)
         {PM_element(a, i, i) = sqrt(rs);
 	 PM_element(b, i, 1) = f[i-1];};
@@ -661,13 +684,12 @@ static double *_PM_mq_coef(int nd, int n, double **x, double *f, double rs)
 
     coef = CMAKE_N(double, n);
 
+#pragma omp parallel for
     for (i = 1; i <= n; i++)
         coef[i-1] = PM_element(b, i, 1);
 
     PM_destroy(a);
     PM_destroy(b);
-
-    CFREE(dx);
 
     return(coef);}
  
@@ -707,6 +729,8 @@ static void _PM_mq_eval(int nd, int n, double **xi, double rs, double *coef,
 
 /* evaluate the function at io */
 	 fc = 0.0;
+
+#pragma omp parallel for
 	 for (l = 0; l < n; l++)
 	     {BASIS_MQ(dc, nd, xi, l, xo, ip, rs);
 	      fc += coef[l]*dc;};
@@ -741,10 +765,15 @@ int PM_interp_mesh_mq(int nd, int nf, int ni, double **xi, double **fi,
     for (id = 0; id < nd; id++)
         no *= mxo[id];
 
+    for (id = 0; id < nd; id++)
+        xo[id] = CMAKE_N(double, mxo[id]);
+
 /* compute the output cartesian product mesh
  * and the mesh based estimate of RS
  */
     rsc = 4.0/ni;
+
+#pragma omp parallel for private(nxo, xic, xmn, xmx, xc, dx, xoc)
     for (id = 0; id < nd; id++)
         {nxo = mxo[id];
 	 xic = xi[id];
@@ -760,8 +789,7 @@ int PM_interp_mesh_mq(int nd, int nf, int ni, double **xi, double **fi,
 	 rsc *= dx;
 	 dx  /= (nxo - 1.0);
 
-	 xoc    = CMAKE_N(double, nxo);
-	 xo[id] = xoc;
+	 xoc = xo[id];
 	 for (i = 0; i < nxo; i++)
 	     xoc[i] = xmn + i*dx;};
 

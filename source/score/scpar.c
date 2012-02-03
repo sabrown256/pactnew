@@ -309,6 +309,47 @@ int SC_init_threads(int nt, PFTid tid)
     return(ret);}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_INIT_OMP - initialize OMP operation */
+
+int SC_init_omp(void)
+   {int ip, rs, nt;
+    char *p;
+
+    nt = -1;
+
+#ifdef PTHREAD_OMP
+
+/* check for number of threads */
+    p = getenv("OMP_NUM_THREADS");
+    if (p != NULL)
+       {nt = SC_stoi(p);
+	omp_set_num_threads(nt);};
+
+/* check for dynamic threads */
+    p = getenv("OMP_DYNAMIC");
+    if (p != NULL)
+       {rs = ((p[0] == 'y') || (p[0] == 'Y'));
+	omp_set_dynamic(rs);};
+
+/* if we asked for threads, force OMP to create threads now
+ * later the problem may have gotten bigger and run out of memory
+ */
+    if (nt > 0)
+       {ip = 0;
+
+#pragma omp parallel default(none) shared(ip)
+#pragma omp critical
+	ip = ip + 1;
+
+       };
+
+#endif
+
+    return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
 
 /*                                CHUNK PARALLEL                            */
 

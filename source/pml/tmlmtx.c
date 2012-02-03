@@ -23,9 +23,12 @@ double
 
 /* OPER_TEST - test basic matrix operations */
 
-static int oper_test()
-   {int nrow = 5, ncol = 3;
+static int oper_test(void)
+   {int nrow, ncol;
     PM_matrix *m, *t, *b, *a, *c;
+
+    nrow = 5;
+    ncol = 3;
 
     m = PM_create(nrow, ncol);
     CFREE(m->array);
@@ -86,8 +89,8 @@ static int oper_test()
 
 /* DET_TEST - test the determinant function */
 
-static int det_test()
-   {int i, n;
+static int det_test(void)
+   {int i, n, rv;
     double det;
     PM_matrix *m;
 
@@ -105,14 +108,16 @@ static int det_test()
 
     PM_destroy(m);
 
-    return(det == -1.0);}
+    rv = (det == -1.0);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* MAIN - a sample program */
 
-int main()
+int main(int c, char **v)
    {int err;
     int64_t bytaa, bytfa, bytab, bytfb;
 
