@@ -1,0 +1,58 @@
+#!/bin/csh -f
+#
+# RESET - backup source mods to subdirectory and restore
+#
+
+unalias *
+
+@ err = 0
+
+set dir = ""
+set rev = TRUE
+set sav = TRUE
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: reset [-h] [-r] [-s] <dir>"
+           echo "   h   this help message"
+           echo "   r   revert only - do not save"
+           echo "   s   save only - do not revert"
+           echo ""
+           exit(1)
+      case -r:
+           set sav = FALSE
+           breaksw
+      case -s:
+           set rev = FALSE
+           breaksw
+      default:
+           set dir = $1
+           breaksw
+   endsw
+   shift
+end
+
+if ("$dir" == "") then
+   echo "No backup directory specified - exiting"
+   exit(1)
+endif
+
+if (!(-d $dir)) then
+   mkdir $dir
+endif
+
+set files = ( `scs-update | grep -e '^M.*' | sed 's|^M||'` )
+
+if ($sav == TRUE) then
+   cp $files $dir
+   @ err = $err + $status
+endif
+
+if ($rev == TRUE) then
+   scs-revert $files
+   @ err = $err + $status
+endif
+
+exit($err)

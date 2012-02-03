@@ -371,6 +371,8 @@ static double *SX_extract_vector(PM_matrix *a, long o, long s, long n)
 
     src = a->array + o;
     val = CMAKE_N(double, n);
+
+#pragma omp parallel for
     for (i = 0L; i < n; i++)
         val[i] = src[i*s];
 
@@ -387,6 +389,7 @@ static void SX_insert_vector(PM_matrix *a, double *val, long o, long s, long n)
 
     src = a->array + o;
 
+#pragma omp parallel for
     for (i = 0L; i < n; i++)
         src[i*s] = val[i];
 
@@ -403,12 +406,21 @@ static void SX_normalize_vector(double *val, long n)
     
     PM_maxmin(val, &xmin, &xmax, n); 
     if (xmax == xmin)
-       {for (i = 0L; i < n; i++)
-            val[i] = 0.0;}
+       {
+
+#pragma omp parallel for
+	for (i = 0L; i < n; i++)
+            val[i] = 0.0;
+
+        }
     else
        {range = xmax - xmin;
+
+#pragma omp parallel for
         for (i = 0L; i < n; i++)
-            val[i] = (val[i] - xmin)/range;}
+            val[i] = (val[i] - xmin)/range;
+
+        };
 
     return;}
 
@@ -425,6 +437,7 @@ static void _SX_cnormalize_table(PM_matrix *a)
     nrow = a->nrow;
     ncol = a->ncol;
 
+#pragma omp parallel for private(vect)
     for (i = 0; i < ncol; i++)
         {vect = SX_extract_vector(a, i, ncol, nrow);
          SX_normalize_vector(vect, nrow);
@@ -463,12 +476,15 @@ static PM_set *_SX_lr_zc_domain(char *name)
     nelem = maxes[0] * maxes[1];
 
 /* shift the domain by one to make it zero origin */    
+
+#pragma omp parallel for
     for (i = 0; i < nelem; i++)
         {x[i] -= 1.0;
          y[i] -= 1.0;}
     
     extrema = set->extrema;
  
+#pragma omp parallel for
     for (i = 0; i < (2*nd); i++)
         extrema[i] -= 1.0;
 
@@ -835,7 +851,7 @@ static object *SX_delete_column(SS_psides *si, object *argl)
             for (i = 0; i < (ncol-1); i++)
                 if (data[i] > data[i+1])
                    {temp = data[i];
-                    data[i] = data[i+1];
+                    data[i]   = data[i+1];
                     data[i+1] = temp;
                     done = 0;};}                  
 
@@ -845,7 +861,7 @@ static object *SX_delete_column(SS_psides *si, object *argl)
         sdata[0] = data[0];
         for (i = 1, j = 1; i < ncol; i++)
             {if (data[i] != sdata[j-1])
-                {sdata[j++] = data[i];};}
+                sdata[j++] = data[i];};
 
 	_SX_del_label(sdata, j);
 	PM_del_col(_SX_table.current, sdata, j);

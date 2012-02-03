@@ -18,13 +18,19 @@ set Tests = ""
 while ($#argv > 0)
    switch ($1)
       case -h:
-           echo "Usage: sxtest [-h] [-vg] [<test>]*"
+           echo "Usage: sxtest [-h] [-t #] [-vg] [<test>]*"
            echo "  h       this help message"
+           echo "  t       run tests with # threads"
            echo "  vg      run tests under valgrind"
            echo "  <test>  one of: oper hash c99 pdb ptr dattr text sqlite xml hdf vif"
            echo "                  pgs axis master exa iply shell mesh intp-df intrp ar diff ext"
            echo ""
            exit(1)
+      case -t:
+           shift
+           setenv OMP_NUM_THREADS $1
+           echo "Running tests with $1 threads"
+           breaksw
       case -*:
            breaksw
       default:

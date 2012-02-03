@@ -1579,6 +1579,8 @@ PM_set *SX_rep_to_ac(char *name, double *rx, double *ry,
     ncell   = bnd[2];
     n_sides = 0;
     pzone   = zones;
+
+#pragma omp parallel for private(incr, pcell)
     for (iz = 0; iz < n_zones; iz++)
         {incr  = 0;
          while (pzone[incr] != -1)

@@ -29,8 +29,6 @@ int main(int c, char **v, char **env)
     double evalt;
     SS_psides *si;
 
-    SC_init_omp();
-
     si = SX_init(SCODE, VERSION, c, v, env);
 
     SS_init(si, "Aborting with error", SX_end,
@@ -51,16 +49,16 @@ int main(int c, char **v, char **env)
 
     PG_IO_INTERRUPTS(FALSE);
 
-    cmd         = NULL;
-    commnd_flag = FALSE;
-    script_file = FALSE;
-    pvflag      = FALSE;
-    tflag       = FALSE;
-    load_init   = TRUE;
-    trap_error  = TRUE;
-    SX_gs.gr_mode  = TRUE;
-    load_rc     = TRUE;
-    zsp         = 2;
+    cmd           = NULL;
+    commnd_flag   = FALSE;
+    script_file   = FALSE;
+    pvflag        = FALSE;
+    tflag         = FALSE;
+    load_init     = TRUE;
+    trap_error    = TRUE;
+    SX_gs.gr_mode = TRUE;
+    load_rc       = TRUE;
+    zsp           = 2;
 
     upix = FALSE;
 

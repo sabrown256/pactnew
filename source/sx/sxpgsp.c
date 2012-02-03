@@ -169,6 +169,8 @@ static object *_SXI_drw_mrk(SS_psides *si, object *argl)
     mrk = 0;
     nd  = 2;
     cs  = WORLDC;
+
+#pragma omp parallel for
     for (id = 0; id < PG_SPACEDM; id++)
         x[id] = SS_null;
 
@@ -361,7 +363,7 @@ static object *_SXI_ddpn(SS_psides *si, object *argl)
     PG_draw_disjoint_polyline_n(dev, nd, cs, (long) n/2, x, clip);
 
     for (i = 0; i < nd; i++)
-        {CFREE(x[i]);};
+        CFREE(x[i]);
 
     return(SS_f);}
 
@@ -483,7 +485,7 @@ static object *_SXI_draw_polyline(SS_psides *si, object *argl)
 	PG_draw_polyline_n(dev, nd, cs, n, x, clip);
 
 	for (i = 0; i < nd; i++)
-	    {CFREE(x[i]);};};
+	    CFREE(x[i]);};
 
     return(SS_f);}
 

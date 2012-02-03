@@ -1945,6 +1945,8 @@ static object *_SX_map_ran_extrema(SS_psides *si, PM_mapping *m)
     nd = 0;
 
 /* NOTE: allow up to 10 dimensional ranges */
+
+#pragma omp parallel for
     for (i = 0; i < 10; i++)
         {rextr[2*i]   =  HUGE_REAL;
          rextr[2*i+1] = -HUGE_REAL;};
@@ -1956,6 +1958,7 @@ static object *_SX_map_ran_extrema(SS_psides *si, PM_mapping *m)
     
 	     PM_array_real(s->element_type, s->extrema, nd, extr);
 
+#pragma omp parallel for
 	     for (i = 0; i < (nd/2); i++)
 	         {rextr[2*i]   = min(rextr[2*i], extr[2*i]);
 		  rextr[2*i+1] = max(rextr[2*i+1], extr[2*i+1]);};};};
@@ -1993,6 +1996,8 @@ static object *_SX_map_dom_extrema(SS_psides *si, PM_mapping *m)
 
     rextr = CMAKE_N(double, n);
     extr  = CMAKE_N(double, n);
+
+#pragma omp parallel for
     for (id = 0; id < nd; id++)
         {rextr[2*id]   = HUGE_REAL;
 	 rextr[2*id+1] = -HUGE_REAL;};
@@ -2007,6 +2012,7 @@ static object *_SX_map_dom_extrema(SS_psides *si, PM_mapping *m)
 	 if ((s != NULL) && (s->dimension == nd))
 	    {PM_array_real(s->element_type, s->extrema, n, extr);
 
+#pragma omp parallel for
 	     for (id = 0; id < nd; id++)
 	         {rextr[2*id]   = min(rextr[2*id], extr[2*id]);
 		  rextr[2*id+1] = max(rextr[2*id+1], extr[2*id+1]);};};};

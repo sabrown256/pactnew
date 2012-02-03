@@ -358,6 +358,9 @@ SS_psides *SS_init_scheme(char *code, char *vers,
 			  int c, char **v, char **env)
    {SS_psides *si;
 
+/* setup OMP the very first thing */
+    SC_init_omp(c, v);
+
     SC_set_banner(" %s  -  %s\n\n", code, vers);
 
 /* try to ensure that the SCHEME environment variable is properly set */
