@@ -72,14 +72,12 @@ double *PM_matrix_done(PM_matrix *mp)
 /* PM_ZERO - zero a matrix with NR rows and NC columns */
 
 PM_matrix *PM_zero(PM_matrix *a)
-   {int i, j, nr, nc;
+   {int n, nr, nc;
 
     nr = a->nrow;
     nc = a->ncol;
-
-    for (i = 1; i <= nr; i++)
-        {for (j = 1; j <= nc; j++)
-             PM_element(a, i, j) = 0.0;};
+    n  = nr*nc;
+    PM_array_set(a->array, n, 0.0);
 
     return(a);}
 
@@ -91,19 +89,20 @@ PM_matrix *PM_zero(PM_matrix *a)
  */
 
 int PM_is_zero(PM_matrix *a)
-   {int i, j, nr, nc, ok;
-    double ac, tol;
+   {int i, n, nr, nc, ok;
+    double tol;
+    double *ar;
 
     tol = 100.0*PM_machine_precision();
 
     nr = a->nrow;
     nc = a->ncol;
+    ar = a->array;
+    n  = nr*nc;
 
     ok = TRUE;
-    for (i = 1; i <= nr; i++)
-        {for (j = 1; j <= nc; j++)
-	     {ac  = PM_element(a, i, j);
-	      ok &= (ABS(ac) <= tol);};};
+    for (i = 0; i < n; i++)
+        ok &= (ABS(ar[i]) <= tol);
 
     return(ok);}
 
@@ -121,6 +120,7 @@ PM_matrix *PM_ident(PM_matrix *a)
     if (nr > nc)
        nr = nc;
 
+#pragma omp parallel for
     for (i = 1; i <= nr; i++)
         PM_element(a, i, i) = 1.0;
 
@@ -134,35 +134,43 @@ PM_matrix *PM_ident(PM_matrix *a)
  */
 
 PM_matrix *PM_negative(PM_matrix *m, PM_matrix *a)
-   {int i, j, nr, nc;
+   {int i, n, nr, nc;
+    double *ar, *mr;
 
     nr = a->nrow;
     nc = a->ncol;
+    ar = a->array;
+    mr = m->array;
+    n  = nr*nc;
 
-    for (i = 1; i <= nr; i++)
-        for (j = 1; j <= nc; j++)
-            PM_element(m, i, j) = -PM_element(a, i, j);
+#pragma omp parallel for
+    for (i = 0; i < n; i++)
+        mr[i] = -ar[i];
 
     return(m);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_COPY - copy a matrix of NR rows and NC columns to a matrix
- *         - of the same size
+/* PM_COPY - copy a matrix of NR rows and NC columns S to a matrix
+ *         - of the same size D
  */
 
-PM_matrix *PM_copy(PM_matrix *to, PM_matrix *from)
-   {int i, j, nr, nc;
+PM_matrix *PM_copy(PM_matrix *d, PM_matrix *s)
+   {int i, n, nr, nc;
+    double *sr, *dr;
 
-    nr = from->nrow;
-    nc = from->ncol;
+    nr = s->nrow;
+    nc = s->ncol;
+    sr = s->array;
+    dr = d->array;
+    n  = nr*nc;
 
-    for (i = 1; i <= nr; i++)
-        for (j = 1; j <= nc; j++)
-            PM_element(to, i, j) = PM_element(from, i, j);
+#pragma omp parallel for
+    for (i = 0; i < n; i++)
+        dr[i] = sr[i];
 
-    return(to);}
+    return(d);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -180,8 +188,13 @@ PM_matrix *_PM_transpose(PM_matrix *m, PM_matrix *a)
     nc = a->ncol;
 
     for (i = 1; i <= nr; i++)
-        {for (j = 1; j <= nc; j++)
-             PM_element(m, j, i) = PM_element(a, i, j);};
+        {
+
+#pragma omp parallel for
+         for (j = 1; j <= nc; j++)
+             PM_element(m, j, i) = PM_element(a, i, j);
+
+        };
 
     return(m);}
 
@@ -329,7 +342,8 @@ PM_matrix *PM_negative_times(PM_matrix *a, PM_matrix *b)
 /* _PM_PLUS - add the given matrices C = A + B */
 
 PM_matrix *_PM_plus(PM_matrix *c, PM_matrix *a, PM_matrix *b)
-   {int i, j, nr, nc;
+   {int i, n, nr, nc;
+    double *ar, *br, *cr;
 
     nr = a->nrow;
     nc = a->ncol;
@@ -337,9 +351,14 @@ PM_matrix *_PM_plus(PM_matrix *c, PM_matrix *a, PM_matrix *b)
        {PM_err("ROW COLUMN MISMATCH - _PM_PLUS");
         return(NULL);};
 
-    for (i = 1; i <= nr; i++)
-        for (j = 1; j <= nc; j++)
-            PM_element(c, i, j) = PM_element(a, i, j) + PM_element(b, i, j);
+    ar = a->array;
+    br = b->array;
+    cr = c->array;
+    n = nr*nc;
+
+#pragma omp parallel for
+    for (i = 0; i < n; i++)
+        cr[i] = ar[i] + br[i];
 
     return(c);}
                 
@@ -369,7 +388,8 @@ PM_matrix *PM_plus(PM_matrix *a, PM_matrix *b)
 /* _PM_MINUS - subtract the given matrices C = A - B */
 
 PM_matrix *_PM_minus(PM_matrix *c, PM_matrix *a, PM_matrix *b)
-   {int i, j, nr, nc;
+   {int i, n, nr, nc;
+    double *ar, *br, *cr;
 
     nr = a->nrow;
     nc = a->ncol;
@@ -377,9 +397,14 @@ PM_matrix *_PM_minus(PM_matrix *c, PM_matrix *a, PM_matrix *b)
        {PM_err("ROW COLUMN MISMATCH - _PM_MINUS");
         return(NULL);};
 
-    for (i = 1; i <= nr; i++)
-        for (j = 1; j <= nc; j++)
-            PM_element(c, i, j) = PM_element(a, i, j) - PM_element(b, i, j);
+    ar = a->array;
+    br = b->array;
+    cr = c->array;
+    n = nr*nc;
+
+#pragma omp parallel for
+    for (i = 0; i < n; i++)
+        cr[i] = ar[i] - br[i];
 
     return(c);}
                 
@@ -449,8 +474,8 @@ int PM_del_col(PM_matrix *a, long *col, long ncol)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PM_GET_COL - Return the specified column from the input matrix
- *            - assumes 0 based column numbering
+/* _PM_GET_COL - return the specified column from the input matrix
+ *             - assumes 0 based column numbering
  */
 
 
@@ -476,9 +501,9 @@ double *_PM_get_col(PM_matrix *a, int col)
  /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PM_PUT_COL - Replace the values in the specified column with the input
- *            - array.
- *            - assumes 0 based column numbering
+/* _PM_PUT_COL - replace the values in the specified column with the input
+ *             - array.
+ *             - assumes 0 based column numbering
  */
 
 
@@ -503,7 +528,7 @@ int _PM_put_col(PM_matrix *a, int col, double *put)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_SORT_ON_COL - Sort the input matrix on the specified column
+/* PM_SORT_ON_COL - sort the input matrix on the specified column
  *                - assumes 0 based column numbering
  */
 

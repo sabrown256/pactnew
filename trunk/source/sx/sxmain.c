@@ -29,6 +29,8 @@ int main(int c, char **v, char **env)
     double evalt;
     SS_psides *si;
 
+    SC_init_omp();
+
     si = SX_init(SCODE, VERSION, c, v, env);
 
     SS_init(si, "Aborting with error", SX_end,

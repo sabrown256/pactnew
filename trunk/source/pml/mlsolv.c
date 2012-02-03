@@ -753,11 +753,14 @@ PM_matrix *PM_solve(PM_matrix *a, PM_matrix *b)
  */
 
 PM_matrix *PM_decomp(PM_matrix *a, int *ips, int flag, int *pnc)
-   {int n, ipv, ns, nc;
+   {int n, ipv, ns, nc, ok;
     int j, i, k;
+    double tol;
     double *ula, *ulb, *ulc, *uld;
     double *ala, *scales, big, size, alp, bet;
     PM_matrix *ul;
+
+    tol = 100.0*PM_machine_precision();
 
     n   = a->nrow;
     ipv = 0.0;
@@ -776,45 +779,57 @@ PM_matrix *PM_decomp(PM_matrix *a, int *ips, int flag, int *pnc)
     scales = CMAKE_N(double, n);
     ula    = ul->array;
 
+    ok = FALSE;
+
+#pragma omp parallel for private(ulb, size, big)
     for (i = 0; i < n; i++)
         {ulb = ula + i*n;
          big = 0.0;
          for (j = 0; j < n; j++)
              {size = ABS(ulb[j]);
-              if (size > big)
+              if (size - big > tol*big)
                  big = size;};
 
-         if (big == 0.0)
-            {PM_err("SINGULAR MATRIX - PM_DECOMP");
-             return(NULL);};
+         if (big < tol)
+            ok = TRUE;
 
          scales[i] = 1.0/big;};
+
+    if (ok == TRUE)
+       {PM_err("SINGULAR MATRIX - PM_DECOMP");
+	return(NULL);};
 
 /* loop over columns */
     for (j = 0; j < n; j++)
         {ulb = ula + j;
 
 /* begin super-diagonal element, beta(i,j) */
+
+#pragma omp parallel for private(ulc, bet)
          for (i = 0; i < j; i++)
              {ulc = ula + i*n;
               bet = ulc[j];
               for (k = 0; k < i; k++)
                   bet -= ulc[k]*ulb[k*n];
+
               ulc[j] = bet;};
 
          big = 0.0;
 
 /* begin the sub-diagonal element, alpha(i,j) */
+
+#pragma omp parallel for private(ulc, alp, size)
          for (i = j; i < n; i++)
              {ulc = ula + i*n;
               alp = ulc[j];
               for (k = 0; k < j; k++)
                   alp -= ulc[k]*ulb[k*n];
+
               ulc[j] = alp;
 
 /* check for the largest pivot element */
               size = scales[i]*ABS(alp);
-              if (size >= big)
+              if (size - big >= tol*big)
                  {big = size;
                   ipv = i;};};
 
@@ -822,6 +837,8 @@ PM_matrix *PM_decomp(PM_matrix *a, int *ips, int flag, int *pnc)
          if (j != ipv)
             {ulc = ula + ipv*n;
              uld = ula + j*n;
+
+#pragma omp parallel for private(size)
              for (k = 0; k < n; k++)
                  {size   = ulc[k];
                   ulc[k] = uld[k];
@@ -837,6 +854,8 @@ PM_matrix *PM_decomp(PM_matrix *a, int *ips, int flag, int *pnc)
 /* normalize the sub-diagonal terms */
          if (j != n-1)
             {size = 1.0/(ulb[j*n]);
+
+#pragma omp parallel for
              for (i = j+1; i < n; i++)
                  ulb[i*n] *= size;};};
 
@@ -885,6 +904,8 @@ double PM_determinant(PM_matrix *a)
 
     else
        {det = (nc & 1) ? -1.0 : 1.0;
+
+#pragma omp parallel for
 	for (i = 1; i <= n; i++)
 	    det *= PM_element(ul, i, i);
 
@@ -937,8 +958,13 @@ PM_matrix *PM_sol(PM_matrix *ul, PM_matrix *b, int *ips, int flag)
 	      sum    = px[ip];
 	      px[ip] = px[i];
 	      if (is >= 0)
-		 for (j = is; j <= i-1; j++)
-		     sum -= ub[j]*px[j];
+		 {
+
+#pragma omp parallel for
+		  for (j = is; j <= i-1; j++)
+		      sum -= ub[j]*px[j];
+
+		 }
 	      else if (sum != 0.0)
 		 is = i;
 
@@ -947,6 +973,8 @@ PM_matrix *PM_sol(PM_matrix *ul, PM_matrix *b, int *ips, int flag)
 	 for (i = n-1; i >= 0; i--)
 	     {ub  = ua + i*n;
 	      sum = px[i];
+
+#pragma omp parallel for
 	      for (j = i+1; j < n; j++)
 		  sum -= ub[j]*px[j];
 
@@ -985,6 +1013,8 @@ PM_matrix *_PM_inverse(PM_matrix *b, PM_matrix *a)
              PM_element(t, i, 1) = ((i == j) ? 1 : 0);
 
          x = PM_sol(lu, t, ips, FALSE);
+
+#pragma omp parallel for
          for (i = 1; i <= row; i++)
              PM_element(b, i, j) = PM_element(x, i, 1);};
 
@@ -1031,11 +1061,16 @@ PM_matrix *PM_upper(PM_matrix *a)
     u = PM_create(nrow, ncol);
 
     for (i = 1; i <= nrow; i++)
-        for (j = 1; j <= ncol; j++)
-            {if (j >= i)
-                PM_element(u, i, j) = PM_element(a, i, j);
-             else
-                PM_element(u, i, j) = 0;};
+        {
+
+#pragma omp parallel for
+         for (j = 1; j <= ncol; j++)
+             {if (j >= i)
+                 PM_element(u, i, j) = PM_element(a, i, j);
+              else
+                 PM_element(u, i, j) = 0;};
+
+	};
 
     return(u);}
 
@@ -1054,13 +1089,18 @@ PM_matrix *PM_lower(PM_matrix *a)
     l = PM_create(ncol, nrow);
 
     for (i = 1; i <= nrow; i++)
-        for (j = 1; j <= ncol; j++)
-            {if (j < i)
-                PM_element(l, i, j) = PM_element(a, i, j);
-             else if (j == i)
-                PM_element(l, i, j) = 1;
-             else
-                PM_element(l, i, j) = 0;};
+        {
+
+#pragma omp parallel for
+	 for (j = 1; j <= ncol; j++)
+             {if (j < i)
+                 PM_element(l, i, j) = PM_element(a, i, j);
+              else if (j == i)
+                 PM_element(l, i, j) = 1;
+              else
+                 PM_element(l, i, j) = 0;};
+
+        };
 
     return(l);}
 
@@ -1112,11 +1152,19 @@ PM_matrix *PM_decb(int n, int ml, int mu, PM_matrix *b, int *ip)
            {for (i = 1; i <= ml; i++)
                 {ii = mu + i;
                  k = ml + 1 - i;
+
+#pragma omp parallel for
                  for (j = 1; j <= ii; j++)
                      PM_element(b, j, i) = PM_element(b, j+k, i);
+
                  k = ii + 1;
+
+#pragma omp parallel for
                  for (j = k; j <= ll; j++)
-                     PM_element(b, j, i) = 0.0;};};
+                     PM_element(b, j, i) = 0.0;};
+
+	   };
+
         lr = ml;
         for (nr = 1; nr <= n1; nr++)
             {np = nr + 1;
@@ -1134,7 +1182,7 @@ PM_matrix *PM_decb(int n, int ml, int mu, PM_matrix *b, int *ip)
                      xm = ABS(PM_element(b, 1, i));};
              ip[nr-1] = mx;
 
-/* interchange rows nr and mx. */
+/* interchange rows nr and mx */
              if (mx != nr)
                 for (i = 1; i <= ll; i++)
                     {xx = PM_element(b, i, nr);
@@ -1142,7 +1190,7 @@ PM_matrix *PM_decb(int n, int ml, int mu, PM_matrix *b, int *ip)
                      PM_element(b, i, mx) = xx;};
              xm = PM_element(b, 1, nr);
 
-/* construct elements of l and u. */
+/* construct elements of l and u */
              if (xm == 0.0)
                 {PM_err("SINGULAR MATRIX - PM_DECB");
                  return(NULL);};
