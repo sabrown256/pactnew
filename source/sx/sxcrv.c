@@ -378,63 +378,65 @@ object *SX_mk_curve_proc(int i)
 
 /* SX_MK_CURVE - the C level function that creates a new curve object */
 
-object *SX_mk_curve(SS_psides *si, int na, double *xa, double *ya,
+object *SX_mk_curve(SS_psides *si, int na, double **x,
 		    char *label, char *filename,
 		    object *(*plt)(SS_psides *si))
-   {int i, j, k, nd, ng;
+   {int i, j, id, nd, ng;
     double tmp;
     double wc[PG_BOXSZ];
-    double *xj[PG_SPACEDM], *xi[PG_SPACEDM], *x[PG_SPACEDM];
+    double *xi[PG_SPACEDM];
+    curve *ds;
     object *o;
 
-    nd   = 2;
-    x[0] = xa;
-    x[1] = ya;
+    nd = 2;
 
     i = SX_next_space(si);
     SX_zero_curve(i);
     SX_assign_next_id(si, i, plt);
 
-    SX_gs.dataset[i].text     = CSTRSAVE(label);
-    SX_gs.dataset[i].modified = FALSE;
+    ds = SX_gs.dataset + i;
+
+    ds->text     = CSTRSAVE(label);
+    ds->modified = FALSE;
 
     if (filename != NULL)
-       SX_gs.dataset[i].file = CSTRSAVE(filename);
+       ds->file = CSTRSAVE(filename);
     else
-       SX_gs.dataset[i].file = NULL;
+       ds->file = NULL;
 
     PG_box_init(2, wc, HUGE, -HUGE);
 
     ng = FALSE;
 
-    for (j = 0; j < na; j++, x[0]++, x[1]++)
-        {tmp   = *x[0];
-         wc[0] = (tmp < wc[0]) ? tmp : wc[0];
-         wc[1] = (tmp > wc[1]) ? tmp : wc[1];
-         tmp   = *x[1];
-         wc[2] = (tmp < wc[2]) ? tmp : wc[2];
-         wc[3] = (tmp > wc[3]) ? tmp : wc[3];};
+/* #pragma omp parallel for private(j, tmp) */
+    for (id = 0; id < nd; id++)
 
-    xj[0] = xa;
-    xj[1] = ya;
-    xi[0] = SX_gs.dataset[i].x[0] = CMAKE_N(double, na);
-    ng |= (xi[0] == NULL);
-    xi[1] = SX_gs.dataset[i].x[1] = CMAKE_N(double, na);
-    ng |= (xi[1] == NULL);
+/* find limits */
+        {for (j = 0; j < na; j++)
+	     {tmp          = x[id][j];
+	      wc[2*id]     = (tmp < wc[2*id])     ? tmp : wc[2*id];
+	      wc[2*id + 1] = (tmp > wc[2*id + 1]) ? tmp : wc[2*id + 1];};
+
+/* allocate new arrays */
+         xi[id] = CMAKE_N(double, na);
+	 if (xi[id] == NULL)
+	    ng = TRUE;
+
+/* copy data */
+	 else
+	    {for (j = 0; j < na; j++)
+	         xi[id][j] = x[id][j];
+
+	     ds->x[id] = xi[id];};};
 
     if (ng == TRUE)
        SS_error(si, "OUT OF MEMORY - CREATE_CURVE", SS_null);
 
-/* copy data */
-    for (k = 0; k < na; k++)
-        {*xi[0]++ = *xj[0]++;
-         *xi[1]++ = *xj[1]++;};
+    PG_box_copy(2, ds->wc, wc);
 
-    PG_box_copy(2, SX_gs.dataset[i].wc, wc);
+    ds->n = na;
 
-    SX_gs.dataset[i].n = na;
-
-    PG_set_line_info(SX_gs.dataset[i].info, PLOT_CARTESIAN, CARTESIAN_2D,
+    PG_set_line_info(ds->info, PLOT_CARTESIAN, CARTESIAN_2D,
 		     LINE_SOLID,
 		     FALSE, 0, SX_next_color(SX_gs.graphics_device), 0, 0.0);
 

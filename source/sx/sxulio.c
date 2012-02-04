@@ -999,7 +999,7 @@ static double *SX_extract_vector(PM_matrix *a, int o, int s, int n)
 
 object *SX_table_curve(SS_psides *si, object *argl)
    {int k, na, yo, ys, xo, xs;
-    double *xa, *ya;
+    double *xa[PG_SPACEDM];
     char label[MAXLINE];
     object *ret;
 
@@ -1015,25 +1015,25 @@ object *SX_table_curve(SS_psides *si, object *argl)
             SC_INT_I, &xs,
             0);
 
-    ya = SX_extract_vector(_SX.current_table, yo, ys, na);
+    xa[1] = SX_extract_vector(_SX.current_table, yo, ys, na);
 
     if (xo != -1)
-       xa = SX_extract_vector(_SX.current_table, xo, xs, na);
+       xa[0] = SX_extract_vector(_SX.current_table, xo, xs, na);
     else
        {xo = 0;
-        xa = CMAKE_N(double, na);
+        xa[0] = CMAKE_N(double, na);
 
 #pragma omp parallel for
         for (k = 0; k < na; k++)
-            xa[k] = (double) (k+1);};
+            xa[0][k] = (double) (k+1);};
 
     snprintf(label, MAXLINE, "Table %d:%ld (%d:%d) vs (%d:%d)",
             _SX.table_n, _SX.table_ln, yo, ys, xo, xs);
 
-    ret = SX_mk_curve(si, na, xa, ya, label, _SX.table_name, NULL);
+    ret = SX_mk_curve(si, na, xa, label, _SX.table_name, NULL);
 
-    CFREE(ya);
-    CFREE(xa);
+    CFREE(xa[1]);
+    CFREE(xa[0]);
 
     return(ret);}
 

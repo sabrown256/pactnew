@@ -22,7 +22,7 @@ static object *_UL_fft(SS_psides *si, object *argl,
 		       char *type, int no, int flag, int ordr)
    {int n, i, jr, ji, n0;
     double xmn, xmx;
-    double *y, *x, *ypr, *ypi;
+    double *x[PG_SPACEDM], *ypr, *ypi;
     complex *cy, *icy;
     char *lbl;
     curve *crvr, *crvi;
@@ -57,27 +57,27 @@ static object *_UL_fft(SS_psides *si, object *argl,
         icy[i] = PM_COMPLEX(ypr[i], ypi[i]);
 
 /* GOTCHA: this assumes a common set of domain values for the curves */
-    n = PM_fft_sc_complex_data(&cy, &x, crvr->x[0], icy, n0,
+    n = PM_fft_sc_complex_data(&cy, &x[0], crvr->x[0], icy, n0,
                                xmn, xmx, flag, ordr);
 
     no += n;
 
-    y = CMAKE_N(double, no);
+    x[1] = CMAKE_N(double, no);
 
 /* extract the real part */
     for (i = 0; i < no; i++)
-        y[i] = PM_REAL_C(cy[i]);
+        x[1][i] = PM_REAL_C(cy[i]);
     lbl = SC_dsnprintf(FALSE, "Real part %s %c %c", type, crvr->id, crvi->id);
-    ch1 = SX_mk_curve(si, no, x, y, lbl, NULL, UL_plot);
+    ch1 = SX_mk_curve(si, no, x, lbl, NULL, UL_plot);
 
 /* extract the imaginary part */
     for (i = 0; i < no; i++)
-        y[i] = PM_IMAGINARY_C(cy[i]);
+        x[1][i] = PM_IMAGINARY_C(cy[i]);
     lbl = SC_dsnprintf(FALSE, "Imaginary part %s %c %c", type, crvr->id, crvi->id);
-    ch2 = SX_mk_curve(si, no, x, y, lbl, NULL, UL_plot);
+    ch2 = SX_mk_curve(si, no, x, lbl, NULL, UL_plot);
 
-    CFREE(x);
-    CFREE(y);
+    CFREE(x[0]);
+    CFREE(x[1]);
     CFREE(icy);
     CFREE(cy);
 
@@ -95,7 +95,7 @@ static object *_UL_fft(SS_psides *si, object *argl,
 object *UL_fft(SS_psides *si, int j)
    {int i, n;
     double xmn, xmx;
-    double *y, *x;
+    double *x[PG_SPACEDM];
     complex *cy;
     char *lbl;
     curve *crv;
@@ -105,29 +105,29 @@ object *UL_fft(SS_psides *si, int j)
     xmn = crv->wc[0];
     xmx = crv->wc[1];
 
-    n = PM_fft_sc_real_data(&cy, &x, crv->x[0], crv->x[1], crv->n,
+    n = PM_fft_sc_real_data(&cy, &x[0], crv->x[0], crv->x[1], crv->n,
                             xmn, xmx, _SX.fft_order);
     if (n == 0)
        SS_error(si, "FFT FAILED - UL_FFT", SS_null);
 
-    y = CMAKE_N(double, n);
-    if (y == NULL)
+    x[1] = CMAKE_N(double, n);
+    if (x[1] == NULL)
        SS_error(si, "INSUFFICIENT MEMORY - UL_FFT", SS_null);
 
 /* extract the real part */
     for (i = 0; i < n; i++)
-        y[i] = PM_REAL_C(cy[i]);
+        x[1][i] = PM_REAL_C(cy[i]);
     lbl = SC_dsnprintf(FALSE, "Real part FFT %c", crv->id);
-    cre = SX_mk_curve(si, n, x, y, lbl, NULL, UL_plot);
+    cre = SX_mk_curve(si, n, x, lbl, NULL, UL_plot);
 
 /* extract the imaginary part */
     for (i = 0; i < n; i++)
-        y[i] = PM_IMAGINARY_C(cy[i]);
+        x[1][i] = PM_IMAGINARY_C(cy[i]);
     lbl = SC_dsnprintf(FALSE, "Imaginary part FFT %c", crv->id);
-    cim = SX_mk_curve(si, n, x, y, lbl, NULL, UL_plot);
+    cim = SX_mk_curve(si, n, x, lbl, NULL, UL_plot);
 
-    CFREE(x);
-    CFREE(y);
+    CFREE(x[0]);
+    CFREE(x[1]);
     CFREE(cy);
 
     rv = SS_make_list(si, SS_OBJECT_I, cre,
@@ -199,7 +199,8 @@ static double _UL_effective_dx(double *x, double *y, int n)
 
 static object *_ULI_convlv(SS_psides *si, object *argl)
    {int jg, jh, n, gn, hn;
-    double *y, *x, *gx, *gy, *hx, *hy, dt, dxeg, dxeh;
+    double *gx, *gy, *hx, *hy, dt, dxeg, dxeh;
+    double *x[PG_SPACEDM];
     char *lbl;
     curve *crvg, *crvh;
     object *ch;
@@ -234,10 +235,10 @@ static object *_ULI_convlv(SS_psides *si, object *argl)
     if (dt == HUGE)
        dt = min(dxeg, dxeh);
 
-    PM_convolve(gx, gy, gn, hx, hy, hn, dt, &x, &y, &n);
+    PM_convolve(gx, gy, gn, hx, hy, hn, dt, &x[0], &x[1], &n);
 
     lbl = SC_dsnprintf(FALSE, "Convolution %c %c", crvg->id, crvh->id);
-    ch = SX_mk_curve(si, n, x, y, lbl, NULL, UL_plot);
+    ch = SX_mk_curve(si, n, x, lbl, NULL, UL_plot);
 
     return(ch);}
 
@@ -457,7 +458,7 @@ static object *_ULI_fit(SS_psides *si, object *obj, object *tok)
         {lbl = SC_dsnprintf(FALSE, "Fit @%d %d", SX_gs.dataset[j].id, order);}
 
     ret = SS_mk_cons(si, SS_reverse(si, ret),
-                     SX_mk_curve(si, SX_gs.default_npts, p[0], p[1],
+                     SX_mk_curve(si, SX_gs.default_npts, p,
 				 lbl, NULL, UL_plot));
 
     CFREE(cf);
@@ -565,8 +566,10 @@ static object *_ULI_fit_curve(SS_psides *si, object *argl)
     if (si->interactive == ON)
        PRINT(stdout, "\n");
 
-    ch = SX_mk_curve(si, SX_gs.dataset[j].n, SX_gs.dataset[j].x[0], UL_gs.bfa[1],
-		     local, NULL, UL_plot);
+    x[0] = SX_gs.dataset[j].x[0];
+    x[1] = UL_gs.bfa[1];
+
+    ch = SX_mk_curve(si, SX_gs.dataset[j].n, x, local, NULL, UL_plot);
 
 /* clean up */
     PM_destroy(a);
@@ -842,15 +845,21 @@ static object *_ULI_edit(SS_psides *si, int ie)
 
 object *UL_dupx(SS_psides *si, int j)
    {char *lbl;
-   object *o;
+    double *x[PG_SPACEDM];
+    curve *ds;
+    object *o;
 
-    if ((SX_gs.dataset[j].id >= 'A') && (SX_gs.dataset[j].id <= 'Z'))
-       lbl = SC_dsnprintf(FALSE, "Dupx %c", SX_gs.dataset[j].id);
+    ds = SX_gs.dataset + j;
+
+    if ((ds->id >= 'A') && (ds->id <= 'Z'))
+       lbl = SC_dsnprintf(FALSE, "Dupx %c", ds->id);
     else
-       lbl = SC_dsnprintf(FALSE, "Dupx @%d", SX_gs.dataset[j].id);
+       lbl = SC_dsnprintf(FALSE, "Dupx @%d", ds->id);
 
-    o = SX_mk_curve(si, SX_gs.dataset[j].n, SX_gs.dataset[j].x[0],
-		    SX_gs.dataset[j].x[0], lbl, NULL, UL_plot);
+    x[0] = ds->x[0];
+    x[1] = ds->x[0];
+
+    o = SX_mk_curve(si, ds->n, x, lbl, NULL, UL_plot);
         
     return(o);}
 

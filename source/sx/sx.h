@@ -723,7 +723,7 @@ extern object
  *SX_get_curve_proc(int j),
  *SX_get_curve_var(int j),
  *SX_mk_curve_proc(int i),
- *SX_mk_curve(SS_psides *si, int na, double *xa, double *ya,
+ *SX_mk_curve(SS_psides *si, int na, double **xa,
 	      char *label, char *filename,
 	      object *(*plt)(SS_psides *si)),
  *SX_set_crv_id(int i, char *id),

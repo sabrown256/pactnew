@@ -672,7 +672,7 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
     int temp_flag;                                /* flags for the pointers */
     double value, gxmin, gxmax, xt;
     double *xp1, *xp2, *yp1, *yp2;
-    double *xa, *af, *ya;                       /* pointers for accumulator */
+    double *xa[PG_SPACEDM], *af;                /* pointers for accumulator */
     char pbf2[MAXLINE];
     char *lbl;
     object *ch, *s, *tmp, *t;
@@ -794,8 +794,8 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
     UL_gs.bfb[1] = CMAKE_N(double, 1);
 
     na = n1;
-    xa = xp1;
-    ya = yp1;
+    xa[0] = xp1;
+    xa[1] = yp1;
     af = NULL;
     strcpy(pbf2, lbl);
     
@@ -808,7 +808,7 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
                 value = (double) SS_INTEGER_VALUE(s);
              else if (SS_floatp(s))
                 value = (double) SS_FLOAT_VALUE(s);
-             for (yp1 = ya, ic = 0; ic < na; yp1++, ic++)
+             for (yp1 = xa[1], ic = 0; ic < na; yp1++, ic++)
                  *yp1 = fun(*yp1, value);
              lbl = SC_dsnprintf(FALSE, "%s %g", pbf2, value);
              strcpy(pbf2, lbl);}
@@ -836,18 +836,18 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
                  yp1 = UL_gs.bfb[1];
                  CREMAKE(UL_gs.bfa[0], double, n1+2+n2);
                  CREMAKE(UL_gs.bfa[1], double, n1+2+n2);
-                 xa = af = UL_gs.bfa[0];
-                 ya = UL_gs.bfa[1];}
+                 xa[0] = af = UL_gs.bfa[0];
+                 xa[1] = UL_gs.bfa[1];}
              else
                 {xp1 = UL_gs.bfa[0];
 
                  yp1 = UL_gs.bfa[1];
                  CREMAKE(UL_gs.bfb[0], double, n1+2+n2);
                  CREMAKE(UL_gs.bfb[1], double, n1+2+n2);
-                 xa = af = UL_gs.bfb[0];
-                 ya = UL_gs.bfb[1];};
+                 xa[0] = af = UL_gs.bfb[0];
+                 xa[1] = UL_gs.bfb[1];};
 
-             na = _UL_bc_operate(cp->proc[0], xa, ya,
+             na = _UL_bc_operate(cp->proc[0], xa[0], xa[1],
 				 xp1, xp2, yp1, yp2, n1, n2);
              if (na == -1)
                 return(SS_f);};};
@@ -859,7 +859,7 @@ object *UL_bc(SS_psides *si, C_procedure *cp, object *argl)
        UL_delete(si, tmp);
 
 /* create new curve with data in the accumulator */
-    ch = SX_mk_curve(si, na, xa, ya, lbl, NULL, UL_plot);
+    ch = SX_mk_curve(si, na, xa, lbl, NULL, UL_plot);
 
     CFREE(UL_gs.bfa[0]);
     CFREE(UL_gs.bfa[1]);
@@ -938,7 +938,7 @@ object *UL_bcxl(SS_psides *si, C_procedure *cp, object *argl)
 
     lbl = SC_dsnprintf(FALSE, "%s %s",
 		       SS_get_string(si->fun), SC_strrev(local));
-    ch = SX_mk_curve(si, n, x[0], x[1], lbl, NULL, UL_plot);
+    ch = SX_mk_curve(si, n, x, lbl, NULL, UL_plot);
 
     SS_assign(si, argl, SS_null);
 
