@@ -980,6 +980,8 @@ static double *SX_extract_vector(PM_matrix *a, int o, int s, int n)
 
     src = a->array + o;
     val = CMAKE_N(double, n);
+
+#pragma omp parallel for
     for (i = 0; i < n; i++)
         val[i] = src[i*s];
 
@@ -1020,6 +1022,8 @@ object *SX_table_curve(SS_psides *si, object *argl)
     else
        {xo = 0;
         xa = CMAKE_N(double, na);
+
+#pragma omp parallel for
         for (k = 0; k < na; k++)
             xa[k] = (double) (k+1);};
 

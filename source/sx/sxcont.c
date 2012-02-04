@@ -247,8 +247,8 @@ static object *_SX_list_vobjects(SS_psides *si, char *patt,
 	     if (((type == 0) || (t == type)) && SC_regx_match(s, patt))
 	        {PRINT(stdout, " %ld  %c  %s\n", i+1, t, s);
 		 SS_assign(si, ret, SS_mk_cons(si,
-					   SS_mk_integer(si, i+1),
-					   ret));}};
+					       SS_mk_integer(si, i+1),
+					       ret));}};
 
 	SS_assign(si, ret, SS_reverse(si, ret));};
 
@@ -299,13 +299,18 @@ static void _SX_sort_lists(SX_menu_item *a, int n)
     SX_menu_item temp;
 
     for (gap = n/2; gap > 0; gap /= 2)
-        for (i = gap; i < n; i++)
-            for (j = i-gap; j >= 0; j -= gap)
-                {if (strcmp(a[j].label, a[j+gap].label) <= 0)
-                    break;
-                 temp     = a[j];
-                 a[j]     = a[j+gap];
-                 a[j+gap] = temp;};
+        {
+
+#pragma omp parallel for private(j, temp)
+	 for (i = gap; i < n; i++)
+             {for (j = i-gap; j >= 0; j -= gap)
+                  {if (strcmp(a[j].label, a[j+gap].label) <= 0)
+		      break;
+		   temp     = a[j];
+		   a[j]     = a[j+gap];
+		   a[j+gap] = temp;};};
+
+        };
 
     return;}
 
@@ -1093,10 +1098,13 @@ void SX_install_global_vars(SS_psides *si)
     si->print_flag  = FALSE;
     si->stat_flag   = FALSE;
 
+#pragma omp parallel for
     for (i = 0; i < PG_SPACEDM; i++)
         SX_gs.log_scale[i] = FALSE;
 
 /* WC to BND offset */
+
+#pragma omp parallel for
     for (i = 0; i < PG_BOXSZ; i++)
         SX_gs.gpad[i] = 0.01;
 
