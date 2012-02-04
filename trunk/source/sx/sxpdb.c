@@ -2361,7 +2361,7 @@ static int _SX_pseudo_suitable(PDBfile *file, syment *et)
 
     ok = !_PD_indirection(type);
     dp = _PD_type_lookup(file, PD_CHART_HOST, type);
-    for (dm = dp->members; dm != NULL && ok; dm = dm->next)
+    for (dm = dp->members; (dm != NULL) && (ok == TRUE); dm = dm->next)
         ok &= !_PD_indirection(dm->type);
 
     return(ok);}

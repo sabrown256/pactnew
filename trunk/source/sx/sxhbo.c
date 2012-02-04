@@ -174,6 +174,8 @@ static PM_set *_SX_build_common_domain(PM_mapping *h)
     dmx    = CMAKE_N(int, nd);
     dextr  = CMAKE_N(double, 2*nde);
     sdextr = CMAKE_N(double, 2*nde);
+
+#pragma omp parallel for
     for (i = 0; i < nde; i++)
         {dextr[2*i]   = HUGE;
          dextr[2*i+1] = -HUGE;};
@@ -189,6 +191,8 @@ static PM_set *_SX_build_common_domain(PM_mapping *h)
               dmx[i] = max(dk, sk);};
 
 	 PM_array_real(sdm->element_type, sdm->extrema, 2*snd, sdextr);
+
+#pragma omp parallel for private(sn, sx, dn, dx)
          for (i = 0; i < nde; i++)
              {sn = sdextr[2*i];
               sx = sdextr[2*i+1];
@@ -331,20 +335,28 @@ static double **_SX_extract_range(SS_psides *si,
         {sra = s[i];
 	 trc = tre[i];
 
+/* loop over neighborhood of id */
+
+#pragma omp parallel for
 	 for (id = 0; id < dne; id++)
 	     {if (id >= snre)
 		 SS_error(si, "IMPROPER MAPPING - _SX_EXTRACT_RANGE", SS_null);
+	      trc[id] = sra[id];};
 
-/* loop over neighborhood of id */
-	      trc[id] = sra[id];};};
+         };
 
     PM_free_vectors(dnde, s);
 
 /* just return the inverse weights */
     if (wgtfl > 0)
-       {for (i = 0; i < dnde; i++)
+       {
+
+#pragma omp parallel for private(trc)
+	for (i = 0; i < dnde; i++)
 	    {trc = tre[i];
-	     PM_array_set(trc, dne, 1.0);};};
+	     PM_array_set(trc, dne, 1.0);};
+
+       };
 
     return(tre);}
 
@@ -498,6 +510,7 @@ static void _SX_init_range(SS_psides *si,
     if (s != NULL)
        tre = _SX_accumulate_mapping(si, d, s, wgt);
 
+/* #pragma omp parallel for private(ok, dst, src) */
     for (i = 0; i < dnde; i++)
         {dst.data = dre[i];
 	 if (tre != NULL)
@@ -506,7 +519,7 @@ static void _SX_init_range(SS_psides *si,
 	    src.data = NULL;
 
 	 ok = PM_conv_array(&dst, &src, FALSE);
-	 if (!ok)
+	 if (ok == FALSE)
 	    SS_error(si, "CAN'T INIT ACCUMULATOR - _SX_INIT_RANGE", obj);};
 
 /* clean up the mess */
@@ -576,6 +589,8 @@ static void _SX_accumulate_range(SS_psides *si, PM_mapping *d,
 
 /* setup accumulators for each component */
     acc = CMAKE_N(C_array *, dnde);
+
+#pragma omp parallel for
     for (i = 0; i < dnde; i++)
         acc[i] = NULL;
 
@@ -598,6 +613,7 @@ static void _SX_accumulate_range(SS_psides *si, PM_mapping *d,
 	    {id = SC_arrtype(obj, -1);
 	     _SS_object_to_numtype_id(id, v, 0, obj);};
 
+/* #pragma omp parallel for private(operand) */
 	 for (i = 0; i < dnde; i++)
 	     {if (tre != NULL)
 		 operand.data = tre[i];
@@ -621,6 +637,8 @@ static void _SX_accumulate_range(SS_psides *si, PM_mapping *d,
 /* save accumulators for each component into the destination */
     operand.type   = dty;
     operand.length = ne;
+
+/* #pragma omp parallel for private(operand) */
     for (i = 0; i < dnde; i++)
         {operand.data = dre[i];
 	 PM_conv_array(&operand, acc[i], TRUE);};

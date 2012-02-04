@@ -263,8 +263,12 @@ static void _SX_shift_set(PM_set *set, double val)
 
     for (i = 0; i < nde; i++)
         {pe = elem[i];
+
+#pragma omp parallel for
          for (j = 0; j < ne; j++)
-             *pe++ += val;};
+             pe[j] += val;
+
+         };
 
     return;}
 
@@ -346,8 +350,12 @@ static void _SX_scale_set(PM_set *set, double val)
 
     for (i = 0; i < nde; i++)
         {pe = elem[i];
+
+#pragma omp parallel for
          for (j = 0; j < ne; j++)
-             *pe++ *= val;};
+             pe[j] *= val;
+
+         };
 
     return;}
 
@@ -460,13 +468,19 @@ static PM_mapping *_SXI_norm_mapping(SS_psides *si, PM_mapping *h)
     for (j = 0; j < nde; j++)
         {pr = dre;
          ps = sre[j];
+
+#pragma omp parallel for private(dx)
          for (i = 0; i < ne; i++)
-             {dx     = *ps++;
-              *pr++ += dx*dx;};};
+             {dx     = ps[i];
+              pr[i] += dx*dx;};
+
+         };
 
     pr = dre;
-    for (i = 0; i < ne; i++, pr++)
-        *pr = sqrt(*pr);
+
+#pragma omp parallel for
+    for (i = 0; i < ne; i++)
+        pr[i] = sqrt(pr[i]);
 
     elem[0] = (void *) dre;
     lbl = SC_dsnprintf(FALSE, "||%s||", range->name);
@@ -538,14 +552,18 @@ static void _SX_integrate_mapping(PM_mapping *f)
 
 /* compute the node volume */
     vol = 1.0;
+
+#pragma omp parallel for
     for (j = 0; j < nde; j++)
         vol *= dsc[j];
 
 /* multiply by the volume */
+
+#pragma omp parallel for private(i, rn)
     for (j = 0; j < ndr; j++)
         {rn = re[j];
          for (i = 0; i < ned; i++)
-             *rn++ *= vol;};
+             rn[i] *= vol;};
 
 /* scale each face by one half - corrects volume factor */
 /*
@@ -571,6 +589,8 @@ static void _SX_integrate_mapping(PM_mapping *f)
          dj   = dmx[j];
          step = lne;
          lne /= dj;
+
+#pragma omp parallel for private(id, ix, jc, is, rn)
          for (i = 0; i < ned; i++)
              {id = i % step;
               ix = id / lne;
@@ -663,11 +683,13 @@ object *SX_plane(SS_psides *si, object *argl)
     ne    = dom->n_elements;
     delem = (double **) dom->elements;
 
-    r  = pr = CMAKE_N(double, ne);
+    r = pr = CMAKE_N(double, ne);
+
+#pragma omp parallel for private(j, v)
     for (i = 0; i < ne; i++)
         {for (j = 0, v = coeff[0]; j < nde; j++)
              {v += coeff[j+1]*delem[j][i];};
-	 *pr++ = v;};
+	 pr[i] = v;};
 
 /* make the range having the same dimension as the domain */
     ran = PM_make_set_alt("Plane", SC_DOUBLE_S, FALSE, nd,
@@ -750,6 +772,7 @@ void SX_filter_coeff(SS_psides *si, double *yp, int n,
         if (ne != ne0)
            SS_error(si, "INCORRECT FILTER SIZE - _SX_FILTER_COEF", SS_null);
 
+#pragma omp parallel for
 	for (i = 0; i < ntimes; i++)
 	    PM_filter_coeff(yp, n, coeff + 1, nc);
 
@@ -806,12 +829,22 @@ static PM_mapping *_SXI_smooth(SS_psides *si, PM_mapping *h, object *argl)
 	    0);
 
     if (SC_str_icmp(SX_gs.smooth_method, "fft") == 0)
-       {for (i = 0; i < ntimes; i++)
-	    PM_smooth_fft(x[0], x[1], n, pts, PM_smooth_filter);}
+       {
+
+#pragma omp parallel for
+	for (i = 0; i < ntimes; i++)
+	    PM_smooth_fft(x[0], x[1], n, pts, PM_smooth_filter);
+
+       }
 
     else if (SC_str_icmp(SX_gs.smooth_method, "averaging") == 0)
-       {for (i = 0; i < ntimes; i++)
-	    PM_smooth_int_ave(x[0], x[1], n, pts);}
+       {
+
+#pragma omp parallel for
+	for (i = 0; i < ntimes; i++)
+	    PM_smooth_int_ave(x[0], x[1], n, pts);
+
+       }
 
     else
        {C_array *arr;
