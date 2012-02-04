@@ -1073,7 +1073,7 @@ static object *UL_derivative(SS_psides *si, int j)
 	UL_gs.bfa[0][1] = x[0][1];
 	UL_gs.bfa[1][1] = UL_gs.bfa[1][0];};
 
-    ch = SX_mk_curve(si, n-1, UL_gs.bfa[0], UL_gs.bfa[1], lbl, NULL, UL_plot);
+    ch = SX_mk_curve(si, n-1, UL_gs.bfa, lbl, NULL, UL_plot);
 
     CFREE(UL_gs.bfa[0]);
     CFREE(UL_gs.bfa[1]);      
@@ -1120,7 +1120,7 @@ static object *_ULI_thin(SS_psides *si, int j, object *argl)
     else
         {lbl = SC_dsnprintf(FALSE, "Thinned @%d", SX_gs.dataset[j].id);}
 
-    ch = SX_mk_curve(si, m, UL_gs.bfa[0], UL_gs.bfa[1], lbl, NULL, UL_plot);
+    ch = SX_mk_curve(si, m, UL_gs.bfa, lbl, NULL, UL_plot);
 
     CFREE(UL_gs.bfa[0]);
     CFREE(UL_gs.bfa[1]);      
@@ -1230,7 +1230,7 @@ static object *_ULI_integrate(SS_psides *si, int j, double d1, double d2)
     else
         {lbl = SC_dsnprintf(FALSE, "Integrate @%d", SX_gs.dataset[j].id);}
 
-    ch = SX_mk_curve(si, n, UL_gs.bfa[0], UL_gs.bfa[1], lbl, NULL, UL_plot);
+    ch = SX_mk_curve(si, n, UL_gs.bfa, lbl, NULL, UL_plot);
 
     CFREE(UL_gs.bfa[0]);
     CFREE(UL_gs.bfa[1]);
@@ -1455,7 +1455,7 @@ static object *_ULI_xmm(SS_psides *si, int j, double d1, double d2)
              UL_gs.bfa[0][k-l-1] = tempx;
              UL_gs.bfa[1][k-l-1] = tempy;};}
              
-    ch = SX_mk_curve(si, k, UL_gs.bfa[0], UL_gs.bfa[1], lbl, NULL, UL_plot);
+    ch = SX_mk_curve(si, k, UL_gs.bfa, lbl, NULL, UL_plot);
 
     CFREE(UL_gs.bfa[0]);
     CFREE(UL_gs.bfa[1]);      
@@ -1651,7 +1651,7 @@ static object *UL_smp_append(SS_psides *si, object *a, object *b)
     else
        {lbl = SC_dsnprintf(FALSE, "Append @%d @%d", SX_gs.dataset[i].id, SX_gs.dataset[j].id);}
 
-    c = SX_mk_curve(si, n, UL_gs.bfa[0], UL_gs.bfa[1], lbl, NULL, UL_plot);
+    c = SX_mk_curve(si, n, UL_gs.bfa, lbl, NULL, UL_plot);
 
     CFREE(UL_gs.bfa[0]);
     CFREE(UL_gs.bfa[1]);      
@@ -1750,7 +1750,7 @@ static object *UL_pr_append(SS_psides *si, object *a, object *b)
     else
        {lbl = SC_dsnprintf(FALSE, "Append @%d @%d", SX_gs.dataset[i].id, SX_gs.dataset[j].id);}
 
-    c = SX_mk_curve(si, n, UL_gs.bfa[0], UL_gs.bfa[1], lbl, NULL, UL_plot);
+    c = SX_mk_curve(si, n, UL_gs.bfa, lbl, NULL, UL_plot);
 
     CFREE(UL_gs.bfa[0]);
     CFREE(UL_gs.bfa[1]);      
@@ -1877,8 +1877,7 @@ object *_UL_make_ln(SS_psides *si, double slope, double interc,
     *(x[0] - 1) = last;
     *(x[1] - 1) = slope*last + interc;
 
-    ch = SX_mk_curve(si, i, UL_gs.bfa[0], UL_gs.bfa[1],
-		     "Straight line", NULL, UL_plot);
+    ch = SX_mk_curve(si, i, UL_gs.bfa, "Straight line", NULL, UL_plot);
 
     CFREE(UL_gs.bfa[0]);
     CFREE(UL_gs.bfa[1]);      
@@ -1960,7 +1959,7 @@ static object *_ULI_mk_curve(SS_psides *si, object *argl)
          else
             *x[1]++ = SS_FLOAT_VALUE(yo);};
 
-    ch = SX_mk_curve(si, n, UL_gs.bfa[0], UL_gs.bfa[1], labls, NULL, UL_plot);
+    ch = SX_mk_curve(si, n, UL_gs.bfa, labls, NULL, UL_plot);
 
     CFREE(UL_gs.bfa[0]);
     CFREE(UL_gs.bfa[1]);
