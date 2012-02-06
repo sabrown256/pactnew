@@ -13,11 +13,67 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_ADD_ENTRYP - return TRUE iff ACC and REJ determine that
+/* _PD_ADD_SYM_PTRP - return TRUE iff ACC and REJ determine that
  *                - entry NAME should be added to the symbol table
  */
 
-int _PD_add_entryp(PDBfile *file, char *name, char *type,
+int _PD_add_sym_ptrp(PDBfile *file, char *name, char *type,
+		   char *acc, char *rej)
+   {int ok;
+
+    ok = ((rej == NULL) || (SC_regx_match(name, rej) == FALSE));
+    if (ok == FALSE)
+       ok = ((acc != NULL) && (SC_regx_match(name, acc) == TRUE));
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_ADD_SYM_ANCP - return TRUE iff ACC and REJ determine that
+ *                  - NAME is in the current directory or it ancestors
+ *                  - that is, toward root
+ *                  - and should be added to the symbol table
+ */
+
+int _PD_add_sym_ancp(PDBfile *file, char *name, char *type,
+		   char *acc, char *rej)
+   {int ok;
+
+    ok = ((rej == NULL) || (SC_regx_match(name, rej) == FALSE));
+    if (ok == FALSE)
+       ok = ((acc != NULL) && (SC_regx_match(name, acc) == TRUE));
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_ADD_SYM_DESP - return TRUE iff ACC and REJ determine that
+ *                  - NAME is in the current directory or it descendants
+ *                  - that is, away from root
+ *                  - and should be added to the symbol table
+ */
+
+int _PD_add_sym_desp(PDBfile *file, char *name, char *type,
+		   char *acc, char *rej)
+   {int ok;
+
+    ok = ((rej == NULL) || (SC_regx_match(name, rej) == FALSE));
+    if (ok == FALSE)
+       ok = ((acc != NULL) && (SC_regx_match(name, acc) == TRUE));
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_ADD_SYM_CURRP - return TRUE iff ACC and REJ determine that
+ *                   - NAME is in the current directory only
+ *                   - and should be added to the symbol table
+ */
+
+int _PD_add_sym_currp(PDBfile *file, char *name, char *type,
 		   char *acc, char *rej)
    {int ok;
 
@@ -101,12 +157,22 @@ PD_delay_mode _PD_symt_set_delay_mode(PDBfile *file, char *mode)
 /* if file mode is "rp" use delay pointer mode */
 	if (strchr(mode, 'p') != NULL)
 	   {file->delay_sym = PD_DELAY_PTRS;
-	    _PD_symt_set_delay_method(file, mode, _PD_add_entryp);}
+	    _PD_symt_set_delay_method(file, mode, _PD_add_sym_ptrp);}
 
-/* if file mode is "rs" use delay all mode */
-	else if (strchr(mode, 's') != NULL)
+/* if file mode is "rsa" use delay all mode */
+	else if (strstr(mode, "sa") != NULL)
 	   {file->delay_sym = PD_DELAY_ALL;
-	    _PD_symt_set_delay_method(file, mode, _PD_add_entryp);}
+	    _PD_symt_set_delay_method(file, mode, _PD_add_sym_ancp);}
+
+/* if file mode is "rsd" use delay all mode */
+	else if (strstr(mode, "sd") != NULL)
+	   {file->delay_sym = PD_DELAY_ALL;
+	    _PD_symt_set_delay_method(file, mode, _PD_add_sym_desp);}
+
+/* if file mode is "rsc" use delay all mode */
+	else if (strstr(mode, "sc") != NULL)
+	   {file->delay_sym = PD_DELAY_ALL;
+	    _PD_symt_set_delay_method(file, mode, _PD_add_sym_currp);}
 
 	else
 	   _PD_symt_set_delay_method(file, mode, NULL);};

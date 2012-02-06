@@ -746,7 +746,6 @@ extern int
 /* PDSYMT.C declarations */
 
 extern int
- _PD_add_entryp(PDBfile *file, char *name, char *type, char *acc, char *rej),
  _PD_symt_delay_rules(PDBfile *file, int when, char **pa, char **pr),
  _PD_pare_symt(PDBfile *file),
  _PD_rd_symt(PDBfile *file, char *acc, char *rej);

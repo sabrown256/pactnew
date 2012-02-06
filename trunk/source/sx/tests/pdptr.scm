@@ -97,7 +97,7 @@ close pdptr.pdb
 
 ; open the file in delay all mode
 
-cf pdptr.pdb "rs"
+cf pdptr.pdb "rsd"
 
 ls
 
