@@ -179,9 +179,6 @@
 
 /*--------------------------------------------------------------------------*/
 
-/* temporary until hasharr rollover complete */
-typedef int (*PFDefDel)(void *a);
-
 typedef struct BF_FILE_s BF_FILE;
 typedef struct s_chardes chardes;
 typedef struct s_fixdes fixdes;
@@ -208,6 +205,10 @@ typedef struct s_PD_image PD_image;
 typedef struct s_PD_pfm_fnc PD_pfm_fnc;
 typedef memdes *(*PFPDBwrite)(PDBfile *file, char *vr, defstr *defp);
 typedef memdes *(*PFPDBread)(memdes *members);
+
+typedef int (*PFSymDelay)(PDBfile *file, char *name, char *type,
+			  char *acc, char *rej);
+
 
 /*
  * #bind derived PD_major_op integer SC_ENUM_I SC_ENUM_I PD_GENERIC
@@ -487,6 +488,9 @@ struct s_PDBfile
     void *meta;                       /* container for metadata in the tr layer */
     io_request req;
     
+    int (*symatch)(PDBfile *file, char *name, char *type,
+		   char *acc, char *rej);
+
 /* the db_layer methods */
     int (*create)(PDBfile *file, int mst);
     int (*open)(PDBfile *file);
@@ -1295,6 +1299,12 @@ extern int
  PD_register_llf(void),
  PD_register_hdf5(void),
  PD_register_pdb(void);
+
+
+/* PDSYMT.C declarations */
+
+extern PFSymDelay
+ PD_set_delay_method(PFSymDelay *mth);
 
 
 /* PDSZOF.C declarations */

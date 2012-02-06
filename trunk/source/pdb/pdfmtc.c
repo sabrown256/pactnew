@@ -552,12 +552,12 @@ static int _PD_parse_symt_iii(PDBfile *file, char *buf, int flag,
 	desc = _PD_mk_descriptor(var, file->default_offset);
 
         name = SC_strtok(desc->name, " \t", s);
+	type = desc->type;
 
 /* check to see whether or not so skip this entry */
-	ok = _PD_add_entryp(name, acc, rej);
+	ok = _PD_symatch(file, name, type, acc, rej);
 	if (ok == TRUE)
-	   {type = desc->type;
-	    dims = desc->dimensions;
+	   {dims = desc->dimensions;
 
 	    addr = SC_stol(SC_strtok(adr, " \t", s));
 	    numb = SC_stol(SC_strtok(NULL, " \t()", s));

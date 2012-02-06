@@ -17,7 +17,8 @@
  *                - entry NAME should be added to the symbol table
  */
 
-int _PD_add_entryp(char *name, char *acc, char *rej)
+int _PD_add_entryp(PDBfile *file, char *name, char *type,
+		   char *acc, char *rej)
    {int ok;
 
     ok = ((rej == NULL) || (SC_regx_match(name, rej) == FALSE));
@@ -99,13 +100,63 @@ PD_delay_mode _PD_symt_set_delay_mode(PDBfile *file, char *mode)
 
 /* if file mode is "rp" use delay pointer mode */
 	if (strchr(mode, 'p') != NULL)
-	   file->delay_sym = PD_DELAY_PTRS;
+	   {file->delay_sym = PD_DELAY_PTRS;
+	    _PD_symt_set_delay_method(file, mode, _PD_add_entryp);}
 
 /* if file mode is "rs" use delay all mode */
 	else if (strchr(mode, 's') != NULL)
-	   file->delay_sym = PD_DELAY_ALL;};
+	   {file->delay_sym = PD_DELAY_ALL;
+	    _PD_symt_set_delay_method(file, mode, _PD_add_entryp);}
+
+	else
+	   _PD_symt_set_delay_method(file, mode, NULL);};
 
     return(ov);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_SYMT_SET_DELAY_METHOD - set the file delay method
+ *                           - return the old value
+ */
+
+PFSymDelay _PD_symt_set_delay_method(PDBfile *file, char *mode,
+				     PFSymDelay mth)
+   {PFSymDelay rv;
+
+    rv = NULL;
+
+/* use global default if MTH is NULL */
+    if (mth == NULL)
+       mth = _PD.symt_delay;
+
+    if (file != NULL)
+       {rv = file->symatch;
+
+/* if file mode is "rp" use delay pointer mode */
+	if (strchr(mode, 'p') != NULL)
+	   file->symatch = mth;
+
+/* if file mode is "rs" use delay all mode */
+	else if (strchr(mode, 's') != NULL)
+	   file->symatch = mth;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_SET_SYMT_DELAY_METHOD - set the default global delay method
+ *                          - return the old value
+ */
+
+PFSymDelay PD_set_symt_delay_method(PFSymDelay mth)
+   {PFSymDelay rv;
+
+    rv = _PD.symt_delay;
+    _PD.symt_delay = mth;
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
