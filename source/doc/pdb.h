@@ -1035,19 +1035,30 @@ in memory, there are now options for keeping only part of the
 symbol table in memory at any given time.
 <p>
 Making symbol table entries that PDBLib can lookup is delayed until
-you call PD_cd to enter a directory.  At that time, the symbol
-table is read in and only the entries for the directory and its
-sub-directories are added to the symbol table.  When you call
+you call PD_cd to enter a directory.  There are special built in
+modes:
+<p>
+<pre>
+    sa    accept all entries for the current directory and its
+          ancestors (i.e. towards the root directory)
+    sc    accept all entries for the current directory only
+    sd    accept all entries for the current directory and its
+          descendants (i.e. away from the root directory)
+    p     accept pointer entries for the current directory only
+</pre>
+When you cd to a directory, the symbol
+table is read in and only the entries specified are added to the
+symbol table.  When you call
 <a href="#pd_cd"><tt>PD_cd</tt></a>
 to enter another directory the current entries are purged
 from the hash array before adding the new entries.  In this way
-only the entries for the current directory tree are available.
+only the specified entries for the current directory tree are available.
 <p>
 This give users a way to manage very large database files with
 a smaller footprint in main memory.  It should be clear that
 this comes at the expense of re-reading the entire symbol table on the
-disk file when you change directories.  PDBLib just does not keep
-entries that are not in the current directory tree.  The memory
+disk file when you change directories.  PDBLib will not keep
+entries that are not in the specified directories.  The memory
 savings can be very large.  As with all database operations, it
 depends on your database.
 <p>
@@ -1066,18 +1077,22 @@ in combination with
 <a href="#pd_cd"><tt>PD_cd</tt></a>
  to navigate around the file.
 <p>
-There are two delayed modes.  In the first, all entries are delayed.
-are delayed. While in the second, only the pointers are delayed.
-Remember that the pointee of every pointer has its own entry in
-the symbol table.  They are pretty much invisible to the user, but
-they may constitute a substantial percentage of the symbol table
-and the in memory hash array.  Delaying adding such entries may
-give a big memory savings.
+To give the user additional flexibility, PDBLib provides a function
+to register custom filters on symbol table entries.  The function
+PD_set_delay_method can be called before a PD_open to specify the
+entry filter that will be used for the next file.  It takes a
+function with prototype:
 <p>
-The delay mode is specified when you open the file.  The file
-mode "rp" causes the file to be opened in delayed pointer mode,
-and the mode "rs" cause the file to be opened in delayed symbol
-mode (all entries delayed).
+int match(PDBFile *file, char *name, char *type, char *acc, char *rej)
+<p>
+The function is called with the file, name, and type of the entry and
+a string specifying patterns that may be accepted and a string specifying
+patterns that may be rejected.  The user function can do whatever it
+needs to do with this information.  If it returns TRUE the entry is
+accepted and if FALSE the entry is rejected.
+<p>
+The old value of this default function is returned by PD_set_delay_method.
+With this you can manage the filters in a general way.
 <p>
 
 <!-- -------------------------------------------------------------------- --> 
