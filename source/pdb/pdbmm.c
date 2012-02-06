@@ -113,6 +113,8 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
 	file->date           = SC_date();
 	file->system_version = PDB_SYSTEM_VERSION;
 
+	file->symatch        = NULL;
+
 	_PD_MARK_AS_FLUSHED(file, FALSE);
 
 /* set the default format version for the file */

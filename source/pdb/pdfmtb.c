@@ -259,27 +259,29 @@ static int _PD_parse_symt_ii(PDBfile *file, char *buf, int flag,
 	 if (name == NULL)
             break;
 
-	ok = _PD_add_entryp(name, acc, rej);
-	if (ok == TRUE)
-	   {type = SC_strtok(NULL, "\001", s);
-	    numb = SC_stol(SC_strtok(NULL, "\001", s));
-	    addr = SC_stol(SC_strtok(NULL, "\001", s));
-	    dims = NULL;
-	    while ((tmp = SC_strtok(NULL, "\001\n", s)) != NULL)
-	       {mini = SC_stol(tmp);
-		leng = SC_stol(SC_strtok(NULL, "\001\n", s));
-		next = _PD_mk_dimensions(mini, leng);
-		if (dims == NULL)
-		   dims = next;
+	 type = SC_strtok(NULL, "\001", s);
 
-		else
-		   {prev->next = next;
-		    SC_mark(next, 1);};
+/* check to see whether or not so skip this entry */
+         ok = _PD_symatch(file, name, type, acc, rej);
+	 if (ok == TRUE)
+	    {numb = SC_stol(SC_strtok(NULL, "\001", s));
+	     addr = SC_stol(SC_strtok(NULL, "\001", s));
+	     dims = NULL;
+	     while ((tmp = SC_strtok(NULL, "\001\n", s)) != NULL)
+	        {mini = SC_stol(tmp);
+		 leng = SC_stol(SC_strtok(NULL, "\001\n", s));
+		 next = _PD_mk_dimensions(mini, leng);
+		 if (dims == NULL)
+		    dims = next;
 
-		prev = next;};
+		 else
+		    {prev->next = next;
+		     SC_mark(next, 1);};
 
-	    ep = _PD_mk_syment(type, numb, addr, NULL, dims);
-	    _PD_e_install(file, name, ep, flag);};};
+		 prev = next;};
+
+	     ep = _PD_mk_syment(type, numb, addr, NULL, dims);
+	     _PD_e_install(file, name, ep, flag);};};
 
     SC_ASSERT(i >= 0);
 

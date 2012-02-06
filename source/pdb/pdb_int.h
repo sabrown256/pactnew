@@ -48,6 +48,9 @@
 #define _PD_entry_set_address(_e, _n, _v)                                    \
    if ((_e) != NULL) _PD_block_set_address((_e)->blocks, _n, _v)
 
+#define _PD_symatch(_f, _n, _t, _a, _r)                                      \
+   (((_f)->symatch != NULL) ? (_f)->symatch(_f, _n, _t, _a, _r) : TRUE)
+
 #define _PD_sys_read(_f, _e, _t, _p)                                         \
    (((_f)->sys->read != NULL) ?                                              \
     (*(_f)->sys->read)(_f, _e, _t, _p) :                                     \
@@ -193,6 +196,9 @@ struct s_PD_state
 
 /* PDFMT.C */
     char id_token[MAXLINE];
+
+/* PDSYMT.C */
+    PFSymDelay symt_delay;
 
    };
 
@@ -740,13 +746,16 @@ extern int
 /* PDSYMT.C declarations */
 
 extern int
- _PD_add_entryp(char *name, char *acc, char *rej),
+ _PD_add_entryp(PDBfile *file, char *name, char *type, char *acc, char *rej),
  _PD_symt_delay_rules(PDBfile *file, int when, char **pa, char **pr),
  _PD_pare_symt(PDBfile *file),
  _PD_rd_symt(PDBfile *file, char *acc, char *rej);
 
 extern PD_delay_mode
  _PD_symt_set_delay_mode(PDBfile *file, char *mode);
+
+extern PFSymDelay
+ _PD_symt_set_delay_method(PDBfile *file, char *mode, PFSymDelay mth);
 
 
 #ifdef __cplusplus
