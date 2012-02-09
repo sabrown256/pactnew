@@ -355,7 +355,7 @@ static object *_SXI_wr_raw(SS_psides *si, object *argl)
    {int ret;
     long ni;
     long long addr;
-    char *intype, *outtype;
+    char *name, *intype, *outtype;
     void *vr;
     PDBfile *file;
     PD_smp_state *pa;
@@ -364,6 +364,8 @@ static object *_SXI_wr_raw(SS_psides *si, object *argl)
     g_file *po;
     
     pa = _PD_get_state(-1);
+
+    name = "/sx-var";
 
     vr = NULL;
 
@@ -427,7 +429,7 @@ static object *_SXI_wr_raw(SS_psides *si, object *argl)
 	         memset(PD_err, 0, MAXLINE);
 		 break;};
 
-	_PD_sys_write(file, vr, ni, intype, outtype);};
+	_PD_sys_write(file, name, vr, ni, intype, outtype);};
 
     return(SS_t);}
 

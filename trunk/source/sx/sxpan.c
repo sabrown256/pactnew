@@ -554,7 +554,7 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
            prev->next = next;
         prev = next;};
 
-/* get the PA_gs.unitss */
+/* get the units */
     nu = NULL;
     while (TRUE)
        {SX_GET_INTEGER_FROM_LIST(si, dm, argl,
@@ -908,7 +908,7 @@ void SX_install_panacea_funcs(SS_psides *si)
                        "dimension",     SC_STRING_I, "dimension",
                        "upper-lower",   SC_STRING_I, "upper-lower",
                        "offset-number", SC_STRING_I, "offset-number",
-                       "PA_gs.unitss",         SC_INT_I, -1,
+                       "units",         SC_INT_I, -1,
                        "per",           SC_INT_I, -2,
                        "attribute",     SC_INT_I, 102,
                        NULL);

@@ -128,8 +128,11 @@ int _PC_bin_read(void *ptr, char *type, size_t ni, PROCESS *pp)
 
 int _PC_bin_write(void *ptr, char *type, size_t ni, PROCESS *pp)
    {int niw;
+    char *name;
     PDBfile *file;
     PD_smp_state *pa;
+
+    name = "/ppc-var";
 
     pa = _PD_get_state(-1);
 
@@ -144,7 +147,7 @@ int _PC_bin_write(void *ptr, char *type, size_t ni, PROCESS *pp)
 	     memset(PD_err, 0, MAXLINE);
 	     break;};
 
-    niw = _PD_sys_write(file, ptr, ni, type, type);
+    niw = _PD_sys_write(file, name, ptr, ni, type, type);
 
     return(niw);}
 

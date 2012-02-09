@@ -106,10 +106,11 @@ void SX_install_funcs(SS_psides *si)
 /* SX_INIT - initialize SX */
 
 SS_psides *SX_init(char *code, char *vers, int c, char **v, char **env)
-   {SS_psides *si;
+   {char *script;
+    SS_psides *si;
 
 /* scheme initializations */
-    si = SS_init_scheme(code, vers, c, v, env);
+    si = SS_init_scheme(code, vers, c, v, env, FALSE);
 
 /* SX initializations depending on scheme */
     SX_install_funcs(si);
@@ -165,6 +166,20 @@ SS_psides *SX_init(char *code, char *vers, int c, char **v, char **env)
     SC_REGISTER_CONTEXT(_SX_type_container, si);
 
     _SX.file_exist_action = FAIL;
+
+/* check if we are supposed to run a script and if so
+ * load the script file - this might not return
+ */
+    script = SS_exe_script(c, v);
+    if (script != NULL)
+       {switch (SETJMP(SC_gs.cpu))
+	   {case ABORT :
+		 SX_end(si, ABORT);
+		 exit(1);
+	    case ERR_FREE :
+	         SX_end(si, ERR_FREE);
+		 exit(0);};
+	SS_load_scm(si, script);};
 
     return(si);}
 

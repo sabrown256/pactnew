@@ -398,7 +398,6 @@ object *SS_define_constant(SS_psides *si, int n, ...)
 
     vr  = SS_null;
     val = SS_null;
-    
 
     SC_VA_START(n);
 
@@ -903,7 +902,7 @@ char *SS_exe_script(int c, char **v)
  *                - command line processing in the "main" routine
  */
 
-int SS_define_argv(SS_psides *si, int c, char **v)
+int SS_define_argv(SS_psides *si, int c, char **v, int go)
    {int i, n, rv, t, after;
     int type[MAXLINE];
     long *lp;
@@ -972,7 +971,8 @@ int SS_define_argv(SS_psides *si, int c, char **v)
 	SS_load_scm(si, "runt.scm");
 
 /* load the script file - this might not return */
-	SS_load_scm(si, script);
+	if (go == TRUE)
+	   SS_load_scm(si, script);
 
 	rv = TRUE;};
 

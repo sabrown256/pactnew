@@ -121,9 +121,19 @@
  * is associated with some variable in the directory.  In the
  * second it is associated with a specific variable.  11/10/2011
  *
+ * Version 29 associate full path name of variable with each
+ * of its pointers rather than just the directory in which the
+ * variable resides as was done in version 28.  This solves a
+ * problem associated with copying PDB files in which the current
+ * directory is always '/' so no real variable info was associated
+ * with the pointers in the copy.
+ * This is forward compatible with older versions except that the
+ * delay symbol modes with not work optimally and that feature
+ * does not go back before version 28.  02/08/2012
+ *
  */
 
-#define PDB_SYSTEM_VERSION  28
+#define PDB_SYSTEM_VERSION  29
 
 #define BITS_DEFAULT 8     /* default bits per byte */
 #define NSTD         6     /* number of standards currently in the system 
@@ -206,7 +216,7 @@ typedef struct s_PD_pfm_fnc PD_pfm_fnc;
 typedef memdes *(*PFPDBwrite)(PDBfile *file, char *vr, defstr *defp);
 typedef memdes *(*PFPDBread)(memdes *members);
 
-typedef int (*PFSymDelay)(PDBfile *file, char *name, char *type,
+typedef int (*PFSymDelay)(PDBfile *file, int ad, char *name, char *type,
 			  char *acc, char *rej);
 
 
@@ -423,7 +433,7 @@ struct s_tr_layer
 struct s_sys_layer
    {int64_t (*read)(PDBfile *file, syment *ep,
 		    char *outtype, void *vr);
-    int64_t (*write)(PDBfile *file, char *vr, int64_t ni,
+    int64_t (*write)(PDBfile *file, char *name, char *vr, int64_t ni,
 		     char *intype, char *outtype);};
 
 struct s_PD_address
@@ -488,7 +498,7 @@ struct s_PDBfile
     void *meta;                       /* container for metadata in the tr layer */
     io_request req;
     
-    int (*symatch)(PDBfile *file, char *name, char *type,
+    int (*symatch)(PDBfile *file, int ad, char *name, char *type,
 		   char *acc, char *rej);
 
 /* the db_layer methods */
@@ -504,7 +514,8 @@ struct s_PDBfile
     int (*wr_prim_types)(FILE *fp, hasharr *tab);
     int (*rd_prim_types)(PDBfile *file, char *bf);
 
-    int (*wr_itag)(PDBfile *file, PD_address *ad, int64_t ni, char *type,
+    int (*wr_itag)(PDBfile *file, char *name, PD_address *ad,
+		   int64_t ni, char *type,
 		   int64_t addr, PD_data_location loc);
     int (*rd_itag)(PDBfile *file, char *p, PD_itag *pi);
 

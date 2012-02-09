@@ -355,7 +355,7 @@ static void _SS_print_err_msg(SS_psides *si, FILE *str, char *s, object *obj)
 /* SS_INIT_SCHEME - initialize the interpreter */
 
 SS_psides *SS_init_scheme(char *code, char *vers,
-			  int c, char **v, char **env)
+			  int c, char **v, char **env, int go)
    {SS_psides *si;
 
 /* setup OMP the very first thing */
@@ -391,7 +391,7 @@ SS_psides *SS_init_scheme(char *code, char *vers,
        SS_env_vars(si, env, NULL);
 
     if (v != NULL)
-       SS_define_argv(si, c, v);
+       SS_define_argv(si, c, v, go);
 
     return(si);}
 

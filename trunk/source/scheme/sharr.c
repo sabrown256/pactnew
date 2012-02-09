@@ -136,7 +136,7 @@ object *SS_hash_dump(SS_psides *si, object *argl)
     if (SS_hasharrp(to) == TRUE)
        {tab    = SS_GET(hasharr, to);
 	names  = SC_hasharr_dump(tab, patt, NULL, SS_true(sort));
-	nnames = SC_MEM_GET_N(char *, names) - 1;}
+	SC_ptr_arr_len(nnames, names);}
 
 /* get the names from hasharr */
     else

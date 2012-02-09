@@ -2022,7 +2022,7 @@ char *SC_vdsnprintf(int cp, const char *format, va_list lst)
 /*--------------------------------------------------------------------------*/
 
 /* SC_DSNPRINTF - sort of dynamic version of vnsprintf
- *              - if CP is TRUE return a newly allocate string which the
+ *              - if CP is TRUE return a newly allocated string which the
  *              - caller must free
  *              - if CP is FALSE return a string which the caller
  *              - caller must NOT free

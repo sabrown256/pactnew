@@ -920,7 +920,7 @@ extern int
  SS_run(SS_psides *si, char *s),
  SS_text_data_filep(char *fname, int cmnt),
  SS_load_scm(SS_psides *si, char *name),
- SS_define_argv(SS_psides *si, int c, char **v);
+ SS_define_argv(SS_psides *si, int c, char **v, int go);
 
 extern void
  SS_var_value(SS_psides *si, char *s, int type, void *vr, int flag);
@@ -1085,7 +1085,7 @@ extern object
 
 extern SS_psides
  *SS_init_scheme(char *code, char *vers,
-		 int c, char **v, char **env);
+		 int c, char **v, char **env, int go);
 
 extern PFPrintErrMsg
  SS_set_print_err_func(PFPrintErrMsg fnc, int dflt),

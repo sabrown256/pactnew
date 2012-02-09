@@ -222,7 +222,7 @@
 
 (define (fm-close file)
     (let* ((name (file-reference file stream-list))
-	   (fp (stream-file name)))
+	   (fp   (stream-file name)))
       (if (and name (not (eqv? (stream-name name) "virtual-internal")))
 	  (begin
 	    ((io-function fp "close-file") fp)

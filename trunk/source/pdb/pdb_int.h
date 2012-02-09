@@ -48,18 +48,18 @@
 #define _PD_entry_set_address(_e, _n, _v)                                    \
    if ((_e) != NULL) _PD_block_set_address((_e)->blocks, _n, _v)
 
-#define _PD_symatch(_f, _n, _t, _a, _r)                                      \
-   (((_f)->symatch != NULL) ? (_f)->symatch(_f, _n, _t, _a, _r) : TRUE)
+#define _PD_symatch(_f, _w, _n, _t, _a, _r)                                  \
+   (((_f)->symatch != NULL) ? (_f)->symatch(_f, _w, _n, _t, _a, _r) : TRUE)
 
 #define _PD_sys_read(_f, _e, _t, _p)                                         \
    (((_f)->sys->read != NULL) ?                                              \
     (*(_f)->sys->read)(_f, _e, _t, _p) :                                     \
     _PD_rd_syment(_f, _e, _t, _p))
 
-#define _PD_sys_write(_f, _p, _n, _ti, _to)                                  \
+#define _PD_sys_write(_f, _s, _p, _n, _ti, _to)                              \
    (((_f)->sys->write != NULL) ?                                             \
-    (*(_f)->sys->write)(_f, _p, _n, _ti, _to) :                              \
-    _PD_wr_syment(_f, _p, _n, _ti, _to))
+    (*(_f)->sys->write)(_f, _s, _p, _n, _ti, _to) :                          \
+    _PD_wr_syment(_f, _s, _p, _n, _ti, _to))
 
 #define _PD_SETUP_PSEUDO_FILE(fp)   (*PD_par_fnc.setup_pseudo_file)(fp)
 #define _PD_SETUP_MP_FILE(f, comm)  (*PD_par_fnc.setup_mp_file)(f, comm)
@@ -659,7 +659,7 @@ extern void
 extern int
  _PD_ptr_reset(PDBfile *file, char *vr),
  _PD_ptr_entry_itag(PDBfile *file, PD_itag *pi, char *p),
- _PD_ptr_wr_itags(PDBfile *file, void *vr, inti ni, char *type),
+ _PD_ptr_wr_itags(PDBfile *file, char *name, void *vr, inti ni, char *type),
  _PD_ptr_rd_itags(PDBfile *file, char **vr, PD_itag *pi),
  _PD_ptr_register_entry(PDBfile *fp, char *name, syment *ep);
 
@@ -672,7 +672,8 @@ extern void
  _PD_ptr_init_apl(PDBfile *file),
  _PD_ptr_free_apl(PDBfile *file),
  _PD_ptr_rd_install_addr(PDBfile *file, int64_t addr, PD_data_location loc),
- _PD_ptr_wr_syment(PDBfile *file, PD_address *ad, char *type,
+ _PD_ptr_remove_entry(PDBfile *file, syment *ep, int lck),
+ _PD_ptr_wr_syment(PDBfile *file, char *name, PD_address *ad, char *type,
 		   inti ni, int64_t addr),
  _PD_ptr_open_setup(PDBfile *file);
 
@@ -710,7 +711,7 @@ extern long
 
 extern int64_t
  _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr),
- _PD_wr_syment(PDBfile *file, char *vr, int64_t ni, char *intype,
+ _PD_wr_syment(PDBfile *file, char *name, char *vr, int64_t ni, char *intype,
 	       char *outtype);
 
 extern int64_t
