@@ -275,9 +275,6 @@ int PD_close(PDBfile *file ARG(,,cls))
 	tr  = file->tr;
 	fun = tr->close;
 	ret = fun(file);};
-/*
-    _SC_prune_major_blocks();
-*/
 
     return(ret);}
 

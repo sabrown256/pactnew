@@ -652,7 +652,8 @@ static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype,
  *                     - HBPI is the bytes per item in memory
  */
 
-static char *_PD_write_hyper_vif(PDBfile *file, char *in, char *intype, 
+static char *_PD_write_hyper_vif(PDBfile *file, char *name,
+				 char *in, char *intype, 
 				 syment *ep, intb hbpi, intb fbpi,
 				 int64_t addr, inti stop, inti step)
    {inti ni;
@@ -666,13 +667,13 @@ static char *_PD_write_hyper_vif(PDBfile *file, char *in, char *intype,
 
 	_PD_set_current_address(file, addr, SEEK_SET, PD_WRITE);
 
-	_PD_sys_write(file, in, ni, intype, outtype);}
+	_PD_sys_write(file, name, in, ni, intype, outtype);}
 
 /* items logically discontiguous */
     else
        {for (; addr <= stop; addr += step, in += hbpi)
 	    {_PD_set_current_address(file, addr, SEEK_SET, PD_WRITE);
-             _PD_sys_write(file, in, 1L, intype, outtype);};};
+             _PD_sys_write(file, name, in, 1L, intype, outtype);};};
 
     return(in);}
 
@@ -687,7 +688,8 @@ static char *_PD_write_hyper_vif(PDBfile *file, char *in, char *intype,
  *                       - HBPI is the bytes per item in memory
  */
 
-static char *_PD_write_hyper_space(PDBfile *file, char *in, char *intype, 
+static char *_PD_write_hyper_space(PDBfile *file, char *name,
+				   char *in, char *intype, 
 				   syment *ep, intb hbpi, intb fbpi,
 				   int64_t addr, inti stop, inti step)
    {inti n, nb, niw, ni;
@@ -725,7 +727,7 @@ static char *_PD_write_hyper_space(PDBfile *file, char *in, char *intype,
 
             niw = min(nb, ni);
 
-            _PD_sys_write(file, in, niw, intype, outtype);
+            _PD_sys_write(file, name, in, niw, intype, outtype);
 	    _PD_block_set_valid(ep->blocks, n, PD_BLOCK_INVALID);
 
             ni   -= niw;
@@ -739,7 +741,7 @@ static char *_PD_write_hyper_space(PDBfile *file, char *in, char *intype,
              n = _PD_effective_addr(&eaddr, &nb, fbpi, bl);
 	     _PD_set_current_address(file, eaddr, SEEK_SET, PD_WRITE);
 
-             _PD_sys_write(file, in, 1L, intype, outtype);
+             _PD_sys_write(file, name, in, 1L, intype, outtype);
 	     _PD_block_set_valid(ep->blocks, n, PD_BLOCK_INVALID);};};
 
     return(in);}
@@ -758,7 +760,8 @@ static char *_PD_write_hyper_space(PDBfile *file, char *in, char *intype,
  *                    - HBPI is the bytes per item in memory
  */
 
-static char *_PD_wr_hyper_index(PDBfile *file, char *out, dimind *pi, 
+static char *_PD_wr_hyper_index(PDBfile *file, char *name,
+				char *out, dimind *pi, 
                                 char *intype, int64_t addr,
 				syment *ep, intb hbpi, intb fbpi)
    {inti stride, step;
@@ -776,14 +779,15 @@ static char *_PD_wr_hyper_index(PDBfile *file, char *out, dimind *pi,
 /* at the bottom of the recursion do the actual operations */
     if (stride <= (long) fbpi)
        {if (file->virtual_internal == TRUE)
-	   out = _PD_write_hyper_vif(file, out, intype, ep,
+	   out = _PD_write_hyper_vif(file, name, out, intype, ep,
 				     hbpi, fbpi, start, stop, step);
 	else
-	   out = _PD_write_hyper_space(file, out, intype, ep,
+	   out = _PD_write_hyper_space(file, name, out, intype, ep,
 				       hbpi, fbpi, start, stop, step);}
     else
        {for (offset = start; offset <= stop; offset += step)
-	    out = _PD_wr_hyper_index(file, out, pi + 1, intype, offset,
+	    out = _PD_wr_hyper_index(file, name,
+				     out, pi + 1, intype, offset,
 				     ep, hbpi, fbpi);};
 
     return(out);}
@@ -887,7 +891,7 @@ int64_t _PD_annotate_text(PDBfile *file, syment *ep, char *name,
  *               - lists
  */
 
-int64_t _PD_wr_syment(PDBfile *file, char *vr, int64_t ni,
+int64_t _PD_wr_syment(PDBfile *file, char *name, char *vr, int64_t ni,
 		      char *intype, char *outtype)
    {int dst, indir, count, itags;
     inti i;
@@ -1005,7 +1009,7 @@ int64_t _PD_wr_syment(PDBfile *file, char *vr, int64_t ni,
     case INDIRECT :
     
          if (vr == NULL)
-            {(*file->wr_itag)(file, NULL, 0L, litype, -1L, TRUE);
+            {(*file->wr_itag)(file, name, NULL, 0L, litype, -1L, TRUE);
              GO_CONT;};
 
 /* dereference a local copy of the type */
@@ -1023,7 +1027,7 @@ int64_t _PD_wr_syment(PDBfile *file, char *vr, int64_t ni,
          SAVE_P(vr);
          vr = DEREF(vr);
          if (vr == NULL)
-            {(*file->wr_itag)(file, NULL, 0L, litype, -1L, FALSE);
+            {(*file->wr_itag)(file, name, NULL, 0L, litype, -1L, FALSE);
              RESTORE_P(char, vr);
              i++;
              vr += sizeof(char *);
@@ -1043,7 +1047,7 @@ int64_t _PD_wr_syment(PDBfile *file, char *vr, int64_t ni,
                      litype);
              PD_error(bf, PD_WRITE);};
 
-         if (_PD_ptr_wr_itags(file, vr, ni, litype) == FALSE)
+         if (_PD_ptr_wr_itags(file, name, vr, ni, litype) == FALSE)
             {RESTORE_I(ni);
              RESTORE_P(char, vr);
              i++;
@@ -1099,7 +1103,8 @@ int _PD_hyper_write(PDBfile *file, char *name, syment *ep,
 		    void *vr, char *intype)
    {int nc, nd, c, rv;
     intb hbpi, fbpi;
-    char s[MAXLINE], *expr;
+    char s[MAXLINE];
+    char *expr;
     dimdes *dims;
     dimind *pi;
 
@@ -1123,7 +1128,7 @@ int _PD_hyper_write(PDBfile *file, char *name, syment *ep,
 	   rv = TRUE;
 
 	else
-	   {rv  = _PD_sys_write(file, vr, PD_entry_number(ep),
+	   {rv  = _PD_sys_write(file, name, vr, PD_entry_number(ep),
 				intype, PD_entry_type(ep));
 	    rv *= _PD_csum_block_write(file, ep, 0);};}
 
@@ -1151,7 +1156,7 @@ int _PD_hyper_write(PDBfile *file, char *name, syment *ep,
 	   PD_error("CAN'T FIND NUMBER OF HOST BYTES - _PD_HYPER_WRITE",
 		    PD_WRITE);
 
-	_PD_wr_hyper_index(file, vr, pi, intype, PD_entry_address(ep),
+	_PD_wr_hyper_index(file, name, vr, pi, intype, PD_entry_address(ep),
 			   ep, hbpi, fbpi);
 
 	CFREE(pi);};

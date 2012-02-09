@@ -2935,7 +2935,7 @@ entering into read-eval-print loops.<p>
 
 <B></B>
 <BLOCKQUOTE>
-SS_psides *SS_init_scheme(char *code, char *vers)
+SS_psides *SS_init_scheme(char *code, char *vers, int c, char **v, int go)
 <P>
 void SS_end_scheme(SS_psides *si, int val)
 <P>

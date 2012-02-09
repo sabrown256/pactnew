@@ -641,7 +641,7 @@ static object *_SSI_trans_on(SS_psides *si, object *obj)
     if (str == NULL)
        SS_error(si, "CAN'T OPEN FILE - TRANSCRIPT-ON", obj);
 
-    si->histdev = SS_mk_outport(si, str, s);
+    si->histdev   = SS_mk_outport(si, str, s);
     si->hist_flag = ALL;
 
     return(SS_t);}
@@ -652,18 +652,23 @@ static object *_SSI_trans_on(SS_psides *si, object *obj)
 /* SS_TRANS_OFF - turn off the transcript of the Scheme session */
 
 object *SS_trans_off(SS_psides *si)
-   {
+   {object *hd, *rv;
 
-    if (SS_nullobjp(si->histdev))
-       return(SS_f);
+    hd = si->histdev;
+    if ((hd == NULL) || (SS_nullobjp(hd) == TRUE))
+       rv = SS_f;
 
-    io_close(SS_OUTSTREAM(si->histdev));
+    else
+       {io_close(SS_OUTSTREAM(hd));
 
-    SS_OBJECT_FREE(si, si->histdev);
+	SS_OBJECT_FREE(si, hd);
+
+	rv = SS_t;};
+
     si->histdev   = SS_null;
     si->hist_flag = NO_LOG;
 
-    return(SS_t);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -13,73 +13,186 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_ADD_SYM_PTRP - return TRUE iff ACC and REJ determine that
- *                - entry NAME should be added to the symbol table
- */
+/* _PD_IS_VAR_IN_DIR - return TRUE iff VAR is in directory DIR */
 
-int _PD_add_sym_ptrp(PDBfile *file, char *name, char *type,
-		   char *acc, char *rej)
+int _PD_is_var_in_dir(char *var, char *dir)
    {int ok;
+    char *p, *d;
 
-    ok = ((rej == NULL) || (SC_regx_match(name, rej) == FALSE));
-    if (ok == FALSE)
-       ok = ((acc != NULL) && (SC_regx_match(name, acc) == TRUE));
+    ok = FALSE;
+
+    if (dir == NULL)
+       dir = "/";
+
+    p = strstr(var, dir);
+
+/* if the first part of VAR matches the current directory */
+    if (p == var)
+       {p += strlen(dir);
+
+/* if the remainder has no '/' or ends in '/' it is in the current directory */
+        d = strchr(p, '/');
+	if ((d == NULL) || (d[1] == '\0'))
+	   ok = TRUE;};
 
     return(ok);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_ADD_SYM_ANCP - return TRUE iff ACC and REJ determine that
+/* _PD_ADD_SYM_PTRP - return TRUE iff pointer
+ *                  - NAME should be added to the symbol table
+ *                  - if AD is TRUE decide whether or not to add
+ *                  - if AD if FALSE decide whether to remove
+ */
+
+int _PD_add_sym_ptrp(PDBfile *file, int ad, char *name, char *type,
+		     char *acc, char *rej)
+   {int ok;
+    char *p, *s;
+
+    if (strncmp(name, file->ptr_base, strlen(file->ptr_base)) == 0)
+       {p  = file->current_prefix;
+	s  = strchr(name, '#') + 1;
+	ok = _PD_is_var_in_dir(s, p);}
+
+    else if (ad == TRUE)
+       ok = TRUE;
+
+    else
+       ok = FALSE;
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_ADD_SYM_ANCP - return TRUE iff
  *                  - NAME is in the current directory or it ancestors
  *                  - that is, toward root
  *                  - and should be added to the symbol table
+ *                  - if AD is TRUE decide whether or not to add
+ *                  - if AD if FALSE decide whether to remove
  */
 
-int _PD_add_sym_ancp(PDBfile *file, char *name, char *type,
-		   char *acc, char *rej)
+int _PD_add_sym_ancp(PDBfile *file, int ad, char *name, char *type,
+		     char *acc, char *rej)
    {int ok;
+    char *p, *d, *s;
+static int count = 0;
+count++;
+    if (ad == TRUE)
+       {if (file->current_prefix == NULL)
+	   p = CSTRSAVE("/");
+	else
+	   p = CSTRSAVE(file->current_prefix);
 
-    ok = ((rej == NULL) || (SC_regx_match(name, rej) == FALSE));
-    if (ok == FALSE)
-       ok = ((acc != NULL) && (SC_regx_match(name, acc) == TRUE));
+	if (strncmp(name, file->ptr_base, strlen(file->ptr_base)) == 0)
+	   {s = strchr(name, '#');
+	    if (s != NULL)
+               {if (file->system_version > 28)
+		   s = CSTRSAVE(s+1);
+	        else
+		   s = SC_dsnprintf(TRUE, "%s_ptr_", s + 1);}
+	    else
+	       s = CSTRSAVE("/");}
+	else
+	   s = CSTRSAVE(name);
+
+	ok  = FALSE;
+	ok |= (strcmp(s, p) == 0);
+	while (ok == FALSE)
+	   {d = strrchr(p, '/');
+	    if (d != NULL)
+	       {d[1] = '\0';
+		ok = _PD_is_var_in_dir(s, p);
+		d[0] = '\0';}
+	    else
+	       break;};
+
+	CFREE(p);
+	CFREE(s);}
+
+    else
+       ok = TRUE;
 
     return(ok);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_ADD_SYM_DESP - return TRUE iff ACC and REJ determine that
+/* _PD_ADD_SYM_DESP - return TRUE iff
  *                  - NAME is in the current directory or it descendants
  *                  - that is, away from root
  *                  - and should be added to the symbol table
+ *                  - if AD is TRUE decide whether or not to add
+ *                  - if AD if FALSE decide whether to remove
  */
 
-int _PD_add_sym_desp(PDBfile *file, char *name, char *type,
-		   char *acc, char *rej)
-   {int ok;
+int _PD_add_sym_desp(PDBfile *file, int ad, char *name, char *type,
+		     char *acc, char *rej)
+   {int ok, nc, ex;
+    char *s, *p;
 
-    ok = ((rej == NULL) || (SC_regx_match(name, rej) == FALSE));
-    if (ok == FALSE)
-       ok = ((acc != NULL) && (SC_regx_match(name, acc) == TRUE));
+/* if checking to add - do not add anything that is already there */
+    if (ad == TRUE)
+       ex = (PD_inquire_entry(file, name, TRUE, NULL) != NULL);
+    else
+       ex = FALSE;
+
+    if (ex == TRUE)
+       ok = FALSE;
+    else
+       {if (strncmp(name, file->ptr_base, strlen(file->ptr_base)) == 0)
+	   s = SC_dsnprintf(TRUE, "%s_ptr_", strchr(name, '#') + 1);
+        else
+	   s = CSTRSAVE(name);
+
+	p  = file->current_prefix;
+	nc = strlen(p);
+
+	ok = (strncmp(p, s, nc) == 0);
+	if (ad == FALSE)
+	   ok &= (SC_LAST_CHAR(s) != '/');
+
+	SFREE(s);};
 
     return(ok);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_ADD_SYM_CURRP - return TRUE iff ACC and REJ determine that
+/* _PD_ADD_SYM_CURRP - return TRUE iff
  *                   - NAME is in the current directory only
  *                   - and should be added to the symbol table
+ *                   - if AD is TRUE decide whether or not to add
+ *                   - if AD if FALSE decide whether to remove
  */
 
-int _PD_add_sym_currp(PDBfile *file, char *name, char *type,
-		   char *acc, char *rej)
+int _PD_add_sym_currp(PDBfile *file, int ad, char *name, char *type,
+		      char *acc, char *rej)
    {int ok;
+    char *s;
 
-    ok = ((rej == NULL) || (SC_regx_match(name, rej) == FALSE));
-    if (ok == FALSE)
-       ok = ((acc != NULL) && (SC_regx_match(name, acc) == TRUE));
+    if (strncmp(name, file->ptr_base, strlen(file->ptr_base)) == 0)
+       {s = strchr(name, '#');
+	if (s != NULL)
+	   {if (file->system_version > 28)
+	       s = CSTRSAVE(s+1);
+	    else
+	       s = SC_dsnprintf(TRUE, "%s_ptr_", s + 1);}
+	else
+	   s = CSTRSAVE("/");}
+    else
+       s = CSTRSAVE(name);
+
+    if (ad == TRUE)
+       {ok  = _PD_is_var_in_dir(s, file->current_prefix);
+	ok &= (SC_hasharr_lookup(file->symtab, name) == NULL);}
+    else
+       ok = (SC_LAST_CHAR(s) != '/');
+
+    CFREE(s);
 
     return(ok);}
 
@@ -234,35 +347,60 @@ PFSymDelay PD_set_symt_delay_method(PFSymDelay mth)
 int _PD_pare_symt(PDBfile *file)
    {int nr, wh;
     long i;
-    char s[MAXLINE];
-    char *nm, **ent;
+    char **ent;
+    char *nm;
     syment *ep;
 
     nr = 0;
 
-    wh = 0;
-    if ((file->delay_sym != PD_DELAY_NONE) &&
-	(strcmp(file->current_prefix, "/") != 0))
-       {snprintf(s, MAXLINE, "*%s*", file->current_prefix);
-
-/* deep remove including the syment */
-        if (wh == 1)
+    if (file->symatch != NULL)
+       {wh = 1;
+	if (wh == 1)
 	   {for (i = 0; SC_hasharr_next(file->symtab, &i, &nm, NULL, (void **) &ep); i++)
-	        {if (SC_LAST_CHAR(nm) != '/')
-		    {_PD_rl_syment_d(ep);
+	        {if (_PD_symatch(file, FALSE, nm, NULL, NULL, NULL) == TRUE)
+		    {if (strncmp(nm, file->ptr_base, strlen(file->ptr_base)) == 0)
+		        _PD_ptr_remove_entry(file, ep, TRUE);
+		     SC_mark(ep, 1);
+		     _PD_rl_syment_d(ep);
 		     SC_hasharr_remove(file->symtab, nm);
 		     nr++;};};}
-
-/* shallow remove excluding the syment */
-        else
-	   {ent = SC_hasharr_dump(file->symtab, s, NULL, FALSE);
+	else
+	   {ent = SC_hasharr_dump(file->symtab, "*", NULL, FALSE);
 
 	    for (i = 0; ent[i] != NULL; i++)
-	        {if (SC_LAST_CHAR(ent[i]) != '/')
+	        {if (_PD_symatch(file, FALSE, ent[i], NULL, NULL, NULL) == TRUE)
 		    {SC_hasharr_remove(file->symtab, ent[i]);
 		     nr++;};};
 
-	    SC_free_strings(ent);};};
+	    SC_free_strings(ent);};}
+
+    else
+       {char s[MAXLINE];
+
+	wh = 0;
+
+	if ((file->delay_sym != PD_DELAY_NONE) &&
+	    (strcmp(file->current_prefix, "/") != 0))
+	   {snprintf(s, MAXLINE, "*%s*", file->current_prefix);
+
+/* deep remove including the syment */
+	    if (wh == 1)
+	       {for (i = 0; SC_hasharr_next(file->symtab, &i, &nm, NULL, (void **) &ep); i++)
+		    {if (SC_LAST_CHAR(nm) != '/')
+		        {_PD_rl_syment_d(ep);
+			 SC_hasharr_remove(file->symtab, nm);
+			 nr++;};};}
+
+/* shallow remove excluding the syment */
+	    else
+	       {ent = SC_hasharr_dump(file->symtab, s, NULL, FALSE);
+
+		for (i = 0; ent[i] != NULL; i++)
+		    {if (SC_LAST_CHAR(ent[i]) != '/')
+		        {SC_hasharr_remove(file->symtab, ent[i]);
+			 nr++;};};
+
+		SC_free_strings(ent);};};};
 
     return(nr);}
 

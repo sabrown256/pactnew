@@ -1082,6 +1082,35 @@ void _PD_ptr_rd_install_addr(PDBfile *file, int64_t addr,
     return;}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PTR_REMOVE_ENTRY - remove address referenced by syment EP from FILE */
+
+void _PD_ptr_remove_entry(PDBfile *file, syment *ep, int lck)
+   {int64_t addr;
+    PD_address *ad;
+    adloc *al;
+
+    if (file != NULL)
+       {if (lck == TRUE)
+	   SC_LOCKON(PD_ptr_lock);
+
+	al   = _PD_ptr_get_al(file);
+	addr = PD_entry_address(ep);
+	ad   = _PD_ptr_rd_lookup(file, addr, NULL);
+	_PD_ptr_remove_addr(al, ad, lck);
+
+/* this will be freed when the hash table is releases
+ * we had to free the contents here
+	CFREE(ad);
+ */
+
+	if (lck == TRUE)
+	   SC_LOCKOFF(PD_ptr_lock);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
 
 /*                           WRITE LIST ROUTINES                            */
 
@@ -1144,17 +1173,18 @@ PD_address *_PD_ptr_wr_lookup(PDBfile *file, void *vr,
  *                   - fill in AD with the address info
  */
 
-void _PD_ptr_wr_syment(PDBfile *file, PD_address *ad, char *type,
+void _PD_ptr_wr_syment(PDBfile *file, char *name,
+		       PD_address *ad, char *type,
 		       inti ni, int64_t addr)
-   {char name[MAXLINE];
+   {char pname[MAXLINE];
     syment *ep;
 
     if (ni > 0)
-       {snprintf(name, MAXLINE, "%s%ld#%s",
-		 file->ptr_base, (long) ad->indx, file->current_prefix);
+       {snprintf(pname, MAXLINE, "%s%ld#%s",
+		 file->ptr_base, (long) ad->indx, name);
 
 	ep = _PD_mk_syment(type, ni, addr, NULL, NULL);
-	_PD_e_install(file, name, ep, TRUE);
+	_PD_e_install(file, pname, ep, TRUE);
 
 	if (file->format_version > 2)
 	   {if (ad != NULL)
@@ -1170,7 +1200,7 @@ void _PD_ptr_wr_syment(PDBfile *file, PD_address *ad, char *type,
  *                  - correctly
  */
 
-int _PD_ptr_wr_itags(PDBfile *file, void *vr, inti ni, char *type)
+int _PD_ptr_wr_itags(PDBfile *file, char *name, void *vr, inti ni, char *type)
    {int rv;
     long n;
     int64_t addr;
@@ -1209,7 +1239,7 @@ int _PD_ptr_wr_itags(PDBfile *file, void *vr, inti ni, char *type)
 	ad = _PD_ptr_get_ad(al, n);};
 
 /* write the itag to the file */
-    (*file->wr_itag)(file, ad, ni, type, addr, loc);
+    (*file->wr_itag)(file, name, ad, ni, type, addr, loc);
 
     SC_LOCKOFF(PD_ptr_lock);
 

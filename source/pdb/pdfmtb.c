@@ -56,18 +56,19 @@ static void _PD_regen_std(PDBfile *file, char *type,
 
 /* _PD_WR_ITAG_II - write an itag to the file
  *                - for a NULL pointer do:
- *                -     _PD_wr_itag(file, -1L, 0L, type, -1L, LOC_OTHER)
+ *                -     _PD_wr_itag(file, name, -1L, 0L, type, -1L, LOC_OTHER)
  *                - for a pointer to data elsewhere do:
- *                -     _PD_wr_itag(file, n, ni, type, addr, LOC_OTHER)
+ *                -     _PD_wr_itag(file, name, n, ni, type, addr, LOC_OTHER)
  *                - for a pointer to data here do:
- *                -     _PD_wr_itag(file, n, ni, type, addr, LOC_HERE)
+ *                -     _PD_wr_itag(file, name, n, ni, type, addr, LOC_HERE)
  *                - for a pointer to discontiguous data do:
- *                -     _PD_wr_itag(file, n, ni, type, addr, LOC_BLOCK)
+ *                -     _PD_wr_itag(file, name, n, ni, type, addr, LOC_BLOCK)
  *                -     then addr is interpreted as the address of the next
  *                -     block of data
  */
 
-static int _PD_wr_itag_ii(PDBfile *file, PD_address *ad, inti ni, char *type,
+static int _PD_wr_itag_ii(PDBfile *file, char *name,
+			  PD_address *ad, inti ni, char *type,
 			  int64_t addr, PD_data_location loc)
    {char s[MAXLINE];
     FILE *fp;
@@ -84,7 +85,7 @@ static int _PD_wr_itag_ii(PDBfile *file, PD_address *ad, inti ni, char *type,
 	lio_printf(fp, s);
 
 	if ((ni > 0) && (loc == LOC_HERE))
-	   _PD_ptr_wr_syment(file, ad, type, ni, addr);};
+	   _PD_ptr_wr_syment(file, name, ad, type, ni, addr);};
 
     return(TRUE);}
 
@@ -262,7 +263,7 @@ static int _PD_parse_symt_ii(PDBfile *file, char *buf, int flag,
 	 type = SC_strtok(NULL, "\001", s);
 
 /* check to see whether or not so skip this entry */
-         ok = _PD_symatch(file, name, type, acc, rej);
+         ok = _PD_symatch(file, TRUE, name, type, acc, rej);
 	 if (ok == TRUE)
 	    {numb = SC_stol(SC_strtok(NULL, "\001", s));
 	     addr = SC_stol(SC_strtok(NULL, "\001", s));

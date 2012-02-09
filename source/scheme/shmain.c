@@ -43,7 +43,7 @@ int main(int c, char **v, char **env)
     char *cmnd;
     SS_psides *si;
 
-    si = SS_init_scheme(CODE, VERSION, c, v, env);
+    si = SS_init_scheme(CODE, VERSION, c, v, env, TRUE);
 
     SS_init(si, "Aborting with error", SS_end_scheme,
             TRUE, SS_interrupt_handler,

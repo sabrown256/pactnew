@@ -1095,7 +1095,7 @@ int main(int c, char **v, char **env)
 
     SC_init_path(1, "ULTRA");
 
-    si = SS_init_scheme(CODE, VERSION, c, v, env);
+    si = SS_init_scheme(CODE, VERSION, c, v, env, TRUE);
 
     SS_init(si, "Aborting with error", _UL_quit,
             TRUE, SS_interrupt_handler,

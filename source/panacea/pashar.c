@@ -611,7 +611,7 @@ void _PA_wrrstrt(char *rsname, int conv_flag)
     char *pname, *ty;
     void *pdata;
     PA_variable *pp;
-    syment *sp;
+    syment *ep;
     PDBfile *pdrs;
     PFWriteState hook;
     FILE *fp;
@@ -665,12 +665,12 @@ void _PA_wrrstrt(char *rsname, int conv_flag)
 	 if ((pscope == RESTART) || (pscope == DEFN) || (pscope == DMND))
 	    {inti ni;
 
-	     sp = PD_copy_syment(PA_VARIABLE_DESC(pp));
+	     ep = PD_copy_syment(PA_VARIABLE_DESC(pp));
 
-	     ni = _PD_comp_num(PD_entry_dimensions(sp));
+	     ni = _PD_comp_num(PD_entry_dimensions(ep));
 
-	     PD_entry_set_address(sp, _PD_get_next_address(pdrs, 
-							   PD_entry_type(sp),
+	     PD_entry_set_address(ep, _PD_get_next_address(pdrs, 
+							   PD_entry_type(ep),
 							   ni,
 							   pdata,
 							   FALSE,
@@ -683,9 +683,9 @@ void _PA_wrrstrt(char *rsname, int conv_flag)
 
 /* force consistency in variable size and shape */
 	     psz = _PA_list_to_dims(PA_VARIABLE_DIMS(pp),
-				    PD_entry_dimensions(sp));
+				    PD_entry_dimensions(ep));
 	     PA_VARIABLE_SIZE(pp) = psz;
-	     sp->number           = psz;
+	     ep->number           = psz;
 
 	     switch (pclass)
 	        {case REQU :
@@ -698,17 +698,17 @@ void _PA_wrrstrt(char *rsname, int conv_flag)
 		 case PSEUDO :
 		 case OPTL   :
 		      if (pdata != NULL)
-			 {_PD_e_install(pdrs, pname, sp, TRUE);
+			 {_PD_e_install(pdrs, pname, ep, TRUE);
 
 /* convert units before writing if requested */
 			  if (int_conv_flag)
 			     PM_array_scale(pdata, psz,
 					    conv_fac);
 
-			  PA_ERR(!_PD_sys_write(pdrs, pdata,
-						PD_entry_number(sp),
-						PD_entry_type(sp),
-						PD_entry_type(sp)),
+			  PA_ERR(!_PD_sys_write(pdrs, pname, pdata,
+						PD_entry_number(ep),
+						PD_entry_type(ep),
+						PD_entry_type(ep)),
 				 "CAN'T WRITE VARIABLE: %s",
 				 pname);
 
@@ -717,7 +717,7 @@ void _PA_wrrstrt(char *rsname, int conv_flag)
 			     PM_array_scale(pdata, psz,
 					    1.0/conv_fac);}
 		      else
-			 _PD_rl_syment_d(sp);
+			 _PD_rl_syment_d(ep);
 
 		      break;
 
@@ -889,7 +889,7 @@ void _PA_rd_variable(PDBfile *pdrs, PA_variable *pp,
 		     int conv_flag, int scope)
    {int psz, int_conv_flag;
     double conv_fac;
-    syment *sp;
+    syment *ep;
     int pclass, pscope;
     char *pname;
     void *pdata;
@@ -898,8 +898,8 @@ void _PA_rd_variable(PDBfile *pdrs, PA_variable *pp,
     pclass = PA_VARIABLE_CLASS(pp);
     pscope = PA_VARIABLE_SCOPE(pp);
 
-    sp = PD_inquire_entry(pdrs, pname, FALSE, NULL);
-    if (sp == NULL)
+    ep = PD_inquire_entry(pdrs, pname, FALSE, NULL);
+    if (ep == NULL)
        {PA_ERR(((pscope == scope) && (pclass == REQU)),
                "REQUIRED VARIABLE %s NOT IN %s - _PA_RD_VARIABLE",
                pname, _PA.rsname);
@@ -908,10 +908,10 @@ void _PA_rd_variable(PDBfile *pdrs, PA_variable *pp,
 /* recompute the size of all variables now that the defining parameters
  * will have been read in
  */
-    psz                  = _PA_dims_to_list(PD_entry_dimensions(sp),
+    psz                  = _PA_dims_to_list(PD_entry_dimensions(ep),
                                             PA_VARIABLE_DIMS(pp));
     PA_VARIABLE_SIZE(pp) = psz;
-    sp->number           = psz;
+    ep->number           = psz;
 
 /* if conversions are requested check that the conversion factor isn't unity */
     COMPUTE_CONVERSION_FACTOR(conv_flag, conv_fac,
@@ -938,7 +938,7 @@ void _PA_rd_variable(PDBfile *pdrs, PA_variable *pp,
         else
            PA_VARIABLE_DATA(pp) = _PA_pdb_read(pdrs, pname, NULL, NULL);
 
-        PA_VARIABLE_DESC(pp) = PD_copy_syment(sp);
+        PA_VARIABLE_DESC(pp) = PD_copy_syment(ep);
         pdata                = PA_VARIABLE_DATA(pp);
 
 /* convert the file data to the requested unit system */

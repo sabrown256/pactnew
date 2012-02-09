@@ -1,218 +1,728 @@
-
-floats/   ints/
 ---------------------------------------
-  full path, delay pointers mode
+---------------------------------------
+   / directory, delay rsa mode
 
-/ints/cn(0,0) =          1
-/ints/cn(0,1) =          2
-/ints/cn(0,2) =          3
-/ints/cn(0,3) =          4
-/ints/cn(0,4) =          5
-/ints/cn(1,0) =          6
-/ints/cn(1,1) =          7
-/ints/cn(1,2) =          8
-/ints/cn(1,3) =          9
-/ints/cn(1,4) =         10
 
-/ints/an = (nil)
+/&ptrs/             /floats/            /ints/              /is
+/&ptrs/ia_1#/ip     /ia                 /ip
 
-/ints/en(0) = (nil)
-/ints/en(1) = (nil)
-/ints/en(2) = (nil)
-
-/ints/sn = (nil)
-
-/floats/cs(0,0) =  1.0000000e+00
-/floats/cs(0,1) =  2.0000000e+00
-/floats/cs(1,0) =  3.0000000e+00
-/floats/cs(1,1) =  4.0000000e+00
-/floats/cs(2,0) =  5.0000000e+00
-/floats/cs(2,1) =  6.0000000e+00
-/floats/cs(3,0) =  7.0000000e+00
-/floats/cs(3,1) =  8.0000000e+00
-/floats/cs(4,0) =  9.0000000e+00
-/floats/cs(4,1) =  1.0000000e+01
-
-/floats/as = (nil)
-
-/floats/es(0) = (nil)
-/floats/es(1) = (nil)
-/floats/es(2) = (nil)
-
-/floats/ss = (nil)
+Known variables:
+   /ip
+   /ia
+   /is
+Unknown variables:
+   /floats/d/fp
+   /floats/d/fa
+   /floats/d/fs
+   /floats/fpp
+   /floats/fap
+   /floats/fp
+   /floats/fa
+   /ints/d/ip
+   /ints/d/ia
+   /ints/d/is
+   /ints/ipp
+   /ints/iap
+   /ints/ip
+   /ints/ia
 
 ---------------------------------------
-  /ints directory, delay pointers mode
+   /ints directory, delay rsa mode
 
-/ints/cn(0,0) =          1
-/ints/cn(0,1) =          2
-/ints/cn(0,2) =          3
-/ints/cn(0,3) =          4
-/ints/cn(0,4) =          5
-/ints/cn(1,0) =          6
-/ints/cn(1,1) =          7
-/ints/cn(1,2) =          8
-/ints/cn(1,3) =          9
-/ints/cn(1,4) =         10
 
-/ints/an(0) =          1
-/ints/an(1) =          2
-/ints/an(2) =          3
-/ints/an(3) =          4
+/&ptrs/                    /&ptrs/ia_7#/ints/ipp      /ints/ia
+/&ptrs/ia_1#/ip            /&ptrs/ia_8#/ints/ipp      /ints/iap
+/&ptrs/ia_2#/ints/ip       /floats/                   /ints/ip
+/&ptrs/ia_3#/ints/iap      /ia                        /ints/ipp
+/&ptrs/ia_4#/ints/iap      /ints/                     /ip
+/&ptrs/ia_5#/ints/iap      /ints/d/                   /is
+/&ptrs/ia_6#/ints/ipp
 
-/ints/en(0)(0) =         -1
-/ints/en(0)(1) =         -2
-/ints/en(0)(2) =         -3
-/ints/en(1)(0) =         40
-/ints/en(1)(1) =         50
-/ints/en(2)(0) =          6
-/ints/en(2)(1) =          7
-/ints/en(2)(2) =          8
-/ints/en(2)(3) =          9
+Known variables:
+   /ints/ipp
+   /ints/iap
+   /ints/ip
+   /ints/ia
+   /ip
+   /ia
+   /is
+Unknown variables:
+   /floats/d/fp
+   /floats/d/fa
+   /floats/d/fs
+   /floats/fpp
+   /floats/fap
+   /floats/fp
+   /floats/fa
+   /ints/d/ip
+   /ints/d/ia
+   /ints/d/is
 
-/ints/sn(0)(0) =          1
-/ints/sn(0)(1) =          2
-/ints/sn(0)(2) =          3
-/ints/sn(0)(3) =          4
-/ints/sn(0)(4) =          5
-/ints/sn(1)(0) =          6
-/ints/sn(1)(1) =          7
-/ints/sn(1)(2) =          8
-/ints/sn(1)(3) =          9
 
----------------------------------------
-  /floats directory, delay pointers mode
+/ints/ia(0,0) =          1
+/ints/ia(0,1) =          2
+/ints/ia(0,2) =          3
+/ints/ia(0,3) =          4
+/ints/ia(0,4) =          5
+/ints/ia(1,0) =          6
+/ints/ia(1,1) =          7
+/ints/ia(1,2) =          8
+/ints/ia(1,3) =          9
+/ints/ia(1,4) =         10
 
-/floats/cs(0,0) =  1.0000000e+00
-/floats/cs(0,1) =  2.0000000e+00
-/floats/cs(1,0) =  3.0000000e+00
-/floats/cs(1,1) =  4.0000000e+00
-/floats/cs(2,0) =  5.0000000e+00
-/floats/cs(2,1) =  6.0000000e+00
-/floats/cs(3,0) =  7.0000000e+00
-/floats/cs(3,1) =  8.0000000e+00
-/floats/cs(4,0) =  9.0000000e+00
-/floats/cs(4,1) =  1.0000000e+01
+/ints/ip(0) =          1
+/ints/ip(1) =          2
+/ints/ip(2) =          3
+/ints/ip(3) =          4
 
-/floats/as(0) =  1.0000000e+00
-/floats/as(1) =  2.0000000e+00
-/floats/as(2) =  3.0000000e+00
-/floats/as(3) =  4.0000000e+00
+/ints/iap(0)(0) =         -1
+/ints/iap(0)(1) =         -2
+/ints/iap(0)(2) =         -3
+/ints/iap(1)(0) =         40
+/ints/iap(1)(1) =         50
+/ints/iap(2)(0) =          6
+/ints/iap(2)(1) =          7
+/ints/iap(2)(2) =          8
+/ints/iap(2)(3) =          9
 
-/floats/es(0)(0) = -1.0000000e+00
-/floats/es(0)(1) = -2.0000000e+00
-/floats/es(0)(2) = -3.0000000e+00
-/floats/es(1)(0) =  4.0000000e+01
-/floats/es(1)(1) =  5.0000000e+01
-/floats/es(2)(0) =  6.0000000e+00
-/floats/es(2)(1) =  7.0000000e+00
-/floats/es(2)(2) =  8.0000000e+00
-/floats/es(2)(3) =  9.0000000e+00
-
-/floats/ss(0)(0) =  1.0000000e+00
-/floats/ss(0)(1) =  2.0000000e+00
-/floats/ss(0)(2) =  3.0000000e+00
-/floats/ss(0)(3) =  4.0000000e+00
-/floats/ss(0)(4) =  5.0000000e+00
-/floats/ss(1)(0) =  6.0000000e+00
-/floats/ss(1)(1) =  7.0000000e+00
-/floats/ss(1)(2) =  8.0000000e+00
-/floats/ss(1)(3) =  9.0000000e+00
-
-floats/   ints/
----------------------------------------
-  full path, delay all mode
-
-/ints/cn is not a file variable
-/ints/an is not a file variable
-/ints/en is not a file variable
-/ints/sn is not a file variable
-/floats/cs is not a file variable
-/floats/as is not a file variable
-/floats/es is not a file variable
-/floats/ss is not a file variable
+/ints/ipp(0)(0) =          1
+/ints/ipp(0)(1) =          2
+/ints/ipp(0)(2) =          3
+/ints/ipp(0)(3) =          4
+/ints/ipp(0)(4) =          5
+/ints/ipp(1)(0) =          6
+/ints/ipp(1)(1) =          7
+/ints/ipp(1)(2) =          8
+/ints/ipp(1)(3) =          9
 
 ---------------------------------------
-  /ints directory, delay all mode
+   /floats directory, delay rsa mode
 
-/ints/cn is a file variable
-/floats/cs is not a file variable
 
-/ints/cn(0,0) =          1
-/ints/cn(0,1) =          2
-/ints/cn(0,2) =          3
-/ints/cn(0,3) =          4
-/ints/cn(0,4) =          5
-/ints/cn(1,0) =          6
-/ints/cn(1,1) =          7
-/ints/cn(1,2) =          8
-/ints/cn(1,3) =          9
-/ints/cn(1,4) =         10
+/&ptrs/                                 /floats/d/
+/&ptrs/ia_1#/ip                         /floats/fa
+/&ptrs/ia_10#/floats/fp                 /floats/fap
+/&ptrs/ia_11#/floats/fap                /floats/fp
+/&ptrs/ia_12#/floats/fap                /floats/fpp
+/&ptrs/ia_13#/floats/fap                /ia
+/&ptrs/ia_14#/floats/fpp                /ints/
+/&ptrs/ia_15#/floats/fpp                /ip
+/&ptrs/ia_16#/floats/fpp                /is
+/floats/
 
-/ints/an(0) =          1
-/ints/an(1) =          2
-/ints/an(2) =          3
-/ints/an(3) =          4
+Known variables:
+   /floats/fpp
+   /floats/fap
+   /floats/fp
+   /floats/fa
+   /ip
+   /ia
+   /is
+Unknown variables:
+   /floats/d/fp
+   /floats/d/fa
+   /floats/d/fs
+   /ints/d/ip
+   /ints/d/ia
+   /ints/d/is
+   /ints/ipp
+   /ints/iap
+   /ints/ip
+   /ints/ia
 
-/ints/en(0)(0) =         -1
-/ints/en(0)(1) =         -2
-/ints/en(0)(2) =         -3
-/ints/en(1)(0) =         40
-/ints/en(1)(1) =         50
-/ints/en(2)(0) =          6
-/ints/en(2)(1) =          7
-/ints/en(2)(2) =          8
-/ints/en(2)(3) =          9
 
-/ints/sn(0)(0) =          1
-/ints/sn(0)(1) =          2
-/ints/sn(0)(2) =          3
-/ints/sn(0)(3) =          4
-/ints/sn(0)(4) =          5
-/ints/sn(1)(0) =          6
-/ints/sn(1)(1) =          7
-/ints/sn(1)(2) =          8
-/ints/sn(1)(3) =          9
+/floats/fa(0,0) =  1.0000000e+00
+/floats/fa(0,1) =  2.0000000e+00
+/floats/fa(1,0) =  3.0000000e+00
+/floats/fa(1,1) =  4.0000000e+00
+/floats/fa(2,0) =  5.0000000e+00
+/floats/fa(2,1) =  6.0000000e+00
+/floats/fa(3,0) =  7.0000000e+00
+/floats/fa(3,1) =  8.0000000e+00
+/floats/fa(4,0) =  9.0000000e+00
+/floats/fa(4,1) =  1.0000000e+01
+
+/floats/fp(0) =  1.0000000e+00
+/floats/fp(1) =  2.0000000e+00
+/floats/fp(2) =  3.0000000e+00
+/floats/fp(3) =  4.0000000e+00
+
+/floats/fap(0)(0) = -1.0000000e+00
+/floats/fap(0)(1) = -2.0000000e+00
+/floats/fap(0)(2) = -3.0000000e+00
+/floats/fap(1)(0) =  4.0000000e+01
+/floats/fap(1)(1) =  5.0000000e+01
+/floats/fap(2)(0) =  6.0000000e+00
+/floats/fap(2)(1) =  7.0000000e+00
+/floats/fap(2)(2) =  8.0000000e+00
+/floats/fap(2)(3) =  9.0000000e+00
+
+/floats/fpp(0)(0) =  1.0000000e+00
+/floats/fpp(0)(1) =  2.0000000e+00
+/floats/fpp(0)(2) =  3.0000000e+00
+/floats/fpp(0)(3) =  4.0000000e+00
+/floats/fpp(0)(4) =  5.0000000e+00
+/floats/fpp(1)(0) =  6.0000000e+00
+/floats/fpp(1)(1) =  7.0000000e+00
+/floats/fpp(1)(2) =  8.0000000e+00
+/floats/fpp(1)(3) =  9.0000000e+00
 
 ---------------------------------------
-  /floats directory, delay all mode
+---------------------------------------
+   / directory, delay rsc mode
 
-/ints/cn is not a file variable
-/floats/cs is a file variable
 
-/floats/cs(0,0) =  1.0000000e+00
-/floats/cs(0,1) =  2.0000000e+00
-/floats/cs(1,0) =  3.0000000e+00
-/floats/cs(1,1) =  4.0000000e+00
-/floats/cs(2,0) =  5.0000000e+00
-/floats/cs(2,1) =  6.0000000e+00
-/floats/cs(3,0) =  7.0000000e+00
-/floats/cs(3,1) =  8.0000000e+00
-/floats/cs(4,0) =  9.0000000e+00
-/floats/cs(4,1) =  1.0000000e+01
+/&ptrs/             /floats/            /ints/              /is
+/&ptrs/ia_1#/ip     /ia                 /ip
 
-/floats/as(0) =  1.0000000e+00
-/floats/as(1) =  2.0000000e+00
-/floats/as(2) =  3.0000000e+00
-/floats/as(3) =  4.0000000e+00
+Known variables:
+   /ip
+   /ia
+   /is
+Unknown variables:
+   /floats/d/fp
+   /floats/d/fa
+   /floats/d/fs
+   /floats/fpp
+   /floats/fap
+   /floats/fp
+   /floats/fa
+   /ints/d/ip
+   /ints/d/ia
+   /ints/d/is
+   /ints/ipp
+   /ints/iap
+   /ints/ip
+   /ints/ia
 
-/floats/es(0)(0) = -1.0000000e+00
-/floats/es(0)(1) = -2.0000000e+00
-/floats/es(0)(2) = -3.0000000e+00
-/floats/es(1)(0) =  4.0000000e+01
-/floats/es(1)(1) =  5.0000000e+01
-/floats/es(2)(0) =  6.0000000e+00
-/floats/es(2)(1) =  7.0000000e+00
-/floats/es(2)(2) =  8.0000000e+00
-/floats/es(2)(3) =  9.0000000e+00
+---------------------------------------
+   /ints directory, delay rsc mode
 
-/floats/ss(0)(0) =  1.0000000e+00
-/floats/ss(0)(1) =  2.0000000e+00
-/floats/ss(0)(2) =  3.0000000e+00
-/floats/ss(0)(3) =  4.0000000e+00
-/floats/ss(0)(4) =  5.0000000e+00
-/floats/ss(1)(0) =  6.0000000e+00
-/floats/ss(1)(1) =  7.0000000e+00
-/floats/ss(1)(2) =  8.0000000e+00
-/floats/ss(1)(3) =  9.0000000e+00
+
+/&ptrs/                    /&ptrs/ia_6#/ints/ipp      /ints/d/
+/&ptrs/ia_2#/ints/ip       /&ptrs/ia_7#/ints/ipp      /ints/ia
+/&ptrs/ia_3#/ints/iap      /&ptrs/ia_8#/ints/ipp      /ints/iap
+/&ptrs/ia_4#/ints/iap      /floats/                   /ints/ip
+/&ptrs/ia_5#/ints/iap      /ints/                     /ints/ipp
+
+Known variables:
+   /ints/ipp
+   /ints/iap
+   /ints/ip
+   /ints/ia
+Unknown variables:
+   /floats/d/fp
+   /floats/d/fa
+   /floats/d/fs
+   /floats/fpp
+   /floats/fap
+   /floats/fp
+   /floats/fa
+   /ints/d/ip
+   /ints/d/ia
+   /ints/d/is
+   /ip
+   /ia
+   /is
+
+
+/ints/ia(0,0) =          1
+/ints/ia(0,1) =          2
+/ints/ia(0,2) =          3
+/ints/ia(0,3) =          4
+/ints/ia(0,4) =          5
+/ints/ia(1,0) =          6
+/ints/ia(1,1) =          7
+/ints/ia(1,2) =          8
+/ints/ia(1,3) =          9
+/ints/ia(1,4) =         10
+
+/ints/ip(0) =          1
+/ints/ip(1) =          2
+/ints/ip(2) =          3
+/ints/ip(3) =          4
+
+/ints/iap(0)(0) =         -1
+/ints/iap(0)(1) =         -2
+/ints/iap(0)(2) =         -3
+/ints/iap(1)(0) =         40
+/ints/iap(1)(1) =         50
+/ints/iap(2)(0) =          6
+/ints/iap(2)(1) =          7
+/ints/iap(2)(2) =          8
+/ints/iap(2)(3) =          9
+
+/ints/ipp(0)(0) =          1
+/ints/ipp(0)(1) =          2
+/ints/ipp(0)(2) =          3
+/ints/ipp(0)(3) =          4
+/ints/ipp(0)(4) =          5
+/ints/ipp(1)(0) =          6
+/ints/ipp(1)(1) =          7
+/ints/ipp(1)(2) =          8
+/ints/ipp(1)(3) =          9
+
+---------------------------------------
+   /floats directory, delay rsc mode
+
+
+/&ptrs/                                 /floats/
+/&ptrs/ia_10#/floats/fp                 /floats/d/
+/&ptrs/ia_11#/floats/fap                /floats/fa
+/&ptrs/ia_12#/floats/fap                /floats/fap
+/&ptrs/ia_13#/floats/fap                /floats/fp
+/&ptrs/ia_14#/floats/fpp                /floats/fpp
+/&ptrs/ia_15#/floats/fpp                /ints/
+/&ptrs/ia_16#/floats/fpp                /ints/d/
+
+Known variables:
+   /floats/fpp
+   /floats/fap
+   /floats/fp
+   /floats/fa
+Unknown variables:
+   /floats/d/fp
+   /floats/d/fa
+   /floats/d/fs
+   /ints/d/ip
+   /ints/d/ia
+   /ints/d/is
+   /ints/ipp
+   /ints/iap
+   /ints/ip
+   /ints/ia
+   /ip
+   /ia
+   /is
+
+
+/floats/fa(0,0) =  1.0000000e+00
+/floats/fa(0,1) =  2.0000000e+00
+/floats/fa(1,0) =  3.0000000e+00
+/floats/fa(1,1) =  4.0000000e+00
+/floats/fa(2,0) =  5.0000000e+00
+/floats/fa(2,1) =  6.0000000e+00
+/floats/fa(3,0) =  7.0000000e+00
+/floats/fa(3,1) =  8.0000000e+00
+/floats/fa(4,0) =  9.0000000e+00
+/floats/fa(4,1) =  1.0000000e+01
+
+/floats/fp(0) =  1.0000000e+00
+/floats/fp(1) =  2.0000000e+00
+/floats/fp(2) =  3.0000000e+00
+/floats/fp(3) =  4.0000000e+00
+
+/floats/fap(0)(0) = -1.0000000e+00
+/floats/fap(0)(1) = -2.0000000e+00
+/floats/fap(0)(2) = -3.0000000e+00
+/floats/fap(1)(0) =  4.0000000e+01
+/floats/fap(1)(1) =  5.0000000e+01
+/floats/fap(2)(0) =  6.0000000e+00
+/floats/fap(2)(1) =  7.0000000e+00
+/floats/fap(2)(2) =  8.0000000e+00
+/floats/fap(2)(3) =  9.0000000e+00
+
+/floats/fpp(0)(0) =  1.0000000e+00
+/floats/fpp(0)(1) =  2.0000000e+00
+/floats/fpp(0)(2) =  3.0000000e+00
+/floats/fpp(0)(3) =  4.0000000e+00
+/floats/fpp(0)(4) =  5.0000000e+00
+/floats/fpp(1)(0) =  6.0000000e+00
+/floats/fpp(1)(1) =  7.0000000e+00
+/floats/fpp(1)(2) =  8.0000000e+00
+/floats/fpp(1)(3) =  9.0000000e+00
+
+---------------------------------------
+---------------------------------------
+   / directory, delay rsd mode
+
+
+/&ptrs/                                 /floats/d/fa
+/&ptrs/ia_1#/ip                         /floats/d/fp
+/&ptrs/ia_10#/floats/fp                 /floats/d/fs
+/&ptrs/ia_11#/floats/fap                /floats/fa
+/&ptrs/ia_12#/floats/fap                /floats/fap
+/&ptrs/ia_13#/floats/fap                /floats/fp
+/&ptrs/ia_14#/floats/fpp                /floats/fpp
+/&ptrs/ia_15#/floats/fpp                /ia
+/&ptrs/ia_16#/floats/fpp                /ints/
+/&ptrs/ia_17#/floats/d/fp               /ints/d/
+/&ptrs/ia_2#/ints/ip                    /ints/d/ia
+/&ptrs/ia_3#/ints/iap                   /ints/d/ip
+/&ptrs/ia_4#/ints/iap                   /ints/d/is
+/&ptrs/ia_5#/ints/iap                   /ints/ia
+/&ptrs/ia_6#/ints/ipp                   /ints/iap
+/&ptrs/ia_7#/ints/ipp                   /ints/ip
+/&ptrs/ia_8#/ints/ipp                   /ints/ipp
+/&ptrs/ia_9#/ints/d/ip                  /ip
+/floats/                                /is
+/floats/d/
+
+Known variables:
+   /floats/d/fp
+   /floats/d/fa
+   /floats/d/fs
+   /floats/fpp
+   /floats/fap
+   /floats/fp
+   /floats/fa
+   /ints/d/ip
+   /ints/d/ia
+   /ints/d/is
+   /ints/ipp
+   /ints/iap
+   /ints/ip
+   /ints/ia
+   /ip
+   /ia
+   /is
+
+---------------------------------------
+   /ints directory, delay rsd mode
+
+
+/&ptrs/                    /&ptrs/ia_8#/ints/ipp      /ints/d/ip
+/&ptrs/ia_2#/ints/ip       /&ptrs/ia_9#/ints/d/ip     /ints/d/is
+/&ptrs/ia_3#/ints/iap      /floats/                   /ints/ia
+/&ptrs/ia_4#/ints/iap      /floats/d/                 /ints/iap
+/&ptrs/ia_5#/ints/iap      /ints/                     /ints/ip
+/&ptrs/ia_6#/ints/ipp      /ints/d/                   /ints/ipp
+/&ptrs/ia_7#/ints/ipp      /ints/d/ia
+
+Known variables:
+   /ints/d/ip
+   /ints/d/ia
+   /ints/d/is
+   /ints/ipp
+   /ints/iap
+   /ints/ip
+   /ints/ia
+Unknown variables:
+   /floats/d/fp
+   /floats/d/fa
+   /floats/d/fs
+   /floats/fpp
+   /floats/fap
+   /floats/fp
+   /floats/fa
+   /ip
+   /ia
+   /is
+
+
+/ints/ia(0,0) =          1
+/ints/ia(0,1) =          2
+/ints/ia(0,2) =          3
+/ints/ia(0,3) =          4
+/ints/ia(0,4) =          5
+/ints/ia(1,0) =          6
+/ints/ia(1,1) =          7
+/ints/ia(1,2) =          8
+/ints/ia(1,3) =          9
+/ints/ia(1,4) =         10
+
+/ints/ip(0) =          1
+/ints/ip(1) =          2
+/ints/ip(2) =          3
+/ints/ip(3) =          4
+
+/ints/iap(0)(0) =         -1
+/ints/iap(0)(1) =         -2
+/ints/iap(0)(2) =         -3
+/ints/iap(1)(0) =         40
+/ints/iap(1)(1) =         50
+/ints/iap(2)(0) =          6
+/ints/iap(2)(1) =          7
+/ints/iap(2)(2) =          8
+/ints/iap(2)(3) =          9
+
+/ints/ipp(0)(0) =          1
+/ints/ipp(0)(1) =          2
+/ints/ipp(0)(2) =          3
+/ints/ipp(0)(3) =          4
+/ints/ipp(0)(4) =          5
+/ints/ipp(1)(0) =          6
+/ints/ipp(1)(1) =          7
+/ints/ipp(1)(2) =          8
+/ints/ipp(1)(3) =          9
+
+---------------------------------------
+   /floats directory, delay rsd mode
+
+
+/&ptrs/                                 /floats/d/
+/&ptrs/ia_10#/floats/fp                 /floats/d/fa
+/&ptrs/ia_11#/floats/fap                /floats/d/fp
+/&ptrs/ia_12#/floats/fap                /floats/d/fs
+/&ptrs/ia_13#/floats/fap                /floats/fa
+/&ptrs/ia_14#/floats/fpp                /floats/fap
+/&ptrs/ia_15#/floats/fpp                /floats/fp
+/&ptrs/ia_16#/floats/fpp                /floats/fpp
+/&ptrs/ia_17#/floats/d/fp               /ints/
+/floats/                                /ints/d/
+
+Known variables:
+   /floats/d/fp
+   /floats/d/fa
+   /floats/d/fs
+   /floats/fpp
+   /floats/fap
+   /floats/fp
+   /floats/fa
+Unknown variables:
+   /ints/d/ip
+   /ints/d/ia
+   /ints/d/is
+   /ints/ipp
+   /ints/iap
+   /ints/ip
+   /ints/ia
+   /ip
+   /ia
+   /is
+
+
+/floats/fa(0,0) =  1.0000000e+00
+/floats/fa(0,1) =  2.0000000e+00
+/floats/fa(1,0) =  3.0000000e+00
+/floats/fa(1,1) =  4.0000000e+00
+/floats/fa(2,0) =  5.0000000e+00
+/floats/fa(2,1) =  6.0000000e+00
+/floats/fa(3,0) =  7.0000000e+00
+/floats/fa(3,1) =  8.0000000e+00
+/floats/fa(4,0) =  9.0000000e+00
+/floats/fa(4,1) =  1.0000000e+01
+
+/floats/fp(0) =  1.0000000e+00
+/floats/fp(1) =  2.0000000e+00
+/floats/fp(2) =  3.0000000e+00
+/floats/fp(3) =  4.0000000e+00
+
+/floats/fap(0)(0) = -1.0000000e+00
+/floats/fap(0)(1) = -2.0000000e+00
+/floats/fap(0)(2) = -3.0000000e+00
+/floats/fap(1)(0) =  4.0000000e+01
+/floats/fap(1)(1) =  5.0000000e+01
+/floats/fap(2)(0) =  6.0000000e+00
+/floats/fap(2)(1) =  7.0000000e+00
+/floats/fap(2)(2) =  8.0000000e+00
+/floats/fap(2)(3) =  9.0000000e+00
+
+/floats/fpp(0)(0) =  1.0000000e+00
+/floats/fpp(0)(1) =  2.0000000e+00
+/floats/fpp(0)(2) =  3.0000000e+00
+/floats/fpp(0)(3) =  4.0000000e+00
+/floats/fpp(0)(4) =  5.0000000e+00
+/floats/fpp(1)(0) =  6.0000000e+00
+/floats/fpp(1)(1) =  7.0000000e+00
+/floats/fpp(1)(2) =  8.0000000e+00
+/floats/fpp(1)(3) =  9.0000000e+00
+
+---------------------------------------
+---------------------------------------
+   / directory, delay rp mode
+
+
+/&ptrs/             /floats/d/fs        /ints/              /ints/iap
+/&ptrs/ia_1#/ip     /floats/fa          /ints/d/            /ints/ip
+/floats/            /floats/fap         /ints/d/ia          /ints/ipp
+/floats/d/          /floats/fp          /ints/d/ip          /ip
+/floats/d/fa        /floats/fpp         /ints/d/is          /is
+/floats/d/fp        /ia                 /ints/ia
+
+Known variables:
+   /floats/d/fp
+   /floats/d/fa
+   /floats/d/fs
+   /floats/fpp
+   /floats/fap
+   /floats/fp
+   /floats/fa
+   /ints/d/ip
+   /ints/d/ia
+   /ints/d/is
+   /ints/ipp
+   /ints/iap
+   /ints/ip
+   /ints/ia
+   /ip
+   /ia
+   /is
+
+---------------------------------------
+   /ints directory, delay rp mode
+
+
+/&ptrs/                    /floats/d/fs               /ints/d/ia
+/&ptrs/                    /floats/d/fs               /ints/d/ip
+/&ptrs/ia_2#/ints/ip       /floats/fa                 /ints/d/ip
+/&ptrs/ia_3#/ints/iap      /floats/fa                 /ints/d/is
+/&ptrs/ia_4#/ints/iap      /floats/fap                /ints/d/is
+/&ptrs/ia_5#/ints/iap      /floats/fap                /ints/ia
+/&ptrs/ia_6#/ints/ipp      /floats/fp                 /ints/ia
+/&ptrs/ia_7#/ints/ipp      /floats/fp                 /ints/iap
+/&ptrs/ia_8#/ints/ipp      /floats/fpp                /ints/iap
+/floats/                   /floats/fpp                /ints/ip
+/floats/                   /ia                        /ints/ip
+/floats/d/                 /ia                        /ints/ipp
+/floats/d/                 /ints/                     /ints/ipp
+/floats/d/fa               /ints/                     /ip
+/floats/d/fa               /ints/d/                   /ip
+/floats/d/fp               /ints/d/                   /is
+/floats/d/fp               /ints/d/ia                 /is
+
+Known variables:
+   /floats/d/fp
+   /floats/d/fa
+   /floats/d/fs
+   /floats/fpp
+   /floats/fap
+   /floats/fp
+   /floats/fa
+   /ints/d/ip
+   /ints/d/ia
+   /ints/d/is
+   /ints/ipp
+   /ints/iap
+   /ints/ip
+   /ints/ia
+   /ip
+   /ia
+   /is
+
+
+/ints/ia(0,0) =          1
+/ints/ia(0,1) =          2
+/ints/ia(0,2) =          3
+/ints/ia(0,3) =          4
+/ints/ia(0,4) =          5
+/ints/ia(1,0) =          6
+/ints/ia(1,1) =          7
+/ints/ia(1,2) =          8
+/ints/ia(1,3) =          9
+/ints/ia(1,4) =         10
+
+/ints/ip(0) =          1
+/ints/ip(1) =          2
+/ints/ip(2) =          3
+/ints/ip(3) =          4
+
+/ints/iap(0)(0) =         -1
+/ints/iap(0)(1) =         -2
+/ints/iap(0)(2) =         -3
+/ints/iap(1)(0) =         40
+/ints/iap(1)(1) =         50
+/ints/iap(2)(0) =          6
+/ints/iap(2)(1) =          7
+/ints/iap(2)(2) =          8
+/ints/iap(2)(3) =          9
+
+/ints/ipp(0)(0) =          1
+/ints/ipp(0)(1) =          2
+/ints/ipp(0)(2) =          3
+/ints/ipp(0)(3) =          4
+/ints/ipp(0)(4) =          5
+/ints/ipp(1)(0) =          6
+/ints/ipp(1)(1) =          7
+/ints/ipp(1)(2) =          8
+/ints/ipp(1)(3) =          9
+
+---------------------------------------
+   /floats directory, delay rp mode
+
+
+/&ptrs/                                 /ia
+/&ptrs/                                 /ia
+/&ptrs/                                 /ia
+/&ptrs/ia_10#/floats/fp                 /ints/
+/&ptrs/ia_11#/floats/fap                /ints/
+/&ptrs/ia_12#/floats/fap                /ints/
+/&ptrs/ia_13#/floats/fap                /ints/d/
+/&ptrs/ia_14#/floats/fpp                /ints/d/
+/&ptrs/ia_15#/floats/fpp                /ints/d/
+/&ptrs/ia_16#/floats/fpp                /ints/d/ia
+/floats/                                /ints/d/ia
+/floats/                                /ints/d/ia
+/floats/                                /ints/d/ip
+/floats/d/                              /ints/d/ip
+/floats/d/                              /ints/d/ip
+/floats/d/                              /ints/d/is
+/floats/d/fa                            /ints/d/is
+/floats/d/fa                            /ints/d/is
+/floats/d/fa                            /ints/ia
+/floats/d/fp                            /ints/ia
+/floats/d/fp                            /ints/ia
+/floats/d/fp                            /ints/iap
+/floats/d/fs                            /ints/iap
+/floats/d/fs                            /ints/iap
+/floats/d/fs                            /ints/ip
+/floats/fa                              /ints/ip
+/floats/fa                              /ints/ip
+/floats/fa                              /ints/ipp
+/floats/fap                             /ints/ipp
+/floats/fap                             /ints/ipp
+/floats/fap                             /ip
+/floats/fp                              /ip
+/floats/fp                              /ip
+/floats/fp                              /is
+/floats/fpp                             /is
+/floats/fpp                             /is
+/floats/fpp
+
+Known variables:
+   /floats/d/fp
+   /floats/d/fa
+   /floats/d/fs
+   /floats/fpp
+   /floats/fap
+   /floats/fp
+   /floats/fa
+   /ints/d/ip
+   /ints/d/ia
+   /ints/d/is
+   /ints/ipp
+   /ints/iap
+   /ints/ip
+   /ints/ia
+   /ip
+   /ia
+   /is
+
+
+/floats/fa(0,0) =  1.0000000e+00
+/floats/fa(0,1) =  2.0000000e+00
+/floats/fa(1,0) =  3.0000000e+00
+/floats/fa(1,1) =  4.0000000e+00
+/floats/fa(2,0) =  5.0000000e+00
+/floats/fa(2,1) =  6.0000000e+00
+/floats/fa(3,0) =  7.0000000e+00
+/floats/fa(3,1) =  8.0000000e+00
+/floats/fa(4,0) =  9.0000000e+00
+/floats/fa(4,1) =  1.0000000e+01
+
+/floats/fp(0) =  1.0000000e+00
+/floats/fp(1) =  2.0000000e+00
+/floats/fp(2) =  3.0000000e+00
+/floats/fp(3) =  4.0000000e+00
+
+/floats/fap(0)(0) = -1.0000000e+00
+/floats/fap(0)(1) = -2.0000000e+00
+/floats/fap(0)(2) = -3.0000000e+00
+/floats/fap(1)(0) =  4.0000000e+01
+/floats/fap(1)(1) =  5.0000000e+01
+/floats/fap(2)(0) =  6.0000000e+00
+/floats/fap(2)(1) =  7.0000000e+00
+/floats/fap(2)(2) =  8.0000000e+00
+/floats/fap(2)(3) =  9.0000000e+00
+
+/floats/fpp(0)(0) =  1.0000000e+00
+/floats/fpp(0)(1) =  2.0000000e+00
+/floats/fpp(0)(2) =  3.0000000e+00
+/floats/fpp(0)(3) =  4.0000000e+00
+/floats/fpp(0)(4) =  5.0000000e+00
+/floats/fpp(1)(0) =  6.0000000e+00
+/floats/fpp(1)(1) =  7.0000000e+00
+/floats/fpp(1)(2) =  8.0000000e+00
+/floats/fpp(1)(3) =  9.0000000e+00
+
 
