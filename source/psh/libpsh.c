@@ -136,7 +136,8 @@ void free_strings(char **lst)
 
     if (lst != NULL)
        {for (i = 0; lst[i] != NULL; i++)
-	    {FREE(lst[i]);};};
+	    {FREE(lst[i]);};
+        FREE(lst);};
 
     return;}
 
@@ -159,17 +160,20 @@ int last_char(char *s)
 /* VSTRCAT - safe strcat function */
 
 char *vstrcat(char *d, int nc, char *fmt, ...)
-   {int n;
+   {int n, nd, ns;
     char s[LRG];
 
     VA_START(fmt);
     VSNPRINTF(s, LRG, fmt);
     VA_END;
 
-    n = nc - 1 - strlen(d);
-    n = min(n, strlen(s));
+    nd = strlen(d);
+    ns = strlen(s);
+    n  = nc - 1 - nd;
+    n  = min(n, ns);
 
     strncat(d, s, n);
+    d[nd+n] = '\0';
 
     return(d);}
 
@@ -179,12 +183,15 @@ char *vstrcat(char *d, int nc, char *fmt, ...)
 /* NSTRCAT - safe strcat function */
 
 char *nstrcat(char *d, int nc, char *s)
-   {int n;
+   {int n, nd, ns;
 
-    n = nc - 1 - strlen(d);
-    n = min(n, strlen(s));
+    nd = strlen(d);
+    ns = strlen(s);
+    n  = nc - 1 - nd;
+    n  = min(n, ns);
 
     strncat(d, s, n);
+    d[nd+n] = '\0';
 
     return(d);}
 
@@ -1302,7 +1309,8 @@ int push_tok(char *s, int nc, int dlm, char *fmt, ...)
 	delim[1] = '\0';
 	strncat(s, delim, nc);};
 
-    strncat(s, t, nc);
+    if (s != NULL)
+       strncat(s, t, nc);
 
     return(rv);}
 
@@ -1328,9 +1336,10 @@ char *append_tok(char *s, int dlm, char *fmt, ...)
 
 	nc = strlen(s) + strlen(t) + strlen(delim) + 10;
 	p  = MAKE_N(char, nc);
-	strcpy(p, s);
-	strcat(p, delim);
-	strcat(p, t);
+	if (p != NULL)
+	   {strcpy(p, s);
+	    strcat(p, delim);
+	    strcat(p, t);};
 	FREE(s);}
 
     else
@@ -1357,7 +1366,8 @@ int push_tok_beg(char *s, int nc, int dlm, char *fmt, ...)
     if (IS_NULL(s) == FALSE)
        vstrcat(bf, LRG, "%c%s", dlm, s);
 
-    strncpy(s, bf, nc);
+    if (s != NULL)
+       strncpy(s, bf, nc);
 
     return(rv);}
 
@@ -1400,13 +1410,14 @@ char **lst_push(char **lst, char *fmt, ...)
        {lst = MAKE_N(char *, 100);
         memset(lst, 0, 100*sizeof(char *));};
 
-    n = lst_length(lst);
-    if (n % 100 == 98)
-       {m = n + 102;
-        REMAKE(lst, char *, m);
-        memset(lst+n, 0, 102*sizeof(char *));};
+    if (lst != NULL)
+       {n = lst_length(lst);
+	if (n % 100 == 98)
+	   {m = n + 102;
+	    REMAKE(lst, char *, m);
+	    memset(lst+n, 0, 102*sizeof(char *));};
 
-    lst[n] = ps;
+	lst[n] = ps;};
 
     return(lst);}
 
@@ -1428,13 +1439,14 @@ char **lst_add(char **lst, char *s)
        {lst = MAKE_N(char *, 100);
         memset(lst, 0, 100*sizeof(char *));};
 
-    n = lst_length(lst);
-    if (n % 100 == 98)
-       {m = n + 102;
-        REMAKE(lst, char *, m);
-        memset(lst+n, 0, 102*sizeof(char *));};
+    if (lst != NULL)
+       {n = lst_length(lst);
+	if (n % 100 == 98)
+	   {m = n + 102;
+	    REMAKE(lst, char *, m);
+	    memset(lst+n, 0, 102*sizeof(char *));};
 
-    lst[n] = ps;
+	lst[n] = ps;};
 
     return(lst);}
 
@@ -1455,10 +1467,11 @@ char **lst_copy(char **lst)
         m = 100 * h;
 
         nlst = MAKE_N(char *, m);
-        memset(nlst, 0, m*sizeof(char *));
+	if (nlst != NULL)
+	   {memset(nlst, 0, m*sizeof(char *));
 
-        for (i = 0; i < n; i++)
-            nlst[i] = STRSAVE(lst[i]);};
+	    for (i = 0; i < n; i++)
+	        nlst[i] = STRSAVE(lst[i]);};};
 
     return(nlst);}
 
@@ -1999,11 +2012,12 @@ void log_activity(char *flog, int ilog, char *oper, char *fmt, ...)
 
     if ((ilog == TRUE) && (flog != NULL))
        {log = fopen(flog, "a");
-	VA_START(fmt);
-	VSNPRINTF(msg, MAXLINE, fmt);
-	VA_END;
-	fprintf(log, "%s\t(%d)\t: %s\n", oper, (int) getpid(), msg);
-        fclose(log);};
+	if (log != NULL)
+	   {VA_START(fmt);
+	    VSNPRINTF(msg, MAXLINE, fmt);
+	    VA_END;
+	    fprintf(log, "%s\t(%d)\t: %s\n", oper, (int) getpid(), msg);
+	    fclose(log);};};
 
     return;}
 
@@ -2133,6 +2147,7 @@ char **file_text(char *fname, ...)
 int is_running(int pid)
    {int st, ok, err;
 
+    ok  = TRUE;
     err = 0;
     st  = kill(pid, 0);
     if (st == -1)
@@ -2140,9 +2155,7 @@ int is_running(int pid)
 	if (err == EPERM)
 	   ok = TRUE;
 	else if (err == ESRCH)
-	   ok = FALSE;}
-    else
-       ok = TRUE;
+	   ok = FALSE;};
 
     return(ok);}
 
