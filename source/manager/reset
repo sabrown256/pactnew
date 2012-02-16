@@ -43,16 +43,18 @@ if (!(-d $dir)) then
    mkdir $dir
 endif
 
-set files = ( `scs-update | grep -e '^M.*' | sed 's|^M||'` )
+set files = ( `scs-update | grep -e '^ *M.*' | sed 's|^ *M||' | sed "s|^.*/||"` )
 
-if ($sav == TRUE) then
-   cp $files $dir
-   @ err = $err + $status
-endif
+if ("$files" != "") then
+   if ($sav == TRUE) then
+      cp $files $dir
+      @ err = $err + $status
+   endif
 
-if ($rev == TRUE) then
-   scs-revert $files
-   @ err = $err + $status
+   if ($rev == TRUE) then
+      scs-revert $files
+      @ err = $err + $status
+   endif
 endif
 
 exit($err)

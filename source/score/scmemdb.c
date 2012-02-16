@@ -397,21 +397,24 @@ int SC_mem_corrupt(int flag)
 
     _SC_mem_list(flag, TRUE, &arr, &nbl);
 
-    last = TRUE;
-    nc   = 0;
-    for (i = 0; i < nbl; i++)
-        {pa = arr + i*ENTRY_SIZE;
-         if (strstr(pa, "***  ***") != NULL)
-	    {nc++;
+    nc = 0;
 
-	     if ((i != 0) && (last == TRUE))
-	        io_printf(stdout, "%8d %s\n", i-1, pa-ENTRY_SIZE);
-	     io_printf(stdout, "%8d %s\n", i, pa);
-	     last = FALSE;}
+    if (arr != NULL)
+       {last = TRUE;
+	for (i = 0; i < nbl; i++)
+	    {pa = arr + i*ENTRY_SIZE;
+	     if (pa != NULL)
+	        {if (strstr(pa, "***  ***") != NULL)
+		    {nc++;
 
-	 else if (last == FALSE)
-	    {io_printf(stdout, "%8d %s\n", i, pa);
-	     last = TRUE;};};
+		     if ((i != 0) && (last == TRUE))
+		        io_printf(stdout, "%8d %s\n", i-1, pa-ENTRY_SIZE);
+		     io_printf(stdout, "%8d %s\n", i, pa);
+		     last = FALSE;}
+
+		 else if (last == FALSE)
+		    {io_printf(stdout, "%8d %s\n", i, pa);
+		     last = TRUE;};};};};
 
     SC_LOCKOFF(SC_mm_lock);
 
@@ -528,12 +531,14 @@ int SC_mem_ss(char *base, int flag)
        {SC_strncpy(root, MAXLINE, base, -1);
 	idx = 0;};
 
+    nbl = 0;
+
     snprintf(s, MAXLINE, "%s.%03d.map", root, idx++);
     fp = fopen(s, "w");
+    if (fp != NULL)
+       {nbl = _SC_mem_map(fp, flag, ((flag & 8) != 0), TRUE);
 
-    nbl = _SC_mem_map(fp, flag, ((flag & 8) != 0), TRUE);
-
-    fclose(fp);
+	fclose(fp);};
 
     return(nbl);}
 
@@ -591,14 +596,16 @@ static long _SC_mem_monitor(int old, int lev, char *id, char *msg, int dif)
     if (old == -1)
        {if (leva > 1)
 	   {fp = fopen(tb, "w");
-	    _SC_mem_map(fp, actfl, show, FALSE);
-	    fclose(fp);};}
+	    if (fp != NULL)
+	       {_SC_mem_map(fp, actfl, show, FALSE);
+		fclose(fp);};};}
 
     else
        {if (leva > 1)
 	   {fp = fopen(ta, "w");
-	    _SC_mem_map(fp, actfl, show, FALSE);
-	    fclose(fp);
+	    if (fp != NULL)
+	       {_SC_mem_map(fp, actfl, show, FALSE);
+		fclose(fp);};
 
 	    REMOVE(td);
 
@@ -932,7 +939,7 @@ void *SC_mem_diff(FILE *fp, void *a, void *b, size_t nb)
 
 	first = TRUE;
 	for (i = 0; i < nb; i++)
-	    {if (pa[i] == pb[i])
+	    {if ((pa != NULL) && (pb != NULL) && (pa[i] == pb[i]))
 	        {if ((is < id) && (0 <= id))
 		    {if (first == TRUE)
 		        {first = FALSE;

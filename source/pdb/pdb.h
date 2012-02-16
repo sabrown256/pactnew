@@ -655,7 +655,7 @@ struct s_PD_itag
    {int64_t nitems;                              /* number of items pointed to */
     char *type;                                     /* type of item pointed to */
     int64_t addr;                           /* address of the itag owning data */
-    int flag;                               /* TRUE if this itag owns the data */
+    PD_data_location flag;                         /* which itag owns the data */
     int length;};             /* byte length of the itag - not written to file */
 
 /* hyper-index support structure */

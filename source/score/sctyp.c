@@ -309,13 +309,14 @@ int SC_type_alias(char *name, int id)
 	_SC.types.typ = ha;};
 
     ot = _SC_get_type_id(id);
+    if (ot != NULL)
+       {t = CPMAKE(SC_type, 3);
+	if (t != NULL)
+	   {*t = *ot;
 
-    t  = CPMAKE(SC_type, 3);
-    *t = *ot;
+	    t->type = CSTRDUP(name, 3);
 
-    t->type = CSTRDUP(name, 3);
-
-    SC_hasharr_install(ha, name, t, "SC_TYPE", 3, -1);
+	    SC_hasharr_install(ha, name, t, "SC_TYPE", 3, -1);};};
 
     return(id);}
 
@@ -1025,7 +1026,7 @@ int SC_type_match_size(SC_kind kind, int nb)
 void *SC_convert_id(int did, void *d, long od, long ds,
 		    int sid, void *s, long os, long ss,
 		    long n, int flag)
-   {int rv, bpi;
+   {int rv, bpi, nd;
     long nc;
 
 /* allocate the space if need be */
@@ -1033,9 +1034,14 @@ void *SC_convert_id(int did, void *d, long od, long ds,
        {bpi = SC_type_size_i(did);
 	d   = CMAKE_N(char, n*bpi);};
 
-    if (_SC_convf[did][sid] != NULL)
+    nd = sizeof(_SC_convf)/(18*sizeof(PFConv));
+    if ((0 <= did) && (did < nd) &&
+	(0 <= sid) && (sid < 18) &&
+	(_SC_convf[did][sid] != NULL))
        nc = _SC_convf[did][sid](d, od, ds, s, os, ss, n);
-    
+    else
+       nc = -1;
+
     rv = (nc == n);
 
     if (flag && (rv == TRUE))

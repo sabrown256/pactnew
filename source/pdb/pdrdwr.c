@@ -1009,7 +1009,7 @@ int64_t _PD_wr_syment(PDBfile *file, char *name, char *vr, int64_t ni,
     case INDIRECT :
     
          if (vr == NULL)
-            {(*file->wr_itag)(file, name, NULL, 0L, litype, -1L, TRUE);
+            {(*file->wr_itag)(file, name, NULL, 0L, litype, -1L, LOC_HERE);
              GO_CONT;};
 
 /* dereference a local copy of the type */
@@ -1027,7 +1027,7 @@ int64_t _PD_wr_syment(PDBfile *file, char *name, char *vr, int64_t ni,
          SAVE_P(vr);
          vr = DEREF(vr);
          if (vr == NULL)
-            {(*file->wr_itag)(file, name, NULL, 0L, litype, -1L, FALSE);
+            {(*file->wr_itag)(file, name, NULL, 0L, litype, -1L, LOC_OTHER);
              RESTORE_P(char, vr);
              i++;
              vr += sizeof(char *);

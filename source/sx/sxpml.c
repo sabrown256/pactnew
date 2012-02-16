@@ -1580,7 +1580,7 @@ PM_set *SX_rep_to_ac(char *name, double *rx, double *ry,
     n_sides = 0;
     pzone   = zones;
 
-#pragma omp parallel for private(incr, pcell)
+#pragma omp parallel for private(incr, pcell) shared(n_sides)
     for (iz = 0; iz < n_zones; iz++)
         {incr  = 0;
          while (pzone[incr] != -1)

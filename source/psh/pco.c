@@ -905,7 +905,7 @@ static void parse_opt(char *s)
 
     ok  = FALSE;
     avl = "off";
-    for (l = 0; l < n; l++)
+    for (l = 0; (l < n) && (ok == FALSE); l++)
         {vr[0] = '\0';
 
 	 t = sa[l];
@@ -955,7 +955,11 @@ static void parse_opt(char *s)
 	    {if (strcmp(vr, "*") == 0)
 	        {if (strcmp(avl, "off") != 0)
 		    {strcpy(s, arg);
-		     LAST_CHAR(s) = '\0';
+		     trim(s, BACK, " \t\n");
+/*
+		     if (LAST_CHAR(s) == '\n')
+		        LAST_CHAR(s) = '\0';
+*/
 		     strcat(s, avl);
 		     ok = TRUE;};}
 

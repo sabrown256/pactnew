@@ -369,26 +369,28 @@ void PM_stats_mean(int n, double *x, double *pmn, double *pmdn,
 
 double PM_romberg(double (*func)(double x), double x0, double x1, double tol)
    {double y0, toln, h, x;
-    double a[15], b[15];
+    double a[16], b[16];
     int i, n, in;
 
     h = x1 - x0;
     x = x0;
+
     a[0] = h*((*func)(x0) + (*func)(x1))/2.0;
     toln = 2.0*tol;
-    for (n = 2; (n < 16) || (toln > tol); n++)
+
+    for (n = 2; (n < 16) && (toln > tol); n++)
         {h    = h/2.0;
          b[0] = a[0]/2.0;
          x    = x0 + h;
          in   = (int) POW(2.0, (n-2));
          for (i = 0; i < in; i++)
              {b[0] += h*func(x);
-              x = x + 2.0*h;};
+              x    += 2.0*h;};
 
          for (i = 1; i < n; i++)
-             b[i] = (POW(4.0, i)*b[i-1]-a[i-1])/(POW(4.0, i) - 1.0);
+             b[i] = (POW(4.0, i)*b[i-1] - a[i-1])/(POW(4.0, i) - 1.0);
 
-         y0   = b[n-1];
+         y0 = b[n-1];
 
          toln = ABS((y0 - b[n-2])/y0);
          if (toln > tol)

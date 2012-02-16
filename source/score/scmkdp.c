@@ -25,14 +25,20 @@ static void _SC_show_is_newer(int rv, char *fa, time_t ta,
     char sa[MAXLINE], sb[MAXLINE];
 
     pca = SC_localtime(&ta, &safe);
-    ca  = *pca;
+    if (pca != NULL)
+       ca = *pca;
+    else
+       memset(&ca, 0, sizeof(ca));
 
     snprintf(sa, MAXLINE, "%4d/%02d/%02d %02d:%02d:%02d",
 	     1900+ca.tm_year, ca.tm_mon+1, ca.tm_mday,
 	     ca.tm_hour, ca.tm_min, ca.tm_sec);
 
     pcb = SC_localtime(&tb, &safe);
-    cb  = *pcb;
+    if (pcb != NULL)
+       cb  = *pcb;
+    else
+       memset(&cb, 0, sizeof(cb));
 
     snprintf(sb, MAXLINE, "%4d/%02d/%02d %02d:%02d:%02d",
 	     1900+cb.tm_year, cb.tm_mon+1, cb.tm_mday,
@@ -87,13 +93,13 @@ static int _SC_is_newer_archive(char *fa, char *fb, time_t tb, anadep *state)
        state->archives = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 
 /* get the name of the archive into arf */
-    strcpy(arf, fa);
+    SC_strncpy(arf, MAXLINE, fa, -1);
     pa = strstr(arf, ".a(");
     if (pa != NULL)
        pa[2] = '\0';
 
 /* get the base name of the .o in the archive */
-    strcpy(s, pa + 3);
+    SC_strncpy(s, MAXLINE, pa + 3, -1);
     pa = strchr(s, '.');
     if (pa != NULL)
        {pa[1] = 'o';
@@ -206,7 +212,7 @@ static int _SC_add_actions(char *tgt, char *dep, char *sfx,
        a.suffix = CSTRSAVE(sfx);
 
     if (dep == NULL)
-       {strcpy(s, tgt);
+       {SC_strncpy(s, MAXLINE, tgt, -1);
 	t = strrchr(s, '(');
 	if (t == NULL)
 	   t = s;
@@ -273,7 +279,7 @@ static int _SC_implicit_ar(char *tgt, char *dep, int nc,
 
     pred = state->pred;
 
-    strcpy(s, tgt + nc + 3);
+    SC_strncpy(s, MAXLINE, tgt + nc + 3, -1);
     base = strtok(s, ".");
     sfx  = "a";
     knd  = ARCHIVE;
@@ -351,7 +357,7 @@ static int _SC_implicit_obj(char *tgt, char *dep, int nc,
     nc = min(nc, MAXLINE-1);
 
 /* find the base and suffix of the target */
-    strcpy(s, tgt);
+    SC_strncpy(s, MAXLINE, tgt, -1);
     s[nc] = '\0';
     base  = s;
     sfx   = s + nc + 1;
@@ -458,7 +464,7 @@ static int _SC_find_rule(int *pfnd, char *tgt, char *dep, int force,
 
     if ((*pred)(state, tgt, dep, force))
        {if (rd->actions != NULL)
-	   {strcpy(s, dep);
+	   {SC_strncpy(s, MAXLINE, dep, -1);
 	    strtok(s, ".\n");
 	    t = strtok(NULL, "\n");
 	    if (t == NULL)

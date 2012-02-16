@@ -321,6 +321,9 @@ static int check_image_loc(char *ta, char *tb, pixdes *pd)
 
     err = FALSE;
 
+    memset(ca, 0, sizeof(ca));
+    memset(cb, 0, sizeof(cb));
+
     nb = pd->nb;
 
     sa[nb] = '\0';

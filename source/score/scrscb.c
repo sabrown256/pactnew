@@ -82,7 +82,8 @@ static void _SC_i_sort(int *ind, int left, int right)
 void SC_i_sort(int *ind, int n)
    {
 
-    _SC_i_sort(ind, 0, n-1);
+    if (ind != NULL)
+       _SC_i_sort(ind, 0, n-1);
 
     return;}
 

@@ -101,7 +101,8 @@ SC_udl *_SC_parse_udl(char *s)
 		proto = t;
 		srvr  = p + 3;
 		p     = strchr(srvr, '/');
-		*p++  = '\0';
+		if (p != NULL)
+		   *p++ = '\0';
 
 		proto = CSTRSAVE(proto);
 		srvr  = CSTRSAVE(srvr);};

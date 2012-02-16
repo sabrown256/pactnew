@@ -825,6 +825,8 @@ int SC_exec_server(char *shell, char *fname, int na, int show, int ignore,
 
     as->ppid = getppid();
 
+    memset(&state, 0, sizeof(state));
+
 /* start/restart from here
  * on each restart do a fresh setjmp
  */

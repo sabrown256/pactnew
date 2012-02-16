@@ -30,7 +30,8 @@ static int _SC_exec_cmd(char **cmd, char *sys,
         {cm = SC_dstrcat(cm, cmd[n]);
 	 cm = SC_dstrcat(cm, " ");};
 
-    SC_LAST_CHAR(cm) = '\0';
+    if (cm != NULL)
+       SC_LAST_CHAR(cm) = '\0';
 
     if (vrb == TRUE)
        {io_printf(stdout, "\n");

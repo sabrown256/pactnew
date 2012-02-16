@@ -781,7 +781,7 @@ PM_matrix *PM_decomp(PM_matrix *a, int *ips, int flag, int *pnc)
 
     ok = FALSE;
 
-#pragma omp parallel for private(ulb, size, big)
+#pragma omp parallel for private(j, ulb, size, big) shared(ok)
     for (i = 0; i < n; i++)
         {ulb = ula + i*n;
          big = 0.0;
@@ -805,7 +805,7 @@ PM_matrix *PM_decomp(PM_matrix *a, int *ips, int flag, int *pnc)
 
 /* begin super-diagonal element, beta(i,j) */
 
-#pragma omp parallel for private(ulc, bet)
+#pragma omp parallel for private(k, ulc, bet)
          for (i = 0; i < j; i++)
              {ulc = ula + i*n;
               bet = ulc[j];
@@ -818,7 +818,7 @@ PM_matrix *PM_decomp(PM_matrix *a, int *ips, int flag, int *pnc)
 
 /* begin the sub-diagonal element, alpha(i,j) */
 
-#pragma omp parallel for private(ulc, alp, size)
+#pragma omp parallel for private(k, ulc, alp, size) shared(ipv, big)
          for (i = j; i < n; i++)
              {ulc = ula + i*n;
               alp = ulc[j];
@@ -905,7 +905,7 @@ double PM_determinant(PM_matrix *a)
     else
        {det = (nc & 1) ? -1.0 : 1.0;
 
-#pragma omp parallel for
+#pragma omp parallel for shared(det)
 	for (i = 1; i <= n; i++)
 	    det *= PM_element(ul, i, i);
 
@@ -960,7 +960,7 @@ PM_matrix *PM_sol(PM_matrix *ul, PM_matrix *b, int *ips, int flag)
 	      if (is >= 0)
 		 {
 
-#pragma omp parallel for
+#pragma omp parallel for shared(sum)
 		  for (j = is; j <= i-1; j++)
 		      sum -= ub[j]*px[j];
 
@@ -974,7 +974,7 @@ PM_matrix *PM_sol(PM_matrix *ul, PM_matrix *b, int *ips, int flag)
 	     {ub  = ua + i*n;
 	      sum = px[i];
 
-#pragma omp parallel for
+#pragma omp parallel for shared(sum)
 	      for (j = i+1; j < n; j++)
 		  sum -= ub[j]*px[j];
 

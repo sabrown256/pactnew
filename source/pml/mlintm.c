@@ -64,7 +64,7 @@ static INLINE double DISTANCE(double **a, int ia, double **b,
 
     d = 0.0;
 
-#pragma omp parallel for private(xa, xb, dx)
+#pragma omp parallel for private(xa, xb, dx) shared(d)
     for (j = 0; j < nd; j++)
         {xa = a[j][ia];
 	 xb = b[j][ib];
@@ -553,7 +553,7 @@ int PM_interp_mesh_id(int nd, int nf, int ni, double **xi, double **fi,
 
 /* compute the output cartesian product mesh */
 
-#pragma omp parallel for private(nxo, xic, xmn, xmx, dx, xoc)
+#pragma omp parallel for private(i, nxo, xic, xc, xmn, xmx, dx, xoc)
     for (id = 0; id < nd; id++)
         {nxo = mxo[id];
 	 xic = xi[id];
@@ -660,7 +660,7 @@ static double *_PM_mq_coef(int nd, int n, double **x, double *f, double rs)
 
 /* set up the real, symmetric matrix that is used in solving for coef */
 
-#pragma omp parallel for private(i, dc, xc, dxc)
+#pragma omp parallel for private(i, id, dc, xc, dxc)
     for (j = 2; j <= n; j++)
         {for (i = 1; i <= j; i++)
 	     {dc = 0.0;
@@ -730,7 +730,7 @@ static void _PM_mq_eval(int nd, int n, double **xi, double rs, double *coef,
 /* evaluate the function at io */
 	 fc = 0.0;
 
-#pragma omp parallel for
+#pragma omp parallel for private(dc) shared(fc)
 	 for (l = 0; l < n; l++)
 	     {BASIS_MQ(dc, nd, xi, l, xo, ip, rs);
 	      fc += coef[l]*dc;};
@@ -773,7 +773,7 @@ int PM_interp_mesh_mq(int nd, int nf, int ni, double **xi, double **fi,
  */
     rsc = 4.0/ni;
 
-#pragma omp parallel for private(nxo, xic, xmn, xmx, xc, dx, xoc)
+#pragma omp parallel for private(i, nxo, xic, xmn, xmx, xc, dx, xoc) shared(rsc)
     for (id = 0; id < nd; id++)
         {nxo = mxo[id];
 	 xic = xi[id];

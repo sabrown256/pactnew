@@ -34,7 +34,9 @@ void *_SC_alloc_over(size_t nb)
     if (_SC_mf.malloc == NULL)
        _SC_mf.malloc = (PFMalloc) dlsym(RTLD_NEXT, "malloc");
 
-    pr = _SC_mf.malloc(nb);
+    pr = NULL;
+    if (_SC_mf.malloc != NULL)
+       pr = _SC_mf.malloc(nb);
 
     return(pr);}
 
@@ -49,7 +51,8 @@ void _SC_free_over(void *p)
     if (_SC_mf.free == NULL)
        _SC_mf.free = (PFFree) dlsym(RTLD_NEXT, "free");
 
-    _SC_mf.free(p);
+    if (_SC_mf.free != NULL)
+       _SC_mf.free(p);
 
     return;}
 
@@ -64,7 +67,9 @@ void *_SC_realloc_over(void *p, size_t nb)
     if (_SC_mf.realloc == NULL)
        _SC_mf.realloc = (PFRealloc) dlsym(RTLD_NEXT, "realloc");
 
-    pr = _SC_mf.realloc(p, nb);
+    pr = NULL;
+    if (_SC_mf.realloc != NULL)
+       pr = _SC_mf.realloc(p, nb);
 
     return(pr);}
 

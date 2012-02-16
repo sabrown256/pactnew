@@ -55,6 +55,8 @@ static void _SC_mem_map_fr(SC_heap_des *ph, PFMemMap f, void *a)
     long i, j;
     mem_descriptor *desc;
 
+    i = 0L;
+
     for (j = 0L; j < _SC_ms.n_bins; j++)
         {for (i = 0L, desc = ph->free_list[j];
 	      desc != NULL;
@@ -63,7 +65,7 @@ static void _SC_mem_map_fr(SC_heap_des *ph, PFMemMap f, void *a)
 	      if (ok == FALSE)
 	         break;};};
 
-    SC_ASSERT(i >= 0);
+    SC_ASSERT(i >= 0L);
 
     return;}
 

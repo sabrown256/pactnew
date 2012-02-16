@@ -79,10 +79,11 @@ int _SC_chg_dir(char *dir, char **pndir)
 
     if ((st == 0) && (pndir != NULL))
        {cwd = SC_getcwd();
-	if ((ndr == NULL) || (strcmp(cwd, ndr) != 0))
-	   {CFREE(ndr);
-	    *pndir = CSTRSAVE(cwd);};
-	CFREE(cwd);};
+	if (cwd != NULL)
+	   {if ((ndr == NULL) || (strcmp(cwd, ndr) != 0))
+	       {CFREE(ndr);
+		*pndir = CSTRSAVE(cwd);};
+	    CFREE(cwd);};};
 
     return(st);}
 
@@ -172,7 +173,9 @@ fspec *_SC_read_filter(char *fname)
 
 	filter[n].text[0] = '\0';
 	filter[n].itok    = -1;
-	n++;}
+	n++;
+
+	fclose(fp);}
 
     else
        filter = NULL;
@@ -1027,12 +1030,12 @@ static int _SC_handle_echo(taskdesc *job, asyncstate *as, subtask *sub)
     SC_filedes *fd;
     parstate *state;
 
+    rv = TRUE;
+
     if (job != NULL)
        {state = job->context;
 
 	SC_START_ACTIVITY(state, HANDLE_ECHO);
-
-	rv = TRUE;
 
 	inf = &job->inf;
 	na  = sub->nt;
@@ -2001,8 +2004,11 @@ static int _SC_close_job_process(taskdesc *job, int setst)
 	    inf = &job->inf;
 
 	    p = SC_datef();
-	    strcpy(inf->stop_time, p);
-	    CFREE(p);
+	    if (p != NULL)
+	       {strcpy(inf->stop_time, p);
+		CFREE(p);}
+	    else
+	       strcpy(inf->stop_time, "0");
 
 	    pp = job->pp;
 	    if (SC_process_alive(pp))

@@ -132,14 +132,14 @@ static int _SC_unpingable(char *type, char *pnglst)
 /* get the net suffix */
 	SC_firsttok(t, "@");
 	net = SC_firsttok(t, "\n");
-
-	while (TRUE)
-	   {s = SC_firsttok(lst, ", \t\n");
-	    if (s == NULL)
-	       break;
-	    else if (strcmp(s, net) == 0)
-	       {rv = TRUE;
-		break;};};};
+	if (net != NULL)
+	   {while (TRUE)
+	       {s = SC_firsttok(lst, ", \t\n");
+		if (s == NULL)
+		   break;
+		else if (strcmp(s, net) == 0)
+		   {rv = TRUE;
+		    break;};};};};
 
     return(rv);}
 
@@ -443,21 +443,22 @@ int SC_host_server_query(char *out, int nc, char *fmt, ...)
 	   {strs = SC_hasharr_dump(_SC.hsst, NULL, NULL, TRUE);
 
 	    out[0] = '\0';
-	    for (i = 0; TRUE; i++)
-	        {t = strs[i];
-		 if (t == NULL)
-		    break;
+	    if (strs != NULL)
+	       {for (i = 0; TRUE; i++)
+		    {t = strs[i];
+		     if (t == NULL)
+		        break;
 
-		 else if ((*t != '#') && (strcmp(t, ".net") != 0))
-		    {na = strlen(out);
-		     ns = strlen(t);
-		     if (na + ns + 1 < nc)
-		        SC_vstrcat(out, nc, "%s ", t);
-		     else
-		        break;};};
+		     else if ((*t != '#') && (strcmp(t, ".net") != 0))
+		        {na = strlen(out);
+			 ns = strlen(t);
+			 if (na + ns + 1 < nc)
+			    SC_vstrcat(out, nc, "%s ", t);
+			 else
+			    break;};};
 
-	    SC_LAST_CHAR(out) = '\0';
-	    CFREE(strs);}
+		SC_LAST_CHAR(out) = '\0';
+		CFREE(strs);};}
 
 /* list all types with suffix specified in .net */
 	else if (strcmp(s, "-types.net-") == 0)
@@ -466,21 +467,23 @@ int SC_host_server_query(char *out, int nc, char *fmt, ...)
 	    strs = SC_hasharr_dump(_SC.hsst, ptrn, NULL, TRUE);
 
 	    out[0] = '\0';
-	    for (i = 0; TRUE; i++)
-	        {t = strs[i];
-		 if (t == NULL)
-		    break;
+	    if (strs != NULL)
+	       {for (i = 0; TRUE; i++)
+		    {t = strs[i];
+		     if (t == NULL)
+		        break;
 
-		 else
-		    {na = strlen(out);
-		     ns = strlen(t);
-		     if (na + ns + 1 < nc)
-		        SC_vstrcat(out, nc, "%s ", t);
 		     else
-		        break;};};
+		        {na = strlen(out);
+			 ns = strlen(t);
+			 if (na + ns + 1 < nc)
+			    SC_vstrcat(out, nc, "%s ", t);
+			 else
+			    break;};};
 
-	    SC_LAST_CHAR(out) = '\0';
-	    CFREE(strs);}
+		CFREE(strs);};
+
+	    SC_LAST_CHAR(out) = '\0';}
 
 /* list all types with specified suffix */
 	else if (strncmp(s, "-types.at-", 10) == 0)
@@ -700,19 +703,20 @@ int SC_get_sys_length_max(int local, int full)
 	else
 	   strs = SC_hasharr_dump(_SC.hsst, NULL, NULL, TRUE);
 
-	for (i = 0; TRUE; i++)
-	    {if (strs[i] == NULL)
-	        break;
+	if (strs != NULL)
+	   {for (i = 0; TRUE; i++)
+	        {if (strs[i] == NULL)
+		    break;
 
-	     strcpy(t, strs[i]);
-	     if (full == FALSE)
-	        {p = strchr(t, '@');
-		 if (p != NULL)
-		    *p = '\0';};
+		 strcpy(t, strs[i]);
+		 if (full == FALSE)
+		    {p = strchr(t, '@');
+		     if (p != NULL)
+		        *p = '\0';};
 
-	     if (strcmp(t, ".net") != 0)
-	        {ns = strlen(t);
-		 nc = max(nc, ns);};};};
+		 if (strcmp(t, ".net") != 0)
+		    {ns = strlen(t);
+		     nc = max(nc, ns);};};};};
 
     return(nc);}
 

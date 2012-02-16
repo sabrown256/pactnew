@@ -206,7 +206,7 @@ struct sockaddr_in *_SC_tcp_address(char *host, int port)
 #else
 	    hea = gethostbyaddr(&nad, sizeof(nad), AF_INET);
 #endif
-	    if (strcmp(hea->h_name, hen->h_name) == 0)
+	    if ((hea != NULL) && (strcmp(hea->h_name, hen->h_name) == 0))
 	       haddr = nad;};};
 #endif
 

@@ -126,18 +126,17 @@ fcdes *_SC_unknown_container(char *name)
         tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
     
 	ae = CMAKE(fcent);
-
-	ae->name    = CSTRSAVE(name);
-	ae->date    = 0;
-	ae->uid     = -1;
-	ae->gid     = -1;
-	ae->size    = ead - sad + 1;
-	ae->address = sad;
-
-	SC_strncpy(ae->perm, 8, "0444", 8);
-
 	if (ae != NULL)
-	   {snprintf(s, MAXLINE, "%ld:%ld", (long) sad, (long) ead);
+	   {ae->name    = CSTRSAVE(name);
+	    ae->date    = 0;
+	    ae->uid     = -1;
+	    ae->gid     = -1;
+	    ae->size    = ead - sad + 1;
+	    ae->address = sad;
+
+	    SC_strncpy(ae->perm, 8, "0444", 8);
+
+	    snprintf(s, MAXLINE, "%ld:%ld", (long) sad, (long) ead);
 	    SC_hasharr_install(tab, s, ae, "fcent", 3, -1);};
 
 	fc = CMAKE(fcdes);

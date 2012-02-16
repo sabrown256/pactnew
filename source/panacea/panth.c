@@ -552,7 +552,7 @@ int PA_th_trans_name(int n, char **names, int ord, int ncpf)
 
     nthf = PA_th_name_list(n, names, &thfiles);
 
-    strcpy(bf, names[0]);
+    SC_strncpy(bf, MAXLINE, names[0], -1);
     root = SC_strtok(bf, ".", s);
 
     ret = PA_th_trans_files(root, ncpf, nthf, thfiles, ord, FALSE);
@@ -616,7 +616,7 @@ int PA_th_trans_link(int n, char **names, int ord, int ncpf)
 
     nthf = PA_th_link_list(n, names, &thfiles);
 
-    strcpy(bf, names[0]);
+    SC_strncpy(bf, MAXLINE, names[0], -1);
     root = SC_strtok(bf, ".", s);
 
     ret = PA_th_trans_files(root, ncpf, nthf, thfiles, ord, FALSE);
@@ -647,7 +647,7 @@ int PA_th_link_list(int n, char **names, char ***pthfiles)
     fa = SC_STRING_ARRAY();
 
     for (i = 0; i < n; i++)
-        {strcpy(bf, names[i]);
+        {SC_strncpy(bf, MAXLINE, names[i], -1);
 	 while (TRUE)
             {fp = PD_open(bf, "r");
              if (fp == NULL)
@@ -655,13 +655,13 @@ int PA_th_link_list(int n, char **names, char ***pthfiles)
                  break;}
 	     SC_array_string_add_copy(fa, bf);
              if (fp->previous_file != NULL)
-                {strcpy(bf, fp->previous_file);
+                {SC_strncpy(bf, MAXLINE, fp->previous_file, -1);
                  PD_close(fp);}
              else
                 {PD_close(fp);
                  break;};};};
 
-    strcpy(bf, names[0]);
+    SC_strncpy(bf, MAXLINE, names[0], -1);
     nthf      = SC_array_get_n(fa);
     *pthfiles = SC_array_done(fa);
 
@@ -688,7 +688,7 @@ static int _PA_setup_uf_family(char *name, char **thfiles,
     if (nthf <= 0)
        return(FALSE);
 
-    strcpy(type, SC_DOUBLE_S);
+    SC_strncpy(type, MAXLINE, SC_DOUBLE_S, -1);
 
     n_max       = 10;
     _PA.thd  = CMAKE_N(th_record, n_max);
@@ -750,7 +750,7 @@ static int _PA_setup_uf_family(char *name, char **thfiles,
     ind[0] = 0L;
     ind[2] = 1L;
 
-    strcpy(name2, name);    
+    SC_strncpy(name2, MAXLINE, name, -1);
     nm = SC_lasttok(name2, "/");
     if (nm != NULL)
        s = nm;
@@ -909,7 +909,7 @@ static char *_PA_type_mix(PDBfile *file, char *type)
     if (desc == NULL)
        return(type);
 
-    strcpy(_PA.type, desc->type);
+    SC_strncpy(_PA.type, MAXLINE, desc->type, -1);
     for (; desc != NULL; desc = desc->next)
         {if (strcmp(_PA.type, desc->type) != 0)
             return(_PA.heterogeneous);};
@@ -936,7 +936,7 @@ static int _PA_proc_rec(char *name, PDBfile *th, int ncpf, int recn)
 
     fp = th->stream;
 
-    strcpy(rname, _PA.thd[recn].entry_name);
+    SC_strncpy(rname, MAXLINE, _PA.thd[recn].entry_name, -1);
     ep = PD_inquire_entry(th, rname, FALSE, NULL);
     if (ep == NULL)
        return(FALSE);
@@ -974,7 +974,7 @@ static int _PA_proc_rec(char *name, PDBfile *th, int ncpf, int recn)
 
 /* allocate the curve arrays */
     crve = CMAKE_N(double *, nv);
-    strcpy(type, SC_DOUBLE_S);
+    SC_strncpy(type, MAXLINE, SC_DOUBLE_S, -1);
 
     nptm = _PA.ndpt[recn].number;
     for (i = 0; i < nv; i++)
@@ -1075,7 +1075,7 @@ int PA_th_trans_files(char *name, int ncpf, int nthf, char **thfiles,
              return(FALSE);};};
 
 /* find the extrema */
-    strcpy(type, SC_DOUBLE_S);
+    SC_strncpy(type, MAXLINE, SC_DOUBLE_S, -1);
 
     for (i = 0; i < _PA.ndom; i++)
 	{PD_read(_PA.uf[i], "npts0", &n);

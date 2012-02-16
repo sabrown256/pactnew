@@ -280,7 +280,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 
 	fname = SC_dsnprintf(TRUE, "/proc/%d/cmdline", pid);
 	fd    = open(fname, O_RDONLY);
-	if (fd > 0)
+	if (fd >= 0)
 	   {nc = read(fd, s, MAXLINE);
 	    close(fd);
 	    if (nc > 0)

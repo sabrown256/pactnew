@@ -377,8 +377,9 @@ static void PG_init_device_geometry(PG_dev_geometry *g)
 	 g->iflog[id] = FALSE;
 
 /* window location/size in PC */
-	 g->hwin[l]   = 0;
-	 g->hwin[l+1] = 0;
+         if (id < 2)
+	    {g->hwin[l]   = 0;
+	     g->hwin[l+1] = 0;};
 
 /* fractional offset from WC to BND */
 	 g->pad[l]   = 0.01;

@@ -670,10 +670,10 @@
 
 (define (copy-worker which rest)
 
-    (define (have-r fl rv) 
+    (define (match-flag fl val rv)
         (if (and (pair? fl) (not rv))
-	    (have-r (cdr fl) (eqv? (print-name (car fl)) "-R"))
-	    #t))
+	    (match-flag (cdr fl) val (eqv? (print-name (car fl)) val))
+	    rv))
 
     (define (mode-flag fl rv) 
         (if (pair? fl)
@@ -702,7 +702,7 @@
 	   (thsf      current-file)
 	   (rw        (mode-flag flags nil)))
 
-          (set! follow-directories (have-r flags #f))
+          (set! follow-directories (match-flag flags "-R" #f))
 
           (if vars
 	      (let* ((fp (stream-file (file-reference dstf stream-list rw)))
@@ -710,6 +710,29 @@
 		     (the-vars (which-variables thsf
 						(current-directory thsf)
 						vars)))
+
+; set the major order of the new file
+; flag -rmo gives row major order
+; flag -cmo gives column major order
+		    (major-order fp
+				 (cond ((match-flag flags "-rmo" #f)
+					row-major)
+				       ((match-flag flags "-cmo" #f)
+					column-major)
+				       (else
+					(major-order fp))))
+
+; set the default offset of the new file
+; quick but too dirty - -d<n> for offset of <n>
+; currently only 0 and 1 are handled
+; otherwise the default
+		    (default-offset fp
+		                    (cond ((match-flag flags "-d0" #f)
+					   0)
+					  ((match-flag flags "-d1" #f)
+					   1)
+					  (else
+					   (default-offset fp))))
 
 		    (define-macro (move-type x)
 		        (write-defstr* fp (read-defstr* thsf x)))

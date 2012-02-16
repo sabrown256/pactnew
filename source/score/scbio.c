@@ -1336,7 +1336,7 @@ static int _SC_beof(FILE *fp)
 /* _SC_BGETS - method for fgets which terminates on \r or \n */
 
 static char *_SC_bgets(char *s, int n, FILE *fp)
-   {int i, nbr, nb;
+   {int i, nbr, nb, nc;
     int64_t pos;
     char *r;
 
@@ -1346,22 +1346,30 @@ static char *_SC_bgets(char *s, int n, FILE *fp)
        r = _SC_rl_fgets(s, n);
 
     else
-       {pos = _SC_bio_tell(bid);
-	nbr = _SC_bio_in(s, 1, n, bid);
-	if (nbr < n)
-	   s[nbr] = '\0';
+       {r = NULL;
+
+/* reserve the last character for a '\0' terminator */
+        nc = n - 1;
+	if (nc > 0)
+	   {pos = _SC_bio_tell(bid);
+	    nbr = _SC_bio_in(s, 1, nc, bid);
+	    if (nbr < nc)
+	       s[nbr] = '\0';
 
 /* check for newlines */
-	if (nbr > 0)
-	   {for (i = 0; (i < n) && (s[i] != '\n') && (s[i] != '\r'); i++);
-	    nb = i + 1;
-	    if (nb < n)
-	       s[nb] = '\0';
+	    if (nbr > 0)
+	       {for (i = 0; (i < nc) && (s[i] != '\n') && (s[i] != '\r'); i++);
+		nb = i + 1;
+		if (nb < nc)
+		   s[nb] = '\0';
 
-	    nb = min(nb, nbr);
-	    _SC_bio_seek(bid, pos + nb, SEEK_SET);};
+		nb = min(nb, nbr);
+		_SC_bio_seek(bid, pos + nb, SEEK_SET);};
        
-	r = (nbr > 0) ? s : NULL;};
+	    r = (nbr > 0) ? s : NULL;
+
+/* always set last character to '\0' to avoid a buffer overrun */
+	    s[nc] = '\0';};};
 
     return(r);}
 

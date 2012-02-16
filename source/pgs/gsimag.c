@@ -31,7 +31,7 @@ static char
 static void _PG_map_type_image(PG_device *dev, char *type, unsigned char *bf,
 			       int kmax, int lmax, int n, int nc,
 			       void *z, double zmin, double zmax)
-   {int id;
+   {int id, nd;
 
 /* scale the data into the buffer */
     if (type == NULL)
@@ -40,7 +40,9 @@ static void _PG_map_type_image(PG_device *dev, char *type, unsigned char *bf,
     else
        {id = SC_deref_id(type, TRUE);
 	if (SC_is_type_prim(id) == TRUE)
-	   {if (_PG_map_type_image_fnc[id] != NULL)
+	   {nd = sizeof(_PG_map_type_image_fnc)/sizeof(PF_PG_map_type_image);
+	    if ((0 <= id) && (id < nd) &&
+		(_PG_map_type_image_fnc[id] != NULL))
 	       _PG_map_type_image_fnc[id](dev, bf, kmax, lmax, n, nc,
 					  z, zmin, zmax);};};
 

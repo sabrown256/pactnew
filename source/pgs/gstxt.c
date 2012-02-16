@@ -706,8 +706,7 @@ static char *_PG_backup_char(PG_text_box *b, char *p, int n)
  
 /* _PG_TEXT_GETS - do fgets for a text box */
  
-static char *_PG_text_gets(PG_text_box *b, char *buffer, int maxlen,
-			   FILE *stream)
+static char *_PG_text_gets(PG_text_box *b, char *bfr, int nc, FILE *stream)
    {int col, line, sc;
     char c, eof, tmp[MAXLINE];
     char *p, *ps, **bf;
@@ -716,7 +715,7 @@ static char *_PG_text_gets(PG_text_box *b, char *buffer, int maxlen,
     if (b == NULL)
        return(NULL);
 
-    p   = (buffer != NULL) ? buffer : tmp;
+    p   = (bfr != NULL) ? bfr : tmp;
     ps  = p;
     eof = (char) EOF;
  
@@ -764,9 +763,9 @@ static char *_PG_text_gets(PG_text_box *b, char *buffer, int maxlen,
            {*p++ = '\n';
             *p = '\0';
 
-	    if (buffer != NULL)
+	    if (bfr != NULL)
 	       {p = b->text_buffer[b->line] + sc;
-		strcpy(buffer, p);}
+		strcpy(bfr, p);}
 	    else
 	       p = bf[line];
 
@@ -776,7 +775,7 @@ static char *_PG_text_gets(PG_text_box *b, char *buffer, int maxlen,
            p = NULL;}
 
     else
-       p = io_gets(p, maxlen, stream);
+       p = io_gets(p, nc, stream);
  
     return(p);}
 
