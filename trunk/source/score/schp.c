@@ -1486,6 +1486,7 @@ PROCESS *SC_open(char **argv, char **envp, char *mode, ...)
     else
        {initf = NULL;
 	exitf = NULL;
+	exita = NULL;
 	retry = -1;
 	iex   = -1;
 
@@ -1526,7 +1527,7 @@ PROCESS *SC_open(char **argv, char **envp, char *mode, ...)
 	SC_VA_END;
 
 /* copy the name to see where we are going */
-	strcpy(name, argv[0]);
+	SC_strncpy(name, MAXLINE, argv[0], -1);
 
 	if (SC_OTHER_HOSTP(name))
 	   {host = SC_strtok(name, ":", s);
@@ -1588,8 +1589,8 @@ int SC_init_server(int step, int closep)
 		 _SC.srvr = _SC_tcp_bind(_SC.sfd, -1);
 		 if (_SC.srvr == NULL)
 		    SC_error(-1, "BIND FAILED - SC_INIT_SERVER");
-
-		 rv = ntohs(_SC.srvr->sin_port);
+		 else
+		    rv = ntohs(_SC.srvr->sin_port);
 
 		 break;
 

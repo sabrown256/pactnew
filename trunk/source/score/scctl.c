@@ -718,23 +718,24 @@ void SC_advance_name(char *s)
     char *p;
 
     p = strchr(s, '.') + 2;
-    n = STRTOL(p, NULL, 36) + 1;        
+    if (p != NULL)
+       {n = STRTOL(p, NULL, 36) + 1;        
 
-    d1 = n / 36;
-    d2 = n % 36;
+	d1 = n / 36;
+	d2 = n % 36;
 
-    if (d1 > 9)
-       d1 += 'a' - 10;
-    else
-       d1 += '0';
+	if (d1 > 9)
+	   d1 += 'a' - 10;
+	else
+	   d1 += '0';
 
-    if (d2 > 9)
-       d2 += 'a' - 10;
-    else
-       d2 += '0';
+	if (d2 > 9)
+	   d2 += 'a' - 10;
+	else
+	   d2 += '0';
 
-    p[0] = d1;
-    p[1] = d2;
+	p[0] = d1;
+	p[1] = d2;};
 
     return;}
 

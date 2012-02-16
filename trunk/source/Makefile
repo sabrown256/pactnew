@@ -8,3 +8,6 @@ check :
 install :
 	@(cd manager ; dsys install)
 
+clean :
+	@(cd manager ; dsys remove)
+

@@ -19,10 +19,15 @@
 
 (define (help)
     (printf nil "\n")
-    (printf nil "Usage: pdbcp [-h] [-v #] <in-file> [<out-file>] [-a <var>*]\n")
-    (printf nil "   a  all remaining arguments specify variables to copy\n")
-    (printf nil "   h  this help message\n")
-    (printf nil "   v  PDB format version for output (default 3)\n")
+    (printf nil "Usage: pdbcp [-cmo] [-d<#>] [-h] [-rmo] [-v #] <in-file> [<out-file>] [-a <var>*]\n")
+    (printf nil "   a    all remaining arguments specify variables to copy\n")
+    (printf nil "   cmo  make the new file column major order\n")
+    (printf nil "        this is a relabelling not a transpose\n")
+    (printf nil "   d    set the default offset of the new file to <#> (default 0)\n")
+    (printf nil "   h    this help message\n")
+    (printf nil "   rmo  make the new file row major order (default)\n")
+    (printf nil "        this is a relabelling not a transpose\n")
+    (printf nil "   v    PDB format version for output (default 3)\n")
     (printf nil "\n")
     (printf nil "Examples:\n")
     (printf nil "   pdbcp -v 2 file1\n")
@@ -40,7 +45,7 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-(define (process-args v)
+(define (process-args v opt)
     (if v
 	(let* ((arg (list-ref v 0))
 	       (rst (list-tail v 1)))
@@ -52,9 +57,14 @@
 		    ((eqv? arg "-h")
 		     (help))
 
+		    ((or (eqv? arg "-rmo")
+			 (eqv? arg "-cmo")
+			 (eqv? (substring arg 0 2) "-d"))
+                     (set! opt (cons arg opt)))
+
 		    ((eqv? arg "-v")
-		     (format-version (car rst))
-		     (set! rst (cdr rst)))
+		     (format-version (list-ref rst 0))
+		     (set! rst (list-tail rst 1)))
 
 		    ((not inf)
 		     (set! inf arg))
@@ -62,7 +72,8 @@
 		    ((not outf)
 		     (set! outf arg)))
 
-	      (process-args rst))))
+	      (process-args rst opt))
+	opt))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
@@ -72,20 +83,20 @@
    (if (not v)
        (help))
 
-   (process-args v)
+   (let* ((opt (process-args v '(-R -w))))
 
-   (if (not inf)
-       (begin (printf nil "No input file specified\n")
-	      (help)))
+         (if (not inf)
+	     (begin (printf nil "No input file specified\n")
+		    (help)))
 
-   (if (not outf)
-       (set! outf "file.out"))
+	 (if (not outf)
+	     (set! outf "file.out"))
 
 ; open the input file
-   (change-file* inf)
+	 (change-file* inf)
 
 ; copy the variables
-   (apply cp `(-R -w ,@vars ,outf)))
+	 (apply cp (append (append opt vars) (list outf)))))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------

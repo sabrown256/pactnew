@@ -1450,8 +1450,9 @@ char *_SC_mf_data(FILE *fp)
  *             - needs error checking
  */
 
-char *_SC_mf_gets(char *s, int nc, FILE *fp)
-   {char *r;
+char *_SC_mf_gets(char *s, int n, FILE *fp)
+   {int nc;
+    char *r;
 
 #ifdef HAVE_MMAP
 
@@ -1459,35 +1460,43 @@ char *_SC_mf_gets(char *s, int nc, FILE *fp)
     SC_mapped_file *mf;
     file_io_desc *fid;
 
-    mf  = (SC_mapped_file *) fp;
-    fid = &mf->fid;
+    r = NULL;
 
-    if (fid->lftell != NULL)
-       pos = (*fid->lftell)(fp);
-    else
-       pos = (*fid->ftell)(fp);
+/* reserve the last character for a '\0' terminator */
+    nc = n - 1;
+    if (nc > 0)
+       {mf  = (SC_mapped_file *) fp;
+	fid = &mf->fid;
 
-    if (fid->lfread != NULL)
-       nbr = (*fid->lfread)(s, 1, nc, fp);
-    else
-       nbr = (*fid->fread)(s, 1, nc, fp);
+	if (fid->lftell != NULL)
+	   pos = (*fid->lftell)(fp);
+	else
+	   pos = (*fid->ftell)(fp);
+
+	if (fid->lfread != NULL)
+	   nbr = (*fid->lfread)(s, 1, nc, fp);
+	else
+	   nbr = (*fid->fread)(s, 1, nc, fp);
 
 /* check for newlines */
-    if (nbr > 0)
-       {for (i = 0; (s[i] != '\n') && (i < nc); i++);
-	if (i < nc)
-	   s[i+1] = '\0';
+	if (nbr > 0)
+	   {for (i = 0; (s[i] != '\n') && (i < nc); i++);
+	    if (i < nc)
+	       s[i+1] = '\0';
 
-	if (fid->lfseek != NULL)
-	   (*fid->lfseek)(fp, pos + i + 1, SEEK_SET);
-	else
-	   (*fid->fseek)(fp, pos + i + 1, SEEK_SET);};
+	    if (fid->lfseek != NULL)
+	       (*fid->lfseek)(fp, pos + i + 1, SEEK_SET);
+	    else
+	       (*fid->fseek)(fp, pos + i + 1, SEEK_SET);};
        
-    r = (nbr > 0) ? s : NULL;
+	r = (nbr > 0) ? s : NULL;
+
+/* always set last character to '\0' to avoid a buffer overrun */
+	s[nc] = '\0';};
 
 #else
 
-    r = io_gets(s, nc, fp);
+    r = io_gets(s, n, fp);
 
 #endif
 

@@ -243,14 +243,20 @@ static int _PD_fcflush(FILE *fp)
 /* _PD_FCGETS - fgets method for containerf */
 
 static char *_PD_fcgets(char *s, int n, FILE *fp)
-   {char *rv;
+   {int nc;
+    char *rv;
     containerf *cf;
     FILE *fl;
 
     cf = GET_CONTAINERF(fp);
     fl = GET_FILE(cf);
+    rv = NULL;
 
-    rv = fgets(s, n, fl);
+/* reserve the last character for a '\0' terminator */
+    nc = n - 1;
+    if (nc > 0)
+       {rv = fgets(s, nc, fl);
+	s[nc] = '\0';};
 
     return(rv);}
 

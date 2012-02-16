@@ -1081,16 +1081,17 @@ static object *_SXI_default_offset(SS_psides *si, object *arg)
 /* _SXI_MAJOR_ORDER - set the file to row or column major order */
 
 static object *_SXI_major_order(SS_psides *si, object *arg)
-   {char *order;
+   {char *s;
+    PD_major_order ord;
     g_file *po;
     PDBfile *file;
-    object *o;
+    object *o, *order;
 
-    po = NULL;
-    order = NULL;
+    po    = NULL;
+    order = SS_null;
     SS_args(si, arg,
             G_FILE, &po,
-            SC_STRING_I, &order,
+            SS_OBJECT_I, &order,
             0);
 
     if (po == NULL)
@@ -1098,13 +1099,19 @@ static object *_SXI_major_order(SS_psides *si, object *arg)
     else
        file = FILE_FILE(PDBfile, po);
 
-    if (order != NULL)
-       {if ((order[0] == 'r') || (order[0] == 'R'))
-           file->major_order = ROW_MAJOR_ORDER;
-        else
-           file->major_order = COLUMN_MAJOR_ORDER;};
+    ord = ROW_MAJOR_ORDER;
+    if (SS_stringp(order) == TRUE)
+       {s = SS_STRING_TEXT(order);
+	if ((s[0] == 'c') || (s[0] == 'C'))
+	   ord = COLUMN_MAJOR_ORDER;}
+    else if (SS_floatp(order) == TRUE)
+       ord = SS_FLOAT_VALUE(order);
+    else if (SS_integerp(order) == TRUE)
+       ord = SS_INTEGER_VALUE(order);
 
-    o = SS_mk_integer(si, file->major_order);
+    file->major_order = ord;
+
+    o = SS_mk_integer(si, ord);
 
     return(o);}
 

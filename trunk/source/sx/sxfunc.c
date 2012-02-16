@@ -553,7 +553,7 @@ static void _SX_integrate_mapping(PM_mapping *f)
 /* compute the node volume */
     vol = 1.0;
 
-#pragma omp parallel for
+#pragma omp parallel for shared(vol)
     for (j = 0; j < nde; j++)
         vol *= dsc[j];
 

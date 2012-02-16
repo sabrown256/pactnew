@@ -295,8 +295,11 @@ int ps(char *ptrn, int pid, int tmod, int all, int mode, int nc, int dt)
 
     for (ic = 0; ic < nc; ic++)
         {ids = SC_process_ids();
-	 nm  = 0;
-	 np  = 0;
+	 if (ids == NULL)
+	    continue;
+
+	 nm = 0;
+	 np = 0;
 	 for (i = 0; ids[i] != -1; i++)
 	     {np++;
 	      err = SC_resource_usage(&ru, ids[i]);

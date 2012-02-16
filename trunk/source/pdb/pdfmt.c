@@ -32,17 +32,20 @@ int
  */
 
 static char *_PD_get_tok(char *s, int n, FILE *fp, int ch)
-   {int i, c, LineSep;
+   {int i, c, nc, LineSep;
     long nb;
     int64_t loc;
     char *ps;
+
+/* reserve the last character for a '\0' terminator */
+    nc = n - 1;
 
 /* this is for old NLTSS generated files - sigh! */
     LineSep = 0x1f;
     
 /* find the current location and remember it */
     loc = lio_tell(fp);
-    nb  = lio_read(s, 1, n, fp);
+    nb  = lio_read(s, 1, nc, fp);
     ps  = s;
 
 /* check for EOF and reset the file pointer if at EOF */

@@ -846,18 +846,19 @@ int main(int c, char **v)
     else
        fo = stdout;
 
-    write_header(fo);
+    if (fo != NULL)
+       {write_header(fo);
 
 /* emit type conversion code */
-    write_converters(fo);
+	write_converters(fo);
 
 /* emit number to string code */
-    write_str(fo);
+	write_str(fo);
 
-    Separator(fo);
+	Separator(fo);
 
-    if (outf != NULL)
-       fclose(fo);
+	if (outf != NULL)
+	   fclose(fo);};
 
     return(rv);}
 

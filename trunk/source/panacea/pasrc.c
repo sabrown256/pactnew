@@ -437,7 +437,7 @@ void PA_source_variables(double t, double dt)
 
 void PA_interp_src(void *v, PA_src_variable *svp, int ni, int nf,
 		   double t, double dt)
-   {int id;
+   {int id, n;
     char *type;
     double *times;
     double t0, t1, t2, t3;
@@ -455,7 +455,8 @@ void PA_interp_src(void *v, PA_src_variable *svp, int ni, int nf,
     id   = SC_type_id(type, FALSE);
 
     if (SC_is_type_prim(id) == TRUE)
-       {if (PA_interp_src_fnc[id] != NULL)
+       {n = sizeof(PA_interp_src_fnc)/sizeof(PFPA_interp_src);
+	if ((0 <= id) && (id < n) && (PA_interp_src_fnc[id] != NULL))
 	   PA_interp_src_fnc[id](v, svp, ni, nf, t, dt, t0, t1, t2, t3);};
 
     return;}

@@ -163,16 +163,20 @@ unsigned int SC_char_index(char *s, int n)
  *           - a safe string concatentation function
  */
 
-char *SC_strcat(char *dest, size_t lnd, char *src)
-   {size_t ld, ls;
+char *SC_strcat(char *dst, size_t lnd, char *src)
+   {size_t ld, ls, lc;
     char *s;
         
-    ld = strlen(dest);
-    ls = strlen(src);
-    if (ls + ld < lnd)
-       s = strcat(dest, src);
-    else
-       s = strncat(dest, src, lnd - ld - 1);
+    s = NULL;
+    if ((dst != NULL) && (src != NULL))
+       {ld = strlen(dst);
+	ls = strlen(src);
+	if (ls + ld < lnd)
+	   s = strcat(dst, src);
+	else
+	   {lc = lnd - ld - 1;
+	    lc = min(lc, ls);
+	    s  = strncat(dst, src, lc);};};
 
     return(s);}
 
@@ -183,7 +187,7 @@ char *SC_strcat(char *dest, size_t lnd, char *src)
  *            - a safe string concatentation function
  */
 
-char *SC_vstrcat(char *dest, size_t lnd, char *fmt, ...)
+char *SC_vstrcat(char *dst, size_t lnd, char *fmt, ...)
    {size_t ld, ls;
     char *s, *t;
         
@@ -193,12 +197,12 @@ char *SC_vstrcat(char *dest, size_t lnd, char *fmt, ...)
     SC_VSNPRINTF(t, lnd, fmt);
     SC_VA_END;
 
-    ld = strlen(dest);
+    ld = strlen(dst);
     ls = strlen(t);
     if (ls + ld < lnd)
-       s = strcat(dest, t);
+       s = strcat(dst, t);
     else
-       s = strncat(dest, t, lnd - ld - 1);
+       s = strncat(dst, t, lnd - ld - 1);
 
     CFREE(t);
 
@@ -211,25 +215,25 @@ char *SC_vstrcat(char *dest, size_t lnd, char *fmt, ...)
  *            - a safe string concatentation function
  */
 
-char *SC_dstrcat(char *dest, char *src)
+char *SC_dstrcat(char *dst, char *src)
    {size_t ln, lnd, ld, ls;
     char *s;
         
     ls = strlen(src);
 
-    if (dest == NULL)
+    if (dst == NULL)
        {lnd  = 2*max(ls, MAXLINE);
-	dest = CMAKE_N(char, lnd);
-        dest[0] = '\0';};
+	dst = CMAKE_N(char, lnd);
+        dst[0] = '\0';};
 
-    lnd = SC_arrlen(dest);
-    ld  = strlen(dest);
+    lnd = SC_arrlen(dst);
+    ld  = strlen(dst);
 
     if (ls + ld >= lnd)
        {ln = 2*(ls + ld);
-	CREMAKE(dest, char, ln);};
+	CREMAKE(dst, char, ln);};
 
-    s = strcat(dest, src);
+    s = strcat(dst, src);
 
     return(s);}
 
@@ -262,24 +266,24 @@ char *SC_strncpy(char *d, size_t nd, char *s, size_t ns)
  *            - a safe string copy function
  */
 
-char *SC_dstrcpy(char *dest, char *src)
+char *SC_dstrcpy(char *dst, char *src)
    {size_t ld, ls;
     char *s;
         
     ls = strlen(src);
 
-    if (dest == NULL)
+    if (dst == NULL)
        {ld   = 2*max(ls, MAXLINE);
-	dest = CMAKE_N(char, ld);
-        dest[0] = '\0';};
+	dst = CMAKE_N(char, ld);
+        dst[0] = '\0';};
 
-    ld = SC_arrlen(dest);
+    ld = SC_arrlen(dst);
 
     if (ls + 2 >= ld)
        {ld = 2*ls;
-	CREMAKE(dest, char, ld);};
+	CREMAKE(dst, char, ld);};
 
-    s = strcpy(dest, src);
+    s = strcpy(dst, src);
 
     return(s);}
 
@@ -657,7 +661,8 @@ int SC_strerror(int err, char *msg, size_t nc)
 char *SC_trim_left(char *s, char *delim)
    {
 
-    for (; (*s != '\0') && (strchr(delim, *s) != NULL); s++);
+    if ((s != NULL) && (delim != NULL))
+       for (; (*s != '\0') && (strchr(delim, *s) != NULL); s++);
 
     return(s);}
 
@@ -672,12 +677,13 @@ char *SC_trim_right(char *s, char *delim)
    {int ic, nc, c;
 
 /* do nothing with zero length strings */
-    nc = strlen(s);
-    for (ic = nc - 1; ic >= 0; ic--)
-        {c = s[ic];
-	 if (strchr(delim, c) == NULL)
-	    break;
-	 s[ic] = '\0';};
+    if ((s != NULL) && (delim != NULL))
+       {nc = strlen(s);
+	for (ic = nc - 1; ic >= 0; ic--)
+	    {c = s[ic];
+	     if (strchr(delim, c) == NULL)
+	        break;
+	     s[ic] = '\0';};};
 
     return(s);}
 
@@ -1268,7 +1274,7 @@ char **SC_tokenize_literal(char *s, char *delim, int nl, int qu)
  */
 
 char **SC_file_strings(char *fname)
-   {char s[MAX_BFSZ];
+   {char s[MAX_BFSZ+1];
     char **sa;
     SC_array *a;
     FILE *fp;
@@ -1276,10 +1282,12 @@ char **SC_file_strings(char *fname)
     a = SC_STRING_ARRAY();
 
     fp = fopen(fname, "r");
-    while (fgets(s, MAX_BFSZ, fp) != NULL)
-       SC_array_string_add_copy(a, s);
+    if (fp != NULL)
+       {while (fgets(s, MAX_BFSZ, fp) != NULL)
+	   {s[MAX_BFSZ] = '\0';
+	    SC_array_string_add_copy(a, s);};
 
-    fclose(fp);
+	fclose(fp);};
 
     sa = SC_array_done(a);
 
@@ -2044,9 +2052,9 @@ char *SC_dsnprintf(int cp, char *fmt, ...)
  */
 
 int SC_vsnprintf(char *dst, size_t nc, const char *fmt, va_list __a__)
-   {int c, nd;
-    char s[MAXLINE], local[MAXLINE], chr[2], ce;
-    char *le, *lb, *pt, *t;
+   {int i, c, nd;
+    char s[MAXLINE], local[MAXLINE+1], chr[2], ce;
+    char *le, *lb, *t;
     void *p;
     int iv;
     long lv;
@@ -2058,10 +2066,19 @@ int SC_vsnprintf(char *dst, size_t nc, const char *fmt, va_list __a__)
 
     nd = 0;
     while (TRUE)
-       {for (pt = local; (((c = *fmt++) != '%') && (c != '\0')); pt++)
+#if 0
+       {char *pt;
+
+	for (pt = local; (((c = *fmt++) != '%') && (c != '\0')); pt++)
 	    *pt = c;
 
         *pt = '\0';
+#else
+       {for (i = 0; (((c = *fmt++) != '%') && (c != '\0') && (i < MAXLINE)); i++)
+	    local[i] = c;
+
+        local[i] = '\0';
+#endif
 
 /* don't exceed the return buffer size */
 	CAT(dst, nc, nd, local);

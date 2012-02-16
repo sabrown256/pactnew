@@ -1448,7 +1448,7 @@ void _PD_request_unset(PDBfile *file)
     if (file != NULL)
        {req = &file->req;
 
-	req->oper = -1;
+	req->oper = PD_UNINIT;
 
 #ifdef USE_REQUESTS
 /*

@@ -327,7 +327,7 @@ void PM_sub_array(void *in, void *out, long *dims, long *reg, long bpi)
 int _PM_find_value(int *nout, int **out, int nx, char *type, void *x,
 		   int (*prd)(double u, double v), double val,
 		   int nin, int *in)
-   {int id, ipt;
+   {int id, ipt, n;
 
     id = SC_type_id(type, FALSE);
 
@@ -338,7 +338,8 @@ int _PM_find_value(int *nout, int **out, int nx, char *type, void *x,
     else
        ipt = 1;
 
-    if (_PM_find_value_fnc[id] != NULL)
+    n = sizeof(_PM_find_value_fnc)/sizeof(PF_PM_find_value);
+    if ((0 <= id) && (id < n) && (_PM_find_value_fnc[id] != NULL))
        _PM_find_value_fnc[id](nx, x, prd, val, nout, out, nin, in, ipt);
 
     else

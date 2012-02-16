@@ -341,7 +341,7 @@ int SC_get_ncpu(void)
 #if defined(LINUX) || defined(CYGWIN)
 
     {int method;
-     char s[MAXLINE];
+     char s[MAXLINE+1];
      char *ps;
      FILE *fp;
 
@@ -350,7 +350,8 @@ int SC_get_ncpu(void)
         {np     = 0;
          method = 0;
 	 while (SC_fgets(s, MAXLINE, fp) != NULL)
-	    {ps = strtok(s, " :\t");
+	    {s[MAXLINE] = '\0';
+             ps = strtok(s, " :\t");
 	     if (ps == NULL)
 	        continue;
 
@@ -478,6 +479,8 @@ int SC_get_pname(char *path, int nc, int pid)
     if (pid < 0)
        pid = getpid();
 
+     rv = -1;
+
 #if 1
     {char *s;
 
@@ -485,7 +488,8 @@ int SC_get_pname(char *path, int nc, int pid)
      if (st == 1)
         {s  = CSTRSAVE(ru.cmd);
 	 t  = SC_strtok(s, " \t\n", p);
-	 rv = SC_full_path(t, path, nc);
+	 if (t != NULL)
+	    rv = SC_full_path(t, path, nc);
 	 CFREE(s);};};
 #else
     {int i, tid;
@@ -497,7 +501,6 @@ int SC_get_pname(char *path, int nc, int pid)
      cmd = "ps -eo pid,args";
 #endif
 
-     rv = -1;
      st = SC_exec(&out, cmd, NULL, -1);
      if (st == 0)
         {for (i = 0; TRUE; i++)

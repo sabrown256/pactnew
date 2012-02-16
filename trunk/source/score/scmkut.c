@@ -282,7 +282,7 @@ static int setup_env(char *src, anadep *state)
 	return(FALSE);};
 
 /* setup the root directory string */
-    strcpy(state->root, state->exe);
+    SC_strncpy(state->root, MAXLINE, state->exe, -1);
 
 /* remove the executable name */
     p = SC_pop_path(state->root);
@@ -341,7 +341,7 @@ static int make_by_host(char *lst, char **v, char *shell, char **env,
 
     ok = TRUE;
 
-    strcpy(cm, "pact");
+    SC_strncpy(cm, MAXLINE, "pact", -1);
     for (i = 0; v[i] != NULL; i++)
         SC_vstrcat(cm, MAXLINE, " %s", v[i]);
     cmnds[0] = cm;

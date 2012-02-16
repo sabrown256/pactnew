@@ -748,10 +748,11 @@ static int _SC_exec(SC_array *out, char *cmnd, char *shell,
 
     _SC_set_run_task_state(NULL);
 
-    st = chdir(cwd);
-    SC_ASSERT(st == 0);
+    if (cwd != NULL)
+       {st = chdir(cwd);
+	SC_ASSERT(st == 0);
 
-    CFREE(cwd);
+	CFREE(cwd);};
 
     if (dbg == TRUE)
        SC_show_state_log(&state);

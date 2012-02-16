@@ -1613,7 +1613,7 @@ CFG_DONE:
            echo "PACT sources reside in $SrcDir"
            set CSrc = ""
            foreach i ($Pact)
-              set CSrc = ( $CSrc `find $i -name "*.[ch]" -print` )
+              set CSrc = ( $CSrc `find $i -name "*.[ch]" | grep -v /z- | grep -v /dev/` )
            end
            wc -l $CSrc     |&                                                 \
            grep -v "wc:"   |                                                  \
@@ -1624,7 +1624,7 @@ CFG_DONE:
            touch foobar
            set FSrc = ""
            foreach i ($Pact)
-              set FSrc = ( $FSrc `find $i -name "*.f" -print` )
+              set FSrc = ( $FSrc `find $i -name "*.f" | grep -v /z- | grep -v /dev/` )
            end
            wc -l $FSrc     |&                                                 \
            grep -v "wc:"   |                                                  \
@@ -1634,10 +1634,10 @@ CFG_DONE:
            echo " in $#FSrc files" >>& $STDOUT
 
            set SSrc = ""
-           set SSrc = ( $SSrc `find panacea -name "*.scm" -print` )
-           set SSrc = ( $SSrc `find scheme -name "*.scm" -print` )
-           set SSrc = ( $SSrc `find sx -name "*.scm" -print` )
-           set SSrc = ( $SSrc `find ultra -name "*.scm" -print` )
+           set SSrc = ( $SSrc `find panacea -name "*.scm" | grep -v /z- | grep -v /dev/` )
+           set SSrc = ( $SSrc `find scheme -name "*.scm" | grep -v /z- | grep -v /dev/` )
+           set SSrc = ( $SSrc `find sx -name "*.scm" | grep -v /z- | grep -v /dev/` )
+           set SSrc = ( $SSrc `find ultra -name "*.scm" | grep -v /z- | grep -v /dev/` )
            wc -l $SSrc     |&                                                 \
            grep -v "wc:"   |                                                  \
            tail -n 1       |                                                  \
@@ -1645,9 +1645,9 @@ CFG_DONE:
            echo " in $#SSrc files" >>& $STDOUT
 
            set PSrc = ""
-           set PSrc = ( $PSrc `find manager -name "pre-Make" -print` )
+           set PSrc = ( $PSrc `find manager -name "pre-Make"` )
            foreach i ($Pact)
-              set PSrc = ( $PSrc `find $i -name "pre-Make" -print` )
+              set PSrc = ( $PSrc `find $i -name "pre-Make"` )
            end
            wc -l $PSrc     |&                                                 \
            grep -v "wc:"   |                                                  \
@@ -2740,26 +2740,31 @@ CFG_DONE:
 
 # NOTE: NFS may prevent this from always working
            set Failed = ( `grep 'TEST ... FAILED' $Log |& sed 's/^.*|//' |& awk '{ print $1 }' | tr "[A-Z]" "[a-z]" | sort | uniq` )
-           set Passed = ( `grep 'TEST ... PASSED' $Log |& sed 's/^.*|//' |& awk '{ print $1 }' | tr "[A-Z]" "[a-z]" | sort | uniq` )
-           set lfail = ""
-           foreach f ($Failed)
-              set lok = TRUE
-              foreach p ($Passed)
-                 if ($f == $p) then
-                    set lok = FALSE
-                    break
+           if ("$Failed" == "") then
+              flog $Log set RStatus = 0
+              NoteD $Log "All tests passed ($RStatus/$ETime)"
+           else
+              set Passed = ( `grep 'TEST ... PASSED' $Log |& sed 's/^.*|//' |& awk '{ print $1 }' | tr "[A-Z]" "[a-z]" | sort | uniq` )
+              set lfail = ""
+              foreach f ($Failed)
+                 set lok = TRUE
+                 foreach p ($Passed)
+                    if ($f == $p) then
+                       set lok = FALSE
+                       break
+                    endif
+                 end
+                 if ($lok == TRUE) then
+                    set lfail = ( $lfail $f )
                  endif
               end
-              if ($lok == TRUE) then
-                 set lfail = ( $lfail $f )
-              endif
-           end
-           set Failed = ( $lfail )
-           unset lfail
-           unset lok
+              set Failed = ( $lfail )
+              unset lfail
+              unset lok
 
-           NoteD $Log "$#Failed test(s) failed ($RStatus/$ETime)"
-           NoteD $Log "   $Failed"
+              NoteD $Log "$#Failed test(s) failed ($RStatus/$ETime)"
+              NoteD $Log "   $Failed"
+           endif
         endif
         NoteD $Log ""
 

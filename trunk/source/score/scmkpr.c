@@ -688,7 +688,7 @@ char *_SC_subst_macro(char *src, int off, SC_rule_cat whch, int exd,
 	    base = NULL;
 	    switch (c)
 	       {case '*':
-		     strcpy(s, tgt);
+		     SC_strncpy(s, MAXLINE, tgt, -1);
 		     if (whch == ARCHIVE)
 		        {t = strtok(s, "(");
 			 t = strtok(NULL, ")");
@@ -702,7 +702,7 @@ char *_SC_subst_macro(char *src, int off, SC_rule_cat whch, int exd,
 		     break;
 
 		case '<':
-		     strcpy(s, tgt);
+		     SC_strncpy(s, MAXLINE, tgt, -1);
 		     if (whch == ARCHIVE)
 		        {t = strtok(s, "(");
 			 t = strtok(NULL, ")");
@@ -1067,8 +1067,8 @@ int SC_parse_makefile(anadep *state, char *fname)
 	   SC_error(-1, "cannot open file %s", fname);
 
 	else
-	   {strcpy(v.name, fname);
-	    strcpy(a.name, fname);
+	   {SC_strncpy(v.name, MAXLINE, fname, -1);
+	    SC_strncpy(a.name, MAXLINE, fname, -1);
 	    v.text = NULL;
 	    a.text = NULL;
 	    a.nc   = 0;

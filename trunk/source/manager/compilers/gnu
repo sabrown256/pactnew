@@ -16,6 +16,7 @@ ERR_PATTERN  = ":+sp+error:"
 Tool CC {
    Exe       = gcc
    Flags     = -ffloat-store
+   Flags    += -Wunknown-pragmas
    Flags    += [ _env_ = C_STD ;                # C standard flags
                  C89   = -std=c89 ;
                  C99   = -std=c99 ;
@@ -33,7 +34,9 @@ Tool CC {
    Flags    += [ _cmd_ = -cov ;                 # coverage analysis
 	         on    = -fprofile-arcs -ftest-coverage ]
    Debug     = -g -O0 -Wall
-   Optimize  = -g -O -Wunused
+   Optimize  = [ _env_ = PACT_CC_VERSION ;      # optimization level
+                 4.1.2 = -g -O0 -Wall ;         # 4.1.2 crashes on mlcfnc.c with -O
+                 *.*   = -g -O -Wunused ]
    Optimize += [ _cmd_ = -tune @ ;              # optimization tuning
                  *     = -mtune=* ]
    Version   = -v

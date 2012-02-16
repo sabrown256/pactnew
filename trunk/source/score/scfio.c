@@ -208,46 +208,53 @@ int64_t SC_get_buffer_size(void)
 /* SC_PROMPT - fprintf PROMPT on stdout and fgets S on stdin */ 
 
 char *SC_prompt(char *prompt, char *s, int n)
-   {int ok;
+   {int nc, ok;
     char *rv;
 
     ok = FALSE;
+    rv = NULL;
+
+/* reserve the last character for a '\0' terminator */
+    nc = n - 1;
+    if (nc > 0)
+       {
 
 #ifdef HAVE_READLINE
 
-    if (SC_isblocked_file(stdin) == TRUE)
-       {char *t;
+	if (SC_isblocked_file(stdin) == TRUE)
+	   {char *t;
 
 /* if we have no prompt assume that we are working with SC_exec_job
  * and the last line received from the child is the prompt
  */
-	if (prompt == NULL)
-	   {prompt = _SC.elbf;
-	    rl_already_prompted = TRUE;}
-	else
-	   rl_already_prompted = FALSE;
+	    if (prompt == NULL)
+	       {prompt = _SC.elbf;
+		rl_already_prompted = TRUE;}
+	    else
+	       rl_already_prompted = FALSE;
 
-	rl_save_prompt();
-	t = readline(prompt);
-	if (t != NULL)
-	   {snprintf(s, n, "%s\n", t);
-	    if (strlen(t) > 0)
-	       add_history(t);
-	    rv = s;}
-	else
-	   rv = NULL;
+	    rl_save_prompt();
+	    t = readline(prompt);
+	    if (t != NULL)
+	       {snprintf(s, nc, "%s\n", t);
+		if (strlen(t) > 0)
+		   add_history(t);
+		rv = s;};
 
-	rl_restore_prompt();
-	rl_clear_message();
+	    rl_restore_prompt();
+	    rl_clear_message();
  	    
-        ok = TRUE;};
+	    ok = TRUE;};
 
 #endif
 
-    if (ok == FALSE)
-       {if (prompt != NULL)
-	   printf("%s", prompt);
-	rv = fgets(s, n, stdin);};
+	if (ok == FALSE)
+	   {if (prompt != NULL)
+	       printf("%s", prompt);
+	    rv = fgets(s, nc, stdin);};
+
+/* always set last character to '\0' to avoid a buffer overrun */
+	s[nc] = '\0';};
 
     return(rv);}
 
@@ -259,8 +266,23 @@ char *SC_prompt(char *prompt, char *s, int n)
 char *_SC_rl_fgets(char *s, int n)
    {char *rv;
 
-/*    rv = SC_prompt(NULL, s, n); */
-    rv = fgets(s, n, stdin);
+#if 0
+
+    rv = SC_prompt(NULL, s, n);
+
+#else
+
+    int nc;
+
+    rv = NULL;
+
+/* reserve the last character for a '\0' terminator */
+    nc = n - 1;
+    if (nc > 0)
+       {rv = fgets(s, nc, stdin);
+	s[n] = '\0';};
+
+#endif
 
     return(rv);}
 
@@ -493,31 +515,39 @@ size_t _SC_fwrite(void *s, size_t bpi, size_t ni, FILE *fp)
 /* SC_FGETS - do an fgets which terminates on \r or \n */
 
 char *SC_fgets(char *s, int n, FILE *fp)
-   {int i, nbr, nb;
+   {int i, nbr, nb, nc;
     int64_t pos;
     char *r;
     static int count = 0;
 
-    if (fp == stdin)
-       r = _SC_rl_fgets(s, n);
+    r = NULL;
 
-    else
-       {pos = ftell(fp);
-	nbr = fread(s, 1, n, fp);
-	if (nbr < n)
-	   s[nbr] = '\0';
+/* reserve the last character for a '\0' terminator */
+    nc = n - 1;
+    if (nc > 0)
+       {if (fp == stdin)
+	   r = _SC_rl_fgets(s, nc);
+
+        else
+	   {pos = ftell(fp);
+	    nbr = fread(s, 1, nc, fp);
+	    if (nbr < nc)
+	       s[nbr] = '\0';
 
 /* check for newlines */
-	if (nbr > 0)
-	   {for (i = 0; (i < n) && (s[i] != '\n') && (s[i] != '\r'); i++);
-	    nb = i + 1;
-	    if (nb < n)
-	       s[nb] = '\0';
+	    if (nbr > 0)
+	       {for (i = 0; (i < nc) && (s[i] != '\n') && (s[i] != '\r'); i++);
+		nb = i + 1;
+		if (nb < nc)
+		   s[nb] = '\0';
 
-	    nb = min(nb, nbr);
-	    fseek(fp, pos + nb, SEEK_SET);};
+		nb = min(nb, nbr);
+		fseek(fp, pos + nb, SEEK_SET);};
        
-	r = (nbr > 0) ? s : NULL;};
+	    r = (nbr > 0) ? s : NULL;};
+
+/* always set last character to '\0' to avoid a buffer overrun */
+	s[nc] = '\0';};
 
     count++;
 
@@ -848,7 +878,8 @@ int SC_file_access(int log)
                   nc = SC_stol(SC_strtok(s+2, ",\n", t));
 
                   bf = CMAKE_N(char, nc+1);
-                  memset(bf, '\n', nc+1);
+                  memset(bf, '\n', nc);
+		  bf[nc] = '\0';
                   ret = SC_fgets(bf, nc, fp);
                   printf("%s", bf);
                   CFREE(bf);

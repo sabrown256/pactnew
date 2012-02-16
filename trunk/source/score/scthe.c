@@ -495,6 +495,8 @@ void _SC_eth_thread_broadcast(SC_thread_cond *tc)
 
     nc = SC_array_get_n(_SC.eth_conds);
 
+    ci = NULL;
+
     for (i = 0; i < nc; i++)
         {ci = SC_array_get(_SC.eth_conds, i);
 	 ci->waiting = FALSE;};

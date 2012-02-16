@@ -496,7 +496,7 @@ static int _SX_display_diff(PDBfile *pf, char *nma, char *nmb,
 static int _SX_diff_primitives(PDBfile *pf, char *nma, char *nmb, 
 			       char *bfa, char *bfb, char *type, 
 			       inti ni, dimdes *dims)
-   {int id, ret;
+   {int id, ret, n;
     char *indx;
     precisionfp *fp_pre;
 
@@ -533,7 +533,8 @@ static int _SX_diff_primitives(PDBfile *pf, char *nma, char *nmb,
 	else
 	   tol = fp_pre[1].tolerance;
 
-	if (_SX_diff_primitives_fnc[id] != NULL)
+	n = sizeof(_SX_diff_primitives_fnc)/sizeof(PF_SX_diff_primitives);
+	if ((0 <= id) && (id < n) && (_SX_diff_primitives_fnc[id] != NULL))
 	   ret = _SX_diff_primitives_fnc[id](indx, bfa, bfb, ni, tol, ipt);}
 
     if (ret == FALSE)

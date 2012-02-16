@@ -39,7 +39,7 @@ int main(int c, char **v)
 		      break;
 
                  case 'f' :
-		      strcpy(outf, v[++i]);
+		      SC_strncpy(outf, MAXLINE, v[++i], -1);
 		      break;
 
 	         case 'h' :
@@ -57,7 +57,7 @@ int main(int c, char **v)
                          type = SC_AR;
 		      break;};}
          else
-            strcpy(fcn, v[i]);};
+            SC_strncpy(fcn, MAXLINE, v[i], -1);};
 
     if (strlen(fcn) == 0)
        {io_printf(stdout, "No fcontainer specified\n");
