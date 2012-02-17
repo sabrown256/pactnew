@@ -291,8 +291,9 @@ static int _is_struct(char **ps, char *s)
 
 char *get_db(database *db, char *var)
    {int c, st, ok;
-    char s[MAXLINE], t[LRG];
+    char s[MAXLINE];
     char *val, *pk, *pm, *ps, *pt;
+    static char t[LRG];
 
     val = NULL;
 
@@ -391,10 +392,11 @@ void load_db(database *db, char *vr, FILE *fp)
    {char s[LRG];
     char *var, *val;
 
-    while (fgets(s, LRG, fp) != NULL)
-       {key_val(&var, &val, s, "=\n");
-	if ((vr == NULL) || (strcmp(vr, var) == 0))
-	   val = put_db(db, var, val);};
+    if ((db != NULL) && (fp != NULL))
+       {while (fgets(s, LRG, fp) != NULL)
+	   {key_val(&var, &val, s, "=\n");
+	    if ((vr == NULL) || (strcmp(vr, var) == 0))
+	       val = put_db(db, var, val);};};
 
     return;}
 
@@ -416,13 +418,14 @@ static database *make_db(char *root)
     t = name_pid(root);
     fpid = (t == NULL) ? NULL : STRSAVE(t);
 
-    db          = MAKE(database);
-    db->ne      = 0;
-    db->root    = STRSAVE(root);
-    db->file    = fname;
-    db->flog    = flog;
-    db->fpid    = fpid;
-    db->entries = NULL;
+    db = MAKE(database);
+    if (db != NULL)
+       {db->ne      = 0;
+	db->root    = STRSAVE(root);
+	db->file    = fname;
+	db->flog    = flog;
+	db->fpid    = fpid;
+	db->entries = NULL;};
 
     return(db);}
 
@@ -434,11 +437,12 @@ static database *make_db(char *root)
 void free_db(database *db)
    {
 
-    FREE(db->root);
-    FREE(db->file);
-    FREE(db->flog);
-    FREE(db->fpid);
-    FREE(db);
+    if (db != NULL)
+       {FREE(db->root);
+	FREE(db->file);
+	FREE(db->flog);
+	FREE(db->fpid);
+	FREE(db);};
 
     return;}
 
@@ -451,8 +455,8 @@ database *db_srv_create(char *root)
    {database *db;
 
     db = make_db(root);
-
-    unlink(db->file);
+    if (db != NULL)
+       unlink(db->file);
 
     return(db);}
 
@@ -466,13 +470,14 @@ database *db_srv_load(char *root)
     FILE *fp;
 
     db = make_db(root);
+    if (db != NULL)
+       {fp = fopen(db->file, "r");
+	if (fp != NULL)
+	   {load_db(db, NULL, fp);
+	    fclose(fp);};
 
-    fp = fopen(db->file, "r");
-    if (fp != NULL)
-       {load_db(db, NULL, fp);
-	fclose(fp);};
-
-    log_activity(db->flog, dbg_db, "SERVER", "load %d |%s|", db->ne, db->file);
+	log_activity(db->flog, dbg_db, "SERVER", "load %d |%s|",
+		     db->ne, db->file);};
 
     return(db);}
 
@@ -491,23 +496,25 @@ database *db_srv_open(char *root, int init)
     else
        db = db_srv_load(root);
 
-    pid = getpid();
+    if (db != NULL)
+       {pid = getpid();
 
 /* if a server is already running there will be a PID file */
-    if (file_exists(db->fpid) == FALSE)
-       {ioc_server = SERVER;
-	rv = open_sock(root);
-	ASSERT(rv == 0);
+	if (file_exists(db->fpid) == FALSE)
+	   {ioc_server = SERVER;
+	    rv = open_sock(root);
+	    ASSERT(rv == 0);
 
-	fp = fopen(db->fpid, "w");
-	fprintf(fp, "%d", pid);
-	fclose(fp);}
+	    fp = fopen(db->fpid, "w");
+	    if (fp != NULL)
+	       {fprintf(fp, "%d", pid);
+		fclose(fp);};}
 
-    else
-       {free_db(db);
-        db = NULL;};
+	else
+	   {free_db(db);
+	    db = NULL;};
 
-    srv.pid = pid;
+	srv.pid = pid;};
 
     return(db);}
 
@@ -519,11 +526,12 @@ database *db_srv_open(char *root, int init)
 void db_srv_close(database *db)
    {
 
-    close_sock(db->root);
+    if (db != NULL)
+       {close_sock(db->root);
 
-    unlink(db->fpid);
+	unlink(db->fpid);
 
-    free_db(db);
+	free_db(db);};
 
     return;}
 
@@ -538,10 +546,11 @@ int db_srv_save(int fd, database *db)
 
     rv = FALSE;
 
-    log_activity(db->flog, dbg_db, "SERVER", "save %d |%s|", db->ne, db->file);
-
     if (db != NULL)
-       {fp = fopen(db->file, "w");
+       {log_activity(db->flog, dbg_db, "SERVER", "save %d |%s|",
+		     db->ne, db->file);
+
+	fp = fopen(db->file, "w");
 	if (fp != NULL)
 	   {save_db(fd, db, NULL, fp);
 	    fclose(fp);
@@ -848,25 +857,26 @@ int db_restore(char *root, char *db)
  * completely converted away from using the environment
  */
     ta = _db_clnt_ex(NULL, "save:");
-    for (i = 0; ta[i] != NULL; i++)
-        {s = ta[i];
-	 if (strncmp(s, "saved", 5) == 0)
-	    break;
-	 else
+    if (ta != NULL)
+       {for (i = 0; ta[i] != NULL; i++)
+	    {s = ta[i];
+	     if (strncmp(s, "saved", 5) == 0)
+	        break;
+	     else
 #if 1
-	    {vl = strchr(s, '=');
-	     if (vl != NULL)
-	        {*vl++ = '\0';
-		 vl = subst(vl, "\"", "", -1);
-		 csetenv(s, vl);};};};
-    lst_free(ta);
+	        {vl = strchr(s, '=');
+		 if (vl != NULL)
+		    {*vl++ = '\0';
+		     vl = subst(vl, "\"", "", -1);
+		     csetenv(s, vl);};};};
+	lst_free(ta);};
 #else
-	    {s  = subst(s, "\"", "", -1);
-	     ok = putenv(s);
-	     ASSERT(ok == 0);
-	     note(Log, TRUE, "setenv %s", s);};};
+	        {s  = subst(s, "\"", "", -1);
+		 ok = putenv(s);
+		 ASSERT(ok == 0);
+		 note(Log, TRUE, "setenv %s", s);};};
 
-    FREE(ta);
+	FREE(ta);};
 #endif
 
     return(rv);}

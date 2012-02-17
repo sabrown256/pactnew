@@ -167,6 +167,8 @@ static void invoke_script(char **vo, char *shell, char *pact,
 
     nstrncpy(args, MAXLINE, p, -1);
 
+    co = 0;
+
     p = strstr(args, "-lang");
     if (p == NULL)
        co = make_shell_script(fi, fname, shell, pact, args, henv, vo, v, k);

@@ -108,6 +108,9 @@ template *make_template(char *proto, int nl, char **body,
 
     t = MAKE(template);
 
+    t->tmn = NULL;
+    t->tmx = NULL;
+
 /* reduce the type range names to indeces */
     for (i = 0; i < N_TYPES; i++)
         {if (types[i] != NULL)
@@ -136,11 +139,11 @@ template *make_template(char *proto, int nl, char **body,
 	 nstrcat(rtype, MAXLINE, " ");};
     LAST_CHAR(rtype) = '\0';
         
+    t->nl    = nl;
+    t->lo    = ln;
     t->rtype = STRSAVE(rtype);
     t->fname = STRSAVE(fname);
     t->args  = STRSAVE(args);
-    t->nl    = nl;
-    t->lo    = ln;
     t->body  = body;
 
     free_strings(sa);

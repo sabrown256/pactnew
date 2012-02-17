@@ -1,0 +1,109 @@
+#!/bin/csh -f
+#
+# TEMPL - test the template generator
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set msg = "TEMPLATE Test .................."
+
+set TEMPLATE = template
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: templ [-h]"
+           echo "  h  this help message"
+           echo ""
+           exit(1);
+      default:
+           breaksw
+   endsw
+   shift
+end
+
+InitLog Log $TestDir/log.template.$LogSfx
+
+flog $Log pushd $RootDir/psh
+flog $Log $MAKE -i template
+flog $Log popd
+flog $Log rehash
+
+flog $Log cd $TestDir
+
+# omit tests - usually in difficult CROSS_COMPILE situation
+if ($RUN_TESTS == FALSE) then
+   NoteD $Log ""
+   NoteD $Log "                    ${msg}omitted"
+   NoteD $Log ""
+
+else
+
+   NoteD $Log ""
+   NoteD $Log "                    $msg"
+   Note $Log ""
+
+   set List = (-va score/scfnca.t pml/mlsrch.t sx/sxpdbd.t)
+
+   Note $Log "Using $TEMPLATE"
+
+   foreach t ($List)
+      Separator $Log
+
+      if ("$t" == "-va") then
+         set u = $t
+         set f = ( `fill-string -n 28 arg` )
+         flog $Log set Res = arg.res
+         flog $Log set Ref = $RefDir/arg
+      else
+         set u = $t:t
+         set f = ( `fill-string -n 28 $u` )
+         flog $Log set Res = $u.res
+         flog $Log set Ref = $RefDir/$u
+      endif
+
+      NoteD $Log -n "                        $f "
+      Note $Log ""
+
+      flog $Log cp $RootDir/$t .
+      flog $Log $TEMPLATE $u -o $Res
+
+      set xstatus = $status
+
+      if (-f $Ref) then
+         flog $Log ( diff -w -b $Res $Ref >! $Res.diff )
+         set xstatus = $status
+      else
+         flog $Log cp $Res $Ref
+         set xstatus = $status
+      endif
+
+      if ($xstatus == 0) then
+         NoteD $Log "ok"
+         flog $Log rm -f $Res $Res.diff
+      else
+         if (-d $Res.log) then
+            flog $Log cat $Res.log
+         endif
+         flog $Log cat $Res
+         flog $Log cat $Res.diff
+         NoteD $Log "ng"
+         flog $Log @ nerr = 1
+      endif
+   end
+
+#   set rpf = ( $rpf *.t.res )
+
+endif
+
+$TEST_CHECK part -a template -e $nerr -rpf "$rpf" "$msg"
+
+exit($status)
+
+

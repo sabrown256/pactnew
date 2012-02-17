@@ -890,9 +890,9 @@ static void parse_db(rundes *st)
  */
 
 static int setup_dbg_path(rundes *st)
-   {int rv;
+   {int i, rv;
     char s[MAXLINE], ent[MAXLINE];
-    char *c, *fn, *lst;
+    char *c, *fn, **lst;
     FILE *fp;
 
     c = cgetenv(TRUE, "DBG_Exe");
@@ -918,25 +918,26 @@ static int setup_dbg_path(rundes *st)
 	    nstrncpy(s, MAXLINE, path_head(s), -1);
 	    nstrncpy(s, MAXLINE, path_head(s), -1);
 	    if (dir_exists("%s/sources", s) == TRUE)
-	       lst = run(FALSE, "ls %s/sources/ 2> /dev/null", s);
+	       lst = ls("", "%s/sources/", s);
 
 	    else
 	       {nstrncpy(s, MAXLINE, path_head(s), -1);
 		if (dir_exists(s) == TRUE)
-		   lst = run(FALSE, "ls %s 2> /dev/null", s);
+		   lst = ls("", "%s", s);
 		else
 		   lst = NULL;};
 
-	    FOREACH(i, lst, " :\n");
-	       nstrncpy(ent, MAXLINE, path_tail(i), -1);
-	       if ((dir_exists("%s/%s", s, ent) == TRUE) &&
-	           (strcmp(ent, "CVS") != 0) &&
-	           (strncmp(ent, "z-", 2) != 0) &&
-		   (strcmp(ent, "dev") != 0))
-		  fprintf(fp, "%s/%s\n", s, ent);
-	    ENDFOR;
+	    for (i = 0; lst[i] != NULL; i++)
+	        {nstrncpy(ent, MAXLINE, path_tail(lst[i]), -1);
+		 if ((dir_exists("%s/%s", s, ent) == TRUE) &&
+		     (strcmp(ent, "CVS") != 0) &&
+		     (strncmp(ent, "z-", 2) != 0) &&
+		     (strcmp(ent, "dev") != 0))
+		    fprintf(fp, "%s/%s\n", s, ent);};
 
 	    fclose(fp);
+
+	    free_strings(lst);
 
 	    if (st->verbose > 0)
 	       printf("Running under %s\n", cgetenv(TRUE, "DBG_Exe"));

@@ -431,11 +431,13 @@ static int _job_parent_fork(process *pp, process *cp, char *mode)
     pp->start_time = wall_clock_time();
     pp->stop_time  = 0.0;
 
-    pp->fin  = fdopen(pp->in, "r");
-    pp->fout = fdopen(pp->out, "w");
+    pp->fin = fdopen(pp->in, "r");
+    if (pp->fin != NULL)
+       setbuf(pp->fin, NULL);
 
-    setbuf(pp->fin, NULL);
-    setbuf(pp->fout, NULL);
+    pp->fout = fdopen(pp->out, "w");
+    if (pp->fout != NULL)
+       setbuf(pp->fout, NULL);
 
     _job_free(cp);
 
@@ -598,28 +600,30 @@ static int _job_setup_proc(process **ppp, process **pcp)
     cp = _job_mk_process(TRUE);
     pp = _job_mk_process(FALSE);
 
+    if ((cp != NULL) && (pp != NULL))
+
 /* set up the communications pipe */
-    flag = _job_init_ipc(pp, cp);
-    if (flag == FALSE)
-       {FREE(pp);
-	FREE(cp);
-        fprintf(stdout, "COULDN'T CREATE IPC CHANNELS - _JOB_SETUP_PROC");
-	return(-1);};
+       {flag = _job_init_ipc(pp, cp);
+	if (flag == FALSE)
+	   {FREE(pp);
+	    FREE(cp);
+	    fprintf(stdout, "COULDN'T CREATE IPC CHANNELS - _JOB_SETUP_PROC");
+	    return(-1);};
 
 #if 0
 /* disable SIGTTOU when running in background */
-    if (is_background() & 1)
-       SC_io_suspend(FALSE);
+	if (is_background() & 1)
+	   SC_io_suspend(FALSE);
 #endif
 
-    pp->status = JOB_RUNNING;
-    pp->reason = 0;
+	pp->status = JOB_RUNNING;
+	pp->reason = 0;
 
-    cp->status = JOB_RUNNING;
-    cp->reason = 0;
+	cp->status = JOB_RUNNING;
+	cp->reason = 0;
 
-    *ppp = pp;
-    *pcp = cp;
+	*ppp = pp;
+	*pcp = cp;};
 
     to = 60000;
 
@@ -689,53 +693,59 @@ process *job_launch(char *cmd, char *mode, void *a)
 
     pp = NULL;
     pl = _job_make_pipeline(argv);
-    n  = _job_pipeline_length(pl);
+    if (pl != NULL)
+       n  = _job_pipeline_length(pl);
+    else
+       n = 0;
 
     pa = MAKE_N(process *, n);
     ca = MAKE_N(process *, n);
 
-/* setup each process in the pipeline */
-    for (i = 0; i < n; i++)
-        {off = pl[i];
-	 _job_setup_proc(&pa[i], &ca[i]);};
+    if ((pa != NULL) && (ca != NULL))
 
-    _job_reconnect_pipeline(n, pa, ca);
+/* setup each process in the pipeline */
+       {for (i = 0; i < n; i++)
+	    {off = pl[i];
+	     _job_setup_proc(&pa[i], &ca[i]);};
+
+	_job_reconnect_pipeline(n, pa, ca);
 
 /* launch each process in the pipeline */
-    for (i = 0; i < n; i++)
-        {pp = pa[i];
-	 cp = ca[i];
+	for (i = 0; i < n; i++)
+	    {pp = pa[i];
+	     cp = ca[i];
 
-	 off = pl[i];
-         al  = argv + off;
+	     off = pl[i];
+	     al  = argv + off;
 
-	 pp->a   = a;
-	 pp->cmd = _job_command_str(al);
-	 strcpy(pp->mode, mode);
+	     pp->a   = a;
+	     pp->cmd = _job_command_str(al);
+	     strcpy(pp->mode, mode);
 
 /* fork the process */
-         pid    = fork();
-	 pp->id = pid;
-	 cp->id = pid;
+	     pid    = fork();
+	     pp->id = pid;
+	     cp->id = pid;
 
-	 switch (pid)
-	    {case -1 :
-	          _job_error_fork(pp, cp);
-		  pp = NULL;
-		  break;
+	     switch (pid)
+	        {case -1 :
+		      _job_error_fork(pp, cp);
+		      pp = NULL;
+		      break;
 
 /* the child process comes here and if successful will never return */
-	     case 0 :
-		  _job_child_fork(pp, cp, al, mode);
-		  break;
+		 case 0 :
+		      _job_child_fork(pp, cp, al, mode);
+		      break;
 
 /* the parent process comes here */
-	     default :
-	          st = _job_parent_fork(pp, cp, mode);
-		  if (st == FALSE)
-		     _job_free(pp);
-		  break;};};
+		 default :
+		      st = _job_parent_fork(pp, cp, mode);
+		      if (st == FALSE)
+			 _job_free(pp);
+		      break;};};};
 
+    free_strings(argv);
     FREE(pl);
     FREE(pa);
     FREE(ca);
@@ -1094,15 +1104,16 @@ process *alaunch(int sip, char *cmd, char *mode, void *a,
 process *arelaunch(process *pp)
    {process *npp;
 
-    if (pp->nattempt <= stck.nattempt)
+    if ((pp != NULL) && (pp->nattempt <= stck.nattempt))
        {npp = alaunch(pp->ip, pp->cmd, pp->mode, pp->a,
 		      pp->accept, pp->reject, pp->wait);
 
-	npp->nattempt = pp->nattempt + 1;
+	if (npp != NULL)
+	   {npp->nattempt = pp->nattempt + 1;
 
-	_job_free(pp);
+	    _job_free(pp);
 
-	pp = npp;};
+	    pp = npp;};};
 
     return(pp);}
 
