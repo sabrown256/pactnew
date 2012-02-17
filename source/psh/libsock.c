@@ -272,7 +272,10 @@ static int connect_client(client *cl)
        {nstrncpy(s, MAXLINE, path_tail(res), -1);
 	res = strrchr(s, '.') + 1;
 	key_val(&host, &prt, res, "@");
-	port = atoi(prt);
+	if (prt != NULL)
+	   port = atoi(prt);
+	else
+	   port = 0;
 
 	if ((host != NULL) && (port > 0))
 	   {sasz = sizeof(struct sockaddr_in);
@@ -352,15 +355,16 @@ static int close_sock(char *root)
     rv = TRUE;
 
     sock = name_sock(root, -1);
-    st   = unlink(sock);
-    rv  &= (st == 0);
+    if (sock != NULL)
+       {st  = unlink(sock);
+	rv &= (st == 0);
 
-    fin_server(root);
+	fin_server(root);
 
-    wh = C_OR_S(srv.server == 0);
+	wh = C_OR_S(srv.server == 0);
 
-    flog = name_log(root);
-    log_activity(flog, dbg_sock, wh, "close %d", st);
+	flog = name_log(root);
+	log_activity(flog, dbg_sock, wh, "close %d", st);};
 
     return(rv);}
 

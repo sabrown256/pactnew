@@ -68,40 +68,40 @@ static atproc *candidate_proc(atdbgdes *st, char *name)
     i  = 0;
     n  = 10;
     al = MAKE_N(atproc, n);
+    if (al != NULL)
 
 /* find the candidate process ids */
-    if ((IS_NULL(st->exe) == FALSE) && (st->spid > 0))
-       {al        = MAKE_N(atproc, 2);
-	al[i].pid = st->spid;
-	nstrncpy(al[i].name, MAXLINE, st->exe, -1);
-	i++;}
-    else
-       {nstrncpy(pids, MAXLINE,
-		 run(FALSE, "ls-jobs %s \"%s\" | sed '/atdbg /d' | sed '/sign /d' | awk '{print $2 \" \" $6}'",
-		     st->opt, name), -1);
-	if (st->verbose == TRUE)
-	   printf("%s\n", pids);
+       {if ((IS_NULL(st->exe) == FALSE) && (st->spid > 0))
+	   {al[i].pid = st->spid;
+	    nstrncpy(al[i].name, MAXLINE, st->exe, -1);
+	    i++;}
+	else
+	   {nstrncpy(pids, MAXLINE,
+		     run(FALSE, "ls-jobs %s \"%s\" | sed '/atdbg /d' | sed '/sign /d' | awk '{print $2 \" \" $6}'",
+			 st->opt, name), -1);
+	    if (st->verbose == TRUE)
+	       printf("%s\n", pids);
 
-	for (i = 0, pl = pids; TRUE; i++)
-	    {t = strtok(pl, " \n");
-	     if (t != NULL)
-	        al[i].pid = atoi(t);
-	     else
-	        break;
-	     pl = NULL;
-	     t = strtok(pl, " \n");
-	     if (t != NULL)
-	        nstrncpy(al[i].name, MAXLINE,
-			 run(FALSE, "rpath %s", t), -1);
-	     else
-	        break;
+	    for (i = 0, pl = pids; TRUE; i++)
+	        {t = strtok(pl, " \n");
+		 if (t != NULL)
+		    al[i].pid = atoi(t);
+		 else
+		    break;
+		 pl = NULL;
+		 t = strtok(pl, " \n");
+		 if (t != NULL)
+		    nstrncpy(al[i].name, MAXLINE,
+			     run(FALSE, "rpath %s", t), -1);
+		 else
+		    break;
 
-	     if (i >= n-2)
-	        {n += 10;
-		 REMAKE(al, atproc, n);};};};
+		 if (i >= n-2)
+		    {n += 10;
+		     REMAKE(al, atproc, n);};};};
 
-    al[i].pid     = -1;
-    al[i].name[0] = '\0';
+	 al[i].pid     = -1;
+	 al[i].name[0] = '\0';};
 
     return(al);}
 
@@ -503,7 +503,7 @@ static int use_dbx(atdbgdes *st, char *fname, atproc *al)
 static int session(atdbgdes *st)
    {int i, n, rv, zip;
     char fname[MAXLINE], names[MAXLINE];
-    char *name, *pl, *lst[32];
+    char *name, *pl, *lst[33];
     atproc *al, *pal;
     FILE *log;
 

@@ -1,0 +1,166 @@
+/*
+ * SCARG.H - generated type handling routines - do not edit
+ *
+ * Source Version: 3.0
+ * Software Release #: LLNL-CODE-422942
+ *
+ */
+
+#ifndef PCK_SCARG
+
+#define PCK_SCARG
+
+#include "cpyright.h"
+
+#ifdef COMPILER_PATHSCALE
+#define SC_VA_ARG_ID(_id, _d, _n)                    \
+   {int _lid;                                        \
+    if (_id == SC_STRING_I)                          \
+       _lid = _id;                                   \
+    else if (SC_is_type_ptr(_id) == TRUE)            \
+       _lid = SC_POINTER_I;                          \
+    else                                             \
+       _lid = _id;                                   \
+    switch (_lid) {                                  \
+       case 2:                                    \
+            {bool *_pv = (bool *) (_d);                \
+             _pv[_n] = va_arg(__a__, int);};        \
+            break;                                 \
+       case 3:                                    \
+            {char *_pv = (char *) (_d);                \
+             _pv[_n] = va_arg(__a__, int);};        \
+            break;                                 \
+       case 4:                                    \
+            {wchar_t *_pv = (wchar_t *) (_d);                \
+             _pv[_n] = va_arg(__a__, int);};        \
+            break;                                 \
+       case 5:                                    \
+            {int8_t *_pv = (int8_t *) (_d);                \
+             _pv[_n] = va_arg(__a__, int);};        \
+            break;                                 \
+       case 6:                                    \
+            {short *_pv = (short *) (_d);                \
+             _pv[_n] = va_arg(__a__, int);};        \
+            break;                                 \
+       case 7:                                    \
+            {int *_pv = (int *) (_d);                \
+             _pv[_n] = va_arg(__a__, int);};        \
+            break;                                 \
+       case 8:                                    \
+            {long *_pv = (long *) (_d);                \
+             _pv[_n] = va_arg(__a__, long);};        \
+            break;                                 \
+       case 9:                                    \
+            {long long *_pv = (long long *) (_d);                \
+             _pv[_n] = va_arg(__a__, long long);};        \
+            break;                                 \
+       case 10:                                    \
+            {float *_pv = (float *) (_d);                \
+             _pv[_n] = va_arg(__a__, double);};        \
+            break;                                 \
+       case 11:                                    \
+            {double *_pv = (double *) (_d);                \
+             _pv[_n] = va_arg(__a__, double);};        \
+            break;                                 \
+       case 12:                                    \
+            {long double *_pv = (long double *) (_d);                \
+             _pv[_n] = va_arg(__a__, long double);};        \
+            break;                                 \
+       case 16:                                    \
+            {quaternion *_pv = (quaternion *) (_d);                \
+             _pv[_n] = va_arg(__a__, quaternion);};        \
+            break;                                 \
+       case 17:                                    \
+            {void * *_pv = (void * *) (_d);                \
+             _pv[_n] = va_arg(__a__, void *);};        \
+            break;                                 \
+       case 19:                                    \
+            {char * *_pv = (char * *) (_d);                \
+             _pv[_n] = va_arg(__a__, char *);};        \
+            break;                                 \
+       }                                             \
+   }
+#else
+#define SC_VA_ARG_ID(_id, _d, _n)                    \
+   {int _lid;                                        \
+    if (_id == SC_STRING_I)                          \
+       _lid = _id;                                   \
+    else if (SC_is_type_ptr(_id) == TRUE)            \
+       _lid = SC_POINTER_I;                          \
+    else                                             \
+       _lid = _id;                                   \
+    switch (_lid) {                                  \
+       case 2:                                    \
+            {bool *_pv = (bool *) (_d);                \
+             _pv[_n] = va_arg(__a__, int);};        \
+            break;                                 \
+       case 3:                                    \
+            {char *_pv = (char *) (_d);                \
+             _pv[_n] = va_arg(__a__, int);};        \
+            break;                                 \
+       case 4:                                    \
+            {wchar_t *_pv = (wchar_t *) (_d);                \
+             _pv[_n] = va_arg(__a__, int);};        \
+            break;                                 \
+       case 5:                                    \
+            {int8_t *_pv = (int8_t *) (_d);                \
+             _pv[_n] = va_arg(__a__, int);};        \
+            break;                                 \
+       case 6:                                    \
+            {short *_pv = (short *) (_d);                \
+             _pv[_n] = va_arg(__a__, int);};        \
+            break;                                 \
+       case 7:                                    \
+            {int *_pv = (int *) (_d);                \
+             _pv[_n] = va_arg(__a__, int);};        \
+            break;                                 \
+       case 8:                                    \
+            {long *_pv = (long *) (_d);                \
+             _pv[_n] = va_arg(__a__, long);};        \
+            break;                                 \
+       case 9:                                    \
+            {long long *_pv = (long long *) (_d);                \
+             _pv[_n] = va_arg(__a__, long long);};        \
+            break;                                 \
+       case 10:                                    \
+            {float *_pv = (float *) (_d);                \
+             _pv[_n] = va_arg(__a__, double);};        \
+            break;                                 \
+       case 11:                                    \
+            {double *_pv = (double *) (_d);                \
+             _pv[_n] = va_arg(__a__, double);};        \
+            break;                                 \
+       case 12:                                    \
+            {long double *_pv = (long double *) (_d);                \
+             _pv[_n] = va_arg(__a__, long double);};        \
+            break;                                 \
+       case 13:                                    \
+            {float _Complex *_pv = (float _Complex *) (_d);                \
+             _pv[_n] = va_arg(__a__, float _Complex);};        \
+            break;                                 \
+       case 14:                                    \
+            {double _Complex *_pv = (double _Complex *) (_d);                \
+             _pv[_n] = va_arg(__a__, double _Complex);};        \
+            break;                                 \
+       case 15:                                    \
+            {long double _Complex *_pv = (long double _Complex *) (_d);                \
+             _pv[_n] = va_arg(__a__, long double _Complex);};        \
+            break;                                 \
+       case 16:                                    \
+            {quaternion *_pv = (quaternion *) (_d);                \
+             _pv[_n] = va_arg(__a__, quaternion);};        \
+            break;                                 \
+       case 17:                                    \
+            {void * *_pv = (void * *) (_d);                \
+             _pv[_n] = va_arg(__a__, void *);};        \
+            break;                                 \
+       case 19:                                    \
+            {char * *_pv = (char * *) (_d);                \
+             _pv[_n] = va_arg(__a__, char *);};        \
+            break;                                 \
+       }                                             \
+   }
+#endif
+
+#endif
+

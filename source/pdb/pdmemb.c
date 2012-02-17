@@ -587,31 +587,33 @@ haelem *PD_inquire_symbol(PDBfile *file ARG(,,cls),
    {char s[MAXLINE], t[MAXLINE];
     haelem *hp;
 
-    if (flag)
-       strcpy(s, _PD_fixname(file, name));
-    else
-       strcpy(s, name);
+    hp = NULL;
+    if (name != NULL)
+       {if (flag)
+	   strcpy(s, _PD_fixname(file, name));
+	else
+	   strcpy(s, name);
 
-    if (fullname != NULL)
-       strcpy(fullname, s);
+	if (fullname != NULL)
+	   strcpy(fullname, s);
 
-    hp = SC_hasharr_lookup(tab, s);
-    if (hp == NULL)
+	hp = SC_hasharr_lookup(tab, s);
+	if (hp == NULL)
 
 /* check case where S begins with '/'
  * it might be under 'foo' rather than '/foo'
  */
-       {if (*s == '/')
-	   {if ((s[1] != '\0') && (s[1] != '&'))
-	       {snprintf(t, MAXLINE, "%s", s+1);
-		hp = SC_hasharr_lookup(tab, t);};}
+	   {if (*s == '/')
+	       {if ((s[1] != '\0') && (s[1] != '&'))
+		   {snprintf(t, MAXLINE, "%s", s+1);
+		    hp = SC_hasharr_lookup(tab, t);};}
 
 /* check case where S does not begin with '/'
  * it might be under '/foo' rather than 'foo'
  */
-	else
-	   {snprintf(t, MAXLINE, "/%s", s);
-	    hp = SC_hasharr_lookup(tab, t);};};
+	    else
+	       {snprintf(t, MAXLINE, "/%s", s);
+		hp = SC_hasharr_lookup(tab, t);};};};
 
     return(hp);}
 	  

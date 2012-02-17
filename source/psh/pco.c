@@ -170,17 +170,10 @@ static char *echo(int log, char *fmt, ...)
     VSNPRINTF(s, LRG, fmt);
     VA_END;
 
-/*
-    run(BOTH, "echo \"%s\"", s)
-    run(FALSE, "echo %s", val)
-    run(FALSE, "echo $%s", fvar)
-    run(FALSE, "echo %s | sed 's|%s||'", nval, val)
-*/
-
     if (strpbrk(s, "$*|{}[]\"'") == NULL)
        rv = STRSAVE(trim(s, BOTH, " \t\n"));
     else
-       rv = run(BOTH, "echo %s", s);
+       rv = STRSAVE(run(BOTH, "echo %s", s));
 
     return(rv);}
 
@@ -217,9 +210,14 @@ static char *push_file(char *s, int itype)
 
     else if (itype == STACK_PROCESS)
        {if (strchr(s, '$') != NULL)
-	   strncpy(lfile, echo(BOTH, "\"%s\"", s), MAXLINE);
+	   {char *p;
+
+	    p = echo(BOTH, "\"%s\"", s);
+	    if (p != NULL)
+	       {nstrncpy(lfile, MAXLINE, p, -1);
+		FREE(p);};}
 	else
-	   strncpy(lfile, s, MAXLINE);};
+	   nstrncpy(lfile, MAXLINE, s, -1);};
 
     if ((ok == TRUE) && (se != NULL))
        {se->itype = itype;
@@ -230,7 +228,7 @@ static char *push_file(char *s, int itype)
 	   {if (lfile[0] != '/')
                snprintf(t, MAXLINE, "%s/%s", st.dir.mng, lfile);
 	    else
-	       strncpy(t, lfile, MAXLINE);
+	       nstrncpy(t, MAXLINE, lfile, -1);
 	    se->fp = fopen(t, "r");}
 
 	else if (itype == STACK_PROCESS)
@@ -341,7 +339,7 @@ static int write_class_pco(FILE *out, char *clss, char *ctype,
     char *c, *pc, *t, *var, *val, *entry;
     char **vars, **vals, **sa;
 
-    strncpy(cl, clss, MAXLINE);
+    nstrncpy(cl, MAXLINE, clss, -1);
     for (c = cl; c != NULL; c = pc)
         {pc = strchr(c, ' ');
          if (pc == NULL)
@@ -456,7 +454,7 @@ static int write_class_perl(FILE *out, char *clss, char *ctype,
     char *c, *pc, *t, *var, *val, *entry;
     char **vars, **vals, **sa;
 
-    strncpy(cl, clss, MAXLINE);
+    nstrncpy(cl, MAXLINE, clss, -1);
     for (c = cl; c != NULL; c = pc)
         {pc = strchr(c, ' ');
          if (pc == NULL)
@@ -955,7 +953,7 @@ static void parse_opt(char *s)
 	    {if (strcmp(vr, "*") == 0)
 	        {if (strcmp(avl, "off") != 0)
 		    {strcpy(s, arg);
-		     trim(s, BACK, " \t\n");
+		     trim(s, BACK, " *\t\n");
 /*
 		     if (LAST_CHAR(s) == '\n')
 		        LAST_CHAR(s) = '\0';
@@ -1067,7 +1065,7 @@ static void parse_rule(char *var, int nc)
 
     n = strlen(val);
     n = min(n, nc-1);
-    strncpy(var, val, nc);
+    nstrncpy(var, nc, val, -1);
 
     return;}
 
@@ -1242,7 +1240,7 @@ static void setup_output_env(char *base)
     dbset(NULL, "CfgDir",  st.dir.cfg);
 
     rv = dbget(NULL, TRUE, "HavePython");
-    if (rv == NULL)
+    if (IS_NULL(rv) == FALSE)
        {if (strcmp(rv, "FALSE") == 0)
 	   dbset(NULL, "HavePython", "FALSE");
 	else
@@ -1334,11 +1332,11 @@ static void default_var(char *base)
 
     snprintf(st.dir.scr, MAXLINE, "%s/scripts", base);
     snprintf(cmd, MAXLINE, "%s/system-id", st.dir.scr);
-    strncpy(st.arch, run(BOTH, cmd), MAXLINE);
+    nstrncpy(st.arch, MAXLINE, run(BOTH, cmd), -1);
 
 /* check variables which may have been initialized from the command line */
     if (IS_NULL(st.system) == TRUE)
-       strncpy(st.system, run(BOTH, "%s/cfgman use", st.dir.scr), MAXLINE);
+       nstrncpy(st.system, MAXLINE, run(BOTH, "%s/cfgman use", st.dir.scr), -1);
 
     dbinitv(NULL, "CfgMan",        "%s/cfgman", st.dir.scr);
     dbinitv(NULL, "Globals",       "");
@@ -1636,7 +1634,7 @@ static void init_session(char *base, int append)
 static void set_var(int rep, char *var, char *oper, char *val)
    {char fvar[MAXLINE], nval[MAXLINE], mval[MAXLINE], lval[MAXLINE];
     char s[LRG+1];
-    char *prfx, *t;
+    char *prfx, *t, *p;
     gt_entry *ge;
 
     ge   = st.gstck.st + st.gstck.n - 1;
@@ -1647,7 +1645,7 @@ static void set_var(int rep, char *var, char *oper, char *val)
        {t = dbget(NULL, FALSE, "Globals");
 	snprintf(s, LRG, "%s %s", t, var);
 	dbset(NULL, "Globals", unique(s, FALSE, ' '));
-	strncpy(fvar, var, MAXLINE);}
+	nstrncpy(fvar, MAXLINE, var, -1);}
     else
        snprintf(fvar, MAXLINE, "%s_%s", prfx, var);
 
@@ -1663,7 +1661,7 @@ static void set_var(int rep, char *var, char *oper, char *val)
     if (strcmp(oper, "=") == 0)
        {t = echo(FALSE, val);
         if (IS_NULL(t) == FALSE)
-           {strncpy(nval, t, MAXLINE);
+           {nstrncpy(nval, MAXLINE, t, -1);
             if (rep == TRUE)
 	       {if (st.aux.MVF == NULL)
 		   st.aux.MVF = open_file("w", st.aux.mvfn);
@@ -1674,7 +1672,9 @@ static void set_var(int rep, char *var, char *oper, char *val)
 
         else
            {nval[0] = '\0';
-            dbset(NULL, fvar, nval);};}
+            dbset(NULL, fvar, nval);};
+
+	FREE(t);}
 
 /* add item to beginning of the existing variable */
     else if (strcmp(oper, "+=") == 0)
@@ -1685,8 +1685,11 @@ static void set_var(int rep, char *var, char *oper, char *val)
  */
        {t = echo(FALSE, val);
         if (IS_NULL(t) == FALSE)
-           {strncpy(lval, t, MAXLINE);
-            strncpy(nval, echo(FALSE, "$%s", fvar), MAXLINE);
+           {nstrncpy(lval, MAXLINE, t, -1);
+	    p = echo(FALSE, "$%s", fvar);
+	    if (p != NULL)
+	       {nstrncpy(nval, MAXLINE, p, -1);
+		FREE(p);};
             note(Log, TRUE, "Change    |%s|", fvar);
             note(Log, TRUE, "Prepend   |%s|", lval);
             note(Log, TRUE, "Old value |%s|", nval);
@@ -1697,7 +1700,10 @@ static void set_var(int rep, char *var, char *oper, char *val)
             note(Log, TRUE, "Change expression |setenv %s %s|", fvar, mval);
             dbset(NULL, fvar, mval);}
         else
-           note(Log, TRUE, "   += not changing %s - no value for |%s|", fvar, val);}
+           note(Log, TRUE, "   += not changing %s - no value for |%s|",
+		fvar, val);
+
+	FREE(t);}
 
 /* add item to end of the existing variable */
     else if (strcmp(oper, "=+") == 0)
@@ -1708,8 +1714,11 @@ static void set_var(int rep, char *var, char *oper, char *val)
  */
        {t = echo(FALSE, val);
         if (IS_NULL(t) == FALSE)
-           {strncpy(lval, t, MAXLINE);
-            strncpy(nval, echo(FALSE, "$%s", fvar), MAXLINE);
+           {nstrncpy(lval, MAXLINE, t, -1);
+	    p = echo(FALSE, "$%s", fvar);
+	    if (p != NULL)
+	       {nstrncpy(nval, MAXLINE, p, -1);
+		FREE(p);};
             note(Log, TRUE, "Change    |%s|", fvar);
             note(Log, TRUE, "Append    |%s|", lval);
             note(Log, TRUE, "Old value |%s|", nval);
@@ -1720,21 +1729,34 @@ static void set_var(int rep, char *var, char *oper, char *val)
             note(Log, TRUE, "Change expression |setenv %s %s|", fvar, mval);
             dbset(NULL, fvar, mval);}
          else
-            note(Log, TRUE, "   =+ not changing %s - no value for |%s|", fvar, val);}
+            note(Log, TRUE, "   =+ not changing %s - no value for |%s|",
+		 fvar, val);
+
+	FREE(t);}
 
 /* remove literal item from variable */
     else if (strcmp(oper, "-=") == 0)
-       {strncpy(nval, echo(FALSE, "$%s", fvar), MAXLINE);
-        note(Log, TRUE, "Change    |%s|", fvar);
-        note(Log, TRUE, "Remove    |%s|", val);
-        note(Log, TRUE, "Old value |%s|", nval);
+       {t = echo(FALSE, "$%s", fvar);
+	if (IS_NULL(t) == FALSE)
+	   {nstrncpy(nval, MAXLINE, t, -1);
+	    note(Log, TRUE, "Change    |%s|", fvar);
+	    note(Log, TRUE, "Remove    |%s|", val);
+	    note(Log, TRUE, "Old value |%s|", nval);
 
-/*        strncpy(nval, run(FALSE, "echo %s | sed 's|%s||'", nval, val), MAXLINE); */
-        strncpy(nval, echo(FALSE, "%s | sed 's|%s||'", nval, val), MAXLINE);
-        note(Log, TRUE, "New value |%s|", nval);
+	    p = echo(FALSE, "%s | sed 's|%s||'", nval, val);
+	    if (p != NULL)
+	       {nstrncpy(nval, MAXLINE, p, -1);
+		FREE(p);};
 
-        note(Log, TRUE, "Change expression |setenv %s %s|", fvar, nval);
-	dbset(NULL, fvar, nval);}
+	    note(Log, TRUE, "New value |%s|", nval);
+
+	    note(Log, TRUE, "Change expression |setenv %s %s|", fvar, nval);
+	    dbset(NULL, fvar, nval);}
+         else
+            note(Log, TRUE, "   -= not changing %s - no value for |%s|",
+		 fvar, val);
+
+	FREE(t);}
 
 /* set value only if undefined */
     else if (strcmp(oper, "=?") == 0)
@@ -1747,7 +1769,10 @@ static void set_var(int rep, char *var, char *oper, char *val)
         if (IS_NULL(t) == FALSE)
 	   dbset(NULL, fvar, t);
         else
-           note(Log, TRUE, "   =? not changing %s - no value for |%s|", fvar, val);}
+           note(Log, TRUE, "   =? not changing %s - no value for |%s|",
+		fvar, val);
+
+	FREE(t);}
 
     else
        noted(Log, "Bad operator '%s' in SET_VAR", oper);
@@ -2152,11 +2177,12 @@ int launch_perdb(int c, char **v)
     char *db;
     static char *sfx[] = { "db", "log", "pid" };
 
+    ok = FALSE;
+
     st.launched = FALSE;
 
     if (cdefenv("PERDB_PATH") == FALSE)
-       {ok = FALSE;
-	n  = sizeof(sfx)/sizeof(char *);
+       {n = sizeof(sfx)/sizeof(char *);
 
 	for (i = 1; i < c; i++)
 	    {if (strcmp(v[i], "-f") == 0)
@@ -2190,8 +2216,9 @@ int kill_perdb(void)
     ok = TRUE;
     if (st.launched == TRUE)
        {db = cgetenv(FALSE, "PERDB_PATH");
-	bf = run(TRUE, "perdb -f %s -l quit:", db);
-	ok = (bf != NULL);};
+	if (IS_NULL(db) == FALSE)
+	   {bf = run(TRUE, "perdb -f %s -l quit:", db);
+	    ok = (bf != NULL);};};
 
     return(ok);}
  
@@ -2257,9 +2284,9 @@ int main(int c, char **v)
  * we get the same value that shell scripts get in other parts of the
  * config process - and consistency is essential
  */
-    strncpy(st.dir.mng, run(BOTH, "pwd"), MAXLINE);
+    nstrncpy(st.dir.mng, MAXLINE, run(BOTH, "pwd"), -1);
 
-    strcpy(base, path_head(st.dir.mng));
+    nstrncpy(base, MAXLINE, path_head(st.dir.mng), -1);
     strcpy(st.cfgf, "DEFAULT");
 
     strct  = "0";
@@ -2322,7 +2349,7 @@ int main(int c, char **v)
                       break;
  
                  case 's':
-                      strncpy(st.system, v[++i], MAXLINE);
+                      nstrncpy(st.system, MAXLINE, v[++i], -1);
                       break;
  
                  case 'v':
@@ -2335,7 +2362,7 @@ int main(int c, char **v)
                       break;};}
 
          else
-            strcpy(st.cfgf, v[i]);};
+            nstrncpy(st.cfgf, MAXLINE, v[i], -1);};
 
     dbset(NULL, "STRICT", strct);
 

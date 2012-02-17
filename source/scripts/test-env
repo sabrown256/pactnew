@@ -23,6 +23,10 @@ end
 source $TestScrDir/env-csh
 setenv TEST_CHECK $TestScrDir/test-check
 
+if ($?TEST_ADVISORY == 0) then
+   setenv TEST_ADVISORY
+endif
+
 # settle log file base
 # at package level Test should be ""
 # at test level Test should be name of test script

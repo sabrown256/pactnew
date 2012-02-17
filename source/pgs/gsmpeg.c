@@ -19906,9 +19906,10 @@ ReadFrame(frame, fileName, conversion, addPath)
 {
     FILE    *ifp;
     char    command[1024];
-    char    fullFileName[1024];
     MpegFrame    tempFrame;
     MpegFrame    *framePtr;
+    static char    fullFileName[1024];
+
 #ifdef BLEAH
     static int32    readDiskTime = 0;
     int32    diskStartTime, diskEndTime;
@@ -20347,8 +20348,12 @@ static boolean ReadPPM(MpegFrame *mf, FILE *fpointer)
 		 state = PPM_READ_STATE_DONE;
 		 break;};};
 
+    width  = (width < 0) ? 0 : width;
+    width  = (width > 10000) ? 10000 : width;
     height = min(height, 1000000);
     height = max(height, 0);
+    maxVal = (maxVal < 0) ? 0 : maxVal;
+    maxVal = (maxVal > 1000000) ? 1000000 : maxVal;
 
     Fsize_Note(mf->id, width, height);
 
@@ -20457,6 +20462,9 @@ int height;
   uint8   junk[4096];
   uint8    *cbptr, *crptr; /*NOTE: replaced "int8" by "unit8" NOTE*/
   int     safe_read_count;
+
+  memset(&line1, 0, sizeof(line1));
+  memset(&line2, 0, sizeof(line2));
 
   Fsize_Note(mf->id, width, height);
 

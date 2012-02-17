@@ -51,7 +51,10 @@ int _PD_add_sym_ptrp(PDBfile *file, int ad, char *name, char *type,
    {int ok;
     char *p, *s;
 
-    if (strncmp(name, file->ptr_base, strlen(file->ptr_base)) == 0)
+    if (name == NULL)
+       ok = FALSE;
+
+    else if (strncmp(name, file->ptr_base, strlen(file->ptr_base)) == 0)
        {p  = file->current_prefix;
 	s  = strchr(name, '#') + 1;
 	ok = _PD_is_var_in_dir(s, p);}
@@ -79,9 +82,11 @@ int _PD_add_sym_ancp(PDBfile *file, int ad, char *name, char *type,
 		     char *acc, char *rej)
    {int ok;
     char *p, *d, *s;
-static int count = 0;
-count++;
-    if (ad == TRUE)
+
+    if (name == NULL)
+       ok = FALSE;
+
+    else if (ad == TRUE)
        {if (file->current_prefix == NULL)
 	   p = CSTRSAVE("/");
 	else
@@ -134,28 +139,32 @@ int _PD_add_sym_desp(PDBfile *file, int ad, char *name, char *type,
    {int ok, nc, ex;
     char *s, *p;
 
-/* if checking to add - do not add anything that is already there */
-    if (ad == TRUE)
-       ex = (PD_inquire_entry(file, name, TRUE, NULL) != NULL);
-    else
-       ex = FALSE;
-
-    if (ex == TRUE)
+    if (name == NULL)
        ok = FALSE;
+
+/* if checking to add - do not add anything that is already there */
     else
-       {if (strncmp(name, file->ptr_base, strlen(file->ptr_base)) == 0)
-	   s = SC_dsnprintf(TRUE, "%s_ptr_", strchr(name, '#') + 1);
-        else
-	   s = CSTRSAVE(name);
+       {if (ad == TRUE)
+	   ex = (PD_inquire_entry(file, name, TRUE, NULL) != NULL);
+	else
+	   ex = FALSE;
 
-	p  = file->current_prefix;
-	nc = strlen(p);
+	if (ex == TRUE)
+	   ok = FALSE;
+	else
+	   {if (strncmp(name, file->ptr_base, strlen(file->ptr_base)) == 0)
+	       s = SC_dsnprintf(TRUE, "%s_ptr_", strchr(name, '#') + 1);
+	    else
+	       s = CSTRSAVE(name);
 
-	ok = (strncmp(p, s, nc) == 0);
-	if (ad == FALSE)
-	   ok &= (SC_LAST_CHAR(s) != '/');
+	    p  = file->current_prefix;
+	    nc = strlen(p);
 
-	SFREE(s);};
+	    ok = (strncmp(p, s, nc) == 0);
+	    if (ad == FALSE)
+	       ok &= (SC_LAST_CHAR(s) != '/');
+
+	    SFREE(s);};};
 
     return(ok);}
 
@@ -174,25 +183,29 @@ int _PD_add_sym_currp(PDBfile *file, int ad, char *name, char *type,
    {int ok;
     char *s;
 
-    if (strncmp(name, file->ptr_base, strlen(file->ptr_base)) == 0)
-       {s = strchr(name, '#');
-	if (s != NULL)
-	   {if (file->system_version > 28)
-	       s = CSTRSAVE(s+1);
+    if (name == NULL)
+       ok = FALSE;
+
+    else
+       {if (strncmp(name, file->ptr_base, strlen(file->ptr_base)) == 0)
+	   {s = strchr(name, '#');
+	    if (s != NULL)
+	       {if (file->system_version > 28)
+		   s = CSTRSAVE(s+1);
+		else
+		   s = SC_dsnprintf(TRUE, "%s_ptr_", s + 1);}
 	    else
-	       s = SC_dsnprintf(TRUE, "%s_ptr_", s + 1);}
+	       s = CSTRSAVE("/");}
 	else
-	   s = CSTRSAVE("/");}
-    else
-       s = CSTRSAVE(name);
+	   s = CSTRSAVE(name);
 
-    if (ad == TRUE)
-       {ok  = _PD_is_var_in_dir(s, file->current_prefix);
-	ok &= (SC_hasharr_lookup(file->symtab, name) == NULL);}
-    else
-       ok = (SC_LAST_CHAR(s) != '/');
+	if (ad == TRUE)
+	   {ok  = _PD_is_var_in_dir(s, file->current_prefix);
+	    ok &= (SC_hasharr_lookup(file->symtab, name) == NULL);}
+	else
+	   ok = (SC_LAST_CHAR(s) != '/');
 
-    CFREE(s);
+	CFREE(s);};
 
     return(ok);}
 

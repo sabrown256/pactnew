@@ -93,7 +93,7 @@ int unsetenv(char *var)
  */
 
 char **tokenize(char *s, char *delim)
-   {int i, n, c;
+   {int i, n, c, ns;
     char *p, *t, *ps, **sa;
 
     sa = NULL;
@@ -106,18 +106,20 @@ char **tokenize(char *s, char *delim)
 	    {if (sa == NULL)
 	        sa = MAKE_N(char *, 1000);
 
-	     ps += strspn(ps, delim);
-	     p   = strpbrk(ps, delim);
-	     if (p != NULL)
-	        {c  = *p;
-		 *p = '\0';
-		 sa[i++] = STRSAVE(ps);
-		 *p = c;
-		 ps = p + 1;}
-	     else
-	        {if (IS_NULL(ps) == FALSE)
-		    sa[i++] = STRSAVE(ps);
-		 break;};};
+	     if (sa != NULL)
+	        {ns  = strspn(ps, delim);
+	        {ps += ns;
+		 p   = strpbrk(ps, delim);
+		 if (p != NULL)
+		    {c  = *p;
+		     *p = '\0';
+		     sa[i++] = STRSAVE(ps);
+		     *p = c;
+		     ps = p + 1;}
+		 else
+		    {if (IS_NULL(ps) == FALSE)
+			sa[i++] = STRSAVE(ps);
+		     break;};};};};
 
 	if (sa != NULL)
 	   sa[i++] = NULL;
@@ -344,7 +346,6 @@ char *strclean(char *d, size_t nd, char *s, size_t ns)
  */
 
 char *strstri(char *string1, char *string2)
-
    {char *s1, *s2, *s3;
         
     s1 = string1;
@@ -375,7 +376,6 @@ char *subst(char *s, char *a, char *b, size_t n)
     char *p, *pr, *ps, *pa, *pb, *r;
     static char bfa[1024*LRG], bfb[1024*LRG];
 
-/* make sure s is not bfa to avoid buffer overlap errors */
     if (s == bfa)
        {pa = bfb;
 	pb = bfa;}
@@ -384,22 +384,26 @@ char *subst(char *s, char *a, char *b, size_t n)
 	pb = bfb;};
 
     ps = pa;
-    strcpy(ps, s);
+	
+    if ((s != NULL) && (a != NULL) && (b != NULL))
 
-    o = 0;
-    for (i = 0; i < n; i++)
-        {p = strstr(ps+o, a);
-	 if (p != NULL)
-	    {pr = p + strlen(a);
-	     *p = '\0';
-	     r  = (i & 1) ? pa : pb;
-	     strcpy(r, ps);
-	     strcat(r, b);
-	     o = strlen(r);
-	     strcat(r, pr);
-	     ps = r;}
-	 else
-	    break;};
+/* make sure s is not bfa to avoid buffer overlap errors */
+       {strcpy(ps, s);
+
+	o = 0;
+	for (i = 0; i < n; i++)
+	    {p = strstr(ps+o, a);
+	     if (p != NULL)
+	        {pr = p + strlen(a);
+		 *p = '\0';
+		 r  = (i & 1) ? pa : pb;
+		 strcpy(r, ps);
+		 strcat(r, b);
+		 o = strlen(r);
+		 strcat(r, pr);
+		 ps = r;}
+	     else
+	        break;};};
 
     return(ps);}
 
@@ -593,20 +597,23 @@ char *path_simplify(char *s, int delim)
     char *t, **sa;
     static char d[LRG];
 
+    d[0] = '\0';
+
     sa = tokenize(s, " :");
     
-    nstrncpy(d, LRG, sa[0], -1);
-    for (i = 1; sa[i] != NULL; i++)
-        {t = sa[i];
+    if (sa != NULL)
+       {nstrncpy(d, LRG, sa[0], -1);
+	for (i = 1; sa[i] != NULL; i++)
+	    {t = sa[i];
 
-	 ok = FALSE;
-	 for (j = i-1; (j >= 0) && (ok == FALSE); j--)
-	     ok = (strcmp(sa[j], t) == 0);
+	     ok = FALSE;
+	     for (j = i-1; (j >= 0) && (ok == FALSE); j--)
+	         ok = (strcmp(sa[j], t) == 0);
 
-	 if (ok == FALSE)
-	    vstrcat(d, LRG, "%c%s", delim, t);};
+	     if (ok == FALSE)
+	        vstrcat(d, LRG, "%c%s", delim, t);};
 
-    free_strings(sa);
+	free_strings(sa);};
 
     return(d);}
 
@@ -744,9 +751,10 @@ int file_script(char *fmt, ...)
     rv = file_executable(s);
     if (rv == TRUE)
        {fp = fopen(s, "r");
-	if (fgets(t, MAXLINE, fp) != NULL)
-	   rv = (strncmp(t, "#!", 2) == 0);
-	fclose(fp);};
+	if (fp != NULL)
+	   {if (fgets(t, MAXLINE, fp) != NULL)
+	       rv = (strncmp(t, "#!", 2) == 0);
+	    fclose(fp);};};
 
     return(rv);}
 
@@ -863,31 +871,6 @@ char *grep(FILE *fp, char *name, char *fmt, ...)
 	ASSERT(err == 0);};
 
     return(r);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* LS - return an array of file names
- *    - the last entry is NULL and marks the end of the list
- */
-
-char **ls(char *opt, char *fmt, ...)
-   {int i;
-    char s[MAXLINE];
-    static char *lst[LRG];
-
-    VA_START(fmt);
-    VSNPRINTF(s, MAXLINE, fmt);
-    VA_END;
-
-    i = 0;
-    FOREACH(ph, run(FALSE, "ls %s %s 2>&1", opt, s), " \n")
-       if (file_exists(ph) == TRUE)
-	  lst[i++] = STRSAVE(ph);
-    ENDFOR;
-    lst[i++] = NULL;
-
-    return(lst);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1030,7 +1013,7 @@ char *strip_quote(char *t)
     static char bf[LRG];
 
     n = strspn(t, " \t");
-    strncpy(bf, t+n, LRG);
+    nstrncpy(bf, LRG, t+n, -1);
     if (bf[0] == '"')
        {for (t = &LAST_CHAR(bf); (*t =='"') && (t != bf); *t-- = '\0');
 	t = bf + strspn(bf, "\"");};
@@ -1307,10 +1290,10 @@ int push_tok(char *s, int nc, int dlm, char *fmt, ...)
     if (IS_NULL(s) == FALSE)
        {delim[0] = dlm;
 	delim[1] = '\0';
-	strncat(s, delim, nc);};
+	nstrcat(s, nc, delim);};
 
     if (s != NULL)
-       strncat(s, t, nc);
+       nstrcat(s, nc, t);
 
     return(rv);}
 
@@ -1362,12 +1345,14 @@ int push_tok_beg(char *s, int nc, int dlm, char *fmt, ...)
 
     rv = TRUE;
 
+/* fill the local buffer BF with the result */
     strncpy(bf, t, LRG);
     if (IS_NULL(s) == FALSE)
        vstrcat(bf, LRG, "%c%s", dlm, s);
 
+/* copy BF back to S */
     if (s != NULL)
-       strncpy(s, bf, nc);
+       nstrncpy(s, nc, bf, -1);
 
     return(rv);}
 
@@ -1395,29 +1380,29 @@ int lst_length(char **lst)
 char **lst_push(char **lst, char *fmt, ...)
    {int n, m;
     char s[MAXLINE];
-    char *ps;
-
-    if (fmt == NULL)
-       ps = NULL;
-    else
-       {VA_START(fmt);
-        VSNPRINTF(s, MAXLINE, fmt);
-        VA_END;
-
-        ps = STRSAVE(s);};
 
     if (lst == NULL)
        {lst = MAKE_N(char *, 100);
-        memset(lst, 0, 100*sizeof(char *));};
+	if (lst != NULL)
+	   memset(lst, 0, 100*sizeof(char *));};
 
     if (lst != NULL)
        {n = lst_length(lst);
 	if (n % 100 == 98)
 	   {m = n + 102;
 	    REMAKE(lst, char *, m);
-	    memset(lst+n, 0, 102*sizeof(char *));};
+	    if (lst != NULL)
+	       memset(lst+n, 0, 102*sizeof(char *));};
 
-	lst[n] = ps;};
+	if (lst != NULL)
+	   {if (fmt == NULL)
+	       lst[n] = NULL;
+	    else
+	       {VA_START(fmt);
+		VSNPRINTF(s, MAXLINE, fmt);
+		VA_END;
+
+		lst[n] = STRSAVE(s);};};};
 
     return(lst);}
 
@@ -1428,25 +1413,25 @@ char **lst_push(char **lst, char *fmt, ...)
 
 char **lst_add(char **lst, char *s)
    {int n, m;
-    char *ps;
-
-    if (s == NULL)
-       ps = NULL;
-    else
-       ps = STRSAVE(s);
 
     if (lst == NULL)
        {lst = MAKE_N(char *, 100);
-        memset(lst, 0, 100*sizeof(char *));};
+	if (lst != NULL)
+	   memset(lst, 0, 100*sizeof(char *));};
 
     if (lst != NULL)
        {n = lst_length(lst);
 	if (n % 100 == 98)
 	   {m = n + 102;
 	    REMAKE(lst, char *, m);
-	    memset(lst+n, 0, 102*sizeof(char *));};
+	    if (lst != NULL)
+	       memset(lst+n, 0, 102*sizeof(char *));};
 
-	lst[n] = ps;};
+	if (lst != NULL)
+	   {if (s == NULL)
+	       lst[n] = NULL;
+	    else
+	       lst[n] = STRSAVE(s);};};
 
     return(lst);}
 
@@ -1560,6 +1545,35 @@ int pop_dir(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* LS - return an array of file names
+ *    - the last entry is NULL and marks the end of the list
+ */
+
+char **ls(char *opt, char *fmt, ...)
+   {int i;
+    char s[MAXLINE];
+    static char **lst;
+
+    VA_START(fmt);
+    VSNPRINTF(s, MAXLINE, fmt);
+    VA_END;
+
+    if (opt == NULL)
+       opt = "";
+
+    lst = NULL;
+    i   = 0;
+    FOREACH(ph, run(FALSE, "ls %s %s 2>&1", opt, s), " \n")
+       if (file_exists(ph) == TRUE)
+	  lst = lst_add(lst, ph);
+    ENDFOR;
+    lst = lst_add(lst, NULL);
+
+    return(lst);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* MATCH - match the first string arg against the
  *       - regular expression defined by the second string arg
  *       - return -1 if it is lexically less than the pattern
@@ -1597,7 +1611,8 @@ int match(char *s, char *patt)
     else if ((*ps == '\0') && (*pp == '\0'))
        rv = 0;
     else
-       {while ((c = *pp++) != '\0')
+       {rv = -1;
+	while ((c = *pp++) != '\0')
 	   {switch (c)
 	       {case '*' :
 		     while (*pp == '*')
@@ -1636,7 +1651,7 @@ int match(char *s, char *patt)
 	    END_CHECK(ps, pp);};
 
 	if (*ps == '\0')
-	   return(-1);};
+	   rv = -1;};
 
     return(rv);}
 
@@ -1653,9 +1668,10 @@ char *unique(char *lst, int beg, int dlm)
     char *item, *p;
     static char nlst[LRG];
 
+    nlst[0] = '\0';
+
     if (lst != NULL)
-       {strcpy(olst, lst);
-	nlst[0] = '\0';
+       {nstrncpy(olst, LRG, lst, -1);
 
 	delim[0] = dlm;
 	delim[1] = '\0';
@@ -1714,7 +1730,7 @@ void splice_out_path(char *path)
 
 	if (ts != ps)
 	   {*(ts-1) = '\0';
-	    strncpy(bf, ps, MAXLINE);}
+	    nstrncpy(bf, MAXLINE, ps, -1);}
 
 	else if (*te == ':')
 	   te++;
@@ -2161,4 +2177,3 @@ int is_running(int pid)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
-
