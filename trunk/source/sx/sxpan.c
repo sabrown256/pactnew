@@ -418,7 +418,8 @@ static int *_SX_index_ptr(SS_psides *si, object **pargl, char *msg)
  *              - <PA_gs.units_spec>      := <PA_gs.units_index> | PER
  *              -
  *              - The valid attribute_id's are:
- *              -      SCOPE, CLASS, PERSIST, CENTER, ALLOCATION
+ *              -      PA_INFO_SCOPE, PA_INFO_CLASS, PA_INFO_PERSIST,
+ *              -      PA_INFO_CENTER, PA_INFO_ALLOCATION
  *              -
  *              - The valid SCOPE's are:
  *              -      DEFN, RESTART, DMND, RUNTIME, EDIT, SCRATCH
@@ -435,7 +436,7 @@ static int *_SX_index_ptr(SS_psides *si, object **pargl, char *msg)
  *              - The valid ALLOCATION's are:
  *              -      STATIC, DYNAMIC
  *              -
- *              - The pre-defined PA_gs.units_index's are:
+ *              - The pre-defined unit indeces are:
  *              -      RAD, STER, MOLE, Q, CM, SEC, G, EV, K, ERG, CC
  *              -
  *              - No attributes are required to be set (ATTRIBUTE must appear
@@ -472,15 +473,15 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
 
     if (!SS_nullobjp(oviv))
        {if (!SS_numbp(oviv))
-           {s = SS_get_string(oviv);
+           {s  = SS_get_string(oviv);
             hp = SC_hasharr_lookup(PA_gs.symbol_tab, s);
-            if (strcmp(hp->type, "variable") == 0)
+	    if ((hp != NULL) && (strcmp(hp->type, "variable") == 0))
                viv = hp->def;};};
 
     if (!SS_nullobjp(ovif))
-       {s = SS_get_string(ovif);
+       {s  = SS_get_string(ovif);
         hp = SC_hasharr_lookup(PA_gs.symbol_tab, s);
-        if (strcmp(hp->type, "procedure") == 0)
+        if ((hp != NULL) && (strcmp(hp->type, "procedure") == 0))
            {addr.memaddr = hp->def;
             vif          = (void (*)(void *p, long sz, char *s)) addr.funcaddr;};};
 
@@ -498,30 +499,30 @@ static object *_SXI_def_var(SS_psides *si, object *argl)
        {SX_GET_INTEGER_FROM_LIST(si, at, argl,
                                  "CAN'T GET ATTRIBUTE - _SXI_DEF_VAR");
         switch (at)
-           {case SCOPE      :
+           {case PA_INFO_SCOPE :
                  SX_GET_INTEGER_FROM_LIST(si, vattr[0], argl,
                                           "CAN'T GET ATTRIBUTE VALUE - _SXI_DEF_VAR");
                  break;
-            case CLASS      :
+            case PA_INFO_CLASS :
                  SX_GET_INTEGER_FROM_LIST(si, vattr[1], argl,
                                           "CAN'T GET ATTRIBUTE VALUE - _SXI_DEF_VAR");
                  break;
-            case PERSIST    :
+            case PA_INFO_PERSISTENCE :
                  SX_GET_INTEGER_FROM_LIST(si, vattr[2], argl,
                                           "CAN'T GET ATTRIBUTE VALUE - _SXI_DEF_VAR");
                  break;
-            case CENTER     :
+            case PA_INFO_CENTER :
                  SX_GET_INTEGER_FROM_LIST(si, vattr[3], argl,
                                           "CAN'T GET ATTRIBUTE VALUE - _SXI_DEF_VAR");
                  break;
-            case ALLOCATION :
+            case PA_INFO_ALLOCATION :
                  SX_GET_INTEGER_FROM_LIST(si, vattr[4], argl,
                                           "CAN'T GET ATTRIBUTE VALUE - _SXI_DEF_VAR");
                  break;
-            case ATTRIBUTE  :
+            case PA_INFO_ATTRIBUTE :
                  enough = TRUE;
                  break;
-            default         :
+            default :
                  PA_ERR(TRUE,
                         "BAD ATTRIBUTE %d - _SXI_DEF_VAR",
                         at);};};
