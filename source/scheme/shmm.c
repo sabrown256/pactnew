@@ -1146,7 +1146,10 @@ object *_SS_numtype_to_object_id(SS_psides *si, int id, void *p, long n)
     else if (id == SC_QUATERNION_I)
        {quaternion *v;
 	v = (quaternion *) p;
-	o = SS_mk_quaternion(si, v[n]);};
+	o = SS_mk_quaternion(si, v[n]);}
+
+    else
+       o = SS_null;
 
     return(o);}
 

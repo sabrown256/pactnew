@@ -212,7 +212,7 @@ object *_SS_make_cast(SS_psides *si, object *type, object *expr)
     SS_args(si, type,
 	    SC_STRING_I, &t,
 	    LAST);
-    strncpy(tname, t, MAXLINE);
+    SC_strncpy(tname, MAXLINE, t, -1);
     p = strstr(tname, "define-");
     t = (p != NULL) ? p + 7 : tname;
        

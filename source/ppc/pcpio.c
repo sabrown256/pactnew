@@ -63,7 +63,9 @@ static int _PC_register_proc(PROCESS *pp, int i)
     SC_poll_desc pd;
 
     if (pp != NULL)
-       {n  = PC_procs.n;
+       {memset(&pd, 0, sizeof(pd));
+
+	n  = PC_procs.n;
 	nx = PC_procs.nx;
 	if (PC_procs.p == NULL)
 	   {nx = i + 8;
@@ -318,27 +320,28 @@ static int _PC_put_msg(PROCESS *pi, char *type, inti ni, int indx)
     char *bf;
     PDBfile *pf;
 
-    pf = (PDBfile *) pi->vif;
+    if ((pi != NULL) && (type != NULL))
+       {pf = (PDBfile *) pi->vif;
 
-    bpi = PN_sizeof(type, pf->host_chart);
-    nbi = ni*bpi;
-    bf  = CMAKE_N(char, nbi);
-    if (_SC_debug)
-       {fprintf(_PC_diag, "   Write Get(%lld,%s,%d)",
-		(long long) ni, type, pi->acpu);
-	fflush(_PC_diag);};
+	bpi = PN_sizeof(type, pf->host_chart);
+	nbi = ni*bpi;
+	bf  = CMAKE_N(char, nbi);
+	if (_SC_debug)
+	   {fprintf(_PC_diag, "   Write Get(%lld,%s,%d)",
+		    (long long) ni, type, pi->acpu);
+	    fflush(_PC_diag);};
 
-    nbt = PC_buffer_data_out(pi, bf, nbi, TRUE);
-    nir = nbt/bpi;
+	nbt = PC_buffer_data_out(pi, bf, nbi, TRUE);
+	nir = nbt/bpi;
 
-    PC_push_message(PC_procs.m + indx, indx, ni, type, bf);
+	PC_push_message(PC_procs.m + indx, indx, ni, type, bf);
 
-    if (_SC_debug)
-       {fprintf(_PC_diag, " Recv(%lld,%s,%d)\n",
-		(long long) nir, type, indx);
-	fflush(_PC_diag);};
+	if (_SC_debug)
+	   {fprintf(_PC_diag, " Recv(%lld,%s,%d)\n",
+		    (long long) nir, type, indx);
+	    fflush(_PC_diag);};
 
-    PC_printf(pi, "%d,%s,%d\n", nir, type, indx);
+	PC_printf(pi, "%d,%s,%d\n", nir, type, indx);};
 
     return(TRUE);}
 

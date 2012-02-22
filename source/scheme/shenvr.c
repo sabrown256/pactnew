@@ -455,8 +455,9 @@ char **SS_bound_vars(SS_psides *si, char *patt, object *penv)
     GET_FRAME(fname, tab, penv);
 
     vrs = SC_hasharr_dump(tab, patt, NULL, TRUE);
-    for (i = 0; vrs[i] != NULL; i++)
-        vrs[i] = CSTRSAVE(vrs[i]);
+    if (vrs != NULL)
+       {for (i = 0; vrs[i] != NULL; i++)
+	    vrs[i] = CSTRSAVE(vrs[i]);};
 
     return(vrs);}
 

@@ -308,10 +308,13 @@ static void _SS_rl_haelem(SS_psides *si, object *obj)
 object *SS_mk_haelem(SS_psides *si, haelem *hp)
    {object *op;
 
-    SC_mark(hp, 1);
+    op = SS_null;
 
-    op = SS_mk_object(si, hp, SS_HAELEM_I, SELF_EV, hp->name,
-		      _SS_wr_haelem, _SS_rl_haelem);
+    if (hp != NULL)
+       {SC_mark(hp, 1);
+
+	op = SS_mk_object(si, hp, SS_HAELEM_I, SELF_EV, hp->name,
+			  _SS_wr_haelem, _SS_rl_haelem);};
 
     return(op);}
 

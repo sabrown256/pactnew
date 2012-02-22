@@ -52,9 +52,10 @@ PROCESS *PC_mk_process(char **argv, char *mode, int type)
     pp = SC_mk_process(argv, mode, type, -1);
 
     if (PC_BINARY_MODEP(mode))
-       {pf                   = PD_open_vif(argv[0]);
-        pf->virtual_internal = FALSE;
-        pf->stream           = (FILE *) pp;
+       {pf = PD_open_vif(argv[0]);
+	if (pf != NULL)
+	   {pf->virtual_internal = FALSE;
+	    pf->stream           = (FILE *) pp;};
 
         pp->vif = pf;};
 
