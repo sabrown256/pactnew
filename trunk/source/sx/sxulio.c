@@ -293,9 +293,10 @@ object *_SXI_valid_ultra_filep(SS_psides *si, object *obj)
 	    mo  = SC_hasharr_dump(pfp->symtab, "Mapping*", NULL, FALSE);
 	    mp  = SC_hasharr_dump(pfp->symtab, "/Mapping*", NULL, FALSE);
 
-	    ok = (((cu[0] != NULL) || (cv[0] != NULL)) &&
-		  (mo[0] == NULL) &&
-		  (mp[0] == NULL));
+	    ok = ((((cu != NULL) && (cu[0] != NULL)) ||
+		   ((cv != NULL) && (cv[0] != NULL))) &&
+		  ((mo != NULL) && (mo[0] == NULL)) &&
+		  ((mp != NULL) && (mp[0] == NULL)));
 
 	    ret = ok ? SS_t : SS_f;
 
@@ -423,11 +424,15 @@ static void _SX_read_text(SS_psides *si, FILE *fp, char *fname)
     _SX.dataptr = 0;
     icurve      = 0;
 
-    x[0] = NULL;
-    x[1] = NULL;
+    xb[0] = NULL;
+    xb[1] = NULL;
 
-    bf = NULL;
-    nb = 0;
+    x[0] = xb[0];
+    x[1] = xb[1];
+
+    csz = 0;
+    bf  = NULL;
+    nb  = 0;
 
     for ( ; j >= 0; )
 	{bf = SC_dgets(bf, &nb, fp);
@@ -1547,7 +1552,7 @@ void SX_close_open_files(void)
         {switch (SX_gs.dataset[i].file_type)
             {case SC_BINARY :
 	          pbi = (bin_info *) SX_gs.dataset[i].file_info;
-		  if (SC_safe_to_free(ppi) == TRUE)
+		  if (SC_safe_to_free(pbi) == TRUE)
 		     {fp = pbi->stream;
 		      if (SX_file_open(fp))
 			 {SX_remove_file(fp);

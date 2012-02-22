@@ -352,6 +352,9 @@ static object *_SXI_ddpn(SS_psides *si, object *argl)
     if (dev == NULL)
        SS_error(si, "BAD DEVICE - _SXI_DDPN", SS_car(si, argl));
 
+    n = 0;
+    memset(x, 0, sizeof(x));
+
     argl = SS_cddr(si, SS_cddr(si, argl));
     if (nd == 2)
        _SX_args_arr_2(si, argl, &n, &x[0], &x[1]);
@@ -459,10 +462,10 @@ static object *_SXI_draw_polyline(SS_psides *si, object *argl)
     clip = TRUE;
     cs   = WORLDC;
     SS_args(si, argl,
-            G_DEVICE, &dev,
-            SC_INT_I, &nd,
+            G_DEVICE,  &dev,
+            SC_INT_I,  &nd,
             SC_ENUM_I, &cs,
-            SC_INT_I, &clip,
+            SC_INT_I,  &clip,
             0);
 
     if (dev == NULL)
@@ -475,7 +478,10 @@ static object *_SXI_draw_polyline(SS_psides *si, object *argl)
 	PG_draw_polyline_n(dev, nd, cs, py->nn, py->x, clip);}
 
     else
-       {if (nd == 2)
+       {n = 0;
+	memset(x, 0, sizeof(x));
+
+	if (nd == 2)
 	   _SX_args_arr_2(si, argl, &n, &x[0], &x[1]);
         else if (nd == 3)
 	   _SX_args_arr_3(si, argl, &n, &x[0], &x[1], &x[2]);
@@ -1754,6 +1760,7 @@ static object *_SXI_satgl(SS_psides *si, object *argl)
 	 else
 	    {typ = hp->type;
 	     pvo = hp->def;
+	     pvi = NULL;
 	     id  = SC_type_id(typ, FALSE);
 	     if (id == SC_INT_I)
 	        {iv = 0;

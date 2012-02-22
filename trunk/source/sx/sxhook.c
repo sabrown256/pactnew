@@ -106,23 +106,25 @@ memdes *_SX_hash_hook(PDBfile *file, char *vr, defstr *dp)
 void _SX_init_hash_objects(SS_psides *si, PDBfile *file)
    {
 
-/* hash table types */
-    PD_def_attr_str(file);
+    if (file != NULL)
 
-    SS_DEFINE_OBJECT(si);
+/* hash table types */
+       {PD_def_attr_str(file);
+
+	SS_DEFINE_OBJECT(si);
 
 /* PML types */
-    PD_def_mapping(file);
+	PD_def_mapping(file);
 
 /* SCHEME object types */
-    SS_DEFINE_STRING;
-    SS_DEFINE_CONS;
-    SS_DEFINE_VARIABLE;
-    SS_DEFINE_BOOLEAN;
-    SS_DEFINE_VECTOR;
+	SS_DEFINE_STRING;
+	SS_DEFINE_CONS;
+	SS_DEFINE_VARIABLE;
+	SS_DEFINE_BOOLEAN;
+	SS_DEFINE_VECTOR;
 
 /* PDBLib types */
-    PD_def_pdb_types(file);
+	PD_def_pdb_types(file);};
 
     return;}
 

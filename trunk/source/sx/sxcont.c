@@ -340,20 +340,23 @@ void _SX_get_menu(SS_psides *si, g_file *po)
     dir = (PD_has_directories(file)) ? PD_pwd(file) : NULL;
 
     names = PD_ls(file, dir, "PM_mapping *", &n);
-    for (i = 0; i < n; i++)
-        _SX_push_menu_item(si, po, names[i], SX_MAPPING_S);
-    CFREE(names);
+    if (names != NULL)
+       {for (i = 0; i < n; i++)
+	    _SX_push_menu_item(si, po, names[i], SX_MAPPING_S);
+	CFREE(names);};
 
     names = PD_ls(file, dir, "PG_image *", &n);
-    for (i = 0; i < n; i++)
-        _SX_push_menu_item(si, po, names[i], SX_IMAGE_S);
-    CFREE(names);
+    if (names != NULL)
+       {for (i = 0; i < n; i++)
+	    _SX_push_menu_item(si, po, names[i], SX_IMAGE_S);
+	CFREE(names);};
 
     names = PD_ls(file, dir, SC_CHAR_S, &n);
-    for (i = 0; i < n; i++)
-        if (SC_regx_match(names[i], "curve????"))
-	   _SX_push_menu_item(si, po, names[i], SX_CURVE_S);
-    CFREE(names);
+    if (names != NULL)
+       {for (i = 0; i < n; i++)
+	    if (SC_regx_match(names[i], "curve????"))
+	       _SX_push_menu_item(si, po, names[i], SX_CURVE_S);
+	CFREE(names);};
 
     n      = SC_array_get_n(po->menu_lst);
     mitems = SC_array_array(po->menu_lst);

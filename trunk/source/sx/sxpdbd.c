@@ -129,11 +129,11 @@ int _SX_type_equal(PDBfile *pfa, PDBfile *pfb, char *typa, char *typb)
     if ((strcmp(typa, "Directory") == 0) && (strcmp(typa, typb) == 0))
        return(TRUE);
  
-    strcpy(bf, typa);
+    SC_strncpy(bf, MAXLINE, typa, -1);
     token = SC_firsttok(bf, " *");
     dpa   = PD_inquire_type(pfa, token);
 
-    strcpy(bf, typb);
+    SC_strncpy(bf, MAXLINE, typb, -1);
     token = SC_firsttok(bf, " *");
     dpb   = PD_inquire_type(pfb, token);
 
@@ -152,10 +152,10 @@ int _SX_type_equal(PDBfile *pfa, PDBfile *pfb, char *typa, char *typb)
         (strncmp(typb, PD_TYPE_PLACEHOLDER, ln) != 0))
 
 /* this assumes typenames are of the form "T *" and not "T*" */
-       {strcpy(bf, typa);
-        strcpy(suffixa, SC_lasttok(bf, " "));
-        strcpy(bf, typb);
-        strcpy(suffixb, SC_lasttok(bf, " "));
+       {SC_strncpy(bf, MAXLINE, typa, -1);
+        SC_strncpy(suffixa, MAXLINE, SC_lasttok(bf, " "), -1);
+        SC_strncpy(bf, MAXLINE, typb, -1);
+        SC_strncpy(suffixb, MAXLINE, SC_lasttok(bf, " "), -1);
     
 /* they must have the same number of indirections */
         if ((strcmp(typa, suffixa) != 0) && (strcmp(suffixa, suffixb) != 0))
@@ -238,6 +238,7 @@ static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb,
     char sa[MAXLINE], sb[MAXLINE];
     char bf[LINE_SIZE+1], bfa[LINE_SIZE], bfb[LINE_SIZ2+1];
     char tmp[LINE_SIZE];
+    char *t;
 
     samen = (strcmp(nma, nmb) == 0);
 
@@ -249,7 +250,8 @@ static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb,
     msz = 0L;
     for (i = 0L; i < ni; i++)
         {if (indx[i])
-            {isz = strlen(PD_index_to_expr(bfa, i, dims, mjr, def_off));
+            {t   = PD_index_to_expr(bfa, i, dims, mjr, def_off);
+	     isz = (t != NULL) ? strlen(t) : 0;
              msz = max(msz, isz);};};
     nn += (msz + 3);
 

@@ -295,35 +295,41 @@ char *SC_dstrcpy(char *dst, char *src)
  *           - this is for UNIX which doesn't have strstr
  */
 
-char *SC_strstr(char *string1, char *string2)
+char *SC_strstr(char *s1, char *s2)
+   {char *rv;
+
+    rv = NULL;
+
+    if ((s1 != NULL) && (s2 != NULL))
+       {
 
 #ifndef ANSI
 
-   {char *s1, *s2, *s3;
+	char *ta, *tb;
         
-    s1 = string1;
-    while (*s1 != '\0')
-       {for (s2 = string2, s3 = s1;
-             (*s2 == *s3) && (*s3 != '\0') && (*s2 != '\0');
-             s3++, s2++);
+	rv = s1;
+	while (*rv != '\0')
+	   {for (ta = s2, tb = rv;
+		 (*ta == *tb) && (*tb != '\0') && (*ta != '\0');
+		 tb++, ta++);
 
-/* if s2 makes it to the end the string is found */
-        if (*s2 == '\0')
-           return(s1);
-        else
-           s1++;};
+/* if ta makes it to the end the string is found */
+	    if (*ta == '\0')
+	       return(rv);
+	    else
+	       rv++;};
 
-    return(NULL);}
+	rv = NULL;
 
 #else
 
-   {char *rv;
-
-    rv = strstr(string1, string2);
-
-    return(rv);}
+	rv = strstr(s1, s2);
 
 #endif
+
+       };
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -103,7 +103,7 @@ C_array *PM_make_array(char *type, long size, void *data)
 
     arr = CMAKE(C_array);
 
-    strcpy(ttype, type);
+    SC_strncpy(ttype, MAXLINE, type, -1);
     pt = SC_firsttok(ttype, " *");
 
     bpi = SIZEOF(pt);

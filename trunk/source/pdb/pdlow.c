@@ -296,10 +296,12 @@ int _PD_safe_flush(PDBfile *file)
 defstr *PD_inquire_type(PDBfile *file ARG(,,cls), char *name)
    {defstr *dp;
 
-    if (_PD_indirection(name) == TRUE)
-       dp = (defstr *) SC_hasharr_def_lookup(file->chart, "*");
-    else
-       dp = (defstr *) SC_hasharr_def_lookup(file->chart, name);
+    dp = NULL;
+    if (name != NULL)
+       {if (_PD_indirection(name) == TRUE)
+	   dp = (defstr *) SC_hasharr_def_lookup(file->chart, "*");
+        else
+	   dp = (defstr *) SC_hasharr_def_lookup(file->chart, name);};
 
     return(dp);}
 
