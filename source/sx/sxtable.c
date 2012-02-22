@@ -717,31 +717,33 @@ static object *SX_wrt_current_table(SS_psides *si, object *argl)
            SS_error(si, "CAN'T OPEN FILE - SX_WRT_CURRENT_TABLE",
 		      SS_mk_string(si, fname));}
 
-/* write the labels if any */
-    if (_SX_table.labels != NULL)
-       {io_printf(fp, "#\t");
+    if (fp != NULL)
 
-        i = 0;
-        while (_SX_table.labels[i] != NULL)
-           {io_printf(fp, "%s\t", _SX_table.labels[i]);
-            i++;};
-        io_printf(fp, "\n");};
+/* write the labels if any */
+       {if (_SX_table.labels != NULL)
+	   {io_printf(fp, "#\t");
+
+	    i = 0;
+	    while (_SX_table.labels[i] != NULL)
+	       {io_printf(fp, "%s\t", _SX_table.labels[i]);
+		i++;};
+	    io_printf(fp, "\n");};
 
 /* write the numbers */
-    nr = _SX_table.current->nrow;
-    nc = _SX_table.current->ncol;
-    ap = _SX_table.current->array;
+	nr = _SX_table.current->nrow;
+	nc = _SX_table.current->ncol;
+	ap = _SX_table.current->array;
 
-    k = 0;
-    for (i = 0; i < nr; i++)
-        for (j = 0; j < nc; j++)
-            {io_printf(fp, SX_gs.text_output_format, ap[k++]);
-             if (j == (nc-1))
-                io_printf(fp, "\n");
-             else
-                io_printf(fp, "\t");};
+	k = 0;
+	for (i = 0; i < nr; i++)
+	    for (j = 0; j < nc; j++)
+	        {io_printf(fp, SX_gs.text_output_format, ap[k++]);
+		 if (j == (nc-1))
+		    io_printf(fp, "\n");
+		 else
+		    io_printf(fp, "\t");};
 
-    io_close(fp);            
+	io_close(fp);};         
 
     return(SS_f);}
 

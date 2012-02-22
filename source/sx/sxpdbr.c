@@ -257,20 +257,20 @@ syment *_SX_rd_data(SS_psides *si, PDBfile *file, char *name, syment *ep,
     syment *cp;
 
     cp = PD_copy_syment(ep);
+    if (cp != NULL)
+       {n    = PD_entry_number(cp);
+	type = PD_entry_type(cp);
 
-    n    = PD_entry_number(cp);
-    type = PD_entry_type(cp);
+	if (!_PD_indirection(type))
+	   {if (!_PD_prim_typep(type, file->host_chart, PD_READ))
+	       SS_error(si, "MUST BE PRIMITIVE TYPE - _SX_RD_DATA", name_obj);
 
-    if (!_PD_indirection(type))
-       {if (!_PD_prim_typep(type, file->host_chart, PD_READ))
-	   SS_error(si, "MUST BE PRIMITIVE TYPE - _SX_RD_DATA", name_obj);
+	    if (file == SX_gs.vif)
+	       addr->diskaddr = PD_entry_address(cp);
 
-	if (file == SX_gs.vif)
-	   addr->diskaddr = PD_entry_address(cp);
-
-	else
-	   {addr->memaddr = _PD_alloc_entry(file, type, n);
-	    PD_read(file, name, addr->memaddr);
+	    else
+	       {addr->memaddr = _PD_alloc_entry(file, type, n);
+		PD_read(file, name, addr->memaddr);
 
 /* GOTCHA: we MUST be consistent about this - if PDB ended up doing
  * a conversion here the type name had better reflect the exact
@@ -278,27 +278,27 @@ syment *_SX_rd_data(SS_psides *si, PDBfile *file, char *name, syment *ep,
  * on the name to do an unwarranted conversion!!!!!!!
  * The question is where in PDB this really ought to go
  */
-	    dpf = _PD_type_lookup(file, PD_CHART_FILE, type);
-	    if (dpf->convert)
-	       {odp = PD_inquire_table_type(file->host_chart, type);
-		if (strcmp(type, odp->type) != 0)
-		   {CFREE(cp->type);
-		    cp->type = CSTRSAVE(odp->type);};};};}
-
-    else
-       {dtype = PD_dereference(CSTRSAVE(type));
-
-	if (!_PD_prim_typep(dtype, file->host_chart, PD_READ))
-	   SS_error(si, "MUST BE PRIMITIVE TYPE - _SX_RD_DATA", name_obj);
-
-	if (file == SX_gs.vif)
-	   {addr->diskaddr = PD_entry_address(cp);
-	    addr->memaddr  = DEREF(addr->memaddr);}
+		dpf = _PD_type_lookup(file, PD_CHART_FILE, type);
+		if ((dpf != NULL) && (dpf->convert == TRUE))
+		   {odp = PD_inquire_table_type(file->host_chart, type);
+		    if ((odp != NULL) && (strcmp(type, odp->type) != 0))
+		       {CFREE(cp->type);
+			cp->type = CSTRSAVE(odp->type);};};};}
 
 	else
-	    PD_read(file, name, &addr->memaddr);
+	   {dtype = PD_dereference(CSTRSAVE(type));
 
-	CFREE(dtype);};
+	    if (!_PD_prim_typep(dtype, file->host_chart, PD_READ))
+	       SS_error(si, "MUST BE PRIMITIVE TYPE - _SX_RD_DATA", name_obj);
+
+	    if (file == SX_gs.vif)
+	       {addr->diskaddr = PD_entry_address(cp);
+		addr->memaddr  = DEREF(addr->memaddr);}
+
+	    else
+	       PD_read(file, name, &addr->memaddr);
+
+	    CFREE(dtype);};};
 
     return(cp);}
 

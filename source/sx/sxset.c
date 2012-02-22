@@ -265,6 +265,7 @@ int _SX_get_input(SS_psides *si, object *str)
     FILE *fp;
 
     rv = 0;
+    p  = NULL;
 
     if (_SX.gets == NULL)
        {if (PG_console_device == NULL)

@@ -245,50 +245,58 @@ void _PM_offsets(long *dims, long **strtind, long *start, long *stride,
  *                   - for carving a sub-array out of an array
  */
 
-long _PM_hyper_indices(long *dims, long *region, long **start, long *chunk)
-   {long ndims, *stride, **strtind;
+long _PM_hyper_indices(long *dims, long *reg, long **pstart, long *chunk)
+   {long ndims, *start, *stride, **strtind;
     long i, j, noffs;
 
-    ndims = dims[0];
+    noffs = -1;
+    start = NULL;
+    if ((dims != NULL) && (reg != NULL))
+       {ndims = dims[0];
 
-    stride = CMAKE_N(long, ndims);
+	stride = CMAKE_N(long, ndims);
 
 /* compute stride for each dimension */
-    stride[0] = 1;
-    for (i = 1, j = 1; j < ndims; i += 2, j++)
-        stride[j] = (dims[i+1] - dims[i] + 1) * stride[j-1];
+	stride[0] = 1;
+	for (i = 1, j = 1; j < ndims; i += 2, j++)
+	    stride[j] = (dims[i+1] - dims[i] + 1) * stride[j-1];
     
 /* compute number of start offsets*/
-    noffs = 1;
-    for (i = ndims * 2; i > 2; i -= 2)
-        noffs *= region[i] - region[i-1] + 1;
+	noffs = 1;
+	for (i = ndims * 2; i > 2; i -= 2)
+	    noffs *= reg[i] - reg[i-1] + 1;
 
 /* allocate the start array */
-    *start = CMAKE_N(long, noffs);
+	start = CMAKE_N(long, noffs);
 
 /* allocate temporary to store permuted indices */
-    strtind = CMAKE_N(long *, noffs);
+	strtind = CMAKE_N(long *, noffs);
 
-    ndims = region[0];
-    for (i = 0; i < noffs; i++)
-        strtind[i] = CMAKE_N(long, ndims);
+	ndims = reg[0];
+	for (i = 0; i < noffs; i++)
+	    strtind[i] = CMAKE_N(long, ndims);
 
 /* permute the indices */
-    _PM_permute(region, strtind, noffs);
+	_PM_permute(reg, strtind, noffs);
 
 /* calculate 1-d starting offsets */
-    _PM_offsets(dims, strtind, *start, stride, noffs);
+	_PM_offsets(dims, strtind, start, stride, noffs);
 
-    *chunk = region[2] - region[1] + 1;
+	*chunk = reg[2] - reg[1] + 1;
 
 /* free up memory */
-    CFREE(stride)
+	CFREE(stride)
 
-    for (i = 0; i < noffs; i++)
-        CFREE(strtind[i]);
+	  for (i = 0; i < noffs; i++)
+	      CFREE(strtind[i]);
 
-    CFREE(strtind);
+	CFREE(strtind);};
  
+    if (*pstart != NULL)
+       *pstart = start;
+    else
+       CFREE(start);
+
     return(noffs);}
 
 /*--------------------------------------------------------------------------*/

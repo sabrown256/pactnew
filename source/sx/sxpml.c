@@ -159,6 +159,9 @@ static object *_SXI_sub_array(SS_psides *si, object *argl)
     else
        {nd       = SS_length(si, dims);
         idims    = CMAKE_N(long, nd + 1);
+	if (idims == NULL)
+	   return(rv);
+
         idims[0] = nd/2;
         for (pd = idims + 1; !SS_nullobjp(dims); pd++)
             SX_GET_INTEGER_FROM_LIST(si, *pd, dims,
@@ -170,8 +173,12 @@ static object *_SXI_sub_array(SS_psides *si, object *argl)
        SS_error(si, "NO REGION SPECIFIED - _SXI_SUB_ARRAY", argl);
 
     else
-       {nr      = SS_length(si, reg);
-        ireg    = CMAKE_N(long, nr + 1);
+       {nr   = SS_length(si, reg);
+        ireg = CMAKE_N(long, nr + 1);
+	if (ireg == NULL)
+	   {CFREE(idims);
+	    return(rv);};
+
         ireg[0] = nr/2;
         for (pr = ireg + 1; !SS_nullobjp(reg); pr++)
             SX_GET_INTEGER_FROM_LIST(si, *pr, reg,
@@ -196,12 +203,12 @@ static object *_SXI_sub_array(SS_psides *si, object *argl)
     
 /* allocate the output array */
     newarr = PM_make_array(typ, rlength, NULL);
+    if (newarr != NULL)
+       {bpi = SIZEOF(typ);
 
-    bpi = SIZEOF(typ);
+	PM_sub_array(d, newarr->data, idims, ireg, bpi);
 
-    PM_sub_array(d, newarr->data, idims, ireg, bpi);
-
-    rv = SX_mk_C_array(si, newarr);
+	rv = SX_mk_C_array(si, newarr);};
 
     return(rv);}
 

@@ -731,12 +731,13 @@ static object *_SXI_get_io_info(SS_psides *si, object *arg)
        {file = FILE_FILE(PDBfile, po);
 	SC_get_io_info(file->stream, &nh, &ns);
 
-	for (i = 0; i < SC_N_IO_OPER; i++)
-	    {c = SS_mk_cons(si, SS_mk_integer(si, nh[i]),
-			    SS_mk_float(si, ns[i]));
-	     o = SS_mk_cons(si, c, o);};
+	if ((ns != NULL) && (nh != NULL))
+	   {for (i = 0; i < SC_N_IO_OPER; i++)
+	        {c = SS_mk_cons(si, SS_mk_integer(si, nh[i]),
+				SS_mk_float(si, ns[i]));
+		 o = SS_mk_cons(si, c, o);};
 
-	o = SS_reverse(si, o);};
+	    o = SS_reverse(si, o);};};
 
     return(o);}
 
@@ -887,6 +888,7 @@ static object *_SXI_family_file(SS_psides *si, object *argl)
     g_file *po;
     object *fl, *o;
 
+    o  = SS_null;
     po = NULL;
     fl = SS_t;
     SS_args(si, argl,
@@ -901,8 +903,8 @@ static object *_SXI_family_file(SS_psides *si, object *argl)
 
     ifl  = SS_true(fl);
     file = PD_family(file, ifl);
-
-    o = SX_mk_gfile(si, _SX_mk_file(file->name, PDBFILE_S, file));
+    if (file != NULL)
+       o = SX_mk_gfile(si, _SX_mk_file(file->name, PDBFILE_S, file));
 
     return(o);}
 
@@ -1530,11 +1532,14 @@ static object *_SXI_list_variables(SS_psides *si, object *argl)
        {CFREE(flags);
         flags = NULL;}
 
-    names = _PD_ls_extr(file, patt, type, size, &num, all, flags);
-
     obj = SS_null;
-    for (i = num - 1; i >= 0; i--)
-        {SS_assign(si, obj, SS_mk_cons(si, SS_mk_string(si, names[i]), obj));};
+
+    names = _PD_ls_extr(file, patt, type, size, &num, all, flags);
+    if (names != NULL)
+       {for (i = num - 1; i >= 0; i--)
+	    {SS_assign(si, obj,
+		       SS_mk_cons(si, SS_mk_string(si, names[i]),
+				  obj));};};
 
     CFREE(names);
 
@@ -2151,23 +2156,26 @@ int _SX_file_varp(PDBfile *file, char *name, int flag)
     char *token;
     syment *ep;
 
-    if (flag)
-       {ep = _PD_effective_ep(file, name, TRUE, NULL);
-        if (ep != NULL)
-           _PD_rl_syment_d(ep);}
+    ep = NULL;
 
-    else
+    if (name != NULL)
+       {if (flag)
+	   {ep = _PD_effective_ep(file, name, TRUE, NULL);
+	    if (ep != NULL)
+	       _PD_rl_syment_d(ep);}
+
+        else
 
 /* check the literal name first - e.g. {t=1!000e-01,x(3:7)} */
-       {ep = PD_inquire_entry(file, name, TRUE, NULL);
-	if (ep == NULL)
-	   {token = SC_firsttok(name, ".([ ");
+	   {ep = PD_inquire_entry(file, name, TRUE, NULL);
+	    if (ep == NULL)
+	       {token = SC_firsttok(name, ".([ ");
 
-	    _SC_udl_container(token, TRUE);
+		_SC_udl_container(token, TRUE);
 
-	    ep = PD_inquire_entry(file, token, TRUE, NULL);};};
+		ep = PD_inquire_entry(file, token, TRUE, NULL);};};};
 
-    rv = (ep == NULL) ? FALSE : TRUE;
+    rv = (ep != NULL);
 
     return(rv);}
 
@@ -2370,8 +2378,9 @@ static int _SX_pseudo_suitable(PDBfile *file, syment *et)
 
     ok = !_PD_indirection(type);
     dp = _PD_type_lookup(file, PD_CHART_HOST, type);
-    for (dm = dp->members; (dm != NULL) && (ok == TRUE); dm = dm->next)
-        ok &= !_PD_indirection(dm->type);
+    if (dp != NULL)
+       {for (dm = dp->members; (dm != NULL) && (ok == TRUE); dm = dm->next)
+	    ok &= !_PD_indirection(dm->type);};
 
     return(ok);}
 
@@ -2411,14 +2420,14 @@ static void _SX_setup_filedata_vif(PDBfile **pfp, int *pwrfl,
 	b.diskaddr = PD_entry_address(eo);
 
 	fp = PN_open(file, b.memaddr);
+	if (fp != NULL)
+	   {et = _PD_mk_syment(PD_entry_type(eo),
+			       PD_entry_number(eo),
+			       b.mdiskaddr,
+			       NULL,
+			       PD_entry_dimensions(eo));
 
-	et = _PD_mk_syment(PD_entry_type(eo),
-			   PD_entry_number(eo),
-			   b.mdiskaddr,
-			   NULL,
-			   PD_entry_dimensions(eo));
-
-	_PD_e_install(fp, t, et, TRUE);
+	    _PD_e_install(fp, t, et, TRUE);};
 
         *pfp = fp;};
 
@@ -2541,7 +2550,7 @@ static object *_SX_write_filedata(SS_psides *si, object *argl)
         if (file->virtual_internal == TRUE)
 	   _SX_setup_filedata_vif(&fp, &wrfl, fullpath, ep);
 
-	if (wrfl)
+	if ((fp != NULL) && (wrfl == TRUE))
            {if (fp->mode == PD_OPEN)
 	       SS_error(si, "FILE OPENED READ-ONLY - SX_WRITE_FILEDATA", SS_null);
 
@@ -2838,7 +2847,7 @@ static object *_SX_read_filedata(SS_psides *si, object *argl)
 
 	if (!_PD_indirection(type))
            {addr.memaddr = _PD_alloc_entry(file, type, number);
-	    ad.diskaddr = PD_entry_address(ep);
+	    ad.diskaddr  = PD_entry_address(ep);
 	    memcpy(addr.memaddr,
 		   ad.memaddr,
 		   SC_arrlen(addr.memaddr));}
@@ -2877,12 +2886,13 @@ static object *_SX_read_filedata(SS_psides *si, object *argl)
 
     if ((strcmp(type, SC_CHAR_S) == 0) && (_SX.string_mode != LITERAL))
        {s = (char *) addr.memaddr;
-	for (n = number - 1; n >= 0; n--)
-	    {if (SC_is_print_char(s[n], 4))
-	        {s[n+1] = '\0';
-		 break;};};
-	if (n < 0)
-	   s[0] = '\0';};
+	if (s != NULL)
+	   {for (n = number - 1; n >= 0; n--)
+	        {if (SC_is_print_char(s[n], 4))
+		    {s[n+1] = '\0';
+		     break;};};
+	    if (n < 0)
+	       s[0] = '\0';};};
 
     o = _SX_mk_gpdbdata(si, name, addr.memaddr, tep, file);
 
