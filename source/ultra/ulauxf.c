@@ -101,6 +101,7 @@ object *UL_fft(SS_psides *si, int j)
     curve *crv;
     object *cre, *cim, *rv;
 
+    rv  = SS_null;
     crv = &SX_gs.dataset[j];
     xmn = crv->wc[0];
     xmx = crv->wc[1];
@@ -110,29 +111,30 @@ object *UL_fft(SS_psides *si, int j)
     if (n == 0)
        SS_error(si, "FFT FAILED - UL_FFT", SS_null);
 
-    x[1] = CMAKE_N(double, n);
-    if (x[1] == NULL)
-       SS_error(si, "INSUFFICIENT MEMORY - UL_FFT", SS_null);
+    else
+       {x[1] = CMAKE_N(double, n);
+	if (x[1] == NULL)
+	   SS_error(si, "INSUFFICIENT MEMORY - UL_FFT", SS_null);
 
 /* extract the real part */
-    for (i = 0; i < n; i++)
-        x[1][i] = PM_REAL_C(cy[i]);
-    lbl = SC_dsnprintf(FALSE, "Real part FFT %c", crv->id);
-    cre = SX_mk_curve(si, n, x, lbl, NULL, UL_plot);
+	for (i = 0; i < n; i++)
+	    x[1][i] = PM_REAL_C(cy[i]);
+	lbl = SC_dsnprintf(FALSE, "Real part FFT %c", crv->id);
+	cre = SX_mk_curve(si, n, x, lbl, NULL, UL_plot);
 
 /* extract the imaginary part */
-    for (i = 0; i < n; i++)
-        x[1][i] = PM_IMAGINARY_C(cy[i]);
-    lbl = SC_dsnprintf(FALSE, "Imaginary part FFT %c", crv->id);
-    cim = SX_mk_curve(si, n, x, lbl, NULL, UL_plot);
+	for (i = 0; i < n; i++)
+	    x[1][i] = PM_IMAGINARY_C(cy[i]);
+	lbl = SC_dsnprintf(FALSE, "Imaginary part FFT %c", crv->id);
+	cim = SX_mk_curve(si, n, x, lbl, NULL, UL_plot);
 
-    CFREE(x[0]);
-    CFREE(x[1]);
-    CFREE(cy);
+	CFREE(x[0]);
+	CFREE(x[1]);
+	CFREE(cy);
 
-    rv = SS_make_list(si, SS_OBJECT_I, cre,
-		      SS_OBJECT_I, cim,
-		      0);
+	rv = SS_make_list(si, SS_OBJECT_I, cre,
+			  SS_OBJECT_I, cim,
+			  0);};
 
     return(rv);}
 
@@ -412,6 +414,7 @@ static object *_ULI_fit(SS_psides *si, object *obj, object *tok)
     char *lbl;
     object *ret;
 
+    ret   = SS_null;
     order = 0;
 
     if (SS_integerp(tok))
@@ -430,40 +433,43 @@ static object *_ULI_fit(SS_psides *si, object *obj, object *tok)
     wc[1] = SX_gs.dataset[j].wc[1];
 
     cf = PM_lsq_fit(2, n, x, wc, order);
+    if (cf != NULL)
 
 /* display coefficients and cons up the return list */
-    if (si->interactive == ON)
-       {if ((SX_gs.dataset[j].id >= 'A') &&
-            (SX_gs.dataset[j].id <= 'Z'))
-           {PRINT(stdout, "\nCurve %c\n", SX_gs.dataset[j].id);}
-        else
-           {PRINT(stdout, "\nCurve @%d\n", SX_gs.dataset[j].id);};}
+       {if (si->interactive == ON)
+	   {if ((SX_gs.dataset[j].id >= 'A') &&
+		(SX_gs.dataset[j].id <= 'Z'))
+	       PRINT(stdout, "\nCurve %c\n", SX_gs.dataset[j].id);
+	    else
+	       PRINT(stdout, "\nCurve @%d\n", SX_gs.dataset[j].id);};
 
-    ret = SS_null;
-    sgn = (order < 0) ? -1 : 1;
-    for (i = 0 ; i < aord; i++)
-        {if (si->interactive == ON)
-	    {PRINT(stdout, "    ");
-	     PRINT(stdout, SX_gs.text_output_format, cf[i]);
-	     PRINT(stdout, " *x^%d\n", sgn*i);};
-         ret = SS_mk_cons(si, SS_mk_float(si, cf[i]), ret);};
+	ret = SS_null;
+	sgn = (order < 0) ? -1 : 1;
+	for (i = 0 ; i < aord; i++)
+	    {if (si->interactive == ON)
+	        {PRINT(stdout, "    ");
+		 PRINT(stdout, SX_gs.text_output_format, cf[i]);
+		 PRINT(stdout, " *x^%d\n", sgn*i);};
+	     ret = SS_mk_cons(si, SS_mk_float(si, cf[i]), ret);};
         
 /* create curve of fit */
-    p = PM_lsq_polynomial(SX_gs.default_npts, order, cf, wc);
+	p = PM_lsq_polynomial(SX_gs.default_npts, order, cf, wc);
 
-    if ((SX_gs.dataset[i].id >= 'A') &&
-        (SX_gs.dataset[i].id <= 'Z'))
-        {lbl = SC_dsnprintf(FALSE, "Fit %c %d", SX_gs.dataset[j].id, order);}
-    else
-        {lbl = SC_dsnprintf(FALSE, "Fit @%d %d", SX_gs.dataset[j].id, order);}
+	if ((SX_gs.dataset[i].id >= 'A') &&
+	    (SX_gs.dataset[i].id <= 'Z'))
+	   lbl = SC_dsnprintf(FALSE, "Fit %c %d",
+			      SX_gs.dataset[j].id, order);
+	else
+	   lbl = SC_dsnprintf(FALSE, "Fit @%d %d",
+			      SX_gs.dataset[j].id, order);
 
-    ret = SS_mk_cons(si, SS_reverse(si, ret),
-                     SX_mk_curve(si, SX_gs.default_npts, p,
-				 lbl, NULL, UL_plot));
+	ret = SS_mk_cons(si, SS_reverse(si, ret),
+			 SX_mk_curve(si, SX_gs.default_npts, p,
+				     lbl, NULL, UL_plot));
 
-    CFREE(cf);
+	PM_free_vectors(2, p);
 
-    PM_free_vectors(2, p);
+	CFREE(cf);};
 
     return(ret);}
 
@@ -519,64 +525,67 @@ static object *_ULI_fit_curve(SS_psides *si, object *argl)
        PRINT(stdout, "\n    Fit curves\n\n");
 
     solution = UL_lsq(a, ay);
+    if (solution != NULL)
 
 /* display coefficients */
-    id = SX_gs.dataset[j].id;
-    alpha_id = ((SX_gs.dataset[i].id >= 'A') &&
-                (SX_gs.dataset[i].id <= 'Z'));
+       {id       = SX_gs.dataset[j].id;
+	alpha_id = ((SX_gs.dataset[i].id >= 'A') &&
+		    (SX_gs.dataset[i].id <= 'Z'));
 
-    if (si->interactive == ON)
-       {if (alpha_id)
-           {PRINT(stdout, "Fit to curve %c\n\n", id);}
-        else
-           {PRINT(stdout, "Fit to curve @%d\n\n", id);};}
+	if (si->interactive == ON)
+	   {if (alpha_id)
+	       PRINT(stdout, "Fit to curve %c\n\n", id);
+	    else
+	       PRINT(stdout, "Fit to curve @%d\n\n", id);};
 
-    if (alpha_id)
-       {snprintf(local, MAXLINE, "Fit(%c ;", id);}
-    else
-       {snprintf(local, MAXLINE, "Fit(%c ;", id);}
+	if (alpha_id)
+	   snprintf(local, MAXLINE, "Fit(%c ;", id);
+	else
+	   snprintf(local, MAXLINE, "Fit(%c ;", id);
 
-    for (i = 1; i <= order; i++)
-        {id = SX_gs.dataset[curid[i-1]].id;
-         alpha_id = ((SX_gs.dataset[i].id >= 'A') &&
-                     (SX_gs.dataset[i].id <= 'Z'));
-	 if (si->interactive == ON)
-	    {PRINT(stdout, "    ");
-	     PRINT(stdout, SX_gs.text_output_format, PM_element(solution, i, 1));
-             if (alpha_id)
-	        {PRINT(stdout, " * curve %c\n", id);}
-             else
-	        {PRINT(stdout, " * curve @%d\n", id);};};
+	for (i = 1; i <= order; i++)
+	    {id = SX_gs.dataset[curid[i-1]].id;
+	     alpha_id = ((SX_gs.dataset[i].id >= 'A') &&
+			 (SX_gs.dataset[i].id <= 'Z'));
+	     if (si->interactive == ON)
+	        {PRINT(stdout, "    ");
+		 PRINT(stdout, SX_gs.text_output_format,
+		       PM_element(solution, i, 1));
+		 if (alpha_id)
+		    PRINT(stdout, " * curve %c\n", id);
+		 else
+		    PRINT(stdout, " * curve @%d\n", id);};
 
-         if (alpha_id)
-            SC_vstrcat(local, MAXLINE, " %c", id);
-         else
-            SC_vstrcat(local, MAXLINE, " @%d", id);};
+	     if (alpha_id)
+	        SC_vstrcat(local, MAXLINE, " %c", id);
+	     else
+	        SC_vstrcat(local, MAXLINE, " @%d", id);};
 
-    SC_strcat(local, MAXLINE, ")");
+	SC_strcat(local, MAXLINE, ")");
 
 /* find fit */
-    PM_destroy(ay);
-    ay = PM_times(a, solution);
+	PM_destroy(ay);
+	ay = PM_times(a, solution);
 
-    UL_gs.bfa[1] = CMAKE_N(double, n);
-    for (i = 1; i <= n; i++)
-        UL_gs.bfa[1][i-1] = PM_element(ay, i, 1);
+	if (ay != NULL)
+	   {UL_gs.bfa[1] = CMAKE_N(double, n);
+	    for (i = 1; i <= n; i++)
+	        UL_gs.bfa[1][i-1] = PM_element(ay, i, 1);};
 
-    if (si->interactive == ON)
-       PRINT(stdout, "\n");
+	if (si->interactive == ON)
+	   PRINT(stdout, "\n");
 
-    x[0] = SX_gs.dataset[j].x[0];
-    x[1] = UL_gs.bfa[1];
+	x[0] = SX_gs.dataset[j].x[0];
+	x[1] = UL_gs.bfa[1];
 
-    ch = SX_mk_curve(si, SX_gs.dataset[j].n, x, local, NULL, UL_plot);
+	ch = SX_mk_curve(si, SX_gs.dataset[j].n, x, local, NULL, UL_plot);
 
 /* clean up */
-    PM_destroy(a);
-    PM_destroy(ay);
-    PM_destroy(solution);
-    CFREE(UL_gs.bfa[1]);
-    CFREE(curid);
+	PM_destroy(a);
+	PM_destroy(ay);
+	PM_destroy(solution);
+	CFREE(UL_gs.bfa[1]);
+	CFREE(curid);};
         
     return(ch);}
         
