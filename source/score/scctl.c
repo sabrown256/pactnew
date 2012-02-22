@@ -984,28 +984,29 @@ pcons *SC_rem_alist(pcons *alist, char *name)
    {pcons *ths, *nxt;
     char *s;
 
-    s = (char *) ((pcons *) alist->car)->car;
-    if (strcmp(s, name) == 0)
-       {SC_rl_pcons(alist->car, 3);
-	nxt = (pcons *) alist->cdr;
+    if (alist != NULL)
+       {s = (char *) ((pcons *) alist->car)->car;
+	if (strcmp(s, name) == 0)
+	   {SC_rl_pcons(alist->car, 3);
+	    nxt = (pcons *) alist->cdr;
 
-	SC_rl_pcons(alist, 0);
-	alist = nxt;
-        SC_mark(alist, -1);}
+	    SC_rl_pcons(alist, 0);
+	    alist = nxt;
+	    SC_mark(alist, -1);}
 
-    else
-       {for (ths = alist; ths->cdr != NULL; ths = nxt)
-            {nxt = (pcons *) ths->cdr;
-             s   = (char *) ((pcons *) nxt->car)->car;            
-             if (strcmp(s, name) == 0)
-                {SC_rl_pcons(nxt->car, 3);
-                 ths->cdr = nxt->cdr;
+	else
+	   {for (ths = alist; ths->cdr != NULL; ths = nxt)
+	        {nxt = (pcons *) ths->cdr;
+		 s   = (char *) ((pcons *) nxt->car)->car;            
+		 if (strcmp(s, name) == 0)
+		    {SC_rl_pcons(nxt->car, 3);
+		     ths->cdr = nxt->cdr;
 
-		 SC_rl_pcons(nxt, 0);
-		 nxt = (pcons *) ths->cdr;
+		     SC_rl_pcons(nxt, 0);
+		     nxt = (pcons *) ths->cdr;
 
-                 if (nxt == NULL)
-                    break;};};};
+		     if (nxt == NULL)
+		        break;};};};};
 
     return(alist);}
 

@@ -543,20 +543,24 @@ PM_mapping *SX_build_return_mapping(SS_psides *si,
 				    PM_set *domain, int init, int wgt)
    {PM_mapping *f;
 
+    f = NULL;
+
+    if (h != NULL)
+
 /* build the return mapping */
-    if (domain == NULL)
-       {domain = _SX_have_common_domain(h);
-	if (domain == NULL)
-	   domain = _SX_build_common_domain(h);};
+       {if (domain == NULL)
+	   {domain = _SX_have_common_domain(h);
+	    if (domain == NULL)
+	       domain = _SX_build_common_domain(h);};
 
-    f = _SX_build_accumulator_mapping(si, domain, h);
+	f = _SX_build_accumulator_mapping(si, domain, h);
 
-    if (label != NULL)
-       {CFREE(f->name);
-	f->name = CSTRSAVE(label);};
+	if (label != NULL)
+	   {CFREE(f->name);
+	    f->name = CSTRSAVE(label);};
 
-    if (init)
-       _SX_init_range(si, f, h, SS_null, wgt);
+	if (init)
+	   _SX_init_range(si, f, h, SS_null, wgt);};
 
     return(f);}
 
