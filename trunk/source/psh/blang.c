@@ -334,13 +334,17 @@ static void femit(FILE *fp, char *t, char *trm)
 /* CONCATENATE - concatenate tokens SA to string S */
 
 static char *concatenate(char *s, int nc, char **sa, char *dlm)
-   {int i;
+   {int i, ns, nd, n;
 
     s[0] = '\0';
     for (i = 0; sa[i] != NULL; i++)
         vstrcat(s, nc, "%s%s", sa[i], dlm);
 
-    s[strlen(s) - strlen(dlm)] = '\0';
+    ns = strlen(s);
+    nd = strlen(dlm);
+    n  = ns - nd;
+    n  = max(n, 0);
+    s[n] = '\0';
 
     return(s);}
 
@@ -640,8 +644,9 @@ static int process_qualifiers(farg *al, char *qual)
        {nstrncpy(t, MAXLINE, qual+4, -1);
 	LAST_CHAR(t) = '\0';
 
-	ta  = split_args(t);
-	ptr = is_ptr(al->type);
+	ta = split_args(t);
+	if (ta != NULL)
+	   {ptr = is_ptr(al->type);
 
 /* get default value(s)
  *    <sspec> := "*" | <val>
@@ -654,46 +659,46 @@ static int process_qualifiers(farg *al, char *qual)
  * NOTE: to make parsing easier things like [,] are not allowed
  * hence the <spec> <sspec> distinction
  */
-	val = ta[0];
-	lst = NULL;
-	if ((IS_NULL(val) == TRUE) || (val[0] == '*'))
-	   lookup_type(&lst, al->type, MODE_C, MODE_C);
-	else
-	   lst = tokenize(val, "[,]");
-	al->val = lst;
-	al->nv  = lst_length(lst);
+	    val = ta[0];
+	    lst = NULL;
+	    if ((IS_NULL(val) == TRUE) || (val[0] == '*'))
+	       lookup_type(&lst, al->type, MODE_C, MODE_C);
+	    else
+	       lst = tokenize(val, "[,]");
+	    al->val = lst;
+	    al->nv  = lst_length(lst);
 
-	if ((al->nv > 1) && (ptr == FALSE))
-	   {berr("multiple values illegal with scalar '%s %s'",
-		 al->arg, al->qualifier);
-	    al->nv = 0;
-	    rv = FALSE;};
+	    if ((al->nv > 1) && (ptr == FALSE))
+	       {berr("multiple values illegal with scalar '%s %s'",
+		     al->arg, al->qualifier);
+		al->nv = 0;
+		rv = FALSE;};
 
 /* get argument IN/OUT direction */
-	al->dir = FD_IN;
-	dir = ta[1];
-	if (dir != NULL)
-	   {if (strcmp(dir, "in") == 0)
-	       al->dir = FD_IN;
-	    else if (strcmp(dir, "out") == 0)
-	       al->dir = FD_OUT;
-	    else if (strcmp(dir, "io") == 0)
-	       al->dir = FD_IN_OUT;};
+	    al->dir = FD_IN;
+	    dir = ta[1];
+	    if (dir != NULL)
+	       {if (strcmp(dir, "in") == 0)
+		   al->dir = FD_IN;
+		else if (strcmp(dir, "out") == 0)
+		   al->dir = FD_OUT;
+		else if (strcmp(dir, "io") == 0)
+		   al->dir = FD_IN_OUT;};
 
-	if (((al->dir == FD_OUT) || (al->dir == FD_IN_OUT)) &&
-	    (ptr == FALSE))
-	   {berr("scalar arguments cannot be IO or OUT - '%s %s'",
-		 al->arg, al->qualifier);
-	    al->nv = 0;
-	    rv = FALSE;};
+	    if (((al->dir == FD_OUT) || (al->dir == FD_IN_OUT)) &&
+		 (ptr == FALSE))
+	       {berr("scalar arguments cannot be IO or OUT - '%s %s'",
+		     al->arg, al->qualifier);
+		al->nv = 0;
+		rv = FALSE;};
 
 /* get kind adjustment */
-	al->cls = ((IS_NULL(ta[2]) == FALSE) && (strcmp(ta[2], "cls") == 0));
+	    al->cls = ((IS_NULL(ta[2]) == FALSE) && (strcmp(ta[2], "cls") == 0));
 
-	free_strings(ta);}
-    else
-       {lookup_type(&al->val, al->type, MODE_C, MODE_C);
-	al->dir = FD_NONE;};
+	    free_strings(ta);}
+	else
+	   {lookup_type(&al->val, al->type, MODE_C, MODE_C);
+	    al->dir = FD_NONE;};};
 
     return(rv);}
 
@@ -786,27 +791,26 @@ static farg *proc_args(fdecl *dcl)
     args = dcl->args;
     
     al = MAKE_N(farg, na);
-    memset(al, 0, na*sizeof(farg));
-
-    err = FALSE;
-    nr  = 0;
-    for (i = 0; i < na; i++)
-        {ok = split_decl(al+i, args[i], TRUE);
-	 if (ok == FALSE)
-	    {FREE(al);
-	     free_strings(dcl->bindings);
-	     dcl->bindings = NULL;
-	     dcl->na       = 0;
-	     err           = TRUE;
-	     break;}
-	 else
-	    {fc_type(NULL, 0, al+i, TRUE, MODE_C);
-	     nr += al[i].nv;};};
-
-    dcl->error = err;
-
     if (al != NULL)
-       {dcl->al    = al;
+       {memset(al, 0, na*sizeof(farg));
+
+	err = FALSE;
+	nr  = 0;
+	for (i = 0; i < na; i++)
+	    {ok = split_decl(al+i, args[i], TRUE);
+	     if (ok == FALSE)
+	        {FREE(al);
+		 free_strings(dcl->bindings);
+		 dcl->bindings = NULL;
+		 dcl->na       = 0;
+		 err           = TRUE;
+		 break;}
+	     else
+	        {fc_type(NULL, 0, al+i, TRUE, MODE_C);
+		 nr += al[i].nv;};};
+
+	dcl->error = err;
+	dcl->al    = al;
 	dcl->nr    = nr;
 	dcl->voida = ((dcl->na == 1) && (IS_NULL(dcl->al[0].name) == TRUE));
 
@@ -866,43 +870,46 @@ static int find_proto(fdecl *dcl, char **cpr, char *f)
 	   {dcl = MAKE(fdecl);
 	    memset(dcl, 0, sizeof(fdecl));};
 
-	dcl->proc  = FALSE;
-	dcl->na    = 0;
-	dcl->args  = NULL;
-	dcl->nc    = 0;
-	dcl->cargs = NULL;
+	if (dcl != NULL)
+	   {dcl->proc  = FALSE;
+	    dcl->na    = 0;
+	    dcl->args  = NULL;
+	    dcl->nc    = 0;
+	    dcl->cargs = NULL;
 
 /* break up the prototype into the type/function name and args */
-	nstrncpy(pf, MAXLINE, pro, -1);
-	p = strchr(pf, '(');
-	*p++ = '\0';
-	pa = p;
-	LAST_CHAR(pa) = '\0';
+	    nstrncpy(pf, MAXLINE, pro, -1);
+	    p = strchr(pf, '(');
+            if (p != NULL)
+	       *p++ = '\0';
+	    pa = p;
+	    LAST_CHAR(pa) = '\0';
 
 /* get the return type */
-        ok = split_decl(&dcl->proto, pf, FALSE);
+	    ok = split_decl(&dcl->proto, pf, FALSE);
 	
-	ty = tokenize(pf, " \t");
-	nt = lst_length(ty);
+	    ty = tokenize(pf, " \t");
+	    if (ty != NULL)
+	       {nt = lst_length(ty);
 
-	FREE(dcl->proto.arg);
-	dcl->proto.arg = STRSAVE(pro);
+		FREE(dcl->proto.arg);
+		dcl->proto.arg = STRSAVE(pro);
 
 /* get the function name */
-	cfn = ty[nt-1];
-	ASSERT(cfn != NULL);
+		cfn = ty[nt-1];
+		ASSERT(cfn != NULL);
 
 /* get the args */
-	args = split_args(pa);
-	for (na = 0; IS_NULL(args[na]) == FALSE; na++);
-	dcl->na    = na;
-	dcl->args  = args;
-	dcl->voida = TRUE;
-	dcl->voidf = (strcmp(dcl->proto.type, "void") == 0);
+		args = split_args(pa);
+		for (na = 0; IS_NULL(args[na]) == FALSE; na++);
+		dcl->na    = na;
+		dcl->args  = args;
+		dcl->voida = TRUE;
+		dcl->voidf = (strcmp(dcl->proto.type, "void") == 0);
 
-	proc_args(dcl);
+		proc_args(dcl);
 
-	free_strings(ty);};
+		free_strings(ty);};};};
 
     return(ok);}
 
@@ -975,15 +982,15 @@ static void add_type(char *cty, char *fty, char *sty, char *pty, char *defv)
     mtype *map;
 
     get_type_map(&n, &map, 1);
+    if (map != NULL)
+       {n--;
+	n = max(n, 0);
 
-    n--;
-    n = max(n, 0);
-
-    map[n].cty  = cty;
-    map[n].fty  = fty;
-    map[n].sty  = sty;
-    map[n].pty  = pty;
-    map[n].defv = defv;
+	map[n].cty  = cty;
+	map[n].fty  = fty;
+	map[n].sty  = sty;
+	map[n].pty  = pty;
+	map[n].defv = defv;};
 
     return;}
 
@@ -997,60 +1004,62 @@ static char *lookup_type(char ***val, char *ty, langmode ity, langmode oty)
     char *rv, *dv, **lst;
     mtype *map;
 
+    rv = NULL;
+
     get_type_map(&n, &map, 0);
 
     l = -1;
-    switch (ity)
-       {case MODE_C :
-             for (i = 0; i < n; i++)
-	         {if (strcmp(ty, map[i].cty) == 0)
-		     {l = i;
-		      break;};};
-	     break;
-        case MODE_F :
-             for (i = 0; i < n; i++)
-	         {if (strcmp(ty, map[i].fty) == 0)
-		     {l = i;
-		      break;};};
-	     break;
-        case MODE_S :
-             for (i = 0; i < n; i++)
-	         {if (strcmp(ty, map[i].sty) == 0)
-		     {l = i;
-		      break;};};
-	     break;
-        case MODE_P :
-             for (i = 0; i < n; i++)
-	         {if (strcmp(ty, map[i].pty) == 0)
-		     {l = i;
-		      break;};};
-	     break;};
-
-    rv = NULL;
-    dv = NO_DEFAULT_VALUE;
-    if (l != -1)
-       {dv = map[l].defv;
-	switch (oty)
+    if (map != NULL)
+       {switch (ity)
 	   {case MODE_C :
-                 rv = map[l].cty;
-	         break;
+	         for (i = 0; i < n; i++)
+		     {if (strcmp(ty, map[i].cty) == 0)
+			 {l = i;
+			  break;};};
+		 break;
 	    case MODE_F :
-                 rv = map[l].fty;
-	         break;
+                 for (i = 0; i < n; i++)
+		     {if (strcmp(ty, map[i].fty) == 0)
+			 {l = i;
+			  break;};};
+		 break;
 	    case MODE_S :
-                 rv = map[l].sty;
-	         break;
-	    case MODE_P :
-                 rv = map[l].pty;
-	         break;};}
-    else if ((is_func_ptr(ty, 3) == TRUE) || (is_ptr(ty) == TRUE))
-       dv = "NULL";
+                 for (i = 0; i < n; i++)
+		     {if (strcmp(ty, map[i].sty) == 0)
+			 {l = i;
+			  break;};};
+		 break;
+ 	    case MODE_P :
+	         for (i = 0; i < n; i++)
+		     {if (strcmp(ty, map[i].pty) == 0)
+			 {l = i;
+			  break;};};
+		 break;};
 
-    if (val != NULL)
-       {lst = NULL;
-	if (dv != NULL)
-	   lst = lst_push(lst, dv);
-        *val = lst;};
+	dv = NO_DEFAULT_VALUE;
+	if (l != -1)
+	   {dv = map[l].defv;
+	    switch (oty)
+	       {case MODE_C :
+		     rv = map[l].cty;
+		     break;
+	        case MODE_F :
+		     rv = map[l].fty;
+		     break;
+	        case MODE_S :
+		     rv = map[l].sty;
+		     break;
+	        case MODE_P :
+		     rv = map[l].pty;
+		     break;};}
+	else if ((is_func_ptr(ty, 3) == TRUE) || (is_ptr(ty) == TRUE))
+	   dv = "NULL";
+
+	if (val != NULL)
+	   {lst = NULL;
+	    if (dv != NULL)
+	       lst = lst_push(lst, dv);
+	    *val = lst;};};
 
     return(rv);}
 
@@ -1148,9 +1157,10 @@ static void add_derived_types(char **sbi)
 	    {if (strncmp(sb, "derived ", 8) == 0)
 		 {nstrncpy(s, MAXLINE, sb, -1);
 		  ta = tokenize(s, " \t");
-		  add_type(ta[1], ta[2], ta[3], ta[4], ta[5]);
-		  FREE(ta[0]);
-		  FREE(ta);};};};
+		  if (ta != NULL)
+		     {add_type(ta[1], ta[2], ta[3], ta[4], ta[5]);
+		      FREE(ta[0]);
+		      FREE(ta);};};};};
 
     return;}
 
@@ -1223,32 +1233,32 @@ static void find_bind(statedes *st)
 
     nb  = 0;
     dcl = MAKE_N(fdecl, nbi);
+    if (dcl != NULL)
+       {for (ib = 0; ib < nbi; ib++)
+	    {sb = sbi[ib];
+	     if (blank_line(sb) == FALSE)
+	        {nstrncpy(t, MAXLINE, sb, -1);
+		 sa = tokenize(t, " \t");
 
-    for (ib = 0; ib < nbi; ib++)
-        {sb = sbi[ib];
-	 if (blank_line(sb) == FALSE)
-	    {nstrncpy(t, MAXLINE, sb, -1);
-	     sa = tokenize(t, " \t");
-
-	     if ((sa != NULL) && (strcmp(sa[0], "derived") != 0))
-	        {ta = NULL;
-		 for (i = 1; sa[i] != NULL; i++)
-		     {lng = sa[i];
-		      p   = strchr(lng, '(');
-		      if (p != NULL)
-			 {*p++ = '\0';
-			  ta   = lst_push(ta, lng);
-			  p    = trim(p, BACK, ")");
-			  if (IS_NULL(p) == TRUE)
-			     ta = lst_push(ta, "yes");
+		 if ((sa != NULL) && (strcmp(sa[0], "derived") != 0))
+		    {ta = NULL;
+		     for (i = 1; sa[i] != NULL; i++)
+		         {lng = sa[i];
+			  p   = strchr(lng, '(');
+			  if (p != NULL)
+			     {*p++ = '\0';
+			      ta   = lst_push(ta, lng);
+			      p    = trim(p, BACK, ")");
+			      if (IS_NULL(p) == TRUE)
+				 ta = lst_push(ta, "yes");
+			      else
+				 ta = lst_push(ta, p);}
 			  else
-			     ta = lst_push(ta, p);}
-		      else
-			 ta = lst_push(ta, lng);};
+			     ta = lst_push(ta, lng);};
 
-		 dcl[nb].bindings = ta;
+		     dcl[nb].bindings = ta;
 
-		 nb += find_proto(dcl+nb, cpr, sa[0]);
+		     nb += find_proto(dcl+nb, cpr, sa[0]);};
 
 		 free_strings(sa);};};};
 
@@ -1450,7 +1460,9 @@ static void fc_type(char *wty, int nc, farg *al, int afl, langmode mode)
     char *pty, *arg, *ty;
 
     if (al != NULL)
-       {if (wty == NULL)
+       {knd = FP_ANY;
+
+	if (wty == NULL)
 	   {wty = lty;
 	    nc  = MAXLINE;};
 
@@ -2180,41 +2192,41 @@ static char **mc_proto_list(fdecl *dcl)
 	    default        :
 	         lst = lst_push(lst, wty);
 		 lst = lst_push(lst, nm);
-		 break;};};
+		 break;};
 
 /* arguments */
-    for (i = 0; i < na; i++)
-        {if ((voida == TRUE) && (i == 0))
-	    continue;
+	for (i = 0; i < na; i++)
+	    {if ((voida == TRUE) && (i == 0))
+		continue;
 
-	 mc_type(MAXLINE, NULL, NULL, wty, al+i);
-	 nm  = al[i].name;
-	 knd = al[i].knd;
-	 switch (knd)
-	    {case FP_FNC      :
-	     case FP_INDIRECT :
-	          lst = lst_push(lst, C_PTR_RETURN);
-	          lst = lst_push(lst, nm);
-		  break;
-	     case FP_ARRAY :
-	          if (strcmp(wty, "character") == 0)
-		     {lst = lst_push(lst, "character(*)");
-		      lst = lst_push(lst, nm);}
-		  else if (strcmp(wty, "C_PTR") == 0)
-		     {lst = lst_push(lst, C_PTR_RETURN);
-		      lst = lst_push(lst, nm);}
-		  else
-		     {lst = lst_push(lst, wty);
-		      lst = lst_push(lst, "%s(*)", nm);};
-		  break;
-	     case FP_SCALAR :
-	     default        :
-	          lst = lst_push(lst, wty);
-	          lst = lst_push(lst, nm);
-		  break;};};
+	      mc_type(MAXLINE, NULL, NULL, wty, al+i);
+	      nm  = al[i].name;
+	      knd = al[i].knd;
+	      switch (knd)
+		 {case FP_FNC      :
+		  case FP_INDIRECT :
+		       lst = lst_push(lst, C_PTR_RETURN);
+		       lst = lst_push(lst, nm);
+		       break;
+		  case FP_ARRAY :
+		       if (strcmp(wty, "character") == 0)
+			  {lst = lst_push(lst, "character(*)");
+			   lst = lst_push(lst, nm);}
+		       else if (strcmp(wty, "C_PTR") == 0)
+			  {lst = lst_push(lst, C_PTR_RETURN);
+			   lst = lst_push(lst, nm);}
+		       else
+			  {lst = lst_push(lst, wty);
+			   lst = lst_push(lst, "%s(*)", nm);};
+		       break;
+		  case FP_SCALAR :
+		  default        :
+		       lst = lst_push(lst, wty);
+		       lst = lst_push(lst, nm);
+		       break;};};
 
-    dcl->tfproto = lst;
-    dcl->ntf     = lst_length(lst);
+	dcl->tfproto = lst;
+	dcl->ntf     = lst_length(lst);};
 
     return(lst);}
 
@@ -3101,7 +3113,7 @@ static void scheme_scalar_return(char *t, int nc,
 	   {switch (knd)
 	       {case FP_ANY :
 		     sty = lookup_type(NULL, ty, MODE_C, MODE_S);
-		     if (strcmp(sty, "SC_ENUM_I") == 0)
+		     if ((sty != NULL) && (strcmp(sty, "SC_ENUM_I") == 0))
 		        snprintf(t, nc, "    _lo = SS_mk_integer(si, _rv);\n");
 		     else
 		        {snprintf(t, nc,
@@ -3183,6 +3195,7 @@ static char **scheme_wrap_install(char **fl, fdecl *dcl, char *sfn,
     t[0] = '\0';
     if (com != NULL)
        concatenate(t, MAXLINE, com, " ");
+
     if (IS_NULL(t) == TRUE)
        {if_call_list(a, MAXLINE, dcl, NULL);
 	if (voida == FALSE)
@@ -3336,47 +3349,47 @@ static void py_format(char *fmt, int nc, char *spec, char *name)
     char t[MAXLINE];
     char *ty, *pf, **ta;
 
-    nstrncpy(t, MAXLINE, spec, -1);
-    ta = tokenize(t, ", \t\n");
-
     memset(fmt, 0, nc);
 
-    pf = fmt;
-    for (i = 0; ta[i] != NULL; i += 2)
-        {ty = ta[i];
-	 if ((strcmp(ty, "SC_CHAR_I") == 0) ||
-	     (strcmp(ty, "char") == 0))
-	    *pf++ = 'b';
-	  else if ((strcmp(ty, "SC_SHORT_I") == 0) ||
-		   (strcmp(ty, "short") == 0))
-	    *pf++ = 'h';
-	  else if ((strcmp(ty, "SC_INT_I") == 0) ||
-		   (strcmp(ty, "int") == 0))
-	    *pf++ = 'i';
-	  else if ((strcmp(ty, "SC_LONG_I") == 0) ||
-		   (strcmp(ty, "long") == 0))
-	    *pf++ = 'l';
-	  else if ((strcmp(ty, "SC_LONG_LONG_I") == 0) ||
-		   (strcmp(ty, "long long") == 0))
-	    *pf++ = 'L';
-	  else if ((strcmp(ty, "SC_FLOAT_I") == 0) ||
-		   (strcmp(ty, "float") == 0))
-	    *pf++ = 'f';
-	  else if ((strcmp(ty, "SC_DOUBLE_I") == 0) ||
-		   (strcmp(ty, "double") == 0))
-	    *pf++ = 'd';
-	  else if ((strcmp(ty, "SC_STRING_I") == 0) ||
-		   (strcmp(ty, "char *") == 0))
-	    *pf++ = 's';
-	  else if (strcmp(ty, "SC_ENUM_I") == 0)
-	    *pf++ = 'i';
-	  else
-	    *pf++ = 'O';};
+    nstrncpy(t, MAXLINE, spec, -1);
+    ta = tokenize(t, ", \t\n");
+    if (ta != NULL)
+       {pf = fmt;
+        for (i = 0; ta[i] != NULL; i += 2)
+	    {ty = ta[i];
+	     if ((strcmp(ty, "SC_CHAR_I") == 0) ||
+		 (strcmp(ty, "char") == 0))
+	        *pf++ = 'b';
+	     else if ((strcmp(ty, "SC_SHORT_I") == 0) ||
+		      (strcmp(ty, "short") == 0))
+	        *pf++ = 'h';
+	     else if ((strcmp(ty, "SC_INT_I") == 0) ||
+		      (strcmp(ty, "int") == 0))
+	        *pf++ = 'i';
+	     else if ((strcmp(ty, "SC_LONG_I") == 0) ||
+		      (strcmp(ty, "long") == 0))
+	        *pf++ = 'l';
+	     else if ((strcmp(ty, "SC_LONG_LONG_I") == 0) ||
+		      (strcmp(ty, "long long") == 0))
+	        *pf++ = 'L';
+	     else if ((strcmp(ty, "SC_FLOAT_I") == 0) ||
+		      (strcmp(ty, "float") == 0))
+	        *pf++ = 'f';
+	     else if ((strcmp(ty, "SC_DOUBLE_I") == 0) ||
+		      (strcmp(ty, "double") == 0))
+	        *pf++ = 'd';
+	     else if ((strcmp(ty, "SC_STRING_I") == 0) ||
+		      (strcmp(ty, "char *") == 0))
+	        *pf++ = 's';
+	     else if (strcmp(ty, "SC_ENUM_I") == 0)
+	        *pf++ = 'i';
+	     else
+	        *pf++ = 'O';};
 
-    if (name != NULL)
-       vstrcat(fmt, nc, ":%s", name);
+	if (name != NULL)
+	   vstrcat(fmt, nc, ":%s", name);
 
-    free_strings(ta);
+	free_strings(ta);};
 
     return;}
 
@@ -3390,18 +3403,19 @@ static void py_arg(char *arg, int nc, char *spec)
     char t[MAXLINE];
     char **ta;
 
-    nstrncpy(t, MAXLINE, spec, -1);
-    ta = tokenize(t, ", \t\n");
+    if (arg != NULL)
+       {arg[0] = '\0';
 
-    arg[0] = '\0';
+	nstrncpy(t, MAXLINE, spec, -1);
+	ta = tokenize(t, ", \t\n");
+	if (ta != NULL)
+	   {for (i = 1; ta[i] != NULL; i += 2)
+	        vstrcat(arg, nc, "%s, ", ta[i]);
 
-    for (i = 1; ta[i] != NULL; i += 2)
-        vstrcat(arg, nc, "%s, ", ta[i]);
+	    n = strlen(arg);
+	    arg[n-2] = '\0';
 
-    n = strlen(arg);
-    arg[n-2] = '\0';
-
-    free_strings(ta);
+	    free_strings(ta);};};
 
     return;}
 
@@ -3885,7 +3899,9 @@ static void python_header(bindes *bd)
 
     snprintf(name, MAXLINE, "py-%s.h", pck);
     fh = fopen(name, "w");
-    
+    if (fh == NULL)
+       return;
+
     fprintf(fh, "/*\n");
     fprintf(fh, " * PY-%s.H - generated header for %s bindings\n", upk, pck);
     fprintf(fh, " *\n");
@@ -4304,6 +4320,8 @@ static void man_wrap(fdecl *dcl, char *sb, char *pck, int ndc, char **cdc)
 
     snprintf(fname, MAXLINE, "%s.3", cfn);
     fp = fopen(fname, "w");
+    if (fp == NULL)
+       return;
 
     fprintf(fp, ".\\\"\n");
     fprintf(fp, ".\\\" See the terms of include/cpyright.h\n");

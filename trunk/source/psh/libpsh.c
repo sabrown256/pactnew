@@ -51,6 +51,80 @@ extern void
  unamef(char *s, int nc, char *wh);
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* NSTRSAVE - safe strdup function */
+
+char *nstrsave(char *s)
+   {char *d;
+
+    d = NULL;
+    if (s != NULL)
+       d = strdup(s);
+
+    return(d);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* VSTRCAT - safe strcat function */
+
+char *vstrcat(char *d, int nc, char *fmt, ...)
+   {int n, nd, ns;
+    char s[LRG];
+
+    VA_START(fmt);
+    VSNPRINTF(s, LRG, fmt);
+    VA_END;
+
+    nd = strlen(d);
+    ns = strlen(s);
+    n  = nc - 1 - nd;
+    n  = min(n, ns);
+    n  = max(n, 0);
+
+    strncat(d, s, n);
+    d[nd+n] = '\0';
+
+    return(d);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* NSTRCAT - safe strcat function */
+
+char *nstrcat(char *d, int nc, char *s)
+   {int n, nd, ns;
+
+    nd = strlen(d);
+    ns = strlen(s);
+    n  = nc - 1 - nd;
+    n  = min(n, ns);
+
+    strncat(d, s, n);
+    d[nd+n] = '\0';
+
+    return(d);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* NSTRNCPY - this is to strncpy as snprintf is to sprintf
+ *          - a safe string copy function
+ *          - unlike strncpy this always returns a null terminated string
+ */
+
+char *nstrncpy(char *d, size_t nd, char *s, size_t ns)
+   {size_t nc;
+        
+    nc = min(ns, nd-1);
+    if (s != NULL)
+       {strncpy(d, s, nc);
+	d[nc] = '\0';};
+
+    return(d);}
+
+/*--------------------------------------------------------------------------*/
 
 #ifdef NO_UNSETENV
 
@@ -100,7 +174,7 @@ char **tokenize(char *s, char *delim)
     n  = strlen(s);
     t  = MAKE_N(char, n+100);
     if (t != NULL)
-       {strcpy(t, s);
+       {nstrncpy(t, n+100, s, -1);
 
 	for (i = 0, ps = t; ps != NULL; )
 	    {if (sa == NULL)
@@ -108,7 +182,7 @@ char **tokenize(char *s, char *delim)
 
 	     if (sa != NULL)
 	        {ns  = strspn(ps, delim);
-	        {ps += ns;
+	         ps += ns;
 		 p   = strpbrk(ps, delim);
 		 if (p != NULL)
 		    {c  = *p;
@@ -119,7 +193,7 @@ char **tokenize(char *s, char *delim)
 		 else
 		    {if (IS_NULL(ps) == FALSE)
 			sa[i++] = STRSAVE(ps);
-		     break;};};};};
+		     break;};};};
 
 	if (sa != NULL)
 	   sa[i++] = NULL;
@@ -155,65 +229,6 @@ int last_char(char *s)
     nc = max(0, nc);
 
     return(nc);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* VSTRCAT - safe strcat function */
-
-char *vstrcat(char *d, int nc, char *fmt, ...)
-   {int n, nd, ns;
-    char s[LRG];
-
-    VA_START(fmt);
-    VSNPRINTF(s, LRG, fmt);
-    VA_END;
-
-    nd = strlen(d);
-    ns = strlen(s);
-    n  = nc - 1 - nd;
-    n  = min(n, ns);
-
-    strncat(d, s, n);
-    d[nd+n] = '\0';
-
-    return(d);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* NSTRCAT - safe strcat function */
-
-char *nstrcat(char *d, int nc, char *s)
-   {int n, nd, ns;
-
-    nd = strlen(d);
-    ns = strlen(s);
-    n  = nc - 1 - nd;
-    n  = min(n, ns);
-
-    strncat(d, s, n);
-    d[nd+n] = '\0';
-
-    return(d);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* NSTRNCPY - this is to strncpy as snprintf is to sprintf
- *          - a safe string copy function
- *          - unlike strncpy this always returns a null terminated string
- */
-
-char *nstrncpy(char *d, size_t nd, char *s, size_t ns)
-   {size_t nc;
-        
-    nc = min(ns, nd-1);
-    if (s != NULL)
-       {strncpy(d, s, nc);
-	d[nc] = '\0';};
-
-    return(d);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -265,7 +280,7 @@ char *fill_string(char *s, int n)
    {int nc, nd;
     static char fill[MAXLINE];
 
-    strcpy(fill, s);
+    nstrncpy(fill, MAXLINE, s, -1);
     nc = strlen(fill);
     nd = n - nc;
 
@@ -464,7 +479,7 @@ char *path_tail(char *s)
     char *pd;
     static char d[LRG];
 
-    strcpy(d, s);
+    nstrncpy(d, LRG, s, -1);
     nc = strlen(d);
     if (nc >= LRG)
        nc = LRG;
@@ -489,7 +504,7 @@ char *path_head(char *s)
     char *pd;
     static char d[LRG];
 
-    strcpy(d, s);
+    nstrncpy(d, LRG, s, -1);
     nc = strlen(d);
     if (nc >= LRG)
        nc = LRG;
@@ -513,7 +528,7 @@ char *path_base(char *s)
     char *pd;
     static char d[LRG];
 
-    strcpy(d, s);
+    nstrncpy(d, LRG, s, -1);
     nc = strlen(d);
     if (nc >= LRG)
        nc = LRG;
@@ -537,7 +552,7 @@ char *path_suffix(char *s)
     char *pd;
     static char d[LRG];
 
-    strcpy(d, s);
+    nstrncpy(d, LRG, s, -1);
     nc = strlen(d);
     if (nc >= LRG)
        nc = LRG;
@@ -565,7 +580,7 @@ int full_path(char *path, int nc, char *dir, char *name)
     rv = TRUE;
 
     if (name[0] == '/')
-       strncpy(s, name, nc);
+       nstrncpy(s, nc, name, -1);
 
     else if (dir != NULL)
        snprintf(s, nc, "%s/%s", dir, name);
@@ -582,8 +597,8 @@ int full_path(char *path, int nc, char *dir, char *name)
 	        break;};
 	snprintf(s, nc, "%s/%s", d, pn);};
 
-    strncpy(path, s, nc-1);
-    path[nc-1] = '\0';
+    nstrncpy(path, nc-1, s, -1);
+/*    path[nc-1] = '\0'; */
 
     return(rv);}
 
@@ -700,7 +715,7 @@ int file_executable(char *fmt, ...)
     rv = FALSE;
     st = stat(s, &bf);
     if (st != 0)
-       strncpy(err, strerror(errno), MAXLINE);
+       nstrncpy(err, MAXLINE, strerror(errno), -1);
     else
        {int ig, ng;
 	gid_t gl[NGROUPX+1];
@@ -1239,7 +1254,7 @@ char *cwhich(char *fmt, ...)
 	ENDFOR;
 
 	if (ok == FALSE)
-	   strcpy(exe, "none");};
+	   nstrncpy(exe, MAXLINE, "none", -1);};
 
     return(exe);}
 
@@ -1320,7 +1335,7 @@ char *append_tok(char *s, int dlm, char *fmt, ...)
 	nc = strlen(s) + strlen(t) + strlen(delim) + 10;
 	p  = MAKE_N(char, nc);
 	if (p != NULL)
-	   {strcpy(p, s);
+	   {nstrncpy(p, nc, s, -1);
 	    strcat(p, delim);
 	    strcat(p, t);};
 	FREE(s);}
@@ -1346,7 +1361,7 @@ int push_tok_beg(char *s, int nc, int dlm, char *fmt, ...)
     rv = TRUE;
 
 /* fill the local buffer BF with the result */
-    strncpy(bf, t, LRG);
+    nstrncpy(bf, LRG, t, -1);
     if (IS_NULL(s) == FALSE)
        vstrcat(bf, LRG, "%c%s", dlm, s);
 
@@ -1550,8 +1565,7 @@ int pop_dir(void)
  */
 
 char **ls(char *opt, char *fmt, ...)
-   {int i;
-    char s[MAXLINE];
+   {char s[MAXLINE];
     static char **lst;
 
     VA_START(fmt);
@@ -1562,7 +1576,6 @@ char **ls(char *opt, char *fmt, ...)
        opt = "";
 
     lst = NULL;
-    i   = 0;
     FOREACH(ph, run(FALSE, "ls %s %s 2>&1", opt, s), " \n")
        if (file_exists(ph) == TRUE)
 	  lst = lst_add(lst, ph);
@@ -1711,7 +1724,7 @@ void splice_out_path(char *path)
    {char bf[MAXLINE], lpth[MAXLINE];
     char *ps, *t, *ts, *te;
 
-    strcpy(lpth, path);
+    nstrncpy(lpth, MAXLINE, path, -1);
 
 /* check for $PATH */
     ps = lpth + strspn(lpth, " \t");
@@ -1752,21 +1765,22 @@ void splice_out_path(char *path)
 void push_path(int end, char *dpath, char *path)
    {char lpth[LRG], tp[LRG];
 
-    strcpy(lpth, strip_quote(path));
+    if (IS_NULL(path) == FALSE)
+       {nstrncpy(lpth, LRG, strip_quote(path), -1);
 
-    splice_out_path(lpth);
+	splice_out_path(lpth);
 
 /* add the new item */
-    if (IS_NULL(dpath) == TRUE)
-       strncpy(tp, lpth, LRG);
+	if (IS_NULL(dpath) == TRUE)
+	   nstrncpy(tp, LRG, lpth, -1);
 
-    else
-       {if (end == APPEND)
-	   snprintf(tp, LRG, "%s:%s", dpath, lpth);
-        else if (end == PREPEND)
-	   snprintf(tp, LRG, "%s:%s", lpth, dpath);};
+	else
+	   {if (end == APPEND)
+	       snprintf(tp, LRG, "%s:%s", dpath, lpth);
+	    else if (end == PREPEND)
+	       snprintf(tp, LRG, "%s:%s", lpth, dpath);};
 
-    strncpy(dpath, path_simplify(tp, ':'), LRG);
+	nstrncpy(dpath, LRG, path_simplify(tp, ':'), -1);};
 
     return;}
 
@@ -2058,19 +2072,19 @@ void unamef(char *s, int nc, char *wh)
 
     switch (*wh)
        {case 'm' :
-             strncpy(s, uts.machine, nc);
+             nstrncpy(s, nc, uts.machine, -1);
              break;
         case 'n' :
-	     strncpy(s, uts.nodename, nc);
+	     nstrncpy(s, nc, uts.nodename, -1);
              break;
         case 'r' :
-	     strncpy(s, uts.release, nc);
+	     nstrncpy(s, nc, uts.release, -1);
              break;
         case 's' :
-	     strncpy(s, uts.sysname, nc);
+	     nstrncpy(s, nc, uts.sysname, -1);
              break;
         case 'v' :
-	     strncpy(s, uts.version, nc);
+	     nstrncpy(s, nc, uts.version, -1);
              break;};
 
     return;}

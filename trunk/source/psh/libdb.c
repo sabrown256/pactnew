@@ -425,7 +425,11 @@ static database *make_db(char *root)
 	db->file    = fname;
 	db->flog    = flog;
 	db->fpid    = fpid;
-	db->entries = NULL;};
+	db->entries = NULL;}
+    else
+       {FREE(flog);
+	FREE(fname);
+	FREE(fpid);};
 
     return(db);}
 
@@ -438,7 +442,8 @@ void free_db(database *db)
    {
 
     if (db != NULL)
-       {FREE(db->root);
+       {free_strings(db->entries);
+	FREE(db->root);
 	FREE(db->file);
 	FREE(db->flog);
 	FREE(db->fpid);
@@ -455,7 +460,7 @@ database *db_srv_create(char *root)
    {database *db;
 
     db = make_db(root);
-    if (db != NULL)
+    if ((db != NULL) && (db->file != NULL))
        unlink(db->file);
 
     return(db);}
@@ -470,7 +475,7 @@ database *db_srv_load(char *root)
     FILE *fp;
 
     db = make_db(root);
-    if (db != NULL)
+    if ((db != NULL) && (db->file != NULL))
        {fp = fopen(db->file, "r");
 	if (fp != NULL)
 	   {load_db(db, NULL, fp);
@@ -500,7 +505,7 @@ database *db_srv_open(char *root, int init)
        {pid = getpid();
 
 /* if a server is already running there will be a PID file */
-	if (file_exists(db->fpid) == FALSE)
+	if ((db->fpid != NULL) && (file_exists(db->fpid) == FALSE))
 	   {ioc_server = SERVER;
 	    rv = open_sock(root);
 	    ASSERT(rv == 0);

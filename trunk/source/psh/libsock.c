@@ -399,6 +399,9 @@ static int read_sock(client *cl, char *s, int nc)
     else
        {nb = read(fd, s, nc);
 
+/* guarantee NULL termination */
+	s[nc-1] = '\0';
+
 	if (s[nb] != '\0')
 	   s[nb] = '\0';
 
@@ -424,39 +427,41 @@ static int write_sock(client *cl, char *s, int nc)
     char *flog, *wh, *root;
     connection *srv;
 
-    root = cl->root;
-    fd   = cl->fd;
-    srv  = cl->server;
+    nb = -1;
 
-    if (nc <= 0)
-       nc = strlen(s) + 1;
+    if ((cl != NULL) && (s != NULL))
+       {root = cl->root;
+	fd   = cl->fd;
+	srv  = cl->server;
 
-    flog = name_log(root);
+	if (nc <= 0)
+	   nc = strlen(s) + 1;
 
-    if (fd == -1)
-       {if (srv->server == 0)
-	   fd = connect_client(cl);
-        else
-	   fd = connect_server(cl);};
+	flog = name_log(root);
 
-    wh = C_OR_S(cl->type == CLIENT);
+	if (fd == -1)
+	   {if (srv->server == 0)
+	       fd = connect_client(cl);
+	    else
+	       fd = connect_server(cl);};
 
-    if (fd < 0)
-       {nb = -1;
-	log_activity(flog, dbg_sock, wh, "write - no connection");}
+	wh = C_OR_S(cl->type == CLIENT);
 
-    else
-       {nb = write(fd, s, nc);
+	if (fd < 0)
+	   log_activity(flog, dbg_sock, wh, "write - no connection");
 
-	if ((nb >= 0) && (nb == nc))
-	   log_activity(flog, dbg_sock, wh, "write %d |%s| (%d)",
-			fd, s, nb);
 	else
-	   log_activity(flog, dbg_sock, wh, "write %d |%s| - %s (%d)",
-			fd, s, strerror(errno), errno);
+	   {nb = write(fd, s, nc);
 
-	if (async_srv == FALSE)
-	   cl->fd = connect_close(fd, cl, NULL);};
+	    if ((nb >= 0) && (nb == nc))
+	       log_activity(flog, dbg_sock, wh, "write %d |%s| (%d)",
+			    fd, s, nb);
+	    else
+	       log_activity(flog, dbg_sock, wh, "write %d |%s| - %s (%d)",
+			    fd, s, strerror(errno), errno);
+
+	    if (async_srv == FALSE)
+	       cl->fd = connect_close(fd, cl, NULL);};};
 
     return(nb);}
 

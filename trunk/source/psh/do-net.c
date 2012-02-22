@@ -255,17 +255,18 @@ static int transition(process *pp, int new)
     char *olds, *news;
     hfspec *sp;
 
-    sp = (hfspec *) pp->a;
+    if (pp != NULL)
+       {sp = (hfspec *) pp->a;
 
-    old = sp->running;
-    olds = run_state[old-IDLE];
-    news = run_state[new-IDLE];
+	old = sp->running;
+	olds = run_state[old-IDLE];
+	news = run_state[new-IDLE];
 
-    if (new == DONE)
-       notej(pp, "transition from %s to %s (%s)",
-	     olds, news, (sp->exit == PASSED) ? "ok" : "ng");
-    else
-       notej(pp, "transition from %s to %s", olds, news);
+	if (new == DONE)
+	   notej(pp, "transition from %s to %s (%s)",
+		 olds, news, (sp->exit == PASSED) ? "ok" : "ng");
+	else
+	   notej(pp, "transition from %s to %s", olds, news);};
 
     return(new);}
 
@@ -681,11 +682,11 @@ static process *arun(hfspec *sp, char *fnm, void *a, char *fmt, ...)
     sp->config[0] = '\0';
 
     if (fnm != NULL)
-       {sp->log = open_file("w+", fnm);
-	setbuf(sp->log,  NULL);
-	nstrncpy(sp->logn, MAXLINE, fnm, -1);
-        if (sp->log != NULL)
-	   notej(pp, "successfully opened log %s", fnm);
+       {nstrncpy(sp->logn, MAXLINE, fnm, -1);
+        sp->log = open_file("w+", fnm);
+	if (sp->log != NULL)
+	   {setbuf(sp->log,  NULL);
+	    notej(pp, "successfully opened log %s", fnm);}
 	else
 	   notej(pp, "failed to open log %s", fnm);}
     else
@@ -1069,6 +1070,8 @@ static char *pop_tok(char *s, int n, char *delim)
    {int i;
     char *p, *ps;
 
+    p = NULL;
+
     for (i = 0, ps = s; i < n; i++, ps = NULL)
         p = strtok(ps, delim);
 
@@ -1275,7 +1278,8 @@ static int watch_sect(char *plog, FILE *repf, char *sect,
     p = strchr(plog, '.');
     nstrncpy(hst, MAXLINE, p+1, -1);
     p = strchr(hst, '.');
-    *p = '\0';
+    if (p != NULL)
+       *p = '\0';
 
 /* read the phase log file */
     while (TRUE)
@@ -1434,7 +1438,8 @@ static void watch_emit(donetdes *st, char *repfn, char *file,
 
 	fp = fopen(repfn, "r");
 	if (fp == NULL)
-	   return;
+	   {fclose(htmlf);
+	    return;};
 
 	while (TRUE)
 	   {p = fgets(s, MAXLINE, fp);
@@ -1487,14 +1492,15 @@ static int watch(donetdes *st, int c, char **v)
         st->stamp[0] = '\0';
         nstrncpy(lnm, MAXLINE, path_tail(file), -1);
 	files = ls("-t", "%s/*/update", st->logdir);
-        for (i = 0; files[i] != NULL; i++)
-	    {f  = files[i];
-	     rv = run(FALSE, "grep \"Updating\" %s | awk '$2 == \"%s\" && $7 ~ /'%s'/ {print \"yes\"}'",
-		      f, st->system, lnm);
-	     if (strcmp(rv, "yes") == 0)
-	        {nstrncpy(st->stamp, MAXLINE, path_tail(path_head(f)), -1);
-		 break;};};
-	free_strings(files);
+	if (files != NULL)
+	   {for (i = 0; files[i] != NULL; i++)
+	        {f  = files[i];
+		 rv = run(FALSE, "grep \"Updating\" %s | awk '$2 == \"%s\" && $7 ~ /'%s'/ {print \"yes\"}'",
+			  f, st->system, lnm);
+		 if (strcmp(rv, "yes") == 0)
+		    {nstrncpy(st->stamp, MAXLINE, path_tail(path_head(f)), -1);
+		     break;};};
+	    free_strings(files);};
 
 	if (IS_NULL(st->stamp) == TRUE)
 	   {printf("\n");
@@ -1535,11 +1541,12 @@ static int watch(donetdes *st, int c, char **v)
        {for (ok = FALSE; ok == FALSE; )
 	    {if (file_exists(upf) == TRUE)
 	        {files = ls("", "*");
-		 for (i = 0; files[i] != NULL; i++)
-		     {if (strstr(files[i], phase) != NULL)
-		         {ok = TRUE;
-			  break;};};
-		 free_strings(files);};
+		 if (files != NULL)
+		    {for (i = 0; files[i] != NULL; i++)
+		         {if (strstr(files[i], phase) != NULL)
+			     {ok = TRUE;
+			      break;};};
+		     free_strings(files);};};
 	     sleep(2);};
     
 	snprintf(repfn, MAXLINE, "%s.%s", cgetenv(FALSE, "USER"), phase);
@@ -1547,15 +1554,18 @@ static int watch(donetdes *st, int c, char **v)
 
 	watch_header(st, ip, repf, file, tr, shm, ehm, clr);
 
+	nr = 0;
+
 /* get the list of log files for this phase */
 	plog = ls("", "%s.*", phase);
 
 /* process the log files */
-	for (nr = 0, i = 0; plog[i] != NULL; i++)
-	    nr = watch_phase(st, repf, plog[i], nr, phase,
-			     pass, fail, skip, wrk);
+	if (plog != NULL)
+	   {for (i = 0; plog[i] != NULL; i++)
+	        nr = watch_phase(st, repf, plog[i], nr, phase,
+				 pass, fail, skip, wrk);
 
-	free_strings(plog);
+	    free_strings(plog);};
 
 	fclose(repf);
 
@@ -1697,21 +1707,21 @@ static int progress(donetdes *st)
 	     touch("%s.t", base);
 
 	     files = ls("", "%s.*", base);
+	     if (files != NULL)
+	        {for (i = 0; files[i] != NULL; i++)
+		     {f = files[i];
+		      if (strcmp(f+strlen(f)-2, ".t") == 0)
+			 run(FALSE, "rm -f %s", f);
 
-	     for (i = 0; files[i] != NULL; i++)
-	         {f = files[i];
-		  if (strcmp(f+strlen(f)-2, ".t") == 0)
-		     run(FALSE, "rm -f %s", f);
+		      else if (strcmp(f, update) != 0)
+			 {printf("%s\n", st->separator);
+			  printf("%s\n", f);
+			  printf("\n");
+			  s = run(FALSE, "cat %s | awk '($1 != \"DO-NET:\") { print }'",
+				  f);
+			  printf("%s\n", s);};};
 
-		  else if (strcmp(f, update) != 0)
-		     {printf("%s\n", st->separator);
-		      printf("%s\n", f);
-		      printf("\n");
-		      s = run(FALSE, "cat %s | awk '($1 != \"DO-NET:\") { print }'",
-			      f);
-		      printf("%s\n", s);};};
-
-	     free_strings(files);};};
+		 free_strings(files);};};};
 
    return(0);}
 
@@ -1989,7 +1999,9 @@ static hfspec *speclist(char *delim, char *specs)
 	   i++;
 	   if (i >= nx)
 	      {nx += 10;
-	       REMAKE(hs, hfspec, nx);};
+	       REMAKE(hs, hfspec, nx);
+	       if (hs == NULL)
+	          return(NULL);};
 
 	ENDFOR;
 
@@ -2047,9 +2059,10 @@ static void readhost(donetdes *st, int log)
 
     st->varspecs = NULL;
 
-    lssh[0] = '\0';
-    hlst[0] = '\0';
-    nlst[0] = '\0';
+    linst[0] = '\0';
+    lssh[0]  = '\0';
+    hlst[0]  = '\0';
+    nlst[0]  = '\0';
 
 /* read the host file */
     fp = fopen(hf, "r");
@@ -2064,6 +2077,7 @@ static void readhost(donetdes *st, int log)
 	       nstrncpy(linst, MAXLINE, trim(p+12, BOTH, " \t\n"), -1);
 	    else if (strncmp(p, "mailprogram", 11) == 0)
 	       {pt = trim(p+11, BOTH, " \t\n");
+		FREE(st->mailer);
 		st->mailer = STRSAVE(pt);}
 	    else if (strncmp(p, "installtime", 11) == 0)
 	       {tl = atoi(trim(p+11, BOTH, " \t\n"));
@@ -2071,6 +2085,7 @@ static void readhost(donetdes *st, int log)
 	        st->phases[PH_HOSTINSTALL].tlimit = tl;}
 	    else if (strncmp(p, "repository", 10) == 0)
 	       {pt = trim(p+10, BOTH, " \t\n");
+		FREE(st->repo);
 		st->repo = STRSAVE(pt);}
 	    else if (strncmp(p, "timelimit", 9) == 0)
 	       {tl = atoi(trim(p+9, BOTH, " \t\n"));
@@ -2085,11 +2100,13 @@ static void readhost(donetdes *st, int log)
 	       nstrncpy(st->handtout, MAXLINE, trim(p+7, BOTH, " \t\n"), -1);
 	    else if (strncmp(p, "system", 6) == 0)
 	       {pt = trim(p+6, BOTH, " \t\n");
+		FREE(st->system);
 		st->system = STRSAVE(pt);}
 	    else if (strncmp(p, "logdir", 6) == 0)
 	       nstrncpy(st->logdir, MAXLINE, trim(p+6, BOTH, " \t\n"), -1);
 	    else if (strncmp(p, "mail", 4) == 0)
 	       {pt = trim(p+4, BOTH, " \t\n");
+		FREE(st->maillist);
 		st->maillist = STRSAVE(pt);}
 	    else if (strncmp(p, "host", 4) == 0)
 	       push_tok(hlst, MEGA, ' ', p);
@@ -2607,48 +2624,50 @@ static int work(donetdes *st, hfspec *sp, int nsp, int ip, int rpt)
     hfspec *lsp;
     phasedes *ph;
 
-    ti    = start_time();
-    ph    = st->phases + ip;
-    phase = ph->name;
-    nsec  = ph->tlimit;
+    ok = FALSE;
+    if (sp != NULL)
+       {ti    = start_time();
+	ph    = st->phases + ip;
+	phase = ph->name;
+	nsec  = ph->tlimit;
 
-    current_phase = ph;
+	current_phase = ph;
 
 /* setup to run NSP jobs asynchronously */
-    asetup(nsp, 3);
+	asetup(nsp, 3);
 
 /* launch the jobs */
-    for (i = 0, lsp = sp; i < nsp; i++, lsp++)
-        {host = lsp->host;
-	 if (IS_NULL(host) == TRUE)
-	    {printf("\n");
-	     printf("No host for %s (%d/%d) in phase %s - exiting\n",
-		    lsp->rawh, i, nsp, phase);
-	     printf("\n");
-	     exit(9);};
+	for (i = 0, lsp = sp; i < nsp; i++, lsp++)
+	    {host = lsp->host;
+	     if (IS_NULL(host) == TRUE)
+	        {printf("\n");
+		 printf("No host for %s (%d/%d) in phase %s - exiting\n",
+			lsp->rawh, i, nsp, phase);
+		 printf("\n");
+		 exit(9);};
 
-	 get_fields(fields, MAXLINE, lsp);
+	     get_fields(fields, MAXLINE, lsp);
 
-	 snprintf(fnm, MAXLINE, "%s/%s.%s.%d", st->uplog, phase, host, i+1);
+	     snprintf(fnm, MAXLINE, "%s/%s.%s.%d", st->uplog, phase, host, i+1);
 
-	 separatorv(Log);
+	     separatorv(Log);
 
-	 noten(Log, st->verbose, "Dispatching %s on %s", phase, host);
-	 arun(lsp, fnm, lsp,
-	      "%s %s %s -%s %s -time_limit %d -host_vars %s -host_fields %s",
-	      st->ssh, host, st->run, phase, st->cargs, nsec,
-	      st->varspecs, fields);};
+	     noten(Log, st->verbose, "Dispatching %s on %s", phase, host);
+	     arun(lsp, fnm, lsp,
+		  "%s %s %s -%s %s -time_limit %d -host_vars %s -host_fields %s",
+		  st->ssh, host, st->run, phase, st->cargs, nsec,
+		  st->varspecs, fields);};
 
-    separatorv(Log);
+	separatorv(Log);
 
 /* wait for the work to complete */
-    cwait(st, sp, nsp, phase, nsec);
+	cwait(st, sp, nsp, phase, nsec);
 
-    current_phase = NULL;
+	current_phase = NULL;
 
-    ok = make_report(st, sp, nsp, rpt);
+	ok = make_report(st, sp, nsp, rpt);
 
-    stop_time(ph->time, 16, ti);
+	stop_time(ph->time, 16, ti);};
 
     return(ok);}
 
@@ -2663,6 +2682,8 @@ static void setup(donetdes *st, int ip, int urepo)
     char *host;
     hfspec *sp, *lsp;
 
+    ok = TRUE;
+
     sp  = st->nets;
     nsp = st->n_nets;
 
@@ -2675,35 +2696,33 @@ static void setup(donetdes *st, int ip, int urepo)
            {note(Log, TRUE, " repository:");
 	    note(Log, TRUE, "    %s (tag %s)", st->repo, st->tag);};
 
-	note(Log, TRUE, " ");};
-
-    ok = TRUE;
+	note(Log, TRUE, " ");
 
 /* if no repo we better have a distribution file which we need to
  * send to all the net hosts now
  */
-    if (urepo == FALSE)
-       {if (file_exists(st->dist) == TRUE)
-	   {chmod(st->dist, 0770);
-	    getcwd(t, LRG);
-	    noten(Log, st->verbose, "Current directory: %s", t);
+	if (urepo == FALSE)
+	   {if (file_exists(st->dist) == TRUE)
+	       {chmod(st->dist, 0770);
+		getcwd(t, LRG);
+		noten(Log, st->verbose, "Current directory: %s", t);
 
-	    for (i = 0, lsp = sp; i < nsp; i++, lsp++)
-	        {host = lsp->host;
+		for (i = 0, lsp = sp; i < nsp; i++, lsp++)
+		    {host = lsp->host;
 
 /* update sources from a distribution file
  * NOTE: see earlier note about KSH and SCP
  */
-		 if (st->usescp == TRUE)
-		    lrun(Log, QLOG, "scp %s %s:%s",
-			 st->dist, host, path_tail(st->dist));
-		 else
-		    lrun(Log, QLOG, "( (sleep 2 ; cat %s) | ssh %s 'cat >| '%s )",
-			 st->dist, host, path_tail(st->dist));};}
-        else
-	   {noten(Log, st->verbose, "Distribution file %s does not exist",
-		  st->dist);
-	    ok = FALSE;};};
+		     if (st->usescp == TRUE)
+		        lrun(Log, QLOG, "scp %s %s:%s",
+			     st->dist, host, path_tail(st->dist));
+		     else
+		        lrun(Log, QLOG, "( (sleep 2 ; cat %s) | ssh %s 'cat >| '%s )",
+			     st->dist, host, path_tail(st->dist));};}
+	    else
+	       {noten(Log, st->verbose, "Distribution file %s does not exist",
+		      st->dist);
+		ok = FALSE;};};};
 
     if (ok == TRUE)
        ok = work(st, sp, nsp, ip, FALSE);
@@ -3028,6 +3047,7 @@ static void fin_sect(donetdes *st, hfspec *sp, int nsp,
 		      nl++;};};
 
 	     fclose(elog);
+	     fclose(fin);
 	     unlink(file);};};
 
     if ((nl > 0) && (bld == FALSE))
@@ -3311,7 +3331,8 @@ static int process_args(donetdes *st, int c, char **v)
             st->usescp = FALSE;
 
 	 else if (strcmp(v[i], "-dbg") == 0)
-            st->debug = STRSAVE(v[++i]);
+	    {FREE(st->debug);
+	     st->debug = STRSAVE(v[++i]);}
 
 	 else if (strcmp(v[i], "-dt") == 0)
             st->vfyt = atoi(v[++i]);
@@ -3373,6 +3394,7 @@ static int process_args(donetdes *st, int c, char **v)
 		      st->localinstall = TRUE;
 		      break;
 		 case 'o':
+		      FREE(st->hostonly);
 		      st->hostonly = STRSAVE(subst(v[++i], ",", " ", -1));
 		      break;
 		 case 'p':
@@ -3428,6 +3450,23 @@ static int process_args(donetdes *st, int c, char **v)
 	    nstrncpy(st->stamp, MAXLINE, v[i], -1);};
 
     return(l);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* CLEANUP - free up dynamic state */
+
+static void cleanup(donetdes *st)
+   {
+
+    FREE(st->debug);
+    FREE(st->hostonly);
+    FREE(st->repo);
+    FREE(st->maillist);
+    FREE(st->mailer);
+    FREE(st->system);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -3585,6 +3624,8 @@ int main(int c, char **v)
 
     if (Log != NULL)
        fclose(Log);
+
+    cleanup(&state);
 
     return(rv);}
 

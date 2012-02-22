@@ -29,6 +29,11 @@ int main(int c, char **v, char **env)
     double evalt;
     SS_psides *si;
 
+    PD_register_sql();
+    PD_register_hdf5();
+
+    PD_set_fmt_version(3);
+
     si = SX_init(SCODE, VERSION, c, v, env);
 
     SS_init(si, "Aborting with error", SX_end,
@@ -41,10 +46,6 @@ int main(int c, char **v, char **env)
  */
     SC_io_connect(SC_REMOTE);
 
-    PD_register_sql();
-    PD_register_hdf5();
-
-    PD_set_fmt_version(3);
     PD_init_threads(0, NULL);
 
     PG_IO_INTERRUPTS(FALSE);

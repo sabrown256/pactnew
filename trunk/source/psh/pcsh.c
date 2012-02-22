@@ -52,27 +52,27 @@ static int make_shell_script(FILE *fi, char *fname, char *shell, char *pact,
 
 /* initialize the repackaged version */
     fo = fopen(fname, "w");
+    if (fo != NULL)
+       {fprintf(fo, "#!%s %s\n", shell, args);
+	fprintf(fo, "setenv PCSH_TMP_ %s\n", fname);
 
-    fprintf(fo, "#!%s %s\n", shell, args);
-    fprintf(fo, "setenv PCSH_TMP_ %s\n", fname);
+	script_env(fo, pact);
 
-    script_env(fo, pact);
-
-    fprintf(fo, "source %s/include/csh-subroutines\n", pact);
-    fprintf(fo, "HAVE_SUBROUTINES\n");
-    fprintf(fo, "\n");
+	fprintf(fo, "source %s/include/csh-subroutines\n", pact);
+	fprintf(fo, "HAVE_SUBROUTINES\n");
+	fprintf(fo, "\n");
 
 /* add the remainder of the shell script */
-    for (i = 0; fgets(s, MAXLINE, fi) != NULL; i++)
-        fputs(s, fo);
+	for (i = 0; fgets(s, MAXLINE, fi) != NULL; i++)
+	    fputs(s, fo);
 
 /* finish up the file */
-    fclose(fo);
+	fclose(fo);
 
-    run(FALSE, "mv %s %s.tmp ; sed 's/[ \t]*exit(/ quit(/g' %s.tmp | sed 's/[ \t]*exit[ \t]/ quit /g' > %s ; rm %s.tmp",
-	fname, fname, fname, fname, fname);
+	run(FALSE, "mv %s %s.tmp ; sed 's/[ \t]*exit(/ quit(/g' %s.tmp | sed 's/[ \t]*exit[ \t]/ quit /g' > %s ; rm %s.tmp",
+	    fname, fname, fname, fname, fname);
 
-    chmod(fname, S_IRUSR | S_IWUSR | S_IXUSR);
+	chmod(fname, S_IRUSR | S_IWUSR | S_IXUSR);};
 
 /* make the new command line to exec */
     co = 0;
@@ -111,11 +111,12 @@ static int make_c_script(FILE *fi, char *fname, char **v)
     fo = fopen(cname, "w");
 
 /* copy the remainder as the C program */
-    for (i = 0; fgets(s, MAXLINE, fi) != NULL; i++)
-        fputs(s, fo);
+    if (fo != NULL)
+       {for (i = 0; fgets(s, MAXLINE, fi) != NULL; i++)
+	    fputs(s, fo);
 
 /* finish up the file */
-    fclose(fo);
+	fclose(fo);};
 
     execute(TRUE, "cc -g -I%s %s -o %s -lc -lm", incdir, cname, fname);
     unlink(cname);
@@ -145,37 +146,38 @@ static void invoke_script(char **vo, char *shell, char *pact,
     snprintf(fname, MAXLINE, "/tmp/%s.%d",
 	     path_tail(sname), (int) getpid());
 
-/* read the first line of the shell script */
-    fi = fopen(sname, "r");
-    fgets(s, MAXLINE, fi);
-
-    p = strtok(s, " ");
-
-/* look for #!/usr/bin/env as a special case */
-    if (strstr(p, "bin/env") != NULL)
-       {henv = TRUE;
-	ad   = ftell(fi);
-	fgets(s, MAXLINE, fi);
-        if (strncmp(s, "#OPT", 4) == 0)
-	   p = strtok(s + 4, "\n");
-        else
-	   {fseek(fi, ad, SEEK_SET);
-	    p = "";};}
-    else
-       {henv = FALSE;
-	p    = strtok(NULL, "\n");};
-
-    nstrncpy(args, MAXLINE, p, -1);
-
     co = 0;
 
-    p = strstr(args, "-lang");
-    if (p == NULL)
-       co = make_shell_script(fi, fname, shell, pact, args, henv, vo, v, k);
-    else if (strcmp(p+6, "c") == 0)
-       co = make_c_script(fi, fname, v);
+/* read the first line of the shell script */
+    fi = fopen(sname, "r");
+    if (fi != NULL)
+       {fgets(s, MAXLINE, fi);
 
-    fclose(fi);
+	p = strtok(s, " ");
+
+/* look for #!/usr/bin/env as a special case */
+	if ((p != NULL) && (strstr(p, "bin/env") != NULL))
+	   {henv = TRUE;
+	    ad   = ftell(fi);
+	    fgets(s, MAXLINE, fi);
+	    if (strncmp(s, "#OPT", 4) == 0)
+	       p = strtok(s + 4, "\n");
+	    else
+	       {fseek(fi, ad, SEEK_SET);
+		p = "";};}
+	else
+	   {henv = FALSE;
+	    p    = strtok(NULL, "\n");};
+
+	nstrncpy(args, MAXLINE, p, -1);
+
+	p = strstr(args, "-lang");
+	if (p == NULL)
+	   co = make_shell_script(fi, fname, shell, pact, args, henv, vo, v, k);
+	else if (strcmp(p+6, "c") == 0)
+	   co = make_c_script(fi, fname, v);
+
+	fclose(fi);};
 
     vo[co++] = STRSAVE(fname);
 
