@@ -1785,19 +1785,23 @@ static object *_ULI_append(SS_psides *si, object *argl)
     acc = SS_car(si, argl);
     if (!SX_curvep_a(acc))
        SS_error(si, "BAD FIRST CURVE -  _ULI_APPEND", acc);
+
     strcpy(local, "Append");
+
     target = UL_COPY_CURVE(si, acc);
-    acc = UL_COPY_CURVE(si, acc);
-    argl = SS_cdr(si, argl);
+    acc    = UL_COPY_CURVE(si, acc);
+    argl   = SS_cdr(si, argl);
+
+    lbl = NULL;
 
     for ( ; SS_consp(argl); argl = SS_cdr(si, argl))
         {b = SS_car(si, argl);
 
          id = SX_gs.dataset[SX_get_crv_index_i(b)].id;
          if ((id >= 'A') && (id <= 'Z'))
-             {lbl = SC_dsnprintf(FALSE, "%s %c", local, id);}
+            lbl = SC_dsnprintf(FALSE, "%s %c", local, id);
          else
-             {lbl = SC_dsnprintf(FALSE, "%s @%d", local, id);}
+	    lbl = SC_dsnprintf(FALSE, "%s @%d", local, id);
 
          if (SX_curvep_a(b))
             {if (UL_gs.simple_append == TRUE)
