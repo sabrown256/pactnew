@@ -153,7 +153,7 @@ static state
 	FALSE, FALSE, FALSE, };
 
 static void
- parse_line(char *s, char *key, char *oper, char *value);
+ parse_line(char *s, char *key, char *oper, char *value, int nc);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -358,55 +358,55 @@ static int write_class_pco(FILE *out, char *clss, char *ctype,
 	     t  = run(BOTH, "env | egrep '^%s_' | sort", c);
 	     sa = tokenize(t, "\n\r");};
 
-         for (n = 0; sa[n] != NULL; n++);
+	 if (sa != NULL)
+	    {for (n = 0; sa[n] != NULL; n++);
 
-	 if ((global == TRUE) && (n > 0))
-	    fprintf(out, "# Global variables\n");
+	     if ((global == TRUE) && (n > 0))
+	        fprintf(out, "# Global variables\n");
 
-	 vars = MAKE_N(char *, n+1);
-	 vals = MAKE_N(char *, n+1);
-	 if ((vars != NULL) && (vals != NULL))
-	    {nc = 0;
-	     for (i = 0; i < n; i++)
-	         {entry = sa[i];
-		  if (IS_NULL(entry) == TRUE)
-		     continue;
-		  if (global == TRUE)
-		     {var = entry;
-		      val = dbget(NULL, TRUE, var);}
-		  else
-		     {var = entry + strlen(c) + 1;
-		      val = strchr(var, '=');
-		      if (val != NULL)
-			 *val++ = '\0';};
+	     vars = MAKE_N(char *, n+1);
+	     vals = MAKE_N(char *, n+1);
+	     if ((vars != NULL) && (vals != NULL))
+	        {nc = 0;
+		 for (i = 0; i < n; i++)
+		     {entry = sa[i];
+		      if (IS_NULL(entry) == TRUE)
+			 continue;
+		      if (global == TRUE)
+			 {var = entry;
+			  val = dbget(NULL, TRUE, var);}
+		      else
+			 {var = entry + strlen(c) + 1;
+			  val = strchr(var, '=');
+			  if (val != NULL)
+			     *val++ = '\0';};
 
-		  ic = strlen(var);
-		  nc = max(nc, ic);
+		      ic = strlen(var);
+		      nc = max(nc, ic);
 
-		  vars[i] = var;
-		  vals[i] = STRSAVE(val);};
+		      vars[i] = var;
+		      vals[i] = STRSAVE(val);};
 
-	     vars[n] = NULL;
-	     vals[n] = NULL;
+		 vars[n] = NULL;
+		 vals[n] = NULL;
 
-	     if (global == TRUE)
-	        snprintf(fmt, MAXLINE, "%%s%%-%ds = %%s\n", nc);
-	     else
-	        snprintf(fmt, MAXLINE, "%%s   %%-%ds = %%s\n", nc);
+		 if (global == TRUE)
+		    snprintf(fmt, MAXLINE, "%%s%%-%ds = %%s\n", nc);
+		 else
+		    snprintf(fmt, MAXLINE, "%%s   %%-%ds = %%s\n", nc);
 
-	     for (i = 0; i < n; i++)
-	         {if ((vars[i] != NULL) && (vals[i] != NULL))
-		     fprintf(out, fmt, ind, vars[i], vals[i]);};
+		 for (i = 0; i < n; i++)
+		     {if ((vars[i] != NULL) && (vals[i] != NULL))
+			 fprintf(out, fmt, ind, vars[i], vals[i]);};
 
-	     if (global == TRUE)
-	        fprintf(out, "\n");
-	     else
-	        fprintf(out, "}\n\n");
+		 if (global == TRUE)
+		    fprintf(out, "\n");
+		 else
+		    fprintf(out, "}\n\n");};
 
+	     FREE(vars);
 	     free_strings(vals);
-	     FREE(vars);};
-
-	 free_strings(sa);};
+	     free_strings(sa);};};
 
     return(TRUE);}
 
@@ -473,55 +473,55 @@ static int write_class_perl(FILE *out, char *clss, char *ctype,
 	     t  = run(BOTH, "env | egrep '^%s_' | sort", c);
 	     sa = tokenize(t, "\n\r");};
 
-         for (n = 0; sa[n] != NULL; n++);
+	 if (sa != NULL)
+	    {for (n = 0; sa[n] != NULL; n++);
 
-	 if ((global == TRUE) && (n > 0))
-	    fprintf(out, "# Global variables\n");
+	     if ((global == TRUE) && (n > 0))
+	        fprintf(out, "# Global variables\n");
 
-	 vars = MAKE_N(char *, n+1);
-	 vals = MAKE_N(char *, n+1);
-	 if ((vars != NULL) && (vals != NULL))
-	    {nc = 0;
-	     for (i = 0; i < n; i++)
-	         {entry = sa[i];
-		  if (IS_NULL(entry) == TRUE)
-		     continue;
-		  if (global == TRUE)
-		     {var = entry;
-		      val = dbget(NULL, FALSE, var);}
-		  else
-		     {var = entry + strlen(c) + 1;
-		      val = strchr(var, '=');
-		      if (val != NULL)
-			 *val++ = '\0';};
+	     vars = MAKE_N(char *, n+1);
+	     vals = MAKE_N(char *, n+1);
+	     if ((vars != NULL) && (vals != NULL))
+	        {nc = 0;
+		 for (i = 0; i < n; i++)
+		     {entry = sa[i];
+		      if (IS_NULL(entry) == TRUE)
+			 continue;
+		      if (global == TRUE)
+			 {var = entry;
+			  val = dbget(NULL, FALSE, var);}
+		      else
+			 {var = entry + strlen(c) + 1;
+			  val = strchr(var, '=');
+			  if (val != NULL)
+			     *val++ = '\0';};
 
-		  ic = strlen(var);
-		  nc = max(nc, ic);
+		      ic = strlen(var);
+		      nc = max(nc, ic);
 
-		  vars[i] = var;
-		  vals[i] = STRSAVE(val);};
+		      vars[i] = var;
+		      vals[i] = STRSAVE(val);};
 
-	     vars[n] = NULL;
-	     vals[n] = NULL;
+		 vars[n] = NULL;
+		 vals[n] = NULL;
 
-	     if (global == TRUE)
-	        snprintf(fmt, MAXLINE, "%%s%%-%ds => '%%s',\n", nc);
-	     else
-	        snprintf(fmt, MAXLINE, "%%s   %%-%ds => '%%s',\n", nc);
+		 if (global == TRUE)
+		    snprintf(fmt, MAXLINE, "%%s%%-%ds => '%%s',\n", nc);
+		 else
+		    snprintf(fmt, MAXLINE, "%%s   %%-%ds => '%%s',\n", nc);
 
-	     for (i = 0; i < n; i++)
-	         {if ((vars[i] != NULL) && (vals[i] != NULL))
-		     fprintf(out, fmt, ind, vars[i], vals[i]);};
+		 for (i = 0; i < n; i++)
+		     {if ((vars[i] != NULL) && (vals[i] != NULL))
+			 fprintf(out, fmt, ind, vars[i], vals[i]);};
 
-	     if (global == TRUE)
-	        fprintf(out, "\n");
-	     else
-	        fprintf(out, "%s},\n\n", ind);
+		 if (global == TRUE)
+		    fprintf(out, "\n");
+		 else
+		    fprintf(out, "%s},\n\n", ind);};
 
+	     FREE(vars);
 	     free_strings(vals);
-	     FREE(vars);};
-
-	 free_strings(sa);};
+	     free_strings(sa);};};
 
     return(TRUE);}
 
@@ -676,29 +676,32 @@ static void write_envf(int lnotice)
 
     fflush(st.aux.SEF);
     sa = file_text("%s/log/file.se", st.dir.root);
-    for (n = 0; sa[n] != NULL; n++);
+    if (sa != NULL)
+       {for (n = 0; sa[n] != NULL; n++);
 
-    for (i = 0; i < n; i++)
-	{p = sa[i];
+	for (i = 0; i < n; i++)
+	    {p = sa[i];
 
-	 var = strtok(p, " ");
-	 val = strtok(NULL, "\n");
-	 nc  = strlen(var);
-
+	     var = strtok(p, " ");
+	     if (var != NULL)
+	        {nc  = strlen(var);
+		 val = strtok(NULL, "\n");
+		    
 /* handle PATH specially - just gather everything that is not $PATH or ${PATH} */
-	 if (strcmp(var, "PATH") == 0)
-	    push_path(APPEND, epath, val);
+	         if (strcmp(var, "PATH") == 0)
+		    push_path(APPEND, epath, val);
 
 /* weed out duplicates - taking only the last setting */
-	 else
-	    {ok = FALSE;
-	     for (j = i+1; (j < n) && (ok == FALSE); j++)
-	         ok = ((strncmp(var, sa[j], nc) == 0) && (sa[j][nc] == ' '));
+		else
+		   {ok  = FALSE;
+		    for (j = i+1; (j < n) && (ok == FALSE); j++)
+		        ok = ((strncmp(var, sa[j], nc) == 0) &&
+			      (sa[j][nc] == ' '));
 		     
-	     if (ok == FALSE)
-	        env_out(fsh, fcsh, fdk, fmd, var, val);};};
+		    if (ok == FALSE)
+		       env_out(fsh, fcsh, fdk, fmd, var, val);};};};
 
-    free_strings(sa);
+	free_strings(sa);};
 
     note(fcsh, TRUE, "");
     note(fsh, TRUE, "");
@@ -892,119 +895,120 @@ static void read_line(char *s, int nc)
 
 /* PARSE_OPT - work with option specifications */
 
-static void parse_opt(char *s)
+static void parse_opt(char *s, int nc)
    {int i, l, n, ok, mt;
     exoper oper;
     char vr[MAXLINE], op[MAXLINE], vl[MAXLINE];
     char *t, *avl, *arg, *opt, **sa;
 
     sa = tokenize(s, "[;]\n\r");
-    for (n = 0; sa[n] != NULL; n++);
+    if (sa != NULL)
+       {for (n = 0; sa[n] != NULL; n++);
 
-    ok  = FALSE;
-    avl = "off";
-    for (l = 0; (l < n) && (ok == FALSE); l++)
-        {vr[0] = '\0';
+	ok  = FALSE;
+	avl = "off";
+	for (l = 0; (l < n) && (ok == FALSE); l++)
+	    {vr[0] = '\0';
 
-	 t = sa[l];
-	 parse_line(t, vr, op, vl);
+	     t = sa[l];
+	     parse_line(t, vr, op, vl, nc);
 
-	 if (IS_NULL(vr) == TRUE)
-	    continue;
+	     if (IS_NULL(vr) == TRUE)
+	        continue;
 
-	 arg = trim(vl, BOTH, " \t");
+	     arg = trim(vl, BOTH, " \t");
 
-	 if (strcmp(op, "=") == 0)
-	    oper = PEQ;
-	 else if (strcmp(op, "<") == 0)
-	    oper = PLT;
-	 else if (strcmp(op, "<=") == 0)
-	    oper = PLE;
-	 else if (strcmp(op, ">") == 0)
-	    oper = PGT;
-	 else if (strcmp(op, ">=") == 0)
-	    oper = PGE;
-	 else if (strcmp(op, "!=") == 0)
-	    oper = PNE;
-	 else
-	    oper = PNONE;
+	     if (strcmp(op, "=") == 0)
+	        oper = PEQ;
+	     else if (strcmp(op, "<") == 0)
+	        oper = PLT;
+	     else if (strcmp(op, "<=") == 0)
+	        oper = PLE;
+	     else if (strcmp(op, ">") == 0)
+	        oper = PGT;
+	     else if (strcmp(op, ">=") == 0)
+	        oper = PGE;
+	     else if (strcmp(op, "!=") == 0)
+	        oper = PNE;
+	     else
+	        oper = PNONE;
 
 /* parse the _cmd_ key */
-	 if (strcmp(vr, "_cmd_") == 0)
-	    {opt = strchr(arg, '@');
-	     if (opt != NULL)
-	        opt[-1] = '\0';
-	     for (i = 0; i < st.na; i++)
-	         {if (strcmp(st.args[i], arg) == 0)
-		     {if ((opt == NULL) || (strchr(opt, '@') == NULL))
-			 avl = "on";
-		      else
-			 avl = st.args[++i];
-		      break;};};}
+	     if (strcmp(vr, "_cmd_") == 0)
+	        {opt = strchr(arg, '@');
+		 if (opt != NULL)
+		    opt[-1] = '\0';
+		 for (i = 0; i < st.na; i++)
+		     {if (strcmp(st.args[i], arg) == 0)
+			 {if ((opt == NULL) || (strchr(opt, '@') == NULL))
+			     avl = "on";
+			  else
+			     avl = st.args[++i];
+			  break;};};}
 
 /* parse the _env_ key */
-	 else if (strcmp(vr, "_env_") == 0)
-	    avl = dbget(NULL, TRUE, arg);
+	     else if (strcmp(vr, "_env_") == 0)
+	        avl = dbget(NULL, TRUE, arg);
 
 /* select the value */
-	 else
+	     else
 
 /* treat single '*' specially since match will automatically succeed */
-	    {if (strcmp(vr, "*") == 0)
-	        {if (strcmp(avl, "off") != 0)
-		    {strcpy(s, arg);
-		     trim(s, BACK, " *\t\n");
+	       {if (strcmp(vr, "*") == 0)
+		   {if (strcmp(avl, "off") != 0)
+		       {nstrncpy(s, nc, arg, -1);
+			trim(s, BACK, " *\t\n");
 /*
-		     if (LAST_CHAR(s) == '\n')
-		        LAST_CHAR(s) = '\0';
+                        if (LAST_CHAR(s) == '\n')
+		           LAST_CHAR(s) = '\0';
 */
-		     strcat(s, avl);
-		     ok = TRUE;};}
+			nstrcat(s, nc, avl);
+			ok = TRUE;};}
 
-	     else if (strcmp(avl, vr) == 0)
-	        {strcpy(s, arg);
-	         ok = TRUE;}
+	        else if (strcmp(avl, vr) == 0)
+		   {nstrncpy(s, nc, arg, -1);
+		    ok = TRUE;}
 
-	     else
-	        {mt = match(avl, vr);
-		 switch (oper)
-		    {case PEQ :
-		          if (mt == 0)
-			     {strcpy(s, arg);
-			      ok = TRUE;};
-			  break;
-		     case PLT :
-		          if (mt < 0)
-			     {strcpy(s, arg);
-			      ok = TRUE;};
-			  break;
-		     case PLE :
-		          if (mt < 1)
-			     {strcpy(s, arg);
-			      ok = TRUE;};
-			  break;
-		     case PGT :
-		          if (mt > 0)
-			     {strcpy(s, arg);
-			      ok = TRUE;};
-			  break;
-		     case PGE :
-		          if (mt > -1)
-			     {strcpy(s, arg);
-			      ok = TRUE;};
-			  break;
-		     case PNE :
-		          if (mt != 0)
-			     {strcpy(s, arg);
-			      ok = TRUE;};
-			  break;
-		     default :
-			  break;};};};};
+		else
+		   {mt = match(avl, vr);
+		    switch (oper)
+		       {case PEQ :
+		             if (mt == 0)
+			        {strcpy(s, arg);
+				 ok = TRUE;};
+			     break;
+			case PLT :
+			     if (mt < 0)
+			        {strcpy(s, arg);
+				 ok = TRUE;};
+			     break;
+			case PLE :
+			     if (mt < 1)
+			        {strcpy(s, arg);
+				 ok = TRUE;};
+			     break;
+			case PGT :
+			     if (mt > 0)
+			        {strcpy(s, arg);
+				 ok = TRUE;};
+			     break;
+			case PGE :
+			     if (mt > -1)
+			        {strcpy(s, arg);
+				 ok = TRUE;};
+			     break;
+			case PNE :
+			     if (mt != 0)
+			        {strcpy(s, arg);
+				 ok = TRUE;};
+			     break;
+			default :
+			     break;};};};};
 
-    if (ok == FALSE)
-       s[0] = '\0';
+	if (ok == FALSE)
+	   s[0] = '\0';
 
-    free_strings(sa);
+	free_strings(sa);};
 
     return;}
 
@@ -1013,7 +1017,7 @@ static void parse_opt(char *s)
 
 /* PARSE_LINE - parse the next line from the input */
 
-static void parse_line(char *s, char *key, char *oper, char *value)
+static void parse_line(char *s, char *key, char *oper, char *value, int nc)
    {char t[LRG];
     char *p;
 
@@ -1021,23 +1025,23 @@ static void parse_line(char *s, char *key, char *oper, char *value)
 
     p = strtok(t, " \t");
     if (p != NULL)
-       strcpy(key, p);
+       nstrncpy(key, nc, p, -1);
 
     p = strtok(NULL, " \t");
     if (p != NULL)
-       strcpy(oper, p);
+       nstrncpy(oper, nc, p, -1);
     else
        oper[0] = '\0';
 
     p = strtok(NULL, "\n");
     if (p != NULL)
-       {strcpy(value, p);
+       {nstrncpy(value, nc, p, -1);
 	if ((strchr(oper, '=') != NULL) && (p[0] == '['))
 	   {while (strchr(value, ']') == NULL)
 	       {read_line(t, LRG);
-		strcat(value, " ");
-		strcat(value, trim(t, FRONT, " \t"));};
-	    parse_opt(value);};}
+		nstrcat(value, nc, " ");
+		nstrcat(value, nc, trim(t, FRONT, " \t"));};
+	    parse_opt(value, nc);};}
     else
        value[0] = '\0';
 
@@ -1853,7 +1857,7 @@ static void process_use(char *sg, char *oper)
 
 static void read_config(char *cfg, int quiet)
    {int il;
-    char line[LRG], key[MAXLINE], oper[LRG], value[LRG];
+    char line[LRG], key[LRG], oper[LRG], value[LRG];
     char *path;
 
     separator(Log);
@@ -1885,7 +1889,7 @@ static void read_config(char *cfg, int quiet)
 	 else if (strcmp(line, "++end++") == 0)
             break;
 
-	 parse_line(line, key, oper, value);
+	 parse_line(line, key, oper, value, LRG);
 
 /* handle include directives */
 	 if (strcmp(key, "include") == 0)

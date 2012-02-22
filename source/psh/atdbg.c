@@ -98,7 +98,9 @@ static atproc *candidate_proc(atdbgdes *st, char *name)
 
 		 if (i >= n-2)
 		    {n += 10;
-		     REMAKE(al, atproc, n);};};};
+		     REMAKE(al, atproc, n);
+		     if (al == NULL)
+		        return(NULL);};};};
 
 	 al[i].pid     = -1;
 	 al[i].name[0] = '\0';};
@@ -258,40 +260,44 @@ static int rsp_totalview(process *pp, char *t)
     dbgrsp *gr;
     atdbgdes *st;
 
-    gr = (dbgrsp *) pp->a;
-    st = gr->st;
-    pr = gr->prompt;
-    nc = strlen(pr);
+    ok = FALSE;
 
-    if (LAST_CHAR(t) == '\n')
-       LAST_CHAR(t) = '\0';
+    if ((pp != NULL) && (t != NULL))
+       {gr = (dbgrsp *) pp->a;
+	st = gr->st;
+	pr = gr->prompt;
+	nc = strlen(pr);
 
-    if (st->log != NULL)
-       fprintf(st->log, "RCV: %s\n", t);
+	if (LAST_CHAR(t) == '\n')
+	   LAST_CHAR(t) = '\0';
 
-    ok = (strncmp(t, pr, nc) == 0);
+	if (st->log != NULL)
+	   fprintf(st->log, "RCV: %s\n", t);
 
-    if (ok == FALSE)
-       {switch (gr->action)
-	   {case QTHREAD:
-                 if (IS_NULL(t) == FALSE)
-		    nstrncpy(gr->result, MAXLINE, t, -1);
-	         break;
+	ok = (strncmp(t, pr, nc) == 0);
 
-	    case BTRACE:
-		 if (strstr(t, "PC=") != NULL)
-		    {nstrncpy(p, MAXLINE, t, -1);
-		     pa = strstr(p, "PC=");
-		     pb = strchr(p, '[');
-		     memmove(pa, pb, strlen(pb)+1);
-		     s = p;
-		     s = subst(s, "PC=", " ", 1);
-		     s = subst(s, "> ", "  ", 1);
-		     s = subst(s, "#", ":", 1);
-		     cache_rsp(st, s);
-		     if (strstr(s, "SC_retrace_exe") != NULL)
-		        cache_rsp(st, "         -+---------------------------+-");};
-		 break;};};
+	if (ok == FALSE)
+	   {switch (gr->action)
+	       {case QTHREAD:
+		     if (IS_NULL(t) == FALSE)
+		        nstrncpy(gr->result, MAXLINE, t, -1);
+		     break;
+
+		case BTRACE:
+		     if (strstr(t, "PC=") != NULL)
+		        {nstrncpy(p, MAXLINE, t, -1);
+			 pa = strstr(p, "PC=");
+			 pb = strchr(p, '[');
+			 if ((pa != NULL) && (pb != NULL))
+			    memmove(pa, pb, strlen(pb)+1);
+			 s = p;
+			 s = subst(s, "PC=", " ", 1);
+			 s = subst(s, "> ", "  ", 1);
+			 s = subst(s, "#", ":", 1);
+			 cache_rsp(st, s);
+			 if (strstr(s, "SC_retrace_exe") != NULL)
+			    cache_rsp(st, "         -+---------------------------+-");};
+		     break;};};};
 
     return(ok);}
 
@@ -319,35 +325,35 @@ static int use_totalview(atdbgdes *st, atproc *al)
 
 	snprintf(cmd, MAXLINE, "%scli", st->dbg);
 	pp = job_launch(cmd, "a", NULL);
+	if (pp != NULL)
+	   {pp->accept = rsp_totalview;
+	    pp->reject = rsp_error;
+	    pp->a      = &gr;
 
-	pp->accept = rsp_totalview;
-	pp->reject = rsp_error;
-	pp->a      = &gr;
-
-	send_msg(pp, 0, NULL);
+	    send_msg(pp, 0, NULL);
 #if 0
-        gr.prompt = "tvcli> ";
-	send_msg(pp, 0, "dset PROMPT {tvcli> }");
+	    gr.prompt = "tvcli> ";
+	    send_msg(pp, 0, "dset PROMPT {tvcli> }");
 #endif
-	send_msg(pp, 0, "dset LINES_PER_SCREEN 0");
-	send_msg(pp, 0, "dattach -no_attach_parallel %s %d", al->name, al->pid);
-	send_msg(pp, 0, "dhalt");
-/*	send_msg(pp, 0, "dwait"); */
-	send_msg(pp, QTHREAD, "f p1 TV::thread get -all id");
+	    send_msg(pp, 0, "dset LINES_PER_SCREEN 0");
+	    send_msg(pp, 0, "dattach -no_attach_parallel %s %d", al->name, al->pid);
+	    send_msg(pp, 0, "dhalt");
+/*	      send_msg(pp, 0, "dwait"); */
+	    send_msg(pp, QTHREAD, "f p1 TV::thread get -all id");
 
-	FOREACH(thr, gr.result, " \n");
-           snprintf(s, MAXLINE,
-		    "\n   ---------------- Thread %s ----------------\n", thr);
-	   cache_rsp(st, s);
-	   send_msg(pp, BTRACE, "dfocus %s {dwhere -a}", thr);
-        ENDFOR;
+	    FOREACH(thr, gr.result, " \n");
+	       snprintf(s, MAXLINE,
+			"\n   ---------------- Thread %s ----------------\n", thr);
+	       cache_rsp(st, s);
+	       send_msg(pp, BTRACE, "dfocus %s {dwhere -a}", thr);
+	    ENDFOR;
 
-/*	send_msg(pp, 0, "ddetach"); */
+/*           send_msg(pp, 0, "ddetach"); */
 
-	nl = send_msg(pp, 0, "exit -force");
+	    nl = send_msg(pp, 0, "exit -force");
 
-	sig = (nl == -1) ? SIGKILL : -1;
-	job_done(pp, sig);}
+	    sig = (nl == -1) ? SIGKILL : -1;
+	    job_done(pp, sig);};}
 
     else
        run(FALSE, "%s %s -pid %d", st->dbg, al->name, al->pid);
@@ -383,7 +389,7 @@ static int rsp_gdb(process *pp, char *t)
        {switch (gr->action)
 	   {case QTHREAD:
 	         u = strtok(t, " \t\n");
-		 if (*u == '*')
+		 if ((u != NULL) && (*u == '*'))
 		    u = strtok(NULL, " \t\n");
                  push_tok(gr->result, MAXLINE, ' ', u);
 	         break;
@@ -426,32 +432,32 @@ static int use_gdb(atdbgdes *st, char *fname, atproc *al)
 
 	snprintf(cmd, MAXLINE, "%s %s", st->dbg, al->name);
 	pp = job_launch(cmd, "a", NULL);
+	if (pp != NULL)
+	   {pp->accept = rsp_gdb;
+	    pp->reject = rsp_error;
+	    pp->a      = &gr;
 
-	pp->accept = rsp_gdb;
-	pp->reject = rsp_error;
-	pp->a      = &gr;
+	    send_msg(pp, 0, NULL);
+	    send_msg(pp, 0, "set width -1");
+	    send_msg(pp, 0, "set height -1");
+	    send_msg(pp, 0, "set confirm off");
+	    send_msg(pp, 0, "attach %d", al->pid);
+	    send_msg(pp, QTHREAD, "info threads");
 
-	send_msg(pp, 0, NULL);
-	send_msg(pp, 0, "set width -1");
-	send_msg(pp, 0, "set height -1");
-	send_msg(pp, 0, "set confirm off");
-	send_msg(pp, 0, "attach %d", al->pid);
-	send_msg(pp, QTHREAD, "info threads");
+	    FOREACH(thr, gr.result, " \n")
+	       snprintf(s, MAXLINE,
+			"\n   ---------------- Thread %s ----------------\n", thr);
+	       cache_rsp(st, s);
+	       send_msg(pp, 0, "thread %s", thr);
+	       send_msg(pp, BTRACE, "backtrace");
+	    ENDFOR;
 
-	FOREACH(thr, gr.result, " \n")
-           snprintf(s, MAXLINE,
-		    "\n   ---------------- Thread %s ----------------\n", thr);
-	   cache_rsp(st, s);
-           send_msg(pp, 0, "thread %s", thr);
-   	   send_msg(pp, BTRACE, "backtrace");
-        ENDFOR;
+	    send_msg(pp, 0, "detach");
 
-	send_msg(pp, 0, "detach");
+	    nl = send_msg(pp, 0, "quit");
 
-	nl = send_msg(pp, 0, "quit");
-
-	sig = (nl == -1) ? SIGKILL : -1;
-	job_done(pp, sig);}
+	    sig = (nl == -1) ? SIGKILL : -1;
+	    job_done(pp, sig);};}
 
     else
        run(FALSE, "xterm -sb -e %s %s %d", st->dbg, al->name, al->pid);
@@ -472,23 +478,24 @@ static int use_dbx(atdbgdes *st, char *fname, atproc *al)
 
     if (st->mode == TRACE)
        {fp = fopen(fname, "w");
-	fprintf(fp, "attach %d\n", al->pid);
-        fprintf(fp, "where\n");
-        fprintf(fp, "quit\n");
-	fclose(fp);
+	if (fp != NULL)
+	   {fprintf(fp, "attach %d\n", al->pid);
+	    fprintf(fp, "where\n");
+	    fprintf(fp, "quit\n");
+	    fclose(fp);
 
-	FOREACH(t, run(FALSE, "%s %s -c %s", st->dbg, al->name, fname), "\n")
-	   s = t;
-	   s = subst(s, ">", " ", 1);
-	   cache_rsp(st, s);
-	ENDFOR;
+	    FOREACH(t, run(FALSE, "%s %s -c %s", st->dbg, al->name, fname), "\n")
+	       s = t;
+	       s = subst(s, ">", " ", 1);
+	       cache_rsp(st, s);
+	    ENDFOR;
 #if 0
         $dbg $exe -c $Tmp  |&              \
         sed 's/>/ /'      |                \
         awk '$1 ~ /[0-9]+/ { print }';
 #endif
 
-	unlink(fname);}
+	    unlink(fname);};}
 
     else
        run(FALSE, "xterm -sb -e %s %s -pid %d", st->dbg, al->name, al->pid);

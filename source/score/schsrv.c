@@ -492,22 +492,23 @@ int SC_host_server_query(char *out, int nc, char *fmt, ...)
             ptrn = SC_dsnprintf(FALSE, "*%s", t);
 	    strs = SC_hasharr_dump(_SC.hsst, ptrn, NULL, TRUE);
 
-	    out[0] = '\0';
-	    for (i = 0; TRUE; i++)
-	        {t = strs[i];
-		 if (t == NULL)
-		    break;
+	    if (strs != NULL)
+	       {out[0] = '\0';
+		for (i = 0; TRUE; i++)
+		    {t = strs[i];
+		     if (t == NULL)
+		        break;
 
-		 else
-		    {na = strlen(out);
-		     ns = strlen(t);
-		     if (na + ns + 1 < nc)
-		        SC_vstrcat(out, nc, "%s ", t);
 		     else
-		        break;};};
+		        {na = strlen(out);
+			 ns = strlen(t);
+			 if (na + ns + 1 < nc)
+			    SC_vstrcat(out, nc, "%s ", t);
+			 else
+			    break;};};
 
-	    SC_LAST_CHAR(out) = '\0';
-	    CFREE(strs);}
+		SC_LAST_CHAR(out) = '\0';
+		CFREE(strs);};}
 
 	else if (strncmp(s, "-nhosts-", 8) == 0)
 	   {SC_strtok(s, " \n", p);

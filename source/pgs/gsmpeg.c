@@ -17934,10 +17934,14 @@ void SetSearchRange(int pixelsP, int pixelsB)
     if (computeMVHist)
        {int max_search;
 
+#if 0
 	max_search = (searchRangeP > searchRangeB) ? 
 	             ((searchRangeP > searchRangeB) ? searchRangeP : searchRangeB) :
 		     ((searchRangeB > searchRangeB) ? searchRangeB : searchRangeB);
-	
+#else
+	max_search = (searchRangeP > searchRangeB) ? searchRangeP : searchRangeB;
+#endif	
+
 	nl = 2*max_search + 3;
 
 	na = 2*searchRangeP + 3;

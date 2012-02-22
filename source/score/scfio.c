@@ -672,6 +672,8 @@ int SC_file_access(int log)
     char s[MAXLINE], *bf, *t;
     FILE *file[MAX_FILES], *fp;
 
+    SC_MEM_INIT_N(FILE *, file, MAX_FILES);
+
     _SC_debug = log;
 
     if (_SC_debug)

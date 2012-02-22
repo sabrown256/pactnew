@@ -127,14 +127,16 @@ char *srv_load_db(client *cl, char *fname, char *var)
 	   snprintf(t, MAXLINE, "loaded %s", var);}
 
     else
-       {fclose(fp);
-	if (var == NULL)
+       {if (var == NULL)
 	   snprintf(t, MAXLINE, "loaded database from %s",
 		    fname);
 	else
 	   snprintf(t, MAXLINE, "loaded %s from %s",
 		    var, fname);};
 
+    if (fp != NULL)
+       fclose(fp);
+	
     return(t);}
 
 /*--------------------------------------------------------------------------*/
@@ -207,7 +209,8 @@ int proc_connection(client *cl)
 /* save to specified place */
 	else if (strncmp(s, "save ", 5) == 0)
 	   {p = strchr(s+5, ':');
-	    *p++ = '\0';
+	    if (p != NULL)
+	       *p++ = '\0';
 	    key_val(NULL, &var, s+5, " \t\n");
 	    val = srv_save_db(cl, s+5, var);}
 
@@ -218,7 +221,8 @@ int proc_connection(client *cl)
 /* load from specified place */
 	else if (strncmp(s, "load ", 5) == 0)
 	   {p = strchr(s+5, ':');
-	    *p++ = '\0';
+	    if (p != NULL)
+	       *p++ = '\0';
 	    val = srv_load_db(cl, s+5, NULL);}
 
 /* variable conditional init */
@@ -234,7 +238,7 @@ int proc_connection(client *cl)
 	   {key_val(&var, &nvl, s, "? \t\n");
 	    val = get_db(db, var);
 	    st  = (val != cnoval());
-	    if (nvl[0] == '\0')
+	    if (IS_NULL(nvl) == TRUE)
 	       {if (st == TRUE)
 		   val = "defined{TRUE}";
 	        else
@@ -250,7 +254,9 @@ int proc_connection(client *cl)
 	    else
 	       {val = trim(val, BACK, " \t");
 		val = put_db(db, var, val);};
-	    if ((strchr("'\"(", val[0]) == NULL) && 
+
+	    if ((val != NULL) &&
+		(strchr("'\"(", val[0]) == NULL) && 
 		(strpbrk(val, " \t") != NULL))
 	       {snprintf(t, MAXLINE, "\"%s\"", val);
 		val = t;};};

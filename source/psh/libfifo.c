@@ -141,6 +141,9 @@ static int read_fifo(char *root, int ch, char *s, int nc)
        {nb = read(fd, s, nc);
 	close(fd);
 
+/* guarantee NULL termination */
+	s[nc-1] = '\0';
+
 	if (s[nb] != '\0')
 	   s[nb] = '\0';
 
@@ -161,28 +164,29 @@ static int write_fifo(char *root, int ch, char *s, int nc)
    {int fd, nb;
     char *fifo, *flog, *wh;
 
-    if (nc <= 0)
-       nc = strlen(s) + 1;
+    nb = -1;
+    if ((root != NULL) && (s != NULL))
+       {if (nc <= 0)
+	   nc = strlen(s) + 1;
 
-    flog = name_log(root);
-    fifo = name_fifo(root, ch);
-    fd   = open(fifo, O_WRONLY, 0200);
+	flog = name_log(root);
+	fifo = name_fifo(root, ch);
+	fd   = open(fifo, O_WRONLY, 0200);
 
-    wh = WHICH_PROC();
+	wh = WHICH_PROC();
 
-    if (fd < 0)
-       {nb = -1;
-	log_activity(flog, dbg_fifo, wh, "write no db");}
+	if (fd < 0)
+	   log_activity(flog, dbg_fifo, wh, "write no db");
 
-    else
-       {nb = write(fd, s, nc);
-	close(fd);
-
-	if (nb < 0)
-	   log_activity(flog, dbg_fifo, wh, "write |%s| (%s)",
-			s, strerror(errno));
 	else
-	   log_activity(flog, dbg_fifo, wh, "write |%s| (%d)", s, nb);};
+	   {nb = write(fd, s, nc);
+	    close(fd);
+
+	    if (nb < 0)
+	       log_activity(flog, dbg_fifo, wh, "write |%s| (%s)",
+			    s, strerror(errno));
+	    else
+	       log_activity(flog, dbg_fifo, wh, "write |%s| (%d)", s, nb);};};
 
     return(nb);}
 

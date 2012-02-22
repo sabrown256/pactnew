@@ -110,35 +110,36 @@ SC_udl *_SC_parse_udl(char *s)
 /* get rough path */	
 	    path = p;
 
+	    if (path != NULL)
 /* check for address */
-	    p = strchr(path, '@');
-	    if (p != NULL)
-	       {*p++ = '\0';
-		addr = p;}
-	    else
-	       {p = strchr(path, ',');
+	       {p = strchr(path, '@');
 		if (p != NULL)
-		   *p++ = '\0';};
+		   {*p++ = '\0';
+		    addr = p;}
+		else
+		   {p = strchr(path, ',');
+		    if (p != NULL)
+		       *p++ = '\0';};
 
 /* get attributes */
-	    if ((p != NULL) && isalnum((int) (*p)))
-	       {for (attr = p; attr != NULL; attr = strchr(n, ','))
-		    {n = strchr(attr, ',');
-		     if (n != NULL)
-		        *n++ = '\0';
+		if ((p != NULL) && isalnum((int) (*p)))
+		   {for (attr = p; attr != NULL; attr = strchr(n, ','))
+		        {n = strchr(attr, ',');
+			 if (n != NULL)
+			    *n++ = '\0';
 
-		     key = attr;
-		     p   = strchr(attr, '=');
-		     if (p == NULL)
-		        val = NULL;
-		     else
-		        {*p++ = '\0';
-			 val  = CSTRSAVE(p);};
+			 key = attr;
+			 p   = strchr(attr, '=');
+			 if (p == NULL)
+			    val = NULL;
+			 else
+			    {*p++ = '\0';
+			     val  = CSTRSAVE(p);};
 
-		     info = SC_add_alist(info, key, SC_STRING_S, val);
+			 info = SC_add_alist(info, key, SC_STRING_S, val);
 
-		     if (n == NULL)
-		        break;};};
+			 if (n == NULL)
+			    break;};};};
 
 /* resolve path for container and entry */
 	    entry = _SC_udl_container(path, TRUE);

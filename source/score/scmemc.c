@@ -214,6 +214,8 @@ void SC_configure_mm(long mxl, long mxm, long bsz, double r)
        for (n = 1L; _SC_ms.mem_align_size*n <= mxl; n++)
 	   _SC_ms.bins[n-1] = (n << _SC_ms.mem_align_expt);
 
+       n = max(n, 2);
+
 /* fill the exponential region */
        for (--n; n < _SC_ms.n_bins; n++)
 	   {l = (long) (r*((double) _SC_ms.bins[n-1]));

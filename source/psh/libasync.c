@@ -220,6 +220,12 @@ static int _job_release(process *pp)
 	if ((in != out) && (out >= 0))
 	   close(out);
 
+	if (pp->fin != NULL)
+	   fclose(pp->fin);
+
+	if (pp->fout != NULL)
+	   fclose(pp->fout);
+
         pp->in = -1;
         FREE(pp->cmd);
 
@@ -689,66 +695,67 @@ process *job_launch(char *cmd, char *mode, void *a)
     char **al, **argv;
     process *pp, *cp, **pa, **ca;
 
-    argv = tokenize(cmd, " \t");
-
     pp = NULL;
-    pl = _job_make_pipeline(argv);
-    if (pl != NULL)
-       n  = _job_pipeline_length(pl);
-    else
-       n = 0;
 
-    pa = MAKE_N(process *, n);
-    ca = MAKE_N(process *, n);
+    argv = tokenize(cmd, " \t");
+    if (argv != NULL)
+       {pl = _job_make_pipeline(argv);
+	if (pl != NULL)
+	   n  = _job_pipeline_length(pl);
+	else
+	   n = 0;
 
-    if ((pa != NULL) && (ca != NULL))
+	pa = MAKE_N(process *, n);
+	ca = MAKE_N(process *, n);
+
+	if ((pa != NULL) && (ca != NULL))
 
 /* setup each process in the pipeline */
-       {for (i = 0; i < n; i++)
-	    {off = pl[i];
-	     _job_setup_proc(&pa[i], &ca[i]);};
+	   {for (i = 0; i < n; i++)
+	        {off = pl[i];
+		 _job_setup_proc(&pa[i], &ca[i]);};
 
-	_job_reconnect_pipeline(n, pa, ca);
+	    _job_reconnect_pipeline(n, pa, ca);
 
 /* launch each process in the pipeline */
-	for (i = 0; i < n; i++)
-	    {pp = pa[i];
-	     cp = ca[i];
+	    for (i = 0; i < n; i++)
+	        {pp = pa[i];
+		 cp = ca[i];
 
-	     off = pl[i];
-	     al  = argv + off;
+		 off = pl[i];
+		 al  = argv + off;
 
-	     pp->a   = a;
-	     pp->cmd = _job_command_str(al);
-	     strcpy(pp->mode, mode);
+		 pp->a   = a;
+		 pp->cmd = _job_command_str(al);
+		 strcpy(pp->mode, mode);
 
 /* fork the process */
-	     pid    = fork();
-	     pp->id = pid;
-	     cp->id = pid;
+		 pid    = fork();
+		 pp->id = pid;
+		 cp->id = pid;
 
-	     switch (pid)
-	        {case -1 :
-		      _job_error_fork(pp, cp);
-		      pp = NULL;
-		      break;
+		 switch (pid)
+		    {case -1 :
+		          _job_error_fork(pp, cp);
+			  pp = NULL;
+			  break;
 
 /* the child process comes here and if successful will never return */
-		 case 0 :
-		      _job_child_fork(pp, cp, al, mode);
-		      break;
+		     case 0 :
+			  _job_child_fork(pp, cp, al, mode);
+			  break;
 
 /* the parent process comes here */
-		 default :
-		      st = _job_parent_fork(pp, cp, mode);
-		      if (st == FALSE)
-			 _job_free(pp);
-		      break;};};};
+		     default :
+			  st = _job_parent_fork(pp, cp, mode);
+			  if (st == FALSE)
+			     _job_free(pp);
+			  break;};};};
 
-    free_strings(argv);
-    FREE(pl);
-    FREE(pa);
-    FREE(ca);
+	free_strings(argv);
+	FREE(pl);
+	FREE(pa);
+	FREE(ca);};
 
     return(pp);}
 
