@@ -991,19 +991,22 @@ static object *_SSI_time(SS_psides *si)
     time_t syst;
     object *o;
 
+    o = SS_null;
+
     syst = time(NULL);
     loct = SC_localtime(&syst, &safe);
 
 /* make the month right */
-    loct->tm_mon++;
+    if (loct != NULL)
+       {loct->tm_mon++;
 
-    o = SS_make_list(si, SC_INT_I, &loct->tm_year,
-		     SC_INT_I, &loct->tm_mon,
-		     SC_INT_I, &loct->tm_mday,
-		     SC_INT_I, &loct->tm_hour,
-		     SC_INT_I, &loct->tm_min,
-		     SC_INT_I, &loct->tm_sec,
-		     0);
+	o = SS_make_list(si, SC_INT_I, &loct->tm_year,
+			 SC_INT_I, &loct->tm_mon,
+			 SC_INT_I, &loct->tm_mday,
+			 SC_INT_I, &loct->tm_hour,
+			 SC_INT_I, &loct->tm_min,
+			 SC_INT_I, &loct->tm_sec,
+			 0);};
 
     return(o);}
 

@@ -256,26 +256,26 @@ int PC_open_group(char **argv, int *pn)
         args[i + offs] = argv[i];
 
     pp = PC_open(args, NULL, "rb+");
+    if (pp != NULL)
+       {PC_block(pp);
+	PC_gets(s, MAXLINE, pp);
 
-    PC_block(pp);
-    PC_gets(s, MAXLINE, pp);
+	p = SC_strtok(s, ",", t);
+	if (p != NULL)
+	   strcpy(_PC.server, p);
 
-    p = SC_strtok(s, ",", t);
-    if (p != NULL)
-       strcpy(_PC.server, p);
+	_PC.server_port = SC_stoi(SC_strtok(NULL, ",\n", t));
+	_PC.n_nodes  = SC_stoi(SC_strtok(NULL, ",\n", t));
+	_SC_debug   = SC_stoi(SC_strtok(NULL, ",\n", t));
 
-    _PC.server_port = SC_stoi(SC_strtok(NULL, ",\n", t));
-    _PC.n_nodes  = SC_stoi(SC_strtok(NULL, ",\n", t));
-    _SC_debug   = SC_stoi(SC_strtok(NULL, ",\n", t));
+	for (i = 0; i < offs; i++)
+	    CFREE(args[i]);
+	CFREE(args);
 
-    for (i = 0; i < offs; i++)
-        CFREE(args[i]);
-    CFREE(args);
+	if (pn != NULL)
+	   *pn = _PC.n_nodes;
 
-    if (pn != NULL)
-       *pn = _PC.n_nodes;
-
-    _PC.server_link = pp;
+	_PC.server_link = pp;};
 
 #endif
 
@@ -478,9 +478,10 @@ static long _PC_out_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     bf = CMAKE_N(char, nb);
 
 /* convert the data into a message buffer */
-    tf  = PN_open(vif, bf);
-    nis = PN_write(tf, type, ni, vr) ? ni : 0;
-    PN_close(tf);
+    tf = PN_open(vif, bf);
+    if (tf != NULL)
+       {nis = PN_write(tf, type, ni, vr) ? ni : 0;
+	PN_close(tf);};
 
 /* send the message now */
     PC_unblock(pp);
@@ -587,9 +588,10 @@ static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 
 /* convert the message to the requested output data */
     if (block)
-       {tf  = PN_open(vif, bf);
-	nir = PN_read(tf, type, ni, vr);
-	PN_close(tf);
+       {tf = PN_open(vif, bf);
+	if (tf != NULL)
+	   {nir = PN_read(tf, type, ni, vr);
+	    PN_close(tf);};
 
 	CFREE(bf);};
 
@@ -633,8 +635,9 @@ static long _PC_wait_n(PROCESS *pp)
 
 	 if (oper == SC_READ_MSG)
 	    {tf = PN_open(vif, bf);
-	     PN_read(tf, type, ni, vr);
-	     PN_close(tf);};
+	     if (tf != NULL)
+	        {PN_read(tf, type, ni, vr);
+		 PN_close(tf);};};
 
 	 CFREE(type);
 	 CFREE(bf);};

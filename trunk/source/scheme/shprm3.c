@@ -628,6 +628,7 @@ static int _SS_filep(SS_psides *si, object *argl, char *dtype)
     char **list;
     SC_udl *pu;
 
+    ret   = SS_null;
     name  = NULL;
     mode  = NULL;
     type  = dtype;
@@ -658,10 +659,10 @@ static int _SS_filep(SS_psides *si, object *argl, char *dtype)
 
 /* check for containers */
     pu = _SC_parse_udl(name);
+    if (pu != NULL)
+       {ret = (_SC_search_file(list, pu->path, mode, type) != NULL);
 
-    ret = (_SC_search_file(list, pu->path, mode, type) != NULL);
-
-    _SC_rel_udl(pu);
+	_SC_rel_udl(pu);};
 
     CFREE(list);
     CFREE(name);

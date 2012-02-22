@@ -75,18 +75,20 @@ int SS_set_display_flag(int flg)
 void SS_print(SS_psides *si, object *strm, object *obj, char *begin, char *end)
    {FILE *str;
 
+    if (obj != NULL)
+
 /* turn off SIGIO handler */
-    SC_catch_io_interrupts(FALSE);
+       {SC_catch_io_interrupts(FALSE);
 
-    str = SS_OUTSTREAM(strm);
-    PRINT(str, "%s", begin);
+	str = SS_OUTSTREAM(strm);
+	PRINT(str, "%s", begin);
 
-    SS_OBJECT_PRINT(si, obj, strm);
+	SS_OBJECT_PRINT(si, obj, strm);
 
-    PRINT(str, "%s", end);
+	PRINT(str, "%s", end);
 
 /* turn on SIGIO handler */
-    SC_catch_io_interrupts(SC_gs.io_interrupts_on);
+	SC_catch_io_interrupts(SC_gs.io_interrupts_on);};
 
     return;}
 
