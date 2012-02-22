@@ -60,9 +60,13 @@ double **PM_copy_vectors(int nd, int n, double **x)
    {int id;
     double **y;
 
-    y = PM_make_vectors(nd, n);
-    for (id = 0; id < nd; id++)
-        PM_array_copy(y[id], x[id], n);
+    y = NULL;
+
+    if (x != NULL)
+       {y = PM_make_vectors(nd, n);
+	if (y != NULL)
+	   {for (id = 0; id < nd; id++)
+	        PM_array_copy(y[id], x[id], n);};};
 
     return(y);}
 
@@ -78,10 +82,11 @@ void PM_free_vectors(int nd, double **x)
  * the reference counting is on this so setting x[id] == NULL is
  * a bad idea in general
  */
-    for (id = 0; id < nd; id++)
-        _SC_FREE_N(x[id], NULL);
+    if (x != NULL)
+       {for (id = 0; id < nd; id++)
+	    _SC_FREE_N(x[id], NULL);
 
-    CFREE(x);
+	CFREE(x);};
 
     return;}
 
@@ -506,7 +511,7 @@ PM_set *PM_mk_set(char *name, char *type, int cp, long ne,
     set->info           = inf;
     set->next           = next;
 
-    strcpy(bf, type);
+    SC_strncpy(bf, MAXLINE, type, -1);
     strtok(bf, " *");
 
 /* get the byte size of type before it is changes with indirections */

@@ -605,8 +605,11 @@ static void _SX_rl_gimage(SS_psides *si, object *obj)
 object *SX_mk_image(SS_psides *si, PG_image *im)
    {object *op;
 
-    op = SS_mk_object(si, im, G_IMAGE, SELF_EV, im->label,
-		      _SX_wr_gimage, _SX_rl_gimage);
+    op = SS_null;
+
+    if (im != NULL)
+       op = SS_mk_object(si, im, G_IMAGE, SELF_EV, im->label,
+			 _SX_wr_gimage, _SX_rl_gimage);
 
     return(op);}
 
@@ -633,7 +636,8 @@ static object *_SXI_graph_pdbcurve(SS_psides *si, object *argl)
             0);
 
     if ((po == NULL) || (po == SX_gs.gvif))
-       file = SX_gs.vif;
+       {file = SX_gs.vif;
+	po   = SX_gs.gvif;}
     else if (strcmp(po->type, PDBFILE_S) == 0)
        file = FILE_FILE(PDBfile, po);
     else
@@ -766,6 +770,8 @@ static object *_SXI_make_device(SS_psides *si, object *argl)
     out_device *out;
     object *o;
 
+    o = SS_null;
+
     name  = NULL;
     type  = NULL;
     title = NULL;
@@ -791,10 +797,10 @@ static object *_SXI_make_device(SS_psides *si, object *argl)
            SS_error(si, "NO TITLE SPECIFIED - _SXI_MAKE_DEVICE", SS_null);};
  
     dev = PG_make_device(name, type, title);
+    if (dev != NULL)
+       {dev->background_color_white = SX_gs.background_color_white;
 
-    dev->background_color_white = SX_gs.background_color_white;
-
-    o = SX_mk_graphics_device(si, dev);
+	o = SX_mk_graphics_device(si, dev);};
 
     CFREE(name);
     CFREE(type);
