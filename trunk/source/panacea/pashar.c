@@ -95,21 +95,28 @@ void PA_def_var(char *vname, char *vtype, void *viv,
     while (!enough)
        {v = SC_VA_ARG(int);
         switch (v)
-           {case SCOPE      : vattr[0] = SC_VA_ARG(int);
-                              break;
-            case CLASS      : vattr[1] = SC_VA_ARG(int);
-                              break;
-            case PERSIST    : vattr[2] = SC_VA_ARG(int);
-                              break;
-            case CENTER     : vattr[3] = SC_VA_ARG(int);
-                              break;
-            case ALLOCATION : vattr[4] = SC_VA_ARG(int);
-                              break;
-            case ATTRIBUTE  : enough = TRUE;
-                              break;
-            default         : PA_ERR(TRUE,
-                                     "BAD ATTRIBUTE %d - PA_DEF_VAR",
-                                     v);};};
+           {case SCOPE :
+	         vattr[0] = SC_VA_ARG(int);
+		 break;
+            case CLASS :
+	         vattr[1] = SC_VA_ARG(int);
+		 break;
+            case PERSIST :
+	         vattr[2] = SC_VA_ARG(int);
+		 break;
+            case CENTER :
+	         vattr[3] = SC_VA_ARG(int);
+		 break;
+            case ALLOCATION :
+	         vattr[4] = SC_VA_ARG(int);
+		 break;
+            case ATTRIBUTE :
+	         enough = TRUE;
+		 break;
+            default :
+	         PA_ERR(TRUE,
+			"BAD ATTRIBUTE %d - PA_DEF_VAR",
+			v);};};
 
 /* get the dimensions */
     vdims = NULL;
@@ -468,39 +475,40 @@ void *_PA_pdb_read(PDBfile *file, char *name, syment **psp, long *indx)
     syment *ep;
     defstr *dp;
 
+    vr = NULL;
+
     strcpy(memb, name);
     token = SC_strtok(memb, ".([", s);
+    if (token != NULL)
 
 /* look up the variable name and return NULL if it is not there */
-    ep = _PD_effective_ep(file, token, TRUE, NULL);
-    if (ep == NULL)
-       return(NULL);
+       {ep = _PD_effective_ep(file, token, TRUE, NULL);
+	if (ep != NULL)
+	   {vtype = PD_entry_type(ep);
 
-    vtype = PD_entry_type(ep);
+	    if (_PD_indirection(vtype))
+	       dp = PD_inquire_host_type(file, "*");
+	    else
+	       dp = PD_inquire_host_type(file, vtype);
 
-    if (_PD_indirection(vtype))
-       dp = PD_inquire_host_type(file, "*");
-    else
-       dp = PD_inquire_host_type(file, vtype);
+	    PA_ERR((dp == NULL),
+		   "BAD TYPE %s - _PA_PDB_READ", vtype);
 
-    PA_ERR((dp == NULL),
-           "BAD TYPE %s - _PA_PDB_READ", vtype);
+	    vr = _PA_alloc(dp, vtype, ep->number, NULL);
 
-    vr = _PA_alloc(dp, vtype, ep->number, NULL);
+	    if (indx == NULL)
+	       PA_ERR(!PD_read(file, token, vr),
+		      "CAN'T READ %s FROM FILE - _PA_PDB_READ", name);
 
-    if (indx == NULL)
-       PA_ERR(!PD_read(file, token, vr),
-	      "CAN'T READ %s FROM FILE - _PA_PDB_READ", name);
-
-    else
-       PA_ERR(!PD_read_alt(file, token, vr, indx),
-              "CAN'T READ %s FROM FILE - _PA_PDB_READ", name);
+	    else
+	       PA_ERR(!PD_read_alt(file, token, vr, indx),
+		      "CAN'T READ %s FROM FILE - _PA_PDB_READ", name);
 
 /* make a copy of the syment because the file's syment will be GC'd */
-    if (psp != NULL)
-       *psp = ep;
-    else
-       _PD_rl_syment(ep);
+	    if (psp != NULL)
+	       *psp = ep;
+	    else
+	       _PD_rl_syment(ep);};};
 
     return(vr);}
 
@@ -624,121 +632,123 @@ void _PA_wrrstrt(char *rsname, int conv_flag)
 
 /* create the restart dump */
     pdrs = PA_open(rsname, "w", TRUE);
-
-    fp = pdrs->stream;
+    if (pdrs != NULL)
+       {fp = pdrs->stream;
 
 /* save the definition constants */
-    PD_write(pdrs, "n_units", SC_INT_S, &PA_gs.n_units);
-    _PA_wr_pseudo_plot_requests(pdrs);
+	PD_write(pdrs, "n_units", SC_INT_S, &PA_gs.n_units);
+	_PA_wr_pseudo_plot_requests(pdrs);
 
 /* check every element of PA_gs.variable_tab to find the RESTART variables */
-    switch (SETJMP(pa->write_err))
-       {case ABORT :
-	     PRINT(stdout, "\n\n%s \n\n", PD_err);
-	     PA_ERR(!PD_close(pdrs),
-		    "CAN'T CLOSE STATE FILE %s - _PA_WRRSTRT",
-		    rsname);
-	     LONGJMP(SC_gs.cpu, ABORT);
-        case ERR_FREE :
-	     return;
-        default :
-	     break;};
+	switch (SETJMP(pa->write_err))
+	   {case ABORT :
+	         PRINT(stdout, "\n\n%s \n\n", PD_err);
+		 PA_ERR(!PD_close(pdrs),
+			"CAN'T CLOSE STATE FILE %s - _PA_WRRSTRT",
+			rsname);
+		 LONGJMP(SC_gs.cpu, ABORT);
+	    case ERR_FREE :
+		 return;
+	    default :
+	         break;};
 
-    for (i = 0; SC_hasharr_next(PA_gs.variable_tab, &i, NULL, &ty, (void **) &pp); i++)
-        {if (ty[3] == 'p')                   /* skip the packages */
-	    continue;
+	for (i = 0; SC_hasharr_next(PA_gs.variable_tab, &i, NULL, &ty, (void **) &pp); i++)
+	    {if (ty[3] == 'p')                   /* skip the packages */
+	        continue;
 
-	 pname  = PA_VARIABLE_NAME(pp);
-	 pclass = PA_VARIABLE_CLASS(pp);
-	 pdata  = PA_VARIABLE_DATA(pp);
-	 pscope = PA_VARIABLE_SCOPE(pp);
+	     pname  = PA_VARIABLE_NAME(pp);
+	     pclass = PA_VARIABLE_CLASS(pp);
+	     pdata  = PA_VARIABLE_DATA(pp);
+	     pscope = PA_VARIABLE_SCOPE(pp);
 
 /* if conversions are requested check that the conversion factor isn't unity */
-	 COMPUTE_CONVERSION_FACTOR(conv_flag, conv_fac,
-				   PA_VARIABLE_EXT_UNIT(pp),
-				   PA_VARIABLE_INT_UNIT(pp));
-	 if (conv_fac != 1.0)
-	    int_conv_flag = TRUE;
-	 else
-	    int_conv_flag = FALSE;
+	     COMPUTE_CONVERSION_FACTOR(conv_flag, conv_fac,
+				       PA_VARIABLE_EXT_UNIT(pp),
+				       PA_VARIABLE_INT_UNIT(pp));
+	     if (conv_fac != 1.0)
+	        int_conv_flag = TRUE;
+	     else
+	        int_conv_flag = FALSE;
 
-	 if ((pscope == RESTART) || (pscope == DEFN) || (pscope == DMND))
-	    {inti ni;
+	     if ((pscope == RESTART) || (pscope == DEFN) || (pscope == DMND))
+	        {inti ni;
 
-	     ep = PD_copy_syment(PA_VARIABLE_DESC(pp));
+		 ep = PD_copy_syment(PA_VARIABLE_DESC(pp));
+		 PA_ERR((ep == NULL),
+			"COPY FAILED SYMENT - _PA_WRRSTRT");
 
-	     ni = _PD_comp_num(PD_entry_dimensions(ep));
+		 ni = _PD_comp_num(PD_entry_dimensions(ep));
 
-	     PD_entry_set_address(ep, _PD_get_next_address(pdrs, 
-							   PD_entry_type(ep),
-							   ni,
-							   pdata,
-							   FALSE,
-							   TRUE,
-							   FALSE));
+		 PD_entry_set_address(ep, _PD_get_next_address(pdrs, 
+							       PD_entry_type(ep),
+							       ni,
+							       pdata,
+							       FALSE,
+							       TRUE,
+							       FALSE));
 
 /* if a DMND variable has no data PA_CONNECT it */
-	     if ((pscope == DMND) && (pdata == NULL))
-	        PA_CONNECT(pdata, pname, FALSE);
+		 if ((pscope == DMND) && (pdata == NULL))
+		    PA_CONNECT(pdata, pname, FALSE);
 
 /* force consistency in variable size and shape */
-	     psz = _PA_list_to_dims(PA_VARIABLE_DIMS(pp),
-				    PD_entry_dimensions(ep));
-	     PA_VARIABLE_SIZE(pp) = psz;
-	     ep->number           = psz;
+		 psz = _PA_list_to_dims(PA_VARIABLE_DIMS(pp),
+					PD_entry_dimensions(ep));
+		 PA_VARIABLE_SIZE(pp) = psz;
+		 ep->number           = psz;
 
-	     switch (pclass)
-	        {case REQU :
-		      if (pdata == NULL)
-			 {PA_CONNECT(pdata, pname, FALSE);
-			  PA_ERR((pdata == NULL),
-				 "VARIABLE %s IS REQUIRED",
-				 pname);};
+		 switch (pclass)
+		    {case REQU :
+		          if (pdata == NULL)
+			     {PA_CONNECT(pdata, pname, FALSE);
+			      PA_ERR((pdata == NULL),
+				     "VARIABLE %s IS REQUIRED",
+				     pname);};
 
-		 case PSEUDO :
-		 case OPTL   :
-		      if (pdata != NULL)
-			 {_PD_e_install(pdrs, pname, ep, TRUE);
+		     case PSEUDO :
+		     case OPTL   :
+			  if (pdata != NULL)
+			     {_PD_e_install(pdrs, pname, ep, TRUE);
 
 /* convert units before writing if requested */
-			  if (int_conv_flag)
-			     PM_array_scale(pdata, psz,
-					    conv_fac);
+			      if (int_conv_flag)
+				 PM_array_scale(pdata, psz,
+						conv_fac);
 
-			  PA_ERR(!_PD_sys_write(pdrs, pname, pdata,
-						PD_entry_number(ep),
-						PD_entry_type(ep),
-						PD_entry_type(ep)),
-				 "CAN'T WRITE VARIABLE: %s",
-				 pname);
+			      PA_ERR(!_PD_sys_write(pdrs, pname, pdata,
+						    PD_entry_number(ep),
+						    PD_entry_type(ep),
+						    PD_entry_type(ep)),
+				     "CAN'T WRITE VARIABLE: %s",
+				     pname);
 
 /* convert back so that runtime data isn't trashed */
-			  if (int_conv_flag)
-			     PM_array_scale(pdata, psz,
-					    1.0/conv_fac);}
-		      else
-			 _PD_rl_syment_d(ep);
+			      if (int_conv_flag)
+				 PM_array_scale(pdata, psz,
+						1.0/conv_fac);}
+			  else
+			     _PD_rl_syment_d(ep);
 
-		      break;
+			  break;
 
-		 default :
-		      PA_ERR(TRUE,
-			     "ILLEGAL STORAGE CLASS %d - _PA_WRRSTRT",
-			     pclass);};};};
+		     default :
+			  PA_ERR(TRUE,
+				 "ILLEGAL STORAGE CLASS %d - _PA_WRRSTRT",
+				 pclass);};};};
 
 /* give the application a chance to add anything special to the state dump */
-    hook = PA_GET_FUNCTION(PFWriteState, "write-state");
-    if (hook != NULL)
-       (*hook)(pdrs);
+	hook = PA_GET_FUNCTION(PFWriteState, "write-state");
+	if (hook != NULL)
+	   (*hook)(pdrs);
 
-    pdrs->chrtaddr = lio_tell(fp);
-    PA_ERR(pdrs->chrtaddr == -1,
-           "CAN'T FIND ADDRESS FOR RESTART FILE - _PA_WRRSTRT");
+	pdrs->chrtaddr = lio_tell(fp);
+	PA_ERR(pdrs->chrtaddr == -1,
+	       "CAN'T FIND ADDRESS FOR RESTART FILE - _PA_WRRSTRT");
 
 /* close the restart dump and advance the name */
-    PA_ERR(!PD_close(pdrs),
-           "CAN'T PROPERLY CLOSE RSTART FILE - %s\n", rsname);
-    PA_advance_name(rsname);
+	PA_ERR(!PD_close(pdrs),
+	       "CAN'T PROPERLY CLOSE RSTART FILE - %s\n", rsname);
+	PA_advance_name(rsname);};
 
     return;}
 

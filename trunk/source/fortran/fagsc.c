@@ -78,6 +78,8 @@ FIXNUM FF_ID(pgplim, PGPLIM)(FIXNUM *sdid, FIXNUM *sncn, char *name,
     pcons *alst;
     PG_device *dev;
 
+    memset(frm, 0, sizeof(frm));
+
     SC_FORTRAN_STR_C(lname, name, *sncn);
     SC_FORTRAN_STR_C(ltype, type, *snct);
 

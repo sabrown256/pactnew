@@ -651,7 +651,7 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
     ne = pt->n_entries;
     nf = pt->n_fields;
 
-    fc  = PA_gs.vif->chart;
+    fc  = (PA_gs.vif != NULL) ? PA_gs.vif->chart : NULL;
     prv = NULL;
     lst = NULL;
 
@@ -729,7 +729,7 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
          desc  = _PD_mk_descriptor(memb, 0L);
          type  = CSTRSAVE(memb);
          ptype = SC_firsttok(type, " \n");
-         if (SC_hasharr_lookup(fc, ptype) == NULL)
+         if ((ptype != NULL) && (SC_hasharr_lookup(fc, ptype) == NULL))
             PA_ERR(((strcmp(ptype, pt->name) != 0) || !_PD_indirection(memb)),
                    "%s BAD MEMBER TYPE - _PA_RD_DB_TAB", memb);
 

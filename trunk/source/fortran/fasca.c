@@ -499,7 +499,7 @@ FIXNUM FF_ID(scdate, SCDATE)(FIXNUM *sncd, char *date)
 
     nc    = *sncd;
     cdate = SC_date();
-    lc    = strlen(cdate);    
+    lc    = (cdate != NULL) ? strlen(cdate) : 0;
 
     SC_strncpy(date, *sncd, cdate, nc);
     CFREE(cdate);
