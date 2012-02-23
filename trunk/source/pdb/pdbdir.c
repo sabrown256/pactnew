@@ -126,40 +126,42 @@ int PD_ln(PDBfile *file ARG(,,cls), char *oldname, char *newname)
         return(FALSE);};
      
     nname = _PD_var_namef(file, newname, newpath);
-
-    strcpy(oldpath, _PD_fixname(file, oldname));
+    if (nname != NULL)
+       {strcpy(oldpath, _PD_fixname(file, oldname));
 
 /* make sure the directory in newname already exists */
-    strcpy(dirname, nname);
-    s = strrchr(dirname, '/');
-    if ((s != NULL) && (PD_has_directories(file)))
-       {s[1] = '\0';
-        if (PD_inquire_entry(file, dirname, FALSE, NULL) == NULL)
-           {SC_LAST_CHAR(dirname) = '\0';
-            snprintf(pa->err, MAXLINE,
-		     "ERROR: DIRECTORY %s DOES NOT EXIST - PD_LN\n", dirname);
-            return(FALSE);};};
+	strcpy(dirname, nname);
+	s = strrchr(dirname, '/');
+	if ((s != NULL) && (PD_has_directories(file)))
+	   {s[1] = '\0';
+	    if (PD_inquire_entry(file, dirname, FALSE, NULL) == NULL)
+	       {SC_LAST_CHAR(dirname) = '\0';
+		snprintf(pa->err, MAXLINE,
+			 "ERROR: DIRECTORY %s DOES NOT EXIST - PD_LN\n",
+			 dirname);
+		return(FALSE);};};
 
-    oldep = PD_inquire_entry(file, oldpath, TRUE, NULL);
-    if (oldep == NULL)
-       {snprintf(pa->err, MAXLINE,
-		 "ERROR: VARIABLE %s NOT FOUND - PD_LN\n", oldname);
-        return(FALSE);};
+	oldep = PD_inquire_entry(file, oldpath, TRUE, NULL);
+	if (oldep == NULL)
+	   {snprintf(pa->err, MAXLINE,
+		     "ERROR: VARIABLE %s NOT FOUND - PD_LN\n", oldname);
+	    return(FALSE);};
            
-    _PD_e_install(file, nname, oldep, TRUE);
+	_PD_e_install(file, nname, oldep, TRUE);
 
-    if (_PD_link_attribute)
-       {if (!PD_inquire_attribute(file, "LINK", NULL))
-	   if (!PD_def_attribute(file, "LINK", SC_STRING_S))
-	      {PD_error("CANNOT CREATE LINK ATTRIBUTE - PD_LN", PD_GENERIC);
-	       return(FALSE);};
+	if (_PD_link_attribute)
+	   {if (!PD_inquire_attribute(file, "LINK", NULL))
+	       {if (!PD_def_attribute(file, "LINK", SC_STRING_S))
+		   {PD_error("CANNOT CREATE LINK ATTRIBUTE - PD_LN",
+			     PD_GENERIC);
+		    return(FALSE);};};
 
-	avl  = CMAKE(char *);
-	*avl = CSTRSAVE(_PD_fixname(file, oldname));
+	    avl  = CMAKE(char *);
+	    *avl = CSTRSAVE(_PD_fixname(file, oldname));
 
-	if (!PD_set_attribute(file, nname, "LINK", (void *) avl))
-	   {PD_error("CANNOT SET LINK ATTRIBUTE - PD_LN", PD_GENERIC);
-	    return(FALSE);};};
+	    if (!PD_set_attribute(file, nname, "LINK", (void *) avl))
+	       {PD_error("CANNOT SET LINK ATTRIBUTE - PD_LN", PD_GENERIC);
+		 return(FALSE);};};};
 
     return(TRUE);}
 
@@ -362,7 +364,7 @@ char **_PD_ls_extr(PDBfile *file, char *path, char *type, long size,
 /* check to see if type of this variable matches request */
               if ((type != NULL) && (type[0] != '*'))
                  {ep = PD_inquire_entry(file, varlist[i], FALSE, NULL);
-                  if (strcmp(ep->type, type) != 0)
+                  if ((ep == NULL) || (strcmp(ep->type, type) != 0))
 		     continue;};
 
 /* check to see if variable size is less than requested */

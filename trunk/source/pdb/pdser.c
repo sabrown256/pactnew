@@ -587,31 +587,34 @@ int64_t _PD_next_address_pf(PDBfile *file, char *type, long number,
     int64_t addr;
     defstr *dpf;
 
+    addr = -1;
+
     flag = ((file->mpi_mode == TRUE)  ||
             (!file->mpi_file)) ? FALSE : TRUE;
 
     dpf = _PD_type_lookup(file, PD_CHART_FILE, type);
-    ipt = _PD_items_per_tuple(dpf);
+    if (dpf != NULL)
+       {ipt = _PD_items_per_tuple(dpf);
 
-    if (dpf->n_indirects == 0)
-       {bpi = dpf->size;
-	nb  = number*ipt*bpi;
-	sk  = TRUE;}
+	if (dpf->n_indirects == 0)
+	   {bpi = dpf->size;
+	    nb  = number*ipt*bpi;
+	    sk  = TRUE;}
 
-    else if (vr == NULL)
-       {bpi = _PD_lookup_size(type, file->chart);
-	nb  = number*bpi;
-	sk  = TRUE;}
+	else if (vr == NULL)
+	   {bpi = _PD_lookup_size(type, file->chart);
+	    nb  = number*bpi;
+	    sk  = TRUE;}
 
-    else
-       {nb  = PD_sizeof(file, type, number, vr);
-	nb *= ipt;
-	sk  = FALSE;};
+	else
+	   {nb  = PD_sizeof(file, type, number, vr);
+	    nb *= ipt;
+	    sk  = FALSE;};
 
-    addr = _PD_GETSPACE(file, nb, flag, colf);
+	addr = _PD_GETSPACE(file, nb, flag, colf);
 
-    if ((seekf) && (sk == TRUE))
-       _PD_set_current_address(file, addr+nb, SEEK_SET, PD_GENERIC);
+	if ((seekf) && (sk == TRUE))
+	   _PD_set_current_address(file, addr+nb, SEEK_SET, PD_GENERIC);};
 
     return(addr);}
 

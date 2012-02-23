@@ -208,32 +208,33 @@ int _PD_csum_block_read(PDBfile *file, char *name, syment *ep, long n)
 
 	lname = _PD_var_namef(NULL, name, bf);
 	epo   = PD_inquire_entry(file, lname, FALSE, NULL);
-	blo   = epo->blocks;
+	if (epo != NULL)
+	   {blo   = epo->blocks;
 
-	for (i = mn; i < mx; i++)
-	    {_PD_block_get_desc(&addr, &ni, bl, i);
-	     n  = _PD_block_find(file, epo, addr);
-	     vl = _PD_block_get_valid(blo, n);
+	    for (i = mn; i < mx; i++)
+	        {_PD_block_get_desc(&addr, &ni, bl, i);
+		 n  = _PD_block_find(file, epo, addr);
+		 vl = _PD_block_get_valid(blo, n);
         
-	     if ((vl == PD_BLOCK_INVALID) || (vl == PD_BLOCK_UNVERIFIED))
+		 if ((vl == PD_BLOCK_INVALID) || (vl == PD_BLOCK_UNVERIFIED))
 
 /* do checksum of block on disk */
-	        {memset(cdig, 0, PD_CKSUM_LEN);
-		 start = addr;
-		 stop  = start + ni*bpi - 1;
-		 PM_md5_checksum_file(file->stream, start, stop, cdig);
+		    {memset(cdig, 0, PD_CKSUM_LEN);
+		     start = addr;
+		     stop  = start + ni*bpi - 1;
+		     PM_md5_checksum_file(file->stream, start, stop, cdig);
 
-		 st  = _PD_block_get_csum(blo, n, rdig);
-		 st &= _PD_csum_compare(cdig, rdig);
-		 if (st == TRUE)
-		    _PD_block_set_valid(blo, n, PD_BLOCK_VALID);
-		 else
-		    {_PD_block_set_valid(blo, n, PD_BLOCK_CORRUPT);
-		     rv = FALSE;};}
+		     st  = _PD_block_get_csum(blo, n, rdig);
+		     st &= _PD_csum_compare(cdig, rdig);
+		     if (st == TRUE)
+		        _PD_block_set_valid(blo, n, PD_BLOCK_VALID);
+		     else
+		        {_PD_block_set_valid(blo, n, PD_BLOCK_CORRUPT);
+			 rv = FALSE;};}
 
-	     else if (vl == PD_BLOCK_CORRUPT)
-	        {rv = FALSE;
-		 break;};};};
+		 else if (vl == PD_BLOCK_CORRUPT)
+		    {rv = FALSE;
+		     break;};};};};
                     
     return(rv);}
 

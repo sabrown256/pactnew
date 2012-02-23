@@ -44,13 +44,14 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
 	if (tr == NULL)
 	   tr = &_PD_tr;
 
-	fp = (pu != NULL) ? pu->stream : NULL;
+	if (pu != NULL)
+	   {fp = pu->stream;
 
-	if (name == NULL)
-	   name = pu->udl;
+	    if (name == NULL)
+	       name = pu->udl;
 
-	if (md == NULL)
-	   md = pu->mode;
+	    if (md == NULL)
+	       md = pu->mode;};
 
 	file->udl        = pu;
 	file->stream     = fp;
