@@ -551,27 +551,28 @@ static int _PD_parse_symt_iii(PDBfile *file, char *buf, int flag,
 	   break;
 
 	desc = _PD_mk_descriptor(var, file->default_offset);
-
-        name = SC_strtok(desc->name, " \t", s);
-	type = desc->type;
+	if (desc != NULL)
+	   {name = SC_strtok(desc->name, " \t", s);
+	    if (name != NULL)
+	       {type = desc->type;
 
 /* check to see whether or not so skip this entry */
-	ok = _PD_symatch(file, TRUE, name, type, acc, rej);
-	if (ok == TRUE)
-	   {dims = desc->dimensions;
+		ok = _PD_symatch(file, TRUE, name, type, acc, rej);
+		if (ok == TRUE)
+		   {dims = desc->dimensions;
 
-	    addr = SC_stol(SC_strtok(adr, " \t", s));
-	    numb = SC_stol(SC_strtok(NULL, " \t()", s));
+		    addr = SC_stol(SC_strtok(adr, " \t", s));
+		    numb = SC_stol(SC_strtok(NULL, " \t()", s));
 
 /* make and install the entry in the symbol table */
-	    ep = _PD_mk_syment(type, numb, addr, NULL, dims);
-	    _PD_e_install(file, name, ep, flag);
+		    ep = _PD_mk_syment(type, numb, addr, NULL, dims);
+		    _PD_e_install(file, name, ep, flag);
 
 /* if it is a pointer register it in the pointer array */
-	    if (strncmp(name, base, nc) == 0)
-	       _PD_ptr_register_entry(file, name, ep);};
+		    if (strncmp(name, base, nc) == 0)
+		       _PD_ptr_register_entry(file, name, ep);};};
 
-	_PD_rl_descriptor(desc);
+	    _PD_rl_descriptor(desc);};
 
 /* end of expression */
 	_PD_get_token(NULL, local, bsz, '\n');};
@@ -948,7 +949,7 @@ static int64_t _PD_wr_chrt_iii(PDBfile *file, FILE *out, int wc)
 /* the hash array for the structure chart is one element long */
     for (i = 0; SC_hasharr_next(fc, &i, &nm, NULL, (void **) &fdp); i++)
         {hdp = PD_inquire_table_type(hc, nm);
-	 if (fdp->members != NULL)
+	 if ((hdp != NULL) && (fdp->members != NULL))
 
 /* NOTE: use nm instead of fdp->type or PD_typedef's will not work */
 	    {_PD_put_string(n++, "   %s (%ld)", nm, fdp->size);
@@ -983,10 +984,11 @@ static int64_t _PD_wr_chrt_iii(PDBfile *file, FILE *out, int wc)
     bf = pa->tbuffer;
 
 /* write the entire chart to the file now */
-    if (out != fp)
-       lio_write(bf, 1, strlen(bf), out);
-    else
-       lio_write(bf, 1, strlen(bf), fp);
+    if (bf != NULL)
+       {if (out != fp)
+	   lio_write(bf, 1, strlen(bf), out);
+	else
+	   lio_write(bf, 1, strlen(bf), fp);};
 
     _PD_put_string(-1, NULL);
 

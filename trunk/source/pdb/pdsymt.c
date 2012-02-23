@@ -407,13 +407,13 @@ int _PD_pare_symt(PDBfile *file)
 /* shallow remove excluding the syment */
 	    else
 	       {ent = SC_hasharr_dump(file->symtab, s, NULL, FALSE);
+		if (ent != NULL)
+		   {for (i = 0; ent[i] != NULL; i++)
+		        {if (SC_LAST_CHAR(ent[i]) != '/')
+			    {SC_hasharr_remove(file->symtab, ent[i]);
+			     nr++;};};
 
-		for (i = 0; ent[i] != NULL; i++)
-		    {if (SC_LAST_CHAR(ent[i]) != '/')
-		        {SC_hasharr_remove(file->symtab, ent[i]);
-			 nr++;};};
-
-		SC_free_strings(ent);};};};
+		     SC_free_strings(ent);};};};};
 
     return(nr);}
 
