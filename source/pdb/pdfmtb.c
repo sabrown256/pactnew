@@ -181,6 +181,8 @@ static int _PD_rd_fmt_ii(PDBfile *file)
 /* get the byte lengths in */
     std->ptr_bytes = *(p++);
 
+    i = 0;
+
     for (id = SC_SHORT_I; id <= SC_LONG_I; id++)
         {i = SC_TYPE_FIX(id);
 	 std->fx[i].bpi = *(p++);};
@@ -368,34 +370,35 @@ static void _PD_rd_blocks_ii(PDBfile *file)
 	name = SC_strtok(local, "\001\n", s);
 	n    = SC_stoi(SC_strtok(NULL, " \n", s));
 	ep   = PD_inquire_entry(file, name, FALSE, NULL);
-	nt   = 0L;
-	for (j = 0L; j < n; j++)
-	    {addr = SC_stoi(SC_strtok(NULL, " \n", s));
-	     numb = SC_stoi(SC_strtok(NULL, " \n", s));
-	     if ((addr == 0) || (numb == 0L))
-	        {_PD_get_token(NULL, local, bsz, '\n');
-		 addr = SC_stoi(SC_strtok(local, " \n", s));
-		 numb = SC_stoi(SC_strtok(NULL, " \n", s));};
+	if (ep != NULL)
+	   {nt   = 0L;
+	    for (j = 0L; j < n; j++)
+	        {addr = SC_stoi(SC_strtok(NULL, " \n", s));
+		 numb = SC_stoi(SC_strtok(NULL, " \n", s));
+		 if ((addr == 0) || (numb == 0L))
+		    {_PD_get_token(NULL, local, bsz, '\n');
+		     addr = SC_stoi(SC_strtok(local, " \n", s));
+		     numb = SC_stoi(SC_strtok(NULL, " \n", s));};
                          
-	     _PD_entry_set_address(ep, j, addr);
-	     _PD_entry_set_number(ep, j, numb);
+		 _PD_entry_set_address(ep, j, addr);
+		 _PD_entry_set_number(ep, j, numb);
 
-	     nt += numb;};
+		 nt += numb;};
 
 /* adjust the slowest varying dimension to reflect the entire entry */
-	dim = PD_entry_dimensions(ep);
-	if (dim != NULL)
-	   {if (PD_get_major_order(file) == COLUMN_MAJOR_ORDER)
-	       for (; dim->next != NULL; dim = dim->next);
+	    dim = PD_entry_dimensions(ep);
+	    if (dim != NULL)
+	       {if (PD_get_major_order(file) == COLUMN_MAJOR_ORDER)
+		   for (; dim->next != NULL; dim = dim->next);
 
-	    stride = PD_entry_number(ep)/dim->number;
-	    stride = nt/stride;
+		stride = PD_entry_number(ep)/dim->number;
+		stride = nt/stride;
 
-	    dim->number    = stride;
-	    dim->index_max = dim->index_min + stride - 1L;};
+		dim->number    = stride;
+		dim->index_max = dim->index_min + stride - 1L;};
 
 /* adjust the number to reflect the entire entry */
-	ep->number = nt;};
+	    ep->number = nt;};};
 
     return;}
 
@@ -901,10 +904,11 @@ static int64_t _PD_wr_chrt_ii(PDBfile *file, FILE *out, int fh)
     bf = pa->tbuffer;
 
 /* write the entire chart to the file now */
-    if (out != fp)
-       lio_write(bf, 1, strlen(bf), out);
-    else
-       lio_write(bf, 1, strlen(bf), fp);
+    if (bf != NULL)
+       {if (out != fp)
+	   lio_write(bf, 1, strlen(bf), out);
+	else
+	   lio_write(bf, 1, strlen(bf), fp);};
 
     _PD_put_string(-1, NULL);
 
@@ -1259,6 +1263,9 @@ static int _PD_wr_fmt_ii(PDBfile *file)
     char outfor[MAXLINE];
     char *nht, *p;
     data_standard *std;
+
+    fp_bias[0] = 0;
+    fp_bias[1] = 0;
 
     p   = outfor + 1;
     std = file->std;

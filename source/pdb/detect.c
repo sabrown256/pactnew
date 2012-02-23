@@ -16,6 +16,7 @@
 #include "scstd.h"
 #include "scope_typeh.h"
 
+#define DBFSZ                  512
 #define BITS_DEFAULT             8
 
 #define I_BOOL                   0
@@ -320,6 +321,7 @@ int derive_float(int *fb, long *ff)
     fval  = 0.0;
     dfv   = 1.0;
     first = -1;
+    last  = -1;
     for (j = 1; j < szf; j++)
         {bofb.f[0] = fval;
 
@@ -657,7 +659,7 @@ void print_html(FILE *fp)
      char temp[MAXLINE];
 
 /* determine the size of the min and max fields */     
-     snprintf(temp, MAXLINE, "%lld", LLONG_MAX);
+     snprintf(temp, MAXLINE, "%lld", (long long) LLONG_MAX);
      mfields = strlen(temp);
 
      snprintf(temp, MAXLINE, "%3.8g", DBL_MAX);
@@ -725,7 +727,8 @@ void print_html(FILE *fp)
 
 /* long long */
      fprintf(fp, "<TR ALIGN=RIGHT><TD>Long long</TD><TD>%d</TD><TD>%d</TD><TD>%lld</TD><TD>%lld</TD></TR>\n",
-            size[I_LONG_LONG], align[I_LONG_LONG], LLONG_MIN, LLONG_MAX);
+            size[I_LONG_LONG], align[I_LONG_LONG],
+	     (long long) LLONG_MIN, (long long) LLONG_MAX);
 
 /* float */
      fprintf(fp, "<TR ALIGN=RIGHT><TD>Float</TD><TD>%d</TD><TD>%d</TD><TD>%3.8g</TD><TD>%3.8g</TD></TR>\n",
@@ -847,7 +850,7 @@ static void print_flt_type(char *type, int sz, int aln,
 /* PRINT_HUMAN - organize the detect output for human consumption */
 
 void print_human(FILE *fp, int sflag, int *fc, int *dc, int *lc)
-    {char bf[MAXLINE], t[MAXLINE];
+    {char bf[DBFSZ], t[MAXLINE];
      char *tptr, *sptr, *aptr, *mnptr, *mxptr;
 
 /* sizes of the fields in the output table */
@@ -857,7 +860,7 @@ void print_human(FILE *fp, int sflag, int *fc, int *dc, int *lc)
      int afield = 11;
 
 /* determine the size of the min and max fields */     
-     snprintf(t, MAXLINE, "%lld", LLONG_MAX);
+     snprintf(t, MAXLINE, "%lld", (long long) LLONG_MAX);
      mfields = strlen(t);
 
      snprintf(t, MAXLINE, "%3.8g", DBL_MAX);
@@ -1171,47 +1174,49 @@ int main(int c, char **v)
     else
        fo = stdout;
 
+    if (fo != NULL)
+
 /* data type sizes are straightforward */
-    TYPE_SET(I_BOOL,                bool,                 cb);
-    TYPE_SET(I_CHAR,                char,                 cc);
-    TYPE_SET(I_WCHAR,               wchar_t,              cw);
-    TYPE_SET(I_INT8,                int8_t,               ci8);
-    TYPE_SET(I_SHORT,               short,                cs);
-    TYPE_SET(I_INT,                 int,                  ci);
-    TYPE_SET(I_LONG,                long,                 cl);
-    TYPE_SET(I_LONG_LONG,           long long,            cll);
-    TYPE_SET(I_FLOAT,               float,                cf);
-    TYPE_SET(I_DOUBLE,              double,               cd);
-    TYPE_SET(I_LONG_DOUBLE,         long double,          cld);
-    TYPE_SET(I_FLOAT_COMPLEX,       float _Complex,       cfc);
-    TYPE_SET(I_DOUBLE_COMPLEX,      double _Complex,      cdc);
-    TYPE_SET(I_LONG_DOUBLE_COMPLEX, long double _Complex, clc);
+       {TYPE_SET(I_BOOL,                bool,                 cb);
+	TYPE_SET(I_CHAR,                char,                 cc);
+	TYPE_SET(I_WCHAR,               wchar_t,              cw);
+	TYPE_SET(I_INT8,                int8_t,               ci8);
+	TYPE_SET(I_SHORT,               short,                cs);
+	TYPE_SET(I_INT,                 int,                  ci);
+	TYPE_SET(I_LONG,                long,                 cl);
+	TYPE_SET(I_LONG_LONG,           long long,            cll);
+	TYPE_SET(I_FLOAT,               float,                cf);
+	TYPE_SET(I_DOUBLE,              double,               cd);
+	TYPE_SET(I_LONG_DOUBLE,         long double,          cld);
+	TYPE_SET(I_FLOAT_COMPLEX,       float _Complex,       cfc);
+	TYPE_SET(I_DOUBLE_COMPLEX,      double _Complex,      cdc);
+	TYPE_SET(I_LONG_DOUBLE_COMPLEX, long double _Complex, clc);
 
-    TYPE_SET(I_POINTER,             void *,               cp);
-    type_set(I_STRUCT,              2*sizeof(char),       sizeof(ct));
+	TYPE_SET(I_POINTER,             void *,               cp);
+	type_set(I_STRUCT,              2*sizeof(char),       sizeof(ct));
 
-    TYPE_SET(17, int16_t,              ci16);
-    TYPE_SET(18, int32_t,              ci32);
-    TYPE_SET(19, int64_t,              ci64);
+	TYPE_SET(17, int16_t,              ci16);
+	TYPE_SET(18, int32_t,              ci32);
+	TYPE_SET(19, int64_t,              ci64);
 
-    bo.i[0] = 1;
-    if (bo.c[0] == 1)
-       strcpy(int_order, "REVERSE_ORDER");
-    else
-       strcpy(int_order, "NORMAL_ORDER");
+	bo.i[0] = 1;
+	if (bo.c[0] == 1)
+	   strcpy(int_order, "REVERSE_ORDER");
+	else
+	   strcpy(int_order, "NORMAL_ORDER");
 
-    derive_fp_format(fb, db, ldb, ff, df, ldf);
-    derive_complex_format(fc, dc, lc);
+	derive_fp_format(fb, db, ldb, ff, df, ldf);
+	derive_complex_format(fc, dc, lc);
 
-    if (cflag)
-        print_header(fo, fb, db, ldb, ff, df, ldf, fc, dc, lc);
-    else if (wflag)
-        print_html(fo);
-    else
-        print_human(fo, sflag, fc, dc, lc);
+	if (cflag)
+	   print_header(fo, fb, db, ldb, ff, df, ldf, fc, dc, lc);
+	else if (wflag)
+	   print_html(fo);
+	else
+	   print_human(fo, sflag, fc, dc, lc);
 
-    if (outf != NULL)
-       fclose(fo);
+	if (outf != NULL)
+	   fclose(fo);};
 
     return(0);}
 
