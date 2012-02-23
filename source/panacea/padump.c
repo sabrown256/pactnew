@@ -62,6 +62,7 @@ static void _PA_begin_premap(PA_plot_request *pr)
          pp = PA_inquire_variable(t);
          PA_ERR((pp == NULL),
                 "VARIABLE NOT %s NOT IN DATABASE - _PA_BEGIN_PREMAP" ,t);
+
          if (first)
             {centering = PA_VARIABLE_CENTERING(pp);
              first     = FALSE;}
@@ -625,6 +626,8 @@ C_array *PA_get_domain_info(PA_plot_request *pr, char *dname, int nc)
 
 	 pname = pi->var_name;
          pp    = PA_inquire_variable(pname);
+	 PA_ERR((pp == NULL),
+		"NO VARIABLE '%s' IN DATABASE - PA_GET_DOMAIN_INFO", pname);
 
          dmap[i].name = CSTRSAVE(pname);
          if (pi->text != NULL)
@@ -770,6 +773,7 @@ static void _PA_init_pseudo_set(PA_plot_request *pr)
          pp = PA_inquire_variable(t);
          PA_ERR((pp == NULL),
                 "VARIABLE NOT %s NOT IN DATABASE - _PA_INIT_PSEUDO_SET" ,t);
+
          if (nde == 0)
             centering = PA_VARIABLE_CENTERING(pp);
          else
@@ -1361,8 +1365,9 @@ void _PA_init_pp(char *ppname, char *gfname)
 
 	    if (ok)
 	       {PA_gs.pva_file = PA_open(gfname, "w", FALSE);
-		PA_ERR(!PD_def_mapping(PA_gs.pva_file),
-		       "CAN`T DEFINE MAPPINGS - _PA_INIT_PP");
+		PA_ERR((PA_gs.pva_file == NULL) ||
+		       (PD_def_mapping(PA_gs.pva_file) == 0),
+		       "CAN'T DEFINE MAPPINGS - _PA_INIT_PP");
 		PRINT(stdout, "PVA file %s opened\n", gfname);};};};
 
     return;}

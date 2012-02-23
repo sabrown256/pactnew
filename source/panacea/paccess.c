@@ -26,14 +26,16 @@ PA_variable *PA_inquire_variable(char *x)
     PA_package *pck;
     PA_variable *vr;
 
-    if (PA_gs.name_spaces)
-       {pck  = PA_current_package();
-	name = pck->name;
-	snprintf(s, MAXLINE, "%s-%s", name, x);}
-    else
-       strcpy(s, x);
+    vr = NULL;
+    if (x != NULL)
+       {if (PA_gs.name_spaces)
+	   {pck  = PA_current_package();
+	    name = pck->name;
+	    snprintf(s, MAXLINE, "%s-%s", name, x);}
+        else
+	   SC_strncpy(s, MAXLINE, x, -1);
 
-    vr = (PA_variable *) SC_hasharr_def_lookup(PA_gs.variable_tab, s);
+	vr = (PA_variable *) SC_hasharr_def_lookup(PA_gs.variable_tab, s);};
 
     return(vr);}
 
@@ -278,6 +280,7 @@ void *PA_get_access(void **vr, char *s, long offs, long ne, int track)
     pp = PA_inquire_variable(s);
     PA_ERR((pp == NULL),
            "VARIABLE %s NOT IN DATA BASE - PA_GET_ACCESS", s);
+
     pname  = PA_VARIABLE_NAME(pp);
     pclass = PA_VARIABLE_CLASS(pp);
     pscope = PA_VARIABLE_SCOPE(pp);
@@ -591,6 +594,7 @@ void PA_rel_access(void **vp, char *s, long offs, long ne)
     pp = PA_inquire_variable(s);
     PA_ERR((pp == NULL),
            "VARIABLE %s NOT IN DATA BASE - PA_REL_ACCESS", s);
+
     pdata    = PA_VARIABLE_DATA(pp);
     pscope   = PA_VARIABLE_SCOPE(pp);
     ppersist = PA_VARIABLE_PERSISTENCE(pp);
@@ -666,6 +670,7 @@ void PA_init_scalar(char *s)
     pp = PA_inquire_variable(s);
     PA_ERR((pp == NULL),
            "VARIABLE %s NOT IN DATA BASE - PA_INIT_SCALAR", s);
+
     pname  = PA_VARIABLE_NAME(pp);
     pclass = PA_VARIABLE_CLASS(pp);
 

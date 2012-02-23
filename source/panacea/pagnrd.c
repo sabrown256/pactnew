@@ -200,26 +200,28 @@ void PA_defh(void)
     PA_gs.token_delimiters = "\n";
     val = PA_get_field("BODY", "DEFINE", REQU);
 
+    if (val != NULL)
+
 /* strip off leading white space */
-    while (TRUE)
-       {if (strchr(" \t\f\r", *val++) == NULL)
-	   break;};
-    val--;
+       {while (TRUE)
+	   {if (strchr(" \t\f\r", *val++) == NULL)
+	       break;};
+	val--;
 
 /* restore the tokenizing delimiter */
-    PA_gs.token_delimiters = delim;
+	PA_gs.token_delimiters = delim;
 
-    if (SC_fltstrp(val))
-       {dv = SC_stof(val);
-	PA_def_alias(var, SC_DOUBLE_S, &dv);}
+	if (SC_fltstrp(val))
+	   {dv = SC_stof(val);
+	    PA_def_alias(var, SC_DOUBLE_S, &dv);}
 
-    else if (SC_intstrp(val, 10))
-       {lv = SC_stoi(val);
-	PA_def_alias(var, SC_LONG_S, &lv);}
+	else if (SC_intstrp(val, 10))
+	   {lv = SC_stoi(val);
+	    PA_def_alias(var, SC_LONG_S, &lv);}
 
-    else
-       {sv = CSTRSAVE(val);
-	PA_def_alias(var, SC_STRING_S, &sv);};
+	else
+	   {sv = CSTRSAVE(val);
+	    PA_def_alias(var, SC_STRING_S, &sv);};};
 
     return;}
 
@@ -235,6 +237,9 @@ void PA_specifyh(void)
     pcons *first, *prev;
 
     s = PA_get_field("TYPE", "PA_SPECIFY", REQU);
+    PA_ERR((s == NULL),
+	   "BAD TYPE - PA_SPECIFY");
+
     if (strcmp(s, "bc") == 0)
        {ivtype = 'b';
         ivident = PA_get_field("IDENTIFIER", "PA_SPECIFY", REQU);}
@@ -767,7 +772,7 @@ int PA_function_form(char *t, PA_set_spec *spec)
     double vc;
     SC_array *val;
 
-    strcpy(s, t);
+    SC_strncpy(s, MAXLINE, t, -1);
 
     val = CMAKE_ARRAY(double, NULL, 0);
 
@@ -776,12 +781,12 @@ int PA_function_form(char *t, PA_set_spec *spec)
        {if (*s == '(')
            strcpy(fnc, "limit");
 	else
-	   strcpy(fnc, SC_firsttok(s, " \t()"));
+	   SC_strncpy(fnc, MAXLINE, SC_firsttok(s, " \t()"), -1);
 
 /* NOTE: the "(" will come from forms like a=(i;j;k)
  *       and fall under the "limit" operator
  */
-	strcpy(arg, SC_firsttok(s, "()"));
+	SC_strncpy(arg, MAXLINE, SC_firsttok(s, "()"), -1);
 	while (TRUE)
 	   {ps = SC_firsttok(arg, ";");
 	    if (ps != NULL)
@@ -799,7 +804,7 @@ int PA_function_form(char *t, PA_set_spec *spec)
 
 /* if there is no match define this to be the case "var=<string>" */
     else
-       {strcpy(fnc, t);
+       {SC_strncpy(fnc, MAXLINE, t, -1);
 
 	ret = FALSE;};
 

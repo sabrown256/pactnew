@@ -32,8 +32,9 @@ int SC_set_hash_dump(hasharr *ha, int (*fun)(haelem **v, int n))
        {_SC.hash_entries = SC_hasharr_dump(ha, NULL, NULL, FALSE);
         _SC.ne = SC_MEM_GET_N(char *, _SC.hash_entries) - 1;
 
-        for (i = 0; i < _SC.ne; i++)
-            _SC.hash_entries[i] = CSTRSAVE(_SC.hash_entries[i]);}
+	if (_SC.hash_entries != NULL)
+	   {for (i = 0; i < _SC.ne; i++)
+	        _SC.hash_entries[i] = CSTRSAVE(_SC.hash_entries[i]);};}
 
     else
        {entries = CMAKE_N(haelem *, ha->ne);

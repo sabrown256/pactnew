@@ -45,10 +45,10 @@ FIXNUM FF_ID(pmrfft, PMRFFT)(double *aoutyr, double *aoutyi, double *aoutx,
     xmx  = *sxx;
     ordr = *so;
 
-    if (!PM_fft_sc_real_data(&cy, &rx, ainx, ainy, n, xmn, xmx, ordr))
-       rv = FALSE;
+    rv = FALSE;
 
-    else
+    if (PM_fft_sc_real_data(&cy, &rx, ainx, ainy, n, xmn, xmx, ordr) &&
+	(cy != NULL) && (rx != NULL))
        {np = n + 1;
 	for (i = 0; i < np; i++)
 	    {aoutyr[i] = PM_REAL_C(cy[i]);
@@ -184,8 +184,10 @@ FIXNUM FF_ID(pmbset, PMBSET)(FIXNUM *sncn, char *fname,
 	strcpy(bf, type);
 	SC_strtok(bf, " *", s);
 	if (bf != NULL)
-	   {id = SC_type_id(bf, FALSE);
-	    if ((id == SC_BOOL_I) && (SC_is_type_num(id) == TRUE))
+	   {bpi = 0;
+
+	    id = SC_type_id(bf, FALSE);
+	    if ((id == SC_BOOL_I) || (SC_is_type_num(id) == TRUE))
 	       bpi = SC_type_size_a(bf);
 
 	    if (bpi > 0)

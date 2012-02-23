@@ -91,7 +91,9 @@ void _PA_init_sources(double t, double dt)
                      {n_times = SC_stoi(SC_strtok(NULL, "|", s));
                       token   = SC_strtok(NULL, "|", s);
                       times   = CMAKE_N(double, n_times);
-                      PA_ERR(!PD_read(fp, token, times),
+
+                      PA_ERR(((times == NULL) ||
+			      (PD_read(fp, token, times) == 0)),
                              "CAN'T READ %s IN %s - INIT-SOURCES",
                              token, files[j]);
                       PM_array_scale(times, n_times, PA_gs.units[SEC]);
@@ -151,7 +153,7 @@ PA_src_variable *PA_get_source(char *s, int start_flag)
 	 strcpy(bf, svp->name);
 	 pb = SC_firsttok(bf, "()");
 
-         if (strcmp(s, pb) == 0)
+         if ((pb != NULL) && (strcmp(s, pb) == 0))
 	    {rv = svp;
 	     break;};};
 
@@ -243,22 +245,23 @@ void _PA_init_queue(PA_src_variable *svp, double t, double dt)
        {snprintf(title, MAXLINE, "src%d:%d", var_indx, indx);
         pd[0] = pd[1] = pd[2] = (double *) _PA_pdb_read(fp, title, &desc,
                                                         NULL);
-        ssz = desc->number;
-        PM_array_scale(pd[2], ssz, conv);
-        qtimes[0] = -2.0e100;
-        qtimes[1] = -1.0e100;
-        qtimes[2] = times[indx];
-        indx++;
-        if (n_times != 1)
-           {snprintf(title, MAXLINE, "src%d:%d", var_indx, indx);
-            pd[3] = (double *) _PA_pdb_read(fp, title, &desc, NULL);
-            ssz = desc->number;
-            PM_array_scale(pd[3], ssz, conv);
-            qtimes[3] = times[indx];
-            indx++;}
-        else
-           {qtimes[3] = 1.0e100;
-            pd[3] = pd[2];};}
+	if (desc != NULL)
+	   {ssz = desc->number;
+	    PM_array_scale(pd[2], ssz, conv);
+	    qtimes[0] = -2.0e100;
+	    qtimes[1] = -1.0e100;
+	    qtimes[2] = times[indx];
+	    indx++;
+	    if (n_times != 1)
+	       {snprintf(title, MAXLINE, "src%d:%d", var_indx, indx);
+		pd[3] = (double *) _PA_pdb_read(fp, title, &desc, NULL);
+		ssz = desc->number;
+		PM_array_scale(pd[3], ssz, conv);
+		qtimes[3] = times[indx];
+		indx++;}
+	    else
+	       {qtimes[3] = 1.0e100;
+		pd[3] = pd[2];};};}
     else
        {nv = min(4, n_times - indx + 2);
         if (indx > 1)
@@ -291,7 +294,7 @@ void _PA_init_queue(PA_src_variable *svp, double t, double dt)
            {pd[0] = pd[1];
             qtimes[0] = qtimes[1] - 1.0e100;};};
 
-    if (pp != NULL)
+    if ((pp != NULL) && (desc != NULL))
 
 /* replace the variable's syment with the file syment */
        {if (PA_VARIABLE_DESC(pp) != NULL)

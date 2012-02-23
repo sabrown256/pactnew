@@ -181,7 +181,8 @@ void PA_definitions(void)
     if (PA_gs.vif == NULL)
        PA_gs.vif = PA_open("vif", "w+", TRUE);
 
-    PA_def_str(PA_gs.vif);
+    if (PA_gs.vif != NULL)
+       PA_def_str(PA_gs.vif);
 
 /* global problem definition variables */
     PA_inst_var("unit", SC_DOUBLE_S, NULL, NULL,

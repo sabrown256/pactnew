@@ -91,7 +91,7 @@ PDBfile *PA_th_family(PDBfile *file)
 
     nf = PD_family(file, FALSE);
 
-    if (nf != file)
+    if ((nf != NULL) && (nf != file))
        {for (i = 0; TRUE; i++)
             {snprintf(bf, MAXLINE, "th%d", i);
              ep = PD_inquire_entry(file, bf, FALSE, NULL);
@@ -264,46 +264,48 @@ static syment *_PA_truncate_entry(PDBfile *file, char *name, long indx)
        od = odims;
 
     if (od == NULL)
-       return(NULL);
+       ep = NULL;
 
-    if (indx < od->index_min)
-       PD_error("INSTANCE INDEX LESS THAN MINIMUM - _PA_TRUNCATE_ENTRY",
-		PD_WRITE);
+    else
+       {if (indx < od->index_min)
+	   PD_error("INSTANCE INDEX LESS THAN MINIMUM - _PA_TRUNCATE_ENTRY",
+		    PD_WRITE);
 
-    if (indx <= od->index_max)
-       {numb = PD_entry_number(ep);
-        dlen = od->index_max - od->index_min + 1L;
-        pags = numb/dlen;
-        enmb = (indx - od->index_min)*pags;
+	if (indx <= od->index_max)
+	   {numb = PD_entry_number(ep);
+	    dlen = od->index_max - od->index_min + 1L;
+	    pags = numb/dlen;
+	    enmb = (indx - od->index_min)*pags;
 
 /* fix the dimensions (the instance index is 1 based reguardless of the
  * PDB API being used
  */
-        od->index_max = indx - 1;
-        od->number    = od->index_max - od->index_min + 1L;
+	    od->index_max = indx - 1;
+	    od->number    = od->index_max - od->index_min + 1L;
 
 /* if we're going back to the beginning, delete the entry */
-        if (enmb == 0)
-           {char path[MAXLINE];
-	    haelem *hp;
-	    hasharr *symt;
+	    if (enmb == 0)
+	       {char path[MAXLINE];
+		haelem *hp;
+		hasharr *symt;
 
-	    symt = file->symtab;
+		symt = file->symtab;
 
-	    hp = PD_inquire_symbol(file, name, TRUE, path, symt);
-	    _PD_rl_syment(ep);
+		hp = PD_inquire_symbol(file, name, TRUE, path, symt);
+		_PD_rl_syment(ep);
 
 /* purify complains of free memory read
  * if hp->def not nulled before SC_hasharr_remove
  */
-	    hp->def = NULL;
-            SC_hasharr_remove(symt, path);
+		if (hp != NULL)
+		   hp->def = NULL;
+		SC_hasharr_remove(symt, path);
 
-            return(NULL);}
+		ep = NULL;}
 
 /* fix the blocks */
-        else
-	   _PD_block_truncate(ep, enmb);};
+	    else
+	       _PD_block_truncate(ep, enmb);};};
 
     return(ep);}
 
@@ -723,9 +725,11 @@ static int _PA_setup_uf_family(char *name, char **thfiles,
 
               ep = PD_inquire_entry(th, _PA.thd[i].entry_name, FALSE, NULL);
               dp = PD_entry_dimensions(ep);
-
-              _PA.ndpt[i].index_min = min(_PA.ndpt[i].index_min, dp->index_min);
-              _PA.ndpt[i].index_max = max(_PA.ndpt[i].index_max, dp->index_max);
+	      if (dp != NULL)
+		 {_PA.ndpt[i].index_min = min(_PA.ndpt[i].index_min,
+					      dp->index_min);
+		  _PA.ndpt[i].index_max = max(_PA.ndpt[i].index_max,
+					      dp->index_max);};
 
               _PA.ncrv[i] = SC_MEM_GET_N(char *, _PA.thd[i].labels);
 
@@ -833,7 +837,7 @@ static int _PA_transpose_stripe(PDBfile *file, double **crve, char *stripe,
     dp = PD_inquire_type(file, type);
     ns = 0;
 
-    desc = dp->members;
+    desc = (dp != NULL) ? dp->members : NULL;
     if (desc == NULL)
        nv = 1;
     else
@@ -990,9 +994,10 @@ static int _PA_proc_rec(char *name, PDBfile *th, int ncpf, int recn)
             {snprintf(PD_err, MAXLINE, "ERROR: SEEK FAILED - _PA_PROC_REC");
              return(FALSE);};
 
-         _PD_entry_set_address(en, 0, addr);
-         _PD_entry_set_number(en, 0, ni);
-	 en->number = ni;
+	 if (en != NULL)
+	    {_PD_entry_set_address(en, 0, addr);
+	     _PD_entry_set_number(en, 0, ni);
+	     en->number = ni;};
 
          nrd += _PD_sys_read(th, en, rtyp, stripe);
 

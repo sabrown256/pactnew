@@ -326,6 +326,10 @@ PA_variable *_PA_process_def_var(char *vname, va_list *lst)
 		 else
 		    pp = PA_inquire_variable(name);
 
+		 PA_ERR((pp == NULL),
+			"VARIABLE %s NOT IN DATA BASE - _PA_PROCESS_DEF_VAR",
+			name);
+
 /* override defaults */
 		 vattr[0]  = PA_VARIABLE_SCOPE(pp);
 		 vattr[1]  = PA_VARIABLE_CLASS(pp);

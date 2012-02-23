@@ -628,7 +628,7 @@ static int _SS_filep(SS_psides *si, object *argl, char *dtype)
     char **list;
     SC_udl *pu;
 
-    ret   = SS_null;
+    ret   = FALSE;
     name  = NULL;
     mode  = NULL;
     type  = dtype;

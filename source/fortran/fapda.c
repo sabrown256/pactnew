@@ -1351,7 +1351,7 @@ FIXNUM FF_ID(pfdefs, PFDEFS)(FIXNUM *sfid,
          desc  = _PD_mk_descriptor(s, file->default_offset);
          type  = CSTRSAVE(s);
          ptype = SC_firsttok(type, " \n");
-         if (SC_hasharr_lookup(fchrt, ptype) == NULL)
+         if ((ptype != NULL) && (SC_hasharr_lookup(fchrt, ptype) == NULL))
             if ((strcmp(ptype, lname) != 0) || !_PD_indirection(s))
                {snprintf(pa->err, MAXLINE,
 			 "ERROR: %s BAD MEMBER TYPE - PFDEFS\n",
@@ -1871,7 +1871,7 @@ FIXNUM FF_ID(pfsvat, PFSVAT)(FIXNUM *sfid, FIXNUM *sncv, char *fvar,
 
     attr = PD_inquire_attribute(file, lattr, NULL);
     lvl  = CMAKE(char *);
-    if (strcmp(attr->type, "char ***") == 0)
+    if ((attr != NULL) && (strcmp(attr->type, "char ***") == 0))
        *lvl = CSTRSAVE(vl);
     else
        *lvl = vl;

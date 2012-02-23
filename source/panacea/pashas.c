@@ -194,8 +194,11 @@ void PA_file_mon(char *edname, char *ppname, char *gfname)
         if (curpos+_PA.ppstr >= MAXSIZE)
            {PD_close(PA_gs.pva_file);
             PA_advance_name(gfname);
+
             PA_gs.pva_file = PA_open(gfname, "w", FALSE);
-            PA_ERR(!PD_def_mapping(PA_gs.pva_file),
+            PA_ERR(((PA_gs.pva_file == NULL) ||
+		    (PD_def_mapping(PA_gs.pva_file) == 0)),
+
                    "CAN`T DEFINE MAPPINGS - PA_FILE_MON");
             PRINT(stdout, "PVA file %s opened\n", gfname);
             _PA.ppstr = 0L;};};
@@ -505,7 +508,7 @@ static void *_PA_realloc(PA_variable *pp, dimdes *olddm, int flag)
 
 /* make arrays of values */
             for (i = 0, pnd = newdm, pod = olddm;
-		 i < nd;
+		 (i < nd) && (pnd != NULL) && (pod != NULL);
 		 i++, pnd = pnd->next, pod = pod->next)
                 {ndm[i] = pnd->number;
                  odm[i] = pod->number;};

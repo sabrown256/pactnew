@@ -1644,8 +1644,8 @@ FIXNUM FF_ID(pgrvpa, PGRVPA)(FIXNUM *sdid, FIXNUM *svwatid)
     dev = SC_GET_POINTER(PG_device, *sdid);
     if (dev != NULL)
        {d = PG_view_attributes_pointer((int) *svwatid);
-
-	PG_restore_view_attributes(dev, d);
+	if (d != NULL)
+	   PG_restore_view_attributes(dev, d);
 
 	rv = TRUE;};
 
