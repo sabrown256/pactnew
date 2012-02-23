@@ -136,7 +136,7 @@ memdes *_SQL_mk_descriptor(PDBfile *file, char *member, int defoff)
 /* get size for character types */
     dp = PD_inquire_type(file, bs);
     nb = SC_stoi(p);
-    if (strcmp(dp->type, SC_CHAR_S) != 0)
+    if ((dp != NULL) && (strcmp(dp->type, SC_CHAR_S) != 0))
        nb = 1;
 
     nd = _PD_mk_dimensions(defoff, nb);
@@ -194,57 +194,58 @@ static int _SQL_wr_defstr(PDBfile *file, char *type)
     members = cl->describe(fp, type);
     if ((members == NULL) || (members->nr == 0))
        {dp = PD_inquire_type(file, type);
+	if (dp != NULL)
+	   {snprintf(qu, MAX_BFSZ, "create table %s\n(", type);
 
-	snprintf(qu, MAX_BFSZ, "create table %s\n(", type);
+	    for (desc = dp->members; desc != NULL; desc = desc->next)
+	        {id = SC_type_id(desc->type, FALSE);
+		 if (id == SC_INT_I)
+		    snprintf(mbr, MAXLINE, "%s integer,\n", desc->name);
 
-	for (desc = dp->members; desc != NULL; desc = desc->next)
-            {id = SC_type_id(desc->type, FALSE);
-	     if (id == SC_INT_I)
-		snprintf(mbr, MAXLINE, "%s integer,\n", desc->name);
+		 else if (id == SC_SHORT_I)
+		    snprintf(mbr, MAXLINE, "%s smallint,\n", desc->name);
 
-	      else if (id == SC_SHORT_I)
-		snprintf(mbr, MAXLINE, "%s smallint,\n", desc->name);
+		 else if (id == SC_LONG_LONG_I)
+		    snprintf(mbr, MAXLINE, "%s bigint,\n", desc->name);
 
-	      else if (id == SC_LONG_LONG_I)
-		snprintf(mbr, MAXLINE, "%s bigint,\n", desc->name);
+		 else if (id == SC_FLOAT_I)
+		    snprintf(mbr, MAXLINE, "%s real,\n", desc->name);
 
-	      else if (id == SC_FLOAT_I)
-		snprintf(mbr, MAXLINE, "%s real,\n", desc->name);
+		 else if (id == SC_DOUBLE_I)
+		    snprintf(mbr, MAXLINE, "%s double precision,\n",
+			     desc->name);
 
-	      else if (id == SC_DOUBLE_I)
-		snprintf(mbr, MAXLINE, "%s double precision,\n", desc->name);
+		 else if (id == SC_CHAR_I)
+		    snprintf(mbr, MAXLINE, "%s varchar(%ld),\n",
+			     desc->name, desc->number);
 
-	      else if (id == SC_CHAR_I)
-		snprintf(mbr, MAXLINE, "%s varchar(%ld),\n",
-			 desc->name, desc->number);
+		 else if (strcmp(desc->type, "date") == 0)
+		    snprintf(mbr, MAXLINE, "%s date,\n", desc->name);
 
-	      else if (strcmp(desc->type, "date") == 0)
-		snprintf(mbr, MAXLINE, "%s date,\n", desc->name);
+		 else if (strcmp(desc->type, "time") == 0)
+		    snprintf(mbr, MAXLINE, "%s time,\n", desc->name);
 
-	      else if (strcmp(desc->type, "time") == 0)
-		snprintf(mbr, MAXLINE, "%s time,\n", desc->name);
+		 else if (strcmp(desc->type, "datetime") == 0)
+		    snprintf(mbr, MAXLINE, "%s datetime,\n", desc->name);
 
-	      else if (strcmp(desc->type, "datetime") == 0)
-		snprintf(mbr, MAXLINE, "%s datetime,\n", desc->name);
+		 else if (strcmp(desc->type, "timestamp") == 0)
+		    snprintf(mbr, MAXLINE, "%s timestamp,\n", desc->name);
 
-	      else if (strcmp(desc->type, "timestamp") == 0)
-		snprintf(mbr, MAXLINE, "%s timestamp,\n", desc->name);
+		 else if (strcmp(desc->type, "interval") == 0)
+		    snprintf(mbr, MAXLINE, "%s interval,\n", desc->name);
 
-	      else if (strcmp(desc->type, "interval") == 0)
-		snprintf(mbr, MAXLINE, "%s interval,\n", desc->name);
+		 else
+		    PD_error("UNKNOWN TYPE - _SQL_WR_DEFSTR", PD_GENERIC);
 
-              else
-		 PD_error("UNKNOWN TYPE - _SQL_WR_DEFSTR", PD_GENERIC);
+		 SC_strcat(qu, MAX_BFSZ, mbr);};
 
-	      SC_strcat(qu, MAX_BFSZ, mbr);};
+	    SC_LAST_CHAR(qu) = '\0';
+	    SC_LAST_CHAR(qu) = '\0';
+	    SC_strcat(qu, MAX_BFSZ, ");\n");
 
-        SC_LAST_CHAR(qu) = '\0';
-        SC_LAST_CHAR(qu) = '\0';
-        SC_strcat(qu, MAX_BFSZ, ");\n");
-
-	ok = cl->oper(fp, qu);
-        if (ok == FALSE)
-	   rv = FALSE;};
+	    ok = cl->oper(fp, qu);
+	    if (ok == FALSE)
+	       rv = FALSE;};};
 
     _SQL_rl_table(members);
 
@@ -421,17 +422,17 @@ int _SQL_read(PDBfile *file, char *name, long ni, dimind *dim, void *vr)
     chi = file->chart;
     cho = file->host_chart;
     dpo = PD_inquire_table_type(cho, name);
+    if (dpo != NULL)
+       {in = (char *) vr;
 
-    in = (char *) vr;
+	for (i = 0; i < ne; i += step)
+	    {s = sa[i];
 
-    for (i = 0; i < ne; i += step)
-        {s = sa[i];
+	     out = in + i*dpo->size;
 
-	 out = in + i*dpo->size;
-
-         PD_convert(&out, &s, name, name, 1,
-		    file->std, file->host_std, file->host_std,
-		    chi, cho, 0, PD_READ);};
+	     PD_convert(&out, &s, name, name, 1,
+			file->std, file->host_std, file->host_std,
+			chi, cho, 0, PD_READ);};};
 
     _SQL_rl_table(entry);
 

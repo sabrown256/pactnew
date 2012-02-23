@@ -498,8 +498,9 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
     PDBfile *file;
     FILE *fp;
 
-    fp   = pu->stream;
-    file = NULL;
+    fp     = pu->stream;
+    file   = NULL;
+    numdim = 0;
 
     _PD_set_io_buffer(pu);
 
@@ -621,26 +622,28 @@ static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 	    ofm = _NAC_unpack_table(file, idmf, ifdm, dmftlen, dmlen, &numdim);};
 
 /* get the name table */
-	ntaddr = tp[13]*CRAY_BYTES_WORD;
-	ntlen  = tp[14];
-	names  = CMAKE_N(char, ntlen);
+	if (ofm != NULL)
+	   {ntaddr = tp[13]*CRAY_BYTES_WORD;
+	    ntlen  = tp[14];
+	    names  = CMAKE_N(char, ntlen);
 
-	if (lio_seek(fp, ntaddr, SEEK_SET))
-	   PD_error("FAILED TO FIND NAME TABLE - _NAC_OPEN", PD_OPEN);
+	    if (lio_seek(fp, ntaddr, SEEK_SET))
+	       PD_error("FAILED TO FIND NAME TABLE - _NAC_OPEN", PD_OPEN);
 
-	if (lio_read(names, 1, ntlen, fp) != ntlen)
-	   PD_error("FAILED TO READ NAME TABLE - _NAC_OPEN", PD_OPEN);
+	    if (lio_read(names, 1, ntlen, fp) != ntlen)
+	       PD_error("FAILED TO READ NAME TABLE - _NAC_OPEN", PD_OPEN);
 
-	_NAC_build_name_table(file, names, ofd, ofa, ofm, tp[6],
-			      numdir, numatt, numdim);
+	    _NAC_build_name_table(file, names, ofd, ofa, ofm, tp[6],
+				  numdir, numatt, numdim);
+
+	    CFREE(names);};
 
 	CFREE(idf);
 	CFREE(ifd);
 	CFREE(iaf);
 	CFREE(ifa);
 	CFREE(ofd);
-	CFREE(ofa);
-	CFREE(names);};
+	CFREE(ofa);};
 
     return(file);}
 

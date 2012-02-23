@@ -200,36 +200,38 @@ int _SQL_read_entry(PDBfile *fp, char *path, char *ty, syment *ep, void *vr)
     char *name, *tok, *p;
     dimind dim;
 
+    rv = 0;
+
     doff = PD_get_offset(fp);
 
     SC_strncpy(s, MAXLINE, path, -1);
     name = SC_strtok(s, "()[]", p);
-    
-    bs = 1L - doff;
-    be = PD_entry_number(ep) - doff;
-    bd = 1L;
+    if (name != NULL)
+       {bs = 1L - doff;
+	be = PD_entry_number(ep) - doff;
+	bd = 1L;
 
-    tok = SC_strtok(NULL, ":]", p);
-    if (tok != NULL)
-       {bs  = SC_stoi(tok) - doff;
 	tok = SC_strtok(NULL, ":]", p);
-	if (tok == NULL)
-	   be = bs;
-	else
-	   be = SC_stoi(tok) - doff;
+	if (tok != NULL)
+	   {bs  = SC_stoi(tok) - doff;
+	    tok = SC_strtok(NULL, ":]", p);
+	    if (tok == NULL)
+	       be = bs;
+	    else
+	       be = SC_stoi(tok) - doff;
 
-	bd = SC_stoi(SC_strtok(NULL, ":]", p));
-	if (bd == 0L)
-	   bd = 1L;};
+	    bd = SC_stoi(SC_strtok(NULL, ":]", p));
+	    if (bd == 0L)
+	       bd = 1L;};
 
-    dim.stride = 0;
-    dim.start  = bs;
-    dim.stop   = be;
-    dim.step   = bd;
+	dim.stride = 0;
+	dim.start  = bs;
+	dim.stop   = be;
+	dim.step   = bd;
 
-    ni = (dim.stop - dim.start)/dim.step + 1;
+	ni = (dim.stop - dim.start)/dim.step + 1;
 
-    rv = _SQL_read(fp, name, ni, &dim, vr);
+	rv = _SQL_read(fp, name, ni, &dim, vr);};
 
     return(rv);}
 

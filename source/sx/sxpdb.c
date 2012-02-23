@@ -2552,7 +2552,8 @@ static object *_SX_write_filedata(SS_psides *si, object *argl)
 
 	if ((fp != NULL) && (wrfl == TRUE))
            {if (fp->mode == PD_OPEN)
-	       SS_error(si, "FILE OPENED READ-ONLY - SX_WRITE_FILEDATA", SS_null);
+	       SS_error(si, "FILE OPENED READ-ONLY - SX_WRITE_FILEDATA",
+			SS_null);
 
             ep = wr(fp, fullpath, PD_entry_type(ep), PD_entry_type(ep),
 		    addr.memaddr, PD_entry_dimensions(ep),
@@ -2560,7 +2561,7 @@ static object *_SX_write_filedata(SS_psides *si, object *argl)
             if (ep == NULL)
 	       SS_error(si, PD_err, namo);};
 
-	if (fp != file)
+	if ((fp != NULL) && (fp != file))
 	   PN_close(fp);};
 
     rv = _SX_mk_gpdbdata(si, fullpath, addr.memaddr, ep, file);
