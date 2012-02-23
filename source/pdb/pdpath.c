@@ -417,8 +417,9 @@ static SC_array *_PD_block_index_deref(locator *stck, long n,
 	    _PD_block_set_desc(addr + ni, nit, nbl, 0);};};
 
     if (addr < 0)
-       {dp    = PD_inquire_table_type(tab, type);
-	addr -= (ni/bpi)*dp->size_bits;}
+       {dp = PD_inquire_table_type(tab, type);
+	if (dp != NULL)
+	   addr -= (ni/bpi)*dp->size_bits;}
 
     else
        {*pnumb = stck[n].number;
@@ -1471,7 +1472,7 @@ static void _PD_do_index(PD_smp_state *pa, char *expr)
     doff = PD_get_offset(file);
 
     if (dims != NULL)
-       {strcpy(t, type);
+       {SC_strncpy(t, MAXLINE, type, -1);
         PD_dereference(t);
         numb = _PD_hyper_number(file, expr, dims, &start);
         indr = FALSE;}
@@ -1482,7 +1483,7 @@ static void _PD_do_index(PD_smp_state *pa, char *expr)
 /* find the offset which will be the first part of the index expression
  * find the number of items requested
  */
-	strcpy(t, expr);
+	SC_strncpy(t, MAXLINE, expr, -1);
 	tok = SC_firsttok(t, ",");
 
 #if 0
@@ -1499,7 +1500,7 @@ static void _PD_do_index(PD_smp_state *pa, char *expr)
 
 #else
 
-	strcpy(s, tok);
+	SC_strncpy(s, MAXLINE, tok, -1);
 	tok = SC_strtok(s, ":", pt);
 	if (tok == NULL)
 	   PD_error("BAD INDEX EXPRESSION - _PD_DO_INDEX", PD_TRACE);

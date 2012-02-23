@@ -929,6 +929,7 @@ syment *_PD_ptr_read(PDBfile *file, int64_t addr, int force)
     PD_address *ad;
     adloc *al;
 
+    ep = NULL;
     al = _PD_ptr_get_al(file);
 
     ad = _PD_ptr_rd_lookup(file, addr, &frst);
@@ -1381,16 +1382,17 @@ static int _PD_ptr_register(haelem *hp, void *a)
     adloc *al;
 
     file = (PDBfile *) a;
-    al   = _PD_ptr_get_al(file);
+    if (file != NULL)
+       {al = _PD_ptr_get_al(file);
 
-    ok = SC_haelem_data(hp, &name, NULL, (void **) &ep, FALSE);
-    SC_ASSERT(ok == TRUE);
+	ok = SC_haelem_data(hp, &name, NULL, (void **) &ep, FALSE);
+	SC_ASSERT(ok == TRUE);
 
-    if ((file != NULL) && (ep != NULL))
-       {nc = strlen(file->ptr_base);
-	if (strncmp(name, file->ptr_base, nc) == 0) 
-	   {i = SC_stoi(name+nc);
-            _PD_ptr_install_entry(al, i, ep, TRUE);};};
+	if ((file != NULL) && (ep != NULL))
+	   {nc = strlen(file->ptr_base);
+	    if (strncmp(name, file->ptr_base, nc) == 0) 
+	       {i = SC_stoi(name+nc);
+		_PD_ptr_install_entry(al, i, ep, TRUE);};};};
 
     return(0);}
 

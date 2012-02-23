@@ -324,6 +324,8 @@ int _PD_read(PDBfile *file, char *fullpath, char *type, syment *ep, void *vr,
     char *typ;
     defstr *dp;
 
+    rv = 0;
+
     file->req.oper = PD_READ;
 
 #ifdef USE_REQUESTS
@@ -1531,7 +1533,7 @@ int PD_fix_denorm(data_standard* std, char *type, int64_t ni, void *vr)
 		 type);
 	st = FALSE;};
 
-    if (st == TRUE)
+    if ((st == TRUE) && (ord != NULL))
 
 /* make sure buf points to bytes that are in big endian byte order */
        {reord = FALSE;
@@ -1559,7 +1561,7 @@ int PD_fix_denorm(data_standard* std, char *type, int64_t ni, void *vr)
 	   buf = var;
 
 /* handle the general case: walk float values, zero-ing if necessary */
-	if (st == TRUE)
+	if ((st == TRUE) && (fmt != NULL))
 	   {n_exp    = fmt[1];     /* # of bits in exponent */
 	    n_mant   = fmt[2];     /* # of bits in mantissa */
 	    exp_bit  = fmt[4] % 8; /* start bit of exponent mod byte size */

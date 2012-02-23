@@ -486,8 +486,11 @@ dimdes *_PD_hyper_dims(PDBfile *file, char *name, dimdes *dims)
 
     strcpy(s, name);
     t = SC_lasttok(s, "[]()");
-    nc = strlen(t);
-    memmove(s, t, nc);
+    if (t != NULL)
+       {nc = strlen(t);
+	memmove(s, t, nc);}
+    else
+       nc = 0;
     s[nc] = '\0';
 
     for (dp = dims; dp != NULL; dp = dims->next)
@@ -547,8 +550,11 @@ char *_PD_expand_hyper_name(PDBfile *file, char *name)
 	return(CSTRSAVE(s));};
 
     t = SC_lasttok(s, "[]()");
-    nc = strlen(t);
-    memmove(s, t, nc);
+    if (t != NULL)
+       {nc = strlen(t);
+	memmove(s, t, nc);}
+    else
+       nc = 0;
     s[nc] = '\0';
 
     err = FALSE;
@@ -591,6 +597,9 @@ static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype,
     char *in, *out, *bf;
     FILE *fp;
     defstr *dpf;
+
+    if ((intype == NULL) || (outtype == NULL) || (vr == NULL))
+       return;
 
     fp  = file->stream;
     bpi = -1;
@@ -1025,7 +1034,7 @@ int64_t _PD_wr_syment(PDBfile *file, char *name, char *vr, int64_t ni,
              GO_CONT;};
 
          SAVE_P(vr);
-         vr = DEREF(vr);
+         vr = (vr != NULL) ? DEREF(vr) : NULL;
          if (vr == NULL)
             {(*file->wr_itag)(file, name, NULL, 0L, litype, -1L, LOC_OTHER);
              RESTORE_P(char, vr);
@@ -1138,9 +1147,10 @@ int _PD_hyper_write(PDBfile *file, char *name, syment *ep,
 		    PD_WRITE);
 
 	expr = SC_lasttok(s, "[]()");
-	nc   = strlen(expr) + 1;
-	nc   = min(nc, MAXLINE);
-	memmove(s, expr, nc);
+	if (expr != NULL)
+	   {nc   = strlen(expr) + 1;
+	     nc   = min(nc, MAXLINE);
+	     memmove(s, expr, nc);};
 
 	pi = _PD_compute_hyper_strides(file, s, dims, &nd);
 	if (pi == NULL)
@@ -1370,6 +1380,9 @@ static void _PD_rd_leaf_members(PDBfile *file, char *vr, inti ni,
     defstr *dpf;
     FILE *fp;
 
+    if ((intype == NULL) || (outtype == NULL))
+       return;
+
     bpi = -1;
     fp  = file->stream;
 
@@ -1546,9 +1559,10 @@ int _PD_hyper_read(PDBfile *file, char *name, char *outtype,
 			PD_READ);
 
 	    expr = SC_lasttok(s, "[]()");
-	    nc   = strlen(expr) + 1;
-	    nc   = min(nc, MAXLINE);
-	    memmove(s, expr, nc);
+	    if (expr != NULL)
+	       {nc   = strlen(expr) + 1;
+		nc   = min(nc, MAXLINE);
+		memmove(s, expr, nc);};
 
 	    pi = _PD_compute_hyper_strides(file, s, dims, &nd);
 	    if (pi == NULL)
@@ -1745,6 +1759,8 @@ int64_t _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
     mem_lst = NULL;
     litype  = NULL;
     lotype  = NULL;
+    addr    = 0;
+    boffs   = 0;
     size    = 0;
     ni      = 0;
 
@@ -1933,7 +1949,8 @@ int64_t _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
             {SC_address ad;
 
              ad.diskaddr = addr;
-             DEREF(pv)   = DEREF(ad.memaddr);
+	     if (pv != NULL)
+	        DEREF(pv) = DEREF(ad.memaddr);
              GO_CONT;}
 
          else if (_PD_ptr_rd_itags(file, lvr, &pi) == FALSE)

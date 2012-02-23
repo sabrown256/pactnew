@@ -903,26 +903,28 @@ void _PD_init_chrt(PDBfile *file, int ftk)
     ret = PD_inquire_type(file, "function");
     if (ret == NULL)
        {ret = PD_inquire_type(file, "*");
-	dp  = _PD_mk_defstr(fchrt, "function", NON_CONVERT_KIND,
+	if (ret != NULL)
+	   {dp  = _PD_mk_defstr(fchrt, "function", NON_CONVERT_KIND,
+				NULL, NULL,
+				ret->size, ret->alignment, ret->fix.order,
+				ret->convert, NULL, NULL, FALSE, FALSE);
+	    if (dp == NULL)
+	       PD_error("FILE FUNCTION DEFINITION FAILED - _PD_INIT_CHART",
+			PD_OPEN);
+
+	    _PD_d_install(file, "function", dp, PD_CHART_FILE);};};
+
+    ret = PD_inquire_host_type(file, "*");
+    if (ret != NULL)
+       {dp  = _PD_mk_defstr(hchrt, "function", NON_CONVERT_KIND,
 			    NULL, NULL,
 			    ret->size, ret->alignment, ret->fix.order,
 			    ret->convert, NULL, NULL, FALSE, FALSE);
 	if (dp == NULL)
-	   PD_error("FILE FUNCTION DEFINITION FAILED - _PD_INIT_CHART",
+	   PD_error("HOST FUNCTION DEFINITION FAILED - _PD_INIT_CHART",
 		    PD_OPEN);
 
-	_PD_d_install(file, "function", dp, PD_CHART_FILE);};
-
-    ret = PD_inquire_host_type(file, "*");
-    dp  = _PD_mk_defstr(hchrt, "function", NON_CONVERT_KIND,
-			NULL, NULL,
-			ret->size, ret->alignment, ret->fix.order,
-			ret->convert, NULL, NULL, FALSE, FALSE);
-    if (dp == NULL)
-       PD_error("HOST FUNCTION DEFINITION FAILED - _PD_INIT_CHART",
-		PD_OPEN);
-
-    _PD_d_install(file, "function", dp, PD_CHART_HOST);
+	_PD_d_install(file, "function", dp, PD_CHART_HOST);};
 
     return;}
 

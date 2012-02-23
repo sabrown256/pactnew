@@ -149,12 +149,16 @@ static inti _PD_sz_leaf_members(PDBfile *file, char *type, inti ni,
     intb bpi;
     defstr *dpf;
 
-    dpf = _PD_type_lookup(file, PD_CHART_FILE, type);
-    bpi = dpf->size;
-    if (bpi == -1)
-       PD_error("CAN'T GET NUMBER OF BYTES - _PD_SZ_LEAF_MEMBERS", PD_TRACE);
+    nb = 0;
 
-    nb = ni*bpi;
+    dpf = _PD_type_lookup(file, PD_CHART_FILE, type);
+    if (dpf != NULL)
+       {bpi = dpf->size;
+	if (bpi == -1)
+	   PD_error("CAN'T GET NUMBER OF BYTES - _PD_SZ_LEAF_MEMBERS",
+		    PD_TRACE);
+
+	nb = ni*bpi;};
 
     return(nb);}
 
@@ -341,7 +345,7 @@ long PD_sizeof(PDBfile *file ARG(,,cls),
              GO_CONT;};
 
          SAVE_P(vr);
-         vr = DEREF(vr);
+         vr = (vr != NULL) ? DEREF(vr) : NULL;
          if (vr == NULL)
             {nb += _PD_sz_itag(ltype, itags);
              RESTORE_P(char, vr);
