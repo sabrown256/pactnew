@@ -175,27 +175,28 @@ static char *_XML_entry_uniq(parse_state *st, char *path, char *name, int lev)
     syment *ep;
     PDBfile *file;
 
-    file = st->file;
+    if (name != NULL)
+       {file = st->file;
 
-    path = SC_dstrcat(path, name);
-    nr   = strlen(path);
-    if (path[nr-1] != '/')
-       {ok = TRUE;
-	if (lev != 0)
-	   {for (i = 1; ok == TRUE; i++)
-	        {ok = FALSE;
-		 path[nr] = '\0';
-	         snprintf(s, MAXLINE, "-%ld", i);
-		 path = SC_dstrcat(path, s);
+	path = SC_dstrcat(path, name);
+	nr   = strlen(path);
+	if (path[nr-1] != '/')
+	   {ok = TRUE;
+	    if (lev != 0)
+	       {for (i = 1; ok == TRUE; i++)
+		    {ok = FALSE;
+		     path[nr] = '\0';
+		     snprintf(s, MAXLINE, "-%ld", i);
+		     path = SC_dstrcat(path, s);
 
-		 ep = PD_inquire_entry(file, path, FALSE, NULL);
-		 ok = (ep != NULL);};};}
+		     ep = PD_inquire_entry(file, path, FALSE, NULL);
+		     ok = (ep != NULL);};};}
 
-    else
-       {ep = PD_inquire_entry(file, path, FALSE, NULL);
-	if (ep == NULL)
-	   {ep = _PD_mk_syment("Directory", 1, 0, NULL, NULL);
-	    _PD_e_install(file, path, ep, FALSE);};};
+	else
+	   {ep = PD_inquire_entry(file, path, FALSE, NULL);
+	    if (ep == NULL)
+	       {ep = _PD_mk_syment("Directory", 1, 0, NULL, NULL);
+		_PD_e_install(file, path, ep, FALSE);};};};
 
     return(path);}
 
@@ -326,7 +327,7 @@ static void _XML_end_tag(parse_state *st, char *t)
 
     SC_strncpy(s, MAXLINE, b, -1);
     b  = SC_strtok(s, " \t>", u);
-    nb = strlen(b);
+    nb = (b != NULL) ? strlen(b) : 0;
 
     if ((strncmp(b, t+2, nb) == 0) && (t[2+nb] == '>'))
        {val = st->value;

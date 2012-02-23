@@ -236,7 +236,7 @@ int _PD_adj_dimensions(PDBfile *file, char *name, syment *ep)
     dims     = ep->dimensions;
 
     strcpy(bf, name);
-    strcpy(head, SC_firsttok(bf, "([\001\n"));
+    SC_strncpy(head, MAXLINE, SC_firsttok(bf, "([\001\n"), -1);
     tail[0] = '\0';
 
     for (id = 0; (token = SC_firsttok(bf, ",)] ")) != NULL; id++)
@@ -555,21 +555,22 @@ int64_t _PD_member_location(char *s, hasharr *tab, defstr *dp, memdes **pdesc)
     char *token;
     memdes *desc, *nxt;
 
-    strcpy(name, s);
-    token = SC_firsttok(name, ".\001");
+    if ((s != NULL) && (tab != NULL) && (dp != NULL))
+       {strcpy(name, s);
+	token = SC_firsttok(name, ".\001");
 
-    for (addr = 0, desc = dp->members; desc != NULL; desc = nxt)
-        {nxt = desc->next;
-         if (strcmp(desc->name, token) == 0)
-            {addr  += desc->member_offs;
-	     *pdesc = desc;
-             dp = PD_inquire_table_type(tab, desc->base_type);
-             if (dp != NULL)
-                {token = SC_firsttok(name, ".\001");
-                 if (token == NULL)
-                    return(addr);
-                 else
-                    nxt = dp->members;};};};
+	for (addr = 0, desc = dp->members; desc != NULL; desc = nxt)
+	    {nxt = desc->next;
+	     if ((token != NULL) && (strcmp(desc->name, token) == 0))
+	        {addr  += desc->member_offs;
+		 *pdesc = desc;
+		 dp = PD_inquire_table_type(tab, desc->base_type);
+		 if (dp != NULL)
+		    {token = SC_firsttok(name, ".\001");
+		     if (token == NULL)
+		        return(addr);
+		     else
+		        nxt = dp->members;};};};};
 
     return(-1);}
                  

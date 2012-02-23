@@ -227,8 +227,7 @@ static int _SQLITE_ni(FILE *fp, char *s)
     snprintf(cmd, MAXLINE, "select count(*) from %s", s);
 
     tab = _SQLITE_query(fp, cmd, NULL, 0);
-
-    nr = SC_stoi(tab->table[0]);
+    nr  = (tab != NULL) ? SC_stoi(tab->table[0]) : 0;
 
     _SQL_rl_table(tab);
 

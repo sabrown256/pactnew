@@ -217,8 +217,11 @@ static int _H5_get_alignment(PDBfile *file, char *type)
                                       0, 0, 0,     /* complex floating point types (ok) */
                                       0, 0 };
 
-    id     = SC_type_id(type, TRUE);
-    result = algn[id];
+    id = SC_type_id(type, TRUE);
+    if ((0 <= id) && (id < N_PRIMITIVES))
+       result = algn[id];
+    else
+       result = 0;
 
     return(result);}
 
@@ -238,6 +241,8 @@ static hid_t _H5_enc_type(PDBfile *file, char *ptyp)
     intb nb;
     hid_t htyp;
     defstr *dp;
+
+    htyp = H5T_NATIVE_SCHAR;
 
     tid = SC_type_id(ptyp, FALSE);
 
@@ -374,7 +379,7 @@ static hsize_t *_H5_enc_dims(PDBfile *file, int *pnd,
 #endif
         SC_ASSERT(status != -1);
 
-        if (H5Tget_class(nativetype_id) == H5T_STRING)
+        if ((hdims != NULL) && (H5Tget_class(nativetype_id) == H5T_STRING))
            hdims[nd-1] = H5Tget_size(nativetype_id);
 
         H5Tclose(nativetype_id);}
@@ -500,6 +505,8 @@ syment *_H5_write_entry(PDBfile *fp, char *path, char *inty, char *outty,
     else
        {rv = _H5_write_data(hfp, path, nd, hdims, htyp, pvr);
 	SC_ASSERT(rv == TRUE);};
+
+    free(hdims);
 
     return(ep);}
 
@@ -979,6 +986,8 @@ static dimdes *_H5_dec_dims(PDBfile *file, hid_t htyp, hid_t hdim)
          else
             dim->next = NULL;};
 
+    free(hdims);
+
     return(pdims);}
 
 /*--------------------------------------------------------------------------*/
@@ -1034,8 +1043,7 @@ static char *_H5_dec_compound(PDBfile *file, hid_t htyp)
     
 /* begin creating a memdes for the defstr */ 
         mnxt = members;
-    
-        for (i = 0; i < nm; i++) 
+	for (i = 0; (i < nm) && (mnxt != NULL); i++) 
 
 /* grab the member's name */
             {mname = H5Tget_member_name(htyp, i);
