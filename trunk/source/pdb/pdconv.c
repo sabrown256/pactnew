@@ -659,56 +659,59 @@ int _PD_require_conv(defstr *dpf, defstr *dph)
     long *fmtf, *fmth;
     multides *tupf, *tuph;
 
-    cnv = dpf->convert;
+    cnv = -1;
 
-    if (cnv == -1)
-       {ordf = dpf->fp.order;
-	fmtf = dpf->fp.format;
-	bpif = dpf->size;
-	tupf = dpf->tuple;
+    if ((dpf != NULL) && (dph != NULL))
+       {cnv = dpf->convert;
 
-	ordh = dph->fp.order;
-	fmth = dph->fp.format;
-	bpih = dph->size;
-	tuph = dph->tuple;
+	if (cnv == -1)
+	   {ordf = dpf->fp.order;
+	    fmtf = dpf->fp.format;
+	    bpif = dpf->size;
+	    tupf = dpf->tuple;
 
-	lreorder = (bpif != bpih);
-	if ((ordf != NULL) && (ordh != NULL))
-	   {for (i = 0; (i < bpif) && (lreorder == FALSE); i++)
-	        lreorder = (ordf[i] != ordh[i]);};
+	    ordh = dph->fp.order;
+	    fmth = dph->fp.format;
+	    bpih = dph->size;
+	    tuph = dph->tuple;
 
-	lreformat = FALSE;
-	if ((fmtf != NULL) && (fmth != NULL))
-	   {for (i = 0; (i < 8) && (lreformat == FALSE); i++)
-	        lreformat = (fmtf[i] != fmth[i]);};
+	    lreorder = (bpif != bpih);
+	    if ((ordf != NULL) && (ordh != NULL))
+	       {for (i = 0; (i < bpif) && (lreorder == FALSE); i++)
+		    lreorder = (ordf[i] != ordh[i]);};
 
-	ltuple = FALSE;
-	if ((tupf != NULL) && (tuph != NULL))
-	   {ltuple = (tupf->ni != tuph->ni);
-	    ni     = tupf->ni;
-	    if ((tupf->order != NULL) && (tuph->order != NULL))
-	       {for (i = 0; (i < ni) && (ltuple == FALSE); i++)
-		    ltuple = (tupf->order[i] != tuph->order[i]);};};
+	    lreformat = FALSE;
+	    if ((fmtf != NULL) && (fmth != NULL))
+	       {for (i = 0; (i < 8) && (lreformat == FALSE); i++)
+		    lreformat = (fmtf[i] != fmth[i]);};
 
-	cnv = FALSE;
+	    ltuple = FALSE;
+	    if ((tupf != NULL) && (tuph != NULL))
+	       {ltuple = (tupf->ni != tuph->ni);
+		ni     = tupf->ni;
+		if ((tupf->order != NULL) && (tuph->order != NULL))
+		   {for (i = 0; (i < ni) && (ltuple == FALSE); i++)
+		        ltuple = (tupf->order[i] != tuph->order[i]);};};
 
-	cnv |= (dpf->kind        != dph->kind);
-	cnv |= (dpf->size_bits   != dph->size_bits);
-	cnv |= (dpf->size        != dph->size);
-	cnv |= (dpf->alignment   != dph->alignment);
-	cnv |= (dpf->n_indirects != dph->n_indirects);
-	cnv |= (dpf->is_indirect != dph->is_indirect);
-	cnv |= (dpf->onescmp     != dph->onescmp);
-	cnv |= (dpf->unsgned     != dph->unsgned);
+	    cnv = FALSE;
 
-        if (dpf->kind == INT_KIND)
-	   cnv |= (dpf->fix.order   != dph->fix.order);
+	    cnv |= (dpf->kind        != dph->kind);
+	    cnv |= (dpf->size_bits   != dph->size_bits);
+	    cnv |= (dpf->size        != dph->size);
+	    cnv |= (dpf->alignment   != dph->alignment);
+	    cnv |= (dpf->n_indirects != dph->n_indirects);
+	    cnv |= (dpf->is_indirect != dph->is_indirect);
+	    cnv |= (dpf->onescmp     != dph->onescmp);
+	    cnv |= (dpf->unsgned     != dph->unsgned);
 
-	cnv |= lreorder;
-	cnv |= lreformat;
-	cnv |= ltuple;
+	    if (dpf->kind == INT_KIND)
+	       cnv |= (dpf->fix.order   != dph->fix.order);
 
-	dpf->convert = cnv;};
+	    cnv |= lreorder;
+	    cnv |= lreformat;
+	    cnv |= ltuple;
+
+	    dpf->convert = cnv;};};
 
     return(cnv);}
 
@@ -724,14 +727,17 @@ int _PD_requires_conversion(PDBfile *file, defstr *dpf,
    {int cnv;
     defstr *dph;
 
+    cnv = -1;
+
     if (dpf == NULL)
        dpf = _PD_type_lookup(file, PD_CHART_FILE, intype);
 
-    if (dpf->convert == -1)
-       {dph = _PD_type_lookup(file, PD_CHART_HOST, outtype);
-	cnv = _PD_require_conv(dpf, dph);}
-    else
-       cnv = ((dpf->convert > 0) || (strcmp(intype, outtype) != 0));
+    if (dpf != NULL)
+       {if (dpf->convert == -1)
+	   {dph = _PD_type_lookup(file, PD_CHART_HOST, outtype);
+	    cnv = _PD_require_conv(dpf, dph);}
+	else
+	   cnv = ((dpf->convert > 0) || (strcmp(intype, outtype) != 0));};
 
     return(cnv);}
 
@@ -2550,11 +2556,13 @@ int PD_convert(char **out, char **in, char *typi, char *typo,
 
     if (dpi == NULL)
        {snprintf(msg, MAXLINE, "BAD IN TYPE, '%s' - PD_CONVERT", typi);
-	PD_error(msg, error);};
+	PD_error(msg, error);
+	return(FALSE);};
 
     if (dpo == NULL)
        {snprintf(msg, MAXLINE, "BAD OUT TYPE, '%s' - PD_CONVERT", typo);
-	PD_error(msg, error);}
+	PD_error(msg, error);
+	return(FALSE);}
 
 /* convert pointers to data via /&ptrs mechanism */
     else if (dpo->is_indirect) 
@@ -2605,14 +2613,16 @@ int PD_convert(char **out, char **in, char *typi, char *typo,
 			 {snprintf(msg, MAXLINE,
 				   "BAD OUT TYPE, '%s' IN STRUCT - PD_CONVERT",
 				   mtype);
-			  PD_error(msg, error);};
+			  PD_error(msg, error);
+			  continue;};
 
                       mdpi = PD_inquire_table_type(chi, mtype);
                       if (mdpi == NULL)
 			 {snprintf(msg, MAXLINE,
 				   "BAD IN TYPE, '%s' IN STRUCT - PD_CONVERT",
 				   mtype);
-			  PD_error(msg, error);};
+			  PD_error(msg, error);
+			  continue;};
 
 		      ret = _PD_convert((char **) out, in, mitems, boffs,
 					mdpi, mdpo, stdi, stdo, hstd,
@@ -2628,7 +2638,8 @@ int PD_convert(char **out, char **in, char *typi, char *typo,
 		     {snprintf(msg, MAXLINE,
 			       "STRUCT CONVERSION FAILED FOR '%s' - PD_CONVERT",
 			       typi);
-		      PD_error(msg, error);};};};}
+		      PD_error(msg, error);
+		      continue;};};};}
 
 /* if members is NULL then it is a primitive type */
     else
