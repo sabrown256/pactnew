@@ -711,6 +711,8 @@ static object *SX_wrt_current_table(SS_psides *si, object *argl)
             SC_STRING_I, &fname,
             0);
 
+    fp = NULL;
+
     if (fname != NULL)
        {fp = io_open(fname, "w");
         if (fp == NULL)

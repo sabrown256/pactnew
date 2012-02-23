@@ -612,56 +612,58 @@ char *_SC_search_file(char **path, char *name, char *mode, char *type)
 
     rv = NULL;
 
+    if (name != NULL)
+
 /* if this is a remote file just go find it */
-    if (strchr(name, ':') != NULL)
-       rv = name;
+       {if (strchr(name, ':') != NULL)
+	   rv = name;
 
-    else if (name[0] == '/')
-       {bp = _SC_form_file_aux("", name);
-        if (SC_query_file(bp, mode, type))
-           rv = bp;
+	else if (name[0] == '/')
+	   {bp = _SC_form_file_aux("", name);
+	    if (SC_query_file(bp, mode, type))
+	       rv = bp;
+	    else
+	       CFREE(bp);}
+
+	else if (name[0] == '~')
+	   {char pth[MAXLINE];
+	    char *cmnd, **output;
+
+	    output = NULL;
+
+	    pth[0] = '\0';
+
+	    cmnd   = SC_dsnprintf(TRUE, "echo %s", name);
+	    output = SC_syscmnd(cmnd);
+	    CFREE(cmnd);
+
+	    if ((output != NULL) &&
+		(output[0] != NULL))
+	       {strcpy(pth, output[0]);
+		CFREE(output[0]);
+		CFREE(output);}
+
+	    if (SC_query_file(pth, mode, type))
+	       rv = CSTRSAVE(pth);}
+
 	else
-	   {CFREE(bp);};}
+	   {if (path == NULL)
+	       {lst[0] = ".";
+		lst[1] = NULL;
+		path   = lst;};
 
-    else if (name[0] == '~')
-       {char pth[MAXLINE];
-        char *cmnd, **output;
+	    for (i = 0; TRUE; i++)
+	        {t = path[i];
+		 if (t == NULL)
+		    break;
 
-	output = NULL;
+		 bp = _SC_form_file_aux(t, name);
 
-        pth[0] = '\0';
+		 if (SC_query_file(bp, mode, type))
+		    {rv = bp;
+		     break;};
 
-        cmnd   = SC_dsnprintf(TRUE, "echo %s", name);
-        output = SC_syscmnd(cmnd);
-        CFREE(cmnd);
-
-        if ((output != NULL) &&
-            (output[0] != NULL))
-	   {strcpy(pth, output[0]);
-            CFREE(output[0]);
-            CFREE(output);}
-
-        if (SC_query_file(pth, mode, type))
-           rv = CSTRSAVE(pth);}
-
-    else
-       {if (path == NULL)
-	   {lst[0] = ".";
-	    lst[1] = NULL;
-	    path   = lst;};
-
-	for (i = 0; TRUE; i++)
-	    {t = path[i];
-	     if (t == NULL)
-	        break;
-
-	     bp = _SC_form_file_aux(t, name);
-
-	     if (SC_query_file(bp, mode, type))
-	        {rv = bp;
-	         break;};
-
-	     CFREE(bp);};};
+		 CFREE(bp);};};};
 
     return(rv);}
  

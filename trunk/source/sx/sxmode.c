@@ -221,53 +221,55 @@ static void _SX_read(SS_psides *si, object *strm)
             SC_STRING_I, &s,
             0);
 
-    bf = NULL;
+    if (s != NULL)
+       {bf = NULL;
 
 /* anything without a print name generates a replot */
-    if ((s != NULL) && strcmp(s, "- no print name -") == 0)
-       {t = SS_BUFFER(strm);
+	if (strcmp(s, "- no print name -") == 0)
+	   {t = SS_BUFFER(strm);
 
-        bf = SC_dsnprintf(FALSE, "(wu)");}
+	    bf = SC_dsnprintf(FALSE, "(wu)");}
 
 /* check for variables and special actions for certain cases depending
  * on the name and the namespace it is found in
  */
-    else if (SS_variablep(o))
-       {SS_var_value(si, "current-file", G_FILE, &po, TRUE);
-	if (po == NULL)
-	   file = SX_gs.vif;
-        else
-	   file = FILE_FILE(PDBfile, po);
+	else if (SS_variablep(o))
+	   {SS_var_value(si, "current-file", G_FILE, &po, TRUE);
+	    if (po == NULL)
+	       file = SX_gs.vif;
+	    else
+	       file = FILE_FILE(PDBfile, po);
 
-	t   = SS_BUFFER(strm);
-	ptr = SS_PTR(strm);
+	    t   = SS_BUFFER(strm);
+	    ptr = SS_PTR(strm);
 
 /* look for file variable expression */
-	if (SS_bind_env(si, o, si->env) == NULL)
-	   {if (_SX_file_varp(file, s, FALSE))
+	    if (SS_bind_env(si, o, si->env) == NULL)
+	       {if (_SX_file_varp(file, s, FALSE))
 
 /* find case */
-	       {if ((*ptr != '\0') && (strchr("!<>=", *ptr) != NULL))
-		   bf = SC_dsnprintf(FALSE, "varfind %s", t);
+		   {if ((*ptr != '\0') && (strchr("!<>=", *ptr) != NULL))
+		       bf = SC_dsnprintf(FALSE, "varfind %s", t);
 
 /* change case */
-		else if ((*ptr != '\0') && (*ptr != '\n'))
-		   bf = SC_dsnprintf(FALSE, "varset! %s", t);
+		    else if ((*ptr != '\0') && (*ptr != '\n'))
+		       bf = SC_dsnprintf(FALSE, "varset! %s", t);
 
 /* print case */
-		else
-		   bf = SC_dsnprintf(FALSE, "varprint %s", t);};}
+		    else
+		       bf = SC_dsnprintf(FALSE, "varprint %s", t);};}
 
 /* look for type name - define case */
-	else if ((strcmp(s, "struct") != 0) && (SC_type_id(s, FALSE) != -1))
-	   bf = SC_dsnprintf(FALSE, "vardef %s", t);};
+	    else if ((strcmp(s, "struct") != 0) &&
+		     (SC_type_id(s, FALSE) != -1))
+	       bf = SC_dsnprintf(FALSE, "vardef %s", t);};
 
-    if (bf != NULL)
-       {strcpy(t, bf);
-        SS_PTR(strm) = t;
-        SS_assign(si, si->rdobj, SS_read(si, strm));};
+	if (bf != NULL)
+	   {strcpy(t, bf);
+	    SS_PTR(strm) = t;
+	    SS_assign(si, si->rdobj, SS_read(si, strm));};
 
-    CFREE(s);
+	CFREE(s);};
 
     return;}
     

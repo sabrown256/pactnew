@@ -345,7 +345,8 @@ int _PD_read(PDBfile *file, char *fullpath, char *type, syment *ep, void *vr,
 	       nf = _PD_comp_nind(nd, ind, 3);};};
 
     if ((nd == -1) && (ind == NULL))
-       rv = _PD_hyper_read(file, fullpath, type, ep, vr);
+       {if (type != NULL)
+	   rv = _PD_hyper_read(file, fullpath, type, ep, vr);}
     else
        rv = _PD_indexed_read_as(file, fullpath, type, vr, nd, ind, ep);
 

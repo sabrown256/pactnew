@@ -257,18 +257,19 @@ static void _SX_shift_set(PM_set *set, double val)
    {double **elem, *pe;
     int i, j, nde, ne;
 
-    ne   = set->n_elements;
-    nde  = set->dimension_elem;
-    elem = (double **) set->elements;
+    if (set != NULL)
+       {ne   = set->n_elements;
+	nde  = set->dimension_elem;
+	elem = (double **) set->elements;
 
-    for (i = 0; i < nde; i++)
-        {pe = elem[i];
+	for (i = 0; i < nde; i++)
+	    {pe = elem[i];
 
 #pragma omp parallel for
-         for (j = 0; j < ne; j++)
-             pe[j] += val;
+	     for (j = 0; j < ne; j++)
+	         pe[j] += val;
 
-         };
+         };};
 
     return;}
 
@@ -346,18 +347,19 @@ static void _SX_scale_set(PM_set *set, double val)
    {double **elem, *pe;
     int i, j, nde, ne;
 
-    ne   = set->n_elements;
-    nde  = set->dimension_elem;
-    elem = (double **) set->elements;
+    if (set != NULL)
+       {ne   = set->n_elements;
+	nde  = set->dimension_elem;
+	elem = (double **) set->elements;
 
-    for (i = 0; i < nde; i++)
-        {pe = elem[i];
+	for (i = 0; i < nde; i++)
+	    {pe = elem[i];
 
 #pragma omp parallel for
-         for (j = 0; j < ne; j++)
-             pe[j] *= val;
+	     for (j = 0; j < ne; j++)
+	         pe[j] *= val;
 
-         };
+	    };};
 
     return;}
 
@@ -541,68 +543,56 @@ static void _SX_integrate_mapping(PM_mapping *f)
     double vol;
     double **re, *dsc, *rn;
 
+    if (f != NULL)
+
 /* build the return mapping */
-    domain = f->domain;
-    range  = f->range;
+       {domain = f->domain;
+	range  = f->range;
 
-    dsc = (double *) domain->scales;
-    ndd = domain->dimension;
-    nde = domain->dimension_elem;
-    dmx = domain->max_index;
-    ned = domain->n_elements;
+	dsc = (double *) domain->scales;
+	ndd = domain->dimension;
+	nde = domain->dimension_elem;
+	dmx = domain->max_index;
+	ned = domain->n_elements;
 
-    ndr = range->dimension_elem;
-    re  = (double **) range->elements;
+	ndr = range->dimension_elem;
+	re  = (double **) range->elements;
 
 /* compute the node volume */
-    vol = 1.0;
+	vol = 1.0;
 
 #pragma omp parallel for shared(vol)
-    for (j = 0; j < nde; j++)
-        vol *= dsc[j];
+	for (j = 0; j < nde; j++)
+	    vol *= dsc[j];
 
 /* multiply by the volume */
 
 #pragma omp parallel for private(i, rn)
-    for (j = 0; j < ndr; j++)
-        {rn = re[j];
-         for (i = 0; i < ned; i++)
-             rn[i] *= vol;};
+	for (j = 0; j < ndr; j++)
+	    {rn = re[j];
+	     for (i = 0; i < ned; i++)
+	         rn[i] *= vol;};
 
-/* scale each face by one half - corrects volume factor */
-/*
-    for (i = 0; i < ned; i++)
-        {id  = i;
-         lne = ned;
-         for (j = ndd-1; j >= 0; j--)
-             {dj   = dmx[j];
-              lne /= dj;
-              ix   = id / lne;
-              if ((ix == 0) || (ix == dj-1))
-                 for (jc = 0; jc < ndr; jc++)
-                     re[jc][i] *= 0.5;
-              id %= lne;};};
-*/
 /* sum it up */
-    lne = ned;
-    for (j = ndd-1; j >= 0; j--)
-        {npts = 1L;
-         for (jn = 0; jn <= j; jn++)
-             npts *= dmx[jn];
+	lne = ned;
+	for (j = ndd-1; j >= 0; j--)
+	    {npts = 1L;
+	     for (jn = 0; jn <= j; jn++)
+	         npts *= dmx[jn];
 
-         dj   = dmx[j];
-         step = lne;
-         lne /= dj;
+	     dj   = dmx[j];
+	     step = lne;
+	     lne /= dj;
 
 #pragma omp parallel for private(id, ix, jc, is, rn)
-         for (i = 0; i < ned; i++)
-             {id = i % step;
-              ix = id / lne;
-              if (ix == 0)
-                 for (jc = 0; jc < ndr; jc++)
-                     {rn = re[jc] + i;
-                      for (is = lne; is < npts; is += lne)
-                          rn[is] += rn[is-lne];};};};
+	     for (i = 0; i < ned; i++)
+	         {id = i % step;
+		  ix = id / lne;
+		  if (ix == 0)
+		     for (jc = 0; jc < ndr; jc++)
+		         {rn = re[jc] + i;
+			  for (is = lne; is < npts; is += lne)
+			      rn[is] += rn[is-lne];};};};};
 
     return;}
         

@@ -616,25 +616,26 @@ void *PG_ptr_attr_glb(char *name)
 void _PG_ptr_attr_set(char *typ, void *pvo, void *pvi)
    {int id;
 
-    id = SC_type_id(typ, FALSE);
+    if ((pvo != NULL) && (pvi != NULL))
+       {id = SC_type_id(typ, FALSE);
 
-    if (id == SC_INT_I)
-       {int *iv;
+	if (id == SC_INT_I)
+	   {int *iv;
 
-	iv  = (int *) pvo;
-	*iv = *(int *) pvi;}
+	    iv  = (int *) pvo;
+	    *iv = *(int *) pvi;}
 
-    else if (id == SC_DOUBLE_I)
-       {double *dv;
+	else if (id == SC_DOUBLE_I)
+	   {double *dv;
 
-	dv  = (double *) pvo;
-	*dv = *(double *) pvi;}
+	    dv  = (double *) pvo;
+	    *dv = *(double *) pvi;}
 
-    else if (id == SC_STRING_I)
-       {char **sv;
+	else if (id == SC_STRING_I)
+	   {char **sv;
 
-	sv  = (char **) pvo;
-	*sv = *(char **) pvi;};
+	    sv  = (char **) pvo;
+	    *sv = *(char **) pvi;};};
 
     return;}
 
