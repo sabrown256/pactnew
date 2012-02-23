@@ -583,6 +583,9 @@ static void _SX_accumulate_range(SS_psides *si, PM_mapping *d,
     PM_mapping *ps;
     object *obj, *al;
 
+    if (d == NULL)
+       return;
+
     dd = d->domain;
     ne = dd->n_elements;
 
@@ -783,7 +786,8 @@ PM_mapping *_SXI_extract_mapping(SS_psides *si, PM_mapping *h, object *argl)
     fd = _SX_build_restricted_domain(si, hd, argl);
     f  = SX_build_return_mapping(si, h, lbl, fd, TRUE, FALSE);
 
-    PM_find_extrema(f->range);
+    if (f != NULL)
+       PM_find_extrema(f->range);
 
     SX_gs.plot_flag = TRUE;
 
@@ -874,7 +878,8 @@ PM_mapping *_SXI_refine_mapping(SS_psides *si, PM_mapping *h, object **pargl)
     fd = _SX_build_lr_domain(si, hd, obj);
     f  = SX_build_return_mapping(si, h, lbl, fd, TRUE, SX_gs.interp_method);
 
-    PM_find_extrema(f->range);
+    if (f != NULL)
+       PM_find_extrema(f->range);
 
     SX_gs.plot_flag = TRUE;
 
@@ -911,7 +916,8 @@ PM_mapping *_SXI_interp_mapping(SS_psides *si, PM_mapping *h, object **pargl)
     fd = _SX_build_lr_domain(si, hd, obj);
     f  = SX_build_return_mapping(si, h, lbl, fd, TRUE, TRUE);
 
-    PM_find_extrema(f->range);
+    if (f != NULL)
+       PM_find_extrema(f->range);
 
     SX_gs.plot_flag = TRUE;
 

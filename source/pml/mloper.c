@@ -483,19 +483,21 @@ int PM_conv_array(C_array *dst, C_array *src, int rel)
     char t[MAXLINE];
     void *da, *sa;
 
-    n  = dst->length;
-    da = dst->data;
-    strcpy(t, dst->type);
-    did = SC_type_id(strtok(t, " *"), FALSE);
-
-    sa = src->data;
-    strcpy(t, src->type);
-    sid = SC_type_id(strtok(t, " *"), FALSE);
-	
     ret = -1;
-    if ((did != -1) && (sid != -1))
-       {da  = SC_convert_id(did, da, 0, 1, sid, sa, 0, 1, n, rel);
-	ret = (da != NULL);};
+
+    if ((dst != NULL) && (src != NULL))
+       {n  = dst->length;
+	da = dst->data;
+	strcpy(t, dst->type);
+	did = SC_type_id(strtok(t, " *"), FALSE);
+
+	sa = src->data;
+	strcpy(t, src->type);
+	sid = SC_type_id(strtok(t, " *"), FALSE);
+	
+	if ((did != -1) && (sid != -1))
+	   {da  = SC_convert_id(did, da, 0, 1, sid, sa, 0, 1, n, rel);
+	    ret = (da != NULL);};};
 
     return(ret);}
 

@@ -561,19 +561,20 @@ defstr *_PD_defstr_inst(PDBfile *file, char *name, PD_type_kind kind,
     algn = host_align->struct_alignment;
     for (pd = desc; pd != NULL; pd = pd->next)
         {dph = PD_inquire_table_type(host_chart, pd->base_type);
-         if (_PD_indirection(pd->type) || (dph == NULL))
-            algn = max(algn, host_align->ptr_alignment);
-         else
-            algn = max(algn, dph->alignment);
+	 if (dph != NULL)
+	    {if (_PD_indirection(pd->type) || (dph == NULL))
+		algn = max(algn, host_align->ptr_alignment);
+	     else
+	        algn = max(algn, dph->alignment);
 
 /* in case we are installing this defstr having read it from
  * another file (as in a copy type operation) redo the cast offsets
  */
-         if (pd->cast_memb != NULL)
-            pd->cast_offs = _PD_member_location(pd->cast_memb,
-						host_chart,
-						dph,
-						&memb);};
+	     if (pd->cast_memb != NULL)
+	        pd->cast_offs = _PD_member_location(pd->cast_memb,
+						    host_chart,
+						    dph,
+						    &memb);};};
 
 /* NOTE: ordr, formt, and conv apply only to the file chart
  *       never to the host chart!!!
@@ -705,7 +706,7 @@ defstr *_PD_type_container(PDBfile *file, defstr *dp)
        id = SC_type_container_size(KIND_INT, size);
 
     type = SC_type_name(id);
-    ndp  = PD_inquire_host_type(file, type);
+    ndp  = (type != NULL) ? PD_inquire_host_type(file, type) : NULL;
 
     return(ndp);}
 

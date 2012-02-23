@@ -123,25 +123,27 @@ SS_psides *SX_init(char *code, char *vers, int c, char **v, char **env)
     pdb_wr_hook = _SX_hash_hook;
     SC_REGISTER_CONTEXT(_SX_hash_hook, si);
 
-    _SX_init_hash_objects(si, SX_gs.vif);
+    if (SX_gs.gvif != NULL)
+       {_SX_init_hash_objects(si, SX_gs.vif);
 
 /* default formats */
-    _PD_set_digits(SX_gs.vif);
-    _SC_set_format_defaults();
+	_PD_set_digits(SX_gs.vif);
+	_SC_set_format_defaults();
 
 #ifndef SPDBX_ONLY
 
 /* PANACEA initializations */
-    PA_def_str(SX_gs.vif);
+	PA_def_str(SX_gs.vif);
 
-    SX_gs.var_tab = SS_mk_hasharr(si, PA_gs.variable_tab);
-    SS_UNCOLLECT(SX_gs.var_tab);
-    if (SC_hasharr_install(si->symtab, "pa-variable-table", SX_gs.var_tab,
-			   SS_POBJECT_S, 3, -1) == NULL)
-       SS_error(si, "CAN'T INSTALL PANACEA DATA BASE - SX_INIT_SYSTEM",
-                SX_gs.var_tab);
+	SX_gs.var_tab = SS_mk_hasharr(si, PA_gs.variable_tab);
+	SS_UNCOLLECT(SX_gs.var_tab);
+	if (SC_hasharr_install(si->symtab, "pa-variable-table", SX_gs.var_tab,
+			       SS_POBJECT_S, 3, -1) == NULL)
+	   SS_error(si, "CAN'T INSTALL PANACEA DATA BASE - SX_INIT_SYSTEM",
+		    SX_gs.var_tab);
 
 #endif
+	};
 
 /* these lisp package special variables are initialized in all modes
  * give default values to the lisp package interface variables

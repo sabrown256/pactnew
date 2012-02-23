@@ -933,7 +933,8 @@ syment *_PD_ptr_read(PDBfile *file, int64_t addr, int force)
     al = _PD_ptr_get_al(file);
 
     ad = _PD_ptr_rd_lookup(file, addr, &frst);
-    ep = ad->entry;
+    if (ad != NULL)
+       ep = ad->entry;
 
 /* only partial reads can land here */
     if ((frst == TRUE) || (force == TRUE))
@@ -990,11 +991,12 @@ static void _PD_ptr_read_push(PDBfile *file, char **vr, PD_itag *pi,
 	naddr = -1L;
 
 	ad = _PD_ptr_rd_lookup(file, addr, pfrst);
-	if (ad->ptr == NULL)
-	   _PD_ptr_set_space(file, ad, vr, pi);
+	if (ad != NULL)
+	   {if (ad->ptr == NULL)
+	       _PD_ptr_set_space(file, ad, vr, pi);
 
-	DEREF(vr) = ad->ptr;
-	SC_mark(ad->ptr, 1);
+	    DEREF(vr) = ad->ptr;
+	    SC_mark(ad->ptr, 1);};
 
 /* this pointer has not been seen before */
 	if (*pfrst == TRUE)
@@ -1040,21 +1042,23 @@ int _PD_ptr_rd_itags(PDBfile *file, char **vr, PD_itag *pi)
    {int frst;
     char *p;
 
-    if ((*file->rd_itag)(file, *vr, pi) == FALSE)
-       PD_error("BAD ITAG - _PD_PTR_RD_ITAGS", PD_READ);
+    frst = FALSE;
+    if (vr != NULL)
+       {if ((*file->rd_itag)(file, *vr, pi) == FALSE)
+	   PD_error("BAD ITAG - _PD_PTR_RD_ITAGS", PD_READ);
 
 /* handle NULL pointer case */
-    if ((pi->addr == -1) || (pi->nitems == 0L))
-       {*vr  = NULL;
-	frst = FALSE;}
+	if ((pi->addr == -1) || (pi->nitems == 0L))
+	   {*vr  = NULL;
+	    frst = FALSE;}
 
-    else if ((_PD_IS_SEQUENTIAL) || (file->use_itags == FALSE))
-       _PD_ptr_read_push(file, vr, pi, &frst);
+	else if ((_PD_IS_SEQUENTIAL) || (file->use_itags == FALSE))
+	   _PD_ptr_read_push(file, vr, pi, &frst);
 
-    else
-       {frst = TRUE;
-	p    = _PD_ptr_alloc_space(file, vr, pi, TRUE);
-	SC_ASSERT(p != NULL);};
+	else
+	   {frst = TRUE;
+	    p    = _PD_ptr_alloc_space(file, vr, pi, TRUE);
+	    SC_ASSERT(p != NULL);};};
 
     return(frst);}
 
@@ -1071,10 +1075,10 @@ void _PD_ptr_rd_install_addr(PDBfile *file, int64_t addr,
     PD_address *ad;
 
     if ((_PD_IS_SEQUENTIAL) || (file->use_itags == FALSE))
-       {ad   = _PD_ptr_rd_lookup(file, addr, NULL);
-	here = _PD_get_current_address(file, PD_READ);
-
-	ad->reta = here;};
+       {ad = _PD_ptr_rd_lookup(file, addr, NULL);
+	if (ad != NULL)
+	   {here = _PD_get_current_address(file, PD_READ);
+	    ad->reta = here;};};
 
 /* restore the file pointer to its original location if necessary */
     if (loc != LOC_HERE)
@@ -1229,11 +1233,11 @@ int _PD_ptr_wr_itags(PDBfile *file, char *name, void *vr, inti ni, char *type)
 	       _PD_ptr_remove_addr(al, ad, FALSE);};
 
 	ad = _PD_ptr_wr_lookup(file, vr, &loc, TRUE, FALSE);
-
-	if (loc == LOC_HERE)
-	   ad->addr = addr;
-	else
-	   addr = ad->addr;}
+	if (ad != NULL)
+	   {if (loc == LOC_HERE)
+	       ad->addr = addr;
+	    else
+	       addr = ad->addr;};}
 
     else
        {n  = _PD_ptr_get_n_spaces(file, TRUE);

@@ -108,7 +108,7 @@ object *UL_fft(SS_psides *si, int j)
 
     n = PM_fft_sc_real_data(&cy, &x[0], crv->x[0], crv->x[1], crv->n,
                             xmn, xmx, _SX.fft_order);
-    if (n == 0)
+    if ((n == 0) || (cy == NULL))
        SS_error(si, "FFT FAILED - UL_FFT", SS_null);
 
     else
@@ -487,6 +487,8 @@ static object *_ULI_fit_curve(SS_psides *si, object *argl)
     char local[MAXLINE];
     PM_matrix *ay, *a, *solution;
     object *ch;
+
+    ch = SS_null;
 
     SS_args(si, argl,
             UL_CURVE_INDEX_I, &j,
