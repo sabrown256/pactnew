@@ -60,6 +60,8 @@ static int _PD_fcseek(FILE *fp, int64_t addr, int offset)
     cf = GET_CONTAINERF(fp);
     fl = GET_FILE(cf);
 
+    ada = -1;
+
 /* compute the absolute container address */
     switch (offset)
        {case SEEK_SET :

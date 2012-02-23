@@ -351,29 +351,30 @@ defstr *PD_defstr_alt(PDBfile *file ARG(,,cls), char *name, int nmemb,
          desc  = _PD_mk_descriptor(nxt, doffs);
          type  = CSTRSAVE(nxt);
          ptype = SC_firsttok(type, " \n");
-         if (SC_hasharr_lookup(fchrt, ptype) == NULL)
-            if ((strcmp(ptype, name) != 0) || !_PD_indirection(nxt))
-               {snprintf(pa->err, MAXLINE,
-			 "ERROR: %s BAD MEMBER TYPE - PD_DEFSTR_ALT\n",
-			 nxt);
-                return(NULL);};
+	 if (ptype != NULL)
+	    {if (SC_hasharr_lookup(fchrt, ptype) == NULL)
+		{if ((strcmp(ptype, name) != 0) || !_PD_indirection(nxt))
+		    {snprintf(pa->err, MAXLINE,
+			      "ERROR: %s BAD MEMBER TYPE - PD_DEFSTR_ALT\n",
+			      nxt);
+		     return(NULL);};};
 
-         dp2 = PD_inquire_table_type(fchrt, ptype);
-         if ((dp2 != NULL)  && !(_PD_indirection(desc->type)))
-            if (dp2->n_indirects > 0)
-               {snprintf(pa->err, MAXLINE,
-			 "ERROR: STATIC MEMBER STRUCT %s CANNOT CONTAIN INDIRECTS\n",
-			 ptype);
-                return(NULL);};
+	     dp2 = PD_inquire_table_type(fchrt, ptype);
+	     if ((dp2 != NULL)  && !(_PD_indirection(desc->type)))
+	        {if (dp2->n_indirects > 0)
+		    {snprintf(pa->err, MAXLINE,
+			      "ERROR: STATIC MEMBER STRUCT %s CANNOT CONTAIN INDIRECTS\n",
+			      ptype);
+		      return(NULL);};};
 
-         CFREE(type);
-         if (lst == NULL)
-            lst = desc;
-         else
-	    {prev->next = desc;
-	     SC_mark(desc, 1);};
+	     CFREE(type);
+	     if (lst == NULL)
+	        lst = desc;
+	     else
+	        {prev->next = desc;
+		 SC_mark(desc, 1);};
 
-         prev = desc;};
+	     prev = desc;};};
 
 /* install the type in all charts */
     dp = _PD_defstr_inst(file, name, STRUCT_KIND, lst,

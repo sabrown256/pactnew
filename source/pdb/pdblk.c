@@ -723,21 +723,22 @@ int _PD_block_csum_read(PDBfile *file)
 	SC_ASSERT(n > 0);
 
 	ep = PD_inquire_entry(file, name, FALSE, NULL);
-	bl = ep->blocks;
-	nb = SC_array_get_n(bl);
+	if (ep != NULL)
+	   {bl = ep->blocks;
+	    nb = SC_array_get_n(bl);
 
-	for (ie = 0L; ie < ne; ie++)
-	    {token = SC_strtok(NULL, " \n", s);
-	     if (token == NULL)
-	        {_PD_get_token(NULL, local, bsz, '\n');
-		 token = SC_strtok(local, " \n", s);};
+	    for (ie = 0L; ie < ne; ie++)
+	        {token = SC_strtok(NULL, " \n", s);
+		 if (token == NULL)
+		    {_PD_get_token(NULL, local, bsz, '\n');
+		     token = SC_strtok(local, " \n", s);};
 		     
-	     j   = SC_stoi(token);
-	     dig = (unsigned char *) SC_strtok(NULL, " \n", s);
+		 j   = SC_stoi(token);
+		 dig = (unsigned char *) SC_strtok(NULL, " \n", s);
 
-	     if (j < nb)
-	        {_PD_block_set_csum(bl, j, dig);
-		 _PD_block_set_valid(bl, j, PD_BLOCK_UNVERIFIED);};};};
+		 if (j < nb)
+		    {_PD_block_set_csum(bl, j, dig);
+		     _PD_block_set_valid(bl, j, PD_BLOCK_UNVERIFIED);};};};};
 
     file->file_cksum |= PD_MD5_RW;
 

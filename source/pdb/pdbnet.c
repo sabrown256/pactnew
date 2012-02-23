@@ -570,7 +570,9 @@ defstr *PN_defstr(hasharr *chart, char *name, data_alignment *align,
          type  = CSTRSAVE(nxt);
          ptype = SC_firsttok(type, " \n");
          if (SC_hasharr_lookup(chart, ptype) == NULL)
-            if ((strcmp(ptype, name) != 0) || !_PD_indirection(nxt))
+            if ((ptype == NULL) ||
+		(strcmp(ptype, name) != 0) ||
+		(_PD_indirection(nxt) == FALSE))
                {snprintf(pa->err, MAXLINE,
                          "ERROR: %s BAD MEMBER TYPE - PN_DEFSTR\n",
                          nxt);

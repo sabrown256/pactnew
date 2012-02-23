@@ -507,6 +507,7 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
     int id, ifx, ifp, icx;
     inti i, j, offset;
     char bf[MAXLINE], s[MAXLINE];
+    char *t;
     defstr *pd;
     FILE *f0;
     char *prefix, *before, *nodename;
@@ -524,8 +525,11 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
     k  = 0;
     for (i = 0L; i < ni; i++, j += offset, k++)
         {if (k > PD_print_controls[4])
-            {m  = strlen(PD_index_to_expr(bf, j,
-					  prnt->dims, prnt->mjr, prnt->def_off));
+            {t  = PD_index_to_expr(bf, j,
+				   prnt->dims,
+				   prnt->mjr,
+				   prnt->def_off);
+             m  = (t != NULL) ? strlen(t) : 0;
              nn = max(nn, m);
              k  = 0;};};
     nn += 7;
@@ -533,7 +537,7 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
     memset(s, ' ', LINE_SIZE);
 
     pd  = PD_inquire_host_type(file, type);
-    isz = pd->size;
+    isz = (pd != NULL) ? pd->size : 0;
     id  = SC_type_id(type, FALSE);
 
     prnt->nn     = nn;
@@ -765,6 +769,8 @@ static int _PD_print_indirection(PD_printdes *prnt, PDBfile *file, char **vr,
          before = after;};
 
     CFREE(dtype);
+
+    prnt->nodename = NULL;
 
     return(status);}
 
