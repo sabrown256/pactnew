@@ -13375,8 +13375,9 @@ static void ProcessRefFrame(MpegFrame *frame, BitBucket *bb, int lastFrame,
  */
 	     else
 	        {printf("Yow, I doubt this works!\n");
-		 bFrame = pastRefFrame->next;
-		 pastRefFrame->next = bFrame->next;};
+		 if (pastRefFrame != NULL)
+		    {bFrame = pastRefFrame->next;
+		     pastRefFrame->next = bFrame->next;};};
 
 	     if (separateFiles)
 	        {if (bb != NULL)
@@ -21477,7 +21478,10 @@ void Parse_Specifics_File_v1(FILE *fp)
     char typ; 
     FrameSpecList *current, *new;
 
-    fsl     = MakeFslEntry();
+    fsl = MakeFslEntry();
+    if (fsl == NULL)
+       return;
+
     current = fsl;
     qs      = 0;
 
@@ -21537,6 +21541,9 @@ void Parse_Specifics_File_v2(FILE *fp)
     boolean relative;
 
     fsl = MakeFslEntry();
+    if (fsl == NULL)
+       return;
+
     current = fsl;
 
     new = NULL;
@@ -21554,11 +21561,12 @@ void Parse_Specifics_File_v2(FILE *fp)
 	         lp += 6;
 		 sscanf(lp, "%d %c %d", &fnum, &typ, &qs);
 		 new = MakeFslEntry();
-		 if (current->framenum != -1)
-		    {current->next = new;
-		     current = new;}
-		 else
-		    free(new);
+		 if (new != NULL)
+		    {if (current->framenum != -1)
+		        {current->next = new;
+			 current = new;}
+		     else
+		        free(new);};
 		 current->framenum = fnum;
 		 current->frametype = CvtType(typ);
 		 if (qs <= 0)
@@ -21593,40 +21601,41 @@ void Parse_Specifics_File_v2(FILE *fp)
 
 		 qs = newqs;
 		 new_blk = AddBs(current, bnum, relative, qs);
-		 if (num_scanned > 2)
+		 if ((new_blk != NULL) && (num_scanned > 2))
 		    {BlockMV *tmp;
 
 		     tmp = CMAKE(BlockMV);
-		     switch (num_scanned)
-		        {case 7:
-			      tmp->typ = TYP_BOTH;
-			      tmp->fx = fx;
-			      tmp->fy = fy;
-			      tmp->bx = sx;
-			      tmp->by = sy;
-			      new_blk->mv = tmp;
-			      break;
-			 case 3:
-			      tmp->typ = TYP_SKIP;
-			      new_blk->mv = tmp;
-			      break;
-			 case 5:
-			      if (my_upper(kind[0]) == 'B')
-				 {tmp->typ = TYP_BACK;
-				  tmp->bx = fx;
-				  tmp->by = fy;}
-			      else
-				 {tmp->typ = TYP_FORW;
+		     if (tmp != NULL)
+		        {switch (num_scanned)
+			    {case 7:
+			          tmp->typ = TYP_BOTH;
 				  tmp->fx = fx;
-				  tmp->fy = fy;};
+				  tmp->fy = fy;
+				  tmp->bx = sx;
+				  tmp->by = sy;
+				  new_blk->mv = tmp;
+				  break;
+			     case 3:
+				  tmp->typ = TYP_SKIP;
+				  new_blk->mv = tmp;
+				  break;
+			     case 5:
+				  if (my_upper(kind[0]) == 'B')
+				     {tmp->typ = TYP_BACK;
+				      tmp->bx = fx;
+				      tmp->by = fy;}
+				  else
+				     {tmp->typ = TYP_FORW;
+				      tmp->fx = fx;
+				      tmp->fy = fy;};
 
-			      new_blk->mv = tmp;
-			      break;
-			 default:
-			      free(tmp);
-			      io_printf(stderr,
-					"Bug in specifics file!  Skipping short/long entry: %s\n",line);
-			      break;};}
+				  new_blk->mv = tmp;
+				  break;
+			     default:
+				  free(tmp);
+				  io_printf(stderr,
+					    "Bug in specifics file!  Skipping short/long entry: %s\n",line);
+				  break;};};}
 		 else
 		    new_blk->mv = (BlockMV *) NULL;
 		 

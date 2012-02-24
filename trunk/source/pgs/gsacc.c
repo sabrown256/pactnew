@@ -449,7 +449,14 @@ void PG_fset_font(PG_device *dev ARG(,in,cls),
    {
 
     if ((dev != NULL) && (dev->set_font != NULL))
-       dev->set_font(dev, face, style, sz);
+       {if (face == NULL)
+	   face = dev->type_face;
+	if (style == NULL)
+	   style = dev->type_style;
+	if (sz == -1)
+	   sz = dev->type_size;
+
+	dev->set_font(dev, face, style, sz);};
 
     return;}
 

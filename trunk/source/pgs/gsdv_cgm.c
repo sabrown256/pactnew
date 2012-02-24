@@ -553,6 +553,9 @@ static void _PG_CGM_write_text(PG_device *dev, FILE *fp, char *s)
     double x[PG_SPACEDM], ix[PG_SPACEDM];
     PG_dev_geometry *g;
 
+    memset(x, 0, sizeof(x));
+    memset(ix, 0, sizeof(ix));
+
     g = &dev->g;
 
     x[0] = dev->tcur[0];

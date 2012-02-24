@@ -348,6 +348,10 @@ static int _PG_fix_orientation(int *js, int in, long *edge, double **x, int nd)
 		      1.0, 1.0, 1.0}};
     double *px;
 
+    memset(dx1, 0, sizeof(dx1));
+    memset(dx2, 0, sizeof(dx2));
+    memset(dxn, 0, sizeof(dxn));
+
     if (x == NULL)
        {js[0] -= in;
 	js[1] -= in;
@@ -1099,6 +1103,8 @@ static int _PG_examine_poly(itf_array *ifs, int it)
 	   {in = cl[0];
 	    im = in;
 	    ok = FALSE;
+	    i1 = 0;
+	    i2 = 0;
 
 /* check the diagonals thru the cell */
 	    for (ia = 0; TRUE; ia++)

@@ -1862,6 +1862,9 @@ static INLINE double _PG_tr_ndc_to_frm_b(PG_device *dev, int id,
 
     g = &dev->g;
 
+    ua = 0.0;
+    ub = 1.0;
+
     l  = 2*id;
     f  = g->fr[l];
     df = g->fr[l+1] - f;

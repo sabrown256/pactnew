@@ -257,7 +257,7 @@ PG_graph *PG_make_graph_from_sets(char *name, PM_set *domain, PM_set *range,
     PG_graph *g;
 
 /* build the mapping */
-    if (domain->topology == NULL)
+    if ((domain == NULL) || (domain->topology == NULL))
        f = PM_make_mapping(name, PM_LR_S, domain, range, centering, NULL);
     else
        f = PM_make_mapping(name, PM_AC_S, domain, range, centering, NULL);
@@ -912,6 +912,10 @@ PG_curve *PG_copy_curve(PG_curve *icv, PG_device *odv, PG_device *idv)
     double p[PG_SPACEDM], t[PG_SPACEDM];
     double ixo[PG_SPACEDM], oxo[PG_SPACEDM];
     PG_curve *ocv;
+
+    memset(p,   0, sizeof(p));
+    memset(ixo, 0, sizeof(ixo));
+    memset(oxo, 0, sizeof(oxo));
 
     ocv = CMAKE(PG_curve);
 

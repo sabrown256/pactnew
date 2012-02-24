@@ -88,6 +88,8 @@ static void _PG_draw_scatter(PG_device *dev, int nd, double **f,
 
 /* allocate space for the rotated points */
     r = PM_copy_vectors(3, nn, t);
+    if (r == NULL)
+       return;
 
     for (i = 0; i < 4; i++)
         bx[i] = dextr[i];
@@ -286,6 +288,8 @@ PG_picture_desc *PG_setup_picture_scatter(PG_device *dev, PG_graph *data,
     change = !dev->supress_setup;
 
     pd = PG_get_rendering_properties(dev, data);
+    if (pd == NULL)
+       return(NULL);
 
     pd->legend_contour_fl = FALSE;
 

@@ -360,22 +360,23 @@ static int PG_CGM_string(PG_device *dev, char **pb, long ns, long accb,
 unsigned char *PG_c_str_pascal(unsigned char *bf, char *s, long n, int pad)
    {int nc;
 
-    nc = (s != NULL) ? strlen(s) : 0;
+    if (s != NULL)
+       {nc = strlen(s);
 
 /* compute n ignoring anything beyond 254 characters */
-    n = (n >= 0) ? n : nc;
-    n = min(n, 254);
+	n = (n >= 0) ? n : nc;
+	n = min(n, 254);
 
-    pad = (pad && EVEN(n));
+	pad = (pad && EVEN(n));
 
 /* make the PASCAL copy of the string */
-    *bf++ = n;
-    while (n--)
-       *bf++ = *s++;
+	*bf++ = n;
+	while (n--)
+	   *bf++ = *s++;
 
 /* force total number of characters to be even */
-    if (pad)
-       *bf++ = '\0';
+	if (pad)
+	   *bf++ = '\0';};
 
     return(bf);}
 
@@ -396,6 +397,11 @@ int PG_CGM_command(PG_device *dev, int cat, int id, int nparams, ...)
     PG_palette *cp;
 
     nbytes = 0L;
+    cp     = NULL;
+    memset(ppcv, 0, sizeof(ppcv));
+    memset(pcv, 0, sizeof(pcv));
+    memset(pdv, 0, sizeof(pdv));
+    memset(piv, 0, sizeof(piv));
 
     SC_VA_START(nparams);
     special = FALSE;

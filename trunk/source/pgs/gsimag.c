@@ -238,6 +238,8 @@ PG_picture_desc *PG_setup_picture_image(PG_device *dev, PG_graph *data,
     change = !dev->supress_setup;
 
     pd = PG_get_rendering_properties(dev, data);
+    if (pd == NULL)
+       return(NULL);
 
     alst = pd->alist;
     pri  = dev->pri;
@@ -714,13 +716,13 @@ void PG_draw_image(PG_device *dev, PG_image *im, char *label, pcons *alist)
 
 /* scale the image to fit its part of the viewport */
 	nim = PG_prep_image(dev, im, nx, ny);
+	if (nim != NULL)
+	   {if (_PG.pol_extr != NULL)
+	       PG_polar_image(nim, _PG.pol_extr, dev->BLACK);
 
-	if (_PG.pol_extr != NULL)
-	   PG_polar_image(nim, _PG.pol_extr, dev->BLACK);
+	    PG_put_image_n(dev, nim->buffer, PIXELC, pc);
 
-	PG_put_image_n(dev, nim->buffer, PIXELC, pc);
-
-	PG_rl_image(nim);
+	    PG_rl_image(nim);};
 
 	pd->mesh_fl &= (_PG.im_temp != NULL);
 	PG_finish_picture(dev, data, pd);
@@ -1100,7 +1102,8 @@ void PG_draw_2dpalette(PG_device *dev, double *frm, double *rex, double wid)
     pd  = pal->pal_dims;
 
     if ((pd == NULL) || (pal->max_pal_dims != 2))
-       PG_draw_palette_n(dev, frm, rex, wid, FALSE);
+       {PG_draw_palette_n(dev, frm, rex, wid, FALSE);
+	return;};
 
     PG_frame_viewport(dev, 2, frm);
 

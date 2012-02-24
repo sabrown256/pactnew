@@ -2384,6 +2384,9 @@ PG_palette *PG_make_ndim_palette(PG_device *tdev, char *name,
     PG_device *dev;
     PG_palette *root, *npal;
 
+    memset(x, 0, sizeof(x));
+    memset(y, 0, sizeof(y));
+
     if (name == NULL)
        name = CSTRSAVE("new");
 

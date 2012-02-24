@@ -474,6 +474,10 @@ static void write_va_arg(FILE *fp)
         {if (types[i] != NULL)
             write_va_arg_clause(fp, i);};
 
+    fprintf(fp, "       default:                                      \\\n");
+    fprintf(fp, "            _d = NULL;                               \\\n");
+    fprintf(fp, "            break;                                   \\\n");
+
     fprintf(fp, "       }                                             \\\n");
     fprintf(fp, "   }\n");
 
@@ -492,6 +496,10 @@ static void write_va_arg(FILE *fp)
     for (i = 0; i < N_TYPES; i++)
         {if (types[i] != NULL)
             write_va_arg_clause(fp, i);};
+
+    fprintf(fp, "       default:                                      \\\n");
+    fprintf(fp, "            _d = NULL;                               \\\n");
+    fprintf(fp, "            break;                                   \\\n");
 
     fprintf(fp, "       }                                             \\\n");
     fprintf(fp, "   }\n");

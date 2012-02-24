@@ -265,10 +265,8 @@ int PG_write_n(PG_device *dev ARG(,,cls), int nd ARG(2),
     double y[PG_SPACEDM];
     char *s;
 
-    if (dev == NULL)
-       rv = FALSE;
-
-    else if (dev->gprint_flag == TRUE)
+    rv = FALSE;
+    if ((dev != NULL) && (dev->gprint_flag == TRUE))
        {SC_VDSNPRINTF(TRUE, s, fmt);
 
 	if ((s != NULL) && (*s != '\0'))

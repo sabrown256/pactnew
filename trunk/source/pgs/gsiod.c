@@ -210,7 +210,8 @@ PG_interface_object *PG_add_iob(PG_device *dev,
 				   CENTER, 0.0, crv, flags, fc, bc,
                                    fsel, fdrw, fact, cnt);
 
-    PG_PUSH_CHILD_IOB(cnt, iob);
+    if (cnt != NULL)
+       {PG_PUSH_CHILD_IOB(cnt, iob);};
 
     return(iob);}
 

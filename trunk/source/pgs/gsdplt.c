@@ -761,21 +761,22 @@ static void _PG_dom_0d_3d(PG_device *dev, long npts,
 		       NULL);
 
     t = PM_copy_vectors(3, npts, r);
+    if (t != NULL)
 
 /* get rid of points outside the domain limits */
-    PG_box_copy(3, wc, dextr);
-    for (i = 0, n = 0; i < npts; i++)
-        {for (id = 0; id < 3; id++)
-	     u[id] = r[id][i];
-
-         if (PG_box_contains(3, wc, u) == TRUE)
+       {PG_box_copy(3, wc, dextr);
+	for (i = 0, n = 0; i < npts; i++)
 	    {for (id = 0; id < 3; id++)
-                 t[id][n] = t[id][i];
-             n++;};};
+	         u[id] = r[id][i];
 
-    PG_draw_markers_n(dev, 3, WORLDC, n, t, mrk);
+	     if (PG_box_contains(3, wc, u) == TRUE)
+	        {for (id = 0; id < 3; id++)
+		     t[id][n] = t[id][i];
+		 n++;};};
 
-    PM_free_vectors(3, t);
+	PG_draw_markers_n(dev, 3, WORLDC, n, t, mrk);
+
+	PM_free_vectors(3, t);};
 
     return;}
 
@@ -798,6 +799,8 @@ static void PG_label_nodes_3(PG_device *dev, double **x,
     PG_make_device_current(dev);
 
     r = PM_copy_vectors(3, n, x);
+    if (r == NULL)
+       return;
 
     PG_rotate_vectors(dev, 3, n, r);
 
@@ -970,6 +973,8 @@ PG_picture_desc *PG_setup_picture_mesh(PG_device *dev, PG_graph *data,
     change = !dev->supress_setup;
 
     pd = PG_get_rendering_properties(dev, data);
+    if (pd == NULL)
+       return(NULL);
 
     alst = pd->alist;
     PG_get_attrs_alist(alst,

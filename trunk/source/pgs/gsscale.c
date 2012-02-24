@@ -113,6 +113,9 @@ double _PG_axis_place(PG_device *dev, double *dx,
 
     g = &dev->g;
 
+    memset(tdx, 0, sizeof(tdx));
+
+    lmt = 0.030;
     csa = ad->cosa;
     sna = ad->sina;
     tty = ad->tick_type;

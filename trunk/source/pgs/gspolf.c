@@ -57,6 +57,8 @@ PG_picture_desc *PG_setup_picture_fill_poly(PG_device *dev, PG_graph *data,
     change = !dev->supress_setup;
 
     pd = PG_get_rendering_properties(dev, data);
+    if (pd == NULL)
+       return(NULL);
 
     pd->legend_contour_fl = FALSE;
 

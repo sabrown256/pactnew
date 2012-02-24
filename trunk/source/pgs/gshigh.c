@@ -80,6 +80,8 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
     if (dev == NULL)
        return;
 
+    memset(xb, 0, sizeof(xb));
+
     g   = &dev->g;
     hcd = HARDCOPY_DEVICE(dev);
 
@@ -112,7 +114,7 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
            {PG_fset_font(dev, face, style, 6);
             memset(label, '\0', MAXLINE);
 	    s = SC_date();
-            strcpy(label, s);
+            SC_strncpy(label, MAXLINE, s, -1);
 	    CFREE(s);
 #ifdef UNIX
 # ifndef SUNMOS

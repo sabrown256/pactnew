@@ -628,15 +628,16 @@ int _PG_X_draw_text(PG_device *dev, char *s, double *x)
 	   {_PG.txtd = PG_make_device("SCREEN", "COLOR", "TextBuffer");
 	    _PG_X_txt_open_screen(_PG.txtd, 0.3, 0.1);};
 
-	pad = 2;
+	if (_PG.txtd != NULL)
+	   {pad = 2;
 
-	bc = dev->BLACK;
-	fc = PG_fget_text_color(dev);
+	    bc = dev->BLACK;
+	    fc = PG_fget_text_color(dev);
 
-	_PG_X_txt_clear_window(_PG.txtd, bc);
-	_PG_X_txt_set_font(_PG.txtd, face, sty, sz);
-	_PG_X_txt_write_text(_PG.txtd, s, fc, pad, dx);
-	ok = _PG_X_txt_place_text(_PG.txtd, dx, dev, ir, bc, pad);
+	    _PG_X_txt_clear_window(_PG.txtd, bc);
+	    _PG_X_txt_set_font(_PG.txtd, face, sty, sz);
+	    _PG_X_txt_write_text(_PG.txtd, s, fc, pad, dx);
+	    ok = _PG_X_txt_place_text(_PG.txtd, dx, dev, ir, bc, pad);};
 
 	CFREE(face);
 	CFREE(sty);};
@@ -682,12 +683,13 @@ int _PG_rst_draw_text(PG_device *dev, char *s)
        {_PG.txtd = PG_make_device("SCREEN", "COLOR", "TextBuffer");
 	_PG_X_txt_open_screen(_PG.txtd, 0.3, 0.1);};
 
-    pad = 2;
+    if (_PG.txtd != NULL)
+       {pad = 2;
 
-    _PG_X_txt_clear_window(_PG.txtd, bc);
-    _PG_X_txt_set_font(_PG.txtd, "helvetica", sty, sz);
-    _PG_X_txt_write_text(_PG.txtd, s, fc, pad, dx);
-    ok = _PG_X_txt_place_image(_PG.txtd, dx, dev, io, bc, pad);
+	_PG_X_txt_clear_window(_PG.txtd, bc);
+	_PG_X_txt_set_font(_PG.txtd, "helvetica", sty, sz);
+	_PG_X_txt_write_text(_PG.txtd, s, fc, pad, dx);
+	ok = _PG_X_txt_place_image(_PG.txtd, dx, dev, io, bc, pad);};
 
     CFREE(face);
     CFREE(sty);

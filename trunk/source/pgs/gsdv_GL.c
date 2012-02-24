@@ -1078,9 +1078,9 @@ static void _PG_GL_clear_region(PG_device *dev, int nd, PG_coord_sys cs,
 	XClearArea(disp, dev->window, pc[0], pc[2],
 		   (unsigned int) iw, (unsigned int) ih, TRUE);
     
-	PG_release_current_device(dev);};
+	PG_release_current_device(dev);
 
-    _PG_clear_raster_region(dev, nd, cs, bx, pad);
+	_PG_clear_raster_region(dev, nd, cs, bx, pad);};
 
     return;}
  
@@ -1573,7 +1573,10 @@ static void _PG_GL_mouse_event_info(PG_device *dev, PG_event *ev,
 	     break;
 	case 3 :
 	     eb = MOUSE_RIGHT;
-	     break;};
+	     break;
+	default :
+	     eb = MOUSE_NONE;
+	     break;
     *peb = eb;
 
 /* button modifers */

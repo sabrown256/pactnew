@@ -756,8 +756,7 @@ int PG_set_axis_attributes(PG_device *dev, ...)
 /* set attribute values */
     PG_fset_clipping(dev, FALSE);
     PG_fset_text_color(dev, txtcolor, TRUE);
-    PG_fset_font(dev, _PG_gattrs.axis_type_face,
-		 dev->type_style, dev->type_size);
+    PG_fset_font(dev, _PG_gattrs.axis_type_face, NULL, -1);
     PG_fset_char_path(dev, chpth);
     PG_fset_char_precision(dev, prec);
     PG_fset_char_up(dev, chup);
