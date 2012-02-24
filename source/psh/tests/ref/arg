@@ -78,6 +78,9 @@
             {char * *_pv = (char * *) (_d);                \
              _pv[_n] = va_arg(__a__, char *);};        \
             break;                                 \
+       default:                                      \
+            _d = NULL;                               \
+            break;                                   \
        }                                             \
    }
 #else
@@ -158,6 +161,9 @@
             {char * *_pv = (char * *) (_d);                \
              _pv[_n] = va_arg(__a__, char *);};        \
             break;                                 \
+       default:                                      \
+            _d = NULL;                               \
+            break;                                   \
        }                                             \
    }
 #endif

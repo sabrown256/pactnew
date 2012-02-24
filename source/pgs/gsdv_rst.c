@@ -112,7 +112,8 @@ void PG_make_raster_family_name(PG_RAST_device *mdv, char *fname, int nc)
     if (mdv != NULL)
        {SC_strncpy(t, MAXLINE, mdv->out_fname, -1);
 	ext    = strrchr(t, '.');
-	*ext++ = '\0';
+	if (ext != NULL)
+	   *ext++ = '\0';
 
 	snprintf(fname, nc, "%s.%03d.%s", t, mdv->nf++, ext);};
 
@@ -227,25 +228,26 @@ void _PG_clear_raster_region(PG_device *dev, int nd, PG_coord_sys cs,
     double box[6];
     PG_RAST_device *mdv;
 
-    GET_RAST_DEVICE(dev, mdv);
+    if (dev != NULL)
+       {GET_RAST_DEVICE(dev, mdv);
 
-    if ((dev != NULL) && (mdv != NULL))
-       {w = PG_window_width(dev);
-	h = PG_window_height(dev);
+	if (mdv != NULL)
+	   {w = PG_window_width(dev);
+	    h = PG_window_height(dev);
 
-	if ((0 < w) && (0 < h))
-	   {p = ((double) pad)/((double) w);
+	    if ((0 < w) && (0 < h))
+	       {p = ((double) pad)/((double) w);
 
-	    PG_box_init(3, box, HUGE, -HUGE);
-	    PG_box_copy(nd, box, bx);
-	    PG_trans_box(dev, nd, cs, box, NORMC, box);
+		PG_box_init(3, box, HUGE, -HUGE);
+		PG_box_copy(nd, box, bx);
+		PG_trans_box(dev, nd, cs, box, NORMC, box);
 
-	    for (id = 0; id < nd; id++)
-	        {l         = 2*id;
-		 box[l]   -= p;
-		 box[l+1] += p;};
+		for (id = 0; id < nd; id++)
+		    {l         = 2*id;
+		     box[l]   -= p;
+		     box[l+1] += p;};
 
-	    _PG_clear_raster_box(dev, NULL, 3, box, FALSE);};};
+		_PG_clear_raster_box(dev, NULL, 3, box, FALSE);};};};
 
     return;}
  

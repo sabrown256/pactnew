@@ -233,9 +233,13 @@ char *_PG_X_get_font_field(char *d, char *s, int n)
     for (i = 1; (i < n) && (ps != NULL); i++)
         ps = strchr(ps, '-') + 1;
 
-    pt = strchr(ps, '-');
-    nc = pt - ps;
-    strncpy(d, ps, nc);
+    if (ps != NULL)
+       {pt = strchr(ps, '-');
+	nc = pt - ps;
+	strncpy(d, ps, nc);}
+    else
+       nc = 0;
+
     d[nc] = '\0';
 
     return(d);}
@@ -1306,9 +1310,9 @@ static void _PG_X_clear_region(PG_device *dev, int nd, PG_coord_sys cs,
 	   XClearArea(disp, PG_X11_DRAWABLE(dev), ipc[0], ipc[1],
 		       ipc[2], ipc[3], TRUE);
     
-	PG_release_current_device(dev);};
+	PG_release_current_device(dev);
 
-    _PG_clear_raster_region(dev, nd, cs, bx, pad);
+	_PG_clear_raster_region(dev, nd, cs, bx, pad);};
 
     return;}
  

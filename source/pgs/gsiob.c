@@ -294,15 +294,15 @@ static void _PG_find_registered(PG_interface_object *iob, haelem **php,
     int ityp;
     char *name, *type;
 
+    hp   = NULL;
+    ityp = 0;
+
     if (iob != NULL)
        {name = iob->name;
 	hp   = SC_hasharr_lookup(_PG.callback_tab, name);
 	if (hp != NULL)
 	   {type = hp->type;
-	    ityp = SC_type_id(type, FALSE);};}
-    else
-       {hp   = NULL;
-	ityp = 0;};
+	    ityp = SC_type_id(type, FALSE);};};
 
     *php   = hp;
     *pityp = ityp;
@@ -1642,6 +1642,9 @@ PG_interface_object *PG_make_interface_object(PG_device *dev,
    {PG_interface_object *iob;
     PFVoid fnc;
 
+    if (name == NULL)
+       name = "unknown";
+
     iob = CMAKE(PG_interface_object);
    
     iob->device        = dev;
@@ -1670,26 +1673,26 @@ PG_interface_object *PG_make_interface_object(PG_device *dev,
        {PG_text_box *b;
 
 	b = PG_open_text_rect(dev, "IOB", FALSE, NULL, crv, 0.0, TRUE);
+	if (b != NULL)
+	   {CFREE(b->text_buffer[0]);
+	    b->text_buffer[0] = CSTRSAVE(name);
+	    b->n_chars_line = max(b->n_chars_line, strlen(name));
+	    b->align        = align;
+	    b->angle        = ang;
+	    b->foreground   = fc;
+	    b->background   = bc;
 
-	CFREE(b->text_buffer[0]);
-	b->text_buffer[0] = CSTRSAVE(name);
-	b->n_chars_line = max(b->n_chars_line, strlen(name));
-	b->align        = align;
-	b->angle        = ang;
-        b->foreground   = fc;
-        b->background   = bc;
+	    if (b->n_lines > 2)
+	       b->type = SCROLLING_WINDOW;
+	    else
+	       {b->type   = FALSE;
+		b->border = 0.0;};
 
-        if (b->n_lines > 2)
-           b->type = SCROLLING_WINDOW;
-        else
-           {b->type   = FALSE;
-	    b->border = 0.0;};
+	    iob->obj    = (void *) b;
+	    iob->action = (PFIobAction) PG_handle_key_press;
+	    iob->draw   = _PG_draw_text_object;
 
-        iob->obj    = (void *) b;
-        iob->action = (PFIobAction) PG_handle_key_press;
-	iob->draw   = _PG_draw_text_object;
-
-        _PG_set_text_background_color(iob, FALSE);}
+	    _PG_set_text_background_color(iob, FALSE);};}
 
     else if (strcmp(type, PG_VARIABLE_OBJECT_S) == 0)
        iob->draw = _PG_draw_variable_object;

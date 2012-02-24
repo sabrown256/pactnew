@@ -86,6 +86,8 @@ static PG_triangle *PG_triangularize_ac(PG_device *dev, PM_mesh_topology *mt,
     SC_ASSERT(nn > 0);
 
     t = PM_copy_vectors(nd, nc[0], r);
+    if (t == NULL)
+       return(NULL);
 
     box = g->wc;
 

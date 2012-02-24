@@ -167,10 +167,11 @@ int _PG_rst_set_font(PG_device *dev, char *face, char *style, int size)
 void _PG_rst_set_char_size(PG_device *dev, int nd, PG_coord_sys cs, double *x)
    {double p[PG_SPACEDM];
 
-    PG_trans_point(dev, nd, cs, x, NORMC, p);
+    if ((x != NULL) && (nd >= 2))
+       {PG_trans_point(dev, nd, cs, x, NORMC, p);
 
-    dev->char_height_s = p[0];
-    dev->char_width_s  = p[1];
+	dev->char_height_s = p[0];
+	dev->char_width_s  = p[1];};
 
     return;}
 

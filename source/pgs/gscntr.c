@@ -189,7 +189,8 @@ static void _PG_poly_fill_contour(PG_device *dev, double *lev,
 				  double *a, double *px, double *py,
 				  int is1, int is2, long *sides,
 				  int nsp, int id, int method,
-				  int *mcnt, int *mark, double *xpt, double *ypt)
+				  int *mcnt, int *mark,
+				  double *xpt, double *ypt)
    {int inp, onp, ofs, clr;
     int is, os, in1, in2, ic, l1, l2;
     int icross[20];
@@ -202,6 +203,9 @@ static void _PG_poly_fill_contour(PG_device *dev, double *lev,
 
     if (dev == NULL)
        return;
+
+    memset(ilx, 0, sizeof(ilx));
+    memset(ily, 0, sizeof(ily));
 
     clr = _PG_get_fill_contour_color(dev, ilev, levmx);
 
@@ -371,57 +375,59 @@ PG_picture_desc *PG_setup_picture_contour(PG_device *dev, PG_graph *data,
     change = !dev->supress_setup;
 
     pd = PG_get_rendering_properties(dev, data);
+    if (pd != NULL)
 
 /* we are drawing a contour plot so we do not want a fill-poly type legend */
-    pd->legend_palette_fl = FALSE;
+       {pd->legend_palette_fl = FALSE;
 
-    alst = pd->alist;
-    pri  = dev->pri;
-    if (pri != NULL)
-       {dd = pri->dd;
-	if (dd != NULL)
-	   {dd->pri->alist  = alst;
-	    dd->pri->render = PLOT_CONTOUR;};};
+	alst = pd->alist;
+	pri  = dev->pri;
+	if (pri != NULL)
+	   {dd = pri->dd;
+	    if (dd != NULL)
+	       {dd->pri->alist  = alst;
+		dd->pri->render = PLOT_CONTOUR;};};
 
 /* setup the viewport */
-    vwprt = pd->viewport;
-    if (vwprt != NULL)
-       PG_box_copy(2, ndc, vwprt);
-    else
-       {ndc[0] = 0.175;
-        ndc[1] = 0.735;
-        ndc[2] = 0.175;
-        ndc[3] = 0.825;};
+	vwprt = pd->viewport;
+	if (vwprt != NULL)
+	   PG_box_copy(2, ndc, vwprt);
+	else
+	   {ndc[0] = 0.175;
+	    ndc[1] = 0.735;
+	    ndc[2] = 0.175;
+	    ndc[3] = 0.825;};
 
-    if (change)
-       {PG_set_viewspace(dev, 2, NORMC, ndc);
+	if (change)
+	   {PG_set_viewspace(dev, 2, NORMC, ndc);
 
 /* find the extrema for this frame */
-	PG_find_extrema(data, 0.0, &dpex, &rpex, &nde, &ddex, &nre, &rdex);
+	    PG_find_extrema(data, 0.0, &dpex, &rpex,
+			    &nde, &ddex, &nre, &rdex);
 
 /* setup the range limits */
-	prx = ((dev->autorange == TRUE) || (rpex == NULL)) ? rdex : rpex;
-	PG_register_range_extrema(dev, nre, prx);
+	    prx = ((dev->autorange == TRUE) || (rpex == NULL)) ? rdex : rpex;
+	    PG_register_range_extrema(dev, nre, prx);
 
 /* setup the domain limits */
-	pdx = ((dev->autodomain == TRUE) || (dpex == NULL)) ? ddex : dpex;
-	PG_set_viewspace(dev, nde, WORLDC, pdx);
+	    pdx = ((dev->autodomain == TRUE) || (dpex == NULL)) ? ddex : dpex;
+	    PG_set_viewspace(dev, nde, WORLDC, pdx);
 
-	CFREE(ddex);
-	CFREE(rdex);
+	    CFREE(ddex);
+	    CFREE(rdex);
 
 /* set up the drawing properties */
-	PG_fset_palette(dev, "standard");
+	    PG_fset_palette(dev, "standard");
 
-	PG_fset_line_color(dev, dev->WHITE, TRUE);
-	PG_fset_text_color(dev, dev->WHITE, TRUE);
+	    PG_fset_line_color(dev, dev->WHITE, TRUE);
+	    PG_fset_text_color(dev, dev->WHITE, TRUE);
 
-	PG_setup_iso_levels(dev, data, pd);
+	    PG_setup_iso_levels(dev, data, pd);
 
-	domain = data->f->domain;
-	if (domain->dimension_elem == 3)
-	   {pd->ax_type = CARTESIAN_3D;
-	    pd->axis_fl = FALSE;};};
+	    domain = data->f->domain;
+	    if (domain->dimension_elem == 3)
+	       {pd->ax_type = CARTESIAN_3D;
+		pd->axis_fl = FALSE;};};};
 
     return(pd);}
 

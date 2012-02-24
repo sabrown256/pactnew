@@ -541,6 +541,8 @@ static void *_PG_do_scan_line(void *arg)
        printf("-> %s\n", *((char **) -1));
 #endif
 
+    memset(a, 0, sizeof(a));
+
     par = (PG_scan_line_data *) arg;
 
     ds       = par->ds;
@@ -920,6 +922,8 @@ PG_picture_desc *PG_setup_picture_surface(PG_device *dev, PG_graph *data,
     change = !dev->supress_setup;
 
     pd = PG_get_rendering_properties(dev, data);
+    if (pd == NULL)
+       return(NULL);
 
     PM_copy_point(PG_SPACEDM, va, pd->va);
     PG_fset_view_angle(dev, TRUE, &va[0], &va[1], &va[2]);

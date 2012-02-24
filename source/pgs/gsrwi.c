@@ -390,19 +390,20 @@ static void _PG_fix_flags(PG_device *dev, int *flags, char *ps)
     flags[2] = FALSE;
 
     strcpy(t, SC_firsttok(ps, ")"));
-    while (TRUE)
-       {tok = SC_firsttok(t, " ,");
-        if (tok == NULL)
-           break;
+    if (t != NULL)
+       {while (TRUE)
+	   {tok = SC_firsttok(t, " ,");
+	    if (tok == NULL)
+	       break;
 
-        if (strcmp(tok, "IsVis") == 0)
-           flags[0] = TRUE;
+	    if (strcmp(tok, "IsVis") == 0)
+	       flags[0] = TRUE;
 
-        else if (strcmp(tok, "IsSel") == 0)
-           flags[1] = TRUE;
+	    else if (strcmp(tok, "IsSel") == 0)
+	       flags[1] = TRUE;
 
-        else if (strcmp(tok, "IsAct") == 0)
-           flags[2] = TRUE;};
+	    else if (strcmp(tok, "IsAct") == 0)
+	       flags[2] = TRUE;};};
 
     return;}
 
@@ -454,10 +455,12 @@ static void _PG_fix_action(PG_device *dev, char **pfct, void **pobj, char *ps)
 
     obj  = NULL;
     fact = SC_firsttok(ps, ")");
-    item = strchr(fact, ',');
-    if (item != NULL)
-       {*item++ = '\0';
-        obj = (void *) PG_find_object(dev, item, (PG_interface_object *) NULL);};
+    if (fact != NULL)
+       {item = strchr(fact, ',');
+	if (item != NULL)
+	   {*item++ = '\0';
+	    obj = (void *) PG_find_object(dev, item,
+					  (PG_interface_object *) NULL);};};
 
     *pfct = fact;
     *pobj = obj;
@@ -478,7 +481,7 @@ static void _PG_fix_boundary(PG_device *dev, int *pnp, double **pxd, double **py
     char *tok;
 
     tok = SC_firsttok(ps, ")");
-    if (strcmp(tok, "RECT") == 0)
+    if ((tok != NULL) && (strcmp(tok, "RECT") == 0))
        {npt = 5;
 	xd  = CMAKE_N(double, npt);
 	yd  = CMAKE_N(double, npt);

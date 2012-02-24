@@ -186,10 +186,11 @@ void _PG_PS_set_fill_color(PG_device *dev, int color, int mapped)
 void _PG_PS_set_char_size(PG_device *dev, int nd, PG_coord_sys cs, double *x)
    {double p[PG_SPACEDM];
 
-    PG_trans_point(dev, nd, cs, x, NORMC, p);
+    if ((x != NULL) && (nd >= 2))
+       {PG_trans_point(dev, nd, cs, x, NORMC, p);
 
-    dev->char_height_s = p[0];
-    dev->char_width_s  = p[1];
+	dev->char_height_s = p[0];
+	dev->char_width_s  = p[1];};
 
     return;}
 
@@ -425,9 +426,10 @@ void _PG_PS_draw_to_rel(PG_device *dev, double x, double y)
 /* _PG_PS_DRAW_CURVE - draw a PG_curve */
  
 void _PG_PS_draw_curve(PG_device *dev, PG_curve *crv, int clip)
-   {int i, flag, n, xo, yo, ix, ixo, iy, iyo, nl;
+   {int i, flag, n, nl;
+    int xo[PG_SPACEDM], ix[PG_SPACEDM], ixo[PG_SPACEDM];
     int pc[PG_BOXSZ];
-    int *x, *y;
+    int *x[PG_SPACEDM];
     
     flag = TRUE;
 
@@ -437,53 +439,55 @@ void _PG_PS_draw_curve(PG_device *dev, PG_curve *crv, int clip)
     
     nl = 0;
     n  = crv->n;
-    x  = crv->x;
-    y  = crv->y;
-    xo = crv->x_origin;
-    yo = crv->y_origin;
+    x[0]  = crv->x;
+    x[1]  = crv->y;
+    xo[0] = crv->x_origin;
+    xo[1] = crv->y_origin;
 
     if (pc[2] > pc[3])
-       {i   = pc[2];
+       {i     = pc[2];
         pc[2] = pc[3];
         pc[3] = i;};
     
 /* make ZeroFault happy by initializing this here */
-    ixo = 0;
-    iyo = 0;
+    ix[0]  = 0;
+    ix[1]  = 0;
+    ixo[0] = 0;
+    ixo[1] = 0;
 
     for (i = 0; i < n; i++)
-        {ixo = ix;
-         iyo = iy;
-         ix  = x[i] + xo;
-         iy  = y[i] + yo;
+        {ixo[0] = ix[0];
+         ixo[1] = ix[1];
+         ix[0]  = x[0][i] + xo[0];
+         ix[1]  = x[1][i] + xo[1];
        
          if (i == 0)
             continue;
     
-         if ((ix == ixo) && (iy == iyo))
+         if ((ix[0] == ixo[0]) && (ix[1] == ixo[1]))
             continue;
 
          if (clip && dev->clipping)
-	    {if (((ix < pc[0]) && (ixo < pc[0])) ||
-		 ((ix > pc[1]) && (ixo > pc[1])))
+	    {if (((ix[0] < pc[0]) && (ixo[0] < pc[0])) ||
+		 ((ix[0] > pc[1]) && (ixo[0] > pc[1])))
 	       {flag = TRUE;
 		continue;}
 
-	     if (((iy < pc[2]) && (iyo < pc[2])) ||
-		 ((iy > pc[3]) && (iyo > pc[3])))
+	     if (((ix[1] < pc[2]) && (ixo[1] < pc[2])) ||
+		 ((ix[1] > pc[3]) && (ixo[1] > pc[3])))
 	       {flag = TRUE;
 		continue;};}
 
 	 if (flag)
-	    {io_printf(dev->file, "%d %d m\n", ixo, iyo);
+	    {io_printf(dev->file, "%d %d m\n", ixo[0], ixo[1]);
 	     flag = FALSE;}
 
-         io_printf(dev->file, "%d %d L\n", ix, iy);
+         io_printf(dev->file, "%d %d L\n", ix[0], ix[1]);
 
          if (++nl >= 256)
             {nl = 0;
 	     io_printf(dev->file, "S\n");
-             io_printf(dev->file, "%d %d m\n", ix, iy);};};
+             io_printf(dev->file, "%d %d m\n", ix[0], ix[1]);};};
 
     io_printf(dev->file, "S\n");
 
@@ -828,6 +832,8 @@ void _PG_PS_set_dev_color(PG_device *dev, int prim, int check)
        return;
 
     color = -1;
+
+    rgb = 0;
 
     switch (prim)
        {case PG_TEXT :

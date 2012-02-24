@@ -182,13 +182,14 @@ void _PG_CGM_set_char_size(PG_device *dev, int nd, PG_coord_sys cs, double *x)
    {int ih;
     double p[PG_SPACEDM];
 
-    PG_trans_point(dev, nd, cs, x, NORMC, p);
+    if ((dev != NULL) && (x != NULL) && (nd >= 2))
+       {PG_trans_point(dev, nd, cs, x, NORMC, p);
 
-    dev->char_height_s = p[0];
-    dev->char_width_s  = p[1];
+	dev->char_height_s = p[0];
+	dev->char_width_s  = p[1];
 
-    ih = dev->char_height_s*PG_window_height(dev);
-    PG_CGM_command(dev, CHARACTER_HEIGHT, ih);
+	ih = dev->char_height_s*PG_window_height(dev);
+	PG_CGM_command(dev, CHARACTER_HEIGHT, ih);};
 
     return;}
 
@@ -357,7 +358,7 @@ void _PG_CGM_draw_to_abs(PG_device *dev, double x, double y)
    {int pts[4];
     double o[PG_SPACEDM], n[PG_SPACEDM];
 
-    if (dev == NULL)
+    if (dev != NULL)
        {if (dev->clipping == TRUE)
 	   {o[0] = dev->gcur[0];
 	    o[1] = dev->gcur[1];
@@ -396,7 +397,7 @@ void _PG_CGM_draw_to_rel(PG_device *dev, double x, double y)
    {int pts[4];
     double o[PG_SPACEDM], n[PG_SPACEDM];
 
-    if (dev == NULL)
+    if (dev != NULL)
        {if (dev->cgm_page_set)
 	   {o[0] = dev->gcur[0];
 	    o[1] = dev->gcur[1];
@@ -576,7 +577,7 @@ void _PG_CGM_shade_poly(PG_device *dev, int nd, int n, double **r)
     if (nd == 3)
        _PG_rst_shade_poly(dev, nd, n, r);
 
-    else if (dev->cgm_page_set)
+    else if ((nd > 1) && (dev->cgm_page_set))
        {if (n > 0)     
            {pts = CMAKE_N(int, 2*n);
             for (i = 0, ix = 0, iy = 1; i < n; i++, ix += 2, iy += 2)

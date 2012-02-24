@@ -486,7 +486,7 @@ static void _PG_legend_palette(PG_device *dev,	PG_picture_desc *pd,
 
 	else if (hvf == HORIZONTAL)
 	   {nde = dev->range_n_extrema >> 1;
-	    if ((cpl->pal_dims == NULL) || (nde < 2))
+	    if ((cpl == NULL) || (cpl->pal_dims == NULL) || (nde < 2))
 	       {_PG_get_place(dbx, lpl, ndc);
 		ndc[2] *= 0.4;
 
@@ -862,6 +862,9 @@ PG_picture_desc *PG_setup_picture(PG_device *dev, PG_graph *data,
 
     if (dev == NULL)
        return(NULL);
+
+    memset(wc, 0, sizeof(wc));
+    memset(ndc, 0, sizeof(ndc));
 
     PG_make_device_current(dev);
 

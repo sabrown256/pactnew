@@ -167,6 +167,8 @@ static void _PG_get_input(int fd, int mask, void *a)
 int PG_init_event_handling(void)
    {int fd;
     
+    fd = -1;
+
 /* create the event loop state */
     if (_PG_ev_loop == NULL)
        _PG_ev_loop = SC_make_event_loop(NULL, NULL, NULL, -1, -1, -1);

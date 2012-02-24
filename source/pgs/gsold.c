@@ -523,10 +523,9 @@ int PG_write_WC(PG_device *dev, double x, double y, char *fmt, ...)
 
     DEPRECATED(2009-10-08);
 
-    if (dev == NULL)
-       rv = FALSE;
+    rv = FALSE;
 
-    else if (dev->gprint_flag)
+    if ((dev != NULL) && (dev->gprint_flag))
        {SC_VDSNPRINTF(TRUE, s, fmt);
 
 	p[0] = x;
