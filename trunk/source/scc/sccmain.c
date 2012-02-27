@@ -80,8 +80,9 @@ int main(int c, char **v, char **env)
 	    {dbg = 2;
 	     break;};};
 
+    cs = -1;
     if (dbg > 0)	
-       cs = SC_mem_monitor(-1, dbg, "CC", msg);
+       cs = SC_mem_monitor(cs, dbg, "CC", msg);
 
     CC_init_c_syntax_mode();
 

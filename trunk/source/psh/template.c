@@ -108,8 +108,8 @@ template *make_template(char *proto, int nl, char **body,
 
     t = MAKE(template);
 
-    t->tmn = NULL;
-    t->tmx = NULL;
+    t->tmn = 0;
+    t->tmx = 0;
 
 /* reduce the type range names to indeces */
     for (i = 0; i < N_TYPES; i++)
@@ -474,9 +474,11 @@ static void write_va_arg(FILE *fp)
         {if (types[i] != NULL)
             write_va_arg_clause(fp, i);};
 
+#if 0
     fprintf(fp, "       default:                                      \\\n");
-    fprintf(fp, "            _d = NULL;                               \\\n");
+    fprintf(fp, "            *(_d) = NULL;                            \\\n");
     fprintf(fp, "            break;                                   \\\n");
+#endif
 
     fprintf(fp, "       }                                             \\\n");
     fprintf(fp, "   }\n");
@@ -497,9 +499,11 @@ static void write_va_arg(FILE *fp)
         {if (types[i] != NULL)
             write_va_arg_clause(fp, i);};
 
+#if 0
     fprintf(fp, "       default:                                      \\\n");
-    fprintf(fp, "            _d = NULL;                               \\\n");
+    fprintf(fp, "            *(_d) = NULL;                            \\\n");
     fprintf(fp, "            break;                                   \\\n");
+#endif
 
     fprintf(fp, "       }                                             \\\n");
     fprintf(fp, "   }\n");

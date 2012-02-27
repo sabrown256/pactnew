@@ -298,7 +298,9 @@ static void _SC_tcp_acceptor(int fd, int mask, void *a)
     if (nfd > 0)
        {pi = SC_register_event_loop_callback(pe, SC_INT_I, &nfd,
 					     acc, rej, -1);
-	SC_ASSERT(pi != 0);};
+	SC_ASSERT(pi != 0);}
+    else
+       close(nfd);
 
 #endif
 

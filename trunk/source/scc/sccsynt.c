@@ -151,18 +151,18 @@ void CC_reckon_line(void)
     char *t, *fn;
     struct stat sb;
 
-    strncpy(s, _CC.lex_text, MAXLINE);
-    t = strtok(s, "# \t\n");
+    SC_strncpy(s, MAXLINE, _CC.lex_text, -1);
+    t  = strtok(s, "# \t\n");
     ln = SC_stoi(t);
 
     fn = strtok(NULL, " \t\n\"");
+    if (fn != NULL)
+       {st = stat(fn, &sb);
+	if (st == 0)
+	   {CFREE(_CC.vloc.fname);
 
-    st = stat(fn, &sb);
-    if (st == 0)
-       {CFREE(_CC.vloc.fname);
-
-	_CC.vloc.iln   = ln;
-	_CC.vloc.fname = CSTRSAVE(fn);};
+	    _CC.vloc.iln   = ln;
+	    _CC.vloc.fname = CSTRSAVE(fn);};};
 
     return;}
 

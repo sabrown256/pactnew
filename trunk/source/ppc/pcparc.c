@@ -478,7 +478,8 @@ static long _PC_out_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     bf = CMAKE_N(char, nb);
 
 /* convert the data into a message buffer */
-    tf = PN_open(vif, bf);
+    nis = 0;
+    tf  = PN_open(vif, bf);
     if (tf != NULL)
        {nis = PN_write(tf, type, ni, vr) ? ni : 0;
 	PN_close(tf);};

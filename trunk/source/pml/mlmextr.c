@@ -481,15 +481,16 @@ static void _PM_laplace_sol(int *unt, int *str,
 
     n   = n_map->nrow;
     axb = PM_mk_sp_lin_sys(n, na, 7, TRUE, FALSE, NULL, NULL);
+    if (axb != NULL)
 
 /* fill in the laplacian and b arrays */
-    _PM_fill_lapl_op(axb, unt, str, na, x, kra, lra,
-		     n_map, no, ts, krc, lrc, crf);
+       {_PM_fill_lapl_op(axb, unt, str, na, x, kra, lra,
+			 n_map, no, ts, krc, lrc, crf);
 
 /* solve the system */
-    _PM_solv_lapl(x, axb, n_map, nr, na);
+	_PM_solv_lapl(x, axb, n_map, nr, na);
 
-    PM_rl_sp_lin_sys(axb);
+	PM_rl_sp_lin_sys(axb);};
 
     return;}
 

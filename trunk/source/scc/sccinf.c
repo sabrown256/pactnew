@@ -105,6 +105,8 @@ expr *CC_add_depend(char *name, qtype t)
    {char s[MAXLINE];
     expr *v;
 
+    v = NULL;
+
     if (name != NULL)
        {if (_CC.depend == NULL)
 	   _CC.depend = SC_make_hasharr(HSZSMALL, FALSE, SC_HA_NAME_KEY, 0);
@@ -364,21 +366,21 @@ int CC_compile_file(char *name, char *cmp, char **v)
     snprintf(inm, MAXLINE, "%s.i", _CC.rloc.fname);
 
     fp = fopen(inm, "r");
-
-    _CC.n_error = 0;
+    if (fp != NULL)
+       {_CC.n_error = 0;
 
 /* parse the preprocessed file declaration by declaration */
-    while (rv == TRUE)
-       rv = CC_parse(fp);
+	while (rv == TRUE)
+	   rv = CC_parse(fp);
 
-    if (_CC.check_decls == TRUE)
-       rv = CC_check(cmp, v);
-    else
-       rv = CC_emit(cmp, v, TRUE);
+	if (_CC.check_decls == TRUE)
+	   rv = CC_check(cmp, v);
+	else
+	   rv = CC_emit(cmp, v, TRUE);
 
-    rv &= (_CC.n_error == 0);
+	rv &= (_CC.n_error == 0);
 
-    fclose(fp);
+	fclose(fp);};
 
     CFREE(_CC.rloc.fname);
 
@@ -536,33 +538,34 @@ expr *_CC_type_decl(expr *t)
 	else
 	   s = _CC.lex_text;
 
-	pd = _CC.cur;
-	pd->dec = CC_DEF;
-	if (strncmp(s, "enum", 4) == 0)
-	   {pd->kind = CC_TYP;
-	    pd->cat  = CC_ENUM;}
+	if (s != NULL)
+	   {pd = _CC.cur;
+	    pd->dec = CC_DEF;
+	    if (strncmp(s, "enum", 4) == 0)
+	       {pd->kind = CC_TYP;
+		pd->cat  = CC_ENUM;}
 
-	else if (strncmp(s, "struct", 6) == 0)
-	   {pd->kind = CC_TYP;
-	    pd->cat  = CC_STRUCT;}
+	    else if (strncmp(s, "struct", 6) == 0)
+	       {pd->kind = CC_TYP;
+		pd->cat  = CC_STRUCT;}
 
-	else if (strncmp(s, "union", 5) == 0)
-	   {pd->kind = CC_TYP;
-	    pd->cat  = CC_UNION;}
+	    else if (strncmp(s, "union", 5) == 0)
+	       {pd->kind = CC_TYP;
+		pd->cat  = CC_UNION;}
 
-	else
-	   {ct = CC_PRIMITIVE;
-	    tc = (expr *) SC_hasharr_def_lookup(_CC.types, s);
-	    if (tc != NULL)
-	       {if (SC_hasharr_lookup(_CC.primitives, tc->type) == NULL)
-		   {ct = CC_DERIVED;
-		    CC_add_depend(tc->type, CC_TYP);};};
-	    pd->cat = ct;};
+	    else
+	       {ct = CC_PRIMITIVE;
+		tc = (expr *) SC_hasharr_def_lookup(_CC.types, s);
+		if (tc != NULL)
+		   {if (SC_hasharr_lookup(_CC.primitives, tc->type) == NULL)
+		       {ct = CC_DERIVED;
+			CC_add_depend(tc->type, CC_TYP);};};
+		pd->cat = ct;};
 
-       if (pd->type != NULL)
-	  {CFREE(pd->type);};
+	    if (pd->type != NULL)
+	       {CFREE(pd->type);};
 
-       pd->type = CSTRSAVE(s);};
+	    pd->type = CSTRSAVE(s);};};
 
     return(t);}
 
@@ -628,7 +631,7 @@ expr *_CC_der_decl(expr *t, expr *v)
 	else
 	   snprintf(s, MAXLINE, "%s %s", pd->type, v->name);}
     else
-       strncpy(s, pd->type, MAXLINE);
+       SC_strncpy(s, MAXLINE, pd->type, -1);
 
     if (v == CC_anon)
        v = CC_copy_expr(v);

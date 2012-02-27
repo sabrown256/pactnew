@@ -40,6 +40,7 @@ double PM_cf_eval(int n, double *a, double *b, double tol)
     b1 = 1.0;
 
     fo = 0.0;
+    f  = 0.0;
 
     for (it = 1; it < n; it++)
         {an = b[it]*a1 + a[it]*a0;
@@ -287,13 +288,13 @@ static double _PM_erfc_a(double x)
    {double a, xa, rv;
 
     xa = ABS(x);
+    rv = 0.0;
 
 /* Abramowitz and Stegun 7.1.25 - fractional error < 9.25e-3 */
     if (_PM.igamma_tol > 9.25e-3)
        {a   = 1.0/(1.0 + 0.47047*xa);
 	rv  = a*(0.3480242 + a*(-0.0958798 + a*0.7478556));
 	rv *= exp(-x*x);}
-
 
 /* rational polynomial fit to obtain fractional error < 3.0e-8
  * due to George Zimmerman

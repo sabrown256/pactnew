@@ -159,6 +159,8 @@ static char *_SC_malloc_loc(void)
 		if (st != NULL)
 		   {SC_storloc sl;
 
+		    memset(&sl, 0, sizeof(SC_storloc));
+
 		    SC_exe_map_addr(&sl, st, pt);
 		    _SC_format_loc(s, MAXLINE, &sl.loc, TRUE, TRUE);
 

@@ -193,8 +193,9 @@ static int _SC_dup_fd(char *msg, int to, SC_filedes *fd, int nfd, int ofd)
     if (rv == TRUE)
        fd[nfd].fd = ofd;
     else
-       SC_error(SC_EXIT_ERRNO(), "COULD NOT DUP %s (%d/%d) - _SC_DUP_FD",
-		fd[nfd].name, ofd, errno);
+       {close(ofd);
+	SC_error(SC_EXIT_ERRNO(), "COULD NOT DUP %s (%d/%d) - _SC_DUP_FD",
+		 fd[nfd].name, ofd, errno);};
 
     return(rv);}
 

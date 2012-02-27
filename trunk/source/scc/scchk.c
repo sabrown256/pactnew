@@ -209,7 +209,7 @@ static int _CC_var_exist(haelem *hp, void *a)
 	 nm = vd->name;
 	 ok = ((nm != NULL) && (strcmp(nm, name) == 0));};
 
-    if ((ok == FALSE) && (v->declared == CC_UNDEF))
+    if ((ok == FALSE) && (v->declared == CC_UNDEF) && (nm != NULL))
        _CC_check_error("'%s' undefined in function %s",
 		       name, nm);
 
