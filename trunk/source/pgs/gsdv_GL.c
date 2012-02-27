@@ -1576,7 +1576,7 @@ static void _PG_GL_mouse_event_info(PG_device *dev, PG_event *ev,
 	     break;
 	default :
 	     eb = MOUSE_NONE;
-	     break;
+	     break;};
     *peb = eb;
 
 /* button modifers */
