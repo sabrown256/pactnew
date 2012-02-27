@@ -158,9 +158,10 @@ void new_connection(char *root, connection *srv)
        {FD_SET(fd, &srv->afs);
 	log_activity(flog, dbg_db, "SERVER", "accept %d", fd);}
     else
-       log_activity(flog, dbg_db, "SERVER",
-		    "accept error - %s (%d)",
-		    strerror(errno), errno);
+       {close(fd);
+	log_activity(flog, dbg_db, "SERVER",
+		     "accept error - %s (%d)",
+		     strerror(errno), errno);};
 
     return;}
 

@@ -114,6 +114,8 @@ int PM_index_min(double *p, int n)
 int PM_find_index(void *p, double f, int n)
    {int id, indx;
 
+    indx = 0;
+
     id = SC_arrtype(p, -1);
     if (SC_is_type_prim(id) == FALSE)
        id = SC_DOUBLE_I;

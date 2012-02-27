@@ -1617,6 +1617,8 @@ pcons *PM_mapping_info(PM_mapping *h, ...)
     else
        return(NULL);
 
+    id = 0;
+
     while (TRUE)
        {name = SC_VA_ARG(char *);
         if (name == NULL)

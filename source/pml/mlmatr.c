@@ -451,9 +451,10 @@ int PM_del_col(PM_matrix *a, long *col, long ncol)
     if ((col[ncol-1] >= nc) || (col[0] < 0))
        return(FALSE);
 
-    nptr = CMAKE_N(double, nr*(nc - ncol));
-    new  = nptr;
-    optr = a->array;
+    nptr  = CMAKE_N(double, nr*(nc - ncol));
+    new   = nptr;
+    optr  = a->array;
+    ndcol = 0;
 
     for (i = 0; i < nr; i++)
         for (j = 0, dcolptr = col, ndcol = 0; j < nc; j++)

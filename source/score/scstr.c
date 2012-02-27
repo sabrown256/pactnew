@@ -1048,6 +1048,8 @@ char **SC_tokenize(char *s, char *delim)
     char *tok, *t, *ps, *u, **sa;
     SC_array *arr;
 
+    sa = NULL;
+
     n = strlen(s);
     t = CMAKE_N(char, n+100);
     if (t != NULL)
@@ -1065,9 +1067,9 @@ char **SC_tokenize(char *s, char *delim)
 
 	SC_array_string_add(arr, NULL);
 
-	CFREE(t);};
+	CFREE(t);
 
-    sa = SC_array_done(arr);
+	sa = SC_array_done(arr);};
 
     return(sa);}
 

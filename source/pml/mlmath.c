@@ -372,8 +372,9 @@ double PM_romberg(double (*func)(double x), double x0, double x1, double tol)
     double a[16], b[16];
     int i, n, in;
 
-    h = x1 - x0;
-    x = x0;
+    h  = x1 - x0;
+    x  = x0;
+    y0 = 0.0;
 
     a[0] = h*((*func)(x0) + (*func)(x1))/2.0;
     toln = 2.0*tol;
@@ -397,7 +398,7 @@ double PM_romberg(double (*func)(double x), double x0, double x1, double tol)
             for (i = 0; i < n; i++)
                 a[i] = b[i];};
 
-      return(y0);}
+    return(y0);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -758,10 +759,12 @@ int PM_smooth_int_ave(double *x, double *y, int n, int pts)
 
 int PM_smooth_fft(double *x, double *y, int n, int pts,
 		  void (*fnc)(complex *cx, int nt, double tol))
-   {int i, j, nt, np, nh;
+   {int i, j, nt, np, nh, rv;
     double xa, xb, yb, ya, dt, idn;
     double *xo;
     complex *cx;
+
+    rv = FALSE;
 
 /* remove the linear trend */
     idn = 1.0/(n - 1);
@@ -773,40 +776,42 @@ int PM_smooth_fft(double *x, double *y, int n, int pts,
 
 /* do the Fourier transform of the data */
     nt = PM_fft_sc_real_data(&cx, &xo, x, y, n, x[0], x[n-1], TRUE);
-
-    nh = nt >> 1;
+    if (cx != NULL)
+       {nh = nt >> 1;
 
 /* filter the transform */
-    if (fnc != NULL)
-       (*fnc)(cx, nt, (double) pts);
+	if (fnc != NULL)
+	   (*fnc)(cx, nt, (double) pts);
 
 /* rearrange for inverse FFT */
-    for (i = 0; i < nh; i++)
-        {PM_COMPLEX_SWAP(cx[i], cx[nh+i]);};
+	for (i = 0; i < nh; i++)
+	    {PM_COMPLEX_SWAP(cx[i], cx[nh+i]);};
 
 /* do the inverse transform */
-    PM_fft_sc_complex(cx, nt-1, -1);
+	PM_fft_sc_complex(cx, nt-1, -1);
 
 /* interpolate the smoothed curve back onto the old mesh */
-    np = nt - 1;
-    dt = (x[n-1] - x[0])/((double) (np - 1));
-    for (i = 0; i < n; i++)
-        {for (j = 0, xa = x[0]; j < np; j++, xa = xb)
-             {xb = xa + dt;
-              if ((xa <= x[i]) && (x[i] < xb))
-                 break;};
-         PM_interp(y[i], x[i],
-		   xa, PM_REAL_C(cx[j]),
-		   xb, PM_REAL_C(cx[j+1]));};
+	np = nt - 1;
+	dt = (x[n-1] - x[0])/((double) (np - 1));
+	for (i = 0; i < n; i++)
+	    {for (j = 0, xa = x[0]; j < np; j++, xa = xb)
+	         {xb = xa + dt;
+		  if ((xa <= x[i]) && (x[i] < xb))
+		     break;};
+	     PM_interp(y[i], x[i],
+		       xa, PM_REAL_C(cx[j]),
+		       xb, PM_REAL_C(cx[j+1]));};
 
 /* restore the linear trend */
-    for (i = 0; i < n; i++)
-        y[i] += (ya*(n - 1 - i) + yb*i);
+	for (i = 0; i < n; i++)
+	    y[i] += (ya*(n - 1 - i) + yb*i);
 
-    CFREE(xo);
-    CFREE(cx);
+	CFREE(xo);
+	CFREE(cx);
 
-    return(TRUE);}
+	rv = TRUE;};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

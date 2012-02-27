@@ -398,7 +398,8 @@ static int _SC_bfr_remove(bio_desc *bid, int i, bio_frame *fr, int fl, int orig)
     int64_t fi[2], ad, nb;
 	
     if ((fr->rw == BIO_WRITE) && (fl == TRUE))
-       {nb    = fr->nb;
+       {ad    = 0;
+	nb    = fr->nb;
 	fi[0] = fr->addr;
 	fi[1] = fi[0] + nb;
 
@@ -644,7 +645,8 @@ static int _SC_bio_seek(bio_desc *bid, int64_t offs, int wh)
    {int ret;
     int64_t addr;
 
-    ret = 0;
+    ret  = 0;
+    addr = 0;
 
     switch (wh)
        {case SEEK_SET :
@@ -959,6 +961,8 @@ static int64_t _SC_bio_out(void *bf, int64_t bpi, int64_t ni, bio_desc *bid)
 
    {int64_t nbc, nbw, ad;
     bio_frame *fr, rq;
+
+    fr = NULL;
 
     if (bid->stack == NULL)
        {nw = SC_write_sigsafe(bid->fd, bf, nb);

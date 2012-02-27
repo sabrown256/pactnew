@@ -172,7 +172,8 @@ int SC_close_log(SC_logfile log)
 
 /* interrupt sent while waiting for lock: global log NOT locked, return */
         if (status == -1)
-           return(-1);
+	   {close(global_log);
+	    return(-1);};
 
 /* LOCK HELD: No returns allowed until lock released */
 

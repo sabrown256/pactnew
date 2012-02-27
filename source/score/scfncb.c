@@ -119,7 +119,9 @@ int _SC_ps_time(char *time)
 
     sec = 0;
     if (time != NULL)
-       {strcpy(sp, time);
+       {memset(in, 0, sizeof(in));
+
+	strcpy(sp, time);
 	t = strchr(sp, '-');
 	if (t != NULL)
 	   {*t++ = '0';

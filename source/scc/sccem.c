@@ -190,20 +190,20 @@ static int _CC_emit_vardef(char *cmp, char **v, int cfl)
     snprintf(nm, MAXLINE, "%s-0.i", _CC.rloc.fname);
 
     fp = fopen(nm, "w");
+    if (fp != NULL)
+       {n = _CC.nd;
+	for (i = 0; i < n; i++)
+	    {pd = _CC.all[i];
+	     if (((pd->kind == CC_VAR) && (pd->stor != CC_EXTERN)) ||
+		 (pd->kind == CC_TYP))
+	        fprintf(fp, "%s\n", pd->out);};
 
-    n = _CC.nd;
-    for (i = 0; i < n; i++)
-        {pd = _CC.all[i];
-	 if (((pd->kind == CC_VAR) && (pd->stor != CC_EXTERN)) ||
-	     (pd->kind == CC_TYP))
-	    fprintf(fp, "%s\n", pd->out);};
+	fprintf(fp, "\n");
 
-    fprintf(fp, "\n");
+	fclose(fp);
 
-    fclose(fp);
-
-    if (cfl == TRUE)
-       rv &= CC_compile(nm, cmp, v);
+	if (cfl == TRUE)
+	   rv &= CC_compile(nm, cmp, v);};
 
     return(rv);}
 
@@ -225,30 +225,30 @@ static int _CC_emit_fnc(int i, int j, char *cmp, char **v, int cfl)
     snprintf(nm, MAXLINE, "%s-%d.i", _CC.rloc.fname, j);
 
     fp = fopen(nm, "w");
+    if (fp != NULL)
+       {dc = _CC.all[i];
+	dl = dc->dep;
+	for (nl = 0; dl[nl] != -1; nl++)
+	    {pd = _CC.all[dl[nl]];
+	     if (pd->kind == CC_TYP)
+	        _CC_emit_type_decl(fp, pd);
+	     else if (pd->kind == CC_VAR)
+	        _CC_emit_var_decl(fp, pd);
+	     else if (pd->kind == CC_FNC)
+	        _CC_emit_fnc_decl(fp, pd);};
 
-    dc = _CC.all[i];
-    dl = dc->dep;
-    for (nl = 0; dl[nl] != -1; nl++)
-        {pd = _CC.all[dl[nl]];
-	 if (pd->kind == CC_TYP)
-	    _CC_emit_type_decl(fp, pd);
-	 else if (pd->kind == CC_VAR)
-	    _CC_emit_var_decl(fp, pd);
-	 else if (pd->kind == CC_FNC)
-	    _CC_emit_fnc_decl(fp, pd);};
+	t = dc->out;
 
-    t = dc->out;
+	fprintf(fp, "# %d \"%s\"\n", dc->vlb, _CC.vloc.fname);
 
-    fprintf(fp, "# %d \"%s\"\n", dc->vlb, _CC.vloc.fname);
+	fprintf(fp, "%s\n", t);
 
-    fprintf(fp, "%s\n", t);
+	fprintf(fp, "\n");
 
-    fprintf(fp, "\n");
+	fclose(fp);
 
-    fclose(fp);
-
-    if (cfl == TRUE)
-       rv &= CC_compile(nm, cmp, v);
+	if (cfl == TRUE)
+	   rv &= CC_compile(nm, cmp, v);};
 
     return(rv);}
 
