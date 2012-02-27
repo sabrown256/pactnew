@@ -240,29 +240,31 @@ static solver_method *_PM_mk_lin_sys(int n_unk, int n_rhs, int nd,
 	axb = PM_mk_sp_lin_sys(n_unk, n_rhs, ns,
 			       (strategy == PM_CG), FALSE,
 			       NULL, NULL);
-
-	sv->axb   = axb;
-	sv->b     = axb->b;
-        sv->set   = _PM_cg_set;
-        sv->solve = _PM_cg_lapl;}
+	if (axb != NULL)
+	   {sv->axb   = axb;
+	    sv->b     = axb->b;
+	    sv->set   = _PM_cg_set;
+	    sv->solve = _PM_cg_lapl;};}
 
     else if (strategy == PM_ICCG)
        {ns  = 2*nd + 1;
 	axb = PM_mk_sp_lin_sys(n_unk, n_rhs, ns, TRUE, TRUE,
 			       PM_iccg_pre, PM_iccg_cmp_Lr);
-	sv->axb   = axb;
-	sv->b     = axb->b;
-        sv->set   = _PM_cg_set;
-        sv->solve = _PM_cg_lapl;}
+	if (axb != NULL)
+	   {sv->axb   = axb;
+	    sv->b     = axb->b;
+	    sv->set   = _PM_cg_set;
+	    sv->solve = _PM_cg_lapl;};}
 
     else if (strategy == PM_HYPRE)
        {ns  = 2*nd + 1;
 	axb = PM_mk_sp_lin_sys(n_unk, n_rhs, ns, TRUE, TRUE,
 			       NULL, NULL);
-	sv->axb   = axb;
-	sv->b     = axb->b;
-        sv->set   = _PM_cg_set;
-        sv->solve = _PM_hypre_lapl;}
+	if (axb != NULL)
+	   {sv->axb   = axb;
+	    sv->b     = axb->b;
+	    sv->set   = _PM_cg_set;
+	    sv->solve = _PM_hypre_lapl;};}
 
     else
        {lapl = PM_create(n_unk, n_unk);

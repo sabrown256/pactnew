@@ -582,6 +582,8 @@ static int _PM_colinear_3d(double **x, int n)
 int PM_colinear_nd(int nd, int n, double **x)
    {int col;
 
+    col = FALSE;
+
     if (nd == 2)
        col = _PM_colinear_2d(x, n);
     else if (nd == 3)
@@ -677,6 +679,10 @@ static int _PM_contains_2d(double *xc, PM_polygon *py, int *iy)
     if (iy != NULL)
        *iy = -1;
 
+    for (i = 0; i < PM_SPACEDM; i++)
+        {x1[i] = 0.0;
+	 x2[i] = 0.0;};
+
 /* check for XC being a node
  * stop immediately in that case to save flops
  */
@@ -756,6 +762,10 @@ static int _PM_contains_3d(double *xc, PM_polygon *py, int *iy)
     nd  = 3;
     tol = TOLERANCE;
 
+    for (i = 0; i < PM_SPACEDM; i++)
+        {x1[i] = 0.0;
+	 x2[i] = 0.0;};
+
 /* start with the 3rd node of the polygon */
     PM_polygon_get_point(x1, py, 2);
 
@@ -792,6 +802,7 @@ static int _PM_contains_3d(double *xc, PM_polygon *py, int *iy)
     for (id = 0; id < nd; id++)
         in &= (d[id] > tol);
 
+    out = FALSE;
     if (in == FALSE)
        {out = TRUE;
 	for (id = 0; id < nd; id++)
@@ -859,15 +870,17 @@ int PM_boundary_nd(double *xc, PM_polygon *py, int *iy)
 /* PM_POLYGON_AREA - compute the area of the polygon PY */
 
 double PM_polygon_area(PM_polygon *py)
-   {int i, np;
+   {int i, id, np;
     double x1[PM_SPACEDM], x2[PM_SPACEDM], x3[PM_SPACEDM], ac;
     double **x;
 
     x  = py->x;
     np = py->nn - 1;
 
-    x1[0] = x[0][0];
-    x1[1] = x[1][0];
+    for (id = 0; id < PM_SPACEDM; id++)
+        {x1[id] = x[id][0];
+	 x2[id] = 0.0;
+	 x3[id] = 0.0;};
 
     ac = 0.0;
     for (i = 1; i < np; i++)
@@ -1819,11 +1832,11 @@ static void _PM_rotate_2d(int n, double **x, double *x0, double a)
     py = x[1];
 
     for (i = 0; i < n; i++)
-        {xc = px[i] - xo[0];
-         yc = py[i] - xo[1];
+        {xc = px[i] - x0[0];
+         yc = py[i] - x0[1];
 
-         px[i] = xo[0] + r11*xc + r12*yc;
-         py[i] = xo[1] + r21*xc + r22*yc;};
+         px[i] = x0[0] + r11*xc + r12*yc;
+         py[i] = x0[1] + r21*xc + r22*yc;};
 
     return;}
 
