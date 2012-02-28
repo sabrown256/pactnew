@@ -843,7 +843,7 @@ static int _PA_transpose_stripe(PDBfile *file, double **crve, char *stripe,
     else
        for (nv = 0; desc != NULL; desc = desc->next, nv++);
 
-    if (strcmp(mix, _PA.heterogeneous) == 0)
+    if ((dp != NULL) && (strcmp(mix, _PA.heterogeneous) == 0))
        {int tmp, incr;
         long mitems, offs, bpm;
         char *ps, *mtype;

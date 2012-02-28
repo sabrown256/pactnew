@@ -382,14 +382,16 @@ static void _PG_fix_color(PG_device *dev, int *pfc, int *pbc, char *ps)
 /* _PG_FIX_FLAGS - parse the flags */
 
 static void _PG_fix_flags(PG_device *dev, int *flags, char *ps)
-   {char t[MAXLINE], *tok;
+   {char t[MAXLINE];
+    char *s, *tok;
 
 /* reset the flags if you come here */
     flags[0] = FALSE;
     flags[1] = FALSE;
     flags[2] = FALSE;
 
-    strcpy(t, SC_firsttok(ps, ")"));
+    s = SC_firsttok(ps, ")");
+    SC_strncpy(t, MAXLINE, s, -1);
     if (t != NULL)
        {while (TRUE)
 	   {tok = SC_firsttok(t, " ,");

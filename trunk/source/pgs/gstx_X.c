@@ -607,6 +607,7 @@ int _PG_X_draw_text(PG_device *dev, char *s, double *x)
     char *face, *sty;
 
     nd = 2;
+    ok = FALSE;
 
     for (id = 0; id < nd; id++)
         ir[id] = x[id];
@@ -665,6 +666,7 @@ int _PG_rst_draw_text(PG_device *dev, char *s)
     char *face, *sty;
 
     nd = 2;
+    ok = FALSE;
 
     PG_fget_font(dev, &face, &sty, &sz);
 

@@ -123,7 +123,7 @@ SS_psides *SX_init(char *code, char *vers, int c, char **v, char **env)
     pdb_wr_hook = _SX_hash_hook;
     SC_REGISTER_CONTEXT(_SX_hash_hook, si);
 
-    if (SX_gs.gvif != NULL)
+    if ((SX_gs.vif != NULL) && (SX_gs.gvif != NULL))
        {_SX_init_hash_objects(si, SX_gs.vif);
 
 /* default formats */

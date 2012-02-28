@@ -44,6 +44,7 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
 	if (tr == NULL)
 	   tr = &_PD_tr;
 
+	fp = NULL;
 	if (pu != NULL)
 	   {fp = pu->stream;
 

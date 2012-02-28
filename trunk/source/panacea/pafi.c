@@ -659,103 +659,107 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
     vattr[1] = OPTL;
     vattr[2] = U_CENT;
 
+    if (PA_gs.vif != NULL)
+
 /* get the entries */
-    for (i = 1, ne_read = 0; TRUE; i++, ne_read++)
-        {if (GETLN(bf, MAXLINE, fp) == NULL)
-            break;
+       {for (i = 1, ne_read = 0; TRUE; i++, ne_read++)
+	    {if (GETLN(bf, MAXLINE, fp) == NULL)
+	        break;
            
-         if (bf[0] == '#')
-            continue;
+	     if (bf[0] == '#')
+	        continue;
 
-         if (SC_blankp(bf, " "))
-            break;
+	     if (SC_blankp(bf, " "))
+	        break;
 
-         pb    = bf;
-         pk    = pt->entries;
-         alist = NULL;
-         for (j = 0; j < nf; j++)
-             {token = SC_strtok(pb, PA_gs.token_delimiters, s);
-              PA_ERR((token == NULL),
-                     "BAD FIELD %d IN ENTRY %d - _PA_RD_DB_TAB", j, i);
-              pb = NULL;
+	     pb    = bf;
+	     pk    = pt->entries;
+	     alist = NULL;
+	     for (j = 0; j < nf; j++)
+	         {token = SC_strtok(pb, PA_gs.token_delimiters, s);
+		  PA_ERR((token == NULL),
+			 "BAD FIELD %d IN ENTRY %d - _PA_RD_DB_TAB", j, i);
+		  pb = NULL;
 
-              if (token[0] == '"')
-                 {snprintf(vname, MAXLINE, "%s %s",
-			   &token[1], SC_strtok(pb, "\"", s));
-                  token = vname;};
+		  if (token[0] == '"')
+		     {snprintf(vname, MAXLINE, "%s %s",
+			       &token[1], SC_strtok(pb, "\"", s));
+		      token = vname;};
 
 /* NOTE: clean this out using SC_add_alist */
-              next = SC_mk_pcons(SC_PCONS_P_S,
-				 SC_mk_pcons(SC_PCONS_P_S, pk->car,
-					     SC_STRING_S, CSTRSAVE(token)),
-				 SC_PCONS_P_S, NULL);
-              if (alist == NULL)
-                 alist = next;
-              else
-                 prev->cdr = (void *) next;
-              prev = next;
-              pk   = (pcons *) pk->cdr;};
+		  next = SC_mk_pcons(SC_PCONS_P_S,
+				     SC_mk_pcons(SC_PCONS_P_S, pk->car,
+						 SC_STRING_S,
+						 CSTRSAVE(token)),
+				     SC_PCONS_P_S, NULL);
+		  if (alist == NULL)
+		     alist = next;
+		  else
+		     prev->cdr = (void *) next;
+		  prev = next;
+		  pk   = (pcons *) pk->cdr;};
               
-         bname = PA_assoc(alist, "KEY");
-         snprintf(vname, MAXLINE, "%s-%s", pt->name, bname);
+	     bname = PA_assoc(alist, "KEY");
+	     snprintf(vname, MAXLINE, "%s-%s", pt->name, bname);
 
 /* NOTE: make a default variable for now, the rest will come later */
-         pp = _PA_mk_variable(vname, NULL, NULL, NULL,
-                              vattr, SC_DOUBLE_S,
-                              1.0, 1.0,
-                              NULL, NULL, alist);
+	     pp = _PA_mk_variable(vname, NULL, NULL, NULL,
+				  vattr, SC_DOUBLE_S,
+				  1.0, 1.0,
+				  NULL, NULL, alist);
 
-	 _PA_install_var(vname, pp);
+	     _PA_install_var(vname, pp);
 
 /* build up a defstr corresponding to this table */
-         GET_INFO(pp, PA_INFO_TYPE, &type);
+	     GET_INFO(pp, PA_INFO_TYPE, &type);
 
 /* while we're here with the actual type fix the pp type */
-         if (_PD_indirection(type))
-            dp = PD_inquire_host_type(PA_gs.vif, "*");
-         else
-            dp = PD_inquire_host_type(PA_gs.vif, type);
-         PA_ERR((dp == NULL),
-                "TYPE %s NOT DEFINED - _PA_RD_DB_TAB", type);
+	     if (_PD_indirection(type))
+	        dp = PD_inquire_host_type(PA_gs.vif, "*");
+	     else
+	        dp = PD_inquire_host_type(PA_gs.vif, type);
+	     PA_ERR((dp == NULL),
+		    "TYPE %s NOT DEFINED - _PA_RD_DB_TAB", type);
 
-         PA_VARIABLE_TYPE(pp) = dp;
+	     PA_VARIABLE_TYPE(pp) = dp;
 
-         GET_INFO(pp, PA_INFO_N_DIMS, &nd);
-         if (nd > 0)
-            snprintf(memb, MAXLINE, "%s *%s", type, bname);
-         else
-            snprintf(memb, MAXLINE, "%s %s", type, bname);
+	     GET_INFO(pp, PA_INFO_N_DIMS, &nd);
+	     if (nd > 0)
+	        snprintf(memb, MAXLINE, "%s *%s", type, bname);
+	     else
+	        snprintf(memb, MAXLINE, "%s %s", type, bname);
 
-         desc  = _PD_mk_descriptor(memb, 0L);
-         type  = CSTRSAVE(memb);
-         ptype = SC_firsttok(type, " \n");
-         if ((ptype != NULL) && (SC_hasharr_lookup(fc, ptype) == NULL))
-            PA_ERR(((strcmp(ptype, pt->name) != 0) || !_PD_indirection(memb)),
-                   "%s BAD MEMBER TYPE - _PA_RD_DB_TAB", memb);
+	     desc  = _PD_mk_descriptor(memb, 0L);
+	     type  = CSTRSAVE(memb);
+	     ptype = SC_firsttok(type, " \n");
+	     if ((ptype != NULL) && (SC_hasharr_lookup(fc, ptype) == NULL))
+	        PA_ERR(((strcmp(ptype, pt->name) != 0) ||
+			!_PD_indirection(memb)),
+		       "%s BAD MEMBER TYPE - _PA_RD_DB_TAB", memb);
 
-         CFREE(type);
-         if (lst == NULL)
-            lst = desc;
-         else
-            prv->next = desc;
-         prv = desc;};
+	     CFREE(type);
+	     if (lst == NULL)
+	        lst = desc;
+	     else
+	        prv->next = desc;
+	     prv = desc;};
 
 /* install the type in both charts */
-    dp = _PD_defstr_inst(PA_gs.vif, pt->name, STRUCT_KIND, lst,
-			 NO_ORDER, NULL, NULL, PD_CHART_HOST);
+        dp = _PD_defstr_inst(PA_gs.vif, pt->name, STRUCT_KIND, lst,
+			     NO_ORDER, NULL, NULL, PD_CHART_HOST);
 
-    PA_ERR((dp == NULL),
-           "STRUCT DEFINITION FAILED - _PA_RD_DB_TAB");
+	PA_ERR((dp == NULL),
+	       "STRUCT DEFINITION FAILED - _PA_RD_DB_TAB");
 
-    PA_WARN((ne > 0) && (ne != ne_read),
-            "TABLE %s, EXPECTED %d ENTRIES FOUND %d - _PA_RD_DB_TAB",
-            pt->name, ne, ne_read);
+	PA_WARN((ne > 0) && (ne != ne_read),
+		"TABLE %s, EXPECTED %d ENTRIES FOUND %d - _PA_RD_DB_TAB",
+		pt->name, ne, ne_read);
 
-    PA_gs.token_delimiters = old_delim;
+	PA_gs.token_delimiters = old_delim;
 
 /* cons this dictionary name onto the list */
-    pck->db_list = SC_mk_pcons(SC_STRING_S, CSTRSAVE(pt->name),
-			       SC_PCONS_P_S, pck->db_list);
+	pck->db_list = SC_mk_pcons(SC_STRING_S, CSTRSAVE(pt->name),
+				   SC_PCONS_P_S, pck->db_list);};
 
     return(ne_read);}
 

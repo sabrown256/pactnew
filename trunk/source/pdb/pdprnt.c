@@ -537,7 +537,10 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
     memset(s, ' ', LINE_SIZE);
 
     pd  = PD_inquire_host_type(file, type);
-    isz = (pd != NULL) ? pd->size : 0;
+    if (pd == NULL)
+       return(status);
+
+    isz = pd->size;
     id  = SC_type_id(type, FALSE);
 
     prnt->nn     = nn;

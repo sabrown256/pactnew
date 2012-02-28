@@ -523,7 +523,7 @@ int PG_CGM_command(PG_device *dev, int cat, int id, int nparams, ...)
 		        return(FALSE);
 		     abytes -= nb;};}
 
-	     else if (strcmp(type[i], "PG_palette") == 0)
+	     else if ((cp != NULL) && (strcmp(type[i], "PG_palette") == 0))
 	        abytes -= PG_CGM_color(dev, cp, offs);};};
 
 /* pad out the element */

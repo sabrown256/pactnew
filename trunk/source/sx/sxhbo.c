@@ -690,13 +690,14 @@ object *_SX_mh_b_s(SS_psides *si, C_procedure *cp, object *argl)
 				    FALSE, SX_gs.interp_method);
 	_SX_unlink_mappings(h);
 
-	_SX_accumulate_range(si, f, argl, proc);
+	if (f != NULL)
+	   {_SX_accumulate_range(si, f, argl, proc);
 
-	SX_gs.plot_flag = TRUE;
+	    SX_gs.plot_flag = TRUE;
 
-	mo = SX_mk_mapping(si, f);
-	if (plf)
-	   mo = SX_display_map(si, mo);};
+	    mo = SX_mk_mapping(si, f);
+	    if (plf)
+	       mo = SX_display_map(si, mo);};};
 
     return(mo);}
 
@@ -787,13 +788,13 @@ PM_mapping *_SXI_extract_mapping(SS_psides *si, PM_mapping *h, object *argl)
     f  = SX_build_return_mapping(si, h, lbl, fd, TRUE, FALSE);
 
     if (f != NULL)
-       PM_find_extrema(f->range);
+       {PM_find_extrema(f->range);
 
-    SX_gs.plot_flag = TRUE;
+	SX_gs.plot_flag = TRUE;
 
-    mo = SX_mk_mapping(si, f);
-    if (plf)
-       mo = SX_display_map(si, mo);
+	mo = SX_mk_mapping(si, f);
+	if (plf)
+	   mo = SX_display_map(si, mo);};
 
     return(f);}
 
