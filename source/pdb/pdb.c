@@ -347,7 +347,7 @@ int _PD_read(PDBfile *file, char *fullpath, char *type, syment *ep, void *vr,
     if ((nd == -1) && (ind == NULL))
        {if (type != NULL)
 	   rv = _PD_hyper_read(file, fullpath, type, ep, vr);}
-    else
+    else if (ind != NULL)
        rv = _PD_indexed_read_as(file, fullpath, type, vr, nd, ind, ep);
 
 /* if requested, set denorm float pt vars to zero */

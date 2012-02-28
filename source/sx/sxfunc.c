@@ -611,10 +611,10 @@ static PM_mapping *_SXI_integrate_mapping(SS_psides *si, PM_mapping *h)
 
 /* build the return mapping */
     f = SX_build_return_mapping(si, h, lbl, NULL, TRUE, FALSE);
+    if (f != NULL)
+       {_SX_integrate_mapping(f);
 
-    _SX_integrate_mapping(f);
-
-    PM_find_extrema(f->range);
+	PM_find_extrema(f->range);};
 
     return(f);}
         

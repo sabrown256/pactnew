@@ -58,6 +58,7 @@ static int _PG_get_attrs_alist(pcons *alst, int dflt, va_list __a__)
 	 pa   = NULL;
 	 SC_assoc_info(alst, name, &pa, NULL);
 
+	 pv = NULL;
 	 SC_VA_ARG_ID(SC_POINTER_I, &pv, 0);
 	 SC_VA_ARG_ID(ityp, v, 0);
 	     

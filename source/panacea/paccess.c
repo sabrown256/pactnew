@@ -392,21 +392,22 @@ static void _PA_cache_group(PA_variable *pp)
         PA_ERR((PA_gs.cache_file == NULL),
                "CAN'T OPEN CACHE FILE - _PA_CACHE_GROUP");};
 
-    wr = PA_gs.cache_file->tr->write;
+    if (PA_gs.cache_file != NULL)
+       {wr = PA_gs.cache_file->tr->write;
 
-    ep   = PA_VARIABLE_DESC(pp);
-    type = ep->type;
-    dims = ep->dimensions;
-    ep   = wr(PA_gs.cache_file,
-	      PA_VARIABLE_NAME(pp),
-	      type, type,
-	      PA_VARIABLE_DATA(pp), dims, FALSE, &new);
-    PA_ERR((ep == NULL),
-	   "WRITE TO CACHE FILE %s FAILED - _PA_CACHE_GROUP", s);
-    if (!new)
-       _PD_rl_syment_d(ep);
+	ep   = PA_VARIABLE_DESC(pp);
+	type = ep->type;
+	dims = ep->dimensions;
+	ep   = wr(PA_gs.cache_file,
+		  PA_VARIABLE_NAME(pp),
+		  type, type,
+		  PA_VARIABLE_DATA(pp), dims, FALSE, &new);
+	PA_ERR((ep == NULL),
+	       "WRITE TO CACHE FILE %s FAILED - _PA_CACHE_GROUP", s);
+	if (!new)
+	   _PD_rl_syment_d(ep);
 
-    PA_VARIABLE_CACHE_FILE_NAME(pp) = CSTRSAVE(s);
+	PA_VARIABLE_CACHE_FILE_NAME(pp) = CSTRSAVE(s);};
 
     return;}
 

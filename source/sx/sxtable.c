@@ -72,33 +72,33 @@ static int _SX_get_line_length(FILE *fp)
 static int _SX_setup_clabels(char *label, int nc, int linelen)  
    {int ntokens, i, rv;
 
+    rv = FALSE;
+
     if (_SX_table.labels != NULL)
        {SC_free_strings(_SX_table.labels);
         _SX_table.labels = NULL;};
 
-    if ((label == NULL) || (label[0] == '\0'))
-       rv = FALSE;
-
-    else
+    if ((label != NULL) && (label[0] != '\0'))
        {_SX_table.labels = SC_tokenize(label, " \t\n\r");
+	if (_SX_table.labels != NULL)
+	   {for (ntokens = 0; _SX_table.labels[ntokens] != NULL; ntokens++);
 
-	for (ntokens = 0; _SX_table.labels[ntokens] != NULL; ntokens++);
+	    if (ntokens == (nc+1))
 
-	if (ntokens == (nc+1))
-/* Assume first token is comment char and take it out of list */
-	   {CFREE(_SX_table.labels[0]);
+/* assume first token is comment char and take it out of list */
+	       {CFREE(_SX_table.labels[0]);
 
-	    for (i = 0; i < nc; i++)
-	        _SX_table.labels[i] = _SX_table.labels[i+1];
+		for (i = 0; i < nc; i++)
+		    _SX_table.labels[i] = _SX_table.labels[i+1];
 
-	    _SX_table.labels[nc] = NULL;}
+		_SX_table.labels[nc] = NULL;}
 
 /* Anything other than nc tokens means we can't interpret label as column labels */
-	else if (ntokens != nc)
-	   {SC_free_strings(_SX_table.labels);
-	    _SX_table.labels = NULL;};
+	    else if (ntokens != nc)
+	       {SC_free_strings(_SX_table.labels);
+		_SX_table.labels = NULL;};
 
-	rv = TRUE;};
+	    rv = TRUE;};};
 
     return(rv);}
 

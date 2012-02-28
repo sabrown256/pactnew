@@ -824,6 +824,10 @@ PG_curve *PG_make_curve(PG_device *dev, PG_coord_sys cs, int closed, int n,
     if (dev != NULL)
        {p[0] = xo[0];
         p[1] = xo[1];
+	ix[0] = 0;
+	ix[1] = 0;
+	ixo[0] = 0;
+	ixo[1] = 0;
           
 	if (cs == WORLDC)
 	   PG_log_point(dev, 2, p);
