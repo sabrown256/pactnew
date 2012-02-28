@@ -216,7 +216,10 @@ static int _SC_open_pty_unix98(PROCESS *pp, PROCESS *cp)
 	pp->in  = pty;
 	pp->out = pty;
 
-	ok = TRUE;};
+	ok = TRUE;}
+
+    else if (pty >= 0)
+       close(pty);
 
     if (ok == FALSE)
        ok = _SC_open_pty_unix(pp, cp);

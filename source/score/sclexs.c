@@ -165,16 +165,17 @@ SC_lexical_stream *SC_open_lexical_stream(char *name, int inbfsz,
 void SC_close_lexical_stream(SC_lexical_stream *str)
    {
 
-    if (str->name != NULL)
-       {io_close(str->file);
-        CFREE(str->name);};
+    if (str != NULL)
+       {if (str->name != NULL)
+	   {io_close(str->file);
+	    CFREE(str->name);};
 
-    CFREE(str->tokens);
-    CFREE(str->in_bf);
-    CFREE(str->out_bf);
-    CFREE(str->str_bf);
+	CFREE(str->tokens);
+	CFREE(str->in_bf);
+	CFREE(str->out_bf);
+	CFREE(str->str_bf);
 
-    CFREE(str);
+	CFREE(str);};
 
     return;}
 

@@ -940,7 +940,7 @@ static char **_SC_backtrace_exe(int pid, int to)
 		for (i = 0; i < n; i++)
 		    {SC_strncpy(s, MAXLINE, out[i], -1);
 		     ta = SC_tokenize(s, " \t[]");
-		     if (ta[1] != NULL)
+		     if ((ta != NULL) && (ta[1] != NULL))
 		        {ad = SC_strtol(ta[1], NULL, 16);
 
 			 SC_exe_map_addr(&sl, st, out[i]);

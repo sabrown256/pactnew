@@ -1982,12 +1982,13 @@ FIXNUM FF_ID(pfln, PFLN)(FIXNUM *sfid, FIXNUM *snco, char *oname,
 
     if ((*snco > MAXLINE) || (*sncn > MAXLINE))
        {PD_error("VARIABLE NAME TOO LONG - PFLN", PD_GENERIC);
-        return(FALSE);};
+        rv = FALSE;}
 
-    SC_FORTRAN_STR_C(oldname, oname, *snco);
-    SC_FORTRAN_STR_C(newname, nname, *sncn);
+    else
+       {SC_FORTRAN_STR_C(oldname, oname, *snco);
+	SC_FORTRAN_STR_C(newname, nname, *sncn);
 
-    rv = PD_ln(file, oldname, newname);
+	rv = PD_ln(file, oldname, newname);};
 
     return(rv);}
 

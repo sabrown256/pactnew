@@ -581,15 +581,18 @@ FIXNUM FF_ID(patrnn, PATRNN)(FIXNUM *sncc, char *chrs,
     FIXNUM ret;
     char **names, *pc;
 
+    ret = FALSE;
+
     pc = CMAKE_N(char, *sncc + 2);
     SC_FORTRAN_STR_C(pc, chrs, *sncc);
 
     names = SC_tokenize(pc, " \t\f\n\r");
-    for (n = 0; names[n] != NULL; n++);
+    if (names != NULL)
+       {for (n = 0; names[n] != NULL; n++);
 
-    ret = PA_th_trans_name(n, names, (int) *sord, (int) *sncpf);
+	ret = PA_th_trans_name(n, names, (int) *sord, (int) *sncpf);
 
-    SC_free_strings(names);
+	SC_free_strings(names);};
 
     CFREE(pc);
 
@@ -599,7 +602,7 @@ FIXNUM FF_ID(patrnn, PATRNN)(FIXNUM *sncc, char *chrs,
 /*--------------------------------------------------------------------------*/
 
 /* PATRNL - transpose a time history file family by links
- *        - Return 1 if successful and 0 otherwise.
+ *        - return 1 if successful and 0 otherwise.
  */
 
 FIXNUM FF_ID(patrnl, PATRNL)(FIXNUM *sncc, char *chrs,
@@ -608,15 +611,18 @@ FIXNUM FF_ID(patrnl, PATRNL)(FIXNUM *sncc, char *chrs,
     FIXNUM ret;
     char **names, *pc;
 
+    ret = FALSE;
+
     pc = CMAKE_N(char, *sncc + 2);
     SC_FORTRAN_STR_C(pc, chrs, *sncc);
 
     names = SC_tokenize(pc, " \t\f\n\r");
-    for (n = 0; names[n] != NULL; n++);
+    if (names != NULL)
+       {for (n = 0; names[n] != NULL; n++);
 
-    ret = PA_th_trans_link(n, names, (int) *sord, (int) *sncpf);
+	ret = PA_th_trans_link(n, names, (int) *sord, (int) *sncpf);
     
-    SC_free_strings(names);
+	SC_free_strings(names);};
 
     CFREE(pc);
 
@@ -626,7 +632,7 @@ FIXNUM FF_ID(patrnl, PATRNL)(FIXNUM *sncc, char *chrs,
 /*--------------------------------------------------------------------------*/
 
 /* PAMRGF - FORTRAN interface routine to merge a family of ULTRA files
- *        - Return 1 if successful and 0 otherwise.
+ *        - return 1 if successful and 0 otherwise.
  *
  *        - SNCB    number of characters in BASE
  *        - BASE    base name of target (merged) file family
@@ -667,16 +673,19 @@ FIXNUM FF_ID(pamrgn, PAMRGN)(FIXNUM *sncb, char *base,
     FIXNUM ret;
     char **files, *pc, s[MAXLINE];
 
+    ret = FALSE;
+
     pc = CMAKE_N(char, *sncc + 2);
     SC_FORTRAN_STR_C(pc, chrs, *sncc);
     SC_FORTRAN_STR_C(s, base, *sncb);
 
     files = SC_tokenize(pc, " \t\f\n\r");
-    for (n = 0; files[n] != NULL; n++);
+    if (files != NULL)
+       {for (n = 0; files[n] != NULL; n++);
 
-    ret = PA_merge_files(s, n, files, (int) *sncpf);
+	ret = PA_merge_files(s, n, files, (int) *sncpf);
 
-    SC_free_strings(files);
+	SC_free_strings(files);};
 
     CFREE(pc);
 
@@ -736,13 +745,15 @@ FIXNUM FF_ID(pathtn, PATHTN)(char *chrs, FIXNUM *sord, FIXNUM *sncpf)
     FIXNUM ret;
     char *pc, **names;
 
+    ret   = FALSE;
     pc    = chrs;
     names = SC_tokenize(pc, " \t\f\n\r");
-    for (n = 0; names[n] != NULL; n++);
+    if (names != NULL)
+       {for (n = 0; names[n] != NULL; n++);
 
-    ret = PA_th_trans_name(n, names, (int) *sord, (int) *sncpf);
+	ret = PA_th_trans_name(n, names, (int) *sord, (int) *sncpf);
 
-    SC_free_strings(names);
+	SC_free_strings(names);};
 
     return(ret);}
 
@@ -759,13 +770,15 @@ FIXNUM FF_ID(pathtl, PATHTL)(char *chrs, FIXNUM *sord, FIXNUM *sncpf)
     FIXNUM ret;
     char **names, *pc;
 
+    ret   = FALSE;
     pc    = chrs;
     names = SC_tokenize(pc, " \t\f\n\r");
-    for (n = 0; names[n] != NULL; n++);
+    if (names != NULL)
+       {for (n = 0; names[n] != NULL; n++);
 
-    ret = PA_th_trans_link(n, names, (int) *sord, (int) *sncpf);
+	ret = PA_th_trans_link(n, names, (int) *sord, (int) *sncpf);
     
-    SC_free_strings(names);
+	SC_free_strings(names);};
 
     return(ret);}
 

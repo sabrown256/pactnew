@@ -113,7 +113,6 @@ fcdes *_SC_unknown_container(char *name)
     ok = FALSE;
     if (nt == 3)
        {fp  = fopen(ta[0], "r");
-	ok  = (fp != NULL);
 	sad = SC_stoi(ta[1]);
 	ead = SC_stoi(ta[2]);
 	ok &= (ead > sad);};
@@ -142,7 +141,10 @@ fcdes *_SC_unknown_container(char *name)
 	fc = CMAKE(fcdes);
 	fc->name    = CSTRSAVE(name);
 	fc->file    = fp;
-	fc->entries = tab;};
+	fc->entries = tab;}
+
+    else if (fp != NULL)
+       fclose(fp);
 
     SC_free_strings(ta);
 
