@@ -186,9 +186,10 @@ static void _SC_process_rule(int *pn, char ***pt, char *s, char *delim)
 
     if (s != NULL)
        {sa = SC_tokenize(s, delim);
-        for (n = 0; sa[n] != NULL; n++);
-	if (n == 0)
-	   {CFREE(sa);};};
+	if (sa != NULL)
+	   {for (n = 0; sa[n] != NULL; n++);
+	    if (n == 0)
+	       CFREE(sa);};};
 
     *pn = n;
     *pt = sa;

@@ -19,10 +19,11 @@ static fcdes *_SC_make_archive(char *name, FILE *fp, int nb, hasharr *tab)
    {fcdes *fc;
 
     fc = CMAKE(fcdes);
-    fc->name     = CSTRSAVE(name);
-    fc->file     = fp;
-    fc->hdr_size = nb;
-    fc->entries  = tab;
+    if (fc != NULL)
+       {fc->name     = CSTRSAVE(name);
+	fc->file     = fp;
+	fc->hdr_size = nb;
+	fc->entries  = tab;};
 
     return(fc);}
 
@@ -397,7 +398,10 @@ fcdes *SC_scan_archive(char *arf)
 
 		fseek(fp, pos, SEEK_SET);};};
 
-	fc = _SC_make_archive(arf, fp, nb, tab);};
+	fc = _SC_make_archive(arf, fp, nb, tab);
+
+        if (fc == NULL)
+	   fclose(fp);};
 
     return(fc);}
 

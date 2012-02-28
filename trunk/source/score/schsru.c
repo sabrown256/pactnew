@@ -292,17 +292,18 @@ static int _SC_sys_host(char *lst, int vrb)
 
     if (lst[0] == '-')
        {tp = SC_get_host_types(0, NULL);
+	if (tp != NULL)
 
 /* check each host of this type */
-	for (n = 0; TRUE; n++)
-	    {ps = tp[n];
-	     if (ps == NULL)
-	        break;
-	     else
-	        {t = strchr(ps, '@');
-		 if (t != NULL)
-		    *t = '\0';
-		 sys[n] = ps;};};}
+	   {for (n = 0; TRUE; n++)
+	        {ps = tp[n];
+		 if (ps == NULL)
+		    break;
+		 else
+		    {t = strchr(ps, '@');
+		     if (t != NULL)
+		        *t = '\0';
+		     sys[n] = ps;};};};}
 
     else
        {ps = s;

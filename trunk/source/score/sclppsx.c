@@ -148,7 +148,6 @@ static int _SC_dup_fd(char *msg, int to, SC_filedes *fd, int nfd, int ofd)
 	       ofd = fd[1].fd;
 	    else if ((nfd == 1) && (fd[2].fd != -1))
 	       ofd = fd[2].fd;}
-	else
 
 /* GOTCHA: retry failed opens if the cause might be due to slow
  * NFS response or transient system issues
@@ -174,16 +173,17 @@ static int _SC_dup_fd(char *msg, int to, SC_filedes *fd, int nfd, int ofd)
  *    ETXTBSY      write executable which is currently being executed
  *
  */
-	   p   = SC_get_perm(FALSE);
-	   ofd = open(fd[nfd].name, fd[nfd].flag, p);
-           err = errno;
-	   if ((ofd == -1) && (to > 0) &&
-	       ((err == ENOSPC) || (err == ENOMEM) ||
-		(err == EMFILE) || (err == ENFILE) ||
-		(err == ENOENT) || (err == EEXIST) ||
-		(err == ETXTBSY)))
-	      {SC_sleep(to);
-	       ofd = open(fd[nfd].name, fd[nfd].flag, p);};};
+	else
+	   {p   = SC_get_perm(FALSE);
+	    ofd = open(fd[nfd].name, fd[nfd].flag, p);
+	    err = errno;
+	    if ((ofd == -1) && (to > 0) &&
+		((err == ENOSPC) || (err == ENOMEM) ||
+		 (err == EMFILE) || (err == ENFILE) ||
+		 (err == ENOENT) || (err == EEXIST) ||
+		 (err == ETXTBSY)))
+	       {SC_sleep(to);
+		ofd = open(fd[nfd].name, fd[nfd].flag, p);};};};
 
     if (ofd < 0)
        SC_error(SC_EXIT_ERRNO(), "COULD NOT OPEN %s (%d/%d) - _SC_DUP_FD",

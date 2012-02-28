@@ -700,7 +700,8 @@ int SC_file_access(int log)
            continue;
 
         indx -= 'A';
-        fp = file[indx];
+	indx  = max(indx, 0);
+        fp    = file[indx];
 
         if (_SC_debug)
            {fprintf(_SC_diag, "Doing: %c on file %d(%p)\n", code, indx, fp);

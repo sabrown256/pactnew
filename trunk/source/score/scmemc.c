@@ -210,6 +210,8 @@ void SC_configure_mm(long mxl, long mxm, long bsz, double r)
 
        assert(_SC_ms.bins != NULL);
 
+       _SC_ms.bins[0] = 8;
+
 /* fill the linear region */
        for (n = 1L; _SC_ms.mem_align_size*n <= mxl; n++)
 	   _SC_ms.bins[n-1] = (n << _SC_ms.mem_align_expt);
