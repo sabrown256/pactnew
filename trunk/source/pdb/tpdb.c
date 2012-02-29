@@ -3672,7 +3672,7 @@ int main(int c, char **v)
         {if (v[i][0] == '-')
             {switch (v[i][1])
                 {case 'b' :
-		      bfsz = SC_stoi(v[++i]);
+		      bfsz = SC_stol(v[++i]);
 		      break;
                  case 'c' :
 		      check_writes = TRUE;

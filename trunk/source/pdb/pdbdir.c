@@ -125,7 +125,7 @@ int PD_ln(PDBfile *file ARG(,,cls), char *oldname, char *newname)
        {PD_error("FILE OPENED READ-ONLY - PD_LN", PD_GENERIC);
         return(FALSE);};
      
-    nname = _PD_var_namef(file, newname, newpath);
+    nname = _PD_var_namef(file, newname, newpath, MAXLINE);
     if (nname != NULL)
        {strcpy(oldpath, _PD_fixname(file, oldname));
 

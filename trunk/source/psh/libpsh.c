@@ -67,24 +67,19 @@ char *nstrsave(char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* VSTRCAT - safe strcat function */
+/* NSTRNCPY - this is to strncpy as snprintf is to sprintf
+ *          - a safe string copy function
+ *          - unlike strncpy this always returns a null terminated string
+ */
 
-char *vstrcat(char *d, int nc, char *fmt, ...)
-   {int n, nd, ns;
-    char s[LRG];
-
-    VA_START(fmt);
-    VSNPRINTF(s, LRG, fmt);
-    VA_END;
-
-    nd = strlen(d);
-    ns = strlen(s);
-    n  = nc - 1 - nd;
-    n  = min(n, ns);
-    n  = max(n, 0);
-
-    strncat(d, s, n);
-    d[nd+n] = '\0';
+char *nstrncpy(char *d, size_t nd, char *s, size_t ns)
+   {size_t nc;
+        
+    if ((s != NULL) && (d != NULL))
+       {nc = min(ns, nd-1);
+	nc = max(nc, 0);
+	strncpy(d, s, nc);
+	d[nc] = '\0';};
 
     return(d);}
 
@@ -96,31 +91,31 @@ char *vstrcat(char *d, int nc, char *fmt, ...)
 char *nstrcat(char *d, int nc, char *s)
    {int n, nd, ns;
 
-    nd = strlen(d);
-    ns = strlen(s);
-    n  = nc - 1 - nd;
-    n  = min(n, ns);
+    if (d != NULL)
+       {nd = strlen(d);
+	ns = strlen(s);
+	n  = nc - 1 - nd;
+	n  = min(n, ns);
+	n  = max(n, 0);
 
-    strncat(d, s, n);
-    d[nd+n] = '\0';
+	nstrncpy(d+nd, n+1, s, -1);
+	d[nd+n] = '\0';};
 
     return(d);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* NSTRNCPY - this is to strncpy as snprintf is to sprintf
- *          - a safe string copy function
- *          - unlike strncpy this always returns a null terminated string
- */
+/* VSTRCAT - safe strcat function */
 
-char *nstrncpy(char *d, size_t nd, char *s, size_t ns)
-   {size_t nc;
-        
-    nc = min(ns, nd-1);
-    if (s != NULL)
-       {strncpy(d, s, nc);
-	d[nc] = '\0';};
+char *vstrcat(char *d, int nc, char *fmt, ...)
+   {char s[LRG];
+
+    VA_START(fmt);
+    VSNPRINTF(s, LRG, fmt);
+    VA_END;
+
+    d = nstrcat(d, nc, s);
 
     return(d);}
 

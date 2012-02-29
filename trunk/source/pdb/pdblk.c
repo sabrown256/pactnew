@@ -717,8 +717,8 @@ int _PD_block_csum_read(PDBfile *file)
 	   break;
 
 	name = SC_strtok(local, " \n", s);
-	n    = SC_stoi(SC_strtok(NULL, " \n", s));
-	ne   = SC_stoi(SC_strtok(NULL, " \n", s));
+	n    = SC_stol(SC_strtok(NULL, " \n", s));
+	ne   = SC_stol(SC_strtok(NULL, " \n", s));
 
 	SC_ASSERT(n > 0);
 
@@ -733,7 +733,7 @@ int _PD_block_csum_read(PDBfile *file)
 		    {_PD_get_token(NULL, local, bsz, '\n');
 		     token = SC_strtok(local, " \n", s);};
 		     
-		 j   = SC_stoi(token);
+		 j   = SC_stol(token);
 		 dig = (unsigned char *) SC_strtok(NULL, " \n", s);
 
 		 if (j < nb)

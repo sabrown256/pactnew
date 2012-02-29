@@ -389,13 +389,13 @@ int main(int c, char **v)
         {if (strcmp(v[i], "-md") == 0)
 	    st.meta = FALSE;
 	 else if (strcmp(v[i], "-n") == 0)
-	    st.n = SC_stoi(v[++i]);
+	    st.n = SC_stol(v[++i]);
 	 else if (strcmp(v[i], "-nv") == 0)
 	    st.nv = SC_stoi(v[++i]);
  	 else if (v[i][0] == '-')
             {switch (v[i][1])
                 {case 'b' :
-		      st.bfsz = SC_stoi(v[++i]);
+		      st.bfsz = SC_stol(v[++i]);
 		      break;
 		 case 'd' :
 		      st.debug_mode  = TRUE;

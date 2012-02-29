@@ -206,7 +206,7 @@ int _PD_csum_block_read(PDBfile *file, char *name, syment *ep, long n)
 	type = PD_entry_type(ep);
 	bpi  = _PD_lookup_size(type, file->chart);
 
-	lname = _PD_var_namef(NULL, name, bf);
+	lname = _PD_var_namef(NULL, name, bf, MAXLINE);
 	epo   = PD_inquire_entry(file, lname, FALSE, NULL);
 	if (epo != NULL)
 	   {blo   = epo->blocks;

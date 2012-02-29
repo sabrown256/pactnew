@@ -291,8 +291,11 @@ long PD_sizeof(PDBfile *file ARG(,,cls),
              svr += size;
              GO(LEAF_ITEM);};
 
-         PD_CAST_TYPE(ttype, desc, svr+desc->member_offs, svr,
-		      PD_error, "BAD CAST - PD_SIZEOF", PD_TRACE);
+         if (svr != NULL)
+	    {PD_CAST_TYPE(ttype, desc, svr+desc->member_offs, svr,
+			  PD_error, "BAD CAST - PD_SIZEOF", PD_TRACE);}
+	 else
+	    ttype = NULL;
 
          SAVE_S(ltype, ttype);
 

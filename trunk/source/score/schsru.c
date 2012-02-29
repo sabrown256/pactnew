@@ -290,6 +290,9 @@ static int _SC_sys_host(char *lst, int vrb)
     char s[MAXLINE], out[MAXLINE];
     char *ps, *t, *p, *sys[100], **tp;
 
+    n = 0;
+    memset(sys, 0, sizeof(sys));
+
     if (lst[0] == '-')
        {tp = SC_get_host_types(0, NULL);
 	if (tp != NULL)

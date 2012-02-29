@@ -89,13 +89,17 @@ void _PA_init_sources(double t, double dt)
                   if ((ivs->type != 'v') ||
                       (strcmp(name, ivs->name) == 0))
                      {n_times = SC_stoi(SC_strtok(NULL, "|", s));
-                      token   = SC_strtok(NULL, "|", s);
-                      times   = CMAKE_N(double, n_times);
 
+                      token = SC_strtok(NULL, "|", s);
+                      PA_ERR((token == NULL),
+                             "NO VARIABLE SPECIFIED - INIT-SOURCES");
+
+                      times = CMAKE_N(double, n_times);
                       PA_ERR(((times == NULL) ||
 			      (PD_read(fp, token, times) == 0)),
                              "CAN'T READ %s IN %s - INIT-SOURCES",
                              token, files[j]);
+
                       PM_array_scale(times, n_times, PA_gs.units[SEC]);
 
 /* install this source variable in the array, PA_gs.sv_list and have the

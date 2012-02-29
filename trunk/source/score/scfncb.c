@@ -226,17 +226,17 @@ int SC_free_mem(double *mem)
 	    break;
 	 if (strcmp(t, "Mem") == 0)
 	    {v      = SC_strtok(NULL, " \t\n", p);
-	     mem[0] = SC_stoi(v);
+	     mem[0] = SC_stol(v);
 	     SC_strtok(NULL, " \t\n", p);
 	     v      = SC_strtok(NULL, " \t\n", p);
-	     mem[1] = SC_stoi(v);
+	     mem[1] = SC_stol(v);
 	     break;}
 	 else if (strcmp(t, "MemTotal") == 0)
 	    {v      = SC_strtok(NULL, " \t\n", p);
-	     mem[0] = SC_stoi(v);}
+	     mem[0] = SC_stol(v);}
 	 else if (strcmp(t, "MemFree") == 0)
 	    {v      = SC_strtok(NULL, " \t\n", p);
-	     mem[1] = SC_stoi(v);
+	     mem[1] = SC_stol(v);
 	     break;};};
 
      io_close(fp);}
@@ -720,17 +720,17 @@ int SC_nfs_monitor(int *st, int nc)
 	t = SC_strtok(s, " \t\n", p);
 	s = NULL;
 
-	st[0] = SC_stoi(t);
+	st[0] = SC_stol(t);
 
 	if (nc == 2)
 	   {t     = SC_strtok(s, " \t\n", p);
 	    t     = SC_strtok(s, " \t\n", p);
-	    st[1] = SC_stoi(t);}
+	    st[1] = SC_stol(t);}
 
 	else
 	   {for (i = 1; i < nc; i++)
 	        {t     = SC_strtok(s, " \t\n", p);
-		 st[i] = SC_stoi(t);};};
+		 st[i] = SC_stol(t);};};
 	rv = TRUE;}
 
     else
@@ -940,17 +940,18 @@ static char **_SC_backtrace_exe(int pid, int to)
 		for (i = 0; i < n; i++)
 		    {SC_strncpy(s, MAXLINE, out[i], -1);
 		     ta = SC_tokenize(s, " \t[]");
-		     if ((ta != NULL) && (ta[1] != NULL))
-		        {ad = SC_strtol(ta[1], NULL, 16);
+		     if (ta != NULL)
+		        {if (ta[1] != NULL)
+			    {ad = SC_strtol(ta[1], NULL, 16);
 
-			 SC_exe_map_addr(&sl, st, out[i]);
+			     SC_exe_map_addr(&sl, st, out[i]);
 
-			 _SC_push_loc(str, i, ad, loc);}
-		     else
-		        {snprintf(s, MAXLINE, "#%-4d[%s]\n", i, ta[0]);
-			 SC_array_string_add_copy(str, s);};
+			     _SC_push_loc(str, i, ad, loc);}
+			 else
+			    {snprintf(s, MAXLINE, "#%-4d[%s]\n", i, ta[0]);
+			     SC_array_string_add_copy(str, s);};
 
-		     SC_free_strings(ta);};
+			 SC_free_strings(ta);};};
 
 		SC_exe_close(st);
 

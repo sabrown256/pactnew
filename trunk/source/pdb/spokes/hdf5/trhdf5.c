@@ -387,18 +387,20 @@ static hsize_t *_H5_enc_dims(PDBfile *file, int *pnd,
     else if (tcid == H5T_STRING)
        {DEBUG1("      H5T_STRING nd(%d)\n", nd);
 
-        nd       = 1;
-        hdims    = (hsize_t*) calloc(nd, sizeof(hsize_t));
-        hdims[0] = H5Tget_size(htyp);}
+        nd    = 1;
+        hdims = (hsize_t*) calloc(nd, sizeof(hsize_t));
+	if (hdims != NULL)
+	   hdims[0] = H5Tget_size(htyp);}
 
     else 
        {long id;
 	dimdes *lst;
 
 	if (ni > 0)
-	   {nd       = 1;
-	    hdims    = (hsize_t *) calloc(nd, sizeof(hsize_t)); 
-	    hdims[0] = ni;}
+	   {nd    = 1;
+	    hdims = (hsize_t *) calloc(nd, sizeof(hsize_t)); 
+	    if (hdims != NULL)
+	       hdims[0] = ni;}
 
         else
 	   {for (nd = 0, lst = pdims; lst != NULL; lst = lst->next, nd++);
@@ -906,14 +908,17 @@ static dimdes *_H5_dec_dims(PDBfile *file, hid_t htyp, hid_t hdim)
 
         DEBUG1("      H5T_ARRAY rank(%d)\n", nd);
         hdims = (hsize_t*) calloc(nd, sizeof(hsize_t));
+	if (hdims != NULL)
+	   {
+
 #if (H5_VERS_RELEASE < 4)
-        status = H5Tget_array_dims(htyp, hdims); 
+	   status = H5Tget_array_dims(htyp, hdims); 
 #else
-	status = H5Tget_array_dims(htyp, hdims, NULL);
+	   status = H5Tget_array_dims(htyp, hdims, NULL);
 #endif
 
-        if (H5Tget_class(nativetype_id) == H5T_STRING)
-           {hdims[nd-1] = H5Tget_size(nativetype_id);}
+	   if (H5Tget_class(nativetype_id) == H5T_STRING)
+	      hdims[nd-1] = H5Tget_size(nativetype_id);};
 
         H5Tclose(nativetype_id);}
 
@@ -922,8 +927,9 @@ static dimdes *_H5_dec_dims(PDBfile *file, hid_t htyp, hid_t hdim)
 
         DEBUG1("      H5T_STRING rank(%d)\n", nd);
 
-        hdims    = (hsize_t*) calloc(nd, sizeof(hsize_t));
-        hdims[0] = H5Tget_size(htyp);}
+        hdims = (hsize_t*) calloc(nd, sizeof(hsize_t));
+	if (hdims != NULL)
+	   hdims[0] = H5Tget_size(htyp);}
 
     else 
        {scid = H5Sget_simple_extent_type(hdim);
@@ -963,30 +969,31 @@ static dimdes *_H5_dec_dims(PDBfile *file, hid_t htyp, hid_t hdim)
 		return(NULL);};};
 
 /* construct the dimensionality information */
-     if (nd > 0)
-        {pdims = CMAKE(dimdes);
-         dim   = pdims;}
-     else 
-        pdims = NULL;
+    if (nd > 0)
+       {pdims = CMAKE(dimdes);
+        dim   = pdims;}
+    else 
+       pdims = NULL;
 
-     for (i = 0; i < nd; i++) 
+    if (hdims != NULL)
+       {for (i = 0; i < nd; i++) 
 
 /* HDF5 files assume 0 based counting */
-         {dim->number    = (long) hdims[i];
-          dim->index_min = 0L;
-          dim->index_max = dim->number - 1L; 
+	    {dim->number    = (long) hdims[i];
+	     dim->index_min = 0L;
+	     dim->index_max = dim->number - 1L; 
 
-          DEBUG1("      dim %d:", nd);
-          DEBUG1(" 0:%ld\n", dim->index_max);    
+	     DEBUG1("      dim %d:", nd);
+	     DEBUG1(" 0:%ld\n", dim->index_max);    
 
 /* are we going around again? */
-         if (i+1 < nd)
-            {dim->next = CMAKE(dimdes);
-             dim       = dim->next;}
-         else
-            dim->next = NULL;};
+	     if (i+1 < nd)
+	        {dim->next = CMAKE(dimdes);
+		 dim       = dim->next;}
+	     else
+	        dim->next = NULL;};
 
-    free(hdims);
+	free(hdims);};
 
     return(pdims);}
 

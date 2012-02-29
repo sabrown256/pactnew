@@ -428,13 +428,13 @@ int main(int c, char **v)
 	 else if (strcmp(v[i], "-dna") == 0)
 	    st.dna = SC_stoi(v[++i]);
 	 else if (strcmp(v[i], "-ni") == 0)
-	    st.ni = SC_stoi(v[++i]);
+	    st.ni = SC_stol(v[++i]);
 	 else if (strcmp(v[i], "-dni") == 0)
-	    st.dni = SC_stoi(v[++i]);
+	    st.dni = SC_stol(v[++i]);
  	 else if (v[i][0] == '-')
             {switch (v[i][1])
                 {case 'b' :
-		      bfsz = SC_stoi(v[++i]);
+		      bfsz = SC_stol(v[++i]);
 		      break;
                  case 'c' :
 		      check_writes = TRUE;

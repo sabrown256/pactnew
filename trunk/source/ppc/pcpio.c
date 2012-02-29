@@ -389,9 +389,9 @@ static int _PC_get_message(int i)
 
         case SC_FREAD :
 	     type = SC_strtok(NULL, ",\n", t);
-	     ni   = SC_stoi(SC_strtok(NULL, ",\n", t));
+	     ni   = SC_stol(SC_strtok(NULL, ",\n", t));
 
-/*	     blk  = SC_stoi(SC_strtok(NULL, ",\n", t)); */
+/*	     blk  = SC_stol(SC_strtok(NULL, ",\n", t)); */
 	     SC_strtok(NULL, ",\n", t);
 
 	     _PC_get_msg(i);
@@ -400,8 +400,8 @@ static int _PC_get_message(int i)
 
         case SC_FWRITE :
              type = SC_strtok(NULL, ",\n", t);
-	     ni   = SC_stoi(SC_strtok(NULL, ",\n", t));
-	     indx = SC_stoi(SC_strtok(NULL, ",\n", t));
+	     ni   = SC_stol(SC_strtok(NULL, ",\n", t));
+	     indx = SC_stol(SC_strtok(NULL, ",\n", t));
 
              _PC_put_msg(pi, type, ni, indx);
 

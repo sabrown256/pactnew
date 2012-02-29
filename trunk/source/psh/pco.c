@@ -859,7 +859,8 @@ static void check_dir(void)
 /* READ_LINE - read the next line from the input */
 
 static void read_line(char *s, int nc)
-   {char *p, *pc;
+   {int n;
+    char *p, *pc;
     file_entry *se;
 
     se = &st.fstck.file[st.fstck.n-1];
@@ -868,11 +869,20 @@ static void read_line(char *s, int nc)
     if (p != NULL)
        {se->iline++;
 
+/* make sure the line ends in '\n'
+ * if last line in file does not end in '\n' this
+ * can happen with bad consequences
+ */
+	n = strlen(p);
+	if (p[n-1] != '\n')
+	   p[n++] = '\n';
+
+/* now end the line - stripping off trailing comment or '\n' */
 	pc = strchr(p, '#');
 	if (pc != NULL)
 	   *pc = '\0';
 	else
-	   LAST_CHAR(s) = '\0';
+	   s[n-1] = '\0';
 
 /* toss blank and comment lines */
 	if (blank_line(s) == TRUE)

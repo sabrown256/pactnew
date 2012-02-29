@@ -755,7 +755,7 @@ int main(int c, char **v)
         {if (v[i][0] == '-')
             {switch (v[i][1])
                 {case 'b' :
-		      bsz = SC_stoi(v[++i]);
+		      bsz = SC_stol(v[++i]);
 		      break;
                  case 'd' :
 		      debug = TRUE;

@@ -581,7 +581,7 @@ extern char
  *_PD_member_name(char *s),
  *_PD_var_name(char *s),
  *_PD_hyper_type(char *name, char *type),
- *_PD_var_namef(PDBfile *file, char *name, char *bf);
+ *_PD_var_namef(PDBfile *file, char *name, char *bf, int nc);
 
 
 /* PDPAR.C declarations */

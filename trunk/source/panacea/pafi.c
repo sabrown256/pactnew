@@ -617,7 +617,7 @@ static void _PA_rd_dd_tab(PA_package *pck, FILE *fp)
  */
 
 int _PA_rd_db_tab(PA_package *pck, FILE *fp)
-   {int i, j, ne, nf, ne_read, nd;
+   {int i, j, ne, nf, nr, nd;
     int vattr[N_ATTRIBUTES];
     char bf[MAXLINE], vname[MAXLINE], memb[MAXLINE];
     char *old_delim, *pb, *token, *bname;
@@ -628,6 +628,8 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
     hasharr *fc;
     memdes *desc, *lst, *prv;
     defstr *dp;
+
+    nr = 0;
 
     if (PA_gs.vif == NULL)
        PA_gs.vif = PA_open("vif", "r+", TRUE);
@@ -662,7 +664,7 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
     if (PA_gs.vif != NULL)
 
 /* get the entries */
-       {for (i = 1, ne_read = 0; TRUE; i++, ne_read++)
+       {for (i = 1, nr = 0; TRUE; i++, nr++)
 	    {if (GETLN(bf, MAXLINE, fp) == NULL)
 	        break;
            
@@ -751,9 +753,9 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
 	PA_ERR((dp == NULL),
 	       "STRUCT DEFINITION FAILED - _PA_RD_DB_TAB");
 
-	PA_WARN((ne > 0) && (ne != ne_read),
+	PA_WARN((ne > 0) && (ne != nr),
 		"TABLE %s, EXPECTED %d ENTRIES FOUND %d - _PA_RD_DB_TAB",
-		pt->name, ne, ne_read);
+		pt->name, ne, nr);
 
 	PA_gs.token_delimiters = old_delim;
 
@@ -761,7 +763,7 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
 	pck->db_list = SC_mk_pcons(SC_STRING_S, CSTRSAVE(pt->name),
 				   SC_PCONS_P_S, pck->db_list);};
 
-    return(ne_read);}
+    return(nr);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

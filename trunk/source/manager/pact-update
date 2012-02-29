@@ -35,33 +35,30 @@ if ($?USER == 0) then
    endif
 endif
 
-set Base       = $cwd
-set KEEP       = FALSE
-set SaveDocs   = FALSE
-set Manager    = manager
-set ConfigDir  = ""
-set ConfigOnly = FALSE
-set Host       = ""
-set LstCfg     = FALSE
-set MailAddr   = $USER
-set Nodename   = `uname -n`
-set Pattern    = 'pact.README pact*-src pact*.tar.gz'
-set InstArg    = ""
-set WhoIAm     = $USER
-set SrcOnly    = FALSE
-set TmpFile    = tmp-file
-set TmpDir     = tmp-dir
-set Host       = `uname -n`
-set OS         = `uname -s | tr "[A-Z]" "[a-z]"`
-set Force      = ""
+set base       = $cwd
+set keep       = FALSE
+set savedocs   = FALSE
+set mngdir     = manager
+set cfgonly    = FALSE
+set lstcfg     = FALSE
+set node       = `uname -n`
+set pattern    = 'pact.README pact*-src pact*.tar.gz'
+set srconly    = FALSE
+set tmpf       = tmp-file
+set tmpd       = tmp-dir
+set host       = `uname -n`
+set os         = `uname -s | tr "[A-Z]" "[a-z]"`
+set force      = ""
+set test       = TRUE
+set vrb        = FALSE
 
-set Name = $0
-set Name = $Name:t
+set name = $0
+set name = $name:t
 
-if ($Name == "pact-update") then
-   set SrcMode = "repo"
+if ($name == "pact-update") then
+   set srcmode = "repo"
 else
-   set SrcMode = "self"
+   set srcmode = "self"
 endif
 
 #--------------------------------------------------------------------------
@@ -70,20 +67,20 @@ endif
 
 #--------------------------------------------------------------------------
 
-set Opt = "$Name  $argv"
+set opt = "$name  $argv"
 
-set CArgs = ""
+set cargs = ""
 while ($#argv > 0)
    switch ($1)
       case -cfg:
-           set ConfigOnly = TRUE
+           set cfgonly = TRUE
            breaksw
       case -force:
-           set Force = "-force"
+           set force = "-force"
            breaksw
       case -h:
            echo ""
-           if ($Name == "pact-update") then
+           if ($name == "pact-update") then
               echo "Usage:"
               echo "       pact-update [-cfg] [-extr] [-force] [-h] [-keep] [-lst]"
               echo "                   [+-net <host>] | [-src] | [-tar <tar-file>] [-vers]"
@@ -93,7 +90,7 @@ while ($#argv > 0)
            else
               echo "Usage:"
               echo "       pact-src [-c] [-cc <C Compiler>] [-cfg] [-force] [-extr] [-g]"
-              echo "                [-h] [-i <dir>] [-keep] [-vers] [-t]"
+              echo "                [-h] [-i <dir>] [-keep] [-t] [-test] [-vers] [-vrb]"
               echo "                ..."
               echo ""
               echo "Self-building PACT distribution."
@@ -110,7 +107,7 @@ while ($#argv > 0)
            echo "               in directory where new distribution being built"
            echo "    -lst       list some possible configurations that are available"
            echo "    -vers      only print the PACT Version (No update)"
-           if ($Name == "pact-update") then
+           if ($name == "pact-update") then
               echo "    +net       get the PACT source from the specified host"
               echo "               via anonymous FTP without the documentation"
               echo "    -net       get the PACT source from the specified host"
@@ -166,6 +163,8 @@ while ($#argv > 0)
               echo "    -s         build OpenMP version (equivalent to -feature openmp)"
               echo "    -sl        build shared libraries (equivalent to -feature shared)"
               echo "    -t         build threaded version (equivalent to -feature pthread)"
+              echo "    -test      do not run tests"
+              echo "    -vrb       run verbosely"
               echo ""
               echo "   Config files are optional and should be used to exercise"
               echo "   more control than is available from the command line options"
@@ -185,29 +184,32 @@ while ($#argv > 0)
            exit(1)
            breaksw
       case -lst:
-           set LstCfg = TRUE
+           set lstcfg = TRUE
            breaksw
       case -keep:
-           set KEEP = TRUE
+           set keep = TRUE
            breaksw
       case +net:
-           set SaveDocs = TRUE
+           set savedocs = TRUE
       case -net:
            shift
-           set Host    = $1
-           set SrcMode = "net"
+           set host    = $1
+           set srcmode = "net"
            breaksw
       case -src:
-           set SrcMode = "source"
-           set KEEP    = TRUE
+           set srcmode = "source"
+           set keep    = TRUE
            breaksw
       case -tar:
            shift
-           set TarFile = $1
-           set SrcMode = "tar"
+           set tarf    = $1
+           set srcmode = "tar"
+           breaksw
+      case -test:
+           set test = FALSE
            breaksw
       case -extr:
-           set SrcOnly = TRUE
+           set srconly = TRUE
            breaksw
       case -vers:
            if (-e ../score/score.h) then
@@ -220,24 +222,26 @@ while ($#argv > 0)
            endif
            exit(0)
            breaksw
-
+      case -vrb:
+           set vrb = TRUE
+           breaksw
       case -cc:
            shift
-           set CArgs = ( $CArgs -cc $1 )
+           set cargs = ( $cargs -cc $1 )
            breaksw
       default:
-           set CArgs = ( $CArgs $1 )
+           set cargs = ( $cargs $1 )
    endsw
    shift
 end
 
-InitLog Log $Base/Build.Log
+InitLog Log $base/Build.Log
 
-Note $Log "Operation:  $Opt "
-Note $Log "Update PACT installation on $Nodename"
+Note $Log "Operation:  $opt "
+Note $Log "Update PACT installation on $node"
 Note $Log ""				 
-Note $Log "Update Log		Host: $Host running $OS"
-Note $Log "User: $WhoIAm		Date: `date`"
+Note $Log "Update Log		Host: $host running $os"
+Note $Log "User: $USER		Date: `date`"
 Note $Log ""				 
 Note $Log ""				 
 
@@ -247,7 +251,7 @@ Note $Log ""
 
 #--------------------------------------------------------------------------
 
-switch ($SrcMode)
+switch ($srcmode)
 
 # sources are out and ready
    case source:
@@ -259,31 +263,31 @@ switch ($SrcMode)
 
 # anonymous ftp based update
    case net:
-        NoteD $Log "Getting the PACT sources from $Host"
+        NoteD $Log "Getting the PACT sources from $host"
 
 # echo the FTP command into the log
         Note $Log ""
         Note $Log "FTP Commands for Update"
-        Note $Log "   open $Host"
-        Note $Log "   user anonymous password $USER@$Nodename"
+        Note $Log "   open $host"
+        Note $Log "   user anonymous password $USER@$node"
         Note $Log "   prompt"
         Note $Log "   bin"
         Note $Log "   cd pub"
-        Note $Log "   mget $Pattern"
+        Note $Log "   mget $pattern"
         Note $Log "   quit"
         Note $Log ""
 
 # do the transfer
-        (echo "open $Host" ; \
-         echo "user anonymous password $USER@$Nodename" ; \
+        (echo "open $host" ; \
+         echo "user anonymous password $USER@$node" ; \
          echo "prompt" ; \
          echo "bin" ; \
          echo "cd pub" ; \
-         echo "mget $Pattern" ; \
+         echo "mget $pattern" ; \
          echo "quit" ) | ftp -n >>& $Log
 
         flog $Log pact-foo-doc.tar.gz
-        if ($SaveDocs == TRUE) then
+        if ($savedocs == TRUE) then
            foreach i (pact*-doc.tar.gz)
               if ($i == pact-foo-doc.tar.gz) then
                  flog $Log rm $i
@@ -295,23 +299,23 @@ switch ($SrcMode)
            flog $Log rm -f pact*-doc.tar.gz
         endif
 
-        set Name = ""
+        set name = ""
         flog $Log touch pact-foo-src
         foreach i (pact*-src)
           if ($i != pact-foo-src) then
-             flog $Log set Name = $i
+             flog $Log set name = $i
           else
              flog $Log rm $i
           endif
         end
-        if ($Name == "") then
-           Note $Log "FTP failed to find PACT sources on $Host"
+        if ($name == "") then
+           Note $Log "FTP failed to find PACT sources on $host"
            exit(1)
         endif
 
         if (-e pact/manager/.pact-date) then
            set OldDate = `cat pact/manager/.pact-date`
-           set NewDate = $Name
+           set NewDate = $name
            flog $Log pact/manager/compare-date $NewDate $OldDate
            switch ($status)
               case 1:
@@ -331,24 +335,24 @@ switch ($SrcMode)
 
 # check if grep supports -a option (-a: process binary files as well as text files, necessary on some Linux systems)
         set GrepArgs = '-a'
-        flog $Log mkdir $TmpDir
-        flog $Log cd $TmpDir
-        echo "foo" > file.$TmpFile
-        flog $Log grep $GrepArgs foo file.$TmpFile
+        flog $Log mkdir $tmpd
+        flog $Log cd $tmpd
+        echo "foo" > file.$tmpf
+        flog $Log grep $GrepArgs foo file.$tmpf
         if ($status != 0) then
            set GrepArgs = ""
         endif
         flog $Log cd ..
-        flog $Log rm -r $TmpDir
+        flog $Log rm -r $tmpd
 
 # determine where pact.tar begins
 # the >& /dev/null following is to throw away complaints from grep about line being too long
-        (grep $GrepArgs -n  '\-----------------------\*\*\*   SEPARATOR   \*\*\*-----------------------' ./$Name > ln_.$TmpFile) >& /dev/null
-        set nlines = `grep -v echo ln_.$TmpFile | awk -F: '{print $1}'`
-        rm ln_.$TmpFile
+        (grep $GrepArgs -n  '\-----------------------\*\*\*   SEPARATOR   \*\*\*-----------------------' ./$name > ln_.$tmpf) >& /dev/null
+        set nlines = `grep -v echo ln_.$tmpf | awk -F: '{print $1}'`
+        rm ln_.$tmpf
 
 # write the shell script to extract the compressed tar file
-        set STDOUT = extr.$TmpFile
+        set STDOUT = extr.$tmpf
         rm -f $STDOUT
         touch $STDOUT
 
@@ -374,10 +378,10 @@ switch ($SrcMode)
         flog $Log chmod a+x $STDOUT
 
 # extract the tar file
-        Note $Log "cat ./$Name | ./$STDOUT"
-        set TarFile = `cat ./$Name | ./$STDOUT`
-        flog $Log set TarFile = $TarFile:r
-        flog $Log set SrcMode = "tar"
+        Note $Log "cat ./$name | ./$STDOUT"
+        set tarf = `cat ./$name | ./$STDOUT`
+        flog $Log set tarf = $tarf:r
+        flog $Log set srcmode = "tar"
 
         flog $Log rm -f $STDOUT
         breaksw
@@ -392,8 +396,8 @@ switch ($SrcMode)
         breaksw
 endsw
 
-if ($LstCfg == TRUE) then
-   tar tzvf $TarFile.gz |& grep "std/auto-" |& awk '{ print "     " $6}' |& sed 's+pact/manager/std/auto-++'
+if ($lstcfg == TRUE) then
+   tar tzvf $tarf.gz |& grep "std/auto-" |& awk '{ print "     " $6}' |& sed 's+pact/manager/std/auto-++'
    exit(1)
 endif
 
@@ -403,7 +407,7 @@ endif
 
 #--------------------------------------------------------------------------
 
-if ($KEEP == "FALSE") then
+if ($keep == "FALSE") then
    if (-d pact) then
       NoteD $Log "Removing old PACT files"
       flog $Log rm -r pact
@@ -411,30 +415,31 @@ if ($KEEP == "FALSE") then
 endif
 
 Note $Log ""
-switch ($SrcMode)
+switch ($srcmode)
    case tar:
         NoteD $Log "Unpacking the PACT sources"
-        flog $Log rm -f $TarFile
+        flog $Log rm -f $tarf
 
-        if (-e $TarFile.gz) then
-           flog $Log gzip -d $TarFile.gz
+        if (-e $tarf.gz) then
+           flog $Log gzip -d $tarf.gz
         endif
-	if (-e $TarFile.Z) then
-	   flog $Log uncompress $TarFile.Z
+	if (-e $tarf.Z) then
+	   flog $Log uncompress $tarf.Z
 	endif
 
-        if ("$OS" == sunos) then
-           set TarArgs = xvomf
+        if ("$os" == sunos) then
+           set tarargs = xvomf
         else
-           set TarArgs = xvmf
+           set tarargs = xvmf
         endif
-        flog $Log tar $TarArgs $TarFile
+        flog $Log tar $tarargs $tarf
         if ($status != 0) then
            NoteD $Log ""
            NoteD $Log "  ERROR: TAR failed"
            NoteD $Log ""
            exit($status)
         endif
+        unset tarargs
 
         flog $Log cd pact
 
@@ -469,7 +474,7 @@ switch ($SrcMode)
         breaksw
 endsw
 
-if ($SrcOnly == TRUE) then
+if ($srconly == TRUE) then
    exit(0)
 endif
 
@@ -481,9 +486,9 @@ Note $Log "Current directory after source setup $cwd"
 
 #--------------------------------------------------------------------------
 
-NoteD $Log "Changing to manager directory: $Manager"
-flog $Log cd $Manager
-flog $Log set Base = $cwd:h
+NoteD $Log "Changing to manager directory: $mngdir"
+flog $Log cd $mngdir
+flog $Log set base = $cwd:h
 
 flog $Log unset System
 flog $Log unsetenv System
@@ -493,17 +498,22 @@ if ($status > 1) then
    exit(1)
 endif
 
-setenv System `$Base/scripts/cfgman -d $Base/dev use`
+setenv System `$base/scripts/cfgman -d $base/dev use`
 Note $Log "System = $System"
 
-set Root      = $Base/dev/$System
-set IncDir    = $Root/include
-set EnvFile   = $IncDir/env-pact.csh
-set VersionID = `cat ./.pact-version`
+set root   = $base/dev/$System
+set incdir = $root/include
+set envf   = $incdir/env-pact.csh
+set versid = `cat ./.pact-version`
 
-NoteD $Log "Configuring PACT version $VersionID ($System) with: $CArgs"
-flog $Log ./dsys config $CArgs
-set LStat = $status
+NoteD $Log "Configuring PACT version $versid ($System) with: $cargs"
+if ($vrb == TRUE) then
+   ftee $Log ./dsys config $cargs
+   set LStat = $status
+else
+   flog $Log ./dsys config $cargs
+   set LStat = $status
+endif
 if ($LStat == 2) then
    tail -n 12 $Log
    exit(2)
@@ -514,13 +524,13 @@ else if ($LStat != 0) then
    exit($LStat)
 endif
 
-if ($ConfigOnly == TRUE) then
+if ($cfgonly == TRUE) then
    exit(0)
 endif
 
-NoteD $Log "Sourcing environment file $EnvFile for $System"
-if (-e $EnvFile) then
-   source $EnvFile
+NoteD $Log "Sourcing environment file $envf for $System"
+if (-e $envf) then
+   source $envf
    rehash
 else
    NoteD $Log ""
@@ -539,9 +549,24 @@ endif
 
    set DName = `cat ./.pact-date`
 
-   flog $Log ./dsys update $Force
-   set upresult = $status
-   Note $Log "Host: $Host"
+   if ($test == TRUE) then
+      if ($vrb == TRUE) then
+         ftee $Log ./dsys update $force
+         set upresult = $status
+      else
+         flog $Log ./dsys update $force
+         set upresult = $status
+      endif
+   else
+      if ($vrb == TRUE) then
+         ftee $Log ./dsys build
+         set upresult = $status
+      else
+         flog $Log ./dsys build
+         set upresult = $status
+      endif
+   endif
+   Note $Log "Host: $host"
    Note $Log "Date: `date`"
 
    if ($upresult != 0) then
@@ -562,15 +587,15 @@ endif
 # move the log now
    set nLogDir = $cwd:h
    set nLogDir = $nLogDir:h
-   mv $Log $nLogDir/$Nodename.BUILD
-   set Log = $nLogDir/$Nodename.BUILD
+   mv $Log $nLogDir/$node.BUILD
+   set Log = $nLogDir/$node.BUILD
 
-   NoteD $Log "See the log file $Nodename.BUILD"
+   NoteD $Log "See the log file $node.BUILD"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-flog $Log cd $Base
+flog $Log cd $base
 echo ""
 
 exit($status)

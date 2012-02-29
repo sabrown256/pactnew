@@ -4895,6 +4895,8 @@ FramesToMPEG(numFrames, outputFileName, outputFile, parallel)
 
     Bitio_Flush(bb);
 
+    CFREE(bb);
+
     io_close(outputFile);
 }
 
@@ -13280,7 +13282,8 @@ static void ProcessRefFrame(MpegFrame *frame, BitBucket *bb, int lastFrame,
 	     if (!stdinUsed)
 	        {bFrame = Frame_New(id, 'b', frameMemory);
 		 if (bFrame == NULL)
-		    return;
+		    {CFREE(bb);
+		     return;};
 	  
 		 time(&tempTimeStart);
 	  
@@ -13387,7 +13390,7 @@ static void ProcessRefFrame(MpegFrame *frame, BitBucket *bb, int lastFrame,
 		    bb = Bitio_New(NULL);
 	         else
 		    {snprintf(fileName, 1024, "%s.frame.%d", outputFileName, 
-			      bFrame->id);
+			      (bFrame != NULL) ? bFrame->id : -1);
 		     fpointer = _PG_fopen(fileName, "wb");
 		     if (fpointer == NULL)
 		        {io_printf(stderr,
@@ -21498,13 +21501,15 @@ void Parse_Specifics_File_v1(FILE *fp)
 		 sscanf(lp, "%d %c %d", &fnum, &typ, &qs);
 		 if (current->framenum != -1)
 		    {new = MakeFslEntry();
-		     current->next = new;
-		     current = new;};
+		     if (new != NULL)
+		        {current->next = new;
+			 current = new;};};
 
-		 current->framenum = fnum;
-		 current->frametype = CvtType(typ);
-		 if (qs <= 0) qs = -1;
-		 current->qscale = qs;
+		 if (current != NULL)
+		    {current->framenum = fnum;
+		     current->frametype = CvtType(typ);
+		     if (qs <= 0) qs = -1;
+		     current->qscale = qs;};
 		 break;
 	    case 'S':
 		 lp += 6;
@@ -21636,7 +21641,7 @@ void Parse_Specifics_File_v2(FILE *fp)
 				  io_printf(stderr,
 					    "Bug in specifics file!  Skipping short/long entry: %s\n",line);
 				  break;};};}
-		 else
+		 else if (new_blk != NULL)
 		    new_blk->mv = (BlockMV *) NULL;
 		 
 		 break;

@@ -649,7 +649,7 @@ syment *_PD_defent(PDBfile *file, char *name, char *outtype,
        PD_error("CANNOT DEFINE ENTRY WITH INDIRECTS - _PD_DEFENT",
                 PD_WRITE);
 
-    lname = _PD_var_namef(file, name, bf);
+    lname = _PD_var_namef(file, name, bf, MAXLINE);
 
     ep   = PD_inquire_entry(file, lname, TRUE, NULL);
     addr = _PD_get_next_address(file, outtype, number, NULL,
@@ -879,7 +879,7 @@ syment *_PD_write(PDBfile *file, char *name, char *intype, char *outtype,
 	    lname = bf;}
 
 	else
-	   lname = _PD_var_namef(NULL, fullpath, bf);
+	   lname = _PD_var_namef(NULL, fullpath, bf, MAXLINE);
 
 	number = _PD_comp_num(dims);
 	addr   = _PD_get_next_address(file, outtype, number, vr,
