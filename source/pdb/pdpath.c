@@ -1505,15 +1505,15 @@ static void _PD_do_index(PD_smp_state *pa, char *expr)
 	if (tok == NULL)
 	   PD_error("BAD INDEX EXPRESSION - _PD_DO_INDEX", PD_TRACE);
 
-	start = SC_stoi(tok) - doff;
+	start = SC_stol(tok) - doff;
 
         tok = SC_strtok(NULL, ":", pt);
         if (tok == NULL)
            stop = start;
         else
-           stop = SC_stoi(tok) - doff;
+           stop = SC_stol(tok) - doff;
 
-        step = SC_stoi(SC_strtok(NULL, ":", pt));
+        step = SC_stol(SC_strtok(NULL, ":", pt));
         if (step == 0L)
            step = 1L;
 
@@ -2107,7 +2107,7 @@ syment *_PD_effective_ep(PDBfile *file, char *name, int flag, char *fullname)
     if (ep != NULL)
        return(PD_copy_syment(ep));
 
-    lname = _PD_var_namef(NULL, name, bf);
+    lname = _PD_var_namef(NULL, name, bf, MAXLINE);
 
 /* get the top level struct to start */
     s = SC_strstr(lname, "->");

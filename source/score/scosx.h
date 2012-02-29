@@ -15,6 +15,14 @@
 
 #include "cpyright.h"
 
+/* GOTCHA: mid 10.6 there was a patch concerning POSIX compliance
+ * which broke the build
+ * this work around needs to be re-analyzed from scratch with 10.7
+ */
+#ifndef SIGPOLL
+# define SIGPOLL 7
+#endif
+
 /*--------------------------------------------------------------------------*/
 
 /*                         STANDARD CONSTANT MACROS                         */

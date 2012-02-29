@@ -109,7 +109,7 @@ fcdes *SC_scan_archive(char *arf)
 		       break;
 
 		    strcpy(s, hdr._ar_name.ar_name);
-		    nc = SC_stoi(hdr.ar_namlen);
+		    nc = SC_stol(hdr.ar_namlen);
 		    fread(s+2, nc, 1, fp);
                     if (strncmp(s, "`\n", 2) == 0)
 		       {strcpy(s, ".SYMTAB");
@@ -143,7 +143,7 @@ fcdes *SC_scan_archive(char *arf)
 		       break;
 
 		    strcpy(s, hdr._ar_name.ar_name);
-		    nc = SC_stoi(hdr.ar_namlen);
+		    nc = SC_stol(hdr.ar_namlen);
 		    fread(s+2, nc, 1, fp);
                     if (strncmp(s, "`\n", 2) == 0)
 		       {strcpy(s, ".SYMTAB");
@@ -218,7 +218,7 @@ fcdes *SC_scan_archive(char *arf)
 		    name = lname;
 		    ext  = ftell(fp);}
 		else if (hdr.ar_name[0] == ' ')
-		   {off = SC_stoi(hdr.ar_name+1);
+		   {off = SC_stol(hdr.ar_name+1);
 		    pos = ext + off;
 		    org = ftell(fp);
 		    fseek(fp, pos, SEEK_SET);
@@ -298,7 +298,7 @@ fcdes *SC_scan_archive(char *arf)
 		    break;
 
 		 if (strncmp(hdr.ar_name, AR_EFMT1, ne) == 0)
-		    {nc = SC_stoi(hdr.ar_name + ne);
+		    {nc = SC_stol(hdr.ar_name + ne);
 		     fread(lname, nc, 1, fp);
 		     name = lname;}
 		 else
@@ -378,7 +378,7 @@ fcdes *SC_scan_archive(char *arf)
 		   {strcpy(lname, ".SYMTAB");
 		    name = lname;}
 		else if (hdr.ar_name[0] == '/')
-		   {off = SC_stoi(hdr.ar_name+1);
+		   {off = SC_stol(hdr.ar_name+1);
 		    pos = ext + off;
 		    org = ftell(fp);
 		    fseek(fp, pos, SEEK_SET);

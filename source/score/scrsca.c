@@ -615,7 +615,7 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	    ru->uid    = SC_stoi(puid);
 	    ru->ut     = SC_str_time(pt);
 	    ru->st     = 0.0;
-	    ru->maxrss = mby*SC_stoi(prss);  /* reported in kbytes */
+	    ru->maxrss = mby*SC_stol(prss);  /* reported in kbytes */
 	    SC_strncpy(ru->cmd, MAXLINE, pcmd, -1);
 
 	    rv = TRUE;};
@@ -719,7 +719,7 @@ int SC_set_resource_limits(int64_t mem, int64_t cpu, int64_t fsz,
 
 /* set virtual memory usage limit */
     if (mem == -1)
-       mem = SC_stoi(getenv("SC_EXEC_RLIMIT_AS"));
+       mem = SC_stol(getenv("SC_EXEC_RLIMIT_AS"));
     if (mem > 0)
        {rv |= getrlimit(RLIMIT_AS, &rl);
 	if (rv == 0)
@@ -728,7 +728,7 @@ int SC_set_resource_limits(int64_t mem, int64_t cpu, int64_t fsz,
 
 /* set CPU time limit */
     if (cpu == -1)
-       cpu = SC_stoi(getenv("SC_EXEC_RLIMIT_CPU"));
+       cpu = SC_stol(getenv("SC_EXEC_RLIMIT_CPU"));
     if (cpu > 0)
        {rv |= getrlimit(RLIMIT_CPU, &rl);
 	if (rv == 0)
@@ -737,7 +737,7 @@ int SC_set_resource_limits(int64_t mem, int64_t cpu, int64_t fsz,
 
 /* set file size limit */
     if (fsz == -1)
-       fsz = SC_stoi(getenv("SC_EXEC_RLIMIT_FSIZE"));
+       fsz = SC_stol(getenv("SC_EXEC_RLIMIT_FSIZE"));
     if (fsz > 0)
        {rv |= getrlimit(RLIMIT_FSIZE, &rl);
 	if (rv == 0)

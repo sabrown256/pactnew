@@ -16,7 +16,6 @@ ERR_PATTERN  = ":+sp+error:"
 Tool CC {
    Exe       = gcc
    Flags     = -ffloat-store
-   Flags    += -Wno-pragmas
    Flags    += [ _env_ = C_STD ;                # C standard flags
                  C89   = -std=c89 ;
                  C99   = -std=c99 ;
@@ -24,6 +23,8 @@ Tool CC {
                  X99   = -std=gnu99 ]
    Flags    += [ _env_ = PACT_CC_VERSION ;      # compiler version flags
                  4.*   = -fsignaling-nans ]
+   Flags    += [ _env_ = PACT_CC_VERSION ;      # pragma warning flags
+                 4.*  >= -Wno-pragmas ]
    Flags    += [ _env_ = PACT_CC_VERSION ;      # stack checking
                  4.2.* >= -fstack-protector ]
    Flags    += [ _env_ = Bits ;                 # address bit size

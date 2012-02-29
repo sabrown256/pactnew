@@ -120,7 +120,7 @@ int main(int c, char **v)
         {if (v[i][0] == '-')
             {switch (v[i][1])
                 {case 'b' :
-		      bfsz = SC_stoi(v[++i]);
+		      bfsz = SC_stol(v[++i]);
 		      break;
                  case 'c' :
 		      nc = SC_stoi(v[++i]);
@@ -128,7 +128,7 @@ int main(int c, char **v)
                  case 'h' :
 		      return(1);
                  case 'n' :
-		      n = SC_stoi(v[++i]);
+		      n = SC_stol(v[++i]);
 		      break;
                  case 'v' :
                       vers = SC_stoi(v[++i]);

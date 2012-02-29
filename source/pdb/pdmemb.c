@@ -130,14 +130,14 @@ char *_PD_var_name(char *s)
  *               - variable name and return a pointer to it
  */
 
-char *_PD_var_namef(PDBfile *file, char *name, char *bf)
-   {int nc;
+char *_PD_var_namef(PDBfile *file, char *name, char *bf, int nc)
+   {int n;
     char *p, *s;
 
     if (file == NULL)
-       strcpy(bf, name);
+       SC_strncpy(bf, nc, name, -1);
     else
-       strcpy(bf, _PD_fixname(file, name));
+       SC_strncpy(bf, nc, _PD_fixname(file, name), -1);
 
 /* NOTE: the code worked like this for many years
  *    s = SC_strtok(bf, ".([", p);
@@ -146,8 +146,8 @@ char *_PD_var_namef(PDBfile *file, char *name, char *bf)
  * which does contain () but is not an array reference.
  * So change the logic to look for '[/]{..}'
  */
-    nc = strlen(bf);
-    if ((strchr(bf, '{') != NULL) && (bf[nc-1] == '}'))
+    n = strlen(bf);
+    if ((strchr(bf, '{') != NULL) && (bf[n-1] == '}'))
        s = bf;
     else
        s = SC_strtok(bf, ".([", p);

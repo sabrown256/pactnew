@@ -2133,10 +2133,11 @@ PG_palette *PG_rd_palette(PG_device *dev, char *fname)
     if (io_gets(bf, MAXLINE, fp) == NULL)
        return(NULL);
     
+    ndims = 0;
     name  = SC_strtok(bf, " \t", s);
     nc    = SC_stoi(SC_strtok(NULL, " \t\r\n", s));
-    ndims = 0;
-    if ((nd   = SC_strtok(NULL," \t\r\n", s)) != NULL)
+    nd    = SC_strtok(NULL," \t\r\n", s);
+    if (nd != NULL)
        {ndims   = SC_stoi(nd);
         dims[0] = SC_stoi(SC_strtok(NULL, " \t\r\n", s));
         dims[1] = SC_stoi(SC_strtok(NULL, " \t\r\n", s));} 
@@ -2168,7 +2169,7 @@ PG_palette *PG_rd_palette(PG_device *dev, char *fname)
 
     io_close(fp);
     if (pal != NULL)
-       {if (ndims != 0)
+       {if ((0 < ndims) && (ndims <= 2))
            _PG_attach_palette_dims(pal, nc, ndims, dims);
         PG_register_palette(dev, pal, FALSE);}
 

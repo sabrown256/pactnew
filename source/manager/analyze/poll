@@ -49,16 +49,7 @@ rm -f $Tmp.c $Tmp
 
 # check for poll
 
-if (-f /usr/include/poll.h) then
-   cat << EOF >! $Tmp.c
-#include <poll.h>
-int main(int c, char **v)
-{struct pollfd as;
- poll(&as, 0, 0);
- return(0);}
-EOF
-
-else
+if (-f /usr/include/stropts.h) then
    cat << EOF >! $Tmp.c
 #include <sys/poll.h>
 #include <stropts.h>
@@ -68,7 +59,18 @@ int main(int c, char **v)
  return(0);}
 EOF
 
+else
+   cat << EOF >! $Tmp.c
+#include <poll.h>
+int main(int c, char **v)
+{struct pollfd as;
+ poll(&as, 0, 0);
+ return(0);}
+EOF
+
 endif
+
+flog $ALog cat $Tmp.c
 
 set FOUND_POLL = FALSE
 flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt

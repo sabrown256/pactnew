@@ -980,8 +980,11 @@ int64_t _PD_wr_syment(PDBfile *file, char *name, char *vr, int64_t ni,
              svr += size;
              GO(LEAF_ITEM);};
 
-         PD_CAST_TYPE(ttype, desc, svr+desc->member_offs, svr,
-		      PD_error, "BAD CAST - _PD_WR_SYMENT", PD_WRITE);
+         if (svr != NULL)
+	    {PD_CAST_TYPE(ttype, desc, svr+desc->member_offs, svr,
+			  PD_error, "BAD CAST - _PD_WR_SYMENT", PD_WRITE);}
+         else
+	    ttype = NULL;
 
          SAVE_S(litype, ttype);
 
@@ -1380,7 +1383,7 @@ static void _PD_rd_leaf_members(PDBfile *file, char *vr, inti ni,
     defstr *dpf;
     FILE *fp;
 
-    if ((intype == NULL) || (outtype == NULL))
+    if ((intype == NULL) || (outtype == NULL) || (vr == NULL))
        return;
 
     bpi = -1;
@@ -1840,7 +1843,8 @@ int64_t _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
             {SC_address ad;
 
              ad.diskaddr = addr;
-             memcpy(pv, ad.memaddr, ni*bpi);
+	     if (pv != NULL)
+	        memcpy(pv, ad.memaddr, ni*bpi);
 /*
 	     nrd += ni;
 	     GO_CONT;
@@ -1969,7 +1973,8 @@ int64_t _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
          SAVE_I(addr);
          SAVE_I(loc);
          SAVE_P(pv);
-         pv = lvr[0];
+         if (lvr != NULL)
+	    pv = lvr[0];
          SET_CONT(SKIP_RET, FALSE);
 
     case SKIP_RET :

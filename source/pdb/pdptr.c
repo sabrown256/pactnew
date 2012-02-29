@@ -1013,7 +1013,8 @@ static void _PD_ptr_read_push(PDBfile *file, char **vr, PD_itag *pi,
 /* we have seen this pointer before */
 	else
 	   {if (loc == LOC_HERE)
-	       {naddr = ad->reta;
+	       {if (ad != NULL)
+		   naddr = ad->reta;
 
 /* NOTE: this is terrible - we have the data but we have to read it
  * anyway because we don't have an address to skip over to
@@ -1184,7 +1185,7 @@ void _PD_ptr_wr_syment(PDBfile *file, char *name,
    {char pname[MAXLINE];
     syment *ep;
 
-    if (ni > 0)
+    if ((ni > 0) && (ad != NULL))
        {snprintf(pname, MAXLINE, "%s%ld#%s",
 		 file->ptr_base, (long) ad->indx, name);
 
@@ -1192,9 +1193,8 @@ void _PD_ptr_wr_syment(PDBfile *file, char *name,
 	_PD_e_install(file, pname, ep, TRUE);
 
 	if (file->format_version > 2)
-	   {if (ad != NULL)
-	       {ad->addr  = addr;
-		ad->entry = ep;};};};
+	   {ad->addr  = addr;
+	    ad->entry = ep;};};
 
     return;}
 
@@ -1365,7 +1365,7 @@ int _PD_ptr_register_entry(PDBfile *file, char *name, syment *ep)
        {al = _PD_ptr_get_al(file);
         nc = strlen(file->ptr_base);
 	if (strncmp(name, file->ptr_base, nc) == 0) 
-	   {i = SC_stoi(name+nc);
+	   {i = SC_stol(name+nc);
             _PD_ptr_install_entry(al, i, ep, TRUE);};};
 
     return(ok);}
@@ -1395,7 +1395,7 @@ static int _PD_ptr_register(haelem *hp, void *a)
 	if ((file != NULL) && (ep != NULL))
 	   {nc = strlen(file->ptr_base);
 	    if (strncmp(name, file->ptr_base, nc) == 0) 
-	       {i = SC_stoi(name+nc);
+	       {i = SC_stol(name+nc);
 		_PD_ptr_install_entry(al, i, ep, TRUE);};};};
 
     return(0);}

@@ -368,17 +368,17 @@ static void _PD_rd_blocks_ii(PDBfile *file)
 	   break;
 
 	name = SC_strtok(local, "\001\n", s);
-	n    = SC_stoi(SC_strtok(NULL, " \n", s));
+	n    = SC_stol(SC_strtok(NULL, " \n", s));
 	ep   = PD_inquire_entry(file, name, FALSE, NULL);
 	if (ep != NULL)
 	   {nt   = 0L;
 	    for (j = 0L; j < n; j++)
-	        {addr = SC_stoi(SC_strtok(NULL, " \n", s));
-		 numb = SC_stoi(SC_strtok(NULL, " \n", s));
+	        {addr = SC_stol(SC_strtok(NULL, " \n", s));
+		 numb = SC_stol(SC_strtok(NULL, " \n", s));
 		 if ((addr == 0) || (numb == 0L))
 		    {_PD_get_token(NULL, local, bsz, '\n');
-		     addr = SC_stoi(SC_strtok(local, " \n", s));
-		     numb = SC_stoi(SC_strtok(NULL, " \n", s));};
+		     addr = SC_stol(SC_strtok(local, " \n", s));
+		     numb = SC_stol(SC_strtok(NULL, " \n", s));};
                          
 		 _PD_entry_set_address(ep, j, addr);
 		 _PD_entry_set_number(ep, j, numb);
@@ -714,7 +714,7 @@ int _PD_rd_ext_ii(PDBfile *file)
         else if (strcmp(token, "Dynamic Spaces") == 0)
            {token = SC_strtok(NULL, "\n", p);
             if (token != NULL)
-	       file->n_dyn_spaces = SC_stoi(token);}
+	       file->n_dyn_spaces = SC_stol(token);}
 
         else if (strcmp(token, "Use Itags") == 0)
            {token = SC_strtok(NULL, "\n", p);

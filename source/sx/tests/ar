@@ -23,6 +23,7 @@ if (($THREADING == no) && ($HAVE_MPI == no)) then
 
    flog $Log rm -f pdbvar.log pdbvar.tar pdbvar.a pdbvar.res
 
+   flog $Log pwd
    flog $Log tar cvf pdbvar.tar demo.d?
    flog $Log ar -rsc pdbvar.a demo.d?
    flog $Log ( cat demo.d? >&! pdbvar.blob )

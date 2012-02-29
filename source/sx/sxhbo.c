@@ -671,6 +671,8 @@ object *_SX_mh_b_s(SS_psides *si, C_procedure *cp, object *argl)
     PM_mapping *f, *h;
     object *first, *mo;
 
+    mo = SS_null;
+
     first = SS_car(si, argl);
     if (SS_floatp(first))
        mo = SS_binary_homogeneous(si, cp, argl);

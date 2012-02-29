@@ -105,48 +105,50 @@ fcdes *_SC_unknown_container(char *name)
     fcdes *fc;
     FILE *fp;
 
+    fc = NULL;
+
     SC_strncpy(s, MAXLINE, name, -1);
     ta = SC_tokenize(s, "~:");
-    SC_ptr_arr_len(nt, ta);
+    if (ta != NULL)
+       {SC_ptr_arr_len(nt, ta);
 
-    fp = NULL;
-    ok = FALSE;
-    if (nt == 3)
-       {fp  = fopen(ta[0], "r");
-	sad = SC_stoi(ta[1]);
-	ead = SC_stoi(ta[2]);
-	ok &= (ead > sad);};
+	fp = NULL;
+	ok = TRUE;
+	if (nt == 3)
+	   {fp  = fopen(ta[0], "r");
+	    sad = SC_stol(ta[1]);
+	    ead = SC_stol(ta[2]);
+	    ok &= (ead > sad);};
 
-    fc = NULL;
-    if (ok == TRUE)
-       {fcent *ae;
-	hasharr *tab;
+	if (ok == TRUE)
+	   {fcent *ae;
+	    hasharr *tab;
 
-        tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
+	    tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
     
-	ae = CMAKE(fcent);
-	if (ae != NULL)
-	   {ae->name    = CSTRSAVE(name);
-	    ae->date    = 0;
-	    ae->uid     = -1;
-	    ae->gid     = -1;
-	    ae->size    = ead - sad + 1;
-	    ae->address = sad;
+	    ae = CMAKE(fcent);
+	    if (ae != NULL)
+	       {ae->name    = CSTRSAVE(name);
+		ae->date    = 0;
+		ae->uid     = -1;
+		ae->gid     = -1;
+		ae->size    = ead - sad + 1;
+		ae->address = sad;
 
-	    SC_strncpy(ae->perm, 8, "0444", 8);
+		SC_strncpy(ae->perm, 8, "0444", 8);
 
-	    snprintf(s, MAXLINE, "%ld:%ld", (long) sad, (long) ead);
-	    SC_hasharr_install(tab, s, ae, "fcent", 3, -1);};
+		snprintf(s, MAXLINE, "%ld:%ld", (long) sad, (long) ead);
+		SC_hasharr_install(tab, s, ae, "fcent", 3, -1);};
 
-	fc = CMAKE(fcdes);
-	fc->name    = CSTRSAVE(name);
-	fc->file    = fp;
-	fc->entries = tab;}
+	    fc = CMAKE(fcdes);
+	    fc->name    = CSTRSAVE(name);
+	    fc->file    = fp;
+	    fc->entries = tab;}
 
-    else if (fp != NULL)
-       fclose(fp);
+	else if (fp != NULL)
+	   fclose(fp);
 
-    SC_free_strings(ta);
+	SC_free_strings(ta);};
 
     return(fc);}
 

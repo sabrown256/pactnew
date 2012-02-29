@@ -945,7 +945,7 @@ int SS_define_argv(SS_psides *si, int c, char **v, int go)
 	     else if (SC_intstrp(s, 10))
 	        {t   = SC_LONG_I;
 		 lp  = CMAKE(long);
-		 *lp = SC_stoi(s);
+		 *lp = SC_stol(s);
 		 p   = lp;}
 	     else if (SC_fltstrp(s))
 	        {t   = SC_DOUBLE_I;

@@ -646,10 +646,10 @@ C_array *PA_get_domain_info(PA_plot_request *pr, char *dname, int nc)
              dmap[i].index = (int) dmap[i].val;}
 
          else if (SC_intstrp(pname, 10))
-             {dmap[i].index = SC_stoi(pname);}
+            dmap[i].index = SC_stoi(pname);
 
          else if (SC_fltstrp(pname))
-             {dmap[i].index = (int) SC_stof(pname);}
+	    dmap[i].index = (int) SC_stof(pname);
 
          else
             {dmap[i].val = start;
