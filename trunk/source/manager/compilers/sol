@@ -21,6 +21,11 @@ Group FC {
    Version = -V
 }
 
+Tool CXX {
+   Exe       = CC
+   Version   = -V
+}
+
 Tool LD {
    Lib = -ldl -lsocket -lw -lnsl -lsunmath -lrt
 }

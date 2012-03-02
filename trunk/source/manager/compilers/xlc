@@ -45,6 +45,14 @@ Tool FC {
    Version = -qversion
 }
 
+Tool CXX {
+   Exe       = xlc++
+   Flags     = 
+   Debug     = -g -O0
+   Optimize  = -g -O
+   Version   = -qversion
+}
+
 Tool LD {
    RPath = -bsvr4 -bnoexpfull -R @
    Flags = [ _env_ = Bits ;                  # address bit size

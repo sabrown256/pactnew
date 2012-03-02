@@ -1,0 +1,21 @@
+#
+# CFG1 - PCO test config
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+run std/use-compiler vers any gcc
+
+include 64-bit
+include compilers/gnu
+include no-bfd
+include no-hdf
+include no-libz
+include no-opengl
+include no-png
+include no-readline
+include no-sql
+include no-x11

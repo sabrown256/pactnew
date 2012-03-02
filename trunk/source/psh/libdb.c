@@ -868,21 +868,12 @@ int db_restore(char *root, char *db)
 	     if (strncmp(s, "saved", 5) == 0)
 	        break;
 	     else
-#if 1
 	        {vl = strchr(s, '=');
 		 if (vl != NULL)
 		    {*vl++ = '\0';
 		     vl = subst(vl, "\"", "", -1);
 		     csetenv(s, vl);};};};
 	lst_free(ta);};
-#else
-	        {s  = subst(s, "\"", "", -1);
-		 ok = putenv(s);
-		 ASSERT(ok == 0);
-		 note(Log, TRUE, "setenv %s", s);};};
-
-	FREE(ta);};
-#endif
 
     return(rv);}
 

@@ -50,11 +50,13 @@ source $ldir/env-csh
        Note $STDOUT "PNG          = yes"
     endif
 
-    set Shared = `grep Shared $lCfg`
-    if ("$Shared" == "") then
-       Note $STDOUT "Shared       = no"
-    else
-       Note $STDOUT "Shared       = yes"
+    if (-f $lCfg) then
+       set Shared = `grep Shared $lCfg`
+       if ("$Shared" == "") then
+          Note $STDOUT "Shared       = no"
+       else
+          Note $STDOUT "Shared       = yes"
+       endif
     endif
 
     Note $STDOUT "UseTmpDir    = $UseTmpDir"

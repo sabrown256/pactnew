@@ -1,0 +1,24 @@
+#!/bin/csh -f
+#
+# CHK++ - verify that C++ is ok with complex handling in PML
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set msg = "PML C++ Check .........."
+
+      NoteD $Log ""
+      NoteD $Log  -n "                    $msg"
+
+      flog $Log pushd $SrcDir
+      flog $Log $MAKE chk++
+
+$TEST_CHECK part -a chk++ -e $xstatus none
+
+exit($status)
+

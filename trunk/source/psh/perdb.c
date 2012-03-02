@@ -109,8 +109,13 @@ char *srv_load_db(client *cl, char *fname, char *var)
 
     if (fname == NULL)
        fp = NULL;
+
     else
-       {snprintf(s, MAXLINE, "%s.%s.db", root, fname);
+       {if (file_exists(fname) == TRUE)
+	   nstrncpy(s, MAXLINE, fname, -1);
+        else
+	   snprintf(s, MAXLINE, "%s.%s.db", root, fname);
+
 	fp = fopen(s, "r");
         if (fp == NULL)
 	   {snprintf(t, MAXLINE, "could not open %s - load %s",

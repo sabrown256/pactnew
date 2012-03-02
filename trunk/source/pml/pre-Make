@@ -26,6 +26,8 @@ LdFlags = -L${LibDir} ${LDFLAGS}
 
 CCAnnounce = ${CCompiler} ${ODC} ${Shared_CC_Flags} ${CFLAGS}
 
+CXX = ${CC_Exe} ${CcFlags}
+
 #
 # Files to Save for Backup (pact save)
 #
@@ -117,6 +119,12 @@ IncAction = @pact generate
 
 # extra commands needed when building TGTLib
 LibAction = pact patch-fpe
+
+#
+# verify C++ compiles
+#
+chk++ :
+	${CXX} -c tests/chk++.cc -o ${PACTTmpDir}/chk++.o
 
 #
 # make new test executable

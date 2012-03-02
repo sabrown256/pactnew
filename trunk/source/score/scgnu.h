@@ -27,18 +27,23 @@
  *      e.g. Cygwin 1.7
  */
 
-#if (__GNUC__ < 4)
-# undef complex
-# undef I
+#ifndef __cplusplus
+
+# if (__GNUC__ < 4)
+#  undef complex
+#  undef I
 typedef unsigned int u_int32_t;
-#endif
+# endif
 
-#ifndef complex
-# define complex _Complex
-#endif
+# ifndef complex
+#  define complex _Complex
+# endif
+#
 
-#ifndef I
-# define I 	(__extension__ 1.0iF)
+# ifndef I
+#  define I 	(__extension__ 1.0iF)
+# endif
+
 #endif
 
 #define _FORTIFY_SOURCE 2
