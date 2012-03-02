@@ -108,7 +108,6 @@ struct s_state
     int installp;
     int loadp;
     int analyzep;
-    int configp;
     int exep;
     int phase;
     int profilep;
@@ -119,6 +118,7 @@ struct s_state
 
     int na;
     char **args;
+    char *db;
 
     file_stack fstck;
     gt_stack gstck;
@@ -594,9 +594,25 @@ static int pco_save_db(char *dbname)
 /* PCO_LOAD_DB - load the specified database */
 
 static int pco_load_db(char *dbname)
-   {int rv;
+   {int rv, i;
+    char *bf, **ta;
 
     rv = db_restore(NULL, dbname);
+
+    bf = run(BOTH, "env | sort");
+
+    separator(Log);
+
+    note(Log, FALSE, "Restored database variables:\n");
+    ta = tokenize(bf, "\n");
+    if (ta != NULL)
+       {for (i = 0; ta[i] != NULL; i++)
+	    note(Log, FALSE, "   %s\n", ta[i]);
+
+        note(Log, FALSE, "%d variables total\n", i);
+	free_strings(ta);};
+
+    separator(Log);
 
     return(rv);}
 
@@ -626,13 +642,90 @@ static void env_out(FILE *fsh, FILE *fcsh, FILE *fdk, FILE *fmd,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* ADD_SET_CFG - add variables set in config files */
+
+static void add_set_cfg(FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
+   {int i, j, n, nc, ok;
+    char *var, *val, *p, **sa;
+
+    fflush(st.aux.SEF);
+    sa = file_text("%s/log/file.se", st.dir.root);
+    if (sa != NULL)
+       {for (n = 0; sa[n] != NULL; n++);
+
+	for (i = 0; i < n; i++)
+	    {p = sa[i];
+
+	     var = strtok(p, " ");
+	     if (var != NULL)
+	        {nc  = strlen(var);
+		 val = strtok(NULL, "\n");
+		    
+/* handle PATH specially - just gather everything that is not $PATH or ${PATH} */
+	         if (strcmp(var, "PATH") == 0)
+		    push_path(APPEND, epath, val);
+
+/* weed out duplicates - taking only the last setting */
+		else
+		   {ok = FALSE;
+		    for (j = i+1; (j < n) && (ok == FALSE); j++)
+		        ok = ((strncmp(var, sa[j], nc) == 0) &&
+			      (sa[j][nc] == ' '));
+		     
+		    if (ok == FALSE)
+		       env_out(fsh, fcsh, fdk, fmd, var, val);};};};
+
+	free_strings(sa);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* ADD_SET_DB - add variables set from database file */
+
+static void add_set_db(FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
+   {int i, n;
+    char s[MAXLINE];
+    char *var, *val, *bf, **sa;
+
+    bf = run(BOTH, "env | sort");
+    sa = tokenize(bf, "\n");
+    if (sa != NULL)
+       {for (n = 0; sa[n] != NULL; n++);
+
+	for (i = 0; i < n; i++)
+	    {var = sa[i];
+
+	     val = strchr(var, '=');
+	     if (val != NULL)
+	        {*val++ = '\0';
+		    
+/* handle PATH specially - just gather everything that is not $PATH or ${PATH} */
+	         if (strcmp(var, "PATH") == 0)
+		    push_path(APPEND, epath, val);
+
+		else
+		   {if (strpbrk(val, " \t$[]{}|*\\") != NULL)
+		       {snprintf(s, LRG, "\"%s\"", val);
+			env_out(fsh, fcsh, fdk, fmd, var, s);}
+		    else
+		       env_out(fsh, fcsh, fdk, fmd, var, val);};};};
+
+	free_strings(sa);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* WRITE_ENVF - write out the env file because other scripts need to source it
  *            - write it for CSH or SH families
  */
 
 static void write_envf(int lnotice)
-   {int i, j, n, nc, ok;
-    char *p, *t, *var, *val, **sa;
+   {int i, n;
+    char *t;
     char *site[] = { "SYS_TYPE", "SYS_SITE", "DAS_ROOT", "DAI_ROOT" };
     FILE *fcsh, *fsh, *fdk, *fmd;
 
@@ -674,34 +767,10 @@ static void write_envf(int lnotice)
     for (i = 0; i < n; i++)
         env_out(fsh, fcsh, fdk, fmd, site[i], dbget(NULL, TRUE, site[i]));
 
-    fflush(st.aux.SEF);
-    sa = file_text("%s/log/file.se", st.dir.root);
-    if (sa != NULL)
-       {for (n = 0; sa[n] != NULL; n++);
-
-	for (i = 0; i < n; i++)
-	    {p = sa[i];
-
-	     var = strtok(p, " ");
-	     if (var != NULL)
-	        {nc  = strlen(var);
-		 val = strtok(NULL, "\n");
-		    
-/* handle PATH specially - just gather everything that is not $PATH or ${PATH} */
-	         if (strcmp(var, "PATH") == 0)
-		    push_path(APPEND, epath, val);
-
-/* weed out duplicates - taking only the last setting */
-		else
-		   {ok  = FALSE;
-		    for (j = i+1; (j < n) && (ok == FALSE); j++)
-		        ok = ((strncmp(var, sa[j], nc) == 0) &&
-			      (sa[j][nc] == ' '));
-		     
-		    if (ok == FALSE)
-		       env_out(fsh, fcsh, fdk, fmd, var, val);};};};
-
-	free_strings(sa);};
+    if (st.db == NULL)
+       add_set_cfg(fcsh, fsh, fdk, fmd);
+    else
+       add_set_db(fcsh, fsh, fdk, fmd);
 
     note(fcsh, TRUE, "");
     note(fsh, TRUE, "");
@@ -2239,17 +2308,38 @@ int kill_perdb(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* DENV - print the current environment */
+
+void denv(void)
+   {int i;
+    char *bf, **ta;
+
+    bf = run(BOTH, "env | sort");
+
+    ta = tokenize(bf, "\n");
+    if (ta != NULL)
+       {for (i = 0; ta[i] != NULL; i++)
+	    printf("> %s\n", ta[i]);
+
+	free_strings(ta);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* HELP - give help message */
 
 static void help(void)
    {
 
     printf("\n");
-    printf("Usage: pact-config [-a] [-as] [-c] [-f <db>] [-F] [-g] [-i <directory>] [-l] [-o] [-p] [-s <sysid>] [-v] -n | <cfg>\n");
+    printf("Usage: pact-config [-a] [-as] [-c] [-db <db>] [-f <path>] [-F] [-g] [-i <directory>] [-l] [-o] [-p] [-s <sysid>] [-v] | <cfg>\n");
     printf("\n");
     printf("             -a      do NOT perform PACT-ANALYZE step\n");
     printf("             -as     run the database asynchronously\n");
     printf("             -c      create missing directories for -i option\n");
+    printf("             -db     configure using database <db>\n");
     printf("             -f      path to database\n");
     printf("             -F      do builds in /tmp for speed\n");
     printf("             -g      build debuggable version\n");
@@ -2313,6 +2403,9 @@ int main(int c, char **v)
         {if (strcmp(v[i], "-strict") == 0)
 	    strct = v[++i];
 
+         else if (strcmp(v[i], "-db") == 0)
+	    st.db = v[++i];
+ 
 	 else if (v[i][0] == '-')
             {switch (v[i][1])
                 {case 'a':
@@ -2350,10 +2443,6 @@ int main(int c, char **v)
                       dbg_db   = TRUE;
                       break;
  
-                 case 'n':
-                      st.configp = TRUE;
-                      break;
- 
                  case 'o':
                       st.abs_opt = TRUE;
                       break;
@@ -2378,35 +2467,42 @@ int main(int c, char **v)
          else
             nstrncpy(st.cfgf, MAXLINE, v[i], -1);};
 
-    dbset(NULL, "STRICT", strct);
+    if (st.db == NULL)
+       {dbset(NULL, "STRICT", strct);
 
-    push_file(st.cfgf, STACK_FILE);
-    strcpy(st.cfgf, st.fstck.file[st.fstck.n-1].name);
-    pop_file();
+	push_file(st.cfgf, STACK_FILE);
+	strcpy(st.cfgf, st.fstck.file[st.fstck.n-1].name);
+	pop_file();
 
-    init_session(base, append);
+	init_session(base, append);
 
 /* make config directory */
-    snprintf(st.dir.cfg, MAXLINE, "cfg-%s", st.system);
-    run(BOTH, "rm -rf %s", st.dir.cfg);
-    run(BOTH, "mkdir %s", st.dir.cfg);
+	snprintf(st.dir.cfg, MAXLINE, "cfg-%s", st.system);
+	run(BOTH, "rm -rf %s", st.dir.cfg);
+	run(BOTH, "mkdir %s", st.dir.cfg);
 
-    if (st.configp == FALSE)
-       {if (file_exists("analyze/program-init") == TRUE)
+	if (file_exists("analyze/program-init") == TRUE)
 	   read_config("program-init", TRUE);
 
 	read_config(st.cfgf, FALSE);
 
 	pco_save_db("inp");
 
-	noted(Log, "");}
+	noted(Log, "");
+
+	check_dir();
+
+	if (st.analyzep == FALSE)
+	   analyze_config(base);}
+
     else
-       pco_load_db("inp");
+       {init_session(base, append);
 
-    check_dir();
+	pco_load_db(st.db);
 
-    if (st.analyzep == FALSE)
-       analyze_config(base);
+	snprintf(st.dir.cfg, MAXLINE, "cfg-%s", cgetenv(FALSE, "System"));
+
+	check_dir();};
 
     summarize_config();
 

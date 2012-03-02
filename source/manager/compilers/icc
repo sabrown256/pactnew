@@ -38,6 +38,14 @@ Tool FC {
    Version = -V
 }
 
+Tool CXX {
+   Exe       = icpc
+   Flags     = 
+   Debug     = -g
+   Optimize  = -g
+   Version   = -V
+}
+
 Tool LD {
    RPath = -Wl,-rpath,@
    Lib   = -lc

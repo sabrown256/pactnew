@@ -27,17 +27,18 @@ while ($#argv > 0)
 end
 
 NoteD $Log ""
-NoteD $Log -n "                    $msg"
+NoteD $Log "                    $msg"
 Note $Log ""
 
 flog $Log pushd ../../../manager
 
 # GOTCHA: need a lighter weight test for the greater test suite
 #   flog $Log ./test-pco
+ftee $Log ../psh/tests/pco-cmp $FilesDir/cfg1
 set xstatus = $status
 flog $Log popd
 
-$TEST_CHECK part -a pco -e $xstatus -rpf "$rpf" none
+$TEST_CHECK part -a pco -e $xstatus -rpf "$rpf" $msg
 
 exit($status)
 

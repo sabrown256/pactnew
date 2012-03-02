@@ -40,6 +40,14 @@ Tool FC {
    Version  = -V
 }
 
+Tool CXX {
+   Exe       = sunCC
+   Flags     = 
+   Debug     = -g -v
+   Optimize  = -g -v
+   Version   = -V
+}
+
 Tool LD {
    RPath   = -Wl,-rpath,@
    Lib     = -lc

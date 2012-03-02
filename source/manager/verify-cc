@@ -1,0 +1,35 @@
+#!/bin/csh -f
+#
+# VERIFY-CC - verify that specified compiler can build hello world
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+@ err = 0
+
+set cc = $1
+set hst = `uname -n`
+set ce  = hello.$hst.$$
+
+if ($err == 0) then
+   $cc ../psh/hello.c -o $ce >& /dev/null
+   @ err = $err + $status
+   if ($err != 0) then
+      echo "$cc cannot compile simple executable - exiting"
+   endif
+endif
+
+if ($err == 0) then
+   $ce >& /dev/null
+   @ err = $err + $status
+   if ($err != 0) then
+      echo "$cc built executable fails to run - exiting"
+   endif
+endif
+
+rm -f $ce
+
+exit($err)

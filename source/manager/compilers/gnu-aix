@@ -43,6 +43,14 @@ Tool FC {
    Version  = -v
 }
 
+Tool CXX {
+   Exe       = g++
+   Flags     = 
+   Debug     = -g -O0 -Wall
+   Optimize  = -g -O -Wunused
+   Version   = -v
+}
+
 Tool LD {
    RPath    = -Wl,-bsvr4,-R,@
    Flags    = [ _env_ = Bits ;               # address bit size

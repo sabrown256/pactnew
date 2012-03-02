@@ -1,0 +1,155 @@
+#!/bin/csh -f
+#
+# PCO-CMP - compare configuration by config versus by database
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+@ err = 0
+
+set cfg  = ""
+set osys = `cfgman use`
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: pco-cmp [-h] [<cfg>]"
+           echo "   h      this help message"
+           echo "   <cfg>  a config file (e.g. gnu-64-mpi-py-s)"
+           exit(1)
+      default:
+           set cfg = $1
+           breaksw
+   endsw
+   shift
+end
+
+if ("$cfg" == "") then
+   set cfg = gnu-64
+endif
+
+set nsys = $osys-$cfg:t
+setenv SESSION_CONFIG      $nsys
+setenv SC_EXEC_N_ATTEMPTS  1
+
+set tsys = `cfgman use`
+set tdir = z-$tsys
+
+source ../scripts/env-csh
+
+# if run under pstest use existing log otherwise make new one
+if ($?Log == 1) then
+   set log = $Log
+else
+   InitLog log $cwd/log.pco-cmp.$tsys
+endif
+
+flog $log rm -rf $tdir
+
+foreach i (cfg db)
+   flog $log mkdir -p $tdir/$i
+end
+
+set incdir = ../dev/$tsys/include
+set logdir = ../dev/$tsys/log
+set refdb  = $cwd/$tdir/test.db
+set cfgd   = $cfg:h
+set cfgf   = $cfg:t
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CONFIG - configure from config file
+
+if ($err == 0) then
+   Separator $log
+   set msg = `fill-string -n 29 "${cfgf}_from_config_file" | sed 's|_| |g'`
+   NoteD $Log -n "                       $msg "
+   Note $log ""
+
+   flog $log dsys remove
+
+   flog $log rm -rf $incdir/*
+
+   set lt = `timer -r`
+   flog $log dsys config -g -f $cfgd $cfgf -a $tsys
+   @ err = $err + $status
+   set lt = `timer -b $lt`
+
+   flog $log cp $incdir/* $tdir/cfg
+   flog $log ( sort $incdir/cfg.db >&! $tdir/cfg/$cfgf.db )
+   flog $log cat $tdir/cfg/$cfgf.db
+
+   if ($err == 0) then
+      NoteD $log "ok ($lt)"
+   else
+      NoteD $log "ng ($lt)"
+   endif
+
+   flog $log ( grep bin/pco $logdir/config |& tail -n 1 )
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# DATABASE - configure from database
+
+if ($err == 0) then
+   Separator $log
+   set msg = `fill-string -n 29 "${cfgf}_from_database" | sed 's|_| |g'`
+   NoteD $Log -n "                       $msg "
+   Note $log ""
+
+   flog $log cp $incdir/cfg.db $refdb
+
+   flog $log dsys remove
+
+   flog $log rm -rf $incdir/*
+
+   set lt = `timer -r`
+   flog $log dsys config -g -db $refdb -a $tsys
+   @ err = $err + $status
+   set lt = `timer -b $lt`
+
+   flog $log cp $incdir/* $tdir/db
+   flog $log ( sort $incdir/cfg.db >&! $tdir/db/$cfgf.db )
+   flog $log cat $tdir/db/$cfgf.db
+
+   if ($err == 0) then
+      NoteD $log "ok ($lt)"
+   else
+      NoteD $log "ng ($lt)"
+   endif
+
+   flog $log ( grep bin/pco $logdir/config |& tail -n 1 )
+
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# COMPARE - check the results
+
+if ($err == 0) then
+   Separator $log
+   flog $log diff $tdir/cfg/$cfgf.db $tdir/db/$cfgf.db
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FINISH - cleanup and restore
+
+# restore the original configuration
+flog $log unsetenv SESSION_CONFIG
+flog $log cfgman add $osys
+
+if ($err == 0) then
+   flog $log dsys delete $nsys
+endif
+
+exit($err)

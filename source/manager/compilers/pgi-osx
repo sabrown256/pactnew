@@ -40,6 +40,14 @@ Tool FC {
    Version = -V
 }
 
+Tool CXX {
+   Exe       = pgCC
+   Flags     = 
+   Debug     = -g -O0
+   Optimize  = -g -O1
+   Version   = -V
+}
+
 Tool LD {
    RPath   = -Wl,-rpath,@
    Flags   = -Ktrap=fp ${NUMA}

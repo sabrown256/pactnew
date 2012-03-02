@@ -1,0 +1,40 @@
+#!/bin/csh -f
+#
+# STRIP-PACT-ENV - remove PACT config variables from environment
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+set sys = `cfgman use`
+
+set inf = "../dev/$sys/include/env-pact.csh"
+
+if (-f $inf) then
+   @ nl = `cat $inf | wc -l`
+   @ il = 0
+   while ($il < $nl)
+      @ il = $il + 1
+      set line = ( `head -n $il $inf | tail -n 1` )
+      if ($#line > 2) then
+         if ("$line[1]" == setenv) then
+            set var = $line[2]
+            switch ($var)
+               case MANPATH:
+               case PATH:
+               case SYS_TYPE:
+                    breaksw
+               default:
+                    echo "unsetenv $line[2] ;"
+                    breaksw
+            endsw
+         endif
+      endif
+   end
+endif
+
+exit(0)

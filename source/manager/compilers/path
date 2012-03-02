@@ -36,6 +36,14 @@ Tool FC {
    Version = --version
 }
 
+Tool CXX {
+   Exe       = pathCC
+   Flags     = 
+   Debug     = -g -Wall
+   Optimize  = -g -O1
+   Version   = --version
+}
+
 Tool LD {
    RPath   = -Wl,-rpath,@
    Flags  += [ _env_ = Bits ;               # address bit size

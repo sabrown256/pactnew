@@ -46,6 +46,14 @@ Tool FC {
    Version   = -v
 }
 
+Tool CXX {
+   Exe       = clang++
+   Flags     = 
+   Debug     = -g -O0 -Wall
+   Optimize  = -g -O -Wunused
+   Version   = -v
+}
+
 Tool LD {
    RPath    = -Wl,-rpath,@
    Lib      = -lc

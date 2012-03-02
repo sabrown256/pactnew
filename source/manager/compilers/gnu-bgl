@@ -45,6 +45,14 @@ Tool FC {
    Version = -v
 }
 
+Tool CXX {
+   Exe       = g++
+   Flags     = 
+   Debug     = -g -O0 -Wall
+   Optimize  = -g -O -Wunused
+   Version   = -v
+}
+
 Tool LD {
    RPath    = -Wl,-rpath,@
    Flags   += [ _cmd_ = -p ;                 # profiling
