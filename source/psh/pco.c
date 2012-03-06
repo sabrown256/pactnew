@@ -1712,6 +1712,57 @@ static void init_session(char *base, int append)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SET_INST_BASE - setup the InstBase related state */
+
+static void set_inst_base(char *ib)
+   {
+
+    if (ib != NULL)
+       {if (LAST_CHAR(ib) == '/')
+	   LAST_CHAR(ib) = '\0';
+	dbset(NULL, "InstBase", ib);
+	dbset(NULL, "PubInc",   "-I%s/include", ib);
+	dbset(NULL, "PubLib",   "-L%s/lib", ib);
+	st.installp = TRUE;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* ENV_SUBST - substitute the text NT for the occurrence of
+ *           - the text of environment variable REFVAR in
+ *           - any environment variable
+ */
+
+static void env_subst(char *refvar, char *nt)
+   {int i;
+    char cv[LRG];
+    char *ot, *ct, *p, *bf, **ta;
+
+    ot = cgetenv(FALSE, refvar);
+
+    bf = run(BOTH, "env");
+
+    ta = tokenize(bf, "\n");
+    if (ta != NULL)
+       {for (i = 0; ta[i] != NULL; i++)
+	    {nstrncpy(cv, LRG, ta[i], -1);
+	     ct = strchr(cv, '=');
+	     if (ct != NULL)
+	        {*ct++ = '\0';
+
+		 p = strstr(ct, ot);
+		 if (p != NULL)
+		    csetenv(cv, subst(ct, ot, nt, -1));};};
+
+	free_strings(ta);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SET_VAR - set a variable as directed */
 
 static void set_var(int rep, char *var, char *oper, char *val)
@@ -2363,7 +2414,7 @@ static void help(void)
 int main(int c, char **v)
    {int i, append, havedb;
     char base[MAXLINE];
-    char *s, *strct;
+    char *ib, *strct;
 
     if (c == 0)
        {help();
@@ -2393,6 +2444,7 @@ int main(int c, char **v)
     nstrncpy(base, MAXLINE, path_head(st.dir.mng), -1);
     strcpy(st.cfgf, "DEFAULT");
 
+    ib     = NULL;
     strct  = "0";
     append = FALSE;
 
@@ -2404,7 +2456,12 @@ int main(int c, char **v)
 	    strct = v[++i];
 
          else if (strcmp(v[i], "-db") == 0)
-	    st.db = v[++i];
+	    {st.db = v[++i];
+             if (file_exists(st.db) == FALSE)
+	        {noted(Log, "No such database '%s' - exiting\n", st.db);
+		 if (havedb == TRUE)
+		    kill_perdb();
+		 return(1);};}
  
 	 else if (v[i][0] == '-')
             {switch (v[i][1])
@@ -2428,13 +2485,7 @@ int main(int c, char **v)
                       break;
  
                  case 'i':
-		      s = v[++i];
-                      if (LAST_CHAR(s) == '/')
-			 LAST_CHAR(s) = '\0';
-                      dbset(NULL, "InstBase", s);
-                      dbset(NULL, "PubInc",   "-I%s/include", s);
-                      dbset(NULL, "PubLib",   "-L%s/lib", s);
-                      st.installp = TRUE;
+		      ib = v[++i];
                       break;
  
                  case 'l':
@@ -2466,6 +2517,8 @@ int main(int c, char **v)
 
          else
             nstrncpy(st.cfgf, MAXLINE, v[i], -1);};
+
+    set_inst_base(ib);
 
     if (st.db == NULL)
        {dbset(NULL, "STRICT", strct);
@@ -2500,7 +2553,13 @@ int main(int c, char **v)
 
 	pco_load_db(st.db);
 
-	snprintf(st.dir.cfg, MAXLINE, "cfg-%s", cgetenv(FALSE, "System"));
+/* order matters crucially here */
+        env_subst("InstBase", ib);
+        env_subst("RootDir",  st.dir.root);
+        env_subst("Base",     base);
+        env_subst("System",   st.system);
+
+	snprintf(st.dir.cfg, MAXLINE, "cfg-%s", st.system);
 
 	check_dir();};
 
