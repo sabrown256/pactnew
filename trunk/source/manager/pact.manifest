@@ -33,7 +33,7 @@ inc scope_exe.h
 inc pdb.h pdform.h scope_x11.h scope_cgm.h scope_raster.h ppc.h
 inc pgs.h pgs_old.h
 inc panace.h scheme.h syntax.h sx.h
-inc do-run-db cfg.pl
+inc do-run-db cfg.pl cfg.db
 
 f90 panacea.mod panaceatypes.mod pdb.mod pdbtypes.mod pgs.mod
 f90 pgstypes.mod pml.mod pmltypes.mod scheme.mod score.mod

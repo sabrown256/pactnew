@@ -51,7 +51,7 @@ if ($err != 0) then
 # hard to find too
 # see manager/which-exe
       set nl = `$exe -h |& wc -l`
-      if ($nl == 8) then
+      if ($nl > 8) then
          strings $d |& grep $sys >>& /dev/null
          if ($status == 0) then
             pushd $d:h >>& /dev/null

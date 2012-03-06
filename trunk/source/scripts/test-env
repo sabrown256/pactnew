@@ -164,13 +164,20 @@ set path = ( . $BinDir $path )
 setenv SCHEME $RootDir/scheme/applications
 setenv SCHEME $RootDir/scheme/applications/extensions:${SCHEME}
 setenv SCHEME $RootDir/scheme/tests:${SCHEME}
-setenv SCHEME $RootDir/sx/applications:${SCHEME}
-setenv SCHEME $RootDir/sx/applications/extensions:${SCHEME}
-setenv SCHEME $RootDir/sx/tests:${SCHEME}
-setenv SCHEME $RootDir/ultra:${SCHEME}
-setenv SCHEME $RootDir/ultra/applications:${SCHEME}
-setenv SCHEME $RootDir/ultra/applications/extensions:${SCHEME}
-setenv SCHEME $RootDir/panacea/applications:${SCHEME}
+
+if ($?Package == 1) then
+   setenv SCHEME $RootDir/$Package/tests:${SCHEME}
+   setenv SCHEME $RootDir/$Package/applications:${SCHEME}
+   setenv SCHEME $RootDir/$Package/applications/extensions:${SCHEME}
+else
+   setenv SCHEME $RootDir/sx/applications:${SCHEME}
+   setenv SCHEME $RootDir/sx/applications/extensions:${SCHEME}
+   setenv SCHEME $RootDir/sx/tests:${SCHEME}
+   setenv SCHEME $RootDir/ultra:${SCHEME}
+   setenv SCHEME $RootDir/ultra/applications:${SCHEME}
+   setenv SCHEME $RootDir/ultra/applications/extensions:${SCHEME}
+   setenv SCHEME $RootDir/panacea/applications:${SCHEME}
+endif
 
 setenv SCHEME $RootDir/dev/$System/scheme:${SCHEME}
 

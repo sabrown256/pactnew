@@ -189,6 +189,18 @@ source $ldir/env-csh
        Note $STDOUT '         echo "   $file"'
        Note $STDOUT '      endif'
        Note $STDOUT '   endif'
+
+# handle PathScale and its FOO.mod convention
+       Note $STDOUT '   set FILE = `echo $file:r | tr "[a-z]" "[a-z]"`.mod'
+       Note $STDOUT '   if (-f $FILE) then'
+       Note $STDOUT '      touch $DestDir/.lock'
+       Note $STDOUT '      sinstall -p 664 $FILE $DestDir'
+       Note $STDOUT '      if ($status != 0) then'
+       Note $STDOUT '         echo "   FAILED ($status) $FILE"'
+       Note $STDOUT '      else'
+       Note $STDOUT '         echo "   $FILE"'
+       Note $STDOUT '      endif'
+       Note $STDOUT '   endif'
        Note $STDOUT 'end'
        Note $STDOUT 'popd >& /dev/null'
        Note $STDOUT ""

@@ -643,9 +643,9 @@ switch ($Cmnd)
                    shift
                    set dbcfg = $1
                    if ("$dbcfg" =~ ../*) then
-                      set dbcfg = $cwd:h/$dbcfg:t
+                      set dbcfg = $cwd:h/$dbcfg
                    else if ("$dbcfg" !~ /*) then
-                      set dbcfg = $cwd/$dbcfg:t
+                      set dbcfg = $cwd/$dbcfg
                    endif
                    set dir = $dbcfg:h
                    set PArgs = ( $PArgs "-db" $dbcfg )
@@ -682,13 +682,14 @@ switch ($Cmnd)
                    breaksw
               case -h:
                    echo ""
-                   echo "Usage: dsys config [-a <sid>] [-b 32 | 64] [-c]"
+                   echo "Usage: dsys config [-a <sid>] [-b 32 | 64] [-c] [-db <db>]"
                    echo "                   [-f <directory>] [-F] [-feature <feature>] [-g]"
                    echo "                   [-gsys <opt>] [-h] [-i <directory>] [-llp] [-o] [-O] [-os <sys-id>]"
                    echo "                   [-p] [-cc <C compiler>] [-py] [-s] [-sl] [-t] [-v] [<config>]"
                    echo ""
                    echo "        -a         set the system id for this config"
                    echo "        -c         create missing directories for -i option"
+                   echo "        -db        configure from specified database"
                    echo "        -f         a directory containing your configuration file"
                    echo "        -F         do fast builds using /tmp"
                    echo "        -g         build an absolutely debuggable version"
@@ -2050,10 +2051,15 @@ CFG_DONE:
 #--------------------------------------------------------------------------
 
    case reconfig:
-        set Inst = ( -i none )
-        set Args = "-r"
+        set inst = ( -i none )
+        set args = "-r"
+        set db   = ""
         while ($#argv > 0)
            switch ($1)
+              case -db:
+                   shift
+                   set db = $IncDir/cfg.db
+                   breaksw
               case -h:
               case help:
                    echo ""
@@ -2065,19 +2071,29 @@ CFG_DONE:
                    exit(1)
                    breaksw
               case -i:
-                   set Inst = ""
+                   set inst = ""
                    breaksw
               default:
-                   set Args = ( $Args $1 )
+                   set args = ( $args $1 )
                    breaksw
            endsw
            shift
         end
 
-        set Cfg = `awk '($1 == "Config") { print $3 }' $IncDir/configured`
+        if ("$db" != "") then
+           set args = ( $args -db $IncDir/cfg.db )
+        else
+           set cfg = `awk '($1 == "Config") { print $3 }' $IncDir/configured`
+           set args = ( $args $cfg:t )
+           unset cfg
+        endif
 
-        $DSYS config $Args $Inst $Cfg:t
+        $DSYS config $args $inst
         set RStatus = $status
+
+        unset args
+        unset inst
+
         breaksw
 
 #--------------------------------------------------------------------------

@@ -49,7 +49,6 @@ if ("$Cfe_CC_Inc" == "$RootInc") then
    flog $ALog setenv Cfe_CC_Inc ""
 endif
 
-#if (("$MDG_Inc" == "-I$RootInc") && ($?IBM_BGP == 0)) then
 if ("$MDG_Inc" == "-I$RootInc") then
    flog $ALog setenv MDG_Inc ""
 endif

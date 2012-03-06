@@ -34,8 +34,12 @@ flog $Log pushd ../../../manager
 
 # GOTCHA: need a lighter weight test for the greater test suite
 #   flog $Log ./test-pco
-ftee $Log ../psh/tests/pco-cmp $FilesDir/cfg1
-set xstatus = $status
+
+if (($?IBM_BGL == 0) && ($?IBM_BGP == 0) && ($?IBM_BGQ == 0)) then
+   ftee $Log ../psh/tests/pco-cmp $FilesDir/cfg1
+   set xstatus = $status
+endif
+
 flog $Log popd
 
 $TEST_CHECK part -a pco -e $xstatus -rpf "$rpf" $msg
