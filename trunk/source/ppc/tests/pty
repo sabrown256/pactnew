@@ -71,7 +71,7 @@ set exe = $BinDir/pcexec
 
       endif
 
-$TEST_CHECK part -a pty -e $xstatus -rpf "$rpf" "$msg"
+$TEST_CHECK part -a pty -e $nerr -rpf "$rpf" "$msg"
 
 exit($status)
 

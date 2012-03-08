@@ -579,6 +579,8 @@ switch ($Cmnd)
         unsetenv Bits
         unsetenv CPU
         unsetenv HaveCOMPLEX
+        unsetenv HAVE_READLINE
+        unsetenv PTHREAD_POSIX
 
         setenv ConfigDir ""
         if ($?SYS_SITE == 1) then
@@ -641,14 +643,11 @@ switch ($Cmnd)
                    breaksw
               case -db:
                    shift
-                   set dbcfg = $1
-                   if ("$dbcfg" =~ ../*) then
-                      set dbcfg = $cwd:h/$dbcfg
-                   else if ("$dbcfg" !~ /*) then
-                      set dbcfg = $cwd/$dbcfg
+                   if ("$1" =~ /*) then
+                      set dbcfg = $1
+                   else
+                      set dbcfg = $cwd/$1
                    endif
-                   set dir = $dbcfg:h
-                   set PArgs = ( $PArgs "-db" $dbcfg )
                    breaksw
               case -f:
                    shift
@@ -834,11 +833,29 @@ switch ($Cmnd)
 # provide context for child processes
         setenv DSYS_TARGET pact_config
 
-# if not using a database do the location/generation steps
-        if ("$dbcfg" == "") then
+        set gdir = gen/$Arch
+        if ($reconfig == FALSE) then
+           rm -f $gdir/$Configuration >& /dev/null
+        endif
 
-# find the configuration file
-           set gdir = gen/$Arch
+# if using a database do the location/generation steps
+        if ("$dbcfg" != "") then
+           echo "Using database $dbcfg to configure this PACT installation."
+
+           if (-f $dbcfg) then
+              set ndbcfg = $cwd/$gdir/$System.cfg
+              if ($dbcfg != $ndbcfg) then
+                 cp $dbcfg $ndbcfg
+              endif
+              set dbcfg = $ndbcfg
+              unset ndbcfg
+           else
+              echo "No such database '$dbcfg' - exiting"
+              exit(1)
+           endif
+
+# if not using a database do the location/generation steps
+        else
 
 # if no configuration is specified - generate from scratch
            if ("$Configuration" == "") then
@@ -874,6 +891,7 @@ switch ($Cmnd)
            endif
            unset gdir
         endif
+
 
 # set the configuration for this system
         if ("$sid" == "") then
@@ -1046,24 +1064,21 @@ switch ($Cmnd)
         if ("$ucfg" != "") then
            NoteD $Log "Using $Configuration in $dir to configure this PACT installation."
            Note $Log "Command: $PConf $PArgs -s $System $ucfg"
-           $PConf $PArgs -s $System $ucfg
+           $PConf -s $System $PArgs $ucfg
            set RStatus = $status
-           if ($RStatus != 0) then
-              goto CFG_DONE
-           endif
 
         else if ("$dbcfg" != "") then
-           NoteD $Log "Using database $dbcfg to configure this PACT installation."
            Note $Log "Command: $PConf $PArgs -s $System"
-           $PConf $PArgs -s $System
+           $PConf -s $System $PArgs -db $dbcfg
            set RStatus = $status
-           if ($RStatus != 0) then
-              goto CFG_DONE
-           endif
+           unset dbcfg
 
         else
            echo "There is no $Configuration in $ConfigDir"
            set RStatus = 3
+        endif
+        unset dir
+        if ($RStatus != 0) then
            goto CFG_DONE
         endif
 
@@ -1178,10 +1193,10 @@ switch ($Cmnd)
 
 # create empty extensions directories if they don't exist already
         set ExtDirs = ( $Base/sx/applications/extensions $Base/ultra/applications/extensions )
-        foreach dir ($ExtDirs)
-           if (-d $dir:h) then
-              if (!(-d $dir)) then
-                 flog $Log mkdir $dir
+        foreach d ($ExtDirs)
+           if (-d $d:h) then
+              if (!(-d $d)) then
+                 flog $Log mkdir $d
               endif
            endif
         end

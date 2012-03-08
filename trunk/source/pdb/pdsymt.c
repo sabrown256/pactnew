@@ -20,20 +20,20 @@ int _PD_is_var_in_dir(char *var, char *dir)
     char *p, *d;
 
     ok = FALSE;
+    if (var != NULL)
+       {if (dir == NULL)
+	   dir = "/";
 
-    if (dir == NULL)
-       dir = "/";
-
-    p = strstr(var, dir);
+	p = strstr(var, dir);
 
 /* if the first part of VAR matches the current directory */
-    if (p == var)
-       {p += strlen(dir);
+	if (p == var)
+	   {p += strlen(dir);
 
 /* if the remainder has no '/' or ends in '/' it is in the current directory */
-        d = strchr(p, '/');
-	if ((d == NULL) || (d[1] == '\0'))
-	   ok = TRUE;};
+	    d = strchr(p, '/');
+	    if ((d == NULL) || (d[1] == '\0'))
+	       ok = TRUE;};};
 
     return(ok);}
 

@@ -2520,19 +2520,19 @@ int main(int c, char **v)
 
     set_inst_base(ib);
 
+    init_session(base, append);
+
+/* make config directory */
+    snprintf(st.dir.cfg, MAXLINE, "cfg-%s", st.system);
+    run(BOTH, "rm -rf %s", st.dir.cfg);
+    run(BOTH, "mkdir %s", st.dir.cfg);
+
     if (st.db == NULL)
        {dbset(NULL, "STRICT", strct);
 
 	push_file(st.cfgf, STACK_FILE);
 	strcpy(st.cfgf, st.fstck.file[st.fstck.n-1].name);
 	pop_file();
-
-	init_session(base, append);
-
-/* make config directory */
-	snprintf(st.dir.cfg, MAXLINE, "cfg-%s", st.system);
-	run(BOTH, "rm -rf %s", st.dir.cfg);
-	run(BOTH, "mkdir %s", st.dir.cfg);
 
 	if (file_exists("analyze/program-init") == TRUE)
 	   read_config("program-init", TRUE);
@@ -2549,9 +2549,7 @@ int main(int c, char **v)
 	   analyze_config(base);}
 
     else
-       {init_session(base, append);
-
-	pco_load_db(st.db);
+       {pco_load_db(st.db);
 
 /* order matters crucially here */
         env_subst("InstBase", ib);

@@ -198,12 +198,30 @@ foreach c ($fname $cname)
 # query the compiler for information
       set inf = ( `$cmp $opt |& $Awk "$prog"` )
       if ($#inf > 1) then
-         set lfvers = ( `echo $inf[2] | $Sed 's/[-_]/./g'` )
+         set lfvers = $inf[2]
          set fc     = $inf[1]
          set bindir = $fc:h
+
       else if ($#inf > 0) then
-         set fc     = $cmp
-         set lfvers = ( `echo $inf[1] | $Sed 's/[-_]/./g'` )
+
+# NOTE: some compilers such as ifort lie about their versions
+# ifort 12.1.xxx all say they are 12.1.0
+# so take the version from the installed path in such a case.
+# this depends on some coordination with the ccomp script
+# and the fact that installations of multiple versions must
+# be more nearly correct in their identifications
+         echo "$inf" |& grep $lvers >& /dev/null
+	 if ($status == 0) then
+            set lfvers = $lvers
+            set fc     = $inf
+            set bindir = $inf:h
+         else
+            set lfvers = $inf[1]
+            set fc     = $cmp
+         endif
+      endif
+      if (!(-f "$lfvers")) then
+         set lfvers = ( `echo $lfvers | $Sed 's/[-_]/./g'` )
       endif
       set froot = $bindir:h
       unset bindir
@@ -215,12 +233,30 @@ foreach c ($fname $cname)
 # query the compiler for information
       set inf = ( `$cmp $opt |& $Awk "$prog"` )
       if ($#inf > 1) then
-         set lcvers = ( `echo $inf[2] | $Sed 's/[-_]/./g'` )
+         set lcvers = $inf[2]
          set cc     = $inf[1]
          set bindir = $cc:h
+
       else if ($#inf > 0) then
-         set cc     = $cmp
-         set lcvers = ( `echo $inf[1] | $Sed 's/[-_]/./g'` )
+
+# NOTE: some compilers such as icc lie about their versions
+# icc 12.1.xxx all say they are 12.1.0
+# so take the version from the installed path in such a case.
+# this depends on some coordination with the ccomp script
+# and the fact that installations of multiple versions must
+# be more nearly correct in their identifications
+         echo "$inf" |& grep $lvers >& /dev/null
+	 if ($status == 0) then
+            set lcvers = $lvers
+            set cc     = $inf
+            set bindir = $inf:h
+         else
+            set lcvers = $inf[1]
+            set cc     = $cmp
+         endif
+      endif
+      if (!(-f "$lcvers")) then
+         set lcvers = ( `echo $lcvers | $Sed 's/[-_]/./g'` )
       endif
       set croot = $bindir:h
       unset bindir

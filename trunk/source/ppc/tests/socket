@@ -55,7 +55,7 @@ set exe = $BinDir/pcexec
          endif
       endif
 
-$TEST_CHECK part -a socket -e $xstatus -rpf "$rpf" "$msg"
+$TEST_CHECK part -a socket -e $nerr -rpf "$rpf" "$msg"
 
 exit($status)
 

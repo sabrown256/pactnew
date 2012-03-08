@@ -81,7 +81,7 @@ static int cycle(int ne)
 
 int main(int c, char **v)
    {int i, noth, ne;
-    int tststdio, begin, quiet;
+    int tststdio, quiet;
     char s[MAXLINE+1];
     char *p;
 
@@ -124,7 +124,6 @@ int main(int c, char **v)
     else
        {if (quiet == FALSE)
 	   lprintf(stdout, 0, "Testing tty I/O");
-        begin = TRUE;
 
 #ifdef HAVE_MPI_STDIN_ALL
 
