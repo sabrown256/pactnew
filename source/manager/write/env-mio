@@ -100,8 +100,10 @@ HAVE_SUBROUTINES
     Note $FOUT '# COMPILER specifications'
     Note $FOUT ''
 
-    set cmplib = ""
-    set lnuma  = ""
+    set cmplib  = ""
+    set ccmplib = ""
+    set fcmplib = ""
+    set lnuma   = ""
 
     set lbits = $Bits
     if ($CPU == ia64) then
@@ -125,31 +127,51 @@ HAVE_SUBROUTINES
     Note $FOUT ""
 
     if ($PACT_CC_FAMILY == GNU) then
-       set CmpBin = $PACT_CC_PATH/bin
-       set cmplib = $PACT_CC_PATH/$LIB
+       set CmpBin  = $PACT_CC_PATH/bin
+       set cmplib  = $PACT_CC_PATH/$LIB
+       set ccmplib = $PACT_CC_PATH/$LIB
+       set fcmplib = $PACT_FC_PATH/$LIB
 
     else if ($PACT_CC_FAMILY == PGI) then
-       set cmplib = $PACT_CC_PATH/lib
-       set lnuma  = $NUMA
+       set ccmplib = $PACT_CC_PATH/lib
+       set fcmplib = $PACT_FC_PATH/lib
+       set cmplib  = $PACT_CC_PATH/lib
+       set lnuma   = $NUMA
        Note $FOUT ""
        Note $FOUT 'VMake += NUMA'
 
     else if ($PACT_CC_FAMILY == INTEL) then
-       set cmplib = $PACT_CC_PATH/lib
+       set cmplib  = $PACT_CC_PATH/lib
+       set ccmplib = $PACT_CC_PATH/lib
+       set fcmplib = $PACT_FC_PATH/lib
 
     else if ($PACT_CC_FAMILY == PATHSCALE) then
        if ("$Bits" == 32) then
-          set cmplib = ${PACT_CC_PATH}:${PACT_CC_PATH}/32
+          set cmplib  = ${PACT_CC_PATH}:${PACT_CC_PATH}/32
+          set ccmplib = ${PACT_CC_PATH}:${PACT_CC_PATH}/32
+          set fcmplib = ${PACT_FC_PATH}:${PACT_FC_PATH}/32
        else
-          set cmplib = $PACT_CC_PATH
+          set cmplib  = $PACT_CC_PATH
+          set ccmplib = $PACT_CC_PATH
+          set fcmplib = $PACT_FC_PATH
        endif
     endif
 
     if (!(-d "$cmplib")) then
        set cmplib = ""
     endif
+    if (!(-d "$ccmplib")) then
+       set ccmplib = ""
+    endif
+    if (!(-d "$fcmplib")) then
+       set fcmplib = ""
+    endif
     if ($?CROSS_COMPILE == 1) then
-       set cmplib = ""
+       if ($CROSS_COMPILE != FALSE) then
+          set cmplib  = ""
+          set ccmplib = ""
+          set fcmplib = ""
+       endif
     endif
 
     Note $FOUT "Path += $CCBin"
@@ -184,6 +206,12 @@ HAVE_SUBROUTINES
     if ("$cmplib" != "") then
        Note $FOUT "RPATH = $cmplib" '$@'
     endif
+    if ("$ccmplib" != "") then
+       Note $FOUT "RPATH = $ccmplib" '$@'
+    endif
+    if ("$fcmplib" != "") then
+       Note $FOUT "RPATH = $fcmplib" '$@'
+    endif
     Note $FOUT ""
 
     Note $FOUT "System/pact {"
@@ -204,16 +232,16 @@ HAVE_SUBROUTINES
     Note $FOUT "}"
     Note $FOUT ""
 
-    set llibs = ""
-    set llibs = ( $llibs $cmplib )
-    set llibs = ( $llibs `echo $RPATH | sed 's/:/ /g'` )
-    set llibs = ( `../scripts/simplify-list $llibs` )
+#    set llibs = ""
+#    set llibs = ( $llibs $cmplib )
+#    set llibs = ( $llibs `echo $RPATH | sed 's/:/ /g'` )
+#    set llibs = ( `../scripts/simplify-list $llibs` )
 
     if ($CCBin != none) then
        Note $FOUT "Tool/cc_pact {"
        Note $FOUT "  ToolClass    = CGroup"
        Note $FOUT "  BinDir       = $CCBin"
-       Note $FOUT "  LibDir       = $llibs"
+       Note $FOUT "  LibDir       = $ccmplib"
        Note $FOUT "  Exe          = $Cfe_CC_Exe"
        Note $FOUT "  Flags        = $Cfe_CC_Flags"
        Note $FOUT "  AddressSize  = $lbits"
@@ -226,7 +254,7 @@ HAVE_SUBROUTINES
        Note $FOUT "Tool/fc_pact {"
        Note $FOUT "  ToolClass    = FGroup"
        Note $FOUT "  BinDir       = $FCBin"
-       Note $FOUT "  LibDir       = $llibs"
+       Note $FOUT "  LibDir       = $fcmplib"
        Note $FOUT "  Exe          = $Cfe_FC_Exe"
        Note $FOUT "  Flags        = $Cfe_FC_Flags"
        Note $FOUT "  AddressSize  = $lbits"
