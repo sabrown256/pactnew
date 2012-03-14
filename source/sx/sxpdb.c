@@ -1101,17 +1101,20 @@ static object *_SXI_major_order(SS_psides *si, object *arg)
     else
        file = FILE_FILE(PDBfile, po);
 
-    ord = ROW_MAJOR_ORDER;
-    if (SS_stringp(order) == TRUE)
-       {s = SS_STRING_TEXT(order);
-	if ((s[0] == 'c') || (s[0] == 'C'))
-	   ord = COLUMN_MAJOR_ORDER;}
-    else if (SS_floatp(order) == TRUE)
-       ord = SS_FLOAT_VALUE(order);
-    else if (SS_integerp(order) == TRUE)
-       ord = SS_INTEGER_VALUE(order);
+    ord = file->major_order;
 
-    file->major_order = ord;
+/* if setting major_order */
+    if (SS_nullobjp(order) == FALSE)
+       {if (SS_stringp(order) == TRUE)
+	   {s = SS_STRING_TEXT(order);
+	    if ((s[0] == 'c') || (s[0] == 'C'))
+	       ord = COLUMN_MAJOR_ORDER;}
+	else if (SS_floatp(order) == TRUE)
+	   ord = SS_FLOAT_VALUE(order);
+	else if (SS_integerp(order) == TRUE)
+	   ord = SS_INTEGER_VALUE(order);
+
+	file->major_order = ord;};
 
     o = SS_mk_integer(si, ord);
 

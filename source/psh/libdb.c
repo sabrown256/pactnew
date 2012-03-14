@@ -194,22 +194,23 @@ char *put_db(database *db, char *var, char *val)
    {int i, nv;
     char **vars;
 
-    nv   = db->ne;
-    vars = db->entries;
-    for (i = 0; i < nv; i++)
-        {if (strcmp(var, vars[i]) == 0)
-	    break;};
+    if (var != NULL)
+       {nv   = db->ne;
+	vars = db->entries;
+	for (i = 0; i < nv; i++)
+	    {if (strcmp(var, vars[i]) == 0)
+	        break;};
 
-    if (i >= nv)
-       {db->entries = lst_push(vars, var);
-	db->ne++;};
+	if (i >= nv)
+	   {db->entries = lst_push(vars, var);
+	    db->ne++;};
 
-    if (val == NULL)
-       val = "";
+	if (val == NULL)
+	   val = "";
 
-    csetenv(var, val);
+	csetenv(var, val);
 
-    log_activity(db->flog, dbg_db, "SERVER", "put |%s|=|%s|", var, val);
+	log_activity(db->flog, dbg_db, "SERVER", "put |%s|=|%s|", var, val);};
 
     return(val);}
 
@@ -389,12 +390,28 @@ int save_db(int fd, database *db, char *var, FILE *fp)
 /* LOAD_DB - load the DB into memory from FP */
 
 void load_db(database *db, char *vr, FILE *fp)
-   {char s[LRG];
-    char *var, *val;
+   {int c;
+    char s[LRG], v[LRG];
+    char *var, *val, *p;
 
     if ((db != NULL) && (fp != NULL))
        {while (fgets(s, LRG, fp) != NULL)
-	   {key_val(&var, &val, s, "=\n");
+	   {p = strstr(s, "=\"");
+
+/* check for <var> = "<line> \n ... " forms */
+	    if (p != NULL)
+	       {nstrncpy(v, LRG, s, -1);
+		c = p[strlen(p)-2];
+		if (c != '\"')
+		   {while ((p = fgets(s, LRG, fp)) != NULL)
+		       {nstrcat(v, LRG, p);
+			if (p[strlen(p)-2] == '\"')
+			   break;};};
+		p = v;}
+	    else
+	       p = s;
+
+	    key_val(&var, &val, p, "=\n");
 	    if ((vr == NULL) || (strcmp(vr, var) == 0))
 	       val = put_db(db, var, val);};};
 
@@ -871,7 +888,8 @@ int db_restore(char *root, char *db)
 	        {vl = strchr(s, '=');
 		 if (vl != NULL)
 		    {*vl++ = '\0';
-		     vl = subst(vl, "\"", "", -1);
+		     vl = strip_quote(vl);
+/*		     vl = subst(vl, "\"", "", -1); */
 		     csetenv(s, vl);};};};
 	lst_free(ta);};
 

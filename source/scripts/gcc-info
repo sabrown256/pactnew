@@ -37,7 +37,7 @@ endif
 if ("$Gcc" =~ *xlc*) then
    set Info = ( no no no no no )
 else
-   set Resp = ( `$Gcc -vrb -v |& grep "Compile line:"` )
+   set Resp = ( `$Gcc -cwvrb -v |& grep "Compile line:"` )
    if ("$Resp" != "") then
       set Gcc = $Resp[3]   
    endif

@@ -12,13 +12,59 @@ perdb -f $db $opt -c -s
 
 echo "-----------------------------------"
 
+echo "set v1 - single token value"
 perdb -f $db $opt v1=1
+
+echo "set v2 - two token, single line list"
 perdb -f $db $opt v2="baz blat"
+
+echo "set v3 - angle bracket, multi-line list"
+perdb -f $db $opt v3="<	foo ;\
+ bar >\
+"
+
+echo "set v4 = double quoted, parenthesized, multi-line list"
+perdb -f $db $opt v4="(	foo ;\
+ bar )\
+"
+
+echo "set v5 = single quoted, parenthesized, multi-line list"
+perdb -f $db $opt v5='(	foo ;\
+ bar )\
+'
+
+echo "set v6 = single quoted, curly bracket, multi-line list"
+perdb -f $db $opt v6='{	foo ;\
+ bar }\
+'
+
+echo "set v7 = single quoted, double quoted, multi-line list"
+perdb -f $db $opt v7='"	foo ;\
+ bar "\
+'
 
 echo "-----------------------------------"
 
+echo "get v1"
 perdb -f $db $opt v1
+
+echo "get v2"
 perdb -f $db $opt v2
+
+echo "get v3"
+perdb -f $db $opt v3
+
+echo "get v4"
+perdb -f $db $opt v4
+
+echo "get v5"
+perdb -f $db $opt v5
+
+echo "get v6"
+perdb -f $db $opt v6
+
+echo "get v7"
+perdb -f $db $opt v7
 
 echo "-----------------------------------"
 

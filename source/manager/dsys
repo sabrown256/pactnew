@@ -1068,7 +1068,7 @@ switch ($Cmnd)
            set RStatus = $status
 
         else if ("$dbcfg" != "") then
-           Note $Log "Command: $PConf $PArgs -s $System"
+           Note $Log "Command: $PConf -s $System $PArgs -db $dbcfg"
            $PConf -s $System $PArgs -db $dbcfg
            set RStatus = $status
            unset dbcfg
