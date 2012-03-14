@@ -1376,9 +1376,7 @@ int lst_length(char **lst)
 
     n = 0;
     if (lst != NULL)
-       {for (n = 0; TRUE; n++)
-            if (lst[n] == NULL)
-               break;};
+       {for (n = 0; lst[n] != NULL; n++);};
 
     return(n);}
 
@@ -2143,11 +2141,33 @@ int demonize(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* FILE_TEXT - return the text of FNAME as a NULL terminated list of strings */
+/* FILE_STRINGS - return the text of FP as a NULL terminated list of strings */
 
-char **file_text(char *fname, ...)
+char **file_strings(FILE *fp)
    {int i;
-    char s[LRG], file[MAXLINE];
+    char s[LRG];
+    char **sa;
+
+    sa = NULL;
+    if (fp != NULL)
+       {for (i = 0; fgets(s, LRG, fp) != NULL; i++)
+	    {if (LAST_CHAR(s) == '\n')
+	        LAST_CHAR(s) = '\0';
+	     sa = lst_add(sa, s);};
+
+	sa = lst_add(sa, NULL);};
+
+    return(sa);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FILE_TEXT - return the text of FNAME as a NULL terminated list of strings
+ *           - if SORT is TRUE sort the file first
+ */
+
+char **file_text(int sort, char *fname, ...)
+   {char file[MAXLINE];
     char **sa;
     FILE *in;
 
@@ -2155,17 +2175,19 @@ char **file_text(char *fname, ...)
     VSNPRINTF(file, MAXLINE, fname);
     VA_END;
 
+    if (sort == TRUE)
+       {run(FALSE, "rm -f %s.srt ; sort %s > %s.srt", file, file, file);
+	nstrcat(file, MAXLINE, ".srt");};
+
     sa = NULL;
 	
     in = fopen(file, "r");
     if (in != NULL)
-       {for (i = 0; fgets(s, LRG, in) != NULL; i++)
-	    {if (LAST_CHAR(s) == '\n')
-	        LAST_CHAR(s) = '\0';
-	     sa = lst_add(sa, s);};
-	sa = lst_add(sa, NULL);
-
+       {sa = file_strings(in);
 	fclose(in);};
+
+    if (sort == TRUE)
+       run(FALSE, "rm -f %s", file);
 
     return(sa);}
 

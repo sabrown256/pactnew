@@ -4479,11 +4479,11 @@ static int blang(char *pck, int cfl, char *fbi,
     rv = FALSE;
 
     if ((IS_NULL(cpr) == FALSE) && (IS_NULL(fbi) == FALSE))
-       {sbi = file_text(fbi);
-	sdc = file_text(cdc);
-	scp = file_text(cpr);
-	sfp = file_text(fpr);
-	swr = file_text(fwr);
+       {sbi = file_text(FALSE, fbi);
+	sdc = file_text(FALSE, cdc);
+	scp = file_text(FALSE, cpr);
+	sfp = file_text(FALSE, fpr);
+	swr = file_text(FALSE, fwr);
 
 	if (scp == NULL)
 	   printf("No prototypes found for '%s'\n", pck);
