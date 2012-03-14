@@ -2467,7 +2467,7 @@ static void help(void)
 
 int main(int c, char **v, char **env)
    {int i, append, havedb;
-    char base[MAXLINE], ib[MAXLINE];
+    char base[MAXLINE], ib[MAXLINE], d[LRG];
     char *strct;
 
     if (c == 0)
@@ -2510,12 +2510,13 @@ int main(int c, char **v, char **env)
 	    strct = v[++i];
 
          else if (strcmp(v[i], "-db") == 0)
-	    {st.db = v[++i];
-             if (file_exists(st.db) == FALSE)
-	        {noted(Log, "No such database '%s' - exiting\n", st.db);
+	    {full_path(d, LRG, NULL, v[++i]);
+             if (file_exists(d) == FALSE)
+	        {noted(Log, "No such database '%s' - exiting\n", d);
 		 if (havedb == TRUE)
 		    kill_perdb();
-		 return(1);};}
+		 return(1);};
+	     st.db = d;}
  
 	 else if (v[i][0] == '-')
             {switch (v[i][1])

@@ -8,7 +8,14 @@
 # include "cpyright.h"
 #
 
+set echo
+set verbose
 source ../../tests/common
+unset echo
+unset verbose
+
+echo "RootDir = $RootDir"
+exit(1)
 
 set msg = "TEMPLATE Test .................."
 
@@ -30,7 +37,7 @@ end
 
 InitLog Log $TestDir/log.template.$LogSfx
 
-flog $Log pushd $RootDir/psh
+flog $Log pushd $SrcDir
 flog $Log $MAKE -i template
 flog $Log popd
 flog $Log rehash

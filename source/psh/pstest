@@ -60,14 +60,20 @@ else
       set Tests = ($Tests regx pco pcsh perdb dorun verify)
    endif
 
+   @ nerr = 0
+   Note $Log "Starting with $nerr errors"
+
    foreach i ($Tests)
-      $SrcDir/tests/$i
-      @ nerr = $nerr + $status
+      ftee $Log $SrcDir/tests/$i
+      if ($status != 0) then
+         Note $Log "Test $i exited with error"
+         flog $Log @ nerr = $nerr + 1
+      endif
    end
    
    $TEST_CHECK clean -n PSH -e $nerr
 
-   set xstatus = $status
+   Note $Log set xstatus = $status
 
 endif
 
