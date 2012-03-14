@@ -760,7 +760,7 @@ static int set_target(rundes *st)
  *       and that must win
  */
     if (IS_NULL(st->sgn) == FALSE)
-       {sa = file_text(st->sgn);
+       {sa = file_text(FALSE, st->sgn);
 	for (i = 0; sa[i] != NULL; i++)
 	    {p = sa[i];
 
@@ -821,7 +821,7 @@ static void parse_db(rundes *st)
 
 	sect[0] = '\0';
 
-	sa = file_text(st->sgn);
+	sa = file_text(FALSE, st->sgn);
 	for (i = 0; sa[i] != NULL; i++)
 	    {p = sa[i];
 

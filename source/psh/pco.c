@@ -649,9 +649,9 @@ static void add_set_cfg(FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
     char *var, *val, *p, **sa;
 
     fflush(st.aux.SEF);
-    sa = file_text("%s/log/file.se", st.dir.root);
+    sa = file_text(TRUE, "%s/log/file.se", st.dir.root);
     if (sa != NULL)
-       {for (n = 0; sa[n] != NULL; n++);
+       {n = lst_length(sa);
 
 	for (i = 0; i < n; i++)
 	    {p = sa[i];
@@ -661,7 +661,9 @@ static void add_set_cfg(FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
 	        {nc  = strlen(var);
 		 val = strtok(NULL, "\n");
 		    
-/* handle PATH specially - just gather everything that is not $PATH or ${PATH} */
+/* handle PATH specially - just gather everything that is
+ * not $PATH or ${PATH}
+ */
 	         if (strcmp(var, "PATH") == 0)
 		    push_path(APPEND, epath, val);
 
@@ -856,12 +858,6 @@ static void write_envf(int lnotice)
     cat(Log, 0, -1, "%s/env-pact.sh",  st.dir.inc);
     cat(Log, 0, -1, "%s/env-pact.dk",  st.dir.inc);
     cat(Log, 0, -1, "%s/env-pact.mdl", st.dir.inc);
-
-/* source this now before trying to compile smake in write/smake */
-    note(Log, TRUE, "Sourcing %s", st.env_csh);
-#if 0
-    source $st.env_csh
-#endif
 
     return;}
 
@@ -1789,25 +1785,30 @@ static void set_inst_base(char *ib)
  */
 
 static void env_subst(char *refvar, char *nt)
-   {int i;
-    char cv[LRG];
-    char *ot, *ct, *p, *bf, **ta;
+   {int i, nc, nv;
+    char *ot, *vr, *vl, *p, *bf, **ta;
 
     ot = cgetenv(FALSE, refvar);
 
-    bf = run(BOTH, "env | awk '{printf(\"%%s\\001\", $0);}'");
+    bf = run(BOTH, "env");
 
-    ta = tokenize(bf, "\001");
+    ta = tokenize(bf, "\n");
     if (ta != NULL)
-       {for (i = 0; ta[i] != NULL; i++)
-	    {nstrncpy(cv, LRG, ta[i], -1);
-	     ct = strchr(cv, '=');
-	     if (ct != NULL)
-	        {*ct++ = '\0';
+       {nv = lst_length(ta);
+	for (i = 0; i < nv; )
+	    {vr = get_multi_line(ta, nv, &i, "=", TRUE);
+	     if (vr != NULL)
+	        {vl = strchr(vr, '=');
+		 if (vl != NULL)
+		    {*vl++ = '\0';
 
-		 p = strstr(ct, ot);
-		 if (p != NULL)
-		    csetenv(cv, subst(ct, ot, nt, -1));};};
+		     nc = strlen(vl);
+		     if (vl[nc-1] == '\n')
+		        vl[nc-1] = '\0';
+
+		     p = strstr(vl, ot);
+		     if (p != NULL)
+		        csetenv(vr, subst(vl, ot, nt, -1));};};};
 
 	free_strings(ta);};
 
@@ -2464,7 +2465,7 @@ static void help(void)
 
 /* MAIN - start it out here */
 
-int main(int c, char **v)
+int main(int c, char **v, char **env)
    {int i, append, havedb;
     char base[MAXLINE], ib[MAXLINE];
     char *strct;

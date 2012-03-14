@@ -387,33 +387,87 @@ int save_db(int fd, database *db, char *var, FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* GET_MULTI_LINE - return the next item from an array of strings SA
+ *                - starting at array element I
+ *                - the items are <key><dlm><value> pairs
+ *                - but <value> may span several elements of SA
+ *                - return I through PI
+ *                - DLM permits processing of forms such as
+ *                - <key>=<value> or <key>:<value>
+ *                - if QU is TRUE watch for double quotes
+ */
+
+enum e_item_state
+   {NONE, TOKEN, DONE};
+typedef enum e_item_state item_state;
+
+char *get_multi_line(char **sa, int ni, int *pi, char *dlm, int qu)
+   {int i, c;
+    item_state st;
+    char *p, *s, *t, *rv;
+    static char v[LRG];
+
+    rv = NULL;
+    if ((sa != NULL) && (pi != NULL))
+       {v[0] = '\0';
+	for (i = *pi, st = NONE; (0 <= i) && (i < ni) && (st != DONE); )
+	    {s = sa[i++];
+	     if (s != NULL)
+	        {p = strstr(s, dlm);
+		 if (p != NULL)
+
+/* look for white space or characters which are illegal in identifiers */
+		    {c  = *p;
+		     *p = '\0';
+		     t  = strpbrk(s, " \t~!@#$%^&?`|;:.,+-*/=(){}[]<>\'\"\\");
+		     *p = c;
+
+/* if we have a valid identifier followed by DLM we have
+ * a string of the form <var><dlm>....
+ * this is the start of an item
+ */
+		     if (t == NULL)
+		        {if (st == TOKEN)
+			    {i--;
+			     rv = v;
+			     st = DONE;}
+			 else
+			    st = TOKEN;};};
+
+		 if (st != DONE)
+		    vstrcat(v, LRG, "%s\n", s);
+
+	         if (i >= ni)
+		    {rv = v;
+		     st = DONE;};};};
+
+	*pi = i;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* LOAD_DB - load the DB into memory from FP */
 
 void load_db(database *db, char *vr, FILE *fp)
-   {int c;
-    char s[LRG], v[LRG];
-    char *var, *val, *p;
+   {char *var, *val, *p;
 
     if ((db != NULL) && (fp != NULL))
-       {while (fgets(s, LRG, fp) != NULL)
-	   {p = strstr(s, "=\"");
+       {int i, nv;
+	char **sa;
 
-/* check for <var> = "<line> \n ... " forms */
-	    if (p != NULL)
-	       {nstrncpy(v, LRG, s, -1);
-		c = p[strlen(p)-2];
-		if (c != '\"')
-		   {while ((p = fgets(s, LRG, fp)) != NULL)
-		       {nstrcat(v, LRG, p);
-			if (p[strlen(p)-2] == '\"')
-			   break;};};
-		p = v;}
-	    else
-	       p = s;
+	sa = file_strings(fp);
+	if (sa != NULL)
+	   {nv = lst_length(sa);
+	    for (i = 0; i < nv; )
+	        {p = get_multi_line(sa, nv, &i, "=", TRUE);
+		 if (p != NULL)
+		    {key_val(&var, &val, p, "=\n");
+		     if ((vr == NULL) || (strcmp(vr, var) == 0))
+		        val = put_db(db, var, val);};};
 
-	    key_val(&var, &val, p, "=\n");
-	    if ((vr == NULL) || (strcmp(vr, var) == 0))
-	       val = put_db(db, var, val);};};
+	    free_strings(sa);};};
 
     return;}
 
@@ -610,7 +664,7 @@ int db_srv_launch(char *root)
 	        nsleep(100);};
 
 /* check the pid */
-        sa = file_text(fpid);
+        sa = file_text(FALSE, fpid);
 
 	if ((sa != NULL) && (sa[0] != NULL))
 	   pid = atoi(sa[0]);

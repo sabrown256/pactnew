@@ -54,7 +54,7 @@ static int report_var(statedes *st, char *fname, char *q, char *key, int newl)
 
     snprintf(file, MAXLINE, "%s/include/%s", st->root, fname);
 
-    sa = file_text(file);
+    sa = file_text(FALSE, file);
     if (sa != NULL)
        {for (i = 0; sa[i] != NULL; i++)
 	    {p = sa[i];
@@ -467,7 +467,7 @@ static int command_makefile(statedes *st, char *fname, int c, char **v, char **a
 	 nstrcat(s, MAXLINE, tok);
 	 nstrcat(s, MAXLINE, " ");};
 
-    sa = file_text(fname);
+    sa = file_text(FALSE, fname);
     if (sa != NULL)
        {snprintf(cmd, MAXLINE, "(echo \"go :\"");
 
