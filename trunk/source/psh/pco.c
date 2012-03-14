@@ -1446,9 +1446,60 @@ static void default_var(char *base)
     snprintf(st.dir.sch, MAXLINE, "%s/scheme",  st.dir.root);
 
 /* variable defaults */
-    strcpy(st.def_tools,    "");
+    strcpy(st.def_tools, "");
 
     push_struct("Glb", st.def_groups, STACK_GROUP);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* RESET_MAKE_VARS - save the Group and Tool variables
+ *                 - needed in the make-def file
+ *                 - GOTCHA: if we do not need $MVFile then
+ *                 - we do not need this routine (see write/make-def)
+ */
+
+static void reset_make_vars(void)
+   {int i, nc;
+    char vr[LRG];
+    char *vl, *bf, **ta;
+
+    if (st.aux.MVF == NULL)
+       st.aux.MVF = open_file("w", st.aux.mvfn);
+
+    nstrncpy(st.def_tools, MAXLINE, cgetenv(FALSE, "Tools"), -1);
+    nstrncpy(st.def_groups, MAXLINE, cgetenv(FALSE, "Groups"), -1);
+
+    bf = run(BOTH, "env");
+
+    ta = tokenize(bf, "\n");
+    if (ta != NULL)
+       {for (i = 0; ta[i] != NULL; i++)
+	    {nstrncpy(vr, LRG, ta[i], -1);
+	     vl = strchr(vr, '=');
+	     if (vl != NULL)
+	        {*vl++ = '\0';
+
+		 if (IS_NULL(vl) == TRUE)
+		    continue;
+
+/* write Tool vars */
+		 FOREACH (t, st.def_tools, " ")
+		    nc = strlen(t);
+		    if ((strncmp(t, vr, nc) == 0) && (vr[nc] == '_'))
+		       note(st.aux.MVF, TRUE, "%s = %s", vr, vl);
+		 ENDFOR
+
+/* write Group vars */
+		 FOREACH (t, st.def_groups, " ")
+		    nc = strlen(t);
+		    if ((strncmp(t, vr, nc) == 0) && (vr[nc] == '_'))
+		       note(st.aux.MVF, TRUE, "%s = %s", vr, vl);
+		 ENDFOR;};};
+
+	free_strings(ta);};
 
     return;}
 
@@ -1717,13 +1768,15 @@ static void init_session(char *base, int append)
 static void set_inst_base(char *ib)
    {
 
-    if (ib != NULL)
+    if (strcmp(ib, "none") != 0)
        {if (LAST_CHAR(ib) == '/')
 	   LAST_CHAR(ib) = '\0';
-	dbset(NULL, "InstBase", ib);
-	dbset(NULL, "PubInc",   "-I%s/include", ib);
-	dbset(NULL, "PubLib",   "-L%s/lib", ib);
+
 	st.installp = TRUE;};
+
+    dbset(NULL, "InstBase", ib);
+    dbset(NULL, "PubInc",   "-I%s/include", ib);
+    dbset(NULL, "PubLib",   "-L%s/lib", ib);
 
     return;}
 
@@ -1742,9 +1795,9 @@ static void env_subst(char *refvar, char *nt)
 
     ot = cgetenv(FALSE, refvar);
 
-    bf = run(BOTH, "env");
+    bf = run(BOTH, "env | awk '{printf(\"%%s\\001\", $0);}'");
 
-    ta = tokenize(bf, "\n");
+    ta = tokenize(bf, "\001");
     if (ta != NULL)
        {for (i = 0; ta[i] != NULL; i++)
 	    {nstrncpy(cv, LRG, ta[i], -1);
@@ -2413,8 +2466,8 @@ static void help(void)
 
 int main(int c, char **v)
    {int i, append, havedb;
-    char base[MAXLINE];
-    char *ib, *strct;
+    char base[MAXLINE], ib[MAXLINE];
+    char *strct;
 
     if (c == 0)
        {help();
@@ -2444,7 +2497,7 @@ int main(int c, char **v)
     nstrncpy(base, MAXLINE, path_head(st.dir.mng), -1);
     strcpy(st.cfgf, "DEFAULT");
 
-    ib     = NULL;
+    nstrncpy(ib, MAXLINE, "none", -1);
     strct  = "0";
     append = FALSE;
 
@@ -2485,7 +2538,7 @@ int main(int c, char **v)
                       break;
  
                  case 'i':
-		      ib = v[++i];
+		      nstrncpy(ib, MAXLINE, v[++i], -1);
                       break;
  
                  case 'l':
@@ -2558,6 +2611,30 @@ int main(int c, char **v)
         env_subst("System",   st.system);
 
 	snprintf(st.dir.cfg, MAXLINE, "cfg-%s", st.system);
+
+/* reset the rules */
+	snprintf(st.rules.ccp, MAXLINE, "\t%s\n", cgetenv(FALSE, "CCP"));
+	snprintf(st.rules.co,  MAXLINE, "\t%s\n", cgetenv(FALSE, "CCObj"));
+	snprintf(st.rules.ca,  MAXLINE, "\t%s\n", cgetenv(FALSE, "CCArc"));
+	snprintf(st.rules.lo,  MAXLINE, "\t%s\n", cgetenv(FALSE, "LexObj"));
+	snprintf(st.rules.la,  MAXLINE, "\t%s\n", cgetenv(FALSE, "LexArc"));
+	snprintf(st.rules.lc,  MAXLINE, "\t%s\n", cgetenv(FALSE, "LexC"));
+	snprintf(st.rules.yo,  MAXLINE, "\t%s\n", cgetenv(FALSE, "YaccObj"));
+	snprintf(st.rules.ya,  MAXLINE, "\t%s\n", cgetenv(FALSE, "YaccArc"));
+	snprintf(st.rules.yc,  MAXLINE, "\t%s\n", cgetenv(FALSE, "YaccC"));
+	snprintf(st.rules.fo,  MAXLINE, "\t%s\n", cgetenv(FALSE, "FCObj"));
+	snprintf(st.rules.fa,  MAXLINE, "\t%s\n", cgetenv(FALSE, "FCArc"));
+	snprintf(st.rules.th,  MAXLINE, "\t%s\n", cgetenv(FALSE, "TemplH"));
+
+	snprintf(st.rules.co_bp, MAXLINE, "\t%s\n", cgetenv(FALSE, "CCObj_BP"));
+	snprintf(st.rules.ca_bp, MAXLINE, "\t%s\n", cgetenv(FALSE, "CCArc_BP"));
+	snprintf(st.rules.lo_bp, MAXLINE, "\t%s\n", cgetenv(FALSE, "LexObj_BP"));
+	snprintf(st.rules.la_bp, MAXLINE, "\t%s\n", cgetenv(FALSE, "LexArc_BP"));
+	snprintf(st.rules.yo_bp, MAXLINE, "\t%s\n", cgetenv(FALSE, "YaccObj_BP"));
+	snprintf(st.rules.ya_bp, MAXLINE, "\t%s\n", cgetenv(FALSE, "YaccArc_BP"));
+
+/* place the make variables */
+        reset_make_vars();
 
 	check_dir();};
 

@@ -79,14 +79,15 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT 'LibName = noname'
     Note $STDOUT ""
 
-    if (-f $MVFile) then
-       Note $STDOUT "#"
-       Note $STDOUT "# variables defined in config file"
-       Note $STDOUT "#"
-       cat $MVFile >>& $STDOUT
-       $RM $MVFile
-       Note $STDOUT ""
-    endif
+# GOTCHA: when this goes remove reset_make_vars in pco.c
+#    if (-f $MVFile) then
+#       Note $STDOUT "#"
+#       Note $STDOUT "# variables defined in config file"
+#       Note $STDOUT "#"
+#       sort $MVFile >>& $STDOUT
+#       $RM $MVFile
+#       Note $STDOUT ""
+#    endif
 
     if ("$GnuMakeOpt" == "-DUSE_GNU_MAKE") then
        Note $STDOUT "HaveGMake = TRUE"

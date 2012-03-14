@@ -395,7 +395,7 @@ char *subst(char *s, char *a, char *b, size_t n)
 
     ps = pa;
 	
-    if ((s != NULL) && (a != NULL) && (b != NULL))
+    if ((s != NULL) && (IS_NULL(a) == FALSE) && (b != NULL))
 
 /* make sure s is not bfa to avoid buffer overlap errors */
        {strcpy(ps, s);
@@ -1886,17 +1886,22 @@ char *trim(char *s, int dir, char *delim)
 void key_val(char **key, char **val, char *s, char *dlm)
    {char *k, *p, *v;
 
-    k = trim(s, FRONT, dlm);
-    p = strpbrk(k, dlm);
-    if (p != NULL)
-       {*p++ = '\0';
-
-	v = trim(p, FRONT, dlm);
-	p = strchr(v, '\n');
+    k = NULL;
+    v = NULL;
+    if (s != NULL)
+       {k = trim(s, FRONT, dlm);
+	p = strpbrk(k, dlm);
 	if (p != NULL)
-	   *p++ = '\0';}
-    else
-       v = NULL;
+	   {*p++ = '\0';
+
+	    v = trim(p, BOTH, dlm);
+/*
+	    v = trim(p, FRONT, dlm);
+	    p = strchr(v, '\n');
+	    if (p != NULL)
+	       *p++ = '\0';
+ */
+	   };};
 
     if (key != NULL)
        *key = k;
@@ -1910,7 +1915,7 @@ void key_val(char **key, char **val, char *s, char *dlm)
 
 /* DELIMITED - return substring of S between matched delimiters BGN and END
  *           - example:
- *           -   "aa (foo(bar)) zz"
+ *           -   "aa (foo(bar)) zz"  with  "(" and ")"
  *           - should return "foo(bar)"
  *           - NOTE: S will be terminated at the first delimiter instance
  */

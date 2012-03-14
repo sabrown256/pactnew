@@ -18,6 +18,11 @@ perdb $opt -s
 echo "-----------------------------------"
 perdb $opt v1
 perdb $opt v2
+perdb $opt v3
+perdb $opt v4
+perdb $opt v5
+perdb $opt v6
+perdb $opt v7
 
 echo "-----------------------------------"
 dbget v1
@@ -26,6 +31,26 @@ echo "v1 : |$v1|"
 echo "-----------------------------------"
 dbget v2
 echo "v2 : |$v2|"
+
+echo "-----------------------------------"
+dbget v3
+echo "v3 : |$v3|"
+
+echo "-----------------------------------"
+dbget v4
+echo "v4 : |$v4|"
+
+echo "-----------------------------------"
+dbget v5
+echo "v5 : |$v5|"
+
+echo "-----------------------------------"
+dbget v6
+echo "v6 : |$v6|"
+
+echo "-----------------------------------"
+dbget v7
+echo "v7 : |$v7|"
 
 echo "-----------------------------------"
 perdb $opt quit:

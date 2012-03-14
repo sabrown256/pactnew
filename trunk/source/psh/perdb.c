@@ -62,7 +62,7 @@ char *srv_save_db(client *cl, char *fname, char *var)
     if ((fname == NULL) || (strcmp(fname, "stdout") == 0))
        fp = NULL;
     else
-       {if (file_exists(fname) == TRUE)
+       {if (fname[0] == '/')
 	   nstrncpy(s, MAXLINE, fname, -1);
         else
 	   snprintf(s, MAXLINE, "%s.%s.db", db->root, fname);

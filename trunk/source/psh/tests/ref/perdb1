@@ -1,8 +1,42 @@
 -----------------------------------
+set v1 - single token value
 1
+set v2 - two token, single line list
 "baz blat"
+set v3 - angle bracket, multi-line list
+"<	foo ;
+ bar >"
+set v4 = double quoted, parenthesized, multi-line list
+(	foo ;
+ bar )
+set v5 = single quoted, parenthesized, multi-line list
+(	foo ;
+ bar )
+set v6 = single quoted, curly bracket, multi-line list
+"{	foo ;
+ bar }"
+set v7 = single quoted, double quoted, multi-line list
+"	foo ;
+ bar "
 -----------------------------------
+get v1
 1
+get v2
 "baz blat"
+get v3
+"<	foo ;
+ bar >"
+get v4
+(	foo ;
+ bar )
+get v5
+(	foo ;
+ bar )
+get v6
+"{	foo ;
+ bar }"
+get v7
+"	foo ;
+ bar "
 -----------------------------------
 done
