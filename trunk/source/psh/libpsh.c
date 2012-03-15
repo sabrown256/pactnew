@@ -120,6 +120,170 @@ char *vstrcat(char *d, int nc, char *fmt, ...)
     return(d);}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* STRING_SORT - sort an array of character pointers
+ *             - by what they point to
+ */
+
+void string_sort(char **v, int n)
+   {int gap, i, j;
+    char *temp;
+
+    for (gap = n/2; gap > 0; gap /= 2)
+        for (i = gap; i < n; i++)
+            for (j = i-gap; j >= 0; j -= gap)
+                {if (strcmp(v[j], v[j+gap]) <= 0)
+                    break;
+                 temp     = v[j];
+                 v[j]     = v[j+gap];
+                 v[j+gap] = temp;};
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* LST_LENGTH - return the length of the list */
+
+int lst_length(char **lst)
+   {int n;
+
+    n = 0;
+    if (lst != NULL)
+       {for (n = 0; lst[n] != NULL; n++);};
+
+    return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* LST_PUSH - add S to list LST */
+
+char **lst_push(char **lst, char *fmt, ...)
+   {int n, m;
+    char s[MAXLINE];
+
+    if (lst == NULL)
+       {lst = MAKE_N(char *, 100);
+	if (lst != NULL)
+	   memset(lst, 0, 100*sizeof(char *));};
+
+    if (lst != NULL)
+       {n = lst_length(lst);
+	if (n % 100 == 98)
+	   {m = n + 102;
+	    REMAKE(lst, char *, m);
+	    if (lst != NULL)
+	       memset(lst+n, 0, 102*sizeof(char *));};
+
+	if (lst != NULL)
+	   {if (fmt == NULL)
+	       lst[n] = NULL;
+	    else
+	       {VA_START(fmt);
+		VSNPRINTF(s, MAXLINE, fmt);
+		VA_END;
+
+		lst[n] = STRSAVE(s);};};};
+
+    return(lst);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* LST_ADD - add S to list LST */
+
+char **lst_add(char **lst, char *s)
+   {int n, m;
+
+    if (lst == NULL)
+       {lst = MAKE_N(char *, 100);
+	if (lst != NULL)
+	   memset(lst, 0, 100*sizeof(char *));};
+
+    if (lst != NULL)
+       {n = lst_length(lst);
+	if (n % 100 == 98)
+	   {m = n + 102;
+	    REMAKE(lst, char *, m);
+	    if (lst != NULL)
+	       memset(lst+n, 0, 102*sizeof(char *));};
+
+	if (lst != NULL)
+	   {if (s == NULL)
+	       lst[n] = NULL;
+	    else
+	       lst[n] = STRSAVE(s);};};
+
+    return(lst);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* LST_COPY - return a copy of LST */
+
+char **lst_copy(char **lst)
+   {int i, h, n, m;
+    char **nlst;
+
+    nlst = NULL;
+
+    if (lst != NULL)
+       {n = lst_length(lst);
+        h = (n + 99) / 100;
+        m = 100 * h;
+
+        nlst = MAKE_N(char *, m);
+	if (nlst != NULL)
+	   {memset(nlst, 0, m*sizeof(char *));
+
+	    for (i = 0; i < n; i++)
+	        nlst[i] = STRSAVE(lst[i]);};};
+
+    return(nlst);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* LST_UNIQ - remove duplicate entries from LST */
+
+char **lst_uniq(char **lst)
+   {int i, j, k, n;
+    char *s;
+
+    if (lst != NULL)
+       {n = lst_length(lst);
+        for (i = 0; i < n; i++)
+	    {s = lst[i];
+	     for (j = i+1; j < n; j++)
+	         {if (strcmp(s, lst[j]) == 0)
+		     {for (k = j+1; k < n; k++)
+			  lst[k-1] = lst[k];
+		      lst[k-1] = NULL;
+		      n--;
+		      i--;
+		      break;};};};};
+
+    return(lst);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* LST_FREE - free the list */
+
+void lst_free(char **lst)
+   {int i, n;
+
+    if (lst != NULL)
+       {n = lst_length(lst);
+	for (i = 0; i < n; i++)
+	    FREE(lst[i]);
+
+	FREE(lst);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
 
 #ifdef NO_UNSETENV
 
@@ -177,9 +341,19 @@ char **tokenize(char *s, char *delim)
 
 	     if (sa != NULL)
 	        {ns  = strspn(ps, delim);
-	         ps += ns;
-		 p   = strpbrk(ps, delim);
-		 if (p != NULL)
+		 ps += ns;
+
+/* find the next unescaped delimiter
+ * we could use strpbrk except for escapes
+ */
+                 for (p = ps; *p != '\0'; p++)
+		     {c = *p;
+		      if (c == '\\')
+			 p++;
+		      else if (strchr(delim, c) != NULL)
+			 break;};
+
+		 if (*p != '\0')
 		    {c  = *p;
 		     *p = '\0';
 		     sa[i++] = STRSAVE(ps);
@@ -1033,6 +1207,23 @@ char *strip_quote(char *t)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* CENV - return a sorted list of environment variables */
+
+char **cenv(int sort)
+   {int n;
+    char *bf, **ta;
+
+    bf = run(FALSE, "env");
+    ta = tokenize(bf, "\n");
+    if ((ta != NULL) && (sort == TRUE))
+       {n = lst_length(ta);
+	string_sort(ta, n);};
+       
+    return(ta);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* CSETENV - set the environment variable VAR to VAL */
 
 int csetenv(char *var, char *fmt, ...)
@@ -1185,15 +1376,24 @@ int cinitenv(char *var, char *fmt, ...)
  */
 
 int cclearenv(char **except)
-   {int i, j, ok, err;
+   {int i, j, ne, ok, err;
     char s[MAXLINE];
-    char *t, **pe;
+    char *t, **pe, **env;
     extern char **environ;
 
     err = 0;
 
-    for (pe = environ, i = 0; *pe != NULL; pe++, i++)
-        {nstrncpy(s, MAXLINE, *pe, -1);
+/* make a copy of environ because
+ * removing elements with unsetenv scrambles environ
+ */
+    env = NULL;
+    for (pe = environ, ne = 0; *pe != NULL; pe++, ne++)
+        env = lst_push(env, *pe);
+    env = lst_push(env, NULL);
+
+/* traverse env to find names of variables to remove */
+    for (i = 0; i < ne; i++)
+        {nstrncpy(s, MAXLINE, env[i], -1);
 	 t = strchr(s, '=');
 	 if (t != NULL)
 	    *t = '\0';
@@ -1205,6 +1405,8 @@ int cclearenv(char **except)
 
 	 if (ok == TRUE)
 	    err |= unsetenv(s);};
+
+    free_strings(env);
 
 /* let us know if there was nothing to do */
     if (i == 0)
@@ -1365,149 +1567,6 @@ int push_tok_beg(char *s, int nc, int dlm, char *fmt, ...)
        nstrncpy(s, nc, bf, -1);
 
     return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* LST_LENGTH - return the length of the list */
-
-int lst_length(char **lst)
-   {int n;
-
-    n = 0;
-    if (lst != NULL)
-       {for (n = 0; lst[n] != NULL; n++);};
-
-    return(n);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* LST_PUSH - add S to list LST */
-
-char **lst_push(char **lst, char *fmt, ...)
-   {int n, m;
-    char s[MAXLINE];
-
-    if (lst == NULL)
-       {lst = MAKE_N(char *, 100);
-	if (lst != NULL)
-	   memset(lst, 0, 100*sizeof(char *));};
-
-    if (lst != NULL)
-       {n = lst_length(lst);
-	if (n % 100 == 98)
-	   {m = n + 102;
-	    REMAKE(lst, char *, m);
-	    if (lst != NULL)
-	       memset(lst+n, 0, 102*sizeof(char *));};
-
-	if (lst != NULL)
-	   {if (fmt == NULL)
-	       lst[n] = NULL;
-	    else
-	       {VA_START(fmt);
-		VSNPRINTF(s, MAXLINE, fmt);
-		VA_END;
-
-		lst[n] = STRSAVE(s);};};};
-
-    return(lst);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* LST_ADD - add S to list LST */
-
-char **lst_add(char **lst, char *s)
-   {int n, m;
-
-    if (lst == NULL)
-       {lst = MAKE_N(char *, 100);
-	if (lst != NULL)
-	   memset(lst, 0, 100*sizeof(char *));};
-
-    if (lst != NULL)
-       {n = lst_length(lst);
-	if (n % 100 == 98)
-	   {m = n + 102;
-	    REMAKE(lst, char *, m);
-	    if (lst != NULL)
-	       memset(lst+n, 0, 102*sizeof(char *));};
-
-	if (lst != NULL)
-	   {if (s == NULL)
-	       lst[n] = NULL;
-	    else
-	       lst[n] = STRSAVE(s);};};
-
-    return(lst);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* LST_COPY - return a copy of LST */
-
-char **lst_copy(char **lst)
-   {int i, h, n, m;
-    char **nlst;
-
-    nlst = NULL;
-
-    if (lst != NULL)
-       {n = lst_length(lst);
-        h = (n + 99) / 100;
-        m = 100 * h;
-
-        nlst = MAKE_N(char *, m);
-	if (nlst != NULL)
-	   {memset(nlst, 0, m*sizeof(char *));
-
-	    for (i = 0; i < n; i++)
-	        nlst[i] = STRSAVE(lst[i]);};};
-
-    return(nlst);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* LST_UNIQ - remove duplicate entries from LST */
-
-char **lst_uniq(char **lst)
-   {int i, j, k, n;
-    char *s;
-
-    if (lst != NULL)
-       {n = lst_length(lst);
-        for (i = 0; i < n; i++)
-	    {s = lst[i];
-	     for (j = i+1; j < n; j++)
-	         {if (strcmp(s, lst[j]) == 0)
-		     {for (k = j+1; k < n; k++)
-			  lst[k-1] = lst[k];
-		      lst[k-1] = NULL;
-		      n--;
-		      i--;
-		      break;};};};};
-
-    return(lst);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* LST_FREE - free the list */
-
-void lst_free(char **lst)
-   {int i, n;
-
-    if (lst != NULL)
-       {n = lst_length(lst);
-	for (i = 0; i < n; i++)
-	    FREE(lst[i]);
-
-	FREE(lst);};
-
-    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -298,11 +298,11 @@ HAVE_SUBROUTINES
     Note $FOUT ""
 
 # SCORE Library
-    set llibs = ""
+    set plibs = ""
     foreach p ($MD_Pck)
        if ($p != DP) then
           set lp = `echo $p | tr "[A-Z]" "[a-z]"`
-          set llibs = ( $llibs $lp )
+          set plibs = ( $plibs $lp )
        endif
     end
 
@@ -312,10 +312,11 @@ HAVE_SUBROUTINES
     Note $FOUT "  LibPaths  = $proot/lib"
     Note $FOUT "  RPaths    = $lrpath"
     Note $FOUT "  LDFlags   = $LD_Lib"
-    Note $FOUT "  Libraries = $llibs"
+    Note $FOUT "  Libraries = $plibs"
     Note $FOUT "}"
     Note $FOUT ""
-    unset llibs
+
+    unset plibs
 
 # PML Library
     Note $FOUT "Library/pml {"
@@ -325,34 +326,41 @@ HAVE_SUBROUTINES
     Note $FOUT ""
 
 # PDB Library
-    set llibs = ""
+    set plibs = ""
     foreach p ($MDI_Pck)
        set lp = `echo $p | tr "[A-Z]" "[a-z]"`
-       set llibs = ( $llibs $lp )
+       set plibs = ( $plibs $lp )
     end
-    set llibs = ( $llibs dp )
+    set plibs = ( $plibs dp )
 
     Note $FOUT "Library/pdb {"
     Note $FOUT "  Archives  = pdb"
-    Note $FOUT "  Libraries = pml $llibs"
+    Note $FOUT "  Libraries = pml $plibs"
     Note $FOUT "}"
     Note $FOUT ""
-    unset llibs
+
+    unset plibs
 
 # PGS Library
-    set llibs = ""
+    set plibs = ""
     foreach p ($MDG_Pck)
        set lp = `echo $p | tr "[A-Z]" "[a-z]"`
-       set llibs = ( $llibs $lp )
+       set plibs = ( $plibs $lp )
     end
+
+    set llibs = ""
+    set llibs = ( $llibs `echo $RPATH | sed 's/:/ /g'` )
+    set llibs = ( `../scripts/simplify-list $llibs` )
 
     Note $FOUT "Library/pgs {"
     Note $FOUT "  Archives  = pgs ppc"
-    Note $FOUT "  Libraries = pml $llibs"
+    Note $FOUT "  Libraries = pml $plibs"
+    Note $FOUT "  LibPaths  = $llibs"
     Note $FOUT "}"
     Note $FOUT ""
 
     unset llibs
+    unset plibs
 
     if ($HAVE_READLINE == TRUE) then
        Note $FOUT 'PkgRL = RL*'

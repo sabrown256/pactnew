@@ -1017,7 +1017,7 @@ switch ($Cmnd)
 	flog $Log $PERDB -l -c -s
 
 	if (($Method == 2) && (-x $BinDir/pco)) then
-           flog $Log set PConf = ( $BinDir/pco $dbopt -l )
+           flog $Log set PConf = ( $BinDir/pco $dbopt -env $cwd/pact.env -l )
            Note $Log "Using binary pco to process input"
         else
            flog $Log set PConf = ./pact-config

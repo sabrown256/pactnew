@@ -8,14 +8,7 @@
 # include "cpyright.h"
 #
 
-set echo
-set verbose
 source ../../tests/common
-unset echo
-unset verbose
-
-echo "RootDir = $RootDir"
-exit(1)
 
 set msg = "TEMPLATE Test .................."
 
