@@ -322,6 +322,42 @@ static void pop_struct(void)
     return;}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* RESET_ENV - check for and act on specifications to modify the environment
+ *           - clear out all environment variables except for PATH
+ *           - and those specified in the optional file
+ */
+
+static int reset_env(int c, char **v)
+   {int i, rv;
+    char *p, **sa, **except;
+
+    sa = NULL;
+    for (i = 1; i < c; i++)
+        {if (strcmp(v[i], "-env") == 0)
+	    {sa = file_text(FALSE, v[++i]);
+	     break;};};
+
+    if (sa != NULL)
+       {except = NULL;
+
+	for (i = 0; sa[i] != NULL; i++)
+	    {p = sa[i];
+	     if ((IS_NULL(p) == FALSE) && (p[0] != '#'))
+	        except = lst_push(except, trim(p, BOTH, " \t\n"));};
+	free_strings(sa);
+
+	if (except != NULL)
+	   {except = lst_push(except, NULL);
+
+	    rv = cclearenv(except);
+
+	    free_strings(except);};};
+
+    return(rv);};
+
+/*--------------------------------------------------------------------------*/
 
 /*                                  EMITTERS                                */
 
@@ -594,19 +630,19 @@ static int pco_save_db(char *dbname)
 /* PCO_LOAD_DB - load the specified database */
 
 static int pco_load_db(char *dbname)
-   {int rv, i;
-    char *bf, **ta;
+   {int rv, i, nv;
+    char **ta;
 
     rv = db_restore(NULL, dbname);
-
-    bf = run(BOTH, "env | sort");
 
     separator(Log);
 
     note(Log, FALSE, "Restored database variables:\n");
-    ta = tokenize(bf, "\n");
+
+    ta = cenv(TRUE);
     if (ta != NULL)
-       {for (i = 0; ta[i] != NULL; i++)
+       {nv = lst_length(ta);
+	for (i = 0; i < nv; i++)
 	    note(Log, FALSE, "   %s\n", ta[i]);
 
         note(Log, FALSE, "%d variables total\n", i);
@@ -687,28 +723,30 @@ static void add_set_cfg(FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
 /* ADD_SET_DB - add variables set from database file */
 
 static void add_set_db(FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
-   {int i, n;
+   {int i, n, nc;
     char s[MAXLINE];
-    char *var, *val, *bf, **sa;
+    char *var, *val, **sa;
 
-    bf = run(BOTH, "env | sort");
-    sa = tokenize(bf, "\n");
+    sa = cenv(TRUE);
     if (sa != NULL)
-       {for (n = 0; sa[n] != NULL; n++);
-
+       {n = lst_length(sa);
 	for (i = 0; i < n; i++)
 	    {var = sa[i];
-
 	     val = strchr(var, '=');
 	     if (val != NULL)
 	        {*val++ = '\0';
 		    
+		 nc = last_char(val);
+		 if (val[nc] == '\n')
+		    val[nc] = '\0';
+
 /* handle PATH specially - just gather everything that is not $PATH or ${PATH} */
 	         if (strcmp(var, "PATH") == 0)
 		    push_path(APPEND, epath, val);
 
 		else
-		   {if (strpbrk(val, " \t$[]{}|*\\") != NULL)
+		   {if ((IS_NULL(val) == TRUE) ||
+			(strpbrk(val, " \t$[]{}|*\\") != NULL))
 		       {snprintf(s, LRG, "\"%s\"", val);
 			env_out(fsh, fcsh, fdk, fmd, var, s);}
 		    else
@@ -1359,7 +1397,9 @@ static void setup_output_env(char *base)
 /* DEFAULT_VAR - setup default variable values */
 
 static void default_var(char *base)
-   {char cmd[MAXLINE];
+   {int i, n;
+    char cmd[MAXLINE];
+    char **sa;
 
     if (cdefenv("USER") == FALSE)
        {if (cdefenv("LOGNAME") == FALSE)
@@ -1369,7 +1409,12 @@ static void default_var(char *base)
 
     csetenv("PATH", "%s:%s", st.dir.mng, cgetenv(TRUE, "PATH"));
 
-    run(BOTH, "env | sort");
+/* log the current environment */
+    sa = cenv(TRUE);
+    n  = lst_length(sa);
+    for (i = 0; i < n; i++)
+        note(Log, TRUE, "%s", sa[i]);
+    free_strings(sa);
 
 /* define the set of specifications which define a tool */
     st.toolv[0] = '\0';
@@ -1468,9 +1513,7 @@ static void reset_make_vars(void)
     nstrncpy(st.def_tools, MAXLINE, cgetenv(FALSE, "Tools"), -1);
     nstrncpy(st.def_groups, MAXLINE, cgetenv(FALSE, "Groups"), -1);
 
-    bf = run(BOTH, "env");
-
-    ta = tokenize(bf, "\n");
+    ta = cenv(FALSE);
     if (ta != NULL)
        {for (i = 0; ta[i] != NULL; i++)
 	    {nstrncpy(vr, LRG, ta[i], -1);
@@ -1786,17 +1829,15 @@ static void set_inst_base(char *ib)
 
 static void env_subst(char *refvar, char *nt)
    {int i, nc, nv;
-    char *ot, *vr, *vl, *p, *bf, **ta;
+    char *ot, *vr, *vl, *p, **ta;
 
     ot = cgetenv(FALSE, refvar);
 
-    bf = run(BOTH, "env");
-
-    ta = tokenize(bf, "\n");
+    ta = cenv(FALSE);
     if (ta != NULL)
        {nv = lst_length(ta);
-	for (i = 0; i < nv; )
-	    {vr = get_multi_line(ta, nv, &i, "=", TRUE);
+	for (i = 0; i < nv; i++)
+	    {vr = ta[i];
 	     if (vr != NULL)
 	        {vl = strchr(vr, '=');
 		 if (vl != NULL)
@@ -2416,14 +2457,13 @@ int kill_perdb(void)
 /* DENV - print the current environment */
 
 void denv(void)
-   {int i;
-    char *bf, **ta;
+   {int i, n;
+    char **ta;
 
-    bf = run(BOTH, "env | sort");
-
-    ta = tokenize(bf, "\n");
+    ta = cenv(TRUE);
     if (ta != NULL)
-       {for (i = 0; ta[i] != NULL; i++)
+       {n = lst_length(ta);
+	for (i = 0; i < n; i++)
 	    printf("> %s\n", ta[i]);
 
 	free_strings(ta);};
@@ -2466,12 +2506,17 @@ static void help(void)
 /* MAIN - start it out here */
 
 int main(int c, char **v, char **env)
-   {int i, append, havedb;
+   {int i, append, havedb, ok;
     char base[MAXLINE], ib[MAXLINE], d[LRG];
     char *strct;
 
-    if (c == 0)
+    if (c <= 1)
        {help();
+	return(1);};
+
+    ok = reset_env(c, v);
+    if (ok == -1)
+       {printf("Could not clear environment - exiting\n");
 	return(1);};
 
 /* locate the tools needed for subshells */
@@ -2517,6 +2562,10 @@ int main(int c, char **v, char **env)
 		    kill_perdb();
 		 return(1);};
 	     st.db = d;}
+ 
+/* this was handled in reset_env */
+         else if (strcmp(v[i], "-env") == 0)
+            i++;
  
 	 else if (v[i][0] == '-')
             {switch (v[i][1])
