@@ -249,9 +249,20 @@ char *SC_prompt(char *prompt, char *s, int n)
 #endif
 
 	if (ok == FALSE)
+#if 0
+	   {char *t;
+
+	    t = SC_leh(prompt);
+	    if (t != NULL)
+	       {snprintf(s, nc, "%s\n", t);
+		if (strlen(t) > 0)
+		   SC_leh_hist_add(t);
+		rv = s;};};
+#else
 	   {if (prompt != NULL)
 	       printf("%s", prompt);
 	    rv = fgets(s, nc, stdin);};
+#endif
 
 /* always set last character to '\0' to avoid a buffer overrun */
 	s[nc] = '\0';};

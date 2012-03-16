@@ -96,11 +96,11 @@
 /* CMAKE_N - allocate a block of type _t and return a pointer to it */
 
 #define CMAKE_N(_t, _n)                                                      \
-    ((_t *) (*SC_gs.mm.nalloc)((long) _n, (long) sizeof(_t), FALSE, -1,      \
+    ((_t *) (*SC_gs.mm.nalloc)((long) (_n), (long) sizeof(_t), FALSE, -1,    \
 			       __func__, __FILE__, __LINE__))
 
 #define CPMAKE_N(_t, _n, _f)                                                 \
-    ((_t *) (*SC_gs.mm.nalloc)((long) _n, (long) sizeof(_t), _f, -1,         \
+    ((_t *) (*SC_gs.mm.nalloc)((long) (_n), (long) sizeof(_t), _f, -1,       \
 			       __func__, __FILE__, __LINE__))
 
 /*--------------------------------------------------------------------------*/
@@ -109,11 +109,11 @@
 /* CREMAKE - reallocate a block of type _t and return a pointer to it */
 
 #define CREMAKE(_p, _t, _n)                                                  \
-   (_p = (_t *) (*SC_gs.mm.realloc)((void *) _p, (long) _n,                  \
+   (_p = (_t *) (*SC_gs.mm.realloc)((void *) _p, (long) (_n),                \
 				   (long) sizeof(_t), FALSE, -1))
 
 #define CPREMAKE(_p, _t, _n, _f)                                             \
-   (_p = (_t *) (*SC_gs.mm.realloc)((void *) _p, (long) _n,                  \
+   (_p = (_t *) (*SC_gs.mm.realloc)((void *) _p, (long) (_n),                \
 				   (long) sizeof(_t), _f, -1))
 
 /*--------------------------------------------------------------------------*/
@@ -1256,6 +1256,21 @@ extern int
  SC_exec_job(char **argv, char *mode, int flags,
 	     PFFileCallback in, PFFileCallback irej,
 	     PFFileCallback out, PFFileCallback orej);
+
+
+/* SCLEH.C declarations */
+
+extern int
+ SC_leh_hist_add(const char *line), 
+ SC_leh_hist_len(int nh),
+ SC_leh_hist_save(char *fname), 
+ SC_leh_hist_load(char *fname);
+
+extern char
+ *SC_leh(const char *prompt);
+
+extern void
+ SC_leh_clear(void);
 
 
 /* SCLOG.C declarations */

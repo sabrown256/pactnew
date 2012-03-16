@@ -116,7 +116,8 @@ PObjs = scerr.o sccntx.o \
         schp.o scpman.o schttp.o scinet.o \
         scmmap.o sclmmap.o scmmaps.o \
         scsysa.o scsysb.o scsysc.o scsysd.o scsyse.o \
-        scfio.o scbio.o scudl.o scioctl.o scsig.o schsrv.o scterm.o \
+        scfio.o scbio.o scudl.o scioctl.o scsig.o schsrv.o \
+        scterm.o scleh.o \
         sctrace.o
 
 TObjs = scpar.o scthn.o scthe.o scthp.o sctho.o scths.o
@@ -149,7 +150,8 @@ ArPObjs = ${TGTLib}(scerr.o) ${TGTLib}(sccntx.o) \
           ${TGTLib}(scsysc.o) ${TGTLib}(scsysd.o) ${TGTLib}(scsyse.o) \
           ${TGTLib}(scfio.o) ${TGTLib}(scbio.o) ${TGTLib}(scudl.o) \
           ${TGTLib}(scioctl.o) ${TGTLib}(scsig.o) \
-          ${TGTLib}(schsrv.o) ${TGTLib}(scterm.o) ${TGTLib}(sctrace.o)
+          ${TGTLib}(schsrv.o) ${TGTLib}(sctrace.o) \
+          ${TGTLib}(scterm.o) ${TGTLib}(scleh.o)
 
 ArSObjs = ${TGTLib}(sclexs.o)
 
