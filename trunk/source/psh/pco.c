@@ -1506,7 +1506,7 @@ static void default_var(char *base)
 static void reset_make_vars(void)
    {int i, nc;
     char vr[LRG];
-    char *vl, *bf, **ta;
+    char *vl, **ta;
 
     if (st.aux.MVF == NULL)
        st.aux.MVF = open_file("w", st.aux.mvfn);
@@ -1833,26 +1833,26 @@ static void env_subst(char *refvar, char *nt)
     char *ot, *vr, *vl, *p, **ta;
 
     ot = cgetenv(FALSE, refvar);
+    if (IS_NULL(ot) == FALSE)
+       {ta = cenv(FALSE);
+	if (ta != NULL)
+	   {nv = lst_length(ta);
+	    for (i = 0; i < nv; i++)
+	        {vr = ta[i];
+		 if (vr != NULL)
+		    {vl = strchr(vr, '=');
+		     if (vl != NULL)
+		        {*vl++ = '\0';
 
-    ta = cenv(FALSE);
-    if (ta != NULL)
-       {nv = lst_length(ta);
-	for (i = 0; i < nv; i++)
-	    {vr = ta[i];
-	     if (vr != NULL)
-	        {vl = strchr(vr, '=');
-		 if (vl != NULL)
-		    {*vl++ = '\0';
+			 nc = strlen(vl);
+			 if (vl[nc-1] == '\n')
+			    vl[nc-1] = '\0';
 
-		     nc = strlen(vl);
-		     if (vl[nc-1] == '\n')
-		        vl[nc-1] = '\0';
+			 p = strstr(vl, ot);
+			 if (p != NULL)
+			    csetenv(vr, subst(vl, ot, nt, -1));};};};
 
-		     p = strstr(vl, ot);
-		     if (p != NULL)
-		        csetenv(vr, subst(vl, ot, nt, -1));};};};
-
-	free_strings(ta);};
+	    free_strings(ta);};};
 
     return;}
 
