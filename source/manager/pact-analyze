@@ -32,8 +32,8 @@ if ($?ScrDir == 0) then
       setenv ScrDir ../../scripts
    endif
 endif
-set Base   = $ScrDir:h
-set ScrDir = $Base/scripts
+set BaseDir = $ScrDir:h
+set ScrDir  = $BaseDir/scripts
 source $ScrDir/env-csh
 source $ScrDir/csh-subroutines
 HAVE_SUBROUTINES
@@ -47,9 +47,9 @@ setenv HostName      `uname -n`
 setenv MajorVersion  `expr $HostOSRel : "\(.\)"`
 
 SafeEnv System  `$ScrDir/cfgman use`
-SafeEnv RootDir $Base/dev/$System
+SafeEnv SysDir  $BaseDir/dev/$System
 
-InitLog ALog $RootDir/log/analyze
+InitLog ALog $SysDir/log/analyze
 
 Note $ALog "HostName         = $HostName"
 Note $ALog "HostOS           = $HostOS"

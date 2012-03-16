@@ -1229,8 +1229,9 @@ static void setup_analyze_env(char *base)
     dbset(NULL, "Arch",    st.arch);
     dbset(NULL, "System",  st.system);
     dbset(NULL, "Sys",     st.sys);
-    dbset(NULL, "Base",    base);
-    dbset(NULL, "RootDir", st.dir.root);
+    dbset(NULL, "BaseDir", base);
+    dbset(NULL, "SysDir",  st.dir.root);
+    dbset(NULL, "ScrDir",  st.dir.scr);
     dbset(NULL, "AnaDir",  "%s/analyze", st.dir.mng);
     dbset(NULL, "Log",     st.logf);
     dbset(NULL, "ALog",    alog);
@@ -2657,8 +2658,8 @@ int main(int c, char **v, char **env)
 
 /* order matters crucially here */
         env_subst("InstBase", ib);
-        env_subst("RootDir",  st.dir.root);
-        env_subst("Base",     base);
+        env_subst("SysDir",   st.dir.root);
+        env_subst("BaseDir",  base);
         env_subst("System",   st.system);
 
 	snprintf(st.dir.cfg, MAXLINE, "cfg-%s", st.system);

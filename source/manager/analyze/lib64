@@ -8,9 +8,9 @@
 # include "cpyright.h"
 #
 
-set Me   = $0
-set Base = $Me:h
-source $Base/common
+set lme   = $0
+set lbase = $lme:h
+source $lbase/common
 
 unalias file
 
@@ -29,8 +29,9 @@ if ($lQuiet == FALSE) then
    Note $ALog ""
 endif
 
-set LRoot = /usr
-source $Base/common-lib64
+set lroot = /usr
+source $lbase/common-lib64
+unset lroot
 setenv LIB $LibT
 
 if ($lQuiet == FALSE) then

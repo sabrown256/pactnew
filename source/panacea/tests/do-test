@@ -6,7 +6,7 @@
 set Package = panacea
 source ../../scripts/env-csh
 
-set DevInc    = $BuildDir/include
+set DevInc    = $SysDir/include
 set MISrc     = $DevInc/make-def
 set CCompiler = `pact +l -info Cfg_CC_Exe | uniq`
 set CFLAGS    = `pact +l -info Cfg_CC_Flags | uniq`

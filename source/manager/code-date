@@ -31,8 +31,8 @@
 
 unalias *
 
-set Base         = $cwd
-set HelpCode     = $Base/$0
+set lhere    = $cwd
+set helpcode = $lhere/$0
 
 set help  = "FALSE"
 
@@ -138,5 +138,5 @@ exit($status)
 
 
 Help:
-   awk '($1 == "#>") {print}' $HelpCode      #Print Usage:
+   awk '($1 == "#>") {print}' $helpcode      #Print Usage:
    exit(1)

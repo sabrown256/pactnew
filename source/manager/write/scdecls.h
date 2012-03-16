@@ -11,13 +11,13 @@
 unalias *
 
 if (-f ../scripts/env-csh) then
-   set SrcDir = $cwd
+   set lpkgdir = $cwd
 else if (-f ../../scripts/env-csh) then
-   set SrcDir = $cwd:h
+   set lpkgdir = $cwd:h
 endif
-set ldir = $SrcDir:h/scripts
-set path = ( $ldir $path )
-source $ldir/env-csh
+set lscrdir = $lpkgdir:h/scripts
+set path    = ( $lscrdir $path )
+source $lscrdir/env-csh
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -36,7 +36,7 @@ source $ldir/env-csh
     Note $STDOUT " */"
     Note $STDOUT ""
 
-    flog $Log pushd $Base/score
+    flog $Log pushd $BaseDir/score
 
     set opt = ""
     set opt = ( $opt $Cfe_CC_Flags )

@@ -10,7 +10,6 @@
 
 unalias *
 
-set Base     = $cwd
 set DateOnly = "FALSE"
 
 while ($#argv > 0)

@@ -8,9 +8,9 @@
 # include "cpyright.h"
 #
 
-set Me   = $0
-set Base = $Me:h
-source $Base/common
+set lme   = $0
+set lbase = $lme:h
+source $lbase/common
 
 if ($?Log == 1) then
    Separator $Log
@@ -76,8 +76,9 @@ end
 # MPI Library
 
 if ($?DP_RPath == 0) then
-   set LRoot = /usr
-   source $Base/common-lib64
+   set lroot = /usr
+   source $lbase/common-lib64
+   unset lroot
    setenv DP_RPath /usr/$LibT
 endif
 

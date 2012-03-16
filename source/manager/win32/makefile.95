@@ -2,9 +2,9 @@
 # Makefile for the PACT Distribution
 #
 
-RootDir = c:\pactdir\pact
-PactDir = ${RootDir}\manager
-InstDir = ${RootDir}\dev
+BaseDir = c:\pactdir\pact
+MngDir  = ${BaseDir}\manager
+DevDir  = ${BaseDir}\dev
 
 pact :
         @echo Building Pact ...
@@ -85,16 +85,16 @@ ultra :
         @echo ULTRA installed
 
 install:
-        cp scconfig.h cpyright.h scdecls.h ${InstDir}\include
-        cp pupdate.bat ${InstDir}\bin
+        cp scconfig.h cpyright.h scdecls.h ${DevDir}\include
+        cp pupdate.bat ${DevDir}\bin
 
 makes :
         @echo Making Pact Makefiles ...
-#        set MANAGER = ${PactDir}
+#        set MANAGER = ${MngDir}
 # The above set does not work on win95.  In order for this
 # environmental variable to be set on my system I had to set
 # it in config.sys.
-        for-pact ${PactDir}\bmake
+        for-pact ${MngDir}\bmake
         @echo Pact Makefiles made
 
 remove :

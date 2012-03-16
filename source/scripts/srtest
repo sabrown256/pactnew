@@ -48,7 +48,7 @@ if ($RUN_TESTS == FALSE) then
 
 # run the tests
 
-else if (-e $RootDir/score/scstd.h) then
+else if (-e $SysDir/score/scstd.h) then
 
    NoteD $Log ""
    NoteD $Log "SCRIPT TEST ..."

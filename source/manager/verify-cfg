@@ -6,15 +6,15 @@
 
 unalias *
 
-set Arch = `../scripts/cfgman use`
-set Base = ""
-set Err  = 0
+set Arch   = `../scripts/cfgman use`
+set SysDir = ""
+set Err    = 0
 
 while ($#argv > 0)
    switch ($1)
       case -b:
            shift
-           set Base = $1
+           set SysDir = $1
            breaksw
       case -h:
            echo ""
@@ -31,13 +31,13 @@ while ($#argv > 0)
    shift
 end
 
-if ("$Base" == "") then
-   set Base = $cwd:h/dev/$Arch
+if ("$SysDir" == "") then
+   set SysDir = $cwd:h/dev/$Arch
 endif
 
-set CfgLog = $Base/log/config
-set BinDir = $Base/bin
-set IncDir = $Base/include
+set CfgLog = $SysDir/log/config
+set BinDir = $SysDir/bin
+set IncDir = $SysDir/include
 
 source ../scripts/env-csh
 
@@ -46,7 +46,7 @@ InitLog Log $cwd/log.verify-cfg.$Arch
 set Cfg = `awk '$2 ~ /SCCONFIG.H/ { print $7 }' $IncDir/scconfig.h`
 
 NoteD $Log ""
-NoteD $Log "Verifying configuration $Cfg in $Base"
+NoteD $Log "Verifying configuration $Cfg in $SysDir"
 
 # Debug/Optimize
 Separator $Log
@@ -55,18 +55,18 @@ if ("$CfgDO" == debuggable) then
    set Req = `grep "Command: setenv CC_Optimize" $CfgLog | sed 's/Command: setenv CC_Optimize //'`
    set Got = `grep "CC_Optimize" $IncDir/make-def | tail -n 1 | sed 's/CC_Optimize = //'`
    if ("$Req" == "$Got") then
-      echo "   debuggable ... yes"
+      NoteD $Log "   debuggable ... yes"
    else
-      echo "   debuggable ... no"
+      NoteD $Log "   debuggable ... no"
       set Err = 1
    endif
 else if ("$CfgDO" == optimized) then
    set Req = `grep "Command: setenv CC_Debug" $CfgLog | sed 's/Command: setenv CC_Debug //'`
    set Got = `grep "CC_Debug" $IncDir/make-def | tail -n 1 | sed 's/CC_Debug = //'`
    if ("$Req" == "$Got") then
-      echo "   optimized .... yes"
+      NoteD $Log "   optimized .... yes"
    else
-      echo "   optimized .... no"
+      NoteD $Log "   optimized .... no"
       set Err = 1
    endif
 else
@@ -77,13 +77,14 @@ endif
 Separator $Log
 flog $Log grep "include pthread" $CfgLog 
 if ($status == 0) then
-   echo -n "   pthread ...... "
-   flog $Log (grep '#define THREADING' $IncDir/scconfig.h | grep pthread)
+   NoteD $Log -n "   pthread ...... "
+   Note $Log ""
+   flog $Log ( grep '#define THREADING' $IncDir/scconfig.h | grep pthread )
    set LStat = $status
    if ($LStat == 0) then
-      echo "yes"
+      NoteD $Log "yes"
    else
-      echo "no"
+      NoteD $Log "no"
       set Err = 2
    endif
 endif
@@ -92,13 +93,14 @@ endif
 Separator $Log
 flog $Log (grep "include" $CfgLog | grep openmp)
 if ($status == 0) then
-   echo -n "   openmp ....... "
-   flog $Log grep '#define HAVE_OPENMP' $IncDir/scconfig.h
+   NoteD $Log -n "   openmp ....... "
+   Note $Log ""
+   flog $Log ( grep '#define THREADING' $IncDir/scconfig.h | grep openmp )
    set LStat = $status
    if ($LStat == 0) then
-      echo "yes"
+      NoteD $Log "yes"
    else
-      echo "no"
+      NoteD $Log "no"
       set Err = 3
    endif
 endif
@@ -107,13 +109,14 @@ endif
 Separator $Log
 flog $Log grep "include mpi" $CfgLog 
 if ($status == 0) then
-   echo -n "   mpi .......... "
+   NoteD $Log -n "   mpi .......... "
+   Note $Log ""
    flog $Log grep '#define HAVE_MPI' $IncDir/scconfig.h
    set LStat = $status
    if ($LStat == 0) then
-      echo "yes"
+      NoteD $Log "yes"
    else
-      echo "no"
+      NoteD $Log "no"
       set Err = 4
    endif
 endif
@@ -122,20 +125,21 @@ endif
 Separator $Log
 flog $Log grep "include python" $CfgLog 
 if ($status == 0) then
-   echo -n "   python ....... "
+   NoteD $Log -n "   python ....... "
+   Note $Log ""
    set PyDir = `grep "setenv PYTHONPATH" $CfgLog | awk '{ print $3 }'`
    Note $Log "PyDir = |$PyDir|"
    if (-d "$PyDir/pact") then
       flog $Log ls -l $PyDir/pact
       if ((-e "$PyDir/pact/libpypdb.so") && (-e "$PyDir/pact/libpypgs.so")) then
-         echo "yes"
+         NoteD $Log "yes"
       else
-         echo "no"
+         NoteD $Log "no"
          set Err = 5
       endif
    else
       Note $Log "No directory |$PyDir|"
-      echo "no"
+      NoteD $Log "no"
       set Err = 5
    endif
 endif
@@ -145,13 +149,13 @@ Separator $Log
 flog $Log grep "Building shared libraries" $CfgLog
 set LStat = $status
 if ($LStat == 0) then
-   echo -n "   shared ....... "
-   flog $Log 
+   NoteD $Log -n "   shared ....... "
+   Note $Log ""
    set build_shared = ( `pact +l -info BuildSharedLibs` )
-   if (("$build_shared[$#build_shared]" == TRUE) then
-      echo "yes"
+   if ("$build_shared[$#build_shared]" == TRUE) then
+      NoteD $Log "yes"
    else
-      echo "no"
+      NoteD $Log "no"
       set Err = 6
    endif
 endif

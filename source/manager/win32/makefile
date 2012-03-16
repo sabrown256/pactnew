@@ -2,9 +2,9 @@
 # Makefile for the PACT Distribution
 #
 
-RootDir = d:\users\sabrown\pact
-PactDir = ${RootDir}\manager
-InstDir = ${RootDir}\dev
+BaseDir = d:\users\sabrown\pact
+MngDir = ${BaseDir}\manager
+DevDir = ${BaseDir}\dev
 
 pact :
 	@echo Building Pact ...
@@ -85,13 +85,13 @@ ultra :
 	@echo ULTRA installed
 
 install:
-	cp scconfig.h cpyright.h ${InstDir}\include
-	cp pupdate.bat ${InstDir}\bin
+	cp scconfig.h cpyright.h ${DevDir}\include
+	cp pupdate.bat ${DevDir}\bin
 
 makes :
 	@echo Making Pact Makefiles ...
-	set MANAGER=${PactDir}
-	for-pact ${PactDir}\manager\bmake
+	set MANAGER=${MngDir}
+	for-pact ${MngDir}\manager\bmake
 	@echo Pact Makefiles made
 
 remove :
