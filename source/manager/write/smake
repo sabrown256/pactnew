@@ -52,7 +52,7 @@ source $ldir/env-csh
        endif
 
        if (-d $InstBase/include) then
-          sed "s|$RootDir|$InstBase|" $IncDir/make-def > $InstBase/include/make-def
+          sed "s|$SysDir|$InstBase|" $IncDir/make-def > $InstBase/include/make-def
           flog $Log cp $IncDir/make-macros $InstBase/include/make-macros
        endif
     endif
