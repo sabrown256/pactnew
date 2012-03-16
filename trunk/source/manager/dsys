@@ -27,9 +27,9 @@ pushd $BldDir >& /dev/null
 
 set Which = "$cwd/pwhich"
 
-set MngDir = $cwd
-set Base   = $MngDir:h
-setenv ScrDir $Base/scripts
+set MngDir  = $cwd
+set BaseDir = $MngDir:h
+setenv ScrDir $BaseDir/scripts
 
 if (-f extensions/sys-site) then
    eval `extensions/sys-site`
@@ -57,13 +57,22 @@ set CfgMan = $ScrDir/cfgman
 setenv System  `$CfgMan -d ../dev use`
 setenv PACTVer `cat $MngDir/.pact-version`
 
-set BaseDev = $Base/dev
-set Root    = $BaseDev/$System
-set IncDir  = $Root/include
-set BinDir  = $Root/bin
-set LibDir  = $Root/lib
-set LogDir  = $Root/log
-set ScmDir  = $Root/scheme
+# directory name conventions
+# to be consistenly used in config, build, test, and install
+#   ..../pact            ->     BaseDir
+#   ..../pact/manager    ->     MngDir
+#   ..../pact/scripts    ->     ScrDir
+#   ..../pact/<pkg>      ->     PkgDir
+#   ..../pact/dev        ->     DevDir
+#   ..../pact/dev/$sys   ->     SysDir
+
+set DevDir  = $BaseDir/dev
+set SysDir  = $DevDir/$System
+set IncDir  = $SysDir/include
+set BinDir  = $SysDir/bin
+set LibDir  = $SysDir/lib
+set LogDir  = $SysDir/log
+set ScmDir  = $SysDir/scheme
 set PACT    = $BinDir/pact
 set PERDB   = $BinDir/perdb
 set EnvCsh  = $IncDir/env-pact.csh
@@ -306,10 +315,10 @@ switch ($Cmnd)
            while ($#Tgts > 0)
               set tgt = $Tgts[1]
               shift Tgts
-              if (-d $Base/$tgt) then
-                 flog $Log pushd $Base/$tgt
+              if (-d $BaseDir/$tgt) then
+                 flog $Log pushd $BaseDir/$tgt
 
-                 NoteD $Log "$Base/$tgt"
+                 NoteD $Log "$BaseDir/$tgt"
                  flog $Log $PACT $Args install
                  NoteD $Log ""
 
@@ -466,10 +475,10 @@ switch ($Cmnd)
            while ($#Tgts > 0)
               set tgt = $Tgts[1]
               shift Tgts
-              if (-d $Base/$tgt) then
-                 flog $Log pushd $Base/$tgt
+              if (-d $BaseDir/$tgt) then
+                 flog $Log pushd $BaseDir/$tgt
 
-                 NoteD $Log "$Base/$tgt"
+                 NoteD $Log "$BaseDir/$tgt"
                  flog $Log $PACT $Args link
                  NoteD $Log ""
 
@@ -784,8 +793,7 @@ switch ($Cmnd)
                    shift
                    setenv System  $1
                    set ExplSystem = TRUE
-                   set RootDir    = $Root/dev/$System
-                   set IncDir     = $RootDir/include
+                   set IncDir     = $SysDir/include
                    set EnvCsh     = $IncDir/env-pact.csh
                    set EnvSh      = $IncDir/env-pact.sh
                    breaksw
@@ -901,12 +909,12 @@ switch ($Cmnd)
         endif
 
 # now that we have the system, reset the variables that depend on it
-        set Root   = $BaseDev/$System
-        set IncDir = $Root/include
-        set BinDir = $Root/bin
-        set LibDir = $Root/lib
-        set LogDir = $Root/log
-        set ScmDir = $Root/scheme
+        set SysDir = $DevDir/$System
+        set IncDir = $SysDir/include
+        set BinDir = $SysDir/bin
+        set LibDir = $SysDir/lib
+        set LogDir = $SysDir/log
+        set ScmDir = $SysDir/scheme
         set PACT   = $BinDir/pact
         set PERDB  = $BinDir/perdb
 
@@ -933,7 +941,7 @@ switch ($Cmnd)
         InitLog Log $LogDir/config
 
         Note $Log "System = $System"
-        Note $Log "Root   = $Root"
+        Note $Log "SysDir = $SysDir"
         Note $Log "Args   = $nargs"
 
         flog $Log umask
@@ -944,9 +952,9 @@ switch ($Cmnd)
         setenv HostOS     `uname -s`
         setenv HostOSRel  `uname -r`
         setenv HostArch   `uname -m`
-        set InstBase  = $BaseDev/$System
-        if (!(-d $BaseDev)) then
-           mkdir $BaseDev
+        set InstBase  = $DevDir/$System
+        if (!(-d $DevDir)) then
+           mkdir $DevDir
         endif
         if (!(-d $InstBase)) then
            mkdir $InstBase
@@ -1029,14 +1037,14 @@ switch ($Cmnd)
         touch $EnvCsh
         Note $EnvCsh ""
         Note $EnvCsh "setenv System $System"
-        Note $EnvCsh "set path   = ( . $BaseDev/"'$System/bin $path )'
+        Note $EnvCsh "set path   = ( . $DevDir/"'$System/bin $path )'
         Note $EnvCsh ""
 
         $RM $EnvSh
         touch $EnvSh
         Note $EnvSh ""
         Note $EnvSh "export System=$System"
-        Note $EnvSh "export PATH=.:$BaseDev/"'$System/bin:$PATH'
+        Note $EnvSh "export PATH=.:$DevDir/"'$System/bin:$PATH'
         Note $EnvSh ""
 
 # remove files we are about to generate
@@ -1113,7 +1121,7 @@ switch ($Cmnd)
 
         set LStat = 1
         if ($CROSS_COMPILE == "FALSE") then
-           flog $Log pushd $Base/score
+           flog $Log pushd $BaseDir/score
            if (-x ${BinDir}/dmake) then
               flog $Log mv ${BinDir}/dmake ${BinDir}/dmake.exec
            endif
@@ -1176,8 +1184,8 @@ switch ($Cmnd)
            if ($status == 0) then
               flog $Log set Opt = dmake
            endif
-        else if (-f $Base/score/z-$System/test/log.tmake) then
-           flog $Log cat $Base/score/z-$System/test/log.tmake
+        else if (-f $BaseDir/score/z-$System/test/log.tmake) then
+           flog $Log cat $BaseDir/score/z-$System/test/log.tmake
         else
            Note $Log "Proceding with untested version"
         endif
@@ -1192,7 +1200,7 @@ switch ($Cmnd)
         rehash
 
 # create empty extensions directories if they don't exist already
-        set ExtDirs = ( $Base/sx/applications/extensions $Base/ultra/applications/extensions )
+        set ExtDirs = ( $BaseDir/sx/applications/extensions $BaseDir/ultra/applications/extensions )
         foreach d ($ExtDirs)
            if (-d $d:h) then
               if (!(-d $d)) then
@@ -1271,7 +1279,7 @@ CFG_DONE:
         while ($#argv > 0)
            switch ($1)
               case -a:
-                   foreach i ($BaseDev/*)
+                   foreach i ($DevDir/*)
                       set c = $i:t
                       if ("$c" =~ *+*) then
                          set Cfgs = ( $Cfgs $c )
@@ -1389,29 +1397,29 @@ CFG_DONE:
 
    case dirs:
 
-        if (!(-d $BaseDev)) then
-           mkdir $BaseDev
+        if (!(-d $DevDir)) then
+           mkdir $DevDir
         endif
-        if (!(-d $Root)) then
-           mkdir $Root
+        if (!(-d $SysDir)) then
+           mkdir $SysDir
         endif
-        if (!(-d $Root/bin)) then
-           mkdir $Root/bin
+        if (!(-d $SysDir/bin)) then
+           mkdir $SysDir/bin
         endif
-        if (!(-d $Root/lib)) then
-           mkdir $Root/lib
+        if (!(-d $SysDir/lib)) then
+           mkdir $SysDir/lib
         endif
-        if (!(-d $Root/include)) then
-           mkdir $Root/include
+        if (!(-d $SysDir/include)) then
+           mkdir $SysDir/include
         endif
-        if (!(-d $Root/scheme)) then
-           mkdir $Root/scheme
+        if (!(-d $SysDir/scheme)) then
+           mkdir $SysDir/scheme
         endif
-        if (!(-d $Root/scheme/extensions)) then
-           mkdir $Root/scheme/extensions
+        if (!(-d $SysDir/scheme/extensions)) then
+           mkdir $SysDir/scheme/extensions
         endif
-        if (!(-d $Root/log)) then
-           mkdir $Root/log
+        if (!(-d $SysDir/log)) then
+           mkdir $SysDir/log
         endif
 
         breaksw
@@ -1597,11 +1605,11 @@ CFG_DONE:
 
               case -x:
                    setenv System  `$CfgMan use`
-                   set Root    = $BaseDev/$System
-                   set IncDir  = $Root/include
+                   set SysDir  = $DevDir/$System
+                   set IncDir  = $SysDir/include
                    set Pck     = `cat $IncDir/package`
                    pushd .. >& /dev/null
-                   set NB = `du -sb $Pck manager python $Root | awk 'BEGIN {nb = 0;} {nb += $1} END {printf("%.1f", nb/(1024.0*1024.0));}'`
+                   set NB = `du -sb $Pck manager python $SysDir | awk 'BEGIN {nb = 0;} {nb += $1} END {printf("%.1f", nb/(1024.0*1024.0));}'`
                    popd >& /dev/null
                    echo "Approximately $NB MB of sources, objects, libraries, and binaries"
                    exit(0)
@@ -2002,7 +2010,7 @@ CFG_DONE:
         if ("$Cfg" == "") then
            echo "No config supplied"
            exit(1)
-        else if (!(-d $BaseDev/$Cfg)) then
+        else if (!(-d $DevDir/$Cfg)) then
            echo "Supplied config, $Cfg, does not exist"
            exit(1)
         else
@@ -2012,7 +2020,7 @@ CFG_DONE:
         InitLog LogFile $LogDir/rebuild
 
         flog $LogFile setenv SESSION_CONFIG $Cfg
-        flog $LogFile source $BaseDev/$Cfg/include/env-pact.csh
+        flog $LogFile source $DevDir/$Cfg/include/env-pact.csh
 
         NoteD $LogFile -n "   Re-compiling ... "
         Note $LogFile ""
@@ -2198,13 +2206,13 @@ CFG_DONE:
         flog $Log popd
 
 # remove other files
-        NoteD $Log "    in $Base/"'*'"/z-$System directories"
+        NoteD $Log "    in $BaseDir/"'*'"/z-$System directories"
         flog $Log $RM ../*/z-$System/obj/*.[cfo] ../*/z-$System/obj/*.mod
         flog $Log $RM ../*/*.o ../pdb/spokes/*/*.o ../score/scf77lr.c
         flog $Log $RM ../sx/z-$System/obj/*.[cfo]
 
 # check the result
-        flog $Log ls -lR $Root
+        flog $Log ls -lR $SysDir
 
         set RStatus = $status
 
@@ -2340,7 +2348,7 @@ CFG_DONE:
 
    case stats-update:
 
-        set PrntDir   = $Base:h
+        set PrntDir   = $BaseDir:h
         set UpdateDir = $PrntDir/update
         set StatsDir  = $PrntDir/stats
 
@@ -3071,7 +3079,7 @@ CFG_DONE:
            shift
         end
 
-        set TIMER     = $Base/scripts/timer
+        set TIMER     = $BaseDir/scripts/timer
         set BeginTime = `$TIMER -r`
 
         $DSYS remove

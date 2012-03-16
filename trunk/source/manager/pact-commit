@@ -10,11 +10,11 @@
 
 unalias *
 
-set MngDir = $cwd
-set Base   = $MngDir:h
-set ScrDir = $Base/scripts
-set PshDir = $Base/psh
-set SccDir = $Base/scc
+set MngDir  = $cwd
+set BaseDir = $MngDir:h
+set ScrDir  = $BaseDir/scripts
+set PshDir  = $BaseDir/psh
+set SccDir  = $BaseDir/scc
 
 source $ScrDir/env-csh
 
@@ -49,8 +49,8 @@ set CfgMan    = $ScrDir/cfgman
 
 setenv System  `$CfgMan use`
 
-set DevDir    = $Base/dev/$System
-set UpdateLog = $DevDir/log/update
+set SysDir    = $BaseDir/dev/$System
+set UpdateLog = $SysDir/log/update
 set Changed   = $MngDir/Changed
 set UnChanged = $MngDir/UnChanged
 
@@ -61,7 +61,7 @@ set Sleep         = "NO"
 
 set CleanBuild   = FALSE
 
-InitLog Log $DevDir/log/commit
+InitLog Log $SysDir/log/commit
 
 switch ($OS)
    case irix:
@@ -319,7 +319,7 @@ if ($TagOnly == FALSE) then
       NoteD $Log "Committing changes to the Manager only"
    
    else if ($DocOnly == TRUE) then
-      flog $Log cd $Base/doc
+      flog $Log cd $BaseDir/doc
       NoteD $Log "Committing changes to the Documents only"
 
 # NOTE: we realize that the handling of .pact-version* is such
@@ -343,7 +343,7 @@ if ($TagOnly == FALSE) then
 #       problem and the sources matter most wrt the version
 
    else
-      flog $Log cd $Base
+      flog $Log cd $BaseDir
       NoteD $Log "Committing source changes"
    endif
 
@@ -396,7 +396,7 @@ endif
 # do this after the sync to avoid a meaningless conflict
 #
 if (($ManOnly == TRUE) || ($DocOnly == TRUE) || ($ScrOnly == TRUE) || ($PshOnly == TRUE) || ($SccOnly == TRUE) || ($TagOnly == TRUE)) then
-   flog $Log pushd $Base/manager
+   flog $Log pushd $BaseDir/manager
 else
    flog $Log pushd manager
 endif
@@ -462,7 +462,7 @@ else
    Note $Lock "done"
 
    if (($ManOnly == TRUE) || ($DocOnly == TRUE) || ($ScrOnly == TRUE) || ($PshOnly == TRUE) || ($SccOnly == TRUE) || ($TagOnly == TRUE)) then
-      flog $Log cd $Base
+      flog $Log cd $BaseDir
    endif
 endif
 

@@ -5,8 +5,8 @@
 # SYSTEM  = DOS
 SYSTEM  =
 MACHINE = DOS
-RootDir = c:\pactdir\pact
-ScmDir  = ${RootDir}\scheme
+BaseDir = c:\pactdir\pact
+ScmDir  = ${BaseDir}\scheme
 
 #
 # Site Dependent Graphics Information

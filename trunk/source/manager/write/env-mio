@@ -186,7 +186,7 @@ HAVE_SUBROUTINES
     Note $FOUT ""
 
     if ($InstBase == none) then
-       set proot = $RootDir
+       set proot = $SysDir
     else
        set proot = $InstBase
     endif

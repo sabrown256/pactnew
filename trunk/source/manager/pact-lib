@@ -17,13 +17,13 @@ setenv HostOS  `uname -s`
 set MngDir = $cwd
 setenv System  `../scripts/cfgman use`
 
-set Base    = $MngDir:h
-set BaseDev = $Base/dev
-set Root    = $BaseDev/$System
-set IncDir  = $Root/include
-set BinDir  = $Root/bin
-set LibDir  = $Root/lib
-setenv ScrDir $Base/scripts
+set BaseDir = $MngDir:h
+set DevDir  = $BaseDir/dev
+set SysDir  = $DevDir/$System
+set IncDir  = $SysDir/include
+set BinDir  = $SysDir/bin
+set LibDir  = $SysDir/lib
+setenv ScrDir $BaseDir/scripts
 
 source $ScrDir/env-csh
 

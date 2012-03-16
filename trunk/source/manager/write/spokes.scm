@@ -11,18 +11,18 @@
 unalias *
 
 if (-f ../scripts/env-csh) then
-   set SrcDir = $cwd
+   set lpkgdir = $cwd
 else if (-f ../../scripts/env-csh) then
-   set SrcDir = $cwd:h
+   set lpkgdir = $cwd:h
 endif
-set ldir = $SrcDir:h/scripts
-set path = ( $ldir $path )
-source $ldir/env-csh
+set lscrdir = $lpkgdir:h/scripts
+set path    = ( $lscrdir $path )
+source $lscrdir/env-csh
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-if (-d $Base/sx/applications) then
+if (-d $BaseDir/sx/applications) then
     Separator $Log
     NoteD $Log "   Binary File Translation Spokes Loader - spokes.scm"
 

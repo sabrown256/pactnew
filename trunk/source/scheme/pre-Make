@@ -187,7 +187,7 @@ scheme :
 link: ${InstallDep}
 	pact man3install
 	pact scminstall
-	@${BinDir}/install-ext ${RootDir}
+	@${BinDir}/install-ext ${SysDir}
 
 #
 # install 

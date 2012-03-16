@@ -1,6 +1,6 @@
 #
 # COMMON-LIB64 - analyze 64-bit archive directories depending on $Bits
-#              - input is shell variable LRoot
+#              - input is shell variable lroot
 #              - output is shell variable LibT
 #
 # Source Version: 3.0
@@ -9,12 +9,12 @@
 # include "cpyright.h"
 #
 
-# initial guess is that we will have $LRoot/lib as the answer
+# initial guess is that we will have $lroot/lib as the answer
 set LibT  = lib
 
 set lBits = ""
 set lDir  = ""
-foreach dir ($LRoot/lib64 $LRoot/lib)
+foreach dir ($lroot/lib64 $lroot/lib)
    ls $dir/*.o >& /dev/null
    if ($status == 0) then
       set Objs = ( `ls $dir/*.o` )

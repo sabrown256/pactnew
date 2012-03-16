@@ -128,10 +128,11 @@ switch ($Phase)
 # any other source option
            else
    
-              set TmpDir = _foo_$Code
-              set TBase  = $cwd:h
-              flog $LogHost mkdir $TBase/$TmpDir
-              flog $LogHost cd $TBase/$TmpDir
+              set ltmp  = _foo_$Code
+              set lbase = $cwd:h
+              flog $LogHost mkdir $lbase/$ltmp
+              flog $LogHost cd $lbase/$ltmp
+	      unset lbase
 
               if ("$Repo" != "") then
                  if ($Tag == "none") then
@@ -156,18 +157,19 @@ switch ($Phase)
               if ($Err == 0) then
                  set Prnt = $cwd:h
                  if (!(-d $Prnt/repository)) then
-                    flog $LogHost $RMDir $Prnt/$Base
+                    flog $LogHost $RMDir $Prnt/$BaseDir
                  endif
-                 flog $LogHost $MV $Code $Prnt/$Base
+                 flog $LogHost $MV $Code $Prnt/$BaseDir
                  flog $LogHost cd $Prnt
-                 if (!(-d $TmpDir/repository)) then
-                    flog $LogHost $RMDir $TmpDir
+                 if (!(-d $ltmp/repository)) then
+                    flog $LogHost $RMDir $ltmp
                  endif         
                  flog $LogHost find . -type d chmod 2770 {} \;
-                 flog $LogHost chmod -R ug+rw,g+X $Base
+                 flog $LogHost chmod -R ug+rw,g+X $BaseDir
               else
                  Note $LogHost "Source setup FAILED"
               endif
+	      unset ltmp
            endif
         endif
 

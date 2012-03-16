@@ -101,14 +101,14 @@ end
       set PyVers            = ""
    endif
 
-   set RootDir = /usr/local/apps/pact
+   set lbase = /usr/local/apps/pact
 
    if ($HavePython == TRUE) then
       if (`expr "$lPyVers" : '.*\..*\..*'` > 0) then
          set lPyVers = $lPyVers:r
       endif
       set PyVers = $lPyVers
-      set PyRoot = $RootDir
+      set PyRoot = $lbase
       set PyHead = python${PyVers}/pact
       if ("$Python_Path" != "") then
          set PyRoot = $PyExe

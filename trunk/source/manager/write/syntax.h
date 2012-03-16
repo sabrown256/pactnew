@@ -11,13 +11,13 @@
 unalias *
 
 if (-f ../scripts/env-csh) then
-   set SrcDir = $cwd
+   set lpkgdir = $cwd
 else if (-f ../../scripts/env-csh) then
-   set SrcDir = $cwd:h
+   set lpkgdir = $cwd:h
 endif
-set ldir = $SrcDir:h/scripts
-set path = ( $ldir $path )
-source $ldir/env-csh
+set lscrdir = $lpkgdir:h/scripts
+set path    = ( $lscrdir $path )
+source $lscrdir/env-csh
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -44,7 +44,7 @@ source $ldir/env-csh
     set lsm   = ""
     @ nsyntxs = 0
     if ("$Yacc_Exe" != "") then
-       flog $Log pushd $Base/scheme
+       flog $Log pushd $BaseDir/scheme
        if (!(-d syntax)) then
           flog $Log mkdir syntax
        endif

@@ -71,7 +71,7 @@ else
       NoteD $Log -n "                        $f "
       Note $Log ""
 
-      flog $Log cp $RootDir/$t .
+      flog $Log cp $BaseDir/$t .
       flog $Log $TEMPLATE $u -o $Res
 
       set xstatus = $status

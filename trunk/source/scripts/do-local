@@ -616,7 +616,7 @@ DIRVAR:
 #       OSF1 csh won't work with an environment variable!!!!!
    set WrkDirTmp = $WrkDir
 
-   setenv Base      $WrkDirTmp:t
+   setenv BaseDir   $WrkDirTmp:t
    setenv Root      $WrkDirTmp:h
    setenv SetupLog  $Root/$UHost.$Stamp.setup
    setenv ArgFile   $SHARED/.do-local-args.$UHost.$Stamp.$$
@@ -678,7 +678,7 @@ INITLOG:
       touch $LogHost
    endif
 
-   Note $LogHost "Base directory: $Base"
+   Note $LogHost "Base directory: $BaseDir"
    Note $LogHost "Root directory: $Root"
    Note $LogHost "Argument File : $ArgFile"
    Note $LogHost "Setup log file: $SetupLog"

@@ -14,10 +14,10 @@ set Which = "$cwd/pwhich"
 set Exe   = `$Which toby`
 
 if (-x "$Exe") then
-   set Arch = `../scripts/cfgman use`
-   set Base = $cwd:h
-   set Root = $Base/dev/$Arch/lib
-   set Libs = `ls $Root`
+   set Arch    = `../scripts/cfgman use`
+   set BaseDir = $cwd:h
+   set LibDir  = $BaseDir/dev/$Arch/lib
+   set Libs    = `ls $LibDir`
 
    set Tmp    = tobydb
    set TobyDB = "."
@@ -34,7 +34,7 @@ if (-x "$Exe") then
       set Name = `expr $lib : 'lib\(.*\)\.a'`
 
       echo "Processing package $Name"
-      cp $Root/$lib $Tmp
+      cp $LibDir/$lib $Tmp
       pushd $Tmp >& /dev/null
 
       ar -x $lib

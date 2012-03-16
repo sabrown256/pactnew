@@ -166,7 +166,7 @@ command :
 link: ${InstallDep}
 	pact scminstall
 	pact scrinstall
-	@${BinDir}/install-ext ${RootDir} ${TGTScrX}
+	@${BinDir}/install-ext ${SysDir} ${TGTScrX}
 
 #
 # install 

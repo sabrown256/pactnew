@@ -15,7 +15,7 @@ foreach f (../scripts ../../scripts ../../../scripts ../../../../scripts)
    if (-f $f/env-csh) then
       pushd $f >>& /dev/null
       setenv TestScrDir $cwd
-      setenv RootDir $cwd:h
+      setenv BaseDir $cwd:h
       popd >>& /dev/null
       break
    endif
@@ -89,16 +89,16 @@ setenv ZeroSpace  "-z 2"
 #   while (!(-d dev) && !(-d manager))
 #      cd .. >& /dev/null
 #   end
-#   setenv RootDir  $cwd
+#   setenv BaseDir  $cwd
 #   popd >& /dev/null
 
-   setenv System    `$RootDir/scripts/cfgman use`
-   setenv BuildDir  $RootDir/dev/$System
-   setenv SrcDir    $RootDir/$Package
+   setenv System    `$BaseDir/scripts/cfgman use`
+   setenv SysDir    $BaseDir/dev/$System
+   setenv SrcDir    $BaseDir/$Package
 
-   setenv IncDir    $BuildDir/include
-   setenv LibDir    $BuildDir/lib
-   setenv BinDir    $BuildDir/bin
+   setenv IncDir    $SysDir/include
+   setenv LibDir    $SysDir/lib
+   setenv BinDir    $SysDir/bin
 
    setenv TestDir   $SrcDir/z-$System/test
    setenv FilesDir  $SrcDir/tests
@@ -108,7 +108,7 @@ setenv ZeroSpace  "-z 2"
    setenv MAKE      $BinDir/pact
    setenv DORUN     $BinDir/do-run
    setenv PSDIFF    $BinDir/ps-diff
-   setenv PX        $RootDir/scripts/px
+   setenv PX        $BaseDir/scripts/px
 
    source $IncDir/env-pact.csh
 
@@ -161,25 +161,25 @@ setenv ZeroSpace  "-z 2"
 
 set path = ( . $BinDir $path )
 
-setenv SCHEME $RootDir/scheme/applications
-setenv SCHEME $RootDir/scheme/applications/extensions:${SCHEME}
-setenv SCHEME $RootDir/scheme/tests:${SCHEME}
+setenv SCHEME $BaseDir/scheme/applications
+setenv SCHEME $BaseDir/scheme/applications/extensions:${SCHEME}
+setenv SCHEME $BaseDir/scheme/tests:${SCHEME}
 
 if ($?Package == 1) then
-   setenv SCHEME $RootDir/$Package/tests:${SCHEME}
-   setenv SCHEME $RootDir/$Package/applications:${SCHEME}
-   setenv SCHEME $RootDir/$Package/applications/extensions:${SCHEME}
+   setenv SCHEME $BaseDir/$Package/tests:${SCHEME}
+   setenv SCHEME $BaseDir/$Package/applications:${SCHEME}
+   setenv SCHEME $BaseDir/$Package/applications/extensions:${SCHEME}
 else
-   setenv SCHEME $RootDir/sx/applications:${SCHEME}
-   setenv SCHEME $RootDir/sx/applications/extensions:${SCHEME}
-   setenv SCHEME $RootDir/sx/tests:${SCHEME}
-   setenv SCHEME $RootDir/ultra:${SCHEME}
-   setenv SCHEME $RootDir/ultra/applications:${SCHEME}
-   setenv SCHEME $RootDir/ultra/applications/extensions:${SCHEME}
-   setenv SCHEME $RootDir/panacea/applications:${SCHEME}
+   setenv SCHEME $BaseDir/sx/applications:${SCHEME}
+   setenv SCHEME $BaseDir/sx/applications/extensions:${SCHEME}
+   setenv SCHEME $BaseDir/sx/tests:${SCHEME}
+   setenv SCHEME $BaseDir/ultra:${SCHEME}
+   setenv SCHEME $BaseDir/ultra/applications:${SCHEME}
+   setenv SCHEME $BaseDir/ultra/applications/extensions:${SCHEME}
+   setenv SCHEME $BaseDir/panacea/applications:${SCHEME}
 endif
 
-setenv SCHEME $RootDir/dev/$System/scheme:${SCHEME}
+setenv SCHEME $SysDir/scheme:${SCHEME}
 
 if ($?PYTHONPATH == 1) then
    setenv PYTHONPATH ${LPYTHON}:$PYTHONPATH
@@ -220,7 +220,7 @@ if ("$Test" == "") then
          if ("$i" == ".") then
             set base = $FilesDir/vg.suppress
          else
-            set base = $RootDir/$i/tests/vg.suppress
+            set base = $BaseDir/$i/tests/vg.suppress
          endif
          if (-f $base) then
             setenv Valgrind  "$Valgrind --suppressions=$base"
@@ -243,9 +243,9 @@ Note $Log "Test environment"
 
 Note $Log ""
 Note $Log "Directories:"
-Note $Log "RootDir    = |$RootDir|"
+Note $Log "BaseDir    = |$BaseDir|"
 Note $Log "System     = |$System|"
-Note $Log "BuildDir   = |$BuildDir|"
+Note $Log "SysDir     = |$SysDir|"
 Note $Log "SrcDir     = |$SrcDir|"
 Note $Log "IncDir     = |$IncDir|"
 Note $Log "LibDir     = |$LibDir|"

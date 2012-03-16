@@ -10,10 +10,10 @@
 
 unalias *
 
-set LPact    = `which pact`
-set PACTRoot = $LPact:h
-set PACTRoot = $PACTRoot:h
-source $PACTRoot/include/csh-subroutines
+set lpact   = `which pact`
+set ldevdir = $lpact:h
+set ldevdir = $ldevdir:h
+source $ldevdir/include/csh-subroutines
 HAVE_SUBROUTINES
 
 set Dir     = ""
@@ -49,14 +49,15 @@ switch ($Process)
 #--------------------------------------------------------------------------
 
    case Check:
-        set lCodes = ( `echo $Codes | sed 's/:/ /g'` )
+        set lcodes = ( `echo $Codes | sed 's/:/ /g'` )
 
         echo "unused functions or variables:"
 
         set Maps = ""
-        foreach i ($lCodes)
+        foreach i ($lcodes)
            set Maps = ( $Maps nm-$i )
         end
+        unset lcodes
 
         @ count = 0
         @ dead  = 0
@@ -167,20 +168,23 @@ MAP_CODES:
 
    set lDir   = $args_[1]
    shift args_
-   set lCodes = ( `echo "$args_" |& sed 's/:/ /g'` )
-   set lBase  = $cwd
+   set lcodes = ( `echo "$args_" |& sed 's/:/ /g'` )
+   set lbase  = $cwd
 
    set Maps = ""
 
    pushd $lDir/bin >& /dev/null
 
    echo "Getting map of codes:"
-   foreach i ($lCodes)
+   foreach i ($lcodes)
       echo "   $i"
-      nm $NMArgs $i >! $lBase/nm-$i
+      nm $NMArgs $i >! $lbase/nm-$i
       set Maps = ( $Maps nm-$i )
    end
    popd >& /dev/null
+
+   unset lbase
+   unset lcodes
 
    return
 

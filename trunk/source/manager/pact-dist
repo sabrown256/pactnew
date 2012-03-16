@@ -13,9 +13,9 @@
 unalias *
 
 if ($?MngDir == 0) then
-   set MngDir = $cwd
-   set Base   = $MngDir:h
-   setenv ScrDir $Base/scripts
+   set MngDir   = $cwd
+   set BaseDir  = $MngDir:h
+   setenv ScrDir $BaseDir/scripts
 endif
 
 source $ScrDir/env-csh
@@ -55,7 +55,7 @@ set MV    = "mv -f"
 set RM    = "rm -f"
 set RMDir = "rm -rf"
 
-InitLog Log $Base/dev/$System/log/dist
+InitLog Log $BaseDir/dev/$System/log/dist
 
 set Opt = "$Exe:t  $argv"
 

@@ -21,10 +21,10 @@ if ($?MngDir == 0) then
    endif
 
    set MngDir = $cwd
-   set lBase  = $MngDir:h
+   set lbase  = $MngDir:h
 
-   setenv Base   $lBase
-   setenv ScrDir $Base/scripts
+   setenv BaseDir   $lbase
+   setenv ScrDir    $BaseDir/scripts
 
    source $ScrDir/env-csh
 endif
@@ -103,10 +103,10 @@ setenv MngDir   $cwd
 setenv CfgMan   $ScrDir/cfgman
 setenv System   `$CfgMan use`
 setenv CfgDir   cfg-$System
-setenv RootDir  $Base/dev/$System
-setenv IncDir   $RootDir/include
-setenv BinDir   $RootDir/bin
-setenv LibDir   $RootDir/lib
+setenv SysDir   $BaseDir/dev/$System
+setenv IncDir   $SysDir/include
+setenv BinDir   $SysDir/bin
+setenv LibDir   $SysDir/lib
 setenv ScmDir   scheme
 setenv Man1Dir  man/man1
 setenv Man3Dir  man/man3
@@ -114,13 +114,13 @@ setenv EnvCsh   $IncDir/env-pact.csh
 setenv EnvSh    $IncDir/env-pact.sh
 setenv EnvDk    $IncDir/env-pact.dk
 
-setenv CEFile   $RootDir/log/file.ce
-setenv CDFile   $RootDir/log/file.cd
-setenv DPFile   $RootDir/log/file.dpe
-setenv SEFile   $RootDir/log/file.se
-setenv MVFile   $RootDir/log/file.mv
-setenv URFile   $RootDir/log/file.ur
-setenv Log      $RootDir/log/config
+setenv CEFile   $SysDir/log/file.ce
+setenv CDFile   $SysDir/log/file.cd
+setenv DPFile   $SysDir/log/file.dpe
+setenv SEFile   $SysDir/log/file.se
+setenv MVFile   $SysDir/log/file.mv
+setenv URFile   $SysDir/log/file.ur
+setenv Log      $SysDir/log/config
 
 setenv NoExe   FALSE
 setenv Load    TRUE
@@ -215,8 +215,8 @@ Main:
           case -s:
                    shift
                    setenv System   $1
-                   setenv RootDir  $Base/dev/$System
-                   setenv IncDir   $RootDir/include
+                   setenv SysDir   $BaseDir/dev/$System
+                   setenv IncDir   $SysDir/include
                    setenv EnvCsh   $IncDir/env-pact.csh
                    setenv EnvSh    $IncDir/env-pact.sh
                    setenv EnvDk    $IncDir/env-pact.dk
@@ -328,7 +328,7 @@ AnalyzeConfig:
     include $MngDir/pact-analyze
 
 # restore config as the log file
-    set Log = "$RootDir/log/config"
+    set Log = "$SysDir/log/config"
     flog $Log $RM `ls`
     flog $Log popd
 
@@ -1312,16 +1312,16 @@ Unique:
 Finish:
 
 # these are finally determined by now and it is safe to define them
-    setenv IncDir  $RootDir/include
-    setenv LibDir  $RootDir/lib
-    setenv BinDir  $RootDir/bin
-    setenv SchDir  $RootDir/scheme
+    setenv IncDir  $SysDir/include
+    setenv LibDir  $SysDir/lib
+    setenv BinDir  $SysDir/bin
+    setenv SchDir  $SysDir/scheme
 
     NoteD $Log "Writing system dependent files"
 
 # if T3D, fiddle pdb fortran interface regression test source
     if ("$PFE" == "mppexec") then
-       cd $Base/pdb
+       cd $BaseDir/pdb
 
        set STDAUX = tmp-$System.f
        flog $Log $RM $STDAUX
@@ -1379,7 +1379,7 @@ Finish:
     write/scdecls.h
     write/syntax.h
 
-    if (-d $Base/sx/applications) then
+    if (-d $BaseDir/sx/applications) then
        write/spokes.scm
     endif
 
