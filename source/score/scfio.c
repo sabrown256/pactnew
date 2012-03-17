@@ -209,7 +209,7 @@ int64_t SC_get_buffer_size(void)
 
 char *SC_prompt(char *prompt, char *s, int n)
    {int nc, ok;
-    char *rv;
+    char *t, *rv;
 
     ok = FALSE;
     rv = NULL;
@@ -222,12 +222,11 @@ char *SC_prompt(char *prompt, char *s, int n)
 #ifdef HAVE_READLINE
 
 	if (SC_isblocked_file(stdin) == TRUE)
-	   {char *t;
 
 /* if we have no prompt assume that we are working with SC_exec_job
  * and the last line received from the child is the prompt
  */
-	    if (prompt == NULL)
+	   {if (prompt == NULL)
 	       {prompt = _SC.elbf;
 		rl_already_prompted = TRUE;}
 	    else
@@ -249,20 +248,12 @@ char *SC_prompt(char *prompt, char *s, int n)
 #endif
 
 	if (ok == FALSE)
-#if 0
-	   {char *t;
-
-	    t = SC_leh(prompt);
+	   {t = SC_leh(prompt);
 	    if (t != NULL)
 	       {snprintf(s, nc, "%s\n", t);
 		if (strlen(t) > 0)
 		   SC_leh_hist_add(t);
 		rv = s;};};
-#else
-	   {if (prompt != NULL)
-	       printf("%s", prompt);
-	    rv = fgets(s, nc, stdin);};
-#endif
 
 /* always set last character to '\0' to avoid a buffer overrun */
 	s[nc] = '\0';};

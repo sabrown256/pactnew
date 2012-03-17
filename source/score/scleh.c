@@ -1,8 +1,12 @@
 /*
  * SCLEH.C - line editing and history
- *         - linenoise work-alike
+ *         - linenoise work-alike (started from linenoise.c)
+ *         - Copyright (c) 2010, Salvatore Sanfilippo <antirez at gmail dot com>
+ *         - Copyright (c) 2010, Pieter Noordhuis <pcnoordhuis at gmail dot com>
  * 
  */
+
+#include "cpyright.h"
 
 #include "score.h"
 #include "scope_term.h"
@@ -12,7 +16,7 @@
 typedef struct s_lehcmp lehcmp;
 typedef struct s_lehdes lehdes;
 
-typedef void(PFlehcb)(const char *, lehcmp *);
+typedef void(PFlehcb)(const char *s, lehcmp *lc);
 
 struct s_lehcmp
    {size_t len;
@@ -170,10 +174,9 @@ static int _SC_leh_get_ncol(void)
    {int rv;
     struct winsize ws;
 
-    rv = ws.ws_col;
-
-    if (ioctl(1, TIOCGWINSZ, &ws) == -1)
-       rv = 80;
+    rv = 80;
+    if (ioctl(1, TIOCGWINSZ, &ws) != -1)
+       rv = ws.ws_col;
 
     return(rv);}
 
@@ -348,14 +351,14 @@ static int _SC_leh_prompt(int fd, char *bf, size_t nb, const char *prompt)
     size_t np, pos, len, cols;
 
     hind = 0;
-    np   = (prompt == NULL) ? 0 : strlen(prompt);
+    np   = 0;
     pos  = 0;
     len  = 0;
     cols = _SC_leh_get_ncol();
 
     bf[0] = '\0';
 
-/* make sure there is always space for the nulterm */
+/* take off one for the terminating null character */
     nb--;
 
 /* the latest history entry is always our current buffer, that
@@ -364,7 +367,8 @@ static int _SC_leh_prompt(int fd, char *bf, size_t nb, const char *prompt)
     SC_leh_hist_add("");
     
     if (prompt != NULL)
-       {if (write(fd, prompt, np) == -1)
+       {np = strlen(prompt);
+	if (write(fd, prompt, np) == -1)
 	   return(-1);};
 
     while (TRUE)
@@ -393,11 +397,11 @@ static int _SC_leh_prompt(int fd, char *bf, size_t nb, const char *prompt)
 
         switch (c)
 
-/* enter */
+/* ctrl-m */
 	   {case 13 :
 	         _SC_leh.nh--;
 		 CFREE(_SC_leh.hist[_SC_leh.nh]);
-		 return((int)len);
+		 return((int) len);
 
 /* ctrl-c */
 	    case 3 :
@@ -489,14 +493,14 @@ right_arrow:
 /* up and down arrow: history */
 up_down_arrow:
 		    if (_SC_leh.nh > 1)
-		       {
+
 /* update the current history entry before to
  * overwrite it with tne next one
  */
-			CFREE(_SC_leh.hist[_SC_leh.nh-1-hind]);
-			_SC_leh.hist[_SC_leh.nh-1-hind] = strdup(bf);
+		       {CFREE(_SC_leh.hist[_SC_leh.nh-1-hind]);
+			_SC_leh.hist[_SC_leh.nh-1-hind] = CSTRSAVE(bf);
 
-/* show the new entry */
+/* display the new entry */
 			hind += (seq[1] == 65) ? 1 : -1;
 			if (hind < 0)
 			   {hind = 0;
@@ -552,7 +556,7 @@ up_down_arrow:
 			 _SC_leh_refresh(fd, prompt, bf, len, pos, cols);};};
 		break;
 
-/* Ctrl+u, delete the whole line */
+/* ctrl-u, delete the whole line */
 	   case 21 :
 	        bf[0] = '\0';
 		pos   = 0;
@@ -560,26 +564,26 @@ up_down_arrow:
 		_SC_leh_refresh(fd, prompt, bf, len, pos, cols);
 		break;
 
-/* Ctrl+k, delete from current to end of line */
+/* ctrl-k, delete from current to end of line */
 	   case 11 :
 	        bf[pos] = '\0';
 		len     = pos;
 		_SC_leh_refresh(fd, prompt, bf, len, pos, cols);
 		break;
 
-/* Ctrl+a, go to the start of the line */
+/* ctrl-a, go to the start of the line */
 	   case 1 :
 	        pos = 0;
 		_SC_leh_refresh(fd, prompt, bf, len, pos, cols);
 		break;
 
-/* ctrl+e, go to the end of the line */
+/* ctrl-e, go to the end of the line */
 	   case 5 :
 	        pos = len;
 		_SC_leh_refresh(fd, prompt, bf, len, pos, cols);
 		break;
 
-/* ctrl+l, clear screen */
+/* ctrl-l, clear screen */
 	   case 12 :
 	        SC_leh_clear();
 		_SC_leh_refresh(fd, prompt, bf, len, pos, cols);};};
@@ -643,10 +647,11 @@ static int _SC_leh_raw(char *bf, size_t nb, const char *prompt)
  */
 
 char *SC_leh(const char *prompt)
-   {int count, nc;
-    char bf[MAX_BFSZ];
-    char *rv;
+   {char *rv;
 
+    int count, nc;
+    char bf[MAX_BFSZ];
+    
     if (_SC_leh_sup_termp() == FALSE)
        {printf("%s", prompt);
         fflush(stdout);
@@ -660,6 +665,7 @@ char *SC_leh(const char *prompt)
 
     else
        {count = _SC_leh_raw(bf, MAX_BFSZ, prompt);
+
         if (count == -1)
 	   return(NULL);};
 
@@ -700,7 +706,7 @@ void SC_leh_cmp_add(lehcmp *lc, char *s)
 /* SC_LEH_HIST_ADD - add S to the history ring */
 
 int SC_leh_hist_add(const char *s)
-   {int nb, rv;
+   {int rv, nb;
     char *cpy;
 
     rv = FALSE;
@@ -731,9 +737,9 @@ int SC_leh_hist_add(const char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_LEH_HIST_LEN - set the size of the history ring to LEN */
+/* SC_LEH_HIST_SET_N - set the size of the history ring to N */
 
-int SC_leh_hist_len(int n)
+int SC_leh_hist_set_n(int n)
    {int rv, nh, nb;
     char **sa;
 
@@ -769,9 +775,9 @@ int SC_leh_hist_len(int n)
  */
 
 int SC_leh_hist_save(char *fname)
-   {int i, rv;
+   {int rv, i;
     FILE *fp;
-    
+
     rv = FALSE;
 
     fp = fopen(fname, "w");
@@ -781,7 +787,7 @@ int SC_leh_hist_save(char *fname)
 
 	rv = TRUE;
 
-	fclose(fp);}
+	fclose(fp);};
 
     return(rv);}
 
@@ -797,7 +803,7 @@ int SC_leh_hist_load(char *fname)
     char t[MAX_BFSZ];
     char *p;
     FILE *fp;
-    
+
     rv = FALSE;
 
     fp = fopen(fname, "r");

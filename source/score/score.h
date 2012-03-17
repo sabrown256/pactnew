@@ -1261,9 +1261,9 @@ extern int
 /* SCLEH.C declarations */
 
 extern int
- SC_leh_hist_add(const char *line), 
- SC_leh_hist_len(int nh),
- SC_leh_hist_save(char *fname), 
+ SC_leh_hist_add(const char *s),
+ SC_leh_hist_set_n(int nh),
+ SC_leh_hist_save(char *fname),
  SC_leh_hist_load(char *fname);
 
 extern char
