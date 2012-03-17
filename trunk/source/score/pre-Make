@@ -491,6 +491,9 @@ foo : ${TGTLib} foo.c
 	${CC} -c foo.c -o foo.o
 	${CLD} ${LdFlags} foo.o -o foo ${Libs}
 
+example : ${TGTLib} example.c
+	${CLD} ${LdFlags} example.c -o example ${Libs}
+
 #
 # dmake - build and test dmake
 #       - this is a special target that you cannot build with dmake
