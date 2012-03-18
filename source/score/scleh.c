@@ -1,9 +1,6 @@
 /*
  * SCLEH.C - line editing and history
- *         - linenoise work-alike (started from linenoise.c)
- *         - Copyright (c) 2010, Salvatore Sanfilippo <antirez at gmail dot com>
- *         - Copyright (c) 2010, Pieter Noordhuis <pcnoordhuis at gmail dot com>
- * 
+ *         - following linenoise by Salvatore Sanfilippo and Pieter Noordhuis
  */
 
 #include "cpyright.h"
@@ -102,54 +99,49 @@ static int _SC_leh_ena_raw(int fd)
    {int rv;
     struct termios raw;
 
-    rv = 0;
+    rv = -1;
 
-    if (isatty(STDIN_FILENO) == FALSE)
-       goto fatal;
+    if (isatty(STDIN_FILENO) == TRUE)
+       {if (_SC_leh.exr == FALSE)
+	   {atexit(_SC_leh_done);
+	    _SC_leh.exr = TRUE;};
 
-    if (_SC_leh.exr == FALSE)
-       {atexit(_SC_leh_done);
-        _SC_leh.exr = TRUE;};
-
-    if (tcgetattr(fd, &_SC_leh.trm) == -1)
-       goto fatal;
+	if (tcgetattr(fd, &_SC_leh.trm) >= 0)
 
 /* modify the original mode */
-    raw = _SC_leh.trm;
+	   {raw = _SC_leh.trm;
 
 /* input modes: no break, no CR to NL, no parity check, no strip char, 
  * no start/stop output control
  */
-    raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
+	    raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
 
 /* output modes - disable post processing */
-    raw.c_oflag &= ~(OPOST);
+	    raw.c_oflag &= ~(OPOST);
 
 /* control modes - set 8 bit chars */
-    raw.c_cflag |= (CS8);
+	    raw.c_cflag |= (CS8);
 
 /* local modes - choing off, canonical off, no extended functions, 
  * no signal chars (^Z, ^C)
  */
-    raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+	    raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
 
 /* control chars - set return condition: min number of bytes and timer
  * We want read to return every single byte, without timeout
  */
-    raw.c_cc[VMIN]  = 1;
-    raw.c_cc[VTIME] = 0;              /* 1 byte, no timer */
+	    raw.c_cc[VMIN]  = 1;
+	    raw.c_cc[VTIME] = 0;              /* 1 byte, no timer */
 
 /* put terminal in raw mode after flushing */
-    if (tcsetattr(fd, TCSAFLUSH, &raw) < 0)
-       goto fatal;
+	    if (tcsetattr(fd, TCSAFLUSH, &raw) >= 0)
+	       {_SC_leh.raw = TRUE;
+		rv          = 0;};};};
 
-    _SC_leh.raw = TRUE;
+    if (rv == -1)
+       errno = ENOTTY;
 
-    return(rv);
-
-fatal:
-    errno = ENOTTY;
-    return(-1);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -449,6 +441,71 @@ static int _SC_leh_up_down(lehloc *lp)
 
 /*--------------------------------------------------------------------------*/
 
+/* _SC_LEH_ANY - any character not otherwise trapped */
+
+int _SC_leh_any(lehloc *lp)
+   {int c, fd, rv;
+    size_t pos, len, cols, nb;
+    char *bf;
+
+    c    = lp->c;
+    fd   = lp->fd;
+    len  = lp->len;
+    pos  = lp->pos;
+    cols = lp->cols;
+    nb   = lp->nb;
+
+    rv = TRUE;
+
+    if (len < nb)
+       {bf = lp->bf;
+	if (len == pos)
+	   {bf[pos] = c;
+	    lp->pos++;
+	    lp->len++;
+	    bf[lp->len] = '\0';
+
+/* avoid a full update of the line in the trivial case */
+	    if (lp->np+lp->len < cols)
+	       {if (write(fd, &c, 1) == -1)
+		   rv = FALSE;}
+	    else
+	       _SC_leh_refresh(lp);}
+
+        else
+	   {memmove(bf+pos+1, bf+pos, len-pos);
+	    bf[pos] = c;
+	    lp->len++;
+	    lp->pos++;
+	    bf[lp->len] = '\0';
+	    _SC_leh_refresh(lp);};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_LEH_DEL - delete escape sequence */
+
+int _SC_leh_del(lehloc *lp)
+   {size_t pos, len;
+    char *bf;
+
+    pos = lp->pos;
+    len = lp->len;
+
+    if ((0 < len) && (pos < len))
+       {bf = lp->bf;
+	memmove(bf+pos, bf+pos+1, len-pos-1);
+	lp->len--;
+	bf[lp->len] = '\0';
+	_SC_leh_refresh(lp);};
+
+    return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_LEH_DEL_BACK - delete the previous character (Ctrl-H) */
 
 int _SC_leh_del_back(lehloc *lp)
@@ -457,7 +514,7 @@ int _SC_leh_del_back(lehloc *lp)
 
     pos = lp->pos;
     len = lp->len;
-    if ((pos > 0) && (len > 0))
+    if ((0 < pos) && (0 < len))
        {bf = lp->bf;
 	memmove(bf+pos-1, bf+pos, len-pos);
 	lp->pos--;
@@ -520,6 +577,32 @@ int _SC_leh_exch_char(lehloc *lp)
 	_SC_leh_refresh(lp);};
 
     return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_LEH_NEXT_LINE - goto the next line (Ctrl-N) */
+
+int _SC_leh_next_line(lehloc *lp)
+   {int rv;
+
+    lp->esa[1] = 66;
+    rv = _SC_leh_up_down(lp);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_LEH_PREV_LINE - goto the previous line (Ctrl-P) */
+
+int _SC_leh_prev_line(lehloc *lp)
+   {int rv;
+
+    lp->esa[1] = 65;
+    rv = _SC_leh_up_down(lp);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -598,20 +681,17 @@ static int _SC_leh_prompt(int fd, char *bf, size_t nb, const char *prompt)
    {int nr, rv;
     lehloc loc;
 
-    size_t len;
-    len  = 0;
-
     loc.fd     = fd;
     loc.hind   = 0;
     loc.pos    = 0;
     loc.len    = 0;
+    loc.c      = 0;
     loc.cols   = _SC_leh_get_ncol();
-    loc.bf     = bf;
     loc.nb     = --nb;   /* take off one for the terminating null character */
     loc.prompt = (char *) prompt;
     loc.np     = (prompt == NULL) ? 0 : strlen(prompt);
-
-    loc.bf[0] = '\0';
+    loc.bf     = bf;
+    loc.bf[0]  = '\0';
 
 /* the latest history entry is always our current buffer, that
  * initially is just an empty string
@@ -625,21 +705,21 @@ static int _SC_leh_prompt(int fd, char *bf, size_t nb, const char *prompt)
     while (TRUE)
        {nr = read(fd, &loc.c, 1);
         if (nr <= 0)
-	   return(loc.len);
+	   break;
 
-/* only autocomplete when the callback is set. It returns < 0 when
- * there was an error reading from fd. Otherwise it will return the
- * character that should be handled next
+/* only autocomplete when the callback is set. It returns -1 when
+ * there was an error reading from FD
+ * otherwise it will return the character that should be handled next
  */
         if ((loc.c == 9) && (_SC_leh.cmp_cb != NULL))
 	   {loc.c = _SC_leh_complete(&loc);
 
 /* return on errors */
             if (loc.c < 0)
-	       return(loc.len);
+	       break;
 
 /* read next character when 0 */
-            if (loc.c == 0)
+            else if (loc.c == 0)
 	       continue;};
 
         switch (loc.c)
@@ -685,13 +765,12 @@ static int _SC_leh_prompt(int fd, char *bf, size_t nb, const char *prompt)
 
 /* ctrl-p */
 	   case 16 :
-	        loc.esa[1] = 65;
-		goto up_down_arrow;
+		rv = _SC_leh_prev_line(&loc);
+		break;
 
 /* ctrl-n */
 	   case 14 :
-	        loc.esa[1] = 66;
-		goto up_down_arrow;
+		rv = _SC_leh_next_line(&loc);
 		break;
 
 /* escape sequence */
@@ -701,67 +780,26 @@ static int _SC_leh_prompt(int fd, char *bf, size_t nb, const char *prompt)
 
 /* left arrow */
 		if ((loc.esa[0] == 91) && (loc.esa[1] == 68))
-		   _SC_leh_left(&loc);
+		   rv = _SC_leh_left(&loc);
 
+/* right arrow */
 		else if ((loc.esa[0] == 91) && (loc.esa[1] == 67))
-		   _SC_leh_right(&loc);
-
-		else if ((loc.esa[0] == 91) &&
-			 ((loc.esa[1] == 65) || (loc.esa[1] == 66)))
+		   rv = _SC_leh_right(&loc);
 
 /* up and down arrow: history */
-up_down_arrow:
-		   {
-#if 0
-                    rv = _SC_leh_up_down(&loc);
-#else
-                    rv = TRUE;
-		    if (_SC_leh.nh > 1)
-		       {size_t ie;
+		else if ((loc.esa[0] == 91) &&
+			 ((loc.esa[1] == 65) || (loc.esa[1] == 66)))
+		   rv = _SC_leh_up_down(&loc);
 
-/* update the current history entry before to
- * overwrite it with tne next one
- */
-			ie = _SC_leh.nh-1-loc.hind;
-			CFREE(_SC_leh.hist[ie]);
-			_SC_leh.hist[ie] = CSTRSAVE(loc.bf);
-
-/* display the new entry */
-			loc.hind += (loc.esa[1] == 65) ? 1 : -1;
-			if (loc.hind < 0)
-			   {loc.hind = 0;
-			    rv = FALSE;}
-		        else if (loc.hind >= _SC_leh.nh)
-			   {loc.hind = _SC_leh.nh-1;
-			    rv = FALSE;}
-
-			else
-			   {ie = _SC_leh.nh-1-loc.hind;
-			    SC_strncpy(loc.bf, loc.nb, _SC_leh.hist[ie], -1);
-
-			    loc.len = strlen(loc.bf);
-			    loc.pos = loc.len;
-			    _SC_leh_refresh(&loc);};};
-#endif
-
-		    if (rv == FALSE)
-		       break;}
-
+/* extended escape sequence */
 		else if ((loc.esa[0] == 91) && (loc.esa[1] > 48) &&
 			 (loc.esa[1] < 55))
-		   {
-
-/* extended escape */
-		    if (read(fd, loc.esb, 2) == -1)
+		   {if (read(fd, loc.esb, 2) == -1)
 		       break;
 
 /* delete */
 		    if ((loc.esa[1] == 51) && (loc.esb[0] == 126))
-		       {if ((loc.len > 0) && (loc.pos < loc.len))
-			   {memmove(bf+loc.pos, bf+loc.pos+1, loc.len-loc.pos-1);
-			    loc.len--;
-			    bf[loc.len] = '\0';
-			    _SC_leh_refresh(&loc);};};};
+		       rv = _SC_leh_del(&loc);};
 		break;
 
 /* ctrl-u, delete the whole line */
@@ -790,27 +828,9 @@ up_down_arrow:
 		break;
 
 	   default :
-	        if (loc.len < loc.nb)
-		   {if (loc.len == loc.pos)
-		       {bf[loc.pos] = loc.c;
-			loc.pos++;
-                        loc.len++;
-			bf[loc.len] = '\0';
-			if (loc.np+loc.len < loc.cols)
-
-/* avoid a full update of the line in the trivial case */
-			   {if (write(fd, &loc.c, 1) == -1)
-			       return(-1);}
-		        else
-			   _SC_leh_refresh(&loc);}
-
-		    else
-		        {memmove(bf+loc.pos+1, bf+loc.pos, loc.len-loc.pos);
-			 bf[loc.pos] = loc.c;
-			 loc.len++;
-			 loc.pos++;
-			 bf[loc.len] = '\0';
-			 _SC_leh_refresh(&loc);};};
+	        rv = _SC_leh_any(&loc);
+		if (rv == FALSE)
+		   return(-1);
 		break;};};
 
     return(loc.len);}
