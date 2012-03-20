@@ -10,7 +10,8 @@
 
 @ err = 0
 
-set cfg  = ""
+set db   = $IncDir/cfg.db
+set cfg  = ( `grep Sys= $db | sed 's/^Sys=//'` )
 set osys = `cfgman use`
 
 while ($#argv > 0)
@@ -19,7 +20,7 @@ while ($#argv > 0)
            echo ""
            echo "Usage: pco-cmp [-h] [<cfg>]"
            echo "   h      this help message"
-           echo "   <cfg>  a config file (e.g. gnu-64-mpi-py-s)"
+           echo "   <cfg>  a config file (default is current config file)"
            exit(1)
       default:
            set cfg = $1

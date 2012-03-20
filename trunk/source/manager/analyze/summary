@@ -64,6 +64,10 @@ source $Me:h/common
        NoteD $Log "   Building absolutely optimized version"
     endif
 
+    if ($Profile == TRUE) then
+       NoteD $Log "   Building profiling version"
+    endif
+       
 # PyExe       the full path to the python executable
 # PyVers      the version of the python executable
 # Python_Path addition to path in order to find python executable
@@ -101,10 +105,6 @@ source $Me:h/common
        NoteD $Log "   Scheme syntax modes will not be built (no yacc or bison)"
     endif
 
-    if ($Profile == TRUE) then
-       NoteD $Log "   Building profiling version"
-    endif
-       
     if ($UseTmpDir == TRUE) then
        NoteD $Log "   Doing fast builds using /tmp"
     endif

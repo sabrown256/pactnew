@@ -644,8 +644,14 @@ switch ($Cmnd)
               case -cc:
                    shift
                    setenv CCompiler  $1
-                   $MngDir/verify-cc $CCompiler
-                   if ($status != 0) exit(1)
+
+# cannot expect to handle CCompiler = gnu here
+# but do check things like CCompiler = gcc
+                   if (-x `which $CCompiler`) then
+                      $MngDir/verify-cc $CCompiler
+                      if ($status != 0) exit(1)
+                   endif
+
                    breaksw
               case -c:
                    set PArgs = ( $PArgs "-c" )
@@ -656,6 +662,11 @@ switch ($Cmnd)
                       set dbcfg = $1
                    else
                       set dbcfg = $cwd/$1
+                   endif
+                   if (-f $dbcfg) then
+                      pushd $dbcfg:h >& /dev/null
+                      set dbcfg = $cwd/$dbcfg:t
+                      popd >& /dev/null
                    endif
                    breaksw
               case -f:
@@ -842,6 +853,9 @@ switch ($Cmnd)
         setenv DSYS_TARGET pact_config
 
         set gdir = gen/$Arch
+        if (!(-d $gdir)) then
+           mkdir -p $gdir >& /dev/null
+        endif
         if ($reconfig == FALSE) then
            rm -f $gdir/$Configuration >& /dev/null
         endif
@@ -862,7 +876,7 @@ switch ($Cmnd)
               exit(1)
            endif
 
-# if not using a database do the location/generation steps
+# if using a file or generated config
         else
 
 # if no configuration is specified - generate from scratch
@@ -870,7 +884,7 @@ switch ($Cmnd)
               echo "Generating configuration from command line options"
               call GEN_CONFIG()
               set ucfg = $gdir/$Configuration
-   	   set dir  = $gdir
+              set dir  = $gdir
 
 # if file exists as is use it
            else if (-f $Configuration) then
@@ -1005,7 +1019,7 @@ switch ($Cmnd)
         flog $Log popd
 
 # remove standard Tool and Group variables from the environment
-	foreach v ( `env | sed 's|=.*$||'` )
+	foreach v ( `env |& sed 's|^[ \t].*||' | sed 's|=.*$||'` )
            switch ($v)
               case CC_*:
               case FC_*:
@@ -1070,7 +1084,7 @@ switch ($Cmnd)
 
 # do the main configuration work
         if ("$ucfg" != "") then
-           NoteD $Log "Using $Configuration in $dir to configure this PACT installation."
+           NoteD $Log "Using $Configuration to configure this PACT installation."
            Note $Log "Command: $PConf $PArgs -s $System $ucfg"
            $PConf -s $System $PArgs $ucfg
            set RStatus = $status
@@ -1243,12 +1257,16 @@ CFG_DONE:
         while ($#argv > 0)
            switch ($1)
               case -a:
+                   set db  = $IncDir/cfg.db
+                   set inf = ( `pact +l -info CONFIG_METHOD` )
+                   set mth = $inf[1]
+                   set cfg = ( `grep Sys= $db | sed 's/^Sys=//'` )
                    set inf = ( `$CfgMan list` )
+                   set cur = ( `$CfgMan use` )
                    echo "Configuration list:    $inf"
-                   echo "Current configuration: `$CfgMan use`"
-                   echo -n "Current config file:   "
-                   head -n 1 $IncDir/configured | awk '{ print $3 }'
-                   echo ""
+                   echo "Current configuration: $cur"
+                   echo "Current config file:   $cfg"
+                   echo "Current config method: $mth"
                    exit(0)
                    breaksw
               case -h:
@@ -2076,18 +2094,34 @@ CFG_DONE:
    case reconfig:
         set inst = ( -i none )
         set args = "-r"
-        set db   = ""
+        set db   = $IncDir/cfg.db
+
+# get config method and original config file
+        if (-f $db) then
+           set inf = ( `pact +l -info CONFIG_METHOD` )
+           set meth = $inf[1]
+           set cfg  = ( `grep Sys= $db |& sed 's/^Sys=//'` )
+        else
+           set meth = file
+           set inf  = ( `awk '($1 == "Config") { print $3 }' $IncDir/configured` )
+           set cfg  = $inf[1]:t
+        endif
+        unset inf
+
         while ($#argv > 0)
            switch ($1)
+              case -cfg:
+                   set meth = file
+                   breaksw
               case -db:
-                   shift
-                   set db = $IncDir/cfg.db
+                   set meth = database
                    breaksw
               case -h:
               case help:
                    echo ""
-                   echo "Usage: dsys reconfig [-db] [-i] [-h]"
+                   echo "Usage: dsys reconfig [-cfg] [-db] [-i] [-h]"
                    echo ""
+                   echo "   cfg   reconfigure from the config file (default)"
                    echo "   db    reconfigure from the database"
                    echo "   i     reconfigure installable (default is non-installable)"
                    echo "   h     this help message"
@@ -2103,14 +2137,17 @@ CFG_DONE:
            shift
         end
 
-        if ("$db" != "") then
-           set args = ( $args -db $IncDir/cfg.db )
-        else
-           set cfg = `awk '($1 == "Config") { print $3 }' $IncDir/configured`
-           set args = ( $args $cfg:t )
-           unset cfg
-        endif
-
+        switch ($meth)
+           case database:
+                set args = ( $args -db $db )
+                breaksw
+           case file:
+                set args = ( $args $cfg:t )
+                unset cfg
+                breaksw
+        endsw
+        unset meth
+ 
         $DSYS config $args $inst
         set RStatus = $status
 
@@ -2807,7 +2844,11 @@ CFG_DONE:
            if ("$Failed" == "") then
               flog $Log set RStatus = 0
               NoteD $Log "All tests passed ($RStatus/$ETime)"
+
            else
+
+# try to find out specific tests that failed
+# comparing against tests that passed
               set Passed = ( `grep 'TEST ... PASSED' $Log |& sed 's/^.*|//' |& awk '{ print $1 }' | tr "[A-Z]" "[a-z]" | sort | uniq` )
               set lfail = ""
               foreach f ($Failed)
@@ -2826,8 +2867,16 @@ CFG_DONE:
               unset lfail
               unset lok
 
-              NoteD $Log "$#Failed test(s) failed ($RStatus/$ETime)"
-              NoteD $Log "   $Failed"
+# if they all really passed then say so
+              if ($#Failed == 0) then
+                 flog $Log set RStatus = 0
+                 NoteD $Log "All tests passed ($RStatus/$ETime)"
+
+# report failed tests
+              else
+                 NoteD $Log "$#Failed test(s) failed ($RStatus/$ETime)"
+                 NoteD $Log "   $Failed"
+              endif
            endif
         endif
         NoteD $Log ""
@@ -3200,17 +3249,17 @@ GEN_CONFIG:
 
    set vrb = FALSE
 
-   set droot = gen/$Arch
-   if (!(-d $droot)) then
-      mkdir -p $droot
+   set gdir = gen/$Arch
+   if (!(-d $gdir)) then
+      mkdir -p $gdir
    endif
 
-   set Tmp = $droot/tmp.$$
+   set Tmp = $gdir/tmp.$$
 
    source write/cfg-base
    source write/cfg-features
  
-   mv $Tmp $droot/$cfg
+   mv $Tmp $gdir/$cfg
    set Configuration = $cfg
 
    return

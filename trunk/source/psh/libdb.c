@@ -757,31 +757,40 @@ char **_db_clnt_ex(char *root, char *req)
 /* DBSET - set the database variable VAR to VAL (counterpart to csetenv) */
 
 int dbset(char *root, char *var, char *fmt, ...)
-   {int err, nc;
+   {int i, err, nc, nr, ok;
     char s[LRG];
     char *t, **ta;
-
-    VA_START(fmt);
-    VSNPRINTF(s, LRG, fmt);
-    VA_END;
+    static char *rej[] = { "PWD", "PERDB_PATH" };
 
     err = 0;
-    nc  = strlen(var) + strlen(s) + 2;
-    t   = malloc(nc);
-    if (t != NULL)
-       {snprintf(t, nc, "%s=%s", var, s);
-	ta  = _db_clnt_ex(root, t);
-	err = (ta != NULL);
+
+/* variables in REJ should never be in the database itself */
+    ok = TRUE;
+    nr = sizeof(rej)/sizeof(char *);
+    for (i = 0; (i < nr) && (ok == TRUE); i++)
+        ok = (strcmp(var, rej[i]) != 0);
+
+    if (ok == TRUE)
+       {VA_START(fmt);
+	VSNPRINTF(s, LRG, fmt);
+	VA_END;
+
+	nc  = strlen(var) + strlen(s) + 2;
+	t   = malloc(nc);
+	if (t != NULL)
+	   {snprintf(t, nc, "%s=%s", var, s);
+	    ta  = _db_clnt_ex(root, t);
+	    err = (ta != NULL);
 
 /* GOTCHA: temporarily also add it to the environment
  * this can go when utilities using this are completely converted
  * away from using the environment
  */
-	err = putenv(t);
+	    err = putenv(t);
 
-	note(Log, TRUE, "setenv %s %s", var, s);
+	    note(Log, TRUE, "setenv %s %s", var, s);
 
-	lst_free(ta);};
+	    lst_free(ta);};};
 
     return(err);}
 

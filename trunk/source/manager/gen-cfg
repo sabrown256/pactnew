@@ -111,12 +111,12 @@ endif
 #--------------------------------------------------------------------------
 
 set arch = `system-id`
-set droot = gen/$arch
-if (!(-d $droot)) then
-   mkdir -p $droot
+set gdir = gen/$arch
+if (!(-d $gdir)) then
+   mkdir -p $gdir
 endif
 
-set Tmp = $droot/$cfg
+set Tmp = $gdir/$cfg
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

@@ -87,7 +87,7 @@ setenv Arch `$ScrDir/system-id`
 
 set Verbose         = FALSE
 set Templates       = FALSE
-set ConfigFile      = DEFAULT
+set CONFIG_FILE     = DEFAULT
 set NoConfig        = FALSE
 set NoAnalyze       = FALSE
 
@@ -230,13 +230,13 @@ Main:
                    set Verbose = TRUE
                    breaksw
           default:
-                   set ConfigFile = $1
+                   set CONFIG_FILE = $1
                    breaksw
        endsw
        shift
     end
 
-    set lSys = $ConfigFile:t
+    set lSys = $CONFIG_FILE:t
     setenv Sys  $lSys
 
     flog $Log $RM $CEFile
@@ -294,7 +294,7 @@ Main:
           if (-f analyze/program-init) then
              call ReadConfig(analyze/program-init TRUE)
           endif
-          call ReadConfig($ConfigFile)
+          call ReadConfig($CONFIG_FILE)
        endif
 
        call CheckDir()
@@ -1369,7 +1369,7 @@ Finish:
 # write the configuration generated files for PACT
     write/envf TRUE
     write/package
-    write/configured $ConfigFile
+    write/configured $CONFIG_FILE
     write/f90-interface
     write/make-def
     write/make-macros

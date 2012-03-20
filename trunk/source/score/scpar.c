@@ -314,11 +314,14 @@ int SC_init_threads(int nt, PFTid tid)
 /* SC_INIT_OMP - initialize OMP operation */
 
 int SC_init_omp(int c, char **v)
-   {int i, nt;
-    static int first = TRUE;
+   {static int first = TRUE;
 
     if (first == TRUE)
        {first = FALSE;
+
+#ifdef PTHREAD_OMP
+	int i, ip, rs, nt;
+	char *p;
 
 	nt = -1;
 
@@ -326,10 +329,6 @@ int SC_init_omp(int c, char **v)
 	    {if (strcmp(v[i], "-t") == 0)
 		{nt = SC_stoi(v[++i]);
 		 break;};};
-
-#ifdef PTHREAD_OMP
-	int ip, rs;
-	char *p;
 
 /* check for number of threads */
 	p = getenv("OMP_NUM_THREADS");
