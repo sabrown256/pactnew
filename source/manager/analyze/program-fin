@@ -9,7 +9,7 @@
 
 run write/do-run-db
 run write/package
-run write/configured $ConfigFile
+run write/configured $CONFIG_FILE
 run write/f90-interface
 run write/make-def
 run write/make-macros

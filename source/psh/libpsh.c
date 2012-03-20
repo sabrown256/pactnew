@@ -1207,23 +1207,6 @@ char *strip_quote(char *t)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* CENV - return a sorted list of environment variables */
-
-char **cenv(int sort)
-   {int n;
-    char *bf, **ta;
-
-    bf = run(FALSE, "env");
-    ta = tokenize(bf, "\n");
-    if ((ta != NULL) && (sort == TRUE))
-       {n = lst_length(ta);
-	string_sort(ta, n);};
-       
-    return(ta);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* CSETENV - set the environment variable VAR to VAL */
 
 int csetenv(char *var, char *fmt, ...)
@@ -1331,6 +1314,68 @@ int cdefenv(char *fmt, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* CENV - return a sorted list of environment variables
+ *      - exclude variables named in REJ
+ */
+
+char **cenv(int sort, char **rej)
+   {int i, n;
+    char t[LRG];
+    char *p, *s, *bf, **ta;
+
+    bf = run(FALSE, "env");
+    ta = tokenize(bf, "\n");
+    if (ta != NULL)
+       {n = lst_length(ta);
+
+/* eliminate the rejected variable entries */
+        if (rej != NULL)
+	   {int j, nc;
+
+	    for (i = 0; i < n; i++)
+	        {for (j = 0; rej[j] != NULL; j++)
+		     {nc = strlen(rej[j]);
+
+/* if it matches, free the existing entry, move the last one
+ * into this slot and decrement both n and i
+ * because this new entry will have to be evaluated
+ */
+		      if ((strncmp(ta[i], rej[j], nc) == 0) &&
+			  (ta[i][nc] == '='))
+			 {FREE(ta[i]);
+			  ta[i--] = ta[--n];
+			  ta[n]   = NULL;
+			  break;};};};};
+	        
+
+/* fix BackSlash because the escaped newline is a problem */
+	for (i = 0; i < n; i++)
+	    {if (strncmp(ta[i], "BackSlash=", 10) == 0)
+	        {p = strchr(ta[i], '\n');
+		 if (p != NULL)
+		    {*p++ = '\0';
+		     s = STRSAVE(ta[i]);
+		     FREE(ta[i]);
+		     ta[i] = STRSAVE(p);
+		     ta[n++] = s;};
+		 break;};};
+
+/* fix PATH because RUN must change the PATH to work */
+	for (i = 0; i < n; i++)
+	    {if (strncmp(ta[i], "PATH=", 5) == 0)
+	        {snprintf(t, LRG, "PATH=%s", cgetenv(FALSE, "PATH"));
+		 FREE(ta[i]);
+		 ta[i] = STRSAVE(t);
+		 break;};};
+
+	if (sort == TRUE)
+	   string_sort(ta, n);};
+
+    return(ta);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* CMPENV - return a strcmp style value for the
  *        - comparison of the environment variable VAR value and VAL
  */
@@ -1388,8 +1433,8 @@ int cclearenv(char **except)
  */
     env = NULL;
     for (pe = environ, ne = 0; *pe != NULL; pe++, ne++)
-        env = lst_push(env, *pe);
-    env = lst_push(env, NULL);
+        env = lst_add(env, *pe);
+    env = lst_add(env, NULL);
 
 /* traverse env to find names of variables to remove */
     for (i = 0; i < ne; i++)

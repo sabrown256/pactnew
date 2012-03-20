@@ -8,50 +8,78 @@
 #include "score.h"
 #include "scope_term.h"
 
+#undef ESC
+
 #define MAX_HIST_N   100
+
+#define CTRL_A       0x01
+#define CTRL_B       0x02
+#define CTRL_C       0x03
+#define CTRL_D       0x04
+#define CTRL_E       0x05
+#define CTRL_F       0x06
+#define CTRL_G       0x07
+#define CTRL_H       0x08
+#define CTRL_I       0x09
+#define CTRL_J       0x0a
+#define CTRL_K       0x0b
+#define CTRL_L       0x0c
+#define CTRL_M       0x0d
+#define CTRL_N       0x0e
+#define CTRL_O       0x0f
+#define CTRL_P       0x10
+#define CTRL_Q       0x11
+#define CTRL_R       0x12
+#define CTRL_S       0x13
+#define CTRL_T       0x14
+#define CTRL_U       0x15
+#define CTRL_V       0x16
+#define CTRL_W       0x17
+#define CTRL_X       0x18
+#define CTRL_Y       0x19
+#define CTRL_Z       0x1a
+#define ESC          0x1b
+#define BSP          0x7f
 
 typedef struct s_lehcmp lehcmp;
 typedef struct s_lehdes lehdes;
 typedef struct s_lehloc lehloc;
 
-typedef void(PFlehcb)(const char *s, lehcmp *lc);
+typedef void (*PFlehcb)(const char *s, lehcmp *lc);
+typedef int (*PFlehact)(lehloc *lp);
 
 struct s_lehcmp
    {size_t len;
     char **cvec;};
 
 struct s_lehdes
-   {int raw;
+   {int fd;
+    int raw;
     int exr;
     int nhx;
     int nh;
     char **hist;
-    PFlehcb *cmp_cb;
-    struct termios trm;};
+    PFlehact *map;
+    PFlehcb cmp_cb;};
 
 struct s_lehloc
    {int fd;
     int hind;
+    int np;               /* size of prompt text */
+    size_t nb;            /* size of current line buffer */
     size_t pos;
     size_t len;
     size_t cols;
     int c;
-    char esa[2];
-    char esb[2];
     char *bf;             /* current line buffer */
-    size_t nb;            /* size of current line buffer */
-    char *prompt;         /* prompt text */
-    int np;};             /* size of prompt text */
+    char *prompt;};       /* prompt text */
 
 static lehdes
- _SC_leh = { FALSE, 0, MAX_HIST_N, 0, NULL, NULL, };
+ _SC_leh = { -1, FALSE, 0, MAX_HIST_N, 0, NULL, NULL, NULL, };
 
 void
  SC_leh_cmp_set_cb_cmp_cb(PFlehcb *f), 
  SC_leh_cmp_add(lehcmp *lc, char *s);
-
-static void
- _SC_leh_done(void);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -93,67 +121,15 @@ static void _SC_leh_free_hist(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_LEH_ENA_RAW - put FD into raw mode */
-
-static int _SC_leh_ena_raw(int fd)
-   {int rv;
-    struct termios raw;
-
-    rv = -1;
-
-    if (isatty(STDIN_FILENO) == TRUE)
-       {if (_SC_leh.exr == FALSE)
-	   {atexit(_SC_leh_done);
-	    _SC_leh.exr = TRUE;};
-
-	if (tcgetattr(fd, &_SC_leh.trm) >= 0)
-
-/* modify the original mode */
-	   {raw = _SC_leh.trm;
-
-/* input modes: no break, no CR to NL, no parity check, no strip char, 
- * no start/stop output control
- */
-	    raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
-
-/* output modes - disable post processing */
-	    raw.c_oflag &= ~(OPOST);
-
-/* control modes - set 8 bit chars */
-	    raw.c_cflag |= (CS8);
-
-/* local modes - choing off, canonical off, no extended functions, 
- * no signal chars (^Z, ^C)
- */
-	    raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
-
-/* control chars - set return condition: min number of bytes and timer
- * We want read to return every single byte, without timeout
- */
-	    raw.c_cc[VMIN]  = 1;
-	    raw.c_cc[VTIME] = 0;              /* 1 byte, no timer */
-
-/* put terminal in raw mode after flushing */
-	    if (tcsetattr(fd, TCSAFLUSH, &raw) >= 0)
-	       {_SC_leh.raw = TRUE;
-		rv          = 0;};};};
-
-    if (rv == -1)
-       errno = ENOTTY;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _SC_LEH_DISA_RAW - put FD into cooked mode */
 
 static void _SC_leh_disa_raw(int fd)
-   {
+   {int rv;
 
-    if ((_SC_leh.raw == TRUE) &&
-	(tcsetattr(fd, TCSAFLUSH, &_SC_leh.trm) != -1))
-       _SC_leh.raw = FALSE;
+    if (_SC_leh.raw == TRUE)
+       {rv = SC_set_cooked_state(fd, FALSE);
+	if (rv == TRUE)
+	   _SC_leh.raw = FALSE;};
 
     return;}
 
@@ -165,12 +141,56 @@ static void _SC_leh_disa_raw(int fd)
  */
 
 static void _SC_leh_done(void)
-   {
+   {int fd;
 
-    _SC_leh_disa_raw(STDIN_FILENO);
-    _SC_leh_free_hist();
+    fd = _SC_leh.fd;
+    if (fd != -1)
+       {_SC_leh_disa_raw(fd);
+
+	_SC_leh_free_hist();
+
+	CFREE(_SC_leh.map);};
 
     return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_LEH_ENA_RAW - put FD into raw mode */
+
+static int _SC_leh_ena_raw(int fd)
+   {int rv;
+
+    rv = FALSE;
+
+    if (isatty(fd) == TRUE)
+       {if (_SC_leh.exr == FALSE)
+	   {atexit(_SC_leh_done);
+	    _SC_leh.exr = TRUE;};
+
+	rv = SC_set_io_attrs(fd,
+			     BRKINT,  SC_TERM_INPUT,     FALSE,
+			     ICRNL,   SC_TERM_INPUT,     FALSE,
+			     INPCK,   SC_TERM_INPUT,     FALSE,
+			     ISTRIP,  SC_TERM_INPUT,     FALSE,
+			     IXON,    SC_TERM_INPUT,     FALSE,
+			     OPOST,   SC_TERM_OUTPUT,    FALSE,
+			     ICANON,  SC_TERM_LOCAL,     FALSE,
+			     ECHO,    SC_TERM_LOCAL,     FALSE,
+			     IEXTEN,  SC_TERM_LOCAL,     FALSE,
+			     ISIG,    SC_TERM_LOCAL,     FALSE,
+			     CS8,     SC_TERM_CONTROL,   TRUE,
+			     VMIN,    SC_TERM_CHAR,      1,
+			     VTIME,   SC_TERM_CHAR,      0,
+			     0);};
+
+    if (rv == TRUE)
+       _SC_leh.raw = TRUE;
+
+    else
+       errno = ENOTTY;
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -206,7 +226,7 @@ static void _SC_leh_refresh(lehloc *lp)
     np     = lp->np;
     prompt = lp->prompt;
 
-    while ((np+pos) >= cols)
+    while (np+pos >= cols)
        {bf++;
         len--;
         pos--;};
@@ -216,28 +236,33 @@ static void _SC_leh_refresh(lehloc *lp)
 
     err = FALSE;
 
-/* move cursor to left edge */
+/* move cursor to left edge - 'ESC [ n G' moves cursor to column n */
     if (err == FALSE)
        {snprintf(seq, 64, "\x1b[0G");
 	nw   = write(fd, seq, strlen(seq));
 	err |= (nw == -1);};
 
-/* write the prompt and the current buffer content */
+/* write the prompt */
     if (err == FALSE)
        {nw   = write(fd, prompt, np);
 	err |= (nw == -1);};
 
+/* write the current buffer content */
     if (err == FALSE)
        {nw   = write(fd, bf, len);
 	err |= (nw == -1);};
 
-/* erase to right */
+/* erase to right - 'ESC [ n K'
+ *   if n is 0 or missing, clear from cursor to EOL
+ *   if n is 1, clear from BOL line to cursor
+ *   if n is 2, clear entire line
+ */
     if (err == FALSE)
        {snprintf(seq, 64, "\x1b[0K");
 	nw   = write(fd, seq, strlen(seq));
 	err |= (nw == -1);};
 
-/* move cursor to original position */
+/* move cursor to original position - 'ESC [ n C' move cursor forward n chars */
     if (err == FALSE)
        {snprintf(seq, 64, "\x1b[0G\x1b[%dC", (int) (pos + np));
 	nw   = write(fd, seq, strlen(seq));
@@ -283,6 +308,7 @@ static void _SC_leh_free_cmp(lehcmp *lc)
 
 static int _SC_leh_complete(lehloc *lp)
    {int nr, nw, ok;
+    size_t i;
     char c;
     lehcmp lc = { 0, NULL };
 
@@ -293,9 +319,7 @@ static int _SC_leh_complete(lehloc *lp)
        _SC_leh_beep();
 
     else
-       {size_t i;
-
-	ok = FALSE;
+       {ok = FALSE;
 	for (i = 0; ok == FALSE; )
 
 /* show completion or original buffer */
@@ -323,14 +347,14 @@ static int _SC_leh_complete(lehloc *lp)
 	     switch(c)
 
 /* tab */
-	        {case 9 :
+	        {case CTRL_I :
                       i = (i+1) % (lc.len+1);
                       if (i == lc.len)
 		         _SC_leh_beep();
 		      break;
 
 /* escape - re-display original buffer */
-                 case 27 :
+                 case ESC :
                       if (i < lc.len)
                          _SC_leh_refresh(lp);
 		      ok = TRUE;
@@ -352,12 +376,17 @@ static int _SC_leh_complete(lehloc *lp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_LEH_CLEAR - clear the screen */
+/* SC_LEH_CLEAR - clear the screen
+ *              -    ESC [ H ESC [ 2 J
+ *              - this is really two sequences
+ *              -    ESC [ H      moves the cursor to upper left corner
+ *              -    ESC [ 2 J    clear the whole screen
+ */
 
-void SC_leh_clear(void)
+void SC_leh_clear(int fd)
    {int nr;
 
-    nr = write(STDIN_FILENO, "\x1b[H\x1b[2J", 7);
+    nr = write(fd, "\x1b[H\x1b[2J", 7);
 
     SC_ASSERT(nr == 7);
 
@@ -400,7 +429,7 @@ static int _SC_leh_right(lehloc *lp)
 
 /* _SC_LEH_UP_DOWN - move up/down through history */
 
-static int _SC_leh_up_down(lehloc *lp)
+static int _SC_leh_up_down(lehloc *lp, int wh)
    {int rv;
     size_t ie;
 
@@ -416,7 +445,7 @@ static int _SC_leh_up_down(lehloc *lp)
 	_SC_leh.hist[ie] = CSTRSAVE(lp->bf);
 
 /* display the new entry */
-	lp->hind += (lp->esa[1] == 65) ? 1 : -1;
+	lp->hind += (wh == 'A') ? 1 : -1;
 	if (lp->hind < 0)
 	   {lp->hind = 0;
 	    rv       = FALSE;}
@@ -443,7 +472,7 @@ static int _SC_leh_up_down(lehloc *lp)
 
 /* _SC_LEH_ANY - any character not otherwise trapped */
 
-int _SC_leh_any(lehloc *lp)
+static int _SC_leh_any(lehloc *lp)
    {int c, fd, rv;
     size_t pos, len, cols, nb;
     char *bf;
@@ -487,7 +516,7 @@ int _SC_leh_any(lehloc *lp)
 
 /* _SC_LEH_DEL - delete escape sequence */
 
-int _SC_leh_del(lehloc *lp)
+static int _SC_leh_del(lehloc *lp)
    {size_t pos, len;
     char *bf;
 
@@ -508,7 +537,7 @@ int _SC_leh_del(lehloc *lp)
 
 /* _SC_LEH_DEL_BACK - delete the previous character (Ctrl-H) */
 
-int _SC_leh_del_back(lehloc *lp)
+static int _SC_leh_del_back(lehloc *lp)
    {size_t pos, len;
     char *bf;
 
@@ -529,7 +558,7 @@ int _SC_leh_del_back(lehloc *lp)
 
 /* _SC_LEH_DEL_CURR - delete the current character (Ctrl-D) */
 
-int _SC_leh_del_curr(lehloc *lp)
+static int _SC_leh_del_curr(lehloc *lp)
    {int rv;
     size_t pos, len;
     char *bf;
@@ -559,7 +588,7 @@ int _SC_leh_del_curr(lehloc *lp)
  *                   - previous characters (Ctrl-T)
  */
 
-int _SC_leh_exch_char(lehloc *lp)
+static int _SC_leh_exch_char(lehloc *lp)
    {size_t pos, len;
     char *bf;
 
@@ -583,11 +612,10 @@ int _SC_leh_exch_char(lehloc *lp)
 
 /* _SC_LEH_NEXT_LINE - goto the next line (Ctrl-N) */
 
-int _SC_leh_next_line(lehloc *lp)
+static int _SC_leh_next_line(lehloc *lp)
    {int rv;
 
-    lp->esa[1] = 66;
-    rv = _SC_leh_up_down(lp);
+    rv = _SC_leh_up_down(lp, 'B');
 
     return(rv);}
 
@@ -596,11 +624,10 @@ int _SC_leh_next_line(lehloc *lp)
 
 /* _SC_LEH_PREV_LINE - goto the previous line (Ctrl-P) */
 
-int _SC_leh_prev_line(lehloc *lp)
+static int _SC_leh_prev_line(lehloc *lp)
    {int rv;
 
-    lp->esa[1] = 65;
-    rv = _SC_leh_up_down(lp);
+    rv = _SC_leh_up_down(lp, 'A');
 
     return(rv);}
 
@@ -609,7 +636,7 @@ int _SC_leh_prev_line(lehloc *lp)
 
 /* _SC_LEH_KILL_LINE - kill the entire line (Ctrl-U) */
 
-int _SC_leh_kill_line(lehloc *lp)
+static int _SC_leh_kill_line(lehloc *lp)
    {
 
     lp->bf[0] = '\0';
@@ -624,7 +651,7 @@ int _SC_leh_kill_line(lehloc *lp)
 
 /* _SC_LEH_KILL_EOL - kill to the end of the line (Ctrl-K) */
 
-int _SC_leh_kill_eol(lehloc *lp)
+static int _SC_leh_kill_eol(lehloc *lp)
    {
 
     lp->bf[lp->pos] = '\0';
@@ -638,7 +665,7 @@ int _SC_leh_kill_eol(lehloc *lp)
 
 /* _SC_LEH_GOTO_BOL - got the beginning of the line (Ctrl-A) */
 
-int _SC_leh_goto_bol(lehloc *lp)
+static int _SC_leh_goto_bol(lehloc *lp)
    {
 
     lp->pos = 0;
@@ -651,7 +678,7 @@ int _SC_leh_goto_bol(lehloc *lp)
 
 /* _SC_LEH_GOTO_EOL - got the end of the line (Ctrl-E) */
 
-int _SC_leh_goto_eol(lehloc *lp)
+static int _SC_leh_goto_eol(lehloc *lp)
    {
 
     lp->pos = lp->len;
@@ -664,13 +691,165 @@ int _SC_leh_goto_eol(lehloc *lp)
 
 /* _SC_LEH_CLEAR_SCREEN - clear the screen (Ctrl-L) */
 
-int _SC_leh_clear_screen(lehloc *lp)
+static int _SC_leh_clear_screen(lehloc *lp)
    {
 
-    SC_leh_clear();
+    SC_leh_clear(lp->fd);
     _SC_leh_refresh(lp);
 
     return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_LEH_INTR - interrupt (Ctrl-C) */
+
+static int _SC_leh_intr(lehloc *lp)
+   {
+
+    errno = EAGAIN;
+
+    return(FALSE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_LEH_CR - handle carriage return (Ctrl-M) */
+
+static int _SC_leh_cr(lehloc *lp)
+   {int rv;
+
+    _SC_leh.nh--;
+    CFREE(_SC_leh.hist[_SC_leh.nh]);
+    rv = lp->len;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_LEH_ESC - handle an escape sequence */
+
+static int _SC_leh_esc(lehloc *lp)
+   {int fd, rv;
+    char esa[2], esb[2];
+
+    rv = FALSE;
+
+    fd = lp->fd;
+
+    if (read(fd, esa, 2) >= 0)
+       {if (esa[0] == '[')
+	   {switch (esa[1])
+
+/* left arrow */
+	       {case 'D' :
+		     rv = _SC_leh_left(lp);
+		     break;
+
+/* right arrow */
+                case 'C' :
+		     rv = _SC_leh_right(lp);
+		     break;
+
+/* up arrow */
+		case 'A' :
+		     rv = _SC_leh_up_down(lp, 'A');
+		     break;
+
+/* down arrow */
+		case 'B' :
+		     rv = _SC_leh_up_down(lp, 'B');
+		     break;
+
+/* extended escape sequences */
+	        default :
+		     if (('0' < esa[1]) && (esa[1] < '7'))
+		        {if (read(fd, esb, 2) >= 0)
+
+/* DEL */
+			    {if ((esa[1] == '3') && (esb[0] == '~'))
+			        rv = _SC_leh_del(lp);};};
+		     break;};};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_LEH_EMACS_MODE - setup emacs mode */
+
+void SC_leh_emacs_mode(void)
+   {int i;
+    PFlehact *map;
+
+    map = CMAKE_N(PFlehact, 256);
+    if (map != NULL)
+       {_SC_leh.map = map;
+
+	for (i = 0; i < 256; i++)
+	    map[i] = _SC_leh_any;
+
+        map[CTRL_A] = _SC_leh_goto_bol;
+        map[CTRL_B] = _SC_leh_left;
+        map[CTRL_C] = _SC_leh_intr;
+        map[CTRL_D] = _SC_leh_del_curr;
+        map[CTRL_E] = _SC_leh_goto_eol;
+        map[CTRL_F] = _SC_leh_right;
+        map[CTRL_H] = _SC_leh_del_back;
+        map[CTRL_K] = _SC_leh_kill_eol;
+        map[CTRL_L] = _SC_leh_clear_screen;
+        map[CTRL_M] = _SC_leh_cr;
+        map[CTRL_N] = _SC_leh_next_line;
+        map[CTRL_P] = _SC_leh_prev_line;
+        map[CTRL_T] = _SC_leh_exch_char;
+        map[CTRL_U] = _SC_leh_kill_line;
+        map[BSP]    = _SC_leh_del_back;
+        map[ESC]    = _SC_leh_esc;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_LEH_VI_MODE - setup vi mode */
+
+void SC_leh_vi_mode(void)
+   {int i;
+    PFlehact *map;
+
+    map = CMAKE_N(PFlehact, 256);
+    if (map != NULL)
+       {_SC_leh.map = map;
+
+	for (i = 0; i < 256; i++)
+	    map[i] = _SC_leh_any;
+/*
+ * ESC          - Switch to command mode
+ * i            - Insert before cursor
+ * a            - Insert after cursor
+ * I            - Insert at the beginning of line
+ * A            - Insert at the end of line
+ * s            - Delete a single character under the cursor and enter input
+ *              - mode (equivalent to c[SPACE])
+ * h            - Move one character right
+ * l            - Move one character left
+ * 0            - Move to the beginning of line
+ * $            - Move to the end of line
+ * x            - Delete a single character under the cursor
+ * X            - Delete a character before the cursor
+ * D            - Delete to the end of the line (equivalent to d$)
+ * dd           - Delete current line (equivalent to 0d$)
+ * /string or   - Search history backward for a command matching string
+ * CTRL-r       -
+ * ?string or   - Search history forward for a command matching string
+ * CTRL-s       - (Note that on most machines Ctrl-s STOPS the terminal
+ *              - output, change it with `stty' (Ctrl-q to resume))
+ * CTRL-r       - Transpose (exchange) two characters
+ */
+       };
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -680,6 +859,12 @@ int _SC_leh_clear_screen(lehloc *lp)
 static int _SC_leh_prompt(int fd, char *bf, size_t nb, const char *prompt)
    {int nr, rv;
     lehloc loc;
+    PFlehact *map;
+
+    if (_SC_leh.map == NULL)
+       SC_leh_emacs_mode();
+
+    map = _SC_leh.map;
 
     loc.fd     = fd;
     loc.hind   = 0;
@@ -693,8 +878,8 @@ static int _SC_leh_prompt(int fd, char *bf, size_t nb, const char *prompt)
     loc.bf     = bf;
     loc.bf[0]  = '\0';
 
-/* the latest history entry is always our current buffer, that
- * initially is just an empty string
+/* most recent history entry is current buffer
+ * initially just an empty string
  */
     SC_leh_hist_add("");
     
@@ -707,131 +892,26 @@ static int _SC_leh_prompt(int fd, char *bf, size_t nb, const char *prompt)
         if (nr <= 0)
 	   break;
 
-/* only autocomplete when the callback is set. It returns -1 when
- * there was an error reading from FD
- * otherwise it will return the character that should be handled next
+/* autocomplete when the callback is set
+ * completion returns -1 on error
+ * otherwise returns the next character to be handled
  */
-        if ((loc.c == 9) && (_SC_leh.cmp_cb != NULL))
+        if ((loc.c == CTRL_I) && (_SC_leh.cmp_cb != NULL))
 	   {loc.c = _SC_leh_complete(&loc);
 
-/* return on errors */
+/* exit on error */
             if (loc.c < 0)
 	       break;
 
-/* read next character when 0 */
+/* read next when null character encountered */
             else if (loc.c == 0)
 	       continue;};
 
-        switch (loc.c)
-
-/* ctrl-m */
-	   {case 13 :
-	         _SC_leh.nh--;
-		 CFREE(_SC_leh.hist[_SC_leh.nh]);
-		 return(loc.len);
-
-/* ctrl-c */
-	    case 3 :
-	         errno = EAGAIN;
-		 return(-1);
-
-/* backspace and ctrl-h */
-	   case 127 :
-	   case 8 :
-	        rv = _SC_leh_del_back(&loc);
-		break;
-
-/* ctrl-d, remove char at right of cursor */
-	   case 4 :
-	        rv = _SC_leh_del_curr(&loc);
-		if (rv == FALSE)
-		   return(-1);
-		break;
-
-/* ctrl-t */
-	   case 20 :
-	        rv = _SC_leh_exch_char(&loc);
-		break;
-
-/* ctrl-b */
-	   case 2 :
-	        _SC_leh_left(&loc);
-		break;
-
-/* ctrl-f */
-	   case 6 :
-	        _SC_leh_right(&loc);
-                break;
-
-/* ctrl-p */
-	   case 16 :
-		rv = _SC_leh_prev_line(&loc);
-		break;
-
-/* ctrl-n */
-	   case 14 :
-		rv = _SC_leh_next_line(&loc);
-		break;
-
-/* escape sequence */
-	   case 27 :
-	        if (read(fd, loc.esa, 2) == -1)
-		   break;
-
-/* left arrow */
-		if ((loc.esa[0] == 91) && (loc.esa[1] == 68))
-		   rv = _SC_leh_left(&loc);
-
-/* right arrow */
-		else if ((loc.esa[0] == 91) && (loc.esa[1] == 67))
-		   rv = _SC_leh_right(&loc);
-
-/* up and down arrow: history */
-		else if ((loc.esa[0] == 91) &&
-			 ((loc.esa[1] == 65) || (loc.esa[1] == 66)))
-		   rv = _SC_leh_up_down(&loc);
-
-/* extended escape sequence */
-		else if ((loc.esa[0] == 91) && (loc.esa[1] > 48) &&
-			 (loc.esa[1] < 55))
-		   {if (read(fd, loc.esb, 2) == -1)
-		       break;
-
-/* delete */
-		    if ((loc.esa[1] == 51) && (loc.esb[0] == 126))
-		       rv = _SC_leh_del(&loc);};
-		break;
-
-/* ctrl-u, delete the whole line */
-	   case 21 :
-	        rv = _SC_leh_kill_line(&loc);
-		break;
-
-/* ctrl-k, delete from current to end of line */
-	   case 11 :
-	        rv = _SC_leh_kill_eol(&loc);
-		break;
-
-/* ctrl-a, go to the start of the line */
-	   case 1 :
-	        rv = _SC_leh_goto_bol(&loc);
-		break;
-
-/* ctrl-e, go to the end of the line */
-	   case 5 :
-	        rv = _SC_leh_goto_eol(&loc);
-		break;
-
-/* ctrl-l, clear screen */
-	   case 12 :
-	        rv = _SC_leh_clear_screen(&loc);
-		break;
-
-	   default :
-	        rv = _SC_leh_any(&loc);
-		if (rv == FALSE)
-		   return(-1);
-		break;};};
+	rv = map[loc.c](&loc);
+	if (loc.c == CTRL_M)
+	   return(rv);
+	else if (rv == FALSE)
+	   return(-1);};
 
     return(loc.len);}
 
@@ -840,17 +920,15 @@ static int _SC_leh_prompt(int fd, char *bf, size_t nb, const char *prompt)
 
 /* _SC_LEH_RAW - raw I/O from stdin */
 
-static int _SC_leh_raw(char *bf, size_t nb, const char *prompt)
-   {int fd, rv;
+static int _SC_leh_raw(int fd, char *bf, size_t nb, const char *prompt)
+   {int rv;
 
     rv = -1;
-
-    fd = STDIN_FILENO;
 
     if (nb == 0)
        errno = EINVAL;
 
-    else if (isatty(STDIN_FILENO) == FALSE)
+    else if (isatty(fd) == FALSE)
        {if (fgets(bf, nb, stdin) != NULL)
 	   {rv = strlen(bf);
 	    if ((rv > 0) && (bf[rv-1] == '\n'))
@@ -858,7 +936,7 @@ static int _SC_leh_raw(char *bf, size_t nb, const char *prompt)
 		bf[rv] = '\0';};};}
 
     else
-       {if (_SC_leh_ena_raw(fd) != -1)
+       {if (_SC_leh_ena_raw(fd) == TRUE)
 	   {rv = _SC_leh_prompt(fd, bf, nb, prompt);
 	    _SC_leh_disa_raw(fd);
 	    printf("\n");};};
@@ -873,30 +951,15 @@ static int _SC_leh_raw(char *bf, size_t nb, const char *prompt)
  *        - do everything with just three sequences
  *        - there may have some flickering with some slow terminals
  *        - but fewer sequences makes for easier portability
- *        -
- *        - Move cursor horizontal absolute
- *        -    ESC [ n G    moves cursor to column n
- *        -
- *        - Erase line
- *        -    ESC [ n K    if n is 0 or missing, clear from cursor to EOL
- *        -                 if n is 1, clear from BOL line to cursor
- *        -                 if n is 2, clear entire line
- *        -
- *        - Move cursor forward
- *        -    ESC [ n C    moves cursor forward of n chars
- *        -
- *        - Clear Screen
- *        -    ESC [ H ESC [ 2 J    (this is really two sequences)
- *        -    ESC [ H      moves the cursor to upper left corner
- *        -    ESC [ 2 J    clear the whole screen
  */
 
 char *SC_leh(const char *prompt)
-   {char *rv;
-
-    int count, nc;
+   {int nr, nc;
     char bf[MAX_BFSZ];
+    char *rv;
     
+    _SC_leh.fd = STDIN_FILENO;
+
     if (_SC_leh_sup_termp() == FALSE)
        {printf("%s", prompt);
         fflush(stdout);
@@ -909,9 +972,8 @@ char *SC_leh(const char *prompt)
             bf[nc] = '\0';};}
 
     else
-       {count = _SC_leh_raw(bf, MAX_BFSZ, prompt);
-
-        if (count == -1)
+       {nr = _SC_leh_raw(_SC_leh.fd, bf, MAX_BFSZ, prompt);
+        if (nr == -1)
 	   return(NULL);};
 
     rv = CSTRSAVE(bf);
@@ -925,7 +987,7 @@ char *SC_leh(const char *prompt)
  *                   - for tab-completion
  */
 
-void SC_leh_cmp_set_cb(PFlehcb *f)
+void SC_leh_cmp_set_cb(PFlehcb f)
    {
 
     _SC_leh.cmp_cb = f;

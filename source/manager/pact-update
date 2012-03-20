@@ -242,16 +242,15 @@ while ($#argv > 0)
 # such as compilers or features
 # but not instbase or debug/opt
       case -db:
-           set cargs = ( $1 $2 )
-           shift
+           set cargs = ( $cargs $1 $2 )
            shift
            breaksw
 
       case -cc:
            set cargs = ( $cargs $1 $2 )
            shift
-           shift
            breaksw
+
       default:
            set cargs = ( $cargs $1 )
    endsw

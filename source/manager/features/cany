@@ -7,5 +7,5 @@
 # include "cpyright.h"
 #
 
-setenv C_STD             any
+C_STD = any
 

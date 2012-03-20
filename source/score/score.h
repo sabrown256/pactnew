@@ -1270,7 +1270,7 @@ extern char
  *SC_leh(const char *prompt);
 
 extern void
- SC_leh_clear(void);
+ SC_leh_clear(int fd);
 
 
 /* SCLOG.C declarations */

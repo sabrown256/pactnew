@@ -21,7 +21,7 @@ setenv PACT_CC_VERSION   ""
 setenv PACT_FC_FAMILY    generic
 setenv PACT_FC_VERSION   ""
 
-setenv C_STD             X99
+C_STD = X99
 setenv TEST_ADVISORY     ""
 
 # GOTCHA: this root may be different for CROSS_COMPILE

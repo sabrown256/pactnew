@@ -149,7 +149,7 @@ struct s_state
 
 static state
  st = { FALSE, FALSE, FALSE, FALSE, FALSE, TRUE,
-	FALSE, FALSE, FALSE, PHASE_READ, FALSE,
+	FALSE, FALSE, FALSE, FALSE, PHASE_READ,
 	FALSE, FALSE, FALSE, };
 
 static void
@@ -639,7 +639,7 @@ static int pco_load_db(char *dbname)
 
     note(Log, FALSE, "Restored database variables:\n");
 
-    ta = cenv(TRUE);
+    ta = cenv(TRUE, NULL);
     if (ta != NULL)
        {nv = lst_length(ta);
 	for (i = 0; i < nv; i++)
@@ -726,8 +726,16 @@ static void add_set_db(FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
    {int i, n, nc;
     char s[MAXLINE];
     char *var, *val, **sa;
+    static char *rej[] = { "Log", "ALog",
+			   "CCP", "CCObj", "CCArc",
+			   "CCObj_BP", "CCArc_BP", 
+			   "LexObj", "LexArc", "LexC",
+			   "LexObj_BP", "LexArc_BP", 
+			   "YaccObj", "YaccArc", "YaccC",
+			   "YaccObj_BP", "YaccArc_BP", 
+			   "FCObj", "FCArc", "TemplH", NULL };
 
-    sa = cenv(TRUE);
+    sa = cenv(TRUE, rej);
     if (sa != NULL)
        {n = lst_length(sa);
 	for (i = 0; i < n; i++)
@@ -745,12 +753,8 @@ static void add_set_db(FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
 		    push_path(APPEND, epath, val);
 
 		else
-		   {if ((IS_NULL(val) == TRUE) ||
-			(strpbrk(val, " \t$[]{}|*\\") != NULL))
-		       {snprintf(s, LRG, "\"%s\"", val);
-			env_out(fsh, fcsh, fdk, fmd, var, s);}
-		    else
-		       env_out(fsh, fcsh, fdk, fmd, var, val);};};};
+		   {snprintf(s, LRG, "\"%s\"", val);
+		    env_out(fsh, fcsh, fdk, fmd, var, s);};};};
 
 	free_strings(sa);};
 
@@ -766,7 +770,7 @@ static void add_set_db(FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
 static void write_envf(int lnotice)
    {int i, n;
     char *t;
-    char *site[] = { "SYS_TYPE", "SYS_SITE", "DAS_ROOT", "DAI_ROOT" };
+    char *site[] = { "CONFIG_METHOD" };
     FILE *fcsh, *fsh, *fdk, *fmd;
 
     separator(Log);
@@ -803,12 +807,12 @@ static void write_envf(int lnotice)
  * NOTE: used the C Shell to expand and print unique environment variable settings
  * in Bourne Shell syntax in the past
  */
-    n = sizeof(site)/sizeof(char *);
-    for (i = 0; i < n; i++)
-        env_out(fsh, fcsh, fdk, fmd, site[i], dbget(NULL, TRUE, site[i]));
-
     if (st.db == NULL)
-       add_set_cfg(fcsh, fsh, fdk, fmd);
+       {n = sizeof(site)/sizeof(char *);
+	for (i = 0; i < n; i++)
+	    env_out(fsh, fcsh, fdk, fmd, site[i], dbget(NULL, TRUE, site[i]));
+
+	add_set_cfg(fcsh, fsh, fdk, fmd);}
     else
        add_set_db(fcsh, fsh, fdk, fmd);
 
@@ -1368,7 +1372,7 @@ static void setup_output_env(char *base)
     dbset(NULL, "NoExe",       st.exep ? "TRUE" : "FALSE");
     dbset(NULL, "ConfigVars",  st.cfgv);
     dbset(NULL, "DefGroups",   st.def_groups);
-    dbset(NULL, "ConfigFile",  st.cfgf);
+    dbset(NULL, "CONFIG_FILE", st.cfgf);
 
     dbset(NULL, "CCP",     st.rules.ccp);
     dbset(NULL, "CCObj",   st.rules.co);
@@ -1411,7 +1415,7 @@ static void default_var(char *base)
     csetenv("PATH", "%s:%s", st.dir.mng, cgetenv(TRUE, "PATH"));
 
 /* log the current environment */
-    sa = cenv(TRUE);
+    sa = cenv(TRUE, NULL);
     n  = lst_length(sa);
     for (i = 0; i < n; i++)
         note(Log, TRUE, "%s", sa[i]);
@@ -1514,7 +1518,7 @@ static void reset_make_vars(void)
     nstrncpy(st.def_tools, MAXLINE, cgetenv(FALSE, "Tools"), -1);
     nstrncpy(st.def_groups, MAXLINE, cgetenv(FALSE, "Groups"), -1);
 
-    ta = cenv(FALSE);
+    ta = cenv(FALSE, NULL);
     if (ta != NULL)
        {for (i = 0; ta[i] != NULL; i++)
 	    {nstrncpy(vr, LRG, ta[i], -1);
@@ -1834,7 +1838,7 @@ static void env_subst(char *refvar, char *nt)
 
     ot = cgetenv(FALSE, refvar);
     if (IS_NULL(ot) == FALSE)
-       {ta = cenv(FALSE);
+       {ta = cenv(FALSE, NULL);
 	if (ta != NULL)
 	   {nv = lst_length(ta);
 	    for (i = 0; i < nv; i++)
@@ -1850,7 +1854,7 @@ static void env_subst(char *refvar, char *nt)
 
 			 p = strstr(vl, ot);
 			 if (p != NULL)
-			    csetenv(vr, subst(vl, ot, nt, -1));};};};
+			    dbset(NULL, vr, subst(vl, ot, nt, -1));};};};
 
 	    free_strings(ta);};};
 
@@ -2461,7 +2465,7 @@ void denv(void)
    {int i, n;
     char **ta;
 
-    ta = cenv(TRUE);
+    ta = cenv(TRUE, NULL);
     if (ta != NULL)
        {n = lst_length(ta);
 	for (i = 0; i < n; i++)
@@ -2562,7 +2566,8 @@ int main(int c, char **v, char **env)
 		 if (havedb == TRUE)
 		    kill_perdb();
 		 return(1);};
-	     st.db = d;}
+	     st.db = d;
+	     dbset(NULL, "CONFIG_METHOD", "database");}
  
 /* this was handled in reset_env */
          else if (strcmp(v[i], "-env") == 0)
@@ -2579,6 +2584,11 @@ int main(int c, char **v, char **env)
 
                  case 'c':
                       st.create_dirs = TRUE;
+                      break;
+ 
+/* this was handled in launch_perdb */
+                 case 'f':
+		      i++;
                       break;
  
                  case 'F':
@@ -2621,7 +2631,8 @@ int main(int c, char **v, char **env)
                       break;};}
 
          else
-            nstrncpy(st.cfgf, MAXLINE, v[i], -1);};
+	    {nstrncpy(st.cfgf, MAXLINE, v[i], -1);
+	     dbset(NULL, "CONFIG_METHOD", "file");};};
 
     set_inst_base(ib);
 
@@ -2657,12 +2668,14 @@ int main(int c, char **v, char **env)
        {pco_load_db(st.db);
 
 /* order matters crucially here */
-        env_subst("InstBase", ib);
-        env_subst("SysDir",   st.dir.root);
-        env_subst("BaseDir",  base);
-        env_subst("System",   st.system);
+        env_subst("InstBase",      ib);
+        env_subst("SysDir",        st.dir.root);
+        env_subst("BaseDir",       base);
+        env_subst("System",        st.system);
+        env_subst("CONFIG_METHOD", "database");
 
 	snprintf(st.dir.cfg, MAXLINE, "cfg-%s", st.system);
+	nstrncpy(st.cfgf,    MAXLINE, cgetenv(FALSE, "CONFIG_FILE"), -1);
 
 /* reset the rules */
 	snprintf(st.rules.ccp, MAXLINE, "\t%s\n", cgetenv(FALSE, "CCP"));
