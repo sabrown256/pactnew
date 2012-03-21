@@ -47,6 +47,39 @@
 #define ERG       PA_gs.erg
 #define CC        PA_gs.cc
 
+#define PA_SET_INDEX_N_ENTRIES  2
+#define PA_SET_INDEX_S          PA_gs.snames[0]
+#define PA_SET_INDEX_P_S        PA_gs.snames[1]
+
+#define PA_INFO_TYPE_S          PA_gs.inames[PA_INFO_TYPE]
+#define PA_INFO_N_DIMS_S        PA_gs.inames[PA_INFO_N_DIMS]
+#define PA_INFO_DIMS_S          PA_gs.inames[PA_INFO_DIMS]
+#define PA_INFO_SCOPE_S         PA_gs.inames[PA_INFO_SCOPE]
+#define PA_INFO_CLASS_S         PA_gs.inames[PA_INFO_CLASS]
+#define PA_INFO_CENTER_S        PA_gs.inames[PA_INFO_CENTER]
+#define PA_INFO_PERSISTENCE_S   PA_gs.inames[PA_INFO_PERSISTENCE]
+#define PA_INFO_ALLOCATION_S    PA_gs.inames[PA_INFO_ALLOCATION]
+#define PA_INFO_FILE_NAME_S     PA_gs.inames[PA_INFO_FILE_NAME]
+#define PA_INFO_INIT_VAL_S      PA_gs.inames[PA_INFO_INIT_VAL]
+#define PA_INFO_INIT_FNC_S      PA_gs.inames[PA_INFO_INIT_FNC]
+#define PA_INFO_CONV_S          PA_gs.inames[PA_INFO_CONV]
+#define PA_INFO_UNIT_S          PA_gs.inames[PA_INFO_UNIT]
+#define PA_INFO_KEY_S           PA_gs.inames[PA_INFO_KEY]
+#define PA_INFO_ATTRIBUTE_S     PA_gs.inames[PA_INFO_ATTRIBUTE]
+#define PA_INFO_UNITS_S         PA_gs.inames[PA_INFO_UNITS]
+#define PA_INFO_DATA_PTR_S      PA_gs.inames[PA_INFO_DATA_PTR]
+#define PA_INFO_UNIT_NUMER_S    PA_gs.inames[PA_INFO_UNIT_NUMER]
+#define PA_INFO_UNIT_DENOM_S    PA_gs.inames[PA_INFO_UNIT_DENOM]
+#define PA_INFO_APPL_ATTR_S     PA_gs.inames[PA_INFO_APPL_ATTR]
+#define PA_INFO_DEFAULT_S       PA_gs.inames[PA_INFO_DEFAULT]
+#define PA_INFO_SHARE_S         PA_gs.inames[PA_INFO_SHARE]
+#define PA_INFO_ATT_NAME_S      PA_gs.inames[PA_INFO_ATT_NAME]
+#define PA_INFO_DIM_NAME_S      PA_gs.inames[PA_INFO_DIM_NAME]
+#define PA_INFO_UNITS_NAME_S    PA_gs.inames[PA_INFO_UNITS_NAME]
+#define PA_INFO_DOMAIN_NAME_S   PA_gs.inames[PA_INFO_DOMAIN_NAME]
+#define PA_INFO_MAP_DOMAIN_S    PA_gs.inames[PA_INFO_MAP_DOMAIN]
+#define PA_INFO_BUILD_DOMAIN_S  PA_gs.inames[PA_INFO_BUILD_DOMAIN]
+
 /*--------------------------------------------------------------------------*/
 
 /*
@@ -710,35 +743,36 @@ struct s_PA_tab_head
     long n_fields;};
 
 enum e_PA_info_tag
-   {LAST_TAG             = 0,
-    PA_INFO_TYPE         = -1,
-    PA_INFO_N_DIMS       = -2,
-    PA_INFO_DIMS         = -3,
-    PA_INFO_SCOPE        = -4,
-    PA_INFO_CLASS        = -5,
-    PA_INFO_CENTER       = -6,
-    PA_INFO_PERSISTENCE  = -7,
-    PA_INFO_ALLOCATION   = -8,
-    PA_INFO_FILE_NAME    = -9,
-    PA_INFO_INIT_VAL     = -10,
-    PA_INFO_INIT_FNC     = -11,
-    PA_INFO_CONV         = -12,
-    PA_INFO_UNIT         = -13,
-    PA_INFO_KEY          = -14,
-    PA_INFO_ATTRIBUTE    = -15,
-    PA_INFO_UNITS        = -16,
-    PA_INFO_DATA_PTR     = -17,
-    PA_INFO_UNIT_NUMER   = -18,
-    PA_INFO_UNIT_DENOM   = -19,
-    PA_INFO_APPL_ATTR    = -20,
-    PA_INFO_DEFAULT      = -21,
-    PA_INFO_SHARE        = -22,
-    PA_INFO_ATT_NAME     = -23,
-    PA_INFO_DIM_NAME     = -24,
-    PA_INFO_UNITS_NAME   = -25,
-    PA_INFO_DOMAIN_NAME  = -26,
-    PA_INFO_MAP_DOMAIN   = -27,
-    PA_INFO_BUILD_DOMAIN = -28};
+   {LAST_TAG = 0,
+    PA_INFO_TYPE,
+    PA_INFO_N_DIMS,
+    PA_INFO_DIMS,
+    PA_INFO_SCOPE,
+    PA_INFO_CLASS,
+    PA_INFO_CENTER,
+    PA_INFO_PERSISTENCE,
+    PA_INFO_ALLOCATION,
+    PA_INFO_FILE_NAME,
+    PA_INFO_INIT_VAL,
+    PA_INFO_INIT_FNC,
+    PA_INFO_CONV,
+    PA_INFO_UNIT,
+    PA_INFO_KEY,
+    PA_INFO_ATTRIBUTE,
+    PA_INFO_UNITS,
+    PA_INFO_DATA_PTR,
+    PA_INFO_UNIT_NUMER,
+    PA_INFO_UNIT_DENOM,
+    PA_INFO_APPL_ATTR,
+    PA_INFO_DEFAULT,
+    PA_INFO_SHARE,
+    PA_INFO_ATT_NAME,
+    PA_INFO_DIM_NAME,
+    PA_INFO_UNITS_NAME,
+    PA_INFO_DOMAIN_NAME,
+    PA_INFO_MAP_DOMAIN,
+    PA_INFO_BUILD_DOMAIN,
+    PA_INFO_N_ENTRIES};
 
 typedef enum e_PA_info_tag PA_info_tag;
 
@@ -806,37 +840,8 @@ struct s_PA_global_state
     char *edit_REQUEST;
     char *edit_OUT;
     char *unit;
-    char *PA_SET_INDEX_S;
-    char *PA_SET_INDEX_P_S;
-
-    char *PA_INFO_TYPE_S;
-    char *PA_INFO_N_DIMS_S;
-    char *PA_INFO_DIMS_S;
-    char *PA_INFO_SCOPE_S;
-    char *PA_INFO_CLASS_S;
-    char *PA_INFO_CENTER_S;
-    char *PA_INFO_PERSISTENCE_S;
-    char *PA_INFO_ALLOCATION_S;
-    char *PA_INFO_FILE_NAME_S;
-    char *PA_INFO_INIT_VAL_S;
-    char *PA_INFO_INIT_FNC_S;
-    char *PA_INFO_CONV_S;
-    char *PA_INFO_UNIT_S;
-    char *PA_INFO_KEY_S;
-    char *PA_INFO_ATTRIBUTE_S;
-    char *PA_INFO_UNITS_S;
-    char *PA_INFO_DATA_PTR_S;
-    char *PA_INFO_UNIT_NUMER_S;
-    char *PA_INFO_UNIT_DENOM_S;
-    char *PA_INFO_APPL_ATTR_S;
-    char *PA_INFO_DEFAULT_S;
-    char *PA_INFO_SHARE_S;
-    char *PA_INFO_ATT_NAME_S;
-    char *PA_INFO_DIM_NAME_S;
-    char *PA_INFO_UNITS_NAME_S;
-    char *PA_INFO_DOMAIN_NAME_S;
-    char *PA_INFO_MAP_DOMAIN_S;
-    char *PA_INFO_BUILD_DOMAIN_S;
+    char *inames[PA_INFO_N_ENTRIES];
+    char *snames[PA_SET_INDEX_N_ENTRIES];
     char *cpp_info;
     char *cpp_allocation;
     char *cpp_scope;
@@ -886,38 +891,6 @@ extern "C" {
 
 extern PA_global_state
  PA_gs;
-
-extern char
- *PA_SET_INDEX_S,
- *PA_SET_INDEX_P_S,
- *PA_INFO_TYPE_S,
- *PA_INFO_N_DIMS_S,
- *PA_INFO_DIMS_S,
- *PA_INFO_SCOPE_S,
- *PA_INFO_CLASS_S,
- *PA_INFO_CENTER_S,
- *PA_INFO_PERSISTENCE_S,
- *PA_INFO_ALLOCATION_S,
- *PA_INFO_FILE_NAME_S,
- *PA_INFO_INIT_VAL_S,
- *PA_INFO_INIT_FNC_S,
- *PA_INFO_CONV_S,
- *PA_INFO_UNIT_S,
- *PA_INFO_KEY_S,
- *PA_INFO_ATTRIBUTE_S,
- *PA_INFO_UNITS_S,
- *PA_INFO_DATA_PTR_S,
- *PA_INFO_UNIT_NUMER_S,
- *PA_INFO_UNIT_DENOM_S,
- *PA_INFO_APPL_ATTR_S,
- *PA_INFO_DEFAULT_S,
- *PA_INFO_SHARE_S,
- *PA_INFO_ATT_NAME_S,
- *PA_INFO_DIM_NAME_S,
- *PA_INFO_UNITS_NAME_S,
- *PA_INFO_DOMAIN_NAME_S,
- *PA_INFO_MAP_DOMAIN_S,
- *PA_INFO_BUILD_DOMAIN_S;
 
 /*--------------------------------------------------------------------------*/
 
