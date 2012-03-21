@@ -26,8 +26,18 @@ void PM_physical_constants_cgs(void)
    {
 
 /* fundamental numerical constants */
+
+/* Pi */
     PM_c.pi = acosl(-1.0);
-/*    PM_c.e  = expl(1.0); */
+
+/* e */
+    PM_c.e  = expl(1.0);
+
+/* golden ratio */
+    PM_c.f  = 1.618033988749894848207210029666925L;
+
+/* Euler-Mascheroni constant - gamma */
+    PM_c.g  = 0.5772156649015328606163073577040024L;
 
 /* fundamental physical constants */
     PM_c.alpha   = 7.297352569824e-03; /* fine structure constant e^2/HbarC */
