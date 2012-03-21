@@ -13,23 +13,10 @@
 #define PCK_PML
 
 #include "score.h"
-
-/* C++ programs will have to explicitly include mlcplx.h if they
- * want a complex type and don't have it
- */
-
-#ifndef __cplusplus
+#include "scope_constants.h"
 #include "scope_complex.h"
-#endif
 
-#undef PI
-#define PI        3.1415926535897931
-
-#define RAD_DEG  57.295779513082323
-#define DEG_RAD   0.017453292519943295
-
-#define TOLERANCE 1.0e-10
-
+#define TOLERANCE             1.0e-10
 #define PM_SPACEDM            3         /* maximum spatial dimension */
 
 #ifndef HYPOT

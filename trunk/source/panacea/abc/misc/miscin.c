@@ -259,7 +259,7 @@ static int c_properties(material *mat, int m)
     double conv;
     component *cmp;
 
-    conv = kBoltz/PA_gs.convrsns[K];
+    conv = PM_c.kboltz/PA_gs.convrsns[K];
 
     rhl = mat->rho;
     al  = mat->a;
@@ -293,12 +293,12 @@ static int c_properties(material *mat, int m)
     else
        {if (al == 0.0)
            {if ((rhl != 0.0) && (nil != 0.0))
-               al = rhl*N0/nil;};
+               al = rhl*PM_c.n0/nil;};
         if (zl == 0.0)
            {if ((nil != 0.0) && (nel != 0.0))
                zl = nil/nel;
             else if ((rhl != 0.0) && (nel != 0.0))
-               zl = rhl*N0/(al*nel);};
+               zl = rhl*PM_c.n0/(al*nel);};
         PA_ERR(((al == 0.0) || (zl == 0.0)),
              "MUST HAVE Ab, Zb, or COMPOSITION - C_PROPERTIES\n");};
 
@@ -310,8 +310,8 @@ static int c_properties(material *mat, int m)
         if (rhl == 0.0)
            nil = nel/zl;
         else            
-           nil = rhl*N0/al;};
-    rhl = al*nil/N0 + nel*M_e;
+           nil = rhl*PM_c.n0/al;};
+    rhl = al*nil/PM_c.n0 + nel*PM_c.m_e;
 
 /* now iff sufficient information compute: p = nkT */
     if ((til != 0.0) && (nil != 0.0))

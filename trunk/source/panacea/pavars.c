@@ -10,35 +10,6 @@
  
 #include "panacea_int.h"
 
-/* physical constants */
-
-double
- alpha,              /* fine structure constant e^2/HbarC  - 7.297353080e-3 */
- c,                              /* speed of light (cm/sec) - 2.99792458e10 */
- Coulomb,                /* Coulomb in fundamental charges - 6.241506363e18 */
- e,                              /* electron charge in esu - 4.80320680e-10 */
- eV_erg,                                      /* eV to erg - 1.60217733e-12 */
- Gn,       /* Newtonian gravitational constant (cm^3/g-sec^2) - 6.673231e-8 */
- Hbar,                                  /* Hbar in erg-sec - 1.05457267e-27 */
- HbarC,                                  /* Hbar*C in eV-cm - 1.97327054e-5 */
- kBoltz,                     /* Boltzman constant in (erg/K) - 1.380658e-16 */
- K_eV,                                        /* Kelvin to eV 8.6173856e-05 */
- M_a,                            /* atomic mass unit in g - 1.660540210e-24 */
- M_e,                               /* electron mass in g - 9.109389754e-28 */
- M_e_eV,                              /* electron mass in eV - 5.10999065e5 */
- N0,                                   /* Avagadro's number - 6.02213665e23 */
- Ryd;                           /* (M_e*c^2*alpha^2)/2 in eV - 13.605698140 */
-
-/* useful conversion constants */
-
-double
- icm_g,                                /* inverse cm to g  - 3.51767578e-38 */
- g_icm,                                 /* g to inverse cm  - 2.84278615e37 */
- icm_eV,                                       /* inverse cm to eV  - HbarC */
- eV_icm,                                 /* eV toinverse cm  - 5.06772882e4 */
- icm_erg,                            /* inverse cm to erg  - 3.16152932e-17 */
- erg_icm;                             /* erg to inverse cm  - 3.16302617e16 */
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -529,8 +500,9 @@ void PA_set_conversions(int flag)
 /*--------------------------------------------------------------------------*/
 
 /* PA_PHYSICAL_CONSTANTS_INT - set up the physical constants in the internal
- *                            - system of units as defined by the unit array
- *                            - e.g. length_internal = length_cgs*unit[CM]
+ *                           - system of units as defined
+ *                           - by the PA_gs.units array
+ *                           - e.g. length_internal = length_cgs*unit[CM]
  */
 
 void PA_physical_constants_int(void)
@@ -538,17 +510,38 @@ void PA_physical_constants_int(void)
 
     PA_physical_constants_cgs();
 
-    Hbar    *= (PA_gs.units[ERG]*PA_gs.units[SEC]);         /* Hbar in erg-sec */
-    HbarC   *= (PA_gs.units[EV]*PA_gs.units[CM]);           /* Hbar*C in eV-cm */
-    eV_erg  *= (PA_gs.units[ERG]/PA_gs.units[EV]);                /* eV to erg */
-    N0      *= PA_gs.units[MOLE];                         /* Avagadro's number */
-    c       *= (PA_gs.units[CM]/PA_gs.units[SEC]);  /* speed of light (cm/sec) */
-    M_e_eV  *= PA_gs.units[EV];                         /* electron mass in eV */
-    M_e     *= PA_gs.units[G];                           /* electron mass in g */
-    M_a     *= PA_gs.units[G];                 /* atomic mass PA_gs.units in g */
-    kBoltz  *= (PA_gs.units[ERG]/PA_gs.units[K]); /* Boltzman constant (erg/K) */
-    e       *= PA_gs.units[Q];                       /* electron charge in esu */
-    Ryd     *= PA_gs.units[EV];                               /* Rydberg in eV */
+/* Hbar in erg-sec */
+    PM_c.hbar    *= (PA_gs.units[ERG]*PA_gs.units[SEC]);
+
+/* Hbar*C in eV-cm */
+    PM_c.hbarc   *= (PA_gs.units[EV]*PA_gs.units[CM]);
+
+/* eV to erg */
+    PM_c.ev_erg  *= (PA_gs.units[ERG]/PA_gs.units[EV]);
+
+/* Avagadro's number */
+    PM_c.n0      *= PA_gs.units[MOLE];
+
+/* speed of light (cm/sec) */
+    PM_c.c       *= (PA_gs.units[CM]/PA_gs.units[SEC]);
+
+/* electron mass in eV */
+    PM_c.m_e_ev  *= PA_gs.units[EV];
+
+/* electron mass in g */
+    PM_c.m_e     *= PA_gs.units[G];
+
+/* atomic mass PA_gs.units in g */
+    PM_c.m_a     *= PA_gs.units[G];
+
+/* Boltzman constant (erg/K) */
+    PM_c.kboltz  *= (PA_gs.units[ERG]/PA_gs.units[K]);
+
+/* electron charge in esu */
+    PM_c.qe      *= PA_gs.units[Q];
+
+/* Rydberg in eV */
+    PM_c.ryd     *= PA_gs.units[EV];
 
     return;}
 
@@ -556,9 +549,9 @@ void PA_physical_constants_int(void)
 /*--------------------------------------------------------------------------*/
 
 /* PA_PHYSICAL_CONSTANTS_EXT - set up the physical constants in the external
- *                            - system of PA_gs.unitss as defined by the PA_gs.convrsns
- *                            - array
- *                            - e.g. length_external = length_cgs*PA_gs.convrsns[CM]
+ *                           - system of units as defined
+ *                           - by the PA_gs.convrsns array
+ *                           - e.g. length_external = length_cgs*convrsns[CM]
  */
 
 void PA_physical_constants_ext(void)
@@ -566,17 +559,38 @@ void PA_physical_constants_ext(void)
 
     PA_physical_constants_cgs();
 
-    Hbar    *= (PA_gs.convrsns[ERG]*PA_gs.convrsns[SEC]);         /* Hbar in erg-sec */
-    HbarC   *= (PA_gs.convrsns[EV]*PA_gs.convrsns[CM]);           /* Hbar*C in eV-cm */
-    eV_erg  *= (PA_gs.convrsns[ERG]/PA_gs.convrsns[EV]);                /* eV to erg */
-    N0      *= PA_gs.convrsns[MOLE];                            /* Avagadro's number */
-    c       *= (PA_gs.convrsns[CM]/PA_gs.convrsns[SEC]);  /* speed of light (cm/sec) */
-    M_e_eV  *= PA_gs.convrsns[EV];                            /* electron mass in eV */
-    M_e     *= PA_gs.convrsns[G];                              /* electron mass in g */
-    M_a     *= PA_gs.convrsns[G];                    /* atomic mass PA_gs.units in g */
-    kBoltz  *= (PA_gs.convrsns[ERG]/PA_gs.convrsns[K]); /* Boltzman constant (erg/K) */
-    e       *= PA_gs.convrsns[Q];                          /* electron charge in esu */
-    Ryd     *= PA_gs.convrsns[EV];                                  /* Rydberg in eV */
+/* Hbar in erg-sec */
+    PM_c.hbar    *= (PA_gs.convrsns[ERG]*PA_gs.convrsns[SEC]);
+
+/* Hbar*C in eV-cm */
+    PM_c.hbarc   *= (PA_gs.convrsns[EV]*PA_gs.convrsns[CM]);
+
+/* eV to erg */
+    PM_c.ev_erg  *= (PA_gs.convrsns[ERG]/PA_gs.convrsns[EV]);
+
+/* Avagadro's number */
+    PM_c.n0      *= PA_gs.convrsns[MOLE];
+
+/* speed of light (cm/sec) */
+    PM_c.c       *= (PA_gs.convrsns[CM]/PA_gs.convrsns[SEC]);
+
+/* electron mass in eV */
+    PM_c.m_e_ev  *= PA_gs.convrsns[EV];
+
+/* electron mass in g */
+    PM_c.m_e     *= PA_gs.convrsns[G];
+
+/* atomic mass PA_gs.units in g */
+    PM_c.m_a     *= PA_gs.convrsns[G];
+
+/* Boltzman constant (erg/K) */
+    PM_c.kboltz  *= (PA_gs.convrsns[ERG]/PA_gs.convrsns[K]);
+
+/* electron charge in esu */
+    PM_c.qe      *= PA_gs.convrsns[Q];
+
+/* Rydberg in eV */
+    PM_c.ryd     *= PA_gs.convrsns[EV];
 
     return;}
 
@@ -590,33 +604,9 @@ void PA_physical_constants_ext(void)
  */
 
 void PA_physical_constants_cgs(void)
+   {
 
-/* fundamental constants */
-   {c       = 2.997924580e+10;                   /* speed of light (cm/sec) */
-    Hbar    = 1.054572670e-27;                           /* Hbar in erg-sec */
-    alpha   = 7.297353020e-03;         /* fine structure constant e^2/HbarC */
-    N0      = 6.022136650e+23;                         /* Avagadro's number */
-    M_e     = 9.109389754e-28;                        /* electron mass in g */
-    kBoltz  = 1.380658000e-16;                 /* Boltzman constant (erg/K) */
-    Gn      = 6.673232000e-08;     /* gravitational constant (cm^3/g-sec^2) */
-    Coulomb = 6.241506363e+18;           /* fundamental charges per Coulomb */
-
-/* useful constants */
-    eV_erg  = 1.0e7/Coulomb;                                   /* eV to erg */
-    K_eV    = kBoltz/eV_erg;                                     /* K to eV */
-    HbarC   = Hbar*c/eV_erg;                             /* Hbar*C in eV-cm */
-    e       = sqrt(alpha*Hbar*c);                 /* electron charge in esu */
-    M_a     = 1.0/N0;                              /* atomic mass unit in g */
-    M_e_eV  = M_e*c*c/eV_erg;                        /* electron mass in eV */
-    Ryd     = 0.5*M_e*c*c*alpha*alpha/eV_erg;              /* Rydberg in eV */
-
-/* useful conversion factors */
-    icm_g   = Hbar/c,                                    /* inverse cm to g */
-    g_icm   = 1.0/icm_g;                                 /* g to inverse cm */
-    icm_eV  = Hbar*c/eV_erg,                            /* inverse cm to eV */
-    eV_icm  = 1.0/icm_eV,                               /* eV to inverse cm */
-    icm_erg = Hbar*c,                                  /* inverse cm to erg */
-    erg_icm = 1.0/icm_erg;                             /* erg to inverse cm */
+    PM_physical_constants_cgs();
 
     return;}
 

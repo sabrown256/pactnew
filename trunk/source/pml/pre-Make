@@ -73,12 +73,12 @@ targets :
 #
 # Headers Files
 #
-Hdrs = pml.h pml_int.h scope_complex.h scope_quaternion.h
+Hdrs = pml.h pml_int.h scope_constants.h scope_complex.h scope_quaternion.h
 
 #
 # Object Files
 #
-Objs = mlmath.o mlsrch.o mlrand.o mlnls.o mlmatr.o                \
+Objs = mlconst.o mlmath.o mlsrch.o mlrand.o mlnls.o mlmatr.o      \
        mlrfnc.o mlcfnc.o mlsfnc.o mlqfnc.o                        \
        mlsolv.o mlsvd.o mlvnd.o mleigen.o                         \
        mlcg.o mliccg.o mlicgs.o                                   \
@@ -87,12 +87,13 @@ Objs = mlmath.o mlsrch.o mlrand.o mlnls.o mlmatr.o                \
        mlchksm.o mlmesh.o mlmsrch.o mlcmsh.o mlmextr.o            \
        mlvect.o mlsmp.o 
 
-ArObjs = ${TGTLib}(mlmath.o)  ${TGTLib}(mlsrch.o)  ${TGTLib}(mlfft.o)   \
+ArObjs = ${TGTLib}(mlconst.o) ${TGTLib}(mlmath.o)                       \
+         ${TGTLib}(mlrfnc.o)  ${TGTLib}(mlcfnc.o)                       \
+         ${TGTLib}(mlqfnc.o)  ${TGTLib}(mlsfnc.o)                       \
          ${TGTLib}(mlmatr.o)  ${TGTLib}(mlsort.o)  ${TGTLib}(mlnls.o)   \
-         ${TGTLib}(mlrfnc.o)  ${TGTLib}(mlcfnc.o)  ${TGTLib}(mlsfnc.o)  \
-         ${TGTLib}(mlqfnc.o)  ${TGTLib}(mleigen.o)                      \
          ${TGTLib}(mlsolv.o)  ${TGTLib}(mlsvd.o)   ${TGTLib}(mlvnd.o)   \
          ${TGTLib}(mlcg.o)    ${TGTLib}(mliccg.o)  ${TGTLib}(mlicgs.o)  \
+         ${TGTLib}(mleigen.o) ${TGTLib}(mlsrch.o)  ${TGTLib}(mlfft.o)   \
          ${TGTLib}(mlintm.o)  ${TGTLib}(mlintp.o)  ${TGTLib}(mlints.o)  \
          ${TGTLib}(mllsq.o)   ${TGTLib}(mlfpe.o)   ${TGTLib}(mloper.o)  \
 	 ${TGTLib}(mlgeom.o)  ${TGTLib}(mlrand.o)  ${TGTLib}(mlmm.o)    \

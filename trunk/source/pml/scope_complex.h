@@ -12,6 +12,10 @@
 
 #define PCK_COMPLEX
 
+/* protect C++ programs from C99 complex which are incompatible */
+
+#ifndef __cplusplus
+
 #include "score.h"
 
 /*--------------------------------------------------------------------------*/
@@ -169,4 +173,5 @@ extern int
 
 #endif
 
+#endif
 

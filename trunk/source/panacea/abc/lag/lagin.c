@@ -756,7 +756,7 @@ int init_cycle(void)
    {int j;
 
     for (j = frz; j <= lrz; j++)
-        p[j] = PARAM[8]*kBoltz*n[j]*tm[j];
+        p[j] = PARAM[8]*PM_c.kboltz*n[j]*tm[j];
 
     for (j = 0; j < N_zones; j++)
         {rpdv[j]  = 0.0;
