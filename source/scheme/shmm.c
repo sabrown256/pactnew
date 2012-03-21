@@ -18,28 +18,6 @@ struct s_obj_map
     int nref;
     object *p;};
 
-int
- SS_OBJECT_I      = 123,
- SS_PROCEDURE_I   = 124,
- SS_CONS_I        = 124,
- SS_VARIABLE_I    = 125,
- SS_INPUT_PORT_I  = 128,
- SS_OUTPUT_PORT_I = 129,
- SS_EOF_I         = 130,
- SS_NULL_I        = 131,
- SS_VECTOR_I      = 132,
- SS_CHARACTER_I   = 133,
- SS_ERROR_I       = 140;
-
-#ifdef LARGE
-
-int
- SS_HAELEM_I      = 134,
- SS_HASHARR_I     = 135,
- SS_PROCESS_I     = 136;
-
-#endif
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 

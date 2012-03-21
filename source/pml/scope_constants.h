@@ -12,17 +12,27 @@
 
 #define PCK_CONSTANTS
 
-#undef PI
-#define PI          3.141592653589793238462643383279502884
-
-#define RAD_DEG    57.29577951308232087665461840231274
-#define DEG_RAD     0.01745329251994329576913914624236579
-
 /*--------------------------------------------------------------------------*/
 
 /*                          PROCEDURAL MACROS                               */
 
 /*--------------------------------------------------------------------------*/
+
+#undef PI
+#define PI        PM_c.pi
+
+#define RAD_DEG   PM_c.rad_deg
+#define DEG_RAD   PM_c.deg_rad
+
+#define Czero     PM_c.zero.c
+#define Cone      PM_c.one.c
+#define CPHUGE    PM_c.hugep.c
+#define CMHUGE    PM_c.hugem.c
+
+#define Qzero     PM_c.zero.q
+#define Qone      PM_c.one.q
+#define QPHUGE    PM_c.hugep.q
+#define QMHUGE    PM_c.hugem.q
 
 /*--------------------------------------------------------------------------*/
 
@@ -31,15 +41,34 @@
 /*--------------------------------------------------------------------------*/
     
 
+typedef struct s_multi_number multi_number;
 typedef struct s_PM_constants PM_constants;
 
+/* use multi_number to contain representation of a value in several forms */
+
+struct s_multi_number
+   {float f;
+    double d;
+    long double l;
+    complex c;
+    quaternion q;};
+
 struct s_PM_constants
+   {multi_number zero;
+    multi_number smallp;
+    multi_number smallm;
+    multi_number one;
+    multi_number hugep;
+    multi_number hugem;
 
 /* fundamental numerical constants */
-   {long double pi;                  /* ratio of circumference to diameter */
+    long double pi;                  /* ratio of circumference to diameter */
     long double e;                                     /* natural log base */
     long double f;                                         /* golden ratio */
     long double g;                            /* Euler-Mascheroni constant */
+
+    long double rad_deg;
+    long double deg_rad;
 
 /* fundamental physical constants */
     double alpha;                     /* fine structure constant e^2/hbarc */

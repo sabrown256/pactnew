@@ -13,28 +13,12 @@
 
 #define SS_PRINT_ERR_MSG (*_SS.pr_err)
 
-char
- *SS_OBJECT_S,
- *SS_POBJECT_S;
-
-object
- *SS_anon_proc,
- *SS_anon_macro,
- *SS_block_proc,
- *SS_scheme_symtab,
- *SS_quoteproc,
- *SS_quasiproc,
- *SS_unqproc,
- *SS_unqspproc,
- *SS_setproc,
- *SS_null,
- *SS_eof,
- *SS_t,
- *SS_f,
- *SS_else;
-
 SS_state
  _SS = { -1, 1, -1, 1, };
+
+SS_global_state
+ SS_gs = { { 123, 124, 124, 125, 128, 129, 130,
+             131, 132, 133, 140, 134, 135, 136 }, };
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
