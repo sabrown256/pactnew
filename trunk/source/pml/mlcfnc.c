@@ -58,12 +58,6 @@
      d     = 1.0/(br*brovu + bi*biovu);                                     \
      _rc   = PM_COMPLEX(d*(ar*brovu + ai*biovu), d*(ai*brovu - ar*biovu));}
 
-static complex
- CPHUGE = HUGE,
- CMHUGE = -HUGE,
- Cone   = 1.0,
- Czero  = 0.0;
-
 /* the implementation here has superior accuracy to
  * several vendor libraries - so the no-brainer is
  * to continue to use these

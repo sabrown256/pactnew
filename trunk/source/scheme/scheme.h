@@ -35,318 +35,46 @@
 
 /*--------------------------------------------------------------------------*/
 
-/*                           STRUCTs and TYPEDEFs                           */
-
-/*--------------------------------------------------------------------------*/
-
-/* SCHEME level special form definers */
-
-enum e_SS_form
-   {SS_MACRO_EV,          /* define-ue */
-    SS_MACRO,             /* define-macro */
-    SS_ESC_PROC,
-    SS_BEGIN,
-
-/* C level special form definers */
-    SS_EE_MACRO,          /* apply */
-    SS_UE_MACRO,          /* let, let* */
-    SS_UR_MACRO,          /* defined?, err-catch, ... */
-    SS_DEFINE,            /* define */
-
-    SS_SET,
-    SS_COND,
-    SS_IF,
-    SS_AND,
-    SS_OR,
-    SS_PROC,
-    SS_PR_PROC};
-
-typedef enum e_SS_form SS_form;
-
-enum e_SS_eval_mode
-   {NO_EV,
-    SELF_EV,
-    VAR_EV,
-    PROC_EV};
-
-typedef enum e_SS_eval_mode SS_eval_mode;
-
-enum e_SS_io_logging
-   {STDIN_ONLY,
-    ALL,
-    NO_LOG};
-
-typedef enum e_SS_io_logging SS_io_logging;
-
-
-/* Generic object definition */
-
-typedef struct s_SS_input_port input_port;
-typedef struct s_SS_output_port output_port;
-typedef struct s_SS_cons cons;
-typedef struct s_SS_variable variable;
-typedef struct s_SS_boolean SS_boolean;
-typedef struct s_SS_string string;
-typedef struct s_SS_continuation continuation;
-typedef struct s_SS_err_continuation err_continuation;
-typedef struct s_SS_esc_proc Esc_procedure;
-typedef struct s_SS_C_proc C_procedure;
-typedef struct s_SS_S_proc S_procedure;
-typedef struct s_SS_proc procedure;
-typedef struct s_SS_vect vector;
-typedef struct s_SS_psides SS_psides;
-typedef struct s_object object;
-
-struct s_object
-   {char *print_name;            /* specific members */
-    void *val;
-
-    SS_eval_mode eval_type;      /* generic members */
-    void (*print)(SS_psides *si, object *obj, object *strm);
-    void (*release)(SS_psides *si, object *obj);};
-
-FUNCTION_POINTER(object, (*PFObject));
-FUNCTION_POINTER(object, *(*PFPObject));
-
-typedef int (*PFPrChIn)(object *str, int ign_ws);
-typedef void (*PFPrintErrMsg)(SS_psides *si, FILE *str, char *s, object *obj);
-typedef object *(*PFPHand)(SS_psides *si, C_procedure *cp, object *argl);
-typedef object *(*PFPOprs)(SS_psides *si);
-
-#define SS_DEFINE_OBJECT(_si)                                               \
-   {defstr *dp;                                                             \
-    dp = PD_defstr(file, "object",                                          \
-                   "char *print_name",                                      \
-                   "char *val",                                             \
-                   "int eval_type",                                         \
-                   "function print",                                        \
-                   "function release",                                      \
-                   LAST);                                                   \
-    if (dp == NULL)                                                         \
-       SS_error(_si, "COULDN'T DEFINE OBJECT TO FILE - SS_DEFINE_OBJECT", \
-                SS_null);}
-
-struct s_SS_psides
-   {int interactive;
-    int trace_env;
-    int know_env;
-    int trap_error;
-    int lines_page;
-    int print_flag;
-    int stat_flag;
-    int bracket_flag;
-    int nsave;
-    int nrestore;
-    int nsetc;
-    int ngoc;
-    int stack_size;
-    int stack_mask;
-    int cont_ptr;
-    int err_cont_ptr;
-    int errlev;
-    int eox;
-    int strict_c;
-
-    char prompt[MAXLINE];
-    char ans_prompt[MAXLINE];
-    char *lex_text;
-
-    continuation *continue_int;
-    err_continuation *continue_err;
-
-    SC_array *stack;
-
-    hasharr *symtab;
-    hasharr *types;
-
-    SS_io_logging hist_flag;
-
-    object *indev;
-    object *outdev;
-    object *histdev;
-    object *this;
-    object *val;
-    object *unev;
-    object *exn;
-    object *argl;
-    object *fun;
-    object *env;
-    object *global_env;
-    object *err_state;
-    object **err_stack;
-    object *rdobj;
-    object *evobj;
-    object *character_stream;
-
-    int (*pr_gets)(SS_psides *si, object *fp);
-    int (*post_print)(SS_psides *si);
-    void (*post_read)(SS_psides *si, object *fp);
-    void (*post_eval)(SS_psides *si, object *fp);
-    void (*name_reproc)(SS_psides *si, char *s, char *name);
-    void (*get_arg)(SS_psides *si, object *obj, void *v, int type);
-    object *(*read)(SS_psides *si, object *fp);
-    object *(*call_arg)(SS_psides *si, int type, void *v);
-
-    void (*pr_ch_out)(int c, object *fp);
-    void (*pr_ch_un)(int c, object *fp);
-
-    JMP_BUF cpu;};
-
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-struct s_SS_input_port
-   {char *name;
-    int iln;                       /* current line number in file */
-    int ichr;                      /* 1 based char index in current line */
-    FILE *str;
-    char buffer[MAX_BFSZ];
-    char *ptr;};
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-struct s_SS_output_port
-   {char *name;
-    FILE *str;};
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-struct s_SS_cons
-   {object *car;
-    object *cdr;};
-
-#define SS_DEFINE_CONS \
-    PD_defstr(file, "cons", \
-              "object *car", \
-              "object *cdr", \
-              LAST)
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-struct s_SS_variable
-   {char *name;
-    object *value;};
-
-#define SS_DEFINE_VARIABLE        \
-    PD_defstr(file, "variable",   \
-              "char *name",       \
-              "object *value",    \
-              LAST)
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-struct s_SS_boolean
-   {char *name;
-    int value;};
-
-#define SS_DEFINE_BOOLEAN         \
-    PD_defstr(file, "boolean",    \
-              "char *name",       \
-              "int value",        \
-              LAST)
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-struct s_SS_string
-   {int length;
-    char *string;};
-
-#define SS_DEFINE_STRING          \
-    PD_defstr(file, "string",     \
-              "int length",       \
-              "char *string",     \
-              LAST)
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-struct s_SS_continuation
-   {object *signal;
-    JMP_BUF cont;};
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-struct s_SS_err_continuation
-   {int stack_ptr;
-    int cont_ptr;
-    object *signal;
-    JMP_BUF cont;};
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* ESCAPE PROCEDURE - used to implement call-with-current-continuation */
-
-struct s_SS_esc_proc
-   {int cont;
-    int stck;
-    int err;
-    int type;};
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/*  C PROCEDURE - primitive procedure or special form (written in C) */
-
-struct s_SS_C_proc
-   {int n;
-    PFVoid *proc;
-    PFPHand handler;};
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* COMPOUND PROCEDURE - Scheme level procedure (written in Scheme) */
-
-struct s_SS_S_proc
-   {SS_form type;
-    object *name;
-    object *lambda;
-    object *env;};
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-struct s_SS_proc
-   {SS_form type;
-    char *name;
-    char *doc;
-    short int trace;
-    object *proc;};
-
-/*--------------------------------------------------------------------------*/
-
-#ifdef LARGE
-
-/*--------------------------------------------------------------------------*/
-
-/*  Vector definition */
-struct s_SS_vect
-   {int length;
-    object **vect;};
-
-#define SS_DEFINE_VECTOR         \
-    PD_defstr(file, "vector",    \
-              "int length",      \
-              "object **vect",   \
-              LAST)
-
-/*--------------------------------------------------------------------------*/
-
-#endif
-
-/*--------------------------------------------------------------------------*/
-
 /*                            PROCEDURAL MACROS                             */
 
 /*--------------------------------------------------------------------------*/
+
+
+#define SS_anon_proc       SS_gs.objs[0]
+#define SS_anon_macro      SS_gs.objs[1]
+#define SS_block_proc      SS_gs.objs[2]
+#define SS_scheme_symtab   SS_gs.objs[3]
+#define SS_quoteproc       SS_gs.objs[4]
+#define SS_quasiproc       SS_gs.objs[5]
+#define SS_unqproc         SS_gs.objs[6]
+#define SS_unqspproc       SS_gs.objs[7]
+#define SS_setproc         SS_gs.objs[8]
+#define SS_null            SS_gs.objs[9]
+#define SS_eof             SS_gs.objs[10]
+#define SS_t               SS_gs.objs[11]
+#define SS_f               SS_gs.objs[12]
+#define SS_else            SS_gs.objs[13]
+#define SS_N_SPECIAL       14
+
+#define SS_OBJECT_S        SS_gs.tnames[0]
+#define SS_POBJECT_S       SS_gs.tnames[1]
+
+#define SS_OBJECT_I        SS_gs.tind[0]
+#define SS_PROCEDURE_I     SS_gs.tind[1]
+#define SS_CONS_I          SS_gs.tind[2]
+#define SS_VARIABLE_I      SS_gs.tind[3]
+#define SS_INPUT_PORT_I    SS_gs.tind[4]
+#define SS_OUTPUT_PORT_I   SS_gs.tind[5]
+#define SS_EOF_I           SS_gs.tind[6]
+#define SS_NULL_I          SS_gs.tind[7]
+#define SS_VECTOR_I        SS_gs.tind[8]
+#define SS_CHARACTER_I     SS_gs.tind[9]
+#define SS_ERROR_I         SS_gs.tind[10]
+#define SS_HAELEM_I        SS_gs.tind[11]
+#define SS_HASHARR_I       SS_gs.tind[12]
+#define SS_PROCESS_I       SS_gs.tind[13]
+#define SS_N_TYPES         14
+
 
 #define SS_GET(_t, _o)          ((_t *) SS_OBJECT(_o))
 #define SS_PP(_f, _memb)        ((procedure *) SS_OBJECT(_f))->_memb
@@ -812,51 +540,327 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
+/*                           STRUCTS AND TYPEDEFS                           */
+
+/*--------------------------------------------------------------------------*/
+
+/* SCHEME level special form definers */
+
+enum e_SS_form
+   {SS_MACRO_EV,          /* define-ue */
+    SS_MACRO,             /* define-macro */
+    SS_ESC_PROC,
+    SS_BEGIN,
+
+/* C level special form definers */
+    SS_EE_MACRO,          /* apply */
+    SS_UE_MACRO,          /* let, let* */
+    SS_UR_MACRO,          /* defined?, err-catch, ... */
+    SS_DEFINE,            /* define */
+
+    SS_SET,
+    SS_COND,
+    SS_IF,
+    SS_AND,
+    SS_OR,
+    SS_PROC,
+    SS_PR_PROC};
+
+typedef enum e_SS_form SS_form;
+
+enum e_SS_eval_mode
+   {NO_EV,
+    SELF_EV,
+    VAR_EV,
+    PROC_EV};
+
+typedef enum e_SS_eval_mode SS_eval_mode;
+
+enum e_SS_io_logging
+   {STDIN_ONLY,
+    ALL,
+    NO_LOG};
+
+typedef enum e_SS_io_logging SS_io_logging;
+
+
+/* Generic object definition */
+
+typedef struct s_SS_input_port input_port;
+typedef struct s_SS_output_port output_port;
+typedef struct s_SS_cons cons;
+typedef struct s_SS_variable variable;
+typedef struct s_SS_boolean SS_boolean;
+typedef struct s_SS_string string;
+typedef struct s_SS_continuation continuation;
+typedef struct s_SS_err_continuation err_continuation;
+typedef struct s_SS_esc_proc Esc_procedure;
+typedef struct s_SS_C_proc C_procedure;
+typedef struct s_SS_S_proc S_procedure;
+typedef struct s_SS_proc procedure;
+typedef struct s_SS_vect vector;
+typedef struct s_SS_psides SS_psides;
+typedef struct s_SS_global_state SS_global_state;
+typedef struct s_object object;
+
+struct s_object
+   {char *print_name;            /* specific members */
+    void *val;
+
+    SS_eval_mode eval_type;      /* generic members */
+    void (*print)(SS_psides *si, object *obj, object *strm);
+    void (*release)(SS_psides *si, object *obj);};
+
+FUNCTION_POINTER(object, (*PFObject));
+FUNCTION_POINTER(object, *(*PFPObject));
+
+typedef int (*PFPrChIn)(object *str, int ign_ws);
+typedef void (*PFPrintErrMsg)(SS_psides *si, FILE *str, char *s, object *obj);
+typedef object *(*PFPHand)(SS_psides *si, C_procedure *cp, object *argl);
+typedef object *(*PFPOprs)(SS_psides *si);
+
+#define SS_DEFINE_OBJECT(_si)                                               \
+   {defstr *dp;                                                             \
+    dp = PD_defstr(file, "object",                                          \
+                   "char *print_name",                                      \
+                   "char *val",                                             \
+                   "int eval_type",                                         \
+                   "function print",                                        \
+                   "function release",                                      \
+                   LAST);                                                   \
+    if (dp == NULL)                                                         \
+       SS_error(_si, "COULDN'T DEFINE OBJECT TO FILE - SS_DEFINE_OBJECT", \
+                SS_null);}
+
+struct s_SS_psides
+   {int interactive;
+    int trace_env;
+    int know_env;
+    int trap_error;
+    int lines_page;
+    int print_flag;
+    int stat_flag;
+    int bracket_flag;
+    int nsave;
+    int nrestore;
+    int nsetc;
+    int ngoc;
+    int stack_size;
+    int stack_mask;
+    int cont_ptr;
+    int err_cont_ptr;
+    int errlev;
+    int eox;
+    int strict_c;
+
+    char prompt[MAXLINE];
+    char ans_prompt[MAXLINE];
+    char *lex_text;
+
+    continuation *continue_int;
+    err_continuation *continue_err;
+
+    SC_array *stack;
+
+    hasharr *symtab;
+    hasharr *types;
+
+    SS_io_logging hist_flag;
+
+    object *indev;
+    object *outdev;
+    object *histdev;
+    object *this;
+    object *val;
+    object *unev;
+    object *exn;
+    object *argl;
+    object *fun;
+    object *env;
+    object *global_env;
+    object *err_state;
+    object **err_stack;
+    object *rdobj;
+    object *evobj;
+    object *character_stream;
+
+    int (*pr_gets)(SS_psides *si, object *fp);
+    int (*post_print)(SS_psides *si);
+    void (*post_read)(SS_psides *si, object *fp);
+    void (*post_eval)(SS_psides *si, object *fp);
+    void (*name_reproc)(SS_psides *si, char *s, char *name);
+    void (*get_arg)(SS_psides *si, object *obj, void *v, int type);
+    object *(*read)(SS_psides *si, object *fp);
+    object *(*call_arg)(SS_psides *si, int type, void *v);
+
+    void (*pr_ch_out)(int c, object *fp);
+    void (*pr_ch_un)(int c, object *fp);
+
+    JMP_BUF cpu;};
+
+struct s_SS_global_state
+ {int tind[SS_N_TYPES];
+  char *tnames[2];
+  object *objs[SS_N_SPECIAL];};
+  
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+struct s_SS_input_port
+   {char *name;
+    int iln;                       /* current line number in file */
+    int ichr;                      /* 1 based char index in current line */
+    FILE *str;
+    char buffer[MAX_BFSZ];
+    char *ptr;};
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+struct s_SS_output_port
+   {char *name;
+    FILE *str;};
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+struct s_SS_cons
+   {object *car;
+    object *cdr;};
+
+#define SS_DEFINE_CONS \
+    PD_defstr(file, "cons", \
+              "object *car", \
+              "object *cdr", \
+              LAST)
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+struct s_SS_variable
+   {char *name;
+    object *value;};
+
+#define SS_DEFINE_VARIABLE        \
+    PD_defstr(file, "variable",   \
+              "char *name",       \
+              "object *value",    \
+              LAST)
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+struct s_SS_boolean
+   {char *name;
+    int value;};
+
+#define SS_DEFINE_BOOLEAN         \
+    PD_defstr(file, "boolean",    \
+              "char *name",       \
+              "int value",        \
+              LAST)
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+struct s_SS_string
+   {int length;
+    char *string;};
+
+#define SS_DEFINE_STRING          \
+    PD_defstr(file, "string",     \
+              "int length",       \
+              "char *string",     \
+              LAST)
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+struct s_SS_continuation
+   {object *signal;
+    JMP_BUF cont;};
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+struct s_SS_err_continuation
+   {int stack_ptr;
+    int cont_ptr;
+    object *signal;
+    JMP_BUF cont;};
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* ESCAPE PROCEDURE - used to implement call-with-current-continuation */
+
+struct s_SS_esc_proc
+   {int cont;
+    int stck;
+    int err;
+    int type;};
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/*  C PROCEDURE - primitive procedure or special form (written in C) */
+
+struct s_SS_C_proc
+   {int n;
+    PFVoid *proc;
+    PFPHand handler;};
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* COMPOUND PROCEDURE - Scheme level procedure (written in Scheme) */
+
+struct s_SS_S_proc
+   {SS_form type;
+    object *name;
+    object *lambda;
+    object *env;};
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+struct s_SS_proc
+   {SS_form type;
+    char *name;
+    char *doc;
+    short int trace;
+    object *proc;};
+
+/*--------------------------------------------------------------------------*/
+
+#ifdef LARGE
+
+/*--------------------------------------------------------------------------*/
+
+/*  Vector definition */
+struct s_SS_vect
+   {int length;
+    object **vect;};
+
+#define SS_DEFINE_VECTOR         \
+    PD_defstr(file, "vector",    \
+              "int length",      \
+              "object **vect",   \
+              LAST)
+
+/*--------------------------------------------------------------------------*/
+
+#endif
+
+/*--------------------------------------------------------------------------*/
+
 /*                          VARIABLE DECLARATIONS                           */
 
 /*--------------------------------------------------------------------------*/
 
-extern object
- *SS_anon_proc,
- *SS_anon_macro,
- *SS_block_proc,
- *SS_scheme_symtab,
- *SS_quoteproc,
- *SS_quasiproc,
- *SS_unqproc,
- *SS_unqspproc,
- *SS_setproc,
- *SS_null,
- *SS_eof,
- *SS_t,
- *SS_f,
- *SS_else;
-
-extern char
- *SS_OBJECT_S,
- *SS_POBJECT_S;
-
-extern int
- SS_OBJECT_I,
- SS_PROCEDURE_I,
- SS_CONS_I,
- SS_VARIABLE_I,
- SS_INPUT_PORT_I,
- SS_OUTPUT_PORT_I,
- SS_EOF_I,
- SS_NULL_I,
- SS_VECTOR_I,
- SS_CHARACTER_I,
- SS_ERROR_I;
-
-#ifdef LARGE
-
-extern int
- SS_HAELEM_I,
- SS_HASHARR_I,
- SS_PROCESS_I;
-
-#endif
+extern SS_global_state
+ SS_gs;
 
 /*--------------------------------------------------------------------------*/
 

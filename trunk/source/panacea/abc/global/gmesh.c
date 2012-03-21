@@ -110,10 +110,11 @@ mesh_quality *compute_mesh_quality(void)
     double *x1, *x2, *x3, *x4;
     double *y1, *y2, *y3, *y4;
     double dx1, dx2, dy1, dy2, dx13, dy13, dx24, dy24;
-    double dxtb, dytb, dxrl, dyrl;
+    double dxtb, dytb, dxrl, dyrl, pot;
     double skew, jac, orth, jt, ot, st, vol;
     mesh_quality *mq;
-    static double pot = PI/2.0;
+
+    pot = PI/2.0;
 
     mq = CMAKE(mesh_quality);
 
