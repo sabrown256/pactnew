@@ -197,16 +197,17 @@ int init_unit(void)
  * is "natural units" with Hbar = c = 1
  */
     if (def_unit_flag)
-       {PA_gs.units[G]   = g_icm;
-        PA_gs.units[SEC] = c;
-        PA_gs.units[K]   = eV_icm*(kBoltz/eV_erg);
-        PA_gs.units[EV]  = eV_icm*PA_gs.units[Q]*PA_gs.units[Q]/PA_gs.units[CM];}
+       {PA_gs.units[G]   = PM_c.g_icm;
+        PA_gs.units[SEC] = PM_c.c;
+        PA_gs.units[K]   = PM_c.ev_icm*(PM_c.kboltz/PM_c.ev_erg);
+        PA_gs.units[EV]  = PM_c.ev_icm*PA_gs.units[Q]*PA_gs.units[Q]/
+	                   PA_gs.units[CM];}
 
 /* the alternate default system of units is the modified CGS system
  * these values should be used in the generator deck if desired
  */
     else
-       PA_gs.units[K] = kBoltz/eV_erg;
+       PA_gs.units[K] = PM_c.kboltz/PM_c.ev_erg;
 
 /* CONVERSIONS
  *
@@ -216,7 +217,7 @@ int init_unit(void)
  * e.g. length_external = length_cgs*PA_gs.convrsns[CM]
  */
 
-    PA_gs.convrsns[K] = kBoltz/eV_erg;
+    PA_gs.convrsns[K] = PM_c.kboltz/PM_c.ev_erg;
 
 /* make the conversion factors consistent with these changes */
     PA_set_conversions(TRUE);

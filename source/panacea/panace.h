@@ -919,35 +919,6 @@ extern char
  *PA_INFO_MAP_DOMAIN_S,
  *PA_INFO_BUILD_DOMAIN_S;
 
-
-/* CODE UNITS VARIABLES AND CONSTANTS */
-
-extern double
- alpha,              /* fine structure constant e^2/HbarC  - 7.297353080e-3 */
- c,                              /* speed of light (cm/sec) - 2.99792458e10 */
- Coulomb,                /* Coulomb in fundamental charges - 6.241506363e18 */
- e,                              /* electron charge in esu - 4.80320680e-10 */
- eV_erg,                                      /* eV to erg - 1.60217733e-12 */
- Gn,       /* Newtonian gravitational constant (cm^3/g-sec^2) - 6.673231e-8 */
- Hbar,                                  /* Hbar in erg-sec - 1.05457267e-27 */
- HbarC,                                  /* Hbar*C in eV-cm - 1.97327054e-5 */
- kBoltz,                     /* Boltzman constant in (erg/K) - 1.380658e-16 */
- K_eV,                                        /* Kelvin to eV 8.6173856e-05 */
- M_a,                            /* atomic mass unit in g - 1.660540210e-24 */
- M_e,                               /* electron mass in g - 9.109389754e-28 */
- M_e_eV,                              /* electron mass in eV - 5.10999065e5 */
- N0,                                   /* Avagadro's number - 6.02213665e23 */
- Ryd,                           /* (M_e*c^2*alpha^2)/2 in eV - 13.605698140 */
-
- icm_g,                                /* inverse cm to g  - 3.51767578e-38 */
- g_icm,                                 /* g to inverse cm  - 2.84278615e37 */
-
- icm_eV,                                       /* inverse cm to eV  - HbarC */
- eV_icm,                                 /* eV toinverse cm  - 5.06772882e4 */
-
- icm_erg,                            /* inverse cm to erg  - 3.16152932e-17 */
- erg_icm;                             /* erg to inverse cm  - 3.16302617e16 */
-
 /*--------------------------------------------------------------------------*/
 
 /*                          FUNCTION DECLARATIONS                           */
