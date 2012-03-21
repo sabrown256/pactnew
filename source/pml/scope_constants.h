@@ -13,19 +13,10 @@
 #define PCK_CONSTANTS
 
 #undef PI
-#define PI        3.141592653589793238462643383279502884
+#define PI          3.141592653589793238462643383279502884
 
-#if 0
-/* golden section - F^2 + 1 = F */
-#define F         1.61803398874989484820458683436563811772
-#define E         2.718281828459045235360287471352662497757
-
-/* Euler-Mascheroni constant = lim(sum(1/i, i = 1,n) - ln(n), n -> inf) */
-#define G         0.577215664901532860606512090082402431
-#endif
-
-#define RAD_DEG    57.295779513082323
-#define DEG_RAD     0.017453292519943295
+#define RAD_DEG    57.29577951308232087665461840231274
+#define DEG_RAD     0.01745329251994329576913914624236579
 
 /*--------------------------------------------------------------------------*/
 
@@ -45,7 +36,10 @@ typedef struct s_PM_constants PM_constants;
 struct s_PM_constants
 
 /* fundamental numerical constants */
-   {long double pi;
+   {long double pi;                  /* ratio of circumference to diameter */
+    long double e;                                     /* natural log base */
+    long double f;                                         /* golden ratio */
+    long double g;                            /* Euler-Mascheroni constant */
 
 /* fundamental physical constants */
     double alpha;                     /* fine structure constant e^2/hbarc */
