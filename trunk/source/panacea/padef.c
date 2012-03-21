@@ -12,36 +12,6 @@
 
 #define PA_info_name(tag)  PA_cpp_value_to_name(PA_gs.cpp_info, tag)
 
-char
- *PA_INFO_TYPE_S,
- *PA_INFO_N_DIMS_S,
- *PA_INFO_DIMS_S,
- *PA_INFO_SCOPE_S,
- *PA_INFO_CLASS_S,
- *PA_INFO_CENTER_S,
- *PA_INFO_PERSISTENCE_S,
- *PA_INFO_ALLOCATION_S,
- *PA_INFO_FILE_NAME_S,
- *PA_INFO_INIT_VAL_S,
- *PA_INFO_INIT_FNC_S,
- *PA_INFO_CONV_S,   /* ext_unit */
- *PA_INFO_UNIT_S,   /* int_unit */
- *PA_INFO_KEY_S,
- *PA_INFO_ATTRIBUTE_S,
- *PA_INFO_UNITS_S,
- *PA_INFO_DATA_PTR_S,
- *PA_INFO_UNIT_NUMER_S,
- *PA_INFO_UNIT_DENOM_S,
- *PA_INFO_APPL_ATTR_S,
- *PA_INFO_DEFAULT_S,
- *PA_INFO_SHARE_S,
- *PA_INFO_ATT_NAME_S,
- *PA_INFO_DIM_NAME_S,
- *PA_INFO_UNITS_NAME_S,
- *PA_INFO_DOMAIN_NAME_S,
- *PA_INFO_MAP_DOMAIN_S,
- *PA_INFO_BUILD_DOMAIN_S;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 

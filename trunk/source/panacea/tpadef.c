@@ -13,50 +13,6 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-void PA_print_var_tab(hasharr *tab)
-   {int i;
-    char **dump, **work;
-    PA_variable *pp;
-
-    dump = SC_hasharr_dump(tab, NULL, NULL, FALSE);
-    if (dump != NULL)
-       {for (work=dump; *work != NULL; work++)
-	    {pp = PA_inquire_variable(*work);
-	     PA_print_variable(pp);};
-
-	 CFREE(dump);};
-
-   return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-void PA_print_variable(PA_variable *pp)
-   {
-
-    printf("Name   : %s\n", PA_VARIABLE_NAME(pp));
-    printf("Type   : %s\n", PA_VARIABLE_TYPE_S(pp));
-    printf("Scope  : %s\n",
-	   PA_cpp_value_to_name(PA_gs.cpp_scope, PA_VARIABLE_SCOPE(pp)));
-    printf("Class  : %s\n",
-	   PA_cpp_value_to_name(PA_gs.cpp_class, PA_VARIABLE_CLASS(pp)));
-    printf("Persist: %s\n",
-	   PA_cpp_value_to_name(PA_gs.cpp_persistence, PA_VARIABLE_PERSISTENCE(pp)));
-    printf("Center : %s\n",
-	   PA_cpp_value_to_name(PA_gs.cpp_center, PA_VARIABLE_CENTERING(pp)));
-    printf("Alloc  : %s\n",
-	   PA_cpp_value_to_name(PA_gs.cpp_allocation, PA_VARIABLE_ALLOCATION(pp)));
-
-    PA_print_var_dim(PA_VARIABLE_DIMS(pp));
-    PA_print_var_units(pp);
-
-    printf("\n");
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 void PA_print_var_dim(PA_dimens *vdims)
    {int min_index = 0;
     int max_index = 0;
@@ -137,21 +93,41 @@ void PA_print_var_units(PA_variable *pp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PA_PRINT_ALIST -  */
+static void _PA_print_info_sym(char *field, int *data)
+   {char *name;
 
-void PA_print_alist(pcons *alist)
-   {pcons *pa, *c;
-
-    printf("---\n");
-    for (pa = alist; pa != NULL; pa = (pcons *) pa->cdr)
-        _PA_print_alist_node(pa->car_type, pa->car);
-
+    if (data != NULL)
+       {if (strcmp(field, PA_INFO_CENTER_S) == 0)
+	   {name = PA_cpp_value_to_name(PA_gs.cpp_center, *data);
+	    printf("\t(%s)", name);}
+        else if (strcmp(field, PA_INFO_ALLOCATION_S) == 0)
+	   {name = PA_cpp_value_to_name(PA_gs.cpp_allocation, *data);
+	    printf("\t(%s)", name);}
+	else if (strcmp(field, PA_INFO_SCOPE_S) == 0)
+	   {name = PA_cpp_value_to_name(PA_gs.cpp_scope, *data);
+	    printf("\t(%s)", name);}
+	else if (strcmp(field, PA_INFO_PERSISTENCE_S) == 0)
+	   {name = PA_cpp_value_to_name(PA_gs.cpp_persistence, *data);
+	    printf("\t(%s)", name);}
+	else if (strcmp(field, PA_INFO_UNITS_S) == 0)
+	   {name = PA_cpp_value_to_name(PA_gs.cpp_units, *data);
+	    printf("\t(%s)", name);}
+	else if (strcmp(field, PA_INFO_UNIT_DENOM_S) == 0)
+	   {name = PA_cpp_value_to_name(PA_gs.cpp_units, *data);
+	    printf("\t(%s)", name);}
+	else if (strcmp(field, PA_INFO_UNIT_NUMER_S) == 0)
+	   {name = PA_cpp_value_to_name(PA_gs.cpp_units, *data);
+	    printf("\t(%s)", name);}
+	else if (strcmp(field, PA_INFO_TYPE_S) == 0)
+	   {name = PA_cpp_value_to_name(PA_gs.cpp_type, *data);
+	    printf("\t(%s)", name);};};
+    
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-void _PA_print_alist_node(char *type, void *data)
+static void _PA_print_alist_node(char *type, void *data)
    {int i, itype;
     char *s;
     pcons *pp;
@@ -191,36 +167,60 @@ void _PA_print_alist_node(char *type, void *data)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-void _PA_print_info_sym(char *field, int *data)
-   {char *name;
+/* PA_PRINT_ALIST -  */
 
-    if (data != NULL)
-       {if (strcmp(field, PA_INFO_CENTER_S) == 0)
-	   {name = PA_cpp_value_to_name(PA_gs.cpp_center, *data);
-	    printf("\t(%s)", name);}
-        else if (strcmp(field, PA_INFO_ALLOCATION_S) == 0)
-	   {name = PA_cpp_value_to_name(PA_gs.cpp_allocation, *data);
-	    printf("\t(%s)", name);}
-	else if (strcmp(field, PA_INFO_SCOPE_S) == 0)
-	   {name = PA_cpp_value_to_name(PA_gs.cpp_scope, *data);
-	    printf("\t(%s)", name);}
-	else if (strcmp(field, PA_INFO_PERSISTENCE_S) == 0)
-	   {name = PA_cpp_value_to_name(PA_gs.cpp_persistence, *data);
-	    printf("\t(%s)", name);}
-	else if (strcmp(field, PA_INFO_UNITS_S) == 0)
-	   {name = PA_cpp_value_to_name(PA_gs.cpp_units, *data);
-	    printf("\t(%s)", name);}
-	else if (strcmp(field, PA_INFO_UNIT_DENOM_S) == 0)
-	   {name = PA_cpp_value_to_name(PA_gs.cpp_units, *data);
-	    printf("\t(%s)", name);}
-	else if (strcmp(field, PA_INFO_UNIT_NUMER_S) == 0)
-	   {name = PA_cpp_value_to_name(PA_gs.cpp_units, *data);
-	    printf("\t(%s)", name);}
-	else if (strcmp(field, PA_INFO_TYPE_S) == 0)
-	   {name = PA_cpp_value_to_name(PA_gs.cpp_type, *data);
-	    printf("\t(%s)", name);};};
-    
+void PA_print_alist(pcons *alist)
+   {pcons *pa, *c;
+
+    printf("---\n");
+    for (pa = alist; pa != NULL; pa = (pcons *) pa->cdr)
+        _PA_print_alist_node(pa->car_type, pa->car);
+
     return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+void PA_print_variable(PA_variable *pp)
+   {
+
+    printf("Name   : %s\n", PA_VARIABLE_NAME(pp));
+    printf("Type   : %s\n", PA_VARIABLE_TYPE_S(pp));
+    printf("Scope  : %s\n",
+	   PA_cpp_value_to_name(PA_gs.cpp_scope, PA_VARIABLE_SCOPE(pp)));
+    printf("Class  : %s\n",
+	   PA_cpp_value_to_name(PA_gs.cpp_class, PA_VARIABLE_CLASS(pp)));
+    printf("Persist: %s\n",
+	   PA_cpp_value_to_name(PA_gs.cpp_persistence, PA_VARIABLE_PERSISTENCE(pp)));
+    printf("Center : %s\n",
+	   PA_cpp_value_to_name(PA_gs.cpp_center, PA_VARIABLE_CENTERING(pp)));
+    printf("Alloc  : %s\n",
+	   PA_cpp_value_to_name(PA_gs.cpp_allocation, PA_VARIABLE_ALLOCATION(pp)));
+
+    PA_print_var_dim(PA_VARIABLE_DIMS(pp));
+    PA_print_var_units(pp);
+
+    printf("\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+void PA_print_var_tab(hasharr *tab)
+   {int i;
+    char **dump, **work;
+    PA_variable *pp;
+
+    dump = SC_hasharr_dump(tab, NULL, NULL, FALSE);
+    if (dump != NULL)
+       {for (work=dump; *work != NULL; work++)
+	    {pp = PA_inquire_variable(*work);
+	     PA_print_variable(pp);};
+
+	 CFREE(dump);};
+
+   return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
