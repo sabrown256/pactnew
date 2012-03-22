@@ -11,12 +11,6 @@
 #include "pdb_int.h"
 #include "scope_mpi.h"
 
-PD_pfm_fnc
- PD_par_fnc;
-
-int
- _PD_nthreads = 0;
-
 /*--------------------------------------------------------------------------*/
 
 /*                          SERIAL PFM ROUTINES                             */
@@ -342,31 +336,31 @@ static int _PD_sseek(FILE *stream, int64_t addr, int offset)
 int _PD_init_s(void)
    {
 
-    PD_par_fnc.open_hook         = lio_open_hook;
+    PD_gs.par.open_hook         = lio_open_hook;
 
-    PD_par_fnc.init              = _PD_pfm_init_s;
-    PD_par_fnc.add_file          = _PD_pfm_add_file_s;
-    PD_par_fnc.remove_file       = _PD_pfm_remove_file_s;
-    PD_par_fnc.getspace          = _PD_pfm_getspace_s;
-    PD_par_fnc.is_dp_init        = _PD_is_dp_init_s;
-    PD_par_fnc.is_smp_init       = _PD_is_smp_init_s;
-    PD_par_fnc.is_sequential     = _PD_is_sequential_s;
-    PD_par_fnc.is_null_fp        = _PD_is_null_fp_s;
-    PD_par_fnc.is_master         = _PD_pfm_is_master_s;
+    PD_gs.par.init              = _PD_pfm_init_s;
+    PD_gs.par.add_file          = _PD_pfm_add_file_s;
+    PD_gs.par.remove_file       = _PD_pfm_remove_file_s;
+    PD_gs.par.getspace          = _PD_pfm_getspace_s;
+    PD_gs.par.is_dp_init        = _PD_is_dp_init_s;
+    PD_gs.par.is_smp_init       = _PD_is_smp_init_s;
+    PD_gs.par.is_sequential     = _PD_is_sequential_s;
+    PD_gs.par.is_null_fp        = _PD_is_null_fp_s;
+    PD_gs.par.is_master         = _PD_pfm_is_master_s;
 
-    PD_par_fnc.get_file_size     = _PD_get_file_size_s;
-    PD_par_fnc.get_file_stream   = _PD_get_file_stream_s;
-    PD_par_fnc.get_file_ptr      = _PD_get_file_ptr_s;
-    PD_par_fnc.next_address      = _PD_next_address_s;
+    PD_gs.par.get_file_size     = _PD_get_file_size_s;
+    PD_gs.par.get_file_stream   = _PD_get_file_stream_s;
+    PD_gs.par.get_file_ptr      = _PD_get_file_ptr_s;
+    PD_gs.par.next_address      = _PD_next_address_s;
 
-    PD_par_fnc.setup_pseudo_file = _PD_pfm_setup_file_s;
-    PD_par_fnc.setup_mp_file     = _PD_pfm_setup_mp_file_s;
-    PD_par_fnc.extend_file       = _PD_pfm_extend_file_s;
-    PD_par_fnc.flush_file        = _PD_pfm_flush_file_s;
-    PD_par_fnc.serial_flush      = _PD_pfm_serial_flush_s;
-    PD_par_fnc.set_eod           = _PD_set_eod_s;
-    PD_par_fnc.mark_as_flushed   = _PD_pfm_mark_as_flushed_s;
-    PD_par_fnc.set_address       = _PD_pfm_setaddr_s;
+    PD_gs.par.setup_pseudo_file = _PD_pfm_setup_file_s;
+    PD_gs.par.setup_mp_file     = _PD_pfm_setup_mp_file_s;
+    PD_gs.par.extend_file       = _PD_pfm_extend_file_s;
+    PD_gs.par.flush_file        = _PD_pfm_flush_file_s;
+    PD_gs.par.serial_flush      = _PD_pfm_serial_flush_s;
+    PD_gs.par.set_eod           = _PD_set_eod_s;
+    PD_gs.par.mark_as_flushed   = _PD_pfm_mark_as_flushed_s;
+    PD_gs.par.set_address       = _PD_pfm_setaddr_s;
 
     return(TRUE);}
 
@@ -434,14 +428,14 @@ static void _PD_init_thread(PD_smp_state *pa, int id)
 /* PDPATH state */
     pa->frames = NULL;
 
-    pa->buffer_size = PD_buffer_size;
+    pa->buffer_size = PD_gs.buffer_size;
     pa->int_std     = INT_STANDARD;
     pa->req_std     = REQ_STANDARD;
     pa->int_align   = INT_ALIGNMENT;
     pa->req_align   = REQ_ALIGNMENT;
-    pa->vif         = PD_vif;
-    pa->wr_hook     = pdb_wr_hook;
-    pa->rd_hook     = pdb_rd_hook;
+    pa->vif         = PD_gs.vif;
+    pa->wr_hook     = PD_gs.write;
+    pa->rd_hook     = PD_gs.read;
 
     return;}
 
@@ -534,11 +528,11 @@ int PD_init_threads(int nthreads, PFTid tid)
 /* check whether SCORE level has been initialized */
        if (SC_n_threads == -1)
 	  {SC_configure_mm(128L, 2000000L, 65536L, 1.2);
-	   _PD_nthreads = max(0L, nthreads);
-	   SC_init_threads(_PD_nthreads, tid);}
+	   PD_gs.nthreads = max(0L, nthreads);
+	   SC_init_threads(PD_gs.nthreads, tid);}
 
        else
-	  _PD_nthreads = SC_n_threads;
+	  PD_gs.nthreads = SC_n_threads;
 
        ret = _PD_init_state(TRUE);
 

@@ -184,7 +184,6 @@ static unsigned char
  */
 
 int
- FORMAT_FIELDS = 8,
  text_order[]         = {-1},
  float2_nrm_order[]   = {1, 2},
  float4_nrm_order[]   = {1, 2, 3, 4},

@@ -1031,7 +1031,7 @@ void PA_put_set(PDBfile *file, PM_set *s)
        {s->opers = NULL;
 
         PA_ERR(!PD_put_set(file, s),
-               "PD_PUT_SET FAILED %s - PA_PUT_MAPPING", PD_err);};
+               "PD_PUT_SET FAILED %s - PA_PUT_MAPPING", PD_get_error());};
 
     return;}
 
@@ -1087,7 +1087,7 @@ void PA_put_picture(PG_device *dev, PDBfile *file, PM_mapping *f,
                 pf->range->opers = NULL;};
 
         PA_ERR(!PD_put_mapping(file, f, _PA.imap++),
-               "PD_PUT_MAPPING FAILED %s - PA_PUT_PICTURE", PD_err);}
+               "PD_PUT_MAPPING FAILED %s - PA_PUT_PICTURE", PD_get_error());}
            
 /* draw the mappings */
     if (dev != NULL)

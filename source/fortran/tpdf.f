@@ -388,7 +388,7 @@
          call errproc
 
 ! ... check file mode
-      if (pfgmod(fileid) .ne. 4) &
+      if (pfgmod(fileid) .ne. 1) &
          call errproc
 
 ! ... set and get and verify default offset
@@ -750,7 +750,7 @@
          call errproc
 
 ! ... check file mode
-      if (pfgmod(fileid) .ne. 2) &
+      if (pfgmod(fileid) .ne. 7) &
          call errproc
 
 ! ... retrieve and verify the value of an attribute

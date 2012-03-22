@@ -518,7 +518,7 @@ static object *_SXI_pdbdata_set(SS_psides *si, object *argl)
 	    s = *(PM_set **) data.memaddr;}
         else
 	   {if (!PD_read(file, name, &data.memaddr))
-	       SS_error(si, PD_err, obj);
+	       SS_error(si, PD_get_error(), obj);
 	    s = (PM_set *) data.memaddr;};
 
 	if (s->info_type == NULL)
@@ -1004,7 +1004,7 @@ static object *_SXI_pdbdata_mapping(SS_psides *si, object *argl)
         data.memaddr  = DEREF(data.memaddr);}
     else
        {if (!PD_read(file, name, &data.memaddr))
-           SS_error(si, PD_err, obj);};
+           SS_error(si, PD_get_error(), obj);};
 
     PD_reset_ptr_list(file);
 
@@ -1016,7 +1016,7 @@ static object *_SXI_pdbdata_mapping(SS_psides *si, object *argl)
 	    PD_process_set_name(dname);
 
 	    if (!PD_read(file, dname, &data.memaddr))
-	       SS_error(si, PD_err, SS_null);
+	       SS_error(si, PD_get_error(), SS_null);
 
 	    f->domain = (PM_set *) data.memaddr;};
 

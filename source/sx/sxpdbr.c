@@ -205,9 +205,9 @@ object *_SXI_read_numeric_data(SS_psides *si, object *argl)
     name_obj = SS_null;
     switch (SETJMP(pa->read_err))
        {case ABORT :
-             SS_error(si, PD_err, name_obj);
+             SS_error(si, PD_get_error(), name_obj);
         default :
-             memset(PD_err, 0, MAXLINE);
+             memset(PD_gs.err, 0, MAXLINE);
 	     cp = _SX_rd_data(si, file, name, ep, &addr, name_obj);
         case ERR_FREE :
 	     break;};

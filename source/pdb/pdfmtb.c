@@ -211,7 +211,7 @@ static int _PD_rd_fmt_ii(PDBfile *file)
 	 for (j = 0; j < n; j++, *(order++) = *(p++));};
 
 /* get the floating point format data in */
-    n = FORMAT_FIELDS - 1;
+    n = PD_gs.format_fields - 1;
     for (id = SC_FLOAT_I; id <= SC_DOUBLE_I; id++)
         {i = SC_TYPE_FP(id);
 	 format = std->fp[i].format;
@@ -1306,7 +1306,7 @@ static int _PD_wr_fmt_ii(PDBfile *file)
 	for (id = SC_FLOAT_I; id <= SC_DOUBLE_I; id++)
 	    {i = SC_TYPE_FP(id);
 	     format = std->fp[i].format;
-	     n = FORMAT_FIELDS - 1;
+	     n = PD_gs.format_fields - 1;
 	     for (j = 0; j < n; j++, *(p++) = *(format++));
 
 	     fp_bias[i] = *format;};

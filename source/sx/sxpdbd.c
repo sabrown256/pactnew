@@ -641,7 +641,7 @@ static int _SX_rd_leaf_t(PDBfile *pf, syment *ep, char *vr, char *intype,
         case ERR_FREE :
 	     return(TRUE);
 	default :
-	     memset(PD_err, 0, MAXLINE);
+	     memset(PD_gs.err, 0, MAXLINE);
 	     break;};
 
     fp  = pf->stream;
@@ -868,7 +868,7 @@ static int _SX_diff_var(SS_psides *si, PDBfile *pfa, PDBfile *pfb,
         case ERR_FREE :
 	     return(TRUE);
         default :
-	     memset(PD_err, 0, MAXLINE);
+	     memset(PD_gs.err, 0, MAXLINE);
 	     break;};
 
     oh = SC_signal_n(SIGFPE, _SX_diff_signal, &de);

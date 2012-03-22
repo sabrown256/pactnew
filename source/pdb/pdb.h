@@ -139,6 +139,12 @@
 #define NSTD         6     /* number of standards currently in the system 
                             * should be same as last standard */
 
+#define PD_err          PD_gs.err
+#define PDBFILE_S       PD_gs.tnames[0]
+#define PD_DEFSTR_S     PD_gs.tnames[1]
+#define PD_ALIGNMENT_S  PD_gs.tnames[2]
+#define PD_STANDARD_S   PD_gs.tnames[3]
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -226,14 +232,14 @@ typedef int (*PFSymDelay)(PDBfile *file, int ad, char *name, char *type,
  */
 
 enum e_PD_major_op
-   {PD_READ = 0,
-    PD_WRITE,
-    PD_APPEND,
-    PD_OPEN,
+   {PD_OPEN = 0,
     PD_CREATE,
     PD_CLOSE,
-    PD_TRACE,
+    PD_READ,
+    PD_WRITE,
     PD_PRINT,
+    PD_TRACE,
+    PD_APPEND,
     PD_GENERIC,
     PD_UNINIT};
 
@@ -809,32 +815,20 @@ struct s_PD_pfm_fnc
 
 struct s_PD_global_state
    {int nthreads;
-    int FORMAT_FIELDS;
+    int format_fields;
     int default_format_version;
     int buffer_size;
-    int DIM;
 
-    long PD_print_controls[1];
-    PD_pfm_fnc par;
+    long print_ctrl[10];
+
+    char err[MAXLINE];
+    char *tnames[4];
 
     PDBfile *vif;
 
-    char *PDBFILE_S;
-    char *PD_ALIGNMENT_S;
-    char *PD_DEFSTR_S;
-    char *PD_STANDARD_S;
-    char PD_err[1];
-
-    JMP_BUF _PD_read_err;
-    JMP_BUF _PD_write_err;
-    JMP_BUF _PD_print_err;
-    JMP_BUF _PD_open_err;
-    JMP_BUF _PD_trace_err;
-    JMP_BUF _PD_close_err;
-    JMP_BUF _PD_create_err;
-
-    PFPDBwrite wr_hook;
-    PFPDBread rd_hook;
+/* semi-obsolete read/write hooks */
+    PFPDBwrite write;
+    PFPDBread read;
 
     data_standard *INT_STANDARD;
     data_standard *REQ_STANDARD;
@@ -872,6 +866,19 @@ struct s_PD_global_state
     data_alignment GNU4_X86_64_ALIGNMENT;
     data_alignment PGI_X86_64_ALIGNMENT;
 
+    PD_pfm_fnc par;
+
+    JMP_BUF cpu[7];
+#if 0
+    JMP_BUF _PD_open_err;
+    JMP_BUF _PD_create_err;
+    JMP_BUF _PD_close_err;
+    JMP_BUF _PD_read_err;
+    JMP_BUF _PD_write_err;
+    JMP_BUF _PD_print_err;
+    JMP_BUF _PD_trace_err;
+#endif
+
    };
 
 #ifdef __cplusplus
@@ -887,21 +894,6 @@ extern "C" {
 extern PD_global_state
  PD_gs;
 
-extern PD_pfm_fnc
- PD_par_fnc;
-
-extern int
- _PD_nthreads;
-
-extern long
- PD_print_controls[];
-
-extern int
- FORMAT_FIELDS,
- PD_default_format_version,
- PD_buffer_size,
- PD_DIM;
-
 extern data_standard
  *INT_STANDARD,
  *REQ_STANDARD,
@@ -912,16 +904,6 @@ extern data_alignment
  *REQ_ALIGNMENT,
  *PD_std_alignments[];
 
-extern PDBfile
- *PD_vif;
-
-extern char
- *PDBFILE_S,
- *PD_ALIGNMENT_S,
- *PD_DEFSTR_S,
- *PD_STANDARD_S,
- PD_err[];
-
 extern JMP_BUF
  _PD_read_err,
  _PD_write_err,
@@ -930,12 +912,6 @@ extern JMP_BUF
  _PD_trace_err,
  _PD_close_err,
  _PD_create_err;
-
-extern PFPDBwrite
- pdb_wr_hook;
-
-extern PFPDBread
- pdb_rd_hook;
 
 extern data_standard
  TEXT_STD,

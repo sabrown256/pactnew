@@ -341,7 +341,7 @@ int PA_th_write(PDBfile *strm, char *name, char *type, int inst, int nr,
         case ERR_FREE :
 	     return(TRUE);
         default :
-	     memset(PD_err, 0, MAXLINE);
+	     memset(PD_gs.err, 0, MAXLINE);
 	     break;};
 
     ep = _PA_truncate_entry(strm, name, inst);
@@ -402,7 +402,7 @@ int PA_th_wr_member(PDBfile *strm, char *name, char *member, char *type,
         case ERR_FREE :
 	     return(TRUE);
         default :
-	     memset(PD_err, 0, MAXLINE);
+	     memset(PD_gs.err, 0, MAXLINE);
 	     break;};
 
     snprintf(lname, MAXLINE, "%s[%d:%d].%s", name, inst, inst, member);
@@ -991,7 +991,7 @@ static int _PA_proc_rec(char *name, PDBfile *th, int ncpf, int recn)
          ni   = _PD_entry_get_number(ep, i);
 
          if (lio_seek(fp, addr, SEEK_SET))
-            {snprintf(PD_err, MAXLINE, "ERROR: SEEK FAILED - _PA_PROC_REC");
+            {snprintf(PD_gs.err, MAXLINE, "ERROR: SEEK FAILED - _PA_PROC_REC");
              return(FALSE);};
 
 	 if (en != NULL)
@@ -1074,7 +1074,7 @@ int PA_th_trans_files(char *name, int ncpf, int nthf, char **thfiles,
              _PA_proc_rec(name, th, ncpf, i);
 
          if (!PD_close(th))
-            {snprintf(PD_err, MAXLINE,
+            {snprintf(PD_gs.err, MAXLINE,
 		      "ERROR: TROUBLE CLOSING %s.t%02d - PA_TH_TRANS_FILES",
 		      name, j);
              return(FALSE);};};
@@ -1177,7 +1177,8 @@ int PA_merge_files(char *base, int n, char **files, int ncpf)
     double xmin, xmax, ymin, ymax, *px, *py;
     
     if (n <= 0)
-       {snprintf(PD_err, MAXLINE, "ERROR: NO FILES SPECIFIED - PA_MERGE_FILES");
+       {snprintf(PD_gs.err, MAXLINE,
+		 "ERROR: NO FILES SPECIFIED - PA_MERGE_FILES");
 	return(FALSE);};
 
     ict = 0;

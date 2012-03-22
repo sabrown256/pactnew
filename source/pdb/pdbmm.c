@@ -11,7 +11,21 @@
 #include "pdb_int.h"
 
 PD_global_state
- PD_gs;
+ PD_gs = { 0, 8, 2, -1,
+
+/* print controls
+ *  0  -  print prefix: 0 = full path, 1 = space, 2 = tree
+ *  1  -  0 = print name, 1 = print type and name
+ *  2  -  recursion: 0 = yes, 1 = count
+ *  3  -  number of items before going to array mode of display
+ *  4  -  number of items per line
+ *  5  -  print variable label: 0 = full, 1 = partial, 2 = nothing
+ */
+           {0L, 0L, 0L, 20L, 2L, 0L, 0L, 0L, 0L, 0L},
+           "",
+           { "PDBfile", NULL, NULL, NULL },
+
+         };
 
 PD_state
  _PD = { -1, 50L, -1, -1, FALSE, -1, FALSE,
@@ -325,7 +339,7 @@ data_standard *_PD_copy_standard(data_standard *src)
     for (i = 0; i < N_PRIMITIVE_FP; i++)
         {std->fp[i].bpi = src->fp[i].bpi;
 
-	 n    = FORMAT_FIELDS;
+	 n    = PD_gs.format_fields;
          fstd = CMAKE_N(long, n);
 	 SC_mark(fstd, 1);
 	 std->fp[i].format = fstd;

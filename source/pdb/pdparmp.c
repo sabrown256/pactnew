@@ -151,7 +151,7 @@ static int _PD_is_dp_init_d(void)
 static int _PD_is_smp_init_d(void)
    {int rv;
 
-    rv = (_PD_nthreads >= 0);
+    rv = (PD_gs.nthreads >= 0);
 
     return(rv);}
 
@@ -163,7 +163,7 @@ static int _PD_is_smp_init_d(void)
 static int _PD_is_sequential_d(void)
    {int rv;
 
-    rv = (_PD_nthreads == 0);
+    rv = (PD_gs.nthreads == 0);
 
     return(rv);}
 
@@ -805,8 +805,8 @@ static FILE *_PD_mpopen(char *name, char *mode)
 #endif
             file_comm = comm;};};
     
-    fa = CMAKE_N(SC_address, _PD_nthreads+1);
-    for (i = 0; i <= _PD_nthreads; i++)
+    fa = CMAKE_N(SC_address, PD_gs.nthreads+1);
+    for (i = 0; i <= PD_gs.nthreads; i++)
         fa[i].diskaddr = 0;
 
 /* no buffered I/O for now */
@@ -1739,31 +1739,31 @@ int _PD_set_collective(int flag)
 int _PD_init_d(void)
    {
 
-    PD_par_fnc.open_hook         = _PD_mpopen;
+    PD_gs.par.open_hook         = _PD_mpopen;
 
-    PD_par_fnc.init              = _PD_pfm_init_d;
-    PD_par_fnc.add_file          = _PD_pfm_add_file_d;
-    PD_par_fnc.remove_file       = _PD_pfm_remove_file_d;
-    PD_par_fnc.getspace          = _PD_pfm_getspace_d;
+    PD_gs.par.init              = _PD_pfm_init_d;
+    PD_gs.par.add_file          = _PD_pfm_add_file_d;
+    PD_gs.par.remove_file       = _PD_pfm_remove_file_d;
+    PD_gs.par.getspace          = _PD_pfm_getspace_d;
 
-    PD_par_fnc.is_dp_init        = _PD_is_dp_init_d;
-    PD_par_fnc.is_smp_init       = _PD_is_smp_init_d;
-    PD_par_fnc.is_sequential     = _PD_is_sequential_d;
-    PD_par_fnc.is_null_fp        = _PD_is_null_fp_d;
-    PD_par_fnc.is_master         = _PD_pfm_is_master_d;
+    PD_gs.par.is_dp_init        = _PD_is_dp_init_d;
+    PD_gs.par.is_smp_init       = _PD_is_smp_init_d;
+    PD_gs.par.is_sequential     = _PD_is_sequential_d;
+    PD_gs.par.is_null_fp        = _PD_is_null_fp_d;
+    PD_gs.par.is_master         = _PD_pfm_is_master_d;
 
-    PD_par_fnc.setup_pseudo_file = _PD_pfm_setup_file_d;
-    PD_par_fnc.setup_mp_file     = _PD_pfm_setup_mp_file_d;
-    PD_par_fnc.get_file_size     = _PD_get_file_size_d;
-    PD_par_fnc.get_file_stream   = _PD_get_file_stream_d;
-    PD_par_fnc.get_file_ptr      = _PD_get_file_ptr_d;
-    PD_par_fnc.next_address      = _PD_next_address_d;
-    PD_par_fnc.extend_file       = _PD_pfm_extend_file_d;
-    PD_par_fnc.flush_file        = _PD_pfm_flush_file_d;
-    PD_par_fnc.serial_flush      = _PD_pfm_serial_flush_d;
-    PD_par_fnc.set_eod           = _PD_set_eod_d;
-    PD_par_fnc.mark_as_flushed   = _PD_pfm_mark_as_flushed_d;
-    PD_par_fnc.set_address       = _PD_pfm_setaddr_d;
+    PD_gs.par.setup_pseudo_file = _PD_pfm_setup_file_d;
+    PD_gs.par.setup_mp_file     = _PD_pfm_setup_mp_file_d;
+    PD_gs.par.get_file_size     = _PD_get_file_size_d;
+    PD_gs.par.get_file_stream   = _PD_get_file_stream_d;
+    PD_gs.par.get_file_ptr      = _PD_get_file_ptr_d;
+    PD_gs.par.next_address      = _PD_next_address_d;
+    PD_gs.par.extend_file       = _PD_pfm_extend_file_d;
+    PD_gs.par.flush_file        = _PD_pfm_flush_file_d;
+    PD_gs.par.serial_flush      = _PD_pfm_serial_flush_d;
+    PD_gs.par.set_eod           = _PD_set_eod_d;
+    PD_gs.par.mark_as_flushed   = _PD_pfm_mark_as_flushed_d;
+    PD_gs.par.set_address       = _PD_pfm_setaddr_d;
 
     return(TRUE);}
 

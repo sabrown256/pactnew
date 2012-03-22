@@ -120,7 +120,7 @@ SS_psides *SX_init(char *code, char *vers, int c, char **v, char **env)
     SX_gs.ovif = SX_mk_gfile(si, SX_gs.gvif);
 
 /* PDB initializations */
-    pdb_wr_hook = _SX_hash_hook;
+    PD_gs.write = _SX_hash_hook;
     SC_REGISTER_CONTEXT(_SX_hash_hook, si);
 
     if ((SX_gs.vif != NULL) && (SX_gs.gvif != NULL))

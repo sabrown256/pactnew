@@ -537,7 +537,7 @@ PDBfile *PA_open(char *name, char *mode, int flag)
     PA_ERR((fp == NULL),
            "CAN'T OPEN FILE %s - PA_OPEN\n", name);
 
-    PD_err[0] = '\0';
+    PD_gs.err[0] = '\0';
 
     PD_set_major_order(fp, COLUMN_MAJOR_ORDER);
     PD_set_offset(fp, PA_get_default_offset());
@@ -642,7 +642,7 @@ void _PA_wrrstrt(char *rsname, int conv_flag)
 /* check every element of PA_gs.variable_tab to find the RESTART variables */
 	switch (SETJMP(pa->write_err))
 	   {case ABORT :
-	         PRINT(stdout, "\n\n%s \n\n", PD_err);
+	         PRINT(stdout, "\n\n%s \n\n", PD_get_error());
 		 PA_ERR(!PD_close(pdrs),
 			"CAN'T CLOSE STATE FILE %s - _PA_WRRSTRT",
 			rsname);

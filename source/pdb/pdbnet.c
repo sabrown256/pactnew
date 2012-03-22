@@ -366,9 +366,9 @@ static void _PN_save_hooks(void)
 
     pa = _PD_get_state(-1);
 
-    pa->pn_open_save = PD_par_fnc.open_hook;
+    pa->pn_open_save = PD_gs.par.open_hook;
 
-    PD_par_fnc.open_hook = (PFfopen) _PN_bopen;
+    PD_gs.par.open_hook = (PFfopen) _PN_bopen;
 
     return;}
 
@@ -382,7 +382,7 @@ static void _PN_restore_hooks(void)
 
     pa = _PD_get_state(-1);
 
-    PD_par_fnc.open_hook = pa->pn_open_save;
+    PD_gs.par.open_hook = pa->pn_open_save;
 
     return;}
 

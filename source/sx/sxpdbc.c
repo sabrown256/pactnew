@@ -112,8 +112,8 @@ void _SX_copy_leaf(SS_psides *si, PDBfile *file, char *vrin, char *vrout,
        {mem_lst = dp->members;
 
 	if (mem_lst != NULL)
-	   if (pdb_wr_hook != NULL)
-	      mem_lst = (*pdb_wr_hook)(file, vrin, dp);
+	   if (PD_gs.write != NULL)
+	      mem_lst = (*PD_gs.write)(file, vrin, dp);
 
 /* for an array of structs copy the indirects for each array element */
 	if (dp->n_indirects)

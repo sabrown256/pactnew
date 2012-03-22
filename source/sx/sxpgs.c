@@ -125,7 +125,7 @@ static object *_SX_pdbdata_graph(SS_psides *si, PDBfile *file,
         f = *(PM_mapping **) data.memaddr;}
     else
        {if (!PD_read(file, name, &f))
-           SS_error(si, PD_err, SS_null);};
+           SS_error(si, PD_get_error(), SS_null);};
 
 /* reconnect any function pointers or undefined structs/members */
     domain = f->domain;
@@ -142,7 +142,7 @@ static object *_SX_pdbdata_graph(SS_psides *si, PDBfile *file,
             PD_process_set_name(dname);};
 
         if (!PD_read(file, dname, &data.memaddr))
-           SS_error(si, PD_err, SS_null);
+           SS_error(si, PD_get_error(), SS_null);
 
         domain = f->domain = (PM_set *) data.memaddr;};
 
@@ -222,7 +222,7 @@ static object *_SX_pdbcurve_graph(SS_psides *si, PDBfile *file,
 /* read the curve */
     if (!PD_read_pdb_curve(file, name, &x, &y, &n, label,
                            &xmn, &xmx, &ymn, &ymx, X_AND_Y))
-       SS_error(si, PD_err, SS_null);
+       SS_error(si, PD_get_error(), SS_null);
 
     domain = PM_make_set("X values", SC_DOUBLE_S, FALSE, 1, n, 1, x);
     range  = PM_make_set("Y values", SC_DOUBLE_S, FALSE, 1, n, 1, y);
@@ -554,7 +554,7 @@ static object *_SXI_pdbdata_image(SS_psides *si, object *argl)
 	    im = *(PG_image **) data.memaddr;}
 	else
 	   {if (!PD_read(file, name, &im))
-	       SS_error(si, PD_err, obj);};
+	       SS_error(si, PD_get_error(), obj);};
 
 	o = SX_mk_image(si, im);};
 

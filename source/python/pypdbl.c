@@ -173,8 +173,8 @@ PyObject *_PP_wr_syment(PP_file *fileinfo,
             return NULL;
         }
 #if 0
-        XXX - lat if (pdb_rd_hook != NULL)
-            mem_lst = (*pdb_rd_hook) (dp->members);
+        XXX - lat if (PD_gs.read != NULL)
+            mem_lst = (*PD_gs.read) (dp->members);
 #endif
 
         if (need_array) {
