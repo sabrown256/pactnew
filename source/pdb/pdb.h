@@ -213,6 +213,7 @@ typedef struct s_attribute_value attribute_value;
 typedef struct s_PD_address PD_address;
 typedef struct s_PD_image PD_image;
 typedef struct s_PD_pfm_fnc PD_pfm_fnc;
+typedef struct s_PD_global_state PD_global_state;
 typedef memdes *(*PFPDBwrite)(PDBfile *file, char *vr, defstr *defp);
 typedef memdes *(*PFPDBread)(memdes *members);
 
@@ -806,15 +807,85 @@ struct s_PD_pfm_fnc
     void (*mark_as_flushed)(PDBfile *file, int wh);
     void (*set_address)(PDBfile *file, int64_t addr);};
 
+struct s_PD_global_state
+   {int nthreads;
+    int FORMAT_FIELDS;
+    int default_format_version;
+    int buffer_size;
+    int DIM;
+
+    long PD_print_controls[1];
+    PD_pfm_fnc par;
+
+    PDBfile *vif;
+
+    char *PDBFILE_S;
+    char *PD_ALIGNMENT_S;
+    char *PD_DEFSTR_S;
+    char *PD_STANDARD_S;
+    char PD_err[1];
+
+    JMP_BUF _PD_read_err;
+    JMP_BUF _PD_write_err;
+    JMP_BUF _PD_print_err;
+    JMP_BUF _PD_open_err;
+    JMP_BUF _PD_trace_err;
+    JMP_BUF _PD_close_err;
+    JMP_BUF _PD_create_err;
+
+    PFPDBwrite wr_hook;
+    PFPDBread rd_hook;
+
+    data_standard *INT_STANDARD;
+    data_standard *REQ_STANDARD;
+    data_standard *PD_std_standards[1];
+
+    data_standard TEXT_STD;
+    data_standard PPC32_STD;
+    data_standard PPC64_STD;
+    data_standard I386_STD;
+    data_standard I586L_STD;
+    data_standard I586O_STD;
+    data_standard X86_64_STD;
+    data_standard X86_64A_STD;
+    data_standard M68X_STD;
+    data_standard VAX_STD;
+    data_standard CRAY_STD;
+
+    data_alignment *INT_ALIGNMENT;
+    data_alignment *REQ_ALIGNMENT;
+    data_alignment *PD_std_alignments[1];
+
+    data_alignment TEXT_ALIGNMENT;
+    data_alignment BYTE_ALIGNMENT;
+    data_alignment WORD2_ALIGNMENT;
+    data_alignment WORD4_ALIGNMENT;
+    data_alignment WORD8_ALIGNMENT;
+    data_alignment GNU4_I686_ALIGNMENT;
+    data_alignment OSX_10_5_ALIGNMENT;
+    data_alignment SPARC_ALIGNMENT;
+    data_alignment XLC32_PPC64_ALIGNMENT;
+    data_alignment CYGWIN_I686_ALIGNMENT;
+    data_alignment GNU3_PPC64_ALIGNMENT;
+    data_alignment GNU4_PPC64_ALIGNMENT;
+    data_alignment XLC64_PPC64_ALIGNMENT;
+    data_alignment GNU4_X86_64_ALIGNMENT;
+    data_alignment PGI_X86_64_ALIGNMENT;
+
+   };
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /*--------------------------------------------------------------------------*/
 
-/*                            PDBLIB VARIABLES                              */
+/*                           VARIABLE DECLARATIONS                          */
 
 /*--------------------------------------------------------------------------*/
+
+extern PD_global_state
+ PD_gs;
 
 extern PD_pfm_fnc
  PD_par_fnc;
@@ -898,7 +969,7 @@ extern data_alignment
 
 /*--------------------------------------------------------------------------*/
 
-/*                            PDBLIB FUNCTIONS                              */
+/*                          FUNCTION DECLARATIONS                           */
 
 /*--------------------------------------------------------------------------*/
 

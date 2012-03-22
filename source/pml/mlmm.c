@@ -10,18 +10,6 @@
 
 #include "pml_int.h"
 
-char
- *PM_AC_S              = "Arbitrarily-Connected",
- *PM_LR_S              = "Logical-Rectangular",
- *PM_MAP_INFO_P_S      = "PM_map_info *",
- *PM_MAPPING_P_S       = "PM_mapping *",
- *PM_SET_P_S           = "PM_set *",
- *PM_MAP_INFO_S        = "PM_map_info",
- *PM_MAPPING_S         = "PM_mapping",
- *PM_MESH_TOPOLOGY_S   = "PM_mesh_topology",
- *PM_MESH_TOPOLOGY_P_S = "PM_mesh_topology *",
- *PM_SET_S             = "PM_set";
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 

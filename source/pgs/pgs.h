@@ -59,6 +59,12 @@
 # define MAXPIX 65535
 #endif
 
+#define PG_TEXT_OBJECT_S         PG_gs.tnames[0]
+#define PG_VARIABLE_OBJECT_S     PG_gs.tnames[1]
+#define PG_BUTTON_OBJECT_S       PG_gs.tnames[2]
+#define PG_CONTAINER_OBJECT_S    PG_gs.tnames[3]
+#define PG_N_TYPES               4
+
 /*--------------------------------------------------------------------------*/
 
 /*                            PROCEDURAL MACROS                             */
@@ -239,8 +245,9 @@ typedef struct s_PG_dev_geometry PG_dev_geometry;
 typedef struct s_curve curve;
 typedef struct s_PG_text_box PG_text_box;
 typedef struct s_PG_event_handler PG_event_handler;
-typedef int (*PFRDev)(PG_device *dev);
+typedef struct s_PG_global_state PG_global_state;
 
+typedef int (*PFRDev)(PG_device *dev);
 typedef void (*PFKeymap)(PG_text_box *b);
 
 /*
@@ -626,7 +633,6 @@ typedef void (*PFEvCallback)(void *d, PG_event *ev);
 typedef void (*PFIobDraw)(PG_interface_object *iob);
 typedef void (*PFIobAction)(PG_interface_object *iob, PG_event *ev);
 typedef PG_interface_object *(*PFIobSelect)(PG_interface_object *iob, PG_event *ev);
-
 
 /*--------------------------------------------------------------------------*/
 
@@ -1058,6 +1064,12 @@ struct s_PG_dev_attributes
 
 /*--------------------------------------------------------------------------*/
 
+struct s_PG_global_state
+   {char *tnames[PG_N_TYPES];
+    FILE *stdscr;      /* this is the effective file pointer for the screen */
+    PG_device *console;};
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -1068,15 +1080,12 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
  
+extern PG_global_state
+ PG_gs;
+
 extern FILE
  *stdscr;              /* this is the effective file pointer for the screen */
  
-extern char
- *PG_TEXT_OBJECT_S,
- *PG_VARIABLE_OBJECT_S,
- *PG_BUTTON_OBJECT_S,
- *PG_CONTAINER_OBJECT_S;
-
 extern PG_device
  *PG_console_device;
 

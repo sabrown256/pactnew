@@ -13,6 +13,10 @@
 PG_state
  _PG = { TRUE, TRUE, 1.0, 22.5, 0.05, 2, -1, -1, };
 
+PG_global_state
+ PG_gs = { { "Text", "Variable", "Button", "Container" },
+	 };
+
 extern void
  _PG_rl_markers(void);
 

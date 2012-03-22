@@ -26,7 +26,12 @@ PM_field
                    (PFByte) PM_ltimes, (PFByte) PM_ldivide};
 
 PM_global_state
- PM_gs = { &_fp_opers, &_int_opers, &_long_opers, };
+ PM_gs = { &_fp_opers, &_int_opers, &_long_opers,
+	   { "PM_set", "PM_set *", "PM_map_info", "PM_map_info *",
+	     "PM_mapping", "PM_mapping *",
+	     "PM_mesh_topology", "PM_mesh_topology *",
+	     "Arbitrarily-Connected", "Logical-Rectangular" },
+	 };
 
 PM_state
  _PM = { -1, 0.05, -1.0, -1.0, 3.0e-8 };
