@@ -22,9 +22,6 @@
 	  (c->bool_alignment != d->bool_alignment))
 
 char
- *PD_ALIGNMENT_S = NULL,
- *PD_DEFSTR_S    = NULL,
- *PD_STANDARD_S  = NULL,
  *SYMENT_P_S     = NULL,
  *SYMENT_S       = NULL;
 
@@ -126,7 +123,7 @@ static int _PD_compare_fp_std(int n, data_standard *sa, data_standard *sb,
 	    if (eq == FALSE)
 	       {for (j = 0; j < na; j++)
 		    eq |= (*(poa++) != *(pob++));
-		for (j = 0; j < FORMAT_FIELDS; j++)
+		for (j = 0; j < PD_gs.format_fields; j++)
 		    eq |= (*(pfa++) != *(pfb++));};};};
 
     return(eq);}
@@ -172,7 +169,7 @@ int _PD_compare_std(data_standard *a, data_standard *b,
 	 for (j = 0; j < n; j++, eq &= (*(oa++) == *(ob++)));};
 
 /* check the floating point format data */
-    n  = FORMAT_FIELDS;
+    n  = PD_gs.format_fields;
     for (i = 0; i < N_PRIMITIVE_FP; i++)
         {fa = a->fp[i].format;
 	 fb = b->fp[i].format;
@@ -234,7 +231,7 @@ SC_udl *_PD_pio_open(char *name, char *mode)
     PFfopen opn;
     SC_udl *pu;
 
-    opn = PD_par_fnc.open_hook;
+    opn = PD_gs.par.open_hook;
     fp  = NULL;
 
     pu = _SC_parse_udl(name);
@@ -1074,7 +1071,7 @@ int _PD_rev_chrt(hasharr *ch)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_GET_ERROR - fetch PD_err
+/* PD_GET_ERROR - fetch the current error message for this thread
  *
  * #bind PD_get_error fortran() scheme() python()
  */
@@ -1089,7 +1086,7 @@ char *PD_get_error(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_GET_BUFFER_SIZE - fetch PD_buffer_size
+/* PD_GET_BUFFER_SIZE - fetch PD_gs.buffer_size
  *
  * #bind PD_get_buffer_size fortran() scheme() python()
  */
@@ -1112,7 +1109,7 @@ int64_t PD_get_buffer_size(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_SET_BUFFER_SIZE - set PD_buffer_size
+/* PD_SET_BUFFER_SIZE - set PD_gs.buffer_size
  *
  * #bind PD_set_buffer_size fortran() scheme(pd-set-buffer-size!) python()
  */
@@ -1671,7 +1668,7 @@ int64_t PD_set_max_file_size(PDBfile *file ARG(,,cls), int64_t v)
 int PD_get_fmt_version(void)
    {int rv;
 
-    rv = PD_default_format_version;
+    rv = PD_gs.default_format_version;
 
     return(rv);}
 
@@ -1687,8 +1684,8 @@ int PD_get_fmt_version(void)
 int PD_set_fmt_version(int v)
    {int rv;
 
-    rv = PD_default_format_version;
-    PD_default_format_version = v;
+    rv = PD_gs.default_format_version;
+    PD_gs.default_format_version = v;
 
     return(rv);}
 

@@ -338,7 +338,7 @@ FIXNUM FF_ID(pfstpt, PFSTPT)(FIXNUM *sfid, FIXNUM *sv)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PFGBFS - FORTRAN interface routine to fetch PD_buffer_size */
+/* PFGBFS - FORTRAN interface routine to fetch PD_gs.buffer_size */
 
 FIXNUM FF_ID(pfgbfs, PFGBFS)(void)
    {FIXNUM rv;
@@ -357,7 +357,7 @@ FIXNUM FF_ID(pfgbfs, PFGBFS)(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PFSBFS - FORTRAN interface routine to set PD_buffer_size */
+/* PFSBFS - FORTRAN interface routine to set PD_gs.buffer_size */
 
 FIXNUM FF_ID(pfsbfs, PFSBFS)(FIXNUM *ssz)
    {FIXNUM rv;
@@ -377,7 +377,7 @@ FIXNUM FF_ID(pfsbfs, PFSBFS)(FIXNUM *ssz)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PFGFMV - FORTRAN interface routine to fetch PD_default_format_version */
+/* PFGFMV - FORTRAN interface routine to fetch PD_gs.default_format_version */
 
 FIXNUM FF_ID(pfgfmv, PFGFMV)(FIXNUM *sv)
    {FIXNUM rv;
@@ -391,7 +391,7 @@ FIXNUM FF_ID(pfgfmv, PFGFMV)(FIXNUM *sv)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PFSFMV - FORTRAN interface routine to set PD_default_format_version */
+/* PFSFMV - FORTRAN interface routine to set PD_gs.default_format_version */
 
 FIXNUM FF_ID(pfsfmv, PFSFMV)(FIXNUM *sv)
    {FIXNUM rv;

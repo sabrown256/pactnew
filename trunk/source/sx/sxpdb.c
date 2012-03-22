@@ -333,7 +333,7 @@ static object *_SXI_rd_raw(SS_psides *si, object *argl)
 	   {case ABORT :
 	         return(SS_f);
 	    default :
-	         memset(PD_err, 0, MAXLINE);
+	         memset(PD_gs.err, 0, MAXLINE);
 		 break;};
 
 	nir = _PD_sys_read(file, ep, outtype, vr);
@@ -426,7 +426,7 @@ static object *_SXI_wr_raw(SS_psides *si, object *argl)
 	   {case ABORT :
 	         return(SS_f);
 	    default :
-	         memset(PD_err, 0, MAXLINE);
+	         memset(PD_gs.err, 0, MAXLINE);
 		 break;};
 
 	_PD_sys_write(file, name, vr, ni, intype, outtype);};
@@ -1607,7 +1607,7 @@ static object *_SXI_make_directory(SS_psides *si, object *argl)
        file = FILE_FILE(PDBfile, po);
 
     if (!PD_mkdir(file, dir))
-       {PD_err[0] = '\0';
+       {PD_gs.err[0] = '\0';
 	if (SS_true(errf))
            SS_error(si, "UNABLE TO CREATE DIRECTORY - _SXI_MAKE_DIRECTORY",
 		    argl);};
@@ -2236,7 +2236,7 @@ static object *_SXI_rd_syment(SS_psides *si, object *argl)
 	if (SS_true(err))
 	   return(SS_null);
 	else
-	   SS_error(si, PD_err, SS_cadr(si, argl));}
+	   SS_error(si, PD_get_error(), SS_cadr(si, argl));}
 
     else if (SC_LAST_CHAR(name) == ']')
        {dp = PD_entry_dimensions(ep);
@@ -2537,7 +2537,7 @@ static object *_SX_write_filedata(SS_psides *si, object *argl)
             if (ep == NULL)
 	       {CFREE(type);
 		CFREE(dims);
-		SS_error(si, PD_err, namo);};};}
+		SS_error(si, PD_get_error(), namo);};};}
         
 /* otherwise the next thing should be a cons */
     else
@@ -2562,7 +2562,7 @@ static object *_SX_write_filedata(SS_psides *si, object *argl)
 		    addr.memaddr, PD_entry_dimensions(ep),
 		    FALSE, &new);
             if (ep == NULL)
-	       SS_error(si, PD_err, namo);};
+	       SS_error(si, PD_get_error(), namo);};
 
 	if ((fp != NULL) && (fp != file))
 	   PN_close(fp);};
@@ -2735,7 +2735,7 @@ static object *_SXI_reserve_pdbdata(SS_psides *si, object *argl)
 	if (ep == NULL)
 	   {CFREE(type);
 	    CFREE(dims);
-	    SS_error(si, PD_err, namo);};
+	    SS_error(si, PD_get_error(), namo);};
 
 	ep = PD_copy_syment(ep);}
         
@@ -2768,7 +2768,7 @@ static object *_SXI_reserve_pdbdata(SS_psides *si, object *argl)
             ep = _PD_defent(fp, fullpath, PD_entry_type(ep),
                             number, PD_entry_dimensions(ep));
             if (ep == NULL)
-	       SS_error(si, PD_err, namo);
+	       SS_error(si, PD_get_error(), namo);
 
 	    ep = PD_copy_syment(ep);};
 
@@ -2871,7 +2871,7 @@ static object *_SX_read_filedata(SS_psides *si, object *argl)
                  SS_error(si, "_PD_HYPER_READ FAILED - SX_READ_FILEDATA",
                           namo);
             default :
-                 memset(PD_err, 0, MAXLINE);
+                 memset(PD_gs.err, 0, MAXLINE);
                  break;};
 
         addr.memaddr = _PD_alloc_entry(file, type, number);
@@ -3273,7 +3273,7 @@ object *SX_pdbdata_handler(SS_psides *si, PDBfile *file,
        {ep = file->tr->write(file, fullpath, type, type,
 			     data.memaddr, NULL, FALSE, &new);
         if (ep == NULL)
-           SS_error(si, PD_err, SS_null);
+           SS_error(si, PD_get_error(), SS_null);
 
 	if (_PD_IS_DP_INIT)
 	   lio_flush(file->stream);
@@ -3308,9 +3308,9 @@ static object *_SXI_set_switch(SS_psides *si, object *argl)
        SS_error(si, "BAD INDEX - _SXI_SET_SWITCH", argl);
 
     if (val != -1)
-       PD_print_controls[indx] = val;
+       PD_gs.print_ctrl[indx] = val;
 
-    rv = SS_mk_integer(si, PD_print_controls[indx]);
+    rv = SS_mk_integer(si, PD_gs.print_ctrl[indx]);
 
     return(rv);}
 
@@ -4195,7 +4195,7 @@ void SX_install_pdb_funcs(SS_psides *si)
     SS_install_cf(si, "format-version",
 		  "Variable: PDB metadata format version",
 		  SS_acc_int,
-                  &PD_default_format_version);
+                  &PD_gs.default_format_version);
 
     SX_install_pdb_attr_funcs(si);
 
@@ -4238,7 +4238,7 @@ static object *_SXI_get_buffer_size(SS_psides *si)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SXI_GET_ERROR - get the PD_err */
+/* _SXI_GET_ERROR - get the PDB error message */
 
 static object *_SXI_get_error(SS_psides *si)
    {char *v;

@@ -48,7 +48,7 @@ PP_print_controls(
         return NULL;
     }
     
-    PD_print_controls[i] = j;
+    PD_gs.print_ctrl[i] = j;
     
     Py_INCREF(Py_None);
     return Py_None;

@@ -65,7 +65,12 @@ if ("$cfg" =~ */*) then
    set cfgs = ""
 else
    set inf  = ( `echo $cfg | sed 's/-/ /g'` )
-   set cfgs = ( -cc $inf[1] )
+   set hst  = `uname -n`
+   if ("$hst" != "$inf[1]") then
+      set cfgs = ( -cc $inf[1] )
+   else
+      set cfgs = ""
+   endif
    set cfgf = ""
    set cfgd = ""
 endif
@@ -77,7 +82,7 @@ endif
 
 if ($err == 0) then
    Separator $log
-   set msg = `fill-string -n 29 "${cfgf}_from_config_file" | sed 's|_| |g'`
+   set msg = `fill-string -n 30 ${cfgf}_from_config_file | sed 's|_| |g'`
    NoteD $Log -n "                       $msg "
    Note $log ""
 
@@ -110,7 +115,7 @@ endif
 
 if ($err == 0) then
    Separator $log
-   set msg = `fill-string -n 29 "${cfgf}_from_database" | sed 's|_| |g'`
+   set msg = `fill-string -n 30 ${cfgf}_from_database | sed 's|_| |g'`
    NoteD $Log -n "                       $msg "
    Note $log ""
 

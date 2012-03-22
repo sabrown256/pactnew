@@ -125,8 +125,8 @@ object *_SX_make_list_leaf(SS_psides *si, PDBfile *file,
 	sz  = defp->size;
 	svr = vr;
         for (ii = 0L; ii < ni; ii++, svr += sz)
-            {if (pdb_wr_hook != NULL)
-                mem_lst = (*pdb_wr_hook)(file, svr, defp);
+            {if (PD_gs.write != NULL)
+                mem_lst = (*PD_gs.write)(file, svr, defp);
              obj1 = SS_null;
              for (desc = mem_lst; desc != NULL; desc = desc->next)
                  {member_offs = desc->member_offs;

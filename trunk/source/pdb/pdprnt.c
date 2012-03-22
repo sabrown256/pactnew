@@ -1,3 +1,4 @@
+
 /*
  * PDPRNT.C - PDB write functionality in PD
  *
@@ -13,18 +14,6 @@
 #define LINE_SIZE 90
 
 typedef int (*PFPrnt)(FILE *fp, void *p, int i, int mode);
-
-/* print controls
- *  0  -  print prefix: 0 = full path, 1 = space, 2 = tree
- *  1  -  0 = print name, 1 = print type and name
- *  2  -  recursion: 0 = yes, 1 = count
- *  3  -  number of items before going to array mode of display
- *  4  -  number of items per line
- *  5  -  print variable label: 0 = full, 1 = partial, 2 = nothing
- */
-
-long
- PD_print_controls[10] = {0L, 0L, 0L, 20L, 2L, 0L, 0L, 0L, 0L, 0L};
 
 static int
  _PD_print_data(FILE *f0,
@@ -55,7 +44,7 @@ static void _PD_disp_mode_i(PD_printdes *prnt, void *x, int tid,
 
     for (i = 0L; i < n; i++)
         {j = ind[i];
-         if (PD_print_controls[5] == 0)
+         if (PD_gs.print_ctrl[5] == 0)
 	    {PRINT(fp, "%s%s%s(%s) = ",
                    prnt->prefix, prnt->after, prnt->nodename,
                    PD_index_to_expr(bf, j,
@@ -80,9 +69,9 @@ static void _PD_disp_mode_1(PD_printdes *prnt, void *x, int tid)
 
     fp = prnt->fp;
 
-    if (PD_print_controls[5] == 0)
+    if (PD_gs.print_ctrl[5] == 0)
        {PRINT(fp, "%s%s%s = ", prnt->prefix, prnt->before, prnt->nodename);}
-    else if (PD_print_controls[5] == 1)
+    else if (PD_gs.print_ctrl[5] == 1)
        {PRINT(fp, "%s%s", prnt->before, prnt->nodename);}
     else
        {PRINT(fp, "        ");};
@@ -109,12 +98,12 @@ static void _PD_disp_mode_2(PD_printdes *prnt, void *x, inti ni, int tid)
 
     i = 0L;
     j = 0L;
-    if (PD_print_controls[5] == 0)
+    if (PD_gs.print_ctrl[5] == 0)
        {PRINT(fp, "%s%s%s(%s) = ",
               prnt->prefix, prnt->before, prnt->nodename,
               PD_index_to_expr(bf, j,
 			       prnt->dims, prnt->mjr, prnt->def_off));}
-    else if (PD_print_controls[5] == 1)
+    else if (PD_gs.print_ctrl[5] == 1)
        {PRINT(fp, "%s%s ", prnt->before, prnt->nodename);}
     else
        {PRINT(fp, "        ");};
@@ -125,12 +114,12 @@ static void _PD_disp_mode_2(PD_printdes *prnt, void *x, inti ni, int tid)
 
     j += prnt->offset;
     for (i = 1L; i < ni; i++, j += prnt->offset)
-        {if (PD_print_controls[5] == 0)
+        {if (PD_gs.print_ctrl[5] == 0)
             {PRINT(fp, "%s%s%s(%s) = ",
                    prnt->prefix, prnt->after, prnt->nodename,
                    PD_index_to_expr(bf, j,
 				    prnt->dims, prnt->mjr, prnt->def_off));}
-         else if (PD_print_controls[5] == 1)
+         else if (PD_gs.print_ctrl[5] == 1)
            {PRINT(fp, "%s%s ", prnt->before, prnt->nodename);}
 	 else
            {PRINT(fp, "        ");};
@@ -160,7 +149,7 @@ static void _PD_disp_mode_3(PD_printdes *prnt, void *x, inti ni, int tid)
 
     i = 0L;
     j = 0L;
-    if (PD_print_controls[5] == 0)
+    if (PD_gs.print_ctrl[5] == 0)
        {PRINT(fp, "%s%s%s\n", prnt->prefix, prnt->before, prnt->nodename);
         sprintf(s, "  (%s)                              ",
 		PD_index_to_expr(bf, j,
@@ -171,8 +160,8 @@ static void _PD_disp_mode_3(PD_printdes *prnt, void *x, inti ni, int tid)
        {PRINT(fp, "        ");};
 
     for (k = 0; i < ni; i++, j += prnt->offset, k++)
-        {if (k >= PD_print_controls[4])
-            {if (PD_print_controls[5] == 0)
+        {if (k >= PD_gs.print_ctrl[4])
+            {if (PD_gs.print_ctrl[5] == 0)
                 {sprintf(s, "  (%s)                              ",
                          PD_index_to_expr(bf, j,
 					  prnt->dims, prnt->mjr, prnt->def_off));
@@ -203,7 +192,7 @@ static void _PD_disp_data(PD_printdes *prnt, void *x,
     else if (ni == 1L)
        _PD_disp_mode_1(prnt, x, tid);
 
-    else if (ni < PD_print_controls[3])
+    else if (ni < PD_gs.print_ctrl[3])
        _PD_disp_mode_2(prnt, x, ni, tid);
 
     else
@@ -428,10 +417,10 @@ static void _PD_print_char_kind(PD_printdes *prnt, char *vr, inti ni,
 
     if (idx == SC_STRING_I)
        {if ((ni == 1L) && (offset == 0L))
-	   {if (PD_print_controls[5] == 0)
+	   {if (PD_gs.print_ctrl[5] == 0)
 	       {PRINT(f0, "%s%s%s = %c\n",
 		      prefix, before, nodename, *cp);}
-	    else if (PD_print_controls[5] == 1)
+	    else if (PD_gs.print_ctrl[5] == 1)
 	       {PRINT(f0, "%s%s = %c\n",
 		      before, nodename, *cp);}
 	    else
@@ -450,10 +439,10 @@ static void _PD_print_char_kind(PD_printdes *prnt, char *vr, inti ni,
 
 /* with quotes */
 	    if (quo == TRUE)
-	       {if (PD_print_controls[5] == 0)
+	       {if (PD_gs.print_ctrl[5] == 0)
 		   {PRINT(f0, "%s%s%s = \"%s\"\n",
 			  prefix, before, nodename, bf);}
-	        else if (PD_print_controls[5] == 1)
+	        else if (PD_gs.print_ctrl[5] == 1)
 		   {PRINT(f0, "%s%s = \"%s\"\n",
 			  before, nodename, bf);}
 		else
@@ -470,10 +459,10 @@ static void _PD_print_char_kind(PD_printdes *prnt, char *vr, inti ni,
 
 /* without quotes */
 	    else
-	       {if (PD_print_controls[5] == 0)
+	       {if (PD_gs.print_ctrl[5] == 0)
 		   {PRINT(f0, "%s%s%s = %s\n",
 			  prefix, before, nodename, bf);}
-	        else if (PD_print_controls[5] == 1)
+	        else if (PD_gs.print_ctrl[5] == 1)
 		   {PRINT(f0, "%s%s = %s\n",
 			  before, nodename, bf);}
 		else
@@ -524,7 +513,7 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
     j  = 0L;
     k  = 0;
     for (i = 0L; i < ni; i++, j += offset, k++)
-        {if (k > PD_print_controls[4])
+        {if (k > PD_gs.print_ctrl[4])
             {t  = PD_index_to_expr(bf, j,
 				   prnt->dims,
 				   prnt->mjr,
@@ -579,9 +568,9 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
 	    _PD_print_char_kind(prnt, vr, ni, type, quo, idx, n, ind);}
 
 	else if (strcmp(type, "function") == 0)
-	   {if (PD_print_controls[5] == 0)
+	   {if (PD_gs.print_ctrl[5] == 0)
 	       {PRINT(f0, "%s%s%s = <function>\n", prefix, before, nodename);}
-	    else if (PD_print_controls[5] == 1)
+	    else if (PD_gs.print_ctrl[5] == 1)
 	       {PRINT(f0, "%s%s = <function>\n", before, nodename);}
 	    else
 	       {PRINT(f0, "        <function>\n");};}
@@ -622,7 +611,7 @@ int PD_write_entry(FILE *f0, PDBfile *file ARG(,,cls),
         case ERR_FREE :
 	     return(0);
         default :
-	     memset(PD_err, 0, MAXLINE);
+	     memset(PD_gs.err, 0, MAXLINE);
 	     break;};
 
      status = 0;
@@ -762,9 +751,9 @@ static int _PD_print_indirection(PD_printdes *prnt, PDBfile *file, char **vr,
                 status &= _PD_print_leaf(prnt, file, DEREF(vr),
 					 ditems, dtype, irecursion, n, ind);}
          else
-	    {if (PD_print_controls[5] == 0)
+	    {if (PD_gs.print_ctrl[5] == 0)
 	        {PRINT(f0, "%s%s%s = (nil)\n", prefix, before, field);}
-	     else if (PD_print_controls[5] == 1)
+	     else if (PD_gs.print_ctrl[5] == 1)
 	        {PRINT(f0, "%s%s = (nil)\n", before, field);}
 	     else
 	        {PRINT(f0, "        (nil)\n");};};
@@ -811,7 +800,7 @@ static int _PD_print_member(FILE *f0, char *prefix,
     if ((ldp != NULL) && (strcmp(ldp->type, mtype) != 0))
        mtype = ldp->type;
 
-    if (PD_print_controls[2] == 0)
+    if (PD_gs.print_ctrl[2] == 0)
        status = _PD_print_data(f0, prefix, mbefore, mafter, mfield,
 			       file, mvr, mitems,
 			       mtype, mdims, mjr, def_off, 0,
@@ -894,8 +883,8 @@ int _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, inti ni,
         s = prefix + strlen(prefix);     /* save end of prefix */
         strcpy(s, before);
 
-        if (pdb_wr_hook != NULL)
-           mem_lst = (*pdb_wr_hook)(file, vr, defp);
+        if (PD_gs.write != NULL)
+           mem_lst = (*PD_gs.write)(file, vr, defp);
 
         size = defp->size;
 
@@ -913,7 +902,7 @@ int _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, inti ni,
 
 /* compute prefix */
 	     mbefore = NULL;
-             switch (PD_print_controls[0])
+             switch (PD_gs.print_ctrl[0])
                 {case 0 :
 		      SC_strcat(field, 80, ".");
 		      mbefore = field;
@@ -938,7 +927,7 @@ int _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, inti ni,
              strcpy(s, after);
 
              for (desc = mem_lst; desc != NULL; desc = desc->next)
-                 {if (PD_print_controls[1] == 0)
+                 {if (PD_gs.print_ctrl[1] == 0)
                      strcpy(mfield, desc->name);
                   else
                      strcpy(mfield, desc->member);
@@ -953,7 +942,7 @@ int _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, inti ni,
 
                   next = desc->next;
                   if (next != NULL)
-                     if ((PD_print_controls[0] == 2) && (next->next == NULL))
+                     if ((PD_gs.print_ctrl[0] == 2) && (next->next == NULL))
                          mafter = spaces;};
 
              svr += size;};

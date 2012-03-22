@@ -110,7 +110,7 @@ int _PC_bin_read(void *ptr, char *type, size_t ni, PROCESS *pp)
     switch (SETJMP(pa->read_err))
        {case ABORT    : return(FALSE);
         case ERR_FREE : return(TRUE);
-        default       : memset(PD_err, 0, MAXLINE);
+        default       : memset(PD_gs.err, 0, MAXLINE);
                         break;};
 
     ep = _PD_mk_syment(type, ni, 0L, NULL, NULL);
@@ -144,7 +144,7 @@ int _PC_bin_write(void *ptr, char *type, size_t ni, PROCESS *pp)
         case ERR_FREE :
 	     return(TRUE);
         default :
-	     memset(PD_err, 0, MAXLINE);
+	     memset(PD_gs.err, 0, MAXLINE);
 	     break;};
 
     niw = _PD_sys_write(file, name, ptr, ni, type, type);

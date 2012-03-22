@@ -16,9 +16,6 @@
 
 #define BUFINCR   4096
 
-int
- PD_default_format_version = 2;
-
 /*--------------------------------------------------------------------------*/
 
 /*                           READ/WRITE SUPPORT                             */
@@ -514,7 +511,7 @@ int _PD_format_version(PDBfile *file, int vers)
    {
 
     if ((vers < 1) || (3 < vers))
-       vers = PD_default_format_version;
+       vers = PD_gs.default_format_version;
 
     switch (vers)
        {case 1 :

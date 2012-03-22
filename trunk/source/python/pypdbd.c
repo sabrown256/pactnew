@@ -338,8 +338,8 @@ long _PP_mark_syment(char *outtype, long nitems, void *vr, int recursive)
             GO_CONT;
         }
 #if 0
-        XXX - lat if (pdb_rd_hook != NULL)
-            mem_lst = (*pdb_rd_hook) (dp->members);
+        XXX - lat if (PD_gs.read != NULL)
+            mem_lst = (*PD_gs.read) (dp->members);
 #endif
 
         /* compute number of entries in struct */

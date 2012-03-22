@@ -10,9 +10,6 @@
  
 #include "pdb_int.h"
 
-char
- *PDBFILE_S = "PDBfile";
-
 SC_array
  *_PD_file_types;
 
@@ -93,7 +90,7 @@ void _PD_conv_in(PDBfile *file, void *out, void *in, char *type, inti ni)
         case ERR_FREE :
 	     return;
         default :
-	     memset(PD_err, 0, MAXLINE);
+	     memset(PD_gs.err, 0, MAXLINE);
 	     break;};
 
     PD_convert((char **) &out, (char **) &in, type, type, ni,

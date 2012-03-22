@@ -19,10 +19,6 @@
 
 #include "pdb_int.h"
 
-int
- PD_DIM = INT_MIN,
- PD_buffer_size = -1;
-
 data_standard
  *REQ_STANDARD = NULL;
 
@@ -37,18 +33,6 @@ JMP_BUF
  _PD_trace_err,
  _PD_close_err,
  _PD_create_err;
-
-PFPDBwrite
- pdb_wr_hook = NULL;
-
-PFPDBread
- pdb_rd_hook = NULL;
-
-PDBfile
- *PD_vif = NULL;
-
-char
- PD_err[MAXLINE];
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

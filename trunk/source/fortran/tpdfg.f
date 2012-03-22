@@ -388,7 +388,7 @@
          call errproc
 
 ! ... check file mode
-      if (pd_get_mode_f(fileid) .ne. 4) &
+      if (pd_get_mode_f(fileid) .ne. 1) &
          call errproc
 
 ! ... set and get and verify major order
@@ -760,7 +760,7 @@
          call errproc
 
 ! ... check file mode
-      if (pd_get_mode_f(fileid) .ne. 2) &
+      if (pd_get_mode_f(fileid) .ne. 7) &
          call errproc
 
 ! ... retrieve and verify the value of an attribute

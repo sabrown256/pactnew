@@ -48,7 +48,7 @@ static void _SX_ins_mem(SS_psides *si, defstr *dp,
 /*--------------------------------------------------------------------------*/
 
 /* _SX_HASH_HOOK - write hook for pdblib to handle hash tables
- *               - pdb_wr_hook
+ *               - PD_gs.write
  */
 
 memdes *_SX_hash_hook(PDBfile *file, char *vr, defstr *dp)

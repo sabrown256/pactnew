@@ -1,5 +1,5 @@
 TXT: PDBLib User's Manual
-MOD: 11/28/2011
+MOD: 03/22/2012
 
 <CENTER>
 <P>
@@ -6925,8 +6925,8 @@ Return the integer value of the current maximum file size.
 </pre>
 <p>
 
-Get the current mode of PDB file <em>fileid</em>: 2 (append - 'a'),
-3 (open - 'r'), 4 (create - 'w').
+Get the current mode of PDB file <em>fileid</em>: 7 (append - 'a'),
+0 (open - 'r'), 1 (create - 'w').
 <p>
 
 The arguments to this function are:

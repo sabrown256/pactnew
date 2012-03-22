@@ -164,8 +164,8 @@ long _PP_rd_syment(PyObject *obj, PP_file *fileinfo,
             }
         }
 #if 0
-        if (pdb_rd_hook != NULL)
-            mem_lst = (*pdb_rd_hook) (dp->members);
+        if (PD_gs.read != NULL)
+            mem_lst = (*PD_gs.read) (dp->members);
 #endif
 
         /* compute number of entries in struct */

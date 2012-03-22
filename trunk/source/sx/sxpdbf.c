@@ -46,8 +46,8 @@ static void _SX_find_leaf(SS_psides *si, hasharr *tytab, PDBfile *file,
 	    sz  = defp->size;
 	    svr = vr;
 	    for (i = 0L; i < ni; i++, svr += sz)
-	        {if (pdb_wr_hook != NULL)
-		    mem_lst = (*pdb_wr_hook)(file, svr, defp);
+	        {if (PD_gs.write != NULL)
+		    mem_lst = (*PD_gs.write)(file, svr, defp);
 
 		 for (desc = mem_lst; desc != NULL; desc = desc->next)
 		     {_SX_find_data(si, tytab, file,

@@ -169,7 +169,7 @@ static void _SX_wrt_pdb_curve(SS_psides *si, PDBfile *fp,
    {
 
     if (!PD_wrt_pdb_curve(fp, crv->text, crv->n, crv->x[0], crv->x[1], icurve))
-       {PRINT(stdout, "%s\n", PD_err);
+       {PRINT(stdout, "%s\n", PD_get_error());
         SS_error(si, "CAN'T WRITE THE CURVE - _SX_WRT_PDB_CURVE",
 		   SS_null);};
 
