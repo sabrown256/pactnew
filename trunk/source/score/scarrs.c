@@ -173,7 +173,7 @@ static void _SC_array_acc_method(SC_array *a)
 static void _SC_array_grow(SC_array *a, long nn, long ng)
    {int chg;
     long i, n, nx, bpi;
-    double gf, fc;
+    double gf, fc, ex;
     char *arr;
     void *e;
 
@@ -187,7 +187,8 @@ static void _SC_array_grow(SC_array *a, long nn, long ng)
        {n  = max(nx, a->n);
 	n  = max(n, nn);
 	gf = a->gf;
-	fc = pow(2.0, -gf*n);
+	ex = -gf*n;
+	fc = pow(2.0, ex);
 	nn = (n + 1)*(1.0 + fc);};
 
 /* if never allocated */

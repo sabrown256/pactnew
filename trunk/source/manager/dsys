@@ -644,12 +644,8 @@ switch ($Cmnd)
               case -cc:
                    shift
                    setenv CCompiler  $1
-
-# cannot expect to handle CCompiler = gnu here
-# but do check things like CCompiler = gcc
-                   if (-x `which $CCompiler`) then
-                      $MngDir/verify-cc $CCompiler
-                      if ($status != 0) exit(1)
+                   $MngDir/verify-cc $CCompiler
+                   if ($status != 0) exit(1)
                    endif
 
                    breaksw

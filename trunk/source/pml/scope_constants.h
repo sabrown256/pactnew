@@ -12,6 +12,8 @@
 
 #define PCK_CONSTANTS
 
+#include "scope_complex.h"
+
 /*--------------------------------------------------------------------------*/
 
 /*                          PROCEDURAL MACROS                               */
@@ -41,12 +43,12 @@
 /*--------------------------------------------------------------------------*/
     
 
-typedef struct s_multi_number multi_number;
+typedef struct s_multi_rep_number multi_rep_number;
 typedef struct s_PM_constants PM_constants;
 
-/* use multi_number to contain representation of a value in several forms */
+/* use multi_rep_number to contain representation of a value in several forms */
 
-struct s_multi_number
+struct s_multi_rep_number
    {float f;
     double d;
     long double l;
@@ -54,12 +56,12 @@ struct s_multi_number
     quaternion q;};
 
 struct s_PM_constants
-   {multi_number zero;
-    multi_number smallp;
-    multi_number smallm;
-    multi_number one;
-    multi_number hugep;
-    multi_number hugem;
+   {multi_rep_number zero;
+    multi_rep_number smallp;
+    multi_rep_number smallm;
+    multi_rep_number one;
+    multi_rep_number hugep;
+    multi_rep_number hugem;
 
 /* fundamental numerical constants */
     long double pi;                  /* ratio of circumference to diameter */
