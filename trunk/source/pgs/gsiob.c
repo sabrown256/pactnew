@@ -11,12 +11,6 @@
 
 #include "pgs_int.h"
 
-char
- *PG_TEXT_OBJECT_S      = "Text",
- *PG_VARIABLE_OBJECT_S  = "Variable",
- *PG_BUTTON_OBJECT_S    = "Button",
- *PG_CONTAINER_OBJECT_S = "Container";
-
 SC_THREAD_LOCK(PG_iob_lock);
 
 extern PG_interface_object

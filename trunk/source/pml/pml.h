@@ -26,6 +26,18 @@
 #define PM_random PM_random_48
 #endif
 
+#define PM_SET_S                PM_gs.tnames[0]
+#define PM_SET_P_S              PM_gs.tnames[1]
+#define PM_MAP_INFO_S           PM_gs.tnames[2]
+#define PM_MAP_INFO_P_S         PM_gs.tnames[3]
+#define PM_MAPPING_S            PM_gs.tnames[4]
+#define PM_MAPPING_P_S          PM_gs.tnames[5]
+#define PM_MESH_TOPOLOGY_S      PM_gs.tnames[6]
+#define PM_MESH_TOPOLOGY_P_S    PM_gs.tnames[7]
+#define PM_AC_S                 PM_gs.tnames[8]
+#define PM_LR_S                 PM_gs.tnames[9]
+#define PM_N_TYPES              10
+
 /*--------------------------------------------------------------------------*/
 
 /*                          PROCEDURAL MACROS                               */
@@ -679,8 +691,11 @@ struct s_PM_global_state
     PM_field *int_opers;
     PM_field *long_opers;
 
+    char *tnames[PM_N_TYPES];
+
 /* zero initial value variables */
     char error[MAXLINE];};
+
     
 #ifdef __cplusplus
 extern "C" {
@@ -694,18 +709,6 @@ extern "C" {
 
 extern PM_global_state
  PM_gs;
-
-extern char
- *PM_AC_S,
- *PM_LR_S,
- *PM_MAP_INFO_S,
- *PM_MAPPING_S,
- *PM_SET_S,
- *PM_MAP_INFO_P_S,
- *PM_MAPPING_P_S,
- *PM_MESH_TOPOLOGY_S,
- *PM_MESH_TOPOLOGY_P_S,
- *PM_SET_P_S;
 
 /*--------------------------------------------------------------------------*/
 

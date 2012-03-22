@@ -10,6 +10,13 @@
 
 #include "pdb_int.h"
 
+PD_global_state
+ PD_gs;
+
+PD_state
+ _PD = { -1, 50L, -1, -1, FALSE, -1, FALSE,
+	 (SC_communicator) 1, (SC_communicator) 2, (SC_communicator) 3, };
+
 static sys_layer
  _PD_sys = {_PD_rd_syment, _PD_wr_syment};
 

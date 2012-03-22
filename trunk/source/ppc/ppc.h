@@ -96,6 +96,8 @@
 
 /*--------------------------------------------------------------------------*/
 
+#define _PC_debug                  _SC_debug
+#define _PC_diag                   _SC_diag
 
 #define PC_gets                     SC_gets
 #define PC_printf                   SC_printf
@@ -144,37 +146,37 @@
 #define PC_alarm    SC_timeout
 
 #define PC_open_member(_x, _y)                                               \
-   ((PC_par_oper != NULL) && (PC_par_oper->open_member != NULL)) ?           \
-   (*PC_par_oper->open_member)(_x, _y) :                                     \
+   (PC_gs.oper.open_member != NULL) ?                                        \
+   (*PC_gs.oper.open_member)(_x, _y) :                                       \
    NULL
 
 #define PC_close_member(_x)                                                  \
-   {if ((PC_par_oper != NULL) && (PC_par_oper->close_member != NULL))        \
-       (*PC_par_oper->close_member)(_x);}
+   {if (PC_gs.oper.close_member != NULL)                                     \
+       (*PC_gs.oper.close_member)(_x);}
 
 #define PC_size_message(_x, _y, _z)                                          \
-   ((PC_par_oper != NULL) && (PC_par_oper->size_message != NULL)) ?          \
-   (*PC_par_oper->size_message)(_x, _y, _z) :                                \
+   (PC_gs.oper.size_message != NULL) ?                                       \
+   (*PC_gs.oper.size_message)(_x, _y, _z) :                                  \
    0L
 
 #define PC_glmn_message(_x)                                                  \
-   ((PC_par_oper != NULL) && (PC_par_oper->glmn_message != NULL)) ?          \
-   (*PC_par_oper->glmn_message)(_x) :                                        \
+   (PC_gs.oper.glmn_message != NULL) ?                                       \
+   (*PC_gs.oper.glmn_message)(_x) :                                          \
    0.0
 
 #define PC_out(_a, _b, _c, _d, _e)                                           \
-   ((PC_par_oper != NULL) && (PC_par_oper->out != NULL)) ?                   \
-   (*PC_par_oper->out)(_a, _b, _c, _d, _e) :                                 \
+   (PC_gs.oper.out != NULL) ?                                                \
+   (*PC_gs.oper.out)(_a, _b, _c, _d, _e) :                                   \
    0L
 
 #define PC_in(_a, _b, _c, _d, _e)                                            \
-   ((PC_par_oper != NULL) && (PC_par_oper->in != NULL)) ?                    \
-   (*PC_par_oper->in)(_a, _b, _c, _d, _e) :                                  \
+   (PC_gs.oper.in != NULL) ?                                                 \
+   (*PC_gs.oper.in)(_a, _b, _c, _d, _e) :                                    \
    0L
 
 #define PC_wait(_x)                                                          \
-   ((PC_par_oper != NULL) && (PC_par_oper->wait != NULL)) ?                  \
-   (*PC_par_oper->wait)(_x) :                                                \
+   (PC_gs.oper.wait != NULL) ?                                               \
+   (*PC_gs.oper.wait)(_x) :                                                  \
    0L
 
 /*--------------------------------------------------------------------------*/
@@ -184,6 +186,7 @@
 /*--------------------------------------------------------------------------*/
 
 typedef struct s_PC_par_fnc PC_par_fnc;
+typedef struct s_PC_global_state PC_global_state;
 
 struct s_PC_par_fnc
    {PROCESS *(*open_member)(char **argv, int *pnn);
@@ -193,6 +196,9 @@ struct s_PC_par_fnc
     long (*out)(void *vr, char *type, size_t ni, PROCESS *pp, int *filt);
     long (*in)(void *vr, char *type, size_t ni, PROCESS *pp, int *filt);
     long (*wait)(PROCESS *pp);};
+
+struct s_PC_global_state
+   {PC_par_fnc oper;};
 
 #ifdef __cplusplus
 extern "C" {
@@ -204,11 +210,8 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-#define _PC_debug _SC_debug
-#define _PC_diag  _SC_diag
-
-extern PC_par_fnc
- *PC_par_oper;
+extern PC_global_state
+  PC_gs;
 
 /*--------------------------------------------------------------------------*/
 

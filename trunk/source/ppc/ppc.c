@@ -11,6 +11,9 @@
 
 #include "ppc_int.h"
 
+PC_global_state
+  PC_gs;
+
 PC_state
  _PC;
 

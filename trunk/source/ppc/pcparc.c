@@ -17,9 +17,6 @@
 # define HAVE_DPE
 #endif
 
-PC_par_fnc
- *PC_par_oper = NULL;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -675,12 +672,10 @@ static void _PC_init_n(PC_par_fnc *p)
 void PC_init_communications(void (*init)(PC_par_fnc *p))
    {
 
-    if (PC_par_oper == NULL)
-       {PC_par_oper = CMAKE(PC_par_fnc);
-	if (init == NULL)
-	   _PC_init_n(PC_par_oper);
-	else
-	   (*init)(PC_par_oper);};
+    if (init == NULL)
+       _PC_init_n(&PC_gs.oper);
+    else
+       (*init)(&PC_gs.oper);
 
     return;}
 
