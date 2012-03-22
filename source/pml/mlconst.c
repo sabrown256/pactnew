@@ -43,13 +43,16 @@ PM_constants
 void PM_physical_constants_cgs(void)
    {
 
-/* fundamental numerical constants */
+/* fundamental numerical constants
+ * NOTE: PGI acosl and expl do not work so do not compute
+ * just use canned values
+ */
 
 /* Pi */
-    PM_c.pi = acosl(-1.0);
+    PM_c.pi = 3.141592653589793238462643383279502884L;
 
 /* e */
-    PM_c.e  = expl(1.0);
+    PM_c.e  = 2.71828182845904523536028747135266249775724709369995L;
 
 /* golden ratio */
     PM_c.f  = 1.618033988749894848207210029666925L;

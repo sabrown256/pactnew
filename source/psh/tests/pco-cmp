@@ -58,8 +58,17 @@ end
 set incdir = ../dev/$tsys/include
 set logdir = ../dev/$tsys/log
 set refdb  = $cwd/$tdir/test.db
-set cfgd   = $cfg:h
-set cfgf   = $cfg:t
+
+if ("$cfg" =~ */*) then
+   set cfgd = ( -f $cfg:h )
+   set cfgf = $cfg:t
+   set cfgs = ""
+else
+   set inf  = ( `echo $cfg | sed 's/-/ /g'` )
+   set cfgs = ( -cc $inf[1] )
+   set cfgf = ""
+   set cfgd = ""
+endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -77,7 +86,7 @@ if ($err == 0) then
    flog $log rm -rf $incdir/*
 
    set lt = `timer -r`
-   flog $log dsys config -g -f $cfgd $cfgf -a $tsys
+   flog $log dsys config -g $cfgd $cfgf $cfgs -a $tsys
    @ err = $err + $status
    set lt = `timer -b $lt`
 

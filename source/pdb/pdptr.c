@@ -395,7 +395,7 @@ static long _PD_ptr_fix(adloc *al, long n)
 static int _PD_ptr_index(void *p)
     {int i;
 
-     i = *((int *) &p);
+     i = *((long *) &p);
 
      return(i);}
 
@@ -409,7 +409,7 @@ static int _PD_ptr_index(void *p)
 static void _PD_index_ptr(char *p, int i)
     {
 
-     *((int *) p) = i;
+     *((long *) p) = i;
 
      return;}
 

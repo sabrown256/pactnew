@@ -10,7 +10,29 @@
 
 @ err = 0
 
-set cc = $1
+set cc = `which $1`
+if (!(-x "$cc")) then
+
+# attempt to map vendors to compilers as cfg-base does
+   switch ($1)
+      case gnu:
+           set cc = `which gcc`
+           breaksw
+      case pgi:
+           set cc = `which pgcc`
+           breaksw
+      case intel:
+           set cc = `which icc`
+           breaksw
+      case path:
+           set cc = `which pathcc`
+           breaksw
+      case sun:
+           set cc = `which suncc`
+           breaksw
+   endsw
+endif
+
 set hst = `uname -n`
 set ce  = hello.$hst.$$
 
