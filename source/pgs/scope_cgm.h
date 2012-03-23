@@ -144,6 +144,8 @@
 
 /*--------------------------------------------------------------------------*/
 
+#undef TEXT_ALIGNMENT
+
 #define LINE_TYPE                       5,2,1,1,SC_INT_S
 #define LINE_WIDTH                      5,3,1,1,SC_INT_S
 #define LINE_COLOUR                     5,4,1,1,SC_CHAR_S

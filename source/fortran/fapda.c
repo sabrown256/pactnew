@@ -2361,7 +2361,7 @@ FIXNUM FF_ID(pfdnrm, PFDNRM)(FIXNUM *istd, FIXNUM *snct, char *type,
     if (is == -1)
        std = NULL;
     else
-       std = PD_std_standards[is - 1];
+       std = PD_gs.std_standards[is - 1];
 
     rv = PD_fix_denorm(std, t, n, vr);
 
@@ -2417,8 +2417,8 @@ FIXNUM FF_ID(pftrgt, PFTRGT)(FIXNUM *sis, FIXNUM *sia)
     st = *sis;
     rv = (al != 6);
     if (rv)
-       {pa->req_std   = PD_std_standards[st - 1];
-        pa->req_align = PD_std_alignments[al - 1];}
+       {pa->req_std   = PD_gs.std_standards[st - 1];
+        pa->req_align = PD_gs.std_alignments[al - 1];}
 
     else
        {pa->req_std   = NULL;
@@ -2445,7 +2445,8 @@ FIXNUM FF_ID(pfntgt, PFNTGT)(FIXNUM *sis, FIXNUM *sia)
     st = *sis;
     ret = (al != 6);
     if (ret)
-       {chart = PN_target(PD_std_standards[st - 1], PD_std_alignments[al - 1]);
+       {chart = PN_target(PD_gs.std_standards[st - 1],
+			  PD_gs.std_alignments[al - 1]);
         rv    = SC_ADD_POINTER(chart);}
 
     else

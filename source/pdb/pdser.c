@@ -429,10 +429,10 @@ static void _PD_init_thread(PD_smp_state *pa, int id)
     pa->frames = NULL;
 
     pa->buffer_size = PD_gs.buffer_size;
-    pa->int_std     = INT_STANDARD;
-    pa->req_std     = REQ_STANDARD;
-    pa->int_align   = INT_ALIGNMENT;
-    pa->req_align   = REQ_ALIGNMENT;
+    pa->int_std     = PD_gs.int_standard;
+    pa->req_std     = PD_gs.req_standard;
+    pa->int_align   = PD_gs.int_alignment;
+    pa->req_align   = PD_gs.req_alignment;
     pa->vif         = PD_gs.vif;
     pa->wr_hook     = PD_gs.write;
     pa->rd_hook     = PD_gs.read;

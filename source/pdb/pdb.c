@@ -19,21 +19,6 @@
 
 #include "pdb_int.h"
 
-data_standard
- *REQ_STANDARD = NULL;
-
-data_alignment
- *REQ_ALIGNMENT = NULL;
-
-JMP_BUF
- _PD_read_err,
- _PD_write_err,
- _PD_print_err,
- _PD_open_err,
- _PD_trace_err,
- _PD_close_err,
- _PD_create_err;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -1482,7 +1467,7 @@ int PD_fix_denorm(data_standard* std, char *type, int64_t ni, void *vr)
     st  = TRUE;
 
     if (std == NULL)
-       std = INT_STANDARD;
+       std = PD_gs.int_standard;
 
     id = SC_type_id(type, FALSE);
 

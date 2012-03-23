@@ -32,33 +32,6 @@ static target
 			    {"vax",     &VAX_STD,     &WORD4_ALIGNMENT},
 			    {"cray",    &CRAY_STD,    &WORD8_ALIGNMENT} };
 
-data_standard
- *PD_std_standards[] = {&X86_64_STD,                 /* 1 */
-                        &I586L_STD,
-                        &I586O_STD,
-                        &I386_STD,
-                        &PPC64_STD,                  /* 5 */
-                        &PPC32_STD,
-                        &M68X_STD,
-                        &VAX_STD,
-                        &CRAY_STD,
-                        NULL};
-
-data_alignment
- *PD_std_alignments[] = {&BYTE_ALIGNMENT,            /* 1 */
-                         &WORD2_ALIGNMENT,
-                         &WORD4_ALIGNMENT,
-                         &WORD8_ALIGNMENT,
-                         &GNU4_X86_64_ALIGNMENT,     /* 5 */
-                         &GNU4_I686_ALIGNMENT,
-                         &CYGWIN_I686_ALIGNMENT,
-                         &GNU3_PPC64_ALIGNMENT,
-                         &XLC64_PPC64_ALIGNMENT,
-                         &XLC32_PPC64_ALIGNMENT,     /* 10 */
-                         &OSX_10_5_ALIGNMENT,
-                         &SPARC_ALIGNMENT,
-                         NULL};
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 

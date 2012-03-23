@@ -985,9 +985,10 @@ void print_header(FILE *fp,
     {int i, j;
 
 /* print the floating point ordering info */
-    fprintf(fp, "\nint\n");
-    fprintf(fp, " host_order = %s,\n", int_order);
+    fprintf(fp, "#define HOST_ORDER %s\n", int_order);
+    fprintf(fp, "\n");
 
+    fprintf(fp, "\nint\n");
     fprintf(fp, " int_ord_f[] = {%d", fb[0]);
     for (i = 1; i < size[I_FLOAT]; i++)
         fprintf(fp, ", %d", fb[i]);
@@ -1054,22 +1055,19 @@ void print_header(FILE *fp,
            size[I_FLOAT]);
     fprintf(fp, "             {%d, int_frm_d, int_ord_d},            /* double definition */\n", 
            size[I_DOUBLE]);
-    fprintf(fp, "             {%d, int_frm_ld, int_ord_ld}}},  /* long double definition */\n", 
+    fprintf(fp, "             {%d, int_frm_ld, int_ord_ld}}};  /* long double definition */\n", 
            size[I_LONG_DOUBLE]);
-
-    fprintf(fp, " *INT_STANDARD = &INT_STD;\n");
 
 /* emit data_alignment definition */
     fprintf(fp, "\n/* Internal DATA_ALIGNMENT */\n\n");
     fprintf(fp, "data_alignment\n");
-    fprintf(fp, " INT_ALG = {%d, %d, {%d, %d}, {%d, %d, %d, %d, %d}, {%d, %d, %d}, %d},\n", 
+    fprintf(fp, " INT_ALG = {%d, %d, {%d, %d}, {%d, %d, %d, %d, %d}, {%d, %d, %d}, %d};\n", 
 	   align[I_POINTER], align[I_BOOL],
            align[I_CHAR], align[I_WCHAR],
            align[I_INT8], align[I_SHORT], align[I_INT], 
            align[I_LONG], align[I_LONG_LONG],
 	   align[I_FLOAT], align[I_DOUBLE], align[I_LONG_DOUBLE],
 	   align[I_STRUCT]);
-    fprintf(fp, " *INT_ALIGNMENT = &INT_ALG;\n");
 
     fprintf(fp, "\n/* complex tuple info */\n\n");
     fprintf(fp, "int\n");

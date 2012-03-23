@@ -78,11 +78,11 @@ int main(int c, char **v)
 	    n = SC_stoi(v[i]);
          else if (is == -1)
 	    {is = SC_stoi(v[i]);
-	     REQ_STANDARD  = PD_std_standards[is - 1];
+	     PD_gs.req_standard  = PD_gs.std_standards[is - 1];
 	     printf("Data Standard  = %d\n", is);}
          else if (ia == -1)
 	    {ia = SC_stoi(v[i]);
-	     REQ_ALIGNMENT = PD_std_alignments[ia - 1];
+	     PD_gs.req_alignment = PD_gs.std_alignments[ia - 1];
 	     printf("Data Alignment = %d\n", ia);};};
 
     SC_signal(SIGINT, SIG_DFL);

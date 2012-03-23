@@ -33,29 +33,29 @@ static void _SX_target(SS_psides *si, int data, int align)
     align_max = 0;
 
     if (data == 0)
-       {if (REQ_STANDARD != NULL)
-           while (REQ_STANDARD != PD_std_standards[data++]);}
+       {if (PD_gs.req_standard != NULL)
+           while (PD_gs.req_standard != PD_gs.std_standards[data++]);}
     else
-       {while (PD_std_standards[data_max++]);
+       {while (PD_gs.std_standards[data_max++]);
         if ((data < 1) || (data >= data_max))
            SS_error(si, "UNKNOWN DATA STANDARD - _SX_TARGET",
                     SS_mk_integer(si, data));};
         
     if (align == 0)
-       {if (REQ_ALIGNMENT != NULL)
-           while (REQ_ALIGNMENT != PD_std_alignments[align++]);}
+       {if (PD_gs.req_alignment != NULL)
+           while (PD_gs.req_alignment != PD_gs.std_alignments[align++]);}
     else
-       {while (PD_std_alignments[align_max++]);
+       {while (PD_gs.std_alignments[align_max++]);
        if ((align < 1) || (align >= align_max))
           SS_error(si, "UNKNOWN DATA ALIGNMENT - _SX_TARGET",
                    SS_mk_integer(si, align));};
 
     if (data != 0)
-       REQ_STANDARD  = PD_std_standards[data - 1];
+       PD_gs.req_standard  = PD_gs.std_standards[data - 1];
     if (align != 0)
-       REQ_ALIGNMENT = PD_std_alignments[align - 1];
+       PD_gs.req_alignment = PD_gs.std_alignments[align - 1];
 
-    PD_target(REQ_STANDARD, REQ_ALIGNMENT);
+    PD_target(PD_gs.req_standard, PD_gs.req_alignment);
 
     return;}
 
