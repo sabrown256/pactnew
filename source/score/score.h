@@ -36,29 +36,29 @@
 #define SC_NSIG 65
 
 #undef SIZEOF
-#define SIZEOF (*SC_sizeof_hook)
+#define SIZEOF     (*SC_gs.size)
 
 #undef CONTAINER
-#define CONTAINER (*SC_gs.type_container)
+#define CONTAINER  (*SC_gs.type_container)
 
-#define OTOL    (*SC_gs.otol)
-#define HTOL    (*SC_gs.htol)
-#define ATOL    (*SC_gs.atol)
-#define ATOF    (*SC_gs.atof)
-#define STRTOD  (*SC_gs.strtod)
-#define STRTOL  (*SC_gs.strtol)
-#define STRTOLL strtoll
+#define OTOL       (*SC_gs.otol)
+#define HTOL       (*SC_gs.htol)
+#define ATOL       (*SC_gs.atol)
+#define ATOF       (*SC_gs.atof)
+#define STRTOD     (*SC_gs.strtod)
+#define STRTOL     (*SC_gs.strtol)
+#define STRTOLL    strtoll
 
 #ifndef SYSTEM
-# define SYSTEM SC_system
+# define SYSTEM    SC_system
 #endif
 
 #ifndef ALARM
-# define ALARM alarm
+# define ALARM     alarm
 #endif
 
 #ifndef REMOVE
-#define REMOVE remove
+#define REMOVE     remove
 #endif
 
 #undef CMAKE
@@ -631,19 +631,22 @@ struct s_SC_global_state
     int radix;
     int unary_plus;
     int verify_writes;
-    int argc;              /* number of command line arguments from main */
-    char **argv;           /* command line arguments from main */
-    char **env;            /* environment from main */
-    void *exe_info;        /* slot for exedes if needed */
-    double (*atof)(const char *s);
-    double (*strtod)(const char *s, char **endp);
+    int argc;                /* number of command line arguments from main */
+    char **argv;                       /* command line arguments from main */
+    char **env;                                   /* environment from main */
+    void *exe_info;                           /* slot for exedes if needed */
+    SC_type_label ltyp[SC_TYP_N];              /* labels of selected types */
+    SC_type_label lityp[SC_ITYP_N];   /* labels of selected indirect types */
+    int (*size)(char *s);                       /* string driven size hook */
     long (*otol)(char *s);
     long (*htol)(char *s);
     long (*atol)(const char *s);
     long (*strtol)(const char *s, char **endp, int base);
+    double (*atof)(const char *s);
+    double (*strtod)(const char *s, char **endp);
     void (*type_container)(char *dtype, char *stype);
     SC_mem_fnc mm;
-    JMP_BUF cpu;};       /* top level environment - mainly for error return */
+    JMP_BUF cpu;};      /* top level environment - mainly for error return */
 
 /*--------------------------------------------------------------------------*/
 
@@ -654,10 +657,6 @@ struct s_SC_global_state
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-extern int
- Zero_I,
- One_I;
 
 extern SC_global_state
  SC_gs;

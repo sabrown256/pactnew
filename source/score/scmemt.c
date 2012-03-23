@@ -207,7 +207,7 @@ static void _SC_grow_thread_data(int nt, int ne)
         {for (ie = 0; ie < st.ne; ie++)
              {i = it*st.nex + ie;
 	      if (st.data[i] == NULL)
-		 {pt  = st.mreg + ie;
+		 {pt = st.mreg + ie;
 		  if (pt != NULL)
 		     {bpi = pt->bpi;
 		      ni  = pt->ni;

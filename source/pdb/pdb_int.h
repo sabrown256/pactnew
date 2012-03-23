@@ -99,6 +99,11 @@
 
 /*--------------------------------------------------------------------------*/
 
+enum e_mpi_comm_ind
+   {COM_NULL = 0, COM_WORLD, COM_SELF, COM_N};
+
+typedef enum e_mpi_comm_ind mpi_comm_ind;
+
 /* inti to be used for quantities that are numbers of items long */
 typedef int64_t inti;
 
@@ -170,9 +175,9 @@ struct s_PD_state
     int mp_collective;
 
 /* PDCOMM.C */
-    SC_communicator comm_null;
-    SC_communicator comm_world;
-    SC_communicator comm_self;
+    int comm_initialized;
+    SC_communicator def_comm[COM_N];        /* default stub communicators */
+    SC_communicator use_comm[COM_N];       /* communicators that are used */
 
 /* initializes to 0 bytes */
 
@@ -180,14 +185,14 @@ struct s_PD_state
     int nfilesx;
 
 /* PDPARMP.C */
-    int nterminated;                    /* num processes who sent terminate msg */
+    int nterminated;              /* num processes who sent terminate msg */
     SC_communicator mp_comm;
 
 /* PDSZOF.C */
     long szl;
 
 /* PDCONV.C */
-    int force;                          /* force conversions if TRUE */
+    int force;                               /* force conversions if TRUE */
 
 /* PDBDIR.C */
     int dir_num;
@@ -230,15 +235,6 @@ extern "C" {
 
 extern PD_state
  _PD;
-
-extern char
- *SYMENT_P_S,
- *SYMENT_S;
-
-extern SC_communicator
- PD_COMM_NULL,
- PD_COMM_WORLD,
- PD_COMM_SELF;
 
 /*--------------------------------------------------------------------------*/
 

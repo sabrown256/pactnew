@@ -32,7 +32,7 @@
 # include <GL/glx.h>
 # include <GL/gl.h>
 # undef SIZEOF
-# define SIZEOF (*SC_sizeof_hook)
+# define SIZEOF (*SC_gs.size)
 #endif
 
 #include "scope_x11.h"

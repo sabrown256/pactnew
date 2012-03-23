@@ -558,7 +558,7 @@ defstr *PN_defstr(hasharr *chart, char *name, data_alignment *align,
 
     pa = _PD_get_state(-1);
 
-    SC_sizeof_hook = _PN_sizeof;
+    SC_gs.size = _PN_sizeof;
 
     SC_VA_START(defoff);
 
