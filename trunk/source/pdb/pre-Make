@@ -109,7 +109,7 @@ ArObjs = ${TGTLib}(pdb.o) ${TGTLib}(pdbaib.o)                        \
          ${TGTLib}(pdszof.o) ${TGTLib}(pdpar.o) ${TGTLib}(pdparmp.o) \
          ${TGTLib}(pdspoke.o)
 
-${LibDep} : ${hdrf} ${Hdrs} pdspoke.c
+${LibDep} : ${hdrf} ${Hdrs} pdspoke.c scope_formats.h
 
 #
 # Generated code rules

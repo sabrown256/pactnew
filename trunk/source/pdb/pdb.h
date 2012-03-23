@@ -145,6 +145,36 @@
 #define PD_ALIGNMENT_S  PD_gs.tnames[2]
 #define PD_STANDARD_S   PD_gs.tnames[3]
 
+#define TEXT_STD        PD_gs.standards[0]
+#define I386_STD        PD_gs.standards[3]
+#define I586L_STD       PD_gs.standards[4]
+#define I586O_STD       PD_gs.standards[5]
+#define PPC32_STD       PD_gs.standards[1]
+#define X86_64_STD      PD_gs.standards[6]
+#define X86_64A_STD     PD_gs.standards[7]
+#define PPC64_STD       PD_gs.standards[2]
+#define M68X_STD        PD_gs.standards[8]
+#define VAX_STD         PD_gs.standards[9]
+#define CRAY_STD        PD_gs.standards[10]
+#define PD_N_STANDARDS  11
+
+#define TEXT_ALIGNMENT         PD_gs.alignments[0]
+#define BYTE_ALIGNMENT         PD_gs.alignments[1]
+#define WORD2_ALIGNMENT        PD_gs.alignments[2]
+#define WORD4_ALIGNMENT        PD_gs.alignments[3]
+#define WORD8_ALIGNMENT        PD_gs.alignments[4]
+#define GNU4_I686_ALIGNMENT    PD_gs.alignments[5]
+#define OSX_10_5_ALIGNMENT     PD_gs.alignments[6]
+#define SPARC_ALIGNMENT        PD_gs.alignments[7]
+#define XLC32_PPC64_ALIGNMENT  PD_gs.alignments[8]
+#define CYGWIN_I686_ALIGNMENT  PD_gs.alignments[9]
+#define GNU3_PPC64_ALIGNMENT   PD_gs.alignments[10]
+#define GNU4_PPC64_ALIGNMENT   PD_gs.alignments[11]
+#define XLC64_PPC64_ALIGNMENT  PD_gs.alignments[12]
+#define GNU4_X86_64_ALIGNMENT  PD_gs.alignments[13]
+#define PGI_X86_64_ALIGNMENT   PD_gs.alignments[14]
+#define PD_N_ALIGNMENTS        15
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -818,6 +848,7 @@ struct s_PD_global_state
     int format_fields;
     int default_format_version;
     int buffer_size;
+    int host_order;
 
     long print_ctrl[10];
 
@@ -825,61 +856,20 @@ struct s_PD_global_state
     char *tnames[4];
 
     PDBfile *vif;
-
-/* semi-obsolete read/write hooks */
-    PFPDBwrite write;
+    PFPDBwrite write;                    /* semi-obsolete read/write hooks */
     PFPDBread read;
 
-    data_standard *INT_STANDARD;
-    data_standard *REQ_STANDARD;
-    data_standard *PD_std_standards[1];
+    data_standard *int_standard;
+    data_standard *req_standard;
+    data_standard standards[PD_N_STANDARDS];
+    data_standard *std_standards[PD_N_STANDARDS + 1];
 
-    data_standard TEXT_STD;
-    data_standard PPC32_STD;
-    data_standard PPC64_STD;
-    data_standard I386_STD;
-    data_standard I586L_STD;
-    data_standard I586O_STD;
-    data_standard X86_64_STD;
-    data_standard X86_64A_STD;
-    data_standard M68X_STD;
-    data_standard VAX_STD;
-    data_standard CRAY_STD;
+    data_alignment *int_alignment;
+    data_alignment *req_alignment;
+    data_alignment alignments[PD_N_ALIGNMENTS];
+    data_alignment *std_alignments[PD_N_ALIGNMENTS + 1];
 
-    data_alignment *INT_ALIGNMENT;
-    data_alignment *REQ_ALIGNMENT;
-    data_alignment *PD_std_alignments[1];
-
-    data_alignment TEXT_ALIGNMENT;
-    data_alignment BYTE_ALIGNMENT;
-    data_alignment WORD2_ALIGNMENT;
-    data_alignment WORD4_ALIGNMENT;
-    data_alignment WORD8_ALIGNMENT;
-    data_alignment GNU4_I686_ALIGNMENT;
-    data_alignment OSX_10_5_ALIGNMENT;
-    data_alignment SPARC_ALIGNMENT;
-    data_alignment XLC32_PPC64_ALIGNMENT;
-    data_alignment CYGWIN_I686_ALIGNMENT;
-    data_alignment GNU3_PPC64_ALIGNMENT;
-    data_alignment GNU4_PPC64_ALIGNMENT;
-    data_alignment XLC64_PPC64_ALIGNMENT;
-    data_alignment GNU4_X86_64_ALIGNMENT;
-    data_alignment PGI_X86_64_ALIGNMENT;
-
-    PD_pfm_fnc par;
-
-    JMP_BUF cpu[7];
-#if 0
-    JMP_BUF _PD_open_err;
-    JMP_BUF _PD_create_err;
-    JMP_BUF _PD_close_err;
-    JMP_BUF _PD_read_err;
-    JMP_BUF _PD_write_err;
-    JMP_BUF _PD_print_err;
-    JMP_BUF _PD_trace_err;
-#endif
-
-   };
+    PD_pfm_fnc par;};
 
 #ifdef __cplusplus
 extern "C" {
@@ -893,55 +883,6 @@ extern "C" {
 
 extern PD_global_state
  PD_gs;
-
-extern data_standard
- *INT_STANDARD,
- *REQ_STANDARD,
- *PD_std_standards[];
-
-extern data_alignment
- *INT_ALIGNMENT,
- *REQ_ALIGNMENT,
- *PD_std_alignments[];
-
-extern JMP_BUF
- _PD_read_err,
- _PD_write_err,
- _PD_print_err,
- _PD_open_err,
- _PD_trace_err,
- _PD_close_err,
- _PD_create_err;
-
-extern data_standard
- TEXT_STD,
- PPC32_STD,
- PPC64_STD,
- I386_STD,
- I586L_STD,
- I586O_STD,
- X86_64_STD,
- X86_64A_STD,
- M68X_STD,
- VAX_STD,
- CRAY_STD;
-
-extern data_alignment
- TEXT_ALIGNMENT,
- BYTE_ALIGNMENT,
- WORD2_ALIGNMENT,
- WORD4_ALIGNMENT,
- WORD8_ALIGNMENT,
- GNU4_I686_ALIGNMENT,
- OSX_10_5_ALIGNMENT,
- SPARC_ALIGNMENT,
- XLC32_PPC64_ALIGNMENT,
- CYGWIN_I686_ALIGNMENT,
- GNU3_PPC64_ALIGNMENT,
- GNU4_PPC64_ALIGNMENT,
- XLC64_PPC64_ALIGNMENT,
- GNU4_X86_64_ALIGNMENT,
- PGI_X86_64_ALIGNMENT;
 
 /*--------------------------------------------------------------------------*/
 

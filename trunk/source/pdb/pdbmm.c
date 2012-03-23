@@ -9,9 +9,10 @@
 #include "cpyright.h"
 
 #include "pdb_int.h"
+#include "scope_formats.h"
 
 PD_global_state
- PD_gs = { 0, 8, 2, -1,
+ PD_gs = { 0, 8, 2, -1, HOST_ORDER,
 
 /* print controls
  *  0  -  print prefix: 0 = full path, 1 = space, 2 = tree
@@ -24,6 +25,67 @@ PD_global_state
            {0L, 0L, 0L, 20L, 2L, 0L, 0L, 0L, 0L, 0L},
            "",
            { "PDBfile", NULL, NULL, NULL },
+	   NULL, NULL, NULL,
+
+/* data_standards */
+           &INT_STD, NULL,
+           { DEF_TEXT_STD,
+             DEF_I386_STD,
+	     DEF_I586L_STD,
+	     DEF_I586O_STD,
+	     DEF_PPC32_STD,
+             DEF_X86_64_STD,
+	     DEF_X86_64A_STD,
+	     DEF_PPC64_STD,
+             DEF_M68X_STD,
+	     DEF_VAX_STD,
+	     DEF_CRAY_STD },
+
+           { &X86_64_STD,                 /* 1 */
+             &I586L_STD,
+             &I586O_STD,
+             &I386_STD,
+             &PPC64_STD,                  /* 5 */
+             &PPC32_STD,
+             &M68X_STD,
+             &VAX_STD,
+             &CRAY_STD,
+             NULL },
+
+/* data_alignments */
+	   &INT_ALG, NULL, 
+           { DEF_TEXT_ALIGN,
+	     DEF_BYTE_ALIGN,
+	     DEF_WORD2_ALIGN,
+	     DEF_WORD4_ALIGN,
+	     DEF_WORD8_ALIGN,
+	     DEF_GNU4_I686_ALIGN,
+	     DEF_OSX_10_5_ALIGN,
+	     DEF_SPARC_ALIGN,
+	     DEF_XLC32_PPC64_ALIGN,
+	     DEF_CYGWIN_I686_ALIGN,
+	     DEF_GNU3_PPC64_ALIGN,
+	     DEF_GNU4_PPC64_ALIGN,
+	     DEF_XLC64_PPC64_ALIGN,
+	     DEF_GNU4_X86_64_ALIGN,
+	     DEF_PGI_X86_64_ALIGN },
+
+#if 0
+
+           { &BYTE_ALIGNMENT,            /* 1 */
+             &WORD2_ALIGNMENT,
+             &WORD4_ALIGNMENT,
+             &WORD8_ALIGNMENT,
+             &GNU4_X86_64_ALIGNMENT,     /* 5 */
+             &GNU4_I686_ALIGNMENT,
+             &CYGWIN_I686_ALIGNMENT,
+             &GNU3_PPC64_ALIGNMENT,
+             &XLC64_PPC64_ALIGNMENT,
+             &XLC32_PPC64_ALIGNMENT,     /* 10 */
+             &OSX_10_5_ALIGNMENT,
+             &SPARC_ALIGNMENT,
+             NULL },
+#endif
 
          };
 
