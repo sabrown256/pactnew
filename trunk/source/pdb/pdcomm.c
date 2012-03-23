@@ -11,24 +11,16 @@
 #include "pdb_int.h"
 #include "scope_mpi.h"
 
-SC_communicator
- PD_COMM_NULL  = (SC_communicator) 0,
- PD_COMM_WORLD = (SC_communicator) 0,
- PD_COMM_SELF  = (SC_communicator) 0;
-
-int
- _PD_comm_initialized = FALSE;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_INITIALIZE_COMM - set the _PD_comm_initialized flag */
+/* _PD_INITIALIZE_COMM - set the _PD.comm_initialized flag */
 
 int _PD_initialize_comm(int v)
    {int rv;
 
-    rv = _PD_comm_initialized;
-    _PD_comm_initialized = v;
+    rv = _PD.comm_initialized;
+    _PD.comm_initialized = v;
 
     return(rv);}
 
@@ -40,9 +32,9 @@ int _PD_initialize_comm(int v)
 static void _PD_comm_connect_nonmpi(void)
    {
 
-    PD_COMM_NULL  = _PD.comm_null;
-    PD_COMM_WORLD = _PD.comm_world;
-    PD_COMM_SELF  = _PD.comm_self;
+    _PD.use_comm[COM_NULL]  = _PD.def_comm[COM_NULL];
+    _PD.use_comm[COM_WORLD] = _PD.def_comm[COM_WORLD];
+    _PD.use_comm[COM_SELF]  = _PD.def_comm[COM_SELF];;
 
     _PD_initialize_comm(TRUE);
 
@@ -66,62 +58,62 @@ void _PD_par_set_comm(SC_communicator comm)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_IS_COMM_NULL - return TRUE iff COMM is PD_COMM_NULL */
+/* _PD_IS_COMM_NULL - return TRUE iff COMM is _PD.use_comm[COM_NULL] */
 
 int _PD_is_comm_null(SC_communicator comm)
    {int rv;
 
-    if (_PD_comm_initialized == FALSE)
+    if (_PD.comm_initialized == FALSE)
        _PD_comm_connect_nonmpi();
 
-    rv = (comm == PD_COMM_NULL);
+    rv = (comm == _PD.use_comm[COM_NULL]);
 
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_IS_COMM_SELF - return TRUE iff COMM is PD_COMM_SELF */
+/* _PD_IS_COMM_SELF - return TRUE iff COMM is _PD.use_comm[COM_SELF] */
 
 int _PD_is_comm_self(SC_communicator comm)
    {int rv;
 
-    if (_PD_comm_initialized == FALSE)
+    if (_PD.comm_initialized == FALSE)
        _PD_comm_connect_nonmpi();
 
-    rv = (comm == PD_COMM_SELF);
+    rv = (comm == _PD.use_comm[COM_SELF]);
 
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_SET_NULL_COMM - set the communicator to PD_COMM_NULL */
+/* _PD_SET_NULL_COMM - set the communicator to _PD.use_comm[COM_NULL] */
 
 void _PD_set_null_comm(int tid)
    {PD_smp_state *pa;
 
-    if (_PD_comm_initialized == FALSE)
+    if (_PD.comm_initialized == FALSE)
        _PD_comm_connect_nonmpi();
 
     pa = _PD_get_state(tid);
-    pa->communicator = PD_COMM_NULL;
+    pa->communicator = _PD.use_comm[COM_NULL];
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_SET_WORLD_COMM - set the communicator to PD_COMM_WORLD */
+/* _PD_SET_WORLD_COMM - set the communicator to _PD.use_comm[COM_WORLD] */
 
 void _PD_set_world_comm(int tid)
    {PD_smp_state *pa;
 
-    if (_PD_comm_initialized == FALSE)
+    if (_PD.comm_initialized == FALSE)
        _PD_comm_connect_nonmpi();
 
     pa = _PD_get_state(tid);
-    pa->communicator = PD_COMM_WORLD;
+    pa->communicator = _PD.use_comm[COM_WORLD];
 
     return;}
 

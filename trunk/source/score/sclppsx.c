@@ -422,10 +422,11 @@ static int _SC_posix_flush(PROCESS *pp)
     _SC_current_flushed_process = pp->id;
 
 #ifdef BSD_TERMINAL
+    static int one = 1;
 
-    iv = ioctl(pp->in, TIOCFLUSH, &One_I);
+    iv = ioctl(pp->in, TIOCFLUSH, &one);
     if (pp->out != pp->in)
-       ov = ioctl(pp->out, TIOCFLUSH, &One_I);
+       ov = ioctl(pp->out, TIOCFLUSH, &one);
     else
        ov = iv;
 

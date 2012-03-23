@@ -134,7 +134,7 @@ void PA_init_system(double t, double dt, int nc,
     PFPkgInizer pck_init;
     PFBuildMap hook;
 
-    SC_sizeof_hook = PA_sizeof;
+    SC_gs.size = PA_sizeof;
 
     t  *= PA_gs.units[SEC]/PA_gs.convrsns[SEC];
     dt *= PA_gs.units[SEC]/PA_gs.convrsns[SEC];

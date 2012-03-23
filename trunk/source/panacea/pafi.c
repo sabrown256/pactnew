@@ -193,7 +193,7 @@ static void _PA_get_alist_dims(PA_package *pck, PA_variable *pp, hasharr *tab)
 
              leng = pv->data;}
 
-         next = _PA_mk_dimens(&One_I, (int *) leng, *PA_gs.dul);
+         next = _PA_mk_dimens(&PM_c.ione.i, (int *) leng, *PA_gs.dul);
          if (vdims == NULL)
             vdims = next;
          else

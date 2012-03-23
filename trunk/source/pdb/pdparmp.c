@@ -1782,9 +1782,9 @@ int _PD_init_d(void)
 static void _PD_comm_connect_mpi(void)
    {
 
-    PD_COMM_NULL  = (SC_communicator) MPI_COMM_NULL;
-    PD_COMM_WORLD = (SC_communicator) MPI_COMM_WORLD;
-    PD_COMM_SELF  = (SC_communicator) MPI_COMM_SELF;
+    _PD.use_comm[COM_NULL]  = (SC_communicator) MPI_COMM_NULL;
+    _PD.use_comm[COM_WORLD] = (SC_communicator) MPI_COMM_WORLD;
+    _PD.use_comm[COM_SELF]  = (SC_communicator) MPI_COMM_SELF;
 
     _PD_initialize_comm(TRUE);
 

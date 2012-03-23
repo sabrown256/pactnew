@@ -38,20 +38,18 @@
 int
  *LAST = NULL;
 
-int
- Zero_I  = 0,
- One_I   = 1;
-
 SC_global_state
  SC_gs = {PACT_VERSION,
 	  0, 0, 0, 1, FALSE, FALSE, 10, TRUE, FALSE,
 	  0, NULL, NULL, NULL,
-          ATOF_FUNCTION,
-          STRTOD_FUNCTION,
+          _SC_DEF_TYP_, _SC_DEF_ITYP_,
+          SC_sizeof,
           _SC_otol,
           _SC_htol,
           ATOL_FUNCTION,
           STRTOL_FUNCTION,
+          ATOF_FUNCTION,
+          STRTOD_FUNCTION,
 	  SC_type_container,
 #ifdef USE_FULL_MM
           {_SC_nalloc_wl, _SC_alloc_wl, _SC_realloc_wl,
@@ -69,7 +67,7 @@ SC_state
         malloc, realloc, free,
 	{-1.0, -1.0}, -1, -1,
 	(PFSignal_handler) -1, {SIG_DFL, NULL}, -1,
-        TYPE_STATE_INIT};
+        _SC_TYPE_STATE_INIT_};
 
 /*--------------------------------------------------------------------------*/
 

@@ -569,7 +569,7 @@ PA_dimens *_PA_process_dimension(va_list *list)
 	   meth = *PA_gs.don;}
 	
        else
-	  {mini = &Zero_I;
+	  {mini = &PM_c.izero.i;
 	   meth = *PA_gs.don;};
 
 	next = _PA_mk_dimens(mini, maxi, meth);

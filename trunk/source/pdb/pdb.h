@@ -139,11 +139,19 @@
 #define NSTD         6     /* number of standards currently in the system 
                             * should be same as last standard */
 
+#define PD_TYPI(_n)     _n ## _I
+#define PD_TYPPI(_n)    _n ## _P_I
+#define PD_TYPN(_n)     PD_gs.tnames[PD_TYPI(_n) - PD_TYPI(PDBfile)]
+#define PD_TYPPN(_n)    PD_gs.tpnames[PD_TYPPI(_n) - PD_TYPPI(PDBfile)]
+
 #define PD_err          PD_gs.err
 #define PDBFILE_S       PD_gs.tnames[0]
 #define PD_DEFSTR_S     PD_gs.tnames[1]
 #define PD_ALIGNMENT_S  PD_gs.tnames[2]
 #define PD_STANDARD_S   PD_gs.tnames[3]
+#define SYMENT_S        PD_gs.tnames[4]
+#define SYMENT_P_S      PD_gs.tnames[5]
+#define PD_N_TYPES      6
 
 #define TEXT_STD        PD_gs.standards[0]
 #define I386_STD        PD_gs.standards[3]
@@ -853,7 +861,7 @@ struct s_PD_global_state
     long print_ctrl[10];
 
     char err[MAXLINE];
-    char *tnames[4];
+    char *tnames[PD_N_TYPES];
 
     PDBfile *vif;
     PFPDBwrite write;                    /* semi-obsolete read/write hooks */

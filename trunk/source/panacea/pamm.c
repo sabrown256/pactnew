@@ -104,9 +104,9 @@ PA_dimens *_PA_mk_dimens(int *mini, int *maxi, int method)
 /* _PA_MK_SYM_DIMS - make the dimdes list from the variable dimension
  *                 - list given
  *                 - if min and/or max not given (NULL pointer) allocate
- *                 - a value and set it to zero instead of using Zero_I
+ *                 - a value and set it to zero instead of using PM_c.izero.i
  *                 - this protects against a _PA_consistent_size operation
- *                 - resetting Zero_I!!!!
+ *                 - resetting PM_c.izero.i!!!!
  */
 
 dimdes *_PA_mk_sym_dims(PA_dimens *vdims)

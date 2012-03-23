@@ -43,12 +43,25 @@
 /*--------------------------------------------------------------------------*/
     
 
-typedef struct s_multi_rep_number multi_rep_number;
+typedef struct s_multi_rep_fix multi_rep_fix;
+typedef struct s_multi_rep_float multi_rep_float;
 typedef struct s_PM_constants PM_constants;
 
-/* use multi_rep_number to contain representation of a value in several forms */
+/* use multi_rep_fix to contain representation of a value
+ * in several forms
+ */
 
-struct s_multi_rep_number
+struct s_multi_rep_fix
+   {short s;
+    int i;
+    long l;
+    long long L;};
+
+/* use multi_rep_float to contain representation of a value
+ * in several forms
+ */
+
+struct s_multi_rep_float
    {float f;
     double d;
     long double l;
@@ -56,12 +69,16 @@ struct s_multi_rep_number
     quaternion q;};
 
 struct s_PM_constants
-   {multi_rep_number zero;
-    multi_rep_number smallp;
-    multi_rep_number smallm;
-    multi_rep_number one;
-    multi_rep_number hugep;
-    multi_rep_number hugem;
+   {multi_rep_fix izero;
+    multi_rep_fix ione;
+    multi_rep_fix imax;
+
+    multi_rep_float zero;
+    multi_rep_float smallp;
+    multi_rep_float smallm;
+    multi_rep_float one;
+    multi_rep_float hugep;
+    multi_rep_float hugem;
 
 /* fundamental numerical constants */
     long double pi;                  /* ratio of circumference to diameter */
