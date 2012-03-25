@@ -40,8 +40,8 @@
 /*--------------------------------------------------------------------------*/
 
 #define IS_BARRIER(_s)                                                       \
-   ((BARRIER != NULL) &&                                                     \
-    (strncmp(_s, BARRIER, strlen(BARRIER)) == 0))
+   ((_SC.barrier != NULL) &&                                                 \
+    (strncmp(_s, _SC.barrier, strlen(_SC.barrier)) == 0))
 
 #define CINIT_ARRAY(_a, _t, _init, _flags)                                   \
     _SC_init_array(_a, #_t, sizeof(_t), _init, (char *) __func__, _flags)
@@ -95,9 +95,6 @@ extern "C" {
 /*                         VARIABLE DECLARATIONS                            */
 
 /*--------------------------------------------------------------------------*/
-
-extern char
- *BARRIER;
 
 /*--------------------------------------------------------------------------*/
 

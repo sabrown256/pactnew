@@ -142,7 +142,7 @@ PC_out(bf, type, ni, pp, filt)
 	     {did = *ppl++;
 	      csend(ityp, bf, nb, dn, did);
 
-	      if (_SC_debug)
+	      if (_SC_ps.debug)
 	         PRINT(stdout, "\t\t\tNode %d sent %d bytes to %d\n",
 		       pp->acpu, nb, dn);};};
 
@@ -192,7 +192,7 @@ PC_in(bf, type, ni, pp, filt)
     nb = ni*sizeof(int);
     crecv(ityp, bf, nb);
 
-    if (_SC_debug)
+    if (_SC_ps.debug)
        PRINT(stdout, "Node %d got %d bytes\n", pp->acpu, nb);
 
     return((int) ni);}

@@ -65,47 +65,47 @@ int main(int argc, char **argv)
     else
        sleep(1);
 
-    if (_SC_debug)
+    if (_SC_ps.debug)
        {fprintf(_PC_diag, "Initialized node #%d of %d\n", pid, nodes);
 	fflush(_PC_diag);};
     PRINT(stdout, "Initialized node #%d of %d\n", pid, nodes);
 
-    if (_SC_debug)
+    if (_SC_ps.debug)
        {fprintf(_PC_diag, "Setup\n");
 	fflush(_PC_diag);};
     setup();
 
-    if (_SC_debug)
+    if (_SC_ps.debug)
        {fprintf(_PC_diag, "Non-blocking patterned read\n");
 	fflush(_PC_diag);};
     test_nb_read_patterned(pp);
 
-    if (_SC_debug)
+    if (_SC_ps.debug)
        {fprintf(_PC_diag, "Blocking ring\n");
 	fflush(_PC_diag);};
     test_ring_b(pp);
 
-    if (_SC_debug)
+    if (_SC_ps.debug)
        {fprintf(_PC_diag, "Non-blocking ring\n");
 	fflush(_PC_diag);};
     test_ring_nb(pp);
 
-    if (_SC_debug)
+    if (_SC_ps.debug)
        {fprintf(_PC_diag, "Type selection\n");
 	fflush(_PC_diag);};
     test_type_sel(pp);
 
-    if (_SC_debug)
+    if (_SC_ps.debug)
        {fprintf(_PC_diag, "Broadcast\n");
 	fflush(_PC_diag);};
     test_broadcast(pp);
 
-    if (_SC_debug)
+    if (_SC_ps.debug)
        {fprintf(_PC_diag, "Transfer rates\n");
 	fflush(_PC_diag);};
     test_rates(pp);
 
-    if (_SC_debug)
+    if (_SC_ps.debug)
        {fprintf(_PC_diag, "Error handling test\n");
 	fflush(_PC_diag);};
     test_error(pp);

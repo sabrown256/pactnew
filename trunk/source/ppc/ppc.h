@@ -96,8 +96,8 @@
 
 /*--------------------------------------------------------------------------*/
 
-#define _PC_debug                  _SC_debug
-#define _PC_diag                   _SC_diag
+#define _PC_debug                  _SC_ps.debug
+#define _PC_diag                   _SC_ps.diag
 
 #define PC_gets                     SC_gets
 #define PC_printf                   SC_printf

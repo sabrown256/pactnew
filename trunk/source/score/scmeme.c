@@ -34,7 +34,7 @@ void SC_end_session(void)
 
 /* free strings */
     CFREE(_SC.ta);
-    CFREE(BARRIER);
+    CFREE(_SC.barrier);
     CFREE(_SC.signame);
     CFREE(_SC.sqbf);
     CFREE(_SC.ecbf);

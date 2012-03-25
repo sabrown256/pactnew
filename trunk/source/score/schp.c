@@ -26,8 +26,8 @@
 
 typedef PROCESS *(*PFPPROC)(char **argv, char *mode, int type);
 
-int
- _SC_current_flushed_process = -1;
+SC_proc_state
+ _SC_ps = { -1, FALSE, NULL };
 
 static char
  *_SC_not_stopped = "running";
@@ -1564,9 +1564,9 @@ int SC_init_server(int step, int closep)
 
     int ok;
     
-    if (_SC_debug)
-       {fprintf(_SC_diag, "   SC_init_server: %d\n", step);
-        fflush(_SC_diag);};
+    if (_SC_ps.debug)
+       {fprintf(_SC_ps.diag, "   SC_init_server: %d\n", step);
+        fflush(_SC_ps.diag);};
 
     rv = -1;
     ok = SC_ERR_TRAP();
@@ -1585,9 +1585,9 @@ int SC_init_server(int step, int closep)
 		 if (_SC.sfd < 0)
 		    SC_error(-1, "COULDN'T OPEN SOCKET - SC_INIT_SERVER");
 
-		 if (_SC_debug)
-		    {fprintf(_SC_diag, "      Socket opened: %d\n", _SC.sfd);
-		     fflush(_SC_diag);};
+		 if (_SC_ps.debug)
+		    {fprintf(_SC_ps.diag, "      Socket opened: %d\n", _SC.sfd);
+		     fflush(_SC_ps.diag);};
 
 		 _SC.srvr = _SC_tcp_bind(_SC.sfd, -1);
 		 if (_SC.srvr == NULL)
@@ -1605,9 +1605,9 @@ int SC_init_server(int step, int closep)
 		 if (closep)
 		    {close(_SC.sfd);
 
-		     if (_SC_debug)
-		        {fprintf(_SC_diag, "      Socket closed: %d\n", _SC.sfd);
-			 fflush(_SC_diag);};
+		     if (_SC_ps.debug)
+		        {fprintf(_SC_ps.diag, "      Socket closed: %d\n", _SC.sfd);
+			 fflush(_SC_ps.diag);};
 
 		     _SC.sfd = -1;
 		     CFREE(_SC.srvr);};

@@ -50,7 +50,7 @@ static PROCESS *_PC_open_member_d(char **argv, int *pnn)
     MPI_Comm_size(MPI_COMM_WORLD, &SC_gs.comm_size);
 
 /* conditional diagnostic messages */
-    if (_SC_debug)
+    if (_SC_ps.debug)
        {snprintf(t, MAXLINE, "PC_clnt_log.%d", (int) getpid());
 	_PC_diag = fopen(t, "w");
 	fprintf(_PC_diag, "\n\n   Node #%d at %s:%d.%d\n",
@@ -71,7 +71,7 @@ static void _PC_close_member_d(PROCESS *pp)
     PC_close(pp);
 
 /* conditional diagnostic messages */
-    if (_SC_debug)
+    if (_SC_ps.debug)
        {fclose(_PC_diag);};
 
     return;}
@@ -145,7 +145,7 @@ static long _PC_out_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 	nn  = *pnl++;};
 
 /* conditional diagnostic messages */
-    if (_SC_debug)
+    if (_SC_ps.debug)
        {fprintf(_PC_diag, "   Write");
 	fprintf(_PC_diag, " Attempt(%d,%s,%d)",	(int) ni, type, pp->acpu);
 	fflush(_PC_diag);};
@@ -188,7 +188,7 @@ static long _PC_out_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 			     bf, type, ni, vr, (void *) &requ);};};};
 
 /* conditional diagnostic messages */
-    if (_SC_debug)
+    if (_SC_ps.debug)
        {fprintf(_PC_diag, " Sent(%ld,%s,%d)\n", nis, types, dn);
 	fflush(_PC_diag);};
 
@@ -227,7 +227,7 @@ static long _PC_in_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
        ip  = nl[1];
 
 /* conditional diagnostic messages */
-    if (_SC_debug)
+    if (_SC_ps.debug)
        {fprintf(_PC_diag, "   Read");
 	fflush(_PC_diag);};
 
@@ -263,7 +263,7 @@ static long _PC_in_d(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 	CFREE(bf);};
 
 /* conditional diagnostic messages */
-    if (_SC_debug)
+    if (_SC_ps.debug)
        {if (nir > 0)
 	   fprintf(_PC_diag, "\n");
 	else
@@ -292,7 +292,7 @@ static long _PC_wait_d(PROCESS *pp)
     np = pp->n_pending;
 
 /* conditional diagnostic messages */
-    if (_SC_debug)
+    if (_SC_ps.debug)
        {fprintf(_PC_diag, "   Wait");
 	fflush(_PC_diag);};
 
@@ -322,7 +322,7 @@ static long _PC_wait_d(PROCESS *pp)
 	 CFREE(bf);};
 
 /* conditional diagnostic messages */
-    if (_SC_debug)
+    if (_SC_ps.debug)
        fprintf(_PC_diag, "\n");
 
     return(np);}

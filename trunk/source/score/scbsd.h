@@ -14,6 +14,13 @@
 
 #include "cpyright.h"
 
+/* GOTCHA: SIGPOLL seems to have disappeared
+ * this work around needs to be re-analyzed from scratch
+ */
+#ifndef SIGPOLL
+# define SIGPOLL 7
+#endif
+
 /*--------------------------------------------------------------------------*/
 
 /*                         STANDARD CONSTANT MACROS                         */

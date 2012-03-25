@@ -39,7 +39,7 @@ static int _PC_put_data(PROCESS *pp, char *bf, char *type, size_t ni,
 	nbo = SC_write_sigsafe(data, pbf, nb);
 	if (nbo < 0)
 	   continue;
-	else if (_SC_debug)
+	else if (_SC_ps.debug)
 	   {fprintf(_PC_diag, ".%d", nbo);
 	    fflush(_PC_diag);};
 	nb  -= nbo;
@@ -263,7 +263,7 @@ int PC_open_group(char **argv, int *pn)
 
 	_PC.server_port = SC_stoi(SC_strtok(NULL, ",\n", t));
 	_PC.n_nodes  = SC_stoi(SC_strtok(NULL, ",\n", t));
-	_SC_debug   = SC_stoi(SC_strtok(NULL, ",\n", t));
+	_SC_ps.debug   = SC_stoi(SC_strtok(NULL, ",\n", t));
 
 	for (i = 0; i < offs; i++)
 	    CFREE(args[i]);
@@ -332,7 +332,7 @@ static PROCESS *_PC_open_member_n(char **argv, int *pnn)
 	PC_block(pp);
 	PC_gets(t, MAXLINE, pp);
 
-	sscanf(t, "%d,%d,%d\n", &pp->acpu, pnn, &_SC_debug);
+	sscanf(t, "%d,%d,%d\n", &pp->acpu, pnn, &_SC_ps.debug);
 
 	PC_printf(pp, "%s,%d,%d\n", srvr, port, (int) getpid());
 	pp->data = PC_init_client(srvr, port);
@@ -340,7 +340,7 @@ static PROCESS *_PC_open_member_n(char **argv, int *pnn)
 	SC_gs.comm_size = *pnn;};
 
 /* conditional diagnostic messages */
-    if (_SC_debug)
+    if (_SC_ps.debug)
        {snprintf(t, MAXLINE, "PC_clnt_log.%d", (int) getpid());
 	_PC_diag = fopen(t, "w");
 	if (_PC_diag != NULL)
@@ -367,7 +367,7 @@ static void _PC_close_member_n(PROCESS *pp)
     PC_close(pp);
 
 /* conditional diagnostic messages */
-    if (_SC_debug)
+    if (_SC_ps.debug)
        {fclose(_PC_diag);};
 
 #endif
@@ -460,7 +460,7 @@ static long _PC_out_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 	nn  = *pnl++;};
 
 /* conditional diagnostic messages */
-    if (_SC_debug)
+    if (_SC_ps.debug)
        {fprintf(_PC_diag, "   Write");
 	fprintf(_PC_diag, " Attempt(%d,%s,%d)",	(int) ni, type, pp->acpu);
 	fflush(_PC_diag);};
@@ -502,7 +502,7 @@ static long _PC_out_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 			  types, MAXLINE, &is);};};
 
 /* conditional diagnostic messages */
-    if (_SC_debug)
+    if (_SC_ps.debug)
        {fprintf(_PC_diag, " Sent(%ld,%s,%d)\n", nis, types, dn);
 	fflush(_PC_diag);};
 
@@ -541,7 +541,7 @@ static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
        ip  = nl[1];
 
 /* conditional diagnostic messages */
-    if (_SC_debug)
+    if (_SC_ps.debug)
        {fprintf(_PC_diag, "   Read");
 	fflush(_PC_diag);};
 
@@ -565,7 +565,7 @@ static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
     for (nbr = nb, bs = FALSE; nbr > 0; pbf += nbt, bs = block)
         {nbt = PC_buffer_data_out(pp, pbf, nbr, bs);
 	 if (nbt > 0)
-	    {if (_SC_debug)
+	    {if (_SC_ps.debug)
 	        {fprintf(_PC_diag, " Recv(%ld,%s)", nbt, types);
 		 fflush(_PC_diag);};};
 
@@ -577,7 +577,7 @@ static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 	     PC_gets(reply, MAXLINE, pp);
 	     sscanf(reply, "%d,%254s\n", &nis, types);
 
-	     if (_SC_debug && block && (nis > 0))
+	     if (_SC_ps.debug && block && (nis > 0))
 	        {fprintf(_PC_diag, " Expect(%d,%s)", nis, types);
 		 fflush(_PC_diag);};};
 
@@ -594,7 +594,7 @@ static long _PC_in_n(void *vr, char *type, size_t ni, PROCESS *pp, int *filt)
 	CFREE(bf);};
 
 /* conditional diagnostic messages */
-    if (_SC_debug)
+    if (_SC_ps.debug)
        {if (nir > 0)
 	   fprintf(_PC_diag, "\n");
 	else
@@ -623,7 +623,7 @@ static long _PC_wait_n(PROCESS *pp)
     np = pp->n_pending;
 
 /* conditional diagnostic messages */
-    if (_SC_debug)
+    if (_SC_ps.debug)
        {fprintf(_PC_diag, "   Wait");
 	fflush(_PC_diag);};
 
@@ -641,7 +641,7 @@ static long _PC_wait_n(PROCESS *pp)
 	 CFREE(bf);};
 
 /* conditional diagnostic messages */
-    if (_SC_debug)
+    if (_SC_ps.debug)
        fprintf(_PC_diag, "\n");
 
     return(np);}

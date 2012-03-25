@@ -106,11 +106,13 @@ struct s_state
     int create_dirs;
     int have_python;
     int installp;
+
     int loadp;
     int analyzep;
     int exep;
     int phase;
     int profilep;
+
     int tmp_dirp;
     int verbose;
     int launched;               /* TRUE iff PCO launched PERDB
@@ -148,9 +150,9 @@ struct s_state
     char system[MAXLINE];};
 
 static state
- st = { FALSE, FALSE, FALSE, FALSE, FALSE, TRUE,
-	FALSE, FALSE, FALSE, FALSE, PHASE_READ,
-	FALSE, FALSE, FALSE, };
+ st = { FALSE, FALSE, FALSE, FALSE, FALSE,
+        TRUE, FALSE, FALSE, PHASE_READ, FALSE,
+	FALSE, FALSE, FALSE, 0, };
 
 static void
  parse_line(char *s, char *key, char *oper, char *value, int nc);
