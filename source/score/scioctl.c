@@ -11,11 +11,7 @@
 
 #include "scope_proc.h"
 
-FILE
- *_SC_diag;
-
 int
- _SC_debug = FALSE,
  _SC_unblock = FALSE;
 
 /*--------------------------------------------------------------------------*/

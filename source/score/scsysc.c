@@ -34,9 +34,6 @@
     SC_LAST_CHAR(_s) = '\0';                                                 \
     strcat(_s, " ");}
 
-char
- *BARRIER = NULL;
-
 static parstate
  *_SC_run_task_state = NULL;
 

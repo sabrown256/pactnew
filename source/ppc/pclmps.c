@@ -145,7 +145,7 @@ PC_out(bf, type, ni, pp, filt)
 
 	     SEND(&dn, ityp, bf, nb, 0);
 
-	     if (_SC_debug)
+	     if (_SC_ps.debug)
 	        PRINT(stdout, "\t\t\tNode %d sent %d bytes to %d\n",
 		      pp->acpu, nb, dn);};};
 
@@ -204,7 +204,7 @@ PC_in(bf, type, ni, pp, filt)
     else
        SRECVNW(&oid, &otyp, bf, pp->acpu, ityp, nb);
 
-    if (_SC_debug)
+    if (_SC_ps.debug)
        PRINT(stdout, "Node %d got %d bytes\n", pp->acpu, nb);
 
     return((int) ni);}

@@ -399,6 +399,14 @@ enum e_SC_mp_tag
 
 typedef enum e_SC_mp_tag SC_mp_tag;
 
+
+typedef struct s_SC_proc_state SC_proc_state;
+
+struct s_SC_proc_state
+   {int current_flushed_process;
+    int debug;
+    FILE *diag;};
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -409,12 +417,8 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-extern int
- _SC_current_flushed_process,
- _SC_debug;
-
-extern FILE
- *_SC_diag;
+extern SC_proc_state
+ _SC_ps;
 
 /*--------------------------------------------------------------------------*/
 

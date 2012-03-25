@@ -258,9 +258,9 @@ struct sockaddr_in *_SC_tcp_bind(int fd, int port)
 		    break;};};
 
 	if (ok >= 0)
-	   {if (_SC_debug)
-	       {fprintf(_SC_diag, "      Bind succeeded: %d\n", port);
-		fflush(_SC_diag);};}
+	   {if (_SC_ps.debug)
+	       {fprintf(_SC_ps.diag, "      Bind succeeded: %d\n", port);
+		fflush(_SC_ps.diag);};}
 	else
 	   {CFREE(ad);};};
 

@@ -241,6 +241,9 @@ struct s_SC_state
    long mem_hst_sz;
    void (*mem_hst)(int act, void *a);
 
+/* SCMKPR.C */
+   char *barrier;
+
 /* SCPAR.C */
    PFTid tid_hook;
 

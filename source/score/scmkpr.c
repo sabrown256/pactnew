@@ -1134,9 +1134,9 @@ int SC_parse_makefile(anadep *state, char *fname)
 
 	t = _SC_var_lookup(state, "BARRIER");
 	if (t != NULL)
-	   {if (BARRIER != NULL)
-	       {CFREE(BARRIER);};
-	    BARRIER = CSTRDUP(t, 3);};};
+	   {if (_SC.barrier != NULL)
+	       {CFREE(_SC.barrier);};
+	    _SC.barrier = CSTRDUP(t, 3);};};
 
     SC_ERR_UNTRAP();
 

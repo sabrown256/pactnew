@@ -419,7 +419,7 @@ static int _SC_posix_flush(PROCESS *pp)
     if (!SC_process_alive(pp))
        return(FALSE);
 
-    _SC_current_flushed_process = pp->id;
+    _SC_ps.current_flushed_process = pp->id;
 
 #ifdef BSD_TERMINAL
     static int one = 1;

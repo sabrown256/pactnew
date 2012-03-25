@@ -29,9 +29,9 @@
 #define REPLY(msg, val)                                                         \
    {printf("%s:%ld\n", msg, (long) (val));                                      \
     fflush(stdout);                                                             \
-    if (_SC_debug)                                                              \
-       {fprintf(_SC_diag, "%s:%ld\n", msg, (long) (val));                       \
-        fflush(_SC_diag);};}
+    if (_SC_ps.debug)                                                              \
+       {fprintf(_SC_ps.diag, "%s:%ld\n", msg, (long) (val));                       \
+        fflush(_SC_ps.diag);};}
 
 #define IO_OPER_START_TIME(_f)                                                  \
    {double _to;                                                                 \
@@ -676,25 +676,25 @@ int SC_file_access(int log)
 
     SC_MEM_INIT_N(FILE *, file, MAX_FILES);
 
-    _SC_debug = log;
+    _SC_ps.debug = log;
 
-    if (_SC_debug)
-       {_SC_diag = fopen("SC_fs.log", "w");
-	if (_SC_diag == NULL)
+    if (_SC_ps.debug)
+       {_SC_ps.diag = fopen("SC_fs.log", "w");
+	if (_SC_ps.diag == NULL)
 	   return(-1);};
 
     cfd = -1;
     while (TRUE)
-       {if (_SC_debug)
-           {fprintf(_SC_diag, "\nWaiting for command ... ");
-            fflush(_SC_diag);};
+       {if (_SC_ps.debug)
+           {fprintf(_SC_ps.diag, "\nWaiting for command ... ");
+            fflush(_SC_ps.diag);};
 
         if (SC_fgets(s, MAXLINE, stdin) == NULL)
            continue;
 
-        if (_SC_debug)
-           {fprintf(_SC_diag, "received: %s", s);
-            fflush(_SC_diag);};
+        if (_SC_ps.debug)
+           {fprintf(_SC_ps.diag, "received: %s", s);
+            fflush(_SC_ps.diag);};
 
         code = s[0];
         indx = s[1];
@@ -705,9 +705,9 @@ int SC_file_access(int log)
 	indx  = max(indx, 0);
         fp    = file[indx];
 
-        if (_SC_debug)
-           {fprintf(_SC_diag, "Doing: %c on file %d(%p)\n", code, indx, fp);
-            fflush(_SC_diag);};
+        if (_SC_ps.debug)
+           {fprintf(_SC_ps.diag, "Doing: %c on file %d(%p)\n", code, indx, fp);
+            fflush(_SC_ps.diag);};
 
         switch (code)
            {case SC_FOPEN :
@@ -734,9 +734,9 @@ int SC_file_access(int log)
                   name = SC_strtok(s+2, ",\n", t);
                   mode = SC_strtok(NULL, ",\n", t);
 		  if ((name != NULL) && (mode != NULL))
-		     {if (_SC_debug)
-			 {fprintf(_SC_diag, "   Open: %s, %s ... ", name, mode);
-			  fflush(_SC_diag);};
+		     {if (_SC_ps.debug)
+			 {fprintf(_SC_ps.diag, "   Open: %s, %s ... ", name, mode);
+			  fflush(_SC_ps.diag);};
 
 		      fp = fopen(name, mode);}
 		  else
@@ -751,9 +751,9 @@ int SC_file_access(int log)
 
                       status = (i < MAX_FILES) ? i : -1;};
 
-                  if (_SC_debug)
-                     {fprintf(_SC_diag, "status(%d)\n", status);
-                      fflush(_SC_diag);};
+                  if (_SC_ps.debug)
+                     {fprintf(_SC_ps.diag, "status(%d)\n", status);
+                      fflush(_SC_ps.diag);};
 
                   REPLY(OPEN_MSG, status);
 
@@ -796,9 +796,9 @@ int SC_file_access(int log)
 
             case SC_FCLOSE :
                  file[indx] = NULL;
-                 if (_SC_debug)
-                    {fprintf(_SC_diag, "   Close: %d(%p) ... ", indx, fp);
-                     fflush(_SC_diag);};
+                 if (_SC_ps.debug)
+                    {fprintf(_SC_ps.diag, "   Close: %d(%p) ... ", indx, fp);
+                     fflush(_SC_ps.diag);};
 
                  REPLY(CLOSE_MSG, fclose(fp));
                  break;
