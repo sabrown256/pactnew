@@ -104,10 +104,16 @@ case exe:
         if ("$iscross" != "") then
            set host = "no-op"
         endif
-     endif
+
+# BG/Q
+     else if (-d /bgsys/bgqrpms) then
+        set iscross = `nm $Exe |& grep _nl_global_locale | grep -w D`
+        if ("$iscross" != "") then
+           set host = "srun"
+        endif
 
 # BG/P
-     if (-d /bgsys) then
+     else if (-d /bgsys) then
         set iscross = `nm $Exe |& grep _nl_global_locale | grep -w D`
         if ("$iscross" != "") then
            set host = "submit"

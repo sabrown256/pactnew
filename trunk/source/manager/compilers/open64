@@ -1,0 +1,71 @@
+#
+# OPEN64 - define OPEN64 derived from SGI IRIX compiler
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+WARN_PATTERN = "Warning: warning WARNING"
+
+Tool CC {
+   Exe      = opencc
+   Flags    =
+   Flags   += [ _env_ = Bits ;              # address bit size
+                *     = -m* ]
+   Optimize = -g3 -O -OPT:Olimit=0
+}
+
+Tool FC {
+   Exe    = openf90
+   Flags  = -freeform
+   Flags += [ _env_ = Bits ;                 # address bit size
+             *     = -m* ]
+}
+
+Tool LD {
+   RPath  = -Wl,-rpath,@
+   Flags  =
+}
+
+Tool Lex {
+   Exe    = opencc
+   Flags  =
+   Flags += [ _env_ = Bits ;                # address bit size
+              *     = -m* ]
+}
+
+Group Std {
+   UseX   = TRUE
+   UseOGL = FALSE
+}
+
+Group Cfg {
+   Use      = Std
+   Use      = CC
+   LD_Flags = ${LD_Flags}
+}
+
+Group MDG {
+   Lib = -lX11
+}
+
+Group Shared {
+   LD_Exe   = opencc
+   CC_Flags = -fPIC
+   LD_Flags = -shared
+}
+
+Group PThread {
+   LD_Lib = -lpthread 
+}
+
+Group OpenMP {
+   LD_Lib    = -lpthread
+   SharedFnc = yes
+}
+
+include cpp-rule
+include serial
+

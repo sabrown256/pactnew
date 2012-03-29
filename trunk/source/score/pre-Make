@@ -327,7 +327,8 @@ ${BinDir}/dspace : scdsk.c ${TGTLib}
 error : ${BinDir}/tscer
 
 ${BinDir}/tscer : ${TGTLib} tscer.c
-	${CCCfe} ${LdFlags} tscer.c -o ${BinDir}/tscer ${Libs}
+	${CLD} ${LdFlags} tscer.c -o ${BinDir}/tscer ${Libs}
+#	${CCCfe} ${LdFlags} tscer.c -o ${BinDir}/tscer ${Libs}
 
 #
 # EXEC SERVER
@@ -376,10 +377,12 @@ ${BinDir}/scmm : scmm.c ${TGTLib}
 #
 # memory diagnostic test
 #
-memchk : ${MMLib} ${BinDir}/tscmtr ${BinDir}/tscmpf
+memchk : ${MMLib} ${BinDir}/tscmtr
 
 ${BinDir}/tscmtr : tscmtr.c ${TGTLib}
 	${CLD} ${LdFlags} tscmtr.c -o ${BinDir}/tscmtr ${MLibs}
+
+memprf : ${MMLib} ${BinDir}/tscmpf
 
 ${BinDir}/tscmpf : tscmpf.c ${TGTLib}
 	${CLD} ${LdFlags} tscmpf.c -o ${BinDir}/tscmpf ${Libs}

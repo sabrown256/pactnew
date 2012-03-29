@@ -99,3 +99,58 @@ char *eval(char *expr, int nc, char *varn)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* PRUNE_ENV - clear out part of the environment specfied by TGT */
+
+void prune_env(char *tgt, char *info)
+   {
+
+    if (IS_NULL(tgt) == FALSE)
+
+/* remove make rule variables */
+       {int i, nr;
+	static char *rnames[] = { "CCP", "CCObj", "CCArc",
+				  "LexObj", "LexArc", "LexC",
+				  "YaccObj", "YaccArc", "YaccC",
+				  "FCObj", "FCArc", "TemplH",
+				  "CCObj_BP", "CCArc_BP",
+				  "LexObj_BP", "LexArc_BP",
+				  "YaccObj_BP", "YaccArc_BP" };
+
+	if (strcmp(tgt, "rules") == 0)
+	   {nr = sizeof(rnames)/sizeof(char *);
+	    for (i = 0; i < nr; i++)
+	        cunsetenv(rnames[i]);}
+
+/* remove PACT config variables */
+        else if (strcmp(tgt, "pact") == 0)
+	   {int i;
+	    char s[MAXLINE], env[MAXLINE];
+	    char **sa, *p;
+
+	    nstrncpy(s, MAXLINE, path_head(cwhich(info)), -1);
+	    snprintf(env, MAXLINE, "%s/include/env-pact.csh", path_head(s));
+	    if (file_exists(env) == TRUE)
+	       {sa = file_text(FALSE, env);
+
+		if (sa != NULL)
+		   {for (i = 0; sa[i] != NULL; i++)
+		        {if (strncmp(sa[i], "setenv ", 7) == 0)
+			    {nstrncpy(s, MAXLINE, sa[i], -1);
+			     p = strchr(s+7, ' ');
+			     if (p != NULL)
+			        *p = '\0';
+			     p = s + 7;
+                             if (strcmp(p, "PATH") != 0)
+			        {cunsetenv(p);};};};};
+
+		free_strings(sa);};}
+
+/* remove variables matching the pattern */
+	else
+	   {};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/

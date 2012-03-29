@@ -95,9 +95,4 @@ Group MPI {
 .f.o:
 	${FC} ${FFLAGS} ${LDFLAGS} -c $<
 
-#setenv CROSS_COMPILE  BGL
-setenv IBM_BGL
-define IBM_BGL
-define GETSOCKNAME_LONG
-
 include serial

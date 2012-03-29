@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 
 #undef TRUE
 #undef FALSE
@@ -18,7 +19,6 @@
 #define FALSE 0
 
 typedef union u_ucsil ucsil;
-typedef union u_ucl ucl;
 
 union u_ucsil
    {unsigned char b[32];
@@ -29,7 +29,8 @@ union u_ucsil
     long l;
     int64_t ll;
     float f;
-    double d;};
+    double d;
+    long double ld;};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -64,9 +65,9 @@ int PM_fix_lmt(char *name, char *sfx, int nb,
 	if (nb < sizeof(int64_t))
 	   imn = -imn;
 
-	printf("#define %s_MIN \t%lld%s\n", name, imn, sfx);
-	printf("#define %s_MAX \t %lld%s\n", name, imx, sfx);
-	printf("#define U%s_MAX\t %llu%s\n",  name, uimx, sfx);
+	printf("#define %s_MIN \t%lld%s\n", name, (long long) imn, sfx);
+	printf("#define %s_MAX \t %lld%s\n", name, (long long) imx, sfx);
+	printf("#define U%s_MAX\t %llu%s\n",  name, (long long) uimx, sfx);
 	printf("\n");
 
 	if (pmn != NULL)
@@ -85,12 +86,13 @@ int PM_fix_lmt(char *name, char *sfx, int nb,
 
 /* MAIN - start here */
 
-main()
-   {int i, nfp, fw;
-    char format[40];
+int main(int c, char **v)
+   {int i, nfp, fw, nf;
+    char format[80];
     int64_t imn, imx, uimx;
     float fmn, fmx;
-    double dmn, dmx, conf;
+    double dmn, dmx;
+    long double ldmn, ldmx, conf;
     ucsil bo, bp;
 
     printf("\n");
@@ -120,15 +122,16 @@ main()
  */
 
 /* do the float limits */
+    nf   = sizeof(float);
     bo.f = 1.0;
     bp.f = 0.5;
-    for (i = 0; i < sizeof(float); i++)
+    for (i = 0; i < nf; i++)
         {bo.b[i] = bo.b[i] & (~bp.b[i]);
          bp.b[i] = 0xFF ^ bo.b[i];};
     fmn =  bo.f;
     fmx = -bp.f;
 
-    nfp  = conf*(sizeof(float) - 1.0) + 1;
+    nfp  = conf*(nf - 1.0) + 1;
     fw   = nfp + 8;
     snprintf(format, 40, "%%s%%%d.%de", fw, nfp);
 
@@ -139,15 +142,16 @@ main()
     printf("\n");
 
 /* do the double limits */
+    nf   = sizeof(double);
     bo.d = 1.0;
     bp.d = 0.5;
-    for (i = 0; i < sizeof(double); i++)
+    for (i = 0; i < nf; i++)
         {bo.b[i] = bo.b[i] & (~bp.b[i]);
          bp.b[i] = 0xFF ^ bo.b[i];};
     dmn =  bo.d;
     dmx = -bp.d;
 
-    nfp  = conf*(sizeof(double) - 1.0) + 1;
+    nfp  = conf*(nf - 1.0) + 1;
     fw   = nfp + 8;
     snprintf(format, 40, "%%s%%%d.%de", fw, nfp);
 
@@ -155,6 +159,26 @@ main()
     printf("\n");
 
     printf(format, "#define DBL_MAX \t", dmx);
+    printf("\n");
+
+/* do the long double limits */
+    nf    = sizeof(long double);
+    bo.ld = 1.0;
+    bp.ld = 0.5;
+    for (i = 0; i < nf; i++)
+        {bo.b[i] = bo.b[i] & (~bp.b[i]);
+         bp.b[i] = 0xFF ^ bo.b[i];};
+    ldmn =  bo.ld;
+    ldmx = -bp.ld;
+
+    nfp  = conf*(nf - 1.0) + 1;
+    fw   = nfp + 9;
+    snprintf(format, 80, "%%s%%%d.%dle", fw, nfp);
+
+    printf(format, "#define LDBL_MIN \t", ldmn);
+    printf("\n");
+
+    printf(format, "#define LDBL_MAX \t", ldmx);
     printf("\n\n");
 
     return(0);}

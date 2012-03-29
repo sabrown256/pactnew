@@ -63,4 +63,6 @@ Group PythonCfg {
 
 define OSF
 
+setenv STATIC_LINKING   TRUE
+
 include serial

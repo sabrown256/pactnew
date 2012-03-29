@@ -1,0 +1,99 @@
+#!/bin/csh -f
+#
+# PRUNE-ENV - trim down the environment
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+set noglob
+
+@ err = 0
+set tgt = ""
+set pat = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: prune-env [-h] rules | pact | <pattern>"
+           echo "   h    this help message"
+           echo ""
+           exit(1)
+      default:
+           if ("$1" == rules) then
+              set tgt = rules
+           else if ("$1" == pact) then
+              set tgt = pact
+           else
+              set tgt = pattern
+              set pat = ( "$1" )
+           endif
+           breaksw
+   endsw
+   shift
+end
+
+switch ($tgt)
+
+# remove variables matching PAT
+   case pattern:
+        foreach v (`env`)
+           set j = ( `echo $v | sed 's~=.*$~~'` )
+           if ("$j" =~ $pat) then
+              echo "unsetenv $j ; "
+           endif
+        end
+        breaksw
+
+# remove implicit make rule variables
+   case rules:
+        set rules = ""
+        set rules = ( $rules CCP CCObj CCArc CCObj_BP CCArc_BP )
+        set rules = ( $rules FCObj FCArc )
+        set rules = ( $rules LexC LexObj LexObj_BP LexArc LexArc_BP )
+        set rules = ( $rules YaccC YaccObj YaccObj_BP YaccArc YaccArc_BP )
+        set rules = ( $rules TemplH )
+        foreach i ($rules)
+           echo "unsetenv $i ; "
+        end
+        breaksw
+
+# remove PACT config variables
+   case pact:
+        set sys = `cfgman use`
+        set inf = "../dev/$sys/include/env-pact.csh"
+
+        if (-f $inf) then
+           @ nl = `cat $inf | wc -l`
+           @ il = 0
+           while ($il < $nl)
+              @ il = $il + 1
+              set line = ( `head -n $il $inf | tail -n 1` )
+              if ($#line > 2) then
+                 if ("$line[1]" == setenv) then
+                    set var = $line[2]
+                    switch ($var)
+                       case MANPATH:
+                       case PATH:
+                       case SYS_TYPE:
+                            breaksw
+                       default:
+                            echo "unsetenv $line[2] ;"
+                            breaksw
+                    endsw
+                 endif
+              endif
+           end
+        endif
+        breaksw
+endsw
+
+exit($err)
+
+
+

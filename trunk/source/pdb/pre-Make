@@ -40,7 +40,7 @@ RemoveFiles = ${BinDir}/tpdb  ${BinDir}/tpda   ${BinDir}/tpdas      \
               ${BinDir}/tpdfr ${BinDir}/tpdc   ${BinDir}/tpdp       \
               ${BinDir}/tpdls ${BinDir}/tpdnrm ${BinDir}/tpdcs      \
               ${BinDir}/tpdn  ${BinDir}/tpdsmp ${BinDir}/tpddp      \
-              ${BinDir}/tpdrc ${BinDir}/tpdtd                       \
+              ${BinDir}/tpdrc ${BinDir}/tpdtd  ${BinDir}/tpdds      \
               ${BinDir}/tpdxrd ${BinDir}/tpdxn                      \
               ${BinDir}/pdtime ${BinDir}/pdb2hdf                    \
               ${BinDir}/exambin ${BinDir}/exam
@@ -142,11 +142,11 @@ IncAction = @pact generate
 # standard tests
 #
 
-Cstd : ${BinDir}/tpdb ${BinDir}/tpdn ${BinDir}/tpda ${BinDir}/tpdas \
+Cstd : ${BinDir}/tpdb  ${BinDir}/tpdn  ${BinDir}/tpda  ${BinDir}/tpdas  \
        ${BinDir}/tpdop ${BinDir}/tpdgs ${BinDir}/tpdls ${BinDir}/tpdnrm \
-       ${BinDir}/tpdrc ${BinDir}/tpdtd ${BinDir}/tpdcs ${BinDir}/tpdap \
-       ${BinDir}/tpdfr ${BinDir}/tpdbf ${BinDir}/tpdfd ${BinDir}/tpdfc \
-       ${BinDir}/tpdc ${BinDir}/tpdp \
+       ${BinDir}/tpdrc ${BinDir}/tpdtd ${BinDir}/tpdcs ${BinDir}/tpdap  \
+       ${BinDir}/tpdfr ${BinDir}/tpdbf ${BinDir}/tpdfd ${BinDir}/tpdfc  \
+       ${BinDir}/tpdc  ${BinDir}/tpdp  ${BinDir}/tpdds \
        ${DepLib}
 Apps : ${BinDir}/pdb2hdf
 
@@ -194,6 +194,9 @@ ${BinDir}/tpdbf : tpdbf.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
         
 ${BinDir}/tpdfc : tpdfc.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 	${CLD} ${LdFlags} tpdfc.c -o ${BinDir}/tpdfc ${Libs}
+        
+${BinDir}/tpdds : tpdds.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
+	${CLD} ${LdFlags} tpdds.c -o ${BinDir}/tpdds ${Libs}
         
 #
 # ascii vs binary performance

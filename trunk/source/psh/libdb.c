@@ -729,6 +729,7 @@ char **_db_clnt_ex(char *root, char *req)
 
     flog = name_log(root);
 
+    log_activity(flog, dbg_db, "CLIENT", "");
     log_activity(flog, dbg_db, "CLIENT", "begin request |%s|", req);
 
 /* make sure that there is a server running */
@@ -748,6 +749,7 @@ char **_db_clnt_ex(char *root, char *req)
 	       p = lst_push(p, s);};};
 
     log_activity(flog, dbg_db, "CLIENT", "end request");
+    log_activity(flog, dbg_db, "CLIENT", "");
 
     return(p);}
 

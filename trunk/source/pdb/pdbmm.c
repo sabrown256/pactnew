@@ -70,8 +70,6 @@ PD_global_state
 	     DEF_GNU4_X86_64_ALIGN,
 	     DEF_PGI_X86_64_ALIGN },
 
-#if 0
-
            { &BYTE_ALIGNMENT,            /* 1 */
              &WORD2_ALIGNMENT,
              &WORD4_ALIGNMENT,
@@ -85,7 +83,6 @@ PD_global_state
              &OSX_10_5_ALIGNMENT,
              &SPARC_ALIGNMENT,
              NULL },
-#endif
 
          };
 

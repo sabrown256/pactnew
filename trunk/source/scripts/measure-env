@@ -1,0 +1,35 @@
+#!/bin/csh -f
+#
+# MEASURE-ENV - measure and report where the environment space is going
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+set tmp = $cwd/log.env
+rm -f $tmp
+touch $tmp
+
+set noglob
+
+@ nt = 0
+foreach i (`env`)
+   set j = `echo $i | sed 's|=.*$||'`
+   @ nc = `printenv $j | wc -c`
+   @ nt = $nt + $nc
+#   echo "$nc $j" >>& $tmp
+   printf "%5d   %s\n" $nc $j >>& $tmp
+end
+
+sort -k 1 -n $tmp
+@ nl = ( `cat $tmp | wc -l` )
+echo "Total number of variables: $nl"
+echo "Total number of characters: $nt"
+
+rm -f $tmp
+
+exit($status)
