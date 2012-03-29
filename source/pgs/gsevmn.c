@@ -155,7 +155,7 @@ static void _PG_get_input(int fd, int mask, void *a)
 	    else
 	       _PG_gcont.input_bf[_PG_gcont.input_nc-2] = '\0';};
 
-	LONGJMP(io_avail, ERR_FREE);};
+	LONGJMP(_PG.io_avail, ERR_FREE);};
 
     return;}
         

@@ -50,9 +50,9 @@ extern "C" {
 typedef struct s_gattrdes gattrdes;
 typedef struct s_gcontdes gcontdes;
 
-typedef struct s_PG_state PG_state;
+typedef struct s_PG_scope_private PG_scope_private;
 
-struct s_PG_state
+struct s_PG_scope_private
    {
 
 /* initializes to non-zero values */
@@ -123,9 +123,6 @@ struct s_PG_state
     int view_attr_max_indx;
     PG_view_attributes **view_attr_list;
 
-/* GSDV.C */
-    int64_t buffer_size;
-
 /* GSDV_RST.C */
     int **rst_marker_fonts;
     int *rst_current_font;
@@ -158,7 +155,11 @@ struct s_PG_state
 
     SC_array *devlst;
 
-    char iso_err[MAXLINE];};
+    char iso_err[MAXLINE];
+
+/* GSDV.C */
+    int64_t buffer_size;
+    JMP_BUF io_avail;};
 
 
 /* global PGS attributes */
@@ -301,11 +302,8 @@ struct s_PG_triangle
 
 /*--------------------------------------------------------------------------*/
 
-extern PG_state
+extern PG_scope_private
  _PG;
-
-extern JMP_BUF
- io_avail;
 
 extern gattrdes
  _PG_gattrs;

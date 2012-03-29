@@ -320,9 +320,9 @@ static void _PG_win32_close_console(void)
 
     FreeConsole();
 
-    _PG_remove_device(PG_console_device);
+    _PG_remove_device(PG_gs.console);
 
-    PG_console_device = NULL;
+    PG_gs.console = NULL;
 
 /* connect I/O to standard functions */
     SC_set_put_line(io_printf_hook);
@@ -917,8 +917,8 @@ static int _PG_win32_open_cons(char *title, char *type, int bckgr, int vis,
 
     PG_setup_markers();
 
-    PG_console_device = PG_make_device("TEXT", type, title);
-    _PG_win32_open_text_window(PG_console_device, vis, xf, yf, dxf, dyf);
+    PG_gs.console = PG_make_device("TEXT", type, title);
+    _PG_win32_open_text_window(PG_gs.console, vis, xf, yf, dxf, dyf);
 
     SC_set_put_line(PG_wind_fprintf);
     SC_set_put_string(PG_wind_fputs);

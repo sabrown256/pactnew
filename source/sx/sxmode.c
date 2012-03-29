@@ -281,8 +281,8 @@ static void _SX_read(SS_psides *si, object *strm)
 int _SX_print(SS_psides *si)
    {
 
-    if (PG_console_device != NULL)
-       PG_console_device->gprint_flag = TRUE;
+    if (PG_gs.console != NULL)
+       PG_gs.console->gprint_flag = TRUE;
 
     return(TRUE);}
 
@@ -297,7 +297,7 @@ int _SX_print(SS_psides *si)
 object *SX_mode_text(SS_psides *si)
    {object *ret;
 
-    if (PG_console_device == NULL)
+    if (PG_gs.console == NULL)
        PG_open_console("PDBView", SX_gs.console_type,
 		       SX_gs.background_color_white,
                        SX_gs.console_x[0], SX_gs.console_x[1],
@@ -412,7 +412,7 @@ void SX_setup_viewspace(PG_device *dev, double mh)
 object *SX_mode_graphics(SS_psides *si)
    {object *ret;
 
-    if (PG_console_device == NULL)
+    if (PG_gs.console == NULL)
        {if (!PG_open_console("PDBView", SX_gs.console_type,
                              SX_gs.background_color_white,
                              SX_gs.console_x[0], SX_gs.console_x[1],
@@ -431,7 +431,7 @@ object *SX_mode_graphics(SS_psides *si)
 
 	SS_set_put_line(si, SX_fprintf);
 	SS_set_put_string(si, SX_fputs);
-	if (PG_console_device == NULL)
+	if (PG_gs.console == NULL)
 	   SC_set_get_line(io_gets);
 	else
 	   SC_set_get_line(PG_wind_fgets);
@@ -480,14 +480,14 @@ object *SX_mode_graphics(SS_psides *si)
 	    SX_gs.window_P[0]    = SX_gs.graphics_device->g.hwin[0];
 	    SX_gs.window_P[1]    = SX_gs.graphics_device->g.hwin[2];
 	    
-	    if (PG_console_device != NULL)
-	       PG_expose_device(PG_console_device);};
+	    if (PG_gs.console != NULL)
+	       PG_expose_device(PG_gs.console);};
 
         ret = SS_t;}
     else
        ret = SS_f;
 
-    PG_make_device_current(PG_console_device);
+    PG_make_device_current(PG_gs.console);
 
     return(ret);}
 

@@ -257,7 +257,7 @@ typedef struct s_attribute_value attribute_value;
 typedef struct s_PD_address PD_address;
 typedef struct s_PD_image PD_image;
 typedef struct s_PD_pfm_fnc PD_pfm_fnc;
-typedef struct s_PD_global_state PD_global_state;
+typedef struct s_PD_scope_public PD_scope_public;
 typedef memdes *(*PFPDBwrite)(PDBfile *file, char *vr, defstr *defp);
 typedef memdes *(*PFPDBread)(memdes *members);
 
@@ -851,7 +851,7 @@ struct s_PD_pfm_fnc
     void (*mark_as_flushed)(PDBfile *file, int wh);
     void (*set_address)(PDBfile *file, int64_t addr);};
 
-struct s_PD_global_state
+struct s_PD_scope_public
    {int nthreads;
     int format_fields;
     int default_format_version;
@@ -889,7 +889,7 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-extern PD_global_state
+extern PD_scope_public
  PD_gs;
 
 /*--------------------------------------------------------------------------*/

@@ -10,10 +10,10 @@
 
 #include "pgs_int.h"
 
-PG_state
+PG_scope_private
  _PG = { TRUE, TRUE, 1.0, 22.5, 0.05, 2, -1, -1, };
 
-PG_global_state
+PG_scope_public
  PG_gs = { { "Text", "Variable", "Button", "Container" },
 	 };
 

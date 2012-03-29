@@ -16,7 +16,6 @@ ERR_PATTERN  = ":+sp+error:"
 Tool CC {
    Exe       = clang
    Flags     =
-   Flags    += -Wno-pragmas
    Flags    += -Wcovered-switch-default
    Flags    += [ _env_ = C_STD ;                # C standard flags
                  C89   = -std=c89 ;

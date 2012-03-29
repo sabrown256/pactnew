@@ -245,7 +245,7 @@ typedef struct s_PG_dev_geometry PG_dev_geometry;
 typedef struct s_curve curve;
 typedef struct s_PG_text_box PG_text_box;
 typedef struct s_PG_event_handler PG_event_handler;
-typedef struct s_PG_global_state PG_global_state;
+typedef struct s_PG_scope_public PG_scope_public;
 
 typedef int (*PFRDev)(PG_device *dev);
 typedef void (*PFKeymap)(PG_text_box *b);
@@ -1064,7 +1064,7 @@ struct s_PG_dev_attributes
 
 /*--------------------------------------------------------------------------*/
 
-struct s_PG_global_state
+struct s_PG_scope_public
    {char *tnames[PG_N_TYPES];
     FILE *stdscr;      /* this is the effective file pointer for the screen */
     PG_device *console;};
@@ -1080,14 +1080,8 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
  
-extern PG_global_state
+extern PG_scope_public
  PG_gs;
-
-extern FILE
- *stdscr;              /* this is the effective file pointer for the screen */
- 
-extern PG_device
- *PG_console_device;
 
 /*--------------------------------------------------------------------------*/
 

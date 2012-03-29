@@ -23,9 +23,9 @@
 
 typedef void (*PFVAP)(void *);
 
-typedef struct s_PC_state PC_state;
+typedef struct s_PC_scope_private PC_scope_private;
 
-struct s_PC_state
+struct s_PC_scope_private
    {
 
 /* initializes to non-zero values */
@@ -49,7 +49,7 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-extern PC_state
+extern PC_scope_private
  _PC;
 
 /*--------------------------------------------------------------------------*/

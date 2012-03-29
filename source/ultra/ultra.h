@@ -37,9 +37,9 @@ enum e_UL_hist_mode
 
 typedef enum e_UL_hist_mode UL_hist_mode;
 
-typedef struct s_UL_global_state UL_global_state;
+typedef struct s_UL_scope_public UL_scope_public;
 
-struct s_UL_global_state
+struct s_UL_scope_public
    {
     int simple_append;
     int save_intermediate;
@@ -49,9 +49,9 @@ struct s_UL_global_state
     double *bfa[2];
     double *bfb[2];};
 
-typedef struct s_UL_state UL_state;
+typedef struct s_UL_scope_private UL_scope_private;
 
-struct s_UL_state
+struct s_UL_scope_private
    {
 
 /* ULTRA.C */
@@ -71,10 +71,10 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-extern UL_global_state
+extern UL_scope_public
  UL_gs;
 
-extern UL_state
+extern UL_scope_private
  _UL;
 
 /*--------------------------------------------------------------------------*/

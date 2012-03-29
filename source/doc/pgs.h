@@ -3201,7 +3201,7 @@ This routine returns the normalized coordinate extent of the character string s 
 
 These routines provide the control over terminal or file I/O in graphical
 applications. The first two are directed at the special device,
-PG_console_device, which is opened with PG_open_console.<p>
+PG_gs.console, which is opened with PG_open_console.<p>
 
 <p>
 
@@ -4908,7 +4908,7 @@ The following program demonstrates some of the PGS functionality for placement a
          PS_dev = PG_make_device("PS", "MONOCHROME", "gstxts");
          PG_open_device(PS_dev, 0.1, 0.1, 0.8, 1.1);
 
-         PG_expose_device(PG_console_device);
+         PG_expose_device(PG_gs.console);
 
          PG_clear_window(SCR_dev);
          PG_clear_window(CGM_dev);

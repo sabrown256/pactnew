@@ -72,7 +72,7 @@ enum e_vtype
 
 typedef enum e_vtype vtype;
 
-typedef struct s_CC_c_parse_state CC_c_parse_state;
+typedef struct s_CC_scope_private CC_scope_private;
 typedef struct s_decl decl;
 typedef struct s_expr expr;
 typedef struct s_file_loc file_loc;
@@ -106,7 +106,7 @@ struct s_decl
     int *dep;
     hasharr *refobjs;};
 
-struct s_CC_c_parse_state
+struct s_CC_scope_private
    {int mode_init;            /* has the C mode been initialized */
     int cpp_define;           /* processing a #define */
     int cpp_directive;        /* parsing a CPP directive */
@@ -143,7 +143,7 @@ struct s_CC_c_parse_state
 
 /*--------------------------------------------------------------------------*/
 
-extern CC_c_parse_state
+extern CC_scope_private
  _CC;
 
 extern int

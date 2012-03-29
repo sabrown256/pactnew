@@ -481,7 +481,7 @@ typedef struct s_SX_object SX_object;
 typedef struct s_SX_menu_item SX_menu_item;
 typedef struct s_g_file g_file;
 typedef struct s_out_device out_device;
-typedef struct s_SX_global_state SX_global_state;
+typedef struct s_SX_scope_public SX_scope_public;
 
 typedef union u_SX_pointer SX_pointer;
 
@@ -528,7 +528,7 @@ struct s_out_device
     PG_device *dev;};
 
 
-struct s_SX_global_state
+struct s_SX_scope_public
 
 /* non-zero default value */
    {int default_npts;
@@ -670,7 +670,7 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-extern SX_global_state
+extern SX_scope_public
  SX_gs;
 
 /*--------------------------------------------------------------------------*/

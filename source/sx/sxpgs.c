@@ -1110,14 +1110,14 @@ int SX_next_color(PG_device *dev)
 
     if (SX_gs.default_color != -1)
        {if (dev == NULL)
-           rv = _PG_trans_color(PG_console_device, SX_gs.default_color);
+           rv = _PG_trans_color(PG_gs.console, SX_gs.default_color);
         else
            rv = _PG_trans_color(dev, SX_gs.default_color);}
 
     else
        {_SX.color = max(_SX.color + 1, 1);
         if (dev == NULL)
-           rv = _PG_trans_color(PG_console_device, _SX.color);
+           rv = _PG_trans_color(PG_gs.console, _SX.color);
         else
            rv = _PG_trans_color(dev, _SX.color);};
 

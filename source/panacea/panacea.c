@@ -10,12 +10,12 @@
  
 #include "panacea_int.h"
 
-PA_state
+PA_scope_private
  _PA = { -1, 0, 0, 0, 1, FALSE, 0, 10, 0, 0, 
          ", \t\n\r", "dictionary", "dimension table",
 	 "ALIST", "SIZE", "heterogeneous", NULL, };
 
-PA_global_state
+PA_scope_public
  PA_gs = { -1, " \t\r\n",
 	   PA_error_handler, PA_warning_handler,
          };

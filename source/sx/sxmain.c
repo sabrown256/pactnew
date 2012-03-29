@@ -199,7 +199,7 @@ int main(int c, char **v, char **env)
         else
            SX_mode_text(si);
 
-        PG_expose_device(PG_console_device);};
+        PG_expose_device(PG_gs.console);};
 
 #ifdef NO_SHELL
 

@@ -554,7 +554,7 @@ int SX_command(SS_psides *si, char *file, char *cmd)
 	else
 	   SX_mode_text(si);
 
-	PG_expose_device(PG_console_device);
+	PG_expose_device(PG_gs.console);
 
 	si->nsave        = 0;
 	si->nrestore     = 0;

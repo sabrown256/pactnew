@@ -776,9 +776,9 @@ enum e_PA_info_tag
 
 typedef enum e_PA_info_tag PA_info_tag;
 
-typedef struct s_PA_global_state PA_global_state;
+typedef struct s_PA_scope_public PA_scope_public;
 
-struct s_PA_global_state
+struct s_PA_scope_public
    {
 
 /* variables with non-zero value initialization */
@@ -889,7 +889,7 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-extern PA_global_state
+extern PA_scope_public
  PA_gs;
 
 /*--------------------------------------------------------------------------*/

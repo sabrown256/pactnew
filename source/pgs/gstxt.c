@@ -42,7 +42,7 @@ static INLINE void _PG_place_text(PG_device *dev, char *p)
         PG_get_text_ext_n(dev, 2, WORLDC, p, dx);
         dev->tcur[0] += dx[0];
 
-        PG_write_text(dev, stdscr, p);};
+        PG_write_text(dev, PG_gs.stdscr, p);};
 
     return;}
 
@@ -378,7 +378,7 @@ void PG_refresh_text_box(PG_text_box *b)
 
 	for (i = 0; i < ln; i++)
 	    {_PG_move_to(b, 0, i);
-	     PG_write_text(dev, stdscr, bf[i]);};
+	     PG_write_text(dev, PG_gs.stdscr, bf[i]);};
 
 	PG_fset_char_path(dev, x);
 
@@ -442,7 +442,7 @@ static void _PG_clear_line(PG_text_box *b, int l)
 	    if (bf != NULL)
 	       {_PG_move_to(b, 0, l);
 		PG_fset_text_color(dev, b->background, FALSE);
-		PG_write_text(dev, stdscr, bf);};};};
+		PG_write_text(dev, PG_gs.stdscr, bf);};};};
 
     return;}    
 
@@ -512,7 +512,7 @@ void _PG_draw_cursor(PG_text_box *b, int inv)
 	PG_fset_text_color(dev, bc, FALSE);
 
 	if (!eol)
-	   PG_write_text(dev, stdscr, crsr);
+	   PG_write_text(dev, PG_gs.stdscr, crsr);
 
 	PG_release_curve(crv);};
 
@@ -535,7 +535,7 @@ static void _PG_redraw_text_line(PG_text_box *b, int c, int l, int flag)
 	    _PG_clear_line(b, l);
 	    _PG_move_to(b, 0, l);
 	    PG_fset_text_color(dev, b->foreground, FALSE);
-	    PG_write_text(dev, stdscr, bf);};};
+	    PG_write_text(dev, PG_gs.stdscr, bf);};};
 
     return;}
 
@@ -625,7 +625,7 @@ static void _PG_newline(PG_text_box *b)
 	else
 	   {nl++;
             _PG_move_to(b, 0, nl);
-	    PG_write_text(dev, stdscr, "More ...");
+	    PG_write_text(dev, PG_gs.stdscr, "More ...");
             PG_update_vs(dev);
 	    PG_get_char(dev);
 
@@ -654,7 +654,7 @@ static void _PG_newline(PG_text_box *b)
 	        {_PG_move_to(b, 0, i);
 		 p = bf[i] = bf[i+1];
 		 if ((p != NULL) && b->active)
-		    PG_write_text(dev, stdscr, p);};
+		    PG_write_text(dev, PG_gs.stdscr, p);};
 
 	    bf[line] = p0;
 	    line = nl+1;};}
@@ -693,7 +693,7 @@ static char *_PG_backup_char(PG_text_box *b, char *p, int n)
 		PG_move_tx_rel_n(dev, x);
 
 		PG_fset_text_color(dev, b->background, FALSE);
-		PG_write_text(dev, stdscr, p);
+		PG_write_text(dev, PG_gs.stdscr, p);
 
 		x[0] = 0.0;
 		x[1] = 0.0;

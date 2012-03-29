@@ -392,7 +392,7 @@ int main(int argc, char *argv[])
 	bx[3] = 0.95;
         PG_add_button(SCR_dev, bx, "Edit", set_edit_mode);};
 
-    PG_expose_device(PG_console_device);
+    PG_expose_device(PG_gs.console);
     clear_window(SCR_dev, NULL);
 
     PG_update_vs(SCR_dev);

@@ -11,10 +11,10 @@
 
 #include "ppc_int.h"
 
-PC_global_state
+PC_scope_public
   PC_gs;
 
-PC_state
+PC_scope_private
  _PC;
 
 /*--------------------------------------------------------------------------*/

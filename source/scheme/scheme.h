@@ -600,7 +600,7 @@ typedef struct s_SS_S_proc S_procedure;
 typedef struct s_SS_proc procedure;
 typedef struct s_SS_vect vector;
 typedef struct s_SS_psides SS_psides;
-typedef struct s_SS_global_state SS_global_state;
+typedef struct s_SS_scope_public SS_scope_public;
 typedef struct s_object object;
 
 struct s_object
@@ -698,7 +698,7 @@ struct s_SS_psides
 
     JMP_BUF cpu;};
 
-struct s_SS_global_state
+struct s_SS_scope_public
  {int tind[SS_N_TYPES];
   char *tnames[2];
   object *objs[SS_N_SPECIAL];};
@@ -859,7 +859,7 @@ struct s_SS_vect
 
 /*--------------------------------------------------------------------------*/
 
-extern SS_global_state
+extern SS_scope_public
  SS_gs;
 
 /*--------------------------------------------------------------------------*/

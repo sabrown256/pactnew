@@ -2013,7 +2013,7 @@ FIXNUM FF_ID(pgwrta, PGWRTA)(FIXNUM *sdid, double *sx, double *sy,
     dev = SC_GET_POINTER(PG_device, *sdid);
     if ((dev != NULL) && (dev->gprint_flag))
        {PG_move_tx_abs_n(dev, x);
-        PG_write_text(dev, stdscr, lmsg);};
+        PG_write_text(dev, PG_gs.stdscr, lmsg);};
 
     rv = TRUE;
 
