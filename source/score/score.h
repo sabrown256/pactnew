@@ -361,7 +361,7 @@ typedef struct s_SC_evlpdes SC_evlpdes;
 typedef struct s_SC_rusedes SC_rusedes;
 typedef struct s_SC_mem_fnc SC_mem_fnc;
 typedef struct s_SC_contextdes SC_contextdes;
-typedef struct s_SC_global_state SC_global_state;
+typedef struct s_SC_scope_public SC_scope_public;
 
 typedef void (*PFFileCallback)(int fd, int mask, void *a);
 typedef PROCESS *(*PFProcInit)(char **argv, char *mode, int type);
@@ -620,7 +620,7 @@ struct s_SC_mem_fnc
     void *(*realloc_n)(void *p, long ni, long bpi, void *a);
     int (*free_n)(void *p, void *a);};
 
-struct s_SC_global_state
+struct s_SC_scope_public
    {char version[32];
     int assert_fail;
     int comm_rank;
@@ -658,7 +658,7 @@ struct s_SC_global_state
 extern "C" {
 #endif
 
-extern SC_global_state
+extern SC_scope_public
  SC_gs;
 
 /*--------------------------------------------------------------------------*/

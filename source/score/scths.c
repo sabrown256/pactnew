@@ -27,10 +27,6 @@ struct s_sproc_lock
    {int initted;
     abilock_t lock;};
 
-SC_thread_attr
- _SC_attr_detached = 0,
- _SC_attr_attached = 1;
-
 SC_array
  *_SC_sproc_threads,
  *_SC_sproc_conds,
@@ -369,20 +365,20 @@ static int _SC_sproc_rand(unsigned int *seed)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-threades
- _SC_sproc_oper = { _SC_sproc_init,
-		    _SC_sproc_thread_self,
-		    _SC_sproc_thread_equal,
-		    _SC_sproc_thread_create,
-		    _SC_sproc_tid,
-		    _SC_sproc_lockon,
-		    _SC_sproc_lockoff,
-		    _SC_sproc_thread_join,
-		    _SC_sproc_strtok,
-		    _SC_sproc_ctime,
-		    _SC_sproc_ttyname,
-		    _SC_sproc_rand,},
- SC_thread_oper = &_SC_sproc_oper;
+SC_scope_thread
+ _SC_ts = { FALSE, 0, SC_LOCK_INIT_STATE, 0, 1,
+            { _SC_sproc_init,
+	      _SC_sproc_thread_self,
+	      _SC_sproc_thread_equal,
+	      _SC_sproc_thread_create,
+	      _SC_sproc_tid,
+	      _SC_sproc_lockon,
+	      _SC_sproc_lockoff,
+	      _SC_sproc_thread_join,
+	      _SC_sproc_strtok,
+	      _SC_sproc_ctime,
+	      _SC_sproc_ttyname,
+	      _SC_sproc_rand,} };
 
 #endif
 

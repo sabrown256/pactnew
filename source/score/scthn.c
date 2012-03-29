@@ -13,10 +13,6 @@
 
 #ifndef HAVE_THREADS
 
-SC_thread_attr
- _SC_attr_detached = 0,
- _SC_attr_attached = 1;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -167,20 +163,20 @@ static int _SC_nth_rand(unsigned int *seed)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-threades
- _SC_nth_oper = { NULL,
-	          _SC_nth_thread_self,
-	          _SC_nth_thread_equal,
-	          _SC_nth_thread_create,
-	          _SC_nth_tid,
-	          _SC_nth_lockon,
-	          _SC_nth_lockoff,
-	          _SC_nth_thread_join,
-	          _SC_nth_strtok,
-	          _SC_nth_ctime,
-	          _SC_nth_ttyname,
-	          _SC_nth_rand,},
- *SC_thread_oper = &_SC_nth_oper;
+SC_scope_thread
+ _SC_ts = { FALSE, 0, SC_LOCK_INIT_STATE, 0, 1,
+            { NULL,
+	      _SC_nth_thread_self,
+	      _SC_nth_thread_equal,
+	      _SC_nth_thread_create,
+	      _SC_nth_tid,
+	      _SC_nth_lockon,
+	      _SC_nth_lockoff,
+	      _SC_nth_thread_join,
+	      _SC_nth_strtok,
+	      _SC_nth_ctime,
+	      _SC_nth_ttyname,
+	      _SC_nth_rand,} };
 
 #endif
 

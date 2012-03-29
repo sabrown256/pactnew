@@ -1566,8 +1566,8 @@ FILE *SC_lbopen(char *name, char *mode)
 void SC_bf_set_hooks(void)
    {
 
-    io_open_hook  = SC_bopen;
-    lio_open_hook = SC_lbopen;
+    _SC_ios.sfopen  = SC_bopen;
+    _SC_ios.lfopen = SC_lbopen;
 
     return;}
 
@@ -1584,8 +1584,8 @@ void SC_bf_set_hooks(void)
 void SC_lbf_set_hooks(void)
    {
 
-    io_open_hook  = SC_bopen;
-    lio_open_hook = SC_lbopen;
+    _SC_ios.sfopen  = SC_bopen;
+    _SC_ios.lfopen = SC_lbopen;
 
     return;}
 

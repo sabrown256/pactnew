@@ -192,7 +192,7 @@ void *malloc(size_t nb)
 
     SC_use_over_mem(TRUE);
 
-    if ((_SC_init_emu_threads == 0) || (_SC_mf.sys > 0))
+    if ((_SC_ts.init_emu == 0) || (_SC_mf.sys > 0))
        pr = _SC_mf.malloc(nb);
 
     else
@@ -214,7 +214,7 @@ void free(void *p)
 
     SC_use_over_mem(TRUE);
 
-    if ((_SC_init_emu_threads == 0) || (_SC_mf.sys > 0))
+    if ((_SC_ts.init_emu == 0) || (_SC_mf.sys > 0))
        _SC_mf.free(p);
 
     else
@@ -232,7 +232,7 @@ void *realloc(void *p, size_t nb)
 
     SC_use_over_mem(TRUE);
 
-    if ((_SC_init_emu_threads == 0) || (_SC_mf.sys > 0))
+    if ((_SC_ts.init_emu == 0) || (_SC_mf.sys > 0))
        p = _SC_mf.realloc(p, nb);
     else
        CREMAKE(p, char, nb);

@@ -15,9 +15,12 @@
 #include "score_int.h"
 #include "scope_mem.h"
 
-SC_thread_lock
- SC_mm_lock = SC_LOCK_INIT_STATE,
- SC_mc_lock = SC_LOCK_INIT_STATE;
+SC_scope_mem
+ _SC_ms = { -1, NULL, 0, 0, 0, 0L, 0L, NULL,
+            SC_LOCK_INIT_STATE, SC_LOCK_INIT_STATE };
+
+SC_memfncs
+  _SC_mf = { FALSE, NULL, NULL, NULL };
 
 /*--------------------------------------------------------------------------*/
 
@@ -178,7 +181,7 @@ void SC_configure_mm(long mxl, long mxm, long bsz, double r)
    {long l, n, szbn;
     size_t nb;
 
-    ONCE_SAFE(_SC_init_emu_threads == TRUE, &SC_mc_lock)
+    ONCE_SAFE(_SC_ts.init_emu == TRUE, &SC_mc_lock)
 
        _SC_ms.mem_align_size = SC_MEM_ALIGN_SIZE;
        _SC_ms.mem_align_pad  = _SC_ms.mem_align_size - 1;
@@ -344,7 +347,7 @@ void _SC_init_heap(SC_heap_des *ph, int id)
 
     assert(ph != NULL);
 
-    ONCE_SAFE(_SC_init_emu_threads == TRUE, &SC_mm_lock)
+    ONCE_SAFE(_SC_ts.init_emu == TRUE, &SC_mm_lock)
        SC_configure_mm(128L, 4096L, 4096L, 1.1);
     END_SAFE;
 

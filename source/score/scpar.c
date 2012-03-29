@@ -62,8 +62,8 @@ static void
  _SC_do_threads(int n, thread_work *tw);
 
 SC_thread_attr
- *_SC_pool_attr = &_SC_attr_attached,
- *_SC_new_attr  = &_SC_attr_attached;
+ *_SC_pool_attr = &_SC_ts.attached,
+ *_SC_new_attr  = &_SC_ts.attached;
 
 int
  SC_n_threads = -1;
@@ -83,7 +83,7 @@ PFTid SC_thread_set_tid(PFTid f)
     if (f != NULL)
        _SC.tid_hook = f;
     else
-       _SC.tid_hook = SC_thread_oper->id;
+       _SC.tid_hook = _SC_ts.oper.id;
 
     return(of);}
 
@@ -109,12 +109,12 @@ int SC_current_thread(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_USING_TPOOL - return value of SC_thread_oper->use_pool */
+/* SC_USING_TPOOL - return value of _SC_ts.oper.use_pool */
 
 int SC_using_tpool(void)
    {
 
-    return(SC_thread_oper->use_pool);}
+    return(_SC_ts.oper.use_pool);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -239,8 +239,8 @@ static void _SC_one_thread(int tid, thread_work *tw)
     chg = FALSE;
     if (tid != -1)
        {chg = TRUE;
-        otid = SC_GET_PKEY(int, SC_thread_oper->ikey);
-	SC_SET_KEY(int, SC_thread_oper->ikey, &tid);};
+        otid = SC_GET_PKEY(int, _SC_ts.oper.ikey);
+	SC_SET_KEY(int, _SC_ts.oper.ikey, &tid);};
 
     if (r == NULL)
        {for (i = 0; i < n; i++)
@@ -252,7 +252,7 @@ static void _SC_one_thread(int tid, thread_work *tw)
 
 /* reset if changed */
     if ((chg == TRUE) && (otid != NULL))
-       SC_SET_KEY(int, SC_thread_oper->ikey, otid);
+       SC_SET_KEY(int, _SC_ts.oper.ikey, otid);
 
     return;}
 
@@ -293,13 +293,13 @@ int SC_init_threads(int nt, PFTid tid)
 
         ti = _SC_get_thread_info(-1);
 
-	SC_CREATE_KEY(SC_thread_oper->ikey, NULL);
-	SC_SET_KEY(int, SC_thread_oper->ikey, &ti->ide);
-	SC_thread_oper->init_ikey = TRUE;
+	SC_CREATE_KEY(_SC_ts.oper.ikey, NULL);
+	SC_SET_KEY(int, _SC_ts.oper.ikey, &ti->ide);
+	_SC_ts.oper.init_ikey = TRUE;
 
 	_SC.tid_hook = (nt > 1) ? tid : NULL;
 	if (_SC.tid_hook == NULL)
-	   _SC.tid_hook = SC_thread_oper->id;
+	   _SC.tid_hook = _SC_ts.oper.id;
 
         SC_THREAD_INIT_SYS();
 
@@ -378,10 +378,10 @@ void SC_chunk_loop(PFPVoidAPV fnc, int mn, int mx, int serial, void *argl)
 
 /* if the threads haven't been initialized before now - do it */
     if (SC_n_threads < 0)
-       SC_init_threads(1, SC_thread_oper->id);
+       SC_init_threads(1, _SC_ts.oper.id);
 
     otid        = _SC.tid_hook;
-    _SC.tid_hook = SC_thread_oper->id;
+    _SC.tid_hook = _SC_ts.oper.id;
     _SC_tc.wid  = 0;
 
     nt = (serial) ? 1 : SC_n_threads;
@@ -490,7 +490,7 @@ void SC_queue_work(PFPVoidAPV fnc, int serial, void *argl)
 
 /* if the threads haven't been initialized before now - do it */
     if (SC_n_threads < 0)
-       SC_init_threads(1, SC_thread_oper->id);
+       SC_init_threads(1, _SC_ts.oper.id);
 
     _SC_tq.nxt = 0;
 
@@ -718,7 +718,7 @@ static void _SC_do_pool_thread(void *x)
 
     tp = &_SC_tp;
 
-    SC_SET_KEY(int, SC_thread_oper->ikey, x);
+    SC_SET_KEY(int, _SC_ts.oper.ikey, x);
 
     while (TRUE)
        {SC_LOCKON(tp->lock);
@@ -858,7 +858,7 @@ void SC_init_tpool(int nt, PFTid tid)
 #ifdef THREAD_CONTROL
 	_SC_init_pool(&_SC_tp, nt);
 
-	SC_thread_oper->use_pool = TRUE;
+	_SC_ts.oper.use_pool = TRUE;
 #endif
        };
  
@@ -909,7 +909,7 @@ static void _SC_do_threads(int n, thread_work *tw)
        {if ((n == 1) && (tw->n_thread == 1))
 	   _SC_one_thread(-1, tw);
 
-	else if (SC_thread_oper->use_pool)
+	else if (_SC_ts.oper.use_pool)
            _SC_do_pool_threads(&_SC_tp, n, tw);
 
 	else

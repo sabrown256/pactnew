@@ -38,7 +38,7 @@
 int
  *LAST = NULL;
 
-SC_global_state
+SC_scope_public
  SC_gs = {PACT_VERSION,
 	  0, 0, 0, 1, FALSE, FALSE, 10, TRUE, FALSE,
 	  0, NULL, NULL, NULL,
@@ -62,7 +62,7 @@ SC_global_state
 #endif
 	  };
 
-SC_state
+SC_scope_private
  _SC = {-1, TRUE, -1,
         malloc, realloc, free,
 	{-1.0, -1.0}, -1, -1,

@@ -336,7 +336,7 @@ static int _PD_sseek(FILE *stream, int64_t addr, int offset)
 int _PD_init_s(void)
    {
 
-    PD_gs.par.open_hook         = lio_open_hook;
+    PD_gs.par.open_hook         = _SC_ios.lfopen;
 
     PD_gs.par.init              = _PD_pfm_init_s;
     PD_gs.par.add_file          = _PD_pfm_add_file_s;

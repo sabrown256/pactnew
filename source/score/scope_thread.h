@@ -30,45 +30,45 @@
 #define SC_THREAD_BROADCAST(_c)  _SC_eth_thread_broadcast(&(_c))
 
 #define SC_THREAD_INIT_SYS()                                                 \
-   {if (SC_thread_oper->init != NULL)                                        \
-       (*SC_thread_oper->init)();}
+   {if (_SC_ts.oper.init != NULL)                                        \
+       (*_SC_ts.oper.init)();}
 
 #define SC_THREAD_SELF()                                                     \
-   ((SC_thread_oper->self == NULL) ? (SC_thread) 0 :                         \
-    (*SC_thread_oper->self)())
+   ((_SC_ts.oper.self == NULL) ? (SC_thread) 0 :                         \
+    (*_SC_ts.oper.self)())
 
 #define SC_THREAD_CREATE(_t, _a, _f, _v)                                     \
-   ((SC_thread_oper->create == NULL) ? 0 :                                   \
-    (*SC_thread_oper->create)(&(_t), _a,                                     \
+   ((_SC_ts.oper.create == NULL) ? 0 :                                   \
+    (*_SC_ts.oper.create)(&(_t), _a,                                     \
                               (PFPVoidAPV) (_f), (void *) (_v)))
 
 #define SC_THREAD_JOIN(_t, _s)                                               \
-   {if (SC_thread_oper->join != NULL)                                        \
-       (*SC_thread_oper->join)(&(_t), _s);}
+   {if (_SC_ts.oper.join != NULL)                                        \
+       (*_SC_ts.oper.join)(&(_t), _s);}
 
 #define SC_strtok(_s, _d, _n)                                                \
-   ((char *) ((SC_thread_oper->strtok == NULL) ? NULL :                      \
-	      (*SC_thread_oper->strtok)(_s, _d, &(_n))))
+   ((char *) ((_SC_ts.oper.strtok == NULL) ? NULL :                      \
+	      (*_SC_ts.oper.strtok)(_s, _d, &(_n))))
 
 #define SC_ctime(_t, _s, _n)                                                 \
-   ((char *) ((SC_thread_oper->ctime == NULL) ? NULL :                       \
-	      (*SC_thread_oper->ctime)(&(_t), _s, _n)))
+   ((char *) ((_SC_ts.oper.ctime == NULL) ? NULL :                       \
+	      (*_SC_ts.oper.ctime)(&(_t), _s, _n)))
 
 #define SC_ttyname(_f, _s, _n)                                               \
-   ((char *) ((SC_thread_oper->ttyname == NULL) ? NULL :                     \
-	      (*SC_thread_oper->ttyname)(_f, _s, _n)))
+   ((char *) ((_SC_ts.oper.ttyname == NULL) ? NULL :                     \
+	      (*_SC_ts.oper.ttyname)(_f, _s, _n)))
 
 #define SC_rand(_n)                                                          \
-   ((SC_thread_oper->rand == NULL) ? 0 :                                     \
-    (*SC_thread_oper->rand)(&(_n)))
+   ((_SC_ts.oper.rand == NULL) ? 0 :                                     \
+    (*_SC_ts.oper.rand)(&(_n)))
 
 #define SC_THREAD_ATTR  SC_DETACHED_THREAD
 
 #define SC_DETACHED_THREAD(_a)                                              \
-   SC_thread_attr *_a = &_SC_attr_detached
+   SC_thread_attr *_a = &_SC_ts.detached
 
 #define SC_ATTACHED_THREAD(_a)                                              \
-   SC_thread_attr *_a = &_SC_attr_attached
+   SC_thread_attr *_a = &_SC_ts.attached
 
 #define SC_THREAD_LOCK(_l)             SC_thread_lock _l = SC_LOCK_INIT_STATE
 
@@ -131,6 +131,13 @@ typedef pthread_cond_t    SC_thread_cond;
 typedef pthread_mutex_t   SC_thread_sys_lock;
 typedef struct s_SC_thread_attr  SC_thread_attr;
 
+struct s_SC_thread_attr
+   {char *id;
+    void (*init)(void);
+    int state;
+    pthread_once_t once;
+    pthread_attr_t pa;};
+
 # define SC_LOCK_INIT_STATE    { -1, 0, 0, 0, SC_NULL_THREAD, PTHREAD_MUTEX_INITIALIZER }
 # define SC_COND_INIT_STATE    PTHREAD_COND_INITIALIZER
 
@@ -190,6 +197,7 @@ typedef int  SC_thread_attr;
 typedef void (*PFTinit)(void *a, int id);
 typedef void (*PFTid)(int *tid);
 typedef int SC_thread_key;
+typedef struct s_SC_scope_thread SC_scope_thread;
 typedef struct s_SC_thread_lock SC_thread_lock;
 typedef struct s_threades threades;
 typedef struct s_thread_info thread_info;
@@ -223,6 +231,15 @@ struct s_threades
     int use_pool;              /* using thread pool flag */
     SC_thread_key ikey;};
 
+struct s_SC_scope_thread
+   {int init_emu;
+    int n_threads;
+    SC_thread_lock lock;
+    SC_thread_attr detached;
+    SC_thread_attr attached;
+    threades oper;};
+
+
 /* PTHREAD emulation auxilliary structures */
 
 struct s_emu_thread_info
@@ -245,16 +262,11 @@ struct s_emu_cond_info
 
 /*--------------------------------------------------------------------------*/
 
+extern SC_scope_thread
+ _SC_ts;
+
 extern int
- _SC_init_emu_threads,
  SC_n_threads;
-
-extern threades
- *SC_thread_oper;
-
-extern SC_thread_attr
- _SC_attr_detached,
- _SC_attr_attached;
 
 extern SC_thread_lock
  SC_ts_lock;
