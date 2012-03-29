@@ -11,7 +11,7 @@
 #include "pdb_int.h"
 #include "scope_formats.h"
 
-PD_global_state
+PD_scope_public
  PD_gs = { 0, 8, 2, -1, HOST_ORDER,
 
 /* print controls
@@ -86,7 +86,7 @@ PD_global_state
 
          };
 
-PD_state
+PD_scope_private
  _PD = { -1, 50L,
          -1, -1, FALSE, -1, FALSE,
          FALSE,

@@ -28,18 +28,21 @@
 /*--------------------------------------------------------------------------*/
 
 #define PG_fgetc(stream)                                                     \
-    (((PG_console_device != NULL) && (PG_console_device->ggetc != NULL)) ?   \
-     (*PG_console_device->ggetc)(stream) :                                   \
+    (((PG_gs.console != NULL) &&                                             \
+      (PG_gs.console->ggetc != NULL)) ?                                      \
+     (*PG_gs.console->ggetc)(stream) :                                       \
      EOF)
 
 #define PG_fgets(buffer, maxlen, stream)                                     \
-    (((PG_console_device != NULL) && (PG_console_device->ggets != NULL)) ?   \
-     (*PG_console_device->ggets)(buffer, maxlen, stream) :                   \
+    (((PG_gs.console != NULL) &&                                             \
+      (PG_gs.console->ggets != NULL)) ?                                      \
+     (*PG_gs.console->ggets)(buffer, maxlen, stream) :                       \
      NULL)
 
 #define PG_puts(bf)                                                          \
-    if ((PG_console_device != NULL) && (PG_console_device->gputs != NULL))   \
-       (*PG_console_device->gputs)(bf)
+    if ((PG_gs.console != NULL) &&                                           \
+        (PG_gs.console->gputs != NULL))                                      \
+       (*PG_gs.console->gputs)(bf)
 
 /*--------------------------------------------------------------------------*/
 

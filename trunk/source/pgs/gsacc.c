@@ -1766,9 +1766,9 @@ void PG_close_device(PG_device *dev ARG(,in,cls))
 void PG_close_console(void)
    {
 
-    if ((PG_console_device != NULL) &&
-	(PG_console_device->close_console != NULL))
-       PG_console_device->close_console();
+    if ((PG_gs.console != NULL) &&
+	(PG_gs.console->close_console != NULL))
+       PG_gs.console->close_console();
 
     return;}
 

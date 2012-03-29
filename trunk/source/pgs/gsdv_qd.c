@@ -295,8 +295,8 @@ int _PG_qd_open_cons(char *title, char *type, int bckgr, int vis,
 
     PG_setup_markers();
 
-    PG_console_device = PG_make_device("TEXT", type, title);
-    _PG_qd_open_text_window(PG_console_device, vis, xf, yf, dxf, dyf);
+    PG_gs.console = PG_make_device("TEXT", type, title);
+    _PG_qd_open_text_window(PG_gs.console, vis, xf, yf, dxf, dyf);
 
     SC_set_put_line(PG_wind_fprintf);
     SC_set_put_string(PG_wind_fputs);
@@ -326,11 +326,11 @@ void _PG_qd_close_device(PG_device *dev)
 void _PG_qd_close_console(void)
    {int i, j;
 
-    CloseWindow(PG_console_device->window);
+    CloseWindow(PG_gs.console->window);
 
-    _PG_remove_device(PG_console_device);
+    _PG_remove_device(PG_gs.console);
 
-    PG_console_device = NULL;
+    PG_gs.console = NULL;
 
 /* connect I/O to standard functions */
     SC_set_put_line(io_printf);
@@ -638,7 +638,7 @@ void _PG_qd_next_line(PG_device *dev)
 /* _PG_QD_WIND_FGETS - get and return a string from the window environment
  *                   - start with a clean event slate, and cycle the main
  *                   - event loop until some event sets
- *                   - PG_console_device->DoneFlag
+ *                   - PG_gs.console->DoneFlag
  */
  
 static char *_PG_qd_wind_fgets(char *str, int maxlen, FILE *fp)
@@ -649,11 +649,11 @@ static char *_PG_qd_wind_fgets(char *str, int maxlen, FILE *fp)
     PG_text_box *b;
     static PG_text_box *b0 = NULL;
 
-    if (PG_console_device == NULL)
+    if (PG_gs.console == NULL)
        _PG_qd_open_cons("", "COLOR", TRUE, FALSE, 0.0, 0.0, 0.1, 0.1);
 
-    PG_make_device_current(PG_console_device);
-    PG_expose_device(PG_console_device);
+    PG_make_device_current(PG_gs.console);
+    PG_expose_device(PG_gs.console);
 
     if (fp != stdin)
        {p = io_gets(str, maxlen, fp);
@@ -661,7 +661,7 @@ static char *_PG_qd_wind_fgets(char *str, int maxlen, FILE *fp)
 
     PG_setup_input(str, maxlen, -1);
 
-    if (SETJMP(io_avail) == ERR_FREE)
+    if (SETJMP(_PG.io_avail) == ERR_FREE)
 
 /* turn off interrupts until the next call to _PG_X_wind_fgets */
        {SC_catch_io_interrupts(FALSE);
@@ -671,21 +671,21 @@ static char *_PG_qd_wind_fgets(char *str, int maxlen, FILE *fp)
     SC_catch_io_interrupts(TRUE);
 
     _PG_mess_flag = FALSE;
-    _PG_whch      = PG_console_device->window;
+    _PG_whch      = PG_gs.console->window;
 
 /* put a line or two below where the typing will be done */
-    oldval = GetControlValue(PG_console_device->scroll_bar);
-    newval = (*PG_console_device->text)->nLines;
-    SetControlMaximum(PG_console_device->scroll_bar,
-              (*PG_console_device->text)->nLines);
-    SetControlValue(PG_console_device->scroll_bar, newval);
+    oldval = GetControlValue(PG_gs.console->scroll_bar);
+    newval = (*PG_gs.console->text)->nLines;
+    SetControlMaximum(PG_gs.console->scroll_bar,
+              (*PG_gs.console->text)->nLines);
+    SetControlValue(PG_gs.console->scroll_bar, newval);
 
-    lineHght = (*PG_console_device->text)->lineHeight;
+    lineHght = (*PG_gs.console->text)->lineHeight;
     Hght     = (oldval - newval - 2)*lineHght;
-    TEPinScroll(0, Hght, PG_console_device->text);
+    TEPinScroll(0, Hght, PG_gs.console->text);
 
 /* update the display rect */
-    _PG_update_display_rect(PG_console_device);
+    _PG_update_display_rect(PG_gs.console);
         
 /* the event loop */
     while (TRUE)
@@ -700,9 +700,9 @@ static char *_PG_qd_wind_fgets(char *str, int maxlen, FILE *fp)
  *            (IBeam if in content region, THE_ARROW if outside)
  *        [2] TEIdle our textedit window, so the insertion bar blinks.
  */
-        if (PG_console_device->window == _PG_actv)
-           {GetMouse(&PG_console_device->mouse);
-            TEIdle(PG_console_device->text);};
+        if (PG_gs.console->window == _PG_actv)
+           {GetMouse(&PG_gs.console->mouse);
+            TEIdle(PG_gs.console->text);};
            
 /* handle the next event */
         if (!PG_get_next_event(NULL)) 
@@ -720,7 +720,7 @@ static char *_PG_qd_wind_fgets(char *str, int maxlen, FILE *fp)
 		    break;
 
                case MOUSE_DOWN_EVENT :
-		    devC = PG_console_device;
+		    devC = PG_gs.console;
 		    iob = PG_get_object_event(devC, &_PG_gcont.current_event);
 		    if ((iob != NULL) && (iob->action != NULL))
 		       (*iob->action)(iob, &_PG_gcont.current_event);
@@ -1057,9 +1057,9 @@ static void _PG_qd_key_event_info(PG_device *dev, PG_event *ev,
 static void _PG_qd_puts(char *bf)
    {
 
-    if (PG_console_device != NULL)
-       {SetPort(PG_console_device->window);
-        _PG_textdraw(PG_console_device, bf);};
+    if (PG_gs.console != NULL)
+       {SetPort(PG_gs.console->window);
+        _PG_textdraw(PG_gs.console, bf);};
 
     return;}
 
@@ -1663,7 +1663,7 @@ static void _PG_menu_command(PG_device *dev, long mResult)
 
         case fileID  : switch (citem) 
                           {case quitCommand : func = (PFVoid) PG_lookup_callback ("End");
-                                              (*func) (PG_console_device, NULL);
+                                              (*func) (PG_gs.console, NULL);
                                               break;
                            default          : break;};
                        break;

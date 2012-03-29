@@ -54,7 +54,7 @@
  
 typedef int (*PFFIXME)(PA_variable *pp, int req, void *vr);
 typedef struct s_th_record th_record;
-typedef struct s_PA_state PA_state;
+typedef struct s_PA_scope_private PA_scope_private;
 
 struct s_th_record
    {int n_members;
@@ -63,9 +63,9 @@ struct s_th_record
     char *type;
     char *entry_name;};
 
-/* PA_STATE - static variables which must potentially be per thread */
+/* PA_SCOPE_PRIVATE - static variables which must potentially be per thread */
 
-struct s_PA_state
+struct s_PA_scope_private
    {int tsid;
     int nthreads;
     int default_offset;
@@ -153,7 +153,7 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-extern PA_state
+extern PA_scope_private
  _PA;
 
 /*--------------------------------------------------------------------------*/

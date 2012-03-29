@@ -254,7 +254,7 @@ typedef struct s_PM_mesh_map PM_mesh_map;
 typedef struct s_PM_set PM_set;
 typedef struct s_PM_map_info PM_map_info;
 typedef struct s_PM_mapping PM_mapping;
-typedef struct s_PM_global_state PM_global_state;
+typedef struct s_PM_scope_public PM_scope_public;
 typedef struct s_sort_link sort_link;
 
 FUNCTION_POINTER(PM_set, *(*PFPPM_set));
@@ -683,7 +683,7 @@ struct s_sort_link
    {int count;
     struct s_sort_link *next;};
 
-struct s_PM_global_state
+struct s_PM_scope_public
    {
 
 /* non-zero initial value variables */
@@ -707,7 +707,7 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-extern PM_global_state
+extern PM_scope_public
  PM_gs;
 
 /*--------------------------------------------------------------------------*/

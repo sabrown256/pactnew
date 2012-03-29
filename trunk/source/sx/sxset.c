@@ -14,13 +14,13 @@
     else if (strcmp(type, str) == 0)                                         \
        *((typ *) (var->val)) =  *((typ *) val)
 
-SX_state
+SX_scope_private
  _SX = { FAIL, 3,
 	 1.0e-15, 1.0e-3, 2.0,
 	 'a', LITERAL, 1, 1, '@', "curves.a",
          TRUE, };
 
-SX_global_state
+SX_scope_public
  SX_gs = {100, -1,
           0, 0, 1,
 #if 0
@@ -270,7 +270,7 @@ int _SX_get_input(SS_psides *si, object *str)
     p  = NULL;
 
     if (_SX.gets == NULL)
-       {if (PG_console_device == NULL)
+       {if (PG_gs.console == NULL)
 	   _SX.gets = io_gets;
         else
 	   _SX.gets = (PFfgets) PG_wind_fgets;};

@@ -14,10 +14,10 @@
 
 typedef void (*PFReplot)(void);
 
-UL_global_state
+UL_scope_public
  UL_gs = { FALSE, TRUE, };
 
-UL_state
+UL_scope_private
  _UL;
 
 /*--------------------------------------------------------------------------*/
@@ -378,8 +378,8 @@ static void _UL_read(SS_psides *si, object *strm)
 static int _UL_print(SS_psides *si)
    {
 
-    if (PG_console_device != NULL)
-       PG_console_device->gprint_flag = TRUE;
+    if (PG_gs.console != NULL)
+       PG_gs.console->gprint_flag = TRUE;
 
     return(TRUE);}
 
@@ -839,7 +839,7 @@ static void UL_init_env(SS_psides *si)
 object *UL_mode_text(SS_psides *si)
    {object *ret;
 
-    if (PG_console_device == NULL)
+    if (PG_gs.console == NULL)
        PG_open_console("ULTRA II", SX_gs.console_type,
 		       SX_gs.background_color_white,
                        SX_gs.console_x[0], SX_gs.console_x[1],
@@ -890,7 +890,7 @@ object *UL_mode_graphics(SS_psides *si)
    {object *ret;
     static object *scrwin = NULL;
 
-    if (PG_console_device == NULL)
+    if (PG_gs.console == NULL)
        {if (!PG_open_console("ULTRA II", SX_gs.console_type,
                              SX_gs.background_color_white,
                              SX_gs.console_x[0], SX_gs.console_x[1],
@@ -907,7 +907,7 @@ object *UL_mode_graphics(SS_psides *si)
 	si->pr_gets    = _SX_get_input;
 	SS_set_put_line(si, SX_fprintf);
 	SS_set_put_string(si, SX_fputs);
-	if (PG_console_device == NULL)
+	if (PG_gs.console == NULL)
 	   SC_set_get_line(io_gets);
 	else
 	   SC_set_get_line(PG_wind_fgets);
@@ -973,14 +973,14 @@ object *UL_mode_graphics(SS_psides *si)
 	    SX_gs.window_P[0]    = SX_gs.graphics_device->g.hwin[0];
 	    SX_gs.window_P[1]    = SX_gs.graphics_device->g.hwin[2];
 
-	    if (PG_console_device != NULL)
-	       PG_expose_device(PG_console_device);};
+	    if (PG_gs.console != NULL)
+	       PG_expose_device(PG_gs.console);};
 
         ret = SS_t;}
     else
        ret = SS_f;
 
-    PG_make_device_current(PG_console_device);
+    PG_make_device_current(PG_gs.console);
 
     return(ret);}
 
@@ -1236,7 +1236,7 @@ int main(int c, char **v, char **env)
        UL_print_banner();
 #endif
 
-    PG_expose_device(PG_console_device);
+    PG_expose_device(PG_gs.console);
 
 /* if it is not a script then we have to process the files at this level */
     if (TRUE)

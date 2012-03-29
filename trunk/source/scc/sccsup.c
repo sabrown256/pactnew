@@ -22,7 +22,7 @@ expr
  *CC_t,
  *CC_f;
 
-CC_c_parse_state
+CC_scope_private
  _CC = { FALSE, FALSE, FALSE, FALSE, FALSE };
 
 /* figure out what to do with a newline
@@ -44,7 +44,7 @@ CC_c_parse_state
  * no sense can be made of this case unlike the if/else
  * shift/reduce conflict
  *
- * use cpp_define member of CC_c_parse_state as control
+ * use cpp_define member of CC_scope_private as control
  * on the parse to resolve the conflict
  */
 

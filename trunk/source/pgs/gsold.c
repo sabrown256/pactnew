@@ -488,7 +488,7 @@ int PG_write_NDC(PG_device *dev, double x, double y, char *fmt, ...)
 	    PG_trans_point(dev, 2, NORMC, p, WORLDC, p);
 
 	    PG_move_tx_abs_n(dev, p);
-	    PG_write_text(dev, stdscr, s);
+	    PG_write_text(dev, PG_gs.stdscr, s);
 
 	    if (logflag)
 	       PG_fset_axis_log_scale(dev, 2, iflg);
@@ -531,7 +531,7 @@ int PG_write_WC(PG_device *dev, double x, double y, char *fmt, ...)
 	p[0] = x;
 	p[1] = y;
         PG_move_tx_abs_n(dev, p);
-        PG_write_text(dev, stdscr, s);
+        PG_write_text(dev, PG_gs.stdscr, s);
 
 #if DEBUG_TEXT
 	{double wc[PG_BOXSZ], dx[PG_SPACEDM];

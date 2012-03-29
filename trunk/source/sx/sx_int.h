@@ -111,9 +111,9 @@ enum e_SX_file_action
 
 typedef enum e_SX_file_action SX_file_action;
 
-typedef struct s_SX_state SX_state;
+typedef struct s_SX_scope_private SX_scope_private;
 
-struct s_SX_state
+struct s_SX_scope_private
    {
 
 /* initializes to non-zero values */
@@ -215,7 +215,7 @@ struct s_SX_state
 
 /*--------------------------------------------------------------------------*/
 
-extern SX_state
+extern SX_scope_private
  _SX;
 
 /*--------------------------------------------------------------------------*/

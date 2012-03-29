@@ -126,7 +126,7 @@ int main(int argc, char **argv)
     PS_dev = PG_make_device("PS", "MONOCHROME", "tgstx");
     PG_open_device(PS_dev, 0.1, 0.1, 0.8, 1.1);
 
-    PG_expose_device(PG_console_device);
+    PG_expose_device(PG_gs.console);
 
     PG_clear_window(SCR_dev);
     PG_clear_window(CGM_dev);

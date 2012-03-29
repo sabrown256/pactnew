@@ -122,7 +122,7 @@ typedef syment *(*PFBinWrite)(PDBfile *file, char *path,
 typedef int (*PFBinRead)(PDBfile *file, char *path, char *ty,
 			 syment *ep, void *vr, int nd, long *ind);
 
-typedef struct s_PD_state PD_state;
+typedef struct s_PD_scope_private PD_scope_private;
 typedef struct s_PD_Pfile PD_Pfile;
 typedef struct s_PD_printdes PD_printdes;
 typedef struct s_adloc adloc;
@@ -156,7 +156,7 @@ struct s_PD_Pfile
     int mp_id;                 /* file id received from MP master process */
     int id;};                  /* id (for smp file manager) */
 
-struct s_PD_state
+struct s_PD_scope_private
    {
 
 /* initializes to non-zero values */
@@ -233,7 +233,7 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-extern PD_state
+extern PD_scope_private
  _PD;
 
 /*--------------------------------------------------------------------------*/

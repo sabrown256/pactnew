@@ -408,7 +408,7 @@ object *UL_plot(SS_psides *si)
         UL_set_graphics_state(SX_gs.graphics_device);
         UL_draw_plot(SX_gs.graphics_device);};
 
-    PG_make_device_current(PG_console_device);
+    PG_make_device_current(PG_gs.console);
 
     return(SS_f);}
 

@@ -158,9 +158,9 @@ int SX_fprintf(FILE *fp, char *fmt, ...)
 /* the ifs are nested to get the right behavior wrt the print_flag
  * LEAVE THEM ALONE !!!!
  */
-	if ((PG_console_device != NULL) && ((fp == stdout) || (fp == stdscr)))
-	   rv = (PG_console_device->gprint_flag) ?
-	         _PG_display_page(PG_console_device, fp, bf) :
+	if ((PG_gs.console != NULL) && ((fp == stdout) || (fp == PG_gs.stdscr)))
+	   rv = (PG_gs.console->gprint_flag) ?
+	         _PG_display_page(PG_gs.console, fp, bf) :
 		 FALSE;
 	else
 	   rv = io_puts(bf, fp);};
@@ -195,14 +195,14 @@ int SX_fputs(const char *s, FILE *fp)
 /* the ifs are nested to get the right behavior wrt the print_flag
  * LEAVE THEM ALONE !!!!
  */
-	if ((PG_console_device != NULL) && ((fp == stdout) || (fp == stdscr)))
-	   {if (PG_console_device->gprint_flag)
+	if ((PG_gs.console != NULL) && ((fp == stdout) || (fp == PG_gs.stdscr)))
+	   {if (PG_gs.console->gprint_flag)
 	       {if (SS_get_display_flag() == TRUE)
-		   _PG_display_page(PG_console_device, fp, (char *) s);
+		   _PG_display_page(PG_gs.console, fp, (char *) s);
 		else
-		   {_PG_display_page(PG_console_device, fp, "\"");
-		    _PG_display_page(PG_console_device, fp, (char *) s);
-		    _PG_display_page(PG_console_device, fp, "\"");};};}
+		   {_PG_display_page(PG_gs.console, fp, "\"");
+		    _PG_display_page(PG_gs.console, fp, (char *) s);
+		    _PG_display_page(PG_gs.console, fp, "\"");};};}
 	else
 	   rv = SS_puts(s, fp, io_puts);}
 

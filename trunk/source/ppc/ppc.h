@@ -186,7 +186,7 @@
 /*--------------------------------------------------------------------------*/
 
 typedef struct s_PC_par_fnc PC_par_fnc;
-typedef struct s_PC_global_state PC_global_state;
+typedef struct s_PC_scope_public PC_scope_public;
 
 struct s_PC_par_fnc
    {PROCESS *(*open_member)(char **argv, int *pnn);
@@ -197,7 +197,7 @@ struct s_PC_par_fnc
     long (*in)(void *vr, char *type, size_t ni, PROCESS *pp, int *filt);
     long (*wait)(PROCESS *pp);};
 
-struct s_PC_global_state
+struct s_PC_scope_public
    {PC_par_fnc oper;};
 
 #ifdef __cplusplus
@@ -210,7 +210,7 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-extern PC_global_state
+extern PC_scope_public
   PC_gs;
 
 /*--------------------------------------------------------------------------*/

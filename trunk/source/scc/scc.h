@@ -37,9 +37,9 @@
 
 /*--------------------------------------------------------------------------*/
 
-typedef struct s_CC_global_state CC_global_state;
+typedef struct s_CC_scope_public CC_scope_public;
 
-struct s_CC_global_state
+struct s_CC_scope_public
    {int none;};
 
 /*--------------------------------------------------------------------------*/
@@ -48,7 +48,7 @@ struct s_CC_global_state
 
 /*--------------------------------------------------------------------------*/
 
-extern CC_global_state
+extern CC_scope_public
  CC_gs;
 
 /*--------------------------------------------------------------------------*/

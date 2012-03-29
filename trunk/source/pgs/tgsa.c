@@ -640,7 +640,7 @@ static int test_4(PG_device *dev)
     PG_box_init(2, wc, -0.02, 1.02);
     PG_draw_box_n(dev, 2, WORLDC, wc);
 
-/*    PG_expose_device(PG_console_device); */
+/*    PG_expose_device(PG_gs.console); */
 
     test_4_aux(dev);
 

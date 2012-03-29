@@ -42,10 +42,10 @@ typedef int             (*PFIntdd)(double, double);
 typedef int64_t         (*PFInt64I)(int64_t);
 typedef int64_t         (*PFInt64II)(int64_t, int64_t);
 
-typedef struct s_PM_state PM_state;
+typedef struct s_PM_scope_private PM_scope_private;
 typedef struct s_PM_smp_state PM_smp_state;
 
-struct s_PM_state
+struct s_PM_scope_private
    {
  
 /* initializes to non-zero values */
@@ -98,7 +98,7 @@ struct s_PM_smp_state
 
 /*--------------------------------------------------------------------------*/
 
-extern PM_state
+extern PM_scope_private
  _PM;
 
 /*--------------------------------------------------------------------------*/

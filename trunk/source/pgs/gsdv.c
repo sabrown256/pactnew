@@ -13,28 +13,19 @@
 #define DEBUG_TEXT 0
 
 #define _FGETC(stream)                                                       \
-    (((PG_console_device != NULL) && (PG_console_device->ggetc != NULL)) ?   \
-     (*PG_console_device->ggetc)(stream) :                                   \
+    (((PG_gs.console != NULL) && (PG_gs.console->ggetc != NULL)) ?           \
+     (*PG_gs.console->ggetc)(stream) :                                       \
      EOF)
 
 #define _FGETS(buffer, maxlen, stream)                                       \
-    (((PG_console_device != NULL) && (PG_console_device->ggets != NULL)) ?   \
-     (*PG_console_device->ggets)(buffer, maxlen, stream) :                   \
+    (((PG_gs.console != NULL) && (PG_gs.console->ggets != NULL)) ?           \
+     (*PG_gs.console->ggets)(buffer, maxlen, stream) :                       \
      NULL)
 
 #define _PUTS(bf)                                                            \
-    if ((PG_console_device != NULL) && (PG_console_device->gputs != NULL))   \
-       (*PG_console_device->gputs)(bf)
+    if ((PG_gs.console != NULL) && (PG_gs.console->gputs != NULL))           \
+       (*PG_gs.console->gputs)(bf)
 
-
-FILE
- *stdscr;              /* this is the effective file pointer for the screen */
-
-PG_device
- *PG_console_device;
- 
-JMP_BUF
- io_avail;
 
 gcontdes
  _PG_gcont;
@@ -278,7 +269,7 @@ int PG_write_n(PG_device *dev ARG(,,cls), int nd ARG(2),
 
 	    PG_trans_point(dev, nd, cs, x, WORLDC, y);
 	    PG_move_tx_abs_n(dev, y);
-	    PG_write_text(dev, stdscr, s);
+	    PG_write_text(dev, PG_gs.stdscr, s);
 
 	    if (cs != WORLDC)
 	       PG_fset_axis_log_scale(dev, nd, oflg);
@@ -358,9 +349,9 @@ int PG_fprintf(FILE *fp, char *fmt, ...)
     if (fp != NULL)
        {SC_VDSNPRINTF(FALSE, s, fmt);
 
-	if ((PG_console_device != NULL) && ((fp == stdout) || (fp == stdscr)))
-	   {if (PG_console_device->gprint_flag)
-	       rv = _PG_display_page(PG_console_device, fp, s);}
+	if ((PG_gs.console != NULL) && ((fp == stdout) || (fp == PG_gs.stdscr)))
+	   {if (PG_gs.console->gprint_flag)
+	       rv = _PG_display_page(PG_gs.console, fp, s);}
 	else
 	   {rv = io_puts(s, fp);};};
 
@@ -382,9 +373,9 @@ int PG_fputs(char *s, FILE *fp)
  * LEAVE THEM ALONE !!!!
  */
     if (fp != NULL)
-       {if ((PG_console_device != NULL) && ((fp == stdout) || (fp == stdscr)))
-	   {if (PG_console_device->gprint_flag)
-	       ret = _PG_display_page(PG_console_device, fp, s);}
+       {if ((PG_gs.console != NULL) && ((fp == stdout) || (fp == PG_gs.stdscr)))
+	   {if (PG_gs.console->gprint_flag)
+	       ret = _PG_display_page(PG_gs.console, fp, s);}
 	else
 	   {ret = io_puts(s, fp);};};
 
@@ -465,8 +456,8 @@ int PG_wind_fprintf(FILE *fp, char *fmt, ...)
     rv = 0;
 
     if (fp != NULL)
-       {if ((fp == stdout) && (PG_console_device != NULL))
-	   {if (PG_console_device->gprint_flag)
+       {if ((fp == stdout) && (PG_gs.console != NULL))
+	   {if (PG_gs.console->gprint_flag)
                {SC_VDSNPRINTF(FALSE, bf, fmt);
 
 		rv = strlen(bf);
@@ -491,8 +482,8 @@ int PG_wind_fputs(char *s, FILE *fp)
     ret = 0;
 
     if (fp != NULL)
-       {if ((fp == stdout) && (PG_console_device != NULL))
-	   {if (PG_console_device->gprint_flag)
+       {if ((fp == stdout) && (PG_gs.console != NULL))
+	   {if (PG_gs.console->gprint_flag)
 	       ret = PG_fputs(s, fp);}
 
         else

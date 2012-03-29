@@ -841,20 +841,20 @@ static int _PG_GL_open_console(char *title, char *type, int bckgr,
 
     PG_setup_markers();
 
-    PG_console_device = PG_make_device("TEXT", type, title);
-    if (PG_console_device == NULL)
+    PG_gs.console = PG_make_device("TEXT", type, title);
+    if (PG_gs.console == NULL)
        return(FALSE);
 
-    PG_query_screen_n(PG_console_device, dx, &nc);
+    PG_query_screen_n(PG_gs.console, dx, &nc);
     if ((dx[0] == 0) && (dx[1] == 0) && (nc == 0))
        return(FALSE);
 
-    PG_console_device->background_color_white = bckgr;
+    PG_gs.console->background_color_white = bckgr;
 
 /* initialize text size info */
     tx[0] = 1.0/TXSPAN;
-    tx[1] = PG_console_device->txt_ratio*tx[0];
-    PG_fset_char_size_n(PG_console_device, 2, NORMC, tx);
+    tx[1] = PG_gs.console->txt_ratio*tx[0];
+    PG_fset_char_size_n(PG_gs.console, 2, NORMC, tx);
 
     SC_setbuf(stdout, NULL);
 
@@ -862,7 +862,7 @@ static int _PG_GL_open_console(char *title, char *type, int bckgr,
     SC_set_put_line(PG_fprintf);
     SC_set_put_string(PG_fputs);
 
-    _PG_push_device(PG_console_device);
+    _PG_push_device(PG_gs.console);
 
     return(TRUE);}
 
@@ -908,9 +908,9 @@ static void _PG_GL_close_device(PG_device *dev)
 static void _PG_GL_close_console(void)
    {
 
-    _PG_remove_device(PG_console_device);
+    _PG_remove_device(PG_gs.console);
 
-    PG_console_device = NULL;
+    PG_gs.console = NULL;
 
 /* connect I/O to standard functions */
     SC_set_put_line(io_printf);
@@ -1155,7 +1155,7 @@ static void _PG_GL_write_text(PG_device *dev, FILE *fp, char *s)
    {double x[PG_SPACEDM];
     Display *disp;
 
-    if (fp == stdscr)
+    if (fp == PG_gs.stdscr)
        {disp = dev->display;
         if (disp == NULL)
            return;
@@ -1298,7 +1298,7 @@ static void _PG_get_event(int fd, int mask, void *a)
 /* _PG_GL_WIND_FGETS - get and return a string from the window environment
  *                   - start with a clean event slate, and cycle the main
  *                   - event loop until some event sets
- *                   - PG_console_device->DoneFlag
+ *                   - PG_gs.console->DoneFlag
  *                   - NOTE: there is a logical problem here in that
  *                   -       sometimes you just want to use PG_wind_fgets to
  *                   -       process events
@@ -1316,7 +1316,7 @@ static char *_PG_GL_wind_fgets(char *str, int maxlen, FILE *fp)
     else
        {PG_setup_input(str, maxlen, -1);
 
-	if (SETJMP(io_avail) == ERR_FREE)
+	if (SETJMP(_PG.io_avail) == ERR_FREE)
 
 /* turn off interrupts until the next call to _PG_GL_wind_fgets */
 	   {PG_catch_interrupts(FALSE);
@@ -1353,7 +1353,7 @@ static char *_PG_GL_wind_fgets(char *str, int maxlen, FILE *fp)
 /* _PG_GL_WIND_FGETC - get and return a character from the window environment
  *                   - start with a clean event slate, and cycle the main
  *                   - event loop until some event sets
- *                   - PG_console_device->DoneFlag
+ *                   - PG_gs.console->DoneFlag
  */
  
 static int _PG_GL_wind_fgetc(FILE *fp)
@@ -1367,7 +1367,7 @@ static int _PG_GL_wind_fgetc(FILE *fp)
     else
        {PG_setup_input(bf, 10, 1);
 
-	if (SETJMP(io_avail) == ERR_FREE)
+	if (SETJMP(_PG.io_avail) == ERR_FREE)
 
 /* turn off interrupts until the next call to _PG_GL_wind_fgetc */
 	   {PG_catch_interrupts(FALSE);

@@ -32,10 +32,10 @@
 
 /*--------------------------------------------------------------------------*/
 
-typedef struct s_SS_state SS_state;
+typedef struct s_SS_scope_private SS_scope_private;
 typedef struct s_SS_smp_state SS_smp_state;
 
-struct s_SS_state
+struct s_SS_scope_private
    {
 
 /* initializes to non-zero values */
@@ -159,7 +159,7 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-extern SS_state
+extern SS_scope_private
  _SS;
 
 /*--------------------------------------------------------------------------*/

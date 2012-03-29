@@ -532,8 +532,8 @@ void SX_parse(SS_psides *si,
                     (replot != NULL))
                    replot(si);};};};
 
-    if (PG_console_device != NULL)
-       PG_console_device->gprint_flag = TRUE;
+    if (PG_gs.console != NULL)
+       PG_gs.console->gprint_flag = TRUE;
 
 /*    for (t = SS_BUFFER(strm); *t; t++); */
     for (t = SS_PTR(strm); *t == '\n'; t++);

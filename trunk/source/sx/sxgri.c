@@ -402,7 +402,7 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
     char *s, *name, **axstf, **axslxf, **axslyf;
     out_device *out;
 
-    if (PG_console_device == NULL)
+    if (PG_gs.console == NULL)
        return(SS_f);
 
     SS_args(si, toggle,
@@ -461,7 +461,7 @@ static object *_SXI_toggle_gri(SS_psides *si, object *toggle)
 /* connect the I/O functions */
 	_SX.gri = PG_make_device("WINDOW", "COLOR", SX_gs.gri_title);
 
-	PG_query_screen_n(PG_console_device, sdx, &nc);
+	PG_query_screen_n(PG_gs.console, sdx, &nc);
         if (SX_gs.gri_dx[0] == 0.0)
            SX_gs.gri_dx[0] = 30.0*SX_gs.gri_type_size/((double) sdx[0]);
 

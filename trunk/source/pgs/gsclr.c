@@ -1918,7 +1918,7 @@ static void _PG_pal_ev_hand(void *d, PG_event *ev)
            {b = (PG_text_box *) iob->obj;
             _PG_gcont.input_bf[0] = b->text_buffer[0][0];};
 
-        LONGJMP(io_avail, ERR_FREE);};
+        LONGJMP(_PG.io_avail, ERR_FREE);};
 
     return;}
 
@@ -1951,7 +1951,7 @@ static void _PG_pal_mouse_ev_hand(PG_device *dev, PG_event *ev)
 
 #endif
 
-    LONGJMP(io_avail, ERR_FREE);}
+    LONGJMP(_PG.io_avail, ERR_FREE);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
