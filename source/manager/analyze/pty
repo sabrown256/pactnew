@@ -33,6 +33,8 @@ int main(int c, char **v)
  return(0);}
 EOF
 
+flog $ALog cat $Tmp.c
+
 setenv HAVE_UNIX98_PTY FALSE
 flog $ALog $CC_Exe $CC_Flags $Tmp.c -o $Tmp
 if ($status == 0) then

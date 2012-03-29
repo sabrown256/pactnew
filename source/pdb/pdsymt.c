@@ -157,7 +157,10 @@ int _PD_add_sym_desp(PDBfile *file, int ad, char *name, char *type,
 	    else
 	       s = CSTRSAVE(name);
 
-	    p  = file->current_prefix;
+	    p = file->current_prefix;
+	    if (p == NULL)
+	       p = "/";
+
 	    nc = strlen(p);
 
 	    ok = (strncmp(p, s, nc) == 0);

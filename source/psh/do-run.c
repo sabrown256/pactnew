@@ -1335,6 +1335,8 @@ int main(int c, char **v)
     rundes state;
 
     setbuf(stdout, NULL);
+    prune_env("rules", NULL);
+    prune_env("pact", v[0]);
 
     signal(SIGINT, interrupt);
 

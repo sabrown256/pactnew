@@ -111,8 +111,10 @@ switch ($Tgt)
    case gnu:
 	if ($?PACT_CC_PATH == 1) then
            if ($PACT_CC_PATH != "/usr") then
-              setenv RPATH     ${PACT_CC_PATH}/${LIB}:${RPATH}
-              setenv Cfg_RPATH ${PACT_CC_PATH}/${LIB}:${RPATH}
+#              setenv RPATH     ${PACT_CC_PATH}/${LIB}:${RPATH}
+#              setenv Cfg_RPATH ${PACT_CC_PATH}/${LIB}:${RPATH}
+              setenv RPATH     ${PACT_CC_PATH}/lib64:${PACT_CC_PATH}/lib:${RPATH}
+              setenv Cfg_RPATH ${PACT_CC_PATH}/lib64:${PACT_CC_PATH}/lib:${RPATH}
            endif
         endif
         breaksw

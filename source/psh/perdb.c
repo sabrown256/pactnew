@@ -177,7 +177,7 @@ void new_connection(char *root, connection *srv)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PROC_CONNECTION - process input on connection FD
+/* PROC_CONNECTION - process input on client connection CL
  *                 - return -1 on error
  *                 -         0 on end of connection
  *                 -         1 if otherwise successful
@@ -299,9 +299,12 @@ static void async_server(client *cl)
 	     if (nr > 0)
 	        {for (fd = 0; (fd < FD_SETSIZE) && (ok == TRUE); ++fd)
 		     {if (FD_ISSET(fd, &rfs))
-		    
+			 {log_activity(flog, dbg_db, "SERVER",
+				       "data available on %d (server %d)",
+				       fd, srv->server);
+
 /* new connection request */
-			 {if (fd == srv->server)
+			  if (fd == srv->server)
 			     new_connection(root, srv);
 
 /* data arriving on an existing connection */

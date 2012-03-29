@@ -357,7 +357,7 @@ static int reset_env(int c, char **v)
 
 	    free_strings(except);};};
 
-    return(rv);};
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 

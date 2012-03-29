@@ -8,6 +8,7 @@
 #
 
 setenv PACT_CC_PATH
+setenv PACT_FC_PATH
 
 include compilers/gnu
 

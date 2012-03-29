@@ -19,16 +19,15 @@ NoteD $Log ""
 NoteD $Log -n "                    $msg"
 Note $Log ""
 
-# NOTE: OSF1 is incapable of building this test properly when statically linked
-if (("$HaveDevZero" == "HAVE_DEV_ZERO" ) && ("$OS" != "OSF1")) then
+if (($?STATIC_LINKING == 0) && ("$HaveDevZero" == "HAVE_DEV_ZERO")) then
    flog $Log pushd $SrcDir
-   flog $Log $MAKE memchk
+   flog $Log $MAKE -i memchk
    set xstatus = $status
    flog $Log popd
 
    if ($xstatus != 0) then
       NoteD $Log "                         ERROR Building Heap Check Test Program"
-      NoteD $Log "                    ${msg}FAILED"
+      NoteD $Log "                    ${msg} FAILED"
    else
       if ("$CFE" != "") then
          setenv CFE   "$CFE -v"

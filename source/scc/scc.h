@@ -40,7 +40,7 @@
 typedef struct s_CC_global_state CC_global_state;
 
 struct s_CC_global_state
-   {};
+   {int none;};
 
 /*--------------------------------------------------------------------------*/
 

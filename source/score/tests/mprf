@@ -19,13 +19,13 @@ NoteD $Log ""
 NoteD $Log "                    $msg"
 
 flog $Log pushd $SrcDir
-flog $Log $MAKE memchk
+flog $Log $MAKE -i memprf
 set xstatus = $status
 flog $Log popd
 
 if ($xstatus != 0) then
    NoteD $Log "                         ERROR Building MM Performance Program"
-   NoteD $Log "                    ${mgs}FAILED"
+   NoteD $Log "                    ${msg}FAILED"
 else
    source ../../../scripts/test-run
 endif

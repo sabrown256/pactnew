@@ -460,7 +460,7 @@ static int write_sock(client *cl, char *s, int nc)
 	       log_activity(flog, dbg_sock, wh, "write %d |%s| - %s (%d)",
 			    fd, s, strerror(errno), errno);
 
-	    if (async_srv == FALSE)
+/*	    if (async_srv == FALSE) */
 	       cl->fd = connect_close(fd, cl, NULL);};};
 
     return(nb);}

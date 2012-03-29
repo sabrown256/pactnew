@@ -264,7 +264,7 @@ static int _PD_parse_symt_ii(PDBfile *file, char *buf, int flag,
 
 	 type = SC_strtok(NULL, "\001", s);
 
-/* check to see whether or not so skip this entry */
+/* check to see whether or not to skip this entry */
          ok = _PD_symatch(file, TRUE, name, type, acc, rej);
 	 if (ok == TRUE)
 	    {numb = SC_stol(SC_strtok(NULL, "\001", s));
