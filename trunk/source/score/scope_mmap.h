@@ -29,6 +29,7 @@ typedef void *(*PFMMap)(void *addr, size_t len,
 			int prot, int flags, int fd, int64_t offs);
 
 typedef struct s_SC_io_buffer SC_io_buffer;
+typedef struct s_SC_scope_mmap SC_scope_mmap;
 
 struct s_SC_io_buffer
    {SC_mapped_file *mf;
@@ -38,15 +39,18 @@ struct s_SC_io_buffer
     int nv;
     void **vrs;};
 
+struct s_SC_scope_mmap
+   {int64_t initial_length;
+    int64_t max_extend;};
+
 /*--------------------------------------------------------------------------*/
 
 /*                         VARIABLE DECLARATIONS                            */
 
 /*--------------------------------------------------------------------------*/
 
-extern int64_t
- _SC_mf_initial_length,
- _SC_mf_max_extend;
+extern SC_scope_mmap
+ _SC_mmf;
 
 /*--------------------------------------------------------------------------*/
 

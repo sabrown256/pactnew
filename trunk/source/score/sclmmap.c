@@ -202,7 +202,7 @@ void _SC_lmf_setup(SC_mapped_file *mf)
 void SC_lmf_set_hooks(void)
    {
 
-    lio_open_hook = SC_lmf_open;
+    _SC_ios.lfopen = SC_lmf_open;
 
     return;}
 
@@ -227,12 +227,12 @@ void SC_set_io_hooks(int whch)
     if (whch == 1)
        {SC_lmf_set_hooks();
 
-	io_open_hook = lio_open_hook;}
+	_SC_ios.sfopen = _SC_ios.lfopen;}
 
     else
        {SC_mf_set_hooks();
 
-	lio_open_hook = io_open_hook;};
+	_SC_ios.lfopen = _SC_ios.sfopen;};
 
     return;}
 
@@ -249,7 +249,7 @@ void SC_set_io_hooks(int whch)
 void SC_lmf_set_hooks(void)
    {
 
-    lio_open_hook = SC_mf_open;
+    _SC_ios.lfopen = SC_mf_open;
 
     return;}
 
@@ -270,7 +270,7 @@ void SC_set_io_hooks(int whch)
 
     SC_mf_set_hooks();
 
-    lio_open_hook = io_open_hook;
+    _SC_ios.lfopen = _SC_ios.sfopen;
 
     return;}
 

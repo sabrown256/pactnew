@@ -26,7 +26,7 @@
 
 typedef PROCESS *(*PFPPROC)(char **argv, char *mode, int type);
 
-SC_proc_state
+SC_scope_proc
  _SC_ps = { -1, FALSE, NULL };
 
 static char

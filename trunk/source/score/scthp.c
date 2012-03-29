@@ -31,23 +31,6 @@
 #endif
 #define SC_CREATE_DETACHED             PTHREAD_CREATE_DETACHED
 
-struct s_SC_thread_attr
-   {char *id;
-    void (*init)(void);
-    int state;
-    pthread_once_t once;
-    pthread_attr_t pa;};
-
-SC_thread_attr
- _SC_attr_detached = { "detached",
-		       _SC_pth_attr_init,
-		       SC_CREATE_DETACHED,
-		       SC_PTHREAD_ONCE_INIT, },
- _SC_attr_attached = { "attached",
-                       _SC_pth_attr_init,
-		       SC_CREATE_ATTACHED,
-		       SC_PTHREAD_ONCE_INIT, };
-
 static SC_thread_attr
   *_SC_current_attr;
 
@@ -231,19 +214,28 @@ static int _SC_pth_rand(unsigned int *seed)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-threades
- _SC_pth_oper = { NULL,
-	          _SC_pth_thread_self,
-	          _SC_pth_thread_equal,
-	          _SC_pth_thread_create,
-	          _SC_pth_tid,
-	          _SC_pth_lockon,
-	          _SC_pth_lockoff,
-	          _SC_pth_thread_join,
-	          _SC_pth_strtok,
-	          _SC_pth_ctime,
-	          _SC_pth_ttyname,
-	          _SC_pth_rand,},
- *SC_thread_oper = &_SC_pth_oper;
+SC_scope_thread
+ _SC_ts = { FALSE, 0, SC_LOCK_INIT_STATE,
+            { "detached",
+	      _SC_pth_attr_init,
+	      SC_CREATE_DETACHED,
+	      SC_PTHREAD_ONCE_INIT, },
+            { "attached",
+              _SC_pth_attr_init,
+	      SC_CREATE_ATTACHED,
+	      SC_PTHREAD_ONCE_INIT, },
+	    { NULL,
+	      _SC_pth_thread_self,
+	      _SC_pth_thread_equal,
+	      _SC_pth_thread_create,
+	      _SC_pth_tid,
+	      _SC_pth_lockon,
+	      _SC_pth_lockoff,
+	      _SC_pth_thread_join,
+	      _SC_pth_strtok,
+	      _SC_pth_ctime,
+	      _SC_pth_ttyname,
+	      _SC_pth_rand,} };
+
 #endif
 

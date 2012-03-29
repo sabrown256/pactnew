@@ -31,9 +31,6 @@ struct s_emu_lock_info
     int active;
     emu_lock_state cond;};
 
-int
- _SC_init_emu_threads = FALSE;
-
 SC_thread_lock
  SC_ts_lock = SC_LOCK_INIT_STATE;
 
@@ -265,7 +262,7 @@ int _SC_eth_lockon(SC_thread_lock *lck)
 
     _SC_eth_init();
 
-    if ((lck != NULL) && (_SC_init_emu_threads == TRUE))
+    if ((lck != NULL) && (_SC_ts.init_emu == TRUE))
        {tid = SC_THREAD_SELF();
 
 /* NOTE: the outcome of this test cannot be effected by any thread except
@@ -276,8 +273,8 @@ int _SC_eth_lockon(SC_thread_lock *lck)
 	   {if (_SC_use_emu_lock == TRUE)
 	       rv = _SC_eth_lock(lck, TRUE);
 
-	    else if (SC_thread_oper->lockon != NULL)
-	       (*SC_thread_oper->lockon)(lck);
+	    else if (_SC_ts.oper.lockon != NULL)
+	       (*_SC_ts.oper.lockon)(lck);
 
 	    lck->active = tid;};
 
@@ -300,7 +297,7 @@ int _SC_eth_lockoff(SC_thread_lock *lck)
 
     _SC_eth_init();
 
-    if ((lck != NULL) && (_SC_init_emu_threads == TRUE))
+    if ((lck != NULL) && (_SC_ts.init_emu == TRUE))
        {tid = SC_THREAD_SELF();
 	
 /* only the active thread manages the reference count */
@@ -314,8 +311,8 @@ int _SC_eth_lockoff(SC_thread_lock *lck)
 	    if (_SC_use_emu_lock == TRUE)
 	       rv = _SC_eth_lock(lck, FALSE);
 
-	    else if (SC_thread_oper->lockoff != NULL)
-	       (*SC_thread_oper->lockoff)(lck);};};
+	    else if (_SC_ts.oper.lockoff != NULL)
+	       (*_SC_ts.oper.lockoff)(lck);};};
 
     return(rv);}
 
@@ -554,7 +551,7 @@ void *SC_get_thread_array(int ita)
 static void _SC_eth_init(void)
    {
 
-    ONCE_SAFE(_SC_init_emu_threads == TRUE, &SC_ts_lock)
+    ONCE_SAFE(_SC_ts.init_emu == TRUE, &SC_ts_lock)
 
        SC_THREAD_INIT_SYS();
 
@@ -566,11 +563,11 @@ static void _SC_eth_init(void)
 
        _SC.eth_keys = CMAKE_ARRAY(SC_thread_key *, NULL, 3);
 
-       _SC_eth_push_key(&SC_thread_oper->ikey, 0);
+       _SC_eth_push_key(&_SC_ts.oper.ikey, 0);
 
        _SC.eth_conds = CMAKE_ARRAY(emu_cond_info, NULL, 3);
 
-       _SC_init_emu_threads = TRUE;
+       _SC_ts.init_emu = TRUE;
 
     END_SAFE;
 

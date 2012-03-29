@@ -183,7 +183,7 @@ void _SC_mf_setup(SC_mapped_file *mf)
 void SC_mf_set_hooks(void)
    {
 
-    io_open_hook = SC_mf_open;
+    _SC_ios.sfopen = SC_mf_open;
 
     return;}
 

@@ -222,6 +222,7 @@ typedef struct s_tasklst tasklst;
 typedef struct s_subtask subtask;
 typedef struct s_parstate parstate;
 typedef struct s_asyncstate asyncstate;
+typedef struct s_SC_scope_proc SC_scope_proc;
 
 struct s_conpool
    {int n_jobs;                    /* number of jobs launched in pool */
@@ -347,6 +348,12 @@ struct s_taskdesc
     void (*add)(taskdesc *job);
     int (*remove)(taskdesc *job);};
 
+
+struct s_SC_scope_proc
+   {int current_flushed_process;
+    int debug;
+    FILE *diag;};
+
 enum e_SC_proc_kind
    {SC_CHILD,
     SC_PARENT};
@@ -400,13 +407,6 @@ enum e_SC_mp_tag
 typedef enum e_SC_mp_tag SC_mp_tag;
 
 
-typedef struct s_SC_proc_state SC_proc_state;
-
-struct s_SC_proc_state
-   {int current_flushed_process;
-    int debug;
-    FILE *diag;};
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -417,7 +417,7 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-extern SC_proc_state
+extern SC_scope_proc
  _SC_ps;
 
 /*--------------------------------------------------------------------------*/

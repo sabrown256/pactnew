@@ -23,7 +23,9 @@ SS_global_state
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_SET_PUT_STRING - set the _SC_putstr method and register the context */
+/* SS_SET_PUT_STRING - set the _SC_ios.putstr method and
+ *                   - register the context
+ */
 
 void SS_set_put_string(SS_psides *si, PFfputs ps)
    {
@@ -36,7 +38,9 @@ void SS_set_put_string(SS_psides *si, PFfputs ps)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_SET_PUT_LINE - set the _SC_putstr method and register the context */
+/* SS_SET_PUT_LINE - set the _SC_ios.putstr method and
+ *                 - register the context
+ */
 
 void SS_set_put_line(SS_psides *si, int (*pf)(FILE *fp, char *fmt, ...))
    {

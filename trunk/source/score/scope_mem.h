@@ -21,8 +21,8 @@
  *             -
  *             -   #include "scope_mem.h"
  *             -
- *             - this results in the variables being declared in the compilation
- *             - unit.
+ *             - this results in the variables being declared in the
+ *             - compilation unit.
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
@@ -87,6 +87,9 @@
 
 /*--------------------------------------------------------------------------*/
 
+#define SC_mm_lock   _SC_ms.mm_lock
+#define SC_mc_lock   _SC_ms.mc_lock
+
 #define SC_SET_BLOCK_ID(_d, _v)   ((_d)->desc.info.idt = _v)
 #define SC_GET_BLOCK_ID(_d)       ((_d)->desc.info.idt)
 
@@ -144,7 +147,7 @@ typedef struct s_major_block_des major_block_des;
 typedef struct s_SC_heap_des SC_heap_des;
 typedef struct s_SC_mem_opt SC_mem_opt;
 typedef struct s_SC_mem_hst SC_mem_hst;
-typedef struct s_SC_mem_state SC_mem_state;
+typedef struct s_SC_scope_mem SC_scope_mem;
 typedef struct s_SC_memfncs SC_memfncs;
 
 typedef void *(*PFMalloc)(size_t size);
@@ -234,7 +237,7 @@ struct s_SC_mem_hst
     char *name;
     mem_descriptor *space;};
 
-struct s_SC_mem_state
+struct s_SC_scope_mem
    {int trap_sig;
     void *trap_ptr;
     int mem_align_expt;
@@ -242,7 +245,10 @@ struct s_SC_mem_state
     int mem_align_pad;
     long block_size;
     long n_bins;
-    long *bins;};
+    long *bins;
+    SC_thread_lock mm_lock;
+    SC_thread_lock mc_lock;};
+
 
 typedef int (*PFMemMap)(SC_heap_des *ph, mem_descriptor *md,
 			mem_kind wh, void *a, long i, long j);
@@ -255,27 +261,11 @@ typedef int (*PFMemMap)(SC_heap_des *ph, mem_descriptor *md,
 
 /*--------------------------------------------------------------------------*/
 
-#ifdef SC_DEFINE
-
-SC_mem_state
- _SC_ms = {-1, NULL, 0, 0, 0, 0L, 0L, NULL};
-
-SC_memfncs
-  _SC_mf = { FALSE, NULL, NULL, NULL };
-
-#else
-
-extern SC_mem_state
+extern SC_scope_mem
  _SC_ms;
 
 extern SC_memfncs
   _SC_mf;
-
-#endif
-
-extern SC_thread_lock
- SC_mm_lock,
- SC_mc_lock;
 
 /*--------------------------------------------------------------------------*/
 

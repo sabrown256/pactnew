@@ -32,34 +32,34 @@
 
 /* general file I/O hooks */
 
-#define io_open    (*io_open_hook)
-#define lio_open    (*lio_open_hook)
+#define io_open     (*_SC_ios.sfopen)
+#define lio_open    (*_SC_ios.lfopen)
 
 #define SC_lmf_insert    SC_mf_insert
 
-#define SC_set_put_line(_f)  (_SC_putln = (PFfprintf) (_f))
-#define SC_get_put_line(_f)  (_f = _SC_putln)
-#define SC_put_line_cmp(_f)  (_SC_putln == (PFfprintf) (_f))
+#define SC_set_put_line(_f)  (_SC_ios.putln = (PFfprintf) (_f))
+#define SC_get_put_line(_f)  (_f = _SC_ios.putln)
+#define SC_put_line_cmp(_f)  (_SC_ios.putln == (PFfprintf) (_f))
 
-#define SC_set_get_line(_f)  (_SC_getln = (PFfgets) (_f))
-#define SC_get_get_line(_f)  (_f = _SC_getln)
-#define SC_get_line_cmp(_f)  (_SC_getln == (PFfgets) (_f))
+#define SC_set_get_line(_f)  (_SC_ios.getln = (PFfgets) (_f))
+#define SC_get_get_line(_f)  (_f = _SC_ios.getln)
+#define SC_get_line_cmp(_f)  (_SC_ios.getln == (PFfgets) (_f))
 
-#define SC_set_put_string(_f)  (_SC_putstr = (PFfputs) (_f))
-#define SC_get_put_string(_f)  (_f = _SC_putstr)
-#define SC_put_string_cmp(_f)  (_SC_putstr == (PFfputs) (_f))
+#define SC_set_put_string(_f)  (_SC_ios.putstr = (PFfputs) (_f))
+#define SC_get_put_string(_f)  (_f = _SC_ios.putstr)
+#define SC_put_string_cmp(_f)  (_SC_ios.putstr == (PFfputs) (_f))
 
 #undef STDOUT
 #define STDOUT ((SC_gs.comm_rank == 0) ? stdout : NULL)
 
 #undef PRINT
-#define PRINT (*_SC_putln)
+#define PRINT (*_SC_ios.putln)
 
 #undef PUTS
-#define PUTS (*_SC_putstr)
+#define PUTS (*_SC_ios.putstr)
 
 #undef GETLN
-#define GETLN (*_SC_getln)
+#define GETLN (*_SC_ios.getln)
 
 #define SC_HAVE_LARGE_FILES   (sizeof(int64_t) == sizeof(long long))
 
@@ -338,6 +338,16 @@ struct s_fcontainer
     fcdes *handle;};
 
 
+typedef struct s_SC_scope_io SC_scope_io;
+
+struct s_SC_scope_io
+   {PFfgets getln;                           /* line input function pointer */
+    PFfprintf putln;                              /* print function pointer */
+    PFfputs putstr;                               /* print function pointer */
+    FILE *(*sfopen)(char *name, char *mode);
+    FILE *(*lfopen)(char *name, char *mode);};
+
+
 enum e_SC_file_cat
    {SC_LOCAL = 201,
     SC_REMOTE,
@@ -356,18 +366,8 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-extern PFfgets
- _SC_getln;                                  /* line input function pointer */
-
-extern PFfprintf
- _SC_putln;                                       /* print function pointer */
-
-extern PFfputs
- _SC_putstr;                                      /* print function pointer */
-
-extern FILE
- *(*io_open_hook)(char *name, char *mode),
- *(*lio_open_hook)(char *name, char *mode);
+extern SC_scope_io
+ _SC_ios;
 
 /*--------------------------------------------------------------------------*/
 

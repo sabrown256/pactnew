@@ -23,10 +23,6 @@ struct s_omp_funarg
 static SC_array
  *_SC_omp_arr = NULL;
 
-SC_thread_attr
- _SC_attr_detached = 0,
- _SC_attr_attached = 1;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -35,7 +31,7 @@ SC_thread_attr
 static void _SC_omp_init(void)
    {int nt;
 
-    if (_SC_init_emu_threads == TRUE)
+    if (_SC_ts.init_emu == TRUE)
        {ONCE_SAFE(FALSE, NULL)
 	   nt = omp_get_num_threads();
 	   omp_set_num_threads(nt);
@@ -136,7 +132,7 @@ static void _SC_omp_lockon(SC_thread_lock *lock)
    {SC_thread_sys_lock *sys;
     omp_lock_t *lck;
 
-    if (_SC_init_emu_threads == TRUE)
+    if (_SC_ts.init_emu == TRUE)
        {sys = &lock->sys;
 	lck = &sys->lock;
 
@@ -155,7 +151,7 @@ static void _SC_omp_lockoff(SC_thread_lock *lock)
    {SC_thread_sys_lock *sys;
     omp_lock_t *lck;
 
-    if (_SC_init_emu_threads == TRUE)
+    if (_SC_ts.init_emu == TRUE)
        {sys = &lock->sys;
 	lck = &sys->lock;
 
@@ -290,20 +286,20 @@ static int _SC_omp_rand(unsigned int *seed)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-threades
- _SC_omp_oper = { _SC_omp_init,
-	          _SC_omp_thread_self,
-	          _SC_omp_thread_equal,
-	          _SC_omp_thread_create,
-	          _SC_omp_tid,
-	          _SC_omp_lockon,
-	          _SC_omp_lockoff,
-	          _SC_omp_thread_join,
-	          _SC_omp_strtok,
-	          _SC_omp_ctime,
-	          _SC_omp_ttyname,
-	          _SC_omp_rand,},
- *SC_thread_oper = &_SC_omp_oper;
+SC_scope_thread
+ _SC_ts = { FALSE, 0, SC_LOCK_INIT_STATE, 0, 1,
+	    { _SC_omp_init,
+	      _SC_omp_thread_self,
+	      _SC_omp_thread_equal,
+	      _SC_omp_thread_create,
+	      _SC_omp_tid,
+	      _SC_omp_lockon,
+	      _SC_omp_lockoff,
+	      _SC_omp_thread_join,
+	      _SC_omp_strtok,
+	      _SC_omp_ctime,
+	      _SC_omp_ttyname,
+	      _SC_omp_rand,} };
 
 #endif
 

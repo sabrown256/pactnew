@@ -133,7 +133,7 @@
 /*--------------------------------------------------------------------------*/
 
 typedef struct s_SC_oscapdes SC_oscapdes;
-typedef struct s_SC_state SC_state;
+typedef struct s_SC_scope_private SC_scope_private;
 
 struct s_SC_oscapdes
    {void (*path_delimiter)(char *delim);
@@ -142,14 +142,16 @@ struct s_SC_oscapdes
     int (*query_exec)(char *path);
     void (*process_methods)(PROCESS *pp);};
 
-/* SC_STATE - single container to hold "static" state
- *          - helps to identify state which may become per thread state
- *          - easier to spot patterns in state
- *          - helps to identify scopes for grouping routines
- *          - down side - combines what was separate, file or function static
+/* SC_SCOPE_PRIVATE - single container to hold "static" state
+ *                  - helps to identify state which may become
+ *                  - per thread state
+ *                  - easier to spot patterns in state
+ *                  - helps to identify scopes for grouping routines
+ *                  - down side - combines what was separate, file or
+ *                  - function static
  */
 
-struct s_SC_state
+struct s_SC_scope_private
    {
 
 /* initializes to non-zero values */
@@ -295,7 +297,7 @@ extern "C" {
 
 /*--------------------------------------------------------------------------*/
 
-extern SC_state
+extern SC_scope_private
  _SC;
 
 extern SC_oscapdes

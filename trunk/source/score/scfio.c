@@ -26,21 +26,21 @@
 #define UNGETC_MSG   "SC_FUNGETC"
 #define EXIT_MSG     "SC_FEXIT"
 
-#define REPLY(msg, val)                                                         \
-   {printf("%s:%ld\n", msg, (long) (val));                                      \
-    fflush(stdout);                                                             \
-    if (_SC_ps.debug)                                                              \
-       {fprintf(_SC_ps.diag, "%s:%ld\n", msg, (long) (val));                       \
+#define REPLY(msg, val)                                                      \
+   {printf("%s:%ld\n", msg, (long) (val));                                   \
+    fflush(stdout);                                                          \
+    if (_SC_ps.debug)                                                        \
+       {fprintf(_SC_ps.diag, "%s:%ld\n", msg, (long) (val));                 \
         fflush(_SC_ps.diag);};}
 
-#define IO_OPER_START_TIME(_f)                                                  \
-   {double _to;                                                                 \
-    if (fid->gather == TRUE)                                                    \
+#define IO_OPER_START_TIME(_f)                                               \
+   {double _to;                                                              \
+    if (fid->gather == TRUE)                                                 \
        _to = SC_wall_clock_time()
 
-#define IO_OPER_ACCUM_TIME(_f, _o)                                              \
-    if (fid->gather == TRUE)                                                    \
-       (_f)->nsec[_o] += (SC_wall_clock_time() - _to);                          \
+#define IO_OPER_ACCUM_TIME(_f, _o)                                           \
+    if (fid->gather == TRUE)                                                 \
+       (_f)->nsec[_o] += (SC_wall_clock_time() - _to);                       \
     (_f)->nhits[_o]++;}
 
 typedef struct s_REMOTE_FILE REMOTE_FILE;
@@ -55,29 +55,20 @@ struct s_REMOTE_FILE
     long size;
     int64_t cf_addr;};
 
-PFfprintf
- _SC_putln = io_printf;
 
-PFfgets
- _SC_getln = io_gets;
-
-PFfputs
- _SC_putstr = io_puts;
-
-
-/* declare the IO hooks */
+/* define the IO hooks */
 
 #ifdef SC_C_STD_BUFFERED_IO
 
-PFfopen
- io_open_hook = SC_fopen,
- lio_open_hook = SC_lfopen;
+SC_scope_io
+ _SC_ios = { io_gets, io_printf, io_puts,
+	     SC_fopen, SC_lfopen };
 
 #else
 
-PFfopen
- io_open_hook = SC_bopen,
- lio_open_hook = SC_lbopen;
+SC_scope_io
+ _SC_ios = { io_gets, io_printf, io_puts,
+	     SC_bopen, SC_lbopen };
 
 #endif
 
@@ -2611,15 +2602,15 @@ int SC_io_connect(int flag)
 
     switch (flag)
        {case SC_REMOTE :
-	     io_open_hook = _SC_ropen;
+	     _SC_ios.sfopen = _SC_ropen;
 	     break;
 
         case SC_BUFFERED :
-	     io_open_hook = SC_bopen;
+	     _SC_ios.sfopen = SC_bopen;
 	     break;
 
         case SC_LOCAL :
-	     io_open_hook = SC_fopen;
+	     _SC_ios.sfopen = SC_fopen;
 	     break;
 
 	default :

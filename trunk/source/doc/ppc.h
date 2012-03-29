@@ -1,5 +1,5 @@
 TXT: PPC User's Manual
-MOD: 04/05/2011
+MOD: 03/29/2012
 
 <CENTER>
 <H1><font color="#ff0000">$TXT</font></H1>
@@ -123,47 +123,6 @@ The model here is in two parts.<p>
 
 <a name="PPCio"></a>
 <b>File I/O Interface</b>
-
-SCORE defines the following set of function pointers:<p>
-
-<BLOCKQUOTE>
-<TABLE>
-<TR><TD>pointer</TD><TD>default value</TD></TR>
-<TR><TD>io_open_hook</TD><TD>fopen</TD></TR>
-<TR><TD>io_tell_hook</TD><TD>ftell</TD></TR>
-<TR><TD>io_read_hook</TD><TD>fread</TD></TR>
-<TR><TD>io_write_hook</TD><TD>fwrite</TD></TR>
-<TR><TD>io_setvbuf_hook</TD><TD>setvbuf</TD></TR>
-<TR><TD>io_close_hook</TD><TD>fclose</TD></TR>
-<TR><TD>io_seek_hook</TD><TD>fseek</TD></TR>
-<TR><TD>io_printf_hook</TD><TD>fprintf</TD></TR>
-<TR><TD>io_puts_hook</TD><TD>fputs</TD></TR>
-<TR><TD>io_getc_hook</TD><TD>fgetc</TD></TR>
-<TR><TD>io_ungetc_hook</TD><TD>ungetc</TD></TR>
-<TR><TD>io_flush_hook</TD><TD>fflush</TD></TR>
-<TR><TD>io_gets_hook</TD><TD>fgets</TD></TR>
-</TABLE>
-</BLOCKQUOTE>
-
-and macros:<p>
-
-<BLOCKQUOTE>
-<TABLE>
-<TR><TD>#define io_open    </TD><TD>(*io_open_hook)</TD></TR>
-<TR><TD>#define io_setvbuf </TD><TD>(*io_setvbuf_hook)</TD></TR>
-<TR><TD>#define io_tell    </TD><TD>(*io_tell_hook)</TD></TR>
-<TR><TD>#define io_read    </TD><TD>(*io_read_hook)</TD></TR>
-<TR><TD>#define io_write   </TD><TD>(*io_write_hook)</TD></TR>
-<TR><TD>#define io_close   </TD><TD>(*io_close_hook)</TD></TR>
-<TR><TD>#define io_seek    </TD><TD>(*io_seek_hook)</TD></TR>
-<TR><TD>#define io_printf  </TD><TD>(*io_printf_hook)</TD></TR>
-<TR><TD>#define io_puts    </TD><TD>(*io_puts_hook)</TD></TR>
-<TR><TD>#define io_getc    </TD><TD>(*io_getc_hook)</TD></TR>
-<TR><TD>#define io_ungetc  </TD><TD>(*io_ungetc_hook)</TD></TR>
-<TR><TD>#define io_flush   </TD><TD>(*io_flush_hook)</TD></TR>
-<TR><TD>#define io_gets    </TD><TD>(*io_gets_hook)</TD></TR>
-</TABLE>
-</BLOCKQUOTE>
 
 These give a call compatible interface to the major portion of the standard
 C file I/O library. It also provides a simple way for an application to supply

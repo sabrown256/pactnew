@@ -9,10 +9,10 @@
  *           -   3) wrap to fit standard C library I/O set
  *           -   4) support 64 bit files (> 2 GB) on 32 bit OSes
  *           -   5) user tunable
- *           -         _SC_mf_initial_length (variable)
- *           -         _SC_mf_max_extend     (variable)
- *           -         SC_mf_set_size        (function)
- *           -         SC_mf_segment_size    (function)
+ *           -         _SC_mmf.initial_length (variable)
+ *           -         _SC_mmf.max_extend     (variable)
+ *           -         SC_mf_set_size         (function)
+ *           -         SC_mf_segment_size     (function)
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942
@@ -28,9 +28,9 @@
 #include "scope_mmap.h"
 #include <sys/mman.h>
 
-int64_t
- _SC_mf_initial_length = 1048576,      /* 1 << 20 ~ 1 MB */
- _SC_mf_max_extend     = 134217728;    /* 1 << 27 ~ 100 MB */
+SC_scope_mmap
+ _SC_mmf = { 1048576,        /* 1 << 20 ~ 1 MB */
+             134217728 };    /* 1 << 27 ~ 100 MB */
 
 /*--------------------------------------------------------------------------*/
 
@@ -257,7 +257,7 @@ void SC_mf_set_prop(SC_mapped_file *mf, int fd, void *p, int64_t len)
     bl = _SC_make_file_block(mf, 0L, 0L, len, NULL);
 
     pgsz = mf->page;
-    szmx = _SC_mf_max_extend;
+    szmx = _SC_mmf.max_extend;
     ns   = (szmx + pgsz - 1)/pgsz;
     szmx = ns*pgsz;
 
@@ -349,7 +349,7 @@ static SC_mapped_file *_SC_mf_map_file(char *name, int action, int extend,
     create = (action & cr);
 
     if (create)
-       mf = _SC_mf_create_file(name, _SC_mf_initial_length, extend, setup);
+       mf = _SC_mf_create_file(name, _SC_mmf.initial_length, extend, setup);
 
     else
        {shar = MAP_SHARED;
@@ -366,7 +366,7 @@ static SC_mapped_file *_SC_mf_map_file(char *name, int action, int extend,
 	   {p = NULL;
 	    if (fstat(fd, &s) == 0)
 	       {len = s.st_size;
-		ssz = min(len, _SC_mf_max_extend);
+		ssz = min(len, _SC_mmf.max_extend);
 		off = 0L;
 
 		p = (*mf->mmapf)(0, ssz, prot, shar, fd, off);
@@ -629,7 +629,7 @@ static void _SC_mf_extend(SC_mapped_file *mf, int64_t nb)
 	pgsz = mf->page;
 
 	ns = ne - ln;
-	ns = max(ns, _SC_mf_max_extend);
+	ns = max(ns, _SC_mmf.max_extend);
 	np = (ns + pgsz - 1)/pgsz;
 	ns = ln + np*pgsz;
 
@@ -1242,8 +1242,8 @@ int64_t _SC_mf_core_tell(FILE *fp)
 void SC_mf_set_size(int64_t mnsz, int64_t extsz)
    {
 
-    _SC_mf_initial_length = mnsz;
-    _SC_mf_max_extend     = extsz;
+    _SC_mmf.initial_length = mnsz;
+    _SC_mmf.max_extend     = extsz;
 
     return;}
 

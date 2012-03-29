@@ -249,7 +249,7 @@ int SC_register_thread_data(char *name, char *type, int ni, size_t bpi,
 	    break;};
 
     if (ie >= st.ne)
-       {IF_SAFE(_SC_init_emu_threads == TRUE, &SC_ts_lock, TRUE)
+       {IF_SAFE(_SC_ts.init_emu == TRUE, &SC_ts_lock, TRUE)
 
            SC_strncpy(st.mreg[ie].name, 80, name, -1);
            st.mreg[ie].type = strdup(type);
