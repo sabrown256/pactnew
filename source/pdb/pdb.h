@@ -13,6 +13,7 @@
 #define PCK_PDB                       /* announce that this package is here */
 
 #include "pml.h"
+#include "pdb_old.h"
 
 /* PDBLib History:
  * Version 4 contains bug fixes pertaining to cast information in PDB files
@@ -697,11 +698,11 @@ struct s_defstr
 
 /* indirect reference tag */
 struct s_PD_itag
-   {int64_t nitems;                              /* number of items pointed to */
-    char *type;                                     /* type of item pointed to */
-    int64_t addr;                           /* address of the itag owning data */
-    PD_data_location flag;                         /* which itag owns the data */
-    int length;};             /* byte length of the itag - not written to file */
+   {int64_t nitems;                           /* number of items pointed to */
+    char *type;                                  /* type of item pointed to */
+    int64_t addr;                        /* address of the itag owning data */
+    PD_data_location flag;                      /* which itag owns the data */
+    int length;};          /* byte length of the itag - not written to file */
 
 /* hyper-index support structure */
 struct s_dimind

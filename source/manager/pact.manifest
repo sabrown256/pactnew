@@ -30,7 +30,8 @@ inc scope_make.h scope_mem.h scope_mpi.h scope_proc.h
 inc scope_thread.h scope_term.h scope_typeh.h scarg.h
 inc scope_lex.h sclexan.h pml.h scope_complex.h scope_constants.h
 inc scope_exe.h
-inc pdb.h pdform.h scope_x11.h scope_cgm.h scope_raster.h ppc.h
+inc pdb.h pdb_old.h pdform.h
+inc scope_x11.h scope_cgm.h scope_raster.h ppc.h
 inc pgs.h pgs_old.h
 inc panace.h scheme.h syntax.h sx.h
 inc do-run-db cfg.pl cfg.db

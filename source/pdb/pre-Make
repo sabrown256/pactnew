@@ -85,7 +85,7 @@ targets :
 #
 # Headers Files
 #
-Hdrs = pdb.h pdb_int.h
+Hdrs = pdb.h pdb_int.h pdb_old.h
 
 #
 # Object Files
