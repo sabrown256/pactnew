@@ -155,7 +155,7 @@ static state
 	FALSE, FALSE, FALSE, 0, };
 
 static void
- parse_line(char *s, char *key, char *oper, char *value, int nc);
+ parse_line(client *cl, char *s, char *key, char *oper, char *value, int nc);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -302,7 +302,7 @@ static void push_struct(char *item, char *collection, int itype)
 
 /* POP_STRUCT - pop the struct stack */
 
-static void pop_struct(void)
+static void pop_struct(client *cl)
    {int n;
     gt_entry *ge;
 
@@ -316,8 +316,8 @@ static void pop_struct(void)
     n  = st.gstck.n - 1;
     ge = st.gstck.st + n;
 
-    dbset(NULL, "CurrGrp", ge->item);
-    dbset(NULL, "CurrTool", "");
+    dbset(cl, "CurrGrp", ge->item);
+    dbset(cl, "CurrTool", "");
 
     note(Log, TRUE, "--- end");
 
@@ -370,15 +370,15 @@ static int reset_env(int c, char **v)
  *                 - look for sub-class SUB of type STYPE
  */
 
-static int write_class_pco(FILE *out, char *clss, char *ctype,
+static int write_class_pco(client *cl, FILE *out, char *clss, char *ctype,
 			   char *sub, char *stype, char *ind)
    {int i, n, ic, nc, global;
-    char cl[MAXLINE], fmt[MAXLINE];
+    char cln[MAXLINE], fmt[MAXLINE];
     char *c, *pc, *t, *var, *val, *entry;
     char **vars, **vals, **sa;
 
-    nstrncpy(cl, MAXLINE, clss, -1);
-    for (c = cl; c != NULL; c = pc)
+    nstrncpy(cln, MAXLINE, clss, -1);
+    for (c = cln; c != NULL; c = pc)
         {pc = strchr(c, ' ');
          if (pc == NULL)
             {if (IS_NULL(c) == TRUE)
@@ -389,7 +389,7 @@ static int write_class_pco(FILE *out, char *clss, char *ctype,
 	 global = (strcmp(c, "Glb") == 0);
 
 	 if (global == TRUE)
-	    {t  = dbget(NULL, FALSE, "Globals");
+	    {t  = dbget(cl, FALSE, "Globals");
 	     sa = tokenize(t, " \t\n\r");}
          else
 	    {fprintf(out, "%s%s %s {\n", ind, ctype, c);
@@ -412,7 +412,7 @@ static int write_class_pco(FILE *out, char *clss, char *ctype,
 			 continue;
 		      if (global == TRUE)
 			 {var = entry;
-			  val = dbget(NULL, TRUE, var);}
+			  val = dbget(cl, TRUE, var);}
 		      else
 			 {var = entry + strlen(c) + 1;
 			  val = strchr(var, '=');
@@ -455,7 +455,7 @@ static int write_class_pco(FILE *out, char *clss, char *ctype,
  *           - to be read back in by pco
  */
 
-static void write_pco(state *st, char *dbname)
+static void write_pco(client *cl, state *st, char *dbname)
    {int rv;
     char t[MAXLINE];
     FILE *out;
@@ -467,10 +467,12 @@ static void write_pco(state *st, char *dbname)
 
     out = open_file("w", t);
 
-    rv = write_class_pco(out, st->def_tools, "Tool", NULL, NULL, "");
+    rv = write_class_pco(cl, out, st->def_tools,
+			 "Tool", NULL, NULL, "");
     ASSERT(rv == 0);
 
-    rv = write_class_pco(out, st->def_groups, "Group", st->def_tools, "Tool", "");
+    rv = write_class_pco(cl, out, st->def_groups,
+			 "Group", st->def_tools, "Tool", "");
     ASSERT(rv == 0);
 
     fclose(out);
@@ -485,15 +487,15 @@ static void write_pco(state *st, char *dbname)
  *                  - look for sub-class SUB of type STYPE
  */
 
-static int write_class_perl(FILE *out, char *clss, char *ctype,
+static int write_class_perl(client *cl, FILE *out, char *clss, char *ctype,
 			    char *sub, char *stype, char *ind)
    {int i, n, ic, nc, global;
-    char cl[MAXLINE], fmt[MAXLINE];
+    char cln[MAXLINE], fmt[MAXLINE];
     char *c, *pc, *t, *var, *val, *entry;
     char **vars, **vals, **sa;
 
-    nstrncpy(cl, MAXLINE, clss, -1);
-    for (c = cl; c != NULL; c = pc)
+    nstrncpy(cln, MAXLINE, clss, -1);
+    for (c = cln; c != NULL; c = pc)
         {pc = strchr(c, ' ');
          if (pc == NULL)
             {if (IS_NULL(c) == TRUE)
@@ -504,7 +506,7 @@ static int write_class_perl(FILE *out, char *clss, char *ctype,
 	 global = (strcmp(c, "Glb") == 0);
 
 	 if (global == TRUE)
-	    {t  = dbget(NULL, FALSE, "Globals");
+	    {t  = dbget(cl, FALSE, "Globals");
 	     sa = tokenize(t, " \t\n\r");}
          else
 	    {fprintf(out, "%s'%s:%s_pact' => {\n", ind, ctype, c);
@@ -527,7 +529,7 @@ static int write_class_perl(FILE *out, char *clss, char *ctype,
 			 continue;
 		      if (global == TRUE)
 			 {var = entry;
-			  val = dbget(NULL, FALSE, var);}
+			  val = dbget(cl, FALSE, var);}
 		      else
 			 {var = entry + strlen(c) + 1;
 			  val = strchr(var, '=');
@@ -570,7 +572,7 @@ static int write_class_perl(FILE *out, char *clss, char *ctype,
  *            - to be read by mio
  */
 
-static void write_perl(state *st, char *dbname)
+static void write_perl(client *cl, state *st, char *dbname)
    {int rv;
     char t[MAXLINE];
     FILE *out;
@@ -583,11 +585,11 @@ static void write_perl(state *st, char *dbname)
 
     fprintf(out, "{\n");
 
-    rv = write_class_perl(out, st->def_tools, "Tool",
+    rv = write_class_perl(cl, out, st->def_tools, "Tool",
 			  NULL, NULL, "   ");
     ASSERT(rv == 0);
 
-    rv = write_class_perl(out, st->def_groups, "Group",
+    rv = write_class_perl(cl, out, st->def_groups, "Group",
 			  st->def_tools, "Tool", "   ");
     ASSERT(rv == 0);
 
@@ -602,27 +604,27 @@ static void write_perl(state *st, char *dbname)
 
 /* PCO_SAVE_DB - write a text representation of the configuration database */
 
-static int pco_save_db(char *dbname)
+static int pco_save_db(client *cl, char *dbname)
    {int rv;
     char t[MAXLINE];
 
     rv = TRUE;
 
-    dbset(NULL, "Tools",  st.def_tools);
-    dbset(NULL, "Groups", st.def_groups);
+    dbset(cl, "Tools",  st.def_tools);
+    dbset(cl, "Groups", st.def_groups);
 
 /* save the persistent database */
     if (dbname == NULL)
        nstrncpy(t, MAXLINE, "save:", -1);
     else
        snprintf(t, MAXLINE, "save %s:", dbname);
-    dbcmd(NULL, t);
+    dbcmd(cl, t);
 
 /* write the input form of the database - to be read back in by pco */
-    write_pco(&st, dbname);
+    write_pco(cl, &st, dbname);
 
 /* write the perl form of the database - to be read back in by mio */
-    write_perl(&st, dbname);
+    write_perl(cl, &st, dbname);
 
     return(rv);}
 
@@ -631,11 +633,11 @@ static int pco_save_db(char *dbname)
 
 /* PCO_LOAD_DB - load the specified database */
 
-static int pco_load_db(char *dbname)
+static int pco_load_db(client *cl, char *dbname)
    {int rv, i, nv;
     char **ta;
 
-    rv = db_restore(NULL, dbname);
+    rv = db_restore(cl, dbname);
 
     separator(Log);
 
@@ -769,7 +771,7 @@ static void add_set_db(FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
  *            - write it for CSH or SH families
  */
 
-static void write_envf(int lnotice)
+static void write_envf(client *cl, int lnotice)
    {int i, n;
     char *t;
     char *site[] = { "CONFIG_METHOD" };
@@ -812,7 +814,7 @@ static void write_envf(int lnotice)
     if (st.db == NULL)
        {n = sizeof(site)/sizeof(char *);
 	for (i = 0; i < n; i++)
-	    env_out(fsh, fcsh, fdk, fmd, site[i], dbget(NULL, TRUE, site[i]));
+	    env_out(fsh, fcsh, fdk, fmd, site[i], dbget(cl, TRUE, site[i]));
 
 	add_set_cfg(fcsh, fsh, fdk, fmd);}
     else
@@ -845,15 +847,15 @@ static void write_envf(int lnotice)
 
      if (st.have_python == TRUE)
         {snprintf(lPython, MAXLINE, "%s/python%s",
-		  st.dir.lib, dbget(NULL, TRUE, "PyVers"));
-	 t = dbget(NULL, TRUE, "PYTHONPATH");
+		  st.dir.lib, dbget(cl, TRUE, "PyVers"));
+	 t = dbget(cl, TRUE, "PYTHONPATH");
 	 if (t != NULL)
 	    {if (strstr(t, lPython) == NULL)
-	        dbset(NULL, "PYTHONPATH", "%s:$PYTHONPATH", lPython);}
+	        dbset(cl, "PYTHONPATH", "%s:$PYTHONPATH", lPython);}
 	 else
-	    dbset(NULL, "PYTHONPATH", lPython);
+	    dbset(cl, "PYTHONPATH", lPython);
 
-	 t = dbget(NULL, TRUE, "PYTHONPATH");
+	 t = dbget(cl, TRUE, "PYTHONPATH");
 	 note(fcsh, TRUE, "setenv PYTHONPATH %s", t);
 	 note(fsh, TRUE,  "export PYTHONPATH=%s", t);
 	 note(fdk, TRUE,  "dk_setenv PYTHONPATH %s", t);
@@ -910,7 +912,7 @@ static void write_envf(int lnotice)
 
 /* CHECK_DIR - check for missing directories */
 
-static void check_dir(void)
+static void check_dir(client *cl)
    {int i, n;
     char Created[LRG], Missing[LRG];
     char *sib, *dir;
@@ -918,7 +920,7 @@ static void check_dir(void)
 			   "scheme", "man", "man/man1", "man/man3"};
 
     n   = sizeof(dlst)/sizeof(char *);
-    sib = dbget(NULL, TRUE, "InstBase");
+    sib = dbget(cl, TRUE, "InstBase");
 
     if (st.create_dirs == TRUE)
        {Created[0] = '\0';
@@ -1014,7 +1016,7 @@ static void read_line(char *s, int nc)
 
 /* PARSE_OPT - work with option specifications */
 
-static void parse_opt(char *s, int nc)
+static void parse_opt(client *cl, char *s, int nc)
    {int i, l, n, ok, mt;
     exoper oper;
     char vr[MAXLINE], op[MAXLINE], vl[MAXLINE];
@@ -1030,7 +1032,7 @@ static void parse_opt(char *s, int nc)
 	    {vr[0] = '\0';
 
 	     t = sa[l];
-	     parse_line(t, vr, op, vl, nc);
+	     parse_line(cl, t, vr, op, vl, nc);
 
 	     if (IS_NULL(vr) == TRUE)
 	        continue;
@@ -1067,7 +1069,7 @@ static void parse_opt(char *s, int nc)
 
 /* parse the _env_ key */
 	     else if (strcmp(vr, "_env_") == 0)
-	        avl = dbget(NULL, TRUE, arg);
+	        avl = dbget(cl, TRUE, arg);
 
 /* select the value */
 	     else
@@ -1136,7 +1138,8 @@ static void parse_opt(char *s, int nc)
 
 /* PARSE_LINE - parse the next line from the input */
 
-static void parse_line(char *s, char *key, char *oper, char *value, int nc)
+static void parse_line(client *cl, char *s,
+		       char *key, char *oper, char *value, int nc)
    {char t[LRG];
     char *p;
 
@@ -1160,7 +1163,7 @@ static void parse_line(char *s, char *key, char *oper, char *value, int nc)
 	       {read_line(t, LRG);
 		nstrcat(value, nc, " ");
 		nstrcat(value, nc, trim(t, FRONT, " \t"));};
-	    parse_opt(value, nc);};}
+	    parse_opt(cl, value, nc);};}
     else
        value[0] = '\0';
 
@@ -1221,7 +1224,7 @@ static void dp_define(void)
  *                   - features
  */
 
-static void setup_analyze_env(char *base)
+static void setup_analyze_env(client *cl, char *base)
    {char alog[MAXLINE];
     FILE *out;
 
@@ -1231,86 +1234,86 @@ static void setup_analyze_env(char *base)
     note(out, TRUE, "%s", get_date());
     fclose(out);
 
-    dbset(NULL, "Host",    st.host);
-    dbset(NULL, "Arch",    st.arch);
-    dbset(NULL, "System",  st.system);
-    dbset(NULL, "Sys",     st.sys);
-    dbset(NULL, "BaseDir", base);
-    dbset(NULL, "SysDir",  st.dir.root);
-    dbset(NULL, "ScrDir",  st.dir.scr);
-    dbset(NULL, "AnaDir",  "%s/analyze", st.dir.mng);
-    dbset(NULL, "Log",     st.logf);
-    dbset(NULL, "ALog",    alog);
+    dbset(cl, "Host",    st.host);
+    dbset(cl, "Arch",    st.arch);
+    dbset(cl, "System",  st.system);
+    dbset(cl, "Sys",     st.sys);
+    dbset(cl, "BaseDir", base);
+    dbset(cl, "SysDir",  st.dir.root);
+    dbset(cl, "ScrDir",  st.dir.scr);
+    dbset(cl, "AnaDir",  "%s/analyze", st.dir.mng);
+    dbset(cl, "Log",     st.logf);
+    dbset(cl, "ALog",    alog);
 
-    dbset(NULL, "AbsoluteDeb", st.abs_deb ? "TRUE" : "FALSE");
-    dbset(NULL, "AbsoluteOpt", st.abs_opt ? "TRUE" : "FALSE");
-    dbset(NULL, "Profile",     st.profilep ? "TRUE" : "FALSE");
-    dbset(NULL, "UseTmpDir",   st.tmp_dirp ? "TRUE" : "FALSE");
+    dbset(cl, "AbsoluteDeb", st.abs_deb ? "TRUE" : "FALSE");
+    dbset(cl, "AbsoluteOpt", st.abs_opt ? "TRUE" : "FALSE");
+    dbset(cl, "Profile",     st.profilep ? "TRUE" : "FALSE");
+    dbset(cl, "UseTmpDir",   st.tmp_dirp ? "TRUE" : "FALSE");
 
     if (strncmp(st.os, "CYGWIN", 6) == 0)
        st.os[6] = '\0';
 
-    dbset(NULL, "HostOS",      st.os);
-    dbset(NULL, "HostOSRel",   st.osrel);
+    dbset(cl, "HostOS",      st.os);
+    dbset(cl, "HostOSRel",   st.osrel);
 
     if (strcmp(st.os, "Windows_NT") == 0)
-       dbset(NULL, "CDecls", "TRUE");
+       dbset(cl, "CDecls", "TRUE");
     else
-       dbset(NULL, "CDecls", "FALSE");
+       dbset(cl, "CDecls", "FALSE");
 
-    dbset(NULL, "ANSI",   "ANSI");
-    dbset(NULL, "MeOnly", "TRUE");
+    dbset(cl, "ANSI",   "ANSI");
+    dbset(cl, "MeOnly", "TRUE");
 
 /* initialization of non-graphics flags */
     if (strcmp(st.os, "AIX") == 0)
-       dbset(NULL, "NM", "/usr/bin/nm -g -X %s", dbget(NULL, TRUE, "Bits"));
+       dbset(cl, "NM", "/usr/bin/nm -g -X %s", dbget(cl, TRUE, "Bits"));
     else
-       dbset(NULL, "NM", "%s -g", cwhich("nm"));
+       dbset(cl, "NM", "%s -g", cwhich("nm"));
 
-    dbinitv(NULL, "CC_Version",  "");
-    dbinitv(NULL, "FC_Version",  "");
-    dbinitv(NULL, "LD_Version",  "");
+    dbinitv(cl, "CC_Version",  "");
+    dbinitv(cl, "FC_Version",  "");
+    dbinitv(cl, "LD_Version",  "");
 
-    dbinitv(NULL, "CC_Inc",    "");
-    dbinitv(NULL, "CC_Flags",  "");
-    dbinitv(NULL, "LD_Lib",    "");
-    dbinitv(NULL, "LD_RPath",  "");
-    dbinitv(NULL, "LD_Flags",  "");
+    dbinitv(cl, "CC_Inc",    "");
+    dbinitv(cl, "CC_Flags",  "");
+    dbinitv(cl, "LD_Lib",    "");
+    dbinitv(cl, "LD_RPath",  "");
+    dbinitv(cl, "LD_Flags",  "");
 
-    dbinitv(NULL, "CPU",       "");
-    dbinitv(NULL, "FPU",       "");
-    dbinitv(NULL, "BE",        "");
+    dbinitv(cl, "CPU",       "");
+    dbinitv(cl, "FPU",       "");
+    dbinitv(cl, "BE",        "");
 
 /* parallel front end */
-    dbinitv(NULL, "PFE",       "%s/do-run -m", st.dir.bin);
+    dbinitv(cl, "PFE",       "%s/do-run -m", st.dir.bin);
 
 /* cross compile front end */
-    if (dbcmp(NULL, "CROSS_COMPILE", "FALSE") != 0)
-       dbinitv(NULL, "CFE", "%s/do-run -m", st.dir.bin);
+    if (dbcmp(cl, "CROSS_COMPILE", "FALSE") != 0)
+       dbinitv(cl, "CFE", "%s/do-run -m", st.dir.bin);
     else
-       dbinitv(NULL, "CFE", "");
+       dbinitv(cl, "CFE", "");
 
 /* initialization of graphics flags */
-    dbinitv(NULL, "GSYS",       "X");
-    dbinitv(NULL, "Std_UseX",   "TRUE");
-    dbinitv(NULL, "Std_UseOGL", "FALSE");
-    dbinitv(NULL, "Std_UseQD",  "FALSE");
+    dbinitv(cl, "GSYS",       "X");
+    dbinitv(cl, "Std_UseX",   "TRUE");
+    dbinitv(cl, "Std_UseOGL", "FALSE");
+    dbinitv(cl, "Std_UseQD",  "FALSE");
 
-    dbinitv(NULL, "DP_Inc",          "");
-    dbinitv(NULL, "DP_Lib",          "");
-    dbinitv(NULL, "MDG_Inc",         "");
-    dbinitv(NULL, "MDG_Lib",         "");
-    dbinitv(NULL, "MD_Inc",          "");
-    dbinitv(NULL, "MD_Lib",          "");
-    dbinitv(NULL, "GraphicsDevices", "PS CGM MPG PNG JPG");
-    dbinitv(NULL, "GraphicsFlag",    "");
+    dbinitv(cl, "DP_Inc",          "");
+    dbinitv(cl, "DP_Lib",          "");
+    dbinitv(cl, "MDG_Inc",         "");
+    dbinitv(cl, "MDG_Lib",         "");
+    dbinitv(cl, "MD_Inc",          "");
+    dbinitv(cl, "MD_Lib",          "");
+    dbinitv(cl, "GraphicsDevices", "PS CGM MPG PNG JPG");
+    dbinitv(cl, "GraphicsFlag",    "");
 
 /* initialize Cfg group flags */
-    dbinitv(NULL, "Cfg_CC_Flags",  dbget(NULL, FALSE, "CC_Flags"));
-    dbinitv(NULL, "Cfg_CC_Inc",    dbget(NULL, FALSE, "CC_Inc"));
-    dbinitv(NULL, "Cfg_LD_RPath",  dbget(NULL, FALSE, "LD_RPath"));
-    dbinitv(NULL, "Cfg_LD_Flags",  dbget(NULL, FALSE, "LD_Flags"));
-    dbinitv(NULL, "Cfg_LD_Lib",    dbget(NULL, FALSE, "LD_Lib"));
+    dbinitv(cl, "Cfg_CC_Flags",  dbget(cl, FALSE, "CC_Flags"));
+    dbinitv(cl, "Cfg_CC_Inc",    dbget(cl, FALSE, "CC_Inc"));
+    dbinitv(cl, "Cfg_LD_RPath",  dbget(cl, FALSE, "LD_RPath"));
+    dbinitv(cl, "Cfg_LD_Flags",  dbget(cl, FALSE, "LD_Flags"));
+    dbinitv(cl, "Cfg_LD_Lib",    dbget(cl, FALSE, "LD_Lib"));
 
     return;}
 
@@ -1321,80 +1324,80 @@ static void setup_analyze_env(char *base)
  *                  - configured files
  */
 
-static void setup_output_env(char *base)
+static void setup_output_env(client *cl, char *base)
    {char *rv;
 
 /* close any open intermediate files and export their names */
-    dbset(NULL, "DPFile", st.aux.dpfn);
+    dbset(cl, "DPFile", st.aux.dpfn);
     if (st.aux.DPF != NULL)
        fclose(st.aux.DPF);
 
-    dbset(NULL, "CEFile", st.aux.cefn);
+    dbset(cl, "CEFile", st.aux.cefn);
     if (st.aux.CEF != NULL)
        fclose(st.aux.CEF);
 
-    dbset(NULL, "MVFile", st.aux.mvfn);
+    dbset(cl, "MVFile", st.aux.mvfn);
     if (st.aux.MVF != NULL)
        fclose(st.aux.MVF);
 
-    dbset(NULL, "URFile", st.aux.urfn);
+    dbset(cl, "URFile", st.aux.urfn);
     if (st.aux.URF != NULL)
        fclose(st.aux.URF);
 
 /* remove duplicate tokens in selected lists */
-    dbset(NULL, "DP_Inc",  unique(dbget(NULL, FALSE, "DP_Inc"),  FALSE, ' '));
-    dbset(NULL, "MDG_Inc", unique(dbget(NULL, FALSE, "MDG_Inc"), FALSE, ' '));
-    dbset(NULL, "MD_Inc",  unique(dbget(NULL, FALSE, "MD_Inc"),  FALSE, ' '));
-    dbset(NULL, "CC_Inc",  unique(dbget(NULL, FALSE, "CC_Inc"),  FALSE, ' '));
+    dbset(cl, "DP_Inc",  unique(dbget(cl, FALSE, "DP_Inc"),  FALSE, ' '));
+    dbset(cl, "MDG_Inc", unique(dbget(cl, FALSE, "MDG_Inc"), FALSE, ' '));
+    dbset(cl, "MD_Inc",  unique(dbget(cl, FALSE, "MD_Inc"),  FALSE, ' '));
+    dbset(cl, "CC_Inc",  unique(dbget(cl, FALSE, "CC_Inc"),  FALSE, ' '));
 
-    dbset(NULL, "DP_Lib",  unique(dbget(NULL, FALSE, "DP_Lib"),  FALSE, ' '));
-    dbset(NULL, "MD_Lib",  unique(dbget(NULL, FALSE, "MD_Lib"),  FALSE, ' '));
-    dbset(NULL, "LD_Lib",  unique(dbget(NULL, FALSE, "LD_Lib"),  FALSE, ' '));
+    dbset(cl, "DP_Lib",  unique(dbget(cl, FALSE, "DP_Lib"),  FALSE, ' '));
+    dbset(cl, "MD_Lib",  unique(dbget(cl, FALSE, "MD_Lib"),  FALSE, ' '));
+    dbset(cl, "LD_Lib",  unique(dbget(cl, FALSE, "LD_Lib"),  FALSE, ' '));
 
 /* NOTE: for OSX this would reduce -framework FOO -framework BAR
  * to -framework FOO BAR which is not legal
  */
     if (strcmp(st.os, "Darwin") != 0)
-       dbset(NULL, "MDG_Lib", unique(dbget(NULL, FALSE, "MDG_Lib"), FALSE, ' '));
+       dbset(cl, "MDG_Lib", unique(dbget(cl, FALSE, "MDG_Lib"), FALSE, ' '));
 
-    dbset(NULL, "BinDir",  st.dir.bin);
-    dbset(NULL, "IncDir",  st.dir.inc);
-    dbset(NULL, "ScrDir",  st.dir.scr);
-    dbset(NULL, "SchDir",  st.dir.sch);
-    dbset(NULL, "CfgDir",  st.dir.cfg);
+    dbset(cl, "BinDir",  st.dir.bin);
+    dbset(cl, "IncDir",  st.dir.inc);
+    dbset(cl, "ScrDir",  st.dir.scr);
+    dbset(cl, "SchDir",  st.dir.sch);
+    dbset(cl, "CfgDir",  st.dir.cfg);
 
-    rv = dbget(NULL, TRUE, "HavePython");
+    rv = dbget(cl, TRUE, "HavePython");
     if (IS_NULL(rv) == FALSE)
        {if (strcmp(rv, "FALSE") == 0)
-	   dbset(NULL, "HavePython", "FALSE");
+	   dbset(cl, "HavePython", "FALSE");
 	else
-	   dbset(NULL, "HavePython",  "TRUE");};
+	   dbset(cl, "HavePython",  "TRUE");};
 
-    dbset(NULL, "Load",        st.loadp ? "TRUE" : "FALSE");
-    dbset(NULL, "NoExe",       st.exep ? "TRUE" : "FALSE");
-    dbset(NULL, "ConfigVars",  st.cfgv);
-    dbset(NULL, "DefGroups",   st.def_groups);
-    dbset(NULL, "CONFIG_FILE", st.cfgf);
+    dbset(cl, "Load",        st.loadp ? "TRUE" : "FALSE");
+    dbset(cl, "NoExe",       st.exep ? "TRUE" : "FALSE");
+    dbset(cl, "ConfigVars",  st.cfgv);
+    dbset(cl, "DefGroups",   st.def_groups);
+    dbset(cl, "CONFIG_FILE", st.cfgf);
 
-    dbset(NULL, "CCP",     st.rules.ccp);
-    dbset(NULL, "CCObj",   st.rules.co);
-    dbset(NULL, "CCArc",   st.rules.ca);
-    dbset(NULL, "LexObj",  st.rules.lo);
-    dbset(NULL, "LexArc",  st.rules.la);
-    dbset(NULL, "LexC",    st.rules.lc);
-    dbset(NULL, "YaccObj", st.rules.yo);
-    dbset(NULL, "YaccArc", st.rules.ya);
-    dbset(NULL, "YaccC",   st.rules.yc);
-    dbset(NULL, "FCObj",   st.rules.fo);
-    dbset(NULL, "FCArc",   st.rules.fa);
-    dbset(NULL, "TemplH",  st.rules.th);
+    dbset(cl, "CCP",     st.rules.ccp);
+    dbset(cl, "CCObj",   st.rules.co);
+    dbset(cl, "CCArc",   st.rules.ca);
+    dbset(cl, "LexObj",  st.rules.lo);
+    dbset(cl, "LexArc",  st.rules.la);
+    dbset(cl, "LexC",    st.rules.lc);
+    dbset(cl, "YaccObj", st.rules.yo);
+    dbset(cl, "YaccArc", st.rules.ya);
+    dbset(cl, "YaccC",   st.rules.yc);
+    dbset(cl, "FCObj",   st.rules.fo);
+    dbset(cl, "FCArc",   st.rules.fa);
+    dbset(cl, "TemplH",  st.rules.th);
 
-    dbset(NULL, "CCObj_BP",   st.rules.co_bp);
-    dbset(NULL, "CCArc_BP",   st.rules.ca_bp);
-    dbset(NULL, "LexObj_BP",  st.rules.lo_bp);
-    dbset(NULL, "LexArc_BP",  st.rules.la_bp);
-    dbset(NULL, "YaccObj_BP", st.rules.yo_bp);
-    dbset(NULL, "YaccArc_BP", st.rules.ya_bp);
+    dbset(cl, "CCObj_BP",   st.rules.co_bp);
+    dbset(cl, "CCArc_BP",   st.rules.ca_bp);
+    dbset(cl, "LexObj_BP",  st.rules.lo_bp);
+    dbset(cl, "LexArc_BP",  st.rules.la_bp);
+    dbset(cl, "YaccObj_BP", st.rules.yo_bp);
+    dbset(cl, "YaccArc_BP", st.rules.ya_bp);
 
     return;}
 
@@ -1403,16 +1406,16 @@ static void setup_output_env(char *base)
 
 /* DEFAULT_VAR - setup default variable values */
 
-static void default_var(char *base)
+static void default_var(client *cl, char *base)
    {int i, n;
     char cmd[MAXLINE];
     char **sa;
 
     if (cdefenv("USER") == FALSE)
        {if (cdefenv("LOGNAME") == FALSE)
-	   dbset(NULL, "USER", "anonymous");
+	   dbset(cl, "USER", "anonymous");
         else
-	   dbset(NULL, "USER", cgetenv(TRUE, "LOGNAME"));};
+	   dbset(cl, "USER", cgetenv(TRUE, "LOGNAME"));};
 
     csetenv("PATH", "%s:%s", st.dir.mng, cgetenv(TRUE, "PATH"));
 
@@ -1469,16 +1472,16 @@ static void default_var(char *base)
     if (IS_NULL(st.system) == TRUE)
        nstrncpy(st.system, MAXLINE, run(BOTH, "%s/cfgman use", st.dir.scr), -1);
 
-    dbinitv(NULL, "CfgMan",        "%s/cfgman", st.dir.scr);
-    dbinitv(NULL, "Globals",       "");
-    dbinitv(NULL, "MngDir",        st.dir.mng);
-    dbinitv(NULL, "InstBase",      "none");
-    dbinitv(NULL, "PubInc",        "");
-    dbinitv(NULL, "PubLib",        "");
-    dbinitv(NULL, "ScmDir",        "scheme");
-    dbinitv(NULL, "Man1Dir",       "man/man1");
-    dbinitv(NULL, "Man3Dir",       "man/man3");
-    dbinitv(NULL, "CROSS_COMPILE", "FALSE");
+    dbinitv(cl, "CfgMan",        "%s/cfgman", st.dir.scr);
+    dbinitv(cl, "Globals",       "");
+    dbinitv(cl, "MngDir",        st.dir.mng);
+    dbinitv(cl, "InstBase",      "none");
+    dbinitv(cl, "PubInc",        "");
+    dbinitv(cl, "PubLib",        "");
+    dbinitv(cl, "ScmDir",        "scheme");
+    dbinitv(cl, "Man1Dir",       "man/man1");
+    dbinitv(cl, "Man3Dir",       "man/man3");
+    dbinitv(cl, "CROSS_COMPILE", "FALSE");
 
 /* global variables */
     snprintf(st.dir.root, MAXLINE, "%s/dev/%s",       base, st.system);
@@ -1789,11 +1792,11 @@ static void bad_pragma_rules(void)
 
 /* INIT_SESSION - initialize the state of the config session */
 
-static void init_session(char *base, int append)
+static void init_session(client *cl, char *base, int append)
    {
 
 /* setup default variable values */
-    default_var(base);
+    default_var(cl, base);
 
 /* setup the default rules for CC, Lex, Yacc, and FC */
     default_rules();
@@ -1811,7 +1814,7 @@ static void init_session(char *base, int append)
 
 /* SET_INST_BASE - setup the InstBase related state */
 
-static void set_inst_base(char *ib)
+static void set_inst_base(client *cl, char *ib)
    {
 
     if (strcmp(ib, "none") != 0)
@@ -1820,9 +1823,9 @@ static void set_inst_base(char *ib)
 
 	st.installp = TRUE;};
 
-    dbset(NULL, "InstBase", ib);
-    dbset(NULL, "PubInc",   "-I%s/include", ib);
-    dbset(NULL, "PubLib",   "-L%s/lib", ib);
+    dbset(cl, "InstBase", ib);
+    dbset(cl, "PubInc",   "-I%s/include", ib);
+    dbset(cl, "PubLib",   "-L%s/lib", ib);
 
     return;}
 
@@ -1834,7 +1837,7 @@ static void set_inst_base(char *ib)
  *           - any environment variable
  */
 
-static void env_subst(char *refvar, char *nt)
+static void env_subst(client *cl, char *refvar, char *nt)
    {int i, nc, nv;
     char *ot, *vr, *vl, *p, **ta;
 
@@ -1856,7 +1859,7 @@ static void env_subst(char *refvar, char *nt)
 
 			 p = strstr(vl, ot);
 			 if (p != NULL)
-			    dbset(NULL, vr, subst(vl, ot, nt, -1));};};};
+			    dbset(cl, vr, subst(vl, ot, nt, -1));};};};
 
 	    free_strings(ta);};};
 
@@ -1867,7 +1870,7 @@ static void env_subst(char *refvar, char *nt)
 
 /* SET_VAR - set a variable as directed */
 
-static void set_var(int rep, char *var, char *oper, char *val)
+static void set_var(client *cl, int rep, char *var, char *oper, char *val)
    {char fvar[MAXLINE], nval[MAXLINE], mval[MAXLINE], lval[MAXLINE];
     char s[LRG+1];
     char *prfx, *t, *p;
@@ -1878,9 +1881,9 @@ static void set_var(int rep, char *var, char *oper, char *val)
 
 /* attach the current group suffix */
     if (strcmp(prfx, "Glb") == 0)
-       {t = dbget(NULL, FALSE, "Globals");
+       {t = dbget(cl, FALSE, "Globals");
 	snprintf(s, LRG, "%s %s", t, var);
-	dbset(NULL, "Globals", unique(s, FALSE, ' '));
+	dbset(cl, "Globals", unique(s, FALSE, ' '));
 	nstrncpy(fvar, MAXLINE, var, -1);}
     else
        snprintf(fvar, MAXLINE, "%s_%s", prfx, var);
@@ -1888,7 +1891,7 @@ static void set_var(int rep, char *var, char *oper, char *val)
     clean_space(val);
 
     if ((strcmp(oper, "+=") == 0) || (strcmp(oper, "=+") == 0))
-       {if (dbdef(NULL, fvar) == FALSE)
+       {if (dbdef(cl, fvar) == FALSE)
            {note(Log, TRUE, "Variable %s does not exist changing %s to =",
                  fvar, oper);
             oper = "=";};};
@@ -1904,11 +1907,11 @@ static void set_var(int rep, char *var, char *oper, char *val)
 
 		note(st.aux.MVF, TRUE, "%s = %s", fvar, nval);};
 
-            dbset(NULL, fvar, nval);}
+            dbset(cl, fvar, nval);}
 
         else
            {nval[0] = '\0';
-            dbset(NULL, fvar, nval);};
+            dbset(cl, fvar, nval);};
 
 	FREE(t);}
 
@@ -1934,7 +1937,7 @@ static void set_var(int rep, char *var, char *oper, char *val)
             note(Log, TRUE, "New value |%s|", mval);
 
             note(Log, TRUE, "Change expression |setenv %s %s|", fvar, mval);
-            dbset(NULL, fvar, mval);}
+            dbset(cl, fvar, mval);}
         else
            note(Log, TRUE, "   += not changing %s - no value for |%s|",
 		fvar, val);
@@ -1963,7 +1966,7 @@ static void set_var(int rep, char *var, char *oper, char *val)
             note(Log, TRUE, "New value |%s|", mval);
 
             note(Log, TRUE, "Change expression |setenv %s %s|", fvar, mval);
-            dbset(NULL, fvar, mval);}
+            dbset(cl, fvar, mval);}
          else
             note(Log, TRUE, "   =+ not changing %s - no value for |%s|",
 		 fvar, val);
@@ -1987,7 +1990,7 @@ static void set_var(int rep, char *var, char *oper, char *val)
 	    note(Log, TRUE, "New value |%s|", nval);
 
 	    note(Log, TRUE, "Change expression |setenv %s %s|", fvar, nval);
-	    dbset(NULL, fvar, nval);}
+	    dbset(cl, fvar, nval);}
          else
             note(Log, TRUE, "   -= not changing %s - no value for |%s|",
 		 fvar, val);
@@ -2003,7 +2006,7 @@ static void set_var(int rep, char *var, char *oper, char *val)
  */
        {t = echo(FALSE, val);
         if (IS_NULL(t) == FALSE)
-	   dbset(NULL, fvar, t);
+	   dbset(cl, fvar, t);
         else
            note(Log, TRUE, "   =? not changing %s - no value for |%s|",
 		fvar, val);
@@ -2020,7 +2023,7 @@ static void set_var(int rep, char *var, char *oper, char *val)
 
 /* PROCESS_USE - do all the variable settings implied by a Use specification */
 
-static void process_use(char *sg, char *oper)
+static void process_use(client *cl, char *sg, char *oper)
    {int whch;
     char nvr[MAXLINE];
     char *val;
@@ -2046,37 +2049,37 @@ static void process_use(char *sg, char *oper)
 /* fill out a group */
        {case STACK_GROUP:
              note(Log, TRUE, "Use group %s to fill group %s",
-		  sg, dbget(NULL, FALSE, "CurrGrp"));
+		  sg, dbget(cl, FALSE, "CurrGrp"));
              FOREACH(var, st.cfgv, " ")
                 snprintf(nvr, MAXLINE, "%s_%s", sg, var);
-                if (dbdef(NULL, nvr) == TRUE)
-                   {val = dbget(NULL, TRUE, nvr);
+                if (dbdef(cl, nvr) == TRUE)
+                   {val = dbget(cl, TRUE, nvr);
                     if (strcmp(var, "Exe") == 0)
-                       set_var(FALSE, var, "=", val);
+                       set_var(cl, FALSE, var, "=", val);
                     else
-                       set_var(FALSE, var, oper, val);};
+                       set_var(cl, FALSE, var, oper, val);};
              ENDFOR
              break;
 
 /* fill out a tool */
         case STACK_TOOL:
-             if (dbcmp(NULL, "CurrTool", "") == 0)
+             if (dbcmp(cl, "CurrTool", "") == 0)
                 {note(Log, TRUE, "Use tool %s to fill group %s",
-		      sg, dbget(NULL, FALSE, "CurrGrp"));
+		      sg, dbget(cl, FALSE, "CurrGrp"));
                  FOREACH(var, st.toolv, " ")
                     snprintf(nvr, MAXLINE, "%s_%s", sg, var);
-                    if (dbdef(NULL, nvr) == TRUE)
-                       {val = dbget(NULL, TRUE, nvr);
-                        set_var(FALSE, nvr, oper, val);};
+                    if (dbdef(cl, nvr) == TRUE)
+                       {val = dbget(cl, TRUE, nvr);
+                        set_var(cl, FALSE, nvr, oper, val);};
                  ENDFOR}
              else
                 {note(Log, TRUE, "Use tool %s to fill tool %s",
-		      sg, dbget(NULL, FALSE, "CurrTool"));
+		      sg, dbget(cl, FALSE, "CurrTool"));
                  FOREACH(var, st.toolv, " ")
                     snprintf(nvr, MAXLINE, "%s_%s", sg, var);
-                    if (dbdef(NULL, nvr) == TRUE)
-                       {val = dbget(NULL, TRUE, nvr);
-                        set_var(FALSE, var, oper, val);};
+                    if (dbdef(cl, nvr) == TRUE)
+                       {val = dbget(cl, TRUE, nvr);
+                        set_var(cl, FALSE, var, oper, val);};
                  ENDFOR};
              break;};
 
@@ -2087,7 +2090,7 @@ static void process_use(char *sg, char *oper)
 
 /* READ_CONFIG - read the user configuration file */
 
-static void read_config(char *cfg, int quiet)
+static void read_config(client *cl, char *cfg, int quiet)
    {int il;
     char line[LRG], key[LRG], oper[LRG], value[LRG];
     char *path;
@@ -2102,7 +2105,7 @@ static void read_config(char *cfg, int quiet)
     note(Log, TRUE, "");
 
     note(Log, TRUE, "");
-    note(Log, TRUE, "Strict checking level is %s", dbget(NULL, TRUE, "STRICT"));
+    note(Log, TRUE, "Strict checking level is %s", dbget(cl, TRUE, "STRICT"));
     note(Log, TRUE, "");
     separator(Log);
 
@@ -2110,7 +2113,7 @@ static void read_config(char *cfg, int quiet)
 
 /* toplevel loop over the input to define configuration parameters */
     for (il = 0; TRUE; il++)
-        {if (dbdef(NULL, "STOP") == TRUE)
+        {if (dbdef(cl, "STOP") == TRUE)
 	    {noted(Log, " ");
 	     exit(1);};
 
@@ -2121,7 +2124,7 @@ static void read_config(char *cfg, int quiet)
 	 else if (strcmp(line, "++end++") == 0)
             break;
 
-	 parse_line(line, key, oper, value, LRG);
+	 parse_line(cl, line, key, oper, value, LRG);
 
 /* handle include directives */
 	 if (strcmp(key, "include") == 0)
@@ -2156,9 +2159,9 @@ static void read_config(char *cfg, int quiet)
 
 	 else if (strcmp(key, "InstBase") == 0)
 	    {if (st.installp == FALSE)
-	        {dbset(NULL, "InstBase", value);
-		 dbset(NULL, "PubInc",   "-I%s/include", value);
-		 dbset(NULL, "PubLib",   "-L%s/lib", value);};}
+	        {dbset(cl, "InstBase", value);
+		 dbset(cl, "PubInc",   "-I%s/include", value);
+		 dbset(cl, "PubLib",   "-L%s/lib", value);};}
 
 	 else if (strcmp(key, "exep") == 0)
 	    {st.exep = TRUE;
@@ -2175,7 +2178,7 @@ static void read_config(char *cfg, int quiet)
 	     if (strcmp(oper, "PATH") == 0)
                 push_path(APPEND, epath, value);
 	     s = echo(FALSE, value);
-	     dbset(NULL, oper, s);}
+	     dbset(cl, oper, s);}
 
 	 else if (strcmp(key, "parent") == 0)
 	    {char *s, *var, *val;
@@ -2187,9 +2190,9 @@ static void read_config(char *cfg, int quiet)
 	     if (strcmp(var, "PATH") == 0)
 	        {push_path(APPEND, epath, val);
 		 s = echo(FALSE, val);
-		 dbset(NULL, var, s);}
+		 dbset(cl, var, s);}
 	     else
-	        dbset(NULL, var, val);
+	        dbset(cl, var, val);
 
 /*	     if (st.phase == PHASE_READ) */
 	        note(st.aux.SEF, TRUE, "%s \"%s\"", var, val);
@@ -2198,30 +2201,30 @@ static void read_config(char *cfg, int quiet)
 /* handle Tool specifications */
 	 else if (strcmp(key, "Tool") == 0)
 	    {note(Log, TRUE, "--- tool %s", oper);
-	     dbset(NULL, "CurrTool", oper);
+	     dbset(cl, "CurrTool", oper);
 	     note(Log, TRUE, "Defining tool %s", oper);
 	     push_struct(oper, st.def_tools, STACK_TOOL);}
 
 /* handle Group specifications */
 	 else if (strcmp(key, "Group") == 0)
 	    {note(Log, TRUE, "--- group %s", oper);
-	     dbset(NULL, "CurrGrp", oper);
+	     dbset(cl, "CurrGrp", oper);
 	     push_struct(oper, st.def_groups, STACK_GROUP);}
 
 /* handle Use specifications */
 	 else if (strcmp(key, "Use") == 0)
-	    process_use(value, oper);
+	    process_use(cl, value, oper);
 
 /* handle struct close specifications */
 	 else if (strcmp(key, "}") == 0)
-            pop_struct();
+            pop_struct(cl);
 
 	 else if ((strcmp(oper, "=") == 0)  ||
 		  (strcmp(oper, "+=") == 0) ||
 		  (strcmp(oper, "=+") == 0) ||
 		  (strcmp(oper, "-=") == 0) ||
 		  (strcmp(oper, "=?") == 0))
-	    set_var(TRUE, key, oper, value);
+	    set_var(cl, TRUE, key, oper, value);
 
 /* .c.i rule handler */
 	 else if (strcmp(key, ".c.i:") == 0)
@@ -2307,7 +2310,7 @@ static void read_config(char *cfg, int quiet)
 
 /* ANALYZE_CONFIG - analyze the system configuration */
 
-static void analyze_config(char *base)
+static void analyze_config(client *cl, char *base)
    {
 
     st.phase = PHASE_ANALYZE;
@@ -2316,16 +2319,16 @@ static void analyze_config(char *base)
     noted(Log, "Analyzing system on %s", st.host);
     note(Log, TRUE, "");
 
-    write_envf(FALSE);
+    write_envf(cl, FALSE);
     
 /* setup the environment for programs which analyze features */
-    setup_analyze_env(base);
+    setup_analyze_env(cl, base);
 
     push_dir(st.dir.cfg);
 
 /* read the file which does the analysis */
     if (file_exists("../analyze/program-analyze") == TRUE)
-       read_config("program-analyze", TRUE);
+       read_config(cl, "program-analyze", TRUE);
 
     run(BOTH, "rm * > /dev/null 2>&1");
     pop_dir();
@@ -2339,13 +2342,13 @@ static void analyze_config(char *base)
 
 /* SUMMARIZE_CONFIG - make a summary report of the configuration */
 
-static void summarize_config(void)
+static void summarize_config(client *cl)
    {
 
     if (file_executable("analyze/summary") == TRUE)
        printf("%s\n", run(BOTH, "analyze/summary"));
 
-    pco_save_db(NULL);
+    pco_save_db(cl, NULL);
 
     return;}
 
@@ -2354,7 +2357,7 @@ static void summarize_config(void)
 
 /* FINISH_CONFIG - complete the configuration files */
 
-static void finish_config(char *base)
+static void finish_config(client *cl, char *base)
    {
 
     st.phase = PHASE_WRITE;
@@ -2370,7 +2373,7 @@ static void finish_config(char *base)
     note(Log, TRUE, "");
 
 /* if T3D, fiddle pdb fortran interface regression test source */
-    if (dbcmp(NULL, "PFE", "mppexec") == 0)
+    if (dbcmp(cl, "PFE", "mppexec") == 0)
        {char tmpf[MAXLINE];
 
 	snprintf(tmpf, MAXLINE, "tmp-%s", st.system);
@@ -2386,15 +2389,15 @@ static void finish_config(char *base)
 
        pop_dir();};
 
-    setup_output_env(base);
+    setup_output_env(cl, base);
 
 /* write the configured files for PACT */
-    write_envf(TRUE);
+    write_envf(cl, TRUE);
 
     LOG_OFF;
 
     if (file_exists("analyze/program-fin") == TRUE)
-       read_config("program-fin", TRUE);
+       read_config(cl, "program-fin", TRUE);
 
     LOG_ON;
 
@@ -2516,10 +2519,13 @@ int main(int c, char **v, char **env)
    {int i, append, havedb, ok;
     char base[MAXLINE], ib[MAXLINE], d[LRG];
     char *strct;
+    client *cl;
 
     if (c <= 1)
        {help();
 	return(1);};
+
+    cl = make_client(NULL, async_srv, CLIENT);
 
     ok = reset_env(c, v);
     if (ok == -1)
@@ -2569,7 +2575,7 @@ int main(int c, char **v, char **env)
 		    kill_perdb();
 		 return(1);};
 	     st.db = d;
-	     dbset(NULL, "CONFIG_METHOD", "database");}
+	     dbset(cl, "CONFIG_METHOD", "database");}
  
 /* this was handled in reset_env */
          else if (strcmp(v[i], "-env") == 0)
@@ -2634,11 +2640,11 @@ int main(int c, char **v, char **env)
 
          else
 	    {nstrncpy(st.cfgf, MAXLINE, v[i], -1);
-	     dbset(NULL, "CONFIG_METHOD", "file");};};
+	     dbset(cl, "CONFIG_METHOD", "file");};};
 
-    set_inst_base(ib);
+    set_inst_base(cl, ib);
 
-    init_session(base, append);
+    init_session(cl, base, append);
 
 /* make config directory */
     snprintf(st.dir.cfg, MAXLINE, "cfg-%s", st.system);
@@ -2646,35 +2652,35 @@ int main(int c, char **v, char **env)
     run(BOTH, "mkdir %s", st.dir.cfg);
 
     if (st.db == NULL)
-       {dbset(NULL, "STRICT", strct);
+       {dbset(cl, "STRICT", strct);
 
 	push_file(st.cfgf, STACK_FILE);
 	strcpy(st.cfgf, st.fstck.file[st.fstck.n-1].name);
 	pop_file();
 
 	if (file_exists("analyze/program-init") == TRUE)
-	   read_config("program-init", TRUE);
+	   read_config(cl, "program-init", TRUE);
 
-	read_config(st.cfgf, FALSE);
+	read_config(cl, st.cfgf, FALSE);
 
-	pco_save_db("inp");
+	pco_save_db(cl, "inp");
 
 	noted(Log, "");
 
-	check_dir();
+	check_dir(cl);
 
 	if (st.analyzep == FALSE)
-	   analyze_config(base);}
+	   analyze_config(cl, base);}
 
     else
-       {pco_load_db(st.db);
+       {pco_load_db(cl, st.db);
 
 /* order matters crucially here */
-        env_subst("InstBase",      ib);
-        env_subst("SysDir",        st.dir.root);
-        env_subst("BaseDir",       base);
-        env_subst("System",        st.system);
-        env_subst("CONFIG_METHOD", "database");
+        env_subst(cl, "InstBase",      ib);
+        env_subst(cl, "SysDir",        st.dir.root);
+        env_subst(cl, "BaseDir",       base);
+        env_subst(cl, "System",        st.system);
+        env_subst(cl, "CONFIG_METHOD", "database");
 
 	snprintf(st.dir.cfg, MAXLINE, "cfg-%s", st.system);
 	nstrncpy(st.cfgf,    MAXLINE, cgetenv(FALSE, "CONFIG_FILE"), -1);
@@ -2703,16 +2709,18 @@ int main(int c, char **v, char **env)
 /* place the make variables */
         reset_make_vars();
 
-	check_dir();};
+	check_dir(cl);};
 
-    summarize_config();
+    summarize_config(cl);
 
-    finish_config(base);
+    finish_config(cl, base);
 
     separator(Log);
     run(BOTH, "rm -rf %s", st.dir.cfg);
 
     LOG_OFF;
+
+    free_client(cl);
 
     if (havedb == TRUE)
        kill_perdb();

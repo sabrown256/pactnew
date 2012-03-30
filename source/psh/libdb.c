@@ -34,12 +34,14 @@ struct s_database
 
 static int
  ioc_server = CLIENT,
+#if 1
+ async_srv = FALSE,
+#else
+ async_srv = TRUE,
+#endif
  dbg_db = FALSE;
 
 #include "libsock.c"
-
-database
- *db = NULL;
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -63,7 +65,7 @@ static void sigtimeout(int sig)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* COMM_READ - read from ROOT into S
+/* COMM_READ - read from CL into S
  *           - quit if it hasn't heard anything in TO seconds
  */
 
@@ -90,7 +92,7 @@ int comm_read(client *cl, char *s, int nc, int to)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* COMM_WRITE - write S to ROOT
+/* COMM_WRITE - write S to CL
  *            - quit if it hasn't heard anything in TO seconds
  */
 
@@ -113,6 +115,43 @@ int comm_write(client *cl, char *s, int nc, int to)
 #endif
 
     return(nb);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* MAKE_CLIENT - initialize and return a client connection instance */
+
+client *make_client(char *root, int async, ckind type)
+   {client *cl;
+
+    cl = MAKE(client);
+    if (cl != NULL)
+       {cl->fd     = -1;
+        cl->async  = async;
+	cl->root   = root;
+	cl->type   = type;
+	cl->server = &srv;};
+
+    return(cl);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FREE_CLIENT - release a client connection instance */
+
+void free_client(client *cl)
+   {
+
+    if (cl != NULL)
+       {
+#if 0
+	if (cl->type == CLIENT)
+	   comm_write(cl, "fin:", 0, 10);
+#endif
+
+	FREE(cl);};
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -353,15 +392,12 @@ int save_db(int fd, database *db, char *var, FILE *fp)
    {int i, rv, nv;
     char s[LRG], t[LRG];
     char *vl, *vr, **vrs;
-    client cl;
+    client *cl;
 
     rv = FALSE;
 
     if (db != NULL)
-       {cl.fd     = fd;
-	cl.root   = db->root;
-	cl.server = &srv;
-	cl.type   = CLIENT;
+       {cl = make_client(db->root, async_srv, CLIENT);
 
         vrs = db->entries;
 	nv  = db->ne;
@@ -376,9 +412,11 @@ int save_db(int fd, database *db, char *var, FILE *fp)
 /* write to the communicator if FP is NULL */
 	         if (fp == NULL)
 		    {snprintf(s, LRG, "%s=%s", vr, vl);
-		     comm_write(&cl, s, 0, 10);}
+		     comm_write(cl, s, 0, 10);}
 		 else
 		    fprintf(fp, "%s=%s\n", vr, vl);};};
+
+	free_client(cl);
 
 	rv = TRUE;};
 
@@ -711,21 +749,13 @@ void db_srv_restart(database *db)
 
 /* _DB_CLNT_EX - do a transaction from the client side of the database */
 
-char **_db_clnt_ex(char *root, char *req)
-   {int nb, to;
-    char **p, *flog;
-    static int first = TRUE;
+char **_db_clnt_ex(client *cl, int init, char *req)
+   {int nb;
+    char **p, *flog, *root;
     static char s[MAXLINE];
-    static client cl;
-
-    if (first == TRUE)
-       {first     = FALSE;
-	cl.fd     = -1;
-	cl.root   = root;
-	cl.type   = CLIENT;
-	cl.server = &srv;};
 
     p = NULL;
+    root = cl->root;
 
     flog = name_log(root);
 
@@ -733,20 +763,28 @@ char **_db_clnt_ex(char *root, char *req)
     log_activity(flog, dbg_db, "CLIENT", "begin request |%s|", req);
 
 /* make sure that there is a server running */
-    db_srv_launch(root);
+    if (init == TRUE)
+       db_srv_launch(root);
 
 /* send the request */
-    nb = comm_write(&cl, req, 0, 10);
+    nb = comm_write(cl, req, 0, 10);
 
 /* get the reply */
     if (nb > 0)
-       {to = 4;
-	while (TRUE)
-	   {nb = comm_read(&cl, s, MAXLINE, to);
-	    if ((nb < 0) || (strcmp(s, EOM) == 0))
-	       break;
-	    else
-	       p = lst_push(p, s);};};
+       {int nc, to, ok;
+	char *t;
+
+	to = 4;
+	for (ok = TRUE; ok == TRUE; )
+	    {nb = comm_read(cl, s, MAXLINE, to);
+	     for (t = s; nb > 0; t += nc, nb -= nc)
+	         {if (strcmp(t, EOM) == 0)
+		     {ok = FALSE;
+		      break;}
+		  else
+		     p = lst_push(p, t);
+
+		  nc = strlen(t) + 1;};};};
 
     log_activity(flog, dbg_db, "CLIENT", "end request");
     log_activity(flog, dbg_db, "CLIENT", "");
@@ -758,7 +796,7 @@ char **_db_clnt_ex(char *root, char *req)
 
 /* DBSET - set the database variable VAR to VAL (counterpart to csetenv) */
 
-int dbset(char *root, char *var, char *fmt, ...)
+int dbset(client *cl, char *var, char *fmt, ...)
    {int i, err, nc, nr, ok;
     char s[LRG];
     char *t, **ta;
@@ -781,7 +819,8 @@ int dbset(char *root, char *var, char *fmt, ...)
 	t   = malloc(nc);
 	if (t != NULL)
 	   {snprintf(t, nc, "%s=%s", var, s);
-	    ta  = _db_clnt_ex(root, t);
+
+	    ta  = _db_clnt_ex(cl, TRUE, t);
 	    err = (ta != NULL);
 
 /* GOTCHA: temporarily also add it to the environment
@@ -805,7 +844,7 @@ int dbset(char *root, char *var, char *fmt, ...)
  *       - (counterpart to cgetenv)
  */
 
-char *dbget(char *root, int lit, char *fmt, ...)
+char *dbget(client *cl, int lit, char *fmt, ...)
    {char var[MAXLINE];
     char *t, **ta;
 
@@ -813,7 +852,7 @@ char *dbget(char *root, int lit, char *fmt, ...)
     VSNPRINTF(var, MAXLINE, fmt);
     VA_END;
 
-    ta = _db_clnt_ex(root, var);
+    ta = _db_clnt_ex(cl, TRUE, var);
     if (ta == NULL)
        t = cnoval();
 
@@ -837,7 +876,7 @@ char *dbget(char *root, int lit, char *fmt, ...)
  *       - (counterpart to cdefenv)
  */
 
-int dbdef(char *root, char *fmt, ...)
+int dbdef(client *cl, char *fmt, ...)
    {int rv;
     char var[MAXLINE];
     char **ta;
@@ -846,7 +885,7 @@ int dbdef(char *root, char *fmt, ...)
     VSNPRINTF(var, MAXLINE, fmt);
     VA_END;
 
-    ta = _db_clnt_ex(root, var);
+    ta = _db_clnt_ex(cl, TRUE, var);
     rv = ((ta != NULL) && (IS_NULL(ta[0]) == FALSE));
 
     lst_free(ta);
@@ -861,11 +900,11 @@ int dbdef(char *root, char *fmt, ...)
  *       - (counterpart to cmpenv)
  */
 
-int dbcmp(char *root, char *var, char *val)
+int dbcmp(client *cl, char *var, char *val)
    {int rv;
     char **ta;
 
-    ta = _db_clnt_ex(root, var);
+    ta = _db_clnt_ex(cl, TRUE, var);
     if (ta != NULL)
        rv = strcmp(ta[0], val);
     else
@@ -882,11 +921,11 @@ int dbcmp(char *root, char *var, char *val)
  *       - one of: quit, save, load, reset
  */
 
-int dbcmd(char *root, char *cmd)
+int dbcmd(client *cl, char *cmd)
    {int rv;
     char **ta;
 
-    ta = _db_clnt_ex(root, cmd);
+    ta = _db_clnt_ex(cl, TRUE, cmd);
     rv = (ta != NULL);
 
     lst_free(ta);
@@ -901,7 +940,7 @@ int dbcmd(char *root, char *cmd)
  *         - (counterpart to cinitenv)
  */
 
-int dbinitv(char *root, char *var, char *fmt, ...)
+int dbinitv(client *cl, char *var, char *fmt, ...)
    {int err;
     char s[LRG];
 
@@ -910,8 +949,8 @@ int dbinitv(char *root, char *var, char *fmt, ...)
     VA_END;
 
     err = 0;
-    if (dbdef(root, var) == FALSE)
-       err = dbset(root, var, s);
+    if (dbdef(cl, var) == FALSE)
+       err = dbset(cl, var, s);
 
     return(err);}
 
@@ -923,7 +962,7 @@ int dbinitv(char *root, char *var, char *fmt, ...)
  *            - of the current process
  */
 
-int db_restore(char *root, char *db)
+int db_restore(client *cl, char *db)
    {int i, rv, ok;
     char t[MAXLINE];
     char **ta, *s, *vl;
@@ -943,7 +982,7 @@ int db_restore(char *root, char *db)
  * GOTCHA: this can go when utilities using this are
  * completely converted away from using the environment
  */
-    ta = _db_clnt_ex(NULL, "save:");
+    ta = _db_clnt_ex(cl, FALSE, "save:");
     if (ta != NULL)
        {for (i = 0; ta[i] != NULL; i++)
 	    {s = ta[i];

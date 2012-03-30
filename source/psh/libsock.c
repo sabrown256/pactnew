@@ -33,6 +33,7 @@ struct s_connection
 
 struct s_client
    {int fd;                      /* client side descriptor */
+    int async;                   /* talking to asynchronous server */
     char *root;
     ckind type;
     connection *server;
@@ -42,7 +43,6 @@ static connection
  srv;
 
 static int
- async_srv = FALSE,
  dbg_sock = FALSE;
 
 /*--------------------------------------------------------------------------*/
@@ -233,16 +233,17 @@ static int connect_server(client *cl)
 			    "getsockname error %d - %s (%d)",
 			    fds, strerror(errno), errno);
 
+	    log_activity(flog, dbg_sock, "SERVER", "accept on %d ...", fds);
 	    fdc = accept(fds, sa, &len);
 	    if (fdc >= 0)
-	       log_activity(flog, dbg_sock, "SERVER", "listening %d", fdc);
+	       log_activity(flog, dbg_sock, "SERVER", "accept ok %d", fdc);
 	    else
 	       log_activity(flog, dbg_sock, "SERVER",
-			    "accept error on %d - %s (%d)",
-			    fds, strerror(errno), errno);}
+			    "accept ng (%s - %d)",
+			    strerror(errno), errno);}
 	else
 	   log_activity(flog, dbg_sock, "SERVER",
-			"listen error on %d - %s (%d)",
+			"listen error on %d - (%s - %d)",
 			fds, strerror(errno), errno);};
 
     cl->fd   = fdc;
@@ -314,7 +315,7 @@ static int connect_client(client *cl)
 				     strerror(errno), errno);
 			fd = connect_close(fd, cl, NULL);};
 
-		    if (async_srv == TRUE)
+		    if (cl->async == TRUE)
 		       srv->server = fd;
 
 		    srv->port   = port;};};};};
@@ -412,7 +413,7 @@ static int read_sock(client *cl, char *s, int nc)
 	   log_activity(flog, dbg_sock, wh, "read %d |%s| - %s (%d)",
 			fd, s, strerror(errno), errno);
 
-	if (async_srv == FALSE)
+	if (cl->async == FALSE)
 	   cl->fd = connect_close(fd, cl, NULL);};
 
     return(nb);}
@@ -451,16 +452,19 @@ static int write_sock(client *cl, char *s, int nc)
 	   log_activity(flog, dbg_sock, wh, "write - no connection");
 
 	else
-	   {nb = write(fd, s, nc);
+	   {log_activity(flog, dbg_sock, wh, "write %d |%s| ... ",
+			 fd, s);
+
+	    nb = write(fd, s, nc);
 
 	    if ((nb >= 0) && (nb == nc))
-	       log_activity(flog, dbg_sock, wh, "write %d |%s| (%d)",
-			    fd, s, nb);
+	       log_activity(flog, dbg_sock, wh, "write %d ok (%d bytes sent)",
+			    fd, nb);
 	    else
-	       log_activity(flog, dbg_sock, wh, "write %d |%s| - %s (%d)",
-			    fd, s, strerror(errno), errno);
+	       log_activity(flog, dbg_sock, wh, "write %d ng (%s - %d)",
+			    fd, strerror(errno), errno);
 
-/*	    if (async_srv == FALSE) */
+	    if (cl->async == FALSE)
 	       cl->fd = connect_close(fd, cl, NULL);};};
 
     return(nb);}

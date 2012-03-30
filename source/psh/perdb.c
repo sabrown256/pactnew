@@ -14,6 +14,9 @@
 
 #include <setjmp.h>
 
+static database
+ *db = NULL;
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -151,6 +154,57 @@ char *srv_load_db(client *cl, char *fname, char *var)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* CHECK_FD - verify/log fd set in SRV */
+
+void check_fd(connection *srv, char *flog)
+   {int fd;
+    char s[MAXLINE];
+    fd_set rfs;
+
+    rfs = srv->afs;
+
+    s[0] = '\0';
+    for (fd = 0; fd < FD_SETSIZE; ++fd)
+        {if (FD_ISSET(fd, &rfs))
+            vstrcat(s, MAXLINE, " %d", fd);};
+
+    log_activity(flog, dbg_db, "SERVER", "monitoring: %s", s);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* ADD_FD - add FD to the set in SRV */
+
+void add_fd(connection *srv, char *flog, int fd)
+   {
+
+    FD_SET(fd, &srv->afs);
+    log_activity(flog, dbg_db, "SERVER", "add %d", fd);
+
+    check_fd(srv, flog);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* REMOVE_FD - add FD to the set in SRV */
+
+void remove_fd(connection *srv, char *flog, int fd)
+   {
+
+    FD_CLR(fd, &srv->afs);
+    log_activity(flog, dbg_db, "SERVER", "remove %d", fd);
+
+    check_fd(srv, flog);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* NEW_CONNECTION - make a new connection on SFD and add it to AFS */
 
 void new_connection(char *root, connection *srv)
@@ -164,13 +218,33 @@ void new_connection(char *root, connection *srv)
 
     fd = accept(srv->server, (struct sockaddr *) &srv->sck, &sz);
     if (fd > 0)
-       {FD_SET(fd, &srv->afs);
-	log_activity(flog, dbg_db, "SERVER", "accept %d", fd);}
+       add_fd(srv, flog, fd);
     else
        {close(fd);
 	log_activity(flog, dbg_db, "SERVER",
 		     "accept error - %s (%d)",
 		     strerror(errno), errno);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TERM_CONNECTION - finish off client connection CL */
+
+void term_connection(client *cl)
+   {int fd;
+    char *root, *flog;
+    connection *srv;
+
+    fd   = cl->fd;
+    root = cl->root;
+    srv  = cl->server;
+    flog = name_log(root);
+
+    remove_fd(srv, flog, fd);
+
+    cl->fd = connect_close(fd, cl, NULL);
 
     return;}
 
@@ -205,6 +279,12 @@ int proc_connection(client *cl)
        {if (strncmp(s, "quit:", 5) == 0)
 	   {rv  = 0;
 	    val = "done";}
+
+/* client is exiting */
+	else if (strncmp(s, "fin:", 4) == 0)
+	   {rv  = 0;
+	    val = NULL;
+	    term_connection(cl);}
 
 /* reset database */
         else if (strncmp(s, "reset:", 6) == 0)
@@ -271,8 +351,12 @@ int proc_connection(client *cl)
 	       {snprintf(t, MAXLINE, "\"%s\"", val);
 		val = t;};};
 
-	nb = comm_write(cl, val, 0, 10);
-	nb = comm_write(cl, EOM, 0, 10);};
+	if (val != NULL)
+	   {nb = comm_write(cl, val, 0, 10);
+	    nb = comm_write(cl, EOM, 0, 10);};
+
+	if (cl->async == TRUE)
+	   cl->fd = connect_close(cl->fd, cl, NULL);};
 
     return(rv);}
 
@@ -294,7 +378,9 @@ static void async_server(client *cl)
 
     if (listen(srv->server, 5) >= 0)
        {for (ok = TRUE; ok == TRUE; )
-	    {rfs = srv->afs;
+	    {check_fd(srv, flog);
+
+	     rfs = srv->afs;
 	     nr  = select(FD_SETSIZE, &rfs, NULL, NULL, NULL);
 	     if (nr > 0)
 	        {for (fd = 0; (fd < FD_SETSIZE) && (ok == TRUE); ++fd)
@@ -311,17 +397,10 @@ static void async_server(client *cl)
 			  else
 			     {cl->fd = fd;
 			      ok     = proc_connection(cl);
-/*
-			      FD_CLR(fd, &srv->afs);
-			      cl->fd = connect_close(fd, cl, NULL);
-			      cl->fd = -1;
-			      nsleep(100);
- */
-			      sched_yield();
-			      };};};};};}
+			      sched_yield();};};};};};}
     else
        log_activity(flog, dbg_db, "SERVER",
-		    "listen error - %s (%d)",
+		    "async_server error (%s - %d)",
 		    strerror(errno), errno);
 
     return;}
@@ -354,7 +433,7 @@ static void sync_server(client *cl)
 
 int server(char *root, int init, int dmn)
    {char *flog;
-    client cl;
+    client *cl;
 
     if ((dmn == FALSE) || (demonize() == TRUE))
        {signal(SIGTERM, sigdone);
@@ -365,24 +444,24 @@ int server(char *root, int init, int dmn)
 
 	log_activity(flog, dbg_db, "SERVER", "begin");
 
-	cl.root   = root;
-	cl.type   = SERVER;
-	cl.server = &srv;
+	cl = make_client(root, async_srv, SERVER);
 
-	cl.db = db_srv_open(root, init);
-	if (cl.db != NULL)
-	   {db = cl.db;
+	cl->db = db_srv_open(root, init);
+	if (cl->db != NULL)
+	   {db = cl->db;
 
 	    if (async_srv == TRUE)
-	       async_server(&cl);
+	       async_server(cl);
 
 	    else
-	       sync_server(&cl);
+	       sync_server(cl);
 
-	    db_srv_save(-1, cl.db);
-	    db_srv_close(cl.db);
+	    db_srv_save(-1, cl->db);
+	    db_srv_close(cl->db);
 
-	    log_activity(flog, dbg_db, "SERVER", "end");};};
+	    log_activity(flog, dbg_db, "SERVER", "end");};
+
+	free_client(cl);};
 
     return(0);}
 
@@ -391,11 +470,14 @@ int server(char *root, int init, int dmn)
 
 /* EXCHANGE - do a transaction from the client side of the database */
 
-int exchange(char *root, char *req)
+int exchange(char *root, int async, char *req)
    {int i, n, rv;
     char **ta;
+    client *cl;
 
-    ta = _db_clnt_ex(root, req);
+    cl = make_client(root, async, CLIENT);
+    ta = _db_clnt_ex(cl, TRUE, req);
+    free_client(cl);
 
     rv = (ta != NULL);
 
@@ -494,7 +576,7 @@ int main(int c, char **v)
 
     else if (IS_NULL(req) == FALSE)
       {LAST_CHAR(req) = '\0';
-       rv = exchange(root, req);};
+       rv = exchange(root, async_srv, req);};
 
     rv = (rv == 0);
 
