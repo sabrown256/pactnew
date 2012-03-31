@@ -870,17 +870,21 @@ int PM_boundary_nd(double *xc, PM_polygon *py, int *iy)
 /* PM_POLYGON_AREA - compute the area of the polygon PY */
 
 double PM_polygon_area(PM_polygon *py)
-   {int i, id, np;
+   {int i, id, nd, np;
     double x1[PM_SPACEDM], x2[PM_SPACEDM], x3[PM_SPACEDM], ac;
     double **x;
 
     x  = py->x;
     np = py->nn - 1;
+    nd = py->nd;
 
     for (id = 0; id < PM_SPACEDM; id++)
-        {x1[id] = x[id][0];
+        {x1[id] = 0.0;
 	 x2[id] = 0.0;
 	 x3[id] = 0.0;};
+
+    for (id = 0; id < nd; id++)
+        x1[id] = x[id][0];
 
     ac = 0.0;
     for (i = 1; i < np; i++)
