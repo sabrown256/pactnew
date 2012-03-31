@@ -52,7 +52,7 @@ static void sigrestart(int sig)
 
 /* SRV_SAVE_DB - save the database */
 
-char *srv_save_db(client *cl, char *fname, char *var)
+static char *srv_save_db(client *cl, char *fname, char *var)
    {int fd, ok;
     char s[MAXLINE];
     FILE *fp;
@@ -104,7 +104,7 @@ char *srv_save_db(client *cl, char *fname, char *var)
 
 /* SRV_LOAD_DB - load the database */
 
-char *srv_load_db(client *cl, char *fname, char *var)
+static char *srv_load_db(client *cl, char *fname, char *var)
    {char s[MAXLINE];
     char *root;
     FILE *fp;
@@ -156,7 +156,7 @@ char *srv_load_db(client *cl, char *fname, char *var)
 
 /* CHECK_FD - verify/log fd set in SRV */
 
-void check_fd(connection *srv, char *flog)
+static void check_fd(connection *srv, char *flog)
    {int fd;
     char s[MAXLINE];
     fd_set rfs;
@@ -177,7 +177,7 @@ void check_fd(connection *srv, char *flog)
 
 /* ADD_FD - add FD to the set in SRV */
 
-void add_fd(connection *srv, char *flog, int fd)
+static void add_fd(connection *srv, char *flog, int fd)
    {
 
     FD_SET(fd, &srv->afs);
@@ -192,7 +192,7 @@ void add_fd(connection *srv, char *flog, int fd)
 
 /* REMOVE_FD - add FD to the set in SRV */
 
-void remove_fd(connection *srv, char *flog, int fd)
+static void remove_fd(connection *srv, char *flog, int fd)
    {
 
     FD_CLR(fd, &srv->afs);
@@ -207,7 +207,7 @@ void remove_fd(connection *srv, char *flog, int fd)
 
 /* NEW_CONNECTION - make a new connection on SFD and add it to AFS */
 
-void new_connection(char *root, connection *srv)
+static void new_connection(char *root, connection *srv)
    {int fd;
     char *flog;
     socklen_t sz;
@@ -232,7 +232,7 @@ void new_connection(char *root, connection *srv)
 
 /* TERM_CONNECTION - finish off client connection CL */
 
-void term_connection(client *cl)
+static void term_connection(client *cl)
    {int fd;
     char *root, *flog;
     connection *srv;
@@ -257,7 +257,7 @@ void term_connection(client *cl)
  *                 -         1 if otherwise successful
  */
 
-int proc_connection(client *cl)
+static int proc_connection(client *cl)
    {int rv, nb, st, to;
     char s[MAXLINE], t[MAXLINE];
     char *var, *val, *nvl, *p;
@@ -352,13 +352,7 @@ int proc_connection(client *cl)
 
 	if (val != NULL)
 	   {nb = comm_write(cl, val, 0, 10);
-	    nb = comm_write(cl, EOM, 0, 10);};
-
-#ifndef NEWWAY
-	if (cl->async == TRUE)
-	   cl->fd = connect_close(cl->fd, cl, NULL);
-#endif
-        };
+	    nb = comm_write(cl, EOM, 0, 10);};};
 
     return(rv);}
 
@@ -410,30 +404,9 @@ static void async_server(client *cl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SYNC_SERVER - run a synchronous server in which
- *             - transactions come in one at a time sequentially
- */
-
-static void sync_server(client *cl)
-   {int ok;
-    char *root;
-
-    root = cl->root;
-
-    for (ok = TRUE; ok == TRUE; )
-        {ok = sock_exists(root);
-	 if (ok == TRUE)
-	    {cl->fd = -1;
-	     ok     = proc_connection(cl);};};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SERVER - run the server side of the database */
 
-int server(char *root, int init, int dmn)
+static int server(char *root, int init, int dmn)
    {char *flog;
     client *cl;
 
@@ -446,17 +419,13 @@ int server(char *root, int init, int dmn)
 
 	log_activity(flog, dbg_db, "SERVER", "begin");
 
-	cl = make_client(root, async_srv, SERVER);
+	cl = make_client(root, SERVER);
 
 	cl->db = db_srv_open(root, init);
 	if (cl->db != NULL)
 	   {db = cl->db;
 
-	    if (async_srv == TRUE)
-	       async_server(cl);
-
-	    else
-	       sync_server(cl);
+	    async_server(cl);
 
 	    db_srv_save(-1, cl->db);
 	    db_srv_close(cl->db);
@@ -472,12 +441,12 @@ int server(char *root, int init, int dmn)
 
 /* EXCHANGE - do a transaction from the client side of the database */
 
-int exchange(char *root, int async, char *req)
+static int exchange(char *root, char *req)
    {int i, n, rv;
     char **ta;
     client *cl;
 
-    cl = make_client(root, async, CLIENT);
+    cl = make_client(root, CLIENT);
     ta = _db_clnt_ex(cl, TRUE, req);
     free_client(cl);
 
@@ -502,11 +471,10 @@ int exchange(char *root, int async, char *req)
 
 /* HELP - print usage info */
 
-void help(void)
+static void help(void)
    {
     printf("\n");
-    printf("Usage: perdb [-as] [-c] [-d] [-f <db>] [-h] [-l] [-s] [<req>]\n");
-    printf("   as  run the database asynchronously\n");
+    printf("Usage: perdb [-c] [-d] [-f <db>] [-h] [-l] [-s] [<req>]\n");
     printf("   c   create the database, removing any existing\n");
     printf("   d   do not run server as daemon\n");
     printf("   f   root path to database\n");
@@ -534,11 +502,7 @@ int main(int c, char **v)
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')
 	    {switch (v[i][1])
-                {case 'a' :
-		      if (v[i][2] == 's')
-			 async_srv = TRUE;
-		      break;
-                 case 'c' :
+                {case 'c' :
                       init = TRUE;
 		      break;
                  case 'd' :
@@ -578,7 +542,7 @@ int main(int c, char **v)
 
     else if (IS_NULL(req) == FALSE)
       {LAST_CHAR(req) = '\0';
-       rv = exchange(root, async_srv, req);};
+       rv = exchange(root, req);};
 
     rv = (rv == 0);
 
