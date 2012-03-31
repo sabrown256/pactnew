@@ -373,11 +373,35 @@ static void async_server(client *cl)
     flog = name_log(root);
 
     if (listen(srv->server, 5) >= 0)
-       {for (ok = TRUE; ok == TRUE; )
+       {int ng, dt, tmax;
+	char *s;
+        struct timeval t;
+
+/* set idle timeout and idle interval
+ * if no input comes in within the idle timeout window stop and return
+ * have the select timeout at the idle interval
+ */
+        s = cgetenv(FALSE, "PERDB_IDLE_TIMEOUT");
+	if (IS_NULL(s) == TRUE)
+	   tmax = 60;
+	else
+	   tmax = atoi(s);
+
+        s = cgetenv(FALSE, "PERDB_IDLE_INTERVAL");
+	if (IS_NULL(s) == TRUE)
+	   dt = tmax;
+	else
+	   dt = atoi(s);
+
+	for (ok = TRUE, ng = 0; (ok == TRUE) && (ng < tmax); )
 	    {check_fd(srv, flog);
 
+/* timeout the select every DT seconds */
+	     t.tv_sec  = dt;
+	     t.tv_usec = 0;
+
 	     rfs = srv->afs;
-	     nr  = select(FD_SETSIZE, &rfs, NULL, NULL, NULL);
+	     nr  = select(FD_SETSIZE, &rfs, NULL, NULL, &t);
 	     if (nr > 0)
 	        {for (fd = 0; (fd < FD_SETSIZE) && (ok == TRUE); ++fd)
 		     {if (FD_ISSET(fd, &rfs))
@@ -393,7 +417,11 @@ static void async_server(client *cl)
 			  else
 			     {cl->fd = fd;
 			      ok     = proc_connection(cl);
-			      sched_yield();};};};};};}
+			      sched_yield();};};};
+		  ng = 0;}
+	     else
+	        ng += dt;};}
+
     else
        log_activity(flog, dbg_db, "SERVER",
 		    "async_server error (%s - %d)",
