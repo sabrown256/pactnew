@@ -19,18 +19,24 @@ dbset v1 1
 dbset v2 "baz blat"
 
 echo "-----------------------------------"
+
 perdb $opt v1
 perdb $opt v2
 
 echo "-----------------------------------"
+
 dbget v1
 echo "v1 : |$v1|"
 
 echo "-----------------------------------"
+
 dbget v2
 echo "v2 : |$v2|"
 
 echo "-----------------------------------"
+
 perdb $opt quit:
+
+echo "-----------------------------------" >>& $db.log
 
 exit($status)

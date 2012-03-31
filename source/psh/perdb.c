@@ -8,6 +8,8 @@
  *
  */
 
+/* #define NEWWAY */
+
 #include "common.h"
 #include "libpsh.c"
 #include "libdb.c"
@@ -282,9 +284,8 @@ int proc_connection(client *cl)
 
 /* client is exiting */
 	else if (strncmp(s, "fin:", 4) == 0)
-	   {rv  = 0;
-	    val = NULL;
-	    term_connection(cl);}
+	   {term_connection(cl);
+	    val = NULL;}
 
 /* reset database */
         else if (strncmp(s, "reset:", 6) == 0)
@@ -355,8 +356,11 @@ int proc_connection(client *cl)
 	   {nb = comm_write(cl, val, 0, 10);
 	    nb = comm_write(cl, EOM, 0, 10);};
 
+#ifndef NEWWAY
 	if (cl->async == TRUE)
-	   cl->fd = connect_close(cl->fd, cl, NULL);};
+	   cl->fd = connect_close(cl->fd, cl, NULL);
+#endif
+        };
 
     return(rv);}
 
