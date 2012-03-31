@@ -34,10 +34,10 @@ struct s_database
 
 static int
  ioc_server = CLIENT,
-#if 1
- async_srv = FALSE,
-#else
+#ifdef NEWWAY
  async_srv = TRUE,
+#else
+ async_srv = FALSE,
 #endif
  dbg_db = FALSE;
 
@@ -122,7 +122,8 @@ int comm_write(client *cl, char *s, int nc, int to)
 /* MAKE_CLIENT - initialize and return a client connection instance */
 
 client *make_client(char *root, int async, ckind type)
-   {client *cl;
+   {char *flog;
+    client *cl;
 
     cl = MAKE(client);
     if (cl != NULL)
@@ -130,7 +131,12 @@ client *make_client(char *root, int async, ckind type)
         cl->async  = async;
 	cl->root   = root;
 	cl->type   = type;
-	cl->server = &srv;};
+	cl->server = &srv;
+
+	flog = name_log(root);
+	log_activity(flog, dbg_db,
+		     (type == CLIENT) ? "CLIENT" : "SERVER",
+		     "----- start -----");};
 
     return(cl);}
 
@@ -140,14 +146,22 @@ client *make_client(char *root, int async, ckind type)
 /* FREE_CLIENT - release a client connection instance */
 
 void free_client(client *cl)
-   {
+   {char *flog;
 
     if (cl != NULL)
        {
-#if 0
+
+#ifdef NEWWAY
 	if (cl->type == CLIENT)
 	   comm_write(cl, "fin:", 0, 10);
+
+	cl->fd = connect_close(cl->fd, cl, NULL);
 #endif
+
+	flog = name_log(cl->root);
+	log_activity(flog, dbg_db,
+		     (cl->type == CLIENT) ? "CLIENT" : "SERVER",
+		     "----- end -----");
 
 	FREE(cl);};
 
@@ -397,7 +411,7 @@ int save_db(int fd, database *db, char *var, FILE *fp)
     rv = FALSE;
 
     if (db != NULL)
-       {cl = make_client(db->root, async_srv, CLIENT);
+       {cl = make_client(db->root, async_srv, SERVER);
 
         vrs = db->entries;
 	nv  = db->ne;
@@ -759,7 +773,6 @@ char **_db_clnt_ex(client *cl, int init, char *req)
 
     flog = name_log(root);
 
-    log_activity(flog, dbg_db, "CLIENT", "");
     log_activity(flog, dbg_db, "CLIENT", "begin request |%s|", req);
 
 /* make sure that there is a server running */
@@ -787,7 +800,6 @@ char **_db_clnt_ex(client *cl, int init, char *req)
 		  nc = strlen(t) + 1;};};};
 
     log_activity(flog, dbg_db, "CLIENT", "end request");
-    log_activity(flog, dbg_db, "CLIENT", "");
 
     return(p);}
 

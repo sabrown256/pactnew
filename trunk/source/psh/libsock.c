@@ -413,8 +413,11 @@ static int read_sock(client *cl, char *s, int nc)
 	   log_activity(flog, dbg_sock, wh, "read %d |%s| - %s (%d)",
 			fd, s, strerror(errno), errno);
 
+#ifndef NEWWAY
 	if (cl->async == FALSE)
-	   cl->fd = connect_close(fd, cl, NULL);};
+	   cl->fd = connect_close(fd, cl, NULL);
+#endif
+        };
 
     return(nb);}
 
@@ -464,8 +467,11 @@ static int write_sock(client *cl, char *s, int nc)
 	       log_activity(flog, dbg_sock, wh, "write %d ng (%s - %d)",
 			    fd, strerror(errno), errno);
 
+#ifndef NEWWAY
 	    if (cl->async == FALSE)
-	       cl->fd = connect_close(fd, cl, NULL);};};
+	       cl->fd = connect_close(fd, cl, NULL);
+#endif
+	    };};
 
     return(nb);}
 
