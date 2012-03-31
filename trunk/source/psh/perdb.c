@@ -8,8 +8,6 @@
  *
  */
 
-/* #define NEWWAY */
-
 #include "common.h"
 #include "libpsh.c"
 #include "libdb.c"

@@ -8,6 +8,8 @@
  *
  */
 
+#define NEWWAY
+
 extern char
  *name_log(char *root);
 
@@ -412,6 +414,7 @@ int save_db(int fd, database *db, char *var, FILE *fp)
 
     if (db != NULL)
        {cl = make_client(db->root, async_srv, SERVER);
+	cl->fd = fd;
 
         vrs = db->entries;
 	nv  = db->ne;
@@ -430,6 +433,7 @@ int save_db(int fd, database *db, char *var, FILE *fp)
 		 else
 		    fprintf(fp, "%s=%s\n", vr, vl);};};
 
+	cl->fd = -1;
 	free_client(cl);
 
 	rv = TRUE;};
