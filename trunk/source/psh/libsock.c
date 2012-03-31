@@ -33,7 +33,6 @@ struct s_connection
 
 struct s_client
    {int fd;                      /* client side descriptor */
-    int async;                   /* talking to asynchronous server */
     char *root;
     ckind type;
     connection *server;
@@ -315,9 +314,7 @@ static int connect_client(client *cl)
 				     strerror(errno), errno);
 			fd = connect_close(fd, cl, NULL);};
 
-		    if (cl->async == TRUE)
-		       srv->server = fd;
-
+		    srv->server = fd;
 		    srv->port   = port;};};};};
 
     cl->fd   = fd;
@@ -411,13 +408,7 @@ static int read_sock(client *cl, char *s, int nc)
 			fd, s, nb);
 	else
 	   log_activity(flog, dbg_sock, wh, "read %d |%s| - %s (%d)",
-			fd, s, strerror(errno), errno);
-
-#ifndef NEWWAY
-	if (cl->async == FALSE)
-	   cl->fd = connect_close(fd, cl, NULL);
-#endif
-        };
+			fd, s, strerror(errno), errno);};
 
     return(nb);}
 
@@ -465,13 +456,7 @@ static int write_sock(client *cl, char *s, int nc)
 			    fd, nb);
 	    else
 	       log_activity(flog, dbg_sock, wh, "write %d ng (%s - %d)",
-			    fd, strerror(errno), errno);
-
-#ifndef NEWWAY
-	    if (cl->async == FALSE)
-	       cl->fd = connect_close(fd, cl, NULL);
-#endif
-	    };};
+			    fd, strerror(errno), errno);};};
 
     return(nb);}
 

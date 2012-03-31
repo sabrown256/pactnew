@@ -8,8 +8,6 @@
  *
  */
 
-#define NEWWAY
-
 extern char
  *name_log(char *root);
 
@@ -36,12 +34,7 @@ struct s_database
 
 static int
  ioc_server = CLIENT,
-#ifdef NEWWAY
- async_srv = TRUE,
-#else
- async_srv = FALSE,
-#endif
- dbg_db = FALSE;
+ dbg_db     = FALSE;
 
 #include "libsock.c"
 
@@ -123,14 +116,13 @@ int comm_write(client *cl, char *s, int nc, int to)
 
 /* MAKE_CLIENT - initialize and return a client connection instance */
 
-client *make_client(char *root, int async, ckind type)
+client *make_client(char *root, ckind type)
    {char *flog;
     client *cl;
 
     cl = MAKE(client);
     if (cl != NULL)
        {cl->fd     = -1;
-        cl->async  = async;
 	cl->root   = root;
 	cl->type   = type;
 	cl->server = &srv;
@@ -151,14 +143,10 @@ void free_client(client *cl)
    {char *flog;
 
     if (cl != NULL)
-       {
-
-#ifdef NEWWAY
-	if (cl->type == CLIENT)
+       {if (cl->type == CLIENT)
 	   comm_write(cl, "fin:", 0, 10);
 
 	cl->fd = connect_close(cl->fd, cl, NULL);
-#endif
 
 	flog = name_log(cl->root);
 	log_activity(flog, dbg_db,
@@ -413,7 +401,7 @@ int save_db(int fd, database *db, char *var, FILE *fp)
     rv = FALSE;
 
     if (db != NULL)
-       {cl = make_client(db->root, async_srv, SERVER);
+       {cl = make_client(db->root, SERVER);
 	cl->fd = fd;
 
         vrs = db->entries;

@@ -11,7 +11,7 @@
 @ err = 0
 
 set db   = $IncDir/cfg.db
-set cfg  = ( `grep Sys= $db | sed 's/^Sys=//'` )
+set cfg  = ( `grep CONFIG_FILE= $db | sed 's/^CONFIG_FILE=//'` )
 set osys = `cfgman use`
 
 while ($#argv > 0)
@@ -66,10 +66,10 @@ if ("$cfg" =~ */*) then
 else
    set inf  = ( `echo $cfg | sed 's/-/ /g'` )
    set hst  = `uname -n`
-   if ("$hst" != "$inf[1]") then
-      set cfgs = ( -cc $inf[1] )
-   else
+   if ("$hst" == "$inf[1]") then
       set cfgs = ""
+   else
+      set cfgs = ( -cc $inf[1] )
    endif
    set cfgf = ""
    set cfgd = ""
