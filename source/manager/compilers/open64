@@ -9,6 +9,8 @@
 
 WARN_PATTERN = "Warning: warning WARNING"
 
+define BAD_COMPLEX_INITIALIZER
+
 Tool CC {
    Exe      = opencc
    Flags    =

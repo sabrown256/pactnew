@@ -105,6 +105,7 @@ struct s_state
     int abs_opt;
     int create_dirs;
     int have_python;
+    int have_db;
     int installp;
 
     int loadp;
@@ -2464,6 +2465,21 @@ int kill_perdb(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SIGDONE - handle signals meant to end session */
+
+static void sigdone(int sig)
+   {
+
+    if (st.have_db == TRUE)
+       kill_perdb();
+
+    exit(sig);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* DENV - print the current environment */
 
 void denv(void)
@@ -2515,7 +2531,7 @@ static void help(void)
 /* MAIN - start it out here */
 
 int main(int c, char **v, char **env)
-   {int i, append, havedb, ok;
+   {int i, append, ok;
     char base[MAXLINE], ib[MAXLINE], d[LRG];
     char *strct;
     client *cl;
@@ -2523,6 +2539,12 @@ int main(int c, char **v, char **env)
     if (c <= 1)
        {help();
 	return(1);};
+
+    signal(SIGSEGV, sigdone);
+    signal(SIGBUS,  sigdone);
+    signal(SIGFPE,  sigdone);
+    signal(SIGTERM, sigdone);
+    signal(SIGINT,  sigdone);
 
     cl = make_client(NULL, CLIENT);
 
@@ -2539,7 +2561,7 @@ int main(int c, char **v, char **env)
 	       "env", "mkdir", "nm", "perdb",
 	       NULL);
 
-    havedb = launch_perdb(c, v);
+    st.have_db = launch_perdb(c, v);
 
 /* technically these are set by 'dsys config' */
     cinitenv("DbgOpt", "-g");
@@ -2570,7 +2592,7 @@ int main(int c, char **v, char **env)
 	    {full_path(d, LRG, NULL, v[++i]);
              if (file_exists(d) == FALSE)
 	        {noted(Log, "No such database '%s' - exiting\n", d);
-		 if (havedb == TRUE)
+		 if (st.have_db == TRUE)
 		    kill_perdb();
 		 return(1);};
 	     st.db = d;
@@ -2718,7 +2740,7 @@ int main(int c, char **v, char **env)
 
     free_client(cl);
 
-    if (havedb == TRUE)
+    if (st.have_db == TRUE)
        kill_perdb();
 
     return(0);}

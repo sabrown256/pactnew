@@ -273,7 +273,10 @@ static int proc_connection(client *cl)
     nb = comm_read(cl, s, MAXLINE, to);
 
 /* decide on the action to take */
-    if (nb > 0)
+    if (nb <= 0)
+       rv = -1;
+
+    else
 
 /* quit session */
        {if (strncmp(s, "quit:", 5) == 0)
@@ -373,7 +376,7 @@ static void async_server(client *cl)
     flog = name_log(root);
 
     if (listen(srv->server, 5) >= 0)
-       {int ng, dt, tmax;
+       {int ng, nb, nbmax, dt, tmax;
 	char *s;
         struct timeval t;
 
@@ -393,7 +396,14 @@ static void async_server(client *cl)
 	else
 	   dt = atoi(s);
 
-	for (ok = TRUE, ng = 0; (ok == TRUE) && (ng < tmax); )
+/* maximum number of consecutive 0 length reads
+ * indicating dropped connection
+ */
+	nb    = 0;
+	nbmax = 10;
+
+	ng = 0;
+	for (ok = TRUE; (ok == TRUE) && (ng < tmax) && (nb < nbmax); )
 	    {check_fd(srv, flog);
 
 /* timeout the select every DT seconds */
@@ -416,7 +426,13 @@ static void async_server(client *cl)
 /* data arriving on an existing connection */
 			  else
 			     {cl->fd = fd;
-			      ok     = proc_connection(cl);
+
+			      ok = proc_connection(cl);
+                              if (ok == -1)
+				 nb++;
+			      else
+				 nb = 0;
+
 			      sched_yield();};};};
 		  ng = 0;}
 	     else
