@@ -979,7 +979,7 @@ int db_restore(client *cl, char *db)
     else
        snprintf(t, MAXLINE, "load %s:", db);
 
-    ok = dbcmd(NULL, t);
+    ok = dbcmd(cl, t);
     ASSERT(ok == 0);
 
 /* the server has the database - now we need it

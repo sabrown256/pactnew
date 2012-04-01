@@ -13,6 +13,8 @@ run analyze/rpath path
 WARN_PATTERN = ":+sp+warning:"
 ERR_PATTERN  = ":+sp+error:"
 
+define BAD_COMPLEX_INITIALIZER
+
 Tool CC {
    Exe       = pathcc
    Flags    += [ _env_ = C_STD ;                # C standard flags
