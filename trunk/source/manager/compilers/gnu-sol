@@ -1,0 +1,31 @@
+#
+# GNU-SOL - define GNU compiler on Solaris
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+include compilers/gnu
+
+Tool LD {
+   Lib = -lsocket -lnsl
+}
+
+Group MDG {
+   Lib += /usr/openwin/lib/libX11.so /usr/openwin/lib/libXext.so
+}
+
+Group PThread {
+   LD_Lib = -lpthread 
+}
+
+Group X11 {
+   Path = /usr/openwin
+}
+
+define SOLARIS
+
+# GCC 3.4.3 complex support is buggy
+setenv TEST_ADVISORY ${TEST_ADVISORY}:pml_func:pml_fpe
