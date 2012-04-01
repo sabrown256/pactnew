@@ -1,0 +1,11 @@
+#
+# GNU-FREEBSD - define GNU compiler for FreeBSD
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+setenv PATH ${PATH}:/usr/local/bin
+include gnu
