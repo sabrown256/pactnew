@@ -139,7 +139,9 @@ else if (-d CVS) then
            end
            breaksw
       case directories:
-           set res = ( $res `find . -name CVS -type d` )
+           set res = ""
+# NOTE: too many directories to put in a list
+           find . -name CVS -type d
            breaksw
       case exe:
            set res = `which cvs`
@@ -177,7 +179,9 @@ else if (-d .svn) then
            exit(1)
            breaksw
       case directories:
-           set res = ( $res `find . -name .svn -type d` )
+           set res = ""
+# NOTE: too many directories to put in a list
+           find . -name .svn -type d
            breaksw
       case exe:
            set res = `which svn`

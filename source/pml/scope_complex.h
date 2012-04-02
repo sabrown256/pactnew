@@ -12,11 +12,21 @@
 
 #define PCK_COMPLEX
 
+#include "score.h"
+
 /* protect C++ programs from C99 complex which are incompatible */
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 
-#include "score.h"
+/* C and C++ standards agree that double complex type must align
+ * the same as an array of 2 doubles
+ * so use this typedef to get compilations to work with C++ compilers
+ * we don't expect to use this in a C++ code
+ */
+
+typedef double (complex)[2];
+
+#else
 
 /*--------------------------------------------------------------------------*/
 
