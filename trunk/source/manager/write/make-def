@@ -370,20 +370,28 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT ""
 
 # match up what derives from the config process with what is used in the pre-Makes
-    Note $STDOUT "CCompiler    = ${CC_Exe}"
-    Note $STDOUT "CCmpLdr      = ${CC_Linker}"
-    Note $STDOUT "CFLAGS       = ${CC_Flags}"
-    Note $STDOUT "CDebug       = ${CC_Debug}"
-    Note $STDOUT "CDefDebug    = ${CDefDebug}"
-    Note $STDOUT "COptimize    = ${CC_Optimize}"
-    Note $STDOUT "CDefOptimize = ${CDefOptimize}"
+    Note $STDOUT "CCompiler     = ${CC_Exe}"
+    Note $STDOUT "CCmpLdr       = ${CC_Linker}"
+    Note $STDOUT "CFLAGS        = ${CC_Flags}"
+    Note $STDOUT "CDebug        = ${CC_Debug}"
+    Note $STDOUT "COptimize     = ${CC_Optimize}"
+    Note $STDOUT "CDefDebug     = ${CDefDebug}"
+    Note $STDOUT "CDefOptimize  = ${CDefOptimize}"
 
-    Note $STDOUT "FCompiler    = ${FC_Exe}"
-    Note $STDOUT "FFLAGS       = ${FC_Flags}"
-    Note $STDOUT "FDebug       = ${FC_Debug}"
-    Note $STDOUT "FDefDebug    = ${FDefDebug}"
-    Note $STDOUT "FOptimize    = ${FC_Optimize}"
-    Note $STDOUT "FDefOptimize = ${FDefOptimize}"
+    Note $STDOUT "CXCompiler    = ${CXX_Exe}"
+    Note $STDOUT "CXCmpLdr      = ${CXX_Linker}"
+    Note $STDOUT "CXFLAGS       = ${CXX_Flags}"
+    Note $STDOUT "CXDebug       = ${CXX_Debug}"
+    Note $STDOUT "CXOptimize    = ${CXX_Optimize}"
+    Note $STDOUT "CXDefDebug    = ${CDefDebug}"
+    Note $STDOUT "CXDefOptimize = ${CDefOptimize}"
+
+    Note $STDOUT "FCompiler     = ${FC_Exe}"
+    Note $STDOUT "FFLAGS        = ${FC_Flags}"
+    Note $STDOUT "FDebug        = ${FC_Debug}"
+    Note $STDOUT "FOptimize     = ${FC_Optimize}"
+    Note $STDOUT "FDefDebug     = ${FDefDebug}"
+    Note $STDOUT "FDefOptimize  = ${FDefOptimize}"
 
     Note $STDOUT "Linker       = ${LD_Exe}"
     Note $STDOUT ""
@@ -427,11 +435,12 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "ARXOpt     = ${AR_Flags} ${AR_XFlag}"
     Note $STDOUT ""
 
-    Note $STDOUT 'CC = ${CCompiler} ${CFLAGS} ${Shared_CC_Flags} ${UniFlags} ${CcFlags}'
-    Note $STDOUT 'FC = ${FCompiler} ${FFLAGS} ${UniFlags} ${FcFlags}'
-    Note $STDOUT 'LX = ${CCompiler} ${LXFLAGS} ${UniFlags} ${CcFlags}'
-    Note $STDOUT 'YC = ${CCompiler} ${LXFLAGS} ${UniFlags} ${CcFlags}'
-    Note $STDOUT 'LD = ${Linker} ${UniFlags} ${LdFlags}'
+    Note $STDOUT 'CC  = ${CCompiler} ${CFLAGS} ${Shared_CC_Flags} ${UniFlags} ${CcFlags}'
+    Note $STDOUT 'CXX = ${CXCompiler} ${CXFLAGS} ${UniFlags} ${CxFlags}'
+    Note $STDOUT 'FC  = ${FCompiler} ${FFLAGS} ${UniFlags} ${FcFlags}'
+    Note $STDOUT 'LX  = ${CCompiler} ${LXFLAGS} ${UniFlags} ${CcFlags}'
+    Note $STDOUT 'YC  = ${CCompiler} ${LXFLAGS} ${UniFlags} ${CcFlags}'
+    Note $STDOUT 'LD  = ${Linker} ${UniFlags} ${LdFlags}'
     Note $STDOUT ""
  
     Note $STDOUT 'CLD            = ${CCmpLdr} ${CFLAGS} ${UniFlags} ${CcFlags}'

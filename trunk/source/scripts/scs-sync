@@ -68,8 +68,6 @@ while ($#argv > 0)
    shift
 end
 
-set excd  = ( ../.git ../.svn .svn ../CVS CVS $ignd )
-
 set log = $cwd/log.sync
 date >&! $log
 
@@ -79,6 +77,10 @@ flog $log rm -rf syncs syncd
 set excf = $cwd/tmp.excf
 rm -f $excf
 touch $excf
+
+set excd  = ( ../.git ../.svn .svn ../CVS CVS $ignd )
+Note $log "Ignore directories: $ignd"
+Note $log "Exclude directories: $excd"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -241,7 +243,8 @@ set dirs = ( `$ldir/scs-meta -d -a | sed 's|'$cwd'|\.|g'` )
 Note $log "Destination repo info:"
 Note $log "   Repo = $repo"
 Note $log "   Kind = $knd"
-Note $log "   Dirs = $dirs"
+# NOTE: dirs may be "Word too long." to print
+#Note $log "   Dirs = $dirs"
 
 NoteD $log -n "Reconciling contents ... "
 Note $log ""
@@ -276,7 +279,7 @@ else if (-d CVS) then
          end
 
 # add entries
-         foreach f ( * )
+         foreach f ( `ls -1` )
             if ($f != CVS) then
                grep "/$f/" CVS/Entries >& /dev/null
                if ($status != 0) then
@@ -312,7 +315,7 @@ else if (-d .svn) then
          end
 
 # add entries
-         foreach e ( * )
+         foreach e ( `ls -1` )
             set f = .svn/text-base/$e.svn-base
             if (!(-f $f)) then
                flog $log svn add $e

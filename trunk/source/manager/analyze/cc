@@ -37,6 +37,12 @@ SafeEnv CC_Inc       ""
 SafeEnv MDG_Inc      ""
 SafeEnv DP_Inc       ""
 
+SafeEnv CXX_Linker    ""
+SafeEnv CXX_Flags     ""
+SafeEnv CXX_Debug     "-g"
+SafeEnv CXX_Optimize  "-O"
+SafeEnv CXX_Inc       ""
+
 set UTime = `timer -r`
 
 setenv AnsiCC     ""
@@ -387,6 +393,10 @@ if ("$CC_Linker" == "") then
    setenv CC_Linker "$CC_Exe"
 endif
 
+if ("$CXX_Linker" == "") then
+   setenv CXX_Linker "$CXX_Exe"
+endif
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
@@ -400,6 +410,12 @@ SetParent CC_Inc
 SetParent CC_Linker
 SetParent MDG_Inc
 SetParent DP_Inc
+
+SetParent CXX_Exe
+SetParent CXX_Flags
+SetParent CXX_Debug
+SetParent CXX_Optimize
+SetParent CXX_Linker
 
 SetParent Cfg_CC_Exe
 SetParent Cfg_CC_Flags
