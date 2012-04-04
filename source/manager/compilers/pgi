@@ -82,3 +82,7 @@ Group OpenMP {
 include cpp-rule
 include serial
 include full-mm
+
+setenv TEST_ADVISORY ${TEST_ADVISORY}:score_mor
+
+

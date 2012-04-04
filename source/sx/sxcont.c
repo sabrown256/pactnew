@@ -35,6 +35,8 @@ void _SX_args(SS_psides *si, object *obj, void *v, int type)
         return;};
 
     switch (type)
+
+/* G_FILE is for any file object wrapped in a g_file */
        {case G_FILE :
              if (!SS_nullobjp(obj) && !SX_FILEP(obj))
                 SS_error(si, "OBJECT NOT FILE - _SX_ARGS", obj);
@@ -43,6 +45,20 @@ void _SX_args(SS_psides *si, object *obj, void *v, int type)
                 *pv = (void *) SX_gs.gvif;
              else
                 *pv = (void *) SS_GET(g_file, obj);
+             break;
+
+/* G_PDBFILE is specifically for a PDBfile - used in generated wrappers */
+        case G_PDBFILE :
+             if (!SS_nullobjp(obj) && !SX_FILEP(obj))
+                SS_error(si, "OBJECT NOT FILE - _SX_ARGS", obj);
+
+	     *pv = (void *) SX_gs.gvif;
+             if (!SS_nullobjp(obj))
+	        {g_file *gf;
+             
+		 gf = (g_file *) SS_GET(g_file, obj);
+		 if (gf != NULL)
+		    *pv = (void *) gf->file;};
              break;
 
         case G_DEVICE :

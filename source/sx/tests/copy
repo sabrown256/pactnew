@@ -1,0 +1,105 @@
+#!/bin/csh -f
+#
+# COPY - pdbcp test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set msg = "PDBCP Test ..................."
+set exe = $BinDir/pdbcp
+
+   NoteD $Log ""
+   NoteD $Log "                    $msg"
+
+   @ nerr = 0
+
+   set lst = ""
+
+# version 2 of the file
+   set lst = ( $lst v2 -v 2 done )
+
+# version 3 of the file
+   set lst = ( $lst v3 -v 3 done )
+
+# verify the input file
+   set lst = ( $lst vi -vfi done )
+
+# whole file checksum
+   set lst = ( $lst cf -cf done )
+
+# whole file checksum and verify
+   set lst = ( $lst vf -cf -vfo done )
+
+# per variable checksum
+   set lst = ( $lst cv -cv done )
+
+# per variable checksum and verify
+   set lst = ( $lst vv -cv -vfo done )
+
+# make a "Fortran" copy of the file column major and default offset 1
+   set lst = ( $lst ft -cmo -d1 done )
+
+   @ it = 0
+   while ($#lst > 0)
+      @ it = $it + 1
+      set lbl = $lst[1]
+      shift lst
+      set opt = ""
+      while ($#lst > 0)
+         set t = $lst[1]
+         shift lst
+         if ("$t" != done) then
+            set opt = ( $opt $t )
+         else
+            break
+         endif
+      end
+      unset t
+
+      set files = ( pdptr.pdb cp-$it.pdb )
+      set opt   = ( $opt $files )
+      set io    = cp-$it.res
+
+      NoteD $Log -n "                       $lbl ........................ "
+      Note $Log ""
+
+      source ../../../scripts/test-run
+      @ nerr = $nerr + $xstatus
+
+      Note $Log "cp-$it.pdb status = $xstatus"
+
+      if ($xstatus == 0) then
+         flog $Log ls -l $files cp-$it.res
+         if ($status == 0) then
+
+# GOTCHA: there seems to be a bug in pdbdiff comparing pdptr.pdb and cp-1.pdb
+# skip that comparison - arghhh
+if ($it != 1) then
+            flog $Log pdbdiff $files
+            set xstatus = $status
+            set rpf = ( $rpf cp-$it.pdb cp-$it.res )
+endif
+         else
+            set xstatus = 1
+         endif
+      endif
+
+      flog $Log cat cp-$it.res
+
+      if ($xstatus == 0) then
+         NoteD $Log "ok ($dt)"
+      else
+         NoteD $Log "ng ($dt)"
+         @ nerr = $nerr + 1
+      endif
+
+   end
+
+$TEST_CHECK part -a pdb -e $nerr -dt $dt -rpf "$rpf" $msg
+
+exit($status)

@@ -114,7 +114,7 @@ typedef int (*PFBinType)(char *type);
 typedef PDBfile *(*PFBinCreate)(tr_layer *tr, SC_udl *pu, char *name, void *a);
 typedef PDBfile *(*PFBinOpen)(tr_layer *tr, SC_udl *pu, char *name,
 			      char *mode, void *a);
-typedef int (*PFBinClose)(PDBfile *file);
+typedef int64_t (*PFBinClose)(PDBfile *file);
 typedef syment *(*PFBinWrite)(PDBfile *file, char *path,
 			      char *inty, char *outty,
 			      void *vr, dimdes *dims,
@@ -518,10 +518,10 @@ extern int
  _PD_rev_chrt(hasharr *ch),
  _PD_items_per_tuple(defstr *dp),
  _PD_set_current_address(PDBfile *file, int64_t addr, int wh, PD_major_op tag),
- _PD_init_s(void),
- _PD_close(PDBfile *file);
+ _PD_init_s(void);
 
 extern int64_t
+ _PD_close(PDBfile *file),
  _PD_eod(PDBfile *file),
  _PD_get_next_address(PDBfile *file, char *type, inti ni, void *vr,
 		      int seekf, int tellf, int colf),

@@ -468,7 +468,7 @@ struct s_tr_layer
     int (*gettype)(char *type);
     PDBfile *(*create)(tr_layer *tr, SC_udl *pu, char *name, void *a);
     PDBfile *(*open)(tr_layer *tr, SC_udl *pu, char *name, char *mode, void *a);
-    int (*close)(PDBfile *file);
+    int64_t (*close)(PDBfile *file);
     int (*read)(PDBfile *file, char *path, char *ty,
 		syment *ep, void *vr, int nd, long *ind);
     syment *(*write)(PDBfile *file, char *path,
@@ -492,7 +492,7 @@ struct s_PD_address
     syment *entry;};           /* symbol table entry */
 
 /*
- * #bind derived PDBfile character-A SC_STRING_I PP_PDBfileObject NULL
+ * #bind derived PDBfile character-A G_PDBFILE PP_PDBfileObject NULL
  */
 
 struct s_PDBfile
@@ -915,9 +915,12 @@ extern syment
  *_PD_write(PDBfile *file, char *name, char *intype, char *outtype,
 	    void *vr, dimdes *dims, int appnd, int *pnew);
 
+extern int64_t
+ PD_close_n(PDBfile *file),
+ PD_flush(PDBfile *file);
+
 extern int
  PD_close(PDBfile *file),
- PD_flush(PDBfile *file),
  PD_remove_entry(PDBfile *file, char *name),
  PD_append(PDBfile *file, char *name, void *vr),
  PD_append_as(PDBfile *file, char *name, char *intype, void *vr),
@@ -1193,6 +1196,7 @@ extern long
  PD_set_pointer_size(long n);
 
 extern int
+ PD_get_system_version(PDBfile *file),
  PD_get_entry_info(syment *ep, char **ptyp, long *pni, int *pnd, long **pdim),
  PD_get_offset(PDBfile *file),
  PD_set_offset(PDBfile *file, int v),

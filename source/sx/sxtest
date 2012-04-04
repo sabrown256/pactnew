@@ -23,7 +23,7 @@ while ($#argv > 0)
            echo "  t       run tests with # threads"
            echo "  vg      run tests under valgrind"
            echo "  <test>  one of: oper hash c99 pdb ptr dattr text sqlite xml hdf vif"
-           echo "                  pgs axis master exa iply shell mesh intp-df intrp ar diff ext"
+           echo "                  pgs axis master exa iply shell copy mesh intp-df intrp ar diff ext"
            echo ""
            exit(1)
       case -t:
@@ -77,7 +77,7 @@ else if (-e $BinDir/sx) then
       set Tests = ( $Tests oper hash c99 )
       set Tests = ( $Tests pdb ptr dattr text sqlite xml hdf vif )
       set Tests = ( $Tests pgs axis iply )
-      set Tests = ( $Tests master exa shell mesh intp-df intrp ar diff ext )
+      set Tests = ( $Tests master exa shell copy mesh intp-df intrp ar diff ext )
    endif
 
    foreach i ($Tests)

@@ -261,7 +261,8 @@ SC_udl *_PD_pio_open(char *name, char *mode)
 /* _PD_SAFE_FLUSH - do a flush if it is safe to do so
  *                - ANSI standard says fflush on output stream only
  *                - so do not try it on a read only stream
- *                - return TRUE iff successful
+ *                - return file length if successful
+ *                - and -1 otherwise
  */
 
 int _PD_safe_flush(PDBfile *file)
@@ -269,7 +270,7 @@ int _PD_safe_flush(PDBfile *file)
     FILE *fp;
     SC_THREAD_ID(_t_index);
 
-    rv = TRUE;
+    rv = -1;
     if ((file->virtual_internal == FALSE) &&
         (strcmp(file->file_mode, BINARY_MODE_R) != 0))
        {fp = file->stream;
@@ -1127,6 +1128,24 @@ int64_t PD_set_buffer_size(int64_t v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PD_GET_SYSTEM_VERSION - return the file system_version
+ *
+ * #bind PD_get_system_version fortran() scheme() python()
+ */
+
+int PD_get_system_version(PDBfile *file ARG(,,cls))
+   {int rv;
+
+    if (file != NULL)
+       rv = file->system_version;
+    else
+       rv = -1;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PD_GET_FILE_LENGTH - return the current file length
  *
  * #bind PD_get_file_length fortran() scheme() python()
@@ -1356,8 +1375,8 @@ FILE *_PD_data_source(SC_udl *pu)
  *           - return TRUE if successful and FALSE otherwise
  */
 
-int _PD_close(PDBfile *file)
-   {int ret;
+int64_t _PD_close(PDBfile *file)
+   {int64_t ret;
     FILE *fp;
 
     ret = FALSE;

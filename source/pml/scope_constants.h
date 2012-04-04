@@ -14,6 +14,10 @@
 
 #include "scope_complex.h"
 
+/* protect C++ programs from C99 complex which are incompatible */
+
+#ifndef __cplusplus
+
 /*--------------------------------------------------------------------------*/
 
 /*                          PROCEDURAL MACROS                               */
@@ -71,7 +75,6 @@
 /*                         STRUCT DEFINITIONS                               */
 
 /*--------------------------------------------------------------------------*/
-    
 
 typedef struct s_multi_rep_fix multi_rep_fix;
 typedef struct s_multi_rep_float multi_rep_float;
@@ -146,10 +149,6 @@ struct s_PM_constants
     double icm_erg;                                   /* inverse cm to erg */
     double erg_icm;};                                 /* erg to inverse cm */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /*--------------------------------------------------------------------------*/
 
 /*                          VARIABLE DECLARATIONS                           */
@@ -159,11 +158,17 @@ extern "C" {
 extern PM_constants
  PM_c;
 
+#endif
+
 /*--------------------------------------------------------------------------*/
 
 /*                          FUNCTION DECLARATIONS                           */
 
 /*--------------------------------------------------------------------------*/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /* MLCONST.C - declarations */
