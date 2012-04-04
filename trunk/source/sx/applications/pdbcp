@@ -19,15 +19,20 @@
 
 (define (help)
     (printf nil "\n")
-    (printf nil "Usage: pdbcp [-cmo] [-d<#>] [-h] [-rmo] [-v #] <in-file> [<out-file>] [-a <var>*]\n")
+    (printf nil "Usage: pdbcp [-cf] [-cmo] [-cv] [-d<#>] [-h] [-rmo] [-v #]\n")
+    (printf nil "             [-vfi] [-vfo] <in-file> [<out-file>] [-a <var>*]\n")
     (printf nil "   a    all remaining arguments specify variables to copy\n")
+    (printf nil "   cf   activate whole file checksum on output file\n")
     (printf nil "   cmo  make the new file column major order\n")
     (printf nil "        this is a relabelling not a transpose\n")
+    (printf nil "   cv   activate per variable checksum on output file\n")
     (printf nil "   d    set the default offset of the new file to <#> (default 0)\n")
     (printf nil "   h    this help message\n")
     (printf nil "   rmo  make the new file row major order (default)\n")
     (printf nil "        this is a relabelling not a transpose\n")
     (printf nil "   v    PDB format version for output (default 3)\n")
+    (printf nil "   vfi  verify checksums on input file\n")
+    (printf nil "   vfo  verify checksums on output file\n")
     (printf nil "\n")
     (printf nil "Examples:\n")
     (printf nil "   pdbcp -v 2 file1\n")
@@ -57,7 +62,11 @@
 		    ((eqv? arg "-h")
 		     (help))
 
-		    ((or (eqv? arg "-rmo")
+		    ((or (eqv? arg "-cv")
+			 (eqv? arg "-cf")
+			 (eqv? arg "-vfi")
+			 (eqv? arg "-vfo")
+			 (eqv? arg "-rmo")
 			 (eqv? arg "-cmo")
 			 (eqv? (substring arg 0 2) "-d"))
                      (set! opt (cons arg opt)))
@@ -83,7 +92,8 @@
    (if (not v)
        (help))
 
-   (let* ((opt (process-args v '(-R -w))))
+   (let* ((opt (process-args v '(-R -w)))
+	  (rv  #t))
 
          (if (not inf)
 	     (begin (printf nil "No input file specified\n")
@@ -96,11 +106,13 @@
 	 (change-file* inf)
 
 ; copy the variables
-	 (apply cp (append (append opt vars) (list outf)))))
+	 (set! rv (apply cp (append (append opt vars) (list outf))))
+
+	 (not rv)))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-(main argv)
+(define rv (main argv))
 
-(quit)
+(quit rv)

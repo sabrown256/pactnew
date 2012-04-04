@@ -39,6 +39,11 @@
 (define font-size-nxm 10)
 (define data-id-save 1)
 
+(define PD_MD5_OFF   0)
+(define PD_MD5_FILE  1)
+(define	PD_MD5_RW    2)
+(define	PD_MD5_FULL  3)
+
 ;--------------------------------------------------------------------------
 
 ;                             AUXILLIARY FUNCTIONS
@@ -700,7 +705,8 @@
 			  (reverse (list-tail (reverse args) 1))
 			  (list-tail args 1)))
 	   (thsf      current-file)
-	   (rw        (mode-flag flags nil)))
+	   (rw        (mode-flag flags nil))
+	   (rv        #t))
 
           (set! follow-directories (match-flag flags "-R" #f))
 
@@ -710,6 +716,12 @@
 		     (the-vars (which-variables thsf
 						(current-directory thsf)
 						vars)))
+
+		    (if (match-flag flags "-vfi" #f)
+			(if (= (pd-verify current-file) 0)
+			    (begin (printf nil "Checksum test failed on '%s'\n"
+					   current-file)
+				   (set! rv #f))))
 
 ; set the major order of the new file
 ; flag -rmo gives row major order
@@ -733,6 +745,17 @@
 					   1)
 					  (else
 					   (default-offset fp))))
+
+; set the checksum mode of the new file
+; flag -cf gives whole file checksum
+; flag -cv gives per variable checksum
+		    (pd-activate-cksum fp
+				 (cond ((match-flag flags "-cf" #f)
+					PD_MD5_FILE)
+				       ((match-flag flags "-cv" #f)
+					PD_MD5_RW)
+				       (else
+					(pd-activate-cksum fp))))
 
 		    (define-macro (move-type x)
 		        (write-defstr* fp (read-defstr* thsf x)))
@@ -763,7 +786,14 @@
 			      (if (not (equal? dstd "/"))
 				  (make-directory fp dstd derr))
 			      (if the-vars
-				  (for-each move-data the-vars))))))))
+				  (for-each move-data the-vars))))
+
+		    (if (match-flag flags "-vfo" #f)
+			(if (= (pd-verify fp) 0)
+			    (begin (printf nil "Checksum test failed on '%s'\n"
+					   dstf)
+				   (set! rv #f))))))
+		    rv))
 
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------

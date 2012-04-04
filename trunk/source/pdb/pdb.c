@@ -208,15 +208,14 @@ int PD_copy_type(PDBfile *sf, PDBfile *df, char *type)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_CLOSE - Close a PDB file after writing out the symbol table and
- *          - structure chart.
- *          - Return TRUE if successful and FALSE otherwise.
- *
- * #bind PD_close fortran() scheme() python()
+/* _PD_CLOSE_WRK - close a PDB file after writing out the symbol table and
+ *               - structure chart
+ *               - return the length of the file successful
+ *               - and -1 otherwise
  */
 
-int PD_close(PDBfile *file ARG(,,cls))
-   {int ret;
+static int64_t _PD_close_wrk(PDBfile *file)
+   {int64_t ret;
     PD_smp_state *pa;
     PFBinClose fun;
     tr_layer *tr;
@@ -246,6 +245,43 @@ int PD_close(PDBfile *file ARG(,,cls))
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PD_CLOSE - Close a PDB file after writing out the symbol table and
+ *          - structure chart.
+ *          - Return TRUE if successful and FALSE otherwise.
+ *
+ * #bind PD_close fortran() scheme() python()
+ */
+
+int PD_close(PDBfile *file ARG(,,cls))
+   {int ret;
+    int64_t ln;
+
+    ln  = _PD_close_wrk(file);
+    ret = (ln > 0);
+
+    return(ret);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_CLOSE_N - Close a PDB file after writing out the symbol table and
+ *            - structure chart.
+ *            - Return the file length if successful
+ *            - and -1 otherwise.
+ *
+ * #bind PD_close_n fortran() scheme() python()
+ */
+
+int64_t PD_close_n(PDBfile *file ARG(,,cls))
+   {int64_t ret;
+
+    ret = _PD_close_wrk(file);
+
+    return(ret);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PD_FLUSH - dump the data description tables containing the current
  *          - state of the PDB file
  *          - the tables are:
@@ -260,12 +296,20 @@ int PD_close(PDBfile *file ARG(,,cls))
  * #bind PD_flush fortran() scheme() python()
  */
 
-int PD_flush(PDBfile *file ARG(,,cls))
-   {int ret;
+int64_t PD_flush(PDBfile *file ARG(,,cls))
+   {int64_t ret;
 
     ret = _PD_FLUSH_FILE(file);
 
     ret = _PD_safe_flush(file);
+
+/* NOTE: this way uses seek and tell to get the length
+ * another, stronger way would be for PDBLib to actually count
+ * the bytes thus returning a length independently of the
+ * C library
+ */
+    if (ret == TRUE)
+       ret = PD_get_file_length(file);
 
     _PD_MARK_AS_FLUSHED(file, TRUE);
 

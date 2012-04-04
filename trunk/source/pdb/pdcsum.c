@@ -371,7 +371,11 @@ int PD_verify(PDBfile *file ARG(,,cls))
 	if ((file->virtual_internal == FALSE) &&
 	    (IS_PDBFILE(file) == TRUE) &&
 	    (fp != NULL))
-	   {prev = _PD_get_current_address(file, PD_GENERIC);
+
+/* the file had better be flushed before doing checksum */
+	   {PD_flush(file);
+
+            prev = _PD_get_current_address(file, PD_GENERIC);
 	    addr = _PD_locate_checksum(file);
 	    if (addr != -1)
 	       {if (file->system_version < 20)
@@ -398,12 +402,11 @@ int PD_verify(PDBfile *file ARG(,,cls))
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_ACTIVATE_CKSUM - if flag is TRUE, turn checksum handling on
- *                   - otherwise turn it off.
- *                   - return the old flag value
- *                   - TRUE, FALSE determine if file level checksumming occurs
- *                   - PD_MD5_RW sets variable level checksumming
- *                   - during PD_write and PD_read calls
+/* PD_ACTIVATE_CKSUM - Turn on file level checksums if flag is PD_MD5_FILE.
+ *                   - Turn on variable level checksums if flag is PD_MD5_RW
+ *                   - during PD_write and PD_read calls.
+ *                   - Turn off all checksums if flag is PD_MD5_OFF.
+ *                   - Return the old flag value.
  *
  * #bind PD_activate_cksum fortran() scheme() python()
  */

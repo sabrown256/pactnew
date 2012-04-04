@@ -635,6 +635,7 @@ struct s_SX_scope_public
 
 enum e_SX_object_type
    {G_FILE = 240,
+    G_PDBFILE,
     G_DEFSTR,
     G_SYMENT,
     G_DIMDES,
