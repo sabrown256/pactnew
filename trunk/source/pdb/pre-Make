@@ -94,7 +94,7 @@ Objs = pdb.o pdbaib.o pdbmp.o pdser.o pdlow.o pdsymt.o pdblk.o \
        pdrdwr.o pdptr.o pdprnt.o pdmemb.o \
        pdbmm.o pdconv.o pdpath.o pdbfc.o pdbnet.o pdshar.o \
        pdcsum.o pdbx.o pdmap.o pdszof.o pdbdir.o pdpar.o pdcomm.o \
-       pdtgt.o pdtyp.o pdtypa.o pdtypb.o pdtypc.o pdspoke.o
+       pdtgt.o pdtyp.o pdtypa.o pdtypb.o pdtypc.o pdspoke.o pdold.o
 
 ArObjs = ${TGTLib}(pdb.o) ${TGTLib}(pdbaib.o)                        \
          ${TGTLib}(pdfmt.o) ${TGTLib}(pdfmta.o)                      \
@@ -107,7 +107,7 @@ ArObjs = ${TGTLib}(pdb.o) ${TGTLib}(pdbaib.o)                        \
          ${TGTLib}(pdprnt.o) ${TGTLib}(pdshar.o) ${TGTLib}(pdtgt.o)  \
          ${TGTLib}(pdbx.o) ${TGTLib}(pdmap.o) ${TGTLib}(pdbdir.o)    \
          ${TGTLib}(pdszof.o) ${TGTLib}(pdpar.o) ${TGTLib}(pdparmp.o) \
-         ${TGTLib}(pdspoke.o)
+         ${TGTLib}(pdspoke.o) ${TGTLib}(pdold.o)
 
 ${LibDep} : ${hdrf} ${Hdrs} pdspoke.c scope_formats.h
 

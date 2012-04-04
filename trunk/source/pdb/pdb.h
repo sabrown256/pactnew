@@ -145,7 +145,6 @@
 #define PD_TYPN(_n)     PD_gs.tnames[PD_TYPI(_n) - PD_TYPI(PDBfile)]
 #define PD_TYPPN(_n)    PD_gs.tpnames[PD_TYPPI(_n) - PD_TYPPI(PDBfile)]
 
-#define PD_err          PD_gs.err
 #define PDBFILE_S       PD_gs.tnames[0]
 #define PD_DEFSTR_S     PD_gs.tnames[1]
 #define PD_ALIGNMENT_S  PD_gs.tnames[2]
