@@ -130,6 +130,26 @@ switch ($cname)
         set fname = sunf90
         breaksw
 
+# Tau
+   case tau_cc*:
+        setenv PACT_CC_FAMILY   TAU
+        setenv PACT_FC_FAMILY   TAU
+        set opt   = ( -v )
+        set pat   = ( tau_cc version )
+        set prog  = ( '$0 ~ /'$pat'/ { print $4 } $0 ~ /Compile line:/ { print $3 }' )
+        set fname = tau_f90
+        breaksw
+
+# TinyCC
+   case tcc*:
+        setenv PACT_CC_FAMILY   TCC
+        setenv PACT_FC_FAMILY   GNU
+        set opt   = ( -v )
+        set pat   = ( tcc version )
+        set prog  = ( '$0 ~ /'$pat'/ { print $4 } $0 ~ /Compile line:/ { print $3 }' )
+        set fname = gfortran
+        breaksw
+
 # XLC
    case *xlc*:
         setenv PACT_CC_FAMILY   XLC

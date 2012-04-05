@@ -8,16 +8,99 @@
 # include "cpyright.h"
 #
 
-if (-f ../scripts/env-csh) then
-   set SrcDir = $cwd
-else if (-f ../../scripts/env-csh) then
-   set SrcDir = $cwd:h
-endif
-set ldir = $SrcDir:h/scripts
-set path = ( $ldir $path )
-source $ldir/env-csh
+# put these in shell variables since
+# prune-env will remove them as environment variables
+set Log    = $1
+set ScrDir = $2
+
+#eval `$ScrDir/prune-env pact`
+set path = ( $ScrDir $path )
+source $ScrDir/env-csh
+
 source $ScrDir/csh-subroutines
 HAVE_SUBROUTINES
+
+#dbget AR_Exe
+#dbget AR_Flags
+#dbget AR_IFlag
+#dbget AR_XFlag
+#dbget ArW32Objs
+#dbget BaseDir
+#dbget BE
+#dbget BuildStrategy
+#dbget CC_Debug
+#dbget CC_Exe
+#dbget CC_Flags
+#dbget CC_Inc
+#dbget CC_Linker
+#dbget CC_Optimize
+#dbget CDefDebug
+#dbget CDefOptimize
+#dbget CXX_Debug
+#dbget CXX_Exe
+#dbget CXX_Flags
+#dbget CXX_Linker
+#dbget CXX_Optimize
+#dbget CDefDebug
+#dbget CDefOptimize
+#dbget CFE
+#dbget DEFAULT_SHELL
+#dbget DP_Inc
+#dbget DP_Lib
+#dbget FC_Debug
+#dbget FC_Exe
+#dbget FC_Flags
+##dbget FC_LD_Lib
+#dbget FC_Optimize
+#dbget FDefDebug
+#dbget FDefOptimize
+#dbget GnuMakeOpt
+#dbget GraphicsDevices
+#dbget GraphicsFlag
+#dbget GSYS
+#dbget HavePython
+#dbget HostOS
+#dbget IncDir
+#dbget InstBase
+#dbget INSTALL
+#dbget IPCSupport
+#dbget LD_Exe
+#dbget LD_Flags
+#dbget LD_Lib
+#dbget Lex_Exe
+#dbget Lex_Flags
+#dbget LibM_Lib
+#dbget Load
+#dbget MD_Inc
+#dbget MD_Lib
+#dbget MDE_Lib
+#dbget MDI_Inc
+#dbget MDI_Lib
+#dbget MDG_Inc
+#dbget MDG_Lib
+#dbget MngDir
+#dbget OStd
+#dbget OW32Objs
+#dbget ParCommSupport
+#dbget PubLib
+#dbget PubInc
+#dbget PyCC
+#dbget PyCfg
+#dbget PyExe
+#dbget PyInc
+#dbget PyVers
+#dbget Ranlib_Exe
+#dbget SUFFIXES
+#dbget Sys
+#dbget SysDir
+#dbget System
+#dbget ThreadLibExt
+#dbget UPDATE
+#dbget URFile
+#dbget Yacc_Exe
+#dbget Yacc_Flags
+
+Separator $Log
 
 set OStd = UNIX
 
@@ -29,7 +112,6 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    Separator $Log
     NoteD $Log "   Site Dependent MAKE Configuration - make-def"
 
 # add DP_Inc to CC_Inc

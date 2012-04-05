@@ -15,49 +15,48 @@ unalias *
 set Log    = $1
 set ScrDir = $2
 
-#eval `$ScrDir/prune-env -e SrcDir pact`
+eval `$ScrDir/prune-env -e MngDir pact`
 set path = ( $ScrDir $path )
 source $ScrDir/env-csh
 
-#dbget Arch
-#dbget BFD_Version
-#dbget CC_Exe
-#dbget CEFile
-#dbget CPU
-#dbget DEFAULT_SHELL
-#dbget DP_Lib
-#dbget DP_Inc
-#dbget FC_ID_CASE
-#dbget FC_ID_UNDERSCORE
-#dbget FFIntPtrDiffer
-#dbget FilterDir
-#dbget FPU
-#dbget GETSOCKOPT_TYPE
-#dbget HAVE_BFD
-#dbget HaveINLINE
-#dbget HAVE_OPENMP
-#dbget HAVE_OPENMPI
-#dbget HAVE_SOCKETS_P
-#dbget HaveTRACKER
-#dbget HaveVACOPY
-#dbget HaveVALIST
-#dbget HostOS
-#dbget HostOSRel
-#dbget IncDir
-#dbget IPCSupport
-#dbget LONG64
-#dbget MACRev
-#dbget MPIAllStdin
-#dbget MPIGoodIO
-#dbget NO_LONG_LONG
-#dbget NEED_ALT_LARGE_FILE
-#dbget PACT_CC_FAMILY
-#dbget PACT_CC_VERSION
-#dbget PTHREAD_POSIX
-#dbget OSType
-#dbget SrcDir
-#dbget Sys
-#dbget TRACKERExe
+dbget Arch
+dbget BFD_Version
+dbget CC_Exe
+dbget CEFile
+dbget CPU
+dbget DEFAULT_SHELL
+dbget DP_Lib
+dbget DP_Inc
+dbget FC_ID_CASE
+dbget FC_ID_UNDERSCORE
+dbget FFIntPtrDiffer
+dbget FilterDir
+dbget FPU
+dbget GETSOCKOPT_TYPE
+dbget HAVE_BFD
+dbget HaveINLINE
+dbget HAVE_OPENMP
+dbget HAVE_OPENMPI
+dbget HAVE_SOCKETS_P
+dbget HaveTRACKER
+dbget HaveVACOPY
+dbget HaveVALIST
+dbget HostOS
+dbget HostOSRel
+dbget IncDir
+dbget IPCSupport
+dbget LONG64
+dbget MACRev
+dbget MPIAllStdin
+dbget MPIGoodIO
+dbget NO_LONG_LONG
+dbget NEED_ALT_LARGE_FILE
+dbget PACT_CC_FAMILY
+dbget PACT_CC_VERSION
+dbget PTHREAD_POSIX
+dbget OSType
+dbget Sys
+dbget TRACKERExe
 
 Separator $Log
 
