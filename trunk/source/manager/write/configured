@@ -10,21 +10,44 @@
 
 unalias *
 
-if (-f ../scripts/env-csh) then
-   set SrcDir = $cwd
-else if (-f ../../scripts/env-csh) then
-   set SrcDir = $cwd:h
-endif
-set ldir = $SrcDir:h/scripts
-set path = ( $ldir $path )
-source $ldir/env-csh
+# put these in shell variables since
+# prune-env will remove them as environment variables
+set Log    = $1
+set ScrDir = $2
+set lCfg   = $3
+
+eval `$ScrDir/prune-env pact`
+set path = ( $ScrDir $path )
+source $ScrDir/env-csh
+
+dbget IncDir
+dbget DbgOpt
+dbget USER
+dbget Host
+dbget HostOS
+dbget HAVE_JPEGLIB
+dbget HAVE_PNGLIB
+dbget UseTmpDir
+dbget FilterDir
+dbget WARN_PATTERN
+dbget ERR_PATTERN
+
+Separator $Log
+Note $Log "   IncDir       = $IncDir"
+Note $Log "   DbgOpt       = $DbgOpt"
+Note $Log "   USER         = $USER"
+Note $Log "   Host         = $Host"
+Note $Log "   HostOS       = $HostOS"
+Note $Log "   HAVE_JPEGLIB = $HAVE_JPEGLIB"
+Note $Log "   HAVE_PNGLIB  = $HAVE_PNGLIB"
+Note $Log "   UseTmpDir    = $UseTmpDir"
+Note $Log "   FilterDir    = $FilterDir"
+Note $Log "   WARN_PATTERN = $WARN_PATTERN"
+Note $Log "   ERR_PATTERN  = $ERR_PATTERN"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    set lCfg = $1
-
-    Separator $Log
     NoteD $Log "   Configuration record - configured"
 
     set STDOUT = $IncDir/configured

@@ -10,19 +10,31 @@
 
 unalias *
 
-if (-f ../scripts/env-csh) then
-   set SrcDir = $cwd
-else if (-f ../../scripts/env-csh) then
-   set SrcDir = $cwd:h
-endif
-set ldir = $SrcDir:h/scripts
-set path = ( $ldir $path )
-source $ldir/env-csh
+# put these in shell variables since
+# prune-env will remove them as environment variables
+set Log    = $1
+set ScrDir = $2
+
+eval `$ScrDir/prune-env -e PACTVer pact`
+set path = ( $ScrDir $path )
+source $ScrDir/env-csh
+
+dbget C_STD
+dbget GLIBC_VERSION
+dbget HostOS
+dbget IncDir
+dbget Sys
+
+Separator $Log
+Note $Log "   C_STD         = $C_STD"
+Note $Log "   GLIBC_VERSION = $GLIBC_VERSION"
+Note $Log "   HostOS        = $HostOS"
+Note $Log "   IncDir        = $IncDir"
+Note $Log "   Sys           = $Sys"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    Separator $Log
     NoteD $Log "   C Environment Configuration - iso-c.h"
 
     set STDOUT = $IncDir/iso-c.h

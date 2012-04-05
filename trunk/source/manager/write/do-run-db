@@ -8,23 +8,40 @@
 # include "cpyright.h"
 #
 
-if (-f ../scripts/env-csh) then
-   set SrcDir = $cwd
-else if (-f ../../scripts/env-csh) then
-   set SrcDir = $cwd:h
-endif
-set ldir = $SrcDir:h/scripts
-set path = ( $ldir $path )
-source $ldir/env-csh
+# put these in shell variables since
+# prune-env will remove them as environment variables
+set Log    = $1
+set ScrDir = $2
+
+eval `$ScrDir/prune-env -e ConfigDir pact`
+set path = ( $ScrDir $path )
+source $ScrDir/env-csh
 source $ScrDir/csh-subroutines
 HAVE_SUBROUTINES
+
+dbget DO_RUN_DBG
+dbget DO_RUN_MPI
+dbget DO_RUN_CROSS
+dbget IncDir
+
+# convert these to shell variables so they
+# do not get whacked by subroutine calls
+set ldbg = $DO_RUN_DBG
+set lmpi = $DO_RUN_MPI
+set lcrs = $DO_RUN_CROSS
+
+Separator $Log
+Note $Log "   ConfigDir     = $ConfigDir"
+Note $Log "   DO_RUN_DBG    = $ldbg"
+Note $Log "   DO_RUN_MPI    = $lmpi"
+Note $Log "   DO_RUN_CROSS  = $lcrs"
+Note $Log "   IncDir        = $IncDir"
 
 @ err = 0
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-Separator $Log
 NoteD $Log "   Do-run signature database - do-run-db"
 
 flog $Log set db = $IncDir/do-run-db
@@ -35,16 +52,16 @@ cat >&! $db << EOF
 
 EOF
 
-if ($?DO_RUN_DBG == 1) then
-   set ldbg = $DO_RUN_DBG
+if ($ldbg != none) then
+   set ldbg = $ldbg
    echo "default DBG $ldbg:r" >>& $db
 endif
-if ($?DO_RUN_MPI == 1) then
-   set lmpi = $DO_RUN_MPI
+if ($lmpi != none) then
+   set lmpi = $lmpi
    echo "default MPI $lmpi:r" >>& $db
 endif
-if ($?DO_RUN_CROSS == 1) then
-   set lcross = $DO_RUN_CROSS
+if ($lcrs != none) then
+   set lcross = $lcrs
    echo "default CROSS $lcross:r" >>& $db
 endif
 
@@ -58,20 +75,20 @@ end
 flog $Log ls -l $db
 
 set cnd = ""
-if ($?DO_RUN_DBG == 1) then
-   set cnd = ( $cnd $DO_RUN_DBG )
+if ($ldbg != none) then
+   set cnd = ( $cnd $ldbg )
 else
    set cnd = ( gdb tv vg vgd zf )
 endif
 
-if ($?DO_RUN_MPI == 1) then
-   set cnd = ( $cnd $DO_RUN_MPI )
+if ($lmpi != none) then
+   set cnd = ( $cnd $lmpi )
 else
    set cnd = ( $cnd poe srun dmpirun mpirun )
 endif
 
-if ($?DO_RUN_CROSS == 1) then
-   set cnd = ( $cnd $DO_RUN_CROSS )
+if ($lcrs != none) then
+   set cnd = ( $cnd $lcrs )
 else
    set cnd = ( $cnd submit )
 endif

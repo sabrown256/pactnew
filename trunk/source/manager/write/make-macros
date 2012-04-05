@@ -10,14 +10,41 @@
 
 unalias *
 
-if (-f ../scripts/env-csh) then
-   set SrcDir = $cwd
-else if (-f ../../scripts/env-csh) then
-   set SrcDir = $cwd:h
-endif
-set ldir = $SrcDir:h/scripts
-set path = ( $ldir $path )
-source $ldir/env-csh
+# put these in shell variables since
+# prune-env will remove them as environment variables
+set Log    = $1
+set ScrDir = $2
+
+eval `$ScrDir/prune-env pact`
+set path = ( $ScrDir $path )
+source $ScrDir/env-csh
+
+dbget Bits
+dbget BuildSharedLibs
+dbget BuildStrategy
+dbget FPU
+dbget HaveGNUFenv
+dbget IncDir
+dbget LibVers
+dbget NoExe
+dbget Ranlib_Exe
+dbget Sys
+dbget SYS_TYPE
+dbget UPDATE
+
+Separator $Log
+Note $Log "   Bits            = $Bits"
+Note $Log "   BuildSharedLibs = $BuildSharedLibs"
+Note $Log "   BuildStrategy   = $BuildStrategy"
+Note $Log "   FPU             = $FPU"
+Note $Log "   HaveGNUFenv     = $HaveGNUFenv"
+Note $Log "   IncDir          = $IncDir"
+Note $Log "   LibVers         = $LibVers"
+Note $Log "   NoExe           = $NoExe"
+Note $Log "   Ranlib_Exe      = $Ranlib_Exe"
+Note $Log "   Sys             = $Sys"
+Note $Log "   SYS_TYPE        = $SYS_TYPE"
+Note $Log "   UPDATE          = $UPDATE"
 
 set LibVers = 1
 
@@ -29,7 +56,6 @@ set LibVers = 1
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    Separator $Log
     NoteD $Log "   System Dependent MAKE Macros - make-macros"
 
     set STDOUT = $IncDir/make-macros

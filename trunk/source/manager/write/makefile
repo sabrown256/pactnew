@@ -10,19 +10,27 @@
 
 unalias *
 
-if (-f ../scripts/env-csh) then
-   set SrcDir = $cwd
-else if (-f ../../scripts/env-csh) then
-   set SrcDir = $cwd:h
-endif
-set ldir = $SrcDir:h/scripts
-set path = ( $ldir $path )
-source $ldir/env-csh
+# put these in shell variables since
+# prune-env will remove them as environment variables
+set Log    = $1
+set ScrDir = $2
+
+eval `$ScrDir/prune-env -e PACTVer pact`
+set path = ( $ScrDir $path )
+source $ScrDir/env-csh
+
+dbget BinDir
+dbget IncDir
+dbget Pck
+
+Separator $Log
+Note $Log "   BinDir  = $BinDir"
+Note $Log "   IncDir  = $IncDir"
+Note $Log "   Pck     = $Pck"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    Separator $Log
     NoteD $Log "   Distribution Makefile - Makefile"
 
     set STDOUT = $IncDir/Makefile

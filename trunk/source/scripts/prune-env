@@ -10,6 +10,10 @@
 
 unalias *
 
+set lbin = `dirname $0`
+set path = ( $lbin $path )
+unset lbin
+
 set noglob
 
 @ err = 0
