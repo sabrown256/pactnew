@@ -23,6 +23,8 @@ setenv PACT_FC_VERSION   ""
 
 C_STD = X99
 setenv TEST_ADVISORY     ""
+setenv PTHREAD_POSIX     FALSE
+setenv PTHREAD_OMP       FALSE
 
 # GOTCHA: this root may be different for CROSS_COMPILE
 # need script to figure out root includes for given compiler

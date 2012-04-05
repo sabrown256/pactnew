@@ -22,14 +22,14 @@ endif
 NoteD $ALog -n "   Hardware: "
 Note $ALog ""
 
-SafeEnv CPU           ""
-SafeEnv FPU           ""
+SafeEnv CPU           "unknown"
+SafeEnv FPU           "unknown"
 
 set HostOS    = `uname -s`
 set HostOSRel = `uname -r`
 set HostHW    = `uname -m`
 
-if ($CPU == "") then
+if ($CPU == "unknown") then
    setenv CPU "$HostHW"
    if ("$HostHW" =~ i*86) then
       setenv CPU  ia32
@@ -40,7 +40,7 @@ if ($CPU == "") then
    endif
 endif
 
-if ($FPU == "") then
+if ($FPU == "unknown") then
    if ("$HostHW" == "alpha") then
       setenv FPU  alpha
    else if ("$HostHW" =~ sun*) then
@@ -53,8 +53,6 @@ if ($FPU == "") then
       setenv FPU  x87
    else if ("$Arch" =~ osx-*-ppc) then
       setenv FPU  ppc
-   else
-      setenv FPU  unknown
    endif
 endif
 

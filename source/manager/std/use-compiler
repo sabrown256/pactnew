@@ -90,6 +90,16 @@ switch ($cname)
         set fname = ifort
         breaksw
 
+# OPEN64
+   case opencc*:
+        setenv PACT_CC_FAMILY   OPEN64
+        setenv PACT_FC_FAMILY   OPEN64
+        set opt   = ( -v )
+        set pat   = ( Open64 Compiler Suite: Version )
+        set prog  = ( '$0 ~ /'$pat'/ { print $NF } $0 ~ /Compile line:/ { print $3 }' )
+        set fname = openf90
+        breaksw
+
 # PATHSCALE
    case pathcc*:
         setenv PACT_CC_FAMILY   PATHSCALE

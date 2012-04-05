@@ -10,19 +10,31 @@
 
 unalias *
 
-if (-f ../scripts/env-csh) then
-   set lpkgdir = $cwd
-else if (-f ../../scripts/env-csh) then
-   set lpkgdir = $cwd:h
-endif
-set lscrdir = $lpkgdir:h/scripts
-set path    = ( $lscrdir $path )
-source $lscrdir/env-csh
+# put these in shell variables since
+# prune-env will remove them as environment variables
+set Log    = $1
+set ScrDir = $2
+
+eval `$ScrDir/prune-env pact`
+set path = ( $ScrDir $path )
+source $ScrDir/env-csh
+
+dbget BackSlash
+dbget BaseDir
+dbget IncDir
+dbget Sys
+dbget Yacc_Exe
+
+Separator $Log
+Note $Log "   BackSlash = $BackSlash"
+Note $Log "   BaseDir   = $BaseDir"
+Note $Log "   IncDir    = $IncDir"
+Note $Log "   Sys       = $Sys"
+Note $Log "   Yacc_Exe  = $Yacc_Exe"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    Separator $Log
     NoteD $Log "   Interpeter Syntax Mode Configuration - syntax.h"
 
     set STDOUT = $IncDir/syntax.h

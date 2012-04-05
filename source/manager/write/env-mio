@@ -10,16 +10,74 @@
 
 unalias *
 
-if (-f ../scripts/env-csh) then
-   set SrcDir = $cwd
-else if (-f ../../scripts/env-csh) then
-   set SrcDir = $cwd:h
-endif
-set ldir = $SrcDir:h/scripts
-set path = ( $ldir $path )
-source $ldir/env-csh
+# put these in shell variables since
+# prune-env will remove them as environment variables
+set Log    = $1
+set ScrDir = $2
+
+eval `$ScrDir/prune-env pact`
+set path = ( $ScrDir $path )
+source $ScrDir/env-csh
 source $ScrDir/csh-subroutines
 HAVE_SUBROUTINES
+
+dbget AR_Flags
+dbget AR_IFlag
+dbget Bits
+dbget CFE
+dbget Cfe_CC_Exe
+dbget Cfe_CC_Flags
+dbget Cfe_FC_Exe
+dbget Cfe_FC_Flags
+dbget CPU
+dbget CROSS_COMPILE
+dbget DAI_ROOT
+dbget DAS_ROOT
+dbget HAVE_READLINE
+dbget HOST_SERVER_DB
+dbget IncDir
+dbget InstBase
+dbget LD_Lib
+dbget LIB
+dbget LibM_Lib
+dbget MD_Pck
+dbget MDE_Lib
+dbget MDG_Lib
+dbget MDG_Pck
+dbget MDI_Pck
+dbget NUMA
+dbget OpenMP_SharedFnc
+dbget PACT_CC_FAMILY
+dbget PACT_CC_VERSION
+dbget PACT_CC_PATH
+dbget PACT_FC_FAMILY
+dbget PACT_FC_VERSION
+dbget PACT_FC_PATH
+dbget PFE
+dbget RPATH
+dbget RUN_SIGNATURE_DB
+dbget SITE_SIGNATURE_DB
+dbget Sys
+dbget SysDir
+dbget SYS_SITE
+dbget SYS_TYPE
+dbget UPDATE_SYS_DB
+
+set plst = ( `echo $MDG_Pck $MDI_Pck $MD_Pck | sed 's|\"||g'` )
+foreach p ( $plst )
+   set plib = ${p}_Lib
+   set pinc = ${p}_Inc
+   set ppth = ${p}_Path
+   set prpt = ${p}_RPath
+   dbget $plib
+   dbget $pinc
+   dbget $ppth
+   dbget $prpt
+end
+unset plib
+unset pinc
+unset ppth
+unset prpt
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
