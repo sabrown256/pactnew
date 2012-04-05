@@ -78,7 +78,12 @@ if (-d $gitd[1]) then
 # NOTE: if files list is too big shell will kill off before the commit
 # if you do not give files you must do git add to the files first
    echo -n "Local commit ...... "
-   echo "git commit $args -q -m '$msg' $files" >&! $log
+
+# GOTCHA: too many files and the echo hacks up a 'Word too long' hairball
+   if ($#files < 40) then
+      echo "git commit $args -q -m '$msg' $files" >&! $log
+   endif
+
    git commit $args -q -m "$msg" $files >>& $log
    set xstatus = $status
    if ($xstatus == 0) then

@@ -114,8 +114,8 @@ else
 endif
 flog $ALog setenv NM "$lNM"
 
-SafeEnv CPU  ""
-SafeEnv FPU  ""
+SafeEnv CPU  "unknown"
+SafeEnv FPU  "unknown"
 
 if ($HostOS == Linux) then
    set i = `uname -m`

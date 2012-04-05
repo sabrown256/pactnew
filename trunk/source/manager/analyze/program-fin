@@ -15,13 +15,14 @@ run write/make-def
 run write/make-macros
 run write/makefile
 run write/iso-c.h
-run write/scconfig.h
-run write/scdecls.h
-run write/syntax.h
+run write/scconfig.h $Log $ScrDir
+run write/scdecls.h $Log $ScrDir
+run write/syntax.h $Log $ScrDir
 
-run write/spokes.scm
+run write/spokes.scm $Log $ScrDir
 
-run write/env-mio
+run write/env-mio $Log $ScrDir
 
-run write/install-pact
-run write/smake
+run write/install-pact $Log $ScrDir
+run write/smake $Log $ScrDir
+

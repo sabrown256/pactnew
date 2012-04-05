@@ -146,7 +146,7 @@ set lConfigVars = ( $lConfigVars LD_Exe LD_Flags LD_Lib )
 # variable defaults
 
 setenv InstBase       none
-setenv FPU            ""
+setenv FPU            unknown
 setenv Globals        ""
 
 setenv PubInc  "-I$InstBase/include"

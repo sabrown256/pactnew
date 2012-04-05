@@ -10,19 +10,37 @@
 
 unalias *
 
-if (-f ../scripts/env-csh) then
-   set lpkgdir = $cwd
-else if (-f ../../scripts/env-csh) then
-   set lpkgdir = $cwd:h
-endif
-set lscrdir = $lpkgdir:h/scripts
-set path    = ( $lscrdir $path )
-source $lscrdir/env-csh
+# put these in shell variables since
+# prune-env will remove them as environment variables
+set Log    = $1
+set ScrDir = $2
+
+eval `$ScrDir/prune-env pact`
+set path = ( $ScrDir $path )
+source $ScrDir/env-csh
+
+dbget BaseDir
+dbget CFE
+dbget Cfe_CC_Flags
+dbget Cfe_LD_Flags
+dbget Cfe_LD_RPath
+dbget Cfe_CC_Exe
+dbget CfgDir
+dbget IncDir
+
+Separator $Log
+Note $Log "   BaseDir      = $BaseDir"
+Note $Log "   CFE          = $CFE"
+Note $Log "   Cfe_CC_Flags = $Cfe_CC_Flags"
+Note $Log "   Cfe_LD_Flags = $Cfe_LD_Flags"
+Note $Log "   Cfe_LD_RPath = $Cfe_LD_RPath"
+Note $Log "   Cfe_CC_Exe   = $Cfe_CC_Exe"
+Note $Log "   CfgDir       = $CfgDir"
+Note $Log "   IncDir       = $IncDir"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    Separator $Log
     NoteD $Log "   C Environment Configuration - scdecls.h"
 
     set STDOUT = $IncDir/scdecls.h
@@ -41,6 +59,7 @@ source $lscrdir/env-csh
     set opt = ""
     set opt = ( $opt $Cfe_CC_Flags )
     set opt = ( $opt $Cfe_LD_Flags $Cfe_LD_RPath )
+    set opt = ( `echo $opt | sed 's|\"||g'` )
 
     flog $Log mkdir $CfgDir
     flog $Log cd $CfgDir

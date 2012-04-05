@@ -15,15 +15,29 @@ set noglob
 @ err = 0
 set tgt = ""
 set pat = ""
+set db  = ""
+set exc = ( MANPATH PATH PERDB_PATH SYS_TYPE )
 
 while ($#argv > 0)
    switch ($1)
+      case -e:
+           shift
+           set exc = ( $exc $1 )
+           breaksw
       case -h:
            echo ""
-           echo "Usage: prune-env [-h] rules | pact | <pattern>"
+           echo "Usage: prune-env [-e <var>] [-h] rules | pact | <pattern>"
+           echo "       prune-env [-e <var>] [-h] -db <config-database>"
+           echo "   e    do not remove the specified variable"
+           echo "        this can be used many times"
            echo "   h    this help message"
            echo ""
            exit(1)
+      case -db:
+           shift
+           set db  = $1
+           set tgt = db
+           breaksw
       default:
            if ("$1" == rules) then
               set tgt = rules
@@ -77,15 +91,49 @@ switch ($tgt)
               if ($#line > 2) then
                  if ("$line[1]" == setenv) then
                     set var = $line[2]
-                    switch ($var)
-                       case MANPATH:
-                       case PATH:
-                       case SYS_TYPE:
-                            breaksw
-                       default:
-                            echo "unsetenv $line[2] ;"
-                            breaksw
-                    endsw
+                    set ok = TRUE
+                    foreach v ($exc)
+                       if ("$v" == "$var") then
+                          set ok = FALSE
+                          break
+                       endif
+                    end
+                    if ($ok == TRUE) then
+                       echo "unsetenv $var ;"
+                    endif
+                 endif
+              endif
+           end
+        endif
+        breaksw
+
+# remove config DB variables
+   case db:
+        if (!(-f "$db")) then
+           set sys = `cfgman use`
+           set db  = "../dev/$sys/include/cfg.db"
+        endif
+
+        if (-f $db) then
+           set noglob
+           @ nl = `cat $db | wc -l`
+           @ il = 0
+           while ($il < $nl)
+              @ il = $il + 1
+              set var = ( `head -n $il $db | tail -n 1 | sed 's|=.*$||'` )
+              if ($#var == 1) then
+                 set ok = TRUE
+                 foreach v ($exc)
+                    if ("$v" == "$var") then
+                       set ok = FALSE
+                       break
+                    endif
+                 end
+                 if ($ok == TRUE) then
+                    printenv $var >& /dev/null
+                    if ($status == 0) then
+                       echo "unsetenv $var ;"
+                    endif
                  endif
               endif
            end

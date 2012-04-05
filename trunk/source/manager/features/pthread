@@ -7,7 +7,7 @@
 # include "cpyright.h"
 #
 
-setenv PTHREAD_POSIX
+setenv PTHREAD_POSIX TRUE
 
 ThreadLibExt = _r
 

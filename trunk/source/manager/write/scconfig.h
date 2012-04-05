@@ -10,19 +10,60 @@
 
 unalias *
 
-if (-f ../scripts/env-csh) then
-   set SrcDir = $cwd
-else if (-f ../../scripts/env-csh) then
-   set SrcDir = $cwd:h
-endif
-set ldir = $SrcDir:h/scripts
-set path = ( $ldir $path )
-source $ldir/env-csh
+# put these in shell variables since
+# prune-env will remove them as environment variables
+set Log    = $1
+set ScrDir = $2
+
+#eval `$ScrDir/prune-env -e SrcDir pact`
+set path = ( $ScrDir $path )
+source $ScrDir/env-csh
+
+#dbget Arch
+#dbget BFD_Version
+#dbget CC_Exe
+#dbget CEFile
+#dbget CPU
+#dbget DEFAULT_SHELL
+#dbget DP_Lib
+#dbget DP_Inc
+#dbget FC_ID_CASE
+#dbget FC_ID_UNDERSCORE
+#dbget FFIntPtrDiffer
+#dbget FilterDir
+#dbget FPU
+#dbget GETSOCKOPT_TYPE
+#dbget HAVE_BFD
+#dbget HaveINLINE
+#dbget HAVE_OPENMP
+#dbget HAVE_OPENMPI
+#dbget HAVE_SOCKETS_P
+#dbget HaveTRACKER
+#dbget HaveVACOPY
+#dbget HaveVALIST
+#dbget HostOS
+#dbget HostOSRel
+#dbget IncDir
+#dbget IPCSupport
+#dbget LONG64
+#dbget MACRev
+#dbget MPIAllStdin
+#dbget MPIGoodIO
+#dbget NO_LONG_LONG
+#dbget NEED_ALT_LARGE_FILE
+#dbget PACT_CC_FAMILY
+#dbget PACT_CC_VERSION
+#dbget PTHREAD_POSIX
+#dbget OSType
+#dbget SrcDir
+#dbget Sys
+#dbget TRACKERExe
+
+Separator $Log
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    Separator $Log
     NoteD $Log "   C Environment Configuration - scconfig.h"
 
     set STDOUT = $IncDir/scconfig.h
@@ -49,29 +90,17 @@ source $ldir/env-csh
     set THE_DATE = `cat .pact-version`
     Note $STDOUT '#define PACT_VERSION        '$QUOTE$THE_DATE$QUOTE
 
-    if ($?CPU == 0) then
-       Note $STDOUT "#define CPU_TYPE            unknown"
-    else
-       Note $STDOUT "#define CPU_TYPE            $CPU"
-    endif
-    if ($?FPU == 0) then
-       Note $STDOUT "#define FPU_TYPE            unknown"
-    else
-       Note $STDOUT "#define FPU_TYPE            $FPU"
-    endif
+    Note $STDOUT "#define CPU_TYPE            $CPU"
+    Note $STDOUT "#define FPU_TYPE            $FPU"
     Note $STDOUT '#define SYSTEM_ID           '$QUOTE$Arch$QUOTE
     if ("$MACRev" != "") then
        Note $STDOUT "#define MACOSX_VERSION      $MACRev"
     endif
 
     Note $STDOUT '#define USE_COMPILER        '$QUOTE$CC_Exe$QUOTE
-    if ($?PACT_CC_FAMILY == 1) then
-       Note $STDOUT '#define COMPILER_'$PACT_CC_FAMILY
-       Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}$PACT_CC_VERSION${QUOTE}
-    else
-       Note $STDOUT '#define COMPILER_UNKNOWN
-       Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}unknown${QUOTE}
-    endif
+
+    Note $STDOUT '#define COMPILER_'$PACT_CC_FAMILY
+    Note $STDOUT '#define COMPILER_VERSION    '${QUOTE}$PACT_CC_VERSION${QUOTE}
 
     Note $STDOUT '#define DEFAULT_SHELL       '$QUOTE$DEFAULT_SHELL$QUOTE
 
@@ -163,6 +192,7 @@ source $ldir/env-csh
        endif
        shift lhave
        shift lhave
+       dbget $lvr
        set res = ( `printenv $lvr` )
        if ("$res" == "TRUE") then
           Note $STDOUT "#define $lvl"
@@ -199,8 +229,9 @@ source $ldir/env-csh
        flog $Log $RM $IncDir/noipc
        Note $STDOUT "#define HAVE_PROCESS_CONTROL"
        if ($HAVE_SOCKETS_P != "FALSE") then
+          set sty = ( `echo $GETSOCKOPT_TYPE | sed 's|\"||g'` )
           Note $STDOUT "#define HAVE_SOCKETS_P"
-          Note $STDOUT "typedef $GETSOCKOPT_TYPE SOCKOPT_T;"
+          Note $STDOUT "typedef $sty SOCKOPT_T;"
        endif
     else
        flog $Log touch $IncDir/noipc
@@ -214,16 +245,16 @@ source $ldir/env-csh
     Note $STDOUT ""
 
 # parallel defines
-    if ("$HAVE_OPENMP" == TRUE) then
+    if ($HAVE_OPENMP == TRUE) then
        Note $STDOUT "#define PTHREAD_OMP"
        Note $STDOUT "#define THREADING openmp"
 
-    else if ($?PTHREAD_POSIX == 1) then
+    else if ($PTHREAD_POSIX == TRUE) then
        Note $STDOUT "#define PTHREAD_POSIX"
        Note $STDOUT "#define THREADING pthread"
     endif
 
-    if ("$HAVE_OPENMPI" == TRUE) then
+    if ($HAVE_OPENMPI == TRUE) then
        Note $STDOUT "#define HAVE_OPENMPI"
     endif
 
@@ -270,22 +301,22 @@ source $ldir/env-csh
 
     Note $STDOUT "#undef $OSType"
     Note $STDOUT "#define $OSType"
-    if ($?HostOS == 1) then
-       set OSL = ( `cat $SrcDir/std/os | grep -v '#'` )
-       while ($#OSL > 2)
-          set sysn = $OSL[1]
-          set pctn = $OSL[2]
-          set incn = $OSL[3]
-          shift OSL
-          shift OSL
-          shift OSL
-          if ("$HostOS" == "$sysn") then
-             Note $STDOUT "#undef $pctn"
-             Note $STDOUT "#define $pctn"
-             Note $STDOUT '#include <'$incn'>'
-          endif
-       end
-    endif
+
+    set OSL = ( `cat $MngDir/std/os | grep -v '#'` )
+    while ($#OSL > 2)
+       set sysn = $OSL[1]
+       set pctn = $OSL[2]
+       set incn = $OSL[3]
+       shift OSL
+       shift OSL
+       shift OSL
+       if ("$HostOS" == "$sysn") then
+          Note $STDOUT "#undef $pctn"
+          Note $STDOUT "#define $pctn"
+          Note $STDOUT '#include <'$incn'>'
+       endif
+    end
+
     Note $STDOUT ""
 
     SafeSet HostArch $HostOSRel

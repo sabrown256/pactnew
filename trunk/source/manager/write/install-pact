@@ -10,19 +10,47 @@
 
 unalias *
 
-if (-f ../scripts/env-csh) then
-   set SrcDir = $cwd
-else if (-f ../../scripts/env-csh) then
-   set SrcDir = $cwd:h
-endif
-set ldir = $SrcDir:h/scripts
-set path = ( $ldir $path )
-source $ldir/env-csh
+# put these in shell variables since
+# prune-env will remove them as environment variables
+set Log    = $1
+set ScrDir = $2
+
+eval `$ScrDir/prune-env pact`
+set path = ( $ScrDir $path )
+source $ScrDir/env-csh
+
+dbget InstBase
+dbget UPDATE
+dbget BinDir
+dbget CfgMan
+dbget Arch
+dbget ScmDir
+dbget Man1Dir
+dbget Man3Dir
+dbget HavePython
+dbget PyVers
+dbget PyDirPy
+dbget PyDirDst
+dbget PyDirSrc
+
+Separator $Log
+Note $Log "   InstBase   = |$InstBase|"
+Note $Log "   UPDATE     = |$UPDATE|"
+Note $Log "   BinDir     = |$BinDir|"
+Note $Log "   CfgMan     = |$CfgMan|"
+Note $Log "   Arch       = |$Arch|"
+Note $Log "   ScmDir     = |$ScmDir|"
+Note $Log "   Man1Dir    = |$Man1Dir|"
+Note $Log "   Man3Dir    = |$Man3Dir|"
+Note $Log "   HavePython = |$HavePython|"
+Note $Log "   PyVers     = |$PyVers|"
+Note $Log "   PyDirPy    = |$PyDirPy|"
+Note $Log "   PyDirDst   = |$PyDirDst|"
+Note $Log "   PyDirSrc   = |$PyDirSrc|"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    Separator $Log
     NoteD $Log "   PACT Installer Script - install-pact"
     Note $Log "Installation base: |$InstBase|"
 
@@ -64,6 +92,8 @@ source $ldir/env-csh
        Note $STDOUT 'set Man3Dir   = $InstDir/'$Man3Dir
        Note $STDOUT ""
 
+# GOTCHA: fix up for pya and python
+# pya is currently the only that can successfully install
        if ($HavePython == TRUE) then
           Note $STDOUT "set PyVers    = $PyVers"
           Note $STDOUT "set PyDirPy   = $PyDirPy"       # python destination

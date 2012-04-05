@@ -1281,8 +1281,8 @@ static void setup_analyze_env(client *cl, char *base)
     dbinitv(cl, "LD_RPath",  "");
     dbinitv(cl, "LD_Flags",  "");
 
-    dbinitv(cl, "CPU",       "");
-    dbinitv(cl, "FPU",       "");
+    dbinitv(cl, "CPU",       "unknown");
+    dbinitv(cl, "FPU",       "unknown");
     dbinitv(cl, "BE",        "");
 
 /* parallel front end */
