@@ -640,6 +640,9 @@ static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype,
         PD_convert(&out, &in, intype, outtype, ni,
                    file->host_std, file->std, file->host_std,
                    file->host_chart, file->chart, 0, PD_WRITE);
+
+	bf = _PD_filt_block_out(file, bf, bpi, ni);
+
         niw = lio_write(bf, (size_t) bpi, (size_t) ni, fp);
         CFREE(bf);}
     else
@@ -1426,8 +1429,10 @@ static void _PD_rd_leaf_members(PDBfile *file, char *vr, inti ni,
 	   memset(bf, 0, nb);
 
         nir = lio_read(bf, (size_t) bpi, (size_t) nia, fp);
+
         if (nir == nia)
-           {in  = bf;
+	   {bf  = _PD_filt_block_in(file, bf, bpi, nia);
+	    in  = bf;
             out = vr;
             PD_convert(&out, &in, intype, outtype, ni,
                        file->std, file->host_std, file->host_std,
@@ -1439,8 +1444,14 @@ static void _PD_rd_leaf_members(PDBfile *file, char *vr, inti ni,
             PD_error("FILE READ FAILED - _PD_RD_LEAF_MEMBERS", PD_READ);};}
 
     else
+
+/* GOTCHA: have to treat this like the conversion above and allocate
+ * a temporary buffer
+ */
        {nir = lio_read(vr, (size_t) bpi, (size_t) ni, fp);
-        if (nir != ni)
+        if (nir == ni)
+	   {bf = _PD_filt_block_in(file, vr, bpi, ni);}
+	else
            PD_error("DATA READ FAILED - _PD_RD_LEAF_MEMBERS", PD_READ);};
 
     return;}

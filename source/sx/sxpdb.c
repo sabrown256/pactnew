@@ -3369,36 +3369,6 @@ static object *_SXI_set_track_pointers(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SXI_SET_ACTIVATE_CHECKSUM - set the file->use_cksum */
-
-static object *_SXI_set_activate_checksum(SS_psides *si, object *argl)
-   {int rv;
-    PD_checksum_mode v;
-    PDBfile *file;
-    g_file *po;
-    object *ov;
-
-    po = NULL;
-    v  = PD_MD5_OFF;
-    SS_args(si, argl,
-            G_FILE, &po,
-            SC_ENUM_I, &v,
-            0);
-
-    if (po == NULL)
-       file = SX_gs.vif;
-    else
-       file = FILE_FILE(PDBfile, po);
-
-    rv = PD_activate_cksum(file, v);
-
-    ov = SS_mk_integer(si, rv);
-
-    return(ov);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _SX_SET_USER_FORMAT - set the SCORE user formats entries I to FORMAT
  *                     - return a string object naming the format
  *                     - for that type
@@ -4097,11 +4067,6 @@ void SX_install_pdb_funcs(SS_psides *si)
                "Set the track_pointers flag for a PDB file",
                SS_nargs, 
                _SXI_set_track_pointers, SS_PR_PROC);
-
-    SS_install(si, "set-activate-checksum!",
-               "Set the checksum flag for a PDB file",
-               SS_nargs, 
-               _SXI_set_activate_checksum, SS_PR_PROC);
 
     SS_install(si, "sizeof",
                "Return the size in bytes of the specified type\nUsage: (sizeof <type> [<file> [1]])",
