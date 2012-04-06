@@ -1382,7 +1382,7 @@ int64_t _PD_close(PDBfile *file)
     ret = FALSE;
 
     if (file != NULL)
-       {ret = _PD_csum_close(file);
+       {ret = _PD_cksum_close(file);
 
 /* position the file pointer at the greater of the current position and
  * the location of the chart

@@ -283,13 +283,13 @@ extern void
  _PD_block_set_desc(int64_t addr, inti ni, SC_array *bl, inti n);
 
 extern int
- _PD_block_get_csum(SC_array *bl, inti n, unsigned char *dig),
- _PD_block_set_csum(SC_array *bl, inti n, unsigned char *dig),
+ _PD_block_get_cksum(SC_array *bl, inti n, unsigned char *dig),
+ _PD_block_set_cksum(SC_array *bl, inti n, unsigned char *dig),
  _PD_block_set_valid(SC_array *bl, inti n, PD_block_type vl),
  _PD_block_add(PDBfile *file, syment *ep, dimdes *dims, int64_t addr),
  _PD_block_define(PDBfile *file),
- _PD_block_csum_write(PDBfile *file, syment *ep, char *name),
- _PD_block_csum_read(PDBfile *file);
+ _PD_block_cksum_write(PDBfile *file, syment *ep, char *name),
+ _PD_block_cksum_read(PDBfile *file);
 
 extern inti
  _PD_effective_addr(int64_t *paddr, inti *pni,
@@ -407,14 +407,14 @@ extern void
  _PD_md5_checksum(PDBfile* file, unsigned char digest[PD_CKSUM_LEN]);
 
 extern int
- _PD_csum_close(PDBfile *file),
- _PD_csum_var_read(PDBfile *file, char *fullpath, char *type,
+ _PD_cksum_close(PDBfile *file),
+ _PD_cksum_var_read(PDBfile *file, char *fullpath, char *type,
 		   syment *ep, void *vr),
- _PD_csum_var_write(PDBfile *file, char *name, syment *ef),
- _PD_csum_block_read(PDBfile *file, char *name, syment *ep, long n),
- _PD_csum_block_write(PDBfile *file, syment *ep, long n),
- _PD_csum_reserve(PDBfile *file),
- _PD_csum_file_write(PDBfile *file);
+ _PD_cksum_var_write(PDBfile *file, char *name, syment *ef),
+ _PD_cksum_block_read(PDBfile *file, char *name, syment *ep, long n),
+ _PD_cksum_block_write(PDBfile *file, syment *ep, long n),
+ _PD_cksum_reserve(PDBfile *file),
+ _PD_cksum_file_write(PDBfile *file);
 
 extern int64_t
  _PD_locate_checksum(PDBfile* file);

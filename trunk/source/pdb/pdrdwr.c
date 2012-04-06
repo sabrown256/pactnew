@@ -1142,7 +1142,7 @@ int _PD_hyper_write(PDBfile *file, char *name, syment *ep,
 	else
 	   {rv  = _PD_sys_write(file, name, vr, PD_entry_number(ep),
 				intype, PD_entry_type(ep));
-	    rv *= _PD_csum_block_write(file, ep, 0);};}
+	    rv *= _PD_cksum_block_write(file, ep, 0);};}
 
     else
        {if (_PD_indirection(PD_entry_type(ep)))
@@ -1242,7 +1242,7 @@ static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
 		_PD_block_set_desc(eaddr, niw, bl, 0);
 		ep->number = niw;
 
-		if (_PD_csum_block_read(file, name, epo, n) == FALSE)
+		if (_PD_cksum_block_read(file, name, epo, n) == FALSE)
 		   nr = 0;
 		else
 		   nr = _PD_sys_read(file, ep, outtype, out);
@@ -1259,7 +1259,7 @@ static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
 	        {eaddr = addr;
 		 n = _PD_effective_addr(&eaddr, &nb, fbpi, blo);
 		 _PD_block_set_address(bl, 0, eaddr);
-		 if (_PD_csum_block_read(file, name, epo, n) == FALSE)
+		 if (_PD_cksum_block_read(file, name, epo, n) == FALSE)
 		    nr = 0;
 		 else
 		    nr = _PD_sys_read(file, ep, outtype, out);
@@ -1541,7 +1541,7 @@ int _PD_hyper_read(PDBfile *file, char *name, char *outtype,
  */
     dep = PD_inquire_entry(file, name, FALSE, NULL);
     if (dep != NULL)
-       {if (_PD_csum_block_read(file, name, ep, -1) == FALSE)
+       {if (_PD_cksum_block_read(file, name, ep, -1) == FALSE)
 	   nrd = 0;
 	else
 	   nrd = _PD_sys_read(file, ep, outtype, vr);}
@@ -1551,7 +1551,7 @@ int _PD_hyper_read(PDBfile *file, char *name, char *outtype,
 	strcpy(s, name);
 	c = SC_LAST_CHAR(s);
 	if (((c != ')') && (c != ']')) || (dims == NULL))
-	   {if (_PD_csum_block_read(file, name, ep, 0) == FALSE)
+	   {if (_PD_cksum_block_read(file, name, ep, 0) == FALSE)
 	       nrd = 0;
 	    else
 	       nrd = _PD_sys_read(file, ep, outtype, vr);}

@@ -696,7 +696,7 @@ int _PD_rd_ext_ii(PDBfile *file)
 	   _PD_rd_blocks_ii(file);
 
         else if (strcmp(token, "Checksums") == 0)
-	   _PD_block_csum_read(file);
+	   _PD_block_cksum_read(file);
 
 /* read in the primitives */
         else if (strcmp(token, "Primitive-Types") == 0)
@@ -1047,11 +1047,11 @@ static int _PD_wr_blocks_ii(PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_WR_CSUM_II - write out the checksums for blocks of
- *                - all variables in FILE
+/* _PD_WR_CKSUM_II - write out the checksums for blocks of
+ *                 - all variables in FILE
  */
 
-static int _PD_wr_csum_ii(PDBfile *file)
+static int _PD_wr_cksum_ii(PDBfile *file)
    {int ok;
     long i;
     char *nm;
@@ -1063,7 +1063,7 @@ static int _PD_wr_csum_ii(PDBfile *file)
        {ok &= _PD_put_string(1, "Checksums:\n");
 
 	for (i = 0; SC_hasharr_next(file->symtab, &i, &nm, NULL, (void **) &ep); i++)
-	    _PD_block_csum_write(file, ep, nm);
+	    _PD_block_cksum_write(file, ep, nm);
 
 	ok &= _PD_put_string(1, "\n");};
 
@@ -1210,10 +1210,10 @@ static int _PD_wr_ext_ii(PDBfile *file, FILE *out)
  * or else the read may improperly reconstruct the dimensions
  */
     ok &= _PD_wr_blocks_ii(file);
-    ok &= _PD_wr_csum_ii(file);
+    ok &= _PD_wr_cksum_ii(file);
 
 /* NOTE: this MUST be the last extra in the file !!! */
-    ok &= _PD_csum_reserve(file);
+    ok &= _PD_cksum_reserve(file);
 
 /* pad the end of the file with some newlines to smooth over the
  * end of binary file problems on different (ie CRAY) systems
@@ -1588,7 +1588,7 @@ static int _PD_flush_ii(PDBfile *file)
 /* WARNING: no more writes to the file before the space
  * reserved for the checksum from here on out
  */
-	ok = _PD_csum_file_write(file);};
+	ok = _PD_cksum_file_write(file);};
 
     return(TRUE);}
 
