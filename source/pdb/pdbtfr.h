@@ -6,6 +6,9 @@
  *
  */
 
+#ifndef PDB_TEST_FRAME
+#define PDB_TEST_FRAME
+
 #include "cpyright.h"
 
 #include "pdb.h"
@@ -22,6 +25,9 @@ struct tframe_s
     int64_t mema[2];  /* mem stats after - alloc and free */
     char msg[MAXLINE];
     double time;};
+
+int
+ read_only = FALSE;
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -135,3 +141,5 @@ static void post_test(tframe *tf, int n)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+#endif

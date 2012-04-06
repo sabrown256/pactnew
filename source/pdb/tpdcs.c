@@ -40,8 +40,7 @@ static teststruct
 
 static int
  debug_mode = FALSE,
- native_only = FALSE,
- read_only  = FALSE;
+ native_only = FALSE;
 
 int
  ia_w0[5],

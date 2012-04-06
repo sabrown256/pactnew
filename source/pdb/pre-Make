@@ -41,7 +41,7 @@ RemoveFiles = ${BinDir}/tpdb  ${BinDir}/tpda   ${BinDir}/tpdas      \
               ${BinDir}/tpdls ${BinDir}/tpdnrm ${BinDir}/tpdcs      \
               ${BinDir}/tpdn  ${BinDir}/tpdsmp ${BinDir}/tpddp      \
               ${BinDir}/tpdrc ${BinDir}/tpdtd  ${BinDir}/tpdds      \
-              ${BinDir}/tpdxrd ${BinDir}/tpdxn                      \
+              ${BinDir}/tpdf  ${BinDir}/tpdxrd ${BinDir}/tpdxn      \
               ${BinDir}/pdtime ${BinDir}/pdb2hdf                    \
               ${BinDir}/exambin ${BinDir}/exam
 
@@ -147,7 +147,7 @@ Cstd : ${BinDir}/tpdb  ${BinDir}/tpdn  ${BinDir}/tpda  ${BinDir}/tpdas  \
        ${BinDir}/tpdop ${BinDir}/tpdgs ${BinDir}/tpdls ${BinDir}/tpdnrm \
        ${BinDir}/tpdrc ${BinDir}/tpdtd ${BinDir}/tpdcs ${BinDir}/tpdap  \
        ${BinDir}/tpdfr ${BinDir}/tpdbf ${BinDir}/tpdfd ${BinDir}/tpdfc  \
-       ${BinDir}/tpdc  ${BinDir}/tpdp  ${BinDir}/tpdds \
+       ${BinDir}/tpdc  ${BinDir}/tpdf  ${BinDir}/tpdp  ${BinDir}/tpdds  \
        ${DepLib}
 Apps : ${BinDir}/pdb2hdf
 
@@ -159,6 +159,9 @@ ${BinDir}/tpdb : tpdb.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 
 ${BinDir}/tpdc : tpdc.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 	${CLD} ${LdFlags} tpdc.c -o ${BinDir}/tpdc ${Libs}
+
+${BinDir}/tpdf : tpdf.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
+	${CLD} ${LdFlags} tpdf.c -o ${BinDir}/tpdf ${Libs}
 
 ${BinDir}/tpdp : tpdp.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 	${CLD} ${LdFlags} tpdp.c -o ${BinDir}/tpdp ${Libs}
