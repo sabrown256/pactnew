@@ -26,8 +26,7 @@ extern long _PD_lookup_size(char *s, hasharr *tab);
 
 static int
  debug_mode  = FALSE,
- native_only = FALSE,
- read_only   = FALSE;
+ native_only = FALSE;
 
 static bool
  bs_w,

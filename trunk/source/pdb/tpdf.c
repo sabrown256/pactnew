@@ -1,5 +1,5 @@
 /*
- * TPDB.C - test for the PDB I/O
+ * TPDF.C - test PDB filter chains
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942
@@ -17,66 +17,6 @@ typedef int (*PFTest)(char *base, char *tgt, int n);
 static int
  debug_mode  = FALSE,
  native_only = FALSE;
-
-/*--------------------------------------------------------------------------*/
-
-/*                            TEST #0 ROUTINES                              */
-
-/*--------------------------------------------------------------------------*/
-
-/* TEST_0 - test PDB calculation of type and struct sizes */
-
-#include "tpdcore0.c"
-
-int test_0(char *base, char *tgt, int n)
-   {int err;
-    char datfile[MAXLINE], fname[MAXLINE];
-    PDBfile *strm;
-    FILE *fp;
-
-/* target the file as asked */
-    test_target(tgt, base, n, fname, datfile);
-
-    fp = io_open(fname, "w");
-
-/* create the named file */
-    strm = PD_create(datfile);
-    if (strm == NULL)
-       error(1, fp, "Test couldn't create file %s\r\n", datfile);
-
-    PRINT(fp, "File %s created\n", datfile);
-
-/* make a few defstructs */
-    PD_defstr(strm, "fr0",
-              "float x_min",
-              "float x_max",
-              "float y_min",
-              "float y_max",
-              LAST);
-
-    PD_defstr(strm, "plot0",
-              "float x_axis(10)",
-              "float y_axis(10)",
-              "integer npts", 
-              "char * label",
-              "fr0 view",
-               LAST);
-
-/* compare the original data with that read in */
-    err = compare_test_0_data(strm, fp);
-
-/* print it out to STDOUT */
-    print_test_0_data(strm, fp);
-
-/* close the file */
-    if (PD_close(strm) == FALSE)
-       error(1, fp, "Test couldn't close file %s\r\n", datfile);
-
-    PRINT(fp, "File %s closed\n", datfile);
-
-    io_close(fp);
-
-    return(err);}
 
 /*--------------------------------------------------------------------------*/
 
@@ -830,8 +770,8 @@ static int run_test(PFTest test, int n, char *host, int native)
 static void print_help(void)
    {
 
-    PRINT(STDOUT, "\nTPDB - run basic PDB test suite\n\n");
-    PRINT(STDOUT, "Usage: tpdb [-b #] [-c] [-d] [-h] [-n] [-r] [-v #] [-0] [-1] [-2] [-3] [-4] [-5] [-6] [-7] [-8] [-9] [-10]\n");
+    PRINT(STDOUT, "\nTPDF - run basic PDB test suite\n\n");
+    PRINT(STDOUT, "Usage: tpdf [-b #] [-c] [-d] [-h] [-n] [-r] [-v #] [-1] [-2] [-3] [-4] [-5] [-6] [-7] [-8]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       b  - set buffer size (default no buffering)\n");
     PRINT(STDOUT, "       c  - verify low level writes\n");
@@ -840,7 +780,6 @@ static void print_help(void)
     PRINT(STDOUT, "       n  - run native mode test only\n");
     PRINT(STDOUT, "       r  - read only (assuming files from other run exist)\n");
     PRINT(STDOUT, "       v  - use format version # (default is 2)\n");
-    PRINT(STDOUT, "       0  - do NOT run test #0\n");
     PRINT(STDOUT, "       1  - do NOT run test #1\n");
     PRINT(STDOUT, "       2  - do NOT run test #2\n");
     PRINT(STDOUT, "       3  - do NOT run test #3\n");
@@ -849,8 +788,6 @@ static void print_help(void)
     PRINT(STDOUT, "       6  - do NOT run test #6\n");
     PRINT(STDOUT, "       7  - do NOT run test #7\n");
     PRINT(STDOUT, "       8  - do NOT run test #8\n");
-    PRINT(STDOUT, "       9  - do NOT run test #9\n");
-    PRINT(STDOUT, "       10 - do NOT run test #10\n");
     PRINT(STDOUT, "\n");
 
     return;}
@@ -862,9 +799,9 @@ static void print_help(void)
 
 int main(int c, char **v)
    {int i, err;
-    int test_zero, test_one, test_two, test_three;
+    int test_one, test_two, test_three;
     int test_four, test_five, test_six, test_seven;
-    int test_eight, test_nine, test_ten;
+    int test_eight;
     int use_mapped_files, check_writes;
     int64_t bfsz;
 
@@ -880,7 +817,6 @@ int main(int c, char **v)
     native_only      = FALSE;
     read_only        = FALSE;
     use_mapped_files = FALSE;
-    test_zero        = TRUE;
     test_one         = TRUE;
     test_two         = TRUE;
     test_three       = TRUE;
@@ -889,8 +825,6 @@ int main(int c, char **v)
     test_six         = TRUE;
     test_seven       = TRUE;
     test_eight       = TRUE;
-    test_nine        = TRUE;
-    test_ten         = TRUE;
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')
             {switch (v[i][1])
@@ -919,14 +853,8 @@ int main(int c, char **v)
                  case 'v' :
                       PD_set_fmt_version(SC_stoi(v[++i]));
 		      break;
-                 case '0' :
-		      test_zero = FALSE;
-		      break;
                  case '1' :
-		      if (v[i][2] == '0')
-			 test_ten = FALSE;
-		      else
-			 test_one = FALSE;
+		      test_one = FALSE;
 		      break;
                  case '2' :
 		      test_two = FALSE;
@@ -948,9 +876,6 @@ int main(int c, char **v)
 		      break;
                  case '8' :
 		      test_eight = FALSE;
-		      break;
-                 case '9' :
-		      test_nine = FALSE;
 		      break;};}
          else
             break;};
@@ -990,10 +915,6 @@ int main(int c, char **v)
        err += run_test(test_7, 7, DATFILE, native_only);
     if (test_eight)
        err += run_test(test_8, 8, DATFILE, native_only);
-    if (test_nine)
-       err += run_test(test_9, 9, DATFILE, native_only);
-    if (test_ten)
-       err += run_test(test_10, 10, DATFILE, native_only);
 
     PRINT(STDOUT, "\n");
 

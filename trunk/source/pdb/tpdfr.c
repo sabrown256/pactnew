@@ -34,8 +34,7 @@ static lev1
  *tar_w;
 
 static int
- write_only  = FALSE,
- read_only   = FALSE;
+ write_only  = FALSE;
 
 /* variables for partial and member reads in test #2 */
 
