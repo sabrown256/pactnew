@@ -446,6 +446,18 @@ extern FIXNUM
 	       void *space, FIXNUM nd, FIXNUM *dims);
 
 
+/* PDFLT.C declarations */
+
+extern char
+ *_PD_filt_block_out(PDBfile *file, char *bf, long bpi, int64_t ni),
+ *_PD_filt_block_in(PDBfile *file, char *bf, long bpi, int64_t ni);
+
+extern int
+ _PD_filt_file_out(PDBfile *file),
+ _PD_filt_file_in(PDBfile *file),
+ _PD_filt_close(PDBfile *file);
+
+
 /* PDFMT.C declarations */
 
 extern void

@@ -1,5 +1,5 @@
 TXT: PDBLib User's Manual
-MOD: 03/22/2012
+MOD: 04/05/2012
 
 <CENTER>
 <P>
@@ -9926,7 +9926,7 @@ File example:
 <pre>
 <i>C Binding: </i>  int PD_activate_cksum(PDBfile *file, int flag)
 <i>Fortran Binding: </i>integer PFSCSM(integer fileid, int flag)
-<i>SX Binding: </i> (set-activate-checksum! file flag)
+<i>SX Binding: </i> (pd-activate-cksum file flag)
 <i>Python Binding: </i> XXX - missing
 </pre>
 <p>

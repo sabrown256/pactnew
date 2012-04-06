@@ -248,6 +248,8 @@ typedef struct s_memdes memdes;
 typedef struct s_symindir symindir;
 typedef struct s_syment syment;
 typedef struct s_defstr defstr;
+typedef struct s_fltwdes fltwdes;
+typedef struct s_fltbdes fltbdes;
 typedef struct s_sys_layer sys_layer;
 typedef struct s_tr_layer tr_layer;
 typedef struct s_PD_itag PD_itag;
@@ -258,6 +260,11 @@ typedef struct s_PD_address PD_address;
 typedef struct s_PD_image PD_image;
 typedef struct s_PD_pfm_fnc PD_pfm_fnc;
 typedef struct s_PD_scope_public PD_scope_public;
+
+typedef int (*PFifltwdes)(fltwdes *fl, PDBfile *file);
+typedef char *(*PFifltbdes)(fltbdes *fl, PDBfile *file,
+			    char *bf, long bpi, int64_t ni);
+
 typedef memdes *(*PFPDBwrite)(PDBfile *file, char *vr, defstr *defp);
 typedef memdes *(*PFPDBread)(memdes *members);
 
@@ -542,6 +549,8 @@ struct s_PDBfile
 
     void *meta;                       /* container for metadata in the tr layer */
     io_request req;
+    fltbdes *filter_block;
+    fltwdes *filter_file;
     
     int (*symatch)(PDBfile *file, int ad, char *name, char *type,
 		   char *acc, char *rej);
@@ -709,6 +718,22 @@ struct s_dimind
     long start;
     long stop;
     long step;};
+
+/* FLTBDES - block filter descriptor */
+
+struct s_fltbdes
+   {void *data;
+    PFifltbdes in;
+    PFifltbdes out;
+    fltbdes *next;};
+
+/* FLTWDES - whole file filter descriptor */
+
+struct s_fltwdes
+   {void *data;
+    PFifltwdes in;
+    PFifltwdes out;
+    fltwdes *next;};
 
 struct s_attribute
    {char *name;
@@ -1152,6 +1177,14 @@ extern FIXNUM
  _PD_read_aux(PDBfile *file, char *name, char *type, void *vr,
 	      FIXNUM *ind);
 
+
+/* PDFLT.C declarations */
+
+extern int
+ PD_filt_register_block(PDBfile *file, PFifltbdes fi, PFifltbdes fo,
+			void *data),
+ PD_filt_register_file(PDBfile *file, PFifltwdes fi, PFifltwdes fo,
+		       void *data);
 
 /* PDFMT.C declarations */
 
