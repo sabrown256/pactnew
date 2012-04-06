@@ -935,7 +935,7 @@ syment *_PD_write(PDBfile *file, char *name, char *intype, char *outtype,
 
     *pnew = new;
 
-    ok = _PD_csum_var_write(file, lname, ep);
+    ok = _PD_cksum_var_write(file, lname, ep);
     SC_ASSERT(ok == TRUE);
   
     return(ep);}

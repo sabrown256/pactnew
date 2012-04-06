@@ -723,7 +723,7 @@ static int _PD_rd_ext_iii(PDBfile *file)
 	   _PD_rd_blocks_iii(file);
 
         else if (strcmp(token, "Checksums") == 0)
-	   _PD_block_csum_read(file);
+	   _PD_block_cksum_read(file);
 
         else if (strcmp(token, "DynamicSpaces") == 0)
            {token = SC_strtok(NULL, "\n", p);
@@ -1036,11 +1036,11 @@ static int _PD_wr_blocks_iii(PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_WR_CSUM_III - write out the checksums for blocks of
- *                 - all variables in FILE
+/* _PD_WR_CKSUM_III - write out the checksums for blocks of
+ *                  - all variables in FILE
  */
 
-static int _PD_wr_csum_iii(PDBfile *file)
+static int _PD_wr_cksum_iii(PDBfile *file)
    {int ok;
     long i;
     char *nm;
@@ -1052,7 +1052,7 @@ static int _PD_wr_csum_iii(PDBfile *file)
        {ok &= _PD_put_string(1, "Checksums:\n");
 
 	for (i = 0; SC_hasharr_next(file->symtab, &i, &nm, NULL, (void **) &ep); i++)
-	    _PD_block_csum_write(file, ep, nm);
+	    _PD_block_cksum_write(file, ep, nm);
 
 	ok &= _PD_put_string(1, "\n");};
 
@@ -1150,7 +1150,7 @@ static int64_t _PD_wr_symt_iii(PDBfile *file)
  * or else the read may improperly reconstruct the dimensions
  */
     ok &= _PD_wr_blocks_iii(file);
-    ok &= _PD_wr_csum_iii(file);
+    ok &= _PD_wr_cksum_iii(file);
 
     return(addr);}
 
@@ -1205,7 +1205,7 @@ static int _PD_wr_ext_iii(PDBfile *file, FILE *out)
 			 file->system_version, file->date);
 
 /* NOTE: this MUST be the last extra in the file !!! */
-    ok &= _PD_csum_reserve(file);
+    ok &= _PD_cksum_reserve(file);
 
 /* pad the end of the file with some newlines to smooth over the
  * end of binary file problems on different (ie CRAY) systems
@@ -1461,7 +1461,7 @@ static int _PD_flush_iii(PDBfile *file)
 /* WARNING: no more writes to the file before the space
  * reserved for the checksum from here on out
  */
-	ok = _PD_csum_file_write(file);
+	ok = _PD_cksum_file_write(file);
 
 /* write out the chart, symtab addresses, and format version */
 	lio_printf(fp, "StructureChartAddress: %lld\n", (int64_t) file->chrtaddr);

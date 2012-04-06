@@ -20,9 +20,9 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_CSUM_COMPARE - compare checksums DA and DB */
+/* _PD_CKSUM_COMPARE - compare checksums DA and DB */
 
-static int _PD_csum_compare(unsigned char *da, unsigned char *db)
+static int _PD_cksum_compare(unsigned char *da, unsigned char *db)
    {int i, rv;
 
     rv = TRUE;
@@ -37,11 +37,11 @@ static int _PD_csum_compare(unsigned char *da, unsigned char *db)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_CSUM_CLOSE - handle checksum related chores on close
- *                - return TRUE if successful and FALSE otherwise
+/* _PD_CKSUM_CLOSE - handle checksum related chores on close
+ *                 - return TRUE if successful and FALSE otherwise
  */
 
-int _PD_csum_close(PDBfile *file)
+int _PD_cksum_close(PDBfile *file)
    {int ok, ret;
 
     ret = TRUE;
@@ -63,11 +63,11 @@ int _PD_csum_close(PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_CSUM_VAR_READ - handle checksum chores on variable read
- *                   - return the number of item successfully read
+/* _PD_CKSUM_VAR_READ - handle checksum chores on variable read
+ *                    - return the number of item successfully read
  */ 
  
-int _PD_csum_var_read(PDBfile *file, char *name, char *type,
+int _PD_cksum_var_read(PDBfile *file, char *name, char *type,
 		      syment *ep, void *vr)
    {int rv, ok;
     inti ni, len;
@@ -92,7 +92,7 @@ int _PD_csum_var_read(PDBfile *file, char *name, char *type,
         
 /* make sure &md5 var has been created */
 	    if (PD_query_entry(file, path, NULL) == NULL)
-	       PD_error("NO MD5 CHECKSUM AVAILABLE FOR THIS VARIABLE - _PD_CSUM_VAR_READ",
+	       PD_error("NO MD5 CHECKSUM AVAILABLE FOR THIS VARIABLE - _PD_CKSUM_VAR_READ",
 			PD_READ);}
         else
            {ni  = _PD_comp_num(ep->dimensions);
@@ -108,12 +108,12 @@ int _PD_csum_var_read(PDBfile *file, char *name, char *type,
             CFREE(path);
         
 /* return -1 and set PD_error if MD5 mismatch */
-	    ok = _PD_csum_compare(cdig, rdig);
+	    ok = _PD_cksum_compare(cdig, rdig);
 	    if (ok == FALSE)
 	       {rv = -1;
 
 /* NOTE: this must be treated as generic because of the PD_read above */
-		PD_error("MD5 CHECKSUM OF VARIABLE FAILED - _PD_CSUM_VAR_READ",
+		PD_error("MD5 CHECKSUM OF VARIABLE FAILED - _PD_CKSUM_VAR_READ",
 			 PD_GENERIC);};};};
                     
     return(rv);}
@@ -121,12 +121,12 @@ int _PD_csum_var_read(PDBfile *file, char *name, char *type,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_CSUM_VAR_WRITE - handle checksum chores on variable write
- *                    - the effective entry EF will have the info
- *                    - for blocks of the entry NAME to be checksummed
+/* _PD_CKSUM_VAR_WRITE - handle checksum chores on variable write
+ *                     - the effective entry EF will have the info
+ *                     - for blocks of the entry NAME to be checksummed
  */
 
-int _PD_csum_var_write(PDBfile *file, char *name, syment *ef)
+int _PD_cksum_var_write(PDBfile *file, char *name, syment *ef)
    {int rv;
     inti i, nb, n, ni;
     int64_t addr;
@@ -162,23 +162,23 @@ int _PD_csum_var_write(PDBfile *file, char *name, syment *ef)
  * the appropriate block of the entry
  */
 		 if (iv == PD_BLOCK_INVALID)
-		    _PD_csum_block_write(file, ep, n);};};};
+		    _PD_cksum_block_write(file, ep, n);};};};
        
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_CSUM_BLOCK_READ - find the checksum for the Nth block of EP
- *                     - and return it in CDIG
- *                     - we must get all of the data from the file
- *                     - because you might not have all of the
- *                     - data and it is hard to deal with the problems
- *                     - of type converted data
- *                     - return the TRUE iff successful
+/* _PD_CKSUM_BLOCK_READ - find the checksum for the Nth block of EP
+ *                      - and return it in CDIG
+ *                      - we must get all of the data from the file
+ *                      - because you might not have all of the
+ *                      - data and it is hard to deal with the problems
+ *                      - of type converted data
+ *                      - return the TRUE iff successful
  */ 
  
-int _PD_csum_block_read(PDBfile *file, char *name, syment *ep, long n)
+int _PD_cksum_block_read(PDBfile *file, char *name, syment *ep, long n)
    {int rv, st;
     inti i, mn, mx, ni, nb;
     intb bpi;
@@ -224,8 +224,8 @@ int _PD_csum_block_read(PDBfile *file, char *name, syment *ep, long n)
 		     stop  = start + ni*bpi - 1;
 		     PM_md5_checksum_file(file->stream, start, stop, cdig);
 
-		     st  = _PD_block_get_csum(blo, n, rdig);
-		     st &= _PD_csum_compare(cdig, rdig);
+		     st  = _PD_block_get_cksum(blo, n, rdig);
+		     st &= _PD_cksum_compare(cdig, rdig);
 		     if (st == TRUE)
 		        _PD_block_set_valid(blo, n, PD_BLOCK_VALID);
 		     else
@@ -241,15 +241,15 @@ int _PD_csum_block_read(PDBfile *file, char *name, syment *ep, long n)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_CSUM_BLOCK_WRITE - find the checksum for the Nth block of EP
- *                      - we must get all of the data from the file
- *                      - because you might not have all of the
- *                      - data and it is hard to deal with the problems
- *                      - of type converted data
- *                      - return the TRUE iff successful
+/* _PD_CKSUM_BLOCK_WRITE - find the checksum for the Nth block of EP
+ *                       - we must get all of the data from the file
+ *                       - because you might not have all of the
+ *                       - data and it is hard to deal with the problems
+ *                       - of type converted data
+ *                       - return the TRUE iff successful
  */ 
  
-int _PD_csum_block_write(PDBfile *file, syment *ep, long n)
+int _PD_cksum_block_write(PDBfile *file, syment *ep, long n)
    {int rv;
     inti ni;
     intb bpi;
@@ -274,7 +274,7 @@ int _PD_csum_block_write(PDBfile *file, syment *ep, long n)
 	memset(cdig, 0, PD_CKSUM_LEN);
 	PM_md5_checksum_file(file->stream, start, stop, cdig);
 
-	rv = _PD_block_set_csum(bl, n, cdig);
+	rv = _PD_block_set_cksum(bl, n, cdig);
 
         file->file_cksum |= PD_MD5_RW;};
                     
@@ -283,11 +283,11 @@ int _PD_csum_block_write(PDBfile *file, syment *ep, long n)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_CSUM_RESERVE - reserve space for checksum
- *                  - this is called during a PD_flush
+/* _PD_CKSUM_RESERVE - reserve space for checksum
+ *                   - this is called during a PD_flush
  */
 
-int _PD_csum_reserve(PDBfile *file)
+int _PD_cksum_reserve(PDBfile *file)
    {int rv;
        
 /* allocate space for the MD5 checksum (128 bits => 16 unsigned chars)
@@ -304,11 +304,11 @@ int _PD_csum_reserve(PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_CSUM_FILE_WRITE - write the whole file checksum in the
- *                     - reserved space
+/* _PD_CKSUM_FILE_WRITE - write the whole file checksum in the
+ *                      - reserved space
  */
 
-int _PD_csum_file_write(PDBfile *file)
+int _PD_cksum_file_write(PDBfile *file)
    {int rv;
     int64_t addr;
     unsigned char dig[PD_CKSUM_LEN];
@@ -326,14 +326,14 @@ int _PD_csum_file_write(PDBfile *file)
 	addr = _PD_locate_checksum(file);
         if (addr != -1)
            {if (lio_write(dig, 1, PD_CKSUM_LEN-1, fp) == -1) 
-	       PD_error("WRITE OF CHECKSUM FAILED - _PD_CSUM_FILE_WRITE",
+	       PD_error("WRITE OF CHECKSUM FAILED - _PD_CKSUM_FILE_WRITE",
 			PD_WRITE);
 
 	    if (file->format_version > 2)
 	       lio_printf(fp, "\n");}
 
         else
-           PD_error("FSEEK FAILED DURING CHECKSUM CALC - _PD_CSUM_FILE_WRITE",
+           PD_error("FSEEK FAILED DURING CHECKSUM CALC - _PD_CKSUM_FILE_WRITE",
 		    PD_WRITE);};
 
     rv = TRUE;
@@ -393,7 +393,7 @@ int PD_verify(PDBfile *file ARG(,,cls))
         
 		_PD_md5_checksum(file, (unsigned char *) csn);
   
-		ok = _PD_csum_compare(cso, csn);
+		ok = _PD_cksum_compare(cso, csn);
 
 		file->file_cksum |= PD_MD5_FILE;};};};
     

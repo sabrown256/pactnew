@@ -304,11 +304,11 @@ inti _PD_n_blocks(syment *ep)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_BLOCK_GET_CSUM - return the checksum of the Nth block of BL in DIG
+/* _PD_BLOCK_GET_CKSUM - return the checksum of the Nth block of BL in DIG
  *                    - return TRUE iff successful
  */
 
-int _PD_block_get_csum(SC_array *bl, inti n, unsigned char *dig)
+int _PD_block_get_cksum(SC_array *bl, inti n, unsigned char *dig)
    {int rv;
     symblock *sp;
 
@@ -327,11 +327,11 @@ int _PD_block_get_csum(SC_array *bl, inti n, unsigned char *dig)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_BLOCK_SET_CSUM - set the checksum of the Nth block of BL in DIG
- *                    - return TRUE iff successful
+/* _PD_BLOCK_SET_CKSUM - set the checksum of the Nth block of BL in DIG
+ *                     - return TRUE iff successful
  */
 
-int _PD_block_set_csum(SC_array *bl, inti n, unsigned char *dig)
+int _PD_block_set_cksum(SC_array *bl, inti n, unsigned char *dig)
    {int rv;
     symblock *sp;
 
@@ -642,11 +642,11 @@ int _PD_block_define(PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_BLOCK_CSUM_WRITE - write the per block checksums
- *                      - for the Checksums extra when closing the file
+/* _PD_BLOCK_CKSUM_WRITE - write the per block checksums
+ *                       - for the Checksums extra when closing the file
  */
 
-int _PD_block_csum_write(PDBfile *file, syment *ep, char *name)
+int _PD_block_cksum_write(PDBfile *file, syment *ep, char *name)
    {int ok, st, ne;
     inti j, n;
     unsigned char dig[PD_CKSUM_LEN];
@@ -677,9 +677,9 @@ int _PD_block_csum_write(PDBfile *file, syment *ep, char *name)
 		        _PD_put_string(1, "\n   ");
 
 		     if (sp->valid == PD_BLOCK_INVALID)
-		        _PD_csum_block_write(file, ep, j);
+		        _PD_cksum_block_write(file, ep, j);
 
-		     st = _PD_block_get_csum(bl, j, dig);
+		     st = _PD_block_get_cksum(bl, j, dig);
 		     SC_ASSERT(st == TRUE);
 
 		     ok &= _PD_put_string(1, " %lld %s",
@@ -692,11 +692,11 @@ int _PD_block_csum_write(PDBfile *file, syment *ep, char *name)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_BLOCK_CSUM_READ - read the per block checksums
- *                     - for the Checksums extra when opening the file
+/* _PD_BLOCK_CKSUM_READ - read the per block checksums
+ *                      - for the Checksums extra when opening the file
  */
 
-int _PD_block_csum_read(PDBfile *file)
+int _PD_block_cksum_read(PDBfile *file)
    {int ok;
     long ie, ne, n, j, nb, bsz;
     unsigned char *dig;
@@ -737,7 +737,7 @@ int _PD_block_csum_read(PDBfile *file)
 		 dig = (unsigned char *) SC_strtok(NULL, " \n", s);
 
 		 if (j < nb)
-		    {_PD_block_set_csum(bl, j, dig);
+		    {_PD_block_set_cksum(bl, j, dig);
 		     _PD_block_set_valid(bl, j, PD_BLOCK_UNVERIFIED);};};};};
 
     file->file_cksum |= PD_MD5_RW;
