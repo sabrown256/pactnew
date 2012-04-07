@@ -181,6 +181,9 @@ struct s_PD_scope_private
 
 /* initializes to 0 bytes */
 
+/* PDFLT.C */
+    fltdes *file_chain;
+
 /* PDPAR.C */
     int nfilesx;
 
@@ -520,7 +523,8 @@ extern void
  _PD_def_real(char *type, PDBfile *file),
  _PD_d_install(PDBfile *file, char *name, defstr *def, PD_chart_kind chk),
  _PD_e_install(PDBfile *file, char *name, syment *entr, int lookup),
- _PD_request_unset(PDBfile *file);
+ _PD_request_unset(PDBfile *file),
+ _PD_replace_file(PDBfile *file, char *name, int64_t addr);
 
 extern int
  _PD_compare_std(data_standard *a, data_standard *b,

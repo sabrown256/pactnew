@@ -1,0 +1,27 @@
+#!/bin/csh -f
+#
+# FILTER - PDB filter test
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set msg = "PDB Filter Test ...................."
+set exe = $BinDir/tpdf
+set opt = ( -v $tst )
+set io  = ftee
+
+NoteD $Log ""
+NoteD $Log "                    $msg"
+Note $Log ""
+
+source ../../../scripts/test-run
+
+$TEST_CHECK part -a filter -e $xstatus -dt $dt -x $exe -rpf "$rpf" "$msg"
+
+exit($status)
+

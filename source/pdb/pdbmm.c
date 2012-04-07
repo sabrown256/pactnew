@@ -182,8 +182,9 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
 	file->req.ftype     = NULL;
 	file->req.htype     = NULL;
 
-	file->filter_block  = NULL;
-	file->filter_file   = NULL;
+	file->block_chain  = NULL;
+	file->file_chain   = _PD.file_chain;
+	_PD.file_chain     = NULL;
 
 	file->symtaddr = 0;
 	file->chrtaddr = 0;

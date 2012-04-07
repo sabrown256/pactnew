@@ -1376,19 +1376,28 @@ FILE *_PD_data_source(SC_udl *pu)
  */
 
 int64_t _PD_close(PDBfile *file)
-   {int64_t ret;
+   {int ok, st;
+    int64_t ret;
     FILE *fp;
 
     ret = FALSE;
 
     if (file != NULL)
-       {ret = _PD_cksum_close(file);
+       {ok = TRUE;
+
+	ok &= _PD_cksum_close(file);
 
 /* position the file pointer at the greater of the current position and
  * the location of the chart
  */
 	if ((file->mode == PD_CREATE) || (file->mode == PD_APPEND))
 	   ret = PD_flush(file);
+	else
+	   ret = PD_get_file_length(file);
+
+	if ((ret > 0) && (ok == TRUE))
+	   {st  = _PD_filt_close(file);
+	    ok &= (st != 0);};
 
 	fp = file->stream;
 	if (fp != NULL)
@@ -1400,7 +1409,9 @@ int64_t _PD_close(PDBfile *file)
 	    file->udl->stream = NULL;};
 
 /* free the space */
-	_PD_rl_pdb(file);};
+	_PD_rl_pdb(file);
+
+	ret = (ok == TRUE) ? ret : -1;};
 
     return(ret);}
 
@@ -1442,17 +1453,55 @@ PDBfile *_PD_open(tr_layer *tr, SC_udl *pu, char *name, char *mode, void *a)
     if (a != NULL)
        _PD_SETUP_MP_FILE(file, *(SC_communicator *) a);
 
-    vers = _PD_identify_file(file);
-    if (vers > 0)
-       {ok = (*file->open)(file);
-	if (ok != TRUE)
-	   PD_error("CANNOT OPEN FILE - _PD_OPEN", PD_OPEN);}
-    else
+    vers = -1;
+
+    ok = _PD_filt_file_in(file);
+    if (ok == TRUE)
+       {vers = _PD_identify_file(file);
+	if (vers > 0)
+	   {ok = (*file->open)(file);
+	    if (ok != TRUE)
+	       PD_error("CANNOT OPEN FILE - _PD_OPEN", PD_OPEN);};};
+
+    if (vers <= 0)
        {file->udl = NULL;
 	_PD_rl_pdb(file);
 	file = NULL;};
 
     return(file);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_REPLACE_FILE - replace the file associated with FILE with NAME
+ *                  - and position the new file at ADDR
+ *                  - used primarily with filter chains
+ */
+
+void _PD_replace_file(PDBfile *file, char *name, int64_t addr)
+   {SC_udl *pu;
+    PD_smp_state *pa;
+    FILE *fp;
+
+    pa = _PD_get_state(-1);
+
+    _SC_rel_udl(file->udl);
+
+    rename(name, file->name);
+
+/* switch all the file references to the new file */
+    pu = _PD_pio_open(file->name, "r+b");
+    fp = _PD_data_source(pu);
+
+    file->udl    = pu;
+    file->stream = fp;
+    pa->ofp      = fp;
+
+    _PD_set_io_buffer(pu);
+
+    lio_seek(fp, addr, SEEK_SET);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
