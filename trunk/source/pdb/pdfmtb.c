@@ -1411,7 +1411,9 @@ static int _PD_open_ii(PDBfile *file)
 /* initialize the starting address for writing */
     _PD_SET_ADDRESS(file, file->chrtaddr);
 
-/* if this file already contains a valid checksum, default file checksums to on */
+/* if this file already contains a valid checksum
+ * default file checksums to on
+ */
     if (PD_verify(file) == TRUE)
        PD_activate_cksum(file, PD_MD5_FILE);
 

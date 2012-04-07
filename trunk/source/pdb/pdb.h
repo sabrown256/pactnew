@@ -248,6 +248,8 @@ typedef struct s_memdes memdes;
 typedef struct s_symindir symindir;
 typedef struct s_syment syment;
 typedef struct s_defstr defstr;
+typedef struct s_fltdes fltdes;
+typedef struct s_fltdat fltdat;
 typedef struct s_fltwdes fltwdes;
 typedef struct s_fltbdes fltbdes;
 typedef struct s_sys_layer sys_layer;
@@ -261,7 +263,9 @@ typedef struct s_PD_image PD_image;
 typedef struct s_PD_pfm_fnc PD_pfm_fnc;
 typedef struct s_PD_scope_public PD_scope_public;
 
-typedef int (*PFifltwdes)(fltwdes *fl, PDBfile *file);
+typedef int (*PFifltdes)(PDBfile *file, fltdes *fl, fltdat *inf);
+typedef int (*PFifltwdes)(fltwdes *fl, PDBfile *file,
+			  int64_t start, int64_t end);
 typedef char *(*PFifltbdes)(fltbdes *fl, PDBfile *file,
 			    char *bf, long bpi, int64_t ni);
 
@@ -549,8 +553,8 @@ struct s_PDBfile
 
     void *meta;                       /* container for metadata in the tr layer */
     io_request req;
-    fltbdes *filter_block;
-    fltwdes *filter_file;
+    fltbdes *block_chain;
+    fltdes *file_chain;
     
     int (*symatch)(PDBfile *file, int ad, char *name, char *type,
 		   char *acc, char *rej);
@@ -719,13 +723,32 @@ struct s_dimind
     long stop;
     long step;};
 
+/* FLTDAT - contain info needed to do filtering */
+
+struct s_fltdat
+   {char *type;               /* data type */
+    long bpi[2];              /* bytes per item in and out */
+    int64_t ni[2];            /* number of items in and out */
+    int64_t nb[2];            /* buffer size in and out */
+    unsigned char *bf[2];};   /* buffers in and out */
+
+/* FLTDES - generic filter descriptor */
+
+struct s_fltdes
+   {void *data;
+    PFifltdes in;
+    PFifltdes out;
+    fltdes *next;
+    fltdes *prev;};
+
 /* FLTBDES - block filter descriptor */
 
 struct s_fltbdes
    {void *data;
     PFifltbdes in;
     PFifltbdes out;
-    fltbdes *next;};
+    fltbdes *next;
+    fltbdes *prev;};
 
 /* FLTWDES - whole file filter descriptor */
 
@@ -733,7 +756,8 @@ struct s_fltwdes
    {void *data;
     PFifltwdes in;
     PFifltwdes out;
-    fltwdes *next;};
+    fltwdes *next;
+    fltwdes *prev;};
 
 struct s_attribute
    {char *name;
@@ -1180,11 +1204,15 @@ extern FIXNUM
 
 /* PDFLT.C declarations */
 
+extern fltdes
+ *PD_filt_file_chain(fltdes *fl, PFifltdes fi, PFifltdes fo,
+		     void *data);
+
 extern int
  PD_filt_register_block(PDBfile *file, PFifltbdes fi, PFifltbdes fo,
 			void *data),
- PD_filt_register_file(PDBfile *file, PFifltwdes fi, PFifltwdes fo,
-		       void *data);
+ PD_filt_register_file(fltdes *fl);
+
 
 /* PDFMT.C declarations */
 

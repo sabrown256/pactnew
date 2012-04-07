@@ -310,7 +310,8 @@ int test_3(char *base, char *tgt, int n)
     if (read_only == FALSE)
 
 /* create the named file */
-       {if ((strm = PD_create(datfile)) == NULL)
+       {strm = PD_create(datfile);
+	if (strm == NULL)
 	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
 

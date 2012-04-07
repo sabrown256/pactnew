@@ -239,7 +239,9 @@ static PDBfile *_PD_open_bin_aux(SC_udl *pu, char *name, char *mode,
        {if (_PD_data_source(pu) != NULL)
 	   file = open(tr, pu, name, mode, a);
 
-/* if we cannot open existing file and it does not exist - try creating file */
+/* if we cannot open existing file and it does not exist
+ * try creating file
+ */
 	if ((file == NULL) && (SC_isfile(pu->path) == FALSE))
 	   {if ((*mode == 'a') && (create != NULL) && (tr->type == PDBFILE_S))
 	       {_SC_rel_udl(pu);

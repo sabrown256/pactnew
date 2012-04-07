@@ -8,15 +8,126 @@
 
 #include "cpyright.h"
 
+#include "pdb_int.h"
 #include "pdbtfr.h"
 
 #define DATFILE "nat"
 
-typedef int (*PFTest)(char *base, char *tgt, int n);
+#define CIRCULAR_SHIFT_RIGHT(_b, _n, _s)                                    \
+  ((_b) >> ((_n) % (_s)) | ((_b) << (((_s) - (_n)) % (_s))))
+
+#define CIRCULAR_SHIFT_LEFT(_b, _n, _s)                                     \
+  ((_b) << ((_n) % (_s)) | ((_b) >> (((_s) - (_n)) % (_s))))
+
+typedef int (*PFTest)(char *base, char *tgt, fltdes *fl, int n);
 
 static int
  debug_mode  = FALSE,
  native_only = FALSE;
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SCRAMBLE_FILE_IN - whole file unscrambling on input */
+
+int scramble_file_in(PDBfile *file, fltdes *fl, fltdat *inf)
+   {int j, s, rv;
+    int64_t i, ni, nir, nic, nbo;
+    unsigned char b[2];
+    unsigned char *bfi, *bfo;
+
+    rv = TRUE;
+
+    ni  = inf->ni[0];
+    bfi = inf->bf[0];
+
+    nir = ni % 5;
+    nic = ni / 5;
+
+    nbo = 4*nic + nir;
+    bfo = CMAKE_N(unsigned char, nbo);
+
+    inf->ni[1] = nbo;
+    inf->nb[1] = nbo;
+    inf->bf[1] = bfo;
+
+    for (i = 0; i < nic; i++)
+        {for (j = 0; j < 4; j++)
+	     {s = (i + j) % 6 + 1;
+	      b[0] = *bfi++;
+	      b[1] = CIRCULAR_SHIFT_RIGHT(b[0], s, 8);
+	      *bfo++ = b[1];};
+
+	 bfi++;};
+
+    for (i = 0; i < nir; i++)
+        *bfo++ = *bfi++;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SCRAMBLE_FILE_OUT - whole file scrambling on output */
+
+int scramble_file_out(PDBfile *file, fltdes *fl, fltdat *inf)
+   {int j, s, rv;
+    int64_t i, ni, nir, nic, nbo;
+    unsigned char b[2];
+    unsigned char *bfi, *bfo;
+
+    rv = TRUE;
+
+    ni  = inf->ni[0];
+    bfi = inf->bf[0];
+
+    nir = ni % 4;
+    nic = ni / 4;
+
+    nbo = 5*nic + nir;
+    bfo = CMAKE_N(unsigned char, nbo);
+
+    inf->ni[1] = nbo;
+    inf->nb[1] = nbo;
+    inf->bf[1] = bfo;
+
+    for (i = 0; i < nic; i++)
+        {for (j = 0; j < 4; j++)
+	     {s = (i + j) % 6 + 1;
+	      b[0] = *bfi++;
+	      b[1] = CIRCULAR_SHIFT_LEFT(b[0], s, 8);
+	      *bfo++ = b[1];};
+
+	 *bfo++ = i % 256;};
+
+    for (i = 0; i < nir; i++)
+        *bfo++ = *bfi++;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SHRINK_FILE_IN - whole file unshrinking on input */
+
+int shrink_file_in(PDBfile *file, fltdes *fl, fltdat *inf)
+   {int rv;
+
+    rv = TRUE;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SHRINK_FILE_OUT - whole file shrinking on output */
+
+int shrink_file_out(PDBfile *file, fltdes *fl, fltdat *inf)
+   {int rv;
+
+    rv = TRUE;
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 
@@ -37,7 +148,7 @@ static int
 
 #include "tpdcore1.c"
 
-int test_1(char *base, char *tgt, int n)
+int test_1(char *base, char *tgt, fltdes *fl, int n)
    {int err;
     char datfile[MAXLINE], fname[MAXLINE];
     PDBfile *strm;
@@ -53,7 +164,8 @@ int test_1(char *base, char *tgt, int n)
     if (read_only == FALSE)
 
 /* create the named file */
-       {strm = PD_create(datfile);
+       {PD_filt_register_file(fl);
+	strm = PD_create(datfile);
 	if (strm == NULL)
 	   error(1, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
@@ -82,6 +194,7 @@ int test_1(char *base, char *tgt, int n)
 	PRINT(fp, "File %s closed\n", datfile);
 
 /* reopen the file to append */
+	PD_filt_register_file(fl);
 	strm = PD_open(datfile, "a");
 	if (strm == NULL)
 	   error(1, fp, "Test couldn't open file %s to append\r\n", datfile);
@@ -96,6 +209,7 @@ int test_1(char *base, char *tgt, int n)
 	PRINT(fp, "File %s closed after append\n", datfile);};
 
 /* reopen the file */
+    PD_filt_register_file(fl);
     strm = PD_open(datfile, "r");
     if (strm == NULL)
        error(1, fp, "Test couldn't open file %s\r\n", datfile);
@@ -145,7 +259,7 @@ int test_1(char *base, char *tgt, int n)
 
 #include "tpdcore2.c"
 
-int test_2(char *base, char *tgt, int n)
+int test_2(char *base, char *tgt, fltdes *fl, int n)
    {int err;
     char datfile[MAXLINE], fname[MAXLINE];
     PDBfile *strm;
@@ -161,7 +275,8 @@ int test_2(char *base, char *tgt, int n)
     if (read_only == FALSE)
 
 /* create the named file */
-       {strm = PD_create(datfile);
+       {PD_filt_register_file(fl);
+	strm = PD_create(datfile);
 	if (strm == NULL)
 	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
@@ -190,6 +305,7 @@ int test_2(char *base, char *tgt, int n)
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* reopen the file */
+    PD_filt_register_file(fl);
     strm = PD_open(datfile, "r");
     if (strm == NULL)
        error(2, fp, "Test couldn't open file %s\r\n", datfile);
@@ -234,7 +350,7 @@ int test_2(char *base, char *tgt, int n)
 
 #include "tpdcore3.c"
 
-int test_3(char *base, char *tgt, int n)
+int test_3(char *base, char *tgt, fltdes *fl, int n)
    {int err;
     char datfile[MAXLINE], fname[MAXLINE];
     PDBfile *strm;
@@ -250,7 +366,9 @@ int test_3(char *base, char *tgt, int n)
     if (read_only == FALSE)
 
 /* create the named file */
-       {if ((strm = PD_create(datfile)) == NULL)
+       {PD_filt_register_file(fl);
+	strm = PD_create(datfile);
+	if (strm == NULL)
 	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
 
@@ -286,6 +404,7 @@ int test_3(char *base, char *tgt, int n)
 	};
 
 /* reopen the file */
+    PD_filt_register_file(fl);
     if ((strm = PD_open(datfile, "r")) == NULL)
        error(2, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
@@ -329,7 +448,7 @@ int test_3(char *base, char *tgt, int n)
 
 #include "tpdcore4.c"
 
-int test_4(char *base, char *tgt, int n)
+int test_4(char *base, char *tgt, fltdes *fl, int n)
    {int err;
     char datfile[MAXLINE], fname[MAXLINE];
     PDBfile *strm;
@@ -345,7 +464,8 @@ int test_4(char *base, char *tgt, int n)
     if (read_only == FALSE)
 
 /* create the named file */
-       {strm = PD_create(datfile);
+       {PD_filt_register_file(fl);
+	strm = PD_create(datfile);
 	if (strm == NULL)
 	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
@@ -369,6 +489,7 @@ int test_4(char *base, char *tgt, int n)
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* reopen the file */
+    PD_filt_register_file(fl);
     strm = PD_open(datfile, "r");
     if (strm == NULL)
        error(2, fp, "Test couldn't open file %s\r\n", datfile);
@@ -413,7 +534,7 @@ int test_4(char *base, char *tgt, int n)
 
 #include "tpdcore5.c"
 
-int test_5(char *base, char *tgt, int n)
+int test_5(char *base, char *tgt, fltdes *fl, int n)
    {int err;
     char datfile[MAXLINE], fname[MAXLINE];
     PDBfile *strm;
@@ -429,7 +550,8 @@ int test_5(char *base, char *tgt, int n)
     if (read_only == FALSE)
 
 /* create the named file */
-       {strm = PD_create(datfile);
+       {PD_filt_register_file(fl);
+	strm = PD_create(datfile);
 	if (strm == NULL)
 	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
@@ -452,6 +574,7 @@ int test_5(char *base, char *tgt, int n)
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* reopen the file */
+    PD_filt_register_file(fl);
     strm = PD_open(datfile, "r");
     if (strm == NULL)
        error(2, fp, "Test couldn't open file %s\r\n", datfile);
@@ -490,7 +613,7 @@ int test_5(char *base, char *tgt, int n)
 
 #include "tpdcore6.c"
 
-int test_6(char *base, char *tgt, int n)
+int test_6(char *base, char *tgt, fltdes *fl, int n)
    {int err;
     char datfile[MAXLINE], fname[MAXLINE];
     PDBfile *strm;
@@ -506,7 +629,8 @@ int test_6(char *base, char *tgt, int n)
     if (read_only == FALSE)
 
 /* create the named file */
-       {strm = PD_create(datfile);
+       {PD_filt_register_file(fl);
+	strm = PD_create(datfile);
 	if (strm == NULL)
 	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
@@ -531,6 +655,7 @@ int test_6(char *base, char *tgt, int n)
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* reopen the file */
+    PD_filt_register_file(fl);
     strm = PD_open(datfile, "r");
     if (strm == NULL)
        error(2, fp, "Test couldn't open file %s\r\n", datfile);
@@ -569,7 +694,7 @@ int test_6(char *base, char *tgt, int n)
 
 #include "tpdcore7.c"
 
-int test_7(char *base, char *tgt, int n)
+int test_7(char *base, char *tgt, fltdes *fl, int n)
    {int err;
     char datfile[MAXLINE], fname[MAXLINE];
     PDBfile *strm;
@@ -585,7 +710,8 @@ int test_7(char *base, char *tgt, int n)
     if (read_only == FALSE)
 
 /* create the named file */
-       {strm = PD_create(datfile);
+       {PD_filt_register_file(fl);
+	strm = PD_create(datfile);
 	if (strm == NULL)
 	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
@@ -608,6 +734,7 @@ int test_7(char *base, char *tgt, int n)
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* reopen the file */
+    PD_filt_register_file(fl);
     strm = PD_open(datfile, "r");
     if (strm == NULL)
        error(2, fp, "Test couldn't open file %s\r\n", datfile);
@@ -646,7 +773,7 @@ int test_7(char *base, char *tgt, int n)
 
 #include "tpdcore8.c"
 
-int test_8(char *base, char *tgt, int n)
+int test_8(char *base, char *tgt, fltdes *fl, int n)
    {int err;
     char datfile[MAXLINE], fname[MAXLINE];
     PDBfile *strm;
@@ -662,7 +789,8 @@ int test_8(char *base, char *tgt, int n)
     if (read_only == FALSE)
 
 /* create the named file */
-       {strm = PD_create(datfile);
+       {PD_filt_register_file(fl);
+	strm = PD_create(datfile);
 	if (strm == NULL)
 	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
@@ -679,6 +807,7 @@ int test_8(char *base, char *tgt, int n)
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* reopen the file */
+    PD_filt_register_file(fl);
     strm = PD_open(datfile, "r");
     if (strm == NULL)
        error(2, fp, "Test couldn't open file %s\r\n", datfile);
@@ -733,7 +862,7 @@ int test_8(char *base, char *tgt, int n)
  *          - return the number of tests that fail
  */
 
-static int run_test(PFTest test, int n, char *host, int native)
+static int run_test(PFTest test, int n, char *host, fltdes *fl, int native)
    {int i, m, rv, fail;
     char *nm;
     tframe st;
@@ -749,12 +878,12 @@ static int run_test(PFTest test, int n, char *host, int native)
 	     SC_ASSERT(rv == TRUE);
 
 	     nm = PD_target_platform_name(i);
-	     if ((*test)(host, nm, n) == FALSE)
+	     if ((*test)(host, nm, fl, n) == FALSE)
 	        {PRINT(STDOUT, "Test #%d %s failed\n", n, nm);
 		 fail++;};};};
 
 /* native test */
-    if ((*test)(host, NULL, n) == FALSE)
+    if ((*test)(host, NULL, fl, n) == FALSE)
        {PRINT(STDOUT, "Test #%d native failed\n", n);
 	fail++;};
 
@@ -804,6 +933,7 @@ int main(int c, char **v)
     int test_eight;
     int use_mapped_files, check_writes;
     int64_t bfsz;
+    fltdes *fl1, *fl2, *fl;
 
     PD_init_threads(0, NULL);
 
@@ -880,6 +1010,14 @@ int main(int c, char **v)
          else
             break;};
 
+    fl1 = PD_filt_file_chain(NULL, scramble_file_in, scramble_file_out, NULL);
+
+    fl2 = PD_filt_file_chain(NULL, scramble_file_in, scramble_file_out, NULL);
+    fl2 = PD_filt_file_chain(fl2, shrink_file_in, shrink_file_out, NULL);
+
+    fl = fl1;
+    fl = fl2;
+
     PD_set_io_hooks(use_mapped_files);
     PD_verify_writes(check_writes);
 
@@ -888,6 +1026,7 @@ int main(int c, char **v)
     SC_signal(SIGINT, SIG_DFL);
 
 /* force allocation of permanent memory outside of memory monitors */
+    PD_filt_register_file(fl);
     PD_open_vif("foo");
 
     PRINT(STDOUT, "\n");
@@ -897,24 +1036,22 @@ int main(int c, char **v)
 
     err = 0;
 
-    if (test_zero)
-       err += run_test(test_0, 0, DATFILE, TRUE);
     if (test_one)
-       err += run_test(test_1, 1, DATFILE, native_only);
+       err += run_test(test_1, 1, DATFILE, fl, native_only);
     if (test_two)
-       err += run_test(test_2, 2, DATFILE, native_only);
+       err += run_test(test_2, 2, DATFILE, fl, native_only);
     if (test_three)
-       err += run_test(test_3, 3, DATFILE, native_only);
+       err += run_test(test_3, 3, DATFILE, fl, native_only);
     if (test_four)
-       err += run_test(test_4, 4, DATFILE, native_only);
+       err += run_test(test_4, 4, DATFILE, fl, native_only);
     if (test_five)
-       err += run_test(test_5, 5, DATFILE, native_only);
+       err += run_test(test_5, 5, DATFILE, fl, native_only);
     if (test_six)
-       err += run_test(test_6, 6, DATFILE, native_only);
+       err += run_test(test_6, 6, DATFILE, fl, native_only);
     if (test_seven)
-       err += run_test(test_7, 7, DATFILE, native_only);
+       err += run_test(test_7, 7, DATFILE, fl, native_only);
     if (test_eight)
-       err += run_test(test_8, 8, DATFILE, native_only);
+       err += run_test(test_8, 8, DATFILE, fl, native_only);
 
     PRINT(STDOUT, "\n");
 
