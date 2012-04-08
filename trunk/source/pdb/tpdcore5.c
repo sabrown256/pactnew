@@ -129,10 +129,11 @@ static int read_test_5_data(PDBfile *strm)
    {int err;
 
     err = PD_read(strm, "tar",    tar5_t);
-    err = PD_read(strm, "tar(0)", tar5_r);
-    err = PD_read(strm, "tar(1)", tar5_r+1);
-    err = PD_read(strm, "tar(2)", tar5_r+2);
-    err = PD_read(strm, "tar(3)", tar5_r+3);
+    if (partial_read == TRUE)
+       {err = PD_read(strm, "tar(0)", tar5_r);
+	err = PD_read(strm, "tar(1)", tar5_r+1);
+	err = PD_read(strm, "tar(2)", tar5_r+2);
+	err = PD_read(strm, "tar(3)", tar5_r+3);};
 
     return(err);}
 
@@ -188,36 +189,37 @@ static int compare_test_5_data(PDBfile *strm, FILE *fp)
     err_tot = TRUE;
 
     err = TRUE;
-    p1w = tar5_w[0].a;
-    p2w = tar5_w[1].a;
-    p3w = tar5_w[0].b;
-    p4w = tar5_w[1].b;
+    if (partial_read == TRUE)
+       {p1w = tar5_w[0].a;
+	p2w = tar5_w[1].a;
+	p3w = tar5_w[0].b;
+	p4w = tar5_w[1].b;
 
-    for (l = 0; l < 2; l++)
-        {p1r = tar5_t[2*l].a;
-	 p2r = tar5_t[2*l+1].a;
-	 for (i = 0; i < N_INT; i++)
-	     {err &= (p1w[i] == p1r[i]);
-	      err &= (p2w[i] == p2r[i]);};
+	for (l = 0; l < 2; l++)
+	    {p1r = tar5_t[2*l].a;
+	     p2r = tar5_t[2*l+1].a;
+	     for (i = 0; i < N_INT; i++)
+	         {err &= (p1w[i] == p1r[i]);
+		  err &= (p2w[i] == p2r[i]);};
 
-	 p3r = tar5_t[2*l].b;
-	 p4r = tar5_t[2*l+1].b;
-	 for (i = 0; i < N_DOUBLE; i++)
-	     {err &= DOUBLE_EQUAL(p3w[i], p3r[i]);
-	      err &= DOUBLE_EQUAL(p4w[i], p4r[i]);};};
+	     p3r = tar5_t[2*l].b;
+	     p4r = tar5_t[2*l+1].b;
+	     for (i = 0; i < N_DOUBLE; i++)
+	         {err &= DOUBLE_EQUAL(p3w[i], p3r[i]);
+		  err &= DOUBLE_EQUAL(p4w[i], p4r[i]);};};
 
-    for (l = 0; l < 2; l++)
-        {p1r = tar5_r[2*l].a;
-	 p2r = tar5_r[2*l+1].a;
-	 for (i = 0; i < N_INT; i++)
-	     {err &= (p1w[i] == p1r[i]);
-	      err &= (p2w[i] == p2r[i]);};
+	for (l = 0; l < 2; l++)
+	    {p1r = tar5_r[2*l].a;
+	     p2r = tar5_r[2*l+1].a;
+	     for (i = 0; i < N_INT; i++)
+	         {err &= (p1w[i] == p1r[i]);
+		  err &= (p2w[i] == p2r[i]);};
 
-	 p3r = tar5_r[2*l].b;
-	 p4r = tar5_r[2*l+1].b;
-	 for (i = 0; i < N_DOUBLE; i++)
-	     {err &= DOUBLE_EQUAL(p3w[i], p3r[i]);
-	      err &= DOUBLE_EQUAL(p4w[i], p4r[i]);};};
+	     p3r = tar5_r[2*l].b;
+	     p4r = tar5_r[2*l+1].b;
+	     for (i = 0; i < N_DOUBLE; i++)
+	         {err &= DOUBLE_EQUAL(p3w[i], p3r[i]);
+		  err &= DOUBLE_EQUAL(p4w[i], p4r[i]);};};};
 
     PRINT(fp, "\n");
 

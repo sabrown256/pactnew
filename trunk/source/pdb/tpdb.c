@@ -15,8 +15,9 @@
 typedef int (*PFTest)(char *base, char *tgt, int n);
 
 static int
- debug_mode  = FALSE,
- native_only = FALSE;
+ debug_mode   = FALSE,
+ partial_read = TRUE,
+ native_only  = FALSE;
 
 /*--------------------------------------------------------------------------*/
 

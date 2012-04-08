@@ -10,11 +10,31 @@
 
 #include "pdb_int.h"
 
-#define PD_filt_switch(_inf, _i, _j)                                         \
-   {(_inf)->nb[_i]  = (_inf)->nb[_j];                                        \
-    (_inf)->bf[_i]  = (_inf)->bf[_j];                                        \
-    (_inf)->bpi[_i] = (_inf)->bpi[_j];                                       \
-    (_inf)->ni[_i]  = (_inf)->ni[_j];}
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_FILT_SWITCH - move the J part of INF to the I part */
+
+void PD_filt_switch(fltdat *inf, int i, int j)
+   {unsigned char *bfa, *bfb;
+
+    bfa = inf->bf[i];
+    bfb = inf->bf[j];
+
+    inf->nb[i]  = inf->nb[j];
+    inf->ni[i]  = inf->ni[j];
+    inf->bpi[i] = inf->bpi[j];
+
+    inf->nb[j]  = 0;
+    inf->ni[j]  = 0;
+    inf->bpi[j] = 0;
+
+    if (bfa != bfb)
+       {CFREE(bfa);
+	inf->bf[i] = bfb;
+        inf->bf[j] = NULL;};
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -36,17 +56,18 @@ int _PD_filt_block_out(PDBfile *file, unsigned char *bf,
 
 /* run the filter chain on the block */
     if ((bf != NULL) && (bpi != 0) && (ni != 0))
-       {fp = file->stream;
+       {fp  = file->stream;
+	flt = file->block_chain;
+
+	memset(&inf, 0, sizeof(inf));
 
 	inf.type   = type;
-	inf.nb[0]  = bpi*ni;
-	inf.bf[0]  = bf;
-	inf.bpi[0] = bpi;
-	inf.ni[0]  = ni;
+	inf.nb[1]  = bpi*ni;
+	inf.bf[1]  = bf;
+	inf.bpi[1] = bpi;
+	inf.ni[1]  = ni;
 
-	PD_filt_switch(&inf, 1, 0);
-
-	flt = file->block_chain;
+	PD_filt_switch(&inf, 0, 1);
 
 /* find the end of the chain */
 	for (fl = flt; (fl != NULL) && (fl->next != NULL); fl = fl->next);
@@ -55,11 +76,21 @@ int _PD_filt_block_out(PDBfile *file, unsigned char *bf,
 	ok = TRUE;
 	for (; (fl != NULL) && (ok == TRUE); fl = fl->prev)
             {ok &= fl->out(file, fl, &inf);
+
+/* we may not free BF so make sure it is
+ * put out of the way before switching
+ */
+	     if (inf.bf[0] == bf)
+	        inf.bf[0] = NULL;
+
 	     PD_filt_switch(&inf, 0, 1);};
                     
         niw = lio_write(inf.bf[0], inf.bpi[0], inf.ni[0], fp);
         nie = inf.ni[0];
-	ok  = (niw == nie);};
+	ok  = (niw == nie);
+
+	if (flt != NULL)
+	   CFREE(inf.bf[0]);};
 
     return(ok);}
 
@@ -74,7 +105,8 @@ int _PD_filt_block_out(PDBfile *file, unsigned char *bf,
 int _PD_filt_block_in(PDBfile *file, unsigned char *bf,
 		      char *type, intb bpi, inti ni)
    {int ok;
-    inti nir, nie;
+    inti nir, nie, nbi;
+    unsigned char *lbf;
     fltdes *fl, *flt;
     fltdat inf;
     FILE *fp;
@@ -84,26 +116,38 @@ int _PD_filt_block_in(PDBfile *file, unsigned char *bf,
 /* run the filter chain on the block */
     if ((bf != NULL) && (bpi != 0) && (ni != 0))
        {fp  = file->stream;
+	flt = file->block_chain;
+	nbi = bpi*ni;
+
+	memset(&inf, 0, sizeof(inf));
+
+	if (flt != NULL)
+	   lbf = CMAKE_N(unsigned char, nbi);
+	else
+	   lbf = bf;
 
 	inf.type   = type;
-	inf.nb[1]  = bpi*ni;
-	inf.bf[1]  = bf;
+	inf.nb[1]  = nbi;
+	inf.bf[1]  = lbf;
 	inf.bpi[1] = bpi;
 	inf.ni[1]  = ni;
 
 	PD_filt_switch(&inf, 0, 1);
 
-/* GOTCHA: the bytes must end up in BF */
-
 	nir = lio_read(inf.bf[0], inf.bpi[0], inf.ni[0], fp);
 	nie = inf.ni[0];
-
-	flt = file->block_chain;
 
 /* run the filter chain in order as defined */
 	ok = (nir == nie);
 	for (fl = flt; (fl != NULL) && (ok == TRUE); fl = fl->next)
-	    {ok &= fl->in(file, fl, &inf);
+
+/* make sure that the final version ends up in BF */
+	    {if (fl->next == NULL)
+	        {inf.bf[1]  = bf;
+		 inf.bpi[1] = bpi;
+		 inf.ni[1]  = ni;};
+
+	     ok &= fl->in(file, fl, &inf);
 	     PD_filt_switch(&inf, 0, 1);};};
 
     return(ok);}
@@ -153,16 +197,13 @@ static int _PD_filt_apply_file(PDBfile *file, fltdes *fl, PFifltdes f,
  * output side is the same as the input side
  * so a do nothing filter works
  */
+	memset(&inf, 0, sizeof(inf));
+
 	inf.type   = "char";
 	inf.nb[0]  = min(nb, ni);
 	inf.bf[0]  = CMAKE_N(unsigned char, nb);
 	inf.bpi[0] = 1;
 	inf.ni[0]  = inf.nb[0];
-
-	inf.nb[1]  = inf.nb[0];
-	inf.bf[1]  = inf.bf[0];
-	inf.bpi[1] = inf.bpi[0];
-	inf.ni[1]  = inf.ni[0];
 
 	snprintf(nm, MAXLINE, "%s.+", file->name);
 

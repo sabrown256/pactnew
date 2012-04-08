@@ -258,10 +258,11 @@ static void cleanup_test_2(void)
 
         CFREE(cp2);};
 
-    for (i = 0; i < 4; i++)
-        {CFREE(ca[i].s[0]);
-	 CFREE(ca[i].s[1]);
-	 CFREE(ca[i].s);};
+    if (partial_read == TRUE)
+       {for (i = 0; i < 4; i++)
+	    {CFREE(ca[i].s[0]);
+	     CFREE(ca[i].s[1]);
+	     CFREE(ca[i].s);};};
 
     if (sp1 != NULL)
        {CFREE(sp1[0]);
@@ -334,26 +335,28 @@ static int read_test_2_data(PDBfile *strm)
     err = PD_read(strm, "tar(1).a(0)", &aa[2]);
     err = PD_read(strm, "tar(1).a(1)", &aa[3]);
 
-    err = PD_read(strm, "tar(0).b", &bp1);
-    err = PD_read(strm, "tar(1).b", &bp2);
+    if (partial_read == TRUE)
+       {err = PD_read(strm, "tar(0).b", &bp1);
+	err = PD_read(strm, "tar(1).b", &bp2);};
 
     err = PD_read(strm, "tar(0).b(0)", &ba[0]);
     err = PD_read(strm, "tar(0).b(1)", &ba[1]);
     err = PD_read(strm, "tar(1).b(0)", &ba[2]);
     err = PD_read(strm, "tar(1).b(1)", &ba[3]);
 
-    err = PD_read(strm, "tar(0).c", &cp1);
-    err = PD_read(strm, "tar(1).c", &cp2);
+    if (partial_read == TRUE)
+       {err = PD_read(strm, "tar(0).c", &cp1);
+	err = PD_read(strm, "tar(1).c", &cp2);
 
-    err = PD_read(strm, "tar(0).c(0)", &ca[0]);
-    err = PD_read(strm, "tar(0).c(1)", &ca[1]);
-    err = PD_read(strm, "tar(1).c(0)", &ca[2]);
-    err = PD_read(strm, "tar(1).c(1)", &ca[3]);
+        err = PD_read(strm, "tar(0).c(0)", &ca[0]);
+	err = PD_read(strm, "tar(0).c(1)", &ca[1]);
+	err = PD_read(strm, "tar(1).c(0)", &ca[2]);
+	err = PD_read(strm, "tar(1).c(1)", &ca[3]);
 
-    err = PD_read(strm, "tar(0).c(0).s", &sp1);
-    err = PD_read(strm, "tar(0).c(1).s", &sp2);
-    err = PD_read(strm, "tar(1).c(0).s", &sp3);
-    err = PD_read(strm, "tar(1).c(1).s", &sp4);
+	err = PD_read(strm, "tar(0).c(0).s", &sp1);
+	err = PD_read(strm, "tar(0).c(1).s", &sp2);
+	err = PD_read(strm, "tar(1).c(0).s", &sp3);
+	err = PD_read(strm, "tar(1).c(1).s", &sp4);};
 
     err = PD_read(strm, "tar(0).c(0).s(0)", &tp1);
     err = PD_read(strm, "tar(0).c(0).s(1)", &tp2);
@@ -365,15 +368,16 @@ static int read_test_2_data(PDBfile *strm)
     err = PD_read(strm, "tar(1).c(1).s(0)", &tp7);
     err = PD_read(strm, "tar(1).c(1).s(1)", &tp8);
 
-    err = PD_read(strm, "tar(0).c(0).s(0)(2)", &ta[0]);
-    err = PD_read(strm, "tar(0).c(0).s(1)(1)", &ta[1]);
-    err = PD_read(strm, "tar(0).c(1).s(0)(3)", &ta[2]);
-    err = PD_read(strm, "tar(0).c(1).s(1)(2)", &ta[3]);
+    if (partial_read == TRUE)
+       {err = PD_read(strm, "tar(0).c(0).s(0)(2)", &ta[0]);
+	err = PD_read(strm, "tar(0).c(0).s(1)(1)", &ta[1]);
+	err = PD_read(strm, "tar(0).c(1).s(0)(3)", &ta[2]);
+	err = PD_read(strm, "tar(0).c(1).s(1)(2)", &ta[3]);
 
-    err = PD_read(strm, "tar(1).c(0).s(0)(2)", &ta[4]);
-    err = PD_read(strm, "tar(1).c(0).s(1)(1)", &ta[5]);
-    err = PD_read(strm, "tar(1).c(1).s(0)(3)", &ta[6]);
-    err = PD_read(strm, "tar(1).c(1).s(1)(2)", &ta[7]);
+	err = PD_read(strm, "tar(1).c(0).s(0)(2)", &ta[4]);
+	err = PD_read(strm, "tar(1).c(0).s(1)(1)", &ta[5]);
+	err = PD_read(strm, "tar(1).c(1).s(0)(3)", &ta[6]);
+	err = PD_read(strm, "tar(1).c(1).s(1)(2)", &ta[7]);};
 
     return(err);}
 
@@ -548,10 +552,11 @@ static void print_test_2_data(FILE *fp)
 
 /* TAR.C.S[i][j] read */
 
-        PRINT(fp, "\nmember read from TAR[0]:\n");
-        PRINT(fp, "C[0].S[0][2]  C[0].S[1][1]  C[1].S[0][3]  C[1].S[1][2]\n");
-        PRINT(fp, "     %c             %c           %c             %c\n",
-                    ta[0], ta[1], ta[2], ta[3]);};
+	if (partial_read == TRUE)
+	   {PRINT(fp, "\nmember read from TAR[0]:\n");
+	    PRINT(fp, "C[0].S[0][2]  C[0].S[1][1]  C[1].S[0][3]  C[1].S[1][2]\n");
+	    PRINT(fp, "     %c             %c           %c             %c\n",
+		  ta[0], ta[1], ta[2], ta[3]);};};
 
     return;}
 
@@ -693,10 +698,11 @@ static int compare_test_2_data(PDBfile *strm, FILE *fp)
         err &= (strcmp(tar_w[1].c[1].s[0], tp7) == 0);
         err &= (strcmp(tar_w[1].c[1].s[1], tp8) == 0);
 
-        err &= (tar_w[0].c[0].s[0][2] == ta[0]);
-        err &= (tar_w[0].c[0].s[1][1] == ta[1]);
-        err &= (tar_w[0].c[1].s[0][3] == ta[2]);
-        err &= (tar_w[0].c[1].s[1][2] == ta[3]);};
+	if (partial_read == TRUE)
+	   {err &= (tar_w[0].c[0].s[0][2] == ta[0]);
+	    err &= (tar_w[0].c[0].s[1][1] == ta[1]);
+	    err &= (tar_w[0].c[1].s[0][3] == ta[2]);
+	    err &= (tar_w[0].c[1].s[1][2] == ta[3]);};};
 
     if (err)
        PRINT(fp, "Indirects compare\n");

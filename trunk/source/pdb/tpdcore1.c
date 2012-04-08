@@ -321,13 +321,14 @@ static int read_test_1_data(PDBfile *strm)
     err = PD_read(strm, "fa2_app", fa2_app_r);
 
 /* partial array read */
-    ind[0] = 1;
-    ind[1] = 2;
-    ind[2] = 1;
-    ind[3] = 0;
-    ind[4] = 1;
-    ind[5] = 1;
-    err = PD_read_alt(strm, "fa2", fa1_r, ind);
+    if (partial_read == TRUE)
+       {ind[0] = 1;
+	ind[1] = 2;
+	ind[2] = 1;
+	ind[3] = 0;
+	ind[4] = 1;
+	ind[5] = 1;
+	err = PD_read_alt(strm, "fa2", fa1_r, ind);};
 
 /* struct member test */
     ind[0] = 8;
@@ -422,19 +423,20 @@ static void print_test_1_data(FILE *fp)
     PRINT(fp, "\n");
 
 /* partial read single elements */
-    PRINT(fp, "\npartial read scalars:\n");
-    PRINT(fp, "  graph.x_axis[8]  = %14.6e\n", fs_p1_r);
-    PRINT(fp, "  graph.view.x_max = %14.6e\n", fs_p2_r);
-    PRINT(fp, "  view.y_max       = %14.6e\n", fs_p3_r);
+    if (partial_read == TRUE)
+       {PRINT(fp, "\npartial read scalars:\n");
+	PRINT(fp, "  graph.x_axis[8]  = %14.6e\n", fs_p1_r);
+	PRINT(fp, "  graph.view.x_max = %14.6e\n", fs_p2_r);
+	PRINT(fp, "  view.y_max       = %14.6e\n", fs_p3_r);
 
-    PRINT(fp, "\n");
+	PRINT(fp, "\n");
 
 /* partial read arrays */
-    PRINT(fp, "partial read float array:\n");
-    for (i = 0; i < N_FLOAT; i++)
-        PRINT(fp, "  fa2_p[%d] = %14.6e\n", i, fa1_r[i]);
+	PRINT(fp, "partial read float array:\n");
+	for (i = 0; i < N_FLOAT; i++)
+	    PRINT(fp, "  fa2_p[%d] = %14.6e\n", i, fa1_r[i]);
 
-    PRINT(fp, "\n");
+	PRINT(fp, "\n");};
 
     return;}
 
@@ -532,16 +534,17 @@ static int compare_test_1_data(PDBfile *strm, FILE *fp)
     err_tot &= err;
 
 /* compare partial read results */
-    err  = TRUE;
-    err &= FLOAT_EQUAL(fs_p1_r, graph_w.x_axis[8]);
-    err &= FLOAT_EQUAL(fs_p2_r, graph_w.view.x_max);
-    err &= FLOAT_EQUAL(fs_p3_r, view_w.y_max);
+    if (partial_read == TRUE)
+       {err  = TRUE;
+	err &= FLOAT_EQUAL(fs_p1_r, graph_w.x_axis[8]);
+	err &= FLOAT_EQUAL(fs_p2_r, graph_w.view.x_max);
+	err &= FLOAT_EQUAL(fs_p3_r, view_w.y_max);
 
-    if (err)
-       PRINT(fp, "Partial reads compare\n");
-    else
-       PRINT(fp, "Partial reads differ\n");
-    err_tot &= err;
+	if (err)
+	   PRINT(fp, "Partial reads compare\n");
+	else
+	   PRINT(fp, "Partial reads differ\n");
+	err_tot &= err;};
 
     return(err_tot);}
 
