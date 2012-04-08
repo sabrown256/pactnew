@@ -22,6 +22,7 @@
 typedef int (*PFTest)(char *base, char *tgt, fltdes *fl, int n);
 
 static int
+ filter_file = TRUE,
  debug_mode  = FALSE,
  native_only = FALSE;
 
@@ -32,24 +33,28 @@ static int
 
 int scramble_file_in(PDBfile *file, fltdes *fl, fltdat *inf)
    {int j, s, rv;
-    int64_t i, ni, nir, nic, nbo;
+    long bpi;
+    int64_t i, ni, nir, nic, nbi, nbo;
     unsigned char b[2];
     unsigned char *bfi, *bfo;
 
     rv = TRUE;
 
     ni  = inf->ni[0];
+    bpi = inf->bpi[0];
     bfi = inf->bf[0];
 
-    nir = ni % 5;
-    nic = ni / 5;
+    nbi = ni*bpi;
+    nir = nbi % 5;
+    nic = nbi / 5;
 
     nbo = 4*nic + nir;
     bfo = CMAKE_N(unsigned char, nbo);
 
-    inf->ni[1] = nbo;
-    inf->nb[1] = nbo;
-    inf->bf[1] = bfo;
+    inf->ni[1]  = nbo;
+    inf->bpi[1] = 1;
+    inf->nb[1]  = nbo;
+    inf->bf[1]  = bfo;
 
     for (i = 0; i < nic; i++)
         {for (j = 0; j < 4; j++)
@@ -72,24 +77,28 @@ int scramble_file_in(PDBfile *file, fltdes *fl, fltdat *inf)
 
 int scramble_file_out(PDBfile *file, fltdes *fl, fltdat *inf)
    {int j, s, rv;
-    int64_t i, ni, nir, nic, nbo;
+    long bpi;
+    int64_t i, ni, nir, nic, nbi, nbo;
     unsigned char b[2];
     unsigned char *bfi, *bfo;
 
     rv = TRUE;
 
     ni  = inf->ni[0];
+    bpi = inf->bpi[0];
     bfi = inf->bf[0];
 
-    nir = ni % 4;
-    nic = ni / 4;
+    nbi = ni*bpi;
+    nir = nbi % 4;
+    nic = nbi / 4;
 
     nbo = 5*nic + nir;
     bfo = CMAKE_N(unsigned char, nbo);
 
-    inf->ni[1] = nbo;
-    inf->nb[1] = nbo;
-    inf->bf[1] = bfo;
+    inf->ni[1]  = nbo;
+    inf->bpi[1] = 1;
+    inf->nb[1]  = nbo;
+    inf->bf[1]  = bfo;
 
     for (i = 0; i < nic; i++)
         {for (j = 0; j < 4; j++)
@@ -111,9 +120,37 @@ int scramble_file_out(PDBfile *file, fltdes *fl, fltdat *inf)
 /* SHRINK_FILE_IN - whole file unshrinking on input */
 
 int shrink_file_in(PDBfile *file, fltdes *fl, fltdat *inf)
-   {int rv;
+   {int j, rv;
+    long bpi;
+    int64_t i, ni, nir, nic, nbi, nbo;
+    unsigned char *bfi, *bfo;
 
     rv = TRUE;
+
+    ni  = inf->ni[0];
+    bpi = inf->bpi[0];
+    bfi = inf->bf[0];
+
+    nbi = ni*bpi;
+    nir = nbi % 4;
+    nic = nbi / 4;
+
+    nbo = 5*nic + nir;
+    bfo = CMAKE_N(unsigned char, nbo);
+
+    inf->ni[1]  = nbo;
+    inf->bpi[1] = 1;
+    inf->nb[1]  = nbo;
+    inf->bf[1]  = bfo;
+
+    for (i = 0; i < nic; i++)
+        {for (j = 0; j < 4; j++)
+	     *bfo++ = *bfi++;
+
+	 *bfo++ = i % 256;};
+
+    for (i = 0; i < nir; i++)
+        *bfo++ = *bfi++;
 
     return(rv);}
 
@@ -123,11 +160,73 @@ int shrink_file_in(PDBfile *file, fltdes *fl, fltdat *inf)
 /* SHRINK_FILE_OUT - whole file shrinking on output */
 
 int shrink_file_out(PDBfile *file, fltdes *fl, fltdat *inf)
-   {int rv;
+   {int j, rv;
+    long bpi;
+    int64_t i, ni, nir, nic, nbi, nbo;
+    unsigned char *bfi, *bfo;
 
     rv = TRUE;
 
+    ni  = inf->ni[0];
+    bpi = inf->bpi[0];
+    bfi = inf->bf[0];
+
+    nbi = ni*bpi;
+    nir = nbi % 5;
+    nic = nbi / 5;
+
+    nbo = 4*nic + nir;
+    bfo = CMAKE_N(unsigned char, nbo);
+
+    inf->ni[1]  = nbo;
+    inf->bpi[1] = 1;
+    inf->nb[1]  = nbo;
+    inf->bf[1]  = bfo;
+
+    for (i = 0; i < nic; i++)
+        {for (j = 0; j < 4; j++)
+	     *bfo++ = *bfi++;
+
+	 bfi++;};
+
+    for (i = 0; i < nir; i++)
+        *bfo++ = *bfi++;
+
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SETUP_CREATE_FILTERS - setup the filters for file NAME */
+
+PDBfile *setup_create_filters(char *name, fltdes *fl)
+   {PDBfile *file;
+
+    if (filter_file == TRUE)
+       {PD_filt_register_file(fl);
+	file = PD_create(name);}
+    else
+       {file = PD_create(name);
+	PD_filt_register_block(file, fl);};
+
+    return(file);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SETUP_OPEN_FILTERS - setup the filters for file NAME */
+
+PDBfile *setup_open_filters(char *name, char *mode, fltdes *fl)
+   {PDBfile *file;
+
+    if (filter_file == TRUE)
+       {PD_filt_register_file(fl);
+	file = PD_open(name, mode);}
+    else
+       {file = PD_open(name, mode);
+	PD_filt_register_block(file, fl);};
+
+    return(file);}
 
 /*--------------------------------------------------------------------------*/
 
@@ -164,8 +263,7 @@ int test_1(char *base, char *tgt, fltdes *fl, int n)
     if (read_only == FALSE)
 
 /* create the named file */
-       {PD_filt_register_file(fl);
-	strm = PD_create(datfile);
+       {strm = setup_create_filters(datfile, fl);
 	if (strm == NULL)
 	   error(1, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
@@ -194,8 +292,7 @@ int test_1(char *base, char *tgt, fltdes *fl, int n)
 	PRINT(fp, "File %s closed\n", datfile);
 
 /* reopen the file to append */
-	PD_filt_register_file(fl);
-	strm = PD_open(datfile, "a");
+	strm = setup_open_filters(datfile, "a", fl);
 	if (strm == NULL)
 	   error(1, fp, "Test couldn't open file %s to append\r\n", datfile);
 	PRINT(fp, "File %s opened to append\n", datfile);
@@ -209,8 +306,7 @@ int test_1(char *base, char *tgt, fltdes *fl, int n)
 	PRINT(fp, "File %s closed after append\n", datfile);};
 
 /* reopen the file */
-    PD_filt_register_file(fl);
-    strm = PD_open(datfile, "r");
+    strm = setup_open_filters(datfile, "r", fl);
     if (strm == NULL)
        error(1, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
@@ -275,8 +371,7 @@ int test_2(char *base, char *tgt, fltdes *fl, int n)
     if (read_only == FALSE)
 
 /* create the named file */
-       {PD_filt_register_file(fl);
-	strm = PD_create(datfile);
+       {strm = setup_create_filters(datfile, fl);
 	if (strm == NULL)
 	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
@@ -305,8 +400,7 @@ int test_2(char *base, char *tgt, fltdes *fl, int n)
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* reopen the file */
-    PD_filt_register_file(fl);
-    strm = PD_open(datfile, "r");
+    strm = setup_open_filters(datfile, "r", fl);
     if (strm == NULL)
        error(2, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
@@ -366,8 +460,7 @@ int test_3(char *base, char *tgt, fltdes *fl, int n)
     if (read_only == FALSE)
 
 /* create the named file */
-       {PD_filt_register_file(fl);
-	strm = PD_create(datfile);
+       {strm = setup_create_filters(datfile, fl);
 	if (strm == NULL)
 	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
@@ -404,8 +497,8 @@ int test_3(char *base, char *tgt, fltdes *fl, int n)
 	};
 
 /* reopen the file */
-    PD_filt_register_file(fl);
-    if ((strm = PD_open(datfile, "r")) == NULL)
+    strm = setup_open_filters(datfile, "r", fl);
+    if (strm == NULL)
        error(2, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
 
@@ -464,8 +557,7 @@ int test_4(char *base, char *tgt, fltdes *fl, int n)
     if (read_only == FALSE)
 
 /* create the named file */
-       {PD_filt_register_file(fl);
-	strm = PD_create(datfile);
+       {strm = setup_create_filters(datfile, fl);
 	if (strm == NULL)
 	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
@@ -489,8 +581,7 @@ int test_4(char *base, char *tgt, fltdes *fl, int n)
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* reopen the file */
-    PD_filt_register_file(fl);
-    strm = PD_open(datfile, "r");
+    strm = setup_open_filters(datfile, "r", fl);
     if (strm == NULL)
        error(2, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
@@ -550,8 +641,7 @@ int test_5(char *base, char *tgt, fltdes *fl, int n)
     if (read_only == FALSE)
 
 /* create the named file */
-       {PD_filt_register_file(fl);
-	strm = PD_create(datfile);
+       {strm = setup_create_filters(datfile, fl);
 	if (strm == NULL)
 	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
@@ -574,8 +664,7 @@ int test_5(char *base, char *tgt, fltdes *fl, int n)
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* reopen the file */
-    PD_filt_register_file(fl);
-    strm = PD_open(datfile, "r");
+    strm = setup_open_filters(datfile, "r", fl);
     if (strm == NULL)
        error(2, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
@@ -629,8 +718,7 @@ int test_6(char *base, char *tgt, fltdes *fl, int n)
     if (read_only == FALSE)
 
 /* create the named file */
-       {PD_filt_register_file(fl);
-	strm = PD_create(datfile);
+       {strm = setup_create_filters(datfile, fl);
 	if (strm == NULL)
 	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
@@ -655,8 +743,7 @@ int test_6(char *base, char *tgt, fltdes *fl, int n)
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* reopen the file */
-    PD_filt_register_file(fl);
-    strm = PD_open(datfile, "r");
+    strm = setup_open_filters(datfile, "r", fl);
     if (strm == NULL)
        error(2, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
@@ -710,8 +797,7 @@ int test_7(char *base, char *tgt, fltdes *fl, int n)
     if (read_only == FALSE)
 
 /* create the named file */
-       {PD_filt_register_file(fl);
-	strm = PD_create(datfile);
+       {strm = setup_create_filters(datfile, fl);
 	if (strm == NULL)
 	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
@@ -734,8 +820,7 @@ int test_7(char *base, char *tgt, fltdes *fl, int n)
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* reopen the file */
-    PD_filt_register_file(fl);
-    strm = PD_open(datfile, "r");
+    strm = setup_open_filters(datfile, "r", fl);
     if (strm == NULL)
        error(2, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
@@ -789,8 +874,7 @@ int test_8(char *base, char *tgt, fltdes *fl, int n)
     if (read_only == FALSE)
 
 /* create the named file */
-       {PD_filt_register_file(fl);
-	strm = PD_create(datfile);
+       {strm = setup_create_filters(datfile, fl);
 	if (strm == NULL)
 	   error(2, fp, "Test couldn't create file %s\r\n", datfile);
 	PRINT(fp, "File %s created\n", datfile);
@@ -807,8 +891,7 @@ int test_8(char *base, char *tgt, fltdes *fl, int n)
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* reopen the file */
-    PD_filt_register_file(fl);
-    strm = PD_open(datfile, "r");
+    strm = setup_open_filters(datfile, "r", fl);
     if (strm == NULL)
        error(2, fp, "Test couldn't open file %s\r\n", datfile);
     PRINT(fp, "File %s opened\n", datfile);
@@ -900,11 +983,16 @@ static void print_help(void)
    {
 
     PRINT(STDOUT, "\nTPDF - run basic PDB test suite\n\n");
-    PRINT(STDOUT, "Usage: tpdf [-b #] [-c] [-d] [-h] [-n] [-r] [-v #] [-1] [-2] [-3] [-4] [-5] [-6] [-7] [-8]\n");
+    PRINT(STDOUT, "Usage: tpdf [-b #] [-c] [-c0] [-c1] [-c2] [-d] [-f] [-h] [-n]\n");
+    PRINT(STDOUT, "            [-r] [-v #] [-1] [-2] [-3] [-4] [-5] [-6] [-7] [-8]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       b  - set buffer size (default no buffering)\n");
     PRINT(STDOUT, "       c  - verify low level writes\n");
+    PRINT(STDOUT, "       c0 - no filter chain\n");
+    PRINT(STDOUT, "       c1 - use single filter chain\n");
+    PRINT(STDOUT, "       c2 - use double filter chain\n");
     PRINT(STDOUT, "       d  - turn on debug mode to display memory maps\n");
+    PRINT(STDOUT, "       f  - turn off file mode in favor of block mode\n");
     PRINT(STDOUT, "       h  - print this help message and exit\n");
     PRINT(STDOUT, "       n  - run native mode test only\n");
     PRINT(STDOUT, "       r  - read only (assuming files from other run exist)\n");
@@ -940,6 +1028,16 @@ int main(int c, char **v)
     SC_bf_set_hooks();
     SC_zero_space_n(1, -2);
 
+    fl1 = PD_filt_make_chain(NULL, "scramble",
+			     scramble_file_in, scramble_file_out, NULL);
+
+    fl2 = PD_filt_make_chain(NULL, "scramble",
+			     scramble_file_in, scramble_file_out, NULL);
+    fl2 = PD_filt_make_chain(fl2, "shrink",
+			     shrink_file_in, shrink_file_out, NULL);
+
+    fl = fl1;
+
     bfsz             = -1;
     bfsz             = 100000;
     check_writes     = FALSE;
@@ -962,11 +1060,26 @@ int main(int c, char **v)
 		      bfsz = SC_stol(v[++i]);
 		      break;
                  case 'c' :
-		      check_writes = TRUE;
+                      switch (v[i][2])
+                         {case '0' :
+                               fl = NULL;
+			       break;
+			  case '1' :
+                               fl = fl1;
+			       break;
+                          case '2' :
+                               fl = fl2;
+			       break;
+                          default :
+			       check_writes = TRUE;
+			       break;};
 		      break;
 		 case 'd' :
 		      debug_mode  = TRUE;
 /*		      SC_gs.mm_debug = TRUE; */
+		      break;
+		 case 'f' :
+		      filter_file = FALSE;
 		      break;
                  case 'h' :
 		      print_help();
@@ -1010,14 +1123,6 @@ int main(int c, char **v)
          else
             break;};
 
-    fl1 = PD_filt_file_chain(NULL, scramble_file_in, scramble_file_out, NULL);
-
-    fl2 = PD_filt_file_chain(NULL, scramble_file_in, scramble_file_out, NULL);
-    fl2 = PD_filt_file_chain(fl2, shrink_file_in, shrink_file_out, NULL);
-
-    fl = fl1;
-    fl = fl2;
-
     PD_set_io_hooks(use_mapped_files);
     PD_verify_writes(check_writes);
 
@@ -1052,6 +1157,9 @@ int main(int c, char **v)
        err += run_test(test_7, 7, DATFILE, fl, native_only);
     if (test_eight)
        err += run_test(test_8, 8, DATFILE, fl, native_only);
+
+    PD_filt_free_chain(fl1);
+    PD_filt_free_chain(fl2);
 
     PRINT(STDOUT, "\n");
 

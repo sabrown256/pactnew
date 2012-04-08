@@ -591,19 +591,16 @@ char *_PD_expand_hyper_name(PDBfile *file, char *name)
 
 static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype, 
                                 inti ni, void *vr)
-   {int cnv, ipt;
+   {int cnv, ipt, ok;
     intb bpi;
-    inti niw, nb;
+    inti nb;
     char *in, *out, *bf;
-    FILE *fp;
     defstr *dpf;
 
     if ((intype == NULL) || (outtype == NULL) || (vr == NULL))
        return;
 
-    fp  = file->stream;
     bpi = -1;
-    niw  = 0;
 
     dpf = _PD_type_lookup(file, PD_CHART_FILE, outtype);
     if (dpf == NULL)
@@ -618,6 +615,7 @@ static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype,
     cnv = _PD_requires_conversion(file, dpf, intype, outtype);
     cnv |= (_PD_TEXT_OUT(file) == TRUE);
 
+    ok = FALSE;
     if (bpi == -1)
        PD_error("CAN'T GET NUMBER OF BYTES - _PD_WR_LEAF_MEMBERS", PD_WRITE);
 
@@ -641,14 +639,13 @@ static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype,
                    file->host_std, file->std, file->host_std,
                    file->host_chart, file->chart, 0, PD_WRITE);
 
-	bf = _PD_filt_block_out(file, bf, bpi, ni);
+	ok = _PD_filt_block_out(file, (unsigned char *) bf, outtype, bpi, ni);
 
-        niw = lio_write(bf, (size_t) bpi, (size_t) ni, fp);
         CFREE(bf);}
     else
-       niw = lio_write(vr, (size_t) bpi, (size_t) ni, fp);
+       ok = _PD_filt_block_out(file, (unsigned char *) vr, outtype, bpi, ni);
 
-    if (niw != ni)
+    if (ok == FALSE)
        PD_error("BYTE WRITE FAILED - _PD_WR_LEAF_MEMBERS", PD_WRITE);
 
     return;}
@@ -1379,19 +1376,16 @@ static int _PD_rd_hyper_index(PDBfile *file, char *name,
 
 static void _PD_rd_leaf_members(PDBfile *file, char *vr, inti ni, 
                                 char *intype, char *outtype, int boffs)
-   {int ipt, cnv;
-    inti nir, nia, nb;
+   {int ipt, cnv, ok;
+    inti nia, nb;
     intb bpi, nbt;
     char *bf, *in, *out;
     defstr *dpf;
-    FILE *fp;
 
     if ((intype == NULL) || (outtype == NULL) || (vr == NULL))
        return;
 
     bpi = -1;
-    fp  = file->stream;
-
     dpf = _PD_type_lookup(file, PD_CHART_FILE, intype);
     ipt = _PD_items_per_tuple(dpf);
 
@@ -1405,6 +1399,7 @@ static void _PD_rd_leaf_members(PDBfile *file, char *vr, inti ni,
 
     cnv = _PD_requires_conversion(file, dpf, outtype, intype);
 
+    ok = FALSE;
     if (bpi == -1)
        PD_error("CAN'T FIND NUMBER OF BYTES - _PD_RD_LEAF_MEMBERS", PD_READ);
 
@@ -1428,11 +1423,9 @@ static void _PD_rd_leaf_members(PDBfile *file, char *vr, inti ni,
 	if (SC_zero_on_alloc_n(-1) == FALSE)
 	   memset(bf, 0, nb);
 
-        nir = lio_read(bf, (size_t) bpi, (size_t) nia, fp);
-
-        if (nir == nia)
-	   {bf  = _PD_filt_block_in(file, bf, bpi, nia);
-	    in  = bf;
+        ok = _PD_filt_block_in(file, (unsigned char *) bf, intype, bpi, nia);
+        if (ok == TRUE)
+	   {in  = bf;
             out = vr;
             PD_convert(&out, &in, intype, outtype, ni,
                        file->std, file->host_std, file->host_std,
@@ -1440,19 +1433,13 @@ static void _PD_rd_leaf_members(PDBfile *file, char *vr, inti ni,
 		       boffs, PD_READ);
             CFREE(bf);}
         else
-           {CFREE(bf);
-            PD_error("FILE READ FAILED - _PD_RD_LEAF_MEMBERS", PD_READ);};}
+           CFREE(bf);}
 
     else
+       ok = _PD_filt_block_in(file, (unsigned char *) vr, intype, bpi, ni);
 
-/* GOTCHA: have to treat this like the conversion above and allocate
- * a temporary buffer
- */
-       {nir = lio_read(vr, (size_t) bpi, (size_t) ni, fp);
-        if (nir == ni)
-	   {bf = _PD_filt_block_in(file, vr, bpi, ni);}
-	else
-           PD_error("DATA READ FAILED - _PD_RD_LEAF_MEMBERS", PD_READ);};
+    if (ok == FALSE)
+       PD_error("DATA READ FAILED - _PD_RD_LEAF_MEMBERS", PD_READ);
 
     return;}
 
