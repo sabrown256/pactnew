@@ -10,6 +10,12 @@
 
 #include "pdb_int.h"
 
+#define PD_filt_switch(_inf, _i, _j)                                         \
+   {(_inf)->nb[_i]  = (_inf)->nb[_j];                                        \
+    (_inf)->bf[_i]  = (_inf)->bf[_j];                                        \
+    (_inf)->bpi[_i] = (_inf)->bpi[_j];                                       \
+    (_inf)->ni[_i]  = (_inf)->ni[_j];}
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -18,16 +24,44 @@
  *                    - return the TRUE iff successful
  */ 
  
-char *_PD_filt_block_out(PDBfile *file, char *bf, long bpi, int64_t ni)
-   {fltbdes *fl, *flt;
-            
+int _PD_filt_block_out(PDBfile *file, unsigned char *bf,
+		       char *type, long bpi, int64_t ni)
+   {int ok;
+    inti niw, nie;
+    fltdes *fl, *flt;
+    fltdat inf;
+    FILE *fp;
+
+    ok = FALSE;
+
 /* run the filter chain on the block */
     if ((bf != NULL) && (bpi != 0) && (ni != 0))
-       {flt = file->block_chain;
-	for (fl = flt; (fl != NULL) && (bf != NULL); fl = fl->next)
-            bf = fl->out(fl, file, bf, bpi, ni);};
+       {fp = file->stream;
+
+	inf.type   = type;
+	inf.nb[0]  = bpi*ni;
+	inf.bf[0]  = bf;
+	inf.bpi[0] = bpi;
+	inf.ni[0]  = ni;
+
+	PD_filt_switch(&inf, 1, 0);
+
+	flt = file->block_chain;
+
+/* find the end of the chain */
+	for (fl = flt; (fl != NULL) && (fl->next != NULL); fl = fl->next);
+
+/* run the filter chain in reverse order as defined */
+	ok = TRUE;
+	for (; (fl != NULL) && (ok == TRUE); fl = fl->prev)
+            {ok &= fl->out(file, fl, &inf);
+	     PD_filt_switch(&inf, 0, 1);};
                     
-    return(bf);}
+        niw = lio_write(inf.bf[0], inf.bpi[0], inf.ni[0], fp);
+        nie = inf.ni[0];
+	ok  = (niw == nie);};
+
+    return(ok);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -37,38 +71,53 @@ char *_PD_filt_block_out(PDBfile *file, char *bf, long bpi, int64_t ni)
  *                   - return the TRUE iff successful
  */ 
  
-char *_PD_filt_block_in(PDBfile *file, char *bf, long bpi, int64_t ni)
-   {fltbdes *fl, *flt;
-            
+int _PD_filt_block_in(PDBfile *file, unsigned char *bf,
+		      char *type, intb bpi, inti ni)
+   {int ok;
+    inti nir, nie;
+    fltdes *fl, *flt;
+    fltdat inf;
+    FILE *fp;
+
+    ok = FALSE;
+
 /* run the filter chain on the block */
     if ((bf != NULL) && (bpi != 0) && (ni != 0))
-       {flt = file->block_chain;
+       {fp  = file->stream;
 
-/* GOTCHA: have to run the filters in the opposite order as on write */
-	for (fl = flt; (fl != NULL) && (bf != NULL); fl = fl->next)
-            bf = fl->in(fl, file, bf, bpi, ni);};
-                    
-    return(bf);}
+	inf.type   = type;
+	inf.nb[1]  = bpi*ni;
+	inf.bf[1]  = bf;
+	inf.bpi[1] = bpi;
+	inf.ni[1]  = ni;
+
+	PD_filt_switch(&inf, 0, 1);
+
+/* GOTCHA: the bytes must end up in BF */
+
+	nir = lio_read(inf.bf[0], inf.bpi[0], inf.ni[0], fp);
+	nie = inf.ni[0];
+
+	flt = file->block_chain;
+
+/* run the filter chain in order as defined */
+	ok = (nir == nie);
+	for (fl = flt; (fl != NULL) && (ok == TRUE); fl = fl->next)
+	    {ok &= fl->in(file, fl, &inf);
+	     PD_filt_switch(&inf, 0, 1);};};
+
+    return(ok);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* PD_FILT_REGISTER_BLOCK - register variable block filter */
 
-int PD_filt_register_block(PDBfile *file, PFifltbdes fi, PFifltbdes fo,
-			   void *data)
-    {fltbdes *fl;
+int PD_filt_register_block(PDBfile *file, fltdes *fl)
+    {
 
-     fl = CMAKE(fltbdes);
-     if (fl != NULL)
-        {fl->in   = fi;
-	 fl->out  = fo;
-	 fl->data = data;
-	 fl->next = file->block_chain;
-	 if (file->block_chain != NULL)
-	    file->block_chain->prev = fl;
-
-         file->block_chain = fl;};
+     if (file != NULL)
+        file->block_chain = fl;
    
      return(TRUE);}
      
@@ -242,15 +291,16 @@ int _PD_filt_close(PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_FILT_FILE_CHAIN - make whole file filter chain */
+/* PD_FILT_MAKE_CHAIN - make a filter chain */
 
-fltdes *PD_filt_file_chain(fltdes *flp, PFifltdes fi, PFifltdes fo,
-			   void *data)
+fltdes *PD_filt_make_chain(fltdes *flp, char *name,
+			   PFifltdes fi, PFifltdes fo, void *data)
    {fltdes *fl;
 
     fl = CMAKE(fltdes);
     if (fl != NULL)
-       {fl->in   = fi;
+       {fl->name = CSTRSAVE(name);
+	fl->in   = fi;
 	fl->out  = fo;
 	fl->data = data;
 	fl->next = flp;
@@ -259,6 +309,21 @@ fltdes *PD_filt_file_chain(fltdes *flp, PFifltdes fi, PFifltdes fo,
 	   flp->prev = fl;};
    
     return(fl);}
+     
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_FILT_FREE_CHAIN - free a filter chain */
+
+void PD_filt_free_chain(fltdes *fl)
+   {fltdes *nxt;
+
+    for (; fl != NULL; fl = nxt)
+        {nxt = fl->next;
+         CFREE(fl->name);
+	 CFREE(fl);};
+   
+    return;}
      
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

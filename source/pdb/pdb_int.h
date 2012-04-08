@@ -451,9 +451,11 @@ extern FIXNUM
 
 /* PDFLT.C declarations */
 
-extern char
- *_PD_filt_block_out(PDBfile *file, char *bf, long bpi, int64_t ni),
- *_PD_filt_block_in(PDBfile *file, char *bf, long bpi, int64_t ni);
+extern int
+ _PD_filt_block_out(PDBfile *file, unsigned char *bf,
+		    char *type, long bpi, int64_t ni),
+ _PD_filt_block_in(PDBfile *file, unsigned char *bf,
+		   char *type, intb bpi, inti ni);
 
 extern int
  _PD_filt_file_out(PDBfile *file),

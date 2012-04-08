@@ -250,8 +250,6 @@ typedef struct s_syment syment;
 typedef struct s_defstr defstr;
 typedef struct s_fltdes fltdes;
 typedef struct s_fltdat fltdat;
-typedef struct s_fltwdes fltwdes;
-typedef struct s_fltbdes fltbdes;
 typedef struct s_sys_layer sys_layer;
 typedef struct s_tr_layer tr_layer;
 typedef struct s_PD_itag PD_itag;
@@ -264,11 +262,6 @@ typedef struct s_PD_pfm_fnc PD_pfm_fnc;
 typedef struct s_PD_scope_public PD_scope_public;
 
 typedef int (*PFifltdes)(PDBfile *file, fltdes *fl, fltdat *inf);
-typedef int (*PFifltwdes)(fltwdes *fl, PDBfile *file,
-			  int64_t start, int64_t end);
-typedef char *(*PFifltbdes)(fltbdes *fl, PDBfile *file,
-			    char *bf, long bpi, int64_t ni);
-
 typedef memdes *(*PFPDBwrite)(PDBfile *file, char *vr, defstr *defp);
 typedef memdes *(*PFPDBread)(memdes *members);
 
@@ -553,7 +546,7 @@ struct s_PDBfile
 
     void *meta;                       /* container for metadata in the tr layer */
     io_request req;
-    fltbdes *block_chain;
+    fltdes *block_chain;
     fltdes *file_chain;
     
     int (*symatch)(PDBfile *file, int ad, char *name, char *type,
@@ -735,29 +728,12 @@ struct s_fltdat
 /* FLTDES - generic filter descriptor */
 
 struct s_fltdes
-   {void *data;
+   {char *name;
+    void *data;
     PFifltdes in;
     PFifltdes out;
     fltdes *next;
     fltdes *prev;};
-
-/* FLTBDES - block filter descriptor */
-
-struct s_fltbdes
-   {void *data;
-    PFifltbdes in;
-    PFifltbdes out;
-    fltbdes *next;
-    fltbdes *prev;};
-
-/* FLTWDES - whole file filter descriptor */
-
-struct s_fltwdes
-   {void *data;
-    PFifltwdes in;
-    PFifltwdes out;
-    fltwdes *next;
-    fltwdes *prev;};
 
 struct s_attribute
    {char *name;
@@ -1205,13 +1181,15 @@ extern FIXNUM
 /* PDFLT.C declarations */
 
 extern fltdes
- *PD_filt_file_chain(fltdes *fl, PFifltdes fi, PFifltdes fo,
-		     void *data);
+ *PD_filt_make_chain(fltdes *fl, char *name,
+		     PFifltdes fi, PFifltdes fo, void *data);
 
 extern int
- PD_filt_register_block(PDBfile *file, PFifltbdes fi, PFifltbdes fo,
-			void *data),
+ PD_filt_register_block(PDBfile *file, fltdes *fl),
  PD_filt_register_file(fltdes *fl);
+
+extern void
+ PD_filt_free_chain(fltdes *fl);
 
 
 /* PDFMT.C declarations */
