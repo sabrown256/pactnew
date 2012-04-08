@@ -22,9 +22,10 @@
 typedef int (*PFTest)(char *base, char *tgt, fltdes *fl, int n);
 
 static int
- filter_file = TRUE,
- debug_mode  = FALSE,
- native_only = FALSE;
+ filter_file  = TRUE,
+ partial_read = TRUE,
+ debug_mode   = FALSE,
+ native_only  = FALSE;
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -48,13 +49,15 @@ int scramble_file_in(PDBfile *file, fltdes *fl, fltdat *inf)
     nir = nbi % 5;
     nic = nbi / 5;
 
-    nbo = 4*nic + nir;
-    bfo = CMAKE_N(unsigned char, nbo);
+    bfo = inf->bf[1];
+    if (bfo == NULL)
+       {nbo = 4*nic + nir;
+	bfo = CMAKE_N(unsigned char, nbo);
 
-    inf->ni[1]  = nbo;
-    inf->bpi[1] = 1;
-    inf->nb[1]  = nbo;
-    inf->bf[1]  = bfo;
+	inf->ni[1]  = nbo;
+	inf->bpi[1] = 1;
+	inf->nb[1]  = nbo;
+	inf->bf[1]  = bfo;};
 
     for (i = 0; i < nic; i++)
         {for (j = 0; j < 4; j++)
@@ -135,13 +138,15 @@ int shrink_file_in(PDBfile *file, fltdes *fl, fltdat *inf)
     nir = nbi % 4;
     nic = nbi / 4;
 
-    nbo = 5*nic + nir;
-    bfo = CMAKE_N(unsigned char, nbo);
+    bfo = inf->bf[1];
+    if (bfo == NULL)
+       {nbo = 5*nic + nir;
+	bfo = CMAKE_N(unsigned char, nbo);
 
-    inf->ni[1]  = nbo;
-    inf->bpi[1] = 1;
-    inf->nb[1]  = nbo;
-    inf->bf[1]  = bfo;
+	inf->ni[1]  = nbo;
+	inf->bpi[1] = 1;
+	inf->nb[1]  = nbo;
+	inf->bf[1]  = bfo;};
 
     for (i = 0; i < nic; i++)
         {for (j = 0; j < 4; j++)
@@ -977,6 +982,42 @@ static int run_test(PFTest test, int n, char *host, fltdes *fl, int native)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WORK - do the test work */
+
+static int work(char *lbl, int *ton, fltdes *fl, int ff, int no)
+   {int err;
+
+    filter_file  = ff;
+    partial_read = (filter_file == TRUE);
+
+    PRINT(STDOUT, "\t\t%s\n", lbl);
+
+    err = 0;
+
+    if (ton[1])
+       err += run_test(test_1, 1, DATFILE, fl, no);
+    if (ton[2])
+       err += run_test(test_2, 2, DATFILE, fl, no);
+    if (ton[3])
+       err += run_test(test_3, 3, DATFILE, fl, no);
+    if (ton[4])
+       err += run_test(test_4, 4, DATFILE, fl, no);
+    if (ton[5])
+       err += run_test(test_5, 5, DATFILE, fl, no);
+#if 0
+    if (ton[6])
+       err += run_test(test_6, 6, DATFILE, fl, no);
+    if (ton[7])
+       err += run_test(test_7, 7, DATFILE, fl, no);
+    if (ton[8])
+       err += run_test(test_8, 8, DATFILE, fl, no);
+#endif
+
+    return(err);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PRINT_HELP - print a help message */
 
 static void print_help(void)
@@ -1016,9 +1057,7 @@ static void print_help(void)
 
 int main(int c, char **v)
    {int i, err;
-    int test_one, test_two, test_three;
-    int test_four, test_five, test_six, test_seven;
-    int test_eight;
+    int ton[8];
     int use_mapped_files, check_writes;
     int64_t bfsz;
     fltdes *fl1, *fl2, *fl;
@@ -1045,14 +1084,10 @@ int main(int c, char **v)
     native_only      = FALSE;
     read_only        = FALSE;
     use_mapped_files = FALSE;
-    test_one         = TRUE;
-    test_two         = TRUE;
-    test_three       = TRUE;
-    test_four        = TRUE;
-    test_five        = TRUE;
-    test_six         = TRUE;
-    test_seven       = TRUE;
-    test_eight       = TRUE;
+
+    for (i = 0; i < 8; i++)
+        ton[i] = TRUE;
+
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')
             {switch (v[i][1])
@@ -1078,8 +1113,14 @@ int main(int c, char **v)
 		      debug_mode  = TRUE;
 /*		      SC_gs.mm_debug = TRUE; */
 		      break;
+
+/* select block filtering and use the 2 filter chain because it
+ * preserves the byte size of the items
+ * which is currently necessary
+ */
 		 case 'f' :
-		      filter_file = FALSE;
+		      filter_file  = FALSE;
+		      partial_read = FALSE;
 		      break;
                  case 'h' :
 		      print_help();
@@ -1097,31 +1138,20 @@ int main(int c, char **v)
                       PD_set_fmt_version(SC_stoi(v[++i]));
 		      break;
                  case '1' :
-		      test_one = FALSE;
-		      break;
                  case '2' :
-		      test_two = FALSE;
-		      break;
                  case '3' :
-		      test_three = FALSE;
-		      break;
                  case '4' :
-		      test_four = FALSE;
-		      break;
                  case '5' :
-		      test_five = FALSE;
-		      break;
                  case '6' :
-		      test_six = FALSE;
-		      break;
                  case '7' :
-		      test_seven = FALSE;
-		      break;
                  case '8' :
-		      test_eight = FALSE;
+		      ton[v[i][1] - '0'] = FALSE;
 		      break;};}
          else
             break;};
+
+    if ((filter_file == FALSE) && (fl == fl1))
+       fl = fl2;
 
     PD_set_io_hooks(use_mapped_files);
     PD_verify_writes(check_writes);
@@ -1141,22 +1171,14 @@ int main(int c, char **v)
 
     err = 0;
 
-    if (test_one)
-       err += run_test(test_1, 1, DATFILE, fl, native_only);
-    if (test_two)
-       err += run_test(test_2, 2, DATFILE, fl, native_only);
-    if (test_three)
-       err += run_test(test_3, 3, DATFILE, fl, native_only);
-    if (test_four)
-       err += run_test(test_4, 4, DATFILE, fl, native_only);
-    if (test_five)
-       err += run_test(test_5, 5, DATFILE, fl, native_only);
-    if (test_six)
-       err += run_test(test_6, 6, DATFILE, fl, native_only);
-    if (test_seven)
-       err += run_test(test_7, 7, DATFILE, fl, native_only);
-    if (test_eight)
-       err += run_test(test_8, 8, DATFILE, fl, native_only);
+/* whole file filtering */
+/*    err += work("file 0", ton, NULL, TRUE, native_only); */
+    err += work("file 1", ton, fl1,  TRUE, native_only);
+    err += work("file 2", ton, fl2,  TRUE, native_only);
+
+/* block filtering */
+/*    err += work("block 0", ton, NULL, TRUE, native_only); */
+    err += work("block 2", ton, fl2,  FALSE, native_only);
 
     PD_filt_free_chain(fl1);
     PD_filt_free_chain(fl2);
