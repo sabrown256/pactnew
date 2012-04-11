@@ -857,8 +857,9 @@ void _PD_free_tuple(multides *tuple)
  */
 
 memdes *PD_copy_members(memdes *desc)
-   {memdes *newm, *nnxt, *thism, *prevm;
-    char *ms, *ts, *bs, *ns, *cs;
+   {inti is, ns;
+    memdes *newm, *nnxt, *thism, *prevm;
+    char *ms, *ts, *bs, *ss, *cs;
     dimdes *nd;
 
     newm  = NULL;
@@ -869,33 +870,58 @@ memdes *PD_copy_members(memdes *desc)
          ms = CSTRSAVE(thism->member);
          ts = CSTRSAVE(thism->type);
          bs = CSTRSAVE(thism->base_type);
-         ns = CSTRSAVE(thism->name);
+         ss = CSTRSAVE(thism->name);
          nd = PD_copy_dims(thism->dimensions);
 
          nnxt->member      = ms;
          nnxt->type        = ts;
          nnxt->is_indirect = _PD_indirection(nnxt->type);   
          nnxt->base_type   = bs;
-         nnxt->name        = ns;
+         nnxt->name        = ss;
          nnxt->dimensions  = nd;
          nnxt->next        = NULL;
 
          SC_mark(ms, 1);
          SC_mark(ts, 1);
          SC_mark(bs, 1);
-         SC_mark(ns, 1);
+         SC_mark(ss, 1);
          SC_mark(nd, 1);
 
          nnxt->member_offs = thism->member_offs;
-         nnxt->cast_offs   = thism->cast_offs;
          nnxt->number      = thism->number;
 
+/* copy cast data */
+         nnxt->cast_offs = thism->cast_offs;
          if (thism->cast_memb != NULL)
 	    {cs = CSTRSAVE(thism->cast_memb);
 	     nnxt->cast_memb  = cs;
              SC_mark(cs, 1);}
 	 else
 	    nnxt->cast_memb = NULL;
+
+/* copy size_from data */
+	 ns = SC_arrlen(thism->size_offs);
+	 if (ns > 0)
+	    {int64_t *nso;
+	     char **nsm;
+
+	     ns /= sizeof(int64_t);
+
+	     nso = CMAKE_N(int64_t, ns);
+	     nsm = CMAKE_N(char *, ns);
+
+	     nnxt->size_offs = nso;
+	     nnxt->size_memb = nsm;
+
+	     for (is = 0; is < ns; is++)
+	         {nso[is] = thism->size_offs[is];
+		  cs      = thism->size_memb[is];
+		  if (cs != NULL)
+		     {nsm[is] = CSTRSAVE(cs);
+		      SC_mark(cs, 1);};};}
+	 else
+	    {nnxt->size_offs = NULL;
+	     nnxt->size_memb = NULL;};
 
          if (newm == NULL)
             newm = nnxt;
@@ -957,6 +983,8 @@ memdes *_PD_mk_descriptor(char *member, int defoff)
     desc->member_offs = -1L;
     desc->cast_offs   = -1L;
     desc->cast_memb   = NULL;
+    desc->size_offs   = NULL;
+    desc->size_memb   = NULL;
     desc->next        = NULL;
 
     return(desc);}
@@ -978,6 +1006,8 @@ void _PD_rl_descriptor(memdes *desc)
 	    CFREE(desc->type);
 	    CFREE(desc->base_type);
 	    CFREE(desc->cast_memb);
+	    CFREE(desc->size_offs);
+	    SC_free_strings(desc->size_memb);
 
 	    _PD_rl_dimensions(desc->dimensions);
 	    desc->dimensions = NULL;};

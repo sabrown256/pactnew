@@ -463,7 +463,7 @@ int _PD_rd_chrt_ii(PDBfile *file)
 	file->current_prefix = CSTRSAVE("/");};
     pa->has_dirs = FALSE;
 
-    _PD_check_casts(file);
+    _PD_cast_check(file);
 
     CFREE(pa->tbuffer);
 

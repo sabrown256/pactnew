@@ -1275,7 +1275,6 @@ int PD_def_mapping(PDBfile *fp ARG(,,cls))
     err &= PD_cast(fp, "PM_set", "elements", "element_type");
     err &= PD_cast(fp, "PM_set", "extrema", "es_type");
     err &= PD_cast(fp, "PM_set", "scales", "es_type");
-    err &= PD_cast(fp, "PM_set", "ordering", "ordering_type");
     err &= PD_cast(fp, "PM_set", "symmetry", "symmetry_type");
     err &= PD_cast(fp, "PM_set", "topology", "topology_type");
     err &= PD_cast(fp, "PM_set", "info", "info_type");

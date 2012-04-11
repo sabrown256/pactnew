@@ -1215,64 +1215,6 @@ int PD_append_as_alt(PDBfile *file ARG(,,cls), char *name, char *intype,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_CAST - tell PDBLib that the type of a particular member (which must
- *         - be a pointer) is specified by another member (which must
- *         - be a character pointer). Put this information into the FILE chart.
- *         - return TRUE iff successful
- *
- * #bind PD_cast fortran() scheme() python()
- */
-
-int PD_cast(PDBfile *file ARG(,,cls), char *type, char *memb, char *contr)
-   {long i;
-    hasharr *tab;
-    defstr *dp;
-    memdes *desc, *lst;
-
-/* first make sure that "type" has a member "contr" which is of type char
- * this assumes that file->chart is a linked list
- */
-    tab = file->chart;
-    for (i = 0; SC_hasharr_next(tab, &i, NULL, NULL, (void **) &dp); i++)
-        {if (strcmp(type, dp->type) != 0)
-	    continue;
-
-/* check that the contr is right */
-	 for (desc = dp->members; desc != NULL; desc = desc->next)
-	     {if (strcmp(contr, desc->name) != 0)
-		 continue;
-
-/* do this once, don't repeat in other chart */
-	      if ((strcmp(desc->base_type, SC_CHAR_S) != 0) ||
-		  !_PD_indirection(desc->type))
-		 {PD_error("BAD CAST CONTROLLER - PD_CAST", PD_GENERIC);
-		  return(FALSE);};
-	      break;};};
-
-/* now that we know such a cast is reasonable, add the cast to the host charts */
-
-/* add the cast to the file->host_chart */
-    tab = file->host_chart;
-    for (i = 0; SC_hasharr_next(tab, &i, NULL, NULL, (void **) &dp); i++)
-        {if (strcmp(type, dp->type) != 0)
-	    continue;
-
-	 for (desc = dp->members; desc != NULL; desc = desc->next)
-	     {if (strcmp(memb, desc->name) != 0)
-		 continue;
-
-/* make an independent copy in case the one in the file chart is released */
-	      CFREE(desc->cast_memb);
-	      desc->cast_memb = CSTRSAVE(contr);
-	      desc->cast_offs = _PD_member_location(contr, tab, dp, &lst);
-
-	      SC_mark(contr, 1);};};
-
-    return(TRUE);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PD_SET_IO_HOOKS - set the I/O hooks for PDB
  *                 - should be set at beginning in serial region
  */
