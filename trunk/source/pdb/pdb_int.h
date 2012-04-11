@@ -252,9 +252,6 @@ extern syment
  *_PD_defent(PDBfile *file, char *name, char *outtype,
 	     inti number, dimdes *dims);
 
-extern void
- _PD_cast_insert(hasharr* chart, char* type, char* memb, char* cast);
-
 extern int
  _PD_read(PDBfile *file, char *fullpath, char *type, syment *ep,
 	  void *vr, int nd, long *ind);
@@ -357,6 +354,12 @@ extern void
 extern int
  _PD_ha_rl_syment(haelem *hp, void *a),
  _PD_ha_rl_defstr(haelem *hp, void *a);
+
+
+/* PDCAST.C declarations */
+
+extern void
+ _PD_cast_check(PDBfile *file);
 
 
 /* PDCOMM.C declarations */
@@ -464,11 +467,6 @@ extern int
 
 
 /* PDFMT.C declarations */
-
-extern void
- _PD_check_casts_list(hasharr *chrt, char **lst, inti n),
- _PD_check_casts_hash(hasharr *chrt, char **lst, inti n),
- _PD_check_casts(PDBfile *file);
 
 extern char
  *_PD_header_token(int which),

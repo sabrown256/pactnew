@@ -1,5 +1,5 @@
 /*
- * TPDTD.C - test for the PDB file independent stuff
+ * TPDTD.C - PDB typedef testing
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942

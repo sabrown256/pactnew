@@ -388,13 +388,17 @@ static void async_server(client *cl)
 	if (IS_NULL(s) == TRUE)
 	   tmax = 60;
 	else
-	   tmax = atoi(s);
+	   {tmax = atoi(s);
+	    log_activity(flog, dbg_db, "SERVER",
+			 "PERDB_IDLE_TIMEOUT = %d", tmax);};
 
         s = cgetenv(FALSE, "PERDB_IDLE_INTERVAL");
 	if (IS_NULL(s) == TRUE)
 	   dt = tmax;
 	else
-	   dt = atoi(s);
+	   {dt = atoi(s);
+	    log_activity(flog, dbg_db, "SERVER",
+			 "PERDB_IDLE_INTERVAL = %d", dt);};
 
 /* maximum number of consecutive 0 length reads
  * indicating dropped connection
@@ -539,7 +543,9 @@ static void help(void)
 int main(int c, char **v)
    {int i, rv, srv, dmn, init, ltr;
     char root[MAXLINE], r[MAXLINE], req[MAXLINE];
-    char *except[] = {"PATH", NULL};
+    char *except[] = {"PATH", "PERDB_IDLE_TIMEOUT",
+		      "PERDB_IDLE_INTERVAL", "PERDB_PATH",
+		      NULL};
 
     req[0] = '\0';
     r[0]   = '\0';

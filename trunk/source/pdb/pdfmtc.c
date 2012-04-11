@@ -497,7 +497,7 @@ static int _PD_rd_chrt_iii(PDBfile *file)
     pa->cast_lst = pl;
     pa->n_casts  = icast;
 
-    _PD_check_casts(file);
+    _PD_cast_check(file);
 
     CFREE(pa->tbuffer);
 

@@ -132,9 +132,13 @@
  * delay symbol modes with not work optimally and that feature
  * does not go back before version 28.  02/08/2012
  *
+ * Version 30 adds the ability to have the size of pointer members
+ * determined by other members similarly to the way types can be
+ * controlled by PD_cast.  04/11/2012
+ *
  */
 
-#define PDB_SYSTEM_VERSION  29
+#define PDB_SYSTEM_VERSION  30
 
 #define BITS_DEFAULT 8     /* default bits per byte */
 #define NSTD         6     /* number of standards currently in the system 
@@ -609,6 +613,8 @@ struct s_memdes
     int64_t member_offs;
     char *cast_memb;
     long cast_offs;
+    char **size_memb;
+    int64_t *size_offs;
     int is_indirect;
     char *type;
     char *base_type;
@@ -625,6 +631,8 @@ FUNCTION_POINTER(memdes, *(*PFPmemdes));
               "int64_t member_offs",      \
               "char *cast_memb",          \
               "long cast_offs",           \
+              "char **size_memb",         \
+              "int64_t *size_offs",       \
               "int is_indirect",          \
               "char *type",               \
               "char *base_type",          \
@@ -969,7 +977,6 @@ extern int
  PD_read_as_alt(PDBfile *file, char *name, char *type, void *vr,
 		long *ind),
  PD_copy_type(PDBfile *sf, PDBfile *df, char *type),
- PD_cast(PDBfile *file, char *type, char *memb, char *contr),
  PD_free(PDBfile *file, char *type, void *var),
  PD_fix_denorm(data_standard* std, char *type, int64_t ni, void *vr),
  PD_autofix_denorm(PDBfile *file, int flag);
@@ -1005,6 +1012,12 @@ extern int
 extern void
  PD_contents(PDBfile *file, FILE *out, int fh, int vers),
  PD_fp_toler(PDBfile *file, long double *fptol);
+
+
+/* PDCAST.C declarations */
+
+extern int
+ PD_cast(PDBfile *file, char *type, char *memb, char *contr);
 
 
 /* PDBMM.C declarations */
