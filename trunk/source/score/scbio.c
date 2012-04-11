@@ -670,6 +670,9 @@ static int _SC_bio_seek(bio_desc *bid, int64_t offs, int wh)
        ret = fseeko(bid->fp, offs, wh);
 # endif
 
+    if (ret < 0)
+       io_error(errno, "fseek to %lld failed", (long long) offs);
+
 #else
 
     if (addr != bid->curr)
@@ -684,6 +687,9 @@ static int _SC_bio_seek(bio_desc *bid, int64_t offs, int wh)
 
 	if (sk == TRUE)
 	   {addr = lseek(bid->fd, offs, wh);
+	    if (addr < 0)
+	       io_error(errno, "lseek to %lld on %d failed",
+			(long long) offs, bid->fd);
 	    bid->nhits[BIO_OPER_SEEK]++;};};
 
 #endif
@@ -717,9 +723,14 @@ static int _SC_verify_file(int fd, int64_t ad, int64_t nb, unsigned char *bf)
     unsigned char *cbf;
 
     rad = lseek(fd, 0, SEEK_CUR);
+    if (rad < 0)
+       io_error(errno, "lseek to 0 on %d failed", fd);
 
     cbf = CMAKE_N(unsigned char, nb);
     st  = lseek(fd, ad, SEEK_SET);
+    if (st < 0)
+       io_error(errno, "lseek to %lld on %d failed",
+		(long long) ad, fd);
 
 /* read the file contents */
     st = SC_read_sigsafe(fd, cbf, nb);
@@ -733,6 +744,10 @@ static int _SC_verify_file(int fd, int64_t ad, int64_t nb, unsigned char *bf)
 	    ok = (cbf[i] == bf[i]);};
 
     st = lseek(fd, rad, SEEK_SET);
+    if (st < 0)
+       io_error(errno, "lseek to %lld on %d failed",
+		(long long) rad, fd);
+
     CFREE(cbf);
 
     return(ok);}
@@ -1439,7 +1454,8 @@ long *SC_binfo(void)
 /* SC_BOPEN - small file method for fopen */
 
 FILE *SC_bopen(char *name, char *mode)
-   {FILE *ret, *fp;
+   {int st;
+    FILE *ret, *fp;
     bio_desc *bid;
     file_io_desc *fid;
 
@@ -1464,7 +1480,10 @@ FILE *SC_bopen(char *name, char *mode)
 /* NOTE: this should not be necessary but various implementations
  * do not reliably leave the system level file position at 0
  */
-	    lseek(bid->fd, 0, 0);
+	    st = lseek(bid->fd, 0, 0);
+	    if (st < 0)
+	       io_error(errno, "lseek to 0 on %d failed", bid->fd);
+
 	    bid->nhits[BIO_OPER_SEEK]++;
 
 #endif
@@ -1499,7 +1518,8 @@ FILE *SC_bopen(char *name, char *mode)
 /* SC_LBOPEN - large file method for fopen */
 
 FILE *SC_lbopen(char *name, char *mode)
-   {FILE *ret, *fp;
+   {int st;
+    FILE *ret, *fp;
     bio_desc *bid;
     file_io_desc *fid;
 
@@ -1525,7 +1545,9 @@ FILE *SC_lbopen(char *name, char *mode)
 /* NOTE: this should not be necessary but various implementations
  * do not reliably leave the system level file position at 0
  */
-	    lseek(bid->fd, 0, 0);
+	    st = lseek(bid->fd, 0, 0);
+	    if (st < 0)
+	       io_error(errno, "lseek to 0 on %d failed", bid->fd);
 	    bid->nhits[BIO_OPER_SEEK]++;
 #endif
 

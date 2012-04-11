@@ -252,6 +252,10 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	fd    = open(fname, O_RDONLY);
 	if (fd >= 0)
 	   {nc = read(fd, s, MAXLINE);
+	    if (nc < 0)
+	       io_error(errno, "read of %lld bytes on %d failed",
+			(long long) MAXLINE, fd);
+
 	    close(fd);
 
 	    if ((0 < nc) && (nc < MAXLINE))
@@ -282,6 +286,9 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	fd    = open(fname, O_RDONLY);
 	if (fd >= 0)
 	   {nc = read(fd, s, MAXLINE);
+	    if (nc < 0)
+	       io_error(errno, "read of %lld bytes on %d failed",
+			(long long) MAXLINE, fd);
 	    close(fd);
 	    if (nc > 0)
 	       SC_strncpy(ru->cmd, MAXLINE, s, -1);};
@@ -305,6 +312,9 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	if (fd > 0)
 	   {nc = sizeof(pstatus_t);
 	    nb = read(fd, &sp, nc);
+	    if (nc < 0)
+	       io_error(errno, "read of %lld bytes on %d failed",
+			(long long) nc, fd);
 	    close(fd);
 
 	    if (stat(fname, &bf) == 0)
@@ -328,6 +338,9 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	if (fd > 0)
 	   {nc = sizeof(psinfo_t);
 	    nb = read(fd, &si, nc);
+	    if (nc < 0)
+	       io_error(errno, "read of %lld bytes on %d failed",
+			(long long) nc, fd);
 	    close(fd);
 
 	    if (nb == nc)
@@ -353,6 +366,9 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	if (fd > 0)
 	   {nc = sizeof(pstatus_t);
 	    nb = read(fd, &sp, nc);
+	    if (nc < 0)
+	       io_error(errno, "read of %lld bytes on %d failed",
+			(long long) nc, fd);
 	    close(fd);
 
 	    if (stat(fname, &bf) == 0)
@@ -376,6 +392,9 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	if (fd > 0)
 	   {nc = sizeof(psinfo_t);
 	    nb = read(fd, &si, nc);
+	    if (nc < 0)
+	       io_error(errno, "read of %lld bytes on %d failed",
+			(long long) nc, fd);
 	    close(fd);
 
 	    if (nb == nc)
@@ -387,6 +406,9 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 	if (fd > 0)
 	   {nc = sizeof(prusage_t);
 	    nb = read(fd, &su, sizeof(prusage_t));
+	    if (nc < 0)
+	       io_error(errno, "read of %lld bytes on %d failed",
+			(long long) sizeof(prusage_t), fd);
 	    close(fd);
 
 	    if (nb == nc)

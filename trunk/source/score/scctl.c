@@ -776,17 +776,16 @@ char *SC_itoa(int n, int radix, int nc)
  */
 
 int SC_query_file(char *name, char *mode, char *type)
-   {int i, n, nt, c, ret;
-    int null_lines;
-    char bf[MAXLINE+1];
+   {int i, c, nr, ret;
+    int64_t nn, np;
+    char bf[MAX_BFSZ+1];
+    double fr;
     FILE *fp;
 
     ret = SC_QUERY_MODE(name, mode);
     if (ret == TRUE)
        {if (type != NULL)
-           {null_lines = 0;
-
-	    memset(bf, 0, MAXLINE+1);
+           {memset(bf, 0, MAX_BFSZ+1);
 
 /* type may be const char * and will die when SC_str_lower
  * attempts to change values
@@ -796,24 +795,26 @@ int SC_query_file(char *name, char *mode, char *type)
             if (strcmp(bf, "ascii") == 0)
                {fp = io_open(name, "r");
 
-		n = 0;
-                for (nt = 0; nt < 2048; nt += n)
-                    {if (io_gets(bf, MAXLINE, fp) == NULL)
-                        break;
-                     n = strlen(bf);
-                     if (n == 0)
-                        {null_lines++;
+/* count the number of printable and non-printable characters
+ * in the first MAX_BFSZ bytes of the file
+ */
+		nn = 0;
+		np = 0;
+		nr = io_read(bf, 1, MAX_BFSZ, fp);
+		for (i = 0; i < nr; i++)
+		    {c = bf[i];
+		     if (SC_is_print_char(c, 0))
+			np++;
+		     else
+		        nn++;};
 
-/* assume an ascii file won't have more than 20 null lines */      
-                         if (null_lines > 20)
-                            {ret = FALSE;
-                             break;};}
-                     for (i = 0; i < n; i++)
-		         {c = bf[i];
-			  if (!SC_is_print_char(c, 0))
-                             ret = FALSE;};};
+                io_close(fp);
 
-                io_close(fp);}
+/* consider the file text if the number of non-printable characters is
+ * less than 5% of the printable characters
+ */
+		fr  = ((double) nn)/((double) np + SMALL);
+                ret = (fr < 0.05);}
             else
                ret = FALSE;};};
 

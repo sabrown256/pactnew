@@ -165,6 +165,38 @@ int SC_gather_io_info(FILE *fp, int wh)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* IO_ERROR - report I/O errors via user specified hook */
+
+void io_error(int err, char *fmt, ...)
+   {char t[MAXLINE], s[MAXLINE];
+
+    SC_VA_START(fmt);
+    SC_VSNPRINTF(t, MAXLINE, fmt);
+    SC_VA_END;
+
+    SC_strerror(err, s, MAXLINE);
+
+    if (_SC_ios.error != NULL)
+       _SC_ios.error(errno, s, t);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_SET_IO_ERROR_HANDLER - assign user supplied I/O error handler */
+
+PFIOErr SC_set_io_error_handler(PFIOErr hnd)
+   {PFIOErr ov;
+
+    ov = _SC_ios.error;
+    _SC_ios.error = hnd;
+
+    return(ov);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_SET_BUFFER_SIZE - set the default I/O buffer size to SZ
  *                    - return the old value
  *                    - -1 turns off default buffering optimization
@@ -441,11 +473,10 @@ static size_t _SC_fwrite_atm(void *s, size_t bpi, size_t ni, FILE *fp)
  */
 
 size_t _SC_fwrite(void *s, size_t bpi, size_t ni, FILE *fp)
-   {int ok, flags, rw, fd;
+   {int ok, flags, rw, fd, st;
     int64_t i, nb;
     size_t nw, nr;
     int64_t addr;
-    char msg[MAXLINE];
     char *ps, *t;
 
 /* turn off SIGIO handler */
@@ -464,7 +495,7 @@ size_t _SC_fwrite(void *s, size_t bpi, size_t ni, FILE *fp)
 /* remember where we are and write it out */
 	addr = ftell(fp);
 	if (addr < 0)
-	   SC_strerror(errno, msg, MAXLINE);
+	   io_error(errno, "ftell failed");
 
 	nw = _SC_fwrite_atm(s, bpi, ni, fp);
 
@@ -475,7 +506,10 @@ size_t _SC_fwrite(void *s, size_t bpi, size_t ni, FILE *fp)
 	   {nb = bpi*ni;
 	    t  = CMAKE_N(char, nb);
 
-	    fseek(fp, addr, SEEK_SET);
+	    st = fseek(fp, addr, SEEK_SET);
+	    if (st < 0)
+	       io_error(errno, "fseek to %lld failed", (long long) addr);
+
 	    nr = _SC_fread(t, bpi, ni, fp);
 
 /* compare */
@@ -490,7 +524,9 @@ size_t _SC_fwrite(void *s, size_t bpi, size_t ni, FILE *fp)
 /* if they disagree move back to the start and return 0 */
 	    if (ok == FALSE)
 	       {nw = 0;
-		fseek(fp, addr, SEEK_SET);};
+		st = fseek(fp, addr, SEEK_SET);
+		if (st < 0)
+		   io_error(errno, "fseek to %lld failed", (long long) addr);};
 
 	    CFREE(t);};}
 
@@ -508,7 +544,7 @@ size_t _SC_fwrite(void *s, size_t bpi, size_t ni, FILE *fp)
 /* SC_FGETS - do an fgets which terminates on \r or \n */
 
 char *SC_fgets(char *s, int n, FILE *fp)
-   {int i, nbr, nb, nc;
+   {int i, nbr, nb, nc, st;
     int64_t pos;
     char *r;
     static int count = 0;
@@ -523,7 +559,14 @@ char *SC_fgets(char *s, int n, FILE *fp)
 
         else
 	   {pos = ftell(fp);
+	    if (pos < 0)
+	       io_error(errno, "ftell failed");
+
 	    nbr = fread(s, 1, nc, fp);
+	    if (nbr < 0)
+	       io_error(errno, "fread of %lld bytes failed",
+			(long long) nc);
+
 	    if (nbr < nc)
 	       s[nbr] = '\0';
 
@@ -535,7 +578,10 @@ char *SC_fgets(char *s, int n, FILE *fp)
 		   s[nb] = '\0';
 
 		nb = min(nb, nbr);
-		fseek(fp, pos + nb, SEEK_SET);};
+		st = fseek(fp, pos + nb, SEEK_SET);
+		if (st < 0)
+		   io_error(errno, "fseek to %lld failed",
+			    (long long) (pos + nb));};
        
 	    r = (nbr > 0) ? s : NULL;};
 
@@ -1567,6 +1613,9 @@ static int64_t _SC_lftell(FILE *fp)
 
 #endif
 
+    if (rv < 0)
+       io_error(errno, "ftell failed");
+
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
@@ -1587,6 +1636,9 @@ static int _SC_lfseek(FILE *fp, int64_t offs, int whence)
     rv = fseek(fp, offs, whence);
 
 #endif
+
+    if (rv < 0)
+       io_error(errno, "fseek to %lld failed", (long long) offs);
 
     return(rv);}
 
@@ -1722,7 +1774,9 @@ long io_tell(FILE *fp)
     rv = -1;
     if (fp != NULL)
        {if (IS_STD_IO(fp))
-	   rv = ftell(fp);
+	   {rv = ftell(fp);
+	    if (rv < 0)
+	       io_error(errno, "ftell failed");}
     
         else
 	   {fid = (file_io_desc *) fp;
@@ -1752,8 +1806,10 @@ int io_seek(FILE *fp, long offs, int whence)
     rv = -1;
     if (fp != NULL)
        {if (IS_STD_IO(fp))
-	   rv = fseek(fp, offs, whence);
-    
+	   {rv = fseek(fp, offs, whence);
+	    if (rv < 0)
+	       io_error(errno, "fseek to %lld failed", (long long) offs);}
+
         else
 	   {fid = (file_io_desc *) fp;
 	    fp  = fid->info;
@@ -2649,16 +2705,26 @@ int64_t SC_file_length(char *name)
  */
 
 int64_t SC_file_size(FILE *fp)
-   {int64_t ad, ln;
+   {int st;
+    int64_t ad, ln;
 
 /* remember where we are */
     ad = ftell(fp);
+    if (ad < 0)
+       io_error(errno, "ftell failed");
 
-    fseek(fp, 0, SEEK_END);
+    st = fseek(fp, 0, SEEK_END);
+    if (st < 0)
+       io_error(errno, "fseek to 0 failed");
+
     ln = ftell(fp);
+    if (ln < 0)
+       io_error(errno, "ftell failed");
 
 /* return to where we started */
-    fseek(fp, ad, SEEK_SET);
+    st = fseek(fp, ad, SEEK_SET);
+    if (st < 0)
+       io_error(errno, "fseek to %lld failed", (long long) ad);
 
     return(ln);}
  
@@ -2712,7 +2778,9 @@ ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
 
 /* non-blocking read or terminal - take what you get */
     if ((blk == FALSE) || (isatty(fd) == TRUE))
-       rv = read(fd, bf, n);
+       {rv = read(fd, bf, n);
+	if (rv < 0)
+	   io_error(errno, "read of %lld bytes on %d failed", (long long) n, fd);}
 
 /* blocking read - insist on the specified number of bytes or an error */
     else
@@ -2724,7 +2792,8 @@ ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
 	while ((nbo > 0) && (nbr != 0))
 	   {nbr = read(fd, pbf, nbo);
 	    if (nbr < 0)
-	       {rv = nbr;
+	       {io_error(errno, "read of %lld on %d failed", (long long) nbo, fd);
+                rv = nbr;
 		break;};
 	    pbf += nbr;
 	    nbo -= nbr;
@@ -2750,7 +2819,8 @@ ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
  */
 
 ssize_t SC_write_sigsafe(int fd, void *bf, size_t n)
-   {long nbo, nbw, zc;
+   {int err;
+    long nbo, nbw, zc;
     ssize_t rv;
     char *pbf;
 
@@ -2762,11 +2832,15 @@ ssize_t SC_write_sigsafe(int fd, void *bf, size_t n)
     while ((nbo > 0) && (zc < 10))
        {nbw = write(fd, pbf, nbo);
 	if (nbw < 0)
+	   {err = errno;
 
 /* if EAGAIN/EWOULDBLOCK try sleeping 10 ms to let the system catch up
  * limit the number of attempts to 10
  */
-	   {if (errno == EAGAIN)
+	    io_error(err, "write of %lld bytes on %d failed",
+		     (long long) nbo, fd);
+
+	    if (err == EAGAIN)
                {SC_sleep(10);
                 zc++;
 		continue;}
@@ -2797,6 +2871,9 @@ static size_t _SC_fread_safe(void *s, size_t bpi, size_t ni, FILE *fp)
     ps = (char *) s;
     while ((ns > 0) && (zc < 10))
        {n = fread(ps, bpi, ns, fp);
+	if (n < 0)
+	   io_error(errno, "fread of %lld bytes failed",
+		    (long long) (bpi*ns));
 
 	zc = (n == 0) ? zc + 1 : 0;
 
@@ -2856,6 +2933,9 @@ size_t SC_fwrite_sigsafe(void *s, size_t bpi, size_t ni, FILE *fp)
     ps = (char *) s;
     while ((ns > 0) && (zc < 10))
        {n = fwrite(ps, bpi, ns, fp);
+	if (n < 0)
+	   io_error(errno, "fwrite of %lld bytes failed",
+		    (long long) (bpi*ns));
 
 	if (n <= 0)
            {zc++;

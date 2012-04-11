@@ -142,6 +142,8 @@ typedef int (*PFfeof)(FILE *stream);
 
 typedef char *(*PFfgets)(char *s, int n, FILE *stream);
 
+typedef void (*PFIOErr)(int err, char *sys, char *usr);
+
 
 /* large file I/O function types */
 
@@ -345,7 +347,8 @@ struct s_SC_scope_io
     PFfprintf putln;                              /* print function pointer */
     PFfputs putstr;                               /* print function pointer */
     FILE *(*sfopen)(char *name, char *mode);
-    FILE *(*lfopen)(char *name, char *mode);};
+    FILE *(*lfopen)(char *name, char *mode);
+    void (*error)(int err, char *sys, char *usr);};
 
 
 enum e_SC_file_cat
@@ -426,6 +429,7 @@ extern FILE
  *SC_std_file(void *p);
 
 extern void
+ io_error(int err, char *fmt, ...),
  SC_get_io_info(FILE *fp, int **pnhits, double **pnsec),
  SC_setbuf(FILE *fp, char *bf);
 
@@ -494,6 +498,9 @@ extern ssize_t
 extern size_t
  SC_fread_sigsafe(void *s, size_t bpi, size_t ni, FILE *fp),
  SC_fwrite_sigsafe(void *s, size_t bpi, size_t ni, FILE *fp);
+
+extern PFIOErr
+ SC_set_io_error_handler(PFIOErr hnd);
 
 
 /* SCMMAP.C declarations */
