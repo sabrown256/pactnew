@@ -1395,9 +1395,10 @@ int64_t _PD_close(PDBfile *file)
 	else
 	   ret = PD_get_file_length(file);
 
-	if ((ret > 0) && (ok == TRUE))
-	   {st  = _PD_filt_close(file);
-	    ok &= (st != 0);};
+	if (file->virtual_internal == FALSE)
+	   {if ((ret > 0) && (ok == TRUE))
+	       {st  = _PD_filt_close(file);
+		ok &= (st != 0);};};
 
 	fp = file->stream;
 	if (fp != NULL)

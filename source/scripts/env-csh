@@ -78,7 +78,7 @@ alias SafeSet   'if ($?\!\!:1 == 0) set \!\!:1 = \!\!:2-$'
 # use dbset instead of setenv
 # matches C call dbset
 # usage: dbset <var> <value>
-alias dbset     'setenv \!\!:1 "`$PERDB \!\!:1 = \!\!:2-$`"'
+#alias dbset     'setenv \!\!:1 "`$PERDB \!\!:1 = \!\!:2-$`"'
 alias dbset     'set t_ = ( `$PERDB \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
 
 # dbget imports a database variable into the current environment
@@ -86,7 +86,7 @@ alias dbset     'set t_ = ( `$PERDB \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ;
 # matches C call dbget
 # usage: dbget <var>
 #        echo $<var>
-alias dbget     'setenv \!\!:1 "`$PERDB \!\!:1`"'
+alias dbget     'setenv \!\!:1 `$PERDB -e \!\!:1`'
 
 # dbdef queries database for existence of a variable
 # matches C call dbdef

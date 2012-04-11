@@ -124,6 +124,8 @@ static fcent *_SC_make_tar_entry(FILE *fp, int round,
        pos = sz;
 
     pos = ftell(fp);
+    if (pos < 0)
+       io_error(errno, "ftell failed");
 		
     ae = CMAKE(fcent);
 
@@ -149,7 +151,8 @@ static fcent *_SC_make_tar_entry(FILE *fp, int round,
  */
 
 fcent *_SC_process_tarhdr(FILE *fp, tarhdr *p)
-   {int rem;
+   {int rem, st;
+    int64_t ad;
     size_t size;
     char name[256], csize[12];
     char *pcsize;
@@ -186,7 +189,10 @@ fcent *_SC_process_tarhdr(FILE *fp, tarhdr *p)
 
 /* advance file pointer to the next tarhdr (if present) */
     rem = size % TAR_BLOCKSIZE;
-    fseek(fp, size + TAR_BLOCKSIZE - rem, SEEK_CUR);
+    ad  = size + TAR_BLOCKSIZE - rem;
+    st  = fseek(fp, ad, SEEK_CUR);
+    if (st < 0)
+       io_error(errno, "fseek to %lld failed", (long long) ad);
 
     return(te);}
 
@@ -217,6 +223,10 @@ fcdes *SC_scan_tarfile(char *tarf)
     
         while (TRUE)
 	   {nr = fread(pp, nb, 1, fp);
+	    if (nr < 0)
+	       io_error(errno, "fread of %lld bytes failed",
+			(long long) nb);
+
             if (nr != 1)
 	       break;
 
@@ -290,18 +300,24 @@ int _SC_tar_checkname(tarhdr *thdr)
 /* _SC_IS_TARFILE - return TRUE if input file is a tar file */
 
 int _SC_is_tarfile(FILE *fp)
-   {int ret, nb, nr;
+   {int ret, nb, nr, st;
     int64_t addsave;
     tarhdr p;
 
     addsave = ftell(fp);
-    SC_ASSERT(addsave >= 0);
+    if (addsave < 0)
+       io_error(errno, "ftell failed");
 
-    fseek(fp, 0, SEEK_SET);
+    st = fseek(fp, 0, SEEK_SET);
+    if (st < 0)
+       io_error(errno, "fseek to 0 failed");
 
     ret = FALSE;
     nb  = sizeof(tarhdr);
-    nr  = fread((char *)&p, nb, 1, fp);
+    nr  = fread((char *) &p, nb, 1, fp);
+    if (nr < 0)
+       io_error(errno, "fread of %lld bytes failed",
+		(long long) nb);
 
     if (nr == 1)
        {if (strncmp(p.magic, "ustar", 6) == 0)

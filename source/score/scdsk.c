@@ -38,8 +38,14 @@ int64_t SC_dsk_space(char *dir, int64_t nbx)
     for (nb = bsz, ok = TRUE; (nb <= nbx) && ok; nb += bsz)
         {ok = FALSE;
 	 no = lseek(fd, bsz, SEEK_CUR);
+	 if (no < 0)
+	    io_error(errno, "lseek to %lld on %d failed",
+		     (long long) bsz, fd);
+
 	 if (no >= nb)
 	    {nw = write(fd, " ", 1);
+	     if (nw < 0)
+	        io_error(err, "write of 1 byte on %d failed", fd);
 	     if (nw == 1)
 	        ok = TRUE;};};
 

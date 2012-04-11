@@ -16,12 +16,15 @@ set Log    = $1
 set ScrDir = $2
 set lCfg   = $3
 
-eval `$ScrDir/prune-env pact`
+eval `$ScrDir/prune-env -e DbgOpt pact`
 set path = ( $ScrDir $path )
 source $ScrDir/env-csh
 
 dbget IncDir
-dbget DbgOpt
+
+# NOTE: must dbset this in dsys first
+#dbget DbgOpt
+
 dbget USER
 dbget Host
 dbget HostOS

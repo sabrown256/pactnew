@@ -69,9 +69,12 @@ static long _SC_mf_tell(FILE *stream)
 /* _SC_MF_MWRITE - mwrite method for memory mapped files */
 
 static int64_t _SC_mf_mwrite(int fd, const void *buf, size_t nb, int64_t off)
-   {int64_t rv;
+   {int st;
+    int64_t rv;
 
-    lseek(fd, off, SEEK_SET);
+    st = lseek(fd, off, SEEK_SET);
+    if (st < 0)
+       io_error(errno, "lseek to %lld on %d failed", (long long) off, fd);
 
     rv = SC_write_sigsafe(fd, (void *) buf, nb);
 

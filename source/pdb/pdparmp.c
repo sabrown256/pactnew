@@ -1492,11 +1492,17 @@ static int64_t _PD_get_file_size_d(PDBfile *file)
     PD_Pfile *pf;
     MPI_File *fp;
 
-    pf = FILE_IO_INFO(PD_Pfile, file->stream);
-    fp = (pf != NULL) ? (MPI_File *) pf->stream : NULL;
+/* NOTE: return a non-zero size for a VIF because other logic
+ * such as the filtering logic takes file size of 0 as an error
+ */
+    sz = 1;
 
-    status = MPI_File_get_size(*fp, &sz);
-    SC_ASSERT(status == 0);
+    if (file->virtual_internal == FALSE)
+       {pf = FILE_IO_INFO(PD_Pfile, file->stream);
+        fp = (pf != NULL) ? (MPI_File *) pf->stream : NULL;
+
+	status = MPI_File_get_size(*fp, &sz);
+	SC_ASSERT(status == 0);};
 
 /* is there a portable way to check the return value (status)? */
 

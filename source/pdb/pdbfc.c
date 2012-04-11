@@ -40,6 +40,8 @@ static int64_t _PD_fctell(FILE *fp)
 
 /* get the absolute container address */
     ada = ftell(fl);
+    if (ada < 0)
+       io_error(errno, "ftell failed");
 
 /* compute the apparent file address */
     addr = ada - cf->begin;
@@ -69,6 +71,8 @@ static int _PD_fcseek(FILE *fp, int64_t addr, int offset)
 	     break;
         case SEEK_CUR :
 	     ada  = ftell(fl);
+	     if (ada < 0)
+	        io_error(errno, "ftell failed");
 	     ada += addr;
 	     break;
         case SEEK_END :
@@ -76,6 +80,8 @@ static int _PD_fcseek(FILE *fp, int64_t addr, int offset)
 	     break;};
 
     ret = fseek(fl, ada, SEEK_SET);
+    if (ret < 0)
+       io_error(errno, "fseek to %lld failed", (long long) ada);
 
     return(ret);}
 
@@ -110,6 +116,9 @@ static uint64_t _PD_fcread(void *p, size_t sz, uint64_t ni, FILE *fp)
     fl = GET_FILE(cf);
 
     rv = fread(p, sz, ni, fl);
+    if (rv < 0)
+       io_error(errno, "fread of %lld bytes failed",
+		(long long) (sz*ni));
 
     return(rv);}
 
@@ -127,6 +136,9 @@ static uint64_t _PD_fcwrite(void *p, size_t sz, uint64_t ni, FILE *fp)
     fl = GET_FILE(cf);
 
     rv = fwrite(p, sz, ni, fl);
+    if (rv < 0)
+       io_error(errno, "fwrite of %lld bytes failed",
+		(long long) (sz*ni));
 
     return(rv);}
 

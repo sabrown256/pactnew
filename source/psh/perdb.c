@@ -483,9 +483,11 @@ static int server(char *root, int init, int dmn)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* EXCHANGE - do a transaction from the client side of the database */
+/* EXCHANGE - do a transaction from the client side of the database
+ *          - if LTR is TRUE strip off the quotes the server side added
+ */
 
-static int exchange(char *root, char *req)
+static int exchange(char *root, int ltr, char *req)
    {int i, n, rv;
     char **ta;
     client *cl;
@@ -503,6 +505,8 @@ static int exchange(char *root, char *req)
 	    rv = TRUE;
 	 else if (strcmp(ta[i], "defined{FALSE}") == 0)
 	    rv = FALSE;
+	 else if (ltr == TRUE)
+	    printf("%s\n", strip_quote(ta[i]));
 	 else
 	    printf("%s\n", ta[i]);};
 
@@ -533,7 +537,7 @@ static void help(void)
 /*--------------------------------------------------------------------------*/
 
 int main(int c, char **v)
-   {int i, rv, srv, dmn, init;
+   {int i, rv, srv, dmn, init, ltr;
     char root[MAXLINE], r[MAXLINE], req[MAXLINE];
     char *except[] = {"PATH", NULL};
 
@@ -542,6 +546,7 @@ int main(int c, char **v)
     srv    = FALSE;
     init   = FALSE;
     dmn    = TRUE;
+    ltr    = FALSE;
 
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')
@@ -551,6 +556,9 @@ int main(int c, char **v)
 		      break;
                  case 'd' :
                       dmn = FALSE;
+		      break;
+                 case 'e' :
+                      ltr = TRUE;
 		      break;
                  case 'f' :
                       nstrncpy(r, MAXLINE, v[++i], -1);
@@ -586,7 +594,7 @@ int main(int c, char **v)
 
     else if (IS_NULL(req) == FALSE)
       {LAST_CHAR(req) = '\0';
-       rv = exchange(root, req);};
+       rv = exchange(root, ltr, req);};
 
     rv = (rv == 0);
 

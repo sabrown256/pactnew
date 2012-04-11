@@ -47,7 +47,10 @@ static fcent *_SC_make_ar_entry(FILE *fp, int round,
     else
        pos = sz;
 
-    ada  = ftell(fp);
+    ada = ftell(fp);
+    if (ada < 0)
+       io_error(errno, "ftell failed");
+
     pos += ada;
 		
     ae = CMAKE(fcent);
@@ -76,7 +79,7 @@ static fcent *_SC_make_ar_entry(FILE *fp, int round,
  */
 
 fcdes *SC_scan_archive(char *arf)
-   {int nr, nb, nc;
+   {int nr, nb, nc, st;
     size_t ad;
     int64_t pos;
     char s[MAXLINE];
@@ -92,7 +95,13 @@ fcdes *SC_scan_archive(char *arf)
     fp = fopen(arf, "r");
     if (fp != NULL)
        {nr = fread(s, 1, 8, fp);
-	fseek(fp, 0, SEEK_SET);
+	if (nr < 0)
+	   io_error(errno, "fread of 8 bytes failed");
+
+	st = fseek(fp, 0, SEEK_SET);
+	if (st < 0)
+	   io_error(errno, "fseek to 0 failed");
+
 	if (nr == 8)
 	   {tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 
@@ -103,14 +112,26 @@ fcdes *SC_scan_archive(char *arf)
 
 		nb = AR_HSZ_BIG;
 		nr = fread(&fhd, FL_HSZ_BIG, 1, fp);
+		if (nr < 0)
+		   io_error(errno, "fread of %lld bytes failed",
+			    (long long) FL_HSZ_BIG);
+
 		while (TRUE)
 		   {nr = fread(&hdr, nb, 1, fp);
+		    if (nr < 0)
+		       io_error(errno, "fread of %lld bytes failed",
+				(long long) nb);
+
 		    if (nr != 1)
 		       break;
 
 		    strcpy(s, hdr._ar_name.ar_name);
 		    nc = SC_stol(hdr.ar_namlen);
-		    fread(s+2, nc, 1, fp);
+		    nr = fread(s+2, nc, 1, fp);
+		    if (nr < 0)
+		       io_error(errno, "fread of %lld bytes failed",
+				(long long) nc);
+
                     if (strncmp(s, "`\n", 2) == 0)
 		       {strcpy(s, ".SYMTAB");
 			p = s;}
@@ -127,7 +148,9 @@ fcdes *SC_scan_archive(char *arf)
 		    ad = SC_stol(hdr.ar_nxtmem);
 		    if (ad == 0)
 		       break;
-		    fseek(fp, ad, SEEK_SET);};}
+		    st = fseek(fp, ad, SEEK_SET);
+		    if (st < 0)
+		       io_error(errno, "fseek to %lld failed", (long long) ad);};}
 
 /* for a 32 bit archive */
 	    else
@@ -136,15 +159,26 @@ fcdes *SC_scan_archive(char *arf)
 
 		nb = AR_HSZ;
 		nr = fread(&fhd, FL_HSZ, 1, fp);
+		if (nr < 0)
+		   io_error(errno, "fread of %lld bytes failed",
+			    (long long) LF_HSZ);
 
 		while (TRUE)
 		   {nr = fread(&hdr, nb, 1, fp);
+		    if (nr < 0)
+		       io_error(errno, "fread of %lld bytes failed",
+				(long long) nb);
+
 		    if (nr != 1)
 		       break;
 
 		    strcpy(s, hdr._ar_name.ar_name);
 		    nc = SC_stol(hdr.ar_namlen);
-		    fread(s+2, nc, 1, fp);
+		    nr = fread(s+2, nc, 1, fp);
+		    if (nr < 0)
+		       io_error(errno, "fread of %lld bytes failed",
+				(long long) nc);
+
                     if (strncmp(s, "`\n", 2) == 0)
 		       {strcpy(s, ".SYMTAB");
 			p = s;}
@@ -161,7 +195,9 @@ fcdes *SC_scan_archive(char *arf)
 		    ad = SC_stol(hdr.ar_nxtmem);
 		    if (ad == 0)
 		       break;
-		    fseek(fp, ad, SEEK_SET);};};};
+		    st = fseek(fp, ad, SEEK_SET);
+		    if (st < 0)
+		       io_error(errno, "fseek to %lld failed", (long long) ad);};};};
 
 	fclose(fp);
 
@@ -184,7 +220,7 @@ fcdes *SC_scan_archive(char *arf)
  */
 
 fcdes *SC_scan_archive(char *arf)
-   {int nr, nb;
+   {int nr, nb, st;
     int64_t pos, ext, org, off;
     char s[MAXLINE], lname[MAXLINE];
     FILE *fp;
@@ -200,6 +236,8 @@ fcdes *SC_scan_archive(char *arf)
     fp = fopen(arf, "r");
     if (fp != NULL)
        {nr = fread(s, 1, 8, fp);
+	if (nr < 0)
+	   io_error(errno, "fread of 8 bytes failed");
 
 	if (nr == 8)
 	   {nb = sizeof(struct ar_hdr);
@@ -210,20 +248,37 @@ fcdes *SC_scan_archive(char *arf)
 
 	    while (TRUE)
 	       {nr = fread(p, nb, 1, fp);
+		if (nr < 0)
+		   io_error(errno, "fread of %lld bytes failed",
+			    (long long) nb);
+
 		if (nr != 1)
 		   break;
 
 		if (strncmp(hdr.ar_name, "ARFILENAMES/", 12) == 0)
 		   {strcpy(lname, ".EXTENDED");
 		    name = lname;
-		    ext  = ftell(fp);}
+		    ext  = ftell(fp);
+		    if (ext < 0)
+		       io_error(errno, "ftell failed");}
+
 		else if (hdr.ar_name[0] == ' ')
 		   {off = SC_stol(hdr.ar_name+1);
 		    pos = ext + off;
 		    org = ftell(fp);
-		    fseek(fp, pos, SEEK_SET);
+		    if (org < 0)
+		       io_error(errno, "ftell failed");
+
+		    st  = fseek(fp, pos, SEEK_SET);
+		    if (st < 0)
+		       io_error(errno, "fseek to %lld failed", (long long) pos);
+
 		    fgets(lname, MAXLINE, fp);
-		    fseek(fp, org, SEEK_SET);
+
+		    st = fseek(fp, org, SEEK_SET);
+		    if (st < 0)
+		       io_error(errno, "fseek to %lld failed", (long long) org);
+
 		    name = lname;}
 		else
 		   {strncpy(lname, hdr.ar_name, 16);
@@ -238,7 +293,9 @@ fcdes *SC_scan_archive(char *arf)
 
 		SC_hasharr_install(tab, ae->name, ae, "fcent", 3, -1);
 
-		fseek(fp, pos, SEEK_SET);};};
+		st = fseek(fp, pos, SEEK_SET);
+		if (st < 0)
+		   io_error(errno, "fseek to %lld failed", (long long) pos);};};
 
 	fclose(fp);
 
@@ -261,7 +318,7 @@ fcdes *SC_scan_archive(char *arf)
  */
 
 fcdes *SC_scan_archive(char *arf)
-   {int i, nr, nb, nc, ne, na, round;
+   {int i, nr, nb, nc, ne, na, round, st;
     int64_t pos;
     char s[MAXLINE], lname[MAXLINE];
     FILE *fp;
@@ -279,6 +336,8 @@ fcdes *SC_scan_archive(char *arf)
     fp = fopen(arf, "r");
     if (fp != NULL)
        {nr = fread(s, 1, 8, fp);
+	if (nr < 0)
+	   io_error(errno, "fread of 8 bytes failed");
 
 #ifdef FREEBSD
 	round = TRUE;
@@ -294,12 +353,19 @@ fcdes *SC_scan_archive(char *arf)
 
 	    for (i = 0; i < INT_MAX; i++)
 	        {nr = fread(p, nb, 1, fp);
+		 if (nr < 0)
+		    io_error(errno, "fread of %lld bytes failed",
+			     (long long) nb);
+
 		 if (nr != 1)
 		    break;
 
 		 if (strncmp(hdr.ar_name, AR_EFMT1, ne) == 0)
 		    {nc = SC_stol(hdr.ar_name + ne);
-		     fread(lname, nc, 1, fp);
+		     nr = fread(lname, nc, 1, fp);
+		     if (nr < 0)
+		        io_error(errno, "fread of %lld bytes failed",
+				 (long long) nc);
 		     name = lname;}
 		 else
 		    {nc = 0;
@@ -319,7 +385,9 @@ fcdes *SC_scan_archive(char *arf)
 
 		 SC_hasharr_install(tab, ae->name, ae, "fcent", 3, -1);
 
-		 fseek(fp, pos, SEEK_SET);};};
+		 st = fseek(fp, pos, SEEK_SET);
+		 if (st < 0)
+		    io_error(errno, "fseek to %lld failed", (long long) pos);};};
 
 	fc = _SC_make_archive(arf, fp, nb, tab);};
 
@@ -340,7 +408,7 @@ fcdes *SC_scan_archive(char *arf)
  */
 
 fcdes *SC_scan_archive(char *arf)
-   {int nr, nb, ni;
+   {int nr, nb, ni, st;
     int64_t ext, org, off;
     int64_t pos;
     char s[MAXLINE], lname[MAXLINE];
@@ -357,6 +425,8 @@ fcdes *SC_scan_archive(char *arf)
     fp = fopen(arf, "r");
     if (fp != NULL)
        {nr = fread(s, 1, 8, fp);
+	if (nr < 0)
+	   io_error(errno, "fread of 8 bytes failed");
 
 	if (nr == 8)
 	   {nb = sizeof(struct ar_hdr);
@@ -367,24 +437,44 @@ fcdes *SC_scan_archive(char *arf)
 
 	    while (TRUE)
 	       {nr = fread(p, nb, 1, fp);
+		if (nr < 0)
+		   io_error(errno, "fread of %lld bytes failed",
+			    (long long) nb);
+
 		if (nr != 1)
 		   break;
 
 		if (strncmp(hdr.ar_name, "//", 2) == 0)
 		   {strcpy(lname, ".EXTENDED");
 		    name = lname;
-		    ext  = ftell(fp);}
+		    ext  = ftell(fp);
+		    if (ext < 0)
+		       io_error(errno, "ftell failed");}
+
 		else if (strncmp(hdr.ar_name, "/ ", 2) == 0)
 		   {strcpy(lname, ".SYMTAB");
 		    name = lname;}
+
 		else if (hdr.ar_name[0] == '/')
 		   {off = SC_stol(hdr.ar_name+1);
 		    pos = ext + off;
 		    org = ftell(fp);
-		    fseek(fp, pos, SEEK_SET);
+		    if (org < 0)
+		       io_error(errno, "ftell failed");
+
+		    st = fseek(fp, pos, SEEK_SET);
+		    if (st < 0)
+		       io_error(errno, "fseek to %lld failed", (long long) pos);
+
 		    ni = fread(lname, MAXLINE, 1, fp);
-		    SC_ASSERT(ni > 0);
-		    fseek(fp, org, SEEK_SET);
+		    if (ni < 0)
+		       io_error(errno, "fread of %lld bytes failed",
+				(long long) MAXLINE);
+
+		    st = fseek(fp, org, SEEK_SET);
+		    if (st < 0)
+		       io_error(errno, "fseek to %lld failed", (long long) pos);
+
 		    name = strtok(lname, "/");}
 		else
 		   name = strtok(hdr.ar_name, "`\n/");
@@ -396,7 +486,9 @@ fcdes *SC_scan_archive(char *arf)
 
 		SC_hasharr_install(tab, ae->name, ae, "fcent", 3, -1);
 
-		fseek(fp, pos, SEEK_SET);};};
+		st = fseek(fp, pos, SEEK_SET);
+		if (st < 0)
+		   io_error(errno, "fseek to %lld failed", (long long) pos);};};
 
 	fc = _SC_make_archive(arf, fp, nb, tab);
 
@@ -416,7 +508,7 @@ fcdes *SC_scan_archive(char *arf)
  */
 
 int _SC_is_archive(FILE *fp)
-   {int rv, nr;
+   {int rv, nr, st;
     int64_t oa;
     char s[MAXLINE];
 
@@ -424,21 +516,43 @@ int _SC_is_archive(FILE *fp)
 
     if (fp != NULL)
        {oa = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
+	if (oa < 0)
+	   io_error(errno, "ftell failed");
+
+	st = fseek(fp, 0, SEEK_SET);
+	if (st < 0)
+	   io_error(errno, "fseek to 0 failed");
 
 #ifdef AIX
 	nr = fread(s, 1, SAIAMAG, fp);
-	fseek(fp, 0, SEEK_SET);
+	if (nr < 0)
+	   io_error(errno, "fread of %lld bytes failed",
+		    (long long) SAIAMAG);
+
+	st = fseek(fp, 0, SEEK_SET);
+	if (st < 0)
+	   io_error(errno, "fseek to 0 failed");
+
 	rv = ((nr == SAIAMAG) &&
 	      ((strncmp(s, AIAMAG, SAIAMAG) == 0) ||
 	       (strncmp(s, AIAMAGBIG, SAIAMAG) == 0)));
 #else
 	nr = fread(s, 1, SARMAG, fp);
-	fseek(fp, 0, SEEK_SET);
+	if (nr < 0)
+	   io_error(errno, "fread of %lld bytes failed",
+		    (long long) SARMAG);
+
+
+	st = fseek(fp, 0, SEEK_SET);
+	if (st < 0)
+	   io_error(errno, "fseek to 0 failed");
+
 	rv = ((nr == SARMAG) && (strncmp(s, ARMAG, SARMAG) == 0));
 #endif
 
-	fseek(fp, oa, SEEK_SET);};
+	st = fseek(fp, oa, SEEK_SET);
+	if (st < 0)
+	   io_error(errno, "fseek to %lld failed", (long long) oa);};
 
     return(rv);}
 
