@@ -394,7 +394,7 @@ static void async_server(client *cl)
 
         s = cgetenv(FALSE, "PERDB_IDLE_INTERVAL");
 	if (IS_NULL(s) == TRUE)
-	   dt = tmax;
+	   dt = tmax >> 1;
 	else
 	   {dt = atoi(s);
 	    log_activity(flog, dbg_db, "SERVER",
