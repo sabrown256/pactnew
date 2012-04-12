@@ -1,5 +1,5 @@
 /*
- * TPDRC.C - test recursive casts
+ * TPDRC.C - test PD_cast and PD_size_from
  *
  * Source Version: 9.0
  * Software Release #: LLNL-CODE-422942
@@ -7,7 +7,12 @@
  */
 
 #include "cpyright.h"
-#include "pdb.h"
+
+#include "pdbtfr.h"
+
+#define DATFILE "cast"
+
+typedef int (*PFTest)(char *base, char *tgt, int n);
 
 typedef struct S_List List;
 typedef struct S_BSTRUCT BSTRUCT;
@@ -25,63 +30,43 @@ struct S_List
     void *data;
     struct S_List *next;};
 
-static int
- debug_mode = FALSE,
- read_only  = FALSE;
+typedef struct s_da da;
 
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
+struct s_da
+   {long n;
+    char *a;};
 
-/* PRINT_HELP - print a help message */
+typedef struct s_db db;
 
-void print_help(void)
-   {
-
-    PRINT(STDOUT, "\nTPDRC - run PDB recursive cast tests\n\n");
-    PRINT(STDOUT, "Usage: tpdrc [-d] [-h] [-r] [-v #]\n");
-    PRINT(STDOUT, "\n");
-    PRINT(STDOUT, "       d - turn on debug mode to display memory maps\n");
-    PRINT(STDOUT, "       h - print this help message and exit\n");
-    PRINT(STDOUT, "       r - read only mode (assuming file from previous run)\n");
-    PRINT(STDOUT, "       v - use specified format version (default 2)\n");
-    PRINT(STDOUT, "\n");
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-int main(int c, char **v)
+struct s_db
    {int i;
-    char *fname, *aname, *bname;
+    long j;
+    char *a;};
+
+static int
+ debug_mode = FALSE;
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TEST_1 - recursive cast test */
+
+int test_1(char *base, char *tgt, int n)
+   {int i, rv;
+    char datfile[MAXLINE], fname[MAXLINE];
+    char *aname, *bname;
     PDBfile *file; 
     defstr *dp;
-    List *head, *ptr;
+    List *head, *ptr, *nxt;
     ASTRUCT *aptr;
     BSTRUCT *bptr;
-  
-    fname     = NULL;
-    read_only = FALSE;
-    for (i = 1; i < c; i++)
-        {if (v[i][0] == '-')
-            {switch (v[i][1])
-                {case 'd' :
-		      debug_mode  = TRUE;
-		      SC_gs.mm_debug = TRUE;
-		      break;
-                 case 'h' :
-		      print_help();
-		      return(1);
-                 case 'r' :
-		      read_only = TRUE;
-                      break;
-                 case 'v' :
-                      PD_set_fmt_version(SC_stoi(v[++i]));
-		      break;};}
-         else
-	    fname = v[i];};
 
-    file = PD_open(fname, "w"); 
+    rv = TRUE;
+
+/* target the file as asked */
+    test_target(tgt, base, n, fname, datfile);
+
+    file = PD_open(datfile, "w"); 
 
     dp = PD_defstr(file,
 		   "List",
@@ -141,7 +126,216 @@ int main(int c, char **v)
 
     PD_close(file);
 
-    return(0);}
+    for (ptr = head; ptr != NULL; ptr = nxt)
+        {nxt = ptr->next;
+	 CFREE(ptr->data);
+	 CFREE(ptr);};
+    CFREE(aname);
+    CFREE(bname);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TEST_2 - test of PD_size_from */
+
+int test_2(char *base, char *tgt, int n)
+   {int i, l, m1, m2, ok, rv;
+    char datfile[MAXLINE], fname[MAXLINE];
+    PDBfile *file; 
+    defstr *dp;
+    da va_r, va_w;
+    db wa_r, wa_w;
+
+    rv = TRUE;
+
+/* target the file as asked */
+    test_target(tgt, base, n, fname, datfile);
+
+/* write data */
+    file = PD_open(datfile, "w");
+
+    dp = PD_defstr(file, "da",
+		   "long n",
+		   "char *a", 
+		   LAST);
+    if (dp == NULL)
+       PRINT(stdout, "PD_defstr da: %s\n", PD_get_error());
+  
+    ok = PD_size_from(file, "da", "a", "n");
+    if (ok == 0)
+       PRINT(stdout, "PD_size_from: %s\n", PD_get_error());
+
+    dp = PD_defstr(file, "db",
+		   "int i",
+		   "long j",
+		   "char *a", 
+		   LAST);
+    if (dp == NULL)
+       PRINT(stdout, "PD_defstr db: %s\n", PD_get_error());
+  
+    ok = PD_size_from(file, "db", "a", "i,j");
+    if (ok == 0)
+       PRINT(stdout, "PD_size_from: %s\n", PD_get_error());
+
+    m1 = 10;
+    m2 = 2;
+
+    va_w.n = m1;
+    va_w.a = CMAKE_N(char, va_w.n+10);
+    for (i = 0; i < m1; i++)
+        va_w.a[i] = 'a' + i;
+    va_w.a[i] = '\0';
+
+    wa_w.i = m1;
+    wa_w.j = m2;
+    wa_w.a = CMAKE_N(char, m1*m2 + 1);
+    for (i = 0; i < m1*m2; i++)
+        wa_w.a[i] = 'a' + i;
+    wa_w.a[i] = '\0';
+
+    PD_write(file, "va", "da", &va_w);
+    PD_write(file, "wa", "db", &wa_w);
+
+    PD_close(file);
+
+/* read data */
+    file = PD_open(datfile, "r");
+
+    ok = PD_read(file, "va", &va_r);
+    ok = PD_read(file, "wa", &wa_r);
+
+    PD_close(file);
+
+/* compare data */
+    rv = TRUE;
+
+    rv &= (va_r.n == va_w.n);
+    for (i = 0; i < va_r.n; i++)
+        rv &= (va_r.a[i] == va_w.a[i]);
+
+    l = wa_r.i * wa_r.j;
+    rv &= (wa_r.i == wa_w.i);
+    rv &= (wa_r.j == wa_w.j);
+    for (i = 0; i < l; i++)
+        rv &= (wa_r.a[i] == wa_w.a[i]);
+
+    CFREE(va_w.a);
+    CFREE(wa_w.a);
+    CFREE(va_r.a);
+    CFREE(wa_r.a);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+
+/*                              DRIVER ROUTINES                             */
+
+/*--------------------------------------------------------------------------*/
+
+/* RUN_TEST - run a particular test through all targeting modes
+ *          - return the number of tests that fail
+ */
+
+static int run_test(PFTest test, int n, char *host, int native)
+   {int i, m, rv, fail;
+    char *nm;
+    tframe st;
+
+    pre_test(&st, debug_mode);
+
+    fail = 0;
+
+    if (native == FALSE)
+       {m = PD_target_n_platforms();
+	for (i = 0; i < m; i++)
+	    {rv = PD_target_platform_n(i);
+	     SC_ASSERT(rv == TRUE);
+
+	     nm = PD_target_platform_name(i);
+	     if ((*test)(host, nm, n) == FALSE)
+	        {PRINT(STDOUT, "Test #%d %s failed\n", n, nm);
+		 fail++;};};};
+
+/* native test */
+    if ((*test)(host, NULL, n) == FALSE)
+       {PRINT(STDOUT, "Test #%d native failed\n", n);
+	fail++;};
+
+    post_test(&st, n);
+
+    return(fail);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PRINT_HELP - print a help message */
+
+void print_help(void)
+   {
+
+    PRINT(STDOUT, "\nTPDRC - run PDB cast tests\n\n");
+    PRINT(STDOUT, "Usage: tpdrc [-d] [-h] [-n] [-r] [-v #] [-1] [-2]\n");
+    PRINT(STDOUT, "\n");
+    PRINT(STDOUT, "       d  - turn on debug mode to display memory maps\n");
+    PRINT(STDOUT, "       h  - print this help message and exit\n");
+    PRINT(STDOUT, "       n  - run native mode test only\n");
+    PRINT(STDOUT, "       r  - read only mode (assuming file from previous run)\n");
+    PRINT(STDOUT, "       v  - use specified format version (default 2)\n");
+    PRINT(STDOUT, "       1  - do NOT run test #1\n");
+    PRINT(STDOUT, "       2  - do NOT run test #2\n");
+    PRINT(STDOUT, "\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+int main(int c, char **v)
+   {int i, n, err;
+    int native_only;
+    int ton[10];
+  
+    for (i = 0; i < 10; i++)
+        ton[i] = TRUE;
+
+    read_only   = FALSE;
+    native_only = FALSE;
+    for (i = 1; i < c; i++)
+        {if (v[i][0] == '-')
+            {switch (v[i][1])
+                {case 'd' :
+		      debug_mode     = TRUE;
+		      SC_gs.mm_debug = TRUE;
+		      break;
+                 case 'h' :
+		      print_help();
+		      return(1);
+                 case 'n' :
+		      native_only = TRUE;
+                      break;
+                 case 'r' :
+		      read_only = TRUE;
+                      break;
+                 case 'v' :
+                      PD_set_fmt_version(SC_stoi(v[++i]));
+		      break;
+                 default:
+                      n = -SC_stoi(v[i]);
+		      ton[n] = FALSE;
+		      break;};};};
+
+    SC_signal(SIGINT, SIG_DFL);
+
+    err = 0;
+
+    if (ton[1])
+       err += run_test(test_1, 1, DATFILE, native_only);
+    if (ton[2])
+       err += run_test(test_2, 2, DATFILE, native_only);
+
+    return(err);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
