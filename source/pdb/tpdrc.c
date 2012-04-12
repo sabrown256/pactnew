@@ -55,6 +55,13 @@ struct s_db3
    {long *n;
     char *a;};
 
+typedef struct s_da4 da4;
+
+struct s_da4
+   {char *type;
+    long *n;
+    void *a;};
+
 static int
  debug_mode = FALSE;
 
@@ -243,7 +250,9 @@ int test_2(char *base, char *tgt, int n)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* TEST_3 - test of PD_size_from with multi-dimension sizing member */
+/* TEST_3 - test of PD_size_from with multi-dimension
+ *        - and indirect sizing members
+ */
 
 int test_3(char *base, char *tgt, int n)
    {int i, ok, rv;
@@ -251,15 +260,17 @@ int test_3(char *base, char *tgt, int n)
     PDBfile *file; 
     defstr *dp;
     da3 va_r, va_w;
+    db3 wa_r, wa_w;
 
     rv = TRUE;
 
 /* target the file as asked */
     test_target(tgt, base, n, fname, datfile);
 
-/* write data */
+/* open file for writing */
     file = PD_open(datfile, "w");
 
+/* setup types */
     dp = PD_defstr(file, "da3",
 		   "long n[3]",
 		   "char *a", 
@@ -271,6 +282,18 @@ int test_3(char *base, char *tgt, int n)
     if (ok == 0)
        PRINT(stdout, "PD_size_from: %s\n", PD_get_error());
 
+    dp = PD_defstr(file, "db3",
+		   "long *n",
+		   "char *a", 
+		   LAST);
+    if (dp == NULL)
+       PRINT(stdout, "PD_defstr db3: %s\n", PD_get_error());
+  
+    ok = PD_size_from(file, "db3", "a", "n");
+    if (ok == 0)
+       PRINT(stdout, "PD_size_from: %s\n", PD_get_error());
+
+/* setup data */
     for (i = 0; i < 3; i++)
         va_w.n[i] = i+2;
 
@@ -283,7 +306,119 @@ int test_3(char *base, char *tgt, int n)
         va_w.a[i] = 'a' + i;
     va_w.a[i] = '\0';
 
+    wa_w.n = CMAKE_N(long, 3);
+    for (i = 0; i < 3; i++)
+        wa_w.n[i] = i+2;
+
+    n = 1;
+    for (i = 0; i < 3; i++)
+        n *= wa_w.n[i];
+
+    wa_w.a = CMAKE_N(char, n+10);
+    for (i = 0; i < n; i++)
+        wa_w.a[i] = 'a' + i;
+    wa_w.a[i] = '\0';
+
+/* write the data */
     PD_write(file, "va", "da3", &va_w);
+    PD_write(file, "wa", "db3", &wa_w);
+
+    PD_close(file);
+
+/* read data */
+    file = PD_open(datfile, "r");
+
+    ok = PD_read(file, "va", &va_r);
+    ok = PD_read(file, "wa", &wa_r);
+
+    PD_close(file);
+
+/* compare data */
+    rv = TRUE;
+
+    n = 1;
+    for (i = 0; i < 3; i++)
+        n *= va_r.n[i];
+
+    for (i = 0; i < 3; i++)
+        rv &= (va_r.n[i] == va_w.n[i]);
+
+    for (i = 0; i < n; i++)
+        rv &= (va_r.a[i] == va_w.a[i]);
+
+    n = 1;
+    for (i = 0; i < 3; i++)
+        n *= wa_r.n[i];
+
+    for (i = 0; i < 3; i++)
+        rv &= (wa_r.n[i] == wa_w.n[i]);
+
+    for (i = 0; i < n; i++)
+        rv &= (wa_r.a[i] == wa_w.a[i]);
+
+/* cleanup memory */
+    CFREE(va_w.a);
+    CFREE(va_r.a);
+    CFREE(wa_w.n);
+    CFREE(wa_w.a);
+    CFREE(wa_r.n);
+    CFREE(wa_r.a);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TEST_4 - test PD_size_from combined with PD_cast */
+
+int test_4(char *base, char *tgt, int n)
+   {int i, ok, rv;
+    char datfile[MAXLINE], fname[MAXLINE];
+    float *fr, *fw;
+    PDBfile *file; 
+    defstr *dp;
+    da4 va_r, va_w;
+
+    rv = TRUE;
+
+/* target the file as asked */
+    test_target(tgt, base, n, fname, datfile);
+
+/* write data */
+    file = PD_open(datfile, "w");
+
+    dp = PD_defstr(file, "da4",
+                   "char *type",
+		   "long *n",
+		   "char *a", 
+		   LAST);
+    if (dp == NULL)
+       PRINT(stdout, "PD_defstr da4: %s\n", PD_get_error());
+  
+    ok = PD_cast(file, "da4", "a", "type");
+    if (ok == 0)
+       PRINT(stdout, "PD_size_from: %s\n", PD_get_error());
+
+    ok = PD_size_from(file, "da4", "a", "n");
+    if (ok == 0)
+       PRINT(stdout, "PD_size_from: %s\n", PD_get_error());
+
+    va_w.type = CSTRSAVE("float");
+
+    va_w.n = CMAKE_N(long, 3);
+    for (i = 0; i < 3; i++)
+        va_w.n[i] = i+2;
+
+    n = 1;
+    for (i = 0; i < 3; i++)
+        n *= va_w.n[i];
+
+    fr = CMAKE_N(float, n);
+    for (i = 0; i < n; i++)
+        fr[i] = 'a' + i;
+    va_w.a = fr;
+
+    PD_write(file, "va", "da4", &va_w);
 
     PD_close(file);
 
@@ -304,10 +439,15 @@ int test_3(char *base, char *tgt, int n)
     for (i = 0; i < 3; i++)
         rv &= (va_r.n[i] == va_w.n[i]);
 
+    fw = va_w.a;
     for (i = 0; i < n; i++)
-        rv &= (va_r.a[i] == va_w.a[i]);
+        rv &= (fr[i] == fw[i]);
 
+    CFREE(va_w.type);
+    CFREE(va_w.n);
     CFREE(va_w.a);
+    CFREE(va_r.type);
+    CFREE(va_r.n);
     CFREE(va_r.a);
 
     return(rv);}
@@ -360,7 +500,7 @@ void print_help(void)
    {
 
     PRINT(STDOUT, "\nTPDRC - run PDB cast tests\n\n");
-    PRINT(STDOUT, "Usage: tpdrc [-d] [-h] [-n] [-r] [-v #] [-1] [-2] [-3]\n");
+    PRINT(STDOUT, "Usage: tpdrc [-d] [-h] [-n] [-r] [-v #] [-1] [-2] [-3] [-4]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       d  - turn on debug mode to display memory maps\n");
     PRINT(STDOUT, "       h  - print this help message and exit\n");
@@ -370,6 +510,7 @@ void print_help(void)
     PRINT(STDOUT, "       1  - do NOT run test #1\n");
     PRINT(STDOUT, "       2  - do NOT run test #2\n");
     PRINT(STDOUT, "       3  - do NOT run test #3\n");
+    PRINT(STDOUT, "       4  - do NOT run test #4\n");
     PRINT(STDOUT, "\n");
 
     return;}
@@ -413,6 +554,8 @@ int main(int c, char **v)
 
     SC_signal(SIGINT, SIG_DFL);
 
+    PRINT(STDOUT, "\n");
+
     err = 0;
 
     if (ton[1])
@@ -421,6 +564,10 @@ int main(int c, char **v)
        err += run_test(test_2, 2, DATFILE, native_only);
     if (ton[3])
        err += run_test(test_3, 3, DATFILE, native_only);
+    if (ton[4])
+       err += run_test(test_4, 4, DATFILE, native_only);
+
+    PRINT(STDOUT, "\n");
 
     return(err);}
 

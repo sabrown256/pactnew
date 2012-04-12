@@ -77,8 +77,6 @@ static int _PD_cast_inject(hasharr *tab, defstr *dp, memdes *desc, char *s)
     desc->cast_memb = CSTRSAVE(s);
     desc->cast_offs = _PD_member_location(s, tab, dp, &lst);
 
-    SC_mark(s, 1);
-
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
@@ -127,22 +125,28 @@ static int _PD_size_from_inject(hasharr *tab, defstr *dp,
 
 static int _PD_cast_process_spec(hasharr *chrt, defstr *dp,
 				 memdes *desc, char *s)
-   {int rv;
-    char **sa;
+   {int it, nt, rv;
+    char **sa, **ta;
 
     rv = FALSE;
 
     if ((s != NULL) && (desc != NULL))
+       {ta = SC_tokenize(s, "<-= \t\001");
+	SC_ptr_arr_len(nt, ta);
+
+	for (it = 0; it < nt; it++)
 
 /* size_from */
-       {if (s[0] == '[')
-	   {sa = SC_tokenize(s, "[], \t");
-	    rv = _PD_size_from_inject(chrt, dp, desc, sa);
-	    SC_free_strings(sa);}
+	    {if (ta[it][0] == '[')
+	        {sa = SC_tokenize(ta[it], "[], \t\001");
+		 rv = _PD_size_from_inject(chrt, dp, desc, sa);
+		 SC_free_strings(sa);}
 
 /* type cast */
-	else
-	    rv = _PD_cast_inject(chrt, dp, desc, s);};
+	     else
+	        rv = _PD_cast_inject(chrt, dp, desc, ta[it]);};
+
+	SC_free_strings(ta);}
 
     return(rv);}
 
@@ -215,7 +219,7 @@ void _PD_cast_check(PDBfile *file)
 
 inti _PD_cast_size(memdes *meml, void *svr, memdes *desc)
    {int sid;
-    long in, sn;
+    long in, sn, bpi;
     inti is, ns, ni, n;
     int64_t *so, *dm;
     char **sm, *p;
@@ -233,7 +237,13 @@ inti _PD_cast_size(memdes *meml, void *svr, memdes *desc)
 	 n   = 0;
 	 sid = SC_fix_type_id(md->base_type, FALSE);
 	 if (sid != -1)
-	    {sn = md->number;
+	    {if (_PD_indirection(md->type) == TRUE)
+	        {bpi = SC_type_size_i(sid);
+		 p   = DEREF(p);
+		 sn  = SC_arrlen(p)/bpi;}
+	     else
+	        sn = md->number;
+
 	     dm = SC_convert_id(SC_INT64_I, NULL, 0, 1,
 				sid, p, 0, 1, sn, FALSE);
 
