@@ -967,22 +967,26 @@ static int64_t _PD_wr_chrt_iii(PDBfile *file, FILE *out, int wc)
 /* NOTE: only the host chart holds the cast so we had to scan down
  * both at the same time to get here
  */
-		  if (hdsc->cast_memb != NULL)
-		     _PD_put_string(n++, "\t<- %s", hdsc->cast_memb);
+		  if ((hdsc->cast_memb != NULL) ||
+		      (hdsc->size_memb != NULL))
+		     {_PD_put_string(n++, "\t<- ");
 
-		  if (hdsc->size_memb != NULL)
-		     {inti is, ns;
-		      char **sm;
+		      if (hdsc->cast_memb != NULL)
+			 _PD_put_string(n++, "%s", hdsc->cast_memb);
 
-		      sm = hdsc->size_memb;
+		      if (hdsc->size_memb != NULL)
+			 {inti is, ns;
+			  char **sm;
 
-		      SC_ptr_arr_len(ns, sm);
-		      for (is = 0; is < ns; is++)
-			  {if (is == 0)
-			      _PD_put_string(n++, "\t<= [%s", sm[is]);
-			   else
-			      _PD_put_string(n++, ",%s", sm[is]);};
-		      _PD_put_string(n++, "]");};
+			  sm = hdsc->size_memb;
+
+			  SC_ptr_arr_len(ns, sm);
+			  for (is = 0; is < ns; is++)
+			      {if (is == 0)
+				  _PD_put_string(n++, " [%s", sm[is]);
+			       else
+				  _PD_put_string(n++, ",%s", sm[is]);};
+			  _PD_put_string(n++, "]");};};
 
 		  _PD_put_string(n++, ";");};
 

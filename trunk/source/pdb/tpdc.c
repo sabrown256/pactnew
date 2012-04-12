@@ -678,8 +678,8 @@ static void print_help(void)
 /* MAIN - test the PDB Library system */
 
 int main(int c, char **v)
-   {int i, err;
-    int test_zero, test_one, test_two;
+   {int i, n, err;
+    int ton[3];
     int use_mapped_files, check_writes;
     int64_t bfsz;
 
@@ -695,9 +695,10 @@ int main(int c, char **v)
     native_only      = FALSE;
     read_only        = FALSE;
     use_mapped_files = FALSE;
-    test_zero        = TRUE;
-    test_one         = TRUE;
-    test_two         = TRUE;
+
+    for (i = 0; i < 3; i++)
+        ton[i] = TRUE;
+
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')
             {switch (v[i][1])
@@ -726,14 +727,9 @@ int main(int c, char **v)
                  case 'v' :
                       PD_set_fmt_version(SC_stoi(v[++i]));
 		      break;
-                 case '0' :
-		      test_zero = FALSE;
-		      break;
-                 case '1' :
-		      test_one = FALSE;
-		      break;
-                 case '2' :
-		      test_two = FALSE;
+                 default :
+		      n = -SC_stoi(v[i]);
+		      ton[n] = FALSE;
 		      break;};}
          else
             break;};
@@ -752,11 +748,11 @@ int main(int c, char **v)
 
     err = 0;
 
-    if (test_zero)
+    if (ton[0])
        err += run_test(test_0, 0, DATFILE, TRUE);
-    if (test_one)
+    if (ton[1])
        err += run_test(test_1, 1, DATFILE, native_only);
-    if (test_two)
+    if (ton[2])
        err += run_test(test_2, 2, DATFILE, native_only);
 
     PRINT(STDOUT, "\n");
