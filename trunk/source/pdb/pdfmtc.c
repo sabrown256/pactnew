@@ -461,13 +461,13 @@ static int _PD_rd_chrt_iii(PDBfile *file)
 		   nxt++;
 
 		member = SC_strtok(nxt, "<;\n", p);
-		modf   = SC_strtok(NULL, "-=;\t\n", p);
+		modf   = SC_strtok(NULL, ";\n", p);
 		nxt    = SC_strtok(NULL, ";", p);
 
 		member = SC_trim_right(member, " \t");
 		member = SC_trim_left(member, " \t");
 		if (modf != NULL)
-		   modf = SC_trim_left(modf, " \t");
+		   modf = SC_trim_left(modf, "-= \t");
 
 		desc = _PD_mk_descriptor(member, file->default_offset);
 		if ((modf == NULL) ||  (*modf == '}'))

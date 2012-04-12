@@ -685,7 +685,7 @@ int _PD_rd_ext_ii(PDBfile *file)
                    break;
                 sa[i++] = CSTRSAVE(SC_strtok(local, "\001\n", s));
                 sa[i++] = CSTRSAVE(SC_strtok(NULL, "\001\n", s));
-                sa[i++] = CSTRSAVE(SC_strtok(NULL, "\001\n", s));
+                sa[i++] = CSTRSAVE(SC_strtok(NULL, "\n", s));
                 if (i >= n_casts)
                    {n_casts += N_CASTS_INCR;
                     CREMAKE(sa, char *, n_casts);};};
