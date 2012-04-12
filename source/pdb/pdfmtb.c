@@ -844,21 +844,23 @@ static int _PD_wr_casts_ii(PDBfile *file)
 		 {ok &= _PD_put_string(1, "%s\001%s\001",
 				       nm, desc->member);
 
-		  if (desc->cast_memb != NULL)
-		     ok &= _PD_put_string(1, "%s\001", desc->cast_memb);
+		  if ((desc->cast_memb != NULL) ||
+		      (desc->size_memb != NULL))
+		     {if (desc->cast_memb != NULL)
+			 ok &= _PD_put_string(1, "%s", desc->cast_memb);
 
-		  if (desc->size_memb != NULL)
-		     {inti is, ns;
-		      char **sm;
+		      if (desc->size_memb != NULL)
+			 {inti is, ns;
+			  char **sm;
 
-		      sm = desc->size_memb;
-		      SC_ptr_arr_len(ns, sm);
-		      for (is = 0; is < ns; is++)
-			  {if (is == 0)
-			      ok &= _PD_put_string(1, "[%s", sm[is]);
-			   else
-			      ok &= _PD_put_string(1, ",%s", sm[is]);};
-		      ok &= _PD_put_string(1, "]");};
+			  sm = desc->size_memb;
+			  SC_ptr_arr_len(ns, sm);
+			  for (is = 0; is < ns; is++)
+			      {if (is == 0)
+				  ok &= _PD_put_string(1, " [%s", sm[is]);
+			       else
+				  ok &= _PD_put_string(1, ",%s", sm[is]);};
+			  ok &= _PD_put_string(1, "]");};};
 
 		  ok &= _PD_put_string(1, "\n");};};};
 

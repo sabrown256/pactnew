@@ -113,10 +113,6 @@ static short
 static int
  debug_mode  = FALSE,
  native_only = FALSE,
- test_one    = TRUE,
- test_two    = TRUE,
- test_three  = TRUE,
- test_four   = TRUE,
  mlt_cnnct   = TRUE,
  is_w,
  is_r,
@@ -1548,17 +1544,18 @@ void print_help(void)
 /* MAIN - test the PDB Library system */
 
 int main(int c, char **v)
-   {int i, err;
+   {int i, n, err;
+    int ton[5];
 
     PD_init_threads(0, NULL);
 
     SC_zero_space_n(1, -2);
     debug_mode  = FALSE;
     native_only = FALSE;
-    test_one    = TRUE;
-    test_two    = TRUE;
-    test_three  = TRUE;
-    test_four   = TRUE;
+
+    for (i = 0; i < 5; i++)
+        ton[i] = TRUE;
+
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')
             {switch (v[i][1])
@@ -1574,17 +1571,9 @@ int main(int c, char **v)
                  case 'v' :
                       PD_set_fmt_version(SC_stoi(v[++i]));
 		      break;
-                 case '1' :
-		      test_one = FALSE;
-		      break;
-                 case '2' :
-		      test_two = FALSE;
-		      break;
-                 case '3' :
-		      test_three = FALSE;
-		      break;
-                 case '4' :
-		      test_four = FALSE;
+                 default :
+		      n = -SC_stoi(v[i]);
+		      ton[n] = FALSE;
 		      break;};}
          else
             break;};
@@ -1598,13 +1587,13 @@ int main(int c, char **v)
 
     err = 0;
 
-    if (test_one)
+    if (ton[1])
        err += run_test(test_1, 1, DATFILE);
-    if (test_two)
+    if (ton[2])
        err += run_test(test_2, 2, DATFILE);
-    if (test_three)
+    if (ton[3])
        err += run_test(test_3, 3, DATFILE);
-    if (test_four)
+    if (ton[4])
        err += run_test(test_4, 4, DATFILE);
 
     PRINT(STDOUT, "\n");

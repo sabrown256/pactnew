@@ -131,7 +131,7 @@ static int _PD_cast_process_spec(hasharr *chrt, defstr *dp,
     rv = FALSE;
 
     if ((s != NULL) && (desc != NULL))
-       {ta = SC_tokenize(s, "<-= \t\001");
+       {ta = SC_tokenize(s, " \t");
 	SC_ptr_arr_len(nt, ta);
 
 	for (it = 0; it < nt; it++)

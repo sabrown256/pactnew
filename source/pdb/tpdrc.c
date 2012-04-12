@@ -11,6 +11,7 @@
 #include "pdbtfr.h"
 
 #define DATFILE "cast"
+#define N        3
 
 typedef int (*PFTest)(char *base, char *tgt, int n);
 
@@ -160,12 +161,12 @@ int test_1(char *base, char *tgt, int n)
 /* TEST_2 - test of PD_size_from */
 
 int test_2(char *base, char *tgt, int n)
-   {int i, l, m1, m2, ok, rv;
+   {int i, l, m1, m2, nr, nw, ok, rv;
     char datfile[MAXLINE], fname[MAXLINE];
     PDBfile *file; 
     defstr *dp;
-    da2 va_r, va_w;
-    db2 wa_r, wa_w;
+    da2 va_r[N], va_w[N];
+    db2 wa_r[N], wa_w[N];
 
     rv = TRUE;
 
@@ -200,50 +201,56 @@ int test_2(char *base, char *tgt, int n)
 
     m1 = 10;
     m2 = 2;
+    nw = m1*m2;
 
-    va_w.n = m1;
-    va_w.a = CMAKE_N(char, va_w.n+10);
-    for (i = 0; i < m1; i++)
-        va_w.a[i] = 'a' + i;
-    va_w.a[i] = '\0';
+    for (l = 0; l < N; l++)
+        {va_w[l].n = m1 + 1;
+	 va_w[l].a = CMAKE_N(char, va_w[l].n+10);
+	 for (i = 0; i < m1; i++)
+	     va_w[l].a[i] = 'a' + i + l;
+	 va_w[l].a[i] = '\0';
 
-    wa_w.i = m1;
-    wa_w.j = m2;
-    wa_w.a = CMAKE_N(char, m1*m2 + 1);
-    for (i = 0; i < m1*m2; i++)
-        wa_w.a[i] = 'a' + i;
-    wa_w.a[i] = '\0';
+	 wa_w[l].i = m1;
+	 wa_w[l].j = m2;
+	 wa_w[l].a = CMAKE_N(char, nw + 1);
+	 for (i = 0; i < nw; i++)
+	     wa_w[l].a[i] = 'a' + i + l;
+	 wa_w[l].a[i] = '\0';};
 
-    PD_write(file, "va", "da2", &va_w);
-    PD_write(file, "wa", "db2", &wa_w);
+    PD_write(file, "va[3]", "da2", va_w);
+    PD_write(file, "wa[3]", "db2", wa_w);
 
     PD_close(file);
 
 /* read data */
     file = PD_open(datfile, "r");
 
-    ok = PD_read(file, "va", &va_r);
-    ok = PD_read(file, "wa", &wa_r);
+    ok = PD_read(file, "va", va_r);
+    ok = PD_read(file, "wa", wa_r);
 
     PD_close(file);
 
 /* compare data */
     rv = TRUE;
 
-    rv &= (va_r.n == va_w.n);
-    for (i = 0; i < va_r.n; i++)
-        rv &= (va_r.a[i] == va_w.a[i]);
+    for (l = 0; l < N; l++)
+        {rv &= (va_r[l].n == va_w[l].n);
+	 for (i = 0; i < va_r[l].n; i++)
+	     rv &= (va_r[l].a[i] == va_w[l].a[i]);
 
-    l = wa_r.i * wa_r.j;
-    rv &= (wa_r.i == wa_w.i);
-    rv &= (wa_r.j == wa_w.j);
-    for (i = 0; i < l; i++)
-        rv &= (wa_r.a[i] == wa_w.a[i]);
+	 nr = wa_r[l].i * wa_r[l].j;
 
-    CFREE(va_w.a);
-    CFREE(wa_w.a);
-    CFREE(va_r.a);
-    CFREE(wa_r.a);
+	 rv &= (wa_r[l].i == wa_w[l].i);
+	 rv &= (wa_r[l].j == wa_w[l].j);
+	 for (i = 0; i < nr; i++)
+	     rv &= (wa_r[l].a[i] == wa_w[l].a[i]);};
+
+/* cleanup memory */
+    for (l = 0; l < N; l++)
+        {CFREE(va_w[l].a);
+	 CFREE(wa_w[l].a);
+	 CFREE(va_r[l].a);
+	 CFREE(wa_r[l].a);};
 
     return(rv);}
 
@@ -255,12 +262,12 @@ int test_2(char *base, char *tgt, int n)
  */
 
 int test_3(char *base, char *tgt, int n)
-   {int i, ok, rv;
+   {int i, l, nw, nr, ok, rv;
     char datfile[MAXLINE], fname[MAXLINE];
     PDBfile *file; 
     defstr *dp;
-    da3 va_r, va_w;
-    db3 wa_r, wa_w;
+    da3 va_r[N], va_w[N];
+    db3 wa_r[N], wa_w[N];
 
     rv = TRUE;
 
@@ -294,75 +301,78 @@ int test_3(char *base, char *tgt, int n)
        PRINT(stdout, "PD_size_from: %s\n", PD_get_error());
 
 /* setup data */
-    for (i = 0; i < 3; i++)
-        va_w.n[i] = i+2;
+    for (l = 0; l < N; l++)
+        {for (i = 0; i < 3; i++)
+	     va_w[l].n[i] = i + l + 2;
 
-    n = 1;
-    for (i = 0; i < 3; i++)
-        n *= va_w.n[i];
+	 nw = 1;
+	 for (i = 0; i < 3; i++)
+	     nw *= va_w[l].n[i];
 
-    va_w.a = CMAKE_N(char, n+10);
-    for (i = 0; i < n; i++)
-        va_w.a[i] = 'a' + i;
-    va_w.a[i] = '\0';
+	 va_w[l].a = CMAKE_N(char, nw+10);
+	 for (i = 0; i < nw; i++)
+	     va_w[l].a[i] = 'a' + i + l;
+	 va_w[l].a[i] = '\0';
 
-    wa_w.n = CMAKE_N(long, 3);
-    for (i = 0; i < 3; i++)
-        wa_w.n[i] = i+2;
+	 wa_w[l].n = CMAKE_N(long, 3);
+	 for (i = 0; i < 3; i++)
+	     wa_w[l].n[i] = i + l + 2;
 
-    n = 1;
-    for (i = 0; i < 3; i++)
-        n *= wa_w.n[i];
+	 nw = 1;
+	 for (i = 0; i < 3; i++)
+	     nw *= wa_w[l].n[i];
 
-    wa_w.a = CMAKE_N(char, n+10);
-    for (i = 0; i < n; i++)
-        wa_w.a[i] = 'a' + i;
-    wa_w.a[i] = '\0';
+	 wa_w[l].a = CMAKE_N(char, nw+10);
+	 for (i = 0; i < nw; i++)
+	     wa_w[l].a[i] = 'a' + i + l;
+	 wa_w[l].a[i] = '\0';};
 
 /* write the data */
-    PD_write(file, "va", "da3", &va_w);
-    PD_write(file, "wa", "db3", &wa_w);
+    PD_write(file, "va[3]", "da3", va_w);
+    PD_write(file, "wa[3]", "db3", wa_w);
 
     PD_close(file);
 
 /* read data */
     file = PD_open(datfile, "r");
 
-    ok = PD_read(file, "va", &va_r);
-    ok = PD_read(file, "wa", &wa_r);
+    ok = PD_read(file, "va", va_r);
+    ok = PD_read(file, "wa", wa_r);
 
     PD_close(file);
 
 /* compare data */
     rv = TRUE;
 
-    n = 1;
-    for (i = 0; i < 3; i++)
-        n *= va_r.n[i];
+    for (l = 0; l < N; l++)
+        {nr = 1;
+	 for (i = 0; i < 3; i++)
+	     nr *= va_r[l].n[i];
 
-    for (i = 0; i < 3; i++)
-        rv &= (va_r.n[i] == va_w.n[i]);
+	 for (i = 0; i < 3; i++)
+	     rv &= (va_r[l].n[i] == va_w[l].n[i]);
 
-    for (i = 0; i < n; i++)
-        rv &= (va_r.a[i] == va_w.a[i]);
+	 for (i = 0; i < nr; i++)
+	     rv &= (va_r[l].a[i] == va_w[l].a[i]);
 
-    n = 1;
-    for (i = 0; i < 3; i++)
-        n *= wa_r.n[i];
+	 nr = 1;
+	 for (i = 0; i < 3; i++)
+	     nr *= wa_r[l].n[i];
 
-    for (i = 0; i < 3; i++)
-        rv &= (wa_r.n[i] == wa_w.n[i]);
+	 for (i = 0; i < 3; i++)
+	     rv &= (wa_r[l].n[i] == wa_w[l].n[i]);
 
-    for (i = 0; i < n; i++)
-        rv &= (wa_r.a[i] == wa_w.a[i]);
+	 for (i = 0; i < nr; i++)
+	     rv &= (wa_r[l].a[i] == wa_w[l].a[i]);};
 
 /* cleanup memory */
-    CFREE(va_w.a);
-    CFREE(va_r.a);
-    CFREE(wa_w.n);
-    CFREE(wa_w.a);
-    CFREE(wa_r.n);
-    CFREE(wa_r.a);
+    for (l = 0; l < N; l++)
+        {CFREE(va_w[l].a);
+	 CFREE(va_r[l].a);
+	 CFREE(wa_w[l].n);
+	 CFREE(wa_w[l].a);
+	 CFREE(wa_r[l].n);
+	 CFREE(wa_r[l].a);};
 
     return(rv);}
 
@@ -372,12 +382,12 @@ int test_3(char *base, char *tgt, int n)
 /* TEST_4 - test PD_size_from combined with PD_cast */
 
 int test_4(char *base, char *tgt, int n)
-   {int i, ok, rv;
+   {int i, l, nr, nw, ok, rv;
     char datfile[MAXLINE], fname[MAXLINE];
     float *fr, *fw;
     PDBfile *file; 
     defstr *dp;
-    da4 va_r, va_w;
+    da4 va_r[N], va_w[N];
 
     rv = TRUE;
 
@@ -403,52 +413,57 @@ int test_4(char *base, char *tgt, int n)
     if (ok == 0)
        PRINT(stdout, "PD_size_from: %s\n", PD_get_error());
 
-    va_w.type = CSTRSAVE("float");
+    for (l = 0; l < N; l++)
+        {va_w[l].type = CSTRSAVE("float *");
 
-    va_w.n = CMAKE_N(long, 3);
-    for (i = 0; i < 3; i++)
-        va_w.n[i] = i+2;
+	 va_w[l].n = CMAKE_N(long, 3);
+	 for (i = 0; i < 3; i++)
+	     va_w[l].n[i] = i + l + 2;
 
-    n = 1;
-    for (i = 0; i < 3; i++)
-        n *= va_w.n[i];
+	 nw = 1;
+	 for (i = 0; i < 3; i++)
+	     nw *= va_w[l].n[i];
 
-    fr = CMAKE_N(float, n);
-    for (i = 0; i < n; i++)
-        fr[i] = 'a' + i;
-    va_w.a = fr;
+	 fr = CMAKE_N(float, nw);
+	 for (i = 0; i < nw; i++)
+	     fr[i] = 'a' + i + l;
+	 va_w[l].a = fr;};
 
-    PD_write(file, "va", "da4", &va_w);
+    PD_write(file, "va[3]", "da4", va_w);
 
     PD_close(file);
 
 /* read data */
     file = PD_open(datfile, "r");
 
-    ok = PD_read(file, "va", &va_r);
+    ok = PD_read(file, "va", va_r);
 
     PD_close(file);
 
 /* compare data */
     rv = TRUE;
 
-    n = 1;
-    for (i = 0; i < 3; i++)
-        n *= va_r.n[i];
+    for (l = 0; l < N; l++)
+        {nr = 1;
+	 for (i = 0; i < 3; i++)
+	     nr *= va_r[l].n[i];
 
-    for (i = 0; i < 3; i++)
-        rv &= (va_r.n[i] == va_w.n[i]);
+	 for (i = 0; i < 3; i++)
+	     rv &= (va_r[l].n[i] == va_w[l].n[i]);
 
-    fw = va_w.a;
-    for (i = 0; i < n; i++)
-        rv &= (fr[i] == fw[i]);
+	 fr = va_r[l].a;
+	 fw = va_w[l].a;
+	 for (i = 0; i < nr; i++)
+	     rv &= (fr[i] == fw[i]);};
 
-    CFREE(va_w.type);
-    CFREE(va_w.n);
-    CFREE(va_w.a);
-    CFREE(va_r.type);
-    CFREE(va_r.n);
-    CFREE(va_r.a);
+/* cleanup memory */
+    for (l = 0; l < N; l++)
+        {CFREE(va_w[l].type);
+	 CFREE(va_w[l].n);
+	 CFREE(va_w[l].a);
+	 CFREE(va_r[l].type);
+	 CFREE(va_r[l].n);
+	 CFREE(va_r[l].a);};
 
     return(rv);}
 
