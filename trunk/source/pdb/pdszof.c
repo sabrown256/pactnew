@@ -357,7 +357,8 @@ long PD_sizeof(PDBfile *file ARG(,,cls),
              GO(INDIR_ITEM);};
 
          SAVE_I(ni);
-         ni = _PD_number_refd(vr, ltype, file->host_chart);
+         ni = _PD_number_refd(mem_lst, svr, desc, vr,
+			      ltype, file->host_chart);
          if (ni == -1L)
             {snprintf(bf, MAXLINE,
                       "CAN'T GET POINTER LENGTH ON %s - PD_SIZEOF",

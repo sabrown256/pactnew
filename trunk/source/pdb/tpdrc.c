@@ -30,17 +30,29 @@ struct S_List
     void *data;
     struct S_List *next;};
 
-typedef struct s_da da;
+typedef struct s_da2 da2;
 
-struct s_da
+struct s_da2
    {long n;
     char *a;};
 
-typedef struct s_db db;
+typedef struct s_db2 db2;
 
-struct s_db
+struct s_db2
    {int i;
     long j;
+    char *a;};
+
+typedef struct s_da3 da3;
+
+struct s_da3
+   {long n[3];
+    char *a;};
+
+typedef struct s_db3 db3;
+
+struct s_db3
+   {long *n;
     char *a;};
 
 static int
@@ -145,8 +157,8 @@ int test_2(char *base, char *tgt, int n)
     char datfile[MAXLINE], fname[MAXLINE];
     PDBfile *file; 
     defstr *dp;
-    da va_r, va_w;
-    db wa_r, wa_w;
+    da2 va_r, va_w;
+    db2 wa_r, wa_w;
 
     rv = TRUE;
 
@@ -156,26 +168,26 @@ int test_2(char *base, char *tgt, int n)
 /* write data */
     file = PD_open(datfile, "w");
 
-    dp = PD_defstr(file, "da",
+    dp = PD_defstr(file, "da2",
 		   "long n",
 		   "char *a", 
 		   LAST);
     if (dp == NULL)
-       PRINT(stdout, "PD_defstr da: %s\n", PD_get_error());
+       PRINT(stdout, "PD_defstr da2: %s\n", PD_get_error());
   
-    ok = PD_size_from(file, "da", "a", "n");
+    ok = PD_size_from(file, "da2", "a", "n");
     if (ok == 0)
        PRINT(stdout, "PD_size_from: %s\n", PD_get_error());
 
-    dp = PD_defstr(file, "db",
+    dp = PD_defstr(file, "db2",
 		   "int i",
 		   "long j",
 		   "char *a", 
 		   LAST);
     if (dp == NULL)
-       PRINT(stdout, "PD_defstr db: %s\n", PD_get_error());
+       PRINT(stdout, "PD_defstr db2: %s\n", PD_get_error());
   
-    ok = PD_size_from(file, "db", "a", "i,j");
+    ok = PD_size_from(file, "db2", "a", "i,j");
     if (ok == 0)
        PRINT(stdout, "PD_size_from: %s\n", PD_get_error());
 
@@ -195,8 +207,8 @@ int test_2(char *base, char *tgt, int n)
         wa_w.a[i] = 'a' + i;
     wa_w.a[i] = '\0';
 
-    PD_write(file, "va", "da", &va_w);
-    PD_write(file, "wa", "db", &wa_w);
+    PD_write(file, "va", "da2", &va_w);
+    PD_write(file, "wa", "db2", &wa_w);
 
     PD_close(file);
 
@@ -225,6 +237,78 @@ int test_2(char *base, char *tgt, int n)
     CFREE(wa_w.a);
     CFREE(va_r.a);
     CFREE(wa_r.a);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TEST_3 - test of PD_size_from with multi-dimension sizing member */
+
+int test_3(char *base, char *tgt, int n)
+   {int i, ok, rv;
+    char datfile[MAXLINE], fname[MAXLINE];
+    PDBfile *file; 
+    defstr *dp;
+    da3 va_r, va_w;
+
+    rv = TRUE;
+
+/* target the file as asked */
+    test_target(tgt, base, n, fname, datfile);
+
+/* write data */
+    file = PD_open(datfile, "w");
+
+    dp = PD_defstr(file, "da3",
+		   "long n[3]",
+		   "char *a", 
+		   LAST);
+    if (dp == NULL)
+       PRINT(stdout, "PD_defstr da3: %s\n", PD_get_error());
+  
+    ok = PD_size_from(file, "da3", "a", "n");
+    if (ok == 0)
+       PRINT(stdout, "PD_size_from: %s\n", PD_get_error());
+
+    for (i = 0; i < 3; i++)
+        va_w.n[i] = i+2;
+
+    n = 1;
+    for (i = 0; i < 3; i++)
+        n *= va_w.n[i];
+
+    va_w.a = CMAKE_N(char, n+10);
+    for (i = 0; i < n; i++)
+        va_w.a[i] = 'a' + i;
+    va_w.a[i] = '\0';
+
+    PD_write(file, "va", "da3", &va_w);
+
+    PD_close(file);
+
+/* read data */
+    file = PD_open(datfile, "r");
+
+    ok = PD_read(file, "va", &va_r);
+
+    PD_close(file);
+
+/* compare data */
+    rv = TRUE;
+
+    n = 1;
+    for (i = 0; i < 3; i++)
+        n *= va_r.n[i];
+
+    for (i = 0; i < 3; i++)
+        rv &= (va_r.n[i] == va_w.n[i]);
+
+    for (i = 0; i < n; i++)
+        rv &= (va_r.a[i] == va_w.a[i]);
+
+    CFREE(va_w.a);
+    CFREE(va_r.a);
 
     return(rv);}
 
@@ -276,7 +360,7 @@ void print_help(void)
    {
 
     PRINT(STDOUT, "\nTPDRC - run PDB cast tests\n\n");
-    PRINT(STDOUT, "Usage: tpdrc [-d] [-h] [-n] [-r] [-v #] [-1] [-2]\n");
+    PRINT(STDOUT, "Usage: tpdrc [-d] [-h] [-n] [-r] [-v #] [-1] [-2] [-3]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       d  - turn on debug mode to display memory maps\n");
     PRINT(STDOUT, "       h  - print this help message and exit\n");
@@ -285,6 +369,7 @@ void print_help(void)
     PRINT(STDOUT, "       v  - use specified format version (default 2)\n");
     PRINT(STDOUT, "       1  - do NOT run test #1\n");
     PRINT(STDOUT, "       2  - do NOT run test #2\n");
+    PRINT(STDOUT, "       3  - do NOT run test #3\n");
     PRINT(STDOUT, "\n");
 
     return;}
@@ -334,6 +419,8 @@ int main(int c, char **v)
        err += run_test(test_1, 1, DATFILE, native_only);
     if (ton[2])
        err += run_test(test_2, 2, DATFILE, native_only);
+    if (ton[3])
+       err += run_test(test_3, 3, DATFILE, native_only);
 
     return(err);}
 

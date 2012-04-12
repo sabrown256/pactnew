@@ -325,7 +325,8 @@ PyObject *_PP_wr_syment(PP_file *fileinfo,
 #if 0
         entry = PP_inquire_type(fileinfo, litype);
         if (entry != NULL) {
-            nitems = _PD_number_refd(DEREF(pv), litype, file->host_chart);
+            nitems = _PD_number_refd(mem_lst, svr, desc, DEREF(pv),
+				     litype, file->host_chart);
             obj = PP_copy_mem_to_obj(file, DEREF(pv), dims, nitems, litype,
                                      entry, form, TRUE);
             RESTORE_S(litype);
@@ -348,7 +349,8 @@ PyObject *_PP_wr_syment(PP_file *fileinfo,
                     nitems = 0L;
                 } else {
                     nitems =
-                        _PD_number_refd(DEREF(pv), litype, file->host_chart);
+                        _PD_number_refd(mem_lst, svr, desc, DEREF(pv),
+					litype, file->host_chart);
                 }
 #endif
                 RESTORE_S(litype);
@@ -407,7 +409,8 @@ PyObject *_PP_wr_syment(PP_file *fileinfo,
             GO(INDIR_RET);
         }
 
-        nitems = _PD_number_refd(pv, litype, file->host_chart);
+        nitems = _PD_number_refd(mem_lst, svr, desc, pv,
+				 litype, file->host_chart);
         if (nitems < 0) {
             PP_error_set_user(NULL,
                               "error from _PP_number_refd called from _PP_wr_syment, type %s",
@@ -832,7 +835,8 @@ static PyObject *_indirect_work(
             Py_INCREF(Py_None);
             obj = Py_None;
         } else {
-            mitems = _PD_number_refd(pvr, litype, file->host_chart);
+            mitems = _PD_number_refd(NULL, NULL, NULL, pvr,
+				     litype, file->host_chart);
             if (mitems == -1L) {
                 PP_error_set_user(NULL,
                                   "CAN'T GET POINTER LENGTH ON %s - _PP_WR_SYMENT",
@@ -864,7 +868,8 @@ static PyObject *_indirect_work(
                 Py_INCREF(Py_None);
                 item = Py_None;
             } else {
-                mitems = _PD_number_refd(pvr, litype, file->host_chart);
+                mitems = _PD_number_refd(NULL, NULL, NULL, pvr,
+					 litype, file->host_chart);
                 if (mitems == -1L) {
                     PP_error_set_user(NULL,
                                       "CAN'T GET POINTER LENGTH ON %s - _PP_WR_SYMENT",

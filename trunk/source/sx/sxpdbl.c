@@ -72,7 +72,8 @@ object *_SX_make_list_indirection(SS_psides *si, PDBfile *file, char **vr,
     obj = SS_null;
 
     for (i = 0L; i < ni; i++, vr++)
-        {ditems = _PD_number_refd(DEREF(vr), dtype, file->host_chart);
+        {ditems = _PD_number_refd(NULL, NULL, NULL, DEREF(vr),
+				  dtype, file->host_chart);
 
          if (ditems < 0L)
             continue;

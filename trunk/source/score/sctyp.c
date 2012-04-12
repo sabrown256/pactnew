@@ -861,7 +861,7 @@ int SC_type_match_size(SC_kind kind, int nb)
  *               -     DID  - type of destination data
  *               -     D    - pointer to converted data destination
  *               -     OD   - offset from destination pointer
- *               -     SD   - stride through destination
+ *               -     DS   - stride through destination
  *               -     SID  - type of source data
  *               -     S    - pointer to data to be converted
  *               -     OS   - offset from source pointer

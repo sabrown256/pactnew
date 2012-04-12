@@ -106,27 +106,33 @@ typedef enum e_PD_instr_rdwr PD_instr_rdwr;
 
 /* _PD_NUMBER_REFD - THREADSAFE
  *                 - compute the number of items pointed to by VR
+ *                 - with addition of PD_size_from may have to
+ *                 - refer to struct containing VR with is SVR
+ *                 - described by MEML
  *                 - return the number of items if successful
  *                 - return -1 if SCORE did NOT allocate the block
  *                 - return -2 if the type is unknown
  */
 
-long _PD_number_refd(void *vr, char *type, hasharr *tab)
+long _PD_number_refd(memdes *meml, void *svr, memdes *desc, void *vr,
+		     char *type, hasharr *tab)
    {intb bpi;
     inti ni;
 
-    if (vr == NULL)
-       return(0L);
+    ni = 0;
 
-    ni = SC_arrlen(vr);
-    if (ni <= 0)
-       return(-1L);
+    if (vr != NULL)
+       {if ((desc != NULL) && (desc->size_memb != NULL))
+           ni = _PD_cast_size(meml, svr, desc);
 
-    bpi = _PD_lookup_size(type, tab);
-    if (bpi == -1)
-       return(-2L);
-
-    ni /= bpi;
+	if (ni <= 0)
+	   {ni = SC_arrlen(vr);
+	    if (ni > 0)
+	       {bpi = _PD_lookup_size(type, tab);
+		if (bpi == -1)
+		   ni = -2;
+		else
+		   ni /= bpi;};};};
 
     return(ni);}
 
@@ -1046,7 +1052,8 @@ int64_t _PD_wr_syment(PDBfile *file, char *name, char *vr, int64_t ni,
              GO(INDIR_ITEM);};
 
          SAVE_I(ni);
-         ni = _PD_number_refd(vr, litype, file->host_chart);
+         ni = _PD_number_refd(mem_lst, svr, desc, vr,
+			      litype, file->host_chart);
          if (ni == -1L)
             {snprintf(bf, MAXLINE,
                       "CAN'T GET POINTER LENGTH ON %s - _PD_WR_SYMENT",
