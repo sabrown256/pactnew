@@ -70,7 +70,8 @@ static void _SX_find_indirection(SS_psides *si, hasharr *tytab,
     dtype = PD_dereference(CSTRSAVE(type));
 
     for (i = 0L; i < ni; i++, vr++)
-        {ditems = _PD_number_refd(DEREF(vr), dtype, file->host_chart);
+        {ditems = _PD_number_refd(NULL, NULL, NULL, DEREF(vr),
+				  dtype, file->host_chart);
 
          if (ditems == -1L)
             {bf = SC_dsnprintf(FALSE,

@@ -729,7 +729,8 @@ static int _PD_print_indirection(PD_printdes *prnt, PDBfile *file, char **vr,
         {if (ni > 1)
             sprintf(s, "(%lld)", (long long) (i + min_index));
 
-         ditems = _PD_number_refd(DEREF(vr), dtype, file->host_chart);
+         ditems = _PD_number_refd(NULL, NULL, NULL, DEREF(vr),
+				  dtype, file->host_chart);
 
          if (ditems == -2L)
             {snprintf(bf, MAXLINE,

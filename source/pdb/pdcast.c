@@ -13,16 +13,16 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_INQUIRE_MEMBER - return the member of DP MEMB */
+/* _PD_INQUIRE_MEMBER - return the member of DP S */
 
-static memdes *_PD_inquire_member(defstr *dp, char *memb)
+static memdes *_PD_inquire_member(defstr *dp, char *s)
    {memdes *desc, *rv;
 
     rv = NULL;
 
-    if ((dp != NULL) && (memb != NULL))
+    if ((dp != NULL) && (s != NULL))
        {for (desc = dp->members; desc != NULL; desc = desc->next)
-	    {if (strcmp(memb, desc->member) == 0)
+	    {if (strcmp(s, desc->member) == 0)
 	        {rv = desc;
 		 break;};};};
 
@@ -31,18 +31,33 @@ static memdes *_PD_inquire_member(defstr *dp, char *memb)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_INQUIRE_MEMBER_NAME - return the member of DP named MEMB */
+/* _PD_GET_MEMBER_NAME - return the member of LST named S */
 
-static memdes *_PD_inquire_member_name(defstr *dp, char *memb)
+static memdes *_PD_get_member_name(memdes *lst, char *s)
    {memdes *desc, *rv;
 
     rv = NULL;
 
-    if ((dp != NULL) && (memb != NULL))
-       {for (desc = dp->members; desc != NULL; desc = desc->next)
-	    {if (strcmp(memb, desc->name) == 0)
+    if ((lst != NULL) && (s != NULL))
+       {for (desc = lst; desc != NULL; desc = desc->next)
+	    {if (strcmp(s, desc->name) == 0)
 	        {rv = desc;
 		 break;};};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_INQUIRE_MEMBER_NAME - return the member of DP named S */
+
+static memdes *_PD_inquire_member_name(defstr *dp, char *s)
+   {memdes *rv;
+
+    rv = NULL;
+
+    if ((dp != NULL) && (s != NULL))
+       rv = _PD_get_member_name(dp->members, s);
 
     return(rv);}
 
@@ -185,6 +200,52 @@ void _PD_cast_check(PDBfile *file)
     pa->n_casts = 0L;
 
     return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_CAST_SIZE - return the size of a pointer described by DESC
+ *               - and based on size_from data
+ *               - which is a member of a struct described by MEML
+ *               - and pointed to by SVR
+ *               - return 0 on failure to interpret size_from info
+ *               - return 1 if there is no size_from info
+ *               - otherwise return the size in items of the member
+ */
+
+inti _PD_cast_size(memdes *meml, void *svr, memdes *desc)
+   {int sid;
+    long in, sn;
+    inti is, ns, ni, n;
+    int64_t *so, *dm;
+    char **sm, *p;
+    memdes *md;
+
+    ni = 1;
+    sm = desc->size_memb;
+    so = desc->size_offs;
+    SC_ptr_arr_len(ns, sm);
+    for (is = 0; is < ns; is++)
+        {p = (char *) svr + so[is];
+
+	 md = _PD_get_member_name(meml, sm[is]);
+
+	 n   = 0;
+	 sid = SC_fix_type_id(md->base_type, FALSE);
+	 if (sid != -1)
+	    {sn = md->number;
+	     dm = SC_convert_id(SC_INT64_I, NULL, 0, 1,
+				sid, p, 0, 1, sn, FALSE);
+
+	     n = 1;
+	     for (in = 0; in < sn; in++)
+	         n *= dm[in];
+
+	     CFREE(dm);};
+
+	 ni *= n;};
+
+    return(ni);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

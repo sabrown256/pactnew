@@ -358,6 +358,9 @@ extern int
 
 /* PDCAST.C declarations */
 
+extern inti
+ _PD_cast_size(memdes *meml, void *svr, memdes *desc);
+
 extern void
  _PD_cast_check(PDBfile *file);
 
@@ -718,7 +721,8 @@ extern int
  _PD_valid_dims(dimdes *dimscheck, dimdes *vardims);
 
 extern long
- _PD_number_refd(void *vr, char *type, hasharr *tab),
+ _PD_number_refd(memdes *meml, void *svr, memdes *desc, void *vr,
+		 char *type, hasharr *tab),
  _PD_rd_pointer(PDBfile *file, int64_t addr);
 
 extern int64_t

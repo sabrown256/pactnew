@@ -205,7 +205,8 @@ long _PP_rel_syment(hasharr *host_chart, char *vr, long nitems, char *intype)
          }
 
          SAVE_I(nitems);
-         nitems = _PD_number_refd(vr, litype, host_chart);
+         nitems = _PD_number_refd(mem_lst, svr, desc, vr,
+				  litype, host_chart);
          if (nitems == -1L) {
              PP_error_set_user(NULL,
                                "error from _PP_number_refd called from _PP_rel_syment, type %s",
@@ -296,7 +297,8 @@ long _PP_mark_syment(char *outtype, long nitems, void *vr, int recursive)
     but we can delete pointer within leaves if (dst == LEAF)
             return 0;
 
-    nitems = _PD_number_refd(pv, litype, PP_vif->host_chart);
+    nitems = _PD_number_refd(NULL, NULL, NULL, pv,
+			     litype, PP_vif->host_chart);
     if (nitems < 0) {
         PP_error_set_user(NULL,
                           "error from _PD_number_refd called from _PP_mark_syment, type %s",
@@ -426,7 +428,8 @@ long _PP_mark_syment(char *outtype, long nitems, void *vr, int recursive)
          SAVE_P(pv);
 
 #if 0
-         nitems = _PD_number_refd(DEREF(pv), litype, PP_vif->host_chart);
+         nitems = _PD_number_refd(mem_lst, svr, desc, DEREF(pv),
+				  litype, PP_vif->host_chart);
          if (nitems < 0) {
              PP_error_set_user(NULL,
                                "error from _PD_number_refd called from _PP_mark_syment, type %s",
