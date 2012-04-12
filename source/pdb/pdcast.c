@@ -13,6 +13,127 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PD_INQUIRE_MEMBER - return the member of DP MEMB */
+
+static memdes *_PD_inquire_member(defstr *dp, char *memb)
+   {memdes *desc, *rv;
+
+    rv = NULL;
+
+    if ((dp != NULL) && (memb != NULL))
+       {for (desc = dp->members; desc != NULL; desc = desc->next)
+	    {if (strcmp(memb, desc->member) == 0)
+	        {rv = desc;
+		 break;};};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_INQUIRE_MEMBER_NAME - return the member of DP named MEMB */
+
+static memdes *_PD_inquire_member_name(defstr *dp, char *memb)
+   {memdes *desc, *rv;
+
+    rv = NULL;
+
+    if ((dp != NULL) && (memb != NULL))
+       {for (desc = dp->members; desc != NULL; desc = desc->next)
+	    {if (strcmp(memb, desc->name) == 0)
+	        {rv = desc;
+		 break;};};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_CAST_INJECT - setup the cast specs from S into DESC */
+
+static int _PD_cast_inject(hasharr *tab, defstr *dp, memdes *desc, char *s)
+   {int rv;
+    memdes *lst;
+
+    rv = TRUE;
+
+/* make an independent copy in case the one in the file chart is released */
+    CFREE(desc->cast_memb);
+    desc->cast_memb = CSTRSAVE(s);
+    desc->cast_offs = _PD_member_location(s, tab, dp, &lst);
+
+    SC_mark(s, 1);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_SIZE_FROM_INJECT - setup the size_from specs from SA into DESC */
+
+static int _PD_size_from_inject(hasharr *tab, defstr *dp,
+				memdes *desc, char **sa)
+   {int rv;
+    inti is, ns, off;
+    int64_t *so;
+    char **sm;
+    memdes *lst;
+
+    SC_ptr_arr_len(ns, sa);
+
+    sm = CMAKE_N(char *, ns+1);
+    so = CMAKE_N(int64_t, ns+1);
+    if ((sm == NULL) || (so == NULL))
+       rv = FALSE;
+
+    else
+       {rv = TRUE;
+
+	SC_free_strings(desc->size_memb);
+	CFREE(desc->size_offs);
+
+	desc->size_memb = sm;
+	desc->size_offs = so;
+
+	for (is = 0; is < ns; is++)
+	    {off = _PD_member_location(sa[is], tab, dp, &lst);
+	     sm[is] = CSTRSAVE(sa[is]);
+	     so[is] = off;};
+
+	sm[is] = NULL;
+	so[is] = 0;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_CAST_PROCESS_SPEC - process a cast or size_from specification S */
+
+static int _PD_cast_process_spec(hasharr *chrt, defstr *dp,
+				 memdes *desc, char *s)
+   {int rv;
+    char **sa;
+
+    rv = FALSE;
+
+    if ((s != NULL) && (desc != NULL))
+
+/* size_from */
+       {if (s[0] == '[')
+	   {sa = SC_tokenize(s, "[], \t");
+	    rv = _PD_size_from_inject(chrt, dp, desc, sa);
+	    SC_free_strings(sa);}
+
+/* type cast */
+	else
+	    rv = _PD_cast_inject(chrt, dp, desc, s);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PD_CAST_CHECK_LIST - complete the set up of
  *                     - the casts in the given chart
  */
@@ -20,49 +141,16 @@
 static void _PD_cast_check_list(hasharr *chrt, char **lst, inti n)
    {long i;
     inti j;
-    memdes *memb, *desc;
+    memdes *desc;
     defstr *dp;
 
 /* assume a single-element, linked-list hasharr */
     for (i = 0; SC_hasharr_next(chrt, &i, NULL, NULL, (void **) &dp); i++)
-        {for (desc = dp->members; desc != NULL; desc = desc->next)
-	     {for (j = 0L; j < n; j += 3)
-		  {if ((strcmp(dp->type, lst[j]) == 0) &&
-		       (strcmp(desc->member, lst[j+1]) == 0))
-		      {desc->cast_memb = lst[j+2];
-		       desc->cast_offs = _PD_member_location(desc->cast_memb,
-							     chrt, dp,
-							     &memb);
-		       SC_mark(lst[j+2], 1);};};};};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PD_CAST_CHECK_HASH - complete the set up of the casts
- *                     - in the given chart
- */
-
-void _PD_cast_check_hash(hasharr *chrt, char **lst, inti n)
-   {long i;
-    inti j;
-    defstr *dp;
-    memdes *memb, *desc;
-
-/* check each hash element
- * do not assume a single-element, linked-list hasharr
- */
-    for (i = 0; SC_hasharr_next(chrt, &i, NULL, NULL, (void **) &dp); i++)
-        {for (desc = dp->members; desc != NULL; desc = desc->next)
-	     {for (j = 0L; j < n; j += 3)
-		  {if ((strcmp(dp->type, lst[j]) == 0) &&
-		       (strcmp(desc->member, lst[j+1]) == 0))
-		      {desc->cast_memb = lst[j+2];
-		       desc->cast_offs = _PD_member_location(desc->cast_memb,
-							     chrt, dp,
-							     &memb);
-		       SC_mark(lst[j+2], 1);};};};};
+        {for (j = 0L; j < n; j += 3)
+	     {if (strcmp(dp->type, lst[j]) == 0)
+		 {desc = _PD_inquire_member(dp, lst[j+1]);
+		  if (desc != NULL)
+		     _PD_cast_process_spec(chrt, dp, desc, lst[j+2]);};};};
 
     return;}
 
@@ -78,8 +166,8 @@ void _PD_cast_check(PDBfile *file)
 
     pa = _PD_get_state(-1);
 
-    nc    = pa->n_casts;
-    clst  = pa->cast_lst;
+    nc   = pa->n_casts;
+    clst = pa->cast_lst;
 
     if (nc > 0)
 
@@ -90,32 +178,13 @@ void _PD_cast_check(PDBfile *file)
 	_PD_cast_check_list(file->host_chart, clst, nc);
 
 /* clean up the mess */
-	for (i = 0L; i < nc; i += 3)
-	    {CFREE(clst[i]);
-	     CFREE(clst[i+1]);};};
+	for (i = 0L; i < nc; i++)
+	    CFREE(clst[i]);};
 
     CFREE(pa->cast_lst);
     pa->n_casts = 0L;
 
     return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PD_INQUIRE_MEMBER - return the member of DP named MEMB */
-
-static memdes *_PD_inquire_member(defstr *dp, char *memb)
-   {memdes *desc, *rv;
-
-    rv = NULL;
-
-    if ((dp != NULL) && (memb != NULL))
-       {for (desc = dp->members; desc != NULL; desc = desc->next)
-	    {if (strcmp(memb, desc->name) == 0)
-	        {rv = desc;
-		 break;};};};
-
-    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -133,7 +202,7 @@ int PD_cast(PDBfile *file ARG(,,cls), char *type, char *memb, char *contr)
    {int rv;
     defstr *dp;
     hasharr *tab;
-    memdes *desc, *lst;
+    memdes *desc;
 
     rv = TRUE;
 
@@ -141,7 +210,7 @@ int PD_cast(PDBfile *file ARG(,,cls), char *type, char *memb, char *contr)
  * this assumes that file->chart is a linked list
  */
     dp   = PD_inquire_type(file, type);
-    desc = _PD_inquire_member(dp, contr);
+    desc = _PD_inquire_member_name(dp, contr);
     if ((desc == NULL) ||
 	(strcmp(desc->base_type, SC_CHAR_S) != 0) ||
 	!_PD_indirection(desc->type))
@@ -155,16 +224,10 @@ int PD_cast(PDBfile *file ARG(,,cls), char *type, char *memb, char *contr)
 
 /* add the cast to the file->host_chart */
        {dp   = PD_inquire_host_type(file, type);
-	desc = _PD_inquire_member(dp, memb);
+	desc = _PD_inquire_member_name(dp, memb);
 	if (desc != NULL)
 	   {tab = file->host_chart;
-
-/* make an independent copy in case the one in the file chart is released */
-	    CFREE(desc->cast_memb);
-	    desc->cast_memb = CSTRSAVE(contr);
-	    desc->cast_offs = _PD_member_location(contr, tab, dp, &lst);
-
-	    SC_mark(contr, 1);};};
+	    rv  = _PD_cast_inject(tab, dp, desc, contr);};};
 
     return(rv);}
 
@@ -185,12 +248,10 @@ int PD_size_from(PDBfile *file ARG(,,cls), char *type,
 		 char *memb, char *contr)
    {int rv;
     long is, ns;
-    inti off;
-    int64_t *so;
-    char **sa, **sm;
+    char **sa;
     hasharr *tab;
     defstr *dp;
-    memdes *desc, *lst;
+    memdes *desc;
 
     rv = TRUE;
 
@@ -202,7 +263,7 @@ int PD_size_from(PDBfile *file ARG(,,cls), char *type,
  */
     dp = PD_inquire_type(file, type);
     for (is = 0; (is < ns) && (rv == TRUE); is++)
-        {desc = _PD_inquire_member(dp, sa[is]);
+        {desc = _PD_inquire_member_name(dp, sa[is]);
 	 if (SC_fix_type_id(desc->base_type, FALSE) == -1)
 	    {PD_error("BAD CAST CONTROLLER - PD_CAST", PD_GENERIC);
 	     rv = FALSE;};};
@@ -214,28 +275,10 @@ int PD_size_from(PDBfile *file ARG(,,cls), char *type,
 
 /* add the size_from to the file->host_chart */
        {dp   = PD_inquire_host_type(file, type);
-	desc = _PD_inquire_member(dp, memb);
+	desc = _PD_inquire_member_name(dp, memb);
 	if (desc != NULL)
 	   {tab = file->host_chart;
-
-	    sm = CMAKE_N(char *, ns);
-	    so = CMAKE_N(int64_t, ns);
-	    if ((sm == NULL) || (so == NULL))
-	       rv = FALSE;
-
-	    else
-	       {SC_free_strings(desc->size_memb);
-		CFREE(desc->size_offs);
-
-		desc->size_memb = sm;
-		desc->size_offs = so;
-
-		for (is = 0; is < ns; is++)
-		    {off = _PD_member_location(sa[is], tab, dp, &lst);
-		     sm[is] = CSTRSAVE(sa[is]);
-		     so[is] = off;
-
-		     SC_mark(sa[is], 1);};};};};
+	    rv = _PD_size_from_inject(tab, dp, desc, sa);};};
 
     SC_free_strings(sa);
 

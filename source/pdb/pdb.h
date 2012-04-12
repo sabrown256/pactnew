@@ -1017,7 +1017,8 @@ extern void
 /* PDCAST.C declarations */
 
 extern int
- PD_cast(PDBfile *file, char *type, char *memb, char *contr);
+ PD_cast(PDBfile *file, char *type, char *memb, char *contr),
+ PD_size_from(PDBfile *file, char *type, char *memb, char *contr);
 
 
 /* PDBMM.C declarations */

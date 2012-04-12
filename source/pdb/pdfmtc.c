@@ -390,7 +390,7 @@ static int _PD_rd_chrt_iii(PDBfile *file)
    {long sz, nbc, ncast, icast, bsz;
     char **pl;
     char type[MAXLINE];
-    char *nxt, *bf, *p, *local, *member, *cast;
+    char *nxt, *bf, *p, *local, *member, *modf;
     memdes *desc, *lst, *prev;
     FILE *fp;
     PD_smp_state *pa;
@@ -460,22 +460,22 @@ static int _PD_rd_chrt_iii(PDBfile *file)
 		else
 		   nxt++;
 
-		member = SC_strtok(nxt, "<-;\n", p);
-		cast   = SC_strtok(NULL, "<-; \t\n", p);
+		member = SC_strtok(nxt, "<;\n", p);
+		modf   = SC_strtok(NULL, "-=;\t\n", p);
 		nxt    = SC_strtok(NULL, ";", p);
 
 		member = SC_trim_right(member, " \t");
 		member = SC_trim_left(member, " \t");
-		if (cast != NULL)
-		   cast = SC_trim_left(cast, " \t");
+		if (modf != NULL)
+		   modf = SC_trim_left(modf, " \t");
 
 		desc = _PD_mk_descriptor(member, file->default_offset);
-		if ((cast == NULL) ||  (*cast == '}'))
-		   nxt = cast;
+		if ((modf == NULL) ||  (*modf == '}'))
+		   nxt = modf;
 		else
 		   {pl[icast]   = CSTRSAVE(type);
-		    pl[icast+2] = CSTRSAVE(cast);
 		    pl[icast+1] = CSTRSAVE(member);
+		    pl[icast+2] = CSTRSAVE(modf);
 		    icast += 3;
 		    if (icast >= ncast)
 		       {ncast += N_CASTS_INCR;
@@ -969,6 +969,20 @@ static int64_t _PD_wr_chrt_iii(PDBfile *file, FILE *out, int wc)
  */
 		  if (hdsc->cast_memb != NULL)
 		     _PD_put_string(n++, "\t<- %s", hdsc->cast_memb);
+
+		  if (hdsc->size_memb != NULL)
+		     {inti is, ns;
+		      char **sm;
+
+		      sm = hdsc->size_memb;
+
+		      SC_ptr_arr_len(ns, sm);
+		      for (is = 0; is < ns; is++)
+			  {if (is == 0)
+			      _PD_put_string(n++, "\t<= [%s", sm[is]);
+			   else
+			      _PD_put_string(n++, ",%s", sm[is]);};
+		      _PD_put_string(n++, "]");};
 
 		  _PD_put_string(n++, ";");};
 

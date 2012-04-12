@@ -863,10 +863,8 @@ static void print_help(void)
 /* MAIN - test the PDB Library system */
 
 int main(int c, char **v)
-   {int i, err;
-    int test_zero, test_one, test_two, test_three;
-    int test_four, test_five, test_six, test_seven;
-    int test_eight, test_nine, test_ten;
+   {int i, n, err;
+    int ton[10];
     int use_mapped_files, check_writes;
     int64_t bfsz;
 
@@ -875,6 +873,9 @@ int main(int c, char **v)
     SC_bf_set_hooks();
     SC_zero_space_n(1, -2);
 
+    for (i = 0; i < 10; i++)
+        ton[i] = TRUE;
+
     bfsz             = -1;
     bfsz             = 100000;
     check_writes     = FALSE;
@@ -882,17 +883,7 @@ int main(int c, char **v)
     native_only      = FALSE;
     read_only        = FALSE;
     use_mapped_files = FALSE;
-    test_zero        = TRUE;
-    test_one         = TRUE;
-    test_two         = TRUE;
-    test_three       = TRUE;
-    test_four        = TRUE;
-    test_five        = TRUE;
-    test_six         = TRUE;
-    test_seven       = TRUE;
-    test_eight       = TRUE;
-    test_nine        = TRUE;
-    test_ten         = TRUE;
+
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')
             {switch (v[i][1])
@@ -921,38 +912,9 @@ int main(int c, char **v)
                  case 'v' :
                       PD_set_fmt_version(SC_stoi(v[++i]));
 		      break;
-                 case '0' :
-		      test_zero = FALSE;
-		      break;
-                 case '1' :
-		      if (v[i][2] == '0')
-			 test_ten = FALSE;
-		      else
-			 test_one = FALSE;
-		      break;
-                 case '2' :
-		      test_two = FALSE;
-		      break;
-                 case '3' :
-		      test_three = FALSE;
-		      break;
-                 case '4' :
-		      test_four = FALSE;
-		      break;
-                 case '5' :
-		      test_five = FALSE;
-		      break;
-                 case '6' :
-		      test_six = FALSE;
-		      break;
-                 case '7' :
-		      test_seven = FALSE;
-		      break;
-                 case '8' :
-		      test_eight = FALSE;
-		      break;
-                 case '9' :
-		      test_nine = FALSE;
+                 default:
+                      n = -SC_stoi(v[i]);
+		      ton[n] = FALSE;
 		      break;};}
          else
             break;};
@@ -974,27 +936,27 @@ int main(int c, char **v)
 
     err = 0;
 
-    if (test_zero)
+    if (ton[0])
        err += run_test(test_0, 0, DATFILE, TRUE);
-    if (test_one)
+    if (ton[1])
        err += run_test(test_1, 1, DATFILE, native_only);
-    if (test_two)
+    if (ton[2])
        err += run_test(test_2, 2, DATFILE, native_only);
-    if (test_three)
+    if (ton[3])
        err += run_test(test_3, 3, DATFILE, native_only);
-    if (test_four)
+    if (ton[4])
        err += run_test(test_4, 4, DATFILE, native_only);
-    if (test_five)
+    if (ton[5])
        err += run_test(test_5, 5, DATFILE, native_only);
-    if (test_six)
+    if (ton[6])
        err += run_test(test_6, 6, DATFILE, native_only);
-    if (test_seven)
+    if (ton[7])
        err += run_test(test_7, 7, DATFILE, native_only);
-    if (test_eight)
+    if (ton[8])
        err += run_test(test_8, 8, DATFILE, native_only);
-    if (test_nine)
+    if (ton[9])
        err += run_test(test_9, 9, DATFILE, native_only);
-    if (test_ten)
+    if (ton[10])
        err += run_test(test_10, 10, DATFILE, native_only);
 
     PRINT(STDOUT, "\n");

@@ -10,19 +10,19 @@
 
 source ../../tests/common
 
-set msg = "PDB Recursive Cast Test ............"
+set msg = "PDB Cast Test ......................"
 set exe = $BinDir/tpdrc
 set opt = ( -v $tst foo.pdb )
 set io  = ftee
 
 NoteD $Log ""
-NoteD $Log -n "                    $msg"
+NoteD $Log "                    $msg"
 Note $Log ""
 
 source ../../../scripts/test-run
 
 set rpf = ( $rpf foo.pdb )
 
-$TEST_CHECK part -a cast -e $xstatus -dt $dt -x $exe -rpf "$rpf" none
+$TEST_CHECK part -a cast -e $xstatus -dt $dt -x $exe -rpf "$rpf" $msg
 
 exit($status)
