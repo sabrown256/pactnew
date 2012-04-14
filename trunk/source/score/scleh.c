@@ -59,6 +59,7 @@ struct s_lehdes
     int nhx;
     int nh;
     char **hist;
+    PFread read;
     PFlehact *map;
     PFlehcb cmp_cb;};
 
@@ -75,7 +76,8 @@ struct s_lehloc
     char *prompt;};       /* prompt text */
 
 static lehdes
- _SC_leh = { -1, FALSE, 0, MAX_HIST_N, 0, NULL, NULL, NULL, };
+ _SC_leh = { -1, FALSE, 0, MAX_HIST_N, 0, NULL,
+	     read, NULL, NULL, };
 
 void
  SC_leh_cmp_set_cb_cmp_cb(PFlehcb *f), 
@@ -262,7 +264,9 @@ static void _SC_leh_refresh(lehloc *lp)
 	nw   = write(fd, seq, strlen(seq));
 	err |= (nw == -1);};
 
-/* move cursor to original position - 'ESC [ n C' move cursor forward n chars */
+/* move cursor to original position
+ * 'ESC [ n C' move cursor forward n chars
+ */
     if (err == FALSE)
        {snprintf(seq, 64, "\x1b[0G\x1b[%dC", (int) (pos + np));
 	nw   = write(fd, seq, strlen(seq));
@@ -339,7 +343,7 @@ static int _SC_leh_complete(lehloc *lp)
 	     else
 	        _SC_leh_refresh(lp);
 
-	     nr = read(lp->fd, &c, 1);
+	     nr = _SC_leh.read(lp->fd, &c, 1);
 	     if (nr <= 0)
 	        {_SC_leh_free_cmp(&lc);
                  return(-1);};
@@ -437,8 +441,8 @@ static int _SC_leh_up_down(lehloc *lp, int wh)
 
     if (_SC_leh.nh > 1)
 
-/* update the current history entry before to
- * overwrite it with the next one
+/* update the current history entry before
+ * overwriting it with the next one
  */
        {ie = _SC_leh.nh - 1 - lp->hind;
 	CFREE(_SC_leh.hist[ie]);
@@ -738,7 +742,7 @@ static int _SC_leh_esc(lehloc *lp)
 
     fd = lp->fd;
 
-    if (read(fd, esa, 2) >= 0)
+    if (_SC_leh.read(fd, esa, 2) >= 0)
        {if (esa[0] == '[')
 	   {switch (esa[1])
 
@@ -765,7 +769,7 @@ static int _SC_leh_esc(lehloc *lp)
 /* extended escape sequences */
 	        default :
 		     if (('0' < esa[1]) && (esa[1] < '7'))
-		        {if (read(fd, esb, 2) >= 0)
+		        {if (_SC_leh.read(fd, esb, 2) >= 0)
 
 /* DEL */
 			    {if ((esa[1] == '3') && (esb[0] == '~'))
@@ -857,9 +861,10 @@ void SC_leh_vi_mode(void)
 /* _SC_LEH_PROMPT - print the PROMPT and fill BF */
 
 static int _SC_leh_prompt(int fd, char *bf, size_t nb, const char *prompt)
-   {int nr, rv;
+   {int nr, np, rv;
     lehloc loc;
     PFlehact *map;
+    static char *linsp = "\f\r\n";
 
     if (_SC_leh.map == NULL)
        SC_leh_emacs_mode();
@@ -873,22 +878,32 @@ static int _SC_leh_prompt(int fd, char *bf, size_t nb, const char *prompt)
     loc.c      = 0;
     loc.cols   = _SC_leh_get_ncol();
     loc.nb     = --nb;   /* take off one for the terminating null character */
-    loc.prompt = (char *) prompt;
-    loc.np     = (prompt == NULL) ? 0 : strlen(prompt);
     loc.bf     = bf;
     loc.bf[0]  = '\0';
+
+    if (prompt == NULL)
+       {loc.prompt = NULL;
+	loc.np     = 0;}
+    else if (strchr(linsp, prompt[0]) != NULL)
+       {np = strspn(prompt, linsp);
+	loc.prompt = (char *) (prompt + np);
+	loc.np     = strlen(loc.prompt);
+        write(fd, "\n", 1);}
+    else
+       {loc.prompt = (char *) prompt;
+	loc.np     = strlen(loc.prompt);};
 
 /* most recent history entry is current buffer
  * initially just an empty string
  */
     SC_leh_hist_add("");
     
-    if (prompt != NULL)
-       {if (write(fd, prompt, loc.np) == -1)
+    if (loc.prompt != NULL)
+       {if (write(fd, loc.prompt, loc.np) == -1)
 	   return(-1);};
 
     while (TRUE)
-       {nr = read(fd, &loc.c, 1);
+       {nr = _SC_leh.read(fd, &loc.c, 1);
         if (nr <= 0)
 	   break;
 
@@ -1130,6 +1145,21 @@ int SC_leh_hist_load(char *fname)
 	 fclose(fp);};
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_LEH_SET_READ - set the read method for LEH
+ *                 - return the old function
+ */
+
+PFread SC_leh_set_read(PFread f)
+   {PFread ov;
+
+    ov = _SC_leh.read;
+    _SC_leh.read = f;
+
+    return(ov);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -28,6 +28,13 @@
 
 #define SC_N_IO_OPER  21
 
+
+/*--------------------------------------------------------------------------*/
+
+/*                           PROCEDURAL MACROS                              */
+
+/*--------------------------------------------------------------------------*/
+
 /* IO Hooks */
 
 /* general file I/O hooks */
@@ -63,11 +70,6 @@
 
 #define SC_HAVE_LARGE_FILES   (sizeof(int64_t) == sizeof(long long))
 
-/*--------------------------------------------------------------------------*/
-
-/*                           PROCEDURAL MACROS                              */
-
-/*--------------------------------------------------------------------------*/
 
 /* general file I/O hooks */
 
@@ -141,6 +143,9 @@ typedef int (*PFfflush)(FILE *stream);
 typedef int (*PFfeof)(FILE *stream);
 
 typedef char *(*PFfgets)(char *s, int n, FILE *stream);
+
+typedef ssize_t (*PFread)(int fd, void *bf, size_t nc);
+typedef ssize_t (*PFwrite)(int fd, void *bf, size_t nc);
 
 typedef void (*PFIOErr)(int err, char *sys, char *usr);
 

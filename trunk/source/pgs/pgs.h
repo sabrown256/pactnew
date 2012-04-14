@@ -941,6 +941,7 @@ struct s_PG_device
     void (*get_image)(PG_device *dev, unsigned char *bf, int ix, int iy,
 		      int nx, int ny);
     void (*get_text_ext)(PG_device *dev, int nd, PG_coord_sys cs, char *s, double *bx);
+    PFread gread;
     PFfgetc ggetc;
     PFfgets ggets;
     void (*gputs)(char *bf);
@@ -1362,6 +1363,9 @@ extern void
 
 extern PG_device
  *PG_open_device(PG_device *dev, double xf, double yf, double dxf, double dyf);
+
+extern ssize_t
+ PG_wind_read(int fd, void *bf, size_t nc);
 
 extern char
  *PG_wind_fgets(char *str, int maxlen, FILE *stream);

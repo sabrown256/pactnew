@@ -1523,6 +1523,45 @@ static void _PG_X_next_line(PG_device *dev, FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PG_X_WIND_READ - get and return a string from the window environment
+ *                 - start with a clean event slate, and cycle the main
+ *                 - event loop until some event sets
+ *                 - PG_gs.console->DoneFlag
+ *                 - NOTE: there is a logical problem here in that
+ *                 -       sometimes you just want to use PG_wind_read to
+ *                 -       process events
+ *                 -       so if str is NULL don't hang around for
+ *                 -       a string
+ */
+ 
+static ssize_t _PG_X_wind_read(int fd, void *bf, size_t nc)
+   {ssize_t rv;
+
+    rv = 0;
+    if (fd != STDIN_FILENO)
+       rv = SC_read_sigsafe(fd, bf, nc);
+
+    else
+       {PG_setup_input(bf, nc+1, nc);
+
+	if (SETJMP(_PG.io_avail) == ERR_FREE)
+
+/* turn off interrupts until the next call to _PG_X_wind_read */
+	   {PG_catch_interrupts(FALSE);
+	    rv = nc;}
+
+	else
+
+/* don't catch interrupts until the SETJMP is successful */
+           {PG_catch_interrupts(TRUE);
+	    PG_poll(TRUE, 100);
+	    PG_catch_interrupts(FALSE);};};
+
+    return(rv);}
+
+/*-------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PG_X_WIND_FGETS - get and return a string from the window environment
  *                  - start with a clean event slate, and cycle the main
  *                  - event loop until some event sets
@@ -1892,6 +1931,7 @@ int PG_setup_x11_device(PG_device *d)
     d->get_char               = _PG_X_get_char;
     d->get_image              = _PG_X_get_image;
     d->get_text_ext           = _PG_X_get_text_ext;
+    d->gread                  = (PFread) _PG_X_wind_read;
     d->ggetc                  = (PFfgetc) _PG_X_wind_fgetc;
     d->ggets                  = (PFfgets) _PG_X_wind_fgets;
     d->gputs                  = _PG_X_puts;

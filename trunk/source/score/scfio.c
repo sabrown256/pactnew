@@ -242,6 +242,7 @@ char *SC_prompt(char *prompt, char *s, int n)
     if (nc > 0)
        {
 
+#if 0
 #ifdef HAVE_READLINE
 
 	if (SC_isblocked_file(stdin) == TRUE)
@@ -269,7 +270,7 @@ char *SC_prompt(char *prompt, char *s, int n)
 	    ok = TRUE;};
 
 #endif
-
+#endif
 	if (ok == FALSE)
 	   {t = SC_leh(prompt);
 	    if (t != NULL)

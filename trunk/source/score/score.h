@@ -1271,6 +1271,9 @@ extern char
 extern void
  SC_leh_clear(int fd);
 
+extern PFread
+ SC_leh_set_read(PFread f);
+
 
 /* SCLOG.C declarations */
 
