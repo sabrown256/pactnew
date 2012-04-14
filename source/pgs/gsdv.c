@@ -12,14 +12,19 @@
 
 #define DEBUG_TEXT 0
 
-#define _FGETC(stream)                                                       \
-    (((PG_gs.console != NULL) && (PG_gs.console->ggetc != NULL)) ?           \
-     (*PG_gs.console->ggetc)(stream) :                                       \
+#define _FREAD(_fd, _bf, _nc)                                                \
+    (((PG_gs.console != NULL) && (PG_gs.console->gread != NULL)) ?           \
+     (*PG_gs.console->gread)(_fd, _bf, _nc) :                                \
      EOF)
 
-#define _FGETS(buffer, maxlen, stream)                                       \
+#define _FGETC(_fp)                                                          \
+    (((PG_gs.console != NULL) && (PG_gs.console->ggetc != NULL)) ?           \
+     (*PG_gs.console->ggetc)(_fp) :                                          \
+     EOF)
+
+#define _FGETS(buffer, maxlen, _fp)                                          \
     (((PG_gs.console != NULL) && (PG_gs.console->ggets != NULL)) ?           \
-     (*PG_gs.console->ggets)(buffer, maxlen, stream) :                       \
+     (*PG_gs.console->ggets)(buffer, maxlen, _fp) :                          \
      NULL)
 
 #define _PUTS(bf)                                                            \
@@ -416,6 +421,23 @@ char *PG_wind_fgets(char *str, int maxlen, FILE *stream)
        p = io_gets(str, maxlen, stream);
 
     return(p);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PG_WIND_READ - window version of read
+ *              - event handling loop driver
+ */
+
+ssize_t PG_wind_read(int fd, void *bf, size_t nc)
+   {ssize_t rv;
+
+    if (fd == STDIN_FILENO)
+       rv = _FREAD(fd, bf, nc);
+    else
+       rv = SC_read_sigsafe(fd, bf, nc);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
