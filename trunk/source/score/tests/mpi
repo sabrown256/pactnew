@@ -64,7 +64,7 @@ endif
 # WRAP
 
       Separator $Log
-      NoteD $Log -n "                       wrap ....................... "
+      NoteD $Log -n "                       wrap ......................."
       Note $Log ""
 
       if ("$MPI" == "") then

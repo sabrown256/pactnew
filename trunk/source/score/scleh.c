@@ -67,6 +67,7 @@ struct s_lehloc
    {int fd;
     int hind;
     int np;               /* size of prompt text */
+    int have_prompt;      /* flag for presence of prompt */
     size_t nb;            /* size of current line buffer */
     size_t pos;
     size_t len;
@@ -212,13 +213,57 @@ static int _SC_leh_get_ncol(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_LEH_PUT_PROMPT - handle all logic for writing the prompt
+ *                    - return TRUE iff successful
+ */
+
+static int _SC_leh_put_prompt(lehloc *lp)
+   {int fd, rv;
+    size_t np;
+    char *prompt;
+    static char *linsp = "\f\r\n";
+
+    fd = lp->fd;
+
+/* if we have no prompt check for a saved prompt value */
+    if (lp->prompt == NULL)
+       {lp->prompt = _SC.elbf;
+	lp->have_prompt = TRUE;}
+    else
+       lp->have_prompt = FALSE;
+
+    if (lp->prompt == NULL)
+       lp->np = 0;
+
+/* handle case of prompt string with newlines, and so forth */
+    else if (strchr(linsp, lp->prompt[0]) != NULL)
+       {np = strspn(lp->prompt, linsp);
+	lp->prompt = (char *) (lp->prompt + np);
+	lp->np     = strlen(lp->prompt);
+        write(fd, "\n", 1);}
+
+    else
+       lp->np = strlen(lp->prompt);
+
+    np     = lp->np;
+    prompt = lp->prompt;
+
+    rv = TRUE;
+    if ((prompt != NULL) && (np > 0) && (lp->have_prompt == FALSE))
+       rv = (write(fd, prompt, np) != -1);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_LEH_REFRESH - redraw the current line */
 
 static void _SC_leh_refresh(lehloc *lp)
    {int fd, err;
     size_t nw, len, np, pos, cols;
     char seq[64];
-    char *bf, *prompt;
+    char *bf;
 
     fd     = lp->fd;
     bf     = lp->bf;
@@ -226,7 +271,6 @@ static void _SC_leh_refresh(lehloc *lp)
     pos    = lp->pos;
     cols   = lp->cols;
     np     = lp->np;
-    prompt = lp->prompt;
 
     while (np+pos >= cols)
        {bf++;
@@ -246,8 +290,7 @@ static void _SC_leh_refresh(lehloc *lp)
 
 /* write the prompt */
     if (err == FALSE)
-       {nw   = write(fd, prompt, np);
-	err |= (nw == -1);};
+       err |= (_SC_leh_put_prompt(lp) == FALSE);
 
 /* write the current buffer content */
     if (err == FALSE)
@@ -858,52 +901,34 @@ void SC_leh_vi_mode(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_LEH_PROMPT - print the PROMPT and fill BF */
+/* _SC_LEH_GETS - print the PROMPT and fill BF in LP
+ *              - return NULL on error
+ */
 
-static int _SC_leh_prompt(int fd, char *bf, size_t nb, const char *prompt)
-   {int nr, np, rv;
-    lehloc loc;
+static char *_SC_leh_gets(lehloc *lp)
+   {int nr, nc, fd, ok;
+    char *rv;
     PFlehact *map;
-    static char *linsp = "\f\r\n";
 
     if (_SC_leh.map == NULL)
        SC_leh_emacs_mode();
 
     map = _SC_leh.map;
 
-    loc.fd     = fd;
-    loc.hind   = 0;
-    loc.pos    = 0;
-    loc.len    = 0;
-    loc.c      = 0;
-    loc.cols   = _SC_leh_get_ncol();
-    loc.nb     = --nb;   /* take off one for the terminating null character */
-    loc.bf     = bf;
-    loc.bf[0]  = '\0';
-
-    if (prompt == NULL)
-       {loc.prompt = NULL;
-	loc.np     = 0;}
-    else if (strchr(linsp, prompt[0]) != NULL)
-       {np = strspn(prompt, linsp);
-	loc.prompt = (char *) (prompt + np);
-	loc.np     = strlen(loc.prompt);
-        write(fd, "\n", 1);}
-    else
-       {loc.prompt = (char *) prompt;
-	loc.np     = strlen(loc.prompt);};
+    fd = lp->fd;
 
 /* most recent history entry is current buffer
  * initially just an empty string
  */
     SC_leh_hist_add("");
     
-    if (loc.prompt != NULL)
-       {if (write(fd, loc.prompt, loc.np) == -1)
-	   return(-1);};
+    rv = NULL;
+    ok = TRUE;
 
-    while (TRUE)
-       {nr = _SC_leh.read(fd, &loc.c, 1);
+    ok &= _SC_leh_put_prompt(lp);
+
+    while (ok == TRUE)
+       {nr = _SC_leh.read(fd, &lp->c, 1);
         if (nr <= 0)
 	   break;
 
@@ -911,48 +936,62 @@ static int _SC_leh_prompt(int fd, char *bf, size_t nb, const char *prompt)
  * completion returns -1 on error
  * otherwise returns the next character to be handled
  */
-        if ((loc.c == CTRL_I) && (_SC_leh.cmp_cb != NULL))
-	   {loc.c = _SC_leh_complete(&loc);
+        if ((lp->c == CTRL_I) && (_SC_leh.cmp_cb != NULL))
+	   {lp->c = _SC_leh_complete(lp);
 
 /* exit on error */
-            if (loc.c < 0)
+            if (lp->c < 0)
 	       break;
 
 /* read next when null character encountered */
-            else if (loc.c == 0)
+            else if (lp->c == 0)
 	       continue;};
 
-	rv = map[loc.c](&loc);
-	if (loc.c == CTRL_M)
-	   return(rv);
-	else if (rv == FALSE)
-	   return(-1);};
+	nc = map[lp->c](lp);
+	if (lp->c == CTRL_M)
+	   {rv = lp->bf;
+	    ok = FALSE;}
+	else if (nc == FALSE)
+	   {rv = NULL;
+	    ok = FALSE;};};
 
-    return(loc.len);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_LEH_RAW - raw I/O from stdin */
+/* _SC_LEH_RAW - raw I/O from stdin
+ *             - return NULL on failure
+ */
 
-static int _SC_leh_raw(int fd, char *bf, size_t nb, const char *prompt)
-   {int rv;
+static char *_SC_leh_raw(lehloc *lp)
+   {int nc, fd;
+    char *bf;
+    size_t nb;
+    char *rv;
 
-    rv = -1;
+    fd = lp->fd;
+    bf = lp->bf;
+    nb = lp->nb;
+
+    nc = -1;
+    rv = bf;
 
     if (nb == 0)
-       errno = EINVAL;
+       {errno = EINVAL;
+	rv    = NULL;}
 
     else if (isatty(fd) == FALSE)
-       {if (fgets(bf, nb, stdin) != NULL)
-	   {rv = strlen(bf);
-	    if ((rv > 0) && (bf[rv-1] == '\n'))
-	       {rv--;
-		bf[rv] = '\0';};};}
+       {rv = fgets(bf, nb, stdin);
+	if (rv != NULL)
+	   {nc = strlen(rv);
+	    if ((nc > 0) && (rv[nc-1] == '\n'))
+	       {nc--;
+		rv[nc] = '\0';};};}
 
     else
        {if (_SC_leh_ena_raw(fd) == TRUE)
-	   {rv = _SC_leh_prompt(fd, bf, nb, prompt);
+	   {rv = _SC_leh_gets(lp);
 	    _SC_leh_disa_raw(fd);
 	    printf("\n");};};
 
@@ -969,29 +1008,39 @@ static int _SC_leh_raw(int fd, char *bf, size_t nb, const char *prompt)
  */
 
 char *SC_leh(const char *prompt)
-   {int nr, nc;
-    char bf[MAX_BFSZ];
+   {int nc;
+    char bf[MAX_BFSZ+1];
     char *rv;
-    
+    lehloc loc;
+
+    memset(&loc, 0, sizeof(loc));
+
+    loc.fd     = STDIN_FILENO;
+    loc.cols   = _SC_leh_get_ncol();
+    loc.nb     = MAX_BFSZ;
+    loc.bf     = bf;
+    loc.bf[0]  = '\0';
+    loc.prompt = (char *) prompt;
+
+    rv = NULL;
     _SC_leh.fd = STDIN_FILENO;
 
     if (_SC_leh_sup_termp() == FALSE)
-       {printf("%s", prompt);
-        fflush(stdout);
-        if (fgets(bf, MAX_BFSZ, stdin) == NULL)
-	   return(NULL);
+       {_SC_leh_put_prompt(&loc);
 
-        nc = strlen(bf);
-        while ((nc > 0) && ((bf[nc-1] == '\n') || (bf[nc-1] == '\r')))
-	   {nc--;
-            bf[nc] = '\0';};}
+	fflush(stdout);
+	rv = fgets(bf, MAX_BFSZ, stdin);
+        if (rv != NULL)
+	   {nc = strlen(rv);
+	    while ((nc > 0) && ((rv[nc-1] == '\n') || (rv[nc-1] == '\r')))
+	       {nc--;
+		rv[nc] = '\0';};};}
 
     else
-       {nr = _SC_leh_raw(_SC_leh.fd, bf, MAX_BFSZ, prompt);
-        if (nr == -1)
-	   return(NULL);};
+       rv = _SC_leh_raw(&loc);
 
-    rv = CSTRSAVE(bf);
+    if (rv != NULL)
+       rv = CSTRSAVE(rv);
 
     return(rv);}
 

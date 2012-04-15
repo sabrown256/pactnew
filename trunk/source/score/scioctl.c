@@ -633,7 +633,7 @@ int SC_set_fd_async_fasync(int fd, int state, int pid)
 #ifdef SGI
 	rstrct = TRUE;
 #else
-	rstrct = (fd == 0);
+	rstrct = (fd == STDIN_FILENO);
 #endif
 
 /* restrict SIGIO only to me - NOT to my process group */
