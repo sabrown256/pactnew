@@ -240,38 +240,7 @@ char *SC_prompt(char *prompt, char *s, int n)
 /* reserve the last character for a '\0' terminator */
     nc = n - 1;
     if (nc > 0)
-       {
-
-#if 0
-#ifdef HAVE_READLINE
-
-	if (SC_isblocked_file(stdin) == TRUE)
-
-/* if we have no prompt assume that we are working with SC_exec_job
- * and the last line received from the child is the prompt
- */
-	   {if (prompt == NULL)
-	       {prompt = _SC.elbf;
-		rl_already_prompted = TRUE;}
-	    else
-	       rl_already_prompted = FALSE;
-
-	    rl_save_prompt();
-	    t = readline(prompt);
-	    if (t != NULL)
-	       {snprintf(s, nc, "%s\n", t);
-		if (strlen(t) > 0)
-		   add_history(t);
-		rv = s;};
-
-	    rl_restore_prompt();
-	    rl_clear_message();
- 	    
-	    ok = TRUE;};
-
-#endif
-#endif
-	if (ok == FALSE)
+       {if (ok == FALSE)
 	   {t = SC_leh(prompt);
 	    if (t != NULL)
 	       {snprintf(s, nc, "%s\n", t);

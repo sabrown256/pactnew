@@ -49,14 +49,9 @@ static FILE *lgf = NULL;
  */
 
 int _SC_reset_stdin(int wh)
-   {int rv;
+   {int rv, fd;
 
     rv = TRUE;
-
-#ifdef HAVE_READLINE
-
-    int fd;
-
     fd = fileno(stdin);
 
     if (wh == FALSE)
@@ -72,7 +67,6 @@ int _SC_reset_stdin(int wh)
 			    ICANON,    SC_TERM_LOCAL,    TRUE,
 			    ECHO,      SC_TERM_LOCAL,    TRUE,
 			    0);
-#endif
 
     return(rv);}
 
@@ -169,6 +163,7 @@ static void _SC_setup_relay(PROCESS *pp)
 
 static void _SC_ex_trm_in(int fd, int mask, void *a)
    {char s[MAXLINE+1];
+    char *p;
     descriptors *pd;
     SC_evlpdes *pe;
     PROCESS *pp;
@@ -185,34 +180,17 @@ static void _SC_ex_trm_in(int fd, int mask, void *a)
 
     _SC_reset_stdin(TRUE);
 
-#ifdef HAVE_READLINE
-
-    SC_block_file(stdin);
-
-    if (SC_prompt(NULL, s, MAXLINE) != NULL)
-       {WRITE_LOG(">", s);
-	SC_printf(pp, "%s", s);
-        SC_yield();};
-
-#else
-
-/* NOTE: we must unblock stdin here because we really do not
- * know how many "messages" there are
- * this way we take input until there is nothing available
- * now if you suspend with ctl-z and stdin is blocked the terminal
- * will get a stream of ctl-d and logout
- */
-    SC_unblock_file(stdin);
-
-    while (SC_fgets(s, MAXLINE, stdin) != NULL)
-       {WRITE_LOG(">", s);
-	SC_printf(pp, "%s", s);
-	count = 0;
-	s[0]  = '\0';};
-
-    SC_block_file(stdin);
-
-#endif
+    if ((SC_isblocked_fd(fd) == 0) || (isatty(fd) == 0))
+       {while ((p = SC_prompt(NULL, s, MAXLINE)) != NULL)
+	   {WRITE_LOG(">", p);
+	    SC_printf(pp, "%s", p);
+	    SC_yield();};}
+    else
+       {p = SC_prompt(NULL, s, MAXLINE);
+	if (p != NULL)
+	   {WRITE_LOG(">", p);
+	    SC_printf(pp, "%s", p);
+	    SC_yield();};};
 
     _SC_reset_stdin(FALSE);
 

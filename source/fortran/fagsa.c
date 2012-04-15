@@ -1219,7 +1219,7 @@ FIXNUM FF_ID(pggtln, PGGTLN)(FIXNUM *sncs, char *s, FIXNUM *sfd)
 
     fd = (long) *sfd;
 
-    if (fd == 0L)
+    if (fd == STDIN_FILENO)
        t = GETLN(s, (int) *sncs, stdin);
 
     else
