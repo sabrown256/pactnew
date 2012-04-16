@@ -116,9 +116,10 @@ static uint64_t _PD_fcread(void *p, size_t sz, uint64_t ni, FILE *fp)
     fl = GET_FILE(cf);
 
     rv = fread(p, sz, ni, fl);
-    if (rv < 0)
-       io_error(errno, "fread of %lld bytes failed",
-		(long long) (sz*ni));
+    if (ferror(fl))
+       {io_error(errno, "fread of %lld bytes failed",
+		 (long long) (sz*ni));
+	clearerr(fl);};
 
     return(rv);}
 

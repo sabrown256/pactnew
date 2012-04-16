@@ -227,6 +227,11 @@ static PG_device *_PG_X_txt_open_screen(PG_device *dev, double dxf, double dyf)
     dev->pixmap = XCreatePixmap(dev->display, dev->window,
 				win_width, win_height, depth);
 
+/* kind of by definition this must be TRUE - it is not always set
+ * by default especially in applications using the non-C bindings
+ */
+    dev->use_pixmap = TRUE;
+
 /* compute the view port */
     _PG_default_viewspace(dev, TRUE);
 
