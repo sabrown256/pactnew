@@ -125,7 +125,7 @@ int main(int c, char **v)
     SC_strcat(s, MAXLINE, ".src");
     pdsf = PD_create(s);
     if (pdsf == NULL)
-       {printf("%s", PD_err);
+       {printf("%s", PD_get_error());
         LONGJMP(SC_gs.cpu, ABORT);};
 
 /* define the source_record for the PDB source file */

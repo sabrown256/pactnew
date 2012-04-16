@@ -2841,9 +2841,11 @@ static size_t _SC_fread_safe(void *s, size_t bpi, size_t ni, FILE *fp)
     ps = (char *) s;
     while ((ns > 0) && (zc < 10))
        {n = fread(ps, bpi, ns, fp);
-	if (n < 0)
-	   io_error(errno, "fread of %lld bytes failed",
-		    (long long) (bpi*ns));
+	if (ferror(fp) != 0)
+	   {io_error(errno, "fread of %lld bytes failed",
+		     (long long) (bpi*ns));
+	    clearerr(fp);
+	    SC_sleep(10);};
 
 	zc = (n == 0) ? zc + 1 : 0;
 
@@ -2903,17 +2905,13 @@ size_t SC_fwrite_sigsafe(void *s, size_t bpi, size_t ni, FILE *fp)
     ps = (char *) s;
     while ((ns > 0) && (zc < 10))
        {n = fwrite(ps, bpi, ns, fp);
-	if (n < 0)
-	   io_error(errno, "fwrite of %lld bytes failed",
-		    (long long) (bpi*ns));
+	if (ferror(fp) != 0)
+	   {io_error(errno, "fwrite of %lld bytes failed",
+		     (long long) (bpi*ns));
+	    clearerr(fp);
+	    SC_sleep(10);};
 
-	if (n <= 0)
-           {zc++;
-            if (ferror(fp) != 0)
-	       {clearerr(fp);
-		SC_sleep(10);};}
-        else
-	   zc = 0;
+	zc = (n == 0) ? zc + 1 : 0;
 
         if (n < ns)
            fflush(fp);

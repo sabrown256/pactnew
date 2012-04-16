@@ -23,7 +23,7 @@ TGTScr = do-local do-stats do-automake distribute \
          prune-env measure-env \
          scs-update scs-commit scs-co scs-history scs-meta \
          scs-add scs-remove scs-lock scs-diff scs-move scs-tag \
-         scs-sync scs-revert
+         scs-sync scs-revert scs-init
 
 TGTInc = env-csh csh-subroutines
 
