@@ -12,6 +12,10 @@
 
 #define DEBUG_TEXT 0
 
+#undef _FREAD
+#undef _FGETC
+#undef _FGETS
+
 #define _FREAD(_fd, _bf, _nc)                                                \
     (((PG_gs.console != NULL) && (PG_gs.console->gread != NULL)) ?           \
      (*PG_gs.console->gread)(_fd, _bf, _nc) :                                \
