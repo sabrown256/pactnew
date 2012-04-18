@@ -93,7 +93,7 @@ void _PM_detect_fpu_x86(unsigned int *pf, unsigned int *pm)
     x        = 0;
     y        = 0;
 
-#if (MACOSX_VERSION == 6)
+#if (MACOSX_VERSION >= 6)
 
 /* Opteron result */
     features = 0x5f;
