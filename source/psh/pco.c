@@ -2566,9 +2566,8 @@ int main(int c, char **v, char **env)
 
     st.have_db = launch_perdb(c, v);
 
-/* technically these are set by 'dsys config' */
+/* technically this is set by 'dsys config' */
     cinitenv("DbgOpt", "-g");
-    cinitenv("PACTVer", "debug");
 
 /* NOTE: because of OSX's nefarious automounter we have to get the current
  * directory this way (rather that via the getcwd library call) so that

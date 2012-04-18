@@ -76,7 +76,7 @@ static sodes *_SC_so_open(char *name)
 	else
 	   se->so = so;
 #else
-        sprintf(msg, MAXLINE, "ERROR: no dynamic linker");
+        snprintf(msg, MAXLINE, "ERROR: no dynamic linker");
         se = NULL;
 #endif
        };
@@ -122,7 +122,6 @@ int SC_so_close(char *name)
 
 void *SC_so_get_func(char *name)
    {char msg[MAXLINE];
-    char *s;
     sodes *se;
     void *f;
 
@@ -134,6 +133,8 @@ void *SC_so_get_func(char *name)
            {
 
 #ifdef HAVE_DYNAMIC_LINKER
+	    char *s;
+
 /* clear any existing error */
 	    dlerror();
 
@@ -160,10 +161,12 @@ void *SC_so_get_func(char *name)
  *              - an so.conf file contains stanzas of the form
  *              - 
  *              - <name> {
+ *              -         kind  = FUNC | LIB
  *              -         lib   = <lib>
  *              -         path  = <path>
  *              -         value = <rv>
  *              -         argl  = <argl>
+ *              -         flag  = <flags>         flags to dlopen
  *              - }
  *              - 
  */

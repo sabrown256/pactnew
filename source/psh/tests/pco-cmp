@@ -165,10 +165,7 @@ FINISH:
 
 # restore the original configuration
 flog $log unsetenv SESSION_CONFIG
-#flog $log cfgman add $osys
 
-if ($err == 0) then
-   flog $log dsys delete $nsys
-endif
+flog $log dsys delete $nsys
 
 exit($err)

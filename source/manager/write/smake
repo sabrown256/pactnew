@@ -15,7 +15,7 @@ unalias *
 set Log    = $1
 set ScrDir = $2
 
-eval `$ScrDir/prune-env -e PACTVer pact`
+eval `$ScrDir/prune-env pact`
 set path = ( $ScrDir $path )
 source $ScrDir/env-csh
 
@@ -25,27 +25,30 @@ dbget System
 dbget GnuMakeOpt
 dbget IncDir
 dbget BinDir
+dbget MngDir
 dbget Cfg_CC_Flags
 dbget Cfg_Lex_Flags
 dbget Cfg_LD_Flags
 dbget Cfg_LD_RPath
 dbget Cfg_CC_Exe
-dbget PACTVer
 dbget UseTmpDir
 
+set lpactver = `cat $MngDir/.pact-version`
+
 Separator $Log
+Note $Log "   lpactver      = |$lpactver|"
 Note $Log "   InstBase      = $InstBase"
 Note $Log "   CfgDir        = $CfgDir"
 Note $Log "   System        = $System"
 Note $Log "   GnuMakeOpt    = $GnuMakeOpt"
 Note $Log "   IncDir        = $IncDir"
 Note $Log "   BinDir        = $BinDir"
+Note $Log "   MngDir        = $MngDir"
 Note $Log "   Cfg_CC_Flags  = $Cfg_CC_Flags"
 Note $Log "   Cfg_Lex_Flags = $Cfg_Lex_Flags"
 Note $Log "   Cfg_LD_Flags  = $Cfg_LD_Flags"
 Note $Log "   Cfg_LD_RPath  = $Cfg_LD_RPath"
 Note $Log "   Cfg_CC_Exe    = $Cfg_CC_Exe"
-Note $Log "   PACTVer       = |$PACTVer|"
 Note $Log "   UseTmpDir     = |$UseTmpDir|"
 
 #--------------------------------------------------------------------------
@@ -105,7 +108,7 @@ EOF
     set MakeOpt = ( $MakeOpt -g )
 
     set MakeOpt = ( $MakeOpt -DSYSTEM_ID=\"${System}\" )
-    set MakeOpt = ( $MakeOpt -DPACT_VERSION=\"${PACTVer}\" )
+    set MakeOpt = ( $MakeOpt -DPACT_VERSION=\"${lpactver}\" )
     set MakeOpt = ( $MakeOpt $GnuMakeOpt )
     set MakeOpt = ( $MakeOpt -I${IncDir} )
 
@@ -173,6 +176,8 @@ EOF
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+unset lpactver
 
 exit(0)
 

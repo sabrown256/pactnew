@@ -15,7 +15,7 @@ unalias *
 set Log    = $1
 set ScrDir = $2
 
-eval `$ScrDir/prune-env -e PACTVer pact`
+eval `$ScrDir/prune-env pact`
 set path = ( $ScrDir $path )
 source $ScrDir/env-csh
 

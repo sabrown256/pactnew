@@ -25,8 +25,15 @@ static int work(statedes *st)
    {int rv;
     double d;
     double (*fcos)(double);
+    char *so;
 
-    rv = SC_so_register_func("libm.so", NULL, "double", "cos", "(double x)");
+#ifdef MACOSX
+    so = "libSystem.B.dylib";
+#else
+    so = "libm.so";
+#endif
+
+    rv = SC_so_register_func(so, NULL, "double", "cos", "(double x)");
 
     fcos = SC_so_get_func("cos");
     if (fcos == NULL)
