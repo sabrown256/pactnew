@@ -73,7 +73,7 @@ HAVE_SUBROUTINES
 #dbget Load
 #dbget MD_Inc
 #dbget MD_Lib
-#dbget MDE_Lib
+dbget MDE_Lib
 #dbget MDI_Inc
 #dbget MDI_Lib
 #dbget MDG_Inc

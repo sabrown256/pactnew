@@ -15,12 +15,12 @@ source $Me:h/common
 Separator $ALog
 Note $ALog "Analyze: exe access support"
 
-SafeEnv MDE_Lib        ""
-SafeEnv BFD_Lib        -lbfd
-SafeEnv BFD_Path       /usr/$LIB
-SafeEnv BFD_Version    0.0.0
-SafeEnv HAVE_BFD       FALSE
-SafeEnv HAVE_DEMANGLE  FALSE
+dbini MDE_Lib        ""
+dbini BFD_Lib        -lbfd
+dbini BFD_Path       /usr/$LIB
+dbini BFD_Version    0.0.0
+dbini HAVE_BFD       FALSE
+dbini HAVE_DEMANGLE  FALSE
 
 # if we have explicitly said we do not want BFD
 # do NOT detect it
@@ -168,12 +168,12 @@ EOF
 
 endif
 
-SetParent BFD_Version
-SetParent BFD_Lib
-SetParent BFD_Path
-SetParent MDE_Lib
-SetParent HAVE_BFD
-SetParent HAVE_DEMANGLE
+dbexp BFD_Version
+dbexp BFD_Lib
+dbexp BFD_Path
+dbexp MDE_Lib
+dbexp HAVE_BFD
+dbexp HAVE_DEMANGLE
 
 Separator $ALog
 

@@ -102,12 +102,12 @@ alias dbdef     '$PERDB \!\!:1 \?'
 # matches C call dbinitv
 # usage: dbini <var> <val>
 alias dbini     'set t_ = ( `$PERDB \!\!:1 =\? \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
-
 alias SafeEnv   'if ($?\!\!:1 == 0) setenv \!\!:1 \!\!:2'
-#alias SafeEnv   'set t_ = ( `$PERDB \!\!:1 =\? \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
+
+# dbexp export the current value of environment variable <var>
+# back to the database
+alias dbexp     'set t_ = ( `$PERDB -l \!\!:1 = $\!\!:1` )'
 alias SetParent 'echo "parent \!\!:1($\!\!:1)"'
-#alias SetParent 'set t_ = ( `$PERDB \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
-#alias SetParent '$PERDB -l \!\!:1 = $\!\!:1'
 
 setenv MV     "mv -f"
 setenv RM     "rm -f"

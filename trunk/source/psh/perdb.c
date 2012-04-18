@@ -547,13 +547,13 @@ int main(int c, char **v)
 		      "PERDB_IDLE_INTERVAL", "PERDB_PATH",
 		      NULL};
 
-    req[0] = '\0';
-    r[0]   = '\0';
-    srv    = FALSE;
-    init   = FALSE;
-    dmn    = TRUE;
-    ltr    = FALSE;
+    r[0] = '\0';
+    srv  = FALSE;
+    init = FALSE;
+    dmn  = TRUE;
+    ltr  = FALSE;
 
+/* everything up to the first token not beginning with '-' is a flag */
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')
 	    {switch (v[i][1])
@@ -580,8 +580,13 @@ int main(int c, char **v)
                       srv = TRUE;
                       break;};}
 	 else
-	    {nstrcat(req, MAXLINE, v[i]);
-	     nstrcat(req, MAXLINE, " ");};};
+	    break;};
+
+/* everything from here is the request */
+    req[0] = '\0';
+    for (; i < c; i++)
+        {nstrcat(req, MAXLINE, v[i]);
+	 nstrcat(req, MAXLINE, " ");};
 
     if (IS_NULL(r) == TRUE)
        {if (cdefenv("PERDB_PATH") == TRUE)

@@ -66,6 +66,7 @@ extern sostate
 /* SCDL.C declarations */
 
 extern int
+ SC_so_close(char *name),
  SC_so_register_func(char *lib, char *path,
 		     char *rv, char *name, char *argl),
  SC_so_config(char *fname);

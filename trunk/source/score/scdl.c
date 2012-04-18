@@ -57,39 +57,61 @@ int SC_so_register_func(char *lib, char *path,
  */
 
 static sodes *_SC_so_open(char *name)
-   {int flag;
-    char msg[MAXLINE];
+   {char msg[MAXLINE];
     char *lib;
-    void *so;
     sodes *se;
 
     se = (sodes *) SC_hasharr_def_lookup(_SC_dl.tab, name);
     if (se != NULL)
        {lib  = se->lib;
+
+#ifdef HAVE_DYNAMIC_LINKER
+	int flag;
+	void *so;
+
 	flag = RTLD_LAZY | RTLD_GLOBAL;
 	so   = dlopen(lib, flag);
 	if (so == NULL)
 	   snprintf(msg, MAXLINE, "ERROR: %s", dlerror());
 	else
-	   se->so = so;};
+	   se->so = so;
+#else
+        sprintf(msg, MAXLINE, "ERROR: no dynamic linker");
+        se = NULL;
+#endif
+       };
 
     return(se);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_SO_CLOSE - close shared object SO */
+/* SC_SO_CLOSE - close shared object associate with function NAME
+ *             - return TRUE iff successful
+ */
 
-static int _SC_so_close(sodes *se)
+int SC_so_close(char *name)
    {int st;
     char msg[MAXLINE];
+    sodes *se;
 
     st = -1;
 
-    if (se != NULL)
-       {st = dlclose(se->so);
+    se = _SC_so_open(name);
+    if ((se != NULL) && (se->so != NULL))
+       {
+
+#ifdef HAVE_DYNAMIC_LINKER
+        st = dlclose(se->so);
 	if (st != 0)
-	   snprintf(msg, MAXLINE, "ERROR: %s", dlerror());};
+	   snprintf(msg, MAXLINE, "ERROR: %s", dlerror());
+#else
+	snprintf(msg, MAXLINE, "ERROR: No dynamic linker");
+#endif
+        };
+
+/* reverse the sense */
+    st = (st == 0);
 
     return(st);}
 
@@ -109,15 +131,23 @@ void *SC_so_get_func(char *name)
     se = _SC_so_open(name);
     if (se != NULL)
        {if (se->f == NULL)
+           {
 
+#ifdef HAVE_DYNAMIC_LINKER
 /* clear any existing error */
-	   {dlerror();
+	    dlerror();
 
 	    se->f = dlsym(se->so, se->name);
+/*	    *(void **) (&se->f) = dlsym(se->so, se->name); */
 
 	    s = dlerror();
 	    if (s != NULL)
-	       snprintf(msg, MAXLINE, "ERROR: %s", s);};
+	       snprintf(msg, MAXLINE, "ERROR: %s", s);
+
+#else
+	    snprintf(msg, MAXLINE, "ERROR: No dynamic linker");
+#endif
+	   };
 
 	f = se->f;};
 

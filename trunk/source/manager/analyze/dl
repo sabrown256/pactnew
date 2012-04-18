@@ -15,11 +15,16 @@ source $Me:h/common
 Separator $ALog
 Note $ALog "Analyze: dynamic linker"
 
-SafeEnv MDE_Lib              ""
-SafeEnv HAVE_DYNAMIC_LINKER FALSE
+dbini MDE_Lib                ""
+dbini HAVE_DYNAMIC_LINKER    FALSE
 
 Note $ALog "MDE_Lib             = |$MDE_Lib|"
 Note $ALog "HAVE_DYNAMIC_LINKER = |$HAVE_DYNAMIC_LINKER|"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# check for DLSYM
 
 cat << EOF >! $Tmp.c
 #include <stdlib.h>
@@ -69,8 +74,11 @@ else
    flog $ALog setenv HAVE_DYNAMIC_LINKER TRUE
 endif
 
-SetParent MDE_Lib
-SetParent HAVE_DYNAMIC_LINKER
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+dbexp HAVE_DYNAMIC_LINKER
+dbexp MDE_Lib
 
 Separator $ALog
 

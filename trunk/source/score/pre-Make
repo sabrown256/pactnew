@@ -468,7 +468,8 @@ ${BinDir}/tscmov : ${TGTLib} tscmov.c
 # comprehensive test suite
 #
 compre : ${BinDir}/tscstr ${BinDir}/tscctl ${BinDir}/tscmemc \
-         ${BinDir}/interact ${BinDir}/tscvs ${BinDir}/tscar
+         ${BinDir}/interact ${BinDir}/tscvs ${BinDir}/tscar \
+         ${BinDir}/tscdl
 
 ${BinDir}/tscstr : ${TGTLib} tscstr.c
 	${CLD} ${LdFlags} tscstr.c -o ${BinDir}/tscstr ${Libs}
@@ -490,6 +491,9 @@ ${BinDir}/dmake : ${TGTLib} scmkut.c
 
 ${BinDir}/tscar : ${TGTLib} tscar.c
 	${CLD} ${LdFlags} tscar.c -o ${BinDir}/tscar ${Libs}
+
+${BinDir}/tscdl : ${TGTLib} tscdl.c
+	${CLD} ${LdFlags} tscdl.c -o ${BinDir}/tscdl ${Libs} ${MDE_Lib}
 
 foo : ${TGTLib} foo.c
 	${CC} -c foo.c -o foo.o
