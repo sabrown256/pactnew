@@ -8,9 +8,11 @@
 # include "cpyright.h"
 #
 
+onintr FINISH
+
 @ err = 0
 
-set db   = $IncDir/cfg.db
+set db   = $EtcDir/cfg.db
 set cfg  = ( `grep CONFIG_FILE= $db | sed 's/^CONFIG_FILE=//'` )
 set osys = `cfgman use`
 
@@ -55,7 +57,7 @@ foreach i (cfg db)
    flog $log mkdir -p $tdir/$i
 end
 
-set incdir = ../dev/$tsys/include
+set etcdir = ../dev/$tsys/etc
 set logdir = ../dev/$tsys/log
 set refdb  = $cwd/$tdir/test.db
 
@@ -88,15 +90,15 @@ if ($err == 0) then
 
    flog $log dsys remove
 
-   flog $log rm -rf $incdir/*
+   flog $log rm -rf $etcdir/*
 
    set lt = `timer -r`
    flog $log dsys config -g $cfgd $cfgf $cfgs -a $tsys
    @ err = $err + $status
    set lt = `timer -b $lt`
 
-   flog $log cp $incdir/* $tdir/cfg
-   flog $log ( sort $incdir/cfg.db >&! $tdir/cfg/$cfgf.db )
+   flog $log cp $etcdir/* $tdir/cfg
+   flog $log ( sort $etcdir/cfg.db >&! $tdir/cfg/$cfgf.db )
    flog $log cat $tdir/cfg/$cfgf.db
 
    if ($err == 0) then
@@ -119,19 +121,19 @@ if ($err == 0) then
    NoteD $Log -n "                       $msg "
    Note $log ""
 
-   flog $log cp $incdir/cfg.db $refdb
+   flog $log cp $etcdir/cfg.db $refdb
 
    flog $log dsys remove
 
-   flog $log rm -rf $incdir/*
+   flog $log rm -rf $etcdir/*
 
    set lt = `timer -r`
    flog $log dsys config -g -db $refdb -a $tsys
    @ err = $err + $status
    set lt = `timer -b $lt`
 
-   flog $log cp $incdir/* $tdir/db
-   flog $log ( sort $incdir/cfg.db >&! $tdir/db/$cfgf.db )
+   flog $log cp $etcdir/* $tdir/db
+   flog $log ( sort $etcdir/cfg.db >&! $tdir/db/$cfgf.db )
    flog $log cat $tdir/db/$cfgf.db
 
    if ($err == 0) then
@@ -158,6 +160,8 @@ endif
 #--------------------------------------------------------------------------
 
 # FINISH - cleanup and restore
+
+FINISH:
 
 # restore the original configuration
 flog $log unsetenv SESSION_CONFIG

@@ -71,6 +71,7 @@ set SysDir  = $DevDir/$System
 set IncDir  = $SysDir/include
 set BinDir  = $SysDir/bin
 set LibDir  = $SysDir/lib
+set EtcDir  = $SysDir/etc
 set LogDir  = $SysDir/log
 set ScmDir  = $SysDir/scheme
 set PACT    = $BinDir/pact
@@ -981,6 +982,9 @@ switch ($Cmnd)
         if (!(-d $InstBase/include/shell)) then
            mkdir $InstBase/include/shell
         endif
+        if (!(-d $InstBase/etc)) then
+           mkdir $InstBase/etc
+        endif
         if (!(-d $InstBase/man)) then
            mkdir $InstBase/man
         endif
@@ -1028,10 +1032,10 @@ switch ($Cmnd)
 	end
 
 # set path for PERDB - spawned by PCO
-        flog $Log set dbopt = ( -f $IncDir/cfg )
+        flog $Log set dbopt = ( -f $EtcDir/cfg )
         flog $Log $RM $IncDir/cfg*
 
-        flog $Log setenv PERDB_PATH $IncDir/cfg
+        flog $Log setenv PERDB_PATH $EtcDir/cfg
 	flog $Log $PERDB -l -c -s
 
 	if (($Method == 2) && (-x $BinDir/pco)) then
@@ -1253,7 +1257,7 @@ CFG_DONE:
         while ($#argv > 0)
            switch ($1)
               case -a:
-                   set db  = $IncDir/cfg.db
+                   set db  = $EtcDir/cfg.db
                    set inf = ( `pact +l -info CONFIG_METHOD` )
                    set mth = $inf[1]
                    set cfg = ( `grep Sys= $db | sed 's/^Sys=//'` )
@@ -1279,7 +1283,7 @@ CFG_DONE:
            shift
         end
 
-        cat $IncDir/configured
+        cat $EtcDir/configured
         breaksw
 
 #--------------------------------------------------------------------------
@@ -1426,6 +1430,9 @@ CFG_DONE:
         if (!(-d $SysDir/include)) then
            mkdir $SysDir/include
         endif
+        if (!(-d $SysDir/etc)) then
+           mkdir $SysDir/etc
+        endif
         if (!(-d $SysDir/scheme)) then
            mkdir $SysDir/scheme
         endif
@@ -1511,6 +1518,7 @@ CFG_DONE:
         set BinDir  = ""
         set LibDir  = ""
         set IncDir  = ""
+        set EtcDir  = ""
         set MgrDir  = ""
         set DocDir  = ""
         set Man1Dir = ""
@@ -1641,6 +1649,7 @@ CFG_DONE:
            set BinDir  = "$BINDIR"
            set LibDir  = ( "$BINDIR:h""/lib" )
            set IncDir  = ( "$BINDIR:h""/include" )
+           set EtcDir  = ( "$BINDIR:h""/etc" )
            set Man1Dir = $DAI_ROOT/pact/man/man1
            set Man3Dir = $DAI_ROOT/pact/man/man3
            set DocDir  = $DAI_ROOT/pact/docs
@@ -1789,6 +1798,17 @@ CFG_DONE:
            $LS $Incs | awk '    { bytes = bytes + $5                                              \
                                       printf "%8d\t%s %s %s\t%s\n", $5, $6, $7, $8, $9 }          \
                                 END { printf "Total space for headers is %d bytes\n\n", bytes }'
+        endif
+
+# CONFIG INFO
+
+        if ($EtcDir != "") then
+           echo ""
+           echo "PACT config files in $EtcDir"
+           cd $EtcDir
+           $LS $Etcs | awk '    { bytes = bytes + $5                                              \
+                                      printf "%8d\t%s %s %s\t%s\n", $5, $6, $7, $8, $9 }          \
+                                END { printf "Total space for configs is %d bytes\n\n", bytes }'
         endif
 
 # SCRIPTS
@@ -2090,7 +2110,7 @@ CFG_DONE:
    case reconfig:
         set inst = ( -i none )
         set args = "-r"
-        set db   = $IncDir/cfg.db
+        set db   = $EtcDir/cfg.db
 
 # get config method and original config file
         if (-f $db) then
@@ -2192,9 +2212,11 @@ CFG_DONE:
         set IncFiles = ( iso-c.h scconfig.h scdecls.h cpyright.h syntax.h )
         set IncFiles = ( $IncFiles env-pact.csh env-pact.sh env-pact.dk env-pact.mod )
         set IncFiles = ( $IncFiles env-mio )
-        set IncFiles = ( $IncFiles package configured make-def make-macros Makefile )
+        set IncFiles = ( $IncFiles package make-def make-macros Makefile )
         set IncFiles = ( $IncFiles f90types.h f90kinds.inc )
-        set IncFiles = ( $IncFiles do-run-db cfg.db cfg.pco cfg.pl )
+
+        set EtcFiles = ( do-run-db cfg.db cfg.pco cfg.pl )
+        set EtcFiles = ( $EtcFiles configured )
 
         set ScmFiles = ( spokes.scm )
 
@@ -2214,6 +2236,17 @@ CFG_DONE:
         flog $Log pushd $IncDir
         flog $Log mkdir tmp
         flog $Log $MV $IncFiles tmp
+        flog $Log touch foo
+        flog $Log $RM *
+        flog $Log $MV tmp/* .
+        flog $Log rmdir tmp
+        flog $Log popd
+ 
+# remove configs
+        NoteD $Log "    in $EtcDir"
+        flog $Log pushd $EtcDir
+        flog $Log mkdir tmp
+        flog $Log $MV $EtcFiles tmp
         flog $Log touch foo
         flog $Log $RM *
         flog $Log $MV tmp/* .

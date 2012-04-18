@@ -64,6 +64,7 @@ struct s_dirdes
     char bin[MAXLINE];
     char cfg[MAXLINE];
     char inc[MAXLINE];
+    char etc[MAXLINE];
     char lib[MAXLINE];
     char mng[MAXLINE];
     char sch[MAXLINE];
@@ -1363,6 +1364,7 @@ static void setup_output_env(client *cl, char *base)
 
     dbset(cl, "BinDir",  st.dir.bin);
     dbset(cl, "IncDir",  st.dir.inc);
+    dbset(cl, "EtcDir",  st.dir.etc);
     dbset(cl, "ScrDir",  st.dir.scr);
     dbset(cl, "SchDir",  st.dir.sch);
     dbset(cl, "CfgDir",  st.dir.cfg);
@@ -1485,17 +1487,17 @@ static void default_var(client *cl, char *base)
     dbinitv(cl, "CROSS_COMPILE", "FALSE");
 
 /* global variables */
-    snprintf(st.dir.root, MAXLINE, "%s/dev/%s",       base, st.system);
-    snprintf(st.dir.inc,  MAXLINE, "%s/include",      st.dir.root);
+    snprintf(st.dir.root, MAXLINE, "%s/dev/%s",  base, st.system);
+    snprintf(st.dir.inc,  MAXLINE, "%s/include", st.dir.root);
+    snprintf(st.dir.etc,  MAXLINE, "%s/etc",     st.dir.root);
+    snprintf(st.dir.lib,  MAXLINE, "%s/lib",     st.dir.root);
+    snprintf(st.dir.bin,  MAXLINE, "%s/bin",     st.dir.root);
+    snprintf(st.dir.sch,  MAXLINE, "%s/scheme",  st.dir.root);
+
     snprintf(st.env_csh,  MAXLINE, "%s/env-pact.csh", st.dir.inc);
     snprintf(st.env_sh,   MAXLINE, "%s/env-pact.sh",  st.dir.inc);
     snprintf(st.env_dk,   MAXLINE, "%s/env-pact.dk",  st.dir.inc);
     snprintf(st.env_mdl,  MAXLINE, "%s/env-pact.mdl", st.dir.inc);
-
-    snprintf(st.dir.inc, MAXLINE, "%s/include", st.dir.root);
-    snprintf(st.dir.lib, MAXLINE, "%s/lib",     st.dir.root);
-    snprintf(st.dir.bin, MAXLINE, "%s/bin",     st.dir.root);
-    snprintf(st.dir.sch, MAXLINE, "%s/scheme",  st.dir.root);
 
 /* variable defaults */
     strcpy(st.def_tools, "");
@@ -2365,6 +2367,7 @@ static void finish_config(client *cl, char *base)
 
 /* these are finally determined by now and it is safe to define them */
     snprintf(st.dir.inc, MAXLINE, "%s/include", st.dir.root);
+    snprintf(st.dir.etc, MAXLINE, "%s/etc",     st.dir.root);
     snprintf(st.dir.lib, MAXLINE, "%s/lib",     st.dir.root);
     snprintf(st.dir.bin, MAXLINE, "%s/bin",     st.dir.root);
     snprintf(st.dir.sch, MAXLINE, "%s/scheme",  st.dir.root);
