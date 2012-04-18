@@ -415,7 +415,7 @@ switch ($Phase)
 
 # now that we are configured check the pattern for warnings and errors
 
-              set Cnfgrd = $WrkDir/dev/$arch/include/configured
+              set Cnfgrd = $WrkDir/dev/$arch/etc/configured
 
               set WarnPattern = `pact +l -info WARN_PATTERN | sed 's| |+sp+|g'`
               if ("$WarnPattern" == "") then

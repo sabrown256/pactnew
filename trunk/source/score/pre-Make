@@ -99,7 +99,8 @@ Hdrs = scstd.h scunix.h scwin32.h scbgl.h \
        scgnu.h sclnx.h scosx.h sccyg.h scbsd.h \
        scaix.h scsol.h schpux.h scirix.h scbeos.h \
        score.h score_int.h score_old.h \
-       scope_hash.h scope_typeh.h scope_io.h scope_array.h
+       scope_hash.h scope_typeh.h scope_io.h scope_array.h \
+       scope_dl.h
 
 #
 # Object Files
@@ -118,7 +119,7 @@ PObjs = scerr.o sccntx.o \
         scsysa.o scsysb.o scsysc.o scsysd.o scsyse.o \
         scfio.o scbio.o scudl.o scioctl.o scsig.o schsrv.o \
         scterm.o scleh.o \
-        sctrace.o
+        scdl.o sctrace.o
 
 TObjs = scpar.o scthn.o scthe.o scthp.o sctho.o scths.o
 
@@ -150,7 +151,7 @@ ArPObjs = ${TGTLib}(scerr.o) ${TGTLib}(sccntx.o) \
           ${TGTLib}(scsysc.o) ${TGTLib}(scsysd.o) ${TGTLib}(scsyse.o) \
           ${TGTLib}(scfio.o) ${TGTLib}(scbio.o) ${TGTLib}(scudl.o) \
           ${TGTLib}(scioctl.o) ${TGTLib}(scsig.o) \
-          ${TGTLib}(schsrv.o) ${TGTLib}(sctrace.o) \
+          ${TGTLib}(schsrv.o) ${TGTLib}(sctrace.o) ${TGTLib}(scdl.o) \
           ${TGTLib}(scterm.o) ${TGTLib}(scleh.o)
 
 ArSObjs = ${TGTLib}(sclexs.o)

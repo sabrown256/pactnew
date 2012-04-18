@@ -20,7 +20,7 @@ eval `$ScrDir/prune-env -e DbgOpt pact`
 set path = ( $ScrDir $path )
 source $ScrDir/env-csh
 
-dbget IncDir
+dbget EtcDir
 
 # NOTE: must dbset this in dsys first
 #dbget DbgOpt
@@ -36,7 +36,7 @@ dbget WARN_PATTERN
 dbget ERR_PATTERN
 
 Separator $Log
-Note $Log "   IncDir       = $IncDir"
+Note $Log "   EtcDir       = $EtcDir"
 Note $Log "   DbgOpt       = $DbgOpt"
 Note $Log "   USER         = $USER"
 Note $Log "   Host         = $Host"
@@ -53,7 +53,7 @@ Note $Log "   ERR_PATTERN  = $ERR_PATTERN"
 
     NoteD $Log "   Configuration record - configured"
 
-    set STDOUT = $IncDir/configured
+    set STDOUT = $EtcDir/configured
 
     flog $Log $RM $STDOUT
     flog $Log touch $STDOUT

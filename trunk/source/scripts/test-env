@@ -96,6 +96,7 @@ setenv ZeroSpace  "-z 2"
    setenv SysDir    $BaseDir/dev/$System
    setenv SrcDir    $BaseDir/$Package
 
+   setenv EtcDir    $SysDir/etc
    setenv IncDir    $SysDir/include
    setenv LibDir    $SysDir/lib
    setenv BinDir    $SysDir/bin

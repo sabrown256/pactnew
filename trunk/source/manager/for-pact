@@ -224,7 +224,7 @@ endif
 
 set arch    = `$Base/scripts/cfgman use`
 set Root    = $Base/dev/$arch
-set CFDFile = $Root/include/configured
+set CFDFile = $Root/etc/configured
 set FORPACT = $Root/bin/for-pact
 
 # echo "Cmmnd  = |$Cmmnd|"
