@@ -406,7 +406,7 @@ static int check(rundes *st)
 	rv = FALSE;};
 
     if (IS_NULL(st->sgn) == TRUE)
-       snprintf(st->sgn, MAXLINE, "%s/include/do-run-db",
+       snprintf(st->sgn, MAXLINE, "%s/etc/do-run-db",
                 path_head(st->bindir));
 
     if (file_exists(st->sgn) == FALSE)

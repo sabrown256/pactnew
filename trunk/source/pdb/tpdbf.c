@@ -113,7 +113,7 @@ int main(int c, char **v)
 
     n    = 1000000;
     nc   = 4;
-    bfsz = 1000000;
+    bfsz = SC_OPT_BFSZ;
     vers = 3;
 
     for (i = 1; i < c; i++)

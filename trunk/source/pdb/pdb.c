@@ -299,9 +299,8 @@ int64_t PD_close_n(PDBfile *file ARG(,,cls))
 int64_t PD_flush(PDBfile *file ARG(,,cls))
    {int64_t ret;
 
+/* do the PDB level work */
     ret = _PD_FLUSH_FILE(file);
-
-    ret = _PD_safe_flush(file);
 
 /* NOTE: this way uses seek and tell to get the length
  * another, stronger way would be for PDBLib to actually count

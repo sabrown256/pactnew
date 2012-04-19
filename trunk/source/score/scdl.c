@@ -175,7 +175,8 @@ static int _SC_so_parse_flags(sodes *se)
  */
 
 static sodes *_SC_so_open(char *tag)
-   {char msg[MAXLINE];
+   {int flag;
+    char msg[MAXLINE];
     char *lib;
     sodes *se;
 
@@ -183,11 +184,10 @@ static sodes *_SC_so_open(char *tag)
     if (se != NULL)
        {lib = se->lib;
 
-#ifdef HAVE_DYNAMIC_LINKER
-	int flag;
-	void *so;
-
 	flag = _SC_so_parse_flags(se);
+
+#ifdef HAVE_DYNAMIC_LINKER
+	void *so;
 
 	so = dlopen(lib, flag);
 	if (so == NULL)
@@ -270,11 +270,13 @@ void *SC_so_get(objindex kind, char *tag, ...)
 		if (s != NULL)
 		   snprintf(msg, MAXLINE, "ERROR: %s", s);
 
-#else
-		snprintf(msg, MAXLINE, "ERROR: No dynamic linker");
-#endif
 		if (se->kind == OBJ_FUNC)
-		   se->f = f;};};};
+		   se->f = f;};
+
+#else
+	       snprintf(msg, MAXLINE, "ERROR: No dynamic linker");
+#endif
+	   };};
 
     return(f);}
 

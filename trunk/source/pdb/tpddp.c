@@ -749,7 +749,7 @@ int main(int c, char **v)
     strcpy(path, ".");
     debug = FALSE;
 
-    bsz = 1024*1024;
+    bsz = SC_OPT_BFSZ;
 
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')

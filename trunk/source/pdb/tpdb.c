@@ -877,7 +877,7 @@ int main(int c, char **v)
         ton[i] = TRUE;
 
     bfsz             = -1;
-    bfsz             = 100000;
+    bfsz             = SC_OPT_BFSZ;
     check_writes     = FALSE;
     debug_mode       = FALSE;
     native_only      = FALSE;
@@ -929,10 +929,7 @@ int main(int c, char **v)
 /* force allocation of permanent memory outside of memory monitors */
     PD_open_vif("foo");
 
-    PRINT(STDOUT, "\n");
-    PRINT(STDOUT, "\t\t                      Memory                Time\n");
-    PRINT(STDOUT, "\t\t                     (bytes)               (secs)\n");
-    PRINT(STDOUT, "\t\t     Test  Allocated     Freed      Diff\n");
+    test_header();
 
     err = 0;
 

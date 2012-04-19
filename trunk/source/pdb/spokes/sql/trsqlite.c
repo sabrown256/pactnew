@@ -96,8 +96,11 @@ void _SQLITE_set_methods(void)
 	rv = SC_so_register_func(OBJ_SO, "libsqlite3.so", "sqlite3",
 				 NULL, NULL, NULL, NULL);
 
-	_S3_mth.open       = SC_so_get(OBJ_SO, "sqlite3", sqlite3_open);
+# ifdef HAVE_SQLITE_V2
 	_S3_mth.open_v2    = SC_so_get(OBJ_SO, "sqlite3", sqlite3_open_v2);
+# endif
+
+	_S3_mth.open       = SC_so_get(OBJ_SO, "sqlite3", sqlite3_open);
 	_S3_mth.close      = SC_so_get(OBJ_SO, "sqlite3", sqlite3_close);
 	_S3_mth.get_table  = SC_so_get(OBJ_SO, "sqlite3", sqlite3_get_table);
 	_S3_mth.free_table = SC_so_get(OBJ_SO, "sqlite3", sqlite3_free_table);
@@ -106,8 +109,13 @@ void _SQLITE_set_methods(void)
 #else
 
 /* statically linked way */
-       {_S3_mth.open       = sqlite3_open;
+       {
+
+# ifdef HAVE_SQLITE_V2
 	_S3_mth.open_v2    = sqlite3_open_v2;
+# endif
+
+	_S3_mth.open       = sqlite3_open;
 	_S3_mth.close      = sqlite3_close;
 	_S3_mth.get_table  = sqlite3_get_table;
 	_S3_mth.free_table = sqlite3_free_table;

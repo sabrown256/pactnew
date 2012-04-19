@@ -768,7 +768,7 @@ static void _PD_pfm_mark_as_flushed_t(PDBfile *file, int wh)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_PFM_SERIAL_FLUSH_T - do a serial flush */
+/* _PD_PFM_SERIAL_FLUSH_T - do a serial file level flush */
 
 static int _PD_pfm_serial_flush_t(FILE *fp, int tid)
    {int rv;
@@ -780,7 +780,7 @@ static int _PD_pfm_serial_flush_t(FILE *fp, int tid)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_PFM_FLUSH_FILE_T - flush the given file */
+/* _PD_PFM_FLUSH_FILE_T - do PDB level flush on the given file */
 
 static int _PD_pfm_flush_file_t(PDBfile *file)
    {int rv;

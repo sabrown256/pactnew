@@ -40,7 +40,8 @@ void exit(int status);
 
 /* REPORT_VAR - report on the variable Q in FILE */
 
-static int report_var(statedes *st, char *fname, char *q, char *key, int newl)
+static int report_var(statedes *st, char *dir, char *fname,
+		      char *q, char *key, int newl)
    {int i, nc, ok, doit, tst;
     int compl, litrl, quote;
     char file[MAXLINE];
@@ -52,7 +53,7 @@ static int report_var(statedes *st, char *fname, char *q, char *key, int newl)
     litrl = st->literal;
     quote = FALSE;
 
-    snprintf(file, MAXLINE, "%s/include/%s", st->root, fname);
+    snprintf(file, MAXLINE, "%s/%s/%s", st->root, dir, fname);
 
     sa = file_text(FALSE, file);
     if (sa != NULL)
@@ -129,26 +130,28 @@ static void report(statedes *st, char *q, int newl)
     ok = FALSE;
 
     if (strcmp(q, "make") == 0)
-       ok = report_var(st, "make-def", "UMake", NULL, newl);
+       ok = report_var(st, "include", "make-def", "UMake", NULL, newl);
 
     if (strcmp(q, "config") == 0)
-       ok = report_var(st, "make-def", "System", NULL, newl);
+       ok = report_var(st, "include", "make-def", "System", NULL, newl);
 
     if (!ok)
-       ok = report_var(st, "scconfig.h", q, "#define", newl);
+       ok = report_var(st, "include", "scconfig.h", q, "#define", newl);
 
     if (!ok)
-       ok = report_var(st, "make-def", q, NULL, newl);
+       ok = report_var(st, "include", "make-def", q, NULL, newl);
 
     if (!ok)
-       ok = report_var(st, "configured", q, NULL, newl);
+       ok = report_var(st, "etc", "configured", q, NULL, newl);
 
     if (!ok)
        {s = getenv("SHELL");
 	if ((s != NULL) && (strstr(s, "csh") != NULL))
-	   ok = report_var(st, "env-pact.csh", q, "setenv", newl);
+	   ok = report_var(st, "include", "env-pact.csh",
+			   q, "setenv", newl);
 	else
-	   ok = report_var(st, "env-pact.sh", q, "export", newl);};
+	   ok = report_var(st, "include", "env-pact.sh",
+			   q, "export", newl);};
 
     return;}
 

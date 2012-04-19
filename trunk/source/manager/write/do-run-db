@@ -22,7 +22,7 @@ HAVE_SUBROUTINES
 dbget DO_RUN_DBG
 dbget DO_RUN_MPI
 dbget DO_RUN_CROSS
-dbget IncDir
+dbget EtcDir
 
 # convert these to shell variables so they
 # do not get whacked by subroutine calls
@@ -35,7 +35,7 @@ Note $Log "   ConfigDir     = $ConfigDir"
 Note $Log "   DO_RUN_DBG    = $ldbg"
 Note $Log "   DO_RUN_MPI    = $lmpi"
 Note $Log "   DO_RUN_CROSS  = $lcrs"
-Note $Log "   IncDir        = $IncDir"
+Note $Log "   EtcDir        = $EtcDir"
 
 @ err = 0
 
@@ -44,7 +44,7 @@ Note $Log "   IncDir        = $IncDir"
 
 NoteD $Log "   Do-run signature database - do-run-db"
 
-flog $Log set db = $IncDir/do-run-db
+flog $Log set db = $EtcDir/do-run-db
 cat >&! $db << EOF
 #
 # DO-RUN-DB - execution signatures for do-run

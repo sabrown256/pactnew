@@ -28,7 +28,8 @@ static char
 
 /* REPORT_VAR - report on the variable Q in FILE */
 
-static int report_var(anadep *state, char *fname, char *q, char *key, int newl)
+static int report_var(anadep *state, char *dir, char *fname,
+		      char *q, char *key, int newl)
    {int i, nc, ok, doit, tst;
     int compl, litrl, quote;
     char s[MAX_BFSZ];
@@ -41,7 +42,7 @@ static int report_var(anadep *state, char *fname, char *q, char *key, int newl)
 
     ok = FALSE;
 
-    file = SC_dsnprintf(TRUE, "%s/include/%s", state->root, fname);
+    file = SC_dsnprintf(TRUE, "%s/%s/%s", state->root, dir, fname);
 
     fp = io_open(file, "r");
     if (fp != NULL)
@@ -125,23 +126,25 @@ static void report(anadep *state, char *q, int newl)
 	CFREE(devdir);};
 
     if (strcmp(q, "config") == 0)
-       ok = report_var(state, "make-def", "System", NULL, newl);
+       ok = report_var(state, "include", "make-def", "System", NULL, newl);
 
     if (!ok)
-       ok = report_var(state, "scconfig.h", q, "#define", newl);
+       ok = report_var(state, "include", "scconfig.h", q, "#define", newl);
 
     if (!ok)
-       ok = report_var(state, "make-def", q, NULL, newl);
+       ok = report_var(state, "include", "make-def", q, NULL, newl);
 
     if (!ok)
-       ok = report_var(state, "configured", q, NULL, newl);
+       ok = report_var(state, "etc", "configured", q, NULL, newl);
 
     if (!ok)
        {s = getenv("SHELL");
 	if ((s != NULL) && (strstr(s, "csh") != NULL))
-	   ok = report_var(state, "env-pact.csh", q, "setenv", newl);
+	   ok = report_var(state, "include", "env-pact.csh",
+			   q, "setenv", newl);
         else
-	   ok = report_var(state, "env-pact.sh", q, "export", newl);};
+	   ok = report_var(state, "include", "env-pact.sh",
+			   q, "export", newl);};
 
     return;}
 
