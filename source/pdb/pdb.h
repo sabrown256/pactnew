@@ -14,6 +14,7 @@
 
 #include "pml.h"
 #include "pdb_old.h"
+#include "scope_dl.h"
 
 /* PDBLib History:
  * Version 4 contains bug fixes pertaining to cast information in PDB files
