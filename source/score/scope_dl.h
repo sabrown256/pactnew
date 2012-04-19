@@ -28,11 +28,18 @@
 
 /*--------------------------------------------------------------------------*/
 
+enum e_objindex
+   { OBJ_FUNC, OBJ_SO, OBJ_UNKNOWN };
+
+typedef enum e_objindex objindex;
+
 typedef struct s_sodes sodes;
 typedef struct s_sostate sostate;
 
 struct s_sodes
-   {char *lib;        /* shared object file name */
+   {objindex kind;
+    char *flags;      /* flags for controlling dlsym */
+    char *lib;        /* shared object file name */
     char *path;       /* path to shared object file */
     char *rv;         /* return value of function */
     char *name;       /* function name */
@@ -67,12 +74,13 @@ extern sostate
 
 extern int
  SC_so_close(char *name),
- SC_so_register_func(char *lib, char *path,
-		     char *rv, char *name, char *argl),
+ SC_so_release(void),
+ SC_so_register_func(objindex kind, char *lib, char *name,
+		     char *path, char *flags, char *rv, char *argl),
  SC_so_config(char *fname);
 
 extern void
- *SC_so_get_func(char *name);
+ *SC_so_get(objindex kind, char *tag, ...);
 
 
 #ifdef __cplusplus
