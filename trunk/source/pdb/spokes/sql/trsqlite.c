@@ -81,6 +81,8 @@ static sqlite3_methods
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+#define DYNAMICALLY_LINKED
+
 /* _SQLITE_SET_METHODS - setup the methods for SQLITE access */
 
 void _SQLITE_set_methods(void)
@@ -95,16 +97,18 @@ void _SQLITE_set_methods(void)
 
 	rv = SC_so_register_func(OBJ_SO, "libsqlite3.so", "sqlite3",
 				 NULL, NULL, NULL, NULL);
+	if (rv == FALSE)
+	   PD_error("CANNOT LOAD 'libsqlite3.so'", PD_OPEN);
 
 # ifdef HAVE_SQLITE_V2
-	_S3_mth.open_v2    = SC_so_get(OBJ_SO, "sqlite3", sqlite3_open_v2);
+	_S3_mth.open_v2    = SC_so_get(OBJ_SO, "sqlite3", "sqlite3_open_v2");
 # endif
 
-	_S3_mth.open       = SC_so_get(OBJ_SO, "sqlite3", sqlite3_open);
-	_S3_mth.close      = SC_so_get(OBJ_SO, "sqlite3", sqlite3_close);
-	_S3_mth.get_table  = SC_so_get(OBJ_SO, "sqlite3", sqlite3_get_table);
-	_S3_mth.free_table = SC_so_get(OBJ_SO, "sqlite3", sqlite3_free_table);
-	_S3_mth.exec       = SC_so_get(OBJ_SO, "sqlite3", sqlite3_exec);};
+	_S3_mth.open       = SC_so_get(OBJ_SO, "sqlite3", "sqlite3_open");
+	_S3_mth.close      = SC_so_get(OBJ_SO, "sqlite3", "sqlite3_close");
+	_S3_mth.get_table  = SC_so_get(OBJ_SO, "sqlite3", "sqlite3_get_table");
+	_S3_mth.free_table = SC_so_get(OBJ_SO, "sqlite3", "sqlite3_free_table");
+	_S3_mth.exec       = SC_so_get(OBJ_SO, "sqlite3", "sqlite3_exec");};
 
 #else
 

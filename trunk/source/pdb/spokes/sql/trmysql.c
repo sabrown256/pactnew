@@ -22,6 +22,80 @@
 
 #define GET_CONNECTION(_f) ((MYSQL *) GET_SQL_FILE(_f)->conn)
 
+typedef struct s_mysql_methods mysql_methods;
+
+struct s_mysql_methods
+   {MYSQL *(*init)(MYSQL *sql);                               /* mysql_init */
+    MYSQL *(*connect)(MYSQL *sql, const char *host,   /* mysql_real_connect */
+		      const char *user,
+		      const char *passwd,
+		      const char *db,
+		      unsigned int port,
+		      const char *unix_socket,
+		      unsigned long clientflag);
+    void (*close)(MYSQL *sql);                               /* mysql_close */
+    int	(*query)(MYSQL *sql, const char *q);                 /* mysql_query */
+    MYSQL_RES *(*result)(MYSQL *mysql);               /* mysql_store_result */
+    my_ulonglong (*num_rows)(MYSQL_RES *res);             /* mysql_num_rows */
+    unsigned int (*num_fields)(MYSQL_RES *res);         /* mysql_num_fields */
+    MYSQL_ROW (*fetch_row)(MYSQL_RES *result);           /* mysql_fetch_row */
+    void (*free_result)(MYSQL_RES *result);            /* mysql_free_result */
+    const char *(*error)(MYSQL *mysql);};                    /* mysql_error */
+
+static mysql_methods
+ _MS_mth;
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+#define DYNAMICALLY_LINKED
+
+/* _MYSQL_SET_METHODS - setup the methods for MYSQL access */
+
+void _MYSQL_set_methods(void)
+   {
+
+    if (_MS_mth.init == NULL)
+
+#ifdef DYNAMICALLY_LINKED
+
+/* dynamically linked way */
+       {int rv;
+
+	rv = SC_so_register_func(OBJ_SO, "libmysql.so", "mysql",
+				 NULL, NULL, NULL, NULL);
+	if (rv == FALSE)
+	   PD_error("CANNOT LOAD 'libmysql.so'", PD_OPEN);
+
+        _MS_mth.init        = SC_so_get(OBJ_SO, "mysql", "mysql_init");
+	_MS_mth.connect     = SC_so_get(OBJ_SO, "mysql", "mysql_real_connect");
+	_MS_mth.close       = SC_so_get(OBJ_SO, "mysql", "mysql_close");
+	_MS_mth.query       = SC_so_get(OBJ_SO, "mysql", "mysql_query");
+	_MS_mth.result      = SC_so_get(OBJ_SO, "mysql", "mysql_store_result");
+	_MS_mth.num_rows    = SC_so_get(OBJ_SO, "mysql", "mysql_num_rows");
+	_MS_mth.num_fields  = SC_so_get(OBJ_SO, "mysql", "mysql_num_fields");
+	_MS_mth.fetch_row   = SC_so_get(OBJ_SO, "mysql", "mysql_fetch_row");
+	_MS_mth.free_result = SC_so_get(OBJ_SO, "mysql", "mysql_free_result");
+	_MS_mth.error       = SC_so_get(OBJ_SO, "mysql", "mysql_error");};
+
+#else
+
+/* statically linked way */
+       {_MS_mth.init        = mysql_init;
+	_MS_mth.connect     = mysql_real_connect;
+	_MS_mth.close       = mysql_close;
+	_MS_mth.query       = mysql_query;
+	_MS_mth.result      = mysql_store_result;
+	_MS_mth.num_rows    = mysql_num_rows;
+	_MS_mth.num_fields  = mysql_num_fields;
+	_MS_mth.fetch_row   = mysql_fetch_row;
+	_MS_mth.free_result = mysql_free_result;
+	_MS_mth.error       = mysql_error;};
+
+#endif
+
+    return;}
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -30,7 +104,7 @@
 static void _MYSQL_error(MYSQL *conn, char *msg)
    {
 
-    printf("MYSQL %s: %s failed\n", msg, mysql_error(conn));
+    printf("MYSQL %s: %s failed\n", msg, _MS_mth.error(conn));
 
     return;}
 
@@ -46,7 +120,7 @@ static int _MYSQL_db_close(FILE *fp)
     sys  = (sql_file *) fp;
     conn = (MYSQL *) sys->conn;
 
-    mysql_close(conn);
+    _MS_mth.close(conn);
 
     return(0);}
 
@@ -101,7 +175,7 @@ int _MYSQL_oper(FILE *fp, char *sql)
 
     conn = GET_CONNECTION(fp);
 
-    if (mysql_query(conn, sql) != 0)
+    if (_MS_mth.query(conn, sql) != 0)
        {_MYSQL_error(conn, "operation");
         printf("-> %s\n", sql);
         rv = FALSE;}
@@ -127,18 +201,18 @@ sql_table *_MYSQL_query(FILE *fp, char *sql, char *delim, int add)
     tab  = NULL;
     conn = GET_CONNECTION(fp);
 
-    if (mysql_query(conn, sql) != 0)
+    if (_MS_mth.query(conn, sql) != 0)
        {_MYSQL_error(conn, "query");
         printf("-> %s\n", sql);}
 
     else
-       {res = mysql_store_result(conn);
+       {res = _MS_mth.result(conn);
 	if (res == NULL)
 	   _MYSQL_error(conn, "store");
 
 	else
-	   {nr = mysql_num_rows(res);
-	    nf = mysql_num_fields(res);
+	   {nr = _MS_mth.num_rows(res);
+	    nf = _MS_mth.num_fields(res);
 
 	    tab = _SQL_mk_table(nr, nf);
 
@@ -148,11 +222,11 @@ sql_table *_MYSQL_query(FILE *fp, char *sql, char *delim, int add)
 	       SC_array_string_add_copy(arr, sql);
 
 /* gather results */
-	    while ((row = mysql_fetch_row(res)) != NULL)
-	       {nf = mysql_num_fields(res);
+	    while ((row = _MS_mth.fetch_row(res)) != NULL)
+	       {nf = _MS_mth.num_fields(res);
 		_MYSQL_gather_row(arr, row, nf, delim);};
 
-	    mysql_free_result(res);
+	    _MS_mth.free_result(res);
 
 	    SC_array_string_add(arr, NULL);
 
@@ -265,6 +339,8 @@ FILE *_MYSQL_open(PDBfile *file, char *name, char *mode)
     MYSQL *conn;
     sql_file *fs;
 
+    _MYSQL_set_methods();
+
     fp = NULL;
     pu = file->udl;
 
@@ -300,12 +376,12 @@ FILE *_MYSQL_open(PDBfile *file, char *name, char *mode)
 	    SC_LAST_CHAR(s) = '\0';
 	    SC_echo_on_file(stdin);};
 
-	conn = mysql_init(NULL);
-	if (mysql_real_connect(conn, hst, usr, pwd, db, 0, NULL, 0) == NULL)
+	conn = _MS_mth.init(NULL);
+	if (_MS_mth.connect(conn, hst, usr, pwd, db, 0, NULL, 0) == NULL)
 	   _MYSQL_error(conn, "connect");
 
         else
-	   {st = mysql_query(conn, "SET NAMES 'utf8'");
+	   {st = _MS_mth.query(conn, "SET NAMES 'utf8'");
 	    if (st != 0)
 	       _MYSQL_error(conn, "set names");
 
