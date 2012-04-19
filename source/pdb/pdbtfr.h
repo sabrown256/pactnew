@@ -117,6 +117,21 @@ static void pre_test(tframe *tf, int debug)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* TEST_HEADER - print column headings */
+
+static void test_header(void)
+   {
+
+    PRINT(STDOUT, "\n");
+    PRINT(STDOUT, "\t\t                      Memory                   Time\n");
+    PRINT(STDOUT, "\t\t                     (bytes)                  (secs)\n");
+    PRINT(STDOUT, "\t\t     Test   Allocated      Freed      Diff\n");
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* POST_TEST - report memory and timing */
 
 static void post_test(tframe *tf, int n)
@@ -134,7 +149,7 @@ static void post_test(tframe *tf, int n)
     tf->cs = SC_mem_monitor(tf->cs, tf->dbg, "B", tf->msg);
 
     PRINT(STDOUT,
-          "\t\t     %3d    %8ld  %8ld   %7ld     %.2g\n",
+          "\t\t     %3d    %9ld  %9ld   %7ld     %.2g\n",
 	  n, da, df, dd, dt);
 
     return;}

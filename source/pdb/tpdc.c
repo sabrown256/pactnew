@@ -689,7 +689,7 @@ int main(int c, char **v)
     SC_zero_space_n(1, -2);
 
     bfsz             = -1;
-    bfsz             = 100000;
+    bfsz             = SC_OPT_BFSZ;
     check_writes     = FALSE;
     debug_mode       = FALSE;
     native_only      = FALSE;
@@ -741,10 +741,7 @@ int main(int c, char **v)
 
     SC_signal(SIGINT, SIG_DFL);
 
-    PRINT(STDOUT, "\n");
-    PRINT(STDOUT, "\t\t                      Memory                Time\n");
-    PRINT(STDOUT, "\t\t                     (bytes)               (secs)\n");
-    PRINT(STDOUT, "\t\t     Test  Allocated     Freed      Diff\n");
+    test_header();
 
     err = 0;
 

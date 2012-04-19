@@ -812,10 +812,7 @@ int main(int c, char **v)
 
     SC_signal(SIGINT, SIG_DFL);
 
-    PRINT(STDOUT, "\n");
-    PRINT(STDOUT, "\t\t                      Memory                Time\n");
-    PRINT(STDOUT, "\t\t                     (bytes)               (secs)\n");
-    PRINT(STDOUT, "\t\t     Test  Allocated     Freed      Diff\n");
+    test_header();
 
     err = 0;
 

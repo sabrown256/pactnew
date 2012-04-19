@@ -98,21 +98,6 @@ static int _PD_pfm_extend_file_s(PDBfile *file, long nb)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_PFM_FLUSH_FILE_S - flush the given file */
-
-static int _PD_pfm_flush_file_s(PDBfile *file)
-   {int ret;
-
-    if (file->flushed)
-       ret = TRUE;
-    else
-       ret = (*file->flush)(file);
-
-    return(ret);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _PD_PFM_IS_MASTER_S - return TRUE iff it is OK to update the EOD point
  *                     - in FILE
  */
@@ -207,12 +192,27 @@ static void _PD_pfm_mark_as_flushed_s(PDBfile *file, int wh)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_PFM_SERIAL_FLUSH_S - do a serial flush */
+/* _PD_PFM_SERIAL_FLUSH_S - do a serial file level flush */
 
 static int _PD_pfm_serial_flush_s(FILE *fp, int tid)
    {int ret;
 
     ret = lio_flush(fp);
+
+    return(ret);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PFM_FLUSH_FILE_S - do PDB level flush on the given file */
+
+static int _PD_pfm_flush_file_s(PDBfile *file)
+   {int ret;
+
+    if (file->flushed)
+       ret = TRUE;
+    else
+       ret = (*file->flush)(file);
 
     return(ret);}
 
@@ -560,7 +560,7 @@ int PD_init_threads_arg(int c, char **v, char *key, PFTid tid)
 	     break;};};
 
 /* make Klocworks happy */
-    nt = min(nt, 1000000);
+    nt = min(nt, SC_OPT_BFSZ);
 
     PD_init_threads(nt, tid);
 

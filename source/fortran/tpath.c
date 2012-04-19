@@ -113,7 +113,7 @@ static int run_test(PFTest test, char *base, char *restart,
 /* large file size test */
     if (opt > 3)
        {snprintf(s, MAXLINE, "%sb", base);
-        (*test)(s, "00", NULL, "w", 1000000,
+        (*test)(s, "00", NULL, "w", SC_OPT_BFSZ,
                 0.0, 0, iter, steps, level);
         PRINT(STDOUT, ".");}
     else

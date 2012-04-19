@@ -419,7 +419,7 @@ int main(int c, char **v)
     st.track         = TRUE;
     
     bfsz             = -1;
-    bfsz             = 100000;
+    bfsz             = SC_OPT_BFSZ;
     check_writes     = FALSE;
     use_mapped_files = FALSE;
     for (i = 1; i < c; i++)

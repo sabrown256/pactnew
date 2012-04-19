@@ -1023,9 +1023,9 @@ static int work(char *lbl, int *ton, fltdes *fl, int ff, int no)
 static void print_help(void)
    {
 
-    PRINT(STDOUT, "\nTPDF - run basic PDB test suite\n\n");
+    PRINT(STDOUT, "\nTPDF - run PDB filter test suite\n\n");
     PRINT(STDOUT, "Usage: tpdf [-b #] [-c] [-c0] [-c1] [-c2] [-d] [-f] [-h] [-n]\n");
-    PRINT(STDOUT, "            [-r] [-v #] [-1] [-2] [-3] [-4] [-5] [-6] [-7] [-8]\n");
+    PRINT(STDOUT, "            [-r] [-v #] [-1] [-2] [-3] [-4] [-5]\n");
     PRINT(STDOUT, "\n");
     PRINT(STDOUT, "       b  - set buffer size (default no buffering)\n");
     PRINT(STDOUT, "       c  - verify low level writes\n");
@@ -1043,9 +1043,6 @@ static void print_help(void)
     PRINT(STDOUT, "       3  - do NOT run test #3\n");
     PRINT(STDOUT, "       4  - do NOT run test #4\n");
     PRINT(STDOUT, "       5  - do NOT run test #5\n");
-    PRINT(STDOUT, "       6  - do NOT run test #6\n");
-    PRINT(STDOUT, "       7  - do NOT run test #7\n");
-    PRINT(STDOUT, "       8  - do NOT run test #8\n");
     PRINT(STDOUT, "\n");
 
     return;}
@@ -1078,7 +1075,7 @@ int main(int c, char **v)
     fl = fl1;
 
     bfsz             = -1;
-    bfsz             = 100000;
+    bfsz             = SC_OPT_BFSZ;
     check_writes     = FALSE;
     debug_mode       = FALSE;
     native_only      = FALSE;
@@ -1164,10 +1161,7 @@ int main(int c, char **v)
     PD_filt_register_file(fl);
     PD_open_vif("foo");
 
-    PRINT(STDOUT, "\n");
-    PRINT(STDOUT, "\t\t                      Memory                Time\n");
-    PRINT(STDOUT, "\t\t                     (bytes)               (secs)\n");
-    PRINT(STDOUT, "\t\t     Test  Allocated     Freed      Diff\n");
+    test_header();
 
     err = 0;
 

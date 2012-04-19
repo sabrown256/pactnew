@@ -191,7 +191,7 @@ static int _PD_filt_apply_file(PDBfile *file, fltdes *fl, PFifltdes f,
 
 	nb = PD_get_buffer_size();
 	if (nb <= 0)
-	   nb = 1000000;
+	   nb = SC_OPT_BFSZ;
 
 /* initialize the filter info such that the
  * output side is the same as the input side
