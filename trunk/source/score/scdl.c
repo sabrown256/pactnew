@@ -22,8 +22,8 @@ sostate
  *                     - return TRUE iff successful
  */
 
-int SC_so_register_func(char *lib, char *path,
-			char *rv, char *name, char *argl)
+int SC_so_register_func(objindex kind, char *lib, char *name,
+			char *path, char *flags, char *rv, char *argl)
    {int ok;
     sodes *se;
 
@@ -35,13 +35,15 @@ int SC_so_register_func(char *lib, char *path,
 
 	se = CMAKE(sodes);
 	if (se != NULL)
-	   {se->lib  = CSTRSAVE(lib);
-	    se->path = CSTRSAVE(path);
-	    se->rv   = (rv != NULL) ? CSTRSAVE(rv) : NULL;
-	    se->name = CSTRSAVE(name);
-	    se->argl = (argl != NULL) ? CSTRSAVE(argl) : NULL;
-	    se->so   = NULL;
-	    se->f    = NULL;
+	   {se->kind  = kind;
+	    se->flags = (flags != NULL) ? CSTRSAVE(flags) : NULL;
+	    se->lib   = CSTRSAVE(lib);
+	    se->path  = CSTRSAVE(path);
+	    se->rv    = (rv != NULL) ? CSTRSAVE(rv) : NULL;
+	    se->name  = CSTRSAVE(name);
+	    se->argl  = (argl != NULL) ? CSTRSAVE(argl) : NULL;
+	    se->so    = NULL;
+	    se->f     = NULL;
 
 	    SC_hasharr_install(_SC_dl.tab, name, se, "sodes", 3, TRUE);
 
@@ -52,52 +54,16 @@ int SC_so_register_func(char *lib, char *path,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_SO_OPEN - open shared object NAME
- *             - return a handle to the shared object
+/* _SC_SO_CLOSE - close shared object associated with TAG
+ *              - return TRUE iff successful
  */
 
-static sodes *_SC_so_open(char *name)
-   {char msg[MAXLINE];
-    char *lib;
-    sodes *se;
-
-    se = (sodes *) SC_hasharr_def_lookup(_SC_dl.tab, name);
-    if (se != NULL)
-       {lib  = se->lib;
-
-#ifdef HAVE_DYNAMIC_LINKER
-	int flag;
-	void *so;
-
-	flag = RTLD_LAZY | RTLD_GLOBAL;
-	so   = dlopen(lib, flag);
-	if (so == NULL)
-	   snprintf(msg, MAXLINE, "ERROR: %s", dlerror());
-	else
-	   se->so = so;
-#else
-        snprintf(msg, MAXLINE, "ERROR: no dynamic linker");
-        se = NULL;
-#endif
-       };
-
-    return(se);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SC_SO_CLOSE - close shared object associate with function NAME
- *             - return TRUE iff successful
- */
-
-int SC_so_close(char *name)
+static int _SC_so_close(sodes *se)
    {int st;
     char msg[MAXLINE];
-    sodes *se;
 
     st = -1;
 
-    se = _SC_so_open(name);
     if ((se != NULL) && (se->so != NULL))
        {
 
@@ -118,39 +84,197 @@ int SC_so_close(char *name)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_SO_GET_FUNC - return the function NAME from a shared object */
+/* _SC_SO_FREE - free the contents of a sodes */
 
-void *SC_so_get_func(char *name)
+int _SC_so_free(haelem *hp, void *arg)
+   {int rv;
+    sodes *se;
+
+    rv = TRUE;
+
+    se = (sodes *) hp->def;
+    if (se != NULL)
+       {rv = _SC_so_close(se);
+
+	CFREE(se->flags);
+	CFREE(se->lib);
+	CFREE(se->path);
+	CFREE(se->rv);
+	CFREE(se->name);
+	CFREE(se->argl);
+
+	se->kind = OBJ_UNKNOWN;
+	se->so   = NULL;
+	se->f    = NULL;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_SO_RELEASE - release all shared objects and registry */
+
+int SC_so_release(void)
+   {int rv;
+
+    rv = TRUE;
+
+    SC_free_hasharr(_SC_dl.tab, _SC_so_free, NULL);
+    _SC_dl.tab = NULL;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_SO_PARSE_FLAGS - parse the flags for dlsym from SE */
+
+static int _SC_so_parse_flags(sodes *se)
+   {int is, ns, flag;
+    char s[MAXLINE];
+    char **sa;
+
+    if (se->flags == NULL)
+       flag = RTLD_LAZY | RTLD_GLOBAL;
+	   
+    else
+       {SC_strncpy(s, MAXLINE, se->flags, -1);
+	sa = SC_tokenize(s, " |");
+	SC_ptr_arr_len(ns, sa);
+
+/* parse out the flags */
+	flag = 0;
+	for (is = 0; is < ns; is++)
+
+/* RTLD_LAZY - resolve on demand */
+	    {if (strcmp(sa[is], "lazy") == 0)
+	        flag |= RTLD_LAZY;
+
+/* RTLD_NOW - resolve on open */
+	     else if (strcmp(sa[is], "now") == 0)
+	        flag |= RTLD_NOW;
+
+/* RTLD_GLOBAL - use to resolve other libraries */
+	     else if (strcmp(sa[is], "global") == 0)
+	        flag |= RTLD_GLOBAL;
+
+/* RTLD_LOCAL - use to resolve this library only */
+	     else if (strcmp(sa[is], "local") == 0)
+	        flag |= RTLD_LOCAL;};
+
+	SC_free_strings(sa);};
+
+    return(flag);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_SO_OPEN - open shared object TAG
+ *             - TAG is the name under which an object is registered
+ *             - return a handle to the shared object
+ */
+
+static sodes *_SC_so_open(char *tag)
    {char msg[MAXLINE];
+    char *lib;
+    sodes *se;
+
+    se = (sodes *) SC_hasharr_def_lookup(_SC_dl.tab, tag);
+    if (se != NULL)
+       {lib = se->lib;
+
+#ifdef HAVE_DYNAMIC_LINKER
+	int flag;
+	void *so;
+
+	flag = _SC_so_parse_flags(se);
+
+	so = dlopen(lib, flag);
+	if (so == NULL)
+	   snprintf(msg, MAXLINE, "ERROR: %s", dlerror());
+	else
+	   se->so = so;
+#else
+        snprintf(msg, MAXLINE, "ERROR: no dynamic linker");
+        se = NULL;
+#endif
+       };
+
+    return(se);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_SO_CLOSE - close shared object associated with TAG
+ *             - return TRUE iff successful
+ */
+
+int SC_so_close(char *tag)
+   {int st;
+    sodes *se;
+
+    se = (sodes *) SC_hasharr_def_lookup(_SC_dl.tab, tag);
+    st = _SC_so_close(se);
+
+    return(st);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_SO_GET - return the function associated with TAG
+ *           - from a shared object KIND
+ */
+
+void *SC_so_get(objindex kind, char *tag, ...)
+   {char msg[MAXLINE];
+    char *fnc;
     sodes *se;
     void *f;
 
     f = NULL;
 
-    se = _SC_so_open(name);
+    se = _SC_so_open(tag);
     if (se != NULL)
-       {if (se->f == NULL)
-           {
+       {SC_VA_START(tag);
+
+/* determine the function name */
+	switch (kind)
+	   {case OBJ_FUNC :
+	         fnc = se->name;
+		 break;
+	    case OBJ_SO :
+		 fnc = SC_VA_ARG(char *);
+		 break;
+	    default :
+	         fnc = NULL;
+		 break;};
+
+	SC_VA_END;
+
+        if (se != NULL)
+           {if (se->f != NULL)
+	       f = se->f;
+
+	    else if (fnc != NULL)
 
 #ifdef HAVE_DYNAMIC_LINKER
-	    char *s;
+	       {char *s;
 
 /* clear any existing error */
-	    dlerror();
+		dlerror();
 
-	    se->f = dlsym(se->so, se->name);
-/*	    *(void **) (&se->f) = dlsym(se->so, se->name); */
+		f = dlsym(se->so, fnc);
+/*                *(void **) (&f) = dlsym(se->so, fnc); */
 
-	    s = dlerror();
-	    if (s != NULL)
-	       snprintf(msg, MAXLINE, "ERROR: %s", s);
+		s = dlerror();
+		if (s != NULL)
+		   snprintf(msg, MAXLINE, "ERROR: %s", s);
 
 #else
-	    snprintf(msg, MAXLINE, "ERROR: No dynamic linker");
+		snprintf(msg, MAXLINE, "ERROR: No dynamic linker");
 #endif
-	   };
-
-	f = se->f;};
+		if (se->kind == OBJ_FUNC)
+		   se->f = f;};};};
 
     return(f);}
 
@@ -161,7 +285,7 @@ void *SC_so_get_func(char *name)
  *              - an so.conf file contains stanzas of the form
  *              - 
  *              - <name> {
- *              -         kind  = FUNC | LIB
+ *              -         kind  = function | so
  *              -         lib   = <lib>
  *              -         path  = <path>
  *              -         value = <rv>
@@ -173,8 +297,9 @@ void *SC_so_get_func(char *name)
 
 int SC_so_config(char *fname)
    {int is, ns, ok;
+    objindex kind;
     char s[MAXLINE];
-    char *lib, *path, *name, *rv, *argl;
+    char *lib, *path, *flags, *name, *rv, *argl;
     char *key, *oper, *val, *p, **sa;
 
     ok = FALSE;
@@ -184,6 +309,14 @@ int SC_so_config(char *fname)
 
 	sa = SC_file_strings(fname);
         SC_ptr_arr_len(ns, sa);
+
+	kind  = OBJ_FUNC;
+	lib   = NULL;
+	flags = NULL;
+	path  = NULL;
+	rv    = NULL;
+	name  = NULL;
+	argl  = NULL;
 
         for (is = 0; (is < ns) && (ok == TRUE); is++)
 	    {if (SC_blankl(sa[is], "#") == TRUE)
@@ -198,18 +331,30 @@ int SC_so_config(char *fname)
 	        name = CSTRSAVE(key);
 
 	     else if (strchr(key, '}') != NULL)
-	        {ok  &= SC_so_register_func(lib, path, rv, name, argl);
-		 lib  = NULL;
-		 path = NULL;
-		 rv   = NULL;
-		 name = NULL;
-		 argl = NULL;}
+	        {ok  &= SC_so_register_func(kind, lib, name,
+					    path, flags, rv, argl);
+		 kind  = OBJ_FUNC;
+		 lib   = NULL;
+		 flags = NULL;
+		 path  = NULL;
+		 rv    = NULL;
+		 name  = NULL;
+		 argl  = NULL;}
+
+	     else if (strcmp(key, "kind") == 0)
+	        {if (strcmp(val, "function") == 0)
+		   kind = OBJ_FUNC;
+	         else if (strcmp(val, "so") == 0)
+		   kind = OBJ_SO;}
 
 	     else if (strcmp(key, "lib") == 0)
 	        lib = CSTRSAVE(val);
 
 	     else if (strcmp(key, "path") == 0)
 	        path = CSTRSAVE(val);
+
+	     else if (strcmp(key, "flags") == 0)
+	        flags = CSTRSAVE(val);
 
 	     else if (strcmp(key, "value") == 0)
 	        rv = CSTRSAVE(val);

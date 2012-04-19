@@ -22,10 +22,12 @@ struct s_statedes
 /* WORK - worker for dynamic linking test */
 
 static int work(statedes *st)
-   {int rv;
-    double d;
-    double (*fcos)(double);
+   {int rv, cs;
+    char msg[MAXLINE];
     char *so;
+    double d;
+    double (*fcos)(double x), (*fsin)(double x);
+    static int dbg = 2;
 
 #ifdef MACOSX
     so = "libSystem.B.dylib";
@@ -33,9 +35,17 @@ static int work(statedes *st)
     so = "libm.so";
 #endif
 
-    rv = SC_so_register_func(so, NULL, "double", "cos", "(double x)");
+    cs = SC_mem_monitor(-1, dbg, "SO", msg);
 
-    fcos = SC_so_get_func("cos");
+/* register a specific function */
+    rv = SC_so_register_func(OBJ_FUNC, so, "cos", NULL, NULL,
+			     "double", "(double x)");
+
+/* register a shared library */
+    rv = SC_so_register_func(OBJ_SO, so, "math", NULL, NULL, NULL, NULL);
+
+/* load specifically registered function */
+    fcos = SC_so_get(OBJ_FUNC, "cos");
     if (fcos == NULL)
        {printf("Failed to load 'cos'\n");
 	rv = FALSE;}
@@ -44,7 +54,19 @@ static int work(statedes *st)
        {d = fcos(2.0);
 	printf("cos(2.0) = %.4f\n", d);};
 
-    rv = SC_so_close("cos");
+/* load unregistered function from shared object */
+    fsin = SC_so_get(OBJ_SO, "math", "sin");
+    if (fsin == NULL)
+       {printf("Failed to load 'sin'\n");
+	rv = FALSE;}
+
+    else
+       {d = fsin(2.0);
+	printf("sin(2.0) = %.4f\n", d);};
+
+    rv = SC_so_release();
+
+    cs = SC_mem_monitor(cs, dbg, "SO", msg);
 
     return(rv);}
 
