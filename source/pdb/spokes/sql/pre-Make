@@ -33,6 +33,8 @@ CleanFiles = *~ core #*#
 #
 Hdrs = trsql.h ../../pdb_int.h
 
+APIs = sqlite.api mysql.api
+
 #
 # Object Files
 #
@@ -41,7 +43,7 @@ Objs = trsql.o trsqlg.o trsqlite.o trmysql.o
 ArObjs = ${TGTLib}(trsql.o) ${TGTLib}(trsqlg.o) \
          ${TGTLib}(trsqlite.o) ${TGTLib}(trmysql.o)
        
-${Objs} : ${Hdrs}
-${LibDep} : ${Hdrs}
+${Objs} : ${Hdrs} ${APIs}
+${LibDep} : ${Hdrs} ${APIs}
 
 spoke : ${TGTLib} ${LibDep}

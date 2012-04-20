@@ -77,229 +77,7 @@ static long
 static sys_layer
  _H5_sys = {_H5_rd_syment, _H5_wr_syment};
 
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-typedef struct s_d_space d_space;
-
-struct s_d_space
-   {herr_t (*close)(hid_t dataset_id);                          /* H5Dclose */
-    hid_t (*create2)(hid_t loc_id, const char *name,          /* H5Dcreate2 */
-		     hid_t dtype_id, hid_t space_id,
-		     hid_t lcpl_id, hid_t dcpl_id, hid_t dapl_id);
-    haddr_t (*get_offset)(hid_t dset_id);                  /* H5Dget_offset */
-    hid_t (*get_space)(hid_t dataset_id);                   /* H5Dget_space */
-    hid_t (*get_type)(hid_t dataset_id );                    /* H5Dget_type */
-    hid_t (*open)(hid_t loc_id, const char *name);               /* H5Dopen */
-    hid_t (*open2)(hid_t loc_id, const char *name,              /* H5Dopen2 */
-		   hid_t dapl_id);
-    herr_t (*read)(hid_t dataset_id, hid_t mem_type_id,          /* H5Dread */
-		   hid_t mem_space_id, hid_t file_space_id,
-		   hid_t xfer_plist_id, void * buf);
-    herr_t (*write)(hid_t dataset_id, hid_t mem_type_id,        /* H5Dwrite */
-		    hid_t mem_space_id, hid_t file_space_id,
-		    hid_t xfer_plist_id, const void * buf);};
-
-typedef struct s_e_space e_space;
-
-struct s_e_space
-   {herr_t (*set_auto)(H5E_auto_t func, void *cld);};        /* H5Eset_auto */
-
-typedef struct s_f_space f_space;
-
-struct s_f_space
-   {hid_t (*create)(const char *name, unsigned flags,          /* H5Fcreate */
-		    hid_t fcpl_id, hid_t fapl_id);
-    hid_t (*open)(const char *name, unsigned flags,              /* H5Fopen */
-		  hid_t fapl_id);};
-
-typedef struct s_g_space g_space;
-
-struct s_g_space
-   {herr_t (*close)(hid_t group_id);                            /* H5Gclose */
-    herr_t (*get_objinfo)(hid_t loc_id,                   /* H5Gget_objinfo */
-			  const char *name,
-			  hbool_t follow_link, H5G_stat_t *statbuf);
-    int (*iterate)(hid_t loc_id, const char *name,            /* H5Giterate */
-		   int *idx, H5G_iterate_t operator, void *operator_data);
-    hid_t (*open)(hid_t loc_id, const char *name,                /* H5Gopen */
-		  hid_t gapl_id);};
-
-typedef struct s_s_space s_space;
-
-struct s_s_space
-   {herr_t (*close)(hid_t space_id);                            /* H5Sclose */
-    hid_t (*create)(int rank,                           /* H5Screate_simple */
-		    const hsize_t *current_dims,
-		    const hsize_t *maximum_dims);
-    int (*get_dims)(hid_t space_id,            /* H5Sget_simple_extent_dims */
-		    hsize_t *dims, hsize_t *maxdims);
-    int (*get_ndims)(hid_t space_id);         /* H5Sget_simple_extent_ndims */
-    H5S_class_t (*get_extent_type)(hid_t space_id);}; /* H5Sget_simple_extent_type */
-
-typedef struct s_t_space t_space;
-
-struct s_t_space
-   {herr_t (*close)(hid_t dtype_id);                            /* H5Tclose */
-    hid_t (*copy)(hid_t dtype_id);                               /* H5Tcopy */
-    hid_t (*create)(H5T_class_t class, size_tsize);            /* H5Tcreate */
-    int (*get_dims)(hid_t adtype_id, hsize_t dims[]);  /* H5Tget_array_dims */
-    int (*get_ndims)(hid_t adtype_id);                /* H5Tget_array_ndims */
-    H5T_class_t (*get_class)(hid_t dtype_id);               /* H5Tget_class */
-    size_t (*get_ebias)(hid_t dtype_id);                    /* H5Tget_ebias */
-    herr_t (*get_fields)(hid_t dtype_id, size_t *spos,     /* H5Tget_fields */
-			 size_t *epos, size_t *esize,
-			 size_t *mpos, size_t *msize);
-    char *(*get_member_name)(hid_t dtype_id,          /* H5Tget_member_name */
-			     unsigned field_idx);
-    size_t (*get_member_offset)(hid_t dtype_id,     /* H5Tget_member_offset */
-				unsigned memb_no);
-    hid_t (*get_member_type)(hid_t dtype_id,          /* H5Tget_member_type */
-			     unsigned field_idx);
-    hid_t (*get_native_type)(hid_t dtype_id,          /* H5Tget_native_type */
-			     H5T_direction_t direction);
-    int (*get_nmembers)(hid_t dtype_id);                 /* H5Tget_nmembers */
-    H5T_order_t (*get_order)(hid_t dtype_id);               /* H5Tget_order */
-    size_t (*get_precision)(hid_t dtype_id);            /* H5Tget_precision */
-    H5T_sign_t (*get_sign)(hid_t dtype_id);                  /* H5Tget_sign */
-    size_t (*get_size)(hid_t dtype_id);                      /* H5Tget_size */
-    hid_t (*get_super)(hid_t dtype_id);                     /* H5Tget_super */
-    herr_t (*insert)(hid_t dtype_id, const char *name,         /* H5Tinsert */
-		     size_t offset, hid_t field_id);};
-
-typedef struct s_hdf5_methods hdf5_methods;
-
-struct s_hdf5_methods
-   {d_space d;
-    e_space e;
-    f_space f;
-    g_space g;
-    s_space s;
-    t_space t;};
-
-static hdf5_methods
- _H5_mth;
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-#define DYNAMICALLY_LINKED
-
-/* _H5_SET_METHODS - setup the methods for HDF5 access */
-
-void _H5_set_methods(void)
-   {
-
-    if (_H5_mth.d.open == NULL)
-
-#ifdef DYNAMICALLY_LINKED
-
-/* dynamically linked way */
-       {int rv;
-
-	rv = SC_so_register_func(OBJ_SO, "libhdf5.so", "hdf5",
-				 NULL, NULL, NULL, NULL);
-	if (rv == FALSE)
-	   PD_error("CANNOT LOAD 'libhdf5.so'", PD_OPEN);
-
-	_H5_mth.d.close             = SC_so_get(OBJ_SO, "hdf5", "H5Dclose");
-	_H5_mth.d.create2           = SC_so_get(OBJ_SO, "hdf5", "H5Dcreate2");
-	_H5_mth.d.get_offset        = SC_so_get(OBJ_SO, "hdf5", "H5Dget_offset");
-	_H5_mth.d.get_space         = SC_so_get(OBJ_SO, "hdf5", "H5Dget_space");
-	_H5_mth.d.get_type          = SC_so_get(OBJ_SO, "hdf5", "H5Dget_type");
-	_H5_mth.d.open              = SC_so_get(OBJ_SO, "hdf5", "H5Dopen
-	_H5_mth.d.open2             = SC_so_get(OBJ_SO, "hdf5", "H5Dopen2");
-	_H5_mth.d.read              = SC_so_get(OBJ_SO, "hdf5", "H5Dread");
-	_H5_mth.d.write             = SC_so_get(OBJ_SO, "hdf5", "H5Dwrite");
-
-	_H5_mth.e.set_auto          = SC_so_get(OBJ_SO, "hdf5", "H5Eset_auto");
-
-	_H5_mth.f.create            = SC_so_get(OBJ_SO, "hdf5", "H5Fcreate");
-	_H5_mth.f.open              = SC_so_get(OBJ_SO, "hdf5", "H5Fopen");
-
-	_H5_mth.g.close             = SC_so_get(OBJ_SO, "hdf5", "H5Gclose");
-	_H5_mth.g.get_objinfo       = SC_so_get(OBJ_SO, "hdf5", "H5Gget_objinfo");
-	_H5_mth.g.iterate           = SC_so_get(OBJ_SO, "hdf5", "H5Giterate");
-	_H5_mth.g.open              = SC_so_get(OBJ_SO, "hdf5", "H5Gopen");
-
-	_H5_mth.s.close             = SC_so_get(OBJ_SO, "hdf5", "H5Sclose");
-	_H5_mth.s.create            = SC_so_get(OBJ_SO, "hdf5", "H5Screate_simple");
-	_H5_mth.s.get_dims          = SC_so_get(OBJ_SO, "hdf5", "H5Sget_simple_extent_dims");
-	_H5_mth.s.get_ndims         = SC_so_get(OBJ_SO, "hdf5", "H5Sget_simple_extent_ndims");
-	_H5_mth.s.get_extent_type   = SC_so_get(OBJ_SO, "hdf5", "H5Sget_simple_extent_type");
-
-	_H5_mth.t.close             = SC_so_get(OBJ_SO, "hdf5", "H5Tclose");
-	_H5_mth.t.copy              = SC_so_get(OBJ_SO, "hdf5", "H5Tcopy");
-	_H5_mth.t.create            = SC_so_get(OBJ_SO, "hdf5", "H5Tcreate");
-	_H5_mth.t.get_dims          = SC_so_get(OBJ_SO, "hdf5", "H5Tget_array_dims");
-	_H5_mth.t.get_ndims         = SC_so_get(OBJ_SO, "hdf5", "H5Tget_array_ndims");
-	_H5_mth.t.get_class         = SC_so_get(OBJ_SO, "hdf5", "H5Tget_class");
-	_H5_mth.t.get_ebias         = SC_so_get(OBJ_SO, "hdf5", "H5Tget_ebias");
-	_H5_mth.t.get_fields        = SC_so_get(OBJ_SO, "hdf5", "H5Tget_fields");
-	_H5_mth.t.get_member_name   = SC_so_get(OBJ_SO, "hdf5", "H5Tget_member_name");
-	_H5_mth.t.get_member_offset = SC_so_get(OBJ_SO, "hdf5", "H5Tget_member_offset");
-	_H5_mth.t.get_member_type   = SC_so_get(OBJ_SO, "hdf5", "H5Tget_member_type");
-	_H5_mth.t.get_native_type   = SC_so_get(OBJ_SO, "hdf5", "H5Tget_native_type");
-	_H5_mth.t.get_nmembers      = SC_so_get(OBJ_SO, "hdf5", "H5Tget_nmembers");
-	_H5_mth.t.get_order         = SC_so_get(OBJ_SO, "hdf5", "H5Tget_order");
-	_H5_mth.t.get_precision     = SC_so_get(OBJ_SO, "hdf5", "H5Tget_precision");
-	_H5_mth.t.get_sign          = SC_so_get(OBJ_SO, "hdf5", "H5Tget_sign");
-	_H5_mth.t.get_size          = SC_so_get(OBJ_SO, "hdf5", "H5Tget_size");
-	_H5_mth.t.get_super         = SC_so_get(OBJ_SO, "hdf5", "H5Tget_super");
-	_H5_mth.t.insert            = SC_so_get(OBJ_SO, "hdf5", "H5Tinsert");};
-
-#else
-
-/* statically linked way */
-       {_H5_mth.d.close             = H5Dclose;
-	_H5_mth.d.create2           = H5Dcreate2;
-	_H5_mth.d.get_offset        = H5Dget_offset;
-	_H5_mth.d.get_space         = H5Dget_space;
-	_H5_mth.d.get_type          = H5Dget_type;
-	_H5_mth.d.open              = H5Dopen
-	_H5_mth.d.open2             = H5Dopen2;
-	_H5_mth.d.read              = H5Dread;
-	_H5_mth.d.write             = H5Dwrite;
-
-	_H5_mth.e.set_auto          = H5Eset_auto;
-
-	_H5_mth.f.create            = H5Fcreate;
-	_H5_mth.f.open              = H5Fopen;
-
-	_H5_mth.g.close             = H5Gclose;
-	_H5_mth.g.get_objinfo       = H5Gget_objinfo;
-	_H5_mth.g.iterate           = H5Giterate;
-	_H5_mth.g.open              = H5Gopen;
-
-	_H5_mth.s.close             = H5Sclose;
-	_H5_mth.s.create            = H5Screate_simple;
-	_H5_mth.s.get_dims          = H5Sget_simple_extent_dims;
-	_H5_mth.s.get_ndims         = H5Sget_simple_extent_ndims;
-	_H5_mth.s.get_extent_type   = H5Sget_simple_extent_type;
-
-	_H5_mth.t.close             = H5Tclose;
-	_H5_mth.t.copy              = H5Tcopy;
-	_H5_mth.t.create            = H5Tcreate;
-	_H5_mth.t.get_dims          = H5Tget_array_dims;
-	_H5_mth.t.get_ndims         = H5Tget_array_ndims;
-	_H5_mth.t.get_class         = H5Tget_class;
-	_H5_mth.t.get_ebias         = H5Tget_ebias;
-	_H5_mth.t.get_fields        = H5Tget_fields;
-	_H5_mth.t.get_member_name   = H5Tget_member_name;
-	_H5_mth.t.get_member_offset = H5Tget_member_offset;
-	_H5_mth.t.get_member_type   = H5Tget_member_type;
-	_H5_mth.t.get_native_type   = H5Tget_native_type;
-	_H5_mth.t.get_nmembers      = H5Tget_nmembers;
-	_H5_mth.t.get_order         = H5Tget_order;
-	_H5_mth.t.get_precision     = H5Tget_precision;
-	_H5_mth.t.get_sign          = H5Tget_sign;
-	_H5_mth.t.get_size          = H5Tget_size;
-	_H5_mth.t.get_super         = H5Tget_super;
-	_H5_mth.t.insert            = H5Tinsert;};
-
-#endif
-
-    return;}
+#include "hdf5.api"
 
 /*--------------------------------------------------------------------------*/
 
@@ -320,7 +98,7 @@ static char *_H5_is_registered(PDBfile *file, hid_t dtid)
     H5T_class_t type_class;
     hdf_state *hst;
 
-    type_class = _H5_mth.t.get_class(dtid);
+    type_class = H5Tget_class(dtid);
  
 /* sanity check: we only register compound types */ 
     if (type_class != H5T_COMPOUND)
@@ -334,7 +112,7 @@ static char *_H5_is_registered(PDBfile *file, hid_t dtid)
     while (iter != NULL && !verdict) 
 
 /* do they have the same number of members? */
-       {if (iter->num_members == _H5_mth.t.get_nmembers(dtid))
+       {if (iter->num_members == H5Tget_nmembers(dtid))
 
 /* initially assume it matches */
 	   {matches = TRUE;
@@ -343,10 +121,10 @@ static char *_H5_is_registered(PDBfile *file, hid_t dtid)
 
 /* if anything does NOT match, remember this */
 	    for (i = 0 ; i < iter->num_members ; i++)
-                {mname = _H5_mth.t.get_member_name(dtid, i);
+                {mname = H5Tget_member_name(dtid, i);
                 
 		 if ((strcmp(info->member_name, mname) != 0) ||
-                     (info->member_offset != _H5_mth.t.get_member_offset(dtid, i)))
+                     (info->member_offset != H5Tget_member_offset(dtid, i)))
                     {matches = FALSE; 
 		     free(mname);
 		     break;}; 
@@ -403,16 +181,16 @@ static void _H5_register(PDBfile *file, hid_t hfp, char *type)
 
 /* insert the data into the new compound_desc */
         iter->compound_name = CSTRSAVE(type);
-        iter->num_members   = _H5_mth.t.get_nmembers(hfp);
+        iter->num_members   = H5Tget_nmembers(hfp);
 
 /* link in all of the compound member info objects */
         iter->info = CMAKE(compound_member_info);
         info = iter->info;
 
         for (i = 0 ; i < iter->num_members ; i++)
-            {mname = _H5_mth.t.get_member_name(hfp, i);
+            {mname = H5Tget_member_name(hfp, i);
 
-             info->member_offset = _H5_mth.t.get_member_offset(hfp, i); 
+             info->member_offset = H5Tget_member_offset(hfp, i); 
              info->member_name   = CSTRSAVE(mname);
 
              free(mname);
@@ -523,7 +301,7 @@ static hid_t _H5_enc_type(PDBfile *file, char *ptyp)
              break;
         case H5T_ARRAY  :  /* ARRAYS */
 	     hid_t supertype_id;
-             supertype_id = _H5_mth.t.get_super(htyp);
+             supertype_id = H5Tget_super(htyp);
 	     typename     = _H5_enc_type(file, supertype_id); 
 	     break;
         case H5T_REFERENCE :  /* REFERENCE ? */
@@ -552,7 +330,7 @@ static hid_t _H5_enc_compound(PDBfile *file, defstr *dp, intb nb)
 
     if ((dp != NULL) && (dp->members != NULL) &&
 	(PD_type_n_indirects(dp) == 0))
-       {htyp = _H5_mth.t.create(H5T_COMPOUND, nb);
+       {htyp = H5Tcreate(H5T_COMPOUND, nb);
 
 	for (mbr = dp->members; mbr != NULL ; mbr = mbr->next)
 	    {mtyp = _H5_enc_type(file, mbr->type);
@@ -574,22 +352,22 @@ static hsize_t *_H5_enc_dims(PDBfile *file, int *pnd,
     hsize_t *hdims;
 
     hdims = NULL;
-    tcid  = _H5_mth.t.get_class(htyp);
+    tcid  = H5Tget_class(htyp);
 
     if (tcid == H5T_ARRAY)
        {hid_t nativetype_id, tempType;
 
-        nd = _H5_mth.t.get_ndims(htyp);
+        nd = H5Tget_array_ndims(htyp);
 
-        nativetype_id = _H5_mth.t.copy(htyp);
+        nativetype_id = H5Tcopy(htyp);
 
 /* get the base native type (for array types) */
-        while (_H5_mth.t.get_class(nativetype_id) == H5T_ARRAY) 
-           {tempType = _H5_mth.t.get_super(nativetype_id);
-            _H5_mth.t.close(nativetype_id);
-            nativetype_id = _H5_mth.t.get_native_type(tempType, H5T_DIR_DESCEND);}
+        while (H5Tget_class(nativetype_id) == H5T_ARRAY) 
+           {tempType = H5Tget_super(nativetype_id);
+            H5Tclose(nativetype_id);
+            nativetype_id = H5Tget_native_type(tempType, H5T_DIR_DESCEND);}
 
-        if (_H5_mth.t.get_class(nativetype_id) == H5T_STRING) 
+        if (H5Tget_class(nativetype_id) == H5T_STRING) 
            {DEBUG1("_H5_enc_dims: careful -- %s\n", "string array");
             nd++;}
 
@@ -597,16 +375,16 @@ static hsize_t *_H5_enc_dims(PDBfile *file, int *pnd,
         hdims = (hsize_t*) calloc(nd, sizeof(hsize_t));
 
 #if (H5_VERS_RELEASE < 4)
-        status = _H5_mth.t.get_dims(htyp, hdims); 
+        status = H5Tget_array_dims(htyp, hdims); 
 #else
-	status = _H5_mth.t.get_dims(htyp, hdims, NULL);
+	status = H5Tget_array_dims(htyp, hdims, NULL);
 #endif
         SC_ASSERT(status != -1);
 
-        if ((hdims != NULL) && (_H5_mth.t.get_class(nativetype_id) == H5T_STRING))
-           hdims[nd-1] = _H5_mth.t.get_size(nativetype_id);
+        if ((hdims != NULL) && (H5Tget_class(nativetype_id) == H5T_STRING))
+           hdims[nd-1] = H5Tget_size(nativetype_id);
 
-        _H5_mth.t.close(nativetype_id);}
+        H5Tclose(nativetype_id);}
 
     else if (tcid == H5T_STRING)
        {DEBUG1("      H5T_STRING nd(%d)\n", nd);
@@ -614,7 +392,7 @@ static hsize_t *_H5_enc_dims(PDBfile *file, int *pnd,
         nd    = 1;
         hdims = (hsize_t*) calloc(nd, sizeof(hsize_t));
 	if (hdims != NULL)
-	   hdims[0] = _H5_mth.t.get_size(htyp);}
+	   hdims[0] = H5Tget_size(htyp);}
 
     else 
        {long id;
@@ -659,24 +437,24 @@ int _H5_write_data(hid_t fid, char *fullpath,
 
     rv = TRUE;
 
-    sid = _H5_mth.s.create(nd, dims, NULL);
+    sid = H5Screate_simple(nd, dims, NULL);
     if (sid < 0)
        rv = FALSE;
 
     else
-       {did = _H5_mth.d.create2(fid, fullpath, htyp, sid,
+       {did = H5Dcreate2(fid, fullpath, htyp, sid,
 			 H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 	if (did < 0)
 	   rv = FALSE;
 
 	else if (vr != NULL)
-	   {st = _H5_mth.d.write(did, htyp, H5S_ALL, H5S_ALL, H5P_DEFAULT, vr);
+	   {st = H5Dwrite(did, htyp, H5S_ALL, H5S_ALL, H5P_DEFAULT, vr);
 	    rv = (st >= 0);};
 
-	if (_H5_mth.d.close(did) < 0)
+	if (H5Dclose(did) < 0)
 	   rv = FALSE;
 
-	else if (_H5_mth.s.close(sid) < 0)
+	else if (H5Sclose(sid) < 0)
 	   rv = FALSE;};
 
     return(rv);}
@@ -758,10 +536,10 @@ static char *_H5_dec_fixed_pt(PDBfile *file, hid_t htyp)
     typ = NULL;
     dp  = CMAKE(defstr);
 
-    precision = (short) _H5_mth.t.get_precision(htyp);
+    precision = (short) H5Tget_precision(htyp);
 
 /* HDF5 assumes all strings are chars with a precision of 8 bits */
-    if (_H5_mth.t.get_class(htyp) == H5T_STRING) 
+    if (H5Tget_class(htyp) == H5T_STRING) 
        precision = 8;
 
     DEBUG1("      precision %d\n", precision);
@@ -769,7 +547,7 @@ static char *_H5_dec_fixed_pt(PDBfile *file, hid_t htyp)
 /* hard-coded mapping of precision to C type name
  * this is required because HDF5 does not maintain type names
  */
-    if (_H5_mth.t.get_sign(htyp)) 
+    if (H5Tget_sign(htyp)) 
        {if (precision == 8)
            typ = CSTRSAVE(SC_CHAR_S);
         else if (precision == 16)
@@ -797,7 +575,7 @@ static char *_H5_dec_fixed_pt(PDBfile *file, hid_t htyp)
            typ = CSTRSAVE("UNKNOWN");};
 
 /* decode byte ordering */ 
-    if (_H5_mth.t.get_order(htyp) == H5T_ORDER_BE) 
+    if (H5Tget_order(htyp) == H5T_ORDER_BE) 
        {order = NORMAL_ORDER;
         DEBUG1("%s", "      big endian integers\n");}
     else 
@@ -821,7 +599,7 @@ static char *_H5_dec_fixed_pt(PDBfile *file, hid_t htyp)
 
 /* HDF5 files do not currently support indirection */
     dp->n_indirects = 0;
-    dp->unsgned     = !(_H5_mth.t.get_sign(htyp)); 
+    dp->unsgned     = !(H5Tget_sign(htyp)); 
     dp->fix.order   = order;
     dp->fp.order    = NULL;
     dp->fp.format   = NULL;
@@ -885,7 +663,7 @@ static char *_H5_dec_float_pt(PDBfile *file, hid_t htyp)
 /* decode bit field
  * you never know who might use file->std in the future: fill it in
  */
-    if (_H5_mth.t.get_order(htyp)) 
+    if (H5Tget_order(htyp)) 
        {DEBUG1("%s", "      big endian float\n");
 
         for (i = 0; i < bpif; i++)
@@ -904,7 +682,7 @@ static char *_H5_dec_float_pt(PDBfile *file, hid_t htyp)
             fstd->fp[1].order[i] = bpid - i;};
 
 /* grab the precision of this float pt value */
-    precision = (short) _H5_mth.t.get_precision(htyp);
+    precision = (short) H5Tget_precision(htyp);
 
     if (precision == 0)
        {fprintf(stderr, "_H5_DEC_FLOAT_PT: error retrieving precision\n");
@@ -941,7 +719,7 @@ static char *_H5_dec_float_pt(PDBfile *file, hid_t htyp)
  *        format[7] = bias of exponent        127  
  */
 
-    status = _H5_mth.t.get_fields(htyp, &spos, &epos, &esize, &mpos, &msize);
+    status = H5Tget_fields(htyp, &spos, &epos, &esize, &mpos, &msize);
 
     if (status < 0)
        {fprintf(stderr, "_H5_DEC_FLOAT_PT: error retrieving exp fields\n");
@@ -954,7 +732,7 @@ static char *_H5_dec_float_pt(PDBfile *file, hid_t htyp)
     format[5] = format[0] - 1L - (long) mpos;
     format[2] = (long) msize;
     format[5] = format[5] - (format[2] - 1L);
-    format[7] = (long) _H5_mth.t.get_ebias(htyp);
+    format[7] = (long) H5Tget_ebias(htyp);
 
     if (format[7] == 0)
        {fprintf(stderr, "_H5_DEC_FLOAT_PT: error retrieving exp bias\n");
@@ -1050,7 +828,7 @@ static char *_H5_dec_type(PDBfile *file, hid_t htyp)
     hid_t styp;
 
     typ  = NULL;
-    tcls = _H5_mth.t.get_class(htyp);
+    tcls = H5Tget_class(htyp);
     DEBUG1("      class %d\n", tcls);
   
     switch (tcls) 
@@ -1079,7 +857,7 @@ static char *_H5_dec_type(PDBfile *file, hid_t htyp)
 /* IGNORE this case? */
              break;
         case H5T_ARRAY  :  /* ARRAYS */
-             styp = _H5_mth.t.get_super(htyp);
+             styp = H5Tget_super(htyp);
 	     typ  = _H5_dec_type(file, styp); 
 	     break;
         case H5T_REFERENCE :  /* REFERENCE ? */
@@ -1113,20 +891,20 @@ static dimdes *_H5_dec_dims(PDBfile *file, hid_t htyp, hid_t hdim)
     hid_t nativetype_id, tempType;
 
     pdims = NULL;
-    tcid  = _H5_mth.t.get_class(htyp);
+    tcid  = H5Tget_class(htyp);
 
     if (tcid == H5T_ARRAY)
-       {nd = _H5_mth.t.get_ndims(htyp);
+       {nd = H5Tget_array_ndims(htyp);
 
-        nativetype_id = _H5_mth.t.copy(htyp);
+        nativetype_id = H5Tcopy(htyp);
 
 /* get the base native type (for array types) */
-        while (_H5_mth.t.get_class(nativetype_id) == H5T_ARRAY) 
-           {tempType = _H5_mth.t.get_super(nativetype_id);
-            _H5_mth.t.close(nativetype_id);
-            nativetype_id = _H5_mth.t.get_native_type(tempType, H5T_DIR_DESCEND);}
+        while (H5Tget_class(nativetype_id) == H5T_ARRAY) 
+           {tempType = H5Tget_super(nativetype_id);
+            H5Tclose(nativetype_id);
+            nativetype_id = H5Tget_native_type(tempType, H5T_DIR_DESCEND);}
 
-        if (_H5_mth.t.get_class(nativetype_id) == H5T_STRING) 
+        if (H5Tget_class(nativetype_id) == H5T_STRING) 
            {DEBUG1("_H5_dec_dims: careful -- %s\n", "string array");
             nd++;}
 
@@ -1136,15 +914,15 @@ static dimdes *_H5_dec_dims(PDBfile *file, hid_t htyp, hid_t hdim)
 	   {
 
 #if (H5_VERS_RELEASE < 4)
-	   status = _H5_mth.t.get_dims(htyp, hdims); 
+	   status = H5Tget_array_dims(htyp, hdims); 
 #else
-	   status = _H5_mth.t.get_dims(htyp, hdims, NULL);
+	   status = H5Tget_array_dims(htyp, hdims, NULL);
 #endif
 
-	   if (_H5_mth.t.get_class(nativetype_id) == H5T_STRING)
-	      hdims[nd-1] = _H5_mth.t.get_size(nativetype_id);};
+	   if (H5Tget_class(nativetype_id) == H5T_STRING)
+	      hdims[nd-1] = H5Tget_size(nativetype_id);};
 
-        _H5_mth.t.close(nativetype_id);}
+        H5Tclose(nativetype_id);}
 
     else if (tcid == H5T_STRING)
        {nd = 1;
@@ -1153,10 +931,10 @@ static dimdes *_H5_dec_dims(PDBfile *file, hid_t htyp, hid_t hdim)
 
         hdims = (hsize_t*) calloc(nd, sizeof(hsize_t));
 	if (hdims != NULL)
-	   hdims[0] = _H5_mth.t.get_size(htyp);}
+	   hdims[0] = H5Tget_size(htyp);}
 
     else 
-       {scid = _H5_mth.s.get_extent_type(hdim);
+       {scid = H5Sget_simple_extent_type(hdim);
 
 /* either we have a scalar space or an array (simple) space */
        switch(scid)
@@ -1172,7 +950,7 @@ static dimdes *_H5_dec_dims(PDBfile *file, hid_t htyp, hid_t hdim)
 	   case H5S_SIMPLE :
 
 /* obtain the rank of this simple data space */
-		nd = _H5_mth.s.get_ndims(hdim);
+		nd = H5Sget_simple_extent_ndims(hdim);
    
 		if (nd < 0) 
 		   {fprintf(stderr, "_H5_dec_dims: error obtaining rank\n");
@@ -1182,7 +960,7 @@ static dimdes *_H5_dec_dims(PDBfile *file, hid_t htyp, hid_t hdim)
 
 /* get the sizes of each dimension */ 
 		hdims  = (hsize_t *) calloc(nd, sizeof(hsize_t)); 
-		status = _H5_mth.s.get_dims(hdim, hdims, NULL);
+		status = H5Sget_simple_extent_dims(hdim, hdims, NULL);
 
 		if (status < 0)
 		   {fprintf(stderr, "_H5_dec_dims: error obtaining dims\n");
@@ -1243,7 +1021,7 @@ static char *_H5_dec_compound(PDBfile *file, hid_t htyp)
     hdf_state *hst;
 
     hst = file->meta;
-    tcl = _H5_mth.t.get_class(htyp);
+    tcl = H5Tget_class(htyp);
   
     if (tcl != H5T_COMPOUND)
        return(NULL);
@@ -1258,7 +1036,7 @@ static char *_H5_dec_compound(PDBfile *file, hid_t htyp)
         members = CMAKE(memdes);
    
 /* how many members are there? */ 
-        nm = _H5_mth.t.get_nmembers(htyp);
+        nm = H5Tget_nmembers(htyp);
     
         if (nm <0)
            {fprintf(stderr, "_H5_DEC_COMPOUND: error retrieving num members\n");
@@ -1277,7 +1055,7 @@ static char *_H5_dec_compound(PDBfile *file, hid_t htyp)
 	for (i = 0; (i < nm) && (mnxt != NULL); i++) 
 
 /* grab the member's name */
-            {mname = _H5_mth.t.get_member_name(htyp, i);
+            {mname = H5Tget_member_name(htyp, i);
     
              if (mname == NULL)
                 {fprintf(stderr, "_H5_DEC_COMPOUND: error retrieving member name\n");
@@ -1286,7 +1064,7 @@ static char *_H5_dec_compound(PDBfile *file, hid_t htyp)
              DEBUG1("      memb name %s\n", mname);
     
 /* grab the member's offset */
-             moffs = (off_t) _H5_mth.t.get_member_offset(htyp, i); 
+             moffs = (off_t) H5Tget_member_offset(htyp, i); 
              if (moffs < 0)
                 {fprintf(stderr, "_H5_DEC_COMPOUND: error retrieving member offset\n");
                  return(NULL);};
@@ -1294,7 +1072,7 @@ static char *_H5_dec_compound(PDBfile *file, hid_t htyp)
              DEBUG1("      offset 0x%lx\n", moffs);
     
 /* grab the type of the internal member */
-             mtyp = _H5_mth.t.get_member_type(htyp, i);
+             mtyp = H5Tget_member_type(htyp, i);
     
              if (mtyp < 0)
                 {fprintf(stderr, "_H5_DEC_COMPOUND: error retrieving member type\n");
@@ -1339,7 +1117,7 @@ static char *_H5_dec_compound(PDBfile *file, hid_t htyp)
                 mnxt = NULL;
 
              free(mname);
-             _H5_mth.t.close(mtyp);
+             H5Tclose(mtyp);
              CFREE(type);};
 
 #if 0
@@ -1348,7 +1126,7 @@ static char *_H5_dec_compound(PDBfile *file, hid_t htyp)
         dp = CMAKE(defstr);
         dp->type        = CSTRSAVE(typ);
         dp->size_bits   = dp->size * 8; 
-        dp->size        = _H5_mth.t.get_size(htyp);
+        dp->size        = H5Tget_size(htyp);
 /* GOTCHA: we have no alignment info from the file; so we guess */
         dp->alignment   = 4;
         dp->n_indirects = 0;
@@ -1367,11 +1145,11 @@ static char *_H5_dec_compound(PDBfile *file, hid_t htyp)
 #if 0
         dp = _PD_mk_defstr(NULL, typ,
 				     members, NULL,
-				     _H5_mth.t.get_size(htyp), 0, -1, FALSE, 
+				     H5Tget_size(htyp), 0, -1, FALSE, 
 				     NULL, NULL, FALSE, FALSE);
 
         DEBUG1("      type name %s\n", typ);
-        DEBUG1("      size %ld\n", (long) _H5_mth.t.get_size(htyp));
+        DEBUG1("      size %ld\n", (long) H5Tget_size(htyp));
         DEBUG1("      alignment %d\n", 4);
 
         _PD_d_install(hst->pf, typ, dp, PD_CHART_HOST);
@@ -1410,17 +1188,17 @@ int _H5_read_data(hid_t fid, const char *fullpath, hid_t htyp, void *vr)
 
     rv = TRUE;
 
-    did = _H5_mth.d.open2(fid, fullpath, H5P_DEFAULT);
+    did = H5Dopen2(fid, fullpath, H5P_DEFAULT);
     if (did < 0)
        rv = FALSE;
 
     else
-       {st = _H5_mth.d.read(did, htyp, H5S_ALL, H5S_ALL, H5P_DEFAULT, vr);
+       {st = H5Dread(did, htyp, H5S_ALL, H5S_ALL, H5P_DEFAULT, vr);
 	if (st < 0)
-	   {_H5_mth.d.close(did);
+	   {H5Dclose(did);
 	    rv = FALSE;}
 
-	else if (_H5_mth.d.close(did))
+	else if (H5Dclose(did))
 	   rv = FALSE;};
 
     return(rv);}
@@ -1456,7 +1234,7 @@ static herr_t H5_read_group_node(hid_t hgr, const char *mname, void *a)
     DEBUG1("ENTERING read group node for: %s\n", mname);
 
 /* get the stats on this object */
-    status = _H5_mth.g.get_objinfo(hgr, mname, FALSE, &statbuf);
+    status = H5Gget_objinfo(hgr, mname, FALSE, &statbuf);
 
 /* ignore directory entries for "." and ".." */
     if ((strcmp(mname, "..") == 0) || (strcmp(mname, ".") == 0)) 
@@ -1499,7 +1277,7 @@ static herr_t H5_read_group_node(hid_t hgr, const char *mname, void *a)
 	     DEBUG1(" with type %s\n", "Directory");   
 
 /* recurse */
-	     status = _H5_mth.g.iterate(hgr, mname, NULL,
+	     status = H5Giterate(hgr, mname, NULL,
 				 &H5_read_group_node, a);
 
 /* return the group prefix to what it was before */
@@ -1515,9 +1293,9 @@ static herr_t H5_read_group_node(hid_t hgr, const char *mname, void *a)
 #else
 	     hds = H5Dopen(hgr, mname);
 #endif
-	     hdim = _H5_mth.d.get_space(hds);
-	     htyp = _H5_mth.d.get_type(hds);    
-	     addr = _H5_mth.d.get_offset(hds);
+	     hdim = H5Dget_space(hds);
+	     htyp = H5Dget_type(hds);    
+	     addr = H5Dget_offset(hds);
              if (addr < 0)
 	        {printf("   Group member %s had no address\n", mname);
 		 return(-1);};
@@ -1565,9 +1343,9 @@ static herr_t H5_read_group_node(hid_t hgr, const char *mname, void *a)
 	     DEBUG1(" with type %s\n", typ);   
 
 /* free up some space */
-	     _H5_mth.t.close(htyp);
-	     _H5_mth.s.close(hdim);
-	     _H5_mth.d.close(hds);
+	     H5Tclose(htyp);
+	     H5Sclose(hdim);
+	     H5Dclose(hds);
 	     CFREE(fullname);
 	     CFREE(typ);
 	     break;
@@ -1665,14 +1443,14 @@ static PDBfile *_H5_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
 
 /* turn off the un-intelligent H5E print subsystem */
 #if (H5_VERS_RELEASE < 4)
-    _H5_mth.e.set_auto(H5E_DEFAULT, NULL, stderr);
+    H5Eset_auto(H5E_DEFAULT, NULL, stderr);
 #else
-    _H5_mth.e.set_auto(H5E_DEFAULT, NULL);
+    H5Eset_auto(H5E_DEFAULT, NULL);
 #endif
 
 /* make sure it really is an HDF5 file */
     mode = H5F_ACC_TRUNC;
-    hst->hf = _H5_mth.f.create(pname, mode, H5P_DEFAULT, H5P_DEFAULT);
+    hst->hf = H5Fcreate(pname, mode, H5P_DEFAULT, H5P_DEFAULT);
 
 /* return if this is not a valid HDF5 file */
     if (hst->hf < 0)
@@ -1725,9 +1503,9 @@ static PDBfile *_H5_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
 
 /*
  * stuff goes here
-    hdf_root_group = _H5_mth.g.open(hst->hf, "/", H5P_DEFAULT);
-    status = _H5_mth.g.iterate(hst->hf, "/", NULL, &H5_read_group_node, file);
-    _H5_mth.g.close(hdf_root_group);
+    hdf_root_group = H5Gopen(hst->hf, "/", H5P_DEFAULT);
+    status = H5Giterate(hst->hf, "/", NULL, &H5_read_group_node, file);
+    H5Gclose(hdf_root_group);
 */
 
 /* if we were unsuccessful, alert the user */
@@ -1773,13 +1551,13 @@ static PDBfile *_H5_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 
 /* turn off the un-intelligent H5E print subsystem */
 #if (H5_VERS_RELEASE < 4)
-    _H5_mth.e.set_auto(H5E_DEFAULT, NULL, stderr);
+    H5Eset_auto(H5E_DEFAULT, NULL, stderr);
 #else
-    _H5_mth.e.set_auto(H5E_DEFAULT, NULL);
+    H5Eset_auto(H5E_DEFAULT, NULL);
 #endif
 
 /* make sure it really is an HDF5 file */
-    hst->hf = _H5_mth.f.open(name, H5F_ACC_RDONLY, H5P_DEFAULT);
+    hst->hf = H5Fopen(name, H5F_ACC_RDONLY, H5P_DEFAULT);
 
 /* return if this is not a valid HDF5 file */
     if (hst->hf < 0)
@@ -1839,12 +1617,12 @@ static PDBfile *_H5_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
  * insert entries in the symbol table as we encounter the objects
  */
 #if (H5_VERS_RELEASE < 4)
-    hdf_root_group = _H5_mth.g.open(hst->hf, "/", H5P_DEFAULT);
+    hdf_root_group = H5Gopen(hst->hf, "/", H5P_DEFAULT);
 #else
-    hdf_root_group = _H5_mth.g.open(hst->hf, "/");
+    hdf_root_group = H5Gopen(hst->hf, "/");
 #endif
-    status = _H5_mth.g.iterate(hst->hf, "/", NULL, &H5_read_group_node, file);
-    _H5_mth.g.close(hdf_root_group);
+    status = H5Giterate(hst->hf, "/", NULL, &H5_read_group_node, file);
+    H5Gclose(hdf_root_group);
 
 /* if we were unsuccessful, alert the user */
     if (status < 0) 
