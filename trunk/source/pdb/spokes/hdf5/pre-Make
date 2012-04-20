@@ -32,6 +32,7 @@ CleanFiles = *~ core #*#
 # Headers Files
 #
 Hdrs = trhdf5.h ../../pdb_int.h
+APIs = hdf5.api
 
 #
 # Object Files
@@ -40,7 +41,7 @@ Objs = trhdf5.o
 
 ArObjs = ${TGTLib}(trhdf5.o)
 
-${Objs} : ${Hdrs}
-${LibDep} : ${Hdrs}
+${Objs} : ${Hdrs} ${APIs}
+${LibDep} : ${Hdrs} ${APIs}
 
 spoke : ${TGTLib} ${LibDep}

@@ -58,76 +58,7 @@ struct s_indbt
     char nfr;            /* number of fragmented free bytes */
     int ipg;};           /* number of rightmost child page */
 
-
-typedef struct s_sqlite3_methods sqlite3_methods;
-
-struct s_sqlite3_methods
-   {int (*close)(sqlite3 *db);                            /* sqlite3_close */
-    void (*free_table)(char **res);                  /* sqlite3_free_table */
-    int (*exec)(sqlite3 *db, const char *sql,              /* sqlite3_exec */
-		int (*callback)(void *, int, char **, char **),
-		void *a, char **err);
-
-    int (*get_table)(sqlite3 *db, const char *sql,    /* sqlite3_get_table */
-		     char ***res, int *nr, int *nc, char **err);
-
-    int (*open_v2)(const char *fname, sqlite3 **db,     /* sqlite3_open_v2 */
-		   int flags, const char *vfs);
-    int (*open)(const char *fname, sqlite3 **db);};        /* sqlite3_open */
-
-static sqlite3_methods
- _S3_mth;
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-#define DYNAMICALLY_LINKED
-
-/* _SQLITE_SET_METHODS - setup the methods for SQLITE access */
-
-void _SQLITE_set_methods(void)
-   {
-
-    if (_S3_mth.open == NULL)
-
-#ifdef DYNAMICALLY_LINKED
-
-/* dynamically linked way */
-       {int rv;
-
-	rv = SC_so_register_func(OBJ_SO, "libsqlite3.so", "sqlite3",
-				 NULL, NULL, NULL, NULL);
-	if (rv == FALSE)
-	   PD_error("CANNOT LOAD 'libsqlite3.so'", PD_OPEN);
-
-# ifdef HAVE_SQLITE_V2
-	_S3_mth.open_v2    = SC_so_get(OBJ_SO, "sqlite3", "sqlite3_open_v2");
-# endif
-
-	_S3_mth.open       = SC_so_get(OBJ_SO, "sqlite3", "sqlite3_open");
-	_S3_mth.close      = SC_so_get(OBJ_SO, "sqlite3", "sqlite3_close");
-	_S3_mth.get_table  = SC_so_get(OBJ_SO, "sqlite3", "sqlite3_get_table");
-	_S3_mth.free_table = SC_so_get(OBJ_SO, "sqlite3", "sqlite3_free_table");
-	_S3_mth.exec       = SC_so_get(OBJ_SO, "sqlite3", "sqlite3_exec");};
-
-#else
-
-/* statically linked way */
-       {
-
-# ifdef HAVE_SQLITE_V2
-	_S3_mth.open_v2    = sqlite3_open_v2;
-# endif
-
-	_S3_mth.open       = sqlite3_open;
-	_S3_mth.close      = sqlite3_close;
-	_S3_mth.get_table  = sqlite3_get_table;
-	_S3_mth.free_table = sqlite3_free_table;
-	_S3_mth.exec       = sqlite3_exec;};
-
-#endif
-
-    return;}
+#include "sqlite.api"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -153,7 +84,7 @@ static int _SQLITE_db_close(FILE *fp)
     sys  = (sql_file *) fp;
     conn = (sqlite3 *) sys->conn;
 
-    _S3_mth.close(conn);
+    sqlite3_close(conn);
 
     return(0);}
 
@@ -211,7 +142,7 @@ int _SQLITE_oper(FILE *fp, char *sql)
 
     conn = GET_CONNECTION(fp);
 
-    ok = _S3_mth.exec(conn, sql, NULL, NULL, &err);
+    ok = sqlite3_exec(conn, sql, NULL, NULL, &err);
     if (ok != SQLITE_OK)
        {rv = FALSE;
 	_SQLITE_error(ok, err);}
@@ -235,7 +166,7 @@ sql_table *_SQLITE_query(FILE *fp, char *sql, char *delim, int add)
     tab  = NULL;
     conn = GET_CONNECTION(fp);
 
-    ok = _S3_mth.get_table(conn, sql, &res, &nr, &nf, &err);
+    ok = sqlite3_get_table(conn, sql, &res, &nr, &nf, &err);
     if (ok != SQLITE_OK)
        _SQLITE_error(ok, err);
 
@@ -248,7 +179,7 @@ sql_table *_SQLITE_query(FILE *fp, char *sql, char *delim, int add)
 	for (ir = 0; ir < nr; ir++)
 	    _SQLITE_gather_row(arr, res, nf, ir);
 
-	_S3_mth.free_table(res);
+	sqlite3_free_table(res);
 
 	SC_array_string_add(arr, NULL);
 
@@ -391,9 +322,9 @@ FILE *_SQLITE_open(PDBfile *file, char *name, char *mode)
 
      sm |= SQLITE_OPEN_NOMUTEX;
 
-     ok = _S3_mth.open_v2(pu->path, &conn, sm, NULL);};
+     ok = sqlite3_open_v2(pu->path, &conn, sm, NULL);};
 #else
-    ok = _S3_mth.open(pu->path, &conn);
+    ok = sqlite3_open(pu->path, &conn);
 #endif
 
     if ((ok != SQLITE_OK) || (conn == NULL))
