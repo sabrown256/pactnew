@@ -1,0 +1,55 @@
+#
+# HDF5.DEF - hdf5 API definition for use by PACT
+#
+# #include "cpyright.h"
+#
+
+package hdf5
+header  hdf5.h
+so      libhdf5.so
+arc     libhdf5.a
+
+functions {
+    H5Dclose
+    H5Dcreate2
+    H5Dget_offset
+    H5Dget_space
+    H5Dget_type
+    H5Dopen
+    H5Dopen2
+    H5Dread
+    H5Dwrite
+    H5Eset_auto
+    H5Fcreate
+    H5Fopen
+    H5Gclose
+    H5Gget_objinfo
+    H5Giterate
+    H5Gopen
+    H5Sclose
+    H5Screate_simple
+    H5Sget_simple_extent_dims
+    H5Sget_simple_extent_ndims
+    H5Sget_simple_extent_type
+    H5Tclose
+    H5Tcopy
+    H5Tcreate
+    H5Tget_array_dims
+    H5Tget_array_ndims
+    H5Tget_class
+    H5Tget_ebias
+    H5Tget_fields
+    H5Tget_member_name
+    H5Tget_member_offset
+    H5Tget_member_type
+    H5Tget_native_type
+    H5Tget_nmembers
+    H5Tget_order
+    H5Tget_precision
+    H5Tget_sign
+    H5Tget_size
+    H5Tget_super
+    H5Tinsert
+}
+
+

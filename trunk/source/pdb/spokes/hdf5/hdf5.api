@@ -239,7 +239,7 @@ void _H5_set_methods(void)
 #define  H5Dget_offset               _H5_mth.d.get_offset
 #define  H5Dget_space                _H5_mth.d.get_space
 #define  H5Dget_type                 _H5_mth.d.get_type
-#define  H5Dope                      _H5_mth.d.open
+#define  H5Dopen                     _H5_mth.d.open
 #define  H5Dopen2                    _H5_mth.d.open2
 #define  H5Dread                     _H5_mth.d.read
 #define  H5Dwrite                    _H5_mth.d.write

@@ -1,0 +1,258 @@
+#!/bin/csh -f
+#
+# IMPORT-API - generate an API binding for a foreign package
+#            - to be used by PACT and
+#            - linked statically or dynamically as requested
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+set pact   = `which pact`
+set bindir = $pact:h
+set lbase  = $bindir:h
+source $lbase/include/env-csh
+
+@ err = 0
+
+set def    = ""
+set incdir = ( . /usr/include )
+set libdir = ( . /lib64 /usr/lib64 /lib /usr/lib )
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: import-api [-h] [-I<incdir>] [-L<libdir>] <def>"
+           echo "   h      this help message"
+           echo "   <def>  api definition file"
+           echo ""
+           exit(1)
+      case -I:
+           set incdir = ( $1 $incdir )
+           breaksw
+      case -L:
+           set libdir = ( $1 $libdir )
+           breaksw
+      default:
+           set def = $1
+           breaksw
+   endsw
+   shift
+end
+
+if ("$def" == "") then
+   echo "No API definition file specified - exiting"
+endif
+if (!(-f "$def")) then
+   echo "File '$def' does not exist - exiting"
+endif
+
+set pck = ( `grep -w package $def` )
+set pck = $pck[2]
+
+set so  = ( `grep -w so $def` )
+set so  = $so[2]
+foreach d ($libdir)
+   if (-f $d/$so) then
+      set so = $d/$so
+      echo "Using shared library '$so'"
+      break
+   endif
+end
+
+set arc = ( `grep -w arc $def` )
+set arc = $arc[2]
+foreach d ($libdir)
+   if (-f $d/$arc) then
+      set arc = $d/$arc
+      echo "Using archive '$arc'"
+      break
+   endif
+end
+
+set hdr = ( `grep -w header $def` )
+set hdr = $hdr[2]
+foreach d ($incdir)
+   if (-f $d/$hdr) then
+      set hdr = $d/$hdr
+      echo "Using header '$hdr'"
+      break
+   endif
+end
+
+set file = $cwd/$hdr:t.api
+
+set CPP = ( gcc -std=gnu99 -E )
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# PROCESS_PACKAGE_HEADER - make a clean list of functions, variables, and
+#                        - typedefs defined by the package header
+
+#   elide '{' '}' -                             remove struct bodies
+#   awk '$NF ~ /\\/ { printf("%s ", $0); }      merge lines ending in \
+#        $NF !~ /\\/ { printf("%s\n", $0); }'
+#   sed 's/\\/ /g'                              remove embedded \
+#   grep -v '#   '                              remove # line directives
+#   sed '/^ *$/d'                               remove blank lines
+#   sed 's/  */ /g'                             compress whitespace
+#   tr "\t" " "                                 remove tabs (bad BSD)
+#   awk '$0 ~ /, *$/   { printf("%s", $0) }     combines ending in ,
+#        $0 !~ /, *$/  { printf("%s\n", $0) }'
+#   tr -d '\n'                                  delete newlines
+#   sed 's/;/;\n/g'                             replace ; with ;\n
+#   sed 's/( */(/g'                             remove whitespace following (
+#   sed '/^; *$/d'                              remove lines with only ;
+#   sed 's/^ *//'                               remove leading whitespace
+#
+
+echo "-> $CPP $hdr"
+
+$CPP $hdr                                       | \
+elide '{' '}' -                                 | \
+awk '$NF ~ /\\/ { printf("%s ", $0); }            \
+     $NF !~ /\\/ { printf("%s\n", $0); }'       | \
+sed 's/\\/ /g'                                  | \
+grep -v '#'                                     | \
+sed '/^ *$/d'                                   | \
+sed 's/  */ /g'                                 | \
+tr "\t" " "                                     | \
+awk '$0 ~ /, *$/   { printf("%s", $0) }           \
+     $0 !~ /, *$/  { printf("%s\n", $0) }'      | \
+tr -d '\n'                                      | \
+sed 's/;/;\n/g'                                 | \
+sed 's/( */(/g'                                 | \
+sed '/^; *$/d'                                  | \
+sed 's/^ *//'                                   | \
+cat >&! $file
+
+echo "-> $file"
+ls -l $hdr $file
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+set fncl = ""
+set ok = FALSE
+@ nl = `cat $def | wc -l`
+@ il = 0
+while ($il < $nl)
+   @ il = $il + 1
+   set line = ( `head -n $il $def | tail -n 1` )
+   if ("$line" == "") continue
+   if ("$line" =~ \#*) continue
+   if ("$line" =~ *functions\ \{) then
+      set ok = TRUE
+      continue
+   endif
+   if ("$line" =~ *\}*) then
+      set ok = FALSE
+      continue
+   endif
+   if ($ok == TRUE) then
+      set fncl = ( $fncl $line )
+   endif
+end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+set PCK = `echo $pck | tr "[a-z]" "[A-Z]"`
+
+set api = $pck.api
+rm -f $api
+touch $api
+
+Note $api '/*'
+Note $api " * $PCK.API - define $PCK API for PACT"
+Note $api ' *'
+Note $api ' * #include "cpyright.h"'
+Note $api ' *'
+Note $api ' */'
+Note $api ''
+Note $api "#ifndef ${PCK}_API_PACT"
+Note $api ''
+Note $api "#define ${PCK}_API_PACT"
+Note $api ''
+Note $api "typedef struct s_${pck}_methods ${pck}_methods;"
+Note $api ''
+Note $api "struct s_${pck}_methods"
+Note $api '   {'
+
+foreach f ($fncl)
+   Note $api "    "`grep -w $f $file`
+end
+
+Note $api '   };'
+Note $api ''
+Note $api "static ${pck}_api"
+Note $api " _${pck}_;"
+Note $api ''
+Note $api '/*--------------------------------------------------------------------------*/'
+Note $api '/*--------------------------------------------------------------------------*/'
+Note $api ''
+Note $api '#define DYNAMICALLY_LINKED'
+Note $api ''
+Note $api "/* _SQLITE_SET_API - setup the API for ${PCK} access */"
+Note $api ''
+Note $api 'void _SQLITE_set_api(void)'
+Note $api '   {'
+Note $api ''
+Note $api "    if (_${pck}_.open == NULL)"
+Note $api ''
+Note $api '#ifdef DYNAMICALLY_LINKED'
+Note $api ''
+Note $api '/* dynamically linked way */'
+Note $api '       {int rv;'
+Note $api ''
+Note $api '	rv = SC_so_register_func(OBJ_SO, "'${so}'", "'${pck}'",'
+Note $api '				 NULL, NULL, NULL, NULL);'
+Note $api '	if (rv == FALSE)'
+Note $api '	   PD_error("CANNOT LOAD '${so}'", PD_OPEN);'
+Note $api ''
+
+foreach f ($fncl)
+   Note $api "	_${pck}_.$f \t = SC_so_get(OBJ_SO, "'"'${pck}'", "'$f'");'
+end
+
+Note $api '       }'
+Note $api ''
+Note $api '#else'
+Note $api ''
+Note $api '/* statically linked way */'
+Note $api '       {'
+Note $api ''
+
+foreach f ($fncl)
+   Note $api "	_${pck}_.$f \t = $f;"
+end
+
+Note $api '       };'
+Note $api ''
+Note $api '#endif'
+Note $api ''
+Note $api '    return;}'
+Note $api ''
+Note $api '/*--------------------------------------------------------------------------*/'
+Note $api '/*--------------------------------------------------------------------------*/'
+Note $api ''
+
+foreach f ($fncl)
+   Note $api "#define $f \t _${pck}_.$f"
+end
+
+Note $api ''
+Note $api '#endif'
+Note $api ''
+
+cat $api | sed 's|\\t|\t|g' >&! $api.new
+mv $api.new $api
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($err)
+
