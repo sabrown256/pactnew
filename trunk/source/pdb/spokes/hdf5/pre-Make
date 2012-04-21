@@ -32,7 +32,8 @@ CleanFiles = *~ core #*#
 # Headers Files
 #
 Hdrs = trhdf5.h ../../pdb_int.h
-APIs = hdf5.api
+
+APIs = ${IncDir}/hdf5.api
 
 #
 # Object Files
@@ -40,6 +41,10 @@ APIs = hdf5.api
 Objs = trhdf5.o
 
 ArObjs = ${TGTLib}(trhdf5.o)
+
+${IncDir}/hdf5.api : hdf5.def
+	@echo "import-api hdf5.def -o ${IncDir}/hdf5.api"
+	@import-api hdf5.def ${MDI_Inc} ${LDPath} -o ${IncDir}/hdf5.api
 
 ${Objs} : ${Hdrs} ${APIs}
 ${LibDep} : ${Hdrs} ${APIs}

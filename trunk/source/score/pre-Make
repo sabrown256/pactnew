@@ -102,6 +102,8 @@ Hdrs = scstd.h scunix.h scwin32.h scbgl.h \
        scope_hash.h scope_typeh.h scope_io.h scope_array.h \
        scope_dl.h
 
+APIs = ${IncDir}/bfd.api
+
 #
 # Object Files
 #
@@ -174,6 +176,10 @@ ArObjs = ${ArDObjs} ${ArEObjs} ${ArMObjs} ${ArPObjs} \
          ${TGTLib}(sctrk.o) ${TGTLib}(sclog.o)   \
          ${TGTLib}(scold.o) ${TGTLib}(scf77lr.o)
 
+${IncDir}/bfd.api : bfd.def
+	@echo "import-api bfd.def -o ${IncDir}/bfd.api"
+	@import-api bfd.def ${MDE_Inc} ${LDPath} -o ${IncDir}/bfd.api
+
 scf77lr.o : scf77lr.l sclexan.h
 
 ${ArDObjs} : scope_make.h scope_proc.h
@@ -191,7 +197,7 @@ ${PObjs} : scope_proc.h
 ${TObjs} : scope_thread.h
 ${Objs}  : ${Hdrs} ${hdrf}
 
-${LibDep} : ${hdrf} ${Hdrs}
+${LibDep} : ${hdrf} ${Hdrs} ${APIs}
 ${MMDep}  : ${Hdrs}
 
 #

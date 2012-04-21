@@ -18,7 +18,7 @@ OD = DefaultG
 # Compiler/Loader Options
 #
 UniFlags =
-CcFlags = ${ODC} -I. -I${IncDir} ${MDInc} ${MDI_Inc}
+CcFlags = ${ODC} -I. -I${PACTTmpDir} -I${IncDir} ${MDInc} ${MDI_Inc}
 LdFlags = -L${LibDir}
 
 CCAnnounce = ${CCompiler} ${ODC} ${CShared} ${CFLAGS}
@@ -33,7 +33,7 @@ CleanFiles = *~ core #*#
 #
 Hdrs = trsql.h ../../pdb_int.h
 
-APIs = sqlite.api mysql.api
+APIs = ${IncDir}/sqlite3.api ${IncDir}/mysql.api
 
 #
 # Object Files
@@ -43,6 +43,14 @@ Objs = trsql.o trsqlg.o trsqlite.o trmysql.o
 ArObjs = ${TGTLib}(trsql.o) ${TGTLib}(trsqlg.o) \
          ${TGTLib}(trsqlite.o) ${TGTLib}(trmysql.o)
        
+${IncDir}/sqlite3.api : sqlite3.def
+	@echo "import-api sqlite3.def -o ${IncDir}/sqlite3.api"
+	@import-api sqlite3.def ${MDI_Inc} ${LDPath} -o ${IncDir}/sqlite3.api
+
+${IncDir}/mysql.api : mysql.def
+	@echo "import-api mysql.def -o ${IncDir}/mysql.api"
+	@import-api mysql.def ${MDI_Inc} ${LDPath} -o ${IncDir}/mysql.api
+
 ${Objs} : ${Hdrs} ${APIs}
 ${LibDep} : ${Hdrs} ${APIs}
 

@@ -12,6 +12,7 @@
 #include "cpyright.h"
 
 #include "score_int.h"
+#include "scope_dl.h"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -57,6 +58,10 @@ void _SC_copy_storloc(SC_storloc *d, SC_storloc *s)
 /*--------------------------------------------------------------------------*/
 
 #include <bfd.h>
+
+#if 0
+#include "bfd.api"
+#endif
 
 /* NOTE: Ubuntu 10.4 has version 2.20,
  * Ubuntu 10.10 has version 2.20.51, and
@@ -541,6 +546,10 @@ static void _SC_exe_close(exedes *st)
 
 void SC_exe_init_api(void)
    {
+
+#if 0
+    _BFD_set_api();
+#endif
 
     _SC.exe.open      = _SC_exe_open;
     _SC.exe.close     = _SC_exe_close;

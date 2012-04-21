@@ -1,7 +1,7 @@
 #
 # MYSQL.DEF - mysql API definition for use by PACT
 #
-# #include "cpyright.h"
+# include "cpyright.h"
 #
 
 package mysql

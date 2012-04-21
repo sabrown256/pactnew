@@ -1,0 +1,32 @@
+#
+# BFD.DEF - bfd API definition for use by PACT
+#
+# #include "cpyright.h"
+#
+
+package bfd
+header  bfd.h
+so      libbfd.so
+arc     libbfd.a
+
+functions {
+   bfd_check_format
+   bfd_check_format_matches
+   bfd_close
+   bfd_demangle
+   bfd_get_error
+   bfd_get_file_flags
+   bfd_get_section_by_name
+   bfd_get_section_flags
+   bfd_get_section_size
+   bfd_get_section_vma
+   bfd_find_nearest_line
+   bfd_find_inliner_info
+   bfd_init
+   bfd_map_over_sections
+   bfd_read_minisymbols
+   bfd_openr
+   bfd_scan_vma
+}
+
+

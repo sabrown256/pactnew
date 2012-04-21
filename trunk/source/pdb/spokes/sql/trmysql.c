@@ -267,7 +267,7 @@ FILE *_MYSQL_open(PDBfile *file, char *name, char *mode)
     MYSQL *conn;
     sql_file *fs;
 
-    _MYSQL_set_methods();
+    _MYSQL_set_api();
 
     fp = NULL;
     pu = file->udl;

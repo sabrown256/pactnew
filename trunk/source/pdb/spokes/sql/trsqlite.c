@@ -58,7 +58,7 @@ struct s_indbt
     char nfr;            /* number of fragmented free bytes */
     int ipg;};           /* number of rightmost child page */
 
-#include "sqlite.api"
+#include "sqlite3.api"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -290,7 +290,7 @@ FILE *_SQLITE_open(PDBfile *file, char *name, char *mode)
     sqlite3 *conn;
     sql_file *fs;
 
-    _SQLITE_set_methods();
+    _SQLITE3_set_api();
 
     fp = NULL;
     pu = file->udl;
