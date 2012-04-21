@@ -1,7 +1,7 @@
 #
-# SQLITE.DEF - sqlite3 API definition for use by PACT
+# SQLITE3.DEF - sqlite3 API definition for use by PACT
 #
-# #include "cpyright.h"
+# include "cpyright.h"
 #
 
 package sqlite3

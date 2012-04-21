@@ -17,6 +17,7 @@ source $lbase/include/env-csh
 @ err = 0
 
 set def    = ""
+set api    = ""
 set incdir = ( . /usr/include )
 set libdir = ( . /lib64 /usr/lib64 /lib /usr/lib )
 
@@ -24,16 +25,27 @@ while ($#argv > 0)
    switch ($1)
       case -h:
            echo ""
-           echo "Usage: import-api [-h] [-I<incdir>] [-L<libdir>] <def>"
+           echo "Usage: import-api [-h] [-I<incdir>]* [-L<libdir>]* [-o <api>] <def>"
            echo "   h      this help message"
+           echo "   I      add <incdir> to include directory list"
+           echo "   L      add <libdir> to lib directory list"
+           echo "   o      name of generated API file"
            echo "   <def>  api definition file"
            echo ""
            exit(1)
-      case -I:
-           set incdir = ( $1 $incdir )
+      case -I*:
+           set t = ( `echo $1 | sed 's|-I||g' | sed 's|:| |g'` )
+           set incdir = ( $t $incdir )
+           unset t
            breaksw
-      case -L:
-           set libdir = ( $1 $libdir )
+      case -L*:
+           set t = ( `echo $1 | sed 's|-L||g' | sed 's|:| |g'` )
+           set libdir = ( $t $libdir )
+           unset t
+           breaksw
+      case -o:
+           shift
+           set api = $1
            breaksw
       default:
            set def = $1
@@ -51,38 +63,60 @@ endif
 
 set pck = ( `grep -w package $def` )
 set pck = $pck[2]
+set PCK = `echo $pck | tr "[a-z]" "[A-Z]"`
 
-set so  = ( `grep -w so $def` )
-set so  = $so[2]
+set so = ( `grep -w so $def` )
+set so = $so[2]
+set ok = FALSE
 foreach d ($libdir)
    if (-f $d/$so) then
       set so = $d/$so
-      echo "Using shared library '$so'"
+      set ok = TRUE
+      echo "   Using shared library '$so'"
       break
    endif
 end
+if ($ok == FALSE) then
+   echo "   Warning: '$so' not found in '$libdir'"
+endif
 
 set arc = ( `grep -w arc $def` )
 set arc = $arc[2]
+set ok  = FALSE
 foreach d ($libdir)
    if (-f $d/$arc) then
       set arc = $d/$arc
-      echo "Using archive '$arc'"
+      set ok  = TRUE
+      echo "   Using archive '$arc'"
       break
    endif
 end
+if ($ok == FALSE) then
+   echo "   Warning: '$arc' not found in '$libdir'"
+endif
 
 set hdr = ( `grep -w header $def` )
 set hdr = $hdr[2]
+set ok  = FALSE
 foreach d ($incdir)
    if (-f $d/$hdr) then
       set hdr = $d/$hdr
-      echo "Using header '$hdr'"
+      set ok  = TRUE
       break
    endif
 end
+if ($ok == FALSE) then
+   echo "   Error: '$hdr' not found in '$incdir'"
+   exit(0)
+endif
 
 set file = $cwd/$hdr:t.api
+if ("$api" == "") then
+   set api = $pck.api
+endif
+echo "   Generating '$api' from '$hdr'"
+rm -f $api
+touch $api
 
 set CPP = ( gcc -std=gnu99 -E )
 
@@ -109,8 +143,6 @@ set CPP = ( gcc -std=gnu99 -E )
 #   sed 's/^ *//'                               remove leading whitespace
 #
 
-echo "-> $CPP $hdr"
-
 $CPP $hdr                                       | \
 elide '{' '}' -                                 | \
 awk '$NF ~ /\\/ { printf("%s ", $0); }            \
@@ -128,9 +160,6 @@ sed 's/( */(/g'                                 | \
 sed '/^; *$/d'                                  | \
 sed 's/^ *//'                                   | \
 cat >&! $file
-
-echo "-> $file"
-ls -l $hdr $file
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -160,12 +189,6 @@ end
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-set PCK = `echo $pck | tr "[a-z]" "[A-Z]"`
-
-set api = $pck.api
-rm -f $api
-touch $api
-
 Note $api '/*'
 Note $api " * $PCK.API - define $PCK API for PACT"
 Note $api ' *'
@@ -177,14 +200,18 @@ Note $api "#ifndef ${PCK}_API_PACT"
 Note $api ''
 Note $api "#define ${PCK}_API_PACT"
 Note $api ''
-Note $api "typedef struct s_${pck}_methods ${pck}_methods;"
+Note $api "typedef struct s_${pck}_api ${pck}_api;"
 Note $api ''
-Note $api "struct s_${pck}_methods"
+Note $api "struct s_${pck}_api"
 Note $api '   {'
 
+set noglob
 foreach f ($fncl)
-   Note $api "    "`grep -w $f $file`
+   set m = '(*f'$f')'
+   set t = ( `grep -w $f $file | sed "s|$f|$m|"` )
+   Note $api "    $t"
 end
+unset noglob
 
 Note $api '   };'
 Note $api ''
@@ -196,12 +223,15 @@ Note $api '/*-------------------------------------------------------------------
 Note $api ''
 Note $api '#define DYNAMICALLY_LINKED'
 Note $api ''
-Note $api "/* _SQLITE_SET_API - setup the API for ${PCK} access */"
+Note $api "/* _${PCK}_SET_API - setup the API for ${PCK} access */"
 Note $api ''
-Note $api 'void _SQLITE_set_api(void)'
+Note $api "void _${PCK}_set_api(void)"
 Note $api '   {'
 Note $api ''
-Note $api "    if (_${pck}_.open == NULL)"
+
+set m = f$fncl[1]
+Note $api "    if (_${pck}_.$m == NULL)"
+
 Note $api ''
 Note $api '#ifdef DYNAMICALLY_LINKED'
 Note $api ''
@@ -211,11 +241,12 @@ Note $api ''
 Note $api '	rv = SC_so_register_func(OBJ_SO, "'${so}'", "'${pck}'",'
 Note $api '				 NULL, NULL, NULL, NULL);'
 Note $api '	if (rv == FALSE)'
-Note $api '	   PD_error("CANNOT LOAD '${so}'", PD_OPEN);'
+Note $api '	   SC_error(-1, "CANNOT LOAD '${so}'");'
 Note $api ''
 
 foreach f ($fncl)
-   Note $api "	_${pck}_.$f \t = SC_so_get(OBJ_SO, "'"'${pck}'", "'$f'");'
+   set m = f$f
+   Note $api "	_${pck}_.$m \t = SC_so_get(OBJ_SO, "'"'${pck}'", "'$f'");'
 end
 
 Note $api '       }'
@@ -227,7 +258,8 @@ Note $api '       {'
 Note $api ''
 
 foreach f ($fncl)
-   Note $api "	_${pck}_.$f \t = $f;"
+   set m = f$f
+   Note $api "	_${pck}_.$m \t = $f;"
 end
 
 Note $api '       };'
@@ -241,7 +273,8 @@ Note $api '/*-------------------------------------------------------------------
 Note $api ''
 
 foreach f ($fncl)
-   Note $api "#define $f \t _${pck}_.$f"
+   set m = f$f
+   Note $api "#define $f \t _${pck}_.$m"
 end
 
 Note $api ''
@@ -250,6 +283,8 @@ Note $api ''
 
 cat $api | sed 's|\\t|\t|g' >&! $api.new
 mv $api.new $api
+
+rm -rf $file
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
