@@ -1,0 +1,25 @@
+#
+# MYSQL.DEF - mysql API definition for use by PACT
+#
+# #include "cpyright.h"
+#
+
+package mysql
+header  mysql.h
+so      libmysql.so
+arc     libmysql.a
+
+functions {
+    mysql_init
+    mysql_real_connect
+    mysql_close
+    mysql_query
+    mysql_store_result
+    mysql_num_rows
+    mysql_num_fields
+    mysql_fetch_row
+    mysql_free_result
+    mysql_error
+}
+
+

@@ -1,0 +1,20 @@
+#
+# SQLITE.DEF - sqlite3 API definition for use by PACT
+#
+# #include "cpyright.h"
+#
+
+package sqlite3
+header  sqlite3.h
+so      libsqlite3.so
+arc     libsqlite3.a
+
+functions {
+   sqlite3_open
+   sqlite3_close
+   sqlite3_get_table
+   sqlite3_free_table
+   sqlite3_exec
+}
+
+
