@@ -217,7 +217,7 @@ Separator $Log
        dbget $lvr
        set res = ( `printenv $lvr` )
        if ("$res" != "") then
-          Note $STDOUT "#define $lvr $res"
+          Note $STDOUT "#define $lvr "'"'$res'"'
        endif
     end
     unset lso
