@@ -24,6 +24,9 @@ SafeEnv SQL_RPath  /usr/lib
 SafeEnv SQL_Path   /usr
 SafeEnv HAVE_SQL   FALSE
 
+dbini MYSQL_SO    ""
+dbini SQLITE3_SO  ""
+
 # if we have explicitly said we do not want SQL
 # do NOT detect it
 if ("$SQL_Path" == none) then
@@ -90,6 +93,9 @@ EOF
       set spkl = ( $spkl mysql )
 
       setenv HAVE_MYSQL  TRUE
+      if ($?lSO == 1) then
+         setenv MYSQL_SO    $lSO
+      endif
    else
       setenv HAVE_MYSQL  ""
    endif
@@ -146,6 +152,9 @@ EOF
       set spkl = ( $spkl sqlite )
 
       setenv HAVE_SQLITE TRUE
+      if ($?lSO == 1) then
+         setenv SQLITE3_SO    $lSO
+      endif
    else
       setenv HAVE_SQLITE ""
    endif
@@ -199,6 +208,9 @@ EOF
 
       setenv HAVE_SQLITE_V2 TRUE
       setenv HAVE_SQLITE    TRUE
+      if ($?lSO == 1) then
+         setenv SQLITE3_SO    $lSO
+      endif
    else
       setenv HAVE_SQLITE_V2 ""
    endif
@@ -243,6 +255,9 @@ EOF
    SetParent HAVE_MYSQL
    SetParent HAVE_SQLITE
    SetParent HAVE_SQLITE_V2
+
+   dbexp MYSQL_SO
+   dbexp SQLITE3_SO
 
 endif
 
