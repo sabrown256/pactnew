@@ -24,6 +24,8 @@ SafeEnv HDF_RPath  /usr/lib
 SafeEnv HDF_Path   /usr
 SafeEnv Z_Lib      "-lz"
 
+dbini HDF5_SO    ""
+
 # if we have explicitly said we do not want HDF5
 # do NOT detect it
 if ("$HDF_Path" == none) then
@@ -83,6 +85,9 @@ EOF
       flog $ALog setenv MDI_Lib       "$PckLib $MDI_Lib"
       flog $ALog setenv MDI_Pck       "HDF $MDI_Pck"
       flog $ALog setenv HAVE_HDF5     TRUE
+      if ($?lSO == 1) then
+         setenv HDF5_SO    $lSO
+      endif
    else
       NoteD $ALog "      no compatible HDF5 version"
       flog $ALog setenv HAVE_HDF5 ""
@@ -106,6 +111,8 @@ EOF
    SetParent HDF_Lib
    SetParent HDF_RPath
    SetParent HDF_Path
+
+   dbexp HDF5_SO
 
 endif
 

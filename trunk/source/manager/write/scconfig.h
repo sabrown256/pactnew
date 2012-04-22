@@ -58,6 +58,10 @@ dbget OSType
 dbget Sys
 dbget TRACKERExe
 
+dbget MYSQL_SO
+dbget SQLITE3_SO
+dbget HDF5_SO
+
 Separator $Log
 
 #--------------------------------------------------------------------------
@@ -142,6 +146,7 @@ Separator $Log
 
     Note $STDOUT ""
 
+# emit the HAVE/USE flags
     set lhave = ""
     set lhave = ( $lhave HaveFLOAT16         HAVE_ANSI_FLOAT16 )
     set lhave = ( $lhave HaveCOMPLEX         HAVE_ANSI_C9X_COMPLEX )
@@ -197,8 +202,28 @@ Separator $Log
           Note $STDOUT "#define $lvl"
        endif
     end
+    unset lhave
     Note $STDOUT ""
 
+# emit the SO flags
+    set lso = ""
+    set lso = ( $lso HDF5_SO )
+    set lso = ( $lso SQLITE3_SO )
+    set lso = ( $lso MYSQL_SO )
+    set lso = ( $lso BFD_SO )
+    while ($#lso > 0)
+       set lvr = $lso[1]
+       shift lso
+       dbget $lvr
+       set res = ( `printenv $lvr` )
+       if ("$res" != "") then
+          Note $STDOUT "#define $lvr $res"
+       endif
+    end
+    unset lso
+    Note $STDOUT ""
+
+# emit non-systematic sets of flags
     if ($HAVE_BFD == TRUE) then
        Note $STDOUT '#define BFD_VERSION "'$BFD_Version'"'
        set inf = ( `echo $BFD_Version | sed 's/\./ /g'` )

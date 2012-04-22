@@ -21,6 +21,7 @@ dbini BFD_Path       /usr/$LIB
 dbini BFD_Version    0.0.0
 dbini HAVE_BFD       FALSE
 dbini HAVE_DEMANGLE  FALSE
+dbini BFD_SO         ""
 
 # if we have explicitly said we do not want BFD
 # do NOT detect it
@@ -111,6 +112,15 @@ EOF
             set ok   = NEED
          endif
       endif
+   endif
+
+# check for static vs dynamic linking
+   set inf = ( `ldd $Tmp |& grep libbfd` )
+   if ($#inf > 2) then
+      set lSO = $inf[3];
+      Note $ALog "Shared library for libbfd: |$lSO|"
+      setenv BFD_SO    $lSO
+      dbexp BFD_SO
    endif
 
    flog $ALog rm -f $Tmp.c $Tmp

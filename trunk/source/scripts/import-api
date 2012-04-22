@@ -221,8 +221,6 @@ Note $api ''
 Note $api '/*--------------------------------------------------------------------------*/'
 Note $api '/*--------------------------------------------------------------------------*/'
 Note $api ''
-Note $api '#define DYNAMICALLY_LINKED'
-Note $api ''
 Note $api "/* _${PCK}_SET_API - setup the API for ${PCK} access */"
 Note $api ''
 Note $api "void _${PCK}_set_api(void)"
@@ -233,7 +231,7 @@ set m = f$fncl[1]
 Note $api "    if (_${pck}_.$m == NULL)"
 
 Note $api ''
-Note $api '#ifdef DYNAMICALLY_LINKED'
+Note $api "#ifdef ${PCK}_SO"
 Note $api ''
 Note $api '/* dynamically linked way */'
 Note $api '       {int rv;'

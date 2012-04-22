@@ -58,6 +58,8 @@ if ("$lFile" != "none") then
    Note $ALog ""
 endif
 
+unset lSO
+
 # now look for the library
 
 Note $ALog "Cfe_CC_Exe   = |$Cfe_CC_Exe|"
@@ -199,6 +201,13 @@ flog $ALog set PckPath = ""
 flog $ALog set PckLib  = ""
 
 GotIt:
+
+# check for static vs dynamic linking
+set inf = ( `ldd $lFile |& grep $lLib` )
+if ($#inf > 2) then
+   set lSO = $inf[3];
+   Note $ALog "Shared library for ${lLib}: |$lSO|"
+endif
 
 if ("$lFile" != "none") then
    flog $ALog $RM $lFile $lFile.c
