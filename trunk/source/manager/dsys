@@ -2204,7 +2204,8 @@ CFG_DONE:
         NoteD $Log "Removing PACT"
 
 # save the files in BinDir
-        set BinFiles = ( smake dmake pact template timer px do-run elide blang )
+        set BinFiles = ( smake dmake pact template timer px )
+        set BinFiles = ( $BinFiles do-run elide blang perdb )
         set BinFiles = ( $BinFiles make-syntax )
         set BinFiles = ( $BinFiles install-pact install-ext )
 

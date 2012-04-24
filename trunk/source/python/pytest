@@ -49,7 +49,7 @@ if ($RUN_TESTS == FALSE) then
 
 # run the tests
 
-else if (-f $LPYTHON/pact/pdb.py) then
+else if (-f $LPYTHON/pact_2/pdb.py) then
 
 # clean up the test dir
    rm -f $Log

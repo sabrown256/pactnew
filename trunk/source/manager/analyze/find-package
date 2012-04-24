@@ -27,11 +27,17 @@ Note $ALog "lLibDirs: ($#lLibDirs) $lLibDirs"
 Note $ALog "lHdrs:    ($#lHdrs) $lHdrs"
 Note $ALog ""
 
-# look for the headers first of all and set PckInc
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# HEADERS - look for the headers first of all and set PckInc
+
 if ("$lHdrs" == "none") then
    flog $ALog set PckInc = none
 else
-   Note $ALog "Looking for $lHdrs in:"
+   Note $ALog ""
+   Note $ALog "Header -------------------------------"
+   Note $ALog "   Looking for $lHdrs in:"
    flog $ALog set PckInc = ""
    foreach i ($lIncDirs)
       Note $ALog "  $i"
@@ -60,7 +66,10 @@ endif
 
 unset lSO
 
-# now look for the library
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# LIBRARY - now look for the library
 
 Note $ALog "Cfe_CC_Exe   = |$Cfe_CC_Exe|"
 Note $ALog "Cfe_CC_Flags = |$Cfe_CC_Flags|"
@@ -72,7 +81,11 @@ flog $ALog set opt = ( $opt $lFile.c -o $lFile )
 flog $ALog set opt = ( $opt $Cfe_CC_Flags $PckInc )
 flog $ALog set opt = ( $opt $Cfe_LD_Flags $Cfe_LD_RPath )
 
-# check for implicit library reference - does the linker know how to find it
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# IMPLICIT - check for implicit library reference
+#          - does the linker know how to find it
 
 # make the list of libraries for linking
 set ldlibs = ""
@@ -115,9 +128,16 @@ if ($Implicit == TRUE) then
          Note $ALog "    build failed ($xstatus) with $ldlibs (implicit)"
       endif
    end
+else
+   Note $ALog ""
+   Note $ALog "Implicit -------------------------------"
+   Note $ALog "   Not checking for implicit library reference"
 endif
 
-# check for explicit library reference
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# EXPLICIT - check for explicit library reference
 
 Note $ALog ""
 Note $ALog "See if explicit library reference works"
@@ -129,10 +149,11 @@ foreach i ($lLibDirs)
       break
    endif
 
+   Note $ALog ""
+   Note $ALog "Explicit -------------------------------"
+   Note $ALog "   $i"
+
    if (-d $i) then
-      Note $ALog ""
-      Note $ALog "Explicit -------------------------------"
-      Note $ALog "   $i"
       flog $ALog set RLib = $i/lib$lLib
       foreach a ( none $ASList )
          if ("$a" == none) then
@@ -188,7 +209,9 @@ foreach i ($lLibDirs)
             endif
             Note $ALog ""
          else
-            Note $ALog "   No $RLib.$a in $i"
+            set t = $RLib:t
+            Note $ALog "   No $t.$a in $i"
+            unset t
          endif
       end
    else
@@ -199,6 +222,11 @@ Note $ALog ""
 
 flog $ALog set PckPath = ""
 flog $ALog set PckLib  = ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FINISH
 
 GotIt:
 
@@ -213,6 +241,8 @@ if ("$lFile" != "none") then
    flog $ALog $RM $lFile $lFile.c
 endif
 
-Note $ALog "Leaving FIND_PACKAGE"
+Note $ALog "Leaving FIND_PACKAGE with:"
+Note $ALog "   PckLib  = |$PckLib|"
+Note $ALog "   PckPath = |$PckPath|"
 Note $ALog ""
 

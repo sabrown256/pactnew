@@ -6,8 +6,8 @@
 
 package mysql
 header  mysql.h
-so      libmysql.so
-arc     libmysql.a
+so      libmysqlclient.so
+arc     libmysqlclient.a
 
 functions {
     mysql_init

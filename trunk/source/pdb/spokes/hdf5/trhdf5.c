@@ -1421,6 +1421,8 @@ static PDBfile *_H5_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
     PD_smp_state *pa;
     hdf_state *hst;
 
+    _HDF5_set_api();
+
     pa = _PD_get_state(-1);
 
     SC_strncpy(lname, MAXLINE, name, -1);
@@ -1533,7 +1535,7 @@ static PDBfile *_H5_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
     PD_smp_state *pa;
     hdf_state *hst;
 
-    _H5_set_methods();
+    _HDF5_set_api();
 
     pa = _PD_get_state(-1);
 

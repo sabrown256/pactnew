@@ -19,10 +19,15 @@ while ($#argv > 0)
    switch ($1)
       case -h:
            echo ""
-           echo "Usage: srtest [-h] [<test>*]"
+           echo "Usage: srtest [-f] [-h] [<test>*]"
+           echo "  f  force the tests to be run"
            echo "  h  this help message"
            echo ""
            exit(1);
+      case -f:
+           unsetenv RUN_TESTS
+           set RUN_TESTS = TRUE
+           breaksw
       case -*:
            breaksw
       default:
@@ -48,17 +53,18 @@ if ($RUN_TESTS == FALSE) then
 
 # run the tests
 
-else if (-e $SysDir/score/scstd.h) then
+else if (-e $BaseDir/score/scstd.h) then
 
    NoteD $Log ""
    NoteD $Log "SCRIPT TEST ..."
 
    if ("$Tests" == "") then
       set Tests = ""
-      set Tests = ($Tests subr)
+      set Tests = ($Tests subr iapi)
    endif
 
    foreach i ($Tests)
+      echo ""
       $FilesDir/$i
       @ nerr = $nerr + $status
    end

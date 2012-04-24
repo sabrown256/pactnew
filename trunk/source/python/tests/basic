@@ -10,7 +10,7 @@
 
 source ../../tests/common
 
-set msg = "Basic Test ..................... "
+set msg = "Basic Test ....................."
 
    NoteD $Log ""
    NoteD $Log -n "                    $msg"

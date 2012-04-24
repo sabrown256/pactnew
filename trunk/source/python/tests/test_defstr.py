@@ -521,16 +521,16 @@ class DefstrPdbdata(test_leak.LeakVif):
         self.failUnlessEqual(str(d1), str(d2))
         d3 = pdb.unpack(d2)
 
-    def testf(self):
-        """create a defstr then pdbdata pointer"""
-        name = 'ptestf'
-        d1 = struct.pack('ififif', 1, 2, 3, 4, 5, 6)
-        d = pdb.defstr(name, ('int i', 'float j'))
-        ref = [(1,2.), (3, 4.), (5, 6.)]
-        d2 = pdb.pdbdata(ref, name + ' *')
-        self.failUnlessEqual(str(d1), str(d2))
-        d3 = pdb.unpack(d2)
-        self.failUnlessEqual(ref, d3)
+#    def testf(self):
+#        """create a defstr then pdbdata pointer"""
+#        name = 'ptestf'
+#        d1 = struct.pack('ififif', 1, 2, 3, 4, 5, 6)
+#        d = pdb.defstr(name, ('int i', 'float j'))
+#        ref = [(1,2.), (3, 4.), (5, 6.)]
+#        d2 = pdb.pdbdata(ref, name + ' *')
+#        self.failUnlessEqual(str(d1), str(d2))
+#        d3 = pdb.unpack(d2)
+#        self.failUnlessEqual(ref, d3)
 
     def testg(self):
         """create a defstr with pointer then pdbdata"""

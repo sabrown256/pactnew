@@ -9,31 +9,40 @@
 
 unalias *
 
+set pact   = `which pact`
+set bindir = $pact:h
+set lbase  = $bindir:h
+set devinc = $lbase/include
+
 if (-d ../scripts) then
    source ../scripts/env-csh
 else
-   set pact   = `which pact`
-   set bindir = $pact:h
-   set lbase  = $bindir:h
    source $lbase/include/env-csh
-   unset bindir
-   unset lbase
 endif
 
-@ err = 0
+setenv PERDB_PATH $lbase/etc/cfg
+unset bindir
+unset lbase
+
+@ nerr = 0
 
 set api    = ""
 set def    = ""
-set keep   = FALSE;
+set fatal  = 0
+set keep   = FALSE
 set noinc  = FALSE
 set incdir = ( . /usr/include )
 set libdir = ( . /lib64 /usr/lib64 /lib /usr/lib )
 
 while ($#argv > 0)
    switch ($1)
+      case -f:
+           set fatal = 1
+           breaksw
       case -h:
            echo ""
-           echo "Usage: import-api [-h] [-i] [-k] [-I<incdir>]* [-L<libdir>]* [-o <api>] <def>"
+           echo "Usage: import-api [-f] [-h] [-i] [-k] [-I<incdir>]* [-L<libdir>]* [-o <api>] <def>"
+           echo "   f      make errors fatal (exit with 1 instead of 0)"
            echo "   h      this help message"
            echo "   i      do not expand dependent includes"
            echo "   k      keep prototypes file"
@@ -72,9 +81,11 @@ end
 
 if ("$def" == "") then
    echo "No API definition file specified - exiting"
+   exit($fatal)
 endif
 if (!(-f "$def")) then
    echo "File '$def' does not exist - exiting"
+   exit($fatal)
 endif
 
 set pck = ( `grep -w package $def` )
@@ -125,7 +136,7 @@ foreach d ($incdir)
 end
 if ($ok == FALSE) then
    echo "   Error: '$hdr' not found in '$incdir'"
-   exit(0)
+   exit($fatal)
 endif
 
 set file = $cwd/$hdr:t.api
@@ -136,7 +147,22 @@ echo "   Generating '$api' from '$hdr'"
 rm -f $api
 touch $api
 
-set CPP = ( gcc -std=gnu99 -E )
+# work out the C preprocessor invocation
+set noglob
+dbget CCP
+dbget CC_Exe
+dbget CC_Flags
+set CPP  = ( `echo "$CCP" | sed 's| \$.*$||'` )
+set CPPF = ( `echo "$CPP" | sed 's|${CC}||'` )
+set CPP  = ( `echo $CC_Exe $CC_Flags -I$hdr:h $CPPF | sed 's|\"||g'` )
+unsetenv CCP
+unsetenv CC_Exe
+unsetenv CC_Flags
+unset noglob
+
+#set CPP = ( gcc -std=gnu99 -E )
+
+#echo "   Using CPP = |$CPP|"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -161,40 +187,50 @@ set CPP = ( gcc -std=gnu99 -E )
 #   sed 's/^ *//'                               remove leading whitespace
 #
 
-set th = $hdr
+# make a local copy ending with .c because
+# some preprocessors want to write intermediate files in the same directory
+# some preprocessors will not work with .h (e.g. PathScale)
+set tf = $hdr:t
+set td = $hdr:h
+set th = $devinc/$tf:r.c
 if ($noinc == TRUE) then
-   set th = $hdr:t
-   set th = $cwd/$th:r.noinc.h
    grep -v 'include' $hdr >&! $th
+else
+   cp $hdr $th
 endif
 
-$CPP $th                                        | \
-elide '{' '}' -                                 | \
-awk '$NF ~ /\\/ { printf("%s ", $0); }            \
-     $NF !~ /\\/ { printf("%s\n", $0); }'       | \
-sed 's/\\/ /g'                                  | \
-grep -v '#'                                     | \
-sed '/^ *$/d'                                   | \
-sed 's/  */ /g'                                 | \
-tr "\t" " "                                     | \
-awk '$0 ~ /, *$/   { printf("%s", $0) }           \
-     $0 !~ /, *$/  { printf("%s\n", $0) }'      | \
-tr -d '\n'                                      | \
-sed 's/;/;\n/g'                                 | \
-sed 's/( */(/g'                                 | \
-sed '/^; *$/d'                                  | \
-sed 's/^ *//'                                   | \
-cat >&! $file
-
-if ($noinc == TRUE) then
-   rm -f $th
+if (-f $th) then
+   $CPP $th                                        |& \
+   elide '/*' '*/' -                               |  \
+   elide '{' '}' -                                 |  \
+   awk '$NF ~ /\\/ { printf("%s ", $0); }             \
+        $NF !~ /\\/ { printf("%s\n", $0); }'       |  \
+   sed 's/\\/ /g'                                  |  \
+   grep -v '#'                                     |  \
+   sed '/^ *$/d'                                   |  \
+   sed 's/  */ /g'                                 |  \
+   tr "\t" " "                                     |  \
+   awk '$0 ~ /, *$/   { printf("%s", $0) }            \
+        $0 !~ /, *$/  { printf("%s\n", $0) }'      |  \
+   tr -d '\n'                                      |  \
+   sed 's/;/;\n/g'                                 |  \
+   sed 's/( */(/g'                                 |  \
+   sed '/^; *$/d'                                  |  \
+   sed 's/^ *//'                                   |  \
+   cat >&! $file
+else
+   @ nerr = $nerr + 2
 endif
+
+rm -f $th*
 unset th
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 set fncl = ""
+
+set missing = ""
 
 # look for specified functions to bind
 set ok = FALSE
@@ -214,7 +250,12 @@ while ($il < $nl)
       continue
    endif
    if ($ok == TRUE) then
-      set fncl = ( $fncl $line )
+      grep -w $line $file >& /dev/null
+      if ($status == 0) then
+         set fncl = ( $fncl $line )
+      else
+         set missing = ( $missing $line )
+      endif
    endif
 end
 
@@ -238,6 +279,21 @@ if ("$fncl" == "") then
    end
    unset noglob
 endif
+
+# it is an error to specify no functions
+if ("$fncl" == "") then
+   @ nerr = $nerr + 4
+endif
+
+if ("$missing" != "") then
+   set t = $hdr:t
+   echo "Missing $#missing requested functions for ${t}:"
+   foreach f ($missing)
+      echo "   $f"
+   end
+   unset t
+endif
+unset missing
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -335,6 +391,10 @@ Note $api ''
 cat $api | sed 's|\\t|\t|g' >&! $api.new
 mv $api.new $api
 
+if (!(-f $api)) then
+   @ nerr = $nerr + 8
+endif
+
 if ($keep == FALSE) then
    rm -rf $file
 endif
@@ -342,5 +402,7 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-exit($err)
+perdb quit:
+
+exit($nerr)
 
