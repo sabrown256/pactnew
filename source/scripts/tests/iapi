@@ -1,0 +1,75 @@
+#!/bin/csh -f
+#
+# IAPI - test import-api
+#
+
+unalias *
+
+source ../../tests/common
+
+set msg = "IMPORT-API Test ................"
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: iapi [-h]"
+           echo "  h  this help message"
+           echo ""
+           exit(1);
+      default:
+           breaksw
+   endsw
+   shift
+end
+
+@ nerr = 0
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+NoteD $Log "                    $msg"
+Note $Log ""
+
+set defl = ""
+set defl = ( $defl $BaseDir/pdb/spokes/hdf5/hdf5.def )
+set defl = ( $defl $BaseDir/pdb/spokes/sql/mysql.def )
+set defl = ( $defl $BaseDir/pdb/spokes/sql/sqlite3.def )
+set defl = ( $defl $BaseDir/score/bfd.def )
+
+unsetenv xstatus
+unset xstatus
+
+foreach i ( $defl )
+   Separator $Log
+   set j = $i:t
+   set lmsg = `fill-string -n 28 $j:r `
+   NoteD $Log -n "                        $lmsg "
+   Note $Log ""
+
+   set a = $j:r.api
+   flog $Log cp $i $j
+   flog $Log import-api -f $j -o $a
+   set xstatus = $status
+
+   flog $Log ls -l $j
+
+   if ($xstatus == 0) then
+      NoteD $Log "ok"
+      flog $Log ls -l $a
+#      set rpf = ( $rpf $Res $Ref )
+   else if ($xstatus == 1) then
+      NoteD $Log "omitted"
+#      set rpf = ( $rpf $Res $Ref )
+   else
+      NoteD $Log "ng ($xstatus)"
+      flog $Log @ nerr = $nerr + 1
+   endif
+
+end
+
+set rpf = ( $rpf *.api )
+
+$TEST_CHECK part -a iapi -e $nerr -rpf "$rpf" "$msg"
+
+exit($status)
