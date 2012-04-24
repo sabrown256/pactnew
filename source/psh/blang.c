@@ -16,6 +16,8 @@
 /* #define NO_DEFAULT_VALUE "NULL" */
 #define NO_DEFAULT_VALUE "----"
 
+#define N_MODES  4
+
 /* #define RETURN_INTEGER */
 
 #ifdef RETURN_INTEGER
@@ -101,6 +103,7 @@ struct s_statedes
     int nfp;                         /* number of Fortran prototype lines */
     int nfw;                         /* number of Fortran wrapper lines */
     int ndcl;                        /* number of declarations */
+    int no[N_MODES];                 /* no generate flags */
     char *pck;                       /* name of package */
     char **sbi;
     char **cdc;
@@ -4464,11 +4467,13 @@ static void fin_doc(bindes *bd)
  */
 
 static int blang(char *pck, int cfl, char *fbi,
-		 char *cdc, char *cpr, char *fpr, char *fwr)
-   {int ib, nb, rv;
+		 char *cdc, char *cpr, char *fpr, char *fwr,
+		 int *no)
+   {int i, ib, nb, rv;
     char **sbi, **sdc, **scp, **sfp, **swr;
     bindes *pb;
     statedes st = {0, 0, 0, 0, 0, 0, 0,
+                   {FALSE, FALSE, FALSE, FALSE},
 		   NULL, NULL, NULL, NULL, NULL, NULL, NULL};
     bindes bd[] = { {&st, NULL, init_fortran, bind_fortran, fin_fortran},
 		    {&st, NULL, init_module, bind_module, fin_module},
@@ -4477,6 +4482,36 @@ static int blang(char *pck, int cfl, char *fbi,
 		    {&st, NULL, init_doc, bind_doc, fin_doc} };
 
     rv = FALSE;
+
+    for (i = 0; i < N_MODES; i++)
+        st.no[i] = no[i];
+
+/* no documents */
+    if (no[0] == TRUE)
+       {bd[4].init = NULL;
+	bd[4].bind = NULL;
+	bd[4].fin  = NULL;};
+
+/* no fortran */
+    if (no[1] == TRUE)
+       {bd[0].init = NULL;
+	bd[0].bind = NULL;
+	bd[0].fin  = NULL;
+	bd[1].init = NULL;
+	bd[1].bind = NULL;
+	bd[1].fin  = NULL;};
+
+/* no python */
+    if (no[2] == TRUE)
+       {bd[3].init = NULL;
+	bd[3].bind = NULL;
+	bd[3].fin  = NULL;};
+
+/* no scheme */
+    if (no[3] == TRUE)
+       {bd[2].init = NULL;
+	bd[2].bind = NULL;
+	bd[2].fin  = NULL;};
 
     if ((IS_NULL(cpr) == FALSE) && (IS_NULL(fbi) == FALSE))
        {sbi = file_text(FALSE, fbi);
@@ -4501,16 +4536,19 @@ static int blang(char *pck, int cfl, char *fbi,
 
 /* initialize the binding constructors */
 		for (pb = bd, ib = 0; ib < nb; ib++, pb++)
-		    pb->init(&st, pb);
+		    {if (pb->init != NULL)
+		        pb->init(&st, pb);};
 
 /* make all the language bindings */
 		if (sbi != NULL)
 		   {for (pb = bd, ib = 0; ib < nb; ib++, pb++)
-		        pb->bind(pb);};
+		        {if (pb->bind != NULL)
+			    pb->bind(pb);};};
 
 /* cleanup */
 		for (pb = bd, ib = 0; ib < nb; ib++, pb++)
-		    pb->fin(pb);
+		    {if (pb->fin != NULL)
+		        pb->fin(pb);};
 
 		rv = TRUE;};};
 
@@ -4529,6 +4567,7 @@ static int blang(char *pck, int cfl, char *fbi,
 
 int main(int c, char **v)
    {int i, rv, cfl;
+    int no[N_MODES];
     char pck[MAXLINE], msg[MAXLINE];
     char *fbi, *cdc, *cpr, *fpr, *fwr;
 
@@ -4539,6 +4578,8 @@ int main(int c, char **v)
     fpr   = "";
     fwr   = "";
     cfl   = 3;
+
+    memset(no, 0, sizeof(no));
 
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-b") == 0)
@@ -4557,12 +4598,24 @@ int main(int c, char **v)
              printf("   f    file containing Fortran prototypes\n");
              printf("   h    this help message\n");
              printf("   l    use long for Fortran implicit arguments\n");
+             printf("   nod  do not generate documentation\n");
+             printf("   nof  do not generate fortran interfaces\n");
+             printf("   nop  do not generate python interfaces\n");
+             printf("   nos  do not generate scheme interfaces\n");
              printf("   o    no interoprabilty interfaces (Fortran wrappers only)\n");
              printf("   w    file containing Fortran wrapper specifications\n");
              printf("   wr   no Fortran wrappers (interoperability only)\n");
              printf("\n");}
 	 else if (strcmp(v[i], "-l") == 0)
             istrl = "long";
+	 else if (strcmp(v[i], "-nod") == 0)
+	    no[0] = TRUE;
+	 else if (strcmp(v[i], "-nof") == 0)
+	    no[1] = TRUE;
+	 else if (strcmp(v[i], "-nop") == 0)
+	    no[2] = TRUE;
+	 else if (strcmp(v[i], "-nos") == 0)
+	    no[3] = TRUE;
 	 else if (strcmp(v[i], "-o") == 0)
             cfl &= ~2;
 	 else if (strcmp(v[i], "-w") == 0)
@@ -4577,7 +4630,7 @@ int main(int c, char **v)
 
     init_types();
 
-    rv = blang(pck, cfl, fbi, cdc, cpr, fpr, fwr);
+    rv = blang(pck, cfl, fbi, cdc, cpr, fpr, fwr, no);
     rv = (rv != TRUE);
 
     printf("done\n");

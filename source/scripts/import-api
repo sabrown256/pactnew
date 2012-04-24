@@ -9,15 +9,23 @@
 
 unalias *
 
-set pact   = `which pact`
-set bindir = $pact:h
-set lbase  = $bindir:h
-source $lbase/include/env-csh
+if (-d ../scripts) then
+   source ../scripts/env-csh
+else
+   set pact   = `which pact`
+   set bindir = $pact:h
+   set lbase  = $bindir:h
+   source $lbase/include/env-csh
+   unset bindir
+   unset lbase
+endif
 
 @ err = 0
 
-set def    = ""
 set api    = ""
+set def    = ""
+set keep   = FALSE;
+set noinc  = FALSE
 set incdir = ( . /usr/include )
 set libdir = ( . /lib64 /usr/lib64 /lib /usr/lib )
 
@@ -25,18 +33,26 @@ while ($#argv > 0)
    switch ($1)
       case -h:
            echo ""
-           echo "Usage: import-api [-h] [-I<incdir>]* [-L<libdir>]* [-o <api>] <def>"
+           echo "Usage: import-api [-h] [-i] [-k] [-I<incdir>]* [-L<libdir>]* [-o <api>] <def>"
            echo "   h      this help message"
+           echo "   i      do not expand dependent includes"
+           echo "   k      keep prototypes file"
            echo "   I      add <incdir> to include directory list"
            echo "   L      add <libdir> to lib directory list"
            echo "   o      name of generated API file"
            echo "   <def>  api definition file"
            echo ""
            exit(1)
+      case -i:
+           set noinc = TRUE
+           breaksw
       case -I*:
            set t = ( `echo $1 | sed 's|-I||g' | sed 's|:| |g'` )
            set incdir = ( $t $incdir )
            unset t
+           breaksw
+      case -k:
+           set keep = TRUE
            breaksw
       case -L*:
            set t = ( `echo $1 | sed 's|-L||g' | sed 's|:| |g'` )
@@ -80,24 +96,26 @@ if ($ok == FALSE) then
    echo "   Warning: '$so' not found in '$libdir'"
 endif
 
-set arc = ( `grep -w arc $def` )
-set arc = $arc[2]
 set ok  = FALSE
-foreach d ($libdir)
-   if (-f $d/$arc) then
-      set arc = $d/$arc
-      set ok  = TRUE
-      echo "   Using archive '$arc'"
-      break
+set arc = ( `grep -w arc $def` )
+if ("$#arc" > 1) then
+   set arc = $arc[2]
+   foreach d ($libdir)
+      if (-f $d/$arc) then
+         set arc = $d/$arc
+         set ok  = TRUE
+         echo "   Using archive '$arc'"
+         break
+      endif
+   end
+   if ($ok == FALSE) then
+      echo "   Warning: '$arc' not found in '$libdir'"
    endif
-end
-if ($ok == FALSE) then
-   echo "   Warning: '$arc' not found in '$libdir'"
 endif
 
+set ok  = FALSE
 set hdr = ( `grep -w header $def` )
 set hdr = $hdr[2]
-set ok  = FALSE
 foreach d ($incdir)
    if (-f $d/$hdr) then
       set hdr = $d/$hdr
@@ -143,7 +161,14 @@ set CPP = ( gcc -std=gnu99 -E )
 #   sed 's/^ *//'                               remove leading whitespace
 #
 
-$CPP $hdr                                       | \
+set th = $hdr
+if ($noinc == TRUE) then
+   set th = $hdr:t
+   set th = $cwd/$th:r.noinc.h
+   grep -v 'include' $hdr >&! $th
+endif
+
+$CPP $th                                        | \
 elide '{' '}' -                                 | \
 awk '$NF ~ /\\/ { printf("%s ", $0); }            \
      $NF !~ /\\/ { printf("%s\n", $0); }'       | \
@@ -161,10 +186,17 @@ sed '/^; *$/d'                                  | \
 sed 's/^ *//'                                   | \
 cat >&! $file
 
+if ($noinc == TRUE) then
+   rm -f $th
+endif
+unset th
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 set fncl = ""
+
+# look for specified functions to bind
 set ok = FALSE
 @ nl = `cat $def | wc -l`
 @ il = 0
@@ -185,6 +217,27 @@ while ($il < $nl)
       set fncl = ( $fncl $line )
    endif
 end
+
+# if none are specified take them all
+if ("$fncl" == "") then
+   set noglob
+   @ nl = `cat $file | wc -l`
+   @ il = 0
+   while ($il < $nl)
+      @ il = $il + 1
+      set line = ( `head -n $il $file | tail -n 1` )
+      if ("$line" == "") continue
+      if ("$line" =~ \#*) continue
+      if ("$line" =~ *\(*) then
+         set s = ( `echo "$line" | sed 's|(.*$||' | sed 's|\*||g'`)
+         if (($#s > 1) && ("$s" !~ *attribute*)) then
+            set t = $s[$#s]
+            set fncl = ( $fncl $t )
+         endif
+      endif
+   end
+   unset noglob
+endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -282,7 +335,9 @@ Note $api ''
 cat $api | sed 's|\\t|\t|g' >&! $api.new
 mv $api.new $api
 
-rm -rf $file
+if ($keep == FALSE) then
+   rm -rf $file
+endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
