@@ -1,0 +1,173 @@
+#!/bin/csh -f
+#
+# IMPORT-SO - make a shared library of SCHEME bindings of
+#           - a package for dynamic loading
+#           - example:
+#           -   import-so -i /usr/include/libavcodec/avcodec.h -l /usr/lib/libavcodec.so
+#
+
+unalias *
+
+set pact   = `which pact`
+set devbin = $pact:h
+set lbase  = $devbin:h
+set devinc = $lbase/include
+source $devinc/env-csh
+
+setenv PERDB_PATH $lbase/etc/cfg
+
+@ err = 0
+
+set hdr = ""
+set lib = ""
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: import-so [-h] [-i <hdr>] [-l <lib>]"
+           echo "   h   this help message"
+           echo "   i   the header file defining the package"
+           echo "   l   the shared library to be imported"
+           echo ""
+           exit(1)
+      case -i:
+           shift
+           set hdr = $1
+           breaksw
+      case -l:
+           shift
+           set lib = $1
+           breaksw
+      default:
+           breaksw
+   endsw
+   shift
+end
+
+InitLog log $cwd/log.import-so
+
+if (!(-f $hdr)) then
+   NoteD $log "No such header file '$hdr' - exiting"
+   exit(1)
+endif
+
+if (!(-f $lib)) then
+   NoteD $log "No such shared library '$lib' - exiting"
+   exit(1)
+endif
+
+set incdir = $hdr:h
+set libdir = $lib:h
+
+flog $log set pkg   = $hdr:t
+flog $log set pkg   = $pkg:r
+flog $log set def   = $cwd/$pkg.def
+flog $log set api   = $pkg.api
+flog $log set proto = $pkg.proto
+flog $log set bind  = $pkg.bind
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# IMPORT - make the API file using import-api
+
+Separator $log
+
+flog $log rm -f $def
+flog $log touch $def
+Note $def "package $pkg"
+Note $def "header  $hdr:t"
+Note $def "so      $lib:t"
+
+flog $log import-api -i -k -o $api -I$incdir -L$libdir $def
+
+flog $log rm -f $def
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# BIND - make the bindings with blang
+
+Separator $log
+
+set noglob
+
+flog $log rm -f $bind
+flog $log touch $bind
+
+# bind file has specs like: <funcname> scheme()
+@ nl = `cat $api | wc -l`
+@ il = 0
+while ($il < $nl)
+   @ il = $il + 1
+   set line = ( `head -n $il $api | tail -n 1` )
+   if (("$line" =~ \#define*) && ("$line" !~ *_PACT*)) then
+      Note $bind "$line[2] scheme()"
+   endif
+end
+
+flog $log set proto = $hdr:t.api
+
+flog $log ls -l $bind $proto
+
+unset noglob
+
+set opt = ""
+set opt = ( $opt -nod -nof -nop )
+flog $log blang $opt -b $bind -c $proto
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# COMPILE - compile the generated files and link them into an SO
+
+Separator $log
+
+flog $log set gc = gs-$pkg.c
+flog $log set go = gs-$pkg.o
+flog $log set so = pact-${pkg}.so
+
+cat $gc | sed 's|'$pkg'_int\.h|'$pkg'\.api|' >&! $gc.new
+mv $gc.new $gc
+
+flog $log ls -l $gc
+
+dbget CC_Exe
+dbget Shared_CC_Flags
+dbget CC_Debug
+#dbget Shared_CC_Inc
+
+dbget Shared_LD_Exe
+dbget Shared_LD_Flags
+#dbget Shared_LD_RPath
+#dbget Shared_LD_Lib
+dbget LD_Lib
+dbget Cfg_LD_RPath
+
+
+Note $log "CC_Exe          = |$CC_Exe|"
+Note $log "Shared_CC_Flags = |$Shared_CC_Flags|"
+Note $log "CC_Debug        = |$CC_Debug|"
+#Note $log "Shared_CC_Inc   = |$Shared_CC_Inc|"
+
+Note $log "Shared_LD_Exe   = |$Shared_LD_Exe|"
+Note $log "Shared_LD_Flags = |$Shared_LD_Flags|"
+#Note $log "Shared_LD_RPath = |$Shared_LD_RPath|"
+#Note $log "Shared_LD_Lib   = |$Shared_LD_Lib|"
+Note $log "LD_Lib          = |$LD_Lib|"
+Note $log "Cfg_LD_RPath    = |$Cfg_LD_RPath|"
+
+
+flog $log set cc = ( ${CC_Exe} ${Shared_CC_Flags} ${CC_Debug} )
+flog $log set cc = ( $cc -I$incdir -I$devinc )
+flog $log set ld = ( ${Shared_LD_Exe} ${Shared_LD_Flags} ${Cfg_LD_RPath} )
+
+flog $log $cc -c $gc
+flog $log $ld $go -o $so ${LD_Lib}
+
+perdb quit:
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($err)

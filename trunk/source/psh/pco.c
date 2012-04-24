@@ -919,7 +919,7 @@ static void check_dir(client *cl)
     char Created[LRG], Missing[LRG];
     char *sib, *dir;
     static char *dlst[] = {"bin", "lib", "include", "include/shell",
-			   "scheme", "man", "man/man1", "man/man3"};
+			   "etc", "scheme", "man", "man/man1", "man/man3"};
 
     n   = sizeof(dlst)/sizeof(char *);
     sib = dbget(cl, TRUE, "InstBase");
