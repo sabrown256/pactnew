@@ -95,6 +95,21 @@ flog $log rm -f $def
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+# PROTO - make the PROTO file using pcpp
+
+Separator $log
+
+pcpp $hdr -o -                                  |& \
+sed 's/extern//g'                               |  \
+sed 's/unsigned//g'                             |  \
+sed 's/const//g'                                |  \
+cat >&! $proto
+
+flog $log cat $proto
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # BIND - make the bindings with blang
 
 Separator $log
@@ -104,18 +119,113 @@ set noglob
 flog $log rm -f $bind
 flog $log touch $bind
 
-# bind file has specs like: <funcname> scheme()
-@ nl = `cat $api | wc -l`
+# bind file has specs like:
+# derived <enumname> none SC_ENUM_I none <default>
+# derived <structname> none SC_POINTER_I NULL NULL
+# <funcname> scheme()
+
+set struct = FALSE
+
+@ nl = `cat $proto | wc -l`
 @ il = 0
 while ($il < $nl)
    @ il = $il + 1
-   set line = ( `head -n $il $api | tail -n 1` )
-   if (("$line" =~ \#define*) && ("$line" !~ *_PACT*)) then
-      Note $bind "$line[2] scheme()"
-   endif
-end
+   set line = ( `head -n $il $proto | tail -n 1` )
 
-flog $log set proto = $hdr:t.api
+#echo "$il> $line"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# ENUMS - derived <enumname> none SC_ENUM_I none <default>
+
+   if ("$line" =~ *enum\ *\{*) then
+      if ("$line" =~ *\}*) then
+         set struct = FALSE
+#echo "enum : |$line|"
+      else
+         set struct = TRUE
+#echo "begin enum : |$line|"
+      endif
+      if ("$line" =~ typedef*) then
+         set inf = ( `echo $line | sed 's/;/ /' | sed 's/,/ /' | sed 's/{/ /'` )
+#echo "-> ($#inf) |$inf|"
+         set t   = $inf[$#inf]
+         set def = $inf[3]
+         Note $bind "derived $t none SC_ENUM_I none $def"
+      endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# STRUCTS
+
+   else if ("$line" =~ *struct\ *\{*) then
+      if ("$line" =~ *\}*) then
+         set struct = FALSE
+#echo "struct : |$line|"
+      else
+         set struct = TRUE
+#echo "begin struct : |$line|"
+      endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# END_STRUCT_ENUM
+
+   else if ("$line" =~ \}*) then
+      set struct = FALSE
+#echo "end struct/enum : |$line|"
+#echo ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# TYPEDEFS - derived <structname> none SC_POINTER_I NULL NULL
+
+   else if ("$line" =~ typedef\ *) then
+      set llin = ( `echo "$line" | sed 's/\*/@/g'` )
+#echo "typedef : |$line|"
+
+# handle pointer forms |typedef a *b;|
+      if ("$llin" =~ *@*) then
+
+# function pointer
+         if ("$llin" =~ *\(*) then
+            set inf = ( `echo $llin | sed 's/)(.*$//' | sed 's/[@\(\)]/ /g' | sed 's/;/ /'` )
+            set t   = $inf[$#inf]
+
+# non-function pointer
+         else
+            set inf = ( `echo $llin | sed 's/@/ /g' | sed 's/;/ /'` )
+            set t   = $inf[$#inf]
+         endif
+         Note $bind "derived $t none SC_POINTER_I NULL NULL"
+
+# handle non-pointer forms |typedef a b;|
+      else
+         set inf = ( `echo $llin | sed 's/;/ /'` )
+         set t   = $inf[$#inf]
+         Note $bind "derived $t none SC_LONG_I NULL 0"
+      endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FUNCTIONS - <funcname> scheme()
+
+   else if (($struct == FALSE) && ("$line" =~ *\(*\)\;)) then
+#echo "function : |$line|"
+      set inf = ( `echo $line | sed 's/(.*$//' | sed 's/\*/ /g'` )
+      set t   = $inf[$#inf]
+      Note $bind "$t scheme()"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+end
 
 flog $log ls -l $bind $proto
 
@@ -214,7 +324,7 @@ flog $log $ld $go -o $so ${LD_Lib}
 flog $log ls -l $so
 flog $log nm $so
 
-perdb quit:
+perdb quit: >& /dev/null
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
