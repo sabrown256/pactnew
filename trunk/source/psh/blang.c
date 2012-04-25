@@ -1084,6 +1084,9 @@ static void init_types(void)
     add_type("long",        "integer(8)",  "SC_LONG_I",        NULL, "0L");
     add_type("long long",   "integer(8)",  "SC_LONG_LONG_I",   NULL, "0LL");
 
+    add_type("size_t",      "integer(8)",  "SC_LONG_I",        NULL, "0L");
+    add_type("ssize_t",     "integer(8)",  "SC_LONG_I",        NULL, "0L");
+
 /* fixed width fixed point types */
     add_type("int16_t",     "integer(2)",  "SC_INT16_I",       NULL, "0");
     add_type("int32_t",     "integer(4)",  "SC_INT32_I",       NULL, "0");

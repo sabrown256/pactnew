@@ -20,11 +20,16 @@ setenv PERDB_PATH $lbase/etc/cfg
 
 set hdr = ""
 set lib = ""
+set iaopt = ""
 while ($#argv > 0)
    switch ($1)
+      case -e:
+           set iaopt = ( $iaopt -i )
+           breaksw
       case -h:
            echo ""
-           echo "Usage: import-so [-h] [-i <hdr>] [-l <lib>]"
+           echo "Usage: import-so [-e] [-h] [-i <hdr>] [-l <lib>]"
+           echo "   e   do not expand includes"
            echo "   h   this help message"
            echo "   i   the header file defining the package"
            echo "   l   the shared library to be imported"
@@ -59,12 +64,13 @@ endif
 set incdir = $hdr:h
 set libdir = $lib:h
 
-flog $log set pkg   = $hdr:t
-flog $log set pkg   = $pkg:r
-flog $log set def   = $cwd/$pkg.def
-flog $log set api   = $pkg.api
-flog $log set proto = $pkg.proto
-flog $log set bind  = $pkg.bind
+flog $log set pck   = $hdr:t
+flog $log set pck   = $pck:r
+set PCK = `echo $pck | tr "[a-z]" "[A-Z]"`
+flog $log set def   = $cwd/$pck.def
+flog $log set api   = $pck.api
+flog $log set proto = $pck.proto
+flog $log set bind  = $pck.bind
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -75,11 +81,14 @@ Separator $log
 
 flog $log rm -f $def
 flog $log touch $def
-Note $def "package $pkg"
+Note $def "package $pck"
 Note $def "header  $hdr:t"
 Note $def "so      $lib:t"
+flog $log cat $def
 
-flog $log import-api -i -k -o $api -I$incdir -L$libdir $def
+flog $log import-api $iaopt -k -o $api -I$incdir -L$libdir $def
+
+flog $log cat $api
 
 flog $log rm -f $def
 
@@ -110,11 +119,15 @@ flog $log set proto = $hdr:t.api
 
 flog $log ls -l $bind $proto
 
+flog $log cat $bind
+flog $log cat $proto
+
 unset noglob
 
 set opt = ""
 set opt = ( $opt -nod -nof -nop )
 flog $log blang $opt -b $bind -c $proto
+set xstatus = $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -123,12 +136,46 @@ flog $log blang $opt -b $bind -c $proto
 
 Separator $log
 
-flog $log set gc = gs-$pkg.c
-flog $log set go = gs-$pkg.o
-flog $log set so = pact-${pkg}.so
+flog $log set gc = gs-$pck.c
+flog $log set go = gs-$pck.o
+flog $log set so = pact-${pck}.so
 
-cat $gc | sed 's|'$pkg'_int\.h|'$pkg'\.api|' >&! $gc.new
-mv $gc.new $gc
+cat $gc | sed 's|'$pck'_int\.h|'$pck'\.api|' >&! $gc.new
+flog $log rm -f $gc
+flog $log touch $gc
+
+Note $gc '/*'
+Note $gc ' * GS-'$PCK'.C - import dynamically generated bindings'
+Note $gc ' *'
+Note $gc ' */'
+Note $gc ''
+Note $gc '#include "cpyright.h"'
+Note $gc ''
+Note $gc '#define '$PCK'_SO'
+
+cat $gc.new >>& $gc
+
+Note $gc ''
+Note $gc '/* SX_LOAD_'$PCK - get in $PCK bindings '*/'
+Note $gc ''
+Note $gc "void SX_load_${pck}(void)"
+Note $gc '   {SS_psides *si;'
+Note $gc '    SS_smp_state *sa;'
+Note $gc ''
+Note $gc '    sa = _SS_get_state(0);'
+Note $gc '    si = &sa->si;'
+Note $gc ''
+Note $gc "    _${PCK}_set_api();"
+Note $gc ''
+Note $gc "    SX_install_${pck}_bindings(si);"
+Note $gc ''
+Note $gc '    return;}'
+Note $gc ''
+Note $gc '/*--------------------------------------------------------------------------*/'
+Note $gc '/*--------------------------------------------------------------------------*/'
+Note $gc ''
+
+flog $log rm -f $gc.new
 
 flog $log ls -l $gc
 
@@ -164,6 +211,8 @@ flog $log set ld = ( ${Shared_LD_Exe} ${Shared_LD_Flags} ${Cfg_LD_RPath} )
 
 flog $log $cc -c $gc
 flog $log $ld $go -o $so ${LD_Lib}
+flog $log ls -l $so
+flog $log nm $so
 
 perdb quit:
 
