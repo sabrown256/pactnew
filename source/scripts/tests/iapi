@@ -32,24 +32,35 @@ NoteD $Log "                    $msg"
 Note $Log ""
 
 set defl = ""
-set defl = ( $defl $BaseDir/pdb/spokes/hdf5/hdf5.def )
-set defl = ( $defl $BaseDir/pdb/spokes/sql/mysql.def )
-set defl = ( $defl $BaseDir/pdb/spokes/sql/sqlite3.def )
-set defl = ( $defl $BaseDir/score/bfd.def )
+set defl = ( $defl $BaseDir/pdb/spokes/hdf5/hdf5.def none )
+set defl = ( $defl $BaseDir/pdb/spokes/sql/mysql.def -I/usr/include/mysql )
+set defl = ( $defl $BaseDir/pdb/spokes/sql/sqlite3.def none )
+set defl = ( $defl $BaseDir/score/bfd.def none )
 
 unsetenv xstatus
 unset xstatus
 
-foreach i ( $defl )
+while ($#defl > 0)
    Separator $Log
-   set j = $i:t
+   set def = $defl[1]
+   set inc = $defl[2]
+   shift defl
+   shift defl
+
+   set j = $def:t
+
+   set opt = ""
+   if ("$inc" != none) then
+      set opt = ( $opt $inc )
+   endif
+
    set lmsg = `fill-string -n 28 $j:r `
    NoteD $Log -n "                        $lmsg "
    Note $Log ""
 
    set a = $j:r.api
-   flog $Log cp $i $j
-   flog $Log import-api -f $j -o $a
+   flog $Log cp $def $j
+   flog $Log import-api $opt -f $j -o $a
    set xstatus = $status
 
    flog $Log ls -l $j
@@ -57,10 +68,10 @@ foreach i ( $defl )
    if ($xstatus == 0) then
       NoteD $Log "ok"
       flog $Log ls -l $a
-#      set rpf = ( $rpf $Res $Ref )
+      set rpf = ( $rpf $j $a )
    else if ($xstatus == 1) then
       NoteD $Log "omitted"
-#      set rpf = ( $rpf $Res $Ref )
+      set rpf = ( $rpf $j $a )
    else
       NoteD $Log "ng ($xstatus)"
       flog $Log @ nerr = $nerr + 1

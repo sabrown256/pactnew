@@ -12,7 +12,6 @@ unalias *
 set pact   = `which pact`
 set bindir = $pact:h
 set lbase  = $bindir:h
-set devinc = $lbase/include
 
 if (-d ../scripts) then
    source ../scripts/env-csh
@@ -20,7 +19,6 @@ else
    source $lbase/include/env-csh
 endif
 
-setenv PERDB_PATH $lbase/etc/cfg
 unset bindir
 unset lbase
 
@@ -147,83 +145,26 @@ echo "   Generating '$api' from '$hdr'"
 rm -f $api
 touch $api
 
-# work out the C preprocessor invocation
-set noglob
-dbget CCP
-dbget CC_Exe
-dbget CC_Flags
-set CPP  = ( `echo "$CCP" | sed 's| \$.*$||'` )
-set CPPF = ( `echo "$CPP" | sed 's|${CC}||'` )
-set CPP  = ( `echo $CC_Exe $CC_Flags -I$hdr:h $CPPF | sed 's|\"||g'` )
-unsetenv CCP
-unsetenv CC_Exe
-unsetenv CC_Flags
-unset noglob
-
-#set CPP = ( gcc -std=gnu99 -E )
-
-#echo "   Using CPP = |$CPP|"
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # PROCESS_PACKAGE_HEADER - make a clean list of functions, variables, and
 #                        - typedefs defined by the package header
-
+#
 #   elide '{' '}' -                             remove struct bodies
-#   awk '$NF ~ /\\/ { printf("%s ", $0); }      merge lines ending in \
-#        $NF !~ /\\/ { printf("%s\n", $0); }'
-#   sed 's/\\/ /g'                              remove embedded \
-#   grep -v '#   '                              remove # line directives
-#   sed '/^ *$/d'                               remove blank lines
-#   sed 's/  */ /g'                             compress whitespace
-#   tr "\t" " "                                 remove tabs (bad BSD)
-#   awk '$0 ~ /, *$/   { printf("%s", $0) }     combines ending in ,
-#        $0 !~ /, *$/  { printf("%s\n", $0) }'
-#   tr -d '\n'                                  delete newlines
-#   sed 's/;/;\n/g'                             replace ; with ;\n
-#   sed 's/( */(/g'                             remove whitespace following (
-#   sed '/^; *$/d'                              remove lines with only ;
-#   sed 's/^ *//'                               remove leading whitespace
+#   sed 's/extern//g'                           get rid of extern
+#   grep -v typedef                             get rid of typedefs
 #
 
-# make a local copy ending with .c because
-# some preprocessors want to write intermediate files in the same directory
-# some preprocessors will not work with .h (e.g. PathScale)
-set tf = $hdr:t
-set td = $hdr:h
-set th = $devinc/$tf:r.c
-if ($noinc == TRUE) then
-   grep -v 'include' $hdr >&! $th
-else
-   cp $hdr $th
-endif
-
-if (-f $th) then
-   $CPP $th                                        |& \
-   elide '/*' '*/' -                               |  \
+if (-f $hdr) then
+   pcpp -o - $hdr                                  |& \
    elide '{' '}' -                                 |  \
-   awk '$NF ~ /\\/ { printf("%s ", $0); }             \
-        $NF !~ /\\/ { printf("%s\n", $0); }'       |  \
-   sed 's/\\/ /g'                                  |  \
-   grep -v '#'                                     |  \
-   sed '/^ *$/d'                                   |  \
-   sed 's/  */ /g'                                 |  \
-   tr "\t" " "                                     |  \
-   awk '$0 ~ /, *$/   { printf("%s", $0) }            \
-        $0 !~ /, *$/  { printf("%s\n", $0) }'      |  \
-   tr -d '\n'                                      |  \
-   sed 's/;/;\n/g'                                 |  \
-   sed 's/( */(/g'                                 |  \
-   sed '/^; *$/d'                                  |  \
-   sed 's/^ *//'                                   |  \
+   sed 's/extern//g'                               |  \
+   grep -v typedef                                 |  \
    cat >&! $file
 else
    @ nerr = $nerr + 2
 endif
-
-rm -f $th*
-unset th
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -308,6 +249,8 @@ Note $api ''
 Note $api "#ifndef ${PCK}_API_PACT"
 Note $api ''
 Note $api "#define ${PCK}_API_PACT"
+Note $api ''
+Note $api '#include <'$hdr:t'>'
 Note $api ''
 Note $api "typedef struct s_${pck}_api ${pck}_api;"
 Note $api ''
@@ -401,8 +344,6 @@ endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-perdb quit:
 
 exit($nerr)
 

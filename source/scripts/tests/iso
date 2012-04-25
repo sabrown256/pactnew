@@ -1,0 +1,85 @@
+#!/bin/csh -f
+#
+# ISO - test import-so
+#
+
+unalias *
+
+source ../../tests/common
+set path = ( $path ../.. )
+
+set msg = "IMPORT-SO Test ................."
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: iso [-h]"
+           echo "  h  this help message"
+           echo ""
+           exit(1);
+      default:
+           breaksw
+   endsw
+   shift
+end
+
+@ nerr = 0
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+NoteD $Log "                    $msg"
+Note $Log ""
+
+set pkgl = ""
+set pkgl = ( $pkgl jpeg yes /usr/include/jpeglib.h /usr/lib/x86_64-linux-gnu/libjpeg.so )
+set pkgl = ( $pkgl avcodec no /usr/include/libavcodec/avcodec.h /usr/lib/libavcodec.so )
+
+unsetenv xstatus
+unset xstatus
+
+while ($#pkgl > 0)
+   Separator $Log
+   set name = $pkgl[1]
+   set opt  = $pkgl[2]
+   set hdr  = $pkgl[3]
+   set so   = $pkgl[4]
+   shift pkgl
+   shift pkgl
+   shift pkgl
+   shift pkgl
+
+   if ((-f $hdr) && (-f $so)) then
+
+      set lmsg = `fill-string -n 28 $name `
+      NoteD $Log -n "                        $lmsg "
+      Note $Log ""
+
+      if ($opt == no) then
+         set isopt = ( -e )
+      else
+         set isopt = ""
+      endif
+
+      flog $Log import-so $isopt -i $hdr -l $so
+      set xstatus = $status
+
+      flog $Log cat log.import-so
+
+      if ($xstatus == 0) then
+         NoteD $Log "ok"
+      else if ($xstatus == 1) then
+         NoteD $Log "omitted"
+      else
+         NoteD $Log "ng ($xstatus)"
+         flog $Log @ nerr = $nerr + 1
+      endif
+   endif
+end
+
+#set rpf = ( $rpf *.api )
+
+$TEST_CHECK part -a iso -e $nerr -rpf "$rpf" "$msg"
+
+exit($status)

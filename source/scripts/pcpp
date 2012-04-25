@@ -1,0 +1,190 @@
+#!/bin/csh -f
+#
+# PCPP - PACT CPP portability wrapper
+#      - also preprocess using PACT config info
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+set pact   = `which pact`
+set bindir = $pact:h
+set lbase  = $bindir:h
+unset bindir
+
+if (-d ../scripts) then
+   source ../scripts/env-csh
+else
+   source $lbase/include/env-csh
+endif
+
+SafeEnv PERDB_PATH $lbase/etc/cfg
+
+unset lbase
+
+@ nerr = 0
+
+set fi     = ""
+set fo     = ""
+set fatal  = 0
+set keep   = FALSE
+set noinc  = FALSE
+
+while ($#argv > 0)
+   switch ($1)
+      case -f:
+           set fatal = 1
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: pcpp [-f] [-h] [-i] [-k] [-o <file>] <file>"
+           echo "   f      make errors fatal (exit with 1 instead of 0)"
+           echo "   h      this help message"
+           echo "   i      do not expand dependent includes"
+           echo "   k      keep prototypes file"
+           echo "   o      name of output file"
+           echo "   <file> input file"
+           echo ""
+           exit(1)
+      case -i:
+           set noinc = TRUE
+           breaksw
+      case -k:
+           set keep = TRUE
+           breaksw
+      case -o:
+           shift
+           set fo = $1
+           breaksw
+      default:
+           set fi = $1
+           breaksw
+   endsw
+   shift
+end
+
+if ("$fi" == "") then
+   echo "No file specified - exiting"
+   exit($fatal)
+endif
+if (!(-f "$fi")) then
+   echo "File '$fi' does not exist - exiting"
+   exit($fatal)
+endif
+
+set tf = $fi:t
+set td = $fi:h
+
+if ("$fo" == "") then
+   set stdout = FALSE
+   set fo = $cwd/$tf:r.i
+else if ("$fo" == "-") then
+   set stdout = TRUE
+   set fo = $cwd/$tf:r.i
+endif
+
+#which perdb
+#echo "PERDB_PATH = $PERDB_PATH"
+
+# work out the C preprocessor invocation
+set noglob
+dbget CCP
+dbget CC_Exe
+dbget CC_Flags
+set CPP  = ( `echo "$CCP" | sed 's| \$.*$||'` )
+set CPPF = ( `echo "$CPP" | sed 's|${CC}||'` )
+set CPP  = ( `echo $CC_Exe $CC_Flags -I$td $CPPF | sed 's|\"||g'` )
+unset CPPF
+unsetenv CCP
+unsetenv CC_Exe
+unsetenv CC_Flags
+unset noglob
+
+# perdb quit: >& /dev/null
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# PROCESS_PACKAGE_HEADER - make a clean list of functions, variables, and
+#                        - typedefs defined by the package header
+
+#   elide '/*' '*/' -                           remove comments
+#   tr "\t" " "                                 remove tabs (BSD brain damage)
+#   awk '$NF ~ /\\/ { printf("%s ", $0); }      merge lines ending in \
+#        $NF !~ /\\/ { printf("%s\n", $0); }'
+#   sed 's/\\/ /g'                              remove embedded \
+#   grep -v '#   '                              remove # line directives
+#   sed '/^ *$/d'                               remove blank lines
+#   sed 's/  */ /g'                             compress whitespace
+#   awk '$0 ~ /, *$/   { printf("%s", $0) }     combines ending in ,
+#        $0 !~ /, *$/  { printf("%s\n", $0) }'
+#   tr -d '\n'                                  delete newlines
+
+#   sed 's/ *; */;/g'                           remove whitespace around
+#   sed 's/ *( */(/g'                           ; ( ) { } [ ]
+#   sed 's/ *) */)/g'
+#   sed 's/ *{ */{/g'
+#   sed 's/ *} */}/g'
+#   sed 's/ *\[ */\[/g'
+#   sed 's/ *\] */\]/g'
+#   sed 's/(\*/ (\*/g'                          change 'int(*f)' to 'int (*f)'
+#   sed 's/} ;/};\n/g'                          change '} ;' to '};\n'
+
+#   sed 's/;/;\n/g'                             replace ; with ;\n
+#   sed 's/\* */\*/g'                           change '* foo' to '*foo'
+#   sed '/^; *$/d'                              remove lines with only ;
+#   sed 's/^ *//'                               remove leading whitespace
+#
+
+# make a local copy ending with .c because
+# some preprocessors want to write intermediate files in the same directory
+# some preprocessors will not work with .h (e.g. PathScale)
+set th = /tmp/$tf:r.c
+
+if ($noinc == TRUE) then
+   grep -v 'include' $fi >&! $th
+else
+   cp $fi $th
+endif
+
+if (-f $th) then
+   $CPP $th                                        |& \
+   elide '/*' '*/' -                               |  \
+   tr "\t" " "                                     |  \
+   awk '$NF ~ /\\/ { printf("%s ", $0); }             \
+        $NF !~ /\\/ { printf("%s\n", $0); }'       |  \
+   sed 's/\\/ /g'                                  |  \
+   grep -v '#'                                     |  \
+   sed '/^ *$/d'                                   |  \
+   sed 's/  */ /g'                                 |  \
+   awk '$0 ~ /, *$/   { printf("%s", $0) }            \
+        $0 !~ /, *$/  { printf("%s\n", $0) }'      |  \
+   tr -d '\n'                                      |  \
+   sed 's/ *; */;/g'                               |  \
+   sed 's/ *( */(/g'                               |  \
+   sed 's/ *) */)/g'                               |  \
+   sed 's/ *{ */ {/g'                              |  \
+   sed 's/ *} */} /g'                              |  \
+   sed 's/ *\[ */\[/g'                             |  \
+   sed 's/ *\] */\]/g'                             |  \
+   sed 's/(\*/ (\*/g'                              |  \
+   sed 's/} ;/};\n/g'                              |  \
+   sed 's/;/;\n/g'                                 |  \
+   sed 's/\* */\*/g'                               |  \
+   sed '/^; *$/d'                                  |  \
+   sed 's/^ *//'                                   |  \
+   cat >&! $fo
+else
+   @ nerr = $nerr + 2
+endif
+
+if (($stdout == TRUE) && (-f $fo)) then
+   cat $fo
+   rm -f $fo
+endif
+
+rm -f $th*
+
+exit($nerr)
+
