@@ -38,6 +38,7 @@ setenv LIB       lib
 setenv SUFFIXES  '.i'
 
 BuildSharedLibs = FALSE
+Linking         = dynamic
 FilterDir       =
 WARN_PATTERN    =
 ERR_PATTERN     =

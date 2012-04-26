@@ -9,9 +9,10 @@
 
 unalias *
 
-set pact   = `which pact`
+set pact   = `which perdb`
 set bindir = $pact:h
 set lbase  = $bindir:h
+set devinc = $lbase/include
 
 if (-d ../scripts) then
    source ../scripts/env-csh
@@ -137,7 +138,7 @@ if ($ok == FALSE) then
    exit($fatal)
 endif
 
-set file = $cwd/$hdr:t.api
+set file = $devinc/$hdr:t.api
 if ("$api" == "") then
    set api = $pck.api
 endif
@@ -227,12 +228,18 @@ if ("$fncl" == "") then
 endif
 
 if ("$missing" != "") then
-   set t = $hdr:t
-   echo "Missing $#missing requested functions for ${t}:"
-   foreach f ($missing)
-      echo "   $f"
-   end
-   unset t
+   if ($#missing == $#fncl) then
+      echo "No functions found in $file - exiting"
+      cat $file
+      exit($fatal)
+   else
+      set t = $hdr:t
+      echo "Missing $#missing out of $#fncl requested functions for ${t}:"
+      foreach f ($missing)
+         echo "   $f"
+      end
+      unset t
+   endif
 endif
 unset missing
 

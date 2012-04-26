@@ -8,7 +8,7 @@
 
 unalias *
 
-set pact   = `which pact`
+set pact   = `which perdb`
 set bindir = $pact:h
 set lbase  = $bindir:h
 unset bindir
@@ -76,32 +76,33 @@ endif
 set tf = $fi:t
 set td = $fi:h
 
+set stdout = FALSE
 if ("$fo" == "") then
-   set stdout = FALSE
    set fo = $cwd/$tf:r.i
 else if ("$fo" == "-") then
    set stdout = TRUE
    set fo = $cwd/$tf:r.i
 endif
 
-#which perdb
-#echo "PERDB_PATH = $PERDB_PATH"
-
 # work out the C preprocessor invocation
 set noglob
-dbget CCP
-dbget CC_Exe
-dbget CC_Flags
-set CPP  = ( `echo "$CCP" | sed 's| \$.*$||'` )
-set CPPF = ( `echo "$CPP" | sed 's|${CC}||'` )
-set CPP  = ( `echo $CC_Exe $CC_Flags -I$td $CPPF | sed 's|\"||g'` )
-unset CPPF
-unsetenv CCP
-unsetenv CC_Exe
-unsetenv CC_Flags
-unset noglob
 
-# perdb quit: >& /dev/null
+# NOTE: parallel builds have too hard a time with multiple PERDB
+# instances so just go straight to the database
+set db       = ${PERDB_PATH}.db
+set CPPF     = ( `grep -w CCP      $db | grep CCP=      | sed 's|^CCP=||' | sed 's| \$.*$||' | sed 's|${CC}||'` )
+set CC_Exe   = ( `grep -w CC_Exe   $db | grep CC_Exe=   | sed 's|^CC_Exe=||'` )
+set CC_Flags = ( `grep -w CC_Flags $db | grep CC_Flags= | sed 's|^CC_Flags=||'` )
+
+set CPP  = ( `echo $CC_Exe $CC_Flags -I$td $CPPF | sed 's|\"||g'` )
+
+#echo "CPP      = |$CPP|"
+
+unset CPPF
+unset CC_Exe
+unset CC_Flags
+unset db
+unset noglob
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
