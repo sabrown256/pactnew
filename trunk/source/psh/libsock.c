@@ -406,9 +406,12 @@ static int read_sock(client *cl, char *s, int nc)
 	if (nb > 0)
 	   log_activity(flog, dbg_sock, wh, "read %d |%s| (%d)",
 			fd, s, nb);
+	else if (nb == 0)
+	   nb = -1;
 	else
-	   log_activity(flog, dbg_sock, wh, "read %d |%s| - %s (%d)",
-			fd, s, strerror(errno), errno);};
+	   {log_activity(flog, dbg_sock, wh, "read %d |%s| - %s (%d)",
+			 fd, s, strerror(errno), errno);
+	    nb = -2;};};
 
     return(nb);}
 

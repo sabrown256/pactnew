@@ -942,7 +942,7 @@ switch ($Cmnd)
         source pact-scs
 
 # set up some items in the working environment
-        set path = ( . $BinDir $path )
+        set path = ( . $BinDir $ScrDir $path )
 
 # make sure the log directory is there - do not wait for later
         if (!(-d $LogDir)) then
@@ -1033,7 +1033,7 @@ switch ($Cmnd)
 
 # set path for PERDB - spawned by PCO
         flog $Log set dbopt = ( -f $EtcDir/cfg )
-        flog $Log $RM $IncDir/cfg*
+        flog $Log $RM $EtcDir/cfg*
 
         flog $Log setenv PERDB_PATH $EtcDir/cfg
 	flog $Log $PERDB -l -c -s
@@ -2207,6 +2207,7 @@ CFG_DONE:
         set BinFiles = ( smake dmake pact template timer px )
         set BinFiles = ( $BinFiles do-run elide blang perdb )
         set BinFiles = ( $BinFiles make-syntax )
+        set BinFiles = ( $BinFiles import-api pcpp )
         set BinFiles = ( $BinFiles install-pact install-ext )
 
 # save the files in IncDir

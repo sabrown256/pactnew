@@ -42,6 +42,10 @@
 # define TERMINAL struct sgttyb
 
 # undef tab
+# undef newline
+# undef buttons
+# undef lines
+
 #endif
 
 #if defined(CYGWIN)

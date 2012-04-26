@@ -9,6 +9,8 @@
 
 include shared
 
+Linking = static
+
 Tool CC {
    Exe      =? ${Python_CC_Exe}
    Debug    =? ${Python_CC_Debug}

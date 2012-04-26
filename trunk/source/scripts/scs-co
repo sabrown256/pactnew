@@ -98,8 +98,16 @@ else if ($knd == git) then
    endif
 
    if ("$srcdate" != "") then
-      set dt = "$srcdate[1]"
+
       git clone $repo $base
+
+      cd $base
+
+      set inf = ( `git log | grep -B 2 "$srcdate"` )
+      if ($#inf > 1) then
+         set tag = $inf[2]
+         git reset --hard $tag
+      endif
    else
       git clone $repo $base
    endif

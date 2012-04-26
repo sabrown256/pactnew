@@ -1,0 +1,279 @@
+/*
+ * HDF5.API - define HDF5 API for PACT
+ *
+ * #include "cpyright.h"
+ *
+ */
+
+#ifndef HDF5_API_PACT
+
+#define HDF5_API_PACT
+
+
+typedef struct s_d_space d_space;
+
+struct s_d_space
+   {herr_t (*close)(hid_t dataset_id);                          /* H5Dclose */
+    hid_t (*create2)(hid_t loc_id, const char *name,          /* H5Dcreate2 */
+		     hid_t dtype_id, hid_t space_id,
+		     hid_t lcpl_id, hid_t dcpl_id, hid_t dapl_id);
+    haddr_t (*get_offset)(hid_t dset_id);                  /* H5Dget_offset */
+    hid_t (*get_space)(hid_t dataset_id);                   /* H5Dget_space */
+    hid_t (*get_type)(hid_t dataset_id );                    /* H5Dget_type */
+    hid_t (*open)(hid_t loc_id, const char *name);               /* H5Dopen */
+    hid_t (*open2)(hid_t loc_id, const char *name,              /* H5Dopen2 */
+		   hid_t dapl_id);
+    herr_t (*read)(hid_t dataset_id, hid_t mem_type_id,          /* H5Dread */
+		   hid_t mem_space_id, hid_t file_space_id,
+		   hid_t xfer_plist_id, void * buf);
+    herr_t (*write)(hid_t dataset_id, hid_t mem_type_id,        /* H5Dwrite */
+		    hid_t mem_space_id, hid_t file_space_id,
+		    hid_t xfer_plist_id, const void * buf);};
+
+typedef struct s_e_space e_space;
+
+struct s_e_space
+   {herr_t (*set_auto)(H5E_auto_t func, void *cld);};        /* H5Eset_auto */
+
+typedef struct s_f_space f_space;
+
+struct s_f_space
+   {hid_t (*create)(const char *name, unsigned flags,          /* H5Fcreate */
+		    hid_t fcpl_id, hid_t fapl_id);
+    hid_t (*open)(const char *name, unsigned flags,              /* H5Fopen */
+		  hid_t fapl_id);};
+
+typedef struct s_g_space g_space;
+
+struct s_g_space
+   {herr_t (*close)(hid_t group_id);                            /* H5Gclose */
+    herr_t (*get_objinfo)(hid_t loc_id,                   /* H5Gget_objinfo */
+			  const char *name,
+			  hbool_t follow_link, H5G_stat_t *statbuf);
+    int (*iterate)(hid_t loc_id, const char *name,            /* H5Giterate */
+		   int *idx, H5G_iterate_t operator, void *operator_data);
+    hid_t (*open)(hid_t loc_id, const char *name,                /* H5Gopen */
+		  hid_t gapl_id);};
+
+typedef struct s_s_space s_space;
+
+struct s_s_space
+   {herr_t (*close)(hid_t space_id);                            /* H5Sclose */
+    hid_t (*create)(int rank,                           /* H5Screate_simple */
+		    const hsize_t *current_dims,
+		    const hsize_t *maximum_dims);
+    int (*get_dims)(hid_t space_id,            /* H5Sget_simple_extent_dims */
+		    hsize_t *dims, hsize_t *maxdims);
+    int (*get_ndims)(hid_t space_id);         /* H5Sget_simple_extent_ndims */
+    H5S_class_t (*get_extent_type)(hid_t space_id);}; /* H5Sget_simple_extent_type */
+
+typedef struct s_t_space t_space;
+
+struct s_t_space
+   {herr_t (*close)(hid_t dtype_id);                            /* H5Tclose */
+    hid_t (*copy)(hid_t dtype_id);                               /* H5Tcopy */
+    hid_t (*create)(H5T_class_t class, size_tsize);            /* H5Tcreate */
+    int (*get_dims)(hid_t adtype_id, hsize_t dims[]);  /* H5Tget_array_dims */
+    int (*get_ndims)(hid_t adtype_id);                /* H5Tget_array_ndims */
+    H5T_class_t (*get_class)(hid_t dtype_id);               /* H5Tget_class */
+    size_t (*get_ebias)(hid_t dtype_id);                    /* H5Tget_ebias */
+    herr_t (*get_fields)(hid_t dtype_id, size_t *spos,     /* H5Tget_fields */
+			 size_t *epos, size_t *esize,
+			 size_t *mpos, size_t *msize);
+    char *(*get_member_name)(hid_t dtype_id,          /* H5Tget_member_name */
+			     unsigned field_idx);
+    size_t (*get_member_offset)(hid_t dtype_id,     /* H5Tget_member_offset */
+				unsigned memb_no);
+    hid_t (*get_member_type)(hid_t dtype_id,          /* H5Tget_member_type */
+			     unsigned field_idx);
+    hid_t (*get_native_type)(hid_t dtype_id,          /* H5Tget_native_type */
+			     H5T_direction_t direction);
+    int (*get_nmembers)(hid_t dtype_id);                 /* H5Tget_nmembers */
+    H5T_order_t (*get_order)(hid_t dtype_id);               /* H5Tget_order */
+    size_t (*get_precision)(hid_t dtype_id);            /* H5Tget_precision */
+    H5T_sign_t (*get_sign)(hid_t dtype_id);                  /* H5Tget_sign */
+    size_t (*get_size)(hid_t dtype_id);                      /* H5Tget_size */
+    hid_t (*get_super)(hid_t dtype_id);                     /* H5Tget_super */
+    herr_t (*insert)(hid_t dtype_id, const char *name,         /* H5Tinsert */
+		     size_t offset, hid_t field_id);};
+
+typedef struct s_hdf5_methods hdf5_methods;
+
+struct s_hdf5_methods
+   {d_space d;
+    e_space e;
+    f_space f;
+    g_space g;
+    s_space s;
+    t_space t;};
+
+static hdf5_methods
+ _H5_mth;
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+#define DYNAMICALLY_LINKED
+
+/* _H5_SET_METHODS - setup the methods for HDF5 access */
+
+void _H5_set_methods(void)
+   {
+
+    if (_H5_mth.d.open == NULL)
+
+#ifdef DYNAMICALLY_LINKED
+
+/* dynamically linked way */
+       {int rv;
+
+	rv = SC_so_register_func(OBJ_SO, "libhdf5.so", "hdf5",
+				 NULL, NULL, NULL, NULL);
+	if (rv == FALSE)
+	   PD_error("CANNOT LOAD 'libhdf5.so'", PD_OPEN);
+
+	_H5_mth.d.close             = SC_so_get(OBJ_SO, "hdf5", "H5Dclose");
+	_H5_mth.d.create2           = SC_so_get(OBJ_SO, "hdf5", "H5Dcreate2");
+	_H5_mth.d.get_offset        = SC_so_get(OBJ_SO, "hdf5", "H5Dget_offset");
+	_H5_mth.d.get_space         = SC_so_get(OBJ_SO, "hdf5", "H5Dget_space");
+	_H5_mth.d.get_type          = SC_so_get(OBJ_SO, "hdf5", "H5Dget_type");
+	_H5_mth.d.open              = SC_so_get(OBJ_SO, "hdf5", "H5Dopen
+	_H5_mth.d.open2             = SC_so_get(OBJ_SO, "hdf5", "H5Dopen2");
+	_H5_mth.d.read              = SC_so_get(OBJ_SO, "hdf5", "H5Dread");
+	_H5_mth.d.write             = SC_so_get(OBJ_SO, "hdf5", "H5Dwrite");
+
+	_H5_mth.e.set_auto          = SC_so_get(OBJ_SO, "hdf5", "H5Eset_auto");
+
+	_H5_mth.f.create            = SC_so_get(OBJ_SO, "hdf5", "H5Fcreate");
+	_H5_mth.f.open              = SC_so_get(OBJ_SO, "hdf5", "H5Fopen");
+
+	_H5_mth.g.close             = SC_so_get(OBJ_SO, "hdf5", "H5Gclose");
+	_H5_mth.g.get_objinfo       = SC_so_get(OBJ_SO, "hdf5", "H5Gget_objinfo");
+	_H5_mth.g.iterate           = SC_so_get(OBJ_SO, "hdf5", "H5Giterate");
+	_H5_mth.g.open              = SC_so_get(OBJ_SO, "hdf5", "H5Gopen");
+
+	_H5_mth.s.close             = SC_so_get(OBJ_SO, "hdf5", "H5Sclose");
+	_H5_mth.s.create            = SC_so_get(OBJ_SO, "hdf5", "H5Screate_simple");
+	_H5_mth.s.get_dims          = SC_so_get(OBJ_SO, "hdf5", "H5Sget_simple_extent_dims");
+	_H5_mth.s.get_ndims         = SC_so_get(OBJ_SO, "hdf5", "H5Sget_simple_extent_ndims");
+	_H5_mth.s.get_extent_type   = SC_so_get(OBJ_SO, "hdf5", "H5Sget_simple_extent_type");
+
+	_H5_mth.t.close             = SC_so_get(OBJ_SO, "hdf5", "H5Tclose");
+	_H5_mth.t.copy              = SC_so_get(OBJ_SO, "hdf5", "H5Tcopy");
+	_H5_mth.t.create            = SC_so_get(OBJ_SO, "hdf5", "H5Tcreate");
+	_H5_mth.t.get_dims          = SC_so_get(OBJ_SO, "hdf5", "H5Tget_array_dims");
+	_H5_mth.t.get_ndims         = SC_so_get(OBJ_SO, "hdf5", "H5Tget_array_ndims");
+	_H5_mth.t.get_class         = SC_so_get(OBJ_SO, "hdf5", "H5Tget_class");
+	_H5_mth.t.get_ebias         = SC_so_get(OBJ_SO, "hdf5", "H5Tget_ebias");
+	_H5_mth.t.get_fields        = SC_so_get(OBJ_SO, "hdf5", "H5Tget_fields");
+	_H5_mth.t.get_member_name   = SC_so_get(OBJ_SO, "hdf5", "H5Tget_member_name");
+	_H5_mth.t.get_member_offset = SC_so_get(OBJ_SO, "hdf5", "H5Tget_member_offset");
+	_H5_mth.t.get_member_type   = SC_so_get(OBJ_SO, "hdf5", "H5Tget_member_type");
+	_H5_mth.t.get_native_type   = SC_so_get(OBJ_SO, "hdf5", "H5Tget_native_type");
+	_H5_mth.t.get_nmembers      = SC_so_get(OBJ_SO, "hdf5", "H5Tget_nmembers");
+	_H5_mth.t.get_order         = SC_so_get(OBJ_SO, "hdf5", "H5Tget_order");
+	_H5_mth.t.get_precision     = SC_so_get(OBJ_SO, "hdf5", "H5Tget_precision");
+	_H5_mth.t.get_sign          = SC_so_get(OBJ_SO, "hdf5", "H5Tget_sign");
+	_H5_mth.t.get_size          = SC_so_get(OBJ_SO, "hdf5", "H5Tget_size");
+	_H5_mth.t.get_super         = SC_so_get(OBJ_SO, "hdf5", "H5Tget_super");
+	_H5_mth.t.insert            = SC_so_get(OBJ_SO, "hdf5", "H5Tinsert");};
+
+#else
+
+/* statically linked way */
+       {_H5_mth.d.close             = H5Dclose;
+	_H5_mth.d.create2           = H5Dcreate2;
+	_H5_mth.d.get_offset        = H5Dget_offset;
+	_H5_mth.d.get_space         = H5Dget_space;
+	_H5_mth.d.get_type          = H5Dget_type;
+	_H5_mth.d.open              = H5Dopen
+	_H5_mth.d.open2             = H5Dopen2;
+	_H5_mth.d.read              = H5Dread;
+	_H5_mth.d.write             = H5Dwrite;
+
+	_H5_mth.e.set_auto          = H5Eset_auto;
+
+	_H5_mth.f.create            = H5Fcreate;
+	_H5_mth.f.open              = H5Fopen;
+
+	_H5_mth.g.close             = H5Gclose;
+	_H5_mth.g.get_objinfo       = H5Gget_objinfo;
+	_H5_mth.g.iterate           = H5Giterate;
+	_H5_mth.g.open              = H5Gopen;
+
+	_H5_mth.s.close             = H5Sclose;
+	_H5_mth.s.create            = H5Screate_simple;
+	_H5_mth.s.get_dims          = H5Sget_simple_extent_dims;
+	_H5_mth.s.get_ndims         = H5Sget_simple_extent_ndims;
+	_H5_mth.s.get_extent_type   = H5Sget_simple_extent_type;
+
+	_H5_mth.t.close             = H5Tclose;
+	_H5_mth.t.copy              = H5Tcopy;
+	_H5_mth.t.create            = H5Tcreate;
+	_H5_mth.t.get_dims          = H5Tget_array_dims;
+	_H5_mth.t.get_ndims         = H5Tget_array_ndims;
+	_H5_mth.t.get_class         = H5Tget_class;
+	_H5_mth.t.get_ebias         = H5Tget_ebias;
+	_H5_mth.t.get_fields        = H5Tget_fields;
+	_H5_mth.t.get_member_name   = H5Tget_member_name;
+	_H5_mth.t.get_member_offset = H5Tget_member_offset;
+	_H5_mth.t.get_member_type   = H5Tget_member_type;
+	_H5_mth.t.get_native_type   = H5Tget_native_type;
+	_H5_mth.t.get_nmembers      = H5Tget_nmembers;
+	_H5_mth.t.get_order         = H5Tget_order;
+	_H5_mth.t.get_precision     = H5Tget_precision;
+	_H5_mth.t.get_sign          = H5Tget_sign;
+	_H5_mth.t.get_size          = H5Tget_size;
+	_H5_mth.t.get_super         = H5Tget_super;
+	_H5_mth.t.insert            = H5Tinsert;};
+
+#endif
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+#define  H5Dclose                    _H5_mth.d.close
+#define  H5Dcreate2                  _H5_mth.d.create2
+#define  H5Dget_offset               _H5_mth.d.get_offset
+#define  H5Dget_space                _H5_mth.d.get_space
+#define  H5Dget_type                 _H5_mth.d.get_type
+#define  H5Dopen                     _H5_mth.d.open
+#define  H5Dopen2                    _H5_mth.d.open2
+#define  H5Dread                     _H5_mth.d.read
+#define  H5Dwrite                    _H5_mth.d.write
+#define  H5Eset_auto                 _H5_mth.e.set_auto
+#define  H5Fcreate                   _H5_mth.f.create
+#define  H5Fopen                     _H5_mth.f.open
+#define  H5Gclose                    _H5_mth.g.close
+#define  H5Gget_objinfo              _H5_mth.g.get_objinfo
+#define  H5Giterate                  _H5_mth.g.iterate
+#define  H5Gopen                     _H5_mth.g.open
+#define  H5Sclose                    _H5_mth.s.close
+#define  H5Screate_simple            _H5_mth.s.create
+#define  H5Sget_simple_extent_dims   _H5_mth.s.get_dims
+#define  H5Sget_simple_extent_ndims  _H5_mth.s.get_ndims
+#define  H5Sget_simple_extent_type   _H5_mth.s.get_extent_type
+#define  H5Tclose                    _H5_mth.t.close
+#define  H5Tcopy                     _H5_mth.t.copy
+#define  H5Tcreate                   _H5_mth.t.create
+#define  H5Tget_array_dims           _H5_mth.t.get_dims
+#define  H5Tget_array_ndims          _H5_mth.t.get_ndims
+#define  H5Tget_class                _H5_mth.t.get_class
+#define  H5Tget_ebias                _H5_mth.t.get_ebias
+#define  H5Tget_fields               _H5_mth.t.get_fields
+#define  H5Tget_member_name          _H5_mth.t.get_member_name
+#define  H5Tget_member_offset        _H5_mth.t.get_member_offset
+#define  H5Tget_member_type          _H5_mth.t.get_member_type
+#define  H5Tget_native_type          _H5_mth.t.get_native_type
+#define  H5Tget_nmembers             _H5_mth.t.get_nmembers
+#define  H5Tget_order                _H5_mth.t.get_order
+#define  H5Tget_precision            _H5_mth.t.get_precision
+#define  H5Tget_sign                 _H5_mth.t.get_sign
+#define  H5Tget_size                 _H5_mth.t.get_size
+#define  H5Tget_super                _H5_mth.t.get_super
+#define  H5Tinsert                   _H5_mth.t.insert
+
+#endif
+

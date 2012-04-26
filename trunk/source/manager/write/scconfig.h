@@ -45,6 +45,7 @@ dbget HostOS
 dbget HostOSRel
 dbget IncDir
 dbget IPCSupport
+dbget Linking
 dbget LONG64
 dbget MACRev
 dbget MPIAllStdin
@@ -206,23 +207,25 @@ Separator $Log
     Note $STDOUT ""
 
 # emit the SO flags
-    set lso = ""
-    set lso = ( $lso HDF5_SO )
-    set lso = ( $lso SQLITE3_SO )
-    set lso = ( $lso MYSQL_SO )
-    set lso = ( $lso BFD_SO )
-    while ($#lso > 0)
-       set lvr = $lso[1]
-       shift lso
-       dbget $lvr
-       set res = ( `printenv $lvr` )
-       if ("$res" != "") then
-          Note $STDOUT "#define $lvr "'"'$res'"'
-       endif
-    end
-    unset lso
-    Note $STDOUT ""
-
+    if ($Linking == dynamic) then
+       set lso = ""
+       set lso = ( $lso HDF5_SO )
+       set lso = ( $lso SQLITE3_SO )
+       set lso = ( $lso MYSQL_SO )
+       set lso = ( $lso BFD_SO )
+       while ($#lso > 0)
+          set lvr = $lso[1]
+          shift lso
+          dbget $lvr
+          set res = ( `printenv $lvr` )
+          if ("$res" != "") then
+             Note $STDOUT "#define $lvr "'"'$res'"'
+          endif
+       end
+       unset lso
+       Note $STDOUT ""
+    endif
+   
 # emit non-systematic sets of flags
     if ($HAVE_BFD == TRUE) then
        Note $STDOUT '#define BFD_VERSION "'$BFD_Version'"'
