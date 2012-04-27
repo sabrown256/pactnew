@@ -20,12 +20,12 @@ set path = ( $ScrDir $path )
 source $ScrDir/env-csh
 
 dbget BinDir
-dbget IncDir
+dbget EtcDir
 dbget Pck
 
 Separator $Log
 Note $Log "   BinDir  = $BinDir"
-Note $Log "   IncDir  = $IncDir"
+Note $Log "   EtcDir  = $EtcDir"
 Note $Log "   Pck     = $Pck"
 
 #--------------------------------------------------------------------------
@@ -33,12 +33,12 @@ Note $Log "   Pck     = $Pck"
 
     NoteD $Log "   Distribution Makefile - Makefile"
 
-    set STDOUT = $IncDir/Makefile
+    set STDOUT = $EtcDir/Makefile
 
     flog $Log $RM $STDOUT
     flog $Log touch $STDOUT
 
-    set Pck = `cat $IncDir/package`
+    set Pck = `cat $EtcDir/package`
 
     Note $Log "Packages: $Pck"
 

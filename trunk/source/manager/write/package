@@ -19,13 +19,13 @@ eval `$ScrDir/prune-env pact`
 set path = ( $ScrDir $path )
 source $ScrDir/env-csh
 
-dbget IncDir
+dbget EtcDir
 dbget HavePython
 dbget HavePythonNumpy
 dbget HavePythonNumeric
 
 Separator $Log
-Note $Log "   IncDir            = $IncDir"
+Note $Log "   EtcDir            = $EtcDir"
 Note $Log "   HavePython        = $HavePython"
 Note $Log "   HavePythonNumpy   = $HavePythonNumpy"
 Note $Log "   HavePythonNumeric = $HavePythonNumeric"
@@ -35,7 +35,7 @@ Note $Log "   HavePythonNumeric = $HavePythonNumeric"
 
     NoteD $Log "   Package List - package"
 
-    set STDOUT = $IncDir/package
+    set STDOUT = $EtcDir/package
 
     flog $Log $RM $STDOUT
     flog $Log touch $STDOUT

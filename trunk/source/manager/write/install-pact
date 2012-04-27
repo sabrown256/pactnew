@@ -105,6 +105,7 @@ Note $Log "   PyDirSrc   = |$PyDirSrc|"
        Note $STDOUT 'set Bins = ( '`awk '$1 == "bin"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest`' )' 
        Note $STDOUT 'set Libs = ( '`awk '$1 == "lib"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest`' )' 
        Note $STDOUT 'set Incs = ( '`awk '$1 == "inc"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest`' )' 
+       Note $STDOUT 'set Etcs = ( '`awk '$1 == "etc"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest`' )' 
        Note $STDOUT 'set Mods = ( '`awk '$1 == "f90"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest`' )' 
        Note $STDOUT 'set Scms = ( '`awk '$1 == "scm"    {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest`' )' 
        Note $STDOUT 'set Scrs = ( '`awk '$1 == "script" {for (i = 2; i <= NF; i++) {printf("%s ", $i);};}' pact.manifest`' )' 
@@ -124,6 +125,7 @@ Note $Log "   PyDirSrc   = |$PyDirSrc|"
        Note $STDOUT 'set DestDir = $InstDir/bin'
        Note $STDOUT ""
 
+# bin installs
        Note $STDOUT "# install executable files with 775"
        Note $STDOUT 'pushd bin >& /dev/null'
        Note $STDOUT 'echo ""'
@@ -175,6 +177,7 @@ Note $Log "   PyDirSrc   = |$PyDirSrc|"
        Note $STDOUT 'popd >& /dev/null'
        Note $STDOUT ""
 
+# include installs
        Note $STDOUT "# install include with 664"
        Note $STDOUT 'pushd include >& /dev/null'
        Note $STDOUT 'echo ""'
@@ -261,6 +264,28 @@ Note $Log "   PyDirSrc   = |$PyDirSrc|"
        Note $STDOUT 'popd >& /dev/null'
        Note $STDOUT ""
 
+# etc installs
+       Note $STDOUT "# install etc with 664"
+       Note $STDOUT 'pushd etc >& /dev/null'
+       Note $STDOUT 'echo ""'
+       Note $STDOUT 'echo "Installing config/info in $InstDir/etc"'
+       Note $STDOUT 'set DestDir = $InstDir/etc'
+       Note $STDOUT 'foreach file ($Etcs)'
+       Note $STDOUT '   if (-f $file) then'
+       Note $STDOUT '      touch $DestDir/.lock'
+       Note $STDOUT '      sinstall -p 664 $file $DestDir'
+       Note $STDOUT '      if ($status != 0) then'
+       Note $STDOUT '         echo "   FAILED ($status) $file"'
+       Note $STDOUT '      else'
+       Note $STDOUT '         echo "   $file"'
+       Note $STDOUT '      endif'
+       Note $STDOUT '   endif'
+       Note $STDOUT 'end'
+
+       Note $STDOUT 'popd >& /dev/null'
+       Note $STDOUT ""
+
+# lib installs
        Note $STDOUT "# install lib with 664"
        Note $STDOUT 'pushd lib >& /dev/null'
        Note $STDOUT 'echo ""'
@@ -329,6 +354,7 @@ Note $Log "   PyDirSrc   = |$PyDirSrc|"
        Note $STDOUT 'popd >& /dev/null'
        Note $STDOUT ""
 
+# scheme installs
        Note $STDOUT "# install SCHEME files with 664"
        Note $STDOUT 'pushd scheme >& /dev/null'
        Note $STDOUT 'echo ""'
@@ -375,6 +401,7 @@ Note $Log "   PyDirSrc   = |$PyDirSrc|"
        Note $STDOUT 'popd >& /dev/null'
        Note $STDOUT ""
 
+# man installs
        Note $STDOUT "# install MAN files with 664"
        Note $STDOUT 'pushd $ldocdir >& /dev/null'
        Note $STDOUT 'echo ""'

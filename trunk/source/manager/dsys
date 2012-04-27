@@ -305,8 +305,8 @@ switch ($Cmnd)
            flog $Log setenv  SC_EXEC_TIME_FACTOR     80
            flog $Log setenv  SC_EXEC_TIME_THRESHOLD  120
 
-           Note $Log "pact -log $Log -f $IncDir/Makefile $Args build"
-           pact -log $Log -f $IncDir/Makefile $Args build
+           Note $Log "pact -log $Log -f $EtcDir/Makefile $Args build"
+           pact -log $Log -f $EtcDir/Makefile $Args build
            set RStatus = $status
 
            flog $Log popd
@@ -464,8 +464,8 @@ switch ($Cmnd)
            flog $Log setenv  SC_EXEC_TIME_LIMIT      3600
            flog $Log setenv  SC_EXEC_TIME_FACTOR     80
            flog $Log setenv  SC_EXEC_TIME_THRESHOLD  120
-           Note $Log "pact -log $Log -f $IncDir/Makefile $Args link"
-           pact -log $Log -f $IncDir/Makefile $Args link
+           Note $Log "pact -log $Log -f $EtcDir/Makefile $Args link"
+           pact -log $Log -f $EtcDir/Makefile $Args link
            set RStatus = $status
            set Build   = "link"
 
@@ -1629,7 +1629,7 @@ CFG_DONE:
                    setenv System  `$CfgMan use`
                    set SysDir  = $DevDir/$System
                    set IncDir  = $SysDir/include
-                   set Pck     = `cat $IncDir/package`
+                   set Pck     = `cat $EtcDir/package`
                    pushd .. >& /dev/null
                    set NB = `du -sb $Pck manager python $SysDir | awk 'BEGIN {nb = 0;} {nb += $1} END {printf("%.1f", nb/(1024.0*1024.0));}'`
                    popd >& /dev/null
@@ -2212,13 +2212,15 @@ CFG_DONE:
 
 # save the files in IncDir
         set IncFiles = ( iso-c.h scconfig.h scdecls.h cpyright.h syntax.h )
+        set IncFiles = ( $IncFiles f90types.h f90kinds.inc )
         set IncFiles = ( $IncFiles env-pact.csh env-pact.sh env-pact.dk env-pact.mod )
         set IncFiles = ( $IncFiles env-mio )
-        set IncFiles = ( $IncFiles package make-def make-macros Makefile )
-        set IncFiles = ( $IncFiles f90types.h f90kinds.inc )
+        set IncFiles = ( $IncFiles make-def make-macros )
 
+# save the files in EtcDir
         set EtcFiles = ( do-run-db cfg.db cfg.pco cfg.pl )
-        set EtcFiles = ( $EtcFiles configured )
+        set EtcFiles = ( $EtcFiles configured package )
+        set EtcFiles = ( $EtcFiles Makefile )
 
         set ScmFiles = ( spokes.scm )
 
