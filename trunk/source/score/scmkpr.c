@@ -1164,7 +1164,7 @@ int SC_parse_premake(anadep *state, char *fname)
        rv = TRUE;
 
     if (rv == TRUE)
-       {s  = SC_dsnprintf(TRUE, "%s/include/make-def", state->root);
+       {s  = SC_dsnprintf(TRUE, "%s/etc/make-def", state->root);
 	ok = SC_parse_makefile(state, s);
         if (ok != TRUE)
 	   rv = -2;
@@ -1185,7 +1185,7 @@ int SC_parse_premake(anadep *state, char *fname)
 	   rv = -3;};
 
     if (rv == TRUE)
-       {s  = SC_dsnprintf(TRUE, "%s/include/make-macros", state->root);
+       {s  = SC_dsnprintf(TRUE, "%s/etc/make-macros", state->root);
 	ok = SC_parse_makefile(state, s);
         if (ok != TRUE)
 	   rv = -4;

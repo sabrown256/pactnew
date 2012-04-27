@@ -38,6 +38,7 @@ endif
 set CfgLog = $SysDir/log/config
 set BinDir = $SysDir/bin
 set IncDir = $SysDir/include
+set EtcDir = $SysDir/etc
 
 source ../scripts/env-csh
 
@@ -53,7 +54,7 @@ Separator $Log
 set CfgDO = `grep "Building absolutely" $CfgLog | awk '{ print $3 }'`
 if ("$CfgDO" == debuggable) then
    set Req = `grep "Command: setenv CC_Optimize" $CfgLog | sed 's/Command: setenv CC_Optimize //'`
-   set Got = `grep "CC_Optimize" $IncDir/make-def | tail -n 1 | sed 's/CC_Optimize = //'`
+   set Got = `grep "CC_Optimize" $EtcDir/make-def | tail -n 1 | sed 's/CC_Optimize = //'`
    if ("$Req" == "$Got") then
       NoteD $Log "   debuggable ... yes"
    else
@@ -62,7 +63,7 @@ if ("$CfgDO" == debuggable) then
    endif
 else if ("$CfgDO" == optimized) then
    set Req = `grep "Command: setenv CC_Debug" $CfgLog | sed 's/Command: setenv CC_Debug //'`
-   set Got = `grep "CC_Debug" $IncDir/make-def | tail -n 1 | sed 's/CC_Debug = //'`
+   set Got = `grep "CC_Debug" $EtcDir/make-def | tail -n 1 | sed 's/CC_Debug = //'`
    if ("$Req" == "$Got") then
       NoteD $Log "   optimized .... yes"
    else

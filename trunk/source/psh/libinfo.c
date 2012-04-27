@@ -132,11 +132,11 @@ static void report(infodes *st, char *q, int newl)
     ok = FALSE;
 
     if (strcmp(q, "make") == 0)
-       ok = report_var(st, "include", "make-def", "UMake",
+       ok = report_var(st, "etc", "make-def", "UMake",
 		       NULL, newl, FALSE);
 
     if (strcmp(q, "config") == 0)
-       ok = report_var(st, "include", "make-def", "System",
+       ok = report_var(st, "etc", "make-def", "System",
 		       NULL, newl, FALSE);
 
     if (!ok)
@@ -144,7 +144,7 @@ static void report(infodes *st, char *q, int newl)
 		       "#define", newl, FALSE);
 
     if (!ok)
-       ok = report_var(st, "include", "make-def", q,
+       ok = report_var(st, "etc", "make-def", q,
 		       NULL, newl, FALSE);
 
     if (!ok)
@@ -218,6 +218,46 @@ int report_info(char *root, int cmpl, int ltrl, itarget tgt, char *ptrn)
              break;};
 
     return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* BUILD_MAKEFILE - make the specified Makefile from the pre-Make
+ *                - in the current directory
+ *                - return 0 iff successful
+ */
+
+int build_makefile(char *root, char *arch, char *mkfile, int vrb)
+   {int err;
+    char cmd[MAXLINE], makef[MAXLINE], etc[MAXLINE];
+
+    err = 0;
+
+    snprintf(etc, MAXLINE, "%s/etc", root);
+    snprintf(makef, MAXLINE, "%s", mkfile);
+
+    snprintf(cmd, MAXLINE, "csh -cf \"mkdir -p %s/obj >& /dev/null\"", arch);
+    system(cmd);
+
+    if (vrb == TRUE)
+       printf("\nMaking %s from pre-Make\n\n", makef);
+
+    snprintf(cmd, MAXLINE, "cp %s/make-def %s", etc, makef);
+    err |= system(cmd);
+
+    snprintf(cmd, MAXLINE, "echo PACTTmpDir = %s/obj >> %s", arch, makef);
+    err |= system(cmd);
+
+    snprintf(cmd, MAXLINE, "echo PACTSrcDir = ../.. >> %s", makef);
+    err |= system(cmd);
+
+    snprintf(cmd, MAXLINE, "cat pre-Make >> %s", makef);
+    err |= system(cmd);
+
+    snprintf(cmd, MAXLINE, "cat %s/make-macros >> %s", etc, makef);
+    err |= system(cmd);
+
+    return(err);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

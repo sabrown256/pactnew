@@ -77,16 +77,16 @@ Note $Log "   UseTmpDir     = |$UseTmpDir|"
        if (-e $InstBase/bin/pact) then
           flog $Log cp $InstBase/bin/pact $InstOld
        endif
-       if (-e $InstBase/include/make-def) then
-          flog $Log cp $InstBase/include/make-def $InstOld
+       if (-e $InstBase/etc/make-def) then
+          flog $Log cp $InstBase/etc/make-def $InstOld
        endif
-       if (-e $InstBase/include/make-macros) then
-          flog $Log cp $InstBase/include/make-macros $InstOld
+       if (-e $InstBase/etc/make-macros) then
+          flog $Log cp $InstBase/etc/make-macros $InstOld
        endif
 
        if (-d $InstBase/include) then
-          sed "s|$SysDir|$InstBase|" $IncDir/make-def > $InstBase/include/make-def
-          flog $Log cp $IncDir/make-macros $InstBase/include/make-macros
+          sed "s|$SysDir|$InstBase|" $EtcDir/make-def > $InstBase/etc/make-def
+          flog $Log cp $EtcDir/make-macros $InstBase/etc/make-macros
        endif
     endif
 

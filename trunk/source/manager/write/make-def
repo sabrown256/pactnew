@@ -47,6 +47,7 @@ HAVE_SUBROUTINES
 #dbget DEFAULT_SHELL
 #dbget DP_Inc
 #dbget DP_Lib
+#dbget EtcDir
 #dbget FC_Debug
 #dbget FC_Exe
 #dbget FC_Flags
@@ -117,7 +118,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
 # add DP_Inc to CC_Inc
     flog $Log setenv CC_Inc  "$CC_Inc $DP_Inc"
 
-    set STDOUT = $IncDir/make-def
+    set STDOUT = $EtcDir/make-def
 
     flog $Log $RM $STDOUT
     flog $Log touch $STDOUT
@@ -144,6 +145,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT 'BinDir  = ${SysDir}/bin'
     Note $STDOUT 'LibDir  = ${SysDir}/lib'
     Note $STDOUT 'IncDir  = ${SysDir}/include'
+    Note $STDOUT 'EtcDir  = ${SysDir}/etc'
     Note $STDOUT 'Man1Dir = ${SysDir}/man/man1'
     Note $STDOUT 'Man3Dir = ${SysDir}/man/man3'
     Note $STDOUT ""
