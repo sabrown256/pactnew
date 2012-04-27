@@ -30,45 +30,6 @@ static char
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* BUILD_MAKEFILE - make the specified Makefile from the pre-Make
- *                - in the current directory
- *                - return 0 iff successful
- */
-
-static int build_makefile(char *mkfile, anadep *state)
-   {int err;
-    char cmnd[MAXLINE], makef[MAXLINE], inc[MAXLINE];
-
-    err = 0;
-
-    snprintf(inc, MAXLINE,   "%s/include", state->root);
-    snprintf(makef, MAXLINE, "%s", mkfile);
-
-    snprintf(cmnd, MAXLINE, "csh -cf \"mkdir -p %s/obj >& /dev/null\"", state->arch);
-    system(cmnd);
-
-    printf("\nMaking %s from pre-Make\n\n", makef);
-
-    snprintf(cmnd, MAXLINE, "cp %s/make-def %s", inc, makef);
-    err |= system(cmnd);
-
-    snprintf(cmnd, MAXLINE, "echo PACTTmpDir = %s/obj >> %s", state->arch, makef);
-    err |= system(cmnd);
-
-    snprintf(cmnd, MAXLINE, "echo PACTSrcDir = ../.. >> %s", makef);
-    err |= system(cmnd);
-
-    snprintf(cmnd, MAXLINE, "cat pre-Make >> %s", makef);
-    err |= system(cmnd);
-
-    snprintf(cmnd, MAXLINE, "cat %s/make-macros >> %s", inc, makef);
-    err |= system(cmnd);
-
-    return(err);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* COMMAND_MAKEFILE - construct a database to run
  *                  - a command specified in A[1-N]
  *                  - in each directory specified in the file A[0]
@@ -456,7 +417,7 @@ int main(int c, char **v, char **env)
              na = 1;}
 	 else if (strcmp(v[i], "-B") == 0)
 	    {snprintf(mkfile, MAXLINE, "%s/Makefile", state->arch);
-	     st = build_makefile(mkfile, state);
+	     st = build_makefile(state->root, state->arch, mkfile, TRUE);
 	     return(st);}
 	 else if (strcmp(v[i], "-cmd") == 0)
 	    {mkname = ".command";

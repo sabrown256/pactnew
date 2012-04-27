@@ -1061,11 +1061,10 @@ switch ($Cmnd)
         Note $EnvSh "export PATH=.:$DevDir/"'$System/bin:$PATH'
         Note $EnvSh ""
 
-# remove files we are about to generate
+# remove files we are about to generate in include
 # so that if generation fails we are not left with ghosts from old configs
         set GenFiles = ""
-        set GenFiles = ( $GenFiles package configured f90-interface )
-        set GenFiles = ( $GenFiles make-def make-macros makefile )
+        set GenFiles = ( $GenFiles f90-interface )
         set GenFiles = ( $GenFiles iso-c.h scconfig.h scdecls.h syntax.h)
         set GenFiles = ( $GenFiles spokes.scm )
         set GenFiles = ( $GenFiles env-mio )
@@ -1073,6 +1072,18 @@ switch ($Cmnd)
            flog $Log $RM $IncDir/$i
         endif
 
+# remove files we are about to generate in etc
+# so that if generation fails we are not left with ghosts from old configs
+        set GenFiles = ""
+        set GenFiles = ( $GenFiles package configured )
+        set GenFiles = ( $GenFiles make-def make-macros Makefile )
+        set GenFiles = ( $GenFiles env-mio )
+        foreach i ( $GenFiles )
+           flog $Log $RM $IncDir/$i
+        endif
+
+# remove files we are about to generate in bin
+# so that if generation fails we are not left with ghosts from old configs
         set GenFiles = ""
         set GenFiles = ( $GenFiles install-pact )
         foreach i ( $GenFiles )
@@ -2213,14 +2224,14 @@ CFG_DONE:
 # save the files in IncDir
         set IncFiles = ( iso-c.h scconfig.h scdecls.h cpyright.h syntax.h )
         set IncFiles = ( $IncFiles f90types.h f90kinds.inc )
-        set IncFiles = ( $IncFiles env-pact.csh env-pact.sh env-pact.dk env-pact.mod )
         set IncFiles = ( $IncFiles env-mio )
-        set IncFiles = ( $IncFiles make-def make-macros )
 
 # save the files in EtcDir
         set EtcFiles = ( do-run-db cfg.db cfg.pco cfg.pl )
         set EtcFiles = ( $EtcFiles configured package )
-        set EtcFiles = ( $EtcFiles Makefile )
+        set EtcFiles = ( $EtcFiles Makefile make-def make-macros )
+        set EtcFiles = ( $EtcFiles env-pact.csh env-pact.sh )
+        set EtcFiles = ( $EtcFiles env-pact.dk env-pact.mod )
 
         set ScmFiles = ( spokes.scm )
 

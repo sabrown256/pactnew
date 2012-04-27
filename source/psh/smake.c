@@ -82,45 +82,6 @@ void manage_tmp_dir(statedes *st, int start)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* BUILD_MAKEFILE - make the specified Makefile from the pre-Make
- *                - in the current directory
- *                - return 0 iff successful
- */
-
-int build_makefile(statedes *st, char *mkfile)
-   {int err;
-    char cmd[MAXLINE], makef[MAXLINE], inc[MAXLINE];
-
-    err = 0;
-
-    snprintf(inc, MAXLINE, "%s/include", st->root);
-    snprintf(makef, MAXLINE, "%s", mkfile);
-
-    snprintf(cmd, MAXLINE, "csh -c \"mkdir -p %s/obj >& /dev/null\"", st->arch);
-    system(cmd);
-
-/*    printf("\nMaking %s from pre-Make\n\n", makef); */
-
-    snprintf(cmd, MAXLINE, "cp %s/make-def %s", inc, makef);
-    err |= system(cmd);
-
-    snprintf(cmd, MAXLINE, "echo PACTTmpDir = %s/obj >> %s", st->arch, makef);
-    err |= system(cmd);
-
-    snprintf(cmd, MAXLINE, "echo PACTSrcDir = ../.. >> %s", makef);
-    err |= system(cmd);
-
-    snprintf(cmd, MAXLINE, "cat pre-Make >> %s", makef);
-    err |= system(cmd);
-
-    snprintf(cmd, MAXLINE, "cat %s/make-macros >> %s", inc, makef);
-    err |= system(cmd);
-
-    return(err);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* HANDLER - handle signals gracefully */
 
 static void handler(int sig)
@@ -245,7 +206,7 @@ static int method_1(statedes *st, int c, char **v, char *pmname)
 	nstrcat(cmd, MAXLINE, s);}
 
     else
-       {snprintf(s, MAXLINE, "echo \"include %s/include/make-def\" ; ", st->root);
+       {snprintf(s, MAXLINE, "echo \"include %s/etc/make-def\" ; ", st->root);
 	nstrcat(cmd, MAXLINE, s);
 
         snprintf(s, MAXLINE, "echo \"PACTTmpDir = %s\" ; ", st->tmpdir);
@@ -263,7 +224,7 @@ static int method_1(statedes *st, int c, char **v, char *pmname)
         snprintf(s, MAXLINE, "cat %s ; ", pmname);
 	nstrcat(cmd, MAXLINE, s);
 
-	snprintf(s, MAXLINE, "echo \"include %s/include/make-macros\"", st->root);
+	snprintf(s, MAXLINE, "echo \"include %s/etc/make-macros\"", st->root);
 	nstrcat(cmd, MAXLINE, s);};
 
     nstrcat(cmd, MAXLINE, ") | ");
@@ -292,7 +253,7 @@ static int method_2(statedes *st, int c, char **v, char *mkfile, long tmm)
        {if (S_ISREG(sbf.st_mode))
 	   {tmp = sbf.st_mtime;
 	    if (tmp > tmm)
-               build_makefile(st, mkfile);};};
+               build_makefile(st->root, st->arch, mkfile, FALSE);};};
 
 /* make the command to invoke make */
     cmd[0] = '\0';
@@ -502,7 +463,7 @@ int main(int c, char **v)
             {switch (v[i][1])
                 {case 'B' :
                       snprintf(mkfile, MAXLINE, "%s/Makefile", st.arch);
-                      status = build_makefile(&st, mkfile);
+                      status = build_makefile(st.root, st.arch, mkfile, TRUE);
 		      return(status);
 		      break;
 		 case 'h' :

@@ -22,6 +22,7 @@ source $ScrDir/env-csh
 dbget Bits
 dbget BuildSharedLibs
 dbget BuildStrategy
+dbget EtcDir
 dbget FPU
 dbget HaveGNUFenv
 dbget IncDir
@@ -36,6 +37,7 @@ Separator $Log
 Note $Log "   Bits            = $Bits"
 Note $Log "   BuildSharedLibs = $BuildSharedLibs"
 Note $Log "   BuildStrategy   = $BuildStrategy"
+Note $Log "   EtcDir          = $EtcDir"
 Note $Log "   FPU             = $FPU"
 Note $Log "   HaveGNUFenv     = $HaveGNUFenv"
 Note $Log "   IncDir          = $IncDir"
@@ -58,7 +60,7 @@ set LibVers = 1
 
     NoteD $Log "   System Dependent MAKE Macros - make-macros"
 
-    set STDOUT = $IncDir/make-macros
+    set STDOUT = $EtcDir/make-macros
 
     flog $Log $RM $STDOUT
     flog $Log touch $STDOUT
