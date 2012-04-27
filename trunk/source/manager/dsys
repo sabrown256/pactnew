@@ -76,7 +76,7 @@ set LogDir  = $SysDir/log
 set ScmDir  = $SysDir/scheme
 set PACT    = $BinDir/pact
 set PERDB   = $BinDir/perdb
-set EnvCsh  = $IncDir/env-pact.csh
+set EnvCsh  = $EtcDir/env-pact.csh
 
 set PCKS    = "-"
 set Tmp     = tmp_$System
@@ -802,8 +802,8 @@ switch ($Cmnd)
                    setenv System  $1
                    set ExplSystem = TRUE
                    set IncDir     = $SysDir/include
-                   set EnvCsh     = $IncDir/env-pact.csh
-                   set EnvSh      = $IncDir/env-pact.sh
+                   set EnvCsh     = $EtcDir/env-pact.csh
+                   set EnvSh      = $EtcDir/env-pact.sh
                    breaksw
               case -p:
                    set PArgs = ( $PArgs "-p" )
@@ -930,8 +930,8 @@ switch ($Cmnd)
         set PERDB  = $BinDir/perdb
 
         if ($ExplSystem == FALSE) then
-           set EnvCsh = $IncDir/env-pact.csh
-           set EnvSh  = $IncDir/env-pact.sh
+           set EnvCsh = $EtcDir/env-pact.csh
+           set EnvSh  = $EtcDir/env-pact.sh
         endif
 
         set temp   = $SHELL
@@ -1478,7 +1478,7 @@ CFG_DONE:
         foreach c ($cfgs)
            echo -n "   $c ... "
            setenv SESSION_CONFIG $c
-           source ../dev/$SESSION_CONFIG/include/env-pact.csh
+           source ../dev/$SESSION_CONFIG/etc/env-pact.csh
            rehash
            install-pact >& /dev/null
            set RStatus = $status
@@ -2054,7 +2054,7 @@ CFG_DONE:
         InitLog LogFile $LogDir/rebuild
 
         flog $LogFile setenv SESSION_CONFIG $Cfg
-        flog $LogFile source $DevDir/$Cfg/include/env-pact.csh
+        flog $LogFile source $DevDir/$Cfg/etc/env-pact.csh
 
         NoteD $LogFile -n "   Re-compiling ... "
         Note $LogFile ""
@@ -2114,12 +2114,12 @@ CFG_DONE:
 
 # get config method and original config file
         if (-f $db) then
-           set inf = ( `pact +l -info CONFIG_METHOD` )
+           set inf  = ( `pact +l -info CONFIG_METHOD` )
            set meth = $inf[1]
            set cfg  = ( `grep Sys= $db |& sed 's/^Sys=//'` )
         else
            set meth = file
-           set inf  = ( `awk '($1 == "Config") { print $3 }' $IncDir/configured` )
+           set inf  = ( `awk '($1 == "Config") { print $3 }' $EtcDir/configured` )
            set cfg  = $inf[1]:t
         endif
         unset inf

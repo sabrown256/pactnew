@@ -8,6 +8,10 @@
  *
  */
 
+#ifndef LIBSOCK
+
+#define LIBSOCK
+
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
@@ -466,3 +470,4 @@ static int write_sock(client *cl, char *s, int nc)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+#endif

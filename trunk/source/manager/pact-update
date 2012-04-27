@@ -524,8 +524,8 @@ setenv System `$base/scripts/cfgman -d $base/dev use`
 Note $Log "System = $System"
 
 set root   = $base/dev/$System
-set incdir = $root/include
-set envf   = $incdir/env-pact.csh
+set etcdir = $root/etc
+set envf   = $etcdir/env-pact.csh
 set versid = `cat ./.pact-version`
 
 NoteD $Log "Configuring PACT version $versid ($System) with: $cargs"

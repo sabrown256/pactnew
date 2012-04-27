@@ -13,163 +13,19 @@
 
 #include "scope_make.h"
 
+/* get report_info from psh routines which supply
+ * smake, dmake, and pact-info
+ */
+#include <../psh/common.h>
+#include <../psh/libpsh.c>
+#include <../psh/libinfo.c>
+
 static int
  debug = FALSE,
  phase = 0;
 
 static char
  **argv = NULL;
-
-/*--------------------------------------------------------------------------*/
-
-/*                             HIGH LEVEL PACT                              */
-
-/*--------------------------------------------------------------------------*/
-
-/* REPORT_VAR - report on the variable Q in FILE */
-
-static int report_var(anadep *state, char *dir, char *fname,
-		      char *q, char *key, int newl)
-   {int i, nc, ok, doit, tst;
-    int compl, litrl, quote;
-    char s[MAX_BFSZ];
-    char *tok, *txt, *ps, *p, *file;
-    FILE *fp;
-
-    compl = state->complete;
-    litrl = state->literal;
-    quote = state->quotes;
-
-    ok = FALSE;
-
-    file = SC_dsnprintf(TRUE, "%s/%s/%s", state->root, dir, fname);
-
-    fp = io_open(file, "r");
-    if (fp != NULL)
-       {for (i = 0; io_gets(s, MAX_BFSZ, fp) != NULL; i++)
-	    {if (key != NULL)
-	        {tok  = strtok(s, " \t\r");
-		 doit = ((tok != NULL) && (strcmp(tok, key) == 0));
-		 ps   = NULL;}
-	     else
-	        {doit = TRUE;
-		 ps   = s;};
-
-	     if (doit)
-	        {tok = strtok(ps, " \t\n");
-		 if (tok == NULL)
-		    continue;
-
-		 tst = (litrl) ? (strcmp(tok, q) == 0) :
-		                 (strncmp(tok, q, strlen(q)) == 0);
-
-		 if (tst)
-		    {txt = strtok(NULL, "\n");
-
-/* with env-pact.sh you WILL get here with txt NULL and tok <var>=<val>
- * or in scconfig.h with txt NULL and tok <var>
- */
-		     if (txt == NULL)
-		        {p = strchr(tok, '=');
-			 if (p != NULL)
-			    {*p++ = '\0';
-			     txt  = p;}
-			 else
-			    txt = tok;}
-
-/* with env-pact.csh you WILL get here with txt <val> and tok <var> */
-		     else
-		        {while (*txt != '\0')
-			    {if (strchr("= \t", *txt) == NULL)
-			        break;
-			     else
-			        txt++;};};
-
-		     if (quote == FALSE)
-		        {nc = strlen(txt);
-			 if (nc >= 2)
-			    SC_strsubst(txt, nc+1, txt, "\"", "", -1);};
-
-		     if (compl)
-		        io_printf(stdout, "%s = %s", tok, txt);
-		     else
-		        io_printf(stdout, "%s", txt);
-
-		     memset(s, 0, MAX_BFSZ);
-		     ok = TRUE;
-
-		     if (newl == TRUE)
-		        io_printf(stdout, "\n");
-                     else
-		        io_printf(stdout, " ");};};};
-
-	io_close(fp);};
-
-    CFREE(file);
-
-    return(ok);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* REPORT - report the value of one of the configuration quantities */
-
-static void report(anadep *state, char *q, int newl)
-   {int ok;
-    char *s, *devdir;
-
-    ok = FALSE;
-
-    if (strcmp(q, "make") == 0)
-       {devdir = SC_dstrcpy(NULL, state->root);
-	io_printf(stdout, "%s/bin/dmake\n", devdir);
-	CFREE(devdir);};
-
-    if (strcmp(q, "config") == 0)
-       ok = report_var(state, "include", "make-def", "System", NULL, newl);
-
-    if (!ok)
-       ok = report_var(state, "include", "scconfig.h", q, "#define", newl);
-
-    if (!ok)
-       ok = report_var(state, "include", "make-def", q, NULL, newl);
-
-    if (!ok)
-       ok = report_var(state, "etc", "configured", q, NULL, newl);
-
-    if (!ok)
-       {s = getenv("SHELL");
-	if ((s != NULL) && (strstr(s, "csh") != NULL))
-	   ok = report_var(state, "include", "env-pact.csh",
-			   q, "setenv", newl);
-        else
-	   ok = report_var(state, "include", "env-pact.sh",
-			   q, "export", newl);};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* REPORT_CL - report the information relevant to compiling and linking */
-
-static void report_cl(anadep *state, char *q)
-   {
-
-    state->literal = TRUE;
-
-    if (strcmp(q, "-incpath") == 0)
-       {report(state, "MDGInc", FALSE);
-        report(state, "MDInc", TRUE);}
-
-    else if (strcmp(q, "-link") == 0)
-       {report(state, "LDRPath", FALSE);
-        report(state, "LDPath", FALSE);
-	report(state, "DP_Lib", FALSE);
-	report(state, "MDGLib", FALSE);
-	report(state, "MDLib",  TRUE);};
-
-    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -238,7 +94,7 @@ static int command_makefile(anadep *state, char **a)
 	 cmnd = SC_dstrcat(cmnd, " ");};
 
     if (a[0][0] == '-')
-       {snprintf(s, MAXLINE, "%s/include/package", state->root);
+       {snprintf(s, MAXLINE, "%s/etc/package", state->root);
 	fname = s;}
     else
        fname = a[0];
@@ -625,21 +481,25 @@ int main(int c, char **v, char **env)
          else if (strcmp(v[i], "-i") == 0)
 	    ignore = TRUE;
 	 else if (strcmp(v[i], "-incpath") == 0)
-	    {report_cl(state, v[i]);
+	    {report_info(state->root, state->complete, state->literal,
+			 INC, NULL);
 	     return(0);}
 	 else if (strcmp(v[i], "-info") == 0)
 	    {if (++i < c)
-	        report(state, v[i], TRUE);
+	        report_info(state->root, state->complete, state->literal,
+			    PATTERN, v[i]);
 	     return(0);}
 	 else if (strcmp(v[i], "+info") == 0)
 	    {if (++i < c)
 	        {state->complete = TRUE;
-		 report(state, v[i], TRUE);};
+		 report_info(state->root, state->complete, state->literal,
+			     PATTERN, v[i]);};
 	     return(0);}
          else if (strcmp(v[i], "+l") == 0)
 	    state->literal = TRUE;
 	 else if (strcmp(v[i], "-link") == 0)
-	    {report_cl(state, v[i]);
+	    {report_info(state->root, state->complete, state->literal,
+			 LINK, NULL);
 	     return(0);}
          else if (strcmp(v[i], "-log") == 0)
 	    log = v[++i];
@@ -686,7 +546,8 @@ int main(int c, char **v, char **env)
 	 else if (strcmp(v[i], "-sys") == 0)
 	    snprintf(state->arch, MAXLINE, "%s", v[++i]);
 	 else if (strcmp(v[i], "-v") == 0)
-	    {io_printf(stdout, "%s\n", VERSION);
+	    {report_info(state->root, state->complete, state->literal,
+			 VERSION, NULL);
 	     return(0);}
          else if (strcmp(v[i], "-vrb") == 0)
 	    {show = 2;

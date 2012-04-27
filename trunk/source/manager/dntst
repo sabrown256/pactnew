@@ -162,7 +162,7 @@ switch ($Phase)
            set SPList = ""
         endif
 
-        set EnvCsh = ../dev/$arch/include/env-pact.csh
+        set EnvCsh = ../dev/$arch/etc/env-pact.csh
         if (-e $EnvCsh) then
            source $EnvCsh
         endif

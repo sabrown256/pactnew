@@ -9,6 +9,10 @@
  *
  */
 
+#ifndef LIBPSH
+
+#define LIBPSH
+
 #define TEXT       10
 #define HTML       11
 
@@ -739,7 +743,9 @@ char *path_suffix(char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* FULL_PATH - make a full path out of NAME */
+/* FULL_PATH - make a full path out of NAME
+ *           - without reference to the PATH environment variable
+ */
 
 int full_path(char *path, int nc, char *dir, char *name)
    {int rv;
@@ -1657,6 +1663,138 @@ int pop_dir(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* POP_PATH - pop the tail of the path off
+ *          - return a pointer to the head component
+ */
+
+char *pop_path(char *path)
+   {char *p;
+
+    p = strrchr(path, '/');
+    if (p != NULL)
+       *p++ = '\0';
+    else
+       p = path;
+
+    return(p);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* IS_EXECUTABLE_FILE - if PATH is the name of an executable file
+ *                    - and if the length of path is <= NCX
+ *                    - copy it into FP and return the length
+ */
+
+static int is_executable_file(char *fp, char *path, int ncx)
+   {int n, muid, mgid, fuid, fgid;
+    int usrx, grpx, othx, file;
+    struct stat bf;
+
+    n = -1;
+
+    muid = getuid();
+    mgid = getgid();
+
+    n = -1;
+    if (stat(path, &bf) == 0)
+       {fuid = bf.st_uid;
+	fgid = bf.st_gid;
+	file = bf.st_mode & S_IFREG;
+	usrx = ((muid == fuid) && (bf.st_mode & S_IXUSR));
+	grpx = ((mgid == fgid) && (bf.st_mode & S_IXGRP));
+	othx = (bf.st_mode & S_IXOTH);
+	if (file && (usrx || grpx || othx))
+	   {n = strlen(path);
+	    if (n <= ncx)
+	       {strcpy(fp, path);
+		n = 0;};};}
+
+    return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* HANDLE_PATH_DOT - given a directory DIR and path NAME
+ *                 - resolve out ./ and ../ elements of NAME
+ *                 - return result in PATH
+ *                 - DIR may be destroyed in this process
+ */
+
+static void handle_path_dot(char *path, char *dir, char *name)
+   {char *s;
+
+    if (dir != NULL)
+       {s = name;
+
+/* loop over any number of ./ or ../ elements of the path */
+	while (s[0] == '.')
+	   {if (s[1] == '.')
+	       {s += 3;
+		pop_path(dir);}
+	    else
+	       s += 2;};
+
+/* construct the candidate path */
+	sprintf(path, "%s/%s", dir, s);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FILE_PATH - given the name of a file return the full path
+ *           - with reference to the PATH environment variable
+ *           - expand out '.' and '..' constructions
+ *           - input is the NAME, output is the PATH which is
+ *           - at most NC chars long
+ *           - return:
+ *           -    0 on success
+ *           -    n NAME is there but NC is too few characters
+ *           -      n is the number of characters needed to contain
+ *           -      the full path
+ */
+
+int file_path(char *name, char *path, int nc)
+   {int n;
+    size_t nb;
+    char pathvar[MAXLINE], fp[MAXLINE];
+    char *t, *p;
+    extern char *getcwd(char *buf, size_t size);
+
+    n  = -1;
+    nb = MAXLINE - 1;
+    switch (name[0])
+       {case '/' :
+	     n = is_executable_file(path, name, nc);
+             break;
+
+        case '.' :
+             t = getcwd(pathvar, nb);
+             handle_path_dot(fp, t, name);
+	     n = is_executable_file(path, fp, nc);
+             break;
+
+        default:
+	     p = getenv("PATH");
+	     if (p != NULL)
+	        {strncpy(pathvar, p, MAXLINE);
+		 pathvar[MAXLINE-1] = '\0';
+
+		 for (t = strtok(pathvar, ":");
+		      t != NULL;
+		      t = strtok(NULL, ":"))
+		     {handle_path_dot(fp, t, name);
+		      n = is_executable_file(path, fp, nc);
+		      if (n == 0)
+			 break;};};
+             break;};
+
+    return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* LS - return an array of file names
  *    - the last entry is NULL and marks the end of the list
  */
@@ -2317,3 +2455,5 @@ int is_running(int pid)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+#endif

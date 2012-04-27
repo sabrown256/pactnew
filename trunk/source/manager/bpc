@@ -278,7 +278,7 @@ void remove_log_files(object *hsts)
 char *command(char *s)
    {char *t;
 
-    t = sprintf("source ../dev/`../scripts/cfgman use`/include/env-pact.csh ; %s", s);
+    t = sprintf("source ../dev/`../scripts/cfgman use`/etc/env-pact.csh ; %s", s);
     printf(stdout, "   %s\n", t);
 
     return(t);}

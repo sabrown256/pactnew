@@ -10,9 +10,7 @@
 
 #include "common.h"
 #include "libpsh.c"
-
-#undef MAXLINE
-#define MAXLINE 4096
+#include "libinfo.c"
 
 typedef struct s_statedes statedes;
 
@@ -34,149 +32,6 @@ char *getcwd();
 char *getenv();
 void (*signal())();
 void exit(int status);
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* REPORT_VAR - report on the variable Q in FILE */
-
-static int report_var(statedes *st, char *dir, char *fname,
-		      char *q, char *key, int newl)
-   {int i, nc, ok, doit, tst;
-    int compl, litrl, quote;
-    char file[MAXLINE];
-    char *p, *tok, *txt, *ps, **sa;
-
-    ok = FALSE;
-
-    compl = st->complete;
-    litrl = st->literal;
-    quote = FALSE;
-
-    snprintf(file, MAXLINE, "%s/%s/%s", st->root, dir, fname);
-
-    sa = file_text(FALSE, file);
-    if (sa != NULL)
-       {for (i = 0; sa[i] != NULL; i++)
-	    {p = sa[i];
-	     if (key != NULL)
-	        {tok  = strtok(p, " \t\r");
-		 doit = ((tok != NULL) && (strcmp(tok, key) == 0));
-		 ps   = NULL;}
-	     else
-	        {doit = TRUE;
-		 ps   = p;};
-
-	     if (doit)
-	        {tok = strtok(ps, " \t\n");
-		 if (tok == NULL)
-		    continue;
-
-		 tst = (litrl) ? (strcmp(tok, q) == 0) :
-		                 (strncmp(tok, q, strlen(q)) == 0);
-
-		 if (tst)
-		    {txt = strtok(NULL, "\n");
-
-/* with env-pact.sh you WILL get here with txt NULL and tok <var>=<val>
- * or in scconfig.h with txt NULL and tok <var>
- */
-		     if (txt == NULL)
-		        {p = strchr(tok, '=');
-			 if (p != NULL)
-			    {*p++ = '\0';
-			     txt  = p;}
-			 else
-			    txt = tok;}
-
-/* with env-pact.csh you WILL get here with txt <val> and tok <var> */
-		     else
-		        {while (*txt != '\0')
-			    {if (strchr("= \t", *txt) == NULL)
-			        break;
-			     else
-			        txt++;};};
-
-		     if (quote == FALSE)
-		        {nc = strlen(txt);
-			 if (nc >= 2)
-			    txt = subst(txt, "\"", "", -1);};
-
-		     if (compl)
-		        printf("%s = %s", tok, txt);
-		     else
-		        printf("%s", txt);
-
-		     ok = TRUE;
-
-		     if (newl == TRUE)
-		        printf("\n");
-                     else
-		        printf(" ");};};};
-
-	free_strings(sa);};
-
-    return(ok);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* REPORT - report the value of one of the configuration quantities */
-
-static void report(statedes *st, char *q, int newl)
-   {int ok;
-    char *s;
-
-    ok = FALSE;
-
-    if (strcmp(q, "make") == 0)
-       ok = report_var(st, "include", "make-def", "UMake", NULL, newl);
-
-    if (strcmp(q, "config") == 0)
-       ok = report_var(st, "include", "make-def", "System", NULL, newl);
-
-    if (!ok)
-       ok = report_var(st, "include", "scconfig.h", q, "#define", newl);
-
-    if (!ok)
-       ok = report_var(st, "include", "make-def", q, NULL, newl);
-
-    if (!ok)
-       ok = report_var(st, "etc", "configured", q, NULL, newl);
-
-    if (!ok)
-       {s = getenv("SHELL");
-	if ((s != NULL) && (strstr(s, "csh") != NULL))
-	   ok = report_var(st, "include", "env-pact.csh",
-			   q, "setenv", newl);
-	else
-	   ok = report_var(st, "include", "env-pact.sh",
-			   q, "export", newl);};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* REPORT_CL - report the information relevant to compiling and linking */
-
-static void report_cl(statedes *st, char *q)
-   {
-
-    st->literal = TRUE;
-
-    if (strcmp(q, "-incpath") == 0)
-       {report(st, "MDGInc", FALSE);
-        report(st, "MDInc", TRUE);}
-
-    else if (strcmp(q, "-link") == 0)
-       {report(st, "LDRPath", FALSE);
-        report(st, "LDPath", FALSE);
-	report(st, "DP_Lib", FALSE);
-	report(st, "MDGLib", FALSE);
-	report(st, "MDLib", TRUE);};
-
-    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -494,138 +349,6 @@ static int command_makefile(statedes *st, char *fname, int c, char **v, char **a
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* POP_PATH - pop the tail of the path off
- *          - return a pointer to the head component
- */
-
-char *pop_path(char *path)
-   {char *p;
-
-    p = strrchr(path, '/');
-    if (p != NULL)
-       *p++ = '\0';
-    else
-       p = path;
-
-    return(p);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* IS_EXECUTABLE_FILE - if PATH is the name of an executable file
- *                    - and if the length of path is <= NCX
- *                    - copy it into FP and return the length
- */
-
-static int is_executable_file(char *fp, char *path, int ncx)
-   {int n, muid, mgid, fuid, fgid;
-    int usrx, grpx, othx, file;
-    struct stat bf;
-
-    n = -1;
-
-    muid = getuid();
-    mgid = getgid();
-
-    n = -1;
-    if (stat(path, &bf) == 0)
-       {fuid = bf.st_uid;
-	fgid = bf.st_gid;
-	file = bf.st_mode & S_IFREG;
-	usrx = ((muid == fuid) && (bf.st_mode & S_IXUSR));
-	grpx = ((mgid == fgid) && (bf.st_mode & S_IXGRP));
-	othx = (bf.st_mode & S_IXOTH);
-	if (file && (usrx || grpx || othx))
-	   {n = strlen(path);
-	    if (n <= ncx)
-	       {strcpy(fp, path);
-		n = 0;};};}
-
-    return(n);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* HANDLE_PATH_DOT - given a directory DIR and path NAME
- *                 - resolve out ./ and ../ elements of NAME
- *                 - return result in PATH
- *                 - DIR may be destroyed in this process
- */
-
-static void handle_path_dot(char *path, char *dir, char *name)
-   {char *s;
-
-    if (dir != NULL)
-       {s = name;
-
-/* loop over any number of ./ or ../ elements of the path */
-	while (s[0] == '.')
-	   {if (s[1] == '.')
-	       {s += 3;
-		pop_path(dir);}
-	    else
-	       s += 2;};
-
-/* construct the candidate path */
-	sprintf(path, "%s/%s", dir, s);};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* FILE_PATH - given the name of a file return the full path
- *           - if FULL is TRUE
- *           - otherwise expand out '.' and '..' constructions
- *           - input is the NAME, output is the PATH which is
- *           - at most NC chars long
- *           - return:
- *           -    0 on success
- *           -    n NAME is there but NC is too few characters
- *           -      n is the number of characters needed to contain
- *           -      the full path
- */
-
-int file_path(char *name, char *path, int nc)
-   {int n;
-    size_t nb;
-    char pathvar[MAXLINE], fp[MAXLINE];
-    char *t, *p;
-    extern char *getcwd(char *buf, size_t size);
-
-    n  = -1;
-    nb = MAXLINE - 1;
-    switch (name[0])
-       {case '/' :
-	     n = is_executable_file(path, name, nc);
-             break;
-
-        case '.' :
-             t = getcwd(pathvar, nb);
-             handle_path_dot(fp, t, name);
-	     n = is_executable_file(path, fp, nc);
-             break;
-
-        default:
-	     p = getenv("PATH");
-	     if (p != NULL)
-	        {strncpy(pathvar, p, MAXLINE);
-		 pathvar[MAXLINE-1] = '\0';
-
-		 for (t = strtok(pathvar, ":");
-		      t != NULL;
-		      t = strtok(NULL, ":"))
-		     {handle_path_dot(fp, t, name);
-		      n = is_executable_file(path, fp, nc);
-		      if (n == 0)
-			 break;};};
-             break;};
-
-    return(n);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* SETUP_ENV - initialize the ARCH and ROOT strings
  *           - return TRUE iff successful with both
  */
@@ -760,11 +483,11 @@ int main(int c, char **v)
 	     i++;}
 
 	 else if (strcmp(v[i], "-incpath") == 0)
-	    {report_cl(&st, v[i]);
+	    {report_info(st.root, st.complete, st.literal, INC, NULL);
 	     return(0);}
 
 	 else if (strcmp(v[i], "-link") == 0)
-	    {report_cl(&st, v[i]);
+	    {report_info(st.root, st.complete, st.literal, LINK, NULL);
 	     return(0);}
 
 /* ignore dmake options taking no argument */
@@ -789,7 +512,8 @@ int main(int c, char **v)
 		 case 'i' :
 		      if (strcmp(v[i], "-info") == 0)
 			 {if (++i < c)
-                             report(&st, v[i], TRUE);
+			     report_info(st.root, st.complete, st.literal,
+					 PATTERN, v[i]);
 			  return(0);};
 		      i--;
 		      ok = FALSE;
@@ -801,16 +525,18 @@ int main(int c, char **v)
                       mv[mc++] = v[i];
 		      break;
 	         case 'v' :
-		      printf("%s\n", PACT_VERSION);
-		      exit(0);
-		      break;};}
+		      report_info(st.root, st.complete, st.literal,
+				  VERSION, NULL);
+		      return(0);};}
+
 	 else if (v[i][0] == '+')
             {switch (v[i][1])
                 {case 'i' :
 		      if (strcmp(v[i], "+info") == 0)
 			 {if (++i < c)
 			     {st.complete = TRUE;
-			      report(&st, v[i], TRUE);};
+			      report_info(st.root, st.complete, st.literal,
+					  PATTERN, v[i]);};
 			  return(0);};
 		      break;
 		 case 'l' :

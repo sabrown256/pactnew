@@ -213,7 +213,7 @@ switch ($Phase)
         set arch   = `../scripts/cfgman use`
         set DevDir = $WrkDir/dev/$arch
         set LogDir = $DevDir/log
-        set IncDir = $DevDir/include
+        set EtcDir = $DevDir/etc
         set Passed = $LogDir/passed
         set path   = ( $DevDir/bin $path )
 
@@ -308,7 +308,7 @@ switch ($Phase)
 
 # on each local host do the builds with specified options
 
-        set EnvCsh = $IncDir/env-pact.csh
+        set EnvCsh = $EtcDir/env-pact.csh
         if (-e $EnvCsh) then
            source $EnvCsh
         endif

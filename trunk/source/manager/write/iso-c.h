@@ -35,7 +35,7 @@ Note $Log "   Sys           = $Sys"
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    NoteD $Log "   C Environment Configuration - iso-c.h"
+    NoteD $Log "   C Standards Configuration - iso-c.h"
 
     set STDOUT = $IncDir/iso-c.h
 

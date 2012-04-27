@@ -84,7 +84,7 @@ switch ($tgt)
 # remove PACT config variables
    case pact:
         set sys = `cfgman use`
-        set inf = "../dev/$sys/include/env-pact.csh"
+        set inf = "../dev/$sys/etc/env-pact.csh"
 
         if (-f $inf) then
            @ nl = `cat $inf | wc -l`

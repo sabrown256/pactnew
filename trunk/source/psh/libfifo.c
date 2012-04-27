@@ -8,6 +8,10 @@
  *
  */
 
+#ifndef LIBFIFO
+
+#define LIBFIFO
+
 static int
  dbg_fifo = FALSE;
 
@@ -193,3 +197,4 @@ static int write_fifo(char *root, int ch, char *s, int nc)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+#endif
