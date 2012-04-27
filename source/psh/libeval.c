@@ -8,6 +8,10 @@
  *
  */
 
+#ifndef LIBEVAL
+
+#define LIBEVAL
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -129,7 +133,7 @@ void prune_env(char *tgt, char *info)
 	    char **sa, *p;
 
 	    nstrncpy(s, MAXLINE, path_head(cwhich(info)), -1);
-	    snprintf(env, MAXLINE, "%s/include/env-pact.csh", path_head(s));
+	    snprintf(env, MAXLINE, "%s/etc/env-pact.csh", path_head(s));
 	    if (file_exists(env) == TRUE)
 	       {sa = file_text(FALSE, env);
 
@@ -154,3 +158,5 @@ void prune_env(char *tgt, char *info)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+#endif

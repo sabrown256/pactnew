@@ -48,6 +48,10 @@
 #include <poll.h>
 #include "nonstd.h"
 
+#undef TRUE
+#undef FALSE
+#undef MAXLINE
+
 #define TRUE       1
 #define FALSE      0
 #define MAXLINE    4096
@@ -56,6 +60,14 @@
 #define N_STACK    32
 #define APPEND     100
 #define PREPEND    101
+
+#undef min
+#undef max
+#undef MAKE
+#undef MAKE_N
+#undef REMAKE
+#undef FREE
+#undef STRSAVE
 
 #define min(a, b)         ((a) < (b) ? (a) : (b))
 #define max(a, b)         ((a) > (b) ? (a) : (b))

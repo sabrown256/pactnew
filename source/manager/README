@@ -103,11 +103,11 @@ installation.
    Now that PACT is installed. You may get any environment variable
    settings special to PACT by sourcing either
 
-       <pact-dir>/include/env-pact.csh
+       <pact-dir>/etc/env-pact.csh
 
    or
 
-       <pact-dir>/include/env-pact.sh
+       <pact-dir>/etc/env-pact.sh
 
    depending on which SHELL you are using.  <pact-dir> refers to the
    value of the -i flag you specified when building.
@@ -215,7 +215,7 @@ installation.
       complained about something in ultra (and your shell is /bin/tcsh.
       You would do the following:
 
-          -> source <pact-dir>/include/env-pact.csh
+          -> source <pact-dir>/etc/env-pact.csh
 
           -> cd pact/ultra
 
@@ -327,9 +327,9 @@ Perform the following steps (assuming for example that the sources are in
                 include, bin, lib, and scheme
          and it must be writable by you.
 
-      d) source <pact-dir>/include/env-pact.csh
+      d) source <pact-dir>/etc/env-pact.csh
                       or
-         . <pact-dir>/include/env-pact.sh
+         . <pact-dir>/etc/env-pact.sh
 
       e) do a pact update to compile, test, and install PACT
 

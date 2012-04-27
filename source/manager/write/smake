@@ -24,6 +24,7 @@ dbget CfgDir
 dbget System
 dbget GnuMakeOpt
 dbget IncDir
+dbget EtcDir
 dbget BinDir
 dbget MngDir
 dbget Cfg_CC_Flags
@@ -42,6 +43,7 @@ Note $Log "   CfgDir        = $CfgDir"
 Note $Log "   System        = $System"
 Note $Log "   GnuMakeOpt    = $GnuMakeOpt"
 Note $Log "   IncDir        = $IncDir"
+Note $Log "   EtcDir        = $EtcDir"
 Note $Log "   BinDir        = $BinDir"
 Note $Log "   MngDir        = $MngDir"
 Note $Log "   Cfg_CC_Flags  = $Cfg_CC_Flags"
@@ -137,7 +139,7 @@ EOF
        else
 
 # put path to compiler at the head of the path variable for ccw
-          source $IncDir/env-pact.csh
+          source $EtcDir/env-pact.csh
 
           flog $Log pushd ../../psh
           flog $Log ./ccw "$RootOpt" smake.c -o $BinDir/smake

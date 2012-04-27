@@ -7,6 +7,10 @@
  * #include "cpyright.h"
  */
 
+#ifndef LIBTIME
+
+#define LIBTIME
+
 #include <sys/time.h>
 
 #define TIME_SEC     500
@@ -64,3 +68,5 @@ char *time_string(char *ts, int nc, int fmt, double t)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+#endif

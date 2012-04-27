@@ -105,14 +105,15 @@ setenv System   `$CfgMan use`
 setenv CfgDir   cfg-$System
 setenv SysDir   $BaseDir/dev/$System
 setenv IncDir   $SysDir/include
+setenv EtcDir   $SysDir/etc
 setenv BinDir   $SysDir/bin
 setenv LibDir   $SysDir/lib
 setenv ScmDir   scheme
 setenv Man1Dir  man/man1
 setenv Man3Dir  man/man3
-setenv EnvCsh   $IncDir/env-pact.csh
-setenv EnvSh    $IncDir/env-pact.sh
-setenv EnvDk    $IncDir/env-pact.dk
+setenv EnvCsh   $EtcDir/env-pact.csh
+setenv EnvSh    $EtcDir/env-pact.sh
+setenv EnvDk    $EtcDir/env-pact.dk
 
 setenv CEFile   $SysDir/log/file.ce
 setenv CDFile   $SysDir/log/file.cd
@@ -217,9 +218,9 @@ Main:
                    setenv System   $1
                    setenv SysDir   $BaseDir/dev/$System
                    setenv IncDir   $SysDir/include
-                   setenv EnvCsh   $IncDir/env-pact.csh
-                   setenv EnvSh    $IncDir/env-pact.sh
-                   setenv EnvDk    $IncDir/env-pact.dk
+                   setenv EnvCsh   $EtcDir/env-pact.csh
+                   setenv EnvSh    $EtcDir/env-pact.sh
+                   setenv EnvDk    $EtcDir/env-pact.dk
                    breaksw
 
           case -t:

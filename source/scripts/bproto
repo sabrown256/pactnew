@@ -22,7 +22,7 @@ set d   = $d:t
 set opt = "-l"
 set opt = ""
 
-source ../dev/$arch/include/env-pact.csh
+source ../dev/$arch/etc/env-pact.csh
 source ../scripts/env-csh
 
 InitLog Log $cwd/z-$arch/obj/bproto

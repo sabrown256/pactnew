@@ -111,7 +111,7 @@ setenv ZeroSpace  "-z 2"
    setenv PSDIFF    $BinDir/ps-diff
    setenv PX        $BaseDir/scripts/px
 
-   source $IncDir/env-pact.csh
+   source $EtcDir/env-pact.csh
 
    if ($?IBM_BGL == 1) then
       setenv RUN_TESTS FALSE

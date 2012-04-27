@@ -786,10 +786,10 @@ static void write_envf(client *cl, int lnotice)
        note(Log, TRUE, "   Environment setup files - env-pact.csh, env-pact.sh, env-pact.dk, and env-pact.mdl");
     note(Log, TRUE, "");
 
-    fcsh = open_file("w", "%s/env-pact.csh", st.dir.inc);
-    fsh  = open_file("w", "%s/env-pact.sh",  st.dir.inc);
-    fdk  = open_file("w", "%s/env-pact.dk",  st.dir.inc);
-    fmd  = open_file("w", "%s/env-pact.mdl", st.dir.inc);
+    fcsh = open_file("w", "%s/env-pact.csh", st.dir.etc);
+    fsh  = open_file("w", "%s/env-pact.sh",  st.dir.etc);
+    fdk  = open_file("w", "%s/env-pact.dk",  st.dir.etc);
+    fmd  = open_file("w", "%s/env-pact.mdl", st.dir.etc);
 
 /* initialize module with boilerplate */
     note(fmd, TRUE,  "#%%Module1.0");
@@ -902,10 +902,10 @@ static void write_envf(client *cl, int lnotice)
     fclose(fdk);
     fclose(fmd);
 
-    cat(Log, 0, -1, "%s/env-pact.csh", st.dir.inc);
-    cat(Log, 0, -1, "%s/env-pact.sh",  st.dir.inc);
-    cat(Log, 0, -1, "%s/env-pact.dk",  st.dir.inc);
-    cat(Log, 0, -1, "%s/env-pact.mdl", st.dir.inc);
+    cat(Log, 0, -1, "%s/env-pact.csh", st.dir.etc);
+    cat(Log, 0, -1, "%s/env-pact.sh",  st.dir.etc);
+    cat(Log, 0, -1, "%s/env-pact.dk",  st.dir.etc);
+    cat(Log, 0, -1, "%s/env-pact.mdl", st.dir.etc);
 
     return;}
 
@@ -1494,10 +1494,10 @@ static void default_var(client *cl, char *base)
     snprintf(st.dir.bin,  MAXLINE, "%s/bin",     st.dir.root);
     snprintf(st.dir.sch,  MAXLINE, "%s/scheme",  st.dir.root);
 
-    snprintf(st.env_csh,  MAXLINE, "%s/env-pact.csh", st.dir.inc);
-    snprintf(st.env_sh,   MAXLINE, "%s/env-pact.sh",  st.dir.inc);
-    snprintf(st.env_dk,   MAXLINE, "%s/env-pact.dk",  st.dir.inc);
-    snprintf(st.env_mdl,  MAXLINE, "%s/env-pact.mdl", st.dir.inc);
+    snprintf(st.env_csh,  MAXLINE, "%s/env-pact.csh", st.dir.etc);
+    snprintf(st.env_sh,   MAXLINE, "%s/env-pact.sh",  st.dir.etc);
+    snprintf(st.env_dk,   MAXLINE, "%s/env-pact.dk",  st.dir.etc);
+    snprintf(st.env_mdl,  MAXLINE, "%s/env-pact.mdl", st.dir.etc);
 
 /* variable defaults */
     strcpy(st.def_tools, "");

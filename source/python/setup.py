@@ -55,7 +55,7 @@ for arg in sys.argv[1:]:
     
 # PACTHOME
 if dsys:
-  # In dsys, SCHEME is set by the $IncDir/env-pact.csh script created by pact-config.
+  # In dsys, SCHEME is set by the $EtcDir/env-pact.csh script created by pact-config.
   SCHEME = os.environ.get('SCHEME')
 
   if SCHEME is not None:

@@ -91,6 +91,10 @@
  *
  */
 
+#ifndef LIBASYNC
+
+#define LIBASYNC
+
 #include <sys/poll.h>
 #include <sys/wait.h>
 #include <setjmp.h>
@@ -1274,3 +1278,5 @@ void afin(void (*f)(process *pp, void *a))
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+#endif

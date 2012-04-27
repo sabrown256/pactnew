@@ -28,7 +28,7 @@ static void script_env(FILE *fo, char *pact)
 	if (file_exists(p) == TRUE)
 	   fprintf(fo, "source %s\n", p);};
 
-    fprintf(fo, "source %s/include/env-pact.csh\n", pact);
+    fprintf(fo, "source %s/etc/env-pact.csh\n", pact);
     fprintf(fo, "source %s/include/env-csh\n", pact);
 
 /* check for a pcshrc file to include after PACT environment */
@@ -227,7 +227,7 @@ static void invoke_command(char **vo, char *shell, char *pact,
 	   {snprintf(t, MAXLINE, "source %s ; ", p);
 	    nstrcat(s, LRG, t);};};
 
-    snprintf(u, MAXLINE, "source %s/include/env-pact.csh ; ", pact);
+    snprintf(u, MAXLINE, "source %s/etc/env-pact.csh ; ", pact);
     nstrcat(s, LRG, u);
     snprintf(u, MAXLINE, "source %s/include/env-csh ; ", pact);
     nstrcat(s, LRG, u);
