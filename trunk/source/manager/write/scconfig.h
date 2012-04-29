@@ -54,6 +54,7 @@ dbget NO_LONG_LONG
 dbget NEED_ALT_LARGE_FILE
 dbget PACT_CC_FAMILY
 dbget PACT_CC_VERSION
+dbget PACT_SO_CACHE
 dbget PTHREAD_POSIX
 dbget OSType
 dbget Sys
@@ -113,6 +114,10 @@ Separator $Log
        Note $STDOUT '#define MAKE_FILTER_FILE    '$QUOTE$FiltFile$QUOTE
     endif
 
+    if ("$PACT_SO_CACHE" != "") then
+       Note $STDOUT '#define PACT_SO_CACHE       '$QUOTE$PACT_SO_CACHE$QUOTE
+    endif
+
     Note $STDOUT ""
 
     Note $STDOUT "#define ANSI"
@@ -147,7 +152,7 @@ Separator $Log
 
     Note $STDOUT ""
 
-# emit the HAVE/USE flags
+# emit the HAVE/USE flags - no value
     set lhave = ""
     set lhave = ( $lhave HaveFLOAT16         HAVE_ANSI_FLOAT16 )
     set lhave = ( $lhave HaveCOMPLEX         HAVE_ANSI_C9X_COMPLEX )

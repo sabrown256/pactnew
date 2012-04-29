@@ -115,6 +115,7 @@ struct s_donetdes
     auxdes aux[N_AUX];
     char bindir[MAXLINE];
     char incdir[MAXLINE];
+    char etcdir[MAXLINE];
     char logdir[MAXLINE];
     char lnetfn[MAXLINE];
     char ssh[MAXLINE];
@@ -3235,7 +3236,7 @@ static void init_aux(donetdes *st)
     pa[4].permi = 0700;
 
 /* prepare the csh-subr script */
-    snprintf(pa[5].proper, MAXLINE, "%s/csh-subroutines", st->incdir);
+    snprintf(pa[5].proper, MAXLINE, "%s/csh-subroutines", st->etcdir);
     snprintf(pa[5].work, MAXLINE, ".do-csh-subr.%s", st->stamp);
     nstrncpy(pa[5].perms, 10, "-rw-------", -1);
     pa[5].permi = 0600;
@@ -3486,6 +3487,7 @@ int main(int c, char **v)
     nstrncpy(exe, MAXLINE, cwhich(v[0]), -1);
     nstrncpy(state.bindir, MAXLINE, path_head(exe), -1);
     snprintf(state.incdir, MAXLINE, "%s/include", path_head(state.bindir));
+    snprintf(state.etcdir, MAXLINE, "%s/etc", path_head(state.bindir));
 
     push_path(PREPEND, lpath, "/sbin");
     push_path(PREPEND, lpath, "/bin");

@@ -36,6 +36,7 @@ inc pgs.h pgs_old.h
 inc panace.h scheme.h syntax.h sx.h
 
 etc do-run-db cfg.pl cfg.db
+etc env-csh csh-subroutines 
 
 f90 panacea.mod panaceatypes.mod pdb.mod pdbtypes.mod pgs.mod
 f90 pgstypes.mod pml.mod pmltypes.mod scheme.mod score.mod
@@ -63,7 +64,7 @@ script run-all load-all mall sign swhich gcc-info system-id cfgman
 script update-sys update-watch plock cleanup-jobs fix-group
 script herd cover find-fnc diff-code diff-tree descend bckgr
 script broadcast check-hosts check-service all-service dot-silent
-script no-op dargs env-csh csh-subroutines merge-aix panache
+script no-op dargs merge-aix panache
 script pdbdiff pdbview pdbcp pdbls label-ps tpu tzu remod mem-stats
 script which-cfg sys-site use-tcsh fill-string mpi-info
 script simplify-path sunrace cross-info find-comments where-git

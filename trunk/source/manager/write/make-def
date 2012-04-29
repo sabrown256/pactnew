@@ -153,8 +153,9 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     if ("$HostOS" == "HP-UX") then
        Note $STDOUT 'TGTLib  = nolib'
     endif
-    Note $STDOUT 'TGTInc  = noinc'
     Note $STDOUT 'TGTBin  = nobin'
+    Note $STDOUT 'TGTEtc  = noetc'
+    Note $STDOUT 'TGTInc  = noinc'
     Note $STDOUT 'TGTScm  = noscm'
     Note $STDOUT 'TGTScr  = noscr'
     Note $STDOUT 'TGTScmX = noscmx'

@@ -72,6 +72,7 @@ Tool CXX {
 
 Tool LD {
    RPath    = -Wl,-rpath,@
+   Flags   += -rdynamic
    Flags   += [ _cmd_ = -p ;                 # profiling
 	        on    = -pg ]
    Flags   += [ _cmd_ = -cov ;               # coverage analysis

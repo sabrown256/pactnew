@@ -85,6 +85,32 @@ static object *_SXI_quit(SS_psides *si, object *arg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SXI_IMPORT - import the specified shared library
+ *             - Usage: (import <header> <library> <flags>)
+ */
+
+static object *_SXI_import(SS_psides *si, object *arg)
+   {int st;
+    char *hdr, *so, *flags;
+    object *rv;
+
+    hdr   = NULL;
+    so    = NULL;
+    flags = NULL;
+    SS_args(si, arg,
+            SC_STRING_I, &hdr,
+            SC_STRING_I, &so,
+            SC_STRING_I, &flags,
+            0);
+
+    st = SX_import_so(si, hdr, so, flags);
+    rv = (st == TRUE) ? SS_t : SS_f;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SXI_TOGGLE_LOG - toggle the command log file */
 
 static object *_SXI_toggle_log(SS_psides *si, object *argl)
@@ -952,6 +978,11 @@ void SX_install_global_funcs(SS_psides *si)
                "Procedure: End the session\n     Usage: end",
                SS_sargs,
                _SXI_quit, SS_PR_PROC);
+
+    SS_install(si, "import",
+               "Procedure: Link in a shared library for use\n     Usage: import <header> <library> [<flags>]",
+               SS_nargs,
+               _SXI_import, SS_PR_PROC);
 
     SS_install(si, "ld",
                "Macro: Read SCHEME forms from file\n     Usage: ld <file-name>",

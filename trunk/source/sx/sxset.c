@@ -312,3 +312,57 @@ int _SX_get_input(SS_psides *si, object *str)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* SX_IMPORT_SO - dynamically generate bindings for functions in
+ *              - the specified shared library
+ */
+
+int SX_import_so(SS_psides *si, char *hdr, char *so, char *flags)
+   {int ok, st;
+    char cmd[MAXLINE], pck[MAXLINE], fnc[MAXLINE];
+    char gso[MAXLINE], path[MAXLINE];
+    char *p;
+    void (*f)(SS_psides *si);
+
+    ok = FALSE;
+
+/* prepare the import-so command to generate and compile
+ * the bindings for the SO
+ */
+    if (flags == NULL)
+       snprintf(cmd, MAXLINE, "import-so -i %s -l %s",
+		hdr, so);
+    else
+       snprintf(cmd, MAXLINE, "import-so %s -i %s -l %s",
+		flags, hdr, so);
+
+    st = system(cmd);
+    if (st == 0)
+
+/* make the name of the function generated to load and install the bindings */
+       {SC_strncpy(pck, MAXLINE, hdr, -1);
+	p = strrchr(pck, '.');
+	if (p != NULL)
+	   *p = '\0';
+
+	p = strrchr(pck, '/');
+	if (p != NULL)
+	   {p++;
+
+	    SC_strncpy(path, MAXLINE, PACT_SO_CACHE, -1);
+	    snprintf(gso, MAXLINE, "%s/pact-%s.so", path, p);
+	    snprintf(fnc, MAXLINE, "SX_load_%s", p);
+
+	    ok = SC_so_register_func(OBJ_FUNC, gso, fnc, path,
+				     NULL, "void", "(SS_psides *si)");
+
+/* get the function and invoke it */
+	    f = SC_so_get(OBJ_FUNC, fnc);
+	    if (f != NULL)
+	       {f(si);
+		ok = TRUE;};};};
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/

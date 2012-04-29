@@ -17,6 +17,7 @@ Note $ALog "Analyze: dynamic linker"
 
 dbini MDE_Lib                ""
 dbini HAVE_DYNAMIC_LINKER    FALSE
+dbini PACT_SO_CACHE          ""
 
 Note $ALog "MDE_Lib             = |$MDE_Lib|"
 Note $ALog "HAVE_DYNAMIC_LINKER = |$HAVE_DYNAMIC_LINKER|"
@@ -77,6 +78,10 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+# make PACT_SO_CACHE specific to the current configuration
+setenv PACT_SO_CACHE  $PACT_SO_CACHE/$System
+
+dbexp PACT_SO_CACHE
 dbexp HAVE_DYNAMIC_LINKER
 dbexp MDE_Lib
 

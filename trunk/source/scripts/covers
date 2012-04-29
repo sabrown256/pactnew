@@ -42,8 +42,8 @@ unalias *
 set LPact    = `which pact`
 set PACTRoot = $LPact:h
 set PACTRoot = $PACTRoot:h
-source $PACTRoot/include/env-csh
-source $PACTRoot/include/csh-subroutines
+source $PACTRoot/etc/env-csh
+source $PACTRoot/etc/csh-subroutines
 HAVE_SUBROUTINES
 
 set Dir     = ""

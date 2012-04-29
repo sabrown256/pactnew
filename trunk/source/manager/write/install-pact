@@ -125,7 +125,11 @@ Note $Log "   PyDirSrc   = |$PyDirSrc|"
        Note $STDOUT 'set DestDir = $InstDir/bin'
        Note $STDOUT ""
 
-# bin installs
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# BIN - bin installs
+
        Note $STDOUT "# install executable files with 775"
        Note $STDOUT 'pushd bin >& /dev/null'
        Note $STDOUT 'echo ""'
@@ -177,7 +181,51 @@ Note $Log "   PyDirSrc   = |$PyDirSrc|"
        Note $STDOUT 'popd >& /dev/null'
        Note $STDOUT ""
 
-# include installs
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# ETC - etc installs
+
+       Note $STDOUT "# install etc with 664"
+       Note $STDOUT 'pushd etc >& /dev/null'
+       Note $STDOUT 'echo ""'
+       Note $STDOUT 'echo "Installing config/info in $InstDir/etc"'
+       Note $STDOUT 'set DestDir = $InstDir/etc'
+       Note $STDOUT 'foreach file ($Etcs)'
+       Note $STDOUT '   if (-f $file) then'
+       Note $STDOUT '      touch $DestDir/.lock'
+       Note $STDOUT '      sinstall -p 664 $file $DestDir'
+       Note $STDOUT '      if ($status != 0) then'
+       Note $STDOUT '         echo "   FAILED ($status) $file"'
+       Note $STDOUT '      else'
+       Note $STDOUT '         echo "   $file"'
+       Note $STDOUT '      endif'
+       Note $STDOUT '   endif'
+       Note $STDOUT 'end'
+
+       Note $STDOUT 'foreach file (env-pact.csh env-pact.sh env-pact.dk env-pact.mod env-mio env-csh csh-subroutines)'
+       Note $STDOUT '   if (-f $file) then'
+       Note $STDOUT '      touch $DestDir/.lock'
+#       Note $STDOUT '      sinstall -p 664 $file $DestDir'
+       Note $STDOUT '      $RM $DestDir/$file'
+       Note $STDOUT "      sed 's|'"'$lsysdir'"'|'"'$InstDir'"'|' "'$file >! $DestDir/$file'
+       Note $STDOUT '      if ($status != 0) then'
+       Note $STDOUT '         echo "   FAILED ($status) $file"'
+       Note $STDOUT '      else'
+       Note $STDOUT '         chmod 664 $DestDir/$file >& /dev/null'
+       Note $STDOUT '         echo "   $file"'
+       Note $STDOUT '      endif'
+       Note $STDOUT '   endif'
+       Note $STDOUT 'end'
+
+       Note $STDOUT 'popd >& /dev/null'
+       Note $STDOUT ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# INCLUDE - include installs
+
        Note $STDOUT "# install include with 664"
        Note $STDOUT 'pushd include >& /dev/null'
        Note $STDOUT 'echo ""'
@@ -242,50 +290,11 @@ Note $Log "   PyDirSrc   = |$PyDirSrc|"
        Note $STDOUT 'popd >& /dev/null'
        Note $STDOUT ""
 
-       Note $STDOUT "# install shell environment files with 664"
-       Note $STDOUT 'pushd include >& /dev/null'
-       Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "Installing shell environment files in $InstDir/include"'
-       Note $STDOUT 'set DestDir = $InstDir/include'
-       Note $STDOUT 'foreach file (env-pact.csh env-pact.sh env-pact.dk env-pact.mod env-mio env-csh csh-subroutines)'
-       Note $STDOUT '   if (-f $file) then'
-       Note $STDOUT '      touch $DestDir/.lock'
-#       Note $STDOUT '      sinstall -p 664 $file $DestDir'
-       Note $STDOUT '      $RM $DestDir/$file'
-       Note $STDOUT "      sed 's|'"'$lsysdir'"'|'"'$InstDir'"'|' "'$file >! $DestDir/$file'
-       Note $STDOUT '      if ($status != 0) then'
-       Note $STDOUT '         echo "   FAILED ($status) $file"'
-       Note $STDOUT '      else'
-       Note $STDOUT '         chmod 664 $DestDir/$file >& /dev/null'
-       Note $STDOUT '         echo "   $file"'
-       Note $STDOUT '      endif'
-       Note $STDOUT '   endif'
-       Note $STDOUT 'end'
-       Note $STDOUT 'popd >& /dev/null'
-       Note $STDOUT ""
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-# etc installs
-       Note $STDOUT "# install etc with 664"
-       Note $STDOUT 'pushd etc >& /dev/null'
-       Note $STDOUT 'echo ""'
-       Note $STDOUT 'echo "Installing config/info in $InstDir/etc"'
-       Note $STDOUT 'set DestDir = $InstDir/etc'
-       Note $STDOUT 'foreach file ($Etcs)'
-       Note $STDOUT '   if (-f $file) then'
-       Note $STDOUT '      touch $DestDir/.lock'
-       Note $STDOUT '      sinstall -p 664 $file $DestDir'
-       Note $STDOUT '      if ($status != 0) then'
-       Note $STDOUT '         echo "   FAILED ($status) $file"'
-       Note $STDOUT '      else'
-       Note $STDOUT '         echo "   $file"'
-       Note $STDOUT '      endif'
-       Note $STDOUT '   endif'
-       Note $STDOUT 'end'
+# LIB - lib installs
 
-       Note $STDOUT 'popd >& /dev/null'
-       Note $STDOUT ""
-
-# lib installs
        Note $STDOUT "# install lib with 664"
        Note $STDOUT 'pushd lib >& /dev/null'
        Note $STDOUT 'echo ""'
@@ -312,49 +321,67 @@ Note $Log "   PyDirSrc   = |$PyDirSrc|"
           Note $STDOUT '   mkdir -p $dst >& /dev/null'
           Note $STDOUT '   if (-d $dst) then'
           Note $STDOUT '      pushd $PyDirSrc >& /dev/null'
-          Note $STDOUT '      echo ""'
-          Note $STDOUT '      echo "Installing python shared objects in $dst"'
-          Note $STDOUT '      foreach f (libpy*.so.1 *.py *.pyc)'
-          Note $STDOUT '         set file = $f'
-          Note $STDOUT '         if (-f $file) then'
-          Note $STDOUT '            touch $DestDir/.lock'
-          Note $STDOUT '            sinstall -p 664 $file $dst'
-          Note $STDOUT '            if ($status != 0) then'
-          Note $STDOUT '               echo "   FAILED ($status) $file"'
-          Note $STDOUT '            else'
-          Note $STDOUT '               echo "   $file"'
+          Note $STDOUT '      if (-f __init__.py) then'
+          Note $STDOUT '         echo ""'
+          Note $STDOUT '         echo "Installing python shared objects in $dst"'
+          Note $STDOUT '         foreach f (libpy*.so.1 *.py *.pyc)'
+          Note $STDOUT '            set file = $f'
+          Note $STDOUT '            if (-f $file) then'
+          Note $STDOUT '               touch $DestDir/.lock'
+          Note $STDOUT '               sinstall -p 664 $file $dst'
+          Note $STDOUT '               if ($status != 0) then'
+          Note $STDOUT '                  echo "   FAILED ($status) $file"'
+          Note $STDOUT '               else'
+          Note $STDOUT '                  echo "   $file"'
+          Note $STDOUT '               endif'
           Note $STDOUT '            endif'
-          Note $STDOUT '         endif'
-          Note $STDOUT '      end'
-          Note $STDOUT '      popd >& /dev/null'
-          Note $STDOUT '      pushd $dst >& /dev/null'
-          Note $STDOUT '      foreach f (libpy*.so.1)'
-          Note $STDOUT '         if (-f $f) then'
-          Note $STDOUT '            set nstatus = 0'
-          Note $STDOUT '            set fb = `expr "$f" : '"'libpy\(.*\)\.so.1'"'`'
-          Note $STDOUT '            set fo = $f:r'
-          Note $STDOUT '            $RM $fo _$fb.so'
-          Note $STDOUT '            ln -s $f $fo'
-          Note $STDOUT '            ln -s $f _$fb.so'
-          Note $STDOUT '            set nstatus = $status'
-          Note $STDOUT '            if ($nstatus != 0) then'
-          Note $STDOUT '               echo "   $f LINK FAILED ($status)"'
-          Note $STDOUT '            else'
-          Note $STDOUT '               chmod 664 $fo _$fb.so >& /dev/null'
-          Note $STDOUT '               echo "   $fo -> $f"'
-          Note $STDOUT '               echo "   _$fb.so -> $f"'
+          Note $STDOUT '         end'
+          Note $STDOUT '         popd >& /dev/null'
+          Note $STDOUT '         pushd $dst >& /dev/null'
+          Note $STDOUT '         foreach f (libpy*.so.1)'
+          Note $STDOUT '            if (-f $f) then'
+          Note $STDOUT '               set nstatus = 0'
+          Note $STDOUT '               set fb = `expr "$f" : '"'libpy\(.*\)\.so.1'"'`'
+          Note $STDOUT '               set fo = $f:r'
+          Note $STDOUT '               $RM $fo _$fb.so'
+          Note $STDOUT '               ln -s $f $fo'
+          Note $STDOUT '               ln -s $f _$fb.so'
+          Note $STDOUT '               set nstatus = $status'
+          Note $STDOUT '               if ($nstatus != 0) then'
+          Note $STDOUT '                  echo "   $f LINK FAILED ($status)"'
+          Note $STDOUT '               else'
+          Note $STDOUT '                  chmod 664 $fo _$fb.so >& /dev/null'
+          Note $STDOUT '                  echo "   $fo -> $f"'
+          Note $STDOUT '                  echo "   _$fb.so -> $f"'
+          Note $STDOUT '               endif'
           Note $STDOUT '            endif'
-          Note $STDOUT '         endif'
-          Note $STDOUT '      end'
-          Note $STDOUT '      popd >& /dev/null'
+          Note $STDOUT '         end'
+          Note $STDOUT '         popd >& /dev/null'
+          Note $STDOUT '      endif'
           Note $STDOUT '   endif'
           Note $STDOUT 'end'
        endif
 
+
+# NOTE: temporarily link to certain etc files
+# this can go after about 12/2012
+       Note $STDOUT 'pusd $DestDir >& /dev/null'
+       Note $STDOUT 'foreach file (env-pact.csh env-pact.sh env-pact.dk env-pact.mod env-mio env-csh csh-subroutines)'
+       Note $STDOUT '   if (-f $file) then'
+       Note $STDOUT '      ln -s ../etc/$file $file'
+       Note $STDOUT '   endif'
+       Note $STDOUT 'end'
+       Note $STDOUT 'popd >& /dev/null'
+
+
        Note $STDOUT 'popd >& /dev/null'
        Note $STDOUT ""
 
-# scheme installs
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# SCHEME - scheme installs
+
        Note $STDOUT "# install SCHEME files with 664"
        Note $STDOUT 'pushd scheme >& /dev/null'
        Note $STDOUT 'echo ""'
@@ -401,7 +428,11 @@ Note $Log "   PyDirSrc   = |$PyDirSrc|"
        Note $STDOUT 'popd >& /dev/null'
        Note $STDOUT ""
 
-# man installs
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# MAN - man installs
+
        Note $STDOUT "# install MAN files with 664"
        Note $STDOUT 'pushd $ldocdir >& /dev/null'
        Note $STDOUT 'echo ""'
@@ -445,12 +476,12 @@ Note $Log "   PyDirSrc   = |$PyDirSrc|"
        Note $STDOUT 'echo "... PACT INSTALLATION COMPLETE"'
        Note $STDOUT 'echo ""'
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
     endif
 
     flog $Log chmod a+x $STDOUT
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 exit(0)
 

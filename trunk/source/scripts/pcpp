@@ -16,7 +16,7 @@ unset bindir
 if (-d ../scripts) then
    source ../scripts/env-csh
 else
-   source $lbase/include/env-csh
+   source $lbase/etc/env-csh
 endif
 
 SafeEnv PERDB_PATH $lbase/etc/cfg

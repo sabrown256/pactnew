@@ -13,7 +13,7 @@ unalias *
 set lpact   = `which pact`
 set ldevdir = $lpact:h
 set ldevdir = $ldevdir:h
-source $ldevdir/include/csh-subroutines
+source $ldevdir/etc/csh-subroutines
 HAVE_SUBROUTINES
 
 set Dir     = ""

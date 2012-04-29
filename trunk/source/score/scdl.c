@@ -11,6 +11,9 @@
 #include "score.h"
 #include "scope_dl.h"
 
+#undef SO_MAIN
+#define SO_MAIN "_main_"
+
 sostate
  _SC_dl;
 
@@ -31,7 +34,11 @@ int SC_so_register_func(objindex kind, char *lib, char *name,
 
     if (name != NULL)
        {if (_SC_dl.tab == NULL)
-	   _SC_dl.tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
+	   {_SC_dl.tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
+
+/* register the current executable for optimal lookup scoping */
+	    SC_so_register_func(OBJ_EXE, NULL, SO_MAIN,
+				NULL, NULL, NULL, NULL);};
 
 	se = CMAKE(sodes);
 	if (se != NULL)
@@ -243,6 +250,7 @@ void *SC_so_get(objindex kind, char *tag, ...)
 	         fnc = se->name;
 		 break;
 	    case OBJ_SO :
+	    case OBJ_EXE :
 		 fnc = SC_VA_ARG(char *);
 		 break;
 	    default :
@@ -259,12 +267,16 @@ void *SC_so_get(objindex kind, char *tag, ...)
 
 #ifdef HAVE_DYNAMIC_LINKER
 	       {char *s;
+		sodes *sem;
+
+/* get the so for the current executable for optimal symbol resolution */
+		sem = _SC_so_open(SO_MAIN);
 
 /* clear any existing error */
 		dlerror();
 
-		f = dlsym(se->so, fnc);
-/*                *(void **) (&f) = dlsym(se->so, fnc); */
+		f = dlsym(sem->so, fnc);
+/*                *(void **) (&f) = dlsym(sem->so, fnc); */
 
 		s = dlerror();
 		if (s != NULL)

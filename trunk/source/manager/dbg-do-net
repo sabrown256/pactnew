@@ -62,6 +62,7 @@ set Root   = $Pact:h
 set Root   = $Root:h
 set BinDir = $Root/bin
 set IncDir = $Root/include
+set EtcDir = $Root/etc
 
 cp $DoCode ~/.$DoCode.$Stamp
 chmod 600 ~/.$DoCode.$Stamp
@@ -78,7 +79,7 @@ chmod 700 ~/.do-nfsmon.$Stamp
 cp $BinDir/iopr ~/.do-iopr.$Stamp
 chmod 700 ~/.do-iopr.$Stamp
 
-cp $IncDir/csh-subroutines ~/.do-csh-subr.$Stamp
+cp $EtcDir/csh-subroutines ~/.do-csh-subr.$Stamp
 chmod 600 ~/.do-csh-subr.$Stamp
 
 cd ~

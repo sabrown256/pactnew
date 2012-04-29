@@ -29,7 +29,7 @@
 /*--------------------------------------------------------------------------*/
 
 enum e_objindex
-   { OBJ_FUNC, OBJ_SO, OBJ_UNKNOWN };
+   { OBJ_FUNC, OBJ_SO, OBJ_EXE, OBJ_UNKNOWN };
 
 typedef enum e_objindex objindex;
 

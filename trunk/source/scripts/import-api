@@ -17,7 +17,7 @@ set devinc = $lbase/include
 if (-d ../scripts) then
    source ../scripts/env-csh
 else
-   source $lbase/include/env-csh
+   source $lbase/etc/env-csh
 endif
 
 unset bindir

@@ -33,9 +33,9 @@ dbget CPU
 dbget CROSS_COMPILE
 dbget DAI_ROOT
 dbget DAS_ROOT
+dbget EtcDir
 dbget HAVE_READLINE
 dbget HOST_SERVER_DB
-dbget IncDir
 dbget InstBase
 dbget LD_Lib
 dbget LIB
@@ -85,7 +85,7 @@ unset prpt
     Separator $Log
     NoteD $Log "   MIO specifications - env-mio"
 
-    set FOUT = $IncDir/env-mio
+    set FOUT = $EtcDir/env-mio
 
     flog $Log $RM $FOUT
     flog $Log touch $FOUT
