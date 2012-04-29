@@ -104,7 +104,7 @@ type of mechanism.
 The syntax described above is merely a set of C shell aliases
 which use standard C shell mechanisms and a handful of shell variables
 to hold the state.  You can find the implementation in
-$PACT/include/csh-subroutines.
+$PACT/etc/csh-subroutines.
 
 The use of 'source' provides an acceptable emulation of actual subroutines.
 The downside of this approach is that each call causes the entire file
@@ -160,7 +160,7 @@ Tue Dec  4 13:32:53 PST 2007
 You do not have to use pcsh to have subroutines emulated in C shell.  If you
 choose to do so you can have them in any C shell script by adding the two lines:
 
-   include $PACT/include/csh-subroutines
+   include $PACT/etc/csh-subroutines
    HAVE_SUBROUTINES
 
 where $PACT is the root path to your local PACT installation.  The additional
@@ -171,7 +171,7 @@ The above example could be modified as follows:
 
    #!/bin/csh -f
 
-   include $PACT/include/csh-subroutines
+   include $PACT/etc/csh-subroutines
    HAVE_SUBROUTINES
 
    call foo(3, 4, a, (a b c))

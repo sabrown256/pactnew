@@ -8,18 +8,27 @@
 
 unalias *
 
+onintr FINISH
+
 set pact   = `which pact`
+set sys    = `cfgman use`
 set devbin = $pact:h
 set lbase  = $devbin:h
 set devinc = $lbase/include
-source $devinc/env-csh
+set devlib = $lbase/lib
+set devetc = $lbase/etc
+
+source $devetc/env-pact.csh
+source $devetc/env-csh
 
 setenv PERDB_PATH $lbase/etc/cfg
 
 @ err = 0
 
+set on  = FALSE
 set hdr = ""
 set lib = ""
+set rem = FALSE
 set iaopt = ""
 while ($#argv > 0)
    switch ($1)
@@ -28,11 +37,12 @@ while ($#argv > 0)
            breaksw
       case -h:
            echo ""
-           echo "Usage: import-so [-e] [-h] [-i <hdr>] [-l <lib>]"
+           echo "Usage: import-so [-e] [-h] [-i <hdr>] [-l <lib>] [-r]"
            echo "   e   do not expand includes"
            echo "   h   this help message"
            echo "   i   the header file defining the package"
            echo "   l   the shared library to be imported"
+           echo "   r   remove any cached files first"
            echo ""
            exit(1)
       case -i:
@@ -43,14 +53,36 @@ while ($#argv > 0)
            shift
            set lib = $1
            breaksw
+      case -r:
+           set rem = TRUE
+           breaksw
       default:
            breaksw
    endsw
    shift
 end
 
-InitLog log $cwd/log.import-so
+# setup a place to cache shared libraries so as to avoid
+# constantly rebuilding them
+SafeEnv PACT_SO_CACHE $HOME/.pact
 
+set cache = $PACT_SO_CACHE/$sys
+
+if (!(-d $cache)) then
+   mkdir -p $cache
+endif
+if (!(-d $cache)) then
+   echo "Directory '$cache' does not exist - exiting"
+   exit(1)
+endif
+
+set pck = $hdr:t
+set pck = $pck:r
+set PCK = `echo $pck | tr "[a-z]" "[A-Z]"`
+
+InitLog log $cache/log.import-$pck
+
+# check input files
 if (!(-f $hdr)) then
    NoteD $log "No such header file '$hdr' - exiting"
    exit(1)
@@ -64,73 +96,95 @@ endif
 set incdir = $hdr:h
 set libdir = $lib:h
 
-flog $log set pck   = $hdr:t
-flog $log set pck   = $pck:r
-set PCK = `echo $pck | tr "[a-z]" "[A-Z]"`
-flog $log set def   = $cwd/$pck.def
-flog $log set api   = $pck.api
-flog $log set proto = $pck.proto
-flog $log set bind  = $pck.bind
+flog $log set def   = $cache/$pck.def
+flog $log set api   = $cache/$pck.api
+flog $log set proto = $cache/$pck.proto
+flog $log set bind  = $cache/$pck.bind
+flog $log set gc    = $cache/gs-$pck.c
+flog $log set go    = $cache/gs-$pck.o
+flog $log set so    = $cache/pact-${pck}.so
+
+if ($rem == TRUE) then
+   flog $log rm -f $def $api $proto $bind $gc $go $so
+endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # IMPORT - make the API file using import-api
 
-Separator $log
+if (!(-f $def)) then
 
-flog $log rm -f $def
-flog $log touch $def
-Note $def "package $pck"
-Note $def "header  $hdr:t"
-Note $def "so      $lib:t"
-flog $log cat $def
+   Separator $log
 
-flog $log import-api $iaopt -k -o $api -I$incdir -L$libdir $def
+   flog $log rm -f $def
+   flog $log touch $def
+   Note $def "package $pck"
+   Note $def "header  $hdr:t"
+   Note $def "so      $lib:t"
 
-flog $log cat $api
+   flog $log ls -l $def
+   flog $log cat $def
 
-flog $log rm -f $def
+endif
+
+if (!(-f $api)) then
+
+   Separator $log
+
+   flog $log import-api $iaopt -k -o $api -I$incdir -L$libdir $def
+
+   flog $log ls -l $api
+   flog $log cat $api
+
+endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # PROTO - make the PROTO file using pcpp
 
-Separator $log
+if (!(-f $proto)) then
 
-pcpp $hdr -o -                                  |& \
-sed 's/extern//g'                               |  \
-sed 's/unsigned//g'                             |  \
-sed 's/const//g'                                |  \
-cat >&! $proto
+   Separator $log
 
-flog $log cat $proto
+   pcpp $hdr -o -                                  |& \
+   sed 's/extern//g'                               |  \
+   sed 's/unsigned//g'                             |  \
+   sed 's/const//g'                                |  \
+   cat >&! $proto
+
+   flog $log ls -l $proto
+   flog $log cat $proto
+
+endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # BIND - make the bindings with blang
 
-Separator $log
+if (!(-f $bind)) then
 
-set noglob
+   Separator $log
 
-flog $log rm -f $bind
-flog $log touch $bind
+   set noglob
+
+   flog $log rm -f $bind
+   flog $log touch $bind
 
 # bind file has specs like:
 # derived <enumname> none SC_ENUM_I none <default>
 # derived <structname> none SC_POINTER_I NULL NULL
 # <funcname> scheme()
 
-set struct = FALSE
+   set struct = FALSE
 
-@ nl = `cat $proto | wc -l`
-@ il = 0
-while ($il < $nl)
-   @ il = $il + 1
-   set line = ( `head -n $il $proto | tail -n 1` )
+   @ nl = `cat $proto | wc -l`
+   @ il = 0
+   while ($il < $nl)
+      @ il = $il + 1
+      set line = ( `head -n $il $proto | tail -n 1` )
 
 #echo "$il> $line"
 
@@ -139,43 +193,43 @@ while ($il < $nl)
 
 # ENUMS - derived <enumname> none SC_ENUM_I none <default>
 
-   if ("$line" =~ *enum\ *\{*) then
-      if ("$line" =~ *\}*) then
-         set struct = FALSE
+      if ("$line" =~ *enum\ *\{*) then
+         if ("$line" =~ *\}*) then
+            set struct = FALSE
 #echo "enum : |$line|"
-      else
-         set struct = TRUE
+         else
+            set struct = TRUE
 #echo "begin enum : |$line|"
-      endif
-      if ("$line" =~ typedef*) then
-         set inf = ( `echo $line | sed 's/;/ /' | sed 's/,/ /' | sed 's/{/ /'` )
+         endif
+         if ("$line" =~ typedef*) then
+            set inf = ( `echo $line | sed 's/;/ /' | sed 's/,/ /' | sed 's/{/ /'` )
 #echo "-> ($#inf) |$inf|"
-         set t   = $inf[$#inf]
-         set def = $inf[3]
-         Note $bind "derived $t none SC_ENUM_I none $def"
-      endif
+            set t   = $inf[$#inf]
+            set def = $inf[3]
+            Note $bind "derived $t none SC_ENUM_I none $def"
+         endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # STRUCTS
 
-   else if ("$line" =~ *struct\ *\{*) then
-      if ("$line" =~ *\}*) then
-         set struct = FALSE
+      else if ("$line" =~ *struct\ *\{*) then
+         if ("$line" =~ *\}*) then
+            set struct = FALSE
 #echo "struct : |$line|"
-      else
-         set struct = TRUE
+         else
+            set struct = TRUE
 #echo "begin struct : |$line|"
-      endif
+         endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # END_STRUCT_ENUM
 
-   else if ("$line" =~ \}*) then
-      set struct = FALSE
+      else if ("$line" =~ \}*) then
+         set struct = FALSE
 #echo "end struct/enum : |$line|"
 #echo ""
 
@@ -184,149 +238,185 @@ while ($il < $nl)
 
 # TYPEDEFS - derived <structname> none SC_POINTER_I NULL NULL
 
-   else if ("$line" =~ typedef\ *) then
-      set llin = ( `echo "$line" | sed 's/\*/@/g'` )
+      else if ("$line" =~ typedef\ *) then
+         set llin = ( `echo "$line" | sed 's/\*/@/g'` )
 #echo "typedef : |$line|"
 
 # handle pointer forms |typedef a *b;|
       if ("$llin" =~ *@*) then
 
 # function pointer
-         if ("$llin" =~ *\(*) then
-            set inf = ( `echo $llin | sed 's/)(.*$//' | sed 's/[@\(\)]/ /g' | sed 's/;/ /'` )
-            set t   = $inf[$#inf]
+            if ("$llin" =~ *\(*) then
+               set inf = ( `echo $llin | sed 's/)(.*$//' | sed 's/[@\(\)]/ /g' | sed 's/;/ /'` )
+               set t   = $inf[$#inf]
 
 # non-function pointer
-         else
-            set inf = ( `echo $llin | sed 's/@/ /g' | sed 's/;/ /'` )
-            set t   = $inf[$#inf]
-         endif
-         Note $bind "derived $t none SC_POINTER_I NULL NULL"
+            else
+               set inf = ( `echo $llin | sed 's/@/ /g' | sed 's/;/ /'` )
+               set t   = $inf[$#inf]
+            endif
+            Note $bind "derived $t none SC_POINTER_I NULL NULL"
 
 # handle non-pointer forms |typedef a b;|
-      else
-         set inf = ( `echo $llin | sed 's/;/ /'` )
-         set t   = $inf[$#inf]
-         Note $bind "derived $t none SC_LONG_I NULL 0"
-      endif
+         else
+            set inf = ( `echo $llin | sed 's/;/ /'` )
+            set t   = $inf[$#inf]
+            Note $bind "derived $t none SC_LONG_I NULL 0"
+         endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # FUNCTIONS - <funcname> scheme()
 
-   else if (($struct == FALSE) && ("$line" =~ *\(*\)\;)) then
+      else if (($struct == FALSE) && ("$line" =~ *\(*\)\;)) then
 #echo "function : |$line|"
-      set inf = ( `echo $line | sed 's/(.*$//' | sed 's/\*/ /g'` )
-      set t   = $inf[$#inf]
-      Note $bind "$t scheme()"
-   endif
+         set inf = ( `echo $line | sed 's/(.*$//' | sed 's/\*/ /g'` )
+         set t   = $inf[$#inf]
+         Note $bind "$t scheme()"
+      endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-end
+   end
 
-flog $log ls -l $bind $proto
+   flog $log ls -l $bind
+   flog $log cat $bind
 
-flog $log cat $bind
-flog $log cat $proto
+   unset noglob
 
-unset noglob
+endif
 
-set opt = ""
-set opt = ( $opt -nod -nof -nop )
-flog $log blang $opt -b $bind -c $proto
-set xstatus = $status
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# BLANG - actually run blang now
+
+if (!(-f $gc)) then
+
+   Separator $log
+
+   set opt = ""
+   set opt = ( $opt -p $cache )
+   set opt = ( $opt -nod -nof -nop )
+   flog $log blang $opt -b $bind -c $proto
+   set xstatus = $status
+
+   flog $log ls -l $gc
+   flog $log cat $gc
+
+endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # COMPILE - compile the generated files and link them into an SO
 
-Separator $log
+if (!(-f $go)) then
 
-flog $log set gc = gs-$pck.c
-flog $log set go = gs-$pck.o
-flog $log set so = pact-${pck}.so
+   Separator $log
 
-cat $gc | sed 's|'$pck'_int\.h|'$pck'\.api|' >&! $gc.new
-flog $log rm -f $gc
-flog $log touch $gc
+   cat $gc | sed 's|'$pck'_int\.h|'$pck'\.api|' >&! $gc.new
+   flog $log rm -f $gc
+   flog $log touch $gc
 
-Note $gc '/*'
-Note $gc ' * GS-'$PCK'.C - import dynamically generated bindings'
-Note $gc ' *'
-Note $gc ' */'
-Note $gc ''
-Note $gc '#include "cpyright.h"'
-Note $gc ''
-Note $gc '#define '$PCK'_SO'
+   Note $gc '/*'
+   Note $gc ' * GS-'$PCK'.C - import dynamically generated bindings'
+   Note $gc ' *'
+   Note $gc ' */'
+   Note $gc ''
+   Note $gc '#include "cpyright.h"'
+   Note $gc ''
+   Note $gc '#define '$PCK'_SO'
 
-cat $gc.new >>& $gc
+   cat $gc.new >>& $gc
 
-Note $gc ''
-Note $gc '/* SX_LOAD_'$PCK - get in $PCK bindings '*/'
-Note $gc ''
-Note $gc "void SX_load_${pck}(void)"
-Note $gc '   {SS_psides *si;'
-Note $gc '    SS_smp_state *sa;'
-Note $gc ''
-Note $gc '    sa = _SS_get_state(0);'
-Note $gc '    si = &sa->si;'
-Note $gc ''
-Note $gc "    _${PCK}_set_api();"
-Note $gc ''
-Note $gc "    SX_install_${pck}_bindings(si);"
-Note $gc ''
-Note $gc '    return;}'
-Note $gc ''
-Note $gc '/*--------------------------------------------------------------------------*/'
-Note $gc '/*--------------------------------------------------------------------------*/'
-Note $gc ''
+   Note $gc ''
+   Note $gc '/* SX_LOAD_'$PCK - get in $PCK bindings '*/'
+   Note $gc ''
+   Note $gc "void SX_load_${pck}(SS_psides *si)"
+   Note $gc '   {'
+   Note $gc ''
+   Note $gc "    _${PCK}_set_api();"
+   Note $gc ''
+   Note $gc "    SX_install_${pck}_bindings(si);"
+   Note $gc ''
+   Note $gc '    return;}'
+   Note $gc ''
+   Note $gc '/*--------------------------------------------------------------------------*/'
+   Note $gc '/*--------------------------------------------------------------------------*/'
+   Note $gc ''
 
-flog $log rm -f $gc.new
+   flog $log rm -f $gc.new
 
-flog $log ls -l $gc
+   flog $log ls -l $gc
 
-dbget CC_Exe
-dbget Shared_CC_Flags
-dbget CC_Debug
-#dbget Shared_CC_Inc
+   set on = TRUE
+   dbget CC_Exe
+   dbget Shared_CC_Flags
+   dbget CC_Debug
+#   dbget Shared_CC_Inc
 
-dbget Shared_LD_Exe
-dbget Shared_LD_Flags
-#dbget Shared_LD_RPath
-#dbget Shared_LD_Lib
-dbget LD_Lib
-dbget Cfg_LD_RPath
+   Note $log "CC_Exe          = |$CC_Exe|"
+   Note $log "Shared_CC_Flags = |$Shared_CC_Flags|"
+   Note $log "CC_Debug        = |$CC_Debug|"
+#   Note $log "Shared_CC_Inc   = |$Shared_CC_Inc|"
 
+   flog $log set cc   = ( ${CC_Exe} ${Shared_CC_Flags} ${CC_Debug} )
+   flog $log set cc   = ( $cc -I$incdir -I$devinc )
 
-Note $log "CC_Exe          = |$CC_Exe|"
-Note $log "Shared_CC_Flags = |$Shared_CC_Flags|"
-Note $log "CC_Debug        = |$CC_Debug|"
-#Note $log "Shared_CC_Inc   = |$Shared_CC_Inc|"
+   flog $log $cc -c $gc -o $go
 
-Note $log "Shared_LD_Exe   = |$Shared_LD_Exe|"
-Note $log "Shared_LD_Flags = |$Shared_LD_Flags|"
-#Note $log "Shared_LD_RPath = |$Shared_LD_RPath|"
-#Note $log "Shared_LD_Lib   = |$Shared_LD_Lib|"
-Note $log "LD_Lib          = |$LD_Lib|"
-Note $log "Cfg_LD_RPath    = |$Cfg_LD_RPath|"
+   flog $log ls -l $go
 
-
-flog $log set cc = ( ${CC_Exe} ${Shared_CC_Flags} ${CC_Debug} )
-flog $log set cc = ( $cc -I$incdir -I$devinc )
-flog $log set ld = ( ${Shared_LD_Exe} ${Shared_LD_Flags} ${Cfg_LD_RPath} )
-
-flog $log $cc -c $gc
-flog $log $ld $go -o $so ${LD_Lib}
-flog $log ls -l $so
-flog $log nm $so
-
-perdb quit: >& /dev/null
+endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+# LINK - link to shared library
+
+if (!(-f $so)) then
+
+   Separator $log
+
+   set on = TRUE
+   dbget Shared_LD_Exe
+   dbget Shared_LD_Flags
+#   dbget Shared_LD_RPath
+#   dbget Shared_LD_Lib
+   dbget LD_Lib
+   dbget Cfg_LD_RPath
+
+   Note $log "Shared_LD_Exe   = |$Shared_LD_Exe|"
+   Note $log "Shared_LD_Flags = |$Shared_LD_Flags|"
+#   Note $log "Shared_LD_RPath = |$Shared_LD_RPath|"
+#   Note $log "Shared_LD_Lib   = |$Shared_LD_Lib|"
+   Note $log "LD_Lib          = |$LD_Lib|"
+   Note $log "Cfg_LD_RPath    = |$Cfg_LD_RPath|"
+
+   flog $log set ld   = ( ${Shared_LD_Exe} ${Shared_LD_Flags} ${Cfg_LD_RPath} )
+   flog $log set libs = ""
+#   flog $log set libs = ( $libs -L$devlib -lsx -lscheme -lpml -lscore )
+
+   flog $log $ld $go -o $so $libs $LD_Lib
+
+   flog $log ls -l $so
+   flog $log ldd -d -r $so
+#   flog $log nm $so
+
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FINISH - cleanup and exit
+
+FINISH:
+
+if ($on == TRUE) then
+   perdb quit: >& /dev/null
+endif
 
 exit($err)

@@ -21,27 +21,27 @@ umask 002
 onintr INTERRUPT
 
 # NOTE: horrible bootstrap to find csh-subroutines
-set IncPath = ""
+set EtcPath = ""
 foreach i (`dirname $0` $cwd $cwd/.. $path)
    set base = $i:h
-   if (-f $base/include/csh-subroutines) then
-      set IncPath = $base/include
+   if (-f $base/etc/csh-subroutines) then
+      set EtcPath = $base/etc
       break
    endif
 end
-if ("$IncPath" == "") then
-   foreach i ($cwd/../include)
+if ("$EtcPath" == "") then
+   foreach i ($cwd/../etc)
       if (-f $i/csh-subroutines) then
-         set IncPath = $i
+         set EtcPath = $i
          break
       endif
    end
 endif
 
-if (-d "$IncPath") then
-   pushd $IncPath >& /dev/null
-   set IncPath = ( $cwd )
-   set CSUBR   = $IncPath/csh-subroutines
+if (-d "$EtcPath") then
+   pushd $EtcPath >& /dev/null
+   set EtcPath = ( $cwd )
+   set CSUBR   = $EtcPath/csh-subroutines
    popd >& /dev/null
 
 # we are going exactly nowhere without csh-subroutines

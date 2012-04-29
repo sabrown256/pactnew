@@ -18,9 +18,9 @@ endif
 
 set Root   = $Exe:h
 set BinDir = $Root/bin
-set IncDir = $Root/include
+set EtcDir = $Root/etc
 
-source $IncDir/env-csh
+source $EtcDir/env-csh
 
 InitLog Log $HOME/.log.check-service
 

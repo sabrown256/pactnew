@@ -110,7 +110,8 @@ struct s_statedes
     char **cpr;
     char **fpr;
     char **fwr;
-    fdecl *dcl;};
+    fdecl *dcl;
+    char path[MAXLINE];};            /* path for output files */
 
 struct s_bindes
    {statedes *st;
@@ -1602,7 +1603,7 @@ static void init_fortran(statedes *st, bindes *bd)
     pck = st->pck;
 
     if (cfl & 1)
-       {snprintf(fn, MAXLINE, "gf-%s.c", pck);
+       {snprintf(fn, MAXLINE, "%s/gf-%s.c", st->path, pck);
 	nstrncpy(ufn, MAXLINE, fn, -1);
 	upcase(ufn);
 
@@ -2310,7 +2311,7 @@ static void init_module(statedes *st, bindes *bd)
     pck = st->pck;
 
     if (cfl & 2)
-       {snprintf(fn, MAXLINE, "gm-%s.f", pck);
+       {snprintf(fn, MAXLINE, "%s/gm-%s.f", st->path, pck);
 	nstrncpy(ufn, MAXLINE, fn, -1);
 	upcase(ufn);
 
@@ -2870,7 +2871,7 @@ static void init_scheme(statedes *st, bindes *bd)
 
     pck = st->pck;
 
-    fp = open_file("w", "gs-%s.c", pck);
+    fp = open_file("w", "%s/gs-%s.c", st->path, pck);
 
     fprintf(fp, "\n");
     fprintf(fp, "#include \"sx_int.h\"\n");
@@ -3473,7 +3474,7 @@ static void init_python(statedes *st, bindes *bd)
 
     pck = st->pck;
 
-    fp = open_file("w", "gp-%s.c", pck);
+    fp = open_file("w", "%s/gp-%s.c", st->path, pck);
 
     fprintf(fp, "\n");
     fprintf(fp, "#include <Python.h>\n");
@@ -3903,7 +3904,7 @@ static void python_header(bindes *bd)
     nstrncpy(upk, MAXLINE, pck, -1);
     upcase(upk);
 
-    snprintf(name, MAXLINE, "py-%s.h", pck);
+    snprintf(name, MAXLINE, "%s/py-%s.h", st->path, pck);
     fh = fopen(name, "w");
     if (fh == NULL)
        return;
@@ -4051,7 +4052,7 @@ static void init_doc(statedes *st, bindes *bd)
 
     pck = st->pck;
 
-    fp = open_file("w", "gh-%s.html", pck);
+    fp = open_file("w", "%s/gh-%s.html", st->path, pck);
 
     fprintf(fp, "\n");
 
@@ -4299,7 +4300,8 @@ static void html_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc)
 
 /* MAN_WRAP - wrap C function DCL in MAN form */
 
-static void man_wrap(fdecl *dcl, char *sb, char *pck, int ndc, char **cdc)
+static void man_wrap(statedes *st, fdecl *dcl,
+		     char *sb, char *pck, int ndc, char **cdc)
    {int voidf;
     char fname[MAXLINE], upk[MAXLINE], pr[MAXLINE];
     char upn[MAXLINE], lfn[MAXLINE], dcn[MAXLINE];
@@ -4324,7 +4326,7 @@ static void man_wrap(fdecl *dcl, char *sb, char *pck, int ndc, char **cdc)
 
     cf_type(fty, MAXLINE, dcl->proto.type);
 
-    snprintf(fname, MAXLINE, "%s.3", cfn);
+    snprintf(fname, MAXLINE, "%s/%s.3", st->path, cfn);
     fp = fopen(fname, "w");
     if (fp == NULL)
        return;
@@ -4441,7 +4443,7 @@ static int bind_doc(bindes *bd)
         {dcl = dcls + ib;
 	 if (dcl->error == FALSE)
 	    {html_wrap(fp, dcl, NULL, ndc, cdc);
-	      man_wrap(dcl, NULL, pck, ndc, cdc);};};
+	      man_wrap(st, dcl, NULL, pck, ndc, cdc);};};
 
     return(rv);}
 
@@ -4469,7 +4471,7 @@ static void fin_doc(bindes *bd)
  *       - return TRUE iff successful
  */
 
-static int blang(char *pck, int cfl, char *fbi,
+static int blang(char *pck, char *pth, int cfl, char *fbi,
 		 char *cdc, char *cpr, char *fpr, char *fwr,
 		 int *no)
    {int i, ib, nb, rv;
@@ -4477,7 +4479,7 @@ static int blang(char *pck, int cfl, char *fbi,
     bindes *pb;
     statedes st = {0, 0, 0, 0, 0, 0, 0,
                    {FALSE, FALSE, FALSE, FALSE},
-		   NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+		   NULL, NULL, NULL, NULL, NULL, NULL, NULL, };
     bindes bd[] = { {&st, NULL, init_fortran, bind_fortran, fin_fortran},
 		    {&st, NULL, init_module, bind_module, fin_module},
 		    {&st, NULL, init_scheme, bind_scheme, fin_scheme},
@@ -4488,6 +4490,8 @@ static int blang(char *pck, int cfl, char *fbi,
 
     for (i = 0; i < N_MODES; i++)
         st.no[i] = no[i];
+
+    nstrncpy(st.path, MAXLINE, pth, -1);
 
 /* no documents */
     if (no[0] == TRUE)
@@ -4572,9 +4576,10 @@ int main(int c, char **v)
    {int i, rv, cfl;
     int no[N_MODES];
     char pck[MAXLINE], msg[MAXLINE];
-    char *fbi, *cdc, *cpr, *fpr, *fwr;
+    char *fbi, *cdc, *cpr, *fpr, *fwr, *pth;
 
     istrl = "int";
+    pth   = ".";
     fbi   = "";
     cpr   = "";
     cdc   = "";
@@ -4594,7 +4599,7 @@ int main(int c, char **v)
 	 else if (strcmp(v[i], "-f") == 0)
 	    fpr = v[++i];
 	 else if (strcmp(v[i], "-h") == 0)
-            {printf("Usage: blang -b <bindings> -c <c-proto> [-d <doc>] [-f <f-proto>] [-h] [-l] [-w <f-wrapper>] [-wr]\n");
+            {printf("Usage: blang -b <bindings> -c <c-proto> [-d <doc>] [-f <f-proto>] [-h] [-l] [-nod] [-nof] [-nop] [-nos] [-p <dir>] [-w <f-wrapper>] [-wr]\n");
              printf("   b    file containing binding specifications\n");
              printf("   c    file containing C prototypes\n");
              printf("   d    file containing documentation comments\n");
@@ -4606,6 +4611,7 @@ int main(int c, char **v)
              printf("   nop  do not generate python interfaces\n");
              printf("   nos  do not generate scheme interfaces\n");
              printf("   o    no interoprabilty interfaces (Fortran wrappers only)\n");
+             printf("   p    directory for generated files\n");
              printf("   w    file containing Fortran wrapper specifications\n");
              printf("   wr   no Fortran wrappers (interoperability only)\n");
              printf("\n");}
@@ -4621,6 +4627,8 @@ int main(int c, char **v)
 	    no[3] = TRUE;
 	 else if (strcmp(v[i], "-o") == 0)
             cfl &= ~2;
+	 else if (strcmp(v[i], "-p") == 0)
+            pth = v[++i];
 	 else if (strcmp(v[i], "-w") == 0)
 	    fwr = v[++i];
 	 else if (strcmp(v[i], "-wr") == 0)
@@ -4633,7 +4641,7 @@ int main(int c, char **v)
 
     init_types();
 
-    rv = blang(pck, cfl, fbi, cdc, cpr, fpr, fwr, no);
+    rv = blang(pck, pth, cfl, fbi, cdc, cpr, fpr, fwr, no);
     rv = (rv != TRUE);
 
     printf("done\n");

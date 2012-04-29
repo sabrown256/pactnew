@@ -914,7 +914,8 @@ extern void
  SX_install_funcs(SS_psides *si);
 
 extern int
- SX_next_prefix(void);
+ SX_next_prefix(void),
+ SX_import_so(SS_psides *si, char *hdr, char *so, char *flags);
 
 
 /* SXULIO.C declarations */

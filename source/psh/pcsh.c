@@ -29,7 +29,7 @@ static void script_env(FILE *fo, char *pact)
 	   fprintf(fo, "source %s\n", p);};
 
     fprintf(fo, "source %s/etc/env-pact.csh\n", pact);
-    fprintf(fo, "source %s/include/env-csh\n", pact);
+    fprintf(fo, "source %s/etc/env-csh\n", pact);
 
 /* check for a pcshrc file to include after PACT environment */
     if (haverc == TRUE)
@@ -58,7 +58,7 @@ static int make_shell_script(FILE *fi, char *fname, char *shell, char *pact,
 
 	script_env(fo, pact);
 
-	fprintf(fo, "source %s/include/csh-subroutines\n", pact);
+	fprintf(fo, "source %s/etc/csh-subroutines\n", pact);
 	fprintf(fo, "HAVE_SUBROUTINES\n");
 	fprintf(fo, "\n");
 
@@ -229,7 +229,7 @@ static void invoke_command(char **vo, char *shell, char *pact,
 
     snprintf(u, MAXLINE, "source %s/etc/env-pact.csh ; ", pact);
     nstrcat(s, LRG, u);
-    snprintf(u, MAXLINE, "source %s/include/env-csh ; ", pact);
+    snprintf(u, MAXLINE, "source %s/etc/env-csh ; ", pact);
     nstrcat(s, LRG, u);
 
 /* check for a pcshrc file to include before PACT environment */

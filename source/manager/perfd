@@ -5,7 +5,7 @@
 
 unalias *
 
-source /usr/local/apps/pactnew/include/env-csh
+source /usr/local/apps/pactnew/etc/env-csh
 
 set Host = `uname -n`
 set Host = $Host:r
