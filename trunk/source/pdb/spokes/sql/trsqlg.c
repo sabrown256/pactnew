@@ -168,6 +168,8 @@ memdes *_SQL_mk_descriptor(PDBfile *file, char *member, int defoff)
     desc->member_offs = -1L;
     desc->cast_offs   = -1L;
     desc->cast_memb   = NULL;
+    desc->size_offs   = NULL;
+    desc->size_memb   = NULL;
     desc->next        = NULL;
 
     return(desc);}

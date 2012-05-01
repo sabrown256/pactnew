@@ -1091,6 +1091,8 @@ static char *_H5_dec_compound(PDBfile *file, hid_t htyp)
              mnxt->cast_memb   = CSTRSAVE(type); 
              mnxt->member_offs = moffs;
              mnxt->cast_offs   = -1; 
+	     mnxt->size_offs   = NULL;
+	     mnxt->size_memb   = NULL;
              mnxt->type        = CSTRSAVE(type);
              mnxt->base_type   = CSTRSAVE(type);
              mnxt->name        = CSTRSAVE(mname);
