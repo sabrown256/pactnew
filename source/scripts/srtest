@@ -60,7 +60,7 @@ else if (-e $BaseDir/score/scstd.h) then
 
    if ("$Tests" == "") then
       set Tests = ""
-      set Tests = ($Tests subr iapi)
+      set Tests = ($Tests subr cpp iapi)
    endif
 
    foreach i ($Tests)

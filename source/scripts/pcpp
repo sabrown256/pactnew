@@ -75,6 +75,9 @@ endif
 
 set tf = $fi:t
 set td = $fi:h
+if ("$tf" == "$td") then
+   set td = .
+endif
 
 set stdout = FALSE
 if ("$fo" == "") then
@@ -150,32 +153,46 @@ else
 endif
 
 if (-f $th) then
-   $CPP $th                                        |& \
-   elide '/*' '*/' -                               |  \
-   tr "\t" " "                                     |  \
-   awk '$NF ~ /\\/ { printf("%s ", $0); }             \
-        $NF !~ /\\/ { printf("%s\n", $0); }'       |  \
-   sed 's/\\/ /g'                                  |  \
-   grep -v '#'                                     |  \
-   sed '/^ *$/d'                                   |  \
-   sed 's/  */ /g'                                 |  \
-   awk '$0 ~ /, *$/   { printf("%s", $0) }            \
-        $0 !~ /, *$/  { printf("%s\n", $0) }'      |  \
-   tr -d '\n'                                      |  \
-   sed 's/ *; */;/g'                               |  \
-   sed 's/ *( */(/g'                               |  \
-   sed 's/ *) */)/g'                               |  \
-   sed 's/ *{ */ {/g'                              |  \
-   sed 's/ *} */} /g'                              |  \
-   sed 's/ *\[ */\[/g'                             |  \
-   sed 's/ *\] */\]/g'                             |  \
-   sed 's/(\*/ (\*/g'                              |  \
-   sed 's/} ;/};\n/g'                              |  \
-   sed 's/;/;\n/g'                                 |  \
-   sed 's/\* */\*/g'                               |  \
-   sed '/^; *$/d'                                  |  \
-   sed 's/^ *//'                                   |  \
+   setenv PERDB_PATH /tmp/$$
+
+   ( $CPP $th ; perdb cppstat=$status >& /dev/null ) |& \
+   elide '/*' '*/' -                                 |  \
+   tr "\t" " "                                       |  \
+   awk '$NF ~ /\\/ { printf("%s ", $0); }               \
+        $NF !~ /\\/ { printf("%s\n", $0); }'         |  \
+   sed 's/\\/ /g'                                    |  \
+   grep -v '#'                                       |  \
+   sed '/^ *$/d'                                     |  \
+   sed 's/  */ /g'                                   |  \
+   awk '$0 ~ /, *$/   { printf("%s", $0) }              \
+        $0 !~ /, *$/  { printf("%s\n", $0) }'        |  \
+   tr -d '\n'                                        |  \
+   sed 's/ *; */;/g'                                 |  \
+   sed 's/ *( */(/g'                                 |  \
+   sed 's/ *) */)/g'                                 |  \
+   sed 's/ *{ */ {/g'                                |  \
+   sed 's/ *} */} /g'                                |  \
+   sed 's/ *\[ */\[/g'                               |  \
+   sed 's/ *\] */\]/g'                               |  \
+   sed 's/(\*/ (\*/g'                                |  \
+   sed 's/} ;/};\n/g'                                |  \
+   sed 's/;/;\n/g'                                   |  \
+   sed 's/\* */\*/g'                                 |  \
+   sed '/^; *$/d'                                    |  \
+   sed 's/^ *//'                                     |  \
    cat >&! $fo
+
+   set cppstat = `perdb cppstat`
+   if ($cppstat != 0) then
+      @ nerr = $nerr + 2
+      rm -rf $fo
+   endif
+   unset cppstat
+
+   perdb quit: >& /dev/null
+   rm -f ${PERDB_PATH}.* >& /dev/null
+   unsetenv PERDB_PATH
+
 else
    @ nerr = $nerr + 2
 endif

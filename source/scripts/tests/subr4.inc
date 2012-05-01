@@ -7,7 +7,7 @@
 # include "cpyright.h"
 #
 
-source $IncDir/csh-subroutines
+source $EtcDir/csh-subroutines
 HAVE_SUBROUTINES
 
 call bar()
