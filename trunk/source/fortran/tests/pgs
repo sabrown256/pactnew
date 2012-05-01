@@ -15,13 +15,13 @@ set msg = "PGS API Test ....................... "
 set tst = $1
 
 # check for Fortran compiler before doing Fortran test
-set FC = `awk '$1 == "FCompiler" { print $3 }' $IncDir/make-def`
+set FC = `awk '$1 == "FCompiler" { print $3 }' $EtcDir/make-def`
 if ("$FC" != "") then
    Note $Log "Using fortran compiler $FC"
    flog $Log swhich -1 $FC
    flog $Log set xstatus = $status
 else
-   fog $Log set xstatus = 1
+   flog $Log set xstatus = 1
 endif
 
 #if (($xstatus == 0) && ("$MPI" == "")) then

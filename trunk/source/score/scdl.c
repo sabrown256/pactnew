@@ -137,7 +137,13 @@ int SC_so_release(void)
 /* _SC_SO_PARSE_FLAGS - parse the flags for dlsym from SE */
 
 static int _SC_so_parse_flags(sodes *se)
-   {int is, ns, flag;
+   {int flag;
+
+    flag = -1;
+
+#ifdef HAVE_DYNAMIC_LINKER
+
+    int is, ns;
     char s[MAXLINE];
     char **sa;
 
@@ -170,6 +176,8 @@ static int _SC_so_parse_flags(sodes *se)
 	        flag |= RTLD_LOCAL;};
 
 	SC_free_strings(sa);};
+
+#endif
 
     return(flag);}
 

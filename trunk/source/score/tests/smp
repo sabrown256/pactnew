@@ -25,6 +25,7 @@ set exe = $BinDir/tscthr
       NoteD $Log ""
       NoteD $Log "                         ERROR Building Parallel Tests"
       NoteD $Log "                    ${msg}FAILED"
+      set lerr = 1
    else
 
       if ($?TEST_MAX_THREADS == 1) then

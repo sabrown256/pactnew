@@ -15,18 +15,23 @@ set exe = $BinDir/tscrs
 set opt = ""
 set io  = ftee
 
-NoteD $Log ""
-NoteD $Log -n "                    $msg"
-NoteD $Log ""
+if (-x $exe) then
 
-flog $Log pushd $SrcDir
-flog $Log $MAKE resource
-set xstatus = $status
-flog $Log popd
+   NoteD $Log ""
+   NoteD $Log -n "                    $msg"
+   NoteD $Log ""
 
-source ../../../scripts/test-run
+   flog $Log pushd $SrcDir
+   flog $Log $MAKE resource
+   set xstatus = $status
+   flog $Log popd
 
-$TEST_CHECK part -a resrc -e $xstatus -dt $dt -x $exe -rpf "$rpf" "$msg"
+   source ../../../scripts/test-run
 
-exit($status)
+   $TEST_CHECK part -a resrc -e $xstatus -dt $dt -x $exe -rpf "$rpf" "$msg"
+
+   set xstatus = $status
+endif
+
+exit($xstatus)
 

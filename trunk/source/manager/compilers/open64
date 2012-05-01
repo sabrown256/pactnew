@@ -28,7 +28,7 @@ Tool FC {
 
 Tool LD {
    RPath  = -Wl,-rpath,@
-   Flags  =
+   Flags += -Wl,-export-dynamic
 }
 
 Tool Lex {

@@ -66,6 +66,8 @@ Tool CXX {
 }
 
 Tool LD {
+#   Flags   += -Wl,-export-dynamic
+   Flags   += -undefined dynamic_lookup
    Flags   += [ _cmd_ = -p ;                 # profiling
 	        on    = -pg ]
    Flags   += [ _cmd_ = -cov ;               # coverage analysis
@@ -97,7 +99,7 @@ Group Cfg {
 Group Shared {
    LD_Exe   = gcc
    CC_Flags = -fPIC
-   LD_Flags = -shared
+   LD_Flags = -shared -undefined dynamic_lookup
    LD_Lib   = -lgomp
 #   LD_Flags = -dynamiclib -flat_namespace -undefined suppress
 }

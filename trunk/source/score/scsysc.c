@@ -1241,7 +1241,7 @@ static int _SC_process_lost(PROCESS *pp)
        {pru = pp->pru;
 	if (pru != NULL)
 	   {t   = pru->wct - pru->wcr;
-	    t   = min(t, SMALL);
+	    t   = max(t, SMALL);
 	    ift = pru->idlet / t;
 	    ifs = pru->since / t;
 	    ifh = pru->since / ((double) DEFAULT_HEARTBEAT);

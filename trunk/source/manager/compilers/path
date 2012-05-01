@@ -47,17 +47,18 @@ Tool CXX {
 }
 
 Tool LD {
-   RPath   = -Wl,-rpath,@
-   Flags  += [ _env_ = Bits ;               # address bit size
-               *     = -m* ]
-   Flags  += [ _cmd_ = -p ;                 # profiling
-	       on    = -pg ]
-   Lib     = -lc
+   RPath  = -Wl,-rpath,@
+   Flags += -Wl,-export-dynamic
+   Flags += [ _env_ = Bits ;               # address bit size
+              *     = -m* ]
+   Flags += [ _cmd_ = -p ;                 # profiling
+	      on    = -pg ]
+   Lib    = -lc
 }
 
 Tool Lex {
    Flags  = -w
-   Flags += [ _env_ = Bits ;                # address bit size
+   Flags += [ _env_ = Bits ;               # address bit size
               *     = -m* ]
 }
 

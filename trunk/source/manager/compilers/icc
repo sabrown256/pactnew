@@ -47,8 +47,9 @@ Tool CXX {
 }
 
 Tool LD {
-   RPath = -Wl,-rpath,@
-   Lib   = -lc
+   RPath  = -Wl,-rpath,@
+   Flags += -Wl,-export-dynamic
+   Lib    = -lc
 }
 
 Tool Lex {

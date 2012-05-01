@@ -51,11 +51,12 @@ Tool CXX {
 }
 
 Tool LD {
-   RPath   = -Wl,-rpath,@
-#   Flags   = -Ktrap=fp ${NUMA}
-   Flags   = -Ktrap=fp
-   Flags   += [ _cmd_ = -p ;                # profiling
-	        on    = -Mprof=func ]
+   RPath  = -Wl,-rpath,@
+#   Flags  = -Ktrap=fp ${NUMA}
+   Flags  = -Ktrap=fp
+   Flags += -Wl,-export-dynamic
+   Flags += [ _cmd_ = -p ;                  # profiling
+	      on    = -Mprof=func ]
 }
 
 Group Cfg {

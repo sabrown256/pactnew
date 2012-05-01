@@ -23,7 +23,8 @@ endif
 unset bindir
 unset lbase
 
-@ nerr = 0
+@ nerr  = 0
+@ nwarn = 0
 
 set api    = ""
 set def    = ""
@@ -103,7 +104,8 @@ foreach d ($libdir)
    endif
 end
 if ($ok == FALSE) then
-   echo "   Warning: '$so' not found in '$libdir'"
+#   echo "   Warning: '$so' not found in '$libdir'"
+   @ nwarn = $nwarn + 1
 endif
 
 set ok  = FALSE
@@ -119,7 +121,8 @@ if ("$#arc" > 1) then
       endif
    end
    if ($ok == FALSE) then
-      echo "   Warning: '$arc' not found in '$libdir'"
+#      echo "   Warning: '$arc' not found in '$libdir'"
+      @ nwarn = $nwarn + 2
    endif
 endif
 
@@ -138,7 +141,7 @@ if ($ok == FALSE) then
    exit($fatal)
 endif
 
-set file = $devinc/$hdr:t.api
+set ppf = $devinc/$hdr:t.api
 if ("$api" == "") then
    set api = $pck.api
 endif
@@ -162,7 +165,7 @@ if (-f $hdr) then
    elide '{' '}' -                                 |  \
    sed 's/extern//g'                               |  \
    grep -v typedef                                 |  \
-   cat >&! $file
+   cat >&! $ppf
 else
    @ nerr = $nerr + 2
 endif
@@ -192,7 +195,7 @@ while ($il < $nl)
       continue
    endif
    if ($ok == TRUE) then
-      grep -w $line $file >& /dev/null
+      grep -w $line $ppf >& /dev/null
       if ($status == 0) then
          set fncl = ( $fncl $line )
       else
@@ -204,11 +207,11 @@ end
 # if none are specified take them all
 if ("$fncl" == "") then
    set noglob
-   @ nl = `cat $file | wc -l`
+   @ nl = `cat $ppf | wc -l`
    @ il = 0
    while ($il < $nl)
       @ il = $il + 1
-      set line = ( `head -n $il $file | tail -n 1` )
+      set line = ( `head -n $il $ppf | tail -n 1` )
       if ("$line" == "") continue
       if ("$line" =~ \#*) continue
       if ("$line" =~ *\(*) then
@@ -224,13 +227,14 @@ endif
 
 # it is an error to specify no functions
 if ("$fncl" == "") then
-   @ nerr = $nerr + 4
-endif
+   echo "No functions found in $ppf - exiting"
+   cat $ppf
+   exit($fatal)
 
-if ("$missing" != "") then
+else if ("$missing" != "") then
    if ($#missing == $#fncl) then
-      echo "No functions found in $file - exiting"
-      cat $file
+      echo "All $#missing functions missing in $ppf - exiting"
+      cat $ppf
       exit($fatal)
    else
       set t = $hdr:t
@@ -239,6 +243,7 @@ if ("$missing" != "") then
          echo "   $f"
       end
       unset t
+      @ nwarn = $nwarn + 4
    endif
 endif
 unset missing
@@ -267,7 +272,7 @@ Note $api '   {'
 set noglob
 foreach f ($fncl)
    set m = '(*f'$f')'
-   set t = ( `grep -w $f $file | sed "s|$f|$m|"` )
+   set t = ( `grep -w $f $ppf | sed "s|$f|$m|"` )
    Note $api "    $t"
 end
 unset noglob
@@ -345,8 +350,12 @@ if (!(-f $api)) then
    @ nerr = $nerr + 8
 endif
 
+if ($nwarn > 0) then
+   echo "Completed with warnings $nwarn"
+endif
+
 if ($keep == FALSE) then
-   rm -rf $file
+   rm -rf $ppf
 endif
 
 #--------------------------------------------------------------------------

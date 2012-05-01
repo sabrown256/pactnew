@@ -16,7 +16,7 @@
 /* #define NO_DEFAULT_VALUE "NULL" */
 #define NO_DEFAULT_VALUE "----"
 
-#define N_MODES  4
+#define N_MODES  5
 
 /* #define RETURN_INTEGER */
 
@@ -27,7 +27,7 @@
 #endif
 
 enum e_langmode
-   {MODE_C = 1, MODE_F, MODE_S, MODE_P };
+   {MODE_C = 1, MODE_F, MODE_S, MODE_P, MODE_B };
 
 typedef enum e_langmode langmode;
 
@@ -89,10 +89,11 @@ struct s_fdecl
     farg *al;};
 
 struct s_mtype
-   {char *cty;
-    char *fty;
-    char *sty;
-    char *pty;
+   {char *cty;                       /* C types */
+    char *fty;                       /* Fortran types */
+    char *sty;                       /* Scheme types */
+    char *pty;                       /* Python types */
+    char *bty;                       /* Basis types */
     char *defv;};
 
 struct s_statedes
@@ -1038,6 +1039,12 @@ static char *lookup_type(char ***val, char *ty, langmode ity, langmode oty)
 		     {if (strcmp(ty, map[i].pty) == 0)
 			 {l = i;
 			  break;};};
+		 break;
+ 	    case MODE_B :
+	         for (i = 0; i < n; i++)
+		     {if (strcmp(ty, map[i].bty) == 0)
+			 {l = i;
+			  break;};};
 		 break;};
 
 	dv = NO_DEFAULT_VALUE;
@@ -1055,6 +1062,9 @@ static char *lookup_type(char ***val, char *ty, langmode ity, langmode oty)
 		     break;
 	        case MODE_P :
 		     rv = map[l].pty;
+		     break;
+	        case MODE_B :
+		     rv = map[l].bty;
 		     break;};}
 	else if ((is_func_ptr(ty, 3) == TRUE) || (is_ptr(ty) == TRUE))
 	   dv = "NULL";
@@ -1603,7 +1613,10 @@ static void init_fortran(statedes *st, bindes *bd)
     pck = st->pck;
 
     if (cfl & 1)
-       {snprintf(fn, MAXLINE, "%s/gf-%s.c", st->path, pck);
+       {if ((st->path == NULL) || (strcmp(st->path, ".") == 0))
+	   snprintf(fn, MAXLINE, "gf-%s.c", pck);
+	 else
+	   snprintf(fn, MAXLINE, "%s/gf-%s.c", st->path, pck);
 	nstrncpy(ufn, MAXLINE, fn, -1);
 	upcase(ufn);
 
@@ -2311,7 +2324,10 @@ static void init_module(statedes *st, bindes *bd)
     pck = st->pck;
 
     if (cfl & 2)
-       {snprintf(fn, MAXLINE, "%s/gm-%s.f", st->path, pck);
+       {if ((st->path == NULL) || (strcmp(st->path, ".") == 0))
+	   snprintf(fn, MAXLINE, "gm-%s.f", pck);
+	 else
+	   snprintf(fn, MAXLINE, "%s/gm-%s.f", st->path, pck);
 	nstrncpy(ufn, MAXLINE, fn, -1);
 	upcase(ufn);
 
@@ -2866,12 +2882,18 @@ static fparam so_type(char *a, int nc, char *ty)
 /* INIT_SCHEME - initialize Scheme file */
 
 static void init_scheme(statedes *st, bindes *bd)
-   {char *pck;
+   {char fn[MAXLINE];
+    char *pck;
     FILE *fp;
 
     pck = st->pck;
 
-    fp = open_file("w", "%s/gs-%s.c", st->path, pck);
+    if ((st->path == NULL) || (strcmp(st->path, ".") == 0))
+       snprintf(fn, MAXLINE, "gs-%s.c", pck);
+    else
+       snprintf(fn, MAXLINE, "%s/gs-%s.c", st->path, pck);
+
+    fp = open_file("w", fn);
 
     fprintf(fp, "\n");
     fprintf(fp, "#include \"sx_int.h\"\n");
@@ -3469,12 +3491,18 @@ static void python_def_structs(FILE *fp, statedes *st)
 /* INIT_PYTHON - initialize Python file */
 
 static void init_python(statedes *st, bindes *bd)
-   {char *pck;
+   {char fn[MAXLINE];
+    char *pck;
     FILE *fp;
 
     pck = st->pck;
 
-    fp = open_file("w", "%s/gp-%s.c", st->path, pck);
+    if ((st->path == NULL) || (strcmp(st->path, ".") == 0))
+       snprintf(fn, MAXLINE, "gp-%s.c", pck);
+    else
+       snprintf(fn, MAXLINE, "%s/gp-%s.c", st->path, pck);
+
+    fp = open_file("w", fn);
 
     fprintf(fp, "\n");
     fprintf(fp, "#include <Python.h>\n");
@@ -3904,7 +3932,11 @@ static void python_header(bindes *bd)
     nstrncpy(upk, MAXLINE, pck, -1);
     upcase(upk);
 
-    snprintf(name, MAXLINE, "%s/py-%s.h", st->path, pck);
+    if ((st->path == NULL) || (strcmp(st->path, ".") == 0))
+       snprintf(name, MAXLINE, "py-%s.h", pck);
+    else
+       snprintf(name, MAXLINE, "%s/py-%s.h", st->path, pck);
+
     fh = fopen(name, "w");
     if (fh == NULL)
        return;
@@ -4047,12 +4079,18 @@ static void fin_python(bindes *bd)
 /* INIT_DOC - initialize Doc file */
 
 static void init_doc(statedes *st, bindes *bd)
-   {char *pck;
+   {char fn[MAXLINE];
+    char *pck;
     FILE *fp;
 
     pck = st->pck;
 
-    fp = open_file("w", "%s/gh-%s.html", st->path, pck);
+    if ((st->path == NULL) || (strcmp(st->path, ".") == 0))
+       snprintf(fn, MAXLINE, "gh-%s.html", pck);
+    else
+       snprintf(fn, MAXLINE, "%s/gh-%s.html", st->path, pck);
+
+    fp = open_file("w", fn);
 
     fprintf(fp, "\n");
 
@@ -4326,7 +4364,11 @@ static void man_wrap(statedes *st, fdecl *dcl,
 
     cf_type(fty, MAXLINE, dcl->proto.type);
 
-    snprintf(fname, MAXLINE, "%s/%s.3", st->path, cfn);
+    if ((st->path == NULL) || (strcmp(st->path, ".") == 0))
+       snprintf(fname, MAXLINE, "%s.3", cfn);
+    else
+       snprintf(fname, MAXLINE, "%s/%s.3", st->path, cfn);
+
     fp = fopen(fname, "w");
     if (fp == NULL)
        return;
@@ -4465,6 +4507,43 @@ static void fin_doc(bindes *bd)
     return;}
 
 /*--------------------------------------------------------------------------*/
+
+/*                              BASIS ROUTINES                                */
+
+/*--------------------------------------------------------------------------*/
+
+/* INIT_BASIS - initialize Basis file */
+
+static void init_basis(statedes *st, bindes *bd)
+   {
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* BIND_BASIS - generate Basis bindings from CPR and SBI
+ *            - return TRUE iff successful
+ */
+
+static int bind_basis(bindes *bd)
+   {int rv;
+
+    rv = TRUE;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* FIN_BASIS - finalize Basis file */
+
+static void fin_basis(bindes *bd)
+   {
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* BLANG - control the generation of language binding
@@ -4484,7 +4563,8 @@ static int blang(char *pck, char *pth, int cfl, char *fbi,
 		    {&st, NULL, init_module, bind_module, fin_module},
 		    {&st, NULL, init_scheme, bind_scheme, fin_scheme},
 		    {&st, NULL, init_python, bind_python, fin_python},
-		    {&st, NULL, init_doc, bind_doc, fin_doc} };
+		    {&st, NULL, init_doc, bind_doc, fin_doc},
+		    {&st, NULL, init_basis, bind_basis, fin_basis} };
 
     rv = FALSE;
 
@@ -4599,7 +4679,7 @@ int main(int c, char **v)
 	 else if (strcmp(v[i], "-f") == 0)
 	    fpr = v[++i];
 	 else if (strcmp(v[i], "-h") == 0)
-            {printf("Usage: blang -b <bindings> -c <c-proto> [-d <doc>] [-f <f-proto>] [-h] [-l] [-nod] [-nof] [-nop] [-nos] [-p <dir>] [-w <f-wrapper>] [-wr]\n");
+            {printf("Usage: blang -b <bindings> -c <c-proto> [-d <doc>] [-f <f-proto>] [-h] [-l] [-nob] [-nod] [-nof] [-nop] [-nos] [-p <dir>] [-w <f-wrapper>] [-wr]\n");
              printf("   b    file containing binding specifications\n");
              printf("   c    file containing C prototypes\n");
              printf("   d    file containing documentation comments\n");
@@ -4617,6 +4697,8 @@ int main(int c, char **v)
              printf("\n");}
 	 else if (strcmp(v[i], "-l") == 0)
             istrl = "long";
+	 else if (strcmp(v[i], "-nob") == 0)
+	    no[4] = TRUE;
 	 else if (strcmp(v[i], "-nod") == 0)
 	    no[0] = TRUE;
 	 else if (strcmp(v[i], "-nof") == 0)
