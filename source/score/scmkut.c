@@ -102,7 +102,7 @@ static int setup_env(char *src, anadep *state)
 	return(FALSE);};
 
 /* setup the root directory string */
-    SC_strncpy(state->root, MAXLINE, state->exe, -1);
+    SC_strncpy(state->root, PATH_MAX, state->exe, -1);
 
 /* remove the executable name */
     p = SC_pop_path(state->root);

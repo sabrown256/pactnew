@@ -53,7 +53,10 @@
 
 ; GOTCHA: some 32 bit machines get a different number of tells than
 ; 64 bit machines
-		        (if (and (> nh 0) (not (string=? on "lftell")))
+; and CLANG gets a different number of seeks
+		        (if (and (> nh 0)
+				 (not (string=? on "lftell"))
+				 (not (string=? on "lfseek")))
 			    (printf nil "      %-10s %8d %11.3e\n"
 				    on nh (/ ns nh)))
 

@@ -1,7 +1,6 @@
 Creating file foofoo
 I/O stats:
    Operation       # Hits   Tave (sec)
-      lfseek           20   0.000e+00
       lfwrite          73   0.000e+00
       fputs            19   0.000e+00
 reading file foofoo
@@ -160,6 +159,5 @@ reading file foofoo
 /struct4.x(3) =     15
 I/O stats:
    Operation       # Hits   Tave (sec)
-      lfseek           82   0.000e+00
       lfread           77   0.000e+00
 

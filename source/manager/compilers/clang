@@ -55,7 +55,8 @@ Tool CXX {
 
 Tool LD {
    RPath    = -Wl,-rpath,@
-   Lib      = -lc
+   Flags   += -rdynamic
+   Lib      = -ldl -lc
 }
 
 Tool Lex {

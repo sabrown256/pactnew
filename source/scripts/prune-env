@@ -115,7 +115,7 @@ switch ($tgt)
    case db:
         if (!(-f "$db")) then
            set sys = `cfgman use`
-           set db  = "../dev/$sys/include/cfg.db"
+           set db  = "../dev/$sys/etc/cfg.db"
         endif
 
         if (-f $db) then

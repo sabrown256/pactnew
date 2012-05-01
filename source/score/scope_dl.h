@@ -11,9 +11,12 @@
 #define PCK_SCOPE_DL
 
 #include "cpyright.h"
+
 #include "scope_proc.h"
 
-#include <dlfcn.h>
+#ifdef HAVE_DYNAMIC_LINKER
+# include <dlfcn.h>
+#endif
 
 /*--------------------------------------------------------------------------*/
 
