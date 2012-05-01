@@ -1,0 +1,72 @@
+#!/bin/csh -f
+#
+# CPP - test pcpp
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set msg = "PCPP Test ......................"
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: pcpp [-h]"
+           echo "  h  this help message"
+           echo ""
+           exit(1);
+      default:
+           breaksw
+   endsw
+   shift
+end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CPP - test pcpp
+
+NoteD $Log "                    $msg"
+
+set List = (cpp1 cpp2)
+
+flog $Log cp $SrcDir/tests/{cpp*} .
+
+foreach t ($List)
+   Separator $Log
+
+   set f = ( `fill-string -n 28 $t` )
+
+   NoteD $Log -n "                        $f "
+   Note $Log ""
+
+   set Res = $t.res
+   set Ref = $t.ref
+
+   $t run >&! $Res
+   flog $Log @ nerr = $nerr + $status
+
+   $t ans >&! $Ref
+   flog $Log @ nerr = $nerr + $status
+
+   flog $Log diff $Res $Ref
+   set xstatus = $status
+   if ($xstatus == 0) then
+      NoteD $Log "ok"
+      set rpf = ( $rpf $Res $Ref )
+   else
+      NoteD $Log "ng"
+      flog $Log @ nerr = $nerr + 1
+   endif
+end
+
+set rpf = ( $rpf cpp* cpp*.h )
+
+$TEST_CHECK part -a pcpp -e $nerr -rpf "$rpf" "$msg"
+
+exit($status)

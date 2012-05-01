@@ -1,0 +1,35 @@
+#!/bin/csh -f
+#
+# CPP1 - basic test of pcpp
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set xstatus = 0
+
+# run the test
+if ($1 == run) then
+   set tmp = $cwd/cpp1
+   cat >! $tmp.h << EOF
+#define a b
+int a;
+
+#if 0
+#error "bad, bad"
+#endif
+
+EOF
+
+   pcpp -o - $tmp.h
+   set xstatus = $status
+
+
+# print the fiducial answers
+else
+   echo "int b;"
+endif
+
+exit($xstatus)
