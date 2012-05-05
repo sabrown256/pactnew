@@ -183,7 +183,7 @@ ${IncDir}/bfd.api : bfd.def
 scf77lr.o : scf77lr.l sclexan.h
 
 ${ArDObjs} : scope_make.h scope_proc.h
-${ArEObjs} : scope_exe.h
+${ArEObjs} : scope_exe.h ${APIs}
 ${ArMObjs} : scope_mem.h
 ${ArPObjs} : scope_proc.h
 ${ArSObjs} : scope_lex.h
@@ -191,13 +191,13 @@ ${ArTObjs} : scope_thread.h
 ${ArObjs}  : ${Hdrs}
 
 ${DObjs} : scope_make.h scope_proc.h
-${EObjs} : scope_exe.h
+${EObjs} : scope_exe.h ${APIs}
 ${MObjs} : scope_mem.h
 ${PObjs} : scope_proc.h
 ${TObjs} : scope_thread.h
 ${Objs}  : ${Hdrs} ${hdrf}
 
-${LibDep} : ${hdrf} ${Hdrs} ${APIs}
+${LibDep} : ${hdrf} ${Hdrs}
 ${MMDep}  : ${Hdrs}
 
 #

@@ -10,22 +10,26 @@ so      libhdf5.so
 arc     libhdf5.a
 
 functions {
+    H5open
+    H5check_version
     H5Dclose
     H5Dcreate2
     H5Dget_offset
     H5Dget_space
     H5Dget_type
-    H5Dopen
+    H5Dopen1
     H5Dopen2
     H5Dread
     H5Dwrite
-    H5Eset_auto
+    H5Eset_auto1
+    H5Eset_auto2
     H5Fcreate
     H5Fopen
     H5Gclose
     H5Gget_objinfo
     H5Giterate
-    H5Gopen
+    H5Gopen1
+    H5Gopen2
     H5Sclose
     H5Screate_simple
     H5Sget_simple_extent_dims
@@ -34,7 +38,8 @@ functions {
     H5Tclose
     H5Tcopy
     H5Tcreate
-    H5Tget_array_dims
+    H5Tget_array_dims1
+    H5Tget_array_dims2
     H5Tget_array_ndims
     H5Tget_class
     H5Tget_ebias
@@ -52,4 +57,15 @@ functions {
     H5Tinsert
 }
 
+variables {
+    H5T_NATIVE_HBOOL_g
+    H5T_NATIVE_SCHAR_g
+    H5T_NATIVE_SHORT_g
+    H5T_NATIVE_INT_g
+    H5T_NATIVE_LONG_g
+    H5T_NATIVE_LLONG_g
+    H5T_NATIVE_FLOAT_g
+    H5T_NATIVE_DOUBLE_g
+    H5T_NATIVE_LDOUBLE_g
+}
 

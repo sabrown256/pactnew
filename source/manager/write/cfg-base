@@ -131,6 +131,9 @@
               case gnu-bgp:
                    echo "include auto-gnu-bgp" >>& $Tmp
                    breaksw
+              case gnu-bgq:
+                   echo "include auto-gnu-bgq" >>& $Tmp
+                   breaksw
               case gnu-cxe:
                    echo "include auto-gnu-cxe" >>& $Tmp
                    breaksw
@@ -168,6 +171,9 @@
                    breaksw
               case xlc-bgp:
                    echo "include auto-xlc-bgp" >>& $Tmp
+                   breaksw
+              case xlc-bgq:
+                   echo "include auto-xlc-bgq" >>& $Tmp
                    breaksw
               default:
               case *gnu:

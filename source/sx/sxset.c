@@ -357,7 +357,7 @@ int SX_import_so(SS_psides *si, char *hdr, char *so, char *flags)
 				     NULL, "void", "(SS_psides *si)");
 
 /* get the function and invoke it */
-	    f = SC_so_get(OBJ_FUNC, fnc);
+	    ASSIGN_FNC(f, SC_so_get(OBJ_FUNC, fnc));
 	    if (f != NULL)
 	       {f(si);
 		ok = TRUE;};};};

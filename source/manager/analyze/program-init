@@ -12,6 +12,9 @@ run analyze/default-bits
 # include PACT libraries in RPATH for the memory manager interposers
 run analyze/rpath -i init
 
+# dynamically link dependent libraries by default
+include features/dld
+
 # PACT_CC_ refers to the Compiler Collection used to build PACT
 # rather than COMPILER_ which is overloaded to the extreme
 setenv PACT_CC_FAMILY    generic
@@ -38,7 +41,6 @@ setenv LIB       lib
 setenv SUFFIXES  '.i'
 
 BuildSharedLibs = FALSE
-Linking         = dynamic
 FilterDir       =
 WARN_PATTERN    =
 ERR_PATTERN     =

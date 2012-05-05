@@ -86,7 +86,7 @@ EOF
       NoteD $ALog "      no readline"
    endif
 
-   setenv MD_Lib   "$llib $MD_Lib"
+#   setenv MD_Lib   "$llib $MD_Lib"
    setenv RL_Inc   ""
    setenv RL_Lib   "$llib"
    setenv RL_RPath ""

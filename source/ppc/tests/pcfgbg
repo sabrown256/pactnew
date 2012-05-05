@@ -19,10 +19,10 @@ set exe    = `which pact`
 set Root   = $exe:h
 set Root   = $Root:h
 set BinDir = $Root/bin
-set IncDir = $Root/include
+set EtcDir = $Root/etc
 set path   = ( $BinDir $path )
 
-source $IncDir/env-csh
+source $EtcDir/env-csh
 
 if ($cwd:t == ppc) then
    set SrcDir = $cwd
