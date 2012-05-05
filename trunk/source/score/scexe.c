@@ -59,9 +59,19 @@ void _SC_copy_storloc(SC_storloc *d, SC_storloc *s)
 
 #include <bfd.h>
 
-#if 0
 #include "bfd.api"
-#endif
+
+/* NOTE: bfd functional macros are invisible to import-api because
+ * the preprocessor expands them
+ * consequently we have to define our own versions
+ */
+#define GET_FILE_FLAGS         bfd_get_file_flags
+#define GET_SECTION_FLAGS      bfd_get_section_flags
+#define GET_SECTION_SIZE       bfd_get_section_size
+#define GET_SECTION_VMA        bfd_get_section_vma
+#define FIND_NEAREST_LINE      bfd_find_nearest_line
+#define FIND_INLINER_INFO      bfd_find_inliner_info
+#define READ_MINISYMBOLS       bfd_read_minisymbols
 
 /* NOTE: Ubuntu 10.4 has version 2.20,
  * Ubuntu 10.10 has version 2.20.51, and
@@ -177,10 +187,10 @@ static long _SC_exe_rd_symt(exedes *st)
     et = GET_ET(st);
 
     ns = -1;
-    if ((bfd_get_file_flags(et) & HAS_SYMS) != 0)
-       {ns = bfd_read_minisymbols(et, FALSE, (void *) &st->symt, &sz);
+    if ((GET_FILE_FLAGS(et) & HAS_SYMS) != 0)
+       {ns = READ_MINISYMBOLS(et, FALSE, (void *) &st->symt, &sz);
 	if (ns == 0)
-	   ns = bfd_read_minisymbols(et, TRUE, (void *) &st->symt, &sz);};
+	   ns = READ_MINISYMBOLS(et, TRUE, (void *) &st->symt, &sz);};
 
     return(ns);}
 
@@ -201,16 +211,16 @@ static void _SC_exe_find_addr(bfd *et, asection *es, void *data)
     symt = GET_SYMT(st);
 
     if ((st->found == FALSE) &&
-	((bfd_get_section_flags(et, es) & SEC_ALLOC) != 0))
-       {vma = bfd_get_section_vma(et, es);
+	((GET_SECTION_FLAGS(et, es) & SEC_ALLOC) != 0))
+       {vma = GET_SECTION_VMA(et, es);
 	adf = st->pc - vma;
 	if (0 <= adf)
-	   {sz = bfd_get_section_size(es);
+	   {sz = GET_SECTION_SIZE(es);
 	    if (adf < sz)
-	       {st->found = bfd_find_nearest_line(et, es, symt, adf,
-						  &sl.pfile,
-						  &sl.pfunc,
-						  &sl.line);
+	       {st->found = FIND_NEAREST_LINE(et, es, symt, adf,
+					      &sl.pfile,
+					      &sl.pfunc,
+					      &sl.line);
 		if (st->found == TRUE)
 		   SAVE_LOC(st, sl);};};};
 
@@ -233,14 +243,14 @@ static void _SC_exe_find_offs(exedes *st)
     symt = GET_SYMT(st);
 
     if ((st->found == FALSE) &&
-	((bfd_get_section_flags(et, es) & SEC_ALLOC) != 0))
+	((GET_SECTION_FLAGS(et, es) & SEC_ALLOC) != 0))
        {ad = st->pc;
-	sz = bfd_get_section_size(es);
+	sz = GET_SECTION_SIZE(es);
 	if (ad < sz)
-	   {st->found = bfd_find_nearest_line(et, es, symt, ad,
-					      &sl.pfile,
-					      &sl.pfunc,
-					      &sl.line);
+	   {st->found = FIND_NEAREST_LINE(et, es, symt, ad,
+					  &sl.pfile,
+					  &sl.pfunc,
+					  &sl.line);
 	    if (st->found == TRUE)
 	       SAVE_LOC(st, sl);};};
 
@@ -257,10 +267,10 @@ static void _SC_exe_find_inline(exedes *st)
 
     et = GET_ET(st);
 
-    st->found = bfd_find_inliner_info(et,
-				      &sl.pfile,
-				      &sl.pfunc,
-				      &sl.line);
+    st->found = FIND_INLINER_INFO(et,
+				  &sl.pfile,
+				  &sl.pfunc,
+				  &sl.line);
     if (st->found == TRUE)
        SAVE_LOC(st, sl);
 
@@ -547,7 +557,7 @@ static void _SC_exe_close(exedes *st)
 void SC_exe_init_api(void)
    {
 
-#if 0
+#ifdef HAVE_BFD
     _BFD_set_api();
 #endif
 

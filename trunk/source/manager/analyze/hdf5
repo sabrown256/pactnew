@@ -26,6 +26,8 @@ SafeEnv Z_Lib      "-lz"
 
 dbini HDF5_SO    ""
 
+dbget Linking
+
 # if we have explicitly said we do not want HDF5
 # do NOT detect it
 if ("$HDF_Path" == none) then
@@ -80,14 +82,14 @@ EOF
       if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
          setenv MDI_Inc "$MDI_Inc $PckInc"
       endif
-
+      if (($Linking == dynamic) && ($?lSO == 1)) then
+         setenv HDF5_SO    $lSO
+      else
+         setenv MDI_Lib       "$PckLib $MDI_Lib"
+      endif
       flog $ALog setenv RPATH         ${RPATH}:${HDF_RPath}
-      flog $ALog setenv MDI_Lib       "$PckLib $MDI_Lib"
       flog $ALog setenv MDI_Pck       "HDF $MDI_Pck"
       flog $ALog setenv HAVE_HDF5     TRUE
-      if ($?lSO == 1) then
-         setenv HDF5_SO    $lSO
-      endif
    else
       NoteD $ALog "      no compatible HDF5 version"
       flog $ALog setenv HAVE_HDF5 ""

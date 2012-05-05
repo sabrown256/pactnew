@@ -27,6 +27,8 @@ SafeEnv HAVE_SQL   FALSE
 dbini MYSQL_SO    ""
 dbini SQLITE3_SO  ""
 
+dbget Linking
+
 # if we have explicitly said we do not want SQL
 # do NOT detect it
 if ("$SQL_Path" == none) then
@@ -38,6 +40,7 @@ else
    set pthl = ""
    set libl = ""
    set spkl = ""
+   set esql = FALSE
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -84,19 +87,21 @@ EOF
    source $AnaDir/find-package
 
    if (("$PckLib" != "") && ("$PckInc" != "")) then
+      set esql = TRUE
       if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
          set incl = ( $incl $PckInc )
       endif
       if ("$PckPath" != "") then
          set pthl = ( $pthl $PckPath )
       endif
-      set libl = ( $libl $PckLib )
+      if (($Linking == dynamic) && ($?lSO == 1)) then
+         setenv MYSQL_SO    $lSO
+      else
+         set libl = ( $libl $PckLib )
+      endif
       set spkl = ( $spkl mysql )
 
       setenv HAVE_MYSQL  TRUE
-      if ($?lSO == 1) then
-         setenv MYSQL_SO    $lSO
-      endif
    else
       setenv HAVE_MYSQL  ""
    endif
@@ -143,19 +148,21 @@ EOF
    source $AnaDir/find-package
 
    if (("$PckLib" != "") && ("$PckInc" != "")) then
+      set esql = TRUE
       if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
          set incl = ( $incl $PckInc )
       endif
       if ("$PckPath" != "") then
          set pthl = ( $pthl $PckPath )
       endif
-      set libl = ( $libl $PckLib )
+      if (($Linking == dynamic) && ($?lSO == 1)) then
+         setenv SQLITE3_SO    $lSO
+      else
+         set libl = ( $libl $PckLib )
+      endif
       set spkl = ( $spkl sqlite )
 
       setenv HAVE_SQLITE TRUE
-      if ($?lSO == 1) then
-         setenv SQLITE3_SO    $lSO
-      endif
    else
       setenv HAVE_SQLITE ""
    endif
@@ -199,19 +206,21 @@ EOF
    source $AnaDir/find-package
 
    if (("$PckLib" != "") && ("$PckInc" != "")) then
+      set esql = TRUE
       if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
          set incl = ( $incl $PckInc )
       endif
       if ("$PckPath" != "") then
          set pthl = ( $pthl $PckPath )
       endif
-      set libl = ( $libl $PckLib )
+      if (($Linking == dynamic) && ($?lSO == 1)) then
+         setenv SQLITE3_SO    $lSO
+      else
+         set libl = ( $libl $PckLib )
+      endif
 
       setenv HAVE_SQLITE_V2 TRUE
       setenv HAVE_SQLITE    TRUE
-      if ($?lSO == 1) then
-         setenv SQLITE3_SO    $lSO
-      endif
    else
       setenv HAVE_SQLITE_V2 ""
    endif
@@ -234,7 +243,7 @@ EOF
       setenv RPATH   ${RPATH}:$p
    end
 
-   if ("$SQL_Lib" != "") then
+   if ($esql == TRUE) then
       flog $ALog setenv MDI_Inc    "$MDI_Inc $incl"
       flog $ALog setenv MDI_Lib    "$libl $MDI_Lib"
       flog $ALog setenv MDI_Pck    "SQL $MDI_Pck"

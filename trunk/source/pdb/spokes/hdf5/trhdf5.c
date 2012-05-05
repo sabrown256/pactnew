@@ -375,9 +375,9 @@ static hsize_t *_H5_enc_dims(PDBfile *file, int *pnd,
         hdims = (hsize_t*) calloc(nd, sizeof(hsize_t));
 
 #if (H5_VERS_RELEASE < 4)
-        status = H5Tget_array_dims(htyp, hdims); 
+        status = H5Tget_array_dims2(htyp, hdims); 
 #else
-	status = H5Tget_array_dims(htyp, hdims, NULL);
+	status = H5Tget_array_dims1(htyp, hdims, NULL);
 #endif
         SC_ASSERT(status != -1);
 
@@ -914,9 +914,9 @@ static dimdes *_H5_dec_dims(PDBfile *file, hid_t htyp, hid_t hdim)
 	   {
 
 #if (H5_VERS_RELEASE < 4)
-	   status = H5Tget_array_dims(htyp, hdims); 
+	   status = H5Tget_array_dims2(htyp, hdims); 
 #else
-	   status = H5Tget_array_dims(htyp, hdims, NULL);
+	   status = H5Tget_array_dims1(htyp, hdims, NULL);
 #endif
 
 	   if (H5Tget_class(nativetype_id) == H5T_STRING)
@@ -1291,9 +1291,9 @@ static herr_t H5_read_group_node(hid_t hgr, const char *mname, void *a)
              DEBUG1("Parsing H5G_DATASET: %s\n", mname);
 
 #if (H5_VERS_RELEASE < 4)
-	     hds = H5Dopen(hgr, mname, H5P_DEFAULT);
+	     hds = H5Dopen2(hgr, mname, H5P_DEFAULT);
 #else
-	     hds = H5Dopen(hgr, mname);
+	     hds = H5Dopen1(hgr, mname);
 #endif
 	     hdim = H5Dget_space(hds);
 	     htyp = H5Dget_type(hds);    
@@ -1447,9 +1447,9 @@ static PDBfile *_H5_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
 
 /* turn off the un-intelligent H5E print subsystem */
 #if (H5_VERS_RELEASE < 4)
-    H5Eset_auto(H5E_DEFAULT, NULL, stderr);
+    H5Eset_auto2(H5E_DEFAULT, NULL, stderr);
 #else
-    H5Eset_auto(H5E_DEFAULT, NULL);
+    H5Eset_auto1(H5E_DEFAULT, NULL);
 #endif
 
 /* make sure it really is an HDF5 file */
@@ -1555,9 +1555,9 @@ static PDBfile *_H5_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 
 /* turn off the un-intelligent H5E print subsystem */
 #if (H5_VERS_RELEASE < 4)
-    H5Eset_auto(H5E_DEFAULT, NULL, stderr);
+    H5Eset_auto2(H5E_DEFAULT, NULL, stderr);
 #else
-    H5Eset_auto(H5E_DEFAULT, NULL);
+    H5Eset_auto1(H5E_DEFAULT, NULL);
 #endif
 
 /* make sure it really is an HDF5 file */
@@ -1621,9 +1621,9 @@ static PDBfile *_H5_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
  * insert entries in the symbol table as we encounter the objects
  */
 #if (H5_VERS_RELEASE < 4)
-    hdf_root_group = H5Gopen(hst->hf, "/", H5P_DEFAULT);
+    hdf_root_group = H5Gopen2(hst->hf, "/", H5P_DEFAULT);
 #else
-    hdf_root_group = H5Gopen(hst->hf, "/");
+    hdf_root_group = H5Gopen1(hst->hf, "/");
 #endif
     status = H5Giterate(hst->hf, "/", NULL, &H5_read_group_node, file);
     H5Gclose(hdf_root_group);

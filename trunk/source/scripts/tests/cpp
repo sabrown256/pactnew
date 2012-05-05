@@ -54,7 +54,7 @@ foreach t ($List)
    $t ans >&! $Ref
    flog $Log @ nerr = $nerr + $status
 
-   flog $Log diff $Res $Ref
+   flog $Log diff -b -B -w $Res $Ref
    set xstatus = $status
    if ($xstatus == 0) then
       NoteD $Log "ok"

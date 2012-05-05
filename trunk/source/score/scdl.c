@@ -284,7 +284,6 @@ void *SC_so_get(objindex kind, char *tag, ...)
 		dlerror();
 
 		f = dlsym(sem->so, fnc);
-/*                *(void **) (&f) = dlsym(sem->so, fnc); */
 
 		s = dlerror();
 		if (s != NULL)

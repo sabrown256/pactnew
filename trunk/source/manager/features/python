@@ -9,7 +9,8 @@
 
 include shared
 
-Linking = static
+# statically link dependent libraries
+include features/dls
 
 Tool CC {
    Exe      =? ${Python_CC_Exe}

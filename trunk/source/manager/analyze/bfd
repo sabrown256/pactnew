@@ -23,6 +23,8 @@ dbini HAVE_BFD       FALSE
 dbini HAVE_DEMANGLE  FALSE
 dbini BFD_SO         ""
 
+dbget Linking
+
 # if we have explicitly said we do not want BFD
 # do NOT detect it
 if ("$BFD_Path" == none) then
@@ -119,8 +121,6 @@ EOF
    if ($#inf > 2) then
       set lSO = $inf[3];
       Note $ALog "Shared library for libbfd: |$lSO|"
-      setenv BFD_SO    $lSO
-      dbexp BFD_SO
    endif
 
    flog $ALog rm -f $Tmp.c $Tmp
@@ -140,7 +140,12 @@ EOF
       endif
 
       NoteD $ALog "      has bfd ($BFD_Version)"
-      flog $ALog setenv MDE_Lib "$MDE_Lib $libs"
+
+      if (($Linking == dynamic) && ($?lSO == 1)) then
+         setenv BFD_SO    $lSO
+      else
+         flog $ALog setenv MDE_Lib "$MDE_Lib $libs"
+      endif
       flog $ALog setenv HAVE_BFD TRUE
    endif
 
@@ -184,6 +189,7 @@ dbexp BFD_Path
 dbexp MDE_Lib
 dbexp HAVE_BFD
 dbexp HAVE_DEMANGLE
+dbexp BFD_SO
 
 Separator $ALog
 

@@ -369,8 +369,8 @@ Note $Log "   PyDirSrc   = |$PyDirSrc|"
           Note $STDOUT '               endif'
           Note $STDOUT '            endif'
           Note $STDOUT '         end'
-          Note $STDOUT '         popd >& /dev/null'
           Note $STDOUT '      endif'
+          Note $STDOUT '      popd >& /dev/null'
           Note $STDOUT '   endif'
           Note $STDOUT 'end'
        endif
