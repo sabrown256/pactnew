@@ -1,0 +1,11 @@
+#
+# DLS - link Dependent Libraries Statically
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+Linking = static
+
