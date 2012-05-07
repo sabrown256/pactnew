@@ -1,0 +1,39 @@
+#
+# AUTO-GNU-BGQ - 64-bit BG/Q back end configuration with GCC
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+setenv PATH  ${PATH}:/bgsys/drivers/ppcfloor/gnu-linux/powerpc64-bgq-linux/bin
+
+setenv RootInc /bgsys/drivers/ppcfloor/gnu-linux/powerpc64-bgq-linux/sys-include
+
+run std/use-compiler /usr/local/bin/mpicc
+
+run analyze/locate-mpi mpich bgq gnu
+
+include 64-bit
+include compilers/gnu-bgp
+include no-x11
+include no-sql
+include no-jpeg
+include no-png
+include no-libz
+include local/lc/bgq
+
+setenv STATIC_LINKING  TRUE
+setenv CROSS_COMPILE   BGQ
+setenv DO_RUN_MPI      "srun.bgq"
+setenv DO_RUN_DBG      "tv.bgq"
+setenv DO_RUN_CROSS    "srun.bgq"
+
+setenv IBM_BGQ
+define IBM_BGQ
+
+setenv OMIT_INTERP
+
+setenv TEST_ADVISORY ${TEST_ADVISORY}:pgs_rendlr:pgs_rendac
+
