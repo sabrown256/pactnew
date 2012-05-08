@@ -14,6 +14,8 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: openmp"
 
+SafeEnv PTHREAD_OMP    FALSE
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
@@ -34,7 +36,7 @@ set opt = ( $opt $Cfe_LD_Flags $Cfe_LD_RPath )
 set opt = ( $opt $Cfe_LD_Lib )
 flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
-   if ($?PTHREAD_OMP == 0) then
+   if ($PTHREAD_OMP == FALSE) then
       NoteD $ALog "      no OpenMP (by request)"
    else
       setenv HAVE_OPENMP TRUE

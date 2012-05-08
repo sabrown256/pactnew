@@ -1,7 +1,6 @@
 #!/bin/csh -f
 #
-# CPP2 - basic test of pcpp with error
-#      - should have no output on error
+# CPP3 - test output to stdout
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -9,7 +8,7 @@
 # include "cpyright.h"
 #
 
-set xstatus = 0
+@ xstatus = 0
 
 # run the test
 if ($1 == run) then
@@ -18,19 +17,16 @@ if ($1 == run) then
 #define a b
 int a;
 
-#if 1
-#error "bad, bad"
-#endif
-
 EOF
 
-   pcpp -o - $tmp.h
-   if ($status == 0) then
-      set xstatus = 1
-   else
-      set xstatus = 0
-   endif
+   pcpp -o - $tmp.h >&! $tmp.1
+   @ xstatus = $xstatus + $status
 
+   pcpp -o $tmp.2 $tmp.h
+   @ xstatus = $xstatus + $status
+
+   diff -b -B -w $tmp.1 $tmp.2 >& /dev/null
+   @ xstatus = $xstatus + $status
 
 # print the fiducial answers
 else

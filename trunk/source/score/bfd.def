@@ -4,10 +4,11 @@
 # #include "cpyright.h"
 #
 
-package bfd
-header  bfd.h
-so      libbfd.so
-arc     libbfd.a
+package    bfd
+condition  HAVE_BFD
+header     bfd.h
+so         libbfd.so
+arc        libbfd.a
 
 functions {
    bfd_check_format

@@ -10,6 +10,13 @@
 
 unalias *
 
+# give a chance to do something at the beginning
+if ($?PACT_DSYS_PRE == 1) then
+   if (-f $PACT_DSYS_PRE) then
+      source $PACT_DSYS_PRE
+   endif
+endif
+
 # a little mess curtesy of cygwin
 if ($?SHELL == 0) then
    if (-x /bin/csh) then

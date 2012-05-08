@@ -34,6 +34,7 @@ typedef struct s_rundes rundes;
 struct s_rundes
    {int conditional;     /* (un)conditionally call MPI_Init iff (FALSE)TRUE */
     int debug;
+    int direct;
     int dryrun;
     int usempi;
     int ncpu;
@@ -330,6 +331,7 @@ static int init(rundes *st, char *os, char *host)
 	   csetenv("Wrap", "");};
 
     st->debug       = FALSE;
+    st->direct      = FALSE;
     st->dryrun      = FALSE;
     st->usempi      = TRUE;
     st->errio       = TRUE;
@@ -422,6 +424,9 @@ static int check(rundes *st)
        {if (st->verbose > 0)
 	   printf("File '%s' not found - serial execution only\n", st->sgn);
 	st->sgn[0] = '\0';};
+
+    if (st->direct == TRUE)
+	st->sgn[0] = '\0';
 
     return(rv);}
 
@@ -783,15 +788,17 @@ static int set_target(rundes *st)
 
 	free_strings(sa);};
 
+    if (st->direct == FALSE)
+
 /* check the environment default target specs */
-    init_mpi_target(st);
-    init_dbg_target(st);
-    init_cross_target(st);
+       {init_mpi_target(st);
+	init_dbg_target(st);
+	init_cross_target(st);
 
 /* set the corresponding environment variables */
-    init_dbg(st);
-    init_cross(st);
-    init_mpi(st);
+	init_dbg(st);
+	init_cross(st);
+	init_mpi(st);};
 
     return(rv);}
 
@@ -870,15 +877,17 @@ static void parse_db(rundes *st)
 
 	free_strings(sa);};
 
+    if (st->direct == FALSE)
+
 /* use full path to MPI front end */
-    exe = cwhich(cgetenv(TRUE, "MPI_Exe"));
-    if (file_executable(exe) == TRUE)
-       csetenv("MPI_Exe", exe);
+       {exe = cwhich(cgetenv(TRUE, "MPI_Exe"));
+        if (file_executable(exe) == TRUE)
+	   csetenv("MPI_Exe", exe);
 
 /* use full path to debugger */
-    exe = cwhich(cgetenv(TRUE, "DBG_Exe"));
-    if (file_executable(exe) == TRUE)
-       csetenv("DBG_Exe", exe);
+	exe = cwhich(cgetenv(TRUE, "DBG_Exe"));
+	if (file_executable(exe) == TRUE)
+	   csetenv("DBG_Exe", exe);};
 
     return;}
 
@@ -980,37 +989,38 @@ static char *cleanup_env(rundes *st)
    {char *cmd;
 
     cmd = subst(cgetenv(TRUE, "Cmd"), "\"\"", "", -1);
-    cmd = shell_clean(cmd);
+    if (st->direct == FALSE)
+       {cmd = shell_clean(cmd);
 
-    snprintf(st->mpife, MAXLINE, "%s", cgetenv(TRUE, "MPI"));
+	snprintf(st->mpife, MAXLINE, "%s", cgetenv(TRUE, "MPI"));
 
-    st->errio = (cmpenv("STDERR", "TRUE") == 0);
+	st->errio = (cmpenv("STDERR", "TRUE") == 0);
 
-    cunsetenv("Batch");
-    cunsetenv("CArgs");
-    cunsetenv("Cmd");
-    cunsetenv("Code");
-    cunsetenv("DBG");
-    cunsetenv("DBG_Delim");
-    cunsetenv("DBG_Exe");
-    cunsetenv("DBG_Flags");
-    cunsetenv("Force");
-    cunsetenv("Host");
-    cunsetenv("MPI");
-    cunsetenv("MPICnd");
-    cunsetenv("MPIFE");
-    cunsetenv("MPILib");
-    cunsetenv("MPINot");
-    cunsetenv("MPI_Exe");
-    cunsetenv("MPI_Flags");
-    cunsetenv("CROSS_Exe");
-    cunsetenv("CROSS_Flags");
-    cunsetenv("NCPU");
-    cunsetenv("NNode");
-    cunsetenv("NProc");
-    cunsetenv("NThread");
-    cunsetenv("Pool");
-    cunsetenv("STDERR");
+	cunsetenv("Batch");
+	cunsetenv("CArgs");
+	cunsetenv("Cmd");
+	cunsetenv("Code");
+	cunsetenv("DBG");
+	cunsetenv("DBG_Delim");
+	cunsetenv("DBG_Exe");
+	cunsetenv("DBG_Flags");
+	cunsetenv("Force");
+	cunsetenv("Host");
+	cunsetenv("MPI");
+	cunsetenv("MPICnd");
+	cunsetenv("MPIFE");
+	cunsetenv("MPILib");
+	cunsetenv("MPINot");
+	cunsetenv("MPI_Exe");
+	cunsetenv("MPI_Flags");
+	cunsetenv("CROSS_Exe");
+	cunsetenv("CROSS_Flags");
+	cunsetenv("NCPU");
+	cunsetenv("NNode");
+	cunsetenv("NProc");
+	cunsetenv("NThread");
+	cunsetenv("Pool");
+	cunsetenv("STDERR");};
 
     return(cmd);}
 
@@ -1154,7 +1164,7 @@ static void help(void)
     printf("\n");
     printf("Usage: do-run [-b] [-bf <file>] [-c] [-cross <cross-fe>] [-d] [-dbg <dbg>] [-dr]\n");
     printf("              [-e] [-f] [-h] [-level #] [-m] [-mpi <mpi-fe>] [-m] [-n #] [-o <file>]\n");
-    printf("              [-p #] [-prt <name>] [-q] [-s <file>] [-t #] [-v] [-vg] [-vgd] [-x]\n");
+    printf("              [-p #] [-prt <name>] [-q] [-r] [-s <file>] [-t #] [-v] [-vg] [-vgd] [-x]\n");
     printf("              [-z] args\n");
     printf("\n");
     printf("       b     - run in batch\n");
@@ -1174,6 +1184,7 @@ static void help(void)
     printf("       o     - output file for DP runs\n");
     printf("       p     - number of processes to use (MPI)\n");
     printf("       prt   - partition to be used (MPI)\n");
+    printf("       r     - run direct - do not check for MPI, debugger, ...\n");
     printf("       q     - suppress do-batch messages in logs\n");
     printf("       s     - use signature file\n");
     printf("       t     - number of threads to use (SMP)\n");
@@ -1272,6 +1283,9 @@ static int process_args(rundes *st, int c, char **v)
 
 	 else if (strcmp(v[i], "-q") == 0)
 	    push_tok(st->dargs, MAXLINE, ' ', v[++i]);
+
+	 else if (strcmp(v[i], "-r") == 0)
+	    st->direct = TRUE;
 
 	 else if (strcmp(v[i], "-s") == 0)
 	    nstrncpy(st->sgn, MAXLINE, v[++i], -1);

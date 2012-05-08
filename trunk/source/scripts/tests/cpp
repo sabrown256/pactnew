@@ -33,7 +33,7 @@ end
 
 NoteD $Log "                    $msg"
 
-set List = (cpp1 cpp2)
+set List = (cpp1 cpp2 cpp3)
 
 flog $Log cp $SrcDir/tests/{cpp*} .
 
