@@ -4,10 +4,11 @@
 # include "cpyright.h"
 #
 
-package hdf5
-header  hdf5.h
-so      libhdf5.so
-arc     libhdf5.a
+package   hdf5
+condition HAVE_HDF5
+header    hdf5.h
+so        libhdf5.so
+arc       libhdf5.a
 
 functions {
     H5open

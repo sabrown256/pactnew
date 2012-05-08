@@ -19,7 +19,7 @@ else
    source $lbase/etc/env-csh
 endif
 
-SafeEnv PERDB_PATH $lbase/etc/cfg
+set lperdb_path = $lbase/etc/cfg
 
 unset lbase
 
@@ -78,13 +78,22 @@ set td = $fi:h
 if ("$tf" == "$td") then
    set td = .
 endif
+set tfi = $tf:r.i
 
 set stdout = FALSE
 if ("$fo" == "") then
-   set fo = $cwd/$tf:r.i
+   set fo = $cwd/$tfi
 else if ("$fo" == "-") then
    set stdout = TRUE
-   set fo = $cwd/$tf:r.i
+
+# try to put the temporary file in a parallel-safe place
+   if ($?TMP == 1) then
+      set fo = $TMP/$tfi
+   else if ($?TMPDIR == 1) then
+      set fo = $TMPDIR/$tfi
+   else
+      set fo = $cwd/$tfi
+   endif
 endif
 
 # work out the C preprocessor invocation
@@ -92,10 +101,12 @@ set noglob
 
 # NOTE: parallel builds have too hard a time with multiple PERDB
 # instances so just go straight to the database
-set db       = ${PERDB_PATH}.db
+set db       = ${lperdb_path}.db
 set CPPF     = ( `grep -w CCP      $db | grep CCP=      | sed 's|^CCP=||' | sed 's| \$.*$||' | sed 's|${CC}||'` )
 set CC_Exe   = ( `grep -w CC_Exe   $db | grep CC_Exe=   | sed 's|^CC_Exe=||'` )
 set CC_Flags = ( `grep -w CC_Flags $db | grep CC_Flags= | sed 's|^CC_Flags=||'` )
+unset lperdb_path
+unset db
 
 set CPP  = ( `echo $CC_Exe $CC_Flags -I$td $CPPF | sed 's|\"||g'` )
 
@@ -153,9 +164,14 @@ else
 endif
 
 if (-f $th) then
-   setenv PERDB_PATH /tmp/$$
+   if ($?PERDB_PATH == 0) then
+      setenv PERDB_PATH /tmp/$$
+      set clean = TRUE
+   else
+      set clean = FALSE
+   endif
 
-   ( $CPP $th ; perdb cppstat=$status >& /dev/null ) |& \
+   ( $CPP $th ; perdb cpp1=$status >& /dev/null )    |& \
    elide '/*' '*/' -                                 |  \
    tr "\t" " "                                       |  \
    awk '$NF ~ /\\/ { printf("%s ", $0); }               \
@@ -182,27 +198,33 @@ if (-f $th) then
    sed 's/^ *//'                                     |  \
    cat >&! $fo
 
-   set cppstat = `perdb cppstat`
-   if ($cppstat != 0) then
-      @ nerr = $nerr + 2
-      rm -rf $fo
+   set cpp1 = `perdb cpp1`
+   if ($clean == TRUE) then
+      perdb quit: >& /dev/null
+      rm -f ${PERDB_PATH}.* >& /dev/null
+      unsetenv PERDB_PATH
    endif
-   unset cppstat
+   unset clean
 
-   perdb quit: >& /dev/null
-   rm -f ${PERDB_PATH}.* >& /dev/null
-   unsetenv PERDB_PATH
+   if ($cpp1 != 0) then
+      @ nerr = $nerr + 2
+   else if (!(-f $fo) || (-z $fo)) then
+      @ nerr = $nerr + 4
+   else
+      if (($stdout == TRUE) && (-f $fo)) then
+         cat $fo
+      endif
+   endif
+   unset cpp1
+
+   rm -f $th*
+   if (($stdout == TRUE) || ($nerr != 0)) then
+      rm -f $fo >& /dev/null
+   endif
 
 else
-   @ nerr = $nerr + 2
+   @ nerr = $nerr + 8
 endif
-
-if (($stdout == TRUE) && (-f $fo)) then
-   cat $fo
-   rm -f $fo
-endif
-
-rm -f $th*
 
 exit($nerr)
 

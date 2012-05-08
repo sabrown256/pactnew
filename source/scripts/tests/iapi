@@ -58,7 +58,8 @@ while ($#defl > 0)
    NoteD $Log -n "                        $lmsg "
    Note $Log ""
 
-   set a = $j:r.api
+   set base = $j:r
+   set a = $base.api
    flog $Log cp $def $j
    flog $Log import-api $opt -f $j -o $a
    set xstatus = $status
@@ -68,18 +69,16 @@ while ($#defl > 0)
    if ($xstatus == 0) then
       NoteD $Log "ok"
       flog $Log ls -l $a
-      set rpf = ( $rpf $j $a )
+      set rpf = ( $rpf $j $a log.$base )
    else if ($xstatus == 1) then
       NoteD $Log "omitted"
-      set rpf = ( $rpf $j $a )
+      set rpf = ( $rpf $j $a log.$base )
    else
       NoteD $Log "ng ($xstatus)"
       flog $Log @ nerr = $nerr + 1
    endif
 
 end
-
-set rpf = ( $rpf *.api )
 
 $TEST_CHECK part -a iapi -e $nerr -rpf "$rpf" "$msg"
 

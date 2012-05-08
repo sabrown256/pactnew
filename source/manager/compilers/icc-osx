@@ -1,5 +1,5 @@
 #
-# ICC - define Intel compiler
+# IC-OSX - define Intel compiler for MAC OS X
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -47,8 +47,7 @@ Tool CXX {
 }
 
 Tool LD {
-   RPath  = -Wl,-rpath,@
-   Flags += -Wl,-export-dynamic
+   Flags += -undefined dynamic_lookup
    Lib    = -lc
 }
 
@@ -65,7 +64,11 @@ Group Cfg {
 Group Shared {
    LD_Exe   = icc
    CC_Flags = -fpic
-   LD_Flags = -shared
+   LD_Flags = -shared -undefined dynamic_lookup
+}
+
+Group MDG {
+   Lib = /System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
 }
 
 Group PThread {
@@ -83,3 +86,16 @@ include serial
 
 define NON_INTEGER_ENUM
 
+setenv PATH /sw/bin:/usr/local/bin:$PATH
+
+Group PNG {
+   Path = /sw
+}
+
+Group JPEG {
+   Path = /sw
+}
+
+Group HDF {
+   Path = /sw
+}

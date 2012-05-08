@@ -89,9 +89,6 @@ Group MPI {
    FC_Exe = mpxlf90
 }
 
-.c.i:
-	${CC} -P $<
-
 .f.o:
 	${FC} ${FFLAGS} ${LDFLAGS} -c $<
 

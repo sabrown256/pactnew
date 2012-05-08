@@ -4,10 +4,11 @@
 # include "cpyright.h"
 #
 
-package sqlite3
-header  sqlite3.h
-so      libsqlite3.so
-arc     libsqlite3.a
+package   sqlite3
+condition HAVE_SQLITE
+header    sqlite3.h
+so        libsqlite3.so
+arc       libsqlite3.a
 
 functions {
    sqlite3_open

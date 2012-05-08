@@ -13,6 +13,7 @@ set pact   = `which perdb`
 set bindir = $pact:h
 set lbase  = $bindir:h
 set devinc = $lbase/include
+set devetc = $lbase/etc
 
 if (-d ../scripts) then
    source ../scripts/env-csh
@@ -92,6 +93,27 @@ set pck = ( `grep -w package $def` )
 set pck = $pck[2]
 set PCK = `echo $pck | tr "[a-z]" "[A-Z]"`
 
+if ("$api" == "") then
+   set api = $pck.api
+endif
+
+set apid = $api:h
+if ($apid == $api) then
+   set apid = $cwd
+endif
+
+InitLog log $apid/log.$pck
+
+# make sure that there is no API file that is empty
+# an empty file may let you compile, but you will fail
+# the tests or the link
+# so die sooner rather than later
+flog $log rm -f $api
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# find the shared library for a dynamic link
 set so = ( `grep -w so $def` )
 set so = $so[2]
 set ok = FALSE
@@ -99,15 +121,16 @@ foreach d ($libdir)
    if (-f $d/$so) then
       set so = $d/$so
       set ok = TRUE
-      echo "   Using shared library '$so'"
+      NoteD $log "   Using shared library '$so'"
       break
    endif
 end
 if ($ok == FALSE) then
-#   echo "   Warning: '$so' not found in '$libdir'"
-   @ nwarn = $nwarn + 1
+#   NoteD $log "   Warning: '$so' not found in '$libdir'"
+   flog $log @ nwarn = $nwarn + 1
 endif
 
+# find the archive for a static link
 set ok  = FALSE
 set arc = ( `grep -w arc $def` )
 if ("$#arc" > 1) then
@@ -116,22 +139,17 @@ if ("$#arc" > 1) then
       if (-f $d/$arc) then
          set arc = $d/$arc
          set ok  = TRUE
-         echo "   Using archive '$arc'"
+         NoteD $log "   Using archive '$arc'"
          break
       endif
    end
    if ($ok == FALSE) then
-#      echo "   Warning: '$arc' not found in '$libdir'"
-      @ nwarn = $nwarn + 2
+#      NoteD $log "   Warning: '$arc' not found in '$libdir'"
+      flog $log @ nwarn = $nwarn + 2
    endif
 endif
 
-# start a blank file now
-# if it exits after this there will at least be a file
-# that make can check for dependencies
-rm -f $api >& /dev/null
-touch $api
-
+# find the header
 set ok  = FALSE
 set hdr = ( `grep -w header $def` )
 set hdr = $hdr[2]
@@ -143,15 +161,35 @@ foreach d ($incdir)
    endif
 end
 if ($ok == FALSE) then
-   echo "   Error: '$hdr' not found in '$incdir'"
+   NoteD $log "   Error: '$hdr' not found in '$incdir'"
    exit($fatal)
 endif
 
-set ppf = $devinc/$hdr:t.api
-if ("$api" == "") then
-   set api = $pck.api
+# find the condition for needing this API
+set cnd = ( `grep -w condition $def` )
+if ("$cnd" != "") then
+   set cnd = $cnd[2]
+
+   flog $log set db = $devetc/cfg.db
+   set defc = ( `grep -w $cnd $db | sed 's|=| |'` )
+   Note $log "Condition $cnd = |$defc|"
+
+# if the condition variable is not set
+   if ("$defc" == "") then
+      NoteD $log "$api is not needed"
+      exit($fatal)
+
+# if the condition variable is set to FALSE
+   else if ("$defc" !~ *TRUE) then
+      NoteD $log "$api is not needed"
+      exit($fatal)
+   endif
+   unset defc
+   unset db
 endif
-echo "   Generating '$api' from '$hdr'"
+unset cnd
+
+NoteD $log "   Generating '$api' from '$hdr'"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -164,24 +202,72 @@ echo "   Generating '$api' from '$hdr'"
 #   grep -v typedef                             get rid of typedefs
 #
 
+Separator $log
+
+flog $log set ppf = $devinc/$hdr:t.api
+
+Note $log "Making $ppf from $hdr"
+
 if (-f $hdr) then
-   pcpp -o - $hdr                                  |& \
-   elide '{' '}' -                                 |  \
-   sed 's/extern//g'                               |  \
-   grep -v typedef                                 |  \
+   if ($?PERDB_PATH == 0) then
+      flog $log setenv PERDB_PATH /tmp/$$
+      flog $log set clean = TRUE
+   else
+      flog $log set clean = FALSE
+   endif
+
+   Note $log "PCPP ... "
+
+   ( pcpp -o - $hdr ; perdb cpp2=$status >& /dev/null )    |& \
+   elide '{' '}' -                                         |  \
+   sed 's/extern//g'                                       |  \
+   grep -v typedef                                         |  \
    cat >&! $ppf
+
+   set cpp2 = `perdb cpp2`
+   set cpp1 = `perdb cpp1`
+   if ($clean == TRUE) then
+      flog $log perdb quit:
+      flog $log rm -f ${PERDB_PATH}.*
+      flog $log unsetenv PERDB_PATH
+   endif
+   unset clean
+
+   if (($cpp2 != 0) || ($cpp1 != 0)) then
+      Note $log "PCPP ... ng ($cpp2/$cpp1)"
+      flog $log @ nerr = $nerr + 2
+      flog $log rm -rf $ppf
+      exit($nerr)
+   else if (-z $ppf) then
+      Note $log "PCPP ... ng (zero length file)"
+      flog $log @ nerr = $nerr + 2
+      flog $log rm -rf $ppf
+      exit($nerr)
+   else
+      Note $log "PCPP ... ok"
+      flog $log ls -l $ppf
+      flog $log cat $ppf
+   endif
+   unset cpp2
+   unset cpp1
+
 else
-   @ nerr = $nerr + 2
+   flog $log @ nerr = $nerr + 2
 endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+# FIND-FUNCTIONS - look for specified functions to bind
+
+Separator $log
+
+Note $log "Finding functions in '$ppf' specified in '$def'"
+
 set fncl    = ""
 set varl    = ""
 set missing = ""
 
-# look for specified functions to bind
 set fok = FALSE
 set vok = FALSE
 @ nl = `cat $def | wc -l`
@@ -207,16 +293,20 @@ while ($il < $nl)
    if ($fok == TRUE) then
       grep -w $line $ppf >& /dev/null
       if ($status == 0) then
+         Note $log "   Function '$line' found"
          set fncl = ( $fncl $line )
       else
+         Note $log "   Function '$line' missing"
          set missing = ( $missing $line )
       endif
 
    else if ($vok == TRUE) then
       grep -w $line $ppf >& /dev/null
       if ($status == 0) then
+         Note $log "   Variable '$line' found"
          set varl = ( $varl $line )
       else
+         Note $log "   Variable '$line' missing"
          set missing = ( $missing $line )
       endif
    endif
@@ -236,6 +326,7 @@ if ("$fncl" == "") then
          set s = ( `echo "$line" | sed 's|(.*$||' | sed 's|\*||g'`)
          if (($#s > 1) && ("$s" !~ *attribute*)) then
             set t = $s[$#s]
+            Note $log "   Function '$line' add"
             set fncl = ( $fncl $t )
          endif
       endif
@@ -244,41 +335,49 @@ if ("$fncl" == "") then
 endif
 
 if ("$varl" == "") then
-   @ nv = 0
+   flog $log @ nv = 0
 else
-   @ nv = $#varl
+   flog $log @ nv = $#varl
 endif
 
 # it is an error to specify no functions
 # however we must generate a dummy API
-@ nf = $#fncl
+flog $log @ nf = $#fncl
 if ("$fncl" == "") then
-   echo "   Warning: no functions found in $ppf"
-   cat $ppf
+   NoteD $log "   Warning: no functions found in $ppf"
+   flog $log cat $ppf
    @ nf = 0
    @ nm = 0
 
 else if ("$missing" != "") then
    @ nm = $#missing
    if ($nm == $nf) then
-      echo "   Warning: all $nm functions missing in $ppf"
-      cat $ppf
+      NoteD $log "   Warning: all $nm functions missing in $ppf"
+      flog $log cat $ppf
    else
       set t = $hdr:t
       @ n  = $nf + $nm
-      echo "   Warning: missing $nm out of $n requested functions or variables for ${t}"
+      NoteD $log "   Warning: missing $nm out of $n requested functions or variables for ${t}"
       foreach f ($missing)
-         echo "      $f"
+         NoteD $log "      $f"
       end
       unset n
       unset t
-      @ nwarn = $nwarn + 4
+      flog $log @ nwarn = $nwarn + 4
    endif
 endif
 unset missing
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+# MAKE-API - build the API file
+
+Separator $log
+
+Note $log "Making API file '$api'"
+
+flog $log touch $api
 
 Note $api '/*'
 Note $api " * $PCK.API - define $PCK API for PACT"
@@ -399,23 +498,31 @@ endif
 Note $api '#endif'
 Note $api ''
 
-cat $api | sed 's|\\t|\t|g' >&! $api.new
-mv $api.new $api
+flog $log ( cat $api | sed 's|\\t|\t|g' >&! $api.new )
+flog $log mv $api.new $api
+flog $log ls -l $api
+flog $log cat $api
 
 if (!(-f $api)) then
-   @ nerr = $nerr + 8
+   flog $log @ nerr = $nerr + 8
 endif
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FINISH - wrap it up
+
+Separator $log
+
+Note $log "Finishing up"
+
 if ($nwarn > 0) then
-   echo "   Completed with warning status $nwarn"
+   NoteD $log "   Completed with warning status $nwarn"
 endif
 
 if ($keep == FALSE) then
-   rm -rf $ppf >& /dev/null
+   flog $log rm -rf $ppf
 endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 exit($nerr)
 

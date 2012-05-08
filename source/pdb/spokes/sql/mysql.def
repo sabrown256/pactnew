@@ -4,10 +4,11 @@
 # include "cpyright.h"
 #
 
-package mysql
-header  mysql.h
-so      libmysqlclient.so
-arc     libmysqlclient.a
+package   mysql
+condition HAVE_MYSQL
+header    mysql.h
+so        libmysqlclient.so
+arc       libmysqlclient.a
 
 functions {
     mysql_init
