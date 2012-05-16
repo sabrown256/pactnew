@@ -10,6 +10,7 @@
 
 #include "cpyright.h"
 
+#include "score_int.h"
 #include "scope_make.h"
 
 /*--------------------------------------------------------------------------*/

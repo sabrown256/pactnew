@@ -8,6 +8,7 @@
 
 #include "cpyright.h"
 
+#include "score_int.h"
 #include "scope_proc.h"
 
 typedef struct s_tcp_loop tcp_loop;

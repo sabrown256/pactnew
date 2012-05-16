@@ -9,6 +9,7 @@
  */
 
 #include "cpyright.h"
+#include "score_int.h"
 #include "scope_mem.h"
 #include "scope_proc.h"
 #include <sys/mman.h>

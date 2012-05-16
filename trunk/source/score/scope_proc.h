@@ -11,7 +11,6 @@
 #define PCK_SCOPE_PROC
 
 #include "cpyright.h"
-#include "score_int.h"
 #include "scope_term.h"
 
 #define DEFAULT_WAIT       5000
