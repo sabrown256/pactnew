@@ -21,6 +21,9 @@ source $ScrDir/env-csh
 
 dbget Arch
 dbget BFD_Version
+dbget BUILD_DEBUG
+dbget BUILD_OPTIMIZE
+dbget BUILD_PROFILE
 dbget CC_Exe
 dbget CEFile
 dbget CPU
@@ -193,6 +196,9 @@ Separator $Log
     set lhave = ( $lhave HAVE_BFD            none )
     set lhave = ( $lhave HAVE_DEMANGLE       none )
     set lhave = ( $lhave USE_FULL_MM         none )
+    set lhave = ( $lhave BUILD_DEBUG         none )
+    set lhave = ( $lhave BUILD_OPTIMIZE      none )
+    set lhave = ( $lhave BUILD_PROFILE       none )
 
     while ($#lhave > 0)
        set lvr = $lhave[1]

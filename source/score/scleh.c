@@ -5,7 +5,7 @@
 
 #include "cpyright.h"
 
-#include "score.h"
+#include "score_int.h"
 #include "scope_term.h"
 
 #undef ESC

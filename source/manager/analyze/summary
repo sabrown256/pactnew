@@ -58,14 +58,17 @@ source $Me:h/common
 
     if ($AbsoluteDeb == TRUE) then
        NoteD $Log "   Building absolutely debuggable version"
+       dbset BUILD_DEBUG TRUE
     endif
 
     if ($AbsoluteOpt == TRUE) then
        NoteD $Log "   Building absolutely optimized version"
+       dbset BUILD_OPTIMIZE TRUE
     endif
 
     if ($Profile == TRUE) then
        NoteD $Log "   Building profiling version"
+       dbset BUILD_PROFILE TRUE
     endif
        
 # PyExe       the full path to the python executable

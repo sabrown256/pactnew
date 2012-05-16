@@ -1759,6 +1759,8 @@ int PD_set_fmt_version(int v)
 
 /* PD_GET_POINTER_SIZE - return the current initial size of the
  *                     - pointer table
+ *
+ * #bind PD_get_pointer_size fortran() scheme(pd-get-pointer-size) python()
  */
 
 long PD_get_pointer_size(void)
@@ -1771,7 +1773,10 @@ long PD_get_pointer_size(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_SET_POINTER_SIZE - set the initial size of the pointer table */
+/* PD_SET_POINTER_SIZE - set the initial size of the pointer table
+ *
+ * #bind PD_set_pointer_size fortran() scheme(pd-set-pointer-size!) python()
+ */
 
 long PD_set_pointer_size(long n)
    {long no;

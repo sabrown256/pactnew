@@ -1,0 +1,48 @@
+#!/bin/csh -f
+#
+# PROF-RES - process the profiling stats
+#
+
+unalias *
+
+@ err = 0
+set exe = ""
+set out = /dev/stdout
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: prof-res [-h] [-o <file>] <exe>"
+           echo ""
+           echo ""
+           exit(1)
+      case -o:
+           shift
+           set out = $1
+           breaksw
+      default:
+           set exe = $1
+           breaksw
+   endsw
+   shift
+end
+
+if ("$exe" == "") then
+   echo "No executable specified - exiting"
+   exit(1)
+endif
+
+set exe = `which $exe`
+if (!(-x "$exe")) then
+   echo "No executable '$exe' - exiting"
+   exit(1)
+endif
+
+if ($out != /dev/stdout) then
+   rm -f $out >& /dev/null
+endif
+gprof $exe gmon.out >& $out
+@ err = $err + $status
+
+exit($err)

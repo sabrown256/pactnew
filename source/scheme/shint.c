@@ -162,7 +162,7 @@ static void _SS_complex_arg(SS_psides *si, object *obj, void *v)
 	    switch (SS_PROCEDURE_TYPE(obj))
 	       {case SS_MACRO : 
 		case SS_PROC  :
-		     SS_error(si, "CAN'T MAKE VALUE - _SS_FLOAT_ARG", obj);
+		     SS_error(si, "CAN'T MAKE VALUE - _SS_COMPLEX_ARG", obj);
 		     break;
 
 		default :
@@ -177,10 +177,10 @@ static void _SS_complex_arg(SS_psides *si, object *obj, void *v)
 		     else if (hand == (PFVoid) SS_acc_double)
 		        z = *(double *) u.memaddr;
 		     else
-		        SS_error(si, "BAD VARIABLE TYPE - _SS_FLOAT_ARG", obj);};}
+		        SS_error(si, "BAD VARIABLE TYPE - _SS_COMPLEX_ARG", obj);};}
 
 	else
-	   SS_error(si, "BAD OBJECT - _SS_FLOAT_ARG", obj);
+	   SS_error(si, "BAD OBJECT - _SS_COMPLEX_ARG", obj);
 
 	zp  = (double _Complex *) v;
 	*zp = z;};
@@ -227,7 +227,7 @@ static void _SS_quaternion_arg(SS_psides *si, object *obj, void *v)
         switch (SS_PROCEDURE_TYPE(obj))
            {case SS_MACRO : 
             case SS_PROC  :
-                 SS_error(si, "CAN'T MAKE VALUE - _SS_FLOAT_ARG", obj);
+                 SS_error(si, "CAN'T MAKE VALUE - _SS_QUATERNION_ARG", obj);
                  break;
 
             default :
@@ -242,13 +242,13 @@ static void _SS_quaternion_arg(SS_psides *si, object *obj, void *v)
                  else if (hand == (PFVoid) SS_acc_double)
                     q.s = *(double *) u.memaddr;
                  else
-                    SS_error(si, "BAD VARIABLE TYPE - _SS_FLOAT_ARG", obj);};}
+                    SS_error(si, "BAD VARIABLE TYPE - _SS_QUATERNION_ARG", obj);};}
 
     else if (SS_nullobjp(obj))
        q.s = 0.0;
 
     else
-       SS_error(si, "BAD OBJECT - _SS_FLOAT_ARG", obj);
+       SS_error(si, "BAD OBJECT - _SS_QUATERNION_ARG", obj);
 
     qp  = (quaternion *) v;
     *qp = q;

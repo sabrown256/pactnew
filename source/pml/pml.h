@@ -742,6 +742,7 @@ extern int
 /* MLCHKSM.C declarations */
 
 extern long
+ PM_md5_hash(void *key, int size),
  PM_checksum_array(void *arr, int ni, int bpi, int nbts),
  PM_checksum_file(FILE* file, int64_t start, int64_t stop, int nbts);
 
@@ -962,6 +963,8 @@ extern double
 extern void
  PM_stats_mean(int n, double *x, double *pmn, double *pmdn,
 	       double *pmod, double *pstd),
+ PM_hasharr_stats(hasharr *ha, double *pmn, double *pmdn,
+		  double *pmod, double *pstd),
  PM_derivative(int n, double *fncx, double *fncy,
 	       double *derx, double *dery),
  PM_array_scale(double *p, int n, double f),

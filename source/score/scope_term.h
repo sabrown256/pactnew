@@ -13,7 +13,6 @@
 #define PCK_SCOPE_TERM
 
 #include "cpyright.h"
-#include "score_int.h"
 
 #include <sys/ioctl.h>
 

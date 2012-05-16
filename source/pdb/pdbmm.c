@@ -143,7 +143,10 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
 	file->name       = CSTRSAVE(name);
 	file->type       = NULL;
 
-	file->symtab            = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
+	file->symtab            = SC_make_hasharr(_PD.ninc, NODOC, SC_HA_NAME_KEY, 0);
+#if 0
+	file->symtab->hash      = PM_md5_hash;
+#endif
 	file->chart             = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 	file->host_chart        = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
 	file->attrtab           = NULL;

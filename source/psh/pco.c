@@ -1601,9 +1601,8 @@ static void default_rules(void)
 
 /* C rules */
     snprintf(st.rules.ccp,   LRG,
-             "\t@(%s ; \\\n          %s)\n",
-	     "echo \"${CCAnnounce} -P $<\"",
-	     "${CC} -P $<");
+             "\t%s\n",
+	     "${CC} -E $<");
 
     snprintf(st.rules.co, LRG,
              "\t@(%s ; \\\n          %s)\n",
