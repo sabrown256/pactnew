@@ -14,6 +14,7 @@ SC_thread_lock
  SC_ha_lock = SC_LOCK_INIT_STATE;
 
 #define HA_STRING_KEY(_h)    (_h == (PFKeyHash) _SC_hasharr_name)
+#define HA_ADDR_KEY(_h)      (_h == (PFKeyHash) _SC_hasharr_addr)
 
 /*--------------------------------------------------------------------------*/
 
@@ -92,11 +93,11 @@ static haelem *_SC_make_haelem(hasharr *ha, void *key)
     if (hp != NULL)
 
 /* setup the key */
-       {if (HA_STRING_KEY(ha->hash))
-	   {lkey = CSTRDUP(key, ha->memfl);
-	    SC_mark(lkey, 1);}
-        else
+       {if (HA_ADDR_KEY(ha->hash))
 	   lkey = key;
+        else
+	   {lkey = CSTRDUP(key, ha->memfl);
+	    SC_mark(lkey, 1);};
 
 	hp->iht  = ha->hash(lkey, ha->size);
 	hp->iar  = SC_array_get_n(ha->a);
@@ -112,14 +113,14 @@ static haelem *_SC_make_haelem(hasharr *ha, void *key)
 /* _SC_FREE_HAELEM - release an haelem */
 
 static void _SC_free_haelem(hasharr *ha, haelem *hp)
-   {int string;
+   {int addr;
 
 /* undo the MARK in SC_hasharr_install */
     if (hp->free == TRUE)
        CFREE(hp->def);
 
-    string = HA_STRING_KEY(ha->hash);
-    if (string == TRUE)
+    addr = HA_ADDR_KEY(ha->hash);
+    if (addr == FALSE)
 #if 1
        CFREE(hp->name);
 #else
@@ -762,7 +763,7 @@ char **SC_hasharr_dump(hasharr *ha, char *patt, char *type, int sort)
 	    sa[ns] = NULL;
 
 /* sort the names */
-	    if ((sort == TRUE) && (HA_STRING_KEY(ha->hash) == TRUE))
+	    if ((sort == TRUE) && (HA_ADDR_KEY(ha->hash) == FALSE))
 	       SC_string_sort(sa, ns);};
 
 	CFREE(tb);};

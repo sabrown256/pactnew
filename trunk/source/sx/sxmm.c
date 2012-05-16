@@ -151,18 +151,29 @@ object *_SX_mk_gdefstr(SS_psides *si, defstr *dp)
 /* _SX_WR_GFILE - print a g_file */
 
 static void _SX_wr_gfile(SS_psides *si, object *obj, object *strm)
-   {PDBfile *file;
-     g_file *po;
+   {char *tya, *tyw, *nm;
+    PDBfile *file;
+    g_file *po;
 
-    po = NULL;
+    po  = NULL;
+    tyw = "none";
+    tya = "none";
+    nm  = "none";
     SS_args(si, obj,
             G_FILE, &po,
 	    0);
 
-    file = FILE_FILE(PDBfile, po);
+    if (po != NULL)
+       {if (po->type != NULL)
+	   tyw = po->type;
+	if (po->name != NULL)
+	   nm  = po->name;};
 
-    PRINT(SS_OUTSTREAM(strm), "<%s|%s|%s>",
-	  FILE_TYPE(obj), file->tr->type, FILE_NAME(obj));
+    file = FILE_FILE(PDBfile, po);
+    if ((file != NULL) && (file->tr != NULL))
+	tya = file->tr->type;
+
+    PRINT(SS_OUTSTREAM(strm), "<%s|%s|%s>", tyw, tya, nm);
 
     return;}
 
@@ -320,16 +331,18 @@ g_file *_SX_mk_open_file(SS_psides *si, char *name, char *type, char *mode)
 void _SX_rel_open_file(SS_psides *si, g_file *po)
    {PDBfile *file;
 
-    file = po->file;
+    if (po != NULL)
+       {file = po->file;
 
 /* close the file */
-    if (!PD_close(file))
-       SS_error(si, "CAN'T PROPERLY CLOSE FILE - _SX_REL_OPEN_FILE", 
-		  po->file_object);
+	if (file != NULL)
+	   {if (!PD_close(file))
+	       SS_error(si, "CAN'T PROPERLY CLOSE FILE - _SX_REL_OPEN_FILE", 
+			po->file_object);};
 
-    po->file = NULL;
+	po->file = NULL;
 
-    _SX_rl_file(po);
+	_SX_rl_file(po);};
 
     return;}
     

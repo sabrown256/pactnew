@@ -2139,11 +2139,16 @@ static object *_SXI_file_varp(SS_psides *si, object *argl)
     else
        file = FILE_FILE(PDBfile, po);
 
-/* check for the flag */
-    flag = (fobj != SS_f);
+    if (file == NULL)
+       ret = FALSE;
 
-    ret = _SX_file_varp(file, name, flag);
-    CFREE(name);
+    else
+
+/* check for the flag */
+       {flag = (fobj != SS_f);
+
+	 ret = _SX_file_varp(file, name, flag);
+	 CFREE(name);};
 
     o = ret ? SS_t : SS_f;
 

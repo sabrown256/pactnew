@@ -330,27 +330,120 @@ double PM_curve_len_3d(double *x, double *y, double *z, int n)
 
 /*--------------------------------------------------------------------------*/
 
-/* PM_STATS_MEAN - compute mean, median, mode, and standard deviation */
+/* PM_STATS_MEAN - compute mean, median, mode, and standard deviation
+ *
+ * #bind PM_stats_mean fortran() scheme() python()
+ */
 
 void PM_stats_mean(int n, double *x, double *pmn, double *pmdn,
 		   double *pmod, double *pstd)
-   {int i;
-    double xc, xs, xsq;
+   {int i, j, nh;
+    double xc, xs, xsq, xmdn, xmn;
 
+/* compute median */
+    nh = n >> 1;
+
+/* sort */
+/*
+    for (i = n-1; i >= 0; i--)
+        {for (j = 0; j <= i; j++)
+	     {if (x[j] >= x[j+1])
+		 {xc     = x[j];
+		  x[j]   = x[j+1];
+		  x[j+1] = xc;};};};
+*/
+    if (n % 2 == 0)
+       xmdn = 0.5*(x[nh] + x[nh-1]);
+    else
+       xmdn = x[nh];
+
+/* compute the mean and standard deviation */
     xs  = 0.0;
     xsq = 0.0;
     for (i = 0; i < n; i++)
         {xc   = x[i];
-         xs  += xc;
-         xsq += xc*xc;};
+	 xs  += xc;
+	 xsq += xc*xc;};
         
+    xmn = xs/((double) n);
+
 /* the mean */
-    if (pmn != NULL)
-       *pmn = xs/((double) n);
+   if (pmn != NULL)
+      *pmn = xmn;
 
 /* the standard deviation */
     if (pstd != NULL)
        *pstd = sqrt((n*xsq - xs*xs)/(n*(n - 1.0)));
+
+/* the median */
+    if (pmdn != NULL)
+       *pmdn = xmdn;
+
+/* the mode */
+    if (pmod != NULL)
+       {int nt, nx;
+	int *ni;
+	double xcx;
+        double *xt;
+
+	xt = CMAKE_N(double, n);
+	ni = CMAKE_N(int, n);
+
+	for (i = 0; i < n; i++)
+	    {xt[i] = x[i];
+	     ni[i] = 0;};
+
+	nt = n;
+	for (i = 0; i < nt; i++)
+	    {for (j = i+1; j < nt; j++)
+	         {if (xt[i] == xt[j])
+		     {ni[i]++;
+		      nt--;
+		      xt[j] = xt[nt];
+		      j--;};};};
+		 
+	nx = -1;
+	for (i = 0; i < nt; i++)
+            {if (ni[i] > nx)
+	        {nx  = ni[i];
+		 xcx = xt[i];};};
+
+	CFREE(ni);
+	CFREE(xt);
+
+       *pmod = xcx;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PM_HASHARR_STATS - compute statistics on the hash efficiency of HA
+ *
+ * #bind PM_hasharr_stats fortran() scheme() python()
+ */
+
+void PM_hasharr_stats(hasharr *ha,
+		      double *pmn ARG(,out),
+		      double *pmdn ARG(,out),
+		      double *pmod ARG(,out),
+		      double *pstd ARG(,out))
+   {long i, sz, ni;
+    double *x;
+    haelem *hp, **tb;
+
+    sz = ha->size;
+    tb = ha->table;
+
+    x = CMAKE_N(double, sz);
+
+    for (i = 0; i < sz; i++)
+        {for (hp = tb[i], ni = 0; hp != NULL; hp = hp->next, ni++)
+	 x[i] = ni;};
+
+    PM_stats_mean(sz, x, pmn, pmdn, pmod, pstd);
+
+    CFREE(x);
 
     return;}
 

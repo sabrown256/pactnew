@@ -469,6 +469,28 @@ void PM_md5_checksum_file(FILE *file, int64_t start, int64_t stop,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* PM_MD5_HASH - compute hash value for string KEY in a array of SIZE */
+
+long PM_md5_hash(void *key, int size)
+   {long nc, v;
+    unsigned char d[33];
+    char *s;
+    extern void PM_md5_checksum_array(void *arr, uint64_t ni, uint64_t bpi,
+				      unsigned char *dig);
+
+    s  = (char *) key;
+    nc = strlen(s);
+
+    PM_md5_checksum_array(s, nc, 1, d);
+
+    v = *(long *) d;
+    v = ((long) abs(v)) % (long) size;
+
+    return(v);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PM_CHECKSUM - compute a checksum on an array PARR which is NI items long
  *             - and BPI bytes per item
  *             - BOFF is a bit offset for the first item

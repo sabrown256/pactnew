@@ -296,7 +296,7 @@ Note $Log "   PyDirSrc   = |$PyDirSrc|"
 # NOTE: temporarily link to certain etc files
 # this can go after about 12/2012
        Note $STDOUT 'pushd $DestDir >& /dev/null'
-       Note $STDOUT 'foreach file (env-pact.csh env-pact.sh env-pact.dk env-pact.mod env-mio env-csh csh-subroutines)'
+       Note $STDOUT 'foreach file (env-pact.csh env-pact.sh env-pact.dk env-pact.mod env-mio env-csh csh-subroutines cfg.db)'
        Note $STDOUT '   rm -f $file'
        Note $STDOUT '   ln -s ../etc/$file $file'
        Note $STDOUT 'end'

@@ -152,11 +152,41 @@ static int connect_close(int fd, client *cl, char *root)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* MAKE_SERVER_SEMA - create a descriptive semaphore for the server
+ *                  - on HOST at PORT at the ROOT collection/location
+ *                  - return TRUE iff successful
+ */
+
+static int make_server_sema(char *root, char *host, int port)
+   {int i, fd, rv;
+    char s[MAXLINE];
+
+    snprintf(s, MAXLINE, "%s.%s@%d", root, host, port);
+
+    rv = 0;
+    for (i = 0; i < 3; i++)
+        {fd = open(s, O_WRONLY | O_CREAT, 0600);
+	 if (fd >= 0)
+	    {rv = fsync(fd);
+	     if (rv != 0)
+	        continue;
+	     rv = close(fd);
+	     if (rv == 0)
+	        break;};};
+
+/* change the sense of the return value */
+    rv = (rv == 0);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* INIT_SERVER - make a connection with the server */
 
 static int init_server(char *root)
-   {int iprt, port, sasz, rv, fd;
-    char s[MAXLINE], host[MAXLINE];
+   {int iprt, port, sasz, rv;
+    char host[MAXLINE];
     char *hst;
 
     sasz = sizeof(struct sockaddr_in);
@@ -179,11 +209,7 @@ static int init_server(char *root)
     if (srv.port >= 0)
        {gethostname(host, MAXLINE);
 	hst = strtok(host, ".\n");
-        snprintf(s, MAXLINE, "%s.%s@%d", root, hst, srv.port);
-	fd = open(s, O_WRONLY | O_CREAT, 0600);
-        close(fd);
-
-	rv = TRUE;};
+	rv = make_server_sema(root, hst, srv.port);};
 
 /* initialize the set of active sockets */
     FD_ZERO(&srv.afs);
