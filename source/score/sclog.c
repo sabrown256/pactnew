@@ -8,6 +8,7 @@
 
 #include "cpyright.h"
 
+#include "score_int.h"
 #include "scope_proc.h"
 
 #define TMP_DIR          "/tmp"

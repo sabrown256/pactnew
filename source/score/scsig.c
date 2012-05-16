@@ -8,6 +8,7 @@
 
 #include "cpyright.h"
 
+#include "score_int.h"
 #include "scope_proc.h"
 
 /* NOTE: Linux defines NSIG as the highest signal number (32)

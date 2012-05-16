@@ -9,6 +9,7 @@
 
 #include "cpyright.h"
 
+#include "score_int.h"
 #include "scope_proc.h"
 
 #define N_PROC_MNG  32

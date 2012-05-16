@@ -12,6 +12,7 @@
 
 #include "cpyright.h"
 
+#include "score_int.h"
 #include "scope_proc.h"
 #include "scope_mpi.h"
 

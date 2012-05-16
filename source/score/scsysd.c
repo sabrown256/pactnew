@@ -6,7 +6,7 @@
  *
  */
 
-#include "score.h"
+#include "score_int.h"
 #include "scope_proc.h"
 
 /* ERROR Exit Statuses
