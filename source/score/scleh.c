@@ -218,7 +218,7 @@ static int _SC_leh_get_ncol(void)
  */
 
 static int _SC_leh_put_prompt(lehloc *lp)
-   {int fd, rv;
+   {int fd, rv, nb;
     size_t np;
     char *prompt;
     static char *linsp = "\f\r\n";
@@ -240,7 +240,9 @@ static int _SC_leh_put_prompt(lehloc *lp)
        {np = strspn(lp->prompt, linsp);
 	lp->prompt = (char *) (lp->prompt + np);
 	lp->np     = strlen(lp->prompt);
-        write(fd, "\n", 1);}
+
+        nb = write(fd, "\n", 1);
+        rv = (nb == 1);}
 
     else
        lp->np = strlen(lp->prompt);
