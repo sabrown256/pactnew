@@ -53,7 +53,7 @@ Tool LD {
 }
 
 Tool Lex {
-   Flags = -wd266
+   Flags = -wd177,266
 }
 
 Group Cfg {

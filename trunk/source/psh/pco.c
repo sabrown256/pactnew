@@ -1303,6 +1303,7 @@ static void setup_analyze_env(client *cl, char *base)
 
     dbinitv(cl, "DP_Inc",          "");
     dbinitv(cl, "DP_Lib",          "");
+    dbinitv(cl, "DP_Path",         "");
     dbinitv(cl, "MDG_Inc",         "");
     dbinitv(cl, "MDG_Lib",         "");
     dbinitv(cl, "MD_Inc",          "");
@@ -1355,6 +1356,8 @@ static void setup_output_env(client *cl, char *base)
     dbset(cl, "DP_Lib",  unique(dbget(cl, FALSE, "DP_Lib"),  FALSE, ' '));
     dbset(cl, "MD_Lib",  unique(dbget(cl, FALSE, "MD_Lib"),  FALSE, ' '));
     dbset(cl, "LD_Lib",  unique(dbget(cl, FALSE, "LD_Lib"),  FALSE, ' '));
+
+    dbset(cl, "DP_Path", unique(dbget(cl, FALSE, "DP_Path"), FALSE, ' '));
 
 /* NOTE: for OSX this would reduce -framework FOO -framework BAR
  * to -framework FOO BAR which is not legal

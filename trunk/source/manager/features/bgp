@@ -1,0 +1,17 @@
+#
+# BGP - config elements for BG/P
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+setenv CROSS_COMPILE  BGP
+setenv DO_RUN_MPI     "salloc.bgp"
+setenv DO_RUN_DBG     "tv.bgp"
+setenv DO_RUN_CROSS   "submit.bgp"
+setenv IBM_BGP
+define IBM_BGP
+
+setenv OMIT_INTERP
