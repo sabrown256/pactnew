@@ -1907,14 +1907,28 @@ CFG_DONE:
            popd >& /dev/null
         endif
 
-        set InstF = ( pact-dist pact-update code-date )
+        set InstF = ""
+        set InstF = ( $InstF pact-dist pact-update code-date )
         set InstF = ( $InstF for-pact install-ext )
+        set InstF = ( $InstF ../scripts/{import-api,pcpp,sinstall} )
 
-        cp gdbinit $BinDir/.gdbinit
-        cp dbxinit $BinDir/.dbxinit
-        cp cpyright.h $IncDir
-        cp $InstF $BinDir
-        set RStatus = $status
+        set liu = ../scripts/sinstall
+
+	@ lerr = 0
+
+        $liu gdbinit $BinDir/.gdbinit
+        @ lerr = $lerr + $status
+        $liu dbxinit $BinDir/.dbxinit
+        @ lerr = $lerr + $status
+        $liu cpyright.h $IncDir
+        @ lerr = $lerr + $status
+        $liu $InstF $BinDir
+        @ lerr = $lerr + $status
+
+        set RStatus = $lerr
+
+        unset liu
+        unset lerr
 
         echo ""
         breaksw
@@ -2227,7 +2241,7 @@ CFG_DONE:
         set BinFiles = ( $BinFiles do-run elide blang perdb )
         set BinFiles = ( $BinFiles make-syntax )
         set BinFiles = ( $BinFiles import-api pcpp )
-        set BinFiles = ( $BinFiles install-pact install-ext )
+        set BinFiles = ( $BinFiles sinstall install-pact install-ext )
 
 # save the files in IncDir
         set IncFiles = ( iso-c.h scconfig.h scdecls.h cpyright.h syntax.h )

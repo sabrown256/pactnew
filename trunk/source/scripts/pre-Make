@@ -27,7 +27,7 @@ TGTScr = do-local do-stats do-automake distribute \
 
 TGTEtc = env-csh csh-subroutines
 
-IncAction = cp cross-info ${BinDir}
+IncAction = sinstall cross-info ${BinDir}
 
 targets :
 	@echo "Targets for SCRIPTS"
@@ -49,7 +49,7 @@ bindf =
 
 generate : ${bindf} ${hdrf}
 
-IncAction = cp ${TGTEtc} ${EtcDir}
+IncAction = sinstall ${TGTEtc} ${EtcDir}
 
 
 link :

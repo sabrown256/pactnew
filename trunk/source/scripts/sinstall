@@ -17,18 +17,22 @@ else
    @ na = 3
 endif
 
+@ nerr = 0
+
 set prm = ""
 set src = ""
 set dst = ""
 set cmd = ""
+set specs = ""
 
 while ($#argv)
    switch ($1)
       case -h:
            echo ""
-           echo "Usage: sinstall [-h] [-na #] [-p <prm>] <src> <dst> [<cmd>]"
+           echo "Usage: sinstall [-h] [-na #] [-p <prm>] <src>* <dst>"
+#           echo "Usage: sinstall [-h] [-na #] [-p <prm>] <src> <dst> [<cmd>]"
            echo ""
-           echo "Install source to destination and be sure that everything"
+           echo "Install source files to destination and be sure that everything"
            echo "is correct.  Try up to NA times to be absolutely sure."
            echo ""
            echo "   h      this help message"
@@ -36,7 +40,7 @@ while ($#argv)
            echo "   p      set permissions of <dst> (e.g. a+rX)"
            echo "   <src>  file to be copied"
            echo "   <dst>  destination of file"
-           echo "   <cmd>  command to run on destination file"
+#           echo "   <cmd>  command to run on destination file"
            echo ""
            exit(1)
       case -na:
@@ -48,106 +52,139 @@ while ($#argv)
            set prm = $1
 	   breaksw
       default:
-           if ("$src" == "") then
-              set src = $1
-           else if ("$dst" == "") then
-              set dst = $1
-           else
-              set cmd = ( $cmd $1 )
-           endif
+           set specs = ( $specs $1 )
+#           if ("$src" == "") then
+#              set src = $1
+#           else if ("$dst" == "") then
+#              set dst = $1
+#           else
+#              set cmd = ( $cmd $1 )
+#           endif
            breaksw
    endsw
    shift
 end
 
-if (!(-f $src)) then
-   echo "No such file $src"
+if ("$specs" == "") then
+   echo "No file specifications - exiting"
    exit(1)
+else
+   @ ns = $#specs - 1
+   @ id = $ns + 1
+   set srcl = ( $specs[1-$ns] )
+   set dstn = $specs[$id]
+   if (($ns > 1) && (!(-d $dstn))) then
+      echo "Refusing to copy $ns files to non-directory '$dstn' - exiting"
+      exit(1)
+   endif
+   unset ns
+   unset id
 endif
-if (-d $dst) then
-   set dst = $dst/$src
-endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# COPY - copy list of files in SRCL to destination DSTN
+
+foreach src ( $srcl )
+
+   if (!(-f $src)) then
+      echo "No such file $src"
+      exit(1)
+   endif
+   if (-d $dstn) then
+      set dst = $dstn/$src:t
+   else
+      set dst = $dstn
+   endif
 
 # decide on MD5 checksumming command
-set md5cmd = ( `where md5sum | head -n 1` )
-if (-x "$md5cmd") then
-   set md5cmd = ( $md5cmd -b )
-else
-   set md5cmd = ( `where md5 | head -n 1` )
-   if (!(-x "$md5cmd")) then
-      set md5cmd = ( wc -c )
-   endif
-endif
-
-@ count  = 1
-@ NSleep = 0
-set chksrc = ( `$md5cmd $src` )
-
-set noglob
-
-while ($count <= $na)
-   if ($count > 1) then
-      echo "***> failed ($Err) [$Stamp] - attempt $count in $NSleep seconds"
-      sleep $NSleep
+   set md5cmd = ( `where md5sum | head -n 1` )
+   if (-x "$md5cmd") then
+      set md5cmd = ( $md5cmd -b )
+   else
+      set md5cmd = ( `where md5 | head -n 1` )
+      if (!(-x "$md5cmd")) then
+         set md5cmd = ( wc -c )
+      endif
    endif
 
-   set Stamp = `date +"%Y/%m/%d %H:%M:%S"`
-   @ Err     = 0
+   @ count  = 1
+   @ NSleep = 0
+   set chksrc = ( `$md5cmd $src` )
+
+   set noglob
+
+   while ($count <= $na)
+      if ($count > 1) then
+         echo "***> failed ($lerr) [$Stamp] - attempt $count in $NSleep seconds"
+         sleep $NSleep
+      endif
+
+      set Stamp = `date +"%Y/%m/%d %H:%M:%S"`
+      @ lerr     = 0
 
 # remove the destination to foil nefarious NFS caching
-   rm -f $dst >& /dev/null
-   if ($status != 0) then
-      @ Err = $Err + 1
-   endif
+      rm -f $dst >& /dev/null
+      if ($status != 0) then
+         @ lerr = $lerr + 1
+      endif
 
 # copy it
-   cp $src $dst >& /dev/null
-   if ($status != 0) then
-      @ Err = $Err + 1
-   endif
+      cp $src $dst >& /dev/null
+      if ($status != 0) then
+         @ lerr = $lerr + 1
+      endif
 
 # set the permissions
-   if ("$prm" != "") then
-      chmod $prm $dst
-      if ($status != 0) then
-         @ Err = $Err + 2
+      if ("$prm" != "") then
+         chmod $prm $dst
+         if ($status != 0) then
+            @ lerr = $lerr + 2
+         endif
       endif
-   endif
 
 # verify the checksum because we do not trust NFS
-   set chkdst = ( `$md5cmd $dst` )
-   if ($chksrc[1] != $chkdst[1]) then
-      @ Err = $Err + 4
-   endif
+      set chkdst = ( `$md5cmd $dst` )
+      if ($chksrc[1] != $chkdst[1]) then
+         @ lerr = $lerr + 4
+      endif
 
 # run specified command
-   if ("$cmd" != "") then
-      pushd $dst:h >>& /dev/null
-      $cmd
-      if ($status != 0) then
-         @ Err = $Err + 8
+      if ("$cmd" != "") then
+         pushd $dst:h >>& /dev/null
+         $cmd
+         if ($status != 0) then
+            @ lerr = $lerr + 8
+         endif
+         popd >>& /dev/null
       endif
-      popd >>& /dev/null
+
+      if ($lerr == 0) then
+         if ($count > 1) then
+            echo "***> succeeded [$Stamp] - on attempt $count"
+         endif
+         break
+      else
+         @ count = $count + 1
+         if ($count < 3) then
+            @ NSleep = 1
+         else
+            @ NSleep = 31
+         endif
+      endif
+   end
+
+   if (($count > $na) && ($lerr != 0)) then
+      @ count = $count - 1
+      echo "***> failed ($lerr) - quitting after $count attempts"
    endif
 
-   if ($Err == 0) then
-      if ($count > 1) then
-         echo "***> succeeded [$Stamp] - on attempt $count"
-      endif
-      break
-   else
-      @ count = $count + 1
-      if ($count < 3) then
-         @ NSleep = 1
-      else
-         @ NSleep = 31
-      endif
-   endif
+   @ nerr = $lerr
+
 end
 
-if (($count > $na) && ($Err != 0)) then
-   @ count = $count - 1
-   echo "***> failed ($Err) - quitting after $count attempts"
-endif
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-exit($Err)
+exit($nerr)

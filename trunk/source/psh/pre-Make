@@ -109,7 +109,7 @@ ${BinDir}/template : template.c ${LibFiles}
 
 
 link : ${InstallDep}
-	cp common.h nonstd.h ${LibFiles} ${IncDir}/shell
+	sinstall common.h nonstd.h ${LibFiles} ${IncDir}/shell
 
 install :
 	pact link

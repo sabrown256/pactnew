@@ -119,7 +119,7 @@ SDir = ${PACTSrcDir}
 
 modules : ${LibDep}
 	@touch dummy.mod
-	cp *.mod ${IncDir}
+	sinstall *.mod ${IncDir}
 	@rm -f dummy.mod ${IncDir}/dummy.mod
 	@rm -rf z-${System}
 

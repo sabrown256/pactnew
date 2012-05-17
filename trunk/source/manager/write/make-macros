@@ -178,8 +178,8 @@ set LibVers = 1
     Note $STDOUT 'incinstall : ${TGTInc}'
     Note $STDOUT '	@[ ! -f ${IncDir}/.lock ] || { echo "${IncDir} is locked" ; exit 1 ; }'
     Note $STDOUT '	${IncAction}'
-    Note $STDOUT '	@[ "${TGTInc}" != "noinc" ] && { echo "cp ${TGTInc} ${IncDir}" ; cp ${TGTInc} ${IncDir} ; } || { exit 0 ; }'
-#    Note $STDOUT '	cp ${TGTInc} ${IncDir}'
+    Note $STDOUT '	@[ "${TGTInc}" != "noinc" ] && { echo "sinstall ${TGTInc} ${IncDir}" ; sinstall ${TGTInc} ${IncDir} ; } || { exit 0 ; }'
+#    Note $STDOUT '	sinstall ${TGTInc} ${IncDir}'
     Note $STDOUT ""
 
     Note $STDOUT '#'
@@ -187,8 +187,8 @@ set LibVers = 1
     Note $STDOUT '#'
     Note $STDOUT 'bininstall : ${TGTBin}'
     Note $STDOUT '	@[ ! -f ${BinDir}/.lock ] || { echo "${BinDir} is locked" ; exit 1 ; }'
-    Note $STDOUT '	@[ "${TGTBin}" != "nobin" ] && { echo "cp ${TGTBin} ${BinDir}" ; cp ${TGTBin} ${BinDir} ; } || { exit 0 ; }'
-#    Note $STDOUT '	cp ${TGTBin} ${BinDir}'
+    Note $STDOUT '	@[ "${TGTBin}" != "nobin" ] && { echo "sinstall ${TGTBin} ${BinDir}" ; sinstall ${TGTBin} ${BinDir} ; } || { exit 0 ; }'
+#    Note $STDOUT '	sinstall ${TGTBin} ${BinDir}'
     Note $STDOUT ""
 
     Note $STDOUT '#'
@@ -196,8 +196,8 @@ set LibVers = 1
     Note $STDOUT '#'
     Note $STDOUT 'scminstall : ${TGTScm}'
     Note $STDOUT '	@[ ! -f ${ScmDir}/.lock ] || { echo "${ScmDir} is locked" ; exit 1 ; }'
-    Note $STDOUT '	@[ "${TGTScm}" != "noscm" ] && { echo "cp ${TGTScm} ${ScmDir}" ; cp ${TGTScm} ${ScmDir} ; } || { exit 0 ; }'
-#    Note $STDOUT '	cp ${TGTScm} ${ScmDir}'
+    Note $STDOUT '	@[ "${TGTScm}" != "noscm" ] && { echo "sinstall ${TGTScm} ${ScmDir}" ; sinstall ${TGTScm} ${ScmDir} ; } || { exit 0 ; }'
+#    Note $STDOUT '	sinstall ${TGTScm} ${ScmDir}'
     Note $STDOUT ""
 
     Note $STDOUT '#'
@@ -205,8 +205,8 @@ set LibVers = 1
     Note $STDOUT '#'
     Note $STDOUT 'extinstall :'
     Note $STDOUT '	@[ ! -f ${ExtDir}/.lock ] || { echo "${ExtDir} is locked" ; exit 1 ; }'
-    Note $STDOUT '	@[ "${TGTScmX}" != "noscmx" ] && { echo "cp ${TGTScmX} ${ExtDir}" ; cp ${TGTScmX} ${ExtDir} ; } || { exit 0 ; }'
-    Note $STDOUT '	@[ "${TGTScrX}" != "noscrx" ] && { echo "cp ${TGTScrX} ${BinDir}" ; cp ${TGTScrX} ${BinDir} ; } || { exit 0 ; }'
+    Note $STDOUT '	@[ "${TGTScmX}" != "noscmx" ] && { echo "sinstall ${TGTScmX} ${ExtDir}" ; sinstall ${TGTScmX} ${ExtDir} ; } || { exit 0 ; }'
+    Note $STDOUT '	@[ "${TGTScrX}" != "noscrx" ] && { echo "sinstall ${TGTScrX} ${BinDir}" ; sinstall ${TGTScrX} ${BinDir} ; } || { exit 0 ; }'
     Note $STDOUT ""
 
     Note $STDOUT '#'
@@ -214,8 +214,8 @@ set LibVers = 1
     Note $STDOUT '#'
     Note $STDOUT 'scrinstall : ${TGTScr}'
     Note $STDOUT '	@[ ! -f ${BinDir}/.lock ] || { echo "${BinDir} is locked" ; exit 1 ; }'
-    Note $STDOUT '	@[ "${TGTScr}" != "noscr" ] && { echo "cp ${TGTScr} ${BinDir}" ; cp ${TGTScr} ${BinDir} ; } || { exit 0 ; }'
-#    Note $STDOUT '	cp ${TGTScr} ${BinDir}'
+    Note $STDOUT '	@[ "${TGTScr}" != "noscr" ] && { echo "sinstall ${TGTScr} ${BinDir}" ; sinstall ${TGTScr} ${BinDir} ; } || { exit 0 ; }'
+#    Note $STDOUT '	sinstall ${TGTScr} ${BinDir}'
     Note $STDOUT ""
 
     Note $STDOUT '#'
@@ -224,12 +224,12 @@ set LibVers = 1
     Note $STDOUT 'man1install :'
     Note $STDOUT '	@[ ! -f ${IncDir}/.lock ] || { echo "${IncDir} is locked" ; exit 1 ; }'
     Note $STDOUT '	../scripts/maninstall -s 1'
-#    Note $STDOUT '	@(echo "cp ${archo}/*.1 ${Man1Dir}" ; cp ${archo}/*.1 ${Man1Dir})'
+#    Note $STDOUT '	@(echo "sinstall ${archo}/*.1 ${Man1Dir}" ; sinstall ${archo}/*.1 ${Man1Dir})'
     Note $STDOUT ""
     Note $STDOUT 'man3install :'
     Note $STDOUT '	@[ ! -f ${IncDir}/.lock ] || { echo "${IncDir} is locked" ; exit 1 ; }'
     Note $STDOUT '	../scripts/maninstall -s 3'
-#    Note $STDOUT '	@(echo "cp ${archo}/*.3 ${Man3Dir}" ; cp ${archo}/*.3 ${Man3Dir})'
+#    Note $STDOUT '	@(echo "sinstall ${archo}/*.3 ${Man3Dir}" ; sinstall ${archo}/*.3 ${Man3Dir})'
     Note $STDOUT ""
 
     Note $STDOUT '#'
