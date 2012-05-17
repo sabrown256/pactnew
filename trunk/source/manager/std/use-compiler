@@ -110,6 +110,16 @@ switch ($cname)
         set fname = pathf90
         breaksw
 
+# PCC
+   case pcc*:
+        setenv PACT_CC_FAMILY   PCC
+        setenv PACT_FC_FAMILY   GNU
+        set opt   = ( -v )
+        set pat   = ( pcc )
+        set prog  = ( '$0 ~ /'$pat'/ { print $2 } $0 ~ /Compile line:/ { print $3 }' )
+        set fname = gfortran
+        breaksw
+
 # PGI
    case pgcc*:
         setenv PACT_CC_FAMILY   PGI

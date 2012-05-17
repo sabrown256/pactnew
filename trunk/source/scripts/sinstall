@@ -11,6 +11,8 @@
 
 unalias *
 
+onintr FINISH
+
 if ($?SC_EXEC_N_ATTEMPTS) then
    @ na = $SC_EXEC_N_ATTEMPTS
 else
@@ -184,7 +186,38 @@ foreach src ( $srcl )
 
 end
 
+unset src
+unset dst
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 exit($nerr)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FINISH - do not leave partially done files if interrupted
+
+FINISH:
+
+if ($?src == 0) then
+
+   if (-f $src) then
+      if (-d $dstn) then
+         set dst = $dstn/$src:t
+      else
+         set dst = $dstn
+      endif
+
+# remove the destination to avoid leaving it in a bad state
+      rm -f $dst >& /dev/null
+
+   endif
+endif
+
+exit(1)
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+

@@ -255,8 +255,12 @@ unset prpt
        Note $FOUT ""
     endif
 
-    Note $FOUT "CFE           = $CFE"
-    Note $FOUT "PFE           = $PFE"
+# get CFE and PFE right when being installed
+    set lcfe = ( `echo "$CFE" | sed "s@$SysDir@$proot@"` )
+    set lpfe = ( `echo "$PFE" | sed "s@$SysDir@$proot@"` )
+
+    Note $FOUT "CFE           = $lcfe"
+    Note $FOUT "PFE           = $lpfe"
     Note $FOUT "CROSS_COMPILE = $CROSS_COMPILE"
     Note $FOUT 'VMake        += CFE PFE CROSS_COMPILE'
 
