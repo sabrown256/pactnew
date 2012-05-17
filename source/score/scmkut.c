@@ -11,6 +11,7 @@
 
 #include "cpyright.h"
 
+#include "score_int.h"
 #include "scope_make.h"
 
 /* get report_info from psh routines which supply

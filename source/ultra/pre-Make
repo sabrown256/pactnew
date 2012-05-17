@@ -116,7 +116,7 @@ ${TGTExe} : ${BinDep}
 # link 
 #
 link: ${InstallDep}
-	cp ultra.ini.user ${ScmDir}/ultra.ini
+	sinstall ultra.ini.user ${ScmDir}/ultra.ini
 	pact scminstall
 
 #
