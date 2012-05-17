@@ -1,0 +1,17 @@
+#
+# BGL - config elements for BG/L
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+#setenv CROSS_COMPILE  BGL
+#setenv DO_RUN_MPI     "salloc.bgl"
+#setenv DO_RUN_CROSS   "no-op"
+
+setenv IBM_BGL
+define IBM_BGL
+define GETSOCKNAME_LONG
+
