@@ -1164,8 +1164,8 @@ static void help(void)
     printf("\n");
     printf("Usage: do-run [-b] [-bf <file>] [-c] [-cross <cross-fe>] [-d] [-dbg <dbg>] [-dr]\n");
     printf("              [-e] [-f] [-h] [-level #] [-m] [-mpi <mpi-fe>] [-m] [-n #] [-o <file>]\n");
-    printf("              [-p #] [-prt <name>] [-q] [-r] [-s <file>] [-t #] [-v] [-vg] [-vgd] [-x]\n");
-    printf("              [-z] args\n");
+    printf("              [-p #] [-prf] [-prt <name>] [-q] [-r] [-s <file>] [-t #] [-v] [-vg] [-vgd]\n");
+    printf("              [-x] [-z] args\n");
     printf("\n");
     printf("       b     - run in batch\n");
     printf("       bf    - file containing info for local batch system\n");
@@ -1183,6 +1183,7 @@ static void help(void)
     printf("       n     - number of nodes to use - default is 1 (MPI)\n");
     printf("       o     - output file for DP runs\n");
     printf("       p     - number of processes to use (MPI)\n");
+    printf("       prf   - run a profiled code and postproccess the result\n");
     printf("       prt   - partition to be used (MPI)\n");
     printf("       r     - run direct - do not check for MPI, debugger, ...\n");
     printf("       q     - suppress do-batch messages in logs\n");
@@ -1229,11 +1230,11 @@ static int process_args(rundes *st, int c, char **v)
 	    nstrncpy(st->crosstgt, MAXLINE, v[++i], -1);
 
 	 else if (strcmp(v[i], "-d") == 0)
-            {st->debug  = TRUE;
+            {st->debug = TRUE;
 	     nstrncpy(st->dbgtgt, MAXLINE, "tv", -1);}
 
 	 else if (strcmp(v[i], "-dbg") == 0)
-            {st->debug  = TRUE;
+            {st->debug = TRUE;
 	     nstrncpy(st->dbgtgt, MAXLINE, v[++i], -1);}
 
 	 else if (strcmp(v[i], "-dr") == 0)
@@ -1278,6 +1279,10 @@ static int process_args(rundes *st, int c, char **v)
 	     push_tok(st->dargs, MAXLINE, ' ', "-p");
 	     push_tok(st->dargs, MAXLINE, ' ', v[i]);}
 
+	 else if (strcmp(v[i], "-prf") == 0)
+            {st->debug = TRUE;
+	     nstrncpy(st->dbgtgt, MAXLINE, "prf", -1);}
+
 	 else if (strcmp(v[i], "-prt") == 0)
 	    csetenv("Pool", v[++i]);
 
@@ -1300,18 +1305,18 @@ static int process_args(rundes *st, int c, char **v)
 	    st->verbose++;
 
 	 else if (strcmp(v[i], "-vg") == 0)
-            {st->debug  = TRUE;
+            {st->debug = TRUE;
 	     nstrncpy(st->dbgtgt, MAXLINE, "vg", -1);}
 
 	 else if (strcmp(v[i], "-vgd") == 0)
-            {st->debug  = TRUE;
+            {st->debug = TRUE;
 	     nstrncpy(st->dbgtgt, MAXLINE, "vgd", -1);}
 
 	 else if (strcmp(v[i], "-x") == 0)
             st->usempi = FALSE;
 
 	 else if (strcmp(v[i], "-z") == 0)
-            {st->debug  = TRUE;
+            {st->debug = TRUE;
 	     nstrncpy(st->dbgtgt, MAXLINE, "zf", -1);}
 
 	 else
