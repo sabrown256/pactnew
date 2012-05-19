@@ -965,7 +965,7 @@ static int setup_dbg_path(rundes *st)
 
 static int setup_dbg(rundes *st)
    {int rv;
-    char *mpife;
+    char *mpife, *mpi;
 
 /* setup to run the debugger */
     rv = setup_dbg_path(st);
@@ -973,7 +973,8 @@ static int setup_dbg(rundes *st)
 /* fix up the command line if there is no MPI front end */
     if (rv == TRUE) 
        {mpife = cgetenv(FALSE, "MPI_Exe");
-	if (IS_NULL(mpife) == TRUE)
+	mpi   = cgetenv(FALSE, "MPI");
+	if ((IS_NULL(mpife) == TRUE) && (IS_NULL(mpi) == FALSE))
 	   csetenv("Cmd", "$Wrap $DBG_Exe $DBG_Flags $Code $DBG_Delim $CArgs");};
 
    return(rv);}
