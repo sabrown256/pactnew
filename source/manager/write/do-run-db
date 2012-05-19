@@ -78,7 +78,7 @@ set cnd = ""
 if ($ldbg != none) then
    set cnd = ( $cnd $ldbg )
 else
-   set cnd = ( gdb tv vg vgd zf )
+   set cnd = ( gdb tv vg vgd prf zf )
 endif
 
 if ($lmpi != none) then
