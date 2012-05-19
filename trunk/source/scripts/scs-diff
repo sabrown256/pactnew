@@ -16,19 +16,36 @@ if ("$ldir" == ".") then
 endif
 set gitd = ( `$ldir/where-git` )
 
+set args = ""
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: scs-diff [-h] <arg>*"
+           echo "   h      this help message"
+           echo "   <arg>  options and arguments to be passed on"
+           echo ""
+           exit(1)
+      default:
+           set args = ( $args $1 )
+           breaksw
+   endsw
+   shift
+end
+
 if (-d $gitd[1]) then
 
 #   pushd $gitd[1] >& /dev/null
-   git diff -U0 $argv
+   git diff -U0 $args
 #   popd >& /dev/null
 
 else if (-d CVS) then
 
    setenv CVS_RSH  ssh
-   cvs diff $argv
+   cvs diff $args
 
 else if (-d .svn) then
-   svn diff --diff-cmd `which diff` -x -r $argv
+   svn diff --diff-cmd `which diff` -x -r $args
 
 endif
 
