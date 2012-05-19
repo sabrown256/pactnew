@@ -28,13 +28,24 @@ while ($#argv > 0)
            shift
            set repo = $1
            breaksw
-      case -k:
-           shift
-           set knd = $1
-           breaksw
       case -D:
            shift
            set srcdate = ( $1 )
+           breaksw
+      case -h:
+           echo ""
+           echo "Usage: scs-co [-d <repo>] [-D <date>] [-h] [-k <knd>] <pkg> [<arg>]*"
+           echo "   d      location of source repository"
+           echo "   D      checkout sources as of <date> stamp"
+           echo "   h      this help message"
+           echo "   k      source control system: cvs, git, or svn"
+           echo "   <pkg>  package to be checked out"
+           echo "   <arg>  options to be passed on"
+           echo ""
+           exit(1)
+      case -k:
+           shift
+           set knd = $1
            breaksw
       case -r:
            set opt = ( $opt $1 $2 )
