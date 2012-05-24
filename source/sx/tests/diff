@@ -27,7 +27,9 @@ set PDBDiff = "$CFE $BinDir/pdbdiff -e -x -q $ZeroSpace"
    flog $Log $Ultra -l $FilesDir/pdbdtu.scm
    set xstatus = $status
 
-   if ($xstatus != 0) then
+   if (($xstatus == 254) || ($xstatus == 255)) then
+      NoteD $Log "omitted"
+   else if ($xstatus != 0) then
       NoteD $Log " FAILED (-1)"
       NoteD $Log "                       Making data failed"
       @ nerr = $nerr + 1

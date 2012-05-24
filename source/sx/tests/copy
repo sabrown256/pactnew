@@ -91,7 +91,9 @@ endif
 
       flog $Log cat cp-$it.res
 
-      if ($xstatus == 0) then
+      if (($xstatus == 254) || ($xstatus == 255)) then
+         NoteD $Log "omitted"
+      else if ($xstatus == 0) then
          NoteD $Log "ok ($dt)"
       else
          NoteD $Log "ng ($dt)"

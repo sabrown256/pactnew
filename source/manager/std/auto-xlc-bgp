@@ -9,11 +9,17 @@
 
 setenv PATH  ${PATH}:/usr/local/bin:/bgsys/drivers/ppcfloor/bin
 
-setenv RootInc /opt/ibmcmp/vac/bg/9.0/include
-
 run std/use-compiler mpixlc
 
-run analyze/locate-mpi mpich bgp xlc
+# specify DP group directly for BG/P since there is no variation
+Group DP {
+   Inc   = -I/bgsys/drivers/ppcfloor/comm/include
+   Lib   = -lmpich.cnk
+   RPath = /bgsys/drivers/ppcfloor/comm/lib
+   Path  = /bgsys/drivers/ppcfloor/comm/bin
+}
+
+setenv RootInc /opt/ibmcmp/vac/bg/9.0/include
 
 include 32-bit
 include compilers/xlc-bgp
@@ -22,9 +28,5 @@ include no-sql
 include no-jpeg
 include no-png
 include no-libz
+including features/bgp
 
-setenv CROSS_COMPILE  BGP
-setenv DO_RUN_MPI     "salloc.bgp"
-setenv DO_RUN_CROSS   "submit"
-setenv IBM_BGP
-define IBM_BGP

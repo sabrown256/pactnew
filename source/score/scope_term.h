@@ -44,6 +44,8 @@
 # undef newline
 # undef buttons
 # undef lines
+# undef bell
+# undef user1
 
 #endif
 

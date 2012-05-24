@@ -356,67 +356,109 @@ PFSymDelay PD_set_symt_delay_method(PFSymDelay mth)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PD_PARE_MATCH - predicate function for SC_hasharr_prune
+ *                - if the element name matches remove it from
+ *                - the pointer table, free the syment, and
+ *                - return TRUE
+ */
+
+static int _PD_pare_match(hasharr *ha, haelem *hp, void *a)
+   {int rv;
+    long nc;
+    char *base, *nm;
+    syment *ep;
+    PDBfile *file;
+
+    file = (PDBfile *) a;
+    nm   = hp->name;
+
+    rv = FALSE;
+
+    if (_PD_symatch(file, FALSE, nm, NULL, NULL, NULL) == TRUE)
+       {ep = hp->def;
+
+	base = file->ptr_base;
+	nc   = strlen(base);
+	if (strncmp(nm, base, nc) == 0)
+	   _PD_ptr_remove_entry(file, ep, TRUE);
+
+	_PD_rl_syment_d(ep);
+
+	hp->def = NULL;
+
+	rv = TRUE;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PARE_DIRD - predicate function for SC_hasharr_prune
+ *               - if the element name ends in slash
+ *               - return TRUE
+ */
+
+static int _PD_pare_dird(hasharr *ha, haelem *hp, void *a)
+   {int rv;
+    char *nm;
+    syment *ep;
+
+    nm = hp->name;
+
+    rv = (SC_LAST_CHAR(nm) != '/');
+    if (rv == TRUE)
+       {ep = hp->def;
+	_PD_rl_syment_d(ep);
+	hp->def = NULL;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PD_PARE_DIRS - predicate function for SC_hasharr_prune
+ *               - if the element name ends in slash
+ *               - return TRUE
+ */
+
+static int _PD_pare_dirs(hasharr *ha, haelem *hp, void *a)
+   {int rv;
+    char *nm;
+
+    nm = hp->name;
+
+    rv = (SC_LAST_CHAR(nm) != '/');
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PD_PARE_SYMT - remove symbol table entries added in the last cd
  *               - return the number of entries removed
  */
 
 int _PD_pare_symt(PDBfile *file)
    {int nr, wh;
-    long i;
-    char **ent;
-    char *nm;
-    syment *ep;
 
     nr = 0;
 
     if (file->symatch != NULL)
-       {wh = 1;
-	if (wh == 1)
-	   {for (i = 0; SC_hasharr_next(file->symtab, &i, &nm, NULL, (void **) &ep); i++)
-	        {if (_PD_symatch(file, FALSE, nm, NULL, NULL, NULL) == TRUE)
-		    {if (strncmp(nm, file->ptr_base, strlen(file->ptr_base)) == 0)
-		        _PD_ptr_remove_entry(file, ep, TRUE);
-		     SC_mark(ep, 1);
-		     _PD_rl_syment_d(ep);
-		     SC_hasharr_remove(file->symtab, nm);
-		     nr++;};};}
-	else
-	   {ent = SC_hasharr_dump(file->symtab, "*", NULL, FALSE);
-
-	    for (i = 0; ent[i] != NULL; i++)
-	        {if (_PD_symatch(file, FALSE, ent[i], NULL, NULL, NULL) == TRUE)
-		    {SC_hasharr_remove(file->symtab, ent[i]);
-		     nr++;};};
-
-	    SC_free_strings(ent);};}
+       nr = SC_hasharr_prune(file->symtab, _PD_pare_match, file);
 
     else
-       {char s[MAXLINE];
-
-	wh = 0;
+       {wh = 0;
 
 	if ((file->delay_sym != PD_DELAY_NONE) &&
 	    (strcmp(file->current_prefix, "/") != 0))
-	   {snprintf(s, MAXLINE, "*%s*", file->current_prefix);
 
 /* deep remove including the syment */
-	    if (wh == 1)
-	       {for (i = 0; SC_hasharr_next(file->symtab, &i, &nm, NULL, (void **) &ep); i++)
-		    {if (SC_LAST_CHAR(nm) != '/')
-		        {_PD_rl_syment_d(ep);
-			 SC_hasharr_remove(file->symtab, nm);
-			 nr++;};};}
+	   {if (wh == 1)
+	       nr = SC_hasharr_prune(file->symtab, _PD_pare_dird, file);
 
 /* shallow remove excluding the syment */
 	    else
-	       {ent = SC_hasharr_dump(file->symtab, s, NULL, FALSE);
-		if (ent != NULL)
-		   {for (i = 0; ent[i] != NULL; i++)
-		        {if (SC_LAST_CHAR(ent[i]) != '/')
-			    {SC_hasharr_remove(file->symtab, ent[i]);
-			     nr++;};};
-
-		     SC_free_strings(ent);};};};};
+	       nr = SC_hasharr_prune(file->symtab, _PD_pare_dirs, file);};};
 
     return(nr);}
 

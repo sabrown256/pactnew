@@ -43,7 +43,7 @@ static long
  _PD_ptr_install(adloc *al, long i, void *vr);
 
 static adloc
- *_PD_ptr_get_al(PDBfile *file),
+ *_PD_ptr_get_al(PDBfile *file, int lck),
  *_PD_ptr_set_al(PDBfile *file, adloc *nal, int serial);
 
 /*--------------------------------------------------------------------------*/
@@ -147,16 +147,19 @@ void _PD_free_adloc(adloc *al)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_PTR_GET_AL - return the current pointer/address list */
+/* _PD_PTR_GET_AL - return the current pointer/address list
+ *                - LCK is TRUE iff a lock is not already on
+ */
 
-static adloc *_PD_ptr_get_al(PDBfile *file)
+static adloc *_PD_ptr_get_al(PDBfile *file, int lck)
    {int tid;
     SC_array *apl;
     adloc *al;
 
     tid = SC_current_thread() + 1;
 
-    SC_LOCKON(PD_ptr_lock);
+    if (lck == TRUE)
+       SC_LOCKON(PD_ptr_lock);
 
     apl = file->ap;
 
@@ -164,7 +167,8 @@ static adloc *_PD_ptr_get_al(PDBfile *file)
     if (al == NULL)
        al = *(adloc **) SC_array_get(apl, 0);
 
-    SC_LOCKOFF(PD_ptr_lock);
+    if (lck == TRUE)
+       SC_LOCKOFF(PD_ptr_lock);
 
     return(al);}
 
@@ -239,12 +243,12 @@ static void _PD_ptr_free_al(PDBfile *file, int serial)
 void _PD_ptr_save_al(PDBfile *file, adloc **poa, char **pob, char *base)
    {adloc *al;
 
+    SC_LOCKON(PD_ptr_lock);
+
     if (poa != NULL)
-       {al = _PD_ptr_get_al(file);
+       {al = _PD_ptr_get_al(file, FALSE);
 	SC_mark(al, 1);
 	*poa = al;};
-
-    SC_LOCKON(PD_ptr_lock);
 
     if (pob != NULL)
        *pob = file->ptr_base;
@@ -425,7 +429,7 @@ static void _PD_index_ptr(char *p, int i)
 long _PD_ptr_get_index(PDBfile *file, long n, char *bf)
    {adloc *al;
 
-    al = _PD_ptr_get_al(file);
+    al = _PD_ptr_get_al(file, TRUE);
 
 /* constrain N to be a valid pointer index
  * any bad values are rerouted to the index for NULL
@@ -529,7 +533,7 @@ static void _PD_ptr_set_space(PDBfile *file, PD_address *ad,
 			      char **vr, PD_itag *pi)
    {adloc *al;
 
-    al = _PD_ptr_get_al(file);
+    al = _PD_ptr_get_al(file, TRUE);
 
     ad->ptr = _PD_ptr_alloc_space(file, vr, pi, FALSE);
     _PD_ptr_install(al, ad->indx, ad->ptr);
@@ -560,6 +564,7 @@ static syment *_PD_ptr_get_entry(adloc *al, long i)
 
 /* _PD_PTR_FIND_ADDR - return the PD_address associated with the address ADDR
  *                   - in the pointer list of FILE
+ *                   - LCK is TRUE iff a lock is not already on
  *                   - return NULL if there is none found
  */
 
@@ -593,6 +598,7 @@ static PD_address *_PD_ptr_find_addr(adloc *al, int64_t addr, int lck)
 
 /* _PD_PTR_FIND_PTR - return the PD_address associated with the pointer VR
  *                  - in the (write) pointer list of FILE
+ *                  - LCK is TRUE iff a lock is not already on
  *                  - return NULL if there is none found
  */
 
@@ -647,6 +653,7 @@ static PD_address *_PD_ptr_find_next(adloc *al, PD_address *ad, void *vr)
 
 /* _PD_PTR_INSTALL_ADDR - install ADDR in the (read) pointer lists of FILE
  *                      - return the associated PD_address
+ *                      - LCK is TRUE iff a lock is not already on
  */
 
 static PD_address *_PD_ptr_install_addr(adloc *al, int64_t addr, int lck)
@@ -688,6 +695,7 @@ static PD_address *_PD_ptr_install_addr(adloc *al, int64_t addr, int lck)
 
 /* _PD_PTR_INSTALL_PTR - install VR in the (write) pointer list of FILE
  *                     - and mark it with the WRITE flag
+ *                     - LCK is TRUE iff a lock is not already on
  *                     - return the associated PD_address
  */
 
@@ -731,6 +739,7 @@ static PD_address *_PD_ptr_install_ptr(adloc *al, char *vr,
 /*--------------------------------------------------------------------------*/
 
 /* _PD_PTR_INSTALL_ENTRY - install EP in the pointer list of FILE
+ *                       - LCK is TRUE iff a lock is not already on
  *                       - return the associated PD_address
  */
 
@@ -767,7 +776,9 @@ static PD_address *_PD_ptr_install_entry(adloc *al, long i,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_PTR_REMOVE_ADDR - remove address indexed by I from FILE */
+/* _PD_PTR_REMOVE_ADDR - remove address indexed by I from FILE
+ *                     - LCK is TRUE iff a lock is not already on
+ */
 
 static void _PD_ptr_remove_addr(adloc *al, PD_address *ad, int lck)
    {
@@ -871,7 +882,7 @@ void dprapl(PDBfile *file)
    {int i, nl;
     adloc *al;
 
-    al = _PD_ptr_get_al(file);
+    al = _PD_ptr_get_al(file, TRUE);
 
     nl = SC_array_get_n(file->ap);
     for (i = 0; i < nl; i++)
@@ -887,26 +898,34 @@ void dprapl(PDBfile *file)
 
 /* _PD_PTR_RD_LOOKUP - lookup ADDR to see if it has been previously
  *                   - read from FILE and remember it if not
+ *                   - LCK is TRUE iff a lock is not already on
  *                   - return the index of ADDR in the read pointer list
  *                   - return TRUE in PFRST the first time ADDR is seen
  */
 
-static PD_address *_PD_ptr_rd_lookup(PDBfile *file, int64_t addr, int *pfrst)
+static PD_address *_PD_ptr_rd_lookup(PDBfile *file, int64_t addr,
+				     int lck, int *pfrst)
    {int frst;
     PD_address *ad;
     adloc *al;
 
-    al = _PD_ptr_get_al(file);
+    if (lck == TRUE)
+       SC_LOCKON(PD_ptr_lock);
+
+    al = _PD_ptr_get_al(file, FALSE);
 
     frst = FALSE;
 
 /* search the disk address list to see if this pointer is known */
-    ad = _PD_ptr_find_addr(al, addr, TRUE);
+    ad = _PD_ptr_find_addr(al, addr, FALSE);
 
 /* add a new pointer */
     if ((ad == NULL) || (file->track_pointers == FALSE))
-       {ad   = _PD_ptr_install_addr(al, addr, TRUE);
+       {ad   = _PD_ptr_install_addr(al, addr, FALSE);
 	frst = TRUE;};
+
+    if (lck == TRUE)
+       SC_LOCKOFF(PD_ptr_lock);
 
     if (pfrst != NULL)
        *pfrst = frst;
@@ -930,9 +949,9 @@ syment *_PD_ptr_read(PDBfile *file, int64_t addr, int force)
     adloc *al;
 
     ep = NULL;
-    al = _PD_ptr_get_al(file);
+    al = _PD_ptr_get_al(file, TRUE);
 
-    ad = _PD_ptr_rd_lookup(file, addr, &frst);
+    ad = _PD_ptr_rd_lookup(file, addr, TRUE, &frst);
     if (ad != NULL)
        ep = ad->entry;
 
@@ -961,7 +980,7 @@ static void _PD_ptr_read_push(PDBfile *file, char **vr, PD_itag *pi,
 
     SC_LOCKON(PD_ptr_lock);
 
-    al = _PD_ptr_get_al(file);
+    al = _PD_ptr_get_al(file, FALSE);
 
     if (file->use_itags == FALSE)
        {i  = _PD_ptr_index(*vr);
@@ -990,7 +1009,7 @@ static void _PD_ptr_read_push(PDBfile *file, char **vr, PD_itag *pi,
 	loc   = pi->flag;
 	naddr = -1L;
 
-	ad = _PD_ptr_rd_lookup(file, addr, pfrst);
+	ad = _PD_ptr_rd_lookup(file, addr, FALSE, pfrst);
 	if (ad != NULL)
 	   {if (ad->ptr == NULL)
 	       _PD_ptr_set_space(file, ad, vr, pi);
@@ -1076,7 +1095,7 @@ void _PD_ptr_rd_install_addr(PDBfile *file, int64_t addr,
     PD_address *ad;
 
     if ((_PD_IS_SEQUENTIAL) || (file->use_itags == FALSE))
-       {ad = _PD_ptr_rd_lookup(file, addr, NULL);
+       {ad = _PD_ptr_rd_lookup(file, addr, TRUE, NULL);
 	if (ad != NULL)
 	   {here = _PD_get_current_address(file, PD_READ);
 	    ad->reta = here;};};
@@ -1090,21 +1109,26 @@ void _PD_ptr_rd_install_addr(PDBfile *file, int64_t addr,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_PTR_REMOVE_ENTRY - remove address referenced by syment EP from FILE */
+/* _PD_PTR_REMOVE_ENTRY - remove address referenced by syment EP from FILE
+ *                      - LCK is TRUE iff a lock is not already on
+ */
 
 void _PD_ptr_remove_entry(PDBfile *file, syment *ep, int lck)
-   {int64_t addr;
-    PD_address *ad;
-    adloc *al;
+   {
 
+#if 0
     if (file != NULL)
        {if (lck == TRUE)
 	   SC_LOCKON(PD_ptr_lock);
 
-	al   = _PD_ptr_get_al(file);
+	int64_t addr;
+	PD_address *ad;
+	adloc *al;
+
+	al   = _PD_ptr_get_al(file, FALSE);
 	addr = PD_entry_address(ep);
-	ad   = _PD_ptr_rd_lookup(file, addr, NULL);
-	_PD_ptr_remove_addr(al, ad, lck);
+	ad   = _PD_ptr_rd_lookup(file, addr, FALSE, NULL);
+	_PD_ptr_remove_addr(al, ad, FALSE);
 
 /* this will be freed when the hash table is releases
  * we had to free the contents here
@@ -1113,6 +1137,7 @@ void _PD_ptr_remove_entry(PDBfile *file, syment *ep, int lck)
 
 	if (lck == TRUE)
 	   SC_LOCKOFF(PD_ptr_lock);};
+#endif
 
     return;}
 
@@ -1124,6 +1149,7 @@ void _PD_ptr_remove_entry(PDBfile *file, syment *ep, int lck)
 
 /* _PD_PTR_WR_LOOKUP - lookup VR to see if it has been previously
  *                   - written to FILE and remember it if not
+ *                   - LCK is TRUE iff a lock is not already on
  *                   - return the index of VR in the write pointer list
  *                   - return the location of the data in PLOC
  *                   - location is LOC_HERE, LOC_OTHER, or LOC_BLOCK
@@ -1140,7 +1166,7 @@ PD_address *_PD_ptr_wr_lookup(PDBfile *file, void *vr,
 
     loc = LOC_OTHER;
 
-    al = _PD_ptr_get_al(file);
+    al = _PD_ptr_get_al(file, FALSE);
 
 /* search the pointer list to see if this pointer is known */
     ad = _PD_ptr_find_ptr(al, vr, FALSE);
@@ -1222,7 +1248,7 @@ int _PD_ptr_wr_itags(PDBfile *file, char *name, void *vr, inti ni, char *type)
 
     SC_LOCKON(PD_ptr_lock);
 
-    al = _PD_ptr_get_al(file);
+    al = _PD_ptr_get_al(file, FALSE);
 
     if ((_PD_IS_SEQUENTIAL) || (file->use_itags == FALSE))
 
@@ -1269,7 +1295,7 @@ int _PD_ptr_entry_itag(PDBfile *file, PD_itag *pi, char *p)
     syment *ep;
     adloc *al;
 
-    al = _PD_ptr_get_al(file);
+    al = _PD_ptr_get_al(file, TRUE);
     n  = _PD_ptr_index(p);
     ep = _PD_ptr_get_entry(al, n);
 
@@ -1322,7 +1348,7 @@ int PD_reset_ptr_list(PDBfile *file ARG(,,cls))
    {int rv;
     adloc *al;
 
-    al = _PD_ptr_get_al(file);
+    al = _PD_ptr_get_al(file, TRUE);
 
     rv = TRUE;
     if ((_PD_IS_SEQUENTIAL) || (file->use_itags == FALSE))
@@ -1340,7 +1366,7 @@ int _PD_ptr_reset(PDBfile *file, char *vr)
     PD_address *ad;
     adloc *al;
 
-    al = _PD_ptr_get_al(file);
+    al = _PD_ptr_get_al(file, TRUE);
 
     ad = _PD_ptr_find_ptr(al, vr, TRUE);
     rv = _PD_ptr_reset_ad(ad, NULL);
@@ -1362,7 +1388,7 @@ int _PD_ptr_register_entry(PDBfile *file, char *name, syment *ep)
     ok = 0;
 
     if ((file != NULL) && (ep != NULL))
-       {al = _PD_ptr_get_al(file);
+       {al = _PD_ptr_get_al(file, TRUE);
         nc = strlen(file->ptr_base);
 	if (strncmp(name, file->ptr_base, nc) == 0) 
 	   {i = SC_stol(name+nc);
@@ -1387,7 +1413,7 @@ static int _PD_ptr_register(haelem *hp, void *a)
 
     file = (PDBfile *) a;
     if (file != NULL)
-       {al = _PD_ptr_get_al(file);
+       {al = _PD_ptr_get_al(file, TRUE);
 
 	ok = SC_haelem_data(hp, &name, NULL, (void **) &ep, FALSE);
 	SC_ASSERT(ok == TRUE);

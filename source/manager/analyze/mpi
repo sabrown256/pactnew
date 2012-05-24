@@ -23,7 +23,6 @@ SafeEnv MPIGoodIO       FALSE
 SafeEnv MPIAllStdin     FALSE
 SafeEnv HAVE_OPENMPI    FALSE
 SafeEnv HAVE_MPI_2      FALSE
-SafeEnv DP_Lib          ""
 SafeEnv DP_Inc          ""
 SafeEnv DP_Lib          ""
 SafeEnv DP_RPath        ""
@@ -139,7 +138,6 @@ EOF
    if ($status != 0) then
       set lParComm = "no"
       setenv DP_Lib    ""
-      setenv DP_Lib    ""
    else
       flog $ALog ldd $Tmp
 
@@ -211,7 +209,6 @@ Note $ALog "lParComm    = |$lParComm|"
 Note $ALog "REQUEST_MPI = |$REQUEST_MPI|"
 
 if (("$lParComm" == no) || ($REQUEST_MPI == FALSE)) then
-   setenv DP_Lib    ""
    setenv DP_Inc    ""
    setenv DP_Lib    ""
    setenv DP_RPath  ""
@@ -228,7 +225,6 @@ else if (("$lParComm" != "") && ($REQUEST_MPI == TRUE)) then
    flog $ALog setenv MD_Pck   "DP $MD_Pck"
 
 else
-   setenv DP_Lib    ""
    setenv DP_Inc    ""
    setenv DP_Lib    ""
    setenv DP_RPath  ""
@@ -243,7 +239,6 @@ SetParent MPIAllStdin
 SetParent MPIGoodIO
 SetParent HAVE_OPENMPI
 SetParent HAVE_MPI_2
-SetParent DP_Lib
 SetParent DP_Inc
 SetParent DP_Lib
 SetParent DP_RPath
