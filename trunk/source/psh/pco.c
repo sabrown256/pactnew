@@ -686,16 +686,37 @@ static void env_out(FILE *fsh, FILE *fcsh, FILE *fdk, FILE *fmd,
 
 /* ADD_SET_CFG - add variables set in config files */
 
-static void add_set_cfg(FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
-   {int i, j, n, nc, ok;
+static void add_set_cfg(client *cl, FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
+   {int i, is, j, js, n, nc, ns, ms, ok;
+    char s[MAXLINE];
+    char *spcg[] = { "DP" };
+    char *spcv[] = { "Inc", "Lib", "RPath", "Path" };
     char *var, *val, *p, **sa;
 
     fflush(st.aux.SEF);
     sa = file_text(TRUE, "%s/log/file.se", st.dir.root);
-    if (sa != NULL)
-       {n = lst_length(sa);
+    n  = (sa != NULL) ? lst_length(sa) : 0;
 
-	for (i = 0; i < n; i++)
+/* add special group variables */
+    ns = sizeof(spcg)/sizeof(char *);
+    ms = sizeof(spcv)/sizeof(char *);
+    for (is = 0; is < ns; is++)
+        {for (js = 0; js < ms; js++)
+	     {snprintf(s, MAXLINE, "%s_%s", spcg[is], spcv[js]);
+
+/* see if S is also in the list SA */
+	      ok = TRUE;
+	      for (i = 0; (i < n) && (ok == TRUE); i++)
+		  ok &= (strncmp(s, sa[i], strlen(s)) != 0);
+
+	      if (ok == TRUE)
+		 {p = dbget(cl, TRUE, s);
+		  if (IS_NULL(p) == FALSE)
+		     env_out(fsh, fcsh, fdk, fmd, s, p);};};};
+
+/* add all the setenv'd variables */
+    if (sa != NULL)
+       {for (i = 0; i < n; i++)
 	    {p = sa[i];
 
 	     var = strtok(p, " ");
@@ -818,7 +839,7 @@ static void write_envf(client *cl, int lnotice)
 	for (i = 0; i < n; i++)
 	    env_out(fsh, fcsh, fdk, fmd, site[i], dbget(cl, TRUE, site[i]));
 
-	add_set_cfg(fcsh, fsh, fdk, fmd);}
+	add_set_cfg(cl, fcsh, fsh, fdk, fmd);}
     else
        add_set_db(fcsh, fsh, fdk, fmd);
 

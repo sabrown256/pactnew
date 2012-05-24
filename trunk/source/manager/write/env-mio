@@ -443,6 +443,16 @@ unset prpt
        set linc  = ( `printenv ${p}_Inc | sed 's|-I||g'` )
        set lrpth = `printenv ${p}_RPath`
 
+# filter out /usr/include from include list
+       set ninc = ""
+       foreach i ($linc)
+          if ($i != /usr/include) then
+             set ninc = ( $ninc $i )
+          endif
+       end
+       set linc = ( $ninc )
+       unset ninc
+
 # emit the package only if at least one element is non-empty
        if (("$lar" != "") || ("$linc" != "") || ("$lrpth" != "")) then
           Note $FOUT "Library/$lp {"

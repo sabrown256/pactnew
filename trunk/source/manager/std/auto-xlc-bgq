@@ -7,11 +7,17 @@
 # include "cpyright.h"
 #
 
-setenv RootInc /opt/ibmcmp/vac/bg/12.1/include
-
 run std/use-compiler mpixlc
 
-run analyze/locate-mpi mpich bgq xlc
+# specify DP group directly for BG/Q since there is no variation
+Group DP {
+   Inc   = -I/bgsys/drivers/ppcfloor/comm/xl/include
+   Lib   = -lmpich
+   RPath = /bgsys/drivers/ppcfloor/comm/xl/lib
+   Path  = /bgsys/drivers/ppcfloor/comm/xl/bin
+}
+
+setenv RootInc /opt/ibmcmp/vac/bg/12.1/include
 
 include 64-bit
 include compilers/xlc-bgq

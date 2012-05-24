@@ -9,11 +9,17 @@
 
 setenv PATH  ${PATH}:/usr/local/bin:/bgsys/drivers/ppcfloor/bin
 
-setenv RootInc /bgsys/drivers/ppctoolchain.gomp/gnu-linux/powerpc-bgp-linux/sys-include
-
 run std/use-compiler /usr/local/tools/compilers/ibm/mpicc-4.3.2
 
-run analyze/locate-mpi mpich bgp gnu
+# specify DP group directly for BG/P since there is no variation
+Group DP {
+   Inc   = -I/bgsys/drivers/ppcfloor/comm/include
+   Lib   = -lmpich.cnk
+   RPath = /bgsys/drivers/ppcfloor/comm/lib
+   Path  = /bgsys/drivers/ppcfloor/comm/bin
+}
+
+setenv RootInc /bgsys/drivers/ppctoolchain.gomp/gnu-linux/powerpc-bgp-linux/sys-include
 
 include 32-bit
 include compilers/gnu-bgp
@@ -22,12 +28,8 @@ include no-sql
 include no-jpeg
 include no-png
 include no-libz
+including features/bgp
 
-setenv CROSS_COMPILE  BGP
-setenv DO_RUN_MPI     "salloc.bgp"
-setenv DO_RUN_CROSS   "submit"
-setenv IBM_BGP
-define IBM_BGP
 define GETSOCKNAME_LONG
 
 setenv TEST_MAX_THREADS 2

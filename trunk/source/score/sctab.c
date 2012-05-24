@@ -190,6 +190,28 @@ static void _SC_insert_haelem(hasharr *ha, haelem *hp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_HAELEM_REMOVE - remove HP from HA */
+
+static int _SC_haelem_remove(hasharr *ha, haelem *hp)
+   {int rv;
+    void *v;
+
+    rv = TRUE;
+
+/* remove from array */
+    v = NULL;
+    SC_array_set(ha->a, hp->iar, &v);
+
+/* remove from haelem list */
+    _SC_free_haelem(ha, hp);
+
+    ha->ne--;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_HAELEM_DATA - return the name and object from a hash element
  *                - return TRUE iff successful
  *                - if SVR is TRUE an PO is non-NULL set hp->def to NULL
@@ -363,6 +385,41 @@ void SC_free_hasharr(hasharr *ha ARG(,,cls),
     CFREE(ha);
 
     return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_HASHARR_PRUNE - remove table entries for which PRED returns TRUE
+ *                  - return the number of entries removed
+ */
+
+long SC_hasharr_prune(hasharr *ha,
+		      int (*pred)(hasharr *ha, haelem *hp, void *a),
+		      void *a)
+   {long i, nr;
+    long sz;
+    haelem **tb, *hp, *prv, *nxt;
+
+    nr = 0;
+
+    sz = ha->size;
+    tb = ha->table;
+    for (i = 0; i < sz; i++)
+        {prv = tb[i];
+	 for (hp = tb[i]; hp != NULL; hp = nxt)
+	     {nxt = hp->next;
+	      if (pred(ha, hp, a) == TRUE)
+		 {if (hp == prv)
+		     {tb[i] = nxt;
+		      prv   = nxt;}
+		  else
+		     prv->next = nxt;
+
+		  nr += _SC_haelem_remove(ha, hp);}
+	    else
+	       prv = hp;};};
+
+    return(nr);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -658,24 +715,14 @@ int SC_hasharr_sort(hasharr *ha, PFIntBin pred)
 static int _SC_splice_out_haelem(hasharr *ha, void *key,
 				 haelem **prv, haelem *ths)
    {int ok;
-    void *v;
     PFIntBin comp;
 
     comp = ha->comp;
 
     ok = (*comp)(key, ths->name);
     if (ok == 0)
-       {v = NULL;
-
-/* remove from array */
-	SC_array_set(ha->a, ths->iar, &v);
-
-/* remove from haelem list */
-	*prv = ths->next;
-
-	_SC_free_haelem(ha, ths);
-
-	ha->ne--;};
+       {*prv = ths->next;
+	_SC_haelem_remove(ha, ths);};
 
     return(ok);}
 

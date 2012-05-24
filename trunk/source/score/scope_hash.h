@@ -137,7 +137,10 @@ extern int
  SC_hasharr_sort(hasharr *ha, PFIntBin pred);
 
 extern long
- SC_hasharr_get_n(hasharr *ha);
+ SC_hasharr_get_n(hasharr *ha),
+ SC_hasharr_prune(hasharr *ha,
+		  int (*pred)(hasharr *ha, haelem *hp, void *a),
+		  void *a);
 
 extern char
  **SC_hasharr_dump(hasharr *ha, char *patt, char *type, int sort);
