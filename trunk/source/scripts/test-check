@@ -182,6 +182,7 @@ switch ($tgt)
         set exe     = ""
         set rpf     = ""
         set mode    = major
+        set rev     = FALSE
 
         while ($#argv > 0)
            switch ("$1")
@@ -202,12 +203,13 @@ switch ($tgt)
                    endif
                    breaksw
               case -h:
-                   echo "Usage: test-check $tgt [-a <tst>] [-dt <time>] [-e <status>] [-h] [-l] [-rpf <files>] [-x <exe>] <msg>"
+                   echo "Usage: test-check $tgt [-a <tst>] [-dt <time>] [-e <status>] [-h] [-l] [-r] [-rpf <files>] [-x <exe>] <msg>"
                    echo "   a     set advisory for test <tst>"
                    echo "   dt    time taken for test"
                    echo "   e     exit status of the test"
                    echo "   h     this help message"
                    echo "   l     print status as ok/ng rather than PASSED/FAILED"
+                   echo "   r     reverse exit status: 0 fails, 1 passes"
                    echo "   rpf   remove <files> if test passes"
                    echo "   x     full path to test executable"
                    echo "   <msg> test id message"
@@ -215,6 +217,9 @@ switch ($tgt)
                    exit(1)
               case -l:
                    set mode = minor
+                   breaksw
+              case -r:
+                   set rev = TRUE
                    breaksw
               case -rpf:
                    shift
@@ -269,6 +274,7 @@ switch ($tgt)
         endif
 
 	if ("$msg" != "") then
+           set lpass = none
            switch ($xstatus)
 # no resources
               case 255:
@@ -313,25 +319,44 @@ switch ($tgt)
                    endif
                    breaksw
               case 0:
-                   if ($mode == major) then
-                      NoteD $log " PASSED ($dt)"
+                   if ($rev == FALSE) then
+                      set lpass = pass
                    else
-                      NoteD $log " ok ($dt)"
+                      set lpass = fail
                    endif
                    breaksw
               default:
-                   if ($mode == major) then
-                      NoteD $log " FAILED ($xstatus/$dt)"
+                   if ($rev == FALSE) then
+                      set lpass = fail
                    else
-                      NoteD $log " ng ($xstatus/$dt)"
+                      set lpass = pass
                    endif
                    breaksw
            endsw
+
+           if ($lpass == pass) then
+              if ($mode == major) then
+                 NoteD $log " PASSED ($dt)"
+              else
+                 NoteD $log " ok ($dt)"
+              endif
+           else if ($lpass == fail) then
+              if ($mode == major) then
+                 NoteD $log " FAILED ($xstatus/$dt)"
+              else
+                 NoteD $log " ng ($xstatus/$dt)"
+              endif
+           endif
+
         endif
 
 # determine ultimate exit status
         switch ($xstatus)
            case 0:
+                if ($rev == TRUE) then
+                   set terr = 1
+                   breaksw
+                endif
 # no resources
            case 255:
 # batch controller failed
@@ -360,7 +385,11 @@ switch ($tgt)
 # leaked
            case 250:
            default:
-                set terr = 1
+                if ($rev == TRUE) then
+                   set terr = 0
+                else
+                   set terr = 1
+                endif
                 breaksw
         endsw
 

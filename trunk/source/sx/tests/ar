@@ -40,8 +40,9 @@ if (($THREADING == no) && ($HAVE_MPI == no)) then
       endif
    endif
 
-   flog $Log touch pdbvar.foo
+   touch pdbvar.foo
    set rpf = ( $rpf pdbvar.* )
+   rm pdbvar.foo
 
 endif
 

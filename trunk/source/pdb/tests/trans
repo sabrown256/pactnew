@@ -14,6 +14,7 @@ InitLog Log $TestDir/log.trans.$LogSfx
 
 set msg = "PDB Translation Test ..............."
 set exe = $BinDir/pdctrns
+set io  = flog
 
 NoteD $Log ""
 NoteD $Log "                    $msg"
@@ -46,8 +47,14 @@ else
          shift lst
          Note $Log "-------------------"
          Note $Log "   $ostd   $file"
-         flog $Log $CFE $exe $ostd $TFile -f $file
-         if ($status != 0) then
+
+         set opt = ( $ostd $TFile -f $file )
+         source ../../../scripts/test-run
+
+#         flog $Log $CFE $exe $ostd $TFile -f $file
+         if ($xstatus >= 254) then
+            NoteD $Log -n "o"
+         else if ($xstatus != 0) then
             @ lerr = $lerr + 1
             NoteD $Log -n "x"
          else if (-f $ref) then
@@ -89,15 +96,19 @@ else
          shift lst
          Note $Log "-------------------"
          Note $Log "   $istd   $file   $ref"
-         flog $Log $CFE $exe $istd $file -f $res
-         if ($status != 0) then
+
+         set opt = ( $istd $file -f $res )
+         source ../../../scripts/test-run
+
+         if ($xstatus >= 254) then
+            NoteD $Log -n "o"
+         else if ($xstatus != 0) then
             @ lerr = $lerr + 1
             NoteD $Log -n "x"
          else if (-f $ref) then
             flog $Log diff -i $res $ref
 #            flog $Log cmp -l $res $ref
             if ($status != 0) then
-#               @ lerr = $lerr + 1
                NoteD $Log -n "+"
                flog $Log cat $res
             else
@@ -122,7 +133,9 @@ else
    endif
 endif
 
+touch tst-foo
 set rpf = ( $rpf tst-*)
+rm tst-foo
 
 $TEST_CHECK part -a trans -e $xstatus -x $exe -rpf "$rpf" "$msg"
 

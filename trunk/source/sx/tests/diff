@@ -11,31 +11,37 @@
 source ../../tests/common
 
 set msg = "PDBDiff Test ................."
-set exe = $BinDir/sx
+set rpf = ""
 
-set Ultra   = "$CFE $BinDir/ultra -e -r -x -q -s $ZeroSpace"
-set PDBDiff = "$CFE $BinDir/pdbdiff -e -x -q $ZeroSpace"
+NoteD $Log ""
+NoteD $Log "                    $msg"
+Note $Log ""
 
-   NoteD $Log ""
-   NoteD $Log "                    $msg"
+set ulopt = "-e -r -x -q -s $ZeroSpace"
+set dfopt = "-e -x -q $ZeroSpace"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# MAKE_DATA
+
+   NoteD $Log -n "                       Make data ................."
    Note $Log ""
 
    flog $Log rm -f pdbd*.dat pdbd.res pdbd.res.diff
 
    flog $Log touch pdbd.res
 
-   flog $Log $Ultra -l $FilesDir/pdbdtu.scm
-   set xstatus = $status
+   set exe = $BinDir/ultra
+   set opt = ( $ulopt -l $FilesDir/pdbdtu.scm )
+   set io  = flog
 
-   if (($xstatus == 254) || ($xstatus == 255)) then
-      NoteD $Log "omitted"
-   else if ($xstatus != 0) then
-      NoteD $Log " FAILED (-1)"
-      NoteD $Log "                       Making data failed"
-      @ nerr = $nerr + 1
-   else
+   source ../../../scripts/test-run
 
-      Note $Log "PDBDiff = |$PDBDiff|"
+   $TEST_CHECK part -a diff_make -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
+   flog $Log @ nerr = $nerr + $status
+
+   if ($nerr == 0) then
       Note $Log "SCHEME  = |$SCHEME|"
       if ($?PACT == 1) then
          Note $Log "PACT  = |$PACT|"
@@ -45,59 +51,73 @@ set PDBDiff = "$CFE $BinDir/pdbdiff -e -x -q $ZeroSpace"
       if ($?DO_RUN_SUBMIT_ENV == 1) then
          Note $Log "DO_RUN_SUBMIT_ENV = |$DO_RUN_SUBMIT_ENV|"
       endif
+   endif
 
-# test 1 - all mappings
-      NoteD $Log -n "                       All mappings .............. "
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# TEST_1 - all mappings
+
+   if ($nerr == 0) then
+      NoteD $Log -n "                       All mappings .............."
       Note $Log ""
 
-      set t0 = `$TIMER -r`
+      set exe = $BinDir/pdbdiff
+      set opt = ( $dfopt -v -w pdbda.dat pdbdb.dat )
+      set io  = pdbd.res
 
-      flog $Log ($PDBDiff -v -w pdbda.dat pdbdb.dat >>& pdbd.res)
-      set xstatus = $status
+      source ../../../scripts/test-run
 
-      set dt = `$TIMER -b $t0`
-      unset t0
+      $TEST_CHECK part -a diff_all -e $xstatus -dt $dt -x $exe -l -r -rpf "$rpf" none
+      flog $Log set xstatus = $status
+      flog $Log @ nerr = $nerr + $xstatus
 
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $Log "omitted"
-      else if ($xstatus == 0) then
-         NoteD $Log "FAILED ($dt)"
-         NoteD $Log "                       Erroneous agreement"
+      if ($xstatus == 1) then
+         NoteD $Log "erroneous agreement ($dt)"
          @ nerr = $nerr + 1
-      else
-         echo  "Checking for 1 different mapping" >>& pdbd.res
-         grep "1 mapping out of 4 differs between pdbda.dat and pdbdb.dat:" pdbda.dat.chk >>& pdbd.res
-         if ($status == 0) then
-            NoteD $Log "ok"
-         else
-            NoteD $Log "ng"
+      else if ((-f pdbd.res) && (-f pdbda.dat.chk)) then
+         Note $Log "Checking for 1 different mapping"
+         flog $Log grep "1 mapping out of 4 differs between pdbda.dat and pdbdb.dat:" pdbda.dat.chk
+         if ($status != 0) then
+            @ nerr = $nerr + 1
+         endif
+         set rpf = ( $rpf pdbd*.dat pdbd*.dat.chk )
+      endif
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# TEST_2 - selected mappings
+
+   if ($nerr == 0) then
+      NoteD $Log -n "                       Selected mappings ........."
+      Note $Log ""
+
+      set exe = $BinDir/pdbdiff
+      set opt = ( $dfopt -v -w pdbda.dat pdbdb.dat -M 2 4 )
+      set io  = pdbd.res
+
+      source ../../../scripts/test-run
+
+      $TEST_CHECK part -a diff_select -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
+      if ($status != 0) then
+         flog $Log @ nerr = $nerr + 1
+         if (-f pdbd.res) then
             NoteD $Log ""
             ftee $Log cat pdbd.res
             NoteD $Log ""
-            @ nerr = $nerr + 1
          endif
       endif
-
-# test 2 - selected mappings
-      NoteD $Log -n "                       Selected mappings ......... "
-      Note $Log ""
-      flog $Log ($PDBDiff -v -w pdbda.dat pdbdb.dat -M 2 4 >&! pdbd.res)
-      set xstatus = $status
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $Log "omitted"
-      else if ($xstatus == 0) then
-         NoteD $Log "ok"
-      else
-         NoteD $Log "ng"
-         NoteD $Log ""
-         ftee $Log cat pdbd.res
-         NoteD $Log ""
-         @ nerr = $nerr + 1
-      endif
-
-      set rpf = ( $rpf pdbd*.dat pdbd.res pdbd*.dat.chk )
-   
+      touch pdbd-foo.dat pdbd-foo.dat.chk
+      set rpf = ( $rpf pdbd*.dat pdbd*.dat.chk )
+      rm pdbd-foo.dat pdbd-foo.dat.chk
    endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+set rpf = ( $rpf pdbd.res )
 
 $TEST_CHECK part -a diff -e $nerr -rpf "$rpf" "$msg"
 

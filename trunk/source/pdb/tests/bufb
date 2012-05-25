@@ -14,6 +14,7 @@ set msg = "PDB Buffer Test B .................."
 set exe = $BinDir/tpdb
 #set opt = ( -n -v $tst )
 set opt = ( -n )
+set io  = flog
 
 set STRACE = ( `which strace` )
 
@@ -27,22 +28,17 @@ if ("$Valgrind" == "") then
    @ lerr = 0
 
    foreach n ( 3 13 127 4093 32749 )
-      set fill = `fill-string -n 32 $n`
-      flog $Log $CFE $exe $opt -b $n
-
 #   foreach n ( 13 127 4093 32749 )
-#      set fill = `fill-string -n 32 $n`
-#      flog $Log $CFE $exe -b $n $opt
+      set fill = `fill-string -n 32 $n`
+      NoteD $Log -n "                        $fill"
 
-      set xstatus = $status
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $Log "                        $fill (omitted)"
-      else if ($xstatus == 0) then
-         NoteD $Log "                        $fill (ok)"
-      else
-         NoteD $Log "                        $fill (ng)"
-         @ lerr = $lerr + 1
-      endif
+      set lopt = ( $opt -b $n )
+
+      source ../../../scripts/test-run
+
+      $TEST_CHECK part -a bufb_${n} -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
+      @ lerr = $lerr + $status
+
    end
 
    $TEST_CHECK part -a bufb -e $xstatus -x $exe "$msg"

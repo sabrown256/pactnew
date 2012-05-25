@@ -24,18 +24,17 @@ set io  = intp.res
    source ../../../scripts/test-run
 
    if ($xstatus == 0) then
-      foreach i (intp.ps)
-         if (-f $FilesDir/ref/$i) then
-            flog $Log ($CFE $PSDIFF $i $FilesDir/ref/$i >&! $i.diff)
-            @ st = $status
-            @ xstatus = $xstatus + $st
-            Note $Log "Test $i:r status $st"
-         endif
-      end
+      set i = intp.ps
+      if (-f $FilesDir/ref/$i) then
+         flog $Log ($CFE $PSDIFF $i $FilesDir/ref/$i >&! $i.diff)
+         @ xstatus = $status
+         Note $Log "Test $i:r status $xstatus"
+      endif
    endif
 
-   touch intp_junk_.diff
+   touch intp_foo_.diff
    set rpf = ( $rpf intp.res.diff intp.res intp.ps intp*.diff )
+   rm intp_foo_.diff
 
 $TEST_CHECK part -a intp -e $xstatus -dt $dt -rpf "$rpf" none
 

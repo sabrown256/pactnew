@@ -26,7 +26,9 @@ set io  = flog
       set xstatus = $status
    endif
 
+   touch sxaxs.foo
    set rpf = ( $rpf sxaxs.* )
+   rm -f sxaxs.foo
 
 $TEST_CHECK part -a axis -e $xstatus -dt $dt -rpf "$rpf" none
 
