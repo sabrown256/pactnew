@@ -6,6 +6,12 @@
 set Package = panacea
 source ../../scripts/env-csh
 
+set exe = $BinDir/panache
+set io  = flog
+set rpf = ""
+
+@ nerr = 0
+
 set DevInc    = $SysDir/include
 set MISrc     = $DevInc/make-def
 set CCompiler = `pact +l -info Cfg_CC_Exe | uniq`
@@ -15,7 +21,6 @@ set Inc       = "-I. -I$DevInc $MDGInc"
 set CCompiler = $CCompiler[$#CCompiler]
 
 InitLog Log $TestDir/log.panache
-set Err = 0
 
 Note $Log "CCompiler = |$CCompiler|"
 Note $Log "CFLAGS    = |$CFLAGS|"
@@ -36,62 +41,52 @@ cat >! pkgmac.h << EOF
  */
 EOF
 
-NoteD $Log -n "                       Single package ............. "
-Note $Log " "
+   NoteD $Log -n "                       Single package ............."
+   Note $Log " "
 
-flog $Log panache pkg.dict
-set xstatus = $status
-if ($xstatus == 0) then
-   flog $Log $PX $CCompiler $CFLAGS $Inc -c pkg.c -o pkg.o
-   set xstatus = $status
-endif
+   set opt = ( pkg.dict )
+   source ../../../scripts/test-run
 
-if (($xstatus == 254) || ($xstatus == 255)) then
-   NoteD $Log "omitted"
-else if ($xstatus != 0) then
-   NoteD $Log "failed"
-   set Err = 1
-else
-   NoteD $Log "ok"
-endif
+#   set xstatus = $status
+   if ($xstatus == 0) then
+      flog $Log $PX $CCompiler $CFLAGS $Inc -c pkg.c -o pkg.o
+      set xstatus = $status
+   endif
+
+   $TEST_CHECK part -a panache_single -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
+   @ nerr = $nerr + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # test building from whole code dictionary
 
-set LErr = 0
+   set lerr = 0
 
-NoteD $Log -n "                       Whole code ................. "
-Note $Log " "
+   NoteD $Log -n "                       Whole code ................."
+   Note $Log " "
 
-flog $Log panache code.dict
-set LErr = $status
-if ($LErr == 0) then
-   foreach i (pkg1 pkg2 pkg3 cgen crun)
-      flog $Log $PX $CCompiler $CFLAGS $Inc -c $i.c -o $i.o
-      set xstatus = $status
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         set LErr = $xstatus
-      else if ($xstatus != 0) then
-         set LErr = 1
-      endif
-   end
-endif
+   set opt = ( code.dict )
+   source ../../../scripts/test-run
 
-if (($LErr == 254) || ($LErr == 255)) then
-   NoteD $Log "omitted"
-else if ($LErr != 0) then
-   NoteD $Log "failed"
-   set Err = 1
-else
-   NoteD $Log "ok"
-endif
+   @ lerr = $xstatus
+   if ($lerr == 0) then
+      foreach i (pkg1 pkg2 pkg3 cgen crun)
+         flog $Log $PX $CCompiler $CFLAGS $Inc -c $i.c -o $i.o
+         set xstatus = $status
+         if ((0 < $xstatus) && ($xstatus < 254)) then
+            @ lerr = $lerr + 1
+         endif
+      end
+   endif
+
+   $TEST_CHECK part -a panache_whole -e $lerr -dt $dt -x $exe -l -rpf "$rpf" none
+   @ nerr = $nerr + $status
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-$TEST_CHECK part -a panache -e $Err
+$TEST_CHECK part -a panache -e $nerr
 
 exit($status)
 
