@@ -69,6 +69,9 @@ else
    echo '>    Consequent: a'
    echo '> setenv var6 a'
    echo 'foo'
+   set xstatus = 0
 endif
+
+echo "xstatus = $xstatus"
 
 exit(0)

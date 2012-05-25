@@ -56,6 +56,9 @@ else
          setenv DORUN     "$BinDir/do-run -m"
       endif
 
+      set exe = $DORUN
+      set io  = flog
+
 # debugging - not in a test
       foreach d ( off )
 
@@ -72,20 +75,16 @@ else
             set f = ( `fill-string -n 28 thread $t` )
 
             Separator $Log
-            NoteD $Log -n "                        $f "
+            NoteD $Log -n "                        $f"
             Note $Log ""
             Note $Log "run $args ($d | $t)"
 
-            flog $Log ( echo "end" | $DORUN -v $args sctty )
+            set opt = ( -v $args sctty )
+            flog $Log ( echo "end" | $exe $opt )
             set xstatus = $status
-            if (($xstatus == 254) || ($xstatus == 255)) then
-               NoteD $Log "omitted"
-            else if ($xstatus == 0) then
-               NoteD $Log "ok"
-            else
-               NoteD $Log "ng ($xstatus)"
-               flog $Log @ nerr = $nerr + 1
-            endif
+
+            $TEST_CHECK part -a verify_${t} -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
+            flog $Log @ nerr = $nerr + $status
 
             flog $Log $RM .tv.*
          end

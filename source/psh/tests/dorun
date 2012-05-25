@@ -52,7 +52,7 @@ InitLog Log $TestDir/log.dorun.$LogSfx
       Separator $Log
 
       set f = ( `fill-string -n 28 $t` )
-      NoteD $Log -n "                        $f "
+      NoteD $Log -n "                        $f"
       Note $Log ""
 
       set Res = $t.res
@@ -61,26 +61,37 @@ InitLog Log $TestDir/log.dorun.$LogSfx
       flog $Log ls ${t}*
 
       set noglob
-      flog $Log ($t -c $DORUN run |& sed 's|1 \* 1|1|g' |& sed 's|\./||g' | grep -v "DBG   = " >&! $Res)
+
+      set exe = $t
+      set opt = ( -c $DORUN )
+
+# run test
+      flog $Log ($exe $opt run |& sed 's|1 \* 1|1|g' |& sed 's|\./||g' | grep -v "DBG   = " >&! $Res)
       set xstatus = $status
-      flog $Log ($t -c $DORUN ans >&! $Ref)
+      flog $Log ls -l $Res
+
+# get fiducial
+      flog $Log ($exe $opt ans >&! $Ref)
       unset noglob
 
       if ("$Valgrind" == "") then
          flog $Log ( diff -w -b $Res $Ref >! $Res.diff )
          set xstatus = $status
+
+         flog $Log ( grep "xstatus = 25" $Res.diff >& /dev/null )
+         if ($status == 0) then
+            flog $Log set xstatus = 255
+         endif
       else
-         grep "ERROR SUMMARY: 0" $Res >! $Res.diff
+         flog $Log ( grep "ERROR SUMMARY: 0" $Res >! $Res.diff )
          set xstatus = $status
       endif
-      if ($xstatus == 0) then
-         NoteD $Log "ok"
-         flog $Log rm -f $Res $Ref $Res.diff
-      else
-         flog $Log cat $Res.diff
-         flog $Log @ nerr = $nerr + 1
-         NoteD $Log "ng"
-      endif
+
+      set rpf = ( $rpf $Res $Ref $Res.diff )
+
+      $TEST_CHECK part -a dorun_${t} -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
+      flog $Log @ nerr = $nerr + $status
+
    end
 
    set rpf = ( $rpf run.* s* )

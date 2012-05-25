@@ -60,6 +60,9 @@ else
    echo '*** error: bad syntax for var8: "(1 == 1) a ? : b"'
    echo '*** error: bad syntax for var9: "(1 == 1) a b ? :"'
    echo 'foo'
+   set xstatus = 0
 endif
+
+echo "xstatus = $xstatus"
 
 exit(0)

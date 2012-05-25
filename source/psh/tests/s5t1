@@ -46,6 +46,9 @@ else
    echo "> Foo already has value 'a'"
    echo '> setenv Cmd no-op'
    echo 'no-op'
+   set xstatus = 0
 endif
+
+echo "xstatus = $xstatus"
 
 exit(0)
