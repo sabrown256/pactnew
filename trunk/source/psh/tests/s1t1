@@ -52,4 +52,6 @@ else
    set xstatus = 0
 endif
 
+echo "xstatus = $xstatus"
+
 exit($xstatus)

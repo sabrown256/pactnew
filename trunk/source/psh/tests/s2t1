@@ -87,6 +87,9 @@ else
    echo '>    Alternate: -unsetenv-'
    echo '> unsetenv var14'
    echo 'foo'
+   set xstatus = 0
 endif
+
+echo "xstatus = $xstatus"
 
 exit(0)

@@ -10,7 +10,7 @@
 
 set exe = do-run
 set tgt = ans
-set opt = ( -level 2 -dr -dbg bar -mpi foo -s run.s1 s1t2
+set opt = ( -level 2 -dr -dbg bar -mpi foo -s run.s1 s1t2 )
 set io  = none
 
 while ($#argv > 0)
@@ -53,6 +53,9 @@ else
    echo 'Skipping DBG section baz'
    echo 'Running under bardbg'
    echo 'bardbg foorun -a -p 1 s1t2'
+   set xstatus = 0
 endif
+
+echo "xstatus = $xstatus"
 
 exit(0)

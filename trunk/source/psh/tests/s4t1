@@ -65,6 +65,9 @@ else
    echo '> setenv var5 0 a b 2 c 4'
    echo '> setenv Cmd $var4'
    echo '0 a b 2 c 4'
+   set xstatus = 0
 endif
+
+echo "xstatus = $xstatus"
 
 exit(0)
