@@ -30,7 +30,9 @@ if ($CROSS_COMPILE == FALSE) then
       source ../../../scripts/test-run
    endif
 
+   touch mft.foo
    set rpf = ( $rpf mft.* )
+   rm mft.foo
 
 endif
 

@@ -56,14 +56,23 @@ set exe = $BinDir/pcexec
 
          if ($xstatus != 0) then
             if ("$Valgrind" == "") then
-               diff pcexec.refi pcexec.ptyi > pcexec.diffi
-               set Files = `find . -name "pcexec.diffi" -size 0c -print`
-               diff pcexec.refp pcexec.ptyp > pcexec.diffp
-               set Files = `find . -name "pcexec.diffp" -size 0c -print`
+               set Files = ""
+               if ((-f pcexec.refi) && (-f pcexec.ptyi)) then
+                  diff pcexec.refi pcexec.ptyi > pcexec.diffi
+                  set Files = `find . -name "pcexec.diffi" -size 0c -print`
+               endif
+               if ((-f pcexec.refp) && (-f pcexec.ptyp)) then
+                  diff pcexec.refp pcexec.ptyp > pcexec.diffp
+                  set Files = `find . -name "pcexec.diffp" -size 0c -print`
+               endif
+
+               touch pcexec.diff-foo pcexec.pty-foo
                set rpf = ( $rpf pcexec.diff* pcexec.pty* pcexec.ref* )
+               rm pcexec.diff-foo pcexec.pty-foo
             else
                set Files = 1
             endif
+
             if ($#Files == 0) then
                @ nerr = $nerr + 1
             endif

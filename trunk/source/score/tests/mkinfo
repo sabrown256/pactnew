@@ -39,23 +39,40 @@ if ($ok == TRUE) then
 
    foreach m (smake dmake)
       Separator $Log
-      set f = ( `fill-string -n 28 $m` )
-      NoteD $Log -n "                       $f "
+      set f = ( `fill-string -n 19 $m` )
+      NoteD $Log -n "                       $f"
       Note $Log ""
       @ lerr = 0
       foreach v ($vars)
-         flog $Log $m -info $v
-         if ($status != 0) then
-            Note $Log "Test $v failed for $m"
-            @ lerr = $lerr + 1
+         set exe = $m
+         set io  = flog
+         set opt = ( -info $v )
+         source ../../scripts/test-run
+
+         if ($xstatus >= 254) then
+            NoteD $Log -n "o"
+            Note $Log ""
+         else if ($xstatus == 123) then
+            NoteD $Log -n "*"
+            Note $Log ""
+         else if ($xstatus != 0) then
+            NoteD $Log -n "x"
+            set lerr = 1
+            Note $Log ""
          else
-            Note $Log "Test $v passed for $m"
+            NoteD $Log -n "."
+            Note $Log ""
          endif
+
+         $TEST_CHECK part -a mkinfo_${m}_${v} -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" ""
+         set xstatus = $status
+         @ lerr = $lerr + $xstatus
       end
+
       if ($lerr == 0) then
-         NoteD $Log "ok"
+         NoteD $Log " ok"
       else
-         NoteD $Log "ng"
+         NoteD $Log " ng"
          @ nerr = $nerr + 1
       endif
    end

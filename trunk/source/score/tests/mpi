@@ -44,15 +44,21 @@ endif
       Note $Log ""
       if ("$MPI" != "") then
 
-         set lTime = `$TIMER -r`
+         set dt = `$TIMER -r`
          flog $Log $PFE -dr -p 2 $exe -t
-         @ NOut = `echo "a" | $PFE -p 2 $exe -t |& grep "Proc" |& wc -l`
-         set lTime = `$TIMER -b $lTime`
-
-         if ($NOut < 2) then
-            NoteD $Log "one process only ($lTime)"
+         if ($status >= 254) then
+            @ NOut = 255
          else
-            NoteD $Log "all processes ($lTime)"
+            @ NOut = `echo "a" | $PFE -p 2 $exe -t |& grep "Proc" |& wc -l`
+         endif
+         set dt = `$TIMER -b $dt`
+
+         if ($NOut == 255) then
+            NoteD $Log "omitted ($dt)"
+         else if ($NOut < 2) then
+            NoteD $Log "one process only ($dt)"
+         else
+            NoteD $Log "all processes ($dt)"
          endif
       else
          NoteD $Log "not MPI (0)"
