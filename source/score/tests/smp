@@ -11,7 +11,7 @@
 source ../../tests/common
 
 set msg = "SCORE Parallel Test ..........."
-set exe = $BinDir/tscthr
+set io  = flog
 
    NoteD $Log ""
    NoteD $Log "                    $msg"
@@ -52,6 +52,7 @@ set exe = $BinDir/tscthr
 
 # THREAD - test thread execution
 
+      set exe = $BinDir/tscthr
       foreach arg (" " "-m 100")
          NoteD $Log ""
 
@@ -84,10 +85,10 @@ set exe = $BinDir/tscthr
             NoteD $Log -n "                          $Name      "
 
             foreach n ($NThrds)
-               flog $Log $CFE $exe $arg -n $n $mode -d 1 -s
-               set xstatus = $status
+               set opt = ( $arg -n $n $mode -d 1 -s )
+               source ../../../scripts/test-run
 
-               if (($xstatus == 254) || ($xstatus == 255)) then
+               if ($xstatus >= 254) then
                   NoteD $Log -n "o"
                   Note $Log ""
                else if ($xstatus == 123) then
@@ -117,6 +118,7 @@ set exe = $BinDir/tscthr
       NoteD $Log "                       Thread Lock Test"
       NoteD $Log "                          # Items   # Threads ($NThrds)"
 
+      set exe = $BinDir/tsctl
       foreach mode (10 100 1000)
          set LUTime = `$TIMER -r`
 
@@ -124,10 +126,13 @@ set exe = $BinDir/tscthr
          echo $mode | awk '{printf("%-4s      ", $1);}'
 
          foreach n ($NThrds)
-            flog $Log $CFE $BinDir/tsctl -nd $mode -nt $n
-            set xstatus = $status
+            set opt = ( -nd $mode -nt $n )
+            source ../../../scripts/test-run
 
-            if (($xstatus == 123) || ($xstatus == 255) || ($xstatus == 254)) then
+            if ($xstatus >= 254) then
+               NoteD $Log -n "o"
+               Note $Log ""
+            else if ($xstatus == 123) then
                NoteD $Log -n "*"
                Note $Log ""
             else if ($xstatus != 0) then

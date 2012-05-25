@@ -36,12 +36,13 @@ if (($CROSS_COMPILE == FALSE) && ($PACT_CC_FAMILY != INTEL)) then
 # GOTCHA: bad chicken and egg logic because of the way make-def works
       set lom = ( `ldd $exe |& grep libosmm | awk '{print $3}'` )
       Note $Log "Full path to libosmm.so is $lom"
+
       if (("$Valgrind" == "") && (-f "$lom")) then
 #         ftee $Log ( ( setenv LD_PRELOAD $LibDir/libosmm.so ; $CFE $exe ) |& grep -v "Dwarf Error" |& grep -iwv error )
 #         ftee $Log ( ( setenv LD_PRELOAD $LibDir/libosmm.so ; $CFE $exe ) |& grep -v "Dwarf Error" )
 #         ftee $Log ( setenv LD_PRELOAD $LibDir/libosmm.so ; $CFE $exe )
-         ftee $Log $CFE $exe
-         set xstatus = $status
+
+         source ../../../scripts/test-run
       endif
    else
       Note $Log "Failed to build tscmo - skipping"
