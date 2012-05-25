@@ -30,63 +30,67 @@ else
    flog $Log pwd
 
    if ($err == 0) then
-      NoteD $Log -n "                       Running test .............. "
+      NoteD $Log -n "                       Running test .............."
       Note $Log ""
-      set lt = `timer -r`
-      flog $Log ( pdbview -q -e -l intp-df.scm >&! intp-df.dat )
+
+      set exe = $BinDir/sx
+      set opt = ( $pvopt -l intp-df.scm )
+      set io  = intp-df.dat
+
+      source ../../../scripts/test-run
+
+      $TEST_CHECK part -a intp-df_run -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
       @ err = $err + $status
-      set lt = `timer -b $lt`
-      if ($err == 0) then
-         NoteD $Log "ok ($lt)"
-      else
-         NoteD $Log "ng ($err/$lt)"
-      endif
+
    endif
 
    if ($err == 0) then
-      NoteD $Log -n "                       Converting tables ......... "
+      NoteD $Log -n "                       Converting tables ........."
       Note $Log ""
-      set lt = `timer -r`
-      flog $Log ultra -q -e -s -l intp-df-proc.scm
+
+      set exe = $BinDir/ultra
+      set opt = ( -q -e -s -l intp-df-proc.scm )
+      set io  = flog
+
+      source ../../../scripts/test-run
+
+      $TEST_CHECK part -a intp-df_conv -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
       @ err = $err + $status
-      set lt = `timer -b $lt`
-      if ($err == 0) then
-         NoteD $Log "ok ($lt)"
-      else
-         NoteD $Log "ng ($err/$lt)"
-      endif
+
    endif
 
    if ($err == 0) then
       set ref = $RefDir/intp-df.u
-      NoteD $Log -n "                       Comparing curves .......... "
+      NoteD $Log -n "                       Comparing curves .........."
       Note $Log ""
-      set lt = `timer -r`
 
 # 0.75 is one horrid tolerance but the MQ seems to be
 # pretty unstable against round off
-      flog $Log pdbdiff -q -e -v -w -t 0.75 intp-df.u $ref -M 1 2 7 8 9 10 15 16 17 18 23 24 25 26 31
+      set exe = $BinDir/pdbdiff
+      set opt = ( -q -e -v -w -t 0.75 intp-df.u $ref )
+      set opt = ( $opt -M 1 2 7 8 9 10 15 16 17 18 23 24 25 26 31 )
+      set io  = flog
+
+      source ../../../scripts/test-run
+
+      $TEST_CHECK part -a intp-df_diff -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
       @ err = $err + $status
-      set lt = `timer -b $lt`
-      if ($err == 0) then
-         NoteD $Log "ok ($lt)"
-      else
-         NoteD $Log "ng ($err/$lt)"
-      endif
+
    endif
 
    if (($err == 0) && ($make_ps == TRUE)) then
-      NoteD $Log -n "                       Making plots .............. "
+      NoteD $Log -n "                       Making plots .............."
       Note $Log ""
-      set lt = `timer -r`
-      flog $Log ultra -q -e -l intp-df-plot.scm
+
+      set exe = $BinDir/ultra
+      set opt = ( -q -e -l intp-df-plot.scm )
+      set io  = flog
+
+      source ../../../scripts/test-run
+
+      $TEST_CHECK part -a intp-df_plot -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
       @ err = $err + $status
-      set lt = `timer -b $lt`
-      if ($err == 0) then
-         NoteD $Log "ok ($lt)"
-      else
-         NoteD $Log "ng ($err/$lt)"
-      endif
+
    endif
 
    $TEST_CHECK part -a intp-df -e $err -dt $dt -rpf "$rpf" $msg

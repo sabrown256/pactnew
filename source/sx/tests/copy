@@ -65,11 +65,10 @@ set exe = $BinDir/pdbcp
       set opt   = ( $opt $files )
       set io    = cp-$it.res
 
-      NoteD $Log -n "                       $lbl ........................ "
+      NoteD $Log -n "                       $lbl ........................"
       Note $Log ""
 
       source ../../../scripts/test-run
-      @ nerr = $nerr + $xstatus
 
       Note $Log "cp-$it.pdb status = $xstatus"
 
@@ -91,14 +90,8 @@ endif
 
       flog $Log cat cp-$it.res
 
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $Log "omitted"
-      else if ($xstatus == 0) then
-         NoteD $Log "ok ($dt)"
-      else
-         NoteD $Log "ng ($dt)"
-         @ nerr = $nerr + 1
-      endif
+      $TEST_CHECK part -a pdb_copy_${it} -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
+      @ nerr = $nerr + $status
 
    end
 

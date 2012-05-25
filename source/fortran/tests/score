@@ -36,7 +36,7 @@ Note $Log ""
 
    source ../../../scripts/test-run
 
-   if ("$Valgrind" == "") then
+   if (("$Valgrind" == "") && ($xstatus == 0)) then
       diff tscls.res $RefDir/tscls > tscls.res.diff
       set rpf = ( $rpf tscls.res.diff )
    endif

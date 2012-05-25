@@ -15,67 +15,77 @@
 # include "cpyright.h"
 #
 
-set t0 = `$TIMER -r`
+set test_run_dbg = FALSE
+#set test_run_dbg = TRUE
 
-switch ($io)
-   case ftee:
-        if ("$Valgrind" == "") then
-           ftee $Log $CFE $exe $opt
-           set xstatus = $status
-        else
-           ftee $Log $Valgrind $exe $opt           |& \
-           grep "ERROR SUMMARY:"                   |& \
-           awk '{ print $4 }'   >&! $Tmp
-           set xstatus = `cat $Tmp`
-           set rpf     = ( $rpf $Tmp )
-        endif
-        breaksw
+if ($test_run_dbg == TRUE) then
+   set xstatus = 255
+   setenv dt 0
 
-   case flog:
-        if ("$Valgrind" == "") then
-           flog $Log $CFE $exe $opt
-           set xstatus = $status
-        else
-           ftee $Log $Valgrind $exe $opt           |& \
-           grep "ERROR SUMMARY:"                   |& \
-           awk '{ print $4 }'   >&! $Tmp
-           set xstatus = `cat $Tmp`
-           set rpf     = ( $rpf $Tmp )
-        endif
-        breaksw
+else
 
-   case none:
-        if ("$Valgrind" == "") then
-           $exe $opt
-           set xstatus = $status
-        else
-           $Valgrind $exe $opt                     |& \
-           grep "ERROR SUMMARY:"                   |& \
-           awk '{ print $4 }'   >&! $Tmp
-           set xstatus = `cat $Tmp`
-           set rpf     = ( $rpf $Tmp )
-        endif
-        breaksw
+   set t0 = `$TIMER -r`
 
-   default:
-        if ("$Valgrind" == "") then
-           flog $Log ($CFE $exe $opt >&! $io)
-           set xstatus = $status
-        else
-           ftee $Log $Valgrind $exe $opt           |& \
-           grep "ERROR SUMMARY:"                   |& \
-           awk '{ print $4 }'   >&! $Tmp
-           set xstatus = `cat $Tmp`
-           set rpf     = ( $rpf $Tmp )
-        endif
-        breaksw
-endsw
+   switch ($io)
+      case ftee:
+           if ("$Valgrind" == "") then
+              ftee $Log $CFE $exe $opt
+              set xstatus = $status
+           else
+              ftee $Log $Valgrind $exe $opt           |& \
+              grep "ERROR SUMMARY:"                   |& \
+              awk '{ print $4 }'   >&! $Tmp
+              set xstatus = `cat $Tmp`
+              set rpf     = ( $rpf $Tmp )
+           endif
+           breaksw
 
-setenv dt `$TIMER -b $t0`
+      case flog:
+           if ("$Valgrind" == "") then
+              flog $Log $CFE $exe $opt
+              set xstatus = $status
+           else
+              ftee $Log $Valgrind $exe $opt           |& \
+              grep "ERROR SUMMARY:"                   |& \
+              awk '{ print $4 }'   >&! $Tmp
+              set xstatus = `cat $Tmp`
+              set rpf     = ( $rpf $Tmp )
+           endif
+           breaksw
+
+      case none:
+           if ("$Valgrind" == "") then
+              $exe $opt
+              set xstatus = $status
+           else
+              $Valgrind $exe $opt                     |& \
+              grep "ERROR SUMMARY:"                   |& \
+              awk '{ print $4 }'   >&! $Tmp
+              set xstatus = `cat $Tmp`
+              set rpf     = ( $rpf $Tmp )
+           endif
+           breaksw
+
+      default:
+           if ("$Valgrind" == "") then
+              flog $Log ($CFE $exe $opt >&! $io)
+              set xstatus = $status
+           else
+              ftee $Log $Valgrind $exe $opt           |& \
+              grep "ERROR SUMMARY:"                   |& \
+              awk '{ print $4 }'   >&! $Tmp
+              set xstatus = `cat $Tmp`
+              set rpf     = ( $rpf $Tmp )
+           endif
+           breaksw
+   endsw
+
+   setenv dt `$TIMER -b $t0`
 
 # GOTCHA: Note ends up not being defined in psh/tests/s1t1 et al
 # because of alias inheritance issues
 #Note $Log "test-run: $exe exit status = $xstatus"
 
-unset t0
+   unset t0
 
+endif

@@ -19,7 +19,7 @@ set rpf = none
 
    foreach t (iply1 iply2)
 
-      NoteD $Log -n "                       $t ..................... "
+      NoteD $Log -n "                       $t ....................."
       Note $Log ""
 
       set opt = ( $pvopt -l $FilesDir/$t.scm )
@@ -30,24 +30,16 @@ set rpf = none
       source ../../../scripts/test-run
 
       if ($xstatus == 0) then
-         foreach i ($t.ps)
-            if (-f $FilesDir/ref/$i) then
-               flog $Log ($CFE $PSDIFF $i $FilesDir/ref/$i >&! $i.diff)
-               @ st      = $status
-               @ xstatus = $xstatus + $st
-               Note $Log "Test $i:r status $st"
-            endif
-         end
+         set i = $t.ps
+         if (-f $FilesDir/ref/$i) then
+            flog $Log ($CFE $PSDIFF $i $FilesDir/ref/$i >&! $i.diff)
+            @ xstatus = $status
+            Note $Log "Test $i:r status $xstatus"
+         endif
       endif
 
-      if (($xstatus == 254) || ($xstatus == 255)) then
-         NoteD $Log "omitted"
-      else if ($xstatus != 0) then
-         NoteD $Log "ng ($dt)"
-         @ nerr = $nerr + 1
-      else
-         NoteD $Log "ok ($dt)"
-      endif
+      $TEST_CHECK part -a iply_${t} -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
+      @ nerr = $nerr + $status
 
    end
 

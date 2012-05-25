@@ -21,7 +21,9 @@ set io  = sxoper.res
 
    if ("$MPI" == "") then
       source ../../../scripts/test-run
+      touch sxoper-foo.ps
       set rpf = ( $rpf sxoper.res arr.dat sxoper*.ps )
+      rm -f sxoper-foo.ps
    endif
 
 $TEST_CHECK part -a oper -e $xstatus -dt $dt -rpf "$rpf" none

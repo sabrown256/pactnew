@@ -10,12 +10,14 @@
 
 source ../../tests/common
 
-set msg = "PDB Buffer Test A .................."
-set exe = $BinDir/tpdbf
-set opt = ( -v $tst )
+set msg  = "PDB Buffer Test A .................."
+set exe  = $BinDir/tpdbf
+set io   = ftee
+set ropt = ( -v $tst )
 
+set STRACE = ""
 #set STRACE = ( `which strace` )
-#if ((-x "$STRACE") && ($OS != AIX)) then
+if ($OS != AIX) then
 
    NoteD $Log ""
    NoteD $Log "                    $msg"
@@ -64,26 +66,41 @@ set opt = ( -v $tst )
 #            foreach c ( 1 4 16 )
             foreach c ( 4 )
                Separator $Log
-               ftee $Log $CFE $exe $opt -n $n -b $m -c $c
-#               Note $Log "Command: $STRACE $exe $opt -n $n -b $m -c $c"
-#               @ nwr = ( `$STRACE $exe $opt -n $n -b $m -c $c |& grep write | tee -a $Log | wc -l` )
-#               echo "$c $nr $mr $rat $nwr" | \
-#               awk '{printf("                       %3d      %4s  %5s %8s    %5d\n", $1, $2, $3, $4, $5);}'
+
+               set opt = ( $ropt -n $n -b $m -c $c )
+
+# run without strace
+               if ("$STRACE" == "") then
+                  source ../../../scripts/test-run
+
+                  $TEST_CHECK part -a bufa_${n} -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" ""
+                  @ nerr = $nerr + $status
+
+# run with strace
+               else
+                  Note $Log "Command: $STRACE $exe $opt"
+                  @ nwr = ( `$STRACE $exe $opt |& grep write | tee -a $Log | wc -l` )
+                  echo "$c $nr $mr $rat $nwr" | \
+                  awk '{printf("                       %3d      %4s  %5s %8s    %5d\n",  \
+                               $1, $2, $3, $4, $5);}'
+               endif
             end
          end
       end
-      set xstatus = $status
+
    else
-      ftee $Log $Valgrind $exe $opt            |& \
+      ftee $Log $Valgrind $exe $ropt           |& \
       grep "ERROR SUMMARY:"                    |& \
       awk '{ print $4 }'   >&! $Tmp
       set xstatus = `cat $Tmp`
-      set rpf     = ( $rpf $Tmp )
+
+      @ nerr  = $nerr + $xstatus
+      set rpf = ( $rpf $Tmp )
    endif
 
 #endif
 
-$TEST_CHECK part -a bufa -e $xstatus -x $exe -rpf "$rpf" "$msg"
+$TEST_CHECK part -a bufa -e $nerr -x $exe -rpf "$rpf" "$msg"
 
 exit($status)
 
