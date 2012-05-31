@@ -48,14 +48,22 @@ set prg   = ""
 set extra = ""
 set sys   = `system-id`
 
+set lst = ""
+foreach d ( `ls ../dev` )
+   if (-d $d) then
+      set lst = ( $lst $d/bin )
+   endif
+end
+
 if ($?DAS_ROOT == 1) then
-   set extra = ( $DAS_ROOT/pactnew/bin $DAS_ROOT/pact/bin )
+   set lst = ( $lst $DAS_ROOT/pactnew/bin $DAS_ROOT/pact/bin )
 endif
 
 # GOTCHA: this is very weak logic in a do-net situation
 set path = ( /usr/bin /bin . )
 rehash
-foreach d ( ../dev/*/bin $extra )
+
+foreach d ( $lst )
    pushd $d >>& /dev/null
 
    set ok = TRUE

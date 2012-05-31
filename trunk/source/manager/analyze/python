@@ -120,6 +120,7 @@ if (-d ../../python) then
                flog $ALog setenv PyExe "wrong-cc"
                flog $ALog setenv HavePython FALSE
             endif
+            flog $ALog setenv Python_Path $i
             flog $ALog set found = TRUE
             break
          endif

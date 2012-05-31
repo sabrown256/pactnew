@@ -1,0 +1,83 @@
+#
+# TPYPACT - shell script to test PyPACT existence
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+
+@ err = 0
+
+set lpact = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: tpypact [-h] [<pact>]"
+           echo "   h      this help message"
+           echo "   <pact> pact executable to be used as base"
+           echo ""
+           exit(1)
+      default:
+           set lpact = $1
+           breaksw
+   endsw
+   shift
+end
+
+if ("$lpact" == "") then
+   set lpact   = `which pact`
+endif
+
+set bindir  = $lpact:h
+set basedir = $bindir:h
+set vers    = `$lpact -info PyVers`
+set libdir  = $basedir/lib/python${vers}
+
+setenv PYTHONPATH $libdir
+
+set log = $cwd/log.tpypact
+rm -f $log
+touch $log
+
+set lst = ""
+set lst = ( $lst numeric pact )
+set lst = ( $lst numpy pact_2 )
+while ($#lst > 0)
+   set tag = $lst[1]
+   set bnd = $lst[2]
+   shift lst
+   shift lst
+
+   @ lerr = 0
+
+   cat >&! tpdb.py << EOF
+import ${bnd}.pdb as pdb
+fp = pdb.PDBfile("testfile", "w");
+ref = [2.0, 3.0]
+fp.write("d2", ref)
+fp.close()
+EOF
+
+   python tpdb.py >>& $log
+   @ lerr = $lerr + $status
+
+   if ($lerr == 0) then
+      ls -lf testfile >>& $log
+      @ lerr = $lerr + $status
+   endif
+
+   rm -f tpdb.py testfile >>& $log
+
+   @ err = $err + $lerr
+   set msg = "$tag $bnd"
+   set msg = `fill-string -n 20 $msg`
+   if ($lerr == 0) then
+      echo "   $msg ok"
+   else
+      echo "   $msg ng"
+   endif
+
+end
+
+exit($err)

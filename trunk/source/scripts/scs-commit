@@ -75,7 +75,7 @@ if (-d $gitd[1]) then
       set file = $inf[2]
       shift inf
       shift inf
-      if (-f $file) then
+      if ((-f $file) || ($tag == 'D')) then
          set files = ( $files $file )
          echo " $tag  $file"
       endif
@@ -89,7 +89,7 @@ if (-d $gitd[1]) then
 
 # GOTCHA: too many files and the echo hacks up a 'Word too long' hairball
    if ($#files < 40) then
-      echo "git commit $args -q -m '$msg' $files" >&! $log
+      echo "git commit $args -q -m '$msg' $files" >>& $log
    endif
 
    git commit $args -q -m "$msg" $files >>& $log

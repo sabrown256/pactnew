@@ -47,7 +47,7 @@ int main(int c, char **v)
 #if (H5_VERS_RELEASE < 4)
  H5Eset_auto(H5E_DEFAULT, NULL, stderr);
 #elif (H5_VERS_RELEASE >= 4)
- H5Eset_auto(H5E_DEFAULT, NULL);
+ H5Eset_auto1(H5E_DEFAULT, NULL);
 #endif
  H5check_version(H5_VERS_MAJOR, H5_VERS_MINOR, H5_VERS_RELEASE);
  return(0);}

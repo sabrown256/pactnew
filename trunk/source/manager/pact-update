@@ -433,7 +433,7 @@ endif
 
 if ($keep == "FALSE") then
    if (-d pact) then
-      NoteD $Log "Removing old PACT files"
+      Note $Log "Removing old PACT files"
       flog $Log rm -r pact
    endif
 endif
@@ -441,33 +441,24 @@ endif
 Note $Log ""
 switch ($srcmode)
    case tar:
-        NoteD $Log "Unpacking the PACT sources"
-        flog $Log rm -f $tarf
+        NoteD $Log -n "   untar ............. "
+        Note $Log ""
 
-        if (-e $tarf.gz) then
-           flog $Log gzip -d $tarf.gz
-        endif
-	if (-e $tarf.Z) then
-	   flog $Log uncompress $tarf.Z
-	endif
-
-        if ("$os" == sunos) then
-           set tarargs = xvomf
+        flog $Log tar xzvmf $tarf.gz
+        set xstatus = $status
+        if ($xstatus == 0) then
+           NoteD $Log "ok"
         else
-           set tarargs = xvmf
-        endif
-        flog $Log tar $tarargs $tarf
-        if ($status != 0) then
-           NoteD $Log ""
-           NoteD $Log "  ERROR: TAR failed"
-           NoteD $Log ""
-           exit($status)
+           NoteD $Log "ng ($xstatus)"
+           Note $Log ""
+           Note $Log "  ERROR: TAR failed"
+           Note $Log ""
+           exit($xstatus)
         endif
         unset tarargs
 
         flog $Log cd pact
 
-        NoteD $Log "PACT sources unpacked"
         breaksw
 
    case source:
@@ -475,16 +466,20 @@ switch ($srcmode)
         breaksw
 
    default:
-
-        NoteD $Log "Checking out the PACT Sources"
+        NoteD $Log -n "   check out ......... "
+        Note $Log ""
 
         set root = pactnew-read-only
         flog $Log svn co http://pactnew.googlecode.com/svn/trunk/ $root
-        if ($status != 0) then
-           NoteD $Log ""
-           NoteD $Log "  ERROR: Source Control System failed"
-           NoteD $Log ""
-           exit($status)
+        set xstatus = $status
+        if ($xstatus == 0) then
+           NoteD $Log "ok"
+        else
+           NoteD $Log "ng ($xstatus)"
+           Note $Log ""
+           Note $Log "  ERROR: Source Control System failed"
+           Note $Log ""
+           exit($xstatus)
         endif
 
 # delete an unnecessary directory layer */
@@ -492,9 +487,9 @@ switch ($srcmode)
         flog $Log rm -r $root
 
 # remove the source control sub-directories
-        NoteD $Log "Removing Source Control Information"
+        Note $Log "Removing Source Control Information"
         flog $Log scripts/scs-meta -d | xargs rm -r
-        NoteD $Log "PACT sources checked out"
+        Note $Log "PACT sources checked out"
         breaksw
 endsw
 
@@ -510,7 +505,7 @@ Note $Log "Current directory after source setup $cwd"
 
 #--------------------------------------------------------------------------
 
-NoteD $Log "Changing to manager directory: $mngdir"
+Note $Log "Changing to manager directory: $mngdir"
 flog $Log cd $mngdir
 flog $Log set base = $cwd:h
 
@@ -527,39 +522,54 @@ Note $Log "System = $System"
 
 set root   = $base/dev/$System
 set etcdir = $root/etc
+set scrdir = $base/scripts
 set envf   = $etcdir/env-pact.csh
 set versid = `cat ./.pact-version`
+set TIMER  = $scrdir/timer
 
-NoteD $Log "Configuring PACT version $versid ($System) with: $cargs"
+set bt = `$TIMER -r`
+
+Note $Log ""
+Note $Log "Building PACT version $versid ($System) with: $cargs"
+
+NoteD $Log -n "   configure ......... "
+set lt = `$TIMER -r`
 if ($vrb == TRUE) then
+   NoteD $Log ""
    ftee $Log ./dsys config $cargs
-   set LStat = $status
+   set xstatus = $status
 else
+   Note $Log ""
    flog $Log ./dsys config $cargs
-   set LStat = $status
+   set xstatus = $status
 endif
-if ($LStat == 2) then
+set lt = `$TIMER -b $lt`
+if ($xstatus == 0) then
+   NoteD $Log "ok ($lt)"
+else if ($xstatus == 2) then
+   NoteD $Log "ng ($xstatus/$lt)"
    tail -n 12 $Log
    exit(2)
-else if ($LStat != 0) then
-   NoteD $Log ""
-   NoteD $Log "  ERROR: DSYS CONFIG failed"
-   NoteD $Log ""
-   exit($LStat)
+else if ($xstatus != 0) then
+   NoteD $Log "ng"
+   Note $Log ""
+   Note $Log "  ERROR: DSYS CONFIG failed"
+   Note $Log ""
+   exit($xstatus)
 endif
 
 if ($cfgonly == TRUE) then
-   exit(0)
+   exit($xstatus)
 endif
 
-NoteD $Log "Sourcing environment file $envf for $System"
+Note $Log "Sourcing environment file $envf for $System"
 if (-e $envf) then
    source $envf
    rehash
 else
-   NoteD $Log ""
-   NoteD $Log "  ERROR: bad environment file"
-   NoteD $Log ""
+   Note $Log ""
+   Note $Log "  ERROR: bad environment file"
+   Note $Log ""
    exit(1)
 endif
 
@@ -569,44 +579,55 @@ endif
 
 #--------------------------------------------------------------------------
 
-   NoteD $Log "Compiling the PACT distribution"
-
    set DName = `cat ./.pact-date`
 
    if ($test == TRUE) then
       if ($vrb == TRUE) then
-         ftee $Log ./dsys update $force
-         set upresult = $status
+         ./dsys update $force -v
+         set xstatus = $status
       else
-         flog $Log ./dsys update $force
-         set upresult = $status
+         ./dsys update $force
+         set xstatus = $status
       endif
    else
+      NoteD $Log -n "   compile ........... "
+
+      set lt = `$TIMER -r`
       if ($vrb == TRUE) then
+         NoteD $Log ""
          ftee $Log ./dsys build
-         set upresult = $status
+         set xstatus = $status
       else
+         Note $Log ""
          flog $Log ./dsys build
-         set upresult = $status
+         set xstatus = $status
+      endif
+      set lt = `$TIMER -b $lt`
+      if ($xstatus == 0) then
+         NoteD $Log "ok ($lt)"
+      else
+         NoteD $Log "ng ($xstatus/$lt)"
       endif
    endif
-   Note $Log "Host: $host"
-   Note $Log "Date: `date`"
 
-   if ($upresult != 0) then
-      NoteD $Log ""
-      NoteD $Log "  ERROR: Make PACT failed"
-      NoteD $Log ""
-      NoteD $Log "See the log file:  $Log"
-      exit($status)
+   set et = `$TIMER -b $bt`
+   if ($xstatus != 0) then
+      NoteD $Log "PACT update failed ($xstatus/$et)"
+
+   else
+      NoteD $Log "PACT update succeeded ($et)"
+
+      flog $Log cat $root/log/update
+
+      flog $Log rm -f .pact-date
+      echo $DName > .pact-date
+
    endif
 
-   tail -n 8 $Log
-   NoteD $Log "Compilation complete"
-
-   flog $Log rm -f .pact-date
-   NoteD $Log $DName 
-   echo $DName > .pact-date
+   NoteD $Log ""
+   NoteD $Log "Distribution: $DName"
+   NoteD $Log "Host:         $host"
+   NoteD $Log "Date:         `date`"
 
 # move the log now
    set nLogDir = $cwd:h
@@ -614,12 +635,13 @@ endif
    mv $Log $nLogDir/$node.BUILD
    set Log = $nLogDir/$node.BUILD
 
-   NoteD $Log "See the log file $node.BUILD"
+   NoteD $Log ""
+   NoteD $Log "For details see the log file $node.BUILD"
+   NoteD $Log ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 flog $Log cd $base
-echo ""
 
-exit($status)
+exit($xstatus)

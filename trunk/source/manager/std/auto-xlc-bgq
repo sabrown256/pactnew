@@ -22,11 +22,11 @@ setenv RootInc /opt/ibmcmp/vac/bg/12.1/include
 include 64-bit
 include compilers/xlc-bgq
 
-including features/c99
+include features/c99
 
 include no-x11
 include no-sql
 include no-jpeg
 include no-png
 include no-libz
-including features/bgq
+include features/bgq

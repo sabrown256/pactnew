@@ -23,10 +23,11 @@ setenv RootInc /opt/ibmcmp/vac/bg/9.0/include
 
 include 32-bit
 include compilers/xlc-bgp
+
 include no-x11
 include no-sql
 include no-jpeg
 include no-png
 include no-libz
-including features/bgp
+include features/bgp
 
