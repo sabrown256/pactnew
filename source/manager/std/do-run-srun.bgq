@@ -1,0 +1,41 @@
+#
+# DO-RUN-SRUN-BGP - DO-RUN database entry for srun
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+Env SLURM_EXIT_ERROR     = 254
+Env SLURM_EXIT_IMMEDIATE = 255
+
+#-------------------------------------------------------------------------
+#-------------------------------------------------------------------------
+
+CROSS : srun {
+
+   Exe   = srun
+   Flags = ($?DO_RUN_SRUN_ENV == 0) ? "" : $DO_RUN_SRUN_ENV
+}
+
+#-------------------------------------------------------------------------
+#-------------------------------------------------------------------------
+
+MPI : srun {
+
+   Env Name = `uname -n`
+
+# BG/Q does not have the MPI I/O problem so mpi-io-wrap is not needed
+   Env Wrap = ""
+
+# check whether an MPI run has been requested
+   Env Par  = (($NProc > 1) || ($Force == TRUE)) ? TRUE : FALSE
+
+   Exe   = srun
+   Flags = -Q -I -N $NProc -p $Pool
+   Flags = ($?DO_RUN_SRUN_ENV == 0) ? $MPI_Flags : $MPI_Flags $DO_RUN_SRUN_ENV
+}
+
+#-------------------------------------------------------------------------
+#-------------------------------------------------------------------------

@@ -24,7 +24,7 @@ setenv RootInc /bgsys/drivers/ppcfloor/gnu-linux/powerpc64-bgq-linux/sys-include
 include 64-bit
 include compilers/gnu-bgp
 
-including features/c99
+include features/c99
 
 include no-x11
 include no-sql

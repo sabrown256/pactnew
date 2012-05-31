@@ -14,18 +14,39 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: site"
 
+#dbini SYS_SITE     ""
+#dbini SYS_TYPE     ""
+#dbini DAI_ROOT     ""
+#dbini DAS_ROOT     ""
+
+SafeEnv SYS_SITE     ""
+SafeEnv SYS_TYPE     ""
+SafeEnv DAI_ROOT     ""
+SafeEnv DAS_ROOT     ""
+
 if (-f $MngDir/extensions/sys-site) then
    eval `$MngDir/extensions/sys-site`
 else
-   if ($?SYS_TYPE == 0) then
+   if ("$SYS_TYPE" == "") then
       setenv SYS_TYPE `$ScrDir/system-id`
    endif
-   setenv SYS_SITE LONER
-   setenv DAI_ROOT /usr/share
-   setenv DAS_ROOT /usr/local
+   if ("$SYS_SITE" == "") then
+      setenv SYS_SITE LONER
+   endif
+   if ("$DAI_ROOT" == "") then
+      setenv DAI_ROOT /usr/share
+   endif
+   if ("$DAS_ROOT" == "") then
+      setenv DAS_ROOT /usr/local
+   endif
 endif
 
 # export the results
+#dbexp SYS_TYPE
+#dbexp SYS_SITE
+#dbexp DAI_ROOT
+#dbexp DAS_ROOT
+
 SetParent SYS_TYPE
 SetParent SYS_SITE
 SetParent DAI_ROOT
