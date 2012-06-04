@@ -75,9 +75,9 @@ source $Me:h/common
 # PyVers      the version of the python executable
 # Python_Path addition to path in order to find python executable
 #             this comes from config files only
-# PyDirSrc    pact/dev/$arch/lib (install this to PyDirDst and PyDirPy)
-# PyDirDst    pact    lib/.../site-packages  (install into)
-# PyDirPy     python  lib/.../site-packages  (install into)
+# PyDirSrc    pact/dev/$arch/lib/pythond.d         (install to PyDirDst and PyDirPy)
+# PyDirDst    pact    lib/pythond.d                (install into)
+# PyDirPy     python  lib/pythond.d/site-packages  (install into)
 
     if (("$PyExe" != "") && ("$PyExe" != "wrong-cc") && \
         ("$PyExe" != "no-numeric") && ($BuildSharedLibs == TRUE)) then

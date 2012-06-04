@@ -6,8 +6,8 @@
 #        - Python_Path addition to path in order to find python executable
 #        -             this comes from config files only
 #        - PyDirSrc    pact/dev/$arch/lib (install this to PyDirDst and PyDirPy)
-#        - PyDirDst    pact    lib/.../site-packages  (install into)
-#        - PyDirPy     python  lib/.../site-packages  (install into)
+#        - PyDirDst    pact    lib/pythond.d                (install into)
+#        - PyDirPy     python  lib/pythond.d/site-packages  (install into)
 #
 #
 # Source Version: 3.0
@@ -158,17 +158,17 @@ if (-d ../../python) then
          set PyRoot = $PyExe
          set PyRoot = $PyRoot:h
          set PyRoot = $PyRoot:h
-         set PyHead = python${PyVers}/site-packages/pact
+         set PyHead = python${PyVers}
       endif
 
 # install destination in python tree
-      setenv PyDirPy  $PyRoot/lib/$PyHead
+      setenv PyDirPy  $PyRoot/lib/$PyHead/site-packages
 
 # install destination in PACT tree
       setenv PyDirDst $InstBase/lib/$PyHead
 
 # install source (local build destination)
-      set PyDirSrc = $SysDir/lib/python${PyVers}/pact
+      set PyDirSrc = $SysDir/lib/python${PyVers}
    endif
 endif
 

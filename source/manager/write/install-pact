@@ -79,6 +79,13 @@ Note $Log "   PyDirSrc   = |$PyDirSrc|"
        Note $STDOUT "set Owner     = $USER"
        Note $STDOUT "set Group     = "'`'"groups | awk '{print "'$1'"}'"'`'
        Note $STDOUT 'set Arch      = `'$CfgMan' use`'
+
+# NOTE: this can only be successfully run from the manager directory
+       if ($cwd !~ */manager) then
+          echo "install-pact can only be run from the manager - exiting"
+          exit(1)
+       endif
+
        Note $STDOUT 'set lbase     = $cwd'
        Note $STDOUT 'set lbasedir  = $lbase:h'
        Note $STDOUT 'set lsysdir   = $lbasedir/dev/$Arch'
@@ -92,13 +99,11 @@ Note $Log "   PyDirSrc   = |$PyDirSrc|"
        Note $STDOUT 'set Man3Dir   = $InstDir/'$Man3Dir
        Note $STDOUT ""
 
-# GOTCHA: fix up for pya and python
-# pya is currently the only that can successfully install
        if ($HavePython == TRUE) then
           Note $STDOUT "set PyVers    = $PyVers"
-          Note $STDOUT "set PyDirPy   = $PyDirPy:h"       # python destination
-          Note $STDOUT "set PyDirDst  = $PyDirDst:h"      # pact destination
-          Note $STDOUT "set PyDirSrc  = $PyDirSrc:h"      # install source
+          Note $STDOUT "set PyDirPy   = $PyDirPy"       # python destination
+          Note $STDOUT "set PyDirDst  = $PyDirDst"      # pact destination
+          Note $STDOUT "set PyDirSrc  = $PyDirSrc"      # install source
           Note $STDOUT ""
        endif
 
