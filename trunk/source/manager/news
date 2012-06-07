@@ -1,3 +1,42 @@
+6/5/2012
+
+For a long time the PACT Python bindings
+were made using the Python Numeric package.  This has been
+superceeded by the NumPy package.  When we build PACT
+we look for both Numeric and NumPy now.  Because the two
+packages have some differences we build a set of bindings for
+each one that is available.  Since Numeric is the original package,
+the bindings using it are in:
+
+     /usr/local/apps/pactnew/gnu/lib/pythond.d/pact
+
+and the new Numeric bindings are in:
+
+     /usr/local/apps/pactnew/gnu/lib/pythond.d/pact_2
+
+Each of those directories will be there if and only if the
+Python package that it corresponds to is there.
+
+The Chaos 5 machines appear to have only the NumPy package
+and consequently only the pact_2 bindings.
+
+To use the Numeric bindings you do:
+
+    setenv PYTHONPATH  /usr/local/apps/pactnew/gnu/lib/pythond.d/pact
+
+    and
+
+    import pact.pdb as pdb
+
+To use the NumPy bindings you do:
+
+    setenv PYTHONPATH  /usr/local/apps/pactnew/gnu/lib/pythond.d/pact_2
+
+    and
+
+    import pact_2.pdb as pdb
+
+
 1/26/2011
 
 PDBLib supports C99 data types (version 26).

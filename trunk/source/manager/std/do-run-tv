@@ -14,6 +14,7 @@ DBG : tv {
    Exe   = totalview
    Flags = 
    Delim = -a
+   Cmd   = $Wrap $DBG_Exe $DBG_Flags $MPI_Exe $DBG_Delim $MPI_Flags $Code $CArgs
 }
 
 #-------------------------------------------------------------------------

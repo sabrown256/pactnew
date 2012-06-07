@@ -35,7 +35,7 @@ Tool CC {
 Tool FC {
    Exe     = mpixlf90_r
    Flags   = -qrecur -qnullterm -qinitauto=ff -qalias=intptr -qundef
-   Flags  += ${XArch} -qrecur
+   Flags  += ${XArch}
    Flags  += [ _env_ = Bits ;                # address bit size
                *     = -q* ]
    Flags  += [ _cmd_ = -p ;                  # profiling

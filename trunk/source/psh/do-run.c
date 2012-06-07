@@ -28,6 +28,7 @@
 #define MAXLINE 512
 
 #define NO_STAT  0xffffff
+#define OMITTED  255
 
 typedef struct s_rundes rundes;
 
@@ -384,11 +385,15 @@ static char *shell_clean(char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* CHECK - verify and correct the state after reading the command line args */
+/* CHECK - verify and correct the state after reading the command line args
+ *       - return TRUE iff everything is good to go
+ */
 
 static int check(rundes *st)
    {int rv;
     char *c, *exe;
+
+    rv = TRUE;
 
 /* NOTE: I expected ncpu to be an environment variable
  * but change it and the behavior is all wrong - see test suite
@@ -1091,8 +1096,7 @@ static int run_interactive(rundes *st)
 
 /* FINISH - semi-arbitrarily declare that failure to run the
  *        - job by reason of lack of resources (usually CPUs)
- *        - causes an exit status value of -1
- *        - this is AIXs and OSFs value
+ *        - causes an exit status value of OMITTED
  */
 
 static int finish(rundes *st, int rv)
@@ -1133,12 +1137,12 @@ static int finish(rundes *st, int rv)
 	   iei = atoi(sei);
 
 	if ((iee != NO_STAT) && (sts == iee))
-	   sts = -1;
+	   sts = OMITTED;
 	else if ((iei != NO_STAT) && (sts == iei))
-	   sts = -1;}
+	   sts = OMITTED;}
 
     else if ((strcmp(st->mpife, "prun") == 0) && (sts == 126))
-       sts = -1;
+       sts = OMITTED;
 
    return(sts);}
 
@@ -1385,6 +1389,14 @@ int main(int c, char **v)
     if (rv == TRUE)
        {rv = process_args(&state, c, v);
 	rv = check(&state);
+
+/* if rv is FALSE the code was not found or executable
+ * which could be NFS - but in any event the code was
+ * not run so return the omitted status value
+ */
+        if (rv == FALSE)
+	   return(OMITTED);
+
 	set_target(&state);
 
 	parse_db(&state);
