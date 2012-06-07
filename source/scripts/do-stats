@@ -159,7 +159,9 @@ foreach ufile ($UpdateDir/*.update $UpdateDir/*/update)
    set vers  = 0
    set lines = `grep "DO-NET: (STAT) Version" $ufile`
    if ($status == 0) then
-      set vers = $lines[4]
+      if ($#lines > 3) then
+         set vers = $lines[4]
+      endif
    endif
    if ($vers != $Version) continue
 

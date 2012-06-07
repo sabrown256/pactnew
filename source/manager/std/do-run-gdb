@@ -17,6 +17,7 @@ DBG : gdb {
    Flags = 
    Delim = 
    Cmd   = $Wrap $MPI_Exe $MPI_Flags $DBG_Exe $Code
+#   Cmd   = $Wrap $DBG_Exe $DBG_Flags $MPI_Exe $DBG_Delim $MPI_Flags $Code $CArgs
 }
 
 #-------------------------------------------------------------------------

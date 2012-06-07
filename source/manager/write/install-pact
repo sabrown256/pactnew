@@ -67,6 +67,9 @@ Note $Log "   PyDirSrc   = |$PyDirSrc|"
     Note $STDOUT "#              - rewritten from Carolyn Sharp's original"
     Note $STDOUT ""
 
+    Note $STDOUT "@ err = 0"
+    Note $STDOUT ""
+
     if ("$InstBase" == "none") then
 
        Note $STDOUT 'echo ""'
@@ -207,13 +210,23 @@ Note $Log "   PyDirSrc   = |$PyDirSrc|"
        Note $STDOUT '      endif'
        Note $STDOUT '   endif'
        Note $STDOUT 'end'
+       Note $STDOUT ''
+
+# substitute $InstDir for the build directory
+# something like /usr/local/apps for ..../dev/$arch
+# difference between $cwd and pwd makes the original path unpredictable
+# so find what actually appeared in the generated files
+       Note $STDOUT 'set inf     = ( `grep SCHEME env-pact.csh | tail -n 1` )'
+       Note $STDOUT 'set lblddir = $inf[3]:h'
+       Note $STDOUT 'unset inf'
+       Note $STDOUT ''
 
        Note $STDOUT 'foreach file (env-pact.csh env-pact.sh env-pact.dk env-pact.mod env-mio env-csh csh-subroutines)'
        Note $STDOUT '   if (-f $file) then'
        Note $STDOUT '      touch $DestDir/.lock'
 #       Note $STDOUT '      sinstall -p 664 $file $DestDir'
        Note $STDOUT '      $RM $DestDir/$file'
-       Note $STDOUT "      sed 's|'"'$lsysdir'"'|'"'$InstDir'"'|' "'$file >! $DestDir/$file'
+       Note $STDOUT "      sed 's|'"'$llbddir'"'|'"'$InstDir'"'|' "'$file >! $DestDir/$file'
        Note $STDOUT '      if ($status != 0) then'
        Note $STDOUT '         echo "   FAILED ($status) $file"'
        Note $STDOUT '      else'
@@ -222,7 +235,9 @@ Note $Log "   PyDirSrc   = |$PyDirSrc|"
        Note $STDOUT '      endif'
        Note $STDOUT '   endif'
        Note $STDOUT 'end'
+       Note $STDOUT ''
 
+       Note $STDOUT 'unset lblddir'
        Note $STDOUT 'popd >& /dev/null'
        Note $STDOUT ""
 
@@ -497,6 +512,9 @@ Note $Log "   PyDirSrc   = |$PyDirSrc|"
        Note $STDOUT 'echo ""'
        Note $STDOUT 'echo "... PACT INSTALLATION COMPLETE"'
        Note $STDOUT 'echo ""'
+       Note $STDOUT ""
+
+       Note $STDOUT 'exit($err)'
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

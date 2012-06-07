@@ -947,7 +947,7 @@ static void check_dir(client *cl)
 
     if (st.create_dirs == TRUE)
        {Created[0] = '\0';
-        if (strcmp(sib, "none") != 0)
+        if ((IS_NULL(sib) == FALSE) && (strcmp(sib, "none") != 0))
            {for (i = 0; i < n; i++)
                 {dir = dlst[i];
                  if (dir_exists("%s/%s", sib, dir) == FALSE)
@@ -965,7 +965,7 @@ static void check_dir(client *cl)
 
     else
        {Missing[0] = '\0';
-        if (strcmp(sib, "none") != 0)
+        if ((IS_NULL(sib) == FALSE) && (strcmp(sib, "none") != 0))
            {for (i = 0; i < n; i++)
                 {dir = dlst[i];
                  if (dir_exists("%s/%s", sib, dir) == FALSE)

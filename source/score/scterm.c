@@ -245,7 +245,7 @@ int SC_set_io_attr(int fd, int attr, int state)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_SET_IO_ATTRS - set the specified set off attributes to be ON or OFF
+/* SC_SET_IO_ATTRS - set the specified set of attributes to be ON or OFF
  *                 - terminated by attribute value of 0
  */
 

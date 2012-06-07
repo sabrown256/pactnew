@@ -354,8 +354,8 @@ switch ($Cmnd)
            NoteD $Log ""
            Separator $Log
            NoteD $Log "Cross compile fixes"
-           set CrossFix = ( hserve mpi-io-wrap ps-diff png-diff )
            set CrossFix = ( hserve mpi-io-wrap )
+#           set CrossFix = ( $CrossFix ps-diff png-diff )
            foreach i ( $CrossFix )
               set exe = `which-exe -d ${BinDir} $i`
               if (-x "$exe") then
