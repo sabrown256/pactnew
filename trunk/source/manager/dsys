@@ -2228,7 +2228,35 @@ CFG_DONE:
    case remove:
         echo ""
 
+        set strict = FALSE
+        while ($#argv > 0)
+           switch ($1)
+              case -cfg:
+                   set strict = TRUE
+                   breaksw
+              case -h:
+              case help:
+                   echo "Usage: dsys remove [-cfg] [-h]"
+                   echo ""
+                   echo "   cfg   do more strict config remove"
+                   echo "   h     this help message"
+                   echo ""
+                   exit(1)
+                   breaksw
+           endsw
+           shift
+        end
+
         InitLog Log $LogDir/remove
+
+        set lpybind = none
+        if (-f $EtcDir/cfg.db) then
+           set inf = ( `grep PyDirSrc $EtcDir/cfg.db | sed 's|=| |'` )
+           if (("$inf" != "") && ($#inf > 2)) then
+              set lpybind = $inf[3]:t
+           endif
+           unset inf
+        endif
 
 # cleanup path so as not to tax wimpy OSs such as Solaris
         eval `$ScrDir/simplify-path`
@@ -2241,68 +2269,97 @@ CFG_DONE:
         NoteD $Log "Removing PACT"
 
 # save the files in BinDir
-        set BinFiles = ( smake dmake pact template timer px )
-        set BinFiles = ( $BinFiles do-run elide blang perdb )
-        set BinFiles = ( $BinFiles make-syntax )
-        set BinFiles = ( $BinFiles import-api pcpp )
-        set BinFiles = ( $BinFiles sinstall install-pact install-ext )
+        set BinFiles = ""
+        if (strict == FALSE) then
+           set BinFiles = ( $BinFiles smake dmake pact template timer px )
+           set BinFiles = ( $BinFiles do-run elide blang perdb )
+           set BinFiles = ( $BinFiles make-syntax )
+           set BinFiles = ( $BinFiles import-api pcpp )
+           set BinFiles = ( $BinFiles sinstall install-pact install-ext )
+        endif
 
 # save the files in IncDir
-        set IncFiles = ( iso-c.h scconfig.h scdecls.h cpyright.h syntax.h )
-        set IncFiles = ( $IncFiles f90types.h f90kinds.inc )
+        set IncFiles = ""
+        if (strict == FALSE) then
+           set IncFiles = ( $IncFiles iso-c.h scconfig.h scdecls.h )
+           set IncFiles = ( $IncFiles cpyright.h syntax.h )
+           set IncFiles = ( $IncFiles f90types.h f90kinds.inc )
+        endif
 
 # save the files in EtcDir
-        set EtcFiles = ( do-run-db cfg.db cfg.pco cfg.pl )
-        set EtcFiles = ( $EtcFiles configured package )
-        set EtcFiles = ( $EtcFiles Makefile make-def make-macros )
-        set EtcFiles = ( $EtcFiles env-pact.csh env-pact.sh )
-        set EtcFiles = ( $EtcFiles env-pact.dk env-pact.mod )
-        set EtcFiles = ( $EtcFiles env-mio )
+        set EtcFiles = ""
+        set EtcFiles = ( $EtcFiles configured )
+        if (strict == FALSE) then
+           set EtcFiles = ( $EtcFiles do-run-db cfg.db cfg.pco cfg.pl )
+           set EtcFiles = ( $EtcFiles Makefile make-def make-macros package )
+           set EtcFiles = ( $EtcFiles env-pact.csh env-pact.sh )
+           set EtcFiles = ( $EtcFiles env-pact.dk env-pact.mod )
+           set EtcFiles = ( $EtcFiles env-mio )
+        endif
 
-        set ScmFiles = ( spokes.scm )
+        set ScmFiles = ""
+        if (strict == FALSE) then
+           set ScmFiles = ( $ScmFiles spokes.scm )
+        endif
 
 # remove scheme files
         NoteD $Log "    in $ScmDir"
         flog $Log pushd $ScmDir
-        flog $Log mkdir tmp
-        flog $Log $MV $ScmFiles tmp
-        flog $Log touch foo
-        flog $Log $RM *
-        flog $Log $MV tmp/* .
-        flog $Log rmdir tmp
+        if ("$ScmFiles" != "") then
+           flog $Log mkdir tmp
+           flog $Log $MV $ScmFiles tmp
+           flog $Log touch foo
+           flog $Log $RM *
+           flog $Log $MV tmp/* .
+           flog $Log rmdir tmp
+        else
+           flog $Log $RM *
+        endif
         flog $Log popd
 
 # remove headers
         NoteD $Log "    in $IncDir"
         flog $Log pushd $IncDir
-        flog $Log mkdir tmp
-        flog $Log $MV $IncFiles tmp
-        flog $Log touch foo
-        flog $Log $RM *
-        flog $Log $MV tmp/* .
-        flog $Log rmdir tmp
+        if ("$IncFiles" != "") then
+           flog $Log mkdir tmp
+           flog $Log $MV $IncFiles tmp
+           flog $Log touch foo
+           flog $Log $RM *
+           flog $Log $MV tmp/* .
+           flog $Log rmdir tmp
+        else
+           flog $Log $RM *
+        endif
         flog $Log popd
  
 # remove configs
         NoteD $Log "    in $EtcDir"
         flog $Log pushd $EtcDir
-        flog $Log mkdir tmp
-        flog $Log $MV $EtcFiles tmp
-        flog $Log touch foo
-        flog $Log $RM *
-        flog $Log $MV tmp/* .
-        flog $Log rmdir tmp
+        if ("$EtcFiles" != "") then
+           flog $Log mkdir tmp
+           flog $Log $MV $EtcFiles tmp
+           flog $Log touch foo
+           flog $Log $RM *
+           flog $Log $MV tmp/* .
+           flog $Log rmdir tmp
+        else
+           flog $Log $RM *
+        endif
         flog $Log popd
  
 # remove binaries
         NoteD $Log "    in $BinDir"
         flog $Log pushd $BinDir
-        flog $Log mkdir tmp
-        flog $Log $MV $BinFiles tmp
-        flog $Log touch foo
-        flog $Log $RM *
-        flog $Log $MV tmp/* .
-        flog $Log rmdir tmp
+        if ("$BinFiles" != "") then
+           flog $Log mkdir tmp
+           flog $Log $MV $BinFiles tmp
+           flog $Log touch foo
+           flog $Log $RM *
+           flog $Log $MV tmp/* .
+           flog $Log rmdir tmp
+        else
+           flog $Log $RM *
+        endif
         flog $Log popd
  
 # remove libraries
@@ -2310,6 +2367,9 @@ CFG_DONE:
         flog $Log pushd $LibDir
         flog $Log touch foo.a foo.so
         flog $Log $RM *.a *.so*
+        if (-d $lpybind) then
+           flog $Log $RMDir $lpybind
+        endif
         flog $Log popd
 
 # remove other files

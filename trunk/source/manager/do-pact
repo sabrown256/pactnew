@@ -351,6 +351,28 @@ switch ($Phase)
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+# remove
+
+              if (($IErr == 0) && ($TestOnly == no)) then
+                 Separator $LogHost
+                 Note $LogHost "Removing"
+                 echo -n "   Removing ... "
+                 flog $LogHost ./dsys remove -cfg
+                 if ($status != 0) then
+                    echo "Failed"
+                    set IErr = 2
+                 else
+                    echo "OK"
+                 endif
+
+# send remove log to update file
+                 tlog "(LOG)" cat $DevDir/log/remove
+
+              endif
+   
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # configure
 
               if (($IErr == 0) && ($TestOnly == no)) then
@@ -452,28 +474,6 @@ switch ($Phase)
               Note $LogHost "Pattern for fatal condition messages: |$ErrPattern| ($#ErrPattern)"
               Note $LogHost "Pattern for system error messages: |$SysPattern| ($#SysPattern)"
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# remove
-
-              if (($IErr == 0) && ($TestOnly == no)) then
-                 Separator $LogHost
-                 Note $LogHost "Removing"
-                 echo -n "   Removing ... "
-                 flog $LogHost ./dsys remove
-                 if ($status != 0) then
-                    echo "Failed"
-                    set IErr = 2
-                 else
-                    echo "OK"
-                 endif
-
-# send remove log to update file
-                 tlog "(LOG)" cat $DevDir/log/remove
-
-              endif
-   
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
