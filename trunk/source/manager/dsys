@@ -43,10 +43,10 @@ if (-f extensions/sys-site) then
 else if (-f local/site-signature) then
    eval `../scripts/sys-site -f local/site-signature`
 else
-   if ($DAI_ROOT == 0) then
+   if ($?DAI_ROOT == 0) then
       setenv DAI_ROOT /usr/share
    endif
-   if ($DAS_ROOT == 0) then
+   if ($?DAS_ROOT == 0) then
       setenv DAS_ROOT /usr/local
    endif
 endif
