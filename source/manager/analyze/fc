@@ -17,6 +17,12 @@ Note $Log "Analyze: fc"
 NoteD $ALog -n "   Fortran Compiler: "
 Note $ALog ""
 
+if ($?NO_FORTRAN == 1) then
+   setenv HAVE_FORTRAN   FALSE
+else
+   setenv HAVE_FORTRAN   TRUE
+endif
+
 SafeEnv FC_Exe      "f90"
 SafeEnv FC_Linker   ""
 SafeEnv FC_Flags    ""
@@ -71,6 +77,8 @@ else
    flog $ALog setenv Cfe_FC_Flags  ""
    flog $ALog setenv Cfg_FC_Exe    none
    flog $ALog setenv Cfg_FC_Flags  ""
+
+   flog $ALog setenv HAVE_FORTRAN  FALSE
 
    goto DONE
 endif
@@ -244,6 +252,8 @@ setenv FC_Flags "$Save_FFLAGS"
 DONE:
 
 # export the results
+SetParent HAVE_FORTRAN
+
 SetParent FC_Exe
 SetParent FC_Flags
 SetParent FC_Debug

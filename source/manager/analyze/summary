@@ -25,8 +25,12 @@ source $Me:h/common
        NoteD $Log "   C Compiler used is $UCC"
     endif
 
-    if (($?Cfe_FC_Exe == 0) || ("$Cfe_FC_Exe" == "none")) then
-       NoteD $Log "   No Fortran compiler found"
+    if ($HAVE_FORTRAN == FALSE) then
+       if (($?Cfe_FC_Exe == 0) || ("$Cfe_FC_Exe" == "none")) then
+          NoteD $Log "   No Fortran compiler found"
+       else
+          NoteD $Log "   Not building Fortran bindings"
+       endif
     else if ("$Cfe_FC_Exe" == "") then
        NoteD $Log "   ERROR: No Fortran compiler available - check your system or your path"
        NoteD $Log ""

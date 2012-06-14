@@ -1144,6 +1144,9 @@ switch ($Cmnd)
            goto CFG_DONE
         endif
 
+# save the database before building dmake because import-api needs it
+	flog $Log $PERDB -l save:
+
 # using existing dmake/smake build new dmake
         Separator $Log
         NoteD $Log "   Persistent Portable Parallel Make - dmake"

@@ -19,6 +19,7 @@ eval `$ScrDir/prune-env pact`
 set path = ( $ScrDir $path )
 source $ScrDir/env-csh
 
+dbget HAVE_FORTRAN
 dbget CFE
 dbget Cfe_CC_Exe
 dbget Cfe_CC_Flags
@@ -32,6 +33,7 @@ dbget IncDir
 
 Separator $Log
 Note $Log "   CFE          = $CFE"
+Note $Log "   HAVE_FORTRAN = $HAVE_FORTRAN"
 Note $Log "   Cfe_CC_Exe   = $Cfe_CC_Exe"
 Note $Log "   Cfe_CC_Flags = $Cfe_CC_Flags"
 Note $Log "   Cfe_FC_Exe   = $Cfe_FC_Exe"
@@ -45,86 +47,89 @@ Note $Log "   IncDir       = $IncDir"
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    if (($Cfe_FC_Exe != "") && ($F_STD == 'F90')) then
-       NoteD $Log "   F90 Include File - f90types.h f90kinds.inc"
+if ($HAVE_FORTRAN == TRUE) then
+   if (($Cfe_FC_Exe != "") && ($F_STD == 'F90')) then
+      NoteD $Log "   F90 Include File - f90types.h f90kinds.inc"
 
-       if (!(-d f90kinds)) then
-          NoteD $Log ""
-          NoteD $Log "      The f90kinds directory is missing"
-          NoteD $Log "      It should be checked out of the source repository"
-          NoteD $Log ""
-          exit(1)
-       endif
+      if (!(-d f90kinds)) then
+         NoteD $Log ""
+         NoteD $Log "      The f90kinds directory is missing"
+         NoteD $Log "      It should be checked out of the source repository"
+         NoteD $Log ""
+         exit(1)
+      endif
 
-       set Tmp = tmp-f90.$Host.$$
+      set Tmp = tmp-f90.$Host.$$
 
-       flog $Log pushd f90kinds
-       if (!(-d $Tmp)) then
-          flog $Log mkdir $Tmp
-       endif
-       flog $Log pushd $Tmp
+      flog $Log pushd f90kinds
+      if (!(-d $Tmp)) then
+         flog $Log mkdir $Tmp
+      endif
+      flog $Log pushd $Tmp
 
-       set lCC = ( `echo $Cfe_CC_Exe $Cfe_CC_Flags $Cfe_LD_Flags $Cfe_LD_RPath | sed 's|\"||g'` )
-       set lFC = ( `echo $Cfe_FC_Exe $Cfe_FC_Flags $Cfe_LD_Flags $Cfe_LD_RPath | sed 's|\"||g'` )
-       Note $Log "lCC = $lCC"
-       Note $Log "lFC = $lFC"
+      set lCC = ( `echo $Cfe_CC_Exe $Cfe_CC_Flags $Cfe_LD_Flags $Cfe_LD_RPath | sed 's|\"||g'` )
+      set lFC = ( `echo $Cfe_FC_Exe $Cfe_FC_Flags $Cfe_LD_Flags $Cfe_LD_RPath | sed 's|\"||g'` )
+      Note $Log "lCC = $lCC"
+      Note $Log "lFC = $lFC"
 
 # run getkinds to generate getbytes.f
-       flog $Log $lFC ../getkinds.f -o getkinds
-       flog $Log ($CFE ./getkinds >&! getbytes.f)
-       if ($status != 0) then
-          NoteD $Log "      Cannot determine Fortran kinds"
-          flog $Log cat getbytes.f
-       endif
+      flog $Log $lFC ../getkinds.f -o getkinds
+      flog $Log ($CFE ./getkinds >&! getbytes.f)
+      if ($status != 0) then
+         NoteD $Log "      Cannot determine Fortran kinds"
+         flog $Log cat getbytes.f
+      endif
 
 # compile and link getbytes
-       flog $Log $lCC -I../.. -c ../csizer.c -o csizer.o
-       flog $Log $lFC getbytes.f csizer.o -o getbytes
-       if ($status != 0) then
-          NoteD $Log "      Cannot compute Fortran primitive byte sizes"
-       endif
+      flog $Log $lCC -I../.. -c ../csizer.c -o csizer.o
+      flog $Log $lFC getbytes.f csizer.o -o getbytes
+      if ($status != 0) then
+         NoteD $Log "      Cannot compute Fortran primitive byte sizes"
+      endif
 
 # run getbytes to generate from_c and from_h
-       flog $Log $CFE ./getbytes
-       if ($status != 0) then
-          Note $Log "***> Cannot run getbytes"
-       endif
+      flog $Log $CFE ./getbytes
+      if ($status != 0) then
+         Note $Log "***> Cannot run getbytes"
+      endif
 
 # run genfiles to generate f90types.h and f90kinds.inc
 # requires from_c and from_h as input
-       flog $Log $lCC -I../.. ../genfiles.c -o genfiles
-       flog $Log $CFE ./genfiles
-       if ($status != 0) then
-          Note $Log "***> Cannot run genfiles"
-       endif
+      flog $Log $lCC -I../.. ../genfiles.c -o genfiles
+      flog $Log $CFE ./genfiles
+      if ($status != 0) then
+         Note $Log "***> Cannot run genfiles"
+      endif
 
-       flog $Log mv f90types.h f90kinds.inc $IncDir
+      flog $Log mv f90types.h f90kinds.inc $IncDir
 
 # run sizeint as input to sizefix
-       flog $Log $lFC ../sizeint.f -o sizeint
-       if ($status != 0) then
-          NoteD $Log "      Cannot compute Fortran integer size"
-       else
-          set si = `$CFE ./sizeint`
-          Note $Log "sizeint = $si"
+      flog $Log $lFC ../sizeint.f -o sizeint
+      if ($status != 0) then
+         NoteD $Log "      Cannot compute Fortran integer size"
+      else
+         set si = `$CFE ./sizeint`
+         Note $Log "sizeint = $si"
 
 # run sizefix to generate Finteger.bytes
-          flog $Log $lCC -I../.. ../sizefix.c -o sizefix
-          flog $Log ($CFE ./sizefix $si >&! $IncDir/Finteger.bytes)
-          if ($status != 0) then
-             NoteD $Log "      Cannot compute Fortran integer size"
-             flog $Log cat $IncDir/Finteger.bytes
-             flog $Log ${RM} $IncDir/Finteger.bytes
-          else
-             flog $Log cat $IncDir/Finteger.bytes
-          endif
-       endif
+         flog $Log $lCC -I../.. ../sizefix.c -o sizefix
+         flog $Log ($CFE ./sizefix $si >&! $IncDir/Finteger.bytes)
+         if ($status != 0) then
+            NoteD $Log "      Cannot compute Fortran integer size"
+            flog $Log cat $IncDir/Finteger.bytes
+            flog $Log ${RM} $IncDir/Finteger.bytes
+         else
+            flog $Log cat $IncDir/Finteger.bytes
+         endif
+      endif
 
-       flog $Log popd
-       flog $Log $RMDir $Tmp
-       flog $Log popd
+      flog $Log popd
+      flog $Log $RMDir $Tmp
+      flog $Log popd
 
-    endif
+   endif
+
+endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
