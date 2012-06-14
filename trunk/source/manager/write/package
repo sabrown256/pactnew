@@ -20,12 +20,14 @@ set path = ( $ScrDir $path )
 source $ScrDir/env-csh
 
 dbget EtcDir
+dbget HAVE_FORTRAN
 dbget HavePython
 dbget HavePythonNumpy
 dbget HavePythonNumeric
 
 Separator $Log
 Note $Log "   EtcDir            = $EtcDir"
+Note $Log "   HAVE_FORTRAN      = $HAVE_FORTRAN"
 Note $Log "   HavePython        = $HavePython"
 Note $Log "   HavePythonNumpy   = $HavePythonNumpy"
 Note $Log "   HavePythonNumeric = $HavePythonNumeric"
@@ -50,6 +52,10 @@ Note $Log "   HavePythonNumeric = $HavePythonNumeric"
           endif
        else if ($i == pya) then
           if (($HavePython == TRUE) && ($HavePythonNumeric == TRUE)) then
+             echo "$i" >>& $STDOUT
+          endif
+       else if ($i == fortran) then
+          if ($HAVE_FORTRAN == TRUE) then
              echo "$i" >>& $STDOUT
           endif
        else
