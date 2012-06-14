@@ -11,43 +11,40 @@
 #include "pdbtfr.h"
 
 #define DATFILE "csm"
+#define ERR     0
 
 typedef int (*PFTest)(char *base, char *tgt, int n);
 
-typedef struct 
+typedef struct s_ts1 ts1;
+typedef struct s_statedes statedes;
+
+struct s_ts1
    {float x_min;
     float x_max;
     float y_min;
-    float y_max;} teststruct;
+    float y_max;};
     
+struct s_statedes
+   {int lm;
+    int ln;
+    int debug_mode;
+    int native_only;
+    int ia_w0[5];
+    int ia_w1[5];
+    int ia_w2[5];
+    int ia_r[15];
+    long *y;
+    float x;
+    char *yname;
+    char *tsname;
+    ts1 *foo;};
+
+static statedes
+ st = { 2048, 2000, FALSE, FALSE, };
+
 #define LARGE_MULTIPLE     2048
 #define LARGE_NON_MULTIPLE 2000
-#define STR_MULTIPLE       "2048"
-#define STR_NON_MULTIPLE   "2000"
     
-static long
- y[LARGE_MULTIPLE];
-
-static float
- x;
-
-static char
- *yname,
- *tsname;
-
-static teststruct
- foo[LARGE_NON_MULTIPLE];
-
-static int
- debug_mode = FALSE,
- native_only = FALSE;
-
-int
- ia_w0[5],
- ia_w1[5],
- ia_w2[5],
- ia_r[15];
-
 /*--------------------------------------------------------------------------*/
 
 /*                              TEST 1 ROUTINES                             */
@@ -59,25 +56,27 @@ int
 static void prep_test_1_data(void)
    {int i, nc;
 
-    x = 3.33;
+    st.x = 3.33;
      
-    for (i = 0; i < LARGE_MULTIPLE; i++)
-        y[i] = (long) i;
+    for (i = 0; i < st.lm; i++)
+        st.y[i] = (long) i;
      
-    for (i = 0; i < LARGE_NON_MULTIPLE; i++)
-        {foo[i].x_min = (float) i;
-	 foo[i].x_max = (float) i+1;
-	 foo[i].y_min = (float) i+2;
-	 foo[i].y_max = (float) i+3;};
+    for (i = 0; i < st.ln; i++)
+        {st.foo[i].x_min = (float) i;
+	 st.foo[i].x_max = (float) i+1;
+	 st.foo[i].y_min = (float) i+2;
+	 st.foo[i].y_max = (float) i+3;};
      
-    nc    = 3 + strlen(STR_MULTIPLE) + 1;
-    yname = CMAKE_N(char, nc);
-    snprintf(yname, LARGE_MULTIPLE, "y(%s)", STR_MULTIPLE);
+    nc    = log10(st.lm);
+    nc   += 5;
+    st.yname = CMAKE_N(char, nc);
+    snprintf(st.yname, nc, "y(%d)", st.lm);
      
-    nc     = 5 + strlen(STR_NON_MULTIPLE) + 1;
-    tsname = CMAKE_N(char, nc);
+    nc     = log10(st.ln);
+    nc    += 7;
+    st.tsname = CMAKE_N(char, nc);
 
-    snprintf(tsname, nc, "foo[%s]", STR_NON_MULTIPLE);
+    snprintf(st.tsname, nc, "foo[%d]", st.ln);
                
     return;}
 
@@ -89,8 +88,8 @@ static void prep_test_1_data(void)
 static void cleanup_test_1_data(void)
    {
                
-    CFREE(yname);
-    CFREE(tsname);
+    CFREE(st.yname);
+    CFREE(st.tsname);
 
     return;}
 
@@ -99,20 +98,25 @@ static void cleanup_test_1_data(void)
 
 /* WRITE_TEST_1_DATA - write out the data into the PDB file */
 
-static void write_test_1_data(PDBfile *strm)
-   {
+static int write_test_1_data(PDBfile *strm)
+   {int rv;
+
+    rv = TRUE;
 
 /* this also writes out an extra hidden checksum variable for x */
-    if (!PD_write(strm, "x", "float", &x))
-       PRINT(stdout, "%s", PD_get_error());
+    if (!PD_write(strm, "x", "float", &st.x))
+       {PRINT(stdout, "%s", PD_get_error());
+	rv = FALSE;};
         
-    if (!PD_write(strm, yname, "long", y))
-       PRINT(stdout, "%s", PD_get_error());
+    if (!PD_write(strm, st.yname, "long", st.y))
+       {PRINT(stdout, "%s", PD_get_error());
+	rv = FALSE;};
         
-    if (!PD_write(strm, tsname, "teststruct", foo))
-       PRINT(stdout, "%s", PD_get_error());
+    if (!PD_write(strm, st.tsname, "ts1", st.foo))
+       {PRINT(stdout, "%s", PD_get_error());
+	rv = FALSE;};
                            
-    return;}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -120,29 +124,29 @@ static void write_test_1_data(PDBfile *strm)
 /* READ_TEST_1_DATA - read in the data into the PDB file */
 
 static int read_test_1_data(PDBfile *strm)
-   {int rv, st;
+   {int rv, ok;
 
-    st = TRUE;
-
-/* determine if read failed or checksum failed: check error */     
-    rv = PD_read(strm, "x", &x); 
-    if ((rv == FALSE) || (rv == -1))
-       {PRINT(stdout, "%s", PD_get_error());  
-	st = FALSE;};
+    ok = TRUE;
 
 /* determine if read failed or checksum failed: check error */     
-    rv = PD_read(strm, "y", y); 
+    rv = PD_read(strm, "x", &st.x); 
     if ((rv == FALSE) || (rv == -1))
        {PRINT(stdout, "%s", PD_get_error());  
-	st = FALSE;};
+	ok = FALSE;};
+
+/* determine if read failed or checksum failed: check error */     
+    rv = PD_read(strm, "y", st.y); 
+    if ((rv == FALSE) || (rv == -1))
+       {PRINT(stdout, "%s", PD_get_error());  
+	ok = FALSE;};
          
 /* determine if read failed or checksum failed: check error */     
-    rv = PD_read(strm, "foo", foo); 
+    rv = PD_read(strm, "foo", st.foo); 
     if ((rv == FALSE) || (rv == -1))
        {PRINT(stdout, "%s", PD_get_error());  
-	st = FALSE;};
+	ok = FALSE;};
 
-    return(st);}
+    return(ok);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -153,7 +157,7 @@ static int read_test_1_data(PDBfile *strm)
  */
 
 static int test_1(char *base, char *tgt, int n)
-   {int err, old;
+   {int err, ok, old;
     char datfile[MAXLINE], fname[MAXLINE];
     PDBfile *strm;
     FILE *fp;
@@ -171,10 +175,10 @@ static int test_1(char *base, char *tgt, int n)
        {strm = PD_open(datfile, "w"); 
 	if (strm == NULL)
 	   {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-	    exit(1);};
+	    return(ERR);};
 	PRINT(fp, "File %s created\n", datfile);
 
-	PD_defstr(strm, "teststruct", 
+	PD_defstr(strm, "ts1", 
 		  "float x_min",
 		  "float x_max",
 		  "float y_min",
@@ -185,21 +189,23 @@ static int test_1(char *base, char *tgt, int n)
 	old = PD_activate_cksum(strm, PD_MD5_FILE);
            
 /* write the test data */
-	write_test_1_data(strm);
+	ok = write_test_1_data(strm);
+	if (ok == FALSE)
+	   return(ERR);
 
 /* close the file - this also calculates a checksum
  * for the entire file and adds it in
  */
 	if (!PD_close(strm))
 	   {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-	    exit(1);};
+	    return(ERR);};
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* reopen the file */
     strm = PD_open(datfile, "r");
     if (strm == NULL)
        {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(1);};
+        return(ERR);};
     PRINT(fp, "File %s opened\n", datfile);
 
     old = PD_activate_cksum(strm, PD_MD5_FILE);
@@ -214,7 +220,7 @@ static int test_1(char *base, char *tgt, int n)
 /* close the file */
     if (!PD_close(strm))
        {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+        return(ERR);};
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print it out to STDOUT */
@@ -223,7 +229,7 @@ static int test_1(char *base, char *tgt, int n)
 /* free known test data memory */
     cleanup_test_1_data();
 
-    if (debug_mode)
+    if (st.debug_mode)
        SC_mem_map(STDOUT, FALSE);
 
     io_close(fp);
@@ -243,24 +249,26 @@ static int test_1(char *base, char *tgt, int n)
 static void prep_test_2_data(void)
    {int i, nc;
 
-    x = 3.33;
+    st.x = 3.33;
      
-    for (i = 0; i < LARGE_MULTIPLE; i++)
-        y[i] = (long) i;
+    for (i = 0; i < st.lm; i++)
+        st.y[i] = (long) i;
      
-    for (i = 0; i < LARGE_NON_MULTIPLE; i++)
-        {foo[i].x_min = (float) i;
-	 foo[i].x_max = (float) i+1;
-	 foo[i].y_min = (float) i+2;
-	 foo[i].y_max = (float) i+3;};
+    for (i = 0; i < st.ln; i++)
+        {st.foo[i].x_min = (float) i;
+	 st.foo[i].x_max = (float) i+1;
+	 st.foo[i].y_min = (float) i+2;
+	 st.foo[i].y_max = (float) i+3;};
      
-    nc    = 3 + strlen(STR_MULTIPLE) + 1;
-    yname = CMAKE_N(char, nc);
-    snprintf(yname, LARGE_MULTIPLE, "y(%s)", STR_MULTIPLE);
+    nc    = log10(st.lm);
+    nc   += 5;
+    st.yname = CMAKE_N(char, nc);
+    snprintf(st.yname, nc, "y(%d)", st.lm);
      
-    nc     = 5 + strlen(STR_NON_MULTIPLE) + 1;
-    tsname = CMAKE_N(char, nc);
-    snprintf(tsname, nc, "foo[%s]", STR_NON_MULTIPLE);
+    nc     = log10(st.ln);
+    nc    += 7;
+    st.tsname = CMAKE_N(char, nc);
+    snprintf(st.tsname, nc, "foo[%d]", st.ln);
                
     return;}
 
@@ -272,8 +280,8 @@ static void prep_test_2_data(void)
 static void cleanup_test_2_data(void)
    {
                
-    CFREE(yname);
-    CFREE(tsname);
+    CFREE(st.yname);
+    CFREE(st.tsname);
 
     return;}
 
@@ -282,20 +290,25 @@ static void cleanup_test_2_data(void)
 
 /* WRITE_TEST_2_DATA - write out the data into the PDB file */
 
-static void write_test_2_data(PDBfile *strm)
-   {
+static int write_test_2_data(PDBfile *strm)
+   {int rv;
+
+    rv = TRUE;
 
 /* this also writes out an extra hidden checksum variable for x */
-    if (!PD_write(strm, "x", "float", &x))
-       PRINT(stdout, "%s", PD_get_error());
+    if (!PD_write(strm, "x", "float", &st.x))
+       {PRINT(stdout, "%s", PD_get_error());
+	rv = FALSE;};
 
-    if (!PD_write(strm, yname, "long", y))
-       PRINT(stdout, "%s", PD_get_error());
+    if (!PD_write(strm, st.yname, "long", st.y))
+       {PRINT(stdout, "%s", PD_get_error());
+	rv = FALSE;};
 
-    if (!PD_write(strm, tsname, "teststruct", foo))
-       PRINT(stdout, "%s", PD_get_error());
+    if (!PD_write(strm, st.tsname, "ts1", st.foo))
+       {PRINT(stdout, "%s", PD_get_error());
+	rv = FALSE;};
 
-    return;}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -303,29 +316,29 @@ static void write_test_2_data(PDBfile *strm)
 /* READ_TEST_2_DATA - read in the data into the PDB file */
 
 static int read_test_2_data(PDBfile *strm)
-   {int rv, st;
+   {int rv, ok;
 
-    st = TRUE;
-
-/* determine if read failed or checksum failed: check error */     
-    rv = PD_read(strm, "x", &x); 
-    if ((rv == FALSE) || (rv == -1))
-       {PRINT(stdout, "%s", PD_get_error());  
-	st = FALSE;};
+    ok = TRUE;
 
 /* determine if read failed or checksum failed: check error */     
-    rv = PD_read(strm, "y", y); 
+    rv = PD_read(strm, "x", &st.x); 
     if ((rv == FALSE) || (rv == -1))
        {PRINT(stdout, "%s", PD_get_error());  
-	st = FALSE;};
+	ok = FALSE;};
+
+/* determine if read failed or checksum failed: check error */     
+    rv = PD_read(strm, "y", st.y); 
+    if ((rv == FALSE) || (rv == -1))
+       {PRINT(stdout, "%s", PD_get_error());  
+	ok = FALSE;};
          
 /* determine if read failed or checksum failed: check error */     
-    rv = PD_read(strm, "foo", foo); 
+    rv = PD_read(strm, "foo", st.foo); 
     if ((rv == FALSE) || (rv == -1))
        {PRINT(stdout, "%s", PD_get_error());  
-	st = FALSE;};
+	ok = FALSE;};
 
-    return(st);}
+    return(ok);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -335,7 +348,7 @@ static int read_test_2_data(PDBfile *strm)
  */
 
 static int test_2(char *base, char *tgt, int n)
-   {int err, old;
+   {int err, ok, old;
     char datfile[MAXLINE], fname[MAXLINE];
     PDBfile *strm;
     FILE *fp;
@@ -353,10 +366,10 @@ static int test_2(char *base, char *tgt, int n)
        {strm = PD_open(datfile, "w"); 
 	if (strm == NULL)
 	   {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-	    exit(1);};
+	    return(ERR);};
 	PRINT(fp, "File %s created\n", datfile);
 
-	PD_defstr(strm, "teststruct", 
+	PD_defstr(strm, "ts1", 
 		  "float x_min",
 		  "float x_max",
 		  "float y_min",
@@ -367,7 +380,9 @@ static int test_2(char *base, char *tgt, int n)
 	old = PD_activate_cksum(strm, PD_MD5_FILE | PD_MD5_RW);
            
 /* write the test data */
-	write_test_2_data(strm);
+	ok = write_test_2_data(strm);
+	if (ok == FALSE)
+	   return(ERR);
 
 /* read the data from the file */
 	err = read_test_2_data(strm);
@@ -377,14 +392,14 @@ static int test_2(char *base, char *tgt, int n)
  */
 	if (!PD_close(strm))
 	   {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-	    exit(1);};
+	    return(ERR);};
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* reopen the file */
     strm = PD_open(datfile, "r");
     if (strm == NULL)
        {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(1);};
+        return(ERR);};
     PRINT(fp, "File %s opened\n", datfile);
 
     old = PD_activate_cksum(strm, PD_MD5_FILE | PD_MD5_RW);
@@ -399,7 +414,7 @@ static int test_2(char *base, char *tgt, int n)
 /* close the file */
     if (!PD_close(strm))
        {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+        return(ERR);};
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print it out to STDOUT */
@@ -408,7 +423,7 @@ static int test_2(char *base, char *tgt, int n)
 /* free known test data memory */
     cleanup_test_2_data();
 
-    if (debug_mode)
+    if (st.debug_mode)
        SC_mem_map(STDOUT, FALSE);
 
     io_close(fp);
@@ -425,27 +440,30 @@ static int test_2(char *base, char *tgt, int n)
 
 /* WRITE_TEST_3_DATA - write out the data into the PDB file */
 
-static void write_test_3_data(PDBfile *strm)
-   {int old;
+static int write_test_3_data(PDBfile *strm)
+   {int rv, old;
 
 /* turn on variable checksums */      
     old = PD_activate_cksum(strm, PD_MD5_RW);
            
 /* this also writes out an extra hidden checksum variable for x */
-    if (!PD_write(strm, "x", "float", &x))
-       PRINT(stdout, "%s", PD_get_error());
+    if (!PD_write(strm, "x", "float", &st.x))
+       {PRINT(stdout, "%s", PD_get_error());
+	rv = FALSE;};
         
-    if (!PD_write(strm, yname, "long", y))
-       PRINT(stdout, "%s", PD_get_error());
+    if (!PD_write(strm, st.yname, "long", st.y))
+       {PRINT(stdout, "%s", PD_get_error());
+	rv = FALSE;};
         
 /* turn off variable checksums */      
     old = PD_activate_cksum(strm, PD_MD5_OFF);
     SC_ASSERT(old == TRUE);
            
-    if (!PD_write(strm, tsname, "teststruct", foo))
-       PRINT(stdout, "%s", PD_get_error());
+    if (!PD_write(strm, st.tsname, "ts1", st.foo))
+       {PRINT(stdout, "%s", PD_get_error());
+	rv = FALSE;};
                            
-    return;}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -455,7 +473,7 @@ static void write_test_3_data(PDBfile *strm)
  */
 
 static int test_3(char *base, char *tgt, int n)
-   {int err, old;
+   {int err, ok, old;
     char datfile[MAXLINE], fname[MAXLINE];
     PDBfile *strm;
     FILE *fp;
@@ -473,10 +491,10 @@ static int test_3(char *base, char *tgt, int n)
        {strm = PD_open(datfile, "w"); 
 	if (strm == NULL)
 	   {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-	    exit(1);};
+	    return(ERR);};
 	PRINT(fp, "File %s created\n", datfile);
 
-	PD_defstr(strm, "teststruct", 
+	PD_defstr(strm, "ts1", 
 		  "float x_min",
 		  "float x_max",
 		  "float y_min",
@@ -484,7 +502,9 @@ static int test_3(char *base, char *tgt, int n)
 		  LAST);
                
 /* write the test data */
-	write_test_3_data(strm);
+	ok = write_test_3_data(strm);
+	if (ok == FALSE)
+	   return(ERR);
 
 /* read the data from the file */
 	err = read_test_2_data(strm);
@@ -494,14 +514,14 @@ static int test_3(char *base, char *tgt, int n)
  */
 	if (!PD_close(strm))
 	   {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-	    exit(1);};
+	    return(ERR);};
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* reopen the file */
     strm = PD_open(datfile, "r");
     if (strm == NULL)
        {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(1);};
+        return(ERR);};
     PRINT(fp, "File %s opened\n", datfile);
 
     old = PD_activate_cksum(strm, PD_MD5_RW);
@@ -516,7 +536,7 @@ static int test_3(char *base, char *tgt, int n)
 /* close the file */
     if (!PD_close(strm))
        {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+        return(ERR);};
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print it out to STDOUT */
@@ -525,7 +545,7 @@ static int test_3(char *base, char *tgt, int n)
 /* free known test data memory */
     cleanup_test_2_data();
 
-    if (debug_mode)
+    if (st.debug_mode)
        SC_mem_map(STDOUT, FALSE);
 
     io_close(fp);
@@ -547,12 +567,12 @@ static void prep_test_4_data(void)
 
 /* set int array */
     for (i = 0; i < 5; i++)
-        {ia_w0[i] = i;
-	 ia_w1[i] = 10*i;
-	 ia_w2[i] = 100*i;};
+        {st.ia_w0[i] = i;
+	 st.ia_w1[i] = 10*i;
+	 st.ia_w2[i] = 100*i;};
 
     for (i = 0; i < 15; i++)
-        ia_r[i] = -1;
+        st.ia_r[i] = -1;
 
     return;}
 
@@ -574,7 +594,7 @@ static void cleanup_test_4_data(void)
 static int read_test_4_data(PDBfile *strm)
    {int err;
 
-    err = PD_read(strm, "ia", &ia_r);
+    err = PD_read(strm, "ia", &st.ia_r);
 
     return(err);}
 
@@ -589,13 +609,13 @@ static void print_test_4_data(FILE *fp)
 /* print int array */
     PRINT(fp, "integer array:\n");
     for (i = 0; i < 5; i++)
-        PRINT(fp, "  ia(%d,1) = %d\n", i, ia_r[i]);
+        PRINT(fp, "  ia(%d,1) = %d\n", i, st.ia_r[i]);
 
     for (i = 0; i < 5; i++)
-        PRINT(fp, "  ia(%d,2) = %d\n", i, ia_r[i+5]);
+        PRINT(fp, "  ia(%d,2) = %d\n", i, st.ia_r[i+5]);
 
     for (i = 0; i < 5; i++)
-        PRINT(fp, "  ia(%d,3) = %d\n", i, ia_r[i+10]);
+        PRINT(fp, "  ia(%d,3) = %d\n", i, st.ia_r[i+10]);
 
     PRINT(fp, "\n");
 
@@ -614,13 +634,13 @@ static int compare_test_4_data(PDBfile *strm, FILE *fp)
 /* compare ia */
     err = TRUE;
     for (i = 0; i < 5; i++)
-        {err &= (ia_w0[i] == ia_r[i]);};
+        {err &= (st.ia_w0[i] == st.ia_r[i]);};
 
     for (i = 0; i < 5; i++)
-        {err &= (ia_w1[i] == ia_r[i+5]);};
+        {err &= (st.ia_w1[i] == st.ia_r[i+5]);};
 
     for (i = 0; i < 5; i++)
-        {err &= (ia_w2[i] == ia_r[i+10]);};
+        {err &= (st.ia_w2[i] == st.ia_r[i+10]);};
 
     if (err)
        PRINT(fp, "Arrays compare\n");
@@ -638,24 +658,26 @@ static int compare_test_4_data(PDBfile *strm, FILE *fp)
  *                   - this is write, append, append
  */
 
-static void write_test_4_data(PDBfile *strm)
-   {
+static int write_test_4_data(PDBfile *strm)
+   {int rv;
+
+    rv = TRUE;
 
 /* write a primitive 2D array into the file in three blocks */
 
-    if (!PD_write(strm, "ia(1,5)", "integer", ia_w0))
+    if (!PD_write(strm, "ia(1,5)", "integer", st.ia_w0))
        {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_4_DATA\n");
-        exit(1);};
+        rv = FALSE;};
 
-    if (!PD_append(strm, "ia(1:1,0:4)", ia_w1))
+    if (!PD_append(strm, "ia(1:1,0:4)", st.ia_w1))
        {PRINT(STDOUT, "IA APPEND 1 FAILED - WRITE_TEST_4_DATA\n");
-        exit(1);};
+        rv = FALSE;};
 
-    if (!PD_append(strm, "ia(2:2,0:4)", ia_w2))
+    if (!PD_append(strm, "ia(2:2,0:4)", st.ia_w2))
        {PRINT(STDOUT, "IA APPEND 2 FAILED - WRITE_TEST_4_DATA\n");
-        exit(1);};
+        rv = FALSE;};
 
-    return;}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -665,7 +687,7 @@ static void write_test_4_data(PDBfile *strm)
  */
 
 static int test_4(char *base, char *tgt, int n)
-   {int err, old;
+   {int err, ok, old;
     char datfile[MAXLINE], fname[MAXLINE];
     PDBfile *strm;
     FILE *fp;
@@ -683,26 +705,28 @@ static int test_4(char *base, char *tgt, int n)
        {strm = PD_create(datfile);
 	if (strm == NULL)
 	   {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-	    exit(1);};
+	    return(ERR);};
 	PRINT(fp, "File %s created\n", datfile);
 
 /* turn on per variable checksums */      
 	old = PD_activate_cksum(strm, PD_MD5_RW);
            
 /* write the test data */
-	write_test_4_data(strm);
+	ok = write_test_4_data(strm);
+	if (ok == FALSE)
+	   return(ERR);
 
 /* close the file */
 	if (!PD_close(strm))
 	   {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-	    exit(1);};
+	    return(ERR);};
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* reopen the file */
     strm = PD_open(datfile, "r");
     if (strm == NULL)
        {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(1);};
+        return(ERR);};
     PRINT(fp, "File %s opened\n", datfile);
 
 /* turn on per variable checksums */      
@@ -718,7 +742,7 @@ static int test_4(char *base, char *tgt, int n)
 /* close the file */
     if (!PD_close(strm))
        {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+        return(ERR);};
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print it out to STDOUT */
@@ -727,7 +751,7 @@ static int test_4(char *base, char *tgt, int n)
 /* free known test data memory */
     cleanup_test_4_data();
 
-    if (debug_mode)
+    if (st.debug_mode)
        SC_mem_map(STDOUT, FALSE);
 
     io_close(fp);
@@ -760,13 +784,13 @@ static void print_test_5_data(FILE *fp)
 /* print int array */
     PRINT(fp, "integer array:\n");
     for (i = 0; i < 5; i++)
-        PRINT(fp, "  ia(%d,1) = %d\n", i, ia_r[i]);
+        PRINT(fp, "  ia(%d,1) = %d\n", i, st.ia_r[i]);
 
     for (i = 0; i < 5; i++)
-        PRINT(fp, "  ia(%d,2) = %d\n", i, ia_r[i+5]);
+        PRINT(fp, "  ia(%d,2) = %d\n", i, st.ia_r[i+5]);
 
     for (i = 0; i < 5; i++)
-        PRINT(fp, "  ia(%d,3) = %d\n", i, ia_r[i+10]);
+        PRINT(fp, "  ia(%d,3) = %d\n", i, st.ia_r[i+10]);
 
     PRINT(fp, "\n");
 
@@ -785,13 +809,13 @@ static int compare_test_5_data(PDBfile *strm, FILE *fp)
 /* compare ia */
     err = TRUE;
     for (i = 0; i < 3; i++)
-        {err &= (ia_w0[i] == ia_r[i]);};
+        {err &= (st.ia_w0[i] == st.ia_r[i]);};
 
     for (i = 1; i < 5; i++)
-        {err &= (ia_w1[i] == ia_r[i+5]);};
+        {err &= (st.ia_w1[i] == st.ia_r[i+5]);};
 
     for (i = 0; i < 5; i++)
-        {err &= (ia_w2[i] == ia_r[i+10]);};
+        {err &= (st.ia_w2[i] == st.ia_r[i+10]);};
 
     if (err)
        PRINT(fp, "Arrays compare\n");
@@ -809,24 +833,26 @@ static int compare_test_5_data(PDBfile *strm, FILE *fp)
  *                   - this is write, append, append
  */
 
-static void write_test_5_data(PDBfile *strm)
-   {
+static int write_test_5_data(PDBfile *strm)
+   {int rv;
+
+    rv = TRUE;
 
 /* write a primitive 1D array into the file in three blocks */
 
-    if (!PD_write(strm, "ia(5)", "integer", ia_w0))
+    if (!PD_write(strm, "ia(5)", "integer", st.ia_w0))
        {PRINT(STDOUT, "IA WRITE FAILED - WRITE_TEST_5_DATA\n");
-        exit(1);};
+        rv = FALSE;};
 
-    if (!PD_append(strm, "ia(5:9)", ia_w1))
+    if (!PD_append(strm, "ia(5:9)", st.ia_w1))
        {PRINT(STDOUT, "IA APPEND 1 FAILED - WRITE_TEST_5_DATA\n");
-        exit(1);};
+        rv = FALSE;};
 
-    if (!PD_append(strm, "ia(10:14)", ia_w2))
+    if (!PD_append(strm, "ia(10:14)", st.ia_w2))
        {PRINT(STDOUT, "IA APPEND 2 FAILED - WRITE_TEST_5_DATA\n");
-        exit(1);};
+        rv = FALSE;};
 
-    return;}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -836,8 +862,11 @@ static void write_test_5_data(PDBfile *strm)
  *                    - row major order
  */
 
-static void change_test_5_data(PDBfile *strm)
-   {int ia_a[2];
+static int change_test_5_data(PDBfile *strm)
+   {int rv;
+    int ia_a[2];
+
+    rv = TRUE;
 
     ia_a[0] = -1;
     ia_a[1] = -2;
@@ -845,18 +874,18 @@ static void change_test_5_data(PDBfile *strm)
 /* change a value in the middle of the first block */
     if (!PD_write(strm, "ia(3)", "integer", ia_a))
        {PRINT(STDOUT, "IA WRITE FAILED - CHANGE_TEST_5_DATA\n");
-        exit(1);};
+        rv = FALSE;};
 
 /* change values in the first and second block
  * this tests writes spanning blocks
  */
     if (!PD_write(strm, "ia(4:5)", "integer", ia_a))
        {PRINT(STDOUT, "IA WRITE FAILED - CHANGE_TEST_5_DATA\n");
-        exit(1);};
+        rv = FALSE;};
 
 /* NOTE: we leave the third block alone to test handling of valid blocks */
 
-    return;}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -890,7 +919,7 @@ static int read_test_5_data(PDBfile *strm)
  */
 
 static int test_5(char *base, char *tgt, int n)
-   {int err, old;
+   {int err, ok, old;
     char datfile[MAXLINE], fname[MAXLINE];
     PDBfile *strm;
     FILE *fp;
@@ -908,26 +937,28 @@ static int test_5(char *base, char *tgt, int n)
        {strm = PD_create(datfile);
 	if (strm == NULL)
 	   {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-	    exit(1);};
+	    return(ERR);};
 	PRINT(fp, "File %s created\n", datfile);
 
 /* turn on per variable checksums */      
 	old = PD_activate_cksum(strm, PD_MD5_RW);
            
 /* write the test data */
-	write_test_5_data(strm);
+	ok = write_test_5_data(strm);
+	if (ok == FALSE)
+	   return(ERR);
 
 /* close the file */
 	if (!PD_close(strm))
 	   {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-	    exit(1);};
+	    return(ERR);};
 	PRINT(fp, "File %s closed\n", datfile);};
 
 /* reopen the file */
     strm = PD_open(datfile, "a");
     if (strm == NULL)
        {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(1);};
+        return(ERR);};
     PRINT(fp, "File %s opened\n", datfile);
 
 /* turn on per variable checksums */      
@@ -950,7 +981,7 @@ static int test_5(char *base, char *tgt, int n)
 /* close the file */
     if (!PD_close(strm))
        {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+        return(ERR);};
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print it out to STDOUT */
@@ -959,7 +990,7 @@ static int test_5(char *base, char *tgt, int n)
 /* free known test data memory */
     cleanup_test_5_data();
 
-    if (debug_mode)
+    if (st.debug_mode)
        SC_mem_map(STDOUT, FALSE);
 
     io_close(fp);
@@ -1035,19 +1066,21 @@ static int test_6(char *base, char *tgt, int n)
        {strm = PD_create(datfile);
 	if (strm == NULL)
 	   {PRINT(fp, "Test couldn't create file %s\r\n", datfile);
-	    exit(1);};
+	    return(ERR);};
 	PRINT(fp, "File %s created\n", datfile);
 
 /* turn on per variable checksums */      
 	old = PD_activate_cksum(strm, PD_MD5_RW);
            
 /* write the test data */
-	write_test_5_data(strm);
+	ok = write_test_5_data(strm);
+	if (ok == FALSE)
+	   return(ERR);
 
 /* close the file */
 	if (!PD_close(strm))
 	   {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-	    exit(1);};
+	    return(ERR);};
 	PRINT(fp, "File %s closed\n", datfile);};
 
     if (read_only == FALSE)
@@ -1057,7 +1090,7 @@ static int test_6(char *base, char *tgt, int n)
     strm = PD_open(datfile, "a");
     if (strm == NULL)
        {PRINT(fp, "Test couldn't open file %s\r\n", datfile);
-        exit(1);};
+        return(ERR);};
     PRINT(fp, "File %s opened\n", datfile);
 
 /* turn on per variable checksums */      
@@ -1075,7 +1108,7 @@ static int test_6(char *base, char *tgt, int n)
 /* close the file */
     if (!PD_close(strm))
        {PRINT(fp, "Test couldn't close file %s\r\n", datfile);
-        exit(1);};
+        return(ERR);};
     PRINT(fp, "File %s closed\n", datfile);
 
 /* print it out to STDOUT */
@@ -1084,7 +1117,7 @@ static int test_6(char *base, char *tgt, int n)
 /* free known test data memory */
     cleanup_test_5_data();
 
-    if (debug_mode)
+    if (st.debug_mode)
        SC_mem_map(STDOUT, FALSE);
 
     io_close(fp);
@@ -1103,13 +1136,13 @@ static int test_6(char *base, char *tgt, int n)
 static int run_test(PFTest test, int n, char *host)
    {int i, m, rv, fail;
     char *nm;
-    tframe st;
+    tframe ti;
 
-    pre_test(&st, debug_mode);
+    pre_test(&ti, st.debug_mode);
 
     fail = 0;
 
-    if (native_only == FALSE)
+    if (st.native_only == FALSE)
        {m = PD_target_n_platforms();
 	for (i = 0; i < m; i++)
 	    {rv = PD_target_platform_n(i);
@@ -1125,7 +1158,7 @@ static int run_test(PFTest test, int n, char *host)
        {PRINT(STDOUT, "Test #%d native failed\n", n);
 	fail++;};
 
-    post_test(&st, n);
+    post_test(&ti, n);
 
     return(fail);}
 
@@ -1138,19 +1171,24 @@ static void print_help(void)
    {
 
     PRINT(STDOUT, "\nTPDCS - run PDB defent/append test suite\n\n");
-    PRINT(STDOUT, "Usage: tpdcs [-d] [-h] [-n] [-r] [-v #] [-1] [-2] [-3] [-4] [-5] [-6]\n");
+    PRINT(STDOUT, "Usage: tpdcs [-b] [-d] [-db] [-h] [-lm #] [-ln #] [-n] [-r] [-v #] [-vw] [-1] [-2] [-3] [-4] [-5] [-6]\n");
     PRINT(STDOUT, "\n");
-    PRINT(STDOUT, "       d - turn on debug mode to display memory maps\n");
-    PRINT(STDOUT, "       h - print this help message and exit\n");
-    PRINT(STDOUT, "       n - run native mode test only\n");
-    PRINT(STDOUT, "       r - read only\n");
-    PRINT(STDOUT, "       v - use specified format version (default 2)\n");
-    PRINT(STDOUT, "       1 - do NOT run test #1\n");
-    PRINT(STDOUT, "       2 - do NOT run test #2\n");
-    PRINT(STDOUT, "       3 - do NOT run test #3\n");
-    PRINT(STDOUT, "       4 - do NOT run test #4\n");
-    PRINT(STDOUT, "       5 - do NOT run test #5\n");
-    PRINT(STDOUT, "       6 - do NOT run test #6\n");
+    PRINT(STDOUT, "       b    set buffer size (default no buffering)\n");
+    PRINT(STDOUT, "       d    turn on debug mode to display memory maps\n");
+    PRINT(STDOUT, "       db   turn on buffer debugging\n");
+    PRINT(STDOUT, "       h    print this help message and exit\n");
+    PRINT(STDOUT, "       lm   power of 2 array size (default 2048)\n");
+    PRINT(STDOUT, "       ln   non-power of 2 array size (default 2000)\n");
+    PRINT(STDOUT, "       n    run native mode test only\n");
+    PRINT(STDOUT, "       r    read only\n");
+    PRINT(STDOUT, "       v    use specified format version (default 2)\n");
+    PRINT(STDOUT, "       vw   verify low level writes\n");
+    PRINT(STDOUT, "       1    do NOT run test #1\n");
+    PRINT(STDOUT, "       2    do NOT run test #2\n");
+    PRINT(STDOUT, "       3    do NOT run test #3\n");
+    PRINT(STDOUT, "       4    do NOT run test #4\n");
+    PRINT(STDOUT, "       5    do NOT run test #5\n");
+    PRINT(STDOUT, "       6    do NOT run test #6\n");
     PRINT(STDOUT, "\n");
 
     return;}
@@ -1164,48 +1202,71 @@ int main(int c, char **v)
    {int i, n, err;
     int ton[7];
     int use_mapped_files;
+    int64_t bfsz;
+    extern int SC_bio_debug(int lvl);
 
     PD_init_threads(0, NULL);
 
     SC_zero_space_n(1, -2);
-    debug_mode       = FALSE;
-    native_only      = FALSE;
+
+    bfsz             = -1;
+    bfsz             = SC_OPT_BFSZ;
     read_only        = FALSE;
     use_mapped_files = FALSE;
+
+    st.debug_mode  = FALSE;
+    st.native_only = FALSE;
 
     for (i = 0; i < 7; i++)
         ton[i] = TRUE;
 
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')
-            {switch (v[i][1])
-                {case 'd' :
-		      debug_mode  = TRUE;
-		      SC_gs.mm_debug = TRUE;
-		      break;
-                 case 'h' :
-		      print_help();
-		      return(1);
-                 case 'm' :
-		      use_mapped_files = TRUE;
-		      break;
-                 case 'n' :
-		      native_only = TRUE;
-		      break;
-                 case 'r' :
-		      read_only = TRUE;
-		      break;
-                 case 'v' :
-                      PD_set_fmt_version(SC_stoi(v[++i]));
-		      break;
-                 default :
-		      n = -SC_stoi(v[i]);
-		      ton[n] = FALSE;
-		      break;};}
+            {if (strcmp(v[i], "-db") == 0)
+	        SC_bio_debug(3);
+             else if (strcmp(v[i], "-lm") == 0)
+	        st.lm = SC_stoi(v[++i]);
+	     else if (strcmp(v[i], "-ln") == 0)
+	        st.ln = SC_stoi(v[++i]);
+	     else if (strcmp(v[i], "-vw") == 0)
+	        PD_verify_writes(1);
+	     else
+                {switch (v[i][1])
+		    {case 'b' :
+		          bfsz = SC_stol(v[++i]);
+			  break;
+		     case 'd' :
+			  st.debug_mode  = TRUE;
+			  SC_gs.mm_debug = TRUE;
+			  break;
+		     case 'h' :
+			  print_help();
+			  return(1);
+		     case 'm' :
+			  use_mapped_files = TRUE;
+			  break;
+		     case 'n' :
+			  st.native_only = TRUE;
+			  break;
+		     case 'r' :
+			  read_only = TRUE;
+			  break;
+		     case 'v' :
+			  PD_set_fmt_version(SC_stoi(v[++i]));
+			  break;
+		     default :
+		          n = -SC_stoi(v[i]);
+			  ton[n] = FALSE;
+			  break;};};}
          else
             break;};
 
+    st.y   = CMAKE_N(long, st.lm);
+    st.foo = CMAKE_N(ts1, st.ln);
+
     PD_set_io_hooks(use_mapped_files);
+
+    PD_set_buffer_size(bfsz);
 
     SC_signal(SIGINT, SIG_DFL);
 
@@ -1227,6 +1288,9 @@ int main(int c, char **v)
        err += run_test(test_6, 6, DATFILE);
 
     PRINT(STDOUT, "\n");
+
+    CFREE(st.y);
+    CFREE(st.foo);
 
     return(err);}
 

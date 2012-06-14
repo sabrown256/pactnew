@@ -1372,7 +1372,8 @@ FILE *_PD_data_source(SC_udl *pu)
 
 /* _PD_CLOSE - close a PDB file after writing out the symbol table and
  *           - structure chart and completing the header
- *           - return TRUE if successful and FALSE otherwise
+ *           - return 1 if successful, -1 on bad checksum,
+ *           - and 0 otherwise
  */
 
 int64_t _PD_close(PDBfile *file)

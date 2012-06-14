@@ -802,12 +802,22 @@ static int _SC_check_write(bio_desc *bid, bio_frame *rq, bio_frame *fr)
 
 	if (count == 1)
 	   {printf("                                      Request                              Buffer\n");
-	    printf("   Write         Addr        Start      Stop  # bytes           Start       Stop  # bytes\n");};
+	    printf("   Write  Kind     Addr        Start      Stop  # bytes           Start       Stop  # bytes\n");};
 
-	printf("%8d  %10ld   %10ld %10ld %8ld      %10ld %10ld %8ld\n",
-	       count++, (long) cad,
-	       (long) rad, (long) (rad+nbr), (long) nbr,
-	       (long) bad, (long) (bad+nbb), (long) nbb);};
+	if (rq->rw == BIO_WRITE)
+	   printf("%8d  %s %10ld   %10ld %10ld %8ld      %10ld %10ld %8ld\n",
+		  count++,
+		  "w",
+		  (long) cad,
+		  (long) rad, (long) (rad+nbr), (long) nbr,
+		  (long) bad, (long) (bad+nbb), (long) nbb);
+	else
+	   printf("%8d  %s %10ld   %10ld %10ld %8ld      %10ld %10ld %8ld\n",
+		  count++,
+		  "r",
+		  (long) cad,
+		  (long) -1L, (long) -1L, (long) nbr,
+		  (long) bad, (long) (bad+nbb), (long) nbb);};
 
     return(ok);}
 
@@ -886,7 +896,7 @@ static int64_t _SC_bio_in(void *bf, int64_t bpi, int64_t ni, bio_desc *bid)
 
 #else
 
-   {int ok;
+   {int i, ok;
     int64_t nbc, ad;
     int64_t bsz, olc, nlc;
     bio_frame *fr, rq;
@@ -923,6 +933,35 @@ static int64_t _SC_bio_in(void *bf, int64_t bpi, int64_t ni, bio_desc *bid)
 	if (fr == NULL)
 	   fr = _SC_bfr_read_setup(bid, NULL);
 
+#if 1
+	for (i = 0, ok = TRUE; ok == TRUE; i++)
+	    {nbc = _SC_bfr_infill(&rq, fr);
+	     nr += nbc;
+	     if (rq.nb != rq.sz)
+	        {bsz = fr->sz;
+		 olc = fr->addr;
+		 nlc = olc + bsz;
+
+/* NOTE: although an io_seek may have been done before getting
+ * to the io_read, it may not have moved the file pointer
+ * because it only knew that the address landed in a buffer
+ * it could not know whether the buffer had enough bytes to
+ * fulfill the request
+ * consequently, if the first pass through the loop does not
+ * fulfill the request, we must do a seek before reading bytes
+ * from the file
+ */
+		 if ((olc != bid->curr) || (i == 0))
+		    {na += (bid->curr - nlc);
+		     ad  = _SC_bio_seek(bid, nlc, SEEK_SET);
+		     SC_ASSERT(ad >= 0);};
+
+		 fr = _SC_bfr_read_setup(bid, fr);
+
+/* signify that something happened and we cannot exit the loop */
+		 nbc = -1;};
+	     ok = (nbc != 0);};
+#else
 	do {nbc = _SC_bfr_infill(&rq, fr);
 	    nr += nbc;
 	    if (rq.nb != rq.sz)
@@ -939,6 +978,7 @@ static int64_t _SC_bio_in(void *bf, int64_t bpi, int64_t ni, bio_desc *bid)
 /* signify that something happened and we cannot exit the loop */
 	        nbc = -1;};}
 	while (nbc != 0);
+#endif
 
 	_SC_bfr_push(bid, fr, TRUE);
 
