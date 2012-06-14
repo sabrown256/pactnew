@@ -19,7 +19,38 @@ NoteD $Log ""
 NoteD $Log "                    $msg"
 Note $Log ""
 
-source ../../../scripts/test-run
+set scan = FALSE
+
+if ($scan == TRUE) then
+
+   @ lerr   = 0
+   set bopt = ( $opt )
+
+   set lst = ""
+   set lst = ( $lst -lm 100 -ln 256 -b 11 end )
+   set lst = ( $lst -b 3 end )
+   while ($#lst > 0)
+      set prm = ""
+      while ($#lst > 0)
+         set v = $lst[1]
+         shift lst
+         if ("$v" == end) then
+            break
+         else
+            set prm = ( $prm $v )
+         endif
+      end
+      
+      NoteD $Log "         Parameters: $prm"
+      set opt = ( $bopt $prm )
+      source ../../../scripts/test-run
+      @ lerr = $lerr + $xstatus
+   end
+   set xstatus = $lerr
+
+else
+   source ../../../scripts/test-run
+endif
 
 $TEST_CHECK part -a checksum -e $xstatus -dt $dt -x $exe "$msg"
 

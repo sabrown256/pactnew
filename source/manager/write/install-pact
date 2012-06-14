@@ -226,7 +226,7 @@ Note $Log "   PyDirSrc   = |$PyDirSrc|"
        Note $STDOUT '      touch $DestDir/.lock'
 #       Note $STDOUT '      sinstall -p 664 $file $DestDir'
        Note $STDOUT '      $RM $DestDir/$file'
-       Note $STDOUT "      sed 's|'"'$llbddir'"'|'"'$InstDir'"'|' "'$file >! $DestDir/$file'
+       Note $STDOUT "      sed 's|'"'$lblddir'"'|'"'$InstDir'"'|' "'$file >! $DestDir/$file'
        Note $STDOUT '      if ($status != 0) then'
        Note $STDOUT '         echo "   FAILED ($status) $file"'
        Note $STDOUT '      else'

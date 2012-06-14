@@ -626,7 +626,7 @@ database *db_srv_open(char *root, int init)
 /* if a server is already running there will be a PID file */
 	if ((db->fpid != NULL) && (file_exists(db->fpid) == FALSE))
 	   {ioc_server = SERVER;
-	    rv = open_sock(root);
+	    rv = open_server(root);
 	    ASSERT(rv == 0);
 
 	    fp = fopen(db->fpid, "w");
@@ -746,7 +746,7 @@ void db_srv_restart(database *db)
 	log_activity(db->flog, dbg_db, "SERVER", "restart");
 
 	ioc_server = SERVER;
-	rv = open_sock(db->root);
+	rv = open_server(db->root);
 	ASSERT(rv == 0);};
 
     return;}

@@ -67,6 +67,10 @@ endif
 
 #--------------------------------------------------------------------------
 
+if ($?SITE_SIGNATURE_DB == 0) then
+   setenv SITE_SIGNATURE_DB ""
+endif
+
 set opt = "$name  $argv"
 
 set cargs = ""
@@ -74,6 +78,9 @@ while ($#argv > 0)
    switch ($1)
       case -cfg:
            set cfgonly = TRUE
+           breaksw
+      case -extr:
+           set srconly = TRUE
            breaksw
       case -force:
            set force = "-force"
@@ -90,7 +97,7 @@ while ($#argv > 0)
            else
               echo "Usage:"
               echo "       pact-src [-c] [-cc <C Compiler>] [-cfg] [-db <db>] [-force] [-extr] [-g]"
-              echo "                [-h] [-i <dir>] [-keep] [-t] [-test] [-vers] [-vrb]"
+              echo "                [-h] [-i <dir>] [-keep] [-site <db>] [-t] [-test] [-vers] [-vrb]"
               echo "                ..."
               echo ""
               echo "Self-building PACT distribution."
@@ -164,6 +171,7 @@ while ($#argv > 0)
               echo "    -mpi       build MPI version (equivalent to -feature mpi)"
               echo "    -py        build python bindings (equivalent to -feature python)"
               echo "    -s         build OpenMP version (equivalent to -feature openmp)"
+              echo "    -site      define the site signature from <db>"
               echo "    -sl        build shared libraries (equivalent to -feature shared)"
               echo "    -t         build threaded version (equivalent to -feature pthread)"
               echo "    -test      do not run tests"
@@ -210,6 +218,10 @@ while ($#argv > 0)
            set host    = $1
            set srcmode = "net"
            breaksw
+      case -site:
+           shift
+           setenv SITE_SIGNATURE_DB $1
+           breaksw
       case -src:
            set srcmode = "source"
            set keep    = TRUE
@@ -221,9 +233,6 @@ while ($#argv > 0)
            breaksw
       case -test:
            set test = FALSE
-           breaksw
-      case -extr:
-           set srconly = TRUE
            breaksw
       case -vers:
            if (-e ../score/score.h) then
@@ -507,6 +516,16 @@ Note $Log "Current directory after source setup $cwd"
 
 Note $Log "Changing to manager directory: $mngdir"
 flog $Log cd $mngdir
+
+if (-f $SITE_SIGNATURE_DB) then
+   Note $Log "Setting up site signature"
+   eval `../scripts/sys-site`
+   Note $Log "   SYS_SITE = $SYS_SITE"
+   Note $Log "   SYS_TYPE = $SYS_TYPE"
+   Note $Log "   DAI_ROOT = $DAI_ROOT"
+   Note $Log "   DAS_ROOT = $DAS_ROOT"
+endif
+
 flog $Log set base = $cwd:h
 
 flog $Log unset System

@@ -23,6 +23,8 @@
 # define INADDR_NONE NULL
 #endif
 
+#define NATTEMPTS   3
+
 #define C_OR_S(_p)    ((_p) ? "CLIENT" : "SERVER")
 
 typedef struct s_connection connection;
@@ -51,11 +53,13 @@ static int
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* NAME_SOCK - make conventional socket name from ROOT and channel
+/* FIND_SEMA - find conventionally named semaphore from ROOT
+ *           - look in the head directory of ROOT
  *           - .../foo -> .../foo.host@port
+ *           - return the unique file name
  */
 
-static char *name_sock(char *root, int ch)
+static char *find_sema(char *root, int ch)
    {int ia, na;
     char *hd, *tl, *rv, *h, *p;
     DIR *dir;
@@ -74,7 +78,7 @@ static char *name_sock(char *root, int ch)
        {hd = path_head(root);
 	tl = path_tail(root);};
 
-    na = 3;
+    na = NATTEMPTS;
     for (ia = 0; (ia < na) && (rv == NULL); ia++)
         {sleep(ia);
 	 dir = opendir(hd);
@@ -98,12 +102,12 @@ static char *name_sock(char *root, int ch)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SOCK_EXISTS - return TRUE iff SOCK exists */
+/* SEMA_EXISTS - return TRUE iff the semaphore specified exists */
 
-static int sock_exists(char *fmt, ...)
+static int sema_exists(char *fmt, ...)
    {int rv;
     char s[MAXLINE];
-    char *sock;
+    char *sema;
 
     rv = FALSE;
 
@@ -112,8 +116,8 @@ static int sock_exists(char *fmt, ...)
 	VSNPRINTF(s, MAXLINE, fmt);
 	VA_END;
 
-	sock = name_sock(s, -1);
-	rv   = (sock != NULL);
+	sema = find_sema(s, -1);
+	rv   = (sema != NULL);
 
 #ifdef VERBOSE
 	{char *flog, *wh;
@@ -164,7 +168,9 @@ static int make_server_sema(char *root, char *host, int port)
     snprintf(s, MAXLINE, "%s.%s@%d", root, host, port);
 
     rv = 0;
-    for (i = 0; i < 3; i++)
+
+/* try NATTEMPTS times to make the semaphore */
+    for (i = 0; i < NATTEMPTS; i++)
         {fd = open(s, O_WRONLY | O_CREAT, 0600);
 	 if (fd >= 0)
 	    {rv = fsync(fd);
@@ -182,52 +188,56 @@ static int make_server_sema(char *root, char *host, int port)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* INIT_SERVER - make a connection with the server */
+/* INIT_SERVER - setup the server side of communications
+ *             - the server scans for a port it can bind
+ *             - and writes the semaphore which clients
+ *             - then parse to obtain the host and port
+ *             - for connections to the server
+ */
 
 static int init_server(char *root)
    {int iprt, port, sasz, rv;
     char host[MAXLINE];
     char *hst;
 
-    sasz = sizeof(struct sockaddr_in);
-    port = -1;
-    rv   = FALSE;
+/* check for server being setup already */
+    if ((srv.server != 0) && (srv.port != 0))
+       rv = TRUE;
 
-    srv.server = socket(PF_INET, SOCK_STREAM, 0);
-    if (srv.server > 0)
-       {srv.sck.sin_family      = PF_INET;
-	srv.sck.sin_addr.s_addr = htonl(INADDR_ANY);
+    else
+       {rv   = FALSE;
+	port = -1;
+	sasz = sizeof(struct sockaddr_in);
 
-	for (iprt = 15000; iprt < 65000; iprt++)
-	    {srv.sck.sin_port = htons(iprt);
+	srv.server = socket(PF_INET, SOCK_STREAM, 0);
+	if (srv.server > 0)
+	   {srv.sck.sin_family      = PF_INET;
+	    srv.sck.sin_addr.s_addr = htonl(INADDR_ANY);
 
-	     if (bind(srv.server, (struct sockaddr *) &srv.sck, sasz) >= 0)
-	        {port = iprt;
-		 break;};};};
+/* scan for a port that we can use */
+	    for (iprt = 15000; iprt < 65000; iprt++)
+	        {srv.sck.sin_port = htons(iprt);
 
-    srv.port = port;
-    if (srv.port >= 0)
-       {gethostname(host, MAXLINE);
-	hst = strtok(host, ".\n");
-	rv = make_server_sema(root, hst, srv.port);};
+		 if (bind(srv.server, (struct sockaddr *) &srv.sck, sasz) >= 0)
+		    {port = iprt;
+		     break;};};};
+
+	srv.port = port;
+	if (srv.port >= 0)
+	   {gethostname(host, MAXLINE);
+
+/* try to keep connections local by converting
+ * complete host names 'abc.xyz.foo' to partial ones 'abc'
+ * also simplifies semaphore file processing
+ */
+	    hst = strtok(host, ".\n");
+	    rv = make_server_sema(root, hst, srv.port);};
 
 /* initialize the set of active sockets */
-    FD_ZERO(&srv.afs);
-    FD_SET(srv.server, &srv.afs);
+	FD_ZERO(&srv.afs);
+	FD_SET(srv.server, &srv.afs);};
 
     return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* FIN_SERVER - close the server socket down */
-
-static void fin_server(char *root)
-   {
-
-    srv.server = connect_close(srv.server, NULL, root);
-
-    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -252,9 +262,9 @@ static int connect_server(client *cl)
 
     sa = (struct sockaddr *) &srv->sck;
 
+    fds = srv->server;
     if (srv->port >= 0)
-       {fds = srv->server;
-	err = listen(fds, 5);
+       {err = listen(fds, 5);
 	if (err >= 0)
 	   {err = getsockname(fds, sa, &len);
 	    if (err == -1)
@@ -297,7 +307,7 @@ static int connect_client(client *cl)
 
     fd = -1;
 
-    res = name_sock(root, -1);
+    res = find_sema(root, -1);
     if (res != NULL)
        {nstrncpy(s, MAXLINE, path_tail(res), -1);
 	res = strrchr(s, '.') + 1;
@@ -328,21 +338,33 @@ static int connect_client(client *cl)
 
 		fd = socket(PF_INET, SOCK_STREAM, 0);
 		if (fd >= 0)
-		   {char *flog;
+		   {int ia, na;
+		    char *flog;
+		    struct sockaddr *sa;
 
 		    flog = name_log(root);
 
-		    err = connect(fd, (struct sockaddr *) &srv->sck, sasz);
+/* try NATTEMPTS times to connect to the server */
+		    na = NATTEMPTS;
+		    for (ia = 0; ia < na; ia++)
+		        {sleep(ia);
+
+			 sa  = (struct sockaddr *) &srv->sck;
+			 err = connect(fd, sa, sasz);
+			 if (err >= 0)
+			    break;};
+
+/* report the connection status */
 		    if (err >= 0)
 		       log_activity(flog, dbg_sock,
-				    "CLIENT", "connect %s@%s  %d",
-				    host, prt, fd);
+				    "CLIENT", "connect %s@%s on %d (attempt %d)",
+				    host, prt, fd, ia);
 		    else
-		       {log_activity(flog, dbg_sock, "CLIENT",
+		       {fd = connect_close(fd, cl, NULL);
+			log_activity(flog, dbg_sock, "CLIENT",
 				     "connect error %s@%s  %d - %s (%d)",
 				     host, prt, fd,
-				     strerror(errno), errno);
-			fd = connect_close(fd, cl, NULL);};
+				     strerror(errno), errno);};
 
 		    srv->server = fd;
 		    srv->port   = port;};};};};
@@ -355,17 +377,61 @@ static int connect_client(client *cl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* OPEN_SOCK - initialize the SOCK */
+/* CONNECT_ERROR - make a connection with the server */
 
-static int open_sock(char *root)
+static int connect_error(client *cl)
+   {int fds;
+    char *root, *flog;
+    connection *srv;
+
+    root = cl->root;
+    flog = name_log(root);
+
+    srv = cl->server;
+    fds = srv->server;
+    if (fds < 0)
+       log_activity(flog, dbg_sock, "CLIENT",
+		    "no server connection available");
+
+    return(-1);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* CLIENT_FD - return the file descriptor of the connection to CL */
+
+static int client_fd(client *cl)
+   {int fd, fds;
+    connection *srv;
+
+    fd = cl->fd;
+
+    if (fd == -1)
+       {srv = cl->server;
+	fds = srv->server;
+	if (fds < 0)
+	   fd = connect_error(cl);
+        else if (fds == 0)
+	   fd = connect_client(cl);
+        else
+	   fd = connect_server(cl);};
+
+    return(fd);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* OPEN_SERVER - initialize the server socket connection speficied by ROOT */
+
+static int open_server(char *root)
    {int rv;
     char *flog, *wh;
 
-    rv = TRUE;
-    rv = init_server(root);
-    rv = sock_exists(root);
-    wh = C_OR_S(srv.server == 0);
+    rv  = TRUE;
+    rv &= init_server(root);
+    rv &= sema_exists(root);
 
+    wh   = C_OR_S(srv.server == 0);
     flog = name_log(root);
     log_activity(flog, dbg_sock, wh, "open %d", rv);
 
@@ -374,20 +440,20 @@ static int open_sock(char *root)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* CLOSE_SOCK - close the SOCK */
+/* CLOSE_SOCK - close the socket specified by ROOT and remove the semaphore */
 
 static int close_sock(char *root)
    {int st, rv;
-    char *sock, *flog, *wh;
+    char *sema, *flog, *wh;
 
     rv = TRUE;
 
-    sock = name_sock(root, -1);
-    if (sock != NULL)
-       {st  = unlink(sock);
+    sema = find_sema(root, -1);
+    if (sema != NULL)
+       {st  = unlink(sema);
 	rv &= (st == 0);
 
-	fin_server(root);
+	srv.server = connect_close(srv.server, NULL, root);
 
 	wh = C_OR_S(srv.server == 0);
 
@@ -404,21 +470,11 @@ static int close_sock(char *root)
 static int read_sock(client *cl, char *s, int nc)
    {int nb, fd;
     char *flog, *wh, *root;
-    connection *srv;
 
+    wh   = C_OR_S(cl->type == CLIENT);
     root = cl->root;
-    fd   = cl->fd;
-    srv  = cl->server;
-
     flog = name_log(root);
-
-    if (fd == -1)
-       {if (srv->server == 0)
-	   fd = connect_client(cl);
-        else
-	   fd = connect_server(cl);};
-
-    wh = C_OR_S(cl->type == CLIENT);
+    fd   = client_fd(cl);
 
     if (fd < 0)
        {nb = -1;
@@ -453,27 +509,14 @@ static int read_sock(client *cl, char *s, int nc)
 static int write_sock(client *cl, char *s, int nc)
    {int nb, fd;
     char *flog, *wh, *root;
-    connection *srv;
 
     nb = -1;
 
     if ((cl != NULL) && (s != NULL))
-       {root = cl->root;
-	fd   = cl->fd;
-	srv  = cl->server;
-
-	if (nc <= 0)
-	   nc = strlen(s) + 1;
-
+       {wh   = C_OR_S(cl->type == CLIENT);
+	root = cl->root;
 	flog = name_log(root);
-
-	if (fd == -1)
-	   {if (srv->server == 0)
-	       fd = connect_client(cl);
-	    else
-	       fd = connect_server(cl);};
-
-	wh = C_OR_S(cl->type == CLIENT);
+	fd   = client_fd(cl);
 
 	if (fd < 0)
 	   log_activity(flog, dbg_sock, wh, "write - no connection");
@@ -481,6 +524,9 @@ static int write_sock(client *cl, char *s, int nc)
 	else
 	   {log_activity(flog, dbg_sock, wh, "write %d |%s| ... ",
 			 fd, s);
+
+	    if (nc <= 0)
+	       nc = strlen(s) + 1;
 
 	    nb = write(fd, s, nc);
 

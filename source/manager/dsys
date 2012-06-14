@@ -2267,40 +2267,46 @@ CFG_DONE:
         flog $Log $Which pact
 
         NoteD $Log "Removing PACT"
+        Note $Log "strict = $strict"
 
 # save the files in BinDir
         set BinFiles = ""
-        if (strict == FALSE) then
+        if ($strict == FALSE) then
            set BinFiles = ( $BinFiles smake dmake pact template timer px )
            set BinFiles = ( $BinFiles do-run elide blang perdb )
            set BinFiles = ( $BinFiles make-syntax )
            set BinFiles = ( $BinFiles import-api pcpp )
            set BinFiles = ( $BinFiles sinstall install-pact install-ext )
         endif
+        Note $Log "BinFiles = $BinFiles"
 
 # save the files in IncDir
         set IncFiles = ""
-        if (strict == FALSE) then
+        if ($strict == FALSE) then
            set IncFiles = ( $IncFiles iso-c.h scconfig.h scdecls.h )
            set IncFiles = ( $IncFiles cpyright.h syntax.h )
            set IncFiles = ( $IncFiles f90types.h f90kinds.inc )
         endif
+        Note $Log "IncFiles = $IncFiles"
 
 # save the files in EtcDir
         set EtcFiles = ""
         set EtcFiles = ( $EtcFiles configured )
-        if (strict == FALSE) then
+        if ($strict == FALSE) then
            set EtcFiles = ( $EtcFiles do-run-db cfg.db cfg.pco cfg.pl )
+           set EtcFiles = ( $EtcFiles cfg.log )
            set EtcFiles = ( $EtcFiles Makefile make-def make-macros package )
            set EtcFiles = ( $EtcFiles env-pact.csh env-pact.sh )
            set EtcFiles = ( $EtcFiles env-pact.dk env-pact.mod )
            set EtcFiles = ( $EtcFiles env-mio )
         endif
+        Note $Log "EtcFiles = $EtcFiles"
 
         set ScmFiles = ""
-        if (strict == FALSE) then
+        if ($strict == FALSE) then
            set ScmFiles = ( $ScmFiles spokes.scm )
         endif
+        Note $Log "ScmFiles = $ScmFiles"
 
 # remove scheme files
         NoteD $Log "    in $ScmDir"
