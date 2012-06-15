@@ -142,8 +142,12 @@ while ($#argv > 0)
               echo "    -llp       use LD_LIBRARY_PATH when analyzing compilers"
               echo "    -os        explicitly set the hardware/OS/release system id"
               echo "    -p         build a profiling version"
+              echo "    -ub        do not do the build step"
+              echo "    -ui        do not do the install step"
+              echo "    -ur        do not do the remove step"
+              echo "    -ut        do not do the test step"
               echo "    -v         display the Version of the Source Control System"
-              echo "    -V         configuration/build makefiles verbose"
+              echo "    -vrb       run verbosely"
               echo ""
               echo "   The following options apply only if no config file or database is specified:"
               echo ""
@@ -177,7 +181,6 @@ while ($#argv > 0)
               echo "    -site      define the site signature from <db>"
               echo "    -sl        build shared libraries (equivalent to -feature shared)"
               echo "    -t         build threaded version (equivalent to -feature pthread)"
-              echo "    -vrb       run verbosely"
               echo ""
               echo "   Config files are optional and should be used to exercise"
               echo "   more control than is available from the command line options"
@@ -227,6 +230,7 @@ while ($#argv > 0)
       case -src:
            set srcmode = "source"
            set keep    = TRUE
+           set dosrc   = FALSE
            breaksw
       case -tar:
            shift
@@ -456,7 +460,7 @@ if ($dosrc == TRUE) then
    if ($keep == "FALSE") then
       if (-d pact) then
          Note $Log "Removing old PACT files"
-         flog $Log rm -r pact
+         flog $Log rm -rf pact
       endif
    endif
 
@@ -529,7 +533,7 @@ if ($docfg == TRUE) then
    Note $Log "Changing to manager directory: $mngdir"
    flog $Log cd $mngdir
 
-   if (-f $SITE_SIGNATURE_DB) then
+   if (-f "$SITE_SIGNATURE_DB") then
       Note $Log "Setting up site signature"
       eval `../scripts/sys-site`
       Note $Log "   SYS_SITE = $SYS_SITE"
