@@ -523,6 +523,10 @@ if ($dosrc == TRUE) then
            breaksw
    endsw
 
+else
+
+   flog $Log cd pact
+
 endif
 
 Note $Log "Current directory after source setup $cwd"
