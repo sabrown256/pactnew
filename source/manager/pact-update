@@ -99,8 +99,8 @@ while ($#argv > 0)
            else
               echo "Usage:"
               echo "       pact-src [-c] [-cc <C Compiler>] [-cfg] [-db <db>] [-force] [-extr] [-g]"
-              echo "                [-h] [-i <dir>] [-keep] [-site <db>] [-t]"
-              echo "                [-ub] [-ui] [-ur] [-ut] [-vers] [-vrb]"
+              echo "                [-h] [-i <dir>] [-keep] [-site <db>] [-src] [-t]"
+              echo "                [-ub] [-uc] [-ui] [-ur] [-ut] [-vers] [-vrb]"
               echo "                ..."
               echo ""
               echo "Self-building PACT distribution."
@@ -117,13 +117,13 @@ while ($#argv > 0)
            echo "    -keep      keep existing PACT distribution, ie. keep 'pact/'"
            echo "               in directory where new distribution being built"
            echo "    -lst       list some possible configurations that are available"
+           echo "    -src       do not setup sources"
            echo "    -vers      only print the PACT Version (No update)"
            if ($name == "pact-update") then
               echo "    +net       get the PACT source from the specified host"
               echo "               via anonymous FTP without the documentation"
               echo "    -net       get the PACT source from the specified host"
               echo "               via anonymous FTP with the documenation"
-              echo "    -src       sources are out and only need to be configured (default)"
               echo "    -tar       compressed or uncompressed tar file, example"
               echo "               for pact.tar.gz type:   -tar pact.tar"
               echo ""
@@ -143,6 +143,7 @@ while ($#argv > 0)
               echo "    -os        explicitly set the hardware/OS/release system id"
               echo "    -p         build a profiling version"
               echo "    -ub        do not do the build step"
+              echo "    -uc        do not do the config step"
               echo "    -ui        do not do the install step"
               echo "    -ur        do not do the remove step"
               echo "    -ut        do not do the test step"
@@ -239,6 +240,9 @@ while ($#argv > 0)
            breaksw
       case -ub:
            set upopt = ( $upopt -b )
+           breaksw
+      case -uc:
+           set docfg = FALSE
            breaksw
       case -ui:
            set upopt = ( $upopt -i )
@@ -522,6 +526,8 @@ if ($dosrc == TRUE) then
 endif
 
 Note $Log "Current directory after source setup $cwd"
+Note $Log "Changing to manager directory: $mngdir"
+flog $Log cd $mngdir
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -529,9 +535,6 @@ Note $Log "Current directory after source setup $cwd"
 # CONFIGURE - configure the sources for a build
 
 if ($docfg == TRUE) then
-
-   Note $Log "Changing to manager directory: $mngdir"
-   flog $Log cd $mngdir
 
    if (-f "$SITE_SIGNATURE_DB") then
       Note $Log "Setting up site signature"
