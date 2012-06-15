@@ -3252,22 +3252,45 @@ CFG_DONE:
 
    case update:
 
+        @ lerr = 0
+
         set force = FALSE
         set vrb   = FALSE
 
+        set dormv = TRUE
+        set dobld = TRUE
+        set dotst = TRUE
+        set doins = TRUE
+
         while ($#argv > 0)
            switch ($1)
+              case -b:
+                   set dobld = FALSE
+                   breaksw
               case -force:
                    set force = TRUE
                    breaksw
               case -h:
               case help:
                    echo ""
-                   echo "Usage: dsys update [-force] [-h] [-v]"
+                   echo "Usage: dsys update [-b] [-force] [-h] [-i] [-r] [-t] [-v]"
+                   echo "   b     - do not do build step"
                    echo "   force - force install if tests fail"
                    echo "   h     - this help message"
+                   echo "   i     - do not do install step"
+                   echo "   r     - do not do remove step"
+                   echo "   t     - do not do test step"
                    echo "   v     - verbose mode"
                    exit(1)
+                   breaksw
+              case -i:
+                   set doins = FALSE
+                   breaksw
+              case -r:
+                   set dormv = FALSE
+                   breaksw
+              case -t:
+                   set dotst = FALSE
                    breaksw
               case -v:
                    set vrb = TRUE
@@ -3281,91 +3304,108 @@ CFG_DONE:
         set TIMER = $BaseDir/scripts/timer
         set BTime = `$TIMER -r`
 
-        set lt = `$TIMER -r`
-        NoteD $Log -n "   remove ............ "
-        if ($vrb == TRUE) then
-           Note $Log ""
-           ftee $Log $DSYS remove
-           set RStatus = $status
-        else
-           flog $Log $DSYS remove
-           set RStatus = $status
-        endif
-        set lt = `$TIMER -b $lt`
-        if ($RStatus == 0) then
-           NoteD $Log "ok ($lt)"
-        else
-           NoteD $Log "ng ($RStatus/$lt)"
-        endif
-
-        set lt = `$TIMER -r`
-        NoteD $Log -n "   compile ........... "
-        if ($vrb == TRUE) then
-           Note $Log ""
-           ftee $Log $DSYS build
-           set RStatus = $status
-        else
-           flog $Log $DSYS build
-           set RStatus = $status
-        endif
-        set lt = `$TIMER -b $lt`
-        if ($RStatus == 0) then
-           NoteD $Log "ok ($lt)"
-        else
-           NoteD $Log "ng ($RStatus/$lt)"
+# remove binaries
+        if (($dormv == TRUE) && ($lerr == 0)) then
+           set lt = `$TIMER -r`
+           NoteD $Log -n "   remove ............ "
+           if ($vrb == TRUE) then
+              Note $Log ""
+              ftee $Log $DSYS remove
+              set xstatus = $status
+           else
+              flog $Log $DSYS remove
+              set xstatus = $status
+           endif
+           set lt = `$TIMER -b $lt`
+           if ($xstatus == 0) then
+              NoteD $Log "ok ($lt)"
+           else
+              NoteD $Log "ng ($xstatus/$lt)"
+           endif
+           @ lerr = $lerr + $xstatus
         endif
 
-        if ($RStatus == 0) then
+# build sources
+        if (($dobld == TRUE) && ($lerr == 0)) then
+           set lt = `$TIMER -r`
+           NoteD $Log -n "   compile ........... "
+           if ($vrb == TRUE) then
+              Note $Log ""
+              ftee $Log $DSYS build
+              set xstatus = $status
+           else
+              flog $Log $DSYS build
+              set xstatus = $status
+           endif
+           set lt = `$TIMER -b $lt`
+           if ($xstatus == 0) then
+              NoteD $Log "ok ($lt)"
+           else
+              NoteD $Log "ng ($xstatus/$lt)"
+           endif
+           @ lerr = $lerr + $xstatus
+        endif
+
+# run test suite
+        if (($dotst == TRUE) && ($lerr == 0)) then
            set lt = `$TIMER -r`
            NoteD $Log -n "   test .............. "
            if ($vrb == TRUE) then
               Note $Log ""
               ftee $Log $DSYS test
-              set RStatus = $status
+              set xstatus = $status
            else
               flog $Log $DSYS test
-              set RStatus = $status
+              set xstatus = $status
            endif
            set lt = `$TIMER -b $lt`
-           if ($RStatus == 0) then
+           if ($xstatus == 0) then
               NoteD $Log "ok ($lt)"
            else
               if ($force == TRUE) then
-                 set RStatus = 0
-                 NoteD $Log "passed ($RStatus/$lt)"
+                 set xstatus = 0
+                 NoteD $Log "passed ($xstatus/$lt)"
               else
-                 NoteD $Log "ng ($RStatus/$lt)"
+                 NoteD $Log "ng ($xstatus/$lt)"
               endif
            endif
+           @ lerr = $lerr + $xstatus
         endif
 
-        if ($RStatus == 0) then
+# install
+        if (($doins == TRUE) && ($lerr == 0)) then
            set lt = `$TIMER -r`
            NoteD $Log -n "   install ........... "
            if ($vrb == TRUE) then
               Note $Log ""
               ftee $Log $BinDir/install-pact
-              set RStatus = $status
+              set xstatus = $status
            else
               flog $Log $BinDir/install-pact
-              set RStatus = $status
+              set xstatus = $status
            endif
            set lt = `$TIMER -b $lt`
-           if ($RStatus == 0) then
+           if ($xstatus == 0) then
               NoteD $Log "ok ($lt)"
            else
-              NoteD $Log "ng ($RStatus/$lt)"
+              NoteD $Log "ng ($xstatus/$lt)"
            endif
+           @ lerr = $lerr + $xstatus
         endif
 
         set ETime = `$TIMER -b $BTime`
 
         NoteD $Log ""
+        set RStatus = $lerr
         if ($RStatus == 0) then
            Note $Log "PACT Update succeeded ($RStatus/$ETime)"
         else
            Note $Log "PACT Update failed ($ETime)"
         endif
+
+        unset xstatus
+        unset lerr
+
         breaksw
 
 #--------------------------------------------------------------------------

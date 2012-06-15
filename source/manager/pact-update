@@ -35,22 +35,23 @@ if ($?USER == 0) then
    endif
 endif
 
-set base       = $cwd
-set keep       = FALSE
-set savedocs   = FALSE
-set mngdir     = manager
-set cfgonly    = FALSE
-set lstcfg     = FALSE
-set node       = `uname -n`
-set pattern    = 'pact.README pact*-src pact*.tar.gz'
-set srconly    = FALSE
-set tmpf       = tmp-file
-set tmpd       = tmp-dir
-set host       = `uname -n`
-set os         = `uname -s | tr "[A-Z]" "[a-z]"`
-set force      = ""
-set test       = TRUE
-set vrb        = FALSE
+set dosrc = TRUE
+set docfg = TRUE
+set doupd = TRUE
+set upopt = ""
+
+set base     = $cwd
+set keep     = FALSE
+set savedocs = FALSE
+set mngdir   = manager
+set lstcfg   = FALSE
+set node     = `uname -n`
+set pattern  = 'pact.README pact*-src pact*.tar.gz'
+set tmpf     = tmp-file
+set tmpd     = tmp-dir
+set host     = `uname -n`
+set os       = `uname -s | tr "[A-Z]" "[a-z]"`
+set vrb      = FALSE
 
 set name = $0
 set name = $name:t
@@ -77,13 +78,14 @@ set cargs = ""
 while ($#argv > 0)
    switch ($1)
       case -cfg:
-           set cfgonly = TRUE
+           set doupd = FALSE
            breaksw
       case -extr:
-           set srconly = TRUE
+           set docfg = FALSE
+           set doupd = FALSE
            breaksw
       case -force:
-           set force = "-force"
+           set upopt = ( $upopt -force )
            breaksw
       case -h:
            echo ""
@@ -97,7 +99,8 @@ while ($#argv > 0)
            else
               echo "Usage:"
               echo "       pact-src [-c] [-cc <C Compiler>] [-cfg] [-db <db>] [-force] [-extr] [-g]"
-              echo "                [-h] [-i <dir>] [-keep] [-site <db>] [-t] [-test] [-vers] [-vrb]"
+              echo "                [-h] [-i <dir>] [-keep] [-site <db>] [-t]"
+              echo "                [-ub] [-ui] [-ur] [-ut] [-vers] [-vrb]"
               echo "                ..."
               echo ""
               echo "Self-building PACT distribution."
@@ -174,7 +177,6 @@ while ($#argv > 0)
               echo "    -site      define the site signature from <db>"
               echo "    -sl        build shared libraries (equivalent to -feature shared)"
               echo "    -t         build threaded version (equivalent to -feature pthread)"
-              echo "    -test      do not run tests"
               echo "    -vrb       run verbosely"
               echo ""
               echo "   Config files are optional and should be used to exercise"
@@ -231,8 +233,17 @@ while ($#argv > 0)
            set tarf    = $1
            set srcmode = "tar"
            breaksw
-      case -test:
-           set test = FALSE
+      case -ub:
+           set upopt = ( $upopt -b )
+           breaksw
+      case -ui:
+           set upopt = ( $upopt -i )
+           breaksw
+      case -ur:
+           set upopt = ( $upopt -r )
+           breaksw
+      case -ut:
+           set upopt = ( $upopt -t )
            breaksw
       case -vers:
            if (-e ../score/score.h) then
@@ -246,7 +257,8 @@ while ($#argv > 0)
            exit(0)
            breaksw
       case -vrb:
-           set vrb = TRUE
+           set vrb   = TRUE
+           set upopt = ( $upopt -v )
            breaksw
 
 # NOTE: database config should remove other config specs
@@ -435,201 +447,182 @@ if ($lstcfg == TRUE) then
 endif
 
 #--------------------------------------------------------------------------
-
-#                                 SETUP SOURCES
-
 #--------------------------------------------------------------------------
 
-if ($keep == "FALSE") then
-   if (-d pact) then
-      Note $Log "Removing old PACT files"
-      flog $Log rm -r pact
+# SOURCE - setup the sources
+
+if ($dosrc == TRUE) then
+
+   if ($keep == "FALSE") then
+      if (-d pact) then
+         Note $Log "Removing old PACT files"
+         flog $Log rm -r pact
+      endif
    endif
-endif
 
-Note $Log ""
-switch ($srcmode)
-   case tar:
-        NoteD $Log -n "   untar ............. "
-        Note $Log ""
-
-        flog $Log tar xzvmf $tarf.gz
-        set xstatus = $status
-        if ($xstatus == 0) then
-           NoteD $Log "ok"
-        else
-           NoteD $Log "ng ($xstatus)"
+   Note $Log ""
+   switch ($srcmode)
+      case tar:
+           NoteD $Log -n "   untar ............. "
            Note $Log ""
-           Note $Log "  ERROR: TAR failed"
+
+           flog $Log tar xzvmf $tarf.gz
+           set xstatus = $status
+           if ($xstatus == 0) then
+              NoteD $Log "ok"
+           else
+              NoteD $Log "ng ($xstatus)"
+              Note $Log ""
+              Note $Log "  ERROR: TAR failed"
+              Note $Log ""
+              exit($xstatus)
+           endif
+           unset tarargs
+
+           flog $Log cd pact
+
+           breaksw
+
+      case source:
+           flog $Log cd pact
+           breaksw
+
+      default:
+           NoteD $Log -n "   check out ......... "
            Note $Log ""
-           exit($xstatus)
-        endif
-        unset tarargs
 
-        flog $Log cd pact
-
-        breaksw
-
-   case source:
-        flog $Log cd pact
-        breaksw
-
-   default:
-        NoteD $Log -n "   check out ......... "
-        Note $Log ""
-
-        set root = pactnew-read-only
-        flog $Log svn co http://pactnew.googlecode.com/svn/trunk/ $root
-        set xstatus = $status
-        if ($xstatus == 0) then
-           NoteD $Log "ok"
-        else
-           NoteD $Log "ng ($xstatus)"
-           Note $Log ""
-           Note $Log "  ERROR: Source Control System failed"
-           Note $Log ""
-           exit($xstatus)
-        endif
+           set root = pactnew-read-only
+           flog $Log svn co http://pactnew.googlecode.com/svn/trunk/ $root
+           set xstatus = $status
+           if ($xstatus == 0) then
+              NoteD $Log "ok"
+           else
+              NoteD $Log "ng ($xstatus)"
+              Note $Log ""
+              Note $Log "  ERROR: Source Control System failed"
+              Note $Log ""
+              exit($xstatus)
+           endif
 
 # delete an unnecessary directory layer */
-        flog $Log mv $root/source/{.?*,*} .
-        flog $Log rm -r $root
+           flog $Log mv $root/source/{.?*,*} .
+           flog $Log rm -r $root
 
 # remove the source control sub-directories
-        Note $Log "Removing Source Control Information"
-        flog $Log scripts/scs-meta -d | xargs rm -r
-        Note $Log "PACT sources checked out"
-        breaksw
-endsw
+           Note $Log "Removing Source Control Information"
+           flog $Log scripts/scs-meta -d | xargs rm -r
+           Note $Log "PACT sources checked out"
+           breaksw
+   endsw
 
-if ($srconly == TRUE) then
-   exit(0)
 endif
 
 Note $Log "Current directory after source setup $cwd"
 
 #--------------------------------------------------------------------------
-
-#                              CONFIGURE DISTRIBUTION
-
 #--------------------------------------------------------------------------
 
-Note $Log "Changing to manager directory: $mngdir"
-flog $Log cd $mngdir
+# CONFIGURE - configure the sources for a build
 
-if (-f $SITE_SIGNATURE_DB) then
-   Note $Log "Setting up site signature"
-   eval `../scripts/sys-site`
-   Note $Log "   SYS_SITE = $SYS_SITE"
-   Note $Log "   SYS_TYPE = $SYS_TYPE"
-   Note $Log "   DAI_ROOT = $DAI_ROOT"
-   Note $Log "   DAS_ROOT = $DAS_ROOT"
+if ($docfg == TRUE) then
+
+   Note $Log "Changing to manager directory: $mngdir"
+   flog $Log cd $mngdir
+
+   if (-f $SITE_SIGNATURE_DB) then
+      Note $Log "Setting up site signature"
+      eval `../scripts/sys-site`
+      Note $Log "   SYS_SITE = $SYS_SITE"
+      Note $Log "   SYS_TYPE = $SYS_TYPE"
+      Note $Log "   DAI_ROOT = $DAI_ROOT"
+      Note $Log "   DAS_ROOT = $DAS_ROOT"
+   endif
+
+   flog $Log set base = $cwd:h
+
+   flog $Log unset System
+   flog $Log unsetenv System
+
+   ./pre-check
+   if ($status > 1) then
+      exit(1)
+   endif
+
+   setenv System `$base/scripts/cfgman -d $base/dev use`
+   Note $Log "System = $System"
+
+   set root   = $base/dev/$System
+   set etcdir = $root/etc
+   set scrdir = $base/scripts
+   set envf   = $etcdir/env-pact.csh
+   set versid = `cat ./.pact-version`
+   set TIMER  = $scrdir/timer
+
+   set bt = `$TIMER -r`
+
+   Note $Log ""
+   Note $Log "Building PACT version $versid ($System) with: $cargs"
+
+   NoteD $Log -n "   configure ......... "
+   set lt = `$TIMER -r`
+   if ($vrb == TRUE) then
+      NoteD $Log ""
+      ftee $Log ./dsys config $cargs
+      set xstatus = $status
+   else
+      Note $Log ""
+      flog $Log ./dsys config $cargs
+      set xstatus = $status
+   endif
+   set lt = `$TIMER -b $lt`
+   if ($xstatus == 0) then
+      NoteD $Log "ok ($lt)"
+   else if ($xstatus == 2) then
+      NoteD $Log "ng ($xstatus/$lt)"
+      tail -n 12 $Log
+      exit(2)
+   else if ($xstatus != 0) then
+      NoteD $Log "ng"
+      Note $Log ""
+      Note $Log "  ERROR: DSYS CONFIG failed"
+      Note $Log ""
+      exit($xstatus)
+   endif
+
 endif
 
-flog $Log set base = $cwd:h
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-flog $Log unset System
-flog $Log unsetenv System
+# UPDATE - remove, compile, link, test and install
 
-./pre-check
-if ($status > 1) then
-   exit(1)
-endif
+if ($doupd == TRUE) then
 
-setenv System `$base/scripts/cfgman -d $base/dev use`
-Note $Log "System = $System"
+   Note $Log "Sourcing environment file $envf for $System"
+   if (-e $envf) then
+      source $envf
+      rehash
+   else
+      Note $Log ""
+      Note $Log "  ERROR: bad environment file"
+      Note $Log ""
+      exit(1)
+   endif
 
-set root   = $base/dev/$System
-set etcdir = $root/etc
-set scrdir = $base/scripts
-set envf   = $etcdir/env-pact.csh
-set versid = `cat ./.pact-version`
-set TIMER  = $scrdir/timer
-
-set bt = `$TIMER -r`
-
-Note $Log ""
-Note $Log "Building PACT version $versid ($System) with: $cargs"
-
-NoteD $Log -n "   configure ......... "
-set lt = `$TIMER -r`
-if ($vrb == TRUE) then
-   NoteD $Log ""
-   ftee $Log ./dsys config $cargs
+   ./dsys update $upopt
    set xstatus = $status
-else
-   Note $Log ""
-   flog $Log ./dsys config $cargs
-   set xstatus = $status
-endif
-set lt = `$TIMER -b $lt`
-if ($xstatus == 0) then
-   NoteD $Log "ok ($lt)"
-else if ($xstatus == 2) then
-   NoteD $Log "ng ($xstatus/$lt)"
-   tail -n 12 $Log
-   exit(2)
-else if ($xstatus != 0) then
-   NoteD $Log "ng"
-   Note $Log ""
-   Note $Log "  ERROR: DSYS CONFIG failed"
-   Note $Log ""
-   exit($xstatus)
-endif
 
-if ($cfgonly == TRUE) then
-   exit($xstatus)
-endif
-
-Note $Log "Sourcing environment file $envf for $System"
-if (-e $envf) then
-   source $envf
-   rehash
-else
-   Note $Log ""
-   Note $Log "  ERROR: bad environment file"
-   Note $Log ""
-   exit(1)
 endif
 
 #--------------------------------------------------------------------------
-
-#                               COMPILE DISTRIBUTION
-
 #--------------------------------------------------------------------------
+
+# FINISH - wrap it all up
+
+   set et = `$TIMER -b $bt`
 
    set DName = `cat ./.pact-date`
 
-   if ($test == TRUE) then
-      if ($vrb == TRUE) then
-         ./dsys update $force -v
-         set xstatus = $status
-      else
-         ./dsys update $force
-         set xstatus = $status
-      endif
-   else
-      NoteD $Log -n "   compile ........... "
-
-      set lt = `$TIMER -r`
-      if ($vrb == TRUE) then
-         NoteD $Log ""
-         ftee $Log ./dsys build
-         set xstatus = $status
-      else
-         Note $Log ""
-         flog $Log ./dsys build
-         set xstatus = $status
-      endif
-      set lt = `$TIMER -b $lt`
-      if ($xstatus == 0) then
-         NoteD $Log "ok ($lt)"
-      else
-         NoteD $Log "ng ($xstatus/$lt)"
-      endif
-   endif
-
-   set et = `$TIMER -b $bt`
    if ($xstatus != 0) then
       NoteD $Log "PACT update failed ($xstatus/$et)"
 
@@ -658,9 +651,6 @@ endif
    NoteD $Log "For details see the log file $node.BUILD"
    NoteD $Log ""
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-flog $Log cd $base
+   flog $Log cd $base
 
 exit($xstatus)

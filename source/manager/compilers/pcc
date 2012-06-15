@@ -61,7 +61,7 @@ Tool Lex {
    Flags  = -w
    Flags += [ _env_ = Bits ;                 # address bit size
               32    = -m32 ;
-              64    = -m64 -fPIC ]
+              64    = -m64 -pie ]
 }
 
 Group Std {
@@ -77,8 +77,8 @@ Group Cfg {
 
 Group Shared {
    LD_Exe   = pcc
-   CC_Flags = -fPIC
-   LD_Flags = -shared
+   CC_Flags = -pie
+   LD_Flags = -dy
 }
 
 Group PThread {
