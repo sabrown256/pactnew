@@ -536,9 +536,21 @@ flog $Log cd $mngdir
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# CONFIGURE - configure the sources for a build
+# PRELIMINARY - do some general preparation for all subsequent work
 
-if ($docfg == TRUE) then
+# initialize these in such a way to make it clear what is missing
+   if ($?SYS_SITE == 0) then
+      setenv SYS_SITE SYS_SITE
+   endif
+   if ($?SYS_TYPE == 0) then
+      setenv SYS_TYPE SYS_TYPE
+   endif
+   if ($?DAI_ROOT == 0) then
+      setenv DAI_ROOT DAI_ROOT
+   endif
+   if ($?DAS_ROOT == 0) then
+      setenv DAS_ROOT DAS_ROOT
+   endif
 
    if (-f "$SITE_SIGNATURE_DB") then
       Note $Log "Setting up site signature"
@@ -554,11 +566,6 @@ if ($docfg == TRUE) then
    flog $Log unset System
    flog $Log unsetenv System
 
-   ./pre-check
-   if ($status > 1) then
-      exit(1)
-   endif
-
    setenv System `$base/scripts/cfgman -d $base/dev use`
    Note $Log "System = $System"
 
@@ -570,6 +577,18 @@ if ($docfg == TRUE) then
    set TIMER  = $scrdir/timer
 
    set bt = `$TIMER -r`
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# CONFIGURE - configure the sources for a build
+
+if ($docfg == TRUE) then
+
+   ./pre-check
+   if ($status > 1) then
+      exit(1)
+   endif
 
    Note $Log ""
    Note $Log "Building PACT version $versid ($System) with: $cargs"
