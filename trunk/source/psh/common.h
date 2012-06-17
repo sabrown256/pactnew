@@ -32,21 +32,23 @@
 
 #endif
 
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <ctype.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/utsname.h>
-#include <time.h>
-#include <fcntl.h>
-#include <signal.h>
-#include <errno.h>
-#include <poll.h>
-#include "nonstd.h"
+#ifndef NO_STD_INCLUDES
+# include <unistd.h>
+# include <stdlib.h>
+# include <string.h>
+# include <stdio.h>
+# include <stdarg.h>
+# include <ctype.h>
+# include <sys/types.h>
+# include <sys/stat.h>
+# include <sys/utsname.h>
+# include <time.h>
+# include <fcntl.h>
+# include <signal.h>
+# include <errno.h>
+# include <poll.h>
+# include "nonstd.h"
+#endif
 
 #undef TRUE
 #undef FALSE
