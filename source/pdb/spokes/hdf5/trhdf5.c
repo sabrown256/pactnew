@@ -69,9 +69,9 @@ static hid_t
 static char
  *_H5_dec_compound(PDBfile *file, hid_t htyp);
 
-static long
+static int64_t
  _H5_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr),
- _H5_wr_syment(PDBfile *file, char *name, char *vr, long ni,
+ _H5_wr_syment(PDBfile *file, char *name, char *vr, int64_t ni,
 	       char *intype, char *outtype);
 
 static sys_layer
@@ -1642,8 +1642,8 @@ static PDBfile *_H5_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 
 /* _H5_RD_SYMENT - read syment method for HDF5 spoke */
 
-long _H5_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
-   {long rv;
+int64_t _H5_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
+   {int64_t rv;
 
     rv = _PD_rd_syment(file, ep, outtype, vr);
 
@@ -1654,9 +1654,9 @@ long _H5_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
 
 /* _H5_WR_SYMENT - read syment method for HDF5 spoke */
 
-long _H5_wr_syment(PDBfile *file, char *name, char *vr, long ni,
-		   char *intype, char *outtype)
-   {long rv;
+int64_t _H5_wr_syment(PDBfile *file, char *name, char *vr, int64_t ni,
+		      char *intype, char *outtype)
+   {int64_t rv;
 
     rv = _PD_wr_syment(file, name, vr, ni, intype, outtype);
 

@@ -443,6 +443,8 @@ static int test_2(char *base, char *tgt, int n)
 static int write_test_3_data(PDBfile *strm)
    {int rv, old;
 
+    rv = TRUE;
+
 /* turn on variable checksums */      
     old = PD_activate_cksum(strm, PD_MD5_RW);
            
