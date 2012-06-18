@@ -72,6 +72,10 @@ if ($?SITE_SIGNATURE_DB == 0) then
    setenv SITE_SIGNATURE_DB ""
 endif
 
+if ($?RUN_SIGNATURE_DB == 0) then
+   setenv RUN_SIGNATURE_DB ""
+endif
+
 set opt = "$name  $argv"
 
 set cargs = ""
@@ -98,8 +102,8 @@ while ($#argv > 0)
               echo "update the PACT installation on this machine"
            else
               echo "Usage:"
-              echo "       pact-src [-c] [-cc <C Compiler>] [-cfg] [-db <db>] [-force] [-extr] [-g]"
-              echo "                [-h] [-i <dir>] [-keep] [-site <db>] [-src] [-t]"
+              echo "       pact-src [-c] [-cc <C Compiler>] [-cfg] [-db <db> <path>] [-force] [-extr] [-g]"
+              echo "                [-h] [-i <dir>] [-keep] [-src] [-t]"
               echo "                [-ub] [-uc] [-ui] [-ur] [-ut] [-vers] [-vrb]"
               echo "                ..."
               echo ""
@@ -110,7 +114,6 @@ while ($#argv > 0)
 
            echo ""
            echo "    -cfg       stop after configuring the distribution"
-           echo "    -db        configure from an existing database <db>"
            echo "    -extr      setup/extract sources only"
            echo "    -force     force install if tests fail"
            echo "    -h         this help package"
@@ -132,6 +135,11 @@ while ($#argv > 0)
            else
               echo ""
               echo "    -c         create missing directories for -i option"
+              echo "    -db        supplement configuration from database <path>"
+              echo "               options for <db> are:"
+              echo "                  cfg   configuration database"
+              echo "                  run   run signature database"
+              echo "                  site  site signature databae"
               echo "    -f         a directory containing your configuration file"
               echo "    -F         do fast builds using /tmp"
               echo "    -g         build an absolutely debuggable version"
@@ -179,7 +187,6 @@ while ($#argv > 0)
               echo "    -mpi       build MPI version (equivalent to -feature mpi)"
               echo "    -py        build python bindings (equivalent to -feature python)"
               echo "    -s         build OpenMP version (equivalent to -feature openmp)"
-              echo "    -site      define the site signature from <db>"
               echo "    -sl        build shared libraries (equivalent to -feature shared)"
               echo "    -t         build threaded version (equivalent to -feature pthread)"
               echo ""
@@ -224,10 +231,6 @@ while ($#argv > 0)
            set host    = $1
            set srcmode = "net"
            breaksw
-      case -site:
-           shift
-           setenv SITE_SIGNATURE_DB $1
-           breaksw
       case -src:
            set srcmode = "source"
            set keep    = TRUE
@@ -251,6 +254,7 @@ while ($#argv > 0)
            set upopt = ( $upopt -r )
            breaksw
       case -ut:
+      case -test:
            set upopt = ( $upopt -t )
            breaksw
       case -vers:
@@ -269,12 +273,26 @@ while ($#argv > 0)
            set upopt = ( $upopt -v )
            breaksw
 
+      case -db:
+           shift
+           switch ($1)
+
 # NOTE: database config should remove other config specs
 # such as compilers or features
 # but not instbase or debug/opt
-      case -db:
-           set cargs = ( $cargs $1 $2 )
-           shift
+              case cfg:
+                   shift
+                   set cargs = ( $cargs -db $1 )
+                   breaksw
+              case run:
+                   shift
+                   setenv RUN_SIGNATURE_DB $1
+                   breaksw
+              case site:
+                   shift
+                   setenv SITE_SIGNATURE_DB $1
+                   breaksw
+           endsw
            breaksw
 
       case -cc:
@@ -538,6 +556,7 @@ flog $Log cd $mngdir
 
 # PRELIMINARY - do some general preparation for all subsequent work
 
+# settle SITE signature
 # initialize these in such a way to make it clear what is missing
    if ($?SYS_SITE == 0) then
       setenv SYS_SITE SYS_SITE
@@ -553,14 +572,25 @@ flog $Log cd $mngdir
    endif
 
    if (-f "$SITE_SIGNATURE_DB") then
-      Note $Log "Setting up site signature"
+      Note $Log "Setting up site signature using '$SITE_SIGNATURE_DB'"
       eval `../scripts/sys-site`
-      Note $Log "   SYS_SITE = $SYS_SITE"
-      Note $Log "   SYS_TYPE = $SYS_TYPE"
-      Note $Log "   DAI_ROOT = $DAI_ROOT"
-      Note $Log "   DAS_ROOT = $DAS_ROOT"
+   else
+      Note $Log "No site signature found"
+   endif
+   Note $Log "   SYS_SITE = $SYS_SITE"
+   Note $Log "   SYS_TYPE = $SYS_TYPE"
+   Note $Log "   DAI_ROOT = $DAI_ROOT"
+   Note $Log "   DAS_ROOT = $DAS_ROOT"
+
+# settle RUN signature
+# NOTE: essential for cross compiling
+   if (-f "$RUN_SIGNATURE_DB") then
+      Note $Log "Setting up run signature using '$RUN_SIGNATURE_DB'"
+   else
+      Note $Log "No run signature found"
    endif
 
+# settle environment of build
    flog $Log set base = $cwd:h
 
    flog $Log unset System
@@ -576,6 +606,7 @@ flog $Log cd $mngdir
    set versid = `cat ./.pact-version`
    set TIMER  = $scrdir/timer
 
+# begin timing
    set bt = `$TIMER -r`
 
 #--------------------------------------------------------------------------
@@ -617,6 +648,22 @@ if ($docfg == TRUE) then
       Note $Log "  ERROR: DSYS CONFIG failed"
       Note $Log ""
       exit($xstatus)
+   endif
+
+   source $envf
+   if (!(-f "$RUN_SIGNATURE_DB")) then
+      set inf = ( `grep CROSS_COMPILE= $etcdir/cfg*.db | grep -v =FALSE` )
+      if ("$inf" != "") then
+         NoteD $Log ""
+         NoteD $Log "You are cross compiling and must have a valid run signature"
+         NoteD $Log "see '-db run <path>' option"
+         NoteD $Log ""
+         exit(1)
+      endif
+   else
+      Note $Log ""
+      Note $Log "Proper setup for cross compiling - ok"
+      Note $Log ""
    endif
 
 endif

@@ -964,9 +964,10 @@ switch ($Cmnd)
 
         InitLog Log $LogDir/config
 
-        Note $Log "System = $System"
-        Note $Log "SysDir = $SysDir"
-        Note $Log "Args   = $nargs"
+        Note $Log "System    = $System"
+        Note $Log "SysDir    = $SysDir"
+        Note $Log "Args      = $nargs"
+        Note $Log "ConfigDir = $ConfigDir"
 
         flog $Log umask
 
@@ -1082,7 +1083,7 @@ switch ($Cmnd)
         set GenFiles = ( $GenFiles spokes.scm )
         foreach i ( $GenFiles )
            flog $Log $RM $IncDir/$i
-        endif
+        end
 
 # remove files we are about to generate in etc
 # so that if generation fails we are not left with ghosts from old configs
@@ -1092,7 +1093,7 @@ switch ($Cmnd)
         set GenFiles = ( $GenFiles env-mio )
         foreach i ( $GenFiles )
            flog $Log $RM $IncDir/$i
-        endif
+        end
 
 # remove files we are about to generate in bin
 # so that if generation fails we are not left with ghosts from old configs
@@ -1100,7 +1101,7 @@ switch ($Cmnd)
         set GenFiles = ( $GenFiles install-pact )
         foreach i ( $GenFiles )
            flog $Log $RM $BinDir/$i
-        endif
+        end
 
 # must have cpyright.h available during configuration
         flog $Log cp cpyright.h $IncDir
@@ -1119,7 +1120,7 @@ switch ($Cmnd)
            unset dbcfg
 
         else
-           echo "There is no $Configuration in $ConfigDir"
+           NoteD $Log "There is no $Configuration in $ConfigDir"
            set RStatus = 3
         endif
         unset dir
@@ -1140,7 +1141,7 @@ switch ($Cmnd)
         set RStatus = $status
         Note $Log "Status = $RStatus"
         if ($RStatus != 0) then
-           echo "   PACT install PROBLEM during 'dsys config'"
+           NoteD $Log "   linstall failed during 'dsys config'"
            goto CFG_DONE
         endif
 

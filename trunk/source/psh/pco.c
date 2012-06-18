@@ -933,6 +933,30 @@ static void write_envf(client *cl, int lnotice)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* CHECK_CROSS - verify that we have a RUN_SIGNATURE_DB if
+ *             - we are cross compiling
+ */
+
+static int check_cross(client *cl)
+   {int rv;
+    char *s;
+
+    rv = TRUE;
+
+    s = cgetenv(TRUE, "CROSS_COMPILE");
+    if (strcmp(s, "FALSE") != 0)
+       {s = cgetenv(TRUE, "RUN_SIGNATURE_DB");
+	if (file_exists(s) == FALSE)
+	   {noted(Log, "");
+	    noted(Log, "You are cross compiling without a run_signature database - exiting");
+	    noted(Log, "");
+	    rv = FALSE;};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* CHECK_DIR - check for missing directories */
 
 static void check_dir(client *cl)
@@ -1498,6 +1522,7 @@ static void default_var(client *cl, char *base)
 /* check variables which may have been initialized from the command line */
     if (IS_NULL(st.system) == TRUE)
        nstrncpy(st.system, MAXLINE, run(BOTH, "%s/cfgman use", st.dir.scr), -1);
+    cinitenv("System", st.system);
 
     dbinitv(cl, "CfgMan",        "%s/cfgman", st.dir.scr);
     dbinitv(cl, "Globals",       "");
@@ -2334,6 +2359,182 @@ static void read_config(client *cl, char *cfg, int quiet)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* ADD_DO_RUN - add an entry to the database */
+
+static void add_do_run(FILE *fp, char *lf)
+   {int i;
+    char **sa;
+
+    sa = file_text(FALSE, lf);
+
+    for (i = 0; sa[i] != NULL; i++)
+        {if (strchr(sa[i], '#') == NULL)
+ 	    fprintf(fp, "%s\n", sa[i]);};
+
+    free_strings(sa);
+
+    fprintf(fp, "\n");
+    fprintf(fp, "#-------------------------------------------------------------------------\n");
+
+    note(Log, TRUE, "Using %s", lf);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DO_RUN_SPEC - return the path to S in LST */
+
+static char *do_run_spec(char *lst, char *s)
+   {char *file;
+    static char t[MAXLINE];
+
+    file = NULL;
+    if (file_exists(s) == TRUE)
+       file = s;
+
+    else
+       {FOREACH(d, lst, " \t\n")
+	   snprintf(t, MAXLINE, "%s/do-run-%s", d, s);
+	   if (file_exists(t) == TRUE)
+	      {file = t;
+	       break;};
+	ENDFOR;};
+
+    return(file);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* WRITE_DO_RUN_DB - write the do-run database */
+
+static void write_do_run_db(client *cl, state *st)
+   {int i, l, ns;
+    char ldbg[MAXLINE], lmpi[MAXLINE], lcrs[MAXLINE];
+    char cfg[MAXLINE], db[MAXLINE];
+    char s[MAXLINE];
+    char **cnd, **sa, *file, *exe, *p;
+    FILE *fp;
+
+    p = cgetenv(TRUE, "ConfigDir");
+    if (IS_NULL(p) == TRUE)
+       p = "local std";
+    nstrncpy(cfg,  MAXLINE, p, -1);
+
+    nstrncpy(ldbg, MAXLINE, dbget(cl, TRUE, "DO_RUN_DBG"), -1);
+    nstrncpy(lmpi, MAXLINE, dbget(cl, TRUE, "DO_RUN_MPI"), -1);
+    nstrncpy(lcrs, MAXLINE, dbget(cl, TRUE, "DO_RUN_CROSS"), -1);
+
+    separator(Log);
+    note(Log, TRUE, "   ConfigDir     = %s", cfg);
+    note(Log, TRUE, "   DO_RUN_DBG    = %s", ldbg);
+    note(Log, TRUE, "   DO_RUN_MPI    = %s", lmpi);
+    note(Log, TRUE, "   DO_RUN_CROSS  = %s", lcrs);
+
+/* initialize the database file */
+    note(Log, TRUE, "   Do-run signature database - do-run-db");
+
+    snprintf(db, MAXLINE, "%s/do-run-db", st->dir.etc);
+    fp = fopen(db, "w");
+
+    fprintf(fp, "#\n");
+    fprintf(fp, "# DO-RUN-DB - execution signatures for do-run\n");
+    fprintf(fp, "#\n");
+
+    cnd = NULL;
+
+/* check for debug specs */
+    if ((IS_NULL(ldbg) == FALSE) && (strcmp(ldbg, "none") != 0))
+       {cnd = lst_push(cnd, ldbg);
+	fprintf(fp, "default DBG %s\n", path_base(ldbg));}
+    else
+       {cnd = lst_push(cnd, "gdb");
+        cnd = lst_push(cnd, "tv");
+        cnd = lst_push(cnd, "vg");
+        cnd = lst_push(cnd, "vgd");
+        cnd = lst_push(cnd, "prf");
+        cnd = lst_push(cnd, "zf");};
+
+/* check for MPI specs */
+    if ((IS_NULL(lmpi) == FALSE) && (strcmp(lmpi, "none") != 0))
+       {cnd = lst_push(cnd, lmpi);
+	fprintf(fp, "default MPI %s\n", path_base(lmpi));}
+    else
+       {cnd = lst_push(cnd, "poe");
+        cnd = lst_push(cnd, "srun");
+        cnd = lst_push(cnd, "dmpirun");
+        cnd = lst_push(cnd, "mpirun");};
+
+/* check for cross compile specs */
+    if ((IS_NULL(lcrs) == FALSE) && (strcmp(lcrs, "none") != 0))
+       {cnd = lst_push(cnd, lcrs);
+	fprintf(fp, "default CROSS %s\n", path_base(lcrs));}
+    else
+       cnd = lst_push(cnd, "submit");
+
+    ns = 0;
+
+/* find the prolog */
+    FOREACH(d, cfg, " \t\n")
+       snprintf(s, MAXLINE, "%s/do-run-prolog", d);
+       if (file_exists(s) == TRUE)
+          {add_do_run(fp, s);
+	   ns++;
+	   break;};
+    ENDFOR;
+
+/* process the specs in CND */
+    for (i = 0; cnd[i] != NULL; i++)
+        {note(Log, TRUE, "Checking %s", cnd[i]);
+
+	 file = do_run_spec(cfg, cnd[i]);
+	 if (IS_NULL(file) == TRUE)
+	    continue;
+
+	 note(Log, TRUE, "   config file = |%s|", file);
+
+	 exe = cwhich(path_base(cnd[i]));
+	 note(Log, TRUE, "   candidate for %s name = |%s|",
+	      cnd[i], exe);
+	 if (file_executable(exe) == TRUE)
+	    {add_do_run(fp, file);
+	     ns++;}
+	 else
+	    {sa = file_text(FALSE, file);
+
+	     for (l = 0; sa[l] != NULL; l++)
+	         {if (strstr(sa[l], "Exe") != NULL)
+		     {p   = strchr(sa[l], '=');
+		      exe = trim(p+1, BOTH, " \t\n\r");
+		      if (exe[0] != '/')
+			 exe = cwhich(exe);
+
+		      note(Log, TRUE, "   candidate for %s file = |%s|",
+			   cnd[i], exe);
+		      if (file_executable(exe) == TRUE)
+			 {add_do_run(fp, file);
+			  ns++;};
+		      break;};};
+
+	     free_strings(sa);};};
+
+    lst_free(cnd);
+
+    fprintf(fp, "\n");
+
+    fclose(fp);
+
+/* add the signature variable to the databases */
+    if (ns > 0)
+       {dbset(cl, "RUN_SIGNATURE_DB", db);
+	csetenv("RUN_SIGNATURE_DB", db);
+	note(st->aux.SEF, TRUE, "RUN_SIGNATURE_DB %s", db);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* ANALYZE_CONFIG - analyze the system configuration */
 
 static void analyze_config(client *cl, char *base)
@@ -2706,6 +2907,17 @@ int main(int c, char **v, char **env)
 
 	read_config(cl, st.cfgf, FALSE);
 
+        write_do_run_db(cl, &st);
+
+	ok = check_cross(cl);
+	if (ok == FALSE)
+	   {free_client(cl);
+
+	    if (st.have_db == TRUE)
+	       kill_perdb();
+
+	    return(2);};
+
 	pco_save_db(cl, "inp");
 
 	noted(Log, "");
@@ -2717,6 +2929,8 @@ int main(int c, char **v, char **env)
 
     else
        {pco_load_db(cl, st.db);
+
+        write_do_run_db(cl, &st);
 
 /* order matters crucially here */
         env_subst(cl, "InstBase",      ib);
