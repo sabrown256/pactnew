@@ -3,9 +3,13 @@
 ;            - which means generating and compiling bindings for them
 ;
 
-(import "/usr/include/jpeglib.h" "/usr/lib/x86_64-linux-gnu/libjpeg.so")
+(cond ((file? "/usr/lib/x86_64-linux-gnu/libjpeg.so")
+       (import "/usr/include/jpeglib.h" "/usr/lib/x86_64-linux-gnu/libjpeg.so"))
+      ((file? "/usr/lib64/libjpeg.so")
+       (import "/usr/include/jpeglib.h" "/usr/lib64/libjpeg.so")))
 
-(define fname "pict-0001-001.jpg")
+;(define fname "pict-0001-001.jpg")
+(define fname "import-image.jpg")
 (define infile (fopen fname "rb"))
 
 (jpeg-create-decompress &cinfo)
