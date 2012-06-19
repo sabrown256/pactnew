@@ -40,6 +40,7 @@ flog $ALog cat $Tmp.c
 
 flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt -lm
 if ($status == 0) then
+#   flog $ALog $CFE -v $Tmp
    set inf = ( `$CFE $Tmp | grep "b ="` )
    if ($#inf > 2) then
       flog $ALog set val = $inf[3]

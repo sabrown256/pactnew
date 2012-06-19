@@ -657,9 +657,9 @@ switch ($Cmnd)
                    shift
                    setenv CCompiler  $1
                    $MngDir/verify-cc $CCompiler
-                   if ($status != 0) exit(1)
+                   if ($status != 0) then
+                      exit(1)
                    endif
-
                    breaksw
               case -c:
                    set PArgs = ( $PArgs "-c" )

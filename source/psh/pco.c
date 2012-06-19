@@ -1312,10 +1312,11 @@ static void setup_analyze_env(client *cl, char *base)
     dbset(cl, "MeOnly", "TRUE");
 
 /* initialization of non-graphics flags */
-    if (strcmp(st.os, "AIX") == 0)
-       dbset(cl, "NM", "/usr/bin/nm -g -X %s", dbget(cl, TRUE, "Bits"));
-    else
-       dbset(cl, "NM", "%s -g", cwhich("nm"));
+    if (dbdef(cl, "NM") == FALSE)
+       {if (strcmp(st.os, "AIX") == 0)
+	   dbset(cl, "NM", "/usr/bin/nm -g -X %s", dbget(cl, TRUE, "Bits"));
+        else
+	   dbset(cl, "NM", "%s -g", cwhich("nm"));};
 
     dbinitv(cl, "CC_Version",  "");
     dbinitv(cl, "FC_Version",  "");

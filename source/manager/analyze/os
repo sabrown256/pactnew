@@ -32,11 +32,22 @@ endif
 
 Note $ALog "HostOS  = $HostOS"
 Note $ALog "RootInc = $RootInc"
-if (("$HostOS" == "Windows_NT") || \
+if ($CROSS_COMPILE == MINGW32) then
+   setenv OSType     WIN32
+   setenv HostOS     Win32
+   setenv HostOSRel  mingw32
+
+else if ($CROSS_COMPILE == MINGW64) then
+   setenv OSType     WIN64
+   setenv HostOS     Win64
+   setenv HostOSRel  mingw64
+
+else if (("$HostOS" == "Windows_NT") || \
     (("$HostOS" == "Linux") && (-e $RootInc/termio.h)) || \
     ($?IBM_BGP == 1) || ($?IBM_BGQ == 1) || \
     (-e $RootInc/sys/termio.h)) then
    setenv OSType "SYSV"
+
 else
    setenv OSType "BSD"
 endif
@@ -51,6 +62,7 @@ NoteD $ALog " ($OSType)"
 
 setenv OSType USE_$OSType
 
+SetParent HostOS
 SetParent OSType
 SetParent MACRev
 
