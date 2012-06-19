@@ -118,6 +118,13 @@ case exe:
         if ("$iscross" != "") then
            set host = "submit"
         endif
+
+# MINGW
+     else
+        set inf = ( `file $Exe` )
+        if ("$inf" =~ *MS\ Windows*) then
+           set host = "wine"
+        endif
      endif
 
      echo $host

@@ -142,6 +142,9 @@
                    echo "include ${Bits}-bit" >>& $Tmp
                    echo "include compilers/icc" >>& $Tmp
                    breaksw
+              case mingw*:
+                   echo "include auto-mingw" >>& $Tmp
+                   breaksw
               case *path:
               case *pathcc:
                    echo "run std/use-compiler $lcc" >>& $Tmp

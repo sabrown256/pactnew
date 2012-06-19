@@ -1,0 +1,109 @@
+#
+# MINGW - define GNU compiler for MINGW
+#
+# include "cpyright.h"
+#
+
+run analyze/rpath gnu
+
+setenv NM /usr/bin/i686-w64-mingw32-nm
+
+WARN_PATTERN = ":+sp+warning:"
+ERR_PATTERN  = ":+sp+error:"
+
+Tool CC {
+   Exe       = i586-mingw32msvc-gcc
+   Flags     = -fsignaling-nans -ffloat-store
+   Flags    += [ _env_ = C_STD ;                # C standard flags
+                 C89   = -std=c89 ;
+                 C99   = -std=c99 ;
+                 X89   = -std=gnu89 ;           # gcc default
+                 X99   = -std=gnu99 ]
+   Flags    += [ _env_ = Bits ;                 # address bit size
+                 *     = -m* ]
+   Flags    += [ _cmd_ = -p ;                   # profiling
+	         on    = -pg ]
+   Flags    += [ _cmd_ = -cov ;                 # coverage analysis
+	         on    = -fprofile-arcs -ftest-coverage ]
+   Debug     = -g -O0 -Wall
+   Optimize  = -g -O -Wunused
+   Version   = -v
+}
+
+Tool FC {
+   Exe     = i586-mingw32msvc-gfortran
+   Flags   = -funderscoring -ffree-form
+   Flags  += [ _env_ = Bits ;                # address bit size
+               *     = -m* ]
+   Flags  += [ _cmd_ = -p ;                  # profiling
+	       on    = -pg ]
+   Flags  += [ _cmd_ = -cov ;                # coverage analysis
+	       on    = -fprofile-arcs -ftest-coverage ]
+   Version = -v
+}
+
+Tool CXX {
+   Exe       = i586-mingw32msvc-g++
+   Flags     = 
+   Debug     = -g -O0 -Wall
+   Optimize  = -g -O -Wunused
+   Version   = -v
+}
+
+Tool LD {
+   Exe      = i586-mingw32msvc-ld
+   RPath    = -Wl,-rpath,@
+   Flags   += [ _cmd_ = -p ;                 # profiling
+	        on    = -pg ]
+   Flags   += [ _cmd_ = -cov ;               # coverage analysis
+	        on    = -lgcov ]
+}
+
+Tool Lex {
+   Flags  = -w
+   Flags += [ _env_ = Bits ;                 # address bit size
+              *     = -m* ]
+}
+
+Tool Ranlib {
+   Exe = i686-w64-mingw32-ranlib
+}
+
+Tool NM {
+   Exe = i686-w64-mingw32-nm
+}
+
+Group Std {
+   CC_Flags = ${CC_Flags}
+   FC_Flags = ${FC_Flags}
+   LD_Flags = ${LD_Flags}
+}
+
+Group Cfg {
+   Use    = Std
+   CC_Exe = i586-mingw32msvc-gcc
+}
+
+Group Shared {
+   LD_Exe    = i586-mingw32msvc-gcc
+   CC_Flags += [ _env_ = Bits ;                 # address bit size
+                *     = -m* ]
+   LD_Flags  = -shared
+}
+
+Group PThread {
+   LD_Lib = -lpthread 
+}
+
+Group OpenMP {
+   CC_Flags = -fopenmp
+   LD_Flags = -fopenmp
+#   LD_Lib   = -lgomp
+   SharedFnc = [ _env_ = PACT_CC_VERSION ;      # compiler version flags
+                4.6.0  <  yes ;
+                4.6.0  >= no ]
+}
+
+include cpp-rule
+include serial
+

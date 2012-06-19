@@ -84,7 +84,9 @@ extern long double
 
 #ifdef HAVE_GNU_LIBC_6
 
-# include <sys/wait.h>
+# ifdef UNIX
+#  include <sys/wait.h>
+# endif
 
 #else
 
