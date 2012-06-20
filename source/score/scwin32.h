@@ -43,8 +43,6 @@
 #define directory_delim "\\"
 #define directory_delim_c '\\'
 
-#define _PC_PATH_MAX   1024
-
 /* define a faux signal set */
 
 #define SIGHUP		 1

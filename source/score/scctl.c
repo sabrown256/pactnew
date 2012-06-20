@@ -181,7 +181,7 @@ char *SC_getcwd(void)
 
     wd = NULL;
 
-#if defined(MACOSX) || defined(FREEBSD)
+#if defined(MACOSX) || defined(FREEBSD) || defined(MSW)
     sz = PATH_MAX;
 #else
     sz = pathconf(".", _PC_PATH_MAX);
