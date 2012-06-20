@@ -159,7 +159,10 @@ EOF
 #include <demangle.h>
 int main(int c, char **v)
    {int f, rv;
+    enum demangling_styles s;
     f  = (DMGL_ANSI | DMGL_PARAMS);
+    s  = cplus_demangle_name_to_style(v[1]);
+    cplus_demangle_set_style(s);
     rv = (f == 0);
     return(rv);}
 EOF
