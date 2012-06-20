@@ -334,12 +334,9 @@ Separator $Log
 
 # OS defines
     SafeEnv OSType "HAVE_SYSV"
-    if ("$OSType" == USE_WIN32) then
-       unset HostOS
-       setenv HostOS Win32
-    else if ("$OSType" == USE_WIN64) then
-       unset HostOS
-       setenv HostOS Win64
+    if ("$OSType" == USE_MSW) then
+       Note $STDOUT "#undef $HostOS"
+       Note $STDOUT "#define $HostOS"
     else
        Note $STDOUT "#undef UNIX"
        Note $STDOUT "#define UNIX"

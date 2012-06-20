@@ -17,11 +17,11 @@
 
 #undef INC
 #undef LINK
-#undef PATTERN
+#undef REGEX
 #undef VERSION
 
 enum e_itarget
-   {INC, LINK, PATTERN, VERSION};
+   {INC, LINK, REGEX, VERSION};
 
 typedef enum e_itarget itarget;
 
@@ -213,7 +213,7 @@ int report_info(char *root, int cmpl, int ltrl, itarget tgt, char *ptrn)
 	case VERSION :
 	     printf("%s\n", PACT_VERSION);
              break;
-	case PATTERN :
+	case REGEX :
 	     report(&st, ptrn, TRUE);
              break;};
 

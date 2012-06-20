@@ -12,7 +12,9 @@ WARN_PATTERN = ":+sp+warning:"
 ERR_PATTERN  = ":+sp+error:"
 
 Tool CC {
-   Exe       = i586-mingw32msvc-gcc
+   Exe       = [ _env_ = Bits ;                 # compiler version
+                 32    = i586-mingw32msvc-gcc ;
+                 64    = i686-w64-mingw32-gcc ]
    Flags     = -fsignaling-nans -ffloat-store
    Flags    += [ _env_ = C_STD ;                # C standard flags
                  C89   = -std=c89 ;
@@ -31,7 +33,9 @@ Tool CC {
 }
 
 Tool FC {
-   Exe     = i586-mingw32msvc-gfortran
+   Exe       = [ _env_ = Bits ;                 # compiler version
+                 32    = i586-mingw32msvc-gfortran ;
+                 64    = i686-w64-mingw32-gfortran ]
    Flags   = -funderscoring -ffree-form
    Flags  += [ _env_ = Bits ;                # address bit size
                *     = -m* ]
@@ -43,7 +47,9 @@ Tool FC {
 }
 
 Tool CXX {
-   Exe       = i586-mingw32msvc-g++
+   Exe       = [ _env_ = Bits ;                 # compiler version
+                 32    = i586-mingw32msvc-g++ ;
+                 64    = i686-w64-mingw32-g++ ]
    Flags     = 
    Debug     = -g -O0 -Wall
    Optimize  = -g -O -Wunused
@@ -51,7 +57,9 @@ Tool CXX {
 }
 
 Tool LD {
-   Exe      = i586-mingw32msvc-ld
+   Exe       = [ _env_ = Bits ;              # linker version
+                 32    = i586-mingw32msvc-ld ;
+                 64    = i686-w64-mingw32-ld ]
    RPath    = -Wl,-rpath,@
    Flags   += [ _cmd_ = -p ;                 # profiling
 	        on    = -pg ]

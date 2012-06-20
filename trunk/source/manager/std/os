@@ -16,5 +16,5 @@ AIX		AIX		scaix.h
 SunOS		SOLARIS		scsol.h
 IRIX64		SGI		scirix.h
 HP-UX		HPUX		schpux.h
-Win32		WIN32		scwin32.h
-Win64		WIN64		scwin32.h
+WIN32           MSW		scwin32.h
+WIN64		MSW		scwin32.h

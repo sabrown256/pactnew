@@ -9,7 +9,7 @@
 
 #include "cpyright.h"
 
-#include "score.h"
+#include "score_int.h"
 
 #ifdef HAVE_RESOURCE_USAGE
 # include <sys/resource.h>

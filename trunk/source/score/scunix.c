@@ -9,6 +9,8 @@
 #include "cpyright.h"
 #include "score_int.h" 
 
+#if defined(UNIX)
+
 extern void
  _SC_posix_process(PROCESS *pp);
 
@@ -132,3 +134,4 @@ SC_oscapdes
 	     _SC_posix_process };
 
 
+#endif

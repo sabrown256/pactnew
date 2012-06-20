@@ -950,10 +950,9 @@ char **SC_get_host_list(char *sys, int single)
  */
 
 int SC_hostname(char *s, int nc)
-   {int st, rv;
+   {int rv, st;
     char chst[MAXLINE];
     char *p;
-    struct utsname uts;
 
     st = gethostname(chst, MAXLINE);
     if (st == 0)
@@ -962,10 +961,14 @@ int SC_hostname(char *s, int nc)
 	if (p != NULL)
 	   *p = '\0';}
 
+#if defined(UNIX)
     else
-       {uname(&uts);
+       {struct utsname uts;
+
+        uname(&uts);
 	strncpy(s, uts.nodename, nc);
         st = 0;};
+#endif
 
     rv = (st == 0);
 
@@ -984,15 +987,18 @@ int SC_hostname(char *s, int nc)
 
 int SC_hosttype(char *s, int nc, char *x)
    {int st, rv;
-    struct utsname uts;
 
     if (x != NULL)
        st = SC_execs(s, nc, NULL, -1, x);
 
+#if defined(UNIX)
     else
-       {uname(&uts);
+       {struct utsname uts;
+
+	uname(&uts);
 	snprintf(s, nc, "%s : %s", uts.nodename, uts.release);
         st = 0;};
+#endif
 
     rv = (st == 0);
 

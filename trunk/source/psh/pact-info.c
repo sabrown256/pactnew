@@ -80,7 +80,7 @@ int main(int c, char **v)
 	     break;}
 
 	 else
-	    {tgt = PATTERN;
+	    {tgt = REGEX;
 	     ptrn = v[i];
 	     break;};};
 

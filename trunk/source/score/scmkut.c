@@ -17,6 +17,7 @@
 /* get report_info from psh routines which supply
  * smake, dmake, and pact-info
  */
+#define NO_STD_INCLUDES
 #include <../psh/common.h>
 #include <../psh/libpsh.c>
 #include <../psh/libinfo.c>
@@ -449,13 +450,13 @@ int main(int c, char **v, char **env)
 	 else if (strcmp(v[i], "-info") == 0)
 	    {if (++i < c)
 	        report_info(state->root, state->complete, state->literal,
-			    PATTERN, v[i]);
+			    REGEX, v[i]);
 	     return(0);}
 	 else if (strcmp(v[i], "+info") == 0)
 	    {if (++i < c)
 	        {state->complete = TRUE;
 		 report_info(state->root, state->complete, state->literal,
-			     PATTERN, v[i]);};
+			     REGEX, v[i]);};
 	     return(0);}
          else if (strcmp(v[i], "+l") == 0)
 	    state->literal = TRUE;

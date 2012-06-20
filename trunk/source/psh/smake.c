@@ -474,7 +474,7 @@ int main(int c, char **v)
 		      if (strcmp(v[i], "-info") == 0)
 			 {if (++i < c)
 			     report_info(st.root, st.complete, st.literal,
-					 PATTERN, v[i]);
+					 REGEX, v[i]);
 			  return(0);};
 		      i--;
 		      ok = FALSE;
@@ -497,7 +497,7 @@ int main(int c, char **v)
 			 {if (++i < c)
 			     {st.complete = TRUE;
 			      report_info(st.root, st.complete, st.literal,
-					  PATTERN, v[i]);};
+					  REGEX, v[i]);};
 			  return(0);};
 		      break;
 		 case 'l' :
