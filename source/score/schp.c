@@ -9,6 +9,7 @@
 #include "cpyright.h"
 
 #include "score_int.h"
+
 #include "scope_proc.h"
 
 /* ISSUES and PROBLEMS
@@ -29,6 +30,8 @@ typedef PROCESS *(*PFPPROC)(char **argv, char *mode, int type);
 
 SC_scope_proc
  _SC_ps = { -1, FALSE, NULL };
+
+#if defined(UNIX)
 
 static char
  *_SC_not_stopped = "running";
@@ -1687,3 +1690,5 @@ void SC_set_processor_info(int size, int rank)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+#endif

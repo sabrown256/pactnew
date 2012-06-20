@@ -10,6 +10,9 @@
 
 #include "cpyright.h"
 #include "score_int.h"
+
+#if defined(UNIX)
+
 #include "scope_mem.h"
 #include "scope_proc.h"
 #include <sys/mman.h>
@@ -209,6 +212,9 @@ void SC_use_guarded_mem(int on)
     return;}
 
 /*--------------------------------------------------------------------------*/
+
+#endif
+
 /*--------------------------------------------------------------------------*/
 
 /* SC_MEM_GUARD_HIGH - guard the upper memory bound if ON == TRUE
@@ -224,3 +230,4 @@ void SC_mem_guard_high(int on)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+

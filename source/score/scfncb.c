@@ -11,8 +11,10 @@
 #include "score_int.h"
 #include "scope_proc.h"
 
-#include <pwd.h>
-#include <sched.h>
+#if defined(UNIX)
+# include <pwd.h>
+# include <sched.h>
+#endif
 
 #ifdef HAVE_BFD
 # include <execinfo.h>

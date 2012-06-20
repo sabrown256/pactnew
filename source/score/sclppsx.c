@@ -10,6 +10,9 @@
 #include "cpyright.h"
 
 #include "score_int.h"
+
+#if defined(UNIX)
+
 #include "scope_proc.h"
 
 #undef NONBLOCK
@@ -488,3 +491,5 @@ void _SC_posix_process(PROCESS *pp)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+#endif

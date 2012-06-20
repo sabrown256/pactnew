@@ -71,7 +71,7 @@ static fcent *_SC_make_ar_entry(FILE *fp, int round,
 
 /*--------------------------------------------------------------------------*/
 
-#ifdef AIX
+#if defined(AIX)
 
 /*--------------------------------------------------------------------------*/
 
@@ -210,9 +210,7 @@ fcdes *SC_scan_archive(char *arf)
 
 # define HAVE_SCAN_ARCHIVE
 
-#endif
-
-#if defined(OSF) && !defined(HAVE_SCAN_ARCHIVE)
+#elif defined(OSF) && !defined(HAVE_SCAN_ARCHIVE)
 
 /*--------------------------------------------------------------------------*/
 
@@ -308,9 +306,7 @@ fcdes *SC_scan_archive(char *arf)
 
 # define HAVE_SCAN_ARCHIVE
 
-#endif
-
-#if defined(USE_BSD) && !defined(HAVE_SCAN_ARCHIVE)
+#elif defined(USE_BSD) && !defined(HAVE_SCAN_ARCHIVE)
 
 /*--------------------------------------------------------------------------*/
 
@@ -398,7 +394,28 @@ fcdes *SC_scan_archive(char *arf)
 
 # define HAVE_SCAN_ARCHIVE
 
+#elif defined(MSW) && !defined(HAVE_SCAN_ARCHIVE)
+
+/*--------------------------------------------------------------------------*/
+
+/* SC_SCAN_ARCHIVE - return a hasharr containing the table of contents
+ *                 - of the archive ARF
+ */
+
+fcdes *SC_scan_archive(char *arf)
+   {fcdes *fc;
+
+    fc  = _SC_make_archive(arf, NULL, 0, NULL);
+
+    return(fc);}
+
+/*--------------------------------------------------------------------------*/
+
+# define HAVE_SCAN_ARCHIVE
+
 #endif
+
+/*--------------------------------------------------------------------------*/
 
 #ifndef HAVE_SCAN_ARCHIVE
 
@@ -524,7 +541,7 @@ int _SC_is_archive(FILE *fp)
 	if (st < 0)
 	   io_error(errno, "fseek to 0 failed");
 
-#ifdef AIX
+#if defined(AIX)
 	nr = fread(s, 1, SAIAMAG, fp);
 	if (nr < 0)
 	   io_error(errno, "fread of %lld bytes failed",
@@ -537,6 +554,12 @@ int _SC_is_archive(FILE *fp)
 	rv = ((nr == SAIAMAG) &&
 	      ((strncmp(s, AIAMAG, SAIAMAG) == 0) ||
 	       (strncmp(s, AIAMAGBIG, SAIAMAG) == 0)));
+
+#elif defined(MSW)
+	s[0] = '\0';
+	nr   = -1;
+	rv   = ((nr >= 0) && (s[0] != '\0'));
+
 #else
 	nr = fread(s, 1, SARMAG, fp);
 	if (nr < 0)

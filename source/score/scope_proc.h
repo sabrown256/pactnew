@@ -17,12 +17,25 @@
 #define DEFAULT_TIMEOUT    30000
 #define DEFAULT_HEARTBEAT  30
 
-#ifndef WIN32
-# undef IN
-# undef OUT
-# define IN  0
-# define OUT 1
-#endif
+/*--------------------------------------------------------------------------*/
+
+/*                             EXEC ERROR STATUS                            */
+
+/*--------------------------------------------------------------------------*/
+
+/* ERROR Exit Statuses
+ *   signo    - range   1 <= 63
+ *   internal - range  64 <= 71    (defined in score_int.h)
+ *   exec     - range  72 <= 79    (some in scsysd.c)
+ *   future   - range  80 <= 127
+ *   errno    - range 128 <= 255
+ */
+
+#define SC_NO_SETSID  72
+#define SC_NO_TTY     73
+#define SC_NO_CLOSE   74
+#define SC_NO_FMT     75
+#define SC_NO_EXEC    76
 
 #define SC_RUNNING      0x0
 #define SC_STOPPED      0x1
@@ -47,23 +60,16 @@
 
 /*--------------------------------------------------------------------------*/
 
-/*                             EXEC ERROR STATUS                            */
+#if defined(UNIX)
 
 /*--------------------------------------------------------------------------*/
 
-/* ERROR Exit Statuses
- *   signo    - range   1 <= 63
- *   internal - range  64 <= 71    (defined in score_int.h)
- *   exec     - range  72 <= 79    (some in scsysd.c)
- *   future   - range  80 <= 127
- *   errno    - range 128 <= 255
- */
-
-#define SC_NO_SETSID  72
-#define SC_NO_TTY     73
-#define SC_NO_CLOSE   74
-#define SC_NO_FMT     75
-#define SC_NO_EXEC    76
+#ifndef WIN32
+# undef IN
+# undef OUT
+# define IN  0
+# define OUT 1
+#endif
 
 /*--------------------------------------------------------------------------*/
 
@@ -90,6 +96,16 @@
 
 #include <sys/types.h>
 #include <sys/wait.h>
+
+/*--------------------------------------------------------------------------*/
+
+#elif defined(MSW)
+
+/*--------------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------------*/
+
+#endif
 
 /*--------------------------------------------------------------------------*/
 

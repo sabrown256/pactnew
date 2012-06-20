@@ -231,12 +231,12 @@ struct sockaddr_in *_SC_tcp_address(char *host, int port)
  */
 
 struct sockaddr_in *_SC_tcp_bind(int fd, int port)
-   {int ok, sasz;
-    struct sockaddr_in *ad;
+   {struct sockaddr_in *ad;
 
     ad = NULL;
 
 #ifdef HAVE_PROCESS_CONTROL
+    int ok, sasz;
 
     ad = CMAKE(struct sockaddr_in);
     if (ad != NULL)
@@ -318,13 +318,14 @@ static void _SC_tcp_acceptor(int fd, int mask, void *a)
 int _SC_tcp_serve(int fd, struct sockaddr_in *ad, void *a,
 		  int (*ex)(int *rv, void *a),
 		  PFFileCallback acc, PFFileCallback rej)
-   {int pi, ok;
-    SC_evlpdes *pe;
-    tcp_loop lp;
+   {int ok;
 
     ok = -1;
 
 #ifdef HAVE_PROCESS_CONTROL
+    int pi;
+    SC_evlpdes *pe;
+    tcp_loop lp;
 
     if (listen(fd, 5) >= 0)
 
@@ -363,13 +364,14 @@ int _SC_tcp_serve(int fd, struct sockaddr_in *ad, void *a,
  */
 
 int _SC_tcp_accept_connection(int fd, struct sockaddr_in *ad)
-   {int err, nfd;
-    socklen_t sasz;
-    struct sockaddr *sa;
+   {int nfd;
     
     nfd = -1;
 
 #ifdef HAVE_PROCESS_CONTROL
+    int err;
+    socklen_t sasz;
+    struct sockaddr *sa;
 
     sa   = (struct sockaddr *) ad;
     sasz = sizeof(struct sockaddr_in);
@@ -400,12 +402,13 @@ int _SC_tcp_accept_connection(int fd, struct sockaddr_in *ad)
 
 static int _SC_connect_to(int fd, struct sockaddr *addr, socklen_t ln,
 			  int to, int fm)
-   {int ok, blck, nrdy, dt, ta, sz, rv;
-    SC_poll_desc pd;
+   {int ok;
 
     ok = -1;
 
 #ifdef HAVE_PROCESS_CONTROL
+    int blck, nrdy, dt, ta, sz, rv;
+    SC_poll_desc pd;
 
 /* do a blocking connect if an infinite timeout has been requested */
     if (to < 0)

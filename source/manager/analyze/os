@@ -30,16 +30,15 @@ if ($?Arch == 0) then
    setenv Arch `../scripts/system-id`
 endif
 
-Note $ALog "HostOS  = $HostOS"
-Note $ALog "RootInc = $RootInc"
+Note $ALog "RootInc   = $RootInc"
 if ($CROSS_COMPILE == MINGW32) then
-   setenv OSType     WIN32
-   setenv HostOS     Win32
+   setenv OSType     MSW
+   setenv HostOS     WIN32
    setenv HostOSRel  mingw32
 
 else if ($CROSS_COMPILE == MINGW64) then
-   setenv OSType     WIN64
-   setenv HostOS     Win64
+   setenv OSType     MSW
+   setenv HostOS     WIN64
    setenv HostOSRel  mingw64
 
 else if (("$HostOS" == "Windows_NT") || \
@@ -51,6 +50,9 @@ else if (("$HostOS" == "Windows_NT") || \
 else
    setenv OSType "BSD"
 endif
+Note $ALog "HostOS    = $HostOS"
+Note $ALog "HostOSRel = $HostOSRel"
+Note $ALog "OSType    = $OSType"
 
 if ($HostOS == Darwin) then
    setenv MACRev `echo $Arch | sed 's/osx-10\.//' | sed 's/-.*//'`

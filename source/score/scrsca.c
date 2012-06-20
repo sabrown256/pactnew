@@ -12,6 +12,8 @@
 #include "score_int.h"
 #include "scope_mem.h"
 
+#if defined(UNIX)
+
 #ifdef HAVE_RESOURCE_USAGE
 # include <sys/resource.h>
 #endif
@@ -857,3 +859,6 @@ int SC_get_resource_limits(int64_t *pmem, int64_t *pcpu, int64_t *pfsz,
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+#endif
+

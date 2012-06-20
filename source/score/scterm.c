@@ -26,7 +26,7 @@
 
 /*--------------------------------------------------------------------------*/
 
-#ifdef BSD_TERMINAL
+#if defined(BSD_TERMINAL)
 
 /*--------------------------------------------------------------------------*/
 
@@ -60,7 +60,7 @@ static int _SC_set_tty_attr(int fd, TERMINAL *t, int now)
 
 /*--------------------------------------------------------------------------*/
 
-#else
+#elif !defined(MSW)
 
 /*--------------------------------------------------------------------------*/
 
@@ -102,10 +102,14 @@ static int _SC_set_tty_attr(int fd, TERMINAL *t, int now)
  *                 - STATE is either 1 (on), 0 (off), -1 (only)
  */
 
-static void _SC_set_io_attr(TERMINAL *t, int class, int attr, int state)
+static void _SC_set_io_attr(void *pt, int class, int attr, int state)
    {
 
 #ifdef TERMINAL
+
+    TERMINAL *t;
+
+    t = (TERMINAL *) pt;
 
 # ifdef BSD_TERMINAL
 
@@ -214,11 +218,12 @@ static void _SC_set_io_attr(TERMINAL *t, int class, int attr, int state)
 /* SC_SET_IO_ATTR - set the specified attribute to be ON or OFF */
 
 int SC_set_io_attr(int fd, int attr, int state)
-   {int rv, ok;
+   {int rv;
 
     rv = FALSE;
 
 #ifdef TERMINAL
+    int ok;
 
     ok = SC_ERR_TRAP();
     if (ok == 0)
@@ -250,11 +255,12 @@ int SC_set_io_attr(int fd, int attr, int state)
  */
 
 int SC_set_io_attrs(int fd, ...)
-   {int rv, ok, attr, state, class;
+   {int rv;
 
     rv = FALSE;
 
 #ifdef TERMINAL
+    int ok, attr, state, class;
 
     ok = SC_ERR_TRAP();
     if (ok == 0)
@@ -328,11 +334,12 @@ int SC_set_io_attrs(int fd, ...)
  */
 
 int SC_set_fd_attr(int fd, int i, int state)
-   {int rv, ok;
+   {int rv;
 
     rv = FALSE;
 
 #ifdef HAVE_POSIX_SYS
+    int ok;
 
     ok = SC_ERR_TRAP();
     if (ok == 0)
@@ -365,10 +372,10 @@ int SC_set_fd_attr(int fd, int i, int state)
  */
 
 void SC_print_term_state(FILE *fp, int fd)
-   {
+   {int c;
 
 #ifdef TERMINAL
-    int c, rv;
+    int rv;
     TERMINFO s;
 
     if (fp != NULL)
@@ -620,11 +627,12 @@ void dbck(void)
  */
 
 int SC_set_raw_state(int fd, int trap)
-   {int rv, ok;
+   {int rv;
 
     rv = FALSE;
 
 #ifdef TERMINAL
+    int ok;
 
     ok = (trap == TRUE) ? SC_ERR_TRAP() : 0;
     if (ok == 0)
@@ -686,11 +694,12 @@ int SC_set_raw_state(int fd, int trap)
  */
 
 int SC_set_cooked_state(int fd, int trap)
-   {int rv, ok;
+   {int rv;
 
     rv = FALSE;
 
 #ifdef TERMINAL
+    int ok;
 
     ok = (trap == TRUE) ? SC_ERR_TRAP() : 0;
     if (ok == 0)
@@ -814,15 +823,17 @@ void *SC_get_term_state(int fd, int size)
  */
 
 int SC_set_term_state(void *pt, int trmfd)
-   {int fd, rv, st;
-    TERMINAL_STATE *t;
+   {int rv;
     SC_contextdes oh;
 
-    t  = (TERMINAL_STATE *) pt;
     rv = FALSE;
     oh = SC_signal_n(SIGTTOU, SIG_IGN, NULL);
 
 #ifdef TERMINAL
+    int fd, st;
+    TERMINAL_STATE *t;
+
+    t = (TERMINAL_STATE *) pt;
 
     if (t != NULL)
        {if (trmfd >= 0)

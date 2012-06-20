@@ -13,6 +13,7 @@
 
 #define LIBPSH
 
+#undef TEXT
 #define TEXT       10
 #define HTML       11
 
