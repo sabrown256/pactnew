@@ -135,8 +135,8 @@ static int _SC_res_usage_self(SC_rusedes *ru, int whch)
 
     SC_mem_trim(0);
 
-    ru->pid      = getpid();
-    ru->ppid     = getppid();
+    ru->pid      = SYS_GETPID();
+    ru->ppid     = SYS_GETPPID();
     ru->uid      = 0;
     ru->priority = 0;
     ru->ut       = 0.0;

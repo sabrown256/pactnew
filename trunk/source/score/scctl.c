@@ -553,11 +553,11 @@ int SC_random_int(int a, int b)
  */
        SC_get_time(NULL, &tu);
        ni = tu;
-       srandom(ni);
+       SYS_SRANDOM(ni);
 
     END_SAFE;
 
-    t  = ((double) random())/((double) INT_MAX);
+    t  = ((double) SYS_RANDOM())/((double) INT_MAX);
     da = a;
     db = b;
 

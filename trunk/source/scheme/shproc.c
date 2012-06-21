@@ -410,7 +410,7 @@ static object *_SSI_resource_usage(SS_psides *si, object *argl)
             0);
 
     if (pid == -1)
-       pid = getpid();
+       pid = SYS_GETPID();
 
     err = SC_resource_usage(&ru, pid);
     if (err == TRUE)

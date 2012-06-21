@@ -88,9 +88,9 @@ static int _SC_query_exec_unix(char *path)
 
     ret  = FALSE;
     only = FALSE;
-    muid = getuid();
+    muid = SYS_GETUID();
     if (only == TRUE)
-       mgid = getgid();
+       mgid = SYS_GETGID();
 
     if (stat(path, &bf) == 0)
        {int ig, ng;
@@ -126,6 +126,8 @@ static int _SC_query_exec_unix(char *path)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* system capability API */
+
 SC_oscapdes
   _SC_os = { _SC_path_delimiter_unix,
 	     _SC_file_length_unix,
@@ -133,5 +135,15 @@ SC_oscapdes
 	     _SC_query_exec_unix,
 	     _SC_posix_process };
 
+/* system call API */
+
+syscall_api
+  _SC_osapi = { getpwuid, getuid, getgid, 
+		getpid, getppid, getpgrp, tcgetpgrp, 
+		setsid, fork, kill, sched_yield,
+		fsync, ioctl, fcntl, 
+		poll, nanosleep, 
+		setenv, unsetenv, 
+		gethostname, ttyname, srandom, random };
 
 #endif

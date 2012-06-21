@@ -56,7 +56,7 @@ void *test_wrk(void *x)
 /* here we set the key to the thread index */
     SC_SET_KEY(int, index_key, x);
 
-    t = random();
+    t = SYS_RANDOM();
     l = (t >> 1) + (t >> 2) + (t >> 3) + (t >> 5) + (t >> 7);
     m = (delay == 0) ? 0 : 1 + l % delay;
     SC_sleep(250*m);

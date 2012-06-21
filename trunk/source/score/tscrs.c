@@ -24,7 +24,7 @@ static int test_1(void)
     double ti, tf;
     SC_rusedes ru;
 
-    pid = getpid();
+    pid = SYS_GETPID();
 
 /* take up some time at least */
 #if 0

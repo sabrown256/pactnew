@@ -563,7 +563,7 @@ static int _SC_parent_fork(PROCESS *pp, PROCESS *cp, int to,
 
 #ifdef F_SETOWN
     if (pp->medium == USE_SOCKETS)
-       fcntl(pp->in, F_SETOWN, pp->root);
+       SYS_FCNTL(pp->in, F_SETOWN, pp->root);
 #endif
 
     if (strchr(mode, 'o') != NULL)
@@ -802,7 +802,7 @@ static int _SC_setup_proc(PROCESS **ppp, PROCESS **pcp,
     cp->reason     = 0;
     cp->open_retry = retry;
 
-    rpid     = getpid();
+    rpid     = SYS_GETPID();
     pp->root = rpid;
     cp->root = rpid;
 
@@ -869,7 +869,7 @@ static PROCESS *_SC_open_proc(int rcpu, char *name, char **argv,
          al  = argv + off;
 
 /* fork the process */
-         pid    = fork();
+         pid    = SYS_FORK();
 	 pp->id = pid;
 	 cp->id = pid;
 

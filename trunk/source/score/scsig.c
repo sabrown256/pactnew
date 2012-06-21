@@ -26,7 +26,7 @@
 int SC_send_signal(int pid, int sig)
    {int rv;
 
-    rv = kill(pid, sig);
+    rv = SYS_KILL(pid, sig);
 
     return(rv);}
 

@@ -95,7 +95,7 @@ targets :
 #
 # Headers Files
 #
-Hdrs = scstd.h scunix.h scwin32.h scbgl.h \
+Hdrs = scstd.h scapi.h scunix.h scwin32.h scbgl.h \
        scgnu.h scpcc.h schpux.h scirix.h \
        sclnx.h scosx.h sccyg.h scbsd.h \
        scaix.h scsol.h scbeos.h \

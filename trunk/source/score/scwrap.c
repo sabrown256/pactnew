@@ -77,11 +77,11 @@ int main(int c, char **v)
 
 /* to cause untagged messages to be suppressed set the variable */
     if (suppress == TRUE)
-       rv = setenv("SC_MPI_SUPPRESS_UNTAGGED", "TRUE", TRUE);
+       rv = SYS_SETENV("SC_MPI_SUPPRESS_UNTAGGED", "TRUE", TRUE);
 
 /* supply the value of the tag appened to messages with the variable */
     if (use_tag == TRUE)
-       rv = setenv("SC_MPI_TAG_IO", "+SC_MPI_IO+", TRUE);
+       rv = SYS_SETENV("SC_MPI_TAG_IO", "+SC_MPI_IO+", TRUE);
 
     flags = 2*blocking;
 

@@ -205,7 +205,7 @@ static int _SC_leh_get_ncol(void)
     struct winsize ws;
 
     rv = 80;
-    if (ioctl(1, TIOCGWINSZ, &ws) != -1)
+    if (SYS_IOCTL(1, TIOCGWINSZ, &ws) != -1)
        rv = ws.ws_col;
 
     return(rv);}

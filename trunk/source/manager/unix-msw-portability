@@ -1,0 +1,54 @@
+SC_yield
+getenv,putenv,setenv,unsetenv
+SC_poll
+
+modularity  pick and choose, dynamic linking, clarity
+portability
+
+
+# system level model
+
+path delimiter
+
+# system level capabilities needed
+
+process
+  fork
+  wait
+ipc
+  socket
+  pipe
+  pty
+i/o
+  poll
+  select
+processor
+  yield
+  ncpu
+ioctl
+signal
+resource
+  memory usage
+  run time
+  list processes
+files
+  length
+  permissions
+  executable, link, ...
+environment
+time/date
+
+# compiler level issues
+
+standards conformance
+   %lld   ANSI
+   %I64d  MS
+
+# graphics
+
+# PACT view
+
+psh
+score
+pgs
+
