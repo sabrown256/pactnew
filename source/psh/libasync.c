@@ -95,9 +95,11 @@
 
 #define LIBASYNC
 
+#include "common.h"
+/*
 #include <sys/poll.h>
 #include <sys/wait.h>
-#include <setjmp.h>
+*/
 
 #define JOB_NOT_FINISHED    -1000
 

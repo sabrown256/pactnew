@@ -12,16 +12,7 @@
 
 #define LIBSOCK
 
-#include <netdb.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <dirent.h>
-#include <sys/socket.h>
-#include <sys/select.h>
-
-#ifndef INADDR_NONE
-# define INADDR_NONE NULL
-#endif
+#include "network.h"
 
 #define NATTEMPTS   3
 

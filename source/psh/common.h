@@ -12,41 +12,17 @@
 #ifndef PCK_COMMON
 #define PCK_COMMON
 
-#if 0
-
-/* GOTCHA: we would like to do this but bootstrapping configuration
- * is a nightmare for now
-  #include "iso-c.h"
- */
-
-#define ISO_C99
-
-/* introduced with C99 compiles */
-#ifdef ISO_C99
-# ifdef __GNUC__
-#  define _POSIX_C_SOURCE   200112L
-#  define _XOPEN_SOURCE     600
-#  define _DARWIN_C_SOURCE
-# endif
-#endif
-
-#endif
+#include "posix.h"
 
 #ifndef NO_STD_INCLUDES
-# include <unistd.h>
 # include <stdlib.h>
 # include <string.h>
 # include <stdio.h>
 # include <stdarg.h>
 # include <ctype.h>
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <sys/utsname.h>
 # include <time.h>
-# include <fcntl.h>
 # include <signal.h>
 # include <errno.h>
-# include <poll.h>
 # include "nonstd.h"
 #endif
 
@@ -119,9 +95,6 @@
    FREE(_t);}
 
 #define IS_NULL(_s)  (((_s) == NULL) || ((_s)[0] == '\0'))
-
-extern int
- sched_yield(void);
 
 int
  _assert_fail = 0;
