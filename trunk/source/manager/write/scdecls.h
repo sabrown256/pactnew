@@ -65,7 +65,10 @@ Note $Log "   IncDir       = $IncDir"
     flog $Log cd $CfgDir
     flog $Log $Cfe_CC_Exe -DMM_CONFIG -I.. -I$IncDir ../scmemi.c -o score-config $opt
     if ($status == 0) then
-       flog $Log ( $CFE ./score-config >>& $STDOUT )
+
+# NOTE: coded this way to throw away message to stderr
+# which may come from CFE instead of score-config
+       flog $Log ( ( $CFE ./score-config >> $STDOUT ) >& /dev/null )
        if ($status == 0) then
           flog $Log $RM ./score-config
           Note $Log "score-config execution succeeded"

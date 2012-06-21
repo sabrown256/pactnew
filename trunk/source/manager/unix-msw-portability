@@ -2,13 +2,17 @@ SC_yield
 getenv,putenv,setenv,unsetenv
 SC_poll
 
+# considerations
+
 modularity  pick and choose, dynamic linking, clarity
 portability
 
 
 # system level model
 
-path delimiter
+path delimiter  ':' vs ';'
+directory delimiter '/' vs '\'
+
 
 # system level capabilities needed
 

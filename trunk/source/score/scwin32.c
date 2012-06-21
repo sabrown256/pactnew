@@ -18,16 +18,21 @@ extern void
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-	    LPSTR lpCmdLine, int iCmdShow)
-   {
-    
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+		   LPSTR lpCmdLine, int iCmdShow)
+   {int rv;
+    extern int main(int c, char **v);
+
+    rv = 0;
+/*    
     _PG_hInstance = hInstance;
     _PG_iCmdShow  = iCmdShow;
-    
+*/  
     main(1, NULL);
-
-    return(_PG_msg.wParam);}
+/*
+    rv = _PG_msg.wParam;
+*/
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -88,15 +93,18 @@ static int _SC_query_mode_win32(char *name, char *mode)
 static int _SC_query_exec_win32(char *path)
    {int ret;
     char s[MAXLINE];
-    char *base, *sfx;
+    char *base, *sfx, *u;
 
-    strcpy(s, path);
+    ret = FALSE;
+
+    SC_strncpy(s, MAXLINE, path, -1);
     SC_str_lower(s);
 
     base = SC_strtok(s, ".", u);
-    sfx  = SC_strtok(NULL, "\n", u);
-    if (sfx != NULL)
-       ret = ((strcmp(sfx, "exe") == 0) || (strcmp(sfx, "bat") == 0))
+    if (base != NULL)
+       {sfx  = SC_strtok(NULL, "\n", u);
+	if (sfx != NULL)
+	   ret = ((strcmp(sfx, "exe") == 0) || (strcmp(sfx, "bat") == 0));};
 
     return(ret);}
 
@@ -108,10 +116,10 @@ static int _SC_query_exec_win32(char *path)
 
 /* GETPWUID_WIN - getpwuid for MSW */
 
-static uid_t getpwuid_win(void)
-   {uid_t rv;
+static struct passwd *getpwuid_win(uid_t uid)
+   {struct passwd *rv;
 
-    rv = -1;
+    rv = NULL;
 
     return(rv);}
 
@@ -214,6 +222,18 @@ static pid_t fork_win(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WAITPID_WIN - waitpid for MSW */
+
+static pid_t waitpid_win(pid_t pid, int *status, int options)
+   {pid_t rv;
+
+    rv = -1;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* KILL_WIN - kill for MSW */
 
 static int kill_win(pid_t pid, int sig)
@@ -252,7 +272,7 @@ static int fsync_win(int fd)
 
 /* IOCTL_WIN - ioctl for MSW */
 
-static int ioctl_win(int d, int request, ...)
+static int ioctl_win(int d, unsigned long request, ...)
    {int rv;
 
     rv = -1;
@@ -382,7 +402,8 @@ SC_oscapdes
 syscall_api
   _SC_osapi = { getpwuid_win, getuid_win, getgid_win, 
 		getpid_win, getppid_win, getpgrp_win, tcgetpgrp_win, 
-		setsid_win, fork_win, kill_win, sched_yield_win,
+		setsid_win, fork_win, waitpid_win,
+		kill_win, sched_yield_win,
 		fsync_win, ioctl_win, fcntl_win, 
 		poll_win, nanosleep_win, 
 		setenv_win, unsetenv_win, 
