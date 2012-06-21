@@ -31,10 +31,15 @@ typedef PROCESS *(*PFPPROC)(char **argv, char *mode, int type);
 SC_scope_proc
  _SC_ps = { -1, FALSE, NULL };
 
-#if defined(UNIX)
+/* #if defined(UNIX) */
+#if 1
+
+#ifdef HAVE_PROCESS_CONTROL
 
 static char
  *_SC_not_stopped = "running";
+
+#endif
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -108,6 +113,8 @@ void _SC_exec_test(char **argv, char **envp, char *mode)
  *                       - in the PROCESS ring buffer
  */
 
+#ifdef HAVE_PROCESS_CONTROL
+
 static int _SC_complete_messagep(PROCESS *pp)
    {unsigned int nb, ob, ls;
     unsigned char *ring, c;
@@ -124,7 +131,11 @@ static int _SC_complete_messagep(PROCESS *pp)
 
     return(FALSE);}
 
+#endif
+
 /*--------------------------------------------------------------------------*/
+
+#ifdef HAVE_PROCESS_CONTROL
 
 #ifdef SGI
 
@@ -251,6 +262,8 @@ static int
 #define PTY_OPEN_DEFINED
 
 /*--------------------------------------------------------------------------*/
+
+#endif
 
 #endif
 
@@ -390,6 +403,8 @@ void _SC_fixup_socket(int s)
 
 /* _SC_INIT_PTY - do PTY initializations for _SC_INIT_IPC */
 
+#ifdef HAVE_PROCESS_CONTROL
+
 static int _SC_init_pty(PROCESS *pp, PROCESS *cp)
    {int ret, nr, nc, pw, ph;
 
@@ -418,6 +433,8 @@ static int _SC_init_pty(PROCESS *pp, PROCESS *cp)
 
     return(ret);}
 
+#endif
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -432,6 +449,8 @@ static int _SC_init_pty(PROCESS *pp, PROCESS *cp)
  *              - the input channel should always be unblocked
  *              - return TRUE iff successful
  */
+
+#ifdef HAVE_PROCESS_CONTROL
 
 static int _SC_init_ipc(PROCESS *pp, PROCESS *cp)
    {int ret;
@@ -509,12 +528,16 @@ static int _SC_init_ipc(PROCESS *pp, PROCESS *cp)
 
     return(ret);}
 
+#endif
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _SC_CHILD_FORK - the child process comes here and
  *                - it will never return
  */
+
+#ifdef HAVE_PROCESS_CONTROL
 
 static void _SC_child_fork(PROCESS *pp, PROCESS *cp, int to,
 			   char **argv, char **envp, char *mode)
@@ -542,10 +565,14 @@ static void _SC_child_fork(PROCESS *pp, PROCESS *cp, int to,
 
     exit(rv);}
 
+#endif
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _SC_PARENT_FORK - the parent process comes here */
+
+#ifdef HAVE_PROCESS_CONTROL
 
 static int _SC_parent_fork(PROCESS *pp, PROCESS *cp, int to,
                            int rcpu, char *mode)
@@ -587,12 +614,16 @@ static int _SC_parent_fork(PROCESS *pp, PROCESS *cp, int to,
 
     return(st);}
 
+#endif
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _SC_ERROR_FORK - come here if fork failed
  *                - just cleanup the remains
  */
+
+#ifdef HAVE_PROCESS_CONTROL
 
 static void _SC_error_fork(PROCESS *pp, PROCESS *cp)
    {
@@ -610,6 +641,8 @@ static void _SC_error_fork(PROCESS *pp, PROCESS *cp)
 
     return;}
 
+#endif
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -620,6 +653,8 @@ static void _SC_error_fork(PROCESS *pp, PROCESS *cp)
  *                   - in effect break ARGV into multiple ARGVs
  *                   - one for each process
  */
+
+#ifdef HAVE_PROCESS_CONTROL
 
 static int *_SC_make_pipeline(char **argv)
    {int i, n;
@@ -642,10 +677,14 @@ static int *_SC_make_pipeline(char **argv)
 
     return(pl);}
 
+#endif
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _SC_PIPELINE_LENGTH - return the length of the pipeline PL */
+
+#ifdef HAVE_PROCESS_CONTROL
 
 static int _SC_pipeline_length(int *pl)
    {int n;
@@ -653,6 +692,8 @@ static int _SC_pipeline_length(int *pl)
     for (n = 0; pl[n] >= 0; n++);
 
     return(n);}
+
+#endif
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -664,6 +705,8 @@ static int _SC_pipeline_length(int *pl)
  *                        - sockets but bad for PTYs
  *                        - on the other hand why do PTYs in a pipeline
  */
+
+#ifdef HAVE_PROCESS_CONTROL
 
 static void _SC_reconnect_pipeline(int n, PROCESS **pa, PROCESS **ca)
    {int i, nm;
@@ -717,6 +760,8 @@ static void _SC_reconnect_pipeline(int n, PROCESS **pa, PROCESS **ca)
 
     return;}
 
+#endif
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -727,6 +772,8 @@ static void _SC_reconnect_pipeline(int n, PROCESS **pa, PROCESS **ca)
  *                - return the timeout in milliseconds for the post-fork
  *                - setup and exec
  */
+
+#ifdef HAVE_PROCESS_CONTROL
 
 static int _SC_setup_proc(PROCESS **ppp, PROCESS **pcp,
 			  char **argv, char *mode,
@@ -816,6 +863,8 @@ static int _SC_setup_proc(PROCESS **ppp, PROCESS **pcp,
 #endif
 
     return(to);}
+
+#endif
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1084,12 +1133,11 @@ static void _SC_handle_sigpipe(int signo)
  *               - if none are available or there is an error return NULL
  */
 
-static char *_SC_get_input(char *bf, int len, PROCESS *pp)
-   {char *pbf;
-
 #ifdef HAVE_PROCESS_CONTROL
 
-    int status, blck, reset, run, nb, st;
+static char *_SC_get_input(char *bf, int len, PROCESS *pp)
+   {int status, blck, reset, run, nb, st;
+    char *pbf;
     int (*get)(char *bf, int len, PROCESS *pp);
 
     if (pp == NULL)
@@ -1163,9 +1211,9 @@ static char *_SC_get_input(char *bf, int len, PROCESS *pp)
 	     SC_block_fd(pp->in);
 	     break;};
 
-#endif
-
     return(pbf);}
+
+#endif
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

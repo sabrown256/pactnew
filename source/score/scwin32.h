@@ -121,6 +121,40 @@ struct flock
     int l_len;
     int l_pid;};
 
+/*--------------------------------------------------------------------------*/
+
+/*                            TERMINAL HANDLING                             */
+
+/*--------------------------------------------------------------------------*/
+
+#define TERMINFO struct termios
+/* #define TERMINAL struct termios */
+
+struct termios
+   {int c_iflag;		/* input mode flags */
+    int c_oflag;		/* output mode flags */
+    int c_cflag;		/* control mode flags */
+    int c_lflag;		/* local mode flags */
+    int c_line;			/* line discipline */
+    int c_cc[8];		/* control characters */
+    int c_ispeed;		/* input speed */
+    int c_ospeed;};		/* output speed */
+
+typedef struct s_TERMINAL_STATE TERMINAL_STATE;
+
+struct winsize
+   {unsigned short ws_row;
+    unsigned short ws_col;
+    unsigned short ws_xpixel;
+    unsigned short ws_ypixel;};
+
+struct s_TERMINAL_STATE
+   {int fd;
+    int full_info;
+    int valid_size;
+/*    TERMINAL term; */
+    struct winsize window_size;};    
+
 #ifdef __cplusplus
 extern "C" {
 #endif

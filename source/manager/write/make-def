@@ -81,6 +81,7 @@ dbget MDE_Lib
 #dbget MDG_Lib
 #dbget MngDir
 #dbget OStd
+#dbget OSType
 #dbget OW32Objs
 #dbget ParCommSupport
 #dbget PubLib
@@ -103,7 +104,11 @@ dbget MDE_Lib
 
 Separator $Log
 
-set OStd = UNIX
+if ("$OSType" == USE_MSW) then
+   set OStd = WIN32
+else
+   set OStd = UNIX
+endif
 
 alias RESET_VAR  'setenv \!\!:1_\!\!:2 \!\!:3-$'
 alias DEFD_VAR   'set ok = `env | grep \!\!:1`'

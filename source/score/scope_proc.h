@@ -103,6 +103,16 @@
 
 /*--------------------------------------------------------------------------*/
 
+#define WNOHANG           1
+
+#define WEXITSTATUS(_s)	  ((_s) & 1)
+#define WTERMSIG(_s)	  ((_s) & 2)
+#define WSTOPSIG(_s)	  ((_s) & 4)
+
+#define WIFEXITED(_s)	  ((_s) & 8)
+#define WIFSIGNALED(_s)	  ((_s) & 16)
+#define WIFSTOPPED(_s)	  ((_s) & 32)
+
 /*--------------------------------------------------------------------------*/
 
 #endif

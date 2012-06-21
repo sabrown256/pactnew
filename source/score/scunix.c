@@ -140,7 +140,7 @@ SC_oscapdes
 syscall_api
   _SC_osapi = { getpwuid, getuid, getgid, 
 		getpid, getppid, getpgrp, tcgetpgrp, 
-		setsid, fork, kill, sched_yield,
+		setsid, fork, waitpid, kill, sched_yield,
 		fsync, ioctl, fcntl, 
 		poll, nanosleep, 
 		setenv, unsetenv, 

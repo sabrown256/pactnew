@@ -45,6 +45,9 @@
 #define SYS_FORK()                                                           \
    ((_SC_osapi.ffork != NULL) ? _SC_osapi.ffork() : -1)
 
+#define SYS_WAITPID(_a, _b, _c)                                              \
+   ((_SC_osapi.fwaitpid != NULL) ? _SC_osapi.fwaitpid(_a, _b, _c) : -1)
+
 #define SYS_KILL(_p, _s)                                                     \
    ((_SC_osapi.fkill != NULL) ? _SC_osapi.fkill(_p, _s) : -1)
 
@@ -107,6 +110,7 @@ struct s_syscall_api
     pid_t (*ftcgetpgrp)(int fd);
     pid_t (*fsetsid)(void);
     pid_t (*ffork)(void);
+    pid_t (*fwaitpid)(pid_t pid, int *status, int options);
 
     int (*fkill)(pid_t pid, int sig);
     int (*fsched_yield)(void);

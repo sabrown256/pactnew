@@ -11,8 +11,6 @@
 
 #include "score_int.h"
 
-#if defined(UNIX)
-
 #include "scope_proc.h"
 
 #define N_PROC_MNG  32
@@ -560,7 +558,7 @@ static int _SC_child_check(int pid)
 
     SC_signal_block(NULL, SC_ALL_SIGNALS, -1);
 
-    st = waitpid(pid, &w, WNOHANG);
+    st = SYS_WAITPID(pid, &w, WNOHANG);
     if (st > 0)
        {cnd = -1;
 	sts = -1;
@@ -601,7 +599,7 @@ int SC_child_kill(int pid)
 
 /* wait at most a second for the child to die */
 	     if (SC_time_allow(1) == 0)
-	        {wst = waitpid(pid, &w, 0);
+	        {wst = SYS_WAITPID(pid, &w, 0);
 		 SC_time_allow(0);};
 
 	     SC_signal_unblock(NULL, SC_ALL_SIGNALS, -1);
@@ -920,4 +918,3 @@ void SC_handle_sigchld(int signo)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-#endif
