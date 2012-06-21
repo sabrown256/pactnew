@@ -11,11 +11,6 @@
 #include "score_int.h"
 #include "scope_proc.h"
 
-#if defined(UNIX)
-# include <pwd.h>
-# include <sched.h>
-#endif
-
 #ifdef HAVE_BFD
 # include <execinfo.h>
 #endif
@@ -482,7 +477,7 @@ int SC_get_pname(char *path, int nc, int pid)
     SC_rusedes ru;
 
     if (pid < 0)
-       pid = getpid();
+       pid = SYS_GETPID();
 
      rv = -1;
 
@@ -762,7 +757,7 @@ void SC_sleep(int to)
     req.tv_nsec = 1.0e9*tn;
 
     while (TRUE)
-       {n = nanosleep(&req, &rem);
+       {n = SYS_NANOSLEEP(&req, &rem);
 	if ((n == -1) && (errno == EINTR))
 	   req = rem;
 	else
@@ -856,7 +851,7 @@ int SC_attach_dbg(int pid)
     char *cmd;
 
     if (pid < 0)
-       pid = getpid();
+       pid = SYS_GETPID();
 
     rv = SC_get_pname(path, PATH_MAX, pid);
     if (rv == 0)
@@ -909,7 +904,7 @@ static char **_SC_backtrace_exe(int pid, int to)
 
     t = NULL;
 
-    epid = (pid < 0) ? getpid() : pid;
+    epid = (pid < 0) ? SYS_GETPID() : pid;
     rv   = SC_get_pname(path, PATH_MAX, epid);
 
 /* current process and executable access active
@@ -1125,8 +1120,8 @@ void SC_get_latencies(double *ptmp, double *phm, double *pnet, double *pprc)
    {int pid;
     char s[MAXLINE], hst[MAXLINE];
 
-    gethostname(hst, MAXLINE);
-    pid = getpid();
+    SYS_GETHOSTNAME(hst, MAXLINE);
+    pid = SYS_GETPID();
 
     if (ptmp != NULL)
        {snprintf(s, MAXLINE, "/tmp/.latency-%s-%d", hst, pid);
@@ -1157,7 +1152,7 @@ char *SC_get_uname(char *name, int nc, int uid)
     rv = NULL;
 
     if (uid == -1)
-       uid = getuid();
+       uid = SYS_GETUID();
 
     name[0] = '\0';
 
@@ -1165,7 +1160,7 @@ char *SC_get_uname(char *name, int nc, int uid)
 
     {struct passwd *pw;
 
-     pw = getpwuid(uid);
+     pw = SYS_GETPWUID(uid);
      if (pw != NULL)
         {snprintf(name, nc, "%10s", pw->pw_name);
 	 rv = name;};}
@@ -1183,7 +1178,7 @@ int SC_yield(void)
    {int rv;
 
 #if 1
-    rv = sched_yield();
+    rv = SYS_SCHED_YIELD();
 #else
     SC_sleep(10);
     rv = TRUE;

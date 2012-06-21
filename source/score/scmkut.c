@@ -262,7 +262,7 @@ static void dmake_sig_handler(int sig)
 	     break;};
 
     io_printf(stdout, "PACT: signal %s (%d) to PID %d while %s for\n",
-	      SC_signal_name(sig), sig, getpid(), s);
+	      SC_signal_name(sig), sig, SYS_GETPID(), s);
     io_printf(stdout, "      ");
     for (i = 0; TRUE; i++)
         {if (argv[i] == NULL)

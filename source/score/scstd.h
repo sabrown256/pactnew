@@ -30,7 +30,6 @@
 
 #include <stdio.h>
 #include <string.h>
-
 #include <math.h>
 
 #ifndef __cplusplus
@@ -62,6 +61,7 @@
 
 #include <scgnu.h>
 #include <scpcc.h>
+#include <scapi.h>
 
 /*--------------------------------------------------------------------------*/
 

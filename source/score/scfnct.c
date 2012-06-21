@@ -359,7 +359,7 @@ static void _SC_timeout_error(int sig)
 
     char s[MAXLINE];
 
-    snprintf(s, MAXLINE, "\nProcess %d timed out\n\n", (int) getpid());
+    snprintf(s, MAXLINE, "\nProcess %d timed out\n\n", (int) SYS_GETPID());
 
 /* NOTE: do not use io_puts here because timeouts often occur because
  * of memory deadlocks and io_puts allocates more memory so we would

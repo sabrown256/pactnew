@@ -592,7 +592,7 @@ int SC_child_kill(int pid)
     for (i = 0; i < na; i++)
 
 /* send the signal */
-        {kst = kill(pid, sa[i]);
+        {kst = SYS_KILL(pid, sa[i]);
 	 if (kst == 0)
 	    {wst = 0;
 

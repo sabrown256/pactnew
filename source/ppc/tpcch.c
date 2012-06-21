@@ -22,10 +22,10 @@ int main(int c, char **v)
 
     rv = 0;
 
-    pid  = getpid();
-    ppid = getppid();
-    pgid = getpgrp();
-    ptid = tcgetpgrp(0);
+    pid  = SYS_GETPID();
+    ppid = SYS_GETPPID();
+    pgid = SYS_GETPGRP();
+    ptid = SYS_TCGETPGRP(0);
     ib   = SC_is_background_process(pid);
 
     printf("\n");

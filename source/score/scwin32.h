@@ -28,6 +28,8 @@
 #include <direct.h>
 #include <process.h>
 
+#include <windows.h>
+
 /*--------------------------------------------------------------------------*/
 
 /*                        STANDARD CONFIGURATIONS                           */
@@ -86,6 +88,8 @@
 
 /*--------------------------------------------------------------------------*/
 
+#define HAVE_STREAMS_P
+
 #define JMP_BUF            jmp_buf
 #define SETJMP(_x)         setjmp(_x)
 #define LONGJMP(_x, _v)    longjmp(_x, _v)
@@ -99,7 +103,16 @@
 
 /*--------------------------------------------------------------------------*/
 
+typedef int uid_t;
+typedef int gid_t;
 typedef int sigset_t;
+
+typedef unsigned long nfds_t;
+
+struct pollfd
+   {int fd;
+    short int events;
+    short int revents;};
 
 struct flock
    {int l_type;

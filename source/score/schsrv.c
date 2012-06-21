@@ -97,7 +97,7 @@ int _SC_ping_host(char *host, int to, int fm)
     st = FALSE;
 
     if (host == NULL)
-       {gethostname(hst, MAXLINE);
+       {SYS_GETHOSTNAME(hst, MAXLINE);
 	ph = hst;}
     else
        ph = host;
@@ -954,7 +954,7 @@ int SC_hostname(char *s, int nc)
     char chst[MAXLINE];
     char *p;
 
-    st = gethostname(chst, MAXLINE);
+    st = SYS_GETHOSTNAME(chst, MAXLINE);
     if (st == 0)
        {strcpy(s, chst);
 	p = strchr(s, '.');

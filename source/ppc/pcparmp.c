@@ -51,7 +51,7 @@ static PROCESS *_PC_open_member_d(char **argv, int *pnn)
 
 /* conditional diagnostic messages */
     if (_SC_ps.debug)
-       {snprintf(t, MAXLINE, "PC_clnt_log.%d", (int) getpid());
+       {snprintf(t, MAXLINE, "PC_clnt_log.%d", (int) SYS_GETPID());
 	_PC_diag = fopen(t, "w");
 	fprintf(_PC_diag, "\n\n   Node #%d at %s:%d.%d\n",
 		pp->acpu, srvr, port, pp->data);

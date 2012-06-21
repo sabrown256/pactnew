@@ -16,7 +16,7 @@
 #define REPLY(msg, val)                                                      \
    {printf("%s:%ld\n", msg, (long) val);                                     \
     fflush(stdout);                                                          \
-    if (_SC_ps.debug)                                                           \
+    if (_SC_ps.debug)                                                        \
        {fprintf(_PC_diag, "%s:%ld\n", msg, (long) val);                      \
         fflush(_PC_diag);};}
 
@@ -105,7 +105,7 @@ static int _PC_setup_children(char **argv, char *mode)
 
 #ifdef HAVE_PROCESS_CONTROL
 
-    gethostname(host, MAXLINE);
+    SYS_GETHOSTNAME(host, MAXLINE);
     port = PC_init_server(SC_GET_PORT, FALSE);
     if (port == -1)
        return(FALSE);
@@ -137,7 +137,7 @@ static int _PC_setup_children(char **argv, char *mode)
     argv += off;
 
     if (_SC_ps.debug)
-       {snprintf(s, MAXLINE, "PC_srvr_log.%d", (int) getpid());
+       {snprintf(s, MAXLINE, "PC_srvr_log.%d", (int) SYS_GETPID());
 	_PC_diag = fopen(s, "w");
 	if (_PC_diag != NULL)
 	   {fprintf(_PC_diag, "\n   ------ Begin Setup ------\n\n");

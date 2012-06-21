@@ -194,7 +194,7 @@ static SC_thread _SC_sproc_thread_self(void)
     SC_thread id;
     emu_thread_info *ta;
 
-    pid = getpid();
+    pid = SYS_GETPID();
     id  = 0;
     np  = SC_array_get_n(_SC_sproc_threads);
 
@@ -221,7 +221,7 @@ static void _SC_sproc_do_thread(void *x)
     func = pdat->func;
     arg  = pdat->arg;
 
-    pdat->pid     = getpid();
+    pdat->pid     = SYS_GETPID();
     pdat->val     = (*func)(arg);
     pdat->running = FALSE;
 
@@ -346,7 +346,7 @@ static char *_SC_sproc_ctime(const time_t *t, char *s, int sz)
 static char *_SC_sproc_ttyname(int fd, char *name, size_t sz)
    {
 
-    SC_strncpy(name, sz, ttyname(fd), -1);
+    SC_strncpy(name, sz, SYS_TTYNAME(fd), -1);
 
     return(name);}
 
