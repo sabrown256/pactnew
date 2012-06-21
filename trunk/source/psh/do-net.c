@@ -14,6 +14,10 @@
 #include "libasync.c"
 
 /* exit states */
+#undef WAITING
+#undef PASSED
+#undef FAILED
+#undef TIMEDOUT
 #define WAITING   10
 #define PASSED    11
 #define FAILED    12
@@ -154,9 +158,6 @@ static char
 
 static void
  finish(donetdes *st, double gti);
-
-extern int
- strcasecmp(const char *a, const char *b);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

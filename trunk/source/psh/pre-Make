@@ -22,11 +22,6 @@ targets :
 	@echo "   test    : run the PSH test suite"
 
 
-InstallDep = ${BinDir}/pco ${BinDir}/do-net ${BinDir}/do-run \
-             ${BinDir}/atdbg ${BinDir}/pcsh ${BinDir}/perdb  \
-             ${BinDir}/elide ${BinDir}/blang                 \
-             ${BinDir}/smake ${BinDir}/pact-info
-
 OD = DefaultG
 
 CcFlags = ${ODC} ${LDRPath}
@@ -37,7 +32,17 @@ LibFiles = libpsh.c libasync.c libeval.c libtime.c \
            libfifo.c libsock.c libdb.c \
            libinfo.c
 
-IncFiles : common.h nonstd.h ${LibFiles}
+POSIXHdrs = posix.h posix-unix.h posix-msw.h posix-beos.h
+NETWHdrs  = network.h network-unix.h network-msw.h network-beos.h
+
+IncFiles = common.h nonstd.h ${POSIXHdrs} ${NETWHdrs} ${LibFiles}
+
+InstallDep = ${BinDir}/pco ${BinDir}/do-net ${BinDir}/do-run \
+             ${BinDir}/atdbg ${BinDir}/pcsh ${BinDir}/perdb  \
+             ${BinDir}/elide ${BinDir}/blang                 \
+             ${BinDir}/smake ${BinDir}/pact-info
+
+RemoveFiles = ${InstallDep} ${IncFiles}
 
 ${InstallDep} : ${IncFiles}
 
@@ -109,7 +114,7 @@ ${BinDir}/template : template.c ${LibFiles}
 
 
 link : ${InstallDep}
-	sinstall common.h nonstd.h ${LibFiles} ${IncDir}/shell
+	sinstall ${IncFiles} ${IncDir}/shell
 
 install :
 	pact link

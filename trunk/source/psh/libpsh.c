@@ -893,10 +893,6 @@ int file_executable(char *fmt, ...)
     if (st != 0)
        nstrncpy(err, MAXLINE, strerror(errno), -1);
     else
-
-#ifdef WIN32
-       rv = TRUE;
-#else
        {int ig, ng;
 	gid_t gl[NGROUPX+1];
 
@@ -926,7 +922,6 @@ int file_executable(char *fmt, ...)
 
 	if (file && (usrx || grpx || othx))
            rv = TRUE;};
-#endif
 
     return(rv);}
 
@@ -1708,13 +1703,8 @@ static int is_executable_file(char *fp, char *path, int ncx)
 	fgid = bf.st_gid;
 	file = bf.st_mode & S_IFREG;
 	usrx = ((muid == fuid) && (bf.st_mode & S_IXUSR));
-#ifdef WIN32
-	grpx = TRUE;
-	othx = TRUE;
-#else
 	grpx = ((mgid == fgid) && (bf.st_mode & S_IXGRP));
 	othx = (bf.st_mode & S_IXOTH);
-#endif
 	if (file && (usrx || grpx || othx))
 	   {n = strlen(path);
 	    if (n <= ncx)
@@ -1771,11 +1761,6 @@ int file_path(char *name, char *path, int nc)
     size_t nb;
     char pathvar[MAXLINE], fp[MAXLINE];
     char *t, *p;
-#ifdef WIN32
-    extern char *getcwd(char *buf, int size);
-#else
-    extern char *getcwd(char *buf, size_t size);
-#endif
 
     n  = -1;
     nb = MAXLINE - 1;
@@ -2240,7 +2225,6 @@ int block_fd(int fd, int on)
 
     status = 0;
 
-#ifndef WIN32
     status = fcntl(fd, F_GETFL, status);
 
 /* block */
@@ -2250,7 +2234,6 @@ int block_fd(int fd, int on)
 /* unblock */
     else
        status = fcntl(fd, F_SETFL, status | O_NDELAY);
-#endif
 
     if (status == -1)
        status = FALSE;
@@ -2320,8 +2303,6 @@ void log_activity(char *flog, int ilog, char *oper, char *fmt, ...)
 
 void unamef(char *s, int nc, char *wh)
    {static int first = TRUE;
-
-#ifndef WIN32
     static struct utsname uts;
 
     if (first == TRUE)
@@ -2346,7 +2327,6 @@ void unamef(char *s, int nc, char *wh)
         case 'v' :
 	     nstrncpy(s, nc, uts.version, -1);
              break;};
-#endif
 
     return;}
 
