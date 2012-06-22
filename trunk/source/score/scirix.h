@@ -15,8 +15,11 @@
 
 #include "cpyright.h"
 
+#if 0
 #include <stdarg.h>
 #include <sys/types.h>
+#endif
+
 #include <sys/sysmp.h>
 #include <sys/sysinfo.h> /* for SAGET and MINFO structures */
 

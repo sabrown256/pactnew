@@ -16,14 +16,7 @@
 #endif
 
 #if defined(LINUX) || defined(CYGWIN)
-# include <dirent.h>
 # include <libgen.h>
-#elif defined(AIX)
-# include <dirent.h>
-#elif defined(SOLARIS)
-# include <dirent.h>
-#elif defined(FREEBSD)
-# include <dirent.h>
 #elif defined(MACOSX)
 # include <sys/sysctl.h>
 # include <mach/task.h>

@@ -20,24 +20,11 @@
 
 /*--------------------------------------------------------------------------*/
 
-#include <unistd.h>
-#include <sys/stat.h>
-#include <sys/utsname.h>
-#include <sys/time.h>
-#include <fcntl.h>
-
-#include <sys/ioctl.h>
-
 #if defined(AIX)
-# include <termios.h>
 # ifdef HAVE_SELECT_P
 #  include <sys/select.h>
 # endif
 # define BAD_FLUSH_SEMANTICS
-#elif defined(BEOS)
-# include <termios.h>
-#else
-# include <sys/termios.h>
 #endif
 
 #if defined(MACOSX)
@@ -99,15 +86,6 @@ typedef int socklen_t;
 # endif
 #endif
 
-#ifdef HAVE_SOCKETS_P
-# include <sys/socket.h>
-# include <arpa/inet.h>
-# include <netinet/in.h>
-# include <netinet/ip.h>
-# include <netdb.h>
-#endif
-
-#include <pwd.h>
 #include <sched.h>
 
 /*--------------------------------------------------------------------------*/

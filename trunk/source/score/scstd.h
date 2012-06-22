@@ -28,6 +28,8 @@
 #include <scwin32.h>
 #include <scbgl.h>
 
+#include <posix.h>
+#include <network.h>
 #include <ansic.h>
 
 #include <scdecls.h>
