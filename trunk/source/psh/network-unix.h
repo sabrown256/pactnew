@@ -16,8 +16,6 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
-#include <sys/select.h>
-#include <dirent.h>
 
 #ifndef INADDR_NONE
 # define INADDR_NONE NULL

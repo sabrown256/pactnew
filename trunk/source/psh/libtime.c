@@ -11,7 +11,7 @@
 
 #define LIBTIME
 
-#include <sys/time.h>
+#include "common.h"
 
 #define TIME_SEC     500
 #define TIME_HMS     501

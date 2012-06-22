@@ -17,6 +17,7 @@
 #include <pwd.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
+#include <sys/select.h>
 #include <sys/sem.h>
 #include <sys/utsname.h>
 #include <sys/wait.h>
