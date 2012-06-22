@@ -11,19 +11,23 @@
 #ifndef PCK_POSIX_UNIX
 #define PCK_POSIX_UNIX
 
+/* NOTE: threading is handled elsewhere and BG/L
+ * does not have this header
+#include <pthread.h>
+ */
+
 #include <cpio.h>
 #include <grp.h>
-#include <pthread.h>
 #include <pwd.h>
+#include <tar.h>
+#include <termios.h>
+#include <poll.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sys/select.h>
 #include <sys/sem.h>
 #include <sys/utsname.h>
 #include <sys/wait.h>
-#include <tar.h>
-#include <termios.h>
-#include <poll.h>
 
 /* include this here to control complications with non-standard ones */
 #include <unistd.h>
