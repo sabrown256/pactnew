@@ -2289,6 +2289,11 @@ CFG_DONE:
         if ($strict == FALSE) then
            set IncFiles = ( $IncFiles iso-c.h scconfig.h scdecls.h )
            set IncFiles = ( $IncFiles cpyright.h syntax.h )
+           set IncFiles = ( $IncFiles posix.h posix-unix.h )
+           set IncFiles = ( $IncFiles posix-msw.h posix-beos.h )
+           set IncFiles = ( $IncFiles network.h network-unix.h )
+           set IncFiles = ( $IncFiles network-msw.h network-beos.h )
+           set IncFiles = ( $IncFiles ansic.h )
            set IncFiles = ( $IncFiles f90types.h f90kinds.inc )
         endif
         Note $Log "IncFiles = $IncFiles"
