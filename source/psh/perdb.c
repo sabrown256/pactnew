@@ -12,8 +12,6 @@
 #include "libpsh.c"
 #include "libdb.c"
 
-#include <setjmp.h>
-
 static database
  *db = NULL;
 

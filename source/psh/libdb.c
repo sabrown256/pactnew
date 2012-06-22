@@ -15,8 +15,6 @@
 extern char
  *name_log(char *root);
 
-#include <setjmp.h>
-
 #define EOM     "++ok++"
 
 #define WHICH_PROC()       ((ioc_server == CLIENT) ? "CLIENT" : "SERVER")
