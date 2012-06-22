@@ -208,7 +208,7 @@ ${MMDep}  : ${Hdrs}
 # scoerce
 
 ${BinDir}/scoerce : scoerce.c ${Hdrs} 
-	${CCCfe} ${Cfe_LD_Flags} ${Cfe_LD_RPath} -I../score scoerce.c -o ${BinDir}/scoerce ${Cfe_LD_Lib}
+	${CCCfe} ${Cfe_LD_Flags} ${Cfe_LD_RPath} -I../psh -I../score scoerce.c -o ${BinDir}/scoerce ${Cfe_LD_Lib}
 
 scoerce : ${BinDir}/scoerce
 
@@ -494,7 +494,7 @@ ${BinDir}/tscvs : ${TGTLib} tscvs.c
 	${CLD} ${LdFlags} tscvs.c -o ${BinDir}/tscvs ${Libs}
 
 ${BinDir}/dmake : ${TGTLib} scmkut.c
-	${CLD} ${LdFlags} scmkut.c -o ${BinDir}/dmake ${Libs}
+	${CLD} -I../psh ${LdFlags} scmkut.c -o ${BinDir}/dmake ${Libs}
 
 ${BinDir}/tscar : ${TGTLib} tscar.c
 	${CLD} ${LdFlags} tscar.c -o ${BinDir}/tscar ${Libs}

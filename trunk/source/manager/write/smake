@@ -143,6 +143,7 @@ EOF
 
           flog $Log pushd ../../psh
           flog $Log ./ccw "$RootOpt" smake.c -o $BinDir/smake
+          flog $Log $BinDir/smake incinstall
           flog $Log popd
        endif
 

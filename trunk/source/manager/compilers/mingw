@@ -65,6 +65,7 @@ Tool LD {
 	        on    = -pg ]
    Flags   += [ _cmd_ = -cov ;               # coverage analysis
 	        on    = -lgcov ]
+   Lib      = -lwsock32
 }
 
 Tool Lex {

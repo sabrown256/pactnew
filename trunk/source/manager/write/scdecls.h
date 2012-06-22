@@ -61,9 +61,12 @@ Note $Log "   IncDir       = $IncDir"
     set opt = ( $opt $Cfe_LD_Flags $Cfe_LD_RPath )
     set opt = ( `echo $opt | sed 's|\"||g'` )
 
+    set inc = ""
+    set inc = ( $inc -I.. -I../../psh -I$IncDir )
+
     flog $Log mkdir $CfgDir
     flog $Log cd $CfgDir
-    flog $Log $Cfe_CC_Exe -DMM_CONFIG -I.. -I$IncDir ../scmemi.c -o score-config $opt
+    flog $Log $Cfe_CC_Exe -DMM_CONFIG $inc ../scmemi.c -o score-config $opt
     if ($status == 0) then
 
 # NOTE: coded this way to throw away message to stderr

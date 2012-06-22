@@ -6,7 +6,7 @@
 #
 
 TGTBin = nobin
-TGTInc = noinc
+TGTInc = ${StdHdrs}
 
 targets :
 	@echo "Targets for PSH"
@@ -28,23 +28,25 @@ CcFlags = ${ODC} ${LDRPath}
 PCC     = ${CCSer}
 #PCC     = cc -g
 
+POSIXHdrs = posix.h posix-unix.h posix-msw.h posix-beos.h
+ANSIHdrs  = ansic.h
+NETWHdrs  = network.h network-unix.h network-msw.h network-beos.h
+StdHdrs   = ${POSIXHdrs} ${ANSIHdrs} ${NETWHdrs}
+
 LibFiles = libpsh.c libasync.c libeval.c libtime.c \
            libfifo.c libsock.c libdb.c \
            libinfo.c
-
-POSIXHdrs = posix.h posix-unix.h posix-msw.h posix-beos.h
-NETWHdrs  = network.h network-unix.h network-msw.h network-beos.h
-
-IncFiles = common.h nonstd.h ${POSIXHdrs} ${NETWHdrs} ${LibFiles}
+IncFiles = common.h nonstd.h ${LibFiles}
 
 InstallDep = ${BinDir}/pco ${BinDir}/do-net ${BinDir}/do-run \
              ${BinDir}/atdbg ${BinDir}/pcsh ${BinDir}/perdb  \
              ${BinDir}/elide ${BinDir}/blang                 \
              ${BinDir}/smake ${BinDir}/pact-info
 
-RemoveFiles = ${InstallDep} ${IncFiles}
+#RemoveFiles = ${InstallDep} ${StdHdrs} ${IncFiles}
+RemoveFiles = ${InstallDep}
 
-${InstallDep} : ${IncFiles}
+${InstallDep} : ${StdHdrs} ${IncFiles}
 
 #
 # Generated code rules

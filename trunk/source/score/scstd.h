@@ -28,34 +28,7 @@
 #include <scwin32.h>
 #include <scbgl.h>
 
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-
-#ifndef __cplusplus
-# ifdef HAVE_ANSI_C9X_COMPLEX
-#  include <complex.h>
-# endif
-#endif
-
-#include <stdbool.h>
-#include <ctype.h>
-#include <wctype.h>
-#include <float.h>
-
-#ifndef S_SPLINT_S
-# include <signal.h>
-#endif
-
-#include <setjmp.h>
-#include <time.h>
-#include <stdlib.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdarg.h>
-#include <limits.h>
-#include <errno.h>
-#include <assert.h>
+#include <ansic.h>
 
 #include <scdecls.h>
 

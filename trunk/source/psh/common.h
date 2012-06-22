@@ -13,25 +13,11 @@
 #define PCK_COMMON
 
 #include "posix.h"
+#include "ansic.h"
+#include "nonstd.h"
 
-#ifndef NO_STD_INCLUDES
-# include <stdlib.h>
-# include <string.h>
-# include <stdio.h>
-# include <stdarg.h>
-# include <ctype.h>
-# include <time.h>
-# include <signal.h>
-# include <errno.h>
-# include "nonstd.h"
-#endif
-
-#undef TRUE
-#undef FALSE
 #undef MAXLINE
 
-#define TRUE       1
-#define FALSE      0
 #define MAXLINE    4096
 #define LRG        4096
 #define MEGA       1048576
@@ -39,16 +25,12 @@
 #define APPEND     100
 #define PREPEND    101
 
-#undef min
-#undef max
 #undef MAKE
 #undef MAKE_N
 #undef REMAKE
 #undef FREE
 #undef STRSAVE
 
-#define min(a, b)         ((a) < (b) ? (a) : (b))
-#define max(a, b)         ((a) > (b) ? (a) : (b))
 #define MAKE(_t)          ((_t *) malloc(sizeof(_t)))
 #define MAKE_N(_t, _n)    ((_t *) calloc(_n, sizeof(_t)))
 #define REMAKE(p, _t, n)  (p = (_t *) realloc((void *) p, (n)*sizeof(_t)))
