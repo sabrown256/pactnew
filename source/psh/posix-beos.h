@@ -14,6 +14,9 @@
 /* include this here to control complications with non-standard ones */
 #include <unistd.h>
 
+/* not strictly POSIX but not ANSI C either */
+#include <sys/ioctl.h>
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 

@@ -12,10 +12,11 @@
 
 #define PCK_NETWORK_UNIX
 
+#include <sys/socket.h>
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
-#include <sys/socket.h>
+#include <netinet/ip.h>
 
 #ifndef INADDR_NONE
 # define INADDR_NONE NULL

@@ -14,6 +14,7 @@
 
 #include "cpyright.h"
 
+#if 0
 #undef byte
 
 #include <ws2tcpip.h>
@@ -29,6 +30,7 @@
 #include <process.h>
 
 #include <windows.h>
+#endif
 
 /*--------------------------------------------------------------------------*/
 
@@ -36,6 +38,7 @@
 
 /*--------------------------------------------------------------------------*/
 
+#if 0
 /* NO_SHELL should be set for platforms lacking shell windows
  * this would include DOS and Windows
  */
@@ -82,11 +85,15 @@
 #define SIGSYS		31
 #define	SIGUNUSED	31
 
+#endif
+
 /*--------------------------------------------------------------------------*/
 
 /*                          STANDARD PROCEDURAL MACROS                      */
 
 /*--------------------------------------------------------------------------*/
+
+#if 0
 
 #define HAVE_STREAMS_P
 
@@ -97,11 +104,15 @@
 #define fileno(x)          _fileno(x)
 /* #define stat(_a, _b)       _stat(_a, _b) */
 
+#endif
+
 /*--------------------------------------------------------------------------*/
 
 /*                           STANDARD TYPEDEFS                              */
 
 /*--------------------------------------------------------------------------*/
+
+#if 0
 
 typedef int uid_t;
 typedef int gid_t;
@@ -121,11 +132,15 @@ struct flock
     int l_len;
     int l_pid;};
 
+#endif
+
 /*--------------------------------------------------------------------------*/
 
 /*                            TERMINAL HANDLING                             */
 
 /*--------------------------------------------------------------------------*/
+
+#if 0
 
 #define TERMINFO struct termios
 /* #define TERMINAL struct termios */
@@ -154,6 +169,8 @@ struct s_TERMINAL_STATE
     int valid_size;
 /*    TERMINAL term; */
     struct winsize window_size;};    
+
+#endif
 
 #ifdef __cplusplus
 extern "C" {

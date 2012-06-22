@@ -657,7 +657,7 @@ SC_proc_info *SC_get_processes(int uid)
    {char *cmd;
     SC_proc_info *pi;
 
-#if defined(CYGWIN)
+#if defined(CYGWIN) || defined(MSW)
     cmd = "ps -W";
     pi  = _SC_get_cygwin_processes(cmd, uid);
 

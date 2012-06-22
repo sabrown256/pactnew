@@ -82,13 +82,7 @@ extern long double
 
 #endif
 
-#ifdef HAVE_GNU_LIBC_6
-
-# ifdef UNIX
-#  include <sys/wait.h>
-# endif
-
-#else
+#ifndef HAVE_GNU_LIBC_6
 
 extern int
  bsd_ioctl(int fildes, int request, ...);
