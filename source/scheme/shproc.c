@@ -11,6 +11,28 @@
 #include "scheme_int.h"
 #include "scope_proc.h"
 
+enum e_SS_io_kind
+   {SS_IO_IN, SS_IO_OUT, SS_IO_ERR};
+
+typedef enum e_SS_io_kind SS_io_kind;
+
+typedef struct s_SS_io SS_io;
+typedef struct s_SS_job SS_job;
+
+struct s_SS_io
+   {SS_io_kind kind;        /* INPUT, OUTPUT, or ERROR - 0, 1, or 2 */
+    int fd;                 /* file descriptor */
+    int pid;                /* pipeline id */
+    object *iex;            /* input expr */
+    object *oex;};          /* output expr */
+
+struct s_SS_job
+   {int id;
+    SS_io fd[3];
+    char *cmd;
+    int exit;
+    SS_job *next;};
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -308,6 +330,287 @@ static object *_SSI_pr_sn_line(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SS_SET_IO_SPEC - initialize an SS_io specification */
+
+static void _SS_set_io_spec(SS_psides *si, SS_job *pj,
+			    SS_io_kind kind, object *ios)
+   {int fd, pid, n;
+    char *type, *host;
+    SS_io *io;
+    object *iex, *oex;
+
+    fd  = -1;
+    pid = -1;
+    iex = SS_null;
+    oex = SS_null;
+
+/* stdin, stdout, stderr, or /dev/null */
+    if (SS_booleanp(ios) == TRUE)
+       {if (SS_BOOLEAN_VALUE(ios) == FALSE)
+	   fd  = -1;
+	else
+	   fd = kind;}
+
+/* output to open file */
+    else if ((SS_outportp(ios) == TRUE) && (kind != SS_IO_IN))
+       fd = fileno(SS_OUTSTREAM(ios));
+
+/* input from open file */
+    else if ((SS_inportp(ios) == TRUE) && (kind == SS_IO_IN))
+       fd = fileno(SS_INSTREAM(ios));
+
+    else if (SS_consp(ios) == TRUE)
+       {type = NULL;
+	host = NULL;
+	n    = -1;
+	SS_args(si, ios,
+		SC_STRING_I,  &type,
+		SC_INTEGER_I, &n,
+		SC_STRING_I,  &host,
+		0);
+
+/* process in pipeline relative to this process */
+	if (strcmp(type, "piper") == 0)
+	   pid = pj->id + n;
+
+/* process in pipeline absolute position */
+	else if (strcmp(type, "pipea") == 0)
+	   pid = n;
+
+/* file name */
+	else if (strcmp(type, "file") == 0)
+	   {if (host == NULL)
+	       fd = n;
+	    else
+	       {if (kind == SS_IO_IN)
+		   fd = open(host, O_RDONLY);
+
+/* GOTCHA: worrry about append or create */
+		else
+		   fd = open(host, O_WRONLY);};}
+
+/* socket connection */
+	else if (strcmp(type, "socket") == 0)
+	   {int to, fm;
+
+	    to = 10000;         /* timeout after 10 seconds */
+	    fm = FALSE;         /* fatal on timeout */
+
+	    fd = _SC_tcp_connect(host, n, to, fm);}
+      
+/* expression to be evaluated for input or output */
+        else
+	   {if (kind == SS_IO_IN)
+	       iex = ios;
+	    else
+	       oex = ios;
+	    SS_mark(ios);};};
+
+    io = pj->fd + kind;
+    if (io != NULL)
+       {io->kind = kind;
+	io->fd   = fd;
+        io->pid  = pid;
+        io->iex  = iex;
+        io->oex  = oex;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+
+#if 0
+
+/*--------------------------------------------------------------------------*/
+
+/* _SS_MAKE_IO_SPEC - make and return an SS_io specification */
+
+static SS_io *_SS_make_io_spec(SS_psides *si, SS_io_kind kind, object *ios)
+   {SS_io *io;
+
+    io = CMAKE(SS_io);
+    if (io != NULL)
+       _SS_set_io_spec(si, io, kind, ios);
+
+    return(io);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_FREE_IO_SPEC - free an SS_io specification */
+
+static void _SS_free_io_spec(SS_io *io)
+   {
+
+    CFREE(io);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+
+#endif
+
+/*--------------------------------------------------------------------------*/
+
+/* _SS_MAKE_PIPELINE - make a SS_job out of IS, OS, ES, and CMD
+ *                   - add it to JOBS and return the result
+ */
+
+static SS_job *_SS_make_pipeline(SS_psides *si, SS_job *jobs, int id,
+				 object *is, object *os, object *es,
+				 char *cmd)
+   {SS_job *pj;
+
+    pj = CMAKE(SS_job);
+    if (pj != NULL)
+       {pj->id   = id;
+	pj->cmd  = CSTRSAVE(cmd);
+	pj->exit = -1;
+	pj->next = jobs;
+
+	_SS_set_io_spec(si, pj, SS_IO_IN,  is);
+	_SS_set_io_spec(si, pj, SS_IO_OUT, os);
+        _SS_set_io_spec(si, pj, SS_IO_ERR, es);};
+
+    return(pj);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_FREE_JOB - free the job PJ */
+
+static void _SS_free_job(SS_job *pj)
+   {
+
+    if (pj != NULL)
+       {CFREE(pj->cmd);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_FREE_PIPELINE - free the job pipeline JOBS */
+
+static void _SS_free_pipeline(SS_job *jobs)
+   {SS_job *pj, *nxt;
+
+    for (pj = jobs; pj != NULL; pj = nxt)
+        {nxt = pj->next;
+	 _SS_free_job(pj);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_RUN_PIPELINE - run the job pipeline JOBS
+ *                  - return the list of exit statuses
+ */
+
+static object *_SS_run_pipeline(SS_psides *si, SS_job *jobs)
+   {SS_job *pj, *nxt;
+    object *o;
+
+    o = SS_null;
+    for (pj = jobs; pj != NULL; pj = nxt)
+        {nxt = pj->next;
+	 o = SS_mk_cons(si, SS_mk_integer(si, pj->exit), o);};
+
+    _SS_free_pipeline(jobs);
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SSI_PR_EXEC - exec at Scheme level
+ *              - syntax: (exec [<in> <out> <err> <cmd>]*)
+ *              -   <in>  := <io-spec>
+ *              -   <out> := <io-spec>
+ *              -   <err> := <io-spec>
+ *              -   <cmd> := command line string
+ *              -   <io-spec>   := #t | #f | <file> | <expr>
+ *              -   <file>      := <file-name> | <file-port> |
+ *                                 <file-descr> | <socket> | <pipe-id>
+ *              -   <file-name> := file name string
+ *              -   <file-port> := <input-port> | <output-port>
+ *              -   <file-desc> := integer file descriptor
+ *              -   <socket>    := (socket <port> <host>)
+ *              -   <pipe-id>   := (piper <id>) | (pipea <id>)
+ *              -   <id>        := piper - relative index <id>
+ *              -                  pipea - absolute index <id>
+ *              -   <expr>      := <var> | <function>
+ *              -   <var>       := <scalar> | <array> | <list>
+ *              -   <function>  := function call
+ *              - an <io-spec> of #t is the default standard I/O
+ *              - (i.e. stdin, stdout, or stderr)
+ *              - an <io-spec> of #f is /dev/null
+ *              - returns a list containing the exit status of
+ *              - each process in the pipeline
+ *
+ *              - msh version would be:
+ *              -   <cmd> [@<d><spec>]*
+ *              -   <d>     := i (input) | o (output) | e (error) | b (o and e)
+ *              -   <spec>  := <file> | a<id> | r<id> | <expr> | <blank>
+ *              -   <id>    := absolute/relative position in pipeline
+ *              -   <expr>  := <scalar> | <array> | <call> | ...
+ *              -   <blank> := nothing - implies standard descriptor
+ *
+ *              - examples:
+ *              -   cat @ifoo.bar @br1 grep "foo"
+ *              -   echo $status -> 0 0
+ *              -   cat @ifoo.bar @or1 @er2 grep "foo" @o grep "bar" @ojunk
+ *              -   echo $status -> 0 0 1
+ *              -   cat @ifoo.bar @ofoo.org:15000 @er1 grep "bar" @ojunk
+ *              -   echo $status -> 0 0
+ *              -   cat @ifoo.org:15000 grep "bar" @ojunk
+ *              -   echo $status -> 0 0
+ *
+ */
+
+static object *_SSI_pr_exec(SS_psides *si, object *argl)
+   {int i, nl, nj;
+    char *cmd;
+    SS_job *jobs;
+    object *o, *is, *os, *es, *t;
+
+    o = SS_null;
+
+    if (!SS_nullobjp(argl))
+       {nl = SS_length(si, argl);
+
+/* check that we have quadruples of jobs */
+	if (nl % 4 == 0)
+           {nj = nl >> 2;
+
+            jobs = NULL;
+
+	    for (i = 0; i < nj; i++)
+	        {is   = SS_car(si, argl);
+		 argl = SS_cdr(si, argl);
+
+		 os   = SS_car(si, argl);
+		 argl = SS_cdr(si, argl);
+
+	         es   = SS_car(si, argl);
+		 argl = SS_cdr(si, argl);
+
+	         t    = SS_car(si, argl);
+		 argl = SS_cdr(si, argl);
+		 cmd  = NULL;
+		 SS_args(si, t,
+			 SC_STRING_I, &cmd,
+			 0);
+
+		 jobs = _SS_make_pipeline(si, jobs, i, is, os, es, cmd);};
+
+	    o = _SS_run_pipeline(si, jobs);};};
+
+    return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SSI_GET_URL_FILE - grab a web page into a file */
 
 static object *_SSI_get_url_file(SS_psides *si, object *argl)
@@ -452,6 +755,11 @@ static object *_SSI_resource_usage(SS_psides *si, object *argl)
 
 void _SS_inst_proc(SS_psides *si)
    {
+
+    SS_install(si, "pipeline",
+               "Procedure: Run job pipeline\nUsage: (pipeline [<in> <out> <err> <command>]*)",
+               SS_nargs,
+               _SSI_pr_exec, SS_PR_PROC);
 
     SS_install(si, "process?",
                "Procedure: Returns #t if the object is a PROCESS object",
