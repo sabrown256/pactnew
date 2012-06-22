@@ -1,0 +1,21 @@
+#
+# DO-RUN-TV - DO-RUN database entry for totalview
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+#-------------------------------------------------------------------------
+#-------------------------------------------------------------------------
+
+DBG : tv {
+   Exe   = totalview
+   Flags = 
+   Delim = -a
+   Cmd   = $Wrap $DBG_Exe $DBG_Flags $MPI_Exe $DBG_Delim $MPI_Flags $Code $CArgs
+}
+
+#-------------------------------------------------------------------------
+#-------------------------------------------------------------------------

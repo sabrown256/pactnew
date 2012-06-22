@@ -662,19 +662,7 @@ static int64_t _SC_get_cmd_resp(PROCESS *pp, char *msg)
 
 /* SC_FILE_ACCESS - carry out file access commands on the named host
  *                - this is the server end
- *                - the command codes are:
- *                -   SC_FOPEN     'o'
- *                -   SC_FCLOSE    'c'
- *                -   SC_FFLUSH    'f'
- *                -   SC_FTELL     't'
- *                -   SC_FSEEK     's'
- *                -   SC_FREAD     'r'
- *                -   SC_FWRITE    'w'
- *                -   SC_FPUTS     'p'
- *                -   SC_FGETS     'g'
- *                -   SC_FGETC     'h'
- *                -   SC_FUNGETC   'u'
- *                -   SC_FEXIT     'x'
+ *                - the command codes are defined in the SC_file_oper enum
  */
 
 int SC_file_access(int log)
@@ -926,10 +914,7 @@ int SC_file_access(int log)
 
                   REPLY(EXIT_MSG, ret);};
 
-                 return(ret);
-
-            default :
-                 break;};};}
+		 break;};};}
 
 /*--------------------------------------------------------------------------*/
 

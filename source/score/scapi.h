@@ -131,7 +131,7 @@ struct s_syscall_api
 
 
 struct s_sysaux_api
-   {
+   {int junk;
 #if 0
  __SC_os
 
