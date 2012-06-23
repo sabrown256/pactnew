@@ -25,7 +25,6 @@
 
 #include <scope_thread.h>
 #include <scunix.h>
-#include <scwin32.h>
 #include <scbgl.h>
 
 #include <posix.h>

@@ -1160,7 +1160,7 @@ char *SC_get_uname(char *name, int nc, int uid)
 
     {struct passwd *pw;
 
-     pw = SYS_GETPWUID(uid);
+     pw = getpwuid(uid);
      if (pw != NULL)
         {snprintf(name, nc, "%10s", pw->pw_name);
 	 rv = name;};}

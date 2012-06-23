@@ -2,7 +2,8 @@
  * SCMKUT.C - a full make utility with
  *          - persistence at the individual command level
  *          - full up version of pact utility
- *          - the one in manager is to bootstrap up to this one
+ *          - smake in psh is there to bootstrap up to this one
+ *          - and be a backup in case this one will not build
  *
  * Source Version: 3.0
  * Software Release #: LLNL-CODE-422942

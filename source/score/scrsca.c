@@ -12,7 +12,11 @@
 #include "score_int.h"
 #include "scope_mem.h"
 
+/*--------------------------------------------------------------------------*/
+
 #if defined(UNIX)
+
+/*--------------------------------------------------------------------------*/
 
 #ifdef HAVE_RESOURCE_USAGE
 # include <sys/resource.h>
@@ -858,7 +862,56 @@ int SC_get_resource_limits(int64_t *pmem, int64_t *pcpu, int64_t *pfsz,
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
+
+#elif defined(MSW)
+
+/*--------------------------------------------------------------------------*/
+
+/* SC_SET_RESOURCE_LIMITS - set limits on resource usage
+ *                        - return TRUE iff successful
+ */
+
+int SC_set_resource_limits(int64_t mem, int64_t cpu, int64_t fsz,
+			   int nfd, int nprc)
+   {int rv;
+
+    rv = 0;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_GET_RESOURCE_LIMITS - get limits on resource usage
+ *                        - return TRUE iff successful
+ */
+
+int SC_get_resource_limits(int64_t *pmem, int64_t *pcpu, int64_t *pfsz,
+			   int *pnfd, int *pnprc)
+   {int rv;
+
+    rv = FALSE;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_RESOURCE_USAGE - fill RU with current resource usages
+ *                   - return TRUE iff useful data was available
+ *                   - zero out RU otherwise
+ */
+
+int SC_resource_usage(SC_rusedes *ru, int pid)
+   {int rv;
+
+    rv = FALSE;
+
+    return(rv);}
+
 /*--------------------------------------------------------------------------*/
 
 #endif
+
+/*--------------------------------------------------------------------------*/
 

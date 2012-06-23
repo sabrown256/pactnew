@@ -412,6 +412,9 @@
 
 /*--------------------------------------------------------------------------*/
 
+typedef unsigned short uint16_t;
+typedef unsigned int   uint32_t;
+
 typedef int uid_t;
 typedef int gid_t;
 typedef int sigset_t;
@@ -483,6 +486,59 @@ extern unsigned int
 
 extern char
  *getcwd(char *buf, int size);
+
+extern struct passwd
+ *getpwuid(uid_t uid);
+
+extern uid_t
+ getuid(void);
+
+extern gid_t
+ getgid(void);
+
+extern pid_t
+ getpid(void),
+ getppid(void),
+ getpgrp(void),
+ tcgetpgrp(int fd),
+ setsid(void),
+ fork(void),
+ waitpid(pid_t pid, int *status, int options);
+
+extern int
+ getgroups(int size, gid_t list[]),
+ kill(pid_t pid, int sig),
+ sched_yield(void),
+ fsync(int fd),
+ ioctl(int d, unsigned long request, ...),
+ fcntl(int fd, int cmd, ...),
+ poll(struct pollfd *fds, nfds_t nfds, int timeout),
+ nanosleep(const struct timespec *req, struct timespec *rem),
+ setenv(const char *name, const char *value, int overwrite),
+ unsetenv(const char *name),
+ uname(struct utsname *buf),
+ pipe(int pipefd[2]),
+ sigsetjmp(sigjmp_buf env, int savesigs),
+ mkdir_msw(const char *pathname, mode_t mode),
+ select_msw(int nfds, fd_set *readfds, fd_set *writefds,
+	    fd_set *exceptfds, struct timeval *timeout);
+
+extern unsigned int
+ alarm(unsigned int seconds);
+
+extern long
+ random(void);
+
+extern char
+ *ttyname(int fd);
+
+extern void
+ siglongjmp(sigjmp_buf env, int val),
+ srandom(unsigned int seed);
+
+/*--------------------------------------------------------------------------*/
+
+#ifndef NO_DEFINE_MSW_POSIX_FUNCS
 
 /*--------------------------------------------------------------------------*/
 
@@ -833,30 +889,31 @@ int mkdir_msw(const char *pathname, mode_t mode)
 
     return(rv);}
 
-/* replace MS non-standard mkdir with our POSIX standard one */
-
 #define mkdir    mkdir_msw
 
 /*--------------------------------------------------------------------------*/
-
-#if 0
-
 /*--------------------------------------------------------------------------*/
 
-/* GETHOSTNAME - gethostname for MSW */
+/* SELECT_MSW - select for MSW */
 
-int gethostname(char *name, size_t len)
+int select_msw(int nfds, fd_set *readfds, fd_set *writefds,
+	       fd_set *exceptfds, struct timeval *timeout)
    {int rv;
 
     rv = -1;
 
     return(rv);}
 
+#define select    select_msw
+
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 #endif
 
-/*--------------------------------------------------------------------------*/
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
