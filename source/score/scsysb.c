@@ -48,7 +48,7 @@ static void _SC_server_show_log(parstate *state, FILE *fp)
 
     if (fp == NULL)
        {home = getenv("HOME");
-	dir  = SC_dsnprintf(TRUE, "%s/dmake-srv.%d", home, (int) SYS_GETPID());
+	dir  = SC_dsnprintf(TRUE, "%s/dmake-srv.%d", home, (int) getpid());
 	fp   = io_open(dir, "w");
 	CFREE(dir);
 
@@ -389,7 +389,7 @@ int _SC_server_heartbeat(int *prv, void *a)
 /* if the parent PID changes - for example being orphaned
  * then we are done
  */
-    ppid = SYS_GETPPID();
+    ppid = getppid();
     if ((ppid < 2) || (ppid != as->ppid))
        LONGJMP(_SC.srv_rstrt, SIGSTOP);
 
@@ -733,7 +733,7 @@ static int _SC_exec_srv_core(char *shell, char *fname, int na,
 			 _SC_server_complete);
 
     np  = SC_get_ncpu();
-    pid = SYS_GETPID();
+    pid = getpid();
 
     state->print(state, "<server> init:\n");
     state->print(state, "<server> PID    = %d\n", pid);
@@ -824,7 +824,7 @@ int SC_exec_server(char *shell, char *fname, int na, int show, int ignore,
     st     = -1;
     as     = &_SC_server_state;
 
-    as->ppid = SYS_GETPPID();
+    as->ppid = getppid();
 
     memset(&state, 0, sizeof(state));
 

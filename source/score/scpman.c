@@ -558,7 +558,7 @@ static int _SC_child_check(int pid)
 
     SC_signal_block(NULL, SC_ALL_SIGNALS, -1);
 
-    st = SYS_WAITPID(pid, &w, WNOHANG);
+    st = waitpid(pid, &w, WNOHANG);
     if (st > 0)
        {cnd = -1;
 	sts = -1;
@@ -590,7 +590,7 @@ int SC_child_kill(int pid)
     for (i = 0; i < na; i++)
 
 /* send the signal */
-        {kst = SYS_KILL(pid, sa[i]);
+        {kst = kill(pid, sa[i]);
 	 if (kst == 0)
 	    {wst = 0;
 
@@ -599,7 +599,7 @@ int SC_child_kill(int pid)
 
 /* wait at most a second for the child to die */
 	     if (SC_time_allow(1) == 0)
-	        {wst = SYS_WAITPID(pid, &w, 0);
+	        {wst = waitpid(pid, &w, 0);
 		 SC_time_allow(0);};
 
 	     SC_signal_unblock(NULL, SC_ALL_SIGNALS, -1);

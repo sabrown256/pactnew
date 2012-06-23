@@ -119,7 +119,7 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
 #ifdef UNIX
 # ifndef SUNMOS
             label[strlen(label)] = ' ';
-            SYS_GETHOSTNAME(&label[strlen(label)], MAXLINE - strlen(label));
+            gethostname(&label[strlen(label)], MAXLINE - strlen(label));
 # endif
 #endif
             PG_get_text_ext_n(dev, 2, WORLDC, label, dxt);

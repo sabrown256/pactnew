@@ -58,7 +58,7 @@
 # endif
 #else
 # define HAVE_INTERRUPTS_P
-# define SC_poll SYS_POLL
+# define SC_poll poll
 #endif
 
 /*--------------------------------------------------------------------------*/

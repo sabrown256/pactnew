@@ -88,9 +88,9 @@ static int _SC_query_exec_unix(char *path)
 
     ret  = FALSE;
     only = FALSE;
-    muid = SYS_GETUID();
+    muid = getuid();
     if (only == TRUE)
-       mgid = SYS_GETGID();
+       mgid = getgid();
 
     if (stat(path, &bf) == 0)
        {int ig, ng;

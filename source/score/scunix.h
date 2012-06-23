@@ -100,8 +100,6 @@ typedef int socklen_t;
 
 /*--------------------------------------------------------------------------*/
 
-#define HAVE_POSIX_SYS
-
 #define directory_delim "/"
 #define directory_delim_c '/'
 

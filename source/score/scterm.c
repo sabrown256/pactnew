@@ -37,7 +37,7 @@
 static int _SC_get_tty_attr(int fd, TERMINAL *t)
    {int rv;
 
-    rv = SYS_IOCTL(fd, TIOCGETP, t);
+    rv = ioctl(fd, TIOCGETP, t);
 
     return(rv);}
 
@@ -52,9 +52,9 @@ static int _SC_set_tty_attr(int fd, TERMINAL *t, int now)
    {int rv;
 
     if (now == TRUE)
-       rv = SYS_IOCTL(fd, TIOCSETN, t);
+       rv = ioctl(fd, TIOCSETN, t);
     else
-       rv = SYS_IOCTL(fd, TIOCSETP, t);
+       rv = ioctl(fd, TIOCSETP, t);
 
     return(rv);}
 
@@ -346,13 +346,13 @@ int SC_set_fd_attr(int fd, int i, int state)
        {if (i != SC_ASYNC)
 	   {int arg, status;
 
-	    arg = SYS_FCNTL(fd, F_GETFL);
+	    arg = fcntl(fd, F_GETFL);
 	    if (arg < 0)
 	       SC_error(-1, "COULDN'T GET DESCRIPTOR FLAG - SC_SET_FD_ATTR");
 
 	    SET_ATTR(arg, i, state);
 
-	    status = SYS_FCNTL(fd, F_SETFL, arg);
+	    status = fcntl(fd, F_SETFL, arg);
 	    if (status < 0)
 	       SC_error(-1, "COULDN'T SET DESCRIPTOR FLAG - SC_SET_FD_ATTR");
 
@@ -552,7 +552,7 @@ void SC_print_term_state(FILE *fp, int fd)
 
 #endif
 
-    c = SYS_FCNTL(fd, F_GETFL);
+    c = fcntl(fd, F_GETFL);
     if (c & O_CREAT)     printf("f> O_CREAT     - create file\n");
 #ifdef O_EXCL
     if (c & O_EXCL)      printf("f> O_EXCL      - fail to open existing file\n");
@@ -604,10 +604,10 @@ void SC_print_term_state(FILE *fp, int fd)
 void dbck(void)
    {int bg, pid, ppid, pgid, ptid;
 
-    pid  = SYS_GETPID();
-    ppid = SYS_GETPPID();
-    pgid = SYS_GETPGRP();
-    ptid = SYS_TCGETPGRP(fileno(stdin));
+    pid  = getpid();
+    ppid = getppid();
+    pgid = getpgrp();
+    ptid = tcgetpgrp(fileno(stdin));
     bg   = SC_is_background_process(pid);
 
     printf("-> ppid(%d) ptid(%d) pgid(%d) pid(%d) background(%d)\n",
@@ -781,18 +781,18 @@ void *SC_get_term_state(int fd, int size)
 
 # ifdef BSD_TERMINAL
 
-    if (SYS_IOCTL(fd, TIOCGETC, &t->tch) < 0)
+    if (ioctl(fd, TIOCGETC, &t->tch) < 0)
        return(NULL);
 
-    if (SYS_IOCTL(fd, TIOCGLTC, &t->ltc) < 0)
+    if (ioctl(fd, TIOCGLTC, &t->ltc) < 0)
        return(NULL);
 
-    if (SYS_IOCTL(fd, TIOCLGET, &t->localmode) < 0)
+    if (ioctl(fd, TIOCLGET, &t->localmode) < 0)
        return(NULL);
 
 /* Mac OS X does not implement this and complains only at runtime! */
 #  if !defined(MACOSX)
-    if (SYS_IOCTL(fd, TIOCGETD, &t->discipline) < 0)
+    if (ioctl(fd, TIOCGETD, &t->discipline) < 0)
        return(NULL);
 #  endif
 # endif
@@ -800,7 +800,7 @@ void *SC_get_term_state(int fd, int size)
       t->valid_size = size;
       if (size == TRUE)
 	 {SC_set_term_size(fd, -1, -1, -1, -1);
-	  st = SYS_IOCTL(fd, TIOCGWINSZ, &t->window_size);
+	  st = ioctl(fd, TIOCGWINSZ, &t->window_size);
 	  if (st < 0)
 	     {CFREE(t);
 	      return(NULL);};};};
@@ -847,21 +847,21 @@ int SC_set_term_state(void *pt, int trmfd)
 
 # ifdef BSD_TERMINAL
 	    if (t->full_info)
-	       {if (SYS_IOCTL(fd, TIOCSETC, &t->tch) < 0)
+	       {if (ioctl(fd, TIOCSETC, &t->tch) < 0)
 		   rv = FALSE;
 
-		else if (SYS_IOCTL(fd, TIOCSLTC, &t->ltc) < 0)
+		else if (ioctl(fd, TIOCSLTC, &t->ltc) < 0)
 		   rv = FALSE;
 
-		else if (SYS_IOCTL(fd, TIOCLSET, &t->localmode) < 0)
+		else if (ioctl(fd, TIOCLSET, &t->localmode) < 0)
 		   rv = FALSE;
 
-		else if (SYS_IOCTL(fd, TIOCSETD, &t->discipline) < 0)
+		else if (ioctl(fd, TIOCSETD, &t->discipline) < 0)
 		   rv = FALSE;};
 # endif
 
 	    if (t->valid_size == TRUE)
-	       {if (SYS_IOCTL(fd, TIOCSWINSZ, &t->window_size) < 0)
+	       {if (ioctl(fd, TIOCSWINSZ, &t->window_size) < 0)
 		   rv = FALSE;};};};
 
 #endif
@@ -1176,7 +1176,7 @@ int SC_get_term_attr(char *cmd, char *rsp, int n, int *val)
 
 /* open the actual terminal device */
 	fd   = fileno(stderr);
-	name = SYS_TTYNAME(fd);
+	name = ttyname(fd);
 	if (name == NULL)
 	   name = "/dev/tty";
 
@@ -1242,7 +1242,7 @@ int SC_get_term_size(int *pcr, int *pcc, int *ppr, int *ppc)
 
 /* open the actual terminal device */
 	fd   = fileno(stderr);
-	name = SYS_TTYNAME(fd);
+	name = ttyname(fd);
 	if (name == NULL)
 	   name = "/dev/tty";
 
@@ -1301,9 +1301,9 @@ int SC_get_term_size(int *pcr, int *pcc, int *ppr, int *ppc)
 
 # if 0
 printf("-> (%d) set term size = %dx%d background(%d) ppid(%d) pgid(%d)\n",
-       SYS_GETPID(), cw, ch, bg,
-       SYS_GETPPID(),
-       SYS_GETPGRP());
+       getpid(), cw, ch, bg,
+       getppid(),
+       getpgrp());
 # endif
 
 #endif
@@ -1354,14 +1354,14 @@ int SC_set_term_size(int fd, int nr, int nc, int pw, int ph)
     if ((0 < nr) && (0 < nc))
 
 /* try to set them using ioctls */
-       {rv = SYS_IOCTL(fd, TIOCGWINSZ, &w);
+       {rv = ioctl(fd, TIOCGWINSZ, &w);
 	if (rv != -1)
 	   {w.ws_row = nr;
 	    w.ws_col = nc;
 	    if ((0 < pr) && (0 < pc))
 	       {w.ws_xpixel = pc;
 		w.ws_ypixel = pr;};
-	    rv = SYS_IOCTL(fd, TIOCSWINSZ, &w);};
+	    rv = ioctl(fd, TIOCSWINSZ, &w);};
 
 /* try to set them using LINES/COLUMNS environment variables */
 	s = SC_dsnprintf(FALSE, "LINES=%d", nr);
@@ -1402,10 +1402,10 @@ int SC_is_background_process(int pid)
     SC_contextdes oh;
 
     if (pid == -1)
-       pid = SYS_GETPID();
-    ppid = SYS_GETPPID();
-    pgid = SYS_GETPGRP();
-    ptid = SYS_TCGETPGRP(fileno(stdin));
+       pid = getpid();
+    ppid = getppid();
+    pgid = getpgrp();
+    ptid = tcgetpgrp(fileno(stdin));
 
     rv = 0;
 
@@ -1444,7 +1444,7 @@ void SC_disconnect_tty(void)
    {
 
 #ifdef HAVE_SYSV
-    if ((cp->ischild == TRUE) && (SYS_SETSID() < 0))
+    if ((cp->ischild == TRUE) && (setsid() < 0))
        SC_error(SC_NO_SETSID,
 		"COULDN'T DITCH CONTROLLING TERMINAL - SC_DISCONNECT_TTY");
 #endif
@@ -1454,7 +1454,7 @@ void SC_disconnect_tty(void)
 
     fd = open("/dev/tty", O_RDWR);
     if (fd >= 0)
-       {if (SYS_IOCTL(fd, TIOCNOTTY, NULL) < 0)
+       {if (ioctl(fd, TIOCNOTTY, NULL) < 0)
 	   SC_error(SC_NO_TTY,
 		    "COULDN'T DITCH CONTROLLING TERMINAL - SC_DISCONNECT_TTY");
 	close(fd);};

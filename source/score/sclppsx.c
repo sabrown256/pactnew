@@ -354,7 +354,7 @@ static int _SC_posix_gets(char *bf, int len, PROCESS *pp)
 static int _SC_posix_in_ready(PROCESS *pp)
    {int rv, status;
 
-    status = SYS_FCNTL(pp->in, F_GETFL);
+    status = fcntl(pp->in, F_GETFL);
     rv     = (status & NONBLOCK);
 
     return(rv);}
@@ -428,9 +428,9 @@ static int _SC_posix_flush(PROCESS *pp)
 #ifdef BSD_TERMINAL
     static int one = 1;
 
-    iv = SYS_IOCTL(pp->in, TIOCFLUSH, &one);
+    iv = ioctl(pp->in, TIOCFLUSH, &one);
     if (pp->out != pp->in)
-       ov = SYS_IOCTL(pp->out, TIOCFLUSH, &one);
+       ov = ioctl(pp->out, TIOCFLUSH, &one);
     else
        ov = iv;
 

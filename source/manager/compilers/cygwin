@@ -10,6 +10,8 @@
 setenv PACT_CC_PATH
 setenv PACT_FC_PATH
 
+GnuMakeOpt   = TRUE
+
 include compilers/gnu
 
 # cygwin does not support -rpath

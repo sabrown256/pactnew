@@ -11,6 +11,8 @@
 #ifndef PCK_POSIX_UNIX
 #define PCK_POSIX_UNIX
 
+#define HAVE_POSIX_SYS
+
 /* NOTE: threading is handled elsewhere and BG/L
  * does not have this header
 #include <pthread.h>

@@ -477,7 +477,7 @@ int SC_get_pname(char *path, int nc, int pid)
     SC_rusedes ru;
 
     if (pid < 0)
-       pid = SYS_GETPID();
+       pid = getpid();
 
      rv = -1;
 
@@ -757,7 +757,7 @@ void SC_sleep(int to)
     req.tv_nsec = 1.0e9*tn;
 
     while (TRUE)
-       {n = SYS_NANOSLEEP(&req, &rem);
+       {n = nanosleep(&req, &rem);
 	if ((n == -1) && (errno == EINTR))
 	   req = rem;
 	else
@@ -851,7 +851,7 @@ int SC_attach_dbg(int pid)
     char *cmd;
 
     if (pid < 0)
-       pid = SYS_GETPID();
+       pid = getpid();
 
     rv = SC_get_pname(path, PATH_MAX, pid);
     if (rv == 0)
@@ -904,7 +904,7 @@ static char **_SC_backtrace_exe(int pid, int to)
 
     t = NULL;
 
-    epid = (pid < 0) ? SYS_GETPID() : pid;
+    epid = (pid < 0) ? getpid() : pid;
     rv   = SC_get_pname(path, PATH_MAX, epid);
 
 /* current process and executable access active
@@ -1120,8 +1120,8 @@ void SC_get_latencies(double *ptmp, double *phm, double *pnet, double *pprc)
    {int pid;
     char s[MAXLINE], hst[MAXLINE];
 
-    SYS_GETHOSTNAME(hst, MAXLINE);
-    pid = SYS_GETPID();
+    gethostname(hst, MAXLINE);
+    pid = getpid();
 
     if (ptmp != NULL)
        {snprintf(s, MAXLINE, "/tmp/.latency-%s-%d", hst, pid);
@@ -1152,7 +1152,7 @@ char *SC_get_uname(char *name, int nc, int uid)
     rv = NULL;
 
     if (uid == -1)
-       uid = SYS_GETUID();
+       uid = getuid();
 
     name[0] = '\0';
 
@@ -1178,7 +1178,7 @@ int SC_yield(void)
    {int rv;
 
 #if 1
-    rv = SYS_SCHED_YIELD();
+    rv = sched_yield();
 #else
     SC_sleep(10);
     rv = TRUE;

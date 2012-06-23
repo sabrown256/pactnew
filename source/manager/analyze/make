@@ -14,6 +14,11 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: make"
 
+SafeEnv GnuMakeOpt ""
+if ("$GnuMakeOpt" == TRUE) then
+   setenv GnuMakeOpt "-DUSE_GNU_MAKE"
+endif
+
 NoteD $ALog -n "   Make: "
 Note $ALog ""
 
@@ -39,7 +44,6 @@ if ($status == 0) then
 
 else
    NoteD $ALog -n "`$Which make`"
-   setenv GnuMakeOpt ""
    touch $Tmp.c
    flog $ALog make -f $Tmp.make $Tmp.a
    if (($status != 0) || !(-e $Tmp.a)) then

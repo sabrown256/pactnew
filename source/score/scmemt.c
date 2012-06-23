@@ -529,7 +529,7 @@ void SC_single_thread(void)
  * -qsmp=noauto still attempts automatic parallelizations
  * must explicitly tell it to run with a single thread
  */
-    SYS_SETENV("OMP_NUM_THREADS", "1", 1);
+    setenv("OMP_NUM_THREADS", "1", 1);
 
 /* you would expect this to do something - not on AIX
     omp_set_num_threads(1);

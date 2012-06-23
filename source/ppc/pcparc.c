@@ -334,14 +334,14 @@ static PROCESS *_PC_open_member_n(char **argv, int *pnn)
 
 	sscanf(t, "%d,%d,%d\n", &pp->acpu, pnn, &_SC_ps.debug);
 
-	PC_printf(pp, "%s,%d,%d\n", srvr, port, (int) SYS_GETPID());
+	PC_printf(pp, "%s,%d,%d\n", srvr, port, (int) getpid());
 	pp->data = PC_init_client(srvr, port);
 
 	SC_gs.comm_size = *pnn;};
 
 /* conditional diagnostic messages */
     if (_SC_ps.debug)
-       {snprintf(t, MAXLINE, "PC_clnt_log.%d", (int) SYS_GETPID());
+       {snprintf(t, MAXLINE, "PC_clnt_log.%d", (int) getpid());
 	_PC_diag = fopen(t, "w");
 	if (_PC_diag != NULL)
 	   {fprintf(_PC_diag, "\n\n   Node #%d at %s:%d.%d\n",

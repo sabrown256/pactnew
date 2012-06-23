@@ -105,7 +105,7 @@ static int _PC_setup_children(char **argv, char *mode)
 
 #ifdef HAVE_PROCESS_CONTROL
 
-    SYS_GETHOSTNAME(host, MAXLINE);
+    gethostname(host, MAXLINE);
     port = PC_init_server(SC_GET_PORT, FALSE);
     if (port == -1)
        return(FALSE);
@@ -137,7 +137,7 @@ static int _PC_setup_children(char **argv, char *mode)
     argv += off;
 
     if (_SC_ps.debug)
-       {snprintf(s, MAXLINE, "PC_srvr_log.%d", (int) SYS_GETPID());
+       {snprintf(s, MAXLINE, "PC_srvr_log.%d", (int) getpid());
 	_PC_diag = fopen(s, "w");
 	if (_PC_diag != NULL)
 	   {fprintf(_PC_diag, "\n   ------ Begin Setup ------\n\n");

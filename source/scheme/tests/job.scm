@@ -5,10 +5,33 @@
 ;(trace pipeline)
 ;(describe pipeline)
 
+; IPC media - pipe, socket, pty
 (define (piper x)    (list 'piper x))
 (define (pipea x)    (list 'pipea x))
 (define (file  x)    (list 'file  x))
 (define (socket h p) (list 'socket h p))
+(define (pty x)      (list 'pty x))
+(define (url x)      (list 'url x))
+
+; waitpid info
+(define (status x)   (list 'status x))
+(define (reason x)   (list 'reason x))
+
+; send signals to processes
+(define (signal x)   (list 'signal x))
+
+; set/get environment variables
+(define (env . x)    (list 'env x))
+
+; get process info
+(define (pid x)      (list 'pid x))
+(define (uid x)      (list 'uid x))
+(define (gid x)      (list 'gid x))
+(define (pgrp x)     (list 'pgrp x))
+(define (rusage x)   (list 'rusage x))
+
+; set process limits
+(define (rlimits x)  (list 'rlimits x))
 
 (define st -1)
 

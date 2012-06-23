@@ -85,8 +85,8 @@ SC_logfile SC_open_log(void)
     log.entry = 0;
 
 /* get a unique name for this log file: prefix-hostname-pid-num */
-    log.pid = SYS_GETPID();
-    SYS_GETHOSTNAME(hostname, HOSTNAME_MAX);
+    log.pid = getpid();
+    gethostname(hostname, HOSTNAME_MAX);
 
 /* make sure everyone who gets a tmp log file, gets their own unique file
  * so we do not have to worry about locking during SC_log() calls
@@ -166,10 +166,10 @@ int SC_close_log(SC_logfile log)
         lock.l_start  = 0;
         lock.l_whence = SEEK_SET;  /* Lock entire file */
         lock.l_len    = 0;
-        lock.l_pid    = SYS_GETPID();
+        lock.l_pid    = getpid();
 
 /* BLOCK waiting to LOCK the global log */
-        status = SYS_FCNTL(global_log, F_SETLKW, &lock); 
+        status = fcntl(global_log, F_SETLKW, &lock); 
 
 /* interrupt sent while waiting for lock: global log NOT locked, return */
         if (status == -1)
@@ -201,11 +201,11 @@ int SC_close_log(SC_logfile log)
            perror("fread");
     
 /* coax the buffers bound for the global log to disk */
-        SYS_FSYNC(global_log);
+        fsync(global_log);
      
 /* UNLOCK the global_log */
         lock.l_type = F_UNLCK;
-        status = SYS_FCNTL(global_log, F_SETLKW, &lock); 
+        status = fcntl(global_log, F_SETLKW, &lock); 
 
         if (status == -1)
            perror("fcntl");

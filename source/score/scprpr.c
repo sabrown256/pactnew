@@ -283,8 +283,8 @@ int ps(char *ptrn, int pid, int tmod, int all, int mode, int nc, int dt)
     int *ids;
     SC_rusedes ru;
 
-    uid = SYS_GETUID();
-    mid = SYS_GETPID();
+    uid = getuid();
+    mid = getpid();
 
     err = 0;
 
