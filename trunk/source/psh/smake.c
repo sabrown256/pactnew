@@ -101,7 +101,7 @@ static int invoke_make(statedes *st, char *cmd, int nc, char *mkf, int c, char *
     char s[MAXLINE];
     char *log, *p;
     
-#ifdef USE_GNU_MAKE
+#if defined(USE_GNU_MAKE)
     snprintf(s, MAXLINE, "gmake --no-print-directory -f -");
 #else
     snprintf(s, MAXLINE, "make -f -");

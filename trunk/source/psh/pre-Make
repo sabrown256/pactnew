@@ -87,7 +87,7 @@ ${BinDir}/pcsh : pcsh.c libpsh.c
 perdb : ${BinDir}/perdb
 
 ${BinDir}/perdb : perdb.c ${LibFiles}
-	${PCC} perdb.c -o ${BinDir}/perdb
+	${PCC} perdb.c -o ${BinDir}/perdb ${MDLib}
 
 elide : ${BinDir}/elide
 
@@ -105,7 +105,7 @@ ${BinDir}/pact-info : pact-info.c common.h
 	${PCC} -DPACT_VERSION=\"${Version}\" pact-info.c -o ${BinDir}/pact-info
 
 ${BinDir}/smake : smake.c common.h
-	${PCC} -DSYSTEM_ID=\"${System}\" -DPACT_VERSION=\"${Version}\" smake.c -o ${BinDir}/smake
+	ccw -DSYSTEM_ID=\"${System}\" -DPACT_VERSION=\"${Version}\" smake.c -o ${BinDir}/smake
 
 
 # debugging only - never to be included in InstallDep

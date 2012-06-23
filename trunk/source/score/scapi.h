@@ -18,9 +18,6 @@
 
 /*--------------------------------------------------------------------------*/
 
-#define SYS_GETPWUID(_p)                                                     \
-   ((_SC_osapi.fgetpwuid != NULL) ? _SC_osapi.fgetpwuid(_p) : NULL)
-
 #define SYS_GETUID()                                                         \
    ((_SC_osapi.fgetuid != NULL) ? _SC_osapi.fgetuid() : -1)
 
