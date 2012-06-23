@@ -102,7 +102,11 @@ static int invoke_make(statedes *st, char *cmd, int nc, char *mkf, int c, char *
     char *log, *p;
     
 #if defined(USE_GNU_MAKE)
-    snprintf(s, MAXLINE, "gmake --no-print-directory -f -");
+    p = cwhich("gmake");
+    if ((IS_NULL(p) == TRUE) || (strcmp(p, "none") == 0))
+       snprintf(s, MAXLINE, "make --no-print-directory -f -");
+    else
+       snprintf(s, MAXLINE, "gmake --no-print-directory -f -");
 #else
     snprintf(s, MAXLINE, "make -f -");
 #endif

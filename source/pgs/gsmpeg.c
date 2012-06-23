@@ -10,6 +10,8 @@
 
 #include "scope_mpeg.h"     /* includes system headers */
 
+#if defined(UNIX)
+
 #undef CMAKE
 #undef CMAKE_N
 #undef CREMAKE
@@ -56,103 +58,103 @@ int Fsize_y = 0;
 /* HUFF.C */
 int huff_maxlevel[32] = { 41, 19, 6, 5, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
 
-uint32 huff_table0[41] = { 0x0, 0x6, 0x8, 0xa, 0xc, 0x4c, 0x42, 0x14, 0x3a, 0x30, 0x26, 0x20, 0x34, 0x32, 0x30, 0x2e, 0x3e, 0x3c, 0x3a, 0x38, 0x36, 0x34, 0x32, 0x30, 0x2e, 0x2c, 0x2a, 0x28, 0x26, 0x24, 0x22, 0x20, 0x30, 0x2e, 0x2c, 0x2a, 0x28, 0x26, 0x24, 0x22, 0x20 };
+u_int32_t huff_table0[41] = { 0x0, 0x6, 0x8, 0xa, 0xc, 0x4c, 0x42, 0x14, 0x3a, 0x30, 0x26, 0x20, 0x34, 0x32, 0x30, 0x2e, 0x3e, 0x3c, 0x3a, 0x38, 0x36, 0x34, 0x32, 0x30, 0x2e, 0x2c, 0x2a, 0x28, 0x26, 0x24, 0x22, 0x20, 0x30, 0x2e, 0x2c, 0x2a, 0x28, 0x26, 0x24, 0x22, 0x20 };
 int huff_bits0[41] = { 0, 3, 5, 6, 8, 9, 9, 11, 13, 13, 13, 13, 14, 14, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 16, 16, 16, 16, 16, 16, 16, 16, 16 };
 
-uint32 huff_table1[19] = { 0x0, 0x6, 0xc, 0x4a, 0x18, 0x36, 0x2c, 0x2a, 0x3e, 0x3c, 0x3a, 0x38, 0x36, 0x34, 0x32, 0x26, 0x24, 0x22, 0x20 };
+u_int32_t huff_table1[19] = { 0x0, 0x6, 0xc, 0x4a, 0x18, 0x36, 0x2c, 0x2a, 0x3e, 0x3c, 0x3a, 0x38, 0x36, 0x34, 0x32, 0x26, 0x24, 0x22, 0x20 };
 int huff_bits1[19] = { 0, 4, 7, 9, 11, 13, 14, 14, 16, 16, 16, 16, 16, 16, 16, 17, 17, 17, 17 };
 
-uint32 huff_table2[6] = { 0x0, 0xa, 0x8, 0x16, 0x28, 0x28 };
+u_int32_t huff_table2[6] = { 0x0, 0xa, 0x8, 0x16, 0x28, 0x28 };
 int huff_bits2[6] = { 0, 5, 8, 11, 13, 14 };
 
-uint32 huff_table3[5] = { 0x0, 0xe, 0x48, 0x38, 0x26 };
+u_int32_t huff_table3[5] = { 0x0, 0xe, 0x48, 0x38, 0x26 };
 int huff_bits3[5] = { 0, 6, 9, 13, 14 };
 
-uint32 huff_table4[4] = { 0x0, 0xc, 0x1e, 0x24 };
+u_int32_t huff_table4[4] = { 0x0, 0xc, 0x1e, 0x24 };
 int huff_bits4[4] = { 0, 6, 11, 13 };
 
-uint32 huff_table5[4] = { 0x0, 0xe, 0x12, 0x24 };
+u_int32_t huff_table5[4] = { 0x0, 0xe, 0x12, 0x24 };
 int huff_bits5[4] = { 0, 7, 11, 14 };
 
-uint32 huff_table6[4] = { 0x0, 0xa, 0x3c, 0x28 };
+u_int32_t huff_table6[4] = { 0x0, 0xa, 0x3c, 0x28 };
 int huff_bits6[4] = { 0, 7, 13, 17 };
 
-uint32 huff_table7[3] = { 0x0, 0x8, 0x2a };
+u_int32_t huff_table7[3] = { 0x0, 0x8, 0x2a };
 int huff_bits7[3] = { 0, 7, 13 };
 
-uint32 huff_table8[3] = { 0x0, 0xe, 0x22 };
+u_int32_t huff_table8[3] = { 0x0, 0xe, 0x22 };
 int huff_bits8[3] = { 0, 8, 13 };
 
-uint32 huff_table9[3] = { 0x0, 0xa, 0x22 };
+u_int32_t huff_table9[3] = { 0x0, 0xa, 0x22 };
 int huff_bits9[3] = { 0, 8, 14 };
 
-uint32 huff_table10[3] = { 0x0, 0x4e, 0x20 };
+u_int32_t huff_table10[3] = { 0x0, 0x4e, 0x20 };
 int huff_bits10[3] = { 0, 9, 14 };
 
-uint32 huff_table11[3] = { 0x0, 0x46, 0x34 };
+u_int32_t huff_table11[3] = { 0x0, 0x46, 0x34 };
 int huff_bits11[3] = { 0, 9, 17 };
 
-uint32 huff_table12[3] = { 0x0, 0x44, 0x32 };
+u_int32_t huff_table12[3] = { 0x0, 0x44, 0x32 };
 int huff_bits12[3] = { 0, 9, 17 };
 
-uint32 huff_table13[3] = { 0x0, 0x40, 0x30 };
+u_int32_t huff_table13[3] = { 0x0, 0x40, 0x30 };
 int huff_bits13[3] = { 0, 9, 17 };
 
-uint32 huff_table14[3] = { 0x0, 0x1c, 0x2e };
+u_int32_t huff_table14[3] = { 0x0, 0x1c, 0x2e };
 int huff_bits14[3] = { 0, 11, 17 };
 
-uint32 huff_table15[3] = { 0x0, 0x1a, 0x2c };
+u_int32_t huff_table15[3] = { 0x0, 0x1a, 0x2c };
 int huff_bits15[3] = { 0, 11, 17 };
 
-uint32 huff_table16[3] = { 0x0, 0x10, 0x2a };
+u_int32_t huff_table16[3] = { 0x0, 0x10, 0x2a };
 int huff_bits16[3] = { 0, 11, 17 };
 
-uint32 huff_table17[2] = { 0x0, 0x3e };
+u_int32_t huff_table17[2] = { 0x0, 0x3e };
 int huff_bits17[2] = { 0, 13 };
 
-uint32 huff_table18[2] = { 0x0, 0x34 };
+u_int32_t huff_table18[2] = { 0x0, 0x34 };
 int huff_bits18[2] = { 0, 13 };
 
-uint32 huff_table19[2] = { 0x0, 0x32 };
+u_int32_t huff_table19[2] = { 0x0, 0x32 };
 int huff_bits19[2] = { 0, 13 };
 
-uint32 huff_table20[2] = { 0x0, 0x2e };
+u_int32_t huff_table20[2] = { 0x0, 0x2e };
 int huff_bits20[2] = { 0, 13 };
 
-uint32 huff_table21[2] = { 0x0, 0x2c };
+u_int32_t huff_table21[2] = { 0x0, 0x2c };
 int huff_bits21[2] = { 0, 13 };
 
-uint32 huff_table22[2] = { 0x0, 0x3e };
+u_int32_t huff_table22[2] = { 0x0, 0x3e };
 int huff_bits22[2] = { 0, 14 };
 
-uint32 huff_table23[2] = { 0x0, 0x3c };
+u_int32_t huff_table23[2] = { 0x0, 0x3c };
 int huff_bits23[2] = { 0, 14 };
 
-uint32 huff_table24[2] = { 0x0, 0x3a };
+u_int32_t huff_table24[2] = { 0x0, 0x3a };
 int huff_bits24[2] = { 0, 14 };
 
-uint32 huff_table25[2] = { 0x0, 0x38 };
+u_int32_t huff_table25[2] = { 0x0, 0x38 };
 int huff_bits25[2] = { 0, 14 };
 
-uint32 huff_table26[2] = { 0x0, 0x36 };
+u_int32_t huff_table26[2] = { 0x0, 0x36 };
 int huff_bits26[2] = { 0, 14 };
 
-uint32 huff_table27[2] = { 0x0, 0x3e };
+u_int32_t huff_table27[2] = { 0x0, 0x3e };
 int huff_bits27[2] = { 0, 17 };
 
-uint32 huff_table28[2] = { 0x0, 0x3c };
+u_int32_t huff_table28[2] = { 0x0, 0x3c };
 int huff_bits28[2] = { 0, 17 };
 
-uint32 huff_table29[2] = { 0x0, 0x3a };
+u_int32_t huff_table29[2] = { 0x0, 0x3a };
 int huff_bits29[2] = { 0, 17 };
 
-uint32 huff_table30[2] = { 0x0, 0x38 };
+u_int32_t huff_table30[2] = { 0x0, 0x38 };
 int huff_bits30[2] = { 0, 17 };
 
-uint32 huff_table31[2] = { 0x0, 0x36 };
+u_int32_t huff_table31[2] = { 0x0, 0x36 };
 int huff_bits31[2] = { 0, 17 };
 
-uint32 *huff_table[32] = { huff_table0, huff_table1, huff_table2, huff_table3, huff_table4, huff_table5, huff_table6, huff_table7, huff_table8, huff_table9, huff_table10, huff_table11, huff_table12, huff_table13, huff_table14, huff_table15, huff_table16, huff_table17, huff_table18, huff_table19, huff_table20, huff_table21, huff_table22, huff_table23, huff_table24, huff_table25, huff_table26, huff_table27, huff_table28, huff_table29, huff_table30, huff_table31 };
+u_int32_t *huff_table[32] = { huff_table0, huff_table1, huff_table2, huff_table3, huff_table4, huff_table5, huff_table6, huff_table7, huff_table8, huff_table9, huff_table10, huff_table11, huff_table12, huff_table13, huff_table14, huff_table15, huff_table16, huff_table17, huff_table18, huff_table19, huff_table20, huff_table21, huff_table22, huff_table23, huff_table24, huff_table25, huff_table26, huff_table27, huff_table28, huff_table29, huff_table30, huff_table31 };
 int *huff_bits[32] = { huff_bits0, huff_bits1, huff_bits2, huff_bits3, huff_bits4, huff_bits5, huff_bits6, huff_bits7, huff_bits8, huff_bits9, huff_bits10, huff_bits11, huff_bits12, huff_bits13, huff_bits14, huff_bits15, huff_bits16, huff_bits17, huff_bits18, huff_bits19, huff_bits20, huff_bits21, huff_bits22, huff_bits23, huff_bits24, huff_bits25, huff_bits26, huff_bits27, huff_bits28, huff_bits29, huff_bits30, huff_bits31 };
 
 /* IFRAME.C */
@@ -1725,7 +1727,7 @@ static void Dump _ANSI_ARGS_((BitBucket *bbPtr));
  * STATIC VARIABLES *
  *==================*/
 
-static uint32 lower_mask[33] = {
+static u_int32_t lower_mask[33] = {
     0,
     0x1, 0x3, 0x7, 0xf,
     0x1f, 0x3f, 0x7f, 0xff,
@@ -1775,7 +1777,7 @@ Bitio_New(FILE *filePtr)
     bbPtr->firstPtr->bitsleft = MAXBITS_PER_BUCKET;
     bbPtr->firstPtr->bitsleftcur = 32;
     bbPtr->firstPtr->currword = 0;
-    memset((char *)bbPtr->firstPtr->bits, 0, sizeof(uint32) * WORDS_PER_BUCKET);
+    memset((char *)bbPtr->firstPtr->bits, 0, sizeof(u_int32_t) * WORDS_PER_BUCKET);
 
     return(bbPtr);
 }
@@ -1820,7 +1822,7 @@ Bitio_Free(BitBucket *bbPtr)
  *
  *===========================================================================*/
 void
-Bitio_Write(BitBucket *bbPtr, uint32 bits, int nbits)
+Bitio_Write(BitBucket *bbPtr, u_int32_t bits, int nbits)
 {
     register struct bitBucket *lastPtr, *newPtr;
     register int delta;
@@ -1850,7 +1852,7 @@ Bitio_Write(BitBucket *bbPtr, uint32 bits, int nbits)
 	newPtr->bitsleft = MAXBITS_PER_BUCKET;
 	newPtr->bitsleftcur = 32;
 	newPtr->currword = 0;
-	memset((char *)newPtr->bits, 0, sizeof(uint32) * WORDS_PER_BUCKET);
+	memset((char *)newPtr->bits, 0, sizeof(u_int32_t) * WORDS_PER_BUCKET);
 	bbPtr->lastPtr = newPtr;
 
 	assert(lastPtr->currword == WORDS_PER_BUCKET - 1);
@@ -1917,13 +1919,13 @@ void
 Bitio_Flush(BitBucket *bbPtr)
 {
     struct bitBucket *ptr, *tempPtr;
-    uint32 buffer[WORDS_PER_BUCKET];
-    uint32  lastWord;
+    u_int32_t buffer[WORDS_PER_BUCKET];
+    u_int32_t  lastWord;
     int i, nitems;
     int	    bitsWritten = 0;
     int	    bitsLeft;
     int	    numWords;
-    uint8   charBuf[4];
+    u_int8_t   charBuf[4];
     boolean    flushHere = FALSE;
     time_t  tempTimeStart, tempTimeEnd;
 
@@ -1948,7 +1950,7 @@ Bitio_Flush(BitBucket *bbPtr)
 		buffer[i] = htonl(ptr->bits[i]);
 	    }
 
-	    nitems = io_write(buffer, sizeof(uint32), numWords, bbPtr->filePtr);
+	    nitems = io_write(buffer, sizeof(u_int32_t), numWords, bbPtr->filePtr);
 	    if (nitems != numWords) {
 		io_printf(stderr, "Whoa!  Trouble writing %d bytes (got %d items)!  Game over, dude!\n",
 			(int)(numWords), nitems);
@@ -1970,7 +1972,7 @@ Bitio_Flush(BitBucket *bbPtr)
 	    while ( bitsLeft > 0 ) {
 		charBuf[0] = (lastWord >> 24);
 		charBuf[0] &= lower_mask[8];
-		io_write(charBuf, 1, sizeof(uint8), bbPtr->filePtr);
+		io_write(charBuf, 1, sizeof(u_int8_t), bbPtr->filePtr);
 		lastWord = (lastWord << 8);
 		bitsLeft -= 8;
 		bitsWritten += 8;
@@ -2008,13 +2010,13 @@ void
 Bitio_WriteToSocket(BitBucket *bbPtr, int socket)
 {
     struct bitBucket *ptr, *tempPtr;
-    uint32 buffer[WORDS_PER_BUCKET];
-    uint32  lastWord;
+    u_int32_t buffer[WORDS_PER_BUCKET];
+    u_int32_t  lastWord;
     int i, nitems;
     int	    bitsWritten = 0;
     int	    bitsLeft;
     int	    numWords;
-    uint8   charBuf[4];
+    u_int8_t   charBuf[4];
     boolean    flushHere = FALSE;
 
     bitsLeft = bbPtr->totalbits;
@@ -2036,10 +2038,10 @@ Bitio_WriteToSocket(BitBucket *bbPtr, int socket)
 		buffer[i] = htonl(ptr->bits[i]);
 	    }
 
-	    nitems = write(socket, buffer, numWords * sizeof(uint32));
-	    if (nitems != numWords*sizeof(uint32)) {
+	    nitems = write(socket, buffer, numWords * sizeof(u_int32_t));
+	    if (nitems != numWords*sizeof(u_int32_t)) {
 		io_printf(stderr, "Whoa!  Trouble writing %d bytes (got %d bytes)!  Game over, dude!\n",
-			(int)(numWords*sizeof(uint32)), nitems);
+			(int)(numWords*sizeof(u_int32_t)), nitems);
 		exit(1);
 	    }
 
@@ -2120,7 +2122,7 @@ static void
 Dump(BitBucket *bbPtr)
 {
     struct bitBucket *ptr, *tempPtr;
-    uint32 buffer[WORDS_PER_BUCKET];
+    u_int32_t buffer[WORDS_PER_BUCKET];
     int i, nitems;
     int	    bitsWritten = 0;
     time_t  tempTimeStart, tempTimeEnd;
@@ -2137,7 +2139,7 @@ Dump(BitBucket *bbPtr)
 	    buffer[i] = htonl(ptr->bits[i]);
 	}
 
-	nitems = io_write((uint8 *)buffer, sizeof(uint32),
+	nitems = io_write((u_int8_t *)buffer, sizeof(u_int32_t),
 			   (ptr->currword + 1), bbPtr->filePtr);
 	if (nitems != (ptr->currword+1)) {
 	    io_printf(stderr, "Error: Trouble writing %d bytes (got %d items)\n",
@@ -2383,14 +2385,14 @@ ComputeDiffDCTs(MpegFrame *current, MpegFrame *prev, int by, int bx,
  *
  *===========================================================================*/
 void
-ComputeMotionBlock(uint8 **prev, int by, int bx, int my, int mx,
+ComputeMotionBlock(u_int8_t **prev, int by, int bx, int my, int mx,
                    Block motionBlock)
 {
     register int   fy, fx;
     register int   y;
     register int16 *destPtr;
-    register uint8 *srcPtr;
-    register uint8 *srcPtr2;
+    register u_int8_t *srcPtr;
+    register u_int8_t *srcPtr2;
     boolean xHalf, yHalf;
 
     xHalf = (ABS(mx) % 2 == 1);
@@ -2465,14 +2467,14 @@ ComputeMotionBlock(uint8 **prev, int by, int bx, int my, int mx,
 	    destPtr = motionBlock[y];
 	    srcPtr = &(prev[fy+y][fx]);
 
-	    destPtr[0] = (uint8) srcPtr[0];
-	    destPtr[1] = (uint8) srcPtr[1];
-	    destPtr[2] = (uint8) srcPtr[2];
-	    destPtr[3] = (uint8) srcPtr[3];
-	    destPtr[4] = (uint8) srcPtr[4];
-	    destPtr[5] = (uint8) srcPtr[5];
-	    destPtr[6] = (uint8) srcPtr[6];
-	    destPtr[7] = (uint8) srcPtr[7];
+	    destPtr[0] = (u_int8_t) srcPtr[0];
+	    destPtr[1] = (u_int8_t) srcPtr[1];
+	    destPtr[2] = (u_int8_t) srcPtr[2];
+	    destPtr[3] = (u_int8_t) srcPtr[3];
+	    destPtr[4] = (u_int8_t) srcPtr[4];
+	    destPtr[5] = (u_int8_t) srcPtr[5];
+	    destPtr[6] = (u_int8_t) srcPtr[6];
+	    destPtr[7] = (u_int8_t) srcPtr[7];
 	}
     }
 }
@@ -2497,10 +2499,10 @@ void
 ComputeMotionLumBlock(MpegFrame *prevFrame, int by, int bx, int my, int mx,
                       LumBlock motionBlock)
 {
-    register uint8 *across;
+    register u_int8_t *across;
     register int32 *macross;
     register int y;
-    uint8 **prev;
+    u_int8_t **prev;
     int	    fy, fx;
     boolean xHalf, yHalf;
 
@@ -2628,10 +2630,10 @@ LumMotionError(LumBlock currentBlock, MpegFrame *prevFrame,
 {
     register int32 adiff = 0,  diff = 0;    /* max value of diff is 255*256 = 65280 */
     register int32 localDiff;
-    register uint8 *across;
+    register u_int8_t *across;
     register int32 *cacross;
     register int y;
-    uint8 **prev;
+    u_int8_t **prev;
     int	    fy, fx;
     boolean xHalf, yHalf;
 
@@ -2832,11 +2834,11 @@ LumAddMotionError(LumBlock currentBlock, LumBlock blockSoFar,
 {
     register int32   diff = 0;    /* max value of diff is 255*256 = 65280 */
     register int32 localDiff;
-    register uint8 *across;
+    register u_int8_t *across;
     register int32 *bacross;
     register int32 *cacross;
     register int y;
-    uint8 **prev;
+    u_int8_t **prev;
     int	    fy, fx;
     boolean xHalf, yHalf;
 
@@ -2933,7 +2935,7 @@ LumAddMotionError(LumBlock currentBlock, LumBlock blockSoFar,
  *
  *===========================================================================*/
 void
-AddMotionBlock(Block block, uint8 **prev, int by, int bx, int my, int mx)
+AddMotionBlock(Block block, u_int8_t **prev, int by, int bx, int my, int mx)
 {
     int	    fy, fx;
     int	    x, y;
@@ -3005,7 +3007,7 @@ AddMotionBlock(Block block, uint8 **prev, int by, int bx, int my, int mx)
  *
  *===========================================================================*/
 void
-AddBMotionBlock(Block block, uint8 **prev, uint8 **next, 
+AddBMotionBlock(Block block, u_int8_t **prev, u_int8_t **next, 
                 int by, int bx, int mode, int fmy, int fmx, int bmy, int bmx)
 {
     int	    x, y;
@@ -3040,7 +3042,7 @@ AddBMotionBlock(Block block, uint8 **prev, uint8 **next,
  *
  *===========================================================================*/
 void
-BlockToData(uint8 **data, Block block, int by, int bx)
+BlockToData(u_int8_t **data, Block block, int by, int bx)
 {
     register int x, y;
     register int fy, fx;
@@ -3079,9 +3081,9 @@ BlockifyFrame(framePtr)
     register int bx, by;
     register int fy, fx;
     register int16  *destPtr;
-    register uint8  *srcPtr;
+    register u_int8_t  *srcPtr;
     register int16  *destPtr2;
-    register uint8  *srcPtr2;
+    register u_int8_t  *srcPtr2;
     Block   *blockPtr;
     Block   *blockPtr2;
 
@@ -3165,11 +3167,11 @@ ComputeSubSampledMotionLumBlock(prevFrame, by, bx, my, mx, motionBlock,
     int startY;
     int startX;
 {
-    register uint8 *across;
+    register u_int8_t *across;
     register int32 *macross;
     register int32 *lastx;
     register int y;
-    uint8 **prev;
+    u_int8_t **prev;
     int    fy, fx;
     boolean xHalf, yHalf;
 
@@ -3255,10 +3257,10 @@ LumMotionErrorSubSampled(currentBlock, prevFrame, by, bx, my, mx, startY,
     register int32    diff = 0;	    /* max value of diff is 255*256 = 65280 */
     register int32 localDiff;
     register int32 *cacross;
-    register uint8 *macross;
+    register u_int8_t *macross;
     register int32 *lastx;
     register int y;
-    uint8 **prev;
+    u_int8_t **prev;
     int    fy, fx;
     boolean xHalf, yHalf;
 
@@ -4921,14 +4923,14 @@ AppendFile(outputFile, inputFile)
     FILE *outputFile;
     FILE *inputFile;
 {
-    uint8   data[9999];
+    u_int8_t   data[9999];
     int	    readItems;
 
     readItems = 9999;
     while ( readItems == 9999 ) {
-	readItems = io_read(data, sizeof(uint8), 9999, inputFile);
+	readItems = io_read(data, sizeof(u_int8_t), 9999, inputFile);
 	if ( readItems > 0 ) {
-	    io_write(data, sizeof(uint8), readItems, outputFile);
+	    io_write(data, sizeof(u_int8_t), readItems, outputFile);
 	}
     }
 
@@ -4990,10 +4992,10 @@ static void Resize_Width _ANSI_ARGS_((MpegFrame *omfrw,MpegFrame *mfrw, int in_x
 static void Resize_Height _ANSI_ARGS_((MpegFrame *omfrh,MpegFrame *mfrh,
        int in_x,
        int in_y,  int out_y));
-static void Resize_Array_Width _ANSI_ARGS_((uint8 **inarray,int in_x,
-       int in_y,uint8 **outarray, int out_x));
-static void Resize_Array_Height _ANSI_ARGS_((uint8 **inarray,int in_x,
-       int in_y,uint8 **outarray, int out_y));
+static void Resize_Array_Width _ANSI_ARGS_((u_int8_t **inarray,int in_x,
+       int in_y,u_int8_t **outarray, int out_x));
+static void Resize_Array_Height _ANSI_ARGS_((u_int8_t **inarray,int in_x,
+       int in_y,u_int8_t **outarray, int out_y));
 
 
 /*=====================*
@@ -5050,24 +5052,24 @@ int in_x,in_y, out_x;
   omfrw->orig_y = NULL;
   Fsize_x = out_x;
   /* Allocate new frame memory */
-  omfrw->orig_y = CMAKE_N(uint8 *, Fsize_y);
+  omfrw->orig_y = CMAKE_N(u_int8_t *, Fsize_y);
   ERRCHK(omfrw->orig_y, "malloc");
   for (y = 0; y < Fsize_y; y++) {
-    omfrw->orig_y[y] = CMAKE_N(uint8, out_x);
+    omfrw->orig_y[y] = CMAKE_N(u_int8_t, out_x);
     ERRCHK(omfrw->orig_y[y], "malloc");
   }
   
-  omfrw->orig_cr = CMAKE_N(uint8 *, Fsize_y/2);
+  omfrw->orig_cr = CMAKE_N(u_int8_t *, Fsize_y/2);
   ERRCHK(omfrw->orig_cr, "malloc");
   for (y = 0; y < Fsize_y / 2; y++) {
-    omfrw->orig_cr[y] = CMAKE_N(uint8, out_x/2);
+    omfrw->orig_cr[y] = CMAKE_N(u_int8_t, out_x/2);
     ERRCHK(omfrw->orig_cr[y], "malloc");
   }
   
-  omfrw->orig_cb = CMAKE_N(uint8 *, Fsize_y/2);
+  omfrw->orig_cb = CMAKE_N(u_int8_t *, Fsize_y/2);
   ERRCHK(omfrw->orig_cb, "malloc");
   for (y = 0; y < Fsize_y / 2; y++) {
-    omfrw->orig_cb[y] = CMAKE_N(uint8, out_x/2);
+    omfrw->orig_cb[y] = CMAKE_N(u_int8_t, out_x/2);
     ERRCHK(omfrw->orig_cb[y], "malloc");
   }
   
@@ -5118,24 +5120,24 @@ int i;
 Fsize_y = out_y;
 
 /* Allocate new frame memory */
-    omfrh->orig_y = CMAKE_N(uint8 *, out_y);
+    omfrh->orig_y = CMAKE_N(u_int8_t *, out_y);
     ERRCHK(omfrh->orig_y, "malloc");
     for (y = 0; y < out_y; y++) {
-	omfrh->orig_y[y] = CMAKE_N(uint8, Fsize_x);
+	omfrh->orig_y[y] = CMAKE_N(u_int8_t, Fsize_x);
 	ERRCHK(omfrh->orig_y[y], "malloc");
     }
 
-    omfrh->orig_cr = CMAKE_N(uint8 *, out_y/2);
+    omfrh->orig_cr = CMAKE_N(u_int8_t *, out_y/2);
     ERRCHK(omfrh->orig_cr, "malloc");
     for (y = 0; y < out_y / 2; y++) {
-	omfrh->orig_cr[y] = CMAKE_N(uint8, Fsize_x/2);
+	omfrh->orig_cr[y] = CMAKE_N(u_int8_t, Fsize_x/2);
 	ERRCHK(omfrh->orig_cr[y], "malloc");
     }
 
-    omfrh->orig_cb = CMAKE_N(uint8 *, out_y/2);
+    omfrh->orig_cb = CMAKE_N(u_int8_t *, out_y/2);
     ERRCHK(omfrh->orig_cb, "malloc");
     for (y = 0; y < out_y / 2; y++) {
-	omfrh->orig_cb[y] = CMAKE_N(uint8, Fsize_x/2);
+	omfrh->orig_cb[y] = CMAKE_N(u_int8_t, Fsize_x/2);
 	ERRCHK(omfrh->orig_cb[y], "malloc");
     }
 
@@ -5179,17 +5181,17 @@ Resize_Array_Height(mfrh->orig_cb,(in_x/2),(in_y/2),omfrh->orig_cb,(out_y/2));
 *=====================================================*/
 static void 
 Resize_Array_Width(inarray,in_x,in_y,outarray,out_x)
-uint8 **inarray;
+u_int8_t **inarray;
 int in_x;
 int in_y;
-uint8 **outarray;
+u_int8_t **outarray;
 int out_x;
 {
 int i,j; 
 int in_total;
 int out_total;
-uint8 *inptr;
-uint8 *outptr;
+u_int8_t *inptr;
+u_int8_t *outptr;
 /* double slope,diff; */
 
  for(i=0;i<in_y;i++){     /* For every row */
@@ -5240,10 +5242,10 @@ uint8 *outptr;
 *===============================*/
 static void 
 Resize_Array_Height(inarray,in_x,in_y,outarray,out_y)
-uint8 **inarray;
+u_int8_t **inarray;
 int in_x;
 int in_y;
-uint8 **outarray;
+u_int8_t **outarray;
 int out_y;
 {
 int i,j,k; 
@@ -5269,7 +5271,7 @@ int out_total;
     } else {  
  
 #if 0
-      uint8 pointA, pointB;
+      u_int8_t pointA, pointB;
 
       pointA = inarray[k][i];
       if (k != (in_y -1))
@@ -5414,11 +5416,11 @@ void Frame_AllocPPM(MpegFrame *frame)
     if (frame->ppm_data != NULL)
        return;
 
-    frame->ppm_data = CMAKE_N(uint8 *, Fsize_y);
+    frame->ppm_data = CMAKE_N(u_int8_t *, Fsize_y);
     ERRCHK(frame->ppm_data, "malloc");
 
     for (y = 0; y < Fsize_y; y++)
-        {frame->ppm_data[y] = CMAKE_N(uint8, 3*Fsize_x);
+        {frame->ppm_data[y] = CMAKE_N(u_int8_t, 3*Fsize_x);
 	 ERRCHK(frame->ppm_data[y], "malloc");};
 
     return;}
@@ -5488,25 +5490,25 @@ void Frame_AllocYCC(MpegFrame *frame)
     DBG_PRINT(("ycc_calc:\n"));
 
 /* first, allocate tons of memory */
-    frame->orig_y = CMAKE_N(uint8 *, Fsize_y);
+    frame->orig_y = CMAKE_N(u_int8_t *, Fsize_y);
     ERRCHK(frame->orig_y, "malloc");
 
     for (y = 0; y < Fsize_y; y++)
-        {frame->orig_y[y] = CMAKE_N(uint8, Fsize_x);
+        {frame->orig_y[y] = CMAKE_N(u_int8_t, Fsize_x);
 	 ERRCHK(frame->orig_y[y], "malloc");};
 
-    frame->orig_cr = CMAKE_N(uint8 *, (Fsize_y >> 1));
+    frame->orig_cr = CMAKE_N(u_int8_t *, (Fsize_y >> 1));
     ERRCHK(frame->orig_cr, "malloc");
 
     for (y = 0; y < (Fsize_y >> 1); y++)
-        {frame->orig_cr[y] = CMAKE_N(uint8, (Fsize_x >> 1));
+        {frame->orig_cr[y] = CMAKE_N(u_int8_t, (Fsize_x >> 1));
 	 ERRCHK(frame->orig_cr[y], "malloc");};
 
-    frame->orig_cb = CMAKE_N(uint8 *, (Fsize_y >> 1));
+    frame->orig_cb = CMAKE_N(u_int8_t *, (Fsize_y >> 1));
     ERRCHK(frame->orig_cb, "malloc");
 
     for (y = 0; y < (Fsize_y >> 1); y++)
-        {frame->orig_cb[y] = CMAKE_N(uint8, (Fsize_x >> 1));
+        {frame->orig_cb[y] = CMAKE_N(u_int8_t, (Fsize_x >> 1));
 	 ERRCHK(frame->orig_cb[y], "malloc");};
 
     if (referenceFrame == ORIGINAL_FRAME)
@@ -5534,25 +5536,25 @@ void Frame_AllocHalf(MpegFrame *frame)
     if (frame->halfX != NULL)
        return;
 
-    frame->halfX = CMAKE_N(uint8 *, Fsize_y);
+    frame->halfX = CMAKE_N(u_int8_t *, Fsize_y);
     ERRCHK(frame->halfX, "malloc");
 
-    frame->halfY = CMAKE_N(uint8 *, Fsize_y-1);
+    frame->halfY = CMAKE_N(u_int8_t *, Fsize_y-1);
     ERRCHK(frame->halfY, "malloc");
 
-    frame->halfBoth = CMAKE_N(uint8 *, Fsize_y - 1);
+    frame->halfBoth = CMAKE_N(u_int8_t *, Fsize_y - 1);
     ERRCHK(frame->halfBoth, "malloc");
 
     for (y = 0; y < Fsize_y; y++)
-        {frame->halfX[y] = CMAKE_N(uint8, Fsize_x - 1);
+        {frame->halfX[y] = CMAKE_N(u_int8_t, Fsize_x - 1);
 	 ERRCHK(frame->halfX[y], "malloc");};
 
     for (y = 0; y < Fsize_y-1; y++)
-        {frame->halfY[y] = CMAKE_N(uint8, Fsize_x);
+        {frame->halfY[y] = CMAKE_N(u_int8_t, Fsize_x);
 	 ERRCHK(frame->halfY[y], "malloc");};
 
     for (y = 0; y < Fsize_y-1; y++)
-        {frame->halfBoth[y] = CMAKE_N(uint8, Fsize_x - 1);
+        {frame->halfBoth[y] = CMAKE_N(u_int8_t, Fsize_x - 1);
 	 ERRCHK(frame->halfBoth[y], "malloc");};
 
     return;}
@@ -5582,25 +5584,25 @@ void Frame_AllocDecoded(MpegFrame *frame, boolean makeReference)
  * it for some reason, so do it this way at least for now -- more
  * flexible
  */
-    frame->decoded_y = CMAKE_N(uint8 *, Fsize_y);
+    frame->decoded_y = CMAKE_N(u_int8_t *, Fsize_y);
     ERRCHK(frame->decoded_y, "malloc");
 
     for (y = 0; y < Fsize_y; y++)
-        {frame->decoded_y[y] = CMAKE_N(uint8, Fsize_x);
+        {frame->decoded_y[y] = CMAKE_N(u_int8_t, Fsize_x);
 	 ERRCHK(frame->decoded_y[y], "malloc");};
 
-    frame->decoded_cr = CMAKE_N(uint8 *, (Fsize_y >> 1));
+    frame->decoded_cr = CMAKE_N(u_int8_t *, (Fsize_y >> 1));
     ERRCHK(frame->decoded_cr, "malloc");
 
     for (y = 0; y < (Fsize_y >> 1); y++)
-        {frame->decoded_cr[y] = CMAKE_N(uint8, (Fsize_x >> 1));
+        {frame->decoded_cr[y] = CMAKE_N(u_int8_t, (Fsize_x >> 1));
 	 ERRCHK(frame->decoded_cr[y], "malloc");};
 
-    frame->decoded_cb = CMAKE_N(uint8 *, (Fsize_y >> 1));
+    frame->decoded_cb = CMAKE_N(u_int8_t *, (Fsize_y >> 1));
     ERRCHK(frame->decoded_cb, "malloc");
 
     for (y = 0; y < (Fsize_y >> 1); y++)
-        {frame->decoded_cb[y] = CMAKE_N(uint8, (Fsize_x >> 1));
+        {frame->decoded_cb[y] = CMAKE_N(u_int8_t, (Fsize_x >> 1));
 	 ERRCHK(frame->decoded_cb[y], "malloc");};
 
     if (makeReference)
@@ -7087,9 +7089,9 @@ BlockComputeSNR(current, snr, psnr)
   int32	varDiff[3];
   double	ratio[3];
   double	total[3];
-  register uint8 **origY=current->orig_y, **origCr=current->orig_cr, 
+  register u_int8_t **origY=current->orig_y, **origCr=current->orig_cr, 
   **origCb=current->orig_cb;
-  register uint8 **newY=current->decoded_y, **newCr=current->decoded_cr, 
+  register u_int8_t **newY=current->decoded_y, **newCr=current->decoded_cr, 
   **newCb=current->decoded_cb;
   static int32       **SignalY,  **NoiseY;
   static int32       **SignalCb, **NoiseCb;
@@ -10847,7 +10849,7 @@ static int gopStartFrame = 0;
 static int lastGOPStart = 0;
 static int lastQSSet;
 
-static uint32 mbAddrIncrTable[][2] = {
+static u_int32_t mbAddrIncrTable[][2] = {
     {0x0, 0},
     {0x1, 1},
     {0x3, 3},
@@ -10883,7 +10885,7 @@ static uint32 mbAddrIncrTable[][2] = {
     {0x19, 11},
     {0x18, 11}};
 
-static uint32 mbMotionVectorTable[][2] = {
+static u_int32_t mbMotionVectorTable[][2] = {
     {0x19, 11},
     {0x1b, 11},
     {0x1d, 11},
@@ -10918,7 +10920,7 @@ static uint32 mbMotionVectorTable[][2] = {
     {0x1a, 11},
     {0x18, 11}};
 
-static uint32 mbPatTable[][2] = {
+static u_int32_t mbPatTable[][2] = {
     {0x0, 0},
     {0xb, 5},
     {0x9, 5},
@@ -11008,20 +11010,20 @@ CONST double VidRateNum[9]={1.0, 23.976, 24.0, 25.0, 29.97, 30.0,
  * INTERNAL PROCEDURE prototypes *
  *===============================*/
 
-static void	GenMBAddrIncr _ANSI_ARGS_((BitBucket *bb, uint32 addr_incr));
-static void	GenPictHead _ANSI_ARGS_((BitBucket *bb, uint32 temp_ref,
-		    uint32 code_type, uint32 vbv_delay,
-		    int32 full_pel_forw_flag, uint32 forw_f_code,
-		    int32 full_pel_back_flag, uint32 back_f_code,
-		    uint8 *extra_info, uint32 extra_info_size,
-		    uint8 *ext_data, uint32 ext_data_size,
-		    uint8 *user_data, uint32 user_data_size));
-static void	GenMBType _ANSI_ARGS_((BitBucket *bb, uint32 pict_code_type,
-		  uint32 mb_quant, uint32 motion_forw, uint32 motion_back,
-		  uint32 mb_pattern, uint32 mb_intra));
+static void	GenMBAddrIncr _ANSI_ARGS_((BitBucket *bb, u_int32_t addr_incr));
+static void	GenPictHead _ANSI_ARGS_((BitBucket *bb, u_int32_t temp_ref,
+		    u_int32_t code_type, u_int32_t vbv_delay,
+		    int32 full_pel_forw_flag, u_int32_t forw_f_code,
+		    int32 full_pel_back_flag, u_int32_t back_f_code,
+		    u_int8_t *extra_info, u_int32_t extra_info_size,
+		    u_int8_t *ext_data, u_int32_t ext_data_size,
+		    u_int8_t *user_data, u_int32_t user_data_size));
+static void	GenMBType _ANSI_ARGS_((BitBucket *bb, u_int32_t pict_code_type,
+		  u_int32_t mb_quant, u_int32_t motion_forw, u_int32_t motion_back,
+		  u_int32_t mb_pattern, u_int32_t mb_intra));
 static void	GenMotionCode _ANSI_ARGS_((BitBucket *bb, int32 vector));
 static void	GenBlockPattern _ANSI_ARGS_((BitBucket *bb,
-					     uint32 mb_pattern));
+					     u_int32_t mb_pattern));
 
 
 /*=====================*
@@ -11105,8 +11107,8 @@ Mhead_GenSequenceHeader(bbPtr, hsize, vsize, pratio, pict_rate, bit_rate,
 			buf_size, c_param_flag, iq_matrix, niq_matrix,
 			ext_data, ext_data_size, user_data, user_data_size)
     BitBucket *bbPtr;
-    uint32 hsize;
-    uint32 vsize;
+    u_int32_t hsize;
+    u_int32_t vsize;
     int32 pratio;
     int32 pict_rate;
     int32 bit_rate;
@@ -11114,7 +11116,7 @@ Mhead_GenSequenceHeader(bbPtr, hsize, vsize, pratio, pict_rate, bit_rate,
     int32 c_param_flag;
     int32 *iq_matrix;
     int32 *niq_matrix;
-    uint8 *ext_data;
+    u_int8_t *ext_data;
     int32 ext_data_size;
     char *user_data; /*NOTE: changed "unit8" to "char" NOTE*/
     int32 user_data_size;
@@ -11291,9 +11293,9 @@ Mhead_GenGOPHeader(bbPtr, drop_frame_flag, tc_hrs, tc_min, tc_sec, tc_pict,
     int32 tc_pict;
     int32 closed_gop;
     int32 broken_link;
-    uint8 *ext_data;
+    u_int8_t *ext_data;
     int32 ext_data_size;
-    uint8 *user_data;
+    u_int8_t *user_data;
     int32 user_data_size;
 {
     int i;
@@ -11380,10 +11382,10 @@ Mhead_GenGOPHeader(bbPtr, drop_frame_flag, tc_hrs, tc_min, tc_sec, tc_pict,
 void
 Mhead_GenSliceHeader(bbPtr, verticalPos, qscale, extra_info, extra_info_size)
     BitBucket *bbPtr;
-    uint32 verticalPos;
-    uint32 qscale;
-    uint8 *extra_info;
-    uint32 extra_info_size;
+    u_int32_t verticalPos;
+    u_int32_t qscale;
+    u_int8_t *extra_info;
+    u_int32_t extra_info_size;
 {
     int i;
 
@@ -11447,25 +11449,25 @@ Mhead_GenMBHeader(bbPtr, pict_code_type, addr_incr, q_scale,
 		  m_vert_forw, motion_back, m_horiz_back, m_vert_back,
 		  mb_pattern, mb_intra)
     BitBucket *bbPtr;
-    uint32 pict_code_type;
-    uint32 addr_incr;
-    uint32 q_scale;
-    uint32 forw_f_code;
-    uint32 back_f_code;
-    uint32 horiz_forw_r;
-    uint32 vert_forw_r;
-    uint32 horiz_back_r;
-    uint32 vert_back_r;
+    u_int32_t pict_code_type;
+    u_int32_t addr_incr;
+    u_int32_t q_scale;
+    u_int32_t forw_f_code;
+    u_int32_t back_f_code;
+    u_int32_t horiz_forw_r;
+    u_int32_t vert_forw_r;
+    u_int32_t horiz_back_r;
+    u_int32_t vert_back_r;
     int32 motion_forw;
     int32 m_horiz_forw;
     int32 m_vert_forw;
     int32 motion_back;
     int32 m_horiz_back;
     int32 m_vert_back;
-    uint32 mb_pattern;
-    uint32 mb_intra;
+    u_int32_t mb_pattern;
+    u_int32_t mb_intra;
 {
-    uint32 mb_quant;
+    u_int32_t mb_quant;
 
     /* MB escape sequences if necessary. */
 
@@ -11575,12 +11577,12 @@ static void
 GenMBType(bbPtr, pict_code_type, mb_quant, motion_forw, motion_back,
 	  mb_pattern, mb_intra)
     BitBucket *bbPtr;
-    uint32 pict_code_type;
-    uint32 mb_quant;
-    uint32 motion_forw;
-    uint32 motion_back;
-    uint32 mb_pattern;
-    uint32 mb_intra;
+    u_int32_t pict_code_type;
+    u_int32_t mb_quant;
+    u_int32_t motion_forw;
+    u_int32_t motion_back;
+    u_int32_t mb_pattern;
+    u_int32_t mb_intra;
 {
     int code;
 
@@ -11723,7 +11725,7 @@ GenMotionCode(bbPtr, vector)
     BitBucket *bbPtr;
     int32 vector;
 {
-    uint32 code, num;
+    u_int32_t code, num;
 
     if ((vector < -16) || (vector > 16)) {
 	perror("Motion vector out of range.");
@@ -11752,9 +11754,9 @@ GenMotionCode(bbPtr, vector)
 static void
 GenBlockPattern(bbPtr, mb_pattern)
     BitBucket *bbPtr;
-    uint32 mb_pattern;
+    u_int32_t mb_pattern;
 {
-    uint32 code, num;
+    u_int32_t code, num;
 
     code = mbPatTable[mb_pattern][0];
     num = mbPatTable[mb_pattern][1];
@@ -11778,10 +11780,10 @@ GenBlockPattern(bbPtr, mb_pattern)
 static void
 GenMBAddrIncr(bbPtr, addr_incr)
     BitBucket *bbPtr;
-    uint32 addr_incr;
+    u_int32_t addr_incr;
 {
-    uint32 code;
-    uint32 num;
+    u_int32_t code;
+    u_int32_t num;
 
     code = mbAddrIncrTable[addr_incr][0];
     num = mbAddrIncrTable[addr_incr][1];
@@ -11808,19 +11810,19 @@ GenPictHead(bbPtr, temp_ref, code_type, vbv_delay, full_pel_forw_flag,
 	    extra_info_size, ext_data, ext_data_size, user_data,
 	    user_data_size)
     BitBucket *bbPtr;
-    uint32 temp_ref;
-    uint32 code_type;
-    uint32 vbv_delay;
+    u_int32_t temp_ref;
+    u_int32_t code_type;
+    u_int32_t vbv_delay;
     int32 full_pel_forw_flag;
-    uint32 forw_f_code;
+    u_int32_t forw_f_code;
     int32 full_pel_back_flag;
-    uint32 back_f_code;
-    uint8 *extra_info;
-    uint32 extra_info_size;
-    uint8 *ext_data;
-    uint32 ext_data_size;
-    uint8 *user_data;
-    uint32 user_data_size;
+    u_int32_t back_f_code;
+    u_int8_t *extra_info;
+    u_int32_t extra_info_size;
+    u_int8_t *ext_data;
+    u_int32_t ext_data_size;
+    u_int8_t *user_data;
+    u_int32_t user_data_size;
 {
     int i;
 
@@ -17414,7 +17416,7 @@ Mpost_RLEHuffIBlock(in, out)
     register int nzeros = 0;
     register int16 cur;
     register int16 acur;
-    register uint32 code;
+    register u_int32_t code;
     register int nbits;
 
     /*
@@ -17499,7 +17501,7 @@ Mpost_RLEHuffPBlock(in, out)
     register int nzeros = 0;
     register int16 cur;
     register int16 acur;
-    register uint32 code;
+    register u_int32_t code;
     register int nbits;
     boolean first_dct = TRUE;
 
@@ -19824,8 +19826,8 @@ void updateVBVBuffer (frameBits)
 
 static int  fileType = BASE_FILE_TYPE;
 struct YuvLine {
-	uint8	data[4096];
-	uint8	y[2048];
+	u_int8_t	data[4096];
+	u_int8_t	y[2048];
 	int8	cr[1024];
 	int8	cb[1024];
 };
@@ -20283,7 +20285,7 @@ char *fileName;
 
 static boolean ReadPPM(MpegFrame *mf, FILE *fpointer)
    {int height, width, maxVal, state, safe_read_count;
-    uint8 junk[4096];
+    u_int8_t junk[4096];
     char inputBuffer[71], string[71];
     char *inputLine;
     register int y;
@@ -20400,7 +20402,7 @@ int width;
 int height;
 {
   register int y;
-  uint8   junk[4096];
+  u_int8_t   junk[4096];
   int     safe_read_count;
 
   Fsize_Note(mf->id, width, height);
@@ -20467,8 +20469,8 @@ int height;
 {
   register int x, y;
   struct  YuvLine line1, line2;
-  uint8   junk[4096];
-  uint8    *cbptr, *crptr; /*NOTE: replaced "int8" by "unit8" NOTE*/
+  u_int8_t   junk[4096];
+  u_int8_t    *cbptr, *crptr; /*NOTE: replaced "int8" by "unit8" NOTE*/
   int     safe_read_count;
 
   memset(&line1, 0, sizeof(line1));
@@ -20531,9 +20533,9 @@ FILE *fpointer;
 struct YuvLine *lineptr;
 int width;
 {
-  uint8   junk[4096];
+  u_int8_t   junk[4096];
   int8    *crptr, *cbptr;
-  uint8   *yptr;
+  u_int8_t   *yptr;
   int     num, length;
   int     safe_read_count;
   
@@ -20620,7 +20622,7 @@ int width;
 int height;
 {
   register int y;
-  uint8   junk[4096];
+  u_int8_t   junk[4096];
   int     safe_read_count;
 
   Fsize_Note(mf->id, width, height);
@@ -20668,7 +20670,7 @@ int height;
 {
   register int y;
   register int x;
-  uint8   buffer[1024];
+  u_int8_t   buffer[1024];
   int     safe_read_count;
 
   Fsize_Note(mf->id, width, height);
@@ -20936,8 +20938,8 @@ PNMtoYUV(frame)
     MpegFrame *frame;
 {
     register int x, y;
-    register uint8 *dy0, *dy1;
-    register uint8 *dcr, *dcb;
+    register u_int8_t *dy0, *dy1;
+    register u_int8_t *dcr, *dcb;
     register xel *src0, *src1;
     register int ydivisor, cdivisor;
     static boolean  first = TRUE;
@@ -21134,9 +21136,9 @@ PPMtoYUV(frame)
     MpegFrame *frame;
 {
     register int x, y;
-    register uint8 *dy0, *dy1;
-    register uint8 *dcr, *dcb;
-    register uint8 *src0, *src1;
+    register u_int8_t *dy0, *dy1;
+    register u_int8_t *dcr, *dcb;
+    register u_int8_t *src0, *src1;
     register int cdivisor;
     static boolean  first = TRUE;
     static float  mult299[1024], mult587[1024], mult114[1024];
@@ -22023,8 +22025,8 @@ LumMotionErrorA(currentBlock, prevFrame, by, bx, my, mx, bestSoFar)
 {
     register int32    diff = 0;	    /* max value of diff is 255*256 = 65280 */
     register int32 localDiff;
-    register uint8 *macross;
-    register uint8 **prev;
+    register u_int8_t *macross;
+    register u_int8_t **prev;
     register int    fy, fx;
     boolean xHalf, yHalf;
 
@@ -22200,8 +22202,8 @@ LumMotionErrorB(currentBlock, prevFrame, by, bx, my, mx, bestSoFar)
 {
     register int32    diff = 0;	    /* max value of diff is 255*256 = 65280 */
     register int32 localDiff;
-    register uint8 *macross;
-    register uint8 **prev;
+    register u_int8_t *macross;
+    register u_int8_t **prev;
     register int    fy, fx;
     boolean xHalf, yHalf;
 
@@ -22377,8 +22379,8 @@ LumMotionErrorC(currentBlock, prevFrame, by, bx, my, mx, bestSoFar)
 {
     register int32    diff = 0;	    /* max value of diff is 255*256 = 65280 */
     register int32 localDiff;
-    register uint8 *macross;
-    register uint8 **prev;
+    register u_int8_t *macross;
+    register u_int8_t **prev;
     register int    fy, fx;
     boolean xHalf, yHalf;
 
@@ -22554,8 +22556,8 @@ LumMotionErrorD(currentBlock, prevFrame, by, bx, my, mx, bestSoFar)
 {
     register int32    diff = 0;	    /* max value of diff is 255*256 = 65280 */
     register int32 localDiff;
-    register uint8 *macross;
-    register uint8 **prev;
+    register u_int8_t *macross;
+    register u_int8_t **prev;
     register int    fy, fx;
     boolean xHalf, yHalf;
 
@@ -22704,3 +22706,5 @@ LumMotionErrorD(currentBlock, prevFrame, by, bx, my, mx, bestSoFar)
 
     return(diff);
 }
+
+#endif

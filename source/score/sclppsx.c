@@ -11,7 +11,7 @@
 
 #include "score_int.h"
 
-#if defined(UNIX)
+#if defined(HAVE_POSIX_SYS)
 
 #include "scope_proc.h"
 
@@ -43,7 +43,7 @@ static int _SC_posix_release(PROCESS *pp)
     if (!SC_process_alive(pp))
        rv = FALSE;
 
-#ifdef UNIX
+#if defined(HAVE_POSIX_SYS)
 
     else
        {int in, out, sts;

@@ -868,7 +868,7 @@ void *SC_mem_attrs(void *p, int attr)
  * the difference and maximum difference could be different
  */
 	if (attr & 2)
-	   {uint64_t a, f, nb;
+	   {u_int64_t a, f, nb;
 
 	    SC_mem_statb(&a, &f, NULL, NULL);
 	    nb = desc->length;

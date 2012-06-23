@@ -1761,6 +1761,92 @@ int64_t SC_stol(char *s)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
+
+/* SC_STRTOL - strtol done right (since some libraries are bad) */
+
+long SC_strtol(char *str, char **ptr, int base)
+   {int c, xx, neg;
+    long val, rv;
+
+    neg = 0;
+
+/* in case no number is formed */
+    if (ptr != (char **) 0)
+       *ptr = str;
+
+/* base is invalid -- should be a fatal error */
+    if (base < 0 || base > MBASE)
+       return(0);
+
+    if (!SC_isalnum(c = *str))
+       {while (SC_is_print_char(c, 3))
+           c = *++str;
+        switch (c)
+           {case '-' : neg++;
+            case '+' : c = *++str;};};                      /* fall-through */
+
+    if (base == 0)
+       {if (c != '0')
+           base = 10;
+        else if (str[1] == 'x' || str[1] == 'X')
+           base = 16;
+	else
+           base = 8;};
+
+/* for any base > 10, the digits incrementally following
+ * 9 are assumed to be "abc...z" or "ABC...Z"
+ */
+    if (!SC_isalnum(c) || (xx = SC_ishexdigit(c)) >= base)
+       return(0);                                       /* no number formed */
+
+/* skip over leading "0x" or "0X" */
+    if ((base == 16) && (c == '0') && SC_isxdigit((int) str[2]) &&
+        ((str[1] == 'x') || (str[1] == 'X')))
+       c = *(str += 2);
+
+/* accumulate neg avoids surprises near MAXLONG */
+    for (val = -SC_ishexdigit(c);
+         SC_isalnum(c = *++str) && (xx = SC_ishexdigit(c)) < base; )
+        val = base * val - xx;
+
+    if (ptr != (char **) 0)
+       *ptr = str;
+
+    rv = neg ? val : -val;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_ITOS - integer to string
+ *         - render NB bytes long integer value N into S which is NC long
+ *         - if S is NULL use a static internal buffer
+ *         - if FMT is supplied use it
+ *         - returns pointer to buffer holding the result
+ */
+
+char *SC_itos(char *s, int nc, long long n, char *fmt)
+   {char frm[MAXLINE];
+    static char bf[80];
+
+    if (s == NULL)
+       {s  = bf;
+	nc = 80;};
+
+    if (fmt == NULL)
+       fmt = "%lld";
+
+#if defined(MSW)
+    fmt = SC_strsubst(frm, MAXLINE, fmt, "lld", "I64d", -1);
+#endif
+
+    snprintf(s, nc, fmt, n);
+
+    return(s);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
         
 /* SC_ATOF - a fast, working version of ATOF */
 
@@ -1902,59 +1988,27 @@ double SC_strtod(const char *nptr, char **endptr)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_STRTOL - strtol done right (since some libraries are bad) */
-
-long SC_strtol(char *str, char **ptr, int base)
-   {int c, xx, neg;
-    long val, rv;
-
-    neg = 0;
-
-/* in case no number is formed */
-    if (ptr != (char **) 0)
-       *ptr = str;
-
-/* base is invalid -- should be a fatal error */
-    if (base < 0 || base > MBASE)
-       return(0);
-
-    if (!SC_isalnum(c = *str))
-       {while (SC_is_print_char(c, 3))
-           c = *++str;
-        switch (c)
-           {case '-' : neg++;
-            case '+' : c = *++str;};};                      /* fall-through */
-
-    if (base == 0)
-       {if (c != '0')
-           base = 10;
-        else if (str[1] == 'x' || str[1] == 'X')
-           base = 16;
-	else
-           base = 8;};
-
-/* for any base > 10, the digits incrementally following
- * 9 are assumed to be "abc...z" or "ABC...Z"
+/* SC_FTOS - float to string
+ *         - render NB bytes long floating point value N into S
+ *         - which is NC long
+ *         - if S is NULL use a static internal buffer
+ *         - if FMT is supplied use it
+ *         - returns pointer to buffer holding the result
  */
-    if (!SC_isalnum(c) || (xx = SC_ishexdigit(c)) >= base)
-       return(0);                                       /* no number formed */
 
-/* skip over leading "0x" or "0X" */
-    if ((base == 16) && (c == '0') && SC_isxdigit((int) str[2]) &&
-        ((str[1] == 'x') || (str[1] == 'X')))
-       c = *(str += 2);
+char *SC_ftos(char *s, int nc, long double f, char *fmt)
+   {static char bf[80];
 
-/* accumulate neg avoids surprises near MAXLONG */
-    for (val = -SC_ishexdigit(c);
-         SC_isalnum(c = *++str) && (xx = SC_ishexdigit(c)) < base; )
-        val = base * val - xx;
+    if (s == NULL)
+       {s  = bf;
+	nc = 80;};
 
-    if (ptr != (char **) 0)
-       *ptr = str;
+    if (fmt == NULL)
+       fmt = "%16.8le";
 
-    rv = neg ? val : -val;
+    snprintf(s, nc, fmt, f);
 
-    return(rv);}
+    return(s);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

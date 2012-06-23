@@ -214,10 +214,10 @@ struct s_SC_heap_des
     long nx_mem_blocks;
     unsigned long hdr_size;
     unsigned long hdr_size_max;
-    uint64_t sp_alloc;
-    uint64_t sp_free;
-    uint64_t sp_diff;
-    uint64_t sp_max;
+    u_int64_t sp_alloc;
+    u_int64_t sp_free;
+    u_int64_t sp_diff;
+    u_int64_t sp_max;
     long ih;                /* current history index */
     long nh;                /* number of history entries */
     SC_mem_hst *ring;};     /* ring of history entries */

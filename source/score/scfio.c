@@ -1603,8 +1603,8 @@ static int _SC_lfseek(FILE *fp, int64_t offs, int whence)
 
 /* _SC_LFREAD - large file IO wrapper for FREAD method */
 
-static uint64_t _SC_lfread(void *s, size_t bpi, uint64_t ni, FILE *fp)
-   {uint64_t zc, n, ns, nr;
+static u_int64_t _SC_lfread(void *s, size_t bpi, u_int64_t ni, FILE *fp)
+   {u_int64_t zc, n, ns, nr;
     char *ps;
 
     zc = 0;
@@ -1627,8 +1627,8 @@ static uint64_t _SC_lfread(void *s, size_t bpi, uint64_t ni, FILE *fp)
 
 /* _SC_LFWRITE - large file IO wrapper for FWRITE method */
 
-static uint64_t _SC_lfwrite(void *s, size_t bpi, uint64_t ni, FILE *fp)
-   {uint64_t zc, n, ns, nw;
+static u_int64_t _SC_lfwrite(void *s, size_t bpi, u_int64_t ni, FILE *fp)
+   {u_int64_t zc, n, ns, nw;
     char *ps;
 
     zc = 0;
@@ -1807,7 +1807,7 @@ size_t io_read(void *p, size_t sz, size_t ni, FILE *fp)
 
 	    else if (fid->lfread != NULL)
 	       {IO_OPER_START_TIME(fid);
-		rv = (*fid->lfread)(p, sz, (uint64_t) ni, fp);
+		rv = (*fid->lfread)(p, sz, (u_int64_t) ni, fp);
 		IO_OPER_ACCUM_TIME(fid, IO_OPER_LFREAD);};};};
 
     return(rv);}
@@ -1837,7 +1837,7 @@ size_t io_write(void *p, size_t sz, size_t ni, FILE *fp)
 
 	    else if (fid->lfwrite != NULL)
 	       {IO_OPER_START_TIME(fid);
-		rv = (*fid->lfwrite)(p, sz, (uint64_t) ni, fp);
+		rv = (*fid->lfwrite)(p, sz, (u_int64_t) ni, fp);
 		IO_OPER_ACCUM_TIME(fid, IO_OPER_LFWRITE);};};};
 
     return(rv);}
@@ -2106,8 +2106,8 @@ char *io_pointer(void *a)
 
 /* IO_SEGSIZE - file IO wrapper for SEGSIZE method */
 
-uint64_t io_segsize(void *a, int64_t n)
-   {uint64_t rv;
+u_int64_t io_segsize(void *a, int64_t n)
+   {u_int64_t rv;
     file_io_desc *fid;
     FILE *fp;
 
@@ -2225,8 +2225,8 @@ int lio_seek(FILE *fp, int64_t offs, int whence)
 
 /* LIO_READ - large file IO wrapper for FREAD method */
 
-uint64_t lio_read(void *p, size_t sz, uint64_t ni, FILE *fp)
-   {uint64_t rv;
+u_int64_t lio_read(void *p, size_t sz, u_int64_t ni, FILE *fp)
+   {u_int64_t rv;
     file_io_desc *fid;
 
     rv = -1;
@@ -2255,8 +2255,8 @@ uint64_t lio_read(void *p, size_t sz, uint64_t ni, FILE *fp)
 
 /* LIO_WRITE - large file IO wrapper for FWRITE method */
 
-uint64_t lio_write(void *p, size_t sz, uint64_t ni, FILE *fp)
-   {uint64_t rv;
+u_int64_t lio_write(void *p, size_t sz, u_int64_t ni, FILE *fp)
+   {u_int64_t rv;
     file_io_desc *fid;
 
     rv = -1;
@@ -2544,8 +2544,8 @@ char *lio_pointer(void *a)
 
 /* LIO_SEGSIZE - large file IO wrapper for SEGSIZE method */
 
-uint64_t lio_segsize(void *a, int64_t n)
-   {uint64_t rv;
+u_int64_t lio_segsize(void *a, int64_t n)
+   {u_int64_t rv;
     file_io_desc *fid;
     FILE *fp;
 

@@ -163,7 +163,7 @@ static int _PN_bseek(FILE *stream, int64_t addr, int offset)
 
 /* _PN_BREAD - do an fread on the pseudo file */
 
-static uint64_t _PN_bread(void *s, size_t nbi, uint64_t ni, FILE *stream)
+static u_int64_t _PN_bread(void *s, size_t nbi, u_int64_t ni, FILE *stream)
    {BF_FILE *fb;
     size_t nbw, nr;
 
@@ -189,7 +189,7 @@ static uint64_t _PN_bread(void *s, size_t nbi, uint64_t ni, FILE *stream)
 
 /* _PN_BWRITE - do an fwrite on the pseudo file */
 
-static uint64_t _PN_bwrite(void *s, size_t nbi, uint64_t ni, FILE *stream)
+static u_int64_t _PN_bwrite(void *s, size_t nbi, u_int64_t ni, FILE *stream)
    {long nbw;
     void *d;
     BF_FILE *fb;
@@ -736,7 +736,7 @@ int PN_write(PDBfile *file, char *type, int64_t ni, void *vr)
 
     PD_reset_ptr_list(file);
 
-    snprintf(bf, MAXLINE, "s[%lld]", (long long) ni);
+    snprintf(bf, MAXLINE, "s[%s]", SC_itos(NULL, 0, ni, NULL));
 
     ret = PD_write(file, bf, type, vr);
 

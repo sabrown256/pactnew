@@ -227,7 +227,7 @@ int _PD_adj_dimensions(PDBfile *file, char *name, syment *ep)
     long i;
     inti imin, imax, istep;
     char head[MAXLINE], expr[MAXLINE], tail[MAXLINE], bf[MAXLINE];
-    char expr2[MAXLINE];
+    char expr2[MAXLINE], t[3][MAXLINE];
     char *token, *smax, *sinc;
     dimdes *dims;
     
@@ -268,10 +268,14 @@ int _PD_adj_dimensions(PDBfile *file, char *name, syment *ep)
 		 imin += i;
 		 imax += i;};};
 
-	 snprintf(expr, MAXLINE, "%s%lld:%lld:%lld,",
-		  expr2, (long long) imin, (long long) imax,
-		  (long long) istep);
+	 SC_itos(t[0], MAXLINE, imin,  NULL);
+	 SC_itos(t[1], MAXLINE, istep, NULL);
+	 SC_itos(t[2], MAXLINE, imax,  NULL);
+	 snprintf(expr, MAXLINE, "%s%s:%s:%s,",
+		  expr2, t[0], t[2], t[1]);
+
 	 strcpy(expr2, expr);
+
 	 dims = dims->next;};
 
     if (expr[0] != '\0')
@@ -689,7 +693,7 @@ static char *_PD_row_major_expr(char *bf, dimdes *pd, inti indx, int def_off)
     dimdes *pt;
 
     if (pd == NULL)
-       sprintf(bf, "%lld", (long long) (indx + def_off));
+       SC_itos(bf, MAXLINE, indx + def_off, NULL);
 
     else
        {bf[0] = '\0';
@@ -704,7 +708,7 @@ static char *_PD_row_major_expr(char *bf, dimdes *pd, inti indx, int def_off)
             m  = indx / stride;
             ix = m + pd->index_min;
 
-            snprintf(tmp, MAXLINE, "%lld,", (long long) ix);
+            snprintf(tmp, MAXLINE, "%s,", SC_itos(NULL, 0, ix, NULL));
             strcat(bf, tmp);
 
             indx -= m*stride;
@@ -729,7 +733,7 @@ static char *_PD_col_major_expr(char *bf, dimdes *pd, inti indx, int def_off)
     inti ix, m, stride;
 
     if (pd == NULL)
-       sprintf(bf, "%lld", (long long) (indx + def_off));
+       SC_itos(bf, MAXLINE, indx + def_off, NULL);
     else
        {bf[0] = '\0';
 
@@ -737,7 +741,7 @@ static char *_PD_col_major_expr(char *bf, dimdes *pd, inti indx, int def_off)
            {stride = pd->number;
             m  = indx - (indx/stride)*stride;
             ix = m + pd->index_min;
-            snprintf(tmp, MAXLINE, "%lld,", (long long) ix);
+            snprintf(tmp, MAXLINE, "%s,", SC_itos(NULL, 0, ix, NULL));
             strcat(bf, tmp);
 
             indx = (indx - m)/stride;

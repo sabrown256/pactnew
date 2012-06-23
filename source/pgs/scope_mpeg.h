@@ -40,6 +40,7 @@
 
 #define NDEBUG
 #include "score.h"
+
 #undef I                 /* C99 pure imaginary */
 #ifndef PCC
 #include <limits.h>
@@ -549,7 +550,10 @@ int pclose();
  * TYPE DEFINITIONS *
  *==================*/
 
+#if defined(UNIX)
 typedef int boolean;
+#endif
+
 /* this is for JPEG stuff */
 #define BOOLEAN_DEFINED
 #define HAVE_BOOLEAN
@@ -559,13 +563,13 @@ typedef int boolean;
  *	    2) int's are not
  */
 
-typedef unsigned char uint8;
-typedef unsigned short uint16;
+typedef unsigned char u_int8_t;
+typedef unsigned short u_int16_t;
 
 #ifdef LONG_32		
-typedef unsigned long uint32;
+typedef unsigned long u_int32_t;
 #else
-typedef unsigned int uint32;
+typedef unsigned int u_int32_t;
 #endif
 
 /* _H_INTTYPES is defined by an AIX include which also typedefs
@@ -672,7 +676,11 @@ typedef int int32;
 #else
     /* let in.h handle it, if possible */		   
 #include <sys/types.h>
+
+#if defined(UNIX)
 #include <netinet/in.h>
+#endif
+
 #endif /* FORCE_LITTLE_ENDIAN */
 #endif /* FORCE_BIG_ENDIAN */
 /*===========================================================================*
@@ -982,7 +990,7 @@ typedef struct detalmv_def {
 
 typedef struct bitBucket {
     struct bitBucket *nextPtr;
-    uint32 bits[WORDS_PER_BUCKET];
+    u_int32_t bits[WORDS_PER_BUCKET];
     int bitsleft, bitsleftcur, currword;
 } ActualBucket;
 
@@ -1009,7 +1017,7 @@ typedef struct _BitBucket {
  *===============================*/
 
 void	    Bitio_Free _ANSI_ARGS_((BitBucket *bbPtr));
-void	    Bitio_Write _ANSI_ARGS_((BitBucket *bbPtr, uint32 bits, int nbits));
+void	    Bitio_Write _ANSI_ARGS_((BitBucket *bbPtr, u_int32_t bits, int nbits));
 void	    Bitio_BytePad _ANSI_ARGS_((BitBucket *bbPtr));
 BitBucket  *Bitio_New _ANSI_ARGS_((FILE *filePtr));
 void	    Bitio_Flush _ANSI_ARGS_((BitBucket *bbPtr));
@@ -1085,12 +1093,12 @@ void	    Bitio_WriteToSocket _ANSI_ARGS_((BitBucket *bbPtr, int socket));
 
 void	SetGOPStartTime _ANSI_ARGS_((int index));
 void	Mhead_GenSequenceHeader _ANSI_ARGS_((BitBucket *bbPtr,
-            uint32 hsize, uint32 vsize,
+            u_int32_t hsize, u_int32_t vsize,
             int32 pratio, int32 pict_rate,
             int32 bit_rate, int32 buf_size,
             int32 c_param_flag, int32 *iq_matrix,
-            int32 *niq_matrix, uint8 *ext_data,
-          /*int32 ext_data_size, uint8 *user_data, int32 user_data_size));*/
+            int32 *niq_matrix, u_int8_t *ext_data,
+          /*int32 ext_data_size, u_int8_t *user_data, int32 user_data_size));*/
             int32 ext_data_size, char *user_data, int32 user_data_size));
 void	Mhead_GenSequenceEnder _ANSI_ARGS_((BitBucket *bbPtr));
 void	Mhead_GenGOPHeader _ANSI_ARGS_((BitBucket *bbPtr,
@@ -1098,24 +1106,24 @@ void	Mhead_GenGOPHeader _ANSI_ARGS_((BitBucket *bbPtr,
            int32 tc_hrs, int32 tc_min,
            int32 tc_sec, int32 tc_pict,
            int32 closed_gop, int32 broken_link,
-           uint8 *ext_data, int32 ext_data_size,
-           uint8 *user_data, int32 user_data_size));
+           u_int8_t *ext_data, int32 ext_data_size,
+           u_int8_t *user_data, int32 user_data_size));
 void	Mhead_GenPictureHeader _ANSI_ARGS_((BitBucket *bbPtr, int frameType,
 					    int pictCount, int f_code));
-void	Mhead_GenSliceHeader _ANSI_ARGS_((BitBucket *bbPtr, uint32 slicenum,
-					  uint32 qscale, uint8 *extra_info,
-					  uint32 extra_info_size));
+void	Mhead_GenSliceHeader _ANSI_ARGS_((BitBucket *bbPtr, u_int32_t slicenum,
+					  u_int32_t qscale, u_int8_t *extra_info,
+					  u_int32_t extra_info_size));
 void	Mhead_GenSliceEnder _ANSI_ARGS_((BitBucket *bbPtr));
 void	Mhead_GenMBHeader _ANSI_ARGS_((BitBucket *bbPtr,
-	  uint32 pict_code_type, uint32 addr_incr,
-          uint32 q_scale,
-          uint32 forw_f_code, uint32 back_f_code,
-          uint32 horiz_forw_r, uint32 vert_forw_r,
-          uint32 horiz_back_r, uint32 vert_back_r,
+	  u_int32_t pict_code_type, u_int32_t addr_incr,
+          u_int32_t q_scale,
+          u_int32_t forw_f_code, u_int32_t back_f_code,
+          u_int32_t horiz_forw_r, u_int32_t vert_forw_r,
+          u_int32_t horiz_back_r, u_int32_t vert_back_r,
           int32 motion_forw, int32 m_horiz_forw,
           int32 m_vert_forw, int32 motion_back,
           int32 m_horiz_back, int32 m_vert_back,
-          uint32 mb_pattern, uint32 mb_intra));
+          u_int32_t mb_pattern, u_int32_t mb_intra));
 
 
 #endif /* MHEADERS_INCLUDED */
@@ -1147,7 +1155,7 @@ void	Mhead_GenMBHeader _ANSI_ARGS_((BitBucket *bbPtr,
 #define HUFF_MAXLEVEL	41
 
 extern int huff_maxlevel[];
-extern uint32 *huff_table[];
+extern u_int32_t *huff_table[];
 extern int *huff_bits[];
 /*===========================================================================*
  * frame.h								     *
@@ -1213,7 +1221,7 @@ typedef struct mpegFrame {
     boolean inUse;	/* TRUE iff this frame is currently being used */
 			/* FALSE means any data here can be thrashed */
 
-    uint8   **ppm_data;
+    u_int8_t   **ppm_data;
     xel **rgb_data;         /* pnm format -- see pbmplus docs */
     xelval rgb_maxval;      /* largest value of any pixel index */
     int rgb_format;         /* more info from pnm */
@@ -1223,16 +1231,16 @@ typedef struct mpegFrame {
      *  8-bit pieces.  We separate y, cr, and cb because cr and cb are
      *  subsampled by a factor of 2.
      */
-    uint8 **orig_y, **orig_cr, **orig_cb;
+    u_int8_t **orig_y, **orig_cr, **orig_cb;
 
     /* now, the decoded data -- relevant only if
      *	    referenceFrame == DECODED_FRAME
      *
      */
-    uint8 **decoded_y, **decoded_cr, **decoded_cb;
+    u_int8_t **decoded_y, **decoded_cr, **decoded_cb;
 
     /* reference data */
-    uint8 **ref_y, **ref_cr, **ref_cb;
+    u_int8_t **ref_y, **ref_cr, **ref_cb;
 
     /*  
      *  these are the Blocks which will ultimately compose MacroBlocks.
@@ -1243,7 +1251,7 @@ typedef struct mpegFrame {
     /*
      *  this is the half-pixel luminance data (for reference frames)
      */
-    uint8 **halfX, **halfY, **halfBoth;
+    u_int8_t **halfX, **halfY, **halfBoth;
 
     boolean   halfComputed;        /* TRUE iff half-pixels already computed */
 
@@ -1576,7 +1584,7 @@ int	BMotionSearch _ANSI_ARGS_((LumBlock currentBlock, MpegFrame *prev, MpegFrame
 void	ComputeDiffDCTs _ANSI_ARGS_((MpegFrame *current, MpegFrame *prev, int by, int bx,
 			int my, int mx, int *pattern));
 int	ComputeDiffDCTBlock _ANSI_ARGS_((Block current, Block dest, Block motionBlock));
-void	ComputeMotionBlock _ANSI_ARGS_((uint8 **prev, int by, int bx, int my, int mx,
+void	ComputeMotionBlock _ANSI_ARGS_((u_int8_t **prev, int by, int bx, int my, int mx,
 			   Block motionBlock));
 void	ComputeMotionLumBlock _ANSI_ARGS_((MpegFrame *prevFrame, int by,
 					   int bx, int my, int mx,
@@ -1849,10 +1857,10 @@ void	ComputeHalfPixelData _ANSI_ARGS_((MpegFrame *frame));
 void mp_validate_size _ANSI_ARGS_((int *x, int *y));
 
 /* block.c */
-void	BlockToData _ANSI_ARGS_((uint8 **data, Block block, int by, int bx));
-void	AddMotionBlock _ANSI_ARGS_((Block block, uint8 **prev, int by, int bx,
+void	BlockToData _ANSI_ARGS_((u_int8_t **data, Block block, int by, int bx));
+void	AddMotionBlock _ANSI_ARGS_((Block block, u_int8_t **prev, int by, int bx,
 		       int my, int mx));
-void	AddBMotionBlock _ANSI_ARGS_((Block block, uint8 **prev, uint8 **next,
+void	AddBMotionBlock _ANSI_ARGS_((Block block, u_int8_t **prev, u_int8_t **next,
 				     int by, int bx, int mode,
 				     int fmy, int fmx, int bmy, int bmx));
 
@@ -2986,4 +2994,5 @@ void	FramesToMPEG _ANSI_ARGS_((int numFrames,
 				  boolean parallel));
 
 #endif
+
 

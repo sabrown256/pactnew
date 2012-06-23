@@ -138,8 +138,9 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     set THE_DATE = `cat .pact-version`
     Note $STDOUT "Version = $THE_DATE"
 
-    if ("$GnuMakeOpt" == "-DUSE_GNU_MAKE") then
-       Note $STDOUT "UMake   = `$MngDir/pwhich gmake`"
+    set mk = ( `$MngDir/pwhich gmake` )
+    if (-x "$mk") then
+       Note $STDOUT "UMake   = $mk
     else
        Note $STDOUT "UMake   = `$MngDir/pwhich make`"
     endif

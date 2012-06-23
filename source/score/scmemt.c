@@ -607,8 +607,8 @@ void dprthrnm(void)
 	 if (ti != NULL)
             {ide = ti->ide;
 	     idt = (int64_t) ti->tid;
-	     fprintf(stdout, " %4d: %4d -> %lld\n",
-		     it, ide, (long long) idt);};};
+	     fprintf(stdout, " %4d: %4d -> %s\n",
+		     it, ide, SC_itos(NULL, 0, idt, NULL));};};
 
     return;}
 

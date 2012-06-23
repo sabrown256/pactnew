@@ -368,10 +368,10 @@ static void _PM_md5_final(unsigned char *dig, PM_MD5_CTX *mc)
  *                       - trailing termination byte
  */
  
-void PM_md5_checksum_array(void *arr, uint64_t ni, uint64_t bpi,
+void PM_md5_checksum_array(void *arr, u_int64_t ni, u_int64_t bpi,
 			   unsigned char *dig)
    {int64_t sz, ln;
-    uint64_t ib, nb;
+    u_int64_t ib, nb;
     unsigned char *p;
     PM_MD5_CTX mc;
     
@@ -475,7 +475,7 @@ long PM_md5_hash(void *key, int size)
    {long nc, v;
     unsigned char d[33];
     char *s;
-    extern void PM_md5_checksum_array(void *arr, uint64_t ni, uint64_t bpi,
+    extern void PM_md5_checksum_array(void *arr, u_int64_t ni, u_int64_t bpi,
 				      unsigned char *dig);
 
     s  = (char *) key;

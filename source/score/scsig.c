@@ -555,6 +555,8 @@ void SC_setup_sig_handlers(PFSignal_handler hand, void *a, int fl)
 int SC_signal_hold(int sig)
    {int rv;
 
+    rv = -1;
+
 #ifdef USE_POSIX_SIGNALS
 
     sigset_t os, ns;
@@ -585,6 +587,8 @@ int SC_signal_hold(int sig)
 
 int SC_signal_release(int sig)
    {int rv;
+
+    rv = -1;
 
 #ifdef USE_POSIX_SIGNALS
 

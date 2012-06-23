@@ -61,7 +61,7 @@ static char
 	       "quaternion", "void *", NULL, "char *" },
  *utypes[] = { NULL, NULL, "bool",
 	       "unsigned char", "wchar_t",
-	       "uint8_t", "unsigned short", "unsigned int",
+	       "u_int8_t", "unsigned short", "unsigned int",
                "unsigned long", "unsigned long long",
 	       "float", "double", "long double",
 	       "float _Complex", "double _Complex",

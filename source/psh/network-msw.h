@@ -27,11 +27,11 @@ extern int
  accept_msw(int sockfd, struct sockaddr *addr, socklen_t *addrlen),
  gethost_msw(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 
-extern uint32_t
- htonl_msw(uint32_t hostlong);
+extern u_int32_t
+ htonl_msw(u_int32_t hostlong);
 
-extern uint16_t
- htons_msw(uint16_t hostshort);
+extern u_int16_t
+ htons_msw(u_int16_t hostshort);
 
 extern in_addr_t
  inet_addr_msw(const char *cp);
@@ -75,8 +75,8 @@ int socket_msw(int domain, int type, int protocol)
 
 /* HTONL_MSW - htonl for MSW */
 
-uint32_t htonl_msw(uint32_t hostlong)
-   {uint32_t rv;
+u_int32_t htonl_msw(u_int32_t hostlong)
+   {u_int32_t rv;
 
     rv = 0;
 
@@ -89,8 +89,8 @@ uint32_t htonl_msw(uint32_t hostlong)
 
 /* HTONS_MSW - htons for MSW */
 
-uint16_t htons_msw(uint16_t hostshort)
-   {uint16_t rv;
+u_int16_t htons_msw(u_int16_t hostshort)
+   {u_int16_t rv;
 
     rv = 0;
 

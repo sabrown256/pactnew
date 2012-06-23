@@ -257,7 +257,7 @@ static void _SC_prim_free(void *p, long nbp, SC_heap_des *ph)
 void *_SC_alloc_nl(long ni, long bpi, void *arg)
    {int na, zsp, prm, typ, line;
     long nb, nbp;
-    uint64_t a, f;
+    u_int64_t a, f;
     char *func, *file;
     SC_mem_opt *opt;
     SC_heap_des *ph;

@@ -431,6 +431,7 @@ int SC_mem_corrupt(int flag)
 int _SC_mem_map(FILE *fp, int flag, int show, int lineno)
    {int i, nbl;
     int64_t a, f, d;
+    char ta[MAXLINE], tb[MAXLINE], tc[MAXLINE];
     char *s, *arr;
     SC_heap_des *ph;
 
@@ -448,8 +449,10 @@ int _SC_mem_map(FILE *fp, int flag, int show, int lineno)
 
 /* report the active memory blocks */
 	SC_mem_stats(&a, &f, &d, NULL);
-	fprintf(fp, "\nMemory Map (%8lld %8lld %8lld)\n",
-		(long long) a, (long long) f, (long long) d);
+	SC_itos(ta, MAXLINE, a, "%8lld");
+	SC_itos(tb, MAXLINE, f, "%8lld");
+	SC_itos(tc, MAXLINE, d, "%8lld");
+	fprintf(fp, "\nMemory Map (%s %s %s)\n", ta, tb, tc);
 
 	_SC_mem_list(flag, show, &arr, &nbl);
         if (arr == NULL)

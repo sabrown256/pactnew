@@ -70,7 +70,7 @@ static void _PD_regen_std(PDBfile *file, char *type,
 static int _PD_wr_itag_ii(PDBfile *file, char *name,
 			  PD_address *ad, inti ni, char *type,
 			  int64_t addr, PD_data_location loc)
-   {char s[MAXLINE];
+   {char s[MAXLINE], t[2][MAXLINE];
     FILE *fp;
 
     if (file->virtual_internal == FALSE)
@@ -79,8 +79,10 @@ static int _PD_wr_itag_ii(PDBfile *file, char *name,
 /* must have a definite large number of digits in address field
  * in order to support relocation
  */
-	snprintf(s, MAXLINE, "%lld\001%s\001%32lld\001%d\001\n",
-		 (long long) ni, type, (long long) addr, loc);
+	SC_itos(t[0], MAXLINE, ni, NULL);
+	SC_itos(t[1], MAXLINE, addr, "%32lld");
+	snprintf(s, MAXLINE, "%s\001%s\001%32s\001%d\001\n",
+		 t[0], type, t[1], loc);
 
 	lio_printf(fp, s);
 
@@ -95,7 +97,7 @@ static int _PD_wr_itag_ii(PDBfile *file, char *name,
 /* _PD_RD_ITAG_II - fill an itag from the file */
 
 static int _PD_rd_itag_ii(PDBfile *file, char *p, PD_itag *pi)
-   {char t[MAXLINE];
+   {char t[3][MAXLINE];
     char *token, *s, *bf;
     FILE *fp;
     PD_smp_state *pa;
@@ -120,18 +122,20 @@ static int _PD_rd_itag_ii(PDBfile *file, char *p, PD_itag *pi)
        {pi->addr = -1;
         pi->flag = TRUE;}
     else
-       {pi->addr  = SC_stol(token);
-        token = SC_strtok(NULL, "\001\n", s);
+       {pi->addr = SC_stol(token);
+        token    = SC_strtok(NULL, "\001\n", s);
         if (token == NULL)
            pi->flag = TRUE;
         else
            pi->flag = atoi(token);};
 
-    snprintf(t, MAXLINE, "%lld\001%s\001%32lld\001%d\001\n",
-	     (long long) pi->nitems, pi->type,
-	     (long long) pi->addr, pi->flag);
+    SC_itos(t[0], MAXLINE, pi->nitems, NULL);
+    SC_itos(t[1], MAXLINE, pi->addr, "%32lld");
 
-    pi->length = strlen(t);
+    snprintf(t[2], MAXLINE, "%s\001%s\001%32s\001%d\001\n",
+	     t[0], pi->type, t[1], pi->flag);
+
+    pi->length = strlen(t[2]);
 
     return(TRUE);}
 
@@ -757,6 +761,7 @@ static int64_t _PD_wr_symt_ii(PDBfile *file)
     long i, stride;
     inti nb, ni, nt;
     int64_t addr, ad;
+    char t[2][MAXLINE];
     char *ty, *nm;
     syment *ep;
     dimdes *lst;
@@ -790,9 +795,12 @@ static int64_t _PD_wr_symt_ii(PDBfile *file)
 	        {PD_error("BAD BLOCK LIST - _PD_WR_SYMT_II", PD_GENERIC);
 		 return(-1L);};};
 
+	 SC_itos(t[0], MAXLINE, nb, NULL);
+	 SC_itos(t[1], MAXLINE, ad, NULL);
+
 	 _PD_put_string(n++, 
-			"%s\001%s\001%lld\001%lld\001",
-			nm, ty, (long long) nb, (int64_t) ad);
+			"%s\001%s\001%s\001%s\001",
+			nm, ty, t[0], t[1]);
 
 /* adjust the slowest varying dimension to reflect only the first block */
 	 flag = PD_get_major_order(file);
@@ -808,8 +816,9 @@ static int64_t _PD_wr_symt_ii(PDBfile *file)
 	      else
 		 ni = lst->number;
 
-	      _PD_put_string(n++, "%ld\001%lld\001",
-			     lst->index_min, (long long) ni);};
+	      SC_itos(t[0], MAXLINE, ni, NULL);
+	      _PD_put_string(n++, "%ld\001%s\001",
+			     lst->index_min, t[0]);};
 
 	 _PD_put_string(n++, "\n");};
 
@@ -1038,6 +1047,7 @@ static int _PD_wr_blocks_ii(PDBfile *file)
     long i, j, n;
     inti ni;
     int64_t addr;
+    char t[2][MAXLINE];
     char *nm;
     syment *ep;
 
@@ -1057,8 +1067,9 @@ static int _PD_wr_blocks_ii(PDBfile *file)
 		  addr = _PD_entry_get_address(ep, j);
 		  ni   = _PD_entry_get_number(ep, j);
 
-		  ok &= _PD_put_string(1, " %lld %lld",
-				       (int64_t) addr, (long long) ni);};
+		  SC_itos(t[0], MAXLINE, ni, NULL);
+		  SC_itos(t[1], MAXLINE, addr, NULL);
+		  ok &= _PD_put_string(1, " %s %s", t[1], t[0]);};
 
 	     ok &= _PD_put_string(1, "\n");};};
 
@@ -1576,6 +1587,7 @@ static int _PD_write_meta_ii(PDBfile *file, FILE *out, int fh)
 
 static int _PD_flush_ii(PDBfile *file)
    {int ok;
+    char t[2][MAXLINE];
     FILE *fp;
     PD_smp_state *pa;
 
@@ -1608,8 +1620,9 @@ static int _PD_flush_ii(PDBfile *file)
 	if (file->headaddr != lio_tell(fp))
 	   PD_error("FSEEK FAILED TO FIND HEADER - _PD_FLUSH_II", PD_WRITE);
 
-	lio_printf(fp, "%22lld\001%22lld\001\n",
-		   (int64_t) file->chrtaddr, (int64_t) file->symtaddr);
+	SC_itos(t[0], MAXLINE, file->chrtaddr, "%22lld");
+	SC_itos(t[1], MAXLINE, file->symtaddr, "%22lld");
+	lio_printf(fp, "%22s\001%22s\001\n", t[0], t[1]);
 
 /* WARNING: no more writes to the file before the space
  * reserved for the checksum from here on out

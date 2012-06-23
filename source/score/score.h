@@ -531,7 +531,7 @@ struct s_SC_message
 
 #ifndef HAVE_STREAMS_P
 
-# ifndef SOLARIS
+# if !defined(SOLARIS) && !defined(MSW)
 
 struct pollfd
    {int fd;
@@ -977,9 +977,9 @@ extern int
 
 extern void
  SC_configure_mm(long mxl, long mxm, long bsz, double r),
- SC_mem_statb_set(uint64_t a, uint64_t f),
+ SC_mem_statb_set(u_int64_t a, u_int64_t f),
  SC_mem_stats_set(int64_t a, int64_t f),
- SC_mem_statb(uint64_t *al, uint64_t *fr, uint64_t *df, uint64_t *mx),
+ SC_mem_statb(u_int64_t *al, u_int64_t *fr, u_int64_t *df, u_int64_t *mx),
  SC_mem_stats(int64_t *al, int64_t *fr, int64_t *df, int64_t *mx),
  SC_mem_stats_acc(int64_t a, int64_t f);
 
@@ -1148,7 +1148,9 @@ extern char
  *SC_concatenate(char *s, int nc, int n, char **a, char *delim, int add),
  *SC_dconcatenate(int n, char **a, char *delim),
  *SC_vdsnprintf(int cp, const char *format, va_list lst),
- *SC_dsnprintf(int cp, char *fmt, ...);
+ *SC_dsnprintf(int cp, char *fmt, ...),
+ *SC_itos(char *s, int nc, long long n, char *fmt),
+ *SC_ftos(char *s, int nc, long double f, char *fmt);
 
 extern double
  SC_stof(char *s),
