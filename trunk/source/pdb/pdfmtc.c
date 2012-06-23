@@ -54,7 +54,7 @@
 static int _PD_wr_itag_iii(PDBfile *file, char *name,
 			   PD_address *ad, inti ni, char *type,
 			   int64_t addr, PD_data_location loc)
-   {char s[MAXLINE];
+   {char s[MAXLINE], t[2][MAXLINE];
     FILE *fp;
 
     if (file->virtual_internal == FALSE)
@@ -65,8 +65,10 @@ static int _PD_wr_itag_iii(PDBfile *file, char *name,
 /* must have a definite large number of digits in address field
  * in order to support relocation
  */
-	   {snprintf(s, MAXLINE, "\n%s(%lld) %32lld %d;\n",
-		     type, (long long) ni, (long long) addr, loc);
+	   {SC_itos(t[0], MAXLINE, ni, NULL);
+	    SC_itos(t[1], MAXLINE, addr, "%32lld");
+	    snprintf(s, MAXLINE, "\n%s(%s) %32s %d;\n",
+		     type, t[0], t[1], loc);
 
 	    lio_printf(fp, s);};
 
@@ -82,7 +84,7 @@ static int _PD_wr_itag_iii(PDBfile *file, char *name,
 
 static int _PD_rd_itag_iii(PDBfile *file, char *p, PD_itag *pi)
    {int ok;
-    char t[MAXLINE];
+    char t[3][MAXLINE];
     char *token, *s, *bf;
     FILE *fp;
     PD_smp_state *pa;
@@ -110,18 +112,20 @@ static int _PD_rd_itag_iii(PDBfile *file, char *p, PD_itag *pi)
 	   {pi->addr = -1;
 	    pi->flag = TRUE;}
 	else
-	   {pi->addr  = SC_stol(token);
-	    token = SC_strtok(NULL, " \n", s);
+	   {pi->addr = SC_stol(token);
+	    token    = SC_strtok(NULL, " \n", s);
 	    if (token == NULL)
 	       pi->flag = TRUE;
 	    else
 	       pi->flag = atoi(token);};
 
-	snprintf(t, MAXLINE, "\n%lld %s %32lld %d;\n",
-		 (long long) pi->nitems, pi->type,
-		 (long long) pi->addr, pi->flag);
+	SC_itos(t[0], MAXLINE, pi->nitems, NULL);
+	SC_itos(t[1], MAXLINE, pi->addr, "%32lld");
 
-	pi->length = strlen(t);}
+	snprintf(t[2], MAXLINE, "\n%s %s %32s %d;\n",
+		 t[0], pi->type, t[1], pi->flag);
+
+	pi->length = strlen(t[2]);}
 
     else
        {ok = _PD_ptr_entry_itag(file, pi, p);
@@ -1022,6 +1026,7 @@ static int _PD_wr_blocks_iii(PDBfile *file)
     long i, j, n;
     inti ni;
     int64_t addr;
+    char t[2][MAXLINE];
     char *nm;
     syment *ep;
     SC_array *bl;
@@ -1042,8 +1047,9 @@ static int _PD_wr_blocks_iii(PDBfile *file)
 
 		  _PD_block_get_desc(&addr, &ni, bl, j);
 
-		  ok &= _PD_put_string(1, " %lld %lld",
-				       (int64_t) addr, (long long) ni);};
+		  SC_itos(t[0], MAXLINE, addr, NULL);
+		  SC_itos(t[1], MAXLINE, ni, NULL);
+		  ok &= _PD_put_string(1, " %s %s", t[0], t[1]);};
 
 	     ok &= _PD_put_string(1, "\n");};};
 
@@ -1090,6 +1096,7 @@ static int64_t _PD_wr_symt_iii(PDBfile *file)
     long i, stride;
     inti nb, ni, nt, mn, mx;
     int64_t addr, ad;
+    char t[2][MAXLINE];
     char *ty, *nm;
     syment *ep;
     dimdes *lst;
@@ -1147,19 +1154,21 @@ static int64_t _PD_wr_symt_iii(PDBfile *file)
 
 	      mn = lst->index_min;
 	      mx = mn + ni - 1;
+	      SC_itos(t[0], MAXLINE, mn, NULL);
+	      SC_itos(t[1], MAXLINE, mx, NULL);
+
 	      if (nd == 0)
-		 _PD_put_string(n++, "[%lld:%lld",
-				(long long) mn, (long long) mx);
+		 _PD_put_string(n++, "[%s:%s", t[0], t[1]);
 	      else
-		 _PD_put_string(n++, ",%lld:%lld",
-				(long long) mn, (long long) mx);};
+		 _PD_put_string(n++, ",%s:%s", t[0], t[1]);};
 
 	 if (nd > 0)
 	    _PD_put_string(n++, "]");
 
+	 SC_itos(t[0], MAXLINE, ad, NULL);
+	 SC_itos(t[1], MAXLINE, nb, NULL);
 	 _PD_put_string(n++, 
-			" @ %lld (%lld);\n",
-			(int64_t) ad, (long long) nb);};
+			" @ %s (%s);\n", t[0], t[1]);};
 
 /* pad an extra newline to mark the end of the symbol table for _PD_rd_symt */
     _PD_put_string(n++, "\n");
@@ -1484,8 +1493,10 @@ static int _PD_flush_iii(PDBfile *file)
 	ok = _PD_cksum_file_write(file);
 
 /* write out the chart, symtab addresses, and format version */
-	lio_printf(fp, "StructureChartAddress: %lld\n", (int64_t) file->chrtaddr);
-	lio_printf(fp, "SymbolTableAddress: %lld\n", (int64_t) file->symtaddr);
+	lio_printf(fp, "StructureChartAddress: %s\n",
+		   SC_itos(NULL, 0, file->chrtaddr, NULL));
+	lio_printf(fp, "SymbolTableAddress: %s\n",
+		   SC_itos(NULL, 0, file->symtaddr, NULL));
 	lio_printf(fp, "%s\n", nht);};
 
     return(TRUE);}

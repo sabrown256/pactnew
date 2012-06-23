@@ -149,18 +149,8 @@ defstr *PA_th_def_rec(PDBfile *file, char *name, char *type,
     defstr *dp;
     th_record ht;
 
-#ifdef SUNMOS
-
-    count = 0;
-    if (PD_inquire_entry(file, "n_types", TRUE, NULL) != NULL)
-       PD_read(file, "n_types", &count);
-
-#else
-
-    if (!PD_read(file, "n_types", &count))
+    if (PD_read(file, "n_types", &count) == 0)
        count = 0;
-
-#endif
 
     n    = nmemb - 1;
     lbls = CMAKE_N(char *, n);
@@ -1023,7 +1013,7 @@ static int _PA_proc_rec(char *name, PDBfile *th, int ncpf, int recn)
 /* write out the time plot range data */
     for (i = 0; i < nc; i++)
         {j = i + 1;
-         snprintf(bf, MAXLINE, "yval%lld", (long long) i);
+         snprintf(bf, MAXLINE, "yval%s", SC_itos(NULL, 0, i, NULL));
          PD_write_alt(pduf, bf, type, crve[j], 1, ind);
          CFREE(crve[j]);};
 

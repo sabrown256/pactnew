@@ -148,9 +148,9 @@ typedef void (*PFIOErr)(int err, char *sys, char *usr);
 
 /* large file I/O function types */
 
-typedef uint64_t (*PFSegSize)(void *fp, int64_t nsz);
-typedef uint64_t (*PFlread)(void *ptr, size_t sz, uint64_t ni, FILE *stream);
-typedef uint64_t (*PFlwrite)(void *ptr, size_t sz, uint64_t ni, FILE *stream);
+typedef u_int64_t (*PFSegSize)(void *fp, int64_t nsz);
+typedef u_int64_t (*PFlread)(void *ptr, size_t sz, u_int64_t ni, FILE *stream);
+typedef u_int64_t (*PFlwrite)(void *ptr, size_t sz, u_int64_t ni, FILE *stream);
 
 typedef struct s_file_io_desc file_io_desc;
 
@@ -169,9 +169,9 @@ struct s_file_io_desc
     int (*fseek)(FILE *fp, long offs, int whence);
     int (*lfseek)(FILE *fp, int64_t offs, int whence);
     size_t (*fread)(void *ptr, size_t sz, size_t ni, FILE *fp);
-    uint64_t (*lfread)(void *ptr, size_t sz, uint64_t ni, FILE *fp);
+    u_int64_t (*lfread)(void *ptr, size_t sz, u_int64_t ni, FILE *fp);
     size_t (*fwrite)(void *ptr, size_t sz, size_t ni, FILE *fp);
-    uint64_t (*lfwrite)(void *ptr, size_t sz, uint64_t ni, FILE *fp);
+    u_int64_t (*lfwrite)(void *ptr, size_t sz, u_int64_t ni, FILE *fp);
     int (*setvbuf)(FILE *fp, char *bf, int type, size_t sz);
     int (*fclose)(FILE *fp);
     int (*fprintf)(FILE *fp, char *fmt, va_list a);
@@ -182,7 +182,7 @@ struct s_file_io_desc
     int (*feof)(FILE *fp);
     char *(*fgets)(char *s, int n, FILE *fp);
     char *(*pointer)(FILE *fp);
-    uint64_t (*segsize)(FILE *fp, int64_t n);
+    u_int64_t (*segsize)(FILE *fp, int64_t n);
     int gather;
     int nhits[SC_N_IO_OPER];
     double nsec[SC_N_IO_OPER];};
@@ -466,10 +466,10 @@ extern size_t
  io_read(void *ptr, size_t sz, size_t ni, FILE *fp),
  io_write(void *ptr, size_t sz, size_t ni, FILE *fp);
 
-extern uint64_t
+extern u_int64_t
  io_segsize(void *fp, int64_t n),
- lio_read(void *ptr, size_t sz, uint64_t ni, FILE *fp),
- lio_write(void *ptr, size_t sz, uint64_t ni, FILE *fp),
+ lio_read(void *ptr, size_t sz, u_int64_t ni, FILE *fp),
+ lio_write(void *ptr, size_t sz, u_int64_t ni, FILE *fp),
  lio_segsize(void *fp, int64_t n);
 
 extern int64_t

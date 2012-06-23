@@ -9,7 +9,9 @@
 #include "cpyright.h"
 #include "pgs_int.h"
 
+#if defined(UNIX)
 typedef int boolean;
+#endif
 
 extern void
  save_image2file(PG_device *dev),

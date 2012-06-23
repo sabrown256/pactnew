@@ -353,7 +353,7 @@ static int _PD_mpflush(FILE *stream)
 
 /* _PD_MPREAD - do an fread on the parallel file */
 
-static uint64_t _PD_mpread(void *s, size_t nbi, uint64_t ni, FILE *stream)
+static u_int64_t _PD_mpread(void *s, size_t nbi, u_int64_t ni, FILE *stream)
    {int nread, fstatus;
     size_t nbr, fail;
     PD_Pfile *pf;
@@ -411,7 +411,7 @@ static uint64_t _PD_mpread(void *s, size_t nbi, uint64_t ni, FILE *stream)
 
 /* _PD_MPWRITE - do an fwrite on the parallel file */
 
-static uint64_t _PD_mpwrite(void *s, size_t nbi, uint64_t ni, FILE *stream)
+static u_int64_t _PD_mpwrite(void *s, size_t nbi, u_int64_t ni, FILE *stream)
    {int nwritten, fstatus;
     long nbw;
     size_t fail;
@@ -467,7 +467,7 @@ static uint64_t _PD_mpwrite(void *s, size_t nbi, uint64_t ni, FILE *stream)
  *              - this used the collective MPI-IO call
  */
 
-static uint64_t _PD_mpwritec(void *s, size_t nbi, uint64_t ni, FILE *stream)
+static u_int64_t _PD_mpwritec(void *s, size_t nbi, u_int64_t ni, FILE *stream)
    {int nwritten, fstatus;
     long nbw;
     size_t fail;

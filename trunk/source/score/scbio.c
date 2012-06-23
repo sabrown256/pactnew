@@ -1201,7 +1201,7 @@ static int64_t _SC_bltell(FILE *fp)
 
 /* _SC_BLREAD - large file method for fread */
 
-static uint64_t _SC_blread(void *s, size_t bpi, uint64_t ni, FILE *fp)
+static u_int64_t _SC_blread(void *s, size_t bpi, u_int64_t ni, FILE *fp)
    {size_t nr;
 
     ACCESS(fp);
@@ -1215,7 +1215,7 @@ static uint64_t _SC_blread(void *s, size_t bpi, uint64_t ni, FILE *fp)
 
 /* _SC_BLWRITE - large file method for fwrite */
 
-static uint64_t _SC_blwrite(void *s, size_t bpi, uint64_t ni, FILE *fp)
+static u_int64_t _SC_blwrite(void *s, size_t bpi, u_int64_t ni, FILE *fp)
    {size_t nw;
 
     ACCESS(fp);

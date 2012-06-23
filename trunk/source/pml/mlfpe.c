@@ -576,10 +576,10 @@ long PM_count_nanf(long n, float *f, int mask)
 
 int PM_fp_typed(double d)
    {int rv, sg;
-    uint64_t ba, bm, bs, b1, l1, l2, l3;
+    u_int64_t ba, bm, bs, b1, l1, l2, l3;
 
     rv = 1;
-    ba = *(uint64_t *) &d;
+    ba = *(u_int64_t *) &d;
 
     l1 = 0xf0;
     l2 = 0xf8;

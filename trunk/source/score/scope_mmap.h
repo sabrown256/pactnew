@@ -82,9 +82,9 @@ extern int
 extern int64_t
  _SC_mf_core_tell(FILE *fp);
 
-extern uint64_t
- _SC_mf_core_read(void *bf, size_t sz, uint64_t ni, FILE *fp),
- _SC_mf_core_write(void *bf, size_t sz, uint64_t ni, FILE *fp),
+extern u_int64_t
+ _SC_mf_core_read(void *bf, size_t sz, u_int64_t ni, FILE *fp),
+ _SC_mf_core_write(void *bf, size_t sz, u_int64_t ni, FILE *fp),
  _SC_mf_segment_size(FILE *fp, int64_t nsz);
 
 

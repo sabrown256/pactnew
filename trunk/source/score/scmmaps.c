@@ -1082,8 +1082,8 @@ static void _SC_mf_rd_stripe(SC_mapped_file *mf, char *s, void *a, int64_t nb)
  *                  - ala the read system call
  */
 
-uint64_t _SC_mf_core_read(void *bf, size_t sz, uint64_t ni, FILE *fp)
-   {uint64_t nir;
+u_int64_t _SC_mf_core_read(void *bf, size_t sz, u_int64_t ni, FILE *fp)
+   {u_int64_t nir;
 
 #ifdef HAVE_MMAP
 
@@ -1119,8 +1119,8 @@ uint64_t _SC_mf_core_read(void *bf, size_t sz, uint64_t ni, FILE *fp)
  *                   - ala the write system call
  */
 
-uint64_t _SC_mf_core_write(void *bf, size_t sz, uint64_t ni, FILE *fp)
-   {uint64_t niw;
+u_int64_t _SC_mf_core_write(void *bf, size_t sz, u_int64_t ni, FILE *fp)
+   {u_int64_t niw;
 
 #ifdef HAVE_MMAP
 
@@ -1209,7 +1209,7 @@ int _SC_mf_core_seek(FILE *fp, int64_t offset, int whence)
 
 /* _SC_MF_CORE_TELL - return the current logical location
  *                  - ala the ftell C library call
- *                  - NOTE: uint64_t and int64_t are the same size
+ *                  - NOTE: u_int64_t and int64_t are the same size
  *                  - when using large files so use standard int64_t
  */
 
@@ -1256,9 +1256,9 @@ void SC_mf_set_size(int64_t mnsz, int64_t extsz)
  *                     - return the actual segment size used
  */
 
-uint64_t _SC_mf_segment_size(FILE *fp, int64_t nsz)
+u_int64_t _SC_mf_segment_size(FILE *fp, int64_t nsz)
    {int64_t len, nbp;
-    uint64_t rv;
+    u_int64_t rv;
     SC_mapped_file *mf;
 
     mf = (SC_mapped_file *) fp;
@@ -1274,7 +1274,7 @@ uint64_t _SC_mf_segment_size(FILE *fp, int64_t nsz)
     mf->scsize  = nsz;
     mf->scsizex = nsz;
 
-    rv = (uint64_t) nsz;
+    rv = (u_int64_t) nsz;
 
     return(rv);}
 

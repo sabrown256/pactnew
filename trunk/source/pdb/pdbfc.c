@@ -107,8 +107,8 @@ static int _PD_fcsetvbuf(FILE *fp, char *bf, int type, size_t sz)
 
 /* _PD_FCREAD - fread method for containerf */
 
-static uint64_t _PD_fcread(void *p, size_t sz, uint64_t ni, FILE *fp)
-   {uint64_t rv;
+static u_int64_t _PD_fcread(void *p, size_t sz, u_int64_t ni, FILE *fp)
+   {u_int64_t rv;
     containerf *cf;
     FILE *fl;
 
@@ -128,7 +128,7 @@ static uint64_t _PD_fcread(void *p, size_t sz, uint64_t ni, FILE *fp)
 
 /* _PD_FCWRITE - fwrite method for containerf */
 
-static uint64_t _PD_fcwrite(void *p, size_t sz, uint64_t ni, FILE *fp)
+static u_int64_t _PD_fcwrite(void *p, size_t sz, u_int64_t ni, FILE *fp)
    {int rv;
     containerf *cf;
     FILE *fl;

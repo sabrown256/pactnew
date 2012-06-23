@@ -288,7 +288,7 @@ static int _PD_pseek(FILE *stream, int64_t offset, int whence)
 
 /* _PD_PREAD - do an fread on the parallel file */
 
-static uint64_t _PD_pread(void *s, size_t nbi, uint64_t ni, FILE *stream)
+static u_int64_t _PD_pread(void *s, size_t nbi, u_int64_t ni, FILE *stream)
    {int status;
     size_t nbw, fail;
     int64_t offs;
@@ -326,7 +326,7 @@ static uint64_t _PD_pread(void *s, size_t nbi, uint64_t ni, FILE *stream)
 
 /* _PD_PWRITE - do an fwrite on the parallel file */
 
-static uint64_t _PD_pwrite(void *s, size_t nbi, uint64_t ni, FILE *stream)
+static u_int64_t _PD_pwrite(void *s, size_t nbi, u_int64_t ni, FILE *stream)
    {int rv;
     long nbw;
     int64_t ad;

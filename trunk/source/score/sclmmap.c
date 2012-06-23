@@ -45,8 +45,8 @@ extern ssize_t
  *               - this wraps the LMF version to be call compatible
  */
 
-static uint64_t _SC_lmf_write(void *bf, size_t sz, uint64_t ni, FILE *stream)
-   {uint64_t rv;
+static u_int64_t _SC_lmf_write(void *bf, size_t sz, u_int64_t ni, FILE *stream)
+   {u_int64_t rv;
 
     rv = _SC_mf_core_write(bf, sz, ni, stream);
 
@@ -59,8 +59,8 @@ static uint64_t _SC_lmf_write(void *bf, size_t sz, uint64_t ni, FILE *stream)
  *              - this wraps the LMF version to be call compatible
  */
 
-static uint64_t _SC_lmf_read(void *bf, size_t sz, uint64_t ni, FILE *stream)
-   {uint64_t rv;
+static u_int64_t _SC_lmf_read(void *bf, size_t sz, u_int64_t ni, FILE *stream)
+   {u_int64_t rv;
 
     rv = _SC_mf_core_read(bf, sz, ni, stream);
 

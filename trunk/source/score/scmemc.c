@@ -50,7 +50,7 @@ void _SC_mem_stats_acc(SC_heap_des *ph, int64_t a, int64_t f)
 
 /* SC_MEM_STATB_SET - set the memory usage to A and F */
 
-void SC_mem_statb_set(uint64_t a, uint64_t f)
+void SC_mem_statb_set(u_int64_t a, u_int64_t f)
    {int64_t d;
     SC_heap_des *ph;
 
@@ -106,7 +106,7 @@ void SC_mem_stats_acc(int64_t a, int64_t f)
 
 /* SC_MEM_STATB - return memory usage statistics */
 
-void SC_mem_statb(uint64_t *al, uint64_t *fr, uint64_t *df, uint64_t *mx)
+void SC_mem_statb(u_int64_t *al, u_int64_t *fr, u_int64_t *df, u_int64_t *mx)
    {SC_heap_des *ph;
 
     ph = _SC_tid_mm();

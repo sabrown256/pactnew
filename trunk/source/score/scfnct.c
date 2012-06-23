@@ -164,23 +164,14 @@ double SC_cpu_time(void)
 
     double dtwc;
     time_t syst;
+    clock_t s;
     static double dtref;
     static time_t systref;
     static clock_t NA = (clock_t) -1;
 
-# ifdef SUNMOS
-    double s;
-# else
-    clock_t s;
-# endif
-
     syst = time(NULL);
 
-# ifdef SUNMOS
-    while ((s = dclock()) == NA);
-# else
     while ((s = clock()) == NA);
-# endif
 
     dt = ((double) s)/((double) TICKS_SECOND);
 
@@ -355,7 +346,7 @@ void SC_sec_str(double t, char *d)
 static void _SC_timeout_error(int sig)
    {
 
-#ifdef UNIX
+#if defined(HAVE_POSIX_SYS)
 
     char s[MAXLINE];
 
@@ -383,7 +374,7 @@ static void _SC_timeout_error(int sig)
 void SC_timeout(int to, PFSignal_handler fnc, void *a)
    {
 
-#ifdef UNIX
+#if defined(HAVE_POSIX_SYS)
 
     int ns;
     void *an;

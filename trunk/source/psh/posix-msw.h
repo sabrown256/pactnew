@@ -18,6 +18,12 @@
 
 #undef byte
 
+#define FLOAT FLOAT_MSW
+#define LONG  LONG_MSW
+#define INT   INT_MSW
+#define SHORT SHORT_MSW
+#define CHAR  CHAR_MSW
+
 #include <ws2tcpip.h>
 
 #define cwait cwait_msw
@@ -35,6 +41,12 @@
 
 #include <windows.h>
 
+#undef CHAR
+#undef SHORT
+#undef INT
+#undef LONG
+#undef FLOAT
+
 /*--------------------------------------------------------------------------*/
 
 /*                        STANDARD CONFIGURATIONS                           */
@@ -49,6 +61,11 @@
 
 #define directory_delim "\\"
 #define directory_delim_c '\\'
+
+/* errno set */
+
+#define	ETXTBSY		26
+
 
 /* signal set */
 
@@ -417,8 +434,10 @@
 
 /*--------------------------------------------------------------------------*/
 
-typedef unsigned short uint16_t;
-typedef unsigned int   uint32_t;
+typedef unsigned char       u_int8_t;
+typedef unsigned short      u_int16_t;
+typedef unsigned int        u_int32_t;
+typedef unsigned long long  u_int64_t;
 
 typedef int uid_t;
 typedef int gid_t;
@@ -539,7 +558,8 @@ extern char
 
 extern void
  siglongjmp(sigjmp_buf env, int val),
- srandom(unsigned int seed);
+ srandom(unsigned int seed),
+ sync(void);
 
 /*--------------------------------------------------------------------------*/
 
@@ -910,6 +930,18 @@ int select_msw(int nfds, fd_set *readfds, fd_set *writefds,
     return(rv);}
 
 #define select    select_msw
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SYNC_MSW - sync for MSW */
+
+void sync_msw(void)
+   {
+
+    return;}
+
+#define sync    sync_msw
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

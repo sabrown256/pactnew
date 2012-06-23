@@ -163,7 +163,7 @@ int _SC_ps_time(char *time)
 int SC_load_ave(double *av)
    {int rv;
 
-#ifdef UNIX
+#if defined(HAVE_POSIX_SYS)
 
     int i, st;
     char sp[MAXLINE];
@@ -200,7 +200,7 @@ int SC_load_ave(double *av)
 int SC_free_mem(double *mem)
    {int i, rv;
 
-#ifdef UNIX
+#if defined(HAVE_POSIX_SYS)
 
     int st;
     char **res;

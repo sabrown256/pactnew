@@ -749,7 +749,7 @@ extern long
 extern void
  PM_checksum(long *psum, int *prmdr, void *parr, int boff,
 	     int ni, int bpi, int nbts),
- PM_md5_checksum_array(void *arr, uint64_t ni, uint64_t bpi, unsigned char *dig),
+ PM_md5_checksum_array(void *arr, u_int64_t ni, u_int64_t bpi, unsigned char *dig),
  PM_md5_checksum_file(FILE* file, int64_t start, int64_t stop, 
                       unsigned char *dig);
 

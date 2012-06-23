@@ -334,7 +334,7 @@ int main(int argc, char **argv)
 
 /* trap the following signals to restore the terminal state */
 
-#ifdef UNIX
+#if defined(HAVE_POSIX_SYS)
     SC_signal_n(SIGSEGV, error_handler, NULL);
     SC_signal_n(SIGABRT, error_handler, NULL);
     SC_signal_n(SIGTERM, error_handler, NULL);

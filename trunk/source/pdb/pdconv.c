@@ -10,18 +10,6 @@
 
 #include "pdb_int.h"
 
-enum e_PD_conv_type
-   {SHORT,
-    INTEGER,
-    LONG,
-    FLOAT,
-    DOUBLE,
-    CHAR,
-    POINTER,
-    NTYPES};
-
-typedef enum e_PD_conv_type PD_conv_type;
-
 #define ITA2_FIGS  0x1B       /* FIGS character (11011) */
 #define ITA2_LTRS  0x1F       /* LTRS character (11111) */
 
@@ -748,18 +736,18 @@ static void _PD_bin_text(char **out, char **in, char *typ, inti ni,
     if (kndi == CHAR_KIND)
        {nb = ni*nbi;
 	if (delim == NULL)
-	   {snprintf(fmt, MAXLINE, "%%-%llds", (long long) nb);
+	   {snprintf(fmt, MAXLINE, "%%-%ss", SC_itos(NULL, 0, nb, NULL));
 	    nc = nb;}
 	else
 	   {ne = strlen(lin);
 	    ne = min(ne, nb);
 	    nc = ne + strlen(delim) + 2;
 	    if (strchr(lin, '\'') == NULL)
-	       snprintf(fmt, MAXLINE, "'%%-%llds'%s",
-			(long long) ne, delim);
+	       snprintf(fmt, MAXLINE, "'%%-%ss'%s",
+			SC_itos(NULL, 0, ne, NULL), delim);
 	    else
-	       snprintf(fmt, MAXLINE, "\"%%-%llds\"%s",
-			(long long) ne, delim);};
+	       snprintf(fmt, MAXLINE, "\"%%-%ss\"%s",
+			SC_itos(NULL, 0, ne, NULL), delim);};
 	snprintf(lout, nc+1, fmt, lin);
 
 	*in  += nb;

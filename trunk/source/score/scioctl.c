@@ -800,7 +800,7 @@ int SC_isblocked_fd(int fd)
 
     status = 0;
 
-#ifdef UNIX
+#if defined(HAVE_POSIX_SYS)
     status = fcntl(fd, F_GETFL, status);
     status = ((status & O_NDELAY) == 0);
 #endif
@@ -846,7 +846,7 @@ int SC_unblock_fd(int fd)
 
     status = 0;
 
-#ifdef UNIX
+#if defined(HAVE_POSIX_SYS)
     status = fcntl(fd, F_GETFL, status);
     status = fcntl(fd, F_SETFL, status | O_NDELAY);
     if (status == -1)
@@ -896,7 +896,7 @@ int SC_block_fd(int fd)
 
     status = 0;
 
-#ifdef UNIX
+#if defined(HAVE_POSIX_SYS)
     status = fcntl(fd, F_GETFL, status);
     status = fcntl(fd, F_SETFL, status & ~O_NDELAY);
     if (status == -1)
@@ -942,7 +942,7 @@ int SC_fd_flags(int fd)
 
     status = 0;
 
-#ifdef UNIX
+#if defined(HAVE_POSIX_SYS)
     status = fcntl(fd, F_GETFL, status);
 #endif
 

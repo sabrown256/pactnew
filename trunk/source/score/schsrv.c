@@ -961,7 +961,7 @@ int SC_hostname(char *s, int nc)
 	if (p != NULL)
 	   *p = '\0';}
 
-#if defined(UNIX)
+#if defined(HAVE_POSIX_SYS)
     else
        {struct utsname uts;
 
@@ -991,7 +991,7 @@ int SC_hosttype(char *s, int nc, char *x)
     if (x != NULL)
        st = SC_execs(s, nc, NULL, -1, x);
 
-#if defined(UNIX)
+#if defined(HAVE_POSIX_SYS)
     else
        {struct utsname uts;
 

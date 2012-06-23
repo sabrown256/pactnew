@@ -47,10 +47,8 @@ extern char
 extern int
  strcasecmp(const char *a, const char *b);
 
-/*
 extern int
  sched_yield(void);
-*/
 
 #endif
 

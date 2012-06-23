@@ -206,6 +206,7 @@ fcontainer *SC_open_fcontainer(char *name, SC_file_type type,
 char **SC_fcontainer_list(fcontainer *cf, int full)
    {int ne;
     long i, n;
+    char ta[MAXLINE], tb[MAXLINE];
     char s[MAXLINE], tm[MAXLINE];
     char **rv, *pt;
     hasharr *tab;
@@ -226,9 +227,11 @@ char **SC_fcontainer_list(fcontainer *cf, int full)
 	        {SC_strncpy(tm, MAXLINE, ctime(&te->date), -1);
 		 pt = tm + 4;
 		 SC_LAST_CHAR(pt) = '\0';
-		 snprintf(s, MAXLINE, "%s %d/%d %8lld %s %8lld %s",
-			  te->perm, te->uid, te->gid, (long long) te->size,
-			  pt, (long long) te->address, te->name);}
+		 SC_itos(ta, MAXLINE, te->size, "%8lld");
+		 SC_itos(tb, MAXLINE, te->address, "%8lld");
+		 snprintf(s, MAXLINE, "%s %d/%d %s %s %s %s",
+			  te->perm, te->uid, te->gid, ta,
+			  pt, tb, te->name);}
 	     else
 	        SC_strncpy(s, MAXLINE, te->name, -1);
 

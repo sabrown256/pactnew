@@ -181,20 +181,20 @@ char *PD_dereference(char *s)
 /* _PD_INDEX_STR - conver the triple IND to a string and return it in S */
 
 static void _PD_index_str(char *s, int nc, inti *ind)
-   {long long start, stop, step;
+   {int i;
+    char t[3][MAXLINE];
 
-   start = ind[0];
-   stop  = ind[1];
-   step  = ind[2];
+    for (i = 0; i < 3; i++)
+        SC_itos(t[i], MAXLINE, ind[i], NULL);
 
-   if (start == stop)
-      SC_vstrcat(s, nc, "%lld,", start);
+   if (ind[0] == ind[2])
+      SC_vstrcat(s, nc, "%s,", t[0]);
 
-   else if (step <= 1L)
-      SC_vstrcat(s, nc, "%lld:%lld,", start, stop);
+   else if (ind[1] <= 1L)
+      SC_vstrcat(s, nc, "%s:%s,", t[0], t[2]);
             
    else
-      SC_vstrcat(s, nc, "%lld:%lld:%lld,", start, stop, step);
+      SC_vstrcat(s, nc, "%s:%s:%s,", t[0], t[2], t[1]);
 
    return;}
 
@@ -877,8 +877,8 @@ int64_t _PD_annotate_text(PDBfile *file, syment *ep, char *name,
        {ni  = PD_entry_number(ep);
 	typ = PD_entry_type(ep);
 	if (ni > 1)
-	   snprintf(s, MAXLINE, "\n# %s %s[%lld]\n",
-		    typ, name, (long long) ni);
+	   snprintf(s, MAXLINE, "\n# %s %s[%s]\n",
+		    typ, name, SC_itos(NULL, 0, ni, NULL));
 	else
 	   snprintf(s, MAXLINE, "\n# %s %s\n", typ, name);
 

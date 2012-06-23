@@ -31,8 +31,7 @@ typedef PROCESS *(*PFPPROC)(char **argv, char *mode, int type);
 SC_scope_proc
  _SC_ps = { -1, FALSE, NULL };
 
-/* #if defined(UNIX) */
-#if 1
+#if defined(HAVE_POSIX_SYS)
 
 #ifdef HAVE_PROCESS_CONTROL
 
