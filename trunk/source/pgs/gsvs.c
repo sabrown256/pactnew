@@ -55,7 +55,7 @@ get_view_surface(vsptr)
        {io_printf(stderr, "GET_VIEW_SURFACE: CAN'T OPEN %s\n", dev);
         return(FALSE);};
 
-    if (SYS_IOCTL(fd, FBIOGTYPE, &fbtype) == -1)
+    if (ioctl(fd, FBIOGTYPE, &fbtype) == -1)
        {io_printf(stderr, "GET_VIEW_SURFACE: IOCTL FBIOGTYPE FAILED ON %s\n",
 		  dev);
         close(fd);

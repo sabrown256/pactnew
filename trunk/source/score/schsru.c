@@ -68,7 +68,7 @@ static int _SC_exec_cmd(char **cmd, char *sys,
     sa = SC_get_host_list(sys, exc-1);
 
     if (notme == TRUE)
-       {SYS_GETHOSTNAME(hst, MAXLINE);
+       {gethostname(hst, MAXLINE);
 	SC_ptr_arr_len(n, sa);
 	for (i = 0; i < n; i++)
 	    {if (strcmp(sa[i], hst) == 0)

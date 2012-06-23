@@ -397,10 +397,10 @@ int main(int argc, char **argv)
 
     if (info == TRUE)
        {PRINT(stdout, "\n");
-	PRINT(stdout, "  ppid(%d)", SYS_GETPPID());
-	PRINT(stdout, "  ptid(%d)", SYS_TCGETPGRP(0));
-	PRINT(stdout, "  pgid(%d)", SYS_GETPGRP());
-	PRINT(stdout, "  pid(%d)",  SYS_GETPID());
+	PRINT(stdout, "  ppid(%d)", getppid());
+	PRINT(stdout, "  ptid(%d)", tcgetpgrp(0));
+	PRINT(stdout, "  pgid(%d)", getpgrp());
+	PRINT(stdout, "  pid(%d)",  getpid());
 	PRINT(stdout, "  background(%d)", SC_is_background_process(-1));
 	PRINT(stdout, "\n");};
 

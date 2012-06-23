@@ -566,7 +566,7 @@ static int SC_set_fd_async_streams(int fd, int state)
 
         arg = 0;
 
-	status = SYS_IOCTL(fd, I_GETSIG, &arg);
+	status = ioctl(fd, I_GETSIG, &arg);
 	if (status < 0)
 	   arg = 0;
 
@@ -575,7 +575,7 @@ static int SC_set_fd_async_streams(int fd, int state)
 	else
 	   na = arg & ~(S_INPUT | S_HIPRI);
 
-	status = SYS_IOCTL(fd, I_SETSIG, na);
+	status = ioctl(fd, I_SETSIG, na);
 	if (status < 0)
 	   SC_error(-1, "SETSIG IOCTL FAILED (%s) - SC_SET_FD_ASYNC_STREAMS",
 		    strerror(errno));
@@ -616,7 +616,7 @@ int SC_set_fd_async_fasync(int fd, int state, int pid)
     if (SC_gs.io_interrupts_on)
 
 /* get the control flag */
-       {arg = SYS_FCNTL(fd, F_GETFL);
+       {arg = fcntl(fd, F_GETFL);
 	if (arg == -1)
 	   SC_error(-1, "GETFL FCNTL FAILED - SC_SET_FD_ASYNC_FASYNC");
 
@@ -627,7 +627,7 @@ int SC_set_fd_async_fasync(int fd, int state, int pid)
 	   arg &= ~FASYNC;
 
 /* set the control flag */
-	status = SYS_FCNTL(fd, F_SETFL, arg);
+	status = fcntl(fd, F_SETFL, arg);
 	if (status == -1)
 	   SC_error(-1, "SETFL FCNTL FAILED - SC_SET_FD_ASYNC_FASYNC");
 
@@ -640,10 +640,10 @@ int SC_set_fd_async_fasync(int fd, int state, int pid)
 /* restrict SIGIO only to me - NOT to my process group */
 	if (rstrct)
 	   {if (pid == -1)
-	       pid = SYS_GETPID();
+	       pid = getpid();
 
 	    if (pid > 0)
-	       status = SYS_FCNTL(fd, F_SETOWN, pid);};
+	       status = fcntl(fd, F_SETOWN, pid);};
 
 /* set the signal handler */
 	if (state)
@@ -801,7 +801,7 @@ int SC_isblocked_fd(int fd)
     status = 0;
 
 #ifdef UNIX
-    status = SYS_FCNTL(fd, F_GETFL, status);
+    status = fcntl(fd, F_GETFL, status);
     status = ((status & O_NDELAY) == 0);
 #endif
 
@@ -847,8 +847,8 @@ int SC_unblock_fd(int fd)
     status = 0;
 
 #ifdef UNIX
-    status = SYS_FCNTL(fd, F_GETFL, status);
-    status = SYS_FCNTL(fd, F_SETFL, status | O_NDELAY);
+    status = fcntl(fd, F_GETFL, status);
+    status = fcntl(fd, F_SETFL, status | O_NDELAY);
     if (status == -1)
        status = FALSE;
     else
@@ -897,8 +897,8 @@ int SC_block_fd(int fd)
     status = 0;
 
 #ifdef UNIX
-    status = SYS_FCNTL(fd, F_GETFL, status);
-    status = SYS_FCNTL(fd, F_SETFL, status & ~O_NDELAY);
+    status = fcntl(fd, F_GETFL, status);
+    status = fcntl(fd, F_SETFL, status & ~O_NDELAY);
     if (status == -1)
        status = FALSE;
     else
@@ -943,7 +943,7 @@ int SC_fd_flags(int fd)
     status = 0;
 
 #ifdef UNIX
-    status = SYS_FCNTL(fd, F_GETFL, status);
+    status = fcntl(fd, F_GETFL, status);
 #endif
 
     return(status);}

@@ -144,7 +144,7 @@ static char *_SC_nth_ctime(const time_t *t, char *s, int sz)
 static char *_SC_nth_ttyname(int fd, char *name, size_t sz)
    {
 
-    SC_strncpy(name, sz, SYS_TTYNAME(fd), -1);
+    SC_strncpy(name, sz, ttyname(fd), -1);
 
     return(name);}
 

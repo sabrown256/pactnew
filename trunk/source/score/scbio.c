@@ -1473,7 +1473,7 @@ static int _SC_bflush(FILE *fp)
 
     ret = _SC_bio_flush(bid);
 
-    st = SYS_FSYNC(bid->fd);
+    st = fsync(bid->fd);
 
     SC_ASSERT(st != 0);
 

@@ -8,7 +8,7 @@ run analyze/rpath gnu
 
 setenv NM /usr/bin/i686-w64-mingw32-nm
 
-USE_GNU_MAKE = TRUE
+GnuMakeOpt   = TRUE
 WARN_PATTERN = ":+sp+warning:"
 ERR_PATTERN  = ":+sp+error:"
 

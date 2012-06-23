@@ -127,7 +127,7 @@ static PROCESS *ps_diff_open(char *f, int off, int side)
 /* ignore SIGCHLD for the system call */
     hnd = SC_signal_n(SIGCHLD, SIG_IGN, NULL);
 
-    pid = SYS_GETPID();
+    pid = getpid();
     rn = SC_dsnprintf(TRUE, ".Xres-%d", pid);
     fp = io_open(rn, "w");
 

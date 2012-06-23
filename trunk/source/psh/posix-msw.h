@@ -11,6 +11,11 @@
 #ifndef PCK_POSIX_MSW
 #define PCK_POSIX_MSW
 
+/* to the extent that these routines emulate the
+ * POSIX routines we need this is a POSIX system
+ */
+#define HAVE_POSIX_SYS
+
 #undef byte
 
 #include <ws2tcpip.h>

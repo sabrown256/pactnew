@@ -117,7 +117,7 @@ static int _SC_state_log(parstate *state, char *fmt, ...)
 
     ifl = (strcmp(fmt, "server> init(%d)") == 0);
     if (ifl == TRUE)
-       {SYS_GETHOSTNAME(chst, MAXLINE);
+       {gethostname(chst, MAXLINE);
 
 	msg = SC_dsnprintf(TRUE, "Host: %s\n", chst);
 	SC_array_string_add(state->log, msg);

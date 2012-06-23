@@ -10,6 +10,7 @@
 run analyze/rpath -a /usr/X11R6/${LIB}:/usr/${LIB}
 run analyze/rpath pgi
 
+GnuMakeOpt   = TRUE
 WARN_PATTERN = "PGFTN-W- PGF90-W- PGC-W-"
 ERR_PATTERN  = "PGFTN-S- PGF90-S- PGC-S- PGC-F-"
 

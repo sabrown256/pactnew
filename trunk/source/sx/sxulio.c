@@ -1355,7 +1355,7 @@ object *SX_write_data(SS_psides *si, object *argl)
 void SX_cache_addpid() 
    {
 
-    snprintf(_SX.cache_filename, 32, "curves-%d.a", (int) SYS_GETPID());
+    snprintf(_SX.cache_filename, 32, "curves-%d.a", (int) getpid());
    
     return;}
 
