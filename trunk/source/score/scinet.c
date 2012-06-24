@@ -171,7 +171,7 @@ struct sockaddr_in *_SC_tcp_address(char *host, int port)
 
     ad = NULL;
 
-#ifdef HAVE_PROCESS_CONTROL
+#if defined(HAVE_POSIX_SYS)
 
     in_addr_t haddr;
 
@@ -235,7 +235,8 @@ struct sockaddr_in *_SC_tcp_bind(int fd, int port)
 
     ad = NULL;
 
-#ifdef HAVE_PROCESS_CONTROL
+#if defined(HAVE_POSIX_SYS)
+
     int ok, sasz;
 
     ad = CMAKE(struct sockaddr_in);
@@ -277,7 +278,7 @@ struct sockaddr_in *_SC_tcp_bind(int fd, int port)
 static void _SC_tcp_acceptor(int fd, int mask, void *a)
    {
 
-#ifdef HAVE_PROCESS_CONTROL
+#if defined(HAVE_POSIX_SYS)
 
     int nfd, pi;
     socklen_t sasz;
@@ -322,7 +323,8 @@ int _SC_tcp_serve(int fd, struct sockaddr_in *ad, void *a,
 
     ok = -1;
 
-#ifdef HAVE_PROCESS_CONTROL
+#if defined(HAVE_POSIX_SYS)
+
     int pi;
     SC_evlpdes *pe;
     tcp_loop lp;
@@ -368,7 +370,8 @@ int _SC_tcp_accept_connection(int fd, struct sockaddr_in *ad)
     
     nfd = -1;
 
-#ifdef HAVE_PROCESS_CONTROL
+#if defined(HAVE_POSIX_SYS)
+
     int err;
     socklen_t sasz;
     struct sockaddr *sa;
@@ -406,7 +409,8 @@ static int _SC_connect_to(int fd, struct sockaddr *addr, socklen_t ln,
 
     ok = -1;
 
-#ifdef HAVE_PROCESS_CONTROL
+#if defined(HAVE_POSIX_SYS)
+
     int blck, nrdy, dt, ta, sz, rv;
     SC_poll_desc pd;
 
@@ -472,7 +476,7 @@ int _SC_tcp_connect(char *host, int port, int to, int fm)
 
     fd = -1;
 
-#ifdef HAVE_PROCESS_CONTROL
+#if defined(HAVE_POSIX_SYS)
 
     int ok;
 

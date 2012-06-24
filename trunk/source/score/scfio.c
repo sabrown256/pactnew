@@ -479,7 +479,8 @@ size_t _SC_fwrite(void *s, size_t bpi, size_t ni, FILE *fp)
 
 	    st = fseek(fp, addr, SEEK_SET);
 	    if (st < 0)
-	       io_error(errno, "fseek to %lld failed", (long long) addr);
+	       io_error(errno, "fseek to %s failed",
+			SC_itos(NULL, 0, addr, NULL));
 
 	    nr = _SC_fread(t, bpi, ni, fp);
 
@@ -497,7 +498,8 @@ size_t _SC_fwrite(void *s, size_t bpi, size_t ni, FILE *fp)
 	       {nw = 0;
 		st = fseek(fp, addr, SEEK_SET);
 		if (st < 0)
-		   io_error(errno, "fseek to %lld failed", (long long) addr);};
+		   io_error(errno, "fseek to %s failed",
+			    SC_itos(NULL, 0, addr, NULL));};
 
 	    CFREE(t);};}
 
@@ -535,8 +537,8 @@ char *SC_fgets(char *s, int n, FILE *fp)
 
 	    nbr = fread(s, 1, nc, fp);
 	    if (nbr < 0)
-	       io_error(errno, "fread of %lld bytes failed",
-			(long long) nc);
+	       io_error(errno, "fread of %s bytes failed",
+			SC_itos(NULL, 0, nc, NULL));
 
 	    if (nbr < nc)
 	       s[nbr] = '\0';
@@ -551,8 +553,8 @@ char *SC_fgets(char *s, int n, FILE *fp)
 		nb = min(nb, nbr);
 		st = fseek(fp, pos + nb, SEEK_SET);
 		if (st < 0)
-		   io_error(errno, "fseek to %lld failed",
-			    (long long) (pos + nb));};
+		   io_error(errno, "fseek to %s failed",
+			    SC_itos(NULL, 0, pos + nb, NULL));};
        
 	    r = (nbr > 0) ? s : NULL;};
 
@@ -1594,7 +1596,9 @@ static int _SC_lfseek(FILE *fp, int64_t offs, int whence)
 #endif
 
     if (rv < 0)
-       io_error(errno, "fseek to %lld failed", (long long) offs);
+       io_error(errno, "fseek to %s failed",
+		SC_itos(NULL, 0, offs, NULL));
+
 
     return(rv);}
 
@@ -1764,7 +1768,8 @@ int io_seek(FILE *fp, long offs, int whence)
        {if (IS_STD_IO(fp))
 	   {rv = fseek(fp, offs, whence);
 	    if (rv < 0)
-	       io_error(errno, "fseek to %lld failed", (long long) offs);}
+	       io_error(errno, "fseek to %s failed",
+			SC_itos(NULL, 0, offs, NULL));}
 
         else
 	   {fid = (file_io_desc *) fp;
@@ -2680,7 +2685,8 @@ int64_t SC_file_size(FILE *fp)
 /* return to where we started */
     st = fseek(fp, ad, SEEK_SET);
     if (st < 0)
-       io_error(errno, "fseek to %lld failed", (long long) ad);
+       io_error(errno, "fseek to %s failed",
+		SC_itos(NULL, 0, ad, NULL));
 
     return(ln);}
  
@@ -2736,7 +2742,8 @@ ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
     if ((blk == FALSE) || (isatty(fd) == TRUE))
        {rv = read(fd, bf, n);
 	if (rv < 0)
-	   io_error(errno, "read of %lld bytes on %d failed", (long long) n, fd);}
+	   io_error(errno, "read of %s bytes on %d failed",
+		    SC_itos(NULL, 0, n, NULL), fd);}
 
 /* blocking read - insist on the specified number of bytes or an error */
     else
@@ -2748,7 +2755,8 @@ ssize_t SC_read_sigsafe(int fd, void *bf, size_t n)
 	while ((nbo > 0) && (nbr != 0))
 	   {nbr = read(fd, pbf, nbo);
 	    if (nbr < 0)
-	       {io_error(errno, "read of %lld on %d failed", (long long) nbo, fd);
+	      {io_error(errno, "read of %s on %d failed",
+			SC_itos(NULL, 0, nbo, NULL), fd);
                 rv = nbr;
 		break;};
 	    pbf += nbr;
@@ -2793,8 +2801,8 @@ ssize_t SC_write_sigsafe(int fd, void *bf, size_t n)
 /* if EAGAIN/EWOULDBLOCK try sleeping 10 ms to let the system catch up
  * limit the number of attempts to 10
  */
-	    io_error(err, "write of %lld bytes on %d failed",
-		     (long long) nbo, fd);
+	    io_error(err, "write of %s bytes on %d failed",
+		     SC_itos(NULL, 0, nbo, NULL), fd);
 
 	    if (err == EAGAIN)
                {SC_sleep(10);
@@ -2828,8 +2836,8 @@ static size_t _SC_fread_safe(void *s, size_t bpi, size_t ni, FILE *fp)
     while ((ns > 0) && (zc < 10))
        {n = fread(ps, bpi, ns, fp);
 	if (ferror(fp) != 0)
-	   {io_error(errno, "fread of %lld bytes failed",
-		     (long long) (bpi*ns));
+	   {io_error(errno, "fread of %s bytes failed",
+		     SC_itos(NULL, 0, bpi*ns, NULL));
 	    clearerr(fp);
 	    SC_sleep(10);};
 
@@ -2892,8 +2900,8 @@ size_t SC_fwrite_sigsafe(void *s, size_t bpi, size_t ni, FILE *fp)
     while ((ns > 0) && (zc < 10))
        {n = fwrite(ps, bpi, ns, fp);
 	if (ferror(fp) != 0)
-	   {io_error(errno, "fwrite of %lld bytes failed",
-		     (long long) (bpi*ns));
+	   {io_error(errno, "fwrite of %s bytes failed",
+		     SC_itos(NULL, 0, bpi*ns, NULL));
 	    clearerr(fp);
 	    SC_sleep(10);};
 

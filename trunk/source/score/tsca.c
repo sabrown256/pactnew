@@ -38,7 +38,8 @@ static int run_test(int n, PFInt tst)
 
     d = da - db;
 
-    io_printf(STDOUT, "\t\t\t%2d\t%8lld\t%.2f\n", n, (long long) d, time);
+    io_printf(STDOUT, "\t\t\t%2d\t%8s\t%.2f\n",
+	      n, SC_itos(NULL, 0, d, "%8lld"), time);
 
     sc = SC_mem_monitor(sc, debug, "A", msg);
 

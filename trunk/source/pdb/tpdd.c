@@ -91,8 +91,9 @@ static void show_stat(statedes *st, char *tag)
        {rs = st->sz[i]/st->sz[ir];
 	rt = tref/tave;};
 
-    printf("\t%-14s %10lld %10.2e %8.2f %10.2e %9.2e\n",
-	   tag, (long long) st->n, 1.0e-3*st->sz[i], rs, tave, rt);
+    printf("\t%-14s %10s %10.2e %8.2f %10.2e %9.2e\n",
+	   tag, SC_itos(NULL, 0, st->n, "%10lld"),
+	   1.0e-3*st->sz[i], rs, tave, rt);
 
     return;}
 

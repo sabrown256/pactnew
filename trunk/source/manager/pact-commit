@@ -10,6 +10,8 @@
 
 unalias *
 
+@ err = 0
+
 set MngDir  = $cwd
 set BaseDir = $MngDir:h
 set ScrDir  = $BaseDir/scripts
@@ -209,8 +211,9 @@ source $MngDir/pact-scs
 if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOnly == FALSE) && ($SccOnly == FALSE) && ($TagOnly == FALSE)) then
    NoteD $Log -n "   Syncing sources ... "
    flog $Log ./dsys sync
-   flog $Log set LStat = $status
-   if ($LStat != 0) then
+   flog $Log set xstatus = $status
+   flog $Log @ err = $err + $xstatus
+   if ($xstatus != 0) then
       $ScrDir/scs-lock unlock
       NoteD $Log ""
       NoteD $Log "Your version failed to sync sources"
@@ -224,8 +227,9 @@ if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOn
    if ($CleanBuild == TRUE) then
       NoteD $Log -n "   Removing binaries ... "
       flog $Log ./dsys remove
-      flog $Log set LStat = $status
-      if ($LStat != 0) then
+      flog $Log set xstatus = $status
+      flog $Log @ err = $err + $xstatus
+      if ($xstatus != 0) then
          $ScrDir/scs-lock unlock
          NoteD $Log ""
          NoteD $Log "Your binaries could not be removed"
@@ -239,8 +243,9 @@ if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOn
 
    NoteD $Log -n "   Building ... "
    flog $Log ./dsys build $Args
-   flog $Log set LStat = $status
-   if ($LStat != 0) then
+   flog $Log set xstatus = $status
+   flog $Log @ err = $err + $xstatus
+   if ($xstatus != 0) then
       $ScrDir/scs-lock unlock
       NoteD $Log ""
       NoteD $Log "Your version failed to build after syncing"
@@ -285,13 +290,16 @@ Note $Lock $Message
 if (($ManOnly == FALSE) && ($DocOnly == FALSE) && ($ScrOnly == FALSE) && ($PshOnly == FALSE) && ($SccOnly == FALSE) && ($TagOnly == FALSE)) then
    Note $Lock -n "Testing ................... "
    ftee $Log ./dsys test $Args
-   if ($status != 0) then
+   grep "All tests passed" $Log >& /dev/null
+   flog $Log set xstatus = $status
+   flog $Log @ err = $err + $xstatus
+   if ($xstatus != 0) then
       $ScrDir/scs-lock unlock
       NoteD $Log ""
       NoteD $Log "Your version failed the test suite"
       NoteD $Log "All tests must pass before the commit will be allowed"
       NoteD $Log ""
-      exit(1)
+      exit($xstatus)
    endif
    Note $Lock "done"
 endif
@@ -360,10 +368,12 @@ if ($TagOnly == FALSE) then
    Note $UpdateLog "Host: $Host           Date: `date`"
    Note $UpdateLog ""
    flog $Log ($ScrDir/scs-update >> $UpdateLog)
-   if ($status != 0) then
+   flog $Log set xstatus = $status
+   flog $Log @ err = $err + $xstatus
+   if ($xstatus != 0) then
       $ScrDir/scs-lock unlock
       NoteD $Log "$SCSExe UPDATE FAILED"
-      exit($status)
+      exit($xstatus)
    endif
    NoteD $Log "Local PACT Sources Checked"
    Note $Lock "done"
@@ -412,11 +422,13 @@ if ($TagOnly == TRUE) then
 
    echo > $TmpMsg
    flog $Log $SCSCom -m 'Tagging repository'
-   if ($status != 0) then
+   flog $Log set xstatus = $status
+   flog $Log @ err = $err + $xstatus
+   if ($xstatus != 0) then
       flog $Log rm -f $TmpMsg
       $ScrDir/scs-lock unlock
       NoteD $Log "Commit FAILED"
-      exit(1)
+      exit($xstatus)
    endif
    flog $Log rm -f $TmpMsg
 
@@ -430,10 +442,12 @@ else
    Note $Lock -n "Committing PACT Sources ... "
    if ($MsgFile == "" ) then
         flog $Log $SCSCom -m "$Message"
-        if ($status != 0) then
+        flog $Log set xstatus = $status
+        flog $Log @ err = $err + $xstatus
+        if ($xstatus != 0) then
            $ScrDir/scs-lock unlock
            NoteD $Log "Commit FAILED"
-           exit(1)
+           exit($xstatus)
         endif
    else
         flog $Log rm -f $TmpMsg
@@ -441,11 +455,13 @@ else
         cat $MsgFile >> $TmpMsg
 
         flog $Log $SCSCom -F $TmpMsg
-        if ($status != 0) then
+        flog $Log set xstatus = $status
+        flog $Log @ err = $err + $xstatus
+        if ($xstatus != 0) then
            flog $Log rm -f $TmpMsg
            $ScrDir/scs-lock unlock
            NoteD $Log "Commit FAILED"
-           exit(1)
+           exit($xstatus)
         endif
         flog $Log rm -f $TmpMsg
    endif
@@ -532,7 +548,7 @@ NoteD $Log "PACT Repository Updated"
 NoteD $Log "See the file $Log for more detail."
 NoteD $Log ""
 
-exit($status)
+exit($err)
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

@@ -250,10 +250,10 @@ char *SS_get_string(object *obj)
        strcpy(_SS.str, obj->print_name);
       
     else if (SS_integerp(obj))
-       snprintf(_SS.str, MAXLINE, "%lld", (long long) SS_INTEGER_VALUE(obj));
+       SC_itos(_SS.str, MAXLINE, SS_INTEGER_VALUE(obj), NULL);
 
     else if (SS_floatp(obj))
-       snprintf(_SS.str, MAXLINE, "%g", SS_FLOAT_VALUE(obj));
+       SC_ftos(_SS.str, MAXLINE, SS_FLOAT_VALUE(obj), "%Lg");
 
     else if (SS_nullobjp(obj))
         strcpy(_SS.str, "nil");

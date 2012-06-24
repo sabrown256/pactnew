@@ -81,7 +81,7 @@ static int _PD_fcseek(FILE *fp, int64_t addr, int offset)
 
     ret = fseek(fl, ada, SEEK_SET);
     if (ret < 0)
-       io_error(errno, "fseek to %lld failed", (long long) ada);
+       io_error(errno, "fseek to %s failed", SC_itos(NULL, 0, ada, NULL));
 
     return(ret);}
 
@@ -117,8 +117,8 @@ static u_int64_t _PD_fcread(void *p, size_t sz, u_int64_t ni, FILE *fp)
 
     rv = fread(p, sz, ni, fl);
     if (ferror(fl))
-       {io_error(errno, "fread of %lld bytes failed",
-		 (long long) (sz*ni));
+       {io_error(errno, "fread of %s bytes failed",
+		 SC_itos(NULL, 0, sz*ni, NULL));
 	clearerr(fl);};
 
     return(rv);}
@@ -138,8 +138,8 @@ static u_int64_t _PD_fcwrite(void *p, size_t sz, u_int64_t ni, FILE *fp)
 
     rv = fwrite(p, sz, ni, fl);
     if (rv < 0)
-       io_error(errno, "fwrite of %lld bytes failed",
-		(long long) (sz*ni));
+       io_error(errno, "fwrite of %s bytes failed",
+		 SC_itos(NULL, 0, sz*ni, NULL));
 
     return(rv);}
 
@@ -357,13 +357,14 @@ FILE *_PD_open_container_file(char *name, char *mode)
  */
 
 PDBfile *PD_open_contained(char *name, int64_t sad, int64_t ead)
-   {char fname[MAXLINE];
+   {char t[3][MAXLINE];
     PDBfile *fp;
 
-    snprintf(fname, MAXLINE, "%s~%lld:%lld", name,
-	     (long long) sad, (long long) ead);
+    SC_itos(t[0], MAXLINE, sad, NULL);
+    SC_itos(t[0], MAXLINE, ead, NULL);
+    snprintf(t[2], MAXLINE, "%s~%s:%s", name, t[0], t[1]);
 
-    fp = PD_open(fname, "r");
+    fp = PD_open(t[2], "r");
 
     return(fp);}
 

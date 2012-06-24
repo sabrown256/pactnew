@@ -103,7 +103,7 @@ static int _PC_setup_children(char **argv, char *mode)
     char **args, s[MAXLINE], host[MAXLINE];
     PROCESS *pp;
 
-#ifdef HAVE_PROCESS_CONTROL
+#if defined(HAVE_POSIX_SYS)
 
     gethostname(host, MAXLINE);
     port = PC_init_server(SC_GET_PORT, FALSE);
@@ -276,10 +276,11 @@ static int _PC_get_msg(int i)
 	       {fprintf(_PC_diag, "   Read");
 		fflush(_PC_diag);};
 
-	    PC_printf(pi, "%lld,%s\n", (long long ) ni, type);
+	    PC_printf(pi, "%s,%s\n", SC_itos(NULL, 0, ni, NULL), type);
 
 	    if (_SC_ps.debug)
-	       {fprintf(_PC_diag, " Put(%lld,%s)", (long long) ni, type);
+	       {fprintf(_PC_diag, " Put(%s,%s)",
+			SC_itos(NULL, 0, ni, NULL), type);
 		fflush(_PC_diag);};
 
 	    bpi = PN_sizeof(type, pf->host_chart);
@@ -290,15 +291,16 @@ static int _PC_get_msg(int i)
                 if (nbe < 0)
                    continue;
 		else if (_SC_ps.debug)
-		   {fprintf(_PC_diag, ".%lld", (long long) nbe);
+		   {fprintf(_PC_diag, ".%s", SC_itos(NULL, 0, nbe, NULL));
 		    fflush(_PC_diag);};
 
 		pbf += nbe;
 		nbo -= nbe;};
 
 	    if (_SC_ps.debug)
-	       {fprintf(_PC_diag, " Sent(%lld,%s,%d)\n",
-			(long long ) (ni - nbo/bpi), type, i);
+	       {fprintf(_PC_diag, " Sent(%s,%s,%d)\n",
+			SC_itos(NULL, 0, ni - nbo/bpi, NULL),
+			type, i);
 		fflush(_PC_diag);};
 
             PC_pop_message(i);
@@ -327,8 +329,8 @@ static int _PC_put_msg(PROCESS *pi, char *type, inti ni, int indx)
 	nbi = ni*bpi;
 	bf  = CMAKE_N(char, nbi);
 	if (_SC_ps.debug)
-	   {fprintf(_PC_diag, "   Write Get(%lld,%s,%d)",
-		    (long long) ni, type, pi->acpu);
+	   {fprintf(_PC_diag, "   Write Get(%s,%s,%d)",
+		    SC_itos(NULL, 0, ni, NULL), type, pi->acpu);
 	    fflush(_PC_diag);};
 
 	nbt = PC_buffer_data_out(pi, bf, nbi, TRUE);
@@ -337,8 +339,8 @@ static int _PC_put_msg(PROCESS *pi, char *type, inti ni, int indx)
 	PC_push_message(PC_procs.m + indx, indx, ni, type, bf);
 
 	if (_SC_ps.debug)
-	   {fprintf(_PC_diag, " Recv(%lld,%s,%d)\n",
-		    (long long) nir, type, indx);
+	   {fprintf(_PC_diag, " Recv(%s,%s,%d)\n",
+		    SC_itos(NULL, 0, nir, NULL), type, indx);
 	    fflush(_PC_diag);};
 
 	PC_printf(pi, "%d,%s,%d\n", nir, type, indx);};
@@ -451,7 +453,7 @@ static int _PC_get_message(int i)
 int PC_process_access(char **argv, char *mode)
    {int rv = FALSE;
 
-#ifdef HAVE_PROCESS_CONTROL
+#if defined(HAVE_POSIX_SYS)
 
     int i, n, rev, msgs, *nim;
 

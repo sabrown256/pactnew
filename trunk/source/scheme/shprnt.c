@@ -1133,10 +1133,10 @@ void SS_wr_atm(SS_psides *si, object *obj, object *strm)
        {s = t;
 
 	if (ityp == SC_INT_I)
-	   snprintf(t, MAXLINE, "%lld", (long long) SS_INTEGER_VALUE(obj));
+	   SC_itos(t, MAXLINE, SS_INTEGER_VALUE(obj), NULL);
 
 	else if (ityp == SC_FLOAT_I)
-	   snprintf(t, MAXLINE, "%g", SS_FLOAT_VALUE(obj));
+	   SC_ftos(t, MAXLINE, SS_FLOAT_VALUE(obj), "%Lg");
 
 	else if (ityp == SC_DOUBLE_COMPLEX_I)
           {double r, i;

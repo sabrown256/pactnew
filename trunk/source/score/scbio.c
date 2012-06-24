@@ -672,7 +672,7 @@ static int _SC_bio_seek(bio_desc *bid, int64_t offs, int wh)
 # endif
 
     if (ret < 0)
-       io_error(errno, "fseek to %lld failed", (long long) offs);
+       io_error(errno, "fseek to %s failed", SC_itos(NULL, 0, offs, NULL));
 
 #else
 
@@ -689,8 +689,8 @@ static int _SC_bio_seek(bio_desc *bid, int64_t offs, int wh)
 	if (sk == TRUE)
 	   {addr = lseek(bid->fd, offs, wh);
 	    if (addr < 0)
-	       io_error(errno, "lseek to %lld on %d failed",
-			(long long) offs, bid->fd);
+	       io_error(errno, "lseek to %s on %d failed",
+			SC_itos(NULL, 0, offs, NULL), bid->fd);
 	    bid->nhits[BIO_OPER_SEEK]++;};};
 
 #endif
@@ -730,8 +730,8 @@ static int _SC_verify_file(int fd, int64_t ad, int64_t nb, unsigned char *bf)
     cbf = CMAKE_N(unsigned char, nb);
     st  = lseek(fd, ad, SEEK_SET);
     if (st < 0)
-       io_error(errno, "lseek to %lld on %d failed",
-		(long long) ad, fd);
+       io_error(errno, "lseek to %s on %d failed",
+		SC_itos(NULL, 0, ad, NULL), fd);
 
 /* read the file contents */
     st = SC_read_sigsafe(fd, cbf, nb);
@@ -746,8 +746,8 @@ static int _SC_verify_file(int fd, int64_t ad, int64_t nb, unsigned char *bf)
 
     st = lseek(fd, rad, SEEK_SET);
     if (st < 0)
-       io_error(errno, "lseek to %lld on %d failed",
-		(long long) rad, fd);
+       io_error(errno, "lseek to %s on %d failed",
+		SC_itos(NULL, 0, rad, NULL), fd);
 
     CFREE(cbf);
 

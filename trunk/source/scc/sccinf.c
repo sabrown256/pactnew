@@ -1070,7 +1070,8 @@ void CC_expr_str(char *s, int nc, expr *e)
     if (e != NULL)
        {switch (e->cat)
            {case CC_INT :
-	         snprintf(s, nc, "int(%lld)", (long long) *(int64_t *) e->ptr);
+	         snprintf(s, nc, "int(%s)",
+			  SC_itos(NULL, 0, *(int64_t *) e->ptr, NULL));
 		 break;
 	    case CC_FLOAT :
 	         snprintf(s, nc, "float(%g)", *(double *) e->ptr);

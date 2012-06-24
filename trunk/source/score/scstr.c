@@ -1827,8 +1827,7 @@ long SC_strtol(char *str, char **ptr, int base)
  */
 
 char *SC_itos(char *s, int nc, long long n, char *fmt)
-   {char frm[MAXLINE];
-    static char bf[80];
+   {static char bf[80];
 
     if (s == NULL)
        {s  = bf;
@@ -1838,10 +1837,17 @@ char *SC_itos(char *s, int nc, long long n, char *fmt)
        fmt = "%lld";
 
 #if defined(MSW)
+
+    char frm[MAXLINE];
+
     fmt = SC_strsubst(frm, MAXLINE, fmt, "lld", "I64d", -1);
-#endif
+    snprintf(s, nc, fmt, n);
+
+#else
 
     snprintf(s, nc, fmt, n);
+
+#endif
 
     return(s);}
 
