@@ -1,0 +1,9 @@
+#!/bin/sh -f
+#
+# WINER - wrap WINE to control stderr for MSW cross compile execution
+#
+
+wine $@ 2> /dev/null
+
+exit $?
+

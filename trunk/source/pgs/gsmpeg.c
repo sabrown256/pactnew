@@ -10,7 +10,7 @@
 
 #include "scope_mpeg.h"     /* includes system headers */
 
-#if defined(UNIX)
+#if defined(HAVE_POSIX_SYS)
 
 #undef CMAKE
 #undef CMAKE_N

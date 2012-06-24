@@ -550,7 +550,7 @@ int pclose();
  * TYPE DEFINITIONS *
  *==================*/
 
-#if defined(UNIX)
+#if defined(HAVE_POSIX_SYS)
 typedef int boolean;
 #endif
 

@@ -12,7 +12,7 @@
 
 CROSS : wine {
 
-   Exe   = wine
+   Exe   = winer
    Flags = 
 
 }
