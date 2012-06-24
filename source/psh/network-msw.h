@@ -17,6 +17,9 @@ typedef unsigned long in_addr_t;
 #include <ws2tcpip.h>
 #include <winsock2.h>
 
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 extern int
  gethostname_msw(char *name, size_t len),
  socket_msw(int domain, int type, int protocol),
@@ -41,10 +44,10 @@ extern in_addr_t
 extern struct hostent
  *gethostbyname_msw(const char *name);
 
+/*--------------------------------------------------------------------------*/
 
 #ifndef NO_DEFINE_MSW_NETWORK_FUNCS
 
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* GETHOSTNAME_MSW - gethostname for MSW */
@@ -55,8 +58,6 @@ int gethostname_msw(char *name, size_t len)
     rv = -1;
 
     return(rv);}
-
-#define gethostname    gethostname_msw
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -70,8 +71,6 @@ int socket_msw(int domain, int type, int protocol)
 
     return(rv);}
 
-#define socket    socket_msw
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -83,8 +82,6 @@ u_int32_t htonl_msw(u_int32_t hostlong)
     rv = 0;
 
     return(rv);}
-
-#define htonl    htonl_msw
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -98,8 +95,6 @@ u_int16_t htons_msw(u_int16_t hostshort)
 
     return(rv);}
 
-#define htons    htons_msw
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -111,8 +106,6 @@ int bind_msw(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
     rv = -1;
 
     return(rv);}
-
-#define bind    bind_msw
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -126,8 +119,6 @@ int connect_msw(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 
     return(rv);}
 
-#define connect    connect_msw
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -140,8 +131,6 @@ int listen_msw(int sockfd, int backlog)
 
     return(rv);}
 
-#define listen    listen_msw
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -153,8 +142,6 @@ int getsockname_msw(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
     rv = -1;
 
     return(rv);}
-
-#define getsockname    getsockname_msw
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -169,8 +156,6 @@ int getsockopt_msw(int sockfd, int level, int optname,
 
     return(rv);}
 
-#define getsockopt    getsockopt_msw
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -182,8 +167,6 @@ int accept_msw(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
     rv = -1;
 
     return(rv);}
-
-#define accept    accept_msw
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -197,8 +180,6 @@ in_addr_t inet_addr_msw(const char *cp)
 
     return(rv);}
 
-#define inet_addr    inet_addr_msw
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -210,8 +191,6 @@ int gethost_msw(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
     rv = -1;
 
     return(rv);}
-
-#define gethost    gethost_msw
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -225,11 +204,24 @@ struct hostent *gethostbyname_msw(const char *name)
 
     return(rv);}
 
-#define gethostbyname    gethostbyname_msw
-
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 #endif
+
+/*--------------------------------------------------------------------------*/
+
+#define gethostname      gethostname_msw
+#define socket           socket_msw
+#define htonl            htonl_msw
+#define htons            htons_msw
+#define bind             bind_msw
+#define connect          connect_msw
+#define listen           listen_msw
+#define getsockname      getsockname_msw
+#define getsockopt       getsockopt_msw
+#define accept           accept_msw
+#define inet_addr        inet_addr_msw
+#define gethost          gethost_msw
+#define gethostbyname    gethostbyname_msw
 
 #endif

@@ -18,11 +18,12 @@
 
 #undef byte
 
-#define FLOAT FLOAT_MSW
-#define LONG  LONG_MSW
-#define INT   INT_MSW
-#define SHORT SHORT_MSW
-#define CHAR  CHAR_MSW
+#define FLOAT   FLOAT_MSW
+#define LONG    LONG_MSW
+#define INT     INT_MSW
+#define SHORT   SHORT_MSW
+#define CHAR    CHAR_MSW
+#define boolean boolean_msw
 
 #include <ws2tcpip.h>
 
@@ -41,6 +42,7 @@
 
 #include <windows.h>
 
+#undef boolean
 #undef TEXT
 #undef CHAR
 #undef SHORT
@@ -57,8 +59,9 @@
 /* NO_SHELL should be set for platforms lacking shell windows
  * this would include DOS and Windows
  */
-
+/*
 #define NO_SHELL
+*/
 
 #define directory_delim "\\"
 #define directory_delim_c '\\'

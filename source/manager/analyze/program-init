@@ -63,6 +63,13 @@ Group Shared {
 
 # define some groups for analysis
 
+# specifications for FPE patching
+Group FPE {
+   Exe    = gcc
+   Flags  = -g -Wall
+   Flags += -fPIC
+}
+
 # machine dependent graphics for PGS - e.g. X11
 Group MDG {
    Inc   = ""

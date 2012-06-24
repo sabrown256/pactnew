@@ -259,43 +259,40 @@ set LibVers = 1
     Note $STDOUT 'patch-fpe :'
 
     if ("$FPU" == "x87") then
+       set lcc = ( $FPE_Exe $FPE_Flags )
+
        Note $STDOUT '	@(cd ${PACTTmpDir} ; \'
-       if ($SYS_TYPE =~ cygwin*) then
-          Note $STDOUT '          echo "gcc -g -Wall -m'${Bits}' -c mlfpex86.c -o mlfpex86.o" ; \'
-          Note $STDOUT '          gcc -g -Wall -m'${Bits}' -I${IncDir} -c ${PACTSrcDir}/mlfpex86.c -o mlfpex86.o ; \'
-       else
-          Note $STDOUT '          echo "gcc -g -Wall -fPIC -c mlfpex86.c -o mlfpex86.o" ; \'
-          Note $STDOUT '          gcc -g -Wall -fPIC -I${IncDir} -c ${PACTSrcDir}/mlfpex86.c -o mlfpex86.o ; \'
-       endif
+       Note $STDOUT '          echo "'$lcc' -c mlfpex86.c -o mlfpex86.o" ; \'
+       Note $STDOUT '          '$lcc' -I${IncDir} -c ${PACTSrcDir}/mlfpex86.c -o mlfpex86.o ; \'
        Note $STDOUT '          ${AR} ${AROpt} ${TGTLib} mlfpex86.o 2> /dev/null ; \'
        Note $STDOUT '          ${RM} mlfpex86.o 2> /dev/null )'
+
     else if ("$FPU" == "ppc") then
-       Note $STDOUT '	@(cd ${PACTTmpDir} ; \'
+       set lcc = ( $FPE_Exe -g -Wall )
        if ($?Bits == 1) then
-          Note $STDOUT '          echo "gcc -g -Wall -m'${Bits}' -c mlfpeppc.c -o mlfpeppc.o" ; \'
-          Note $STDOUT '          gcc -g -Wall -m'${Bits}' -I${IncDir} -c ${PACTSrcDir}/mlfpeppc.c -o mlfpeppc.o ; \'
-       else
-          Note $STDOUT '          echo "gcc -g -Wall -c mlfpeppc.c -o mlfpeppc.o" ; \'
-          Note $STDOUT '          gcc -g -Wall -I${IncDir} -c ${PACTSrcDir}/mlfpeppc.c -o mlfpeppc.o ; \'
+          set lcc = ( $lcc -m$Bits )
        endif
+
+       Note $STDOUT '	@(cd ${PACTTmpDir} ; \'
+       Note $STDOUT '          echo "'$lcc' -c mlfpeppc.c -o mlfpeppc.o" ; \'
+       Note $STDOUT '          '$lcc' -I${IncDir} -c ${PACTSrcDir}/mlfpeppc.c -o mlfpeppc.o ; \'
        Note $STDOUT '          ${AR} ${AROpt} ${TGTLib} mlfpeppc.o 2> /dev/null ; \'
        Note $STDOUT '          ${RM} mlfpeppc.o 2> /dev/null )'
     endif
 
     if ($HaveGNUFenv == TRUE) then
-       set Opts = ( -g -Wall )
+       set lcc = ( $FPE_Exe -g -Wall )
        if ($BuildSharedLibs == TRUE) then
-          set Opts = ( $Opts -fPIC )
+          set lcc = ( $lcc -fPIC )
        endif
-#       if ($?Bits == 1) then
-#          set Opts = ( $Opts -m${Bits} )
-#       endif
        Note $STDOUT '	@(cd ${PACTTmpDir} ; \'
-       Note $STDOUT '          gcc '${Opts}' -I${IncDir} -c ${PACTSrcDir}/mlfpegnu.c -o mlfpegnu.o ; \'
+       Note $STDOUT '          '$lcc' -I${IncDir} -c ${PACTSrcDir}/mlfpegnu.c -o mlfpegnu.o ; \'
        Note $STDOUT '          ${AR} ${AROpt} ${TGTLib} mlfpegnu.o 2> /dev/null ; \'
        Note $STDOUT '          ${RM} mlfpegnu.o 2> /dev/null )'
     endif
     Note $STDOUT ""
+
+    unset lcc
 
     Note $STDOUT '#'
     Note $STDOUT '# Record the interface changes as defined in the headers'

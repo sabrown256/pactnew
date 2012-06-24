@@ -23,7 +23,8 @@ TGTScr = do-local do-stats do-automake distribute \
          pcpp import-api import-so prune-env measure-env \
          scs-update scs-commit scs-co scs-history scs-meta \
          scs-add scs-remove scs-lock scs-diff scs-move scs-tag \
-         scs-sync scs-revert scs-init
+         scs-sync scs-revert scs-init \
+         winer
 
 TGTEtc = env-csh csh-subroutines
 

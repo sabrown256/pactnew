@@ -9,7 +9,8 @@
 #include "cpyright.h"
 #include "pgs_int.h"
 
-#if defined(UNIX)
+/* #if defined(UNIX) */
+#if 1
 typedef int boolean;
 #endif
 

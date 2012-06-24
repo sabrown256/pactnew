@@ -344,8 +344,10 @@ void PG_register_device(char *name, PFRDev fnc)
 	PG_register_device("QD",     PG_setup_qd_device);
         strncpy(_PG_gcont.default_window_device, "QD", MAXLINE);
 #elif defined(WIN32)
+/* GOTCHA: temporarily off
 	PG_register_device("WIN32",  PG_setup_win32_device);
         strncpy(_PG_gcont.default_window_device, "WIN32", MAXLINE);
+*/
 #endif
 #if defined(HAVE_OGL)
 	PG_register_device("GL",     PG_setup_gl_device);

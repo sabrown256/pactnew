@@ -573,8 +573,10 @@ void PG_setup_ctrls_glb(char *s)
        PG_qd_setup_ctrls_glb();
 
 #elif defined(WIN32)
+/* GOTCHA: temporarily off
     if (strcmp(s, "WIN32") == 0)
        PG_win32_setup_ctrls_glb();
+*/
 #endif
 
 #if defined(HAVE_OGL)

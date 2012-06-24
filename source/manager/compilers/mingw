@@ -8,6 +8,11 @@ run analyze/rpath gnu
 
 setenv NM /usr/bin/i686-w64-mingw32-nm
 
+#CPU          = [ _env_ = Bits ;                 # target CPU
+#                 x86 ;
+#                 x86_64 ]
+CPU = x86
+
 GnuMakeOpt   = TRUE
 WARN_PATTERN = ":+sp+warning:"
 ERR_PATTERN  = ":+sp+error:"
@@ -22,6 +27,8 @@ Tool CC {
                  C99   = -std=c99 ;
                  X89   = -std=gnu89 ;           # gcc default
                  X99   = -std=gnu99 ]
+   Flags    += [ _env_ = PACT_CC_VERSION ;      # pragma warning flags
+                 4.*  >= -Wno-pragmas ]
    Flags    += [ _env_ = Bits ;                 # address bit size
                  *     = -m* ]
    Flags    += [ _cmd_ = -p ;                   # profiling
@@ -34,15 +41,18 @@ Tool CC {
 }
 
 Tool FC {
-   Exe       = [ _env_ = Bits ;                 # compiler version
-                 32    = i586-mingw32msvc-gfortran ;
-                 64    = i686-w64-mingw32-gfortran ]
+   Exe     = [ _env_ = Bits ;                 # compiler version
+               32    = i586-mingw32msvc-gfortran ;
+               64    = i686-w64-mingw32-gfortran ]
    Flags   = -funderscoring -ffree-form
-   Flags  += [ _env_ = Bits ;                # address bit size
+   Flags  += [ _env_ = PACT_CC_VERSION ;      # compiler version flags
+               4.*   = -fsignaling-nans ;
+               4.6.* >= -fsignaling-nans -Wno-unused-dummy-argument ]
+   Flags  += [ _env_ = Bits ;                 # address bit size
                *     = -m* ]
-   Flags  += [ _cmd_ = -p ;                  # profiling
+   Flags  += [ _cmd_ = -p ;                   # profiling
 	       on    = -pg ]
-   Flags  += [ _cmd_ = -cov ;                # coverage analysis
+   Flags  += [ _cmd_ = -cov ;                 # coverage analysis
 	       on    = -fprofile-arcs -ftest-coverage ]
    Version = -v
 }
@@ -81,6 +91,15 @@ Tool Ranlib {
 
 Tool NM {
    Exe = i686-w64-mingw32-nm
+}
+
+Group FPE {
+   Exe    = [ _env_ = Bits ;                    # compiler version
+              32    = i586-mingw32msvc-gcc ;
+              64    = i686-w64-mingw32-gcc ]
+   Flags  = -g -Wall
+   Flags += [ _env_ = Bits ;                    # compiler flags
+              *     = -m* ]
 }
 
 Group Std {

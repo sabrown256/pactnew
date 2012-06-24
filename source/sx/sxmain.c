@@ -63,10 +63,10 @@ int main(int c, char **v, char **env)
 
     upix = FALSE;
 
-#ifndef NO_SHELL
-
 /* initialize the file order */
     n_files = 0;
+
+#ifndef NO_SHELL
 
 /* connect the I/O functions */
     SS_set_put_line(si, SS_printf);
@@ -80,7 +80,7 @@ int main(int c, char **v, char **env)
 #endif
 
     if (SS_exe_script(c, v) != NULL)
-       {SX_gs.qflag    = TRUE;
+       {SX_gs.qflag = TRUE;
 	script_file = TRUE;
 	trap_error  = FALSE;};
 
@@ -204,7 +204,7 @@ int main(int c, char **v, char **env)
 #ifdef NO_SHELL
 
     if (SX_gs.gr_mode)
-        SS_banner(SS_mk_string(si, PCODE));
+        SS_banner(si, SS_mk_string(si, PCODE));
 
 #endif
 

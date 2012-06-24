@@ -21,6 +21,13 @@ Tool LD {
    Flags =
 }
 
+# specifications for FPE patching
+Group FPE {
+   Flags  = -g -Wall
+   Flags += [ _env_ = Bits ;                    # compiler flags
+              *     = -m* ]
+}
+
 Group Std {
    LD_Flags = ${LD_Flags}
 }
