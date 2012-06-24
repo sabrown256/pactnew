@@ -190,19 +190,20 @@ static int _SC_so_parse_flags(sodes *se)
  */
 
 static sodes *_SC_so_open(char *tag)
-   {int flag;
-    char msg[MAXLINE];
-    char *lib;
+   {char msg[MAXLINE];
     sodes *se;
 
     se = (sodes *) SC_hasharr_def_lookup(_SC_dl.tab, tag);
     if (se != NULL)
-       {lib = se->lib;
-
-	flag = _SC_so_parse_flags(se);
+       {
 
 #ifdef HAVE_DYNAMIC_LINKER
+	int flag;
+	char *lib;
 	void *so;
+
+	lib  = se->lib;
+	flag = _SC_so_parse_flags(se);
 
 	so = dlopen(lib, flag);
 	if (so == NULL)

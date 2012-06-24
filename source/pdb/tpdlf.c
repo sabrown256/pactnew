@@ -73,8 +73,9 @@ static void show_stat(statedes *st, char *tag)
     i  = st->i;
     dt = st->t[i];
 
-    printf("\t\t%-14s %10lld %10.2e %10.2e\n",
-	   tag, (long long) st->n, 1.0e-6*st->sz[i], dt);
+    printf("\t\t%-14s %10s %10.2e %10.2e\n",
+	   tag, SC_itos(NULL, 0, st->n, "%10lld"),
+	   1.0e-6*st->sz[i], dt);
 
     return;}
 

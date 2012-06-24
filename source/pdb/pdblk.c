@@ -666,8 +666,8 @@ int _PD_block_cksum_write(PDBfile *file, syment *ep, char *name)
 	     ne += (sp->valid != PD_BLOCK_UNINIT);};
 
 	if (ne > 0)
-	   {ok &= _PD_put_string(1, "%s %lld %ld\n   ",
-				 name, (long long) n, ne);
+	   {ok &= _PD_put_string(1, "%s %s %ld\n   ",
+				 name, SC_itos(NULL, 0, n, NULL), ne);
 
 /* write the initialized checksums */
 	    for (j = 0L; j < n; j++)
@@ -682,8 +682,8 @@ int _PD_block_cksum_write(PDBfile *file, syment *ep, char *name)
 		     st = _PD_block_get_cksum(bl, j, dig);
 		     SC_ASSERT(st == TRUE);
 
-		     ok &= _PD_put_string(1, " %lld %s",
-					  (long long) j, dig);};};
+		     ok &= _PD_put_string(1, " %s %s",
+					  SC_itos(NULL, 0, j, NULL), dig);};};
 
 	    ok &= _PD_put_string(1, "\n");};};
 

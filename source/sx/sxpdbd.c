@@ -592,13 +592,13 @@ static int _SX_diff_structs(SS_psides *si,
 
 		  mitems = desca->number;
 
-		  snprintf(mnma, MAXLINE, "%s[%lld].%s", 
+		  snprintf(mnma, MAXLINE, "%s[%s].%s", 
 			   nma,
-			   (long long) (i + pfa->default_offset),
+			   SC_itos(NULL, 0, i + pfa->default_offset, NULL),
 			   desca->name);
-		  snprintf(mnmb, MAXLINE, "%s[%lld].%s", 
+		  snprintf(mnmb, MAXLINE, "%s[%s].%s", 
 			   nmb,
-			   (long long) (i + pfb->default_offset),
+			   SC_itos(NULL, 0, i + pfb->default_offset, NULL),
 			   descb->name);
 
 		  mdims = desca->dimensions;
@@ -815,10 +815,12 @@ static int _SX_diff_tree(SS_psides *si, char *nma, char *nmb,
         ret = TRUE;
         for (i = 0L; i < ni; i++)
 	    {if (flag)
-	        {snprintf(lnma, MAXLINE, "%s[%lld]", 
-			  nma, (long long) (i + pfa->default_offset));
-		 snprintf(lnmb, MAXLINE, "%s[%lld]", 
-			  nmb, (long long) (i + pfb->default_offset));}
+	        {snprintf(lnma, MAXLINE, "%s[%s]", 
+			  nma,
+			  SC_itos(NULL, 0, i + pfa->default_offset, NULL));
+		 snprintf(lnmb, MAXLINE, "%s[%s]", 
+			  nmb,
+			  SC_itos(NULL, 0, i + pfb->default_offset, NULL));}
 	     else
 		{snprintf(lnma, MAXLINE, "%s", nma);
 		 snprintf(lnmb, MAXLINE, "%s", nmb);};

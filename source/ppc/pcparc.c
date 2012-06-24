@@ -233,7 +233,7 @@ int PC_open_group(char **argv, int *pn)
     char **args, s[MAXLINE], *t, *p;
     PROCESS *pp;
 
-#ifdef HAVE_PROCESS_CONTROL
+#if defined(HAVE_POSIX_SYS)
 
     PC_init_communications(NULL);
 
@@ -291,7 +291,7 @@ static PROCESS *_PC_open_member_n(char **argv, int *pnn)
     char *tok, t[MAXLINE], srvr[MAXLINE], *s, *p;
     PROCESS *pp;
 
-#ifdef HAVE_PROCESS_CONTROL
+#if defined(HAVE_POSIX_SYS)
 
 /* if the server is the parent of this process, argv will have the
  * server name and port number just after the first NULL item in argv
@@ -362,7 +362,7 @@ static PROCESS *_PC_open_member_n(char **argv, int *pnn)
 static void _PC_close_member_n(PROCESS *pp)
    {
 
-#ifdef HAVE_PROCESS_CONTROL
+#if defined(HAVE_POSIX_SYS)
 
     PC_close(pp);
 

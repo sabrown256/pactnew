@@ -41,6 +41,7 @@
 
 #include <windows.h>
 
+#undef TEXT
 #undef CHAR
 #undef SHORT
 #undef INT
@@ -65,7 +66,8 @@
 /* errno set */
 
 #define	ETXTBSY		26
-
+#define	ETIMEDOUT	110
+#define	EINPROGRESS	115
 
 /* signal set */
 
@@ -554,7 +556,8 @@ extern long
  random(void);
 
 extern char
- *ttyname(int fd);
+ *ttyname(int fd),
+ *realpath(const char *path, char *resolved_path);
 
 extern void
  siglongjmp(sigjmp_buf env, int val),
@@ -883,6 +886,28 @@ void siglongjmp(sigjmp_buf env, int val)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SYNC - sync for MSW */
+
+void sync(void)
+   {
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* REALPATH - realpath for MSW */
+
+char *realpath(const char *path, char *resolved_path)
+   {char *rv;
+
+    rv = NULL;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SRANDOM - srandom for MSW */
 
 void srandom(unsigned int seed)
@@ -930,18 +955,6 @@ int select_msw(int nfds, fd_set *readfds, fd_set *writefds,
     return(rv);}
 
 #define select    select_msw
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* SYNC_MSW - sync for MSW */
-
-void sync_msw(void)
-   {
-
-    return;}
-
-#define sync    sync_msw
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

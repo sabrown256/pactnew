@@ -74,7 +74,8 @@ static int64_t _SC_mf_mwrite(int fd, const void *buf, size_t nb, int64_t off)
 
     st = lseek(fd, off, SEEK_SET);
     if (st < 0)
-       io_error(errno, "lseek to %lld on %d failed", (long long) off, fd);
+       io_error(errno, "lseek to %s on %d failed",
+                SC_itos(NULL, 0, off, NULL), fd);
 
     rv = SC_write_sigsafe(fd, (void *) buf, nb);
 

@@ -24,6 +24,8 @@ extern int
  connect_msw(int sockfd, const struct sockaddr *addr, socklen_t addrlen),
  listen_msw(int sockfd, int backlog),
  getsockname_msw(int sockfd, struct sockaddr *addr, socklen_t *addrlen),
+ getsockopt_msw(int sockfd, int level, int optname,
+		void *optval, socklen_t *optlen),
  accept_msw(int sockfd, struct sockaddr *addr, socklen_t *addrlen),
  gethost_msw(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 
@@ -153,6 +155,21 @@ int getsockname_msw(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
     return(rv);}
 
 #define getsockname    getsockname_msw
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* GETSOCKOPT_MSW - getsockopt for MSW */
+
+int getsockopt_msw(int sockfd, int level, int optname,
+		   void *optval, socklen_t *optlen)
+   {int rv;
+
+    rv = -1;
+
+    return(rv);}
+
+#define getsockopt    getsockopt_msw
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

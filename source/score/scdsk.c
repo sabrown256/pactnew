@@ -39,8 +39,8 @@ int64_t SC_dsk_space(char *dir, int64_t nbx)
         {ok = FALSE;
 	 no = lseek(fd, bsz, SEEK_CUR);
 	 if (no < 0)
-	    io_error(errno, "lseek to %lld on %d failed",
-		     (long long) bsz, fd);
+	    io_error(errno, "lseek to %s on %d failed",
+		     SC_itos(NULL, 0, bsz, NULL), fd);
 
 	 if (no >= nb)
 	    {nw = write(fd, " ", 1);

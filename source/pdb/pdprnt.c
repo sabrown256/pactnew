@@ -254,9 +254,12 @@ void PD_write_extras(FILE *f0, PDBfile *file ARG(,,cls))
        {PRINT(f0, "Symbol Table Address: 0x%lx\n", file->symtab);
 	PRINT(f0, "Structure Chart Address: 0x%lx\n", file->chart);}
     else
-       {PRINT(f0, "Header Address: %lld\n", (int64_t) file->headaddr);
-	PRINT(f0, "Symbol Table Address: %lld\n", (int64_t) file->symtaddr);
-	PRINT(f0, "Structure Chart Address: %lld\n", (int64_t) file->chrtaddr);};
+       {PRINT(f0, "Header Address: %s\n",
+	      SC_itos(NULL, 0, file->headaddr, NULL));
+	PRINT(f0, "Symbol Table Address: %s\n",
+	      SC_itos(NULL, 0, file->symtaddr, NULL));
+	PRINT(f0, "Structure Chart Address: %s\n",
+	      SC_itos(NULL, 0, file->chrtaddr, NULL));};
 
     return;}
 
@@ -284,22 +287,24 @@ void PD_print_extras(PDBfile *file ARG(,,cls))
  */
 
 void PD_write_syment(FILE *f0, syment *ep)
-   {dimdes *dim;
+   {char t[2][MAXLINE];
+    dimdes *dim;
 
     PRINT(f0, "Type: %s\n", PD_entry_type(ep));
     if (PD_entry_dimensions(ep) != NULL)
        {PRINT(f0, "Dimensions: (");
 
         for (dim = PD_entry_dimensions(ep); dim != NULL; dim = dim->next)
-            {PRINT(f0, "%lld:%lld",
-		   (long long) dim->index_min, (long long) dim->index_max);
+            {SC_itos(t[0], MAXLINE, dim->index_min, NULL);
+	     SC_itos(t[1], MAXLINE, dim->index_max, NULL);
+	     PRINT(f0, "%s:%s", t[0], t[1]);
 	     if (dim->next != NULL)
 	        PRINT(f0, ", ");};
 
 	PRINT(f0, ")\n");};
 
-    PRINT(f0, "Length: %lld\n", (long long) PD_entry_number(ep));
-    PRINT(f0, "Address: %lld\n", (int64_t) PD_entry_address(ep));
+    PRINT(f0, "Length: %s\n", SC_itos(NULL, 0, PD_entry_number(ep), NULL));
+    PRINT(f0, "Address: %s\n", SC_itos(NULL, 0, PD_entry_address(ep), NULL));
 
     return;}
 
@@ -727,7 +732,7 @@ static int _PD_print_indirection(PD_printdes *prnt, PDBfile *file, char **vr,
 
     for (i = 0L; i < ni; i++, vr++)
         {if (ni > 1)
-            sprintf(s, "(%lld)", (long long) (i + min_index));
+            sprintf(s, "(%s)", SC_itos(NULL, 0, i + min_index, NULL));
 
          ditems = _PD_number_refd(NULL, NULL, NULL, DEREF(vr),
 				  dtype, file->host_chart);
@@ -896,8 +901,8 @@ int _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, inti ni,
                  else
                     min_index = def_off;
 
-                 snprintf(field, 80, "%s(%lld)",
-			  nodename, (long long) (ii + min_index));}
+                 snprintf(field, 80, "%s(%s)",
+			  nodename, SC_itos(NULL, 0, ii + min_index, NULL));}
              else
                 strcpy(field, nodename);
 

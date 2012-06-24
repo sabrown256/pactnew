@@ -190,11 +190,11 @@ static void _PD_index_str(char *s, int nc, inti *ind)
    if (ind[0] == ind[2])
       SC_vstrcat(s, nc, "%s,", t[0]);
 
-   else if (ind[1] <= 1L)
-      SC_vstrcat(s, nc, "%s:%s,", t[0], t[2]);
+   else if (ind[2] <= 1L)
+      SC_vstrcat(s, nc, "%s:%s,", t[0], t[1]);
             
    else
-      SC_vstrcat(s, nc, "%s:%s:%s,", t[0], t[2], t[1]);
+      SC_vstrcat(s, nc, "%s:%s:%s,", t[0], t[1], t[2]);
 
    return;}
 

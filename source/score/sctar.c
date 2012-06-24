@@ -192,7 +192,7 @@ fcent *_SC_process_tarhdr(FILE *fp, tarhdr *p)
     ad  = size + TAR_BLOCKSIZE - rem;
     st  = fseek(fp, ad, SEEK_CUR);
     if (st < 0)
-       io_error(errno, "fseek to %lld failed", (long long) ad);
+       io_error(errno, "fseek to %s failed", SC_itos(NULL, 0, ad, NULL));
 
     return(te);}
 
@@ -224,8 +224,8 @@ fcdes *SC_scan_tarfile(char *tarf)
         while (TRUE)
 	   {nr = fread(pp, nb, 1, fp);
 	    if (nr < 0)
-	       io_error(errno, "fread of %lld bytes failed",
-			(long long) nb);
+	       io_error(errno, "fread of %s bytes failed",
+			SC_itos(NULL, 0, nb, NULL));
 
             if (nr != 1)
 	       break;
@@ -316,8 +316,8 @@ int _SC_is_tarfile(FILE *fp)
     nb  = sizeof(tarhdr);
     nr  = fread((char *) &p, nb, 1, fp);
     if (nr < 0)
-       io_error(errno, "fread of %lld bytes failed",
-		(long long) nb);
+       io_error(errno, "fread of %s bytes failed",
+		SC_itos(NULL, 0, nb, NULL));
 
     if (nr == 1)
        {if (strncmp(p.magic, "ustar", 6) == 0)

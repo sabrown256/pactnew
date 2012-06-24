@@ -18,6 +18,10 @@
 #include "scheme.h"
 #include "scope_quaternion.h"
 
+#ifdef NO_SHELL
+# include "pgs_int.h"
+#endif
+
 /*--------------------------------------------------------------------------*/
 
 /*                           DEFINED CONSTANTS                              */
