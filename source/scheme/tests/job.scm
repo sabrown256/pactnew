@@ -2,16 +2,19 @@
 ; JOB.SCM - test of pipeline function in SCHEME
 ;
 
-;(trace pipeline)
+(trace pipeline)
 ;(describe pipeline)
 
 ; IPC media - pipe, socket, pty
 (define (piper x)    (list 'piper x))
 (define (pipea x)    (list 'pipea x))
+(define (sio   x)    (list 'sio   x))
 (define (file  x)    (list 'file  x))
 (define (socket h p) (list 'socket h p))
 (define (pty x)      (list 'pty x))
 (define (url x)      (list 'url x))
+(define (var x)      (list 'var x))
+(define (fnc x)      (list 'fnc x))
 
 ; waitpid info
 (define (status x)   (list 'status x))
@@ -50,9 +53,9 @@
 
 ; simple absolute pipeline test
 
-(set! st (pipeline #f (pipea 2) #f (sprintf "cat %s" "job.scm")
-		   #t (pipea 3) #f "grep \"pipeline\""
-		   #t #t #f "wc -l"))
+(set! st (pipeline #f (pipea 2) (pipea 3) (sprintf "cat %s" "job.scm")
+		   #t (pipea 3) (pipea 3) "grep \"pipeline\""
+		   #t #t (sio 1) "wc -l"))
 (printf nil "st = %s\n" st)
 
 ;--------------------------------------------------------------------------
@@ -62,7 +65,7 @@
 
 (define inp (list 1 "ta" 2 "tb" 3 "tc"))
 (define outp nil)
-(set! st (pipeline inp (piper 1) #f "cat"
+(set! st (pipeline (var inp) (piper 1) #f "cat"
 		   #t  (pipea 3) #f "grep \"t\""
 		   #t outp #f "wc -l"))
 (printf nil "st = %s  out = %s\n" st outp)
