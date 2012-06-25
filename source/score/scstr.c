@@ -2010,9 +2010,21 @@ char *SC_ftos(char *s, int nc, long double f, char *fmt)
 	nc = 80;};
 
     if (fmt == NULL)
-       fmt = "%16.8le";
+       fmt = "%16.8Le";
+
+#if defined(COMPILER_PGI)
+
+    char frm[MAXLINE];
+
+    fmt = SC_strsubst(frm, MAXLINE, fmt, "L", "", -1);
+
+    snprintf(s, nc, fmt, (double) f);
+
+#else
 
     snprintf(s, nc, fmt, f);
+
+#endif
 
     return(s);}
 
