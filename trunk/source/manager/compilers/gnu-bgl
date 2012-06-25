@@ -60,7 +60,7 @@ Tool LD {
 	        on    = -pg ]
    Flags   += [ _cmd_ = -cov ;               # coverage analysis
 	        on    = -lgcov ]
-   Lib      = -lc
+   Lib      = -lc -lnss_files -lnss_dns -lresolv
 }
 
 Tool Lex {

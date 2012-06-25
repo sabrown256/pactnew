@@ -47,7 +47,7 @@ Tool CXX {
 }
 
 Tool LD {
-   Lib = -lc
+   Lib = -lc -lnss_files -lnss_dns -lresolv
 }
 
 Tool Lex {

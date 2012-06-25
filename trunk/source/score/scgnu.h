@@ -32,7 +32,7 @@
 # if (__GNUC__ < 4)
 #  undef complex
 #  undef I
-typedef unsigned int u_int32_t;
+/* typedef unsigned int u_int32_t; */
 # endif
 
 # ifndef complex
