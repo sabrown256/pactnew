@@ -30,8 +30,7 @@ struct s_SS_job
    {int id;
     SS_io fd[3];
     char *cmd;
-    int exit;
-    SS_job *next;};
+    int exit;};
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -375,7 +374,19 @@ static void _SS_set_io_spec(SS_psides *si, SS_job *pj,
 
 /* process in pipeline absolute position */
 	else if (strcmp(type, "pipea") == 0)
-	   pid = n;
+	   pid = n - 1;
+
+/* current process file descriptor */
+	else if (strcmp(type, "sio") == 0)
+	   fd = n;
+
+/* variable */
+	else if (strcmp(type, "var") == 0)
+	   fd = -2;
+
+/* function */
+	else if (strcmp(type, "fnc") == 0)
+	   fd = -3;
 
 /* file name */
 	else if (strcmp(type, "file") == 0)
@@ -455,23 +466,23 @@ static void _SS_free_io_spec(SS_io *io)
  *                   - add it to JOBS and return the result
  */
 
-static SS_job *_SS_make_pipeline(SS_psides *si, SS_job *jobs, int id,
-				 object *is, object *os, object *es,
-				 char *cmd)
+static void _SS_make_pipeline(SS_psides *si, SS_job *jobs, int id,
+			      object *is, object *os, object *es,
+			      char *cmd)
    {SS_job *pj;
 
-    pj = CMAKE(SS_job);
-    if (pj != NULL)
-       {pj->id   = id;
+    if ((jobs != NULL) && (id >= 0))
+       {pj = jobs + id;
+
+	pj->id   = id;
 	pj->cmd  = CSTRSAVE(cmd);
 	pj->exit = -1;
-	pj->next = jobs;
 
 	_SS_set_io_spec(si, pj, SS_IO_IN,  is);
 	_SS_set_io_spec(si, pj, SS_IO_OUT, os);
         _SS_set_io_spec(si, pj, SS_IO_ERR, es);};
 
-    return(pj);}
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -492,29 +503,138 @@ static void _SS_free_job(SS_job *pj)
 /* _SS_FREE_PIPELINE - free the job pipeline JOBS */
 
 static void _SS_free_pipeline(SS_job *jobs)
-   {SS_job *pj, *nxt;
+   {int i;
 
-    for (pj = jobs; pj != NULL; pj = nxt)
-        {nxt = pj->next;
-	 _SS_free_job(pj);};
+    for (i = 0; jobs[i].cmd != NULL; i++)
+        _SS_free_job(jobs + i);
+
+    CFREE(jobs);
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SS_RUN_PIPELINE - run the job pipeline JOBS
+/* _SS_PIPELINE_LENGTH - return the length of the pipeline JOBS */
+
+static int _SS_pipeline_length(SS_job *jobs)
+   {int n;
+
+    for (n = 0; jobs[n].cmd != NULL; n++);
+
+    return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static void dprpipe(SS_psides *si, SS_job *jobs)
+   {int i, n, pid, fd;
+    char s[MAXLINE];
+    char **sa;
+
+    n = _SS_pipeline_length(jobs);
+
+    sa = CMAKE_N(char *, n+1);
+
+    for (i = 0; jobs[i].cmd != NULL; i++)
+        {
+
+	 snprintf(s, MAXLINE, "%3d: ", i);
+
+         pid = jobs[i].fd[SS_IO_IN].pid;
+	 if (pid == -1)
+	    SC_vstrcat(s, MAXLINE, "i(stdin) ",
+		       jobs[i].fd[SS_IO_IN].pid);
+	 else
+	    SC_vstrcat(s, MAXLINE, "i(%d)     ",
+		       jobs[i].fd[SS_IO_IN].pid);
+
+         pid = jobs[i].fd[SS_IO_OUT].pid;
+	 if (pid == -1)
+	    {fd = jobs[i].fd[SS_IO_OUT].fd;
+	     if (fd == 2)
+	        SC_vstrcat(s, MAXLINE, "o(stderr) ",
+			   jobs[i].fd[SS_IO_OUT].pid);
+	     else
+	        SC_vstrcat(s, MAXLINE, "o(stdout) ",
+			   jobs[i].fd[SS_IO_OUT].pid);}
+	 else
+	    SC_vstrcat(s, MAXLINE, "o(%d)      ",
+		       jobs[i].fd[SS_IO_OUT].pid);
+
+         pid = jobs[i].fd[SS_IO_ERR].pid;
+	 if (pid == -1)
+	    {fd = jobs[i].fd[SS_IO_ERR].fd;
+	     if (fd == 1)
+	        SC_vstrcat(s, MAXLINE, "e(stdout) ",
+			   jobs[i].fd[SS_IO_ERR].pid);
+	     else
+	        SC_vstrcat(s, MAXLINE, "e(stderr) ",
+			   jobs[i].fd[SS_IO_ERR].pid);}
+	 else
+	    SC_vstrcat(s, MAXLINE, "e(%d)      ",
+		       jobs[i].fd[SS_IO_ERR].pid);
+
+	 SC_vstrcat(s, MAXLINE, " %s", jobs[i].cmd);
+         sa[i] = CSTRSAVE(s);};
+
+    sa[n] = NULL;
+
+    for (i = 0; i < n; i++)
+        printf("%s\n", sa[i]);
+
+    SC_free_strings(sa);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_PIPELINE_CONNECT - connect I/O descriptors of the JOBS
+ *                      - in the pipeline
+ */
+
+static void _SS_pipeline_connect(SS_psides *si, SS_job *jobs)
+   {int i;
+    SS_io *ios, *iod;
+
+    for (i = 0; jobs[i].cmd != NULL; i++)
+
+/* connect stdout */
+        {ios = jobs[i].fd + SS_IO_OUT;
+	 if (ios->pid != -1)
+	    {iod      = jobs[ios->pid].fd + SS_IO_IN;
+	     iod->pid = ios->pid;};
+
+/* connect stderr */
+	 ios = jobs[i].fd + SS_IO_ERR;
+	 if (ios->pid != -1)
+	    {iod      = jobs[ios->pid].fd + SS_IO_IN;
+	     iod->pid = ios->pid;};
+
+/* connect self */
+};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_PIPELINE_RUN - run the job pipeline JOBS
  *                  - return the list of exit statuses
  */
 
-static object *_SS_run_pipeline(SS_psides *si, SS_job *jobs)
-   {SS_job *pj, *nxt;
+static object *_SS_pipeline_run(SS_psides *si, SS_job *jobs)
+   {int i, n;
     object *o;
 
+    n = _SS_pipeline_length(jobs);
+
+dprpipe(si, jobs);
+
     o = SS_null;
-    for (pj = jobs; pj != NULL; pj = nxt)
-        {nxt = pj->next;
-	 o = SS_mk_cons(si, SS_mk_integer(si, pj->exit), o);};
+    for (i = n-1; i >= 0; i--)
+        o = SS_mk_cons(si, SS_mk_integer(si, jobs[i].exit), o);
 
     _SS_free_pipeline(jobs);
 
@@ -539,6 +659,7 @@ static object *_SS_run_pipeline(SS_psides *si, SS_job *jobs)
  *              -   <pipe-id>   := (piper <id>) | (pipea <id>)
  *              -   <id>        := piper - relative index <id>
  *              -                  pipea - absolute index <id>
+ *              -                  sio   - file descriptor <id> of current
  *              -   <expr>      := <var> | <function>
  *              -   <var>       := <scalar> | <array> | <list>
  *              -   <function>  := function call
@@ -583,7 +704,8 @@ static object *_SSI_pr_exec(SS_psides *si, object *argl)
 	if (nl % 4 == 0)
            {nj = nl >> 2;
 
-            jobs = NULL;
+            jobs = CMAKE_N(SS_job, nj+1);
+	    memset(jobs, nj+1, sizeof(SS_job));
 
 	    for (i = 0; i < nj; i++)
 	        {is   = SS_car(si, argl);
@@ -602,9 +724,11 @@ static object *_SSI_pr_exec(SS_psides *si, object *argl)
 			 SC_STRING_I, &cmd,
 			 0);
 
-		 jobs = _SS_make_pipeline(si, jobs, i, is, os, es, cmd);};
+		 _SS_make_pipeline(si, jobs, i, is, os, es, cmd);};
 
-	    o = _SS_run_pipeline(si, jobs);};};
+	    _SS_pipeline_connect(si, jobs);
+
+	    o = _SS_pipeline_run(si, jobs);};};
 
     return(o);}
 
