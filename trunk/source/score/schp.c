@@ -89,9 +89,9 @@ void _SC_exec_test(char **argv, char **envp, char *mode)
 
     pp->medium     = USE_PIPES;
     pp->data_type  = SC_ASCII;
-    pp->io[0]      = 0;
-    pp->io[1]      = 1;
-    pp->io[2]      = 2;
+    pp->ISTDIN     = 0;
+    pp->ISTDOUT    = 1;
+    pp->ISTDERR    = 2;
     pp->ischild    = FALSE;
     pp->status     = SC_RUNNING;
     pp->reason     = 0;
@@ -156,13 +156,13 @@ static int _SC_open_pty_unix(PROCESS *pp, PROCESS *cp)
     if (pc != NULL)
        {cp->spty = CSTRSAVE(pc);
 
-	cp->io[0] = pty;
-	cp->io[1] = pty;
-	cp->io[2] = pty;
+	cp->ISTDIN  = pty;
+	cp->ISTDOUT = pty;
+	cp->ISTDERR = pty;
 
-	pp->io[0] = pty;
-	pp->io[1] = pty;
-	pp->io[2] = pty;
+	pp->ISTDIN  = pty;
+	pp->ISTDOUT = pty;
+	pp->ISTDERR = pty;
 
 	ok = TRUE;}
 
@@ -195,14 +195,14 @@ static int _SC_open_pty_unix(PROCESS *pp, PROCESS *cp)
 		 {spty = SC_dsnprintf(TRUE, "/dev/%s%c%c",
 				      SC_SLAVE_PTY_NAME, c, d);
                   
-		  cp->spty  = spty;
-		  cp->io[0] = pty;
-		  cp->io[1] = pty;
-		  cp->io[2] = pty;
+		  cp->spty    = spty;
+		  cp->ISTDIN  = pty;
+		  cp->ISTDOUT = pty;
+		  cp->ISTDERR = pty;
 
-		  pp->io[0] = pty;
-		  pp->io[1] = pty;
-		  pp->io[2] = pty;
+		  pp->ISTDIN  = pty;
+		  pp->ISTDOUT = pty;
+		  pp->ISTDERR = pty;
 
 		  break;};};};
 
@@ -235,13 +235,13 @@ static int _SC_open_pty_unix98(PROCESS *pp, PROCESS *cp)
        {ps = ptsname(pty);
 	cp->spty = CSTRSAVE(ps);
 
-	cp->io[0] = pty;
-	cp->io[1] = pty;
-	cp->io[2] = pty;
+	cp->ISTDIN  = pty;
+	cp->ISTDOUT = pty;
+	cp->ISTDERR = pty;
 
-	pp->io[0] = pty;
-	pp->io[1] = pty;
-	pp->io[2] = pty;
+	pp->ISTDIN  = pty;
+	pp->ISTDOUT = pty;
+	pp->ISTDERR = pty;
 
 	ok = TRUE;}
 
@@ -301,9 +301,9 @@ PROCESS *SC_mk_process(char **argv, char *mode, int type, int iex)
 
     pp->status      = NOT_FINISHED;
     pp->reason      = NOT_FINISHED;
-    pp->io[0]       = -1;
-    pp->io[1]       = -1;
-    pp->io[2]       = -1;
+    pp->ISTDIN      = -1;
+    pp->ISTDOUT     = -1;
+    pp->ISTDERR     = -1;
     pp->data        = -1;
     pp->medium      = NO_IPC;
     pp->gone        = -1;
@@ -480,24 +480,37 @@ static int _SC_init_ipc(PROCESS *pp, PROCESS *cp)
         case USE_PIPES :
              {int ports[2];
 
+/* stdin */
               if (pipe(ports) < 0)
                  SC_error(-1, "COULDN'T CREATE PIPE #1 - _SC_INIT_IPC");
 
-              pp->io[0] = ports[0];
-              cp->io[1] = ports[1];
+              pp->ISTDIN  = ports[0];
+              cp->ISTDOUT = ports[1];
 
+/* stdout */
               if (pipe(ports) < 0)
-                 {close(pp->io[0]);
-                  close(cp->io[1]);
+                 {close(pp->ISTDIN);
+                  close(cp->ISTDOUT);
                   SC_error(-1, "COULDN'T CREATE PIPE #2 - _SC_INIT_IPC");};
 
-              cp->io[0] = ports[0];
-              pp->io[1] = ports[1];
+              cp->ISTDIN  = ports[0];
+              pp->ISTDOUT = ports[1];
 
-              SC_set_fd_attr(pp->io[0], O_RDONLY | O_NDELAY, TRUE);
-              SC_set_fd_attr(pp->io[1], O_WRONLY, TRUE);
-              SC_set_fd_attr(cp->io[0], O_RDONLY & ~O_NDELAY, TRUE);
-              SC_set_fd_attr(cp->io[1], O_WRONLY, TRUE);};
+/* stderr */
+              if (pipe(ports) < 0)
+                 {close(pp->ISTDIN);
+                  close(cp->ISTDOUT);
+                  SC_error(-1, "COULDN'T CREATE PIPE #2 - _SC_INIT_IPC");};
+
+              cp->ISTDERR = ports[0];
+              pp->ISTDERR = ports[1];
+
+              SC_set_fd_attr(pp->ISTDIN,  O_RDONLY | O_NDELAY, TRUE);
+              SC_set_fd_attr(pp->ISTDOUT, O_WRONLY, TRUE);
+              SC_set_fd_attr(pp->ISTDERR, O_WRONLY, TRUE);
+              SC_set_fd_attr(cp->ISTDIN,  O_RDONLY & ~O_NDELAY, TRUE);
+              SC_set_fd_attr(cp->ISTDOUT, O_WRONLY, TRUE);
+              SC_set_fd_attr(cp->ISTDERR, O_WRONLY, TRUE);};
 
               break;
 
@@ -506,29 +519,34 @@ static int _SC_init_ipc(PROCESS *pp, PROCESS *cp)
         case USE_SOCKETS :
              {int ports[2];
 
+/* stdin */
               if (socketpair(PF_UNIX, SOCK_STREAM, 0, ports) < 0)
                  SC_error(-1, "COULDN'T CREATE SOCKET PAIR #1 - _SC_INIT_IPC");
-/*
-	      _SC_fixup_socket(ports[0]);
-	      _SC_fixup_socket(ports[1]);
-*/
-              pp->io[0] = ports[0];
-              cp->io[1] = ports[1];
-              if (socketpair(PF_UNIX, SOCK_STREAM, 0, ports) < 0)
-                 {close(pp->io[0]);
-                  close(cp->io[1]);
-                  SC_error(-1, "COULDN'T CREATE SOCKET PAIR #2 - _SC_INIT_IPC");};
-/*
-	      _SC_fixup_socket(ports[0]);
-	      _SC_fixup_socket(ports[1]);
-*/
-              cp->io[0] = ports[0];
-              pp->io[1] = ports[1];
+              pp->ISTDIN  = ports[0];
+              cp->ISTDOUT = ports[1];
 
-              SC_set_fd_attr(pp->io[0], O_RDONLY | O_NDELAY, TRUE);
-              SC_set_fd_attr(pp->io[1], O_WRONLY, TRUE);
-              SC_set_fd_attr(cp->io[0], O_RDONLY & ~O_NDELAY, TRUE);
-              SC_set_fd_attr(cp->io[1], O_WRONLY, TRUE);};
+/* stdout */
+              if (socketpair(PF_UNIX, SOCK_STREAM, 0, ports) < 0)
+                 {close(pp->ISTDIN);
+                  close(cp->ISTDOUT);
+                  SC_error(-1, "COULDN'T CREATE SOCKET PAIR #2 - _SC_INIT_IPC");};
+              cp->ISTDIN  = ports[0];
+              pp->ISTDOUT = ports[1];
+
+/* stderr */
+              if (socketpair(PF_UNIX, SOCK_STREAM, 0, ports) < 0)
+                 {close(pp->ISTDIN);
+                  close(cp->ISTDOUT);
+                  SC_error(-1, "COULDN'T CREATE SOCKET PAIR #2 - _SC_INIT_IPC");};
+              cp->ISTDERR = ports[0];
+              pp->ISTDERR = ports[1];
+
+              SC_set_fd_attr(pp->ISTDIN,  O_RDONLY | O_NDELAY, TRUE);
+              SC_set_fd_attr(pp->ISTDOUT, O_WRONLY, TRUE);
+              SC_set_fd_attr(pp->ISTDERR, O_WRONLY, TRUE);
+              SC_set_fd_attr(cp->ISTDIN,  O_RDONLY & ~O_NDELAY, TRUE);
+              SC_set_fd_attr(cp->ISTDOUT, O_WRONLY, TRUE);
+              SC_set_fd_attr(cp->ISTDERR, O_WRONLY, TRUE);};
 
              break;
 
@@ -603,7 +621,7 @@ static int _SC_parent_fork(PROCESS *pp, PROCESS *cp, int to,
 
 #ifdef F_SETOWN
     if (pp->medium == USE_SOCKETS)
-       fcntl(pp->io[0], F_SETOWN, pp->root);
+       fcntl(pp->ISTDIN, F_SETOWN, pp->root);
 #endif
 
     if (strchr(mode, 'o') != NULL)
@@ -617,11 +635,11 @@ static int _SC_parent_fork(PROCESS *pp, PROCESS *cp, int to,
        {if (_SC.orig_tty != NULL)
 	   SC_set_raw_state(0, FALSE);
 
-	SC_set_raw_state(pp->io[0], FALSE);
+	SC_set_raw_state(pp->ISTDIN, FALSE);
 
-	cp->io[0] = -1;
-	cp->io[1] = -1;
-	cp->io[2] = -1;};
+	cp->ISTDIN  = -1;
+	cp->ISTDOUT = -1;
+	cp->ISTDERR = -1;};
 
     cp->release(cp);
     cp = NULL;
@@ -879,7 +897,7 @@ static void _SC_init_io_spec(SC_job *pj, int n, int id)
 
 static void _SC_set_io_spec(SC_job *jobs, int n, int id,
 			    SC_io_kind kind, char *link)
-   {int fd, gid, nc;
+   {int fd, gid, nc, md;
     SC_io_device dev;
     SC_io_kind ios, iod;
     char s[MAXLINE];
@@ -917,7 +935,10 @@ static void _SC_set_io_spec(SC_job *jobs, int n, int id,
 
 /* GOTCHA: worrry about append or create */
 		 else
-		    fd = open(ps+1, O_WRONLY);
+		    {md  = O_WRONLY;
+		     md |= O_CREAT;
+		     md |= O_TRUNC;
+		     fd  = open(ps+1, md, 0600);};
 		 break;
 	    case 's' :
 		 dev = SC_IODEV_SOCKET;
@@ -1033,9 +1054,15 @@ static void _SC_pipeline_parse(SC_job *jobs, int n, int id)
 
 static void _SC_reconnect_pipeline(int n, SC_job *pg,
 				   PROCESS **pa, PROCESS **ca)
-   {int i, nm;
+   {int i, is, ide, ido, nm;
     SC_job *g;
     PROCESS *pp, *cp, *pn, *cn;
+
+/* parse out the process group links */
+    for (i = 0; i < n; i++)
+        _SC_pipeline_parse(pg, n, i);
+
+/* dprpipe(pg); */
 
     nm = n - 1;
 
@@ -1044,53 +1071,55 @@ static void _SC_reconnect_pipeline(int n, SC_job *pg,
  */
     if (nm > 0)
 
-/* parse out the process group links */
-       {for (i = 0; i < n; i++)
-	    _SC_pipeline_parse(pg, n, i);
-
-dprpipe(pg);
-
 /* set any sockets to read/write mode */
-	for (i = 0; i < n; i++)
+       {for (i = 0; i < n; i++)
 	    {pp = pa[i];
 	     cp = ca[i];
 	     if (cp->medium == USE_SOCKETS)
-	        {SC_set_fd_attr(pp->io[0], O_RDWR,   -1);
-		 SC_set_fd_attr(pp->io[1], O_RDWR,   -1);
-		 SC_set_fd_attr(pp->io[2], O_WRONLY, -1);
-		 SC_set_fd_attr(cp->io[0], O_RDWR,   -1);
-		 SC_set_fd_attr(cp->io[1], O_RDWR,   -1);
-		 SC_set_fd_attr(cp->io[2], O_WRONLY, -1);};};
+	        {SC_set_fd_attr(pp->ISTDIN,  O_RDWR,   -1);
+		 SC_set_fd_attr(pp->ISTDOUT, O_RDWR,   -1);
+		 SC_set_fd_attr(pp->ISTDERR, O_WRONLY, -1);
+		 SC_set_fd_attr(cp->ISTDIN,  O_RDWR,   -1);
+		 SC_set_fd_attr(cp->ISTDOUT, O_RDWR,   -1);
+		 SC_set_fd_attr(cp->ISTDERR, O_WRONLY, -1);};};
 
 /* reconnect terminal process output to first process */
 	pp = pa[nm];
 	pn = pa[0];
-	close(pp->io[1]);
-	pp->io[1] = pn->io[1];
-	pn->io[1] = -2;
+	close(pp->ISTDOUT);
+	pp->ISTDOUT = pn->ISTDOUT;
+	pn->ISTDOUT = -2;
 
 /* close all other parent to child lines */
 	for (i = 1; i < nm; i++)
 	    {pp = pa[i];
 	     cp = ca[i];
-	     g  = pg + i;
 
-	     close(pp->io[1]);
-	     close(cp->io[0]);
+	     close(pp->ISTDOUT);
+	     close(cp->ISTDIN);
 
-	     pp->io[1] = -2;
-	     cp->io[0] = -2;};
+	     pp->ISTDOUT = -2;
+	     cp->ISTDIN  = -2;};
 
 /* connect all non-terminal child out to next child in */
 	for (i = 0; i < nm; i++)
-	    {pp = pa[i];
-	     cp = ca[i];
-	     cn = ca[i+1];
+	    {is = i;
+	     g  = pg + is;
 
-	     close(cn->io[0]);
+	     ido = g->fd[SC_IO_OUT].gid;
+	     ide = g->fd[SC_IO_ERR].gid;
 
-	     cn->io[0] = pp->io[0];
-	     pp->io[0] = -2;};};
+	     ido = i + 1;
+	     ide = i + 1;
+
+	     pp = pa[is];
+	     cp = ca[is];
+	     cn = ca[ido];
+
+	     close(cn->ISTDIN);
+
+	     cn->ISTDIN = pp->ISTDIN;
+	     pp->ISTDIN = -2;};};
 
     return;}
 
@@ -1568,13 +1597,13 @@ static char *_SC_get_input(char *bf, int len, PROCESS *pp)
 
 /* if unblocked when should be blocked */
     if (status && blck)
-       {SC_block_fd(pp->io[0]);
+       {SC_block_fd(pp->ISTDIN);
         status = FALSE;
         reset  = FALSE;}
 
 /* if blocked when should be unblocked */
     else if (!status && !blck)
-       {SC_unblock_fd(pp->io[0]);
+       {SC_unblock_fd(pp->ISTDIN);
         status = TRUE;
         reset  = TRUE;};
 
@@ -1615,10 +1644,10 @@ static char *_SC_get_input(char *bf, int len, PROCESS *pp)
 /* reset the blocking to its state upon entry */
     switch (reset)
        {case 0 :
-	     SC_unblock_fd(pp->io[0]);
+	     SC_unblock_fd(pp->ISTDIN);
 	     break;
         case 1 :
-	     SC_block_fd(pp->io[0]);
+	     SC_block_fd(pp->ISTDIN);
 	     break;};
 
     return(pbf);}
