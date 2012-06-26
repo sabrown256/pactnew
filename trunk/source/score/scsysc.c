@@ -939,7 +939,10 @@ static int _SC_init_subtasks(subtask *sub, char *shell, char **ta, int na)
     for (n = 0; n < na; n++)
         {t = ta[n];
 
-	 if (strpbrk(t, "[]()@$*`") != NULL)
+	 if ((t[0] == SC_PROCESS_DELIM) && (_SC_ps.msh_syntax == TRUE))
+	    pipe = TRUE;
+
+	 else if (strpbrk(t, "[]()@$*`") != NULL)
 	    dosh = TRUE;
 
 	 else if (strncmp(t, "if", 2) == 0)

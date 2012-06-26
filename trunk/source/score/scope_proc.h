@@ -17,6 +17,8 @@
 #define DEFAULT_TIMEOUT    30000
 #define DEFAULT_HEARTBEAT  30
 
+#define SC_PROCESS_DELIM   '@'
+
 /*--------------------------------------------------------------------------*/
 
 /*                             EXEC ERROR STATUS                            */
@@ -376,6 +378,7 @@ struct s_taskdesc
 struct s_SC_scope_proc
    {int current_flushed_process;
     int debug;
+    int msh_syntax;
     FILE *diag;};
 
 enum e_SC_proc_kind
@@ -430,6 +433,35 @@ enum e_SC_mp_tag
 
 typedef enum e_SC_mp_tag SC_mp_tag;
 
+enum e_SC_io_kind
+   {SC_IO_IN, SC_IO_OUT, SC_IO_ERR};
+
+typedef enum e_SC_io_kind SC_io_kind;
+
+enum e_SC_io_device
+   {SC_IODEV_NONE,
+    SC_IODEV_PIPE, SC_IODEV_SOCKET, SC_IODEV_PTY, 
+    SC_IODEV_TERM, SC_IODEV_FILE, SC_IODEV_VAR, SC_IODEV_EXPR };
+
+typedef enum e_SC_io_device SC_io_device;
+
+typedef struct s_SC_io SC_io;
+typedef struct s_SC_job SC_job;
+
+struct s_SC_io
+   {SC_io_kind kind;        /* INPUT, OUTPUT, or ERROR - 0, 1, or 2 */
+    SC_io_device dev;
+    int fd;                 /* file descriptor */
+    int gid;};              /* id in process group */
+
+struct s_SC_job
+   {int id;                 /* id of process in group */
+    int ia;                 /* index of first element of argv for spec */
+    int exit;               /* exit status value */
+    char *cmd;              /* text of command */
+    char *ios;              /* text representation of I/O connections */
+    char **argv;            /* tokens of command */
+    SC_io fd[3];};          /* struct representation of I/O connections */
 
 #ifdef __cplusplus
 extern "C" {

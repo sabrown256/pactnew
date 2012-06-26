@@ -922,7 +922,7 @@ static object *_SSI_system(SS_psides *si, object *argl)
  */
 
 static object *_SSI_syscmnd(SS_psides *si, object *argl)
-   {int i, to;
+   {int i, to, ost;
     char *cmd, **output;
     object *lst;
 
@@ -933,6 +933,9 @@ static object *_SSI_syscmnd(SS_psides *si, object *argl)
 	    SC_STRING_I,  &cmd,
 	    SC_INT_I, &to,
 	    0);
+
+    ost = _SC_ps.msh_syntax;
+    _SC_ps.msh_syntax = TRUE;
 
     if (to > 0)
        {if (SC_time_allow(to) == 0)
@@ -947,12 +950,16 @@ static object *_SSI_syscmnd(SS_psides *si, object *argl)
     lst = SS_null;
     if (output != NULL)
        {for (i = 0; output[i] != NULL; i++)
-            {SS_assign(si, lst, SS_mk_cons(si, SS_mk_string(si, output[i]), lst));};
+            {SS_assign(si, lst,
+		       SS_mk_cons(si, SS_mk_string(si, output[i]),
+				  lst));};
 
         SS_assign(si, lst, SS_reverse(si, lst));
 	SC_mark(lst, -1);
 
         SC_free_strings(output);}
+
+    _SC_ps.msh_syntax = ost;
 
     return(lst);}
 
