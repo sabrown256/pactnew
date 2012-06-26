@@ -38,7 +38,7 @@ static void child_has_txt(int fd, int mask, void *a)
     p = NULL;
     for (i = 0; i < n; i++)
         if (pp[i] != NULL)
-	   if (pp[i]->in == fd)
+	   if (pp[i]->ISTDIN == fd)
 	      {p = pp[i];
 	       break;};
 
@@ -112,7 +112,7 @@ static int process_end(int *prv, void *a)
 		rv         = reason;
 
 /* get anything remaining from the child */
-		child_has_txt(p->in, 0, a);
+		child_has_txt(p->ISTDIN, 0, a);
 
 		if (!quiet)
 		   PRINT(stdout, "\n    Child #%d (%d) terminated (%d %d)\n",
