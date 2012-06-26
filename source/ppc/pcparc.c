@@ -322,12 +322,14 @@ static PROCESS *_PC_open_member_n(char **argv, int *pnn)
 	    strcpy(srvr, _PC.server);
 	    port = _PC.server_port;
 
-	    pp->in  = _PC.server_link->in;
-	    pp->out = _PC.server_link->out;}
+	    pp->io[0] = _PC.server_link->io[0];
+	    pp->io[1] = _PC.server_link->io[1];
+	    pp->io[2] = _PC.server_link->io[2];}
 
        else
-	  {pp->in  = 0;
-	   pp->out = 1;};
+	  {pp->io[0] = 0;
+	   pp->io[1] = 1;
+	   pp->io[2] = 2;};
 
 	PC_block(pp);
 	PC_gets(t, MAXLINE, pp);

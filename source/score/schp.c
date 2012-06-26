@@ -89,8 +89,9 @@ void _SC_exec_test(char **argv, char **envp, char *mode)
 
     pp->medium     = USE_PIPES;
     pp->data_type  = SC_ASCII;
-    pp->in         = 0;
-    pp->out        = 1;
+    pp->io[0]      = 0;
+    pp->io[1]      = 1;
+    pp->io[2]      = 2;
     pp->ischild    = FALSE;
     pp->status     = SC_RUNNING;
     pp->reason     = 0;
@@ -155,11 +156,13 @@ static int _SC_open_pty_unix(PROCESS *pp, PROCESS *cp)
     if (pc != NULL)
        {cp->spty = CSTRSAVE(pc);
 
-	cp->in  = pty;
-	cp->out = pty;
+	cp->io[0] = pty;
+	cp->io[1] = pty;
+	cp->io[2] = pty;
 
-	pp->in  = pty;
-	pp->out = pty;
+	pp->io[0] = pty;
+	pp->io[1] = pty;
+	pp->io[2] = pty;
 
 	ok = TRUE;}
 
@@ -192,12 +195,14 @@ static int _SC_open_pty_unix(PROCESS *pp, PROCESS *cp)
 		 {spty = SC_dsnprintf(TRUE, "/dev/%s%c%c",
 				      SC_SLAVE_PTY_NAME, c, d);
                   
-		  cp->spty = spty;
-		  cp->in   = pty;
-		  cp->out  = pty;
+		  cp->spty  = spty;
+		  cp->io[0] = pty;
+		  cp->io[1] = pty;
+		  cp->io[2] = pty;
 
-		  pp->in  = pty;
-		  pp->out = pty;
+		  pp->io[0] = pty;
+		  pp->io[1] = pty;
+		  pp->io[2] = pty;
 
 		  break;};};};
 
@@ -230,11 +235,13 @@ static int _SC_open_pty_unix98(PROCESS *pp, PROCESS *cp)
        {ps = ptsname(pty);
 	cp->spty = CSTRSAVE(ps);
 
-	cp->in  = pty;
-	cp->out = pty;
+	cp->io[0] = pty;
+	cp->io[1] = pty;
+	cp->io[2] = pty;
 
-	pp->in  = pty;
-	pp->out = pty;
+	pp->io[0] = pty;
+	pp->io[1] = pty;
+	pp->io[2] = pty;
 
 	ok = TRUE;}
 
@@ -294,8 +301,9 @@ PROCESS *SC_mk_process(char **argv, char *mode, int type, int iex)
 
     pp->status      = NOT_FINISHED;
     pp->reason      = NOT_FINISHED;
-    pp->in          = -1;
-    pp->out         = -1;
+    pp->io[0]       = -1;
+    pp->io[1]       = -1;
+    pp->io[2]       = -1;
     pp->data        = -1;
     pp->medium      = NO_IPC;
     pp->gone        = -1;
@@ -475,21 +483,21 @@ static int _SC_init_ipc(PROCESS *pp, PROCESS *cp)
               if (pipe(ports) < 0)
                  SC_error(-1, "COULDN'T CREATE PIPE #1 - _SC_INIT_IPC");
 
-              pp->in  = ports[0];
-              cp->out = ports[1];
+              pp->io[0] = ports[0];
+              cp->io[1] = ports[1];
 
               if (pipe(ports) < 0)
-                 {close(pp->in);
-                  close(cp->out);
+                 {close(pp->io[0]);
+                  close(cp->io[1]);
                   SC_error(-1, "COULDN'T CREATE PIPE #2 - _SC_INIT_IPC");};
 
-              cp->in  = ports[0];
-              pp->out = ports[1];
+              cp->io[0] = ports[0];
+              pp->io[1] = ports[1];
 
-              SC_set_fd_attr(pp->in, O_RDONLY | O_NDELAY, TRUE);
-              SC_set_fd_attr(pp->out, O_WRONLY, TRUE);
-              SC_set_fd_attr(cp->in, O_RDONLY & ~O_NDELAY, TRUE);
-              SC_set_fd_attr(cp->out, O_WRONLY, TRUE);};
+              SC_set_fd_attr(pp->io[0], O_RDONLY | O_NDELAY, TRUE);
+              SC_set_fd_attr(pp->io[1], O_WRONLY, TRUE);
+              SC_set_fd_attr(cp->io[0], O_RDONLY & ~O_NDELAY, TRUE);
+              SC_set_fd_attr(cp->io[1], O_WRONLY, TRUE);};
 
               break;
 
@@ -504,23 +512,23 @@ static int _SC_init_ipc(PROCESS *pp, PROCESS *cp)
 	      _SC_fixup_socket(ports[0]);
 	      _SC_fixup_socket(ports[1]);
 */
-              pp->in  = ports[0];
-              cp->out = ports[1];
+              pp->io[0] = ports[0];
+              cp->io[1] = ports[1];
               if (socketpair(PF_UNIX, SOCK_STREAM, 0, ports) < 0)
-                 {close(pp->in);
-                  close(cp->out);
+                 {close(pp->io[0]);
+                  close(cp->io[1]);
                   SC_error(-1, "COULDN'T CREATE SOCKET PAIR #2 - _SC_INIT_IPC");};
 /*
 	      _SC_fixup_socket(ports[0]);
 	      _SC_fixup_socket(ports[1]);
 */
-              cp->in  = ports[0];
-              pp->out = ports[1];
+              cp->io[0] = ports[0];
+              pp->io[1] = ports[1];
 
-              SC_set_fd_attr(pp->in, O_RDONLY | O_NDELAY, TRUE);
-              SC_set_fd_attr(pp->out, O_WRONLY, TRUE);
-              SC_set_fd_attr(cp->in, O_RDONLY & ~O_NDELAY, TRUE);
-              SC_set_fd_attr(cp->out, O_WRONLY, TRUE);};
+              SC_set_fd_attr(pp->io[0], O_RDONLY | O_NDELAY, TRUE);
+              SC_set_fd_attr(pp->io[1], O_WRONLY, TRUE);
+              SC_set_fd_attr(cp->io[0], O_RDONLY & ~O_NDELAY, TRUE);
+              SC_set_fd_attr(cp->io[1], O_WRONLY, TRUE);};
 
              break;
 
@@ -595,7 +603,7 @@ static int _SC_parent_fork(PROCESS *pp, PROCESS *cp, int to,
 
 #ifdef F_SETOWN
     if (pp->medium == USE_SOCKETS)
-       fcntl(pp->in, F_SETOWN, pp->root);
+       fcntl(pp->io[0], F_SETOWN, pp->root);
 #endif
 
     if (strchr(mode, 'o') != NULL)
@@ -609,10 +617,11 @@ static int _SC_parent_fork(PROCESS *pp, PROCESS *cp, int to,
        {if (_SC.orig_tty != NULL)
 	   SC_set_raw_state(0, FALSE);
 
-	SC_set_raw_state(pp->in, FALSE);
+	SC_set_raw_state(pp->io[0], FALSE);
 
-	cp->in  = -1;
-	cp->out = -1;};
+	cp->io[0] = -1;
+	cp->io[1] = -1;
+	cp->io[2] = -1;};
 
     cp->release(cp);
     cp = NULL;
@@ -661,7 +670,7 @@ static void _SC_error_fork(PROCESS *pp, PROCESS *cp)
 
 #ifdef HAVE_PROCESS_CONTROL
 
-static SC_job *_SC_make_pipeline(char **argv)
+static SC_job *_SC_make_pipeline(char **argv, char **env)
    {int i, n;
     SC_job *pg;
 
@@ -675,16 +684,20 @@ static SC_job *_SC_make_pipeline(char **argv)
 
     n          = 0;
     pg[n].argv = argv;
+    pg[n].env  = env;
 
     for (i = 0; argv[i] != NULL; i++)
         {if ((strcmp(argv[i], "|") == 0) ||
 	     (argv[i][0] == SC_PROCESS_DELIM))
             {pg[n].ios  = argv[i];
+
 	     if (argv[i+1] != NULL)
 	        {n++;
 		 pg[n].ia   = i+1;
-		 pg[n].argv = argv + i + 1;};
-	     argv[i]    = NULL;};};
+		 pg[n].argv = argv + i + 1;
+		 pg[n].env  = env;};
+
+	     argv[i] = NULL;};};
 
     n++;
     pg[n].ia = -1;
@@ -1042,17 +1055,19 @@ dprpipe(pg);
 	    {pp = pa[i];
 	     cp = ca[i];
 	     if (cp->medium == USE_SOCKETS)
-	        {SC_set_fd_attr(pp->in,  O_RDWR, -1);
-		 SC_set_fd_attr(pp->out, O_RDWR, -1);
-		 SC_set_fd_attr(cp->in,  O_RDWR, -1);
-		 SC_set_fd_attr(cp->out, O_RDWR, -1);};};
+	        {SC_set_fd_attr(pp->io[0], O_RDWR,   -1);
+		 SC_set_fd_attr(pp->io[1], O_RDWR,   -1);
+		 SC_set_fd_attr(pp->io[2], O_WRONLY, -1);
+		 SC_set_fd_attr(cp->io[0], O_RDWR,   -1);
+		 SC_set_fd_attr(cp->io[1], O_RDWR,   -1);
+		 SC_set_fd_attr(cp->io[2], O_WRONLY, -1);};};
 
 /* reconnect terminal process output to first process */
 	pp = pa[nm];
 	pn = pa[0];
-	close(pp->out);
-	pp->out = pn->out;
-	pn->out = -2;
+	close(pp->io[1]);
+	pp->io[1] = pn->io[1];
+	pn->io[1] = -2;
 
 /* close all other parent to child lines */
 	for (i = 1; i < nm; i++)
@@ -1060,11 +1075,11 @@ dprpipe(pg);
 	     cp = ca[i];
 	     g  = pg + i;
 
-	     close(pp->out);
-	     close(cp->in);
+	     close(pp->io[1]);
+	     close(cp->io[0]);
 
-	     pp->out = -2;
-	     cp->in  = -2;};
+	     pp->io[1] = -2;
+	     cp->io[0] = -2;};
 
 /* connect all non-terminal child out to next child in */
 	for (i = 0; i < nm; i++)
@@ -1072,10 +1087,10 @@ dprpipe(pg);
 	     cp = ca[i];
 	     cn = ca[i+1];
 
-	     close(cn->in);
+	     close(cn->io[0]);
 
-	     cn->in = pp->in;
-	     pp->in = -2;};};
+	     cn->io[0] = pp->io[0];
+	     pp->io[0] = -2;};};
 
     return;}
 
@@ -1188,36 +1203,33 @@ static int _SC_setup_proc(PROCESS **ppp, PROCESS **pcp,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_OPEN_PROC - start up a process on the current CPU
- *               - and open a connection to it for further communications
+/* _SC_SETUP_PROCESS_GROUP - setup and return a process group
+ *                         - as specified in ARGV
  */
 
-static PROCESS *_SC_open_proc(int rcpu, char *name, char **argv,
-			      char **envp, char *mode,
-			      SC_filedes *fd, int retry, int iex,
-			      PFProcInit initf, PFProcExit exitf, void *exita)
-   {PROCESS *pp;
-
-#ifdef HAVE_PROCESS_CONTROL
-    int i, n, pid, to, st, off;
-    char **al, *mod;
-    PROCESS *cp, **pa, **ca;
-    SC_job *pg;
+static SC_process_group *_SC_setup_process_group(char **argv, char **envp,
+						 char *mode, SC_filedes *fd,
+						 int retry, int iex,
+						 int rcpu,
+						 PFProcInit initf,
+						 PFProcExit exitf,
+						 void *exita)
+   {int i, n, to, off;
+    char *mod;
+    PROCESS **pa, **ca;
+    SC_job *pj;
     SC_filedes *pfd;
+    SC_process_group *pgr;
 
-    if (_SC_redir_fail(fd) != -1)
-       return(NULL);
-
-    pp = NULL;
-    pg = _SC_make_pipeline(argv);
-    n  = _SC_pipeline_length(pg);
+    pj = _SC_make_pipeline(argv, envp);
+    n  = _SC_pipeline_length(pj);
 
     pa = CMAKE_N(PROCESS *, n);
     ca = CMAKE_N(PROCESS *, n);
 
 /* setup each process in the pipeline */
     for (i = 0; i < n; i++)
-        {off = pg[i].ia;
+        {off = pj[i].ia;
 
 /* NOTE: use sockets for the non-terminal process */
 	 mod = (i < n-1) ? "as" : mode;
@@ -1226,15 +1238,71 @@ static PROCESS *_SC_open_proc(int rcpu, char *name, char **argv,
 	 to = _SC_setup_proc(&pa[i], &ca[i], argv+off, mod,
 			     pfd, retry, iex, initf, exitf, exita);};
 
-    _SC_reconnect_pipeline(n, pg, pa, ca);
+    _SC_reconnect_pipeline(n, pj, pa, ca);
+
+    pgr = CMAKE(SC_process_group);
+    if (pgr != NULL)
+       {pgr->np       = n;
+	pgr->to       = to;
+	pgr->rcpu     = rcpu;
+	pgr->mode     = mode;
+	pgr->jobs     = pj;
+	pgr->terminal = NULL;
+	pgr->parents  = pa;
+	pgr->children = ca;};
+
+    return(pgr);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_FREE_PROCESS_GROUP - release a process group instance */
+
+static void _SC_free_process_group(SC_process_group *pgr)
+   {
+
+    if (pgr != NULL)
+       {CFREE(pgr->jobs);
+	CFREE(pgr->parents);
+	CFREE(pgr->children);
+	CFREE(pgr);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_LAUNCH_PROCESS_GROUP - fork and exec each job
+ *                          - in the process group PGR
+ *                          - return the terminal process
+ */
+
+static PROCESS *_SC_launch_process_group(SC_process_group *pgr)
+   {int i, n, pid, to, st, rcpu;
+    char *md, **al, **el;
+    PROCESS *pp, *cp, **pa, **ca;
+    SC_job *pj;
+
+    n    = pgr->np;
+    to   = pgr->to;
+    pj   = pgr->jobs;
+    pa   = pgr->parents;
+    ca   = pgr->children;
+    md   = pgr->mode;
+    rcpu = pgr->rcpu;
 
 /* launch each process in the pipeline */
     for (i = 0; i < n; i++)
         {pp = pa[i];
 	 cp = ca[i];
 
-	 off = pg[i].ia;
+/*
+         int off;
+	 off = pj[i].ia;
          al  = argv + off;
+ */
+         al  = pj[i].argv;
+	 el  = pj[i].env;
 
 /* fork the process */
          pid    = fork();
@@ -1249,24 +1317,47 @@ static PROCESS *_SC_open_proc(int rcpu, char *name, char **argv,
 
 /* the child process comes here and if successful will never return */
 	     case 0 :
-		  _SC_child_fork(pp, cp, to, al, envp, mode);
+		  _SC_child_fork(pp, cp, to, al, el, md);
 		  break;
 
 /* the parent process comes here */
 	     default :
-	          st = _SC_parent_fork(pp, cp, to, rcpu, mode);
+	          st = _SC_parent_fork(pp, cp, to, rcpu, md);
 		  if (st == FALSE)
 		     {SC_close(pp);
 		      pp = NULL;};
 		  break;};};
 
-    CFREE(pg);
-    CFREE(pa);
-    CFREE(ca);
+    return(pp);}
 
-#else
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_OPEN_PROC - start up a process on the current CPU
+ *               - and open a connection to it for further communications
+ */
+
+static PROCESS *_SC_open_proc(int rcpu, char *name, char **argv,
+			      char **envp, char *mode,
+			      SC_filedes *fd, int retry, int iex,
+			      PFProcInit initf, PFProcExit exitf, void *exita)
+   {PROCESS *pp;
 
     pp = NULL;
+
+#ifdef HAVE_PROCESS_CONTROL
+
+    SC_process_group *pgr;
+
+    if (_SC_redir_fail(fd) != -1)
+       return(NULL);
+
+    pgr = _SC_setup_process_group(argv, envp, mode, fd, retry, iex, rcpu,
+				  initf, exitf, exita);
+
+    pp  = _SC_launch_process_group(pgr);
+
+    _SC_free_process_group(pgr);
 
 #endif
 
@@ -1477,13 +1568,13 @@ static char *_SC_get_input(char *bf, int len, PROCESS *pp)
 
 /* if unblocked when should be blocked */
     if (status && blck)
-       {SC_block_fd(pp->in);
+       {SC_block_fd(pp->io[0]);
         status = FALSE;
         reset  = FALSE;}
 
 /* if blocked when should be unblocked */
     else if (!status && !blck)
-       {SC_unblock_fd(pp->in);
+       {SC_unblock_fd(pp->io[0]);
         status = TRUE;
         reset  = TRUE;};
 
@@ -1524,10 +1615,10 @@ static char *_SC_get_input(char *bf, int len, PROCESS *pp)
 /* reset the blocking to its state upon entry */
     switch (reset)
        {case 0 :
-	     SC_unblock_fd(pp->in);
+	     SC_unblock_fd(pp->io[0]);
 	     break;
         case 1 :
-	     SC_block_fd(pp->in);
+	     SC_block_fd(pp->io[0]);
 	     break;};
 
     return(pbf);}

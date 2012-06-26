@@ -179,7 +179,7 @@ int SC_register_event_loop_callback(SC_evlpdes *pe, int type, void *p,
     SC_poll_desc pd;
 
     if (type == SC_PROCESS_I)
-       fd = ((PROCESS *) p)->in;
+       fd = ((PROCESS *) p)->io[0];
 
     else if (type == SC_FILE_I)
        fd = fileno((FILE *) p);
@@ -214,7 +214,7 @@ int SC_replace_event_loop_accept(SC_evlpdes *pe, int type, void *p,
     SC_poll_desc *pd;
 
     if (type == SC_PROCESS_I)
-       fd = ((PROCESS *) p)->in;
+       fd = ((PROCESS *) p)->io[0];
 
     else if (type == SC_FILE_I)
        fd = fileno((FILE *) p);
@@ -250,7 +250,7 @@ int SC_replace_event_loop_reject(SC_evlpdes *pe, int type, void *p,
     SC_poll_desc *pd;
 
     if (type == SC_PROCESS_I)
-       fd = ((PROCESS *) p)->in;
+       fd = ((PROCESS *) p)->io[0];
 
     else if (type == SC_FILE_I)
        fd = fileno((FILE *) p);
@@ -291,7 +291,7 @@ void SC_remove_event_loop_callback(SC_evlpdes *pe, int type, void *p)
 
     if (type == SC_PROCESS_I)
        {pp = (PROCESS *) p;
-	fd = pp->in;}
+	fd = pp->io[0];}
 
     else if (type == SC_FILE_I)
        {fp = (FILE *) p;
@@ -336,7 +336,7 @@ void SC_get_event_loop_callback(SC_evlpdes *pe, int type, void *p,
 
     if (type == SC_PROCESS_I)
        {pp = (PROCESS *) p;
-	fd = pp->in;}
+	fd = pp->io[0];}
 
     else if (type == SC_FILE_I)
        {fp = (FILE *) p;
@@ -732,9 +732,9 @@ int SC_set_attr(PROCESS *pp, int attr, int val)
 
         default :
 	     if (attr == SC_ASYNC)
-	        rv = SC_set_fd_async(pp->in, val, pp->id);
+	        rv = SC_set_fd_async(pp->io[0], val, pp->id);
 	     else
-	        rv = SC_set_fd_attr(pp->in, attr, val);
+	        rv = SC_set_fd_attr(pp->io[0], attr, val);
 	     break;};
 
     return(rv);}
@@ -1016,7 +1016,7 @@ int SC_io_callback_file(FILE *fp, PFFileCallback acc, PFFileCallback rej)
 int SC_io_callback(PROCESS *pp, PFFileCallback acc, PFFileCallback rej)
    {int fd, rv;
 
-    fd = pp->in;
+    fd = pp->io[0];
     rv = SC_io_callback_pid(fd, acc, rej, pp->id);
 
     return(rv);}
@@ -1067,7 +1067,7 @@ int SC_replace_accept_file(FILE *fp, PFFileCallback acc)
 int SC_replace_accept(PROCESS *pp, PFFileCallback acc)
    {int fd, rv;
 
-    fd = pp->in;
+    fd = pp->io[0];
 
     rv = SC_replace_accept_fd(fd, acc);
 
@@ -1119,7 +1119,7 @@ int SC_replace_reject_file(FILE *fp, PFFileCallback rej)
 int SC_replace_reject(PROCESS *pp, PFFileCallback rej)
    {int fd, rv;
 
-    fd = pp->in;
+    fd = pp->io[0];
 
     rv = SC_replace_reject_fd(fd, rej);
 

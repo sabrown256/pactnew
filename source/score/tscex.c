@@ -8,6 +8,7 @@
 
 #include "cpyright.h"
 
+#include "score.h"
 #include "scope_proc.h"
 
 static int
@@ -98,6 +99,8 @@ static int test_srv(char *mode, int dt)
 					 tty_has_txt,
 					 NULL,
 					 -1);
+
+    SC_ASSERT(pi == TRUE);
 
     SC_unblock_file(stdin);
 

@@ -166,7 +166,7 @@
     0)
 
 #define SC_process_alive(_p)                                                 \
-   (((_p) != NULL) && ((_p)->in != -1))
+   (((_p) != NULL) && ((_p)->io[0] != -1))
 
 #define SC_status(_p)                                                        \
    ((SC_process_alive(_p)) ? (_p)->statusp(_p) : SC_DEAD)
@@ -447,6 +447,7 @@ typedef enum e_SC_io_device SC_io_device;
 
 typedef struct s_SC_io SC_io;
 typedef struct s_SC_job SC_job;
+typedef struct s_SC_process_group SC_process_group;
 
 struct s_SC_io
    {SC_io_kind kind;        /* INPUT, OUTPUT, or ERROR - 0, 1, or 2 */
@@ -461,7 +462,18 @@ struct s_SC_job
     char *cmd;              /* text of command */
     char *ios;              /* text representation of I/O connections */
     char **argv;            /* tokens of command */
+    char **env;             /* environment variables for command */
     SC_io fd[3];};          /* struct representation of I/O connections */
+
+struct s_SC_process_group
+   {int np;                 /* number of processes in group */
+    int to;                 /* group time out */
+    int rcpu;               /* */
+    char *mode;             /* IPC mode */
+    SC_job *jobs;           /* array of jobs in group */
+    PROCESS *terminal;      /* terminal process */
+    PROCESS **parents;      /* parent process array */
+    PROCESS **children;};   /* child process array */
 
 #ifdef __cplusplus
 extern "C" {

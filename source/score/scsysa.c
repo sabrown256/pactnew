@@ -128,7 +128,7 @@ void _SC_process_output(int fd, int mask, void *a)
 	 if (job != NULL)
 	    {pp = job->pp;
 	     if (SC_process_alive(pp))
-	        {if (pp->in == fd)
+	        {if (pp->io[0] == fd)
 		    {nb = pp->n_read;
 
 		     while (SC_gets(s, MAX_BFSZ, pp) != NULL)
@@ -185,7 +185,7 @@ void _SC_process_out_reject(int fd, int mask, void *a)
 	 if (job != NULL)
 	    {pp = job->pp;
 	     if (SC_process_alive(pp))
-	        {if ((pp->in == fd) && (SC_status(pp) == SC_RUNNING))
+	        {if ((pp->io[0] == fd) && (SC_status(pp) == SC_RUNNING))
 		    _SC_rejected_process(as, state, job, mask);};};};
 
     SC_END_ACTIVITY(state);

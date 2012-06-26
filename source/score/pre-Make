@@ -342,10 +342,13 @@ ${BinDir}/tscer : ${TGTLib} tscer.c
 # EXEC SERVER
 #
 
-exec : ${BinDir}/tscex
+exec : ${BinDir}/tscex ${BinDir}/tscpgrp
 
 ${BinDir}/tscex : ${TGTLib} tscex.c
 	${CCCfe} ${LdFlags} tscex.c -o ${BinDir}/tscex ${Libs}
+
+${BinDir}/tscpgrp : ${TGTLib} tscpgrp.c
+	${CCCfe} ${LdFlags} tscpgrp.c -o ${BinDir}/tscpgrp ${Libs}
 
 #
 # MPI

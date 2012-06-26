@@ -623,20 +623,22 @@ static char *_SC_prep_command(char *in, int check)
    {int nc;
     char *out;
 
-    SC_trim_right(in, " ");
+    out = NULL;
+    if (in != NULL)
+       {SC_trim_right(in, " ");
 
 /* transform a command of the form ( ... ) to ' ... '
  * this will save a process being created by the shell SH
  */
-    nc = strlen(in) - 1;
-    nc = max(nc, 0);
-    if ((in[0] == '(') && (in[nc] == ')'))
-       {out = CSTRSAVE(in+1);
-        SC_LAST_CHAR(out) = '\0';}
+	nc = strlen(in) - 1;
+	nc = max(nc, 0);
+	if ((in[0] == '(') && (in[nc] == ')'))
+	   {out = CSTRSAVE(in+1);
+	    SC_LAST_CHAR(out) = '\0';}
 
 /* copy in the command if not of the form ( ... ) */
-    else
-       out = CSTRSAVE(in);
+	else
+	   out = CSTRSAVE(in);};
 
     return(out);}
 
@@ -1710,7 +1712,7 @@ static int _SC_task_done(taskdesc *job, int setst)
 
 	    acc = state->acc;
 	    if (acc != NULL)
-	       (*acc)(pp->in, 0, state);
+	       (*acc)(pp->io[0], 0, state);
 
 	    if (job->nzip > 3)
 	       job->print(job, NULL,
