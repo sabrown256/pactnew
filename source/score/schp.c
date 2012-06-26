@@ -29,9 +29,15 @@
 typedef PROCESS *(*PFPPROC)(char **argv, char *mode, int type);
 
 SC_scope_proc
- _SC_ps = { -1, FALSE, NULL };
+ _SC_ps = { -1, FALSE, FALSE, NULL };
 
 #if defined(HAVE_POSIX_SYS)
+
+#define SC_IO_ID(_c)                                                        \
+   (((_c) == 'i') ? SC_IO_IN : (((_c) == 'e') ? SC_IO_ERR : SC_IO_OUT))
+
+#define SC_ID_IO(_i)                                                        \
+   (((_i) == SC_IO_IN) ? 'i' : (((_i) == SC_IO_ERR) ? 'e' : 'o'))
 
 #ifdef HAVE_PROCESS_CONTROL
 
@@ -655,26 +661,35 @@ static void _SC_error_fork(PROCESS *pp, PROCESS *cp)
 
 #ifdef HAVE_PROCESS_CONTROL
 
-static int *_SC_make_pipeline(char **argv)
+static SC_job *_SC_make_pipeline(char **argv)
    {int i, n;
-    int *pl;
+    SC_job *pg;
 
     n = 1;
     for (i = 0; argv[i] != NULL; i++)
-        n += (strcmp(argv[i], "|") == 0);
+        n += ((strcmp(argv[i], "|") == 0) ||
+	      (argv[i][0] == SC_PROCESS_DELIM));
 
-    pl = CMAKE_N(int, n+1);
-    n  = 0;
+    pg = CMAKE_N(SC_job, n+1);
+    SC_MEM_INIT_N(SC_job, pg, n+1);
 
-    pl[n++] = 0;
+    n          = 0;
+    pg[n].argv = argv;
+
     for (i = 0; argv[i] != NULL; i++)
-        {if (strcmp(argv[i], "|") == 0)
-            {pl[n++] = i+1;
-	     argv[i] = NULL;};};
+        {if ((strcmp(argv[i], "|") == 0) ||
+	     (argv[i][0] == SC_PROCESS_DELIM))
+            {pg[n].ios  = argv[i];
+	     if (argv[i+1] != NULL)
+	        {n++;
+		 pg[n].ia   = i+1;
+		 pg[n].argv = argv + i + 1;};
+	     argv[i]    = NULL;};};
 
-    pl[n++] = -1;
+    n++;
+    pg[n].ia = -1;
 
-    return(pl);}
+    return(pg);}
 
 #endif
 
@@ -685,14 +700,310 @@ static int *_SC_make_pipeline(char **argv)
 
 #ifdef HAVE_PROCESS_CONTROL
 
-static int _SC_pipeline_length(int *pl)
+static int _SC_pipeline_length(SC_job *pg)
    {int n;
 
-    for (n = 0; pl[n] >= 0; n++);
+    for (n = 0; pg[n].ia >= 0; n++);
 
     return(n);}
 
 #endif
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+static void dprpipe(SC_job *jobs)
+   {int i, n, c, io, gid, fd;
+    char s[MAXLINE];
+    char **sa;
+    SC_io_device dev;
+    SC_job *pjs, *pjd;
+    SC_io *ips;
+
+    n = _SC_pipeline_length(jobs);
+
+    sa = CMAKE_N(char *, n+1);
+
+    for (i = 0; jobs[i].cmd != NULL; i++)
+        {pjs = jobs + i;
+
+	 if (pjs->ios == NULL)
+	    snprintf(s, MAXLINE, "%3d: end\n     ", i);
+	 else
+	    snprintf(s, MAXLINE, "%3d: %s\n     ", i, pjs->ios);
+
+/* stdin */
+	 ips = pjs->fd + SC_IO_IN;
+	 dev = ips->dev;
+         gid = ips->gid;
+	 if (gid == -1)
+	    SC_vstrcat(s, MAXLINE, "i(stdin) ", ips->gid);
+	 else
+	    {pjd = jobs + gid;
+
+	     c = SC_ID_IO(SC_IO_OUT);
+	     for (io = 0; io < 3; io++)
+	         {if (pjd->fd[io].gid == i)
+		     c = SC_ID_IO(io);};
+
+	     SC_vstrcat(s, MAXLINE, "i(%d)%c    ", ips->gid, c);};
+
+/* stdout */
+	 ips = pjs->fd + SC_IO_OUT;
+	 dev = ips->dev;
+         gid = ips->gid;
+	 if (gid == -1)
+	    {fd = ips->fd;
+	     switch (dev)
+	        {case SC_IODEV_PIPE :
+		 case SC_IODEV_NONE :
+		      if (fd == -1)
+			 SC_vstrcat(s, MAXLINE, "o(stdout) ");
+		      else
+			 SC_vstrcat(s, MAXLINE, "o(stderr) ");
+		      break;
+		 case SC_IODEV_SOCKET :
+		      break;
+		 case SC_IODEV_PTY :
+		      break;
+		 case SC_IODEV_TERM :
+		      SC_vstrcat(s, MAXLINE, "o(tty)    ");
+		      break;
+		 case SC_IODEV_FILE :
+		      SC_vstrcat(s, MAXLINE, "o(file)   ");
+		      break;
+		 case SC_IODEV_VAR :
+		      SC_vstrcat(s, MAXLINE, "o(var)    ");
+		      break;
+		 case SC_IODEV_EXPR :
+		      SC_vstrcat(s, MAXLINE, "o(expr)   ");
+		      break;};}
+	 else
+	    {c = SC_ID_IO(SC_IO_IN);
+	     SC_vstrcat(s, MAXLINE, "o(%d)%c     ", ips->gid, c);};
+
+/* stderr */
+	 ips = pjs->fd + SC_IO_ERR;
+	 dev = ips->dev;
+         gid = ips->gid;
+	 if (gid == -1)
+	    {fd = ips->fd;
+	     switch (dev)
+	        {case SC_IODEV_PIPE :
+		 case SC_IODEV_NONE :
+		      if (fd == -1)
+			 SC_vstrcat(s, MAXLINE, "o(stderr) ");
+		      else
+			 SC_vstrcat(s, MAXLINE, "o(stdout) ");
+		      break;
+		 case SC_IODEV_SOCKET :
+		      break;
+		 case SC_IODEV_PTY :
+		      break;
+		 case SC_IODEV_TERM :
+		      SC_vstrcat(s, MAXLINE, "o(tty)    ");
+		      break;
+		 case SC_IODEV_FILE :
+		      SC_vstrcat(s, MAXLINE, "o(file)   ");
+		      break;
+		 case SC_IODEV_VAR :
+		      SC_vstrcat(s, MAXLINE, "o(var)    ");
+		      break;
+		 case SC_IODEV_EXPR :
+		      SC_vstrcat(s, MAXLINE, "o(expr)   ");
+		      break;};}
+	 else
+	    {c = SC_ID_IO(SC_IO_IN);
+	     SC_vstrcat(s, MAXLINE, "e(%d)%c     ", ips->gid, c);};
+
+	 SC_vstrcat(s, MAXLINE, " %s", pjs->cmd);
+         sa[i] = CSTRSAVE(s);};
+
+    sa[n] = NULL;
+
+    for (i = 0; i < n; i++)
+        printf("%s\n", sa[i]);
+
+    SC_free_strings(sa);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_INIT_IO_SPEC - initialize an SC_io specification PJ->fd[KIND] */
+
+static void _SC_init_io_spec(SC_job *pj, int n, int id)
+   {
+
+    pj->fd[SC_IO_IN].kind = SC_IO_IN;
+    pj->fd[SC_IO_IN].fd   = -1;
+    pj->fd[SC_IO_IN].gid  = pj->id - 1;
+
+    pj->fd[SC_IO_OUT].kind = SC_IO_OUT;
+    pj->fd[SC_IO_OUT].fd   = -1;
+    pj->fd[SC_IO_OUT].gid  = (id < n-1) ? pj->id + 1 : -1;
+
+    pj->fd[SC_IO_ERR].kind = SC_IO_ERR;
+    pj->fd[SC_IO_ERR].fd   = -1;
+    pj->fd[SC_IO_ERR].gid  = -1;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_SET_IO_SPEC - initialize an SC_io specification PJ->fd[KIND]
+ *                 - according to LINK whose syntax is:
+ *                 -   <ios><gid><iod>
+ *                 - where
+ *                 -   <ios>  := 'i' | 'o' | 'e' | 'b'
+ *                 -   <gid>  := <n> | +<n> | -<n> | <expr>
+ *                 -   <expr> := 't' | <var> | <file>
+ *                 -   <var>  := environment variable
+ *                 -   <file> := file name
+ */
+
+static void _SC_set_io_spec(SC_job *jobs, int n, int id,
+			    SC_io_kind kind, char *link)
+   {int fd, gid, nc;
+    SC_io_device dev;
+    SC_io_kind ios, iod;
+    char s[MAXLINE];
+    char *p, *ps;
+    SC_io *ips, *ipd;
+    SC_job *pjs, *pjd;
+
+    if ((0 <= id) && (id < n))
+       {pjs  = jobs + id;
+	fd  = -1;
+	gid = -1;
+	dev = SC_IODEV_NONE;
+
+	SC_strncpy(s, MAXLINE, link, -1);
+	nc  = strlen(s);
+	ios = SC_IO_ID(s[0]);
+	iod = SC_IO_ID(s[nc-1]);
+
+	SC_ASSERT(ios == kind);
+
+	ps = s + 1;
+	switch (ps[0])
+	   {case '+' :
+	    case '-' :
+	         dev = SC_IODEV_PIPE;
+		 gid = pjs->id + SC_stoi(ps);
+		 break;
+	    case 'e' :
+		 dev = SC_IODEV_EXPR;
+		 break;
+	    case 'f' :
+		 dev = SC_IODEV_FILE;
+		 if (kind == SC_IO_IN)
+		    fd = open(ps+1, O_RDONLY);
+
+/* GOTCHA: worrry about append or create */
+		 else
+		    fd = open(ps+1, O_WRONLY);
+		 break;
+	    case 's' :
+		 dev = SC_IODEV_SOCKET;
+		 {int to, fm, port;
+		  char *host;
+
+		  to = 10000;         /* timeout after 10 seconds */
+		  fm = FALSE;         /* fatal on timeout */
+
+		  host = ps + 1;
+		  p    = strchr(host, ':');
+		  *p++ = '\0';
+		  port = SC_stoi(p);
+
+		  fd = _SC_tcp_connect(host, port, to, fm);};
+		 break;
+	    case 't' :
+		 dev = SC_IODEV_TERM;
+		 s[nc-1] = '\0';
+		 break;
+	    case 'v' :
+		 dev = SC_IODEV_VAR;
+		 break;
+	    default :
+		 dev = SC_IODEV_PIPE;
+		 if (SC_numstrp(ps) == TRUE)
+		    gid = SC_stoi(ps) - 1;
+		 else
+		    {s[nc-1] = '\0';
+		     if (SC_numstrp(ps) == TRUE)
+		        gid = SC_stoi(ps) - 1;};
+		 break;};
+
+/* set the destination io spec for a pipe */
+	if (dev == SC_IODEV_PIPE)
+	   {pjd = jobs + gid;
+	    ipd = pjd->fd + iod;
+	    if (ipd != NULL)
+	       {ipd->kind = iod;
+		ipd->dev  = dev;
+		ipd->fd   = fd;
+		ipd->gid  = id;};};
+
+/* set the source io spec */
+	ips = pjs->fd + ios;
+	if (ips != NULL)
+	   {ips->kind = ios;
+	    ips->dev  = dev;
+	    ips->fd   = fd;
+	    ips->gid  = gid;};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_PIPELINE_PARSE - parse out the I/O specifications for the ID job
+ *                    - out of the N JOBS
+ */
+
+static void _SC_pipeline_parse(SC_job *jobs, int n, int id)
+   {int i, na;
+    char cmd[MAXLINE];
+    char **sa;
+    SC_job *pjs;
+
+    if ((jobs != NULL) && (id >= 0))
+       {pjs = jobs + id;
+
+	for (na = 0; pjs->argv[na] != NULL; na++);
+	SC_concatenate(cmd, MAXLINE, na, pjs->argv, " ", FALSE);
+
+	pjs->id   = id;
+	pjs->cmd  = CSTRSAVE(cmd);
+	pjs->exit = -1;
+
+	_SC_init_io_spec(pjs, n, id);
+	if (pjs->ios != NULL)
+	   {sa = SC_tokenize(pjs->ios, "@");
+
+	    for (i = 0; sa[i] != NULL; i++)
+	        {switch (sa[i][0])
+		    {case 'i' :
+		          _SC_set_io_spec(jobs, n, id, SC_IO_IN,  sa[i]);
+			  break;
+		     case 'o' :
+			  _SC_set_io_spec(jobs, n, id, SC_IO_OUT, sa[i]);
+			  break;
+		     case 'e' :
+			  _SC_set_io_spec(jobs, n, id, SC_IO_ERR, sa[i]);
+			  break;
+		     case 'b' :
+			  _SC_set_io_spec(jobs, n, id, SC_IO_OUT, sa[i]);
+			  _SC_set_io_spec(jobs, n, id, SC_IO_ERR, sa[i]);
+			  break;};};
+
+	    SC_free_strings(sa);};};
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -707,8 +1018,10 @@ static int _SC_pipeline_length(int *pl)
 
 #ifdef HAVE_PROCESS_CONTROL
 
-static void _SC_reconnect_pipeline(int n, PROCESS **pa, PROCESS **ca)
+static void _SC_reconnect_pipeline(int n, SC_job *pg,
+				   PROCESS **pa, PROCESS **ca)
    {int i, nm;
+    SC_job *g;
     PROCESS *pp, *cp, *pn, *cn;
 
     nm = n - 1;
@@ -718,8 +1031,14 @@ static void _SC_reconnect_pipeline(int n, PROCESS **pa, PROCESS **ca)
  */
     if (nm > 0)
 
-/* set any sockets to read/write mode */
+/* parse out the process group links */
        {for (i = 0; i < n; i++)
+	    _SC_pipeline_parse(pg, n, i);
+
+dprpipe(pg);
+
+/* set any sockets to read/write mode */
+	for (i = 0; i < n; i++)
 	    {pp = pa[i];
 	     cp = ca[i];
 	     if (cp->medium == USE_SOCKETS)
@@ -739,6 +1058,7 @@ static void _SC_reconnect_pipeline(int n, PROCESS **pa, PROCESS **ca)
 	for (i = 1; i < nm; i++)
 	    {pp = pa[i];
 	     cp = ca[i];
+	     g  = pg + i;
 
 	     close(pp->out);
 	     close(cp->in);
@@ -880,24 +1200,24 @@ static PROCESS *_SC_open_proc(int rcpu, char *name, char **argv,
 
 #ifdef HAVE_PROCESS_CONTROL
     int i, n, pid, to, st, off;
-    int *pl;
     char **al, *mod;
     PROCESS *cp, **pa, **ca;
+    SC_job *pg;
     SC_filedes *pfd;
 
     if (_SC_redir_fail(fd) != -1)
        return(NULL);
 
     pp = NULL;
-    pl = _SC_make_pipeline(argv);
-    n  = _SC_pipeline_length(pl);
+    pg = _SC_make_pipeline(argv);
+    n  = _SC_pipeline_length(pg);
 
     pa = CMAKE_N(PROCESS *, n);
     ca = CMAKE_N(PROCESS *, n);
 
 /* setup each process in the pipeline */
     for (i = 0; i < n; i++)
-        {off = pl[i];
+        {off = pg[i].ia;
 
 /* NOTE: use sockets for the non-terminal process */
 	 mod = (i < n-1) ? "as" : mode;
@@ -906,14 +1226,14 @@ static PROCESS *_SC_open_proc(int rcpu, char *name, char **argv,
 	 to = _SC_setup_proc(&pa[i], &ca[i], argv+off, mod,
 			     pfd, retry, iex, initf, exitf, exita);};
 
-    _SC_reconnect_pipeline(n, pa, ca);
+    _SC_reconnect_pipeline(n, pg, pa, ca);
 
 /* launch each process in the pipeline */
     for (i = 0; i < n; i++)
         {pp = pa[i];
 	 cp = ca[i];
 
-	 off = pl[i];
+	 off = pg[i].ia;
          al  = argv + off;
 
 /* fork the process */
@@ -940,7 +1260,7 @@ static PROCESS *_SC_open_proc(int rcpu, char *name, char **argv,
 		      pp = NULL;};
 		  break;};};
 
-    CFREE(pl);
+    CFREE(pg);
     CFREE(pa);
     CFREE(ca);
 
