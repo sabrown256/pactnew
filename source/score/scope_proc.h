@@ -19,6 +19,10 @@
 
 #define SC_PROCESS_DELIM   '@'
 
+#define ISTDIN   io[0]
+#define ISTDOUT  io[1]
+#define ISTDERR  io[2]
+
 /*--------------------------------------------------------------------------*/
 
 /*                             EXEC ERROR STATUS                            */

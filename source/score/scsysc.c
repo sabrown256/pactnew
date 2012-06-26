@@ -723,28 +723,46 @@ static int _SC_parse_redirect(char *src, char *oper, char *dst,
 
     t = ta[i];
 
-    nc = p - t;
-    strncpy(src, t, nc);
-    src[nc] = '\0';
+/* msh syntax */
+    if ((t[0] == SC_PROCESS_DELIM) && (t[2] == 'f'))
+       {switch (t[1])
+	   {case 'i':
+	         strcpy(oper, "<");
+		 break;
+	    case 'e':
+	    case 'b':
+	         strcpy(oper, ">&");
+		 break;
+	    case 'o':
+	    default :
+	         strcpy(oper, ">");
+		 break;};
+	strcpy(dst, t+3);}
 
-    for (nc = 0; TRUE; nc++)
-        {c = *p++;
-	 if ((c != '\0') && (strchr("<>!&", c) != NULL))
-	    oper[nc] = c;
-	 else
-	    {oper[nc] = '\0';
-	     p--;
-	     break;};};
-
-    dst[0] = '\0';
-    nc     = strlen(p);
-    if (nc == 0)
-       {t = ta[++i];
-	if (t != NULL)
-	   strcpy(dst, t);}
+/* conventional UNIX shell syntax */
     else
-       {strncpy(dst, p, nc);
-	dst[nc] = '\0';};
+       {nc = p - t;
+	strncpy(src, t, nc);
+	src[nc] = '\0';
+
+	for (nc = 0; TRUE; nc++)
+	    {c = *p++;
+	     if ((c != '\0') && (strchr("<>!&", c) != NULL))
+	        oper[nc] = c;
+	     else
+	        {oper[nc] = '\0';
+		 p--;
+		 break;};};
+
+	dst[0] = '\0';
+	nc     = strlen(p);
+	if (nc == 0)
+	   {t = ta[++i];
+	    if (t != NULL)
+	       strcpy(dst, t);}
+	else
+	   {strncpy(dst, p, nc);
+	    dst[nc] = '\0';};};
 
     return(i);}
 
@@ -828,7 +846,7 @@ static void _SC_redirect_subtask(subtask *ps)
 	 if (strchr("'\"", *t) == NULL)
 
 /* look for tokens containing redirection specifications */
-	    {p = strpbrk(t, "<>");
+	    {p = strpbrk(t, "<>@");
 	     if (p != NULL)
 	        _SC_redirect_fd(ps, i--, p);
 
