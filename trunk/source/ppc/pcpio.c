@@ -79,7 +79,7 @@ static int _PC_register_proc(PROCESS *pp, int i)
 	    CREMAKE(PC_procs.m, SC_message, nx);
 	    CREMAKE(PC_procs.fd, SC_poll_desc, nx);};
 
-	pd.fd     = pp->in;
+	pd.fd     = pp->io[0];
 	pd.events = POLLIN | POLLPRI;
 
 	PC_procs.p[i]  = pp;
@@ -157,9 +157,10 @@ static int _PC_setup_children(char **argv, char *mode)
 	    fflush(_PC_diag);};
 
 	if (pp != NULL)
-	   {pp->in   = 0;
-	    pp->out  = 1;
-	    pp->acpu = which;
+	   {pp->io[0] = 0;
+	    pp->io[1] = 1;
+	    pp->io[2] = 2;
+	    pp->acpu  = which;
 
 /* this goes to PC_open_group */
 	    PC_printf(pp, "%s,%d,%d,%d\n", host, port, n, _SC_ps.debug);

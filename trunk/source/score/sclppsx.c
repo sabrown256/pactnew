@@ -55,8 +55,8 @@ static int _SC_posix_release(PROCESS *pp)
  * make sure that we do the following only once
  */
 	if (sts == 0)
-	   {in  = pp->in;
-	    out = pp->out;
+	   {in  = pp->io[0];
+	    out = pp->io[1];
 
 /* check to see that the process has indeed exited */
 	    if (pp->ischild == FALSE)
@@ -94,7 +94,7 @@ static int _SC_posix_setup_tty(PROCESS *pp, int child)
        return(FALSE);
 
     medium = pp->medium;
-    in     = pp->in;
+    in     = pp->io[0];
 
 /* for child */
     if (child)
@@ -107,8 +107,8 @@ static int _SC_posix_setup_tty(PROCESS *pp, int child)
                         pp->spty);
 
 /* now close the master */
-            if (in != pp->in)
-               {if (close(pp->in) < 0)
+            if (in != pp->io[0])
+               {if (close(pp->io[0]) < 0)
                    SC_error(-1, "COULDN'T CLOSE MASTER - _SC_POSIX_SETUP_TTY");};
 
 	    tty = pp->tty;
@@ -119,8 +119,8 @@ static int _SC_posix_setup_tty(PROCESS *pp, int child)
 
 	    SC_set_raw_state(in, FALSE);
 
-            pp->out = in;
-            pp->in  = in;};};
+            pp->io[1] = in;
+            pp->io[0] = in;};};
 
     SC_block_fd(in);
 
@@ -231,8 +231,8 @@ static int _SC_posix_exec(PROCESS *cp, char **argv, char **env, char *mode)
 /* setup the tty first */
 	cp->setup(cp, TRUE);
 
-	child_in  = cp->in;
-	child_out = cp->out;
+	child_in  = cp->io[0];
+	child_out = cp->io[1];
 	to        = cp->open_retry;
 
 /* set the process stdin, stdout, and stderr to those from the pipe */
@@ -251,8 +251,9 @@ static int _SC_posix_exec(PROCESS *cp, char **argv, char **env, char *mode)
 	if (cp->data_type == SC_BINARY)
 
 /* keep the info about the parent for use in binary I/O */
-	   {cp->in  = 0;
-	    cp->out = 1;
+	   {cp->io[0] = 0;
+	    cp->io[1] = 1;
+	    cp->io[2] = 2;
 	    _SC.terminal = cp;
 	    if (!(*cp->send_formats)())
 	       SC_error(SC_NO_FMT, "COULDN'T SEND FORMATS - _SC_POSIX_EXEC");}
@@ -330,7 +331,7 @@ static int _SC_posix_gets(char *bf, int len, PROCESS *pp)
     if (pp != NULL)
        {SC_flush(pp);
 
-	n = SC_read_sigsafe(pp->in, bf, len);
+	n = SC_read_sigsafe(pp->io[0], bf, len);
 	switch (n)
 	   {case 0 :
 	    case -1 :
@@ -354,7 +355,7 @@ static int _SC_posix_gets(char *bf, int len, PROCESS *pp)
 static int _SC_posix_in_ready(PROCESS *pp)
    {int rv, status;
 
-    status = fcntl(pp->in, F_GETFL);
+    status = fcntl(pp->io[0], F_GETFL);
     rv     = (status & NONBLOCK);
 
     return(rv);}
@@ -428,9 +429,9 @@ static int _SC_posix_flush(PROCESS *pp)
 #ifdef BSD_TERMINAL
     static int one = 1;
 
-    iv = ioctl(pp->in, TIOCFLUSH, &one);
-    if (pp->out != pp->in)
-       ov = ioctl(pp->out, TIOCFLUSH, &one);
+    iv = ioctl(pp->io[0], TIOCFLUSH, &one);
+    if (pp->io[1] != pp->io[0])
+       ov = ioctl(pp->io[1], TIOCFLUSH, &one);
     else
        ov = iv;
 
@@ -457,7 +458,7 @@ static int _SC_posix_printf(PROCESS *pp, char *buffer)
     if ((pp != NULL) && (buffer != NULL))
        {len = strlen(buffer);
 
-	nb = SC_write_sigsafe(pp->out, buffer, len);
+	nb = SC_write_sigsafe(pp->io[1], buffer, len);
 	if (nb != len)
 	   SC_error(-1, "FAILED WRITE %d OF %d BYTES - _SC_POSIX_PRINTF",
 		    nb, len);

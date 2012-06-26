@@ -340,8 +340,8 @@ int _SC_delete_pid(int pid)
 	 fl = pp->flags & SC_PROC_IO;
 
 	 if ((pp->id == pid) && (fl != 0))
-	    {SC_rl_io_callback(pp->in);
-	     SC_rl_io_callback(pp->out);
+	    {SC_rl_io_callback(pp->io[0]);
+	     SC_rl_io_callback(pp->io[1]);
 
 	     _SC_mark_exited_child(pp);
 
@@ -385,8 +385,9 @@ static void _SC_rl_process(PROCESS *pp)
         pp->id        = -1;
         pp->root      = -1;
         pp->type      = -1;
-        pp->in        = -1;
-        pp->out       = -1;
+        pp->io[0]     = -1;
+        pp->io[1]     = -1;
+        pp->io[2]     = -1;
         pp->data      = -1;
         pp->nb_ring   = 0L;
         pp->ib_in     = 0L;

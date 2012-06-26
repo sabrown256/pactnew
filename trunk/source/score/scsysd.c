@@ -1094,7 +1094,7 @@ int _SC_which_pool(conpool *cp, int fd)
 	    continue;
 
 	 pp = pco->pp;
-	 if (pp->in == fd)
+	 if (pp->io[0] == fd)
 	    break;};
 
     if (ic >= nc)
@@ -1457,7 +1457,7 @@ static void _SC_pool_reject(int fd, int mask, void *a)
 	    continue;
 
 	 pp = pco->pp;
-	 if (SC_process_alive(pp) && (pp->in == fd))
+	 if (SC_process_alive(pp) && (pp->io[0] == fd))
             {_SC_pool_rejected(as, cp, ic, pp);
 	     break;};};
 

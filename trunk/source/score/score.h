@@ -434,8 +434,7 @@ struct s_PROCESS
     int type;            /* process type (SC_LOCAL, SC_REMOTE, SC_PARALLEL) */
     int id;                                      /* process id of the child */
     int root;                          /* process id of the original parent */
-    int in;
-    int out;
+    int io[3];                                     /* stdin, stdout, stderr */
     int ischild;                             /* TRUE iff started as a child */
     int flags;
     SC_ipc_mode medium;                 /* USE_PTYS, USE_SOCKETS, USE_PIPES */

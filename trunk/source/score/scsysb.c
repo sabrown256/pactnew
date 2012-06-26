@@ -682,7 +682,7 @@ static void _SC_server_in_reject(int fd, int mask, void *a)
 	 if (job != NULL)
 	    {pp = job->pp;
 	     if (SC_process_alive(pp))
-	        {if (pp->in == fd)
+	        {if (pp->io[0] == fd)
 		    {_SC_exec_printf(as,
 				     "_SC_SERVER_IN_REJECT: error\n");
 

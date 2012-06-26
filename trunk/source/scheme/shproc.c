@@ -24,7 +24,8 @@ static void _SS_wr_process(SS_psides *si, object *obj, object *strm)
     str = SS_OUTSTREAM(strm);
 
     pp = SS_PROCESS_VALUE(obj);
-    PRINT(str, "<PROCESS|%d-%d-%d-%d-", pp->id, pp->index, pp->in, pp->out);
+    PRINT(str, "<PROCESS|%d-%d-%d-%d-", pp->id, pp->index,
+	  pp->io[0], pp->io[1]);
 
     flag = (pp->status & ~SC_CHANGED);
     switch (flag)
@@ -250,8 +251,8 @@ static object *_SSI_pr_stat(SS_psides *si, object *obj)
        rs = pp->reason;
 
     ret = SS_make_list(si, SC_INT_I, &pp->id,
-                       SC_INT_I, &pp->in,
-                       SC_INT_I, &pp->out,
+                       SC_INT_I, &pp->io[0],
+                       SC_INT_I, &pp->io[1],
                        SC_INT_I, &st,
                        SC_INT_I, &rs,
                        0);

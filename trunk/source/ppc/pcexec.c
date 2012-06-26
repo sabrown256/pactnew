@@ -92,7 +92,7 @@ static int process_end(int *prv, void *a)
 	   *prv = reason;
 
 /* get anything remaining from the child */
-        child_has_txt(pp->in, 0, a);
+        child_has_txt(pp->io[0], 0, a);
 
         rv = PC_close(pp);
 	if (rv == FALSE)
