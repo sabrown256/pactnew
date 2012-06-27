@@ -846,9 +846,11 @@ static void _SC_redirect_subtask(subtask *ps)
 	 if (strchr("'\"", *t) == NULL)
 
 /* look for tokens containing redirection specifications */
-	    {p = strpbrk(t, "<>@");
+	    {p = strpbrk(t, "<>");
 	     if (p != NULL)
 	        _SC_redirect_fd(ps, i--, p);
+	     else if ((t[0] == SC_PROCESS_DELIM) && (t[2] == 'f'))
+	        _SC_redirect_fd(ps, i--, t);
 
 	     n = ps->nt;};};
 
