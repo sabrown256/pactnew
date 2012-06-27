@@ -25,9 +25,9 @@ static void cat_file(char *file)
     for (i = 0; sa[i] != NULL; i++)
         {s = sa[i];
 	 if (i & 1)
-	    fprintf(stderr, "err(%d)-> %s\n", i, s);
+	    fprintf(stderr, "err(%d)-> %s", i, s);
 	 else
-	    fprintf(stdout, "out(%d)-> %s\n", i, s);};
+	    fprintf(stdout, "out(%d)-> %s", i, s);};
 
     SC_free_strings(sa);
 
@@ -75,11 +75,11 @@ static int test_pipe_1(void)
     st = 0;
 
 /* simple pipeline variants - all equivalent */
-    char *tpipe[] = { "date | wc -l", 
-		      "date @ wc -l",
-		      "date @o wc -l",
-		      "date @o2i wc -l",
-		      "date @o+1i wc -l" };
+    char *tpipe[] = { "date | cat -n", 
+		      "date @ cat -n",
+		      "date @o cat -n",
+		      "date @o2i cat -n",
+		      "date @o+1i cat -n" };
     n = sizeof(tpipe)/sizeof(char *);
 
     printf("\t\t\tsimple pipes .....\n");
@@ -106,11 +106,11 @@ static int test_pipe_2(void)
     st = 0;
 
 /* simple pipeline variants - all equivalent */
-    char *tpipe[] = { "tscpgrp -f tests/pgrp.dat | wc -l", 
-		      "tscpgrp -f tests/pgrp.dat @ wc -l",
-		      "tscpgrp -f tests/pgrp.dat @o+1 cat",
-		      "tscpgrp -f tests/pgrp.dat @e+1 cat",
-		      "tscpgrp -f tests/pgrp.dat @o+1e+2 cat @ cat" };
+    char *tpipe[] = { "tscpgrp -f tests/pgrp.dat | cat -n", 
+		      "tscpgrp -f tests/pgrp.dat @ cat -n",
+		      "tscpgrp -f tests/pgrp.dat @o+1 cat -n",
+		      "tscpgrp -f tests/pgrp.dat @e+1 cat -n",
+		      "tscpgrp -f tests/pgrp.dat @o+1e+2 cat -n @ cat -n" };
 
     n = sizeof(tpipe)/sizeof(char *);
 
@@ -138,7 +138,9 @@ static int test_file_1(void)
     st = 0;
 
 /* file variants */
-    char *tfile[] = { "date @ofdate.out",
+    char *tfile[] = { "date >! date.out",
+		      "cat < date.out",
+                      "date @owdate.out",
 		      "cat @ifdate.out" };
 
     n = sizeof(tfile)/sizeof(char *);

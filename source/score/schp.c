@@ -768,7 +768,7 @@ static void dprpipe(SC_job *jobs)
 	 dev = ips->dev;
          gid = ips->gid;
 	 if (gid == -1)
-	    SC_vstrcat(s, MAXLINE, "i(stdin) ", ips->gid);
+	    SC_vstrcat(s, MAXLINE, "i(ttyin) ", ips->gid);
 	 else
 	    {pjd = jobs + gid;
 
@@ -789,9 +789,9 @@ static void dprpipe(SC_job *jobs)
 	        {case SC_IODEV_PIPE :
 		 case SC_IODEV_NONE :
 		      if (fd == -1)
-			 SC_vstrcat(s, MAXLINE, "o(stdout) ");
+			 SC_vstrcat(s, MAXLINE, "o(ttyout) ");
 		      else
-			 SC_vstrcat(s, MAXLINE, "o(stderr) ");
+			 SC_vstrcat(s, MAXLINE, "o(ttyerr) ");
 		      break;
 		 case SC_IODEV_SOCKET :
 		      break;
@@ -823,9 +823,9 @@ static void dprpipe(SC_job *jobs)
 	        {case SC_IODEV_PIPE :
 		 case SC_IODEV_NONE :
 		      if (fd == -1)
-			 SC_vstrcat(s, MAXLINE, "o(stderr) ");
+			 SC_vstrcat(s, MAXLINE, "o(ttyerr) ");
 		      else
-			 SC_vstrcat(s, MAXLINE, "o(stdout) ");
+			 SC_vstrcat(s, MAXLINE, "o(ttyout) ");
 		      break;
 		 case SC_IODEV_SOCKET :
 		      break;
@@ -928,17 +928,32 @@ static void _SC_set_io_spec(SC_job *jobs, int n, int id,
 	    case 'e' :
 		 dev = SC_IODEV_EXPR;
 		 break;
+	    case 'a' :
 	    case 'f' :
+	    case 'w' :
 		 dev = SC_IODEV_FILE;
+
+/* shell redirection syntax and file mode correspondence
+ *  <   ->  O_RDONLY
+ *  >   ->  O_WRONLY | O_CREAT | O_EXCL
+ *  >!  ->  O_WRONLY | O_CREAT | O_TRUNC
+ *  >>  ->  O_WRONLY | O_APPEND
+ */
+		 switch (ps[0])
+		    {case 'f' :
+		          md = O_WRONLY | O_CREAT | O_EXCL;
+		          break;
+		     case 'w' :
+		          md = O_WRONLY | O_CREAT | O_TRUNC;
+		          break;
+		     case 'a' :
+		          md = O_WRONLY | O_APPEND;
+		          break;}
+
 		 if (kind == SC_IO_IN)
 		    fd = open(ps+1, O_RDONLY);
-
-/* GOTCHA: worrry about append or create */
 		 else
-		    {md  = O_WRONLY;
-		     md |= O_CREAT;
-		     md |= O_TRUNC;
-		     fd  = open(ps+1, md, 0600);};
+		    fd = open(ps+1, md, 0600);
 		 break;
 	    case 's' :
 		 dev = SC_IODEV_SOCKET;
@@ -1760,21 +1775,21 @@ int _SC_redir_fail(SC_filedes *fd)
     if (fail == -1)
        {nm = fd[0].name;
 	fl = fd[0].flag;
-	if ((nm != NULL) && !SC_isfile(nm))
+	if ((nm != NULL) && (SC_isfile(nm) == FALSE))
 	   fail = 0;};
 
 /* stdout redirection fails if file exists and mode has exclusive bit */
     if (fail == -1)
        {nm = fd[1].name;
 	fl = fd[1].flag;
-	if ((nm != NULL) && SC_isfile(nm) && (fl & O_EXCL))
+	if ((nm != NULL) && (SC_isfile(nm) == TRUE) && (fl & O_EXCL))
 	   fail = 1;};
 
 /* stderr redirection fails if file exists and mode has exclusive bit */
     if (fail == -1)
        {nm = fd[2].name;
 	fl = fd[2].flag;
-	if ((nm != NULL) && SC_isfile(nm) && (fl & O_EXCL))
+	if ((nm != NULL) && (SC_isfile(nm) == TRUE) && (fl & O_EXCL))
 	   fail = 2;};
 
     return(fail);}

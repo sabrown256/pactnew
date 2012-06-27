@@ -57,7 +57,7 @@ static int _SC_query_mode_unix(char *name, char *mode)
 
     ret = FALSE;
 
-    if (stat(name, &sb) == 0)
+    if ((name != NULL) && (stat(name, &sb) == 0))
 
 /* if not a regular file forget it (what about other types: S_IFLNK,
  * S_IFSOCK, S_IFIFO, S_IFBLK, or S_IFCHR?)
