@@ -102,15 +102,30 @@ enum e_io_oper
 
 typedef enum e_io_oper io_oper;
 
+enum e_SC_io_kind
+   {IO_STD_IN, IO_STD_OUT, IO_STD_ERR};
+
+typedef enum e_SC_io_kind SC_io_kind;
+
+enum e_SC_io_device
+   {IO_DEV_NONE,
+    IO_DEV_PIPE, IO_DEV_SOCKET, IO_DEV_PTY, 
+    IO_DEV_TERM, IO_DEV_FILE, IO_DEV_VAR, IO_DEV_EXPR };
+
+typedef enum e_SC_io_device SC_io_device;
+
 typedef struct s_SC_filedes SC_filedes;
 typedef struct s_SC_ttydes SC_ttydes;
 
 FUNCTION_POINTER(FILE,  *(*PFPFILE));
 
 struct s_SC_filedes
-   {char *name;              /* file name */
-    int flag;                /* file mode flag for open */
-    int fd;};                /* system level file descriptor */
+   {int fd;                 /* file descriptor */
+    int flag;               /* file mode flag for open */
+    int gid;                /* id in process group */
+    SC_io_kind kind;        /* input, output, or error - 0, 1, or 2 */
+    SC_io_device dev;       /* file, pipe, socket, ... */
+    char *name;};           /* file name */
 
 struct s_SC_ttydes
    {int nr;                  /* number of rows for TTY */

@@ -327,9 +327,13 @@ struct s_subtask
    {int need;              /* TRUE if shell is needed to run the subtask */
     int pipe;              /* TRUE if the subtask is pipelined */
     int nt;                /* number of tokens of the subtask */
+    int id;                /* id of process in group */
+    int exit;              /* exit status value */
     char *shell;
     char *command;         /* full text of the subtask */
+    char *ios;             /* text representation of I/O connections */
     char **argf;           /* tokenized version suitable for SC_open */
+    char **env;            /* environment variables for command */
     SC_filedes fd[SC_N_IO_CH];};
 
 struct s_tasklst
@@ -438,44 +442,14 @@ enum e_SC_mp_tag
 
 typedef enum e_SC_mp_tag SC_mp_tag;
 
-enum e_SC_io_kind
-   {SC_IO_IN, SC_IO_OUT, SC_IO_ERR};
-
-typedef enum e_SC_io_kind SC_io_kind;
-
-enum e_SC_io_device
-   {SC_IODEV_NONE,
-    SC_IODEV_PIPE, SC_IODEV_SOCKET, SC_IODEV_PTY, 
-    SC_IODEV_TERM, SC_IODEV_FILE, SC_IODEV_VAR, SC_IODEV_EXPR };
-
-typedef enum e_SC_io_device SC_io_device;
-
-typedef struct s_SC_io SC_io;
-typedef struct s_SC_job SC_job;
 typedef struct s_SC_process_group SC_process_group;
-
-struct s_SC_io
-   {SC_io_kind kind;        /* INPUT, OUTPUT, or ERROR - 0, 1, or 2 */
-    SC_io_device dev;
-    int fd;                 /* file descriptor */
-    int gid;};              /* id in process group */
-
-struct s_SC_job
-   {int id;                 /* id of process in group */
-    int ia;                 /* index of first element of argv for spec */
-    int exit;               /* exit status value */
-    char *cmd;              /* text of command */
-    char *ios;              /* text representation of I/O connections */
-    char **argv;            /* tokens of command */
-    char **env;             /* environment variables for command */
-    SC_io fd[SC_N_IO_CH];}; /* struct representation of I/O connections */
 
 struct s_SC_process_group
    {int np;                 /* number of processes in group */
     int to;                 /* group time out */
     int rcpu;               /* */
     char *mode;             /* IPC mode */
-    SC_job *jobs;           /* array of jobs in group */
+    subtask *jobs;          /* array of jobs in group */
     PROCESS *terminal;      /* terminal process */
     PROCESS **parents;      /* parent process array */
     PROCESS **children;};   /* child process array */
