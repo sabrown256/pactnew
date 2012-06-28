@@ -36,9 +36,9 @@ static void send_binary(long ni, char *type)
         argv    = CMAKE_N(char *, 2);
         argv[0] = CSTRSAVE("VIF");
 
-        tty          = PC_mk_process(argv, "ab", SC_CHILD);
-        tty->ISTDIN  = 0;
-        tty->ISTDOUT = 1;};
+        tty = PC_mk_process(argv, "ab", SC_CHILD);
+	for (i = 0; i < SC_N_IO_CH; i++)
+	    tty->io[i] = i;};
 
     pp = tty;
     if (pp != NULL)

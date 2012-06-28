@@ -103,7 +103,7 @@ enum e_io_oper
 typedef enum e_io_oper io_oper;
 
 enum e_SC_io_kind
-   {IO_STD_IN, IO_STD_OUT, IO_STD_ERR};
+   {IO_STD_NONE = -1, IO_STD_IN, IO_STD_OUT, IO_STD_ERR};
 
 typedef enum e_SC_io_kind SC_io_kind;
 
@@ -113,6 +113,11 @@ enum e_SC_io_device
     IO_DEV_TERM, IO_DEV_FILE, IO_DEV_VAR, IO_DEV_EXPR };
 
 typedef enum e_SC_io_device SC_io_device;
+
+enum e_SC_task_kind
+   {TASK_NONE, TASK_COMPOUND, TASK_GROUP};
+
+typedef enum e_SC_task_kind SC_task_kind;
 
 typedef struct s_SC_filedes SC_filedes;
 typedef struct s_SC_ttydes SC_ttydes;
