@@ -46,8 +46,8 @@ static int _SC_posix_release(PROCESS *pp)
 #if defined(HAVE_POSIX_SYS)
 
     else
-       {int in, out, sts;
-	int ex, cnd, rsn;
+       {int i, ex, cnd, rsn, sts;
+	int io[SC_N_IO_CH];
 
 	sts = pp->flags & SC_PROC_IO;
 
@@ -55,21 +55,27 @@ static int _SC_posix_release(PROCESS *pp)
  * make sure that we do the following only once
  */
 	if (sts == 0)
-	   {in  = pp->io[0];
-	    out = pp->io[1];
+	   {for (i = 0; i < SC_N_IO_CH; i++)
+	        io[i] = pp->io[i];
 
 /* check to see that the process has indeed exited */
 	    if (pp->ischild == FALSE)
 	       {ex = SC_child_status(pp->id, &cnd, &rsn);
 	        rv = (ex == pp->id);};
 
+/* stdin */
 	    if (SC_time_allow(1) == 0)
-	       {if (in >= 0)
-		   close(in);
+	       {if (io[0] >= 0)
+		   close(io[0]);
 		SC_time_allow(0);};
 
-	    if ((in != out) && (out >= 0))
-	       close(out);
+/* stdout */
+	    if ((io[0] != io[1]) && (io[1] >= 0))
+	       close(io[1]);
+
+/* stderr */
+	    if (io[2] >= 0)
+	       close(io[2]);
 
 	    SC_process_state(pp, SC_PROC_IO);};};
 
@@ -217,7 +223,7 @@ static int _SC_posix_exec(PROCESS *cp, char **argv, char **env, char *mode)
 
 #ifdef HAVE_PROCESS_CONTROL
 
-    int to, child_in, child_out;
+    int i, to, cio[SC_N_IO_CH];
 
     err = SC_NO_EXEC;
 
@@ -231,29 +237,37 @@ static int _SC_posix_exec(PROCESS *cp, char **argv, char **env, char *mode)
 /* setup the tty first */
 	cp->setup(cp, TRUE);
 
-	child_in  = cp->io[0];
-	child_out = cp->io[1];
-	to        = cp->open_retry;
+	for (i = 0; i < SC_N_IO_CH; i++)
+	    cio[i] = cp->io[i];
+
+	to = cp->open_retry;
 
 /* set the process stdin, stdout, and stderr to those from the pipe */
-	_SC_dup_fd("STDIN",  to, cp->fd, 0, child_in);
-	_SC_dup_fd("STDOUT", to, cp->fd, 1, child_out);
-	_SC_dup_fd("STDERR", to, cp->fd, 2, child_out);
+	_SC_dup_fd("STDIN",  to, cp->fd, 0, cio[0]);
+	_SC_dup_fd("STDOUT", to, cp->fd, 1, cio[1]);
+	_SC_dup_fd("STDERR", to, cp->fd, 2, cio[1]);
 
 /* now that they are copied release the old values */
-	if (child_out != child_in)
-	   close(child_out);
+#if 0
+	if (close(cio[2]) < 0)
+	   SC_error(SC_NO_CLOSE, "COULDN'T CLOSE STDERR - _SC_POSIX_EXEC");
+#endif
 
-	if (close(child_in) < 0)
-	   SC_error(SC_NO_CLOSE, "COULDN'T CLOSE DESCRIPTOR - _SC_POSIX_EXEC");
+	if (cio[1] != cio[0])
+	   {if (close(cio[1]) < 0)
+	       SC_error(SC_NO_CLOSE,
+			"COULDN'T CLOSE STDOUT - _SC_POSIX_EXEC");};
+
+	if (close(cio[0]) < 0)
+	   SC_error(SC_NO_CLOSE, "COULDN'T CLOSE STDIN - _SC_POSIX_EXEC");
 
 /* if this is a binary connection inform the parent of the binary formats */
 	if (cp->data_type == SC_BINARY)
 
 /* keep the info about the parent for use in binary I/O */
-	   {cp->io[0] = 0;
-	    cp->io[1] = 1;
-	    cp->io[2] = 2;
+	   {for (i = 0; i < SC_N_IO_CH; i++)
+	        cp->io[i] = i;
+
 	    _SC.terminal = cp;
 	    if (!(*cp->send_formats)())
 	       SC_error(SC_NO_FMT, "COULDN'T SEND FORMATS - _SC_POSIX_EXEC");}
@@ -430,6 +444,7 @@ static int _SC_posix_flush(PROCESS *pp)
     static int one = 1;
 
     iv = ioctl(pp->io[0], TIOCFLUSH, &one);
+    iv = ioctl(pp->io[2], TIOCFLUSH, &one);
     if (pp->io[1] != pp->io[0])
        ov = ioctl(pp->io[1], TIOCFLUSH, &one);
     else

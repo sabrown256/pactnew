@@ -18,6 +18,7 @@
 #define DEFAULT_HEARTBEAT  30
 
 #define SC_PROCESS_DELIM   '@'
+#define SC_N_IO_CH         3
 
 #define ISTDIN   io[0]
 #define ISTDOUT  io[1]
@@ -329,7 +330,7 @@ struct s_subtask
     char *shell;
     char *command;         /* full text of the subtask */
     char **argf;           /* tokenized version suitable for SC_open */
-    SC_filedes fd[3];};
+    SC_filedes fd[SC_N_IO_CH];};
 
 struct s_tasklst
    {int nl;                /* number of subtasks launched - current subtask index */
@@ -467,7 +468,7 @@ struct s_SC_job
     char *ios;              /* text representation of I/O connections */
     char **argv;            /* tokens of command */
     char **env;             /* environment variables for command */
-    SC_io fd[3];};          /* struct representation of I/O connections */
+    SC_io fd[SC_N_IO_CH];}; /* struct representation of I/O connections */
 
 struct s_SC_process_group
    {int np;                 /* number of processes in group */
