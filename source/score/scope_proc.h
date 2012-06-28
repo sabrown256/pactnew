@@ -18,11 +18,8 @@
 #define DEFAULT_HEARTBEAT  30
 
 #define SC_PROCESS_DELIM   '@'
+#define SC_PIPE_DELIM      "|"
 #define SC_N_IO_CH         3
-
-#define ISTDIN   io[0]
-#define ISTDOUT  io[1]
-#define ISTDERR  io[2]
 
 /*--------------------------------------------------------------------------*/
 
@@ -319,12 +316,18 @@ struct s_asyncstate
 /* command task description */
 
 /* TASKDESC - describe and manage a task which has the BNF
- *          - <task>           := <simple-command> [ ; <simple-command>]*
- *          - <simple-command> := a single command, e.g. uname -a
+ *          - <task>             := <compound-command> | <process-group>
+ *          - <compound-command> := <simple-command> [ ; <simple-command>]*
+ *          - <process-group>    := <simple-command> [ <ios> <simple-command>]*
+ *          - <ios>              := specifies io connections between
+ *                                  processes, files, variables, ...
+ *                                  e.g. '|',  '<',  '>', or '@' type specs
+ *          - <simple-command>   := a single command, e.g. uname -a
  */
 
 struct s_subtask
-   {int need;              /* TRUE if shell is needed to run the subtask */
+   {int kind;              /* compound or process group */
+    int need;              /* TRUE if shell is needed to run the subtask */
     int pipe;              /* TRUE if the subtask is pipelined */
     int nt;                /* number of tokens of the subtask */
     int id;                /* id of process in group */

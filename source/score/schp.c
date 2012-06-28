@@ -688,7 +688,7 @@ static subtask *_SC_make_pipeline(char **argv, char **env)
 
     n = 1;
     for (i = 0; argv[i] != NULL; i++)
-        n += ((strcmp(argv[i], "|") == 0) ||
+        n += ((strcmp(argv[i], SC_PIPE_DELIM) == 0) ||
 	      (argv[i][0] == SC_PROCESS_DELIM));
 
     pg = CMAKE_N(subtask, n+1);
@@ -699,7 +699,7 @@ static subtask *_SC_make_pipeline(char **argv, char **env)
     pg[n].env  = env;
 
     for (i = 0; argv[i] != NULL; i++)
-        {if ((strcmp(argv[i], "|") == 0) ||
+        {if ((strcmp(argv[i], SC_PIPE_DELIM) == 0) ||
 	     (argv[i][0] == SC_PROCESS_DELIM))
             {pg[n].ios  = argv[i];
 
@@ -714,7 +714,8 @@ static subtask *_SC_make_pipeline(char **argv, char **env)
         {al = pg[i].argf;
 	 for (na = 0; al[na] != NULL; na++);
 	 SC_concatenate(cmd, MAXLINE, na, al, " ", FALSE);
-	 pg[i].command = CSTRSAVE(cmd);};
+	 pg[i].command = CSTRSAVE(cmd);
+	 pg[i].kind    = TASK_GROUP;};
 
     n++;
     pg[n].command = NULL;
@@ -772,7 +773,7 @@ static void dprpipe(subtask *jobs)
 	    {pjd = jobs + gid;
 
 	     c = SC_ID_IO(IO_STD_OUT);
-	     for (io = 0; io < 3; io++)
+	     for (io = 0; io < SC_N_IO_CH; io++)
 	         {if (pjd->fd[io].gid == i)
 		     c = SC_ID_IO(io);};
 
@@ -1873,7 +1874,8 @@ void _SC_set_filedes(SC_filedes *fd, int ifd, char *name, int fl)
        {nm = CSTRSAVE(name);
 
 	fd[ifd].name = nm;
-	fd[ifd].flag = fl;};
+	fd[ifd].flag = fl;
+	fd[ifd].dev  = IO_DEV_FILE;};
 
     return;}
 
@@ -1898,27 +1900,32 @@ void _SC_fin_filedes(SC_filedes *fd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_INIT_FILEDES - initialize a set of 3 SC_filedes structures */
+/* _SC_INIT_FILEDES - initialize a set of SC_N_IO_CH SC_filedes structures */
 
 void _SC_init_filedes(SC_filedes *fd)
    {int i;
 
-    for (i = 0; i < 3; i++)
-        {fd[i].name  = NULL;
+    for (i = 0; i < SC_N_IO_CH; i++)
+        {fd[i].fd    = -1;
 	 fd[i].flag  = -1;
-         fd[i].fd    = -1;};
+	 fd[i].gid   = -1;
+	 fd[i].kind  = IO_STD_NONE;
+	 fd[i].dev   = IO_DEV_NONE;
+	 fd[i].name  = NULL;};
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_COPY_FILEDES - copy a set of 3 SC_filedes' FA into another FB */
+/* _SC_COPY_FILEDES - copy a set of SC_N_IO_CH SC_filedes FA
+ *                  - into another FB
+ */
 
 void _SC_copy_filedes(SC_filedes *fb, SC_filedes *fa)
    {int i;
 
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < SC_N_IO_CH; i++)
         fb[i] = fa[i];
 
     return;}
@@ -1965,7 +1972,7 @@ PROCESS *SC_open(char **argv, char **envp, char *mode, ...)
    {int ok, ifd, iex, retry;
     char name[MAXLINE];
     char *key, *host, *proc, *s, *nm;
-    SC_filedes fd[3];
+    SC_filedes fd[SC_N_IO_CH];
     PROCESS *pp;
     PFProcInit initf;
     PFProcExit exitf;

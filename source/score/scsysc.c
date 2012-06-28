@@ -41,6 +41,25 @@ static parstate
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* DPRSUBTASK - print the subtask T */
+
+void dprsubtask(subtask *t)
+   {int i;
+
+    if (t != NULL)
+       {printf("Task: %s\n", t->command);
+        printf("   Tokens: %d\n", t->nt);
+        printf("   Shell: %s\n", t->shell);
+	if (t->ios != NULL)
+	   printf("   Redirections: %s\n", t->ios);
+	for (i = 0; t->argf[i] != NULL; i++)
+	    printf("   Arg %d: %s\n", i, t->argf[i]);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_SET_RUN_TASK_STATE - set the _SC_run_task_state to STATE */
 
 void _SC_set_run_task_state(parstate *state)
@@ -245,6 +264,7 @@ static void _SC_free_tasklst(tasklst *tl)
 
 	     CFREE(sub->shell);
 	     CFREE(sub->command);
+	     CFREE(sub->ios);
 
 	     SC_free_strings(sub->argf);};
 
@@ -890,7 +910,7 @@ static void _SC_unquote_subtask(subtask *ps)
  */
 
 static void _SC_push_subtask(subtask *sub, int it, char *shell,
-			     SC_array *tf, int dosh, int pipe)
+			     SC_array *tf, int dosh, char *ios)
    {int nt;
     char **sa, *sc;
     subtask *ps;
@@ -902,12 +922,14 @@ static void _SC_push_subtask(subtask *sub, int it, char *shell,
 
     sc = SC_dconcatenate(nt, sa, " ");
 
+    ps->kind    = TASK_COMPOUND;
     ps->need    = dosh;
-    ps->pipe    = pipe;
+    ps->pipe    = (ios != NULL);
     ps->shell   = CSTRSAVE(shell);
     ps->nt      = nt;
     ps->argf    = sa;
     ps->command = sc;
+    ps->ios     = CSTRSAVE(ios);
 
     _SC_init_filedes(ps->fd);
 
@@ -945,15 +967,15 @@ static void _SC_push_token(SC_array *tf, char *t)
  */
 
 static int _SC_init_subtasks(subtask *sub, char *shell, char **ta, int na)
-   {int it, n, dosh, doif, pipe, term;
-    char *t;
+   {int it, n, dosh, doif, term;
+    char *t, *ios;
     SC_array *tf;
 
     it    = 0;
     doif  = FALSE;
     dosh  = FALSE;
-    pipe  = FALSE;
     term  = FALSE;
+    ios   = NULL;
 
     tf = SC_STRING_ARRAY();
     SC_array_resize(tf, na, -1.0);
@@ -962,7 +984,7 @@ static int _SC_init_subtasks(subtask *sub, char *shell, char **ta, int na)
         {t = ta[n];
 
 	 if ((t[0] == SC_PROCESS_DELIM) && (_SC_ps.msh_syntax == TRUE))
-	    pipe = TRUE;
+	    ios = t;
 
 	 else if (strpbrk(t, "[]()@$*`") != NULL)
 	    dosh = TRUE;
@@ -987,16 +1009,16 @@ static int _SC_init_subtasks(subtask *sub, char *shell, char **ta, int na)
 	 else if ((strcmp(t, ";\n") == 0) && (doif == FALSE))
 	    term = TRUE;
 
-	 else if (strcmp(t, "|") == 0)
-	    pipe = TRUE;
+	 else if (strcmp(t, SC_PIPE_DELIM) == 0)
+	    ios = t;
 
 	 if (term == TRUE)
 	    {if (tf->n > 0)
-	        {_SC_push_subtask(sub, it++, shell, tf, dosh, pipe);
+	        {_SC_push_subtask(sub, it++, shell, tf, dosh, ios);
 		 tf = SC_STRING_ARRAY();
 		 SC_array_resize(tf, na, -1.0);};
+	     ios  = NULL;
 	     term = FALSE;
-	     pipe = FALSE;
 	     dosh = FALSE;}
 
 /* build up an entry from non-terminal tokens */
@@ -1004,7 +1026,7 @@ static int _SC_init_subtasks(subtask *sub, char *shell, char **ta, int na)
 	    _SC_push_token(tf, t);};
 
     if ((n >= na) && (tf->n > 0))
-       _SC_push_subtask(sub, it++, shell, tf, dosh, pipe);
+       _SC_push_subtask(sub, it++, shell, tf, dosh, ios);
 
     return(it);}
 
