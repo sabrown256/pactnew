@@ -453,7 +453,8 @@ static void _job_child_fork(process *pp, process *cp, char **argv, char *mode)
 /* _JOB_PARENT_FORK - the parent process comes here */
 
 static int _job_parent_fork(process *pp, process *cp, char *mode)
-   {int st;
+   {int i, st;
+    char *modes[N_IO_CHANNELS] = { "r", "w", "w" };
    
     st = TRUE;
 
@@ -461,20 +462,10 @@ static int _job_parent_fork(process *pp, process *cp, char *mode)
     pp->start_time = wall_clock_time();
     pp->stop_time  = 0.0;
 
-/* parent stdin */
-    pp->fio[0] = fdopen(pp->io[0], "r");
-    if (pp->fio[0] != NULL)
-       setbuf(pp->fio[0], NULL);
-
-/* parent stdout */
-    pp->fio[1] = fdopen(pp->io[1], "w");
-    if (pp->fio[1] != NULL)
-       setbuf(pp->fio[1], NULL);
-
-/* parent stderr */
-    pp->fio[2] = fdopen(pp->io[2], "w");
-    if (pp->fio[2] != NULL)
-       setbuf(pp->fio[2], NULL);
+    for (i = 0; i < N_IO_CHANNELS; i++)
+        {pp->fio[i] = fdopen(pp->io[i], modes[i]);
+	 if (pp->fio[i] != NULL)
+	    setbuf(pp->fio[i], NULL);};
 
     _job_free(cp);
 
