@@ -528,7 +528,7 @@ int SC_exec_async_s(char *shell, char **env,
 		      st = system(pc);
 
 		   else
-		      {cm  = SC_dsnprintf(TRUE, "%s -c 'cd ~ ; cd %s ; %s'",
+		      {cm  = SC_dsnprintf(TRUE, "%s -cf 'cd ~ ; cd %s ; %s'",
 					  shell, dirs[id], pc);
 
 		       job = SC_make_taskdesc(&state, jid++,

@@ -15,6 +15,9 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: poll"
 
+SafeEnv HAVE_SELECT_P   FALSE
+SafeEnv HAVE_STREAMS_P  FALSE
+
 set poll = ""
 
 set IOHandling = ""
@@ -88,9 +91,6 @@ else
    NoteD $ALog -n "      has $poll file polling"
    Note $ALog ""
 endif
-
-SafeEnv HAVE_SELECT_P   FALSE
-SafeEnv HAVE_STREAMS_P  FALSE
 
 # make the decisions
 if ($HAVE_SELECT_P == File) then

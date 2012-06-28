@@ -573,7 +573,7 @@ static void _SC_server_job(parstate *state, char *t)
 
 /* send acknowledgement */
 	_SC_exec_printf(as,
-			"[Job %2d]: %s %s -c 'cd %s ; %s'\n",
+			"[Job %2d]: %s %s -cf 'cd %s ; %s'\n",
 			jid, _SC_EXEC_JOB, shell, dir, cmd);
 
 /* launch command */
@@ -586,7 +586,7 @@ static void _SC_server_job(parstate *state, char *t)
 	    inf = &job->inf;
 
 	    job->tag(job, tag, MAXLINE, NULL);
-	    state->print(state, "%s command %s -c 'cd %s ; %s'\n",
+	    state->print(state, "%s command %s -cf 'cd %s ; %s'\n",
 			 tag, shell, dir, cmd);
 
 	    job->add(job);

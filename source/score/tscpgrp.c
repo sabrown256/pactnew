@@ -108,8 +108,8 @@ static int test_pipe_2(void)
 /* simple pipeline variants - all equivalent */
     char *tpipe[] = { "tscpgrp -f tests/pgrp.dat | cat -n", 
 		      "tscpgrp -f tests/pgrp.dat @ cat -n",
-		      "tscpgrp -f tests/pgrp.dat @o+1 cat -n",
-		      "tscpgrp -f tests/pgrp.dat @e+1 cat -n",
+		      "tscpgrp -f tests/pgrp.dat @o+1 cat -n > /dev/null",
+		      "tscpgrp -f tests/pgrp.dat @e+1 cat -n > /dev/null",
 		      "tscpgrp -f tests/pgrp.dat @o+1e+2 cat -n @ cat -n" };
 
     n = sizeof(tpipe)/sizeof(char *);
