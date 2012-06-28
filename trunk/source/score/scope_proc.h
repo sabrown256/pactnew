@@ -326,12 +326,12 @@ struct s_asyncstate
  */
 
 struct s_subtask
-   {int kind;              /* compound or process group */
-    int need;              /* TRUE if shell is needed to run the subtask */
-    int pipe;              /* TRUE if the subtask is pipelined */
+   {int need;              /* TRUE if shell is needed to run the subtask */
+    int pipe;              /* TRUE if the subtask is a process group */
     int nt;                /* number of tokens of the subtask */
     int id;                /* id of process in group */
     int exit;              /* exit status value */
+    SC_task_kind kind;     /* compound command or process group */
     char *shell;
     char *command;         /* full text of the subtask */
     char *ios;             /* text representation of I/O connections */
@@ -480,7 +480,11 @@ extern SC_scope_proc
 /* SCHP.C declarations */
 
 extern int
+ _SC_kind_io(SC_io_kind k),
  _SC_redir_fail(SC_filedes *fd);
+
+extern SC_io_kind
+ _SC_io_kind(char *ios);
 
 extern void
  SC_reset_terminal(void),

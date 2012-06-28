@@ -33,12 +33,6 @@ SC_scope_proc
 
 #if defined(HAVE_POSIX_SYS)
 
-#define SC_IO_ID(_c)                                                        \
-   (((_c) == 'i') ? IO_STD_IN : (((_c) == 'e') ? IO_STD_ERR : IO_STD_OUT))
-
-#define SC_ID_IO(_i)                                                        \
-   (((_i) == IO_STD_IN) ? 'i' : (((_i) == IO_STD_ERR) ? 'e' : 'o'))
-
 #ifdef HAVE_PROCESS_CONTROL
 
 static char
@@ -670,17 +664,17 @@ static void _SC_error_fork(PROCESS *pp, PROCESS *cp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_MAKE_PIPELINE - scan ARGV for pipe indicators and
- *                   - NULL out those entries
- *                   - return a list of offsets into ARGV for each
- *                   - individual process
- *                   - in effect break ARGV into multiple ARGVs
- *                   - one for each process
+/* _SC_MAKE_GROUP_TASKS - scan ARGV for pipe indicators and
+ *                       - NULL out those entries
+ *                       - return a list of offsets into ARGV for each
+ *                       - individual process
+ *                       - in effect break ARGV into multiple ARGVs
+ *                       - one for each process
  */
 
 #ifdef HAVE_PROCESS_CONTROL
 
-static subtask *_SC_make_pipeline(char **argv, char **env)
+static subtask *_SC_make_group_tasks(char **argv, char **env)
    {int i, n, na;
     char cmd[MAXLINE];
     char **al;
@@ -727,11 +721,13 @@ static subtask *_SC_make_pipeline(char **argv, char **env)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_PIPELINE_LENGTH - return the length of the pipeline PL */
+/* _SC_PROCESS_GROUP_N - return the number of processes
+ *                     - in the process_group PG
+ */
 
 #ifdef HAVE_PROCESS_CONTROL
 
-static int _SC_pipeline_length(subtask *pg)
+static int _SC_process_group_n(subtask *pg)
    {int n;
 
     for (n = 0; pg[n].command != NULL; n++);
@@ -743,44 +739,46 @@ static int _SC_pipeline_length(subtask *pg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-static void dprpipe(subtask *jobs)
+/* DPRGRP - diagnostic print of process_group tasks */
+
+void dprgrp(subtask *pg)
    {int i, n, c, io, gid, fd;
     char s[MAXLINE];
     char **sa;
     SC_io_device dev;
-    subtask *pjs, *pjd;
+    subtask *pgs, *pgd;
     SC_filedes *ips;
 
-    n = _SC_pipeline_length(jobs);
+    n = _SC_process_group_n(pg);
 
     sa = CMAKE_N(char *, n+1);
 
-    for (i = 0; jobs[i].command != NULL; i++)
-        {pjs = jobs + i;
+    for (i = 0; pg[i].command != NULL; i++)
+        {pgs = pg + i;
 
-	 if (pjs->ios == NULL)
+	 if (pgs->ios == NULL)
 	    snprintf(s, MAXLINE, "%3d: end\n     ", i);
 	 else
-	    snprintf(s, MAXLINE, "%3d: %s\n     ", i, pjs->ios);
+	    snprintf(s, MAXLINE, "%3d: %s\n     ", i, pgs->ios);
 
 /* stdin */
-	 ips = pjs->fd + IO_STD_IN;
+	 ips = pgs->fd + IO_STD_IN;
 	 dev = ips->dev;
          gid = ips->gid;
 	 if (gid == -1)
 	    SC_vstrcat(s, MAXLINE, "i(ttyin) ", ips->gid);
 	 else
-	    {pjd = jobs + gid;
+	    {pgd = pg + gid;
 
-	     c = SC_ID_IO(IO_STD_OUT);
+	     c = _SC_kind_io(IO_STD_OUT);
 	     for (io = 0; io < SC_N_IO_CH; io++)
-	         {if (pjd->fd[io].gid == i)
-		     c = SC_ID_IO(io);};
+	         {if (pgd->fd[io].gid == i)
+		     c = _SC_kind_io(io);};
 
 	     SC_vstrcat(s, MAXLINE, "i(%d)%c    ", ips->gid, c);};
 
 /* stdout */
-	 ips = pjs->fd + IO_STD_OUT;
+	 ips = pgs->fd + IO_STD_OUT;
 	 dev = ips->dev;
          gid = ips->gid;
 	 if (gid == -1)
@@ -810,11 +808,11 @@ static void dprpipe(subtask *jobs)
 		      SC_vstrcat(s, MAXLINE, "o(expr)   ");
 		      break;};}
 	 else
-	    {c = SC_ID_IO(IO_STD_IN);
+	    {c = _SC_kind_io(IO_STD_IN);
 	     SC_vstrcat(s, MAXLINE, "o(%d)%c     ", ips->gid, c);};
 
 /* stderr */
-	 ips = pjs->fd + IO_STD_ERR;
+	 ips = pgs->fd + IO_STD_ERR;
 	 dev = ips->dev;
          gid = ips->gid;
 	 if (gid == -1)
@@ -844,10 +842,10 @@ static void dprpipe(subtask *jobs)
 		      SC_vstrcat(s, MAXLINE, "o(expr)   ");
 		      break;};}
 	 else
-	    {c = SC_ID_IO(IO_STD_IN);
+	    {c = _SC_kind_io(IO_STD_IN);
 	     SC_vstrcat(s, MAXLINE, "e(%d)%c     ", ips->gid, c);};
 
-	 SC_vstrcat(s, MAXLINE, " %s", pjs->command);
+	 SC_vstrcat(s, MAXLINE, " %s", pgs->command);
          sa[i] = CSTRSAVE(s);};
 
     sa[n] = NULL;
@@ -862,29 +860,95 @@ static void dprpipe(subtask *jobs)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_INIT_IO_SPEC - initialize an SC_filedes specification PJ->fd[KIND] */
+/* _SC_INIT_IO_SPEC - initialize an SC_filedes specification PG->fd[KIND] */
 
-static void _SC_init_io_spec(subtask *pj, int n, int id)
+static void _SC_init_io_spec(subtask *pg, int n, int id)
    {
 
-    pj->fd[IO_STD_IN].kind = IO_STD_IN;
-    pj->fd[IO_STD_IN].fd   = -1;
-    pj->fd[IO_STD_IN].gid  = pj->id - 1;
+    pg->fd[IO_STD_IN].kind = IO_STD_IN;
+    pg->fd[IO_STD_IN].fd   = -1;
+    pg->fd[IO_STD_IN].gid  = pg->id - 1;
 
-    pj->fd[IO_STD_OUT].kind = IO_STD_OUT;
-    pj->fd[IO_STD_OUT].fd   = -1;
-    pj->fd[IO_STD_OUT].gid  = (id < n-1) ? pj->id + 1 : -1;
+    pg->fd[IO_STD_OUT].kind = IO_STD_OUT;
+    pg->fd[IO_STD_OUT].fd   = -1;
+    pg->fd[IO_STD_OUT].gid  = (id < n-1) ? pg->id + 1 : -1;
 
-    pj->fd[IO_STD_ERR].kind = IO_STD_ERR;
-    pj->fd[IO_STD_ERR].fd   = -1;
-    pj->fd[IO_STD_ERR].gid  = -1;
+    pg->fd[IO_STD_ERR].kind = IO_STD_ERR;
+    pg->fd[IO_STD_ERR].fd   = -1;
+    pg->fd[IO_STD_ERR].gid  = -1;
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_SET_IO_SPEC - initialize an SC_filedes specification PJ->fd[KIND]
+/* _SC_IO_KIND - return the SC_io_kind of IOS */
+
+SC_io_kind _SC_io_kind(char *ios)
+   {int c;
+    SC_io_kind rv;
+
+    rv = IO_STD_NONE;
+
+    if (ios != NULL)
+       {c = ios[0];
+	if (strncmp(ios, "1>", 2) == 0)
+	   rv = IO_STD_OUT;
+
+	else if (strncmp(ios, "2>", 2) == 0)
+	   rv = IO_STD_ERR;
+
+/* get >& and >>& */
+	else if (strstr(ios, ">&") != NULL)
+	   rv = IO_STD_BOND;
+
+	else
+	   {switch (c)
+	       {case 'i' :
+		case '<' :
+		     rv = IO_STD_IN;
+		     break;
+	        case 'o' :
+		case '>' :
+		     rv = IO_STD_OUT;
+		     break;
+		case 'e' :
+		     rv = IO_STD_ERR;
+		     break;};};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_KIND_IO - return the character matching SC_io_kind K */
+
+int _SC_kind_io(SC_io_kind k)
+   {int rv;
+
+    switch (k)
+       {case IO_STD_IN :
+	     rv = 'i';
+	     break;
+        case IO_STD_OUT :
+	     rv = 'o';
+	     break;
+        case IO_STD_ERR :
+	     rv = 'e';
+	     break;
+        case IO_STD_BOND :
+	     rv = 'b';
+	     break;
+        default :
+	     rv = '\0';
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_SET_IO_SPEC - initialize an SC_filedes specification PG->fd[KIND]
  *                 - according to LINK whose syntax is:
  *                 -   <ios><gid><iod>
  *                 - where
@@ -895,7 +959,7 @@ static void _SC_init_io_spec(subtask *pj, int n, int id)
  *                 -   <file> := file name
  */
 
-static void _SC_set_io_spec(subtask *jobs, int n, int id,
+static void _SC_set_io_spec(subtask *pg, int n, int id,
 			    SC_io_kind kind, char *link)
    {int fd, gid, nc, md;
     SC_io_device dev;
@@ -903,18 +967,18 @@ static void _SC_set_io_spec(subtask *jobs, int n, int id,
     char s[MAXLINE];
     char *p, *ps;
     SC_filedes *ips, *ipd;
-    subtask *pjs, *pjd;
+    subtask *pgs, *pgd;
 
     if ((0 <= id) && (id < n))
-       {pjs  = jobs + id;
+       {pgs  = pg + id;
 	fd  = -1;
 	gid = -1;
 	dev = IO_DEV_NONE;
 
 	SC_strncpy(s, MAXLINE, link, -1);
 	nc  = strlen(s);
-	ios = SC_IO_ID(s[0]);
-	iod = SC_IO_ID(s[nc-1]);
+	ios = _SC_io_kind(s);
+	iod = _SC_io_kind(s + nc - 1);
 
 	SC_ASSERT(ios == kind);
 
@@ -923,7 +987,7 @@ static void _SC_set_io_spec(subtask *jobs, int n, int id,
 	   {case '+' :
 	    case '-' :
 	         dev = IO_DEV_PIPE;
-		 gid = pjs->id + SC_stoi(ps);
+		 gid = pgs->id + SC_stoi(ps);
 		 break;
 	    case 'e' :
 		 dev = IO_DEV_EXPR;
@@ -988,61 +1052,64 @@ static void _SC_set_io_spec(subtask *jobs, int n, int id,
 		 break;};
 
 /* set the destination io spec for a pipe */
-	if (dev == IO_DEV_PIPE)
-	   {pjd = jobs + gid;
-	    ipd = pjd->fd + iod;
-	    if (ipd != NULL)
-	       {ipd->kind = iod;
-		ipd->dev  = dev;
-		ipd->fd   = fd;
-		ipd->gid  = id;};};
+	if ((dev == IO_DEV_PIPE) &&
+	    (0 <= gid) && (gid < n))
+	   {pgd = pg + gid;
+	    if ((0 <= iod) && (iod < SC_N_IO_CH))
+	       {ipd = pgd->fd + iod;
+		if (ipd != NULL)
+		   {ipd->kind = iod;
+		    ipd->dev  = dev;
+		    ipd->fd   = fd;
+		    ipd->gid  = id;};};};
 
 /* set the source io spec */
-	ips = pjs->fd + ios;
-	if (ips != NULL)
-	   {ips->kind = ios;
-	    ips->dev  = dev;
-	    ips->fd   = fd;
-	    ips->gid  = gid;};};
+	if ((0 <= ios) && (ios < SC_N_IO_CH))
+	   {ips = pgs->fd + ios;
+	    if (ips != NULL)
+	       {ips->kind = ios;
+		ips->dev  = dev;
+		ips->fd   = fd;
+		ips->gid  = gid;};};};
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_PIPELINE_PARSE - parse out the I/O specifications for the ID job
- *                    - out of the N JOBS
+/* _SC_PROCESS_GROUP_PARSE - parse out the I/O specifications for the ID job
+ *                         - out of the N PG
  */
 
-static void _SC_pipeline_parse(subtask *jobs, int n, int id)
+static void _SC_process_group_parse(subtask *pg, int n, int id)
    {int i;
     char **sa;
-    subtask *pjs;
+    subtask *pgs;
 
-    if ((jobs != NULL) && (id >= 0))
-       {pjs = jobs + id;
+    if ((pg != NULL) && (id >= 0))
+       {pgs = pg + id;
 
-	pjs->id   = id;
-	pjs->exit = -1;
+	pgs->id   = id;
+	pgs->exit = -1;
 
-	_SC_init_io_spec(pjs, n, id);
-	if (pjs->ios != NULL)
-	   {sa = SC_tokenize(pjs->ios, "@");
+	_SC_init_io_spec(pgs, n, id);
+	if (pgs->ios != NULL)
+	   {sa = SC_tokenize(pgs->ios, "@");
 
 	    for (i = 0; sa[i] != NULL; i++)
 	        {switch (sa[i][0])
 		    {case 'i' :
-		          _SC_set_io_spec(jobs, n, id, IO_STD_IN,  sa[i]);
+		          _SC_set_io_spec(pg, n, id, IO_STD_IN,  sa[i]);
 			  break;
 		     case 'o' :
-			  _SC_set_io_spec(jobs, n, id, IO_STD_OUT, sa[i]);
+			  _SC_set_io_spec(pg, n, id, IO_STD_OUT, sa[i]);
 			  break;
 		     case 'e' :
-			  _SC_set_io_spec(jobs, n, id, IO_STD_ERR, sa[i]);
+			  _SC_set_io_spec(pg, n, id, IO_STD_ERR, sa[i]);
 			  break;
 		     case 'b' :
-			  _SC_set_io_spec(jobs, n, id, IO_STD_OUT, sa[i]);
-			  _SC_set_io_spec(jobs, n, id, IO_STD_ERR, sa[i]);
+			  _SC_set_io_spec(pg, n, id, IO_STD_OUT, sa[i]);
+			  _SC_set_io_spec(pg, n, id, IO_STD_ERR, sa[i]);
 			  break;};};
 
 	    SC_free_strings(sa);};};
@@ -1052,27 +1119,22 @@ static void _SC_pipeline_parse(subtask *jobs, int n, int id)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_RECONNECT_PIPELINE - reconnect the N PROCCESS's in PA and CA
- *                        - from the canonical parent/child topology
- *                        - into a pipeline topology
- *                        - NOTE: this logic is good for both pipes and
- *                        - sockets but bad for PTYs
- *                        - on the other hand why do PTYs in a pipeline
+/* _SC_RECONNECT_PROCESS_GROUP - reconnect the N PROCCESS's in PA and CA
+ *                             - from the canonical parent/child topology
+ *                             - into a process_group topology
+ *                             - NOTE: this logic is good for both pipes and
+ *                             - sockets but bad for PTYs
+ *                             - on the other hand why do PTYs
+ *                             - in a process_group
  */
 
 #ifdef HAVE_PROCESS_CONTROL
 
-static void _SC_reconnect_pipeline(int n, subtask *pg,
-				   PROCESS **pa, PROCESS **ca)
+static void _SC_reconnect_process_group(int n, subtask *pg,
+					PROCESS **pa, PROCESS **ca)
    {int i, is, ide, ido, nm;
     subtask *g;
     PROCESS *pp, *cp, *pn, *cn;
-
-/* parse out the process group links */
-    for (i = 0; i < n; i++)
-        _SC_pipeline_parse(pg, n, i);
-
-/* dprpipe(pg); */
 
     nm = n - 1;
 
@@ -1256,19 +1318,19 @@ static SC_process_group *_SC_setup_process_group(char **argv, char **envp,
    {int i, n, to;
     char *mod, **al;
     PROCESS **pa, **ca;
-    subtask *pj;
+    subtask *pg;
     SC_filedes *pfd;
     SC_process_group *pgr;
 
-    pj = _SC_make_pipeline(argv, envp);
-    n  = _SC_pipeline_length(pj);
+    pg = _SC_make_group_tasks(argv, envp);
+    n  = _SC_process_group_n(pg);
 
     pa = CMAKE_N(PROCESS *, n);
     ca = CMAKE_N(PROCESS *, n);
 
-/* setup each process in the pipeline */
+/* setup each process in the process_group */
     for (i = 0; i < n; i++)
-        {al = pj[i].argf;
+        {al = pg[i].argf;
 
 /* NOTE: use sockets for the non-terminal process */
 	 mod = (i < n-1) ? "as" : mode;
@@ -1277,7 +1339,11 @@ static SC_process_group *_SC_setup_process_group(char **argv, char **envp,
 	 to = _SC_setup_proc(&pa[i], &ca[i], al, mod,
 			     pfd, retry, iex, initf, exitf, exita);};
 
-    _SC_reconnect_pipeline(n, pj, pa, ca);
+/* parse out the process group links */
+    for (i = 0; i < n; i++)
+        _SC_process_group_parse(pg, n, i);
+
+    _SC_reconnect_process_group(n, pg, pa, ca);
 
     pgr = CMAKE(SC_process_group);
     if (pgr != NULL)
@@ -1285,7 +1351,7 @@ static SC_process_group *_SC_setup_process_group(char **argv, char **envp,
 	pgr->to       = to;
 	pgr->rcpu     = rcpu;
 	pgr->mode     = mode;
-	pgr->jobs     = pj;
+	pgr->jobs     = pg;
 	pgr->terminal = NULL;
 	pgr->parents  = pa;
 	pgr->children = ca;};
@@ -1320,23 +1386,23 @@ static PROCESS *_SC_launch_process_group(SC_process_group *pgr)
    {int i, n, pid, to, st, rcpu;
     char *md, **al, **el;
     PROCESS *pp, *cp, **pa, **ca;
-    subtask *pj;
+    subtask *pg;
 
     n    = pgr->np;
     to   = pgr->to;
-    pj   = pgr->jobs;
+    pg   = pgr->jobs;
     pa   = pgr->parents;
     ca   = pgr->children;
     md   = pgr->mode;
     rcpu = pgr->rcpu;
 
-/* launch each process in the pipeline */
+/* launch each process in the process_group */
     for (i = 0; i < n; i++)
         {pp = pa[i];
 	 cp = ca[i];
 
-         al = pj[i].argf;
-	 el = pj[i].env;
+         al = pg[i].argf;
+	 el = pg[i].env;
 
 /* fork the process */
          pid    = fork();

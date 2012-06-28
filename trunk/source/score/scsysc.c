@@ -49,11 +49,14 @@ void dprsubtask(subtask *t)
     if (t != NULL)
        {printf("Task: %s\n", t->command);
         printf("   Tokens: %d\n", t->nt);
-        printf("   Shell: %s\n", t->shell);
-	if (t->ios != NULL)
-	   printf("   Redirections: %s\n", t->ios);
+	printf("   Argv:\n");
 	for (i = 0; t->argf[i] != NULL; i++)
-	    printf("   Arg %d: %s\n", i, t->argf[i]);};
+	    printf("      (%d) %s\n", i, t->argf[i]);
+
+	if (t->shell != NULL)
+	   printf("   Shell: %s\n", t->shell);
+	if (t->ios != NULL)
+	   printf("   Redirections: %s\n", t->ios);};
 
     return;}
 
@@ -789,21 +792,21 @@ static int _SC_parse_redirect(char *src, char *oper, char *dst,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_REDIRECT_FD - give SRC, OPER, DST strings
+/* _SC_REDIRECT_FD - give SRC, IOS, DST strings
  *                 - fill in the appropriate entry of the SC_filedes
  *                 - in PS
  */
 
 static void _SC_redirect_fd(subtask *ps, int i, char *p)
    {int j, n, di, fd;
-    char src[MAXLINE], dst[MAXLINE], oper[MAXLINE];
+    char src[MAXLINE], dst[MAXLINE], ios[MAXLINE];
     char **ta;
 
     n  = ps->nt;
     ta = ps->argf;
 
 /* parse out the redirect related specifications */
-    j = _SC_parse_redirect(src, oper, dst, ta, i, p);
+    j = _SC_parse_redirect(src, ios, dst, ta, i, p);
 
 /* splice out the redirect related tokens array */
     di = j - i + 1;
@@ -817,15 +820,15 @@ static void _SC_redirect_fd(subtask *ps, int i, char *p)
     ps->nt = n;
 
 /* add the redirect specifications to the filedes */
-    switch (oper[0])
+    switch (ios[0])
        {case '<' :
-	     _SC_redir_filedes(ps->fd, 3, 0, oper, dst);
+	     _SC_redir_filedes(ps->fd, 3, 0, ios, dst);
 	     break;
 
 	case '>' :
 	     switch (src[0])
 	        {case '&' :
-		      _SC_redir_filedes(ps->fd, 3, 2, oper, dst);
+		      _SC_redir_filedes(ps->fd, 3, 2, ios, dst);
 		      fd = 1;
 		      break;
 		 case '\0' :
@@ -834,7 +837,7 @@ static void _SC_redirect_fd(subtask *ps, int i, char *p)
 		 default :
 		      fd = SC_stoi(src);
 		      break;};
-	     _SC_redir_filedes(ps->fd, 3, fd, oper, dst);
+	     _SC_redir_filedes(ps->fd, 3, fd, ios, dst);
 	     break;
 
 	default :

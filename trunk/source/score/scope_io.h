@@ -103,7 +103,7 @@ enum e_io_oper
 typedef enum e_io_oper io_oper;
 
 enum e_SC_io_kind
-   {IO_STD_NONE = -1, IO_STD_IN, IO_STD_OUT, IO_STD_ERR};
+   {IO_STD_NONE = -1, IO_STD_IN, IO_STD_OUT, IO_STD_ERR, IO_STD_BOND};
 
 typedef enum e_SC_io_kind SC_io_kind;
 
