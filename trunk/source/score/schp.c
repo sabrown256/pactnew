@@ -83,15 +83,17 @@ void _SC_dethread(void)
 /* _SC_EXEC_TEST - test the exec system call */
 
 void _SC_exec_test(char **argv, char **envp, char *mode)
-   {PROCESS *pp;
+   {int i;
+    PROCESS *pp;
 
     pp = SC_mk_process(argv, mode, SC_CHILD, -1);
 
     pp->medium     = USE_PIPES;
     pp->data_type  = SC_ASCII;
-    pp->ISTDIN     = 0;
-    pp->ISTDOUT    = 1;
-    pp->ISTDERR    = 2;
+
+    for (i = 0; i < SC_N_IO_CH; i++)
+        pp->io[i] = i;
+
     pp->ischild    = FALSE;
     pp->status     = SC_RUNNING;
     pp->reason     = 0;
@@ -148,7 +150,7 @@ static int _SC_complete_messagep(PROCESS *pp)
 /*--------------------------------------------------------------------------*/
 
 static int _SC_open_pty_unix(PROCESS *pp, PROCESS *cp)
-   {int pty, ok;
+   {int i, pty, ok;
     char *pc;
     extern char *_getpty(int *pfd, int mode, mode_t perm, int flag);
 
@@ -156,13 +158,9 @@ static int _SC_open_pty_unix(PROCESS *pp, PROCESS *cp)
     if (pc != NULL)
        {cp->spty = CSTRSAVE(pc);
 
-	cp->ISTDIN  = pty;
-	cp->ISTDOUT = pty;
-	cp->ISTDERR = pty;
-
-	pp->ISTDIN  = pty;
-	pp->ISTDOUT = pty;
-	pp->ISTDERR = pty;
+	for (i = 0; i < SC_N_IO_CH; i++)
+	    {cp->io[i] = pty;
+	     pp->io[i] = pty;};
 
 	ok = TRUE;}
 
@@ -180,7 +178,7 @@ static int _SC_open_pty_unix(PROCESS *pp, PROCESS *cp)
 /* _SC_OPEN_PTY_UNIX - generic unix pseudo terminal open routine */
 
 static int _SC_open_pty_unix(PROCESS *pp, PROCESS *cp)
-   {int c, d, ok, pty;
+   {int i, c, d, ok, pty;
     char *mpty, *spty, *pc, *pd;
 
     c  = ' ';
@@ -195,14 +193,11 @@ static int _SC_open_pty_unix(PROCESS *pp, PROCESS *cp)
 		 {spty = SC_dsnprintf(TRUE, "/dev/%s%c%c",
 				      SC_SLAVE_PTY_NAME, c, d);
                   
-		  cp->spty    = spty;
-		  cp->ISTDIN  = pty;
-		  cp->ISTDOUT = pty;
-		  cp->ISTDERR = pty;
+		  cp->spty = spty;
 
-		  pp->ISTDIN  = pty;
-		  pp->ISTDOUT = pty;
-		  pp->ISTDERR = pty;
+		  for (i = 0; i < SC_N_IO_CH; i++)
+		      {cp->io[i] = pty;
+		       pp->io[i] = pty;};
 
 		  break;};};};
 
@@ -221,7 +216,7 @@ static int _SC_open_pty_unix(PROCESS *pp, PROCESS *cp)
 /*--------------------------------------------------------------------------*/
 
 static int _SC_open_pty_unix98(PROCESS *pp, PROCESS *cp)
-   {int ok, err, pty;
+   {int i, ok, err, pty;
     char *ps;
     extern char *ptsname(int fd);
     extern int grantpt(int fd);
@@ -235,13 +230,9 @@ static int _SC_open_pty_unix98(PROCESS *pp, PROCESS *cp)
        {ps = ptsname(pty);
 	cp->spty = CSTRSAVE(ps);
 
-	cp->ISTDIN  = pty;
-	cp->ISTDOUT = pty;
-	cp->ISTDERR = pty;
-
-	pp->ISTDIN  = pty;
-	pp->ISTDOUT = pty;
-	pp->ISTDERR = pty;
+	for (i = 0; i < SC_N_IO_CH; i++)
+	    {cp->io[i] = pty;
+	     pp->io[i] = pty;};
 
 	ok = TRUE;}
 
@@ -284,7 +275,8 @@ static int
 /* SC_MK_PROCESS - initialize and return a PROCESS */
 
 PROCESS *SC_mk_process(char **argv, char *mode, int type, int iex)
-   {unsigned int nb;
+   {int i;
+    unsigned int nb;
     PROCESS *pp;
 
     pp = CMAKE(PROCESS);
@@ -301,9 +293,10 @@ PROCESS *SC_mk_process(char **argv, char *mode, int type, int iex)
 
     pp->status      = NOT_FINISHED;
     pp->reason      = NOT_FINISHED;
-    pp->ISTDIN      = -1;
-    pp->ISTDOUT     = -1;
-    pp->ISTDERR     = -1;
+
+    for (i = 0; i < SC_N_IO_CH; i++)
+        pp->io[i] = -1;
+
     pp->data        = -1;
     pp->medium      = NO_IPC;
     pp->gone        = -1;
@@ -480,37 +473,37 @@ static int _SC_init_ipc(PROCESS *pp, PROCESS *cp)
         case USE_PIPES :
              {int ports[2];
 
-/* stdin */
+/* child stdin */
               if (pipe(ports) < 0)
-                 SC_error(-1, "COULDN'T CREATE PIPE #1 - _SC_INIT_IPC");
+                 {close(pp->io[0]);
+                  close(cp->io[1]);
+                  SC_error(-1, "COULDN'T CREATE PIPE #1 - _SC_INIT_IPC");};
 
-              pp->ISTDIN  = ports[0];
-              cp->ISTDOUT = ports[1];
+              cp->io[0] = ports[0];
+              pp->io[1] = ports[1];
 
-/* stdout */
+/* child stdout */
               if (pipe(ports) < 0)
-                 {close(pp->ISTDIN);
-                  close(cp->ISTDOUT);
-                  SC_error(-1, "COULDN'T CREATE PIPE #2 - _SC_INIT_IPC");};
+                 SC_error(-1, "COULDN'T CREATE PIPE #2 - _SC_INIT_IPC");
 
-              cp->ISTDIN  = ports[0];
-              pp->ISTDOUT = ports[1];
+              cp->io[1] = ports[1];
+              pp->io[0] = ports[0];
 
-/* stderr */
+/* child stderr */
               if (pipe(ports) < 0)
-                 {close(pp->ISTDIN);
-                  close(cp->ISTDOUT);
-                  SC_error(-1, "COULDN'T CREATE PIPE #2 - _SC_INIT_IPC");};
+                 {close(pp->io[0]);
+                  close(cp->io[1]);
+                  SC_error(-1, "COULDN'T CREATE PIPE #3 - _SC_INIT_IPC");};
 
-              cp->ISTDERR = ports[0];
-              pp->ISTDERR = ports[1];
+              cp->io[2] = ports[0];
+              pp->io[2] = ports[1];
 
-              SC_set_fd_attr(pp->ISTDIN,  O_RDONLY | O_NDELAY, TRUE);
-              SC_set_fd_attr(pp->ISTDOUT, O_WRONLY, TRUE);
-              SC_set_fd_attr(pp->ISTDERR, O_WRONLY, TRUE);
-              SC_set_fd_attr(cp->ISTDIN,  O_RDONLY & ~O_NDELAY, TRUE);
-              SC_set_fd_attr(cp->ISTDOUT, O_WRONLY, TRUE);
-              SC_set_fd_attr(cp->ISTDERR, O_WRONLY, TRUE);};
+              SC_set_fd_attr(pp->io[0], O_RDONLY | O_NDELAY, TRUE);
+              SC_set_fd_attr(pp->io[1], O_WRONLY, TRUE);
+              SC_set_fd_attr(pp->io[2], O_WRONLY, TRUE);
+              SC_set_fd_attr(cp->io[0], O_RDONLY & ~O_NDELAY, TRUE);
+              SC_set_fd_attr(cp->io[1], O_WRONLY, TRUE);
+              SC_set_fd_attr(cp->io[2], O_WRONLY, TRUE);};
 
               break;
 
@@ -519,34 +512,34 @@ static int _SC_init_ipc(PROCESS *pp, PROCESS *cp)
         case USE_SOCKETS :
              {int ports[2];
 
-/* stdin */
+/* child stdin */
               if (socketpair(PF_UNIX, SOCK_STREAM, 0, ports) < 0)
-                 SC_error(-1, "COULDN'T CREATE SOCKET PAIR #1 - _SC_INIT_IPC");
-              pp->ISTDIN  = ports[0];
-              cp->ISTDOUT = ports[1];
+                 {close(pp->io[0]);
+                  close(cp->io[1]);
+                  SC_error(-1, "COULDN'T CREATE SOCKET PAIR #1 - _SC_INIT_IPC");};
+              cp->io[0] = ports[0];
+              pp->io[1] = ports[1];
 
-/* stdout */
+/* child stdout */
               if (socketpair(PF_UNIX, SOCK_STREAM, 0, ports) < 0)
-                 {close(pp->ISTDIN);
-                  close(cp->ISTDOUT);
-                  SC_error(-1, "COULDN'T CREATE SOCKET PAIR #2 - _SC_INIT_IPC");};
-              cp->ISTDIN  = ports[0];
-              pp->ISTDOUT = ports[1];
+                 SC_error(-1, "COULDN'T CREATE SOCKET PAIR #2 - _SC_INIT_IPC");
+              cp->io[1] = ports[1];
+              pp->io[0] = ports[0];
 
-/* stderr */
+/* child stderr */
               if (socketpair(PF_UNIX, SOCK_STREAM, 0, ports) < 0)
-                 {close(pp->ISTDIN);
-                  close(cp->ISTDOUT);
-                  SC_error(-1, "COULDN'T CREATE SOCKET PAIR #2 - _SC_INIT_IPC");};
-              cp->ISTDERR = ports[0];
-              pp->ISTDERR = ports[1];
+                 {close(pp->io[0]);
+                  close(cp->io[1]);
+                  SC_error(-1, "COULDN'T CREATE SOCKET PAIR #3 - _SC_INIT_IPC");};
+              cp->io[2] = ports[1];
+              pp->io[2] = ports[0];
 
-              SC_set_fd_attr(pp->ISTDIN,  O_RDONLY | O_NDELAY, TRUE);
-              SC_set_fd_attr(pp->ISTDOUT, O_WRONLY, TRUE);
-              SC_set_fd_attr(pp->ISTDERR, O_WRONLY, TRUE);
-              SC_set_fd_attr(cp->ISTDIN,  O_RDONLY & ~O_NDELAY, TRUE);
-              SC_set_fd_attr(cp->ISTDOUT, O_WRONLY, TRUE);
-              SC_set_fd_attr(cp->ISTDERR, O_WRONLY, TRUE);};
+              SC_set_fd_attr(pp->io[0], O_RDONLY | O_NDELAY, TRUE);
+              SC_set_fd_attr(pp->io[1], O_WRONLY, TRUE);
+              SC_set_fd_attr(pp->io[2], O_WRONLY, TRUE);
+              SC_set_fd_attr(cp->io[0], O_RDONLY & ~O_NDELAY, TRUE);
+              SC_set_fd_attr(cp->io[1], O_WRONLY, TRUE);
+              SC_set_fd_attr(cp->io[2], O_WRONLY, TRUE);};
 
              break;
 
@@ -607,7 +600,7 @@ static void _SC_child_fork(PROCESS *pp, PROCESS *cp, int to,
 
 static int _SC_parent_fork(PROCESS *pp, PROCESS *cp, int to,
                            int rcpu, char *mode)
-   {int st;
+   {int i, st;
    
     st = TRUE;
 
@@ -621,7 +614,7 @@ static int _SC_parent_fork(PROCESS *pp, PROCESS *cp, int to,
 
 #ifdef F_SETOWN
     if (pp->medium == USE_SOCKETS)
-       fcntl(pp->ISTDIN, F_SETOWN, pp->root);
+       fcntl(pp->io[0], F_SETOWN, pp->root);
 #endif
 
     if (strchr(mode, 'o') != NULL)
@@ -635,11 +628,10 @@ static int _SC_parent_fork(PROCESS *pp, PROCESS *cp, int to,
        {if (_SC.orig_tty != NULL)
 	   SC_set_raw_state(0, FALSE);
 
-	SC_set_raw_state(pp->ISTDIN, FALSE);
+	SC_set_raw_state(pp->io[0], FALSE);
 
-	cp->ISTDIN  = -1;
-	cp->ISTDOUT = -1;
-	cp->ISTDERR = -1;};
+	for (i = 0; i < SC_N_IO_CH; i++)
+	    cp->io[i] = -1;};
 
     cp->release(cp);
     cp = NULL;
@@ -1091,30 +1083,30 @@ static void _SC_reconnect_pipeline(int n, SC_job *pg,
 	    {pp = pa[i];
 	     cp = ca[i];
 	     if (cp->medium == USE_SOCKETS)
-	        {SC_set_fd_attr(pp->ISTDIN,  O_RDWR,   -1);
-		 SC_set_fd_attr(pp->ISTDOUT, O_RDWR,   -1);
-		 SC_set_fd_attr(pp->ISTDERR, O_WRONLY, -1);
-		 SC_set_fd_attr(cp->ISTDIN,  O_RDWR,   -1);
-		 SC_set_fd_attr(cp->ISTDOUT, O_RDWR,   -1);
-		 SC_set_fd_attr(cp->ISTDERR, O_WRONLY, -1);};};
+	        {SC_set_fd_attr(pp->io[0], O_RDWR,   -1);
+		 SC_set_fd_attr(pp->io[1], O_RDWR,   -1);
+		 SC_set_fd_attr(pp->io[2], O_WRONLY, -1);
+		 SC_set_fd_attr(cp->io[0], O_RDWR,   -1);
+		 SC_set_fd_attr(cp->io[1], O_RDWR,   -1);
+		 SC_set_fd_attr(cp->io[2], O_WRONLY, -1);};};
 
 /* reconnect terminal process output to first process */
 	pp = pa[nm];
 	pn = pa[0];
-	close(pp->ISTDOUT);
-	pp->ISTDOUT = pn->ISTDOUT;
-	pn->ISTDOUT = -2;
+	close(pp->io[1]);
+	pp->io[1] = pn->io[1];
+	pn->io[1] = -2;
 
 /* close all other parent to child lines */
 	for (i = 1; i < nm; i++)
 	    {pp = pa[i];
 	     cp = ca[i];
 
-	     close(pp->ISTDOUT);
-	     close(cp->ISTDIN);
+	     close(pp->io[1]);
+	     close(cp->io[0]);
 
-	     pp->ISTDOUT = -2;
-	     cp->ISTDIN  = -2;};
+	     pp->io[1] = -2;
+	     cp->io[0] = -2;};
 
 /* connect all non-terminal child out to next child in */
 	for (i = 0; i < nm; i++)
@@ -1131,10 +1123,10 @@ static void _SC_reconnect_pipeline(int n, SC_job *pg,
 	     cp = ca[is];
 	     cn = ca[ido];
 
-	     close(cn->ISTDIN);
+	     close(cn->io[0]);
 
-	     cn->ISTDIN = pp->ISTDIN;
-	     pp->ISTDIN = -2;};};
+	     cn->io[0] = pp->io[0];
+	     pp->io[0] = -2;};};
 
     return;}
 
@@ -1340,13 +1332,8 @@ static PROCESS *_SC_launch_process_group(SC_process_group *pgr)
         {pp = pa[i];
 	 cp = ca[i];
 
-/*
-         int off;
-	 off = pj[i].ia;
-         al  = argv + off;
- */
-         al  = pj[i].argv;
-	 el  = pj[i].env;
+         al = pj[i].argv;
+	 el = pj[i].env;
 
 /* fork the process */
          pid    = fork();
@@ -1612,13 +1599,13 @@ static char *_SC_get_input(char *bf, int len, PROCESS *pp)
 
 /* if unblocked when should be blocked */
     if (status && blck)
-       {SC_block_fd(pp->ISTDIN);
+       {SC_block_fd(pp->io[0]);
         status = FALSE;
         reset  = FALSE;}
 
 /* if blocked when should be unblocked */
     else if (!status && !blck)
-       {SC_unblock_fd(pp->ISTDIN);
+       {SC_unblock_fd(pp->io[0]);
         status = TRUE;
         reset  = TRUE;};
 
@@ -1659,10 +1646,10 @@ static char *_SC_get_input(char *bf, int len, PROCESS *pp)
 /* reset the blocking to its state upon entry */
     switch (reset)
        {case 0 :
-	     SC_unblock_fd(pp->ISTDIN);
+	     SC_unblock_fd(pp->io[0]);
 	     break;
         case 1 :
-	     SC_block_fd(pp->ISTDIN);
+	     SC_block_fd(pp->io[0]);
 	     break;};
 
     return(pbf);}
