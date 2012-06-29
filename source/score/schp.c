@@ -883,43 +883,84 @@ static void _SC_init_io_spec(subtask *pg, int n, int id)
 /*--------------------------------------------------------------------------*/
 
 /* _SC_IO_KIND - return the SC_io_kind of IOS in KND
+ *             - the SC_io_device of IOS in DEV
  *             - and the file mode in MODE
  *             - the mode is for >, >>, or >!
  */
 
-int _SC_io_kind(char *ios, SC_io_kind *pknd, int *pmode)
-   {int c, rv, mode;
+int _SC_io_kind(char *ios, SC_io_kind *pknd, SC_io_device *pdev, int *pmode)
+   {int ck, cd, gid, nc, rel, rv, mode;
+    SC_io_device dev;
     SC_io_kind knd;
 
     rv = FALSE;
 
+    dev = IO_DEV_NONE;
     knd = IO_STD_NONE;
+
+    nc = 0;
+    ck = ios[nc++];
+    cd = ios[nc++];
 
     if (ios != NULL)
        {if (strncmp(ios, "1>", 2) == 0)
-	   knd = IO_STD_OUT;
+	   {knd = IO_STD_OUT;
+	    dev = IO_DEV_FILE;}
 
 	else if (strncmp(ios, "2>", 2) == 0)
-	   knd = IO_STD_ERR;
+	   {knd = IO_STD_ERR;
+	    dev = IO_DEV_FILE;}
 
 /* get >& and >>& */
 	else if (strstr(ios, ">&") != NULL)
-	   knd = IO_STD_BOND;
+	   {knd = IO_STD_BOND;
+	    dev = IO_DEV_FILE;}
 
 	else
-	   {c = ios[0];
-	    switch (c)
-	       {case 'i' :
+	   {switch (ck)
+	       {case 'e' :
+		     knd = IO_STD_ERR;
+		     break;
+	        case 'i' :
 		case '<' :
 		     knd = IO_STD_IN;
 		     break;
 	        case 'o' :
 		case '>' :
 		     knd = IO_STD_OUT;
-		     break;
-		case 'e' :
-		     knd = IO_STD_ERR;
 		     break;};};
+
+/* next for the device type */
+        rel = FALSE;
+	switch (cd)
+	   {case '+' :
+	    case '-' :
+	         dev = IO_DEV_PTY;
+	         dev = IO_DEV_SOCKET;
+	         dev = IO_DEV_PIPE;
+		 rel = TRUE;
+		 nc++;
+		 break;
+	    case 'e' :
+	    case '&' :
+	         dev = IO_DEV_EXPR;
+		 break;
+	    case 'f' :
+	    case 'w' :
+	    case '!' :
+	    case 'a' :
+	    case '>' :
+	         dev = IO_DEV_FILE;
+		 break;
+	    case 'v' :
+	         dev = IO_DEV_VAR;
+		 break;
+	    case 't' :
+	         dev = IO_DEV_TERM;
+		 break;};
+
+	if (dev == IO_DEV_PIPE)
+	   gid = SC_stoi(ios+nc);
 
 /* now for the mode */
 	mode = '\0';
@@ -934,6 +975,9 @@ int _SC_io_kind(char *ios, SC_io_kind *pknd, int *pmode)
 
     if (pknd != NULL)
        *pknd = knd;
+
+    if (pdev != NULL)
+       *pdev = dev;
 
     if (pmode != NULL)
        *pmode = mode;
@@ -999,8 +1043,8 @@ static void _SC_set_io_spec(subtask *pg, int n, int id,
 
 	SC_strncpy(s, MAXLINE, link, -1);
 	nc  = strlen(s);
-	_SC_io_kind(s, &ios, NULL);
-	_SC_io_kind(s + nc - 1, &iod, NULL);
+	_SC_io_kind(s, &ios, NULL, NULL);
+	_SC_io_kind(s + nc - 1, &iod, NULL, NULL);
 
 	SC_ASSERT(ios == kind);
 
@@ -1916,7 +1960,7 @@ void _SC_redir_filedes(SC_filedes *fd, int nfd, int ifd,
  *  >>  ->  O_WRONLY | O_APPEND
  */
 #if 1
-	_SC_io_kind(redir, &id, &mode);
+	_SC_io_kind(redir, &id, NULL, &mode);
 	switch (id)
 	   {case IO_STD_IN :
 	         fd[ifd].name = nm;
