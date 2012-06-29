@@ -480,7 +480,7 @@ extern SC_scope_proc
 /* SCHP.C declarations */
 
 extern int
- _SC_io_kind(char *ios, SC_io_kind *pknd, int *pmode),
+ _SC_io_kind(char *ios, SC_io_kind *pknd, SC_io_device *pdev, int *pmode),
  _SC_kind_io(SC_io_kind k),
  _SC_redir_fail(SC_filedes *fd);
 
