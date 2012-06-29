@@ -706,7 +706,7 @@ static subtask *_SC_make_group_tasks(char **argv, char **env)
 
     for (i = 0; i <= n; i++)
         {al = pg[i].argf;
-	 for (na = 0; al[na] != NULL; na++);
+	 SC_ptr_arr_len(na, al);
 	 SC_concatenate(cmd, MAXLINE, na, al, " ", FALSE);
 	 pg[i].command = CSTRSAVE(cmd);
 	 pg[i].kind    = TASK_GROUP;};
@@ -882,39 +882,61 @@ static void _SC_init_io_spec(subtask *pg, int n, int id)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_IO_KIND - return the SC_io_kind of IOS */
+/* _SC_IO_KIND - return the SC_io_kind of IOS in KND
+ *             - and the file mode in MODE
+ *             - the mode is for >, >>, or >!
+ */
 
-SC_io_kind _SC_io_kind(char *ios)
-   {int c;
-    SC_io_kind rv;
+int _SC_io_kind(char *ios, SC_io_kind *pknd, int *pmode)
+   {int c, rv, mode;
+    SC_io_kind knd;
 
-    rv = IO_STD_NONE;
+    rv = FALSE;
+
+    knd = IO_STD_NONE;
 
     if (ios != NULL)
-       {c = ios[0];
-	if (strncmp(ios, "1>", 2) == 0)
-	   rv = IO_STD_OUT;
+       {if (strncmp(ios, "1>", 2) == 0)
+	   knd = IO_STD_OUT;
 
 	else if (strncmp(ios, "2>", 2) == 0)
-	   rv = IO_STD_ERR;
+	   knd = IO_STD_ERR;
 
 /* get >& and >>& */
 	else if (strstr(ios, ">&") != NULL)
-	   rv = IO_STD_BOND;
+	   knd = IO_STD_BOND;
 
 	else
-	   {switch (c)
+	   {c = ios[0];
+	    switch (c)
 	       {case 'i' :
 		case '<' :
-		     rv = IO_STD_IN;
+		     knd = IO_STD_IN;
 		     break;
 	        case 'o' :
 		case '>' :
-		     rv = IO_STD_OUT;
+		     knd = IO_STD_OUT;
 		     break;
 		case 'e' :
-		     rv = IO_STD_ERR;
-		     break;};};};
+		     knd = IO_STD_ERR;
+		     break;};};
+
+/* now for the mode */
+	mode = '\0';
+	if (strstr(ios, ">>") != NULL)
+	   mode = 'a';
+	else if (strchr(ios, '!') != NULL)
+	   mode = 'w';
+	else if (strchr("ioeb", ios[0]) != NULL)
+	   mode = ios[1];
+
+	rv = TRUE;};
+
+    if (pknd != NULL)
+       *pknd = knd;
+
+    if (pmode != NULL)
+       *pmode = mode;
 
     return(rv);}
 
@@ -977,8 +999,8 @@ static void _SC_set_io_spec(subtask *pg, int n, int id,
 
 	SC_strncpy(s, MAXLINE, link, -1);
 	nc  = strlen(s);
-	ios = _SC_io_kind(s);
-	iod = _SC_io_kind(s + nc - 1);
+	_SC_io_kind(s, &ios, NULL);
+	_SC_io_kind(s + nc - 1, &iod, NULL);
 
 	SC_ASSERT(ios == kind);
 
@@ -992,6 +1014,7 @@ static void _SC_set_io_spec(subtask *pg, int n, int id,
 	    case 'e' :
 		 dev = IO_DEV_EXPR;
 		 break;
+
 	    case 'a' :
 	    case 'f' :
 	    case 'w' :
@@ -1019,6 +1042,7 @@ static void _SC_set_io_spec(subtask *pg, int n, int id,
 		 else
 		    fd = open(ps+1, md, 0600);
 		 break;
+
 	    case 's' :
 		 dev = IO_DEV_SOCKET;
 		 {int to, fm, port;
@@ -1859,8 +1883,9 @@ int _SC_redir_fail(SC_filedes *fd)
 
 void _SC_redir_filedes(SC_filedes *fd, int nfd, int ifd,
 		       char *redir, char *name)
-   {int ofd, excl, fl, flc, flt, fla;
+   {int ofd, excl, fl, flc, flt, fla, mode;
     char *nm;
+    SC_io_kind id;
 
     if ((name != NULL) && (redir != NULL))
        {if (SC_numstrp(name))
@@ -1890,6 +1915,48 @@ void _SC_redir_filedes(SC_filedes *fd, int nfd, int ifd,
  *  >!  ->  O_WRONLY | O_CREAT | O_TRUNC
  *  >>  ->  O_WRONLY | O_APPEND
  */
+#if 1
+	_SC_io_kind(redir, &id, &mode);
+	switch (id)
+	   {case IO_STD_IN :
+	         fd[ifd].name = nm;
+		 fd[ifd].flag = O_RDONLY;
+	         break;
+	    case IO_STD_OUT :
+	         switch (mode)
+		    {case 'w' :
+		          fl = flt;
+			  break;
+		     case 'a' :
+		          fl = fla;
+			  break;
+		     default :
+		          fl = flc;
+			  break;};
+		 fd[ifd].name = nm;
+		 fd[ifd].flag = fl;
+	         break;
+	    case IO_STD_ERR :
+	         break;
+	    case IO_STD_BOND :
+	         switch (mode)
+		    {case 'w' :
+		          fl = (fl == -1) ? flt : fl;
+			  break;
+		     case 'a' :
+		          fl = (fl == -1) ? fla : fl;
+			  break;
+		     default :
+		          fl = (fl == -1) ? flc : fl;
+			  break;};
+		 fd[1].name = nm;
+		 fd[2].name = nm;
+		 fd[1].flag = fl;
+		 fd[2].flag = fl;
+	         break;
+	    default :
+	         break;};};
+#else
 	if (strcmp(redir, "<") == 0)
 	   {fd[ifd].name = nm;
 	    fd[ifd].flag = O_RDONLY;}
@@ -1923,6 +1990,7 @@ void _SC_redir_filedes(SC_filedes *fd, int nfd, int ifd,
 
 	    fd[ifd].name = nm;
 	    fd[ifd].flag = fl;};};
+#endif
 
     return;}
 
