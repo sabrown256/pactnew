@@ -142,12 +142,7 @@ struct s_process
 
     int io[N_IO_CHANNELS];
     FILE *fio[N_IO_CHANNELS];
-/*
-    int in;
-    int out;
-    FILE *fin;
-    FILE *fout;
-*/
+
     double start_time;
     double stop_time;
 
@@ -226,7 +221,7 @@ static int _job_release(process *pp)
 
     rv = FALSE;
     if (job_alive(pp))
-       {for (i = 0; N_IO_CHANNELS; i++)
+       {for (i = 0; i < N_IO_CHANNELS; i++)
 	    io[i] = pp->io[i];
 
 /* stdin */
@@ -244,11 +239,13 @@ static int _job_release(process *pp)
 	   fclose(pp->fio[1]);
 
 /* stderr */
+#if 0
 	if (io[2] >= 0)
 	   close(io[2]);
 
 	if (pp->fio[2] != NULL)
 	   fclose(pp->fio[2]);
+#endif
 
         pp->io[0] = -1;
         FREE(pp->cmd);
@@ -298,8 +295,10 @@ static int _job_exec(process *cp, char **argv, char **env, char *mode)
        {for (i = 0; i < N_IO_CHANNELS; i++)
 	    io[i] = cp->io[i];
 
+#if 1
 /* NOTE: in past stderr went to stdout */
 	io[2] = io[1];
+#endif
 
 	rv = block_fd(io[0], TRUE);
 	ASSERT(rv == 0);
