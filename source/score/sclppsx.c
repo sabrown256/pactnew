@@ -153,7 +153,7 @@ static int _SC_dup_fd(char *msg, int to, SC_filedes *fd, int nfd, int ofd)
     p = 0;
 
     if (fd[nfd].flag != -1)
-       {if (fd[1].name == fd[2].name)
+       {if ((fd[1].name == fd[2].name) && (fd[1].name != NULL))
 	   {if ((nfd == 2) && (fd[1].fd != -1))
 	       ofd = fd[1].fd;
 	    else if ((nfd == 1) && (fd[2].fd != -1))
