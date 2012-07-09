@@ -336,26 +336,6 @@ static void femit(FILE *fp, char *t, char *trm)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* CONCATENATE - concatenate tokens SA to string S */
-
-static char *concatenate(char *s, int nc, char **sa, char *dlm)
-   {int i, ns, nd, n;
-
-    s[0] = '\0';
-    for (i = 0; sa[i] != NULL; i++)
-        vstrcat(s, nc, "%s%s", sa[i], dlm);
-
-    ns = strlen(s);
-    nd = strlen(dlm);
-    n  = ns - nd;
-    n  = max(n, 0);
-    s[n] = '\0';
-
-    return(s);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* IS_VAR_ARG - return TRUE iff the function described by PR
  *            - has a variable arg list
  */

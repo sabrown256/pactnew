@@ -118,17 +118,54 @@
 #define JOB_NO_EXEC    76
 
 #define job_alive(pp)                                                             \
-   ((pp != NULL) && (pp->io[0] != -1))
+   ((pp != NULL) && (pp->io[0].fd != -1))
 
 #define job_running(pp)                                                           \
-   ((pp != NULL) && (pp->io[0] != -1) && (pp->status == JOB_RUNNING))
+   ((pp != NULL) && (pp->io[0].fd != -1) && (pp->status == JOB_RUNNING))
 
 typedef void (*PFSIGHand)(int sig);
 typedef void (*PFIOHand)(int fd, int mask, void *a);
+
+enum e_io_kind
+   {IO_STD_NONE = -1, IO_STD_IN, IO_STD_OUT, IO_STD_ERR, IO_STD_BOND};
+
+typedef enum e_io_kind io_kind;
+
+enum e_io_device
+   {IO_DEV_NONE,
+    IO_DEV_PIPE, IO_DEV_SOCKET, IO_DEV_PTY, 
+    IO_DEV_TERM, IO_DEV_FILE, IO_DEV_VAR, IO_DEV_EXPR };
+
+typedef enum e_io_device io_device;
+
+enum e_io_mode
+   {IO_MODE_NONE,
+    IO_MODE_RO, IO_MODE_WO, IO_MODE_WD, IO_MODE_APPEND };
+
+typedef enum e_io_mode io_mode;
+
+enum e_st_sep
+   {ST_NEXT, ST_AND, ST_OR};
+
+typedef enum e_st_sep st_sep;
+
 typedef struct pollfd apollfd;
 typedef struct s_process process;
 typedef struct s_process_group process_group;
 typedef struct s_process_stack process_stack;
+typedef struct s_iodes iodes;
+
+struct s_iodes
+   {int fd;
+    int fid;                /* file descriptor for redirect - 2>&1 type */
+    int gid;                /* index of process group member for redirect */
+    int flag;               /* file open mode flags */
+    io_kind knd;
+    io_device dev;
+    io_mode mode;
+    char *file;
+    char **raw;
+    FILE *fp;};
 
 struct s_process
    {int ip;                                                /* process index */
@@ -138,10 +175,13 @@ struct s_process
     int ischild;                             /* TRUE iff started as a child */
     int nattempt;                   /* count the times the job is attempted */
     char *cmd;
+    char **ios;
+    char **arg;
+    char **env;
+    char *shell;
     char mode[10];
 
-    int io[N_IO_CHANNELS];
-    FILE *fio[N_IO_CHANNELS];
+    iodes io[N_IO_CHANNELS];
 
     double start_time;
     double stop_time;
@@ -152,10 +192,14 @@ struct s_process
     void *a;};                 /* external data associated with the process */
 
 struct s_process_group
-   {int np;
-    int *pl;
-    process **pa;
-    process **ca;};
+   {int np;                 /* number of processes in group */
+    int to;                 /* group time out */
+    char *mode;             /* IPC mode */
+    char *shell;
+    char **env;
+    process *terminal;      /* terminal process */
+    process **parents;      /* parent process array */
+    process **children;};   /* child process array */
 
 struct s_process_stack
    {int ip;
@@ -181,10 +225,63 @@ static sigjmp_buf
 
 /*--------------------------------------------------------------------------*/
 
+/* _INIT_IODES - initialize a set of N_IO_CH iodes structures */
+
+static void _init_iodes(iodes *fd)
+   {int i;
+
+    for (i = 0; i < N_IO_CHANNELS; i++)
+        {fd[i].fd   = -1;
+	 fd[i].fid  = -1;
+	 fd[i].gid  = -1;
+	 fd[i].flag = -1;
+	 fd[i].knd  = IO_STD_NONE;
+	 fd[i].dev  = IO_DEV_NONE;
+	 fd[i].mode = IO_MODE_NONE;
+	 fd[i].file = NULL;
+	 fd[i].raw  = NULL;
+	 fd[i].fp   = NULL;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _DEFAULT_IODES - initialize a set of N_IO_CH iodes structures */
+
+static void _default_iodes(iodes *fd)
+   {int i;
+
+    for (i = 0; i < N_IO_CHANNELS; i++)
+        {if (fd[i].fd == -1)
+	    fd[i].fd = i;
+
+	 if (fd[i].dev == IO_DEV_NONE)
+	    fd[i].dev = IO_DEV_FILE;};
+
+    if (fd[0].knd == IO_STD_NONE)
+       {fd[0].knd  = IO_STD_IN;
+	fd[0].mode = IO_MODE_RO;};
+
+    if (fd[1].knd == IO_STD_NONE)
+       {fd[1].knd  = IO_STD_OUT;
+	fd[1].mode = IO_MODE_WO;};
+
+    if (fd[2].knd == IO_STD_NONE)
+       {fd[2].knd  = IO_STD_ERR;
+	fd[2].mode = IO_MODE_WO;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _JOB_MK_PROCESS - initialize and return a process */
 
-static process *_job_mk_process(int child)
-   {int i;
+static process *_job_mk_process(int child, char **arg,
+				char **env, char *shell)
+   {char s[MAXLINE];
+    char *sc;
     process *pp;
 
     pp = MAKE(process);
@@ -197,11 +294,18 @@ static process *_job_mk_process(int child)
 	pp->nattempt    = 1;
 	pp->mode[0]     = '\0';
 
-        for (i = 0; i < N_IO_CHANNELS; i++)
-	    {pp->io[i]  = -1;
-	     pp->fio[i] = NULL;};
+	_init_iodes(pp->io);
 
-	pp->cmd         = NULL;
+	if (arg == NULL)
+	   sc = NULL;
+	else
+	   {sc = concatenate(s, MAXLINE, arg, " ");
+	    sc = STRSAVE(sc);};
+
+	pp->cmd         = sc;
+	pp->arg         = arg;
+	pp->env         = env;
+	pp->shell       = shell;
 	pp->start_time  = -1.0;
 	pp->stop_time   = -1.0;
         pp->accept      = NULL;
@@ -222,32 +326,32 @@ static int _job_release(process *pp)
     rv = FALSE;
     if (job_alive(pp))
        {for (i = 0; i < N_IO_CHANNELS; i++)
-	    io[i] = pp->io[i];
+	    io[i] = pp->io[i].fd;
 
 /* stdin */
 	if (io[0] >= 0)
 	   close(io[0]);
 
-	if (pp->fio[0] != NULL)
-	   fclose(pp->fio[0]);
+	if (pp->io[0].fp != NULL)
+	   fclose(pp->io[0].fp);
 
 /* stdout */
 	if ((io[0] != io[1]) && (io[1] >= 0))
 	   close(io[1]);
 
-	if (pp->fio[1] != NULL)
-	   fclose(pp->fio[1]);
+	if (pp->io[1].fp != NULL)
+	   fclose(pp->io[1].fp);
 
 /* stderr */
 #if 0
 	if (io[2] >= 0)
 	   close(io[2]);
 
-	if (pp->fio[2] != NULL)
-	   fclose(pp->fio[2]);
+	if (pp->io[2].fp != NULL)
+	   fclose(pp->io[2].fp);
 #endif
 
-        pp->io[0] = -1;
+        pp->io[0].fd = -1;
         FREE(pp->cmd);
 
 	rv = TRUE;};
@@ -293,7 +397,7 @@ static int _job_exec(process *cp, char **argv, char **env, char *mode)
 
     if (cp != NULL)
        {for (i = 0; i < N_IO_CHANNELS; i++)
-	    io[i] = cp->io[i];
+	    io[i] = cp->io[i].fd;
 
 #if 1
 /* NOTE: in past stderr went to stdout */
@@ -389,37 +493,37 @@ static int _job_init_ipc(process *pp, process *cp)
 
 /* child stdin */
     if (pipe(ports) < 0)
-       {close(pp->io[0]);
-	close(cp->io[1]);
+       {close(pp->io[0].fd);
+	close(cp->io[1].fd);
 	fprintf(stdout, "COULDN'T CREATE PIPE #1 - _JOB_INIT_IPC");
 	return(FALSE);};
 
-    cp->io[0] = ports[0];
-    pp->io[1] = ports[1];
+    cp->io[0].fd = ports[0];
+    pp->io[1].fd = ports[1];
 
 /* child stdout */
     if (pipe(ports) < 0)
        {fprintf(stdout, "COULDN'T CREATE PIPE #2 - _JOB_INIT_IPC");
 	return(FALSE);};
 
-    cp->io[1] = ports[1];
-    pp->io[0] = ports[0];
+    cp->io[1].fd = ports[1];
+    pp->io[0].fd = ports[0];
 
 /* child stderr */
     if (pipe(ports) < 0)
        {fprintf(stdout, "COULDN'T CREATE PIPE #e - _JOB_INIT_IPC");
 	return(FALSE);};
 
-    cp->io[2] = ports[1];
-    pp->io[2] = ports[0];
+    cp->io[2].fd = ports[1];
+    pp->io[2].fd = ports[0];
 
-    _job_set_attr(pp->io[0], O_RDONLY | O_NDELAY, TRUE);
-    _job_set_attr(pp->io[1], O_WRONLY, TRUE);
-    _job_set_attr(pp->io[2], O_WRONLY, TRUE);
+    _job_set_attr(pp->io[0].fd, O_RDONLY | O_NDELAY, TRUE);
+    _job_set_attr(pp->io[1].fd, O_WRONLY, TRUE);
+    _job_set_attr(pp->io[2].fd, O_WRONLY, TRUE);
 
-    _job_set_attr(cp->io[0], O_RDONLY & ~O_NDELAY, TRUE);
-    _job_set_attr(cp->io[1], O_WRONLY, TRUE);
-    _job_set_attr(cp->io[2], O_WRONLY, TRUE);
+    _job_set_attr(cp->io[0].fd, O_RDONLY & ~O_NDELAY, TRUE);
+    _job_set_attr(cp->io[1].fd, O_WRONLY, TRUE);
+    _job_set_attr(cp->io[2].fd, O_WRONLY, TRUE);
 
     return(ret);}
 
@@ -462,9 +566,9 @@ static int _job_parent_fork(process *pp, process *cp, char *mode)
     pp->stop_time  = 0.0;
 
     for (i = 0; i < N_IO_CHANNELS; i++)
-        {pp->fio[i] = fdopen(pp->io[i], modes[i]);
-	 if (pp->fio[i] != NULL)
-	    setbuf(pp->fio[i], NULL);};
+        {pp->io[i].fp = fdopen(pp->io[i].fd, modes[i]);
+	 if (pp->io[i].fp != NULL)
+	    setbuf(pp->io[i].fp, NULL);};
 
     _job_free(cp);
 
@@ -489,101 +593,6 @@ static void _job_error_fork(process *pp, process *cp)
     _job_free(cp);
 
     fprintf(stdout, "COULDN'T FORK process - _JOB_ERROR_FORK");
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _JOB_MAKE_PIPELINE - scan ARGV for pipe indicators and
- *                    - NULL out those entries
- *                    - return a list of offsets into ARGV for each
- *                    - individual process
- *                    - in effect break ARGV into multiple ARGVs
- *                    - one for each process
- */
-
-static int *_job_make_pipeline(char **argv)
-   {int i, n;
-    int *pl;
-
-    n = 1;
-    for (i = 0; argv[i] != NULL; i++)
-        n += (strcmp(argv[i], "|") == 0);
-
-    pl = MAKE_N(int, n+1);
-    if (pl != NULL)
-       {n  = 0;
-
-	pl[n++] = 0;
-	for (i = 0; argv[i] != NULL; i++)
-	    {if (strcmp(argv[i], "|") == 0)
-	        {pl[n++] = i+1;
-		 argv[i] = NULL;};};
-
-	pl[n++] = -1;};
-
-    return(pl);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _JOB_PIPELINE_LENGTH - return the length of the pipeline PL */
-
-static int _job_pipeline_length(int *pl)
-   {int n;
-
-    for (n = 0; pl[n] >= 0; n++);
-
-    return(n);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _JOB_RECONNECT_PIPELINE - reconnect the N PROCCESS's in PA and CA
- *                         - from the canonical parent/child topology
- *                         - into a pipeline topology
- */
-
-static void _job_reconnect_pipeline(int n, process **pa, process **ca)
-   {int i, nm;
-    process *pp, *cp, *pn, *cn;
-
-    nm = n - 1;
-
-/* remove the parent to child channels except for the last one
- * the final parent out gets connected to the first child in
- */
-    if (nm > 0)
-
-/* reconnect terminal process output to first process */
-       {pp = pa[nm];
-	pn = pa[0];
-	close(pp->io[1]);
-	pp->io[1] = pn->io[1];
-	pn->io[1] = -2;
-
-/* close all other parent to child lines */
-	for (i = 1; i < nm; i++)
-	    {pp = pa[i];
-	     cp = ca[i];
-
-	     close(pp->io[1]);
-	     close(cp->io[0]);
-
-	     pp->io[1] = -2;
-	     cp->io[0] = -2;};
-
-/* connect all non-terminal child out to next child in */
-	for (i = 0; i < nm; i++)
-	    {pp = pa[i];
-	     cp = ca[i];
-	     cn = ca[i+1];
-
-	     close(cn->io[0]);
-
-	     cn->io[0] = pp->io[0];
-	     pp->io[0] = -2;};};
 
     return;}
 
@@ -620,12 +629,13 @@ static char *_job_command_str(char **al)
  *                 - setup and exec
  */
 
-static int _job_setup_proc(process **ppp, process **pcp)
+static int _job_setup_proc(process **ppp, process **pcp, 
+			   char **arg, char **env, char *shell)
    {int to, flag;
     process *pp, *cp;
 
-    cp = _job_mk_process(TRUE);
-    pp = _job_mk_process(FALSE);
+    cp = _job_mk_process(TRUE, arg, env, shell);
+    pp = _job_mk_process(FALSE, arg, env, shell);
 
     if ((cp != NULL) && (pp != NULL))
 
@@ -659,78 +669,18 @@ static int _job_setup_proc(process **ppp, process **pcp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PROCESS_GROUP_SETUP - initialize and return a process group by
- *                      - parsing out ARGV
- */
-
-static process_group *_process_group_setup(char **argv, char *mode, void *a)
-   {int i, n;
-    int *pl;
-    process **pa, **ca;
-    process_group *pg;
-
-    pg = NULL;
-
-    pl = _job_make_pipeline(argv);
-    if (pl != NULL)
-       n = _job_pipeline_length(pl);
-    else
-       n = 0;
-
-    pa = MAKE_N(process *, n);
-    ca = MAKE_N(process *, n);
-
-    if ((pa != NULL) && (ca != NULL))
-
-/* setup each process in the pipeline */
-       {for (i = 0; i < n; i++)
-	    _job_setup_proc(&pa[i], &ca[i]);
-
-	_job_reconnect_pipeline(n, pa, ca);
-
-	pg = MAKE(process_group);
-	if (pg != NULL)
-	   {pg->np = n;
-	    pg->pl = pl;
-	    pg->pa = pa;
-	    pg->ca = ca;};};
-
-    return(pg);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _FREE_PROCESS_GROUP - free a process group instance */
-
-static void _free_process_group(process_group *pg)
-   {
-
-    if (pg != NULL)
-       {FREE(pg->pl);
-	FREE(pg->pa);
-	FREE(pg->ca);
-        FREE(pg);};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _JOB_FORK - fork PP/CP and exec the command in CP with AL */
 
-static process *_job_fork(process_group *pg, int i,
+static process *_job_fork(process *pp, process *cp,
 			  char **argv, char *mode, void *a)
    {int st, pid;
-    char **al;
-    process *pp, *cp;
 
-    pp = pg->pa[i];
-    cp = pg->ca[i];
+    if (argv == NULL)
+       argv = pp->arg;
 
-    al = argv + pg->pl[i];
-
-    pp->a   = a;
-    pp->cmd = _job_command_str(al);
+    pp->a = a;
+    if (pp->cmd == NULL)
+       pp->cmd = _job_command_str(argv);
     strcpy(pp->mode, mode);
 
 /* fork the process */
@@ -746,7 +696,7 @@ static process *_job_fork(process_group *pg, int i,
 
 /* the child process comes here and if successful will never return */
 	 case 0 :
-	      _job_child_fork(pp, cp, al, mode);
+	      _job_child_fork(pp, cp, argv, mode);
 	      break;
 
 /* the parent process comes here */
@@ -813,25 +763,17 @@ static void _job_timeout(int to)
  */
 
 process *job_launch(char *cmd, char *mode, void *a)
-   {int i, n;
-    char **argv;
-    process *pp;
-    process_group *pg;
+   {char **argv;
+    process *pp, *cp;
 
     pp = NULL;
 
     argv = tokenize(cmd, " \t");
     if (argv != NULL)
-       {pg = _process_group_setup(argv, mode, a);
+       {_job_setup_proc(&pp, &cp, argv, NULL, NULL);
+	pp = _job_fork(pp, cp, argv, mode, a);
 
-/* launch each process in the pipeline */
-	if (pg != NULL)
-	   {n = pg->np;
-	    for (i = 0; i < n; i++)
-	        pp = _job_fork(pg, i, argv, mode, a);};
-
-	free_strings(argv);
-	_free_process_group(pg);};
+	free_strings(argv);};
 
     return(pp);}
 
@@ -851,7 +793,7 @@ int job_read(process *pp, int (*out)(process *pp, char *s))
     nl = 0;
 
     if (job_alive(pp))
-       {fi = pp->fio[0];
+       {fi = pp->io[0].fp;
 	if (fi != NULL)
 	   {while (TRUE)
 	       {p = fgets(s, MAXLINE, fi);
@@ -885,7 +827,7 @@ int job_write(process *pp, char *fmt, ...)
     nc = 0;
 
     if (job_alive(pp))
-       {fo = pp->fio[1];
+       {fo = pp->io[1].fp;
 	if (fo != NULL)
 	   {ns = strlen(s);
 	    nc = fwrite_safe(s, 1, ns, fo);};};
@@ -907,7 +849,7 @@ int job_poll(process *pp, int to)
 
     n = 0;
     if (job_running(pp))
-       {fds.fd      = pp->io[0];
+       {fds.fd      = pp->io[0].fd;
 	fds.events  = stck.mask_acc;
 	fds.revents = 0;
 	n = 1;};
@@ -949,8 +891,8 @@ int job_response(process *pp, int to, char *fmt, ...)
     rsp = pp->accept;
 
     if (job_alive(pp))
-       {fi = pp->fio[0];
-	fo = pp->fio[1];
+       {fi = pp->io[0].fp;
+	fo = pp->io[1].fp;
 	ns = strlen(s);
 	nc = -1;
 
@@ -1167,7 +1109,7 @@ process *alaunch(int sip, char *cmd, char *mode, void *a,
 
 	pp->ip = ip;
 
-	fd = pp->io[0];
+	fd = pp->io[0].fd;
 	rv = block_fd(fd, FALSE);
 	ASSERT(rv == 0);
 
@@ -1221,7 +1163,7 @@ int apoll(int to)
     for (n = 0, i = 0; i < np; i++)
         {pp = stck.proc[i];
 	 if (job_running(pp))
-	    {fds[n].fd      = pp->io[0];
+	    {fds[n].fd      = pp->io[0].fd;
 	     fds[n].events  = stck.mask_acc;
 	     fds[n].revents = 0;
 	     n++;};};
@@ -1237,7 +1179,7 @@ int apoll(int to)
 /* find the process containing the file desciptor FD and drain it */
 	     for (j = 0; j < np; j++)
 	         {pp = stck.proc[j];
-		  if ((job_alive(pp) == TRUE) && (pp->io[0] == fd))
+		  if ((job_alive(pp) == TRUE) && (pp->io[0].fd == fd))
 		     {if (rev & stck.mask_acc)
 			 {nrdy--;
 			  job_read(pp, pp->accept);}
