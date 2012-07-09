@@ -289,6 +289,26 @@ void lst_free(char **lst)
     return;}
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* CONCATENATE - concatenate tokens SA to string S */
+
+char *concatenate(char *s, int nc, char **sa, char *dlm)
+   {int i, ns, nd, n;
+
+    s[0] = '\0';
+    for (i = 0; sa[i] != NULL; i++)
+        vstrcat(s, nc, "%s%s", sa[i], dlm);
+
+    ns = strlen(s);
+    nd = strlen(dlm);
+    n  = ns - nd;
+    n  = max(n, 0);
+    s[n] = '\0';
+
+    return(s);}
+
+/*--------------------------------------------------------------------------*/
 
 #ifdef NO_UNSETENV
 
