@@ -187,16 +187,16 @@ static void _PD_index_str(char *s, int nc, inti *ind)
     for (i = 0; i < 3; i++)
         SC_itos(t[i], MAXLINE, ind[i], NULL);
 
-   if (ind[0] == ind[2])
-      SC_vstrcat(s, nc, "%s,", t[0]);
+    if (ind[0] == ind[1])
+       SC_vstrcat(s, nc, "%s,", t[0]);
 
-   else if (ind[2] <= 1L)
-      SC_vstrcat(s, nc, "%s:%s,", t[0], t[1]);
+    else if (ind[2] <= 1L)
+       SC_vstrcat(s, nc, "%s:%s,", t[0], t[1]);
             
-   else
-      SC_vstrcat(s, nc, "%s:%s:%s,", t[0], t[1], t[2]);
+    else
+       SC_vstrcat(s, nc, "%s:%s:%s,", t[0], t[1], t[2]);
 
-   return;}
+    return;}
 
 /*--------------------------------------------------------------------------*/
 

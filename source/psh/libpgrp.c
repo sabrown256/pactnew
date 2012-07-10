@@ -571,127 +571,6 @@ static int _SC_process_group_n(subtask *pg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DPRGRP - diagnostic print of process_group tasks */
-
-void dprgrp(subtask *pg)
-   {int i, n, c, io, gid, fd;
-    char s[MAXLINE];
-    char **sa;
-    SC_io_device dev;
-    subtask *pgs, *pgd;
-    SC_iodes *ips;
-
-    n = _SC_process_group_n(pg);
-
-    sa = CMAKE_N(char *, n+1);
-
-    for (i = 0; pg[i].command != NULL; i++)
-        {pgs = pg + i;
-
-	 if (pgs->ios == NULL)
-	    snprintf(s, MAXLINE, "%3d: end\n     ", i);
-	 else
-	    snprintf(s, MAXLINE, "%3d: %s\n     ", i, pgs->ios);
-
-/* stdin */
-	 ips = pgs->fd + IO_STD_IN;
-	 dev = ips->dev;
-         gid = ips->gid;
-	 if (gid == -1)
-	    SC_vstrcat(s, MAXLINE, "i(ttyin) ", ips->gid);
-	 else
-	    {pgd = pg + gid;
-
-	     c = _SC_kind_io(IO_STD_OUT);
-	     for (io = 0; io < SC_N_IO_CH; io++)
-	         {if (pgd->fd[io].gid == i)
-		     c = _SC_kind_io(io);};
-
-	     SC_vstrcat(s, MAXLINE, "i(%d)%c    ", ips->gid, c);};
-
-/* stdout */
-	 ips = pgs->fd + IO_STD_OUT;
-	 dev = ips->dev;
-         gid = ips->gid;
-	 if (gid == -1)
-	    {fd = ips->fd;
-	     switch (dev)
-	        {case IO_DEV_PIPE :
-		 case IO_DEV_NONE :
-		      if (fd == -1)
-			 SC_vstrcat(s, MAXLINE, "o(ttyout) ");
-		      else
-			 SC_vstrcat(s, MAXLINE, "o(ttyerr) ");
-		      break;
-		 case IO_DEV_SOCKET :
-		      break;
-		 case IO_DEV_PTY :
-		      break;
-		 case IO_DEV_TERM :
-		      SC_vstrcat(s, MAXLINE, "o(tty)    ");
-		      break;
-		 case IO_DEV_FILE :
-		      SC_vstrcat(s, MAXLINE, "o(file)   ");
-		      break;
-		 case IO_DEV_VAR :
-		      SC_vstrcat(s, MAXLINE, "o(var)    ");
-		      break;
-		 case IO_DEV_EXPR :
-		      SC_vstrcat(s, MAXLINE, "o(expr)   ");
-		      break;};}
-	 else
-	    {c = _SC_kind_io(IO_STD_IN);
-	     SC_vstrcat(s, MAXLINE, "o(%d)%c     ", ips->gid, c);};
-
-/* stderr */
-	 ips = pgs->fd + IO_STD_ERR;
-	 dev = ips->dev;
-         gid = ips->gid;
-	 if (gid == -1)
-	    {fd = ips->fd;
-	     switch (dev)
-	        {case IO_DEV_PIPE :
-		 case IO_DEV_NONE :
-		      if (fd == -1)
-			 SC_vstrcat(s, MAXLINE, "o(ttyerr) ");
-		      else
-			 SC_vstrcat(s, MAXLINE, "o(ttyout) ");
-		      break;
-		 case IO_DEV_SOCKET :
-		      break;
-		 case IO_DEV_PTY :
-		      break;
-		 case IO_DEV_TERM :
-		      SC_vstrcat(s, MAXLINE, "o(tty)    ");
-		      break;
-		 case IO_DEV_FILE :
-		      SC_vstrcat(s, MAXLINE, "o(file)   ");
-		      break;
-		 case IO_DEV_VAR :
-		      SC_vstrcat(s, MAXLINE, "o(var)    ");
-		      break;
-		 case IO_DEV_EXPR :
-		      SC_vstrcat(s, MAXLINE, "o(expr)   ");
-		      break;};}
-	 else
-	    {c = _SC_kind_io(IO_STD_IN);
-	     SC_vstrcat(s, MAXLINE, "e(%d)%c     ", ips->gid, c);};
-
-	 SC_vstrcat(s, MAXLINE, " %s", pgs->command);
-         sa[i] = STRSAVE(s);};
-
-    sa[n] = NULL;
-
-    for (i = 0; i < n; i++)
-        printf("%s\n", sa[i]);
-
-    SC_free_strings(sa);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _SC_INIT_IO_SPEC - initialize an SC_iodes specification PG->fd[KIND] */
 
 static void _SC_init_io_spec(subtask *pg, int n, int id)
@@ -3956,6 +3835,130 @@ taskdesc *SC_make_taskdesc(parstate *state, int jid,
 #endif
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DPRGRP - diagnostic print of process_group tasks */
+
+void dprgrp(process_group *pg)
+   {int i, n, c, io, gid, fd;
+    char s[MAXLINE];
+    char **sa;
+    io_device dev;
+    process_group *pgs, *pgd;
+    iodes *ips;
+
+    n = pg->np;
+
+    sa = MAKE_N(char *, n+1);
+
+    for (i = 0; i < n; i++)
+        {pgs = pg + i;
+
+	 if (pgs->ios == NULL)
+	    snprintf(s, MAXLINE, "%3d: end\n     ", i);
+	 else
+	    snprintf(s, MAXLINE, "%3d: %s\n     ", i, pgs->ios);
+
+/* stdin */
+	 ips = pgs->fd + IO_STD_IN;
+	 dev = ips->dev;
+         gid = ips->gid;
+	 if (gid == -1)
+	    vstrcat(s, MAXLINE, "i(ttyin) ", ips->gid);
+	 else
+	    {pgd = pg + gid;
+
+/*
+	     c = _SC_kind_io(IO_STD_OUT);
+	     for (io = 0; io < SC_N_IO_CH; io++)
+	         {if (pgd->fd[io].gid == i)
+		     c = _SC_kind_io(io);};
+*/
+	     vstrcat(s, MAXLINE, "i(%d)%c    ", ips->gid, c);};
+
+/* stdout */
+	 ips = pgs->fd + IO_STD_OUT;
+	 dev = ips->dev;
+         gid = ips->gid;
+	 if (gid == -1)
+	    {fd = ips->fd;
+	     switch (dev)
+	        {case IO_DEV_PIPE :
+		 case IO_DEV_NONE :
+		      if (fd == -1)
+			 vstrcat(s, MAXLINE, "o(ttyout) ");
+		      else
+			 vstrcat(s, MAXLINE, "o(ttyerr) ");
+		      break;
+		 case IO_DEV_SOCKET :
+		      break;
+		 case IO_DEV_PTY :
+		      break;
+		 case IO_DEV_TERM :
+		      vstrcat(s, MAXLINE, "o(tty)    ");
+		      break;
+		 case IO_DEV_FILE :
+		      vstrcat(s, MAXLINE, "o(file)   ");
+		      break;
+		 case IO_DEV_VAR :
+		      vstrcat(s, MAXLINE, "o(var)    ");
+		      break;
+		 case IO_DEV_EXPR :
+		      vstrcat(s, MAXLINE, "o(expr)   ");
+		      break;};}
+/*
+	 else
+	    {c = _SC_kind_io(IO_STD_IN);
+	     vstrcat(s, MAXLINE, "o(%d)%c     ", ips->gid, c);};
+*/
+/* stderr */
+	 ips = pgs->fd + IO_STD_ERR;
+	 dev = ips->dev;
+         gid = ips->gid;
+	 if (gid == -1)
+	    {fd = ips->fd;
+	     switch (dev)
+	        {case IO_DEV_PIPE :
+		 case IO_DEV_NONE :
+		      if (fd == -1)
+			 vstrcat(s, MAXLINE, "o(ttyerr) ");
+		      else
+			 vstrcat(s, MAXLINE, "o(ttyout) ");
+		      break;
+		 case IO_DEV_SOCKET :
+		      break;
+		 case IO_DEV_PTY :
+		      break;
+		 case IO_DEV_TERM :
+		      vstrcat(s, MAXLINE, "o(tty)    ");
+		      break;
+		 case IO_DEV_FILE :
+		      vstrcat(s, MAXLINE, "o(file)   ");
+		      break;
+		 case IO_DEV_VAR :
+		      vstrcat(s, MAXLINE, "o(var)    ");
+		      break;
+		 case IO_DEV_EXPR :
+		      vstrcat(s, MAXLINE, "o(expr)   ");
+		      break;};}
+/*
+	 else
+	    {c = _SC_kind_io(IO_STD_IN);
+	     vstrcat(s, MAXLINE, "e(%d)%c     ", ips->gid, c);};
+*/
+	 vstrcat(s, MAXLINE, " %s", pgs->command);
+         sa[i] = STRSAVE(s);};
+
+    sa[n] = NULL;
+
+    for (i = 0; i < n; i++)
+        printf("%s\n", sa[i]);
+
+    free_strings(sa);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
 
 /*                               GROUP ROUTINES                             */
 
@@ -3964,7 +3967,7 @@ taskdesc *SC_make_taskdesc(parstate *state, int jid,
 /* SET_IODES - parse IOS and set the members of IOS accordingly */
 
 int set_iodes(iodes *pio, char *ios)
-   {int ck, cd, fid, gid, nc, rel, rv;
+   {int ck, cd, fid, gid, nc, rel, pos, rv;
     io_mode mode;
     io_device dev;
     io_kind knd;
@@ -4035,7 +4038,6 @@ int set_iodes(iodes *pio, char *ios)
 	         dev = IO_DEV_SOCKET;
 	         dev = IO_DEV_PIPE;
 		 rel = TRUE;
-		 nc++;
 		 break;
 	    case 'e' :
 	    case '&' :
@@ -4056,7 +4058,11 @@ int set_iodes(iodes *pio, char *ios)
 		 break;};
 
 	if (dev == IO_DEV_PIPE)
-	   gid = atoi(ios+nc);
+	   {pos = atoi(ios+nc);
+	    if (rel == TRUE)
+	       gid += pos;
+	    else
+	       gid = pos;};
 
 /* now for the mode */
 	if (strstr(ios, "<") != NULL)
@@ -4199,7 +4205,7 @@ static int parse_redirect(iodes *pio, process *pp, int i)
     if (pio != NULL)
        {t = ta[i];
 	
-	gid = -1;
+	gid = pp->ip;
 	fid = -1;
 	fn  = NULL;
 
@@ -4356,10 +4362,11 @@ static void unquote_process(process *pp)
  */
 
 static void reconnect_pgrp(process_group *pg)
-   {int i, ide, ido, nm, n;
+   {int i, gie, gio, nm, n;
     int fdo[N_IO_CHANNELS];
     process *pp, *cp, *cn, *pt;
     process **pa, **ca;
+    io_device dve, dvo;
 
     n  = pg->np;
     pa = pg->parents;
@@ -4415,17 +4422,24 @@ static void reconnect_pgrp(process_group *pg)
 	    {pp = pa[i];
 	     cp = ca[i];
 
-	     ido = pp->io[IO_STD_OUT].gid;
-	     ide = pp->io[IO_STD_ERR].gid;
+	     gio = pp->io[IO_STD_OUT].gid;
+	     dvo = pp->io[IO_STD_OUT].dev;
+	     gie = pp->io[IO_STD_ERR].gid;
+	     dve = pp->io[IO_STD_ERR].dev;
 
-	     ide = i + 1;
+/* default to the next process in line */
+	     if ((dvo == IO_DEV_PIPE) && (gio == -1))
+	        gio = i + 1;
+	     if ((dve == IO_DEV_PIPE) && (gie == -1))
+	        gie = i + 1;
 
-	     cn = ca[ido];
+	     if (gio >= 0)
+	        {cn = ca[gio];
 
-	     close(cn->io[0].fd);
+		 close(cn->io[0].fd);
 
-	     cn->io[0].fd = pp->io[0].fd;
-	     pp->io[0].fd = -2;};};
+		 cn->io[0].fd = pp->io[0].fd;
+		 pp->io[0].fd = -2;};};};
 
     return;}
 
@@ -4444,6 +4458,8 @@ static void setup_pgrp(process_group *pg, int it,
     pg->to = _job_setup_proc(&pp, &cp, ta, pg->env, pg->shell);
 
     pp->ios = ios;
+    pp->ip  = it;
+    cp->ip  = it;
 
     pa[it] = pp;
     ca[it] = cp;
@@ -4503,13 +4519,16 @@ static void parse_pgrp(statement *s)
         {t   = sa[i];
 	 ios = NULL;
 
-	 if (strpbrk(t, "@|<>") != NULL)
+	 if (t == NULL)
+	    continue;
+
+	 else if (strpbrk(t, "@|<>") != NULL)
 	    {for (j = i; j < nc; j++)
 	         {if (strpbrk(sa[j], "@|<>") != NULL)
-		     ios = lst_add(ios, sa[j]);
+		     {ios = lst_add(ios, sa[j]);
+		      sa[j] = NULL;}
 		  else
 		     break;};
-	     sa[i] = NULL;
 	     term  = TRUE;}
 
 	 else if (strpbrk(t, "[]()@$*`") != NULL)
@@ -4742,10 +4761,7 @@ static int run_pgrp(statement *s)
 /* FREE_PGRP - free the process group PG */
 
 static void free_pgrp(process_group *pg, int np)
-   {int i;
-
-    for (i = 0; i < np; i++)
-        pg[i].np = 0;
+   {
 
     FREE(pg);
 
