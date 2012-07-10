@@ -249,7 +249,7 @@ static void _init_iodes(iodes *fd)
 
 /* _DEFAULT_IODES - initialize a set of N_IO_CH iodes structures */
 
-static void _default_iodes(iodes *fd)
+void _default_iodes(iodes *fd)
    {int i;
 
     for (i = 0; i < N_IO_CHANNELS; i++)
@@ -257,7 +257,7 @@ static void _default_iodes(iodes *fd)
 	    fd[i].fd = i;
 
 	 if (fd[i].dev == IO_DEV_NONE)
-	    fd[i].dev = IO_DEV_FILE;};
+	    fd[i].dev = IO_DEV_TERM;};
 
     if (fd[0].knd == IO_STD_NONE)
        {fd[0].knd  = IO_STD_IN;

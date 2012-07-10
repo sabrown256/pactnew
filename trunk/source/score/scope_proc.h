@@ -557,6 +557,9 @@ extern void
 
 /* SCSYSA.C declarations */
 
+extern char
+ *_SC_shell_no_rc_cmd(char *shell);
+
 extern void
  _SC_setup_output(jobinfo *inf, char *name),
  _SC_process_output(int fd, int mask, void *a),

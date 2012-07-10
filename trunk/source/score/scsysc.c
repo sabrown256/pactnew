@@ -1456,8 +1456,8 @@ static int _SC_manage_launched_job(taskdesc *job, asyncstate *as, PROCESS *pp)
  */
 
 static int _SC_cmnd_exec(taskdesc *job, asyncstate *as, subtask *sub)
-   {int st, to;
-    char **ca, *icmnd[5];
+   {int st, to, nc;
+    char *t, **ca, *icmnd[6];
     jobinfo *inf;
     PROCESS *pp;
     SC_filedes *fd;
@@ -1477,10 +1477,14 @@ static int _SC_cmnd_exec(taskdesc *job, asyncstate *as, subtask *sub)
 	   ca = sub->argf;
 
 	else
-	   {icmnd[0] = sub->shell;
-	    icmnd[1] = "-c";
-	    icmnd[2] = sub->command;
-	    icmnd[3] = NULL;
+	   {nc = 0;
+	    t  =_SC_shell_no_rc_cmd(sub->shell);
+	    icmnd[nc++] = sub->shell;
+	    if (t[0] == '-')
+	       icmnd[nc++] = t;
+	    icmnd[nc++] = "-c";
+	    icmnd[nc++] = sub->command;
+	    icmnd[nc++] = NULL;
 
 	    ca = icmnd;
 
