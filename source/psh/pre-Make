@@ -24,7 +24,7 @@ targets :
 
 OD = DefaultG
 
-CcFlags = ${ODC} ${LDRPath}
+CcFlags = ${ODC} ${LDPath} ${LDRPath}
 PCC     = ${CCSer}
 #PCC     = cc -g
 

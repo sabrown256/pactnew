@@ -312,6 +312,39 @@ void SC_show_state_log(parstate *state)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_SHELL_NO_RC_CMD - return the "flag" to run a shell command
+ *                     - without reading the rc file for the shell
+ *                     - the CSH family and BASH are the only
+ *                     - predictable ones
+ *                     - /bin/sh and /bin/ksh vary from platform to platform
+ *                     - so other shells all return blank
+ */
+
+char *_SC_shell_no_rc_cmd(char *shell)
+   {static char rv[80];
+
+#if 0
+    rv = "-c";
+
+    if ((shell != NULL) && (strstr(shell, "csh") != NULL))
+       rv = "-cf";
+#else
+    SC_strncpy(rv, 80, " ", -1);
+
+    if (shell != NULL)
+       {if (strstr(shell, "csh") != NULL)
+	   SC_strncpy(rv, 80, "-f", -1);
+
+	else if (strstr(shell, "bash") != NULL)
+	   SC_strncpy(rv, 80, "--noprofile", -1);};
+
+#endif
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_EXEC_ASYNC - execute each command in CMNDS under SHELL asynchronously
  *               - and with persistence
  *               - a word about shells:
@@ -528,8 +561,10 @@ int SC_exec_async_s(char *shell, char **env,
 		      st = system(pc);
 
 		   else
-		      {cm  = SC_dsnprintf(TRUE, "%s -cf 'cd ~ ; cd %s ; %s'",
-					  shell, dirs[id], pc);
+		      {cm  = SC_dsnprintf(TRUE, "%s %s -c 'cd ~ ; cd %s ; %s'",
+					  shell,
+					  _SC_shell_no_rc_cmd(shell),
+					  dirs[id], pc);
 
 		       job = SC_make_taskdesc(&state, jid++,
 					      hst, shell, NULL, cm);

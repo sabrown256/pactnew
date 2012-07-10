@@ -3837,65 +3837,89 @@ taskdesc *SC_make_taskdesc(parstate *state, int jid,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _KIND_IO - return the character matching io_kind K */
+
+int _kind_io(io_kind k)
+   {int rv;
+
+    switch (k)
+       {case IO_STD_IN :
+	     rv = 'i';
+	     break;
+        case IO_STD_OUT :
+	     rv = 'o';
+	     break;
+        case IO_STD_ERR :
+	     rv = 'e';
+	     break;
+        case IO_STD_BOND :
+	     rv = 'b';
+	     break;
+        default :
+	     rv = '\0';
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* DPRGRP - diagnostic print of process_group tasks */
 
 void dprgrp(process_group *pg)
-   {int i, n, c, io, gid, fd;
+   {int i, j, n, c, gid;
     char s[MAXLINE];
     char **sa;
     io_device dev;
-    process_group *pgs, *pgd;
-    iodes *ips;
+    process *pps, *ppd;
+    iodes *fds;
 
     n = pg->np;
 
     sa = MAKE_N(char *, n+1);
+    sa[0] = '\0';
 
     for (i = 0; i < n; i++)
-        {pgs = pg + i;
+        {pps = pg->parents[i];
 
-	 if (pgs->ios == NULL)
+	 if (pps->ios == NULL)
 	    snprintf(s, MAXLINE, "%3d: end\n     ", i);
 	 else
-	    snprintf(s, MAXLINE, "%3d: %s\n     ", i, pgs->ios);
+	    {snprintf(s, MAXLINE, "%3d:", i);
+	     for (j = 0; pps->ios[j] != NULL; j++)
+	         vstrcat(s, MAXLINE, " %s ", pps->ios[j]);
+	     vstrcat(s, MAXLINE, "\n     ");};
 
 /* stdin */
-	 ips = pgs->fd + IO_STD_IN;
-	 dev = ips->dev;
-         gid = ips->gid;
+	 fds = pps->io + IO_STD_IN;
+	 dev = fds->dev;
+         gid = fds->gid;
 	 if (gid == -1)
-	    vstrcat(s, MAXLINE, "i(ttyin) ", ips->gid);
+	    vstrcat(s, MAXLINE, "i(ttyin) ", fds->gid);
 	 else
-	    {pgd = pg + gid;
+	    {ppd = pg->parents[gid];
 
-/*
-	     c = _SC_kind_io(IO_STD_OUT);
-	     for (io = 0; io < SC_N_IO_CH; io++)
-	         {if (pgd->fd[io].gid == i)
-		     c = _SC_kind_io(io);};
-*/
-	     vstrcat(s, MAXLINE, "i(%d)%c    ", ips->gid, c);};
+	     c = _kind_io(IO_STD_OUT);
+	     for (j = 0; j < N_IO_CH; j++)
+	         {if (ppd->io[j].gid == i)
+		     c = _kind_io(j);};
+
+	     vstrcat(s, MAXLINE, "i(%d)%c    ", fds->gid, c);};
 
 /* stdout */
-	 ips = pgs->fd + IO_STD_OUT;
-	 dev = ips->dev;
-         gid = ips->gid;
+	 fds = pps->io + IO_STD_OUT;
+	 dev = fds->dev;
+         gid = fds->gid;
 	 if (gid == -1)
-	    {fd = ips->fd;
-	     switch (dev)
+	    {switch (dev)
 	        {case IO_DEV_PIPE :
 		 case IO_DEV_NONE :
-		      if (fd == -1)
-			 vstrcat(s, MAXLINE, "o(ttyout) ");
-		      else
-			 vstrcat(s, MAXLINE, "o(ttyerr) ");
+		 case IO_DEV_TERM :
+		      vstrcat(s, MAXLINE, "o(ttyout) ");
 		      break;
 		 case IO_DEV_SOCKET :
 		      break;
 		 case IO_DEV_PTY :
-		      break;
-		 case IO_DEV_TERM :
-		      vstrcat(s, MAXLINE, "o(tty)    ");
 		      break;
 		 case IO_DEV_FILE :
 		      vstrcat(s, MAXLINE, "o(file)   ");
@@ -3906,31 +3930,25 @@ void dprgrp(process_group *pg)
 		 case IO_DEV_EXPR :
 		      vstrcat(s, MAXLINE, "o(expr)   ");
 		      break;};}
-/*
+
 	 else
-	    {c = _SC_kind_io(IO_STD_IN);
-	     vstrcat(s, MAXLINE, "o(%d)%c     ", ips->gid, c);};
-*/
+	    {c = _kind_io(IO_STD_IN);
+	     vstrcat(s, MAXLINE, "o(%d)%c     ", fds->gid, c);};
+
 /* stderr */
-	 ips = pgs->fd + IO_STD_ERR;
-	 dev = ips->dev;
-         gid = ips->gid;
+	 fds = pps->io + IO_STD_ERR;
+	 dev = fds->dev;
+         gid = fds->gid;
 	 if (gid == -1)
-	    {fd = ips->fd;
-	     switch (dev)
+	    {switch (dev)
 	        {case IO_DEV_PIPE :
 		 case IO_DEV_NONE :
-		      if (fd == -1)
-			 vstrcat(s, MAXLINE, "o(ttyerr) ");
-		      else
-			 vstrcat(s, MAXLINE, "o(ttyout) ");
+		 case IO_DEV_TERM :
+		      vstrcat(s, MAXLINE, "o(ttyerr) ");
 		      break;
 		 case IO_DEV_SOCKET :
 		      break;
 		 case IO_DEV_PTY :
-		      break;
-		 case IO_DEV_TERM :
-		      vstrcat(s, MAXLINE, "o(tty)    ");
 		      break;
 		 case IO_DEV_FILE :
 		      vstrcat(s, MAXLINE, "o(file)   ");
@@ -3941,12 +3959,12 @@ void dprgrp(process_group *pg)
 		 case IO_DEV_EXPR :
 		      vstrcat(s, MAXLINE, "o(expr)   ");
 		      break;};}
-/*
+
 	 else
-	    {c = _SC_kind_io(IO_STD_IN);
-	     vstrcat(s, MAXLINE, "e(%d)%c     ", ips->gid, c);};
-*/
-	 vstrcat(s, MAXLINE, " %s", pgs->command);
+	    {c = _kind_io(IO_STD_IN);
+	     vstrcat(s, MAXLINE, "e(%d)%c     ", fds->gid, c);};
+
+	 vstrcat(s, MAXLINE, " %s", pps->cmd);
          sa[i] = STRSAVE(s);};
 
     sa[n] = NULL;
@@ -4302,11 +4320,7 @@ static void redirect_copy(process *cp, process *pp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* REDIRECT_PROCESS - look through the tokens of the subtask PS
- *                  - for I/O redirection specifications and
- *                  - move any such specifications to the
- *                  - subtasks file descriptors
- */
+/* REDIRECT_PROCESS - look through the I/O specifications of PP */
 
 static void redirect_process(process *pp)
    {int i, n;
@@ -4315,6 +4329,7 @@ static void redirect_process(process *pp)
     ta = pp->ios;
     n  = lst_length(ta);
 
+/* find self-specifications in each process */
     for (i = 0; i < n; i++)
         i = redirect_fd(pp, i);
 
@@ -4352,6 +4367,75 @@ static void unquote_process(process *pp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* FILLIN_PGRP - to this point each process in the group has its own
+ *             - specifications determined
+ *             - now fill in the implied connections of the other processes
+ */
+
+void fillin_pgrp(process_group *pg)
+   {int i, n, gid;
+    process **pa, *pp;
+    iodes *pio, *dio;
+
+    n  = pg->np;
+    pa = pg->parents;
+
+    for (i = 0; i < n; i++)
+        {pp = pa[i];
+
+/* stdin */
+         pio = pp->io + 0;
+	 switch (pio->dev)
+            {case IO_DEV_PIPE :
+	          break;
+	     default :
+	          break;};
+
+/* stdout */
+         pio = pp->io + 1;
+	 switch (pio->dev)
+            {case IO_DEV_PIPE :
+	          gid = pio->gid;
+	          dio = pa[gid]->io + IO_STD_IN;
+		  dio->gid = i;
+		  dio->dev = IO_DEV_PIPE;
+	          break;
+	     default :
+	          break;};
+
+/* stderr */
+         pio = pp->io + 2;
+	 switch (pio->dev)
+            {case IO_DEV_PIPE :
+	          gid = pio->gid;
+	          dio = pa[gid]->io + IO_STD_IN;
+		  dio->gid = i;
+		  dio->dev = IO_DEV_PIPE;
+	          break;
+	     default :
+	          break;};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TRANSFER_FD - transfer the KND descriptor of PN to CN */
+
+static int transfer_fd(process *pn, io_kind pk, process *cn, io_kind ck)
+   {int fd;
+
+    fd            = pn->io[pk].fd;
+    pn->io[pk].fd = -2;
+
+    close(cn->io[ck].fd);
+    cn->io[ck].fd = fd;
+
+    return(fd);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* RECONNECT_PGRP - reconnect the N proccess's in PG
  *                - from the canonical parent/child topology
  *                - into a process_group topology
@@ -4364,7 +4448,7 @@ static void unquote_process(process *pp)
 static void reconnect_pgrp(process_group *pg)
    {int i, gie, gio, nm, n;
     int fdo[N_IO_CHANNELS];
-    process *pp, *cp, *cn, *pt;
+    process *pp, *cp, *pt;
     process **pa, **ca;
     io_device dve, dvo;
 
@@ -4373,6 +4457,8 @@ static void reconnect_pgrp(process_group *pg)
     ca = pg->children;
     pt = pg->terminal;
     nm = n - 1;
+
+    fillin_pgrp(pg);
 
 /* remove the parent to child channels except for the last one
  * the final parent out gets connected to the first child in
@@ -4397,12 +4483,12 @@ static void reconnect_pgrp(process_group *pg)
 
 /* get the output fds of the first member of the group */
 	pp = pa[0];
-        for (i = 0; i < 2; i++)
+        for (i = 0; i < 1; i++)
 	    {fdo[i] = pp->io[i+1].fd;
 	     pp->io[i+1].fd = -2;};
 
 /* reconnect terminal process output to first process */
-        for (i = 0; i < 2; i++)
+        for (i = 0; i < 1; i++)
 	    {close(pt->io[i+1].fd);
 	     pt->io[i+1].fd = fdo[i];};
 
@@ -4433,13 +4519,15 @@ static void reconnect_pgrp(process_group *pg)
 	     if ((dve == IO_DEV_PIPE) && (gie == -1))
 	        gie = i + 1;
 
+/* stdout */
 	     if (gio >= 0)
-	        {cn = ca[gio];
+	        transfer_fd(pa[i], IO_STD_IN, ca[gio], IO_STD_IN);
 
-		 close(cn->io[0].fd);
+/* stderr */
+	     if (gie >= 0)
+	        transfer_fd(pa[i], IO_STD_ERR, ca[gie], IO_STD_IN);};};
 
-		 cn->io[0].fd = pp->io[0].fd;
-		 pp->io[0].fd = -2;};};};
+dprgrp(pg);
 
     return;}
 
