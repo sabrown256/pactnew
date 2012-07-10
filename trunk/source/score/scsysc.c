@@ -822,13 +822,16 @@ static void _SC_redirect_fd(subtask *ps, int i, char *p)
     ps->nt = n;
 
 /* add the redirect specifications to the filedes */
-#if 1
+#if 0
     switch (knd)
        {case IO_STD_IN :
 	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 0, ios, dst);
 	     break;
         case IO_STD_OUT :
-	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 1, ios, dst);
+	     fd = 1;
+	     if (src != NULL)
+	        fd = SC_stoi(src);
+	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, fd, ios, dst);
 	     break;
         case IO_STD_ERR :
 	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 2, ios, dst);

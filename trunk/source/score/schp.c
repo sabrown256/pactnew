@@ -1944,7 +1944,7 @@ void _SC_redir_filedes(SC_filedes *fd, int nfd, int ifd,
 	    fl  = -1;};
 
 /* do not try to use O_EXCL bit with devices - think about it */
-	if (strncmp(nm, "/dev/", 5) == 0)
+	if ((nm != NULL) && (strncmp(nm, "/dev/", 5) == 0))
 	   excl = 0;
 	else
 	   excl = O_EXCL;
@@ -1959,7 +1959,6 @@ void _SC_redir_filedes(SC_filedes *fd, int nfd, int ifd,
  *  >!  ->  O_WRONLY | O_CREAT | O_TRUNC
  *  >>  ->  O_WRONLY | O_APPEND
  */
-#if 1
 	_SC_io_kind(redir, &id, NULL, &mode);
 	switch (id)
 	   {case IO_STD_IN :
@@ -2000,41 +1999,6 @@ void _SC_redir_filedes(SC_filedes *fd, int nfd, int ifd,
 	         break;
 	    default :
 	         break;};};
-#else
-	if (strcmp(redir, "<") == 0)
-	   {fd[ifd].name = nm;
-	    fd[ifd].flag = O_RDONLY;}
-
-/* dual stream redirects: >&, >&!, and >>& */
-	else if (strchr(redir, '&') != NULL)
-	   {if (strcmp(redir, ">&") == 0)
-	       fl = (fl == -1) ? flc : fl;
-
-	    else if (strcmp(redir, ">&!") == 0)
-	       fl = (fl == -1) ? flt : fl;
-
-	    else if (strcmp(redir, ">>&") == 0)
-	       fl = (fl == -1) ? fla : fl;
-
-	    fd[1].name = nm;
-	    fd[2].name = nm;
-	    fd[1].flag = fl;
-	    fd[2].flag = fl;}
-
-/* single stream redirects: >, >!, and >> */
-	else
-	   {if (strcmp(redir, ">") == 0)
-	       fl = flc;
-
-	    else if (strcmp(redir, ">!") == 0)
-	       fl = flt;
-
-	    else if (strcmp(redir, ">>") == 0)
-	       fl = fla;
-
-	    fd[ifd].name = nm;
-	    fd[ifd].flag = fl;};};
-#endif
 
     return;}
 

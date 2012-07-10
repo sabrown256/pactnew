@@ -23,7 +23,7 @@ lib libpact.a libosmm.so
 inc cpyright.h iso-c.h scconfig.h scdecls.h
 inc posix.h posix-unix.h posix-msw.h posix-beos.h
 inc network.h network-unix.h network-msw.h network-beos.h
-int ansic.h
+inc ansic.h
 inc f77std.h f90kinds.inc f90types.h
 inc score.h scstd.h score_old.h scapi.h scunix.h scwin32.h scbgl.h
 inc scgnu.h scpcc.h sclnx.h scosx.h sccyg.h

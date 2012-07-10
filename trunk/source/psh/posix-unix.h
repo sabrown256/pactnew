@@ -40,6 +40,8 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+#ifndef __cplusplus
+
 extern char
  *getcwd(char *buf, size_t size);
 
@@ -49,6 +51,8 @@ extern int
 
 extern int
  sched_yield(void);
+
+#endif
 
 #endif
 
