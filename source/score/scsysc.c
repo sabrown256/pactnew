@@ -765,9 +765,10 @@ static int _SC_io_splice_out(subtask *ps, int i, int j)
  *                    -   fd  := [digits]+  (defaults to 1, stdout, if absent)
  */
 
-static int _SC_parse_redirect(char *src, char *oper, char *dst,
+static int _SC_parse_redirect(SC_iodes *pio, char *src, char *oper, char *dst,
 			      char **ta, int i, char *p)
    {int c, nc;
+    char ldst[MAXLINE];
     char *t;
 
     t  = ta[i];
@@ -789,7 +790,7 @@ static int _SC_parse_redirect(char *src, char *oper, char *dst,
 	    default :
 	         strcpy(oper, ">");
 		 break;};
-	strcpy(dst, t+3);}
+	strcpy(ldst, t+3);}
 
 /* conventional UNIX shell syntax */
     else
@@ -802,15 +803,20 @@ static int _SC_parse_redirect(char *src, char *oper, char *dst,
 		 p--;
 		 break;};};
 
-	dst[0] = '\0';
-	nc     = strlen(p);
+	ldst[0] = '\0';
+	nc      = strlen(p);
 	if (nc == 0)
 	   {t = ta[++i];
 	    if (t != NULL)
-	       strcpy(dst, t);}
+	       strcpy(ldst, t);}
 	else
-	   {strncpy(dst, p, nc);
-	    dst[nc] = '\0';};};
+	   {strncpy(ldst, p, nc);
+	    ldst[nc] = '\0';};};
+
+    pio->raw  = CSTRSAVE(p);
+    pio->file = CSTRSAVE(ldst);
+
+    _SC_io_kind(pio, oper);
 
     return(i);}
 
@@ -825,15 +831,15 @@ static void _SC_redirect_fd(subtask *ps, int i, char *p)
    {int j, n, di, fd;
     char src[MAXLINE], dst[MAXLINE], ios[MAXLINE];
     char **ta;
-    SC_io_kind knd;
-    SC_iodes tio;
+    SC_iodes io;
+
+    memset(&io, 0, sizeof(io));
 
     n  = ps->nt;
     ta = ps->argf;
 
 /* parse out the redirect related specifications */
-    j = _SC_parse_redirect(src, ios, dst, ta, i, p);
-    _SC_io_kind(&tio, ios);
+    j = _SC_parse_redirect(&io, src, ios, dst, ta, i, p);
 
 /* splice out the redirect related tokens array */
     di = j - i + 1;
@@ -848,33 +854,33 @@ static void _SC_redirect_fd(subtask *ps, int i, char *p)
 
 /* add the redirect specifications to the filedes */
 #if 0
-    switch (tio.knd)
+    switch (io.knd)
        {case IO_STD_IN :
-	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 0, ios, dst);
+	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 0, &io, ios, NULL);
 	     break;
         case IO_STD_OUT :
 	     fd = 1;
 	     if (src != NULL)
 	        fd = SC_stoi(src);
-	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, fd, ios, dst);
+	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, fd, &io, ios, NULL);
 	     break;
         case IO_STD_ERR :
-	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 2, ios, dst);
+	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 2, &io, ios, NULL);
 	     break;
         case IO_STD_BOND :
-	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 1, ios, dst);
-	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 2, ios, dst);
+	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 1, &io, ios, NULL);
+	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 2, &io, ios, NULL);
 	     break;};
 #else
     switch (ios[0])
        {case '<' :
-	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 0, ios, dst);
+	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 0, &io, ios, NULL);
 	     break;
 
 	case '>' :
 	     switch (src[0])
 	        {case '&' :
-		      _SC_redir_filedes(ps->fd, SC_N_IO_CH, 2, ios, dst);
+		      _SC_redir_filedes(ps->fd, SC_N_IO_CH, 2, &io, ios, NULL);
 		      fd = 1;
 		      break;
 		 case '\0' :
@@ -883,7 +889,7 @@ static void _SC_redirect_fd(subtask *ps, int i, char *p)
 		 default :
 		      fd = SC_stoi(src);
 		      break;};
-	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, fd, ios, dst);
+	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, fd, &io, ios, NULL);
 	     break;
 
 	default :
