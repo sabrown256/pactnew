@@ -725,6 +725,32 @@ static void _SC_subst_task_env(int na, char **ta)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SC_IO_SPLICE_OUT - splice out the Ith thru Jth tokens out
+ *                   - of PS->ARGF
+ */
+
+static int _SC_io_splice_out(subtask *ps, int i, int j)
+   {int n, di;
+    char **ta;
+
+    n  = ps->nt;
+    ta = ps->argf;
+
+    di = j - i + 1;
+    n -= di;
+    for ( ; i <= j; j--)
+        {CFREE(ta[j]);};
+
+    for (j = i; j < n; j++)
+        ta[j] = ta[j+di];
+
+    ps->nt = n;
+
+    return(n);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SC_PARSE_REDIRECT - parse tokens until
  *                    - a redirection of the form <src><oper><dst>
  *                    - is obtained
@@ -791,24 +817,23 @@ static int _SC_parse_redirect(char *src, char *oper, char *dst,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_REDIRECT_FD - give SRC, IOS, DST strings
- *                 - fill in the appropriate entry of the SC_iodes
- *                 - in PS
+/* _SC_REDIRECT_FD - determine the I/O redirections in PS->ARGF
+ *                 - and fill in PS->FD from them
  */
 
 static void _SC_redirect_fd(subtask *ps, int i, char *p)
-   {int j, n, di, fd, md;
+   {int j, n, di, fd;
     char src[MAXLINE], dst[MAXLINE], ios[MAXLINE];
     char **ta;
     SC_io_kind knd;
-    SC_io_device dev;
+    SC_iodes tio;
 
     n  = ps->nt;
     ta = ps->argf;
 
 /* parse out the redirect related specifications */
     j = _SC_parse_redirect(src, ios, dst, ta, i, p);
-    _SC_io_kind(ios, &knd, &dev, &md);
+    _SC_io_kind(&tio, ios);
 
 /* splice out the redirect related tokens array */
     di = j - i + 1;
@@ -823,7 +848,7 @@ static void _SC_redirect_fd(subtask *ps, int i, char *p)
 
 /* add the redirect specifications to the filedes */
 #if 0
-    switch (knd)
+    switch (tio.knd)
        {case IO_STD_IN :
 	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 0, ios, dst);
 	     break;
