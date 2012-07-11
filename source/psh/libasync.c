@@ -204,6 +204,7 @@ struct s_process_group
 struct s_process_stack
    {int ip;
     int np;
+    int nfd;
     int nattempt;
     int mask_acc;
     int mask_rej;
@@ -211,7 +212,7 @@ struct s_process_stack
     process **proc;};
 
 static process_stack
- stck = { 0, 0, 3,
+ stck = { 0, 0, 0, 3,
           (POLLIN | POLLPRI),
 	  (POLLERR | POLLHUP | POLLNVAL),
           NULL, NULL};
@@ -1040,13 +1041,47 @@ void asetup(int n, int na)
        {FREE(stck.fd);};
 
     stck.proc = MAKE_N(process *, n);
-    stck.fd   = MAKE_N(apollfd, n);
+    stck.fd   = MAKE_N(apollfd, N_IO_CHANNELS*n);
 
     stck.ip       = 0;
     stck.np       = n;
+    stck.nfd      = N_IO_CHANNELS*n;
     stck.nattempt = na;
 
     return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _AWATCH_FD - register the KND file descriptor of PP as the SIPth element */
+
+static int _awatch_fd(process *pp, io_kind knd, int sip)
+   {int ip, fd, rv;
+
+    ip = (sip < 0) ? stck.ip++ : sip;
+    if (ip >= stck.nfd)
+       {int i, n;
+
+	printf("ERROR: Bad process accounting (%d > %d) - exiting\n",
+	       stck.ip, stck.np);
+
+	n = stck.np;
+	for (i = 0; i < n; i++)
+	    printf("%d ", stck.proc[i]->ip);
+	printf("\n");
+	exit(1);};
+
+    fd = pp->io[knd].fd;
+    rv = block_fd(fd, FALSE);
+    ASSERT(rv == 0);
+
+    stck.proc[ip] = pp;
+
+    stck.fd[ip].fd      = fd;
+    stck.fd[ip].events  = stck.mask_acc;
+    stck.fd[ip].revents = 0;
+
+    return(ip);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1084,7 +1119,7 @@ process *alaunch(int sip, char *cmd, char *mode, void *a,
 		 int (*acc)(process *pp, char *s),
 		 int (*rej)(process *pp, char *s),
 		 void (*wt)(process *pp))
-   {int ip, fd, rv;
+   {int ip;
     process *pp;
 
     pp = job_launch(cmd, mode, a);
@@ -1094,30 +1129,9 @@ process *alaunch(int sip, char *cmd, char *mode, void *a,
 	pp->wait     = wt;
 	pp->nattempt = 1;
 
-	ip = (sip < 0) ? stck.ip++ : sip;
-        if (ip >= stck.np)
-           {int i, n;
+	ip = _awatch_fd(pp, IO_STD_IN, sip);
 
-	    printf("ERROR: Bad process accounting (%d > %d) - exiting\n",
-		   stck.ip, stck.np);
-
-	    n = stck.np;
-            for (i = 0; i < n; i++)
-	        printf("%d ", stck.proc[i]->ip);
-	    printf("\n");
-	    exit(1);};
-
-	pp->ip = ip;
-
-	fd = pp->io[0].fd;
-	rv = block_fd(fd, FALSE);
-	ASSERT(rv == 0);
-
-	stck.proc[ip] = pp;
-
-	stck.fd[ip].fd      = fd;
-	stck.fd[ip].events  = stck.mask_acc;
-	stck.fd[ip].revents = 0;};
+	pp->ip = ip;};
 
     return(pp);}
 
