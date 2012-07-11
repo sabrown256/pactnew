@@ -248,6 +248,7 @@ typedef struct s_jobinfo jobinfo;
 typedef struct s_taskdesc taskdesc;
 typedef struct s_tasklst tasklst;
 typedef struct s_subtask subtask;
+typedef struct s_SC_process_group SC_process_group;
 typedef struct s_parstate parstate;
 typedef struct s_asyncstate asyncstate;
 typedef struct s_SC_scope_proc SC_scope_proc;
@@ -337,7 +338,17 @@ struct s_subtask
     char *ios;             /* text representation of I/O connections */
     char **argf;           /* tokenized version suitable for SC_open */
     char **env;            /* environment variables for command */
-    SC_filedes fd[SC_N_IO_CH];};
+    SC_iodes fd[SC_N_IO_CH];};
+
+struct s_SC_process_group
+   {int np;                 /* number of processes in group */
+    int to;                 /* group time out */
+    int rcpu;               /* */
+    char *mode;             /* IPC mode */
+    subtask *jobs;          /* array of jobs in group */
+    PROCESS *terminal;      /* terminal process */
+    PROCESS **parents;      /* parent process array */
+    PROCESS **children;};   /* child process array */
 
 struct s_tasklst
    {int nl;                /* number of subtasks launched - current subtask index */
@@ -378,7 +389,7 @@ struct s_taskdesc
     int (*retryp)(taskdesc *job, subtask *sub, int sts, int sgn, int setst);
     int (*print)(taskdesc *job, asyncstate *as, char *fmt, ...);
     void (*redir)(taskdesc *job, asyncstate *as,
-		  SC_filedes *fd, char *s, int newl);
+		  SC_iodes *fd, char *s, int newl);
     void (*tag)(taskdesc *job, char *tag, int nc, char *tm);
     void (*report)(taskdesc *job, char *where);
     int (*finish)(taskdesc *job, asyncstate *as, int srv);
@@ -445,18 +456,6 @@ enum e_SC_mp_tag
 
 typedef enum e_SC_mp_tag SC_mp_tag;
 
-typedef struct s_SC_process_group SC_process_group;
-
-struct s_SC_process_group
-   {int np;                 /* number of processes in group */
-    int to;                 /* group time out */
-    int rcpu;               /* */
-    char *mode;             /* IPC mode */
-    subtask *jobs;          /* array of jobs in group */
-    PROCESS *terminal;      /* terminal process */
-    PROCESS **parents;      /* parent process array */
-    PROCESS **children;};   /* child process array */
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -482,16 +481,16 @@ extern SC_scope_proc
 extern int
  _SC_io_kind(char *ios, SC_io_kind *pknd, SC_io_device *pdev, int *pmode),
  _SC_kind_io(SC_io_kind k),
- _SC_redir_fail(SC_filedes *fd);
+ _SC_redir_fail(SC_iodes *fd);
 
 extern void
  SC_reset_terminal(void),
  _SC_dethread(void),
- _SC_redir_filedes(SC_filedes *fd, int nfd, int ifd, char *redir, char *name),
- _SC_set_filedes(SC_filedes *fd, int ifd, char *name, int fl),
- _SC_fin_filedes(SC_filedes *file),
- _SC_init_filedes(SC_filedes *fd),
- _SC_copy_filedes(SC_filedes *fb, SC_filedes *fa);
+ _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd, char *redir, char *name),
+ _SC_set_filedes(SC_iodes *fd, int ifd, char *name, int fl),
+ _SC_fin_filedes(SC_iodes *file),
+ _SC_init_filedes(SC_iodes *fd),
+ _SC_copy_filedes(SC_iodes *fb, SC_iodes *fa);
 
 extern PROCESS
  *SC_open_remote(char *host, char *cmnd,

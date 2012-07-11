@@ -470,7 +470,7 @@ struct s_PROCESS
     SC_process_rusedes *pru;
 
     int open_retry;     /* time in milliseconds to retry select open failures */
-    SC_filedes fd[3];   /* file desc for stdin, stdout, stderr redirection */
+    SC_iodes fd[3];     /* file desc for stdin, stdout, stderr redirection */
 
     void *exit_arg;     /* store argument to pass to on_exit function */
     void (*on_exit)(PROCESS *pp, void *a);

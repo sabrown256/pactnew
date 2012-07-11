@@ -106,11 +106,11 @@ static int test_pipe_2(void)
     st = 0;
 
 /* simple pipeline variants - all equivalent */
-    char *tpipe[] = { "tscpgrp -f tests/pgrp.dat | cat -n", 
-		      "tscpgrp -f tests/pgrp.dat @ cat -n",
+    char *tpipe[] = { "tscpgrp -f tests/pgrp.dat | cat -E", 
+		      "tscpgrp -f tests/pgrp.dat @ cat -E",
 		      "tscpgrp -f tests/pgrp.dat @o+1 cat -n > /dev/null",
 		      "tscpgrp -f tests/pgrp.dat @e+1 cat -n > /dev/null",
-		      "tscpgrp -f tests/pgrp.dat @o+1e+2 cat -n @ cat -n" };
+		      "tscpgrp -f tests/pgrp.dat @o+1e+2 cat -n @ cat -E" };
 
     n = sizeof(tpipe)/sizeof(char *);
 
@@ -138,9 +138,10 @@ static int test_file_1(void)
     st = 0;
 
 /* file variants */
-    char *tfile[] = { "date >! date.out",
+    char *tfile[] = { "pwd >! date.out",
 		      "cat < date.out",
-                      "date @owdate.out",
+                      "pwd @owdate.out",
+                      "date @oadate.out",
 		      "cat @ifdate.out" };
 
     n = sizeof(tfile)/sizeof(char *);

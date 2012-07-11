@@ -792,7 +792,7 @@ static int _SC_parse_redirect(char *src, char *oper, char *dst,
 /*--------------------------------------------------------------------------*/
 
 /* _SC_REDIRECT_FD - give SRC, IOS, DST strings
- *                 - fill in the appropriate entry of the SC_filedes
+ *                 - fill in the appropriate entry of the SC_iodes
  *                 - in PS
  */
 
@@ -1098,7 +1098,7 @@ static int _SC_handle_echo(taskdesc *job, asyncstate *as, subtask *sub)
    {int c, n, m, sc, nc, na, newl, rv;
     char *s, *t, **ta;
     jobinfo *inf;
-    SC_filedes *fd;
+    SC_iodes *fd;
     parstate *state;
 
     rv = TRUE;
@@ -1152,7 +1152,7 @@ static int _SC_handle_echo(taskdesc *job, asyncstate *as, subtask *sub)
 	       SC_LAST_CHAR(s) = '\0';
 
 	    fd = sub->fd;
-	    if ((fd[1].name == NULL) && (fd[2].name == NULL))
+	    if ((fd[1].file == NULL) && (fd[2].file == NULL))
 	       {job->print(job, as, "echo '%s'\n", s);
 
 		if (newl == TRUE)
@@ -1375,7 +1375,7 @@ static int _SC_manage_launched_job(taskdesc *job, asyncstate *as, PROCESS *pp)
     subtask *sub;
     jobinfo *inf;
     SC_evlpdes *pe;
-    SC_filedes *fd;
+    SC_iodes *fd;
     parstate *state;
 
     rv = FALSE;
@@ -1424,13 +1424,13 @@ static int _SC_manage_launched_job(taskdesc *job, asyncstate *as, PROCESS *pp)
 	       {case 0 :
 		     job->print(job, as,
 				"no such file %s\n",
-				fd[ifd].name);
+				fd[ifd].file);
 		     break;
 		case 1 :
 		case 2 :
 		     job->print(job, as,
 				"%s already exists\n",
-				fd[ifd].name);
+				fd[ifd].file);
 		     break;
 
 		default :
@@ -1460,7 +1460,7 @@ static int _SC_cmnd_exec(taskdesc *job, asyncstate *as, subtask *sub)
     char *t, **ca, *icmnd[6];
     jobinfo *inf;
     PROCESS *pp;
-    SC_filedes *fd;
+    SC_iodes *fd;
     parstate *state;
 
     st = FALSE;
@@ -1498,9 +1498,9 @@ static int _SC_cmnd_exec(taskdesc *job, asyncstate *as, subtask *sub)
 #if 0
 		     "EXIT", _SC_next_task, state,
 #endif
-		     "STDIN",  fd[0].name, fd[0].flag,
-		     "STDOUT", fd[1].name, fd[1].flag,
-		     "STDERR", fd[2].name, fd[2].flag,
+		     "STDIN",  fd[0].file, fd[0].flag,
+		     "STDOUT", fd[1].file, fd[1].flag,
+		     "STDERR", fd[2].file, fd[2].flag,
 		     "OPEN-RETRY-TIME", to,
 		     "RING-EXP", 18,
 		     NULL);
@@ -1804,7 +1804,7 @@ static int _SC_task_done(taskdesc *job, int setst)
  */
 
 static void _SC_print_redir(taskdesc *job, asyncstate *as,
-			    SC_filedes *fd, char *s, int newl)
+			    SC_iodes *fd, char *s, int newl)
    {int ffe, ffo, df, nc;
     char *fne, *fno;
     mode_t p;
@@ -1812,9 +1812,9 @@ static void _SC_print_redir(taskdesc *job, asyncstate *as,
     if (s != NULL)
        {nc = strlen(s);
 
-	fno = fd[1].name;
+	fno = fd[1].file;
 	ffo = fd[1].flag;
-	fne = fd[2].name;
+	fne = fd[2].file;
 	ffe = fd[2].flag;
 
 	p = SC_get_perm(FALSE);

@@ -747,7 +747,7 @@ void dprgrp(subtask *pg)
     char **sa;
     SC_io_device dev;
     subtask *pgs, *pgd;
-    SC_filedes *ips;
+    SC_iodes *ips;
 
     n = _SC_process_group_n(pg);
 
@@ -860,20 +860,20 @@ void dprgrp(subtask *pg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_INIT_IO_SPEC - initialize an SC_filedes specification PG->fd[KIND] */
+/* _SC_INIT_IO_SPEC - initialize an SC_iodes specification PG->fd[KIND] */
 
 static void _SC_init_io_spec(subtask *pg, int n, int id)
    {
 
-    pg->fd[IO_STD_IN].kind = IO_STD_IN;
+    pg->fd[IO_STD_IN].knd  = IO_STD_IN;
     pg->fd[IO_STD_IN].fd   = -1;
     pg->fd[IO_STD_IN].gid  = pg->id - 1;
 
-    pg->fd[IO_STD_OUT].kind = IO_STD_OUT;
+    pg->fd[IO_STD_OUT].knd  = IO_STD_OUT;
     pg->fd[IO_STD_OUT].fd   = -1;
     pg->fd[IO_STD_OUT].gid  = (id < n-1) ? pg->id + 1 : -1;
 
-    pg->fd[IO_STD_ERR].kind = IO_STD_ERR;
+    pg->fd[IO_STD_ERR].knd  = IO_STD_ERR;
     pg->fd[IO_STD_ERR].fd   = -1;
     pg->fd[IO_STD_ERR].gid  = -1;
 
@@ -1014,7 +1014,7 @@ int _SC_kind_io(SC_io_kind k)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_SET_IO_SPEC - initialize an SC_filedes specification PG->fd[KIND]
+/* _SC_SET_IO_SPEC - initialize an SC_iodes specification PG->fd[KIND]
  *                 - according to LINK whose syntax is:
  *                 -   <ios><gid><iod>
  *                 - where
@@ -1032,7 +1032,7 @@ static void _SC_set_io_spec(subtask *pg, int n, int id,
     SC_io_kind ios, iod;
     char s[MAXLINE];
     char *p, *ps;
-    SC_filedes *ips, *ipd;
+    SC_iodes *ips, *ipd;
     subtask *pgs, *pgd;
 
     if ((0 <= id) && (id < n))
@@ -1126,7 +1126,7 @@ static void _SC_set_io_spec(subtask *pg, int n, int id,
 	    if ((0 <= iod) && (iod < SC_N_IO_CH))
 	       {ipd = pgd->fd + iod;
 		if (ipd != NULL)
-		   {ipd->kind = iod;
+		   {ipd->knd  = iod;
 		    ipd->dev  = dev;
 		    ipd->fd   = fd;
 		    ipd->gid  = id;};};};
@@ -1135,7 +1135,7 @@ static void _SC_set_io_spec(subtask *pg, int n, int id,
 	if ((0 <= ios) && (ios < SC_N_IO_CH))
 	   {ips = pgs->fd + ios;
 	    if (ips != NULL)
-	       {ips->kind = ios;
+	       {ips->knd  = ios;
 		ips->dev  = dev;
 		ips->fd   = fd;
 		ips->gid  = gid;};};};
@@ -1280,7 +1280,7 @@ static void _SC_reconnect_process_group(int n, subtask *pg,
 
 static int _SC_setup_proc(PROCESS **ppp, PROCESS **pcp,
 			  char **argv, char *mode,
-			  SC_filedes *fd, int retry, int iex,
+			  SC_iodes *fd, int retry, int iex,
 			  PFProcInit initf, PFProcExit exitf, void *exita)
    {int to, flag, rpid, savetty;
     PROCESS *pp, *cp;
@@ -1377,7 +1377,7 @@ static int _SC_setup_proc(PROCESS **ppp, PROCESS **pcp,
  */
 
 static SC_process_group *_SC_setup_process_group(char **argv, char **envp,
-						 char *mode, SC_filedes *fd,
+						 char *mode, SC_iodes *fd,
 						 int retry, int iex,
 						 int rcpu,
 						 PFProcInit initf,
@@ -1387,7 +1387,7 @@ static SC_process_group *_SC_setup_process_group(char **argv, char **envp,
     char *mod, **al;
     PROCESS **pa, **ca;
     subtask *pg;
-    SC_filedes *pfd;
+    SC_iodes *pfd;
     SC_process_group *pgr;
 
     pg = _SC_make_group_tasks(argv, envp);
@@ -1507,7 +1507,7 @@ static PROCESS *_SC_launch_process_group(SC_process_group *pgr)
 
 static PROCESS *_SC_open_proc(int rcpu, char *name, char **argv,
 			      char **envp, char *mode,
-			      SC_filedes *fd, int retry, int iex,
+			      SC_iodes *fd, int retry, int iex,
 			      PFProcInit initf, PFProcExit exitf, void *exita)
    {PROCESS *pp;
 
@@ -1882,7 +1882,7 @@ int SC_printf(PROCESS *pp, char *fmt, ...)
  *                - so that we can quit early and not even fork
  */
 
-int _SC_redir_fail(SC_filedes *fd)
+int _SC_redir_fail(SC_iodes *fd)
    {int fl, fail;
     char *nm;
 
@@ -1897,21 +1897,21 @@ int _SC_redir_fail(SC_filedes *fd)
 
 /* input redirection fails if file does not exist */
     if (fail == -1)
-       {nm = fd[0].name;
+       {nm = fd[0].file;
 	fl = fd[0].flag;
 	if ((nm != NULL) && (SC_isfile(nm) == FALSE))
 	   fail = 0;};
 
 /* stdout redirection fails if file exists and mode has exclusive bit */
     if (fail == -1)
-       {nm = fd[1].name;
+       {nm = fd[1].file;
 	fl = fd[1].flag;
 	if ((nm != NULL) && (SC_isfile(nm) == TRUE) && (fl & O_EXCL))
 	   fail = 1;};
 
 /* stderr redirection fails if file exists and mode has exclusive bit */
     if (fail == -1)
-       {nm = fd[2].name;
+       {nm = fd[2].file;
 	fl = fd[2].flag;
 	if ((nm != NULL) && (SC_isfile(nm) == TRUE) && (fl & O_EXCL))
 	   fail = 2;};
@@ -1925,7 +1925,7 @@ int _SC_redir_fail(SC_filedes *fd)
  *                   - NAME specifies the file to be used
  */
 
-void _SC_redir_filedes(SC_filedes *fd, int nfd, int ifd,
+void _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd,
 		       char *redir, char *name)
    {int ofd, excl, fl, flc, flt, fla, mode;
     char *nm;
@@ -1936,7 +1936,7 @@ void _SC_redir_filedes(SC_filedes *fd, int nfd, int ifd,
 	   {ofd = SC_stoi(name);
 	    if (ofd >= nfd)
 	       return;
-	    nm  = fd[ofd].name;
+	    nm  = fd[ofd].file;
 	    fl  = fd[ofd].flag;}
 	else
 	   {ofd = ifd;
@@ -1962,7 +1962,7 @@ void _SC_redir_filedes(SC_filedes *fd, int nfd, int ifd,
 	_SC_io_kind(redir, &id, NULL, &mode);
 	switch (id)
 	   {case IO_STD_IN :
-	         fd[ifd].name = nm;
+	         fd[ifd].file = nm;
 		 fd[ifd].flag = O_RDONLY;
 	         break;
 	    case IO_STD_OUT :
@@ -1976,7 +1976,7 @@ void _SC_redir_filedes(SC_filedes *fd, int nfd, int ifd,
 		     default :
 		          fl = flc;
 			  break;};
-		 fd[ifd].name = nm;
+		 fd[ifd].file = nm;
 		 fd[ifd].flag = fl;
 	         break;
 	    case IO_STD_ERR :
@@ -1992,8 +1992,8 @@ void _SC_redir_filedes(SC_filedes *fd, int nfd, int ifd,
 		     default :
 		          fl = (fl == -1) ? flc : fl;
 			  break;};
-		 fd[1].name = nm;
-		 fd[2].name = nm;
+		 fd[1].file = nm;
+		 fd[2].file = nm;
 		 fd[1].flag = fl;
 		 fd[2].flag = fl;
 	         break;
@@ -2009,13 +2009,13 @@ void _SC_redir_filedes(SC_filedes *fd, int nfd, int ifd,
  *                 - NAME specifies the file to be used
  */
 
-void _SC_set_filedes(SC_filedes *fd, int ifd, char *name, int fl)
+void _SC_set_filedes(SC_iodes *fd, int ifd, char *name, int fl)
    {char *nm;
 
     if (name != NULL)
        {nm = CSTRSAVE(name);
 
-	fd[ifd].name = nm;
+	fd[ifd].file = nm;
 	fd[ifd].flag = fl;
 	fd[ifd].dev  = IO_DEV_FILE;};
 
@@ -2024,47 +2024,47 @@ void _SC_set_filedes(SC_filedes *fd, int ifd, char *name, int fl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_FIN_FILEDES - release the contents of the SC_filedes' FD */
+/* _SC_FIN_FILEDES - release the contents of the SC_iodes' FD */
 
-void _SC_fin_filedes(SC_filedes *fd)
+void _SC_fin_filedes(SC_iodes *fd)
    {int i, n;
 
-    if (fd[2].name != fd[1].name)
+    if (fd[2].file != fd[1].file)
        n = 3;
     else
        n = 2;
 
     for (i = 0; i < n; i++)
-        {CFREE(fd[i].name);};
+        {CFREE(fd[i].file);};
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_INIT_FILEDES - initialize a set of SC_N_IO_CH SC_filedes structures */
+/* _SC_INIT_FILEDES - initialize a set of SC_N_IO_CH SC_iodes structures */
 
-void _SC_init_filedes(SC_filedes *fd)
+void _SC_init_filedes(SC_iodes *fd)
    {int i;
 
     for (i = 0; i < SC_N_IO_CH; i++)
         {fd[i].fd    = -1;
 	 fd[i].flag  = -1;
 	 fd[i].gid   = -1;
-	 fd[i].kind  = IO_STD_NONE;
+	 fd[i].knd   = IO_STD_NONE;
 	 fd[i].dev   = IO_DEV_NONE;
-	 fd[i].name  = NULL;};
+	 fd[i].file  = NULL;};
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_COPY_FILEDES - copy a set of SC_N_IO_CH SC_filedes FA
+/* _SC_COPY_FILEDES - copy a set of SC_N_IO_CH SC_iodes FA
  *                  - into another FB
  */
 
-void _SC_copy_filedes(SC_filedes *fb, SC_filedes *fa)
+void _SC_copy_filedes(SC_iodes *fb, SC_iodes *fa)
    {int i;
 
     for (i = 0; i < SC_N_IO_CH; i++)
@@ -2114,7 +2114,7 @@ PROCESS *SC_open(char **argv, char **envp, char *mode, ...)
    {int ok, ifd, iex, retry;
     char name[MAXLINE];
     char *key, *host, *proc, *s, *nm;
-    SC_filedes fd[SC_N_IO_CH];
+    SC_iodes fd[SC_N_IO_CH];
     PROCESS *pp;
     PFProcInit initf;
     PFProcExit exitf;
