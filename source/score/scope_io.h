@@ -114,23 +114,32 @@ enum e_SC_io_device
 
 typedef enum e_SC_io_device SC_io_device;
 
+enum e_SC_io_mode
+   {IO_MODE_NONE,
+    IO_MODE_RO, IO_MODE_WO, IO_MODE_WD, IO_MODE_APPEND };
+
+typedef enum e_SC_io_mode SC_io_mode;
+
 enum e_SC_task_kind
    {TASK_NONE, TASK_COMPOUND, TASK_GROUP};
 
 typedef enum e_SC_task_kind SC_task_kind;
 
-typedef struct s_SC_filedes SC_filedes;
+typedef struct s_SC_iodes SC_iodes;
 typedef struct s_SC_ttydes SC_ttydes;
 
 FUNCTION_POINTER(FILE,  *(*PFPFILE));
 
-struct s_SC_filedes
-   {int fd;                 /* file descriptor */
-    int flag;               /* file mode flag for open */
-    int gid;                /* id in process group */
-    SC_io_kind kind;        /* input, output, or error - 0, 1, or 2 */
-    SC_io_device dev;       /* file, pipe, socket, ... */
-    char *name;};           /* file name */
+struct s_SC_iodes
+   {int fd;
+    int fid;                /* file descriptor for redirect - 2>&1 type */
+    int gid;                /* index of process group member for redirect */
+    int flag;               /* file open mode flags */
+    SC_io_kind knd;
+    SC_io_device dev;
+    SC_io_mode mode;
+    char *file;             /* file name */
+    char *raw;};
 
 struct s_SC_ttydes
    {int nr;                  /* number of rows for TTY */

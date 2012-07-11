@@ -145,7 +145,7 @@ static int _SC_posix_setup_tty(PROCESS *pp, int child)
  *            - return TRUE iff successful
  */
 
-static int _SC_dup_fd(char *msg, int to, SC_filedes *fd, int nfd, int ofd)
+static int _SC_dup_fd(char *msg, int to, SC_iodes *fd, int nfd, int ofd)
    {int rv, err;
     mode_t p;
 
@@ -153,7 +153,7 @@ static int _SC_dup_fd(char *msg, int to, SC_filedes *fd, int nfd, int ofd)
     p = 0;
 
     if (fd[nfd].flag != -1)
-       {if ((fd[1].name == fd[2].name) && (fd[1].name != NULL))
+       {if ((fd[1].file == fd[2].file) && (fd[1].file != NULL))
 	   {if ((nfd == 2) && (fd[1].fd != -1))
 	       ofd = fd[1].fd;
 	    else if ((nfd == 1) && (fd[2].fd != -1))
@@ -185,7 +185,7 @@ static int _SC_dup_fd(char *msg, int to, SC_filedes *fd, int nfd, int ofd)
  */
 	else
 	   {p   = SC_get_perm(FALSE);
-	    ofd = open(fd[nfd].name, fd[nfd].flag, p);
+	    ofd = open(fd[nfd].file, fd[nfd].flag, p);
 	    err = errno;
 	    if ((ofd == -1) && (to > 0) &&
 		((err == ENOSPC) || (err == ENOMEM) ||
@@ -193,11 +193,11 @@ static int _SC_dup_fd(char *msg, int to, SC_filedes *fd, int nfd, int ofd)
 		 (err == ENOENT) || (err == EEXIST) ||
 		 (err == ETXTBSY)))
 	       {SC_sleep(to);
-		ofd = open(fd[nfd].name, fd[nfd].flag, p);};};};
+		ofd = open(fd[nfd].file, fd[nfd].flag, p);};};};
 
     if (ofd < 0)
        SC_error(SC_EXIT_ERRNO(), "COULD NOT OPEN %s (%d/%d) - _SC_DUP_FD",
-		fd[nfd].name, ofd, errno);
+		fd[nfd].file, ofd, errno);
 
     rv = (dup2(ofd, nfd) >= 0);
     if (rv == TRUE)
@@ -205,7 +205,7 @@ static int _SC_dup_fd(char *msg, int to, SC_filedes *fd, int nfd, int ofd)
     else
        {close(ofd);
 	SC_error(SC_EXIT_ERRNO(), "COULD NOT DUP %s (%d/%d) - _SC_DUP_FD",
-		 fd[nfd].name, ofd, errno);};
+		 fd[nfd].file, ofd, errno);};
 
     return(rv);}
 
