@@ -1974,13 +1974,18 @@ int _SC_redir_fail(SC_iodes *fd)
  *                   - NAME specifies the file to be used
  */
 
-void _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd,
+void _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd, SC_iodes *pio,
 		       char *redir, char *name)
    {int ofd, excl, fl, flc, flt, fla;
+    SC_io_kind knd;
+    SC_io_mode md;
     char *nm;
-    SC_iodes tio;
 
-    if ((name != NULL) && (redir != NULL))
+    name = pio->file;
+    md   = pio->mode;
+    knd  = pio->knd;
+
+    if (name != NULL)
        {if (SC_numstrp(name))
 	   {ofd = SC_stoi(name);
 	    if (ofd >= nfd)
@@ -1989,9 +1994,41 @@ void _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd,
 	    fl  = fd[ofd].flag;}
 	else
 	   {ofd = ifd;
-	    nm  = CSTRSAVE(name);
+	    nm  = name;
 	    fl  = -1;};
 
+#if 0
+/* shell redirection syntax and file mode correspondence */
+	switch (md)
+
+/*  <   ->  O_RDONLY */
+	   {case IO_MODE_RO :
+	         fl = O_RDONLY;
+		 break;
+
+/*  >!  ->  O_WRONLY | O_CREAT | O_TRUNC */
+	    case IO_MODE_WD :
+	         fl = O_WRONLY | O_CREAT | O_TRUNC;
+		 break;
+
+/*  >>  ->  O_WRONLY | O_APPEND */
+	    case IO_MODE_APPEND :
+		 fl = O_WRONLY | O_CREAT | O_APPEND;
+		 break;
+
+/*  >   ->  O_WRONLY | O_CREAT | O_EXCL */
+	    default :
+
+/* do not try to use O_EXCL bit with devices - think about it */
+	         if ((nm != NULL) && (strncmp(nm, "/dev/", 5) == 0))
+		    excl = 0;
+		 else
+		    excl = O_EXCL;
+
+		 fl = O_WRONLY | O_CREAT | excl;
+		 break;};
+
+#else
 /* do not try to use O_EXCL bit with devices - think about it */
 	if ((nm != NULL) && (strncmp(nm, "/dev/", 5) == 0))
 	   excl = 0;
@@ -2008,14 +2045,12 @@ void _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd,
  *  >!  ->  O_WRONLY | O_CREAT | O_TRUNC
  *  >>  ->  O_WRONLY | O_APPEND
  */
-	_SC_io_kind(&tio, redir);
-	switch (tio.knd)
+	switch (knd)
 	   {case IO_STD_IN :
-	         fd[ifd].file = nm;
-		 fd[ifd].flag = O_RDONLY;
+		 fl = O_RDONLY;
 	         break;
 	    case IO_STD_OUT :
-	         switch (tio.mode)
+	         switch (md)
 		    {case IO_MODE_WD :
 		          fl = flt;
 			  break;
@@ -2025,13 +2060,11 @@ void _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd,
 		     default :
 		          fl = flc;
 			  break;};
-		 fd[ifd].file = nm;
-		 fd[ifd].flag = fl;
 	         break;
 	    case IO_STD_ERR :
 	         break;
 	    case IO_STD_BOND :
-	         switch (tio.mode)
+	         switch (md)
 		    {case IO_MODE_WD :
 		          fl = (fl == -1) ? flt : fl;
 			  break;
@@ -2041,10 +2074,45 @@ void _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd,
 		     default :
 		          fl = (fl == -1) ? flc : fl;
 			  break;};
+	         break;
+	    default :
+	         break;};
+#endif
+
+	switch (knd)
+	   {case IO_STD_IN :
+	         fd[ifd].file = nm;
+	         break;
+	    case IO_STD_OUT :
+		 fd[ifd].file = nm;
+	         break;
+	    case IO_STD_ERR :
+	         break;
+	    case IO_STD_BOND :
 		 fd[1].file = nm;
 		 fd[2].file = nm;
-		 fd[1].flag = fl;
+	         break;
+	    default :
+	         break;};
+
+	switch (knd)
+	   {case IO_STD_IN :
+		 fd[ifd].flag = fl;
+	         break;
+	    case IO_STD_OUT :
+		 fd[ifd].flag = fl;
+	         break;
+	    case IO_STD_ERR :
 		 fd[2].flag = fl;
+	         break;
+	    case IO_STD_BOND :
+		 fd[2].file = nm;
+		 fd[1].flag = fl;
+#ifdef NEWWAY
+		 fd[2].flag = -1;
+#else
+		 fd[2].flag = fl;
+#endif
 	         break;
 	    default :
 	         break;};};
