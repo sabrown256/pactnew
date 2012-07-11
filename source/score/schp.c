@@ -1974,12 +1974,11 @@ int _SC_redir_fail(SC_iodes *fd)
  *                   - NAME specifies the file to be used
  */
 
-void _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd, SC_iodes *pio,
-		       char *redir, char *name)
+void _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd, SC_iodes *pio)
    {int ofd, excl, fl, flc, flt, fla;
     SC_io_kind knd;
     SC_io_mode md;
-    char *nm;
+    char *nm, *name;
 
     name = pio->file;
     md   = pio->mode;

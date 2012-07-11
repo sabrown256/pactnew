@@ -486,8 +486,7 @@ extern int
 extern void
  SC_reset_terminal(void),
  _SC_dethread(void),
- _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd, SC_iodes *pio,
-		   char *redir, char *name),
+ _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd, SC_iodes *pio),
  _SC_set_filedes(SC_iodes *fd, int ifd, char *name, int fl),
  _SC_fin_filedes(SC_iodes *file),
  _SC_init_filedes(SC_iodes *fd),

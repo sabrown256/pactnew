@@ -856,31 +856,31 @@ static void _SC_redirect_fd(subtask *ps, int i, char *p)
 #if 0
     switch (io.knd)
        {case IO_STD_IN :
-	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 0, &io, ios, NULL);
+	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 0, &io);
 	     break;
         case IO_STD_OUT :
 	     fd = 1;
 	     if (src != NULL)
 	        fd = SC_stoi(src);
-	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, fd, &io, ios, NULL);
+	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, fd, &io);
 	     break;
         case IO_STD_ERR :
-	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 2, &io, ios, NULL);
+	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 2, &io);
 	     break;
         case IO_STD_BOND :
-	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 1, &io, ios, NULL);
-	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 2, &io, ios, NULL);
+	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 1, &io);
+	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 2, &io);
 	     break;};
 #else
     switch (ios[0])
        {case '<' :
-	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 0, &io, ios, NULL);
+	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 0, &io);
 	     break;
 
 	case '>' :
 	     switch (src[0])
 	        {case '&' :
-		      _SC_redir_filedes(ps->fd, SC_N_IO_CH, 2, &io, ios, NULL);
+		      _SC_redir_filedes(ps->fd, SC_N_IO_CH, 2, &io);
 		      fd = 1;
 		      break;
 		 case '\0' :
@@ -889,7 +889,7 @@ static void _SC_redirect_fd(subtask *ps, int i, char *p)
 		 default :
 		      fd = SC_stoi(src);
 		      break;};
-	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, fd, &io, ios, NULL);
+	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, fd, &io);
 	     break;
 
 	default :
