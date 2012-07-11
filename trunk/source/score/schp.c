@@ -865,17 +865,17 @@ void dprgrp(subtask *pg)
 static void _SC_init_io_spec(subtask *pg, int n, int id)
    {
 
-    pg->fd[IO_STD_IN].knd  = IO_STD_IN;
-    pg->fd[IO_STD_IN].fd   = -1;
-    pg->fd[IO_STD_IN].gid  = pg->id - 1;
+    pg->fd[IO_STD_IN].knd = IO_STD_IN;
+    pg->fd[IO_STD_IN].fd  = -1;
+    pg->fd[IO_STD_IN].gid = pg->id - 1;
 
-    pg->fd[IO_STD_OUT].knd  = IO_STD_OUT;
-    pg->fd[IO_STD_OUT].fd   = -1;
-    pg->fd[IO_STD_OUT].gid  = (id < n-1) ? pg->id + 1 : -1;
+    pg->fd[IO_STD_OUT].knd = IO_STD_OUT;
+    pg->fd[IO_STD_OUT].fd  = -1;
+    pg->fd[IO_STD_OUT].gid = (id < n-1) ? pg->id + 1 : -1;
 
-    pg->fd[IO_STD_ERR].knd  = IO_STD_ERR;
-    pg->fd[IO_STD_ERR].fd   = -1;
-    pg->fd[IO_STD_ERR].gid  = -1;
+    pg->fd[IO_STD_ERR].knd = IO_STD_ERR;
+    pg->fd[IO_STD_ERR].fd  = -1;
+    pg->fd[IO_STD_ERR].gid = -1;
 
     return;}
 
@@ -888,22 +888,39 @@ static void _SC_init_io_spec(subtask *pg, int n, int id)
  *             - the mode is for >, >>, or >!
  */
 
-int _SC_io_kind(char *ios, SC_io_kind *pknd, SC_io_device *pdev, int *pmode)
-   {int ck, cd, gid, nc, rel, rv, mode;
+int _SC_io_kind(SC_iodes *pio, char *ios)
+   {int ck, cd, fid, gid, nc, rel, rv, md;
+    SC_io_mode mode;
     SC_io_device dev;
     SC_io_kind knd;
 
     rv = FALSE;
 
-    dev = IO_DEV_NONE;
-    knd = IO_STD_NONE;
+    dev  = IO_DEV_NONE;
+    knd  = IO_STD_NONE;
+    mode = IO_MODE_NONE;
+
+    gid = pio->gid;
+    fid = pio->fid;
+    if (ios == NULL)
+       ios = pio->raw;
+
+    if (ios[0] == SC_PROCESS_DELIM)
+       ios++;
 
     nc = 0;
     ck = ios[nc++];
     cd = ios[nc++];
 
     if (ios != NULL)
-       {if (strncmp(ios, "1>", 2) == 0)
+
+/* get >&, &>, >>&, and &>> */
+       {if ((strstr(ios, ">&") != NULL) ||
+	    (strstr(ios, "&>") != NULL))
+	   {knd = IO_STD_BOND;
+	    dev = IO_DEV_FILE;}
+
+        else if (strncmp(ios, "1>", 2) == 0)
 	   {knd = IO_STD_OUT;
 	    dev = IO_DEV_FILE;}
 
@@ -911,22 +928,29 @@ int _SC_io_kind(char *ios, SC_io_kind *pknd, SC_io_device *pdev, int *pmode)
 	   {knd = IO_STD_ERR;
 	    dev = IO_DEV_FILE;}
 
-/* get >& and >>& */
-	else if (strstr(ios, ">&") != NULL)
+#if 1
+	else if ((strstr(ios, "|&") != NULL) ||
+		 (strstr(ios, "&|") != NULL))
 	   {knd = IO_STD_BOND;
-	    dev = IO_DEV_FILE;}
+	    dev = IO_DEV_PIPE;}
 
+	else if (strchr(ios, '|') != NULL)
+	   {knd = IO_STD_OUT;
+	    dev = IO_DEV_PIPE;}
+#endif
 	else
 	   {switch (ck)
 	       {case 'e' :
 		     knd = IO_STD_ERR;
 		     break;
-	        case 'i' :
 		case '<' :
+		     cd = ck;
+	        case 'i' :
 		     knd = IO_STD_IN;
 		     break;
-	        case 'o' :
 		case '>' :
+		     cd = ck;
+	        case 'o' :
 		     knd = IO_STD_OUT;
 		     break;};};
 
@@ -963,24 +987,41 @@ int _SC_io_kind(char *ios, SC_io_kind *pknd, SC_io_device *pdev, int *pmode)
 	   gid = SC_stoi(ios+nc);
 
 /* now for the mode */
-	mode = '\0';
-	if (strstr(ios, ">>") != NULL)
-	   mode = 'a';
+	if (strstr(ios, "<") != NULL)
+	   mode = IO_MODE_RO;
+	else if (strstr(ios, ">>") != NULL)
+	   mode = IO_MODE_APPEND;
 	else if (strchr(ios, '!') != NULL)
-	   mode = 'w';
+	   mode = IO_MODE_WD;
+	else if (strstr(ios, ">") != NULL)
+	   mode = IO_MODE_WO;
 	else if (strchr("ioeb", ios[0]) != NULL)
-	   mode = ios[1];
+	   {switch (cd)
+	       {case 'f' :
+                     mode = IO_MODE_WO;
+                     break;
+		case 'w' :
+                     mode = IO_MODE_WD;
+                     break;
+		case 'a' :
+                     mode = IO_MODE_APPEND;
+		     break;};};
+
+	md = '\0';
+	if (strstr(ios, ">>") != NULL)
+	   md = 'a';
+	else if (strchr(ios, '!') != NULL)
+	   md = 'w';
+	else if (strchr("ioeb", ios[0]) != NULL)
+	   md = ios[1];
 
 	rv = TRUE;};
 
-    if (pknd != NULL)
-       *pknd = knd;
-
-    if (pdev != NULL)
-       *pdev = dev;
-
-    if (pmode != NULL)
-       *pmode = mode;
+    pio->knd  = knd;
+    pio->fid  = fid;
+    pio->gid  = gid;
+    pio->dev  = dev;
+    pio->mode = mode;
 
     return(rv);}
 
@@ -1027,12 +1068,12 @@ int _SC_kind_io(SC_io_kind k)
 
 static void _SC_set_io_spec(subtask *pg, int n, int id,
 			    SC_io_kind kind, char *link)
-   {int fd, gid, nc, md;
+   {int fd, gid, nc, md, prm, excl;
     SC_io_device dev;
-    SC_io_kind ios, iod;
-    char s[MAXLINE];
-    char *p, *ps;
+    SC_iodes ios, iod;
     SC_iodes *ips, *ipd;
+    char s[MAXLINE];
+    char *p, *ps, *nm;
     subtask *pgs, *pgd;
 
     if ((0 <= id) && (id < n))
@@ -1043,10 +1084,10 @@ static void _SC_set_io_spec(subtask *pg, int n, int id,
 
 	SC_strncpy(s, MAXLINE, link, -1);
 	nc  = strlen(s);
-	_SC_io_kind(s, &ios, NULL, NULL);
-	_SC_io_kind(s + nc - 1, &iod, NULL, NULL);
+	_SC_io_kind(&ios, s);
+	_SC_io_kind(&iod, s + nc - 1);
 
-	SC_ASSERT(ios == kind);
+	SC_ASSERT(ios.knd == kind);
 
 	ps = s + 1;
 	switch (ps[0])
@@ -1062,29 +1103,39 @@ static void _SC_set_io_spec(subtask *pg, int n, int id,
 	    case 'a' :
 	    case 'f' :
 	    case 'w' :
+	         nm  = ps + 1;
 		 dev = IO_DEV_FILE;
 
+/* GOTCHA: what should the real permissions be? */
+		 prm = 0600;
+		 prm = SC_get_perm(FALSE);
+
+/* do not try to use O_EXCL bit with devices - think about it */
+		 if (strncmp(nm, "/dev/", 5) == 0)
+		    excl = 0;
+		 else
+		    excl = O_EXCL;
+
+		 if (kind == IO_STD_IN)
+		    fd = open(nm, O_RDONLY);
+		 else
 /* shell redirection syntax and file mode correspondence
  *  <   ->  O_RDONLY
  *  >   ->  O_WRONLY | O_CREAT | O_EXCL
  *  >!  ->  O_WRONLY | O_CREAT | O_TRUNC
  *  >>  ->  O_WRONLY | O_APPEND
  */
-		 switch (ps[0])
-		    {case 'f' :
-		          md = O_WRONLY | O_CREAT | O_EXCL;
-		          break;
-		     case 'w' :
-		          md = O_WRONLY | O_CREAT | O_TRUNC;
-		          break;
-		     case 'a' :
-		          md = O_WRONLY | O_APPEND;
-		          break;}
-
-		 if (kind == IO_STD_IN)
-		    fd = open(ps+1, O_RDONLY);
-		 else
-		    fd = open(ps+1, md, 0600);
+		    {switch (ps[0])
+		        {case 'f' :
+			      md = O_WRONLY | O_CREAT | excl;
+			      break;
+			 case 'w' :
+			      md = O_WRONLY | O_CREAT | O_TRUNC;
+			      break;
+			 case 'a' :
+			      md = O_WRONLY | O_APPEND;
+			      break;};
+		     fd = open(nm, md, prm);};
 		 break;
 
 	    case 's' :
@@ -1123,22 +1174,22 @@ static void _SC_set_io_spec(subtask *pg, int n, int id,
 	if ((dev == IO_DEV_PIPE) &&
 	    (0 <= gid) && (gid < n))
 	   {pgd = pg + gid;
-	    if ((0 <= iod) && (iod < SC_N_IO_CH))
-	       {ipd = pgd->fd + iod;
+	    if ((0 <= iod.knd) && (iod.knd < SC_N_IO_CH))
+	       {ipd = pgd->fd + iod.knd;
 		if (ipd != NULL)
-		   {ipd->knd  = iod;
-		    ipd->dev  = dev;
-		    ipd->fd   = fd;
-		    ipd->gid  = id;};};};
+		   {ipd->knd = iod.knd;
+		    ipd->dev = dev;
+		    ipd->fd  = fd;
+		    ipd->gid = id;};};};
 
 /* set the source io spec */
-	if ((0 <= ios) && (ios < SC_N_IO_CH))
-	   {ips = pgs->fd + ios;
+	if ((0 <= ios.knd) && (ios.knd < SC_N_IO_CH))
+	   {ips = pgs->fd + ios.knd;
 	    if (ips != NULL)
-	       {ips->knd  = ios;
-		ips->dev  = dev;
-		ips->fd   = fd;
-		ips->gid  = gid;};};};
+	       {ips->knd = ios.knd;
+		ips->dev = dev;
+		ips->fd  = fd;
+		ips->gid = gid;};};};
 
     return;}
 
@@ -1200,7 +1251,7 @@ static void _SC_process_group_parse(subtask *pg, int n, int id)
 
 static void _SC_reconnect_process_group(int n, subtask *pg,
 					PROCESS **pa, PROCESS **ca)
-   {int i, is, ide, ido, nm;
+   {int i, ide, ido, nm;
     subtask *g;
     PROCESS *pp, *cp, *pn, *cn;
 
@@ -1243,17 +1294,15 @@ static void _SC_reconnect_process_group(int n, subtask *pg,
 
 /* connect all non-terminal child out to next child in */
 	for (i = 0; i < nm; i++)
-	    {is = i;
-	     g  = pg + is;
+	    {g = pg + i;
 
 	     ido = g->fd[IO_STD_OUT].gid;
 	     ide = g->fd[IO_STD_ERR].gid;
 
-	     ido = i + 1;
 	     ide = i + 1;
 
-	     pp = pa[is];
-	     cp = ca[is];
+	     pp = pa[i];
+	     cp = ca[i];
 	     cn = ca[ido];
 
 	     close(cn->io[0]);
@@ -1927,9 +1976,9 @@ int _SC_redir_fail(SC_iodes *fd)
 
 void _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd,
 		       char *redir, char *name)
-   {int ofd, excl, fl, flc, flt, fla, mode;
+   {int ofd, excl, fl, flc, flt, fla;
     char *nm;
-    SC_io_kind id;
+    SC_iodes tio;
 
     if ((name != NULL) && (redir != NULL))
        {if (SC_numstrp(name))
@@ -1959,18 +2008,18 @@ void _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd,
  *  >!  ->  O_WRONLY | O_CREAT | O_TRUNC
  *  >>  ->  O_WRONLY | O_APPEND
  */
-	_SC_io_kind(redir, &id, NULL, &mode);
-	switch (id)
+	_SC_io_kind(&tio, redir);
+	switch (tio.knd)
 	   {case IO_STD_IN :
 	         fd[ifd].file = nm;
 		 fd[ifd].flag = O_RDONLY;
 	         break;
 	    case IO_STD_OUT :
-	         switch (mode)
-		    {case 'w' :
+	         switch (tio.mode)
+		    {case IO_MODE_WD :
 		          fl = flt;
 			  break;
-		     case 'a' :
+		     case IO_MODE_APPEND :
 		          fl = fla;
 			  break;
 		     default :
@@ -1982,11 +2031,11 @@ void _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd,
 	    case IO_STD_ERR :
 	         break;
 	    case IO_STD_BOND :
-	         switch (mode)
-		    {case 'w' :
+	         switch (tio.mode)
+		    {case IO_MODE_WD :
 		          fl = (fl == -1) ? flt : fl;
 			  break;
-		     case 'a' :
+		     case IO_MODE_APPEND :
 		          fl = (fl == -1) ? fla : fl;
 			  break;
 		     default :
@@ -2049,11 +2098,14 @@ void _SC_init_filedes(SC_iodes *fd)
 
     for (i = 0; i < SC_N_IO_CH; i++)
         {fd[i].fd    = -1;
-	 fd[i].flag  = -1;
+	 fd[i].fid   = -1;
 	 fd[i].gid   = -1;
+	 fd[i].flag  = -1;
 	 fd[i].knd   = IO_STD_NONE;
 	 fd[i].dev   = IO_DEV_NONE;
-	 fd[i].file  = NULL;};
+	 fd[i].mode  = IO_MODE_NONE;
+	 fd[i].file  = NULL;
+	 fd[i].raw   = NULL;};
 
     return;}
 
@@ -2156,6 +2208,14 @@ PROCESS *SC_open(char **argv, char **envp, char *mode, ...)
 		else if (strcmp(key, "EXIT") == 0)
 		   {exitf = SC_VA_ARG(PFProcExit);
 		    exita = SC_VA_ARG(void *);}
+		else if (strcmp(key, "IO-DES") == 0)
+		   {int ifd, nfd;
+		    SC_iodes *pfd;
+
+		    pfd = SC_VA_ARG(SC_iodes *);
+		    nfd = SC_VA_ARG(int);
+		    for (ifd = 0; ifd < nfd; ifd++)
+		        fd[ifd] = pfd[ifd];}
 		else if (strcmp(key, "STDIN") == 0)
 		   {nm  = SC_VA_ARG(char *);
 		    ifd = SC_VA_ARG(int);

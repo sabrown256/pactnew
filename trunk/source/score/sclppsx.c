@@ -137,27 +137,25 @@ static int _SC_posix_setup_tty(PROCESS *pp, int child)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_DUP_FD - if FILE is NULL duplicate file OFD to file NFD
- *            - otherwise open FILE and duplicate it to NFD
- *            - if TO is greater than zero and select open errors occur
- *            - retry the open in TO milliseconds
- *            - use MSG for error reporing purposes
- *            - return TRUE iff successful
+/* _SC_GET_DUP_FD - determine and return the descriptor to assign
+ *                - to FD[NFD]
  */
 
-static int _SC_dup_fd(char *msg, int to, SC_iodes *fd, int nfd, int ofd)
-   {int rv, err;
+static int _SC_get_dup_fd(char *msg, int to, SC_iodes *fd, int nfd, int ofd)
+   {int err;
     mode_t p;
 
-/* make Klocworks happy */
-    p = 0;
+/* if bonded get the already open descriptor */
+    if ((fd[1].file == fd[2].file) && (fd[1].file != NULL))
+       {if ((nfd == 2) && (fd[1].fd != -1))
+	   ofd = fd[1].fd;
+        else if ((nfd == 1) && (fd[2].fd != -1))
+	   ofd = fd[2].fd;}
 
-    if (fd[nfd].flag != -1)
-       {if ((fd[1].file == fd[2].file) && (fd[1].file != NULL))
-	   {if ((nfd == 2) && (fd[1].fd != -1))
-	       ofd = fd[1].fd;
-	    else if ((nfd == 1) && (fd[2].fd != -1))
-	       ofd = fd[2].fd;}
+/* otherwise open the descriptor */
+    else
+       {p   = SC_get_perm(FALSE);
+	ofd = open(fd[nfd].file, fd[nfd].flag, p);
 
 /* GOTCHA: retry failed opens if the cause might be due to slow
  * NFS response or transient system issues
@@ -183,17 +181,33 @@ static int _SC_dup_fd(char *msg, int to, SC_iodes *fd, int nfd, int ofd)
  *    ETXTBSY      write executable which is currently being executed
  *
  */
-	else
-	   {p   = SC_get_perm(FALSE);
-	    ofd = open(fd[nfd].file, fd[nfd].flag, p);
-	    err = errno;
-	    if ((ofd == -1) && (to > 0) &&
-		((err == ENOSPC) || (err == ENOMEM) ||
-		 (err == EMFILE) || (err == ENFILE) ||
-		 (err == ENOENT) || (err == EEXIST) ||
-		 (err == ETXTBSY)))
-	       {SC_sleep(to);
-		ofd = open(fd[nfd].file, fd[nfd].flag, p);};};};
+	err = errno;
+	if ((ofd == -1) && (to > 0) &&
+	    ((err == ENOSPC) || (err == ENOMEM) ||
+	     (err == EMFILE) || (err == ENFILE) ||
+	     (err == ENOENT) || (err == EEXIST) ||
+	     (err == ETXTBSY)))
+	   {SC_sleep(to);
+	    ofd = open(fd[nfd].file, fd[nfd].flag, p);};};
+
+    return(ofd);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_DUP_FD - if FILE is NULL duplicate file OFD to file NFD
+ *            - otherwise open FILE and duplicate it to NFD
+ *            - if TO is greater than zero and select open errors occur
+ *            - retry the open in TO milliseconds
+ *            - use MSG for error reporing purposes
+ *            - return TRUE iff successful
+ */
+
+static int _SC_dup_fd(char *msg, int to, SC_iodes *fd, int nfd, int ofd)
+   {int rv;
+
+    if (fd[nfd].flag != -1)
+       ofd = _SC_get_dup_fd(msg, to, fd, nfd, ofd);
 
     if (ofd < 0)
        SC_error(SC_EXIT_ERRNO(), "COULD NOT OPEN %s (%d/%d) - _SC_DUP_FD",
