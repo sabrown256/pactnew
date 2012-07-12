@@ -765,60 +765,72 @@ static int _SC_io_splice_out(subtask *ps, int i, int j)
  *                    -   fd  := [digits]+  (defaults to 1, stdout, if absent)
  */
 
-static int _SC_parse_redirect(SC_iodes *pio, char *src, char *oper, char *dst,
-			      char **ta, int i, char *p)
-   {int c, nc;
-    char ldst[MAXLINE];
-    char *t;
+static int _SC_parse_redirect(SC_iodes *pio, subtask *ps, int i, char *p,
+			      char *src)
+   {int j, fid, gid, so;
+    int c, nc;
+    char file[MAXLINE];
+    char *t, *fn, **ta;
 
-    t  = ta[i];
-    nc = p - t;
-    strncpy(src, t, nc);
-    src[nc] = '\0';
+    ta = ps->argf;
+    j  = i;
+
+    if (pio != NULL)
+       {t = ta[j];
+	
+	gid = -1;
+	fid = -1;
+	fn  = NULL;
+	so  = FALSE;
+
+/* save the original specification */
+	pio->raw = CSTRSAVE(p);
+
+	nc = p - t;
+	strncpy(src, t, nc);
+	src[nc] = '\0';
 	
 /* msh syntax */
-    if (t[0] == SC_PROCESS_DELIM)
-       {switch (t[1])
-	   {case 'i':
-	         strcpy(oper, "<");
-		 break;
-	    case 'e':
-	    case 'b':
-	         strcpy(oper, ">&");
-		 break;
-	    case 'o':
-	    default :
-	         strcpy(oper, ">");
-		 break;};
-	strcpy(ldst, t+3);}
+	if (t[0] == SC_PROCESS_DELIM)
+	   {fn = t + 3;
+	    strcpy(file, t+3);}
 
 /* conventional UNIX shell syntax */
-    else
-       {for (nc = 0; TRUE; nc++)
-	    {c = *p++;
-	     if ((c != '\0') && (strchr("<>!&", c) != NULL))
-	        oper[nc] = c;
-	     else
-	        {oper[nc] = '\0';
-		 p--;
-		 break;};};
-
-	ldst[0] = '\0';
-	nc      = strlen(p);
-	if (nc == 0)
-	   {t = ta[++i];
-	    if (t != NULL)
-	       strcpy(ldst, t);}
 	else
-	   {strncpy(ldst, p, nc);
-	    ldst[nc] = '\0';};};
+	   {for (nc = 0; TRUE; nc++)
+	        {c = *p++;
+		 if ((c == '\0') || (strchr("<>!&", c) == NULL))
+		    {p--;
+		     break;};};
 
-    pio->raw  = CSTRSAVE(p);
-    pio->file = CSTRSAVE(ldst);
+	    file[0] = '\0';
+	    nc      = strlen(p);
+	    if (nc == 0)
+	       {t = ta[++j];
+		if (t != NULL)
+		   {SC_strncpy(file, MAXLINE, t, -1);
+		    fn = file;};
+		so = TRUE;}
+	    else
+	       {SC_strncpy(file, MAXLINE, p, nc);
+		file[nc] = '\0';
+	        fn = file;
+		so = TRUE;};};
 
-    _SC_io_kind(pio, oper);
+	pio->gid = gid;
+	pio->fid = fid;
+	if (fn != NULL)
+	   pio->file = CSTRSAVE(fn);
 
-    return(i);}
+/* parse out the specification - results in PIO */
+	_SC_io_kind(pio, NULL);
+
+/* splice out the redirect related tokens array */
+	if (so == TRUE)
+	   {_SC_io_splice_out(ps, i, j);
+	    j = i - 1;};};
+
+    return(j);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -827,76 +839,77 @@ static int _SC_parse_redirect(SC_iodes *pio, char *src, char *oper, char *dst,
  *                 - and fill in PS->FD from them
  */
 
-static void _SC_redirect_fd(subtask *ps, int i, char *p)
-   {int j, n, di, fd;
-    char src[MAXLINE], dst[MAXLINE], ios[MAXLINE];
-    char **ta;
+static int _SC_redirect_fd(subtask *ps, int i, char *p)
+   {int rv;
+    char src[MAXLINE];
     SC_iodes io;
 
     memset(&io, 0, sizeof(io));
 
-    n  = ps->nt;
-    ta = ps->argf;
-
 /* parse out the redirect related specifications */
-    j = _SC_parse_redirect(&io, src, ios, dst, ta, i, p);
-
-/* splice out the redirect related tokens array */
-    di = j - i + 1;
-    n -= di;
-    for ( ; i <= j; j--)
-        {CFREE(ta[j]);};
-
-    for (j = i; j < n; j++)
-        ta[j] = ta[j+di];
-
-    ps->nt = n;
+    rv = _SC_parse_redirect(&io, ps, i, p, src);
 
 /* add the redirect specifications to the filedes */
 #if 0
     switch (io.knd)
        {case IO_STD_IN :
+	     ps->fd[0] = io;
 	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 0, &io);
 	     break;
         case IO_STD_OUT :
-	     fd = 1;
-	     if (src != NULL)
-	        fd = SC_stoi(src);
-	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, fd, &io);
+	     ps->fd[1] = io;
+	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 1, &io);
 	     break;
         case IO_STD_ERR :
+	     ps->fd[2] = io;
 	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 2, &io);
 	     break;
         case IO_STD_BOND :
+	     ps->fd[1] = io;
+#ifdef NEWWAY
+
+/* since 2>&1 syntax does not specify a file name this is split up */
+	     if ((io.file != NULL) && (io.fid != -1))
+	        _SC_redir_filedes(ps->fd, SC_N_IO_CH, 1, &io);
+	     else
+	        {io.file = ps->fd[1].name;
+		 io.raw  = CSTRSAVE(p);};
+#else
 	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 1, &io);
+#endif
+	     ps->fd[2] = io;
 	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 2, &io);
 	     break;};
 #else
-    switch (ios[0])
-       {case '<' :
+    switch (io.knd)
+       {case IO_STD_IN :
 	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 0, &io);
 	     break;
 
-	case '>' :
-	     switch (src[0])
-	        {case '&' :
-		      _SC_redir_filedes(ps->fd, SC_N_IO_CH, 2, &io);
-		      fd = 1;
-		      break;
-		 case '\0' :
-		      fd = 1;
-		      break;
-		 default :
-		      fd = SC_stoi(src);
-		      break;};
-	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, fd, &io);
+        case IO_STD_OUT :
+        case IO_STD_ERR :
+        case IO_STD_BOND :
+	     {int fd;
+
+	      switch (src[0])
+	         {case '&' :
+		       _SC_redir_filedes(ps->fd, SC_N_IO_CH, 2, &io);
+		       fd = 1;
+		       break;
+		  case '\0' :
+		       fd = 1;
+		       break;
+		  default :
+		       fd = SC_stoi(src);
+		       break;};
+	      _SC_redir_filedes(ps->fd, SC_N_IO_CH, fd, &io);};
 	     break;
 
 	default :
 	     break;};
 #endif
 
-    return;}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1529,9 +1542,14 @@ static int _SC_cmnd_exec(taskdesc *job, asyncstate *as, subtask *sub)
 #if 0
 		     "EXIT", _SC_next_task, state,
 #endif
+
+#if 0
+                     "IO-DES", fd, SC_N_IO_CH,
+#else
 		     "STDIN",  fd[0].file, fd[0].flag,
 		     "STDOUT", fd[1].file, fd[1].flag,
 		     "STDERR", fd[2].file, fd[2].flag,
+#endif
 		     "OPEN-RETRY-TIME", to,
 		     "RING-EXP", 18,
 		     NULL);
