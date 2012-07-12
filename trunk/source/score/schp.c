@@ -889,7 +889,7 @@ static void _SC_init_io_spec(subtask *pg, int n, int id)
  */
 
 int _SC_io_kind(SC_iodes *pio, char *ios)
-   {int ck, cd, fid, gid, nc, rel, rv, md;
+   {int ck, cd, fid, gid, nc, rel, rv;
     SC_io_mode mode;
     SC_io_device dev;
     SC_io_kind knd;
@@ -927,7 +927,6 @@ int _SC_io_kind(SC_iodes *pio, char *ios)
 	else if (strncmp(ios, "2>", 2) == 0)
 	   {knd = IO_STD_ERR;
 	    dev = IO_DEV_FILE;}
-
 #if 1
 	else if ((strstr(ios, "|&") != NULL) ||
 		 (strstr(ios, "&|") != NULL))
@@ -1006,14 +1005,6 @@ int _SC_io_kind(SC_iodes *pio, char *ios)
 		case 'a' :
                      mode = IO_MODE_APPEND;
 		     break;};};
-
-	md = '\0';
-	if (strstr(ios, ">>") != NULL)
-	   md = 'a';
-	else if (strchr(ios, '!') != NULL)
-	   md = 'w';
-	else if (strchr("ioeb", ios[0]) != NULL)
-	   md = ios[1];
 
 	rv = TRUE;};
 
@@ -1116,22 +1107,23 @@ static void _SC_set_io_spec(subtask *pg, int n, int id,
 		 else
 		    excl = O_EXCL;
 
+/*  <   ->  O_RDONLY */
 		 if (kind == IO_STD_IN)
 		    fd = open(nm, O_RDONLY);
 		 else
-/* shell redirection syntax and file mode correspondence
- *  <   ->  O_RDONLY
- *  >   ->  O_WRONLY | O_CREAT | O_EXCL
- *  >!  ->  O_WRONLY | O_CREAT | O_TRUNC
- *  >>  ->  O_WRONLY | O_APPEND
- */
 		    {switch (ps[0])
+
+/*  >   ->  O_WRONLY | O_CREAT | O_EXCL */
 		        {case 'f' :
 			      md = O_WRONLY | O_CREAT | excl;
 			      break;
+
+/*  >!  ->  O_WRONLY | O_CREAT | O_TRUNC */
 			 case 'w' :
 			      md = O_WRONLY | O_CREAT | O_TRUNC;
 			      break;
+
+/*  >>  ->  O_WRONLY | O_APPEND */
 			 case 'a' :
 			      md = O_WRONLY | O_APPEND;
 			      break;};
@@ -1975,7 +1967,7 @@ int _SC_redir_fail(SC_iodes *fd)
  */
 
 void _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd, SC_iodes *pio)
-   {int ofd, excl, fl, flc, flt, fla;
+   {int ofd, excl, fl;
     SC_io_kind knd;
     SC_io_mode md;
     char *nm, *name;
@@ -1995,6 +1987,12 @@ void _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd, SC_iodes *pio)
 	   {ofd = ifd;
 	    nm  = name;
 	    fl  = -1;};
+
+/* do not try to use O_EXCL bit with devices - think about it */
+	if ((nm != NULL) && (strncmp(nm, "/dev/", 5) == 0))
+	   excl = 0;
+	else
+	   excl = O_EXCL;
 
 #if 0
 /* shell redirection syntax and file mode correspondence */
@@ -2017,22 +2015,11 @@ void _SC_redir_filedes(SC_iodes *fd, int nfd, int ifd, SC_iodes *pio)
 
 /*  >   ->  O_WRONLY | O_CREAT | O_EXCL */
 	    default :
-
-/* do not try to use O_EXCL bit with devices - think about it */
-	         if ((nm != NULL) && (strncmp(nm, "/dev/", 5) == 0))
-		    excl = 0;
-		 else
-		    excl = O_EXCL;
-
 		 fl = O_WRONLY | O_CREAT | excl;
 		 break;};
 
 #else
-/* do not try to use O_EXCL bit with devices - think about it */
-	if ((nm != NULL) && (strncmp(nm, "/dev/", 5) == 0))
-	   excl = 0;
-	else
-	   excl = O_EXCL;
+	int flc, flt, fla;
 
 	flc = O_WRONLY | O_CREAT | excl;
 	flt = O_WRONLY | O_CREAT | O_TRUNC;
