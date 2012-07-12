@@ -6,31 +6,43 @@
 unalias *
 
 set END   = '}'
-set SignF = ""
+set signf = ""
 
 if ($?SITE_SIGNATURE_DB == 1) then
-   set SignF = $SITE_SIGNATURE_DB
+   set signf = $SITE_SIGNATURE_DB
 endif
 
-set Prog = $0
-set PDir = $Prog:h
+set exe    = $0
+set bindir = $exe:h
 
-set Verbose  = FALSE
-set OutShell = csh
+set deflt = FALSE
+set osh   = csh
+set vrb   = FALSE
+set ucnd  = FALSE
 
 while ($#argv > 0)
    switch ($1)
       case -csh:
-           set OutShell = csh
+           set osh = csh
+           breaksw
+      case -dc:
+           set deflt = TRUE
+           set ucnd  = FALSE
+           breaksw
+      case -du:
+           set deflt = TRUE
+           set ucnd  = TRUE
            breaksw
       case -f:
            shift
-           set SignF = $1
+           set signf = $1
            breaksw
       case -h:
            echo ""
-           echo "Usage: sys-site [-csh] [-f <sign>] [-h] [-sh] [-v]"
+           echo "Usage: sys-site [-csh] [-dc] [-du] [-f <sign>] [-h] [-sh] [-v]"
            echo "   csh emit results in C shell syntax (default)"
+           echo "   dc  conditionally emit default settings when no database specified"
+           echo "   du  unconditionally emit default settings when no database specified"
            echo "   f   use signature file <sign>"
            echo "   h   this help message"
            echo "   sh  emit results in Bourne shell syntax"
@@ -38,26 +50,26 @@ while ($#argv > 0)
            echo ""
            exit(1)
       case -sh:
-           set OutShell = sh
+           set osh = sh
            breaksw
       case -v:
-           set Verbose = TRUE
+           set vrb = TRUE
            breaksw
    endsw
    shift
 end
 
-if (-f "$SignF") then
+if (-f "$signf") then
 
 # process any variable settings into shell variables of this session
    set noglob
-   set VarLst = ( `cat $SignF | awk '$2 == "=" { print $1 }'` )
-   set ExpLst = ( `cat $SignF | awk '$2 == "=" { printf("set %s ; ", $0); }'` )
+   set VarLst = ( `cat $signf | awk '$2 == "=" { print $1 }'` )
+   set ExpLst = ( `cat $signf | awk '$2 == "=" { printf("set %s ; ", $0); }'` )
 
    eval "$ExpLst"
    unset noglob
 
-   if ($Verbose == TRUE) then
+   if ($vrb == TRUE) then
       foreach var ($VarLst)
          set val = `set | awk '$1 == "'$var'" { print }'`
          shift val
@@ -67,13 +79,13 @@ if (-f "$SignF") then
 
    set Section = $END
    set skip    = FALSE
-   set nlines  = ( `wc -l $SignF` )
+   set nlines  = ( `wc -l $signf` )
    @ nline = $nlines[1]
    @ iline = 0
    while ($iline < $nline)
       set noglob
       @ iline = $iline + 1
-      set line = ( `head -n $iline $SignF |& tail -n 1` )
+      set line = ( `head -n $iline $signf |& tail -n 1` )
       if (("$line" == "") || ("$line" =~ \#*)) continue
  
 # skip all remaining tests in a section
@@ -89,7 +101,7 @@ if (-f "$SignF") then
       else if ("$line" =~ variable*:*\{) then
          set Section = $line[3]
          set skip    = FALSE
-         if ($Verbose == TRUE) then
+         if ($vrb == TRUE) then
             echo "line ${iline}:   determine $Section"
          endif
 
@@ -103,7 +115,7 @@ if (-f "$SignF") then
 # do if test on things that match (...)
          if ("$line" =~ \(*\)) then
             eval "if $line set Res = TRUE"
-            if ($Verbose == TRUE) then
+            if ($vrb == TRUE) then
                echo "line ${iline}:      test $line => $Res"
             endif
 
@@ -117,7 +129,7 @@ if (-f "$SignF") then
 #            $line >& /dev/null
             eval "$line" >& /dev/null
             if ($status == 0) set Res = TRUE
-            if ($Verbose == TRUE) then
+            if ($vrb == TRUE) then
                echo "line ${iline}:      $line => $Res"
             endif
          endif
@@ -126,21 +138,90 @@ if (-f "$SignF") then
          if ($Res == TRUE) then
             eval "setenv $Section $Val"
             set skip = TRUE
-            if ($Verbose == TRUE) then
+            if ($vrb == TRUE) then
                echo "line ${iline}:   $Section = $Val"
             endif
-            if ($OutShell == csh) then
+            if ($osh == csh) then
                echo "setenv $Section `printenv $Section` ; "
-            else if ($OutShell == sh) then
+            else if ($osh == sh) then
                echo "$Section=`printenv $Section` ; export $Section ; "
             endif
          endif
       endif
    end
 
+else if ($deflt == TRUE) then
+
+   set lsys = `$bindir/system-id`
+
+# unconditionally set these
+   if ($ucnd == TRUE) then
+      if ($osh == csh) then
+         echo "setenv SYS_SITE LONER ; "
+      else if ($osh == sh) then
+         echo "SYS_SITE=LONER ; export SYS_SITE ; "
+      endif
+      if ($osh == csh) then
+         echo "setenv SYS_TYPE $lsys ; "
+      else if ($osh == sh) then
+         echo "SYS_TYPE=$lsys ; export SYS_TYPE ; "
+      endif
+      if ($osh == csh) then
+         echo "setenv DAI_ROOT /usr/local ; "
+      else if ($osh == sh) then
+         echo "DAI_ROOT=/usr/local ; export DAI_ROOT ; "
+      endif
+      if ($osh == csh) then
+         echo "setenv DAS_ROOT /usr/share ; "
+      else if ($osh == sh) then
+         echo "DAS_ROOT=/usr/share ; export DAS_ROOT ; "
+      endif
+
+# set these only if not already set
+   else
+      set inf = ( `printenv SYS_SITE` )
+      if ("$inf" == "") then
+         if ($osh == csh) then
+            echo "setenv SYS_SITE LONER ; "
+         else if ($osh == sh) then
+            echo "SYS_SITE=LONER ; export SYS_SITE ; "
+         endif
+      endif
+
+      set inf = ( `printenv SYS_TYPE` )
+      if ("$inf" == "") then
+         if ($osh == csh) then
+            echo "setenv SYS_TYPE $lsys ; "
+         else if ($osh == sh) then
+            echo "SYS_TYPE=$lsys ; export SYS_TYPE ; "
+         endif
+      endif
+
+      set inf = ( `printenv DAI_ROOT` )
+      if ("$inf" == "") then
+         if ($osh == csh) then
+            echo "setenv DAI_ROOT /usr/local ; "
+         else if ($osh == sh) then
+            echo "DAI_ROOT=/usr/local ; export DAI_ROOT ; "
+         endif
+      endif
+
+      set inf = ( `printenv DAS_ROOT` )
+      if ("$inf" == "") then
+         if ($osh == csh) then
+            echo "setenv DAS_ROOT /usr/share ; "
+         else if ($osh == sh) then
+            echo "DAS_ROOT=/usr/share ; export DAS_ROOT ; "
+         endif
+      endif
+      unset inf
+   endif
+
+   unset lsys
+   
 endif
 
-echo "$PDir/no-op"
+echo "$bindir/no-op"
 
 unset noglob
 

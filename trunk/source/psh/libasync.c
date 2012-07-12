@@ -126,6 +126,11 @@
 typedef void (*PFSIGHand)(int sig);
 typedef void (*PFIOHand)(int fd, int mask, void *a);
 
+enum e_io_hand
+   {IO_HND_NONE, IO_HND_CLOSE, IO_HND_PIPE, IO_HND_POLL};
+
+typedef enum e_io_hand io_hand;
+
 enum e_io_kind
    {IO_STD_NONE = -1, IO_STD_IN, IO_STD_OUT, IO_STD_ERR, IO_STD_BOND};
 
@@ -160,6 +165,7 @@ struct s_iodes
     int fid;                /* file descriptor for redirect - 2>&1 type */
     int gid;                /* index of process group member for redirect */
     int flag;               /* file open mode flags */
+    io_hand hnd;
     io_kind knd;
     io_device dev;
     io_mode mode;
@@ -204,18 +210,21 @@ struct s_process_group
 struct s_process_stack
    {int ip;
     int np;
+    int ifd;
     int nfd;
     int nattempt;
     int mask_acc;
     int mask_rej;
+    int *map;
+    int *io;
     apollfd *fd;
     process **proc;};
 
 static process_stack
- stck = { 0, 0, 0, 3,
+ stck = { 0, 0, 0, 0, 3,
           (POLLIN | POLLPRI),
 	  (POLLERR | POLLHUP | POLLNVAL),
-          NULL, NULL};
+          NULL, NULL, NULL, NULL};
 
 static sigjmp_buf
  _job_cpu;
@@ -228,15 +237,16 @@ static sigjmp_buf
 
 /* _INIT_IODES - initialize a set of N_IO_CH iodes structures */
 
-static void _init_iodes(iodes *fd)
+static void _init_iodes(int n, iodes *fd)
    {int i;
 
-    for (i = 0; i < N_IO_CHANNELS; i++)
+    for (i = 0; i < n; i++)
         {fd[i].fd   = -1;
 	 fd[i].fid  = -1;
 	 fd[i].gid  = -1;
 	 fd[i].flag = -1;
 	 fd[i].knd  = IO_STD_NONE;
+	 fd[i].hnd  = IO_HND_NONE;
 	 fd[i].dev  = IO_DEV_NONE;
 	 fd[i].mode = IO_MODE_NONE;
 	 fd[i].file = NULL;
@@ -295,7 +305,7 @@ static process *_job_mk_process(int child, char **arg,
 	pp->nattempt    = 1;
 	pp->mode[0]     = '\0';
 
-	_init_iodes(pp->io);
+	_init_iodes(N_IO_CHANNELS, pp->io);
 
 	if (arg == NULL)
 	   sc = NULL;
@@ -394,13 +404,13 @@ static int _job_exec(process *cp, char **argv, char **env, char *mode)
    {int i, err, rv;
     int io[N_IO_CHANNELS];
 
-    err = FALSE;
+    err = 0;
 
     if (cp != NULL)
        {for (i = 0; i < N_IO_CHANNELS; i++)
 	    io[i] = cp->io[i].fd;
 
-#if 1
+#if 0
 /* NOTE: in past stderr went to stdout */
 	io[2] = io[1];
 #endif
@@ -413,14 +423,8 @@ static int _job_exec(process *cp, char **argv, char **env, char *mode)
 	    dup2(io[i], i);
 
 /* now that they are copied release the old values */
-	if (close(io[2]) < 0)
-	   return(err);
-
-	if (io[1] != io[0])
-	   close(io[1]);
-
-	if (close(io[0]) < 0)
-	   return(err);
+	for (i = 0; i < N_IO_CHANNELS; i++)
+	    close(io[i]);
 
 /* exec the process with args and environment - this won't return */
 	err = execvp(argv[0], argv);};
@@ -940,7 +944,7 @@ int job_response(process *pp, int to, char *fmt, ...)
 /* JOB_WAIT - check to update the process status */
 
 void job_wait(process *pp)
-   {int st, w, pid, sts, cnd;
+   {int i, st, w, pid, sts, cnd;
 
     if (pp != NULL)
        {pid = pp->id;
@@ -970,7 +974,13 @@ void job_wait(process *pp)
 	    pp->reason    = sts;
 
 	    if (pp->wait != NULL)
-	       (*pp->wait)(pp);}
+	       {(*pp->wait)(pp);
+
+		for (i = 0; i < N_IO_CHANNELS; i++)
+		    {pp->io[i].fd  = -1;
+		     pp->io[i].hnd = IO_HND_NONE;
+		     pp->io[i].dev = IO_DEV_NONE;
+		     pp->io[i].knd = IO_STD_NONE;};};}
 
 	else if ((st < 0) && (pp->status == JOB_RUNNING))
 	   pp->status = JOB_DEAD;};
@@ -1034,18 +1044,25 @@ int job_done(process *pp, int sig)
 void asetup(int n, int na)
    {
 
+/* per process members */
     if (stck.proc != NULL)
-       {FREE(stck.proc);};
+       FREE(stck.proc);
 
-    if (stck.fd != NULL)
-       {FREE(stck.fd);};
-
+    stck.ip   = 0;
+    stck.np   = n;
     stck.proc = MAKE_N(process *, n);
-    stck.fd   = MAKE_N(apollfd, N_IO_CHANNELS*n);
 
-    stck.ip       = 0;
-    stck.np       = n;
-    stck.nfd      = N_IO_CHANNELS*n;
+/* per descriptor members */
+    if (stck.fd != NULL)
+       FREE(stck.fd);
+
+    stck.ifd  = 0;
+    stck.nfd  = N_IO_CHANNELS*n;
+    stck.fd   = MAKE_N(apollfd, N_IO_CHANNELS*n);
+    stck.map  = MAKE_N(int, N_IO_CHANNELS*n);
+    stck.io   = MAKE_N(int, N_IO_CHANNELS*n);
+
+/* everything else */
     stck.nattempt = na;
 
     return;}
@@ -1056,10 +1073,11 @@ void asetup(int n, int na)
 /* _AWATCH_FD - register the KND file descriptor of PP as the SIPth element */
 
 static int _awatch_fd(process *pp, io_kind knd, int sip)
-   {int ip, fd, rv;
+   {int ip, ifd, fd, rv;
 
+/* handle the process */
     ip = (sip < 0) ? stck.ip++ : sip;
-    if (ip >= stck.nfd)
+    if (ip >= stck.np)
        {int i, n;
 
 	printf("ERROR: Bad process accounting (%d > %d) - exiting\n",
@@ -1071,15 +1089,20 @@ static int _awatch_fd(process *pp, io_kind knd, int sip)
 	printf("\n");
 	exit(1);};
 
+    stck.proc[ip] = pp;
+
+/* handle the descriptor */
     fd = pp->io[knd].fd;
     rv = block_fd(fd, FALSE);
     ASSERT(rv == 0);
 
-    stck.proc[ip] = pp;
+    ifd = stck.ifd++;
+    stck.fd[ifd].fd      = 0;
+    stck.fd[ifd].events  = 0;
+    stck.fd[ifd].revents = 0;
 
-    stck.fd[ip].fd      = fd;
-    stck.fd[ip].events  = stck.mask_acc;
-    stck.fd[ip].revents = 0;
+    stck.io[ifd]  = fd;
+    stck.map[ifd] = ip;
 
     return(ip);}
 
@@ -1098,11 +1121,14 @@ static void _afinish(void)
 	    _job_free(stck.proc[i]);
 	FREE(stck.proc);};
 
-    if (stck.fd != NULL)
-       {FREE(stck.fd);};
+    FREE(stck.fd);
+    FREE(stck.map);
+    FREE(stck.io);
 
-    stck.ip = 0;
-    stck.np = 0;
+    stck.ip  = 0;
+    stck.np  = 0;
+    stck.ifd = 0;
+    stck.nfd = 0;
 
     return;}
 
@@ -1165,22 +1191,28 @@ process *arelaunch(process *pp)
  */
 
 int apoll(int to)
-   {int i, j, n, fd, np, nrdy;
+   {int i, j, n, ifd, nfd, fd, np, nrdy;
+    int *map, *io;
     short rev;
     process *pp;
     apollfd *fds;
 
     np  = stck.np;
+    nfd = stck.ifd;
     fds = stck.fd;
+    map = stck.map;
+    io  = stck.io;
 
 /* find the descriptors of running jobs only */
     for (n = 0, i = 0; i < np; i++)
         {pp = stck.proc[i];
 	 if (job_running(pp))
-	    {fds[n].fd      = pp->io[0].fd;
-	     fds[n].events  = stck.mask_acc;
-	     fds[n].revents = 0;
-	     n++;};};
+	    {for (ifd = 0; ifd < nfd; ifd++)
+	         {if (map[ifd] == i)
+		     {fds[n].fd      = io[ifd];
+		      fds[n].events  = stck.mask_acc;
+		      fds[n].revents = 0;
+		      n++;};};};};
 
 /* now poll the active descriptors */
     nrdy = poll(fds, n, to);
@@ -1193,14 +1225,16 @@ int apoll(int to)
 /* find the process containing the file desciptor FD and drain it */
 	     for (j = 0; j < np; j++)
 	         {pp = stck.proc[j];
-		  if ((job_alive(pp) == TRUE) && (pp->io[0].fd == fd))
-		     {if (rev & stck.mask_acc)
-			 {nrdy--;
-			  job_read(pp, pp->accept);}
+		  if (job_alive(pp) == TRUE)
+		     {for (ifd = 0; ifd < nfd; ifd++)
+			  {if ((map[ifd] == j) && (io[ifd] == fd))
+			      {if (rev & stck.mask_acc)
+				  {nrdy--;
+				   job_read(pp, pp->accept);}
 
-		      else if (rev & stck.mask_rej)
-			 {nrdy--;
-			  job_read(pp, pp->reject);};};};};};
+			       else if (rev & stck.mask_rej)
+				  {nrdy--;
+				   job_read(pp, pp->reject);};};};};};};};
 
     return(nrdy);}
 

@@ -206,10 +206,54 @@ void dprgrp(process_group *pg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DPRIO - print the file descriptors from the processes */
+/* DPRDIO - print the file descriptors from an iodes PIO */
 
-void dprio(char *tag, int n, process **pa, process **ca)
+void dprdio(iodes *pio)
+   {int fd, gid;
+    char *io, *hnd, *knd, *dev;
+    static char *std[] = {"none", "in", "out", "err"};
+    static char *hn[]  = {"none", "clos", "pipe", "poll"};
+    static char *kn[]  = {"none", "in", "out", "err", "bond"};
+    static char *dn[]  = {"none", "pipe", "sock", "pty", "term",
+                          "file", "var", "expr"};
+
+    io  = std[pio->knd + 1];
+    fd  = pio->fd;
+    gid = pio->gid;
+    hnd = hn[pio->hnd];
+    knd = kn[pio->knd + 1];
+    dev = dn[pio->dev];
+
+    printf("%4s %3d %3d %4s %4s %4s\n",
+	   io, fd, gid, hnd, knd, dev);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DPRPIO - print the file descriptors from a process PP */
+
+void dprpio(char *tag, process *pp)
    {int i;
+    iodes *pio;
+
+    printf("%s\n", tag);
+    printf("Unit  fd gid  hnd  knd  dev\n");
+    for (i = 0; i < N_IO_CHANNELS; i++)
+        {pio = pp->io + i;
+	 dprdio(pio);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DPRGIO - print the file descriptors from the processes of a group */
+
+void dprgio(char *tag, int n, process **pa, process **ca)
+   {int i;
+    char *hnd;
     process *pp, *cp;
 
     printf("----------------------------------------------------\n");
@@ -220,9 +264,54 @@ void dprio(char *tag, int n, process **pa, process **ca)
 	 cp = ca[i];
 	 if ((pp != NULL) && (cp != NULL))
 	    {printf("command: %s\n", pp->cmd);
-	     printf("   stdin:  %2d -> %2d\n", pp->io[1].fd, cp->io[0].fd);
-	     printf("   stdout: %2d <- %2d\n", pp->io[0].fd, cp->io[1].fd);
-	     printf("   stderr: %2d <- %2d\n", pp->io[2].fd, cp->io[2].fd);
+             switch (pp->io[1].hnd)
+	        {case IO_HND_PIPE :
+		      hnd = "pipe";
+		      break;
+	         case IO_HND_POLL :
+		      hnd = "poll";
+		      break;
+	         case IO_HND_CLOSE :
+		      hnd = "clsd";
+		      break;
+	         default :
+		      hnd = "none";
+		      break;};
+	     printf("   stdin:  %3d(%s) -> %3d\n",
+		    pp->io[1].fd, hnd, cp->io[0].fd);
+
+             switch (pp->io[0].hnd)
+	        {case IO_HND_PIPE :
+		      hnd = "pipe";
+		      break;
+	         case IO_HND_POLL :
+		      hnd = "poll";
+		      break;
+	         case IO_HND_CLOSE :
+		      hnd = "clsd";
+		      break;
+	         default :
+		      hnd = "none";
+		      break;};
+	     printf("   stdout: %3d(%s) <- %3d\n",
+		    pp->io[0].fd, hnd, cp->io[1].fd);
+
+             switch (pp->io[2].hnd)
+	        {case IO_HND_PIPE :
+		      hnd = "pipe";
+		      break;
+	         case IO_HND_POLL :
+		      hnd = "poll";
+		      break;
+	         case IO_HND_CLOSE :
+		      hnd = "clsd";
+		      break;
+	         default :
+		      hnd = "none";
+		      break;};
+	     printf("   stderr: %3d(%s) <- %3d\n",
+		    pp->io[2].fd, hnd, cp->io[2].fd);
+
 	     printf("\n");};};
 
     printf("----------------------------------------------------\n");
@@ -515,7 +604,7 @@ static int redirect_fd(process *pp, int i)
    {int rv;
     iodes io;
 
-    memset(&io, 0, sizeof(io));
+    _init_iodes(1, &io);
 
 /* parse out the redirect related specifications */
     rv = parse_redirect(&io, pp, i);
@@ -681,11 +770,12 @@ void fillin_pgrp(process_group *pg)
 static int transfer_fd(process *pn, io_kind pk, process *cn, io_kind ck)
    {int fd;
 
-    fd            = pn->io[pk].fd;
-    pn->io[pk].fd = -2;
+    pn->io[pk].hnd = IO_HND_PIPE;
+    fd             = pn->io[pk].fd;
 
     close(cn->io[ck].fd);
-    cn->io[ck].fd = fd;
+    cn->io[ck].hnd = IO_HND_PIPE;
+    cn->io[ck].fd  = fd;
 
     return(fd);}
 
@@ -696,12 +786,17 @@ static int transfer_fd(process *pn, io_kind pk, process *cn, io_kind ck)
 
 static int watch_fd(process *pn, io_kind pk)
    {int fd;
+    io_device dev;
+    io_hand hnd;
 
-    fd = pn->io[pk].fd;
-    if (fd > 0)
-       {_awatch_fd(pn, pk, -1);
+    fd  = pn->io[pk].fd;
+    dev = pn->io[pk].dev;
+    hnd = pn->io[pk].hnd;
+    if ((fd > 0) && (hnd != IO_HND_PIPE))
+/*    if ((fd > 0) && (dev == IO_DEV_TERM) && (hnd != IO_HND_PIPE)) */
+       {_awatch_fd(pn, pk, pn->ip);
 
-	pn->io[pk].fd = -3;};
+	pn->io[pk].hnd = IO_HND_POLL;};
 
     return(fd);}
 
@@ -718,10 +813,10 @@ static int watch_fd(process *pn, io_kind pk)
  */
 
 static void reconnect_pgrp(process_group *pg)
-   {int i, gie, gio, nm, n;
+   {int i, gi, nm, n;
     process *pp, *cp, *pt;
     process **pa, **ca;
-    io_device dve, dvo;
+    io_device dv;
 
     n  = pg->np;
     pa = pg->parents;
@@ -731,7 +826,7 @@ static void reconnect_pgrp(process_group *pg)
 
     fillin_pgrp(pg);
 
-dprio("b", n, pa, ca);
+dprgio("b", n, pa, ca);
 
 /* remove the parent to child channels except for the last one
  * the final parent out gets connected to the first child in
@@ -757,7 +852,7 @@ dprio("b", n, pa, ca);
 /* reconnect terminal process output to first process */
 	transfer_fd(pa[0], IO_STD_OUT, pt, IO_STD_OUT);
 
-dprio("c", n, pa, ca);
+dprgio("c", n, pa, ca);
 
 /* close all other parent to child lines */
 	for (i = 1; i < nm; i++)
@@ -766,36 +861,76 @@ dprio("c", n, pa, ca);
 
 	     close(pp->io[1].fd);
 	     close(cp->io[0].fd);
-
+/*
 	     pp->io[1].fd = -2;
-	     cp->io[0].fd = -2;};
-dprio("d", n, pa, ca);
+	     cp->io[0].fd = -2;
+*/
+	     pp->io[1].hnd = IO_HND_CLOSE;
+	     cp->io[0].hnd = IO_HND_CLOSE;};
+dprgio("d", n, pa, ca);
 
-/* connect all non-terminal child out to next child in */
+/* connect all non-terminal children output to appropriate child input */
 	for (i = 0; i < nm; i++)
 	    {pp = pa[i];
 	     cp = ca[i];
 
-	     gio = pp->io[IO_STD_OUT].gid;
-	     dvo = pp->io[IO_STD_OUT].dev;
-	     gie = pp->io[IO_STD_ERR].gid;
-	     dve = pp->io[IO_STD_ERR].dev;
+/* stdout */
+	     gi = pp->io[IO_STD_OUT].gid;
+	     dv = pp->io[IO_STD_OUT].dev;
 
 /* default to the next process in line */
-	     if ((dvo == IO_DEV_PIPE) && (gio == -1))
-	        gio = i + 1;
-	     if ((dve == IO_DEV_PIPE) && (gie == -1))
-	        gie = i + 1;
+	     if ((dv == IO_DEV_PIPE) && (gi == -1))
+	        gi = i + 1;
 
-/* stdout */
-	     if (gio >= 0)
-	        transfer_fd(pa[i], IO_STD_IN, ca[gio], IO_STD_IN);
+	     if (gi >= 0)
+	        transfer_fd(pa[i], IO_STD_IN, ca[gi], IO_STD_IN);
 
 /* stderr */
-	     if (gie >= 0)
-	        transfer_fd(pa[i], IO_STD_ERR, ca[gie], IO_STD_IN);};};
+	     gi = pp->io[IO_STD_ERR].gid;
+	     dv = pp->io[IO_STD_ERR].dev;
 
-dprio("reconnect_pgrp", n, pa, ca);
+/* default to the next process in line */
+	     if ((dv == IO_DEV_PIPE) && (gi == -1))
+	        gi = i + 1;
+
+	     if (gi >= 0)
+	        transfer_fd(pa[i], IO_STD_ERR, ca[gi], IO_STD_IN);};
+dprgio("e", n, pa, ca);
+
+
+/* connect all non-terminal children input to appropriate child output */
+	for (i = 1; i < nm; i++)
+	    {pp = pa[i];
+	     cp = ca[i];
+
+/* stdin */
+	     gi = pp->io[IO_STD_IN].gid;
+	     dv = pp->io[IO_STD_IN].dev;
+
+/* default to the previous process in line */
+	     if ((dv == IO_DEV_PIPE) && (gi == -1))
+	        gi = i - 1;
+
+	     if (gi >= 0)
+	        {
+int fd;
+    if (ca[gi]->io[IO_STD_OUT].gid == i)
+       {ca[gi]->io[IO_STD_OUT].hnd = IO_HND_PIPE;
+	fd             = ca[gi]->io[IO_STD_OUT].fd;
+
+	pp->io[IO_STD_OUT].hnd = IO_HND_PIPE;
+	pp->io[IO_STD_OUT].fd  = fd;};
+
+    if (ca[gi]->io[IO_STD_ERR].gid == i)
+       {ca[gi]->io[IO_STD_ERR].hnd = IO_HND_PIPE;
+	fd             = ca[gi]->io[IO_STD_ERR].fd;
+
+	pp->io[IO_STD_IN].hnd = IO_HND_PIPE;
+	pp->io[IO_STD_IN].fd  = fd;};
+                     };};};
+
+
+dprgio("reconnect_pgrp", n, pa, ca);
 
 dprgrp(pg);
 
@@ -1004,9 +1139,9 @@ void _pgrp_wait(process *pp)
 	default :
 	     st = "unk";
 	     break;};
-/*
-    printf("exited (%s/%d)\n", st, pp->reason);
-*/
+
+    ASSERT(st != NULL);
+
 /* drain text from the job - apoll will no longer check it after this */
     rv = job_read(pp, pp->accept);
     ASSERT(rv == 0);
@@ -1072,7 +1207,7 @@ void register_io_pgrp(process_group *pg)
     for (i = 0; i < np; i++)
         {pp = pa[i];
 	 watch_fd(pp, IO_STD_IN);
-/*	 watch_fd(pp, IO_STD_OUT); */
+	 watch_fd(pp, IO_STD_OUT);
 	 watch_fd(pp, IO_STD_ERR);};
 
     return;}
@@ -1099,6 +1234,7 @@ static int run_pgrp(statement *s)
 	asetup(np, 1);
 
 	register_io_pgrp(pg);
+dprgio("run_pgrp", np, pg->parents, pg->children);
 
 /* launch the jobs - io_data passed to macc, myrej, and mydone */
 	for (i = 0; i < np; i++)
@@ -1123,6 +1259,7 @@ static int run_pgrp(statement *s)
 
 /* wait for the work to complete - _pgrp_work does the work */
 	tc = await(300, "commands", _pgrp_tty, _pgrp_work, st);
+	ASSERT(tc >= 0);
 
 /* close out the jobs */
 	afin(_pgrp_fin);
