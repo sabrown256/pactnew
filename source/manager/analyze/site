@@ -27,18 +27,7 @@ SafeEnv DAS_ROOT     ""
 if (-f $MngDir/extensions/sys-site) then
    eval `$MngDir/extensions/sys-site`
 else
-   if ("$SYS_TYPE" == "") then
-      setenv SYS_TYPE `$ScrDir/system-id`
-   endif
-   if ("$SYS_SITE" == "") then
-      setenv SYS_SITE LONER
-   endif
-   if ("$DAI_ROOT" == "") then
-      setenv DAI_ROOT /usr/share
-   endif
-   if ("$DAS_ROOT" == "") then
-      setenv DAS_ROOT /usr/local
-   endif
+   eval `$ScrDir/sys-site -dc`
 endif
 
 # export the results

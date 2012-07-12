@@ -571,16 +571,7 @@ flog $Log cd $mngdir
       setenv DAS_ROOT DAS_ROOT
    endif
 
-   if (-f "$SITE_SIGNATURE_DB") then
-      Note $Log "Setting up site signature using '$SITE_SIGNATURE_DB'"
-      eval `../scripts/sys-site`
-   else
-      Note $Log "No site signature found"
-   endif
-   Note $Log "   SYS_SITE = $SYS_SITE"
-   Note $Log "   SYS_TYPE = $SYS_TYPE"
-   Note $Log "   DAI_ROOT = $DAI_ROOT"
-   Note $Log "   DAS_ROOT = $DAS_ROOT"
+   eval `../scripts/sys-site -du`
 
 # settle RUN signature
 # NOTE: essential for cross compiling

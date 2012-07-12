@@ -436,7 +436,7 @@ complex PM_csqrt(complex c)
 	cb = cos(b);
 
 	x = a*sqrt(0.5*(1.0 + cb));
-	y = a*sqrt(0.5*(1.0 - cb));};
+	y = copysign(a*sqrt(0.5*(1.0 - cb)), b);};
 
     r = PM_COMPLEX(x, y);
 #endif

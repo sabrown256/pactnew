@@ -45,14 +45,6 @@ endif
 set Sed = `which sed`
 set Awk = `which awk`
 
-# figure out the site context
-if (-f extensions/sys-site) then
-   eval `extensions/sys-site`
-else
-   setenv DAI_ROOT /usr/share
-   setenv DAS_ROOT /usr/local
-endif
-
 # find and source env-csh
 if (-f ../scripts/env-csh) then
    set scrd = $cwd
@@ -64,6 +56,13 @@ set path = ( $ldir $path )
 source $ldir/env-csh
 unset ldir
 unset scrd
+
+# figure out the site context
+if (-f extensions/sys-site) then
+   eval `extensions/sys-site`
+else
+   eval `sys-site -dc`
+endif
 
 # default compiler and query info
 set cc = ( `which $cname` )

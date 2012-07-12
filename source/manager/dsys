@@ -40,15 +40,8 @@ setenv ScrDir $BaseDir/scripts
 
 if (-f extensions/sys-site) then
    eval `extensions/sys-site`
-else if (-f local/site-signature) then
-   eval `../scripts/sys-site -f local/site-signature`
 else
-   if ($?DAI_ROOT == 0) then
-      setenv DAI_ROOT /usr/share
-   endif
-   if ($?DAS_ROOT == 0) then
-      setenv DAS_ROOT /usr/local
-   endif
+   eval `../scripts/sys-site -du -f local/site-signature`
 endif
 
 source $ScrDir/env-csh

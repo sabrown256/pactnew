@@ -9,4 +9,11 @@
 
 include spokes
 include compilers/gnu-osx
+include no-opengl
+
+# advise that the following tests will not count as failures
+setenv TEST_ADVISORY ${TEST_ADVISORY}:score_mpi:score_mk_async
+setenv TEST_ADVISORY ${TEST_ADVISORY}:pml_perf
+setenv TEST_ADVISORY ${TEST_ADVISORY}:ppc_pty_interrupt
+setenv TEST_ADVISORY ${TEST_ADVISORY}:sx_hdf
 

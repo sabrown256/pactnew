@@ -55,9 +55,17 @@ int _PD_add_sym_ptrp(PDBfile *file, int ad, char *name, char *type,
        ok = FALSE;
 
     else if (strncmp(name, file->ptr_base, strlen(file->ptr_base)) == 0)
-       {p  = file->current_prefix;
-	s  = strchr(name, '#') + 1;
-	ok = _PD_is_var_in_dir(s, p);}
+       {p = file->current_prefix;
+	s = strchr(name, '#');
+
+/* we must add old style pointers without pathnames because
+ * we do not know who they belong to
+ */
+	if (s == NULL)
+	   ok = TRUE;
+	else
+	   {s++;
+	    ok = _PD_is_var_in_dir(s, p);};}
 
     else if (ad == TRUE)
        ok = TRUE;

@@ -65,8 +65,10 @@
            breaksw
       case darwin:
            set ladv = ""
-           set ladv = ${ladv}:score_mpi
+           set ladv = ${ladv}:score_mpi:score_mk_async
            set ladv = ${ladv}:pml_perf
+           set ladv = ${ladv}:ppc_pty_interrupt
+           set ladv = ${ladv}:sx_hdf
            switch ($lcc)
               case *pgcc*:
                    echo "run std/use-compiler $lcc" >>& $Tmp
@@ -77,6 +79,7 @@
               case *gcc*:
                    echo "run std/use-compiler $lcc" >>& $Tmp
                    echo "include compilers/gnu-osx" >>& $Tmp
+                   echo "include no-opengl" >>& $Tmp
                    echo "setenv TEST_ADVISORY "'${TEST_ADVISORY}'"$ladv" >>& $Tmp
                    breaksw
            endsw
