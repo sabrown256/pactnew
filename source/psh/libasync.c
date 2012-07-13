@@ -354,7 +354,7 @@ static int _job_release(process *pp)
 	   fclose(pp->io[1].fp);
 
 /* stderr */
-#if 0
+#if 1
 	if (io[2] >= 0)
 	   close(io[2]);
 
@@ -948,6 +948,7 @@ void job_wait(process *pp)
 
     if (pp != NULL)
        {pid = pp->id;
+
 	st  = waitpid(pid, &w, WNOHANG);
 	if (st == 0)
 	   pp->status = JOB_RUNNING;
@@ -973,11 +974,22 @@ void job_wait(process *pp)
 	    pp->status    = cnd;
 	    pp->reason    = sts;
 
+/* effect a 1 ms delay - without which a process group will hang
+ * e.g. aexec "ls aexec.c foo.h @o+1 @e+2 cat -n @ cat -E"
+ */
+	    poll(NULL, 0, 1);
+
 	    if (pp->wait != NULL)
 	       {(*pp->wait)(pp);
 
 		for (i = 0; i < N_IO_CHANNELS; i++)
-		    {pp->io[i].fd  = -1;
+		    {if (pp->io[i].fd >= 0)
+		        close(pp->io[i].fd);
+
+		     if (pp->io[i].fp != NULL)
+		        fclose(pp->io[i].fp);
+
+		     pp->io[i].fd  = -1;
 		     pp->io[i].hnd = IO_HND_NONE;
 		     pp->io[i].dev = IO_DEV_NONE;
 		     pp->io[i].knd = IO_STD_NONE;};};}
