@@ -375,7 +375,10 @@ int set_iodes(iodes *pio, char *ios)
 #endif
 	else
 	   {switch (ck)
-	       {case 'e' :
+	       {case 'b' :
+		     knd = IO_STD_BOND;
+		     break;
+		case 'e' :
 		     knd = IO_STD_ERR;
 		     break;
 		case '<' :
@@ -390,7 +393,13 @@ int set_iodes(iodes *pio, char *ios)
 		     break;};};
 
 /* next for the device type */
-        rel = FALSE;
+	rel = FALSE;
+	if (strchr("0123456789", cd) != NULL)
+	   {dev = IO_DEV_PTY;
+	    dev = IO_DEV_SOCKET;
+	    dev = IO_DEV_PIPE;
+	    nc--;};
+
 	switch (cd)
 	   {case '+' :
 	    case '-' :
@@ -422,7 +431,7 @@ int set_iodes(iodes *pio, char *ios)
 	    if (rel == TRUE)
 	       gid += pos;
 	    else
-	       gid = pos;};
+	       gid = pos - 1;};
 
 /* now for the mode */
 	if (strstr(ios, "<") != NULL)
@@ -826,8 +835,6 @@ static void reconnect_pgrp(process_group *pg)
 
     fillin_pgrp(pg);
 
-dprgio("b", n, pa, ca);
-
 /* remove the parent to child channels except for the last one
  * the final parent out gets connected to the first child in
  */
@@ -852,8 +859,6 @@ dprgio("b", n, pa, ca);
 /* reconnect terminal process output to first process */
 	transfer_fd(pa[0], IO_STD_OUT, pt, IO_STD_OUT);
 
-dprgio("c", n, pa, ca);
-
 /* close all other parent to child lines */
 	for (i = 1; i < nm; i++)
 	    {pp = pa[i];
@@ -867,7 +872,6 @@ dprgio("c", n, pa, ca);
 */
 	     pp->io[1].hnd = IO_HND_CLOSE;
 	     cp->io[0].hnd = IO_HND_CLOSE;};
-dprgio("d", n, pa, ca);
 
 /* connect all non-terminal children output to appropriate child input */
 	for (i = 0; i < nm; i++)
@@ -895,8 +899,6 @@ dprgio("d", n, pa, ca);
 
 	     if (gi >= 0)
 	        transfer_fd(pa[i], IO_STD_ERR, ca[gi], IO_STD_IN);};
-dprgio("e", n, pa, ca);
-
 
 /* connect all non-terminal children input to appropriate child output */
 	for (i = 1; i < nm; i++)
@@ -912,25 +914,22 @@ dprgio("e", n, pa, ca);
 	        gi = i - 1;
 
 	     if (gi >= 0)
-	        {
-int fd;
-    if (ca[gi]->io[IO_STD_OUT].gid == i)
-       {ca[gi]->io[IO_STD_OUT].hnd = IO_HND_PIPE;
-	fd             = ca[gi]->io[IO_STD_OUT].fd;
+	        {int fd;
 
-	pp->io[IO_STD_OUT].hnd = IO_HND_PIPE;
-	pp->io[IO_STD_OUT].fd  = fd;};
+		 if (ca[gi]->io[IO_STD_OUT].gid == i)
+		    {ca[gi]->io[IO_STD_OUT].hnd = IO_HND_PIPE;
+		     fd             = ca[gi]->io[IO_STD_OUT].fd;
 
-    if (ca[gi]->io[IO_STD_ERR].gid == i)
-       {ca[gi]->io[IO_STD_ERR].hnd = IO_HND_PIPE;
-	fd             = ca[gi]->io[IO_STD_ERR].fd;
+		     pp->io[IO_STD_OUT].hnd = IO_HND_PIPE;
+		     pp->io[IO_STD_OUT].fd  = fd;};
 
-	pp->io[IO_STD_IN].hnd = IO_HND_PIPE;
-	pp->io[IO_STD_IN].fd  = fd;};
-                     };};};
+		 if (ca[gi]->io[IO_STD_ERR].gid == i)
+		    {ca[gi]->io[IO_STD_ERR].hnd = IO_HND_PIPE;
+		     fd             = ca[gi]->io[IO_STD_ERR].fd;
 
+		     pp->io[IO_STD_IN].hnd = IO_HND_PIPE;
+		     pp->io[IO_STD_IN].fd  = fd;};};};};
 
-dprgio("reconnect_pgrp", n, pa, ca);
 
 dprgrp(pg);
 
