@@ -1,0 +1,82 @@
+#!/bin/csh -f
+#
+# EXT - test aexec
+#
+
+@ err = 0
+
+alias pe  'aexec "\!*"'
+alias pg  'eval `aexec "\!*"`'
+
+set proc = TRUE
+set proc = FALSE
+set var  = TRUE
+
+set echo 
+set verbose
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# processes only
+
+if ($proc == TRUE) then
+
+   echo "--------------------------"
+   echo "ls aexec.c foo.h @o+1 @e+2 cat -n @ cat -E"
+   pe ls aexec.c foo.h @o+1 @e+2 cat -n @ cat -E
+   echo "status = $status"
+
+   echo "--------------------------"
+   echo "ls aexec.c foo.h @o2 @e3 cat -n @ cat -E"
+   pe ls aexec.c foo.h @o2 @e3 cat -n @ cat -E
+   echo "status = $status"
+
+   echo "--------------------------"
+   echo "ls aexec.c foo.h @o2 @e2 cat -n"
+   pe ls aexec.c foo.h @o2 @e2 cat -n
+   echo "status = $status"
+
+   echo "--------------------------"
+   echo "ls aexec.c foo.h @b2 cat -n"
+   pe ls aexec.c foo.h @b2 cat -n
+   echo "status = $status"
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# VARIABLES - test redirections with variables
+#           - the -v <var> MUST come first and mode last
+
+if ($var == TRUE) then
+#   echo "--------------------------"
+#   echo "date @o2 aexec -v foo -w"
+#   pg date @o2 aexec -v foo -w
+#   echo "foo     = $foo"
+#   echo "xstatus = $xstatus"
+
+#   echo "--------------------------"
+#   echo "date @o2 aexec -v foo -rw"
+#   pg date @o2 aexec -v foo -rw
+#   echo "foo     = $foo"
+#   echo "xstatus = $xstatus"
+
+#   echo "--------------------------"
+#   echo "date @b2 aexec -v foo -w"
+#   pg date @b2 aexec -v foo -w
+#   echo "foo     = $foo"
+#   echo "xstatus = $xstatus"
+
+   echo "--------------------------"
+   echo "date @o2 @o3 aexec -v foo -w @ aexec -v bar -w"
+   pg date @o2 @o3 aexec -v foo -w @ aexec -v bar -w
+   echo "foo     = $foo"
+   echo "bar     = $bar"
+   echo "xstatus = $xstatus"
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($err)

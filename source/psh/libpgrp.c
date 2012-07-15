@@ -936,7 +936,9 @@ static void reconnect_pgrp(process_group *pg)
 		     pp->io[IO_STD_IN].fd  = fd;};};};};
 
 
-dprgrp(pg);
+#ifdef DEBUG
+    dprgrp(pg);
+#endif
 
     return;}
 
@@ -1070,7 +1072,10 @@ static void parse_pgrp(statement *s)
     pg->terminal = pa[it - 1];
 
     reconnect_pgrp(pg);
+
+#ifdef DEBUG
     printf("-> %s\n", s->text);
+#endif
 
     s->np = it;
     s->pg = pg;
@@ -1102,7 +1107,10 @@ int _pgrp_reject(int fd, process *pp, char *s)
    {int rv;
 
     rv = TRUE;
+
+#ifdef DEBUG
     printf("reject> %d %s (%s)\n", fd, pp->cmd, s);
+#endif
 
     return(rv);}
 
@@ -1175,10 +1183,12 @@ int _pgrp_tty(char *tag)
 	 n += job_running(pp);};
 
     rv = (n != 0);
-/*
+
+#ifdef DEBUG
     if (rv == TRUE)
        printf("all done\n");
-*/
+#endif
+
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
@@ -1191,7 +1201,9 @@ int _pgrp_tty(char *tag)
 void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
    {
 
+#ifdef DEBUG
 /*     printf("work method pid=%d i=%d\n", getpid(), i); */
+#endif
 
     return;}
 
@@ -1253,7 +1265,10 @@ static int run_pgrp(statement *s)
 	asetup(np, 1);
 
 	register_io_pgrp(pg);
-dprgio("run_pgrp", np, pg->parents, pg->children);
+
+#ifdef DEBUG
+	dprgio("run_pgrp", np, pg->parents, pg->children);
+#endif
 
 /* launch the jobs - io_data passed to macc, myrej, and mydone */
 	for (i = 0; i < np; i++)
@@ -1289,7 +1304,7 @@ dprgio("run_pgrp", np, pg->parents, pg->children);
 	    rv |= st[i];
 
 /* export group status */
-        snprintf(t, MAXLINE, "set xstatus = (");
+        snprintf(t, MAXLINE, "\nset xstatus = (");
 	for (i = 0; i < np; i++)
 	    vstrcat(t, MAXLINE, " %d", st[i]);
         vstrcat(t, MAXLINE, " )");
