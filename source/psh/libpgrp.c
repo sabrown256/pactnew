@@ -795,14 +795,19 @@ static int transfer_fd(process *pn, io_kind pk, process *cn, io_kind ck)
 
 static int watch_fd(process *pn, io_kind pk)
    {int fd;
-    io_device dev;
     io_hand hnd;
 
     fd  = pn->io[pk].fd;
-    dev = pn->io[pk].dev;
     hnd = pn->io[pk].hnd;
+
+#if 1
     if ((fd > 0) && (hnd != IO_HND_PIPE))
-/*    if ((fd > 0) && (dev == IO_DEV_TERM) && (hnd != IO_HND_PIPE)) */
+#else
+    io_device dev;
+    dev = pn->io[pk].dev;
+    if ((fd > 0) && (dev == IO_DEV_TERM) && (hnd != IO_HND_PIPE))
+#endif
+
        {_awatch_fd(pn, pk, pn->ip);
 
 	pn->io[pk].hnd = IO_HND_POLL;};
@@ -1080,7 +1085,7 @@ static void parse_pgrp(statement *s)
 
 /* _PGRP_ACCEPT - accept messages read from PP */
 
-int _pgrp_accept(process *pp, char *s)
+int _pgrp_accept(int fd, process *pp, char *s)
    {int rv;
 
     rv = fputs(s, stdout);
@@ -1093,11 +1098,11 @@ int _pgrp_accept(process *pp, char *s)
 
 /* _PGRP_REJECT - reject messages read from PP */
 
-int _pgrp_reject(process *pp, char *s)
+int _pgrp_reject(int fd, process *pp, char *s)
    {int rv;
 
     rv = TRUE;
-    printf("reject method\n");
+    printf("reject> %d %s (%s)\n", fd, pp->cmd, s);
 
     return(rv);}
 
@@ -1142,7 +1147,7 @@ void _pgrp_wait(process *pp)
     ASSERT(st != NULL);
 
 /* drain text from the job - apoll will no longer check it after this */
-    rv = job_read(pp, pp->accept);
+    rv = job_read(pp->io[IO_STD_IN].fd, pp, pp->accept);
     ASSERT(rv == 0);
 
     return;}
@@ -1155,11 +1160,25 @@ void _pgrp_wait(process *pp)
  */
 
 int _pgrp_tty(char *tag)
-   {int rv;
+   {int i, n, np, rv;
+    process *pp;
+
 
 /*    printf("tty method pid=%d  fd=%d\n", getpid(), fileno(stdin)); */
     rv = FALSE;
 
+    np = stck.np;
+
+/* count the running jobs */
+    for (n = 0, i = 0; i < np; i++)
+        {pp = stck.proc[i];
+	 n += job_running(pp);};
+
+    rv = (n != 0);
+/*
+    if (rv == TRUE)
+       printf("all done\n");
+*/
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
@@ -1219,6 +1238,7 @@ void register_io_pgrp(process_group *pg)
 static int run_pgrp(statement *s)
    {int i, np, rv, fd, tc;
     int *st;
+    char t[MAXLINE];
     process *pp;
     process_group *pg;
 
@@ -1263,9 +1283,17 @@ dprgio("run_pgrp", np, pg->parents, pg->children);
 /* close out the jobs */
 	afin(_pgrp_fin);
 
+/* find weak scalar return value */
 	rv = 0;
 	for (i = 0; i < np; i++)
 	    rv |= st[i];
+
+/* export group status */
+        snprintf(t, MAXLINE, "set xstatus = (");
+	for (i = 0; i < np; i++)
+	    vstrcat(t, MAXLINE, " %d", st[i]);
+        vstrcat(t, MAXLINE, " )");
+        printf("%s\n", t);
 
         FREE(st);};
 

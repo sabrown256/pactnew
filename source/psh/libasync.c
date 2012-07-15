@@ -192,8 +192,8 @@ struct s_process
     double start_time;
     double stop_time;
 
-    int (*accept)(process *pp, char *s);   /* accept messages read from job */
-    int (*reject)(process *pp, char *s);   /* reject messages read from job */
+    int (*accept)(int fd, process *pp, char *s);   /* accept messages read from job */
+    int (*reject)(int fd, process *pp, char *s);   /* reject messages read from job */
     void (*wait)(process *pp);              /* call when wait says its done */
     void *a;};                 /* external data associated with the process */
 
@@ -789,7 +789,7 @@ process *job_launch(char *cmd, char *mode, void *a)
  *          - return the number of lines read iff successful
  */
 
-int job_read(process *pp, int (*out)(process *pp, char *s))
+int job_read(int fd, process *pp, int (*out)(int fd, process *pp, char *s))
    {int nl;
     char s[LRG];
     char *p;
@@ -806,7 +806,7 @@ int job_read(process *pp, int (*out)(process *pp, char *s))
 		   break;
 		nl++;
 		if (out != NULL)
-		   (*out)(pp, s);};};};
+		   (*out)(fd, pp, s);};};};
 
     return(nl);}
 
@@ -875,11 +875,11 @@ int job_poll(process *pp, int to)
  */
 
 int job_response(process *pp, int to, char *fmt, ...)
-   {volatile int i, nl, nc, ns, ok, dt;
+   {volatile int i, nl, nc, ns, ok, dt, fd;
     char s[LRG], t[LRG];
     char *p;
     FILE *fi, *fo;
-    int (*rsp)(process *pp, char *s);
+    int (*rsp)(int fd, process *pp, char *s);
 
     VA_START(fmt);
 
@@ -897,6 +897,7 @@ int job_response(process *pp, int to, char *fmt, ...)
 
     if (job_alive(pp))
        {fi = pp->io[0].fp;
+	fd = pp->io[0].fd;
 	fo = pp->io[1].fp;
 	ns = strlen(s);
 	nc = -1;
@@ -924,14 +925,14 @@ int job_response(process *pp, int to, char *fmt, ...)
 			     break;};
 			 nl++;
 			 if (rsp != NULL)
-			    ok = (*rsp)(pp, t);};};
+			    ok = (*rsp)(fd, pp, t);};};
 
 		if (dt > 0)
 		   _job_timeout(0);}
 
 /* if we time out treat it as a reject message */
 	    else if (pp->reject != NULL)
-	       (*pp->reject)(pp, t);
+	       (*pp->reject)(-1, pp, t);
 
 	    if (ok == FALSE)
 	       nl = -2;};};
@@ -1039,7 +1040,7 @@ int job_done(process *pp, int sig)
 
     job_wait(pp);
 
-    rv = job_read(pp, pp->accept);
+    rv = job_read(-1, pp, pp->accept);
 
     _job_release(pp);
 
@@ -1154,8 +1155,8 @@ static void _afinish(void)
  */
 
 process *alaunch(int sip, char *cmd, char *mode, void *a,
-		 int (*acc)(process *pp, char *s),
-		 int (*rej)(process *pp, char *s),
+		 int (*acc)(int fd, process *pp, char *s),
+		 int (*rej)(int fd, process *pp, char *s),
 		 void (*wt)(process *pp))
    {int ip;
     process *pp;
@@ -1242,11 +1243,11 @@ int apoll(int to)
 			  {if ((map[ifd] == j) && (io[ifd] == fd))
 			      {if (rev & stck.mask_acc)
 				  {nrdy--;
-				   job_read(pp, pp->accept);}
+				   job_read(fd, pp, pp->accept);}
 
 			       else if (rev & stck.mask_rej)
 				  {nrdy--;
-				   job_read(pp, pp->reject);};};};};};};};
+				   job_read(fd, pp, pp->reject);};};};};};};};
 
     return(nrdy);}
 

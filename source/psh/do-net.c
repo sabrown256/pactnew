@@ -454,7 +454,7 @@ static void aexit(process *pp)
        notej(pp, "exited (%s/%d)", st, pp->reason);
 
 /* drain text from the job - apoll will no longer check it after this */
-    rv = job_read(pp, pp->accept);
+    rv = job_read(-1, pp, pp->accept);
     ASSERT(rv == 0);
 
     return;}
@@ -472,7 +472,7 @@ static void finup(process *pp, void *a)
 
     sp = (hfspec *) a;
 
-    job_read(pp, pp->accept);
+    job_read(-1, pp, pp->accept);
         
 /* since we are done with it kill the job if it is still running */
     if (job_running(pp))
