@@ -639,7 +639,7 @@ static int log_in(process *pp, char *ar, char *s)
 
 /* REJ_IN - read from pipe in SPEC */
 
-static int rej_in(process *pp, char *s)
+static int rej_in(int fd, process *pp, char *s)
    {int rv;
 
     rv = log_in(pp, "reject", s);
@@ -651,7 +651,7 @@ static int rej_in(process *pp, char *s)
 
 /* ACC_IN - read from pipe in SPEC */
 
-static int acc_in(process *pp, char *s)
+static int acc_in(int fd, process *pp, char *s)
    {int rv;
 
     rv = log_in(pp, "accept", s);

@@ -5,6 +5,8 @@
  *
  */
 
+/* #define DEBUG */
+
 #include "common.h"
 #include "libpsh.c"
 #include "libpgrp.c"
@@ -28,11 +30,9 @@ int do_file(int c, char **v)
     for (i = 0; i < c; i++)
         {if (strcmp(v[i], "-r") == 0)
 	    md = IO_MODE_RO;
-	 else if (strcmp(v[i], "-wo") == 0)
+	 else if (strcmp(v[i], "-w") == 0)
 	    md = IO_MODE_WO;
-	 else if (strcmp(v[i], "-wd") == 0)
-	    md = IO_MODE_WD;
-	 else if (strcmp(v[i], "-a") == 0)
+	 else if ((strcmp(v[i], "-rw") == 0) || (strcmp(v[i], "-a") == 0))
 	    md = IO_MODE_APPEND;
 	 else
 	    fn = v[i];};
@@ -46,7 +46,8 @@ int do_file(int c, char **v)
 		 while (feof(fp) == FALSE)
 		    {p = fgets(t, MAXLINE, fp);
 		     if (p != NULL)
-		        fputs(p, stdout);};
+		        fputs(p, stdout);
+		     sched_yield();};
 
 		 fclose(fp);
 		 break;
@@ -60,7 +61,8 @@ int do_file(int c, char **v)
 		 while (feof(stdin) == FALSE)
 		    {p = fgets(t, MAXLINE, stdin);
 		     if (p != NULL)
-		        fputs(p, fp);};
+		        fputs(p, fp);
+		     sched_yield();};
 
 		 fclose(fp);
 		 break;
@@ -70,7 +72,8 @@ int do_file(int c, char **v)
 		 while (feof(stdin) == FALSE)
 		    {p = fgets(t, MAXLINE, stdin);
 		     if (p != NULL)
-		        fputs(p, fp);};
+		        fputs(p, fp);
+		     sched_yield();};
 
 		 fclose(fp);
 		 break;
@@ -119,10 +122,11 @@ int do_var(int c, char **v)
 		    {p = fgets(t, MAXLINE, stdin);
 		     if (p != NULL)
 		        {LAST_CHAR(t) = '\0';
-			 sa = lst_add(sa, t);};};
+			 sa = lst_add(sa, t);
+		       sched_yield();};};
 
 		 vl = concatenate(t, MAXLINE, sa, " ");
-		 printf("setenv %s \"%s\"\n", vr, vl);
+		 printf("setenv %s \"%s\" ; ", vr, vl);
 
 		 break;
 
@@ -142,9 +146,10 @@ int do_var(int c, char **v)
 		        {LAST_CHAR(t) = '\0';
 			 sa = lst_add(sa, t);
 			 vl = concatenate(t, MAXLINE, sa, " ");
-			 fprintf(stdout, "%s\n", vl);};};
+			 fprintf(stdout, "%s\n", vl);};
+		       sched_yield();};
 
-		 fprintf(stdout, "setenv %s \"%s\"\n", vr, vl);
+		 fprintf(stdout, "setenv %s \"%s\" ; ", vr, vl);
 
 		 break;
 
@@ -175,6 +180,10 @@ int help(void)
 int main(int c, char **v, char **env)
    {int i, rv;
 
+#ifdef DEBUG
+printf("main> a c = %d\n", c);
+#endif
+
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-f") == 0)
             {rv = do_file(c-i-1, v+i+1);
@@ -188,6 +197,10 @@ int main(int c, char **v, char **env)
 	 else
 	    {rv = aexec(c-1, v+1, env);
 	     break;};};
+
+#ifdef DEBUG
+printf("main> z\n");
+#endif
 
     return(rv);}
 

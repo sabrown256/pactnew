@@ -756,6 +756,10 @@ static int _SC_leh_clear_screen(lehloc *lp)
 static int _SC_leh_intr(lehloc *lp)
    {
 
+    _SC_leh_disa_raw(STDIN_FILENO);
+
+    kill(0, SIGINT);
+
     errno = EAGAIN;
 
     return(FALSE);}
@@ -773,6 +777,38 @@ static int _SC_leh_cr(lehloc *lp)
     rv = lp->len;
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_LEH_RESUME - resume foreground execution */
+
+static void _SC_leh_resume(int sig)
+   {
+
+/* return to raw mode */
+    _SC_leh_ena_raw(STDIN_FILENO);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SC_LEH_SUSPEND - suspend the process group */
+
+static int _SC_leh_suspend(lehloc *lp)
+   {
+
+/* switch to cooked mode for terminal */
+    _SC_leh_disa_raw(STDIN_FILENO);
+
+/* put handler on SIGCONT */
+    SC_signal_n(SIGCONT, _SC_leh_resume, NULL);
+
+/* send ourselves a STOP */
+    kill(getpid(), SIGSTOP);
+
+    return(TRUE);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -853,6 +889,7 @@ void SC_leh_emacs_mode(void)
         map[CTRL_P] = _SC_leh_prev_line;
         map[CTRL_T] = _SC_leh_exch_char;
         map[CTRL_U] = _SC_leh_kill_line;
+        map[CTRL_Z] = _SC_leh_suspend;
         map[BSP]    = _SC_leh_del_back;
         map[ESC]    = _SC_leh_esc;};
 

@@ -818,7 +818,7 @@ PM_matrix *PM_decomp(PM_matrix *a, int *ips, int flag, int *pnc)
 
 /* begin the sub-diagonal element, alpha(i,j) */
 
-#pragma omp parallel for private(k, ulc, alp, size) shared(ipv, big)
+/* #pragma omp parallel for private(k, ulc, alp, size) shared(ipv, big) */
          for (i = j; i < n; i++)
              {ulc = ula + i*n;
               alp = ulc[j];

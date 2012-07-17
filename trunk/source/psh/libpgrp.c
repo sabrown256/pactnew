@@ -35,6 +35,9 @@
  *           - <io-dst>    := <io-kind>
  *           - 
  *
+ * read http://www.gnu.org/software/libc/manual/html_node/Implementing-a-Shell.html#Implementing-a-Shell
+ * for a good discussion of shell-like job control
+ *
  * #include "cpyright.h"
  *
  */
@@ -52,6 +55,7 @@
 #define N_IO_CH         3
 
 typedef struct s_statement statement;
+typedef struct s_process_session process_session;
 
 struct s_statement
    {int np;                 /* number of processes in group */
@@ -60,6 +64,13 @@ struct s_statement
     char *shell;            /* shell which runs the individual processes */
     char **env;
     process_group *pg;};
+
+struct s_process_session
+   {pid_t pgid;                        /* OS process group id */
+    int terminal;                      /* file descriptor of stdin */
+    int interactive;                   /* TRUE iff interactive session */
+    int foreground;                    /* TRUE iff current job is foreground */
+    struct termios attr;};             /* terminal attributes */
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -110,12 +121,12 @@ void dprgrp(process_group *pg)
         {pps = pg->parents[i];
 
 	 if (pps->ios == NULL)
-	    snprintf(s, MAXLINE, "%3d: end\n     ", i);
+	    snprintf(s, MAXLINE, "%3d: end\ndbg>      ", i);
 	 else
 	    {snprintf(s, MAXLINE, "%3d:", i);
 	     for (j = 0; pps->ios[j] != NULL; j++)
 	         vstrcat(s, MAXLINE, " %s ", pps->ios[j]);
-	     vstrcat(s, MAXLINE, "\n     ");};
+	     vstrcat(s, MAXLINE, "\ndbg>      ");};
 
 /* stdin */
 	 fds = pps->io + IO_STD_IN;
@@ -197,7 +208,7 @@ void dprgrp(process_group *pg)
     sa[n] = NULL;
 
     for (i = 0; i < n; i++)
-        printf("%s\n", sa[i]);
+        printf("dbg> %s\n", sa[i]);
 
     free_strings(sa);
 
@@ -224,7 +235,7 @@ void dprdio(iodes *pio)
     knd = kn[pio->knd + 1];
     dev = dn[pio->dev];
 
-    printf("%4s %3d %3d %4s %4s %4s\n",
+    printf("dbg> %4s %3d %3d %4s %4s %4s\n",
 	   io, fd, gid, hnd, knd, dev);
 
     return;}
@@ -238,8 +249,8 @@ void dprpio(char *tag, process *pp)
    {int i;
     iodes *pio;
 
-    printf("%s\n", tag);
-    printf("Unit  fd gid  hnd  knd  dev\n");
+    printf("dbg> %s\n", tag);
+    printf("dbg> Unit  fd gid  hnd  knd  dev\n");
     for (i = 0; i < N_IO_CHANNELS; i++)
         {pio = pp->io + i;
 	 dprdio(pio);};
@@ -256,14 +267,14 @@ void dprgio(char *tag, int n, process **pa, process **ca)
     char *hnd;
     process *pp, *cp;
 
-    printf("----------------------------------------------------\n");
-    printf("%s\n\n", tag);
+    printf("dbg> ----------------------------------------------------\n");
+    printf("dbg> %s\ndbg>\n", tag);
 
     for (i = 0; i < n; i++)
         {pp = pa[i];
 	 cp = ca[i];
 	 if ((pp != NULL) && (cp != NULL))
-	    {printf("command: %s\n", pp->cmd);
+	    {printf("dbg> command: %s\n", pp->cmd);
              switch (pp->io[1].hnd)
 	        {case IO_HND_PIPE :
 		      hnd = "pipe";
@@ -277,7 +288,7 @@ void dprgio(char *tag, int n, process **pa, process **ca)
 	         default :
 		      hnd = "none";
 		      break;};
-	     printf("   stdin:  %3d(%s) -> %3d\n",
+	     printf("dbg>    stdin:  %3d(%s) -> %3d\n",
 		    pp->io[1].fd, hnd, cp->io[0].fd);
 
              switch (pp->io[0].hnd)
@@ -293,7 +304,7 @@ void dprgio(char *tag, int n, process **pa, process **ca)
 	         default :
 		      hnd = "none";
 		      break;};
-	     printf("   stdout: %3d(%s) <- %3d\n",
+	     printf("dbg>    stdout: %3d(%s) <- %3d\n",
 		    pp->io[0].fd, hnd, cp->io[1].fd);
 
              switch (pp->io[2].hnd)
@@ -309,12 +320,12 @@ void dprgio(char *tag, int n, process **pa, process **ca)
 	         default :
 		      hnd = "none";
 		      break;};
-	     printf("   stderr: %3d(%s) <- %3d\n",
+	     printf("dbg>    stderr: %3d(%s) <- %3d\n",
 		    pp->io[2].fd, hnd, cp->io[2].fd);
 
-	     printf("\n");};};
+	     printf("dbg>\n");};};
 
-    printf("----------------------------------------------------\n");
+    printf("dbg> ----------------------------------------------------\n");
 
     return;}
 
@@ -1074,7 +1085,7 @@ static void parse_pgrp(statement *s)
     reconnect_pgrp(pg);
 
 #ifdef DEBUG
-    printf("-> %s\n", s->text);
+    printf("dbg> pgrp: %s\n", s->text);
 #endif
 
     s->np = it;
@@ -1109,7 +1120,7 @@ int _pgrp_reject(int fd, process *pp, char *s)
     rv = TRUE;
 
 #ifdef DEBUG
-    printf("reject> %d %s (%s)\n", fd, pp->cmd, s);
+    printf("dbg> reject: fd(%d) cmd(%s) txt(%s)\n", fd, pp->cmd, s);
 #endif
 
     return(rv);}
@@ -1172,7 +1183,7 @@ int _pgrp_tty(char *tag)
     process *pp;
 
 
-/*    printf("tty method pid=%d  fd=%d\n", getpid(), fileno(stdin)); */
+/*    printf("dbg> tty method pid=%d  fd=%d\n", getpid(), fileno(stdin)); */
     rv = FALSE;
 
     np = stck.np;
@@ -1186,7 +1197,7 @@ int _pgrp_tty(char *tag)
 
 #ifdef DEBUG
     if (rv == TRUE)
-       printf("all done\n");
+       printf("dbg> all done\n");
 #endif
 
     return(rv);}
@@ -1202,7 +1213,7 @@ void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
    {
 
 #ifdef DEBUG
-/*     printf("work method pid=%d i=%d\n", getpid(), i); */
+/*     printf("dbg> work method pid=%d i=%d\n", getpid(), i); */
 #endif
 
     return;}
@@ -1270,7 +1281,7 @@ static int run_pgrp(statement *s)
 	dprgio("run_pgrp", np, pg->parents, pg->children);
 #endif
 
-/* launch the jobs - io_data passed to macc, myrej, and mydone */
+/* launch the jobs - io_data passed to accept, reject, and wait methods */
 	for (i = 0; i < np; i++)
 	    {pp = _job_fork(pg->parents[i], pg->children[i],
 			    NULL, "rw", st);
@@ -1279,10 +1290,20 @@ static int run_pgrp(statement *s)
 	     pp->wait     = _pgrp_wait;
 	     pp->nattempt = 1;
 	     pp->ip       = i;
-
+/*
 	     fd = pp->io[0].fd;
 	     rv = block_fd(fd, FALSE);
-	     ASSERT(rv == 0);
+*/
+	     ASSERT(rv == 0);};
+
+/* poll all the newly launched jobs so they are checked at least once
+ * when all the connections are finally setup and active
+ * which it not the case in the loop where they are launched
+ */
+	for (i = 0; i < np; i++)
+	    {pp = pg->parents[i];
+
+	     fd = pp->io[0].fd;
 
 	     stck.proc[i]       = pp;
 	     stck.fd[i].fd      = fd;
@@ -1304,7 +1325,7 @@ static int run_pgrp(statement *s)
 	    rv |= st[i];
 
 /* export group status */
-        snprintf(t, MAXLINE, "\nset xstatus = (");
+        snprintf(t, MAXLINE, "set xstatus = (");
 	for (i = 0; i < np; i++)
 	    vstrcat(t, MAXLINE, " %d", st[i]);
         vstrcat(t, MAXLINE, " )");
@@ -1417,6 +1438,124 @@ statement *parse_statement(char *s, char **env, char *shell)
 	FREE(t);};
 
     return(sa);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+  
+/* INIT_SESSION - initialize a process session instance
+ *              - setup OS level process group properly
+ *              - make sure the session is running interactively
+ *              - as the foreground job before proceeding
+ */
+     
+process_session *init_session(void)
+   {int pgid, tid, fin, iact;
+    struct termios attr;
+    process_session *ps;
+     
+    ps   = NULL;
+    fin  = STDIN_FILENO;
+    iact = isatty(fin);
+     
+    if (iact == TRUE)
+
+/* make sure we are in the foreground */
+       {while (TRUE)
+	  {pgid = getpgrp();
+	   tid  = tcgetpgrp(fin);
+	   if (tid == pgid)
+	      break;
+	   kill(-pgid, SIGTTIN);};
+     
+/* ignore interactive and job-control signals */
+	signal(SIGINT,  SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
+	signal(SIGTSTP, SIG_IGN);
+	signal(SIGTTIN, SIG_IGN);
+	signal(SIGTTOU, SIG_IGN);
+	signal(SIGCHLD, SIG_IGN);
+     
+/* put the current process in its own group */
+	pgid = getpid();
+	if (setpgid(pgid, pgid) < 0)
+	   printf("Couldn't put the session in its own process group");
+
+	else
+     
+/* take control of the terminal */
+	   {tcsetpgrp(fin, pgid);
+     
+/* save default terminal attributes for session */
+	    tcgetattr(fin, &attr);
+
+	    ps = MAKE(process_session);
+	    if (ps != NULL)
+	       {ps->pgid        = pgid;
+		ps->terminal    = fin;
+		ps->interactive = iact;
+		ps->foreground  = TRUE;
+		ps->attr        = attr;};};};
+
+    return(ps);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* JOB_FOREGROUND - put PP in the foreground
+ *                - if cont is TRUE restore the saved terminal modes and
+ *                - send the process group a SIGCONT signal to
+ *                - wake it up before we block
+ */
+     
+void job_foreground(process_session *ps, process *pp, int cont)
+   {struct termios attr;
+
+/*    attr = pp->trm_attr; */
+
+/* put the job into the foreground  */
+    tcsetpgrp(ps->terminal, pp->pgid);
+     
+/* send the job a continue signal, if necessary */
+    if (cont == TRUE)
+       {tcsetattr(ps->terminal, TCSADRAIN, &attr);
+	if (kill(- pp->pgid, SIGCONT) < 0)
+	   perror("kill(SIGCONT)");};
+     
+/* wait for it to report */
+    job_wait(pp);
+     
+/* put the shell back in the foreground */
+    tcsetpgrp(ps->terminal, ps->pgid);
+     
+/* restore the shell's terminal modes */
+    tcgetattr(ps->terminal, &attr);
+    tcsetattr(ps->terminal, TCSADRAIN, &ps->attr);
+
+    ps->foreground = TRUE;
+
+/*    pp->trm_attr = attr; */
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* JOB_BACKGROUND - put PP in the background
+ *                - if CONT is TRUE send the process group
+ *                - a SIGCONT signal to wake it up
+ */
+     
+void job_background(process_session *ps, process *pp, int cont)
+   {
+
+/* send the job a continue signal */
+    if (cont == TRUE)
+       {if (kill(-pp->pgid, SIGCONT) < 0)
+           perror("kill(SIGCONT)");};
+
+    ps->foreground = FALSE;
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
