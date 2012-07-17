@@ -230,7 +230,7 @@ static void send_cached(atdbgdes *st)
 
 /* RSP_ERROR - handle errors such as timeouts or poll rejects */
 
-static int rsp_error(process *pp, char *t)
+static int rsp_error(int fd, process *pp, char *t)
    {int ok;
     dbgrsp *gr;
     atdbgdes *st;
@@ -253,7 +253,7 @@ static int rsp_error(process *pp, char *t)
 
 /* RSP_TOTALVIEW - handle lines from the totalview CLI */
 
-static int rsp_totalview(process *pp, char *t)
+static int rsp_totalview(int fd, process *pp, char *t)
    {int ok, nc;
     char p[MAXLINE];
     char *s, *pa, *pb, *pr;
@@ -365,7 +365,7 @@ static int use_totalview(atdbgdes *st, atproc *al)
 
 /* RSP_GDB - handle lines from GDB */
 
-static int rsp_gdb(process *pp, char *t)
+static int rsp_gdb(int fd, process *pp, char *t)
    {int ok, nc;
     char p[MAXLINE];
     char *s, *pr, *u;

@@ -12,8 +12,8 @@ set proc = TRUE
 set proc = FALSE
 set var  = TRUE
 
-set echo 
-set verbose
+#set echo 
+#set verbose
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -50,30 +50,37 @@ endif
 #           - the -v <var> MUST come first and mode last
 
 if ($var == TRUE) then
-#   echo "--------------------------"
-#   echo "date @o2 aexec -v foo -w"
-#   pg date @o2 aexec -v foo -w
-#   echo "foo     = $foo"
-#   echo "xstatus = $xstatus"
-
-#   echo "--------------------------"
-#   echo "date @o2 aexec -v foo -rw"
-#   pg date @o2 aexec -v foo -rw
-#   echo "foo     = $foo"
-#   echo "xstatus = $xstatus"
-
-#   echo "--------------------------"
-#   echo "date @b2 aexec -v foo -w"
-#   pg date @b2 aexec -v foo -w
-#   echo "foo     = $foo"
-#   echo "xstatus = $xstatus"
 
    echo "--------------------------"
-   echo "date @o2 @o3 aexec -v foo -w @ aexec -v bar -w"
-   pg date @o2 @o3 aexec -v foo -w @ aexec -v bar -w
-   echo "foo     = $foo"
-   echo "bar     = $bar"
-   echo "xstatus = $xstatus"
+   unsetenv foo
+   echo "command: date @o2 aexec -v foo -r"
+   pg date @o2 aexec -v foo -r
+   echo "> foo     = `printenv foo`"
+   echo "> xstatus = $xstatus"
+
+   echo "--------------------------"
+   echo "command: cat @i2 aexec -v foo -w"
+   pe cat @i2 aexec -v foo -w
+
+#   echo "--------------------------"
+#   echo "command: date @o2 aexec -v foo -rw"
+#   pe date @o2 aexec -v foo -rw
+#   echo "> foo     = $foo"
+#   echo "> xstatus = $xstatus"
+
+   echo "--------------------------"
+   echo "command: date @b2 aexec -v foo -r"
+   pe date @b2 aexec -v foo -r
+#   echo "> foo     = $foo"
+#   echo "> xstatus = $xstatus"
+
+   echo "--------------------------"
+   unsetenv foo
+   echo "command: date @o2 @e3 aexec -v foo -r @ aexec -v bar -r"
+   pg date @o2 @e3 aexec -v foo -r @ aexec -v bar -r
+   echo "> foo     = `printenv foo`"
+   echo "> bar     = `printenv bar`"
+   echo "> xstatus = $xstatus"
 endif
 
 #--------------------------------------------------------------------------

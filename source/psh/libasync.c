@@ -176,6 +176,7 @@ struct s_iodes
 struct s_process
    {int ip;                                                /* process index */
     int id;                                      /* process id of the child */
+    int pgid;                                  /* OS level process group id */
     int status;            /* process status - JOB_RUNNING, JOB_EXITED, ... */
     int reason; /* reason for latest status change - also child exit status */
     int ischild;                             /* TRUE iff started as a child */
@@ -299,6 +300,7 @@ static process *_job_mk_process(int child, char **arg,
     if (pp != NULL)
        {pp->ip          = -1;
 	pp->id          = -1;
+	pp->pgid        = getpgrp();
 	pp->status      = JOB_NOT_FINISHED;
 	pp->reason      = JOB_NOT_FINISHED;
 	pp->ischild     = child;
@@ -407,7 +409,32 @@ static int _job_exec(process *cp, char **argv, char **env, char *mode)
     err = 0;
 
     if (cp != NULL)
-       {for (i = 0; i < N_IO_CHANNELS; i++)
+       {
+
+/* put the process into the process group and
+ * give the process group the terminal
+ */
+#if 1
+	int pid, pgid, fg;
+
+	fg   = TRUE;
+	pid  = getpid();
+	pgid = cp->pgid;
+	setpgid(pid, pgid);
+	if (fg == TRUE)
+	   tcsetpgrp(STDIN_FILENO, pgid);
+#endif
+     
+/* reset the signal handlers for the child */
+	signal (SIGINT, SIG_DFL);
+	signal (SIGQUIT, SIG_DFL);
+	signal (SIGTSTP, SIG_DFL);
+	signal (SIGTTIN, SIG_DFL);
+	signal (SIGTTOU, SIG_DFL);
+	signal (SIGCHLD, SIG_DFL);
+
+/* setup the I/O descriptors */
+	for (i = 0; i < N_IO_CHANNELS; i++)
 	    io[i] = cp->io[i].fd;
 
 #if 0
@@ -566,6 +593,15 @@ static int _job_parent_fork(process *pp, process *cp, char *mode)
    
     st = TRUE;
 
+#if 1
+    int pid, pgid;
+
+    pid  = pp->id;
+    pgid = pp->pgid;
+    if (isatty(STDIN_FILENO) == TRUE)
+       setpgid(pid, pgid);
+#endif
+
     pp->id         = cp->id;
     pp->start_time = wall_clock_time();
     pp->stop_time  = 0.0;
@@ -576,6 +612,8 @@ static int _job_parent_fork(process *pp, process *cp, char *mode)
 	    setbuf(pp->io[i].fp, NULL);};
 
     _job_free(cp);
+
+    sched_yield();
 
     return(st);}
 
@@ -806,7 +844,8 @@ int job_read(int fd, process *pp, int (*out)(int fd, process *pp, char *s))
 		   break;
 		nl++;
 		if (out != NULL)
-		   (*out)(fd, pp, s);};};};
+		   out(fd, pp, s);
+		sched_yield();};};};
 
     return(nl);}
 
@@ -925,14 +964,14 @@ int job_response(process *pp, int to, char *fmt, ...)
 			     break;};
 			 nl++;
 			 if (rsp != NULL)
-			    ok = (*rsp)(fd, pp, t);};};
+			    ok = rsp(fd, pp, t);};};
 
 		if (dt > 0)
 		   _job_timeout(0);}
 
 /* if we time out treat it as a reject message */
 	    else if (pp->reject != NULL)
-	       (*pp->reject)(-1, pp, t);
+	       pp->reject(-1, pp, t);
 
 	    if (ok == FALSE)
 	       nl = -2;};};
@@ -975,13 +1014,15 @@ void job_wait(process *pp)
 	    pp->status    = cnd;
 	    pp->reason    = sts;
 
+#if 0
 /* effect a 1 ms delay - without which a process group will hang
  * e.g. aexec "ls aexec.c foo.h @o+1 @e+2 cat -n @ cat -E"
  */
 	    poll(NULL, 0, 1);
+#endif
 
 	    if (pp->wait != NULL)
-	       {(*pp->wait)(pp);
+	       {pp->wait(pp);
 
 		for (i = 0; i < N_IO_CHANNELS; i++)
 		    {if (pp->io[i].fd >= 0)
@@ -1301,14 +1342,14 @@ int await(int tf, char *tag,
         {if (tty == NULL)
 	    st = FALSE;
 	 else
-	    st = (*tty)(tag);
+	    st = tty(tag);
 
 	 tc = wall_clock_time() - ti;
 	 nd = acheck();
 	 apoll(1000);
 
 	 if (f != NULL)
-	    (*f)(i, tag, a, nd, np, tc, tf);};
+	    f(i, tag, a, nd, np, tc, tf);};
 
     return(tc);}
 
@@ -1329,7 +1370,7 @@ void amap(void (*f)(process *pp, void *a))
 	 a  = pp->a;
 
 	 if (f != NULL)
-	    (*f)(pp, a);};
+	    f(pp, a);};
 
     return;}
 
