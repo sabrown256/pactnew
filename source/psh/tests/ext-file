@@ -1,0 +1,51 @@
+#!/bin/csh -f
+#
+# EXT-FILE - test aexec with files
+#
+
+@ err = 0
+
+alias pe  'aexec "\!*"'
+alias pg  'eval `aexec "\!*"`'
+
+#set echo 
+#set verbose
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   echo "--------------------------"
+   unsetenv foo
+   echo "command: date @o2 aexec -v foo -r"
+   pg date @o2 aexec -v foo -r
+   echo "> foo     = `printenv foo`"
+   echo "> xstatus = $xstatus"
+
+   echo "--------------------------"
+   echo "command: cat @i2 aexec -v foo -w"
+   pe cat @i2 aexec -v foo -w
+
+#   echo "--------------------------"
+#   echo "command: date @o2 aexec -v foo -rw"
+#   pe date @o2 aexec -v foo -rw
+#   echo "> foo     = $foo"
+#   echo "> xstatus = $xstatus"
+
+   echo "--------------------------"
+   echo "command: date @b2 aexec -v foo -r"
+   pe date @b2 aexec -v foo -r
+#   echo "> foo     = $foo"
+#   echo "> xstatus = $xstatus"
+
+   echo "--------------------------"
+   unsetenv foo
+   echo "command: date @o2 @e3 aexec -v foo -r @ aexec -v bar -r"
+   pg date @o2 @e3 aexec -v foo -r @ aexec -v bar -r
+   echo "> foo     = `printenv foo`"
+   echo "> bar     = `printenv bar`"
+   echo "> xstatus = $xstatus"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($err)

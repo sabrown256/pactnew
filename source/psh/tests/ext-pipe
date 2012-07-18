@@ -1,0 +1,39 @@
+#!/bin/csh -f
+#
+# EXT-PIPE - test aexec with old shell pipe syntax
+#
+
+@ err = 0
+
+alias pe  'echo "" ; echo "Command: \!*" ; aexec \!*'
+
+#set echo 
+#set verbose
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+echo "------------------------------------------------------------------------"
+echo ""
+echo "# simple stdout variants"
+
+   pe '/bin/echo foo | cat -n'
+   echo "status = $status"
+
+echo ""
+echo "------------------------------------------------------------------------"
+echo ""
+echo "# simple bonded stdout/stderr variants"
+
+   pe 'ls aexec.c foo.h | cat -n'
+   echo "status = $status"
+
+   pe 'ls aexec.c foo.h |& cat -n'
+   echo "status = $status"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+echo ""
+
+exit($err)

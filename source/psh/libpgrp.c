@@ -338,7 +338,8 @@ void dprgio(char *tag, int n, process **pa, process **ca)
 /* SET_IODES - parse IOS and set the members of IOS accordingly */
 
 int set_iodes(iodes *pio, char *ios)
-   {int ck, cd, fid, gid, nc, rel, pos, rv;
+   {int ck, cd, fid, gid, nc, ni, rel, pos, rv;
+    char *p;
     io_mode mode;
     io_device dev;
     io_kind knd;
@@ -355,11 +356,14 @@ int set_iodes(iodes *pio, char *ios)
     if (ios[0] == PROCESS_DELIM)
        ios++;
 
+    ni = strlen(ios);
     nc = 0;
     ck = ios[nc++];
-    cd = ios[nc++];
+    cd = (nc < ni) ? ios[nc++] : '?';
 
     if (ios != NULL)
+
+/* figure out the device type */
 
 /* get >&, &>, >>&, and &>> */
        {if ((strstr(ios, ">&") != NULL) ||
@@ -374,7 +378,7 @@ int set_iodes(iodes *pio, char *ios)
 	else if (strncmp(ios, "2>", 2) == 0)
 	   {knd = IO_STD_ERR;
 	    dev = IO_DEV_FILE;}
-#if 1
+
 	else if ((strstr(ios, "|&") != NULL) ||
 		 (strstr(ios, "&|") != NULL))
 	   {knd = IO_STD_BOND;
@@ -383,62 +387,64 @@ int set_iodes(iodes *pio, char *ios)
 	else if (strchr(ios, '|') != NULL)
 	   {knd = IO_STD_OUT;
 	    dev = IO_DEV_PIPE;}
-#endif
+
 	else
 	   {switch (ck)
 	       {case 'b' :
 		     knd = IO_STD_BOND;
+		     dev = IO_DEV_PIPE;
 		     break;
 		case 'e' :
 		     knd = IO_STD_ERR;
+		     dev = IO_DEV_PIPE;
 		     break;
 		case '<' :
 		     cd = ck;
 	        case 'i' :
 		     knd = IO_STD_IN;
+		     dev = IO_DEV_PIPE;
 		     break;
 		case '>' :
 		     cd = ck;
 	        case 'o' :
 		     knd = IO_STD_OUT;
+		     dev = IO_DEV_PIPE;
 		     break;};};
 
-/* next for the device type */
-	rel = FALSE;
-	if (strchr("0123456789", cd) != NULL)
-	   {dev = IO_DEV_PTY;
-	    dev = IO_DEV_SOCKET;
-	    dev = IO_DEV_PIPE;
-	    nc--;};
+	rel = TRUE;
 
-	switch (cd)
-	   {case '+' :
-	    case '-' :
-	         dev = IO_DEV_PTY;
-	         dev = IO_DEV_SOCKET;
-	         dev = IO_DEV_PIPE;
-		 rel = TRUE;
-		 break;
-	    case 'e' :
-	    case '&' :
-	         dev = IO_DEV_EXPR;
-		 break;
-	    case 'f' :
-	    case 'w' :
-	    case '!' :
-	    case 'a' :
-	    case '>' :
-	         dev = IO_DEV_FILE;
-		 break;
-	    case 'v' :
-	         dev = IO_DEV_VAR;
-		 break;
-	    case 't' :
-	         dev = IO_DEV_TERM;
-		 break;};
+	if (strchr("0123456789", cd) != NULL)
+	   {rel = FALSE;
+	    nc--;}
+	else if (strchr("+-", cd) != NULL)
+	   rel = TRUE;
+	else
+	   {switch (cd)
+	       {case 'e' :
+		case '&' :
+		     dev = IO_DEV_EXPR;
+		     break;
+		case 'f' :
+		case 'w' :
+		case '!' :
+		case 'a' :
+		case '>' :
+		     dev = IO_DEV_FILE;
+		     break;
+		case 'v' :
+		     dev = IO_DEV_VAR;
+		     break;
+		case 't' :
+		     dev = IO_DEV_TERM;
+		     break;};};
 
 	if (dev == IO_DEV_PIPE)
-	   {pos = atoi(ios+nc);
+	   {p = ios + nc;
+	    if (IS_NULL(p) == TRUE)
+	       pos = (knd == IO_STD_IN) ? -1 : 1;
+	    else
+	       pos = atoi(ios+nc);
+
 	    if (rel == TRUE)
 	       gid += pos;
 	    else
