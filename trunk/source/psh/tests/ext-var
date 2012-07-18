@@ -5,8 +5,8 @@
 
 @ err = 0
 
-alias pe  'aexec "\!*"'
-alias pg  'eval `aexec "\!*"`'
+alias pe  'echo "" ; echo "Command: \!*" ; aexec "\!*"'
+alias pg  'echo "" ; echo "Command: \!*" ; eval `aexec "\!*"`'
 
 #set echo 
 #set verbose
@@ -14,38 +14,61 @@ alias pg  'eval `aexec "\!*"`'
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-   echo "--------------------------"
+echo "------------------------------------------------------------------------"
+echo ""
+echo "# simple stdout variants"
+
    unsetenv foo
-   echo "command: date @o2 aexec -v foo -r"
-   pg date @o2 aexec -v foo -r
+   pg date @o aexec -v foo -r
+   echo "> foo     = `printenv foo`"
+   echo "> xstatus = $xstatus"
+   echo "status = $status"
+
+echo "------------------------------------------------------------------------"
+echo ""
+echo "# simple stdin variants"
+
+   pe cat @i aexec -v foo -w
+   echo "status = $status"
+
+echo "------------------------------------------------------------------------"
+echo ""
+echo "# simple append variants"
+
+   pe date @o2 aexec -v foo -rw
    echo "> foo     = `printenv foo`"
    echo "> xstatus = $xstatus"
 
-   echo "--------------------------"
-   echo "command: cat @i2 aexec -v foo -w"
-   pe cat @i2 aexec -v foo -w
+echo "------------------------------------------------------------------------"
+echo ""
+echo "# simple bonded variants"
 
-#   echo "--------------------------"
-#   echo "command: date @o2 aexec -v foo -rw"
-#   pe date @o2 aexec -v foo -rw
-#   echo "> foo     = $foo"
-#   echo "> xstatus = $xstatus"
-
-   echo "--------------------------"
-   echo "command: date @b2 aexec -v foo -r"
    pe date @b2 aexec -v foo -r
-#   echo "> foo     = $foo"
-#   echo "> xstatus = $xstatus"
+   echo "> foo     = `printenv foo`"
+   echo "> xstatus = $xstatus"
+   echo "status = $status"
 
-   echo "--------------------------"
+echo "------------------------------------------------------------------------"
+echo ""
+echo "# non-simple stdout variants"
+
    unsetenv foo
-   echo "command: date @o2 @e3 aexec -v foo -r @ aexec -v bar -r"
    pg date @o2 @e3 aexec -v foo -r @ aexec -v bar -r
    echo "> foo     = `printenv foo`"
    echo "> bar     = `printenv bar`"
    echo "> xstatus = $xstatus"
+   echo "status = $status"
+
+   unsetenv foo
+   pg ls aexec.c foo.h @o2 @e3 aexec -v foo -r @ aexec -v bar -r
+   echo "> foo     = `printenv foo`"
+   echo "> bar     = `printenv bar`"
+   echo "> xstatus = $xstatus"
+   echo "status = $status"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
+
+echo ""
 
 exit($err)
