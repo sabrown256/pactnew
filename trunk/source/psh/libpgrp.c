@@ -647,6 +647,10 @@ static int redirect_fd(process *pp, int i)
 	     redir_io(pp->io, N_IO_CH, 2, &io);
 	     break;
         case IO_STD_BOND :
+	     io.fd = pp->io[2].fd;
+	     pp->io[2] = io;
+	     redir_io(pp->io, N_IO_CH, 2, &io);
+	     io.fd = pp->io[1].fd;
 	     pp->io[1] = io;
 #ifdef NEWWAY
 
@@ -659,8 +663,6 @@ static int redirect_fd(process *pp, int i)
 #else
 	     redir_io(pp->io, N_IO_CH, 1, &io);
 #endif
-	     pp->io[2] = io;
-	     redir_io(pp->io, N_IO_CH, 2, &io);
 	     break;
         default :
 	     break;};
@@ -793,7 +795,11 @@ static int transfer_fd(process *pn, io_kind pk, process *cn, io_kind ck)
     pn->io[pk].hnd = IO_HND_PIPE;
     fd             = pn->io[pk].fd;
 
-    close(cn->io[ck].fd);
+/* GOTCHA: we can close something we need in the bonded case
+ * or leak descriptors in the other cases
+ * better bookkeeping is needed here
+    _fd_close(cn->io[ck].fd);
+ */
     cn->io[ck].hnd = IO_HND_PIPE;
     cn->io[ck].fd  = fd;
 
@@ -880,8 +886,8 @@ static void reconnect_pgrp(process_group *pg)
 	    {pp = pa[i];
 	     cp = ca[i];
 
-	     close(pp->io[1].fd);
-	     close(cp->io[0].fd);
+	     _fd_close(pp->io[1].fd);
+	     _fd_close(cp->io[0].fd);
 /*
 	     pp->io[1].fd = -2;
 	     cp->io[0].fd = -2;
@@ -1082,6 +1088,10 @@ static void parse_pgrp(statement *s)
     pg->np       = it;
     pg->terminal = pa[it - 1];
 
+#ifdef DEBUG
+	dprgio("parse_pgrp", pg->np, pg->parents, pg->children);
+#endif
+
     reconnect_pgrp(pg);
 
 #ifdef DEBUG
@@ -1181,7 +1191,6 @@ void _pgrp_wait(process *pp)
 int _pgrp_tty(char *tag)
    {int i, n, np, rv;
     process *pp;
-
 
 /*    printf("dbg> tty method pid=%d  fd=%d\n", getpid(), fileno(stdin)); */
     rv = FALSE;

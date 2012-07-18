@@ -236,6 +236,22 @@ static sigjmp_buf
 
 /*--------------------------------------------------------------------------*/
 
+/* _FD_CLOSE - wrap close to be able to monitor/log them all */
+
+int _fd_close(int fd)
+   {int rv;
+
+#ifdef DEBUG
+    printf("dbg> closing %d\n", fd);
+#endif
+
+    rv = close(fd);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _INIT_IODES - initialize a set of N_IO_CH iodes structures */
 
 static void _init_iodes(int n, iodes *fd)
@@ -343,14 +359,14 @@ static int _job_release(process *pp)
 
 /* stdin */
 	if (io[0] >= 0)
-	   close(io[0]);
+	   _fd_close(io[0]);
 
 	if (pp->io[0].fp != NULL)
 	   fclose(pp->io[0].fp);
 
 /* stdout */
 	if ((io[0] != io[1]) && (io[1] >= 0))
-	   close(io[1]);
+	   _fd_close(io[1]);
 
 	if (pp->io[1].fp != NULL)
 	   fclose(pp->io[1].fp);
@@ -358,7 +374,7 @@ static int _job_release(process *pp)
 /* stderr */
 #if 1
 	if (io[2] >= 0)
-	   close(io[2]);
+	   _fd_close(io[2]);
 
 	if (pp->io[2].fp != NULL)
 	   fclose(pp->io[2].fp);
@@ -451,7 +467,7 @@ static int _job_exec(process *cp, char **argv, char **env, char *mode)
 
 /* now that they are copied release the old values */
 	for (i = 0; i < N_IO_CHANNELS; i++)
-	    close(io[i]);
+	    _fd_close(io[i]);
 
 /* exec the process with args and environment - this won't return */
 	err = execvp(argv[0], argv);};
@@ -525,8 +541,8 @@ static int _job_init_ipc(process *pp, process *cp)
 
 /* child stdin */
     if (pipe(ports) < 0)
-       {close(pp->io[0].fd);
-	close(cp->io[1].fd);
+       {_fd_close(pp->io[0].fd);
+	_fd_close(cp->io[1].fd);
 	fprintf(stdout, "COULDN'T CREATE PIPE #1 - _JOB_INIT_IPC");
 	return(FALSE);};
 
@@ -1026,7 +1042,7 @@ void job_wait(process *pp)
 
 		for (i = 0; i < N_IO_CHANNELS; i++)
 		    {if (pp->io[i].fd >= 0)
-		        close(pp->io[i].fd);
+		        _fd_close(pp->io[i].fd);
 
 		     if (pp->io[i].fp != NULL)
 		        fclose(pp->io[i].fp);
