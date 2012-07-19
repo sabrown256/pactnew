@@ -10,13 +10,18 @@
 #include "common.h"
 #include "libpsh.c"
 #include "libpgrp.c"
+#include "libdb.c"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DO_FILE - abstract file as process for AEXEC */
+/* DO_FILE - abstract file as process for AEXEC
+ *         - mode -r means stdin to file
+ *         -      -w means file to stdout
+ *         -      -a means stdin to file to stdout
+ */
 
-int do_file(int c, char **v)
+int do_file(char *db, int c, char **v)
    {int i, rv;
     io_mode md;
     char t[MAXLINE];
@@ -28,9 +33,9 @@ int do_file(int c, char **v)
     fn = NULL;
 
     for (i = 0; i < c; i++)
-        {if (strcmp(v[i], "-r") == 0)
+        {if (strcmp(v[i], "-w") == 0)
 	    md = IO_MODE_RO;
-	 else if (strcmp(v[i], "-w") == 0)
+	 else if (strcmp(v[i], "-r") == 0)
 	    md = IO_MODE_WO;
 	 else if ((strcmp(v[i], "-rw") == 0) || (strcmp(v[i], "-a") == 0))
 	    md = IO_MODE_APPEND;
@@ -86,9 +91,13 @@ int do_file(int c, char **v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DO_VAR - abstract variable as process for AEXEC */
+/* DO_VAR - abstract variable as process for AEXEC
+ *        - mode -r means stdin to var
+ *        -      -w means var to stdout
+ *        -      -a means stdin to var to stdout
+ */
 
-int do_var(int c, char **v)
+int do_var(char *db, int c, char **v)
    {int i, n, nc, ns, rv;
     io_mode md;
     char t[MAXLINE];
@@ -100,9 +109,9 @@ int do_var(int c, char **v)
     md = IO_MODE_NONE;
 
     for (i = 0; i < c; i++)
-        {if (strcmp(v[i], "-r") == 0)
+        {if (strcmp(v[i], "-w") == 0)
 	    md = IO_MODE_RO;
-	 else if (strcmp(v[i], "-w") == 0)
+	 else if (strcmp(v[i], "-r") == 0)
 	    md = IO_MODE_WO;
 	 else if ((strcmp(v[i], "-rw") == 0) || (strcmp(v[i], "-a") == 0))
 	    md = IO_MODE_APPEND;
@@ -126,7 +135,10 @@ int do_var(int c, char **v)
 		       sched_yield();};};
 
 		 vl = concatenate(t, MAXLINE, sa, " ");
-		 printf("setenv %s \"%s\" ; ", vr, vl);
+		 if (db == NULL)
+		    printf("setenv %s \"%s\" ; ", vr, vl);
+		 else
+		    dbset(NULL, vr, vl);
 
 		 break;
 
@@ -149,7 +161,10 @@ int do_var(int c, char **v)
 			 fprintf(stdout, "%s\n", vl);};
 		       sched_yield();};
 
-		 fprintf(stdout, "setenv %s \"%s\" ; ", vr, vl);
+		 if (db == NULL)
+		    printf("setenv %s \"%s\" ; ", vr, vl);
+		 else
+		    dbset(NULL, vr, vl);
 
 		 break;
 
@@ -179,23 +194,26 @@ int help(void)
 
 int main(int c, char **v, char **env)
    {int i, rv;
+    char *db;
 
 #ifdef DEBUG
 printf("main> a c = %d\n", c);
 #endif
 
+    db = getenv("PERDB_PATH");
+
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-f") == 0)
-            {rv = do_file(c-i-1, v+i+1);
+            {rv = do_file(db, c-i-1, v+i+1);
 	     break;}
          else if (strcmp(v[i], "-h") == 0)
             {rv = help();
 	     break;}
 	 else if (strcmp(v[i], "-v") == 0)
-            {rv = do_var(c-i-1, v+i+1);
+            {rv = do_var(db, c-i-1, v+i+1);
 	     break;}
 	 else
-	    {rv = aexec(c-1, v+1, env);
+	    {rv = aexec(db, c-1, v+1, env);
 	     break;};};
 
 #ifdef DEBUG

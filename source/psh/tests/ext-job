@@ -31,10 +31,10 @@ echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple stdout and stderr variants"
 
-   pe ls aexec.c foo.h @o+1 @e+2 cat -n @ cat -E
+   pe ls ext-* foo.h @o+1 @e+2 cat -n @ cat -E
    echo "status = $status"
 
-   pe ls aexec.c foo.h @o2 @e3 cat -n @ cat -E
+   pe ls ext-* foo.h @o2 @e3 cat -n @ cat -E
    echo "status = $status"
 
 echo ""
@@ -42,16 +42,16 @@ echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple bonded stdout/stderr variants"
 
-   pe ls aexec.c foo.h @b cat -n
+   pe ls ext-* foo.h @b cat -n
    echo "status = $status"
 
-   pe ls aexec.c foo.h @b+1 cat -n
+   pe ls ext-* foo.h @b+1 cat -n
    echo "status = $status"
 
-   pe ls aexec.c foo.h @b2 cat -n
+   pe ls ext-* foo.h @b2 cat -n
    echo "status = $status"
 
-   pe ls aexec.c foo.h @o2 @e2 cat -n
+   pe ls ext-* foo.h @o2 @e2 cat -n
    echo "status = $status"
 
 #--------------------------------------------------------------------------
