@@ -25,10 +25,10 @@ echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple bonded stdout/stderr variants"
 
-   pe 'ls aexec.c foo.h | cat -n'
+   pe 'ls ext-* foo.h | cat -n'
    echo "status = $status"
 
-   pe 'ls aexec.c foo.h |& cat -n'
+   pe 'ls ext-* foo.h |& cat -n'
    echo "status = $status"
 
 #--------------------------------------------------------------------------

@@ -1001,6 +1001,60 @@ static void setup_pgrp(process_group *pg, int it,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* EXPAND_SHORTHAND - expand shorthand notations:
+ *                  -  file       =>  f<x>:<name>  -> aexec -f <name> -<x>
+ *                  -  variable   =>  v<x>:<name>  -> aexec -v <name> -<x>
+ *                  -  procedure  =>  p<x>:<name>  -> aexec -p <name> -<x>
+ *                  -  executable =>  x<x>:<name>  -> <name>
+ */
+
+static char **expand_shorthand(char **ta, char *t)
+   {char s[MAXLINE];
+    char *p, *md, *nm;
+
+    if (t != NULL)
+       {nstrncpy(s, MAXLINE, t + 1, -1);
+	p = strchr(s, ':');
+	*p++ = '\0';
+	md = s;
+	nm = p;
+
+	switch (t[0])
+
+/* file */
+	   {case 'f' :
+	         ta = lst_add(ta, "aexec");
+	         ta = lst_add(ta, "-f");
+	         ta = lst_add(ta, nm);
+	         ta = lst_push(ta, "-%s", md);
+		 break;
+
+/* variable */
+	    case 'v' :
+	         ta = lst_add(ta, "aexec");
+	         ta = lst_add(ta, "-v");
+	         ta = lst_add(ta, nm);
+	         ta = lst_push(ta, "-%s", md);
+		 break;
+
+/* procedure */
+	    case 'p' :
+	         ta = lst_add(ta, "aexec");
+	         ta = lst_add(ta, "-p");
+	         ta = lst_add(ta, nm);
+	         ta = lst_push(ta, "-%s", md);
+		 break;
+
+/* executable */
+	    case 'x' :
+	         ta = lst_add(ta, t);
+		 break;};};
+
+    return(ta);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PARSE_PGRP - parse out specifications in S to initialize PG */
 
 static void parse_pgrp(statement *s)
@@ -1086,7 +1140,10 @@ static void parse_pgrp(statement *s)
 
 /* build up an entry from non-terminal tokens */
 	 else
-	    ta = lst_add(ta, t);};
+	    {if ((strchr(t, ':') != NULL) && (strchr("fvpx", t[0]) != NULL))
+	        ta = expand_shorthand(ta, t);
+	     else
+	        ta = lst_add(ta, t);};};
 
     if ((i >= nc) && (lst_length(ta) > 0))
        setup_pgrp(pg, it++, ta, dosh, ios);
@@ -1417,11 +1474,14 @@ statement *parse_statement(char *s, char **env, char *shell)
 	     for (ps = pt, c = *ps++; c != '\0'; c = *ps++)
 	         {if (c == '\\')
 		     continue;
+
+/* handle ';' statement separator */
 		  if (c == ';')
 		     {ps[-1] = '\0';
 		      trm    = ST_NEXT;
 		      break;}
 
+/* handle '&&' statement separator */
 		  else if (c == '&')
 		     {c = *ps++;
 		      if (c == '&')
@@ -1431,6 +1491,7 @@ statement *parse_statement(char *s, char **env, char *shell)
 		      else if (c == '\0')
 			 break;}
 
+/* handle '||' statement separator */
 		  else if (c == '|')
 		     {c = *ps++;
 		      if (c == '|')
@@ -1577,7 +1638,7 @@ void job_background(process_session *ps, process *pp, int cont)
 
 /* AEXEC - execute a <statement> */
 
-int aexec(int c, char **v, char **env)
+int aexec(char *db, int c, char **v, char **env)
    {int i, nc, rv, st;
     char *s, *shell;
     statement *sl;

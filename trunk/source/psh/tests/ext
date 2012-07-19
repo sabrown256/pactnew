@@ -3,87 +3,62 @@
 # EXT - test aexec
 #
 
-@ err = 0
+source ../../tests/common
 
-alias pe  'aexec "\!*"'
-alias pg  'eval `aexec "\!*"`'
+set msg = "AEXEC Test ....................."
 
-set proc = TRUE
-set proc = FALSE
-set var  = TRUE
+set AEXEC = aexec
 
-#set echo 
-#set verbose
+set lst = ( job pipe file var )
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: aexec [-h]"
+           echo "  h  this help message"
+           echo ""
+           exit(1);
+      default:
+           breaksw
+   endsw
+   shift
+end
 
-# processes only
+   NoteD $Log ""
+   NoteD $Log "                    $msg"
 
-if ($proc == TRUE) then
+   @ nerr = 0
 
-   echo "--------------------------"
-   echo "ls aexec.c foo.h @o+1 @e+2 cat -n @ cat -E"
-   pe ls aexec.c foo.h @o+1 @e+2 cat -n @ cat -E
-   echo "status = $status"
+   flog $Log rm -f run.* s*
+   flog $Log cp $SrcDir/tests/ext-* .
 
-   echo "--------------------------"
-   echo "ls aexec.c foo.h @o2 @e3 cat -n @ cat -E"
-   pe ls aexec.c foo.h @o2 @e3 cat -n @ cat -E
-   echo "status = $status"
+   Note $Log "Using $AEXEC"
+   Note $Log "Path = $PATH"
 
-   echo "--------------------------"
-   echo "ls aexec.c foo.h @o2 @e2 cat -n"
-   pe ls aexec.c foo.h @o2 @e2 cat -n
-   echo "status = $status"
+   flog $Log pwd
+   flog $Log ls -l ext-*
 
-   echo "--------------------------"
-   echo "ls aexec.c foo.h @b2 cat -n"
-   pe ls aexec.c foo.h @b2 cat -n
-   echo "status = $status"
-endif
+   foreach t ($lst)
+      Separator $Log
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+      set f = ( `fill-string -n 28 $t` )
+      NoteD $Log -n "                        $f"
+      Note $Log ""
 
-# VARIABLES - test redirections with variables
-#           - the -v <var> MUST come first and mode last
+      set exe = $t
+      set opt = ""
+      set rpf = ""
 
-if ($var == TRUE) then
+      flog $Log ./ext-$t
 
-   echo "--------------------------"
-   unsetenv foo
-   echo "command: date @o2 aexec -v foo -r"
-   pg date @o2 aexec -v foo -r
-   echo "> foo     = `printenv foo`"
-   echo "> xstatus = $xstatus"
+      set rpf = ( $rpf ext-$t )
 
-   echo "--------------------------"
-   echo "command: cat @i2 aexec -v foo -w"
-   pe cat @i2 aexec -v foo -w
+      $TEST_CHECK part -a aexec_${t} -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
+      @ nerr = $nerr + $status
+   end
 
-#   echo "--------------------------"
-#   echo "command: date @o2 aexec -v foo -rw"
-#   pe date @o2 aexec -v foo -rw
-#   echo "> foo     = $foo"
-#   echo "> xstatus = $xstatus"
+$TEST_CHECK part -a aexec -e $nerr -rpf "$rpf" "$msg"
 
-   echo "--------------------------"
-   echo "command: date @b2 aexec -v foo -r"
-   pe date @b2 aexec -v foo -r
-#   echo "> foo     = $foo"
-#   echo "> xstatus = $xstatus"
+exit($status)
 
-   echo "--------------------------"
-   unsetenv foo
-   echo "command: date @o2 @e3 aexec -v foo -r @ aexec -v bar -r"
-   pg date @o2 @e3 aexec -v foo -r @ aexec -v bar -r
-   echo "> foo     = `printenv foo`"
-   echo "> bar     = `printenv bar`"
-   echo "> xstatus = $xstatus"
-endif
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-exit($err)

@@ -39,7 +39,8 @@ LibFiles = libpsh.c libasync.c libeval.c libtime.c \
 IncFiles = common.h nonstd.h ${LibFiles}
 
 InstallDep = ${BinDir}/pco ${BinDir}/do-net ${BinDir}/do-run \
-             ${BinDir}/atdbg ${BinDir}/pcsh ${BinDir}/perdb  \
+             ${BinDir}/atdbg ${BinDir}/pcsh \
+             ${BinDir}/aexec ${BinDir}/perdb  \
              ${BinDir}/elide ${BinDir}/blang                 \
              ${BinDir}/smake ${BinDir}/pact-info
 
@@ -78,6 +79,11 @@ atdbg : ${BinDir}/atdbg
 
 ${BinDir}/atdbg : atdbg.c libpsh.c
 	${PCC} atdbg.c -o ${BinDir}/atdbg
+
+aexec : ${BinDir}/aexec
+
+${BinDir}/aexec : aexec.c libpsh.c
+	${PCC} aexec.c -o ${BinDir}/aexec
 
 pcsh : ${BinDir}/pcsh
 
