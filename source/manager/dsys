@@ -1019,6 +1019,7 @@ switch ($Cmnd)
         if ($status == 0) then
            flog $Log ./ccw -g do-run.c -o $BinDir/do-run
            flog $Log ./ccw -g perdb.c -o $BinDir/perdb
+           flog $Log ./ccw -g aexec.c -o $BinDir/aexec
            flog $Log ./ccw -g elide.c -o $BinDir/elide
            flog $Log ./ccw -g blang.c -o $BinDir/blang
            flog $Log ./ccw -g -I../score -I../manager template.c -o $BinDir/template
@@ -2270,7 +2271,7 @@ CFG_DONE:
         set BinFiles = ""
         if ($strict == FALSE) then
            set BinFiles = ( $BinFiles smake dmake pact template timer px )
-           set BinFiles = ( $BinFiles do-run elide blang perdb )
+           set BinFiles = ( $BinFiles do-run elide blang aexec perdb )
            set BinFiles = ( $BinFiles make-syntax )
            set BinFiles = ( $BinFiles import-api pcpp )
            set BinFiles = ( $BinFiles sinstall install-pact install-ext )
