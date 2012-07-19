@@ -553,11 +553,7 @@ void redir_io(iodes *fd, int nfd, int ifd, iodes *pio)
 	    case IO_STD_BOND :
 		 fd[2].file = nm;
 		 fd[1].flag = fl;
-#ifdef NEWWAY
-		 fd[2].flag = -1;
-#else
 		 fd[2].flag = fl;
-#endif
 	         break;
 	    default :
 	         break;};};
@@ -607,11 +603,11 @@ static int parse_redirect(iodes *pio, process *pp, int i)
 		fn = file;};}
 
 	else if (t[0] == PROCESS_DELIM)
-	   fn = t + 3;
+	   fn = t + strlen(t);
 
 	pio->gid = gid;
 	pio->fid = fid;
-	if (fn != NULL)
+	if (IS_NULL(fn) == FALSE)
 	   pio->file = STRSAVE(fn);
 
 /* parse out the specification - results in PIO */
@@ -894,10 +890,7 @@ static void reconnect_pgrp(process_group *pg)
 
 	     _fd_close(pp->io[1].fd);
 	     _fd_close(cp->io[0].fd);
-/*
-	     pp->io[1].fd = -2;
-	     cp->io[0].fd = -2;
-*/
+
 	     pp->io[1].hnd = IO_HND_CLOSE;
 	     cp->io[0].hnd = IO_HND_CLOSE;};
 
@@ -946,18 +939,19 @@ static void reconnect_pgrp(process_group *pg)
 
 		 if (ca[gi]->io[IO_STD_OUT].gid == i)
 		    {ca[gi]->io[IO_STD_OUT].hnd = IO_HND_PIPE;
-		     fd             = ca[gi]->io[IO_STD_OUT].fd;
+
+		     fd = ca[gi]->io[IO_STD_OUT].fd;
 
 		     pp->io[IO_STD_OUT].hnd = IO_HND_PIPE;
 		     pp->io[IO_STD_OUT].fd  = fd;};
 
 		 if (ca[gi]->io[IO_STD_ERR].gid == i)
 		    {ca[gi]->io[IO_STD_ERR].hnd = IO_HND_PIPE;
-		     fd             = ca[gi]->io[IO_STD_ERR].fd;
+
+		     fd = ca[gi]->io[IO_STD_ERR].fd;
 
 		     pp->io[IO_STD_IN].hnd = IO_HND_PIPE;
 		     pp->io[IO_STD_IN].fd  = fd;};};};};
-
 
 #ifdef DEBUG
     dprgrp(pg);
@@ -1177,6 +1171,10 @@ static void parse_pgrp(statement *s)
 int _pgrp_accept(int fd, process *pp, char *s)
    {int rv;
 
+#ifdef TRACE
+    fprintf(stderr, "trace> accept from %d\n", fd);
+#endif
+
     rv = fputs(s, stdout);
     rv = (rv >= 0);
 
@@ -1194,6 +1192,11 @@ int _pgrp_reject(int fd, process *pp, char *s)
 
 #ifdef DEBUG
     printf("dbg> reject: fd(%d) cmd(%s) txt(%s)\n", fd, pp->cmd, s);
+#endif
+
+#ifdef TRACE
+    fprintf(stderr, "trace> reject from %d\n", fd);
+    fputs(s, stderr);
 #endif
 
     return(rv);}
@@ -1238,8 +1241,13 @@ void _pgrp_wait(process *pp)
 
     ASSERT(st != NULL);
 
-/* drain text from the job - apoll will no longer check it after this */
-    rv = job_read(pp->io[IO_STD_IN].fd, pp, pp->accept);
+
+#ifdef TRACE
+    fprintf(stderr, "trace> wait %d with status %s (%d) (alive %d)\n",
+	    pp->id, st, pp->reason, job_alive(pp));
+#endif
+
+    rv = job_done(pp, SIGTERM);
     ASSERT(rv == 0);
 
     return;}
@@ -1255,7 +1263,6 @@ int _pgrp_tty(char *tag)
    {int i, n, np, rv;
     process *pp;
 
-/*    printf("dbg> tty method pid=%d  fd=%d\n", getpid(), fileno(stdin)); */
     rv = FALSE;
 
     np = stck.np;
@@ -1268,6 +1275,7 @@ int _pgrp_tty(char *tag)
     rv = (n != 0);
 
 #ifdef DEBUG
+/*    printf("dbg> tty method pid=%d  fd=%d\n", getpid(), fileno(stdin)); */
     if (rv == TRUE)
        printf("dbg> all done\n");
 #endif
@@ -1302,6 +1310,13 @@ void _pgrp_fin(process *pp, void *a)
     i  = pp->ip;
     st = (int *) a;
     st[i] = pp->reason;
+
+    job_done(pp, SIGKILL);
+
+#ifdef TRACE
+    fprintf(stderr, "trace> fin %d with status %d (alive %d)\n",
+	    pp->id, st[i], job_alive(pp));
+#endif
 
     return;}
 
@@ -1357,6 +1372,12 @@ static int run_pgrp(statement *s)
 	for (i = 0; i < np; i++)
 	    {pp = _job_fork(pg->parents[i], pg->children[i],
 			    NULL, "rw", st);
+#ifdef TRACE
+	     fprintf(stderr, "trace> launch %d (%d,%d,%d)\n       %s\n",
+		     pp->id,
+		     pp->io[0].fd, pp->io[1].fd, pp->io[2].fd,
+		     pp->cmd);
+#endif
 	     pp->accept   = _pgrp_accept;
 	     pp->reject   = _pgrp_reject;
 	     pp->wait     = _pgrp_wait;
@@ -1454,7 +1475,7 @@ static void free_statements(statement *sl)
 /*--------------------------------------------------------------------------*/
 
 /* PARSE_STATEMENT - parse a string S into an array of statements
- *                 - delimited by: ';', '&&', '||'
+ *                 - delimited by: ';', '&&', or '||'
  */
 
 statement *parse_statement(char *s, char **env, char *shell)
