@@ -74,7 +74,7 @@ switch ($OS[1])
         breaksw
 
    case "linux" :
-        set inf = ( `ldd --version |& head -n 1 | awk '{print $NF}' | sed 's/\./ /g'` )
+        set inf = ( `ldd --version |& grep ldd |& head -n 1 | awk '{print $NF}' | sed 's/\./ /g'` )
         set Concise = "$inf[1].$inf[2]"
         unset inf
         if ("$Concise" == "") then

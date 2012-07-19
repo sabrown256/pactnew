@@ -252,6 +252,60 @@ int _fd_close(int fd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _JOB_IO_CLOSE - close the KND I/O channel of PP */
+
+void _job_io_close(process *pp, io_kind knd)
+   {int fd;
+    FILE *fp;
+
+    fd = pp->io[knd].fd;
+    fp = pp->io[knd].fp;
+
+    if (fd >= 0)
+       _fd_close(fd);
+
+    if (fp != NULL)
+       fclose(fp);
+
+    pp->io[knd].fd  = -1;
+    pp->io[knd].fp  = NULL;
+    pp->io[knd].hnd = IO_HND_NONE;
+    pp->io[knd].dev = IO_DEV_NONE;
+    pp->io[knd].knd = IO_STD_NONE;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+sigset_t _block_all_sig(void)
+   {int rv;
+    sigset_t ns, os;
+
+    sigemptyset(&ns);
+    sigfillset(&ns);
+    rv = sigprocmask(SIG_BLOCK, &ns, &os);
+    ASSERT(rv == 0);
+
+    return(os);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+sigset_t _unblock_all_sig(void)
+   {int rv;
+    sigset_t ns, os;
+
+    sigemptyset(&ns);
+    sigfillset(&ns);
+    rv = sigprocmask(SIG_UNBLOCK, &ns, &os);
+    ASSERT(rv == 0);
+
+    return(os);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _INIT_IODES - initialize a set of N_IO_CH iodes structures */
 
 static void _init_iodes(int n, iodes *fd)
@@ -357,30 +411,23 @@ static int _job_release(process *pp)
        {for (i = 0; i < N_IO_CHANNELS; i++)
 	    io[i] = pp->io[i].fd;
 
-/* stdin */
-	if (io[0] >= 0)
-	   _fd_close(io[0]);
-
-	if (pp->io[0].fp != NULL)
-	   fclose(pp->io[0].fp);
+/* stderr */
+	_job_io_close(pp, IO_STD_ERR);
 
 /* stdout */
+#if 1
+	_job_io_close(pp, IO_STD_OUT);
+#else
 	if ((io[0] != io[1]) && (io[1] >= 0))
 	   _fd_close(io[1]);
 
 	if (pp->io[1].fp != NULL)
 	   fclose(pp->io[1].fp);
-
-/* stderr */
-#if 1
-	if (io[2] >= 0)
-	   _fd_close(io[2]);
-
-	if (pp->io[2].fp != NULL)
-	   fclose(pp->io[2].fp);
 #endif
 
-        pp->io[0].fd = -1;
+/* stdin */
+	_job_io_close(pp, IO_STD_IN);
+
         FREE(pp->cmd);
 
 	rv = TRUE;};
@@ -442,12 +489,12 @@ static int _job_exec(process *cp, char **argv, char **env, char *mode)
 #endif
      
 /* reset the signal handlers for the child */
-	signal (SIGINT, SIG_DFL);
-	signal (SIGQUIT, SIG_DFL);
-	signal (SIGTSTP, SIG_DFL);
-	signal (SIGTTIN, SIG_DFL);
-	signal (SIGTTOU, SIG_DFL);
-	signal (SIGCHLD, SIG_DFL);
+	signal(SIGINT, SIG_DFL);
+	signal(SIGQUIT, SIG_DFL);
+	signal(SIGTSTP, SIG_DFL);
+	signal(SIGTTIN, SIG_DFL);
+	signal(SIGTTOU, SIG_DFL);
+	signal(SIGCHLD, SIG_DFL);
 
 /* setup the I/O descriptors */
 	for (i = 0; i < N_IO_CHANNELS; i++)
@@ -742,6 +789,8 @@ static process *_job_fork(process *pp, process *cp,
        pp->cmd = _job_command_str(argv);
     strcpy(pp->mode, mode);
 
+    _block_all_sig();
+
 /* fork the process */
     pid    = fork();
     pp->id = pid;
@@ -764,6 +813,8 @@ static process *_job_fork(process *pp, process *cp,
 	      if (st == FALSE)
 		 _job_free(pp);
 	      break;};
+
+    _unblock_all_sig();
 
     return(pp);}
 
@@ -854,14 +905,19 @@ int job_read(int fd, process *pp, int (*out)(int fd, process *pp, char *s))
     if (job_alive(pp))
        {fi = pp->io[0].fp;
 	if (fi != NULL)
-	   {while (TRUE)
+	   {/* _block_all_sig(); */
+
+	    while (TRUE)
 	       {p = fgets(s, MAXLINE, fi);
 		if (p == NULL)
 		   break;
 		nl++;
 		if (out != NULL)
 		   out(fd, pp, s);
-		sched_yield();};};};
+
+		sched_yield();};
+
+/*	    _unblock_all_sig(); */};};
 
     return(nl);}
 
@@ -889,8 +945,12 @@ int job_write(process *pp, char *fmt, ...)
     if (job_alive(pp))
        {fo = pp->io[1].fp;
 	if (fo != NULL)
-	   {ns = strlen(s);
-	    nc = fwrite_safe(s, 1, ns, fo);};};
+	   {_block_all_sig();
+
+	    ns = strlen(s);
+	    nc = fwrite_safe(s, 1, ns, fo);
+
+	    _unblock_all_sig();};};
 
     return(nc);}
 
@@ -1005,6 +1065,8 @@ void job_wait(process *pp)
     if (pp != NULL)
        {pid = pp->id;
 
+	_block_all_sig();
+
 	st  = waitpid(pid, &w, WNOHANG);
 	if (st == 0)
 	   pp->status = JOB_RUNNING;
@@ -1041,19 +1103,12 @@ void job_wait(process *pp)
 	       {pp->wait(pp);
 
 		for (i = 0; i < N_IO_CHANNELS; i++)
-		    {if (pp->io[i].fd >= 0)
-		        _fd_close(pp->io[i].fd);
-
-		     if (pp->io[i].fp != NULL)
-		        fclose(pp->io[i].fp);
-
-		     pp->io[i].fd  = -1;
-		     pp->io[i].hnd = IO_HND_NONE;
-		     pp->io[i].dev = IO_DEV_NONE;
-		     pp->io[i].knd = IO_STD_NONE;};};}
+		    _job_io_close(pp, i);};}
 
 	else if ((st < 0) && (pp->status == JOB_RUNNING))
-	   pp->status = JOB_DEAD;};
+	   pp->status = JOB_DEAD;
+
+	_unblock_all_sig();};
 
     return;}
 
