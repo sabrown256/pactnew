@@ -975,7 +975,7 @@ static void cwait(donetdes *st, hfspec *sp, int nsp, char *sect, int tf)
 /* check the jobs until they are all done, or time is exhausted,
  * or we get an interrupt from the terminal
  */
-    tc = await(tf, sect, check_tty, waitup, sp);
+    tc = await(tf, 1000, sect, check_tty, waitup, sp);
 
 /* close out the jobs */
     afin(finup);
@@ -1761,7 +1761,7 @@ static int verifyhosts(donetdes *st, hfspec *sp, int nsp)
     separatorv(Log);
 
 /* wait for the work to complete */
-    tc = await(st->vfyt, "verify", check_tty, NULL, NULL);
+    tc = await(st->vfyt, 1000, "verify", check_tty, NULL, NULL);
     ASSERT(tc == TRUE);
 
 /* close out the jobs */

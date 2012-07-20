@@ -61,12 +61,13 @@
  *       Do a job_wait on each job and return the number of jobs which
  *       are done.
  *
- *    int await(int tf, char *tag,
+ *    int await(unsigned int tf, int dt, char *tag,
  *              int (*tty)(char *tag),
  *              void (*f)(int i, char *tag, void *a, int nd, int np, int tc, int tf),
  *              void *a)
  *       Monitor the jobs until TF seconds have elapsed, all jobs
  *       are done, or TTY returns FALSE.  Call TTY and F each cycle.
+ *       Poll for DT milliseconds in each cycle.
  *
  *    void amap(void (*f)(process *pp, void *a))
  *       Apply the function F to each job.
@@ -84,7 +85,7 @@
  *         alaunch(i, cmd[i], "r", io_data, myacc, myrej, mydone);
  *
  *  * wait for the work to complete - work_data passed to mywork *
- *     tc = await(30, "commands", mytty, mywork, work_data);
+ *     tc = await(30, 100, "commands", mytty, mywork, work_data);
  *
  *  * close out the jobs *
  *     afin(myfin);
@@ -242,7 +243,7 @@ int _fd_close(int fd)
    {int rv;
 
 #ifdef DEBUG
-    printf("dbg> closing %d\n", fd);
+    fprintf(stderr, "dbg> closing %d\n", fd);
 #endif
 
     rv = close(fd);
@@ -279,13 +280,19 @@ void _job_io_close(process *pp, io_kind knd)
 /*--------------------------------------------------------------------------*/
 
 sigset_t _block_all_sig(void)
-   {int rv;
-    sigset_t ns, os;
+   {sigset_t os;
+
+    memset(&os, 0, sizeof(os));
+
+#if 0
+    int rv;
+    sigset_t ns;
 
     sigemptyset(&ns);
     sigfillset(&ns);
     rv = sigprocmask(SIG_BLOCK, &ns, &os);
     ASSERT(rv == 0);
+#endif
 
     return(os);}
 
@@ -293,15 +300,43 @@ sigset_t _block_all_sig(void)
 /*--------------------------------------------------------------------------*/
 
 sigset_t _unblock_all_sig(void)
-   {int rv;
-    sigset_t ns, os;
+   {sigset_t os;
+
+    memset(&os, 0, sizeof(os));
+
+#if 0
+    int rv;
+    sigset_t ns;
 
     sigemptyset(&ns);
     sigfillset(&ns);
     rv = sigprocmask(SIG_UNBLOCK, &ns, &os);
     ASSERT(rv == 0);
+#endif
 
     return(os);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _JOB_GRP_ATTR - add PP to the process group if G is TRUE
+ *               - have PP take the controlling terminal
+ *               - iff T is TRUE
+ */
+
+void _job_grp_attr(process *pp, int g, int t)
+   {int pid, pgid;
+
+    pid  = pp->id;
+    pgid = pp->pgid;
+
+    if (g == TRUE)
+       setpgid(pid, pgid);
+
+    if (t == TRUE)
+       tcsetpgrp(STDIN_FILENO, pgid);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -358,6 +393,37 @@ void _default_iodes(iodes *fd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _INIT_PROCESS - set process state to defaults */
+
+void _init_process(process *pp)
+   {
+
+    _init_iodes(N_IO_CHANNELS, pp->io);
+
+    pp->ip          = -1;
+    pp->id          = -1;
+    pp->pgid        = -1;
+    pp->status      = JOB_NOT_FINISHED;
+    pp->reason      = JOB_NOT_FINISHED;
+    pp->ischild     = FALSE;
+    pp->nattempt    = 1;
+    pp->mode[0]     = '\0';
+    pp->cmd         = NULL;
+    pp->arg         = NULL;
+    pp->env         = NULL;
+    pp->shell       = NULL;
+    pp->start_time  = -1.0;
+    pp->stop_time   = -1.0;
+    pp->accept      = NULL;
+    pp->reject      = NULL;
+    pp->wait        = NULL;
+    pp->a           = NULL;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _JOB_MK_PROCESS - initialize and return a process */
 
 static process *_job_mk_process(int child, char **arg,
@@ -368,33 +434,20 @@ static process *_job_mk_process(int child, char **arg,
 
     pp = MAKE(process);
     if (pp != NULL)
-       {pp->ip          = -1;
-	pp->id          = -1;
-	pp->pgid        = getpgrp();
-	pp->status      = JOB_NOT_FINISHED;
-	pp->reason      = JOB_NOT_FINISHED;
-	pp->ischild     = child;
-	pp->nattempt    = 1;
-	pp->mode[0]     = '\0';
-
-	_init_iodes(N_IO_CHANNELS, pp->io);
-
-	if (arg == NULL)
+       {if (arg == NULL)
 	   sc = NULL;
 	else
 	   {sc = concatenate(s, MAXLINE, arg, " ");
 	    sc = STRSAVE(sc);};
 
-	pp->cmd         = sc;
-	pp->arg         = arg;
-	pp->env         = env;
-	pp->shell       = shell;
-	pp->start_time  = -1.0;
-	pp->stop_time   = -1.0;
-        pp->accept      = NULL;
-        pp->reject      = NULL;
-        pp->wait        = NULL;
-        pp->a           = NULL;};
+	_init_process(pp);
+
+	pp->pgid    = getpgrp();
+	pp->ischild = child;
+	pp->cmd     = sc;
+	pp->arg     = arg;
+	pp->env     = env;
+	pp->shell   = shell;};
 
     return(pp);}
 
@@ -404,29 +457,12 @@ static process *_job_mk_process(int child, char **arg,
 /* _JOB_RELEASE - close the file descriptors */
 
 static int _job_release(process *pp)
-   {int i, rv, io[N_IO_CHANNELS];
+   {int i, rv;
 
     rv = FALSE;
     if (job_alive(pp))
-       {for (i = 0; i < N_IO_CHANNELS; i++)
-	    io[i] = pp->io[i].fd;
-
-/* stderr */
-	_job_io_close(pp, IO_STD_ERR);
-
-/* stdout */
-#if 1
-	_job_io_close(pp, IO_STD_OUT);
-#else
-	if ((io[0] != io[1]) && (io[1] >= 0))
-	   _fd_close(io[1]);
-
-	if (pp->io[1].fp != NULL)
-	   fclose(pp->io[1].fp);
-#endif
-
-/* stdin */
-	_job_io_close(pp, IO_STD_IN);
+       {for (i = N_IO_CHANNELS - 1; i >= 0; i--)
+	    _job_io_close(pp, i);
 
         FREE(pp->cmd);
 
@@ -466,28 +502,19 @@ static void _job_free(process *pp)
  */
 
 static int _job_exec(process *cp, char **argv, char **env, char *mode)
-   {int i, err, rv;
+   {int i, err, fg, rv;
     int io[N_IO_CHANNELS];
 
     err = 0;
 
     if (cp != NULL)
-       {
 
 /* put the process into the process group and
  * give the process group the terminal
  */
-#if 1
-	int pid, pgid, fg;
+       {fg = TRUE;
+	_job_grp_attr(cp, TRUE, fg);
 
-	fg   = TRUE;
-	pid  = getpid();
-	pgid = cp->pgid;
-	setpgid(pid, pgid);
-	if (fg == TRUE)
-	   tcsetpgrp(STDIN_FILENO, pgid);
-#endif
-     
 /* reset the signal handlers for the child */
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
@@ -499,11 +526,6 @@ static int _job_exec(process *cp, char **argv, char **env, char *mode)
 /* setup the I/O descriptors */
 	for (i = 0; i < N_IO_CHANNELS; i++)
 	    io[i] = cp->io[i].fd;
-
-#if 0
-/* NOTE: in past stderr went to stdout */
-	io[2] = io[1];
-#endif
 
 	rv = block_fd(io[0], TRUE);
 	ASSERT(rv == 0);
@@ -656,14 +678,8 @@ static int _job_parent_fork(process *pp, process *cp, char *mode)
    
     st = TRUE;
 
-#if 1
-    int pid, pgid;
-
-    pid  = pp->id;
-    pgid = pp->pgid;
-    if (isatty(STDIN_FILENO) == TRUE)
-       setpgid(pid, pgid);
-#endif
+/* take the controlling terminal */
+    _job_grp_attr(pp, isatty(STDIN_FILENO), FALSE);
 
     pp->id         = cp->id;
     pp->start_time = wall_clock_time();
@@ -1092,13 +1108,6 @@ void job_wait(process *pp)
 	    pp->status    = cnd;
 	    pp->reason    = sts;
 
-#if 0
-/* effect a 1 ms delay - without which a process group will hang
- * e.g. aexec "ls aexec.c foo.h @o+1 @e+2 cat -n @ cat -E"
- */
-	    poll(NULL, 0, 1);
-#endif
-
 	    if (pp->wait != NULL)
 	       {pp->wait(pp);
 
@@ -1383,22 +1392,24 @@ int acheck(void)
 
 /* restart job if indicated */
 	     if (pp->status & JOB_RESTART)
-	        pp = arelaunch(pp);
+	        pp = arelaunch(pp);};
 
-	     nf += (job_running(pp) == FALSE);};};
+	 nf += (job_running(pp) == FALSE);};
 
     return(nf);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* AWAIT - wait for the jobs in the process stack until they are all done,
+/* AWAIT - wait TF seconds for the jobs in the process stack
+ *       - or until they are all done,
  *       - or time is exhausted, or we get an interrupt from the terminal
  *       - return the time taken in seconds
  *       - check TTY and call F each cycle
+ *       - poll for DT milliseconds in each cycle
  */
 
-int await(int tf, char *tag,
+int await(unsigned int tf, int dt, char *tag,
 	  int (*tty)(char *tag),
 	  void (*f)(int i, char *tag, void *a, int nd, int np, int tc, int tf),
 	  void *a)
@@ -1417,7 +1428,7 @@ int await(int tf, char *tag,
 
 	 tc = wall_clock_time() - ti;
 	 nd = acheck();
-	 apoll(1000);
+	 apoll(dt);
 
 	 if (f != NULL)
 	    f(i, tag, a, nd, np, tc, tf);};
@@ -1438,10 +1449,11 @@ void amap(void (*f)(process *pp, void *a))
 
     for (i = 0; i < np; i++)
         {pp = stck.proc[i];
-	 a  = pp->a;
+	 if (pp != NULL)
+	    {a  = pp->a;
 
-	 if (f != NULL)
-	    f(pp, a);};
+	     if (f != NULL)
+	        f(pp, a);};};
 
     return;}
 

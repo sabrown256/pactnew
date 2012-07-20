@@ -25,14 +25,12 @@
  *           - <pipe-io>   := '|'  |  '|&'  | '&|'
  *
  *           - <pgr-io>    := <pgr-spec> | <pgr-spec> <pgr-io>
- *           - <pgr-spec>  := '@' <io-kind> <io-dev> <io-dst>
+ *           - <pgr-spec>  := '@' <io-kind> |
+ *           -                '@' <io-kind> <io-id> |
+ *           -                '@' <io-kind> <io-id> <io-kind>
  *           - <io-kind>   := 'i' | 'o' | 'e' | 'b'
- *           - <io-dev>    := 'f' <file-name> |    // WO write only
- *                            'w' <file-name> |    // WD delete first
- *                            'a' <file-name> |    // WA append
- *                            'v' <var-name>  |
- *                            'e' <expr>
- *           - <io-dst>    := <io-kind>
+ *           - <io-id>     := +<n> | -<n> | <n>
+ *           - <n>         := unsigned integer value
  *           - 
  *
  * read http://www.gnu.org/software/libc/manual/html_node/Implementing-a-Shell.html#Implementing-a-Shell
@@ -56,6 +54,7 @@
 
 typedef struct s_statement statement;
 typedef struct s_process_session process_session;
+typedef char *(*PFPChar)(char *x);
 
 struct s_statement
    {int np;                 /* number of processes in group */
@@ -63,7 +62,9 @@ struct s_statement
     char *text;             /* text of group */
     char *shell;            /* shell which runs the individual processes */
     char **env;
-    process_group *pg;};
+    int *st;                /* exit status array */
+    process_group *pg;
+    PFPChar (*map)(char *nm);};
 
 struct s_process_session
    {pid_t pgid;                        /* OS process group id */
@@ -420,22 +421,9 @@ int set_iodes(iodes *pio, char *ios)
 	   rel = TRUE;
 	else
 	   {switch (cd)
-	       {case 'e' :
-		case '&' :
-		     dev = IO_DEV_EXPR;
-		     break;
-		case 'f' :
-		case 'w' :
-		case '!' :
-		case 'a' :
+	       {case '!' :
 		case '>' :
 		     dev = IO_DEV_FILE;
-		     break;
-		case 'v' :
-		     dev = IO_DEV_VAR;
-		     break;
-		case 't' :
-		     dev = IO_DEV_TERM;
 		     break;};};
 
 	if (dev == IO_DEV_PIPE)
@@ -1100,10 +1088,10 @@ static void parse_pgrp(statement *s)
 		  else
 		     break;};
 	     term  = TRUE;}
-
+/*
 	 else if (strpbrk(t, "[]()@$*`") != NULL)
 	    dosh = TRUE;
-
+*/
 	 else if (strncmp(t, "if", 2) == 0)
 	    {doif = TRUE;
 	     dosh = TRUE;}
@@ -1146,7 +1134,7 @@ static void parse_pgrp(statement *s)
     pg->terminal = pa[it - 1];
 
 #ifdef DEBUG
-	dprgio("parse_pgrp", pg->np, pg->parents, pg->children);
+    dprgio("parse_pgrp", pg->np, pg->parents, pg->children);
 #endif
 
     reconnect_pgrp(pg);
@@ -1208,6 +1196,8 @@ int _pgrp_reject(int fd, process *pp, char *s)
 
 void _pgrp_wait(process *pp)
    {int rv;
+
+#ifdef TRACE
     char *st;
 
     switch (pp->status)
@@ -1239,10 +1229,6 @@ void _pgrp_wait(process *pp)
 	     st = "unk";
 	     break;};
 
-    ASSERT(st != NULL);
-
-
-#ifdef TRACE
     fprintf(stderr, "trace> wait %d with status %s (%d) (alive %d)\n",
 	    pp->id, st, pp->reason, job_alive(pp));
 #endif
@@ -1260,24 +1246,17 @@ void _pgrp_wait(process *pp)
  */
 
 int _pgrp_tty(char *tag)
-   {int i, n, np, rv;
-    process *pp;
+   {int nf, np, rv;
 
     rv = FALSE;
-
     np = stck.np;
 
-/* count the running jobs */
-    for (n = 0, i = 0; i < np; i++)
-        {pp = stck.proc[i];
-	 n += job_running(pp);};
+    nf = acheck();
+    rv = (nf == np);
 
-    rv = (n != 0);
-
-#ifdef DEBUG
-/*    printf("dbg> tty method pid=%d  fd=%d\n", getpid(), fileno(stdin)); */
+#ifdef TRACE
     if (rv == TRUE)
-       printf("dbg> all done\n");
+       fprintf(stderr, "trace> all done\n");
 #endif
 
     return(rv);}
@@ -1287,14 +1266,46 @@ int _pgrp_tty(char *tag)
 
 /* _PGRP_WORK - main worker handling I/O connections for
  *            - running process group
+ *            - strong version of function/procedure call
+ *            - function name is mapped to function
+ *            - it is then called and the result
+ *            - sent to the appropiate output channel
  */
 
 void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
-   {
+   {int io;
+    io_device dv;
+    iodes *pio;
+    char *fn, *t;
+    statement *s;
+    process_group *pg;
+    process *pp;
+    FILE *fp;
+    PFPChar f;
+    PFPChar (*map)(char *nm);
 
-#ifdef DEBUG
-/*     printf("dbg> work method pid=%d i=%d\n", getpid(), i); */
+    s   = (statement *) a;
+    map = s->map;
+    if (map != NULL)
+       {pg = s->pg;
+	pp = pg->parents[i];
+
+/* if the current process is a function execute it */
+	for (io = 1; io < N_IO_CHANNELS; io++)
+	    {pio = pp->io + io;
+	     dv  = pio->dev;
+	     if (dv == IO_DEV_EXPR)
+	        {fn = pio->file;
+		 fp = pio->fp;
+		 f  = map(fn);
+		 if ((f != NULL) && (fp != NULL))
+		    {
+#ifdef TRACE
+		     fprintf(stderr, "trace> call '%s' (%d)\n", fn, i);
 #endif
+		     t = f(NULL);
+		     if (t != NULL)
+		        fputs(t, fp);};};};};
 
     return;}
 
@@ -1306,9 +1317,11 @@ void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
 void _pgrp_fin(process *pp, void *a)
    {int i;
     int *st;
+    statement *s;
 
     i  = pp->ip;
-    st = (int *) a;
+    s  = (statement *) a;
+    st = s->st;
     st[i] = pp->reason;
 
     job_done(pp, SIGKILL);
@@ -1346,9 +1359,9 @@ void register_io_pgrp(process_group *pg)
 /* RUN_PGRP - run the process group PG */
 
 static int run_pgrp(statement *s)
-   {int i, np, rv, fd, tc;
-    int *st;
-    char t[MAXLINE];
+   {int i, np, rv, tc, fd;
+    char vl[MAXLINE];
+    char *db;
     process *pp;
     process_group *pg;
 
@@ -1358,7 +1371,7 @@ static int run_pgrp(statement *s)
        {pg = s->pg;
 	np = s->np;
 
-	st = MAKE_N(int, np);
+	s->st = MAKE_N(int, np);
 
 	asetup(np, 1);
 
@@ -1370,8 +1383,8 @@ static int run_pgrp(statement *s)
 
 /* launch the jobs - io_data passed to accept, reject, and wait methods */
 	for (i = 0; i < np; i++)
-	    {pp = _job_fork(pg->parents[i], pg->children[i],
-			    NULL, "rw", st);
+	    {pp = _job_fork(pg->parents[i], pg->children[i], NULL, "rw", s);
+
 #ifdef TRACE
 	     fprintf(stderr, "trace> launch %d (%d,%d,%d)\n       %s\n",
 		     pp->id,
@@ -1383,48 +1396,41 @@ static int run_pgrp(statement *s)
 	     pp->wait     = _pgrp_wait;
 	     pp->nattempt = 1;
 	     pp->ip       = i;
-/*
-	     fd = pp->io[0].fd;
-	     rv = block_fd(fd, FALSE);
-*/
+
 	     ASSERT(rv == 0);};
 
-/* poll all the newly launched jobs so they are checked at least once
- * when all the connections are finally setup and active
- * which it not the case in the loop where they are launched
- */
+/* load up the process stack */
 	for (i = 0; i < np; i++)
 	    {pp = pg->parents[i];
-
 	     fd = pp->io[0].fd;
 
 	     stck.proc[i]       = pp;
 	     stck.fd[i].fd      = fd;
 	     stck.fd[i].events  = stck.mask_acc;
-	     stck.fd[i].revents = 0;
-
-	     apoll(1);};
+	     stck.fd[i].revents = 0;};
 
 /* wait for the work to complete - _pgrp_work does the work */
-	tc = await(300, "commands", _pgrp_tty, _pgrp_work, st);
+	tc = await(-1, 1, "commands", _pgrp_tty, _pgrp_work, s);
 	ASSERT(tc >= 0);
 
 /* close out the jobs */
 	afin(_pgrp_fin);
 
-/* find weak scalar return value */
-	rv = 0;
+/* process the exit statuses */
+	rv    = 0;
+	vl[0] = '\0';
 	for (i = 0; i < np; i++)
-	    rv |= st[i];
+	    {rv |= s->st[i];
+	     vstrcat(vl, MAXLINE, "%d ", s->st[i]);};
+	LAST_CHAR(vl) = '\0';
 
-/* export group status */
-        snprintf(t, MAXLINE, "set xstatus = (");
-	for (i = 0; i < np; i++)
-	    vstrcat(t, MAXLINE, " %d", st[i]);
-        vstrcat(t, MAXLINE, " )");
-        printf("%s\n", t);
+	db = getenv("PERDB_PATH");
+	if (db != NULL)
+	   dbset(NULL, "xstatus", vl);
+	else
+	   printf("setenv xstatus \"%s\"\n", vl);
 
-        FREE(st);};
+        FREE(s->st);};
 
     return(rv);}
 
@@ -1465,6 +1471,7 @@ static void free_statements(statement *sl)
 
     for (n = 0; sl[n].text != NULL; n++)
         {FREE(sl[n].text);
+	 FREE(sl[n].st);
 	 free_pgrp(sl[n].pg, sl[n].np);};
 
     FREE(sl);
@@ -1478,7 +1485,8 @@ static void free_statements(statement *sl)
  *                 - delimited by: ';', '&&', or '||'
  */
 
-statement *parse_statement(char *s, char **env, char *shell)
+statement *parse_statement(char *s, char **env, char *shell,
+			   PFPChar (*map)(char *s))
    {int i, n, c;
     char *pt, *t, *ps;
     st_sep trm;
@@ -1528,6 +1536,8 @@ statement *parse_statement(char *s, char **env, char *shell)
 		 sa[i].text       = STRSAVE(trim(pt, BOTH, " \t\n\r\f"));
 		 sa[i].shell      = STRSAVE(shell);
 		 sa[i].env        = env;
+		 sa[i].st         = NULL;
+		 sa[i].map        = map;
 		 i++;};
 
 	     pt = ps;};
@@ -1659,7 +1669,7 @@ void job_background(process_session *ps, process *pp, int cont)
 
 /* AEXEC - execute a <statement> */
 
-int aexec(char *db, int c, char **v, char **env)
+int aexec(char *db, int c, char **v, char **env, PFPChar (*map)(char *s))
    {int i, nc, rv, st;
     char *s, *shell;
     statement *sl;
@@ -1672,7 +1682,7 @@ int aexec(char *db, int c, char **v, char **env)
         s = append_tok(s, ' ', "%s", v[i]);
 
 /* parse command to list of statements - ;, &&, or || */
-    sl = parse_statement(s, env, shell);
+    sl = parse_statement(s, env, shell, map);
     nc = statements_n(sl);
 
 /* parse each statement into process groups */

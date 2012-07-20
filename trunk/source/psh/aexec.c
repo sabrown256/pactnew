@@ -13,8 +13,8 @@
 
 #include "common.h"
 #include "libpsh.c"
-#include "libpgrp.c"
 #include "libdb.c"
+#include "libpgrp.c"
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -344,7 +344,7 @@ printf("main> a c = %d\n", c);
             {rv = do_var(db, c-i-1, v+i+1);
 	     break;}
 	 else
-	    {rv = aexec(db, c-1, v+1, env);
+	    {rv = aexec(db, c-1, v+1, env, NULL);
 	     break;};};
 
 #ifdef DEBUG
