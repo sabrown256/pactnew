@@ -166,10 +166,11 @@ int do_var(char *db, int c, char **v)
 		       sched_yield();};};
 
 		 vl = concatenate(t, MAXLINE, sa, " ");
-		 if (db == NULL)
-		    printf("setenv %s \"%s\" ; ", vr, vl);
-		 else
+
+		 if (db != NULL)
 		    dbset(NULL, vr, vl);
+		 else
+		    printf("setenv %s \"%s\" ; ", vr, vl);
 
 		 break;
 
@@ -184,10 +185,10 @@ int do_var(char *db, int c, char **v)
 			 fprintf(stdout, "%s\n", vl);};
 		       sched_yield();};
 
-		 if (db == NULL)
-		    printf("setenv %s \"%s\" ; ", vr, vl);
-		 else
+		 if (db != NULL)
 		    dbset(NULL, vr, vl);
+		 else
+		    printf("setenv %s \"%s\" ; ", vr, vl);
 
 		 break;
 
@@ -325,7 +326,7 @@ int main(int c, char **v, char **env)
     char *db;
 
 #ifdef DEBUG
-printf("main> a c = %d\n", c);
+    printf("main> a c = %d\n", c);
 #endif
 
     db = getenv("PERDB_PATH");
@@ -348,7 +349,7 @@ printf("main> a c = %d\n", c);
 	     break;};};
 
 #ifdef DEBUG
-printf("main> z\n");
+    printf("main> z\n");
 #endif
 
     return(rv);}

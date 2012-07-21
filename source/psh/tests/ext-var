@@ -5,11 +5,11 @@
 
 @ err = 0
 
-alias pe  'echo "" ; echo "Command: \!*" ; aexec "\!*"'
-alias pg  'echo "" ; echo "Command: \!*" ; eval `aexec "\!*"`'
+source $TestScrDir/env-csh
 
-#set echo 
-#set verbose
+alias pe  'unsetenv astatus ; echo "" ; echo "Command: \!*" ; aexec \!* ; dbget astatus'
+
+dbset astatus ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -19,52 +19,105 @@ echo ""
 echo "# simple stdout variants"
 
    unsetenv foo
-   pg date @o vw:foo
+   pe date @o vw:foo >&! ext-v1.res
+   dbget foo
+   cat ext-v1.res
    echo "> foo     = `printenv foo`"
-   echo "> xstatus = $xstatus"
-   echo "status = $status"
+   echo "> astatus = $astatus"
+   if ("$astatus" != "0 0") then
+      @ err = $err + 1
+      echo "v1 failed"
+   else
+      rm -f ext-v1.res
+      echo "v1 passed"
+   endif
 
 echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple stdin variants"
 
-   pe cat @i vr:foo
-   echo "status = $status"
+   pe cat @i vr:foo >&! ext-v2.res
+   cat ext-v2.res
+   echo "> astatus = $astatus"
+   if ("$astatus" != "0 0") then
+      @ err = $err + 1
+      echo "v2 failed"
+   else
+      rm -f ext-v2.res
+      echo "v2 passed"
+   endif
 
 echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple append variants"
 
-   pe date @o2 va:foo
+   pe date @o2 va:foo >&! ext-v3.res
+   dbget foo
+   cat ext-v3.res
    echo "> foo     = `printenv foo`"
-   echo "> xstatus = $xstatus"
+   echo "> astatus = $astatus"
+   if ("$astatus" != "0 0") then
+      @ err = $err + 1
+      echo "v3 failed"
+   else
+      rm -f ext-v3.res
+      echo "v3 passed"
+   endif
 
 echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple bonded variants"
 
-   pe date @b2 vw:foo
+   pe date @b2 vw:foo >&! ext-v4.res
+   dbget foo
+   cat ext-v4.res
    echo "> foo     = `printenv foo`"
-   echo "> xstatus = $xstatus"
-   echo "status = $status"
+   echo "> astatus = $astatus"
+   if ("$astatus" != "0 0") then
+      @ err = $err + 1
+      echo "v4 failed"
+   else
+      rm -f ext-v4.res
+      echo "v4 passed"
+   endif
 
 echo "------------------------------------------------------------------------"
 echo ""
 echo "# non-simple stdout variants"
 
+if (0) then
    unsetenv foo
-   pg date @o2 @e3 vw:foo @ vw:bar
+   pe date @o2 @e3 vw:foo @ vw:bar >&! ext-v5.res
+   dbget foo
+   dbget bar
+   cat ext-v5.res
    echo "> foo     = `printenv foo`"
    echo "> bar     = `printenv bar`"
-   echo "> xstatus = $xstatus"
-   echo "status = $status"
+   echo "> astatus = $astatus"
+   if ("$astatus" != "0 0 0") then
+      @ err = $err + 1
+      echo "v5 failed"
+   else
+      rm -f ext-v5.res
+      echo "v5 passed"
+   endif
 
    unsetenv foo
-   pg ls ext-* foo.h @o2 @e3 vw:foo @ vw:bar
+   pe ls ext-* foo.h @o2 @e3 vw:foo @ vw:bar >&! ext-v6.res
+   dbget foo
+   dbget bar
+   cat ext-v6.res
    echo "> foo     = `printenv foo`"
    echo "> bar     = `printenv bar`"
-   echo "> xstatus = $xstatus"
-   echo "status = $status"
+   echo "> astatus = $astatus"
+   if ("$astatus" != "2 0 0") then
+      @ err = $err + 1
+      echo "v6 failed"
+   else
+      rm -f ext-v6.res
+      echo "v6 passed"
+   endif
+endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

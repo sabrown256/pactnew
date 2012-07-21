@@ -5,10 +5,9 @@
 
 @ err = 0
 
-alias pe  'echo "" ; echo "Command: \!*" ; aexec \!*'
+source $TestScrDir/env-csh
 
-#set echo 
-#set verbose
+alias pe  'unsetenv astatus ; echo "" ; echo "Command: \!*" ; aexec \!* ; dbget astatus'
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -17,19 +16,43 @@ echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple stdout variants"
 
-   pe '/bin/echo foo | cat -n'
-   echo "status = $status"
+   pe /bin/echo foo '|' cat -n >&! ext-p1.res
+   cat ext-p1.res
+   echo "> astatus = $astatus"
+   if ("$astatus" != "0 0") then
+      @ err = $err + 1
+      echo "p1 failed"
+   else
+      rm -f ext-p1.res
+      echo "p1 passed"
+   endif
 
 echo ""
 echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple bonded stdout/stderr variants"
 
-   pe 'ls ext-* foo.h | cat -n'
-   echo "status = $status"
+   pe ls ext-* foo.h '|' cat -n >&! ext-p2.res
+   cat ext-p2.res
+   echo "> astatus = $astatus"
+   if ("$astatus" != "2 0") then
+      @ err = $err + 1
+      echo "p2 failed"
+   else
+      rm -f ext-p2.res
+      echo "p2 passed"
+   endif
 
-   pe 'ls ext-* foo.h |& cat -n'
-   echo "status = $status"
+   pe ls ext-* foo.h '|&' cat -n >&! ext-p3.res
+   cat ext-p3.res
+   echo "> astatus = $astatus"
+   if ("$astatus" != "2 0") then
+      @ err = $err + 1
+      echo "p3 failed"
+   else
+      rm -f ext-p3.res
+      echo "p3 passed"
+   endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

@@ -5,10 +5,9 @@
 
 @ err = 0
 
-alias pe  'echo "" ; echo "Command: \!*" ; aexec "\!*"'
+source $TestScrDir/env-csh
 
-#set echo 
-#set verbose
+alias pe  'unsetenv astatus ; echo "" ; echo "Command: \!*" ; aexec \!* ; dbget astatus'
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -17,42 +16,114 @@ echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple stdout variants"
 
-   pe /bin/echo 'foo' @o cat -n
-   echo "status = $status"
+   pe /bin/echo 'foo' @o cat -n >&! ext-j1.res
+   cat ext-j1.res
+   echo "> astatus = $astatus"
+   if ("$astatus" != "0 0") then
+      @ err = $err + 1
+      echo "j1 failed"
+   else
+      rm -f ext-j1.res
+      echo "j1 passed"
+   endif
 
-   pe /bin/echo 'foo' @o+1 cat -n
-   echo "status = $status"
+   pe /bin/echo 'foo' @o+1 cat -n >&! ext-j2.res
+   cat ext-j2.res
+   echo "> astatus = $astatus"
+   if ("$astatus" != "0 0") then
+      @ err = $err + 1
+      echo "j2 failed"
+   else
+      rm -f ext-j2.res
+      echo "j2 passed"
+   endif
 
-   pe /bin/echo 'foo' @o2 cat -n
-   echo "status = $status"
+   pe /bin/echo 'foo' @o2 cat -n >&! ext-j3.res
+   cat ext-j3.res
+   echo "> astatus = $astatus"
+   if ("$astatus" != "0 0") then
+      @ err = $err + 1
+      echo "j3 failed"
+   else
+      rm -f ext-j3.res
+      echo "j3 passed"
+   endif
 
 echo ""
 echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple stdout and stderr variants"
 
-   pe ls ext-* foo.h @o+1 @e+2 cat -n @ cat -E
-   echo "status = $status"
+   pe ls ext-* foo.h @o+1 @e+2 cat -n @ cat -E >&! ext-j4.res
+   cat ext-j4.res
+   echo "> astatus = $astatus"
+   if ("$astatus" != "2 0 0") then
+      @ err = $err + 1
+      echo "j4 failed"
+   else
+      rm -f ext-j4.res
+      echo "j4 passed"
+   endif
 
-   pe ls ext-* foo.h @o2 @e3 cat -n @ cat -E
-   echo "status = $status"
+   pe ls ext-* foo.h @o2 @e3 cat -n @ cat -E >&! ext-j5.res
+   cat ext-j5.res
+   echo "> astatus = $astatus"
+   if ("$astatus" != "2 0 0") then
+      @ err = $err + 1
+      echo "j5 failed"
+   else
+      rm -f ext-j5.res
+      echo "j5 passed"
+   endif
 
 echo ""
 echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple bonded stdout/stderr variants"
 
-   pe ls ext-* foo.h @b cat -n
-   echo "status = $status"
+   pe ls ext-* foo.h @b cat -n >&! ext-j6.res
+   cat ext-j6.res
+   echo "> astatus = $astatus"
+   if ("$astatus" != "2 0") then
+      @ err = $err + 1
+      echo "j6 failed"
+   else
+      rm -f ext-j6.res
+      echo "j6 passed"
+   endif
 
-   pe ls ext-* foo.h @b+1 cat -n
-   echo "status = $status"
+   pe ls ext-* foo.h @b+1 cat -n >&! ext-j7.res
+   cat ext-j7.res
+   echo "> astatus = $astatus"
+   if ("$astatus" != "2 0") then
+      @ err = $err + 1
+      echo "j7 failed"
+   else
+      rm -f ext-j7.res
+      echo "j7 passed"
+   endif
 
-   pe ls ext-* foo.h @b2 cat -n
-   echo "status = $status"
+   pe ls ext-* foo.h @b2 cat -n >&! ext-j8.res
+   cat ext-j8.res
+   echo "> astatus = $astatus"
+   if ("$astatus" != "2 0") then
+      @ err = $err + 1
+      echo "j8 failed"
+   else
+      rm -f ext-j8.res
+      echo "j8 passed"
+   endif
 
-   pe ls ext-* foo.h @o2 @e2 cat -n
-   echo "status = $status"
+   pe ls ext-* foo.h @o2 @e2 cat -n >&! ext-j9.res
+   cat ext-j9.res
+   echo "> astatus = $astatus"
+   if ("$astatus" != "2 0") then
+      @ err = $err + 1
+      echo "j9 failed"
+   else
+      rm -f ext-j9.res
+      echo "j9 passed"
+   endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
