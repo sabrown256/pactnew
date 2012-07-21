@@ -1426,9 +1426,9 @@ static int run_pgrp(statement *s)
 
 	db = getenv("PERDB_PATH");
 	if (db != NULL)
-	   dbset(NULL, "xstatus", vl);
+	   dbset(NULL, "astatus", vl);
 	else
-	   printf("setenv xstatus \"%s\"\n", vl);
+	   printf("setenv astatus \"%s\"\n", vl);
 
         FREE(s->st);};
 

@@ -3,14 +3,11 @@
 # EXT-FILE - test aexec with files
 #
 
-
 @ err = 0
 
-alias pe  'echo "" ; echo "Command: \!*" ; aexec "\!*"'
-alias pg  'echo "" ; echo "Command: \!*" ; eval `aexec "\!*"`'
+source $TestScrDir/env-csh
 
-#set echo 
-#set verbose
+alias pe  'unsetenv astatus ; echo "" ; echo "Command: \!*" ; aexec \!* ; dbget astatus'
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -20,52 +17,96 @@ echo ""
 echo "# simple stdout variants"
 
    rm -rf foo
-   pg date @o fw:foo
+   pe date @o fw:foo >&! ext-f1.res
+   cat ext-f1.res
    echo "> foo     = `cat foo`"
-   echo "> xstatus = $xstatus"
-   echo "status = $status"
+   echo "> astatus = $astatus"
+   if ("$astatus" != "0 0") then
+      @ err = $err + 1
+      echo "f1 failed"
+   else
+      rm -f ext-f1.res
+      echo "f1 passed"
+   endif
 
 echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple stdin variants"
 
-   pe cat @i fr:foo
-   echo "status = $status"
+   pe cat @i fr:foo >&! ext-f2.res
+   cat ext-f2.res
+   echo "> astatus = $astatus"
+   if ("$astatus" != "0 0") then
+      @ err = $err + 1
+      echo "f2 failed"
+   else
+      rm -f ext-f2.res
+      echo "f2 passed"
+   endif
 
 echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple append variants"
 
-   pe date @o2 fa:foo
+   pe date @o2 fa:foo >&! ext-f3.res
+   cat ext-f3.res
    echo "> foo     = `cat foo`"
-   echo "> xstatus = $xstatus"
+   echo "> astatus = $astatus"
+   if ("$astatus" != "0 0") then
+      @ err = $err + 1
+      echo "f3 failed"
+   else
+      rm -f ext-f3.res
+      echo "f3 passed"
+   endif
 
 echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple bonded variants"
 
-   pe date @b2 fw:foo
+   pe date @b2 fw:foo >&! ext-f4.res
+   cat ext-f4.res
    echo "> foo     = `cat foo`"
-   echo "> xstatus = $xstatus"
-   echo "status = $status"
+   echo "> astatus = $astatus"
+   if ("$astatus" != "0 0") then
+      @ err = $err + 1
+      echo "f4 failed"
+   else
+      rm -f ext-f4.res
+      echo "f4 passed"
+   endif
 
 echo "------------------------------------------------------------------------"
 echo ""
 echo "# non-simple stdout variants"
 
    rm -rf foo
-   pg date @o2 @e3 fw:foo @ fw:bar
+   pe date @o2 @e3 fw:foo @ fw:bar >&! ext-f5.res
+   cat ext-f5.res
    echo "> foo     = `cat foo`"
    echo "> bar     = `cat bar`"
-   echo "> xstatus = $xstatus"
-   echo "status = $status"
+   echo "> astatus = $astatus"
+   if ("$astatus" != "0 0 0") then
+      @ err = $err + 1
+      echo "f5 failed"
+   else
+      rm -f ext-f5.res
+      echo "f5 passed"
+   endif
 
    rm -rf foo
-   pg ls ext-* foo.h @o2 @e3 fw:foo @ fw:bar
+   pe ls ext-* foo.h @o2 @e3 fw:foo @ fw:bar >&! ext-f6.res
+   cat ext-f6.res
    echo "> foo     = `cat foo`"
    echo "> bar     = `cat bar`"
-   echo "> xstatus = $xstatus"
-   echo "status = $status"
+   echo "> astatus = $astatus"
+   if ("$astatus" != "2 0 0") then
+      @ err = $err + 1
+      echo "f6 failed"
+   else
+      rm -f ext-f6.res
+      echo "f6 passed"
+   endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

@@ -33,7 +33,7 @@ ANSIHdrs  = ansic.h
 NETWHdrs  = network.h network-unix.h network-msw.h network-beos.h
 StdHdrs   = ${POSIXHdrs} ${ANSIHdrs} ${NETWHdrs}
 
-LibFiles = libpsh.c libasync.c libeval.c libtime.c \
+LibFiles = libpsh.c libasync.c libpgrp.c libeval.c libtime.c \
            libfifo.c libsock.c libdb.c \
            libinfo.c
 IncFiles = common.h nonstd.h ${LibFiles}

@@ -762,6 +762,10 @@ char **_db_clnt_ex(client *cl, int init, char *req)
     char **p, *flog, *root;
     static char s[MAXLINE];
 
+    if (cl == NULL)
+       {root = cgetenv(TRUE, "PERDB_PATH");
+	cl   = make_client(root, CLIENT);};
+
     p = NULL;
     root = cl->root;
 

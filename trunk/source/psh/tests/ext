@@ -8,6 +8,7 @@ source ../../tests/common
 set msg = "AEXEC Test ....................."
 
 set AEXEC = aexec
+set PERDB = perdb
 
 set lst = ( job pipe file var )
 
@@ -30,6 +31,11 @@ end
 
    @ nerr = 0
 
+   set tf = `timer -r`
+
+   flog $Log setenv PERDB_PATH $cwd/ext
+   flog $Log $PERDB -l -c -s
+
    flog $Log rm -f run.* s*
    flog $Log cp $SrcDir/tests/ext-* .
 
@@ -50,15 +56,24 @@ end
       set opt = ""
       set rpf = ""
 
+      set lt = `timer -r`
+
       flog $Log ./ext-$t
+      set xstatus = $status
+
+      set lt = `timer -b $lt`
 
       set rpf = ( $rpf ext-$t )
 
-      $TEST_CHECK part -a aexec_${t} -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
+      $TEST_CHECK part -a aexec_${t} -e $xstatus -dt $lt -x $exe -l -rpf "$rpf" none
       @ nerr = $nerr + $status
    end
 
-$TEST_CHECK part -a aexec -e $nerr -rpf "$rpf" "$msg"
+   flog $Log $PERDB -l quit:
+
+   set tf = `timer -b $tf`
+
+$TEST_CHECK part -a aexec -e $nerr -dt $tf -rpf "$rpf" "$msg"
 
 exit($status)
 
