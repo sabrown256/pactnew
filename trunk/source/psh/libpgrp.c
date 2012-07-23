@@ -153,6 +153,8 @@ void dprgrp(process_group *pg)
 	 if (gid == -1)
 	    {switch (dev)
 	        {case IO_DEV_PIPE :
+		      vstrcat(s, MAXLINE, "o(bad-pipe) ");
+		      break;
 		 case IO_DEV_NONE :
 		 case IO_DEV_TERM :
 		      vstrcat(s, MAXLINE, "o(ttyout) ");
@@ -161,7 +163,7 @@ void dprgrp(process_group *pg)
 		      break;
 		 case IO_DEV_PTY :
 		      break;
-		 case IO_DEV_EXPR :
+		 case IO_DEV_FNC :
 		      vstrcat(s, MAXLINE, "o(expr)   ");
 		      break;};}
 
@@ -176,6 +178,8 @@ void dprgrp(process_group *pg)
 	 if (gid == -1)
 	    {switch (dev)
 	        {case IO_DEV_PIPE :
+		      vstrcat(s, MAXLINE, "o(bad-pipe) ");
+		      break;
 		 case IO_DEV_NONE :
 		 case IO_DEV_TERM :
 		      vstrcat(s, MAXLINE, "o(ttyerr) ");
@@ -184,7 +188,7 @@ void dprgrp(process_group *pg)
 		      break;
 		 case IO_DEV_PTY :
 		      break;
-		 case IO_DEV_EXPR :
+		 case IO_DEV_FNC :
 		      vstrcat(s, MAXLINE, "o(expr)   ");
 		      break;};}
 
@@ -514,8 +518,7 @@ void redir_io(iodes *fd, int nfd, int ifd, iodes *pio)
 
 static int parse_redirect(iodes *pio, process *pp, int i)
    {int fid, gid;
-    char file[MAXLINE];
-    char *t, *fn, **ta;
+    char *t, **ta;
 
     ta = pp->ios;
 
@@ -524,7 +527,6 @@ static int parse_redirect(iodes *pio, process *pp, int i)
 	
 	gid = pp->ip;
 	fid = -1;
-	fn  = NULL;
 
 /* determine the name of the file for redirection */
 	if (strcmp(t, "2>&1") == 0)
@@ -627,6 +629,12 @@ static void redirect_process(process *pp)
         i = redirect_fd(pp, i);
 
     _default_iodes(pp->io);
+
+    ta = pp->arg;
+    if ((strcmp(ta[0], "aexec") == 0) && (strcmp(ta[1], "-p") == 0))
+       {pp->isfunc = TRUE;
+	for (i = 0; i < N_IO_CHANNELS; i++)
+	    pp->io[i].dev = IO_DEV_FNC;};
 
     return;}
 
@@ -1312,7 +1320,7 @@ void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
 	for (io = 1; io < N_IO_CHANNELS; io++)
 	    {pio = pp->io + io;
 	     dv  = pio->dev;
-	     if (dv == IO_DEV_EXPR)
+	     if (dv == IO_DEV_FNC)
 	        {fn = pio->file;
 		 fp = pio->fp;
 		 f  = map(fn);

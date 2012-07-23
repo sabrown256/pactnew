@@ -133,14 +133,15 @@ enum e_io_hand
 typedef enum e_io_hand io_hand;
 
 enum e_io_kind
-   {IO_STD_NONE = -1, IO_STD_IN, IO_STD_OUT, IO_STD_ERR, IO_STD_BOND};
+   {IO_STD_NONE = -1, IO_STD_IN, IO_STD_OUT, IO_STD_ERR, IO_STD_BOND,
+    IO_STD_STATUS, IO_STD_RESOURCE};
 
 typedef enum e_io_kind io_kind;
 
 enum e_io_device
    {IO_DEV_NONE,
     IO_DEV_PIPE, IO_DEV_SOCKET, IO_DEV_PTY, 
-    IO_DEV_TERM, IO_DEV_FILE, IO_DEV_EXPR };
+    IO_DEV_TERM, IO_DEV_FNC };
 
 typedef enum e_io_device io_device;
 
@@ -181,6 +182,7 @@ struct s_process
     int status;            /* process status - JOB_RUNNING, JOB_EXITED, ... */
     int reason; /* reason for latest status change - also child exit status */
     int ischild;                             /* TRUE iff started as a child */
+    int isfunc;            /* TRUE iff parent level function sans fork/exec */
     int nattempt;                   /* count the times the job is attempted */
     char *cmd;
     char **ios;
@@ -406,6 +408,7 @@ void _init_process(process *pp)
     pp->status      = JOB_NOT_FINISHED;
     pp->reason      = JOB_NOT_FINISHED;
     pp->ischild     = FALSE;
+    pp->isfunc      = FALSE;
     pp->nattempt    = 1;
     pp->mode[0]     = '\0';
     pp->cmd         = NULL;
@@ -444,6 +447,7 @@ static process *_job_mk_process(int child, char **arg,
 
 	pp->pgid    = getpgrp();
 	pp->ischild = child;
+	pp->isfunc  = FALSE;
 	pp->cmd     = sc;
 	pp->arg     = arg;
 	pp->env     = env;
@@ -660,6 +664,7 @@ static void _job_child_fork(process *pp, process *cp, char **argv, char *mode)
 
 /* setup the running child state */
     cp->ischild    = TRUE;
+    cp->isfunc     = FALSE;
     cp->start_time = wall_clock_time();
     cp->stop_time  = 0.0;
 
@@ -710,6 +715,7 @@ static void _job_error_fork(process *pp, process *cp)
  * the managed process list works right
  */
     pp->ischild = TRUE;
+    pp->isfunc  = FALSE;
 
     _job_free(pp);
     _job_free(cp);
