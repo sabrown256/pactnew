@@ -3,11 +3,15 @@
 # EXT-VAR - test aexec with variables
 #
 
+unalias *
+
 @ err = 0
 
 source $TestScrDir/env-csh
 
 alias pe  'unsetenv astatus ; echo "" ; echo "Command: \!*" ; aexec \!* ; dbget astatus'
+
+rm -f ext-*.res.raw >& /dev/null
 
 dbset astatus ""
 
@@ -18,11 +22,11 @@ echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple stdout variants"
 
-   unsetenv foo
-   pe date @o vw:foo >&! ext-v1.res
-   dbget foo
+   unsetenv v1
+   pe /bin/echo v1-text @o vw:v1 >&! ext-v1.res
+   dbget v1
    cat ext-v1.res
-   echo "> foo     = `printenv foo`"
+   echo "> v1      = `printenv v1`"
    echo "> astatus = $astatus"
    if ("$astatus" != "0 0") then
       @ err = $err + 1
@@ -36,7 +40,7 @@ echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple stdin variants"
 
-   pe cat @i vr:foo >&! ext-v2.res
+   pe cat @i vr:v1 >&! ext-v2.res
    cat ext-v2.res
    echo "> astatus = $astatus"
    if ("$astatus" != "0 0") then
@@ -51,10 +55,10 @@ echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple append variants"
 
-   pe date @o2 va:foo >&! ext-v3.res
-   dbget foo
+   pe /bin/echo v3-text @o2 va:v1 >&! ext-v3.res
+   dbget v1
    cat ext-v3.res
-   echo "> foo     = `printenv foo`"
+   echo "> v1      = `printenv v1`"
    echo "> astatus = $astatus"
    if ("$astatus" != "0 0") then
       @ err = $err + 1
@@ -68,10 +72,10 @@ echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple bonded variants"
 
-   pe date @b2 vw:foo >&! ext-v4.res
-   dbget foo
+   pe /bin/echo v4-text @b2 vw:v4 >&! ext-v4.res
+   dbget v4
    cat ext-v4.res
-   echo "> foo     = `printenv foo`"
+   echo "> v4      = `printenv v4`"
    echo "> astatus = $astatus"
    if ("$astatus" != "0 0") then
       @ err = $err + 1
@@ -86,13 +90,14 @@ echo ""
 echo "# non-simple stdout variants"
 
 if (0) then
-   unsetenv foo
-   pe date @o2 @e3 vw:foo @ vw:bar >&! ext-v5.res
-   dbget foo
-   dbget bar
+   unsetenv v5out
+   unsetenv v5err
+   pe /bin/echo v5-text @o2 @e3 vw:v5out @ vw:v5err >&! ext-v5.res
+   dbget v5out
+   dbget v5err
    cat ext-v5.res
-   echo "> foo     = `printenv foo`"
-   echo "> bar     = `printenv bar`"
+   echo "> v5out   = `printenv v5out`"
+   echo "> v5err   = `printenv v5err`"
    echo "> astatus = $astatus"
    if ("$astatus" != "0 0 0") then
       @ err = $err + 1
@@ -102,13 +107,16 @@ if (0) then
       echo "v5 passed"
    endif
 
-   unsetenv foo
-   pe ls ext-* foo.h @o2 @e3 vw:foo @ vw:bar >&! ext-v6.res
-   dbget foo
-   dbget bar
+   unsetenv v5out
+   unsetenv v5err
+   pe ls ext-* foo.h @o2 @e3 vw:v6out @ vw:v6err >&! ext-v6.res.raw
+   sort ext-v6.res.raw >&! ext-v6.res
+   rm -f ext-v6.res.raw
+   dbget v6out
+   dbget v6err
    cat ext-v6.res
-   echo "> foo     = `printenv foo`"
-   echo "> bar     = `printenv bar`"
+   echo "> v6out   = `printenv v6out`"
+   echo "> v6err   = `printenv v6err`"
    echo "> astatus = $astatus"
    if ("$astatus" != "2 0 0") then
       @ err = $err + 1

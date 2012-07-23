@@ -140,7 +140,7 @@ typedef enum e_io_kind io_kind;
 enum e_io_device
    {IO_DEV_NONE,
     IO_DEV_PIPE, IO_DEV_SOCKET, IO_DEV_PTY, 
-    IO_DEV_TERM, IO_DEV_FILE, IO_DEV_VAR, IO_DEV_EXPR };
+    IO_DEV_TERM, IO_DEV_FILE, IO_DEV_EXPR };
 
 typedef enum e_io_device io_device;
 
