@@ -1,0 +1,109 @@
+#!/bin/csh -f
+#
+# EXT-FNC - test aexec with functions
+#
+
+@ err = 0
+
+source $TestScrDir/env-csh
+
+alias pe  'unsetenv astatus ; echo "" ; echo "Command: \!*" ; aexec \!* ; dbget astatus'
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+echo "------------------------------------------------------------------------"
+echo ""
+echo "# simple stdout variants"
+
+   rm -rf foo
+   pe date @o pw:test foo >&! ext-p1.res
+   cat ext-p1.res
+   echo "> astatus = $astatus"
+   if ("$astatus" != "0 0") then
+      @ err = $err + 1
+      echo "p1 failed"
+   else
+      rm -f ext-p1.res
+      echo "p1 passed"
+   endif
+
+echo "------------------------------------------------------------------------"
+echo ""
+echo "# simple stdin variants"
+
+   pe cat @i pr:test foo >&! ext-p2.res
+   cat ext-p2.res
+   echo "> astatus = $astatus"
+   if ("$astatus" != "0 0") then
+      @ err = $err + 1
+      echo "p2 failed"
+   else
+      rm -f ext-p2.res
+      echo "p2 passed"
+   endif
+
+echo "------------------------------------------------------------------------"
+echo ""
+echo "# simple append variants"
+
+   pe date @o2 pa:test foo >&! ext-p3.res
+   cat ext-p3.res
+   echo "> astatus = $astatus"
+   if ("$astatus" != "0 0") then
+      @ err = $err + 1
+      echo "p3 failed"
+   else
+      rm -f ext-p3.res
+      echo "p3 passed"
+   endif
+
+echo "------------------------------------------------------------------------"
+echo ""
+echo "# simple bonded variants"
+
+   pe date @b2 pw:test foo >&! ext-p4.res
+   cat ext-p4.res
+   echo "> astatus = $astatus"
+   if ("$astatus" != "0 0") then
+      @ err = $err + 1
+      echo "p4 failed"
+   else
+      rm -f ext-p4.res
+      echo "p4 passed"
+   endif
+
+echo "------------------------------------------------------------------------"
+echo ""
+echo "# non-simple stdout variants"
+
+   rm -rf foo
+   pe date @o2 @e3 pw:test foo @ pw:test bar >&! ext-p5.res
+   cat ext-p5.res
+   echo "> astatus = $astatus"
+   if ("$astatus" != "0 0 0") then
+      @ err = $err + 1
+      echo "p5 failed"
+   else
+      rm -f ext-p5.res
+      echo "p5 passed"
+   endif
+
+   rm -rf foo
+   pe ls ext-* foo.h @o2 @e3 pw:test foo @ pw:test bar >&! ext-p6.res
+   cat ext-p6.res
+   echo "> astatus = $astatus"
+   if ("$astatus" != "2 0 0") then
+      @ err = $err + 1
+      echo "p6 failed"
+   else
+      rm -f ext-p6.res
+      echo "p6 passed"
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+echo ""
+
+exit($err)

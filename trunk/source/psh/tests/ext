@@ -10,7 +10,7 @@ set msg = "AEXEC Test ....................."
 set AEXEC = aexec
 set PERDB = perdb
 
-set lst = ( job pipe file var )
+set lst = ( job pipe file var fnc )
 
 while ($#argv > 0)
    switch ($1)
