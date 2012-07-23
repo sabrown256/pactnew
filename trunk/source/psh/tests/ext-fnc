@@ -11,104 +11,101 @@ source $TestScrDir/env-csh
 
 alias pe  'unsetenv astatus ; echo "" ; echo "Command: \!*" ; aexec \!* ; dbget astatus'
 
-rm -f ext-*.res.raw >& /dev/null
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-echo "------------------------------------------------------------------------"
+foreach i (1 2 3 4 5 6)
+
+   echo ""
+   echo "---------------------------------------------------"
+   echo ""
+
+   set id  = p$i
+   set res = ext-$id.res
+   set raw = $res.raw
+   set dif = $res.dif
+   set ref = $RefDir/ext-$id
+
+   set pa = p1out
+
+   switch ($i)
+
+# simple stdout variants
+      case 1:
+           rm -rf $id
+           set cmd = ( pe /bin/echo "$id" @o pw:test ${pa} '>&!' $res )
+           set gst = "0 0"
+           set srt = FALSE
+           breaksw
+
+# simple stdin variants
+      case 2:
+           set cmd = ( pe cat @i pr:test ${pa} '>&!' $res )
+           set gst = "0 0"
+           set srt = FALSE
+           breaksw
+
+# simple append variants
+      case 3:
+           set cmd = ( pe /bin/echo "$id" @o2 pa:test p3out '>&!' $res )
+           set gst = "0 0"
+           set srt = FALSE
+           breaksw
+
+# simple bonded variants
+      case 4:
+           set cmd = ( pe /bin/echo "$id" @b2 pw:test p4bond '>&!' $res )
+           set gst = "0 0"
+           set srt = FALSE
+           breaksw
+
+# non-simple stdout variants
+      case 5:
+           set cmd = ( pe /bin/echo "$id" @o2 @e3 pw:test p5out @ pw:test p5err '>&!' $res )
+           set gst = "0 0 0"
+           set srt = FALSE
+           breaksw
+
+      case 6:
+           set cmd = ( pe ls ext-* foo.h @o2 @e3 pw:test p6out @ pw:test p6err '>&!' $raw )
+           set gst = "2 0 0"
+           set srt = TRUE
+           breaksw
+   endsw
+
+   eval $cmd
+
+   if ($srt == TRUE) then
+      sort $raw >&! $res
+      rm -f $raw
+   endif
+
+   cat $res
+
+   echo "> astatus = $astatus"
+   if ("$astatus" != "$gst") then
+      @ err = $err + 1
+      echo "$id failed"
+   else if (-f $ref) then
+      diff $res $ref >&! $dif
+      if ($status == 0) then
+         echo "$id passed"
+         rm -f $res $dif
+      else
+         echo "$id differed"
+         cat $dif
+      endif
+   else
+      cp $res $ref
+      echo "$id added"
+      rm -f $res
+   endif
+
+end
+
 echo ""
-echo "# simple stdout variants"
-
-   rm -rf p1out
-   pe /bin/echo p1 @o pw:test p1out >&! ext-p1.res
-   cat ext-p1.res
-   echo "> astatus = $astatus"
-   if ("$astatus" != "0 0") then
-      @ err = $err + 1
-      echo "p1 failed"
-   else
-      rm -f ext-p1.res
-      echo "p1 passed"
-   endif
-
-echo "------------------------------------------------------------------------"
-echo ""
-echo "# simple stdin variants"
-
-   pe cat @i pr:test p1out >&! ext-p2.res
-   cat ext-p2.res
-   echo "> astatus = $astatus"
-   if ("$astatus" != "0 0") then
-      @ err = $err + 1
-      echo "p2 failed"
-   else
-      rm -f ext-p2.res
-      echo "p2 passed"
-   endif
-
-echo "------------------------------------------------------------------------"
-echo ""
-echo "# simple append variants"
-
-   pe /bin/echo p3 @o2 pa:test p3out >&! ext-p3.res
-   cat ext-p3.res
-   echo "> astatus = $astatus"
-   if ("$astatus" != "0 0") then
-      @ err = $err + 1
-      echo "p3 failed"
-   else
-      rm -f ext-p3.res
-      echo "p3 passed"
-   endif
-
-echo "------------------------------------------------------------------------"
-echo ""
-echo "# simple bonded variants"
-
-   pe /bin/echo p4 @b2 pw:test p4out >&! ext-p4.res
-   cat ext-p4.res
-   echo "> astatus = $astatus"
-   if ("$astatus" != "0 0") then
-      @ err = $err + 1
-      echo "p4 failed"
-   else
-      rm -f ext-p4.res
-      echo "p4 passed"
-   endif
-
-echo "------------------------------------------------------------------------"
-echo ""
-echo "# non-simple stdout variants"
-
-   rm -rf p5out
-   pe /bin/echo p5 @o2 @e3 pw:test p5out @ pw:test p5err >&! ext-p5.res
-   cat ext-p5.res
-   echo "> astatus = $astatus"
-   if ("$astatus" != "0 0 0") then
-      @ err = $err + 1
-      echo "p5 failed"
-   else
-      rm -f ext-p5.res
-      echo "p5 passed"
-   endif
-
-   rm -rf p6out
-   pe ls ext-* foo.h @o2 @e3 pw:test p6out @ pw:test p6err >&! ext-p6.res
-   sort ext-p6.res.raw >&! ext-p6.res
-   cat ext-p6.res
-   echo "> astatus = $astatus"
-   if ("$astatus" != "2 0 0") then
-      @ err = $err + 1
-      echo "p6 failed"
-   else
-      rm -f ext-p6.res
-      echo "p6 passed"
-   endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-echo ""
 
 exit($err)

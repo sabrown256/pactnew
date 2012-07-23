@@ -1,0 +1,6 @@
+     1	ext-file
+     2	ext-fnc
+     3	ext-job
+     4	ext-pipe
+     5	ext-var
+ls: cannot access foo.h: No such file or directory$

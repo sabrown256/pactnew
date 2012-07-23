@@ -11,139 +11,108 @@ source $TestScrDir/env-csh
 
 alias pe  'unsetenv astatus ; echo "" ; echo "Command: \!*" ; aexec \!* ; dbget astatus'
 
-rm -f ext-*.res.raw >& /dev/null
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-echo "------------------------------------------------------------------------"
+foreach i (1 2 3 4 5 6 7 8 9)
+
+   echo ""
+   echo "---------------------------------------------------"
+   echo ""
+
+   set id  = j$i
+   set res = ext-$id.res
+   set raw = $res.raw
+   set dif = $res.dif
+   set ref = $RefDir/ext-$id
+
+   switch ($i)
+
+# simple stdout variants
+      case 1:
+           set cmd = ( pe /bin/echo "$id" @o cat -n '>&!' $res )
+           set gst = "0 0"
+           set srt = FALSE
+           breaksw
+      case 2:
+           set cmd = ( pe /bin/echo "$id" @o+1 cat -n '>&!' $res )
+           set gst = "0 0"
+           set srt = FALSE
+           breaksw
+      case 3:
+           set cmd = ( pe /bin/echo "$id" @o2 cat -n '>&!' $res )
+           set gst = "0 0"
+           set srt = FALSE
+           breaksw
+
+# simple stdout and stderr variants
+      case 4:
+           set cmd = ( pe ls ext-* foo.h @o+1 @e+2 cat -n @ cat -E '>&!' $raw )
+           set gst = "2 0 0"
+           set srt = TRUE
+           breaksw
+      case 5:
+           set cmd = ( pe ls ext-* foo.h @o2 @e3 cat -n @ cat -E '>&!' $raw )
+           set gst = "2 0 0"
+           set srt = TRUE
+           breaksw
+
+# simple bonded stdout/stderr variants
+      case 6:
+           set cmd = ( pe ls ext-* foo.h @b cat -n '>&!' $raw )
+           set gst = "2 0"
+           set srt = TRUE
+           breaksw
+      case 7:
+           set cmd = ( pe ls ext-* foo.h @b+1 cat -n '>&!' $raw )
+           set gst = "2 0"
+           set srt = TRUE
+           breaksw
+      case 8:
+           set cmd = ( pe ls ext-* foo.h @b2 cat -n '>&!' $raw )
+           set gst = "2 0"
+           set srt = TRUE
+           breaksw
+      case 9:
+           set cmd = ( pe ls ext-* foo.h @o2 @e2 cat -n '>&!' $raw )
+           set gst = "2 0"
+           breaksw
+           set srt = TRUE
+   endsw
+
+   eval $cmd
+
+   if ($srt == TRUE) then
+      sort $raw >&! $res
+      rm -f $raw
+   endif
+
+   cat $res
+
+   echo "> astatus = $astatus"
+   if ("$astatus" != "$gst") then
+      @ err = $err + 1
+      echo "$id failed"
+   else if (-f $ref) then
+      diff $res $ref >&! $dif
+      if ($status == 0) then
+         echo "$id passed"
+         rm -f $res $dif
+      else
+         echo "$id differed"
+         cat $dif
+      endif
+   else
+      cp $res $ref
+      echo "$id added"
+      rm -f $res
+   endif
+
+end
+
 echo ""
-echo "# simple stdout variants"
-
-   pe /bin/echo 'j1' @o cat -n >&! ext-j1.res
-   cat ext-j1.res
-   echo "> astatus = $astatus"
-   if ("$astatus" != "0 0") then
-      @ err = $err + 1
-      echo "j1 failed"
-   else
-      rm -f ext-j1.res
-      echo "j1 passed"
-   endif
-
-   pe /bin/echo 'j2' @o+1 cat -n >&! ext-j2.res
-   cat ext-j2.res
-   echo "> astatus = $astatus"
-   if ("$astatus" != "0 0") then
-      @ err = $err + 1
-      echo "j2 failed"
-   else
-      rm -f ext-j2.res
-      echo "j2 passed"
-   endif
-
-   pe /bin/echo 'j3' @o2 cat -n >&! ext-j3.res
-   cat ext-j3.res
-   echo "> astatus = $astatus"
-   if ("$astatus" != "0 0") then
-      @ err = $err + 1
-      echo "j3 failed"
-   else
-      rm -f ext-j3.res
-      echo "j3 passed"
-   endif
-
-echo ""
-echo "------------------------------------------------------------------------"
-echo ""
-echo "# simple stdout and stderr variants"
-
-   pe ls ext-* foo.h @o+1 @e+2 cat -n @ cat -E >&! ext-j4.res.raw
-   sort ext-j4.res.raw >&! ext-j4.res
-   rm -f ext-j4.res.raw
-   cat ext-j4.res
-   echo "> astatus = $astatus"
-   if ("$astatus" != "2 0 0") then
-      @ err = $err + 1
-      echo "j4 failed"
-   else
-      rm -f ext-j4.res
-      echo "j4 passed"
-   endif
-
-   pe ls ext-* foo.h @o2 @e3 cat -n @ cat -E >&! ext-j5.res.raw
-   sort ext-j5.res.raw >&! ext-j5.res
-   rm -f ext-j5.res.raw
-   cat ext-j5.res
-   echo "> astatus = $astatus"
-   if ("$astatus" != "2 0 0") then
-      @ err = $err + 1
-      echo "j5 failed"
-   else
-      rm -f ext-j5.res
-      echo "j5 passed"
-   endif
-
-echo ""
-echo "------------------------------------------------------------------------"
-echo ""
-echo "# simple bonded stdout/stderr variants"
-
-   pe ls ext-* foo.h @b cat -n >&! ext-j6.res.raw
-   sort ext-j6.res.raw >&! ext-j6.res
-   rm -f ext-j6.res.raw
-   cat ext-j6.res
-   echo "> astatus = $astatus"
-   if ("$astatus" != "2 0") then
-      @ err = $err + 1
-      echo "j6 failed"
-   else
-      rm -f ext-j6.res
-      echo "j6 passed"
-   endif
-
-   pe ls ext-* foo.h @b+1 cat -n >&! ext-j7.res.raw
-   sort ext-j7.res.raw >&! ext-j7.res
-   rm -f ext-j7.res.raw
-   cat ext-j7.res
-   echo "> astatus = $astatus"
-   if ("$astatus" != "2 0") then
-      @ err = $err + 1
-      echo "j7 failed"
-   else
-      rm -f ext-j7.res
-      echo "j7 passed"
-   endif
-
-   pe ls ext-* foo.h @b2 cat -n >&! ext-j8.res.raw
-   sort ext-j8.res.raw >&! ext-j8.res
-   rm -f ext-j8.res.raw
-   cat ext-j8.res
-   echo "> astatus = $astatus"
-   if ("$astatus" != "2 0") then
-      @ err = $err + 1
-      echo "j8 failed"
-   else
-      rm -f ext-j8.res
-      echo "j8 passed"
-   endif
-
-   pe ls ext-* foo.h @o2 @e2 cat -n >&! ext-j9.res.raw
-   sort ext-j9.res.raw >&! ext-j9.res
-   rm -f ext-j9.res.raw
-   cat ext-j9.res
-   echo "> astatus = $astatus"
-   if ("$astatus" != "2 0") then
-      @ err = $err + 1
-      echo "j9 failed"
-   else
-      rm -f ext-j9.res
-      echo "j9 passed"
-   endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-echo ""
 
 exit($err)

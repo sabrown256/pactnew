@@ -58,6 +58,10 @@ end
 
       set lt = `timer -r`
 
+      rm -f ext-*.res.raw >& /dev/null
+
+      dbset astatus ""
+
       flog $Log ./ext-$t
       set xstatus = $status
 

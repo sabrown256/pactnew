@@ -11,111 +11,117 @@ source $TestScrDir/env-csh
 
 alias pe  'unsetenv astatus ; echo "" ; echo "Command: \!*" ; aexec \!* ; dbget astatus'
 
-rm -f ext-*.res.raw >& /dev/null
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-echo "------------------------------------------------------------------------"
+foreach i (1 2 3 4 5 6)
+
+   echo ""
+   echo "---------------------------------------------------"
+   echo ""
+
+   set id  = f$i
+   set res = ext-$id.res
+   set raw = $res.raw
+   set dif = $res.dif
+   set ref = $RefDir/ext-$id
+
+   set fa = f1.dat
+
+   switch ($i)
+
+# simple stdout variants
+      case 1:
+           rm -rf $id
+           set cmd = ( pe /bin/echo "$id" @o fw:${fa} '>&!' $res )
+           set gst = "0 0"
+           set srt = FALSE
+           set cfl = ( $fa )
+           breaksw
+
+# simple stdin variants
+      case 2:
+           set cmd = ( pe cat @i fr:${fa} '>&!' $res )
+           set gst = "0 0"
+           set srt = FALSE
+           set cfl = ""
+           breaksw
+
+# simple append variants
+      case 3:
+           set cmd = ( pe /bin/echo "$id" @o2 fa:${fa} '>&!' $res )
+           set gst = "0 0"
+           set srt = FALSE
+           set cfl = ( $fa )
+           breaksw
+
+# simple bonded variants
+      case 4:
+           set cmd = ( pe /bin/echo "$id" @b2 fw:f4bond '>&!' $res )
+           set gst = "0 0"
+           set srt = FALSE
+           set cfl = ( f4bond )
+           breaksw
+
+# non-simple stdout variants
+      case 5:
+           set cmd = ( pe /bin/echo "$id" @o2 @e3 fw:f5out @ fw:f5err '>&!' $res )
+           set gst = "0 0 0"
+           set srt = FALSE
+           set cfl = ( f5out f5err )
+           breaksw
+
+      case 6:
+           set cmd = ( pe ls 'ext-*' foo.h @o2 @e3 fw:f6out @ fw:f6err '>&!' $raw )
+           set gst = "2 0 0"
+           set srt = TRUE
+           set cfl = ( f6out f6err )
+           breaksw
+   endsw
+
+   if ("$cfl" != NULL) then
+      rm -rf $cfl
+   endif
+
+   eval $cmd
+
+   if ($srt == TRUE) then
+      sort $raw >&! $res
+      rm -f $raw
+   endif
+
+   if ("$cfl" != NULL) then
+      foreach c ($cfl)
+         echo "> $c = `cat $c`"
+      end
+   endif
+
+   cat $res
+
+   echo "> astatus = $astatus"
+   if ("$astatus" != "$gst") then
+      @ err = $err + 1
+      echo "$id failed"
+   else if (-f $ref) then
+      diff $res $ref >&! $dif
+      if ($status == 0) then
+         echo "$id passed"
+         rm -f $res $dif
+      else
+         echo "$id differed"
+         cat $dif
+      endif
+   else
+      cp $res $ref
+      echo "$id added"
+      rm -f $res
+   endif
+
+end
+
 echo ""
-echo "# simple stdout variants"
-
-   rm -rf f1
-   pe /bin/echo f1 @o fw:f1.dat >&! ext-f1.res
-   cat ext-f1.res
-   echo "> f1.dat  = `cat f1.dat`"
-   echo "> astatus = $astatus"
-   if ("$astatus" != "0 0") then
-      @ err = $err + 1
-      echo "f1 failed"
-   else
-      rm -f ext-f1.res
-      echo "f1 passed"
-   endif
-
-echo "------------------------------------------------------------------------"
-echo ""
-echo "# simple stdin variants"
-
-   pe cat @i fr:f1.dat >&! ext-f2.res
-   cat ext-f2.res
-   echo "> astatus = $astatus"
-   if ("$astatus" != "0 0") then
-      @ err = $err + 1
-      echo "f2 failed"
-   else
-      rm -f ext-f2.res
-      echo "f2 passed"
-   endif
-
-echo "------------------------------------------------------------------------"
-echo ""
-echo "# simple append variants"
-
-   pe /bin/echo f3 @o2 fa:f1.dat >&! ext-f3.res
-   cat ext-f3.res
-   echo "> f1.dat  = `cat f1.dat`"
-   echo "> astatus = $astatus"
-   if ("$astatus" != "0 0") then
-      @ err = $err + 1
-      echo "f3 failed"
-   else
-      rm -f ext-f3.res
-      echo "f3 passed"
-   endif
-
-echo "------------------------------------------------------------------------"
-echo ""
-echo "# simple bonded variants"
-
-   pe /bin/echo f4 @b2 fw:f4.dat >&! ext-f4.res
-   cat ext-f4.res
-   echo "> f4.dat  = `cat f4.dat`"
-   echo "> astatus = $astatus"
-   if ("$astatus" != "0 0") then
-      @ err = $err + 1
-      echo "f4 failed"
-   else
-      rm -f ext-f4.res
-      echo "f4 passed"
-   endif
-
-echo "------------------------------------------------------------------------"
-echo ""
-echo "# non-simple stdout variants"
-
-   rm -rf f5out
-   pe /bin/echo f5 @o2 @e3 fw:f5out @ fw:f5err >&! ext-f5.res
-   cat ext-f5.res
-   echo "> f5out  = `cat f5out`"
-   echo "> f5err  = `cat f5err`"
-   echo "> astatus = $astatus"
-   if ("$astatus" != "0 0 0") then
-      @ err = $err + 1
-      echo "f5 failed"
-   else
-      rm -f ext-f5.res
-      echo "f5 passed"
-   endif
-
-   rm -rf f6out
-   pe ls ext-* foo.h @o2 @e3 fw:f6out @ fw:f6err >&! ext-f6.res.raw
-   sort ext-f6.res.raw >&! ext-f6.res
-   cat ext-f6.res
-   echo "> f6out  = `cat f6out`"
-   echo "> f6err  = `cat f6err`"
-   echo "> astatus = $astatus"
-   if ("$astatus" != "2 0 0") then
-      @ err = $err + 1
-      echo "f6 failed"
-   else
-      rm -f ext-f6.res
-      echo "f6 passed"
-   endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-echo ""
 
 exit($err)

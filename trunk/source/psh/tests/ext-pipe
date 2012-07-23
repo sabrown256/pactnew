@@ -11,60 +11,77 @@ source $TestScrDir/env-csh
 
 alias pe  'unsetenv astatus ; echo "" ; echo "Command: \!*" ; aexec \!* ; dbget astatus'
 
-rm -f ext-*.res.raw >& /dev/null
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-echo "------------------------------------------------------------------------"
-echo ""
-echo "# simple stdout variants"
+foreach i (1 2 3)
 
-   pe /bin/echo s1 '|' cat -n >&! ext-s1.res
-   cat ext-s1.res
-   echo "> astatus = $astatus"
-   if ("$astatus" != "0 0") then
-      @ err = $err + 1
-      echo "s1 failed"
-   else
-      rm -f ext-s1.res
-      echo "s1 passed"
+   echo ""
+   echo "---------------------------------------------------"
+   echo ""
+
+   set id  = s$i
+   set res = ext-$id.res
+   set raw = $res.raw
+   set dif = $res.dif
+   set ref = $RefDir/ext-$id
+
+   switch ($i)
+
+# simple stdout variants
+      case 1:
+           set cmd = ( pe /bin/echo "$id" "'|'" cat -n >&! $res )
+           set gst = "0 0"
+           set srt = FALSE
+           breaksw
+
+# simple bonded stdout/stderr variants
+      case 2:
+           set cmd = ( pe ls 'ext-*' foo.h "'|'" cat -n >&! $raw )
+           set gst = "2 0"
+           set srt = TRUE
+           breaksw
+      case 3:
+           set cmd = ( pe ls 'ext-*' foo.h "'|&'" cat -n >&! $raw )
+           set gst = "2 0"
+           set srt = TRUE
+           breaksw
+   endsw
+
+   eval $cmd
+
+   if ($srt == TRUE) then
+      sort $raw >&! $res
+      rm -f $raw
    endif
 
-echo ""
-echo "------------------------------------------------------------------------"
-echo ""
-echo "# simple bonded stdout/stderr variants"
+   cat $res
 
-   pe ls ext-* foo.h '|' cat -n >&! ext-s2.res.raw
-   sort  ext-s2.res.raw >&! ext-s2.res
-   rm -f ext-s2.res.raw
-   cat ext-s2.res
    echo "> astatus = $astatus"
-   if ("$astatus" != "2 0") then
+   if ("$astatus" != "$gst") then
       @ err = $err + 1
-      echo "s2 failed"
+      echo "$id failed"
+   else if (-f $ref) then
+      diff $res $ref >&! $dif
+      if ($status == 0) then
+         echo "$id passed"
+         rm -f $res $dif
+      else
+         echo "$id differed"
+         cat $dif
+      endif
    else
-      rm -f ext-s2.res
-      echo "s2 passed"
+      cp $res $ref
+      echo "$id added"
+      rm -f $res
    endif
 
-   pe ls ext-* foo.h '|&' cat -n >&! ext-s3.res.raw
-   sort  ext-s3.res.raw >&! ext-s3.res
-   rm -f ext-s3.res.raw
-   cat ext-s3.res
-   echo "> astatus = $astatus"
-   if ("$astatus" != "2 0") then
-      @ err = $err + 1
-      echo "s3 failed"
-   else
-      rm -f ext-s3.res
-      echo "s3 passed"
-   endif
+end
+
+echo ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-echo ""
 
 exit($err)
+
