@@ -298,7 +298,12 @@ int main(int c, char **v, char **env)
             {rv = do_fnc(db, c-i-1, v+i+1, mapf);
 	     break;}
 	 else
-	    {rv = aexec(db, c-1, v+1, env, NULL);
+            {
+#ifdef STRONG_FUNCTIONS
+	     rv = aexec(db, c-1, v+1, env, mapf);
+#else
+	     rv = aexec(db, c-1, v+1, env, NULL);
+#endif
 	     break;};};
 
 #ifdef DEBUG

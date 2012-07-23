@@ -1084,7 +1084,7 @@ int job_response(process *pp, int to, char *fmt, ...)
 void job_wait(process *pp)
    {int i, st, w, pid, sts, cnd;
 
-    if (pp != NULL)
+    if ((pp != NULL) && (pp->id != -1))
        {pid = pp->id;
 
 	_block_all_sig();
