@@ -1,0 +1,2 @@
+p6err> out: ls: cannot access foo.h: No such file or directory
+p6out> out: ext-fnc

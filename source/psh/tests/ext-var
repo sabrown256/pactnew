@@ -11,9 +11,123 @@ source $TestScrDir/env-csh
 
 alias pe  'unsetenv astatus ; echo "" ; echo "Command: \!*" ; aexec \!* ; dbget astatus'
 
-rm -f ext-*.res.raw >& /dev/null
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-dbset astatus ""
+foreach i (1 2 3 4 5 6)
+
+   echo ""
+   echo "---------------------------------------------------"
+   echo ""
+
+   set id  = v$i
+   set res = ext-$id.res
+   set raw = $res.raw
+   set dif = $res.dif
+   set ref = $RefDir/ext-$id
+
+   set va = v1out
+
+   switch ($i)
+
+# simple stdout variants
+      case 1:
+           rm -rf $id
+           set cmd = ( pe /bin/echo "$id" @o vw:${va} '>&!' $res )
+           set gst = "0 0"
+           set srt = FALSE
+           set pvl = ( $va )
+           breaksw
+
+# simple stdin variants
+      case 2:
+           set cmd = ( pe cat @i vr:${va} '>&!' $res )
+           set gst = "0 0"
+           set srt = FALSE
+           set pvl = ""
+           breaksw
+
+# simple append variants
+      case 3:
+           set cmd = ( pe /bin/echo "$id" @o2 va:${va} '>&!' $res )
+           set gst = "0 0"
+           set srt = FALSE
+           set pvl = ( $va )
+           breaksw
+
+# simple bonded variants
+      case 4:
+           set cmd = ( pe /bin/echo "$id" @b2 vw:v4bond '>&!' $res )
+           set gst = "0 0"
+           set srt = FALSE
+           set pvl = ( v4bond )
+           breaksw
+
+# non-simple stdout variants
+      case 5:
+           set cmd = ( pe /bin/echo "$id" @o2 @e3 vw:v5out @ vw:v5err '>&!' $res )
+           set gst = "0 0 0"
+           set srt = FALSE
+           set pvl = ( v5out v5err )
+           breaksw
+
+      case 6:
+           set cmd = ( pe ls 'ext-*' foo.h @o2 @e3 vw:v6out @ vw:v6err '>&!' $raw )
+           set gst = "2 0 0"
+           set srt = TRUE
+           set pvl = ( v6out v6err )
+           breaksw
+   endsw
+
+#   if ("$pvl" != NULL) then
+#      foreach v ($pvl)
+#         unsetenv $v
+#      end
+#   endif
+
+   eval $cmd
+
+   if ($srt == TRUE) then
+      sort $raw >&! $res
+      rm -f $raw
+   endif
+
+   if ("$pvl" != NULL) then
+      foreach v ($pvl)
+         dbget $v
+         echo "> $v = `printenv $v`"
+      end
+   endif
+
+   cat $res
+
+   echo "> astatus = $astatus"
+   if ("$astatus" != "$gst") then
+      @ err = $err + 1
+      echo "$id failed"
+   else if (-f $ref) then
+      diff $res $ref >&! $dif
+      if ($status == 0) then
+         echo "$id passed"
+         rm -f $res $dif
+      else
+         echo "$id differed"
+         cat $dif
+      endif
+   else
+      cp $res $ref
+      echo "$id added"
+      rm -f $res
+   endif
+
+end
+
+echo ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+exit($err)
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
