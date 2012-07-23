@@ -3,11 +3,15 @@
 # EXT-FNC - test aexec with functions
 #
 
+unalias *
+
 @ err = 0
 
 source $TestScrDir/env-csh
 
 alias pe  'unsetenv astatus ; echo "" ; echo "Command: \!*" ; aexec \!* ; dbget astatus'
+
+rm -f ext-*.res.raw >& /dev/null
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -16,8 +20,8 @@ echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple stdout variants"
 
-   rm -rf foo
-   pe date @o pw:test foo >&! ext-p1.res
+   rm -rf p1out
+   pe /bin/echo p1 @o pw:test p1out >&! ext-p1.res
    cat ext-p1.res
    echo "> astatus = $astatus"
    if ("$astatus" != "0 0") then
@@ -32,7 +36,7 @@ echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple stdin variants"
 
-   pe cat @i pr:test foo >&! ext-p2.res
+   pe cat @i pr:test p1out >&! ext-p2.res
    cat ext-p2.res
    echo "> astatus = $astatus"
    if ("$astatus" != "0 0") then
@@ -47,7 +51,7 @@ echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple append variants"
 
-   pe date @o2 pa:test foo >&! ext-p3.res
+   pe /bin/echo p3 @o2 pa:test p3out >&! ext-p3.res
    cat ext-p3.res
    echo "> astatus = $astatus"
    if ("$astatus" != "0 0") then
@@ -62,7 +66,7 @@ echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple bonded variants"
 
-   pe date @b2 pw:test foo >&! ext-p4.res
+   pe /bin/echo p4 @b2 pw:test p4out >&! ext-p4.res
    cat ext-p4.res
    echo "> astatus = $astatus"
    if ("$astatus" != "0 0") then
@@ -77,8 +81,8 @@ echo "------------------------------------------------------------------------"
 echo ""
 echo "# non-simple stdout variants"
 
-   rm -rf foo
-   pe date @o2 @e3 pw:test foo @ pw:test bar >&! ext-p5.res
+   rm -rf p5out
+   pe /bin/echo p5 @o2 @e3 pw:test p5out @ pw:test p5err >&! ext-p5.res
    cat ext-p5.res
    echo "> astatus = $astatus"
    if ("$astatus" != "0 0 0") then
@@ -89,8 +93,9 @@ echo "# non-simple stdout variants"
       echo "p5 passed"
    endif
 
-   rm -rf foo
-   pe ls ext-* foo.h @o2 @e3 pw:test foo @ pw:test bar >&! ext-p6.res
+   rm -rf p6out
+   pe ls ext-* foo.h @o2 @e3 pw:test p6out @ pw:test p6err >&! ext-p6.res
+   sort ext-p6.res.raw >&! ext-p6.res
    cat ext-p6.res
    echo "> astatus = $astatus"
    if ("$astatus" != "2 0 0") then

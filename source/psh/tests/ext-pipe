@@ -3,11 +3,15 @@
 # EXT-PIPE - test aexec with old shell pipe syntax
 #
 
+unalias *
+
 @ err = 0
 
 source $TestScrDir/env-csh
 
 alias pe  'unsetenv astatus ; echo "" ; echo "Command: \!*" ; aexec \!* ; dbget astatus'
+
+rm -f ext-*.res.raw >& /dev/null
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -16,7 +20,7 @@ echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple stdout variants"
 
-   pe /bin/echo foo '|' cat -n >&! ext-s1.res
+   pe /bin/echo s1 '|' cat -n >&! ext-s1.res
    cat ext-s1.res
    echo "> astatus = $astatus"
    if ("$astatus" != "0 0") then
@@ -30,9 +34,11 @@ echo "# simple stdout variants"
 echo ""
 echo "------------------------------------------------------------------------"
 echo ""
-echo "# simsle bonded stdout/stderr variants"
+echo "# simple bonded stdout/stderr variants"
 
-   pe ls ext-* foo.h '|' cat -n >&! ext-s2.res
+   pe ls ext-* foo.h '|' cat -n >&! ext-s2.res.raw
+   sort  ext-s2.res.raw >&! ext-s2.res
+   rm -f ext-s2.res.raw
    cat ext-s2.res
    echo "> astatus = $astatus"
    if ("$astatus" != "2 0") then
@@ -43,7 +49,9 @@ echo "# simsle bonded stdout/stderr variants"
       echo "s2 passed"
    endif
 
-   pe ls ext-* foo.h '|&' cat -n >&! ext-s3.res
+   pe ls ext-* foo.h '|&' cat -n >&! ext-s3.res.raw
+   sort  ext-s3.res.raw >&! ext-s3.res
+   rm -f ext-s3.res.raw
    cat ext-s3.res
    echo "> astatus = $astatus"
    if ("$astatus" != "2 0") then

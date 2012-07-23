@@ -36,7 +36,7 @@ end
    flog $Log setenv PERDB_PATH $cwd/ext
    flog $Log $PERDB -l -c -s
 
-   flog $Log rm -f run.* s*
+   flog $Log rm -f ext-*
    flog $Log cp $SrcDir/tests/ext-* .
 
    Note $Log "Using $AEXEC"

@@ -68,11 +68,11 @@ struct s_statement
     PFPChar (*map)(char *nm);};
 
 struct s_process_session
-   {pid_t pgid;                        /* OS process group id */
-    int terminal;                      /* file descriptor of stdin */
-    int interactive;                   /* TRUE iff interactive session */
-    int foreground;                    /* TRUE iff current job is foreground */
-    struct termios attr;};             /* terminal attributes */
+   {pid_t pgid;                     /* OS process group id */
+    int terminal;                   /* file descriptor of stdin */
+    int interactive;                /* TRUE iff interactive session */
+    int foreground;                 /* TRUE iff current job is foreground */
+    struct termios attr;};          /* terminal attributes */
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -161,12 +161,6 @@ void dprgrp(process_group *pg)
 		      break;
 		 case IO_DEV_PTY :
 		      break;
-		 case IO_DEV_FILE :
-		      vstrcat(s, MAXLINE, "o(file)   ");
-		      break;
-		 case IO_DEV_VAR :
-		      vstrcat(s, MAXLINE, "o(var)    ");
-		      break;
 		 case IO_DEV_EXPR :
 		      vstrcat(s, MAXLINE, "o(expr)   ");
 		      break;};}
@@ -189,12 +183,6 @@ void dprgrp(process_group *pg)
 		 case IO_DEV_SOCKET :
 		      break;
 		 case IO_DEV_PTY :
-		      break;
-		 case IO_DEV_FILE :
-		      vstrcat(s, MAXLINE, "o(file)   ");
-		      break;
-		 case IO_DEV_VAR :
-		      vstrcat(s, MAXLINE, "o(var)    ");
 		      break;
 		 case IO_DEV_EXPR :
 		      vstrcat(s, MAXLINE, "o(expr)   ");
@@ -341,7 +329,7 @@ void dprgio(char *tag, int n, process **pa, process **ca)
 
 int set_iodes(iodes *pio, char *ios)
    {int ck, cd, fid, gid, nc, ni, rel, pos, rv;
-    char *p;
+    char *p, *err_exist;
     io_mode mode;
     io_device dev;
     io_kind knd;
@@ -366,52 +354,23 @@ int set_iodes(iodes *pio, char *ios)
     if (ios != NULL)
 
 /* figure out the device type */
-
-/* get >&, &>, >>&, and &>> */
-       {if ((strstr(ios, ">&") != NULL) ||
-	    (strstr(ios, "&>") != NULL))
-	   {knd = IO_STD_BOND;
-	    dev = IO_DEV_FILE;}
-
-        else if (strncmp(ios, "1>", 2) == 0)
-	   {knd = IO_STD_OUT;
-	    dev = IO_DEV_FILE;}
-
-	else if (strncmp(ios, "2>", 2) == 0)
-	   {knd = IO_STD_ERR;
-	    dev = IO_DEV_FILE;}
-
-	else if ((strstr(ios, "|&") != NULL) ||
-		 (strstr(ios, "&|") != NULL))
-	   {knd = IO_STD_BOND;
-	    dev = IO_DEV_PIPE;}
-
-	else if (strchr(ios, '|') != NULL)
-	   {knd = IO_STD_OUT;
-	    dev = IO_DEV_PIPE;}
-
-	else
-	   {switch (ck)
-	       {case 'b' :
-		     knd = IO_STD_BOND;
-		     dev = IO_DEV_PIPE;
-		     break;
-		case 'e' :
-		     knd = IO_STD_ERR;
-		     dev = IO_DEV_PIPE;
-		     break;
-		case '<' :
-		     cd = ck;
-	        case 'i' :
-		     knd = IO_STD_IN;
-		     dev = IO_DEV_PIPE;
-		     break;
-		case '>' :
-		     cd = ck;
-	        case 'o' :
-		     knd = IO_STD_OUT;
-		     dev = IO_DEV_PIPE;
-		     break;};};
+       {switch (ck)
+	   {case 'b' :
+	         knd = IO_STD_BOND;
+		 dev = IO_DEV_PIPE;
+		 break;
+	    case 'e' :
+		 knd = IO_STD_ERR;
+		 dev = IO_DEV_PIPE;
+		 break;
+	    case 'i' :
+		 knd = IO_STD_IN;
+		 dev = IO_DEV_PIPE;
+		 break;
+	    case 'o' :
+		 knd = IO_STD_OUT;
+		 dev = IO_DEV_PIPE;
+		 break;};
 
 	rel = TRUE;
 
@@ -420,12 +379,6 @@ int set_iodes(iodes *pio, char *ios)
 	    nc--;}
 	else if (strchr("+-", cd) != NULL)
 	   rel = TRUE;
-	else
-	   {switch (cd)
-	       {case '!' :
-		case '>' :
-		     dev = IO_DEV_FILE;
-		     break;};};
 
 	if (dev == IO_DEV_PIPE)
 	   {p = ios + nc;
@@ -440,21 +393,14 @@ int set_iodes(iodes *pio, char *ios)
 	       gid = pos - 1;};
 
 /* now for the mode */
-	if (strstr(ios, "<") != NULL)
-	   mode = IO_MODE_RO;
-	else if (strstr(ios, ">>") != NULL)
-	   mode = IO_MODE_APPEND;
-	else if (strchr(ios, '!') != NULL)
-	   mode = IO_MODE_WD;
-	else if (strstr(ios, ">") != NULL)
-	   mode = IO_MODE_WO;
-	else if (strchr("ioeb", ios[0]) != NULL)
-	   {switch (cd)
+	if (strchr("ioeb", ios[0]) != NULL)
+	   {err_exist = getenv("REDIRECT_EXIST_ERROR");
+	    switch (cd)
 	       {case 'f' :
                      mode = IO_MODE_WO;
                      break;
 		case 'w' :
-                     mode = IO_MODE_WD;
+		     mode = (err_exist != NULL) ? IO_MODE_WO : IO_MODE_WD;
                      break;
 		case 'a' :
                      mode = IO_MODE_APPEND;
@@ -584,20 +530,9 @@ static int parse_redirect(iodes *pio, process *pp, int i)
 	if (strcmp(t, "2>&1") == 0)
 	   fid = 1;
 
-/* determine the name of the file for redirection */
-	else if (strpbrk(t, "<>") != NULL)
-	   {t = ta[++i];
-	    if (t != NULL)
-	       {nstrncpy(file, MAXLINE, t, -1);
-		fn = file;};}
-
-	else if (t[0] == PROCESS_DELIM)
-	   fn = t + strlen(t);
-
-	pio->gid = gid;
-	pio->fid = fid;
-	if (IS_NULL(fn) == FALSE)
-	   pio->file = STRSAVE(fn);
+	pio->gid  = gid;
+	pio->fid  = fid;
+	pio->file = NULL;
 
 /* parse out the specification - results in PIO */
 	set_iodes(pio, t);};
@@ -1040,6 +975,81 @@ static char **expand_shorthand(char **ta, char *t)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SUBST_SYNTAX - substitute new constructions for old ones
+ *              -   '< <name>'    ->  @i pr:file <name>
+ *              -   '> <name>'    ->  @o pw:file <name>
+ *              -   '>! <name>'   ->  @o pw:file <name>
+ *              -   '1> <name>'   ->  @o pw:file <name>
+ *              -   '>> <name>'   ->  @o pa:file <name>
+ *              -   '2> <name>'   ->  @e pw:file <name>
+ *              -   '>& <name>'   ->  @b pw:file <name>
+ *              -   '&> <name>'   ->  @b pw:file <name>
+ *              -   '>&! <name>'  ->  @b pw:file <name>
+ *              -   '>>& <name>'  ->  @b pa:file <name>
+ *              -   '|'           ->  @o
+ *              -   '|&'          ->  @b
+ */
+
+char **subst_syntax(char **sa)
+   {int i, nc;
+    char *t, **ra;
+
+    ra = NULL;
+    nc = lst_length(sa);
+    for (i = 0; i < nc; i++)
+        {t = sa[i];
+
+/* stdin replacements */
+	 if (strcmp(t, "<") == 0)
+	    {ra = lst_add(ra, "@i");
+	     ra = lst_add(ra, "fr:file");}
+
+/* stdout replacements */
+	 else if ((strcmp(t, ">") == 0) ||
+	     (strcmp(t, ">!") == 0) ||
+	     (strcmp(t, "1>") == 0))
+	    {ra = lst_add(ra, "@o");
+	     ra = lst_push(ra, "fw:%s", sa[++i]);}
+
+	 else if (strcmp(t, ">>") == 0)
+	    {ra = lst_add(ra, "@o");
+	     ra = lst_push(ra, "fa:%s", sa[++i]);}
+
+/* stderr replacements */
+	 else if (strcmp(t, "2>") == 0)
+	    {ra = lst_add(ra, "@e");
+	     ra = lst_push(ra, "fw:%s", sa[++i]);}
+
+/* bonded replacements */
+	 else if ((strcmp(t, ">&") == 0) ||
+		  (strcmp(t, "&>") == 0) ||
+		  (strcmp(t, ">&!") == 0))
+	    {ra = lst_add(ra, "@e");
+	     ra = lst_push(ra, "fw:%s", sa[++i]);}
+
+	 else if (strcmp(t, ">>&") == 0)
+	    {ra = lst_add(ra, "@e");
+	     ra = lst_push(ra, "fa:%s", sa[++i]);}
+
+/* pipe replacements */
+	 else if (strcmp(t, "|") == 0)
+	    ra = lst_add(ra, "@o");
+
+/* bonded pipe replacements */
+	 else if (strcmp(t, "|&") == 0)
+	    ra = lst_add(ra, "@b");
+
+/* everything else */
+	 else
+	    ra = lst_add(ra, t);};
+
+    free_strings(sa);
+
+    return(ra);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PARSE_PGRP - parse out specifications in S to initialize PG */
 
 static void parse_pgrp(statement *s)
@@ -1060,6 +1070,8 @@ static void parse_pgrp(statement *s)
     ta = NULL;
     sa = tokenize(s->text, " \t\n\r\f");
     nc = lst_length(sa);
+
+    sa = subst_syntax(sa);
 
 /* maximum number of process would be the number of tokens */
     pa = MAKE_N(process *, nc);
@@ -1083,18 +1095,21 @@ static void parse_pgrp(statement *s)
 	 if (t == NULL)
 	    continue;
 
-	 else if (strpbrk(t, "@|<>") != NULL)
+	 else if (strchr(t, PROCESS_DELIM) != NULL)
 	    {for (j = i; j < nc; j++)
-	         {if (strpbrk(sa[j], "@|<>") != NULL)
+	         {if (strchr(sa[j], PROCESS_DELIM) != NULL)
 		     {ios = lst_add(ios, sa[j]);
 		      sa[j] = NULL;}
 		  else
 		     break;};
 	     term  = TRUE;}
-/*
+#if 0
 	 else if (strpbrk(t, "[]()@$*`") != NULL)
+#else
+	 else if (strpbrk(t, "[]()$*`") != NULL)
+#endif
 	    dosh = TRUE;
-*/
+
 	 else if (strncmp(t, "if", 2) == 0)
 	    {doif = TRUE;
 	     dosh = TRUE;}
