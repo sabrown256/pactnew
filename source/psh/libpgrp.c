@@ -55,6 +55,7 @@
 typedef struct s_statement statement;
 typedef struct s_process_session process_session;
 typedef char *(*PFPChar)(char *x);
+typedef int (*PFPCAL)(char *db, io_mode m, int c, char **v);
 
 struct s_statement
    {int np;                 /* number of processes in group */
@@ -984,8 +985,8 @@ static void setup_pgrp(process_group *pg, int it,
 /*--------------------------------------------------------------------------*/
 
 /* EXPAND_SHORTHAND - expand shorthand notations:
- *                  -  file       =>  f<x>:<name>  -> aexec -f <name> -<x>
- *                  -  variable   =>  v<x>:<name>  -> aexec -v <name> -<x>
+ *                  -  file       =>  f<x>:<name>  -> aexec -p file -<x> <name>
+ *                  -  variable   =>  v<x>:<name>  -> aexec -p var -<x> <name>
  *                  -  procedure  =>  p<x>:<name>  -> aexec -p <name> -<x>
  *                  -  executable =>  x<x>:<name>  -> <name>
  */
@@ -1006,17 +1007,19 @@ static char **expand_shorthand(char **ta, char *t)
 /* file */
 	   {case 'f' :
 	         ta = lst_add(ta, "aexec");
-	         ta = lst_add(ta, "-f");
-	         ta = lst_add(ta, nm);
+	         ta = lst_add(ta, "-p");
+	         ta = lst_add(ta, "file");
 	         ta = lst_push(ta, "-%s", md);
+	         ta = lst_add(ta, nm);
 		 break;
 
 /* variable */
 	    case 'v' :
 	         ta = lst_add(ta, "aexec");
-	         ta = lst_add(ta, "-v");
-	         ta = lst_add(ta, nm);
+	         ta = lst_add(ta, "-p");
+	         ta = lst_add(ta, "var");
 	         ta = lst_push(ta, "-%s", md);
+	         ta = lst_add(ta, nm);
 		 break;
 
 /* procedure */
