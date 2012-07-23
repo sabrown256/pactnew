@@ -65,7 +65,7 @@ struct s_statement
     char **env;
     int *st;                /* exit status array */
     process_group *pg;
-    PFPChar (*map)(char *nm);};
+    PFPCAL (*map)(char *nm);};
 
 struct s_process_session
    {pid_t pgid;                     /* OS process group id */
@@ -218,9 +218,9 @@ void dprdio(iodes *pio)
     char *io, *hnd, *knd, *dev;
     static char *std[] = {"none", "in", "out", "err"};
     static char *hn[]  = {"none", "clos", "pipe", "poll"};
-    static char *kn[]  = {"none", "in", "out", "err", "bond"};
-    static char *dn[]  = {"none", "pipe", "sock", "pty", "term",
-                          "file", "var", "expr"};
+    static char *kn[]  = {"none", "in", "out", "err", "bond",
+			  "status", "rsrc"};
+    static char *dn[]  = {"none", "pipe", "sock", "pty", "term", "fnc"};
 
     io  = std[pio->knd + 1];
     fd  = pio->fd;
@@ -768,6 +768,144 @@ static int watch_fd(process *pn, io_kind pk)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* CLOSE_PARENT_CHILD - close all non-terminal parent to child lines */
+
+void close_parent_child(int n, process **pa, process **ca)
+   {int i, nm;
+    process *pp, *cp;
+
+    nm = n - 1;
+
+    for (i = 1; i < nm; i++)
+        {pp = pa[i];
+	 cp = ca[i];
+
+	 _fd_close(pp->io[1].fd);
+	 _fd_close(cp->io[0].fd);
+
+	 pp->io[1].hnd = IO_HND_CLOSE;
+	 cp->io[0].hnd = IO_HND_CLOSE;};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* CONNECT_CHILD_OUT_IN - connect all non-terminal child output
+ *                      - to appropriate child input
+ */
+
+void connect_child_out_in(int n, process **pa, process **ca)
+   {int i, gi, nm;
+    io_device dv;
+    process *pp;
+
+    nm = n - 1;
+
+    for (i = 0; i < nm; i++)
+        {pp = pa[i];
+
+/* stdout */
+	 gi = pp->io[IO_STD_OUT].gid;
+	 dv = pp->io[IO_STD_OUT].dev;
+
+/* default to the next process in line */
+	 if ((dv == IO_DEV_PIPE) && (gi == -1))
+	    gi = i + 1;
+
+	 if (gi >= 0)
+	    transfer_fd(pa[i], IO_STD_IN, ca[gi], IO_STD_IN);
+
+/* stderr */
+	 gi = pp->io[IO_STD_ERR].gid;
+	 dv = pp->io[IO_STD_ERR].dev;
+
+/* default to the next process in line */
+	 if ((dv == IO_DEV_PIPE) && (gi == -1))
+	    gi = i + 1;
+
+	 if (gi >= 0)
+	    transfer_fd(pa[i], IO_STD_ERR, ca[gi], IO_STD_IN);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* CONNECT_CHILD_IN_OUT - connect all non-terminal child input to
+ *                      - appropriate child output
+ */
+
+void connect_child_in_out(int n, process **pa, process **ca)
+   {int i, gi, nm;
+    io_device dv;
+    process *pp;
+
+    nm = n - 1;
+
+    for (i = 1; i < nm; i++)
+        {pp = pa[i];
+
+/* stdin */
+	 gi = pp->io[IO_STD_IN].gid;
+	 dv = pp->io[IO_STD_IN].dev;
+
+/* default to the previous process in line */
+	 if ((dv == IO_DEV_PIPE) && (gi == -1))
+	    gi = i - 1;
+
+	 if (gi >= 0)
+	    {int fd;
+
+	     if (ca[gi]->io[IO_STD_OUT].gid == i)
+	        {ca[gi]->io[IO_STD_OUT].hnd = IO_HND_PIPE;
+
+		  fd = ca[gi]->io[IO_STD_OUT].fd;
+
+		  pp->io[IO_STD_OUT].hnd = IO_HND_PIPE;
+		  pp->io[IO_STD_OUT].fd  = fd;};
+
+	     if (ca[gi]->io[IO_STD_ERR].gid == i)
+	        {ca[gi]->io[IO_STD_ERR].hnd = IO_HND_PIPE;
+
+		 fd = ca[gi]->io[IO_STD_ERR].fd;
+
+		 pp->io[IO_STD_IN].hnd = IO_HND_PIPE;
+		 pp->io[IO_STD_IN].fd  = fd;};};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TRANSFER_FNC_CHILD - transfer all function call I/O from child
+ *                    - to parent and free child
+ */
+
+void transfer_fnc_child(int n, process **pa, process **ca)
+   {
+
+#ifdef STRONG_FUNCTIONS
+    int i, io;
+    process *pp, *cp;
+
+    for (i = 0; i < n; i++)
+        {pp = pa[i];
+	  cp = ca[i];
+
+	  if (pp->isfunc == TRUE)
+	     {for (io = 0; io < N_IO_CHANNELS; io++)
+		  transfer_fd(cp, io, pp, io);
+	       _job_free(cp);
+
+	       ca[i] = NULL;};};
+#endif
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* RECONNECT_PGRP - reconnect the N proccess's in PG
  *                - from the canonical parent/child topology
  *                - into a process_group topology
@@ -778,10 +916,9 @@ static int watch_fd(process *pn, io_kind pk)
  */
 
 static void reconnect_pgrp(process_group *pg)
-   {int i, gi, nm, n;
-    process *pp, *cp, *pt;
+   {int nm, n;
+    process *pt;
     process **pa, **ca;
-    io_device dv;
 
     n  = pg->np;
     pa = pg->parents;
@@ -816,74 +953,16 @@ static void reconnect_pgrp(process_group *pg)
 	transfer_fd(pa[0], IO_STD_OUT, pt, IO_STD_OUT);
 
 /* close all other parent to child lines */
-	for (i = 1; i < nm; i++)
-	    {pp = pa[i];
-	     cp = ca[i];
-
-	     _fd_close(pp->io[1].fd);
-	     _fd_close(cp->io[0].fd);
-
-	     pp->io[1].hnd = IO_HND_CLOSE;
-	     cp->io[0].hnd = IO_HND_CLOSE;};
+	close_parent_child(n, pa, ca);
 
 /* connect all non-terminal children output to appropriate child input */
-	for (i = 0; i < nm; i++)
-	    {pp = pa[i];
-	     cp = ca[i];
-
-/* stdout */
-	     gi = pp->io[IO_STD_OUT].gid;
-	     dv = pp->io[IO_STD_OUT].dev;
-
-/* default to the next process in line */
-	     if ((dv == IO_DEV_PIPE) && (gi == -1))
-	        gi = i + 1;
-
-	     if (gi >= 0)
-	        transfer_fd(pa[i], IO_STD_IN, ca[gi], IO_STD_IN);
-
-/* stderr */
-	     gi = pp->io[IO_STD_ERR].gid;
-	     dv = pp->io[IO_STD_ERR].dev;
-
-/* default to the next process in line */
-	     if ((dv == IO_DEV_PIPE) && (gi == -1))
-	        gi = i + 1;
-
-	     if (gi >= 0)
-	        transfer_fd(pa[i], IO_STD_ERR, ca[gi], IO_STD_IN);};
+	connect_child_out_in(n, pa, ca);
 
 /* connect all non-terminal children input to appropriate child output */
-	for (i = 1; i < nm; i++)
-	    {pp = pa[i];
-	     cp = ca[i];
+	connect_child_in_out(n, pa, ca);
 
-/* stdin */
-	     gi = pp->io[IO_STD_IN].gid;
-	     dv = pp->io[IO_STD_IN].dev;
-
-/* default to the previous process in line */
-	     if ((dv == IO_DEV_PIPE) && (gi == -1))
-	        gi = i - 1;
-
-	     if (gi >= 0)
-	        {int fd;
-
-		 if (ca[gi]->io[IO_STD_OUT].gid == i)
-		    {ca[gi]->io[IO_STD_OUT].hnd = IO_HND_PIPE;
-
-		     fd = ca[gi]->io[IO_STD_OUT].fd;
-
-		     pp->io[IO_STD_OUT].hnd = IO_HND_PIPE;
-		     pp->io[IO_STD_OUT].fd  = fd;};
-
-		 if (ca[gi]->io[IO_STD_ERR].gid == i)
-		    {ca[gi]->io[IO_STD_ERR].hnd = IO_HND_PIPE;
-
-		     fd = ca[gi]->io[IO_STD_ERR].fd;
-
-		     pp->io[IO_STD_IN].hnd = IO_HND_PIPE;
-		     pp->io[IO_STD_IN].fd  = fd;};};};};
+/* transfer all function call I/O to parent and free child */
+	transfer_fnc_child(n, pa, ca);};
 
 #ifdef DEBUG
     dprgrp(pg);
@@ -1299,16 +1378,17 @@ int _pgrp_tty(char *tag)
  */
 
 void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
-   {int io;
+   {int c, io, rv;
+    io_mode md;
     io_device dv;
     iodes *pio;
-    char *fn, *t;
+    char *db, *fn, **v;
+    FILE *fp;
     statement *s;
     process_group *pg;
     process *pp;
-    FILE *fp;
-    PFPChar f;
-    PFPChar (*map)(char *nm);
+    PFPCAL f;
+    PFPCAL (*map)(char *nm);
 
     s   = (statement *) a;
     map = s->map;
@@ -1321,17 +1401,20 @@ void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
 	    {pio = pp->io + io;
 	     dv  = pio->dev;
 	     if (dv == IO_DEV_FNC)
-	        {fn = pio->file;
+	        {v  = pp->arg;
+		 c  = lst_length(pp->arg);
+		 fn = v[2];
 		 fp = pio->fp;
 		 f  = map(fn);
 		 if ((f != NULL) && (fp != NULL))
-		    {
+		    {v += 4;
+		     c -= 4;
 #ifdef TRACE
 		     fprintf(stderr, "trace> call '%s' (%d)\n", fn, i);
 #endif
-		     t = f(NULL);
-		     if (t != NULL)
-		        fputs(t, fp);};};};};
+		     db = NULL;
+		     md = pio->mode;
+		     rv = f(db, md, c, v);};};};};
 
     return;}
 
@@ -1388,7 +1471,7 @@ static int run_pgrp(statement *s)
    {int i, np, rv, tc, fd;
     char vl[MAXLINE];
     char *db;
-    process *pp;
+    process *pp, *cp;
     process_group *pg;
 
     rv = -1;
@@ -1409,7 +1492,13 @@ static int run_pgrp(statement *s)
 
 /* launch the jobs - io_data passed to accept, reject, and wait methods */
 	for (i = 0; i < np; i++)
-	    {pp = _job_fork(pg->parents[i], pg->children[i], NULL, "rw", s);
+	    {pp = pg->parents[i];
+	     cp = pg->children[i];
+
+#ifdef STRONG_FUNCTIONS
+	     if (pp->isfunc == FALSE)
+#endif
+	        pp = _job_fork(pp, cp, NULL, "rw", s);
 
 #ifdef TRACE
 	     fprintf(stderr, "trace> launch %d (%d,%d,%d)\n       %s\n",
@@ -1512,7 +1601,7 @@ static void free_statements(statement *sl)
  */
 
 statement *parse_statement(char *s, char **env, char *shell,
-			   PFPChar (*map)(char *s))
+			   PFPCAL (*map)(char *s))
    {int i, n, c;
     char *pt, *t, *ps;
     st_sep trm;
@@ -1695,7 +1784,7 @@ void job_background(process_session *ps, process *pp, int cont)
 
 /* AEXEC - execute a <statement> */
 
-int aexec(char *db, int c, char **v, char **env, PFPChar (*map)(char *s))
+int aexec(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
    {int i, nc, rv, st;
     char *s, *shell;
     statement *sl;
