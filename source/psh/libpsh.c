@@ -1113,7 +1113,10 @@ char *get_date(void)
 void nsleep(int ms)
    {
 
-    poll(NULL, 0, ms);
+    if (ms <= 0)
+       sched_yield();
+    else
+       poll(NULL, 0, ms);
 
     return;}
 

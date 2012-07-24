@@ -795,7 +795,9 @@ char **_db_clnt_ex(client *cl, int init, char *req)
 		  else
 		     p = lst_push(p, t);
 
-		  nc = strlen(t) + 1;};};};
+		  nc = strlen(t) + 1;};
+	     if (ok == TRUE)
+	        nsleep(0);};};
 
     log_activity(flog, dbg_db, "CLIENT", "end request");
 

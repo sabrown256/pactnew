@@ -2296,7 +2296,7 @@ static object *_SXI_set_label(SS_psides *si, object *argl)
     if ((obj == NULL) || (label == NULL))
        SS_error(si, "INSUFFICIENT ARGUMENTS - _SXI_SET_LABEL", argl);
 
-    if (SX_SETP(obj))
+    else if (SX_SETP(obj))
        {PM_set *s;
 
         s = SS_GET(PM_set, obj);
@@ -2326,6 +2326,13 @@ static object *_SXI_set_label(SS_psides *si, object *argl)
 
     else
        SS_error(si, "BAD DRAWABLE - _SXI_SET_LABEL", obj);
+
+/* NOTE: this is a problematic fix for a bug that only surfaced
+ * after more than 10 years
+ * the problematic part is the reference count
+ * the object print_name never was marked - tough to figure too
+ */
+    obj->print_name = label;
 
     obj = SS_car(si, argl);
 
