@@ -128,7 +128,7 @@ typedef void (*PFSIGHand)(int sig);
 typedef void (*PFIOHand)(int fd, int mask, void *a);
 
 enum e_io_hand
-   {IO_HND_NONE, IO_HND_CLOSE, IO_HND_PIPE, IO_HND_POLL};
+   {IO_HND_NONE, IO_HND_CLOSE, IO_HND_PIPE, IO_HND_FNC, IO_HND_POLL};
 
 typedef enum e_io_hand io_hand;
 
@@ -281,6 +281,26 @@ void _job_io_close(process *pp, io_kind knd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _IO_FILE_PTR - setup and return the FILE pointer for KND in PP */
+
+FILE *_io_file_ptr(process *pp, io_kind knd)
+   {iodes *lio;
+    FILE *fp;
+    char *modes[N_IO_CHANNELS] = { "r", "w", "w" };
+   
+    lio = pp->io + knd;
+    if (lio->fp == NULL)
+       {lio->fp = fdopen(lio->fd, modes[knd]);
+	if (lio->fp != NULL)
+	   setbuf(lio->fp, NULL);};
+
+    fp = lio->fp;
+
+    return(fp);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 sigset_t _block_all_sig(void)
    {sigset_t os;
 
@@ -384,11 +404,11 @@ void _default_iodes(iodes *fd)
 
     if (fd[1].knd == IO_STD_NONE)
        {fd[1].knd  = IO_STD_OUT;
-	fd[1].mode = IO_MODE_WO;};
+	fd[1].mode = IO_MODE_WD;};
 
     if (fd[2].knd == IO_STD_NONE)
        {fd[2].knd  = IO_STD_ERR;
-	fd[2].mode = IO_MODE_WO;};
+	fd[2].mode = IO_MODE_WD;};
 
     return;}
 

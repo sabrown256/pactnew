@@ -11,6 +11,8 @@
 /* look at process execution and I/O */
 /* #define TRACE */
 
+/* #define STRONG_FUNCTIONS */
+
 #include "common.h"
 #include "libpsh.c"
 #include "libdb.c"
@@ -34,6 +36,7 @@ static int do_fnc(char *db, int c, char **v, PFPCAL (*map)(char *x))
    {int i, rv, err_exist;
     io_mode md;
     char *fn;
+    FILE *fio[2];
     PFPCAL f;
 
     rv = -1;
@@ -59,7 +62,10 @@ static int do_fnc(char *db, int c, char **v, PFPCAL (*map)(char *x))
 	if (map != NULL)
 	   {f = map(fn);
 	    if (f != NULL)
-	       rv = f(db, md, c, v);};};
+	       {fio[0] = stdin;
+		fio[1] = stdout;
+
+		rv = f(db, md, fio, c, v);};};};
 
     return(rv);}
 
@@ -68,7 +74,7 @@ static int do_fnc(char *db, int c, char **v, PFPCAL (*map)(char *x))
 
 /* EXE_VAR - function to access variables */
 
-static int exe_var(char *db, io_mode md, int c, char **v)
+static int exe_var(char *db, io_mode md, FILE **fio, int c, char **v)
    {int i, n, nc, ns, rv;
     char t[MAXLINE];
     char *p, *vr, *vl, **sa;
@@ -98,8 +104,8 @@ static int exe_var(char *db, io_mode md, int c, char **v)
 /* stdin to variable */
 	    case IO_MODE_WO :
 	    case IO_MODE_WD :
-	         while (feof(stdin) == FALSE)
-		    {p = fgets(t, MAXLINE, stdin);
+	         while (feof(fio[0]) == FALSE)
+		    {p = fgets(t, MAXLINE, fio[0]);
 		     if (p != NULL)
 		        {LAST_CHAR(t) = '\0';
 			 sa = lst_add(sa, t);
@@ -116,13 +122,13 @@ static int exe_var(char *db, io_mode md, int c, char **v)
 
 /* stdin append to variable */
 	    case IO_MODE_APPEND :
-	         while (feof(stdin) == FALSE)
-		    {p = fgets(t, MAXLINE, stdin);
+	         while (feof(fio[0]) == FALSE)
+		    {p = fgets(t, MAXLINE, fio[0]);
 		     if (p != NULL)
 		        {LAST_CHAR(t) = '\0';
 			 sa = lst_add(sa, t);
 			 vl = concatenate(t, MAXLINE, sa, " ");
-			 fprintf(stdout, "%s\n", vl);};
+			 fprintf(fio[1], "%s\n", vl);};
 		       sched_yield();};
 
 		 if (db != NULL)
@@ -144,7 +150,7 @@ static int exe_var(char *db, io_mode md, int c, char **v)
 
 /* EXE_FILE - function to access files */
 
-static int exe_file(char *db, io_mode md, int c, char **v)
+static int exe_file(char *db, io_mode md, FILE **fio, int c, char **v)
    {int rv;
     char t[MAXLINE];
     char *p, *fn;
@@ -165,7 +171,7 @@ static int exe_file(char *db, io_mode md, int c, char **v)
 		    {while (feof(fp) == FALSE)
 		        {p = fgets(t, MAXLINE, fp);
 			 if (p != NULL)
-			    fputs(p, stdout);
+			    fputs(p, fio[1]);
 			 sched_yield();};
 
 		     fclose(fp);};
@@ -181,8 +187,8 @@ static int exe_file(char *db, io_mode md, int c, char **v)
 		 if (fp == NULL)
 		    fprintf(stderr, "Cannot open '%s' for writing\n", fn);
 		 else
-		    {while (feof(stdin) == FALSE)
-		        {p = fgets(t, MAXLINE, stdin);
+		    {while (feof(fio[0]) == FALSE)
+		        {p = fgets(t, MAXLINE, fio[0]);
 			 if (p != NULL)
 			    fputs(p, fp);
 			 sched_yield();};
@@ -196,8 +202,8 @@ static int exe_file(char *db, io_mode md, int c, char **v)
 		 if (fp == NULL)
 		    fprintf(stderr, "Cannot open '%s' for append\n", fn);
 		 else
-		    {while (feof(stdin) == FALSE)
-		        {p = fgets(t, MAXLINE, stdin);
+		    {while (feof(fio[0]) == FALSE)
+		        {p = fgets(t, MAXLINE, fio[0]);
 			 if (p != NULL)
 			    fputs(p, fp);
 			 sched_yield();};
@@ -215,7 +221,7 @@ static int exe_file(char *db, io_mode md, int c, char **v)
 
 /* EXE_TEST - function to test */
 
-static int exe_test(char *db, io_mode md, int c, char **v)
+static int exe_test(char *db, io_mode md, FILE **fio, int c, char **v)
    {int rv;
     char t[MAXLINE];
     char *tag, *p;
@@ -230,14 +236,14 @@ static int exe_test(char *db, io_mode md, int c, char **v)
 	     break;
 	case IO_MODE_WO :
 	case IO_MODE_WD :
-	     while (feof(stdin) == FALSE)
-	        {p = fgets(t, MAXLINE, stdin);
+	     while (feof(fio[0]) == FALSE)
+	        {p = fgets(t, MAXLINE, fio[0]);
 		 if (p != NULL)
 		    printf("%s> out: %s", tag, p);};
 	     break;
 	case IO_MODE_APPEND :
-	     while (feof(stdin) == FALSE)
-	        {p = fgets(t, MAXLINE, stdin);
+	     while (feof(fio[0]) == FALSE)
+	        {p = fgets(t, MAXLINE, fio[0]);
 		 if (p != NULL)
 		    printf("%s> append: %s", tag, t);};
 	     break;

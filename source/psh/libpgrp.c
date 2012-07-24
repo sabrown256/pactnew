@@ -55,7 +55,7 @@
 typedef struct s_statement statement;
 typedef struct s_process_session process_session;
 typedef char *(*PFPChar)(char *x);
-typedef int (*PFPCAL)(char *db, io_mode m, int c, char **v);
+typedef int (*PFPCAL)(char *db, io_mode m, FILE **fp, int c, char **v);
 
 struct s_statement
    {int np;                 /* number of processes in group */
@@ -630,11 +630,13 @@ static void redirect_process(process *pp)
 
     _default_iodes(pp->io);
 
+#ifndef STRONG_FUNCTIONS
     ta = pp->arg;
     if ((strcmp(ta[0], "aexec") == 0) && (strcmp(ta[1], "-p") == 0))
        {pp->isfunc = TRUE;
 	for (i = 0; i < N_IO_CHANNELS; i++)
 	    pp->io[i].dev = IO_DEV_FNC;};
+#endif
 
     return;}
 
@@ -714,7 +716,20 @@ void fillin_pgrp(process_group *pg)
 		  dio->dev = IO_DEV_PIPE;
 	          break;
 	     default :
-	          break;};};
+	          break;};
+
+#ifdef STRONG_FUNCTIONS
+	 char **ta;
+
+	 ta = pp->arg;
+	 if ((strcmp(ta[0], "aexec") == 0) && (strcmp(ta[1], "-p") == 0))
+	    {pp->isfunc = TRUE;
+	     for (i = 0; i < N_IO_CHANNELS; i++)
+	         {pio = pp->io + i;
+		  if (pio->gid != -1)
+		     pio->dev = IO_DEV_FNC;};};
+#endif
+	 };
 
     return;}
 
@@ -1378,15 +1393,16 @@ int _pgrp_tty(char *tag)
  */
 
 void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
-   {int c, io, rv;
+   {int c, io, ip, rv;
     io_mode md;
     io_device dv;
+    io_hand hnd;
     iodes *pio;
     char *db, *fn, **v;
-    FILE *fp;
+    FILE *fp[2];
     statement *s;
     process_group *pg;
-    process *pp;
+    process *pp, **pa;
     PFPCAL f;
     PFPCAL (*map)(char *nm);
 
@@ -1394,27 +1410,39 @@ void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
     map = s->map;
     if (map != NULL)
        {pg = s->pg;
-	pp = pg->parents[i];
+        np = s->np;
+	db = NULL;
+
+        pa = pg->parents;
+	for (ip = 0; ip < np; ip++)
+	    {pp = pa[ip];
 
 /* if the current process is a function execute it */
-	for (io = 1; io < N_IO_CHANNELS; io++)
-	    {pio = pp->io + io;
-	     dv  = pio->dev;
-	     if (dv == IO_DEV_FNC)
-	        {v  = pp->arg;
-		 c  = lst_length(pp->arg);
-		 fn = v[2];
-		 fp = pio->fp;
-		 f  = map(fn);
-		 if ((f != NULL) && (fp != NULL))
-		    {v += 4;
-		     c -= 4;
+	     for (io = 0; io < N_IO_CHANNELS; io++)
+	         {pio = pp->io + io;
+		  md  = pio->mode;
+		  dv  = pio->dev;
+		  hnd = pio->hnd;
+		  if ((hnd == IO_HND_FNC) || (dv == IO_DEV_FNC))
+		     {v  = pp->arg;
+		      c  = lst_length(pp->arg);
+		      fn = v[2];
+		      f  = map(fn);
+		      if (f != NULL)
+			 {v += 4;
+			  c -= 4;
+
+			  if (io == IO_STD_IN)
+			     {fp[0] = _io_file_ptr(pp, io);
+			      fp[1] = _io_file_ptr(pp, IO_STD_OUT);}
+			  else
+			     {fp[0] = _io_file_ptr(pp, IO_STD_IN);
+			      fp[1] = _io_file_ptr(pp, io);};
 #ifdef TRACE
-		     fprintf(stderr, "trace> call '%s' (%d)\n", fn, i);
+			  fprintf(stderr, "trace> call '%s' (%d)\n", fn, i);
 #endif
-		     db = NULL;
-		     md = pio->mode;
-		     rv = f(db, md, c, v);};};};};
+			  rv = f(db, md, fp, c, v);
+			  ASSERT(rv >= -1);};};};};};
 
     return;}
 
