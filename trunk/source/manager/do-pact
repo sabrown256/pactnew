@@ -660,11 +660,21 @@ switch ($Phase)
            flog $LogHost set SrcDir = $FooDir/$SrcType
 
            if ($use_rsync == TRUE) then
+              @ lerr = 0
               set opt = ""
               set opt = ( $opt -auvC )
               set opt = ( $opt --del )
+
+# rsync just the changed files
               flog $LogHost rsync $opt --exclude 'z-*' --exclude dev --exclude manager --exclude panacea/abc --exclude tests $WrkDir/ $SrcDir
-              set xstatus = $status
+              @ lerr = $lerr + $status
+
+# fix the permissions for users
+              flog $LogHost chmod -R g+rwX,o+rX $SrcDir
+              @ lerr = $lerr + $status
+
+              set xstatus = $lerr
+              unset lerr
            else
 
               flog $LogHost cp -R $WrkDir/* $SrcDir
