@@ -70,6 +70,227 @@ static int do_fnc(char *db, int c, char **v, PFPCAL (*map)(char *x))
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
+
+#ifdef STRONG_FUNCTIONS
+
+/*--------------------------------------------------------------------------*/
+
+/* STR_VAR - function to access variables */
+
+static int str_var(char *db, io_mode md, FILE **fio, int c, char **v)
+   {int i, n, nc, ns, rv;
+    char t[MAXLINE];
+    char *p, *vr, *vl, **sa;
+
+    rv = 0;
+    vr = v[0];
+
+    if ((vr != NULL) && (md != IO_MODE_NONE))
+       {sa = NULL;
+
+        vl = getenv(vr);
+	if (vl != NULL)
+	   sa = lst_add(sa, vl);
+
+	switch (md)
+
+/* variable to stdout NC times */
+	   {case IO_MODE_RO :
+	         nc = 1;
+		 ns = lst_length(sa);
+		 for (n = 0; n < nc; n++)
+		     {for (i = 0; i < ns; i++)
+			  printf("%s ", sa[i]);
+		      printf("\n");};
+		 break;
+
+/* stdin to variable */
+	    case IO_MODE_WO :
+	    case IO_MODE_WD :
+	         while (feof(fio[0]) == FALSE)
+		    {p = fgets(t, MAXLINE, fio[0]);
+		     if (p != NULL)
+		        {LAST_CHAR(t) = '\0';
+			 sa = lst_add(sa, t);
+		       sched_yield();};};
+
+		 vl = concatenate(t, MAXLINE, sa, " ");
+
+		 if (db != NULL)
+		    dbset(NULL, vr, vl);
+		 else
+		    printf("setenv %s \"%s\" ; ", vr, vl);
+
+		 break;
+
+/* stdin append to variable */
+	    case IO_MODE_APPEND :
+	         while (feof(fio[0]) == FALSE)
+		    {p = fgets(t, MAXLINE, fio[0]);
+		     if (p != NULL)
+		        {LAST_CHAR(t) = '\0';
+			 sa = lst_add(sa, t);
+			 vl = concatenate(t, MAXLINE, sa, " ");
+			 fprintf(fio[1], "%s\n", vl);};
+		       sched_yield();};
+
+		 if (db != NULL)
+		    dbset(NULL, vr, vl);
+		 else
+		    printf("setenv %s \"%s\" ; ", vr, vl);
+
+		 break;
+
+	    default :
+		 break;};
+
+	free_strings(sa);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* STR_FILE - function to access files */
+
+static int str_file(char *db, io_mode md, FILE **fio, int c, char **v)
+   {int rv;
+    char t[MAXLINE];
+    char *p, *fn;
+    static FILE *fp = NULL;
+
+    rv = 0;
+    fn = v[0];
+
+    if ((fn != NULL) && (md != IO_MODE_NONE))
+       {if (fp == NULL)
+
+/* open the file */
+	   {switch (md)
+	       {case IO_MODE_RO :
+		     fp = fopen(fn, "r");
+		     if (fp == NULL)
+		        fprintf(stderr, "Cannot open '%s' for reading\n", fn);
+		     break;
+
+	        case IO_MODE_WO :
+		     if (file_exists(fn) == TRUE)
+		        return(-1);
+
+	        case IO_MODE_WD :
+		     fp = fopen(fn, "w");
+		     if (fp == NULL)
+		        fprintf(stderr, "Cannot open '%s' for writing\n", fn);
+		     break;
+
+	        case IO_MODE_APPEND :
+		     fp = fopen(fn, "a");
+		     if (fp == NULL)
+		        fprintf(stderr, "Cannot open '%s' for append\n", fn);
+		     break;
+
+	       default :
+		     break;};};
+
+	if (fp != NULL)
+
+/* do the I/O */
+	   {switch (md)
+
+/* file to stdout */
+	       {case IO_MODE_RO :
+		     while (feof(fp) == FALSE)
+		        {p = fgets(t, MAXLINE, fp);
+			 if (p != NULL)
+			    fputs(p, fio[1]);
+			 sched_yield();};
+		     break;
+
+/* stdin to file */
+	        case IO_MODE_WO :
+	        case IO_MODE_WD :
+		     while (feof(fio[0]) == FALSE)
+		        {p = fgets(t, MAXLINE, fio[0]);
+			 if (p != NULL)
+			    fputs(p, fp);
+			 sched_yield();};
+
+		     fflush(fp);
+		     break;
+
+/* stdin append to file */
+	        case IO_MODE_APPEND :
+		     while (feof(fio[0]) == FALSE)
+		        {p = fgets(t, MAXLINE, fio[0]);
+			 if (p != NULL)
+			    fputs(p, fp);
+			 sched_yield();};
+
+		     fflush(fp);
+		     break;
+
+	        default :
+		     break;};};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* STR_TEST - function to test */
+
+static int str_test(char *db, io_mode md, FILE **fio, int c, char **v)
+   {int rv;
+    char t[MAXLINE];
+    char *tag, *p;
+    static int count = 0;
+
+    rv  = 0;
+    tag = v[0];
+
+    switch (md)
+       {case IO_MODE_RO :
+	     printf("%s> originate: %d\n", tag, ++count);
+	     break;
+	case IO_MODE_WO :
+	case IO_MODE_WD :
+	     while (feof(fio[0]) == FALSE)
+	        {p = fgets(t, MAXLINE, fio[0]);
+		 if (p != NULL)
+		    printf("%s> out: %s", tag, p);};
+	     break;
+	case IO_MODE_APPEND :
+	     while (feof(fio[0]) == FALSE)
+	        {p = fgets(t, MAXLINE, fio[0]);
+		 if (p != NULL)
+		    printf("%s> append: %s", tag, t);};
+	     break;
+        default :
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* MAPS - map function name to procedure for execution */
+
+static PFPCAL maps(char *s)
+   {PFPCAL f;
+
+    if (strcmp(s, "var") == 0)
+       f = str_var;
+    else if (strcmp(s, "file") == 0)
+       f = str_file;
+    else if (strcmp(s, "test") == 0)
+       f = str_test;
+
+    return(f);}
+
+/*--------------------------------------------------------------------------*/
+
+#else
+
 /*--------------------------------------------------------------------------*/
 
 /* EXE_VAR - function to access variables */
@@ -270,6 +491,9 @@ static PFPCAL mapf(char *s)
     return(f);}
 
 /*--------------------------------------------------------------------------*/
+
+#endif
+
 /*--------------------------------------------------------------------------*/
 
 /* HELP - print help message */
@@ -300,17 +524,20 @@ int main(int c, char **v, char **env)
         {if (strcmp(v[i], "-h") == 0)
             {rv = help();
 	     break;}
+
+#ifdef STRONG_FUNCTIONS
+	 else
+	    {rv = gexec(db, c-1, v+1, env, maps);
+	     break;};
+#else
 	 else if (strcmp(v[i], "-p") == 0)
             {rv = do_fnc(db, c-i-1, v+i+1, mapf);
 	     break;}
 	 else
-            {
-#ifdef STRONG_FUNCTIONS
-	     rv = gexec(db, c-1, v+1, env, mapf);
-#else
-	     rv = gexec(db, c-1, v+1, env, NULL);
+            {rv = gexec(db, c-1, v+1, env, NULL);
+	     break;};
 #endif
-	     break;};};
+	};
 
 #ifdef DEBUG
     printf("main> z\n");

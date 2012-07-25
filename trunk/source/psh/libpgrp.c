@@ -334,7 +334,7 @@ void dprgio(char *tag, int n, process **pa, process **ca)
 /* SET_IODES - parse IOS and set the members of IOS accordingly */
 
 int set_iodes(iodes *pio, char *ios)
-   {int ck, cd, fid, gid, nc, ni, rel, pos, rv;
+   {int ck, cd, gid, nc, ni, rel, pos, rv;
     char *p, *err_exist;
     io_mode mode;
     io_device dev;
@@ -347,7 +347,6 @@ int set_iodes(iodes *pio, char *ios)
     mode = IO_MODE_NONE;
 
     gid = pio->gid;
-    fid = pio->fid;
 
     if (ios[0] == PROCESS_DELIM)
        ios++;
@@ -389,7 +388,8 @@ int set_iodes(iodes *pio, char *ios)
 	if (dev == IO_DEV_PIPE)
 	   {p = ios + nc;
 	    if (IS_NULL(p) == TRUE)
-	       pos = (knd == IO_STD_IN) ? -1 : 1;
+/*	       pos = (knd == IO_STD_IN) ? -1 : 1; */
+	       pos = 1;
 	    else
 	       pos = atoi(ios+nc);
 
@@ -415,7 +415,6 @@ int set_iodes(iodes *pio, char *ios)
 	rv = TRUE;};
 
     pio->knd  = knd;
-    pio->fid  = fid;
     pio->gid  = gid;
     pio->dev  = dev;
     pio->mode = mode;
@@ -519,23 +518,14 @@ void redir_io(iodes *fd, int nfd, int ifd, iodes *pio)
  */
 
 static int parse_redirect(iodes *pio, process *pp, int i)
-   {int fid, gid;
-    char *t, **ta;
+   {char *t, **ta;
 
     ta = pp->ios;
 
     if (pio != NULL)
        {t = ta[i];
 	
-	gid = pp->ip;
-	fid = -1;
-
-/* determine the name of the file for redirection */
-	if (strcmp(t, "2>&1") == 0)
-	   fid = 1;
-
-	pio->gid  = gid;
-	pio->fid  = fid;
+	pio->gid  = pp->ip;
 	pio->file = NULL;
 
 /* parse out the specification - results in PIO */
@@ -582,17 +572,7 @@ static int redirect_fd(process *pp, int i)
 	     redir_io(pp->io, N_IO_CH, 2, &io);
 	     io.fd = pp->io[1].fd;
 	     pp->io[1] = io;
-#ifdef NEWWAY
-
-/* since 2>&1 syntax does not specify a file name this is split up */
-	     if ((io.file != NULL) && (io.fid != -1))
-	        redir_io(pp->io, N_IO_CH, 1, &io);
-	     else
-	        {io.file = pp->io[1].name;
-		 io.raw  = STRSAVE(p);};
-#else
 	     redir_io(pp->io, N_IO_CH, 1, &io);
-#endif
 	     break;
         default :
 	     break;};
@@ -718,20 +698,7 @@ void fillin_pgrp(process_group *pg)
 		  dio->dev = IO_DEV_PIPE;
 	          break;
 	     default :
-	          break;};
-
-#ifdef STRONG_FUNCTIONS
-	 char **ta;
-
-	 ta = pp->arg;
-	 if ((strcmp(ta[0], "gexec") == 0) && (strcmp(ta[1], "-p") == 0))
-	    {pp->isfunc = TRUE;
-	     for (i = 0; i < N_IO_CHANNELS; i++)
-	         {pio = pp->io + i;
-		  if (pio->gid != -1)
-		     pio->dev = IO_DEV_FNC;};};
-#endif
-	 };
+	          break;};};
 
     return;}
 
@@ -912,18 +879,28 @@ void transfer_fnc_child(int n, process **pa, process **ca)
 
 #ifdef STRONG_FUNCTIONS
     int i, io;
+    char **ta;
+    iodes *pio;
     process *pp, *cp;
 
     for (i = 0; i < n; i++)
         {pp = pa[i];
-	  cp = ca[i];
+	 cp = ca[i];
 
-	  if (pp->isfunc == TRUE)
-	     {for (io = 0; io < N_IO_CHANNELS; io++)
-		  transfer_fd(cp, io, pp, io);
-	       _job_free(cp);
+	 ta = pp->arg;
+	 if ((strcmp(ta[0], "gexec") == 0) && (strcmp(ta[1], "-p") == 0))
+	    {pp->isfunc = TRUE;
+	     for (i = 0; i < N_IO_CHANNELS; i++)
+	         {pio = pp->io + i;
+/*		  if (pio->gid != -1) */
+		     pio->dev = IO_DEV_FNC;};};
 
-	       ca[i] = NULL;};};
+	 if (pp->isfunc == TRUE)
+	    {for (io = 0; io < N_IO_CHANNELS; io++)
+		 transfer_fd(cp, io, pp, io);
+	     _job_free(cp);
+
+	     ca[i] = NULL;};};
 #endif
 
     return;}
