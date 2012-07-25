@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# EXT-FILE - test aexec with files
+# EXT-FILE - test gexec with files
 #
 
 unalias *
@@ -9,7 +9,7 @@ unalias *
 
 source $TestScrDir/env-csh
 
-alias pe  'unsetenv astatus ; echo "" ; echo "Command: \!*" ; aexec \!* ; dbget astatus'
+alias pe  'unsetenv gstatus ; echo "" ; echo "Command: \!*" ; gexec \!* ; dbget gstatus'
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -98,8 +98,8 @@ foreach i (1 2 3 4 5 6)
 
    cat $res
 
-   echo "> astatus = $astatus"
-   if ("$astatus" != "$gst") then
+   echo "> gstatus = $gstatus"
+   if ("$gstatus" != "$gst") then
       @ err = $err + 1
       echo "$id failed"
    else if (-f $ref) then
