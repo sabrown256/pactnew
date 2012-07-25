@@ -59,6 +59,8 @@ typedef int (*PFPCAL)(char *db, io_mode m, FILE **fp, int c, char **v);
 
 struct s_statement
    {int np;                 /* number of processes in group */
+    int nf;                 /* number of functions in group */
+    int ne;                 /* number of entries in group */
     st_sep terminator;      /* action terminator of group */
     char *text;             /* text of group */
     char *shell;            /* shell which runs the individual processes */
@@ -740,9 +742,16 @@ void fillin_pgrp(process_group *pg)
 
 static int transfer_fd(process *pn, io_kind pk, process *cn, io_kind ck)
    {int fd;
+    FILE *fp;
+
+    fd = pn->io[pk].fd;
+    fp = pn->io[pk].fp;
 
     pn->io[pk].hnd = IO_HND_PIPE;
-    fd             = pn->io[pk].fd;
+    pn->io[pk].fp  = NULL;
+#ifdef STRONG_FUNCTIONS
+    pn->io[pk].fd  = -100;
+#endif
 
 /* GOTCHA: we can close something we need in the bonded case
  * or leak descriptors in the other cases
@@ -750,6 +759,7 @@ static int transfer_fd(process *pn, io_kind pk, process *cn, io_kind ck)
     _fd_close(cn->io[ck].fd);
  */
     cn->io[ck].hnd = IO_HND_PIPE;
+    cn->io[ck].fp  = fp;
     cn->io[ck].fd  = fd;
 
     return(fd);}
@@ -1263,7 +1273,7 @@ static void parse_pgrp(statement *s)
     printf("dbg> pgrp: %s\n", s->text);
 #endif
 
-    s->np = it;
+    s->ne = it;
     s->pg = pg;
 
     return;}
@@ -1393,7 +1403,7 @@ int _pgrp_tty(char *tag)
  */
 
 void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
-   {int c, io, ip, rv;
+   {int c, io, ip, ne, rv;
     io_mode md;
     io_device dv;
     io_hand hnd;
@@ -1410,11 +1420,11 @@ void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
     map = s->map;
     if (map != NULL)
        {pg = s->pg;
-        np = s->np;
+        ne = s->ne;
 	db = NULL;
 
         pa = pg->parents;
-	for (ip = 0; ip < np; ip++)
+	for (ip = 0; ip < ne; ip++)
 	    {pp = pa[ip];
 
 /* if the current process is a function execute it */
@@ -1434,14 +1444,17 @@ void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
 
 			  if (io == IO_STD_IN)
 			     {fp[0] = _io_file_ptr(pp, io);
-			      fp[1] = _io_file_ptr(pp, IO_STD_OUT);}
+			      fp[1] = _io_file_ptr(pp, IO_STD_OUT);
+			      md    = IO_MODE_WD;}
 			  else
 			     {fp[0] = _io_file_ptr(pp, IO_STD_IN);
-			      fp[1] = _io_file_ptr(pp, io);};
+			      fp[1] = _io_file_ptr(pp, io);
+			      md    = IO_MODE_RO;};
 #ifdef TRACE
 			  fprintf(stderr, "trace> call '%s' (%d)\n", fn, i);
 #endif
 			  rv = f(db, md, fp, c, v);
+			  pp->reason = rv;
 			  ASSERT(rv >= -1);};};};};};
 
     return;}
@@ -1496,7 +1509,7 @@ void register_io_pgrp(process_group *pg)
 /* RUN_PGRP - run the process group PG */
 
 static int run_pgrp(statement *s)
-   {int i, np, rv, tc, fd;
+   {int i, ne, np, rv, tc, fd;
     char vl[MAXLINE];
     char *db;
     process *pp, *cp;
@@ -1506,9 +1519,22 @@ static int run_pgrp(statement *s)
 
     if (s != NULL)
        {pg = s->pg;
-	np = s->np;
+	ne = s->ne;
 
-	s->st = MAKE_N(int, np);
+	s->st = MAKE_N(int, ne);
+
+#ifdef STRONG_FUNCTIONS
+	for (i = 0; i < ne; i++)
+	    {pp = pg->parents[i];
+	     if (pp->isfunc == TRUE)
+                 s->nf++;
+	     else
+                 s->np++;};
+#else
+        s->np = s->ne;
+#endif
+
+	np = s->np;
 
 	asetup(np, 1);
 
@@ -1562,7 +1588,7 @@ static int run_pgrp(statement *s)
 /* process the exit statuses */
 	rv    = 0;
 	vl[0] = '\0';
-	for (i = 0; i < np; i++)
+	for (i = 0; i < ne; i++)
 	    {rv |= s->st[i];
 	     vstrcat(vl, MAXLINE, "%d ", s->st[i]);};
 	LAST_CHAR(vl) = '\0';
@@ -1615,7 +1641,7 @@ static void free_statements(statement *sl)
     for (n = 0; sl[n].text != NULL; n++)
         {FREE(sl[n].text);
 	 FREE(sl[n].st);
-	 free_pgrp(sl[n].pg, sl[n].np);};
+	 free_pgrp(sl[n].pg, sl[n].ne);};
 
     FREE(sl);
 
@@ -1675,7 +1701,10 @@ statement *parse_statement(char *s, char **env, char *shell,
 	        sa = MAKE_N(statement, 1000);
 
 	     if (sa != NULL)
-	        {sa[i].terminator = trm;
+	        {sa[i].np         = 0;
+	         sa[i].nf         = 0;
+	         sa[i].ne         = 0;
+                 sa[i].terminator = trm;
 		 sa[i].text       = STRSAVE(trim(pt, BOTH, " \t\n\r\f"));
 		 sa[i].shell      = STRSAVE(shell);
 		 sa[i].env        = env;
@@ -1758,7 +1787,8 @@ process_session *init_session(void)
  */
      
 void job_foreground(process_session *ps, process *pp, int cont)
-   {struct termios attr;
+   {int pgid, st;
+    struct termios attr;
 
 /*    attr = pp->trm_attr; */
 
@@ -1767,9 +1797,11 @@ void job_foreground(process_session *ps, process *pp, int cont)
      
 /* send the job a continue signal, if necessary */
     if (cont == TRUE)
-       {tcsetattr(ps->terminal, TCSADRAIN, &attr);
-	if (kill(- pp->pgid, SIGCONT) < 0)
-	   perror("kill(SIGCONT)");};
+       {pgid = pp->pgid;
+	st = tcsetattr(ps->terminal, TCSADRAIN, &attr);
+	st = kill(-pgid, SIGCONT);
+	if (st < 0)
+	   perror("SIGCONT");};
      
 /* wait for it to report */
     job_wait(pp);
@@ -1796,12 +1828,14 @@ void job_foreground(process_session *ps, process *pp, int cont)
  */
      
 void job_background(process_session *ps, process *pp, int cont)
-   {
+   {int pgid, st;
 
 /* send the job a continue signal */
     if (cont == TRUE)
-       {if (kill(-pp->pgid, SIGCONT) < 0)
-           perror("kill(SIGCONT)");};
+       {pgid = pp->pgid;
+	st = kill(-pgid, SIGCONT);
+        if (st < 0)
+           perror("SIGCONT");};
 
     ps->foreground = FALSE;
 
