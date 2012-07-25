@@ -1216,11 +1216,11 @@ void asetup(int n, int na)
     if (stck.fd != NULL)
        FREE(stck.fd);
 
-    stck.ifd  = 0;
-    stck.nfd  = N_IO_CHANNELS*n;
-    stck.fd   = MAKE_N(apollfd, N_IO_CHANNELS*n);
-    stck.map  = MAKE_N(int, N_IO_CHANNELS*n);
-    stck.io   = MAKE_N(int, N_IO_CHANNELS*n);
+    stck.ifd = 0;
+    stck.nfd = N_IO_CHANNELS*n;
+    stck.fd  = MAKE_N(apollfd, N_IO_CHANNELS*n);
+    stck.map = MAKE_N(int, N_IO_CHANNELS*n);
+    stck.io  = MAKE_N(int, N_IO_CHANNELS*n);
 
 /* everything else */
     stck.nattempt = na;
