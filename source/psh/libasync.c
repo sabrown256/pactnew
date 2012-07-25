@@ -164,7 +164,6 @@ typedef struct s_iodes iodes;
 
 struct s_iodes
    {int fd;
-    int fid;                /* file descriptor for redirect - 2>&1 type */
     int gid;                /* index of process group member for redirect */
     int flag;               /* file open mode flags */
     io_hand hnd;
@@ -370,7 +369,6 @@ static void _init_iodes(int n, iodes *fd)
 
     for (i = 0; i < n; i++)
         {fd[i].fd   = -1;
-	 fd[i].fid  = -1;
 	 fd[i].gid  = -1;
 	 fd[i].flag = -1;
 	 fd[i].knd  = IO_STD_NONE;
