@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-# EXT-VAR - test aexec with variables
+# EXT-VAR - test gexec with variables
 #
 
 unalias *
@@ -9,7 +9,7 @@ unalias *
 
 source $TestScrDir/env-csh
 
-alias pe  'unsetenv astatus ; echo "" ; echo "Command: \!*" ; aexec \!* ; dbget astatus'
+alias pe  'unsetenv gstatus ; echo "" ; echo "Command: \!*" ; gexec \!* ; dbget gstatus'
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -101,8 +101,8 @@ foreach i (1 2 3 4 5 6)
 
    cat $res
 
-   echo "> astatus = $astatus"
-   if ("$astatus" != "$gst") then
+   echo "> gstatus = $gstatus"
+   if ("$gstatus" != "$gst") then
       @ err = $err + 1
       echo "$id failed"
    else if (-f $ref) then
@@ -141,8 +141,8 @@ echo "# simple stdout variants"
    dbget v1
    cat ext-v1.res
    echo "> v1      = `printenv v1`"
-   echo "> astatus = $astatus"
-   if ("$astatus" != "0 0") then
+   echo "> gstatus = $gstatus"
+   if ("$gstatus" != "0 0") then
       @ err = $err + 1
       echo "v1 failed"
    else
@@ -156,8 +156,8 @@ echo "# simple stdin variants"
 
    pe cat @i vr:v1 >&! ext-v2.res
    cat ext-v2.res
-   echo "> astatus = $astatus"
-   if ("$astatus" != "0 0") then
+   echo "> gstatus = $gstatus"
+   if ("$gstatus" != "0 0") then
       @ err = $err + 1
       echo "v2 failed"
    else
@@ -173,8 +173,8 @@ echo "# simple append variants"
    dbget v1
    cat ext-v3.res
    echo "> v1      = `printenv v1`"
-   echo "> astatus = $astatus"
-   if ("$astatus" != "0 0") then
+   echo "> gstatus = $gstatus"
+   if ("$gstatus" != "0 0") then
       @ err = $err + 1
       echo "v3 failed"
    else
@@ -190,8 +190,8 @@ echo "# simple bonded variants"
    dbget v4
    cat ext-v4.res
    echo "> v4      = `printenv v4`"
-   echo "> astatus = $astatus"
-   if ("$astatus" != "0 0") then
+   echo "> gstatus = $gstatus"
+   if ("$gstatus" != "0 0") then
       @ err = $err + 1
       echo "v4 failed"
    else
@@ -212,8 +212,8 @@ if (0) then
    cat ext-v5.res
    echo "> v5out   = `printenv v5out`"
    echo "> v5err   = `printenv v5err`"
-   echo "> astatus = $astatus"
-   if ("$astatus" != "0 0 0") then
+   echo "> gstatus = $gstatus"
+   if ("$gstatus" != "0 0 0") then
       @ err = $err + 1
       echo "v5 failed"
    else
@@ -231,8 +231,8 @@ if (0) then
    cat ext-v6.res
    echo "> v6out   = `printenv v6out`"
    echo "> v6err   = `printenv v6err`"
-   echo "> astatus = $astatus"
-   if ("$astatus" != "2 0 0") then
+   echo "> gstatus = $gstatus"
+   if ("$gstatus" != "2 0 0") then
       @ err = $err + 1
       echo "v6 failed"
    else

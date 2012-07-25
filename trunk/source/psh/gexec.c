@@ -1,5 +1,5 @@
 /*
- * AEXEC.C - process group management
+ * GEXEC.C - process group management
  *
  * #include "cpyright.h"
  *
@@ -21,7 +21,7 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DO_FNC - abstract function/procedure as process for AEXEC
+/* DO_FNC - abstract function/procedure as process for GEXEC
  *        - mode -r means stdin to fnc
  *        -      -w means fnc to stdout
  *        -      -a means stdin to fnc to stdout
@@ -306,9 +306,9 @@ int main(int c, char **v, char **env)
 	 else
             {
 #ifdef STRONG_FUNCTIONS
-	     rv = aexec(db, c-1, v+1, env, mapf);
+	     rv = gexec(db, c-1, v+1, env, mapf);
 #else
-	     rv = aexec(db, c-1, v+1, env, NULL);
+	     rv = gexec(db, c-1, v+1, env, NULL);
 #endif
 	     break;};};
 

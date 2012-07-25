@@ -634,7 +634,7 @@ static void redirect_process(process *pp)
 
 #ifndef STRONG_FUNCTIONS
     ta = pp->arg;
-    if ((strcmp(ta[0], "aexec") == 0) && (strcmp(ta[1], "-p") == 0))
+    if ((strcmp(ta[0], "gexec") == 0) && (strcmp(ta[1], "-p") == 0))
        {pp->isfunc = TRUE;
 	for (i = 0; i < N_IO_CHANNELS; i++)
 	    pp->io[i].dev = IO_DEV_FNC;};
@@ -724,7 +724,7 @@ void fillin_pgrp(process_group *pg)
 	 char **ta;
 
 	 ta = pp->arg;
-	 if ((strcmp(ta[0], "aexec") == 0) && (strcmp(ta[1], "-p") == 0))
+	 if ((strcmp(ta[0], "gexec") == 0) && (strcmp(ta[1], "-p") == 0))
 	    {pp->isfunc = TRUE;
 	     for (i = 0; i < N_IO_CHANNELS; i++)
 	         {pio = pp->io + i;
@@ -1032,9 +1032,9 @@ static void setup_pgrp(process_group *pg, int it,
 /*--------------------------------------------------------------------------*/
 
 /* EXPAND_SHORTHAND - expand shorthand notations:
- *                  -  file       =>  f<x>:<name>  -> aexec -p file -<x> <name>
- *                  -  variable   =>  v<x>:<name>  -> aexec -p var -<x> <name>
- *                  -  procedure  =>  p<x>:<name>  -> aexec -p <name> -<x>
+ *                  -  file       =>  f<x>:<name>  -> gexec -p file -<x> <name>
+ *                  -  variable   =>  v<x>:<name>  -> gexec -p var -<x> <name>
+ *                  -  procedure  =>  p<x>:<name>  -> gexec -p <name> -<x>
  *                  -  executable =>  x<x>:<name>  -> <name>
  */
 
@@ -1053,7 +1053,7 @@ static char **expand_shorthand(char **ta, char *t)
 
 /* file */
 	   {case 'f' :
-	         ta = lst_add(ta, "aexec");
+	         ta = lst_add(ta, "gexec");
 	         ta = lst_add(ta, "-p");
 	         ta = lst_add(ta, "file");
 	         ta = lst_push(ta, "-%s", md);
@@ -1062,7 +1062,7 @@ static char **expand_shorthand(char **ta, char *t)
 
 /* variable */
 	    case 'v' :
-	         ta = lst_add(ta, "aexec");
+	         ta = lst_add(ta, "gexec");
 	         ta = lst_add(ta, "-p");
 	         ta = lst_add(ta, "var");
 	         ta = lst_push(ta, "-%s", md);
@@ -1071,7 +1071,7 @@ static char **expand_shorthand(char **ta, char *t)
 
 /* procedure */
 	    case 'p' :
-	         ta = lst_add(ta, "aexec");
+	         ta = lst_add(ta, "gexec");
 	         ta = lst_add(ta, "-p");
 	         ta = lst_add(ta, nm);
 	         ta = lst_push(ta, "-%s", md);
@@ -1595,9 +1595,9 @@ static int run_pgrp(statement *s)
 
 	db = getenv("PERDB_PATH");
 	if (db != NULL)
-	   dbset(NULL, "astatus", vl);
+	   dbset(NULL, "gstatus", vl);
 	else
-	   printf("setenv astatus \"%s\"\n", vl);
+	   printf("setenv gstatus \"%s\"\n", vl);
 
         FREE(s->st);};
 
@@ -1844,9 +1844,9 @@ void job_background(process_session *ps, process *pp, int cont)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* AEXEC - execute a <statement> */
+/* GEXEC - execute a <statement> */
 
-int aexec(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
+int gexec(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
    {int i, nc, rv, st;
     char *s, *shell;
     statement *sl;
