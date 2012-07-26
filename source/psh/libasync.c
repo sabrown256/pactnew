@@ -160,7 +160,13 @@ typedef struct pollfd apollfd;
 typedef struct s_process process;
 typedef struct s_process_group process_group;
 typedef struct s_process_stack process_stack;
+typedef struct s_io_connector io_connector;
 typedef struct s_iodes iodes;
+
+/* NOTE: one of the difficulties in managing the connections between
+ * processes is keeping track of which elements are about the connection
+ * and which are about the end-point of the connection
+ */
 
 struct s_iodes
    {int fd;
@@ -173,6 +179,15 @@ struct s_iodes
     char *file;
     char **raw;
     FILE *fp;};
+
+/* connection between process
+ * parent associates with one end
+ * child associates with the other end
+ */
+
+struct s_io_connector
+   {iodes in;                /* descriptor for input - read */
+    iodes out;};             /* descriptor for output - write */
 
 struct s_process
    {int ip;                                                /* process index */
@@ -190,6 +205,7 @@ struct s_process
     char *shell;
     char mode[10];
 
+    io_connector *ioc;
     iodes io[N_IO_CHANNELS];
 
     double start_time;
@@ -206,6 +222,7 @@ struct s_process_group
     char *mode;             /* IPC mode */
     char *shell;
     char **env;
+    io_connector *ioc;
     process *terminal;      /* terminal process */
     process **parents;      /* parent process array */
     process **children;};   /* child process array */
@@ -243,11 +260,15 @@ static sigjmp_buf
 int _fd_close(int fd)
    {int rv;
 
-#ifdef DEBUG
-    fprintf(stderr, "dbg> closing %d\n", fd);
-#endif
-
+#if 0
+    rv = 0;
+#else
     rv = close(fd);
+
+#ifdef DEBUG
+    fprintf(stderr, "dbg> %d closing %d (%d)\n", getpid(), fd, rv);
+#endif
+#endif
 
     return(rv);}
 
@@ -510,7 +531,7 @@ static void _job_free(process *pp)
        {pp->ip = -2;
 	FREE(pp);}
     else
-       printf("Job freed twice\n");
+       fprintf(stderr, "Job freed twice\n");
 
     return;}
 
@@ -565,9 +586,9 @@ static int _job_exec(process *cp, char **argv, char **env, char *mode)
 
 /* if we get here the exec failed */
     if (err == -1)
-       fprintf(stdout, "EXECVP ERROR: '%s' - _JOB_EXEC", argv[0]);
+       fprintf(stderr, "EXECVP ERROR: '%s' - _JOB_EXEC", argv[0]);
     else
-       fprintf(stdout, "EXECVP RETURNED: '%s' - _JOB_EXEC", argv[0]);
+       fprintf(stderr, "EXECVP RETURNED: '%s' - _JOB_EXEC", argv[0]);
 
     return(err);}
 
@@ -595,7 +616,7 @@ static int _job_set_attr(int fd, int i, int state)
 
     arg = fcntl(fd, F_GETFL);
     if (arg < 0)
-       fprintf(stdout, "COULDN'T GET DESCRIPTOR FLAG - _JOB_SET_ATTR");
+       fprintf(stderr, "COULDN'T GET DESCRIPTOR FLAG - _JOB_SET_ATTR\n");
 
     switch (state)
        {case 1 :
@@ -610,11 +631,30 @@ static int _job_set_attr(int fd, int i, int state)
 
     status = fcntl(fd, F_SETFL, arg);
     if (status < 0)
-       fprintf(stdout, "COULDN'T SET DESCRIPTOR FLAG - _JOB_SET_ATTR");
+       fprintf(stderr, "COULDN'T SET DESCRIPTOR FLAG - _JOB_SET_ATTR\n");
 
     rv = TRUE;
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _IOC_INIT - initialize the io_connector IOC */
+
+static int _ioc_init(io_connector *ioc)
+   {int st;
+    int ports[2];
+
+    st = -1;
+
+    if (ioc != NULL)
+       {st = pipe(ports);
+	if (st == 0)
+	   {ioc->in.fd  = ports[0];
+	    ioc->out.fd = ports[1];};};
+
+    return(st);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -669,6 +709,108 @@ static int _job_init_ipc(process *pp, process *cp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _JOB_SET_IPC - set the inter-process communications channels
+ *              - for PP and CP from IOC prior to launching the job
+ *              - the separation between _JOB_INIT_IPC and _JOB_SET_IPC
+ *              - allows for redirections between processes
+ *              - return TRUE iff successful
+ */
+
+static int _job_set_ipc(process *pp, process *cp)
+   {int rv;
+    io_connector *ioc;
+
+    rv = FALSE;
+
+    if (pp->ioc == cp->ioc)
+       {rv = TRUE;
+
+	ioc = pp->ioc;
+
+/* child stdin */
+	cp->io[0].fd = ioc[IO_STD_IN].in.fd;
+	pp->io[1].fd = ioc[IO_STD_IN].out.fd;
+
+/* child stdout */
+	cp->io[1].fd = ioc[IO_STD_OUT].out.fd;
+	pp->io[0].fd = ioc[IO_STD_OUT].in.fd;
+
+/* child stderr */
+	cp->io[2].fd = ioc[IO_STD_ERR].out.fd;
+	pp->io[2].fd = ioc[IO_STD_ERR].in.fd;
+
+#if 1
+        io_device medium;
+
+	medium = IO_DEV_PIPE;
+	if (medium == IO_DEV_PIPE)
+	   {_job_set_attr(pp->io[0].fd, O_RDONLY | O_NDELAY, TRUE);
+	    _job_set_attr(pp->io[1].fd, O_WRONLY, TRUE);
+	    _job_set_attr(pp->io[2].fd, O_WRONLY, TRUE);
+
+	    _job_set_attr(cp->io[0].fd, O_RDONLY & ~O_NDELAY, TRUE);
+	    _job_set_attr(cp->io[1].fd, O_WRONLY, TRUE);
+	    _job_set_attr(cp->io[2].fd, O_WRONLY, TRUE);}
+
+	else if (medium == IO_DEV_SOCKET)
+	   {_job_set_attr(pp->io[0].fd, O_RDWR, TRUE);
+	    _job_set_attr(pp->io[1].fd, O_RDWR, TRUE);
+	    _job_set_attr(pp->io[2].fd, O_WRONLY, TRUE);
+
+	    _job_set_attr(cp->io[0].fd, O_RDWR, TRUE);
+	    _job_set_attr(cp->io[1].fd, O_RDWR, TRUE);
+	    _job_set_attr(cp->io[2].fd, O_WRONLY, TRUE);};
+#endif
+        };
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DPRDIO - print the file descriptors from an iodes PIO */
+
+void dprdio(iodes *pio)
+   {int fd, gid;
+    char *io, *hnd, *knd, *dev;
+    static char *std[] = {"none", "in", "out", "err"};
+    static char *hn[]  = {"none", "clos", "pipe", "poll"};
+    static char *kn[]  = {"none", "in", "out", "err", "bond",
+			  "status", "rsrc"};
+    static char *dn[]  = {"none", "pipe", "sock", "pty", "term", "fnc"};
+
+    io  = std[pio->knd + 1];
+    fd  = pio->fd;
+    gid = pio->gid;
+    hnd = hn[pio->hnd];
+    knd = kn[pio->knd + 1];
+    dev = dn[pio->dev];
+
+    fprintf(stderr, "dbg> %4s %3d %3d %4s %4s %4s\n",
+	    io, fd, gid, hnd, knd, dev);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DPRPIO - print the file descriptors from a process PP */
+
+void dprpio(char *tag, process *pp)
+   {int i;
+    iodes *pio;
+
+    fprintf(stderr, "dbg> %d  %s\n", getpid(), tag);
+    fprintf(stderr, "dbg> Unit  fd gid  hnd  knd  dev\n");
+    for (i = 0; i < N_IO_CHANNELS; i++)
+        {pio = pp->io + i;
+	 dprdio(pio);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _JOB_CHILD_FORK - the child process comes here and
  *                 - it will never return
  */
@@ -686,6 +828,10 @@ static void _job_child_fork(process *pp, process *cp, char **argv, char *mode)
     cp->start_time = wall_clock_time();
     cp->stop_time  = 0.0;
 
+#ifdef TRACE
+    dprpio("_job_child_fork", cp);
+#endif
+
     rv = _job_exec(cp, argv, environ, mode);
 
     exit(rv);}
@@ -697,7 +843,6 @@ static void _job_child_fork(process *pp, process *cp, char **argv, char *mode)
 
 static int _job_parent_fork(process *pp, process *cp, char *mode)
    {int i, st;
-    char *modes[N_IO_CHANNELS] = { "r", "w", "w" };
    
     st = TRUE;
 
@@ -709,11 +854,13 @@ static int _job_parent_fork(process *pp, process *cp, char *mode)
     pp->stop_time  = 0.0;
 
     for (i = 0; i < N_IO_CHANNELS; i++)
-        {pp->io[i].fp = fdopen(pp->io[i].fd, modes[i]);
-	 if (pp->io[i].fp != NULL)
-	    setbuf(pp->io[i].fp, NULL);};
+        _io_file_ptr(pp, i);
 
     _job_free(cp);
+
+#ifdef TRACE
+    dprpio("_job_parent_fork", pp);
+#endif
 
     sched_yield();
 
@@ -735,10 +882,10 @@ static void _job_error_fork(process *pp, process *cp)
     pp->ischild = TRUE;
     pp->isfunc  = FALSE;
 
+    fprintf(stderr, "COULDN'T FORK '%s' - _JOB_ERROR_FORK\n", pp->cmd);
+
     _job_free(pp);
     _job_free(cp);
-
-    fprintf(stdout, "COULDN'T FORK process - _JOB_ERROR_FORK");
 
     return;}
 
@@ -790,7 +937,7 @@ static int _job_setup_proc(process **ppp, process **pcp,
 	if (flag == FALSE)
 	   {FREE(pp);
 	    FREE(cp);
-	    fprintf(stdout, "COULDN'T CREATE IPC CHANNELS - _JOB_SETUP_PROC");
+	    fprintf(stderr, "COULDN'T CREATE IPC CHANNELS - _JOB_SETUP_PROC");
 	    return(-1);};
 
 #if 0
@@ -892,7 +1039,7 @@ static void _job_timeout(int to)
 	ASSERT(ns == 0);
 
 	if (err == SIG_ERR)
-	   printf("Setting SIGALRM failed\n");
+	   fprintf(stderr, "Setting SIGALRM failed\n");
 
 /* set lst appropriately */
 	if (to == 0)
@@ -943,7 +1090,7 @@ int job_read(int fd, process *pp, int (*out)(int fd, process *pp, char *s))
     nl = 0;
 
     if (job_alive(pp))
-       {fi = pp->io[0].fp;
+       {fi = pp->io[IO_STD_IN].fp;
 	if (fi != NULL)
 	   {/* _block_all_sig(); */
 
@@ -1238,13 +1385,13 @@ static int _awatch_fd(process *pp, io_kind knd, int sip)
     if (ip >= stck.np)
        {int i, n;
 
-	printf("ERROR: Bad process accounting (%d > %d) - exiting\n",
+	fprintf(stderr, "ERROR: Bad process accounting (%d > %d) - exiting\n",
 	       stck.ip, stck.np);
 
 	n = stck.np;
 	for (i = 0; i < n; i++)
-	    printf("%d ", stck.proc[i]->ip);
-	printf("\n");
+	    fprintf(stderr, "%d ", stck.proc[i]->ip);
+	fprintf(stderr, "\n");
 	exit(1);};
 
     stck.proc[ip] = pp;

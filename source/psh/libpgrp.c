@@ -106,6 +106,114 @@ int _kind_io(io_kind k)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _IO_KIND - return the io_kind matching character C */
+
+int _io_kind(int c)
+   {io_kind rv;
+
+    switch (c)
+       {case 'b' :
+	     rv = IO_STD_BOND;
+	     break;
+        case 'e' :
+	     rv = IO_STD_ERR;
+	     break;
+        case 'i' :
+	     rv = IO_STD_IN;
+	     break;
+        case 'o' :
+	     rv = IO_STD_OUT;
+	     break;
+        default :
+	     rv = IO_STD_NONE;
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _IO_MODE - return the io_mode matching character C */
+
+int _io_mode(io_kind knd)
+   {io_mode rv;
+    static char *err_exist;
+
+    err_exist = getenv("REDIRECT_EXIST_ERROR");
+
+    switch (knd)
+       {case IO_STD_IN :
+	     rv = IO_MODE_RO;
+	     break;
+        case IO_STD_OUT :
+        case IO_STD_ERR :
+        case IO_STD_BOND :
+	     rv = (err_exist != NULL) ? IO_MODE_WO : IO_MODE_WD;
+	     break;
+        default :
+	     rv = IO_MODE_NONE;
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DPRIOC - print NC io_connectors from IOC */
+
+void dprioc(char *tag, int np, io_connector *ioc)
+   {int i, fd, io, gid, nc;
+    char *hnd, *knd, *dev;
+    io_connector *pioc;
+    static char *hn[]  = {"none", "clos", "pipe", "poll"};
+    static char *kn[]  = {"none", "in", "out", "err", "bond",
+			  "status", "rsrc"};
+    static char *dn[]  = {"none", "pipe", "sock", "pty", "term", "fnc"};
+
+    nc = N_IO_CHANNELS*np;
+
+    fprintf(stderr, "dbg> -----------------------------------------------\n");
+    fprintf(stderr, "dbg> %d  %s\n", getpid(), tag);
+    fprintf(stderr, "dbg> %d processes   %d connections\n", np, nc);
+
+    for (i = 0; i < nc; i++)
+        {pioc = ioc + i;
+
+	 io = i % N_IO_CHANNELS;
+	 if (io == 0)
+	    fprintf(stderr, "dbg>\n");
+
+	 fd  = pioc->in.fd;
+	 gid = pioc->in.gid;
+	 hnd = hn[pioc->in.hnd];
+	 knd = kn[pioc->in.knd + 1];
+	 dev = dn[pioc->in.dev];
+
+	 if (pioc->in.dev == IO_DEV_PIPE)
+	    fprintf(stderr, "dbg> %2d  read  %3d %3d %4s %4s %4s %d\n",
+		    io, fd, gid, hnd, knd, dev, gid);
+	 else
+	    fprintf(stderr, "dbg> %2d  read  %3d %3d %4s %4s %4s\n",
+		    io, fd, gid, hnd, knd, dev);
+
+	 fd  = pioc->out.fd;
+	 gid = pioc->out.gid;
+	 hnd = hn[pioc->out.hnd];
+	 knd = kn[pioc->out.knd + 1];
+	 dev = dn[pioc->out.dev];
+
+	 if (pioc->out.dev == IO_DEV_PIPE)
+	    fprintf(stderr, "dbg>     write %3d %3d %4s %4s %4s %d\n",
+		    fd, gid, hnd, knd, dev, gid);
+	 else
+	    fprintf(stderr, "dbg>     write %3d %3d %4s %4s %4s\n",
+		    fd, gid, hnd, knd, dev);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* DPRGRP - diagnostic print of process_group tasks */
 
 void dprgrp(process_group *pg)
@@ -204,52 +312,9 @@ void dprgrp(process_group *pg)
     sa[n] = NULL;
 
     for (i = 0; i < n; i++)
-        printf("dbg> %s\n", sa[i]);
+        fprintf(stderr, "dbg> %s\n", sa[i]);
 
     free_strings(sa);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DPRDIO - print the file descriptors from an iodes PIO */
-
-void dprdio(iodes *pio)
-   {int fd, gid;
-    char *io, *hnd, *knd, *dev;
-    static char *std[] = {"none", "in", "out", "err"};
-    static char *hn[]  = {"none", "clos", "pipe", "poll"};
-    static char *kn[]  = {"none", "in", "out", "err", "bond",
-			  "status", "rsrc"};
-    static char *dn[]  = {"none", "pipe", "sock", "pty", "term", "fnc"};
-
-    io  = std[pio->knd + 1];
-    fd  = pio->fd;
-    gid = pio->gid;
-    hnd = hn[pio->hnd];
-    knd = kn[pio->knd + 1];
-    dev = dn[pio->dev];
-
-    printf("dbg> %4s %3d %3d %4s %4s %4s\n",
-	   io, fd, gid, hnd, knd, dev);
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DPRPIO - print the file descriptors from a process PP */
-
-void dprpio(char *tag, process *pp)
-   {int i;
-    iodes *pio;
-
-    printf("dbg> %s\n", tag);
-    printf("dbg> Unit  fd gid  hnd  knd  dev\n");
-    for (i = 0; i < N_IO_CHANNELS; i++)
-        {pio = pp->io + i;
-	 dprdio(pio);};
 
     return;}
 
@@ -263,14 +328,14 @@ void dprgio(char *tag, int n, process **pa, process **ca)
     char *hnd;
     process *pp, *cp;
 
-    printf("dbg> ----------------------------------------------------\n");
-    printf("dbg> %s\ndbg>\n", tag);
+    fprintf(stderr, "dbg> -----------------------------------------------\n");
+    fprintf(stderr, "dbg> %s\ndbg>\n", tag);
 
     for (i = 0; i < n; i++)
         {pp = pa[i];
 	 cp = ca[i];
 	 if ((pp != NULL) && (cp != NULL))
-	    {printf("dbg> command: %s\n", pp->cmd);
+	    {fprintf(stderr, "dbg> command: %s\n", pp->cmd);
              switch (pp->io[1].hnd)
 	        {case IO_HND_PIPE :
 		      hnd = "pipe";
@@ -284,8 +349,8 @@ void dprgio(char *tag, int n, process **pa, process **ca)
 	         default :
 		      hnd = "none";
 		      break;};
-	     printf("dbg>    stdin:  %3d(%s) -> %3d\n",
-		    pp->io[1].fd, hnd, cp->io[0].fd);
+	     fprintf(stderr, "dbg>    stdin:  %3d(%s) -> %3d\n",
+		     pp->io[1].fd, hnd, cp->io[0].fd);
 
              switch (pp->io[0].hnd)
 	        {case IO_HND_PIPE :
@@ -300,8 +365,8 @@ void dprgio(char *tag, int n, process **pa, process **ca)
 	         default :
 		      hnd = "none";
 		      break;};
-	     printf("dbg>    stdout: %3d(%s) <- %3d\n",
-		    pp->io[0].fd, hnd, cp->io[1].fd);
+	     fprintf(stderr, "dbg>    stdout: %3d(%s) <- %3d\n",
+		     pp->io[0].fd, hnd, cp->io[1].fd);
 
              switch (pp->io[2].hnd)
 	        {case IO_HND_PIPE :
@@ -316,12 +381,12 @@ void dprgio(char *tag, int n, process **pa, process **ca)
 	         default :
 		      hnd = "none";
 		      break;};
-	     printf("dbg>    stderr: %3d(%s) <- %3d\n",
-		    pp->io[2].fd, hnd, cp->io[2].fd);
+	     fprintf(stderr, "dbg>    stderr: %3d(%s) <- %3d\n",
+		     pp->io[2].fd, hnd, cp->io[2].fd);
 
-	     printf("dbg>\n");};};
+	     fprintf(stderr, "dbg>\n");};};
 
-    printf("dbg> ----------------------------------------------------\n");
+    fprintf(stderr, "dbg> -----------------------------------------------\n");
 
     return;}
 
@@ -734,6 +799,53 @@ static int transfer_fd(process *pn, io_kind pk, process *cn, io_kind ck)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* TRANSFER_IO - transfer the B connector to A
+ *             - the A connector is specified by IOC, IA, and AK
+ *             - the B connector is specified by IOC, IB, and BK
+ */
+
+static void transfer_io(io_connector *ioc, int ia, io_kind ak,
+			int ib, io_kind bk)
+   {io_connector *pia, *pib;
+
+    pia = ioc + N_IO_CHANNELS*ia + ak;
+    pib = ioc + N_IO_CHANNELS*ib + bk;
+
+/* (0, IO_STD_OUT) and (1, IO_STD_IN) before
+dbg>  1  read    5  -1 none  out term
+dbg>     write   6   1 none  out pipe 1
+
+dbg>  0  read    9   0 none   in pipe 0
+dbg>     write  10  -1 none   in term
+*/
+/*    _fd_close(pia->in.fd); */
+    pia->in.fd   = pib->in.fd;
+    pia->in.dev  = IO_DEV_PIPE;
+    pia->in.gid  = ib;
+/*
+    pia->out.dev = IO_DEV_PIPE;
+    pia->out.gid = ib;
+*/
+/*    _fd_close(pia->out.fd); */
+    pia->out.fd  = pib->out.fd;
+    pib->out.dev = IO_DEV_PIPE;
+    pib->out.gid = ia;
+    pib->in.dev  = IO_DEV_PIPE;
+    pib->in.gid  = ia;
+
+/* (0, IO_STD_OUT) and (1, IO_STD_IN) after
+dbg>  1  read    9   1 none  out pipe 1
+dbg>     write  10   1 none  out pipe 1
+
+dbg>  0  read    9   0 none   in pipe 0
+dbg>     write  10   0 none   in pipe 0
+*/
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* WATCH_FD - register the KND descriptor of PN to be polled */
 
 static int watch_fd(process *pn, io_kind pk)
@@ -1139,6 +1251,39 @@ char **subst_syntax(char **sa)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* MK_CONNECTORS - initialize a set of io_connectors for NP processes */
+
+io_connector *mk_connectors(int np)
+   {int ip, i;
+    io_device dev;
+    io_mode md;
+    io_connector *ioc, *pioc;
+
+    ioc = MAKE_N(io_connector, N_IO_CHANNELS*np);
+    for (ip = 0; ip < np; ip++)
+        {for (i = 0; i < N_IO_CHANNELS; i++)
+	     {pioc = ioc + N_IO_CHANNELS*ip + i;
+
+	      dev = IO_DEV_TERM;
+	      md  = _io_mode(i);
+
+	      pioc->in.knd   = i;
+	      pioc->in.dev   = dev;
+	      pioc->in.mode  = md;
+	      pioc->in.gid   = -1;
+	      pioc->in.fd    = -1;
+
+	      pioc->out.knd  = i;
+	      pioc->out.dev  = dev;
+	      pioc->out.mode = md;
+	      pioc->out.gid  = -1;
+	      pioc->out.fd   = -1;};};
+
+    return(ioc);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PARSE_PGRP - parse out specifications in S to initialize PG */
 
 static void parse_pgrp(statement *s)
@@ -1247,7 +1392,7 @@ static void parse_pgrp(statement *s)
     reconnect_pgrp(pg);
 
 #ifdef DEBUG
-    printf("dbg> pgrp: %s\n", s->text);
+    fprintf(stderr, "dbg> pgrp: %s\n", s->text);
 #endif
 
     s->ne = it;
@@ -1286,7 +1431,7 @@ int _pgrp_reject(int fd, process *pp, char *s)
     rv = TRUE;
 
 #ifdef DEBUG
-    printf("dbg> reject: fd(%d) cmd(%s) txt(%s)\n", fd, pp->cmd, s);
+    fprintf(stderr, "dbg> reject: fd(%d) cmd(%s) txt(%s)\n", fd, pp->cmd, s);
 #endif
 
 #ifdef TRACE
@@ -1734,7 +1879,8 @@ process_session *init_session(void)
 /* put the current process in its own group */
 	pgid = getpid();
 	if (setpgid(pgid, pgid) < 0)
-	   printf("Couldn't put the session in its own process group");
+	   fprintf(stderr,
+		   "Couldn't put the session in its own process group");
 
 	else
      
