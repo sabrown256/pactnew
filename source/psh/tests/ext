@@ -10,21 +10,34 @@ set msg = "GEXEC Test ....................."
 set GEXEC = gexec
 set PERDB = perdb
 
-set lst = ( job pipe fnc file var )
+set db  = TRUE
+set lst = ""
 
 while ($#argv > 0)
    switch ($1)
       case -h:
            echo ""
-           echo "Usage: gexec [-h]"
+           echo "Usage: ext [-h] [-n]"
            echo "  h  this help message"
+           echo "  n  do not use perdb"
            echo ""
            exit(1);
+      case -n:
+           set db = FALSE
+           breaksw
       default:
+           set lst = ( $lst $1 )
            breaksw
    endsw
    shift
 end
+
+if ("$lst" == "") then
+   set lst = ( job pipe fnc file var )
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
    NoteD $Log ""
    NoteD $Log "                    $msg"
@@ -33,8 +46,10 @@ end
 
    set tf = `timer -r`
 
-   flog $Log setenv PERDB_PATH $cwd/ext
-   flog $Log $PERDB -l -c -s
+   if ($db == TRUE) then
+      flog $Log setenv PERDB_PATH $cwd/ext
+      flog $Log $PERDB -l -c -s
+   endif
 
    flog $Log rm -f ext-*
    flog $Log cp $SrcDir/tests/ext-* .
@@ -73,9 +88,14 @@ end
       @ nerr = $nerr + $status
    end
 
-   flog $Log $PERDB -l quit:
+   if ($db == TRUE) then
+      flog $Log $PERDB -l quit:
+   endif
 
    set tf = `timer -b $tf`
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 $TEST_CHECK part -a gexec -e $nerr -dt $tf -rpf "$rpf" "$msg"
 

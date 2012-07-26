@@ -50,7 +50,6 @@
 
 #define PROCESS_DELIM   '@'
 #define PIPE_DELIM      "|"
-#define N_IO_CH         3
 
 typedef struct s_statement statement;
 typedef struct s_process_session process_session;
@@ -173,9 +172,10 @@ void dprioc(char *tag, int np, io_connector *ioc)
     nc = N_IO_CHANNELS*np;
 
     fprintf(stderr, "dbg> -----------------------------------------------\n");
-    fprintf(stderr, "dbg> %d  %s\n", getpid(), tag);
+    fprintf(stderr, "dbg> %d  %s  ioc\n", getpid(), tag);
     fprintf(stderr, "dbg> %d processes   %d connections\n", np, nc);
 
+    fprintf(stderr, "dbg> Unit       fd gid  hnd  knd  dev #\n");
     for (i = 0; i < nc; i++)
         {pioc = ioc + i;
 
@@ -216,105 +216,31 @@ void dprioc(char *tag, int np, io_connector *ioc)
 
 /* DPRGRP - diagnostic print of process_group tasks */
 
-void dprgrp(process_group *pg)
-   {int i, j, n, c, gid;
-    char s[MAXLINE];
-    char **sa;
-    io_device dev;
-    process *pps, *ppd;
-    iodes *fds;
+void dprgrp(char *tag, process_group *pg)
+   {int i, n;
+    process *pp, *cp;
 
     n = pg->np;
 
-    sa = MAKE_N(char *, n+1);
-    sa[0] = '\0';
+    fprintf(stderr, "dbg> -----------------------------------------------\n");
+    fprintf(stderr, "dbg> %d  %s  group\n", getpid(), tag);
+    fprintf(stderr, "dbg> %d processes\n", n);
 
+    fprintf(stderr, "dbg> Unit  fd gid  hnd  knd  dev\n");
     for (i = 0; i < n; i++)
-        {pps = pg->parents[i];
+        {pp = pg->parents[i];
+	 cp = pg->children[i];
 
-	 if (pps->ios == NULL)
-	    snprintf(s, MAXLINE, "%3d: end\ndbg>      ", i);
-	 else
-	    {snprintf(s, MAXLINE, "%3d:", i);
-	     for (j = 0; pps->ios[j] != NULL; j++)
-	         vstrcat(s, MAXLINE, " %s ", pps->ios[j]);
-	     vstrcat(s, MAXLINE, "\ndbg>      ");};
+	 dprdio(cp->io + IO_STD_IN);
+	 dprdio(pp->io + IO_STD_OUT);
 
-/* stdin */
-	 fds = pps->io + IO_STD_IN;
-	 dev = fds->dev;
-         gid = fds->gid;
-	 if (gid == -1)
-	    vstrcat(s, MAXLINE, "i(ttyin) ", fds->gid);
-	 else
-	    {ppd = pg->parents[gid];
+	 dprdio(pp->io + IO_STD_IN);
+	 dprdio(cp->io + IO_STD_OUT);
 
-	     c = _kind_io(IO_STD_OUT);
-	     for (j = 0; j < N_IO_CH; j++)
-	         {if (ppd->io[j].gid == i)
-		     c = _kind_io(j);};
+	 dprdio(pp->io + IO_STD_ERR);
+	 dprdio(cp->io + IO_STD_ERR);
 
-	     vstrcat(s, MAXLINE, "i(%d)%c    ", fds->gid, c);};
-
-/* stdout */
-	 fds = pps->io + IO_STD_OUT;
-	 dev = fds->dev;
-         gid = fds->gid;
-	 if (gid == -1)
-	    {switch (dev)
-	        {case IO_DEV_PIPE :
-		      vstrcat(s, MAXLINE, "o(bad-pipe) ");
-		      break;
-		 case IO_DEV_NONE :
-		 case IO_DEV_TERM :
-		      vstrcat(s, MAXLINE, "o(ttyout) ");
-		      break;
-		 case IO_DEV_SOCKET :
-		      break;
-		 case IO_DEV_PTY :
-		      break;
-		 case IO_DEV_FNC :
-		      vstrcat(s, MAXLINE, "o(expr)   ");
-		      break;};}
-
-	 else
-	    {c = _kind_io(IO_STD_IN);
-	     vstrcat(s, MAXLINE, "o(%d)%c     ", fds->gid, c);};
-
-/* stderr */
-	 fds = pps->io + IO_STD_ERR;
-	 dev = fds->dev;
-         gid = fds->gid;
-	 if (gid == -1)
-	    {switch (dev)
-	        {case IO_DEV_PIPE :
-		      vstrcat(s, MAXLINE, "o(bad-pipe) ");
-		      break;
-		 case IO_DEV_NONE :
-		 case IO_DEV_TERM :
-		      vstrcat(s, MAXLINE, "o(ttyerr) ");
-		      break;
-		 case IO_DEV_SOCKET :
-		      break;
-		 case IO_DEV_PTY :
-		      break;
-		 case IO_DEV_FNC :
-		      vstrcat(s, MAXLINE, "o(expr)   ");
-		      break;};}
-
-	 else
-	    {c = _kind_io(IO_STD_IN);
-	     vstrcat(s, MAXLINE, "e(%d)%c     ", fds->gid, c);};
-
-	 vstrcat(s, MAXLINE, " %s", pps->cmd);
-         sa[i] = STRSAVE(s);};
-
-    sa[n] = NULL;
-
-    for (i = 0; i < n; i++)
-        fprintf(stderr, "dbg> %s\n", sa[i]);
-
-    free_strings(sa);
+	 fprintf(stderr, "dbg>\n");};
 
     return;}
 
@@ -408,9 +334,11 @@ void redirect_io(process *pp, iodes *io)
 	     io->fd = pio->fd;
 	     *pio   = *io;
 
+#ifdef OLDWAY
 	     pio    = pp->io + io->knd;
 	     io->fd = pio->fd;
 	     *pio   = *io;
+#endif
 	     break;
 
         case IO_STD_OUT :
@@ -419,10 +347,13 @@ void redirect_io(process *pp, iodes *io)
 	     io->fd = pio->fd;
 	     *pio   = *io;
 
+#ifdef OLDWAY
 	     pio    = pp->io + io->knd;
 	     io->fd = pio->fd;
 	     *pio   = *io;
+#endif
 	     break;
+
         case IO_STD_BOND :
 	     pio    = &pp->ioc[IO_STD_ERR].out;
 	     io->fd = pio->fd;
@@ -431,13 +362,16 @@ void redirect_io(process *pp, iodes *io)
 	     io->fd = pio->fd;
 	     *pio   = *io;
 
+#ifdef OLDWAY
 	     pio    = pp->io + IO_STD_ERR;
 	     io->fd = pio->fd;
 	     *pio   = *io;
 	     pio    = pp->io + IO_STD_OUT;
 	     io->fd = pio->fd;
 	     *pio   = *io;
+#endif
 	     break;
+
         default :
 	     break;};
 
@@ -539,7 +473,7 @@ static int redirect_fd(process_group *pg, int ip, int i)
 static void redirect_copy(process *cp, process *pp)
    {int i, fd;
 
-    for (i = 0; i < N_IO_CH; i++)
+    for (i = 0; i < N_IO_CHANNELS; i++)
         {fd = cp->io[i].fd;
 	 cp->io[i]    = pp->io[i];
 	 cp->io[i].fd = fd;};
@@ -635,6 +569,8 @@ void fillin_pgrp(process_group *pg)
 		 {pioc->out.hnd  = (pp->isfunc) ? IO_HND_FNC : IO_HND_POLL;
 		  pioc->out.mode = IO_MODE_WD;};};
 
+#ifdef OLDWAY
+
 /* stdout */
          pio = pp->io + 1;
 	 switch (pio->dev)
@@ -657,7 +593,9 @@ void fillin_pgrp(process_group *pg)
 		  dio->dev = IO_DEV_PIPE;
 	          break;
 	     default :
-	          break;};};
+	          break;};
+#endif
+        };
 
     return;}
 
@@ -702,14 +640,7 @@ static int watch_fd(process *pn, io_kind pk)
     fd  = pn->io[pk].fd;
     hnd = pn->io[pk].hnd;
 
-#if 1
     if ((fd > 0) && (hnd != IO_HND_PIPE))
-#else
-    io_device dev;
-    dev = pn->io[pk].dev;
-    if ((fd > 0) && (dev == IO_DEV_TERM) && (hnd != IO_HND_PIPE))
-#endif
-
        {_awatch_fd(pn, pk, pn->ip);
 
 	pn->io[pk].hnd = IO_HND_POLL;};
@@ -717,9 +648,6 @@ static int watch_fd(process *pn, io_kind pk)
     return(fd);}
 
 /*--------------------------------------------------------------------------*/
-
-#ifdef NEWWAY
-
 /*--------------------------------------------------------------------------*/
 
 /* TRANSFER_IO - transfer the B connector to A
@@ -741,20 +669,20 @@ dbg>     write   6   1 none  out pipe 1
 dbg>  0  read    9   0 none   in pipe 0
 dbg>     write  10  -1 none   in term
 */
-/*    _fd_close(pia->in.fd); */
-    pia->in.fd   = pib->in.fd;
-    pia->in.dev  = IO_DEV_PIPE;
-    pia->in.gid  = ib;
-/*
-    pia->out.dev = IO_DEV_PIPE;
-    pia->out.gid = ib;
-*/
-/*    _fd_close(pia->out.fd); */
-    pia->out.fd  = pib->out.fd;
-    pib->out.dev = IO_DEV_PIPE;
-    pib->out.gid = ia;
+/*    _fd_close(pib->in.fd); */
+    pib->in.fd   = pia->in.fd;
     pib->in.dev  = IO_DEV_PIPE;
-    pib->in.gid  = ia;
+    pib->in.gid  = ib;
+/*
+    pib->out.dev = IO_DEV_PIPE;
+    pib->out.gid = ib;
+*/
+/*    _fd_close(pib->out.fd); */
+    pib->out.fd  = pia->out.fd;
+    pia->out.dev = IO_DEV_PIPE;
+    pia->out.gid = ia;
+    pia->in.dev  = IO_DEV_PIPE;
+    pia->in.gid  = ia;
 
 /* (0, IO_STD_OUT) and (1, IO_STD_IN) after
 dbg>  1  read    9   1 none  out pipe 1
@@ -768,7 +696,7 @@ dbg>     write  10   0 none   in pipe 0
 
 /*--------------------------------------------------------------------------*/
 
-#else
+#ifdef OLDWAY
 
 /*--------------------------------------------------------------------------*/
 
@@ -963,10 +891,7 @@ static void reconnect_pgrp(process_group *pg)
  * the final parent out gets connected to the first child in
  */
     if (nm > 0)
-       {
-
-#ifdef NEWWAY
-	int ig, ip;
+       {int ig, ip;
 	io_connector *sio;
 
 	transfer_io(ioc, 0, IO_STD_IN, nm, IO_STD_OUT);
@@ -982,27 +907,9 @@ static void reconnect_pgrp(process_group *pg)
                  {sio = ioc + N_IO_CHANNELS*ip + i;
 		  if (sio->in.dev == IO_DEV_PIPE)
 		     {sio->out.dev = IO_DEV_PIPE;
-		      sio->out.gid = sio->in.gid;};};};};
+		      sio->out.gid = sio->in.gid;};};};
 
-#ifdef DEBUG
-    dprioc("reconnect_group", pg->np, pg->ioc);
-#endif
-
-#else
-
-#if 0
-/* set any sockets to read/write mode */
-	for (i = 0; i < n; i++)
-	    {pp = pa[i];
-	     cp = ca[i];
-	     if (cp->medium == USE_SOCKETS)
-	        {SC_set_fd_attr(pp->io[0], O_RDWR,   -1);
-		 SC_set_fd_attr(pp->io[1], O_RDWR,   -1);
-		 SC_set_fd_attr(pp->io[2], O_WRONLY, -1);
-		 SC_set_fd_attr(cp->io[0], O_RDWR,   -1);
-		 SC_set_fd_attr(cp->io[1], O_RDWR,   -1);
-		 SC_set_fd_attr(cp->io[2], O_WRONLY, -1);};};
-#endif
+#ifdef OLDWAY
 
 /* reconnect terminal process output to first process */
 	transfer_fd(pa[0], IO_STD_OUT, pt, IO_STD_OUT);
@@ -1017,11 +924,13 @@ static void reconnect_pgrp(process_group *pg)
 	connect_child_in_out(n, pa, ca);
 
 /* transfer all function call I/O to parent and free child */
-	transfer_fnc_child(n, pa, ca);};
+	transfer_fnc_child(n, pa, ca);
+#endif
+    };
 
 #ifdef DEBUG
-    dprgrp(pg);
-#endif
+    dprioc("reconnect_pgrp", pg->np, pg->ioc);
+    dprgrp("reconnect_pgrp", pg);
 #endif
 
     return;}
@@ -1322,11 +1231,6 @@ static void parse_pgrp(statement *s)
 
     pg->np       = it;
     pg->terminal = pa[it - 1];
-
-#ifdef DEBUG
-    dprioc("parse_pgrp", pg->np, pg->ioc);
-    dprgio("parse_pgrp", pg->np, pg->parents, pg->children);
-#endif
 
     reconnect_pgrp(pg);
 
