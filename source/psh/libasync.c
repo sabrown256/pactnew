@@ -169,16 +169,13 @@ typedef struct s_iodes iodes;
  */
 
 struct s_iodes
-   {int fd;
+   {io_hand hnd;
+    io_kind knd;            /* stdin, stdout, stderr, ... (end-point) */
+    io_device dev;          /* terminal, pipe, function */
+    io_mode mode;           /* read, write, append */
     int gid;                /* index of process group member for redirect */
-    int flag;               /* file open mode flags */
-    io_hand hnd;
-    io_kind knd;
-    io_device dev;
-    io_mode mode;
-    char *file;
-    char **raw;
-    FILE *fp;};
+    int fd;                 /* file descriptor of connection end-point */
+    FILE *fp;};             /* FILE pointer for FD */
 
 /* connection between process
  * parent associates with one end
@@ -389,15 +386,12 @@ static void _init_iodes(int n, iodes *fd)
    {int i;
 
     for (i = 0; i < n; i++)
-        {fd[i].fd   = -1;
-	 fd[i].gid  = -1;
-	 fd[i].flag = -1;
-	 fd[i].knd  = IO_STD_NONE;
+        {fd[i].knd  = IO_STD_NONE;
 	 fd[i].hnd  = IO_HND_NONE;
 	 fd[i].dev  = IO_DEV_NONE;
 	 fd[i].mode = IO_MODE_NONE;
-	 fd[i].file = NULL;
-	 fd[i].raw  = NULL;
+	 fd[i].gid  = -1;
+	 fd[i].fd   = -1;
 	 fd[i].fp   = NULL;};
 
     return;}
@@ -659,56 +653,6 @@ static int _ioc_init(io_connector *ioc)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _JOB_INIT_IPC - establish two inter-process communications channels
- *               - the input channel should always be unblocked
- *               - return TRUE iff successful
- */
-
-static int _job_init_ipc(process *pp, process *cp)
-   {int ret;
-    int ports[2];
-
-    ret = TRUE;
-
-/* child stdin */
-    if (pipe(ports) < 0)
-       {_fd_close(pp->io[0].fd);
-	_fd_close(cp->io[1].fd);
-	fprintf(stdout, "COULDN'T CREATE PIPE #1 - _JOB_INIT_IPC");
-	return(FALSE);};
-
-    cp->io[0].fd = ports[0];
-    pp->io[1].fd = ports[1];
-
-/* child stdout */
-    if (pipe(ports) < 0)
-       {fprintf(stdout, "COULDN'T CREATE PIPE #2 - _JOB_INIT_IPC");
-	return(FALSE);};
-
-    cp->io[1].fd = ports[1];
-    pp->io[0].fd = ports[0];
-
-/* child stderr */
-    if (pipe(ports) < 0)
-       {fprintf(stdout, "COULDN'T CREATE PIPE #e - _JOB_INIT_IPC");
-	return(FALSE);};
-
-    cp->io[2].fd = ports[1];
-    pp->io[2].fd = ports[0];
-
-    _job_set_attr(pp->io[0].fd, O_RDONLY | O_NDELAY, TRUE);
-    _job_set_attr(pp->io[1].fd, O_WRONLY, TRUE);
-    _job_set_attr(pp->io[2].fd, O_WRONLY, TRUE);
-
-    _job_set_attr(cp->io[0].fd, O_RDONLY & ~O_NDELAY, TRUE);
-    _job_set_attr(cp->io[1].fd, O_WRONLY, TRUE);
-    _job_set_attr(cp->io[2].fd, O_WRONLY, TRUE);
-
-    return(ret);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _JOB_SET_IPC - set the inter-process communications channels
  *              - for PP and CP from IOC prior to launching the job
  *              - the separation between _JOB_INIT_IPC and _JOB_SET_IPC
@@ -762,6 +706,55 @@ static int _job_set_ipc(process *pp, process *cp)
 	    _job_set_attr(cp->io[2].fd, O_WRONLY, TRUE);};
 #endif
         };
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _JOB_INIT_IPC - establish two inter-process communications channels
+ *               - the input channel should always be unblocked
+ *               - return TRUE iff successful
+ */
+
+static int _job_init_ipc(process *pp, process *cp, io_connector *ioc)
+   {int st, rv;
+
+    rv = FALSE;
+
+    if (ioc != NULL)
+       {rv = TRUE;
+
+/* child stdin */
+        if (rv == TRUE)
+	   {st = _ioc_init(ioc + IO_STD_IN);
+	    if (st < 0)
+	       {_fd_close(pp->io[0].fd);
+		_fd_close(cp->io[1].fd);
+		fprintf(stderr, "COULDN'T CREATE PIPE #1 - _JOB_INIT_IPC\n");
+		rv = FALSE;};};
+
+/* child stdout */
+	if (rv == TRUE)
+	   {st = _ioc_init(ioc + IO_STD_OUT);
+	    if (st < 0)
+	       {fprintf(stderr, "COULDN'T CREATE PIPE #2 - _JOB_INIT_IPC\n");
+		rv = FALSE;};};
+
+/* child stderr */
+	if (rv == TRUE)
+	   {st = _ioc_init(ioc + IO_STD_ERR);
+	    if (st < 0)
+	       {fprintf(stderr, "COULDN'T CREATE PIPE #3 - _JOB_INIT_IPC\n");
+		rv = FALSE;};};
+
+	if (rv == TRUE)
+	   {pp->ioc = ioc;
+	    cp->ioc = ioc;};};
+
+#ifndef NEWWAY
+    _job_set_ipc(pp, cp);
+#endif
 
     return(rv);}
 
@@ -922,9 +915,9 @@ static char *_job_command_str(char **al)
  *                 - setup and exec
  */
 
-static int _job_setup_proc(process **ppp, process **pcp, 
+static int _job_setup_proc(process **ppp, process **pcp, io_connector *ioc,
 			   char **arg, char **env, char *shell)
-   {int to, flag;
+   {int to, st;
     process *pp, *cp;
 
     cp = _job_mk_process(TRUE, arg, env, shell);
@@ -933,8 +926,8 @@ static int _job_setup_proc(process **ppp, process **pcp,
     if ((cp != NULL) && (pp != NULL))
 
 /* set up the communications pipe */
-       {flag = _job_init_ipc(pp, cp);
-	if (flag == FALSE)
+       {st = _job_init_ipc(pp, cp, ioc);
+	if (st == FALSE)
 	   {FREE(pp);
 	    FREE(cp);
 	    fprintf(stderr, "COULDN'T CREATE IPC CHANNELS - _JOB_SETUP_PROC");
@@ -975,6 +968,10 @@ static process *_job_fork(process *pp, process *cp,
     if (pp->cmd == NULL)
        pp->cmd = _job_command_str(argv);
     strcpy(pp->mode, mode);
+
+#ifdef NEWWAY
+    _job_set_ipc(pp, cp);
+#endif
 
     _block_all_sig();
 
@@ -1061,13 +1058,15 @@ static void _job_timeout(int to)
 
 process *job_launch(char *cmd, char *mode, void *a)
    {char **argv;
+    io_connector *ioc;
     process *pp, *cp;
 
     pp = NULL;
 
     argv = tokenize(cmd, " \t");
     if (argv != NULL)
-       {_job_setup_proc(&pp, &cp, argv, NULL, NULL);
+       {ioc = MAKE_N(io_connector, 3);
+	_job_setup_proc(&pp, &cp, ioc, argv, NULL, NULL);
 	pp = _job_fork(pp, cp, argv, mode, a);
 
 	free_strings(argv);};
