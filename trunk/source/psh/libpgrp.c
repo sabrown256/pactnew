@@ -404,25 +404,37 @@ void redirect_io(process *pp, iodes *io)
 /* add the redirect specifications to the filedes */
     switch (io->knd)
        {case IO_STD_IN :
-	     pio    = pp->io + IO_STD_IN;
+	     pio    = &pp->ioc[io->knd].in;
+	     io->fd = pio->fd;
+	     *pio   = *io;
+
+	     pio    = pp->io + io->knd;
 	     io->fd = pio->fd;
 	     *pio   = *io;
 	     break;
+
         case IO_STD_OUT :
-	     pio    = pp->io + IO_STD_OUT;
+        case IO_STD_ERR :
+	     pio    = &pp->ioc[io->knd].out;
 	     io->fd = pio->fd;
 	     *pio   = *io;
-	     break;
-        case IO_STD_ERR :
-	     pio    = pp->io + IO_STD_ERR;
+
+	     pio    = pp->io + io->knd;
 	     io->fd = pio->fd;
 	     *pio   = *io;
 	     break;
         case IO_STD_BOND :
+	     pio    = &pp->ioc[IO_STD_ERR].out;
+	     io->fd = pio->fd;
+	     *pio   = *io;
+	     pio    = &pp->ioc[IO_STD_OUT].out;
+	     io->fd = pio->fd;
+	     *pio   = *io;
+
 	     pio    = pp->io + IO_STD_ERR;
 	     io->fd = pio->fd;
 	     *pio   = *io;
-	     pio    = pp->io + IO_STD_ERR;
+	     pio    = pp->io + IO_STD_OUT;
 	     io->fd = pio->fd;
 	     *pio   = *io;
 	     break;
@@ -439,13 +451,13 @@ void redirect_io(process *pp, iodes *io)
  */
 
 static int redirect_fd(process_group *pg, int ip, int i)
-   {int ck, cd, aip, nc, ni, rel, pos;
+   {int ck, cd, aip, bip, nc, ni, rel, pos;
     char *t, **ta;
     char *p;
-    io_mode amd;
+    io_mode amd, bmd;
     io_device dev;
-    io_kind aknd;
-    iodes ca;
+    io_kind aknd, bknd;
+    iodes ca, cb;
     process *pp;
 
     pp = pg->parents[ip];
@@ -453,11 +465,14 @@ static int redirect_fd(process_group *pg, int ip, int i)
 /* parse out the redirect related specifications */
     ta = pp->ios;
     t  = ta[i];
-
-    aip  = pp->ip;
+	
+    aip  = ip;
+    bip  = ip;
     amd  = IO_MODE_NONE;
+    bmd  = IO_MODE_NONE;
     dev  = IO_DEV_NONE;
     aknd = IO_STD_NONE;
+    bknd = IO_STD_NONE;
 
     if (t[0] == PROCESS_DELIM)
        t++;
@@ -476,6 +491,12 @@ static int redirect_fd(process_group *pg, int ip, int i)
 
 /* get the device mode */
 	amd = _io_mode(aknd);
+	if (aknd == IO_STD_IN)
+	   {bmd  = _io_mode(IO_STD_OUT);
+	    bknd = IO_STD_OUT;}
+	else
+	   {bmd = _io_mode(IO_STD_IN);
+	    bknd = IO_STD_IN;};
 
 /* find the group id of the other end of the I/O connection */
 	rel = TRUE;
@@ -493,11 +514,20 @@ static int redirect_fd(process_group *pg, int ip, int i)
     _init_iodes(1, &ca);
 
     ca.knd  = aknd;
-    ca.gid  = aip;
     ca.dev  = dev;
+    ca.gid  = aip;
     ca.mode = amd;
 
-    redirect_io(pp, &ca);
+    redirect_io(pg->parents[bip], &ca);
+
+    _init_iodes(1, &cb);
+
+    cb.knd  = bknd;
+    cb.dev  = dev;
+    cb.gid  = bip;
+    cb.mode = bmd;
+
+    redirect_io(pg->parents[aip], &cb);
 
     return(i);}
 
@@ -582,23 +612,28 @@ static void unquote_process(process *pp)
  */
 
 void fillin_pgrp(process_group *pg)
-   {int i, n, gid;
+   {int i, ip, np, gid;
+    io_connector *ioc, *pioc;
     process **pa, *pp;
     iodes *pio, *dio;
 
-    n  = pg->np;
-    pa = pg->parents;
+    np  = pg->np;
+    pa  = pg->parents;
+    ioc = pg->ioc;
 
-    for (i = 0; i < n; i++)
-        {pp = pa[i];
+    for (ip = 0; ip < np; ip++)
+        {pp = pa[ip];
 
-/* stdin */
-         pio = pp->io + 0;
-	 switch (pio->dev)
-            {case IO_DEV_PIPE :
-	          break;
-	     default :
-	          break;};
+	 for (i = 0; i < N_IO_CHANNELS; i++)
+	     {pioc = ioc + N_IO_CHANNELS*ip + i;
+
+	      if (pioc->in.hnd == IO_HND_NONE)
+		 {pioc->in.hnd  = (pp->isfunc) ? IO_HND_FNC : IO_HND_POLL;
+		  pioc->in.mode = IO_MODE_RO;}
+
+	      if (pioc->out.hnd == IO_HND_NONE)
+		 {pioc->out.hnd  = (pp->isfunc) ? IO_HND_FNC : IO_HND_POLL;
+		  pioc->out.mode = IO_MODE_WD;};};
 
 /* stdout */
          pio = pp->io + 1;
@@ -606,7 +641,7 @@ void fillin_pgrp(process_group *pg)
             {case IO_DEV_PIPE :
 	          gid = pio->gid;
 	          dio = pa[gid]->io + IO_STD_IN;
-		  dio->gid = i;
+		  dio->gid = ip;
 		  dio->dev = IO_DEV_PIPE;
 	          break;
 	     default :
@@ -618,7 +653,7 @@ void fillin_pgrp(process_group *pg)
             {case IO_DEV_PIPE :
 	          gid = pio->gid;
 	          dio = pa[gid]->io + IO_STD_IN;
-		  dio->gid = i;
+		  dio->gid = ip;
 		  dio->dev = IO_DEV_PIPE;
 	          break;
 	     default :
