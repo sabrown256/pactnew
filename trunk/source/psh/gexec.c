@@ -13,6 +13,9 @@
 
 /* #define STRONG_FUNCTIONS */
 
+/* #define NEWWAY */
+#define OLDWAY
+
 #include "common.h"
 #include "libpsh.c"
 #include "libdb.c"

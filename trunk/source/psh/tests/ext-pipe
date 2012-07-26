@@ -48,37 +48,48 @@ foreach i (1 2 3)
            breaksw
    endsw
 
+   Note $Log "cmd = $cmd"
+   Note $Log "srt = $srt"
+
    eval $cmd
 
    if ($srt == TRUE) then
-      sort $raw >&! $res
-      rm -f $raw
+      flog $Log ( sort $raw >&! $res )
+      flog $Log rm -f $raw
    endif
 
-   cat $res
+   flog $Log cat $res
 
-   echo "> gstatus = $gstatus"
+   if ($?PERDB_PATH == 0) then
+      eval `grep "setenv gstatus" $res`
+      grep -v "setenv gstatus" $res >&! $res.new
+      flog $Log mv $res.new $res
+   endif
+
+   Note $Log "> gstatus = $gstatus"
    if ("$gstatus" != "$gst") then
-      @ err = $err + 1
+      flog $Log @ err = $err + 1
       echo "$id failed"
    else if (-f $ref) then
-      diff $res $ref >&! $dif
+      flog $Log ( diff $res $ref >&! $dif )
       if ($status == 0) then
          echo "$id passed"
-         rm -f $res $dif
+         flog $Log rm -f $res $dif
       else
+         flog $Log @ err = $err + 1
          echo "$id differed"
-         cat $dif
+         flog $Log cat $dif
       endif
    else
-      cp $res $ref
       echo "$id added"
-      rm -f $res
+      flog $Log cp $res $ref
+      flog $Log rm -f $res
    endif
 
 end
 
-echo ""
+Note $Log "exiting with err = $err"
+Note $Log ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

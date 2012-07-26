@@ -610,7 +610,7 @@ static int _job_set_attr(int fd, int i, int state)
 
     arg = fcntl(fd, F_GETFL);
     if (arg < 0)
-       fprintf(stderr, "COULDN'T GET DESCRIPTOR FLAG - _JOB_SET_ATTR\n");
+       fprintf(stderr, "Couldn't get flag for %d - _job_set_attr\n", fd);
 
     switch (state)
        {case 1 :
@@ -625,7 +625,7 @@ static int _job_set_attr(int fd, int i, int state)
 
     status = fcntl(fd, F_SETFL, arg);
     if (status < 0)
-       fprintf(stderr, "COULDN'T SET DESCRIPTOR FLAG - _JOB_SET_ATTR\n");
+       fprintf(stderr, "Couldn't set flag for %d - _job_set_attr\n", fd);
 
     rv = TRUE;
 
@@ -697,12 +697,12 @@ static int _job_set_ipc(process *pp, process *cp)
 	    _job_set_attr(cp->io[2].fd, O_WRONLY, TRUE);}
 
 	else if (medium == IO_DEV_SOCKET)
-	   {_job_set_attr(pp->io[0].fd, O_RDWR, TRUE);
-	    _job_set_attr(pp->io[1].fd, O_RDWR, TRUE);
+	   {_job_set_attr(pp->io[0].fd, O_RDWR,   TRUE);
+	    _job_set_attr(pp->io[1].fd, O_RDWR,   TRUE);
 	    _job_set_attr(pp->io[2].fd, O_WRONLY, TRUE);
 
-	    _job_set_attr(cp->io[0].fd, O_RDWR, TRUE);
-	    _job_set_attr(cp->io[1].fd, O_RDWR, TRUE);
+	    _job_set_attr(cp->io[0].fd, O_RDWR,   TRUE);
+	    _job_set_attr(cp->io[1].fd, O_RDWR,   TRUE);
 	    _job_set_attr(cp->io[2].fd, O_WRONLY, TRUE);};
 #endif
         };
@@ -752,7 +752,7 @@ static int _job_init_ipc(process *pp, process *cp, io_connector *ioc)
 	   {pp->ioc = ioc;
 	    cp->ioc = ioc;};};
 
-#ifndef NEWWAY
+#ifdef OLDWAY
     _job_set_ipc(pp, cp);
 #endif
 
