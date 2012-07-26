@@ -494,74 +494,7 @@ int set_iodes(iodes *pio, char *ios)
  */
 
 void redir_io(iodes *fd, int nfd, int ifd, iodes *pio)
-   {int ofd, excl, fl;
-    io_kind knd;
-    io_mode md;
-    char *nm, *name;
-
-    name = pio->file;
-    md   = pio->mode;
-    knd  = pio->knd;
-
-    if (name != NULL)
-       {if (strcspn(name, "+-0123456789") == 0)
-	   {ofd = atol(name);
-	    if (ofd >= nfd)
-	       return;
-	    nm  = fd[ofd].file;
-	    fl  = fd[ofd].flag;}
-	else
-	   {ofd = ifd;
-	    nm  = name;
-	    fl  = -1;};
-
-/* shell redirection syntax and file mode correspondence */
-	switch (md)
-
-/*  <   ->  O_RDONLY */
-	   {case IO_MODE_RO :
-	         fl = O_RDONLY;
-		 break;
-
-/*  >!  ->  O_WRONLY | O_CREAT | O_TRUNC */
-	    case IO_MODE_WD :
-	         fl = O_WRONLY | O_CREAT | O_TRUNC;
-		 break;
-
-/*  >>  ->  O_WRONLY | O_APPEND */
-	    case IO_MODE_APPEND :
-		 fl = O_WRONLY | O_CREAT | O_APPEND;
-		 break;
-
-/*  >   ->  O_WRONLY | O_CREAT | O_EXCL */
-	    default :
-
-/* do not try to use O_EXCL bit with devices - think about it */
-	         if ((nm != NULL) && (strncmp(nm, "/dev/", 5) == 0))
-		    excl = 0;
-		 else
-		    excl = O_EXCL;
-
-		 fl = O_WRONLY | O_CREAT | excl;
-		 break;};
-
-	switch (knd)
-	   {case IO_STD_IN :
-		 fd[ifd].flag = fl;
-	         break;
-	    case IO_STD_OUT :
-		 fd[ifd].flag = fl;
-	         break;
-	    case IO_STD_ERR :
-		 fd[2].flag = fl;
-	         break;
-	    case IO_STD_BOND :
-		 fd[2].file = nm;
-		 fd[1].flag = fl;
-		 fd[2].flag = fl;
-	         break;
-	    default :
-	         break;};};
+   {
 
     return;}
 
@@ -590,8 +523,7 @@ static int parse_redirect(iodes *pio, process *pp, int i)
     if (pio != NULL)
        {t = ta[i];
 	
-	pio->gid  = pp->ip;
-	pio->file = NULL;
+	pio->gid = pp->ip;
 
 /* parse out the specification - results in PIO */
 	set_iodes(pio, t);};
@@ -1092,11 +1024,13 @@ static void reconnect_pgrp(process_group *pg)
 static void setup_pgrp(process_group *pg, int it,
 		       char **ta, int dosh, char **ios)
    {process *pp, *cp, **pa, **ca;
+    io_connector *ioc;
 
-    pa = pg->parents;
-    ca = pg->children;
+    pa  = pg->parents;
+    ca  = pg->children;
+    ioc = pg->ioc + N_IO_CHANNELS*it;
 
-    pg->to = _job_setup_proc(&pp, &cp, ta, pg->env, pg->shell);
+    pg->to = _job_setup_proc(&pp, &cp, ioc, ta, pg->env, pg->shell);
 
     pp->ios = ios;
     pp->ip  = it;
@@ -1290,6 +1224,7 @@ static void parse_pgrp(statement *s)
    {int i, j, it, nc, dosh, doif, term;
     char *t, *shell;
     char **sa, **ta, **env, **ios;
+    io_connector *ioc;
     process **pa, **ca;
     process_group *pg;
 
@@ -1308,8 +1243,10 @@ static void parse_pgrp(statement *s)
     sa = subst_syntax(sa);
 
 /* maximum number of process would be the number of tokens */
-    pa = MAKE_N(process *, nc);
-    ca = MAKE_N(process *, nc);
+    pa  = MAKE_N(process *, nc);
+    ca  = MAKE_N(process *, nc);
+
+    ioc = mk_connectors(nc);
 
     pg = MAKE(process_group);
     if (pg != NULL)
@@ -1319,6 +1256,7 @@ static void parse_pgrp(statement *s)
 	pg->shell    = shell;
 	pg->env      = env;
 	pg->terminal = NULL;
+	pg->ioc      = ioc;
 	pg->parents  = pa;
 	pg->children = ca;};
 
@@ -1386,6 +1324,7 @@ static void parse_pgrp(statement *s)
     pg->terminal = pa[it - 1];
 
 #ifdef DEBUG
+    dprioc("parse_pgrp", pg->np, pg->ioc);
     dprgio("parse_pgrp", pg->np, pg->parents, pg->children);
 #endif
 
