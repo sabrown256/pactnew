@@ -396,139 +396,40 @@ void dprgio(char *tag, int n, process **pa, process **ca)
 
 /*--------------------------------------------------------------------------*/
 
-/* SET_IODES - parse IOS and set the members of IOS accordingly */
+/* REDIRECT_IO - modify the I/O channel of PP according to IO */
 
-int set_iodes(iodes *pio, char *ios)
-   {int ck, cd, gid, nc, ni, rel, pos, rv;
-    char *p, *err_exist;
-    io_mode mode;
-    io_device dev;
-    io_kind knd;
+void redirect_io(process *pp, iodes *io)
+   {iodes *pio;
 
-    rv = FALSE;
-
-    dev  = IO_DEV_NONE;
-    knd  = IO_STD_NONE;
-    mode = IO_MODE_NONE;
-
-    gid = pio->gid;
-
-    if (ios[0] == PROCESS_DELIM)
-       ios++;
-
-    ni = strlen(ios);
-    nc = 0;
-    ck = ios[nc++];
-    cd = (nc < ni) ? ios[nc++] : '?';
-
-    if (ios != NULL)
-
-/* figure out the device type */
-       {switch (ck)
-	   {case 'b' :
-	         knd = IO_STD_BOND;
-		 dev = IO_DEV_PIPE;
-		 break;
-	    case 'e' :
-		 knd = IO_STD_ERR;
-		 dev = IO_DEV_PIPE;
-		 break;
-	    case 'i' :
-		 knd = IO_STD_IN;
-		 dev = IO_DEV_PIPE;
-		 break;
-	    case 'o' :
-		 knd = IO_STD_OUT;
-		 dev = IO_DEV_PIPE;
-		 break;};
-
-	rel = TRUE;
-
-	if (strchr("0123456789", cd) != NULL)
-	   {rel = FALSE;
-	    nc--;}
-	else if (strchr("+-", cd) != NULL)
-	   rel = TRUE;
-
-	if (dev == IO_DEV_PIPE)
-	   {p = ios + nc;
-	    if (IS_NULL(p) == TRUE)
-/*	       pos = (knd == IO_STD_IN) ? -1 : 1; */
-	       pos = 1;
-	    else
-	       pos = atoi(ios+nc);
-
-	    if (rel == TRUE)
-	       gid += pos;
-	    else
-	       gid = pos - 1;};
-
-/* now for the mode */
-	if (strchr("ioeb", ios[0]) != NULL)
-	   {err_exist = getenv("REDIRECT_EXIST_ERROR");
-	    switch (cd)
-	       {case 'f' :
-                     mode = IO_MODE_WO;
-                     break;
-		case 'w' :
-		     mode = (err_exist != NULL) ? IO_MODE_WO : IO_MODE_WD;
-                     break;
-		case 'a' :
-                     mode = IO_MODE_APPEND;
-		     break;};};
-
-	rv = TRUE;};
-
-    pio->knd  = knd;
-    pio->gid  = gid;
-    pio->dev  = dev;
-    pio->mode = mode;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* REDIR_IO - set the parts of FD implied by REDIR
- *          - NAME specifies the file to be used
- */
-
-void redir_io(iodes *fd, int nfd, int ifd, iodes *pio)
-   {
+/* add the redirect specifications to the filedes */
+    switch (io->knd)
+       {case IO_STD_IN :
+	     pio    = pp->io + IO_STD_IN;
+	     io->fd = pio->fd;
+	     *pio   = *io;
+	     break;
+        case IO_STD_OUT :
+	     pio    = pp->io + IO_STD_OUT;
+	     io->fd = pio->fd;
+	     *pio   = *io;
+	     break;
+        case IO_STD_ERR :
+	     pio    = pp->io + IO_STD_ERR;
+	     io->fd = pio->fd;
+	     *pio   = *io;
+	     break;
+        case IO_STD_BOND :
+	     pio    = pp->io + IO_STD_ERR;
+	     io->fd = pio->fd;
+	     *pio   = *io;
+	     pio    = pp->io + IO_STD_ERR;
+	     io->fd = pio->fd;
+	     *pio   = *io;
+	     break;
+        default :
+	     break;};
 
     return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* PARSE_REDIRECT - parse tokens until
- *                    - a redirection of the form <src><oper><dst>
- *                    - is obtained
- *                    -
- *                    - output redirections (covers sh and csh families)
- *                    -   [src]>[&] dst     src to dst, create name, error if it exists
- *                    -   [src]>![&] dst    src to dst, create name, truncate if it exists
- *                    -   [src]>>[&] dst    src to dst, append
- *                    -
- *                    -   dst := <filename> | <fd>
- *                    -   src := <fd> | &
- *                    -   fd  := [digits]+  (defaults to 1, stdout, if absent)
- */
-
-static int parse_redirect(iodes *pio, process *pp, int i)
-   {char *t, **ta;
-
-    ta = pp->ios;
-
-    if (pio != NULL)
-       {t = ta[i];
-	
-	pio->gid = pp->ip;
-
-/* parse out the specification - results in PIO */
-	set_iodes(pio, t);};
-
-    return(i);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -537,44 +438,68 @@ static int parse_redirect(iodes *pio, process *pp, int i)
  *             - and fill in PP->IO from them
  */
 
-static int redirect_fd(process *pp, int i)
-   {int rv;
-    iodes io;
+static int redirect_fd(process_group *pg, int ip, int i)
+   {int ck, cd, aip, nc, ni, rel, pos;
+    char *t, **ta;
+    char *p;
+    io_mode amd;
+    io_device dev;
+    io_kind aknd;
+    iodes ca;
+    process *pp;
 
-    _init_iodes(1, &io);
+    pp = pg->parents[ip];
 
 /* parse out the redirect related specifications */
-    rv = parse_redirect(&io, pp, i);
+    ta = pp->ios;
+    t  = ta[i];
 
-/* add the redirect specifications to the filedes */
-    switch (io.knd)
-       {case IO_STD_IN :
-	     io.fd = pp->io[0].fd;
-	     pp->io[0] = io;
-	     redir_io(pp->io, N_IO_CH, 0, &io);
-	     break;
-        case IO_STD_OUT :
-	     io.fd = pp->io[1].fd;
-	     pp->io[1] = io;
-	     redir_io(pp->io, N_IO_CH, 1, &io);
-	     break;
-        case IO_STD_ERR :
-	     io.fd = pp->io[2].fd;
-	     pp->io[2] = io;
-	     redir_io(pp->io, N_IO_CH, 2, &io);
-	     break;
-        case IO_STD_BOND :
-	     io.fd = pp->io[2].fd;
-	     pp->io[2] = io;
-	     redir_io(pp->io, N_IO_CH, 2, &io);
-	     io.fd = pp->io[1].fd;
-	     pp->io[1] = io;
-	     redir_io(pp->io, N_IO_CH, 1, &io);
-	     break;
-        default :
-	     break;};
+    aip  = pp->ip;
+    amd  = IO_MODE_NONE;
+    dev  = IO_DEV_NONE;
+    aknd = IO_STD_NONE;
 
-    return(rv);}
+    if (t[0] == PROCESS_DELIM)
+       t++;
+
+    ni = strlen(t);
+    nc = 0;
+    ck = t[nc++];
+    cd = (nc < ni) ? t[nc++] : '?';
+
+/* determine the device and mode */
+    if (strchr("ioeb", t[0]) != NULL)
+       {dev = IO_DEV_PIPE;
+
+/* get the device kind */
+	aknd = _io_kind(ck);
+
+/* get the device mode */
+	amd = _io_mode(aknd);
+
+/* find the group id of the other end of the I/O connection */
+	rel = TRUE;
+	if (strchr("0123456789", cd) != NULL)
+	   {rel = FALSE;
+	    nc--;};
+
+	p   = t + nc;
+	pos = (IS_NULL(p) == TRUE) ? 1 : atoi(p);
+	if (rel == TRUE)
+	   aip += pos;
+	else
+	   aip = pos - 1;};
+
+    _init_iodes(1, &ca);
+
+    ca.knd  = aknd;
+    ca.gid  = aip;
+    ca.dev  = dev;
+    ca.mode = amd;
+
+    redirect_io(pp, &ca);
+
+    return(i);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -596,16 +521,18 @@ static void redirect_copy(process *cp, process *pp)
 
 /* REDIRECT_PROCESS - look through the I/O specifications of PP */
 
-static void redirect_process(process *pp)
+static void redirect_process(process_group *pg, int it)
    {int i, n;
     char **ta;
+    process *pp;
 
+    pp = pg->parents[it];
     ta = pp->ios;
     n  = lst_length(ta);
 
 /* find self-specifications in each process */
     for (i = 0; i < n; i++)
-        i = redirect_fd(pp, i);
+        i = redirect_fd(pg, it, i);
 
     _default_iodes(pp->io);
 
@@ -731,6 +658,35 @@ static int transfer_fd(process *pn, io_kind pk, process *cn, io_kind ck)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WATCH_FD - register the KND descriptor of PN to be polled */
+
+static int watch_fd(process *pn, io_kind pk)
+   {int fd;
+    io_hand hnd;
+
+    fd  = pn->io[pk].fd;
+    hnd = pn->io[pk].hnd;
+
+#if 1
+    if ((fd > 0) && (hnd != IO_HND_PIPE))
+#else
+    io_device dev;
+    dev = pn->io[pk].dev;
+    if ((fd > 0) && (dev == IO_DEV_TERM) && (hnd != IO_HND_PIPE))
+#endif
+
+       {_awatch_fd(pn, pk, pn->ip);
+
+	pn->io[pk].hnd = IO_HND_POLL;};
+
+    return(fd);}
+
+/*--------------------------------------------------------------------------*/
+
+#ifdef NEWWAY
+
+/*--------------------------------------------------------------------------*/
+
 /* TRANSFER_IO - transfer the B connector to A
  *             - the A connector is specified by IOC, IA, and AK
  *             - the B connector is specified by IOC, IB, and BK
@@ -776,32 +732,9 @@ dbg>     write  10   0 none   in pipe 0
     return;}
 
 /*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
 
-/* WATCH_FD - register the KND descriptor of PN to be polled */
-
-static int watch_fd(process *pn, io_kind pk)
-   {int fd;
-    io_hand hnd;
-
-    fd  = pn->io[pk].fd;
-    hnd = pn->io[pk].hnd;
-
-#if 1
-    if ((fd > 0) && (hnd != IO_HND_PIPE))
 #else
-    io_device dev;
-    dev = pn->io[pk].dev;
-    if ((fd > 0) && (dev == IO_DEV_TERM) && (hnd != IO_HND_PIPE))
-#endif
 
-       {_awatch_fd(pn, pk, pn->ip);
-
-	pn->io[pk].hnd = IO_HND_POLL;};
-
-    return(fd);}
-
-/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* CLOSE_PARENT_CHILD - close all non-terminal parent to child lines */
@@ -912,6 +845,9 @@ void connect_child_in_out(int n, process **pa, process **ca)
     return;}
 
 /*--------------------------------------------------------------------------*/
+
+#endif
+
 /*--------------------------------------------------------------------------*/
 
 /* TRANSFER_FNC_CHILD - transfer all function call I/O from child
@@ -962,15 +898,29 @@ void transfer_fnc_child(int n, process **pa, process **ca)
  */
 
 static void reconnect_pgrp(process_group *pg)
-   {int nm, n;
-    process *pt;
+   {int i, nm, n;
+    io_connector *ioc;
+    process *pt, *pp, *cp;
     process **pa, **ca;
 
-    n  = pg->np;
-    pa = pg->parents;
-    ca = pg->children;
-    pt = pg->terminal;
-    nm = n - 1;
+    n   = pg->np;
+    pa  = pg->parents;
+    ca  = pg->children;
+    ioc = pg->ioc;
+    pt  = pg->terminal;
+    nm  = n - 1;
+
+    for (i = 0; i < n; i++)
+        {pp = pa[i];
+	 cp = ca[i];
+
+/* process out I/O redirections if we don't need a shell to do the command */
+	 redirect_process(pg, i);
+	 redirect_copy(cp, pp);
+
+/* remove a layer of quotes if we don't need a shell to do the command */
+	 unquote_process(pp);
+	 unquote_process(cp);};
 
     fillin_pgrp(pg);
 
@@ -978,8 +928,32 @@ static void reconnect_pgrp(process_group *pg)
  * the final parent out gets connected to the first child in
  */
     if (nm > 0)
-
        {
+
+#ifdef NEWWAY
+	int ig, ip;
+	io_connector *sio;
+
+	transfer_io(ioc, 0, IO_STD_IN, nm, IO_STD_OUT);
+        for (ip = 0; ip < n; ip++)
+            {for (i = 0; i < N_IO_CHANNELS; i++)
+                 {sio = ioc + N_IO_CHANNELS*ip + i;
+		  ig  = sio->out.gid;
+		  if (sio->out.dev == IO_DEV_PIPE)
+		     transfer_io(ioc, ig, IO_STD_IN, ip, i);};};
+                     
+        for (ip = 0; ip < n; ip++)
+            {for (i = 0; i < N_IO_CHANNELS; i++)
+                 {sio = ioc + N_IO_CHANNELS*ip + i;
+		  if (sio->in.dev == IO_DEV_PIPE)
+		     {sio->out.dev = IO_DEV_PIPE;
+		      sio->out.gid = sio->in.gid;};};};};
+
+#ifdef DEBUG
+    dprioc("reconnect_group", pg->np, pg->ioc);
+#endif
+
+#else
 
 #if 0
 /* set any sockets to read/write mode */
@@ -1013,6 +987,7 @@ static void reconnect_pgrp(process_group *pg)
 #ifdef DEBUG
     dprgrp(pg);
 #endif
+#endif
 
     return;}
 
@@ -1038,16 +1013,6 @@ static void setup_pgrp(process_group *pg, int it,
 
     pa[it] = pp;
     ca[it] = cp;
-
-    if (dosh == FALSE)
-
-/* process out I/O redirections if we don't need a shell to do the command */
-       {redirect_process(pp);
-	redirect_copy(cp, pp);
-
-/* remove a layer of quotes if we don't need a shell to do the command */
-	unquote_process(pp);
-	unquote_process(cp);};
 
     return;}
 
