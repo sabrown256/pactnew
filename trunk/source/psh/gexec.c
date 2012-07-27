@@ -534,7 +534,7 @@ int main(int c, char **v, char **env)
             {rv = do_fnc(db, c-i-1, v+i+1, mapf);
 	     break;}
 	 else
-            {rv = gexec(db, c-1, v+1, env, NULL);
+            {rv = gexec(db, c-i, v+i, env, NULL);
 	     break;};
 #endif
 	};
