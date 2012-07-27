@@ -263,7 +263,7 @@ int _fd_close(int fd)
     rv = close(fd);
 
 #ifdef DEBUG
-    fprintf(stderr, "dbg> %d closing %d (%d)\n", getpid(), fd, rv);
+    fprintf(stderr, "[%d]: closing %d (%d)\n", getpid(), fd, rv);
 #endif
 #endif
 
@@ -610,7 +610,8 @@ static int _job_set_attr(int fd, int i, int state)
 
     arg = fcntl(fd, F_GETFL);
     if (arg < 0)
-       fprintf(stderr, "Couldn't get flag for %d - _job_set_attr\n", fd);
+       fprintf(stderr, "[%d]: Error get flag on %d - _job_set_attr\n",
+               getpid(), fd);
 
     switch (state)
        {case 1 :
@@ -625,7 +626,8 @@ static int _job_set_attr(int fd, int i, int state)
 
     status = fcntl(fd, F_SETFL, arg);
     if (status < 0)
-       fprintf(stderr, "Couldn't set flag for %d - _job_set_attr\n", fd);
+       fprintf(stderr, "[%d]: Error set flag on %d - _job_set_attr\n",
+               getpid(), fd);
 
     rv = TRUE;
 
@@ -763,7 +765,7 @@ static int _job_init_ipc(process *pp, process *cp, io_connector *ioc)
 
 /* DPRDIO - print the file descriptors from an iodes PIO */
 
-void dprdio(iodes *pio)
+void dprdio(char *tag, iodes *pio)
    {int fd, gid;
     char *io, *hnd, *knd, *dev;
     static char *std[] = {"none", "in", "out", "err"};
@@ -779,8 +781,8 @@ void dprdio(iodes *pio)
     knd = kn[pio->knd + 1];
     dev = dn[pio->dev];
 
-    fprintf(stderr, "dbg> %4s %3d %3d %4s %4s %4s\n",
-	    io, fd, gid, hnd, knd, dev);
+    fprintf(stderr, "dbg> %6s %4s %3d %3d %4s %4s %4s\n",
+	    tag, io, fd, gid, hnd, knd, dev);
 
     return;}
 
@@ -794,10 +796,10 @@ void dprpio(char *tag, process *pp)
     iodes *pio;
 
     fprintf(stderr, "dbg> %d  %s\n", getpid(), tag);
-    fprintf(stderr, "dbg> Unit  fd gid  hnd  knd  dev\n");
+    fprintf(stderr, "dbg>        Unit  fd gid  hnd  knd  dev\n");
     for (i = 0; i < N_IO_CHANNELS; i++)
         {pio = pp->io + i;
-	 dprdio(pio);};
+	 dprdio("", pio);};
 
     return;}
 
