@@ -5,12 +5,6 @@
  *
  */
 
-/* look at process group parsing and I/O connections */
-/* #define DEBUG */
-
-/* look at process execution and I/O */
-/* #define TRACE */
-
 /* #define STRONG_FUNCTIONS */
 
 /* #define NEWWAY */
@@ -515,18 +509,21 @@ static int help(void)
 
 int main(int c, char **v, char **env)
    {int i, rv;
-    char *db;
+    char *db, *s;
 
-#ifdef DEBUG
-    printf("main> a c = %d\n", c);
-#endif
+    db = cgetenv(TRUE, "PERDB_PATH");
+    s  = cgetenv(TRUE, "GEXEC_DEBUG_LEVEL");
 
-    db = getenv("PERDB_PATH");
+    dbg_level = (s == NULL) ? 0 : atol(s);
 
     for (i = 1; i < c; i++)
         {if (strcmp(v[i], "-h") == 0)
             {rv = help();
 	     break;}
+
+	 else if (strcmp(v[i], "-d") == 0)
+            {dbg_level = atol(v[++i]);
+             csetenv("GEXEC_DEBUG_LEVEL", "%d", dbg_level);}
 
 #ifdef STRONG_FUNCTIONS
 	 else
@@ -541,10 +538,6 @@ int main(int c, char **v, char **env)
 	     break;};
 #endif
 	};
-
-#ifdef DEBUG
-    printf("main> z\n");
-#endif
 
     return(rv);}
 

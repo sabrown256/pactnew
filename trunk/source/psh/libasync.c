@@ -246,10 +246,33 @@ static process_stack
 static sigjmp_buf
  _job_cpu;
 
+static int
+ dbg_level = 0;
+
 /*--------------------------------------------------------------------------*/
 
 /*                              INFRASTRUCTURE                              */
 
+/*--------------------------------------------------------------------------*/
+
+/* _DBG - diagnostic debug print function */
+
+void _dbg(unsigned int lvl, char *fmt, ...)
+   {int pid;
+    char s[LRG];
+
+    if (lvl & dbg_level)
+       {VA_START(fmt);
+	VSNPRINTF(s, LRG, fmt);
+	VA_END;
+
+	pid = getpid();
+
+	fprintf(stderr, "[%d/%d]: %s\n", pid, dbg_level, s);};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _FD_CLOSE - wrap close to be able to monitor/log them all */
@@ -262,9 +285,7 @@ int _fd_close(int fd)
 #else
     rv = close(fd);
 
-#ifdef DEBUG
-    fprintf(stderr, "[%d]: closing %d (%d)\n", getpid(), fd, rv);
-#endif
+    _dbg(1, "closing %d (%d)", fd, rv);
 #endif
 
     return(rv);}
@@ -781,8 +802,8 @@ void dprdio(char *tag, iodes *pio)
     knd = kn[pio->knd + 1];
     dev = dn[pio->dev];
 
-    fprintf(stderr, "dbg> %6s %4s %3d %3d %4s %4s %4s\n",
-	    tag, io, fd, gid, hnd, knd, dev);
+    _dbg(-1, "%6s %4s %3d %3d %4s %4s %4s",
+	 tag, io, fd, gid, hnd, knd, dev);
 
     return;}
 
@@ -795,8 +816,8 @@ void dprpio(char *tag, process *pp)
    {int i;
     iodes *pio;
 
-    fprintf(stderr, "dbg> %d  %s\n", getpid(), tag);
-    fprintf(stderr, "dbg>        Unit  fd gid  hnd  knd  dev\n");
+    _dbg(-1, tag);
+    _dbg(-1, "        Unit  fd gid  hnd  knd  dev");
     for (i = 0; i < N_IO_CHANNELS; i++)
         {pio = pp->io + i;
 	 dprdio("", pio);};
@@ -823,9 +844,8 @@ static void _job_child_fork(process *pp, process *cp, char **argv, char *mode)
     cp->start_time = wall_clock_time();
     cp->stop_time  = 0.0;
 
-#ifdef TRACE
-    dprpio("_job_child_fork", cp);
-#endif
+    if (dbg_level & 2)
+       dprpio("_job_child_fork", cp);
 
     rv = _job_exec(cp, argv, environ, mode);
 
@@ -853,9 +873,8 @@ static int _job_parent_fork(process *pp, process *cp, char *mode)
 
     _job_free(cp);
 
-#ifdef TRACE
-    dprpio("_job_parent_fork", pp);
-#endif
+    if (dbg_level & 2)
+       dprpio("_job_parent_fork", pp);
 
     sched_yield();
 
