@@ -164,7 +164,7 @@ void dprioc(char *tag, int np, io_connector *ioc)
    {int i, fd, io, gid, nc;
     char *hnd, *knd, *dev;
     io_connector *pioc;
-    static char *hn[]  = {"none", "clos", "pipe", "poll"};
+    static char *hn[]  = {"none", "clos", "pipe", "fnc", "poll"};
     static char *kn[]  = {"none", "in", "out", "err", "bond",
 			  "status", "rsrc"};
     static char *dn[]  = {"none", "pipe", "sock", "pty", "term", "fnc"};
@@ -231,14 +231,14 @@ void dprgrp(char *tag, process_group *pg)
         {pp = pg->parents[i];
 	 cp = pg->children[i];
 
-	 dprdio(cp->io + IO_STD_IN);
-	 dprdio(pp->io + IO_STD_OUT);
+	 dprdio("child",  cp->io + IO_STD_IN);
+	 dprdio("parent", pp->io + IO_STD_OUT);
 
-	 dprdio(pp->io + IO_STD_IN);
-	 dprdio(cp->io + IO_STD_OUT);
+	 dprdio("parent", pp->io + IO_STD_IN);
+	 dprdio("child",  cp->io + IO_STD_OUT);
 
-	 dprdio(pp->io + IO_STD_ERR);
-	 dprdio(cp->io + IO_STD_ERR);
+	 dprdio("parent", pp->io + IO_STD_ERR);
+	 dprdio("child",  cp->io + IO_STD_ERR);
 
 	 fprintf(stderr, "dbg>\n");};
 
@@ -634,15 +634,29 @@ static int transfer_fd(process *pn, io_kind pk, process *cn, io_kind ck)
 /* WATCH_FD - register the KND descriptor of PN to be polled */
 
 static int watch_fd(process *pn, io_kind pk)
-   {int fd;
+   {int ip, fd;
     io_hand hnd;
+    io_connector *ioc;
 
+    ip  = pn->ip;
+    ioc = pn->ioc + pk;
+    fd  = (pk == IO_STD_IN) ? ioc->out.fd  : ioc->in.fd;
+    hnd = (pk == IO_STD_IN) ? ioc->out.hnd : ioc->in.hnd;
+    fd  = ioc->in.fd;
+    hnd = ioc->in.hnd;
+
+#ifndef NEWWAY
     fd  = pn->io[pk].fd;
     hnd = pn->io[pk].hnd;
-
+#endif
     if ((fd > 0) && (hnd != IO_HND_PIPE))
-       {_awatch_fd(pn, pk, pn->ip);
+       {_awatch_fd(pn, pk, ip);
 
+#ifdef DEBUG
+fprintf(stderr, "[%d]: watch fd=%d on %d @ %d\n", getpid(), fd, ip, pk);
+#endif
+
+	ioc->out.hnd   = IO_HND_POLL;
 	pn->io[pk].hnd = IO_HND_POLL;};
 
     return(fd);}
@@ -662,35 +676,24 @@ static void transfer_io(io_connector *ioc, int ia, io_kind ak,
     pia = ioc + N_IO_CHANNELS*ia + ak;
     pib = ioc + N_IO_CHANNELS*ib + bk;
 
-/* (0, IO_STD_OUT) and (1, IO_STD_IN) before
-dbg>  1  read    5  -1 none  out term
-dbg>     write   6   1 none  out pipe 1
-
-dbg>  0  read    9   0 none   in pipe 0
-dbg>     write  10  -1 none   in term
-*/
 /*    _fd_close(pib->in.fd); */
     pib->in.fd   = pia->in.fd;
     pib->in.dev  = IO_DEV_PIPE;
-    pib->in.gid  = ib;
+    pib->in.hnd  = IO_HND_PIPE;
+    pib->in.gid  = ia;
 /*
     pib->out.dev = IO_DEV_PIPE;
-    pib->out.gid = ib;
+    pib->out.hnd = IO_HND_PIPE;
+    pib->out.gid = ia;
 */
 /*    _fd_close(pib->out.fd); */
     pib->out.fd  = pia->out.fd;
     pia->out.dev = IO_DEV_PIPE;
-    pia->out.gid = ia;
+    pia->out.hnd = IO_HND_PIPE;
+    pia->out.gid = ib;
     pia->in.dev  = IO_DEV_PIPE;
-    pia->in.gid  = ia;
-
-/* (0, IO_STD_OUT) and (1, IO_STD_IN) after
-dbg>  1  read    9   1 none  out pipe 1
-dbg>     write  10   1 none  out pipe 1
-
-dbg>  0  read    9   0 none   in pipe 0
-dbg>     write  10   0 none   in pipe 0
-*/
+    pia->in.hnd  = IO_HND_PIPE;
+    pia->in.gid  = ib;
 
     return;}
 
@@ -899,14 +902,20 @@ static void reconnect_pgrp(process_group *pg)
             {for (i = 0; i < N_IO_CHANNELS; i++)
                  {sio = ioc + N_IO_CHANNELS*ip + i;
 		  ig  = sio->out.gid;
-		  if (sio->out.dev == IO_DEV_PIPE)
-		     transfer_io(ioc, ig, IO_STD_IN, ip, i);};};
+		  if ((sio->out.dev == IO_DEV_PIPE) &&
+		      (sio->out.hnd != IO_HND_PIPE))
+		     transfer_io(ioc, ig, IO_STD_IN, ip, i);
+		  else if ((sio->in.dev == IO_DEV_PIPE) &&
+			   (sio->in.hnd != IO_HND_PIPE))
+		     transfer_io(ioc, ig, IO_STD_OUT, ip, i);};};
                      
         for (ip = 0; ip < n; ip++)
             {for (i = 0; i < N_IO_CHANNELS; i++)
                  {sio = ioc + N_IO_CHANNELS*ip + i;
-		  if (sio->in.dev == IO_DEV_PIPE)
+		  if ((sio->in.dev == IO_DEV_PIPE) &&
+		      (sio->out.hnd != IO_HND_PIPE))
 		     {sio->out.dev = IO_DEV_PIPE;
+		      sio->out.hnd = IO_HND_PIPE;
 		      sio->out.gid = sio->in.gid;};};};
 
 #ifdef OLDWAY
@@ -1454,17 +1463,16 @@ void _pgrp_fin(process *pp, void *a)
 /* REGISTER_IO_PGRP - setup to poll all remaining process side descriptors */
 
 void register_io_pgrp(process_group *pg)
-   {int i, np;
+   {int i, ip, np;
     process *pp, **pa;
 
     np = pg->np;
     pa = pg->parents;
 
-    for (i = 0; i < np; i++)
-        {pp = pa[i];
-	 watch_fd(pp, IO_STD_IN);
-	 watch_fd(pp, IO_STD_OUT);
-	 watch_fd(pp, IO_STD_ERR);};
+    for (ip = 0; ip < np; ip++)
+        {pp = pa[ip];
+         for (i = 0; i < N_IO_CHANNELS; i++)
+	     watch_fd(pp, i);};
 
     return;}
 
