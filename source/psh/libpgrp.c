@@ -171,17 +171,17 @@ void dprioc(char *tag, int np, io_connector *ioc)
 
     nc = N_IO_CHANNELS*np;
 
-    fprintf(stderr, "dbg> -----------------------------------------------\n");
-    fprintf(stderr, "dbg> %d  %s  ioc\n", getpid(), tag);
-    fprintf(stderr, "dbg> %d processes   %d connections\n", np, nc);
+    _dbg(-1, "-----------------------------------------------");
+    _dbg(-1, "%s  ioc", tag);
+    _dbg(-1, "%d processes   %d connections", np, nc);
 
-    fprintf(stderr, "dbg> Unit       fd gid  hnd  knd  dev #\n");
+    _dbg(-1, "Unit       fd gid  hnd  knd  dev #");
     for (i = 0; i < nc; i++)
         {pioc = ioc + i;
 
 	 io = i % N_IO_CHANNELS;
 	 if (io == 0)
-	    fprintf(stderr, "dbg>\n");
+	    _dbg(-1, "");
 
 	 fd  = pioc->in.fd;
 	 gid = pioc->in.gid;
@@ -190,11 +190,11 @@ void dprioc(char *tag, int np, io_connector *ioc)
 	 dev = dn[pioc->in.dev];
 
 	 if (pioc->in.dev == IO_DEV_PIPE)
-	    fprintf(stderr, "dbg> %2d  read  %3d %3d %4s %4s %4s %d\n",
-		    io, fd, gid, hnd, knd, dev, gid);
+	    _dbg(-1, "%2d  read  %3d %3d %4s %4s %4s %d",
+		 io, fd, gid, hnd, knd, dev, gid);
 	 else
-	    fprintf(stderr, "dbg> %2d  read  %3d %3d %4s %4s %4s\n",
-		    io, fd, gid, hnd, knd, dev);
+	    _dbg(-1, "%2d  read  %3d %3d %4s %4s %4s",
+		 io, fd, gid, hnd, knd, dev);
 
 	 fd  = pioc->out.fd;
 	 gid = pioc->out.gid;
@@ -203,11 +203,11 @@ void dprioc(char *tag, int np, io_connector *ioc)
 	 dev = dn[pioc->out.dev];
 
 	 if (pioc->out.dev == IO_DEV_PIPE)
-	    fprintf(stderr, "dbg>     write %3d %3d %4s %4s %4s %d\n",
-		    fd, gid, hnd, knd, dev, gid);
+	    _dbg(-1, "    write %3d %3d %4s %4s %4s %d",
+		 fd, gid, hnd, knd, dev, gid);
 	 else
-	    fprintf(stderr, "dbg>     write %3d %3d %4s %4s %4s\n",
-		    fd, gid, hnd, knd, dev);};
+	    _dbg(-1, "    write %3d %3d %4s %4s %4s",
+		 fd, gid, hnd, knd, dev);};
 
     return;}
 
@@ -222,11 +222,11 @@ void dprgrp(char *tag, process_group *pg)
 
     n = pg->np;
 
-    fprintf(stderr, "dbg> -----------------------------------------------\n");
-    fprintf(stderr, "dbg> %d  %s  group\n", getpid(), tag);
-    fprintf(stderr, "dbg> %d processes\n", n);
+    _dbg(-1, "-----------------------------------------------");
+    _dbg(-1, "%s  group", tag);
+    _dbg(-1, "%d processes", n);
 
-    fprintf(stderr, "dbg> Unit  fd gid  hnd  knd  dev\n");
+    _dbg(-1, "Unit  fd gid  hnd  knd  dev");
     for (i = 0; i < n; i++)
         {pp = pg->parents[i];
 	 cp = pg->children[i];
@@ -240,7 +240,7 @@ void dprgrp(char *tag, process_group *pg)
 	 dprdio("parent", pp->io + IO_STD_ERR);
 	 dprdio("child",  cp->io + IO_STD_ERR);
 
-	 fprintf(stderr, "dbg>\n");};
+	 _dbg(-1, "");};
 
     return;}
 
@@ -254,14 +254,15 @@ void dprgio(char *tag, int n, process **pa, process **ca)
     char *hnd;
     process *pp, *cp;
 
-    fprintf(stderr, "dbg> -----------------------------------------------\n");
-    fprintf(stderr, "dbg> %s\ndbg>\n", tag);
+    _dbg(-1, "-----------------------------------------------");
+    _dbg(-1, "%s", tag);
+    _dbg(-1, "");
 
     for (i = 0; i < n; i++)
         {pp = pa[i];
 	 cp = ca[i];
 	 if ((pp != NULL) && (cp != NULL))
-	    {fprintf(stderr, "dbg> command: %s\n", pp->cmd);
+	    {_dbg(-1, "command: %s", pp->cmd);
              switch (pp->io[1].hnd)
 	        {case IO_HND_PIPE :
 		      hnd = "pipe";
@@ -275,8 +276,8 @@ void dprgio(char *tag, int n, process **pa, process **ca)
 	         default :
 		      hnd = "none";
 		      break;};
-	     fprintf(stderr, "dbg>    stdin:  %3d(%s) -> %3d\n",
-		     pp->io[1].fd, hnd, cp->io[0].fd);
+	     _dbg(-1, "   stdin:  %3d(%s) -> %3d",
+		  pp->io[1].fd, hnd, cp->io[0].fd);
 
              switch (pp->io[0].hnd)
 	        {case IO_HND_PIPE :
@@ -291,8 +292,8 @@ void dprgio(char *tag, int n, process **pa, process **ca)
 	         default :
 		      hnd = "none";
 		      break;};
-	     fprintf(stderr, "dbg>    stdout: %3d(%s) <- %3d\n",
-		     pp->io[0].fd, hnd, cp->io[1].fd);
+	     _dbg(-1, "   stdout: %3d(%s) <- %3d",
+		  pp->io[0].fd, hnd, cp->io[1].fd);
 
              switch (pp->io[2].hnd)
 	        {case IO_HND_PIPE :
@@ -307,12 +308,12 @@ void dprgio(char *tag, int n, process **pa, process **ca)
 	         default :
 		      hnd = "none";
 		      break;};
-	     fprintf(stderr, "dbg>    stderr: %3d(%s) <- %3d\n",
+	     _dbg(-1, "   stderr: %3d(%s) <- %3d",
 		     pp->io[2].fd, hnd, cp->io[2].fd);
 
-	     fprintf(stderr, "dbg>\n");};};
+	     _dbg(-1, "");};};
 
-    fprintf(stderr, "dbg> -----------------------------------------------\n");
+    _dbg(-1, "-----------------------------------------------");
 
     return;}
 
@@ -1712,8 +1713,7 @@ process_session *init_session(void)
 /* put the current process in its own group */
 	pgid = getpid();
 	if (setpgid(pgid, pgid) < 0)
-	   fprintf(stderr,
-		   "Couldn't put the session in its own process group");
+	   _dbg(-1, "Couldn't put the session in its own process group");
 
 	else
      
