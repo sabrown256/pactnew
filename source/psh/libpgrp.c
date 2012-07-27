@@ -652,9 +652,7 @@ static int watch_fd(process *pn, io_kind pk)
     if ((fd > 0) && (hnd != IO_HND_PIPE))
        {_awatch_fd(pn, pk, ip);
 
-#ifdef DEBUG
-fprintf(stderr, "[%d]: watch fd=%d on %d @ %d\n", getpid(), fd, ip, pk);
-#endif
+	_dbg(1, "watch fd=%d on %d @ %d", fd, ip, pk);
 
 	ioc->out.hnd   = IO_HND_POLL;
 	pn->io[pk].hnd = IO_HND_POLL;};
@@ -937,10 +935,9 @@ static void reconnect_pgrp(process_group *pg)
 #endif
     };
 
-#ifdef DEBUG
-    dprioc("reconnect_pgrp", pg->np, pg->ioc);
-    dprgrp("reconnect_pgrp", pg);
-#endif
+    if (dbg_level & 1)
+       {dprioc("reconnect_pgrp", pg->np, pg->ioc);
+	dprgrp("reconnect_pgrp", pg);};
 
     return;}
 
@@ -1243,9 +1240,7 @@ static void parse_pgrp(statement *s)
 
     reconnect_pgrp(pg);
 
-#ifdef DEBUG
-    fprintf(stderr, "dbg> pgrp: %s\n", s->text);
-#endif
+    _dbg(1, "process group: %s", s->text);
 
     s->ne = it;
     s->pg = pg;
@@ -1263,9 +1258,7 @@ static void parse_pgrp(statement *s)
 int _pgrp_accept(int fd, process *pp, char *s)
    {int rv;
 
-#ifdef TRACE
-    fprintf(stderr, "trace> accept from %d\n", fd);
-#endif
+    _dbg(2, "accept from %d", fd);
 
     rv = fputs(s, stdout);
     rv = (rv >= 0);
@@ -1282,14 +1275,10 @@ int _pgrp_reject(int fd, process *pp, char *s)
 
     rv = TRUE;
 
-#ifdef DEBUG
-    fprintf(stderr, "dbg> reject: fd(%d) cmd(%s) txt(%s)\n", fd, pp->cmd, s);
-#endif
+    _dbg(1, "reject: fd(%d) cmd(%s) txt(%s)", fd, pp->cmd, s);
 
-#ifdef TRACE
-    fprintf(stderr, "trace> reject from %d\n", fd);
-    fputs(s, stderr);
-#endif
+    if (dbg_level & 2)
+       fputs(s, stderr);
 
     return(rv);}
 
@@ -1301,41 +1290,40 @@ int _pgrp_reject(int fd, process *pp, char *s)
 void _pgrp_wait(process *pp)
    {int rv;
 
-#ifdef TRACE
-    char *st;
+    if (dbg_level & 2)
+       {char *st;
 
-    switch (pp->status)
-       {case JOB_RUNNING :
-	     st = "run";
-	     break;
-	case JOB_STOPPED :
-	     st = "stop";
-	     break;
-	case JOB_CHANGED :
-	     st = "chng";
-	     break;
-	case JOB_EXITED :
-	     st = "exit";
-	     break;
-	case JOB_COREDUMPED :
-	     st = "core";
-	     break;
-	case JOB_SIGNALED :
-	     st = "sgnl";
-	     break;
-	case JOB_KILLED :
-	     st = "kill";
-	     break;
-	case JOB_DEAD :
-	     st = "dead";
-	     break;
-	default :
-	     st = "unk";
-	     break;};
+	switch (pp->status)
+	   {case JOB_RUNNING :
+	         st = "run";
+		 break;
+	    case JOB_STOPPED :
+		 st = "stop";
+		 break;
+	    case JOB_CHANGED :
+		 st = "chng";
+		 break;
+	    case JOB_EXITED :
+		 st = "exit";
+		 break;
+	    case JOB_COREDUMPED :
+		 st = "core";
+		 break;
+	    case JOB_SIGNALED :
+		 st = "sgnl";
+		 break;
+	    case JOB_KILLED :
+		 st = "kill";
+		 break;
+	    case JOB_DEAD :
+		 st = "dead";
+		 break;
+	    default :
+		   st = "unk";
+		 break;};
 
-    fprintf(stderr, "trace> wait %d with status %s (%d) (alive %d)\n",
-	    pp->id, st, pp->reason, job_alive(pp));
-#endif
+	_dbg(2, "wait %d with status %s (%d) (alive %d)",
+	     pp->id, st, pp->reason, job_alive(pp));};
 
     rv = job_done(pp, SIGTERM);
     ASSERT(rv == 0);
@@ -1358,10 +1346,8 @@ int _pgrp_tty(char *tag)
     nf = acheck();
     rv = (nf == np);
 
-#ifdef TRACE
     if (rv == TRUE)
-       fprintf(stderr, "trace> all done\n");
-#endif
+       _dbg(2, "all done");
 
     return(rv);}
 
@@ -1424,9 +1410,9 @@ void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
 			     {fp[0] = _io_file_ptr(pp, IO_STD_IN);
 			      fp[1] = _io_file_ptr(pp, io);
 			      md    = IO_MODE_RO;};
-#ifdef TRACE
-			  fprintf(stderr, "trace> call '%s' (%d)\n", fn, i);
-#endif
+
+			  _dbg(2, "call '%s' (%d)", fn, i);
+
 			  rv = f(db, md, fp, c, v);
 			  pp->reason = rv;
 			  ASSERT(rv >= -1);};};};};};
@@ -1450,10 +1436,8 @@ void _pgrp_fin(process *pp, void *a)
 
     job_done(pp, SIGKILL);
 
-#ifdef TRACE
-    fprintf(stderr, "trace> fin %d with status %d (alive %d)\n",
-	    pp->id, st[i], job_alive(pp));
-#endif
+    _dbg(2, "fin %d with status %d (alive %d)",
+	 pp->id, st[i], job_alive(pp));
 
     return;}
 
@@ -1513,9 +1497,8 @@ static int run_pgrp(statement *s)
 
 	register_io_pgrp(pg);
 
-#ifdef DEBUG
-	dprgio("run_pgrp", np, pg->parents, pg->children);
-#endif
+	if (dbg_level & 1)
+	   dprgio("run_pgrp", np, pg->parents, pg->children);
 
 /* launch the jobs - io_data passed to accept, reject, and wait methods */
 	for (i = 0; i < np; i++)
@@ -1527,12 +1510,11 @@ static int run_pgrp(statement *s)
 #endif
 	        pp = _job_fork(pp, cp, NULL, "rw", s);
 
-#ifdef TRACE
-	     fprintf(stderr, "trace> launch %d (%d,%d,%d)\n       %s\n",
-		     pp->id,
-		     pp->io[0].fd, pp->io[1].fd, pp->io[2].fd,
-		     pp->cmd);
-#endif
+	     _dbg(2, "launch %d (%d,%d,%d)       %s",
+		  pp->id,
+		  pp->io[0].fd, pp->io[1].fd, pp->io[2].fd,
+		  pp->cmd);
+
 	     pp->accept   = _pgrp_accept;
 	     pp->reject   = _pgrp_reject;
 	     pp->wait     = _pgrp_wait;
