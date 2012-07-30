@@ -5,8 +5,6 @@
  *
  */
 
-/* #define STRONG_FUNCTIONS */
-
 /* #define NEWWAY */
 #define OLDWAY
 
@@ -67,9 +65,6 @@ static int do_fnc(char *db, int c, char **v, PFPCAL (*map)(char *x))
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
-
-#ifdef STRONG_FUNCTIONS
-
 /*--------------------------------------------------------------------------*/
 
 /* STR_VAR - function to access variables */
@@ -285,9 +280,6 @@ static PFPCAL maps(char *s)
     return(f);}
 
 /*--------------------------------------------------------------------------*/
-
-#else
-
 /*--------------------------------------------------------------------------*/
 
 /* EXE_VAR - function to access variables */
@@ -488,9 +480,6 @@ static PFPCAL mapf(char *s)
     return(f);}
 
 /*--------------------------------------------------------------------------*/
-
-#endif
-
 /*--------------------------------------------------------------------------*/
 
 /* HELP - print help message */
@@ -525,19 +514,19 @@ int main(int c, char **v, char **env)
             {dbg_level = atol(v[++i]);
              csetenv("GEXEC_DEBUG_LEVEL", "%d", dbg_level);}
 
-#ifdef STRONG_FUNCTIONS
-	 else
-	    {rv = gexec(db, c-1, v+1, env, maps);
-	     break;};
-#else
+	 else if (strcmp(v[i], "-s") == 0)
+            strong_functions = TRUE;
+
+	 else if (strong_functions == TRUE)
+	    {rv = gexec(db, c-i, v+i, env, maps);
+	     break;}
+
 	 else if (strcmp(v[i], "-p") == 0)
             {rv = do_fnc(db, c-i-1, v+i+1, mapf);
 	     break;}
 	 else
             {rv = gexec(db, c-i, v+i, env, NULL);
-	     break;};
-#endif
-	};
+	     break;};};
 
     return(rv);}
 

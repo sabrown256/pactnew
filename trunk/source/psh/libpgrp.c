@@ -75,6 +75,9 @@ struct s_process_session
     int foreground;                 /* TRUE iff current job is foreground */
     struct termios attr;};          /* terminal attributes */
 
+static int
+ strong_functions = FALSE;
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -501,13 +504,12 @@ static void redirect_process(process_group *pg, int it)
 
     _default_iodes(pp->io);
 
-#ifndef STRONG_FUNCTIONS
-    ta = pp->arg;
-    if ((strcmp(ta[0], "gexec") == 0) && (strcmp(ta[1], "-p") == 0))
-       {pp->isfunc = TRUE;
-	for (i = 0; i < N_IO_CHANNELS; i++)
-	    pp->io[i].dev = IO_DEV_FNC;};
-#endif
+    if (strong_functions == FALSE)
+       {ta = pp->arg;
+	if ((strcmp(ta[0], "gexec") == 0) && (strcmp(ta[1], "-p") == 0))
+	   {pp->isfunc = TRUE;
+	    for (i = 0; i < N_IO_CHANNELS; i++)
+	        pp->io[i].dev = IO_DEV_FNC;};};
 
     return;}
 
@@ -614,10 +616,10 @@ static int transfer_fd(process *pn, io_kind pk, process *cn, io_kind ck)
 
     pn->io[pk].hnd = IO_HND_PIPE;
     pn->io[pk].fp  = NULL;
-#ifdef STRONG_FUNCTIONS
-    pn->io[pk].fd  = -100;
-#endif
-
+/*
+    if (strong_functions == TRUE)
+       pn->io[pk].fd  = -100;
+*/
 /* GOTCHA: we can close something we need in the bonded case
  * or leak descriptors in the other cases
  * better bookkeeping is needed here
@@ -820,33 +822,30 @@ void connect_child_in_out(int n, process **pa, process **ca)
  */
 
 void transfer_fnc_child(int n, process **pa, process **ca)
-   {
-
-#ifdef STRONG_FUNCTIONS
-    int i, io;
+   {int i, io;
     char **ta;
     iodes *pio;
     process *pp, *cp;
 
-    for (i = 0; i < n; i++)
-        {pp = pa[i];
-	 cp = ca[i];
+    if (strong_functions == TRUE)
+       {for (i = 0; i < n; i++)
+	    {pp = pa[i];
+	     cp = ca[i];
 
-	 ta = pp->arg;
-	 if ((strcmp(ta[0], "gexec") == 0) && (strcmp(ta[1], "-p") == 0))
-	    {pp->isfunc = TRUE;
-	     for (i = 0; i < N_IO_CHANNELS; i++)
-	         {pio = pp->io + i;
-/*		  if (pio->gid != -1) */
-		     pio->dev = IO_DEV_FNC;};};
+	     ta = pp->arg;
+	     if ((strcmp(ta[0], "gexec") == 0) && (strcmp(ta[1], "-p") == 0))
+	        {pp->isfunc = TRUE;
+		 for (i = 0; i < N_IO_CHANNELS; i++)
+		     {pio = pp->io + i;
+/*		        if (pio->gid != -1) */
+		         pio->dev = IO_DEV_FNC;};};
 
-	 if (pp->isfunc == TRUE)
-	    {for (io = 0; io < N_IO_CHANNELS; io++)
-		 transfer_fd(cp, io, pp, io);
-	     _job_free(cp);
+	     if (pp->isfunc == TRUE)
+	        {for (io = 0; io < N_IO_CHANNELS; io++)
+		     transfer_fd(cp, io, pp, io);
+		 _job_free(cp);
 
-	     ca[i] = NULL;};};
-#endif
+		 ca[i] = NULL;};};};
 
     return;}
 
@@ -1481,16 +1480,15 @@ static int run_pgrp(statement *s)
 
 	s->st = MAKE_N(int, ne);
 
-#ifdef STRONG_FUNCTIONS
-	for (i = 0; i < ne; i++)
-	    {pp = pg->parents[i];
-	     if (pp->isfunc == TRUE)
-                 s->nf++;
-	     else
-                 s->np++;};
-#else
-        s->np = s->ne;
-#endif
+	if (strong_functions == TRUE)
+	   {for (i = 0; i < ne; i++)
+	        {pp = pg->parents[i];
+		 if (pp->isfunc == TRUE)
+		    s->nf++;
+		 else
+		    s->np++;};}
+	else
+	   s->np = s->ne;
 
 	np = s->np;
 
@@ -1506,9 +1504,7 @@ static int run_pgrp(statement *s)
 	    {pp = pg->parents[i];
 	     cp = pg->children[i];
 
-#ifdef STRONG_FUNCTIONS
-	     if (pp->isfunc == FALSE)
-#endif
+	     if ((strong_functions == FALSE) || (pp->isfunc == FALSE))
 	        pp = _job_fork(pp, cp, NULL, "rw", s);
 
 	     _dbg(2, "launch %d (%d,%d,%d)       %s",
