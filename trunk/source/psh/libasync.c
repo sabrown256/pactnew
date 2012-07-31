@@ -247,7 +247,8 @@ static sigjmp_buf
  _job_cpu;
 
 static int
- dbg_level = 0;
+ dbg_level = 0,
+ strong_functions = FALSE;
 
 /*--------------------------------------------------------------------------*/
 
@@ -302,11 +303,12 @@ void _job_io_close(process *pp, io_kind knd)
     fd = pp->io[knd].fd;
     fp = pp->io[knd].fp;
 
-    if (fd >= 0)
-       _fd_close(fd);
+    if ((strong_functions == FALSE) || (pp->isfunc == FALSE))
+       {if (fd >= 0)
+	   _fd_close(fd);
 
-    if (fp != NULL)
-       fclose(fp);
+	if (fp != NULL)
+	   fclose(fp);};
 
     pp->io[knd].fd  = -1;
     pp->io[knd].fp  = NULL;
@@ -1112,7 +1114,9 @@ int job_read(int fd, process *pp, int (*out)(int fd, process *pp, char *s))
     if (job_alive(pp))
        {fi = pp->io[IO_STD_IN].fp;
 	if (fi != NULL)
-	   {/* _block_all_sig(); */
+ 	   {fd = pp->io[IO_STD_IN].fd;
+
+/*            _block_all_sig(); */
 
 	    while (TRUE)
 	       {p = fgets(s, MAXLINE, fi);
@@ -1401,33 +1405,37 @@ static int _awatch_fd(process *pp, io_kind knd, int sip)
    {int ip, ifd, fd, rv;
 
 /* handle the process */
-    ip = (sip < 0) ? stck.ip++ : sip;
-    if (ip >= stck.np)
-       {int i, n;
+    if ((strong_functions == TRUE) && (pp->isfunc == TRUE))
+       ip = pp->ip;
+    else
+       {ip = (sip < 0) ? stck.ip++ : sip;
+	if (ip >= stck.np)
+	   {int i, n;
 
-	fprintf(stderr, "ERROR: Bad process accounting (%d > %d) - exiting\n",
-	       stck.ip, stck.np);
+	    fprintf(stderr,
+		    "ERROR: Bad process accounting (%d > %d) - exiting\n",
+		    stck.ip, stck.np);
 
-	n = stck.np;
-	for (i = 0; i < n; i++)
-	    fprintf(stderr, "%d ", stck.proc[i]->ip);
-	fprintf(stderr, "\n");
-	exit(1);};
+	    n = stck.np;
+	    for (i = 0; i < n; i++)
+	        fprintf(stderr, "%d ", stck.proc[i]->ip);
+	    fprintf(stderr, "\n");
+	    exit(1);};
 
-    stck.proc[ip] = pp;
+	stck.proc[ip] = pp;
 
 /* handle the descriptor */
-    fd = pp->io[knd].fd;
-    rv = block_fd(fd, FALSE);
-    ASSERT(rv == 0);
+	fd = pp->io[knd].fd;
+	rv = block_fd(fd, FALSE);
+	ASSERT(rv == 0);
 
-    ifd = stck.ifd++;
-    stck.fd[ifd].fd      = 0;
-    stck.fd[ifd].events  = 0;
-    stck.fd[ifd].revents = 0;
+	ifd = stck.ifd++;
+	stck.fd[ifd].fd      = 0;
+	stck.fd[ifd].events  = 0;
+	stck.fd[ifd].revents = 0;
 
-    stck.io[ifd]  = fd;
-    stck.map[ifd] = ip;
+	stck.io[ifd]  = fd;
+	stck.map[ifd] = ip;};
 
     return(ip);}
 
