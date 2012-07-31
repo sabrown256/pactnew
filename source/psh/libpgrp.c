@@ -75,9 +75,6 @@ struct s_process_session
     int foreground;                 /* TRUE iff current job is foreground */
     struct termios attr;};          /* terminal attributes */
 
-static int
- strong_functions = FALSE;
-
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
