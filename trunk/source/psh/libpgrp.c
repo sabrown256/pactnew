@@ -229,19 +229,20 @@ void dprgrp(char *tag, process_group *pg)
     _dbg(-1, "%s  group", tag);
     _dbg(-1, "%d processes", n);
 
-    _dbg(-1, "Unit  fd gid  hnd  knd  dev");
+    _dbg(-1, "       Unit  fd gid  hnd  knd  dev");
     for (i = 0; i < n; i++)
         {pp = pg->parents[i];
 	 cp = pg->children[i];
 
-	 dprdio("child",  cp->io + IO_STD_IN);
-	 dprdio("parent", pp->io + IO_STD_OUT);
+	 if (cp != NULL)
+	    {dprdio("child",  cp->io + IO_STD_IN);
+	     dprdio("child",  cp->io + IO_STD_OUT);
+	     dprdio("child",  cp->io + IO_STD_ERR);};
 
-	 dprdio("parent", pp->io + IO_STD_IN);
-	 dprdio("child",  cp->io + IO_STD_OUT);
-
-	 dprdio("parent", pp->io + IO_STD_ERR);
-	 dprdio("child",  cp->io + IO_STD_ERR);
+	 if (pp != NULL)
+	    {dprdio("parent", pp->io + IO_STD_IN);
+	     dprdio("parent", pp->io + IO_STD_OUT);
+	     dprdio("parent", pp->io + IO_STD_ERR);};
 
 	 _dbg(-1, "");};
 
@@ -609,25 +610,29 @@ void fillin_pgrp(process_group *pg)
 
 static int transfer_fd(process *pn, io_kind pk, process *cn, io_kind ck)
    {int fd;
+    iodes *pio, *cio;
     FILE *fp;
 
-    fd = pn->io[pk].fd;
-    fp = pn->io[pk].fp;
+    pio = pn->io + pk;
+    cio = cn->io + ck;
 
-    pn->io[pk].hnd = IO_HND_PIPE;
-    pn->io[pk].fp  = NULL;
+    fd = pio->fd;
+    fp = pio->fp;
+
+    pio->hnd = IO_HND_PIPE;
+    pio->fp  = NULL;
 /*
     if (strong_functions == TRUE)
-       pn->io[pk].fd  = -100;
+       pio->fd  = -100;
 */
 /* GOTCHA: we can close something we need in the bonded case
  * or leak descriptors in the other cases
  * better bookkeeping is needed here
-    _fd_close(cn->io[ck].fd);
+    _fd_close(cio->fd);
  */
-    cn->io[ck].hnd = IO_HND_PIPE;
-    cn->io[ck].fp  = fp;
-    cn->io[ck].fd  = fd;
+    cio->hnd = IO_HND_PIPE;
+    cio->fp  = fp;
+    cio->fd  = fd;
 
     return(fd);}
 
@@ -821,22 +826,28 @@ void connect_child_in_out(int n, process **pa, process **ca)
  *                    - to parent and free child
  */
 
-void transfer_fnc_child(int n, process **pa, process **ca)
-   {int i, io;
+void transfer_fnc_child(process_group *pg)
+   {int i, io, n;
     char **ta;
     iodes *pio;
     process *pp, *cp;
+    process **pa, **ca;
 
     if (strong_functions == TRUE)
-       {for (i = 0; i < n; i++)
+       {n   = pg->np;
+	pa  = pg->parents;
+	ca  = pg->children;
+ 
+	for (i = 0; i < n; i++)
 	    {pp = pa[i];
 	     cp = ca[i];
 
 	     ta = pp->arg;
 	     if ((strcmp(ta[0], "gexec") == 0) && (strcmp(ta[1], "-p") == 0))
 	        {pp->isfunc = TRUE;
-		 for (i = 0; i < N_IO_CHANNELS; i++)
-		     {pio = pp->io + i;
+ 		 cp->isfunc = TRUE;
+ 		 for (io = 0; io < N_IO_CHANNELS; io++)
+ 		     {pio = pp->io + io;
 /*		        if (pio->gid != -1) */
 		         pio->dev = IO_DEV_FNC;};};
 
@@ -931,7 +942,7 @@ static void reconnect_pgrp(process_group *pg)
 	connect_child_in_out(n, pa, ca);
 
 /* transfer all function call I/O to parent and free child */
-	transfer_fnc_child(n, pa, ca);
+	transfer_fnc_child(pg);
 #endif
     };
 
@@ -1466,7 +1477,7 @@ void register_io_pgrp(process_group *pg)
 /* RUN_PGRP - run the process group PG */
 
 static int run_pgrp(statement *s)
-   {int i, ne, np, rv, tc, fd;
+   {int i, io, ne, np, rv, tc, fd;
     char vl[MAXLINE];
     char *db;
     process *pp, *cp;
@@ -1492,25 +1503,28 @@ static int run_pgrp(statement *s)
 
 	np = s->np;
 
-	asetup(np, 1);
+	asetup(ne, 1);
 
 	register_io_pgrp(pg);
 
 	if (dbg_level & 1)
-	   dprgio("run_pgrp", np, pg->parents, pg->children);
+	   dprgio("run_pgrp", ne, pg->parents, pg->children);
 
 /* launch the jobs - io_data passed to accept, reject, and wait methods */
-	for (i = 0; i < np; i++)
+	for (i = 0; i < ne; i++)
 	    {pp = pg->parents[i];
 	     cp = pg->children[i];
 
 	     if ((strong_functions == FALSE) || (pp->isfunc == FALSE))
-	        pp = _job_fork(pp, cp, NULL, "rw", s);
+	        {pp = _job_fork(pp, cp, NULL, "rw", s);
 
-	     _dbg(2, "launch %d (%d,%d,%d)       %s",
-		  pp->id,
-		  pp->io[0].fd, pp->io[1].fd, pp->io[2].fd,
-		  pp->cmd);
+		 _dbg(2, "launch %d (%d,%d,%d)       %s",
+		      pp->id,
+		      pp->io[0].fd, pp->io[1].fd, pp->io[2].fd,
+		      pp->cmd);}
+ 	     else
+ 	        {for (io = 0; io < N_IO_CHANNELS; io++)
+ 		     _io_file_ptr(pp, io);};
 
 	     pp->accept   = _pgrp_accept;
 	     pp->reject   = _pgrp_reject;
