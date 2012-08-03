@@ -5,20 +5,32 @@
 
 unalias *
 
+set t = var
+
 @ err = 0
 
 source $TestScrDir/env-csh
 
-alias pe  'unsetenv gstatus ; echo "" ; echo "Command: \!*" ; gexec \!* ; dbget gstatus'
+alias pe  'unsetenv gstatus ; gexec \!* ; dbget gstatus'
+
+set f = ( `fill-string -n 8 -c ' ' $t` )
+NoteD $Log -n "                        $f "
+Note $Log ""
+
+set exe = $t
+set opt = ""
+set rpf = ""
+
+set lt = `timer -r`
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 foreach i (1 2 3 4 5 6)
 
-   echo ""
-   echo "---------------------------------------------------"
-   echo ""
+   Note $Log ""
+   Note $Log "---------------------------------------------------"
+   Note $Log ""
 
    set id  = v$i
    set res = ext-$id.res
@@ -88,7 +100,7 @@ foreach i (1 2 3 4 5 6)
    Note $Log "cmd = $cmd"
    Note $Log "srt = $srt"
 
-   eval $cmd
+   flog $Log eval $cmd
 
    if ($srt == TRUE) then
       flog $Log ( sort $raw >&! $res )
@@ -98,7 +110,7 @@ foreach i (1 2 3 4 5 6)
    if ("$pvl" != NULL) then
       foreach v ($pvl)
          dbget $v
-         echo "> $v = `printenv $v`"
+         Note $Log "> $v = `printenv $v`"
       end
    endif
 
@@ -113,24 +125,30 @@ foreach i (1 2 3 4 5 6)
    Note $Log "> gstatus = $gstatus"
    if ("$gstatus" != "$gst") then
       flog $Log @ err = $err + 1
-      echo "$id failed"
+      NoteD $Log -n "x"
+      Note $Log "$id failed"
    else if (-f $ref) then
       flog $Log ( diff $res $ref >&! $dif )
       if ($status == 0) then
-         echo "$id passed"
+         NoteD $Log -n "."
+         Note $Log "$id passed"
          flog $Log rm -f $res $dif
       else
+         NoteD $Log -n "o"
          flog $Log @ err = $err + 1
-         echo "$id differed"
+         Note $Log "$id differed"
          flog $Log cat $dif
       endif
    else
-      echo "$id added"
+      NoteD $Log -n "+"
+      Note $Log "$id added"
       flog $Log cp $res $ref
       flog $Log rm -f $res
    endif
 
 end
+
+NoteD $Log -n " ................."
 
 Note $Log "exiting with err = $err"
 Note $Log ""
@@ -138,7 +156,15 @@ Note $Log ""
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-exit($err)
+set xstatus = $err
+
+set lt = `timer -b $lt`
+
+set rpf = ( $rpf ext-$t )
+
+$TEST_CHECK part -a gexec_${t} -e $xstatus -dt $lt -x $exe -l -rpf "$rpf" none
+
+exit($status)
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -254,7 +280,3 @@ endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-echo ""
-
-exit($err)

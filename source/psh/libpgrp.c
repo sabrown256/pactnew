@@ -28,10 +28,15 @@
  *           - <pgr-spec>  := '@' <io-kind> |
  *           -                '@' <io-kind> <io-id> |
  *           -                '@' <io-kind> <io-id> <io-kind>
- *           - <io-kind>   := 'i' | 'o' | 'e' | 'b'
+ *           - <io-kind>   := 'i' | 'o' | 'e' | 'b' |
+ *           -                'r' | 'x' | 'l' | 'v'
  *           - <io-id>     := +<n> | -<n> | <n>
  *           - <n>         := unsigned integer value
  *           - 
+ *           - Illegal cases:
+ *           -   @i<n>i       input to input
+ *           -   @o<n>o, @e<n>e, @o<n>e, or @e<n>o    output to output
+ *           -   @o<n> @e<n>  where <n> is the same   use @b<n> to express that
  *
  * read http://www.gnu.org/software/libc/manual/html_node/Implementing-a-Shell.html#Implementing-a-Shell
  * for a good discussion of shell-like job control
@@ -78,6 +83,45 @@ struct s_process_session
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _NAME_IO - return the name of io_kind K */
+
+char *_name_io(io_kind k)
+   {char *rv;
+
+    switch (k)
+       {case IO_STD_IN :
+	     rv = "stdin";
+	     break;
+        case IO_STD_OUT :
+	     rv = "stdout";
+	     break;
+        case IO_STD_ERR :
+	     rv = "stderr";
+	     break;
+        case IO_STD_BOND :
+	     rv = "bonded";
+	     break;
+        case IO_STD_STATUS :                       /* exit status - output */
+	     rv = "status";
+	     break;
+        case IO_STD_RESOURCE :                  /* resource usage - output */
+	     rv = "rusage";
+	     break;
+        case IO_STD_LIMIT :                     /* resource limits - input */
+	     rv = "rlimit";
+	     break;
+        case IO_STD_ENV_VAR :             /* environment variables - input */
+	     rv = "env";
+	     break;
+        default :
+	     rv = "none";
+	     break;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _KIND_IO - return the character matching io_kind K */
 
 int _kind_io(io_kind k)
@@ -95,6 +139,18 @@ int _kind_io(io_kind k)
 	     break;
         case IO_STD_BOND :
 	     rv = 'b';
+	     break;
+        case IO_STD_STATUS :                        /* exit status - output */
+	     rv = 'x';
+	     break;
+        case IO_STD_RESOURCE :                   /* resource usage - output */
+	     rv = 'r';
+	     break;
+        case IO_STD_LIMIT :                      /* resource limits - input */
+	     rv = 'l';
+	     break;
+        case IO_STD_ENV_VAR :              /* environment variables - input */
+	     rv = 'v';
 	     break;
         default :
 	     rv = '\0';
@@ -122,6 +178,18 @@ int _io_kind(int c)
 	     break;
         case 'o' :
 	     rv = IO_STD_OUT;
+	     break;
+        case 'x' :                                  /* exit status - output */
+	     rv = IO_STD_STATUS;
+	     break;
+        case 'r' :                               /* resource usage - output */
+	     rv = IO_STD_RESOURCE;
+	     break;
+        case 'l' :                               /* resource limits - input */
+	     rv = IO_STD_LIMIT;
+	     break;
+        case 'v' :                         /* environment variables - input */
+	     rv = IO_STD_ENV_VAR;
 	     break;
         default :
 	     rv = IO_STD_NONE;
@@ -166,7 +234,7 @@ void dprioc(char *tag, int np, io_connector *ioc)
     io_connector *pioc;
     static char *hn[]  = {"none", "clos", "pipe", "fnc", "poll"};
     static char *kn[]  = {"none", "in", "out", "err", "bond",
-			  "status", "rsrc"};
+			  "status", "rsrc", "limit", "env"};
     static char *dn[]  = {"none", "pipe", "sock", "pty", "term", "fnc"};
 
     nc = N_IO_CHANNELS*np;
@@ -226,10 +294,12 @@ void dprgrp(char *tag, process_group *pg)
     _dbg(-1, "%s  group", tag);
     _dbg(-1, "%d processes", n);
 
-    _dbg(-1, "       Unit  fd gid  hnd  knd  dev");
+    _dbg(-1, "         Unit  fd  dev  knd  hnd gid");
     for (i = 0; i < n; i++)
         {pp = pg->parents[i];
 	 cp = pg->children[i];
+
+         _dbg(-1, "process #%d: %s", i, pp->cmd);
 
 	 if (cp != NULL)
 	    {dprdio("child",  cp->io + IO_STD_IN);
@@ -324,10 +394,16 @@ void dprgio(char *tag, int n, process **pa, process **ca)
 
 /*--------------------------------------------------------------------------*/
 
-/* REDIRECT_IO - modify the I/O channel of PP according to IO */
+/* REDIRECT_IO - modify the I/O channel of the IP process in PG
+ *             - according to IO
+ */
 
-void redirect_io(process *pp, iodes *io)
+void redirect_io(process_group *pg, int ip, iodes *io)
    {iodes *pio;
+    process *pp, *cp;
+
+    pp = pg->parents[ip];
+    cp = pg->children[ip];
 
 /* add the redirect specifications to the filedes */
     switch (io->knd)
@@ -357,19 +433,29 @@ void redirect_io(process *pp, iodes *io)
 	     break;
 
         case IO_STD_BOND :
-	     pio    = &pp->ioc[IO_STD_ERR].out;
-	     io->fd = pio->fd;
-	     *pio   = *io;
 	     pio    = &pp->ioc[IO_STD_OUT].out;
 	     io->fd = pio->fd;
 	     *pio   = *io;
+	     pio    = &pp->ioc[IO_STD_ERR].out;
+	     *pio   = *io;
 
-#ifdef OLDWAY
-	     pio    = pp->io + IO_STD_ERR;
+	     pio    = &cp->ioc[IO_STD_OUT].out;
 	     io->fd = pio->fd;
 	     *pio   = *io;
+	     pio    = &cp->ioc[IO_STD_ERR].out;
+	     *pio   = *io;
+
+#ifdef OLDWAY
 	     pio    = pp->io + IO_STD_OUT;
 	     io->fd = pio->fd;
+	     *pio   = *io;
+	     pio    = pp->io + IO_STD_ERR;
+	     *pio   = *io;
+
+	     pio    = cp->io + IO_STD_OUT;
+	     io->fd = pio->fd;
+	     *pio   = *io;
+	     pio    = cp->io + IO_STD_ERR;
 	     *pio   = *io;
 #endif
 	     break;
@@ -418,8 +504,12 @@ static int redirect_fd(process_group *pg, int ip, int i)
     ck = t[nc++];
     cd = (nc < ni) ? t[nc++] : '?';
 
+/* look for special devices */
+    if (strchr("rxlv", t[0]) != NULL)
+       {}
+
 /* determine the device and mode */
-    if (strchr("ioeb", t[0]) != NULL)
+    else if (strchr("ioeb", t[0]) != NULL)
        {dev = IO_DEV_PIPE;
 
 /* get the device kind */
@@ -440,8 +530,11 @@ static int redirect_fd(process_group *pg, int ip, int i)
 	   {rel = FALSE;
 	    nc--;};
 
-	p   = t + nc;
-	pos = (IS_NULL(p) == TRUE) ? 1 : atoi(p);
+	if (nc >= ni)
+	   pos = 1;
+	else
+	   {p   = t + nc;
+	    pos = (IS_NULL(p) == TRUE) ? 1 : atoi(p);};
 	if (rel == TRUE)
 	   aip += pos;
 	else
@@ -454,7 +547,7 @@ static int redirect_fd(process_group *pg, int ip, int i)
     ca.gid  = aip;
     ca.mode = amd;
 
-    redirect_io(pg->parents[bip], &ca);
+    redirect_io(pg, bip, &ca);
 
     _init_iodes(1, &cb);
 
@@ -463,7 +556,7 @@ static int redirect_fd(process_group *pg, int ip, int i)
     cb.gid  = bip;
     cb.mode = bmd;
 
-    redirect_io(pg->parents[aip], &cb);
+    redirect_io(pg, aip, &cb);
 
     return(i);}
 
@@ -618,10 +711,11 @@ static int transfer_fd(process *pn, io_kind pk, process *cn, io_kind ck)
 
     pio->hnd = IO_HND_PIPE;
     pio->fp  = NULL;
-/*
+
     if (strong_functions == TRUE)
-       pio->fd  = -100;
-*/
+       {pio->fd  *= -1;
+	pio->hnd  = IO_HND_CLOSE;};
+
 /* GOTCHA: we can close something we need in the bonded case
  * or leak descriptors in the other cases
  * better bookkeeping is needed here
@@ -654,10 +748,10 @@ static int watch_fd(process *pn, io_kind pk)
     fd  = pn->io[pk].fd;
     hnd = pn->io[pk].hnd;
 #endif
-    if ((fd > 0) && (hnd != IO_HND_PIPE))
+    if ((fd > 2) && (hnd != IO_HND_PIPE) && (hnd != IO_HND_CLOSE))
        {_awatch_fd(pn, pk, ip);
 
-	_dbg(1, "watch fd=%d on %d @ %d", fd, ip, pk);
+	_dbg(1, "watch fd=%d on %d @ %s", fd, ip, _name_io(pk));
 
 	ioc->out.hnd   = IO_HND_POLL;
 	pn->io[pk].hnd = IO_HND_POLL;};
@@ -708,21 +802,30 @@ static void transfer_io(io_connector *ioc, int ia, io_kind ak,
 
 /* CLOSE_PARENT_CHILD - close all non-terminal parent to child lines */
 
-void close_parent_child(int n, process **pa, process **ca)
-   {int i, nm;
-    process *pp, *cp;
+void close_parent_child(process_group *pg)
+   {int ip, np, nm;
+    iodes *pio, *cio;
+    process *pp, *cp, **pa, **ca;
 
-    nm = n - 1;
+    np = pg->np;
+    pa = pg->parents;
+    ca = pg->children;
+    nm = np - 1;
 
-    for (i = 1; i < nm; i++)
-        {pp = pa[i];
-	 cp = ca[i];
+    for (ip = 1; ip < nm; ip++)
+        {pp = pa[ip];
+	 cp = ca[ip];
 
-	 _fd_close(pp->io[1].fd);
-	 _fd_close(cp->io[0].fd);
+	 pio = pp->io + IO_STD_OUT;
+	 cio = cp->io + IO_STD_IN;
 
-	 pp->io[1].hnd = IO_HND_CLOSE;
-	 cp->io[0].hnd = IO_HND_CLOSE;};
+	 if (pio->fd > 2)
+	    {_fd_close(pio->fd);
+	     _fd_close(cio->fd);
+	     pio->fd *= -1;};
+
+	 pio->hnd = IO_HND_CLOSE;
+	 cio->hnd = IO_HND_CLOSE;};
 
     return;}
 
@@ -733,37 +836,91 @@ void close_parent_child(int n, process **pa, process **ca)
  *                      - to appropriate child input
  */
 
-void connect_child_out_in(int n, process **pa, process **ca)
-   {int i, gi, nm;
+void connect_child_out_in(process_group *pg)
+   {int ip, np, gi, nm;
     io_device dv;
-    process *pp;
+    iodes *pio;
+    process *pp, **pa, **ca;
 
-    nm = n - 1;
+    np = pg->np;
+    pa = pg->parents;
+    ca = pg->children;
+    nm = np - 1;
 
-    for (i = 0; i < nm; i++)
-        {pp = pa[i];
+    for (ip = 0; ip < nm; ip++)
+        {pp = pa[ip];
 
 /* stdout */
-	 gi = pp->io[IO_STD_OUT].gid;
-	 dv = pp->io[IO_STD_OUT].dev;
+	 pio = pp->io + IO_STD_OUT;
+	 gi  = pio->gid;
+	 dv  = pio->dev;
 
-/* default to the next process in line */
+/* default to the next process in group */
 	 if ((dv == IO_DEV_PIPE) && (gi == -1))
-	    gi = i + 1;
+	    gi = ip + 1;
 
 	 if (gi >= 0)
-	    transfer_fd(pa[i], IO_STD_IN, ca[gi], IO_STD_IN);
+	    transfer_fd(pp, IO_STD_IN, ca[gi], IO_STD_IN);
 
 /* stderr */
-	 gi = pp->io[IO_STD_ERR].gid;
-	 dv = pp->io[IO_STD_ERR].dev;
+	 pio = pp->io + IO_STD_ERR;
+	 if (pio->knd != IO_STD_BOND)
+	    {gi  = pio->gid;
+	     dv  = pio->dev;
 
-/* default to the next process in line */
-	 if ((dv == IO_DEV_PIPE) && (gi == -1))
-	    gi = i + 1;
+/* default to the next process in group */
+	     if ((dv == IO_DEV_PIPE) && (gi == -1))
+	        gi = ip + 1;
 
-	 if (gi >= 0)
-	    transfer_fd(pa[i], IO_STD_ERR, ca[gi], IO_STD_IN);};
+	     if (gi >= 0)
+	        transfer_fd(pp, IO_STD_ERR, ca[gi], IO_STD_IN);};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TRANSFER_IN - transfer I/O channel KND from process IA to IB */
+
+void transfer_in(process_group *pg, int ia, int ib, io_kind knd)
+   {int np, fd;
+    iodes *pia, *pib, *cia, *cib;
+    process *pa, *pb, *ca, *cb;
+
+    np = pg->np;
+    if ((0 <= ia) && (ia < np) && (0 <= ib) && (ib < np))
+       {pa = pg->parents[ia];
+	ca = pg->children[ia];
+	pb = pg->parents[ib];
+	cb = pg->children[ib];
+
+	pia = pa->io + knd;
+	cia = ca->io + knd;
+	pib = pb->io + knd;
+	cib = cb->io + knd;
+	if ((cib->gid == ia) &&
+	    ((cia->dev == IO_DEV_PIPE) && (cia->gid == -1)))
+	   {if (strong_functions == TRUE)
+	       {fd = pia->fd;
+
+		transfer_fd(pa, knd, cb, knd);
+		pia->hnd = IO_HND_NONE;
+		pia->dev = IO_DEV_NONE;
+		pia->fd  = -2;
+		pia->fp  = NULL;
+
+		if (pib->fd == fd)
+		   {pib->fd = -2;
+		    pib->fp = NULL;
+		    pib->hnd = IO_HND_NONE;
+		    pib->dev = IO_DEV_NONE;};}
+	   else
+	      {cib->hnd = IO_HND_PIPE;
+
+	       fd = cib->fd;
+
+	       pia->hnd = IO_HND_PIPE;
+	       pia->fd  = fd;};};};
 
     return;}
 
@@ -774,42 +931,32 @@ void connect_child_out_in(int n, process **pa, process **ca)
  *                      - appropriate child output
  */
 
-void connect_child_in_out(int n, process **pa, process **ca)
-   {int i, gi, nm;
+void connect_child_in_out(process_group *pg)
+   {int i0, ip, np, gi, nm;
     io_device dv;
-    process *pp;
+    iodes *pia;
+    process *pp, **pa;
 
-    nm = n - 1;
+    np = pg->np;
+    pa = pg->parents;
+    nm = np - 1;
+    i0 = (strong_functions == FALSE);
 
-    for (i = 1; i < nm; i++)
-        {pp = pa[i];
+    for (ip = i0; ip < nm; ip++)
+        {pp = pa[ip];
 
 /* stdin */
-	 gi = pp->io[IO_STD_IN].gid;
-	 dv = pp->io[IO_STD_IN].dev;
+	 pia = pp->io + IO_STD_IN;
+	 gi  = pia->gid;
+	 dv  = pia->dev;
 
-/* default to the previous process in line */
+/* default to the next process in group */
 	 if ((dv == IO_DEV_PIPE) && (gi == -1))
-	    gi = i - 1;
+	    gi = ip + 1;
 
 	 if (gi >= 0)
-	    {int fd;
-
-	     if (ca[gi]->io[IO_STD_OUT].gid == i)
-	        {ca[gi]->io[IO_STD_OUT].hnd = IO_HND_PIPE;
-
-		  fd = ca[gi]->io[IO_STD_OUT].fd;
-
-		  pp->io[IO_STD_OUT].hnd = IO_HND_PIPE;
-		  pp->io[IO_STD_OUT].fd  = fd;};
-
-	     if (ca[gi]->io[IO_STD_ERR].gid == i)
-	        {ca[gi]->io[IO_STD_ERR].hnd = IO_HND_PIPE;
-
-		 fd = ca[gi]->io[IO_STD_ERR].fd;
-
-		 pp->io[IO_STD_IN].hnd = IO_HND_PIPE;
-		 pp->io[IO_STD_IN].fd  = fd;};};};
+	    {transfer_in(pg, ip, gi, IO_STD_OUT);
+	     transfer_in(pg, ip, gi, IO_STD_ERR);};};
 
     return;}
 
@@ -842,15 +989,30 @@ void transfer_fnc_child(process_group *pg)
 	     ta = pp->arg;
 	     if ((strcmp(ta[0], "gexec") == 0) && (strcmp(ta[1], "-p") == 0))
 	        {pp->isfunc = TRUE;
- 		 cp->isfunc = TRUE;
- 		 for (io = 0; io < N_IO_CHANNELS; io++)
- 		     {pio = pp->io + io;
-/*		        if (pio->gid != -1) */
-		         pio->dev = IO_DEV_FNC;};};
+ 		 cp->isfunc = TRUE;};
 
 	     if (pp->isfunc == TRUE)
 	        {for (io = 0; io < N_IO_CHANNELS; io++)
-		     transfer_fd(cp, io, pp, io);
+ 		     {pio = pp->io + io;
+		      if ((i == n-1) && (io == IO_STD_OUT) &&
+			  (pio->dev == IO_DEV_TERM))
+			 {
+/* need this for date @o pw:test but
+ * cannot tolerate it for cat @i fr:foo
+ */
+                          pio->fd  = io;
+			  pio->hnd = IO_HND_NONE;
+			  pio->dev = IO_DEV_TERM;
+
+			  }
+		      else if (pio->dev == IO_DEV_PIPE)
+			 transfer_fd(cp, io, pp, io);
+		      else
+		         {pio->fd  = io;
+			  pio->hnd = IO_HND_POLL;};
+
+		      pio->dev = IO_DEV_FNC;};
+
 		 _job_free(cp);
 
 		 ca[i] = NULL;};};};
@@ -930,13 +1092,17 @@ static void reconnect_pgrp(process_group *pg)
 	transfer_fd(pa[0], IO_STD_OUT, pt, IO_STD_OUT);
 
 /* close all other parent to child lines */
-	close_parent_child(n, pa, ca);
+	close_parent_child(pg);
 
-/* connect all non-terminal children output to appropriate child input */
-	connect_child_out_in(n, pa, ca);
+/* connect all non-terminal children output to appropriate child input
+ * there are from output specifications @o, @e, @b, @r, and @x 
+ */
+	connect_child_out_in(pg);
 
-/* connect all non-terminal children input to appropriate child output */
-	connect_child_in_out(n, pa, ca);
+/* connect all non-terminal children input to appropriate child output
+ * there are from input specifications @i, @l, and @v
+ */
+	connect_child_in_out(pg);
 
 /* transfer all function call I/O to parent and free child */
 	transfer_fnc_child(pg);
@@ -944,7 +1110,7 @@ static void reconnect_pgrp(process_group *pg)
     };
 
     if (dbg_level & 1)
-       {dprioc("reconnect_pgrp", pg->np, pg->ioc);
+       {/* dprioc("reconnect_pgrp", pg->np, pg->ioc); */
 	dprgrp("reconnect_pgrp", pg);};
 
     return;}
@@ -1330,8 +1496,13 @@ void _pgrp_wait(process *pp)
 		   st = "unk";
 		 break;};
 
-	_dbg(2, "wait %d with status %s (%d) (alive %d)",
-	     pp->id, st, pp->reason, job_alive(pp));};
+	if (pp->isfunc == TRUE)
+	   _dbg(2, "wait function %d: %s", pp->ip, pp->cmd);
+	else
+	   _dbg(2, "wait process %d: (%d) %s", pp->ip, pp->id, pp->cmd);
+
+	_dbg(2, "   status %s (%d) (alive %d)",
+	     st, pp->reason, job_alive(pp));};
 
     rv = job_done(pp, SIGTERM);
     ASSERT(rv == 0);
@@ -1362,6 +1533,83 @@ int _pgrp_tty(char *tag)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _FNC_WAIT - analog of job_wait for functions
+ *           - return TRUE iff function is still running
+ */
+
+int _fnc_wait(process_group *pg, int ip, int st)
+   {int io, rv, sts, cnd;
+    process *pp;
+
+    rv = TRUE;
+
+    pp = pg->parents[ip];
+
+    if (job_alive(pp) == TRUE)
+       {if (st == 0)
+	   pp->status = JOB_RUNNING;
+
+/* negative status means error exit */
+	else if (st < 0)
+	   {cnd = JOB_EXITED;
+	    sts = -st;
+	    rv  = FALSE;}
+
+/* positive status means "normal" exit */
+	else if (st > 0)
+	   {cnd = JOB_EXITED;
+	    sts = 0;
+	    rv  = FALSE;};
+
+	if (st != 0)
+	   {int fd, jo;
+            iodes *pio;
+	    process *pd;
+	    FILE *fp;
+
+	    _block_all_sig();
+
+	    for (io = 0; io < N_IO_CHANNELS; io++)
+	        {pio = pp->io + io;
+		 if (pio->gid != -1)
+		    {fd = pio->fd;
+		     fp = pio->fp;
+		     if (fd > 2)
+		        _fd_close(fd);
+		     if (fp != NULL)
+		        fclose(fp);
+
+		     pio->fd  = -1;
+		     pio->fp  = NULL;
+		     pio->hnd = IO_HND_NONE;
+		     pio->dev = IO_DEV_NONE;
+		     pio->knd = IO_STD_NONE;
+
+		     pd = pg->parents[pio->gid];
+
+		     for (jo = 0; jo < N_IO_CHANNELS; jo++)
+		         {if (pd->io[jo].gid == ip)
+			     {job_read(pd->io[jo].fd, pd, pd->accept);
+			      _job_io_close(pd, jo);};};
+
+		     kill(pd->id, SIGHUP);
+
+		     job_wait(pd);};};
+
+	    pp->stop_time = wall_clock_time();
+	    pp->status    = cnd;
+	    pp->reason    = sts;
+
+	    if ((pp->wait != NULL) && (pp->isfunc == FALSE))
+	       pp->wait(pp);
+
+	    _unblock_all_sig();};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PGRP_WORK - main worker handling I/O connections for
  *            - running process group
  *            - strong version of function/procedure call
@@ -1376,8 +1624,8 @@ void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
     io_device dv;
     io_hand hnd;
     iodes *pio;
-    char *db, *fn, **v;
-    FILE *fp[2];
+    char *ms, *db, *fn, **v;
+    FILE *fp[3];
     statement *s;
     process_group *pg;
     process *pp, **pa;
@@ -1394,6 +1642,8 @@ void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
         pa = pg->parents;
 	for (ip = 0; ip < ne; ip++)
 	    {pp = pa[ip];
+	     if (job_running(pp) != TRUE)
+	        continue;
 
 /* if the current process is a function execute it */
 	     for (io = 0; io < N_IO_CHANNELS; io++)
@@ -1405,25 +1655,43 @@ void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
 		     {v  = pp->arg;
 		      c  = lst_length(pp->arg);
 		      fn = v[2];
+		      ms = v[3];
 		      f  = map(fn);
 		      if (f != NULL)
 			 {v += 4;
 			  c -= 4;
 
-			  if (io == IO_STD_IN)
-			     {fp[0] = _io_file_ptr(pp, io);
-			      fp[1] = _io_file_ptr(pp, IO_STD_OUT);
-			      md    = IO_MODE_WD;}
-			  else
-			     {fp[0] = _io_file_ptr(pp, IO_STD_IN);
-			      fp[1] = _io_file_ptr(pp, io);
-			      md    = IO_MODE_RO;};
+			  switch (ms[1])
+			     {case 'r' :
+				   md = IO_MODE_RO;
+				   break;
+			      case 'w' :
+				   md = IO_MODE_WD;
+				   break;
+			      case 'a' :
+				   md = IO_MODE_APPEND;
+				   break;
+			      default :
+				   if (io == IO_STD_IN)
+				      md = IO_MODE_WD;
+				   else
+				      md = IO_MODE_RO;
+				   break;};
 
-			  _dbg(2, "call '%s' (%d)", fn, i);
+			  fp[0] = _io_file_ptr(pp, IO_STD_IN);
+			  fp[1] = _io_file_ptr(pp, IO_STD_OUT);
+			  fp[2] = _io_file_ptr(pp, IO_STD_ERR);
+
+/*			  _dbg(2, "call '%s' (%d)", fn, i); */
+
+			  nsleep(1);
 
 			  rv = f(db, md, fp, c, v);
-			  pp->reason = rv;
-			  ASSERT(rv >= -1);};};};};};
+			  rv =_fnc_wait(pg, ip, rv);
+			  if (rv == FALSE)
+			     break;};};};};};
+
+    sched_yield();
 
     return;}
 
@@ -1503,10 +1771,10 @@ static int run_pgrp(statement *s)
 	asetup(ne, 1);
 
 	register_io_pgrp(pg);
-
+/*
 	if (dbg_level & 1)
 	   dprgio("run_pgrp", ne, pg->parents, pg->children);
-
+*/
 /* launch the jobs - io_data passed to accept, reject, and wait methods */
 	for (i = 0; i < ne; i++)
 	    {pp = pg->parents[i];
@@ -1520,7 +1788,8 @@ static int run_pgrp(statement *s)
 		      pp->io[0].fd, pp->io[1].fd, pp->io[2].fd,
 		      pp->cmd);}
  	     else
- 	        {for (io = 0; io < N_IO_CHANNELS; io++)
+ 	        {pp->a = s;
+		 for (io = 0; io < N_IO_CHANNELS; io++)
  		     _io_file_ptr(pp, io);};
 
 	     pp->accept   = _pgrp_accept;
@@ -1557,10 +1826,11 @@ static int run_pgrp(statement *s)
 	LAST_CHAR(vl) = '\0';
 
 	db = getenv("PERDB_PATH");
-	if (db != NULL)
+	if (IS_NULL(db) == FALSE)
 	   dbset(NULL, "gstatus", vl);
 	else
-	   printf("setenv gstatus \"%s\"\n", vl);
+	   {printf("setenv gstatus \"%s\"\n", vl);
+	    fflush(stdout);};
 
         FREE(s->st);};
 

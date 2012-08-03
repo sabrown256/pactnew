@@ -13,6 +13,8 @@ set PERDB = perdb
 set db  = TRUE
 set lst = ""
 
+Note $Log "Args: $argv"
+
 while ($#argv > 0)
    switch ($1)
       case -h:
@@ -63,28 +65,11 @@ endif
    foreach t ($lst)
       Separator $Log
 
-      set f = ( `fill-string -n 28 $t` )
-      NoteD $Log -n "                        $f"
-      Note $Log ""
-
-      set exe = $t
-      set opt = ""
-      set rpf = ""
-
-      set lt = `timer -r`
-
       rm -f ext-*.res.raw >& /dev/null
 
       dbset gstatus ""
 
-      flog $Log ./ext-$t
-      set xstatus = $status
-
-      set lt = `timer -b $lt`
-
-      set rpf = ( $rpf ext-$t )
-
-      $TEST_CHECK part -a gexec_${t} -e $xstatus -dt $lt -x $exe -l -rpf "$rpf" none
+      ./ext-$t
       @ nerr = $nerr + $status
    end
 

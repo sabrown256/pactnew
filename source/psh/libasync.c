@@ -96,6 +96,9 @@
 
 #define LIBASYNC
 
+/* #define NEWWAY */
+#define OLDWAY
+
 #include "common.h"
 
 #define JOB_NOT_FINISHED    -1000
@@ -134,7 +137,7 @@ typedef enum e_io_hand io_hand;
 
 enum e_io_kind
    {IO_STD_NONE = -1, IO_STD_IN, IO_STD_OUT, IO_STD_ERR, IO_STD_BOND,
-    IO_STD_STATUS, IO_STD_RESOURCE};
+    IO_STD_STATUS, IO_STD_RESOURCE, IO_STD_LIMIT, IO_STD_ENV_VAR};
 
 typedef enum e_io_kind io_kind;
 
@@ -247,8 +250,13 @@ static sigjmp_buf
  _job_cpu;
 
 static int
+ _n_sig_block = 0,
  dbg_level = 0,
- strong_functions = FALSE;
+#if 0
+ strong_functions = TRUE;
+#else
+  strong_functions = FALSE;
+#endif
 
 /*--------------------------------------------------------------------------*/
 
@@ -297,15 +305,16 @@ int _fd_close(int fd)
 /* _JOB_IO_CLOSE - close the KND I/O channel of PP */
 
 void _job_io_close(process *pp, io_kind knd)
-   {int fd;
+   {int fd, af;
     FILE *fp;
 
     fd = pp->io[knd].fd;
     fp = pp->io[knd].fp;
 
     if ((strong_functions == FALSE) || (pp->isfunc == FALSE))
-       {if (fd >= 0)
-	   _fd_close(fd);
+       {af = abs(fd);
+	if (fd > 2)
+	   _fd_close(af);
 
 	if (fp != NULL)
 	   fclose(fp);};
@@ -346,15 +355,18 @@ sigset_t _block_all_sig(void)
 
     memset(&os, 0, sizeof(os));
 
-#if 0
+#if 1
     int rv;
     sigset_t ns;
 
-    sigemptyset(&ns);
-    sigfillset(&ns);
-    rv = sigprocmask(SIG_BLOCK, &ns, &os);
-    ASSERT(rv == 0);
+    if (_n_sig_block == 0)
+       {sigemptyset(&ns);
+	sigfillset(&ns);
+	rv = sigprocmask(SIG_BLOCK, &ns, &os);
+	ASSERT(rv == 0);};
 #endif
+
+    _n_sig_block++;
 
     return(os);}
 
@@ -366,14 +378,18 @@ sigset_t _unblock_all_sig(void)
 
     memset(&os, 0, sizeof(os));
 
-#if 0
+    _n_sig_block--;
+    _n_sig_block = max(_n_sig_block, 0);
+
+#if 1
     int rv;
     sigset_t ns;
 
-    sigemptyset(&ns);
-    sigfillset(&ns);
-    rv = sigprocmask(SIG_UNBLOCK, &ns, &os);
-    ASSERT(rv == 0);
+    if (_n_sig_block == 0)
+       {sigemptyset(&ns);
+	sigfillset(&ns);
+	rv = sigprocmask(SIG_UNBLOCK, &ns, &os);
+	ASSERT(rv == 0);};
 #endif
 
     return(os);}
@@ -538,17 +554,18 @@ static int _job_release(process *pp)
 static void _job_free(process *pp)
    {
 
-    _job_release(pp);
+    if (pp != NULL)
+       {_job_release(pp);
 
 /* set the process index to -2 to indicate that it has been freed
  * in case there is a second pointer to this space
  * and try to free it just once
  */
-    if (pp->ip > -2)
-       {pp->ip = -2;
-	FREE(pp);}
-    else
-       fprintf(stderr, "Job freed twice\n");
+	if (pp->ip > -2)
+	   {pp->ip = -2;
+	    FREE(pp);}
+	else
+	   fprintf(stderr, "Job freed twice\n");};
 
     return;}
 
@@ -794,7 +811,7 @@ void dprdio(char *tag, iodes *pio)
     static char *std[] = {"none", "in", "out", "err"};
     static char *hn[]  = {"none", "clos", "pipe", "poll"};
     static char *kn[]  = {"none", "in", "out", "err", "bond",
-			  "status", "rsrc"};
+			  "status", "rsrc", "limit", "env"};
     static char *dn[]  = {"none", "pipe", "sock", "pty", "term", "fnc"};
 
     io  = std[pio->knd + 1];
@@ -804,8 +821,12 @@ void dprdio(char *tag, iodes *pio)
     knd = kn[pio->knd + 1];
     dev = dn[pio->dev];
 
-    _dbg(-1, "%6s %4s %3d %3d %4s %4s %4s",
-	 tag, io, fd, gid, hnd, knd, dev);
+    if (gid != -1)
+       _dbg(-1, "%8s %4s %3d %4s %4s %4s %3d",
+	    tag, io, fd, dev, knd, hnd, gid);
+    else
+       _dbg(-1, "%8s %4s %3d %4s %4s %4s",
+	    tag, io, fd, dev, knd, hnd);
 
     return;}
 
@@ -819,10 +840,10 @@ void dprpio(char *tag, process *pp)
     iodes *pio;
 
     _dbg(-1, tag);
-    _dbg(-1, "        Unit  fd gid  hnd  knd  dev");
+    _dbg(-1, "         Unit  fd  dev  knd  hnd gid");
     for (i = 0; i < N_IO_CHANNELS; i++)
         {pio = pp->io + i;
-	 dprdio("", pio);};
+	 dprdio(" ", pio);};
 
     return;}
 
@@ -1104,7 +1125,7 @@ process *job_launch(char *cmd, char *mode, void *a)
  */
 
 int job_read(int fd, process *pp, int (*out)(int fd, process *pp, char *s))
-   {int nl;
+   {int i, rv, ev, nl, nr;
     char s[LRG];
     char *p;
     FILE *fi;
@@ -1113,22 +1134,34 @@ int job_read(int fd, process *pp, int (*out)(int fd, process *pp, char *s))
 
     if (job_alive(pp))
        {fi = pp->io[IO_STD_IN].fp;
-	if (fi != NULL)
- 	   {fd = pp->io[IO_STD_IN].fd;
+	fd = pp->io[IO_STD_IN].fd;
+	if ((fi != NULL) && (fd != -1))
+ 	   {_block_all_sig();
 
-/*            _block_all_sig(); */
+/*	    block_fd(fd, FALSE); */
 
-	    while (TRUE)
-	       {p = fgets(s, MAXLINE, fi);
-		if (p == NULL)
-		   break;
-		nl++;
-		if (out != NULL)
-		   out(fd, pp, s);
+/* count consecutive null reads and bail after 1000 of them */
+	    nr = 0;
 
-		sched_yield();};
+	    rv = 0;
+	    for (i = 0; (rv == 0) && (nr < 1000); i++)
+	        {if (feof(fi) == TRUE)
+		    rv = 1;
+		 else
+		    {nr++;
+		     p  = fgets(s, MAXLINE, fi);
+		     ev = errno;
+		     if (p != NULL)
+		        {nl++;
+			 nr = 0;
+			 if (out != NULL)
+			    out(fd, pp, s);}
+		     else if (ev == EBADF)
+		        rv = 1;};
 
-/*	    _unblock_all_sig(); */};};
+		 sched_yield();};
+
+	    _unblock_all_sig();};};
 
     return(nl);}
 
@@ -1278,7 +1311,7 @@ void job_wait(process *pp)
 
 	_block_all_sig();
 
-	st  = waitpid(pid, &w, WNOHANG);
+	st = waitpid(pid, &w, WNOHANG);
 	if (st == 0)
 	   pp->status = JOB_RUNNING;
 
@@ -1426,16 +1459,17 @@ static int _awatch_fd(process *pp, io_kind knd, int sip)
 
 /* handle the descriptor */
 	fd = pp->io[knd].fd;
-	rv = block_fd(fd, FALSE);
-	ASSERT(rv == 0);
+	if (fd > 2)
+	   {rv = block_fd(fd, FALSE);
+	    ASSERT(rv == 0);
 
-	ifd = stck.ifd++;
-	stck.fd[ifd].fd      = 0;
-	stck.fd[ifd].events  = 0;
-	stck.fd[ifd].revents = 0;
+	    ifd = stck.ifd++;
+	    stck.fd[ifd].fd      = 0;
+	    stck.fd[ifd].events  = 0;
+	    stck.fd[ifd].revents = 0;
 
-	stck.io[ifd]  = fd;
-	stck.map[ifd] = ip;};
+	    stck.io[ifd]  = fd;
+	    stck.map[ifd] = ip;};};
 
     return(ip);}
 
@@ -1524,7 +1558,7 @@ process *arelaunch(process *pp)
  */
 
 int apoll(int to)
-   {int i, j, n, ifd, nfd, fd, np, nrdy;
+   {int i, ip, n, ifd, nfd, fd, np, nrdy;
     int *map, *io;
     short rev;
     process *pp;
@@ -1537,11 +1571,11 @@ int apoll(int to)
     io  = stck.io;
 
 /* find the descriptors of running jobs only */
-    for (n = 0, i = 0; i < np; i++)
-        {pp = stck.proc[i];
+    for (n = 0, ip = 0; ip < np; ip++)
+        {pp = stck.proc[ip];
 	 if (job_running(pp))
 	    {for (ifd = 0; ifd < nfd; ifd++)
-	         {if (map[ifd] == i)
+	         {if (map[ifd] == ip)
 		     {fds[n].fd      = io[ifd];
 		      fds[n].events  = stck.mask_acc;
 		      fds[n].revents = 0;
@@ -1556,11 +1590,11 @@ int apoll(int to)
 	     fd  = fds[i].fd;
 
 /* find the process containing the file desciptor FD and drain it */
-	     for (j = 0; j < np; j++)
-	         {pp = stck.proc[j];
+	     for (ip = 0; ip < np; ip++)
+	         {pp = stck.proc[ip];
 		  if (job_alive(pp) == TRUE)
 		     {for (ifd = 0; ifd < nfd; ifd++)
-			  {if ((map[ifd] == j) && (io[ifd] == fd))
+			  {if ((map[ifd] == ip) && (io[ifd] == fd))
 			      {if (rev & stck.mask_acc)
 				  {nrdy--;
 				   job_read(fd, pp, pp->accept);}
@@ -1649,7 +1683,7 @@ void amap(void (*f)(process *pp, void *a))
     for (i = 0; i < np; i++)
         {pp = stck.proc[i];
 	 if (pp != NULL)
-	    {a  = pp->a;
+	    {a = pp->a;
 
 	     if (f != NULL)
 	        f(pp, a);};};

@@ -5,20 +5,32 @@
 
 unalias *
 
+set t = pipe
+
 @ err = 0
 
 source $TestScrDir/env-csh
 
-alias pe  'unsetenv gstatus ; echo "" ; echo "Command: \!*" ; gexec \!* ; dbget gstatus'
+alias pe  'unsetenv gstatus ; gexec \!* ; dbget gstatus'
+
+set f = ( `fill-string -n 8 -c ' ' $t` )
+NoteD $Log -n "                        $f "
+Note $Log ""
+
+set exe = $t
+set opt = ""
+set rpf = ""
+
+set lt = `timer -r`
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 foreach i (1 2 3)
 
-   echo ""
-   echo "---------------------------------------------------"
-   echo ""
+   Note $Log ""
+   Note $Log "---------------------------------------------------"
+   Note $Log ""
 
    set id  = s$i
    set res = ext-$id.res
@@ -37,12 +49,12 @@ foreach i (1 2 3)
 
 # simple bonded stdout/stderr variants
       case 2:
-           set cmd = ( pe ls 'ext-*' foo.h "'|'" cat -n >&! $raw )
+           set cmd = ( pe ls 'ext-*e' foo.h "'|'" cat -n >&! $raw )
            set gst = "2 0"
            set srt = TRUE
            breaksw
       case 3:
-           set cmd = ( pe ls 'ext-*' foo.h "'|&'" cat -n >&! $raw )
+           set cmd = ( pe ls 'ext-*e' foo.h "'|&'" cat -n >&! $raw )
            set gst = "2 0"
            set srt = TRUE
            breaksw
@@ -51,7 +63,7 @@ foreach i (1 2 3)
    Note $Log "cmd = $cmd"
    Note $Log "srt = $srt"
 
-   eval $cmd
+   flog $Log eval $cmd
 
    if ($srt == TRUE) then
       flog $Log ( sort $raw >&! $res )
@@ -69,24 +81,30 @@ foreach i (1 2 3)
    Note $Log "> gstatus = $gstatus"
    if ("$gstatus" != "$gst") then
       flog $Log @ err = $err + 1
-      echo "$id failed"
+      NoteD $Log -n "x"
+      Note $Log "$id failed"
    else if (-f $ref) then
       flog $Log ( diff $res $ref >&! $dif )
       if ($status == 0) then
-         echo "$id passed"
+         NoteD $Log -n "."
+         Note $Log "$id passed"
          flog $Log rm -f $res $dif
       else
          flog $Log @ err = $err + 1
-         echo "$id differed"
+         NoteD $Log -n "o"
+         Note $Log "$id differed"
          flog $Log cat $dif
       endif
    else
-      echo "$id added"
+      NoteD $Log -n "+"
+      Note $Log "$id added"
       flog $Log cp $res $ref
       flog $Log rm -f $res
    endif
 
 end
+
+NoteD $Log -n " ..................."
 
 Note $Log "exiting with err = $err"
 Note $Log ""
@@ -94,5 +112,12 @@ Note $Log ""
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-exit($err)
+set xstatus = $err
 
+set lt = `timer -b $lt`
+
+set rpf = ( $rpf ext-$t )
+
+$TEST_CHECK part -a gexec_${t} -e $xstatus -dt $lt -x $exe -l -rpf "$rpf" none
+
+exit($status)
