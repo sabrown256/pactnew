@@ -5,9 +5,6 @@
  *
  */
 
-/* #define NEWWAY */
-#define OLDWAY
-
 #include "common.h"
 #include "libpsh.c"
 #include "libdb.c"
@@ -70,12 +67,14 @@ static int do_fnc(char *db, int c, char **v, PFPCAL (*map)(char *x))
 /* STR_VAR - function to access variables */
 
 static int str_var(char *db, io_mode md, FILE **fio, int c, char **v)
-   {int i, n, nc, ns, rv;
+   {int i, nc, ns, rv;
     char t[MAXLINE];
     char *p, *vr, *vl, **sa;
+    static int ic = 0;
 
     rv = 0;
     vr = v[0];
+    nc = (c > 1) ? atol(v[1]) : 1;
 
     if ((vr != NULL) && (md != IO_MODE_NONE))
        {sa = NULL;
@@ -88,48 +87,57 @@ static int str_var(char *db, io_mode md, FILE **fio, int c, char **v)
 
 /* variable to stdout NC times */
 	   {case IO_MODE_RO :
-	         nc = 1;
 		 ns = lst_length(sa);
-		 for (n = 0; n < nc; n++)
-		     {for (i = 0; i < ns; i++)
-			  printf("%s ", sa[i]);
-		      printf("\n");};
+		 for (i = 0; i < ns; i++)
+		     fprintf(fio[1], "%s ", sa[i]);
+		 fprintf(fio[1], "\n");
+		 ic++;
+		 if (ic >= nc)
+		    rv = 1;
 		 break;
 
 /* stdin to variable */
 	    case IO_MODE_WO :
 	    case IO_MODE_WD :
-	         while (feof(fio[0]) == FALSE)
-		    {p = fgets(t, MAXLINE, fio[0]);
-		     if (p != NULL)
-		        {LAST_CHAR(t) = '\0';
-			 sa = lst_add(sa, t);
-		       sched_yield();};};
+	         for (i = 0; rv == 0; i++)
+		     {if (feof(fio[0]) == TRUE)
+			 rv = 1;
+		      else
+			 {p = fgets(t, MAXLINE, fio[0]);
+			  if (p != NULL)
+			     {LAST_CHAR(t) = '\0';
+			      sa = lst_add(sa, t);}
+			  else if (errno == EBADF)
+			     rv = 1;};};
 
 		 vl = concatenate(t, MAXLINE, sa, " ");
 
-		 if (db != NULL)
+		 if (IS_NULL(db) == FALSE)
 		    dbset(NULL, vr, vl);
 		 else
-		    printf("setenv %s \"%s\" ; ", vr, vl);
+		    fprintf(fio[1], "setenv %s \"%s\" ; ", vr, vl);
 
 		 break;
 
 /* stdin append to variable */
 	    case IO_MODE_APPEND :
-	         while (feof(fio[0]) == FALSE)
-		    {p = fgets(t, MAXLINE, fio[0]);
-		     if (p != NULL)
-		        {LAST_CHAR(t) = '\0';
-			 sa = lst_add(sa, t);
-			 vl = concatenate(t, MAXLINE, sa, " ");
-			 fprintf(fio[1], "%s\n", vl);};
-		       sched_yield();};
+	         for (i = 0; rv == 0; i++)
+		     {if (feof(fio[0]) == TRUE)
+			 rv = 1;
+		      else
+			 {p = fgets(t, MAXLINE, fio[0]);
+			  if (p != NULL)
+			     {LAST_CHAR(t) = '\0';
+			      sa = lst_add(sa, t);
+			      vl = concatenate(t, MAXLINE, sa, " ");
+			      fprintf(fio[1], "%s\n", vl);}
+			  else if (errno == EBADF)
+			     rv = 1;};};
 
-		 if (db != NULL)
+		 if (IS_NULL(db) == FALSE)
 		    dbset(NULL, vr, vl);
 		 else
-		    printf("setenv %s \"%s\" ; ", vr, vl);
+		    fprintf(fio[1], "setenv %s \"%s\" ; ", vr, vl);
 
 		 break;
 
@@ -146,7 +154,7 @@ static int str_var(char *db, io_mode md, FILE **fio, int c, char **v)
 /* STR_FILE - function to access files */
 
 static int str_file(char *db, io_mode md, FILE **fio, int c, char **v)
-   {int rv;
+   {int i, rv, ev;
     char t[MAXLINE];
     char *p, *fn;
     static FILE *fp = NULL;
@@ -191,38 +199,38 @@ static int str_file(char *db, io_mode md, FILE **fio, int c, char **v)
 
 /* file to stdout */
 	       {case IO_MODE_RO :
-		     while (feof(fp) == FALSE)
-		        {p = fgets(t, MAXLINE, fp);
-			 if (p != NULL)
-			    fputs(p, fio[1]);
-			 sched_yield();};
+		     for (i = 0; rv == 0; i++)
+		         {if (feof(fp) == TRUE)
+			     rv = 1;
+			  else
+			     {p = fgets(t, MAXLINE, fp);
+			      if (p != NULL)
+				 fputs(p, fio[1]);};};
 		     break;
 
 /* stdin to file */
 	        case IO_MODE_WO :
 	        case IO_MODE_WD :
-		     while (feof(fio[0]) == FALSE)
-		        {p = fgets(t, MAXLINE, fio[0]);
-			 if (p != NULL)
-			    fputs(p, fp);
-			 sched_yield();};
-
-		     fflush(fp);
-		     break;
-
-/* stdin append to file */
 	        case IO_MODE_APPEND :
-		     while (feof(fio[0]) == FALSE)
-		        {p = fgets(t, MAXLINE, fio[0]);
-			 if (p != NULL)
-			    fputs(p, fp);
-			 sched_yield();};
+		     for (i = 0; rv == 0; i++)
+		         {if (feof(fio[0]) == TRUE)
+			     rv = 1;
+			  else
+			     {p  = fgets(t, MAXLINE, fio[0]);
+			      ev = errno;
+			      if (p != NULL)
+				 fputs(p, fp);
+			      else if (ev == EBADF)
+			         rv = 2;};};
 
 		     fflush(fp);
 		     break;
 
 	        default :
-		     break;};};};
+		     break;};
+
+	    if (rv == 1)
+	       fclose(fp);};};
 
     return(rv);}
 
@@ -232,40 +240,41 @@ static int str_file(char *db, io_mode md, FILE **fio, int c, char **v)
 /* STR_TEST - function to test */
 
 static int str_test(char *db, io_mode md, FILE **fio, int c, char **v)
-   {int rv;
+   {int i, rv;
     char t[MAXLINE];
     char *tag, *p;
     static int count = 0;
 
     rv  = 0;
     tag = v[0];
+/*
+printf("test> (%d,%d,%d)  stdin=%d  stdout=%d  stderr=%d\n",
+       fileno(fio[0]), fileno(fio[1]), fileno(fio[2]),
+       fileno(stdin), fileno(stdout), fileno(stderr));
+*/
+    if (md == IO_MODE_RO)
+       block_fd(fileno(stdin), FALSE);
 
-    switch (md)
-       {case IO_MODE_RO :
-	     printf("%s> originate: %d\n", tag, ++count);
-	     break;
-	case IO_MODE_WO :
-	case IO_MODE_WD :
-	     while (feof(fio[0]) == FALSE)
-	        {p = fgets(t, MAXLINE, fio[0]);
-		 if (p != NULL)
-		    printf("%s> out: %s", tag, p);};
-	     break;
-	case IO_MODE_APPEND :
-	     while (feof(fio[0]) == FALSE)
-	        {p = fgets(t, MAXLINE, fio[0]);
-		 if (p != NULL)
-		    printf("%s> append: %s", tag, t);};
-	     break;
-        default :
-	     break;};
+    for (i = 0; TRUE; i++)
+        {if (feof(fio[0]) == TRUE)
+	    {rv = 1;
+	     break;}
+	 else
+	    {p = fgets(t, MAXLINE, fio[0]);
+	     if (p != NULL)
+	        {count = 0;
+		 fprintf(fio[1], "%s> out: %s", tag, p);}
+	     else
+	        {fprintf(fio[1], "%s> originate: %d\n", tag, ++count);
+		 rv = (count > 6);
+		 break;};};};
 
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* MAPS - map function name to procedure for execution */
+/* MAPS - map function name to procedure for strong function execution */
 
 static PFPCAL maps(char *s)
    {PFPCAL f;
@@ -323,7 +332,7 @@ static int exe_var(char *db, io_mode md, FILE **fio, int c, char **v)
 
 		 vl = concatenate(t, MAXLINE, sa, " ");
 
-		 if (db != NULL)
+		 if (IS_NULL(db) == FALSE)
 		    dbset(NULL, vr, vl);
 		 else
 		    printf("setenv %s \"%s\" ; ", vr, vl);
@@ -341,7 +350,7 @@ static int exe_var(char *db, io_mode md, FILE **fio, int c, char **v)
 			 fprintf(fio[1], "%s\n", vl);};
 		       sched_yield();};
 
-		 if (db != NULL)
+		 if (IS_NULL(db) == FALSE)
 		    dbset(NULL, vr, vl);
 		 else
 		    printf("setenv %s \"%s\" ; ", vr, vl);
