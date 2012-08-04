@@ -39,7 +39,9 @@ printf("test> (%d,%d,%d)  stdin=%d  stdout=%d  stderr=%d\n",
 		 fprintf(fio[1], "%s> out: %s", tag, p);}
 	     else
 	        {fprintf(fio[1], "%s> gen: %d\n", tag, ++count);
-		 rv = (count > 6);};};};
+		 rv = (count > 6);};
+
+	    sched_yield();};};
 
     return(rv);}
 
@@ -528,6 +530,9 @@ int main(int c, char **v, char **env)
 
 	 else if (strcmp(v[i], "-s") == 0)
             strong_functions = TRUE;
+
+	 else if (strcmp(v[i], "-w") == 0)
+            strong_functions = FALSE;
 
 	 else if (strong_functions == TRUE)
 	    {rv = gexec(db, c-i, v+i, env, maps);
