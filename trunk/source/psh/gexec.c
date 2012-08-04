@@ -13,6 +13,39 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* DO_TEST - do the I/O work for the test function */
+
+static int do_test(FILE **fio, char *tag)
+   {int i, rv;
+    char t[MAXLINE];
+    char *p;
+    static int count = 0;
+
+    rv = 0;
+
+/*
+printf("test> (%d,%d,%d)  stdin=%d  stdout=%d  stderr=%d\n",
+       fileno(fio[0]), fileno(fio[1]), fileno(fio[2]),
+       fileno(stdin), fileno(stdout), fileno(stderr));
+*/
+
+    for (i = 0; rv == 0; i++)
+        {if (feof(fio[0]) == TRUE)
+	    rv = 1;
+	 else
+	    {p = fgets(t, MAXLINE, fio[0]);
+	     if (p != NULL)
+	        {count = 0;
+		 fprintf(fio[1], "%s> out: %s", tag, p);}
+	     else
+	        {fprintf(fio[1], "%s> gen: %d\n", tag, ++count);
+		 rv = (count > 6);};};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* DO_FNC - abstract function/procedure as process for GEXEC
  *        - mode -r means stdin to fnc
  *        -      -w means fnc to stdout
@@ -240,34 +273,16 @@ static int str_file(char *db, io_mode md, FILE **fio, int c, char **v)
 /* STR_TEST - function to test */
 
 static int str_test(char *db, io_mode md, FILE **fio, int c, char **v)
-   {int i, rv;
-    char t[MAXLINE];
-    char *tag, *p;
-    static int count = 0;
+   {int rv;
+    char *tag;
 
     rv  = 0;
     tag = v[0];
-/*
-printf("test> (%d,%d,%d)  stdin=%d  stdout=%d  stderr=%d\n",
-       fileno(fio[0]), fileno(fio[1]), fileno(fio[2]),
-       fileno(stdin), fileno(stdout), fileno(stderr));
-*/
+
     if (md == IO_MODE_RO)
        block_fd(fileno(stdin), FALSE);
 
-    for (i = 0; TRUE; i++)
-        {if (feof(fio[0]) == TRUE)
-	    {rv = 1;
-	     break;}
-	 else
-	    {p = fgets(t, MAXLINE, fio[0]);
-	     if (p != NULL)
-	        {count = 0;
-		 fprintf(fio[1], "%s> out: %s", tag, p);}
-	     else
-	        {fprintf(fio[1], "%s> originate: %d\n", tag, ++count);
-		 rv = (count > 6);
-		 break;};};};
+    rv = do_test(fio, tag);
 
     return(rv);}
 
@@ -442,8 +457,7 @@ static int exe_file(char *db, io_mode md, FILE **fio, int c, char **v)
 
 static int exe_test(char *db, io_mode md, FILE **fio, int c, char **v)
    {int rv;
-    char t[MAXLINE];
-    char *tag, *p;
+    char *tag;
     static int count = 0;
 
     rv  = 0;
@@ -451,22 +465,11 @@ static int exe_test(char *db, io_mode md, FILE **fio, int c, char **v)
 
     switch (md)
        {case IO_MODE_RO :
-	     printf("%s> originate: %d\n", tag, ++count);
-	     break;
-	case IO_MODE_WO :
-	case IO_MODE_WD :
-	     while (feof(fio[0]) == FALSE)
-	        {p = fgets(t, MAXLINE, fio[0]);
-		 if (p != NULL)
-		    printf("%s> out: %s", tag, p);};
-	     break;
-	case IO_MODE_APPEND :
-	     while (feof(fio[0]) == FALSE)
-	        {p = fgets(t, MAXLINE, fio[0]);
-		 if (p != NULL)
-		    printf("%s> append: %s", tag, t);};
+	     fprintf(fio[1], "%s> gen: %d\n", tag, ++count);
 	     break;
         default :
+	     rv = do_test(fio, tag);
+	     rv = 0;
 	     break;};
 
     return(rv);}

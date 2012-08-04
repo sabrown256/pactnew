@@ -45,16 +45,16 @@ foreach i (1 2 3 4 5 6)
 # simple stdout variants
       case 1:
            rm -rf $id
-           set cmd = ( pe /bin/echo "$id" @o pw:test ${pa} '>&!' $res )
+           set cmd = ( pe /bin/echo "$id" @o pw:test ${pa} '>&!' $raw )
            set gst = "0 0"
-           set srt = FALSE
+           set srt = TRUE
            breaksw
 
 # simple stdin variants
       case 2:
-           set cmd = ( pe cat @i pr:test ${pa} '>&!' $res )
+           set cmd = ( pe cat @i pr:test ${pa} '>&!' $raw )
            set gst = "0 0"
-           set srt = FALSE
+           set srt = TRUE
            breaksw
 
 # simple append variants
@@ -73,9 +73,9 @@ foreach i (1 2 3 4 5 6)
 
 # non-simple stdout variants
       case 5:
-           set cmd = ( pe /bin/echo "$id" @o2 @e3 pw:test p5out @ pw:test p5err '>&!' $res )
+           set cmd = ( pe /bin/echo "$id" @o2 @e3 pw:test p5out @ pw:test p5err '>&!' $raw )
            set gst = "0 0 0"
-           set srt = FALSE
+           set srt = TRUE
            breaksw
 
       case 6:
@@ -99,9 +99,13 @@ foreach i (1 2 3 4 5 6)
 
    if ($?PERDB_PATH == 0) then
       eval `grep "setenv gstatus" $res`
-      grep -v "setenv gstatus" $res >&! $res.new
+      flog $Log ( grep -v "setenv gstatus" $res >&! $res.new )
       flog $Log mv $res.new $res
    endif
+
+   flog $Log ( grep -v "gen" $res >&! $res.new )
+   flog $Log mv $res.new $res
+flog $Log cat $res
 
    Note $Log "> gstatus = $gstatus"
    if ("$gstatus" != "$gst") then
