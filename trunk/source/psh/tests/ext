@@ -67,7 +67,9 @@ endif
 
       rm -f ext-*.res.raw >& /dev/null
 
-      dbset gstatus ""
+      if ($db == TRUE) then
+         dbset gstatus ""
+      endif
 
       ./ext-$t
       @ nerr = $nerr + $status

@@ -11,8 +11,6 @@ set t = file
 
 source $TestScrDir/env-csh
 
-alias pe  'unsetenv gstatus ; gexec \!* ; dbget gstatus'
-
 set f = ( `fill-string -n 8 -c ' ' $t` )
 NoteD $Log -n "                        $f "
 Note $Log ""
@@ -45,7 +43,7 @@ foreach i (1 2 3 4 5 6)
 # simple stdout variants
       case 1:
            rm -rf $id
-           set cmd = ( pe /bin/echo "$id" @o fw:${fa} '>&!' $res )
+           set cmd = ( gexec /bin/echo "$id" @o fw:${fa} '>&!' $res )
            set gst = "0 0"
            set srt = FALSE
            set cfl = ( $fa )
@@ -53,7 +51,7 @@ foreach i (1 2 3 4 5 6)
 
 # simple stdin variants
       case 2:
-           set cmd = ( pe cat @i fr:${fa} '>&!' $res )
+           set cmd = ( gexec cat @i fr:${fa} '>&!' $res )
            set gst = "0 0"
            set srt = FALSE
            set cfl = ""
@@ -61,7 +59,7 @@ foreach i (1 2 3 4 5 6)
 
 # simple append variants
       case 3:
-           set cmd = ( pe /bin/echo "$id" @o2 fa:${fa} '>&!' $res )
+           set cmd = ( gexec /bin/echo "$id" @o2 fa:${fa} '>&!' $res )
            set gst = "0 0"
            set srt = FALSE
            set cfl = ( $fa )
@@ -69,7 +67,7 @@ foreach i (1 2 3 4 5 6)
 
 # simple bonded variants
       case 4:
-           set cmd = ( pe /bin/echo "$id" @b2 fw:f4bond '>&!' $res )
+           set cmd = ( gexec /bin/echo "$id" @b2 fw:f4bond '>&!' $res )
            set gst = "0 0"
            set srt = FALSE
            set cfl = ( f4bond )
@@ -77,14 +75,14 @@ foreach i (1 2 3 4 5 6)
 
 # non-simple stdout variants
       case 5:
-           set cmd = ( pe /bin/echo "$id" @o2 @e3 fw:f5out @ fw:f5err '>&!' $res )
+           set cmd = ( gexec /bin/echo "$id" @o2 @e3 fw:f5out @ fw:f5err '>&!' $res )
            set gst = "0 0 0"
            set srt = FALSE
            set cfl = ( f5out f5err )
            breaksw
 
       case 6:
-           set cmd = ( pe ls 'ext-*' foo.h @o2 @e3 fw:f6out @ fw:f6err '>&!' $raw )
+           set cmd = ( gexec ls 'ext-*' foo.h @o2 @e3 fw:f6out @ fw:f6err '>&!' $raw )
            set gst = "2 0 0"
            set srt = TRUE
            set cfl = ( f6out f6err )

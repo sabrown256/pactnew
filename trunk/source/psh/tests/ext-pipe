@@ -11,8 +11,6 @@ set t = pipe
 
 source $TestScrDir/env-csh
 
-alias pe  'unsetenv gstatus ; gexec \!* ; dbget gstatus'
-
 set f = ( `fill-string -n 8 -c ' ' $t` )
 NoteD $Log -n "                        $f "
 Note $Log ""
@@ -42,19 +40,19 @@ foreach i (1 2 3)
 
 # simple stdout variants
       case 1:
-           set cmd = ( pe /bin/echo "$id" "'|'" cat -n >&! $res )
+           set cmd = ( gexec /bin/echo "$id" "'|'" cat -n >&! $res )
            set gst = "0 0"
            set srt = FALSE
            breaksw
 
 # simple bonded stdout/stderr variants
       case 2:
-           set cmd = ( pe ls 'ext-*e' foo.h "'|'" cat -n >&! $raw )
+           set cmd = ( gexec ls 'ext-*e' foo.h "'|'" cat -n >&! $raw )
            set gst = "2 0"
            set srt = TRUE
            breaksw
       case 3:
-           set cmd = ( pe ls 'ext-*e' foo.h "'|&'" cat -n >&! $raw )
+           set cmd = ( gexec ls 'ext-*e' foo.h "'|&'" cat -n >&! $raw )
            set gst = "2 0"
            set srt = TRUE
            breaksw
