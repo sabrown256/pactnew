@@ -11,8 +11,6 @@ set t = var
 
 source $TestScrDir/env-csh
 
-alias pe  'unsetenv gstatus ; gexec \!* ; dbget gstatus'
-
 set f = ( `fill-string -n 8 -c ' ' $t` )
 NoteD $Log -n "                        $f "
 Note $Log ""
@@ -45,7 +43,7 @@ foreach i (1 2 3 4 5 6)
 # simple stdout variants
       case 1:
            rm -rf $id
-           set cmd = ( pe /bin/echo "$id" @o vw:${va} '>&!' $res )
+           set cmd = ( gexec /bin/echo "$id" @o vw:${va} '>&!' $res )
            set gst = "0 0"
            set srt = FALSE
            set pvl = ( $va )
@@ -53,7 +51,7 @@ foreach i (1 2 3 4 5 6)
 
 # simple stdin variants
       case 2:
-           set cmd = ( pe cat @i vr:${va} '>&!' $res )
+           set cmd = ( gexec cat @i vr:${va} '>&!' $res )
            set gst = "0 0"
            set srt = FALSE
            set pvl = ""
@@ -61,7 +59,7 @@ foreach i (1 2 3 4 5 6)
 
 # simple append variants
       case 3:
-           set cmd = ( pe /bin/echo "$id" @o2 va:${va} '>&!' $res )
+           set cmd = ( gexec /bin/echo "$id" @o2 va:${va} '>&!' $res )
            set gst = "0 0"
            set srt = FALSE
            set pvl = ( $va )
@@ -69,7 +67,7 @@ foreach i (1 2 3 4 5 6)
 
 # simple bonded variants
       case 4:
-           set cmd = ( pe /bin/echo "$id" @b2 vw:v4bond '>&!' $res )
+           set cmd = ( gexec /bin/echo "$id" @b2 vw:v4bond '>&!' $res )
            set gst = "0 0"
            set srt = FALSE
            set pvl = ( v4bond )
@@ -77,14 +75,14 @@ foreach i (1 2 3 4 5 6)
 
 # non-simple stdout variants
       case 5:
-           set cmd = ( pe /bin/echo "$id" @o2 @e3 vw:v5out @ vw:v5err '>&!' $res )
+           set cmd = ( gexec /bin/echo "$id" @o2 @e3 vw:v5out @ vw:v5err '>&!' $res )
            set gst = "0 0 0"
            set srt = FALSE
            set pvl = ( v5out v5err )
            breaksw
 
       case 6:
-           set cmd = ( pe ls 'ext-*' foo.h @o2 @e3 vw:v6out @ vw:v6err '>&!' $raw )
+           set cmd = ( gexec ls 'ext-*' foo.h @o2 @e3 vw:v6out @ vw:v6err '>&!' $raw )
            set gst = "2 0 0"
            set srt = TRUE
            set pvl = ( v6out v6err )
@@ -174,7 +172,7 @@ echo ""
 echo "# simple stdout variants"
 
    unsetenv v1
-   pe /bin/echo v1-text @o vw:v1 >&! ext-v1.res
+   gexec /bin/echo v1-text @o vw:v1 >&! ext-v1.res
    dbget v1
    cat ext-v1.res
    echo "> v1      = `printenv v1`"
@@ -191,7 +189,7 @@ echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple stdin variants"
 
-   pe cat @i vr:v1 >&! ext-v2.res
+   gexec cat @i vr:v1 >&! ext-v2.res
    cat ext-v2.res
    echo "> gstatus = $gstatus"
    if ("$gstatus" != "0 0") then
@@ -206,7 +204,7 @@ echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple append variants"
 
-   pe /bin/echo v3-text @o2 va:v1 >&! ext-v3.res
+   gexec /bin/echo v3-text @o2 va:v1 >&! ext-v3.res
    dbget v1
    cat ext-v3.res
    echo "> v1      = `printenv v1`"
@@ -223,7 +221,7 @@ echo "------------------------------------------------------------------------"
 echo ""
 echo "# simple bonded variants"
 
-   pe /bin/echo v4-text @b2 vw:v4 >&! ext-v4.res
+   gexec /bin/echo v4-text @b2 vw:v4 >&! ext-v4.res
    dbget v4
    cat ext-v4.res
    echo "> v4      = `printenv v4`"
@@ -243,7 +241,7 @@ echo "# non-simple stdout variants"
 if (0) then
    unsetenv v5out
    unsetenv v5err
-   pe /bin/echo v5-text @o2 @e3 vw:v5out @ vw:v5err >&! ext-v5.res
+   gexec /bin/echo v5-text @o2 @e3 vw:v5out @ vw:v5err >&! ext-v5.res
    dbget v5out
    dbget v5err
    cat ext-v5.res
@@ -260,7 +258,7 @@ if (0) then
 
    unsetenv v5out
    unsetenv v5err
-   pe ls ext-* foo.h @o2 @e3 vw:v6out @ vw:v6err >&! ext-v6.res.raw
+   gexec ls ext-* foo.h @o2 @e3 vw:v6out @ vw:v6err >&! ext-v6.res.raw
    sort ext-v6.res.raw >&! ext-v6.res
    rm -f ext-v6.res.raw
    dbget v6out

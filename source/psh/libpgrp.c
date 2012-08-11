@@ -412,11 +412,9 @@ void redirect_io(process_group *pg, int ip, iodes *io)
 	     io->fd = pio->fd;
 	     *pio   = *io;
 
-#ifdef OLDWAY
 	     pio    = pp->io + io->knd;
 	     io->fd = pio->fd;
 	     *pio   = *io;
-#endif
 	     break;
 
         case IO_STD_OUT :
@@ -425,11 +423,9 @@ void redirect_io(process_group *pg, int ip, iodes *io)
 	     io->fd = pio->fd;
 	     *pio   = *io;
 
-#ifdef OLDWAY
 	     pio    = pp->io + io->knd;
 	     io->fd = pio->fd;
 	     *pio   = *io;
-#endif
 	     break;
 
         case IO_STD_BOND :
@@ -445,7 +441,6 @@ void redirect_io(process_group *pg, int ip, iodes *io)
 	     pio    = &cp->ioc[IO_STD_ERR].out;
 	     *pio   = *io;
 
-#ifdef OLDWAY
 	     pio    = pp->io + IO_STD_OUT;
 	     io->fd = pio->fd;
 	     *pio   = *io;
@@ -457,7 +452,6 @@ void redirect_io(process_group *pg, int ip, iodes *io)
 	     *pio   = *io;
 	     pio    = cp->io + IO_STD_ERR;
 	     *pio   = *io;
-#endif
 	     break;
 
         default :
@@ -595,13 +589,6 @@ static void redirect_process(process_group *pg, int it)
 
     _default_iodes(pp->io);
 
-    if (strong_functions == FALSE)
-       {ta = pp->arg;
-	if ((strcmp(ta[0], "gexec") == 0) && (strcmp(ta[1], "-p") == 0))
-	   {pp->isfunc = TRUE;
-	    for (i = 0; i < N_IO_CHANNELS; i++)
-	        pp->io[i].dev = IO_DEV_FNC;};};
-
     return;}
 
 /*--------------------------------------------------------------------------*/
@@ -663,8 +650,6 @@ void fillin_pgrp(process_group *pg)
 		 {pioc->out.hnd  = (pp->isfunc) ? IO_HND_FNC : IO_HND_POLL;
 		  pioc->out.mode = IO_MODE_WD;};};
 
-#ifdef OLDWAY
-
 /* stdout */
          pio = pp->io + 1;
 	 switch (pio->dev)
@@ -687,9 +672,7 @@ void fillin_pgrp(process_group *pg)
 		  dio->dev = IO_DEV_PIPE;
 	          break;
 	     default :
-	          break;};
-#endif
-        };
+	          break;};};
 
     return;}
 
@@ -712,9 +695,8 @@ static int transfer_fd(process *pn, io_kind pk, process *cn, io_kind ck)
     pio->hnd = IO_HND_PIPE;
     pio->fp  = NULL;
 
-    if (strong_functions == TRUE)
-       {pio->fd  *= -1;
-	pio->hnd  = IO_HND_CLOSE;};
+    pio->fd  *= -1;
+    pio->hnd  = IO_HND_CLOSE;
 
 /* GOTCHA: we can close something we need in the bonded case
  * or leak descriptors in the other cases
@@ -744,10 +726,9 @@ static int watch_fd(process *pn, io_kind pk)
     fd  = ioc->in.fd;
     hnd = ioc->in.hnd;
 
-#ifndef NEWWAY
     fd  = pn->io[pk].fd;
     hnd = pn->io[pk].hnd;
-#endif
+
     if ((fd > 2) && (hnd != IO_HND_PIPE) && (hnd != IO_HND_CLOSE))
        {_awatch_fd(pn, pk, ip);
 
@@ -773,17 +754,11 @@ static void transfer_io(io_connector *ioc, int ia, io_kind ak,
     pia = ioc + N_IO_CHANNELS*ia + ak;
     pib = ioc + N_IO_CHANNELS*ib + bk;
 
-/*    _fd_close(pib->in.fd); */
     pib->in.fd   = pia->in.fd;
     pib->in.dev  = IO_DEV_PIPE;
     pib->in.hnd  = IO_HND_PIPE;
     pib->in.gid  = ia;
-/*
-    pib->out.dev = IO_DEV_PIPE;
-    pib->out.hnd = IO_HND_PIPE;
-    pib->out.gid = ia;
-*/
-/*    _fd_close(pib->out.fd); */
+
     pib->out.fd  = pia->out.fd;
     pia->out.dev = IO_DEV_PIPE;
     pia->out.hnd = IO_HND_PIPE;
@@ -795,9 +770,6 @@ static void transfer_io(io_connector *ioc, int ia, io_kind ak,
     return;}
 
 /*--------------------------------------------------------------------------*/
-
-#ifdef OLDWAY
-
 /*--------------------------------------------------------------------------*/
 
 /* CLOSE_PARENT_CHILD - close all non-terminal parent to child lines */
@@ -900,27 +872,19 @@ void transfer_in(process_group *pg, int ia, int ib, io_kind knd)
 	cib = cb->io + knd;
 	if ((cib->gid == ia) &&
 	    ((cia->dev == IO_DEV_PIPE) && (cia->gid == -1)))
-	   {if (strong_functions == TRUE)
-	       {fd = pia->fd;
+	   {fd = pia->fd;
 
-		transfer_fd(pa, knd, cb, knd);
-		pia->hnd = IO_HND_NONE;
-		pia->dev = IO_DEV_NONE;
-		pia->fd  = -2;
-		pia->fp  = NULL;
+	    transfer_fd(pa, knd, cb, knd);
+	    pia->hnd = IO_HND_NONE;
+	    pia->dev = IO_DEV_NONE;
+	    pia->fd  = -2;
+	    pia->fp  = NULL;
 
-		if (pib->fd == fd)
-		   {pib->fd = -2;
-		    pib->fp = NULL;
-		    pib->hnd = IO_HND_NONE;
-		    pib->dev = IO_DEV_NONE;};}
-	   else
-	      {cib->hnd = IO_HND_PIPE;
-
-	       fd = cib->fd;
-
-	       pia->hnd = IO_HND_PIPE;
-	       pia->fd  = fd;};};};
+	    if (pib->fd == fd)
+	       {pib->fd = -2;
+		pib->fp = NULL;
+		pib->hnd = IO_HND_NONE;
+		pib->dev = IO_DEV_NONE;};};};
 
     return;}
 
@@ -940,7 +904,7 @@ void connect_child_in_out(process_group *pg)
     np = pg->np;
     pa = pg->parents;
     nm = np - 1;
-    i0 = (strong_functions == FALSE);
+    i0 = 0;
 
     for (ip = i0; ip < nm; ip++)
         {pp = pa[ip];
@@ -961,9 +925,6 @@ void connect_child_in_out(process_group *pg)
     return;}
 
 /*--------------------------------------------------------------------------*/
-
-#endif
-
 /*--------------------------------------------------------------------------*/
 
 /* TRANSFER_FNC_CHILD - transfer all function call I/O from child
@@ -977,45 +938,44 @@ void transfer_fnc_child(process_group *pg)
     process *pp, *cp;
     process **pa, **ca;
 
-    if (strong_functions == TRUE)
-       {n   = pg->np;
-	pa  = pg->parents;
-	ca  = pg->children;
+    n   = pg->np;
+    pa  = pg->parents;
+    ca  = pg->children;
  
-	for (i = 0; i < n; i++)
-	    {pp = pa[i];
-	     cp = ca[i];
+    for (i = 0; i < n; i++)
+        {pp = pa[i];
+	 cp = ca[i];
 
-	     ta = pp->arg;
-	     if ((strcmp(ta[0], "gexec") == 0) && (strcmp(ta[1], "-p") == 0))
-	        {pp->isfunc = TRUE;
- 		 cp->isfunc = TRUE;};
+	 ta = pp->arg;
+	 if ((strcmp(ta[0], "gexec") == 0) && (strcmp(ta[1], "-p") == 0))
+	    {pp->isfunc = TRUE;
+	     cp->isfunc = TRUE;};
 
-	     if (pp->isfunc == TRUE)
-	        {for (io = 0; io < N_IO_CHANNELS; io++)
- 		     {pio = pp->io + io;
-		      if ((i == n-1) && (io == IO_STD_OUT))
-			 {if (pio->dev == IO_DEV_TERM)
-			     {
+	 if (pp->isfunc == TRUE)
+	    {for (io = 0; io < N_IO_CHANNELS; io++)
+		 {pio = pp->io + io;
+		  if ((i == n-1) && (io == IO_STD_OUT))
+		     {if (pio->dev == IO_DEV_TERM)
+			 {
 /* need this for date @o pw:test but
  * cannot tolerate it for cat @i fr:foo
  */
-			      pio->fd  = io;
-			      pio->hnd = IO_HND_NONE;
-			      pio->dev = IO_DEV_TERM;};}
+			  pio->fd  = io;
+			  pio->hnd = IO_HND_NONE;
+			  pio->dev = IO_DEV_TERM;};}
 
-		      else if (pio->dev == IO_DEV_PIPE)
-			 transfer_fd(cp, io, pp, io);
+		  else if (pio->dev == IO_DEV_PIPE)
+		     transfer_fd(cp, io, pp, io);
 
-		      else
-		         {pio->fd  = io;
-			  pio->hnd = IO_HND_POLL;};
+		  else
+		     {pio->fd  = io;
+		      pio->hnd = IO_HND_POLL;};
 
-		      pio->dev = IO_DEV_FNC;};
+		  pio->dev = IO_DEV_FNC;};
 
-		 _job_free(cp);
+	      _job_free(cp);
 
-		 ca[i] = NULL;};};};
+	      ca[i] = NULL;};};
 
     return;}
 
@@ -1086,8 +1046,6 @@ static void reconnect_pgrp(process_group *pg)
 		      sio->out.hnd = IO_HND_PIPE;
 		      sio->out.gid = sio->in.gid;};};};
 
-#ifdef OLDWAY
-
 /* reconnect terminal process output to first process */
 	transfer_fd(pa[0], IO_STD_OUT, pt, IO_STD_OUT);
 
@@ -1105,13 +1063,10 @@ static void reconnect_pgrp(process_group *pg)
 	connect_child_in_out(pg);
 
 /* transfer all function call I/O to parent and free child */
-	transfer_fnc_child(pg);
-#endif
-    };
+	transfer_fnc_child(pg);};
 
     if (dbg_level & 1)
-       {/* dprioc("reconnect_pgrp", pg->np, pg->ioc); */
-	dprgrp("reconnect_pgrp", pg);};
+       dprgrp("reconnect_pgrp", pg);
 
     return;}
 
@@ -1364,11 +1319,8 @@ static void parse_pgrp(statement *s)
 		  else
 		     break;};
 	     term  = TRUE;}
-#if 0
-	 else if (strpbrk(t, "[]()@$*`") != NULL)
-#else
+
 	 else if (strpbrk(t, "[]()$*`") != NULL)
-#endif
 	    dosh = TRUE;
 
 	 else if (strncmp(t, "if", 2) == 0)
@@ -1567,7 +1519,7 @@ int _fnc_wait(process_group *pg, int ip, int st)
 	    process *pd;
 	    FILE *fp;
 
-	    _block_all_sig();
+	    _block_all_sig(TRUE);
 
 	    for (io = 0; io < N_IO_CHANNELS; io++)
 	        {pio = pp->io + io;
@@ -1603,7 +1555,7 @@ int _fnc_wait(process_group *pg, int ip, int st)
 	    if ((pp->wait != NULL) && (pp->isfunc == FALSE))
 	       pp->wait(pp);
 
-	    _unblock_all_sig();};};
+	    _block_all_sig(FALSE);};};
 
     return(rv);}
 
@@ -1756,31 +1708,25 @@ static int run_pgrp(statement *s)
 
 	s->st = MAKE_N(int, ne);
 
-	if (strong_functions == TRUE)
-	   {for (i = 0; i < ne; i++)
-	        {pp = pg->parents[i];
-		 if (pp->isfunc == TRUE)
-		    s->nf++;
-		 else
-		    s->np++;};}
-	else
-	   s->np = s->ne;
+	for (i = 0; i < ne; i++)
+	    {pp = pg->parents[i];
+	     if (pp->isfunc == TRUE)
+	        s->nf++;
+	     else
+	        s->np++;};
 
 	np = s->np;
 
 	asetup(ne, 1);
 
 	register_io_pgrp(pg);
-/*
-	if (dbg_level & 1)
-	   dprgio("run_pgrp", ne, pg->parents, pg->children);
-*/
+
 /* launch the jobs - io_data passed to accept, reject, and wait methods */
 	for (i = 0; i < ne; i++)
 	    {pp = pg->parents[i];
 	     cp = pg->children[i];
 
-	     if ((strong_functions == FALSE) || (pp->isfunc == FALSE))
+	     if (pp->isfunc == FALSE)
 	        {pp = _job_fork(pp, cp, NULL, "rw", s);
 
 		 _dbg(2, "launch %d (%d,%d,%d)       %s",

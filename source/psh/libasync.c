@@ -96,9 +96,6 @@
 
 #define LIBASYNC
 
-/* #define NEWWAY */
-#define OLDWAY
-
 #include "common.h"
 
 #define JOB_NOT_FINISHED    -1000
@@ -121,10 +118,10 @@
 #define JOB_NO_FMT     75
 #define JOB_NO_EXEC    76
 
-#define job_alive(pp)                                                             \
+#define job_alive(pp)                                                         \
    ((pp != NULL) && (pp->io[0].fd != -1))
 
-#define job_running(pp)                                                           \
+#define job_running(pp)                                                       \
    ((pp != NULL) && (pp->io[0].fd != -1) && (pp->status == JOB_RUNNING))
 
 typedef void (*PFSIGHand)(int sig);
@@ -251,12 +248,7 @@ static sigjmp_buf
 
 static int
  _n_sig_block = 0,
- dbg_level = 0,
-#if 0
- strong_functions = TRUE;
-#else
-  strong_functions = FALSE;
-#endif
+ dbg_level = 0;
 
 /*--------------------------------------------------------------------------*/
 
@@ -311,7 +303,7 @@ void _job_io_close(process *pp, io_kind knd)
     fd = pp->io[knd].fd;
     fp = pp->io[knd].fp;
 
-    if ((strong_functions == FALSE) || (pp->isfunc == FALSE))
+    if (pp->isfunc == FALSE)
        {af = abs(fd);
 	if (fd > 2)
 	   _fd_close(af);
@@ -350,47 +342,34 @@ FILE *_io_file_ptr(process *pp, io_kind knd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-sigset_t _block_all_sig(void)
-   {sigset_t os;
+/* _BLOCK_ALL_SIG - block all incoming signals if WH is TRUE
+ *                - and unblock them if WH if FALSE
+ */
+
+sigset_t _block_all_sig(int wh)
+   {int rv;
+    sigset_t ns, os;
 
     memset(&os, 0, sizeof(os));
 
-#if 1
-    int rv;
-    sigset_t ns;
+    if (wh == TRUE)
+       {if (_n_sig_block == 0)
+	   {sigemptyset(&ns);
+	    sigfillset(&ns);
+	    rv = sigprocmask(SIG_BLOCK, &ns, &os);
+	    ASSERT(rv == 0);};
 
-    if (_n_sig_block == 0)
-       {sigemptyset(&ns);
-	sigfillset(&ns);
-	rv = sigprocmask(SIG_BLOCK, &ns, &os);
-	ASSERT(rv == 0);};
-#endif
+	_n_sig_block++;}
 
-    _n_sig_block++;
+    else
+       {_n_sig_block--;
+	_n_sig_block = max(_n_sig_block, 0);
 
-    return(os);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-sigset_t _unblock_all_sig(void)
-   {sigset_t os;
-
-    memset(&os, 0, sizeof(os));
-
-    _n_sig_block--;
-    _n_sig_block = max(_n_sig_block, 0);
-
-#if 1
-    int rv;
-    sigset_t ns;
-
-    if (_n_sig_block == 0)
-       {sigemptyset(&ns);
-	sigfillset(&ns);
-	rv = sigprocmask(SIG_UNBLOCK, &ns, &os);
-	ASSERT(rv == 0);};
-#endif
+	if (_n_sig_block == 0)
+	   {sigemptyset(&ns);
+	    sigfillset(&ns);
+	    rv = sigprocmask(SIG_UNBLOCK, &ns, &os);
+	    ASSERT(rv == 0);};};
 
     return(os);}
 
@@ -794,9 +773,7 @@ static int _job_init_ipc(process *pp, process *cp, io_connector *ioc)
 	   {pp->ioc = ioc;
 	    cp->ioc = ioc;};};
 
-#ifdef OLDWAY
     _job_set_ipc(pp, cp);
-#endif
 
     return(rv);}
 
@@ -1013,11 +990,7 @@ static process *_job_fork(process *pp, process *cp,
        pp->cmd = _job_command_str(argv);
     strcpy(pp->mode, mode);
 
-#ifdef NEWWAY
-    _job_set_ipc(pp, cp);
-#endif
-
-    _block_all_sig();
+    _block_all_sig(TRUE);
 
 /* fork the process */
     pid    = fork();
@@ -1042,7 +1015,7 @@ static process *_job_fork(process *pp, process *cp,
 		 _job_free(pp);
 	      break;};
 
-    _unblock_all_sig();
+    _block_all_sig(FALSE);
 
     return(pp);}
 
@@ -1136,7 +1109,7 @@ int job_read(int fd, process *pp, int (*out)(int fd, process *pp, char *s))
        {fi = pp->io[IO_STD_IN].fp;
 	fd = pp->io[IO_STD_IN].fd;
 	if ((fi != NULL) && (fd != -1))
- 	   {_block_all_sig();
+ 	   {_block_all_sig(TRUE);
 
 /*	    block_fd(fd, FALSE); */
 
@@ -1161,7 +1134,7 @@ int job_read(int fd, process *pp, int (*out)(int fd, process *pp, char *s))
 
 		 sched_yield();};
 
-	    _unblock_all_sig();};};
+	    _block_all_sig(FALSE);};};
 
     return(nl);}
 
@@ -1189,12 +1162,12 @@ int job_write(process *pp, char *fmt, ...)
     if (job_alive(pp))
        {fo = pp->io[1].fp;
 	if (fo != NULL)
-	   {_block_all_sig();
+	   {_block_all_sig(TRUE);
 
 	    ns = strlen(s);
 	    nc = fwrite_safe(s, 1, ns, fo);
 
-	    _unblock_all_sig();};};
+	    _block_all_sig(FALSE);};};
 
     return(nc);}
 
@@ -1309,7 +1282,7 @@ void job_wait(process *pp)
     if ((pp != NULL) && (pp->id != -1))
        {pid = pp->id;
 
-	_block_all_sig();
+	_block_all_sig(TRUE);
 
 	st = waitpid(pid, &w, WNOHANG);
 	if (st == 0)
@@ -1345,7 +1318,7 @@ void job_wait(process *pp)
 	else if ((st < 0) && (pp->status == JOB_RUNNING))
 	   pp->status = JOB_DEAD;
 
-	_unblock_all_sig();};
+	_block_all_sig(FALSE);};
 
     return;}
 
@@ -1438,7 +1411,7 @@ static int _awatch_fd(process *pp, io_kind knd, int sip)
    {int ip, ifd, fd, rv;
 
 /* handle the process */
-    if ((strong_functions == TRUE) && (pp->isfunc == TRUE))
+    if (pp->isfunc == TRUE)
        ip = pp->ip;
     else
        {ip = (sip < 0) ? stck.ip++ : sip;
