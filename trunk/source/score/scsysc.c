@@ -852,19 +852,19 @@ static int _SC_redirect_fd(subtask *ps, int i, char *p)
 /* add the redirect specifications to the filedes */
 #if 0
     switch (io.knd)
-       {case IO_STD_IN :
+       {case SC_IO_STD_IN :
 	     ps->fd[0] = io;
 	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 0, &io);
 	     break;
-        case IO_STD_OUT :
+        case SC_IO_STD_OUT :
 	     ps->fd[1] = io;
 	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 1, &io);
 	     break;
-        case IO_STD_ERR :
+        case SC_IO_STD_ERR :
 	     ps->fd[2] = io;
 	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 2, &io);
 	     break;
-        case IO_STD_BOND :
+        case SC_IO_STD_BOND :
 	     ps->fd[1] = io;
 #ifdef NEWWAY
 
@@ -882,13 +882,13 @@ static int _SC_redirect_fd(subtask *ps, int i, char *p)
 	     break;};
 #else
     switch (io.knd)
-       {case IO_STD_IN :
+       {case SC_IO_STD_IN :
 	     _SC_redir_filedes(ps->fd, SC_N_IO_CH, 0, &io);
 	     break;
 
-        case IO_STD_OUT :
-        case IO_STD_ERR :
-        case IO_STD_BOND :
+        case SC_IO_STD_OUT :
+        case SC_IO_STD_ERR :
+        case SC_IO_STD_BOND :
 	     {int fd;
 
 	      switch (src[0])

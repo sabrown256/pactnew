@@ -1,5 +1,5 @@
 /*
- * SHPROC.C - C and Scheme Process control routines
+ * SHPRC1.C - C and Scheme Process control routines
  *
  * Source Version: 5.0
  * Software Release #: LLNL-CODE-422942

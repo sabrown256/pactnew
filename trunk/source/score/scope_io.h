@@ -103,20 +103,21 @@ enum e_io_oper
 typedef enum e_io_oper io_oper;
 
 enum e_SC_io_kind
-   {IO_STD_NONE = -1, IO_STD_IN, IO_STD_OUT, IO_STD_ERR, IO_STD_BOND};
+   {SC_IO_STD_NONE = -1, SC_IO_STD_IN, SC_IO_STD_OUT,
+    SC_IO_STD_ERR, SC_IO_STD_BOND};
 
 typedef enum e_SC_io_kind SC_io_kind;
 
 enum e_SC_io_device
-   {IO_DEV_NONE,
-    IO_DEV_PIPE, IO_DEV_SOCKET, IO_DEV_PTY, 
-    IO_DEV_TERM, IO_DEV_FILE, IO_DEV_VAR, IO_DEV_EXPR };
+   {SC_IO_DEV_NONE,
+    SC_IO_DEV_PIPE, SC_IO_DEV_SOCKET, SC_IO_DEV_PTY, 
+    SC_IO_DEV_TERM, SC_IO_DEV_FILE, SC_IO_DEV_VAR, SC_IO_DEV_EXPR };
 
 typedef enum e_SC_io_device SC_io_device;
 
 enum e_SC_io_mode
-   {IO_MODE_NONE,
-    IO_MODE_RO, IO_MODE_WO, IO_MODE_WD, IO_MODE_APPEND };
+   {SC_IO_MODE_NONE,
+    SC_IO_MODE_RO, SC_IO_MODE_WO, SC_IO_MODE_WD, SC_IO_MODE_APPEND };
 
 typedef enum e_SC_io_mode SC_io_mode;
 
