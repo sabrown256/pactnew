@@ -58,7 +58,6 @@
 
 typedef struct s_statement statement;
 typedef struct s_process_session process_session;
-typedef char *(*PFPChar)(char *x);
 typedef int (*PFPCAL)(char *db, io_mode m, FILE **fp, int c, char **v);
 
 struct s_statement
