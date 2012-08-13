@@ -2410,7 +2410,7 @@ static char *do_run_spec(char *lst, char *s)
 /* WRITE_DO_RUN_DB - write the do-run database */
 
 static void write_do_run_db(client *cl, state *st)
-   {int i, l, ns;
+   {int i, l, nm, ns;
     char ldbg[MAXLINE], lmpi[MAXLINE], lcrs[MAXLINE];
     char cfg[MAXLINE], db[MAXLINE];
     char s[MAXLINE];
@@ -2485,39 +2485,42 @@ static void write_do_run_db(client *cl, state *st)
     ENDFOR;
 
 /* process the specs in CND */
+    nm = 0;
     for (i = 0; cnd[i] != NULL; i++)
         {note(Log, TRUE, "Checking %s", cnd[i]);
 
 	 file = do_run_spec(cfg, cnd[i]);
 	 if (IS_NULL(file) == TRUE)
-	    continue;
+	    {nm++;
+	     note(Log, TRUE, "   missing do-run config = |%s|", file);}
 
-	 note(Log, TRUE, "   config file = |%s|", file);
-
-	 exe = cwhich(path_base(cnd[i]));
-	 note(Log, TRUE, "   candidate for %s name = |%s|",
-	      cnd[i], exe);
-	 if (file_executable(exe) == TRUE)
-	    {add_do_run(fp, file);
-	     ns++;}
 	 else
-	    {sa = file_text(FALSE, file);
+	    {note(Log, TRUE, "   using do-run config = |%s|", file);
 
-	     for (l = 0; sa[l] != NULL; l++)
-	         {if (strstr(sa[l], "Exe") != NULL)
-		     {p   = strchr(sa[l], '=');
-		      exe = trim(p+1, BOTH, " \t\n\r");
-		      if (exe[0] != '/')
-			 exe = cwhich(exe);
+	     exe = cwhich(path_base(cnd[i]));
+	     note(Log, TRUE, "   candidate for %s name = |%s|",
+		  cnd[i], exe);
+	     if (file_executable(exe) == TRUE)
+	        {add_do_run(fp, file);
+		 ns++;}
+	     else
+	        {sa = file_text(FALSE, file);
 
-		      note(Log, TRUE, "   candidate for %s file = |%s|",
-			   cnd[i], exe);
-		      if (file_executable(exe) == TRUE)
-			 {add_do_run(fp, file);
-			  ns++;};
-		      break;};};
+		 for (l = 0; sa[l] != NULL; l++)
+		     {if (strstr(sa[l], "Exe") != NULL)
+			 {p   = strchr(sa[l], '=');
+			  exe = trim(p+1, BOTH, " \t\n\r");
+			  if (exe[0] != '/')
+			     exe = cwhich(exe);
 
-	     free_strings(sa);};};
+			  note(Log, TRUE, "   candidate for %s file = |%s|",
+			       cnd[i], exe);
+			  if (file_executable(exe) == TRUE)
+			     {add_do_run(fp, file);
+			      ns++;};
+			  break;};};
+
+		 free_strings(sa);};};};
 
     lst_free(cnd);
 
@@ -2525,8 +2528,11 @@ static void write_do_run_db(client *cl, state *st)
 
     fclose(fp);
 
-/* add the signature variable to the databases */
-    if (ns > 0)
+/* add the signature variable to the databases iff
+ * there were specification - ns > 0 
+ * and there were no missing specifications - nm == 0
+ */
+    if ((nm == 0) && (ns > 0))
        {dbset(cl, "RUN_SIGNATURE_DB", db);
 	csetenv("RUN_SIGNATURE_DB", db);
 	note(st->aux.SEF, TRUE, "RUN_SIGNATURE_DB %s", db);};

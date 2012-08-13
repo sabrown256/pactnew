@@ -24,7 +24,7 @@
 (printf nil "-> %s\n" (syscmnd "ls -1 ../../shpr*.c"))
 
 (printf nil "\ntest pipelines without a shell\n")
-(printf nil "expect: shprm2.c shprm3.c\n")
+(printf nil "expect: shprc2.c shprm1.c\n")
 (printf nil "-> %s\n" (syscmnd "ls -1 ../../shpr*.c | head -n 3 | tail -n 2"))
 
 (quit)

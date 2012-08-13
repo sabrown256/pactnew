@@ -1122,7 +1122,7 @@ int job_read(int fd, process *pp, int (*out)(int fd, process *pp, char *s))
 		    rv = 1;
 		 else
 		    {nr++;
-		     p  = fgets(s, MAXLINE, fi);
+		     p  = fgets(s, LRG, fi);
 		     ev = errno;
 		     if (p != NULL)
 		        {nl++;
