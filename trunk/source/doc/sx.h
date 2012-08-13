@@ -1,5 +1,5 @@
 TXT: SX User's Manual
-MOD: 05/05/2011
+MOD: 08/13/2012
 
 <CENTER>
 <P>
@@ -4297,7 +4297,10 @@ These functions augment the I/O capabilities of the basic interpeter.<p>
 
 <B>
 <BLOCKQUOTE>
-void SX_parse(SS_psides *si, PFVoid replot, PFPChar reproc)
+void SX_parse(SS_psides *si,
+	      object *(*replot)(SS_psides *si),
+	      char *(*reproc)(SS_psides *si, char *s),
+	      object *strm)
 </BLOCKQUOTE>
 </B>
 

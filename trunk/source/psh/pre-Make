@@ -57,7 +57,7 @@ ${InstallDep} : ${StdHdrs} ${IncFiles}
 
 hdrf = 
 
-IncAction = 
+IncAction = sinstall ${IncFiles} ${IncDir}/shell
 
 
 pco : ${BinDir}/pco
