@@ -454,6 +454,11 @@ static object *_SSI_resource_usage(SS_psides *si, object *argl)
 void _SS_inst_proc(SS_psides *si)
    {
 
+    SS_install(si, "!",
+               "Procedure: Exec a process group",
+               SS_nargs,
+               _SSI_gexec, SS_UR_MACRO);
+
     SS_install(si, "process?",
                "Procedure: Returns #t if the object is a PROCESS object",
                SS_sargs,

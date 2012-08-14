@@ -58,7 +58,8 @@
 
 typedef struct s_statement statement;
 typedef struct s_process_session process_session;
-typedef int (*PFPCAL)(char *db, io_mode m, FILE **fp, int c, char **v);
+typedef int (*PFPCAL)(char *db, io_mode m, FILE **fp,
+		      char *name, int c, char **v);
 
 struct s_statement
    {int np;                 /* number of processes in group */
@@ -1637,7 +1638,7 @@ void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
 
 			  nsleep(1);
 
-			  rv = f(db, md, fp, c, v);
+			  rv = f(db, md, fp, fn, c, v);
 			  rv =_fnc_wait(pg, ip, rv);
 			  if (rv == FALSE)
 			     break;};};};};};

@@ -56,7 +56,8 @@ printf("test> (%d,%d,%d)  stdin=%d  stdout=%d  stderr=%d\n",
 
 /* STR_VAR - function to access variables */
 
-static int str_var(char *db, io_mode md, FILE **fio, int c, char **v)
+static int str_var(char *db, io_mode md, FILE **fio,
+		   char *name, int c, char **v)
    {int i, nc, ns, rv;
     char t[MAXLINE];
     char *p, *vr, *vl, **sa;
@@ -143,7 +144,8 @@ static int str_var(char *db, io_mode md, FILE **fio, int c, char **v)
 
 /* STR_FILE - function to access files */
 
-static int str_file(char *db, io_mode md, FILE **fio, int c, char **v)
+static int str_file(char *db, io_mode md, FILE **fio,
+		    char *name, int c, char **v)
    {int i, rv, ev;
     char t[MAXLINE];
     char *p, *fn;
@@ -234,7 +236,8 @@ static int str_file(char *db, io_mode md, FILE **fio, int c, char **v)
 
 /* STR_TEST - function to test */
 
-static int str_test(char *db, io_mode md, FILE **fio, int c, char **v)
+static int str_test(char *db, io_mode md, FILE **fio,
+		    char *name, int c, char **v)
    {int rv;
     char *tag;
 
