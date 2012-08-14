@@ -1186,6 +1186,7 @@ extern int
  SC_numstrp(char *s),
  SC_intstrp(char *s, int base),
  SC_fltstrp(char *s),
+ SC_cmplxstrp(char *s),
  SC_chrstrp(char *s),
  SC_str_icmp(char *s, char *t),
  SC_vsnprintf(char *dst, size_t nc, const char *fmt, va_list a);

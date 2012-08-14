@@ -10,11 +10,17 @@
 
 #include "scheme_int.h"
 
+#if 0
 #include "shell/common.h"
 #include "shell/libpsh.c"
 #include "shell/libdb.c"
 #include "shell/libpgrp.c"
-
+#else
+#include "../psh/common.h"
+#include "../psh/libpsh.c"
+#include "../psh/libdb.c"
+#include "../psh/libpgrp.c"
+#endif
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -39,6 +45,39 @@ static char **_SS_list_strings(SS_psides *si, object *argl)
     al = SC_array_done(a);
 
     return(al);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_STRING_LIST - return a list of derived from string S */
+
+static object *_SS_string_list(SS_psides *si, char *s)
+   {int i, n;
+    char *t, **sa;
+    object *o, *lst;
+
+    sa = SC_tokenize(s, " \t");
+    SC_ptr_arr_len(n, sa);
+
+    lst = SS_null;
+    for (i = 0; i < n; i++)
+        {t = sa[i];
+	 if (SC_intstrp(t, SC_gs.radix))
+	    o = SS_mk_integer(si, SC_stol(t));
+	 else if (SC_fltstrp(t))
+	    o = SS_mk_float(si, SC_stof(t));
+	 else if (SC_cmplxstrp(t))
+	    o = SS_mk_complex(si, SC_stoc(t));
+	 else
+	    o = SS_mk_string(si, t);
+
+	 lst = SS_mk_cons(si, o, lst);};
+	 
+    SC_free_strings(sa);
+
+    lst = SS_reverse(si, lst);
+
+    return(lst);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -123,7 +162,7 @@ static PFPCAL _SS_maps(char *s)
 /* _SSI_GEXEC - gexec wrapper/access for SCHEME */
 
 static object *_SSI_gexec(SS_psides *si, object *argl)
-   {int n, rv;
+   {int n;
     char t[MAXLINE];
     char *s, *db, **al;
     object *o;
@@ -133,7 +172,7 @@ static object *_SSI_gexec(SS_psides *si, object *argl)
     if (db == NULL)
        {snprintf(t, MAXLINE, "PERDB_PATH=%s/.gexecdb", getenv("HOME"));
 	SC_putenv(t);
-	db = t;};
+	db = getenv("PERDB_PATH");};
 
     cl = make_client(db, CLIENT);
     dbset(cl, "gstatus", "");
@@ -141,11 +180,10 @@ static object *_SSI_gexec(SS_psides *si, object *argl)
     n  = SS_length(si, argl);
     al = _SS_list_strings(si, argl);
 
-    rv = gexec(db, n, al, NULL, _SS_maps);
+    gexec(db, n, al, NULL, _SS_maps);
 
-    s = dbget(cl, TRUE, "gstatus");
-    o = SS_mk_string(si, s);
-/*    o = SS_mk_integer(si, rv); */
+    s = dbget(cl, FALSE, "gstatus");
+    o = _SS_string_list(si, s);
 
     return(o);}
 
