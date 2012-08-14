@@ -304,9 +304,9 @@ object *SS_list_tail(SS_psides *si, object *lst, int n)
 	   {n = nl + n;
 	    if ((0 <= n) && (n <= nl))
 	       {for (i = 0; i < n; i++)
-                   {h    = SS_car(si, lst);
-		    lst  = SS_cdr(si, lst);
-		    nlst = SS_mk_cons(si, h, nlst);};
+		    {h    = SS_car(si, lst);
+		     lst  = SS_cdr(si, lst);
+		     nlst = SS_mk_cons(si, h, nlst);};
 		nlst = SS_reverse(si, nlst);};}
 
 	else if ((0 <= n) && (n < SS_length(si, lst)))

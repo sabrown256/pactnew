@@ -77,7 +77,7 @@ struct s_SS_scope_private
 /* SHINT.C */
     char *ibf;
 
-/* SHPROC.C */
+/* SHPRC1.C */
     int n_tries;
 
 /* SHREAD.C */
@@ -226,10 +226,16 @@ extern void
  _SS_inst_lrg(SS_psides *si);
 
 
-/* SHPROC.C declarations */
+/* SHPRC1.C declarations */
 
 extern void
  _SS_inst_proc(SS_psides *si);
+
+
+/* SHPRC2.C declarations */
+
+extern object
+ *_SSI_gexec(SS_psides *si, object *argl);
 
 #endif
 
