@@ -455,7 +455,9 @@ extern file_io_desc
  *SC_make_io_desc(void *fp);
 
 extern FILE
+ *SC_fwrap(FILE *fp),
  *SC_fopen(char *name, char *mode),
+ *SC_lfwrap(FILE *fp),
  *SC_lfopen(char *name, char *mode),
  *SC_std_file(void *p);
 

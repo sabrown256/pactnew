@@ -454,11 +454,6 @@ static object *_SSI_resource_usage(SS_psides *si, object *argl)
 void _SS_inst_proc(SS_psides *si)
    {
 
-    SS_install(si, "!",
-               "Procedure: Exec a process group",
-               SS_nargs,
-               _SSI_gexec, SS_UR_MACRO);
-
     SS_install(si, "process?",
                "Procedure: Returns #t if the object is a PROCESS object",
                SS_sargs,
@@ -523,6 +518,9 @@ void _SS_inst_proc(SS_psides *si)
                "Procedure: return a list of resource usage info for the given pid\nUsage: (resource-usage pid)",
                SS_nargs,
                _SSI_resource_usage, SS_PR_PROC);
+
+/* install process group functions */
+    _SS_inst_pgrp(si);
 
     _SS.n_tries = 100;
 

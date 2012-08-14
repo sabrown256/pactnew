@@ -532,31 +532,37 @@ char *SC_fgets(char *s, int n, FILE *fp)
 
         else
 	   {pos = ftell(fp);
+
+/* if we cannot reposition in the stream we have to use fgets
+ * or we will lose messages
+ */
 	    if (pos < 0)
-	       io_error(errno, "ftell failed");
+	       {io_error(errno, "ftell failed");
+		r = fgets(s, nc, fp);}
 
-	    nbr = fread(s, 1, nc, fp);
-	    if (nbr < 0)
-	       io_error(errno, "fread of %s bytes failed",
-			SC_itos(NULL, 0, nc, NULL));
+	    else
+	       {nbr = fread(s, 1, nc, fp);
+		if (nbr < 0)
+		   io_error(errno, "fread of %s bytes failed",
+			    SC_itos(NULL, 0, nc, NULL));
 
-	    if (nbr < nc)
-	       s[nbr] = '\0';
+		if (nbr < nc)
+		   s[nbr] = '\0';
 
 /* check for newlines */
-	    if (nbr > 0)
-	       {for (i = 0; (i < nc) && (s[i] != '\n') && (s[i] != '\r'); i++);
-		nb = i + 1;
-		if (nb < nc)
-		   s[nb] = '\0';
+		if (nbr > 0)
+		   {for (i = 0; (i < nc) && (s[i] != '\n') && (s[i] != '\r'); i++);
+		    nb = i + 1;
+		    if (nb < nc)
+		       s[nb] = '\0';
 
-		nb = min(nb, nbr);
-		st = fseek(fp, pos + nb, SEEK_SET);
-		if (st < 0)
-		   io_error(errno, "fseek to %s failed",
-			    SC_itos(NULL, 0, pos + nb, NULL));};
+		    nb = min(nb, nbr);
+		    st = fseek(fp, pos + nb, SEEK_SET);
+		    if (st < 0)
+		       io_error(errno, "fseek to %s failed",
+				SC_itos(NULL, 0, pos + nb, NULL));};
        
-	    r = (nbr > 0) ? s : NULL;};
+		r = (nbr > 0) ? s : NULL;};};
 
 /* always set last character to '\0' to avoid a buffer overrun */
 	s[nc] = '\0';};
@@ -568,37 +574,49 @@ char *SC_fgets(char *s, int n, FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_FOPEN - wrapper for fopen for handling null file names */
+/* SC_FWRAP - wrap FILE FP in an file_io_desc and return it */
 
-FILE *SC_fopen(char *name, char *mode)
-   {FILE *ret, *fp;
+FILE *SC_fwrap(FILE *fp)
+   {FILE *ret;
     file_io_desc *fid;
 
     ret = NULL;
 
-    if (name != NULL)
-       {fp = fopen(name, mode);
-	if (fp != NULL)
-	   {fid          = SC_make_io_desc(fp);
-	    fid->info    = fp;
-	    fid->fopen   = SC_fopen;
-	    fid->ftell   = ftell;
-	    fid->fseek   = fseek;
-	    fid->fread   = fread;
-	    fid->fwrite  = _SC_fwrite;
-	    fid->setvbuf = _SC_setvbuf;
-	    fid->fclose  = fclose;
-	    fid->fprintf = _SC_fprintf;
-	    fid->fputs   = _SC_fputs;
-	    fid->fgetc   = fgetc;
-	    fid->ungetc  = ungetc;
-	    fid->fflush  = _SC_fflush;
-	    fid->feof    = feof;
-	    fid->fgets   = SC_fgets;
+    if (fp != NULL)
+       {fid          = SC_make_io_desc(fp);
+	fid->info    = fp;
+	fid->fopen   = SC_fopen;
+	fid->ftell   = ftell;
+	fid->fseek   = fseek;
+	fid->fread   = fread;
+	fid->fwrite  = _SC_fwrite;
+	fid->setvbuf = _SC_setvbuf;
+	fid->fclose  = fclose;
+	fid->fprintf = _SC_fprintf;
+	fid->fputs   = _SC_fputs;
+	fid->fgetc   = fgetc;
+	fid->ungetc  = ungetc;
+	fid->fflush  = _SC_fflush;
+	fid->feof    = feof;
+	fid->fgets   = SC_fgets;
 
-	    ret = (FILE *) fid;}
-	else
-	   ret = NULL;};
+	ret = (FILE *) fid;};
+
+    return(ret);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_FOPEN - wrapper for fopen for handling null file names */
+
+FILE *SC_fopen(char *name, char *mode)
+   {FILE *ret, *fp;
+
+    ret = NULL;
+
+    if (name != NULL)
+       {fp  = fopen(name, mode);
+	ret = SC_fwrap(fp);};
 
     return(ret);}
 
@@ -1656,36 +1674,48 @@ static u_int64_t _SC_lfwrite(void *s, size_t bpi, u_int64_t ni, FILE *fp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_LFOPEN - large file wrapper for fopen for handling null file names */
+/* SC_LFWRAP - wrap large file FP in an file_io_desc and return it */
 
-FILE *SC_lfopen(char *name, char *mode)
-   {FILE *ret, *fp;
+FILE *SC_lfwrap(FILE *fp)
+   {FILE *ret;
     file_io_desc *fid;
 
     ret = NULL;
 
-    if (name != NULL)
-       {fp = fopen(name, mode);
-	if (fp != NULL)
-	   {fid          = SC_make_io_desc(fp);
-	    fid->fopen   = SC_lfopen;
-	    fid->lftell  = _SC_lftell;
-	    fid->lfseek  = _SC_lfseek;
-	    fid->lfread  = _SC_lfread;
-	    fid->lfwrite = _SC_lfwrite;
-	    fid->setvbuf = _SC_setvbuf;
-	    fid->fclose  = fclose;
-	    fid->fprintf = _SC_fprintf;
-	    fid->fputs   = _SC_fputs;
-	    fid->fgetc   = fgetc;
-	    fid->ungetc  = ungetc;
-	    fid->fflush  = _SC_fflush;
-	    fid->feof    = feof;
-	    fid->fgets   = SC_fgets;
+    if (fp != NULL)
+       {fid          = SC_make_io_desc(fp);
+	fid->fopen   = SC_lfopen;
+	fid->lftell  = _SC_lftell;
+	fid->lfseek  = _SC_lfseek;
+	fid->lfread  = _SC_lfread;
+	fid->lfwrite = _SC_lfwrite;
+	fid->setvbuf = _SC_setvbuf;
+	fid->fclose  = fclose;
+	fid->fprintf = _SC_fprintf;
+	fid->fputs   = _SC_fputs;
+	fid->fgetc   = fgetc;
+	fid->ungetc  = ungetc;
+	fid->fflush  = _SC_fflush;
+	fid->feof    = feof;
+	fid->fgets   = SC_fgets;
 
-	    ret = (FILE *) fid;}
-	else
-	   ret = NULL;};
+	ret = (FILE *) fid;};
+
+    return(ret);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* SC_LFOPEN - large file wrapper for fopen for handling null file names */
+
+FILE *SC_lfopen(char *name, char *mode)
+   {FILE *ret, *fp;
+
+    ret = NULL;
+
+    if (name != NULL)
+       {fp  = fopen(name, mode);
+	ret = SC_lfwrap(fp);};
 
     return(ret);}
 
