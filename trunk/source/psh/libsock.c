@@ -402,7 +402,7 @@ static int client_fd(client *cl)
 	fds = srv->server;
 	if (fds < 0)
 	   fd = connect_error(cl);
-        else if (fds == 0)
+        else if ((fds == 0) || (cl->type == CLIENT))
 	   fd = connect_client(cl);
         else
 	   fd = connect_server(cl);};

@@ -1644,6 +1644,37 @@ int SC_fltstrp(char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* SC_CMPLXSTRP - tests to see if a string is a complex number */
+
+int SC_cmplxstrp(char *s)
+   {int n, rv;
+
+    if (s == NULL)
+       rv = FALSE;
+
+    else if (!SC_gs.unary_plus && (*s == '+'))
+       rv = FALSE;
+
+    else if ((strcmp(s, "+") == 0) ||
+	     (strcmp(s, "-") == 0) ||
+	     (strcmp(s, ".") == 0) ||
+	     (strcmp(s, "..") == 0))
+       rv = FALSE;
+
+    else
+       {n = strlen(s);
+	if (strspn(s, " \t+-*.0123456789iIeE") != n)
+	   rv = FALSE;
+
+/* GOTCHA: need to test further here */
+	else
+	   rv = TRUE;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* SC_CHRSTRP - test whether a string is made up of printable characters */
 
 int SC_chrstrp(char *s)

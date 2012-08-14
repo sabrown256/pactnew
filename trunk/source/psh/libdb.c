@@ -704,6 +704,7 @@ int db_srv_launch(char *root)
 	    {if (i == 1)
 		{snprintf(s, MAXLINE, "perdb -f %s -s -l", root);
 		 st = system(s);
+		 st = WEXITSTATUS(st);
 		 log_activity(flog, dbg_db, "CLIENT", "launch |%s| (%d)",
 			      s, st);}
 	     else
