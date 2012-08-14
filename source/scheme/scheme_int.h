@@ -234,8 +234,9 @@ extern void
 
 /* SHPRC2.C declarations */
 
-extern object
- *_SSI_gexec(SS_psides *si, object *argl);
+extern void
+ _SS_inst_pgrp(SS_psides *si);
+
 
 #endif
 

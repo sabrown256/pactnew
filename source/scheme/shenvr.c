@@ -754,7 +754,8 @@ object *SS_lk_var_val(SS_psides *si, object *vr)
 /* _SS_GET_PRINT_NAME - return a good printing name for the object O */
 
 char *_SS_get_print_name(SS_psides *si, object *o)
-   {char *s, *rv;
+   {char t[MAXLINE];
+    char *s, *rv;
     procedure *pp;
 
     rv = NULL;
@@ -780,8 +781,29 @@ char *_SS_get_print_name(SS_psides *si, object *o)
 		     s = "procedure";
 		     break;};}
 
+        else if (SS_integerp(o))
+	   {snprintf(t, MAXLINE, "%ld", (long) SS_INTEGER_VALUE(o));
+	    s = t;}
+
+        else if (SS_floatp(o))
+	   {snprintf(t, MAXLINE, "%g", SS_FLOAT_VALUE(o));
+	    s = t;}
+
+        else if (SS_complexp(o))
+	   {complex c;
+	    c = SS_COMPLEX_VALUE(o);
+	    SC_ntos(t, MAXLINE, SC_DOUBLE_COMPLEX_I, &c, 0, 1);
+	    s = t;}
+
+        else if (SS_quaternionp(o))
+	   {quaternion q;
+	    q = SS_QUATERNION_VALUE(o);
+	    SC_ntos(t, MAXLINE, SC_QUATERNION_I, &q, 0, 1);
+	    s = t;}
+
         else if (o->print_name != NULL)
 	   s = o->print_name;
+
 	else
 	   s = "- no print name -";
 

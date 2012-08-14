@@ -34,7 +34,7 @@ static void SS_clr_strm(object *str)
 
 static object *_SSI_rd_line(SS_psides *si, object *str)
    {FILE *s;
-    char *t, *t1;
+    char *t, *p;
     object *ret;
 
     if (SS_nullobjp(str))
@@ -45,14 +45,17 @@ static object *_SSI_rd_line(SS_psides *si, object *str)
     s = SS_INSTREAM(str);
     t = SS_BUFFER(str);
     SS_PTR(str) = t;
+
     if (GETLN(t, MAXLINE, s) == NULL)
-       return(SS_eof);
+       ret = SS_eof;
 
-    for (t1 = t; *t1 != '\n'; t1++);
-    *t1 = '\0';
+    else
+       {p = strchr(t, '\n');
+	if (p != NULL)
+	   *p = '\0';
 
-    ret = SS_mk_string(si, t);
-    *t = '\0';
+	ret = SS_mk_string(si, t);
+	*t = '\0';};
 
     return(ret);}
 

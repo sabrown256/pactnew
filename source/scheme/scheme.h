@@ -226,7 +226,7 @@
  *                - return FALSE otherwise
  */
 
-#define SS_quaterionp(_o) (SC_arrtype(_o, -1) == SC_QUATERNION_I)
+#define SS_quaternionp(_o) (SC_arrtype(_o, -1) == SC_QUATERNION_I)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

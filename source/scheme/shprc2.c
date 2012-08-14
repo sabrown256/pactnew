@@ -21,13 +21,14 @@
 /* _SS_LIST_STRINGS - return a list of strings derived from ARGL */
 
 static char **_SS_list_strings(SS_psides *si, object *argl)
-   {char *s, **al;
+   {int i;
+    char *s, **al;
     object *o;
     SC_array *a;
 
     a = SC_STRING_ARRAY();
 
-    for ( ; SS_consp(argl); argl = SS_cdr(si, argl))
+    for (i = 0; SS_consp(argl); argl = SS_cdr(si, argl), i++)
         {o = SS_car(si, argl);
 	 s = NULL;
 	 SS_args(si, o,
@@ -50,6 +51,7 @@ static int _SS_proc_exec(char *db, io_mode m, FILE **fp,
     object *fnc, *expr;
     void *ptr[MAXLINE];
     SS_psides *si;
+    char *ioc[] = { "stdin", "stdout", "stderr" };
 
     si = SS_get_current_scheme(-1);
 
@@ -60,22 +62,21 @@ static int _SS_proc_exec(char *db, io_mode m, FILE **fp,
 
     l = 0;
 
+/* start with the function mode */
     type[l] = SC_INTEGER_I;
     ptr[l]  = &m;
     l++;
 
-    type[l] = SS_OBJECT_I;
-    ptr[l]  = SS_mk_inport(si, fp[0], "stdin");
-    l++;
+/* add the standard I/O channels */
+    for (i = 0; i < N_IO_CHANNELS; i++)
+        {type[l] = SS_OBJECT_I;
+         if (i == 0)
+	    ptr[l] = SS_mk_inport(si, SC_fwrap(fp[i]), ioc[i]);
+	 else
+	    ptr[l] = SS_mk_outport(si, SC_fwrap(fp[i]), ioc[i]);
+	 l++;};
 
-    type[l] = SS_OBJECT_I;
-    ptr[l]  = SS_mk_outport(si, fp[1], "stdout");
-    l++;
-
-    type[l] = SS_OBJECT_I;
-    ptr[l]  = SS_mk_outport(si, fp[2], "stderr");
-    l++;
-
+/* add the arguments */
     for (i = 0; i < c; i++)
         {type[l] = SC_STRING_I;
          ptr[l]  = v[i];
@@ -97,7 +98,10 @@ static int _SS_proc_exec(char *db, io_mode m, FILE **fp,
     SS_assign(si, si->argl, SS_null);
     SS_assign(si, si->fun, SS_null);
 
-    rv = 0;
+    rv = -1;
+    SS_args(si, si->val,
+	    SC_INTEGER_I, &rv,
+	    0);
 
     return(rv);}
 
@@ -118,21 +122,52 @@ static PFPCAL _SS_maps(char *s)
 
 /* _SSI_GEXEC - gexec wrapper/access for SCHEME */
 
-object *_SSI_gexec(SS_psides *si, object *argl)
+static object *_SSI_gexec(SS_psides *si, object *argl)
    {int n, rv;
-    char *db, **al;
+    char t[MAXLINE];
+    char *s, *db, **al;
     object *o;
+    client *cl;
 
     db = getenv("PERDB_PATH");
+    if (db == NULL)
+       {snprintf(t, MAXLINE, "PERDB_PATH=%s/.gexecdb", getenv("HOME"));
+	SC_putenv(t);
+	db = t;};
+
+    cl = make_client(db, CLIENT);
+    dbset(cl, "gstatus", "");
 
     n  = SS_length(si, argl);
     al = _SS_list_strings(si, argl);
 
     rv = gexec(db, n, al, NULL, _SS_maps);
 
-    o = SS_mk_integer(si, rv);
+    s = dbget(cl, TRUE, "gstatus");
+    o = SS_mk_string(si, s);
+/*    o = SS_mk_integer(si, rv); */
 
     return(o);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_INST_PGRP - install the primitives for process group control */
+
+void _SS_inst_pgrp(SS_psides *si)
+   {
+
+    SS_install_cf(si, "process-group-debug",
+		  "Variable: Flag controlling level of diagnostic output for gexec",
+		  SS_acc_int,
+                  &dbg_level);
+
+    SS_install(si, "!",
+               "Procedure: Exec a process group",
+               SS_nargs,
+               _SSI_gexec, SS_UR_MACRO);
+
+    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -950,7 +950,12 @@ static int check_cross(client *cl)
 	   {noted(Log, "");
 	    noted(Log, "You are cross compiling without a run_signature database - exiting");
 	    noted(Log, "");
-	    rv = FALSE;};};
+	    rv = FALSE;}
+	else
+	   {note(Log, TRUE, "");
+	    note(Log, TRUE, "You are cross compiling with run_signature database %s",
+		 s);
+	    note(Log, TRUE, "");};};
 
     return(rv);}
 
@@ -2536,6 +2541,8 @@ static void write_do_run_db(client *cl, state *st)
        {dbset(cl, "RUN_SIGNATURE_DB", db);
 	csetenv("RUN_SIGNATURE_DB", db);
 	note(st->aux.SEF, TRUE, "RUN_SIGNATURE_DB %s", db);};
+
+    separator(Log);
 
     return;}
 

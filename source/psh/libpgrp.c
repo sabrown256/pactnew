@@ -1603,7 +1603,8 @@ void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
 		  md  = pio->mode;
 		  dv  = pio->dev;
 		  hnd = pio->hnd;
-		  if ((hnd == IO_HND_FNC) || (dv == IO_DEV_FNC))
+		  if (((hnd == IO_HND_FNC) || (dv == IO_DEV_FNC)) &&
+		      (pio->gid != -1))
 		     {v  = pp->arg;
 		      c  = lst_length(pp->arg);
 		      fn = v[2];

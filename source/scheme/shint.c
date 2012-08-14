@@ -203,7 +203,7 @@ static void _SS_quaternion_arg(SS_psides *si, object *obj, void *v)
     q.j = 0.0;
     q.k = 0.0;
 
-    if (SS_quaterionp(obj))
+    if (SS_quaternionp(obj))
        q = SS_QUATERNION_VALUE(obj);
 
     else if (SS_complexp(obj))
