@@ -1,0 +1,4 @@
+gexo1: 'v1> out message #1'
+gexb1: 'v2> err message #1 v2> out message #1'
+gexo2: 'v3> out message #1'
+gexe2: 'v3> err message #1'

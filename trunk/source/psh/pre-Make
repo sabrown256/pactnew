@@ -42,7 +42,8 @@ InstallDep = ${BinDir}/pco ${BinDir}/do-net ${BinDir}/do-run \
              ${BinDir}/atdbg ${BinDir}/pcsh \
              ${BinDir}/gexec ${BinDir}/perdb  \
              ${BinDir}/elide ${BinDir}/blang                 \
-             ${BinDir}/smake ${BinDir}/pact-info
+             ${BinDir}/smake ${BinDir}/pact-info \
+             ${BinDir}/osrc
 
 #RemoveFiles = ${InstallDep} ${StdHdrs} ${IncFiles}
 RemoveFiles = ${InstallDep}
@@ -104,6 +105,11 @@ blang : ${BinDir}/blang
 
 ${BinDir}/blang : blang.c ${LibFiles}
 	${PCC} blang.c -o ${BinDir}/blang
+
+osrc : ${BinDir}/osrc
+
+${BinDir}/osrc : osrc.c ${LibFiles}
+	${PCC} osrc.c -o ${BinDir}/osrc ${MDLib}
 
 smake : ${BinDir}/pact-info ${BinDir}/smake
 

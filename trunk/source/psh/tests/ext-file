@@ -82,8 +82,8 @@ foreach i (1 2 3 4 5 6)
            breaksw
 
       case 6:
-           set cmd = ( gexec ls 'ext-*' foo.h @o2 @e3 fw:f6out @ fw:f6err '>&!' $raw )
-           set gst = "2 0 0"
+           set cmd = ( gexec osrc -t f6 @o2 @e3 fw:f6out @ fw:f6err '>&!' $raw )
+           set gst = "1 0 0"
            set srt = TRUE
            set cfl = ( f6out f6err )
            breaksw

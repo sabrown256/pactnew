@@ -52,6 +52,9 @@ static FILE
 static dir_stack
  dstck;
 
+static int
+ db_log_level = 1;
+
 extern void
  unamef(char *s, int nc, char *wh);
 
@@ -2303,11 +2306,11 @@ size_t fwrite_safe(void *s, size_t bpi, size_t nitems, FILE *fp)
 
 /* LOG_ACTIVITY - log messages to FLOG */
 
-void log_activity(char *flog, int ilog, char *oper, char *fmt, ...)
+void log_activity(char *flog, int ilog, int ilev, char *oper, char *fmt, ...)
    {char msg[MAXLINE];
     FILE *log;
 
-    if ((ilog == TRUE) && (flog != NULL))
+    if ((ilog == TRUE) && (flog != NULL) && (ilev <= db_log_level))
        {log = fopen(flog, "a");
 	if (log != NULL)
 	   {VA_START(fmt);

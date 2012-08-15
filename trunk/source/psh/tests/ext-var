@@ -82,8 +82,8 @@ foreach i (1 2 3 4 5 6)
            breaksw
 
       case 6:
-           set cmd = ( gexec ls 'ext-*' foo.h @o2 @e3 vw:v6out @ vw:v6err '>&!' $raw )
-           set gst = "2 0 0"
+           set cmd = ( gexec osrc -t v6 @o2 @e3 vw:v6out @ vw:v6err '>&!' $raw )
+           set gst = "1 0 0"
            set srt = TRUE
            set pvl = ( v6out v6err )
            breaksw
@@ -260,7 +260,7 @@ if (0) then
 
    unsetenv v5out
    unsetenv v5err
-   gexec ls ext-* foo.h @o2 @e3 vw:v6out @ vw:v6err >&! ext-v6.res.raw
+   gexec osrc -t v5 @o2 @e3 vw:v6out @ vw:v6err >&! ext-v6.res.raw
    sort ext-v6.res.raw >&! ext-v6.res
    rm -f ext-v6.res.raw
    dbget v6out

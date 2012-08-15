@@ -24,7 +24,8 @@ static void sigdone(int sig)
    {
 
     if (db != NULL)
-       {log_activity(db->flog, dbg_db, "SERVER", "signalled %d - done", sig);
+       {log_activity(db->flog, dbg_db, 4,
+		     "SERVER", "signalled %d - done", sig);
 	close_sock(db->root);
 	db_srv_save(-1, db);
 	unlink(db->fpid);};
@@ -166,7 +167,7 @@ static void check_fd(connection *srv, char *flog)
         {if (FD_ISSET(fd, &rfs))
             vstrcat(s, MAXLINE, " %d", fd);};
 
-    log_activity(flog, dbg_db, "SERVER", "monitoring: %s", s);
+    log_activity(flog, dbg_db, 4, "SERVER", "monitoring: %s", s);
 
     return;}
 
@@ -179,7 +180,7 @@ static void add_fd(connection *srv, char *flog, int fd)
    {
 
     FD_SET(fd, &srv->afs);
-    log_activity(flog, dbg_db, "SERVER", "add %d", fd);
+    log_activity(flog, dbg_db, 1, "SERVER", "add fd %d", fd);
 
     check_fd(srv, flog);
 
@@ -194,7 +195,7 @@ static void remove_fd(connection *srv, char *flog, int fd)
    {
 
     FD_CLR(fd, &srv->afs);
-    log_activity(flog, dbg_db, "SERVER", "remove %d", fd);
+    log_activity(flog, dbg_db, 1, "SERVER", "remove fd %d", fd);
 
     check_fd(srv, flog);
 
@@ -219,7 +220,7 @@ static void new_connection(char *root, connection *srv)
        add_fd(srv, flog, fd);
     else
        {close(fd);
-	log_activity(flog, dbg_db, "SERVER",
+	log_activity(flog, dbg_db, 1, "SERVER",
 		     "accept error - %s (%d)",
 		     strerror(errno), errno);};
 
@@ -387,7 +388,7 @@ static void async_server(client *cl)
 	   tmax = 60;
 	else
 	   {tmax = atoi(s);
-	    log_activity(flog, dbg_db, "SERVER",
+	    log_activity(flog, dbg_db, 4, "SERVER",
 			 "PERDB_IDLE_TIMEOUT = %d", tmax);};
 
         s = cgetenv(FALSE, "PERDB_IDLE_INTERVAL");
@@ -395,7 +396,7 @@ static void async_server(client *cl)
 	   dt = tmax >> 1;
 	else
 	   {dt = atoi(s);
-	    log_activity(flog, dbg_db, "SERVER",
+	    log_activity(flog, dbg_db, 4, "SERVER",
 			 "PERDB_IDLE_INTERVAL = %d", dt);};
 
 /* maximum number of consecutive 0 length reads
@@ -417,7 +418,7 @@ static void async_server(client *cl)
 	     if (nr > 0)
 	        {for (fd = 0; (fd < FD_SETSIZE) && (ok == TRUE); ++fd)
 		     {if (FD_ISSET(fd, &rfs))
-			 {log_activity(flog, dbg_db, "SERVER",
+			 {log_activity(flog, dbg_db, 4, "SERVER",
 				       "data available on %d (server %d)",
 				       fd, srv->server);
 
@@ -431,17 +432,28 @@ static void async_server(client *cl)
 
 			      ok = proc_connection(cl);
                               if (ok == -1)
-				 nb++;
+				 {ok = TRUE;
+				  remove_fd(srv, flog, fd);
+				  nb++;}
 			      else
 				 nb = 0;
 
 			      sched_yield();};};};
 		  ng = 0;}
 	     else
-	        ng += dt;};}
+	        ng += dt;};
+
+	if (ok != TRUE)
+	   log_activity(flog, dbg_db, 4, "SERVER", "done by command");
+	else if (ng >= tmax)
+	   log_activity(flog, dbg_db, 4, "SERVER",
+			"done by time: %d >= %d", ng, tmax);
+	else if (nb >= nbmax)
+	   log_activity(flog, dbg_db, 4, "SERVER",
+			"done by failed reads: %d >= %d", nb, nbmax);}
 
     else
-       log_activity(flog, dbg_db, "SERVER",
+       log_activity(flog, dbg_db, 1, "SERVER",
 		    "async_server error (%s - %d)",
 		    strerror(errno), errno);
 
@@ -463,7 +475,7 @@ static int server(char *root, int init, int dmn)
 
 	flog = name_log(root);
 
-	log_activity(flog, dbg_db, "SERVER", "begin");
+	log_activity(flog, dbg_db, 1, "SERVER", "start server");
 
 	cl = make_client(root, SERVER);
 
@@ -474,11 +486,11 @@ static int server(char *root, int init, int dmn)
 	    async_server(cl);
 
 	    db_srv_save(-1, cl->db);
-	    db_srv_close(cl->db);
+	    db_srv_close(cl->db);};
 
-	    log_activity(flog, dbg_db, "SERVER", "end");};
+	free_client(cl);
 
-	free_client(cl);};
+	log_activity(flog, dbg_db, 1, "SERVER", "end server");};
 
     return(0);}
 

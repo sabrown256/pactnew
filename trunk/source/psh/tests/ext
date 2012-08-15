@@ -50,6 +50,7 @@ endif
 
    if ($db == TRUE) then
       flog $Log setenv PERDB_PATH $cwd/ext
+      flog $Log rm -f ${PERDB_PATH}.*
       flog $Log $PERDB -l -c -s
    endif
 
@@ -78,6 +79,8 @@ endif
    if ($db == TRUE) then
       flog $Log $PERDB -l quit:
    endif
+
+   flog $Log sign -9 cat
 
    set tf = `timer -b $tf`
 

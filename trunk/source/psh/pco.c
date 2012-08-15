@@ -948,12 +948,13 @@ static int check_cross(client *cl)
        {s = cgetenv(TRUE, "RUN_SIGNATURE_DB");
 	if (file_exists(s) == FALSE)
 	   {noted(Log, "");
-	    noted(Log, "You are cross compiling without a run_signature database - exiting");
+	    noted(Log, "Cross compiling without a run_signature database - exiting");
 	    noted(Log, "");
 	    rv = FALSE;}
 	else
-	   {note(Log, TRUE, "");
-	    note(Log, TRUE, "You are cross compiling with run_signature database %s",
+	   {dbset(cl, "RUN_SIGNATURE_DB", s);
+	    note(Log, TRUE, "");
+	    note(Log, TRUE, "Cross compiling with run_signature database %s",
 		 s);
 	    note(Log, TRUE, "");};};
 

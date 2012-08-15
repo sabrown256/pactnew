@@ -1,0 +1,19 @@
+a
+b
+bond #0 3> p2> err message #1
+bond #0 3> p2> err message #2
+bond #0 3> p2> out message #1
+bond #0 3> p2> out message #2
+bond #0 3> p2> out message #3
+bond #0 3> p2> out message #4
+c
+err #0 3> p3> err message #1
+err #0 3> p3> err message #2
+out #0 3> p1> out message #1
+out #0 3> p1> out message #2
+out #0 3> p1> out message #3
+out #0 3> p1> out message #4
+out #0 3> p3> out message #1
+out #0 3> p3> out message #2
+out #0 3> p3> out message #3
+out #0 3> p3> out message #4
