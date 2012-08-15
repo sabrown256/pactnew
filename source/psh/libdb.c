@@ -130,9 +130,9 @@ client *make_client(char *root, ckind type)
 	cl->server = &srv;
 
 	flog = name_log(root);
-	log_activity(flog, dbg_db,
+	log_activity(flog, dbg_db, 1,
 		     (type == CLIENT) ? "CLIENT" : "SERVER",
-		     "----- start -----");};
+		     "----- start client -----");};
 
     return(cl);}
 
@@ -148,12 +148,13 @@ void free_client(client *cl)
        {if (cl->type == CLIENT)
 	   comm_write(cl, "fin:", 0, 10);
 
-	cl->fd = connect_close(cl->fd, cl, NULL);
+	if (cl->fd >= 0)
+	   cl->fd = connect_close(cl->fd, cl, NULL);
 
 	flog = name_log(cl->root);
-	log_activity(flog, dbg_db,
+	log_activity(flog, dbg_db, 1,
 		     (cl->type == CLIENT) ? "CLIENT" : "SERVER",
-		     "----- end -----");
+		     "----- end client -----");
 
 	FREE(cl);};
 
@@ -226,7 +227,7 @@ void reset_db(database *db)
 
     db->ne = 0;
 
-    log_activity(db->flog, dbg_db, "SERVER", "reset");
+    log_activity(db->flog, dbg_db, 1, "SERVER", "reset");
 
     return;}
 
@@ -255,7 +256,8 @@ char *put_db(database *db, char *var, char *val)
 
 	csetenv(var, val);
 
-	log_activity(db->flog, dbg_db, "SERVER", "put |%s|=|%s|", var, val);};
+	log_activity(db->flog, dbg_db, 1,
+		     "SERVER", "put |%s|=|%s|", var, val);};
 
     return(val);}
 
@@ -385,7 +387,7 @@ char *get_db(database *db, char *var)
                            *pt++ = c;
                            break;};};};};
 
-    log_activity(db->flog, dbg_db, "SERVER", "get |%s|=|%s|", var, val);
+    log_activity(db->flog, dbg_db, 1, "SERVER", "get |%s|=|%s|", var, val);
 
     return(val);}
 
@@ -598,7 +600,7 @@ database *db_srv_load(char *root)
 	   {load_db(db, NULL, fp);
 	    fclose(fp);};
 
-	log_activity(db->flog, dbg_db, "SERVER", "load %d |%s|",
+	log_activity(db->flog, dbg_db, 1, "SERVER", "load %d |%s|",
 		     db->ne, db->file);};
 
     return(db);}
@@ -669,7 +671,7 @@ int db_srv_save(int fd, database *db)
     rv = FALSE;
 
     if (db != NULL)
-       {log_activity(db->flog, dbg_db, "SERVER", "save %d |%s|",
+       {log_activity(db->flog, dbg_db, 1, "SERVER", "save %d |%s|",
 		     db->ne, db->file);
 
 	fp = fopen(db->file, "w");
@@ -705,7 +707,7 @@ int db_srv_launch(char *root)
 		{snprintf(s, MAXLINE, "perdb -f %s -s -l", root);
 		 st = system(s);
 		 st = WEXITSTATUS(st);
-		 log_activity(flog, dbg_db, "CLIENT", "launch |%s| (%d)",
+		 log_activity(flog, dbg_db, 1, "CLIENT", "launch |%s| (%d)",
 			      s, st);}
 	     else
 	        nsleep(100);};
@@ -725,7 +727,7 @@ int db_srv_launch(char *root)
 
 	srv.pid = pid;
 
-        log_activity(flog, dbg_db, "CLIENT", "server pid %d (%d)",
+        log_activity(flog, dbg_db, 1, "CLIENT", "server pid %d (%d)",
 		     pid, i);};
 
     return(rv);}
@@ -742,7 +744,7 @@ void db_srv_restart(database *db)
        {close_sock(db->root);
 	db_srv_save(-1, db);
 
-	log_activity(db->flog, dbg_db, "SERVER", "restart");
+	log_activity(db->flog, dbg_db, 1, "SERVER", "restart");
 
 	ioc_server = SERVER;
 	rv = open_server(db->root);
@@ -772,7 +774,7 @@ char **_db_clnt_ex(client *cl, int init, char *req)
 
     flog = name_log(root);
 
-    log_activity(flog, dbg_db, "CLIENT", "begin request |%s|", req);
+    log_activity(flog, dbg_db, 1, "CLIENT", "begin request |%s|", req);
 
 /* make sure that there is a server running */
     if (init == TRUE)
@@ -800,7 +802,7 @@ char **_db_clnt_ex(client *cl, int init, char *req)
 	     if (ok == TRUE)
 	        nsleep(0);};};
 
-    log_activity(flog, dbg_db, "CLIENT", "end request");
+    log_activity(flog, dbg_db, 1, "CLIENT", "end request");
 
     return(p);}
 

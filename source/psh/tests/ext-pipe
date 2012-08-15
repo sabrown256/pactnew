@@ -47,13 +47,13 @@ foreach i (1 2 3)
 
 # simple bonded stdout/stderr variants
       case 2:
-           set cmd = ( gexec ls 'ext-*e' foo.h "'|'" cat -n >&! $raw )
-           set gst = "2 0"
+           set cmd = ( gexec osrc -t s2 "'|'" cat -n >&! $raw )
+           set gst = "1 0"
            set srt = TRUE
            breaksw
       case 3:
-           set cmd = ( gexec ls 'ext-*e' foo.h "'|&'" cat -n >&! $raw )
-           set gst = "2 0"
+           set cmd = ( gexec osrc -t s3 "'|&'" cat -n >&! $raw )
+           set gst = "1 0"
            set srt = TRUE
            breaksw
    endsw

@@ -115,7 +115,7 @@ static int sema_exists(char *fmt, ...)
 
 	 flog = name_log(s);
 	 wh   = C_OR_S(srv.server == 0);
-	 log_activity(flog, dbg_sock, wh, "exist |%s| (%s)",
+	 log_activity(flog, dbg_sock, 2, wh, "exist |%s| (%s)",
 		      sock,
 		      (rv == TRUE) ? "yes" : "no");};
 #endif
@@ -139,7 +139,7 @@ static int connect_close(int fd, client *cl, char *root)
     close(fd);
 
     flog = name_log(root);
-    log_activity(flog, dbg_sock, wh,
+    log_activity(flog, dbg_sock, 2, wh,
 		 "close socket %d", fd);
 
     return(-1);}
@@ -259,20 +259,22 @@ static int connect_server(client *cl)
 	if (err >= 0)
 	   {err = getsockname(fds, sa, &len);
 	    if (err == -1)
-	       log_activity(flog, dbg_sock, "SERVER",
+	       log_activity(flog, dbg_sock, 1, "SERVER",
 			    "getsockname error %d - %s (%d)",
 			    fds, strerror(errno), errno);
 
-	    log_activity(flog, dbg_sock, "SERVER", "accept on %d ...", fds);
+	    log_activity(flog, dbg_sock, 2, "SERVER",
+			 "accept on %d ...", fds);
 	    fdc = accept(fds, sa, &len);
 	    if (fdc >= 0)
-	       log_activity(flog, dbg_sock, "SERVER", "accept ok %d", fdc);
+	       log_activity(flog, dbg_sock, 2, "SERVER",
+			    "accept ok %d", fdc);
 	    else
-	       log_activity(flog, dbg_sock, "SERVER",
+	       log_activity(flog, dbg_sock, 1, "SERVER",
 			    "accept ng (%s - %d)",
 			    strerror(errno), errno);}
 	else
-	   log_activity(flog, dbg_sock, "SERVER",
+	   log_activity(flog, dbg_sock, 1, "SERVER",
 			"listen error on %d - (%s - %d)",
 			fds, strerror(errno), errno);};
 
@@ -347,12 +349,12 @@ static int connect_client(client *cl)
 
 /* report the connection status */
 		    if (err >= 0)
-		       log_activity(flog, dbg_sock,
-				    "CLIENT", "connect %s@%s on %d (attempt %d)",
+		       log_activity(flog, dbg_sock, 2, "CLIENT",
+				    "connect %s@%s on %d (attempt %d)",
 				    host, prt, fd, ia);
 		    else
 		       {fd = connect_close(fd, cl, NULL);
-			log_activity(flog, dbg_sock, "CLIENT",
+			log_activity(flog, dbg_sock, 1, "CLIENT",
 				     "connect error %s@%s  %d - %s (%d)",
 				     host, prt, fd,
 				     strerror(errno), errno);};
@@ -381,7 +383,7 @@ static int connect_error(client *cl)
     srv = cl->server;
     fds = srv->server;
     if (fds < 0)
-       log_activity(flog, dbg_sock, "CLIENT",
+       log_activity(flog, dbg_sock, 1, "CLIENT",
 		    "no server connection available");
 
     return(-1);}
@@ -424,7 +426,7 @@ static int open_server(char *root)
 
     wh   = C_OR_S(srv.server == 0);
     flog = name_log(root);
-    log_activity(flog, dbg_sock, wh, "open %d", rv);
+    log_activity(flog, dbg_sock, 2, wh, "open %d", rv);
 
     return(rv);}
 
@@ -449,7 +451,7 @@ static int close_sock(char *root)
 	wh = C_OR_S(srv.server == 0);
 
 	flog = name_log(root);
-	log_activity(flog, dbg_sock, wh, "close %d", st);};
+	log_activity(flog, dbg_sock, 2, wh, "close %d", st);};
 
     return(rv);}
 
@@ -459,7 +461,7 @@ static int close_sock(char *root)
 /* READ_SOCK - read from the socket ROOT into S */
 
 static int read_sock(client *cl, char *s, int nc)
-   {int nb, fd;
+   {int nb, fd, ev;
     char *flog, *wh, *root;
 
     wh   = C_OR_S(cl->type == CLIENT);
@@ -469,26 +471,36 @@ static int read_sock(client *cl, char *s, int nc)
 
     if (fd < 0)
        {nb = -1;
-	log_activity(flog, dbg_sock, wh, "read - no connection");}
+	log_activity(flog, dbg_sock, 1, wh, "read - no connection");}
 
     else
        {nb = read(fd, s, nc);
+	ev = errno;
 
 /* guarantee NULL termination */
 	s[nc-1] = '\0';
 
-	if (s[nb] != '\0')
-	   s[nb] = '\0';
-
 	if (nb > 0)
-	   log_activity(flog, dbg_sock, wh, "read %d |%s| (%d)",
-			fd, s, nb);
-	else if (nb == 0)
-	   nb = -1;
+	   {if (s[nb] != '\0')
+	       s[nb] = '\0';
+
+	    log_activity(flog, dbg_sock, 1, wh,
+			 "read %d |%s| (%d)",
+			 fd, s, nb);}
 	else
-	   {log_activity(flog, dbg_sock, wh, "read %d |%s| - %s (%d)",
-			 fd, s, strerror(errno), errno);
-	    nb = -2;};};
+	   {s[0] = '\0';
+
+	    if (nb == 0)
+	       {log_activity(flog, dbg_sock, 2, wh,
+			     "read %d - zero byte", fd);
+/* GOCTHA: should probably be moved to async_server in perdb.c */
+		cl->fd = connect_close(fd, cl, NULL);
+		nb = -1;}
+	    else
+	       {log_activity(flog, dbg_sock, 1, wh,
+			     "read %d error - %s (%d)",
+			     fd, strerror(ev), ev);
+		nb = -2;};};};
 
     return(nb);}
 
@@ -510,10 +522,10 @@ static int write_sock(client *cl, char *s, int nc)
 	fd   = client_fd(cl);
 
 	if (fd < 0)
-	   log_activity(flog, dbg_sock, wh, "write - no connection");
+	   log_activity(flog, dbg_sock, 1, wh, "write - no connection");
 
 	else
-	   {log_activity(flog, dbg_sock, wh, "write %d |%s| ... ",
+	   {log_activity(flog, dbg_sock, 1, wh, "write %d |%s| ... ",
 			 fd, s);
 
 	    if (nc <= 0)
@@ -522,10 +534,12 @@ static int write_sock(client *cl, char *s, int nc)
 	    nb = write(fd, s, nc);
 
 	    if ((nb >= 0) && (nb == nc))
-	       log_activity(flog, dbg_sock, wh, "write %d ok (%d bytes sent)",
+	       log_activity(flog, dbg_sock, 2, wh,
+			    "write %d ok (%d bytes sent)",
 			    fd, nb);
 	    else
-	       log_activity(flog, dbg_sock, wh, "write %d ng (%s - %d)",
+	       log_activity(flog, dbg_sock, 1, wh,
+			    "write %d ng (%s - %d)",
 			    fd, strerror(errno), errno);};};
 
     return(nb);}

@@ -2067,6 +2067,189 @@ int gexec(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
     return(st);}
 
 /*--------------------------------------------------------------------------*/
+
+/*                             VARIABLE METHOD                              */
+
+/*--------------------------------------------------------------------------*/
+
+/* GEXEC_VAR - function to access variables */
+
+int gexec_var(char *db, io_mode md, FILE **fio,
+	      char *name, int c, char **v)
+   {int i, nc, ns, rv;
+    char t[MAXLINE];
+    char *p, *vr, *vl, **sa;
+    static int ic = 0;
+
+    rv = 0;
+    vr = v[0];
+    nc = (c > 1) ? atol(v[1]) : 1;
+
+    if ((vr != NULL) && (md != IO_MODE_NONE))
+       {sa = NULL;
+
+        vl = getenv(vr);
+	if (vl != NULL)
+	   sa = lst_add(sa, vl);
+
+	switch (md)
+
+/* variable to stdout NC times */
+	   {case IO_MODE_RO :
+		 ns = lst_length(sa);
+		 for (i = 0; i < ns; i++)
+		     fprintf(fio[1], "%s ", sa[i]);
+		 fprintf(fio[1], "\n");
+		 ic++;
+		 if (ic >= nc)
+		    rv = 1;
+		 break;
+
+/* stdin to variable */
+	    case IO_MODE_WO :
+	    case IO_MODE_WD :
+	         for (i = 0; rv == 0; i++)
+		     {if (feof(fio[0]) == TRUE)
+			 rv = 1;
+		      else
+			 {p = fgets(t, MAXLINE, fio[0]);
+			  if (p != NULL)
+			     {LAST_CHAR(t) = '\0';
+			      sa = lst_add(sa, t);}
+			  else if (errno == EBADF)
+			     rv = 1;};};
+
+		 vl = concatenate(t, MAXLINE, sa, " ");
+
+		 if (IS_NULL(db) == FALSE)
+		    dbset(NULL, vr, vl);
+		 else
+		    fprintf(fio[1], "setenv %s \"%s\" ; ", vr, vl);
+
+		 break;
+
+/* stdin append to variable */
+	    case IO_MODE_APPEND :
+	         for (i = 0; rv == 0; i++)
+		     {if (feof(fio[0]) == TRUE)
+			 rv = 1;
+		      else
+			 {p = fgets(t, MAXLINE, fio[0]);
+			  if (p != NULL)
+			     {LAST_CHAR(t) = '\0';
+			      sa = lst_add(sa, t);
+			      vl = concatenate(t, MAXLINE, sa, " ");
+			      fprintf(fio[1], "%s\n", vl);}
+			  else if (errno == EBADF)
+			     rv = 1;};};
+
+		 if (IS_NULL(db) == FALSE)
+		    dbset(NULL, vr, vl);
+		 else
+		    fprintf(fio[1], "setenv %s \"%s\" ; ", vr, vl);
+
+		 break;
+
+	    default :
+		 break;};
+
+	free_strings(sa);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* GEXEC_FILE - function to access files */
+
+int gexec_file(char *db, io_mode md, FILE **fio,
+	       char *name, int c, char **v)
+   {int i, rv, ev;
+    char t[MAXLINE];
+    char *p, *fn;
+    static FILE *fp = NULL;
+
+    rv = 0;
+    fn = v[0];
+
+    if ((fn != NULL) && (md != IO_MODE_NONE))
+       {if (fp == NULL)
+
+/* open the file */
+	   {switch (md)
+	       {case IO_MODE_RO :
+		     fp = fopen(fn, "r");
+		     if (fp == NULL)
+		        fprintf(stderr, "Cannot open '%s' for reading\n", fn);
+		     break;
+
+	        case IO_MODE_WO :
+		     if (file_exists(fn) == TRUE)
+		        return(-1);
+
+	        case IO_MODE_WD :
+		     fp = fopen(fn, "w");
+		     if (fp == NULL)
+		        fprintf(stderr, "Cannot open '%s' for writing\n", fn);
+		     break;
+
+	        case IO_MODE_APPEND :
+		     fp = fopen(fn, "a");
+		     if (fp == NULL)
+		        fprintf(stderr, "Cannot open '%s' for append\n", fn);
+		     break;
+
+	       default :
+		     break;};};
+
+	if (fp != NULL)
+
+/* do the I/O */
+	   {switch (md)
+
+/* file to stdout */
+	       {case IO_MODE_RO :
+		     for (i = 0; rv == 0; i++)
+		         {if (feof(fp) == TRUE)
+			     rv = 1;
+			  else
+			     {p = fgets(t, MAXLINE, fp);
+			      if (p != NULL)
+				 fputs(p, fio[1]);};};
+		     break;
+
+/* stdin to file */
+	        case IO_MODE_WO :
+	        case IO_MODE_WD :
+	        case IO_MODE_APPEND :
+		     for (i = 0; rv == 0; i++)
+		         {if (feof(fio[0]) == TRUE)
+			     rv = 1;
+			  else
+			     {p  = fgets(t, MAXLINE, fio[0]);
+			      ev = errno;
+			      if (p != NULL)
+				 fputs(p, fp);
+			      else if (feof(fio[0]) == TRUE)
+				 rv = 1;
+			      else if (ev == EBADF)
+			         rv = 2;};};
+
+		     fflush(fp);
+		     break;
+
+	        default :
+		     break;};
+
+/*
+	    if (rv == 1)
+	       fclose(fp);
+*/
+	   };};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 #endif

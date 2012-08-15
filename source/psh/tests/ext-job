@@ -57,30 +57,30 @@ foreach i (1 2 3 4 5 6 7 8)
 
 # simple stdout and stderr variants
       case 4:
-           set cmd = ( gexec ls ext-* foo.h @o+1 @e+2 cat -n @ cat -E '>&!' $raw )
-           set gst = "2 0 0"
+           set cmd = ( gexec osrc -t j4 @o+1 @e+2 cat -n @ cat -E '>&!' $raw )
+           set gst = "1 0 0"
            set srt = TRUE
            breaksw
       case 5:
-           set cmd = ( gexec ls ext-* foo.h @o2 @e3 cat -n @ cat -E '>&!' $raw )
-           set gst = "2 0 0"
+           set cmd = ( gexec osrc -t j5 @o2 @e3 cat -n @ cat -E '>&!' $raw )
+           set gst = "1 0 0"
            set srt = TRUE
            breaksw
 
 # simple bonded stdout/stderr variants
       case 6:
-           set cmd = ( gexec ls ext-* foo.h @b cat -n '>&!' $raw )
-           set gst = "2 0"
+           set cmd = ( gexec osrc -t j6 @b cat -n '>&!' $raw )
+           set gst = "1 0"
            set srt = TRUE
            breaksw
       case 7:
-           set cmd = ( gexec ls ext-* foo.h @b+1 cat -n '>&!' $raw )
-           set gst = "2 0"
+           set cmd = ( gexec osrc -t j7 @b+1 cat -n '>&!' $raw )
+           set gst = "1 0"
            set srt = TRUE
            breaksw
       case 8:
-           set cmd = ( gexec ls ext-* foo.h @b2 cat -n '>&!' $raw )
-           set gst = "2 0"
+           set cmd = ( gexec osrc -t j8 @b2 cat -n '>&!' $raw )
+           set gst = "1 0"
            set srt = TRUE
            breaksw
    endsw

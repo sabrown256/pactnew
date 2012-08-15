@@ -26,19 +26,12 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
-(system "touch a.c b.c c.h")
-
-;(trace cat)
-(trace !)
-
 ;(process-group-debug 3)
 
 (! /bin/echo a @ /bin/echo b @ /bin/echo c)
-(! ls -1 a.c b.c c.h foo.h @o pw:cat 0 out)
-(! ls -1 a.c b.c c.h foo.h @b pw:cat 0 bond)
-(! ls -1 a.c b.c c.h foo.h @o2 @e3 pw:cat 0 out @ pw:cat 0 err)
-
-(system "rm -f a.c b.c c.h")
+(! osrc -t p1 @o pw:cat 0 out)
+(! osrc -t p2 @b pw:cat 0 bond)
+(! osrc -t p3 @o2 @e3 pw:cat 0 out @ pw:cat 0 err)
 
 (quit)
 

@@ -17,35 +17,107 @@ set exe = $BinDir/scheme
       NoteD $Log ""
       NoteD $Log "                    $msg"
 
-# basic test
-      NoteD $Log -n "                       basic ....................."
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# generic function test
+      NoteD $Log -n "                       func ......................"
       Note $Log ""
 
       set t0 = `$TIMER -r`
 
-      $CFE scheme -e -l $FilesDir/gexec.scm >&! shgex.res
+      $CFE $exe -e -l $FilesDir/gexecp.scm >&! shgexp.res
       set xstatus = $status
 
-      flog $Log ( sort shgex.res >&! shgex.srt )
-      flog $Log mv shgex.srt shgex.res
+      flog $Log ( sort shgexp.res >&! shgexp.srt )
+      flog $Log mv shgexp.srt shgexp.res
 
-      flog $Log ( diff shgex.res $FilesDir/ref/shgex >&! shgex.res.diff )
+      flog $Log ( diff shgexp.res $FilesDir/ref/shgexp >&! shgexp.res.diff )
       set dstatus = $status
 
       set dt = `$TIMER -b $t0`
       unset t0
 
       if (($xstatus != 0) || ($dstatus != 0)) then
-         flog $Log cat shgex.res
-         flog $Log cat shgex.res.diff
+         flog $Log cat shgexp.res
+         flog $Log cat shgexp.res.diff
          set xstatus = 1
       endif
 
-      set rpf = ( shgex.res* )
+      set rpf = ( shgexp.res* )
 
       $TEST_CHECK part -a gexec_basic -e $xstatus -l -dt $dt -rpf "$rpf" none
 
       @ nerr = $nerr + $status
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# file test
+      NoteD $Log -n "                       file ......................"
+      Note $Log ""
+
+      set t0 = `$TIMER -r`
+
+      $CFE $exe -e -l $FilesDir/gexecf.scm >&! shgexf.res
+      set xstatus = $status
+
+#      flog $Log ( sort shgexf.res >&! shgexf.srt )
+#      flog $Log mv shgexf.srt shgexf.res
+
+      flog $Log ( diff shgexf.res $FilesDir/ref/shgexf >&! shgexf.res.diff )
+      set dstatus = $status
+
+      set dt = `$TIMER -b $t0`
+      unset t0
+
+      if (($xstatus != 0) || ($dstatus != 0)) then
+         flog $Log cat shgexf.res
+         flog $Log cat shgexf.res.diff
+         set xstatus = 1
+      endif
+
+      set rpf = ( shgexf.res* )
+
+      $TEST_CHECK part -a gexec_file -e $xstatus -l -dt $dt -rpf "$rpf" none
+
+      @ nerr = $nerr + $status
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# variable test
+      NoteD $Log -n "                       var ......................."
+      Note $Log ""
+
+      set t0 = `$TIMER -r`
+
+      $CFE $exe -e -l $FilesDir/gexecv.scm >&! shgexv.res
+      set xstatus = $status
+
+#      flog $Log ( sort shgexv.res >&! shgexv.srt )
+#      flog $Log mv shgexv.srt shgexv.res
+
+      flog $Log ( diff shgexv.res $FilesDir/ref/shgexv >&! shgexv.res.diff )
+      set dstatus = $status
+
+      set dt = `$TIMER -b $t0`
+      unset t0
+
+      if (($xstatus != 0) || ($dstatus != 0)) then
+         flog $Log cat shgexv.res
+         flog $Log cat shgexv.res.diff
+         set xstatus = 1
+      endif
+
+      set rpf = ( shgexv.res* )
+
+      $TEST_CHECK part -a gexec_var -e $xstatus -l -dt $dt -rpf "$rpf" none
+
+      @ nerr = $nerr + $status
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
    endif
 

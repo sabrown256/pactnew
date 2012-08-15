@@ -152,7 +152,12 @@ static int _SS_proc_exec(char *db, io_mode m, FILE **fp,
 static PFPCAL _SS_maps(char *s)
    {PFPCAL f;
 
-    f = _SS_proc_exec;
+    if (strcmp(s, "var") == 0)
+       f = gexec_var;
+    else if (strcmp(s, "file") == 0)
+       f = gexec_file;
+    else
+       f = _SS_proc_exec;
 
     return(f);}
 
