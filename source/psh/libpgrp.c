@@ -1589,7 +1589,7 @@ void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
     if (map != NULL)
        {pg = s->pg;
         ne = s->ne;
-	db = NULL;
+	db = getenv("PERDB_PATH");
 
         pa = pg->parents;
 	for (ip = 0; ip < ne; ip++)
