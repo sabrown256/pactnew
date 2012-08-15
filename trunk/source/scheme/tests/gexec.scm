@@ -26,16 +26,19 @@
 ;--------------------------------------------------------------------------
 ;--------------------------------------------------------------------------
 
+(system "touch a.c b.c c.h")
+
 ;(trace cat)
 (trace !)
 
 ;(process-group-debug 3)
 
 (! /bin/echo a @ /bin/echo b @ /bin/echo c)
-(! ls -l scheme.h shtlev.c scheme_int.h foo.h @o pw:cat 0 out)
-(! ls -l scheme.h shtlev.c scheme_int.h foo.h @b pw:cat 0 bond)
-(! ls -l scheme.h shtlev.c scheme_int.h foo.h @o2 @e3 pw:cat 0 out @ pw:cat 0 err)
+(! ls -1 a.c b.c c.h foo.h @o pw:cat 0 out)
+(! ls -1 a.c b.c c.h foo.h @b pw:cat 0 bond)
+(! ls -1 a.c b.c c.h foo.h @o2 @e3 pw:cat 0 out @ pw:cat 0 err)
 
+(system "rm -f a.c b.c c.h")
 
 (quit)
 

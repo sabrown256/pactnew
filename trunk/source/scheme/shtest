@@ -23,7 +23,7 @@ while ($#argv > 0)
            echo "  t       run tests with # threads"
            echo "  vg      run tests under valgrind"
            echo "  <test>  one of: mem string numer"
-           echo "                  proc shell"
+           echo "                  proc gexec shell"
            echo "                  csynt bsynt"
            echo ""
            exit(1)
@@ -64,7 +64,7 @@ else if (-e $BinDir/scheme) then
 
    if ("$Tests" == "") then
       set Tests = ""
-      set Tests = ( $Tests mem string numer proc shell csynt bsynt )
+      set Tests = ( $Tests mem string numer proc gexec shell csynt bsynt )
    endif
 
    foreach i ($Tests)

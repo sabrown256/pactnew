@@ -96,11 +96,12 @@ foreach i (1 2 3 4 5 6 7 8)
    endif
 
    flog $Log cat $res
-
    if ($?PERDB_PATH == 0) then
       eval `grep "setenv gstatus" $res`
       grep -v "setenv gstatus" $res >&! $res.new
       flog $Log mv $res.new $res
+   else
+      dbget gstatus
    endif
 
    Note $Log "> gstatus = $gstatus"

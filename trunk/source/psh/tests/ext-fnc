@@ -101,6 +101,8 @@ foreach i (1 2 3 4 5 6)
       eval `grep "setenv gstatus" $res`
       grep -v "setenv gstatus" $res >&! $res.new
       flog $Log mv $res.new $res
+   else
+      dbget gstatus
    endif
 
    Note $Log "> gstatus = $gstatus"
