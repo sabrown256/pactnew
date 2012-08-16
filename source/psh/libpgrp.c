@@ -226,62 +226,6 @@ int _io_mode(io_kind knd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* DPRIOC - print NC io_connectors from IOC */
-
-void dprioc(char *tag, int np, io_connector *ioc)
-   {int i, fd, io, gid, nc;
-    char *hnd, *knd, *dev;
-    io_connector *pioc;
-    static char *hn[]  = {"none", "clos", "pipe", "fnc", "poll"};
-    static char *kn[]  = {"none", "in", "out", "err", "bond",
-			  "status", "rsrc", "limit", "env"};
-    static char *dn[]  = {"none", "pipe", "sock", "pty", "term", "fnc"};
-
-    nc = N_IO_CHANNELS*np;
-
-    _dbg(-1, "-----------------------------------------------");
-    _dbg(-1, "%s  ioc", tag);
-    _dbg(-1, "%d processes   %d connections", np, nc);
-
-    _dbg(-1, "Unit       fd gid  hnd  knd  dev #");
-    for (i = 0; i < nc; i++)
-        {pioc = ioc + i;
-
-	 io = i % N_IO_CHANNELS;
-	 if (io == 0)
-	    _dbg(-1, "");
-
-	 fd  = pioc->in.fd;
-	 gid = pioc->in.gid;
-	 hnd = hn[pioc->in.hnd];
-	 knd = kn[pioc->in.knd + 1];
-	 dev = dn[pioc->in.dev];
-
-	 if (pioc->in.dev == IO_DEV_PIPE)
-	    _dbg(-1, "%2d  read  %3d %3d %4s %4s %4s %d",
-		 io, fd, gid, hnd, knd, dev, gid);
-	 else
-	    _dbg(-1, "%2d  read  %3d %3d %4s %4s %4s",
-		 io, fd, gid, hnd, knd, dev);
-
-	 fd  = pioc->out.fd;
-	 gid = pioc->out.gid;
-	 hnd = hn[pioc->out.hnd];
-	 knd = kn[pioc->out.knd + 1];
-	 dev = dn[pioc->out.dev];
-
-	 if (pioc->out.dev == IO_DEV_PIPE)
-	    _dbg(-1, "    write %3d %3d %4s %4s %4s %d",
-		 fd, gid, hnd, knd, dev, gid);
-	 else
-	    _dbg(-1, "    write %3d %3d %4s %4s %4s",
-		 fd, gid, hnd, knd, dev);};
-
-    return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* DPRGRP - diagnostic print of process_group tasks */
 
 void dprgrp(char *tag, process_group *pg)
@@ -408,10 +352,6 @@ void redirect_io(process_group *pg, int ip, iodes *io)
 /* add the redirect specifications to the filedes */
     switch (io->knd)
        {case IO_STD_IN :
-	     pio    = &pp->ioc[io->knd].in;
-	     io->fd = pio->fd;
-	     *pio   = *io;
-
 	     pio    = pp->io + io->knd;
 	     io->fd = pio->fd;
 	     *pio   = *io;
@@ -419,28 +359,12 @@ void redirect_io(process_group *pg, int ip, iodes *io)
 
         case IO_STD_OUT :
         case IO_STD_ERR :
-	     pio    = &pp->ioc[io->knd].out;
-	     io->fd = pio->fd;
-	     *pio   = *io;
-
 	     pio    = pp->io + io->knd;
 	     io->fd = pio->fd;
 	     *pio   = *io;
 	     break;
 
         case IO_STD_BOND :
-	     pio    = &pp->ioc[IO_STD_OUT].out;
-	     io->fd = pio->fd;
-	     *pio   = *io;
-	     pio    = &pp->ioc[IO_STD_ERR].out;
-	     *pio   = *io;
-
-	     pio    = &cp->ioc[IO_STD_OUT].out;
-	     io->fd = pio->fd;
-	     *pio   = *io;
-	     pio    = &cp->ioc[IO_STD_ERR].out;
-	     *pio   = *io;
-
 	     pio    = pp->io + IO_STD_OUT;
 	     io->fd = pio->fd;
 	     *pio   = *io;
@@ -627,28 +551,15 @@ static void unquote_process(process *pp)
  */
 
 void fillin_pgrp(process_group *pg)
-   {int i, ip, np, gid;
-    io_connector *ioc, *pioc;
+   {int ip, np, gid;
     process **pa, *pp;
     iodes *pio, *dio;
 
-    np  = pg->np;
-    pa  = pg->parents;
-    ioc = pg->ioc;
+    np = pg->np;
+    pa = pg->parents;
 
     for (ip = 0; ip < np; ip++)
         {pp = pa[ip];
-
-	 for (i = 0; i < N_IO_CHANNELS; i++)
-	     {pioc = ioc + N_IO_CHANNELS*ip + i;
-
-	      if (pioc->in.hnd == IO_HND_NONE)
-		 {pioc->in.hnd  = (pp->isfunc) ? IO_HND_FNC : IO_HND_POLL;
-		  pioc->in.mode = IO_MODE_RO;}
-
-	      if (pioc->out.hnd == IO_HND_NONE)
-		 {pioc->out.hnd  = (pp->isfunc) ? IO_HND_FNC : IO_HND_POLL;
-		  pioc->out.mode = IO_MODE_WD;};};
 
 /* stdout */
          pio = pp->io + 1;
@@ -717,15 +628,8 @@ static int transfer_fd(process *pn, io_kind pk, process *cn, io_kind ck)
 static int watch_fd(process *pn, io_kind pk)
    {int ip, fd;
     io_hand hnd;
-    io_connector *ioc;
 
     ip  = pn->ip;
-    ioc = pn->ioc + pk;
-    fd  = (pk == IO_STD_IN) ? ioc->out.fd  : ioc->in.fd;
-    hnd = (pk == IO_STD_IN) ? ioc->out.hnd : ioc->in.hnd;
-    fd  = ioc->in.fd;
-    hnd = ioc->in.hnd;
-
     fd  = pn->io[pk].fd;
     hnd = pn->io[pk].hnd;
 
@@ -734,40 +638,9 @@ static int watch_fd(process *pn, io_kind pk)
 
 	_dbg(1, "watch fd=%d on %d @ %s", fd, ip, _name_io(pk));
 
-	ioc->out.hnd   = IO_HND_POLL;
 	pn->io[pk].hnd = IO_HND_POLL;};
 
     return(fd);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* TRANSFER_IO - transfer the B connector to A
- *             - the A connector is specified by IOC, IA, and AK
- *             - the B connector is specified by IOC, IB, and BK
- */
-
-static void transfer_io(io_connector *ioc, int ia, io_kind ak,
-			int ib, io_kind bk)
-   {io_connector *pia, *pib;
-
-    pia = ioc + N_IO_CHANNELS*ia + ak;
-    pib = ioc + N_IO_CHANNELS*ib + bk;
-
-    pib->in.fd   = pia->in.fd;
-    pib->in.dev  = IO_DEV_PIPE;
-    pib->in.hnd  = IO_HND_PIPE;
-    pib->in.gid  = ia;
-
-    pib->out.fd  = pia->out.fd;
-    pia->out.dev = IO_DEV_PIPE;
-    pia->out.hnd = IO_HND_PIPE;
-    pia->out.gid = ib;
-    pia->in.dev  = IO_DEV_PIPE;
-    pia->in.hnd  = IO_HND_PIPE;
-    pia->in.gid  = ib;
-
-    return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -993,14 +866,12 @@ void transfer_fnc_child(process_group *pg)
 
 static void reconnect_pgrp(process_group *pg)
    {int i, nm, n;
-    io_connector *ioc;
     process *pt, *pp, *cp;
     process **pa, **ca;
 
     n   = pg->np;
     pa  = pg->parents;
     ca  = pg->children;
-    ioc = pg->ioc;
     pt  = pg->terminal;
     nm  = n - 1;
 
@@ -1022,32 +893,9 @@ static void reconnect_pgrp(process_group *pg)
  * the final parent out gets connected to the first child in
  */
     if (nm > 0)
-       {int ig, ip;
-	io_connector *sio;
-
-	transfer_io(ioc, 0, IO_STD_IN, nm, IO_STD_OUT);
-        for (ip = 0; ip < n; ip++)
-            {for (i = 0; i < N_IO_CHANNELS; i++)
-                 {sio = ioc + N_IO_CHANNELS*ip + i;
-		  ig  = sio->out.gid;
-		  if ((sio->out.dev == IO_DEV_PIPE) &&
-		      (sio->out.hnd != IO_HND_PIPE))
-		     transfer_io(ioc, ig, IO_STD_IN, ip, i);
-		  else if ((sio->in.dev == IO_DEV_PIPE) &&
-			   (sio->in.hnd != IO_HND_PIPE))
-		     transfer_io(ioc, ig, IO_STD_OUT, ip, i);};};
-                     
-        for (ip = 0; ip < n; ip++)
-            {for (i = 0; i < N_IO_CHANNELS; i++)
-                 {sio = ioc + N_IO_CHANNELS*ip + i;
-		  if ((sio->in.dev == IO_DEV_PIPE) &&
-		      (sio->out.hnd != IO_HND_PIPE))
-		     {sio->out.dev = IO_DEV_PIPE;
-		      sio->out.hnd = IO_HND_PIPE;
-		      sio->out.gid = sio->in.gid;};};};
 
 /* reconnect terminal process output to first process */
-	transfer_fd(pa[0], IO_STD_OUT, pt, IO_STD_OUT);
+       {transfer_fd(pa[0], IO_STD_OUT, pt, IO_STD_OUT);
 
 /* close all other parent to child lines */
 	close_parent_child(pg);
@@ -1078,13 +926,11 @@ static void reconnect_pgrp(process_group *pg)
 static void setup_pgrp(process_group *pg, int it,
 		       char **ta, int dosh, char **ios)
    {process *pp, *cp, **pa, **ca;
-    io_connector *ioc;
 
-    pa  = pg->parents;
-    ca  = pg->children;
-    ioc = pg->ioc + N_IO_CHANNELS*it;
+    pa = pg->parents;
+    ca = pg->children;
 
-    pg->to = _job_setup_proc(&pp, &cp, ioc, ta, pg->env, pg->shell);
+    pg->to = _job_setup_proc(&pp, &cp, ta, pg->env, pg->shell);
 
     pp->ios = ios;
     pp->ip  = it;
@@ -1229,46 +1075,12 @@ char **subst_syntax(char **sa)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* MK_CONNECTORS - initialize a set of io_connectors for NP processes */
-
-io_connector *mk_connectors(int np)
-   {int ip, i;
-    io_device dev;
-    io_mode md;
-    io_connector *ioc, *pioc;
-
-    ioc = MAKE_N(io_connector, N_IO_CHANNELS*np);
-    for (ip = 0; ip < np; ip++)
-        {for (i = 0; i < N_IO_CHANNELS; i++)
-	     {pioc = ioc + N_IO_CHANNELS*ip + i;
-
-	      dev = IO_DEV_TERM;
-	      md  = _io_mode(i);
-
-	      pioc->in.knd   = i;
-	      pioc->in.dev   = dev;
-	      pioc->in.mode  = md;
-	      pioc->in.gid   = -1;
-	      pioc->in.fd    = -1;
-
-	      pioc->out.knd  = i;
-	      pioc->out.dev  = dev;
-	      pioc->out.mode = md;
-	      pioc->out.gid  = -1;
-	      pioc->out.fd   = -1;};};
-
-    return(ioc);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* PARSE_PGRP - parse out specifications in S to initialize PG */
 
 static void parse_pgrp(statement *s)
    {int i, j, it, nc, dosh, doif, term;
     char *t, *shell;
     char **sa, **ta, **env, **ios;
-    io_connector *ioc;
     process **pa, **ca;
     process_group *pg;
 
@@ -1290,8 +1102,6 @@ static void parse_pgrp(statement *s)
     pa  = MAKE_N(process *, nc);
     ca  = MAKE_N(process *, nc);
 
-    ioc = mk_connectors(nc);
-
     pg = MAKE(process_group);
     if (pg != NULL)
        {pg->np       = 0;
@@ -1300,7 +1110,6 @@ static void parse_pgrp(statement *s)
 	pg->shell    = shell;
 	pg->env      = env;
 	pg->terminal = NULL;
-	pg->ioc      = ioc;
 	pg->parents  = pa;
 	pg->children = ca;};
 

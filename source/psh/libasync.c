@@ -160,7 +160,6 @@ typedef struct pollfd apollfd;
 typedef struct s_process process;
 typedef struct s_process_group process_group;
 typedef struct s_process_stack process_stack;
-typedef struct s_io_connector io_connector;
 typedef struct s_iodes iodes;
 
 /* NOTE: one of the difficulties in managing the connections between
@@ -176,15 +175,6 @@ struct s_iodes
     int gid;                /* index of process group member for redirect */
     int fd;                 /* file descriptor of connection end-point */
     FILE *fp;};             /* FILE pointer for FD */
-
-/* connection between process
- * parent associates with one end
- * child associates with the other end
- */
-
-struct s_io_connector
-   {iodes in;                /* descriptor for input - read */
-    iodes out;};             /* descriptor for output - write */
 
 struct s_process
    {int ip;                                                /* process index */
@@ -202,7 +192,6 @@ struct s_process
     char *shell;
     char mode[10];
 
-    io_connector *ioc;
     iodes io[N_IO_CHANNELS];
 
     double start_time;
@@ -219,7 +208,6 @@ struct s_process_group
     char *mode;             /* IPC mode */
     char *shell;
     char **env;
-    io_connector *ioc;
     process *terminal;      /* terminal process */
     process **parents;      /* parent process array */
     process **children;};   /* child process array */
@@ -655,125 +643,68 @@ static int _job_set_attr(int fd, int i, int state)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _IOC_INIT - initialize the io_connector IOC */
-
-static int _ioc_init(io_connector *ioc)
-   {int st;
-    int ports[2];
-
-    st = -1;
-
-    if (ioc != NULL)
-       {st = pipe(ports);
-	if (st == 0)
-	   {ioc->in.fd  = ports[0];
-	    ioc->out.fd = ports[1];};};
-
-    return(st);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _JOB_SET_IPC - set the inter-process communications channels
- *              - for PP and CP from IOC prior to launching the job
- *              - the separation between _JOB_INIT_IPC and _JOB_SET_IPC
- *              - allows for redirections between processes
- *              - return TRUE iff successful
- */
-
-static int _job_set_ipc(process *pp, process *cp)
-   {int rv;
-    io_connector *ioc;
-
-    rv = FALSE;
-
-    if (pp->ioc == cp->ioc)
-       {rv = TRUE;
-
-	ioc = pp->ioc;
-
-/* child stdin */
-	cp->io[0].fd = ioc[IO_STD_IN].in.fd;
-	pp->io[1].fd = ioc[IO_STD_IN].out.fd;
-
-/* child stdout */
-	cp->io[1].fd = ioc[IO_STD_OUT].out.fd;
-	pp->io[0].fd = ioc[IO_STD_OUT].in.fd;
-
-/* child stderr */
-	cp->io[2].fd = ioc[IO_STD_ERR].out.fd;
-	pp->io[2].fd = ioc[IO_STD_ERR].in.fd;
-
-#if 1
-        io_device medium;
-
-	medium = IO_DEV_PIPE;
-	if (medium == IO_DEV_PIPE)
-	   {_job_set_attr(pp->io[0].fd, O_RDONLY | O_NDELAY, TRUE);
-	    _job_set_attr(pp->io[1].fd, O_WRONLY, TRUE);
-	    _job_set_attr(pp->io[2].fd, O_WRONLY, TRUE);
-
-	    _job_set_attr(cp->io[0].fd, O_RDONLY & ~O_NDELAY, TRUE);
-	    _job_set_attr(cp->io[1].fd, O_WRONLY, TRUE);
-	    _job_set_attr(cp->io[2].fd, O_WRONLY, TRUE);}
-
-	else if (medium == IO_DEV_SOCKET)
-	   {_job_set_attr(pp->io[0].fd, O_RDWR,   TRUE);
-	    _job_set_attr(pp->io[1].fd, O_RDWR,   TRUE);
-	    _job_set_attr(pp->io[2].fd, O_WRONLY, TRUE);
-
-	    _job_set_attr(cp->io[0].fd, O_RDWR,   TRUE);
-	    _job_set_attr(cp->io[1].fd, O_RDWR,   TRUE);
-	    _job_set_attr(cp->io[2].fd, O_WRONLY, TRUE);};
-#endif
-        };
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _JOB_INIT_IPC - establish two inter-process communications channels
  *               - the input channel should always be unblocked
  *               - return TRUE iff successful
  */
 
-static int _job_init_ipc(process *pp, process *cp, io_connector *ioc)
+static int _job_init_ipc(process *pp, process *cp)
    {int st, rv;
+    int fds[2];
+    io_device medium;
 
-    rv = FALSE;
-
-    if (ioc != NULL)
-       {rv = TRUE;
+    rv = TRUE;
 
 /* child stdin */
-        if (rv == TRUE)
-	   {st = _ioc_init(ioc + IO_STD_IN);
-	    if (st < 0)
-	       {_fd_close(pp->io[0].fd);
-		_fd_close(cp->io[1].fd);
-		fprintf(stderr, "COULDN'T CREATE PIPE #1 - _JOB_INIT_IPC\n");
-		rv = FALSE;};};
+    if (rv == TRUE)
+       {st = pipe(fds);
+	if (st < 0)
+	   {_fd_close(pp->io[0].fd);
+	    _fd_close(cp->io[1].fd);
+	    fprintf(stderr, "COULDN'T CREATE PIPE #1 - _JOB_INIT_IPC\n");
+	    rv = FALSE;}
+	else
+	   {cp->io[0].fd = fds[0];
+	    pp->io[1].fd = fds[1];};};
 
 /* child stdout */
-	if (rv == TRUE)
-	   {st = _ioc_init(ioc + IO_STD_OUT);
-	    if (st < 0)
-	       {fprintf(stderr, "COULDN'T CREATE PIPE #2 - _JOB_INIT_IPC\n");
-		rv = FALSE;};};
+    if (rv == TRUE)
+       {st = pipe(fds);
+	if (st < 0)
+	   {fprintf(stderr, "COULDN'T CREATE PIPE #2 - _JOB_INIT_IPC\n");
+	    rv = FALSE;}
+	else
+	   {cp->io[1].fd = fds[1];
+	    pp->io[0].fd = fds[0];};};
 
 /* child stderr */
-	if (rv == TRUE)
-	   {st = _ioc_init(ioc + IO_STD_ERR);
-	    if (st < 0)
-	       {fprintf(stderr, "COULDN'T CREATE PIPE #3 - _JOB_INIT_IPC\n");
-		rv = FALSE;};};
+    if (rv == TRUE)
+       {st = pipe(fds);
+	if (st < 0)
+	   {fprintf(stderr, "COULDN'T CREATE PIPE #3 - _JOB_INIT_IPC\n");
+	    rv = FALSE;}
+	else
+	   {cp->io[2].fd = fds[1];
+	    pp->io[2].fd = fds[0];};};
 
-	if (rv == TRUE)
-	   {pp->ioc = ioc;
-	    cp->ioc = ioc;};};
+    medium = IO_DEV_PIPE;
+    if (medium == IO_DEV_PIPE)
+       {_job_set_attr(pp->io[0].fd, O_RDONLY | O_NDELAY, TRUE);
+	_job_set_attr(pp->io[1].fd, O_WRONLY, TRUE);
+	_job_set_attr(pp->io[2].fd, O_WRONLY, TRUE);
 
-    _job_set_ipc(pp, cp);
+	_job_set_attr(cp->io[0].fd, O_RDONLY & ~O_NDELAY, TRUE);
+	_job_set_attr(cp->io[1].fd, O_WRONLY, TRUE);
+	_job_set_attr(cp->io[2].fd, O_WRONLY, TRUE);}
+
+    else if (medium == IO_DEV_SOCKET)
+       {_job_set_attr(pp->io[0].fd, O_RDWR,   TRUE);
+	_job_set_attr(pp->io[1].fd, O_RDWR,   TRUE);
+	_job_set_attr(pp->io[2].fd, O_WRONLY, TRUE);
+
+	_job_set_attr(cp->io[0].fd, O_RDWR,   TRUE);
+	_job_set_attr(cp->io[1].fd, O_RDWR,   TRUE);
+	_job_set_attr(cp->io[2].fd, O_WRONLY, TRUE);};
 
     return(rv);}
 
@@ -936,7 +867,7 @@ static char *_job_command_str(char **al)
  *                 - setup and exec
  */
 
-static int _job_setup_proc(process **ppp, process **pcp, io_connector *ioc,
+static int _job_setup_proc(process **ppp, process **pcp,
 			   char **arg, char **env, char *shell)
    {int to, st;
     process *pp, *cp;
@@ -947,7 +878,7 @@ static int _job_setup_proc(process **ppp, process **pcp, io_connector *ioc,
     if ((cp != NULL) && (pp != NULL))
 
 /* set up the communications pipe */
-       {st = _job_init_ipc(pp, cp, ioc);
+       {st = _job_init_ipc(pp, cp);
 	if (st == FALSE)
 	   {FREE(pp);
 	    FREE(cp);
@@ -1075,15 +1006,13 @@ static void _job_timeout(int to)
 
 process *job_launch(char *cmd, char *mode, void *a)
    {char **argv;
-    io_connector *ioc;
     process *pp, *cp;
 
     pp = NULL;
 
     argv = tokenize(cmd, " \t");
     if (argv != NULL)
-       {ioc = MAKE_N(io_connector, 3);
-	_job_setup_proc(&pp, &cp, ioc, argv, NULL, NULL);
+       {_job_setup_proc(&pp, &cp, argv, NULL, NULL);
 	pp = _job_fork(pp, cp, argv, mode, a);
 
 	free_strings(argv);};
