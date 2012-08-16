@@ -35,6 +35,7 @@ while ($#argv > 0)
 end
 
 if ("$lst" == "") then
+#   set lst = ( job pipe fnc file var fan )
    set lst = ( job pipe fnc file var )
 endif
 

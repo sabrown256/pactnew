@@ -238,7 +238,7 @@ void dprgrp(char *tag, process_group *pg)
     _dbg(-1, "%s  group", tag);
     _dbg(-1, "%d processes", n);
 
-    _dbg(-1, "         Unit  fd  dev  knd  hnd gid");
+    _dbg(-1, "         Unit  fd     dev  knd  hnd gid");
     for (i = 0; i < n; i++)
         {pp = pg->parents[i];
 	 cp = pg->children[i];
@@ -590,39 +590,6 @@ void fillin_pgrp(process_group *pg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* TRANSFER_FD - transfer the KND descriptor of PN to CN */
-
-static int transfer_fd(process *pn, io_kind pk, process *cn, io_kind ck)
-   {int fd;
-    iodes *pio, *cio;
-    FILE *fp;
-
-    pio = pn->io + pk;
-    cio = cn->io + ck;
-
-    fd = pio->fd;
-    fp = pio->fp;
-
-    pio->hnd = IO_HND_PIPE;
-    pio->fp  = NULL;
-
-    pio->fd  *= -1;
-    pio->hnd  = IO_HND_CLOSE;
-
-/* GOTCHA: we can close something we need in the bonded case
- * or leak descriptors in the other cases
- * better bookkeeping is needed here
-    _fd_close(cio->fd);
- */
-    cio->hnd = IO_HND_PIPE;
-    cio->fp  = fp;
-    cio->fd  = fd;
-
-    return(fd);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* WATCH_FD - register the KND descriptor of PN to be polled */
 
 static int watch_fd(process *pn, io_kind pk)
@@ -639,6 +606,48 @@ static int watch_fd(process *pn, io_kind pk)
 	_dbg(1, "watch fd=%d on %d @ %s", fd, ip, _name_io(pk));
 
 	pn->io[pk].hnd = IO_HND_POLL;};
+
+    return(fd);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TRANSFER_FD - transfer the KND descriptor of PN to CN */
+
+static int transfer_fd(process *pn, io_kind pk, process *cn, io_kind ck)
+   {int fd;
+    iodes *pio, *cio;
+    FILE *fp;
+
+    pio = pn->io + pk;
+    cio = cn->io + ck;
+
+    if (cio->nc <= 1)
+       {fd = pio->fd;
+	fp = pio->fp;
+
+	pio->hnd = IO_HND_PIPE;
+	pio->fp  = NULL;
+
+	pio->fd  *= -1;
+	pio->hnd  = IO_HND_CLOSE;
+
+/* GOTCHA: we can close something we need in the bonded case
+ * or leak descriptors in the other cases
+ * better bookkeeping is needed here
+    _fd_close(cio->fd);
+ */
+	cio->hnd = IO_HND_PIPE;
+	cio->fp  = fp;
+	cio->fd  = fd;}
+
+    else
+       {
+
+/* get the descriptor for the other end of the pipe */
+	pio->dst = _ioc_fd(cio->fd, ck);
+
+       };
 
     return(fd);}
 
@@ -673,6 +682,77 @@ void close_parent_child(process_group *pg)
 	 cio->hnd = IO_HND_CLOSE;};
 
     return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* COUNT_FAN_IN - count connections to input slots */
+
+int count_fan_in(process_group *pg)
+   {int io, ip, nd, np, gi, nc, nm;
+    io_device dv;
+    iodes *pio;
+    process *pp, **pa, **ca;
+
+    np = pg->np;
+    pa = pg->parents;
+    ca = pg->children;
+    nm = np - 1;
+
+    for (ip = 0; ip < nm; ip++)
+        {pp = pa[ip];
+
+/* stdout */
+	 pio = pp->io + IO_STD_OUT;
+	 gi  = pio->gid;
+	 dv  = pio->dev;
+
+/* default to the next process in group */
+	 if ((dv == IO_DEV_PIPE) && (gi == -1))
+	    gi = ip + 1;
+
+	 if (gi >= 0)
+	    {nc = ca[gi]->io[IO_STD_IN].nc;
+	     nc = max(nc, 0);
+	     ca[gi]->io[IO_STD_IN].nc = ++nc;}
+
+/* stderr */
+	 pio = pp->io + IO_STD_ERR;
+	 if (pio->knd != IO_STD_BOND)
+	    {gi  = pio->gid;
+	     dv  = pio->dev;
+
+/* default to the next process in group */
+	     if ((dv == IO_DEV_PIPE) && (gi == -1))
+	        gi = ip + 1;
+
+	     if (gi >= 0)
+	        {nc = ca[gi]->io[IO_STD_IN].nc;
+		 nc = max(nc, 0);
+		 ca[gi]->io[IO_STD_IN].nc = ++nc;};};};
+
+/* reset any count less than 2 to -1 */
+    nd = 0;
+    for (ip = 0; ip < nm; ip++)
+        {for (io = 0; io < N_IO_CHANNELS; io++)
+	     {pio = pp->io + io;
+	      gi  = pio->gid;
+	      dv  = pio->dev;
+
+/* default to the next process in group */
+	      if ((dv == IO_DEV_PIPE) && (gi == -1))
+		 gi = ip + 1;
+
+	      if (gi >= 0)
+		 {nc = ca[gi]->io[IO_STD_IN].nc;
+		  if (nc < 2)
+		     nc = -1;
+
+		  ca[gi]->io[IO_STD_IN].nc = nc;
+
+		  nd = (nc > 0);};};};
+
+    return(nd);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -893,9 +973,10 @@ static void reconnect_pgrp(process_group *pg)
  * the final parent out gets connected to the first child in
  */
     if (nm > 0)
+       {count_fan_in(pg);
 
 /* reconnect terminal process output to first process */
-       {transfer_fd(pa[0], IO_STD_OUT, pt, IO_STD_OUT);
+        transfer_fd(pa[0], IO_STD_OUT, pt, IO_STD_OUT);
 
 /* close all other parent to child lines */
 	close_parent_child(pg);
@@ -932,6 +1013,7 @@ static void setup_pgrp(process_group *pg, int it,
 
     pg->to = _job_setup_proc(&pp, &cp, ta, pg->env, pg->shell);
 
+    pp->pg  = pg;
     pp->ios = ios;
     pp->ip  = it;
     cp->ip  = it;
@@ -1191,12 +1273,20 @@ static void parse_pgrp(statement *s)
 /* _PGRP_ACCEPT - accept messages read from PP */
 
 int _pgrp_accept(int fd, process *pp, char *s)
-   {int rv;
+   {int io, nc, nw, fdi, fdo, rv;
 
     _dbg(2, "accept from %d", fd);
 
-    rv = fputs(s, stdout);
-    rv = (rv >= 0);
+    fdo = fileno(stdout);
+    for (io = 0; io < N_IO_CHANNELS; io++)
+        {fdi = pp->io[io].dst;
+	 if ((pp->io[io].fd == fd) && (fdi >= 0))
+	    {fdo = fdi;
+	     break;};};
+
+    nc = strlen(s);
+    nw = write(fdo, s, nc);
+    rv = (nw != nc);
 
     return(rv);}
 
@@ -1214,6 +1304,59 @@ int _pgrp_reject(int fd, process *pp, char *s)
 
     if (dbg_level & 2)
        fputs(s, stderr);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _DEREF_IO - in the case of fan in lower the count
+ *           - on the destination descriptor
+ *           - and send a SIGHUP to the destination process
+ *           - when the count drops to 0
+ */
+
+int _deref_io(process *pp)
+   {int nc, io, ip, rv;
+    iodes *cio;
+    process *pd, *cd;
+    process_group *pg;
+
+    rv = 0;
+
+    pg = pp->pg;
+    if (pg != NULL)
+       {for (io = 0; io < N_IO_CHANNELS; io++)
+	    {ip = pp->io[io].gid;
+	     if (ip >= 0)
+	        {pd = pg->parents[ip];
+		 cd = pg->children[ip];
+		 if ((pd != NULL) && (cd != NULL))
+		    {cio = cd->io + IO_STD_IN;
+
+/* lower the count on the descriptor */
+		     nc = cio->nc - 1;
+
+/* close all descriptors for the destination if nobody left to talk to it */
+		     if (nc == 0)
+		        {
+#if 0
+			 int i;
+
+			 for (i = N_IO_CHANNELS - 1; i >= 0; i--)
+			     _job_io_close(pd, i);
+
+			 if (pd->isfunc == TRUE)
+			    _dbg(2, "fin function %d: %s",
+				 pd->ip, pd->cmd);
+			 else
+			    _dbg(2, "fin process %d: (%d) %s",
+				 pd->ip, pd->id, pd->cmd);
+#endif
+			 nc--;};
+
+		     nc = max(nc, -1);
+		     cio->nc = nc;};};};};
 
     return(rv);}
 
@@ -1264,6 +1407,8 @@ void _pgrp_wait(process *pp)
 
 	_dbg(2, "   status %s (%d) (alive %d)",
 	     st, pp->reason, job_alive(pp));};
+
+    _deref_io(pp);
 
     rv = job_done(pp, SIGTERM);
     ASSERT(rv == 0);
