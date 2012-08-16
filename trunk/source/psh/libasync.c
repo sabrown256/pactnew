@@ -173,6 +173,8 @@ struct s_iodes
     io_device dev;          /* terminal, pipe, function */
     io_mode mode;           /* read, write, append */
     int gid;                /* index of process group member for redirect */
+    int nc;                 /* number of connections to fd - for fan in */
+    int dst;                /* fan in destination descriptor */
     int fd;                 /* file descriptor of connection end-point */
     FILE *fp;};             /* FILE pointer for FD */
 
@@ -200,6 +202,8 @@ struct s_process
     int (*accept)(int fd, process *pp, char *s);   /* accept messages read from job */
     int (*reject)(int fd, process *pp, char *s);   /* reject messages read from job */
     void (*wait)(process *pp);              /* call when wait says its done */
+
+    process_group *pg;               /* pointer to associated process group */
     void *a;};                 /* external data associated with the process */
 
 struct s_process_group
@@ -397,6 +401,8 @@ static void _init_iodes(int n, iodes *fd)
 	 fd[i].dev  = IO_DEV_NONE;
 	 fd[i].mode = IO_MODE_NONE;
 	 fd[i].gid  = -1;
+	 fd[i].nc   = -1;
+	 fd[i].dst  = -1;
 	 fd[i].fd   = -1;
 	 fd[i].fp   = NULL;};
 
@@ -459,6 +465,7 @@ void _init_process(process *pp)
     pp->accept      = NULL;
     pp->reject      = NULL;
     pp->wait        = NULL;
+    pp->pg          = NULL;
     pp->a           = NULL;
 
     return;}
@@ -643,6 +650,27 @@ static int _job_set_attr(int fd, int i, int state)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _IOC_FD - return the descriptor of the other end of the pipe
+ *         - associated with FD taken to be of kind K
+ */
+
+int _ioc_fd(int fd, io_kind k)
+   {int rv;
+
+/* GOTCHA: gross assumption that the write end of the pipe
+ * associated with fd has a descriptor that whose value
+ * is 1 greater than the read end which is fd
+ */
+    if (k == IO_STD_IN)
+       rv = fd + 1;
+    else
+       rv = fd - 1;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _JOB_INIT_IPC - establish two inter-process communications channels
  *               - the input channel should always be unblocked
  *               - return TRUE iff successful
@@ -714,7 +742,7 @@ static int _job_init_ipc(process *pp, process *cp)
 /* DPRDIO - print the file descriptors from an iodes PIO */
 
 void dprdio(char *tag, iodes *pio)
-   {int fd, gid;
+   {int nc, fd, gid;
     char *io, *hnd, *knd, *dev;
     static char *std[] = {"none", "in", "out", "err"};
     static char *hn[]  = {"none", "clos", "pipe", "poll"};
@@ -723,6 +751,7 @@ void dprdio(char *tag, iodes *pio)
     static char *dn[]  = {"none", "pipe", "sock", "pty", "term", "fnc"};
 
     io  = std[pio->knd + 1];
+    nc  = pio->nc;
     fd  = pio->fd;
     gid = pio->gid;
     hnd = hn[pio->hnd];
@@ -730,11 +759,11 @@ void dprdio(char *tag, iodes *pio)
     dev = dn[pio->dev];
 
     if (gid != -1)
-       _dbg(-1, "%8s %4s %3d %4s %4s %4s %3d",
-	    tag, io, fd, dev, knd, hnd, gid);
+       _dbg(-1, "%8s %4s %3d(%d) %4s %4s %4s %3d",
+	    tag, io, fd, nc, dev, knd, hnd, gid);
     else
-       _dbg(-1, "%8s %4s %3d %4s %4s %4s",
-	    tag, io, fd, dev, knd, hnd);
+       _dbg(-1, "%8s %4s %3d(%d) %4s %4s %4s",
+	    tag, io, fd, nc, dev, knd, hnd);
 
     return;}
 
@@ -748,7 +777,7 @@ void dprpio(char *tag, process *pp)
     iodes *pio;
 
     _dbg(-1, tag);
-    _dbg(-1, "         Unit  fd  dev  knd  hnd gid");
+    _dbg(-1, "         Unit  fd     dev  knd  hnd gid");
     for (i = 0; i < N_IO_CHANNELS; i++)
         {pio = pp->io + i;
 	 dprdio(" ", pio);};
