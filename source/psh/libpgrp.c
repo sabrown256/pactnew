@@ -656,7 +656,7 @@ static int transfer_fd(process *pn, io_kind pk, process *cn, io_kind ck)
 
 /* CLOSE_PARENT_CHILD - close all non-terminal parent to child lines */
 
-void close_parent_child(process_group *pg)
+void close_parent_child(process_group *pg, int tci)
    {int ip, np, nm;
     iodes *pio, *cio;
     process *pp, *cp, **pa, **ca;
@@ -664,7 +664,7 @@ void close_parent_child(process_group *pg)
     np = pg->np;
     pa = pg->parents;
     ca = pg->children;
-    nm = np - 1;
+    nm = (tci == TRUE) ? np - 1 : np;
 
     for (ip = 1; ip < nm; ip++)
         {pp = pa[ip];
@@ -698,11 +698,27 @@ int count_fan_in(process_group *pg)
     pa = pg->parents;
     ca = pg->children;
     nm = np - 1;
+    nm = np;
 
     for (ip = 0; ip < nm; ip++)
         {pp = pa[ip];
 
-/* stdout */
+/* stdin fan out */
+	 pio = pp->io + IO_STD_IN;
+	 gi  = pio->gid;
+	 dv  = pio->dev;
+
+/* default to the next process in group */
+	 if ((dv == IO_DEV_PIPE) && (gi == -1))
+	    gi = ip + 1;
+
+/* NOTE: for now fan out only to stdout */
+	 if (gi >= 0)
+	    {nc = ca[gi]->io[IO_STD_OUT].nc;
+	     nc = max(nc, 0);
+	     ca[gi]->io[IO_STD_OUT].nc = ++nc;}
+
+/* stdout fan in */
 	 pio = pp->io + IO_STD_OUT;
 	 gi  = pio->gid;
 	 dv  = pio->dev;
@@ -716,7 +732,7 @@ int count_fan_in(process_group *pg)
 	     nc = max(nc, 0);
 	     ca[gi]->io[IO_STD_IN].nc = ++nc;}
 
-/* stderr */
+/* stderr fan in */
 	 pio = pp->io + IO_STD_ERR;
 	 if (pio->knd != IO_STD_BOND)
 	    {gi  = pio->gid;
@@ -734,7 +750,8 @@ int count_fan_in(process_group *pg)
 /* reset any count less than 2 to -1 */
     nd = 0;
     for (ip = 0; ip < nm; ip++)
-        {for (io = 0; io < N_IO_CHANNELS; io++)
+        {pp = pa[ip];
+	 for (io = 0; io < N_IO_CHANNELS; io++)
 	     {pio = pp->io + io;
 	      gi  = pio->gid;
 	      dv  = pio->dev;
@@ -761,7 +778,7 @@ int count_fan_in(process_group *pg)
  *                      - to appropriate child input
  */
 
-void connect_child_out_in(process_group *pg)
+void connect_child_out_in(process_group *pg, int tci)
    {int ip, np, gi, nm;
     io_device dv;
     iodes *pio;
@@ -770,7 +787,7 @@ void connect_child_out_in(process_group *pg)
     np = pg->np;
     pa = pg->parents;
     ca = pg->children;
-    nm = np - 1;
+    nm = (tci == TRUE) ? np - 1 : np;
 
     for (ip = 0; ip < nm; ip++)
         {pp = pa[ip];
@@ -790,8 +807,8 @@ void connect_child_out_in(process_group *pg)
 /* stderr */
 	 pio = pp->io + IO_STD_ERR;
 	 if (pio->knd != IO_STD_BOND)
-	    {gi  = pio->gid;
-	     dv  = pio->dev;
+	    {gi = pio->gid;
+	     dv = pio->dev;
 
 /* default to the next process in group */
 	     if ((dv == IO_DEV_PIPE) && (gi == -1))
@@ -823,8 +840,11 @@ void transfer_in(process_group *pg, int ia, int ib, io_kind knd)
 	cia = ca->io + knd;
 	pib = pb->io + knd;
 	cib = cb->io + knd;
-	if ((cib->gid == ia) &&
-	    ((cia->dev == IO_DEV_PIPE) && (cia->gid == -1)))
+	if (cib->nc > 0)
+	   pia->src = _ioc_fd(cib->fd, knd);
+
+	else if ((cib->gid == ia) &&
+		 ((cia->dev == IO_DEV_PIPE) && (cia->gid == -1)))
 	   {fd = pia->fd;
 
 	    transfer_fd(pa, knd, cb, knd);
@@ -848,7 +868,7 @@ void transfer_in(process_group *pg, int ia, int ib, io_kind knd)
  *                      - appropriate child output
  */
 
-void connect_child_in_out(process_group *pg)
+void connect_child_in_out(process_group *pg, int tci)
    {int i0, ip, np, gi, nm;
     io_device dv;
     iodes *pia;
@@ -856,7 +876,7 @@ void connect_child_in_out(process_group *pg)
 
     np = pg->np;
     pa = pg->parents;
-    nm = np - 1;
+    nm = (tci == TRUE) ? np - 1 : np;
     i0 = 0;
 
     for (ip = i0; ip < nm; ip++)
@@ -945,7 +965,7 @@ void transfer_fnc_child(process_group *pg)
  */
 
 static void reconnect_pgrp(process_group *pg)
-   {int i, nm, n;
+   {int i, nm, n, tci;
     process *pt, *pp, *cp;
     process **pa, **ca;
 
@@ -975,21 +995,31 @@ static void reconnect_pgrp(process_group *pg)
     if (nm > 0)
        {count_fan_in(pg);
 
-/* reconnect terminal process output to first process */
-        transfer_fd(pa[0], IO_STD_OUT, pt, IO_STD_OUT);
+/* reconnect terminal process output to first process
+ * NOTE: we cannot do this if a pipe goes into the first process
+ * this is a pipeline thought - for a group we have to decided
+ * who the terminal will talk to
+	tci = (pa[0]->io[IO_STD_IN].dev == IO_DEV_TERM);
+ */
+        tci = FALSE;
+	if (tci == TRUE)
+	   transfer_fd(pa[0], IO_STD_OUT, pt, IO_STD_OUT);
 
-/* close all other parent to child lines */
-	close_parent_child(pg);
+/* close all other parent to child lines
+ * NOTE: doing this could close the descriptors for fan in
+ * to a process specified in the middle of the group
+	close_parent_child(pg, FALSE);
+ */
 
 /* connect all non-terminal children output to appropriate child input
  * there are from output specifications @o, @e, @b, @r, and @x 
  */
-	connect_child_out_in(pg);
+	connect_child_out_in(pg, FALSE);
 
 /* connect all non-terminal children input to appropriate child output
  * there are from input specifications @i, @l, and @v
  */
-	connect_child_in_out(pg);
+	connect_child_in_out(pg, FALSE);
 
 /* transfer all function call I/O to parent and free child */
 	transfer_fnc_child(pg);};
@@ -1270,12 +1300,50 @@ static void parse_pgrp(statement *s)
 
 /*--------------------------------------------------------------------------*/
 
+/* _DEREF_CLOSE - close the fan in descriptors of PP */
+
+int _deref_close(process *pp)
+   {int io, ip, lo, fdi, nc, rv;
+    iodes *cio;
+    process *pd, *cd;
+    process_group *pg;
+
+    rv = 0;
+
+    pg = pp->pg;
+    if (pg != NULL)
+       {for (io = 0; io < N_IO_CHANNELS; io++)
+	    {ip = pp->io[io].gid;
+	     if (ip >= 0)
+	        {pd = pg->parents[ip];
+		 cd = pg->children[ip];
+		 if ((pd != NULL) && (cd != NULL))
+		    {cio = cd->io + IO_STD_IN;
+		     nc  = cio->nc;
+
+		     fdi = pp->io[IO_STD_IN].dst;
+		     if ((nc == 0) && (fdi >= 0))
+		        {rv = _fd_close(fdi);
+			 nsleep(10);
+			 job_read(-1, pd, pd->accept);
+
+#if 1
+			 for (lo = N_IO_CHANNELS - 1; lo >= 0; lo--)
+			     _job_io_close(pd, lo);
+#endif
+			 _dbg(2, "close deref %d", fdi);
+
+			 break;};};};};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PGRP_ACCEPT - accept messages read from PP */
 
 int _pgrp_accept(int fd, process *pp, char *s)
    {int io, nc, nw, fdi, fdo, rv;
-
-    _dbg(2, "accept from %d", fd);
 
     fdo = fileno(stdout);
     for (io = 0; io < N_IO_CHANNELS; io++)
@@ -1283,6 +1351,8 @@ int _pgrp_accept(int fd, process *pp, char *s)
 	 if ((pp->io[io].fd == fd) && (fdi >= 0))
 	    {fdo = fdi;
 	     break;};};
+
+    _dbg(2, "accept from %d send to %d", fd, fdo);
 
     nc = strlen(s);
     nw = write(fdo, s, nc);
@@ -1336,25 +1406,6 @@ int _deref_io(process *pp)
 
 /* lower the count on the descriptor */
 		     nc = cio->nc - 1;
-
-/* close all descriptors for the destination if nobody left to talk to it */
-		     if (nc == 0)
-		        {
-#if 0
-			 int i;
-
-			 for (i = N_IO_CHANNELS - 1; i >= 0; i--)
-			     _job_io_close(pd, i);
-
-			 if (pd->isfunc == TRUE)
-			    _dbg(2, "fin function %d: %s",
-				 pd->ip, pd->cmd);
-			 else
-			    _dbg(2, "fin process %d: (%d) %s",
-				 pd->ip, pd->id, pd->cmd);
-#endif
-			 nc--;};
-
 		     nc = max(nc, -1);
 		     cio->nc = nc;};};};};
 
@@ -1412,6 +1463,9 @@ void _pgrp_wait(process *pp)
 
     rv = job_done(pp, SIGTERM);
     ASSERT(rv == 0);
+
+/* check on fan in for fan out descriptors */
+    _deref_close(pp);
 
     return;}
 

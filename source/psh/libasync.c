@@ -175,6 +175,7 @@ struct s_iodes
     int gid;                /* index of process group member for redirect */
     int nc;                 /* number of connections to fd - for fan in */
     int dst;                /* fan in destination descriptor */
+    int src;                /* fan out source descriptor */
     int fd;                 /* file descriptor of connection end-point */
     FILE *fp;};             /* FILE pointer for FD */
 
@@ -403,6 +404,7 @@ static void _init_iodes(int n, iodes *fd)
 	 fd[i].gid  = -1;
 	 fd[i].nc   = -1;
 	 fd[i].dst  = -1;
+	 fd[i].src  = -1;
 	 fd[i].fd   = -1;
 	 fd[i].fp   = NULL;};
 
@@ -742,7 +744,7 @@ static int _job_init_ipc(process *pp, process *cp)
 /* DPRDIO - print the file descriptors from an iodes PIO */
 
 void dprdio(char *tag, iodes *pio)
-   {int nc, fd, gid;
+   {int nc, fd, gid, dst, src;
     char *io, *hnd, *knd, *dev;
     static char *std[] = {"none", "in", "out", "err"};
     static char *hn[]  = {"none", "clos", "pipe", "poll"};
@@ -752,6 +754,8 @@ void dprdio(char *tag, iodes *pio)
 
     io  = std[pio->knd + 1];
     nc  = pio->nc;
+    dst = pio->dst;
+    src = pio->src;
     fd  = pio->fd;
     gid = pio->gid;
     hnd = hn[pio->hnd];
@@ -759,11 +763,11 @@ void dprdio(char *tag, iodes *pio)
     dev = dn[pio->dev];
 
     if (gid != -1)
-       _dbg(-1, "%8s %4s %3d(%d) %4s %4s %4s %3d",
-	    tag, io, fd, nc, dev, knd, hnd, gid);
+       _dbg(-1, "%8s %4s %3d(%d) %4s %4s %4s %3d %3d %3d",
+	    tag, io, fd, nc, dev, knd, hnd, gid, dst, src);
     else
-       _dbg(-1, "%8s %4s %3d(%d) %4s %4s %4s",
-	    tag, io, fd, nc, dev, knd, hnd);
+       _dbg(-1, "%8s %4s %3d(%d) %4s %4s %4s     %3d %3d",
+	    tag, io, fd, nc, dev, knd, hnd, dst, src);
 
     return;}
 
