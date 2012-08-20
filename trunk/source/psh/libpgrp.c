@@ -17,7 +17,7 @@
  *           - <shell-io>  := <shell-op> | <shell-op> <file-name>
  *           - <file-name> := 'name of file'
  *           - <shell-op>  := '<' | '>' | '>&' | '&>' | 
- *                            '>>' | '>>&' |
+ *           -                '>>' | '>>&' |
  *           -                '>!' | '>&!' |
  *           -                '1>' | '2>' | '2>&1'
  *
@@ -600,7 +600,10 @@ static int watch_fd(process *pn, io_kind pk)
     fd  = pn->io[pk].fd;
     hnd = pn->io[pk].hnd;
 
-    if ((fd > 2) && (hnd != IO_HND_PIPE) && (hnd != IO_HND_CLOSE))
+    if ((fd > 2) &&
+        (hnd != IO_HND_PIPE) &&
+	(hnd != IO_HND_CLOSE) &&
+	(pk != IO_STD_OUT))
        {_awatch_fd(pn, pk, ip);
 
 	_dbg(1, "watch fd=%d on %d @ %s", fd, ip, _name_io(pk));
@@ -622,21 +625,14 @@ static int transfer_fd(process *pn, io_kind pk, process *cn, io_kind ck)
     pio = pn->io + pk;
     cio = cn->io + ck;
 
-    if (cio->nc <= 1)
+    if (cio->fanc[IO_FAN_IN] <= 1)
        {fd = pio->fd;
 	fp = pio->fp;
 
-	pio->hnd = IO_HND_PIPE;
+	pio->hnd = IO_HND_CLOSE;
 	pio->fp  = NULL;
+	pio->fd *= -1;
 
-	pio->fd  *= -1;
-	pio->hnd  = IO_HND_CLOSE;
-
-/* GOTCHA: we can close something we need in the bonded case
- * or leak descriptors in the other cases
- * better bookkeeping is needed here
-    _fd_close(cio->fd);
- */
 	cio->hnd = IO_HND_PIPE;
 	cio->fp  = fp;
 	cio->fd  = fd;}
@@ -645,7 +641,7 @@ static int transfer_fd(process *pn, io_kind pk, process *cn, io_kind ck)
        {
 
 /* get the descriptor for the other end of the pipe */
-	pio->dst = _ioc_fd(cio->fd, ck);
+	pio->fanto[IO_FAN_IN] = _ioc_fd(cio->fd, ck);
 
        };
 
@@ -714,9 +710,9 @@ int count_fan_in(process_group *pg)
 
 /* NOTE: for now fan out only to stdout */
 	 if (gi >= 0)
-	    {nc = ca[gi]->io[IO_STD_OUT].nc;
+	    {nc = ca[gi]->io[IO_STD_OUT].fanc[IO_FAN_OUT];
 	     nc = max(nc, 0);
-	     ca[gi]->io[IO_STD_OUT].nc = ++nc;}
+	     ca[gi]->io[IO_STD_OUT].fanc[IO_FAN_OUT] = ++nc;}
 
 /* stdout fan in */
 	 pio = pp->io + IO_STD_OUT;
@@ -728,9 +724,9 @@ int count_fan_in(process_group *pg)
 	    gi = ip + 1;
 
 	 if (gi >= 0)
-	    {nc = ca[gi]->io[IO_STD_IN].nc;
+	    {nc = ca[gi]->io[IO_STD_IN].fanc[IO_FAN_IN];
 	     nc = max(nc, 0);
-	     ca[gi]->io[IO_STD_IN].nc = ++nc;}
+	     ca[gi]->io[IO_STD_IN].fanc[IO_FAN_IN] = ++nc;}
 
 /* stderr fan in */
 	 pio = pp->io + IO_STD_ERR;
@@ -743,9 +739,9 @@ int count_fan_in(process_group *pg)
 	        gi = ip + 1;
 
 	     if (gi >= 0)
-	        {nc = ca[gi]->io[IO_STD_IN].nc;
+	        {nc = ca[gi]->io[IO_STD_IN].fanc[IO_FAN_IN];
 		 nc = max(nc, 0);
-		 ca[gi]->io[IO_STD_IN].nc = ++nc;};};};
+		 ca[gi]->io[IO_STD_IN].fanc[IO_FAN_IN] = ++nc;};};};
 
 /* reset any count less than 2 to -1 */
     nd = 0;
@@ -761,11 +757,11 @@ int count_fan_in(process_group *pg)
 		 gi = ip + 1;
 
 	      if (gi >= 0)
-		 {nc = ca[gi]->io[IO_STD_IN].nc;
+		 {nc = ca[gi]->io[IO_STD_IN].fanc[IO_FAN_IN];
 		  if (nc < 2)
 		     nc = -1;
 
-		  ca[gi]->io[IO_STD_IN].nc = nc;
+		  ca[gi]->io[IO_STD_IN].fanc[IO_FAN_IN] = nc;
 
 		  nd = (nc > 0);};};};
 
@@ -840,8 +836,8 @@ void transfer_in(process_group *pg, int ia, int ib, io_kind knd)
 	cia = ca->io + knd;
 	pib = pb->io + knd;
 	cib = cb->io + knd;
-	if (cib->nc > 0)
-	   pia->src = _ioc_fd(cib->fd, knd);
+	if (cib->fanc[IO_FAN_IN] > 0)
+	   pia->fanto[IO_FAN_OUT] = _ioc_fd(cib->fd, knd);
 
 	else if ((cib->gid == ia) &&
 		 ((cia->dev == IO_DEV_PIPE) && (cia->gid == -1)))
@@ -999,27 +995,33 @@ static void reconnect_pgrp(process_group *pg)
  * NOTE: we cannot do this if a pipe goes into the first process
  * this is a pipeline thought - for a group we have to decided
  * who the terminal will talk to
-	tci = (pa[0]->io[IO_STD_IN].dev == IO_DEV_TERM);
  */
+/* #define OLDWAY */
+#ifdef OLDWAY
+	tci = (pa[0]->io[IO_STD_IN].dev == IO_DEV_TERM);
+#else
         tci = FALSE;
+#endif
 	if (tci == TRUE)
 	   transfer_fd(pa[0], IO_STD_OUT, pt, IO_STD_OUT);
 
 /* close all other parent to child lines
  * NOTE: doing this could close the descriptors for fan in
  * to a process specified in the middle of the group
-	close_parent_child(pg, FALSE);
  */
+#ifdef OLDWAY
+	close_parent_child(pg, tci);
+#endif
 
 /* connect all non-terminal children output to appropriate child input
  * there are from output specifications @o, @e, @b, @r, and @x 
  */
-	connect_child_out_in(pg, FALSE);
+	connect_child_out_in(pg, tci);
 
 /* connect all non-terminal children input to appropriate child output
  * there are from input specifications @i, @l, and @v
  */
-	connect_child_in_out(pg, FALSE);
+	connect_child_in_out(pg, tci);
 
 /* transfer all function call I/O to parent and free child */
 	transfer_fnc_child(pg);};
@@ -1319,9 +1321,9 @@ int _deref_close(process *pp)
 		 cd = pg->children[ip];
 		 if ((pd != NULL) && (cd != NULL))
 		    {cio = cd->io + IO_STD_IN;
-		     nc  = cio->nc;
+		     nc  = cio->fanc[IO_FAN_IN];
 
-		     fdi = pp->io[IO_STD_IN].dst;
+		     fdi = pp->io[IO_STD_IN].fanto[IO_FAN_IN];
 		     if ((nc == 0) && (fdi >= 0))
 		        {rv = _fd_close(fdi);
 			 nsleep(10);
@@ -1347,7 +1349,7 @@ int _pgrp_accept(int fd, process *pp, char *s)
 
     fdo = fileno(stdout);
     for (io = 0; io < N_IO_CHANNELS; io++)
-        {fdi = pp->io[io].dst;
+        {fdi = pp->io[io].fanto[IO_FAN_IN];
 	 if ((pp->io[io].fd == fd) && (fdi >= 0))
 	    {fdo = fdi;
 	     break;};};
@@ -1405,9 +1407,9 @@ int _deref_io(process *pp)
 		    {cio = cd->io + IO_STD_IN;
 
 /* lower the count on the descriptor */
-		     nc = cio->nc - 1;
+		     nc = cio->fanc[IO_FAN_IN] - 1;
 		     nc = max(nc, -1);
-		     cio->nc = nc;};};};};
+		     cio->fanc[IO_FAN_IN] = nc;};};};};
 
     return(rv);}
 
