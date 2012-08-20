@@ -141,15 +141,20 @@ typedef enum e_io_kind io_kind;
 enum e_io_device
    {IO_DEV_NONE,
     IO_DEV_PIPE, IO_DEV_SOCKET, IO_DEV_PTY, 
-    IO_DEV_TERM, IO_DEV_FNC };
+    IO_DEV_TERM, IO_DEV_FNC};
 
 typedef enum e_io_device io_device;
 
 enum e_io_mode
    {IO_MODE_NONE,
-    IO_MODE_RO, IO_MODE_WO, IO_MODE_WD, IO_MODE_APPEND };
+    IO_MODE_RO, IO_MODE_WO, IO_MODE_WD, IO_MODE_APPEND};
 
 typedef enum e_io_mode io_mode;
+
+enum e_io_fan
+   {IO_FAN_NONE = -1, IO_FAN_IN, IO_FAN_OUT};
+
+typedef enum e_io_fan io_fan;
 
 enum e_st_sep
    {ST_NEXT, ST_AND, ST_OR};
@@ -173,9 +178,8 @@ struct s_iodes
     io_device dev;          /* terminal, pipe, function */
     io_mode mode;           /* read, write, append */
     int gid;                /* index of process group member for redirect */
-    int nc;                 /* number of connections to fd - for fan in */
-    int dst;                /* fan in destination descriptor */
-    int src;                /* fan out source descriptor */
+    int fanc[2];            /* number of connections to fd - for fan in */
+    int fanto[2];           /* fan in/out descriptor */
     int fd;                 /* file descriptor of connection end-point */
     FILE *fp;};             /* FILE pointer for FD */
 
@@ -394,7 +398,7 @@ void _job_grp_attr(process *pp, int g, int t)
 /* _INIT_IODES - initialize a set of N_IO_CH iodes structures */
 
 static void _init_iodes(int n, iodes *fd)
-   {int i;
+   {int i, j;
 
     for (i = 0; i < n; i++)
         {fd[i].knd  = IO_STD_NONE;
@@ -402,11 +406,12 @@ static void _init_iodes(int n, iodes *fd)
 	 fd[i].dev  = IO_DEV_NONE;
 	 fd[i].mode = IO_MODE_NONE;
 	 fd[i].gid  = -1;
-	 fd[i].nc   = -1;
-	 fd[i].dst  = -1;
-	 fd[i].src  = -1;
 	 fd[i].fd   = -1;
-	 fd[i].fp   = NULL;};
+	 fd[i].fp   = NULL;
+
+	 for (j = 0; j < 2; j++)
+	     {fd[i].fanc[j]  = -1;
+	      fd[i].fanto[j] = -1;};};
 
     return;}
 
@@ -753,9 +758,9 @@ void dprdio(char *tag, iodes *pio)
     static char *dn[]  = {"none", "pipe", "sock", "pty", "term", "fnc"};
 
     io  = std[pio->knd + 1];
-    nc  = pio->nc;
-    dst = pio->dst;
-    src = pio->src;
+    nc  = pio->fanc[IO_FAN_IN];
+    dst = pio->fanto[IO_FAN_IN];
+    src = pio->fanto[IO_FAN_OUT];
     fd  = pio->fd;
     gid = pio->gid;
     hnd = hn[pio->hnd];
