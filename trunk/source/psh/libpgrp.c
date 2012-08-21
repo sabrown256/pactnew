@@ -710,9 +710,11 @@ int count_fan_in(process_group *pg)
 
 /* NOTE: for now fan out only to stdout */
 	 if (gi >= 0)
-	    {nc = ca[gi]->io[IO_STD_OUT].fanc[IO_FAN_OUT];
-	     nc = max(nc, 0);
-	     ca[gi]->io[IO_STD_OUT].fanc[IO_FAN_OUT] = ++nc;}
+	    {io = IO_STD_OUT;
+	     nc = ca[gi]->io[io].fanc[IO_FAN_OUT];
+	     nc = max(nc, 0) + 1;
+	     ca[gi]->io[io].fanc[IO_FAN_OUT] = nc;
+	     pa[gi]->io[IO_STD_IN].fanc[IO_FAN_OUT] = nc;}
 
 /* stdout fan in */
 	 pio = pp->io + IO_STD_OUT;
@@ -797,8 +799,16 @@ void connect_child_out_in(process_group *pg, int tci)
 	 if ((dv == IO_DEV_PIPE) && (gi == -1))
 	    gi = ip + 1;
 
+/* GOTCHA: sort this out for fan out case without
+ * breaking other tests
+ */
+#if 1
 	 if (gi >= 0)
 	    transfer_fd(pp, IO_STD_IN, ca[gi], IO_STD_IN);
+#else
+	 if ((gi >= 0) && (pp->io[IO_STD_IN].fanc[IO_FAN_OUT] < 0))
+	    transfer_fd(pp, IO_STD_IN, ca[gi], IO_STD_IN);
+#endif
 
 /* stderr */
 	 pio = pp->io + IO_STD_ERR;
@@ -822,7 +832,7 @@ void connect_child_out_in(process_group *pg, int tci)
 
 void transfer_in(process_group *pg, int ia, int ib, io_kind knd)
    {int np, fd;
-    iodes *pia, *pib, *cia, *cib;
+    iodes *pia, *pib, *pifo, *cia, *cifi;
     process *pa, *pb, *ca, *cb;
 
     np = pg->np;
@@ -835,11 +845,26 @@ void transfer_in(process_group *pg, int ia, int ib, io_kind knd)
 	pia = pa->io + knd;
 	cia = ca->io + knd;
 	pib = pb->io + knd;
-	cib = cb->io + knd;
-	if (cib->fanc[IO_FAN_IN] > 0)
-	   pia->fanto[IO_FAN_OUT] = _ioc_fd(cib->fd, knd);
 
-	else if ((cib->gid == ia) &&
+	cifi = cb->io + knd;
+	pifo = pb->io + IO_STD_IN;
+
+/* GOTCHA: sort this out for fan out case without breaking
+ * other tests
+ */
+#if 1
+	if (cifi->fanc[IO_FAN_IN] > 0)
+#else
+	if (cifi->fanc[IO_FAN_OUT] > 0)
+#endif
+           {fd = abs(pifo->fd);
+
+	    pia->fanto[IO_FAN_OUT] = fd;
+	    pifo->fd  = fd;
+	    pifo->dev = IO_DEV_TERM;
+	    pifo->hnd = IO_HND_POLL;}
+
+	else if ((cifi->gid == ia) &&
 		 ((cia->dev == IO_DEV_PIPE) && (cia->gid == -1)))
 	   {fd = pia->fd;
 
