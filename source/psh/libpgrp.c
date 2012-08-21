@@ -56,6 +56,17 @@
 #define PROCESS_DELIM   '@'
 #define PIPE_DELIM      "|"
 
+#define CHECK_FAN(_x, _n)                                                    \
+   {_n = _x;                                                                 \
+    if (_n < 2)                                                              \
+       _n = -1;                                                              \
+    _x = _n;}
+
+#define INC_FAN(_x, _n)                                                      \
+   {_n = _x;                                                                 \
+    _n = max(_n, 0) + 1;                                                     \
+    _x = _n;}
+
 typedef struct s_statement statement;
 typedef struct s_process_session process_session;
 typedef int (*PFPCAL)(char *db, io_mode m, FILE **fp,
@@ -699,23 +710,6 @@ int count_fan_in(process_group *pg)
     for (ip = 0; ip < nm; ip++)
         {pp = pa[ip];
 
-/* stdin fan out */
-	 pio = pp->io + IO_STD_IN;
-	 gi  = pio->gid;
-	 dv  = pio->dev;
-
-/* default to the next process in group */
-	 if ((dv == IO_DEV_PIPE) && (gi == -1))
-	    gi = ip + 1;
-
-/* NOTE: for now fan out only to stdout */
-	 if (gi >= 0)
-	    {io = IO_STD_OUT;
-	     nc = ca[gi]->io[io].fanc[IO_FAN_OUT];
-	     nc = max(nc, 0) + 1;
-	     ca[gi]->io[io].fanc[IO_FAN_OUT] = nc;
-	     pa[gi]->io[IO_STD_IN].fanc[IO_FAN_OUT] = nc;}
-
 /* stdout fan in */
 	 pio = pp->io + IO_STD_OUT;
 	 gi  = pio->gid;
@@ -726,9 +720,7 @@ int count_fan_in(process_group *pg)
 	    gi = ip + 1;
 
 	 if (gi >= 0)
-	    {nc = ca[gi]->io[IO_STD_IN].fanc[IO_FAN_IN];
-	     nc = max(nc, 0);
-	     ca[gi]->io[IO_STD_IN].fanc[IO_FAN_IN] = ++nc;}
+	    INC_FAN(ca[gi]->io[IO_STD_IN].fanc[IO_FAN_IN], nc);
 
 /* stderr fan in */
 	 pio = pp->io + IO_STD_ERR;
@@ -741,9 +733,7 @@ int count_fan_in(process_group *pg)
 	        gi = ip + 1;
 
 	     if (gi >= 0)
-	        {nc = ca[gi]->io[IO_STD_IN].fanc[IO_FAN_IN];
-		 nc = max(nc, 0);
-		 ca[gi]->io[IO_STD_IN].fanc[IO_FAN_IN] = ++nc;};};};
+	        INC_FAN(ca[gi]->io[IO_STD_IN].fanc[IO_FAN_IN], nc);};};
 
 /* reset any count less than 2 to -1 */
     nd = 0;
@@ -758,13 +748,9 @@ int count_fan_in(process_group *pg)
 	      if ((dv == IO_DEV_PIPE) && (gi == -1))
 		 gi = ip + 1;
 
+/* check fan in counts */
 	      if (gi >= 0)
-		 {nc = ca[gi]->io[IO_STD_IN].fanc[IO_FAN_IN];
-		  if (nc < 2)
-		     nc = -1;
-
-		  ca[gi]->io[IO_STD_IN].fanc[IO_FAN_IN] = nc;
-
+		 {CHECK_FAN(ca[gi]->io[IO_STD_IN].fanc[IO_FAN_IN], nc);
 		  nd = (nc > 0);};};};
 
     return(nd);}
@@ -799,16 +785,9 @@ void connect_child_out_in(process_group *pg, int tci)
 	 if ((dv == IO_DEV_PIPE) && (gi == -1))
 	    gi = ip + 1;
 
-/* GOTCHA: sort this out for fan out case without
- * breaking other tests
- */
-#if 1
-	 if (gi >= 0)
-	    transfer_fd(pp, IO_STD_IN, ca[gi], IO_STD_IN);
-#else
+/* GOTCHA: we don't know about fan out yet */
 	 if ((gi >= 0) && (pp->io[IO_STD_IN].fanc[IO_FAN_OUT] < 0))
 	    transfer_fd(pp, IO_STD_IN, ca[gi], IO_STD_IN);
-#endif
 
 /* stderr */
 	 pio = pp->io + IO_STD_ERR;
@@ -824,6 +803,68 @@ void connect_child_out_in(process_group *pg, int tci)
 	        transfer_fd(pp, IO_STD_ERR, ca[gi], IO_STD_IN);};};
 
     return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* COUNT_FAN_OUT - count connections to output slots */
+
+int count_fan_out(process_group *pg)
+   {int io, ip, nd, np, gi, nc, nm;
+    int pgo, pge;
+    io_device dv;
+    iodes *pio, *cio, *ps;
+    process *pp, *cp, **pa, **ca;
+
+    np = pg->np;
+    pa = pg->parents;
+    ca = pg->children;
+    nm = np - 1;
+    nm = np;
+
+    for (ip = 0; ip < nm; ip++)
+        {pp = pa[ip];
+	 cp = ca[ip];
+
+/* stdout fan out */
+	 pio = pp->io + IO_STD_IN;
+	 gi  = pio->gid;
+	 dv  = pio->dev;
+
+/* default to the next process in group */
+	 if ((dv == IO_DEV_PIPE) && (gi == -1))
+	    gi = ip + 1;
+
+/* NOTE: for now fan out only to stdout */
+	 if (gi >= 0)
+	    {ps  = pa[gi]->io;
+             pgo = ps[IO_STD_OUT].gid;
+	     pge = ps[IO_STD_ERR].gid;
+	     if (((pgo != -1) && (pge == -1)) ||
+		 ((pgo == -1) && (pge != -1)))
+	        {INC_FAN(ca[gi]->io[IO_STD_IN].fanc[IO_FAN_OUT], nc);
+		 pa[gi]->io[IO_STD_IN].fanc[IO_FAN_OUT] = nc;};};};
+
+/* reset any count less than 2 to -1 */
+    nd = 0;
+    for (ip = 0; ip < nm; ip++)
+        {pp = pa[ip];
+	 cp = ca[ip];
+	 for (io = 0; io < N_IO_CHANNELS; io++)
+	     {pio = pp->io + io;
+	      cio = cp->io + io;
+	      gi  = pio->gid;
+	      dv  = pio->dev;
+
+/* default to the next process in group */
+	      if ((dv == IO_DEV_PIPE) && (gi == -1))
+		 gi = ip + 1;
+
+/* check fan out counts */
+	      CHECK_FAN(pio->fanc[IO_FAN_OUT], nc);
+	      CHECK_FAN(cio->fanc[IO_FAN_OUT], nc);};};
+
+    return(nd);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -852,10 +893,10 @@ void transfer_in(process_group *pg, int ia, int ib, io_kind knd)
 /* GOTCHA: sort this out for fan out case without breaking
  * other tests
  */
-#if 1
+#if 0
 	if (cifi->fanc[IO_FAN_IN] > 0)
 #else
-	if (cifi->fanc[IO_FAN_OUT] > 0)
+	if (pifo->fanc[IO_FAN_OUT] > 0)
 #endif
            {fd = abs(pifo->fd);
 
@@ -1012,6 +1053,7 @@ static void reconnect_pgrp(process_group *pg)
  */
     if (nm > 0)
        {count_fan_in(pg);
+	count_fan_out(pg);
 
 /* reconnect terminal process output to first process
  * NOTE: we cannot do this if a pipe goes into the first process
@@ -1035,13 +1077,13 @@ static void reconnect_pgrp(process_group *pg)
 	close_parent_child(pg, tci);
 #endif
 
-/* connect all non-terminal children output to appropriate child input
- * there are from output specifications @o, @e, @b, @r, and @x 
+/* connect child output to appropriate child input
+ * these are from output specifications @o, @e, @b, @r, and @x 
  */
 	connect_child_out_in(pg, tci);
 
-/* connect all non-terminal children input to appropriate child output
- * there are from input specifications @i, @l, and @v
+/* connect child input to appropriate child output
+ * these are from input specifications @i, @l, and @v
  */
 	connect_child_in_out(pg, tci);
 
@@ -1324,10 +1366,31 @@ static void parse_pgrp(statement *s)
 
 /*--------------------------------------------------------------------------*/
 
-/* _DEREF_CLOSE - close the fan in descriptors of PP */
+/* _DEREF_JOB_CLOSE - close a job PP for fan in/out reasons */
 
-int _deref_close(process *pp)
-   {int io, ip, lo, fdi, nc, rv;
+int _deref_job_close(int fd, process *pp)
+   {int rv, io;
+
+    rv = _fd_close(fd);
+    nsleep(10);
+    job_read(-1, pp, pp->accept);
+
+#if 1
+    for (io = N_IO_CHANNELS - 1; io >= 0; io--)
+        _job_io_close(pp, io);
+#endif
+
+    _dbg(2, "close deref %d", fd);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _DEREF_CLOSE_FAN_IN - close the fan in descriptors of PP */
+
+int _deref_close_fan_in(process *pp)
+   {int io, ip, fdi, nc, rv;
     iodes *cio;
     process *pd, *cd;
     process_group *pg;
@@ -1344,20 +1407,52 @@ int _deref_close(process *pp)
 		 if ((pd != NULL) && (cd != NULL))
 		    {cio = cd->io + IO_STD_IN;
 		     nc  = cio->fanc[IO_FAN_IN];
-
 		     fdi = pp->io[IO_STD_IN].fanto[IO_FAN_IN];
 		     if ((nc == 0) && (fdi >= 0))
-		        {rv = _fd_close(fdi);
-			 nsleep(10);
-			 job_read(-1, pd, pd->accept);
-
-#if 1
-			 for (lo = N_IO_CHANNELS - 1; lo >= 0; lo--)
-			     _job_io_close(pd, lo);
-#endif
-			 _dbg(2, "close deref %d", fdi);
-
+		        {rv = _deref_job_close(fdi, pd);
 			 break;};};};};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _DEREF_CLOSE_FAN_OUT - close the fan out descriptors of PP */
+
+int _deref_close_fan_out(process *pp)
+   {int io, ip, fdi, fdo, nc, np, rv;
+    iodes *pio;
+    process *pd, **pa;
+    process_group *pg;
+
+    rv = 0;
+
+    pg = pp->pg;
+    if (pg != NULL)
+       {np = pg->np;
+	pa = pg->parents;
+	for (ip = 0; ip < np; ip++)
+	    {pd = pa[ip];
+	     if (pd != NULL)
+	        {for (io = 0; io < N_IO_CHANNELS; io++)
+		     {pio = pd->io + io;
+		      if (pio->fanto[IO_FAN_OUT] > 0)
+			 {fdi = pio->fd;
+			  if (fdi >= 0)
+			     rv = _deref_job_close(fdi, pd);};};};};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _DEREF_CLOSE - close the fan in descriptors of PP */
+
+int _deref_close(process *pp)
+   {int rv;
+
+    rv = _deref_close_fan_in(pp);
+    rv = _deref_close_fan_out(pp);
 
     return(rv);}
 
@@ -1388,18 +1483,27 @@ int _pgrp_fan_in(int fd, process *pp, char *s)
 /* _PGRP_FAN_OUT - send messages for fan out */
 
 int _pgrp_fan_out(int fd, process *pp, char *s)
-   {int io, nc, nw, fdi, rv;
+   {int io, ip, nc, np, nw, fdi, fdo, rv;
+    process *pd, **pa;
+    process_group *pg;
 
-    nc = strlen(s);
     rv = FALSE;
 
-    for (io = 0; io < N_IO_CHANNELS; io++)
-        {fdi = pp->io[io].fanto[IO_FAN_IN];
-	 if ((pp->io[io].fd == fd) && (fdi >= 0))
-	    {nw = write(fdi, s, nc);
-	     rv = (nw == nc);
-	     _dbg(2, "accept from %d send to %d", fd, fdi);
-	     break;};};
+    pg = pp->pg;
+    if (pg != NULL)
+       {nc = strlen(s);
+
+        np = pg->np;
+	pa = pg->parents;
+	for (ip = 0; ip < np; ip++)
+	    {pd = pa[ip];
+	     for (io = 0; io < N_IO_CHANNELS; io++)
+	         {fdi = pd->io[io].fanto[IO_FAN_OUT];
+		  if ((fdi == fd) && (io != IO_STD_ERR))
+		     {fdo = pd->io[io].fd;
+		      nw  = write(fdo, s, nc);
+		      rv |= (nw == nc);
+		      _dbg(2, "accept from %d send to %d", fd, fdo);};};};};
 
     return(rv);}
 
@@ -1487,7 +1591,7 @@ int _deref_io(process *pp)
 		 if ((pd != NULL) && (cd != NULL))
 		    {cio = cd->io + IO_STD_IN;
 
-/* lower the count on the descriptor */
+/* lower the fan in count on the descriptor */
 		     nc = cio->fanc[IO_FAN_IN] - 1;
 		     nc = max(nc, -1);
 		     cio->fanc[IO_FAN_IN] = nc;};};};};
