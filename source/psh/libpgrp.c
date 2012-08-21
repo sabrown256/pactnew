@@ -238,7 +238,7 @@ void dprgrp(char *tag, process_group *pg)
     _dbg(-1, "%s  group", tag);
     _dbg(-1, "%d processes", n);
 
-    _dbg(-1, "         Unit  fd     dev  knd  hnd gid");
+    _dbg(-1, "         Unit  fd      dev  knd  hnd gid");
     for (i = 0; i < n; i++)
         {pp = pg->parents[i];
 	 cp = pg->children[i];
@@ -1339,23 +1339,82 @@ int _deref_close(process *pp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PGRP_ACCEPT - accept messages read from PP */
+/* _PGRP_FAN_IN - send messages for fan in */
 
-int _pgrp_accept(int fd, process *pp, char *s)
-   {int io, nc, nw, fdi, fdo, rv;
+int _pgrp_fan_in(int fd, process *pp, char *s)
+   {int io, nc, nw, fdi, rv;
 
-    fdo = fileno(stdout);
+    nc = strlen(s);
+    rv = FALSE;
+
     for (io = 0; io < N_IO_CHANNELS; io++)
         {fdi = pp->io[io].fanto[IO_FAN_IN];
 	 if ((pp->io[io].fd == fd) && (fdi >= 0))
-	    {fdo = fdi;
+	    {nw = write(fdi, s, nc);
+	     rv = (nw == nc);
+	     _dbg(2, "accept from %d send to %d", fd, fdi);
 	     break;};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PGRP_FAN_OUT - send messages for fan out */
+
+int _pgrp_fan_out(int fd, process *pp, char *s)
+   {int io, nc, nw, fdi, rv;
+
+    nc = strlen(s);
+    rv = FALSE;
+
+    for (io = 0; io < N_IO_CHANNELS; io++)
+        {fdi = pp->io[io].fanto[IO_FAN_IN];
+	 if ((pp->io[io].fd == fd) && (fdi >= 0))
+	    {nw = write(fdi, s, nc);
+	     rv = (nw == nc);
+	     _dbg(2, "accept from %d send to %d", fd, fdi);
+	     break;};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PGRP_SEND - send accepted messages */
+
+int _pgrp_send(int fd, process *pp, char *s)
+   {int nc, nw, fdo, rv;
+
+    nc = strlen(s);
+
+    fdo = fileno(stdout);
 
     _dbg(2, "accept from %d send to %d", fd, fdo);
 
-    nc = strlen(s);
     nw = write(fdo, s, nc);
-    rv = (nw != nc);
+    rv = (nw == nc);
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _PGRP_ACCEPT - accept messages read from PP */
+
+int _pgrp_accept(int fd, process *pp, char *s)
+   {int rv;
+
+    rv = _pgrp_fan_in(fd, pp, s);
+
+    if (rv == FALSE)
+       rv = _pgrp_fan_out(fd, pp, s);
+
+    if (rv == FALSE)
+       rv = _pgrp_send(fd, pp, s);
+
+/* reverse sense of return value */
+    rv = (rv == FALSE);
 
     return(rv);}
 
