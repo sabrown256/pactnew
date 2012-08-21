@@ -923,15 +923,12 @@ void transfer_fnc_child(process_group *pg)
 	 if (pp->isfunc == TRUE)
 	    {for (io = 0; io < N_IO_CHANNELS; io++)
 		 {pio = pp->io + io;
-		  if ((i == n-1) && (io == IO_STD_OUT))
-		     {if (pio->dev == IO_DEV_TERM)
-			 {
-/* need this for date @o pw:test but
- * cannot tolerate it for cat @i fr:foo
- */
-			  pio->fd  = io;
-			  pio->hnd = IO_HND_NONE;
-			  pio->dev = IO_DEV_TERM;};}
+		  if ((i == n-1) &&
+		      (io == IO_STD_OUT) &&
+                      (pio->dev == IO_DEV_TERM))
+		     {pio->fd  = io;
+		      pio->hnd = IO_HND_NONE;
+		      pio->dev = IO_DEV_TERM;}
 
 		  else if (pio->dev == IO_DEV_PIPE)
 		     transfer_fd(cp, io, pp, io);
