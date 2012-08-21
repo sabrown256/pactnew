@@ -758,20 +758,25 @@ void dprdio(char *tag, iodes *pio)
     static char *dn[]  = {"none", "pipe", "sock", "pty", "term", "fnc"};
 
     io  = std[pio->knd + 1];
-    nc  = pio->fanc[IO_FAN_IN];
-    dst = pio->fanto[IO_FAN_IN];
-    src = pio->fanto[IO_FAN_OUT];
     fd  = pio->fd;
     gid = pio->gid;
     hnd = hn[pio->hnd];
     knd = kn[pio->knd + 1];
     dev = dn[pio->dev];
 
+/* report fan in or fan out count - can't be both */
+    nc = pio->fanc[IO_FAN_IN];
+    if (nc == -1)
+       nc = pio->fanc[IO_FAN_OUT];
+
+    dst = pio->fanto[IO_FAN_IN];
+    src = pio->fanto[IO_FAN_OUT];
+
     if (gid != -1)
-       _dbg(-1, "%8s %4s %3d(%d) %4s %4s %4s %3d %3d %3d",
+       _dbg(-1, "%8s %4s %3d(%2d) %4s %4s %4s %3d %3d %3d",
 	    tag, io, fd, nc, dev, knd, hnd, gid, dst, src);
     else
-       _dbg(-1, "%8s %4s %3d(%d) %4s %4s %4s     %3d %3d",
+       _dbg(-1, "%8s %4s %3d(%2d) %4s %4s %4s     %3d %3d",
 	    tag, io, fd, nc, dev, knd, hnd, dst, src);
 
     return;}
@@ -786,7 +791,7 @@ void dprpio(char *tag, process *pp)
     iodes *pio;
 
     _dbg(-1, tag);
-    _dbg(-1, "         Unit  fd     dev  knd  hnd gid");
+    _dbg(-1, "         Unit  fd      dev  knd  hnd gid");
     for (i = 0; i < N_IO_CHANNELS; i++)
         {pio = pp->io + i;
 	 dprdio(" ", pio);};
