@@ -30,9 +30,10 @@ SafeEnv IMF_Path ""
 if (-d "$IMF_Path") then
    set nbits = `nbit -d`
    if ($nbits == 64) then
-      set inf = ( `ls -rt $IMF_Path/i*/lib/*64/libimf.a |& grep -v beta | tail -n 1` )
+#      set inf = ( `ls -rt $IMF_Path/i*/lib/*64/libimf.a |& grep -v beta | tail -n 1` )
+      set inf = ( `ls -rt $IMF_Path/ic*/lib/libimf.a |& grep -v beta | tail -n 1` )
    else
-      set inf = ( `ls -rt $IMF_Path/i*/lib/libimf.a |& grep -v beta | tail -n 1` )
+      set inf = ( `ls -rt $IMF_Path/ic*/lib/libimf.a |& grep -v beta | tail -n 1` )
    endif
 else
    set inf = ""
