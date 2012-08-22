@@ -19,6 +19,7 @@ SafeEnv Cfg_RPATH    ""
 SafeEnv MD_Pck       ""
 SafeEnv LibM_Lib     "-lm"
 SafeEnv LibM_RPath   ""
+SafeEnv IMF_Lib      "-limf"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -57,7 +58,7 @@ if ("$IMF_Path" != "") then
    flog $ALog setenv RPATH         ${RPATH}:${IMF_Path}
    flog $ALog setenv Cfg_RPATH     ${Cfg_RPATH}:${IMF_Path}
    flog $ALog setenv MD_Pck        "$MD_Pck LibM"
-   flog $ALog setenv LibM_Lib      "-limf"
+   flog $ALog setenv LibM_Lib      "${IMF_Lib}"
    flog $ALog setenv LibM_RPath    ${IMF_Path}
 
 else
