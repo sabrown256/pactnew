@@ -17,18 +17,6 @@ set VERSION = "2.2"
 # determine the bin directory path
 set BinDir = $PACT/bin
 
-# determine if tracker is available
-set TRACKER = "none"
-
-foreach directory ( "/usr/local/apps/tracker" `echo $PATH | sed 's/:/ /g'` )
-   if (-d $directory) then
-      if (-x $directory/bin/tracker) then
-         set TRACKER = $directory/bin/tracker
-         break
-      endif
-   endif
-end
-
 # determine if sx is available
 if (!(-x $BinDir/sx)) then
    echo ""
@@ -80,8 +68,8 @@ while ($#argv > 0)
 end
 
 # track this run
-if ((-x "$TRACKER") && ($track == 1)) then
-  $TRACKER -b -n pdbview -v $VERSION -P 1 -T 1 -W 1.0
+if ((-x "$TRACKERExe") && ($track == 1)) then
+  $TRACKERExe -b -n pdbview -v $VERSION -P 1 -T 1 -W 1.0
 endif
 
 # do the browsing of the PDB file

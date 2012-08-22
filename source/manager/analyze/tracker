@@ -21,10 +21,15 @@ foreach d ( /usr/apps/tracker $DAS_ROOT/tracker /usr /usr/local )
    if (-d $d) then
       set OK = FALSE
       if (-x $d/bin/tracker) then
-         setenv TRACKERExe $d/bin/tracker
-         setenv HaveTRACKER TRUE
-         break
-      else
+
+# if it works we will get a help message if not
+# maybe some complaints about missing so's
+         set inf = ( `$d/bin/tracker |& grep "help screen for more information"` )
+         if ("$inf" != "") then
+            setenv TRACKERExe $d/bin/tracker
+            setenv HaveTRACKER TRUE
+            break
+         endif
       endif
    endif
 end

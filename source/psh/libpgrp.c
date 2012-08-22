@@ -704,7 +704,6 @@ int count_fan_in(process_group *pg)
     np = pg->np;
     pa = pg->parents;
     ca = pg->children;
-    nm = np - 1;
     nm = np;
 
     for (ip = 0; ip < nm; ip++)
@@ -819,7 +818,6 @@ int count_fan_out(process_group *pg)
     np = pg->np;
     pa = pg->parents;
     ca = pg->children;
-    nm = np - 1;
     nm = np;
 
     for (ip = 0; ip < nm; ip++)
@@ -890,14 +888,7 @@ void transfer_in(process_group *pg, int ia, int ib, io_kind knd)
 	cifi = cb->io + knd;
 	pifo = pb->io + IO_STD_IN;
 
-/* GOTCHA: sort this out for fan out case without breaking
- * other tests
- */
-#if 0
-	if (cifi->fanc[IO_FAN_IN] > 0)
-#else
 	if (pifo->fanc[IO_FAN_OUT] > 0)
-#endif
            {fd = abs(pifo->fd);
 
 	    pia->fanto[IO_FAN_OUT] = fd;
@@ -1059,23 +1050,17 @@ static void reconnect_pgrp(process_group *pg)
  * NOTE: we cannot do this if a pipe goes into the first process
  * this is a pipeline thought - for a group we have to decided
  * who the terminal will talk to
- */
-/* #define OLDWAY */
-#ifdef OLDWAY
 	tci = (pa[0]->io[IO_STD_IN].dev == IO_DEV_TERM);
-#else
+ */
         tci = FALSE;
-#endif
 	if (tci == TRUE)
 	   transfer_fd(pa[0], IO_STD_OUT, pt, IO_STD_OUT);
 
 /* close all other parent to child lines
  * NOTE: doing this could close the descriptors for fan in
  * to a process specified in the middle of the group
- */
-#ifdef OLDWAY
 	close_parent_child(pg, tci);
-#endif
+ */
 
 /* connect child output to appropriate child input
  * these are from output specifications @o, @e, @b, @r, and @x 
@@ -1375,10 +1360,8 @@ int _deref_job_close(int fd, process *pp)
     nsleep(10);
     job_read(-1, pp, pp->accept);
 
-#if 1
     for (io = N_IO_CHANNELS - 1; io >= 0; io--)
         _job_io_close(pp, io);
-#endif
 
     _dbg(2, "close deref %d", fd);
 
@@ -1420,7 +1403,7 @@ int _deref_close_fan_in(process *pp)
 /* _DEREF_CLOSE_FAN_OUT - close the fan out descriptors of PP */
 
 int _deref_close_fan_out(process *pp)
-   {int io, ip, fdi, fdo, nc, np, rv;
+   {int io, ip, fdi, np, rv;
     iodes *pio;
     process *pd, **pa;
     process_group *pg;

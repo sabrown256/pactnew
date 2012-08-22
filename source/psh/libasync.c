@@ -278,13 +278,9 @@ void _dbg(unsigned int lvl, char *fmt, ...)
 int _fd_close(int fd)
    {int rv;
 
-#if 0
-    rv = 0;
-#else
     rv = close(fd);
 
     _dbg(1, "closing %d (%d)", fd, rv);
-#endif
 
     return(rv);}
 
@@ -1080,16 +1076,8 @@ int job_read(int fd, process *pp, int (*out)(int fd, process *pp, char *s))
     if (job_alive(pp))
        {fi = pp->io[IO_STD_IN].fp;
 	fd = pp->io[IO_STD_IN].fd;
-#if 0
-/* in case we are dealing with a procedure in the process group */
-	if ((fi == NULL) && (fd < -2))
-	   {fd = -fd;
-	    fi = fdopen(fd, "r");};
-#endif
 	if ((fi != NULL) && (fd != -1))
  	   {_block_all_sig(TRUE);
-
-/*	    block_fd(fd, FALSE); */
 
 /* count consecutive null reads and bail after 1000 of them */
 	    nr = 0;
