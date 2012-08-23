@@ -23,12 +23,6 @@ static int do_test(FILE **fio, char *tag)
 
     rv = 0;
 
-/*
-printf("test> (%d,%d,%d)  stdin=%d  stdout=%d  stderr=%d\n",
-       fileno(fio[0]), fileno(fio[1]), fileno(fio[2]),
-       fileno(stdin), fileno(stdout), fileno(stderr));
-*/
-
     for (i = 0; rv == 0; i++)
         {if (feof(fio[0]) == TRUE)
 	    rv = 1;
@@ -47,7 +41,6 @@ printf("test> (%d,%d,%d)  stdin=%d  stdout=%d  stderr=%d\n",
 		 rv = (count > 6);};
 
 	     nsleep(10);};};
-/*	     sched_yield(); */
 
     return(rv);}
 
