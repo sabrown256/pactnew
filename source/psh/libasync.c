@@ -199,7 +199,7 @@ struct s_process
     char *shell;
     char mode[10];
 
-    iodes io[N_IO_CHANNELS];
+    iodes io[N_IO_CHANNELS+1];
 
     double start_time;
     double stop_time;
@@ -391,52 +391,52 @@ void _job_grp_attr(process *pp, int g, int t)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _INIT_IODES - initialize a set of N_IO_CH iodes structures */
+/* _INIT_IODES - initialize a set of N_IO_CHANNELS iodes structures */
 
-static void _init_iodes(int n, iodes *fd)
+static void _init_iodes(int n, iodes *pio)
    {int i, j;
 
     for (i = 0; i < n; i++)
-        {fd[i].knd  = IO_STD_NONE;
-	 fd[i].hnd  = IO_HND_NONE;
-	 fd[i].dev  = IO_DEV_NONE;
-	 fd[i].mode = IO_MODE_NONE;
-	 fd[i].gid  = -1;
-	 fd[i].fd   = -1;
-	 fd[i].fp   = NULL;
+        {pio[i].knd  = IO_STD_NONE;
+	 pio[i].hnd  = IO_HND_NONE;
+	 pio[i].dev  = IO_DEV_NONE;
+	 pio[i].mode = IO_MODE_NONE;
+	 pio[i].gid  = -1;
+	 pio[i].fd   = -1;
+	 pio[i].fp   = NULL;
 
 	 for (j = 0; j < 2; j++)
-	     {fd[i].fanc[j]  = -1;
-	      fd[i].fanto[j] = -1;};};
+	     {pio[i].fanc[j]  = -1;
+	      pio[i].fanto[j] = -1;};};
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _DEFAULT_IODES - initialize a set of N_IO_CH iodes structures */
+/* _DEFAULT_IODES - initialize a set of N_IO_CHANNELS iodes structures */
 
-void _default_iodes(iodes *fd)
+void _default_iodes(iodes *pio)
    {int i;
 
-    for (i = 0; i < N_IO_CHANNELS; i++)
-        {if (fd[i].fd == -1)
-	    fd[i].fd = i;
+    for (i = 0; i <= N_IO_CHANNELS; i++)
+        {if (pio[i].fd == -1)
+	    pio[i].fd = i;
 
-	 if (fd[i].dev == IO_DEV_NONE)
-	    fd[i].dev = IO_DEV_TERM;};
+	 if (pio[i].dev == IO_DEV_NONE)
+	    pio[i].dev = IO_DEV_TERM;};
 
-    if (fd[0].knd == IO_STD_NONE)
-       {fd[0].knd  = IO_STD_IN;
-	fd[0].mode = IO_MODE_RO;};
+    if (pio[0].knd == IO_STD_NONE)
+       {pio[0].knd  = IO_STD_IN;
+	pio[0].mode = IO_MODE_RO;};
 
-    if (fd[1].knd == IO_STD_NONE)
-       {fd[1].knd  = IO_STD_OUT;
-	fd[1].mode = IO_MODE_WD;};
+    if (pio[1].knd == IO_STD_NONE)
+       {pio[1].knd  = IO_STD_OUT;
+	pio[1].mode = IO_MODE_WD;};
 
-    if (fd[2].knd == IO_STD_NONE)
-       {fd[2].knd  = IO_STD_ERR;
-	fd[2].mode = IO_MODE_WD;};
+    if (pio[2].knd == IO_STD_NONE)
+       {pio[2].knd  = IO_STD_ERR;
+	pio[2].mode = IO_MODE_WD;};
 
     return;}
 
@@ -448,7 +448,7 @@ void _default_iodes(iodes *fd)
 void _init_process(process *pp)
    {
 
-    _init_iodes(N_IO_CHANNELS, pp->io);
+    _init_iodes(N_IO_CHANNELS+1, pp->io);
 
     pp->ip          = -1;
     pp->id          = -1;
@@ -746,34 +746,49 @@ static int _job_init_ipc(process *pp, process *cp)
 
 void dprdio(char *tag, iodes *pio)
    {int nc, fd, gid, dst, src;
-    char *io, *hnd, *knd, *dev;
-    static char *std[] = {"none", "in", "out", "err"};
+    char sdst[MAXLINE], ssrc[MAXLINE], snc[MAXLINE];
+    char *hnd, *knd, *dev;
     static char *hn[]  = {"none", "clos", "pipe", "poll"};
     static char *kn[]  = {"none", "in", "out", "err", "bond",
-			  "status", "rsrc", "limit", "env"};
+			  "sts", "rsrc", "lmt", "env"};
     static char *dn[]  = {"none", "pipe", "sock", "pty", "term", "fnc"};
 
-    io  = std[pio->knd + 1];
-    fd  = pio->fd;
-    gid = pio->gid;
-    hnd = hn[pio->hnd];
-    knd = kn[pio->knd + 1];
-    dev = dn[pio->dev];
+    if (pio->knd != IO_STD_NONE)
+       {fd  = pio->fd;
+	gid = pio->gid;
+	hnd = hn[pio->hnd];
+	knd = kn[pio->knd + 1];
+	dev = dn[pio->dev];
 
 /* report fan in or fan out count - can't be both */
-    nc = pio->fanc[IO_FAN_IN];
-    if (nc == -1)
-       nc = pio->fanc[IO_FAN_OUT];
+	nc = pio->fanc[IO_FAN_IN];
+	if (nc == -1)
+	   nc = pio->fanc[IO_FAN_OUT];
 
-    dst = pio->fanto[IO_FAN_IN];
-    src = pio->fanto[IO_FAN_OUT];
+	dst = pio->fanto[IO_FAN_IN];
+	src = pio->fanto[IO_FAN_OUT];
 
-    if (gid != -1)
-       _dbg(-1, "%8s %4s %3d(%2d) %4s %4s %4s %3d %3d %3d",
-	    tag, io, fd, nc, dev, knd, hnd, gid, dst, src);
-    else
-       _dbg(-1, "%8s %4s %3d(%2d) %4s %4s %4s     %3d %3d",
-	    tag, io, fd, nc, dev, knd, hnd, dst, src);
+	if (dst == -1)
+	   strcpy(sdst, "   ");
+	else
+	   snprintf(sdst, MAXLINE, "%3d", dst);
+
+	if (src == -1)
+	   strcpy(ssrc, "   ");
+	else
+	   snprintf(ssrc, MAXLINE, "%3d", src);
+
+	if (nc == -1)
+	   strcpy(snc, "    ");
+	else
+	   snprintf(snc, MAXLINE, "(%2d)", nc);
+
+	if (gid != -1)
+	   _dbg(-1, "%8s %3d%4s %4s %4s %4s %3d %3s %3s",
+		tag, fd, snc, dev, knd, hnd, gid, sdst, ssrc);
+	else
+	   _dbg(-1, "%8s %3d%4s %4s %4s %4s     %3s %3s",
+		tag, fd, snc, dev, knd, hnd, sdst, ssrc);};
 
     return;}
 
@@ -787,8 +802,8 @@ void dprpio(char *tag, process *pp)
     iodes *pio;
 
     _dbg(-1, tag);
-    _dbg(-1, "         Unit  fd      dev  knd  hnd gid");
-    for (i = 0; i < N_IO_CHANNELS; i++)
+    _dbg(-1, "          fd      dev  knd  hnd gid dst src");
+    for (i = 0; i <= N_IO_CHANNELS; i++)
         {pio = pp->io + i;
 	 dprdio(" ", pio);};
 
@@ -1250,7 +1265,20 @@ void job_wait(process *pp)
 
 	_block_all_sig(TRUE);
 
+#if 1
 	st = waitpid(pid, &w, WNOHANG);
+#else
+
+/* wait4 is not POSIX standard */
+	{struct rusage ra;
+
+	 st = wait4(pid, &w, WNOHANG, &ra);
+	 if (st == pid)
+	    printf("user %ld %ld  sys %ld %ld\n", 
+		   (long) ra.ru_utime.tv_sec, (long) ra.ru_utime.tv_usec,
+		   (long) ra.ru_stime.tv_sec, (long) ra.ru_stime.tv_usec);};
+#endif
+
 	if (st == 0)
 	   pp->status = JOB_RUNNING;
 

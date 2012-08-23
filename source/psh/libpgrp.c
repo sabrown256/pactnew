@@ -249,7 +249,7 @@ void dprgrp(char *tag, process_group *pg)
     _dbg(-1, "%s  group", tag);
     _dbg(-1, "%d processes", n);
 
-    _dbg(-1, "         Unit  fd      dev  knd  hnd gid");
+    _dbg(-1, "          fd      dev  knd  hnd gid dst src");
     for (i = 0; i < n; i++)
         {pp = pg->parents[i];
 	 cp = pg->children[i];
@@ -264,7 +264,8 @@ void dprgrp(char *tag, process_group *pg)
 	 if (pp != NULL)
 	    {dprdio("parent", pp->io + IO_STD_IN);
 	     dprdio("parent", pp->io + IO_STD_OUT);
-	     dprdio("parent", pp->io + IO_STD_ERR);};
+	     dprdio("parent", pp->io + IO_STD_ERR);
+	     dprdio("parent", pp->io + N_IO_CHANNELS);};
 
 	 _dbg(-1, "");};
 
@@ -354,7 +355,7 @@ void dprgio(char *tag, int n, process **pa, process **ca)
  */
 
 void redirect_io(process_group *pg, int ip, iodes *io)
-   {iodes *pio;
+   {iodes *pio, *dio;
     process *pp, *cp;
 
     pp = pg->parents[ip];
@@ -386,6 +387,14 @@ void redirect_io(process_group *pg, int ip, iodes *io)
 	     io->fd = pio->fd;
 	     *pio   = *io;
 	     pio    = cp->io + IO_STD_ERR;
+	     *pio   = *io;
+	     break;
+
+        case IO_STD_STATUS :
+        case IO_STD_RESOURCE :
+	     pio    = pp->io + N_IO_CHANNELS;
+	     dio    = pg->parents[io->gid]->io + IO_STD_OUT;
+	     io->fd = dio->fd;
 	     *pio   = *io;
 	     break;
 
@@ -434,8 +443,25 @@ static int redirect_fd(process_group *pg, int ip, int i)
     cd = (nc < ni) ? t[nc++] : '?';
 
 /* look for special devices */
-    if (strchr("rxlv", t[0]) != NULL)
+    if (IS_NULL(t) == TRUE)
        {}
+
+    else if (strchr("rxlv", t[0]) != NULL)
+       {aknd = _io_kind(ck);
+
+/* get the device mode */
+	switch (aknd)
+	   {case IO_STD_STATUS :
+	    case IO_STD_RESOURCE :
+	         amd  = _io_mode(IO_STD_IN);
+	         bmd  = _io_mode(IO_STD_OUT);
+		 bknd = IO_STD_OUT;
+		 break;
+	    default :
+	         amd  = _io_mode(IO_STD_OUT);
+	         bmd  = _io_mode(IO_STD_IN);
+		 bknd = IO_STD_IN;
+		 break;};}
 
 /* determine the device and mode */
     else if (strchr("ioeb", t[0]) != NULL)
@@ -451,23 +477,23 @@ static int redirect_fd(process_group *pg, int ip, int i)
 	    bknd = IO_STD_OUT;}
 	else
 	   {bmd = _io_mode(IO_STD_IN);
-	    bknd = IO_STD_IN;};
+	    bknd = IO_STD_IN;};};
 
 /* find the group id of the other end of the I/O connection */
-	rel = TRUE;
-	if (strchr("0123456789", cd) != NULL)
-	   {rel = FALSE;
-	    nc--;};
+    rel = TRUE;
+    if (strchr("0123456789", cd) != NULL)
+       {rel = FALSE;
+	nc--;};
 
-	if (nc >= ni)
-	   pos = 1;
-	else
-	   {p   = t + nc;
-	    pos = (IS_NULL(p) == TRUE) ? 1 : atoi(p);};
-	if (rel == TRUE)
-	   aip += pos;
-	else
-	   aip = pos - 1;};
+    if (nc >= ni)
+       pos = 1;
+    else
+       {p   = t + nc;
+	pos = (IS_NULL(p) == TRUE) ? 1 : atoi(p);};
+    if (rel == TRUE)
+       aip += pos;
+    else
+       aip = pos - 1;
 
     _init_iodes(1, &ca);
 
@@ -784,8 +810,8 @@ void connect_child_out_in(process_group *pg, int tci)
 	 if ((dv == IO_DEV_PIPE) && (gi == -1))
 	    gi = ip + 1;
 
-/* GOTCHA: we don't know about fan out yet */
-	 if ((gi >= 0) && (pp->io[IO_STD_IN].fanc[IO_FAN_OUT] < 0))
+	 if ((gi >= 0) && (pp->io[IO_STD_IN].fanc[IO_FAN_OUT] < 0) &&
+	     (pa[gi]->io[N_IO_CHANNELS].knd == IO_STD_NONE))
 	    transfer_fd(pp, IO_STD_IN, ca[gi], IO_STD_IN);
 
 /* stderr */
@@ -1584,6 +1610,49 @@ int _deref_io(process *pp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _POST_INFO - handle post termination info for
+ *            - IO_STD_EXIT, IO_STD_RESOURCE, or similar
+ */
+
+void _post_info(process *pp)
+   {int nw, nc, fd;
+    char t[MAXLINE];
+    iodes *pio;
+    process *pd;
+
+    pio = pp->io + N_IO_CHANNELS;
+    fd  = (pio == NULL) ? -1 : pio->fd;
+    if (fd != -1)
+       {switch (pio->knd)
+	   {case IO_STD_STATUS :
+		 snprintf(t, MAXLINE, "Exit status: %d\n", pp->reason);
+		 nc = strlen(t);
+	         break;
+
+            case IO_STD_RESOURCE :
+		 snprintf(t, MAXLINE, "Resource usage: %d %d %d\n", 0, 0, 0);
+		 nc = strlen(t);
+		 break;
+
+            default :
+	         nc = 0;
+	         break;};
+
+	if (nc > 0)
+	   {nw = write(fd, t, nc);
+
+	    _dbg(2, "   send status %d to %d: %d (%d)",
+		 pio->gid, fd, pp->reason, nw);
+
+	    if (nw == nc)
+	       {pd = pp->pg->parents[pio->gid];
+		job_done(pd, -1);};};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PGRP_WAIT - call when wait says its done */
 
 void _pgrp_wait(process *pp)
@@ -1630,6 +1699,8 @@ void _pgrp_wait(process *pp)
 	     st, pp->reason, job_alive(pp));};
 
     _deref_io(pp);
+
+    _post_info(pp);
 
     rv = job_done(pp, SIGTERM);
     ASSERT(rv == 0);
@@ -2250,13 +2321,84 @@ int gexec(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
 
 /*--------------------------------------------------------------------------*/
 
+/* TRANSFER_FF - read available bytes from FI and write them to FO
+ *             - return 0 if successful and not at end of file
+ *             - return 1 if successful and at end of file
+ *             - return 2 if unsuccessful
+ */
+
+int transfer_ff(FILE *fi, FILE *fo)
+   {int i, rv, ev;
+    char t[LRG];
+
+    rv = 0;
+
+    for (i = 0; rv == 0; i++)
+        {if (feof(fi) == TRUE)
+	    rv = 1;
+
+	 else
+	    {
+#if 1
+
+	     size_t nr, nw;
+
+	     nr = fread(t, 1, LRG, fi);
+	     ev = errno;
+	     if (nr > 0)
+	        {for (nw = 0; nw < nr; )
+		     nw += fwrite(t, 1, nr-nw, fo);}
+
+#else
+
+	     p  = fgets(t, LRG, fi);
+	     ev = errno;
+	     if (p != NULL)
+	        fputs(p, fo);
+#endif
+
+	     else if (feof(fi) == TRUE)
+	        rv = 1;
+	     else if (ev == EBADF)
+	        rv = 2;};};
+
+     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* TRANSFER_FT - read from FI and push onto SA */
+
+int transfer_ft(FILE *fi, char ***psa)
+   {int i, rv;
+    char t[MAXLINE];
+    char *p;
+
+    rv = 0;
+
+    for (i = 0; rv == 0; i++)
+        {if (feof(fi) == TRUE)
+	    rv = 1;
+	 else
+	    {p = fgets(t, MAXLINE, fi);
+	     if (p != NULL)
+	        {LAST_CHAR(t) = '\0';
+		 *psa = lst_add(*psa, t);}
+	     else if (errno == EBADF)
+	        rv = 1;};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* GEXEC_VAR - function to access variables */
 
 int gexec_var(char *db, io_mode md, FILE **fio,
 	      char *name, int c, char **v)
    {int i, nc, ns, rv;
     char t[MAXLINE];
-    char *p, *vr, *vl, **sa;
+    char *vr, *vl, **sa;
     static int ic = 0;
 
     rv = 0;
@@ -2286,17 +2428,7 @@ int gexec_var(char *db, io_mode md, FILE **fio,
 /* stdin to variable */
 	    case IO_MODE_WO :
 	    case IO_MODE_WD :
-	         for (i = 0; rv == 0; i++)
-		     {if (feof(fio[0]) == TRUE)
-			 rv = 1;
-		      else
-			 {p = fgets(t, MAXLINE, fio[0]);
-			  if (p != NULL)
-			     {LAST_CHAR(t) = '\0';
-			      sa = lst_add(sa, t);}
-			  else if (errno == EBADF)
-			     rv = 1;};};
-
+	         rv = transfer_ft(fio[0], &sa);
 		 vl = concatenate(t, MAXLINE, sa, " ");
 
 		 if (IS_NULL(db) == FALSE)
@@ -2308,18 +2440,10 @@ int gexec_var(char *db, io_mode md, FILE **fio,
 
 /* stdin append to variable */
 	    case IO_MODE_APPEND :
-	         for (i = 0; rv == 0; i++)
-		     {if (feof(fio[0]) == TRUE)
-			 rv = 1;
-		      else
-			 {p = fgets(t, MAXLINE, fio[0]);
-			  if (p != NULL)
-			     {LAST_CHAR(t) = '\0';
-			      sa = lst_add(sa, t);
-			      vl = concatenate(t, MAXLINE, sa, " ");
-			      fprintf(fio[1], "%s\n", vl);}
-			  else if (errno == EBADF)
-			     rv = 1;};};
+	         rv = transfer_ft(fio[0], &sa);
+		 vl = concatenate(t, MAXLINE, sa, " ");
+
+		 fprintf(fio[1], "%s\n", vl);
 
 		 if (IS_NULL(db) == FALSE)
 		    dbset(NULL, vr, vl);
@@ -2342,9 +2466,8 @@ int gexec_var(char *db, io_mode md, FILE **fio,
 
 int gexec_file(char *db, io_mode md, FILE **fio,
 	       char *name, int c, char **v)
-   {int i, rv, ev;
-    char t[MAXLINE];
-    char *p, *fn;
+   {int rv;
+    char *fn;
     static FILE *fp = NULL;
 
     rv = 0;
@@ -2387,43 +2510,19 @@ int gexec_file(char *db, io_mode md, FILE **fio,
 
 /* file to stdout */
 	       {case IO_MODE_RO :
-		     for (i = 0; rv == 0; i++)
-		         {if (feof(fp) == TRUE)
-			     rv = 1;
-			  else
-			     {p = fgets(t, MAXLINE, fp);
-			      if (p != NULL)
-				 fputs(p, fio[1]);};};
+		     rv = transfer_ff(fp, fio[1]);
 		     break;
 
 /* stdin to file */
 	        case IO_MODE_WO :
 	        case IO_MODE_WD :
 	        case IO_MODE_APPEND :
-		     for (i = 0; rv == 0; i++)
-		         {if (feof(fio[0]) == TRUE)
-			     rv = 1;
-			  else
-			     {p  = fgets(t, MAXLINE, fio[0]);
-			      ev = errno;
-			      if (p != NULL)
-				 fputs(p, fp);
-			      else if (feof(fio[0]) == TRUE)
-				 rv = 1;
-			      else if (ev == EBADF)
-			         rv = 2;};};
-
+		     rv = transfer_ff(fio[0], fp);
 		     fflush(fp);
 		     break;
 
 	        default :
-		     break;};
-
-/*
-	    if (rv == 1)
-	       fclose(fp);
-*/
-	   };};
+		     break;};};};
 
     return(rv);}
 
