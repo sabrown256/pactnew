@@ -16,7 +16,7 @@ NoteD $Log -n "                        $f "
 Note $Log ""
 
 set exe = $t
-set opt = ""
+set opt = ( $argv )
 set rpf = ""
 
 set lt = `timer -r`
@@ -43,41 +43,41 @@ foreach i (1 2 3 4 5 6)
 # simple stdout variants
       case 1:
            rm -rf $id
-           set cmd = ( gexec /bin/echo "$id" @o pw:test ${pa} '>&!' $raw )
+           set cmd = ( gexec $opt /bin/echo "$id" @o pw:test ${pa} '>&!' $raw )
            set gst = "0 0"
            set srt = TRUE
            breaksw
 
 # simple stdin variants
       case 2:
-           set cmd = ( gexec cat @i pr:test ${pa} '>&!' $raw )
+           set cmd = ( gexec $opt cat @i pr:test ${pa} '>&!' $raw )
            set gst = "0 0"
            set srt = TRUE
            breaksw
 
 # simple append variants
       case 3:
-           set cmd = ( gexec /bin/echo "$id" @o2 pa:test p3out '>&!' $raw )
+           set cmd = ( gexec $opt /bin/echo "$id" @o2 pa:test p3out '>&!' $raw )
            set gst = "0 0"
            set srt = TRUE
            breaksw
 
 # simple bonded variants
       case 4:
-           set cmd = ( gexec /bin/echo "$id" @b2 pw:test p4bond '>&!' $raw )
+           set cmd = ( gexec $opt /bin/echo "$id" @b2 pw:test p4bond '>&!' $raw )
            set gst = "0 0"
            set srt = TRUE
            breaksw
 
 # non-simple stdout variants
       case 5:
-           set cmd = ( gexec /bin/echo "$id" @o2 @e3 pw:test p5out @ pw:test p5err '>&!' $raw )
+           set cmd = ( gexec $opt /bin/echo "$id" @o2 @e3 pw:test p5out @ pw:test p5err '>&!' $raw )
            set gst = "0 0 0"
            set srt = TRUE
            breaksw
 
       case 6:
-           set cmd = ( gexec osrc -t p6 @o2 @e3 pw:test p6out @ pw:test p6err '>&!' $raw )
+           set cmd = ( gexec $opt osrc -t p6 @o2 @e3 pw:test p6out @ pw:test p6err '>&!' $raw )
            set gst = "1 0 0"
            set srt = TRUE
            breaksw

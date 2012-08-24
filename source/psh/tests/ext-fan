@@ -16,7 +16,7 @@ NoteD $Log -n "                        $f "
 Note $Log ""
 
 set exe = $t
-set opt = ""
+set opt = ( $argv )
 set rpf = ""
 
 set lt = `timer -r`
@@ -41,36 +41,36 @@ foreach i (1 2 3 4 5 6)
 
 # fan in tests
       case 1:
-           set cmd = ( gexec /bin/echo "${id}a" @o3 /bin/echo "${id}b" @o3 sort '>&!' $res )
+           set cmd = ( gexec $opt /bin/echo "${id}a" @o3 /bin/echo "${id}b" @o3 sort '>&!' $res )
            set gst = "0 0 0"
            set srt = FALSE
            breaksw
       case 2:
-           set cmd = ( gexec /bin/echo "${id}a" @o2 sort @ /bin/echo "${id}b" @o2 '>&!' $res )
+           set cmd = ( gexec $opt /bin/echo "${id}a" @o2 sort @ /bin/echo "${id}b" @o2 '>&!' $res )
            set gst = "0 0 0"
            set srt = FALSE
            breaksw
       case 3:
-           set cmd = ( gexec sort @ /bin/echo "${id}a" @o1 /bin/echo "${id}b" @o1 '>&!' $res )
+           set cmd = ( gexec $opt sort @ /bin/echo "${id}a" @o1 /bin/echo "${id}b" @o1 '>&!' $res )
            set gst = "0 0 0"
            set srt = FALSE
            breaksw
 
 # fan out tests
       case 4:
-           set cmd = ( gexec /bin/echo ${id} @ cat -n @i1 cat -E @i1 '>&!' $res )
+           set cmd = ( gexec $opt /bin/echo ${id} @ cat -n @i1 cat -E @i1 '>&!' $res )
            set gst = "0 0 0"
            set srt = FALSE
            breaksw
 
       case 5:
-           set cmd = ( gexec cat -n @i2 /bin/echo ${id} @ cat -E @i2 '>&!' $res )
+           set cmd = ( gexec $opt cat -n @i2 /bin/echo ${id} @ cat -E @i2 '>&!' $res )
            set gst = "0 0 0"
            set srt = FALSE
            breaksw
 
       case 6:
-           set cmd = ( gexec cat -n @i3 cat -E @i3 /bin/echo ${id}'>&!' $res )
+           set cmd = ( gexec $opt cat -n @i3 cat -E @i3 /bin/echo ${id}'>&!' $res )
            set gst = "0 0 0"
            set srt = FALSE
            breaksw

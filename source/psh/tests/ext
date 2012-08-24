@@ -12,6 +12,7 @@ set PERDB = perdb
 
 set db  = TRUE
 set lst = ""
+set opt = ""
 
 Note $Log "Args: $argv"
 
@@ -27,12 +28,17 @@ while ($#argv > 0)
       case -n:
            set db = FALSE
            breaksw
+      case -*:
+           set opt = ( $opt $1 )
+           breaksw
       default:
            set lst = ( $lst $1 )
            breaksw
    endsw
    shift
 end
+
+Note $Log "Options: $opt"
 
 if ("$lst" == "") then
    set lst = ( job pipe fnc file var fan )
@@ -73,7 +79,7 @@ endif
          dbset gstatus ""
       endif
 
-      ./ext-$t
+      ./ext-$t $opt
       @ nerr = $nerr + $status
    end
 
