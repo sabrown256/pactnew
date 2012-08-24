@@ -166,6 +166,8 @@ typedef struct s_process process;
 typedef struct s_process_group process_group;
 typedef struct s_process_stack process_stack;
 typedef struct s_iodes iodes;
+typedef struct process_group_state process_group_state;
+
 
 /* NOTE: one of the difficulties in managing the connections between
  * processes is keeping track of which elements are about the connection
@@ -234,18 +236,12 @@ struct s_process_stack
     apollfd *fd;
     process **proc;};
 
-static process_stack
- stck = { 0, 0, 0, 0, 3,
-          (POLLIN | POLLPRI),
-	  (POLLERR | POLLHUP | POLLNVAL),
-          NULL, NULL, NULL, NULL};
-
-static sigjmp_buf
- _job_cpu;
-
-static int
- _n_sig_block = 0,
- dbg_level = 0;
+struct process_group_state
+   {int n_sig_block;
+    int dbg_level;
+    io_device medium;
+    process_stack stck;
+    sigjmp_buf cpu;};
 
 /*--------------------------------------------------------------------------*/
 
@@ -253,20 +249,41 @@ static int
 
 /*--------------------------------------------------------------------------*/
 
+/* GET_PROCESS_GROUP_STATE - return a pointer to the global state
+ *                         - for managing process_groups
+ */
+
+process_group_state *get_process_group_state(void)
+   {process_group_state *ps;
+    static process_group_state st = { 0, 0, IO_DEV_PIPE,
+				      { 0, 0, 0, 0, 3,
+					(POLLIN | POLLPRI),
+					(POLLERR | POLLHUP | POLLNVAL),
+					NULL, NULL, NULL, NULL}, };
+
+    ps = &st;
+
+    return(ps);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _DBG - diagnostic debug print function */
 
 void _dbg(unsigned int lvl, char *fmt, ...)
    {int pid;
     char s[LRG];
+    process_group_state *ps;
 
-    if (lvl & dbg_level)
+    ps = get_process_group_state();
+    if (lvl & ps->dbg_level)
        {VA_START(fmt);
 	VSNPRINTF(s, LRG, fmt);
 	VA_END;
 
 	pid = getpid();
 
-	fprintf(stderr, "[%d/%d]: %s\n", pid, dbg_level, s);};
+	fprintf(stderr, "[%d/%d]: %s\n", pid, ps->dbg_level, s);};
 
     return;}
 
@@ -342,23 +359,26 @@ FILE *_io_file_ptr(process *pp, io_kind knd)
 sigset_t _block_all_sig(int wh)
    {int rv;
     sigset_t ns, os;
+    process_group_state *ps;
+
+    ps = get_process_group_state();
 
     memset(&os, 0, sizeof(os));
 
     if (wh == TRUE)
-       {if (_n_sig_block == 0)
+       {if (ps->n_sig_block == 0)
 	   {sigemptyset(&ns);
 	    sigfillset(&ns);
 	    rv = sigprocmask(SIG_BLOCK, &ns, &os);
 	    ASSERT(rv == 0);};
 
-	_n_sig_block++;}
+	ps->n_sig_block++;}
 
     else
-       {_n_sig_block--;
-	_n_sig_block = max(_n_sig_block, 0);
+       {ps->n_sig_block--;
+	ps->n_sig_block = max(ps->n_sig_block, 0);
 
-	if (_n_sig_block == 0)
+	if (ps->n_sig_block == 0)
 	   {sigemptyset(&ns);
 	    sigfillset(&ns);
 	    rv = sigprocmask(SIG_UNBLOCK, &ns, &os);
@@ -674,22 +694,89 @@ int _ioc_fd(int fd, io_kind k)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _IOC_PAIR - return a pair if file descriptors for IPC in FDS */
+
+io_device _ioc_pair(int *fds, int id)
+   {int st;
+    io_device medium, rv;
+    static int lid = -1;
+    process_group_state *ps;
+
+    ps = get_process_group_state();
+
+    medium = ps->medium;
+
+    switch (medium)
+       {default :
+	case IO_DEV_PIPE :
+	     st = pipe(fds);
+	     break;
+
+        case IO_DEV_SOCKET :
+	     st = socketpair(PF_UNIX, SOCK_STREAM, 0, fds);
+	     break;
+
+        case IO_DEV_PTY :
+	     {int err;
+	      char *ps;
+	      static int fdl[2] = {-1, -1};
+	      extern char *ptsname(int fd);
+	      extern int grantpt(int fd);
+	      extern int unlockpt(int fd);
+
+	      st = -1;
+
+	      if (id != lid)
+		 {fdl[0]  = open("/dev/ptmx", O_RDWR | O_NOCTTY);
+		  err  = grantpt(fdl[0]);
+		  err |= unlockpt(fdl[0]);
+		  if (err != 0)
+		     fdl[0] = -1;
+		  else
+		     {lid = id;
+		      ps  = ptsname(fdl[0]);
+		      fdl[1] = open(ps, O_RDWR);};};
+
+	      if (fdl[0] >= 0)
+		 {fds[0] = fcntl(fdl[0], F_DUPFD, fdl[0]);
+		  fds[1] = fcntl(fdl[1], F_DUPFD, fdl[1]);
+/*
+		  for (i = 0; i < SC_N_IO_CH; i++)
+		      {cp->io[i] = fdl[0];
+		       pp->io[i] = fdl[0];};
+*/
+		  st = 0;};
+	      break;};};
+
+    if (st == 0)
+       rv = medium;
+    else
+       rv = IO_DEV_NONE;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _JOB_INIT_IPC - establish two inter-process communications channels
  *               - the input channel should always be unblocked
  *               - return TRUE iff successful
  */
 
 static int _job_init_ipc(process *pp, process *cp)
-   {int st, rv;
+   {int rv;
     int fds[2];
     io_device medium;
+    static int count = 0;
 
     rv = TRUE;
 
+    count++;
+
 /* child stdin */
     if (rv == TRUE)
-       {st = pipe(fds);
-	if (st < 0)
+       {medium = _ioc_pair(fds, count);
+	if (medium == IO_DEV_NONE)
 	   {_fd_close(pp->io[0].fd);
 	    _fd_close(cp->io[1].fd);
 	    fprintf(stderr, "COULDN'T CREATE PIPE #1 - _JOB_INIT_IPC\n");
@@ -700,8 +787,8 @@ static int _job_init_ipc(process *pp, process *cp)
 
 /* child stdout */
     if (rv == TRUE)
-       {st = pipe(fds);
-	if (st < 0)
+       {medium = _ioc_pair(fds, count);
+	if (medium == IO_DEV_NONE)
 	   {fprintf(stderr, "COULDN'T CREATE PIPE #2 - _JOB_INIT_IPC\n");
 	    rv = FALSE;}
 	else
@@ -710,15 +797,14 @@ static int _job_init_ipc(process *pp, process *cp)
 
 /* child stderr */
     if (rv == TRUE)
-       {st = pipe(fds);
-	if (st < 0)
+       {medium = _ioc_pair(fds, count);
+	if (medium == IO_DEV_NONE)
 	   {fprintf(stderr, "COULDN'T CREATE PIPE #3 - _JOB_INIT_IPC\n");
 	    rv = FALSE;}
 	else
 	   {cp->io[2].fd = fds[1];
 	    pp->io[2].fd = fds[0];};};
 
-    medium = IO_DEV_PIPE;
     if (medium == IO_DEV_PIPE)
        {_job_set_attr(pp->io[0].fd, O_RDONLY | O_NDELAY, TRUE);
 	_job_set_attr(pp->io[1].fd, O_WRONLY, TRUE);
@@ -819,6 +905,9 @@ void dprpio(char *tag, process *pp)
 static void _job_child_fork(process *pp, process *cp, char **argv, char *mode)
    {int rv;
     extern char **environ;
+    process_group_state *ps;
+
+    ps = get_process_group_state();
 
 /* free the parent state which the child does not need */
     _job_free(pp);
@@ -829,7 +918,7 @@ static void _job_child_fork(process *pp, process *cp, char **argv, char *mode)
     cp->start_time = wall_clock_time();
     cp->stop_time  = 0.0;
 
-    if (dbg_level & 2)
+    if (ps->dbg_level & 2)
        dprpio("_job_child_fork", cp);
 
     rv = _job_exec(cp, argv, environ, mode);
@@ -843,6 +932,9 @@ static void _job_child_fork(process *pp, process *cp, char **argv, char *mode)
 
 static int _job_parent_fork(process *pp, process *cp, char *mode)
    {int i, st;
+    process_group_state *ps;
+
+    ps = get_process_group_state();
    
     st = TRUE;
 
@@ -858,7 +950,7 @@ static int _job_parent_fork(process *pp, process *cp, char *mode)
 
     _job_free(cp);
 
-    if (dbg_level & 2)
+    if (ps->dbg_level & 2)
        dprpio("_job_parent_fork", pp);
 
     sched_yield();
@@ -1010,9 +1102,11 @@ static process *_job_fork(process *pp, process *cp,
 /* _TIMEOUT_ERROR - tell somebody that we timed out and exit */
 
 static void _timeout_error(int sig)
-   {
+   {process_group_state *ps;
 
-    siglongjmp(_job_cpu, 1);}
+    ps = get_process_group_state();
+
+    siglongjmp(ps->cpu, 1);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1164,11 +1258,14 @@ int job_write(process *pp, char *fmt, ...)
 int job_poll(process *pp, int to)
    {int n, ok;
     apollfd fds;
+    process_group_state *ps;
+
+    ps = get_process_group_state();
 
     n = 0;
     if (job_running(pp))
        {fds.fd      = pp->io[0].fd;
-	fds.events  = stck.mask_acc;
+	fds.events  = ps->stck.mask_acc;
 	fds.revents = 0;
 	n = 1;};
 
@@ -1193,6 +1290,9 @@ int job_response(process *pp, int to, char *fmt, ...)
     char *p;
     FILE *fi, *fo;
     int (*rsp)(int fd, process *pp, char *s);
+    process_group_state *ps;
+
+    ps = get_process_group_state();
 
     VA_START(fmt);
 
@@ -1226,7 +1326,7 @@ int job_response(process *pp, int to, char *fmt, ...)
 	else if (fi != NULL)
 	   {ok = FALSE;
 	    dt = (to < 0) ? -1 : to*1.0e-3;
-	    if (sigsetjmp(_job_cpu, TRUE) == 0)
+	    if (sigsetjmp(ps->cpu, TRUE) == 0)
 	       {if (dt > 0)
 		   _job_timeout(dt);
 
@@ -1371,28 +1471,30 @@ int job_done(process *pp, int sig)
 /* ASETUP - setup state to run and monitor N jobs */
 
 void asetup(int n, int na)
-   {
+   {process_group_state *ps;
+
+    ps = get_process_group_state();
 
 /* per process members */
-    if (stck.proc != NULL)
-       FREE(stck.proc);
+    if (ps->stck.proc != NULL)
+       FREE(ps->stck.proc);
 
-    stck.ip   = 0;
-    stck.np   = n;
-    stck.proc = MAKE_N(process *, n);
+    ps->stck.ip   = 0;
+    ps->stck.np   = n;
+    ps->stck.proc = MAKE_N(process *, n);
 
 /* per descriptor members */
-    if (stck.fd != NULL)
-       FREE(stck.fd);
+    if (ps->stck.fd != NULL)
+       FREE(ps->stck.fd);
 
-    stck.ifd = 0;
-    stck.nfd = N_IO_CHANNELS*n;
-    stck.fd  = MAKE_N(apollfd, N_IO_CHANNELS*n);
-    stck.map = MAKE_N(int, N_IO_CHANNELS*n);
-    stck.io  = MAKE_N(int, N_IO_CHANNELS*n);
+    ps->stck.ifd = 0;
+    ps->stck.nfd = N_IO_CHANNELS*n;
+    ps->stck.fd  = MAKE_N(apollfd, N_IO_CHANNELS*n);
+    ps->stck.map = MAKE_N(int, N_IO_CHANNELS*n);
+    ps->stck.io  = MAKE_N(int, N_IO_CHANNELS*n);
 
 /* everything else */
-    stck.nattempt = na;
+    ps->stck.nattempt = na;
 
     return;}
 
@@ -1403,26 +1505,29 @@ void asetup(int n, int na)
 
 static int _awatch_fd(process *pp, io_kind knd, int sip)
    {int ip, ifd, fd, rv;
+    process_group_state *ps;
+
+    ps = get_process_group_state();
 
 /* handle the process */
     if (pp->isfunc == TRUE)
        ip = pp->ip;
     else
-       {ip = (sip < 0) ? stck.ip++ : sip;
-	if (ip >= stck.np)
+       {ip = (sip < 0) ? ps->stck.ip++ : sip;
+	if (ip >= ps->stck.np)
 	   {int i, n;
 
 	    fprintf(stderr,
 		    "ERROR: Bad process accounting (%d > %d) - exiting\n",
-		    stck.ip, stck.np);
+		    ps->stck.ip, ps->stck.np);
 
-	    n = stck.np;
+	    n = ps->stck.np;
 	    for (i = 0; i < n; i++)
-	        fprintf(stderr, "%d ", stck.proc[i]->ip);
+	        fprintf(stderr, "%d ", ps->stck.proc[i]->ip);
 	    fprintf(stderr, "\n");
 	    exit(1);};
 
-	stck.proc[ip] = pp;
+	ps->stck.proc[ip] = pp;
 
 /* handle the descriptor */
 	fd = pp->io[knd].fd;
@@ -1430,13 +1535,13 @@ static int _awatch_fd(process *pp, io_kind knd, int sip)
 	   {rv = block_fd(fd, FALSE);
 	    ASSERT(rv == 0);
 
-	    ifd = stck.ifd++;
-	    stck.fd[ifd].fd      = 0;
-	    stck.fd[ifd].events  = 0;
-	    stck.fd[ifd].revents = 0;
+	    ifd = ps->stck.ifd++;
+	    ps->stck.fd[ifd].fd      = 0;
+	    ps->stck.fd[ifd].events  = 0;
+	    ps->stck.fd[ifd].revents = 0;
 
-	    stck.io[ifd]  = fd;
-	    stck.map[ifd] = ip;};};
+	    ps->stck.io[ifd]  = fd;
+	    ps->stck.map[ifd] = ip;};};
 
     return(ip);}
 
@@ -1447,22 +1552,25 @@ static int _awatch_fd(process *pp, io_kind knd, int sip)
 
 static void _afinish(void)
    {int i, np;
+    process_group_state *ps;
 
-    np = stck.np;
+    ps = get_process_group_state();
 
-    if (stck.proc != NULL)
+    np = ps->stck.np;
+
+    if (ps->stck.proc != NULL)
        {for (i = 0; i < np; i++)
-	    _job_free(stck.proc[i]);
-	FREE(stck.proc);};
+	    _job_free(ps->stck.proc[i]);
+	FREE(ps->stck.proc);};
 
-    FREE(stck.fd);
-    FREE(stck.map);
-    FREE(stck.io);
+    FREE(ps->stck.fd);
+    FREE(ps->stck.map);
+    FREE(ps->stck.io);
 
-    stck.ip  = 0;
-    stck.np  = 0;
-    stck.ifd = 0;
-    stck.nfd = 0;
+    ps->stck.ip  = 0;
+    ps->stck.np  = 0;
+    ps->stck.ifd = 0;
+    ps->stck.nfd = 0;
 
     return;}
 
@@ -1502,8 +1610,11 @@ process *alaunch(int sip, char *cmd, char *mode, void *a,
 
 process *arelaunch(process *pp)
    {process *npp;
+    process_group_state *ps;
 
-    if ((pp != NULL) && (pp->nattempt <= stck.nattempt))
+    ps = get_process_group_state();
+
+    if ((pp != NULL) && (pp->nattempt <= ps->stck.nattempt))
        {npp = alaunch(pp->ip, pp->cmd, pp->mode, pp->a,
 		      pp->accept, pp->reject, pp->wait);
 
@@ -1530,21 +1641,24 @@ int apoll(int to)
     short rev;
     process *pp;
     apollfd *fds;
+    process_group_state *ps;
 
-    np  = stck.np;
-    nfd = stck.ifd;
-    fds = stck.fd;
-    map = stck.map;
-    io  = stck.io;
+    ps = get_process_group_state();
+
+    np  = ps->stck.np;
+    nfd = ps->stck.ifd;
+    fds = ps->stck.fd;
+    map = ps->stck.map;
+    io  = ps->stck.io;
 
 /* find the descriptors of running jobs only */
     for (n = 0, ip = 0; ip < np; ip++)
-        {pp = stck.proc[ip];
+        {pp = ps->stck.proc[ip];
 	 if (job_running(pp))
 	    {for (ifd = 0; ifd < nfd; ifd++)
 	         {if (map[ifd] == ip)
 		     {fds[n].fd      = io[ifd];
-		      fds[n].events  = stck.mask_acc;
+		      fds[n].events  = ps->stck.mask_acc;
 		      fds[n].revents = 0;
 		      n++;};};};};
 
@@ -1558,15 +1672,15 @@ int apoll(int to)
 
 /* find the process containing the file desciptor FD and drain it */
 	     for (ip = 0; ip < np; ip++)
-	         {pp = stck.proc[ip];
+	         {pp = ps->stck.proc[ip];
 		  if (job_alive(pp) == TRUE)
 		     {for (ifd = 0; ifd < nfd; ifd++)
 			  {if ((map[ifd] == ip) && (io[ifd] == fd))
-			      {if (rev & stck.mask_acc)
+			      {if (rev & ps->stck.mask_acc)
 				  {nrdy--;
 				   job_read(fd, pp, pp->accept);}
 
-			       else if (rev & stck.mask_rej)
+			       else if (rev & ps->stck.mask_rej)
 				  {nrdy--;
 				   job_read(fd, pp, pp->reject);};};};};};};};
 
@@ -1582,11 +1696,14 @@ int apoll(int to)
 int acheck(void)
    {int ip, np, nf;
     process *pp;
+    process_group_state *ps;
 
-    np = stck.np;
+    ps = get_process_group_state();
+
+    np = ps->stck.np;
 
     for (nf = 0, ip = 0; ip < np; ip++)
-        {pp = stck.proc[ip];
+        {pp = ps->stck.proc[ip];
 	 if (job_alive(pp) == TRUE)
 	    {job_wait(pp);
 
@@ -1614,8 +1731,11 @@ int await(unsigned int tf, int dt, char *tag,
 	  void (*f)(int i, char *tag, void *a, int nd, int np, int tc, int tf),
 	  void *a)
    {int i, nd, np, st, ti, tc;
+    process_group_state *ps;
 
-    np = stck.np;
+    ps = get_process_group_state();
+
+    np = ps->stck.np;
     nd = -1;
     ti = wall_clock_time();
     tc = 0;
@@ -1644,11 +1764,14 @@ void amap(void (*f)(process *pp, void *a))
    {int i, np;
     process *pp;
     void *a;
+    process_group_state *ps;
 
-    np = stck.np;
+    ps = get_process_group_state();
+
+    np = ps->stck.np;
 
     for (i = 0; i < np; i++)
-        {pp = stck.proc[i];
+        {pp = ps->stck.proc[i];
 	 if (pp != NULL)
 	    {a = pp->a;
 

@@ -1044,6 +1044,9 @@ static void reconnect_pgrp(process_group *pg)
    {int i, nm, n, tci;
     process *pt, *pp, *cp;
     process **pa, **ca;
+    process_group_state *ps;
+
+    ps = get_process_group_state();
 
     n   = pg->np;
     pa  = pg->parents;
@@ -1101,7 +1104,7 @@ static void reconnect_pgrp(process_group *pg)
 /* transfer all function call I/O to parent and free child */
 	transfer_fnc_child(pg);};
 
-    if (dbg_level & 1)
+    if (ps->dbg_level & 1)
        dprgrp("reconnect_pgrp", pg);
 
     return;}
@@ -1563,12 +1566,15 @@ int _pgrp_accept(int fd, process *pp, char *s)
 
 int _pgrp_reject(int fd, process *pp, char *s)
    {int rv;
+    process_group_state *ps;
+
+    ps = get_process_group_state();
 
     rv = TRUE;
 
     _dbg(1, "reject: fd(%d) cmd(%s) txt(%s)", fd, pp->cmd, s);
 
-    if (dbg_level & 2)
+    if (ps->dbg_level & 2)
        fputs(s, stderr);
 
     return(rv);}
@@ -1657,8 +1663,11 @@ void _post_info(process *pp)
 
 void _pgrp_wait(process *pp)
    {int rv;
+    process_group_state *ps;
 
-    if (dbg_level & 2)
+    ps = get_process_group_state();
+
+    if (ps->dbg_level & 2)
        {char *st;
 
 	switch (pp->status)
@@ -1719,9 +1728,12 @@ void _pgrp_wait(process *pp)
 
 int _pgrp_tty(char *tag)
    {int nf, np, rv;
+    process_group_state *ps;
+
+    ps = get_process_group_state();
 
     rv = FALSE;
-    np = stck.np;
+    np = ps->stck.np;
 
     nf = acheck();
     rv = (nf == np);
@@ -1949,6 +1961,9 @@ static int run_pgrp(statement *s)
     char *db;
     process *pp, *cp;
     process_group *pg;
+    process_group_state *ps;
+
+    ps = get_process_group_state();
 
     rv = -1;
 
@@ -2001,10 +2016,10 @@ static int run_pgrp(statement *s)
 	    {pp = pg->parents[i];
 	     fd = pp->io[0].fd;
 
-	     stck.proc[i]       = pp;
-	     stck.fd[i].fd      = fd;
-	     stck.fd[i].events  = stck.mask_acc;
-	     stck.fd[i].revents = 0;};
+	     ps->stck.proc[i]       = pp;
+	     ps->stck.fd[i].fd      = fd;
+	     ps->stck.fd[i].events  = ps->stck.mask_acc;
+	     ps->stck.fd[i].revents = 0;};
 
 /* wait for the work to complete - _pgrp_work does the work */
 	tc = await(-1, 1, "commands", _pgrp_tty, _pgrp_work, s);
