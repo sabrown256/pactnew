@@ -67,6 +67,8 @@
     _n = max(_n, 0) + 1;                                                     \
     _x = _n;}
 
+#define RTIME(_r)     (_r.tv_sec + 1.0e-6*_r.tv_usec)
+
 typedef struct s_statement statement;
 typedef struct s_process_session process_session;
 typedef int (*PFPCAL)(char *db, io_mode m, FILE **fp,
@@ -1636,7 +1638,11 @@ void _post_info(process *pp)
 	         break;
 
             case IO_STD_RESOURCE :
-		 snprintf(t, MAXLINE, "Resource usage: %d %d %d\n", 0, 0, 0);
+		 snprintf(t, MAXLINE, "Resource usage: %.2g %.2g %d\n",
+			  RTIME(pp->ru.ru_utime),
+			  RTIME(pp->ru.ru_stime),
+			  0);
+
 		 nc = strlen(t);
 		 break;
 
