@@ -211,6 +211,7 @@ struct s_process
     void (*wait)(process *pp);              /* call when wait says its done */
 
     process_group *pg;               /* pointer to associated process group */
+    struct rusage ru;
     void *a;};                 /* external data associated with the process */
 
 struct s_process_group
@@ -490,6 +491,8 @@ void _init_process(process *pp)
     pp->wait        = NULL;
     pp->pg          = NULL;
     pp->a           = NULL;
+
+    memset(&pp->ru, 0, sizeof(struct rusage));
 
     return;}
 
@@ -1355,6 +1358,42 @@ int job_response(process *pp, int to, char *fmt, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _JOB_WAITR - do a waitpid and getrusage for finishing jobs
+ *            - tries to do with POSIX calls what the non-POSIX
+ *            - wait4 does
+ */
+
+int _job_waitr(int pid, int *pw, int opt, struct rusage *pr)
+   {int rv;
+
+#if 1
+    int st;
+    struct rusage ra;
+
+    st = getrusage(RUSAGE_CHILDREN, &ra);
+
+    rv = waitpid(pid, pw, WNOHANG);
+    if (rv == pid)
+       {st = getrusage(RUSAGE_CHILDREN, pr);
+	if (st == 0)
+	   {pr->ru_utime.tv_sec  -= ra.ru_utime.tv_sec;
+	    pr->ru_utime.tv_usec -= ra.ru_utime.tv_usec;
+	    pr->ru_stime.tv_sec  -= ra.ru_stime.tv_sec;
+	    pr->ru_stime.tv_usec -= ra.ru_stime.tv_usec;};};
+
+#else
+
+/* wait4 is not POSIX standard */
+
+    rv = wait4(pid, &w, WNOHANG, pr);
+
+#endif
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* JOB_WAIT - check to update the process status */
 
 void job_wait(process *pp)
@@ -1365,19 +1404,7 @@ void job_wait(process *pp)
 
 	_block_all_sig(TRUE);
 
-#if 1
-	st = waitpid(pid, &w, WNOHANG);
-#else
-
-/* wait4 is not POSIX standard */
-	{struct rusage ra;
-
-	 st = wait4(pid, &w, WNOHANG, &ra);
-	 if (st == pid)
-	    printf("user %ld %ld  sys %ld %ld\n", 
-		   (long) ra.ru_utime.tv_sec, (long) ra.ru_utime.tv_usec,
-		   (long) ra.ru_stime.tv_sec, (long) ra.ru_stime.tv_usec);};
-#endif
+	st = _job_waitr(pid, &w, WNOHANG, &pp->ru);
 
 	if (st == 0)
 	   pp->status = JOB_RUNNING;
