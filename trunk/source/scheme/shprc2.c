@@ -21,6 +21,7 @@
 #include "../psh/libdb.c"
 #include "../psh/libpgrp.c"
 #endif
+
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -198,12 +199,14 @@ static object *_SSI_gexec(SS_psides *si, object *argl)
 /* _SS_INST_PGRP - install the primitives for process group control */
 
 void _SS_inst_pgrp(SS_psides *si)
-   {
+   {process_group_state *ps;
+
+    ps = get_process_group_state();
 
     SS_install_cf(si, "process-group-debug",
 		  "Variable: Flag controlling level of diagnostic output for gexec",
 		  SS_acc_int,
-                  &dbg_level);
+                  &ps->dbg_level);
 
     SS_install(si, "!",
                "Procedure: Exec a process group",

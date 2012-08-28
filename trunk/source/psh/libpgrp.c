@@ -267,7 +267,10 @@ void dprgrp(char *tag, process_group *pg)
 	    {dprdio("parent", pp->io + IO_STD_IN);
 	     dprdio("parent", pp->io + IO_STD_OUT);
 	     dprdio("parent", pp->io + IO_STD_ERR);
-	     dprdio("parent", pp->io + N_IO_CHANNELS);};
+	     dprdio("parent", pp->io + IO_STD_STATUS);
+	     dprdio("parent", pp->io + IO_STD_RESOURCE);
+	     dprdio("parent", pp->io + IO_STD_LIMIT);
+	     dprdio("parent", pp->io + IO_STD_ENV_VAR);};
 
 	 _dbg(-1, "");};
 
@@ -394,7 +397,15 @@ void redirect_io(process_group *pg, int ip, iodes *io)
 
         case IO_STD_STATUS :
         case IO_STD_RESOURCE :
-	     pio    = pp->io + N_IO_CHANNELS;
+	     pio    = pp->io + io->knd;
+	     dio    = pg->parents[io->gid]->io + IO_STD_OUT;
+	     io->fd = dio->fd;
+	     *pio   = *io;
+	     break;
+
+        case IO_STD_LIMIT :
+        case IO_STD_ENV_VAR :
+	     pio    = pp->io + io->knd;
 	     dio    = pg->parents[io->gid]->io + IO_STD_OUT;
 	     io->fd = dio->fd;
 	     *pio   = *io;
@@ -790,7 +801,7 @@ int count_fan_in(process_group *pg)
  */
 
 void connect_child_out_in(process_group *pg, int tci)
-   {int ip, np, gi, nm;
+   {int i, ip, np, gi, nm, ok;
     io_device dv;
     iodes *pio;
     process *pp, **pa, **ca;
@@ -812,9 +823,13 @@ void connect_child_out_in(process_group *pg, int tci)
 	 if ((dv == IO_DEV_PIPE) && (gi == -1))
 	    gi = ip + 1;
 
-	 if ((gi >= 0) && (pp->io[IO_STD_IN].fanc[IO_FAN_OUT] < 0) &&
-	     (pa[gi]->io[N_IO_CHANNELS].knd == IO_STD_NONE))
-	    transfer_fd(pp, IO_STD_IN, ca[gi], IO_STD_IN);
+	 if ((gi >= 0) && (pp->io[IO_STD_IN].fanc[IO_FAN_OUT] < 0))
+	    {ok = TRUE;
+	     for (i = IO_STD_STATUS; i <= IO_STD_ENV_VAR; i++)
+	         ok &= (pa[gi]->io[i].knd == IO_STD_NONE);
+
+	     if (ok == TRUE)
+	        transfer_fd(pp, IO_STD_IN, ca[gi], IO_STD_IN);};
 
 /* stderr */
 	 pio = pp->io + IO_STD_ERR;
@@ -1524,6 +1539,35 @@ int _pgrp_fan_out(int fd, process *pp, char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PGRP_DATA_CHILD - send data messages for child execution */
+
+int _pgrp_data_child(int fd, process *pp, char *s)
+   {int ip, nc, np, nw, fdi, fdo, rv;
+    process *pd, **pa;
+    process_group *pg;
+
+    rv = FALSE;
+
+    pg = pp->pg;
+    if (pg != NULL)
+       {nc = strlen(s);
+
+        np = pg->np;
+	pa = pg->parents;
+	for (ip = 0; ip < np; ip++)
+	    {pd  = pa[ip];
+	     fdi = pd->io[IO_STD_IN].fd;
+	     fdo = pd->io[IO_STD_ENV_VAR].fd;
+	     if ((fdo != -1) && (fd == fdi))
+	        {nw  = write(fdo, s, nc);
+		 rv |= (nw == nc);
+		 _dbg(2, "accept from %d send to %d (%s)", fd, fdo, s);};};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PGRP_SEND - send accepted messages */
 
 int _pgrp_send(int fd, process *pp, char *s)
@@ -1552,6 +1596,9 @@ int _pgrp_accept(int fd, process *pp, char *s)
 
     if (rv == FALSE)
        rv = _pgrp_fan_out(fd, pp, s);
+
+    if (rv == FALSE)
+       rv = _pgrp_data_child(fd, pp, s);
 
     if (rv == FALSE)
        rv = _pgrp_send(fd, pp, s);
@@ -1623,42 +1670,43 @@ int _deref_io(process *pp)
  */
 
 void _post_info(process *pp)
-   {int nw, nc, fd;
+   {int i, nw, nc, fd;
     char t[MAXLINE];
     iodes *pio;
     process *pd;
 
-    pio = pp->io + N_IO_CHANNELS;
-    fd  = (pio == NULL) ? -1 : pio->fd;
-    if (fd != -1)
-       {switch (pio->knd)
-	   {case IO_STD_STATUS :
-		 snprintf(t, MAXLINE, "Exit status: %d\n", pp->reason);
-		 nc = strlen(t);
-	         break;
+    for (i = IO_STD_STATUS; i <= IO_STD_ENV_VAR; i++)
+        {pio = pp->io + i;
+	 fd  = (pio == NULL) ? -1 : pio->fd;
+	 if (fd != -1)
+	    {switch (pio->knd)
+	        {case IO_STD_STATUS :
+		      snprintf(t, MAXLINE, "Exit status: %d\n", pp->reason);
+		      nc = strlen(t);
+		      break;
 
-            case IO_STD_RESOURCE :
-		 snprintf(t, MAXLINE, "Resource usage: %.2g %.2g %d\n",
-			  RTIME(pp->ru.ru_utime),
-			  RTIME(pp->ru.ru_stime),
-			  0);
+		 case IO_STD_RESOURCE :
+		      snprintf(t, MAXLINE, "Resource usage: %.2g %.2g %d\n",
+			       RTIME(pp->ru.ru_utime),
+			       RTIME(pp->ru.ru_stime),
+			       0);
 
-		 nc = strlen(t);
-		 break;
+		      nc = strlen(t);
+		      break;
 
-            default :
-	         nc = 0;
-	         break;};
+		 default :
+		      nc = 0;
+		      break;};
 
-	if (nc > 0)
-	   {nw = write(fd, t, nc);
+	     if (nc > 0)
+	        {nw = write(fd, t, nc);
 
-	    _dbg(2, "   send status %d to %d: %d (%d)",
-		 pio->gid, fd, pp->reason, nw);
+		 _dbg(2, "   send status %d to %d: %d (%d)",
+		      pio->gid, fd, pp->reason, nw);
 
-	    if (nw == nc)
-	       {pd = pp->pg->parents[pio->gid];
-		job_done(pd, -1);};};};
+		 if (nw == nc)
+		    {pd = pp->pg->parents[pio->gid];
+		     job_done(pd, -1);};};};};
 
     return;}
 
@@ -1805,15 +1853,16 @@ int _fnc_wait(process_group *pg, int ip, int st)
 		     pio->knd = IO_STD_NONE;
 
 		     pd = pg->parents[pio->gid];
+		     if (pd->isfunc == FALSE)
+		        {for (jo = 0; jo < N_IO_CHANNELS; jo++)
+			     {if (pd->io[jo].gid == ip)
+				 {job_read(pd->io[jo].fd, pd, pd->accept);
+				  _job_io_close(pd, jo);};};
 
-		     for (jo = 0; jo < N_IO_CHANNELS; jo++)
-		         {if (pd->io[jo].gid == ip)
-			     {job_read(pd->io[jo].fd, pd, pd->accept);
-			      _job_io_close(pd, jo);};};
+			 if (pd->id > 0)
+			    kill(pd->id, SIGHUP);
 
-		     kill(pd->id, SIGHUP);
-
-		     job_wait(pd);};};
+			 job_wait(pd);};};};
 
 	    pp->stop_time = wall_clock_time();
 	    pp->status    = cnd;
@@ -2033,6 +2082,11 @@ static int run_pgrp(statement *s)
 
 /* close out the jobs */
 	afin(_pgrp_fin);
+
+/* free up the process memory */
+	for (i = 0; i < np; i++)
+	    {FREE(pg->parents[i]);
+	     FREE(pg->children[i]);};
 
 /* process the exit statuses */
 	rv    = 0;
@@ -2362,13 +2416,15 @@ int transfer_ff(FILE *fi, FILE *fo)
 	    {
 #if 1
 
-	     size_t nr, nw;
+	     size_t nr, nw, ni;
 
 	     nr = fread(t, 1, LRG, fi);
 	     ev = errno;
 	     if (nr > 0)
 	        {for (nw = 0; nw < nr; )
-		     nw += fwrite(t, 1, nr-nw, fo);}
+                     {ni  = fwrite(t, 1, nr-nw, fo);
+                      ev  = errno;
+                      nw += ni;};}
 
 #else
 
@@ -2488,11 +2544,15 @@ int gexec_var(char *db, io_mode md, FILE **fio,
 int gexec_file(char *db, io_mode md, FILE **fio,
 	       char *name, int c, char **v)
    {int rv;
-    char *fn;
+    static char *fn = NULL;
     static FILE *fp = NULL;
 
     rv = 0;
-    fn = v[0];
+    if (fn != v[0])
+       {if (fp != NULL)
+	   fclose(fp);
+	fp = NULL;
+	fn = v[0];};
 
     if ((fn != NULL) && (md != IO_MODE_NONE))
        {if (fp == NULL)

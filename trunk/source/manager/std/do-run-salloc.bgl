@@ -1,0 +1,26 @@
+#
+# DO-RUN-SALLOC-BGL - DO-RUN database entry for salloc on BG/L
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+Env SLURM_EXIT_ERROR     = 254
+Env SLURM_EXIT_IMMEDIATE = 255
+
+#-------------------------------------------------------------------------
+#-------------------------------------------------------------------------
+
+MPI : salloc {
+
+   Env Par  = ($NProc > 1) ? TRUE : FALSE
+   Env Wrap = ($Par == TRUE) ? -noop- : ""
+
+   Exe   = ($Par == TRUE) ? salloc : no-op -exit 0
+   Flags = ($Par == TRUE) ? -q -I -N $NProc mpirun -np $NProc : ""
+}
+
+#-------------------------------------------------------------------------
+#-------------------------------------------------------------------------

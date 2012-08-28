@@ -351,6 +351,11 @@ static int _PD_rd_prim_typ_iii(PDBfile *file, char *bf)
         CFREE(type);};
 
 /* get global type qualifier information */
+
+/* GOTCHA: this was already initialized in _PD_mk_pdb
+    file->default_offset = 0;
+*/
+
     while (_PD_get_token(NULL, local, bsz, '\n'))
        {if (*local == '\0')
            break;
@@ -713,7 +718,6 @@ static int _PD_rd_ext_iii(PDBfile *file)
     local = pa->local;
     bsz   = sizeof(pa->local);
 
-    file->default_offset = 0;
     file->system_version = 0;
     CFREE(file->date);
 
