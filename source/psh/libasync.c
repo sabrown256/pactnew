@@ -97,9 +97,11 @@
 #define LIBASYNC
 
 #include "common.h"
+#include "network.h"
 
 #define JOB_NOT_FINISHED    -1000
 #define N_IO_CHANNELS       3
+#define N_CHANNELS          7
 
 /* job status values */
 #define JOB_RUNNING      0x0
@@ -133,8 +135,9 @@ enum e_io_hand
 typedef enum e_io_hand io_hand;
 
 enum e_io_kind
-   {IO_STD_NONE = -1, IO_STD_IN, IO_STD_OUT, IO_STD_ERR, IO_STD_BOND,
-    IO_STD_STATUS, IO_STD_RESOURCE, IO_STD_LIMIT, IO_STD_ENV_VAR};
+   {IO_STD_NONE = -1, IO_STD_IN, IO_STD_OUT, IO_STD_ERR,
+    IO_STD_STATUS, IO_STD_RESOURCE, IO_STD_LIMIT, IO_STD_ENV_VAR,
+    IO_STD_BOND};
 
 typedef enum e_io_kind io_kind;
 
@@ -201,7 +204,7 @@ struct s_process
     char *shell;
     char mode[10];
 
-    iodes io[N_IO_CHANNELS+1];
+    iodes io[N_CHANNELS];
 
     double start_time;
     double stop_time;
@@ -338,7 +341,7 @@ void _job_io_close(process *pp, io_kind knd)
 FILE *_io_file_ptr(process *pp, io_kind knd)
    {iodes *lio;
     FILE *fp;
-    char *modes[N_IO_CHANNELS] = { "r", "w", "w" };
+    char *modes[] = { "r", "w", "w", "w", "w", "r", "r" };
    
     lio = pp->io + knd;
     if (lio->fp == NULL)
@@ -412,7 +415,7 @@ void _job_grp_attr(process *pp, int g, int t)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _INIT_IODES - initialize a set of N_IO_CHANNELS iodes structures */
+/* _INIT_IODES - initialize a set of N iodes structures */
 
 static void _init_iodes(int n, iodes *pio)
    {int i, j;
@@ -435,13 +438,15 @@ static void _init_iodes(int n, iodes *pio)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _DEFAULT_IODES - initialize a set of N_IO_CHANNELS iodes structures */
+/* _DEFAULT_IODES - initialize a set of iodes structures */
 
 void _default_iodes(iodes *pio)
-   {int i;
+   {int i, n;
 
-    for (i = 0; i <= N_IO_CHANNELS; i++)
-        {if (pio[i].fd == -1)
+    n = N_CHANNELS;
+
+    for (i = 0; i < n; i++)
+        {if ((pio[i].fd == -1) && (i < N_IO_CHANNELS))
 	    pio[i].fd = i;
 
 	 if (pio[i].dev == IO_DEV_NONE)
@@ -469,7 +474,7 @@ void _default_iodes(iodes *pio)
 void _init_process(process *pp)
    {
 
-    _init_iodes(N_IO_CHANNELS+1, pp->io);
+    _init_iodes(N_CHANNELS, pp->io);
 
     pp->ip          = -1;
     pp->id          = -1;
@@ -563,7 +568,7 @@ static void _job_free(process *pp)
  */
 	if (pp->ip > -2)
 	   {pp->ip = -2;
-	    FREE(pp);}
+/*	    FREE(pp); */}
 	else
 	   fprintf(stderr, "Job freed twice\n");};
 
@@ -743,11 +748,6 @@ io_device _ioc_pair(int *fds, int id)
 	      if (fdl[0] >= 0)
 		 {fds[0] = fcntl(fdl[0], F_DUPFD, fdl[0]);
 		  fds[1] = fcntl(fdl[1], F_DUPFD, fdl[1]);
-/*
-		  for (i = 0; i < SC_N_IO_CH; i++)
-		      {cp->io[i] = fdl[0];
-		       pp->io[i] = fdl[0];};
-*/
 		  st = 0;};
 	      break;};};
 
@@ -838,8 +838,9 @@ void dprdio(char *tag, iodes *pio)
     char sdst[MAXLINE], ssrc[MAXLINE], snc[MAXLINE];
     char *hnd, *knd, *dev;
     static char *hn[]  = {"none", "clos", "pipe", "poll"};
-    static char *kn[]  = {"none", "in", "out", "err", "bond",
-			  "sts", "rsrc", "lmt", "env"};
+    static char *kn[]  = {"none", "in", "out", "err",
+			  "sts", "rsrc", "lmt", "env",
+			  "bond"};
     static char *dn[]  = {"none", "pipe", "sock", "pty", "term", "fnc"};
 
     if (pio->knd != IO_STD_NONE)
@@ -887,12 +888,14 @@ void dprdio(char *tag, iodes *pio)
 /* DPRPIO - print the file descriptors from a process PP */
 
 void dprpio(char *tag, process *pp)
-   {int i;
+   {int i, n;
     iodes *pio;
 
     _dbg(-1, tag);
     _dbg(-1, "          fd      dev  knd  hnd gid dst src");
-    for (i = 0; i <= N_IO_CHANNELS; i++)
+
+    n = N_CHANNELS;
+    for (i = 0; i < n; i++)
         {pio = pp->io + i;
 	 dprdio(" ", pio);};
 
@@ -911,6 +914,44 @@ static void _job_child_fork(process *pp, process *cp, char **argv, char *mode)
     process_group_state *ps;
 
     ps = get_process_group_state();
+
+   {int i, ip, nr, nl, np, ev, ok, fd;
+    char t[MAXLINE];
+    char *p;
+    FILE *fp;
+    iodes *pio;
+    process **pa;
+    process_group *pg;
+    extern int job_poll(process *pp, int to);
+
+    pg = pp->pg;
+    pa = pg->parents;
+    np = pg->np;
+    for (ip = 0; ip < np; ip++)
+        {pio = pa[ip]->io + IO_STD_ENV_VAR;
+	 if (pio->gid == pp->ip)
+	    {fd = pg->children[pp->ip]->io[IO_STD_IN].fd;
+	     fp = fdopen(fd, "r");
+	     nsleep(100);
+
+	     nr = 0;
+	     ok = 0;
+	     for (i = 0; (ok == 0) && (nr < 1000); i++)
+	         {if (feof(fp) == TRUE)
+	 	     ok = 1;
+		  else
+		     {nr++;
+		      p  = fgets(t, LRG, fp);
+		      ev = errno;
+		      if (p != NULL)
+		         {nl++;
+			  nr = 0;
+			  LAST_CHAR(t) = '\0';
+			  _dbg(2, "setenv %s", t);
+			  putenv(STRSAVE(t));
+			  break;}
+		      else if (ev == EBADF)
+		         ok = 1;};};};};};
 
 /* free the parent state which the child does not need */
     _job_free(pp);
@@ -1498,7 +1539,8 @@ int job_done(process *pp, int sig)
 /* ASETUP - setup state to run and monitor N jobs */
 
 void asetup(int n, int na)
-   {process_group_state *ps;
+   {int m;
+    process_group_state *ps;
 
     ps = get_process_group_state();
 
@@ -1514,11 +1556,13 @@ void asetup(int n, int na)
     if (ps->stck.fd != NULL)
        FREE(ps->stck.fd);
 
+    m = n*N_IO_CHANNELS;
+
     ps->stck.ifd = 0;
-    ps->stck.nfd = N_IO_CHANNELS*n;
-    ps->stck.fd  = MAKE_N(apollfd, N_IO_CHANNELS*n);
-    ps->stck.map = MAKE_N(int, N_IO_CHANNELS*n);
-    ps->stck.io  = MAKE_N(int, N_IO_CHANNELS*n);
+    ps->stck.nfd = m;
+    ps->stck.fd  = MAKE_N(apollfd, m);
+    ps->stck.map = MAKE_N(int, m);
+    ps->stck.io  = MAKE_N(int, m);
 
 /* everything else */
     ps->stck.nattempt = na;

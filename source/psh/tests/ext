@@ -41,8 +41,8 @@ end
 Note $Log "Options: $opt"
 
 if ("$lst" == "") then
-   set lst = ( job pipe fnc file var fan )
-#   set lst = ( job pipe fnc file var )
+   set lst = ( job pipe fnc file var fan spec )
+#   set lst = ( job pipe fnc file var fan )
 endif
 
 #--------------------------------------------------------------------------

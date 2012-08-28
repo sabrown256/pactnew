@@ -1,0 +1,37 @@
+#
+# DO-RUN-SALLOC-BGP - DO-RUN database entry for salloc
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+# GOTCHA: pending a SLURM fix 
+#Env SLURM_EXIT_ERROR     = 254
+Env SLURM_EXIT_ERROR     = 255
+Env SLURM_EXIT_IMMEDIATE = 255
+
+#-------------------------------------------------------------------------
+#-------------------------------------------------------------------------
+
+MPI : salloc {
+
+# BG/P does not have the MPI I/O problem so mpi-io-wrap is not needed
+   Env Wrap = ""
+
+# check whether an MPI run has been requested
+   Env Par  = (($NProc > 1) || ($Force == TRUE)) ? TRUE : FALSE
+
+# check whether or not we must use salloc 
+# either MPI_Init is unconditionally called or it is conditional
+# and we will definitely be calling it
+   Env Init = (($MPICnd == FALSE) || (($MPICnd == TRUE) && ($Par == TRUE))) ? TRUE : FALSE
+
+   Exe   = ($Init == TRUE) ? salloc : /bgsys/drivers/ppcfloor/bin/submit
+   Flags = ($Init == TRUE) ? -Q -I -N $NProc -p $Pool mpirun -np $NProc -mode SMP : -mode SMP -env_all
+   Flags = ($?DO_RUN_MPIRUN_ENV == 0) ? $MPI_Flags : $MPI_Flags $DO_RUN_MPIRUN_ENV
+}
+
+#-------------------------------------------------------------------------
+#-------------------------------------------------------------------------
