@@ -24,8 +24,7 @@ set lt = `timer -r`
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-#foreach i (1 2 3 4)
-foreach i (1 2 3)
+foreach i (1 2 3 4)
 
    Note $Log ""
    Note $Log "---------------------------------------------------"
@@ -54,8 +53,8 @@ foreach i (1 2 3)
            set srt = FALSE
            breaksw
       case 4:
-           set cmd = ( gexec $opt /bin/echo "coredumpsize=10" @l /bin/csh -c limit '>&!' $raw )
-           set gst = "0 0"
+           set cmd = ( gexec $opt /bin/echo "core=13000" @l /bin/csh -c limit @o grep coredumpsize '>&!' $res )
+           set gst = "0 0 0"
            set srt = FALSE
            breaksw
    endsw

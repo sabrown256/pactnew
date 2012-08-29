@@ -1556,12 +1556,26 @@ int _pgrp_data_child(int fd, process *pp, char *s)
 	pa = pg->parents;
 	for (ip = 0; ip < np; ip++)
 	    {pd  = pa[ip];
-	     fdi = pd->io[IO_STD_IN].fd;
+
+/* send environment variables */
 	     fdo = pd->io[IO_STD_ENV_VAR].fd;
-	     if ((fdo != -1) && (fd == fdi))
-	        {nw  = write(fdo, s, nc);
-		 rv |= (nw == nc);
-		 _dbg(2, "accept from %d send to %d (%s)", fd, fdo, s);};};};
+	     if (fdo != -1)
+	        {fdi = pd->io[IO_STD_IN].fd;
+		 if (fd == fdi)
+		    {nw  = write(fdo, s, nc);
+		     rv |= (nw == nc);
+		     _dbg(2, "accept from %d send to %d (%s)",
+			  fd, fdo, s);};};
+
+/* send resource limits */
+	     fdo = pd->io[IO_STD_LIMIT].fd;
+	     if (fdo != -1)
+	        {fdi = pd->io[IO_STD_IN].fd;
+		 if (fd == fdi)
+		    {nw  = write(fdo, s, nc);
+		     rv |= (nw == nc);
+		     _dbg(2, "accept from %d send to %d (%s)",
+			  fd, fdo, s);};};};};
 
     return(rv);}
 
@@ -1675,7 +1689,7 @@ void _post_info(process *pp)
     iodes *pio;
     process *pd;
 
-    for (i = IO_STD_STATUS; i <= IO_STD_ENV_VAR; i++)
+    for (i = IO_STD_STATUS; i <= IO_STD_RESOURCE; i++)
         {pio = pp->io + i;
 	 fd  = (pio == NULL) ? -1 : pio->fd;
 	 if (fd != -1)

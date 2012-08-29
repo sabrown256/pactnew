@@ -904,17 +904,12 @@ void dprpio(char *tag, process *pp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _JOB_CHILD_FORK - the child process comes here and
- *                 - it will never return
+/* _JOB_CHILD_PRELIM - handle preliminaries to job child exec
+ *                   - namely environment variables and
+ *                   - resource limits
  */
 
-static void _job_child_fork(process *pp, process *cp, char **argv, char *mode)
-   {int rv;
-    extern char **environ;
-    process_group_state *ps;
-
-    ps = get_process_group_state();
-
+void _job_child_prelim(process *pp)
    {int i, ip, nr, nl, np, ev, ok, fd;
     char t[MAXLINE];
     char *p;
@@ -928,6 +923,8 @@ static void _job_child_fork(process *pp, process *cp, char **argv, char *mode)
     pa = pg->parents;
     np = pg->np;
     for (ip = 0; ip < np; ip++)
+
+/* environment variables */
         {pio = pa[ip]->io + IO_STD_ENV_VAR;
 	 if (pio->gid == pp->ip)
 	    {fd = pg->children[pp->ip]->io[IO_STD_IN].fd;
@@ -951,7 +948,110 @@ static void _job_child_fork(process *pp, process *cp, char **argv, char *mode)
 			  putenv(STRSAVE(t));
 			  break;}
 		      else if (ev == EBADF)
-		         ok = 1;};};};};};
+		         ok = 1;};};};
+
+/* resource limits */
+	 pio = pa[ip]->io + IO_STD_LIMIT;
+	 if (pio->gid == pp->ip)
+	    {int op;
+	     char *vr, *vl;
+	     struct rlimit rl;
+
+	     fd = pg->children[pp->ip]->io[IO_STD_IN].fd;
+	     fp = fdopen(fd, "r");
+	     nsleep(100);
+
+	     nr = 0;
+	     ok = 0;
+	     for (i = 0; (ok == 0) && (nr < 1000); i++)
+	         {if (feof(fp) == TRUE)
+	 	     ok = 1;
+		  else
+		     {nr++;
+		      p  = fgets(t, LRG, fp);
+		      ev = errno;
+		      if (p != NULL)
+		         {nl++;
+			  nr = 0;
+			  LAST_CHAR(t) = '\0';
+
+			  op = -1;
+			  vr = t;
+			  vl = strchr(vr, '=');
+			  if (vl != NULL)
+			     {*vl = '\0';
+			      vl++;}
+			  else
+			     continue;
+
+/* address space - virtual memory */
+			  if (strcmp(vr, "as") == 0)
+			     {op = RLIMIT_AS;
+			      rl.rlim_cur = atol(vl);}
+
+/* maximum core file size */
+			  else if (strcmp(vr, "core") == 0)
+			     {op = RLIMIT_CORE;
+			      rl.rlim_cur = atol(vl);}
+
+/* CPU seconds limit */
+			  else if (strcmp(vr, "cpu") == 0)
+			     {op = RLIMIT_CPU;
+			      rl.rlim_cur = atol(vl);}
+
+/* file size limit */
+			  else if (strcmp(vr, "fsize") == 0)
+			     {op = RLIMIT_FSIZE;
+			      rl.rlim_cur = atol(vl);}
+
+/* file number limit */
+			  else if (strcmp(vr, "nofile") == 0)
+			     {op = RLIMIT_NOFILE;
+			      rl.rlim_cur = atol(vl);}
+
+/* thread number limit */
+			  else if (strcmp(vr, "nproc") == 0)
+			     {op = RLIMIT_NPROC;
+			      rl.rlim_cur = atol(vl);}
+
+/* memory page limit */
+			  else if (strcmp(vr, "rss") == 0)
+			     {op = RLIMIT_RSS;
+			      rl.rlim_cur = atol(vl);}
+
+
+/* stack size limit */
+			  else if (strcmp(vr, "stack") == 0)
+			     {op = RLIMIT_STACK;
+			      rl.rlim_cur = atol(vl);};
+
+			  if (op != -1)
+			     {_dbg(2, "setlimits %s = %ld",
+				   vr, (long) rl.rlim_cur);
+			      setrlimit(op, &rl);};
+
+                          ok = 1;}
+
+		      else if (ev == EBADF)
+		         ok = 1;};};};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _JOB_CHILD_FORK - the child process comes here and
+ *                 - it will never return
+ */
+
+static void _job_child_fork(process *pp, process *cp, char **argv, char *mode)
+   {int rv;
+    extern char **environ;
+    process_group_state *ps;
+
+    ps = get_process_group_state();
+
+    _job_child_prelim(pp);
 
 /* free the parent state which the child does not need */
     _job_free(pp);
