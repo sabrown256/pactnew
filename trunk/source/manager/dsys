@@ -704,7 +704,7 @@ switch ($Cmnd)
                    echo ""
                    echo "Usage: dsys config [-a <sid>] [-b 32 | 64] [-c] [-db <db>]"
                    echo "                   [-f <directory>] [-F] [-feature <feature>] [-g]"
-                   echo "                   [-gsys <opt>] [-h] [-i <directory>] [-llp] [-o] [-O] [-os <sys-id>]"
+                   echo "                   [-gsys <opt>] [-h] [-i <directory>] [-llp <path>] [-o] [-O] [-os <sys-id>]"
                    echo "                   [-p] [-cc <C compiler>] [-py] [-s] [-sl] [-t] [-v] [<config>]"
                    echo ""
                    echo "        -a         set the system id for this config"
@@ -718,7 +718,8 @@ switch ($Cmnd)
                    echo "        -h         this help message"
                    echo "        -i         base installation directory (default /usr/local)"
                    echo "                   to omit installation use "-i none""
-                   echo "        -llp       use LD_LIBRARY_PATH when analyzing compilers"
+                   echo "        -llp       use <path> for LD_LIBRARY_PATH when analyzing compilers"
+                   echo "                   special value '.' for path computed from compiler location (old default)"
                    echo "        -o         build an absolutely optimizied version"
                    echo "        -O         build an mixed debuggable/optimizied version"
                    echo "        -os        explicitly set the hardware/OS/release system id"
@@ -787,7 +788,8 @@ switch ($Cmnd)
                    set python = TRUE
                    breaksw
               case -llp:
-                   setenv UseLDLibPath "-l"
+                   shift
+                   setenv UseLDLibPath "-l $1"
                    breaksw
               case -md:
                    shift
