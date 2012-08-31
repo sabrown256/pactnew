@@ -14,7 +14,7 @@ source $Me:h/common
 
 set ANSI     = TRUE
 set FullPath = FALSE
-set LibPath  = FALSE
+set LibPath  = ""
 set ncclst   = ""
 
 @ Verbose  = 0
@@ -23,16 +23,17 @@ while ($#argv > 0)
    switch ($1)
        case -h:
             echo ""
-            echo "Usage: cc-find [-h] [-l] [-p] [-v] [-w] <cc>*"
+            echo "Usage: cc-find [-h] [-l <path>] [-p] [-v] [-w] <cc>*"
             echo "  h   this help message"
-            echo "  l   set and use LD_LIBRARY_PATH to detect compiler"
+            echo "  l   use <path> for LD_LIBRARY_PATH to detect compiler"
             echo "  p   use full path to compiler"
             echo "  v   increment verbosity level"
             echo "  w   compiler works ANSI or not"
             echo ""
             exit(1)
        case -l:
-            set LibPath = TRUE
+            shift
+            set LibPath = ( $1 )
             breaksw
        case -p:
             set FullPath = TRUE
@@ -116,8 +117,12 @@ foreach cc ($cclst)
       set libdir = $bindir:h/lib
 
 # if forced to - use LD_LIBRARY_PATH in compiler detection
-      if ($LibPath == TRUE) then
-         setenv LD_LIBRARY_PATH $libdir
+      if ("$LibPath" != "") then
+         if ("$LibPath" == ".") then
+            setenv LD_LIBRARY_PATH $libdir
+         else
+            setenv LD_LIBRARY_PATH $LibPath
+         endif
          if ($Verbose > 1) then
             echo ""
             echo "LD_LIBRARY_PATH = $LD_LIBRARY_PATH"

@@ -1787,7 +1787,14 @@ process *arelaunch(process *pp)
     ps = get_process_group_state();
 
     if ((pp != NULL) && (pp->nattempt <= ps->stck.nattempt))
-       {npp = alaunch(pp->ip, pp->cmd, pp->mode, pp->a,
+
+/* GOTCHA: not quite correct but better than nothing
+ * the stack should be carefully reconstructed to account for
+ * retrying the one process 
+ */
+       {ps->stck.ifd = 0;
+
+	npp = alaunch(pp->ip, pp->cmd, pp->mode, pp->a,
 		      pp->accept, pp->reject, pp->wait);
 
 	if (npp != NULL)

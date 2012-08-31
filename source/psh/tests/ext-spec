@@ -53,7 +53,7 @@ foreach i (1 2 3 4)
            set srt = FALSE
            breaksw
       case 4:
-           set cmd = ( gexec $opt /bin/echo "core=13000" @l /bin/csh -c limit @o grep coredumpsize '>&!' $res )
+           set cmd = ( gexec $opt /bin/echo "core=13000" @l /bin/csh -cf limit @o grep coredumpsize '>&!' $res )
            set gst = "0 0 0"
            set srt = FALSE
            breaksw

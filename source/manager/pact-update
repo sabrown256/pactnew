@@ -147,7 +147,8 @@ while ($#argv > 0)
               echo "               options are: gl (OpenGL), qd (Apple Quickdraw), and x11 (default)"
               echo "    -i         base installation directory (default /usr/local)"
               echo "               to omit installation use "-i none""
-              echo "    -llp       use LD_LIBRARY_PATH when analyzing compilers"
+              echo "    -llp       use <path> for LD_LIBRARY_PATH when analyzing compilers"
+              echo "               special value '.' for path computed from compiler location (old default)"
               echo "    -os        explicitly set the hardware/OS/release system id"
               echo "    -p         build a profiling version"
               echo "    -ub        do not do the build step"
@@ -296,6 +297,7 @@ while ($#argv > 0)
            breaksw
 
       case -cc:
+      case -llp:
            set cargs = ( $cargs $1 $2 )
            shift
            breaksw
