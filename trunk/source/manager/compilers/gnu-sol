@@ -10,8 +10,7 @@
 include compilers/gnu
 
 Tool LD {
-   Lib    = -lsocket -lnsl
-   Flags -= -rdynamic
+   Lib = -lsocket -lnsl
 }
 
 Group MDG {

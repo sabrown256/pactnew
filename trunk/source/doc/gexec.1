@@ -1,0 +1,289 @@
+.\"
+.\" Source Version: 3.0
+.\" Software Release #: LLNL-CODE-422942
+.\"
+.\" include cpyright.h
+.\"
+
+.TH GEXEC 1 "02 September 2012"
+.SH NAME
+gexec \- generalization of process pipelines
+.SH SYNOPSIS
+.B gexec [-d #] [-h] [-p] [-s] [-t] <command>*
+
+.SH DESCRIPTION
+
+gexec runs groups of processes with more arbitrary I/O connectivity.
+The standard UNIX shells have the ability of running pipelines of
+process in which the output of one serves as the input to the next.
+There are a few problems and limitations with the simple pipeline
+model as implemented.
+
+1) The exit status of all processes but the last is lost
+
+2) The ability to redirect stdout to one process and stderr
+   to another is absent
+
+3) There is no fan out or fan in in a pipeline
+
+4) Shell functions cannot interact with processes
+
+5) Sending other information such as environment variables,
+   resource limits, resource usage, or even exit status is
+   not done
+
+gexec is implemented as a C function which could be incorporated
+into a code as an alternative to the system function.  It is available
+in the PACT SCHEME interpreter where processes and SCHEME functions
+can communicate.
+
+The grammar for commands is:
+
+     <command>   := <pgrp> | <pgrp> <st-sep> <command>
+     <st-sep>    := ';'  |  '&&'  |  '||'
+
+     <pgrp>      := <job> | <job> <pgrp-io> <pgrp>
+     <job>       := <program> <args> | <program> <args> <file-io>
+     <program>   := 'executable program or script'
+     <args>      := <arg> | <arg> <args>
+     <arg>       := 'argument to an executable'
+
+     <file-io>   := <shell-io> | <pgr-io>
+     <shell-io>  := <shell-op> | <shell-op> <file-name>
+     <file-name> := 'name of file'
+     <shell-op>  := '<' | '>' | '>&' | '&>' | 
+                    '>>' | '>>&' |
+                    '>!' | '>&!' |
+                    '1>' | '2>' | '2>&1'
+
+     <pgrp-io>   := <pipe-io> | <pgr-io>
+     <pipe-io>   := '|'  |  '|&'  | '&|'
+
+     <pgr-io>    := <pgr-spec> | <pgr-spec> <pgr-io>
+     <pgr-spec>  := '@' |
+                    '@' <io-kind> |
+                    '@' <io-kind> <io-id> |
+                    '@' <io-kind> <io-id> <io-kind>
+     <io-kind>   := 'i' | 'o' | 'e' | 'b' |
+                    'r' | 'x' | 'l' | 'v'
+     <io-id>     := +<n> | -<n> | <n>
+     <n>         := unsigned integer value
+     
+Illegal cases are:
+
+     @i<n>i       input to input
+     @o<n>o, @e<n>e, @o<n>e, or @e<n>o    output to output
+     @o<n> @e<n>  where <n> is the same   use @b<n> to express that
+
+Gexec works with the PACT utility perdb - the persistent database.
+Perdb is used by processes in place of the environment to provide
+a persistent database without regard to parent/child process relationships.
+In this way arbitrary process can share a database (which is really
+what the environment is) in a more symmetric and friendly way.
+In particular, gexec sets a variable 'gstatus' in the persisent
+database which is a text string (as are environment variables) containing
+the exit status of each process in the process group run by gexec.
+See the perdb man pages for more details of its operation.
+
+
+.SH OPTIONS
+
+.TP
+.B \-d
+Set the debugging level to see information on I/O connections.
+.TP
+.B \-h
+This help message.
+.TP
+.B \-p
+Use pipes to communcate between processes.
+.TP
+.B \-s
+Use sockets to communcate between processes.
+.TP
+.B \-t
+Use PTYs to communcate between processes (not complete).
+
+.SH EXAMPLES
+
+The following examples are take from the gexec test suite.
+The program osrc is a simple program that prints messages
+to both its stdout and stderr.  It is used for reproducibility.
+If you wish to run one of these examples doing an ls on some
+files that exist and some that don't will work as well.
+
+.B Processes
+
+Here are several examples of communication between processes.
+Notice that some standard shell cases are supported and their
+special syntax must be quoted to avoid it being caught by
+the shell.
+
+# simple asynchronous processes
+
+ gexec pwd @ date @ ls
+
+# simple stdout variants
+
+ gexec /bin/echo "foo" @o cat -n
+ gexec /bin/echo "foo" @o+1 cat -n
+ gexec /bin/echo "foo" @o2 cat -n
+ gexec /bin/echo "foo" '|' cat -n
+
+# simple stdout and stderr variants
+
+ gexec osrc -t j4 @o+1 @e+2 cat -n @ cat -E
+ gexec osrc -t j5 @o2 @e3 cat -n @ cat -E
+
+# simple bonded stdout/stderr variants
+
+ gexec osrc -t j6 @b cat -n
+ gexec osrc -t j7 @b+1 cat -n
+ gexec osrc -t j8 @b2 cat -n
+ gexec osrc -t s2 '|' cat -n
+ gexec osrc -t s3 '|&' cat -n
+
+.B Functions
+
+These are examples of redirecting process I/O to and from
+functions or procedures.  The syntax: 'pw:test foo' means
+that test is a procedure that will called with the argument
+foo and written to; 'pr:test foo' means test is a procedure
+that will be called with the argument foo and read from;
+and 'pa:test foo' means that test is a procedure which will
+be called with the argument foo and it will be appended to
+(this may not be a useful distinction but it is made for
+consistentcy with file I/O).
+
+These examples of functions are only vaguely useful.  The
+gexec program has one built in function for testing the
+interaction between processes and functions.  The PACT
+SCHEME interpreter test suite has better examples showing
+how to have functions work with processes.
+
+The builtin gexec function is called 'test' and it prints
+some messages to which the argument is prepended.
+
+ gexec /bin/echo "foo" @o pw:test bar
+
+# simple stdin variants
+
+ gexec cat @i pr:test bar
+
+# simple append variants
+
+ gexec /bin/echo "foo" @o2 pa:test p3out
+
+# simple bonded variants
+
+ gexec /bin/echo "foo" @b2 pw:test p4bond
+
+# non-simple stdout variants
+
+ gexec /bin/echo "foo" @o2 @e3 pw:test p5out @ pw:test p5err
+ gexec osrc -t p6 @o2 @e3 pw:test p6out @ pw:test p6err
+
+.B Files
+
+These are examples of redirecting process I/O to and from
+files.  The syntax: 'fw:file.dat' means that file.dat is
+a file and it will be created and written to; 'fr:file.dat'
+means that file.dat is a file whose content will be read
+and sent on; and 'fa:file.dat' means that file.dat is
+a file and its contents will be appended to.
+
+# simple stdout variants
+
+ gexec /bin/echo "foo" @o fw:file.dat
+
+# simple stdin variants
+
+ gexec cat @i fr:file.dat
+
+# simple append variants
+
+ gexec /bin/echo "foo" @o2 fa:file.dat
+
+# simple bonded variants
+
+ gexec /bin/echo "foo" @b2 fw:f4bond
+
+# non-simple stdout variants
+
+ gexec /bin/echo "foo" @o2 @e3 fw:f5out @ fw:f5err
+ gexec osrc -t f6 @o2 @e3 fw:f6out @ fw:f6err
+
+.B Variables
+
+These are examples of redirecting process I/O to and from
+environment variables.  The syntax: 'vw:foo' means
+that foo is a variable that will be written to; 'vr:foo'
+means test is a variable that will be read from;
+and 'va:foo' means that test is a variable which will
+be appended to.
+
+# simple stdout variants
+
+ gexec /bin/echo "foo" @o vw:ev1
+
+# simple stdin variants
+
+ gexec cat @i vr:ev1
+
+# simple append variants
+
+ gexec /bin/echo "foo" @o2 va:ev1
+
+# simple bonded variants
+
+ gexec /bin/echo "foo" @b2 vw:v4bond
+
+# non-simple stdout variants
+
+ gexec /bin/echo "foo" @o2 @e3 vw:v5out @ vw:v5err
+ gexec osrc -t v6 @o2 @e3 vw:v6out @ vw:v6err
+
+.B Special kinds
+
+The special I/O kinds are @x for exit status, @r for
+resource usage, @v for environment variable(s), and @l
+for resource limits.  For @x and @r the results are written
+to specified process after the job is run.  For @v and @l
+the results are read by the specified process and set before
+it is exec'd.
+
+# send the exit status of echo to cat
+ gexec /bin/echo "foo" @x cat -n
+
+# send the resource usage of echo to cat
+ gexec /bin/echo "foo" @r cat -n
+
+Note that the resource usages are at least the POSIX
+mandated ones.
+
+# run printenv with the addition of the variable foo
+ gexec /bin/echo "foo=bar" @v printenv foo
+
+# run csh with the core dump size limit
+ gexec /bin/echo "core=13000" @l /bin/csh -cf limit @o grep coredumpsize
+
+Note the options for setting resource limits are (depending
+on the OS):
+
+   core   - maximum core file size (RLIMIT_CORE)
+   as     - address space - virtual memory (RLIMIT_AS)
+   cpu    - CPU seconds limit (RLIMIT_CPU)
+   fsize  - file size limit (RLIMIT_FSIZE)
+   nofile - file number limit (RLIMIT_NOFILE)
+   nproc  - thread number limit (RLIMIT_RSS)
+   stack  - stack size limit (RLIMIT_STACK)
+
+
+.SH See also
+.TP 
+.B perdb.
+
+.SH BUGS
+.TP 
+.B None known.
+

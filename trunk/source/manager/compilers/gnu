@@ -72,11 +72,13 @@ Tool CXX {
 
 Tool LD {
    RPath    = -Wl,-rpath,@
-   Flags   += -rdynamic
-   Flags   += -Wl,--disable-new-dtags        # save us from RUN_PATH
-   Flags   += [ _cmd_ = -p ;                 # profiling
+   Flags   += [ _env_ = HOSTOS ;
+                Linux = -rdynamic ]
+   Flags   += [ _env_ = HOSTOS ;
+                Linux = -Wl,--disable-new-dtags ] # save us from RUN_PATH
+   Flags   += [ _cmd_ = -p ;                      # profiling
 	        on    = -pg ]
-   Flags   += [ _cmd_ = -cov ;               # coverage analysis
+   Flags   += [ _cmd_ = -cov ;                    # coverage analysis
 	        on    = -lgcov ]
    Lib      = -lc
 }
