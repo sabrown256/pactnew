@@ -656,7 +656,7 @@ static int _job_set_attr(int fd, int i, int state)
     arg = fcntl(fd, F_GETFL);
     if (arg < 0)
        fprintf(stderr, "[%d]: Error get flag on %d - _job_set_attr\n",
-               getpid(), fd);
+               (int) getpid(), fd);
 
     switch (state)
        {case 1 :
@@ -672,7 +672,7 @@ static int _job_set_attr(int fd, int i, int state)
     status = fcntl(fd, F_SETFL, arg);
     if (status < 0)
        fprintf(stderr, "[%d]: Error set flag on %d - _job_set_attr\n",
-               getpid(), fd);
+               (int) getpid(), fd);
 
     rv = TRUE;
 
@@ -985,46 +985,59 @@ void _job_child_prelim(process *pp)
 			      else
 				 continue;
 
-/* address space - virtual memory */
-			      if (strcmp(vr, "as") == 0)
-				 {op = RLIMIT_AS;
-				  rl.rlim_cur = atol(vl);}
-
 /* maximum core file size */
-			      else if (strcmp(vr, "core") == 0)
+			      if (strcmp(vr, "core") == 0)
 				 {op = RLIMIT_CORE;
 				  rl.rlim_cur = atol(vl);}
 
+#ifdef RLIMIT_AS
+/* address space - virtual memory */
+			      else if (strcmp(vr, "as") == 0)
+				 {op = RLIMIT_AS;
+				  rl.rlim_cur = atol(vl);}
+#endif
+
+#ifdef RLIMIT_CPU
 /* CPU seconds limit */
 			      else if (strcmp(vr, "cpu") == 0)
 				 {op = RLIMIT_CPU;
 				  rl.rlim_cur = atol(vl);}
+#endif
 
+#ifdef RLIMIT_FSIZE
 /* file size limit */
 			      else if (strcmp(vr, "fsize") == 0)
 				 {op = RLIMIT_FSIZE;
 				  rl.rlim_cur = atol(vl);}
+#endif
 
+#ifdef RLIMIT_NOFILE
 /* file number limit */
 			      else if (strcmp(vr, "nofile") == 0)
 				 {op = RLIMIT_NOFILE;
 				  rl.rlim_cur = atol(vl);}
+#endif
 
+#ifdef RLIMIT_NPROC
 /* thread number limit */
 			      else if (strcmp(vr, "nproc") == 0)
 				 {op = RLIMIT_NPROC;
 				  rl.rlim_cur = atol(vl);}
+#endif
 
+#ifdef RLIMIT_RSS
 /* memory page limit */
 			      else if (strcmp(vr, "rss") == 0)
 				 {op = RLIMIT_RSS;
 				  rl.rlim_cur = atol(vl);}
+#endif
 
-
+#ifdef RLIMIT_STACK
 /* stack size limit */
 			      else if (strcmp(vr, "stack") == 0)
 				 {op = RLIMIT_STACK;
 				  rl.rlim_cur = atol(vl);};
+#endif
 
 			      if (op != -1)
 				 {_dbg(2, "setlimits %s = %ld",
