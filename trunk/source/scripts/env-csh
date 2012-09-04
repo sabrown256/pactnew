@@ -106,6 +106,8 @@ alias SafeEnv   'if ($?\!\!:1 == 0) setenv \!\!:1 \!\!:2'
 
 # dbexp export the current value of environment variable <var>
 # back to the database
+# matches C call dbexp
+# usage: dbexp <var>
 alias dbexp     'set t_ = ( `$PERDB -l \!\!:1 = $\!\!:1` )'
 alias SetParent 'echo "parent \!\!:1($\!\!:1)"'
 

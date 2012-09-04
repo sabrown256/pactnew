@@ -450,8 +450,8 @@ else
            exit($xstatus)
         endif
    else
-        flog $Log rm -f $TmpMsg
-        echo $Message | sed s/\"//g > $TmpMsg
+#        echo $Message | sed s/\"//g >! $TmpMsg
+        gexec echo $Message @o sed s/\"//g @o fw:$TmpMsg
         cat $MsgFile >> $TmpMsg
 
         flog $Log $SCSCom -F $TmpMsg

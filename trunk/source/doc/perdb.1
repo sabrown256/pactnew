@@ -1,0 +1,247 @@
+.\"
+.\" Source Version: 3.0
+.\" Software Release #: LLNL-CODE-422942
+.\"
+.\" include cpyright.h
+.\"
+
+.TH PERDB 1 "02 September 2012"
+.SH NAME
+perdb \- persistent database
+.SH SYNOPSIS
+.B perdb [-c] [-d] [-f <db>] [-h] [-l] [-s] [<req>]
+
+.SH DESCRIPTION
+
+With POSIX systems the environment is a simple database
+of the form VAR=VAL.  It is available to all programs run
+on the system.  One of the features of the way the environment
+is handled is that child processes inherit the environment
+of their parents but cannot modify their parent's environment.
+
+In some cases, such as configuring a code system for compilation,
+a more symmetric database is desired.  Any process regardless
+of relation to other processes can query, add to, or modify the
+database.
+
+Perdb was designed to work this way.  It is also designed to be
+as transparent as possible.  See the examples given below.
+
+Perdb works on a client/server model.  One can explicitly
+launch a server using the -s option below.  Or a server will
+be implicitly launched when perdb is run to perform any
+other database operation.  The server can be explicitly shut
+down with the quit: command or the server will save the database
+in $PERDB.db and exit after the value of the environment
+variable PERDB_IDLE_TIMEOUT passes without any transactions.
+
+You can have the server and or the clients log transactions
+by using the -l option.  The log file is $PERDB_PATH.log.
+
+
+.SH OPTIONS
+
+.TP
+.B \-c
+Create the database, removing any existing.
+.TP
+.B \-d
+Do not run server as daemon (for debugging only).
+.TP
+.B \-f
+Root path to database.
+.TP
+.B \-h
+This help message.
+.TP
+.B \-l
+Log transactions with the server.
+.TP
+.B \-s
+Run as server.
+
+.SH ENVIRONMENT VARIABLES
+
+PERDB_PATH
+
+This is the root path to a database.  It is not a directory
+name, but a root name to which a suffix is attached for the
+various files associated with a database.
+
+PERDB_IDLE_TIMEOUT
+
+This is the time that a server will run without processing
+any transactions before it saves the database and exits.
+The default is 60 seconds.
+
+PERDB_IDLE_INTERVAL
+
+This is the time that the server waits for input to become
+available before checking on other aspects of its function.
+The default is half of PERDB_IDLE_TIMEOUT.  You really do
+not need to set this unless you are checking on performance
+of the server.
+
+.SH EXAMPLES
+
+The following examples are taken from the perdb test suite.
+
+.B Controlling the database
+
+Here are several examples of selecting or controlling the
+database.  In the first example the database is specified
+on the command line.  In the second exampke, the database
+is specified by the environment variable PERDB_PATH.  If
+neither specification is used the default is ~/.perdb.
+
+perdb -f ~/foo a=b
+
+setenv PERDB_PATH ~/foo
+perdb a=b
+
+In these two cases the database would be ~/foo.db and
+the log file would be ~/foo.log.
+
+
+.B Set Operations
+
+Here are several examples of setting variables.
+In all of these it will be assumed that the environment
+PERDB_PATH is set.
+
+# set v1 - single token value
+
+perdb v1=1
+
+# set v2 - two token, single line list
+
+perdb v2="baz blat"
+
+# set v3 - angle bracket, multi-line list
+
+perdb v3="< foo ;\e
+.BR
+ bar >"
+
+# set v4 = double quoted, parenthesized, multi-line list
+
+perdb v4="( foo ;\e
+.BR
+ bar )"
+
+# set v5 = single quoted, parenthesized, multi-line list
+
+perdb v5='( foo ;\e
+.BR
+ bar )'
+
+# set v6 = single quoted, curly bracket, multi-line list
+
+perdb v6='{ foo ;\e
+.BR
+ bar }'
+
+# set v7 = single quoted, double quoted, multi-line list
+
+perdb v7='" foo ;\e
+.BR
+ bar "'
+
+
+.B Get Operations
+
+These are examples of getting variables from a database.
+In all of these it will be assumed that the environment
+PERDB_PATH is set.
+
+# get v1
+
+perdb v1
+
+.B Def Operations
+
+These are examples of querying a database for existence
+of a variable:
+
+perdb v1 \e?
+
+.B Conditional Operations
+
+These are examples of setting the values of variables if
+and only if they have no current value:
+
+perdb v2 =\e? foo
+
+.B Perdb Commands
+
+In all of these it will be assumed that the environment
+PERDB_PATH is set.
+
+# write all variables to file $PERDB_PATH.db
+
+perdb save:
+
+# write variable v1 to file $PERDB_PATH.db
+
+perdb save: v1
+
+# write all variable v1 to file $PERDB_PATH.dba.db
+
+perdb save dba: v1
+
+# read all variables from file $PERDB_PATH.db into the database
+
+perdb load:
+
+# read all variables from file $PERDB_PATH.dba.db into the database
+
+perdb load dba:
+
+# reset the database, removing all variables
+
+perdb reset:
+
+# tell the server to exit
+
+perdb quit:
+
+.SH AMENITIES FOR CSH
+
+If you include the PACT file env-csh in your CSH scripts
+you will have the following aliases which make using perdb
+more convenient in your shell scripts:
+
+dbset <var> <val>
+
+Set variable <var> to <val> in the database and the
+current environment.  Use dbset instead of setenv.  This
+also matches the C call dbset.
+
+dbget <var>
+
+Import the database variable <var> into the current environment.
+Use dbget before referencing the variable.  This also matches
+the C call dbget.
+
+dbdef <var>
+
+Query the database for existence of variable <var>.  This also
+matches the C call dbdef.  Check $status for the result.
+
+dbini <var> <val>
+
+Initialize variable <var> to <val> in the database if and only
+if <var> does not already have a value.  This also matches the
+C call dbinitv.
+
+dbexp <var>
+
+Export the current value of environment variable <var>
+back to the database.  This also matches the C call dbexp.
+
+
+.SH BUGS
+ 
+Not optimized for performance.  Also transactions sometimes
+lost on highly loaded systems.
+
