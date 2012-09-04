@@ -768,7 +768,7 @@ static void _SC_init_io_spec(subtask *pg, int n, int id)
  */
 
 int _SC_io_kind(SC_iodes *pio, char *ios)
-   {int ck, cd, fid, gid, nc, rel, rv;
+   {int ck, cd, fid, gid, nc, rv;
     SC_io_mode mode;
     SC_io_device dev;
     SC_io_kind knd;
@@ -806,7 +806,7 @@ int _SC_io_kind(SC_iodes *pio, char *ios)
 	else if (strncmp(ios, "2>", 2) == 0)
 	   {knd = SC_IO_STD_ERR;
 	    dev = SC_IO_DEV_FILE;}
-#if 1
+
 	else if ((strstr(ios, "|&") != NULL) ||
 		 (strstr(ios, "&|") != NULL))
 	   {knd = SC_IO_STD_BOND;
@@ -815,7 +815,7 @@ int _SC_io_kind(SC_iodes *pio, char *ios)
 	else if (strchr(ios, '|') != NULL)
 	   {knd = SC_IO_STD_OUT;
 	    dev = SC_IO_DEV_PIPE;}
-#endif
+
 	else
 	   {switch (ck)
 	       {case 'e' :
@@ -833,14 +833,12 @@ int _SC_io_kind(SC_iodes *pio, char *ios)
 		     break;};};
 
 /* next for the device type */
-        rel = FALSE;
 	switch (cd)
 	   {case '+' :
 	    case '-' :
 	         dev = SC_IO_DEV_PTY;
 	         dev = SC_IO_DEV_SOCKET;
 	         dev = SC_IO_DEV_PIPE;
-		 rel = TRUE;
 		 nc++;
 		 break;
 	    case 'e' :
@@ -1122,7 +1120,7 @@ static void _SC_process_group_parse(subtask *pg, int n, int id)
 
 static void _SC_reconnect_process_group(int n, subtask *pg,
 					PROCESS **pa, PROCESS **ca)
-   {int i, ide, ido, nm;
+   {int i, ido, nm;
     subtask *g;
     PROCESS *pp, *cp, *pn, *cn;
 
@@ -1168,9 +1166,6 @@ static void _SC_reconnect_process_group(int n, subtask *pg,
 	    {g = pg + i;
 
 	     ido = g->fd[SC_IO_STD_OUT].gid;
-	     ide = g->fd[SC_IO_STD_ERR].gid;
-
-	     ide = i + 1;
 
 	     pp = pa[i];
 	     cp = ca[i];

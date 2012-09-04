@@ -1576,7 +1576,7 @@ CFG_DONE:
                                  if ("$Date" == "") then
                                     grep $Tag $RepoDir/commitlog
                                  else
-                                    grep $Tag $RepoDir/commitlog |&  \
+                                    grep $Tag $RepoDir/commitlog    |&  \
                                     sed "s/'//g"                    |&  \
                                     sed 's/\"//g'                   |&  \
                                     awk '$4 >= "D'$Date'" { print }'
@@ -2012,7 +2012,10 @@ CFG_DONE:
         flog $LogFile $ScrDir/scs-update
         Note $LogFile do-net -e $DO_PACT $DArgs $CArgs
 
-        do-net -e $DO_PACT $DArgs $CArgs |& tee -ai $LogFile
+#        do-net -e $DO_PACT $DArgs $CArgs |& tee -ai $LogFile
+	gexec do-net -e $DO_PACT $DArgs $CArgs @b tee -ai $LogFile
+        dbget gstatus
+        set RStatus = $gstatus[1]
 
         breaksw
 
@@ -3470,7 +3473,10 @@ CFG_DONE:
 
         Note $Log "Command: $Cmd"
 
-        $Cmd |& tee -ai $Log
+#        $Cmd |& tee -ai $Log
+        gexec $Cmd @b tee -ai $Log
+        dbget gstatus
+        set RStatus = $gstatus[1]
 
         breaksw
 

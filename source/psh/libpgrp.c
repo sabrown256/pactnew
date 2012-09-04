@@ -1843,29 +1843,20 @@ int _fnc_wait(process_group *pg, int ip, int st)
 	    rv  = FALSE;};
 
 	if (st != 0)
-	   {int fd, jo;
+	   {int jo;
             iodes *pio;
 	    process *pd;
-	    FILE *fp;
 
 	    _block_all_sig(TRUE);
 
 	    for (io = 0; io < N_IO_CHANNELS; io++)
 	        {pio = pp->io + io;
 		 if (pio->gid != -1)
-		    {fd = pio->fd;
-		     fp = pio->fp;
-		     if (fd > 2)
-		        _fd_close(fd);
-		     if (fp != NULL)
-		        fclose(fp);
 
-		     pio->fd  = -1;
-		     pio->fp  = NULL;
-		     pio->hnd = IO_HND_NONE;
-		     pio->dev = IO_DEV_NONE;
-		     pio->knd = IO_STD_NONE;
+/* close this channel */
+		    {_job_io_close(pp, io);
 
+/* close process channels this function talks to */
 		     pd = pg->parents[pio->gid];
 		     if (pd->isfunc == FALSE)
 		        {for (jo = 0; jo < N_IO_CHANNELS; jo++)
@@ -1876,7 +1867,9 @@ int _fnc_wait(process_group *pg, int ip, int st)
 			 if (pd->id > 0)
 			    kill(pd->id, SIGHUP);
 
-			 job_wait(pd);};};};
+			 job_wait(pd);};}
+	       else
+		  pio->fd = -1;};
 
 	    pp->stop_time = wall_clock_time();
 	    pp->status    = cnd;
@@ -2487,7 +2480,7 @@ int transfer_ft(FILE *fi, char ***psa)
 
 int gexec_var(char *db, io_mode md, FILE **fio,
 	      char *name, int c, char **v)
-   {int i, nc, ns, rv;
+   {int i, nc, ns, nw, rv;
     char t[MAXLINE];
     char *vr, *vl, **sa;
     static int ic = 0;
@@ -2507,13 +2500,19 @@ int gexec_var(char *db, io_mode md, FILE **fio,
 
 /* variable to stdout NC times */
 	   {case IO_MODE_RO :
+	         nw = 0;
 		 ns = lst_length(sa);
 		 for (i = 0; i < ns; i++)
-		     fprintf(fio[1], "%s ", sa[i]);
+		     {nw += strlen(sa[i]);
+		      fprintf(fio[1], "%s ", sa[i]);};
 		 fprintf(fio[1], "\n");
+		 nw++;
+                 fflush(fio[1]);
 		 ic++;
 		 if (ic >= nc)
 		    rv = 1;
+		 _dbg(-2, "sent to %d %d chars (%d)",
+		      fileno(fio[1]), nw, rv);
 		 break;
 
 /* stdin to variable */
