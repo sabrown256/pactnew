@@ -126,7 +126,7 @@ static int _SC_query_exec_unix(char *path)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* system capability API */
+/* system capability API - PACT level */
 
 SC_oscapdes
   _SC_os = { _SC_path_delimiter_unix,
@@ -135,7 +135,7 @@ SC_oscapdes
 	     _SC_query_exec_unix,
 	     _SC_posix_process };
 
-/* system call API */
+/* system call API - POSIX level compliant */
 
 syscall_api
   _SC_osapi = { getpwuid, getuid, getgid, 

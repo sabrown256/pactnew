@@ -23,7 +23,7 @@ SafeEnv MDG_Lib          ""
 SafeEnv MDG_Pck          ""
 SafeEnv OGL_Inc          ""
 SafeEnv OGL_Lib          ""
-SafeEnv OGL_RPath        /usr/lib
+SafeEnv OGL_RPath        $RootLib
 SafeEnv OGL_Path         /usr
 SafeEnv Std_UseOGL       FALSE
 
@@ -63,8 +63,11 @@ int main(int c, char **v)
 EOF
 
    set Implicit = TRUE
-   set lIncDirs = ( $RootInc /usr/X11R6/include )
-   set lLibDirs = ( $lLibDirs /usr/lib64 /usr/lib /usr/openwin/lib /usr/X11R6/lib )
+   set lIncDirs = ( $RootInc )
+   set lLibDirs = ( $lLibDirs /usr/lib64 $RootLib /usr/openwin/lib )
+# NOTE: X11R6 is mostly gone
+#   set lIncDirs = ( $RootInc /usr/X11R6/include )
+#   set lLibDirs = ( $lLibDirs /usr/lib64 $RootLib /usr/openwin/lib /usr/X11R6/lib )
    set lHdrs    = ( GL/gl.h GL/glx.h )
    set ASList   = ( a so )
    set lLib     = GL

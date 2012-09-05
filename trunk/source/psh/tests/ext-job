@@ -21,6 +21,15 @@ set rpf = ""
 
 set lt = `timer -r`
 
+set catE = cat
+foreach i ( -E -e )
+   echo foo | cat $i >& /dev/null
+   if ($status == 0) then
+      set catE = ( cat $i )
+      break
+   endif
+end
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
@@ -57,12 +66,12 @@ foreach i (1 2 3 4 5 6 7 8)
 
 # simple stdout and stderr variants
       case 4:
-           set cmd = ( gexec $opt osrc -t j4 @o+1 @e+2 cat -n @ cat -E '>&!' $raw )
+           set cmd = ( gexec $opt osrc -t j4 @o+1 @e+2 cat -n @ $catE '>&!' $raw )
            set gst = "1 0 0"
            set srt = TRUE
            breaksw
       case 5:
-           set cmd = ( gexec $opt osrc -t j5 @o2 @e3 cat -n @ cat -E '>&!' $raw )
+           set cmd = ( gexec $opt osrc -t j5 @o2 @e3 cat -n @ $catE '>&!' $raw )
            set gst = "1 0 0"
            set srt = TRUE
            breaksw

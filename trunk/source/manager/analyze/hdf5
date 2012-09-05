@@ -20,7 +20,7 @@ SafeEnv MDI_Lib    ""
 SafeEnv MDI_Pck    ""
 SafeEnv HDF_Inc    ""
 SafeEnv HDF_Lib    ""
-SafeEnv HDF_RPath  /usr/lib
+SafeEnv HDF_RPath  $RootLib
 SafeEnv HDF_Path   /usr
 SafeEnv Z_Lib      "-lz"
 

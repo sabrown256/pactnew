@@ -566,10 +566,12 @@ typedef int boolean;
 typedef unsigned char u_int8_t;
 typedef unsigned short u_int16_t;
 
+#if 0
 #ifdef LONG_32		
 typedef unsigned long u_int32_t;
 #else
 typedef unsigned int u_int32_t;
+#endif
 #endif
 
 /* _H_INTTYPES is defined by an AIX include which also typedefs

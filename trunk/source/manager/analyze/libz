@@ -20,7 +20,7 @@ SafeEnv MD_Lib    ""
 SafeEnv MD_Pck    ""
 SafeEnv Z_Inc     ""
 SafeEnv Z_Lib     ""
-SafeEnv Z_RPath   /usr/lib
+SafeEnv Z_RPath   $RootLib
 SafeEnv Z_Path    /usr
 
 # if we have explicitly said we do not want libZ do NOT detect it

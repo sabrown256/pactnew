@@ -8,4 +8,8 @@
 #
 
 setenv PATH ${PATH}:/usr/local/bin
+
+setenv RootInc /usr/local/include
+setenv RootLib /usr/local/lib
+
 include gnu

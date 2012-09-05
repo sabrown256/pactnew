@@ -179,6 +179,7 @@
 
 #define FILE_FILE(_t, _o)    (_t *) ((_o)->file)
 
+#undef FILE_TYPE    /* Solaris has this */
 #define FILE_TYPE(_o)        (SS_GET(g_file, _o)->type)
 #define FILE_STREAM(_t, _o)  (_t *) (SS_GET(g_file, _o)->file)
 #define FILE_NAME(_o)        (SS_GET(g_file, _o)->name)

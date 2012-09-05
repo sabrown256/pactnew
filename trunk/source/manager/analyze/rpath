@@ -145,8 +145,12 @@ switch ($Tgt)
         breaksw
 
    case linux:
-        setenv RPATH     /usr/X11R6/${LIB}:/usr/${LIB}:${RPATH}
-        setenv Cfg_RPATH /usr/X11R6/${LIB}:/usr/${LIB}:${RPATH}
+        setenv RPATH     /usr/${LIB}:${RPATH}
+        setenv Cfg_RPATH /usr/${LIB}:${RPATH}
+
+# NOTE: X11R6 is mostly gone
+#        setenv RPATH     /usr/X11R6/${LIB}:/usr/${LIB}:${RPATH}
+#        setenv Cfg_RPATH /usr/X11R6/${LIB}:/usr/${LIB}:${RPATH}
         breaksw
 
    case path:
