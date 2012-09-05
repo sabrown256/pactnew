@@ -824,20 +824,20 @@ char **SC_hasharr_dump(hasharr *ha, char *patt, char *type, int sort)
 
 void dhash(hasharr *ha, char *patt, int sort)
    {int i, n;
-    char **lines;
+    char **sa;
 
-    lines = SC_hasharr_dump(ha, patt, NULL, FALSE);
-    if (lines != NULL)
-       {SC_ptr_arr_len(n, lines);
+    sa = SC_hasharr_dump(ha, patt, NULL, FALSE);
+    if (sa != NULL)
+       {SC_ptr_arr_len(n, sa);
 
 	if (sort == TRUE)
-	   SC_string_sort(lines, n);
+	   SC_string_sort(sa, n);
 
         for (i = 0; i < n; i++)
-            {if (lines[i] != NULL)
-	        io_printf(stdout, "%4d\t%s\n", i, lines[i]);};
+            {if (sa[i] != NULL)
+	        io_printf(stdout, "%4d\t%s\n", i, sa[i]);};
 
-        SC_free_strings(lines);};
+        SC_free_strings(sa);};
 
     return;}
 

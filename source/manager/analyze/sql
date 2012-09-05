@@ -20,7 +20,7 @@ SafeEnv MDI_Lib    ""
 SafeEnv MDI_Pck    ""
 SafeEnv SQL_Inc    ""
 SafeEnv SQL_Lib    ""
-SafeEnv SQL_RPath  /usr/lib
+SafeEnv SQL_RPath  $RootLib
 SafeEnv SQL_Path   /usr
 SafeEnv HAVE_SQL   FALSE
 

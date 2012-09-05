@@ -39,6 +39,7 @@ setenv DO_RUN_CROSS      none
 # GOTCHA: this root may be different for CROSS_COMPILE
 # need script to figure out root includes for given compiler
 setenv RootInc  /usr/include
+setenv RootLib  /usr/lib
 
 setenv LIB       lib
 

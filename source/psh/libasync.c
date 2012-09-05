@@ -837,7 +837,7 @@ void dprdio(char *tag, iodes *pio)
    {int nc, fd, gid, dst, src;
     char sdst[MAXLINE], ssrc[MAXLINE], snc[MAXLINE];
     char *hnd, *knd, *dev;
-    static char *hn[]  = {"none", "clos", "pipe", "poll"};
+    static char *hn[]  = {"none", "clos", "pipe", "fnc", "poll"};
     static char *kn[]  = {"none", "in", "out", "err",
 			  "sts", "rsrc", "lmt", "env",
 			  "bond"};

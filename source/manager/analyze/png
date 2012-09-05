@@ -20,7 +20,7 @@ SafeEnv MDG_Lib      ""
 SafeEnv MDG_Pck      ""
 SafeEnv PNG_Inc      ""
 SafeEnv PNG_Lib      ""
-SafeEnv PNG_RPath    /usr/lib
+SafeEnv PNG_RPath    $RootLib
 SafeEnv PNG_Path     /usr
 SafeEnv HAVE_PNGLIB  FALSE
 

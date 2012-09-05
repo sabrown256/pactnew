@@ -64,27 +64,27 @@ IncAction = sinstall ${IncFiles} ${IncDir}/shell
 pco : ${BinDir}/pco
 
 ${BinDir}/pco : pco.c libpsh.c
-	${PCC} pco.c -o ${BinDir}/pco
+	${PCC} pco.c -o ${BinDir}/pco ${MDLib}
 
 do-net : ${BinDir}/do-net
 
 ${BinDir}/do-net : do-net.c ${LibFiles}
-	${PCC} do-net.c -o ${BinDir}/do-net
+	${PCC} do-net.c -o ${BinDir}/do-net ${MDLib}
 
 do-run : ${BinDir}/do-run
 
 ${BinDir}/do-run : do-run.c ${LibFiles}
-	${PCC} do-run.c -o ${BinDir}/do-run
+	${PCC} do-run.c -o ${BinDir}/do-run ${MDLib}
 
 atdbg : ${BinDir}/atdbg
 
 ${BinDir}/atdbg : atdbg.c libpsh.c
-	${PCC} atdbg.c -o ${BinDir}/atdbg
+	${PCC} atdbg.c -o ${BinDir}/atdbg ${MDLib}
 
 gexec : ${BinDir}/gexec
 
 ${BinDir}/gexec : gexec.c libpsh.c
-	${PCC} gexec.c -o ${BinDir}/gexec
+	${PCC} gexec.c -o ${BinDir}/gexec ${MDLib}
 
 pcsh : ${BinDir}/pcsh
 
@@ -99,7 +99,7 @@ ${BinDir}/perdb : perdb.c ${LibFiles}
 elide : ${BinDir}/elide
 
 ${BinDir}/elide : elide.c ${LibFiles}
-	${PCC} elide.c -o ${BinDir}/elide
+	${PCC} elide.c -o ${BinDir}/elide ${MDLib}
 
 blang : ${BinDir}/blang
 

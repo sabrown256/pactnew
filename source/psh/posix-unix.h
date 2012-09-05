@@ -30,12 +30,42 @@
 #include <sys/sem.h>
 #include <sys/utsname.h>
 #include <sys/wait.h>
+#include <sys/resource.h>
 
 /* include this here to control complications with non-standard ones */
 #include <unistd.h>
 
 /* not strictly POSIX but not ANSI C either */
 #include <sys/ioctl.h>
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* GCC predefined OS designation macros
+ * and any non-standard or non-portable specifications
+ */
+
+/* Linux */
+
+#ifdef __linux__
+#endif
+
+/* FreeBSD */
+
+#ifdef __FreeBSD__
+# undef lines
+# undef newline
+# undef buttons
+#endif
+
+/* Solaris */
+
+#ifdef __sun__
+
+typedef uint64_t u_int64_t;
+typedef uint32_t u_int32_t;
+
+#endif
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
