@@ -1,6 +1,6 @@
-     1	j5> out message #1
-     2	j5> out message #2
-     3	j5> out message #3
-     4	j5> out message #4
-j5> err message #1$
-j5> err message #2$
+err> j5> err message #1
+err> j5> err message #2
+out> j5> out message #1
+out> j5> out message #2
+out> j5> out message #3
+out> j5> out message #4

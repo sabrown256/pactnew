@@ -21,14 +21,8 @@ set rpf = ""
 
 set lt = `timer -r`
 
-set catE = cat
-foreach i ( -E -e )
-   echo foo | cat $i >& /dev/null
-   if ($status == 0) then
-      set catE = ( cat $i )
-      break
-   endif
-end
+set logout = ( osrc -t out cat )
+set logerr = ( osrc -t err cat )
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -49,46 +43,46 @@ foreach i (1 2 3 4 5 6 7 8)
 
 # simple stdout variants
       case 1:
-           set cmd = ( gexec $opt /bin/echo "$id" @o cat -n '>&!' $res )
+           set cmd = ( gexec $opt /bin/echo "$id" @o $logout '>&!' $res )
            set gst = "0 0"
            set srt = FALSE
            breaksw
       case 2:
-           set cmd = ( gexec $opt /bin/echo "$id" @o+1 cat -n '>&!' $res )
+           set cmd = ( gexec $opt /bin/echo "$id" @o+1 $logout '>&!' $res )
            set gst = "0 0"
            set srt = FALSE
            breaksw
       case 3:
-           set cmd = ( gexec $opt /bin/echo "$id" @o2 cat -n '>&!' $res )
+           set cmd = ( gexec $opt /bin/echo "$id" @o2 $logout '>&!' $res )
            set gst = "0 0"
            set srt = FALSE
            breaksw
 
 # simple stdout and stderr variants
       case 4:
-           set cmd = ( gexec $opt osrc -t j4 @o+1 @e+2 cat -n @ $catE '>&!' $raw )
+           set cmd = ( gexec $opt osrc -t j4 @o+1 @e+2 $logout @ $logerr '>&!' $raw )
            set gst = "1 0 0"
            set srt = TRUE
            breaksw
       case 5:
-           set cmd = ( gexec $opt osrc -t j5 @o2 @e3 cat -n @ $catE '>&!' $raw )
+           set cmd = ( gexec $opt osrc -t j5 @o2 @e3 $logout @ $logerr '>&!' $raw )
            set gst = "1 0 0"
            set srt = TRUE
            breaksw
 
 # simple bonded stdout/stderr variants
       case 6:
-           set cmd = ( gexec $opt osrc -t j6 @b cat -n '>&!' $raw )
+           set cmd = ( gexec $opt osrc -t j6 @b $logout '>&!' $raw )
            set gst = "1 0"
            set srt = TRUE
            breaksw
       case 7:
-           set cmd = ( gexec $opt osrc -t j7 @b+1 cat -n '>&!' $raw )
+           set cmd = ( gexec $opt osrc -t j7 @b+1 $logout '>&!' $raw )
            set gst = "1 0"
            set srt = TRUE
            breaksw
       case 8:
-           set cmd = ( gexec $opt osrc -t j8 @b2 cat -n '>&!' $raw )
+           set cmd = ( gexec $opt osrc -t j8 @b2 $logout '>&!' $raw )
            set gst = "1 0"
            set srt = TRUE
            breaksw

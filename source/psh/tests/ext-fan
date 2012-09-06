@@ -21,14 +21,8 @@ set rpf = ""
 
 set lt = `timer -r`
 
-set catE = cat
-foreach i ( -E -e )
-   echo foo | cat $i >& /dev/null
-   if ($status == 0) then
-      set catE = ( cat $i )
-      break
-   endif
-end
+set logout = ( osrc -t out cat )
+set logerr = ( osrc -t err cat )
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -67,19 +61,19 @@ foreach i (1 2 3 4 5 6)
 
 # fan out tests
       case 4:
-           set cmd = ( gexec $opt /bin/echo ${id} @ cat -n @i1 $catE @i1 '>&!' $res )
+           set cmd = ( gexec $opt /bin/echo ${id} @ $logout @i1 $logerr @i1 '>&!' $res )
            set gst = "0 0 0"
            set srt = FALSE
            breaksw
 
       case 5:
-           set cmd = ( gexec $opt cat -n @i2 /bin/echo ${id} @ $catE @i2 '>&!' $res )
+           set cmd = ( gexec $opt $logout @i2 /bin/echo ${id} @ $logerr @i2 '>&!' $res )
            set gst = "0 0 0"
            set srt = FALSE
            breaksw
 
       case 6:
-           set cmd = ( gexec $opt cat -n @i3 $catE @i3 /bin/echo ${id}'>&!' $res )
+           set cmd = ( gexec $opt $logout @i3 $logerr @i3 /bin/echo ${id}'>&!' $res )
            set gst = "0 0 0"
            set srt = FALSE
            breaksw

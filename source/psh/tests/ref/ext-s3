@@ -1,6 +1,6 @@
-     1	s3> err message #1
-     2	s3> err message #2
-     3	s3> out message #1
-     4	s3> out message #2
-     5	s3> out message #3
-     6	s3> out message #4
+out> s3> err message #1
+out> s3> err message #2
+out> s3> out message #1
+out> s3> out message #2
+out> s3> out message #3
+out> s3> out message #4
