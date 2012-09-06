@@ -1,4 +1,4 @@
-     1	s2> out message #1
-     2	s2> out message #2
-     3	s2> out message #3
-     4	s2> out message #4
+out> s2> out message #1
+out> s2> out message #2
+out> s2> out message #3
+out> s2> out message #4

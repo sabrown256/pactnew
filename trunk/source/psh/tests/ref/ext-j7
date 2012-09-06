@@ -1,6 +1,6 @@
-     1	j7> err message #1
-     2	j7> err message #2
-     3	j7> out message #1
-     4	j7> out message #2
-     5	j7> out message #3
-     6	j7> out message #4
+out> j7> err message #1
+out> j7> err message #2
+out> j7> out message #1
+out> j7> out message #2
+out> j7> out message #3
+out> j7> out message #4

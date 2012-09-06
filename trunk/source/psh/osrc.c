@@ -60,13 +60,14 @@ static int gen(char *tag, int nc, int ne, int no)
 /*--------------------------------------------------------------------------*/
 
 int main(int c, char **v)
-   {int i, nc, ne, no, rv;
+   {int i, nc, ne, no, rv, oper;
     char *tag;
 
-    nc = 2;
-    ne = 1;
-    no = 2;
-    tag = "";
+    nc   = 2;
+    ne   = 1;
+    no   = 2;
+    tag  = "";
+    oper = 0;
 
     for (i = 1; i < c; i++)
         {if (v[i][0] == '-')
@@ -84,9 +85,14 @@ int main(int c, char **v)
                       tag = v[++i];
                       break;};}
 	  else if (strcmp(v[i], "cat") == 0)
-	     rv = cat(tag, nc, ne, no);
+	     oper = 1;
 	  else
-	     rv = gen(tag, nc, ne, no);};
+	     oper = 0;};
+
+    if (oper == 1)
+       rv = cat(tag, nc, ne, no);
+    else
+       rv = gen(tag, nc, ne, no);
 
 /* reverse the sense of the exit status */
     rv = (rv != TRUE);
