@@ -922,7 +922,7 @@ static void _job_set_process_env(process *pp)
 
 	fd = pg->children[pp->ip]->io[IO_STD_IN].fd;
 	fp = fdopen(fd, "r");
-	nsleep(100);
+/*	nsleep(100); */
 
 	nl = 0;
 	nr = 0;
@@ -968,7 +968,7 @@ void _job_set_process_rlimits(process *pp)
 
 	fd = pg->children[pp->ip]->io[IO_STD_IN].fd;
 	fp = fdopen(fd, "r");
-	nsleep(100);
+/*	nsleep(100); */
 
 	nl = 0;
 	nr = 0;
