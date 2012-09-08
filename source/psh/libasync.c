@@ -317,13 +317,12 @@ void _job_io_close(process *pp, io_kind knd)
     fd = pp->io[knd].fd;
     fp = pp->io[knd].fp;
 
-    if (pp->isfunc == FALSE)
-       {af = abs(fd);
-	if (fd > 2)
-	   _fd_close(af);
+    af = abs(fd);
+    if (fd > 2)
+       _fd_close(af);
 
-	if (fp != NULL)
-	   fclose(fp);};
+    if (fp != NULL)
+       fclose(fp);
 
     pp->io[knd].fd  = -1;
     pp->io[knd].fp  = NULL;
@@ -567,8 +566,7 @@ static void _job_free(process *pp)
  * and try to free it just once
  */
 	if (pp->ip > -2)
-	   {pp->ip = -2;
-/*	    FREE(pp); */}
+	   pp->ip = -2;
 	else
 	   fprintf(stderr, "Job freed twice\n");};
 
@@ -583,7 +581,8 @@ static void _job_free(process *pp)
  *           - return -1 indicating failure
  */
 
-static int _job_exec(process *cp, char **argv, char **env, char *mode)
+static int _job_exec(process *cp, int *fds,
+		     char **argv, char **env, char *mode)
    {int i, err, fg, rv;
     int io[N_IO_CHANNELS];
 
@@ -616,9 +615,10 @@ static int _job_exec(process *cp, char **argv, char **env, char *mode)
 	for (i = 0; i < N_IO_CHANNELS; i++)
 	    dup2(io[i], i);
 
-/* now that they are copied release the old values */
-	for (i = 0; i < N_IO_CHANNELS; i++)
-	    _fd_close(io[i]);
+/* release file descriptors that may have been opened for pipes */
+	if (fds != NULL)
+	   {for (i = 0; fds[i] > 0; i++)
+	        _fd_close(fds[i]);};
 
 /* exec the process with args and environment - this won't return */
 	err = execvp(argv[0], argv);};
@@ -904,16 +904,177 @@ void dprpio(char *tag, process *pp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _JOB_SET_PROCESS_ENV - set environment variables for PP */
+
+static void _job_set_process_env(process *pp)
+   {int i, nr, nl, ev, ok, fd;
+    char t[MAXLINE];
+    char *p;
+    FILE *fp;
+    process_group *pg;
+
+    ok = (pp != NULL);
+    if (ok == TRUE)
+       ok &= (pp->pg != NULL);
+
+    if (ok == TRUE)
+       {pg = pp->pg;
+
+	fd = pg->children[pp->ip]->io[IO_STD_IN].fd;
+	fp = fdopen(fd, "r");
+	nsleep(100);
+
+	nl = 0;
+	nr = 0;
+	ok = 0;
+	for (i = 0; (ok == 0) && (nr < 1000); i++)
+	    {if (feof(fp) == TRUE)
+		ok = 1;
+	     else
+	        {nr++;
+		 p  = fgets(t, LRG, fp);
+		 ev = errno;
+		 if (p != NULL)
+		    {nl++;
+		     nr = 0;
+		     LAST_CHAR(t) = '\0';
+		     _dbg(2, "setenv %s", t);
+		     putenv(STRSAVE(t));
+		     break;}
+		 else if (ev == EBADF)
+		    ok = 1;};};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _JOB_SET_PROCESS_RLIMITS - set resource limits for PP */
+
+void _job_set_process_rlimits(process *pp)
+   {int i, nr, nl, ev, ok, op, fd;
+    char t[MAXLINE];
+    char *p, *vr, *vl;
+    FILE *fp;
+    process_group *pg;
+    struct rlimit rl;
+
+    ok = (pp != NULL);
+    if (ok == TRUE)
+       ok &= (pp->pg != NULL);
+
+    if (ok == TRUE)
+       {pg = pp->pg;
+
+	fd = pg->children[pp->ip]->io[IO_STD_IN].fd;
+	fp = fdopen(fd, "r");
+	nsleep(100);
+
+	nl = 0;
+	nr = 0;
+	ok = 0;
+	for (i = 0; (ok == 0) && (nr < 1000); i++)
+	    {if (feof(fp) == TRUE)
+		ok = 1;
+	     else
+	        {nr++;
+		 p  = fgets(t, LRG, fp);
+		 ev = errno;
+		 if (p != NULL)
+		    {nl++;
+		     nr = 0;
+		     LAST_CHAR(t) = '\0';
+
+		     op = -1;
+		     vr = t;
+		     vl = strchr(vr, '=');
+		     if (vl != NULL)
+		        {*vl = '\0';
+			 vl++;}
+		     else
+		        continue;
+
+/* maximum core file size */
+		     if (strcmp(vr, "core") == 0)
+		        {op = RLIMIT_CORE;
+			 rl.rlim_cur = atol(vl);}
+
+#ifdef RLIMIT_AS
+/* address space - virtual memory */
+		     else if (strcmp(vr, "as") == 0)
+		        {op = RLIMIT_AS;
+			 rl.rlim_cur = atol(vl);}
+#endif
+
+#ifdef RLIMIT_CPU
+/* CPU seconds limit */
+		     else if (strcmp(vr, "cpu") == 0)
+		        {op = RLIMIT_CPU;
+			 rl.rlim_cur = atol(vl);}
+#endif
+
+#ifdef RLIMIT_FSIZE
+/* file size limit */
+		     else if (strcmp(vr, "fsize") == 0)
+		        {op = RLIMIT_FSIZE;
+			 rl.rlim_cur = atol(vl);}
+#endif
+
+#ifdef RLIMIT_NOFILE
+/* file number limit */
+		     else if (strcmp(vr, "nofile") == 0)
+		        {op = RLIMIT_NOFILE;
+			 rl.rlim_cur = atol(vl);}
+#endif
+
+#ifdef RLIMIT_NPROC
+/* thread number limit */
+		     else if (strcmp(vr, "nproc") == 0)
+		        {op = RLIMIT_NPROC;
+			 rl.rlim_cur = atol(vl);}
+#endif
+
+#ifdef RLIMIT_RSS
+/* memory page limit */
+		     else if (strcmp(vr, "rss") == 0)
+		        {op = RLIMIT_RSS;
+			 rl.rlim_cur = atol(vl);}
+#endif
+
+#ifdef RLIMIT_STACK
+/* stack size limit */
+		     else if (strcmp(vr, "stack") == 0)
+		        {op = RLIMIT_STACK;
+			 rl.rlim_cur = atol(vl);};
+#endif
+
+		     if (op != -1)
+		        {int st;
+			 char bf[MAXLINE];
+
+			 st = setrlimit(op, &rl);
+			 strerror_r(errno, bf, MAXLINE);
+			 _dbg(2, "received from %d - setlimit %s = %ld (%d/%s)",
+			      fd, vr, (long) rl.rlim_cur, st,
+			      (st == 0) ? "ok" : bf);};
+
+		     ok = 1;}
+
+		 else if (ev == EBADF)
+		    ok = 1;};};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _JOB_CHILD_PRELIM - handle preliminaries to job child exec
  *                   - namely environment variables and
  *                   - resource limits
  */
 
 void _job_child_prelim(process *pp)
-   {int i, ip, nr, nl, np, ev, ok, fd;
-    char t[MAXLINE];
-    char *p;
-    FILE *fp;
+   {int ip, np;
     iodes *pio;
     process **pa;
     process_group *pg;
@@ -928,126 +1089,12 @@ void _job_child_prelim(process *pp)
 /* environment variables */
 	    {pio = pa[ip]->io + IO_STD_ENV_VAR;
 	     if (pio->gid == pp->ip)
-	        {fd = pg->children[pp->ip]->io[IO_STD_IN].fd;
-		 fp = fdopen(fd, "r");
-		 nsleep(100);
-
-		 nr = 0;
-		 ok = 0;
-		 for (i = 0; (ok == 0) && (nr < 1000); i++)
-		     {if (feof(fp) == TRUE)
-			 ok = 1;
-		      else
-			 {nr++;
-			  p  = fgets(t, LRG, fp);
-			  ev = errno;
-			  if (p != NULL)
-			     {nl++;
-			      nr = 0;
-			      LAST_CHAR(t) = '\0';
-			      _dbg(2, "setenv %s", t);
-			      putenv(STRSAVE(t));
-			      break;}
-			  else if (ev == EBADF)
-			     ok = 1;};};};
+	        _job_set_process_env(pp);
 
 /* resource limits */
 	     pio = pa[ip]->io + IO_STD_LIMIT;
 	     if (pio->gid == pp->ip)
-	        {int op;
-		 char *vr, *vl;
-		 struct rlimit rl;
-
-		 fd = pg->children[pp->ip]->io[IO_STD_IN].fd;
-		 fp = fdopen(fd, "r");
-		 nsleep(100);
-
-		 nr = 0;
-		 ok = 0;
-		 for (i = 0; (ok == 0) && (nr < 1000); i++)
-		     {if (feof(fp) == TRUE)
-	 	         ok = 1;
-		      else
-			 {nr++;
-			  p  = fgets(t, LRG, fp);
-			  ev = errno;
-			  if (p != NULL)
-			     {nl++;
-			      nr = 0;
-			      LAST_CHAR(t) = '\0';
-
-			      op = -1;
-			      vr = t;
-			      vl = strchr(vr, '=');
-			      if (vl != NULL)
-				 {*vl = '\0';
-				  vl++;}
-			      else
-				 continue;
-
-/* maximum core file size */
-			      if (strcmp(vr, "core") == 0)
-				 {op = RLIMIT_CORE;
-				  rl.rlim_cur = atol(vl);}
-
-#ifdef RLIMIT_AS
-/* address space - virtual memory */
-			      else if (strcmp(vr, "as") == 0)
-				 {op = RLIMIT_AS;
-				  rl.rlim_cur = atol(vl);}
-#endif
-
-#ifdef RLIMIT_CPU
-/* CPU seconds limit */
-			      else if (strcmp(vr, "cpu") == 0)
-				 {op = RLIMIT_CPU;
-				  rl.rlim_cur = atol(vl);}
-#endif
-
-#ifdef RLIMIT_FSIZE
-/* file size limit */
-			      else if (strcmp(vr, "fsize") == 0)
-				 {op = RLIMIT_FSIZE;
-				  rl.rlim_cur = atol(vl);}
-#endif
-
-#ifdef RLIMIT_NOFILE
-/* file number limit */
-			      else if (strcmp(vr, "nofile") == 0)
-				 {op = RLIMIT_NOFILE;
-				  rl.rlim_cur = atol(vl);}
-#endif
-
-#ifdef RLIMIT_NPROC
-/* thread number limit */
-			      else if (strcmp(vr, "nproc") == 0)
-				 {op = RLIMIT_NPROC;
-				  rl.rlim_cur = atol(vl);}
-#endif
-
-#ifdef RLIMIT_RSS
-/* memory page limit */
-			      else if (strcmp(vr, "rss") == 0)
-				 {op = RLIMIT_RSS;
-				  rl.rlim_cur = atol(vl);}
-#endif
-
-#ifdef RLIMIT_STACK
-/* stack size limit */
-			      else if (strcmp(vr, "stack") == 0)
-				 {op = RLIMIT_STACK;
-				  rl.rlim_cur = atol(vl);};
-#endif
-
-			      if (op != -1)
-				 {_dbg(2, "setlimits %s = %ld",
-				       vr, (long) rl.rlim_cur);
-				  setrlimit(op, &rl);};
-
-			      ok = 1;}
-
-			  else if (ev == EBADF)
-			     ok = 1;};};};};};
+	        _job_set_process_rlimits(pp);};};
 
     return;}
 
@@ -1058,7 +1105,8 @@ void _job_child_prelim(process *pp)
  *                 - it will never return
  */
 
-static void _job_child_fork(process *pp, process *cp, char **argv, char *mode)
+static void _job_child_fork(process *pp, process *cp, int *fds,
+			    char **argv, char *mode)
    {int rv;
     extern char **environ;
     process_group_state *ps;
@@ -1079,7 +1127,7 @@ static void _job_child_fork(process *pp, process *cp, char **argv, char *mode)
     if (ps->dbg_level & 2)
        dprpio("_job_child_fork", cp);
 
-    rv = _job_exec(cp, argv, environ, mode);
+    rv = _job_exec(cp, fds, argv, environ, mode);
 
     exit(rv);}
 
@@ -1088,7 +1136,7 @@ static void _job_child_fork(process *pp, process *cp, char **argv, char *mode)
 
 /* _JOB_PARENT_FORK - the parent process comes here */
 
-static int _job_parent_fork(process *pp, process *cp, char *mode)
+static int _job_parent_fork(process *pp, process *cp, int *fds, char *mode)
    {int i, st;
     process_group_state *ps;
 
@@ -1122,7 +1170,7 @@ static int _job_parent_fork(process *pp, process *cp, char *mode)
  *                 - just cleanup the remains
  */
 
-static void _job_error_fork(process *pp, process *cp)
+static void _job_error_fork(process *pp, process *cp, int *fds)
    {
 
 /* mark this as having to do with the child so that
@@ -1211,11 +1259,56 @@ static int _job_setup_proc(process **ppp, process **pcp,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* LIST_FDS - return an array of file descriptor opened for PG */
+
+int *list_fds(process_group *pg)
+   {int io, l, lf, nf, ip, np, fd, ok;
+    int *fds;
+    process *pp, **pa;
+    iodes *pio;
+
+    fds = NULL;
+
+    if (pg != NULL)
+       {np = pg->np;
+	pa = pg->parents;
+
+	nf  = N_CHANNELS*np;
+	fds = MAKE_N(int, nf);
+
+	lf = 0;
+
+/* scan processes */
+	for (ip = 0; ip < np; ip++)
+	    {pp = pa[ip];
+
+/* scan channels for current process */
+	     for (io = 0; io < N_CHANNELS; io++)
+	         {pio = pp->io + io;
+		  fd  = pio->fd;
+		  if (fd > 2)
+
+/* check if this descriptor has already been entered */
+		     {ok = FALSE;
+		      for (l = 0; (l < lf) && (ok == FALSE); l++)
+			  ok |= (fd == fds[l]);
+
+		      if (ok == FALSE)
+			 fds[lf++] = fd;};};};
+
+	fds[lf++] = -1;};
+
+    return(fds);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _JOB_FORK - fork PP/CP and exec the command in CP with AL */
 
 static process *_job_fork(process *pp, process *cp,
 			  char **argv, char *mode, void *a)
    {int st, pid;
+    int *fds;
 
     if (argv == NULL)
        argv = pp->arg;
@@ -1224,6 +1317,8 @@ static process *_job_fork(process *pp, process *cp,
     if (pp->cmd == NULL)
        pp->cmd = _job_command_str(argv);
     strcpy(pp->mode, mode);
+
+    fds = list_fds(pp->pg);
 
     _block_all_sig(TRUE);
 
@@ -1234,18 +1329,18 @@ static process *_job_fork(process *pp, process *cp,
 
     switch (pid)
         {case -1 :
-	      _job_error_fork(pp, cp);
+	      _job_error_fork(pp, cp, fds);
 	      pp = NULL;
 	      break;
 
 /* the child process comes here and if successful will never return */
 	 case 0 :
-	      _job_child_fork(pp, cp, argv, mode);
+	      _job_child_fork(pp, cp, fds, argv, mode);
 	      break;
 
 /* the parent process comes here */
 	 default :
-	      st = _job_parent_fork(pp, cp, mode);
+	      st = _job_parent_fork(pp, cp, fds, mode);
 	      if (st == FALSE)
 		 _job_free(pp);
 	      break;};
