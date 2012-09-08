@@ -687,13 +687,9 @@ static int transfer_fd(process *pn, io_kind pk, process *cn, io_kind ck)
 	cio->fp  = fp;
 	cio->fd  = fd;}
 
-    else
-       {
-
 /* get the descriptor for the other end of the pipe */
-	pio->fanto[IO_FAN_IN] = _ioc_fd(cio->fd, ck);
-
-       };
+    else
+       pio->fanto[IO_FAN_IN] = _ioc_fd(cio->fd, ck);
 
     return(fd);}
 
@@ -1059,17 +1055,16 @@ void transfer_fnc_child(process_group *pg)
 
 static void reconnect_pgrp(process_group *pg)
    {int i, nm, n, tci;
-    process *pt, *pp, *cp;
+    process *pp, *cp;
     process **pa, **ca;
     process_group_state *ps;
 
     ps = get_process_group_state();
 
-    n   = pg->np;
-    pa  = pg->parents;
-    ca  = pg->children;
-    pt  = pg->terminal;
-    nm  = n - 1;
+    n  = pg->np;
+    pa = pg->parents;
+    ca = pg->children;
+    nm = n - 1;
 
     for (i = 0; i < n; i++)
         {pp = pa[i];
@@ -1092,21 +1087,7 @@ static void reconnect_pgrp(process_group *pg)
        {count_fan_in(pg);
 	count_fan_out(pg);
 
-/* reconnect terminal process output to first process
- * NOTE: we cannot do this if a pipe goes into the first process
- * this is a pipeline thought - for a group we have to decided
- * who the terminal will talk to
-	tci = (pa[0]->io[IO_STD_IN].dev == IO_DEV_TERM);
- */
         tci = FALSE;
-	if (tci == TRUE)
-	   transfer_fd(pa[0], IO_STD_OUT, pt, IO_STD_OUT);
-
-/* close all other parent to child lines
- * NOTE: doing this could close the descriptors for fan in
- * to a process specified in the middle of the group
-	close_parent_child(pg, tci);
- */
 
 /* connect child output to appropriate child input
  * these are from output specifications @o, @e, @b, @r, and @x 
@@ -1154,10 +1135,10 @@ static void setup_pgrp(process_group *pg, int it,
 /*--------------------------------------------------------------------------*/
 
 /* EXPAND_SHORTHAND - expand shorthand notations:
- *                  -  file       =>  f<x>:<name>  -> gexec -p file -<x> <name>
- *                  -  variable   =>  v<x>:<name>  -> gexec -p var -<x> <name>
- *                  -  procedure  =>  p<x>:<name>  -> gexec -p <name> -<x>
- *                  -  executable =>  x<x>:<name>  -> <name>
+ *                  -  file       => f<x>:<name> -> gexec -p file -<x> <name>
+ *                  -  variable   => v<x>:<name> -> gexec -p var -<x> <name>
+ *                  -  procedure  => p<x>:<name> -> gexec -p <name> -<x>
+ *                  -  executable => x<x>:<name> -> <name>
  */
 
 static char **expand_shorthand(char **ta, char *t)
@@ -1308,8 +1289,8 @@ static void parse_pgrp(statement *s)
     sa = subst_syntax(sa);
 
 /* maximum number of process would be the number of tokens */
-    pa  = MAKE_N(process *, nc);
-    ca  = MAKE_N(process *, nc);
+    pa = MAKE_N(process *, nc);
+    ca = MAKE_N(process *, nc);
 
     pg = MAKE(process_group);
     if (pg != NULL)
@@ -1336,7 +1317,7 @@ static void parse_pgrp(statement *s)
 		      sa[j] = NULL;}
 		  else
 		     break;};
-	     term  = TRUE;}
+	     term = TRUE;}
 
 	 else if (strpbrk(t, "[]()$*`") != NULL)
 	    dosh = TRUE;
@@ -1861,8 +1842,8 @@ int _fnc_wait(process_group *pg, int ip, int st)
 		     if (pd->isfunc == FALSE)
 		        {for (jo = 0; jo < N_IO_CHANNELS; jo++)
 			     {if (pd->io[jo].gid == ip)
-				 {job_read(pd->io[jo].fd, pd, pd->accept);
-				  _job_io_close(pd, jo);};};
+				 job_read(pd->io[jo].fd, pd, pd->accept);
+			      _job_io_close(pd, jo);};
 
 			 if (pd->id > 0)
 			    kill(pd->id, SIGHUP);
@@ -1957,8 +1938,6 @@ void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
 			  fp[0] = _io_file_ptr(pp, IO_STD_IN);
 			  fp[1] = _io_file_ptr(pp, IO_STD_OUT);
 			  fp[2] = _io_file_ptr(pp, IO_STD_ERR);
-
-/*			  _dbg(2, "call '%s' (%d)", fn, i); */
 
 			  nsleep(1);
 
@@ -2420,10 +2399,7 @@ int transfer_ff(FILE *fi, FILE *fo)
 	    rv = 1;
 
 	 else
-	    {
-#if 1
-
-	     size_t nr, nw, ni;
+	    {size_t nr, nw, ni;
 
 	     nr = fread(t, 1, LRG, fi);
 	     ev = errno;
@@ -2431,18 +2407,14 @@ int transfer_ff(FILE *fi, FILE *fo)
 	        {for (nw = 0; nw < nr; )
                      {ni  = fwrite(t, 1, nr-nw, fo);
                       ev  = errno;
-                      nw += ni;};}
+                      nw += ni;};
 
-#else
-
-	     p  = fgets(t, LRG, fi);
-	     ev = errno;
-	     if (p != NULL)
-	        fputs(p, fo);
-#endif
+		 _dbg(-2, "sent %d chars from file to %d (%d)",
+		      nw, fileno(fo), rv);}
 
 	     else if (feof(fi) == TRUE)
 	        rv = 1;
+
 	     else if (ev == EBADF)
 	        rv = 2;};};
 
@@ -2511,8 +2483,10 @@ int gexec_var(char *db, io_mode md, FILE **fio,
 		 ic++;
 		 if (ic >= nc)
 		    rv = 1;
-		 _dbg(-2, "sent to %d %d chars (%d)",
-		      fileno(fio[1]), nw, rv);
+
+		 _dbg(-2, "sent %d chars from %s to %d (%d)",
+		      nw, vr, fileno(fio[1]), rv);
+
 		 break;
 
 /* stdin to variable */
