@@ -36,6 +36,54 @@ static int cat(char *tag, int nc, int ne, int no)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* CONV - run conversation between processes
+ *      - to test both functions and processes for GEXEC
+ *      - process version of gexec_conv
+ */
+
+static int conv(char *side)
+   {int rv, nx;
+    char s[MAXLINE];
+    char *p;
+
+    nx = 5;
+    rv = 0;
+    if (strcmp(side, "a") == 0)
+       {static int ia = 0;
+
+	while (rv == 0)
+	   {if (ia <= nx)
+	       {fprintf(stderr, "A sent: %d\n", ia);
+		fprintf(stdout, "%d\n", ia);
+		ia++;};
+	    p = fgets(s, MAXLINE, stdin);
+	    if (p != NULL)
+	       {fprintf(stderr, "A recv: %s", s);
+		if (strcmp(s, "end\n") == 0)
+		   {fprintf(stderr, "Conv side a concluded\n");
+		    rv = 1;};};};}
+
+    else if (strcmp(side, "b") == 0)
+       {static int ib = 0;
+
+	while ((ib < 2*nx) && (rv == 0))
+	   {p = fgets(s, MAXLINE, stdin);
+	    if (p != NULL)
+	       {fprintf(stderr, "B recv: %s", s);
+		if (ib >= nx)
+		   {fprintf(stderr, "Conv side b concluded\n");
+		    fprintf(stdout, "end\n");
+		    rv = 1;}
+		else
+		   {fprintf(stderr, "B sent: %c\n", 'a' + ib);
+		    fprintf(stdout, "%c\n", 'a' + ib);
+		    ib++;};};};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* GEN - generate messages for stdout and stderr
  *     - return TRUE if nothing was written to stderr
  */
@@ -61,7 +109,7 @@ static int gen(char *tag, int nc, int ne, int no)
 
 int main(int c, char **v)
    {int i, nc, ne, no, rv, oper;
-    char *tag;
+    char *tag, *side;
 
     nc   = 2;
     ne   = 1;
@@ -84,12 +132,17 @@ int main(int c, char **v)
 		 case 't' :
                       tag = v[++i];
                       break;};}
+	  else if (strcmp(v[i], "conv") == 0)
+	     {oper = 2;
+	      side = v[++i];}
 	  else if (strcmp(v[i], "cat") == 0)
 	     oper = 1;
 	  else
 	     oper = 0;};
 
-    if (oper == 1)
+    if (oper == 2)
+       rv = conv(side);
+    else if (oper == 1)
        rv = cat(tag, nc, ne, no);
     else
        rv = gen(tag, nc, ne, no);

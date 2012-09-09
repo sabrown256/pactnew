@@ -1,0 +1,25 @@
+A sent: 0
+A sent: 1
+B recv: 0
+B sent: a
+B recv: 1
+B sent: b
+A sent: 2
+A recv: a
+A sent: 3
+A recv: b
+A sent: 4
+A sent: 5
+B recv: 2
+B sent: c
+B recv: 3
+B sent: d
+B recv: 4
+B sent: e
+B recv: 5
+Conv side b concluded
+A recv: c
+A recv: d
+A recv: e
+A recv: end
+Conv side a concluded

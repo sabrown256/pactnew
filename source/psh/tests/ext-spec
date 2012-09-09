@@ -27,7 +27,7 @@ set logerr = ( osrc -t err cat )
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-foreach i (1 2 3 4)
+foreach i (1 2 3 4 5)
 
    Note $Log ""
    Note $Log "---------------------------------------------------"
@@ -58,6 +58,11 @@ foreach i (1 2 3 4)
       case 4:
            set cmd = ( gexec $opt /bin/echo "core=13000" @l /bin/csh -cf limit @o grep coredumpsize '>&!' $res )
            set gst = "0 0 0"
+           set srt = FALSE
+           breaksw
+      case 5:
+           set cmd = ( gexec $opt pa:conv a @i @o pa:conv b '>&!' $res )
+           set gst = "0 0"
            set srt = FALSE
            breaksw
    endsw
@@ -107,7 +112,7 @@ foreach i (1 2 3 4)
 
 end
 
-NoteD $Log -n " .................."
+NoteD $Log -n " ................."
 
 Note $Log "exiting with err = $err"
 Note $Log ""

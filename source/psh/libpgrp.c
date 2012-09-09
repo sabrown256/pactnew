@@ -2041,6 +2041,7 @@ static int run_pgrp(statement *s)
 		      pp->cmd);}
  	     else
  	        {pp->a = s;
+		 _awatch_fd(pp, IO_STD_NONE, -1);
 		 for (io = 0; io < N_IO_CHANNELS; io++)
  		     _io_file_ptr(pp, io);};
 
