@@ -1791,7 +1791,8 @@ static int _awatch_fd(process *pp, io_kind knd, int sip)
 
 /* handle the process */
     if (pp->isfunc == TRUE)
-       ip = pp->ip;
+       {ip = pp->ip;
+	ps->stck.proc[ip] = pp;}
     else
        {ip = (sip < 0) ? ps->stck.ip++ : sip;
 	if (ip >= ps->stck.np)

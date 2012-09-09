@@ -67,6 +67,61 @@ static int str_test(char *db, io_mode md, FILE **fio,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* GEXEC_CONV - run conversation between processes
+ *            - to test both functions and processes for GEXEC
+ */
+
+int gexec_conv(char *db, io_mode md, FILE **fio,
+	       char *name, int c, char **v)
+   {int rv, nx;
+    char s[MAXLINE];
+    char *p, *side;
+
+    nx = 5;
+    rv = 0;
+    side = v[0];
+
+    if ((side != NULL) && (md != IO_MODE_NONE))
+       {if (strcmp(side, "a") == 0)
+	   {static int ia = 0;
+
+	    while (rv == 0)
+	       {if (ia <= nx)
+		   {fprintf(stderr, "A sent: %d\n", ia);
+		    fprintf(fio[1], "%d\n", ia);
+		    ia++;};
+		p = fgets(s, MAXLINE, fio[0]);
+		if (p == NULL)
+		   break;
+		else
+		   {fprintf(stderr, "A recv: %s", s);
+		    if (strcmp(s, "end\n") == 0)
+		       {fprintf(stderr, "Conv side a concluded\n");
+			rv = 1;};};};}
+
+	else if (strcmp(side, "b") == 0)
+	   {static int ib = 0;
+
+	    for (; (ib < 2*nx) && (rv == 0); )
+	        {p = fgets(s, MAXLINE, fio[0]);
+		 if (p == NULL)
+		    break;
+		 else
+		    {fprintf(stderr, "B recv: %s", s);
+		     if (ib >= nx)
+		        {fprintf(stderr, "Conv side b concluded\n");
+			 fprintf(fio[1], "end\n");
+			 rv = 1;}
+		     else
+		        {fprintf(stderr, "B sent: %c\n", 'a' + ib);
+		         fprintf(fio[1], "%c\n", 'a' + ib);
+		         ib++;};};};};};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* MAPS - map function name to procedure for strong function execution */
 
 static PFPCAL maps(char *s)
@@ -78,6 +133,8 @@ static PFPCAL maps(char *s)
        f = gexec_file;
     else if (strcmp(s, "test") == 0)
        f = str_test;
+    else if (strcmp(s, "conv") == 0)
+       f = gexec_conv;
 
     return(f);}
 
@@ -130,7 +187,7 @@ int main(int c, char **v, char **env)
 
 	 else
 	    {rv = gexec(db, c-i, v+i, env, maps);
-	     break;}};
+	     break;};};
 
     return(rv);}
 
