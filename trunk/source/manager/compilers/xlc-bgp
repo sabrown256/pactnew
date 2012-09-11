@@ -104,6 +104,10 @@ Group MPI {
    FC_Exe = mpixlf90_r
 }
 
+Group X11 {
+   RPath = /usr/X11R6/$LIB
+}
+
 .f.o:
 	${FC} ${FFLAGS} ${LDFLAGS} -c $<
 

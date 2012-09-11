@@ -2,3 +2,5 @@ out> s2> out message #1
 out> s2> out message #2
 out> s2> out message #3
 out> s2> out message #4
+s2> err message #1
+s2> err message #2

@@ -340,7 +340,7 @@ void _job_io_close(process *pp, io_kind knd)
 FILE *_io_file_ptr(process *pp, io_kind knd)
    {iodes *lio;
     FILE *fp;
-    char *modes[] = { "r", "w", "w", "w", "w", "r", "r" };
+    char *modes[] = { "r", "w", "r", "w", "w", "r", "r" };
    
     lio = pp->io + knd;
     if (lio->fp == NULL)
@@ -951,7 +951,7 @@ static void _job_set_process_env(process *pp)
 
 /* _JOB_SET_PROCESS_RLIMITS - set resource limits for PP */
 
-void _job_set_process_rlimits(process *pp)
+static void _job_set_process_rlimits(process *pp)
    {int i, nr, nl, ev, ok, op, fd;
     char t[MAXLINE];
     char *p, *vr, *vl;
@@ -1051,12 +1051,19 @@ void _job_set_process_rlimits(process *pp)
 		     if (op != -1)
 		        {int st;
 			 char bf[MAXLINE];
+			 struct rlimit ol;
 
+			 st = getrlimit(op, &ol);
 			 st = setrlimit(op, &rl);
-			 strerror_r(errno, bf, MAXLINE);
-			 _dbg(2, "received from %d - setlimit %s = %ld (%d/%s)",
-			      fd, vr, (long) rl.rlim_cur, st,
-			      (st == 0) ? "ok" : bf);};
+			 if (st == 0)
+			    _dbg(2, "received from %d - setlimit %s = %ld (ok)",
+				 fd, vr, (long) rl.rlim_cur);
+			 else
+			    {strerror_r(errno, bf, MAXLINE);
+			     _dbg(2, "received from %d - setlimit %s = %ld (%ld/%s)",
+				  fd, vr,
+				  (long) rl.rlim_cur, (long) ol.rlim_max,
+				  (st == 0) ? "ok" : bf);};};
 
 		     ok = 1;}
 
@@ -1345,6 +1352,8 @@ static process *_job_fork(process *pp, process *cp,
 		 _job_free(pp);
 	      break;};
 
+    FREE(fds);
+
     _block_all_sig(FALSE);
 
     return(pp);}
@@ -1428,17 +1437,25 @@ process *job_launch(char *cmd, char *mode, void *a)
  */
 
 int job_read(int fd, process *pp, int (*out)(int fd, process *pp, char *s))
-   {int i, rv, ev, nl, nr;
+   {int i, io, rv, ev, nl, nr, lfd;
     char s[LRG];
     char *p;
-    FILE *fi;
+    FILE *lfi;
 
     nl = 0;
 
     if (job_alive(pp))
-       {fi = pp->io[IO_STD_IN].fp;
-	fd = pp->io[IO_STD_IN].fd;
-	if ((fi != NULL) && (fd != -1))
+       {if (fd == -1)
+	   {lfi = pp->io[IO_STD_IN].fp;
+	    lfd = pp->io[IO_STD_IN].fd;}
+	else
+	   {for (io = 0; io < N_IO_CHANNELS; io++)
+	        {lfd = pp->io[io].fd;
+		 if (lfd == fd)
+		    {lfi = pp->io[io].fp;
+		     break;};};};
+
+	if ((lfi != NULL) && (lfd != -1))
  	   {_block_all_sig(TRUE);
 
 /* count consecutive null reads and bail after 1000 of them */
@@ -1446,17 +1463,17 @@ int job_read(int fd, process *pp, int (*out)(int fd, process *pp, char *s))
 
 	    rv = 0;
 	    for (i = 0; (rv == 0) && (nr < 1000); i++)
-	        {if (feof(fi) == TRUE)
+	        {if (feof(lfi) == TRUE)
 		    rv = 1;
 		 else
 		    {nr++;
-		     p  = fgets(s, LRG, fi);
+		     p  = fgets(s, LRG, lfi);
 		     ev = errno;
 		     if (p != NULL)
 		        {nl++;
 			 nr = 0;
 			 if (out != NULL)
-			    out(fd, pp, s);}
+			    out(lfd, pp, s);}
 		     else if (ev == EBADF)
 		        rv = 1;};
 

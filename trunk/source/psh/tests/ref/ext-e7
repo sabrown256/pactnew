@@ -13,13 +13,7 @@ A sent: 5
 B recv: 0
 B recv: 1
 B recv: 2
-B recv: 3
-B recv: 4
-B recv: 5
 B sent: a
 B sent: b
 B sent: c
-B sent: d
-B sent: e
 Conv side a concluded
-Conv side b concluded

@@ -96,7 +96,7 @@ Note $Log "   UseTmpDir     = |$UseTmpDir|"
 
 cat << EOF >! $TMAKEF
 b:
-	@csh -c "echo OK"
+	@csh -cf "echo OK"
 
 a:
 	@$BinDir/smake -f $TMAKEF b

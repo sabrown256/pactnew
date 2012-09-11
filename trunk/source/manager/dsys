@@ -1133,7 +1133,7 @@ switch ($Cmnd)
         flog $Log chmod a+x code-date
         flog $Log pwd
 
-        flog $Log csh $DSYS linstall
+        flog $Log csh -f $DSYS linstall
         set RStatus = $status
         Note $Log "Status = $RStatus"
         if ($RStatus != 0) then
@@ -1572,15 +1572,16 @@ CFG_DONE:
                                  echo "  <tag> may be one of F, B, M, S, X"
                                  breaksw
                             default:
-                                 set Tag = "|$1|"
-                                 if ("$Date" == "") then
-                                    grep $Tag $RepoDir/commitlog
-                                 else
-                                    grep $Tag $RepoDir/commitlog    |&  \
-                                    sed "s/'//g"                    |&  \
-                                    sed 's/\"//g'                   |&  \
-                                    awk '$4 >= "D'$Date'" { print }'
-                                 endif
+                                 git log
+#                                 set Tag = "|$1|"
+#                                 if ("$Date" == "") then
+#                                    grep $Tag $RepoDir/commitlog
+#                                 else
+#                                    grep $Tag $RepoDir/commitlog    |&  \
+#                                    sed "s/'//g"                    |&  \
+#                                    sed 's/\"//g'                   |&  \
+#                                    awk '$4 >= "D'$Date'" { print }'
+#                                 endif
                                  set Date = ""
                                  breaksw
                          endsw
