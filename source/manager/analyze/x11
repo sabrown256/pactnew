@@ -25,7 +25,7 @@ SafeEnv Cfe_CC_Flags     "-g"
 SafeEnv MDG_Inc          ""
 SafeEnv MDG_Lib          ""
 SafeEnv MDG_Pck          ""
-SafeEnv X11_Inc          ""
+SafeEnv X11_Inc          $RootInc
 SafeEnv X11_Lib          ""
 SafeEnv X11_RPath        $RootLib
 SafeEnv X11_Path         /usr
@@ -93,12 +93,13 @@ EOF
       set lIncDirs = ( $lIncDirs $i/include )
       set lLibDirs = ( $lLibDirs $i/$LIB )
    end
-   set lIncDirs = ( $lIncDirs $RootInc )
-   set lLibDirs = ( $lLibDirs $RootLib )
+   set lIncDirs = ( $lIncDirs $X11_Inc )
+   set lLibDirs = ( $lLibDirs $X11_RPath )
 
 # the X11R6 directories are pretty much gone
-#   set lIncDirs = ( $lIncDirs $RootInc /usr/X11R6/include )
-#   set lLibDirs = ( $lLibDirs $RootLib /usr/X11R6/$LIB /usr/X11R6/lib )
+# except for some older systems
+   set lIncDirs = ( $lIncDirs /usr/X11R6/include )
+   set lLibDirs = ( $lLibDirs /usr/X11R6/$LIB /usr/X11R6/lib )
 
    set Implicit = TRUE
    set lHdrs    = ( X11/Xlib.h )

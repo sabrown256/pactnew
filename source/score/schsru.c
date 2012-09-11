@@ -532,6 +532,9 @@ int main(int c, char **v)
 
     SC_host_server_fin();
 
+/* reverse the sense to get exit status */
+    st = (st != TRUE);
+
     return(st);}
 
 /*--------------------------------------------------------------------------*/

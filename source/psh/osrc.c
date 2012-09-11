@@ -46,6 +46,10 @@ static int conv(char *side)
     char s[MAXLINE];
     char *p;
 
+    memset(s, 0, MAXLINE);
+    setbuf(stdout, NULL);
+    setbuf(stderr, NULL);
+
     nx = 5;
     rv = 0;
     if (strcmp(side, "a") == 0)

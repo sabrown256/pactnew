@@ -1384,7 +1384,7 @@ int _deref_job_close(int fd, process *pp)
    {int rv, io;
 
     rv = _fd_close(fd);
-/*    nsleep(10); */
+    nsleep(10);
     job_read(-1, pp, pp->accept);
 
     for (io = N_IO_CHANNELS - 1; io >= 0; io--)
@@ -1939,7 +1939,7 @@ void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
 			  fp[1] = _io_file_ptr(pp, IO_STD_OUT);
 			  fp[2] = _io_file_ptr(pp, IO_STD_ERR);
 
-/*			  nsleep(1); */
+			  nsleep(10);
 
 			  rv = f(db, md, fp, fn, c, v);
 			  rv =_fnc_wait(pg, ip, rv);
@@ -2052,6 +2052,8 @@ static int run_pgrp(statement *s)
 	     pp->ip       = i;
 
 	     ASSERT(rv == 0);};
+
+	sched_yield();
 
 /* load up the process stack */
 	for (i = 0; i < np; i++)

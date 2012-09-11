@@ -97,5 +97,9 @@ Group PThread {
    LD_Lib = -lpthread 
 }
 
+Group X11 {
+   RPath = /usr/X11R6/$LIB
+}
+
 include cpp-rule
 include serial

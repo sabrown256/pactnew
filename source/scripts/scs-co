@@ -112,12 +112,14 @@ else if ($knd == git) then
 
    if ("$srcdate" != "") then
 
-      set dt = ( `date -d $srcdate +%b%e` )
+      set dt = ( `date -d $srcdate '+%b %e'` )
       cd $base
 
       set inf = ( `git log | grep -B 2 "$dt"` )
       if ($#inf > 1) then
          set tag = $inf[2]
+         echo "---------------------------"
+         echo "Resetting to $srcdate ($dt)"
          git reset --hard $tag
       endif
    endif
