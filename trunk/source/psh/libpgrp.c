@@ -1112,8 +1112,8 @@ static void reconnect_pgrp(process_group *pg)
 
 /* SETUP_PGRP - fill the ITth process in PG from the tokens TA */
 
-static void setup_pgrp(process_group *pg, int it,
-		       char **ta, int dosh, char **ios)
+static char **setup_pgrp(process_group *pg, int it,
+			 char **ta, int dosh, char **ios)
    {process *pp, *cp, **pa, **ca;
 
     pa = pg->parents;
@@ -1129,7 +1129,10 @@ static void setup_pgrp(process_group *pg, int it,
     pa[it] = pp;
     ca[it] = cp;
 
-    return;}
+    free_strings(ta);
+    ta = NULL;
+
+    return(ta);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1284,9 +1287,9 @@ static void parse_pgrp(statement *s)
 
     ta = NULL;
     sa = tokenize(s->text, " \t\n\r\f");
-    nc = lst_length(sa);
 
     sa = subst_syntax(sa);
+    nc = lst_length(sa);
 
 /* maximum number of process would be the number of tokens */
     pa = MAKE_N(process *, nc);
@@ -1344,8 +1347,7 @@ static void parse_pgrp(statement *s)
 
 	 if (term == TRUE)
 	    {if (lst_length(ta) > 0)
-	        {setup_pgrp(pg, it++, ta, dosh, ios);
-		 ta = NULL;};
+	        ta = setup_pgrp(pg, it++, ta, dosh, ios);
 	     ios  = NULL;
 	     term = FALSE;
 	     dosh = FALSE;}
@@ -1358,7 +1360,7 @@ static void parse_pgrp(statement *s)
 	        ta = lst_add(ta, t);};};
 
     if ((i >= nc) && (lst_length(ta) > 0))
-       setup_pgrp(pg, it++, ta, dosh, ios);
+       ta = setup_pgrp(pg, it++, ta, dosh, ios);
 
     pg->np       = it;
     pg->terminal = pa[it - 1];
@@ -1369,6 +1371,12 @@ static void parse_pgrp(statement *s)
 
     s->ne = it;
     s->pg = pg;
+
+/* free string array allowing for NULL out entries */
+    for (i = 0; i < nc; i++)
+        {if (sa[i] != NULL)
+	    FREE(sa[i]);};
+    FREE(sa);
 
     return;}
 
@@ -2033,7 +2041,7 @@ static int run_pgrp(statement *s)
 	     cp = pg->children[i];
 
 	     if (pp->isfunc == FALSE)
-	        {pp = _job_fork(pp, cp, NULL, "rw", s);
+	        {pp = _job_fork(pp, cp, "rw", s);
 
 		 _dbg(2, "launch %d (%d,%d,%d)       %s",
 		      pp->id,
@@ -2076,6 +2084,8 @@ static int run_pgrp(statement *s)
 	for (i = 0; i < np; i++)
 	    {FREE(pg->parents[i]);
 	     FREE(pg->children[i]);};
+	FREE(pg->parents);
+	FREE(pg->children);
 
 /* process the exit statuses */
 	rv    = 0;
@@ -2133,6 +2143,7 @@ static void free_statements(statement *sl)
 
     for (n = 0; sl[n].text != NULL; n++)
         {FREE(sl[n].text);
+	 FREE(sl[n].shell);
 	 FREE(sl[n].st);
 	 free_pgrp(sl[n].pg, sl[n].ne);};
 
@@ -2341,10 +2352,19 @@ void job_background(process_session *ps, process *pp, int cont)
 
 int gexec(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
    {int i, nc, rv, st;
+    int fa, fb;
     char *s, *shell;
     statement *sl;
+    process_group_state *ps;
+
+    ps = get_process_group_state();
 
     shell = "/bin/csh";
+
+/* diagnostic for leaked descriptors */
+    if (ps->dbg_level & 4)
+       {fb = fcntl(0, F_DUPFD, 2);
+	close(fb);};
 
 /* concatenate command line arguments into one big string */
     s = NULL;
@@ -2376,6 +2396,15 @@ int gexec(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
 
     free_statements(sl);
     FREE(s);
+
+/* diagnostic for leaked descriptors */
+    if (ps->dbg_level & 4)
+       {fa = fcntl(0, F_DUPFD, fb);
+	close(fa);
+        if (fa == fb)
+	   _dbg(4, "no descriptors leaked\n");
+	else
+	   _dbg(4, "leaked %d descriptors\n", fa-fb);};
 
     return(st);}
 

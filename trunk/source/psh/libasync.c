@@ -524,8 +524,9 @@ static process *_job_mk_process(int child, char **arg,
 	pp->pgid    = getpgrp();
 	pp->ischild = child;
 	pp->isfunc  = FALSE;
+	pp->ios     = NULL;
 	pp->cmd     = sc;
-	pp->arg     = arg;
+	pp->arg     = lst_copy(arg);
 	pp->env     = env;
 	pp->shell   = shell;};
 
@@ -544,6 +545,8 @@ static int _job_release(process *pp)
        {for (i = N_IO_CHANNELS - 1; i >= 0; i--)
 	    _job_io_close(pp, i);
 
+	free_strings(pp->ios);
+	free_strings(pp->arg);
         FREE(pp->cmd);
 
 	rv = TRUE;};
@@ -1112,8 +1115,7 @@ void _job_child_prelim(process *pp)
  *                 - it will never return
  */
 
-static void _job_child_fork(process *pp, process *cp, int *fds,
-			    char **argv, char *mode)
+static void _job_child_fork(process *pp, process *cp, int *fds, char *mode)
    {int rv;
     extern char **environ;
     process_group_state *ps;
@@ -1134,7 +1136,7 @@ static void _job_child_fork(process *pp, process *cp, int *fds,
     if (ps->dbg_level & 2)
        dprpio("_job_child_fork", cp);
 
-    rv = _job_exec(cp, fds, argv, environ, mode);
+    rv = _job_exec(cp, fds, cp->arg, environ, mode);
 
     exit(rv);}
 
@@ -1313,16 +1315,13 @@ int *list_fds(process_group *pg)
 /* _JOB_FORK - fork PP/CP and exec the command in CP with AL */
 
 static process *_job_fork(process *pp, process *cp,
-			  char **argv, char *mode, void *a)
+			  char *mode, void *a)
    {int st, pid;
     int *fds;
 
-    if (argv == NULL)
-       argv = pp->arg;
-
     pp->a = a;
     if (pp->cmd == NULL)
-       pp->cmd = _job_command_str(argv);
+       pp->cmd = _job_command_str(pp->arg);
     strcpy(pp->mode, mode);
 
     fds = list_fds(pp->pg);
@@ -1342,7 +1341,7 @@ static process *_job_fork(process *pp, process *cp,
 
 /* the child process comes here and if successful will never return */
 	 case 0 :
-	      _job_child_fork(pp, cp, fds, argv, mode);
+	      _job_child_fork(pp, cp, fds, mode);
 	      break;
 
 /* the parent process comes here */
@@ -1423,7 +1422,7 @@ process *job_launch(char *cmd, char *mode, void *a)
     argv = tokenize(cmd, " \t");
     if (argv != NULL)
        {_job_setup_proc(&pp, &cp, argv, NULL, NULL);
-	pp = _job_fork(pp, cp, argv, mode, a);
+	pp = _job_fork(pp, cp, mode, a);
 
 	free_strings(argv);};
 
@@ -1445,10 +1444,9 @@ int job_read(int fd, process *pp, int (*out)(int fd, process *pp, char *s))
     nl = 0;
 
     if (job_alive(pp))
-       {if (fd == -1)
-	   {lfi = pp->io[IO_STD_IN].fp;
-	    lfd = pp->io[IO_STD_IN].fd;}
-	else
+       {lfi = pp->io[IO_STD_IN].fp;
+	lfd = pp->io[IO_STD_IN].fd;
+	if (fd != -1)
 	   {for (io = 0; io < N_IO_CHANNELS; io++)
 	        {lfd = pp->io[io].fd;
 		 if (lfd == fd)
@@ -1767,31 +1765,99 @@ int job_done(process *pp, int sig)
 void asetup(int n, int na)
    {int m;
     process_group_state *ps;
+    process_stack *st;
 
     ps = get_process_group_state();
+    st = &ps->stck;
 
 /* per process members */
-    if (ps->stck.proc != NULL)
-       FREE(ps->stck.proc);
+    if (st->proc != NULL)
+       FREE(st->proc);
 
-    ps->stck.ip   = 0;
-    ps->stck.np   = n;
-    ps->stck.proc = MAKE_N(process *, n);
+    st->ip   = 0;
+    st->np   = n;
+    st->proc = MAKE_N(process *, n);
 
 /* per descriptor members */
-    if (ps->stck.fd != NULL)
-       FREE(ps->stck.fd);
+    if (st->fd != NULL)
+       FREE(st->fd);
 
     m = n*N_IO_CHANNELS;
 
-    ps->stck.ifd = 0;
-    ps->stck.nfd = m;
-    ps->stck.fd  = MAKE_N(apollfd, m);
-    ps->stck.map = MAKE_N(int, m);
-    ps->stck.io  = MAKE_N(int, m);
+    st->ifd = 0;
+    st->nfd = m;
+    st->fd  = MAKE_N(apollfd, m);
+    st->map = MAKE_N(int, m);
+    st->io  = MAKE_N(int, m);
 
 /* everything else */
-    ps->stck.nattempt = na;
+    st->nattempt = na;
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _AWATCH_PUSH_FD - add FD from PP to stack */
+
+static int _awatch_push_fd(process *pp, int fd)
+   {int ip, ifd, rv;
+    process_group_state *ps;
+    process_stack *st;
+
+    ps = get_process_group_state();
+    st = &ps->stck;
+
+    ip = pp->ip;
+
+    rv = block_fd(fd, FALSE);
+    ASSERT(rv == 0);
+
+    ifd = st->ifd++;
+    st->fd[ifd].fd      = 0;
+    st->fd[ifd].events  = 0;
+    st->fd[ifd].revents = 0;
+
+    st->io[ifd]  = fd;
+    st->map[ifd] = ip;
+
+    return(ifd);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _AWATCH_POP_FD - remove everything to do with PP from stack */
+
+static void _awatch_pop_fd(process *pp)
+   {int io, ip, ifd, np, nfd, fd;
+    process_group_state *ps;
+    process_stack *st;
+
+    ps = get_process_group_state();
+    st = &ps->stck;
+
+/* remove the process */
+    np = st->np - 1;
+    ip = pp->ip;
+    st->proc[ip] = st->proc[np];
+    st->proc[np] = NULL;
+
+/* remove the descriptors of the process */
+    nfd = st->ifd;
+    for (io = 0; io < N_IO_CHANNELS; io++)
+        {fd = pp->io[io].fd;
+
+	 for (ifd = 0; ifd < nfd; ifd++)
+	     {if (st->io[ifd] == fd)
+		 {nfd--;
+		  st->io[ifd]  = st->io[nfd];
+		  st->map[ifd] = st->map[nfd];
+		  st->io[nfd]  = 0;
+		  st->map[nfd] = 0;
+		  ifd--;};};};
+
+    st->ifd = nfd;
+    st->ip--;
 
     return;}
 
@@ -1801,7 +1867,7 @@ void asetup(int n, int na)
 /* _AWATCH_FD - register the KND file descriptor of PP as the SIPth element */
 
 static int _awatch_fd(process *pp, io_kind knd, int sip)
-   {int ip, ifd, fd, rv;
+   {int ip, fd;
     process_group_state *ps;
 
     ps = get_process_group_state();
@@ -1825,21 +1891,13 @@ static int _awatch_fd(process *pp, io_kind knd, int sip)
 	    fprintf(stderr, "\n");
 	    exit(1);};
 
+	pp->ip = ip;
 	ps->stck.proc[ip] = pp;
 
 /* handle the descriptor */
 	fd = pp->io[knd].fd;
 	if (fd > 2)
-	   {rv = block_fd(fd, FALSE);
-	    ASSERT(rv == 0);
-
-	    ifd = ps->stck.ifd++;
-	    ps->stck.fd[ifd].fd      = 0;
-	    ps->stck.fd[ifd].events  = 0;
-	    ps->stck.fd[ifd].revents = 0;
-
-	    ps->stck.io[ifd]  = fd;
-	    ps->stck.map[ifd] = ip;};};
+	   _awatch_push_fd(pp, fd);};
 
     return(ip);}
 
@@ -1885,8 +1943,7 @@ process *alaunch(int sip, char *cmd, char *mode, void *a,
 		 int (*acc)(int fd, process *pp, char *s),
 		 int (*rej)(int fd, process *pp, char *s),
 		 void (*wt)(process *pp))
-   {int ip;
-    process *pp;
+   {process *pp;
 
     pp = job_launch(cmd, mode, a);
     if (pp != NULL)
@@ -1895,9 +1952,7 @@ process *alaunch(int sip, char *cmd, char *mode, void *a,
 	pp->wait     = wt;
 	pp->nattempt = 1;
 
-	ip = _awatch_fd(pp, IO_STD_IN, sip);
-
-	pp->ip = ip;};
+	_awatch_fd(pp, IO_STD_IN, sip);};
 
     return(pp);}
 
@@ -1913,12 +1968,7 @@ process *arelaunch(process *pp)
     ps = get_process_group_state();
 
     if ((pp != NULL) && (pp->nattempt <= ps->stck.nattempt))
-
-/* GOTCHA: not quite correct but better than nothing
- * the stack should be carefully reconstructed to account for
- * retrying the one process 
- */
-       {ps->stck.ifd = 0;
+       {_awatch_pop_fd(pp);
 
 	npp = alaunch(pp->ip, pp->cmd, pp->mode, pp->a,
 		      pp->accept, pp->reject, pp->wait);
