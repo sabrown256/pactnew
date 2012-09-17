@@ -1490,7 +1490,7 @@ int _pgrp_fan_in(int fd, process *pp, char *s)
 	 if ((pp->io[io].fd == fd) && (fdi >= 0))
 	    {nw = write(fdi, s, nc);
 	     rv = (nw == nc);
-	     _dbg(2, "accept from %d send to %d", fd, fdi);
+	     _dbg(2, "accept %d bytes from %d send to %d", nw, fd, fdi);
 	     break;};};
 
     return(rv);}
@@ -1521,7 +1521,8 @@ int _pgrp_fan_out(int fd, process *pp, char *s)
 		     {fdo = pd->io[io].fd;
 		      nw  = write(fdo, s, nc);
 		      rv |= (nw == nc);
-		      _dbg(2, "accept from %d send to %d", fd, fdo);};};};};
+		      _dbg(2, "accept %d bytes from %d send to %d",
+                           nw, fd, fdo);};};};};
 
     return(rv);}
 
@@ -1544,7 +1545,7 @@ int _pgrp_data_child(int fd, process *pp, char *s)
         np = pg->np;
 	pa = pg->parents;
 	for (ip = 0; ip < np; ip++)
-	    {pd  = pa[ip];
+	    {pd = pa[ip];
 
 /* send environment variables */
 	     fdo = pd->io[IO_STD_ENV_VAR].fd;
@@ -1553,8 +1554,8 @@ int _pgrp_data_child(int fd, process *pp, char *s)
 		 if (fd == fdi)
 		    {nw  = write(fdo, s, nc);
 		     rv |= (nw == nc);
-		     _dbg(2, "accept from %d send to %d (%s)",
-			  fd, fdo, s);};};
+		     _dbg(2, "accept %d bytes from %d send to %d (%s)",
+			  nw, fd, fdo, s);};};
 
 /* send resource limits */
 	     fdo = pd->io[IO_STD_LIMIT].fd;
@@ -1563,8 +1564,8 @@ int _pgrp_data_child(int fd, process *pp, char *s)
 		 if (fd == fdi)
 		    {nw  = write(fdo, s, nc);
 		     rv |= (nw == nc);
-		     _dbg(2, "accept from %d send to %d (%s)",
-			  fd, fdo, s);};};};};
+		     _dbg(2, "accept %d bytes from %d send to %d (%s)",
+			  nw, fd, fdo, s);};};};};
 
     return(rv);}
 
@@ -1580,7 +1581,7 @@ int _pgrp_send(int fd, process *pp, char *s)
 
     fdo = fileno(stdout);
 
-    _dbg(2, "accept from %d send to %d", fd, fdo);
+    _dbg(2, "accept %d bytes from %d send to %d", nc, fd, fdo);
 
     nw = write(fdo, s, nc);
     rv = (nw == nc);
@@ -2406,6 +2407,9 @@ int gexec(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
 	else
 	   _dbg(4, "leaked %d descriptors\n", fa-fb);};
 
+/* be sure to leave with stdin in blocking mode */
+    block_fd(0, TRUE);
+
     return(st);}
 
 /*--------------------------------------------------------------------------*/
@@ -2421,20 +2425,22 @@ int gexec(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
  */
 
 int transfer_ff(FILE *fi, FILE *fo)
-   {int i, rv, ev;
+   {int i, ne, nx, rv, ev;
+    size_t nr, nw, ni;
     char t[LRG];
 
     rv = 0;
+    ne = 0;
+    nx = 100000;
 
-    for (i = 0; rv == 0; i++)
+    for (i = 0; (rv == 0) && (ne < nx); i++)
         {if (feof(fi) == TRUE)
 	    rv = 1;
 
 	 else
-	    {size_t nr, nw, ni;
-
-	     nr = fread(t, 1, LRG, fi);
+	    {nr = fread(t, 1, LRG, fi);
 	     ev = errno;
+             ne++;
 	     if (nr > 0)
 	        {for (nw = 0; nw < nr; )
                      {ni  = fwrite(t, 1, nr-nw, fo);
@@ -2442,13 +2448,21 @@ int transfer_ff(FILE *fi, FILE *fo)
                       nw += ni;};
 
 		 _dbg(-2, "sent %d chars from file to %d (%d)",
-		      nw, fileno(fo), rv);}
+		      nw, fileno(fo), rv);
+
+                 ne = 0;}
 
 	     else if (feof(fi) == TRUE)
 	        rv = 1;
 
 	     else if (ev == EBADF)
 	        rv = 2;};};
+
+/* if number of consecutive zero length reads exceeds NX count it as EOF
+ * SOLARIS does not seem to get feof equal TRUE
+ */
+     if (ne >= nx)
+        rv = 1;
 
      return(rv);}
 
@@ -2458,22 +2472,32 @@ int transfer_ff(FILE *fi, FILE *fo)
 /* TRANSFER_FT - read from FI and push onto SA */
 
 int transfer_ft(FILE *fi, char ***psa)
-   {int i, rv;
+   {int i, ne, nx, rv;
     char t[MAXLINE];
     char *p;
 
     rv = 0;
+    ne = 0;
+    nx = 100000;
 
-    for (i = 0; rv == 0; i++)
+    for (i = 0; (rv == 0) && (ne < nx); i++)
         {if (feof(fi) == TRUE)
 	    rv = 1;
 	 else
-	    {p = fgets(t, MAXLINE, fi);
+	    {ne++;
+             p = fgets(t, MAXLINE, fi);
 	     if (p != NULL)
 	        {LAST_CHAR(t) = '\0';
-		 *psa = lst_add(*psa, t);}
+		 *psa = lst_add(*psa, t);
+                 ne = 0;}
 	     else if (errno == EBADF)
 	        rv = 1;};};
+
+/* if number of consecutive zero length reads exceeds NX count it as EOF
+ * SOLARIS does not seem to get feof equal TRUE
+ */
+     if (ne >= nx)
+        rv = 1;
 
     return(rv);}
 
