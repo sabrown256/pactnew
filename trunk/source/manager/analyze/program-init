@@ -28,7 +28,7 @@ C_STD = X99
 setenv TEST_ADVISORY     ""
 
 # GOTCHA: temporarily pass the spec test
-setenv TEST_ADVISORY     "psh_gexec_spec"
+#setenv TEST_ADVISORY     "psh_gexec_spec"
 
 setenv PTHREAD_POSIX     FALSE
 setenv PTHREAD_OMP       FALSE

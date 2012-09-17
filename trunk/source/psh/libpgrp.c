@@ -1386,6 +1386,53 @@ static void parse_pgrp(statement *s)
 
 /*--------------------------------------------------------------------------*/
 
+/* GPOLL - poll all the active jobs in a process group
+ *       - TO is the number of milliseconds to wait for input
+ *       - TO = -1 means block
+ */
+
+int gpoll(int to)
+   {int ip, n, ifd, nfd, np, ok;
+    int *map, *io;
+    process *pp;
+    apollfd *fds;
+    process_group_state *ps;
+
+    ps = get_process_group_state();
+
+    np  = ps->stck.np;
+    nfd = ps->stck.ifd;
+    fds = ps->stck.fd;
+    map = ps->stck.map;
+    io  = ps->stck.io;
+
+    n = 0;
+
+/* add stdin */
+    fds[n].fd      = 0;
+    fds[n].events  = ps->stck.mask_acc;
+    fds[n].revents = 0;
+    n++;
+
+/* find the descriptors of running jobs only */
+    for (ip = 0; ip < np; ip++)
+        {pp = ps->stck.proc[ip];
+	 if (job_running(pp))
+	    {for (ifd = 0; ifd < nfd; ifd++)
+	         {if (map[ifd] == ip)
+		     {fds[n].fd      = io[ifd];
+		      fds[n].events  = ps->stck.mask_acc;
+		      fds[n].revents = 0;
+		      n++;};};};};
+
+/* now poll the active descriptors */
+    ok = poll(fds, n, to);
+
+    return(ok);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _DEREF_JOB_CLOSE - close a job PP for fan in/out reasons */
 
 int _deref_job_close(int fd, process *pp)
@@ -1955,6 +2002,7 @@ void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
 			  if (rv == FALSE)
 			     break;};};};};};
 
+    gpoll(100);
 /*    sched_yield(); */
 
     return;}

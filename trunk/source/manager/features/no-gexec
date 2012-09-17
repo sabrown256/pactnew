@@ -1,0 +1,14 @@
+#
+# NO-GEXEC - do not let GEXEC tests fail the test suite
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+setenv TEST_ADVISORY     "psh_gexec:scheme_gexec"
+
+
+
+

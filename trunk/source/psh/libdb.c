@@ -761,7 +761,7 @@ void db_srv_restart(database *db)
 /* _DB_CLNT_EX - do a transaction from the client side of the database */
 
 char **_db_clnt_ex(client *cl, int init, char *req)
-   {int nb;
+   {int nb, ne, nx;
     char **p, *flog, *root;
     static char s[MAXLINE];
 
@@ -769,7 +769,7 @@ char **_db_clnt_ex(client *cl, int init, char *req)
        {root = cgetenv(TRUE, "PERDB_PATH");
 	cl   = make_client(root, CLIENT);};
 
-    p = NULL;
+    p    = NULL;
     root = cl->root;
 
     flog = name_log(root);
@@ -788,19 +788,30 @@ char **_db_clnt_ex(client *cl, int init, char *req)
        {int nc, to, ok;
 	char *t;
 
+	ne = 0;
+	nx = 100;
 	to = 4;
 	for (ok = TRUE; ok == TRUE; )
 	    {nb = comm_read(cl, s, MAXLINE, to);
-	     for (t = s; nb > 0; t += nc, nb -= nc)
-	         {if (strcmp(t, EOM) == 0)
-		     {ok = FALSE;
-		      break;}
-		  else
-		     p = lst_push(p, t);
+	     ne = (nb < 0) ? ne+1 : 0;
 
-		  nc = strlen(t) + 1;};
-	     if (ok == TRUE)
-	        nsleep(0);};};
+/* if more than NX consecutive read failures bail */
+	     if (ne >= nx)
+	        {p  = NULL;
+		 ok = FALSE;}
+
+	     else
+	        {for (t = s; nb > 0; t += nc, nb -= nc)
+		     {if (strcmp(t, EOM) == 0)
+			 {ok = FALSE;
+			  break;}
+		      else
+			 p = lst_push(p, t);
+
+		      nc = strlen(t) + 1;};
+
+		 if (ok == TRUE)
+		    nsleep(0);};};};
 
     log_activity(flog, dbg_db, 1, "CLIENT", "end request");
 

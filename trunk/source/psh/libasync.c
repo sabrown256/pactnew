@@ -1473,11 +1473,12 @@ int job_read(int fd, process *pp, int (*out)(int fd, process *pp, char *s))
 			 if (out != NULL)
 			    out(lfd, pp, s);}
 		     else if (ev == EBADF)
-		        rv = 1;};
+		        rv = 1;};};
 
-		 sched_yield();};
+	    _block_all_sig(FALSE);
 
-	    _block_all_sig(FALSE);};};
+/*	    nsleep(100); */
+/*	    sched_yield(); */};};
 
     return(nl);}
 
@@ -1829,7 +1830,7 @@ static int _awatch_push_fd(process *pp, int fd)
 /* _AWATCH_POP_FD - remove everything to do with PP from stack */
 
 static void _awatch_pop_fd(process *pp)
-   {int io, ip, ifd, np, nfd, fd;
+   {int ip, ifd, np, nfd;
     process_group_state *ps;
     process_stack *st;
 
@@ -1844,17 +1845,14 @@ static void _awatch_pop_fd(process *pp)
 
 /* remove the descriptors of the process */
     nfd = st->ifd;
-    for (io = 0; io < N_IO_CHANNELS; io++)
-        {fd = pp->io[io].fd;
-
-	 for (ifd = 0; ifd < nfd; ifd++)
-	     {if (st->io[ifd] == fd)
-		 {nfd--;
-		  st->io[ifd]  = st->io[nfd];
-		  st->map[ifd] = st->map[nfd];
-		  st->io[nfd]  = 0;
-		  st->map[nfd] = 0;
-		  ifd--;};};};
+    for (ifd = 0; ifd < nfd; ifd++)
+        {if (st->map[ifd] == ip)
+	    {nfd--;
+	     st->io[ifd]  = st->io[nfd];
+	     st->map[ifd] = st->map[nfd];
+	     st->io[nfd]  = 0;
+	     st->map[nfd] = 0;
+	     ifd--;};};
 
     st->ifd = nfd;
     st->ip--;
