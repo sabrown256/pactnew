@@ -2247,29 +2247,26 @@ char *delimited(char *s, char *bgn, char *end)
 
 /* BLOCK_FD - set the file descriptor to be blocked in ON is TRUE
  *          - otherwise unblocked
+ *          - return the original value
  */
 
 int block_fd(int fd, int on)
-   {int status;
+   {int ov, nv;
 
-    status = 0;
-
-    status = fcntl(fd, F_GETFL, status);
+    ov = 0;
+    ov = fcntl(fd, F_GETFL, ov);
 
 /* block */
     if (on == TRUE)
-       status = fcntl(fd, F_SETFL, status & ~O_NDELAY);
+       nv = fcntl(fd, F_SETFL, ov & ~O_NDELAY);
 
 /* unblock */
-    else
-       status = fcntl(fd, F_SETFL, status | O_NDELAY);
+    else if (on == FALSE)
+       nv = fcntl(fd, F_SETFL, ov | O_NDELAY);
 
-    if (status == -1)
-       status = FALSE;
-    else
-       status = TRUE;
+    ASSERT(nv != -1);
 
-    return(status);}
+    return(ov);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -2413,21 +2410,74 @@ int demonize(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* FILE_STRINGS_PUSH - get the text of FP as a
+ *                   - NULL terminated list of strings
+ *                   - appended to the list PSA
+ *                   - if SNL is TRUE strip off trailing newline
+ *                   - NBR is the number of blocking reads to do
+ *                   - reads after NBR are non-blocking
+ *                   - NBR equal -1 means all blocking reads
+ *                   - the extra work here is to be able to get
+ *                   - strings from pipes and sockets as well as files
+ *                   - return TRUE iff successful
+ */
+
+int file_strings_push(FILE *fp, char ***psa, int snl, unsigned int nbr)
+   {int ne, nx, ev, fd, ost, rv;
+    unsigned int i;
+    char t[LRG];
+    char *p;
+
+    rv = FALSE;
+
+    if (fp != NULL)
+       {rv = TRUE;
+	ne = 0;
+	nx = 100000;
+
+	fd  = fileno(fp);
+	ost = block_fd(fd, -1);
+
+	for (i = 0; (rv == TRUE) && (ne < nx); i++)
+	    {if (feof(fp) == TRUE)
+	        rv = FALSE;
+	     else
+	        {ne++;
+		 block_fd(fd, i < nbr);
+		 p  = fgets(t, LRG, fp);
+		 ev = errno;
+		 if (p != NULL)
+		    {ne = 0;
+		     if ((snl == TRUE) && (LAST_CHAR(t) == '\n'))
+		        LAST_CHAR(t) = '\0';
+		     *psa = lst_add(*psa, t);}
+		 else if (ev == EBADF)
+		    rv = FALSE;};};
+
+/* if number of consecutive zero length reads exceeds NX count it as EOF
+ * SOLARIS does not seem to get feof equal TRUE when
+ * FP is stdout or stderr
+ */
+	if (ne >= nx)
+	   rv = FALSE;
+
+	*psa = lst_add(*psa, NULL);
+
+	ost = block_fd(fd, ost);};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* FILE_STRINGS - return the text of FP as a NULL terminated list of strings */
 
 char **file_strings(FILE *fp)
-   {int i;
-    char s[LRG];
-    char **sa;
+   {char **sa;
 
     sa = NULL;
-    if (fp != NULL)
-       {for (i = 0; fgets(s, LRG, fp) != NULL; i++)
-	    {if (LAST_CHAR(s) == '\n')
-	        LAST_CHAR(s) = '\0';
-	     sa = lst_add(sa, s);};
 
-	sa = lst_add(sa, NULL);};
+    file_strings_push(fp, &sa, TRUE, -1);
 
     return(sa);}
 

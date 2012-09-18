@@ -1898,9 +1898,10 @@ int _fnc_wait(process_group *pg, int ip, int st)
 		     if (pd->isfunc == FALSE)
 		        {for (jo = 0; jo < N_IO_CHANNELS; jo++)
 			     {if (pd->io[jo].gid == ip)
+{
 				 job_read(pd->io[jo].fd, pd, pd->accept);
 			      _job_io_close(pd, jo);};
-
+};
 			 if (pd->id > 0)
 			    kill(pd->id, SIGHUP);
 
@@ -2517,42 +2518,9 @@ int transfer_ff(FILE *fi, FILE *fo)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* TRANSFER_FT - read from FI and push onto SA */
-
-int transfer_ft(FILE *fi, char ***psa)
-   {int i, ne, nx, rv;
-    char t[MAXLINE];
-    char *p;
-
-    rv = 0;
-    ne = 0;
-    nx = 100000;
-
-    for (i = 0; (rv == 0) && (ne < nx); i++)
-        {if (feof(fi) == TRUE)
-	    rv = 1;
-	 else
-	    {ne++;
-             p = fgets(t, MAXLINE, fi);
-	     if (p != NULL)
-	        {LAST_CHAR(t) = '\0';
-		 *psa = lst_add(*psa, t);
-                 ne = 0;}
-	     else if (errno == EBADF)
-	        rv = 1;};};
-
-/* if number of consecutive zero length reads exceeds NX count it as EOF
- * SOLARIS does not seem to get feof equal TRUE
+/* GEXEC_VAR - function to access variables
+ *           - return 0 iff successful
  */
-     if (ne >= nx)
-        rv = 1;
-
-    return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* GEXEC_VAR - function to access variables */
 
 int gexec_var(char *db, io_mode md, FILE **fio,
 	      char *name, int c, char **v)
@@ -2561,7 +2529,7 @@ int gexec_var(char *db, io_mode md, FILE **fio,
     char *vr, *vl, **sa;
     static int ic = 0;
 
-    rv = 0;
+    rv = 1;
     vr = v[0];
     nc = (c > 1) ? atol(v[1]) : 1;
 
@@ -2585,8 +2553,7 @@ int gexec_var(char *db, io_mode md, FILE **fio,
 		 nw++;
                  fflush(fio[1]);
 		 ic++;
-		 if (ic >= nc)
-		    rv = 1;
+		 rv = (ic < nc);
 
 		 _dbg(-2, "sent %d chars from %s to %d (%d)",
 		      nw, vr, fileno(fio[1]), rv);
@@ -2596,7 +2563,7 @@ int gexec_var(char *db, io_mode md, FILE **fio,
 /* stdin to variable */
 	    case IO_MODE_WO :
 	    case IO_MODE_WD :
-	         rv = transfer_ft(fio[0], &sa);
+	         rv = file_strings_push(fio[0], &sa, TRUE, -1);
 		 vl = concatenate(t, MAXLINE, sa, " ");
 
 		 if (IS_NULL(db) == FALSE)
@@ -2608,7 +2575,7 @@ int gexec_var(char *db, io_mode md, FILE **fio,
 
 /* stdin append to variable */
 	    case IO_MODE_APPEND :
-	         rv = transfer_ft(fio[0], &sa);
+	         rv = file_strings_push(fio[0], &sa, TRUE, -1);
 		 vl = concatenate(t, MAXLINE, sa, " ");
 
 		 fprintf(fio[1], "%s\n", vl);
@@ -2624,6 +2591,9 @@ int gexec_var(char *db, io_mode md, FILE **fio,
 		 break;};
 
 	free_strings(sa);};
+
+/* reverse the sense */
+    rv = !rv;
 
     return(rv);}
 

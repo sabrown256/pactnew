@@ -121,7 +121,7 @@
 #define JOB_NO_EXEC    76
 
 #define job_alive(pp)                                                         \
-   ((pp != NULL) && (pp->io[0].fd != -1))
+   ((pp != NULL) && ((pp->io[0].fd != -1) || (pp->io[2].fd != -1)))
 
 #define job_running(pp)                                                       \
    ((pp != NULL) && (pp->io[0].fd != -1) && (pp->status == JOB_RUNNING))
@@ -586,7 +586,7 @@ static void _job_free(process *pp)
 
 static int _job_exec(process *cp, int *fds,
 		     char **argv, char **env, char *mode)
-   {int i, err, fg, rv;
+   {int i, err, fg;
     int io[N_IO_CHANNELS];
 
     err = 0;
@@ -611,8 +611,7 @@ static int _job_exec(process *cp, int *fds,
 	for (i = 0; i < N_IO_CHANNELS; i++)
 	    io[i] = cp->io[i].fd;
 
-	rv = block_fd(io[0], TRUE);
-	ASSERT(rv == 0);
+	block_fd(io[0], TRUE);
 
 /* set the process stdin, stdout, and stderr to those from the pipe */
 	for (i = 0; i < N_IO_CHANNELS; i++)
@@ -910,9 +909,8 @@ void dprpio(char *tag, process *pp)
 /* _JOB_SET_PROCESS_ENV - set environment variables for PP */
 
 static void _job_set_process_env(process *pp)
-   {int i, nr, nl, ev, ok, fd;
-    char t[MAXLINE];
-    char *p;
+   {int i, ok, fd;
+    char **sa;
     FILE *fp;
     process_group *pg;
 
@@ -927,27 +925,109 @@ static void _job_set_process_env(process *pp)
 	fp = fdopen(fd, "r");
 /*	nsleep(100); */
 
-	nl = 0;
-	nr = 0;
-	ok = 0;
-	for (i = 0; (ok == 0) && (nr < 1000); i++)
-	    {if (feof(fp) == TRUE)
-		ok = 1;
-	     else
-	        {nr++;
-		 p  = fgets(t, LRG, fp);
-		 ev = errno;
-		 if (p != NULL)
-		    {nl++;
-		     nr = 0;
-		     LAST_CHAR(t) = '\0';
-		     _dbg(2, "setenv %s", t);
-		     putenv(STRSAVE(t));
-		     break;}
-		 else if (ev == EBADF)
-		    ok = 1;};};};
+	sa = NULL;
+	ok = file_strings_push(fp, &sa, TRUE, 1);
+	if (sa != NULL)
+	   {for (i = 0; sa[i] != NULL; i++)
+	        {_dbg(2, "setenv %s", sa[i]);
+		 putenv(STRSAVE(sa[i]));
+		 break;};
+
+	    free_strings(sa);};};
 
     return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _DO_RLIMIT - process rlimit specification VR */
+
+int _do_rlimit(char *vr)
+   {int rv, op;
+    char *vl;
+    struct rlimit rl;
+
+    rv = TRUE;
+
+    vl = strchr(vr, '=');
+    if (vl != NULL)
+       {*vl = '\0';
+	vl++;
+
+	op = -1;
+
+/* maximum core file size */
+	if (strcmp(vr, "core") == 0)
+	   {op = RLIMIT_CORE;
+	    rl.rlim_cur = atol(vl);}
+
+#ifdef RLIMIT_AS
+/* address space - virtual memory */
+	else if (strcmp(vr, "as") == 0)
+	   {op = RLIMIT_AS;
+	    rl.rlim_cur = atol(vl);}
+#endif
+
+#ifdef RLIMIT_CPU
+/* CPU seconds limit */
+	else if (strcmp(vr, "cpu") == 0)
+	   {op = RLIMIT_CPU;
+	    rl.rlim_cur = atol(vl);}
+#endif
+
+#ifdef RLIMIT_FSIZE
+/* file size limit */
+	else if (strcmp(vr, "fsize") == 0)
+	   {op = RLIMIT_FSIZE;
+	    rl.rlim_cur = atol(vl);}
+#endif
+
+#ifdef RLIMIT_NOFILE
+/* file number limit */
+	else if (strcmp(vr, "nofile") == 0)
+	   {op = RLIMIT_NOFILE;
+	    rl.rlim_cur = atol(vl);}
+#endif
+
+#ifdef RLIMIT_NPROC
+/* thread number limit */
+	else if (strcmp(vr, "nproc") == 0)
+	   {op = RLIMIT_NPROC;
+	    rl.rlim_cur = atol(vl);}
+#endif
+
+#ifdef RLIMIT_RSS
+/* memory page limit */
+	else if (strcmp(vr, "rss") == 0)
+	   {op = RLIMIT_RSS;
+	    rl.rlim_cur = atol(vl);}
+#endif
+
+#ifdef RLIMIT_STACK
+/* stack size limit */
+	else if (strcmp(vr, "stack") == 0)
+	   {op = RLIMIT_STACK;
+	    rl.rlim_cur = atol(vl);};
+#endif
+
+	if (op != -1)
+	   {int st;
+	    char bf[MAXLINE];
+	    struct rlimit ol;
+
+	    st = getrlimit(op, &ol);
+	    st = setrlimit(op, &rl);
+	    if (st == 0)
+	       _dbg(2, "setlimit %s = %ld (ok)",
+		    vr, (long) rl.rlim_cur);
+	    else
+	       {strerror_r(errno, bf, MAXLINE);
+		_dbg(2, "setlimit %s = %ld (%ld/%s)",
+		     vr,
+		     (long) rl.rlim_cur, (long) ol.rlim_max,
+		     (st == 0) ? "ok" : bf);};};};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -955,12 +1035,10 @@ static void _job_set_process_env(process *pp)
 /* _JOB_SET_PROCESS_RLIMITS - set resource limits for PP */
 
 static void _job_set_process_rlimits(process *pp)
-   {int i, nr, nl, ev, ok, op, fd;
-    char t[MAXLINE];
-    char *p, *vr, *vl;
+   {int i, ok, fd;
+    char **sa;
     FILE *fp;
     process_group *pg;
-    struct rlimit rl;
 
     ok = (pp != NULL);
     if (ok == TRUE)
@@ -973,105 +1051,13 @@ static void _job_set_process_rlimits(process *pp)
 	fp = fdopen(fd, "r");
 /*	nsleep(100); */
 
-	nl = 0;
-	nr = 0;
-	ok = 0;
-	for (i = 0; (ok == 0) && (nr < 1000); i++)
-	    {if (feof(fp) == TRUE)
-		ok = 1;
-	     else
-	        {nr++;
-		 p  = fgets(t, LRG, fp);
-		 ev = errno;
-		 if (p != NULL)
-		    {nl++;
-		     nr = 0;
-		     LAST_CHAR(t) = '\0';
+	sa = NULL;
+	ok = file_strings_push(fp, &sa, TRUE, 1);
+	if (sa != NULL)
+	   {for (i = 0; sa[i] != NULL; i++)
+	        _do_rlimit(sa[i]);
 
-		     op = -1;
-		     vr = t;
-		     vl = strchr(vr, '=');
-		     if (vl != NULL)
-		        {*vl = '\0';
-			 vl++;}
-		     else
-		        continue;
-
-/* maximum core file size */
-		     if (strcmp(vr, "core") == 0)
-		        {op = RLIMIT_CORE;
-			 rl.rlim_cur = atol(vl);}
-
-#ifdef RLIMIT_AS
-/* address space - virtual memory */
-		     else if (strcmp(vr, "as") == 0)
-		        {op = RLIMIT_AS;
-			 rl.rlim_cur = atol(vl);}
-#endif
-
-#ifdef RLIMIT_CPU
-/* CPU seconds limit */
-		     else if (strcmp(vr, "cpu") == 0)
-		        {op = RLIMIT_CPU;
-			 rl.rlim_cur = atol(vl);}
-#endif
-
-#ifdef RLIMIT_FSIZE
-/* file size limit */
-		     else if (strcmp(vr, "fsize") == 0)
-		        {op = RLIMIT_FSIZE;
-			 rl.rlim_cur = atol(vl);}
-#endif
-
-#ifdef RLIMIT_NOFILE
-/* file number limit */
-		     else if (strcmp(vr, "nofile") == 0)
-		        {op = RLIMIT_NOFILE;
-			 rl.rlim_cur = atol(vl);}
-#endif
-
-#ifdef RLIMIT_NPROC
-/* thread number limit */
-		     else if (strcmp(vr, "nproc") == 0)
-		        {op = RLIMIT_NPROC;
-			 rl.rlim_cur = atol(vl);}
-#endif
-
-#ifdef RLIMIT_RSS
-/* memory page limit */
-		     else if (strcmp(vr, "rss") == 0)
-		        {op = RLIMIT_RSS;
-			 rl.rlim_cur = atol(vl);}
-#endif
-
-#ifdef RLIMIT_STACK
-/* stack size limit */
-		     else if (strcmp(vr, "stack") == 0)
-		        {op = RLIMIT_STACK;
-			 rl.rlim_cur = atol(vl);};
-#endif
-
-		     if (op != -1)
-		        {int st;
-			 char bf[MAXLINE];
-			 struct rlimit ol;
-
-			 st = getrlimit(op, &ol);
-			 st = setrlimit(op, &rl);
-			 if (st == 0)
-			    _dbg(2, "received from %d - setlimit %s = %ld (ok)",
-				 fd, vr, (long) rl.rlim_cur);
-			 else
-			    {strerror_r(errno, bf, MAXLINE);
-			     _dbg(2, "received from %d - setlimit %s = %ld (%ld/%s)",
-				  fd, vr,
-				  (long) rl.rlim_cur, (long) ol.rlim_max,
-				  (st == 0) ? "ok" : bf);};};
-
-		     ok = 1;}
-
-		 else if (ev == EBADF)
-		    ok = 1;};};};
+	    free_strings(sa);};};
 
     return;}
 
@@ -1436,9 +1422,8 @@ process *job_launch(char *cmd, char *mode, void *a)
  */
 
 int job_read(int fd, process *pp, int (*out)(int fd, process *pp, char *s))
-   {int i, io, rv, ev, nl, nr, lfd;
-    char s[LRG];
-    char *p;
+   {int i, io, nl, lfd;
+    char **sa;
     FILE *lfi;
 
     nl = 0;
@@ -1456,24 +1441,13 @@ int job_read(int fd, process *pp, int (*out)(int fd, process *pp, char *s))
 	if ((lfi != NULL) && (lfd != -1))
  	   {_block_all_sig(TRUE);
 
-/* count consecutive null reads and bail after 1000 of them */
-	    nr = 0;
+	    sa = NULL;
+	    file_strings_push(lfi, &sa, FALSE, 0);
+	    if ((sa != NULL) && (out != NULL))
+	       {for (i = 0; sa[i] != NULL; i++)
+		    out(lfd, pp, sa[i]);
 
-	    rv = 0;
-	    for (i = 0; (rv == 0) && (nr < 1000); i++)
-	        {if (feof(lfi) == TRUE)
-		    rv = 1;
-		 else
-		    {nr++;
-		     p  = fgets(s, LRG, lfi);
-		     ev = errno;
-		     if (p != NULL)
-		        {nl++;
-			 nr = 0;
-			 if (out != NULL)
-			    out(lfd, pp, s);}
-		     else if (ev == EBADF)
-		        rv = 1;};};
+	        free_strings(sa);};
 
 	    _block_all_sig(FALSE);
 
@@ -1743,13 +1717,16 @@ int job_signal(process *pp, int sig)
  */
 
 int job_done(process *pp, int sig)
-   {int rv;
+   {int io, fd, rv;
 
     rv = job_signal(pp, sig);
 
     job_wait(pp);
 
-    rv = job_read(-1, pp, pp->accept);
+/* check both stdin and stderr */
+    for (io = 0; io < 3; io += 2)
+        {fd = pp->io[io].fd;
+	 rv = job_read(fd, pp, pp->accept);};
 
     _job_release(pp);
 
@@ -1802,7 +1779,7 @@ void asetup(int n, int na)
 /* _AWATCH_PUSH_FD - add FD from PP to stack */
 
 static int _awatch_push_fd(process *pp, int fd)
-   {int ip, ifd, rv;
+   {int ip, ifd;
     process_group_state *ps;
     process_stack *st;
 
@@ -1811,8 +1788,7 @@ static int _awatch_push_fd(process *pp, int fd)
 
     ip = pp->ip;
 
-    rv = block_fd(fd, FALSE);
-    ASSERT(rv == 0);
+    block_fd(fd, FALSE);
 
     ifd = st->ifd++;
     st->fd[ifd].fd      = 0;
