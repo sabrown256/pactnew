@@ -679,7 +679,7 @@ if ($doupd == TRUE) then
       exit(1)
    endif
 
-   ./dsys update $upopt
+   ftee $Log ./dsys update $upopt
    set xstatus = $status
 
 endif
@@ -695,6 +695,16 @@ endif
 
    if ($xstatus != 0) then
       NoteD $Log "PACT update failed ($xstatus/$et)"
+      set lst = ""
+      set lst = ($lst $logdir/config $logdir/analyze $logdir/build $logdir/test)
+      set lst = ($lst $etcdir/cfg.db $etcdir/cfg.log)
+      set lst = ($lst $etcdir/env-pact.csh $etcdir/make-def)
+      foreach i ($lst)
+         if (-f $i) then
+            Separator $Log
+            flog $Log cat $i
+         endif
+      end
 
    else
       NoteD $Log "PACT update succeeded ($et)"

@@ -27,7 +27,7 @@ set logerr = ( osrc -t err cat )
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-foreach i (1 2 3 4 5 6 7 8)
+foreach i (1 2 3 4 5 6 7 8 9 10 11 12)
 
    Note $Log ""
    Note $Log "---------------------------------------------------"
@@ -86,6 +86,31 @@ foreach i (1 2 3 4 5 6 7 8)
            set gst = "1 0"
            set srt = TRUE
            breaksw
+
+# conversation tests
+      case 9:
+           set cmd = ( gexec $opt pa:conv a @i @o pa:conv b '>&!' $raw )
+           set gst = "0 0"
+           set srt = TRUE
+           breaksw
+
+      case 10:
+           set cmd = ( gexec $opt osrc conv a @i @o pa:conv b '>&!' $raw )
+           set gst = "0 0"
+           set srt = TRUE
+           breaksw
+
+      case 11:
+           set cmd = ( gexec $opt pa:conv a @i @o osrc conv b '>&!' $raw )
+           set gst = "0 0"
+           set srt = TRUE
+           breaksw
+
+      case 12:
+           set cmd = ( gexec $opt osrc conv a @i @o osrc conv b '>&!' $raw )
+           set gst = "0 0"
+           set srt = TRUE
+           breaksw
    endsw
 
    Note $Log "cmd = $cmd"
@@ -133,7 +158,7 @@ foreach i (1 2 3 4 5 6 7 8)
 
 end
 
-NoteD $Log -n " ..............."
+NoteD $Log -n " ..........."
 
 Note $Log "exiting with err = $err"
 Note $Log ""
