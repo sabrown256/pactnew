@@ -111,7 +111,8 @@ static int _SS_proc_exec(char *db, io_mode m, FILE **fp,
     for (i = 0; i < N_IO_CHANNELS; i++)
         {type[l] = SS_OBJECT_I;
          if (i == 0)
-	    ptr[l] = SS_mk_inport(si, SC_fwrap(fp[i]), ioc[i]);
+	    {SC_block_file(fp[i]);
+	     ptr[l] = SS_mk_inport(si, SC_fwrap(fp[i]), ioc[i]);}
 	 else
 	    ptr[l] = SS_mk_outport(si, SC_fwrap(fp[i]), ioc[i]);
 	 l++;};
