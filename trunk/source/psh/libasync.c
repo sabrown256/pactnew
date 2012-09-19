@@ -314,21 +314,22 @@ void _job_io_close(process *pp, io_kind knd)
    {int fd, af;
     FILE *fp;
 
-    fd = pp->io[knd].fd;
-    fp = pp->io[knd].fp;
+    if (knd != IO_STD_NONE)
+       {fd = pp->io[knd].fd;
+	fp = pp->io[knd].fp;
 
-    af = abs(fd);
-    if (fd > 2)
-       _fd_close(af);
+	af = abs(fd);
+	if (fd > 2)
+	   _fd_close(af);
 
-    if (fp != NULL)
-       fclose(fp);
+	if (fp != NULL)
+	   fclose(fp);
 
-    pp->io[knd].fd  = -1;
-    pp->io[knd].fp  = NULL;
-    pp->io[knd].hnd = IO_HND_NONE;
-    pp->io[knd].dev = IO_DEV_NONE;
-    pp->io[knd].knd = IO_STD_NONE;
+	pp->io[knd].fd  = -1;
+	pp->io[knd].fp  = NULL;
+	pp->io[knd].hnd = IO_HND_NONE;
+	pp->io[knd].dev = IO_DEV_NONE;
+	pp->io[knd].knd = IO_STD_NONE;};
 
     return;}
 
@@ -923,7 +924,6 @@ static void _job_set_process_env(process *pp)
 
 	fd = pg->children[pp->ip]->io[IO_STD_IN].fd;
 	fp = fdopen(fd, "r");
-/*	nsleep(100); */
 
 	sa = NULL;
 	ok = file_strings_push(fp, &sa, TRUE, 1);
@@ -1049,7 +1049,6 @@ static void _job_set_process_rlimits(process *pp)
 
 	fd = pg->children[pp->ip]->io[IO_STD_IN].fd;
 	fp = fdopen(fd, "r");
-/*	nsleep(100); */
 
 	sa = NULL;
 	ok = file_strings_push(fp, &sa, TRUE, 1);
@@ -1439,20 +1438,13 @@ int job_read(int fd, process *pp, int (*out)(int fd, process *pp, char *s))
 		     break;};};};
 
 	if ((lfi != NULL) && (lfd != -1))
- 	   {_block_all_sig(TRUE);
-
-	    sa = NULL;
+ 	   {sa = NULL;
 	    file_strings_push(lfi, &sa, FALSE, 0);
 	    if ((sa != NULL) && (out != NULL))
 	       {for (i = 0; sa[i] != NULL; i++)
 		    out(lfd, pp, sa[i]);
 
-	        free_strings(sa);};
-
-	    _block_all_sig(FALSE);
-
-/*	    nsleep(100); */
-/*	    sched_yield(); */};};
+	        free_strings(sa);};};};
 
     return(nl);}
 
@@ -1480,12 +1472,8 @@ int job_write(process *pp, char *fmt, ...)
     if (job_alive(pp))
        {fo = pp->io[1].fp;
 	if (fo != NULL)
-	   {_block_all_sig(TRUE);
-
-	    ns = strlen(s);
-	    nc = fwrite_safe(s, 1, ns, fo);
-
-	    _block_all_sig(FALSE);};};
+	   {ns = strlen(s);
+	    nc = fwrite_safe(s, 1, ns, fo);};};
 
     return(nc);}
 
@@ -1637,12 +1625,10 @@ int _job_waitr(int pid, int *pw, int opt, struct rusage *pr)
 /* JOB_WAIT - check to update the process status */
 
 void job_wait(process *pp)
-   {int i, st, w, pid, sts, cnd;
+   {int st, w, pid, sts, cnd;
 
     if ((pp != NULL) && (pp->id != -1))
        {pid = pp->id;
-
-	_block_all_sig(TRUE);
 
 	st = _job_waitr(pid, &w, WNOHANG, &pp->ru);
 
@@ -1671,15 +1657,10 @@ void job_wait(process *pp)
 	    pp->reason    = sts;
 
 	    if (pp->wait != NULL)
-	       {pp->wait(pp);
-
-		for (i = 0; i < N_IO_CHANNELS; i++)
-		    _job_io_close(pp, i);};}
+	       pp->wait(pp);}
 
 	else if ((st < 0) && (pp->status == JOB_RUNNING))
-	   pp->status = JOB_DEAD;
-
-	_block_all_sig(FALSE);};
+	   pp->status = JOB_DEAD;};
 
     return;}
 
