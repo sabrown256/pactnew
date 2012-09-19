@@ -1436,14 +1436,11 @@ int gpoll(int to)
 /* _DEREF_JOB_CLOSE - close a job PP for fan in/out reasons */
 
 int _deref_job_close(int fd, process *pp)
-   {int rv, io;
+   {int rv;
 
     rv = _fd_close(fd);
-    nsleep(10);
-    job_read(-1, pp, pp->accept);
 
-    for (io = N_IO_CHANNELS - 1; io >= 0; io--)
-        _job_io_close(pp, io);
+    job_done(pp, 0);
 
     _dbg(2, "close deref %d", fd);
 
@@ -1880,43 +1877,24 @@ int _fnc_wait(process_group *pg, int ip, int st)
 	    rv  = FALSE;};
 
 	if (st != 0)
-	   {int jo;
-            iodes *pio;
-	    process *pd;
-
-	    _block_all_sig(TRUE);
+	   {iodes *pio;
 
 	    for (io = 0; io < N_IO_CHANNELS; io++)
 	        {pio = pp->io + io;
 		 if (pio->gid != -1)
 
 /* close this channel */
-		    {_job_io_close(pp, io);
+		    _job_io_close(pp, io);
 
-/* close process channels this function talks to */
-		     pd = pg->parents[pio->gid];
-		     if (pd->isfunc == FALSE)
-		        {for (jo = 0; jo < N_IO_CHANNELS; jo++)
-			     {if (pd->io[jo].gid == ip)
-{
-				 job_read(pd->io[jo].fd, pd, pd->accept);
-			      _job_io_close(pd, jo);};
-};
-			 if (pd->id > 0)
-			    kill(pd->id, SIGHUP);
-
-			 job_wait(pd);};}
-	       else
-		  pio->fd = -1;};
+		 else
+		    pio->fd = -1;};
 
 	    pp->stop_time = wall_clock_time();
 	    pp->status    = cnd;
 	    pp->reason    = sts;
 
 	    if ((pp->wait != NULL) && (pp->isfunc == FALSE))
-	       pp->wait(pp);
-
-	    _block_all_sig(FALSE);};};
+	       pp->wait(pp);};};
 
     return(rv);}
 
@@ -1996,15 +1974,12 @@ void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
 			  fp[1] = _io_file_ptr(pp, IO_STD_OUT);
 			  fp[2] = _io_file_ptr(pp, IO_STD_ERR);
 
-			  nsleep(10);
-
 			  rv = f(db, md, fp, fn, c, v);
 			  rv =_fnc_wait(pg, ip, rv);
 			  if (rv == FALSE)
 			     break;};};};};};
 
     gpoll(100);
-/*    sched_yield(); */
 
     return;}
 
@@ -2110,8 +2085,6 @@ static int run_pgrp(statement *s)
 	     pp->ip       = i;
 
 	     ASSERT(rv == 0);};
-
-	sched_yield();
 
 /* load up the process stack */
 	for (i = 0; i < np; i++)

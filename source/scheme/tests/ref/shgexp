@@ -17,3 +17,5 @@ out #0 3> p3> out message #1
 out #0 3> p3> out message #2
 out #0 3> p3> out message #3
 out #0 3> p3> out message #4
+p1> err message #1
+p1> err message #2

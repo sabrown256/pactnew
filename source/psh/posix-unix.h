@@ -18,7 +18,7 @@
 #include <pthread.h>
  */
 
-#include <cpio.h>
+/* #include <cpio.h> */
 #include <grp.h>
 #include <pwd.h>
 #include <tar.h>
