@@ -17,10 +17,10 @@ echo "-----------------------------------"
 perdb $opt save: v2
 
 echo "-----------------------------------"
-perdb $opt save intera: v1
+perdb $opt save:intera v1
 
 echo "-----------------------------------"
-perdb $opt save interb:
+perdb $opt save:interb
 
 echo "-----------------------------------"
 perdb $opt save:

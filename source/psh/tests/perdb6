@@ -1,7 +1,6 @@
 #!/bin/csh -f
 #
-# PERDB6 - test adding members
-#        - GOTCHA: does not work as desired - some redesign required
+# PERDB6 - test def and init
 #        - no FIFO
 #
 
@@ -10,41 +9,47 @@ set db  = ./db6
 
 alias dbset     'set t_ = ( `perdb $opt \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
 alias dbget     'setenv \!\!:1 "`perdb $opt \!\!:1`"'
+alias dbdef     'perdb $opt \!\!:1 \?'
+alias dbini     'set t_ = ( `perdb $opt \!\!:1 =\? \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
 
-rm -f db6-* >& /dev/null
+set res = ( "defined" "undefined" )
+
+rm -f db6* >& /dev/null
 
 setenv PERDB_PATH $db
 
 echo "-----------------------------------"
 
-dbset v1 "(m1 m2)"
+dbdef v1
+@ xstat = $status + 1 ; echo "v1 ? $res[$xstat]"
+dbdef v1
+@ xstat = $status + 1 ; echo "v1 ? $res[$xstat]"
+
+dbset v1 abc
 echo "v1 = `printenv 'v1'`"
 
-dbset v1.m3 new
-echo "v1 = `printenv 'v1'`"
-
-dbget v1.m3
-echo "v1.m3 = `printenv 'v1.m3'`"
+dbdef v1
+@ xstat = $status + 1 ; echo "v1 ? $res[$xstat]"
 
 echo ""
 perdb $opt save: v1
 
 echo "-----------------------------------"
 
-dbset v2 "(m1=1 m2=a b m3=abc m4='x=y' m5= m6=end)"
+dbdef v2
+@ xstat = $status + 1 ; echo "v2 ? $res[$xstat]"
+
+dbini v2 abc
 echo "v2 = `printenv 'v2'`"
 
-dbset v2.m7 new
+dbdef v2
+@ xstat = $status + 1 ; echo "v2 ? $res[$xstat]"
+
+dbini v2 xyz
 echo "v2 = `printenv 'v2'`"
 
-dbget v2.m7
-echo "v2 = `printenv 'v2'`"
-
-dbset v2.m1 2
-echo "v2 = `printenv 'v2'`"
-
-dbget v2.m1
-echo "v2 = `printenv 'v2'`"
+dbdef v2
+@ xstat = $status + 1 ; echo "v2 ? $res[$xstat]"
 
 echo ""
 perdb $opt save: v2

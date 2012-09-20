@@ -250,6 +250,146 @@ static void term_connection(client *cl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* DO_SAVE - save the database variables
+ *         - syntax is
+ *         -    save:[<name>] <var>*
+ *         - where
+ *         -   <name> is a database name
+ *         -          if <name> is stdout dumps to stdout
+ *         -          else if <name> is full path use it
+ *         -          otherwise database will be named <root>.<name>.db
+ *         -          default is <root>.db
+ *         -   <var>  variable name to be saved
+ *         -          if no variables specified all are saved
+ */
+
+static char *do_save(client *cl, char *s)
+   {char *var, *val, *fname, *p;
+
+    p = s + 5;
+    if ((*p == '\0') || (strchr(" \t\n\f", *p) != NULL))
+       fname = NULL;
+    else
+       {fname = p;
+
+	p = strpbrk(fname, " \t\n\f");
+        if (p != NULL)
+	   *p++ = '\0';};
+
+    key_val(&var, NULL, p, " \t\n");
+
+    val = srv_save_db(cl, fname, var);
+
+    return(val);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DO_LOAD - load the database variables
+ *         - syntax is
+ *         -    load:[<name>] <var>*
+ *         - where
+ *         -   <name> is a database name
+ *         -          if <name> is stdout dumps to stdout
+ *         -          else if <name> is full path use it
+ *         -          otherwise database will be named <root>.<name>.db
+ *         -          default is <root>.db
+ *         -   <var>  variable name to be loaded
+ *         -          if no variables specified all are loaded
+ */
+
+static char *do_load(client *cl, char *s)
+   {char *var, *val, *fname, *p;
+
+    p = s + 5;
+    if ((*p == '\0') || (strchr(" \t\n\f", *p) != NULL))
+       fname = NULL;
+    else
+       {fname = p;
+
+	p = strpbrk(fname, " \t\n\f");
+	if (p != NULL)
+	   *p++ = '\0';};
+
+    key_val(&var, NULL, p, " \t\n");
+
+    val = srv_load_db(cl, fname, var);
+
+    return(val);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DO_COND_INIT - handle conditional initialization */
+
+static char *do_cond_init(database *db, char *s)
+   {int st;
+    char *var, *val, *nvl;
+
+    key_val(&var, &nvl, s, "=? \t\n");
+
+    val = get_db(db, var);
+
+    st = (val != cnoval());
+    if (st == FALSE)
+       val = put_db(db, var, nvl);
+
+    return(val);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DO_DEFD - handle defined query */
+
+static char *do_defd(database *db, char *s)
+   {int st;
+    char *var, *val, *nvl;
+
+    key_val(&var, &nvl, s, "? \t\n");
+
+    val = get_db(db, var);
+
+    st = (val != cnoval());
+    if (IS_NULL(nvl) == TRUE)
+       {if (st == TRUE)
+	   val = "defined{TRUE}";
+        else
+	   val = "defined{FALSE}";}
+
+    else if (st == FALSE)
+       val = put_db(db, var, nvl);
+
+    return(val);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* DO_SET_GET - handle variable set or get operations */
+
+static char *do_set_get(database *db, char *s)
+   {char *var, *val;
+    static char t[MAXLINE];
+
+    key_val(&var, &val, s, "= \t\n");
+
+    if (val == NULL)
+       val = get_db(db, var);
+
+    else
+       {val = trim(val, BACK, " \t");
+	val = put_db(db, var, val);};
+
+    if ((val != NULL) &&
+	(strchr("'\"(", val[0]) == NULL) && 
+	(strpbrk(val, " \t") != NULL))
+       {snprintf(t, MAXLINE, "\"%s\"", val);
+	val = t;};
+
+    return(val);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PROC_CONNECTION - process input on client connection CL
  *                 - return -1 on error
  *                 -         0 on end of connection
@@ -257,9 +397,9 @@ static void term_connection(client *cl)
  */
 
 static int proc_connection(client *cl)
-   {int rv, nb, st, to;
-    char s[MAXLINE], t[MAXLINE];
-    char *var, *val, *nvl, *p;
+   {int rv, nb, to;
+    char s[MAXLINE];
+    char *val;
     database *db;
 
     db = cl->db;
@@ -292,65 +432,25 @@ static int proc_connection(client *cl)
 	   {reset_db(db);
 	    val = "reset";}
 
-/* save to standard place */
+/* save database */
 	else if (strncmp(s, "save:", 5) == 0)
-	   {key_val(NULL, &var, s, ": \t\n");
-	    val = srv_save_db(cl, NULL, var);}
+	   val = do_save(cl, s);
 
-/* save to specified place */
-	else if (strncmp(s, "save ", 5) == 0)
-	   {p = strchr(s+5, ':');
-	    if (p != NULL)
-	       *p++ = '\0';
-	    key_val(NULL, &var, s+5, " \t\n");
-	    val = srv_save_db(cl, s+5, var);}
-
-/* load from standard place */
+/* load database */
 	else if (strncmp(s, "load:", 5) == 0)
-	   val = srv_load_db(cl, NULL, NULL);
-
-/* load from specified place */
-	else if (strncmp(s, "load ", 5) == 0)
-	   {p = strchr(s+5, ':');
-	    if (p != NULL)
-	       *p++ = '\0';
-	    val = srv_load_db(cl, s+5, NULL);}
+           val = do_load(cl, s);
 
 /* variable conditional init */
 	else if (strstr(s, "=\?") != NULL)
-	   {key_val(&var, &nvl, s, "=? \t\n");
-	    val = get_db(db, var);
-	    st  = (val != cnoval());
-	    if (st == FALSE)
-	       val = put_db(db, var, nvl);}
+	   val = do_cond_init(db, s);
 
 /* variable defined? */
 	else if (strchr(s, '?') != NULL)
-	   {key_val(&var, &nvl, s, "? \t\n");
-	    val = get_db(db, var);
-	    st  = (val != cnoval());
-	    if (IS_NULL(nvl) == TRUE)
-	       {if (st == TRUE)
-		   val = "defined{TRUE}";
-	        else
-		   val = "defined{FALSE}";}
-	    else if (st == FALSE)
-	       val = put_db(db, var, nvl);}
+           val = do_defd(db, s);
 
 /* variable set/get */
 	else
-	   {key_val(&var, &val, s, "= \t\n");
-	    if (val == NULL)
-	       {val = get_db(db, var);}
-	    else
-	       {val = trim(val, BACK, " \t");
-		val = put_db(db, var, val);};
-
-	    if ((val != NULL) &&
-		(strchr("'\"(", val[0]) == NULL) && 
-		(strpbrk(val, " \t") != NULL))
-	       {snprintf(t, MAXLINE, "\"%s\"", val);
-		val = t;};};
+	   val = do_set_get(db, s);
 
 	if (val != NULL)
 	   {nb = comm_write(cl, val, 0, 10);
