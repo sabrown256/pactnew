@@ -619,7 +619,7 @@ static int pco_save_db(client *cl, char *dbname)
     if (dbname == NULL)
        nstrncpy(t, MAXLINE, "save:", -1);
     else
-       snprintf(t, MAXLINE, "save %s:", dbname);
+       snprintf(t, MAXLINE, "save:%s", dbname);
     dbcmd(cl, t);
 
 /* write the input form of the database - to be read back in by pco */

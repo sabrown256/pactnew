@@ -999,7 +999,7 @@ int db_restore(client *cl, char *db)
     if (db == NULL)
        nstrncpy(t, MAXLINE, "load:", -1);
     else
-       snprintf(t, MAXLINE, "load %s:", db);
+       snprintf(t, MAXLINE, "load:%s", db);
 
     ok = dbcmd(cl, t);
     ASSERT(ok == 0);
@@ -1019,7 +1019,6 @@ int db_restore(client *cl, char *db)
 		 if (vl != NULL)
 		    {*vl++ = '\0';
 		     vl = strip_quote(vl);
-/*		     vl = subst(vl, "\"", "", -1); */
 		     csetenv(s, vl);};};};
 	lst_free(ta);};
 

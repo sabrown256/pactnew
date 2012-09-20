@@ -1,6 +1,7 @@
 #!/bin/csh -f
 #
-# PERDB7 - test def and init
+# PERDB7 - test adding members
+#        - GOTCHA: does not work as desired - some redesign required
 #        - no FIFO
 #
 
@@ -9,47 +10,41 @@ set db  = ./db7
 
 alias dbset     'set t_ = ( `perdb $opt \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
 alias dbget     'setenv \!\!:1 "`perdb $opt \!\!:1`"'
-alias dbdef     'perdb $opt \!\!:1 \?'
-alias dbini     'set t_ = ( `perdb $opt \!\!:1 =\? \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
 
-set res = ( "defined" "undefined" )
-
-rm -f db7-* >& /dev/null
+rm -f db7* >& /dev/null
 
 setenv PERDB_PATH $db
 
 echo "-----------------------------------"
 
-dbdef v1
-@ xstat = $status + 1 ; echo "v1 ? $res[$xstat]"
-dbdef v1
-@ xstat = $status + 1 ; echo "v1 ? $res[$xstat]"
-
-dbset v1 abc
+dbset v1 "(m1 m2)"
 echo "v1 = `printenv 'v1'`"
 
-dbdef v1
-@ xstat = $status + 1 ; echo "v1 ? $res[$xstat]"
+dbset v1.m3 new
+echo "v1 = `printenv 'v1'`"
+
+dbget v1.m3
+echo "v1.m3 = `printenv 'v1.m3'`"
 
 echo ""
 perdb $opt save: v1
 
 echo "-----------------------------------"
 
-dbdef v2
-@ xstat = $status + 1 ; echo "v2 ? $res[$xstat]"
-
-dbini v2 abc
+dbset v2 "(m1=1 m2=a b m3=abc m4='x=y' m5= m6=end)"
 echo "v2 = `printenv 'v2'`"
 
-dbdef v2
-@ xstat = $status + 1 ; echo "v2 ? $res[$xstat]"
-
-dbini v2 xyz
+dbset v2.m7 new
 echo "v2 = `printenv 'v2'`"
 
-dbdef v2
-@ xstat = $status + 1 ; echo "v2 ? $res[$xstat]"
+dbget v2.m7
+echo "v2 = `printenv 'v2'`"
+
+dbset v2.m1 2
+echo "v2 = `printenv 'v2'`"
+
+dbget v2.m1
+echo "v2 = `printenv 'v2'`"
 
 echo ""
 perdb $opt save: v2

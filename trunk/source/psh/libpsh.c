@@ -2162,18 +2162,11 @@ void key_val(char **key, char **val, char *s, char *dlm)
 	p = strpbrk(k, dlm);
 	if (p != NULL)
 	   {*p++ = '\0';
-
-	    v = trim(p, BOTH, dlm);
-/*
-	    v = trim(p, FRONT, dlm);
-	    p = strchr(v, '\n');
-	    if (p != NULL)
-	       *p++ = '\0';
- */
-	   };};
+	    v    = trim(p, BOTH, dlm);};};
 
     if (key != NULL)
        *key = k;
+
     if (val != NULL)
        *val = v;
 
@@ -2263,6 +2256,9 @@ int block_fd(int fd, int on)
 /* unblock */
     else if (on == FALSE)
        nv = fcntl(fd, F_SETFL, ov | O_NDELAY);
+
+    else
+       nv = 0;
 
     ASSERT(nv != -1);
 
