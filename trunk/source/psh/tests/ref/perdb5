@@ -18,4 +18,21 @@ v2 : |b|
 v3 : |c|
 v4 : ||
 -----------------------------------
+setenv v1 a ;
+setenv v2 b ;
+setenv v3 c ;
+/bin/true
+-----------------------------------
+setenv v1 a ;
+setenv v3 c ;
+/bin/true
+-----------------------------------
+export v1=a ;
+export v2=b ;
+export v3=c ;
+/bin/true
+-----------------------------------
+export v1=a ;
+/bin/true
+-----------------------------------
 done

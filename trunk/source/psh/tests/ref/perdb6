@@ -5,7 +5,7 @@ v1 = abc
 v1 ? defined
 
 v1=abc
-saved v1
+saved variables
 -----------------------------------
 v2 ? undefined
 v2 = abc
@@ -14,6 +14,6 @@ v2 = abc
 v2 ? defined
 
 v2=abc
-saved v2
+saved variables
 -----------------------------------
 done
