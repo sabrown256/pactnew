@@ -82,18 +82,18 @@ EOF
       NoteD $ALog "      has PNG ($PckLib)"
 
       if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
-         setenv MDG_Inc "$MDG_Inc $PckInc"
+         flog $ALog setenv MDG_Inc "$MDG_Inc $PckInc"
       endif
 
       if ("$PckPath" != "") then
-         setenv RPATH     ${RPATH}:${PckPath}
+         flog $ALog setenv RPATH     ${RPATH}:${PckPath}
       endif
-      setenv MDG_Lib      "$MDG_Lib $PckLib"
-      setenv MDG_Pck      "$MDG_Pck PNG"
-      setenv HAVE_PNGLIB  TRUE
+      flog $ALog setenv MDG_Lib      "$MDG_Lib $PckLib"
+      flog $ALog setenv MDG_Pck      "$MDG_Pck PNG"
+      flog $ALog setenv HAVE_PNGLIB  TRUE
    else
       NoteD $ALog "      no PNG"
-      setenv HAVE_PNGLIB FALSE
+      flog $ALog setenv HAVE_PNGLIB FALSE
    endif
 
    set ETime = `timer -b $UTime`

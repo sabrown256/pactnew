@@ -24,5 +24,15 @@ source $AnaDir/x11
 source $AnaDir/png
 source $AnaDir/jpeg
 
+Separator $Log
+
+Note $Log "Graphics summary variables:"
+Note $Log "   RPATH   = $RPATH"
+Note $Log "   MDG_Inc = $MDG_Inc"
+Note $Log "   MDG_Lib = $MDG_Lib"
+Note $Log "   MDG_Pck = $MDG_Pck"
+
+Separator $Log
+
 exit(0)
 

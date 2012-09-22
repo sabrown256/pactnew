@@ -89,16 +89,16 @@ EOF
       setenv GraphicsFlag     "$GraphicsFlag -DOGL"
 
       if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
-         setenv MDG_Inc "$MDG_Inc $PckInc"
+         flog $ALog setenv MDG_Inc "$MDG_Inc $PckInc"
       endif
       Note $ALog "MDG Include = |$MDG_Inc|"
 
-      setenv MDG_Lib    "$MDG_Lib $PckLib"
-      setenv MDG_Pck    "$MDG_Pck OGL"
-      setenv Std_UseOGL TRUE
+      flog $ALog setenv MDG_Lib    "$MDG_Lib $PckLib"
+      flog $ALog setenv MDG_Pck    "$MDG_Pck OGL"
+      flog $ALog setenv Std_UseOGL TRUE
    else
       NoteD $ALog "      no OpenGL"
-      setenv Std_UseOGL FALSE
+      flog $ALog setenv Std_UseOGL FALSE
    endif
 
    setenv OGL_Inc   "$PckInc"

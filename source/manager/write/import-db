@@ -1,0 +1,41 @@
+#
+# IMPORT-DB - import database into environment
+#           - helper for manager/write programs
+#
+# include cpyright.h
+#
+
+# MODE determines whether variables are imported from the
+# database en masse or one at a time
+# theoretically one at a time should be pretty expensive
+# values for mode
+#    1  prune and import en masse
+#    2  prune and import one at a time
+
+set mode = 1
+
+# prune and import en masse
+if ($mode == 1) then
+   set lt = `timer -r`
+   eval `perdb csh:stdout $vl`
+   set lt = `timer -b $lt`
+   Note $Log "Import variables en masse in $lt seconds:"
+
+# otherwise
+else
+   set lt = `timer -r`
+   foreach v ($vl)
+      dbget $v
+   end
+   set lt = `timer -b $lt`
+   Note $Log "Import variables individually in $lt seconds:"
+endif
+
+# list variables and values
+foreach v ($vl)
+   Note $Log "   $v = `printenv $v`"
+end
+Note $Log ""
+
+unset vl
+unset mode

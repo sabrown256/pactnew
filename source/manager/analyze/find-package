@@ -222,6 +222,7 @@ Note $ALog ""
 
 flog $ALog set PckPath = ""
 flog $ALog set PckLib  = ""
+flog $ALog set PckInc  = ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -242,6 +243,7 @@ if ("$lFile" != "none") then
 endif
 
 Note $ALog "Leaving FIND_PACKAGE with:"
+Note $ALog "   PckInc  = |$PckInc|"
 Note $ALog "   PckLib  = |$PckLib|"
 Note $ALog "   PckPath = |$PckPath|"
 Note $ALog ""
