@@ -124,25 +124,29 @@ EOF
 
       set lok = FALSE
       if ("$PckInc" != "none") then
-         if (("$PckInc" != "-I$RootInc") || ($?IBM_BGP == 1)) then
+
+# NOTE: we really mean /usr/include and not Root Inc here because
+# all compilers automatically look to /usr/include but not necessarily
+# to whatever RootInc is set to
+         if (("$PckInc" != "-I/usr/include") || ($?IBM_BGP == 1)) then
             set lok = TRUE
          endif
       endif
 
       if ($lok == TRUE) then
-         setenv MDG_Inc "$MDG_Inc $PckInc"
+         flog $ALog setenv MDG_Inc "$MDG_Inc $PckInc"
       endif
       unset lok
 
       if ("$PckPath" != "") then
-         setenv RPATH    ${RPATH}:${PckPath}
+         flog $ALog setenv RPATH    ${RPATH}:${PckPath}
       endif
-      setenv MDG_Lib     "$MDG_Lib $PckLib"
-      setenv MDG_Pck     "$MDG_Pck X11"
-      setenv Std_UseX    TRUE
+      flog $ALog setenv MDG_Lib     "$MDG_Lib $PckLib"
+      flog $ALog setenv MDG_Pck     "$MDG_Pck X11"
+      flog $ALog setenv Std_UseX    TRUE
    else
       NoteD $ALog "      no X11"
-      setenv Std_UseX    FALSE
+      flog $ALog setenv Std_UseX    FALSE
    endif
 
    set ETime = `timer -b $UTime`
