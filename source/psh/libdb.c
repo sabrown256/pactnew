@@ -396,8 +396,8 @@ char *get_db(database *db, char *var)
 
 /* SAVE_DB - save variable VAR to FP */
 
-int save_db(int fd, database *db, char *var, FILE *fp)
-   {int i, rv, nv;
+int save_db(int fd, database *db, char **var, FILE *fp, const char *fmt)
+   {int i, l, rv, nv;
     char s[LRG], t[LRG];
     char *vl, *vr, **vrs;
     client *cl;
@@ -412,18 +412,31 @@ int save_db(int fd, database *db, char *var, FILE *fp)
 	nv  = db->ne;
 	for (i = 0; i < nv; i++)
 	    {vr = vrs[i];
-             if ((IS_NULL(var) == TRUE) || (strcmp(var, vr) == 0))
-		{vl = cgetenv(TRUE, vr);
-		 if ((vl[0] != '"') && (strpbrk(vl, " \t") != NULL))
-		    {snprintf(t, MAXLINE, "\"%s\"", vl);
-		     vl = t;};
+	     if (var == NULL)
+	        vl = cgetenv(TRUE, vr);
+	     else
+	        {vl = NULL;
+		 for (l = 0; var[l] != NULL; l++)
+		     {if (strcmp(var[l], vr) == 0)
+		         {vl = cgetenv(TRUE, vr);
+			  break;};};
+		 if (vl == NULL)
+		    continue;};
+
+	     if ((vl[0] != '"') && (strpbrk(vl, " \t") != NULL))
+	        {snprintf(t, MAXLINE, "\"%s\"", vl);
+		 vl = t;};
+
+	     if (fmt == NULL)
+	        snprintf(s, LRG, "%s=%s", vr, vl);
+	     else
+	        snprintf(s, LRG, fmt, vr, vl);
 
 /* write to the communicator if FP is NULL */
-	         if (fp == NULL)
-		    {snprintf(s, LRG, "%s=%s", vr, vl);
-		     comm_write(cl, s, 0, 10);}
-		 else
-		    fprintf(fp, "%s=%s\n", vr, vl);};};
+	     if (fp == NULL)
+	        comm_write(cl, s, 0, 10);
+	     else
+	        fprintf(fp, "%s\n", s);};
 
 	cl->fd = -1;
 	free_client(cl);
@@ -676,7 +689,7 @@ int db_srv_save(int fd, database *db)
 
 	fp = fopen(db->file, "w");
 	if (fp != NULL)
-	   {save_db(fd, db, NULL, fp);
+	   {save_db(fd, db, NULL, fp, NULL);
 	    fclose(fp);
 	    rv = TRUE;};};
 

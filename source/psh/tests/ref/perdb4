@@ -1,16 +1,16 @@
 -----------------------------------
 v1=1
-saved v1
+saved variables
 -----------------------------------
 v2="baz blat"
-saved v2
+saved variables
 -----------------------------------
-saved v1 to db3.intera.db
+saved variables to db3.intera.db
 -----------------------------------
 saved database to db3.interb.db
 -----------------------------------
 v1=1
 v2="baz blat"
-saved 
+saved database
 -----------------------------------
 done

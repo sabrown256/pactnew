@@ -51,7 +51,7 @@ static void sigrestart(int sig)
 
 /* SRV_SAVE_DB - save the database */
 
-static char *srv_save_db(client *cl, char *fname, char *var)
+static char *srv_save_db(client *cl, char *fname, char **var, const char *fmt)
    {int fd, ok;
     char s[MAXLINE];
     FILE *fp;
@@ -61,6 +61,7 @@ static char *srv_save_db(client *cl, char *fname, char *var)
     fd = cl->fd;
     db = cl->db;
 
+/* figure out where results go */
     if ((fname == NULL) || (strcmp(fname, "stdout") == 0))
        fp = NULL;
     else
@@ -76,25 +77,32 @@ static char *srv_save_db(client *cl, char *fname, char *var)
 	    return(t);};
         fname = path_tail(s);};
 	   
-    ok = save_db(fd, db, var, fp);
+/* do the work */
+    ok = save_db(fd, db, var, fp, fmt);
     ASSERT(ok == 0);
 
     if (fp != NULL)
        fclose(fp);
 	
-    if (fname == NULL)
+/* make up the ending message */
+    if ((IS_NULL(fmt) == FALSE) &&
+	((strncmp(fmt, "setenv ", 7) == 0) ||
+	 (strncmp(fmt, "export ", 7) == 0)))
+       snprintf(t, MAXLINE, "%s", cwhich("true"));
+
+     else if (fname == NULL)
        {if (var == NULL)
 	   snprintf(t, MAXLINE, "saved database");
         else
-	   snprintf(t, MAXLINE, "saved %s", var);}
+	   snprintf(t, MAXLINE, "saved variables");}
 
     else
        {if (var == NULL)
 	   snprintf(t, MAXLINE, "saved database to %s",
 		    fname);
 	else
-	   snprintf(t, MAXLINE, "saved %s to %s",
-		    var, fname);};
+	   snprintf(t, MAXLINE, "saved variables to %s",
+		    fname);};
 
     return(t);}
 
@@ -263,10 +271,10 @@ static void term_connection(client *cl)
  *         -          if no variables specified all are saved
  */
 
-static char *do_save(client *cl, char *s)
-   {char *var, *val, *fname, *p;
+static char *do_save(client *cl, char *s, const char *fmt)
+   {char **var, *val, *fname, *p;
 
-    p = s + 5;
+    p = s;
     if ((*p == '\0') || (strchr(" \t\n\f", *p) != NULL))
        fname = NULL;
     else
@@ -276,9 +284,14 @@ static char *do_save(client *cl, char *s)
         if (p != NULL)
 	   *p++ = '\0';};
 
-    key_val(&var, NULL, p, " \t\n");
+    var = tokenize(p, " \t\n\f");
+    if ((var != NULL) && (var[0] == NULL))
+       {free_strings(var);
+        var = NULL;};
 
-    val = srv_save_db(cl, fname, var);
+    val = srv_save_db(cl, fname, var, fmt);
+
+    free_strings(var);
 
     return(val);}
 
@@ -399,7 +412,7 @@ static char *do_set_get(database *db, char *s)
 static int proc_connection(client *cl)
    {int rv, nb, to;
     char s[MAXLINE];
-    char *val;
+    char *val, *fmt;
     database *db;
 
     db = cl->db;
@@ -432,9 +445,19 @@ static int proc_connection(client *cl)
 	   {reset_db(db);
 	    val = "reset";}
 
+/* import variables to CSH environment */
+	else if (strncmp(s, "csh:", 4) == 0)
+	   {fmt = "setenv %s %s ;";
+	    val = do_save(cl, s+4, fmt);}
+
+/* import variables to SH environment */
+	else if (strncmp(s, "sh:", 3) == 0)
+	   {fmt = "export %s=%s ;";
+	    val = do_save(cl, s+3, fmt);}
+
 /* save database */
 	else if (strncmp(s, "save:", 5) == 0)
-	   val = do_save(cl, s);
+	   val = do_save(cl, s+5, "%s=%s");
 
 /* load database */
 	else if (strncmp(s, "load:", 5) == 0)
@@ -636,9 +659,10 @@ static int exchange(char *root, int ltr, char *req)
 static void help(void)
    {
     printf("\n");
-    printf("Usage: perdb [-c] [-d] [-f <db>] [-h] [-l] [-s] [<req>]\n");
+    printf("Usage: perdb [-c] [-d] [-e] [-f <db>] [-h] [-l] [-s] [<req>]\n");
     printf("   c   create the database, removing any existing\n");
     printf("   d   do not run server as daemon\n");
+    printf("   e   exact - do not strip off quotes\n");
     printf("   f   root path to database\n");
     printf("   h   this help message\n");
     printf("   l   log transactions with the server\n");

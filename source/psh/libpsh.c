@@ -361,44 +361,45 @@ char **tokenize(char *s, char *delim)
     char *p, *t, *ps, **sa;
 
     sa = NULL;
-    n  = strlen(s);
-    t  = MAKE_N(char, n+100);
-    if (t != NULL)
-       {nstrncpy(t, n+100, s, -1);
+    if (s != NULL)
+       {n  = strlen(s);
+	t  = MAKE_N(char, n+100);
+	if (t != NULL)
+	   {nstrncpy(t, n+100, s, -1);
 
-	for (i = 0, ps = t; ps != NULL; )
-	    {if (sa == NULL)
-	        sa = MAKE_N(char *, 1000);
+	    for (i = 0, ps = t; ps != NULL; )
+	        {if (sa == NULL)
+	            sa = MAKE_N(char *, 1000);
 
-	     if (sa != NULL)
-	        {ns  = strspn(ps, delim);
-		 ps += ns;
+		 if (sa != NULL)
+		    {ns  = strspn(ps, delim);
+		     ps += ns;
 
 /* find the next unescaped delimiter
  * we could use strpbrk except for escapes
  */
-                 for (p = ps; *p != '\0'; p++)
-		     {c = *p;
-		      if (c == '\\')
-			 p++;
-		      else if (strchr(delim, c) != NULL)
-			 break;};
+		     for (p = ps; *p != '\0'; p++)
+		         {c = *p;
+			  if (c == '\\')
+			     p++;
+			  else if (strchr(delim, c) != NULL)
+			     break;};
 
-		 if (*p != '\0')
-		    {c  = *p;
-		     *p = '\0';
-		     sa[i++] = STRSAVE(ps);
-		     *p = c;
-		     ps = p + 1;}
-		 else
-		    {if (IS_NULL(ps) == FALSE)
-			sa[i++] = STRSAVE(ps);
-		     break;};};};
+		     if (*p != '\0')
+		        {c  = *p;
+			 *p = '\0';
+			 sa[i++] = STRSAVE(ps);
+			 *p = c;
+			 ps = p + 1;}
+		     else
+		        {if (IS_NULL(ps) == FALSE)
+			    sa[i++] = STRSAVE(ps);
+			 break;};};};
 
-	if (sa != NULL)
-	   sa[i++] = NULL;
+	    if (sa != NULL)
+	       sa[i++] = NULL;
 
-	FREE(t);};
+	    FREE(t);};};
 
     return(sa);}
 

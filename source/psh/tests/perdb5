@@ -61,6 +61,22 @@ echo "v4 : |$v4|"
 
 echo "-----------------------------------"
 
+perdb $opt csh:stdout
+
+echo "-----------------------------------"
+
+perdb $opt csh:stdout v1 v3 v5
+
+echo "-----------------------------------"
+
+perdb $opt sh:stdout
+
+echo "-----------------------------------"
+
+perdb $opt sh:stdout v1
+
+echo "-----------------------------------"
+
 perdb $opt quit:
 
 exit($status)
