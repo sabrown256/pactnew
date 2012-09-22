@@ -146,6 +146,7 @@ switch ($OS[1])
            case *86:
                 echo "bsd-$Concise"
                 breaksw
+           case amd64:
            case x86_64:
                 set lhw = o
                 echo "bsd-$Concise-$lhw"
