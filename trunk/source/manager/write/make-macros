@@ -19,34 +19,20 @@ eval `$ScrDir/prune-env pact`
 set path = ( $ScrDir $path )
 source $ScrDir/env-csh
 
-dbget Bits
-dbget BuildSharedLibs
-dbget BuildStrategy
-dbget EtcDir
-dbget FPU
-dbget HaveGNUFenv
-dbget IncDir
-dbget LibVers
-dbget NoExe
-dbget Ranlib_Exe
-dbget Sys
-dbget SYS_TYPE
-dbget UPDATE
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 Separator $Log
-Note $Log "   Bits            = $Bits"
-Note $Log "   BuildSharedLibs = $BuildSharedLibs"
-Note $Log "   BuildStrategy   = $BuildStrategy"
-Note $Log "   EtcDir          = $EtcDir"
-Note $Log "   FPU             = $FPU"
-Note $Log "   HaveGNUFenv     = $HaveGNUFenv"
-Note $Log "   IncDir          = $IncDir"
-Note $Log "   LibVers         = $LibVers"
-Note $Log "   NoExe           = $NoExe"
-Note $Log "   Ranlib_Exe      = $Ranlib_Exe"
-Note $Log "   Sys             = $Sys"
-Note $Log "   SYS_TYPE        = $SYS_TYPE"
-Note $Log "   UPDATE          = $UPDATE"
+
+NoteD $Log "   System Dependent MAKE Macros - make-macros"
+Note $Log ""
+
+set vl = ""
+set vl = ( $vl Bits BuildSharedLibs BuildStrategy )
+set vl = ( $vl EtcDir FPU HaveGNUFenv IncDir LibVers )
+set vl = ( $vl NoExe Ranlib_Exe Sys SYS_TYPE UPDATE )
+
+source $MngDir/write/import-db
 
 set LibVers = 1
 
@@ -57,8 +43,6 @@ set LibVers = 1
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-    NoteD $Log "   System Dependent MAKE Macros - make-macros"
 
     set STDOUT = $EtcDir/make-macros
 
