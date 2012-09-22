@@ -19,23 +19,23 @@ eval `$ScrDir/prune-env pact`
 set path = ( $ScrDir $path )
 source $ScrDir/env-csh
 
-dbget BackSlash
-dbget BaseDir
-dbget IncDir
-dbget Sys
-dbget Yacc_Exe
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 Separator $Log
-Note $Log "   BackSlash = $BackSlash"
-Note $Log "   BaseDir   = $BaseDir"
-Note $Log "   IncDir    = $IncDir"
-Note $Log "   Sys       = $Sys"
-Note $Log "   Yacc_Exe  = $Yacc_Exe"
+
+NoteD $Log "   Interpeter Syntax Mode Configuration - syntax.h"
+Note $Log ""
+
+set vl = ""
+set vl = ( $vl BaseDir IncDir Sys Yacc_Exe )
+
+source $MngDir/write/import-db
+
+dbget BackSlash
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-    NoteD $Log "   Interpeter Syntax Mode Configuration - syntax.h"
 
     set STDOUT = $IncDir/syntax.h
 

@@ -19,29 +19,23 @@ eval `$ScrDir/prune-env pact`
 set path = ( $ScrDir $path )
 source $ScrDir/env-csh
 
-dbget BaseDir
-dbget CFE
-dbget Cfe_CC_Exe
-dbget Cfe_CC_Flags
-dbget Cfe_LD_Flags
-dbget Cfe_LD_RPath
-dbget CfgDir
-dbget IncDir
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 Separator $Log
-Note $Log "   BaseDir      = $BaseDir"
-Note $Log "   CFE          = $CFE"
-Note $Log "   Cfe_CC_Exe   = $Cfe_CC_Exe"
-Note $Log "   Cfe_CC_Flags = $Cfe_CC_Flags"
-Note $Log "   Cfe_LD_Flags = $Cfe_LD_Flags"
-Note $Log "   Cfe_LD_RPath = $Cfe_LD_RPath"
-Note $Log "   CfgDir       = $CfgDir"
-Note $Log "   IncDir       = $IncDir"
+
+NoteD $Log "   C Environment Configuration - scdecls.h"
+Note $Log ""
+
+set vl = ""
+set vl = ( $vl BaseDir CFE )
+set vl = ( $vl Cfe_CC_Exe Cfe_CC_Flags Cfe_LD_Flags Cfe_LD_RPath )
+set vl = ( $vl CfgDir IncDir )
+
+source $MngDir/write/import-db
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-    NoteD $Log "   C Environment Configuration - scdecls.h"
 
     set STDOUT = $IncDir/scdecls.h
 

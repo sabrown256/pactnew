@@ -19,27 +19,26 @@ eval `$ScrDir/prune-env pact`
 set path = ( $ScrDir $path )
 source $ScrDir/env-csh
 
-dbget BackSlash
-dbget BaseDir
-dbget SchDir
-dbget Sys
-dbget SchemeSpokes
-dbget CSpokes
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 Separator $Log
-Note $Log "   BackSlash    = $BackSlash"
-Note $Log "   BaseDir      = $BaseDir"
-Note $Log "   SchDir       = $SchDir"
-Note $Log "   Sys          = $Sys"
-Note $Log "   SchemeSpokes = $SchemeSpokes"
-Note $Log "   CSpokes      = $CSpokes"
+
+NoteD $Log "   Binary File Translation Spokes Loader - spokes.scm"
+Note $Log ""
+
+set vl = ""
+set vl = ( $vl BaseDir SchDir Sys )
+set vl = ( $vl SchemeSpokes CSpokes )
+
+source $MngDir/write/import-db
+
+dbget BackSlash
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 if (-d $BaseDir/sx/applications) then
-    Separator $Log
-    NoteD $Log "   Binary File Translation Spokes Loader - spokes.scm"
 
     set STDOUT = $SchDir/spokes.scm
 

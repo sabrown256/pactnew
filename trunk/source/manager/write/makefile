@@ -19,19 +19,21 @@ eval `$ScrDir/prune-env pact`
 set path = ( $ScrDir $path )
 source $ScrDir/env-csh
 
-dbget BinDir
-dbget EtcDir
-dbget Pck
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 Separator $Log
-Note $Log "   BinDir  = $BinDir"
-Note $Log "   EtcDir  = $EtcDir"
-Note $Log "   Pck     = $Pck"
+
+NoteD $Log "   Distribution Makefile - Makefile"
+Note $Log ""
+
+set vl = ""
+set vl = ( $vl BinDir EtcDir Pck )
+
+source $MngDir/write/import-db
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-    NoteD $Log "   Distribution Makefile - Makefile"
 
     set STDOUT = $EtcDir/Makefile
 

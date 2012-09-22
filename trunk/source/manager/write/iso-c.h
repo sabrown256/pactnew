@@ -19,23 +19,21 @@ eval `$ScrDir/prune-env pact`
 set path = ( $ScrDir $path )
 source $ScrDir/env-csh
 
-dbget C_STD
-dbget GLIBC_VERSION
-dbget HostOS
-dbget IncDir
-dbget Sys
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 Separator $Log
-Note $Log "   C_STD         = $C_STD"
-Note $Log "   GLIBC_VERSION = $GLIBC_VERSION"
-Note $Log "   HostOS        = $HostOS"
-Note $Log "   IncDir        = $IncDir"
-Note $Log "   Sys           = $Sys"
+
+NoteD $Log "   C Standards Configuration - iso-c.h"
+Note $Log ""
+
+set vl = ""
+set vl = ( $vl C_STD GLIBC_VERSION HostOS IncDir Sys )
+
+source $MngDir/write/import-db
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-    NoteD $Log "   C Standards Configuration - iso-c.h"
 
     set STDOUT = $IncDir/iso-c.h
 

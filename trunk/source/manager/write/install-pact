@@ -19,39 +19,24 @@ eval `$ScrDir/prune-env pact`
 set path = ( $ScrDir $path )
 source $ScrDir/env-csh
 
-dbget InstBase
-dbget UPDATE
-dbget BinDir
-dbget CfgMan
-dbget Arch
-dbget ScmDir
-dbget Man1Dir
-dbget Man3Dir
-dbget HavePython
-dbget PyVers
-dbget PyDirPy
-dbget PyDirDst
-dbget PyDirSrc
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 Separator $Log
-Note $Log "   InstBase   = |$InstBase|"
-Note $Log "   UPDATE     = |$UPDATE|"
-Note $Log "   BinDir     = |$BinDir|"
-Note $Log "   CfgMan     = |$CfgMan|"
-Note $Log "   Arch       = |$Arch|"
-Note $Log "   ScmDir     = |$ScmDir|"
-Note $Log "   Man1Dir    = |$Man1Dir|"
-Note $Log "   Man3Dir    = |$Man3Dir|"
-Note $Log "   HavePython = |$HavePython|"
-Note $Log "   PyVers     = |$PyVers|"
-Note $Log "   PyDirPy    = |$PyDirPy|"
-Note $Log "   PyDirDst   = |$PyDirDst|"
-Note $Log "   PyDirSrc   = |$PyDirSrc|"
+
+NoteD $Log "   PACT Installer Script - install-pact"
+Note $Log ""
+
+set vl = ""
+set vl = ( $vl InstBase UPDATE BinDir CfgMan Arch )
+set vl = ( $vl ScmDir Man1Dir Man3Dir )
+set vl = ( $vl HavePython PyVers PyDirPy PyDirDst PyDirSrc )
+
+source $MngDir/write/import-db
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-    NoteD $Log "   PACT Installer Script - install-pact"
     Note $Log "Installation base: |$InstBase|"
 
     set STDOUT = $BinDir/install-pact

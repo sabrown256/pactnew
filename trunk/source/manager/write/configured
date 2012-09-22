@@ -20,38 +20,25 @@ eval `$ScrDir/prune-env -e DbgOpt pact`
 set path = ( $ScrDir $path )
 source $ScrDir/env-csh
 
-dbget EtcDir
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+Separator $Log
+NoteD $Log "   Configuration record - configured"
+Note $Log ""
+
+set vl = ""
+set vl = ( $vl EtcDir UseTmpDir FilterDir )
+set vl = ( $vl Host HostOS HAVE_JPEGLIB HAVE_PNGLIB )
+set vl = ( $vl WARN_PATTERN ERR_PATTERN USER )
+
+source $MngDir/write/import-db
 
 # NOTE: must dbset this in dsys first
 #dbget DbgOpt
 
-dbget USER
-dbget Host
-dbget HostOS
-dbget HAVE_JPEGLIB
-dbget HAVE_PNGLIB
-dbget UseTmpDir
-dbget FilterDir
-dbget WARN_PATTERN
-dbget ERR_PATTERN
-
-Separator $Log
-Note $Log "   EtcDir       = $EtcDir"
-Note $Log "   DbgOpt       = $DbgOpt"
-Note $Log "   USER         = $USER"
-Note $Log "   Host         = $Host"
-Note $Log "   HostOS       = $HostOS"
-Note $Log "   HAVE_JPEGLIB = $HAVE_JPEGLIB"
-Note $Log "   HAVE_PNGLIB  = $HAVE_PNGLIB"
-Note $Log "   UseTmpDir    = $UseTmpDir"
-Note $Log "   FilterDir    = $FilterDir"
-Note $Log "   WARN_PATTERN = $WARN_PATTERN"
-Note $Log "   ERR_PATTERN  = $ERR_PATTERN"
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-    NoteD $Log "   Configuration record - configured"
 
     set STDOUT = $EtcDir/configured
 
@@ -60,10 +47,7 @@ Note $Log "   ERR_PATTERN  = $ERR_PATTERN"
 
     Note $STDOUT "Config       = $lCfg"
     Note $STDOUT "DbgOpt       = $DbgOpt"
-    Note $STDOUT "User         = $USER"
     Note $STDOUT "Date         = `date`"
-    Note $STDOUT "Host         = $Host"
-    Note $STDOUT "OS           = $HostOS"
     if ("$HAVE_JPEGLIB" == "") then
        Note $STDOUT "JPEG         = no"
     else
