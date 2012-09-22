@@ -19,30 +19,20 @@ eval `$ScrDir/prune-env pact`
 set path = ( $ScrDir $path )
 source $ScrDir/env-csh
 
-dbget HAVE_FORTRAN
-dbget CFE
-dbget Cfe_CC_Exe
-dbget Cfe_CC_Flags
-dbget Cfe_FC_Exe
-dbget Cfe_FC_Flags
-dbget Cfe_LD_Flags
-dbget Cfe_LD_RPath
-dbget F_STD
-dbget Host
-dbget IncDir
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 Separator $Log
-Note $Log "   CFE          = $CFE"
-Note $Log "   HAVE_FORTRAN = $HAVE_FORTRAN"
-Note $Log "   Cfe_CC_Exe   = $Cfe_CC_Exe"
-Note $Log "   Cfe_CC_Flags = $Cfe_CC_Flags"
-Note $Log "   Cfe_FC_Exe   = $Cfe_FC_Exe"
-Note $Log "   Cfe_FC_Flags = $Cfe_FC_Flags"
-Note $Log "   Cfe_LD_Flags = $Cfe_LD_Flags"
-Note $Log "   Cfe_LD_RPath = $Cfe_LD_RPath"
-Note $Log "   F_STD        = $F_STD"
-Note $Log "   Host         = $Host"
-Note $Log "   IncDir       = $IncDir"
+
+Note $Log "   F90 Include File - f90types.h f90kinds.inc"
+Note $Log ""
+
+set vl = ""
+set vl = ( $vl CFE Cfe_CC_Exe Cfe_CC_Flags )
+set vl = ( $vl Cfe_FC_Exe Cfe_FC_Flags Cfe_LD_Flags Cfe_LD_RPath )
+set vl = ( $vl F_STD HAVE_FORTRAN Host IncDir )
+
+source $MngDir/write/import-db
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

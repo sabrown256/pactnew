@@ -19,60 +19,35 @@ eval `$ScrDir/prune-env -e MngDir pact`
 set path = ( $ScrDir $path )
 source $ScrDir/env-csh
 
-dbget Arch
-dbget BFD_Version
-dbget BUILD_DEBUG
-dbget BUILD_OPTIMIZE
-dbget BUILD_PROFILE
-dbget CC_Exe
-dbget CEFile
-dbget CPU
-dbget DEFAULT_SHELL
-dbget DP_Lib
-dbget DP_Inc
-dbget FC_ID_CASE
-dbget FC_ID_UNDERSCORE
-dbget FFIntPtrDiffer
-dbget FilterDir
-dbget FPU
-dbget GETSOCKOPT_TYPE
-dbget HAVE_BFD
-dbget HaveINLINE
-dbget HAVE_OPENMP
-dbget HAVE_OPENMPI
-dbget HAVE_SOCKETS_P
-dbget HaveTRACKER
-dbget HaveVACOPY
-dbget HaveVALIST
-dbget HostOS
-dbget HostOSRel
-dbget IncDir
-dbget IPCSupport
-dbget Linking
-dbget LONG64
-dbget MACRev
-dbget MPIAllStdin
-dbget MPIGoodIO
-dbget NO_LONG_LONG
-dbget NEED_ALT_LARGE_FILE
-dbget PACT_CC_FAMILY
-dbget PACT_CC_VERSION
-dbget PACT_SO_CACHE
-dbget PTHREAD_POSIX
-dbget OSType
-dbget Sys
-dbget TRACKERExe
-
-dbget MYSQL_SO
-dbget SQLITE3_SO
-dbget HDF5_SO
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 Separator $Log
 
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
+NoteD $Log "   C Environment Configuration - scconfig.h"
+Note $Log ""
 
-    NoteD $Log "   C Environment Configuration - scconfig.h"
+set vl = ""
+set vl = ( $vl Arch BFD_Version BUILD_DEBUG BUILD_OPTIMIZE BUILD_PROFILE )
+set vl = ( $vl CC_Exe CEFile CPU )
+set vl = ( $vl DEFAULT_SHELL DP_Lib DP_Inc )
+set vl = ( $vl FC_ID_CASE FC_ID_UNDERSCORE FFIntPtrDiffer FilterDir FPU )
+set vl = ( $vl GETSOCKOPT_TYPE )
+set vl = ( $vl HAVE_BFD HaveINLINE HAVE_OPENMP HAVE_OPENMPI HAVE_SOCKETS_P )
+set vl = ( $vl HaveTRACKER HaveVACOPY HaveVALIST HostOS HostOSRel )
+set vl = ( $vl IncDir IPCSupport )
+set vl = ( $vl Linking LONG64 )
+set vl = ( $vl MACRev MPIAllStdin MPIGoodIO )
+set vl = ( $vl NO_LONG_LONG NEED_ALT_LARGE_FILE )
+set vl = ( $vl PACT_CC_FAMILY PACT_CC_VERSION PACT_SO_CACHE PTHREAD_POSIX )
+set vl = ( $vl OSType )
+set vl = ( $vl Sys TRACKERExe )
+set vl = ( $vl MYSQL_SO SQLITE3_SO HDF5_SO )
+
+source $MngDir/write/import-db
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
     set STDOUT = $IncDir/scconfig.h
 

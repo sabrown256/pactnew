@@ -13,36 +13,40 @@
 set Log    = $1
 set ScrDir = $2
 
-eval `$ScrDir/prune-env -e ConfigDir pact`
-set path = ( $ScrDir $path )
+if ($?pruned == 0) then
+   eval `$ScrDir/prune-env pact`
+   set path   = ( $ScrDir $path )
+   set pruned = TRUE
+endif
+
 source $ScrDir/env-csh
+
 source $ScrDir/csh-subroutines
 HAVE_SUBROUTINES
 
-dbget DO_RUN_DBG
-dbget DO_RUN_MPI
-dbget DO_RUN_CROSS
-dbget EtcDir
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+Separator $Log
+NoteD $Log "   Do-run signature database - do-run-db"
+Note $Log ""
+
+set vl = ""
+set vl = ( $vl DO_RUN_DBG DO_RUN_MPI DO_RUN_CROSS EtcDir )
+
+source $MngDir/write/import-db
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 # convert these to shell variables so they
 # do not get whacked by subroutine calls
+# GOTCHA: this is no longer necessary
 set ldbg = $DO_RUN_DBG
 set lmpi = $DO_RUN_MPI
 set lcrs = $DO_RUN_CROSS
 
-Separator $Log
-Note $Log "   ConfigDir     = $ConfigDir"
-Note $Log "   DO_RUN_DBG    = $ldbg"
-Note $Log "   DO_RUN_MPI    = $lmpi"
-Note $Log "   DO_RUN_CROSS  = $lcrs"
-Note $Log "   EtcDir        = $EtcDir"
-
 @ err = 0
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-NoteD $Log "   Do-run signature database - do-run-db"
 
 flog $Log set db = $EtcDir/do-run-db
 cat >&! $db << EOF

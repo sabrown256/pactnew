@@ -19,45 +19,30 @@ eval `$ScrDir/prune-env pact`
 set path = ( $ScrDir $path )
 source $ScrDir/env-csh
 
-dbget InstBase
-dbget CfgDir
-dbget System
-dbget GnuMakeOpt
-dbget IncDir
-dbget EtcDir
-dbget BinDir
-dbget MngDir
-dbget Cfg_CC_Flags
-dbget Cfg_Lex_Flags
-dbget Cfg_LD_Flags
-dbget Cfg_LD_RPath
-dbget Cfg_CC_Exe
-dbget UseTmpDir
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+Separator $Log
+
+NoteD $Log -n "   System make wrapper - smake"
+Note $Log ""
+Note $Log ""
+
+set vl = ""
+set vl = ( $vl InstBase CfgDir System GnuMakeOpt )
+set vl = ( $vl IncDir EtcDir BinDir MngDir )
+set vl = ( $vl Cfg_CC_Flags Cfg_Lex_Flags Cfg_LD_Flags )
+set vl = ( $vl Cfg_LD_RPath Cfg_CC_Exe )
+set vl = ( $vl UseTmpDir )
+
+source $MngDir/write/import-db
 
 set lpactver = `cat $MngDir/.pact-version`
 
-Separator $Log
 Note $Log "   lpactver      = |$lpactver|"
-Note $Log "   InstBase      = $InstBase"
-Note $Log "   CfgDir        = $CfgDir"
-Note $Log "   System        = $System"
-Note $Log "   GnuMakeOpt    = $GnuMakeOpt"
-Note $Log "   IncDir        = $IncDir"
-Note $Log "   EtcDir        = $EtcDir"
-Note $Log "   BinDir        = $BinDir"
-Note $Log "   MngDir        = $MngDir"
-Note $Log "   Cfg_CC_Flags  = $Cfg_CC_Flags"
-Note $Log "   Cfg_Lex_Flags = $Cfg_Lex_Flags"
-Note $Log "   Cfg_LD_Flags  = $Cfg_LD_Flags"
-Note $Log "   Cfg_LD_RPath  = $Cfg_LD_RPath"
-Note $Log "   Cfg_CC_Exe    = $Cfg_CC_Exe"
-Note $Log "   UseTmpDir     = |$UseTmpDir|"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-    NoteD $Log -n "   System make wrapper - smake"
-    Note $Log " "
 
     flog $Log pushd $CfgDir
 

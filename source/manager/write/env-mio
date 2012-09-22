@@ -15,53 +15,42 @@ unalias *
 set Log    = $1
 set ScrDir = $2
 
-eval `$ScrDir/prune-env pact`
-set path = ( $ScrDir $path )
+if ($?pruned == 0) then
+   eval `$ScrDir/prune-env pact`
+   set path   = ( $ScrDir $path )
+   set pruned = TRUE
+endif
+
 source $ScrDir/env-csh
+
 source $ScrDir/csh-subroutines
 HAVE_SUBROUTINES
 
-dbget AR_Flags
-dbget AR_IFlag
-dbget Bits
-dbget CFE
-dbget Cfe_CC_Exe
-dbget Cfe_CC_Flags
-dbget Cfe_FC_Exe
-dbget Cfe_FC_Flags
-dbget CPU
-dbget CROSS_COMPILE
-dbget DAI_ROOT
-dbget DAS_ROOT
-dbget EtcDir
-dbget HAVE_READLINE
-dbget HOST_SERVER_DB
-dbget InstBase
-dbget LD_Lib
-dbget LIB
-dbget LibM_Lib
-dbget MD_Pck
-dbget MDE_Lib
-dbget MDG_Lib
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+Separator $Log
+
+NoteD $Log "   MIO specifications - env-mio"
+Note $Log ""
+
 dbget MDG_Pck
 dbget MDI_Pck
-dbget NUMA
-dbget OpenMP_SharedFnc
-dbget PACT_CC_FAMILY
-dbget PACT_CC_VERSION
-dbget PACT_CC_PATH
-dbget PACT_FC_FAMILY
-dbget PACT_FC_VERSION
-dbget PACT_FC_PATH
-dbget PFE
-dbget RPATH
-dbget RUN_SIGNATURE_DB
-dbget SITE_SIGNATURE_DB
-dbget Sys
-dbget SysDir
-dbget SYS_SITE
-dbget SYS_TYPE
-dbget UPDATE_SYS_DB
+dbget MD_Pck
+
+set vl = ""
+set vl = ( $vl AR_Flags AR_IFlag Bits )
+set vl = ( $vl CFE Cfe_CC_Exe Cfe_CC_Flags Cfe_FC_Exe Cfe_FC_Flags )
+set vl = ( $vl CPU CROSS_COMPILE )
+set vl = ( $vl DAI_ROOT DAS_ROOT EtcDir )
+set vl = ( $vl HAVE_READLINE HOST_SERVER_DB InstBase )
+set vl = ( $vl LD_Lib LIB LibM_Lib )
+set vl = ( $vl MDE_Lib MDG_Lib )
+set vl = ( $vl NUMA OpenMP_SharedFnc )
+set vl = ( $vl PACT_CC_FAMILY PACT_CC_VERSION PACT_CC_PATH )
+set vl = ( $vl PACT_FC_FAMILY PACT_FC_VERSION PACT_FC_PATH )
+set vl = ( $vl PFE RPATH RUN_SIGNATURE_DB SITE_SIGNATURE_DB )
+set vl = ( $vl Sys SysDir SYS_SITE SYS_TYPE UPDATE_SYS_DB )
 
 set plst = ( `echo $MDG_Pck $MDI_Pck $MD_Pck | sed 's|\"||g'` )
 foreach p ( $plst )
@@ -69,21 +58,18 @@ foreach p ( $plst )
    set pinc = ${p}_Inc
    set ppth = ${p}_Path
    set prpt = ${p}_RPath
-   dbget $plib
-   dbget $pinc
-   dbget $ppth
-   dbget $prpt
+   set vl = ( $vl $plib $pinc $ppth $prpt )
 end
 unset plib
 unset pinc
 unset ppth
 unset prpt
+unset plst
+
+source $MngDir/write/import-db
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-    Separator $Log
-    NoteD $Log "   MIO specifications - env-mio"
 
     set FOUT = $EtcDir/env-mio
 

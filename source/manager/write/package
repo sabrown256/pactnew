@@ -19,23 +19,21 @@ eval `$ScrDir/prune-env pact`
 set path = ( $ScrDir $path )
 source $ScrDir/env-csh
 
-dbget EtcDir
-dbget HAVE_FORTRAN
-dbget HavePython
-dbget HavePythonNumpy
-dbget HavePythonNumeric
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 Separator $Log
-Note $Log "   EtcDir            = $EtcDir"
-Note $Log "   HAVE_FORTRAN      = $HAVE_FORTRAN"
-Note $Log "   HavePython        = $HavePython"
-Note $Log "   HavePythonNumpy   = $HavePythonNumpy"
-Note $Log "   HavePythonNumeric = $HavePythonNumeric"
+NoteD $Log "   Package List - package"
+Note $Log ""
+
+set vl = ""
+set vl = ( $vl EtcDir HAVE_FORTRAN )
+set vl = ( $vl HavePython HavePythonNumpy HavePythonNumeric )
+
+source $MngDir/write/import-db
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-    NoteD $Log "   Package List - package"
 
     set STDOUT = $EtcDir/package
 
