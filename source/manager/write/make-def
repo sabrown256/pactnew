@@ -13,96 +13,89 @@
 set Log    = $1
 set ScrDir = $2
 
-#eval `$ScrDir/prune-env pact`
-set path = ( $ScrDir $path )
+if ($?pruned == 0) then
+   eval `$ScrDir/prune-env pact`
+   set path   = ( $ScrDir $path )
+   set pruned = TRUE
+endif
+
 source $ScrDir/env-csh
 
 source $ScrDir/csh-subroutines
 HAVE_SUBROUTINES
 
-#dbget AR_Exe
-#dbget AR_Flags
-#dbget AR_IFlag
-#dbget AR_XFlag
-#dbget ArW32Objs
-#dbget BaseDir
-#dbget BE
-#dbget BuildStrategy
-#dbget CC_Debug
-#dbget CC_Exe
-#dbget CC_Flags
-#dbget CC_Inc
-#dbget CC_Linker
-#dbget CC_Optimize
-#dbget CDefDebug
-#dbget CDefOptimize
-#dbget CXX_Debug
-#dbget CXX_Exe
-#dbget CXX_Flags
-#dbget CXX_Linker
-#dbget CXX_Optimize
-#dbget CDefDebug
-#dbget CDefOptimize
-#dbget CFE
-#dbget DEFAULT_SHELL
-#dbget DP_Inc
-#dbget DP_Lib
-#dbget EtcDir
-#dbget FC_Debug
-#dbget FC_Exe
-#dbget FC_Flags
-##dbget FC_LD_Lib
-#dbget FC_Optimize
-#dbget FDefDebug
-#dbget FDefOptimize
-#dbget GnuMakeOpt
-#dbget GraphicsDevices
-#dbget GraphicsFlag
-#dbget GSYS
-#dbget HavePython
-#dbget HostOS
-#dbget IncDir
-#dbget InstBase
-#dbget INSTALL
-#dbget IPCSupport
-#dbget LD_Exe
-#dbget LD_Flags
-#dbget LD_Lib
-#dbget Lex_Exe
-#dbget Lex_Flags
-#dbget LibM_Lib
-#dbget Load
-#dbget MD_Inc
-#dbget MD_Lib
-dbget MDE_Lib
-#dbget MDI_Inc
-#dbget MDI_Lib
-#dbget MDG_Inc
-#dbget MDG_Lib
-#dbget MngDir
-#dbget OStd
-#dbget OSType
-#dbget OW32Objs
-#dbget ParCommSupport
-#dbget PubLib
-#dbget PubInc
-#dbget PyCC
-#dbget PyCfg
-#dbget PyExe
-#dbget PyInc
-#dbget PyVers
-#dbget Ranlib_Exe
-#dbget SUFFIXES
-#dbget Sys
-#dbget SysDir
-#dbget System
-#dbget ThreadLibExt
-#dbget UPDATE
-#dbget URFile
-#dbget Yacc_Exe
-#dbget Yacc_Flags
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 Separator $Log
+
+NoteD $Log "   Site Dependent MAKE Configuration - make-def"
+Note $Log ""
+
+set vl = ""
+set vl = ( $vl AR_IFlag AR_XFlag ArW32Objs )
+set vl = ( $vl BaseDir BE Bits BuildStrategy )
+set vl = ( $vl CDefDebug CDefOptimize CFE )
+set vl = ( $vl DEFAULT_SHELL EtcDir )
+#set vl = ( $vl FC_LD_Lib )
+set vl = ( $vl FDefDebug FDefOptimize )
+set vl = ( $vl GOOD_OPENMP_PRAGMAS GnuMakeOpt )
+set vl = ( $vl GraphicsDevices GraphicsFlag GSYS )
+set vl = ( $vl HavePython HostOS )
+set vl = ( $vl IncDir InstBase INSTALL IPCSupport )
+set vl = ( $vl Load MngDir )
+set vl = ( $vl OStd OSType OW32Objs )
+set vl = ( $vl ParCommSupport PubLib PubInc )
+set vl = ( $vl PyCC PyCfg PyExe PyInc PyVers )
+set vl = ( $vl RPATH SUFFIXES Sys SysDir System )
+set vl = ( $vl ThreadLibExt UPDATE URFile )
+
+# compiler tools
+foreach t (CC FC CXX)
+   foreach f (Debug Exe Flags Inc Linker Optimize)
+      set vl = ( $vl ${t}_${f} )
+   end
+end
+
+# linker tool
+foreach f (Exe Flags Lib RPath)
+   set vl = ( $vl LD_${f} )
+end
+
+# other tools
+foreach t (AR Lex Ranlib Yacc)
+   foreach f (Exe Flags)
+      set vl = ( $vl ${t}_${f} )
+   end
+end
+
+# groups
+foreach g (Cfg Cfe Ser Std Shared)
+
+# compilers
+   foreach t (CC FC CXX)
+      foreach f (Exe Flags Inc Linker)
+         set vl = ( $vl ${g}_${t}_${f} )
+      end
+   end
+
+# linker
+   foreach f (Exe Lib RPath)
+      set vl = ( $vl ${g}_LD_${f} )
+   end
+end
+
+# others
+foreach t (MD MDE MDI MDG DP LibM)
+   foreach f (Inc Lib)
+      set vl = ( $vl ${t}_${f} )
+   end
+end
+
+source $MngDir/write/import-db
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 if ("$OSType" == USE_MSW) then
    set OStd = WIN32
@@ -117,8 +110,6 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-    NoteD $Log "   Site Dependent MAKE Configuration - make-def"
 
 # add DP_Inc to CC_Inc
     flog $Log setenv CC_Inc  "$CC_Inc $DP_Inc"
@@ -572,6 +563,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
 
 # write the default make rules
     call PrintRule(".c.i:", CCP)
+
     if ($GOOD_OPENMP_PRAGMAS == TRUE) then
        call PrintRule(".c.o:", CCObj)
        call PrintRule(".c.a:", CCArc)
