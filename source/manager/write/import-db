@@ -9,7 +9,7 @@
 # database en masse or one at a time
 # theoretically one at a time should be pretty expensive
 # values for mode
-#    1  prune and import en masse
+#    1  prune and import en masse (about a 3x speedup)
 #    2  prune and import one at a time
 
 set mode = 1

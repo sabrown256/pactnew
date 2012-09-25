@@ -970,7 +970,6 @@ switch ($Cmnd)
 
 # make sure that the installation directories exist
         setenv HostOS     `uname -s`
-        setenv HostOSRel  `uname -r`
         setenv HostArch   `uname -m`
         set InstBase  = $DevDir/$System
         if (!(-d $DevDir)) then
