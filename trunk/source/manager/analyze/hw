@@ -25,9 +25,8 @@ Note $ALog ""
 SafeEnv CPU           "unknown"
 SafeEnv FPU           "unknown"
 
-set HostOS    = `uname -s`
-set HostOSRel = `uname -r`
-set HostHW    = `uname -m`
+set HostOS = `uname -s`
+set HostHW = `uname -m`
 
 if ($CPU == "unknown") then
    setenv CPU "$HostHW"

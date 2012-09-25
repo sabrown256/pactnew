@@ -1,0 +1,226 @@
+#!/bin/csh -f
+#
+# MEASURE-SHELL - time various shell operations
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+@ err = 0
+
+foreach i ( touch rm true timer perdb )
+   set ex = `which $i`
+   if (!(-x "$ex")) then
+      echo "Utility '$i' not found - exiting'
+      exit(1)
+   endif
+end
+
+set bar  = 0
+set file = foo.$$
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# measure base loop
+
+@ n = 400000
+set bt = `timer -r`
+@ i = 0
+while ($i < $n)
+   @ i = $i + 1
+end
+@ bt = `timer -b $bt`
+@ bt = ( 1000000 * $bt ) / $n
+echo "   base loop ....... $bt usec"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# measure fork/exec time
+# remember FA - the time for this fork/exec usage
+
+@ n = 20000
+set fa = `timer -r`
+@ i = 0
+while ($i < $n)
+   @ i = $i + 1
+   true
+end
+@ fa = `timer -b $fa`
+@ fa = ( 1000000 * $fa ) / $n - $bt
+echo "   fork/exec a ..... $fa usec"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# measure fork/exec time
+# remember FB - the time for this fork/exec usage
+
+@ n = 20000
+set fb = `timer -r`
+@ i = 0
+while ($i < $n)
+   @ i = $i + 1
+   set foo = `true`
+end
+@ fb = `timer -b $fb`
+@ fb = ( 1000000 * $fb ) / $n - $bt
+echo "   fork/exec b ..... $fb usec"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# measure file access time
+# this is the time minus the FA fork/exec time minus the loop time
+# remember FC1 as this time plus the FA time and the loop time
+
+@ n = 2000
+set fc1 = `timer -r`
+@ i = 0
+while ($i < $n)
+   @ i = $i + 1
+   touch $file
+end
+@ fc1 = `timer -b $fc1`
+@ fc1 = ( 1000000 * $fc1 ) / $n
+
+@ fc = $fc1 - $fa - $bt
+echo "   touch ........... $fc usec"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# measure removal time
+# this is the time minus the FC1 creation time
+# minus twice the FA fork/exec time (for the touch and rm)
+# minus the loop time
+# remember FC2 as this time plus twice FA and the loop time
+
+@ n = 2000
+set fc2 = `timer -r`
+@ i = 0
+while ($i < $n)
+   @ i = $i + 1
+   touch $file
+   rm -f $file
+end
+@ fc2 = `timer -b $fc2`
+@ fc2 = ( 1000000 * $fc2 ) / $n
+
+@ fc = $fc2 - $fc1 - $fa - $bt
+echo "   rm .............. $fc usec"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# measure combined creation/removal time
+# similar to the above but counting both the touch and the rm
+
+@ n = 2000
+set lt = `timer -r`
+@ i = 0
+while ($i < $n)
+   @ i = $i + 1
+   touch $file
+   rm -f $file
+end
+@ lt = `timer -b $lt`
+@ lt = ( 1000000 * $lt ) / $n
+
+@ fc = $lt - ( 2 * $fa ) - $bt
+echo "   touch/rm ........ $fc usec"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# measure file I/O
+
+@ n = 2000
+set lt = `timer -r`
+@ i = 0
+while ($i < $n)
+   @ i = $i + 1
+   touch $file
+   echo "the quick brown fox jumps over the lazy dog" >> $file
+   rm -f $file
+end
+@ lt = `timer -b $lt`
+@ lt = ( 1000000 * $lt ) / $n - $fc2
+echo "   file/io ......... $lt usec"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# measure setting a variable to a constant value
+
+@ n = 400000
+set lt = `timer -r`
+@ i = 0
+while ($i < $n)
+   @ i = $i + 1
+   set foo = 0
+end
+@ lt = `timer -b $lt`
+@ lt = ( 1000000 * $lt ) / $n - $bt
+echo "   constant ........ $lt usec"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# measure setting a variable to a shell variable
+
+@ n = 400000
+set lt = `timer -r`
+@ i = 0
+while ($i < $n)
+   @ i = $i + 1
+   set foo = $bar
+end
+@ lt = `timer -b $lt`
+@ lt = ( 1000000 * $lt ) / $n - $bt
+echo "   shell/var ....... $lt usec"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# measure setting a variable to a environment variable
+
+@ n = 400000
+set lt = `timer -r`
+@ i = 0
+while ($i < $n)
+   @ i = $i + 1
+   set foo = $USER
+end
+@ lt = `timer -b $lt`
+@ lt = ( 1000000 * $lt ) / $n - $bt
+echo "   env/var ......... $lt usec"
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# measure setting a variable to a database variable
+
+perdb v1 = 1 >& /dev/null
+@ n = 200
+set lt = `timer -r`
+@ i = 0
+while ($i < $n)
+   @ i = $i + 1
+   set foo = `perdb v1`
+end
+@ lt = `timer -b $lt`
+@ lt = ( 1000000 * $lt ) / $n - $fb - $bt
+echo "   db/var .......... $lt usec"
+perdb quit: >& /dev/null
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+
+exit($err)

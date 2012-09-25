@@ -30,6 +30,11 @@ if ($?Arch == 0) then
    setenv Arch `../scripts/system-id`
 endif
 
+# remove parens - they confuse shells later on
+set losr = ( `echo $HostOSRel | sed 's/(/,/g' | sed 's/)/,/g'` )
+setenv HostOSRel $losr
+unset losr
+
 Note $ALog "RootInc   = $RootInc"
 if ($CROSS_COMPILE == MINGW32) then
    setenv OSType     MSW

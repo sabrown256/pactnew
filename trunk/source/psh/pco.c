@@ -1522,6 +1522,11 @@ static void default_var(client *cl, char *base)
     unamef(st.osrel, MAXLINE, "r");
     unamef(st.hw,    MAXLINE, "m");
 
+/* remove parens from osrel - it is bad for the shells later on */
+    sa = tokenize(st.osrel, "()");
+    concatenate(st.osrel, MAXLINE, sa, ",");
+    free_strings(sa);
+
     snprintf(st.dir.scr, MAXLINE, "%s/scripts", base);
     snprintf(cmd, MAXLINE, "%s/system-id", st.dir.scr);
     nstrncpy(st.arch, MAXLINE, run(BOTH, cmd), -1);

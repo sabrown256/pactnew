@@ -14,6 +14,8 @@
 
 #include "network.h"
 
+#define NEWWAY
+
 #define NATTEMPTS   3
 
 #define C_OR_S(_p)    ((_p) ? "CLIENT" : "SERVER")
@@ -51,16 +53,26 @@ static int
  */
 
 static char *find_sema(char *root, int ch)
-   {int ia, na;
-    char *hd, *tl, *rv, *h, *p;
-    DIR *dir;
-    struct dirent *dp;
+   {char *rv;
     static char s[MAXLINE];
 
     rv = NULL;
 
     if (root == NULL)
        root = cgetenv(TRUE, "PERDB_PATH");
+
+#ifdef NEWWAY
+
+    snprintf(s, MAXLINE, "%s.conn", root);
+    if (file_exists(s) == TRUE)
+       rv = s;
+
+#else
+
+    int ia, na;
+    char *hd, *tl, *h, *p;
+    DIR *dir;
+    struct dirent *dp;
 
     if (IS_NULL(root) == TRUE)
        {hd = ".";
@@ -87,6 +99,8 @@ static char *find_sema(char *root, int ch)
 			 rv = s;
 			 break;};};};
 	     closedir(dir);};};
+
+#endif
 
     return(rv);}
 
@@ -126,6 +140,119 @@ static int sema_exists(char *fmt, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* MAKE_SERVER_SEMA - create a descriptive semaphore for the server
+ *                  - on HOST at PORT at the ROOT collection/location
+ *                  - return TRUE iff successful
+ */
+
+static int make_server_sema(char *root, char *host, int port)
+   {int rv;
+    char s[MAXLINE];
+
+    rv = FALSE;
+
+#ifdef NEWWAY
+    
+    FILE *fp;
+
+    snprintf(s, MAXLINE, "%s.conn", root);
+    fp = fopen(s, "w");
+    if (fp != NULL)
+       {in_addr_t haddr;
+
+        fprintf(fp, "%s\n", host);
+	fprintf(fp, "%d\n", port);
+
+/* address */
+	haddr = inet_addr(host);
+
+	if (haddr == INADDR_NONE)
+	   {struct hostent *hp;
+
+	    hp = gethostbyname(host);
+	    if (hp != NULL)
+	       haddr = *(in_addr_t *) hp->h_addr_list[0];};
+
+	fprintf(fp, "%ld\n", (long) haddr);
+
+	fclose(fp);
+
+        rv = TRUE;};
+
+#else
+
+    int i, fd;
+
+    snprintf(s, MAXLINE, "%s.%s@%d", root, host, port);
+
+/* try NATTEMPTS times to make the semaphore */
+    for (i = 0; i < NATTEMPTS; i++)
+        {fd = open(s, O_WRONLY | O_CREAT, 0600);
+	 if (fd >= 0)
+	    {rv = fsync(fd);
+	     if (rv != 0)
+	        continue;
+	     rv = close(fd);
+	     if (rv == 0)
+	        break;};};
+
+/* change the sense of the return value */
+    rv = (rv == 0);
+
+#endif
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PARSE_SEMA - parse out the connection info associated with ROOT
+ *            - return a string array with the entries:
+ *            -    0 host name
+ *            -    1 port number
+ *            -    2 IP address
+ */
+
+char **parse_sema(char *root)
+   {char *res, **rv;
+
+    rv = NULL;
+
+    res = find_sema(root, -1);
+    if (res != NULL)
+
+#ifdef NEWWAY
+
+      rv = file_text(FALSE, res);
+
+#else
+
+       {char s[MAXLINE];
+	char *host, *prt;
+
+        nstrncpy(s, MAXLINE, path_tail(res), -1);
+	res = strrchr(s, '.') + 1;
+	key_val(&host, &prt, res, "@");
+
+	rv = lst_add(rv, host);
+
+/* port */
+	if (prt != NULL)
+	   rv = lst_add(rv, prt);
+	else
+	   rv = lst_add(rv, "0");
+
+/* address */
+        snprintf(s, MAXLINE, "%ld", (long) INADDR_NONE);
+	rv = lst_add(rv, s);};
+
+#endif
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* CONNECT_CLOSE - close the socket connection */
 
 static int connect_close(int fd, client *cl, char *root)
@@ -143,38 +270,6 @@ static int connect_close(int fd, client *cl, char *root)
 		 "close socket %d", fd);
 
     return(-1);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* MAKE_SERVER_SEMA - create a descriptive semaphore for the server
- *                  - on HOST at PORT at the ROOT collection/location
- *                  - return TRUE iff successful
- */
-
-static int make_server_sema(char *root, char *host, int port)
-   {int i, fd, rv;
-    char s[MAXLINE];
-
-    snprintf(s, MAXLINE, "%s.%s@%d", root, host, port);
-
-    rv = 0;
-
-/* try NATTEMPTS times to make the semaphore */
-    for (i = 0; i < NATTEMPTS; i++)
-        {fd = open(s, O_WRONLY | O_CREAT, 0600);
-	 if (fd >= 0)
-	    {rv = fsync(fd);
-	     if (rv != 0)
-	        continue;
-	     rv = close(fd);
-	     if (rv == 0)
-	        break;};};
-
-/* change the sense of the return value */
-    rv = (rv == 0);
-
-    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -286,13 +381,51 @@ static int connect_server(client *cl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* GET_CONNECT_SOCKET - fill PS with required info for connect call
+ *                    - return the semaphore string array iff successful
+ *                    - useful for later logging
+ */
+
+char **get_connect_socket(struct sockaddr_in *ps, char *root)
+   {int sasz, port;
+    in_addr_t haddr;
+    char *host, **sa;
+
+    sa = parse_sema(root);
+    if ((sa != NULL) && (ps != NULL))
+       {host  = sa[0];
+	port  = atoi(sa[1]);
+	haddr = atol(sa[2]);
+
+	sasz = sizeof(struct sockaddr_in);
+
+	memset(ps, 0, sasz);
+	ps->sin_family = PF_INET;
+	ps->sin_port   = htons(port);
+
+	if (haddr == INADDR_NONE)
+	   {haddr = inet_addr(host);
+
+	    if (haddr == INADDR_NONE)
+	       {struct hostent *hp;
+
+		hp = gethostbyname(host);
+		if (hp != NULL)
+		   haddr = *(in_addr_t *) hp->h_addr_list[0];};};
+
+	if (haddr != INADDR_NONE)
+	   memcpy(&ps->sin_addr, &haddr, sizeof(long));};
+
+    return(sa);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* CONNECT_CLIENT - client initiates connection with the server */
 
 static int connect_client(client *cl)
-   {int sasz, fd, err, port;
-    char s[MAXLINE];
-    char *res, *host, *prt, *root;
-    in_addr_t haddr;
+   {int sasz, fd, err;
+    char *root, **ta;
     connection *srv;
 
     root = cl->root;
@@ -300,67 +433,44 @@ static int connect_client(client *cl)
 
     fd = -1;
 
-    res = find_sema(root, -1);
-    if (res != NULL)
-       {nstrncpy(s, MAXLINE, path_tail(res), -1);
-	res = strrchr(s, '.') + 1;
-	key_val(&host, &prt, res, "@");
-	if (prt != NULL)
-	   port = atoi(prt);
-	else
-	   port = 0;
+    ta = get_connect_socket(&srv->sck, root);
+    if (ta != NULL)
+       {fd = socket(PF_INET, SOCK_STREAM, 0);
+	if (fd >= 0)
+	   {int ia, na;
+	    char *flog;
+	    struct sockaddr *sa;
 
-	if ((host != NULL) && (port > 0))
-	   {sasz = sizeof(struct sockaddr_in);
+	    flog = name_log(root);
 
-	    memset(&srv->sck, 0, sasz);
-	    srv->sck.sin_family = PF_INET;
-	    srv->sck.sin_port   = htons(port);
-
-	    haddr = inet_addr(host);
-
-	    if (haddr == INADDR_NONE)
-	       {struct hostent *hp;
-
-		hp = gethostbyname(host);
-		if (hp != NULL)
-		   haddr = *(in_addr_t *) hp->h_addr_list[0];};
-
-	    if (haddr != INADDR_NONE)
-	       {memcpy(&srv->sck.sin_addr, &haddr, sizeof(long));
-
-		fd = socket(PF_INET, SOCK_STREAM, 0);
-		if (fd >= 0)
-		   {int ia, na;
-		    char *flog;
-		    struct sockaddr *sa;
-
-		    flog = name_log(root);
+	    sasz = sizeof(struct sockaddr_in);
 
 /* try NATTEMPTS times to connect to the server */
-		    na = NATTEMPTS;
-		    for (ia = 0; ia < na; ia++)
-		        {sleep(ia);
+	    na = NATTEMPTS;
+	    for (ia = 0; ia < na; ia++)
+	        {sleep(ia);
 
-			 sa  = (struct sockaddr *) &srv->sck;
-			 err = connect(fd, sa, sasz);
-			 if (err >= 0)
-			    break;};
+		 sa  = (struct sockaddr *) &srv->sck;
+		 err = connect(fd, sa, sasz);
+		 if (err >= 0)
+		    break;};
 
 /* report the connection status */
-		    if (err >= 0)
-		       log_activity(flog, dbg_sock, 2, "CLIENT",
-				    "connect %s@%s on %d (attempt %d)",
-				    host, prt, fd, ia);
-		    else
-		       {fd = connect_close(fd, cl, NULL);
-			log_activity(flog, dbg_sock, 1, "CLIENT",
-				     "connect error %s@%s  %d - %s (%d)",
-				     host, prt, fd,
-				     strerror(errno), errno);};
+	    if (err >= 0)
+	       log_activity(flog, dbg_sock, 2, "CLIENT",
+			    "connect %s@%s on %d (attempt %d)",
+			    ta[0], ta[1], fd, ia);
+	    else
+	       {fd = connect_close(fd, cl, NULL);
+		log_activity(flog, dbg_sock, 1, "CLIENT",
+			     "connect error %s@%s  %d - %s (%d)",
+			     ta[0], ta[1], fd,
+			     strerror(errno), errno);};
 
-		    srv->server = fd;
-		    srv->port   = port;};};};};
+	    srv->server = fd;
+	    srv->port   = atoi(ta[1]);};
+
+	free_strings(ta);};
 
     cl->fd   = fd;
     cl->type = CLIENT;
