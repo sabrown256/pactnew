@@ -15,13 +15,21 @@ Separator $Log
 Note $Log "Analyze: hdf5"
 
 # vanilla place to look if previously undefined
-SafeEnv MDI_Inc    ""
-SafeEnv MDI_Lib    ""
-SafeEnv MDI_Pck    ""
-SafeEnv HDF_Inc    ""
-SafeEnv HDF_Lib    ""
-SafeEnv HDF_RPath  $RootLib
-SafeEnv HDF_Path   /usr
+dbini MDI_Inc    ""
+dbini MDI_Lib    ""
+dbini MDI_Pck    ""
+dbini HDF_Inc    ""
+dbini HDF_Lib    ""
+dbini HDF_RPath  $RootLib
+dbini HDF_Path   /usr
+#SafeEnv MDI_Inc    ""
+#SafeEnv MDI_Lib    ""
+#SafeEnv MDI_Pck    ""
+#SafeEnv HDF_Inc    ""
+#SafeEnv HDF_Lib    ""
+#SafeEnv HDF_RPath  $RootLib
+#SafeEnv HDF_Path   /usr
+
 SafeEnv Z_Lib      "-lz"
 
 dbini HDF5_SO    ""
@@ -105,16 +113,23 @@ EOF
    setenv HDF_Path  ""
 
 # export the results
-   SetParent RPATH
-   SetParent MDI_Inc
-   SetParent MDI_Lib
-   SetParent MDI_Pck
-   SetParent HDF_Inc
-   SetParent HDF_Lib
-   SetParent HDF_RPath
-   SetParent HDF_Path
-
    dbexp HDF5_SO
+   dbexp MDI_Inc
+   dbexp MDI_Lib
+   dbexp MDI_Pck
+   dbexp HDF_Inc
+   dbexp HDF_Lib
+   dbexp HDF_RPath
+   dbexp HDF_Path
+#   SetParent MDI_Inc
+#   SetParent MDI_Lib
+#   SetParent MDI_Pck
+#   SetParent HDF_Inc
+#   SetParent HDF_Lib
+#   SetParent HDF_RPath
+#   SetParent HDF_Path
+
+   SetParent RPATH
 
 endif
 

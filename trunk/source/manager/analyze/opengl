@@ -14,17 +14,25 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: opengl"
 
+dbini MDG_Inc          ""
+dbini MDG_Lib          ""
+dbini MDG_Pck          ""
+dbini OGL_Inc          ""
+dbini OGL_Lib          ""
+dbini OGL_RPath        $RootLib
+dbini OGL_Path         /usr
+#SafeEnv MDG_Inc          ""
+#SafeEnv MDG_Lib          ""
+#SafeEnv MDG_Pck          ""
+#SafeEnv OGL_Inc          ""
+#SafeEnv OGL_Lib          ""
+#SafeEnv OGL_RPath        $RootLib
+#SafeEnv OGL_Path         /usr
+
 SafeEnv HostOS           `uname -s`
 SafeEnv GraphicsDevices  ""
 SafeEnv GraphicsFlag     ""
 
-SafeEnv MDG_Inc          ""
-SafeEnv MDG_Lib          ""
-SafeEnv MDG_Pck          ""
-SafeEnv OGL_Inc          ""
-SafeEnv OGL_Lib          ""
-SafeEnv OGL_RPath        $RootLib
-SafeEnv OGL_Path         /usr
 SafeEnv Std_UseOGL       FALSE
 
 # if we have explicitly said we do not want OGL
@@ -115,13 +123,21 @@ EOF
    if ($Std_UseOGL == TRUE) then
 
 # export the results
-      SetParent MDG_Inc
-      SetParent MDG_Lib
-      SetParent MDG_Pck
-      SetParent OGL_Inc
-      SetParent OGL_Lib
-      SetParent OGL_RPath
-      SetParent OGL_Path
+      dbexp MDG_Inc
+      dbexp MDG_Lib
+      dbexp MDG_Pck
+      dbexp OGL_Inc
+      dbexp OGL_Lib
+      dbexp OGL_RPath
+      dbexp OGL_Path
+#      SetParent MDG_Inc
+#      SetParent MDG_Lib
+#      SetParent MDG_Pck
+#      SetParent OGL_Inc
+#      SetParent OGL_Lib
+#      SetParent OGL_RPath
+#      SetParent OGL_Path
+
       SetParent GraphicsDevices
 
    endif

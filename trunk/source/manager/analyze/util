@@ -17,8 +17,10 @@ Note $Log "Analyze: util"
 NoteD $ALog "   System Utilities: "
 
 # get the AR options sorted out if they were not pre-defined
-SafeEnv AR_Exe    ar
-SafeEnv AR_Flags  ""
+dbini AR_Exe    ar
+dbini AR_Flags  ""
+#SafeEnv AR_Exe    ar
+#SafeEnv AR_Flags  ""
 
 rm -f foo.c foo.o bar.c bar.o main.c libfoo.a $Tmp
 
@@ -150,10 +152,15 @@ else
 endif
 
 # export the results
-SetParent AR_Exe
-SetParent AR_Flags
-SetParent AR_IFlag
-SetParent AR_XFlag
+dbexp AR_Exe
+dbexp AR_Flags
+dbexp AR_IFlag
+dbexp AR_XFlag
+#SetParent AR_Exe
+#SetParent AR_Flags
+#SetParent AR_IFlag
+#SetParent AR_XFlag
+
 SetParent Ranlib_Exe
 SetParent UPDATE
 SetParent INSTALL

@@ -15,13 +15,21 @@ Separator $Log
 Note $Log "Analyze: readline"
 
 # vanilla place to look if previously undefined
-SafeEnv MD_Inc     ""
-SafeEnv MD_Lib     ""
-SafeEnv MD_Pck     ""
-SafeEnv RL_Inc    ""
-SafeEnv RL_Lib    ""
-SafeEnv RL_RPath  /usr/${LIB}
-SafeEnv RL_Path   /usr
+dbini MD_Inc     ""
+dbini MD_Lib     ""
+dbini MD_Pck     ""
+dbini RL_Inc    ""
+dbini RL_Lib    ""
+dbini RL_RPath  /usr/${LIB}
+dbini RL_Path   /usr
+#SafeEnv MD_Inc     ""
+#SafeEnv MD_Lib     ""
+#SafeEnv MD_Pck     ""
+#SafeEnv RL_Inc    ""
+#SafeEnv RL_Lib    ""
+#SafeEnv RL_RPath  /usr/${LIB}
+#SafeEnv RL_Path   /usr
+
 SafeEnv HAVE_READLINE   FALSE
 
 # if we have explicitly said we do not want READLINE
@@ -95,13 +103,20 @@ EOF
    setenv RL_Path  ""
 
 # export the results
+   dbexp MD_Lib
+   dbexp MD_Pck
+   dbexp RL_Inc
+   dbexp RL_Lib
+   dbexp RL_RPath
+   dbexp RL_Path
+#   SetParent MD_Lib
+#   SetParent MD_Pck
+#   SetParent RL_Inc
+#   SetParent RL_Lib
+#   SetParent RL_RPath
+#   SetParent RL_Path
+
    SetParent RPATH
-   SetParent MD_Lib
-   SetParent MD_Pck
-   SetParent RL_Inc
-   SetParent RL_Lib
-   SetParent RL_RPath
-   SetParent RL_Path
    SetParent HAVE_READLINE
 
 endif

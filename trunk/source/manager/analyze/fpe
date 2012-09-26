@@ -64,8 +64,12 @@ endif
 #--------------------------------------------------------------------------
 
 # export the results
-SetParent HaveANSIFenv
-SetParent HaveGNUFenv
+
+dbexp HaveANSIFenv
+dbexp HaveGNUFenv
+
+#SetParent HaveANSIFenv
+#SetParent HaveGNUFenv
 
 exit(0)
 

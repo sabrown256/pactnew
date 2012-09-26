@@ -15,9 +15,13 @@ Separator $Log
 Note $Log "Analyze: libz"
 
 # vanilla place to look if previously undefined
-SafeEnv MD_Inc    ""
-SafeEnv MD_Lib    ""
-SafeEnv MD_Pck    ""
+dbini MD_Inc    ""
+dbini MD_Lib    ""
+dbini MD_Pck    ""
+#SafeEnv MD_Inc    ""
+#SafeEnv MD_Lib    ""
+#SafeEnv MD_Pck    ""
+
 SafeEnv Z_Inc     ""
 SafeEnv Z_Lib     ""
 SafeEnv Z_RPath   $RootLib
@@ -96,10 +100,14 @@ EOF
    set ETime = `timer -b $UTime`
 
 # export the results
+   dbexp MD_Inc
+   dbexp MD_Lib
+   dbexp MD_Pck
+#   SetParent MD_Inc
+#   SetParent MD_Lib
+#   SetParent MD_Pck
+
    SetParent RPATH
-   SetParent MD_Inc
-   SetParent MD_Lib
-   SetParent MD_Pck
    SetParent Z_Inc
    SetParent Z_Lib
    SetParent Z_RPath

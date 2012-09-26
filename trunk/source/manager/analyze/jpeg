@@ -15,13 +15,21 @@ Separator $Log
 Note $Log "Analyze: jpeg"
 
 # vanilla place to look if previously undefined
-SafeEnv MDG_Inc       ""
-SafeEnv MDG_Lib       ""
-SafeEnv MDG_Pck       ""
-SafeEnv JPEG_Inc      ""
-SafeEnv JPEG_Lib      ""
-SafeEnv JPEG_RPath    $RootLib
-SafeEnv JPEG_Path     /usr
+dbini MDG_Inc       ""
+dbini MDG_Lib       ""
+dbini MDG_Pck       ""
+dbini JPEG_Inc      ""
+dbini JPEG_Lib      ""
+dbini JPEG_RPath    $RootLib
+dbini JPEG_Path     /usr
+#SafeEnv MDG_Inc       ""
+#SafeEnv MDG_Lib       ""
+#SafeEnv MDG_Pck       ""
+#SafeEnv JPEG_Inc      ""
+#SafeEnv JPEG_Lib      ""
+#SafeEnv JPEG_RPath    $RootLib
+#SafeEnv JPEG_Path     /usr
+
 SafeEnv HAVE_JPEGLIB  FALSE
 
 # if we have explicitly said we do not want JPEG
@@ -99,14 +107,22 @@ EOF
    setenv JPEG_Path ""
 
 # export the results
+   dbexp MDG_Inc
+   dbexp MDG_Lib
+   dbexp MDG_Pck
+   dbexp JPEG_Inc
+   dbexp JPEG_Lib
+   dbexp JPEG_RPath
+   dbexp JPEG_Path
+#   SetParent MDG_Inc
+#   SetParent MDG_Lib
+#   SetParent MDG_Pck
+#   SetParent JPEG_Inc
+#   SetParent JPEG_Lib
+#   SetParent JPEG_RPath
+#   SetParent JPEG_Path
+
    SetParent RPATH
-   SetParent MDG_Inc
-   SetParent MDG_Lib
-   SetParent MDG_Pck
-   SetParent JPEG_Inc
-   SetParent JPEG_Lib
-   SetParent JPEG_RPath
-   SetParent JPEG_Path
 
 endif
 

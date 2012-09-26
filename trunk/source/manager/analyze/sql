@@ -15,13 +15,21 @@ Separator $Log
 Note $Log "Analyze: sql"
 
 # vanilla place to look if previously undefined
-SafeEnv MDI_Inc    ""
-SafeEnv MDI_Lib    ""
-SafeEnv MDI_Pck    ""
-SafeEnv SQL_Inc    ""
-SafeEnv SQL_Lib    ""
-SafeEnv SQL_RPath  $RootLib
-SafeEnv SQL_Path   /usr
+dbini MDI_Inc    ""
+dbini MDI_Lib    ""
+dbini MDI_Pck    ""
+dbini SQL_Inc    ""
+dbini SQL_Lib    ""
+dbini SQL_RPath  $RootLib
+dbini SQL_Path   /usr
+#SafeEnv MDI_Inc    ""
+#SafeEnv MDI_Lib    ""
+#SafeEnv MDI_Pck    ""
+#SafeEnv SQL_Inc    ""
+#SafeEnv SQL_Lib    ""
+#SafeEnv SQL_RPath  $RootLib
+#SafeEnv SQL_Path   /usr
+
 SafeEnv HAVE_SQL   FALSE
 
 dbini MYSQL_SO    ""
@@ -254,14 +262,22 @@ EOF
    endif
 
 # export the results
+   dbexp MDI_Inc
+   dbexp MDI_Lib
+   dbexp MDI_Pck
+   dbexp SQL_Inc
+   dbexp SQL_Lib
+   dbexp SQL_RPath
+   dbexp SQL_Path
+#   SetParent MDI_Inc
+#   SetParent MDI_Lib
+#   SetParent MDI_Pck
+#   SetParent SQL_Inc
+#   SetParent SQL_Lib
+#   SetParent SQL_RPath
+#   SetParent SQL_Path
+
    SetParent RPATH
-   SetParent MDI_Inc
-   SetParent MDI_Lib
-   SetParent MDI_Pck
-   SetParent SQL_Inc
-   SetParent SQL_Lib
-   SetParent SQL_RPath
-   SetParent SQL_Path
    SetParent HAVE_MYSQL
    SetParent HAVE_SQLITE
    SetParent HAVE_SQLITE_V2

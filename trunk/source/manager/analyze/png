@@ -15,13 +15,21 @@ Separator $Log
 Note $Log "Analyze: png"
 
 # vanilla place to look if previously undefined
-SafeEnv MDG_Inc      ""
-SafeEnv MDG_Lib      ""
-SafeEnv MDG_Pck      ""
-SafeEnv PNG_Inc      ""
-SafeEnv PNG_Lib      ""
-SafeEnv PNG_RPath    $RootLib
-SafeEnv PNG_Path     /usr
+dbini MDG_Inc      ""
+dbini MDG_Lib      ""
+dbini MDG_Pck      ""
+dbini PNG_Inc      ""
+dbini PNG_Lib      ""
+dbini PNG_RPath    $RootLib
+dbini PNG_Path     /usr
+#SafeEnv MDG_Inc      ""
+#SafeEnv MDG_Lib      ""
+#SafeEnv MDG_Pck      ""
+#SafeEnv PNG_Inc      ""
+#SafeEnv PNG_Lib      ""
+#SafeEnv PNG_RPath    $RootLib
+#SafeEnv PNG_Path     /usr
+
 SafeEnv HAVE_PNGLIB  FALSE
 
 # if we have explicitly said we do not want PNG
@@ -106,14 +114,22 @@ EOF
    setenv PNG_Path  ""
 
 # export the results
+   dbexp MDG_Inc
+   dbexp MDG_Lib
+   dbexp MDG_Pck
+   dbexp PNG_Inc
+   dbexp PNG_Lib
+   dbexp PNG_RPath
+   dbexp PNG_Path
+#   SetParent MDG_Inc
+#   SetParent MDG_Lib
+#   SetParent MDG_Pck
+#   SetParent PNG_Inc
+#   SetParent PNG_Lib
+#   SetParent PNG_RPath
+#   SetParent PNG_Path
+
    SetParent RPATH
-   SetParent MDG_Inc
-   SetParent MDG_Lib
-   SetParent MDG_Pck
-   SetParent PNG_Inc
-   SetParent PNG_Lib
-   SetParent PNG_RPath
-   SetParent PNG_Path
 
 endif
 
