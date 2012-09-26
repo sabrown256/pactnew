@@ -25,7 +25,7 @@ SafeEnv Cfg_LD_RPath   ""
 SafeEnv Cfe_LD_Flags   ""
 SafeEnv Cfe_LD_Lib     ""
 SafeEnv Cfe_LD_RPath   ""
-SafeEnv MDG_Lib        ""
+#SafeEnv MDG_Lib        ""
 SafeEnv DP_Lib         ""
 
 if (!(-x "$LD_Exe")) then
@@ -97,7 +97,7 @@ SetParent Cfg_LD_RPath
 SetParent Cfe_LD_Flags
 SetParent Cfe_LD_Lib
 SetParent Cfe_LD_RPath
-SetParent MDG_Lib
+#SetParent MDG_Lib
 SetParent DP_Lib
 SetParent Shared_LD_Exe
 SetParent HaveRPATH

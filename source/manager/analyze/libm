@@ -14,9 +14,11 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: math"
 
+dbini MD_Pck       ""
+#SafeEnv MD_Pck       ""
+
 SafeEnv RPATH        ""
 SafeEnv Cfg_RPATH    ""
-SafeEnv MD_Pck       ""
 SafeEnv LibM_Lib     "-lm"
 SafeEnv LibM_RPath   ""
 SafeEnv IMF_Lib      "-limf"
@@ -70,10 +72,12 @@ NoteD $ALog "   Math library: $LibM_Lib"
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+dbexp MD_Pck
+#SetParent MD_Pck
+
 SetParent IMF_Path
 SetParent RPATH
 SetParent Cfg_RPATH
-SetParent MD_Pck
 SetParent LibM_Lib
 SetParent LibM_RPath
 

@@ -49,9 +49,11 @@ if ("$Cfe_CC_Inc" == "$RootInc") then
    flog $ALog setenv Cfe_CC_Inc ""
 endif
 
+dbini MDG_Inc ""
 if ("$MDG_Inc" == "-I$RootInc") then
    flog $ALog setenv MDG_Inc ""
 endif
+dbexp MDG_Inc
 
 if ($?Save_CC == 1) then
    flog $ALog setenv CC_Exe "$Save_CC"
@@ -84,7 +86,7 @@ SetParent CDefDebug
 SetParent CDefOptimize
 SetParent FDefDebug
 SetParent FDefOptimize
-SetParent MDG_Inc
+#SetParent MDG_Inc
 
 exit(0)
 

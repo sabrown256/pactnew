@@ -17,6 +17,9 @@ if ($?Log == 1) then
    Note $Log "Analyze: mpi"
 endif
 
+dbini MD_Pck          ""
+#SafeEnv MD_Pck          ""
+
 SafeEnv REQUEST_MPI     FALSE
 SafeEnv ParCommSupport  PARC
 SafeEnv MPIGoodIO       FALSE
@@ -26,7 +29,6 @@ SafeEnv HAVE_MPI_2      FALSE
 SafeEnv DP_Inc          ""
 SafeEnv DP_Lib          ""
 SafeEnv DP_RPath        ""
-SafeEnv MD_Pck          ""
 
 # NOTE: because locate-mpi ends up getting DP_RPath on your RPATH
 # before feature/mpi is invoked you can end up with MPI
@@ -234,6 +236,9 @@ endif
 flog $ALog setenv ParComm "$lParComm"
 
 # export the results
+dbexp MD_Pck
+#SetParent MD_Pck
+
 SetParent ParCommSupport
 SetParent MPIAllStdin
 SetParent MPIGoodIO
@@ -242,7 +247,6 @@ SetParent HAVE_MPI_2
 SetParent DP_Inc
 SetParent DP_Lib
 SetParent DP_RPath
-SetParent MD_Pck
 
 exit(0)
 

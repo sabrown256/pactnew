@@ -14,6 +14,21 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: x11"
 
+dbini MDG_Inc          ""
+dbini MDG_Lib          ""
+dbini MDG_Pck          ""
+dbini X11_Inc          $RootInc
+dbini X11_Lib          ""
+dbini X11_RPath        $RootLib
+dbini X11_Path         /usr
+#SafeEnv MDG_Inc          ""
+#SafeEnv MDG_Lib          ""
+#SafeEnv MDG_Pck          ""
+#SafeEnv X11_Inc          $RootInc
+#SafeEnv X11_Lib          ""
+#SafeEnv X11_RPath        $RootLib
+#SafeEnv X11_Path         /usr
+
 SafeEnv AnaDir           analyze
 SafeEnv ALog             $cwd/cfg-$System/log.analyze
 SafeEnv HostOS           `uname -s`
@@ -22,13 +37,6 @@ SafeEnv GraphicsFlag     ""
 SafeEnv Cfe_CC_Exe       "cc"
 SafeEnv Cfe_CC_Flags     "-g"
 
-SafeEnv MDG_Inc          ""
-SafeEnv MDG_Lib          ""
-SafeEnv MDG_Pck          ""
-SafeEnv X11_Inc          $RootInc
-SafeEnv X11_Lib          ""
-SafeEnv X11_RPath        $RootLib
-SafeEnv X11_Path         /usr
 SafeEnv Std_UseX         TRUE
 
 # if we have explicitly said we do not want X11
@@ -161,14 +169,22 @@ EOF
    endif
 
 # export the results
+   dbexp MDG_Inc
+   dbexp MDG_Lib
+   dbexp MDG_Pck
+   dbexp X11_Inc
+   dbexp X11_Lib
+   dbexp X11_RPath
+   dbexp X11_Path
+#   SetParent MDG_Inc
+#   SetParent MDG_Lib
+#   SetParent MDG_Pck
+#   SetParent X11_Inc
+#   SetParent X11_Lib
+#   SetParent X11_RPath
+#   SetParent X11_Path
+
    SetParent RPATH
-   SetParent MDG_Inc
-   SetParent MDG_Lib
-   SetParent MDG_Pck
-   SetParent X11_Inc
-   SetParent X11_Lib
-   SetParent X11_RPath
-   SetParent X11_Path
    SetParent GraphicsDevices
 
 endif
