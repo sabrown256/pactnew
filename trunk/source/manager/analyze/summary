@@ -11,6 +11,12 @@
 set Me = $0
 source $Me:h/common
 
+set vl = ""
+set vl = ( $vl HAVE_PYTHON HAVE_PY_NUMERIC HAVE_PY_NUMPY )
+set vl = ( $vl BuildSharedLibs PY_Exe PY_DirPy PY_DirSrc PY_DirDst )
+
+source $MngDir/write/import-db
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 

@@ -19,7 +19,7 @@ int PP_buffer_extractor(PyObject *obj, void *arg)
 {
     int ret = 1;
 
-#ifdef HAVE_PYTHON_NUMERIC
+#ifdef HAVE_PY_NUMERIC
 
     PyArrayObject *arr;
     

@@ -36,7 +36,7 @@
  */
 
 #define PY_ARRAY_UNIQUE_SYMBOL PP_
-#ifdef HAVE_PYTHON_NUMERIC
+#ifdef HAVE_PY_NUMERIC
 # include <Numeric/arrayobject.h>
 #endif
 
