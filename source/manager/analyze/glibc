@@ -64,9 +64,10 @@ else
 endif
 
 dbexp HAVE_GNU_LIBC_6
+dbexp GLIBC_VERSION
 #SetParent HAVE_GNU_LIBC_6
+#SetParent GLIBC_VERSION
 
-SetParent GLIBC_VERSION
 
 #exit(0)
 

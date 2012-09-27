@@ -33,17 +33,18 @@ set opt = ( $opt $Cfe_LD_Flags $Cfe_LD_RPath )
 
 flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
-   setenv IPCSupport "POSIX"
+   setenv IPC_STD "POSIX"
    NoteD $ALog "      has posix process support"
 else
-   setenv IPCSupport "NOIPC"
+   setenv IPC_STD "NOIPC"
    NoteD $ALog "      no process support"
 endif
 
 rm -f $Tmp.c $Tmp
 
 # export the results
-SetParent IPCSupport
+dbexp IPC_STD
+#SetParent IPC_STD
 
 exit(0)
 

@@ -7,7 +7,7 @@
 # include "cpyright.h"
 #
 
-setenv HaveCOMPLEX FALSE
+setenv HAVE_ANSI_C9X_COMPLEX FALSE
 
 
 

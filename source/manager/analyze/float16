@@ -34,7 +34,7 @@ int main(int c, char **v)
     return(0);}
 EOF
 
-flog $ALog setenv HaveFLOAT16 FALSE
+flog $ALog setenv HAVE_ANSI_FLOAT16 FALSE
 
 flog $ALog cat $Tmp.c
 
@@ -48,11 +48,11 @@ if ($status == 0) then
       flog $ALog set val = none
    endif
    if ($val =~ 1.41421*) then
-      flog $ALog setenv HaveFLOAT16 TRUE
+      flog $ALog setenv HAVE_ANSI_FLOAT16 TRUE
    endif
 endif
 
-if ($HaveFLOAT16 == TRUE) then
+if ($HAVE_ANSI_FLOAT16 == TRUE) then
    NoteD $ALog "      has long double support"
 else
    NoteD $ALog "      no long double support"
@@ -64,6 +64,7 @@ rm -f $Tmp $Tmp.c $Tmp.o
 #--------------------------------------------------------------------------
 
 # export the result
-SetParent HaveFLOAT16
+dbexp HAVE_ANSI_FLOAT16
+#SetParent HAVE_ANSI_FLOAT16
 
 #exit(0)

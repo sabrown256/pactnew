@@ -26,16 +26,17 @@ EOF
 
 flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
 if ($status == 0) then
-   setenv HaveINLINE TRUE
+   setenv HAVE_INLINE TRUE
    NoteD $ALog "      has inline support"
 else
-   setenv HaveINLINE FALSE
+   setenv HAVE_INLINE FALSE
    NoteD $ALog "      no inline support"
 endif
 
 rm -f $Tmp $Tmp.c $Tmp.o
 
 # export the result
-SetParent HaveINLINE
+dbexp HAVE_INLINE
+#SetParent HAVE_INLINE
 
 #exit(0)

@@ -648,7 +648,7 @@ InstBase
    The directory in which the PACT manager expects to find lib, bin, include,
    and scheme directories into which to install PACT.  Default is "/usr/local".
 
-IPCSupport
+IPC_STD
    Specify the support for IPC.  Some non-standard operating systems
    force a choice here.  Current choices are: POSIX or NOIPC. The
    default is POSIX.
