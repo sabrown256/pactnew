@@ -684,22 +684,20 @@ static void env_out(FILE *fsh, FILE *fcsh, FILE *fdk, FILE *fmd,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* ADD_SET_CFG - add variables set in config files */
+/* ADD_SPECIAL_VARS - add special groups variables SPCG
+ *                  - if BLANK is TRUE emit non-NULL variables
+ *                  - otherwise skip them
+ */
 
-static void add_set_cfg(client *cl, FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
-   {int i, is, j, js, n, nc, ns, ms, ok;
+static void add_special_vars(client *cl,
+			     FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd,
+			     int ns, char **spcg,
+			     int ms, char **spcv,
+			     int n, char **sa, int blank)
+   {int i, is, js, ok;
     char s[MAXLINE];
-    char *spcg[] = { "DP" };
-    char *spcv[] = { "Inc", "Lib", "RPath", "Path" };
-    char *var, *val, *p, **sa;
+    char *p;
 
-    fflush(st.aux.SEF);
-    sa = file_text(TRUE, "%s/log/file.se", st.dir.root);
-    n  = (sa != NULL) ? lst_length(sa) : 0;
-
-/* add special group variables */
-    ns = sizeof(spcg)/sizeof(char *);
-    ms = sizeof(spcv)/sizeof(char *);
     for (is = 0; is < ns; is++)
         {for (js = 0; js < ms; js++)
 	     {snprintf(s, MAXLINE, "%s_%s", spcg[is], spcv[js]);
@@ -711,8 +709,46 @@ static void add_set_cfg(client *cl, FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
 
 	      if (ok == TRUE)
 		 {p = dbget(cl, TRUE, s);
-		  if (IS_NULL(p) == FALSE)
+		  if ((IS_NULL(p) == FALSE) || (blank == TRUE))
 		     env_out(fsh, fcsh, fdk, fmd, s, p);};};};
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* ADD_SET_CFG - add variables set in config files */
+
+static void add_set_cfg(client *cl, FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
+   {int i, j, n, nc, ns, ms, ok;
+    char *spcgn[] = { "DP" };
+    char *spcgb[] = { "MDG", "PY", "TRACKER" };
+    char *spcv[] = { "Inc", "Lib", "RPath", "Path", "Exe" };
+    char *spcgh[] = { "HAVE" };
+    char *spcvh[] = { "PYTHON" };
+    char *var, *val, *p, **sa;
+
+    fflush(st.aux.SEF);
+    sa = file_text(TRUE, "%s/log/file.se", st.dir.root);
+    n  = (sa != NULL) ? lst_length(sa) : 0;
+
+    ms = sizeof(spcv)/sizeof(char *);
+
+/* add special group variables if non-blank */
+    ns = sizeof(spcgn)/sizeof(char *);
+    add_special_vars(cl, fcsh, fsh, fdk, fmd, 
+		     ns, spcgn, ms, spcv, n, sa, FALSE);
+
+/* add special group variables even if blank */
+    ns = sizeof(spcgb)/sizeof(char *);
+    add_special_vars(cl, fcsh, fsh, fdk, fmd, 
+		     ns, spcgb, ms, spcv, n, sa, TRUE);
+
+/* add select HAVE_ variables even if blank */
+    ms = sizeof(spcvh)/sizeof(char *);
+    ns = sizeof(spcgh)/sizeof(char *);
+    add_special_vars(cl, fcsh, fsh, fdk, fmd, 
+		     ns, spcgh, ms, spcvh, n, sa, TRUE);
 
 /* add all the setenv'd variables */
     if (sa != NULL)
@@ -798,6 +834,7 @@ static void write_envf(client *cl, int lnotice)
    {int i, n;
     char *t;
     char *site[] = { "CONFIG_METHOD" };
+    char *sfx[]  = { "csh", "sh", "dk", "mdl" };
     FILE *fcsh, *fsh, *fdk, *fmd;
 
     separator(Log);
@@ -923,10 +960,12 @@ static void write_envf(client *cl, int lnotice)
     fclose(fdk);
     fclose(fmd);
 
-    cat(Log, 0, -1, "%s/env-pact.csh", st.dir.etc);
-    cat(Log, 0, -1, "%s/env-pact.sh",  st.dir.etc);
-    cat(Log, 0, -1, "%s/env-pact.dk",  st.dir.etc);
-    cat(Log, 0, -1, "%s/env-pact.mdl", st.dir.etc);
+/* log the results */
+    n = sizeof(sfx)/sizeof(char *);
+    for (i = 0; i < n; i++)
+        {note(Log, TRUE, "----- env-pact.%s -----", sfx[i]);
+	 cat(Log, 0, -1, "%s/env-pact.%s", st.dir.etc, sfx[i]);
+         note(Log, TRUE, " ");};
 
     return;}
 

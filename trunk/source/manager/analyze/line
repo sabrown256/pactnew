@@ -1,7 +1,7 @@
 #!/bin/csh -f
 #
 # LINE - analyze the line directive handling of CPP
-#      - Computes: BadLineDirectives
+#      - Computes: HAVE_BAD_LINE_DIRECTIVES
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -28,16 +28,17 @@ EOF
 
 flog $ALog $Cfe_CC_Exe -c $AC -o $AO
 if ($status == 0) then
-   setenv BadLineDirectives FALSE
+   setenv HAVE_BAD_LINE_DIRECTIVES FALSE
    NoteD $ALog "      proper line directive handling"
 else
-   setenv BadLineDirectives TRUE
+   setenv HAVE_BAD_LINE_DIRECTIVES TRUE
    NoteD $ALog "      bad line directive handling"
 endif
 
 rm -f $AC $AO $BC
 
 # export the result
-SetParent BadLineDirectives
+dbexp HAVE_BAD_LINE_DIRECTIVES
+#SetParent HAVE_BAD_LINE_DIRECTIVES
 
 #exit(0)

@@ -1,0 +1,85 @@
+#!/bin/csh -f
+#
+# CSTD - analyze the C Standard to which CC adheres
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+unset cc
+unsetenv cc
+
+set cc  = $1
+set tmp = $cwd/tmp-std
+
+set cc = `which $cc`
+if (-x "$cc") then
+
+   cat >&! $tmp.c << EOF
+#include <stdlib.h>
+#include <stdio.h>
+#include <complex.h>
+/* #include <threads.h> */
+int main(int c, char **v)
+   {
+#ifdef __STDC_VERSION__
+     printf("   standard %ld\n", __STDC_VERSION__);
+#else
+     printf("   non standard\n");
+#endif
+#ifdef __STDC_ANALYZABLE__
+     printf("   has analyzability\n");
+#else
+     printf("   no analyzability\n");
+#endif
+#ifdef __STDC_LIB_EXT1__
+     printf("   has bounds checking\n");
+#else
+     printf("   no bounds checking\n");
+#endif
+#ifdef __STDC_NO_THREADS__
+     printf("   has multithreading\n");
+#else
+     printf("   no multithreading\n");
+#endif
+#ifdef __STDC_NO_ATOMICS__
+     printf("   has atomic primitives\n");
+#else
+     printf("   no atomic primitives\n");
+#endif
+#ifdef __STDC_IEC_559__
+     printf("   has IEC 60559 floating-point arithmetic\n");
+#else
+     printf("   no IEC 60559 floating-point arithmetic\n");
+#endif
+#ifdef __STDC_IEC_559_COMPLEX__
+     printf("   has IEC 60559 complex arithmetic\n");
+#else
+     printf("   no IEC 60559 complex arithmetic\n");
+#endif
+#ifdef __STDC_NO_COMPLEX__
+     printf("   has complex types\n");
+#else
+     printf("   no complex types\n");
+#endif
+#ifdef __STDC_NO_VLA__
+     printf("   has variable length arrays\n");
+#else
+     printf("   no variable length arrays\n");
+#endif
+    return(0);}
+EOF
+
+   $cc $tmp.c -o $tmp
+   if ($status == 0) then
+      $tmp
+   endif
+#   rm -f $tmp $tmp.c
+
+endif
+
+exit($status)

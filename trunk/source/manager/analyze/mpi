@@ -17,17 +17,20 @@ if ($?Log == 1) then
    Note $Log "Analyze: mpi"
 endif
 
-dbini MD_Pck          ""
-dbini HAVE_OPENMPI    FALSE
-dbini HAVE_MPI_2      FALSE
-#SafeEnv MD_Pck          ""
-#SafeEnv HAVE_OPENMPI    FALSE
-#SafeEnv HAVE_MPI_2      FALSE
+dbini MD_Pck             ""
+dbini HAVE_OPENMPI       FALSE
+dbini HAVE_MPI_2         FALSE
+dbini STD_PARALLEL_COMM  PARC
+dbini HAVE_MPI_STDIN_ALL FALSE
+dbini HAVE_MPI_GOOD_IO   FALSE
+#SafeEnv MD_Pck             ""
+#SafeEnv HAVE_OPENMPI       FALSE
+#SafeEnv HAVE_MPI_2         FALSE
+#SafeEnv STD_PARALLEL_COMM  PARC
+#SafeEnv HAVE_MPI_STDIN_ALL FALSE
+#SafeEnv HAVE_MPI_GOOD_IO   FALSE
 
 SafeEnv REQUEST_MPI     FALSE
-SafeEnv ParCommSupport  PARC
-SafeEnv MPIGoodIO       FALSE
-SafeEnv MPIAllStdin     FALSE
 SafeEnv DP_Inc          ""
 SafeEnv DP_Lib          ""
 SafeEnv DP_RPath        ""
@@ -66,8 +69,8 @@ foreach j ($DP_Inc $RootInc)
 # check for <path>/<pkg>/<pkg>.h form
    if ($GotIt == TRUE) then
       flog $ALog set lParComm = ( mpi $lParComm )
-      if ("$ParCommSupport" == "") then
-         set ParCommSupport = `echo mpi | tr "[a-z]" "[A-Z]"`
+      if ("$STD_PARALLEL_COMM" == "") then
+         set STD_PARALLEL_COMM = `echo mpi | tr "[a-z]" "[A-Z]"`
       endif
       break
    endif
@@ -151,7 +154,7 @@ EOF
       if ($LStat == 0) then
          @ NOut = `grep "Proc" $Tmp.res |& wc -l`
          if ($NOut > 1) then
-            setenv MPIAllStdin TRUE
+            setenv HAVE_MPI_STDIN_ALL TRUE
             set MPIStdIO = "all processes"
          else
             set MPIStdIO = "one process"
@@ -241,13 +244,16 @@ flog $ALog setenv ParComm "$lParComm"
 dbexp MD_Pck
 dbexp HAVE_OPENMPI
 dbexp HAVE_MPI_2
+dbexp STD_PARALLEL_COMM
+dbexp HAVE_MPI_STDIN_ALL
+dbexp HAVE_MPI_GOOD_IO
 #SetParent MD_Pck
 #SetParent HAVE_OPENMPI
 #SetParent HAVE_MPI_2
+#SetParent STD_PARALLEL_COMM
+#SetParent HAVE_MPI_STDIN_ALL
+#SetParent HAVE_MPI_GOOD_IO
 
-SetParent ParCommSupport
-SetParent MPIAllStdin
-SetParent MPIGoodIO
 SetParent DP_Inc
 SetParent DP_Lib
 SetParent DP_RPath

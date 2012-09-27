@@ -45,9 +45,9 @@ flog $ALog rm -f $Tmp.c $Tmp
 
 # export the results
 dbexp HAVE_SOCKETS
+dbexp GETSOCKOPT_TYPE
 #SetParent HAVE_SOCKETS
-
-SetParent GETSOCKOPT_TYPE
+#SetParent GETSOCKOPT_TYPE
 
 exit(0)
 
