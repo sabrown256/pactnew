@@ -46,7 +46,7 @@ set vl = ( $vl IncDir InstBase INSTALL IPCSupport )
 set vl = ( $vl Load MngDir )
 set vl = ( $vl OStd OSType OW32Objs )
 set vl = ( $vl ParCommSupport PubLib PubInc )
-set vl = ( $vl PyCC PyCfg PyExe PyInc PyVers )
+set vl = ( $vl PY_CC PY_Cfg PY_Exe PY_Inc PY_Vers )
 set vl = ( $vl RPATH SUFFIXES Sys SysDir System )
 set vl = ( $vl ThreadLibExt UPDATE URFile )
 
@@ -420,11 +420,11 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "UPDATE     = $UPDATE"
 
     if ($HavePython == TRUE) then
-       set lPython = $PyExe
-       Note $STDOUT "PyVers     = $PyVers"
-       Note $STDOUT "PyCC       = $PyCC"
-       Note $STDOUT "PyCfgDir   = $PyCfg"
-       Note $STDOUT "PyIncDir   = $PyInc"
+       set lPython = $PY_Exe
+       Note $STDOUT "PY_Vers     = $PY_Vers"
+       Note $STDOUT "PY_CC       = $PY_CC"
+       Note $STDOUT "PY_CfgDir   = $PY_Cfg"
+       Note $STDOUT "PY_IncDir   = $PY_Inc"
        Note $STDOUT "PythonPath = $lPython:h"
     endif
 

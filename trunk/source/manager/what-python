@@ -1,13 +1,13 @@
 #!/bin/csh -f
 #
 # WHAT-PYTHON - analyze the platform PYTHON
-#        - PyExe       the full path to the python executable
-#        - PyVers      the version of the python executable
-#        - Python_Path addition to path in order to find python executable
-#        -             this comes from config files only
-#        - PyDirSrc    pact/dev/$arch/lib/pythond.d         (install to PyDirDst and PyDirPy)
-#        - PyDirDst    pact    lib/pythond.d                (install into)
-#        - PyDirPy     python  lib/pythond.d/site-packages  (install into)
+#        - PY_Exe       the full path to the python executable
+#        - PY_Vers      the version of the python executable
+#        - PY_Path      addition to path in order to find python executable
+#        -              this comes from config files only
+#        - PY_DirSrc    pact/dev/$arch/lib/pythond.d         (install to PY_DirDst and PY_DirPy)
+#        - PY_DirDst    pact    lib/pythond.d                (install into)
+#        - PY_DirPy     python  lib/pythond.d/site-packages  (install into)
 #
 #
 # Source Version: 3.0
@@ -20,12 +20,12 @@ set HostOS = ( `uname -s` )
 set HavePython        = FALSE
 set HavePythonNumeric = FALSE
 set HavePythonNumpy   = FALSE
-set PyExe             = ""
-set PyVers            = ""
-set PyCC              = ""
-set PyCfg             = ""
-set PyInc             = ""
-set Python_Path       = ""
+set PY_Exe            = ""
+set PY_Vers           = ""
+set PY_CC             = ""
+set PY_Cfg            = ""
+set PY_Inc            = ""
+set PY_Path           = ""
 
 while ($#argv > 0)
    switch ($1)
@@ -36,7 +36,7 @@ while ($#argv > 0)
            echo ""
            exit(1)
       default:
-           set PyExe =  $1
+           set PY_Exe = $1
            breaksw
    endsw
    shift
@@ -45,35 +45,35 @@ end
    echo -n "   Python: "
 
    set found = FALSE
-   set Python_Path = $PyExe:h
+   set PY_Path = $PY_Exe:h
 
-      if (-x "$PyExe") then
-         $PyExe ../python/python-cc.py >& /dev/null
+      if (-x "$PY_Exe") then
+         $PY_Exe ../python/python-cc.py >& /dev/null
          set LStat1 = $status
-         set lpyinc = ( `$PyExe ../python/python-inc-dir.py |& cat` )
+         set lpyinc = ( `$PY_Exe ../python/python-inc-dir.py |& cat` )
          if (($LStat1 != 0) || !(-f "$lpyinc/Python.h")) then
-            set PyExe =  ""
+            set PY_Exe =  ""
          else
-            set pyv = `$PyExe -V |& awk '{ print $2 }'`
+            set pyv = `$PY_Exe -V |& awk '{ print $2 }'`
             if ($#pyv > 2) continue
 
             set HavePython = TRUE
-            set PyCC  = `$PyExe ../python/python-cc.py |& awk '{ print $1 }'`
-            set PyInc = `$PyExe ../python/python-inc-dir.py`
-            set PyCfg = `$PyExe ../python/python-cfg-dir.py`
+            set PY_CC  = `$PY_Exe ../python/python-cc.py |& awk '{ print $1 }'`
+            set PY_Inc = `$PY_Exe ../python/python-inc-dir.py`
+            set PY_Cfg = `$PY_Exe ../python/python-cfg-dir.py`
 
-            echo "$PyExe ($pyv)"
-            echo "      compiled with $PyCC"
-            echo "      has include directory $PyInc"
-            set lPyVers = `$PyExe ../python/python-version.py`
+            echo "$PY_Exe ($pyv)"
+            echo "      compiled with $PY_CC"
+            echo "      has include directory $PY_Inc"
+            set lPyVers = `$PY_Exe ../python/python-version.py`
 
-            set PyLib = `echo $PyInc | sed 's/include/lib/'`
-            if (-d $PyInc/Numeric) then
+            set PY_Lib = `echo $PY_Inc | sed 's/include/lib/'`
+            if (-d $PY_Inc/Numeric) then
                echo "      has numeric extensions"
                set HavePythonNumeric = TRUE
             endif
-            if ((-d $PyLib/site-packages/NumPy) || (-d $PyLib/site-packages/numpy) || \
-                (-d $PyLib/dist-packages/NumPy) || (-d $PyLib/dist-packages/numpy)) then
+            if ((-d $PY_Lib/site-packages/NumPy) || (-d $PY_Lib/site-packages/numpy) || \
+                (-d $PY_Lib/dist-packages/NumPy) || (-d $PY_Lib/dist-packages/numpy)) then
                echo "      has numpy extensions"
                set HavePythonNumpy = TRUE
             endif
@@ -81,8 +81,8 @@ end
                echo "      does not have numeric extensions"
             endif
 
-            if ((($HostOS == "Linux") || ($HostOS == "Darwin") || ($HostOS == "FreeBSD")) && ($PyCC == cc)) then
-               set PyCC =  gcc
+            if ((($HostOS == "Linux") || ($HostOS == "Darwin") || ($HostOS == "FreeBSD")) && ($PY_CC == cc)) then
+               set PY_CC =  gcc
             endif
             set found = TRUE
          endif
@@ -93,12 +93,12 @@ end
       set HavePython        = FALSE
       set HavePythonNumeric = FALSE
       set HavePythonNumpy   = FALSE
-      set Python_Path       = ""
-      set PyExe             = ""
-      set PyCC              = ""
-      set PyCfg             = ""
-      set PyInc             = ""
-      set PyVers            = ""
+      set PY_Path           = ""
+      set PY_Exe            = ""
+      set PY_CC             = ""
+      set PY_Cfg            = ""
+      set PY_Inc            = ""
+      set PY_Vers           = ""
    endif
 
    set lbase = /usr/local/apps/pact
@@ -107,14 +107,14 @@ end
       if (`expr "$lPyVers" : '.*\..*\..*'` > 0) then
          set lPyVers = $lPyVers:r
       endif
-      set PyVers = $lPyVers
-      set PyRoot = $lbase
-      set PyHead = python${PyVers}/pact
-      if ("$Python_Path" != "") then
-         set PyRoot = $PyExe
-         set PyRoot = $PyRoot:h
-         set PyRoot = $PyRoot:h
-         set PyHead = python${PyVers}/site-packages/pact
+      set PY_Vers = $lPyVers
+      set PY_Root = $lbase
+      set PY_Head = python${PY_Vers}/pact
+      if ("$PY_Path" != "") then
+         set PY_Root = $PY_Exe
+         set PY_Root = $PY_Root:h
+         set PY_Root = $PY_Root:h
+         set PY_Head = python${PY_Vers}/site-packages/pact
       endif
    endif
 
@@ -122,12 +122,12 @@ end
 echo "HavePython        = $HavePython"
 echo "HavePythonNumeric = $HavePythonNumeric"
 echo "HavePythonNumpy   = $HavePythonNumpy"
-echo "Python_Path       = $Python_Path"
-echo "PyExe             = $PyExe"
-echo "PyCC              = $PyCC"
-echo "PyCfg             = $PyCfg"
-echo "PyInc             = $PyInc"
-echo "PyVers            = $PyVers"
+echo "PY_Path           = $PY_Path"
+echo "PY_Exe            = $PY_Exe"
+echo "PY_CC             = $PY_CC"
+echo "PY_Cfg            = $PY_Cfg"
+echo "PY_Inc            = $PY_Inc"
+echo "PY_Vers           = $PY_Vers"
 
 exit(0)
 

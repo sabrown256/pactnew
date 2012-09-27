@@ -30,7 +30,7 @@ Note $Log ""
 set vl = ""
 set vl = ( $vl InstBase UPDATE BinDir CfgMan Arch )
 set vl = ( $vl ScmDir Man1Dir Man3Dir )
-set vl = ( $vl HavePython PyVers PyDirPy PyDirDst PyDirSrc )
+set vl = ( $vl HavePython PY_Vers PY_DirPy PY_DirDst PY_DirSrc )
 
 source $MngDir/write/import-db
 
@@ -88,10 +88,10 @@ source $MngDir/write/import-db
        Note $STDOUT ""
 
        if ($HavePython == TRUE) then
-          Note $STDOUT "set PyVers    = $PyVers"
-          Note $STDOUT "set PyDirPy   = $PyDirPy"       # python destination
-          Note $STDOUT "set PyDirDst  = $PyDirDst"      # pact destination
-          Note $STDOUT "set PyDirSrc  = $PyDirSrc"      # install source
+          Note $STDOUT "set PY_Vers    = $PY_Vers"
+          Note $STDOUT "set PY_DirPy   = $PY_DirPy"       # python destination
+          Note $STDOUT "set PY_DirDst  = $PY_DirDst"      # pact destination
+          Note $STDOUT "set PY_DirSrc  = $PY_DirSrc"      # install source
           Note $STDOUT ""
        endif
 
@@ -336,18 +336,18 @@ source $MngDir/write/import-db
 
        if ($HavePython == TRUE) then
 
-          Note $STDOUT 'if (-d $PyDirSrc) then'
+          Note $STDOUT 'if (-d $PY_DirSrc) then'
 
 # determine which bindings we have
 # this cannot be done at config time because nothing will have been built
-          Note $STDOUT '   pushd $PyDirSrc >& /dev/null'
+          Note $STDOUT '   pushd $PY_DirSrc >& /dev/null'
           Note $STDOUT '   set PyBind = ( `ls` )'
           Note $STDOUT '   popd >& /dev/null'
 
           Note $STDOUT '   foreach bnd ($PyBind)'
-          Note $STDOUT '      foreach d ($PyDirDst)'
+          Note $STDOUT '      foreach d ($PY_DirDst)'
           Note $STDOUT '         set dst = $d/$bnd'
-          Note $STDOUT '         set src = $PyDirSrc/$bnd'
+          Note $STDOUT '         set src = $PY_DirSrc/$bnd'
           Note $STDOUT '         mkdir -p $dst >& /dev/null'
           Note $STDOUT '         if (-d $dst) then'
           Note $STDOUT '            pushd $src >& /dev/null'

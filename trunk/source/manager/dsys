@@ -2254,7 +2254,7 @@ CFG_DONE:
 
         set lpybind = none
         if (-f $EtcDir/cfg.db) then
-           set inf = ( `grep PyDirSrc $EtcDir/cfg.db | sed 's|=| |'` )
+           set inf = ( `grep PY_DirSrc $EtcDir/cfg.db | sed 's|=| |'` )
            if (("$inf" != "") && ($#inf > 2)) then
               set lpybind = $inf[3]:t
            endif

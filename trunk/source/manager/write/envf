@@ -107,7 +107,7 @@ source $MngDir/write/import-db
 
     if ($?HavePython) then
        if ($HavePython == TRUE) then
-          set lPython = $LibDir/python$PyVers
+          set lPython = $LibDir/python$PY_Vers
           if ($?PYTHONPATH) then
              if (`expr "$PYTHONPATH" : '.*'$lPython'.*'` == 0) then
                 setenv PYTHONPATH ${lPython}:$PYTHONPATH

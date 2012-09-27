@@ -49,9 +49,9 @@ flog $Log set DevLib = $Root/lib
 flog $Log set Def = $DevInc/make-def
 
 flog $Log set AR       = ( `pact +l -info AR | uniq` `pact +l -info ARXOpt | uniq` )
-flog $Log set CCmp     = ( `pact +l -info PyCC` )
-flog $Log set PyVers   = ( `pact +l -info PyVers` )
-flog $Log set PyCfgDir = ( `pact +l -info PyCfgDir` )
+flog $Log set CCmp     = ( `pact +l -info PY_CC` )
+flog $Log set PY_Vers   = ( `pact +l -info PY_Vers` )
+flog $Log set PY_CfgDir = ( `pact +l -info PY_CfgDir` )
 flog $Log set SFLAGS   = ( `pact +l -info Shared_LD_Flags | uniq` )
 flog $Log set Link     = ( `pact +l -info Shared_LD_Exe | uniq` )
 flog $Log set ShLibs   = ( `pact +l -info Shared_LD_Lib | uniq` )
@@ -72,7 +72,7 @@ end
 flog $Log set DPLibs   = ( $lst )
 
 flog $Log set LD     = ( $Link $SFLAGS )
-flog $Log set PyPath = $DevLib/python${PyVers}
+flog $Log set PyPath = $DevLib/python${PY_Vers}
 flog $Log set PyPact = $PyPath/pact_${PyPACTVers}
 
 flog $Log set Libs   = ( $LDRPath -L$DevLib $LDPath $MDGLibs $MDILibs -lc -lm $ShLibs $DPLibs $MDLibs )
@@ -85,8 +85,8 @@ flog $Log set CFPGS = ""
 
 # NOTE: IBM model is difficult - grrrrrrrrrrr
 if ($OS == AIX) then
-   flog $Log set CFPDB = ( -bE:${SrcDir}/pypdb.exp -bI:${PyCfgDir}/python.exp -bM:SRE -bnoentry -bloadmap:pypdb.map )
-   flog $Log set CFPGS = ( -bE:${SrcDir}/pypgs.exp -bI:${PyCfgDir}/python.exp -bM:SRE -bnoentry -bloadmap:pypgs.map )
+   flog $Log set CFPDB = ( -bE:${SrcDir}/pypdb.exp -bI:${PY_CfgDir}/python.exp -bM:SRE -bnoentry -bloadmap:pypdb.map )
+   flog $Log set CFPGS = ( -bE:${SrcDir}/pypgs.exp -bI:${PY_CfgDir}/python.exp -bM:SRE -bnoentry -bloadmap:pypgs.map )
 endif
 
 if (!(-d $PyPact)) then
