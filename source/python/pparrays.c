@@ -12,7 +12,7 @@
 
 #define PY_ARRAY_UNIQUE_SYMBOL PP_
 
-#ifdef HAVE_PYTHON_NUMERIC
+#ifdef HAVE_PY_NUMERIC
 # include <Numeric/arrayobject.h>
 #endif
 
@@ -24,7 +24,7 @@ struct s_PP_numpy_map {
 
 typedef struct s_PP_numpy_map PP_numpy_map;
 
-#ifdef HAVE_PYTHON_NUMERIC
+#ifdef HAVE_PY_NUMERIC
 static PP_numpy_map *tc_to_entry[PP_NUM_TYPES];
 #endif
 
@@ -36,7 +36,7 @@ static hasharr *_numpy_map;
 int darray_extractor(PyObject *obj, void *arg)
 {
 
-#ifdef HAVE_PYTHON_NUMERIC
+#ifdef HAVE_PY_NUMERIC
     PyArrayObject *arr;
     
     /* create an array object */
@@ -56,7 +56,7 @@ int darray_extractor(PyObject *obj, void *arg)
 int iarray_extractor(PyObject *obj, void *arg)
 {
 
-#ifdef HAVE_PYTHON_NUMERIC
+#ifdef HAVE_PY_NUMERIC
     PyArrayObject *arr;
     
     /* create an array object */
@@ -79,7 +79,7 @@ int iarray_extractor(PyObject *obj, void *arg)
 int pplong_extractor(PyObject *obj, void *arg)
 {
 
-#ifdef HAVE_PYTHON_NUMERIC
+#ifdef HAVE_PY_NUMERIC
     long **buf;
     Py_ssize_t nd, i;
     PyObject *subobj;
@@ -123,7 +123,7 @@ int pplong_extractor(PyObject *obj, void *arg)
 int REAL_array_extractor(PyObject *obj, void *arg)
 {
 
-#ifdef HAVE_PYTHON_NUMERIC
+#ifdef HAVE_PY_NUMERIC
     PyArrayObject *arr;
     char t;
 
@@ -159,7 +159,7 @@ PP_numpy_map *PP_lookup_type_num(char *name)
 int array_pack(void *vr, PyObject *obj, long nitems, PP_types tc)
 {
 
-#ifdef HAVE_PYTHON_NUMERIC
+#ifdef HAVE_PY_NUMERIC
     PyArrayObject *arr;
     PP_numpy_map *entry;
 
@@ -195,7 +195,7 @@ PyObject *PP_array_unpack(void *vr, long nitems, PP_types tc)
 
     rv = NULL;
 
-#ifdef HAVE_PYTHON_NUMERIC
+#ifdef HAVE_PY_NUMERIC
     PP_numpy_map *entry;
 
     if (tc > 0 && tc < PP_NUM_TYPES)
@@ -224,7 +224,7 @@ PyObject *PP_array_unpack(void *vr, long nitems, PP_types tc)
 void _PP_init_numpy(void)
 {
 
-#ifdef HAVE_PYTHON_NUMERIC
+#ifdef HAVE_PY_NUMERIC
     PP_numpy_map *nentry;
     static char *XX_FOO_MAP;
     static PP_numpy_map
@@ -267,7 +267,7 @@ void _PP_init_numpy(void)
 
 void _PP_init_numpy_types(PP_file *fileinfo)
 {
-#ifdef HAVE_PYTHON_NUMERIC
+#ifdef HAVE_PY_NUMERIC
     PP_type_entry *entry;
 
     entry = PP_make_type_entry(

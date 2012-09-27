@@ -170,7 +170,7 @@ PP_image_im_buffer_get(PP_imageObject *self, void *context)
 /* DO-NOT-DELETE splicer.begin(pgs.image.descriptor.im.buffer_get) */
     PyObject *rv;
 
-#ifdef HAVE_PYTHON_NUMERIC
+#ifdef HAVE_PY_NUMERIC
     int dims[2];
     PG_image *im;
 

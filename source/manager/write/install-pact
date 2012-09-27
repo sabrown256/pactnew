@@ -30,7 +30,7 @@ Note $Log ""
 set vl = ""
 set vl = ( $vl InstBase UPDATE BinDir CfgMan Arch )
 set vl = ( $vl ScmDir Man1Dir Man3Dir )
-set vl = ( $vl HavePython PY_Vers PY_DirPy PY_DirDst PY_DirSrc )
+set vl = ( $vl HAVE_PYTHON PY_Vers PY_DirPy PY_DirDst PY_DirSrc )
 
 source $MngDir/write/import-db
 
@@ -87,7 +87,7 @@ source $MngDir/write/import-db
        Note $STDOUT 'set Man3Dir   = $InstDir/'$Man3Dir
        Note $STDOUT ""
 
-       if ($HavePython == TRUE) then
+       if ($HAVE_PYTHON == TRUE) then
           Note $STDOUT "set PY_Vers    = $PY_Vers"
           Note $STDOUT "set PY_DirPy   = $PY_DirPy"       # python destination
           Note $STDOUT "set PY_DirDst  = $PY_DirDst"      # pact destination
@@ -334,7 +334,7 @@ source $MngDir/write/import-db
        Note $STDOUT '   endif'
        Note $STDOUT 'end'
 
-       if ($HavePython == TRUE) then
+       if ($HAVE_PYTHON == TRUE) then
 
           Note $STDOUT 'if (-d $PY_DirSrc) then'
 

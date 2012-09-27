@@ -22,19 +22,31 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: python"
 
-SafeEnv HavePython        FALSE
-SafeEnv HavePythonNumeric FALSE
-SafeEnv HavePythonNumpy   FALSE
-SafeEnv PY_Exe      ""
-SafeEnv PY_Vers     ""
-SafeEnv PY_DirPy    ""
-SafeEnv PY_DirDst   ""
-SafeEnv PY_DirSrc   ""
+dbini HAVE_PYTHON     FALSE
+dbini HAVE_PY_NUMERIC FALSE
+dbini HAVE_PY_NUMPY   FALSE
+dbini PY_Exe      ""
+dbini PY_Vers     ""
+dbini PY_DirPy    ""
+dbini PY_DirDst   ""
+dbini PY_DirSrc   ""
+dbini PY_CC       ""
+dbini PY_Cfg      ""
+dbini PY_Inc      ""
+dbini PY_Path     ""
 
-SafeEnv PY_CC       ""
-SafeEnv PY_Cfg      ""
-SafeEnv PY_Inc      ""
-SafeEnv PY_Path     ""
+#SafeEnv HAVE_PYTHON     FALSE
+#SafeEnv HAVE_PY_NUMERIC FALSE
+#SafeEnv HAVE_PY_NUMPY   FALSE
+#SafeEnv PY_Exe      ""
+#SafeEnv PY_Vers     ""
+#SafeEnv PY_DirPy    ""
+#SafeEnv PY_DirDst   ""
+#SafeEnv PY_DirSrc   ""
+#SafeEnv PY_CC       ""
+#SafeEnv PY_Cfg      ""
+#SafeEnv PY_Inc      ""
+#SafeEnv PY_Path     ""
 
 # if there is no python directory no need to look further
 if (-d ../../python) then
@@ -68,7 +80,7 @@ if (-d ../../python) then
             set pyv = `$PY_Exe -V |& awk '{ print $2 }'`
             if ($#pyv > 2) continue
 
-            flog $ALog setenv HavePython TRUE
+            flog $ALog setenv HAVE_PYTHON TRUE
             setenv PY_CC  `$PY_Exe ../../python/python-cc.py |& awk '{ print $1 }'`
             setenv PY_Inc `$PY_Exe ../../python/python-inc-dir.py`
             setenv PY_Lib `echo $PY_Inc | sed 's/include/lib/'`
@@ -81,24 +93,24 @@ if (-d ../../python) then
 
             if (-d $PY_Inc/Numeric) then
                NoteD $ALog "      has numeric extensions"
-               flog $ALog setenv HavePythonNumeric TRUE
+               flog $ALog setenv HAVE_PY_NUMERIC TRUE
             else
-               flog $ALog setenv HavePythonNumeric FALSE
+               flog $ALog setenv HAVE_PY_NUMERIC FALSE
             endif
             if ((-d $PY_Lib/site-packages/NumPy) || (-d $PY_Lib/site-packages/numpy) || \
                 (-d $PY_Lib/dist-packages/NumPy) || (-d $PY_Lib/dist-packages/numpy) || \
                 (-d $PY_Inc/numpy)) then
                NoteD $ALog "      has numpy extensions"
-               flog $ALog setenv HavePythonNumpy TRUE
+               flog $ALog setenv HAVE_PY_NUMPY TRUE
             else
-               flog $ALog setenv HavePythonNumpy FALSE
+               flog $ALog setenv HAVE_PY_NUMPY FALSE
             endif
 
-            if (($HavePythonNumeric == FALSE) && ($HavePythonNumpy == FALSE)) then
+            if (($HAVE_PY_NUMERIC == FALSE) && ($HAVE_PY_NUMPY == FALSE)) then
                NoteD $ALog "      does not have numeric extensions"
 # NOTE: if we can build sensibly without any numeric extensions delete these
                flog $ALog setenv PY_Exe "no-numeric"
-               flog $ALog setenv HavePython FALSE
+               flog $ALog setenv HAVE_PYTHON FALSE
             endif
 
             if ((($HostOS == "Linux") || ($HostOS == "Darwin") || ($HostOS == "FreeBSD")) && ($PY_CC == cc)) then
@@ -111,13 +123,13 @@ if (-d ../../python) then
                Note $ALog "PCVer = |$PCVer|"
                if ("$CCVer" != "$PCVer") then
                   flog $ALog setenv PY_Exe "wrong-cc"
-                  flog $ALog setenv HavePython FALSE
+                  flog $ALog setenv HAVE_PYTHON FALSE
                endif      
             else if ($PY_CC != $CC_Exe) then
                Note $ALog "PY_CC   = |$PY_CC|"
                Note $ALog "CC_Exe = |$CC_Exe|"
                flog $ALog setenv PY_Exe "wrong-cc"
-               flog $ALog setenv HavePython FALSE
+               flog $ALog setenv HAVE_PYTHON FALSE
             endif
             flog $ALog setenv PY_Path $i
             flog $ALog set found = TRUE
@@ -128,9 +140,9 @@ if (-d ../../python) then
 
    if ($found == FALSE) then
       NoteD $ALog "none recognizable"
-      flog $ALog setenv HavePython        FALSE
-      flog $ALog setenv HavePythonNumeric FALSE
-      flog $ALog setenv HavePythonNumpy   FALSE
+      flog $ALog setenv HAVE_PYTHON     FALSE
+      flog $ALog setenv HAVE_PY_NUMERIC FALSE
+      flog $ALog setenv HAVE_PY_NUMPY   FALSE
       flog $ALog setenv PY_Path ""
       flog $ALog setenv PY_Exe ""
       flog $ALog setenv PY_CC ""
@@ -143,10 +155,10 @@ if (-d ../../python) then
    endif
 
    if ($BuildSharedLibs == FALSE) then
-      flog $ALog setenv HavePython FALSE
+      flog $ALog setenv HAVE_PYTHON FALSE
    endif
 
-   if ($HavePython == TRUE) then
+   if ($HAVE_PYTHON == TRUE) then
       if (`expr "$lPY_Vers" : '.*\..*\..*'` > 0) then
          set lPY_Vers = $lPY_Vers:r
       endif
@@ -172,18 +184,31 @@ if (-d ../../python) then
 endif
 
 # export the results
-SetParent HavePython
-SetParent HavePythonNumeric
-SetParent HavePythonNumpy
-SetParent PY_Path
-SetParent PY_Exe
-SetParent PY_CC
-SetParent PY_Cfg
-SetParent PY_DirSrc
-SetParent PY_DirDst
-SetParent PY_DirPy
-SetParent PY_Inc
-SetParent PY_Vers
+dbexp HAVE_PYTHON
+dbexp HAVE_PY_NUMERIC
+dbexp HAVE_PY_NUMPY
+dbexp PY_Path
+dbexp PY_Exe
+dbexp PY_CC
+dbexp PY_Cfg
+dbexp PY_DirSrc
+dbexp PY_DirDst
+dbexp PY_DirPy
+dbexp PY_Inc
+dbexp PY_Vers
+
+#SetParent HAVE_PYTHON
+#SetParent HAVE_PY_NUMERIC
+#SetParent HAVE_PY_NUMPY
+#SetParent PY_Path
+#SetParent PY_Exe
+#SetParent PY_CC
+#SetParent PY_Cfg
+#SetParent PY_DirSrc
+#SetParent PY_DirDst
+#SetParent PY_DirPy
+#SetParent PY_Inc
+#SetParent PY_Vers
 
 exit(0)
 

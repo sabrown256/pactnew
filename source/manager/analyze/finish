@@ -49,8 +49,10 @@ if ("$Cfe_CC_Inc" == "$RootInc") then
    flog $ALog setenv Cfe_CC_Inc ""
 endif
 
+# NOTE: compilers look at /usr/include by default not
+# necessarily $RootInc
 dbini MDG_Inc ""
-if ("$MDG_Inc" == "-I$RootInc") then
+if ("$MDG_Inc" == "-I/usr/include") then
    flog $ALog setenv MDG_Inc ""
 endif
 dbexp MDG_Inc

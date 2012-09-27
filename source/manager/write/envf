@@ -22,6 +22,7 @@ source $ldir/env-csh
 
 set vl = ""
 set vl = ( $vl HAVE_OPENMP HAVE_READLINE )
+set vl = ( $vl HAVE_PYTHON PY_Vers )
 
 source $MngDir/write/import-db
 
@@ -105,8 +106,8 @@ source $MngDir/write/import-db
     Note $EnvDk 'dk_alter MANPATH '$SysDir'/man'
     Note $EnvDk ""
 
-    if ($?HavePython) then
-       if ($HavePython == TRUE) then
+    if ($?HAVE_PYTHON) then
+       if ($HAVE_PYTHON == TRUE) then
           set lPython = $LibDir/python$PY_Vers
           if ($?PYTHONPATH) then
              if (`expr "$PYTHONPATH" : '.*'$lPython'.*'` == 0) then

@@ -1424,12 +1424,12 @@ static void setup_output_env(client *cl, char *base)
     dbset(cl, "SchDir",  st.dir.sch);
     dbset(cl, "CfgDir",  st.dir.cfg);
 
-    rv = dbget(cl, TRUE, "HavePython");
+    rv = dbget(cl, TRUE, "HAVE_PYTHON");
     if (IS_NULL(rv) == FALSE)
        {if (strcmp(rv, "FALSE") == 0)
-	   dbset(cl, "HavePython", "FALSE");
+	   dbset(cl, "HAVE_PYTHON", "FALSE");
 	else
-	   dbset(cl, "HavePython",  "TRUE");};
+	   dbset(cl, "HAVE_PYTHON",  "TRUE");};
 
     dbset(cl, "Load",        st.loadp ? "TRUE" : "FALSE");
     dbset(cl, "NoExe",       st.exep ? "TRUE" : "FALSE");

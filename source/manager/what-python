@@ -17,15 +17,15 @@
 #
 
 set HostOS = ( `uname -s` )
-set HavePython        = FALSE
-set HavePythonNumeric = FALSE
-set HavePythonNumpy   = FALSE
-set PY_Exe            = ""
-set PY_Vers           = ""
-set PY_CC             = ""
-set PY_Cfg            = ""
-set PY_Inc            = ""
-set PY_Path           = ""
+set HAVE_PYTHON     = FALSE
+set HAVE_PY_NUMERIC = FALSE
+set HAVE_PY_NUMPY   = FALSE
+set PY_Exe          = ""
+set PY_Vers         = ""
+set PY_CC           = ""
+set PY_Cfg          = ""
+set PY_Inc          = ""
+set PY_Path         = ""
 
 while ($#argv > 0)
    switch ($1)
@@ -57,7 +57,7 @@ end
             set pyv = `$PY_Exe -V |& awk '{ print $2 }'`
             if ($#pyv > 2) continue
 
-            set HavePython = TRUE
+            set HAVE_PYTHON = TRUE
             set PY_CC  = `$PY_Exe ../python/python-cc.py |& awk '{ print $1 }'`
             set PY_Inc = `$PY_Exe ../python/python-inc-dir.py`
             set PY_Cfg = `$PY_Exe ../python/python-cfg-dir.py`
@@ -70,14 +70,14 @@ end
             set PY_Lib = `echo $PY_Inc | sed 's/include/lib/'`
             if (-d $PY_Inc/Numeric) then
                echo "      has numeric extensions"
-               set HavePythonNumeric = TRUE
+               set HAVE_PY_NUMERIC = TRUE
             endif
             if ((-d $PY_Lib/site-packages/NumPy) || (-d $PY_Lib/site-packages/numpy) || \
                 (-d $PY_Lib/dist-packages/NumPy) || (-d $PY_Lib/dist-packages/numpy)) then
                echo "      has numpy extensions"
-               set HavePythonNumpy = TRUE
+               set HAVE_PY_NUMPY = TRUE
             endif
-            if (($HavePythonNumeric == FALSE) && ($HavePythonNumpy == FALSE)) then
+            if (($HAVE_PY_NUMERIC == FALSE) && ($HAVE_PY_NUMPY == FALSE)) then
                echo "      does not have numeric extensions"
             endif
 
@@ -90,20 +90,20 @@ end
 
    if ($found == FALSE) then
       echo "none recognizable"
-      set HavePython        = FALSE
-      set HavePythonNumeric = FALSE
-      set HavePythonNumpy   = FALSE
-      set PY_Path           = ""
-      set PY_Exe            = ""
-      set PY_CC             = ""
-      set PY_Cfg            = ""
-      set PY_Inc            = ""
-      set PY_Vers           = ""
+      set HAVE_PYTHON     = FALSE
+      set HAVE_PY_NUMERIC = FALSE
+      set HAVE_PY_NUMPY   = FALSE
+      set PY_Path         = ""
+      set PY_Exe          = ""
+      set PY_CC           = ""
+      set PY_Cfg          = ""
+      set PY_Inc          = ""
+      set PY_Vers         = ""
    endif
 
    set lbase = /usr/local/apps/pact
 
-   if ($HavePython == TRUE) then
+   if ($HAVE_PYTHON == TRUE) then
       if (`expr "$lPyVers" : '.*\..*\..*'` > 0) then
          set lPyVers = $lPyVers:r
       endif
@@ -119,15 +119,15 @@ end
    endif
 
 # export the results
-echo "HavePython        = $HavePython"
-echo "HavePythonNumeric = $HavePythonNumeric"
-echo "HavePythonNumpy   = $HavePythonNumpy"
-echo "PY_Path           = $PY_Path"
-echo "PY_Exe            = $PY_Exe"
-echo "PY_CC             = $PY_CC"
-echo "PY_Cfg            = $PY_Cfg"
-echo "PY_Inc            = $PY_Inc"
-echo "PY_Vers           = $PY_Vers"
+echo "HAVE_PYTHON     = $HAVE_PYTHON"
+echo "HAVE_PY_NUMERIC = $HAVE_PY_NUMERIC"
+echo "HAVE_PY_NUMPY   = $HAVE_PY_NUMPY"
+echo "PY_Path         = $PY_Path"
+echo "PY_Exe          = $PY_Exe"
+echo "PY_CC           = $PY_CC"
+echo "PY_Cfg          = $PY_Cfg"
+echo "PY_Inc          = $PY_Inc"
+echo "PY_Vers         = $PY_Vers"
 
 exit(0)
 

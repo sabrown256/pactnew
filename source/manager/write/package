@@ -28,7 +28,7 @@ Note $Log ""
 
 set vl = ""
 set vl = ( $vl EtcDir HAVE_FORTRAN )
-set vl = ( $vl HavePython HavePythonNumpy HavePythonNumeric )
+set vl = ( $vl HAVE_PYTHON HAVE_PY_NUMPY HAVE_PY_NUMERIC )
 
 source $MngDir/write/import-db
 
@@ -45,11 +45,11 @@ source $MngDir/write/import-db
 # must have one package per line because dmake needs it that way
     foreach i ($Pkgs)
        if ($i == python) then
-          if (($HavePython == TRUE) && ($HavePythonNumpy == TRUE)) then
+          if (($HAVE_PYTHON == TRUE) && ($HAVE_PY_NUMPY == TRUE)) then
              echo "$i" >>& $STDOUT
           endif
        else if ($i == pya) then
-          if (($HavePython == TRUE) && ($HavePythonNumeric == TRUE)) then
+          if (($HAVE_PYTHON == TRUE) && ($HAVE_PY_NUMERIC == TRUE)) then
              echo "$i" >>& $STDOUT
           endif
        else if ($i == fortran) then
