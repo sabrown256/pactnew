@@ -18,14 +18,16 @@ if ($?Log == 1) then
 endif
 
 dbini MD_Pck          ""
+dbini HAVE_OPENMPI    FALSE
+dbini HAVE_MPI_2      FALSE
 #SafeEnv MD_Pck          ""
+#SafeEnv HAVE_OPENMPI    FALSE
+#SafeEnv HAVE_MPI_2      FALSE
 
 SafeEnv REQUEST_MPI     FALSE
 SafeEnv ParCommSupport  PARC
 SafeEnv MPIGoodIO       FALSE
 SafeEnv MPIAllStdin     FALSE
-SafeEnv HAVE_OPENMPI    FALSE
-SafeEnv HAVE_MPI_2      FALSE
 SafeEnv DP_Inc          ""
 SafeEnv DP_Lib          ""
 SafeEnv DP_RPath        ""
@@ -237,13 +239,15 @@ flog $ALog setenv ParComm "$lParComm"
 
 # export the results
 dbexp MD_Pck
+dbexp HAVE_OPENMPI
+dbexp HAVE_MPI_2
 #SetParent MD_Pck
+#SetParent HAVE_OPENMPI
+#SetParent HAVE_MPI_2
 
 SetParent ParCommSupport
 SetParent MPIAllStdin
 SetParent MPIGoodIO
-SetParent HAVE_OPENMPI
-SetParent HAVE_MPI_2
 SetParent DP_Inc
 SetParent DP_Lib
 SetParent DP_RPath

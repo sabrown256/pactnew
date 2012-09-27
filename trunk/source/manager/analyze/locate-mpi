@@ -242,7 +242,9 @@ if ($?DP_Path == 1) then
 
    unset rlib
 
-   SetParent HAVE_OPENMPI
+   dbexp HAVE_OPENMPI
+#   SetParent HAVE_OPENMPI
+
    SetParent DP_Inc
    SetParent DP_Lib
    SetParent DP_RPath

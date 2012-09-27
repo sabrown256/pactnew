@@ -73,7 +73,8 @@ else
 endif
 
 # export the results
-SetParent HAVE_MMAP
+dbexp HAVE_MMAP
+#SetParent HAVE_MMAP
 
 exit(0)
 

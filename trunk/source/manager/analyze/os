@@ -69,8 +69,10 @@ NoteD $ALog " ($OSType)"
 
 setenv OSType USE_$OSType
 
+dbexp OSType
+#SetParent OSType
+
 SetParent HostOS
-SetParent OSType
 SetParent MACRev
 
 exit(0)

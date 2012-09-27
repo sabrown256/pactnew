@@ -20,6 +20,11 @@ set ldir = $SrcDir:h/scripts
 set path = ( $ldir $path )
 source $ldir/env-csh
 
+set vl = ""
+set vl = ( $vl HAVE_OPENMP HAVE_READLINE )
+
+source $MngDir/write/import-db
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
@@ -27,9 +32,9 @@ source $ldir/env-csh
 
     Separator $Log
     if ($lnotice == TRUE) then
-       NoteD $Log "   Environment setup files - env-pact.csh, env-pact.sh, and env-pact.dk"
+       NoteD $Log "   Environment setup files - env-pact"
     else
-       Note $Log "   Environment setup files - env-pact.csh, env-pact.sh, and env-pact.dk"
+       Note $Log "   Environment setup files - env-pact"
     endif
     Note $Log " "
 

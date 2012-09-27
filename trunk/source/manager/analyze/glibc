@@ -11,7 +11,8 @@
 set Me = $0
 source $Me:h/common
 
-SafeEnv HAVE_GNU_LIBC_6 FALSE
+dbini HAVE_GNU_LIBC_6 FALSE
+#SafeEnv HAVE_GNU_LIBC_6 FALSE
 
 setenv GLIBC_VERSION ""
 
@@ -62,8 +63,10 @@ else
    NoteD $ALog "      no GCC found on this system"
 endif
 
+dbexp HAVE_GNU_LIBC_6
+#SetParent HAVE_GNU_LIBC_6
+
 SetParent GLIBC_VERSION
-SetParent HAVE_GNU_LIBC_6
 
 #exit(0)
 

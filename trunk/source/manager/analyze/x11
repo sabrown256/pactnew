@@ -125,7 +125,7 @@ EOF
    if (("$PckLib" != "") && ("$PckInc" != "") && ($?IBM_BGL == 0)) then
       NoteD $ALog "      has X11 ($PckLib)"
 
-      setenv HAVE_SOCKETS_P   Envir
+#      setenv HAVE_SOCKETS   Envir
       setenv GSYS             "X"
       setenv GraphicsDevices  "$GraphicsDevices X"
       setenv GraphicsFlag     "$GraphicsFlag -DX11"

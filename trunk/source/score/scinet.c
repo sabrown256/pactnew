@@ -28,7 +28,7 @@ struct s_tcp_loop
 void dsocket(int s)
    {
 
-#ifdef HAVE_SOCKETS_P
+#ifdef HAVE_SOCKETS
 
     int ok;
     socklen_t iv, nb;

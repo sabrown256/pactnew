@@ -1,7 +1,7 @@
 #!/bin/csh -f
 #
 # POLL - analyze the handling of poll or select
-#      - Computes: HAVE_STREAMS_P HAVE_SELECT_P
+#      - Computes: HAVE_STREAMS, HAVE_SELECT
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -15,8 +15,13 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: poll"
 
-SafeEnv HAVE_SELECT_P   FALSE
-SafeEnv HAVE_STREAMS_P  FALSE
+dbini HAVE_SELECT   FALSE
+dbini HAVE_STREAMS  FALSE
+#SafeEnv HAVE_SELECT   FALSE
+#SafeEnv HAVE_STREAMS  FALSE
+
+dbget HAVE_SELECT
+dbget HAVE_STREAMS
 
 set poll = ""
 
@@ -93,31 +98,31 @@ else
 endif
 
 # make the decisions
-if ($HAVE_SELECT_P == File) then
+if ($HAVE_SELECT == File) then
    if ($FOUND_SELECT == FALSE) then
       NoteD $ALog "   select requested but not found"
    else
       set FOUND_POLL = FALSE
    endif
 endif
-setenv HAVE_SELECT_P $FOUND_SELECT
+setenv HAVE_SELECT $FOUND_SELECT
 
-if ($HAVE_STREAMS_P == File) then
+if ($HAVE_STREAMS == File) then
    if ($FOUND_POLL == FALSE) then
       NoteD $ALog "   poll requested but not found"
    else
       set FOUND_SELECT = FALSE
    endif
 endif
-setenv HAVE_STREAMS_P $FOUND_POLL
+setenv HAVE_STREAMS $FOUND_POLL
 
-if (($HAVE_SELECT_P == TRUE) && ($HAVE_STREAMS_P == TRUE)) then
-   setenv HAVE_SELECT_P FALSE
+if (($HAVE_SELECT == TRUE) && ($HAVE_STREAMS == TRUE)) then
+   setenv HAVE_SELECT FALSE
    NoteD $ALog -n " (using poll)"
 else if ($#IOHandling > 1) then
-   if ($HAVE_STREAMS_P == TRUE) then
+   if ($HAVE_STREAMS == TRUE) then
       NoteD $ALog -n " (using poll)"
-   else if ($HAVE_SELECT_P == TRUE) then
+   else if ($HAVE_SELECT == TRUE) then
       NoteD $ALog -n " (using select)"
    endif
 endif
@@ -125,8 +130,10 @@ endif
 NoteD $ALog ""
 
 # export the results
-SetParent HAVE_STREAMS_P
-SetParent HAVE_SELECT_P
+dbexp HAVE_STREAMS
+dbexp HAVE_SELECT
+#SetParent HAVE_STREAMS
+#SetParent HAVE_SELECT
 
 exit(0)
 

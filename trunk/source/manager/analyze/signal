@@ -14,7 +14,8 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: signal"
 
-SafeEnv HAVE_POSIX_SIGNALS    FALSE
+dbini HAVE_POSIX_SIGNALS    FALSE
+#SafeEnv HAVE_POSIX_SIGNALS    FALSE
 
 set sig = ""
 
@@ -98,7 +99,8 @@ else
 endif
 
 # export the results
-SetParent HAVE_POSIX_SIGNALS
+dbexp HAVE_POSIX_SIGNALS
+#SetParent HAVE_POSIX_SIGNALS
 
 exit(0)
 
