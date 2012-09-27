@@ -42,7 +42,8 @@ else
    NoteD $ALog "      has working fork/exec"
 endif
 
-SetParent HAVE_FORK_EXEC
+dbexp HAVE_FORK_EXEC
+#SetParent HAVE_FORK_EXEC
 
 exit(0)
 

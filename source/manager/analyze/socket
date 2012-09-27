@@ -17,7 +17,8 @@ Note $Log "Analyze: socket"
 NoteD $ALog -n "      getsockopt type: "
 Note $ALog ""
 
-SafeEnv HAVE_SOCKETS_P    TRUE
+dbini HAVE_SOCKETS    TRUE
+#SafeEnv HAVE_SOCKETS    TRUE
 
 cat << EOF >! $Tmp.c
 #include <sys/socket.h>
@@ -43,7 +44,9 @@ NoteD $ALog $GETSOCKOPT_TYPE
 flog $ALog rm -f $Tmp.c $Tmp
 
 # export the results
-SetParent HAVE_SOCKETS_P
+dbexp HAVE_SOCKETS
+#SetParent HAVE_SOCKETS
+
 SetParent GETSOCKOPT_TYPE
 
 exit(0)

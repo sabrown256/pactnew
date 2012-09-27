@@ -21,7 +21,7 @@
 /*--------------------------------------------------------------------------*/
 
 #if defined(AIX)
-# ifdef HAVE_SELECT_P
+# ifdef HAVE_SELECT
 #  include <sys/select.h>
 # endif
 # define BAD_FLUSH_SEMANTICS
@@ -71,7 +71,7 @@
 typedef int socklen_t;
 #endif
 
-#ifdef HAVE_STREAMS_P
+#ifdef HAVE_STREAMS
 # ifdef HAVE_ASYNC_STREAMS
 #  include <stropts.h>
 # endif
@@ -79,7 +79,7 @@ typedef int socklen_t;
 # define SC_SIGIO SIGPOLL
 #endif
 
-#ifdef HAVE_SELECT_P
+#ifdef HAVE_SELECT
 # undef KERNEL
 # ifndef SC_SIGIO
 #  define SC_SIGIO SIGIO

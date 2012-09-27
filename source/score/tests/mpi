@@ -13,10 +13,6 @@ source ../../tests/common
 set msg = "SCORE MPI Test ................"
 set exe = $BinDir/sctty
 
-if ($HAVE_READLINE == TRUE) then
-   setenv TEST_ADVISORY "score_mpi_wrap"
-endif
-
    NoteD $Log ""
    NoteD $Log "                    $msg"
 

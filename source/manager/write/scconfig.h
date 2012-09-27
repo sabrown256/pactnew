@@ -44,7 +44,7 @@ set vl = ( $vl Sys TRACKERExe )
 set vl = ( $vl MYSQL_SO SQLITE3_SO HDF5_SO )
 set vl = ( $vl BadLineDirectives )
 set vl = ( $vl BUILD_DEBUG BUILD_OPTIMIZE BUILD_PROFILE )
-set vl = ( $vl HaveINLINE HAVE_OPENMP HAVE_OPENMPI HAVE_SOCKETS_P )
+set vl = ( $vl HaveINLINE HAVE_OPENMP HAVE_OPENMPI HAVE_SOCKETS )
 set vl = ( $vl HaveTRACKER )
 set vl = ( $vl HaveFLOAT16 HaveCOMPLEX )
 set vl = ( $vl HaveANSIFenv HaveGNUFenv )
@@ -57,7 +57,7 @@ set vl = ( $vl HAVE_JPEGLIB HAVE_PNGLIB )
 set vl = ( $vl HAVE_FORK_EXEC HAVE_GETHOSTBYNAME HAVE_RESOURCE_USAGE )
 set vl = ( $vl HAVE_GETPWUID HAVE_MMAP HAVE_VSNPRINTF )
 set vl = ( $vl HAVE_ASYNC_STREAMS HAVE_POSIX_SIGNALS )
-set vl = ( $vl HAVE_STREAMS_P HAVE_SELECT_P HAVE_UNIX98_PTY )
+set vl = ( $vl HAVE_STREAMS HAVE_SELECT HAVE_UNIX98_PTY )
 set vl = ( $vl HAVE_POSIX_STRERROR HAVE_GNU_STRERROR )
 set vl = ( $vl HAVE_GNU_LIBC_6 )
 set vl = ( $vl HAVE_DYNAMIC_LINKER HAVE_BFD HAVE_DEMANGLE )
@@ -178,8 +178,8 @@ source $MngDir/write/import-db
     set lhave = ( $lhave HAVE_GETPWUID       none )
     set lhave = ( $lhave HAVE_ASYNC_STREAMS  none )
     set lhave = ( $lhave HAVE_POSIX_SIGNALS  USE_POSIX_SIGNALS )
-    set lhave = ( $lhave HAVE_STREAMS_P      none )
-    set lhave = ( $lhave HAVE_SELECT_P       none )
+    set lhave = ( $lhave HAVE_STREAMS        none )
+    set lhave = ( $lhave HAVE_SELECT         none )
     set lhave = ( $lhave HAVE_UNIX98_PTY     none )
     set lhave = ( $lhave HAVE_MMAP           none )
     set lhave = ( $lhave BadLineDirectives   HAVE_BAD_LINE_DIRECTIVES )
@@ -261,9 +261,9 @@ source $MngDir/write/import-db
     if ($IPCSupport != "NOIPC") then
        flog $Log $RM $IncDir/noipc
        Note $STDOUT "#define HAVE_PROCESS_CONTROL"
-       if ($HAVE_SOCKETS_P != "FALSE") then
+       if ($HAVE_SOCKETS != "FALSE") then
           set sty = ( `echo $GETSOCKOPT_TYPE | sed 's|\"||g'` )
-          Note $STDOUT "#define HAVE_SOCKETS_P"
+          Note $STDOUT "#define HAVE_SOCKETS"
           Note $STDOUT "typedef $sty SOCKOPT_T;"
        endif
     else
@@ -328,7 +328,6 @@ source $MngDir/write/import-db
     endif
 
 # OS defines
-    SafeEnv OSType "HAVE_SYSV"
     if ("$OSType" == USE_MSW) then
        Note $STDOUT "#undef $HostOS"
        Note $STDOUT "#define $HostOS"

@@ -875,16 +875,16 @@ HAVE_NO_RUSAGE
 HAVE_NO_SIGFPE
    Indicate the absence of the floating point exception handler package.
 
-HAVE_SELECT_P
+HAVE_SELECT
    Indicate the presence of a working "select" system call iff there is
    no working STREAMS package available.
    PACT-ANALYZE detects this for you.
 
-HAVE_SOCKETS_P
+HAVE_SOCKETS
    Indicate the presence of a working socket library. Default is off.
    If you have X windows you have this.
 
-HAVE_STREAMS_P
+HAVE_STREAMS
    Indicate the presence of a working STREAMS package. Default is off.
    PACT-ANALYZE detects this for you.
 

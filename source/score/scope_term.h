@@ -34,7 +34,7 @@
 
 /*--------------------------------------------------------------------------*/
 
-#ifndef HAVE_STREAMS_P
+#ifndef HAVE_STREAMS
 # ifndef POLLIN
 #  define POLLIN    0x0001
 # endif

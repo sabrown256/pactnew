@@ -424,7 +424,7 @@
 
 /*--------------------------------------------------------------------------*/
 
-#define HAVE_STREAMS_P
+#define HAVE_STREAMS
 
 #define JMP_BUF            jmp_buf
 #define SETJMP(_x)         setjmp(_x)

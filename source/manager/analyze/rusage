@@ -38,7 +38,8 @@ else
    NoteD $ALog "      has resource usage"
 endif
 
-SetParent HAVE_RESOURCE_USAGE
+dbexp HAVE_RESOURCE_USAGE
+#SetParent HAVE_RESOURCE_USAGE
 
 exit(0)
 

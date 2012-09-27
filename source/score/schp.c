@@ -369,7 +369,7 @@ PROCESS *SC_mk_process(char **argv, char *mode, int type, int iex)
 void _SC_fixup_socket(int s)
    {
 
-# ifdef HAVE_SOCKETS_P
+# ifdef HAVE_SOCKETS
     int ok, nb, iv;
 
     iv = 0;
@@ -501,7 +501,7 @@ static int _SC_init_ipc(PROCESS *pp, PROCESS *cp)
 
               break;
 
-# ifdef HAVE_SOCKETS_P
+# ifdef HAVE_SOCKETS
 
         case USE_SOCKETS :
              {int ports[2];

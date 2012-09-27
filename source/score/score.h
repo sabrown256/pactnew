@@ -528,7 +528,7 @@ struct s_SC_message
  * differences between various multiplex I/O functionalities
  */
 
-#ifndef HAVE_STREAMS_P
+#ifndef HAVE_STREAMS
 
 # if !defined(SOLARIS) && !defined(MSW)
 
@@ -964,7 +964,7 @@ extern int
  SC_replace_reject(PROCESS *pp, PFFileCallback rej),
  SC_poll_descriptors(int to);
 
-#ifndef HAVE_STREAMS_P
+#ifndef HAVE_STREAMS
 
 extern int
  SC_poll(SC_poll_desc *fds, long nfds, int timeout);

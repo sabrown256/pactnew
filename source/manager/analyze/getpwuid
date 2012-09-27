@@ -38,7 +38,8 @@ if ($HAVE_GETPWUID == FALSE) then
    NoteD $ALog "      no getpwuid"
 endif
 
-SetParent HAVE_GETPWUID
+dbexp HAVE_GETPWUID
+#SetParent HAVE_GETPWUID
 
 exit(0)
 

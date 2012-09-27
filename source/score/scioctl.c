@@ -548,7 +548,7 @@ int SC_process_event_loop(PROCESS *pp, void *a,
 
 /*--------------------------------------------------------------------------*/
 
-#ifdef HAVE_STREAMS_P
+#ifdef HAVE_STREAMS
 
 /* SC_SET_FD_ASYNC_STREAMS - setup asynchronous I/O when using STREAMS */
 
@@ -684,7 +684,7 @@ int SC_set_fd_async(int fd, int state, int pid)
 
 #ifdef HAVE_POSIX_SYS
 
-# ifdef HAVE_STREAMS_P
+# ifdef HAVE_STREAMS
 
        rv = SC_set_fd_async_streams(fd, state);
 
@@ -1227,9 +1227,9 @@ int SC_poll_descriptors(int to)
 
 /*--------------------------------------------------------------------------*/
 
-#ifndef HAVE_STREAMS_P
+#ifndef HAVE_STREAMS
 
-#ifdef HAVE_SELECT_P
+#ifdef HAVE_SELECT
 
 /*--------------------------------------------------------------------------*/
 

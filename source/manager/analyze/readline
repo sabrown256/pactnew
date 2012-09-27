@@ -22,6 +22,7 @@ dbini RL_Inc    ""
 dbini RL_Lib    ""
 dbini RL_RPath  /usr/${LIB}
 dbini RL_Path   /usr
+dbini HAVE_READLINE   FALSE
 #SafeEnv MD_Inc     ""
 #SafeEnv MD_Lib     ""
 #SafeEnv MD_Pck     ""
@@ -29,7 +30,6 @@ dbini RL_Path   /usr
 #SafeEnv RL_Lib    ""
 #SafeEnv RL_RPath  /usr/${LIB}
 #SafeEnv RL_Path   /usr
-
 SafeEnv HAVE_READLINE   FALSE
 
 # if we have explicitly said we do not want READLINE
@@ -117,11 +117,11 @@ EOF
 #   SetParent RL_Path
 
    SetParent RPATH
-   SetParent HAVE_READLINE
 
 endif
 
-SetParent HAVE_READLINE
+dbexp HAVE_READLINE
+#SetParent HAVE_READLINE
 
 exit(0)
 

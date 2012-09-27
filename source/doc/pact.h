@@ -1,5 +1,5 @@
 TXT: PACT User's Guide
-MOD: 05/19/2011
+MOD: 09/26/2012
 
 <CENTER>
 <h1><FONT color="#ff0000">PACT User's Guide</FONT></h1>
@@ -1434,20 +1434,20 @@ Default is &#147;w+b&#148;.</UL>
 Don&#146;t set this.</UL>
 
 <P>
-<B>HAVE_SELECT_P</B>
+<B>HAVE_SELECT</B>
 <BR>
 <UL>Indicate the presence of a working &#147;select&#148; system call iff
 there is no working STREAMS package available. PACT-ANALYZE detects this
 for you.</UL>
 
 <P>
-<B>HAVE_SOCKETS_P</B>
+<B>HAVE_SOCKETS</B>
 <BR>
 <UL>Indicate the presence of a working socket library. Default is off.
 If you have X windows you have this.</UL>
 
 <P>
-<B>HAVE_STREAMS_P</B>
+<B>HAVE_STREAMS</B>
 <BR>
 <UL>Indicate the presence of a working STREAMS package. Default is off.
 PACT-ANALYZE detects this for you.</UL>

@@ -46,7 +46,8 @@ if ($HAVE_GETHOSTBYNAME == FALSE) then
    NoteD $ALog "      no gethostbyname"
 endif
 
-SetParent HAVE_GETHOSTBYNAME
+dbexp HAVE_GETHOSTBYNAME
+#SetParent HAVE_GETHOSTBYNAME
 
 exit(0)
 
