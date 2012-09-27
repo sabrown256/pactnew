@@ -11,8 +11,8 @@
 set Me = $0
 source $Me:h/common
 
-setenv HaveVACOPY FALSE
-setenv HaveVALIST TRUE
+setenv HAVE_VA_COPY FALSE
+setenv HAVE_VA_LIST TRUE
 
 cat << EOF >! $Tmp.c
 #include <stdarg.h>
@@ -38,7 +38,7 @@ EOF
 
 flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
 if (($status == 0) && ($?IBM_BGL == 0)) then
-   setenv HaveVACOPY TRUE
+   setenv HAVE_VA_COPY TRUE
    NoteD $ALog "      has va_copy"
 else
 
@@ -57,7 +57,7 @@ EOF
    if ($status == 0) then
       NoteD $ALog "      has complete variable arg list support"
    else
-      setenv HaveVALIST FALSE
+      setenv HAVE_VA_LIST FALSE
       NoteD $ALog "      has partial variable arg list support"
    endif
 endif
@@ -65,7 +65,9 @@ endif
 rm -f $Tmp $Tmp.c $Tmp.o
 
 # export the result
-SetParent HaveVALIST
-SetParent HaveVACOPY
+dbexp HAVE_VA_LIST
+dbexp HAVE_VA_COPY
+#SetParent HAVE_VA_LIST
+#SetParent HAVE_VA_COPY
 
 #exit(0)

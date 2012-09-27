@@ -11,11 +11,12 @@
 set Me = $0
 source $Me:h/common
 
-SafeEnv HaveCOMPLEX TRUE
+dbini HAVE_ANSI_C9X_COMPLEX TRUE
+#SafeEnv HAVE_ANSI_C9X_COMPLEX TRUE
 
-Note $ALog "HaveCOMPLEX = $HaveCOMPLEX"
+Note $ALog "HAVE_ANSI_C9X_COMPLEX = $HAVE_ANSI_C9X_COMPLEX"
 
-if ($HaveCOMPLEX == TRUE) then
+if ($HAVE_ANSI_C9X_COMPLEX == TRUE) then
 
 cat << EOF >! $Tmp.c
 #include <complex.h>
@@ -33,7 +34,7 @@ EOF
    if ($status == 0) then
       NoteD $ALog "      has C99 complex support"
    else
-      setenv HaveCOMPLEX FALSE
+      setenv HAVE_ANSI_C9X_COMPLEX FALSE
       NoteD $ALog "      no C99 complex support"
    endif
 
@@ -43,6 +44,7 @@ else
 endif
 
 # export the result
-SetParent HaveCOMPLEX
+dbexp HAVE_ANSI_C9X_COMPLEX
+#SetParent HAVE_ANSI_C9X_COMPLEX
 
 #exit(0)

@@ -14,8 +14,10 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: tracker"
 
+dbini HAVE_TRACKER ""
+#SafeEnv HAVE_TRACKER ""
+
 SafeEnv TRACKERExe  ""
-SafeEnv HaveTRACKER ""
 
 foreach d ( /usr/apps/tracker $DAS_ROOT/tracker /usr /usr/local )
    if (-d $d) then
@@ -27,7 +29,7 @@ foreach d ( /usr/apps/tracker $DAS_ROOT/tracker /usr /usr/local )
          set inf = ( `$d/bin/tracker |& grep "help screen for more information"` )
          if ("$inf" != "") then
             setenv TRACKERExe $d/bin/tracker
-            setenv HaveTRACKER TRUE
+            setenv HAVE_TRACKER TRUE
             break
          endif
       endif
@@ -35,8 +37,10 @@ foreach d ( /usr/apps/tracker $DAS_ROOT/tracker /usr /usr/local )
 end
 
 # export the results
+dbexp HAVE_TRACKER
+#SetParent HAVE_TRACKER
+
 SetParent TRACKERExe
-SetParent HaveTRACKER
 
 exit(0)
 

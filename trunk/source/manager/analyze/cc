@@ -34,7 +34,6 @@ SafeEnv CC_Flags     ""
 SafeEnv CC_Debug     "-g"
 SafeEnv CC_Optimize  "-O"
 SafeEnv CC_Inc       ""
-#SafeEnv MDG_Inc      ""
 SafeEnv DP_Inc       ""
 
 SafeEnv CXX_Linker    ""
@@ -239,7 +238,7 @@ if ($Cfg_CC_Exe != "") then
 
    Note $ALog "Determine whether a FORTRAN integer can hold a pointer"
 
-   setenv FFIntPtrDiffer ""
+   setenv FC_INT_PTR_DIFFER ""
 
    cat << EOF >! $Tmp.c
 #include <stdio.h>
@@ -253,8 +252,8 @@ EOF
    flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
    if ($status == 0) then
 #      flog $ALog $CFE -v ./$Tmp $BE
-      setenv FFIntPtrDiffer `$CFE ./$Tmp $BE`
-      if ("$FFIntPtrDiffer" != "") then
+      setenv FC_INT_PTR_DIFFER `$CFE ./$Tmp $BE`
+      if ("$FC_INT_PTR_DIFFER" != "") then
          NoteD $ALog "      pointer size differs from Fortran INTEGER size"
       endif
 
@@ -387,7 +386,7 @@ EOF
    Note $ALog "   AnsiCC          = |$AnsiCC|"
    Note $ALog "   CC_Exe          = |$CC_Exe|"
    Note $ALog "   Cfg_CC_Exe      = |$Cfg_CC_Exe|"
-   Note $ALog "   FFIntPtrDiffer  = |$FFIntPtrDiffer|"
+   Note $ALog "   FC_INT_PTR_DIFFER  = |$FC_INT_PTR_DIFFER|"
    Note $ALog "   LONG64          = |$LONG64|"
    Note $ALog ""
 
@@ -412,7 +411,6 @@ SetParent CC_Debug
 SetParent CC_Optimize
 SetParent CC_Inc
 SetParent CC_Linker
-#SetParent MDG_Inc
 SetParent DP_Inc
 
 SetParent CXX_Exe
@@ -431,9 +429,13 @@ SetParent Cfe_CC_Inc
 
 SetParent Save_CC
 SetParent Save_CFLAGS
-SetParent LONG64
-SetParent FFIntPtrDiffer
-SetParent NEED_ALT_LARGE_FILE
+
+dbexp LONG64
+dbexp FC_INT_PTR_DIFFER
+dbexp NEED_ALT_LARGE_FILE
+#SetParent LONG64
+#SetParent FC_INT_PTR_DIFFER
+#SetParent NEED_ALT_LARGE_FILE
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

@@ -11,7 +11,6 @@
 unalias *
 
 # put these in shell variables since
-# prune-env will remove them as environment variables
 set Log    = $1
 set ScrDir = $2
 
@@ -31,10 +30,10 @@ set vl = ""
 set vl = ( $vl Arch BFD_Version BUILD_DEBUG BUILD_OPTIMIZE BUILD_PROFILE )
 set vl = ( $vl CC_Exe CEFile CPU )
 set vl = ( $vl DEFAULT_SHELL DP_Lib DP_Inc )
-set vl = ( $vl FC_ID_CASE FC_ID_UNDERSCORE FFIntPtrDiffer FilterDir FPU )
+set vl = ( $vl FC_ID_CASE FC_ID_UNDERSCORE FC_INT_PTR_DIFFER FilterDir FPU )
 set vl = ( $vl GETSOCKOPT_TYPE )
 set vl = ( $vl HostOS HostOSRel )
-set vl = ( $vl IncDir IPCSupport )
+set vl = ( $vl IncDir IPC_STD )
 set vl = ( $vl Linking LONG64 )
 set vl = ( $vl MACRev MPIAllStdin MPIGoodIO )
 set vl = ( $vl NO_LONG_LONG NEED_ALT_LARGE_FILE )
@@ -43,12 +42,13 @@ set vl = ( $vl OSType )
 set vl = ( $vl Sys TRACKERExe )
 set vl = ( $vl MYSQL_SO SQLITE3_SO HDF5_SO )
 set vl = ( $vl BadLineDirectives )
-set vl = ( $vl BUILD_DEBUG BUILD_OPTIMIZE BUILD_PROFILE )
-set vl = ( $vl HaveINLINE HAVE_OPENMP HAVE_OPENMPI HAVE_SOCKETS )
-set vl = ( $vl HaveTRACKER )
-set vl = ( $vl HaveFLOAT16 HaveCOMPLEX )
+dbexp vl = ( $vl BUILD_DEBUG BUILD_OPTIMIZE BUILD_PROFILE )
+#set vl = ( $vl BUILD_DEBUG BUILD_OPTIMIZE BUILD_PROFILE )
+set vl = ( $vl HAVE_INLINE HAVE_OPENMP HAVE_OPENMPI HAVE_SOCKETS )
+set vl = ( $vl HAVE_TRACKER )
+set vl = ( $vl HAVE_ANSI_FLOAT16 HAVE_ANSI_C9X_COMPLEX )
 set vl = ( $vl HaveANSIFenv HaveGNUFenv )
-set vl = ( $vl HaveVACOPY HaveVALIST )
+set vl = ( $vl HAVE_VA_COPY HAVE_VA_LIST )
 set vl = ( $vl HAVE_PYTHON HAVE_PY_NUMERIC HAVE_PY_NUMPY )
 set vl = ( $vl HAVE_FLEX_SCANNER )
 set vl = ( $vl HAVE_READLINE )
@@ -125,7 +125,7 @@ source $MngDir/write/import-db
     Note $STDOUT "#undef SIGNED"
     Note $STDOUT "#define SIGNED signed"
     Note $STDOUT "#undef INLINE"
-    if ($HaveINLINE == TRUE) then
+    if ($HAVE_INLINE == TRUE) then
        Note $STDOUT "#define INLINE inline"
     else
        Note $STDOUT "#define INLINE"
@@ -139,8 +139,8 @@ source $MngDir/write/import-db
        Note $STDOUT "#define LONG64"
     endif
 
-    if ("$FFIntPtrDiffer" != "") then
-       Note $STDOUT "#define $FFIntPtrDiffer"
+    if ("$FC_INT_PTR_DIFFER" != "") then
+       Note $STDOUT "#define $FC_INT_PTR_DIFFER"
     endif
 
     if (-e $IncDir/Finteger.bytes) then
@@ -152,48 +152,48 @@ source $MngDir/write/import-db
 
 # emit the HAVE/USE flags - no value
     set lhave = ""
-    set lhave = ( $lhave HaveFLOAT16         HAVE_ANSI_FLOAT16 )
-    set lhave = ( $lhave HaveCOMPLEX         HAVE_ANSI_C9X_COMPLEX )
-    set lhave = ( $lhave HaveANSIFenv        HAVE_ANSI_C9X_FENV )
-    set lhave = ( $lhave HaveGNUFenv         HAVE_GNU_FENV )
-    set lhave = ( $lhave HaveVACOPY          HAVE_VA_COPY )
-    set lhave = ( $lhave HAVE_PYTHON         none )
-    set lhave = ( $lhave HAVE_PY_NUMERIC     none )
-    set lhave = ( $lhave HAVE_PY_NUMPY       none )
-    set lhave = ( $lhave HAVE_FLEX_SCANNER   USE_FLEX )
-    set lhave = ( $lhave HAVE_READLINE       none )
-    set lhave = ( $lhave HAVE_HDF5           none )
-    set lhave = ( $lhave HAVE_SQL            none )
-    set lhave = ( $lhave HAVE_MYSQL          none )
-    set lhave = ( $lhave HAVE_SQLITE         none )
-    set lhave = ( $lhave HAVE_SQLITE_V2      none )
-    set lhave = ( $lhave Std_UseX            HAVE_X11 )
-    set lhave = ( $lhave Std_UseOGL          HAVE_OGL )
-    set lhave = ( $lhave Std_UseQD           HAVE_QUICKDRAW )
-    set lhave = ( $lhave HAVE_JPEGLIB        none )
-    set lhave = ( $lhave HAVE_PNGLIB         none )
-    set lhave = ( $lhave HAVE_FORK_EXEC      none )
-    set lhave = ( $lhave HAVE_GETHOSTBYNAME  none )
-    set lhave = ( $lhave HAVE_RESOURCE_USAGE none )
-    set lhave = ( $lhave HAVE_GETPWUID       none )
-    set lhave = ( $lhave HAVE_ASYNC_STREAMS  none )
-    set lhave = ( $lhave HAVE_POSIX_SIGNALS  USE_POSIX_SIGNALS )
-    set lhave = ( $lhave HAVE_STREAMS        none )
-    set lhave = ( $lhave HAVE_SELECT         none )
-    set lhave = ( $lhave HAVE_UNIX98_PTY     none )
-    set lhave = ( $lhave HAVE_MMAP           none )
-    set lhave = ( $lhave BadLineDirectives   HAVE_BAD_LINE_DIRECTIVES )
-    set lhave = ( $lhave HAVE_POSIX_STRERROR HAVE_POSIX_STRERROR_R )
-    set lhave = ( $lhave HAVE_GNU_STRERROR   HAVE_GNU_STRERROR_R )
-    set lhave = ( $lhave HAVE_VSNPRINTF      HAVE_VSNPRINTF )
-    set lhave = ( $lhave HAVE_GNU_LIBC_6     none )
-    set lhave = ( $lhave HAVE_DYNAMIC_LINKER none )
-    set lhave = ( $lhave HAVE_BFD            none )
-    set lhave = ( $lhave HAVE_DEMANGLE       none )
-    set lhave = ( $lhave USE_FULL_MM         none )
-    set lhave = ( $lhave BUILD_DEBUG         none )
-    set lhave = ( $lhave BUILD_OPTIMIZE      none )
-    set lhave = ( $lhave BUILD_PROFILE       none )
+    set lhave = ( $lhave HAVE_ANSI_FLOAT16     none)
+    set lhave = ( $lhave HAVE_ANSI_C9X_COMPLEX none )
+    set lhave = ( $lhave HaveANSIFenv          HAVE_ANSI_C9X_FENV )
+    set lhave = ( $lhave HaveGNUFenv           HAVE_GNU_FENV )
+    set lhave = ( $lhave HAVE_VA_COPY          none )
+    set lhave = ( $lhave HAVE_PYTHON           none )
+    set lhave = ( $lhave HAVE_PY_NUMERIC       none )
+    set lhave = ( $lhave HAVE_PY_NUMPY         none )
+    set lhave = ( $lhave HAVE_FLEX_SCANNER     USE_FLEX )
+    set lhave = ( $lhave HAVE_READLINE         none )
+    set lhave = ( $lhave HAVE_HDF5             none )
+    set lhave = ( $lhave HAVE_SQL              none )
+    set lhave = ( $lhave HAVE_MYSQL            none )
+    set lhave = ( $lhave HAVE_SQLITE           none )
+    set lhave = ( $lhave HAVE_SQLITE_V2        none )
+    set lhave = ( $lhave HAVE_JPEGLIB          none )
+    set lhave = ( $lhave HAVE_PNGLIB           none )
+    set lhave = ( $lhave HAVE_FORK_EXEC        none )
+    set lhave = ( $lhave HAVE_GETHOSTBYNAME    none )
+    set lhave = ( $lhave HAVE_RESOURCE_USAGE   none )
+    set lhave = ( $lhave HAVE_GETPWUID         none )
+    set lhave = ( $lhave HAVE_ASYNC_STREAMS    none )
+    set lhave = ( $lhave HAVE_POSIX_SIGNALS    USE_POSIX_SIGNALS )
+    set lhave = ( $lhave HAVE_STREAMS          none )
+    set lhave = ( $lhave HAVE_SELECT           none )
+    set lhave = ( $lhave HAVE_UNIX98_PTY       none )
+    set lhave = ( $lhave HAVE_MMAP             none )
+    set lhave = ( $lhave BadLineDirectives     HAVE_BAD_LINE_DIRECTIVES )
+    set lhave = ( $lhave HAVE_POSIX_STRERROR   HAVE_POSIX_STRERROR_R )
+    set lhave = ( $lhave HAVE_GNU_STRERROR     HAVE_GNU_STRERROR_R )
+    set lhave = ( $lhave HAVE_VSNPRINTF        HAVE_VSNPRINTF )
+    set lhave = ( $lhave HAVE_GNU_LIBC_6       none )
+    set lhave = ( $lhave HAVE_DYNAMIC_LINKER   none )
+    set lhave = ( $lhave HAVE_BFD              none )
+    set lhave = ( $lhave HAVE_DEMANGLE         none )
+    set lhave = ( $lhave USE_FULL_MM           none )
+    set lhave = ( $lhave BUILD_DEBUG           none )
+    set lhave = ( $lhave BUILD_OPTIMIZE        none )
+    set lhave = ( $lhave BUILD_PROFILE         none )
+    set lhave = ( $lhave Std_UseX              HAVE_X11 )
+    set lhave = ( $lhave Std_UseOGL            HAVE_OGL )
+    set lhave = ( $lhave Std_UseQD             HAVE_QUICKDRAW )
 
     while ($#lhave > 0)
        set lvr = $lhave[1]
@@ -243,11 +243,11 @@ source $MngDir/write/import-db
        unset inf
     endif
 
-    if (($HaveVACOPY != TRUE) && ($HaveVALIST == FALSE)) then
+    if (($HAVE_VA_COPY != TRUE) && ($HAVE_VA_LIST == FALSE)) then
        Note $STDOUT "#define NO_VA_LIST"
     endif
 
-    if ($HaveTRACKER == TRUE) then
+    if ($HAVE_TRACKER == TRUE) then
        Note $STDOUT "#define HAVE_TRACKER"
        Note $STDOUT "#define TRACKER_EXE "$QUOTE$TRACKERExe$QUOTE
     endif
@@ -258,7 +258,7 @@ source $MngDir/write/import-db
        endif
     endif
 
-    if ($IPCSupport != "NOIPC") then
+    if ($IPC_STD != "NOIPC") then
        flog $Log $RM $IncDir/noipc
        Note $STDOUT "#define HAVE_PROCESS_CONTROL"
        if ($HAVE_SOCKETS != "FALSE") then

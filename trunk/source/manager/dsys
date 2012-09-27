@@ -592,7 +592,7 @@ switch ($Cmnd)
         unsetenv PACT_FC_PATH
         unsetenv Bits
         unsetenv CPU
-        unsetenv HaveCOMPLEX
+        unsetenv HAVE_ANSI_C9X_COMPLEX
         unsetenv HAVE_READLINE
         unsetenv PTHREAD_POSIX
 
