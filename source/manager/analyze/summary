@@ -75,36 +75,36 @@ source $Me:h/common
        dbset BUILD_PROFILE TRUE
     endif
        
-# PyExe       the full path to the python executable
-# PyVers      the version of the python executable
-# Python_Path addition to path in order to find python executable
+# PY_Exe       the full path to the python executable
+# PY_Vers      the version of the python executable
+# PY_Path addition to path in order to find python executable
 #             this comes from config files only
-# PyDirSrc    pact/dev/$arch/lib/pythond.d         (install to PyDirDst and PyDirPy)
-# PyDirDst    pact    lib/pythond.d                (install into)
-# PyDirPy     python  lib/pythond.d/site-packages  (install into)
+# PY_DirSrc    pact/dev/$arch/lib/pythond.d         (install to PY_DirDst and PY_DirPy)
+# PY_DirDst    pact    lib/pythond.d                (install into)
+# PY_DirPy     python  lib/pythond.d/site-packages  (install into)
 
-    if (("$PyExe" != "") && ("$PyExe" != "wrong-cc") && \
-        ("$PyExe" != "no-numeric") && ($BuildSharedLibs == TRUE)) then
-       flog $ALog mkdir -p $PyDirPy
+    if (("$PY_Exe" != "") && ("$PY_Exe" != "wrong-cc") && \
+        ("$PY_Exe" != "no-numeric") && ($BuildSharedLibs == TRUE)) then
+       flog $ALog mkdir -p $PY_DirPy
 
        NoteD $Log "   Python bindings will be built in:"
-       NoteD $Log "      $PyDirSrc"
+       NoteD $Log "      $PY_DirSrc"
        if ("$InstBase" != none) then
           NoteD $Log "   Python bindings will be installed in:"
-          NoteD $Log "      $PyDirDst"
-          if (-d $PyDirPy) then
-             NoteD $Log "      $PyDirPy"
+          NoteD $Log "      $PY_DirDst"
+          if (-d $PY_DirPy) then
+             NoteD $Log "      $PY_DirPy"
           else
-             NoteD $Log "      $PyDirPy (no permissions)"
+             NoteD $Log "      $PY_DirPy (no permissions)"
           endif
        endif
     else if ($BuildSharedLibs == FALSE) then
        NoteD $Log "   Python bindings will not be built (need shared library option)"
-    else if ("$PyExe" == "wrong-cc") then
+    else if ("$PY_Exe" == "wrong-cc") then
        NoteD $Log "   Python bindings will not be built (wrong compiler)"
-    else if ("$PyExe" == "no-numeric") then
+    else if ("$PY_Exe" == "no-numeric") then
        NoteD $Log "   Python bindings will not be built (no numeric extensions)"
-    else if ("$PyExe" == "") then
+    else if ("$PY_Exe" == "") then
        NoteD $Log "   Python bindings will not be built (no python)"
     endif
 

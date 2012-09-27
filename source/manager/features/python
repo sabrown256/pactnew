@@ -13,32 +13,32 @@ include shared
 include features/dls
 
 Tool CC {
-   Exe      =? ${Python_CC_Exe}
-   Debug    =? ${Python_CC_Debug}
-   Optimize =? ${Python_CC_Optimize}
-   Linker   =? ${Python_CC_Linker}
-   Flags    =? ${Python_CC_Flags}
+   Exe      =? ${PY_CC_Exe}
+   Debug    =? ${PY_CC_Debug}
+   Optimize =? ${PY_CC_Optimize}
+   Linker   =? ${PY_CC_Linker}
+   Flags    =? ${PY_CC_Flags}
 }
 
 Tool FC {
-   Exe    =? ${Python_FC_Exe}
-   Linker =? ${Python_FC_Linker}
-   Flags  =? ${Python_FC_Flags}
+   Exe    =? ${PY_FC_Exe}
+   Linker =? ${PY_FC_Linker}
+   Flags  =? ${PY_FC_Flags}
 }
 
 Tool LD {
-   Exe   =? ${Python_LD_Exe}
-   Flags =? ${Python_LD_Flags}
+   Exe   =? ${PY_LD_Exe}
+   Flags =? ${PY_LD_Flags}
 }
 
 Tool AR {
-   Exe   =? ${Python_AR_Exe}
-   Flags =? ${Python_AR_Flags}
+   Exe   =? ${PY_AR_Exe}
+   Flags =? ${PY_AR_Flags}
 }
 
 Group Cfg {
-   CC_Exe    =? ${Python_CC_Exe}
-   FC_Exe    =? ${Python_FC_Exe}
-   CC_Linker =? ${Python_CC_Linker}
+   CC_Exe    =? ${PY_CC_Exe}
+   FC_Exe    =? ${PY_FC_Exe}
+   CC_Linker =? ${PY_CC_Linker}
 }
 

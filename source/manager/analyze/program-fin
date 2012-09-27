@@ -11,7 +11,7 @@
 run write/package         $Log $ScrDir
 run write/configured      $Log $ScrDir $CONFIG_FILE
 run write/f90-interface   $Log $ScrDir
-run write/make-def                     $Log $ScrDir
+run write/make-def        $Log $ScrDir
 run write/make-macros     $Log $ScrDir
 run write/makefile        $Log $ScrDir
 run write/iso-c.h         $Log $ScrDir

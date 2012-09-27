@@ -11,7 +11,7 @@
 
 PyPACTVers = 2
 LibName=py_${PyPACTVers}
-PyDir  = ${LibDir}/python${PyVers}/pact
+PyDir  = ${LibDir}/python${PY_Vers}/pact
 TGTLib = ${LibDir}/lib${LibName}.a
 
 OD = DefaultG
@@ -20,7 +20,7 @@ OD = DefaultG
 # Compiler/Loader Options
 #
 UniFlags =
-CcFlags = ${ODC} -I. -I../.. -I${PyIncDir} -I${IncDir} ${MDInc} ${MDGInc}
+CcFlags = ${ODC} -I. -I../.. -I${PY_IncDir} -I${IncDir} ${MDInc} ${MDGInc}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
 CCAnnounce = ${CCompiler} ${ODC} ${Shared_CC_Flags} ${CFLAGS}

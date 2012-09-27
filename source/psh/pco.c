@@ -870,7 +870,7 @@ static void write_envf(client *cl, int lnotice)
 
      if (st.have_python == TRUE)
         {snprintf(lPython, MAXLINE, "%s/python%s",
-		  st.dir.lib, dbget(cl, TRUE, "PyVers"));
+		  st.dir.lib, dbget(cl, TRUE, "PY_Vers"));
 	 t = dbget(cl, TRUE, "PYTHONPATH");
 	 if (t != NULL)
 	    {if (strstr(t, lPython) == NULL)

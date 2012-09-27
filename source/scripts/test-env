@@ -149,7 +149,7 @@ setenv ZeroSpace  "-z 2"
    setenv HaveDevZero  `$PACT_Exe +l -info HAVE_DEV_ZERO`
    setenv LARGE_FILES  `$PACT_Exe -info _LARGE_FILES`
 
-   setenv PYVER      `$PACT_Exe -info PyVers`
+   setenv PYVER      `$PACT_Exe -info PY_Vers`
    setenv PYTHONBIN  `$PACT_Exe -info PythonPath`
    setenv PYTHON     $PYTHONBIN/python
    setenv LPYTHON    $LibDir/python$PYVER

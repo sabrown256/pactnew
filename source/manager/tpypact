@@ -31,7 +31,7 @@ endif
 
 set bindir  = $lpact:h
 set basedir = $bindir:h
-set vers    = `$lpact -info PyVers`
+set vers    = `$lpact -info PY_Vers`
 set libdir  = $basedir/lib/python${vers}
 
 setenv PYTHONPATH $libdir
