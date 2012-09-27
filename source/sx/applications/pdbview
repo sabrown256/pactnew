@@ -68,8 +68,8 @@ while ($#argv > 0)
 end
 
 # track this run
-if ((-x "$TRACKERExe") && ($track == 1)) then
-  $TRACKERExe -b -n pdbview -v $VERSION -P 1 -T 1 -W 1.0
+if ((-x "$TRACKER_Exe") && ($track == 1)) then
+  $TRACKER_Exe -b -n pdbview -v $VERSION -P 1 -T 1 -W 1.0
 endif
 
 # do the browsing of the PDB file

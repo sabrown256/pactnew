@@ -15,9 +15,9 @@ Separator $Log
 Note $Log "Analyze: tracker"
 
 dbini HAVE_TRACKER ""
+dbini TRACKER_Exe  ""
 #SafeEnv HAVE_TRACKER ""
-
-SafeEnv TRACKERExe  ""
+#SafeEnv TRACKER_Exe  ""
 
 foreach d ( /usr/apps/tracker $DAS_ROOT/tracker /usr /usr/local )
    if (-d $d) then
@@ -28,7 +28,7 @@ foreach d ( /usr/apps/tracker $DAS_ROOT/tracker /usr /usr/local )
 # maybe some complaints about missing so's
          set inf = ( `$d/bin/tracker |& grep "help screen for more information"` )
          if ("$inf" != "") then
-            setenv TRACKERExe $d/bin/tracker
+            setenv TRACKER_Exe $d/bin/tracker
             setenv HAVE_TRACKER TRUE
             break
          endif
@@ -38,9 +38,9 @@ end
 
 # export the results
 dbexp HAVE_TRACKER
+dbexp TRACKER_Exe
 #SetParent HAVE_TRACKER
-
-SetParent TRACKERExe
+#SetParent TRACKER_Exe
 
 exit(0)
 

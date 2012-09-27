@@ -137,7 +137,8 @@ else
 endif
 
 # export the results
-SetParent NO_TERMINAL
+dbexp NO_TERMINAL
+#SetParent NO_TERMINAL
 
 exit(0)
 

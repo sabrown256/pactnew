@@ -11,8 +11,8 @@ GnuMakeOpt   = TRUE
 WARN_PATTERN = "WARNING: (E) (W) (I)"
 ERR_PATTERN  = "Error: (S)"
 
-setenv OBJECT_MODE ${Bits}
-setenv MPIGoodIO   TRUE
+setenv OBJECT_MODE        ${Bits}
+setenv HAVE_MPI_GOOD_IO   TRUE
 
 XArch = -qarch=450
 

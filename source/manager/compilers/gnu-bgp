@@ -13,8 +13,8 @@ GnuMakeOpt   = TRUE
 WARN_PATTERN = ":+sp+warning:"
 ERR_PATTERN  = ":+sp+error:"
 
-setenv OBJECT_MODE ${Bits}
-setenv MPIGoodIO   TRUE
+setenv OBJECT_MODE       ${Bits}
+setenv HAVE_MPI_GOOD_IO  TRUE
 
 Tool CC {
    Exe       = mpicc

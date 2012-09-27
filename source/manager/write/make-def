@@ -45,7 +45,7 @@ set vl = ( $vl HAVE_PYTHON HostOS )
 set vl = ( $vl IncDir InstBase INSTALL IPC_STD )
 set vl = ( $vl Load MngDir )
 set vl = ( $vl OStd OSType OW32Objs )
-set vl = ( $vl ParCommSupport PubLib PubInc )
+set vl = ( $vl STD_PARALLEL_COMM PubLib PubInc )
 set vl = ( $vl PY_CC PY_Cfg PY_Exe PY_Inc PY_Vers )
 set vl = ( $vl RPATH SUFFIXES Sys SysDir System )
 set vl = ( $vl ThreadLibExt UPDATE URFile )
@@ -265,10 +265,10 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
 
 # Parallel I/O
     if ($BuildStrategy == "SpaceSaving") then
-       set MPDev  = '${Ar'$ParCommSupport'}'
+       set MPDev  = '${Ar'$STD_PARALLEL_COMM'}'
        set IPCDev = '${Ar'$IPC_STD'}'
     else
-       set MPDev  = '${O'$ParCommSupport'}'
+       set MPDev  = '${O'$STD_PARALLEL_COMM'}'
        set IPCDev = '${O'$IPC_STD'}'
     endif
     Note $STDOUT "MPassDevices = $MPDev"
