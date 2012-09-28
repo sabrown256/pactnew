@@ -35,10 +35,10 @@ set vl = ( $vl GETSOCKOPT_TYPE )
 set vl = ( $vl HostOS HostOSRel )
 set vl = ( $vl IncDir IPC_STD )
 set vl = ( $vl Linking LONG64 )
-set vl = ( $vl MACRev HAVE_MPI_STDIN_ALL HAVE_MPI_GOOD_IO )
+set vl = ( $vl HAVE_MPI_STDIN_ALL HAVE_MPI_GOOD_IO )
 set vl = ( $vl NO_LONG_LONG NEED_ALT_LARGE_FILE )
 set vl = ( $vl PACT_CC_FAMILY PACT_CC_VERSION PACT_SO_CACHE PTHREAD_POSIX )
-set vl = ( $vl OSType )
+set vl = ( $vl OSType OSX_Version )
 set vl = ( $vl Sys TRACKER_Exe )
 set vl = ( $vl MYSQL_SO SQLITE3_SO HDF5_SO )
 set vl = ( $vl HAVE_BAD_LINE_DIRECTIVES )
@@ -96,8 +96,8 @@ source $MngDir/write/import-db
     Note $STDOUT "#define CPU_TYPE            $CPU"
     Note $STDOUT "#define FPU_TYPE            $FPU"
     Note $STDOUT '#define SYSTEM_ID           '$QUOTE$Arch$QUOTE
-    if ("$MACRev" != "") then
-       Note $STDOUT "#define MACOSX_VERSION      $MACRev"
+    if ("$OSX_Version" != "") then
+       Note $STDOUT "#define MACOSX_VERSION      $OSX_Version"
     endif
 
     Note $STDOUT '#define USE_COMPILER        '$QUOTE$CC_Exe$QUOTE

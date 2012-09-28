@@ -42,8 +42,10 @@ switch ($OS)
         breaksw
 endsw
 
-SetParent OSX_REV
-SetParent OSX_SHARED_LIBS
+dbexp OSX_REV
+dbexp OSX_SHARED_LIBS
+#SetParent OSX_REV
+#SetParent OSX_SHARED_LIBS
 
 exit(0)
 

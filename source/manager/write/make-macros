@@ -29,7 +29,7 @@ Note $Log ""
 
 set vl = ""
 set vl = ( $vl Bits BuildSharedLibs BuildStrategy )
-set vl = ( $vl EtcDir FPU HaveGNUFenv IncDir LibVers )
+set vl = ( $vl EtcDir FPU HaveGNUFenv IncDir INSTALL )
 set vl = ( $vl NoExe Ranlib_Exe Sys SYS_TYPE UPDATE )
 
 source $MngDir/write/import-db
