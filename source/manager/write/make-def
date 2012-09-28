@@ -43,12 +43,14 @@ set vl = ( $vl GOOD_OPENMP_PRAGMAS GnuMakeOpt )
 set vl = ( $vl GraphicsDevices GraphicsFlag GSYS )
 set vl = ( $vl HAVE_PYTHON HostOS )
 set vl = ( $vl IncDir InstBase INSTALL IPC_STD )
+set vl = ( $vl Lex_Exe Lex_Flags )
 set vl = ( $vl Load MngDir )
 set vl = ( $vl OStd OSType OW32Objs )
 set vl = ( $vl STD_PARALLEL_COMM PubLib PubInc )
 set vl = ( $vl PY_CC PY_Cfg PY_Exe PY_Inc PY_Vers )
 set vl = ( $vl RPATH SUFFIXES Sys SysDir System )
 set vl = ( $vl ThreadLibExt UPDATE URFile )
+set vl = ( $vl Yacc_Exe Yacc_Flags )
 
 # compiler tools
 foreach t (CC FC CXX)
@@ -345,15 +347,19 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT ""
 
     Note $STDOUT "# tool LEX"
-    foreach v (Exe Flags)
-       DEFD_VAR Lex_${v}
-       if ("$ok" == "") then
-          Note $STDOUT "Lex_${v} = `printenv ${v}`"
-       else
-          VAR_VALUE Lex ${v}
-          Note $STDOUT "Lex_${v} = $value"
-       endif
-    end
+    Note $STDOUT "Lex_Exe   = $Lex_Exe"
+    Note $STDOUT "Lex_Flags = $Lex_Flags"
+#    foreach v (Exe Flags)
+#        set val = `$PERDB -e Lex_${v}`
+#        Note $STDOUT "Lex_${v} = $val"
+##       DEFD_VAR Lex_${v}
+##       if ("$ok" == "") then
+##          Note $STDOUT "Lex_${v} = `printenv ${v}`"
+##       else
+##          VAR_VALUE Lex ${v}
+##          Note $STDOUT "Lex_${v} = $value"
+##       endif
+#    end
     Note $STDOUT ""
 
     Note $STDOUT "# tool RANLIB"
