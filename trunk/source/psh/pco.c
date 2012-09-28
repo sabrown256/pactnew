@@ -684,6 +684,39 @@ static void env_out(FILE *fsh, FILE *fcsh, FILE *fdk, FILE *fmd,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* ADD_SPEC_ENV_VARS - add variables specified in the environment
+ *                   - variable ENV_VARS to the environment files
+ */
+
+static void add_spec_env_vars(client *cl,
+			      FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd,
+			      int n, char **sa, int blank)
+   {int i, iv, nv, ok;
+    char *p, *v, *var, **va;
+
+    var = cgetenv(TRUE, "ENV_VARS");
+    va  = tokenize(var, ":");
+    nv  = (va != NULL) ? lst_length(va) : 0;
+    for (iv = 0; iv < nv; iv++)
+
+/* see if S is also in the list SA */
+        {ok = TRUE;
+	 for (i = 0; (i < n) && (ok == TRUE); i++)
+	     {v = va[iv];
+	      ok &= (strncmp(v, sa[i], strlen(v)) != 0);};
+
+	 if (ok == TRUE)
+	    {p = dbget(cl, TRUE, v);
+	     if ((IS_NULL(p) == FALSE) || (blank == TRUE))
+	        env_out(fsh, fcsh, fdk, fmd, v, p);};};
+
+    free_strings(va);
+
+    return;}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* ADD_SPECIAL_VARS - add special groups variables SPCG
  *                  - if BLANK is TRUE emit non-NULL variables
  *                  - otherwise skip them
@@ -720,17 +753,22 @@ static void add_special_vars(client *cl,
 /* ADD_SET_CFG - add variables set in config files */
 
 static void add_set_cfg(client *cl, FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
-   {int i, j, n, nc, ns, ms, ok;
-    char *spcgn[] = { "DP" };
-    char *spcgb[] = { "MDG", "PY", "TRACKER" };
-    char *spcv[] = { "Inc", "Lib", "RPath", "Path", "Exe" };
-    char *spcgh[] = { "HAVE" };
-    char *spcvh[] = { "PYTHON" };
+   {int i, j, n, nc, ok;
     char *var, *val, *p, **sa;
 
     fflush(st.aux.SEF);
     sa = file_text(TRUE, "%s/log/file.se", st.dir.root);
     n  = (sa != NULL) ? lst_length(sa) : 0;
+
+    add_spec_env_vars(cl, fcsh, fsh, fdk, fmd, n, sa, TRUE);
+
+#if 0
+    int ns, ms;
+    char *spcgn[] = { "DP" };
+    char *spcgb[] = { "MDG", "PY", "TRACKER" };
+    char *spcv[] = { "Inc", "Lib", "RPath", "Path", "Exe" };
+    char *spcgh[] = { "HAVE" };
+    char *spcvh[] = { "PYTHON" };
 
     ms = sizeof(spcv)/sizeof(char *);
 
@@ -749,6 +787,7 @@ static void add_set_cfg(client *cl, FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
     ns = sizeof(spcgh)/sizeof(char *);
     add_special_vars(cl, fcsh, fsh, fdk, fmd, 
 		     ns, spcgh, ms, spcvh, n, sa, TRUE);
+#endif
 
 /* add all the setenv'd variables */
     if (sa != NULL)
@@ -760,10 +799,13 @@ static void add_set_cfg(client *cl, FILE *fcsh, FILE *fsh, FILE *fdk, FILE *fmd)
 	        {nc  = strlen(var);
 		 val = strtok(NULL, "\n");
 		    
+		 if (strcmp(var, "ENV_VARS") == 0)
+		    continue;
+
 /* handle PATH specially - just gather everything that is
  * not $PATH or ${PATH}
  */
-	         if (strcmp(var, "PATH") == 0)
+	         else if (strcmp(var, "PATH") == 0)
 		    push_path(APPEND, epath, val);
 
 /* weed out duplicates - taking only the last setting */
