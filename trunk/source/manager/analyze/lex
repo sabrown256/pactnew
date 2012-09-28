@@ -17,8 +17,11 @@ Note $Log "Analyze: lex"
 NoteD $ALog -n "   Lex: "
 Note $ALog ""
 
-SafeEnv Lex_Exe           ""
-SafeEnv Lex_Flags         ""
+dbini Lex_Exe           ""
+dbini Lex_Flags         ""
+#SafeEnv Lex_Exe           ""
+#SafeEnv Lex_Flags         ""
+
 SafeEnv Cfg_Lex_Flags     ""
 SafeEnv Cfe_Lex_Flags     ""
 SafeEnv HAVE_FLEX_SCANNER FALSE
@@ -63,8 +66,11 @@ NoteD $ALog ""
 rm -f $Tmp.l
 
 # export the results
-SetParent Lex_Exe
-SetParent Lex_Flags
+dbexp Lex_Exe
+dbexp Lex_Flags
+#SetParent Lex_Exe
+#SetParent Lex_Flags
+
 SetParent Cfg_Lex_Flags
 SetParent Cfe_Lex_Flags
 SetParent HAVE_FLEX_SCANNER

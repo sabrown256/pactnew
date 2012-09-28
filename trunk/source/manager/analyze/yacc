@@ -18,8 +18,10 @@ Note $Log "Analyze: yacc"
 NoteD $ALog -n "   Yacc: "
 Note $ALog ""
 
-SafeEnv Yacc_Exe    yacc
-SafeEnv Yacc_Flags  ""
+dbini Yacc_Exe    yacc
+dbini Yacc_Flags  ""
+#SafeEnv Yacc_Exe    yacc
+#SafeEnv Yacc_Flags  ""
 
 # find an executable
 if (!(-x "$Yacc_Exe")) then
@@ -62,8 +64,10 @@ else
 endif
 
 # export the results
-SetParent Yacc_Exe
-SetParent Yacc_Flags
+dbexp Yacc_Exe
+dbexp Yacc_Flags
+#SetParent Yacc_Exe
+#SetParent Yacc_Flags
 
 exit(0)
 
