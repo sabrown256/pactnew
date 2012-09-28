@@ -27,17 +27,18 @@ EOF
 
 flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
 if ($status == 0) then
-   setenv GOOD_OPENMP_PRAGMAS  TRUE
+   setenv HAVE_GOOD_OMP_PRAGMAS  TRUE
    NoteD $ALog "      proper pragma handling"
 else
-   setenv GOOD_OPENMP_PRAGMAS  FALSE
+   setenv HAVE_GOOD_OMP_PRAGMAS  FALSE
    NoteD $ALog "      bad pragma handling"
 endif
 
 flog $ALog rm -f $Tmp.c $Tmp
 
 # export the results
-SetParent GOOD_OPENMP_PRAGMAS
+dbexp HAVE_GOOD_OMP_PRAGMAS
+#SetParent HAVE_GOOD_OMP_PRAGMAS
 
 exit(0)
 
