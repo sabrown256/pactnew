@@ -23,7 +23,8 @@ Tool CC {
                  C89   = -qlanglvl=stdc89 ;
                  C99   = -qlanglvl=stdc99 ;
                  X89   = -qlanglvl=extc89 ;
-                 X99   = -qlanglvl=extc99 ]
+                 X99   = -qlanglvl=extc99 ;
+                 X11   = -qlanglvl=extc1x ]
    Flags    =+ -qldbl128                     # 16 byte long double
    Flags    =+ -qsuppress=1500-010:1506-1300:1506-1298:1506-273 
    Flags    += [ _env_ = Bits ;              # address bit size

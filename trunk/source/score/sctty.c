@@ -50,7 +50,7 @@ static int cycle(int ne)
     if (begin == TRUE)
        lprintf(stdout, 0, "-> ");
 
-    s[MAXLINE] = '\0';
+    s[MAXLINE-1] = '\0';
     p = SC_fgets(s, MAXLINE, stdin);
 
     if (p != NULL)

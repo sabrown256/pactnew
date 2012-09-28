@@ -1,0 +1,11 @@
+#
+# C11 - define the use of ISO C11
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+C_STD = C11
+
