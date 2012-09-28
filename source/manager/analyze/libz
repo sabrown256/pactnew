@@ -18,14 +18,17 @@ Note $Log "Analyze: libz"
 dbini MD_Inc    ""
 dbini MD_Lib    ""
 dbini MD_Pck    ""
+dbini Z_Inc     ""
+dbini Z_Lib     ""
+dbini Z_RPath   $RootLib
+dbini Z_Path    /usr
 #SafeEnv MD_Inc    ""
 #SafeEnv MD_Lib    ""
 #SafeEnv MD_Pck    ""
-
-SafeEnv Z_Inc     ""
-SafeEnv Z_Lib     ""
-SafeEnv Z_RPath   $RootLib
-SafeEnv Z_Path    /usr
+#SafeEnv Z_Inc     ""
+#SafeEnv Z_Lib     ""
+#SafeEnv Z_RPath   $RootLib
+#SafeEnv Z_Path    /usr
 
 # if we have explicitly said we do not want libZ do NOT detect it
 if ("$Z_Path" == none) then
@@ -103,15 +106,19 @@ EOF
    dbexp MD_Inc
    dbexp MD_Lib
    dbexp MD_Pck
+   dbexp Z_Inc
+   dbexp Z_Lib
+   dbexp Z_RPath
+   dbexp Z_Path
 #   SetParent MD_Inc
 #   SetParent MD_Lib
 #   SetParent MD_Pck
+#   SetParent Z_Inc
+#   SetParent Z_Lib
+#   SetParent Z_RPath
+#   SetParent Z_Path
 
    SetParent RPATH
-   SetParent Z_Inc
-   SetParent Z_Lib
-   SetParent Z_RPath
-   SetParent Z_Path
 
 endif
 
