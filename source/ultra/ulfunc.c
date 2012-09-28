@@ -2076,12 +2076,12 @@ void UL_install_scheme_funcs(SS_psides *si)
 
 
     SS_install(si, "open-device*",
-               "Procedure: Open graphics display device\n     Usage: open-device* <name> <tx[1]e> <title>",
+               "Procedure: Open graphics display device\n     Usage: open-device* <name> <type> <title>",
                SS_nargs,
                _ULI_open_device, SS_PR_PROC);
 
     SS_install(si, "open-device",
-               "Macro: Open graphics device\n     Usage: open-device <name> <tx[1]e> <title>",
+               "Macro: Open graphics device\n     Usage: open-device <name> <type> <title>",
                SS_nargs,
                _ULI_open_device, SS_UR_MACRO);
 
@@ -2157,7 +2157,7 @@ void UL_install_scheme_funcs(SS_psides *si)
                UL_mode_text, SS_UR_MACRO);
 
     SS_install(si, "graphics",
-               "Macro: Enter graphics mode\n     To enter text mode tx[1]e: text\n     Usage: graphics",
+               "Macro: Enter graphics mode\n     To enter text mode type: text\n     Usage: graphics",
                SS_zargs,
                UL_mode_graphics, SS_UR_MACRO);
 
@@ -2198,12 +2198,12 @@ void UL_install_scheme_funcs(SS_psides *si)
                SX_read_ver1, SS_PR_PROC);
 
     SS_install(si, "wrt",
-               "Procedure: Save curves to file\n     Usage: wrt [<tx[1]e>] <file-name> <curve-list>",
+               "Procedure: Save curves to file\n     Usage: wrt [<type>] <file-name> <curve-list>",
                SS_nargs,
                SX_write_data, SS_PR_PROC);
 
     SS_install(si, "save",
-               "Macro: Save curves to file\n     Usage: save [<tx[1]e>] <file-name> <curve-lst>",
+               "Macro: Save curves to file\n     Usage: save [<type>] <file-name> <curve-lst>",
                SS_nargs,
                SX_write_data, SS_UR_MACRO);
 

@@ -20,8 +20,10 @@ Tool CC {
    Flags    += [ _env_ = C_STD ;                # C standard flags
                  C89   = -std=c89 ;
                  C99   = -std=c99 ;
+                 C11   = -std=c11 ;
                  X89   = -std=gnu89 ;           # gcc default
-                 X99   = -std=gnu99 ]
+                 X99   = -std=gnu99 ;
+                 X11   = -std=gnu11 ]
    Flags    += [ _env_ = PACT_CC_VERSION ;      # compiler version flags
                  4.*   = -fsignaling-nans ]
    Flags    += [ _env_ = PACT_CC_VERSION ;      # pragma warning flags

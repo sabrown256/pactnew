@@ -10,10 +10,28 @@
 
 unalias *
 
-unset cc
 unsetenv cc
 
-set cc  = $1
+set cc     = ""
+set cflags = ""
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: cstd [-h] <cc> <cflags>"
+           echo ""
+           exit(1)
+      default:
+           if ("$cc" == "") then
+              set cc = $1
+           else
+              set cflags = ( $cflags $1 )
+           endif
+           breaksw
+   endsw
+   shift
+end
+
 set tmp = $cwd/tmp-std
 
 set cc = `which $cc`
@@ -74,7 +92,7 @@ int main(int c, char **v)
     return(0);}
 EOF
 
-   $cc $tmp.c -o $tmp
+   $cc $cflags $tmp.c -o $tmp
    if ($status == 0) then
       $tmp
    endif

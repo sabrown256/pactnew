@@ -139,6 +139,34 @@ source $MngDir/write/import-db
     endif
 
     switch ($C_STD)
+       case C11:
+            Note $STDOUT '#define ISO_C11'
+            Note $STDOUT ''
+            breaksw
+       case X11:
+            Note $STDOUT '#define ISO_C11'
+            Note $STDOUT ''
+            Note $STDOUT '#ifdef __GNUC__'
+            Note $STDOUT ''
+#            Note $STDOUT '# ifndef _POSIX_C_SOURCE'
+#            Note $STDOUT "#  define _POSIX_C_SOURCE   ${POSIX_STD}L"
+#            Note $STDOUT '# endif'
+#            Note $STDOUT ''
+
+            if (($HostOS != FreeBSD) && ($HostOS != SunOS)) then
+               Note $STDOUT '# ifndef _XOPEN_SOURCE'
+               Note $STDOUT "#  define _XOPEN_SOURCE     ${XOPEN_STD}"
+               Note $STDOUT '# endif'
+               Note $STDOUT ''
+            endif
+
+            Note $STDOUT '# ifndef _DARWIN_C_SOURCE'
+            Note $STDOUT '#  define _DARWIN_C_SOURCE'
+            Note $STDOUT '# endif'
+            Note $STDOUT ''
+            Note $STDOUT '#endif'
+            Note $STDOUT ''
+            breaksw
        case C99:
             Note $STDOUT '#define ISO_C99'
             Note $STDOUT ''
