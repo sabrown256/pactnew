@@ -22,6 +22,8 @@ dbini PNG_Inc      ""
 dbini PNG_Lib      ""
 dbini PNG_RPath    $RootLib
 dbini PNG_Path     /usr
+dbini Z_Lib        ""
+dbini Z_Path       /usr
 #SafeEnv MDG_Inc      ""
 #SafeEnv MDG_Lib      ""
 #SafeEnv MDG_Pck      ""

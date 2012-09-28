@@ -22,6 +22,8 @@ dbini HDF_Inc    ""
 dbini HDF_Lib    ""
 dbini HDF_RPath  $RootLib
 dbini HDF_Path   /usr
+dbini Z_Lib      "-lz"
+
 #SafeEnv MDI_Inc    ""
 #SafeEnv MDI_Lib    ""
 #SafeEnv MDI_Pck    ""
@@ -29,8 +31,7 @@ dbini HDF_Path   /usr
 #SafeEnv HDF_Lib    ""
 #SafeEnv HDF_RPath  $RootLib
 #SafeEnv HDF_Path   /usr
-
-SafeEnv Z_Lib      "-lz"
+#SafeEnv Z_Lib      "-lz"
 
 dbini HDF5_SO    ""
 
