@@ -30,6 +30,12 @@ setenv TEST_ADVISORY     ""
 # GOTCHA: temporarily pass the spec test
 #setenv TEST_ADVISORY     "psh_gexec_spec"
 
+setenv ENV_VARS ""
+setenv ENV_VARS ${ENV_VARS}:DP_Inc:DP_Lib:DP_RPath:DP_Path
+setenv ENV_VARS ${ENV_VARS}:MDG_Inc:MDG_Lib:MDG_RPath:MDG_Path
+setenv ENV_VARS ${ENV_VARS}:PY_Inc:PY_Lib:PY_RPath:PY_Path
+setenv ENV_VARS ${ENV_VARS}:TRACKER_Exe:HAVE_PYTHON
+
 setenv PTHREAD_POSIX     FALSE
 setenv PTHREAD_OMP       FALSE
 setenv DO_RUN_DBG        none
