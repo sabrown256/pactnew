@@ -48,7 +48,7 @@ set vl = ( $vl Load MngDir )
 set vl = ( $vl OStd OSType OW32Objs )
 set vl = ( $vl STD_PARALLEL_COMM PubLib PubInc )
 set vl = ( $vl PY_CC PY_Cfg PY_Exe PY_Inc PY_Vers )
-set vl = ( $vl RPATH SUFFIXES Sys SysDir System )
+set vl = ( $vl Ranlib_Exe RPATH SUFFIXES Sys SysDir System )
 set vl = ( $vl ThreadLibExt UPDATE URFile )
 set vl = ( $vl Yacc_Exe Yacc_Flags )
 
@@ -363,15 +363,16 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT ""
 
     Note $STDOUT "# tool RANLIB"
-    foreach v (Exe)
-       DEFD_VAR Ranlib_${v}
-       if ("$ok" == "") then
-          Note $STDOUT "Ranlib_${v} = `printenv ${v}`"
-       else
-          VAR_VALUE Ranlib ${v}
-          Note $STDOUT "Ranlib_${v} = $value"
-       endif
-    end
+    Note $STDOUT "Ranlib_Exe = $Ranlib_Exe"
+#    foreach v (Exe)
+#       DEFD_VAR Ranlib_${v}
+#       if ("$ok" == "") then
+#          Note $STDOUT "Ranlib_${v} = `printenv ${v}`"
+#       else
+#          VAR_VALUE Ranlib ${v}
+#          Note $STDOUT "Ranlib_${v} = $value"
+#       endif
+#    end
     Note $STDOUT ""
 
 # emit items from the Glb group

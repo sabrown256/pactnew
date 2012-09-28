@@ -156,12 +156,13 @@ dbexp AR_Exe
 dbexp AR_Flags
 dbexp AR_IFlag
 dbexp AR_XFlag
+dbexp Ranlib_Exe
 #SetParent AR_Exe
 #SetParent AR_Flags
 #SetParent AR_IFlag
 #SetParent AR_XFlag
+#SetParent Ranlib_Exe
 
-SetParent Ranlib_Exe
 SetParent UPDATE
 SetParent INSTALL
 
