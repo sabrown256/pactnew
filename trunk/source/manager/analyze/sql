@@ -15,13 +15,17 @@ Separator $Log
 Note $Log "Analyze: sql"
 
 # vanilla place to look if previously undefined
-dbini MDI_Inc    ""
-dbini MDI_Lib    ""
-dbini MDI_Pck    ""
-dbini SQL_Inc    ""
-dbini SQL_Lib    ""
-dbini SQL_RPath  $RootLib
-dbini SQL_Path   /usr
+dbini MDI_Inc     ""
+dbini MDI_Lib     ""
+dbini MDI_Pck     ""
+dbini SQL_Inc     ""
+dbini SQL_Lib     ""
+dbini SQL_RPath   $RootLib
+dbini SQL_Path    /usr
+dbini MYSQL_SO    ""
+dbini SQLITE3_SO  ""
+dbini HAVE_SQL    FALSE
+
 #SafeEnv MDI_Inc    ""
 #SafeEnv MDI_Lib    ""
 #SafeEnv MDI_Pck    ""
@@ -29,11 +33,7 @@ dbini SQL_Path   /usr
 #SafeEnv SQL_Lib    ""
 #SafeEnv SQL_RPath  $RootLib
 #SafeEnv SQL_Path   /usr
-
-SafeEnv HAVE_SQL   FALSE
-
-dbini MYSQL_SO    ""
-dbini SQLITE3_SO  ""
+#SafeEnv HAVE_SQL   FALSE
 
 dbget Linking
 
@@ -269,6 +269,11 @@ EOF
    dbexp SQL_Lib
    dbexp SQL_RPath
    dbexp SQL_Path
+   dbexp MYSQL_SO
+   dbexp SQLITE3_SO
+   dbexp HAVE_MYSQL
+   dbexp HAVE_SQLITE
+   dbexp HAVE_SQLITE_V2
 #   SetParent MDI_Inc
 #   SetParent MDI_Lib
 #   SetParent MDI_Pck
@@ -276,18 +281,16 @@ EOF
 #   SetParent SQL_Lib
 #   SetParent SQL_RPath
 #   SetParent SQL_Path
+#   SetParent HAVE_MYSQL
+#   SetParent HAVE_SQLITE
+#   SetParent HAVE_SQLITE_V2
 
    SetParent RPATH
-   SetParent HAVE_MYSQL
-   SetParent HAVE_SQLITE
-   SetParent HAVE_SQLITE_V2
-
-   dbexp MYSQL_SO
-   dbexp SQLITE3_SO
 
 endif
 
-SetParent HAVE_SQL
+dbexp HAVE_SQL
+#SetParent HAVE_SQL
 
 exit(0)
 

@@ -252,7 +252,8 @@ setenv FC_Flags "$Save_FFLAGS"
 DONE:
 
 # export the results
-SetParent HAVE_FORTRAN
+dbexp HAVE_FORTRAN
+#SetParent HAVE_FORTRAN
 
 SetParent FC_Exe
 SetParent FC_Flags

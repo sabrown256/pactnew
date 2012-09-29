@@ -19,12 +19,13 @@ Note $ALog ""
 
 dbini Lex_Exe           ""
 dbini Lex_Flags         ""
+dbini HAVE_FLEX_SCANNER FALSE
 #SafeEnv Lex_Exe           ""
 #SafeEnv Lex_Flags         ""
+#SafeEnv HAVE_FLEX_SCANNER FALSE
 
 SafeEnv Cfg_Lex_Flags     ""
 SafeEnv Cfe_Lex_Flags     ""
-SafeEnv HAVE_FLEX_SCANNER FALSE
 
 cat << EOF >! $Tmp.l
 %{
@@ -68,12 +69,13 @@ rm -f $Tmp.l
 # export the results
 dbexp Lex_Exe
 dbexp Lex_Flags
+dbexp HAVE_FLEX_SCANNER
 #SetParent Lex_Exe
 #SetParent Lex_Flags
+#SetParent HAVE_FLEX_SCANNER
 
 SetParent Cfg_Lex_Flags
 SetParent Cfe_Lex_Flags
-SetParent HAVE_FLEX_SCANNER
 
 exit(0)
 

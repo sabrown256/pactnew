@@ -134,7 +134,8 @@ EOF
 
 endif
 
-SetParent HAVE_HDF5
+dbexp HAVE_HDF5
+#SetParent HAVE_HDF5
 
 exit(0)
 
