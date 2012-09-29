@@ -24,6 +24,7 @@ dbini X11_Path          /usr
 dbini GRAPHICS_Windows  ""
 dbini GRAPHICS_Devices  ""
 dbini GRAPHICS_Flags    ""
+dbini Std_UseX          TRUE
 #SafeEnv MDG_Inc          ""
 #SafeEnv MDG_Lib          ""
 #SafeEnv MDG_Pck          ""
@@ -33,14 +34,13 @@ dbini GRAPHICS_Flags    ""
 #SafeEnv X11_Path         /usr
 #SafeEnv GRAPHICS_Devices ""
 #SafeEnv GRAPHICS_Flags   ""
+#SafeEnv Std_UseX         TRUE
 
 SafeEnv AnaDir           analyze
 SafeEnv ALog             $cwd/cfg-$System/log.analyze
 SafeEnv OS_Name           `uname -s`
 SafeEnv Cfe_CC_Exe       "cc"
 SafeEnv Cfe_CC_Flags     "-g"
-
-SafeEnv Std_UseX         TRUE
 
 # if we have explicitly said we do not want X11
 # do NOT detect it
@@ -195,7 +195,8 @@ EOF
 
 endif
 
-SetParent Std_UseX
+dbexp Std_UseX
+#SetParent Std_UseX
 
 exit(0)
 

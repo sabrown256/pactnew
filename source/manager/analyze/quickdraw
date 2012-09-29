@@ -21,6 +21,8 @@ dbini QD_Path           /usr
 dbini GRAPHICS_Windows  ""
 dbini GRAPHICS_Devices  ""
 dbini GRAPHICS_Flags    ""
+dbini Std_UseQD         FALSE
+dbini Cfg_CC_Exe        "cc"
 #SafeEnv MDG_Inc          ""
 #SafeEnv MDG_Lib          ""
 #SafeEnv MDG_Pck          ""
@@ -30,13 +32,12 @@ dbini GRAPHICS_Flags    ""
 #SafeEnv QD_Path          /usr
 #SafeEnv GRAPHICS_Devices ""
 #SafeEnv GRAPHICS_Flags   ""
+#SafeEnv Std_UseQD        FALSE
+#SafeEnv Cfg_CC_Exe       "cc"
 
 SafeEnv OS_Name           `uname -s`
-SafeEnv Cfg_CC_Exe       "cc"
 SafeEnv AnaDir           analyze
 SafeEnv ALog             $cwd/cfg-$System/log.analyze
-
-SafeEnv Std_UseQD        FALSE
 
 if ($OS_Name == Darwin) then
 
@@ -120,7 +121,8 @@ EOF
 
 endif
 
-SetParent Std_UseQD
+dbexp Std_UseQD
+#SetParent Std_UseQD
 
 exit(0)
 

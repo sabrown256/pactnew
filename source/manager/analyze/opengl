@@ -24,6 +24,7 @@ dbini OGL_Path          /usr
 dbini GRAPHICS_Windows  ""
 dbini GRAPHICS_Devices  ""
 dbini GRAPHICS_Flags    ""
+dbini Std_UseOGL        FALSE
 #SafeEnv MDG_Inc          ""
 #SafeEnv MDG_Lib          ""
 #SafeEnv MDG_Pck          ""
@@ -33,10 +34,9 @@ dbini GRAPHICS_Flags    ""
 #SafeEnv OGL_Path         /usr
 #SafeEnv GRAPHICS_Devices ""
 #SafeEnv GRAPHICS_Flags   ""
+#SafeEnv Std_UseOGL       FALSE
 
 SafeEnv OS_Name           `uname -s`
-
-SafeEnv Std_UseOGL       FALSE
 
 # if we have explicitly said we do not want OGL
 # do NOT detect it
@@ -149,7 +149,8 @@ EOF
 
 endif
 
-SetParent Std_UseOGL
+dbexp Std_UseOGL
+#SetParent Std_UseOGL
 
 exit(0)
 
