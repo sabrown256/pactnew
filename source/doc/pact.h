@@ -1,5 +1,5 @@
 TXT: PACT User's Guide
-MOD: 09/26/2012
+MOD: 09/28/2012
 
 <CENTER>
 <h1><FONT color="#ff0000">PACT User's Guide</FONT></h1>
@@ -1153,7 +1153,7 @@ idea of what they are for (just in case you need to look in the code).<p>
 <P>
 <P>
 
-<B>BuildStrategy</B>
+<B>MAKE_Strategy</B>
 <BR>
 <UL>UNIX systems with a sufficiently smart make can save lots of disk space by
 building the objects directly into library archives. Use
