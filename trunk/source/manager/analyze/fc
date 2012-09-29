@@ -253,16 +253,17 @@ DONE:
 
 # export the results
 dbexp HAVE_FORTRAN
+dbexp Cfg_FC_Exe
+dbexp Cfg_FC_Flags
 #SetParent HAVE_FORTRAN
+#SetParent Cfg_FC_Exe
+#SetParent Cfg_FC_Flags
 
 SetParent FC_Exe
 SetParent FC_Flags
 SetParent FC_Debug
 SetParent FC_Optimize
 SetParent FC_Linker
-
-SetParent Cfg_FC_Exe
-SetParent Cfg_FC_Flags
 
 SetParent Cfe_FC_Exe
 SetParent Cfe_FC_Flags

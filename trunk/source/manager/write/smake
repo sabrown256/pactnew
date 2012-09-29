@@ -31,8 +31,8 @@ Note $Log ""
 set vl = ""
 set vl = ( $vl InstBase CfgDir System GMAKE_Flag )
 set vl = ( $vl IncDir EtcDir BinDir MngDir )
-set vl = ( $vl Cfg_CC_Flags Cfg_Lex_Flags Cfg_LD_Flags )
-set vl = ( $vl Cfg_LD_RPath Cfg_CC_Exe )
+set vl = ( $vl Cfg_CC_Exe Cfg_CC_Flags Cfg_Lex_Flags )
+set vl = ( $vl Cfg_LD_Flags Cfg_LD_RPath )
 set vl = ( $vl UseTmpDir )
 
 source $MngDir/write/import-db

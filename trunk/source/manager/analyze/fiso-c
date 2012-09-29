@@ -14,6 +14,14 @@
 set Me = $0
 source $Me:h/common
 
+set vl = ""
+set vl = ( $vl FC_Exe FC_Flags Cfg_FC_Exe Cfg_FC_Flags )
+
+source $MngDir/write/import-db
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 cat << EOF >! ${Tmp}_iso.f
       program main
         use iso_c_binding
@@ -42,12 +50,14 @@ flog $ALog rm -f ${Tmp}_iso*
 
 # export the result
 dbexp HAVE_ISO_C_BINDING
+dbexp Cfg_FC_Exe
+dbexp Cfg_FC_Flags
 #SetParent HAVE_ISO_C_BINDING
+#SetParent Cfg_FC_Exe
+#SetParent Cfg_FC_Flags
 
 SetParent FC_Exe
 SetParent FC_Flags
-SetParent Cfg_FC_Exe
-SetParent Cfg_FC_Flags
 SetParent Cfe_FC_Exe
 SetParent Cfe_FC_Flags
 

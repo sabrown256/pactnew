@@ -404,6 +404,13 @@ endif
 #--------------------------------------------------------------------------
 
 # export the results
+dbexp Cfg_CC_Exe
+dbexp Cfg_CC_Flags
+dbexp Cfg_CC_Inc
+#SetParent Cfg_CC_Exe
+#SetParent Cfg_CC_Flags
+#SetParent Cfg_CC_Inc
+
 SetParent CList
 SetParent CC_Exe
 SetParent CC_Flags
@@ -418,10 +425,6 @@ SetParent CXX_Flags
 SetParent CXX_Debug
 SetParent CXX_Optimize
 SetParent CXX_Linker
-
-SetParent Cfg_CC_Exe
-SetParent Cfg_CC_Flags
-SetParent Cfg_CC_Inc
 
 SetParent Cfe_CC_Exe
 SetParent Cfe_CC_Flags

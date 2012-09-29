@@ -51,6 +51,7 @@ set vl = ( $vl PY_CC PY_Cfg PY_Exe PY_Inc PY_Vers )
 set vl = ( $vl Ranlib_Exe RPATH SUFFIXES Sys SysDir System )
 set vl = ( $vl ThreadLibExt UPDATE URFile )
 set vl = ( $vl Yacc_Exe Yacc_Flags )
+set vl = ( $vl Cfg_CC_Exe Cfg_CC_Flags Cfg_CC_Inc )
 
 # compiler tools
 foreach t (CC FC CXX)
