@@ -46,7 +46,7 @@ SC_contextdes SC_signal_n(int sig, PFSignal_handler fn, void *a)
 
     rv.a = SC_GET_CONTEXT(fn);
 
-#ifdef USE_POSIX_SIGNALS
+#ifdef HAVE_POSIX_SIGNALS
 
     {struct sigaction na, oa;
      
@@ -96,7 +96,7 @@ SC_contextdes SC_signal_action_n(int sig, PFSignal_handler fn, void *a,
 
     rv.a = SC_GET_CONTEXT(fn);
 
-#ifdef USE_POSIX_SIGNALS
+#ifdef HAVE_POSIX_SIGNALS
 
     int is;
     struct sigaction na, oa;
@@ -154,7 +154,7 @@ SC_contextdes SC_signal_action_n(int sig, PFSignal_handler fn, void *a,
 int SC_signal_block(sigset_t *pos, ...)
    {int is, rv;
 
-#ifdef USE_POSIX_SIGNALS
+#ifdef HAVE_POSIX_SIGNALS
 
     sigset_t ns;
 
@@ -215,7 +215,7 @@ int SC_signal_block(sigset_t *pos, ...)
 int SC_signal_unblock(sigset_t *pos, ...)
    {int is, rv;
 
-#ifdef USE_POSIX_SIGNALS
+#ifdef HAVE_POSIX_SIGNALS
 
     sigset_t ns;
 
@@ -274,7 +274,7 @@ int SC_signal_unblock(sigset_t *pos, ...)
 void dsigact(int sig)
    {
 
-#ifdef USE_POSIX_SIGNALS
+#ifdef HAVE_POSIX_SIGNALS
 
     int i;
     struct sigaction oa;
@@ -557,7 +557,7 @@ int SC_signal_hold(int sig)
 
     rv = -1;
 
-#ifdef USE_POSIX_SIGNALS
+#ifdef HAVE_POSIX_SIGNALS
 
     sigset_t os, ns;
 
@@ -590,7 +590,7 @@ int SC_signal_release(int sig)
 
     rv = -1;
 
-#ifdef USE_POSIX_SIGNALS
+#ifdef HAVE_POSIX_SIGNALS
 
     sigset_t os, ns;
 

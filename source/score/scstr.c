@@ -596,7 +596,7 @@ int _SC_strerr_psx(int err, char *msg, size_t nc)
 
     rv = 0;
 
-#ifdef HAVE_POSIX_STRERROR_R
+#ifdef HAVE_POSIX_STRERROR
 
     rv = strerror_r(errno, msg, nc);
 
@@ -612,7 +612,7 @@ int _SC_strerr_psx(int err, char *msg, size_t nc)
 int _SC_strerr_gnu(int err, char *msg, size_t nc)
    {int rv;
 
-#if defined(HAVE_GNU_STRERROR_R)
+#if defined(HAVE_GNU_STRERROR)
 
     int ln;
     char *s;
@@ -642,10 +642,10 @@ int _SC_strerr_gnu(int err, char *msg, size_t nc)
 int SC_strerror(int err, char *msg, size_t nc)
    {int rv;
 
-#if defined(HAVE_GNU_STRERROR_R)
+#if defined(HAVE_GNU_STRERROR)
     rv = _SC_strerr_gnu(err, msg, nc);
 
-#elif defined(HAVE_POSIX_STRERROR_R)
+#elif defined(HAVE_POSIX_STRERROR)
     rv = _SC_strerr_psx(err, msg, nc);
 
 #else

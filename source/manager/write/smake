@@ -29,7 +29,7 @@ Note $Log ""
 Note $Log ""
 
 set vl = ""
-set vl = ( $vl InstBase CfgDir System GnuMakeOpt )
+set vl = ( $vl InstBase CfgDir System GMAKE_Flag )
 set vl = ( $vl IncDir EtcDir BinDir MngDir )
 set vl = ( $vl Cfg_CC_Flags Cfg_Lex_Flags Cfg_LD_Flags )
 set vl = ( $vl Cfg_LD_RPath Cfg_CC_Exe )
@@ -90,16 +90,15 @@ EOF
 
     flog $Log cat $TMAKEF
 
-# build the small version of the PACT program (call it smake)
-    set MakeOpt = ""
-    set MakeOpt = ( $MakeOpt -g )
+# build the small version of the PACT program - smake
+    set mkopt = ""
+    set mkopt = ( $mkopt -g )
+    set mkopt = ( $mkopt -DSYSTEM_ID=\"${System}\" )
+    set mkopt = ( $mkopt -DPACT_VERSION=\"${lpactver}\" )
+    set mkopt = ( $mkopt $GMAKE_Flag )
+    set mkopt = ( $mkopt -I${IncDir} )
 
-    set MakeOpt = ( $MakeOpt -DSYSTEM_ID=\"${System}\" )
-    set MakeOpt = ( $MakeOpt -DPACT_VERSION=\"${lpactver}\" )
-    set MakeOpt = ( $MakeOpt $GnuMakeOpt )
-    set MakeOpt = ( $MakeOpt -I${IncDir} )
-
-    set RootOpt = ( $MakeOpt )
+    set RootOpt = ( $mkopt )
     if ($UseTmpDir == TRUE) then
        set RootOpt = ( $RootOpt -DUSE_TMP_DIR )
     endif

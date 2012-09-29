@@ -152,6 +152,9 @@ source $MngDir/write/import-db
 
 # emit the HAVE/USE flags - no value
     set lhave = ""
+    set lhave = ( $lhave BUILD_DEBUG              none )
+    set lhave = ( $lhave BUILD_OPTIMIZE           none )
+    set lhave = ( $lhave BUILD_PROFILE            none )
     set lhave = ( $lhave HAVE_ANSI_FLOAT16        none )
     set lhave = ( $lhave HAVE_ANSI_C9X_COMPLEX    none )
     set lhave = ( $lhave HAVE_ANSI_C9X_FENV       none )
@@ -160,7 +163,6 @@ source $MngDir/write/import-db
     set lhave = ( $lhave HAVE_PYTHON              none )
     set lhave = ( $lhave HAVE_PY_NUMERIC          none )
     set lhave = ( $lhave HAVE_PY_NUMPY            none )
-    set lhave = ( $lhave HAVE_FLEX_SCANNER        USE_FLEX )
     set lhave = ( $lhave HAVE_READLINE            none )
     set lhave = ( $lhave HAVE_HDF5                none )
     set lhave = ( $lhave HAVE_SQL                 none )
@@ -174,26 +176,26 @@ source $MngDir/write/import-db
     set lhave = ( $lhave HAVE_RESOURCE_USAGE      none )
     set lhave = ( $lhave HAVE_GETPWUID            none )
     set lhave = ( $lhave HAVE_ASYNC_STREAMS       none )
-    set lhave = ( $lhave HAVE_POSIX_SIGNALS       USE_POSIX_SIGNALS )
+    set lhave = ( $lhave HAVE_POSIX_SIGNALS       none )
     set lhave = ( $lhave HAVE_STREAMS             none )
     set lhave = ( $lhave HAVE_SELECT              none )
     set lhave = ( $lhave HAVE_UNIX98_PTY          none )
     set lhave = ( $lhave HAVE_MMAP                none )
     set lhave = ( $lhave HAVE_BAD_LINE_DIRECTIVES none )
-    set lhave = ( $lhave HAVE_POSIX_STRERROR      HAVE_POSIX_STRERROR_R )
-    set lhave = ( $lhave HAVE_GNU_STRERROR        HAVE_GNU_STRERROR_R )
+    set lhave = ( $lhave HAVE_POSIX_STRERROR      none )
+    set lhave = ( $lhave HAVE_GNU_STRERROR        none )
     set lhave = ( $lhave HAVE_VSNPRINTF           none )
     set lhave = ( $lhave HAVE_GNU_LIBC_6          none )
     set lhave = ( $lhave HAVE_DYNAMIC_LINKER      none )
     set lhave = ( $lhave HAVE_BFD                 none )
     set lhave = ( $lhave HAVE_DEMANGLE            none )
-    set lhave = ( $lhave BUILD_DEBUG              none )
-    set lhave = ( $lhave BUILD_OPTIMIZE           none )
-    set lhave = ( $lhave BUILD_PROFILE            none )
+    set lhave = ( $lhave USE_FULL_MM              none )
+
+# these involve the HAVE/USE dichotomy
+    set lhave = ( $lhave HAVE_FLEX_SCANNER        USE_FLEX )
     set lhave = ( $lhave Std_UseX                 HAVE_X11 )
     set lhave = ( $lhave Std_UseOGL               HAVE_OGL )
     set lhave = ( $lhave Std_UseQD                HAVE_QUICKDRAW )
-    set lhave = ( $lhave USE_FULL_MM              none )
 
     while ($#lhave > 0)
        set lvr = $lhave[1]
