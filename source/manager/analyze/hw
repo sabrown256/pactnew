@@ -22,8 +22,10 @@ endif
 NoteD $ALog -n "   Hardware: "
 Note $ALog ""
 
-SafeEnv CPU           "unknown"
-SafeEnv FPU           "unknown"
+dbini CPU           "unknown"
+dbini FPU           "unknown"
+#SafeEnv CPU           "unknown"
+#SafeEnv FPU           "unknown"
 
 set OS_Name = `uname -s`
 set HostHW = `uname -m`
@@ -64,8 +66,10 @@ if ("$FPU" != "unknown") then
 endif
 NoteD $ALog ""
 
-SetParent CPU
-SetParent FPU
+dbexp CPU
+dbexp FPU
+#SetParent CPU
+#SetParent FPU
 
 exit(0)
 
