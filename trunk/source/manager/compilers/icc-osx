@@ -11,7 +11,7 @@
 run analyze/rpath -a /usr/${LIB}
 run analyze/rpath intel
 
-GnuMakeOpt   = TRUE
+GMAKE_Flag   = TRUE
 WARN_PATTERN = ":+sp+warning+sp+"
 ERR_PATTERN  = ":+sp+error:"
 

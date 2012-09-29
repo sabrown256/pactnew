@@ -9,7 +9,7 @@
 
 run analyze/rpath gnu
 
-GnuMakeOpt   = TRUE
+GMAKE_Flag   = TRUE
 WARN_PATTERN = ":+sp+warning:"
 ERR_PATTERN  = ":+sp+error:"
 

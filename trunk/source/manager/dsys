@@ -219,11 +219,6 @@ switch ($Cmnd)
         set ThreadMake = ""
         set Make = `pact -info make`
         set Make = $Make:t
-        if ($Make == "gmake") then
-           set HaveGMake  = TRUE
-        else
-           set HaveGMake  = FALSE
-        endif
 
 #        set Args = "-dbg"
         set Args = ""

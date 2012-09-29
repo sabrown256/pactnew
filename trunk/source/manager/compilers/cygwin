@@ -10,7 +10,7 @@
 setenv PACT_CC_PATH
 setenv PACT_FC_PATH
 
-GnuMakeOpt   = TRUE
+GMAKE_Flag   = TRUE
 
 include compilers/gnu
 

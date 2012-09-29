@@ -14,9 +14,9 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: make"
 
-SafeEnv GnuMakeOpt ""
-if ("$GnuMakeOpt" == TRUE) then
-   setenv GnuMakeOpt "-DUSE_GNU_MAKE"
+SafeEnv GMAKE_Flag ""
+if ("$GMAKE_Flag" == TRUE) then
+   setenv GMAKE_Flag "-DUSE_GNU_MAKE"
 endif
 
 NoteD $ALog -n "   Make: "
@@ -38,7 +38,7 @@ flog $ALog gmake --version
 if ($status == 0) then
    NoteD $ALog -n "`$Which gmake`"
    NoteD $ALog -n " (GNU) "
-   setenv GnuMakeOpt "-DUSE_GNU_MAKE"
+   setenv GMAKE_Flag "-DUSE_GNU_MAKE"
    setenv BuildStrategy "SpaceSaving"
    NoteD $ALog " library aware"
 
@@ -60,7 +60,7 @@ flog $ALog rm -f $Tmp.make
 
 # export the results
 SetParent BuildStrategy
-SetParent GnuMakeOpt
+SetParent GMAKE_Flag
 
 exit(0)
 

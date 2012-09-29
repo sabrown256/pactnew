@@ -13,7 +13,7 @@ setenv NM /usr/bin/i686-w64-mingw32-nm
 #                 x86_64 ]
 CPU = x86
 
-GnuMakeOpt   = TRUE
+GMAKE_Flag   = TRUE
 WARN_PATTERN = ":+sp+warning:"
 ERR_PATTERN  = ":+sp+error:"
 
