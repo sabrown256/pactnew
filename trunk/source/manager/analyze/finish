@@ -14,6 +14,17 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: finish"
 
+set vl = ""
+set vl = ( $vl GRAPHICS_Windows )
+set vl = ( $vl Std_UseX Std_UseOGL Std_UseQD )
+set vl = ( $vl AbsoluteDeb MDG_Inc )
+set vl = ( $vl CC_Optimize CC_Debug )
+set vl = ( $vl FC_Optimize FC_Debug )
+set vl = ( $vl Save_CC Save_CFLAGS )
+set vl = ( $vl Cfe_CC_Inc )
+
+source $MngDir/write/import-db
+
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
@@ -21,15 +32,15 @@ if ($Std_UseX == FALSE) then
 
 # have OpenGL
    if ($Std_UseOGL == "TRUE") then
-      flog $ALog setenv GRAPHICS_Use OGL
+      flog $ALog setenv GRAPHICS_Windows OGL
 
 # have Quickdraw
    else if ($Std_UseQD == "TRUE") then
-      flog $ALog setenv GRAPHICS_Use QD
+      flog $ALog setenv GRAPHICS_Windows QD
 
 # no screen graphics
    else
-      flog $ALog setenv GRAPHICS_Use       ""
+      flog $ALog setenv GRAPHICS_Windows       ""
       flog $ALog setenv Std_UseX   FALSE
       flog $ALog setenv Std_UseOGL FALSE
       flog $ALog setenv Std_UseQD  FALSE
@@ -38,7 +49,8 @@ if ($Std_UseX == FALSE) then
       SetParent Std_UseOGL
       SetParent Std_UseQD
    endif
-   SetParent GRAPHICS_Use
+   dbexp GRAPHICS_Windows
+#   SetParent GRAPHICS_Windows
 
 endif
 
@@ -56,6 +68,7 @@ if ("$MDG_Inc" == "-I/usr/include") then
    flog $ALog setenv MDG_Inc ""
 endif
 dbexp MDG_Inc
+#SetParent MDG_Inc
 
 if ($?Save_CC == 1) then
    flog $ALog setenv CC_Exe "$Save_CC"
@@ -88,7 +101,6 @@ SetParent CDefDebug
 SetParent CDefOptimize
 SetParent FDefDebug
 SetParent FDefOptimize
-#SetParent MDG_Inc
 
 exit(0)
 

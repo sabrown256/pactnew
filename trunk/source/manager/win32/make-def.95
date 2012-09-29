@@ -16,7 +16,7 @@ HGIDir = c:\bc5\include
 HGLDir = c:\bc5\lib
 HGLibs = 
 LDF    = tld
-GRAPHICS_Use= 
+GRAPHICS_Windows= 
 
 LR = ls
 

@@ -143,7 +143,7 @@ SafeEnv LD_Flags   ""
 
 Separator $ALog
 
-SafeEnv GRAPHICS_Use       "X"
+SafeEnv GRAPHICS_Windows       "X"
 SafeEnv Std_UseX   TRUE
 SafeEnv Std_UseOGL FALSE
 SafeEnv Std_UseQD  FALSE

@@ -1227,7 +1227,7 @@ FOptimize for those purposes.
 <BR>Default is &#147;&#147;</UL>
 
 <P>
-<B>GRAPHICS_Use</B>
+<B>GRAPHICS_Windows</B>
 <BR>
 <UL>The host graphics system being used (almost always X).
 <BR>Default is &#147;X&#148;</UL>
@@ -1388,7 +1388,7 @@ type &#147;char&#148; if no voids (default for PCC compilers).</UL>
 <P>
 <B>X11R4</B>
 <BR>
-<UL>PACT uses X11 R4 or later graphics (implied by &#147;GRAPHICS_Use = X&#148;).</UL>
+<UL>PACT uses X11 R4 or later graphics (implied by &#147;GRAPHICS_Windows = X&#148;).</UL>
 
 <P>
 <br>

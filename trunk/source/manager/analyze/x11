@@ -14,13 +14,16 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: x11"
 
-dbini MDG_Inc          ""
-dbini MDG_Lib          ""
-dbini MDG_Pck          ""
-dbini X11_Inc          $RootInc
-dbini X11_Lib          ""
-dbini X11_RPath        $RootLib
-dbini X11_Path         /usr
+dbini MDG_Inc           ""
+dbini MDG_Lib           ""
+dbini MDG_Pck           ""
+dbini X11_Inc           $RootInc
+dbini X11_Lib           ""
+dbini X11_RPath         $RootLib
+dbini X11_Path          /usr
+dbini GRAPHICS_Windows  ""
+dbini GRAPHICS_Devices  ""
+dbini GRAPHICS_Flags    ""
 #SafeEnv MDG_Inc          ""
 #SafeEnv MDG_Lib          ""
 #SafeEnv MDG_Pck          ""
@@ -28,12 +31,12 @@ dbini X11_Path         /usr
 #SafeEnv X11_Lib          ""
 #SafeEnv X11_RPath        $RootLib
 #SafeEnv X11_Path         /usr
+#SafeEnv GRAPHICS_Devices ""
+#SafeEnv GRAPHICS_Flags   ""
 
 SafeEnv AnaDir           analyze
 SafeEnv ALog             $cwd/cfg-$System/log.analyze
 SafeEnv OS_Name           `uname -s`
-SafeEnv GRAPHICS_Devices  ""
-SafeEnv GRAPHICS_Flags     ""
 SafeEnv Cfe_CC_Exe       "cc"
 SafeEnv Cfe_CC_Flags     "-g"
 
@@ -126,7 +129,7 @@ EOF
       NoteD $ALog "      has X11 ($PckLib)"
 
 #      setenv HAVE_SOCKETS   Envir
-      setenv GRAPHICS_Use             "X"
+      setenv GRAPHICS_Windows             "X"
       setenv GRAPHICS_Devices  "$GRAPHICS_Devices X"
       setenv GRAPHICS_Flags     "$GRAPHICS_Flags -DX11"
 
@@ -176,6 +179,9 @@ EOF
    dbexp X11_Lib
    dbexp X11_RPath
    dbexp X11_Path
+   dbexp GRAPHICS_Windows
+   dbexp GRAPHICS_Devices
+   dbexp GRAPHICS_Flags
 #   SetParent MDG_Inc
 #   SetParent MDG_Lib
 #   SetParent MDG_Pck
@@ -183,9 +189,9 @@ EOF
 #   SetParent X11_Lib
 #   SetParent X11_RPath
 #   SetParent X11_Path
+#   SetParent GRAPHICS_Devices
 
    SetParent RPATH
-   SetParent GRAPHICS_Devices
 
 endif
 

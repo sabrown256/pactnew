@@ -14,13 +14,16 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: opengl"
 
-dbini MDG_Inc          ""
-dbini MDG_Lib          ""
-dbini MDG_Pck          ""
-dbini OGL_Inc          ""
-dbini OGL_Lib          ""
-dbini OGL_RPath        $RootLib
-dbini OGL_Path         /usr
+dbini MDG_Inc           ""
+dbini MDG_Lib           ""
+dbini MDG_Pck           ""
+dbini OGL_Inc           ""
+dbini OGL_Lib           ""
+dbini OGL_RPath         $RootLib
+dbini OGL_Path          /usr
+dbini GRAPHICS_Windows  ""
+dbini GRAPHICS_Devices  ""
+dbini GRAPHICS_Flags    ""
 #SafeEnv MDG_Inc          ""
 #SafeEnv MDG_Lib          ""
 #SafeEnv MDG_Pck          ""
@@ -28,10 +31,10 @@ dbini OGL_Path         /usr
 #SafeEnv OGL_Lib          ""
 #SafeEnv OGL_RPath        $RootLib
 #SafeEnv OGL_Path         /usr
+#SafeEnv GRAPHICS_Devices ""
+#SafeEnv GRAPHICS_Flags   ""
 
 SafeEnv OS_Name           `uname -s`
-SafeEnv GRAPHICS_Devices  ""
-SafeEnv GRAPHICS_Flags     ""
 
 SafeEnv Std_UseOGL       FALSE
 
@@ -92,8 +95,8 @@ EOF
       NoteD $ALog "      has OpenGL ($PckLib)"
       Note $ALog "Include = |$PckInc|"
 
-      setenv GRAPHICS_Use             "OGL"
-      setenv GRAPHICS_Devices  "$GRAPHICS_Devices OGL"
+      setenv GRAPHICS_Windows   "OGL"
+      setenv GRAPHICS_Devices   "$GRAPHICS_Devices OGL"
       setenv GRAPHICS_Flags     "$GRAPHICS_Flags -DOGL"
 
       if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
@@ -130,6 +133,9 @@ EOF
       dbexp OGL_Lib
       dbexp OGL_RPath
       dbexp OGL_Path
+      dbexp GRAPHICS_Windows
+      dbexp GRAPHICS_Devices
+      dbexp GRAPHICS_Flags
 #      SetParent MDG_Inc
 #      SetParent MDG_Lib
 #      SetParent MDG_Pck
@@ -137,8 +143,7 @@ EOF
 #      SetParent OGL_Lib
 #      SetParent OGL_RPath
 #      SetParent OGL_Path
-
-      SetParent GRAPHICS_Devices
+#      SetParent GRAPHICS_Devices
 
    endif
 
