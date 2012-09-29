@@ -34,7 +34,7 @@ Note $Log ""
 
 set vl = ""
 set vl = ( $vl AR_IFlag AR_XFlag ArW32Objs )
-set vl = ( $vl BaseDir BE Bits BuildStrategy )
+set vl = ( $vl BaseDir BE Bits MAKE_Strategy )
 set vl = ( $vl CDefDebug CDefOptimize CFE )
 set vl = ( $vl DEFAULT_SHELL EtcDir )
 #set vl = ( $vl FC_LD_Lib )
@@ -199,7 +199,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "#"
     Note $STDOUT -n "OSSupport ="
     if ($lostd == UNIX) then
-       if ($BuildStrategy == "SpaceSaving") then
+       if ($MAKE_Strategy == "SpaceSaving") then
 	  Note $STDOUT -n ' ${ArUnxObjs}'
        else
 	  Note $STDOUT -n ' ${OUnxObjs'}'
@@ -207,7 +207,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
 
 # cannot ever get here but it shows how the abstraction works
     else if ($lostd == WIN32) then
-       if ($BuildStrategy == "SpaceSaving") then
+       if ($MAKE_Strategy == "SpaceSaving") then
 	  Note $STDOUT -n ' ${ArW32Objs}'
        else
 	  Note $STDOUT -n ' ${OW32Objs'}'
@@ -226,7 +226,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
 
     Note $STDOUT -n "GraphicsDevices ="
     foreach dev ($GraphicsDevices)
-       if ($BuildStrategy == "SpaceSaving") then
+       if ($MAKE_Strategy == "SpaceSaving") then
 	  Note $STDOUT -n ' ${Ar'$dev'}'
        else
 	  Note $STDOUT -n ' ${O'$dev'}'
@@ -252,7 +252,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
           if (-d $mod) then
              if ($mod != $scsd) then
                 set SynSCM = ( $SynSCM applications/${mod}synt.scm )
-                if ($BuildStrategy == "SpaceSaving") then
+                if ($MAKE_Strategy == "SpaceSaving") then
    	           Note $STDOUT -n ' ${Ar'$mod'}'
                 else
 	           Note $STDOUT -n ' ${O'$mod'}'
@@ -266,7 +266,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "SyntaxScheme = $SynSCM"
 
 # Parallel I/O
-    if ($BuildStrategy == "SpaceSaving") then
+    if ($MAKE_Strategy == "SpaceSaving") then
        set MPDev  = '${Ar'$STD_PARALLEL_COMM'}'
        set IPCDev = '${Ar'$IPC_STD'}'
     else
@@ -445,9 +445,9 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT '#                    LibDep = ${Objs}'
     Note $STDOUT "#"
 
-# BuildStrategy handler
+# MAKE_Strategy handler
 
-    if ($BuildStrategy == "SpaceSaving") then
+    if ($MAKE_Strategy == "SpaceSaving") then
        Note $STDOUT 'LibDep = ${ArObjs}'
        Note $STDOUT ""
        Note $STDOUT '.PRECIOUS: ${TGTLib}'
