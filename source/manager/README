@@ -683,7 +683,7 @@ which come with a UNIX/POSIX system.
 Some of these are implied by the PACT coding and are listed here to give you
 an idea of what they are there for (just in case you need to look in the code).
 
-BuildStrategy
+MAKE_Strategy
    UNIX systems with a sufficiently smart make can save
    lots of disk space by building the objects directly into
    library archives. Use "SpaceSaving" if your make is good enough

@@ -28,7 +28,7 @@ NoteD $Log "   System Dependent MAKE Macros - make-macros"
 Note $Log ""
 
 set vl = ""
-set vl = ( $vl Bits BuildSharedLibs BuildStrategy )
+set vl = ( $vl Bits BuildSharedLibs MAKE_Strategy )
 set vl = ( $vl EtcDir FPU HAVE_GNU_FENV IncDir INSTALL )
 set vl = ( $vl NoExe Ranlib_Exe Sys SYS_TYPE UPDATE )
 
@@ -91,7 +91,7 @@ set LibVers = 1
     Note $STDOUT '${TGTLib} : ${LibDep}'
     Note $STDOUT '	@[ ! -f ${LibDir}/.lock ] || { echo "${LibDir} is locked" ; exit 1 ; }'
     Note $STDOUT '	${LibAction}'
-    if ("$BuildStrategy" != "SpaceSaving") then
+    if ("$MAKE_Strategy" != "SpaceSaving") then
        Note $STDOUT '	${AR} ${AROpt} ${TGTLib} ${Objs}'
     endif
     if ("$Ranlib_Exe" != "touch") then
