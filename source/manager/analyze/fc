@@ -130,7 +130,7 @@ if ($FC_Exe != "") then
    Note $ALog "   FAMILY = $PACT_FC_FAMILY"
    flog $ALog which $Cfe_FC_Exe
 
-   if ($HostOS == SunOS) then
+   if ($OS_Name == SunOS) then
       flog $ALog $Cfg_FC_Exe $FC_Version
       set CmpVers = any
       set xstatus = $status

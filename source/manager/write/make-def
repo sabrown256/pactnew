@@ -41,11 +41,11 @@ set vl = ( $vl DEFAULT_SHELL EtcDir )
 set vl = ( $vl FDefDebug FDefOptimize )
 set vl = ( $vl HAVE_GOOD_OMP_PRAGMAS GnuMakeOpt )
 set vl = ( $vl GraphicsDevices GraphicsFlag GSYS )
-set vl = ( $vl HAVE_PYTHON HostOS )
+set vl = ( $vl HAVE_PYTHON OS_Name )
 set vl = ( $vl IncDir InstBase INSTALL IPC_STD )
 set vl = ( $vl Lex_Exe Lex_Flags )
 set vl = ( $vl Load MngDir )
-set vl = ( $vl OStd OSType OW32Objs )
+set vl = ( $vl OS_Type OW32Objs )
 set vl = ( $vl STD_PARALLEL_COMM PubLib PubInc )
 set vl = ( $vl PY_CC PY_Cfg PY_Exe PY_Inc PY_Vers )
 set vl = ( $vl Ranlib_Exe RPATH SUFFIXES Sys SysDir System )
@@ -99,10 +99,10 @@ source $MngDir/write/import-db
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-if ("$OSType" == USE_MSW) then
-   set OStd = WIN32
+if ("$OS_Type" == USE_MSW) then
+   set lostd = WIN32
 else
-   set OStd = UNIX
+   set lostd = UNIX
 endif
 
 alias RESET_VAR  'setenv \!\!:1_\!\!:2 \!\!:3-$'
@@ -149,7 +149,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT 'Man3Dir = ${SysDir}/man/man3'
     Note $STDOUT ""
 
-    if ("$HostOS" == "HP-UX") then
+    if ("$OS_Name" == "HP-UX") then
        Note $STDOUT 'TGTLib  = nolib'
     endif
     Note $STDOUT 'TGTBin  = nobin'
@@ -198,7 +198,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT "# Site Dependent OS Support"
     Note $STDOUT "#"
     Note $STDOUT -n "OSSupport ="
-    if ($OStd == UNIX) then
+    if ($lostd == UNIX) then
        if ($BuildStrategy == "SpaceSaving") then
 	  Note $STDOUT -n ' ${ArUnxObjs}'
        else
@@ -206,7 +206,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
        endif
 
 # cannot ever get here but it shows how the abstraction works
-    else if ($OStd == WIN32) then
+    else if ($lostd == WIN32) then
        if ($BuildStrategy == "SpaceSaving") then
 	  Note $STDOUT -n ' ${ArW32Objs}'
        else

@@ -22,10 +22,10 @@ set fpe = ""
 # check for standard FPE handling
 
 if (-e $RootInc/fenv.h) then
-   setenv HaveANSIFenv TRUE
+   setenv HAVE_ANSI_C9X_FENV TRUE
    set fpe = ( $fpe "ANSI C99" )
 else
-   setenv HaveANSIFenv FALSE
+   setenv HAVE_ANSI_C9X_FENV FALSE
    set fpe = ( $fpe "C89" )
 endif
 
@@ -46,10 +46,10 @@ EOF
 
 flog $ALog gcc $Tmp.c -o $Tmp -lc -lm
 if ($status == 0) then
-   setenv HaveGNUFenv TRUE
+   setenv HAVE_GNU_FENV TRUE
    set fpe = ( $fpe "with GNU extensions" )
 else
-   setenv HaveGNUFenv FALSE
+   setenv HAVE_GNU_FENV FALSE
 endif
 
 flog $ALog rm -f $Tmp $Tmp.c
@@ -65,11 +65,11 @@ endif
 
 # export the results
 
-dbexp HaveANSIFenv
-dbexp HaveGNUFenv
+dbexp HAVE_ANSI_C9X_FENV
+dbexp HAVE_GNU_FENV
 
-#SetParent HaveANSIFenv
-#SetParent HaveGNUFenv
+#SetParent HAVE_ANSI_C9X_FENV
+#SetParent HAVE_GNU_FENV
 
 exit(0)
 

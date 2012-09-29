@@ -11,9 +11,8 @@
 
 unalias *
 
-set Exe    = ""
-set Tgt    = "bin"
-set HostOS = `uname -s`
+set Exe = ""
+set Tgt = "bin"
 
 while ($#argv > 0)
    switch ($1)

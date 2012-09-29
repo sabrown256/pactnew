@@ -1,7 +1,7 @@
 #!/bin/csh -f
 #
 # OS - analyze the platform OS
-#    - Computes: OSType, HostOS, OSX_Version
+#    - Computes: OS_Type, OS_Name, OSX_Version
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
@@ -25,58 +25,58 @@ Note $ALog ""
 dbini OSX_Version        ""
 #SafeEnv OSX_Version        ""
 
-SafeEnv HostOS        `uname -s`
-SafeEnv HostOSRel     `uname -r`
+SafeEnv OS_Name        `uname -s`
+SafeEnv OS_Release     `uname -r`
 
 if ($?Arch == 0) then
    setenv Arch `../scripts/system-id`
 endif
 
 # remove parens - they confuse shells later on
-set losr = ( `echo $HostOSRel | sed 's/(/,/g' | sed 's/)/,/g'` )
-setenv HostOSRel $losr
+set losr = ( `echo $OS_Release | sed 's/(/,/g' | sed 's/)/,/g'` )
+setenv OS_Release $losr
 unset losr
 
 Note $ALog "RootInc   = $RootInc"
 if ($CROSS_COMPILE == MINGW32) then
-   setenv OSType     MSW
-   setenv HostOS     WIN32
-   setenv HostOSRel  mingw32
+   setenv OS_Type     MSW
+   setenv OS_Name     WIN32
+   setenv OS_Release  mingw32
 
 else if ($CROSS_COMPILE == MINGW64) then
-   setenv OSType     MSW
-   setenv HostOS     WIN64
-   setenv HostOSRel  mingw64
+   setenv OS_Type     MSW
+   setenv OS_Name     WIN64
+   setenv OS_Release  mingw64
 
-else if (("$HostOS" == "Windows_NT") || \
-    (("$HostOS" == "Linux") && (-e $RootInc/termio.h)) || \
+else if (("$OS_Name" == "Windows_NT") || \
+    (("$OS_Name" == "Linux") && (-e $RootInc/termio.h)) || \
     ($?IBM_BGP == 1) || ($?IBM_BGQ == 1) || \
     (-e $RootInc/sys/termio.h)) then
-   setenv OSType "SYSV"
+   setenv OS_Type "SYSV"
 
 else
-   setenv OSType "BSD"
+   setenv OS_Type "BSD"
 endif
-Note $ALog "HostOS    = $HostOS"
-Note $ALog "HostOSRel = $HostOSRel"
-Note $ALog "OSType    = $OSType"
+Note $ALog "OS_Name    = $OS_Name"
+Note $ALog "OS_Release = $OS_Release"
+Note $ALog "OS_Type    = $OS_Type"
 
-if ($HostOS == Darwin) then
+if ($OS_Name == Darwin) then
    setenv OSX_Version `echo $Arch | sed 's/osx-10\.//' | sed 's/-.*//'`
 endif
 
 # there are systems that put out garbage if this is on a single echo (AIX)
-NoteD $ALog -n "$HostOS $HostOSRel"
-NoteD $ALog " ($OSType)"
+NoteD $ALog -n "$OS_Name $OS_Release"
+NoteD $ALog " ($OS_Type)"
 
-setenv OSType USE_$OSType
+setenv OS_Type USE_$OS_Type
 
-dbexp OSType
+dbexp OS_Type
 dbexp OSX_Version
-#SetParent OSType
+#SetParent OS_Type
 #SetParent OSX_Version
 
-SetParent HostOS
+SetParent OS_Name
 
 exit(0)
 

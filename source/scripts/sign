@@ -25,7 +25,6 @@ if (!(-x "$LSJOBS")) then
    exit(1)
 endif
 
-set OSType  = `uname -s`
 set SIG     = ""
 set PName   = ""
 set Signal  = TRUE

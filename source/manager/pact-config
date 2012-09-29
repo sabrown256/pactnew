@@ -75,8 +75,8 @@ set SRCDate       = ""
 source pact-scs
 
 setenv Host       `uname -n`
-setenv HostOS     `uname -s`
-setenv HostOSRel  `uname -r`
+setenv OS_Name     `uname -s`
+setenv OS_Release  `uname -r`
 
 setenv Arch `$ScrDir/system-id`
 

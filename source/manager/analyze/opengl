@@ -29,7 +29,7 @@ dbini OGL_Path         /usr
 #SafeEnv OGL_RPath        $RootLib
 #SafeEnv OGL_Path         /usr
 
-SafeEnv HostOS           `uname -s`
+SafeEnv OS_Name           `uname -s`
 SafeEnv GraphicsDevices  ""
 SafeEnv GraphicsFlag     ""
 
@@ -45,7 +45,7 @@ else
 
    set UTime = `timer -r`
 
-   if (($HostOS == Darwin) && ($CC_Exe !~ pgc*)) then
+   if (($OS_Name == Darwin) && ($CC_Exe !~ pgc*)) then
       Note $ALog "Finding GL on MAC OS X"
       setenv MDG_Lib "$MDG_Lib -framework GLUT -framework OpenGL"
    endif

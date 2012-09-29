@@ -26,7 +26,7 @@ dbini QD_Path          /usr
 #SafeEnv QD_RPath         $RootLib
 #SafeEnv QD_Path          /usr
 
-SafeEnv HostOS           `uname -s`
+SafeEnv OS_Name           `uname -s`
 SafeEnv GraphicsDevices  ""
 SafeEnv GraphicsFlag     ""
 SafeEnv Cfg_CC_Exe       "cc"
@@ -35,7 +35,7 @@ SafeEnv ALog             $cwd/cfg-$System/log.analyze
 
 SafeEnv Std_UseQD        FALSE
 
-if ($HostOS == Darwin) then
+if ($OS_Name == Darwin) then
 
    Separator $Log
    Note $Log "Analyze: Quickdraw"

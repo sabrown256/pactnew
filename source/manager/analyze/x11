@@ -31,7 +31,7 @@ dbini X11_Path         /usr
 
 SafeEnv AnaDir           analyze
 SafeEnv ALog             $cwd/cfg-$System/log.analyze
-SafeEnv HostOS           `uname -s`
+SafeEnv OS_Name           `uname -s`
 SafeEnv GraphicsDevices  ""
 SafeEnv GraphicsFlag     ""
 SafeEnv Cfe_CC_Exe       "cc"
@@ -60,7 +60,7 @@ else if ($Std_UseX == TRUE) then
 # write a little X test that works around dumb Solaris
 # on which XOpenDisplay hangs forever if it does not
 # like the DISPLAY variable value
-   if ($HostOS == SunOS) then
+   if ($OS_Name == SunOS) then
 
       cat << EOF >! $Tmp.c
 #include <stdint.h>

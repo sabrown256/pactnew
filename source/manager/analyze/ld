@@ -44,7 +44,7 @@ EOF
 Note $ALog ""
 Note $ALog "Checking for -rpath flag"
 flog $ALog $Cfe_CC_Exe -c $Tmp.c -o $Tmp.o
-if ($HostOS == AIX) then
+if ($OS_Name == AIX) then
    flog $ALog $LD_Exe $Tmp.o -o $Tmp -bsvr4 -R $cwd
    set LStat = $status
 else

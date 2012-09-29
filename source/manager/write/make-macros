@@ -29,7 +29,7 @@ Note $Log ""
 
 set vl = ""
 set vl = ( $vl Bits BuildSharedLibs BuildStrategy )
-set vl = ( $vl EtcDir FPU HaveGNUFenv IncDir INSTALL )
+set vl = ( $vl EtcDir FPU HAVE_GNU_FENV IncDir INSTALL )
 set vl = ( $vl NoExe Ranlib_Exe Sys SYS_TYPE UPDATE )
 
 source $MngDir/write/import-db
@@ -264,7 +264,7 @@ set LibVers = 1
        Note $STDOUT '          ${RM} mlfpeppc.o 2> /dev/null )'
     endif
 
-    if ($HaveGNUFenv == TRUE) then
+    if ($HAVE_GNU_FENV == TRUE) then
        set lcc = ( $FPE_Exe -g -Wall )
        if ($BuildSharedLibs == TRUE) then
           set lcc = ( $lcc -fPIC )
