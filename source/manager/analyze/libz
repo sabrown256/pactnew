@@ -122,7 +122,8 @@ EOF
 
 endif
 
-SetParent HAVE_ZLIB
+dbexp HAVE_ZLIB
+#SetParent HAVE_ZLIB
 
 exit(0)
 

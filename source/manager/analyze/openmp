@@ -52,7 +52,8 @@ flog $ALog rm -f $Tmp.c $Tmp
 #--------------------------------------------------------------------------
 
 # export the results
-SetParent HAVE_OPENMP
+dbexp HAVE_OPENMP
+#SetParent HAVE_OPENMP
 
 exit(0)
 

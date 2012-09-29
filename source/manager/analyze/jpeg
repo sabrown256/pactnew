@@ -22,6 +22,7 @@ dbini JPEG_Inc      ""
 dbini JPEG_Lib      ""
 dbini JPEG_RPath    $RootLib
 dbini JPEG_Path     /usr
+dbini HAVE_JPEGLIB  FALSE
 #SafeEnv MDG_Inc       ""
 #SafeEnv MDG_Lib       ""
 #SafeEnv MDG_Pck       ""
@@ -29,8 +30,7 @@ dbini JPEG_Path     /usr
 #SafeEnv JPEG_Lib      ""
 #SafeEnv JPEG_RPath    $RootLib
 #SafeEnv JPEG_Path     /usr
-
-SafeEnv HAVE_JPEGLIB  FALSE
+#SafeEnv HAVE_JPEGLIB  FALSE
 
 # if we have explicitly said we do not want JPEG
 # do NOT detect it
@@ -126,7 +126,8 @@ EOF
 
 endif
 
-SetParent HAVE_JPEGLIB
+dbexp HAVE_JPEGLIB
+#SetParent HAVE_JPEGLIB
 
 exit(0)
 
