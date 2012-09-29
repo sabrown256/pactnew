@@ -23,7 +23,7 @@ Note $Tmp.h "#include <unistd.h>"
 Note $Tmp.h "#include <sys/ioctl.h>"
 Note $Tmp.h "#include <fcntl.h>"
 
-switch ($HostOS)
+switch ($OS_Name)
    case Darwin:
    case FreeBSD:
         Note $Tmp.h "#include <sys/termios.h>"

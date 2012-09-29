@@ -32,13 +32,13 @@ set vl = ( $vl CC_Exe CEFile CPU )
 set vl = ( $vl DEFAULT_SHELL DP_Lib DP_Inc )
 set vl = ( $vl FC_ID_CASE FC_ID_UNDERSCORE FC_INT_PTR_DIFFER FilterDir FPU )
 set vl = ( $vl GETSOCKOPT_TYPE )
-set vl = ( $vl HostOS HostOSRel )
+set vl = ( $vl OS_Name OS_Release )
 set vl = ( $vl IncDir IPC_STD )
 set vl = ( $vl Linking LONG64 )
 set vl = ( $vl HAVE_MPI_STDIN_ALL HAVE_MPI_GOOD_IO )
 set vl = ( $vl NO_LONG_LONG NEED_ALT_LARGE_FILE )
 set vl = ( $vl PACT_CC_FAMILY PACT_CC_VERSION PACT_SO_CACHE PTHREAD_POSIX )
-set vl = ( $vl OSType OSX_Version )
+set vl = ( $vl OS_Type OSX_Version )
 set vl = ( $vl Sys TRACKER_Exe )
 set vl = ( $vl MYSQL_SO SQLITE3_SO HDF5_SO )
 set vl = ( $vl HAVE_BAD_LINE_DIRECTIVES )
@@ -47,7 +47,7 @@ dbexp vl = ( $vl BUILD_DEBUG BUILD_OPTIMIZE BUILD_PROFILE )
 set vl = ( $vl HAVE_INLINE HAVE_OPENMP HAVE_OPENMPI HAVE_SOCKETS )
 set vl = ( $vl HAVE_TRACKER )
 set vl = ( $vl HAVE_ANSI_FLOAT16 HAVE_ANSI_C9X_COMPLEX )
-set vl = ( $vl HaveANSIFenv HaveGNUFenv )
+set vl = ( $vl HAVE_ANSI_C9X_FENV HAVE_GNU_FENV )
 set vl = ( $vl HAVE_VA_COPY HAVE_VA_LIST )
 set vl = ( $vl HAVE_PYTHON HAVE_PY_NUMERIC HAVE_PY_NUMPY )
 set vl = ( $vl HAVE_FLEX_SCANNER )
@@ -152,10 +152,10 @@ source $MngDir/write/import-db
 
 # emit the HAVE/USE flags - no value
     set lhave = ""
-    set lhave = ( $lhave HAVE_ANSI_FLOAT16        none)
+    set lhave = ( $lhave HAVE_ANSI_FLOAT16        none )
     set lhave = ( $lhave HAVE_ANSI_C9X_COMPLEX    none )
-    set lhave = ( $lhave HaveANSIFenv             HAVE_ANSI_C9X_FENV )
-    set lhave = ( $lhave HaveGNUFenv              HAVE_GNU_FENV )
+    set lhave = ( $lhave HAVE_ANSI_C9X_FENV       none )
+    set lhave = ( $lhave HAVE_GNU_FENV            none )
     set lhave = ( $lhave HAVE_VA_COPY             none )
     set lhave = ( $lhave HAVE_PYTHON              none )
     set lhave = ( $lhave HAVE_PY_NUMERIC          none )
@@ -182,18 +182,18 @@ source $MngDir/write/import-db
     set lhave = ( $lhave HAVE_BAD_LINE_DIRECTIVES none )
     set lhave = ( $lhave HAVE_POSIX_STRERROR      HAVE_POSIX_STRERROR_R )
     set lhave = ( $lhave HAVE_GNU_STRERROR        HAVE_GNU_STRERROR_R )
-    set lhave = ( $lhave HAVE_VSNPRINTF           HAVE_VSNPRINTF )
+    set lhave = ( $lhave HAVE_VSNPRINTF           none )
     set lhave = ( $lhave HAVE_GNU_LIBC_6          none )
     set lhave = ( $lhave HAVE_DYNAMIC_LINKER      none )
     set lhave = ( $lhave HAVE_BFD                 none )
     set lhave = ( $lhave HAVE_DEMANGLE            none )
-    set lhave = ( $lhave USE_FULL_MM              none )
     set lhave = ( $lhave BUILD_DEBUG              none )
     set lhave = ( $lhave BUILD_OPTIMIZE           none )
     set lhave = ( $lhave BUILD_PROFILE            none )
     set lhave = ( $lhave Std_UseX                 HAVE_X11 )
     set lhave = ( $lhave Std_UseOGL               HAVE_OGL )
     set lhave = ( $lhave Std_UseQD                HAVE_QUICKDRAW )
+    set lhave = ( $lhave USE_FULL_MM              none )
 
     while ($#lhave > 0)
        set lvr = $lhave[1]
@@ -253,7 +253,7 @@ source $MngDir/write/import-db
     endif
 
     if (-e /dev/zero) then
-       if (("$HostOS" != "HP-UX") && ("$HostOS" != "Darwin")) then
+       if (("$OS_Name" != "HP-UX") && ("$OS_Name" != "Darwin")) then
           Note $STDOUT "#define HAVE_DEV_ZERO"
        endif
     endif
@@ -270,7 +270,7 @@ source $MngDir/write/import-db
        flog $Log touch $IncDir/noipc
     endif
 
-    if (("$NEED_ALT_LARGE_FILE" == "TRUE") && ($HostOS != FreeBSD)) then
+    if (("$NEED_ALT_LARGE_FILE" == "TRUE") && ($OS_Name != FreeBSD)) then
        Note $STDOUT "#define NEED_ALT_LARGE_FILE"
        Note $STDOUT "#define HAVE_ALT_LARGE_FILE"
     endif
@@ -328,16 +328,16 @@ source $MngDir/write/import-db
     endif
 
 # OS defines
-    if ("$OSType" == USE_MSW) then
-       Note $STDOUT "#undef $HostOS"
-       Note $STDOUT "#define $HostOS"
+    if ("$OS_Type" == USE_MSW) then
+       Note $STDOUT "#undef $OS_Name"
+       Note $STDOUT "#define $OS_Name"
     else
        Note $STDOUT "#undef UNIX"
        Note $STDOUT "#define UNIX"
     endif
 
-    Note $STDOUT "#undef $OSType"
-    Note $STDOUT "#define $OSType"
+    Note $STDOUT "#undef $OS_Type"
+    Note $STDOUT "#define $OS_Type"
 
     set OSL = ( `cat $MngDir/std/os | grep -v '#'` )
     while ($#OSL > 2)
@@ -347,7 +347,7 @@ source $MngDir/write/import-db
        shift OSL
        shift OSL
        shift OSL
-       if ("$HostOS" == "$sysn") then
+       if ("$OS_Name" == "$sysn") then
           Note $STDOUT "#undef $pctn"
           Note $STDOUT "#define $pctn"
           Note $STDOUT '#include <'$incn'>'
@@ -356,7 +356,7 @@ source $MngDir/write/import-db
 
     Note $STDOUT ""
 
-    SafeSet HostArch $HostOSRel
+    SafeSet HostArch $OS_Release
 
     Note $STDOUT "#endif"
     Note $STDOUT ""

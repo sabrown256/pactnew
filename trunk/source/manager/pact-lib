@@ -12,7 +12,7 @@ unalias *
 
 @ err = 0
 
-setenv HostOS  `uname -s`
+setenv OS_Name  `uname -s`
 
 set MngDir = $cwd
 setenv System  `../scripts/cfgman use`
@@ -57,7 +57,7 @@ mv libpact.a ..
 echo "done"
 
 # make libpact.so with all the .o files
-if ($HostOS != Darwin) then
+if ($OS_Name != Darwin) then
    set bshld = `pact +l -info BuildSharedLibs | tail -n 1`
    set sld   = `pact +l -info Shared_LD_Exe`
    set ldf   = `pact +l -info Shared_LD_Flags`

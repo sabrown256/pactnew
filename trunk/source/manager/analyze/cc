@@ -179,7 +179,7 @@ if ($Cfg_CC_Exe != "") then
    Note $ALog "   FAMILY = $PACT_CC_FAMILY"
    flog $ALog which $Cfe_CC_Exe
 
-   if ($HostOS == SunOS) then
+   if ($OS_Name == SunOS) then
       flog $ALog $Cfg_CC_Exe $CC_Version
       flog $ALog set CmpVers = any
       set xstatus = $status
@@ -338,7 +338,7 @@ EOF
 
 # OSX ARCH - check for -arch flag
 
-   if ("$HostOS" == Darwin) then
+   if ("$OS_Name" == Darwin) then
 
       Note $ALog "Determine whether -arch flag is needed on GCC/OSX"
       cat << EOF >! $Tmp.c

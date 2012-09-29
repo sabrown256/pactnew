@@ -969,7 +969,7 @@ switch ($Cmnd)
         flog $Log $RM *.core *~
 
 # make sure that the installation directories exist
-        setenv HostOS     `uname -s`
+        setenv OS_Name     `uname -s`
         setenv HostArch   `uname -m`
         set InstBase  = $DevDir/$System
         if (!(-d $DevDir)) then

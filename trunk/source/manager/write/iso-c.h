@@ -28,7 +28,7 @@ NoteD $Log "   C Standards Configuration - iso-c.h"
 Note $Log ""
 
 set vl = ""
-set vl = ( $vl C_STD GLIBC_VERSION HostOS IncDir Sys )
+set vl = ( $vl C_STD GLIBC_VERSION OS_Name IncDir Sys )
 
 source $MngDir/write/import-db
 
@@ -153,7 +153,7 @@ source $MngDir/write/import-db
 #            Note $STDOUT '# endif'
 #            Note $STDOUT ''
 
-            if (($HostOS != FreeBSD) && ($HostOS != SunOS)) then
+            if (($OS_Name != FreeBSD) && ($OS_Name != SunOS)) then
                Note $STDOUT '# ifndef _XOPEN_SOURCE'
                Note $STDOUT "#  define _XOPEN_SOURCE     ${XOPEN_STD}"
                Note $STDOUT '# endif'
@@ -181,7 +181,7 @@ source $MngDir/write/import-db
 #            Note $STDOUT '# endif'
 #            Note $STDOUT ''
 
-            if (($HostOS != FreeBSD) && ($HostOS != SunOS)) then
+            if (($OS_Name != FreeBSD) && ($OS_Name != SunOS)) then
                Note $STDOUT '# ifndef _XOPEN_SOURCE'
                Note $STDOUT "#  define _XOPEN_SOURCE     ${XOPEN_STD}"
                Note $STDOUT '# endif'

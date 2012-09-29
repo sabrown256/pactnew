@@ -113,10 +113,10 @@ if (-d ../../python) then
                flog $ALog setenv HAVE_PYTHON FALSE
             endif
 
-            if ((($HostOS == "Linux") || ($HostOS == "Darwin") || ($HostOS == "FreeBSD")) && ($PY_CC == cc)) then
+            if ((($OS_Name == "Linux") || ($OS_Name == "Darwin") || ($OS_Name == "FreeBSD")) && ($PY_CC == cc)) then
                flog $ALog setenv PY_CC gcc
             endif
-            if ($HostOS == "AIX") then
+            if ($OS_Name == "AIX") then
                set CCVer = `$CC_Exe -qversion`
                set PCVer = `$PY_CC -qversion`
                Note $ALog "CCVer = |$CCVer|"

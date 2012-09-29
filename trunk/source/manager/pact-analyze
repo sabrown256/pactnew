@@ -41,10 +41,10 @@ HAVE_SUBROUTINES
 set help     = FALSE
 set HelpCode = ./$0                      
 
-setenv HostOS        `uname -s`
-setenv HostOSRel     `uname -r`
+setenv OS_Name        `uname -s`
+setenv OS_Release     `uname -r`
 setenv HostName      `uname -n`
-setenv MajorVersion  `expr $HostOSRel : "\(.\)"`
+setenv MajorVersion  `expr $OS_Release : "\(.\)"`
 
 SafeEnv System  `$ScrDir/cfgman use`
 SafeEnv SysDir  $BaseDir/dev/$System
@@ -52,8 +52,8 @@ SafeEnv SysDir  $BaseDir/dev/$System
 InitLog ALog $SysDir/log/analyze
 
 Note $ALog "HostName         = $HostName"
-Note $ALog "HostOS           = $HostOS"
-Note $ALog "HostOSRel        = $HostOSRel"
+Note $ALog "OS_Name           = $OS_Name"
+Note $ALog "OS_Release        = $OS_Release"
 Note $ALog "MajorVersion     = $MajorVersion"
 Note $ALog "Source Directory = $ScrDir"
 
@@ -65,7 +65,7 @@ if ($?USER == 0) then
    endif
 endif
 
-if ("$HostOS" == "Windows_NT") then
+if ("$OS_Name" == "Windows_NT") then
    flog $ALog setenv CDecls TRUE
 else
    flog $ALog setenv CDecls FALSE
@@ -101,13 +101,13 @@ end
 
 # initialization of non-graphics flags
 
-set lTmp = ( "tmp-"`echo $HostOS-$$ | tr "[A-Z]" "[a-z]"` )
+set lTmp = ( "tmp-"`echo $OS_Name-$$ | tr "[A-Z]" "[a-z]"` )
 setenv Tmp "$lTmp"
 
 flog $ALog setenv DORUN  $BinDir/do-run
 flog $ALog setenv TIMER  $ScrDir/timer
 
-if ($HostOS == "AIX") then
+if ($OS_Name == "AIX") then
    set lNM = ( /usr/bin/nm -g )
 else
    set lNM = ( `where nm | head -n 1` -g )
@@ -117,7 +117,7 @@ flog $ALog setenv NM "$lNM"
 SafeEnv CPU  "unknown"
 SafeEnv FPU  "unknown"
 
-if ($HostOS == Linux) then
+if ($OS_Name == Linux) then
    set i = `uname -m`
    if ($i == "alpha") then
       flog $ALog setenv FPU "alpha"

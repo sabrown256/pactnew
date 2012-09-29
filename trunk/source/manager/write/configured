@@ -29,7 +29,7 @@ Note $Log ""
 
 set vl = ""
 set vl = ( $vl EtcDir UseTmpDir FilterDir )
-set vl = ( $vl Host HostOS HAVE_JPEGLIB HAVE_PNGLIB )
+set vl = ( $vl Host OS_Name HAVE_JPEGLIB HAVE_PNGLIB )
 set vl = ( $vl WARN_PATTERN ERR_PATTERN USER )
 
 source $MngDir/write/import-db

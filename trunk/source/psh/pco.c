@@ -1387,8 +1387,8 @@ static void setup_analyze_env(client *cl, char *base)
     if (strncmp(st.os, "CYGWIN", 6) == 0)
        st.os[6] = '\0';
 
-    dbset(cl, "HostOS",      st.os);
-    dbset(cl, "HostOSRel",   st.osrel);
+    dbset(cl, "OS_Name",      st.os);
+    dbset(cl, "OS_Release",   st.osrel);
 
     if (strcmp(st.os, "Windows_NT") == 0)
        dbset(cl, "CDecls", "TRUE");
