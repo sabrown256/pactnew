@@ -11,13 +11,16 @@
 set Me = $0
 source $Me:h/common
 
-dbini MDG_Inc          ""
-dbini MDG_Lib          ""
-dbini MDG_Pck          ""
-dbini QD_Inc           ""
-dbini QD_Lib           ""
-dbini QD_RPath         $RootLib
-dbini QD_Path          /usr
+dbini MDG_Inc           ""
+dbini MDG_Lib           ""
+dbini MDG_Pck           ""
+dbini QD_Inc            ""
+dbini QD_Lib            ""
+dbini QD_RPath          $RootLib
+dbini QD_Path           /usr
+dbini GRAPHICS_Windows  ""
+dbini GRAPHICS_Devices  ""
+dbini GRAPHICS_Flags    ""
 #SafeEnv MDG_Inc          ""
 #SafeEnv MDG_Lib          ""
 #SafeEnv MDG_Pck          ""
@@ -25,10 +28,10 @@ dbini QD_Path          /usr
 #SafeEnv QD_Lib           ""
 #SafeEnv QD_RPath         $RootLib
 #SafeEnv QD_Path          /usr
+#SafeEnv GRAPHICS_Devices ""
+#SafeEnv GRAPHICS_Flags   ""
 
 SafeEnv OS_Name           `uname -s`
-SafeEnv GRAPHICS_Devices  ""
-SafeEnv GRAPHICS_Flags     ""
 SafeEnv Cfg_CC_Exe       "cc"
 SafeEnv AnaDir           analyze
 SafeEnv ALog             $cwd/cfg-$System/log.analyze
@@ -70,7 +73,7 @@ EOF
       if ($Std_UseQD == TRUE) then
          NoteD $ALog "      has Quickdraw (Carbon)"
 
-         setenv GRAPHICS_Use             "QD"
+         setenv GRAPHICS_Windows             "QD"
          setenv GRAPHICS_Devices  "$GRAPHICS_Devices QD"
          setenv GRAPHICS_Flags     "$GRAPHICS_Flags -framework Carbon"
 
@@ -103,6 +106,9 @@ EOF
    dbexp QD_Lib
    dbexp QD_RPath
    dbexp QD_Path
+   dbexp GRAPHICS_Windows
+   dbexp GRAPHICS_Devices
+   dbexp GRAPHICS_Flags
 #   SetParent MDG_Inc
 #   SetParent MDG_Lib
 #   SetParent MDG_Pck
@@ -110,8 +116,7 @@ EOF
 #   SetParent QD_Lib
 #   SetParent QD_RPath
 #   SetParent QD_Path
-
-   SetParent GRAPHICS_Devices
+#   SetParent GRAPHICS_Devices
 
 endif
 

@@ -1429,7 +1429,7 @@ static void setup_analyze_env(client *cl, char *base)
        dbinitv(cl, "CFE", "");
 
 /* initialization of graphics flags */
-    dbinitv(cl, "GRAPHICS_Use",       "X");
+    dbinitv(cl, "GRAPHICS_Windows",       "X");
     dbinitv(cl, "Std_UseX",   "TRUE");
     dbinitv(cl, "Std_UseOGL", "FALSE");
     dbinitv(cl, "Std_UseQD",  "FALSE");

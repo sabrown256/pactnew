@@ -40,7 +40,7 @@ set vl = ( $vl DEFAULT_SHELL EtcDir )
 #set vl = ( $vl FC_LD_Lib )
 set vl = ( $vl FDefDebug FDefOptimize )
 set vl = ( $vl HAVE_GOOD_OMP_PRAGMAS GMAKE_Flag )
-set vl = ( $vl GRAPHICS_Devices GRAPHICS_Flags GRAPHICS_Use )
+set vl = ( $vl GRAPHICS_Devices GRAPHICS_Flags GRAPHICS_Windows )
 set vl = ( $vl HAVE_PYTHON OS_Name )
 set vl = ( $vl IncDir InstBase INSTALL IPC_STD )
 set vl = ( $vl Lex_Exe Lex_Flags )
@@ -235,7 +235,7 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
     Note $STDOUT ""
 
     Note $STDOUT ""
-    Note $STDOUT "GRAPHICS_Use=$GRAPHICS_Use"
+    Note $STDOUT "GRAPHICS_Windows=$GRAPHICS_Windows"
     Note $STDOUT ""
 
 # Syntax Modes
