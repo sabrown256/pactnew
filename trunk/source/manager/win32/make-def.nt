@@ -12,7 +12,7 @@ ScmDir  = $(RootDr)\scheme
 #
 
 LDF    = link
-GSYS=win
+GRAPHICS_Use=win
 
 LR = ls
 

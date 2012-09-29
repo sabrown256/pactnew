@@ -27,8 +27,8 @@ dbini QD_Path          /usr
 #SafeEnv QD_Path          /usr
 
 SafeEnv OS_Name           `uname -s`
-SafeEnv GraphicsDevices  ""
-SafeEnv GraphicsFlag     ""
+SafeEnv GRAPHICS_Devices  ""
+SafeEnv GRAPHICS_Flags     ""
 SafeEnv Cfg_CC_Exe       "cc"
 SafeEnv AnaDir           analyze
 SafeEnv ALog             $cwd/cfg-$System/log.analyze
@@ -70,9 +70,9 @@ EOF
       if ($Std_UseQD == TRUE) then
          NoteD $ALog "      has Quickdraw (Carbon)"
 
-         setenv GSYS             "QD"
-         setenv GraphicsDevices  "$GraphicsDevices QD"
-         setenv GraphicsFlag     "$GraphicsFlag -framework Carbon"
+         setenv GRAPHICS_Use             "QD"
+         setenv GRAPHICS_Devices  "$GRAPHICS_Devices QD"
+         setenv GRAPHICS_Flags     "$GRAPHICS_Flags -framework Carbon"
 
          setenv MDG_Pck          "$MDG_Pck QD"
 
@@ -111,7 +111,7 @@ EOF
 #   SetParent QD_RPath
 #   SetParent QD_Path
 
-   SetParent GraphicsDevices
+   SetParent GRAPHICS_Devices
 
 endif
 

@@ -30,8 +30,8 @@ dbini OGL_Path         /usr
 #SafeEnv OGL_Path         /usr
 
 SafeEnv OS_Name           `uname -s`
-SafeEnv GraphicsDevices  ""
-SafeEnv GraphicsFlag     ""
+SafeEnv GRAPHICS_Devices  ""
+SafeEnv GRAPHICS_Flags     ""
 
 SafeEnv Std_UseOGL       FALSE
 
@@ -92,9 +92,9 @@ EOF
       NoteD $ALog "      has OpenGL ($PckLib)"
       Note $ALog "Include = |$PckInc|"
 
-      setenv GSYS             "OGL"
-      setenv GraphicsDevices  "$GraphicsDevices OGL"
-      setenv GraphicsFlag     "$GraphicsFlag -DOGL"
+      setenv GRAPHICS_Use             "OGL"
+      setenv GRAPHICS_Devices  "$GRAPHICS_Devices OGL"
+      setenv GRAPHICS_Flags     "$GRAPHICS_Flags -DOGL"
 
       if (("$PckInc" != "none") && ("$PckInc" != "-I$RootInc")) then
          flog $ALog setenv MDG_Inc "$MDG_Inc $PckInc"
@@ -138,7 +138,7 @@ EOF
 #      SetParent OGL_RPath
 #      SetParent OGL_Path
 
-      SetParent GraphicsDevices
+      SetParent GRAPHICS_Devices
 
    endif
 

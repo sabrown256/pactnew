@@ -5,7 +5,7 @@
 .\" include cpyright.h
 .\"
 
-.TH PACT 1 "27 September 2012"
+.TH PACT 1 "29 September 2012"
 .SH NAME
 pact \- a make-type utility featuring persistence and distributed parallel
 operation.  Also reports how it was configured.
@@ -710,14 +710,14 @@ FrontEnd
    target codes must be run in a special way. This is used
    to execute the target appropriately.  Default is "".
 
-GraphicsDevices
+GRAPHICS_Devices
    Host graphics systems/devices available. Current
    possibilities are PS, CGM (PostScript and Computer
    Graphics Metafile), PNG, JPEG, and X (mostly) are
    generic to all systems.  When PACT is configured it
    looks for available graphics systems.
 
-GraphicsFlag
+GRAPHICS_Flags
    Any special graphics flag (not usually needed with
    X11).  Default is "".
 
@@ -855,7 +855,7 @@ UNIX
    UNIX/POSIX Operating System (as opposed to MAC or Windows).
 
 X11R4
-   PACT uses X11 R4 or later graphics (goes with GraphicsDevices).
+   PACT uses X11 R4 or later graphics (goes with GRAPHICS_Devices).
 
 
                    Other System Dependent Parameters

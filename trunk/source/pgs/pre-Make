@@ -38,7 +38,7 @@ CleanFiles =
 #
 # Things upon which install depends (pact install)
 #
-InstallDep = ${GraphicsPackages} ${TGTLib}
+InstallDep = ${TGTLib}
 BinDep = ${TGTLib}
 BinObj =
 
@@ -88,7 +88,7 @@ GObjsB = gsdvb.o gspolf.o gsdplt.o gsgrot.o gsscat.o gsiob.o gsiod.o gsrwi.o
 GObjsC = gsmm.o gsattr.o gstxt.o gsclr.o gshigh.o gsdv.o gspr.o gsvsp.o gsrend.o
 GObjsD = gsdv_im.o gsdv_rst.o gspr_rst.o gsdlr.o gsold.o gssfnt.o
 GObjsE = gsfia.o gsfib.o
-Objs = ${GObjsA} ${GObjsB} ${GObjsC} ${GObjsD} ${GObjsE} ${GraphicsDevices}
+Objs = ${GObjsA} ${GObjsB} ${GObjsC} ${GObjsD} ${GObjsE} ${GRAPHICS_Devices}
 
 ${Objs} : ${Hdrs}
 
@@ -127,7 +127,7 @@ ArJPG = ${TGTLib}(gsdv_jpg.o)
 ArMPG = ${TGTLib}(gsdv_mpg.o) ${TGTLib}(gspr_mpg.o) ${TGTLib}(gsmpeg.o)
 ArPNG = ${TGTLib}(gsdv_png.o)
 
-${LibDep} : ${hdrf} ${Hdrs} ${GraphicsDevices}
+${LibDep} : ${hdrf} ${Hdrs} ${GRAPHICS_Devices}
 
 ${ArMPG} : ${MpgHdr}
 ${ArX}   : ${XHdr}

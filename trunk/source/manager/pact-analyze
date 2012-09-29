@@ -143,15 +143,15 @@ SafeEnv LD_Flags   ""
 
 Separator $ALog
 
-SafeEnv GSYS       "X"
+SafeEnv GRAPHICS_Use       "X"
 SafeEnv Std_UseX   TRUE
 SafeEnv Std_UseOGL FALSE
 SafeEnv Std_UseQD  FALSE
 
 SafeEnv MDG_Inc         ""
 SafeEnv MDG_Lib         ""
-SafeEnv GraphicsDevices "PS CGM MPG PNG JPG"
-SafeEnv GraphicsFlag    ""
+SafeEnv GRAPHICS_Devices "PS CGM MPG PNG JPG"
+SafeEnv GRAPHICS_Flags    ""
 
 Note $ALog ""
 
