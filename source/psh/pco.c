@@ -1429,7 +1429,7 @@ static void setup_analyze_env(client *cl, char *base)
        dbinitv(cl, "CFE", "");
 
 /* initialization of graphics flags */
-    dbinitv(cl, "GSYS",       "X");
+    dbinitv(cl, "GRAPHICS_Use",       "X");
     dbinitv(cl, "Std_UseX",   "TRUE");
     dbinitv(cl, "Std_UseOGL", "FALSE");
     dbinitv(cl, "Std_UseQD",  "FALSE");
@@ -1441,8 +1441,8 @@ static void setup_analyze_env(client *cl, char *base)
     dbinitv(cl, "MDG_Lib",         "");
     dbinitv(cl, "MD_Inc",          "");
     dbinitv(cl, "MD_Lib",          "");
-    dbinitv(cl, "GraphicsDevices", "PS CGM MPG PNG JPG");
-    dbinitv(cl, "GraphicsFlag",    "");
+    dbinitv(cl, "GRAPHICS_Devices", "PS CGM MPG PNG JPG");
+    dbinitv(cl, "GRAPHICS_Flags",    "");
 
 /* initialize Cfg group flags */
     dbinitv(cl, "Cfg_CC_Flags",  dbget(cl, FALSE, "CC_Flags"));

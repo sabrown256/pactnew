@@ -21,15 +21,15 @@ if ($Std_UseX == FALSE) then
 
 # have OpenGL
    if ($Std_UseOGL == "TRUE") then
-      flog $ALog setenv GSYS OGL
+      flog $ALog setenv GRAPHICS_Use OGL
 
 # have Quickdraw
    else if ($Std_UseQD == "TRUE") then
-      flog $ALog setenv GSYS QD
+      flog $ALog setenv GRAPHICS_Use QD
 
 # no screen graphics
    else
-      flog $ALog setenv GSYS       ""
+      flog $ALog setenv GRAPHICS_Use       ""
       flog $ALog setenv Std_UseX   FALSE
       flog $ALog setenv Std_UseOGL FALSE
       flog $ALog setenv Std_UseQD  FALSE
@@ -38,7 +38,7 @@ if ($Std_UseX == FALSE) then
       SetParent Std_UseOGL
       SetParent Std_UseQD
    endif
-   SetParent GSYS
+   SetParent GRAPHICS_Use
 
 endif
 

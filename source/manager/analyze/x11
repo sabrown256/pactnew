@@ -32,8 +32,8 @@ dbini X11_Path         /usr
 SafeEnv AnaDir           analyze
 SafeEnv ALog             $cwd/cfg-$System/log.analyze
 SafeEnv OS_Name           `uname -s`
-SafeEnv GraphicsDevices  ""
-SafeEnv GraphicsFlag     ""
+SafeEnv GRAPHICS_Devices  ""
+SafeEnv GRAPHICS_Flags     ""
 SafeEnv Cfe_CC_Exe       "cc"
 SafeEnv Cfe_CC_Flags     "-g"
 
@@ -126,9 +126,9 @@ EOF
       NoteD $ALog "      has X11 ($PckLib)"
 
 #      setenv HAVE_SOCKETS   Envir
-      setenv GSYS             "X"
-      setenv GraphicsDevices  "$GraphicsDevices X"
-      setenv GraphicsFlag     "$GraphicsFlag -DX11"
+      setenv GRAPHICS_Use             "X"
+      setenv GRAPHICS_Devices  "$GRAPHICS_Devices X"
+      setenv GRAPHICS_Flags     "$GRAPHICS_Flags -DX11"
 
       set lok = FALSE
       if ("$PckInc" != "none") then
@@ -185,7 +185,7 @@ EOF
 #   SetParent X11_Path
 
    SetParent RPATH
-   SetParent GraphicsDevices
+   SetParent GRAPHICS_Devices
 
 endif
 

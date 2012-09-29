@@ -701,7 +701,7 @@ CFE
    a special way.  This is used to execute the target appropriately.
    Default is "".
 
-GraphicsDevices
+GRAPHICS_Devices
    Host graphics systems/devices available. Current possibilities are
    PS and CGM (PostScript and Computer Graphics Metafile) are generic
    to all systems. X, GL, XGL, SUN, and PEX (X Windows System, SGI's GL,
@@ -712,7 +712,7 @@ GraphicsDevices
    More recently we have added JPEG and MPEG capabilities as well.
    Default is "PS CGM".
 
-GraphicsFlag
+GRAPHICS_Flags
    Any special graphics flag (not usually needed with X11).  Default is "".
 
 INSTALL
@@ -836,7 +836,7 @@ UNIX
    UNIX/POSIX Operating System (as opposed to DOS or MAC).
 
 HAVE_X11
-   PACT uses X11 R4 or later graphics (goes with GraphicsDevices).
+   PACT uses X11 R4 or later graphics (goes with GRAPHICS_Devices).
 
 
                    Other System Dependent Parameters
