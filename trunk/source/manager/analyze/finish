@@ -45,9 +45,12 @@ if ($Std_UseX == FALSE) then
       flog $ALog setenv Std_UseOGL FALSE
       flog $ALog setenv Std_UseQD  FALSE
 
-      SetParent Std_UseX
-      SetParent Std_UseOGL
-      SetParent Std_UseQD
+      dbexp Std_UseX
+      dbexp Std_UseOGL
+      dbexp Std_UseQD
+#      SetParent Std_UseX
+#      SetParent Std_UseOGL
+#      SetParent Std_UseQD
    endif
    dbexp GRAPHICS_Windows
 #   SetParent GRAPHICS_Windows
