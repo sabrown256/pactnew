@@ -23,15 +23,18 @@ else
    setenv HAVE_FORTRAN   TRUE
 endif
 
+dbini FC_ID_UNDERSCORE "_"
+dbini FC_ID_CASE       "lower"
+dbini F_STD            "F90"
+#SafeEnv FC_ID_UNDERSCORE "_"
+#SafeEnv FC_ID_CASE       "lower"
+#SafeEnv F_STD            "F90"
+
 SafeEnv FC_Exe      "f90"
 SafeEnv FC_Linker   ""
 SafeEnv FC_Flags    ""
 SafeEnv FC_Debug    "-g"
 SafeEnv FC_Optimize "-O"
-
-SafeEnv FC_ID_UNDERSCORE "_"
-SafeEnv FC_ID_CASE       "lower"
-SafeEnv F_STD            "F90"
 
 set UTime = `timer -r`
 
@@ -253,11 +256,20 @@ DONE:
 
 # export the results
 dbexp HAVE_FORTRAN
+dbexp F_STD
+
 dbexp Cfg_FC_Exe
 dbexp Cfg_FC_Flags
+
+dbexp FC_ID_UNDERSCORE
+dbexp FC_ID_CASE
+
 #SetParent HAVE_FORTRAN
 #SetParent Cfg_FC_Exe
 #SetParent Cfg_FC_Flags
+#SetParent FC_ID_UNDERSCORE
+#SetParent FC_ID_CASE
+#SetParent F_STD
 
 SetParent FC_Exe
 SetParent FC_Flags
@@ -267,10 +279,6 @@ SetParent FC_Linker
 
 SetParent Cfe_FC_Exe
 SetParent Cfe_FC_Flags
-
-SetParent F_STD
-SetParent FC_ID_UNDERSCORE
-SetParent FC_ID_CASE
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

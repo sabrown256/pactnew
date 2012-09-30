@@ -64,10 +64,12 @@ Note $ALog "Temporary file base: $Tmp"
 Note $ALog "Manager directory: $MngDir"
 Note $ALog ""
 
+dbini CList      ""
+#SafeEnv CList      ""
+
 SafeEnv MngDir     $cwd
 SafeEnv CFE        ""
 SafeEnv PFE        "do-run -m"
 SafeEnv BE         ""
-SafeEnv CList      ""
 SafeEnv NM         nm
 
