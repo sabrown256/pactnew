@@ -421,6 +421,7 @@ dbexp CXX_Linker
 
 dbexp Save_CC
 dbexp Save_CFLAGS
+dbexp CList
 
 dbexp LONG64
 dbexp FC_INT_PTR_DIFFER
@@ -436,11 +437,11 @@ dbexp NEED_ALT_LARGE_FILE
 #SetParent CXX_Linker
 #SetParent Save_CC
 #SetParent Save_CFLAGS
+#SetParent CList
 #SetParent LONG64
 #SetParent FC_INT_PTR_DIFFER
 #SetParent NEED_ALT_LARGE_FILE
 
-SetParent CList
 SetParent CC_Exe
 SetParent CC_Flags
 SetParent CC_Debug

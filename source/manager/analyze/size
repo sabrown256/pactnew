@@ -122,9 +122,12 @@ Note $ALog ""
 flog $ALog rm -f $Tmp.c $Tmp
 
 # export the results
-SetParent INT4
-SetParent INT8
-SetParent NO_LONG_LONG
+dbexp INT4
+dbexp INT8
+dbexp NO_LONG_LONG
+#SetParent INT4
+#SetParent INT8
+#SetParent NO_LONG_LONG
 
 #exit(0)
 
