@@ -23,6 +23,7 @@ dbini HAVE_MPI_2         FALSE
 dbini STD_PARALLEL_COMM  PARC
 dbini HAVE_MPI_STDIN_ALL FALSE
 dbini HAVE_MPI_GOOD_IO   FALSE
+dbini Save_CC            "cc"
 #SafeEnv MD_Pck             ""
 #SafeEnv HAVE_OPENMPI       FALSE
 #SafeEnv HAVE_MPI_2         FALSE
