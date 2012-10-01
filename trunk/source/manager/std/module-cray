@@ -57,8 +57,9 @@ endif
 
 if ($?MODULESHOME == 1) then
 
-   alias setp   'setenv \!* ; echo "parent \!\!:1($\!\!:1)"'
-   alias unsetp 'echo "\!*"'
+   set PERDB = $BinDir/perdb
+#   alias setp   'setenv \!* ; echo "parent \!\!:1($\!\!:1)"'
+   alias setp   'setenv \!* ; `$PERDB -l \!\!:1 = $\!\!:1`'
 
    set MODULE = ( $MODULESHOME/bin/modulecmd tcsh )
 

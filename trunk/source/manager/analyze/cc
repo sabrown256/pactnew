@@ -23,16 +23,24 @@ else
    Note $ALog "Cross compiling C compiler analysis"
 endif
 
+dbini CC_Debug      "-g"
+dbini CC_Optimize   "-O"
+dbini CC_Linker     ""
 dbini CXX_Linker    ""
 dbini CXX_Flags     ""
 dbini CXX_Debug     "-g"
 dbini CXX_Optimize  "-O"
 dbini CXX_Inc       ""
+dbini DP_Inc       ""
+#SafeEnv CC_Debug     "-g"
+#SafeEnv CC_Optimize  "-O"
+#SafeEnv CC_Linker    ""
 #SafeEnv CXX_Linker    ""
 #SafeEnv CXX_Flags     ""
 #SafeEnv CXX_Debug     "-g"
 #SafeEnv CXX_Optimize  "-O"
 #SafeEnv CXX_Inc       ""
+#SafeEnv DP_Inc       ""
 
 SafeEnv UseLDLibPath ""
 
@@ -40,12 +48,8 @@ SafeEnv UseLDLibPath ""
 # if nothing is specified try cc
 SafeEnv CC_Exe       "cc"
 
-SafeEnv CC_Linker    ""
 SafeEnv CC_Flags     ""
-SafeEnv CC_Debug     "-g"
-SafeEnv CC_Optimize  "-O"
 SafeEnv CC_Inc       ""
-SafeEnv DP_Inc       ""
 
 set UTime = `timer -r`
 
@@ -409,6 +413,10 @@ endif
 #--------------------------------------------------------------------------
 
 # export the results
+dbexp CC_Debug
+dbexp CC_Optimize
+dbexp CC_Linker
+
 dbexp Cfg_CC_Exe
 dbexp Cfg_CC_Flags
 dbexp Cfg_CC_Inc
@@ -426,7 +434,11 @@ dbexp CList
 dbexp LONG64
 dbexp FC_INT_PTR_DIFFER
 dbexp NEED_ALT_LARGE_FILE
+dbexp DP_Inc
 
+#SetParent CC_Debug
+#SetParent CC_Optimize
+#SetParent CC_Linker
 #SetParent Cfg_CC_Exe
 #SetParent Cfg_CC_Flags
 #SetParent Cfg_CC_Inc
@@ -441,14 +453,11 @@ dbexp NEED_ALT_LARGE_FILE
 #SetParent LONG64
 #SetParent FC_INT_PTR_DIFFER
 #SetParent NEED_ALT_LARGE_FILE
+#SetParent DP_Inc
 
 SetParent CC_Exe
 SetParent CC_Flags
-SetParent CC_Debug
-SetParent CC_Optimize
 SetParent CC_Inc
-SetParent CC_Linker
-SetParent DP_Inc
 
 SetParent Cfe_CC_Exe
 SetParent Cfe_CC_Flags
