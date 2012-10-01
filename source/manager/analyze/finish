@@ -97,13 +97,18 @@ endif
 #--------------------------------------------------------------------------
 
 # export the results
+dbexp CDefDebug
+dbexp CDefOptimize
+dbexp FDefDebug
+dbexp FDefOptimize
+#SetParent CDefDebug
+#SetParent CDefOptimize
+#SetParent FDefDebug
+#SetParent FDefOptimize
+
 SetParent Cfe_CC_Inc
 SetParent CC_Exe
 SetParent CC_Flags
-SetParent CDefDebug
-SetParent CDefOptimize
-SetParent FDefDebug
-SetParent FDefOptimize
 
 exit(0)
 

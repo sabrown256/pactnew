@@ -17,16 +17,19 @@ Note $Log "Analyze: ld"
 NoteD $ALog -n "   Ld: "
 Note $ALog ""
 
+dbini DP_Lib         ""
+dbini Cfg_LD_Flags   ""
+dbini Cfg_LD_RPath   ""
+#SafeEnv DP_Lib         ""
+#SafeEnv Cfg_LD_Flags   ""
+#SafeEnv Cfg_LD_RPath   ""
+
 SafeEnv LD_Exe         ""
 SafeEnv LD_Flags       ""
 SafeEnv LD_Lib         ""
-SafeEnv Cfg_LD_Flags   ""
-SafeEnv Cfg_LD_RPath   ""
 SafeEnv Cfe_LD_Flags   ""
 SafeEnv Cfe_LD_Lib     ""
 SafeEnv Cfe_LD_RPath   ""
-#SafeEnv MDG_Lib        ""
-SafeEnv DP_Lib         ""
 
 if (!(-x "$LD_Exe")) then
    if (-x `$Which ld`) then
@@ -92,18 +95,21 @@ endif
 # export the results
 dbexp HAVE_RPATH
 dbexp Shared_LD_Exe
+dbexp DP_Lib
+dbexp Cfg_LD_Flags
+dbexp Cfg_LD_RPath
 #SetParent HAVE_RPATH
 #SetParent Shared_LD_Exe
+#SetParent DP_Lib
+#SetParent Cfg_LD_Flags
+#SetParent Cfg_LD_RPath
 
 SetParent LD_Exe
 SetParent LD_Flags
 SetParent LD_Lib
-SetParent Cfg_LD_Flags
-SetParent Cfg_LD_RPath
 SetParent Cfe_LD_Flags
 SetParent Cfe_LD_Lib
 SetParent Cfe_LD_RPath
-SetParent DP_Lib
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
