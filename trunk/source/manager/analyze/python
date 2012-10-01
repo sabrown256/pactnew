@@ -154,7 +154,7 @@ if (-d ../../python) then
       flog $ALog setenv PY_Vers ""
    endif
 
-   if ($BuildSharedLibs == FALSE) then
+   if ($MAKE_Shared_Libs == FALSE) then
       flog $ALog setenv HAVE_PYTHON FALSE
    endif
 

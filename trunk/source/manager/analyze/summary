@@ -14,7 +14,7 @@ source $Me:h/common
 set vl = ""
 set vl = ( $vl HAVE_FORTRAN )
 set vl = ( $vl HAVE_PYTHON HAVE_PY_NUMERIC HAVE_PY_NUMPY )
-set vl = ( $vl BuildSharedLibs PY_Exe PY_DirPy PY_DirSrc PY_DirDst )
+set vl = ( $vl MAKE_Shared_Libs PY_Exe PY_DirPy PY_DirSrc PY_DirDst )
 set vl = ( $vl Yacc_Exe )
 
 source $MngDir/write/import-db
@@ -59,7 +59,7 @@ source $MngDir/write/import-db
        NoteD $Log "   Cross compiling for target $CROSS_COMPILE"
     endif
 
-    if ($BuildSharedLibs == TRUE) then
+    if ($MAKE_Shared_Libs == TRUE) then
        NoteD $Log "   Building shared libraries"
     else
        NoteD $Log "   Building static libraries"
@@ -92,7 +92,7 @@ source $MngDir/write/import-db
 # PY_DirPy     python  lib/pythond.d/site-packages  (install into)
 
     if (("$PY_Exe" != "") && ("$PY_Exe" != "wrong-cc") && \
-        ("$PY_Exe" != "no-numeric") && ($BuildSharedLibs == TRUE)) then
+        ("$PY_Exe" != "no-numeric") && ($MAKE_Shared_Libs == TRUE)) then
        flog $ALog mkdir -p $PY_DirPy
 
        NoteD $Log "   Python bindings will be built in:"
@@ -106,7 +106,7 @@ source $MngDir/write/import-db
              NoteD $Log "      $PY_DirPy (no permissions)"
           endif
        endif
-    else if ($BuildSharedLibs == FALSE) then
+    else if ($MAKE_Shared_Libs == FALSE) then
        NoteD $Log "   Python bindings will not be built (need shared library option)"
     else if ("$PY_Exe" == "wrong-cc") then
        NoteD $Log "   Python bindings will not be built (wrong compiler)"

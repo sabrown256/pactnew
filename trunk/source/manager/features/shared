@@ -7,7 +7,7 @@
 # include "cpyright.h"
 #
 
-BuildSharedLibs = TRUE
+MAKE_Shared_Libs = TRUE
 
 Tool CC {
    Shared =+ ${Shared_CC_Flags}
