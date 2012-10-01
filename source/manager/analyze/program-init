@@ -54,7 +54,7 @@ setenv LIB       lib
 
 setenv SUFFIXES  '.i'
 
-BuildSharedLibs = FALSE
+MAKE_Shared_Libs = FALSE
 FilterDir       =
 WARN_PATTERN    =
 ERR_PATTERN     =

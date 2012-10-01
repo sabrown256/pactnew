@@ -152,7 +152,7 @@ set LStat = $status
 if ($LStat == 0) then
    NoteD $Log -n "   shared ....... "
    Note $Log ""
-   set build_shared = ( `pact +l -info BuildSharedLibs` )
+   set build_shared = ( `pact +l -info MAKE_Shared_Libs` )
    if ("$build_shared[$#build_shared]" == TRUE) then
       NoteD $Log "yes"
    else

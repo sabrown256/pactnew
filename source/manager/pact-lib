@@ -58,7 +58,7 @@ echo "done"
 
 # make libpact.so with all the .o files
 if ($OS_Name != Darwin) then
-   set bshld = `pact +l -info BuildSharedLibs | tail -n 1`
+   set bshld = `pact +l -info MAKE_Shared_Libs | tail -n 1`
    set sld   = `pact +l -info Shared_LD_Exe`
    set ldf   = `pact +l -info Shared_LD_Flags`
    if ("$bshld" == TRUE) then

@@ -61,7 +61,8 @@ endif
 
 flog $ALog $RM $Tmp $Tmp.c $Tmp.o
 
-SafeEnv Shared_LD_Exe "$LD_Exe"
+dbini Shared_LD_Exe "$LD_Exe"
+#SafeEnv Shared_LD_Exe "$LD_Exe"
 
 # capture current notion of rpath
 if ($?Cfg_RPATH == 1) then
@@ -90,7 +91,9 @@ endif
 
 # export the results
 dbexp HAVE_RPATH
+dbexp Shared_LD_Exe
 #SetParent HAVE_RPATH
+#SetParent Shared_LD_Exe
 
 SetParent LD_Exe
 SetParent LD_Flags
@@ -100,9 +103,7 @@ SetParent Cfg_LD_RPath
 SetParent Cfe_LD_Flags
 SetParent Cfe_LD_Lib
 SetParent Cfe_LD_RPath
-#SetParent MDG_Lib
 SetParent DP_Lib
-SetParent Shared_LD_Exe
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

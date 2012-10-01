@@ -28,7 +28,8 @@ SafeEnv IMF_Lib      "-limf"
 
 # Intel Math library
 
-SafeEnv IMF_Path ""
+dbini IMF_Path ""
+#SafeEnv IMF_Path ""
 
 if (-d "$IMF_Path") then
    set nbits = `nbit -d`
@@ -73,9 +74,10 @@ NoteD $ALog "   Math library: $LibM_Lib"
 #--------------------------------------------------------------------------
 
 dbexp MD_Pck
+dbexp IMF_Path
 #SetParent MD_Pck
+#SetParent IMF_Path
 
-SetParent IMF_Path
 SetParent RPATH
 SetParent Cfg_RPATH
 SetParent LibM_Lib

@@ -28,7 +28,7 @@ NoteD $Log "   System Dependent MAKE Macros - make-macros"
 Note $Log ""
 
 set vl = ""
-set vl = ( $vl Bits BuildSharedLibs MAKE_Strategy )
+set vl = ( $vl Bits MAKE_Shared_Libs MAKE_Strategy )
 set vl = ( $vl EtcDir FPU HAVE_GNU_FENV IncDir INSTALL )
 set vl = ( $vl NoExe Ranlib_Exe Sys SYS_TYPE UPDATE )
 
@@ -54,7 +54,7 @@ set LibVers = 1
     Note $STDOUT '#'
     Note $STDOUT ""
 
-    if ($BuildSharedLibs == TRUE) then
+    if ($MAKE_Shared_Libs == TRUE) then
        Note $STDOUT '#'
        Note $STDOUT '# make shared library'
        Note $STDOUT '#'
@@ -113,7 +113,7 @@ set LibVers = 1
        Note $STDOUT '# make new executable'
        Note $STDOUT '#'
 
-       if ($BuildSharedLibs == TRUE) then
+       if ($MAKE_Shared_Libs == TRUE) then
           Note $STDOUT '${TGTBin} : ${BinDep} ${TGTShLib}'
        else
           Note $STDOUT '${TGTBin} : ${BinDep}'
@@ -127,7 +127,7 @@ set LibVers = 1
     Note $STDOUT '#'
     Note $STDOUT '# install library'
     Note $STDOUT '#'
-    if ($BuildSharedLibs == TRUE) then
+    if ($MAKE_Shared_Libs == TRUE) then
        Note $STDOUT 'libinstall : ${TGTLib} ${TGTShLib}'
     else
        Note $STDOUT 'libinstall : ${TGTLib}'
@@ -266,7 +266,7 @@ set LibVers = 1
 
     if ($HAVE_GNU_FENV == TRUE) then
        set lcc = ( $FPE_Exe -g -Wall )
-       if ($BuildSharedLibs == TRUE) then
+       if ($MAKE_Shared_Libs == TRUE) then
           set lcc = ( $lcc -fPIC )
        endif
        Note $STDOUT '	@(cd ${PACTTmpDir} ; \'
