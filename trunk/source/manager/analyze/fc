@@ -30,8 +30,8 @@ dbini FC_ID_UNDERSCORE "_"
 dbini FC_ID_CASE       "lower"
 dbini F_STD            "F90"
 
-SafeEnv FC_Exe      "f90"
-SafeEnv FC_Flags    ""
+envini FC_Exe      "f90"
+envini FC_Flags    ""
 
 set UTime = `timer -r`
 
@@ -84,7 +84,7 @@ else
 endif
 
 # make sure that we have the main Fortran compiler
-SafeEnv FC_Exe "$F90C[1]"
+envini FC_Exe "$F90C[1]"
 if ($FC_Exe == "") then
    flog $ALog setenv FC_Exe "$F90C[1]"
 endif
@@ -99,7 +99,7 @@ endif
 
 set Save_FFLAGS = ( $FC_Flags )
 
-SafeEnv Cfg_FC_Flags "$FC_Flags"
+envini Cfg_FC_Flags "$FC_Flags"
 
 if ("$FC_Linker" == "") then
    flog $ALog setenv FC_Linker "$FC_Exe"
@@ -160,7 +160,7 @@ if ($FC_Exe != "") then
    else if (("$CmpVers" != any) && ($STRICT > 0)) then
       NoteD $ALog "      requested version $CmpVers (not found)"
       setenv STOP ""
-      SetParent STOP
+      envexp STOP
       exit(0)
    else
       NoteD $ALog "      requested version $CmpVers (not found)"
@@ -265,11 +265,11 @@ dbexp Cfg_FC_Flags
 dbexp FC_ID_UNDERSCORE
 dbexp FC_ID_CASE
 
-SetParent FC_Exe
-SetParent FC_Flags
+envexp FC_Exe
+envexp FC_Flags
 
-SetParent Cfe_FC_Exe
-SetParent Cfe_FC_Flags
+envexp Cfe_FC_Exe
+envexp Cfe_FC_Flags
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

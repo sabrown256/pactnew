@@ -66,9 +66,9 @@ Note $ALog ""
 
 dbini CList      ""
 
-SafeEnv MngDir     $cwd
-SafeEnv CFE        ""
-SafeEnv PFE        "do-run -m"
-SafeEnv BE         ""
-SafeEnv NM         nm
+envini MngDir     $cwd
+envini CFE        ""
+envini PFE        "do-run -m"
+envini BE         ""
+envini NM         nm
 

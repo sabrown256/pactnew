@@ -28,7 +28,7 @@ dbini DP_Inc             ""
 dbini DP_Lib             ""
 dbini DP_RPath           ""
 
-SafeEnv REQUEST_MPI     FALSE
+envini REQUEST_MPI     FALSE
 
 # NOTE: because locate-mpi ends up getting DP_RPath on your RPATH
 # before feature/mpi is invoked you can end up with MPI

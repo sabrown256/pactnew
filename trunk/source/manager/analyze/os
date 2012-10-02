@@ -24,8 +24,8 @@ Note $ALog ""
 
 dbini OSX_Version        ""
 
-SafeEnv OS_Name        `uname -s`
-SafeEnv OS_Release     `uname -r`
+envini OS_Name        `uname -s`
+envini OS_Release     `uname -r`
 
 if ($?Arch == 0) then
    setenv Arch `../scripts/system-id`
@@ -73,7 +73,7 @@ setenv OS_Type USE_$OS_Type
 dbexp OS_Type
 dbexp OSX_Version
 
-SetParent OS_Name
+envexp OS_Name
 
 exit(0)
 

@@ -39,7 +39,7 @@ if ($lQuiet == FALSE) then
 endif
 
 # export the results
-SetParent LIB
+envexp LIB
 
 exit(0)
 

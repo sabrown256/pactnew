@@ -53,10 +53,10 @@ dbexp HAVE_ISO_C_BINDING
 dbexp Cfg_FC_Exe
 dbexp Cfg_FC_Flags
 
-SetParent FC_Exe
-SetParent FC_Flags
-SetParent Cfe_FC_Exe
-SetParent Cfe_FC_Flags
+envexp FC_Exe
+envexp FC_Flags
+envexp Cfe_FC_Exe
+envexp Cfe_FC_Flags
 
 
 #exit(0)

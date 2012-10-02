@@ -21,12 +21,12 @@ dbini DP_Lib         ""
 dbini Cfg_LD_Flags   ""
 dbini Cfg_LD_RPath   ""
 
-SafeEnv LD_Exe         ""
-SafeEnv LD_Flags       ""
-SafeEnv LD_Lib         ""
-SafeEnv Cfe_LD_Flags   ""
-SafeEnv Cfe_LD_Lib     ""
-SafeEnv Cfe_LD_RPath   ""
+envini LD_Exe         ""
+envini LD_Flags       ""
+envini LD_Lib         ""
+envini Cfe_LD_Flags   ""
+envini Cfe_LD_Lib     ""
+envini Cfe_LD_RPath   ""
 
 if (!(-x "$LD_Exe")) then
    if (-x `$Which ld`) then
@@ -95,12 +95,12 @@ dbexp DP_Lib
 dbexp Cfg_LD_Flags
 dbexp Cfg_LD_RPath
 
-SetParent LD_Exe
-SetParent LD_Flags
-SetParent LD_Lib
-SetParent Cfe_LD_Flags
-SetParent Cfe_LD_Lib
-SetParent Cfe_LD_RPath
+envexp LD_Exe
+envexp LD_Flags
+envexp LD_Lib
+envexp Cfe_LD_Flags
+envexp Cfe_LD_Lib
+envexp Cfe_LD_RPath
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

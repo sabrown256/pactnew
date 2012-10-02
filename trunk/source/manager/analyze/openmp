@@ -14,7 +14,7 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: openmp"
 
-SafeEnv PTHREAD_OMP    FALSE
+envini PTHREAD_OMP    FALSE
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

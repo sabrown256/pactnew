@@ -113,7 +113,7 @@ EOF
    dbexp HDF_RPath
    dbexp HDF_Path
 
-   SetParent RPATH
+   envexp RPATH
 
 endif
 

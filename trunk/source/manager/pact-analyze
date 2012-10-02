@@ -46,8 +46,8 @@ setenv OS_Release     `uname -r`
 setenv HostName      `uname -n`
 setenv MajorVersion  `expr $OS_Release : "\(.\)"`
 
-SafeEnv System  `$ScrDir/cfgman use`
-SafeEnv SysDir  $BaseDir/dev/$System
+envini System  `$ScrDir/cfgman use`
+envini SysDir  $BaseDir/dev/$System
 
 InitLog ALog $SysDir/log/analyze
 
@@ -114,8 +114,8 @@ else
 endif
 flog $ALog setenv NM "$lNM"
 
-SafeEnv CPU  "unknown"
-SafeEnv FPU  "unknown"
+envini CPU  "unknown"
+envini FPU  "unknown"
 
 if ($OS_Name == Linux) then
    set i = `uname -m`
@@ -128,13 +128,13 @@ if ($OS_Name == Linux) then
    endif
 endif
 
-SafeEnv CFE        ""
-SafeEnv PFE        "$DORUN -m"
-SafeEnv BE         ""
-SafeEnv CC_Inc     ""
-SafeEnv CC_Flags   ""
-SafeEnv LD_Lib     ""
-SafeEnv LD_Flags   ""
+envini CFE        ""
+envini PFE        "$DORUN -m"
+envini BE         ""
+envini CC_Inc     ""
+envini CC_Flags   ""
+envini LD_Lib     ""
+envini LD_Flags   ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -143,15 +143,15 @@ SafeEnv LD_Flags   ""
 
 Separator $ALog
 
-SafeEnv GRAPHICS_Windows       "X"
-SafeEnv Std_UseX   TRUE
-SafeEnv Std_UseOGL FALSE
-SafeEnv Std_UseQD  FALSE
+envini GRAPHICS_Windows       "X"
+envini Std_UseX   TRUE
+envini Std_UseOGL FALSE
+envini Std_UseQD  FALSE
 
-SafeEnv MDG_Inc         ""
-SafeEnv MDG_Lib         ""
-SafeEnv GRAPHICS_Devices "PS CGM MPG PNG JPG"
-SafeEnv GRAPHICS_Flags    ""
+envini MDG_Inc         ""
+envini MDG_Lib         ""
+envini GRAPHICS_Devices "PS CGM MPG PNG JPG"
+envini GRAPHICS_Flags    ""
 
 Note $ALog ""
 
@@ -162,10 +162,10 @@ Note $ALog ""
 
 Separator $ALog
 
-SafeEnv Cfg_CC_Flags  "$CC_Flags"
-SafeEnv Cfg_CC_Inc    "$CC_Inc"
-SafeEnv Cfg_LD_Flags  "$LD_Flags"
-SafeEnv Cfg_LD_Lib    "$LD_Lib"
+envini Cfg_CC_Flags  "$CC_Flags"
+envini Cfg_CC_Inc    "$CC_Inc"
+envini Cfg_LD_Flags  "$LD_Flags"
+envini Cfg_LD_Lib    "$LD_Lib"
 
 Note $ALog "Cfg_CC_Inc   = |$Cfg_CC_Inc|"
 Note $ALog "Cfg_LD_Flags = |$Cfg_LD_Flags|"
