@@ -68,7 +68,10 @@ Tool CXX {
 
 Tool LD {
 #   Flags   += -Wl,-export-dynamic
-   Flags   += -undefined dynamic_lookup
+
+# NOTE: readline detection is fouled up by this option
+#   Flags   += -undefined dynamic_lookup
+
    Flags   += [ _cmd_ = -p ;                 # profiling
 	        on    = -pg ]
    Flags   += [ _cmd_ = -cov ;               # coverage analysis
