@@ -75,7 +75,7 @@ end
 
 # setup a place to cache shared libraries so as to avoid
 # constantly rebuilding them
-SafeEnv PACT_SO_CACHE $HOME/.pact
+envini PACT_SO_CACHE $HOME/.pact
 
 set cache = $PACT_SO_CACHE/$sys
 
@@ -112,7 +112,7 @@ flog $log set api   = $cache/$pck.api
 flog $log set proto = $cache/$pck.proto
 flog $log set bind  = $cache/$pck.bind
 flog $log set gsc   = $cache/gs-$pck.c
-flog $log set gso   = $cache/gs-$pck.o
+flog $log set g so   = $cache/gs-$pck.o
 flog $log set so    = $cache/pact-${pck}.$SO
 
 flog $log set gbc   = $cache/gb-$pck.c

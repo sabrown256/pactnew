@@ -60,7 +60,7 @@ endif
 #  InitLog <log> <path>
 #       Initialize a log file with variable name <log> and file name <path>
 #
-#  SafeEnv <var> <default>
+#  envini <var> <default>
 #       If <var> is not defined, define it with value <default>
 #
 
@@ -102,14 +102,14 @@ alias dbdef     '$PERDB \!\!:1 \?'
 # matches C call dbinitv
 # usage: dbini <var> <val>
 alias dbini     'set t_ = ( `$PERDB \!\!:1 =\? \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
-alias SafeEnv   'if ($?\!\!:1 == 0) setenv \!\!:1 \!\!:2'
+alias envini    'if ($?\!\!:1 == 0) setenv \!\!:1 \!\!:2'
 
 # dbexp export the current value of environment variable <var>
 # back to the database
 # matches C call dbexp
 # usage: dbexp <var>
 alias dbexp     'set t_ = ( `$PERDB -l \!\!:1 = $\!\!:1` )'
-alias SetParent 'echo "parent \!\!:1($\!\!:1)"'
+alias envexp    'echo "parent \!\!:1($\!\!:1)"'
 
 setenv MV     "mv -f"
 setenv RM     "rm -f"
