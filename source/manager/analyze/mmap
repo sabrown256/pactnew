@@ -74,7 +74,6 @@ endif
 
 # export the results
 dbexp HAVE_MMAP
-#SetParent HAVE_MMAP
 
 exit(0)
 

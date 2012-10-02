@@ -23,17 +23,6 @@ dbini GRAPHICS_Devices  ""
 dbini GRAPHICS_Flags    ""
 dbini Std_UseQD         FALSE
 dbini Cfg_CC_Exe        "cc"
-#SafeEnv MDG_Inc          ""
-#SafeEnv MDG_Lib          ""
-#SafeEnv MDG_Pck          ""
-#SafeEnv QD_Inc           ""
-#SafeEnv QD_Lib           ""
-#SafeEnv QD_RPath         $RootLib
-#SafeEnv QD_Path          /usr
-#SafeEnv GRAPHICS_Devices ""
-#SafeEnv GRAPHICS_Flags   ""
-#SafeEnv Std_UseQD        FALSE
-#SafeEnv Cfg_CC_Exe       "cc"
 
 SafeEnv OS_Name           `uname -s`
 SafeEnv AnaDir           analyze
@@ -110,19 +99,10 @@ EOF
    dbexp GRAPHICS_Windows
    dbexp GRAPHICS_Devices
    dbexp GRAPHICS_Flags
-#   SetParent MDG_Inc
-#   SetParent MDG_Lib
-#   SetParent MDG_Pck
-#   SetParent QD_Inc
-#   SetParent QD_Lib
-#   SetParent QD_RPath
-#   SetParent QD_Path
-#   SetParent GRAPHICS_Devices
 
 endif
 
 dbexp Std_UseQD
-#SetParent Std_UseQD
 
 exit(0)
 

@@ -32,15 +32,6 @@ dbini CXX_Debug     "-g"
 dbini CXX_Optimize  "-O"
 dbini CXX_Inc       ""
 dbini DP_Inc       ""
-#SafeEnv CC_Debug     "-g"
-#SafeEnv CC_Optimize  "-O"
-#SafeEnv CC_Linker    ""
-#SafeEnv CXX_Linker    ""
-#SafeEnv CXX_Flags     ""
-#SafeEnv CXX_Debug     "-g"
-#SafeEnv CXX_Optimize  "-O"
-#SafeEnv CXX_Inc       ""
-#SafeEnv DP_Inc       ""
 
 SafeEnv UseLDLibPath ""
 
@@ -435,25 +426,6 @@ dbexp LONG64
 dbexp FC_INT_PTR_DIFFER
 dbexp NEED_ALT_LARGE_FILE
 dbexp DP_Inc
-
-#SetParent CC_Debug
-#SetParent CC_Optimize
-#SetParent CC_Linker
-#SetParent Cfg_CC_Exe
-#SetParent Cfg_CC_Flags
-#SetParent Cfg_CC_Inc
-#SetParent CXX_Exe
-#SetParent CXX_Flags
-#SetParent CXX_Debug
-#SetParent CXX_Optimize
-#SetParent CXX_Linker
-#SetParent Save_CC
-#SetParent Save_CFLAGS
-#SetParent CList
-#SetParent LONG64
-#SetParent FC_INT_PTR_DIFFER
-#SetParent NEED_ALT_LARGE_FILE
-#SetParent DP_Inc
 
 SetParent CC_Exe
 SetParent CC_Flags

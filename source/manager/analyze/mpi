@@ -27,15 +27,6 @@ dbini Save_CC            "cc"
 dbini DP_Inc             ""
 dbini DP_Lib             ""
 dbini DP_RPath           ""
-#SafeEnv MD_Pck             ""
-#SafeEnv HAVE_OPENMPI       FALSE
-#SafeEnv HAVE_MPI_2         FALSE
-#SafeEnv STD_PARALLEL_COMM  PARC
-#SafeEnv HAVE_MPI_STDIN_ALL FALSE
-#SafeEnv HAVE_MPI_GOOD_IO   FALSE
-#SafeEnv DP_Inc          ""
-#SafeEnv DP_Lib          ""
-#SafeEnv DP_RPath        ""
 
 SafeEnv REQUEST_MPI     FALSE
 
@@ -254,15 +245,6 @@ dbexp HAVE_MPI_GOOD_IO
 dbexp DP_Inc
 dbexp DP_Lib
 dbexp DP_RPath
-#SetParent MD_Pck
-#SetParent HAVE_OPENMPI
-#SetParent HAVE_MPI_2
-#SetParent STD_PARALLEL_COMM
-#SetParent HAVE_MPI_STDIN_ALL
-#SetParent HAVE_MPI_GOOD_IO
-#SetParent DP_Inc
-#SetParent DP_Lib
-#SetParent DP_RPath
 
 exit(0)
 

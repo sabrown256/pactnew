@@ -65,6 +65,4 @@ rm -f $Tmp $Tmp.c $Tmp.o
 
 # export the result
 dbexp HAVE_ANSI_FLOAT16
-#SetParent HAVE_ANSI_FLOAT16
 
-#exit(0)

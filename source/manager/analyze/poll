@@ -17,8 +17,6 @@ Note $Log "Analyze: poll"
 
 dbini HAVE_SELECT   FALSE
 dbini HAVE_STREAMS  FALSE
-#SafeEnv HAVE_SELECT   FALSE
-#SafeEnv HAVE_STREAMS  FALSE
 
 dbget HAVE_SELECT
 dbget HAVE_STREAMS
@@ -132,8 +130,6 @@ NoteD $ALog ""
 # export the results
 dbexp HAVE_STREAMS
 dbexp HAVE_SELECT
-#SetParent HAVE_STREAMS
-#SetParent HAVE_SELECT
 
 exit(0)
 

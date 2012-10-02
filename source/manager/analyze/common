@@ -65,7 +65,6 @@ Note $ALog "Manager directory: $MngDir"
 Note $ALog ""
 
 dbini CList      ""
-#SafeEnv CList      ""
 
 SafeEnv MngDir     $cwd
 SafeEnv CFE        ""

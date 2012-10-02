@@ -47,7 +47,6 @@ if ($HAVE_GETHOSTBYNAME == FALSE) then
 endif
 
 dbexp HAVE_GETHOSTBYNAME
-#SetParent HAVE_GETHOSTBYNAME
 
 exit(0)
 

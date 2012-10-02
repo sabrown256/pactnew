@@ -22,7 +22,6 @@ set MathLib = ""
 # look for GNU Scientific library
 
 dbini GSL_Path ""
-#SafeEnv GSL_Path ""
 
 if (-d $RootInc/gsl) then
    set rinc = $RootInc
@@ -39,8 +38,6 @@ endif
 # look for BLAS
 
 dbini BLAS_Path ""
-#SafeEnv BLAS_Path ""
-#set MathLib = ( $MathLib blas )
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -48,8 +45,6 @@ dbini BLAS_Path ""
 # look for LAPACK
 
 dbini LAPACK_Path ""
-#SafeEnv LAPACK_Path ""
-#set MathLib = ( $MathLib lapack )
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -77,9 +72,6 @@ flog $ALog rm -f $Tmp.res
 dbexp GSL_Path
 dbexp BLAS_Path
 dbexp LAPACK_Path
-#SetParent GSL_Path
-#SetParent BLAS_Path
-#SetParent LAPACK_Path
 
 exit(0)
 

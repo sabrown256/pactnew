@@ -68,8 +68,5 @@ endif
 dbexp HAVE_ANSI_C9X_FENV
 dbexp HAVE_GNU_FENV
 
-#SetParent HAVE_ANSI_C9X_FENV
-#SetParent HAVE_GNU_FENV
-
 exit(0)
 

@@ -23,7 +23,6 @@ NoteD $ALog -n "   Operating System: "
 Note $ALog ""
 
 dbini OSX_Version        ""
-#SafeEnv OSX_Version        ""
 
 SafeEnv OS_Name        `uname -s`
 SafeEnv OS_Release     `uname -r`
@@ -73,8 +72,6 @@ setenv OS_Type USE_$OS_Type
 
 dbexp OS_Type
 dbexp OSX_Version
-#SetParent OS_Type
-#SetParent OSX_Version
 
 SetParent OS_Name
 

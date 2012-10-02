@@ -20,9 +20,6 @@ NoteD $ALog "   System Utilities: "
 dbini AR_Exe    ar
 dbini AR_Flags  ""
 dbini INSTALL "cp"
-#SafeEnv AR_Exe    ar
-#SafeEnv AR_Flags  ""
-#SafeEnv INSTALL "cp"
 
 rm -f foo.c foo.o bar.c bar.o main.c libfoo.a $Tmp
 
@@ -159,13 +156,6 @@ dbexp AR_XFlag
 dbexp Ranlib_Exe
 dbexp UPDATE
 dbexp INSTALL
-#SetParent AR_Exe
-#SetParent AR_Flags
-#SetParent AR_IFlag
-#SetParent AR_XFlag
-#SetParent Ranlib_Exe
-#SetParent UPDATE
-#SetParent INSTALL
 
 exit(0)
 

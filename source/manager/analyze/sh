@@ -24,7 +24,6 @@ foreach i ($path /usr/bin /bin)
       NoteD $ALog "$i/bash"
       setenv DEFAULT_SHELL $i/bash
       dbexp DEFAULT_SHELL
-#      SetParent DEFAULT_SHELL
       exit(0)
    endif
 end
@@ -34,12 +33,10 @@ foreach i ($path /usr/bin /bin)
       NoteD $ALog "$i/sh"
       setenv DEFAULT_SHELL $i/sh
       dbexp DEFAULT_SHELL
-#      SetParent DEFAULT_SHELL
       exit(0)
    endif
 end
 
 dbexp DEFAULT_SHELL
-#SetParent DEFAULT_SHELL
 
 exit(1)

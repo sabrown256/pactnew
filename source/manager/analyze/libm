@@ -14,22 +14,19 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: math"
 
+dbini IMF_Lib      "-limf"
+dbini IMF_Path     ""
 dbini MD_Pck       ""
-#SafeEnv MD_Pck       ""
 
 SafeEnv RPATH        ""
 SafeEnv Cfg_RPATH    ""
 SafeEnv LibM_Lib     "-lm"
 SafeEnv LibM_RPath   ""
-SafeEnv IMF_Lib      "-limf"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # Intel Math library
-
-dbini IMF_Path ""
-#SafeEnv IMF_Path ""
 
 if (-d "$IMF_Path") then
    set nbits = `nbit -d`
@@ -75,8 +72,6 @@ NoteD $ALog "   Math library: $LibM_Lib"
 
 dbexp MD_Pck
 dbexp IMF_Path
-#SetParent MD_Pck
-#SetParent IMF_Path
 
 SetParent RPATH
 SetParent Cfg_RPATH

@@ -26,15 +26,6 @@ dbini MYSQL_SO    ""
 dbini SQLITE3_SO  ""
 dbini HAVE_SQL    FALSE
 
-#SafeEnv MDI_Inc    ""
-#SafeEnv MDI_Lib    ""
-#SafeEnv MDI_Pck    ""
-#SafeEnv SQL_Inc    ""
-#SafeEnv SQL_Lib    ""
-#SafeEnv SQL_RPath  $RootLib
-#SafeEnv SQL_Path   /usr
-#SafeEnv HAVE_SQL   FALSE
-
 dbget Linking
 
 # if we have explicitly said we do not want SQL
@@ -274,23 +265,12 @@ EOF
    dbexp HAVE_MYSQL
    dbexp HAVE_SQLITE
    dbexp HAVE_SQLITE_V2
-#   SetParent MDI_Inc
-#   SetParent MDI_Lib
-#   SetParent MDI_Pck
-#   SetParent SQL_Inc
-#   SetParent SQL_Lib
-#   SetParent SQL_RPath
-#   SetParent SQL_Path
-#   SetParent HAVE_MYSQL
-#   SetParent HAVE_SQLITE
-#   SetParent HAVE_SQLITE_V2
 
    SetParent RPATH
 
 endif
 
 dbexp HAVE_SQL
-#SetParent HAVE_SQL
 
 exit(0)
 

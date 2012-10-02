@@ -25,14 +25,6 @@ dbini PNG_Path     /usr
 dbini Z_Lib        ""
 dbini Z_Path       /usr
 dbini HAVE_PNGLIB  FALSE
-#SafeEnv MDG_Inc      ""
-#SafeEnv MDG_Lib      ""
-#SafeEnv MDG_Pck      ""
-#SafeEnv PNG_Inc      ""
-#SafeEnv PNG_Lib      ""
-#SafeEnv PNG_RPath    $RootLib
-#SafeEnv PNG_Path     /usr
-#SafeEnv HAVE_PNGLIB  FALSE
 
 # if we have explicitly said we do not want PNG
 # do NOT detect it
@@ -123,20 +115,12 @@ EOF
    dbexp PNG_Lib
    dbexp PNG_RPath
    dbexp PNG_Path
-#   SetParent MDG_Inc
-#   SetParent MDG_Lib
-#   SetParent MDG_Pck
-#   SetParent PNG_Inc
-#   SetParent PNG_Lib
-#   SetParent PNG_RPath
-#   SetParent PNG_Path
 
    SetParent RPATH
 
 endif
 
 dbexp HAVE_PNGLIB
-#SetParent HAVE_PNGLIB
 
 exit(0)
 

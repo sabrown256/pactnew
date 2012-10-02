@@ -23,6 +23,7 @@ source $ldir/env-csh
 set vl = ""
 set vl = ( $vl HAVE_OPENMP HAVE_READLINE )
 set vl = ( $vl HAVE_PYTHON PY_Vers )
+set vl = ( $vl SYS_SITE SYS_TYPE DAS_ROOT DAI_ROOT )
 
 source $MngDir/write/import-db
 

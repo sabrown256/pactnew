@@ -29,12 +29,6 @@ dbini FC_Linker        ""
 dbini FC_ID_UNDERSCORE "_"
 dbini FC_ID_CASE       "lower"
 dbini F_STD            "F90"
-#SafeEnv FC_Debug    "-g"
-#SafeEnv FC_Optimize "-O"
-#SafeEnv FC_Linker   ""
-#SafeEnv FC_ID_UNDERSCORE "_"
-#SafeEnv FC_ID_CASE       "lower"
-#SafeEnv F_STD            "F90"
 
 SafeEnv FC_Exe      "f90"
 SafeEnv FC_Flags    ""
@@ -270,16 +264,6 @@ dbexp Cfg_FC_Flags
 
 dbexp FC_ID_UNDERSCORE
 dbexp FC_ID_CASE
-
-#SetParent HAVE_FORTRAN
-#SetParent FC_Debug
-#SetParent FC_Optimize
-#SetParent FC_Linker
-#SetParent Cfg_FC_Exe
-#SetParent Cfg_FC_Flags
-#SetParent FC_ID_UNDERSCORE
-#SetParent FC_ID_CASE
-#SetParent F_STD
 
 SetParent FC_Exe
 SetParent FC_Flags

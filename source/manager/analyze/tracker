@@ -16,8 +16,7 @@ Note $Log "Analyze: tracker"
 
 dbini HAVE_TRACKER ""
 dbini TRACKER_Exe  ""
-#SafeEnv HAVE_TRACKER ""
-#SafeEnv TRACKER_Exe  ""
+dbini DAS_ROOT     "/usr/local"
 
 foreach d ( /usr/apps/tracker $DAS_ROOT/tracker /usr /usr/local )
    if (-d $d) then
@@ -39,8 +38,6 @@ end
 # export the results
 dbexp HAVE_TRACKER
 dbexp TRACKER_Exe
-#SetParent HAVE_TRACKER
-#SetParent TRACKER_Exe
 
 exit(0)
 

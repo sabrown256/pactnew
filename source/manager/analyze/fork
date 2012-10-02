@@ -43,7 +43,6 @@ else
 endif
 
 dbexp HAVE_FORK_EXEC
-#SetParent HAVE_FORK_EXEC
 
 exit(0)
 

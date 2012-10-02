@@ -39,6 +39,4 @@ rm -f $AC $AO $BC
 
 # export the result
 dbexp HAVE_BAD_LINE_DIRECTIVES
-#SetParent HAVE_BAD_LINE_DIRECTIVES
 
-#exit(0)

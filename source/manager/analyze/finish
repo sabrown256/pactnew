@@ -48,12 +48,9 @@ if ($Std_UseX == FALSE) then
       dbexp Std_UseX
       dbexp Std_UseOGL
       dbexp Std_UseQD
-#      SetParent Std_UseX
-#      SetParent Std_UseOGL
-#      SetParent Std_UseQD
    endif
+
    dbexp GRAPHICS_Windows
-#   SetParent GRAPHICS_Windows
 
 endif
 
@@ -71,7 +68,6 @@ if ("$MDG_Inc" == "-I/usr/include") then
    flog $ALog setenv MDG_Inc ""
 endif
 dbexp MDG_Inc
-#SetParent MDG_Inc
 
 if ($?Save_CC == 1) then
    flog $ALog setenv CC_Exe "$Save_CC"
@@ -101,10 +97,6 @@ dbexp CDefDebug
 dbexp CDefOptimize
 dbexp FDefDebug
 dbexp FDefOptimize
-#SetParent CDefDebug
-#SetParent CDefOptimize
-#SetParent FDefDebug
-#SetParent FDefOptimize
 
 SetParent Cfe_CC_Inc
 SetParent CC_Exe

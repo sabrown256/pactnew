@@ -67,7 +67,4 @@ rm -f $Tmp $Tmp.c $Tmp.o
 # export the result
 dbexp HAVE_VA_LIST
 dbexp HAVE_VA_COPY
-#SetParent HAVE_VA_LIST
-#SetParent HAVE_VA_COPY
 
-#exit(0)

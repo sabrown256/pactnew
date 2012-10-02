@@ -44,7 +44,6 @@ rm -f $Tmp.c $Tmp
 
 # export the results
 dbexp IPC_STD
-#SetParent IPC_STD
 
 exit(0)
 

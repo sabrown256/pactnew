@@ -12,7 +12,6 @@ set Me = $0
 source $Me:h/common
 
 dbini HAVE_GNU_LIBC_6 FALSE
-#SafeEnv HAVE_GNU_LIBC_6 FALSE
 
 setenv GLIBC_VERSION ""
 
@@ -65,9 +64,6 @@ endif
 
 dbexp HAVE_GNU_LIBC_6
 dbexp GLIBC_VERSION
-#SetParent HAVE_GNU_LIBC_6
-#SetParent GLIBC_VERSION
 
 
-#exit(0)
 

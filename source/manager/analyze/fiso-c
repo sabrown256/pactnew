@@ -52,9 +52,6 @@ flog $ALog rm -f ${Tmp}_iso*
 dbexp HAVE_ISO_C_BINDING
 dbexp Cfg_FC_Exe
 dbexp Cfg_FC_Flags
-#SetParent HAVE_ISO_C_BINDING
-#SetParent Cfg_FC_Exe
-#SetParent Cfg_FC_Flags
 
 SetParent FC_Exe
 SetParent FC_Flags

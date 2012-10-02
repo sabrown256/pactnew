@@ -20,9 +20,6 @@ Note $ALog ""
 dbini DP_Lib         ""
 dbini Cfg_LD_Flags   ""
 dbini Cfg_LD_RPath   ""
-#SafeEnv DP_Lib         ""
-#SafeEnv Cfg_LD_Flags   ""
-#SafeEnv Cfg_LD_RPath   ""
 
 SafeEnv LD_Exe         ""
 SafeEnv LD_Flags       ""
@@ -65,7 +62,6 @@ endif
 flog $ALog $RM $Tmp $Tmp.c $Tmp.o
 
 dbini Shared_LD_Exe "$LD_Exe"
-#SafeEnv Shared_LD_Exe "$LD_Exe"
 
 # capture current notion of rpath
 if ($?Cfg_RPATH == 1) then
@@ -98,11 +94,6 @@ dbexp Shared_LD_Exe
 dbexp DP_Lib
 dbexp Cfg_LD_Flags
 dbexp Cfg_LD_RPath
-#SetParent HAVE_RPATH
-#SetParent Shared_LD_Exe
-#SetParent DP_Lib
-#SetParent Cfg_LD_Flags
-#SetParent Cfg_LD_RPath
 
 SetParent LD_Exe
 SetParent LD_Flags

@@ -38,7 +38,6 @@ flog $ALog rm -f $Tmp.c $Tmp
 
 # export the results
 dbexp HAVE_GOOD_OMP_PRAGMAS
-#SetParent HAVE_GOOD_OMP_PRAGMAS
 
 exit(0)
 

@@ -49,7 +49,6 @@ rm -f $Tmp.c $Tmp
 
 # export the results
 dbexp HAVE_UNIX98_PTY
-#SetParent HAVE_UNIX98_PTY
 
 exit(0)
 
