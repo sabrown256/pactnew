@@ -18,10 +18,10 @@ dbini IMF_Lib      "-limf"
 dbini IMF_Path     ""
 dbini MD_Pck       ""
 
-SafeEnv RPATH        ""
-SafeEnv Cfg_RPATH    ""
-SafeEnv LibM_Lib     "-lm"
-SafeEnv LibM_RPath   ""
+envini RPATH        ""
+envini Cfg_RPATH    ""
+envini LibM_Lib     "-lm"
+envini LibM_RPath   ""
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -73,10 +73,10 @@ NoteD $ALog "   Math library: $LibM_Lib"
 dbexp MD_Pck
 dbexp IMF_Path
 
-SetParent RPATH
-SetParent Cfg_RPATH
-SetParent LibM_Lib
-SetParent LibM_RPath
+envexp RPATH
+envexp Cfg_RPATH
+envexp LibM_Lib
+envexp LibM_RPath
 
 exit(0)
 

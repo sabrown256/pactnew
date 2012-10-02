@@ -116,7 +116,7 @@ EOF
    dbexp PNG_RPath
    dbexp PNG_Path
 
-   SetParent RPATH
+   envexp RPATH
 
 endif
 

@@ -266,7 +266,7 @@ EOF
    dbexp HAVE_SQLITE
    dbexp HAVE_SQLITE_V2
 
-   SetParent RPATH
+   envexp RPATH
 
 endif
 

@@ -104,7 +104,7 @@ EOF
    dbexp Z_RPath
    dbexp Z_Path
 
-   SetParent RPATH
+   envexp RPATH
 
 endif
 

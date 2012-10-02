@@ -337,7 +337,7 @@ switch ($Cmnd)
 # some things should be on the back end for testing
 # but some need to be used by the system on the front end
 # see score/make-wrap
-        SafeEnv CROSS_COMPILE FALSE
+        envini CROSS_COMPILE FALSE
         if ($CROSS_COMPILE != FALSE) then
            NoteD $Log ""
            Separator $Log
@@ -1143,9 +1143,9 @@ switch ($Cmnd)
         NoteD $Log "   Persistent Portable Parallel Make - dmake"
 
         if ($?IBM_BGL == 1) then
-           SafeEnv CROSS_COMPILE none
+           envini CROSS_COMPILE none
         else           
-           SafeEnv CROSS_COMPILE FALSE
+           envini CROSS_COMPILE FALSE
         endif
 
         Note $Log "CROSS_COMPILE = $CROSS_COMPILE"

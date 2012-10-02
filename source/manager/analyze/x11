@@ -26,11 +26,11 @@ dbini GRAPHICS_Devices  ""
 dbini GRAPHICS_Flags    ""
 dbini Std_UseX          TRUE
 
-SafeEnv AnaDir           analyze
-SafeEnv ALog             $cwd/cfg-$System/log.analyze
-SafeEnv OS_Name           `uname -s`
-SafeEnv Cfe_CC_Exe       "cc"
-SafeEnv Cfe_CC_Flags     "-g"
+envini AnaDir           analyze
+envini ALog             $cwd/cfg-$System/log.analyze
+envini OS_Name           `uname -s`
+envini Cfe_CC_Exe       "cc"
+envini Cfe_CC_Flags     "-g"
 
 # if we have explicitly said we do not want X11
 # do NOT detect it
@@ -173,7 +173,7 @@ EOF
    dbexp GRAPHICS_Devices
    dbexp GRAPHICS_Flags
 
-   SetParent RPATH
+   envexp RPATH
 
 endif
 

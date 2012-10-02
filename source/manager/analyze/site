@@ -19,10 +19,7 @@ dbini SYS_TYPE     ""
 dbini DAI_ROOT     ""
 #dbini DAS_ROOT     ""
 
-#SafeEnv SYS_SITE     ""
-#SafeEnv SYS_TYPE     ""
-#SafeEnv DAI_ROOT     ""
-SafeEnv DAS_ROOT     ""
+envini DAS_ROOT     ""
 
 if (-f $MngDir/extensions/sys-site) then
    eval `$MngDir/extensions/sys-site`
@@ -36,10 +33,7 @@ dbexp SYS_SITE
 dbexp DAI_ROOT
 #dbexp DAS_ROOT
 
-#SetParent SYS_TYPE
-#SetParent SYS_SITE
-#SetParent DAI_ROOT
-SetParent DAS_ROOT
+envexp DAS_ROOT
 
 exit(0)
 

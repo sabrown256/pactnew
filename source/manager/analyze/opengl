@@ -26,7 +26,7 @@ dbini GRAPHICS_Devices  ""
 dbini GRAPHICS_Flags    ""
 dbini Std_UseOGL        FALSE
 
-SafeEnv OS_Name           `uname -s`
+envini OS_Name           `uname -s`
 
 # if we have explicitly said we do not want OGL
 # do NOT detect it

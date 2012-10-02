@@ -76,31 +76,31 @@ endif
 set tmp = ($Save_CFLAGS)
 flog $ALog setenv CC_Flags "$tmp"
 
-flog $Log setenv CDefOptimize "$CC_Optimize"
-flog $Log setenv CDefDebug    "$CC_Debug"
-flog $Log setenv FDefOptimize "$FC_Optimize"
-flog $Log setenv FDefDebug    "$FC_Debug"
+flog $Log setenv CC_Optimize_Default "$CC_Optimize"
+flog $Log setenv CC_Debug_Default    "$CC_Debug"
+flog $Log setenv FC_Optimize_Default "$FC_Optimize"
+flog $Log setenv FC_Debug_Default    "$FC_Debug"
 
 if ($AbsoluteDeb == TRUE) then
-   flog $Log setenv CDefOptimize "$CC_Debug"
-   flog $Log setenv FDefOptimize "$FC_Debug"
+   flog $Log setenv CC_Optimize_Default "$CC_Debug"
+   flog $Log setenv FC_Optimize_Default "$FC_Debug"
 else if ($AbsoluteOpt == TRUE) then
-   flog $Log setenv CDefDebug "$CC_Optimize"
-   flog $Log setenv FDefDebug "$FC_Optimize"
+   flog $Log setenv CC_Debug_Default "$CC_Optimize"
+   flog $Log setenv FC_Debug_Default "$FC_Optimize"
 endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
 # export the results
-dbexp CDefDebug
-dbexp CDefOptimize
-dbexp FDefDebug
-dbexp FDefOptimize
+dbexp CC_Debug_Default
+dbexp CC_Optimize_Default
+dbexp FC_Debug_Default
+dbexp FC_Optimize_Default
 
-SetParent Cfe_CC_Inc
-SetParent CC_Exe
-SetParent CC_Flags
+envexp Cfe_CC_Inc
+envexp CC_Exe
+envexp CC_Flags
 
 exit(0)
 

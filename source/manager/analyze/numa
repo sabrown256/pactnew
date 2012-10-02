@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-SafeEnv NUMA ""
+envini NUMA ""
 
 if ($PACT_CC_FAMILY == PGI) then
    /bin/ls /usr/lib*/libnuma*.so >& /dev/null
@@ -19,7 +19,7 @@ if ($PACT_CC_FAMILY == PGI) then
    endif
 endif
 
-SetParent NUMA
+envexp NUMA
 
-#exit(0)
+
 

@@ -33,14 +33,14 @@ dbini CXX_Optimize  "-O"
 dbini CXX_Inc       ""
 dbini DP_Inc       ""
 
-SafeEnv UseLDLibPath ""
+envini UseLDLibPath ""
 
 # NOTE: we cannot have nothing for CC_Exec
 # if nothing is specified try cc
-SafeEnv CC_Exe       "cc"
+envini CC_Exe       "cc"
 
-SafeEnv CC_Flags     ""
-SafeEnv CC_Inc       ""
+envini CC_Flags     ""
+envini CC_Inc       ""
 
 set UTime = `timer -r`
 
@@ -81,7 +81,7 @@ else
    NoteD $ALog " none"
    NoteD $ALog "      No ANSI C compiler found, PACT cannot be built without one"
    setenv STOP ""
-   SetParent STOP
+   envexp STOP
    exit(0)
 endif
 
@@ -120,7 +120,7 @@ if ($?Cfg_CC_Flags == 0) then
 endif
 
 # remember the requested flags and setup for configuration purposes
-SafeEnv Cfg_CC_Inc ""
+envini Cfg_CC_Inc ""
 flog $ALog setenv Save_CFLAGS "$CC_Flags"
 Note $ALog ""
 
@@ -130,7 +130,7 @@ if ("$Cfg_CC_Inc" != "") then
    Note $ALog ""
 endif
 
-SafeEnv Cfg_CC_Flags "$CC_Flags"
+envini Cfg_CC_Flags "$CC_Flags"
 
 # temporarily add debug flags to compiler flags for config
 if ($?Cfg_CC_Debug == 1) then
@@ -224,7 +224,7 @@ if ($Cfg_CC_Exe != "") then
    else if (("$CmpVers" != any) && ($STRICT > 0)) then
       NoteD $ALog "      requested version $CmpVers (not found)"
       setenv STOP ""
-      SetParent STOP
+      envexp STOP
       exit(0)
    else
       NoteD $ALog "      requested version $CmpVers (not found)"
@@ -264,7 +264,7 @@ EOF
       NoteD $ALog "   $Cfe_CC_Flags"
       NoteD $ALog "are incorrect for $Cfe_CC_Exe - failed"
       setenv STOP ""
-      SetParent STOP
+      envexp STOP
       exit(0)
    endif
    Note $ALog ""
@@ -294,7 +294,7 @@ EOF
       NoteD $ALog "   $Cfe_CC_Flags"
       NoteD $ALog "are incorrect for $Cfe_CC_Exe - failed"
       setenv STOP ""
-      SetParent STOP
+      envexp STOP
       exit(0)
    endif
    Note $ALog ""
@@ -326,7 +326,7 @@ EOF
       NoteD $ALog "   $Cfe_CC_Flags"
       NoteD $ALog "are incorrect for $Cfe_CC_Exe - failed"
       setenv STOP ""
-      SetParent STOP
+      envexp STOP
       exit(0)
    endif
    Note $ALog ""
@@ -427,13 +427,13 @@ dbexp FC_INT_PTR_DIFFER
 dbexp NEED_ALT_LARGE_FILE
 dbexp DP_Inc
 
-SetParent CC_Exe
-SetParent CC_Flags
-SetParent CC_Inc
+envexp CC_Exe
+envexp CC_Flags
+envexp CC_Inc
 
-SetParent Cfe_CC_Exe
-SetParent Cfe_CC_Flags
-SetParent Cfe_CC_Inc
+envexp Cfe_CC_Exe
+envexp Cfe_CC_Flags
+envexp Cfe_CC_Inc
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

@@ -24,7 +24,7 @@ dbini RL_RPath  /usr/${LIB}
 dbini RL_Path   /usr
 dbini HAVE_READLINE   FALSE
 
-SafeEnv HAVE_READLINE   FALSE
+envini HAVE_READLINE   FALSE
 
 # if we have explicitly said we do not want READLINE
 # do NOT detect it
@@ -104,7 +104,7 @@ EOF
    dbexp RL_RPath
    dbexp RL_Path
 
-   SetParent RPATH
+   envexp RPATH
 
 endif
 

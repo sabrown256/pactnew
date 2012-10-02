@@ -221,9 +221,9 @@ call CLEAN_PATH(RPATH)
 
 switch ($Out)
    case parent:
-        SetParent RPATH
+        envexp RPATH
         call CLEAN_PATH(Cfg_RPATH)
-        SetParent Cfg_RPATH
+        envexp Cfg_RPATH
         breaksw
    case echo:
         echo $RPATH

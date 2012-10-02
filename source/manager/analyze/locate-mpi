@@ -248,7 +248,7 @@ if ($?DP_Path == 1) then
    dbexp DP_RPath
    dbexp DP_Path
 
-   SetParent RPATH
+   envexp RPATH
 
 else if ($Verbose == TRUE) then
    echo "No MPI found matching: $SW $HW $Comp"
