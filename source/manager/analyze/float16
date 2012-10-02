@@ -19,9 +19,12 @@ cat << EOF >! $Tmp.c
 #include <limits.h>
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 int main(int c, char **v)
-   {double x, y;
+   {int rv;
+    double x, y;
     long double a, b;
+    char s[100];
     a = 1.23e34l;
     b = sqrtl(2.0);
     x = 1.23e34;
@@ -31,38 +34,37 @@ int main(int c, char **v)
     printf("x = %26.16e\n", x/y);
     printf("b = %44.34Le\n", b);
     printf("y = %26.16e\n", y);
-    return(0);}
+    snprintf(s, 100, "%44.34Le", b);
+    if (strstr(s, "1.4142135623730") != NULL)
+       {rv = 0;
+        fprintf(stderr, "TRUE\n");}
+    else
+       {rv = 1;
+        fprintf(stderr, "FALSE\n");};
+    return(rv);}
 EOF
 
-flog $ALog setenv HAVE_ANSI_FLOAT16 FALSE
+set ok = FALSE
 
 flog $ALog cat $Tmp.c
 
 flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt -lm
 if ($status == 0) then
-#   flog $ALog $CFE -v $Tmp
-   set inf = ( `$CFE $Tmp | grep "b ="` )
-   if ($#inf > 2) then
-      flog $ALog set val = $inf[3]
-   else
-      flog $ALog set val = none
-   endif
-   if ($val =~ 1.41421*) then
-      flog $ALog setenv HAVE_ANSI_FLOAT16 TRUE
+   flog $ALog gexec $CFE $Tmp @o2 @e3 fa:$ALog @ vw:HAVE_ANSI_FLOAT16
+   dbget gstatus
+   if ("$gstatus" =~ 0*) then
+      set ok = TRUE
    endif
 endif
 
-if ($HAVE_ANSI_FLOAT16 == TRUE) then
+rm -f $Tmp $Tmp.c $Tmp.o
+
+if ($ok == TRUE) then
    NoteD $ALog "      has long double support"
 else
    NoteD $ALog "      no long double support"
 endif
 
-rm -f $Tmp $Tmp.c $Tmp.o
-
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-# export the result
-dbexp HAVE_ANSI_FLOAT16
 
