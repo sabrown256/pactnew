@@ -17,32 +17,33 @@ Note $Log "Analyze: fork/exec"
 
 cat << EOF >! $Tmp.c
 #include <stdlib.h>
+#include <stdio.h>
 int main(int c, char **v)
    {int rv;
     rv = system("date");
+    if (rv == 0)
+       fprintf(stderr, "TRUE\n");
+    else
+       fprintf(stderr, "FALSE\n");
     return(rv);}
 EOF
-
-setenv HAVE_FORK_EXEC FALSE
 
 set opt = ""
 set opt = ( $opt $CC_Flags $Cfe_LD_Flags $Cfe_LD_RPath )
 flog $ALog $CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
-   flog $ALog $CFE $Tmp
-   if ($status == 0) then
-      setenv HAVE_FORK_EXEC TRUE
-      flog $ALog $RM $Tmp.c $Tmp
-   endif
+   flog $ALog gexec $CFE $Tmp @o2 @e3 fw:/dev/null @ vw:HAVE_FORK_EXEC
 endif
 
-if ($HAVE_FORK_EXEC == FALSE) then
-   NoteD $ALog "      no working fork/exec"
-else
+flog $ALog $RM $Tmp.c $Tmp
+
+dbget gstatus
+
+if ("$gstatus" =~ 0*) then
    NoteD $ALog "      has working fork/exec"
+else
+   NoteD $ALog "      no working fork/exec"
 endif
-
-dbexp HAVE_FORK_EXEC
 
 exit(0)
 

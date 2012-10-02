@@ -17,6 +17,7 @@ Note $Log "Analyze: gethostbyname"
 
 cat << EOF >! $Tmp.c
 #include <stdlib.h>
+#include <stdio.h>
 #include <netdb.h>
 int main(int c, char **v)
    {int rv;
@@ -26,6 +27,10 @@ int main(int c, char **v)
        rv = 0;
     else
        rv = 1;
+    if (rv == 0)
+       printf("TRUE\n");
+    else
+       printf("FALSE\n");
     return(rv);}
 EOF
 
@@ -35,18 +40,16 @@ set opt = ""
 set opt = ( $opt $CC_Flags $Cfe_LD_Flags $Cfe_LD_RPath )
 flog $ALog $CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
-   flog $ALog $CFE $Tmp `uname -n`
-   if ($status == 0) then
-      setenv HAVE_GETHOSTBYNAME TRUE
-      flog $ALog rm -f $Tmp.c $Tmp
-   endif
+   flog $ALog gexec $CFE $Tmp `uname -n` @o2 @e3 vw:HAVE_GETHOSTBYNAME @ fw:/dev/null
 endif
 
-if ($HAVE_GETHOSTBYNAME == FALSE) then
+flog $ALog rm -f $Tmp.c $Tmp
+
+dbget gstatus
+
+if ("$gstatus" !~ 0*) then
    NoteD $ALog "      no gethostbyname"
 endif
-
-dbexp HAVE_GETHOSTBYNAME
 
 exit(0)
 

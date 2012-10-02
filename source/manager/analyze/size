@@ -13,12 +13,8 @@ source $Me:h/common
 
 Note $ALog "      Find Integer Sizes"
 
-if ($?INT4 == 0) then
-   setenv INT4  int
-endif
-if ($?INT8 == 0) then
-   setenv INT8  long
-endif
+dbini INT4  int
+dbini INT8  long
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -38,7 +34,41 @@ if ($status != 0) then
 else
    setenv NO_LONG_LONG FALSE
 endif
+
 flog $ALog rm -f $Tmp.c $Tmp
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# INT4
+
+cat << EOF >! $Tmp.c
+#include <stdio.h>
+int main(int c, char **v)
+{
+ if (sizeof(int) == 4)
+    printf("int\n");
+ else if (sizeof(long) == 4)
+    printf("long\n");
+ else
+    printf("unknown\n");
+return(0);}
+EOF
+
+flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
+if ($status == 0) then
+   flog $ALog gexec $CFE $Tmp @o2 @e3 vw:INT4 @ fw:/dev/null
+endif
+
+flog $ALog rm -f $Tmp.c $Tmp
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# INT8
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 if ($NO_LONG_LONG == TRUE) then
    goto VERSIONA
@@ -49,60 +79,44 @@ endif
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-# VERSIONA - no long long
-
 VERSIONA:
 
-cat << EOF >! $Tmp.c
+   cat << EOF >! $Tmp.c
 #include <stdio.h>
 int main(int c, char **v)
 {
- if (sizeof(int) == 4)
-    printf("setenv INT4 int\n");
- else if (sizeof(long) == 4)
-    printf("setenv INT4 long\n");
- else
-    printf("setenv INT4 unknown\n");
- printf(";\n");
  if (sizeof(int) == 8)
-    printf("setenv INT8 int\n");
+    printf("int\n");
  else if (sizeof(long) == 8)
-    printf("setenv INT8 long\n");
+    printf("long\n");
  else
-    printf("setenv INT8 unknown\n");
+    printf("unknown\n");
 return(0);}
 EOF
 
-goto COMPILE
+   goto COMPILE
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
-
-# VERSIONB - with long long
 
 VERSIONB:
 
-cat << EOF >! $Tmp.c
+   cat << EOF >! $Tmp.c
 #include <stdio.h>
 int main(int c, char **v)
 {
- if (sizeof(int) == 4)
-    printf("setenv INT4 int\n");
- else if (sizeof(long) == 4)
-    printf("setenv INT4 long\n");
- else
-    printf("setenv INT4 unknown\n");
- printf(";\n");
  if (sizeof(int) == 8)
-    printf("setenv INT8 int\n");
+    printf("int\n");
  else if (sizeof(long) == 8)
-    printf("setenv INT8 long\n");
+    printf("long\n");
  else if (sizeof(long long) == 8)
-    printf("setenv INT8 \'long long\'\n");
+    printf("long long\n");
  else
-    printf("setenv INT8 unknown\n");
+    printf("unknown\n");
 return(0);}
 EOF
+
+   goto COMPILE
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -110,7 +124,18 @@ EOF
 COMPILE:
 
 flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
-eval `$CFE $Tmp`
+if ($status == 0) then
+   flog $ALog gexec $CFE $Tmp @o2 @e3 vw:INT8 @ fw:/dev/null
+endif
+
+flog $ALog rm -f $Tmp.c $Tmp
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+set vl = ( INT4 INT8 )
+
+source $MngDir/write/import-db
 
 Note $ALog ""
 Note $ALog "Integer size info:"
@@ -119,11 +144,6 @@ Note $ALog "   INT8         = $INT8"
 Note $ALog "   NO_LONG_LONG = $NO_LONG_LONG"
 Note $ALog ""
 
-flog $ALog rm -f $Tmp.c $Tmp
-
-# export the results
-dbexp INT4
-dbexp INT8
 dbexp NO_LONG_LONG
 
 
