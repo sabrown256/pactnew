@@ -24,8 +24,6 @@ dbini RL_RPath  /usr/${LIB}
 dbini RL_Path   /usr
 dbini HAVE_READLINE   FALSE
 
-envini HAVE_READLINE   FALSE
-
 # if we have explicitly said we do not want READLINE
 # do NOT detect it
 if ("$RL_Path" == none) then
@@ -56,11 +54,14 @@ int main(int c, char **v)
  rl_restore_prompt();
  rl_clear_message();
  printf("%s 0x%04x\n", rl_library_version, rl_readline_version);
+ if (rv == 0)
+    fprintf(stderr, "TRUE\n");
+ else
+    fprintf(stderr, "FALSE\n");
  return(rv);}
 EOF
 
-   setenv HAVE_READLINE FALSE
-
+   set ok    = FALSE
    set lvers = none
    set llib  = ""
    set libl  = ( -lreadline -lcurses )
@@ -68,25 +69,28 @@ EOF
    set opt   = ( $opt $CC_Flags $Cfe_LD_Flags $Cfe_LD_RPath $libl )
    flog $ALog $CC_Exe $Tmp.c -o $Tmp $opt
    if ($status == 0) then
-      flog $ALog $CFE $Tmp
-      if ($status == 0) then
-         set inf   = ( `$CFE $Tmp` )
-         set lvers = $inf[1]
-         setenv HAVE_READLINE TRUE
-         flog $ALog set llib = ( $libl )
-         flog $ALog setenv MD_Pck        "RL $MD_Pck"
-         flog $ALog $RM $Tmp.c $Tmp
+      flog $ALog gexec $CFE $Tmp @o2 @e3 vw:READLINE_Version @ vw:HAVE_READLINE
+
+      set vl = ( gstatus READLINE_Version )
+
+      source $MngDir/write/import-db
+
+      if ("$gstatus" =~ 0*) then
+         set ok = TRUE
       endif
    endif
    unset opt
-   unset libl
 
-   if ("$llib" != "") then
-      flog $ALog setenv HAVE_READLINE   TRUE
-      NoteD $ALog "      has readline $lvers ($llib)"
+   if ($ok == TRUE) then
+      flog $ALog set llib = ( $libl )
+      flog $ALog setenv MD_Pck        "RL $MD_Pck"
+      NoteD $ALog "      has readline $READLINE_Version ($llib)"
    else
       NoteD $ALog "      no readline"
    endif
+   unset libl
+
+   flog $ALog $RM $Tmp.c $Tmp
 
 #   setenv MD_Lib   "$llib $MD_Lib"
    setenv RL_Inc   ""
@@ -107,8 +111,6 @@ EOF
    envexp RPATH
 
 endif
-
-dbexp HAVE_READLINE
 
 exit(0)
 

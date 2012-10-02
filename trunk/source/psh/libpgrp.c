@@ -2509,14 +2509,14 @@ int gexec_var(char *db, io_mode md, FILE **fio,
     if ((vr != NULL) && (md != IO_MODE_NONE))
        {sa = NULL;
 
-        vl = getenv(vr);
-	if (vl != NULL)
-	   sa = lst_add(sa, vl);
-
 	switch (md)
 
 /* variable to stdout NC times */
 	   {case IO_MODE_RO :
+	         vl = getenv(vr);
+		 if (vl != NULL)
+		    sa = lst_add(sa, vl);
+
 	         nw = 0;
 		 ns = lst_length(sa);
 		 for (i = 0; i < ns; i++)
@@ -2548,6 +2548,10 @@ int gexec_var(char *db, io_mode md, FILE **fio,
 
 /* stdin append to variable */
 	    case IO_MODE_APPEND :
+	         vl = getenv(vr);
+		 if (vl != NULL)
+		    sa = lst_add(sa, vl);
+
 	         rv = file_strings_push(fio[0], &sa, TRUE, -1);
 		 vl = concatenate(t, MAXLINE, sa, " ");
 
