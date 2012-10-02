@@ -138,7 +138,6 @@ endif
 
 # export the results
 dbexp NO_TERMINAL
-#SetParent NO_TERMINAL
 
 exit(0)
 

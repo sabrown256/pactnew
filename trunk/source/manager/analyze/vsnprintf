@@ -37,7 +37,6 @@ flog $ALog rm -f $Tmp $Tmp.c $Tmp.o
 
 # export the results
 dbexp HAVE_VSNPRINTF
-#SetParent HAVE_VSNPRINTF
 
 exit(0)
 

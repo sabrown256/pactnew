@@ -39,7 +39,6 @@ if ($HAVE_GETPWUID == FALSE) then
 endif
 
 dbexp HAVE_GETPWUID
-#SetParent HAVE_GETPWUID
 
 exit(0)
 

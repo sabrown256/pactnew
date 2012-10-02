@@ -22,11 +22,6 @@ dbini Lex_Flags         ""
 dbini Cfg_Lex_Flags     ""
 dbini Cfe_Lex_Flags     ""
 dbini HAVE_FLEX_SCANNER FALSE
-#SafeEnv Lex_Exe           ""
-#SafeEnv Lex_Flags         ""
-#SafeEnv Cfg_Lex_Flags     ""
-#SafeEnv Cfe_Lex_Flags     ""
-#SafeEnv HAVE_FLEX_SCANNER FALSE
 
 
 cat << EOF >! $Tmp.l
@@ -74,11 +69,6 @@ dbexp Lex_Flags
 dbexp Cfg_Lex_Flags
 dbexp Cfe_Lex_Flags
 dbexp HAVE_FLEX_SCANNER
-#SetParent Lex_Exe
-#SetParent Lex_Flags
-#SetParent Cfg_Lex_Flags
-#SetParent Cfe_Lex_Flags
-#SetParent HAVE_FLEX_SCANNER
 
 exit(0)
 

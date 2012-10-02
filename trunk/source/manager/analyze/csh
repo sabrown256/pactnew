@@ -38,6 +38,5 @@ else
 endif
 
 dbexp BackSlash
-#SetParent BackSlash
 
 exit(0)

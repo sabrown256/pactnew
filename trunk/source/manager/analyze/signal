@@ -15,7 +15,6 @@ Separator $Log
 Note $Log "Analyze: signal"
 
 dbini HAVE_POSIX_SIGNALS    FALSE
-#SafeEnv HAVE_POSIX_SIGNALS    FALSE
 
 set sig = ""
 
@@ -100,7 +99,6 @@ endif
 
 # export the results
 dbexp HAVE_POSIX_SIGNALS
-#SetParent HAVE_POSIX_SIGNALS
 
 exit(0)
 

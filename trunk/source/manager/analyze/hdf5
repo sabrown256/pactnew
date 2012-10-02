@@ -22,18 +22,8 @@ dbini HDF_Inc    ""
 dbini HDF_Lib    ""
 dbini HDF_RPath  $RootLib
 dbini HDF_Path   /usr
-dbini Z_Lib      "-lz"
-
-#SafeEnv MDI_Inc    ""
-#SafeEnv MDI_Lib    ""
-#SafeEnv MDI_Pck    ""
-#SafeEnv HDF_Inc    ""
-#SafeEnv HDF_Lib    ""
-#SafeEnv HDF_RPath  $RootLib
-#SafeEnv HDF_Path   /usr
-#SafeEnv Z_Lib      "-lz"
-
 dbini HDF5_SO    ""
+dbini Z_Lib      "-lz"
 
 dbget Linking
 
@@ -122,20 +112,12 @@ EOF
    dbexp HDF_Lib
    dbexp HDF_RPath
    dbexp HDF_Path
-#   SetParent MDI_Inc
-#   SetParent MDI_Lib
-#   SetParent MDI_Pck
-#   SetParent HDF_Inc
-#   SetParent HDF_Lib
-#   SetParent HDF_RPath
-#   SetParent HDF_Path
 
    SetParent RPATH
 
 endif
 
 dbexp HAVE_HDF5
-#SetParent HAVE_HDF5
 
 exit(0)
 

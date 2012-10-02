@@ -15,7 +15,6 @@ Separator $Log
 Note $Log "Analyze: make"
 
 dbini GMAKE_Flag ""
-#SafeEnv GMAKE_Flag ""
 
 if ("$GMAKE_Flag" == TRUE) then
    setenv GMAKE_Flag "-DUSE_GNU_MAKE"
@@ -63,8 +62,6 @@ flog $ALog rm -f $Tmp.make
 # export the results
 dbexp MAKE_Strategy
 dbexp GMAKE_Flag
-#SetParent MAKE_Strategy
-#SetParent GMAKE_Flag
 
 exit(0)
 

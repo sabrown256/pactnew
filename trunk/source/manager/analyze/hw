@@ -24,11 +24,9 @@ Note $ALog ""
 
 dbini CPU           "unknown"
 dbini FPU           "unknown"
-#SafeEnv CPU           "unknown"
-#SafeEnv FPU           "unknown"
 
 set OS_Name = `uname -s`
-set HostHW = `uname -m`
+set HostHW  = `uname -m`
 
 if ($CPU == "unknown") then
    setenv CPU "$HostHW"
@@ -68,8 +66,6 @@ NoteD $ALog ""
 
 dbexp CPU
 dbexp FPU
-#SetParent CPU
-#SetParent FPU
 
 exit(0)
 

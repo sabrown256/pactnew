@@ -14,14 +14,14 @@ source $Me:h/common
 Separator $Log
 Note $Log "Analyze: site"
 
-#dbini SYS_SITE     ""
-#dbini SYS_TYPE     ""
-#dbini DAI_ROOT     ""
+dbini SYS_SITE     ""
+dbini SYS_TYPE     ""
+dbini DAI_ROOT     ""
 #dbini DAS_ROOT     ""
 
-SafeEnv SYS_SITE     ""
-SafeEnv SYS_TYPE     ""
-SafeEnv DAI_ROOT     ""
+#SafeEnv SYS_SITE     ""
+#SafeEnv SYS_TYPE     ""
+#SafeEnv DAI_ROOT     ""
 SafeEnv DAS_ROOT     ""
 
 if (-f $MngDir/extensions/sys-site) then
@@ -31,14 +31,14 @@ else
 endif
 
 # export the results
-#dbexp SYS_TYPE
-#dbexp SYS_SITE
-#dbexp DAI_ROOT
+dbexp SYS_TYPE
+dbexp SYS_SITE
+dbexp DAI_ROOT
 #dbexp DAS_ROOT
 
-SetParent SYS_TYPE
-SetParent SYS_SITE
-SetParent DAI_ROOT
+#SetParent SYS_TYPE
+#SetParent SYS_SITE
+#SetParent DAI_ROOT
 SetParent DAS_ROOT
 
 exit(0)

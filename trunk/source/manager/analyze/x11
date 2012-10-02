@@ -25,16 +25,6 @@ dbini GRAPHICS_Windows  ""
 dbini GRAPHICS_Devices  ""
 dbini GRAPHICS_Flags    ""
 dbini Std_UseX          TRUE
-#SafeEnv MDG_Inc          ""
-#SafeEnv MDG_Lib          ""
-#SafeEnv MDG_Pck          ""
-#SafeEnv X11_Inc          $RootInc
-#SafeEnv X11_Lib          ""
-#SafeEnv X11_RPath        $RootLib
-#SafeEnv X11_Path         /usr
-#SafeEnv GRAPHICS_Devices ""
-#SafeEnv GRAPHICS_Flags   ""
-#SafeEnv Std_UseX         TRUE
 
 SafeEnv AnaDir           analyze
 SafeEnv ALog             $cwd/cfg-$System/log.analyze
@@ -182,21 +172,12 @@ EOF
    dbexp GRAPHICS_Windows
    dbexp GRAPHICS_Devices
    dbexp GRAPHICS_Flags
-#   SetParent MDG_Inc
-#   SetParent MDG_Lib
-#   SetParent MDG_Pck
-#   SetParent X11_Inc
-#   SetParent X11_Lib
-#   SetParent X11_RPath
-#   SetParent X11_Path
-#   SetParent GRAPHICS_Devices
 
    SetParent RPATH
 
 endif
 
 dbexp Std_UseX
-#SetParent Std_UseX
 
 exit(0)
 

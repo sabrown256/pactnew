@@ -25,16 +25,6 @@ dbini GRAPHICS_Windows  ""
 dbini GRAPHICS_Devices  ""
 dbini GRAPHICS_Flags    ""
 dbini Std_UseOGL        FALSE
-#SafeEnv MDG_Inc          ""
-#SafeEnv MDG_Lib          ""
-#SafeEnv MDG_Pck          ""
-#SafeEnv OGL_Inc          ""
-#SafeEnv OGL_Lib          ""
-#SafeEnv OGL_RPath        $RootLib
-#SafeEnv OGL_Path         /usr
-#SafeEnv GRAPHICS_Devices ""
-#SafeEnv GRAPHICS_Flags   ""
-#SafeEnv Std_UseOGL       FALSE
 
 SafeEnv OS_Name           `uname -s`
 
@@ -136,21 +126,12 @@ EOF
       dbexp GRAPHICS_Windows
       dbexp GRAPHICS_Devices
       dbexp GRAPHICS_Flags
-#      SetParent MDG_Inc
-#      SetParent MDG_Lib
-#      SetParent MDG_Pck
-#      SetParent OGL_Inc
-#      SetParent OGL_Lib
-#      SetParent OGL_RPath
-#      SetParent OGL_Path
-#      SetParent GRAPHICS_Devices
 
    endif
 
 endif
 
 dbexp Std_UseOGL
-#SetParent Std_UseOGL
 
 exit(0)
 

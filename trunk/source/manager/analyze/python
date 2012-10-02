@@ -35,19 +35,6 @@ dbini PY_Cfg      ""
 dbini PY_Inc      ""
 dbini PY_Path     ""
 
-#SafeEnv HAVE_PYTHON     FALSE
-#SafeEnv HAVE_PY_NUMERIC FALSE
-#SafeEnv HAVE_PY_NUMPY   FALSE
-#SafeEnv PY_Exe      ""
-#SafeEnv PY_Vers     ""
-#SafeEnv PY_DirPy    ""
-#SafeEnv PY_DirDst   ""
-#SafeEnv PY_DirSrc   ""
-#SafeEnv PY_CC       ""
-#SafeEnv PY_Cfg      ""
-#SafeEnv PY_Inc      ""
-#SafeEnv PY_Path     ""
-
 # if there is no python directory no need to look further
 if (-d ../../python) then
 
@@ -196,19 +183,6 @@ dbexp PY_DirDst
 dbexp PY_DirPy
 dbexp PY_Inc
 dbexp PY_Vers
-
-#SetParent HAVE_PYTHON
-#SetParent HAVE_PY_NUMERIC
-#SetParent HAVE_PY_NUMPY
-#SetParent PY_Path
-#SetParent PY_Exe
-#SetParent PY_CC
-#SetParent PY_Cfg
-#SetParent PY_DirSrc
-#SetParent PY_DirDst
-#SetParent PY_DirPy
-#SetParent PY_Inc
-#SetParent PY_Vers
 
 exit(0)
 

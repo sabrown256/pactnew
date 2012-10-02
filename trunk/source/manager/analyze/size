@@ -125,9 +125,5 @@ flog $ALog rm -f $Tmp.c $Tmp
 dbexp INT4
 dbexp INT8
 dbexp NO_LONG_LONG
-#SetParent INT4
-#SetParent INT8
-#SetParent NO_LONG_LONG
 
-#exit(0)
 

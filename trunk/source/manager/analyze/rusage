@@ -39,7 +39,6 @@ else
 endif
 
 dbexp HAVE_RESOURCE_USAGE
-#SetParent HAVE_RESOURCE_USAGE
 
 exit(0)
 

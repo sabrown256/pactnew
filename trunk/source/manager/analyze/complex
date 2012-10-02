@@ -12,13 +12,12 @@ set Me = $0
 source $Me:h/common
 
 dbini HAVE_ANSI_C9X_COMPLEX TRUE
-#SafeEnv HAVE_ANSI_C9X_COMPLEX TRUE
 
 Note $ALog "HAVE_ANSI_C9X_COMPLEX = $HAVE_ANSI_C9X_COMPLEX"
 
 if ($HAVE_ANSI_C9X_COMPLEX == TRUE) then
 
-cat << EOF >! $Tmp.c
+   cat << EOF >! $Tmp.c
 #include <complex.h>
 int main(int c, char **v)
    {
@@ -45,6 +44,4 @@ endif
 
 # export the result
 dbexp HAVE_ANSI_C9X_COMPLEX
-#SetParent HAVE_ANSI_C9X_COMPLEX
 
-#exit(0)

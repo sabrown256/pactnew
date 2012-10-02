@@ -16,7 +16,6 @@ Separator $Log
 Note $Log "Analyze: asynchronous I/O in STREAMS"
 
 dbini HAVE_ASYNC_STREAMS FALSE
-#SafeEnv HAVE_ASYNC_STREAMS FALSE
 
 if (-f /usr/include/stropts.h) then
 
@@ -46,7 +45,6 @@ else
 endif
 
 dbexp HAVE_ASYNC_STREAMS
-#SetParent HAVE_ASYNC_STREAMS
 
 exit(0)
 
