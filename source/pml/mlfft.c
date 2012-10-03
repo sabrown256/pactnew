@@ -321,11 +321,11 @@ int PM_fft_sc_complex(complex *x, int n, int flag)
             {for (i = m-1; i < n; i += istep)
                  {j = i + mmax;
 
-                  temp = PM_TIMES_CC(w, x[j]);
-                  x[j] = PM_MINUS_CC(x[i], temp);
-                  x[i] = PM_PLUS_CC(x[i], temp);};
+                  temp = w*x[j];
+                  x[j] = x[i] - temp;
+                  x[i] = x[i] + temp;};
 
-             w = PM_TIMES_CC(w, dw);};
+             w = w*dw;};
         mmax = istep;};
 
     x[n] = x[0];
@@ -337,7 +337,7 @@ int PM_fft_sc_complex(complex *x, int n, int flag)
        nrm = 0.5;
 
     for (i = 0; i <= n; i++)
-        x[i] = PM_TIMES_RC(nrm, x[i]);
+        x[i] = nrm*x[i];
 
     return(TRUE);}
 

@@ -927,8 +927,8 @@ void PM_smooth_filter(complex *z, int n, double pts)
              mlt = min(mlt, 1.0);
              if (mlt < 0.0)
                 mlt = 0.0;
-             z[nh+i] = PM_TIMES_RC(mlt, z[nh+i]);
-             z[nh-i] = PM_TIMES_RC(mlt, z[nh-i]);}
+             z[nh+i] *= mlt;
+             z[nh-i] *= mlt;}
          else
             {z[nh+i] = PM_COMPLEX(0.0, 0.0);
              z[nh-i] = PM_COMPLEX(0.0, 0.0);};};
