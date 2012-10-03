@@ -72,7 +72,7 @@
 complex PM_plus_cc(complex b, complex c)
    {complex rv;
 
-    rv = PM_PLUS_CC(b, c);
+    rv = b + c;
 
     return(rv);}
 
@@ -84,7 +84,7 @@ complex PM_plus_cc(complex b, complex c)
 complex PM_minus_cc(complex b, complex c)
    {complex rv;
 
-    rv = PM_MINUS_CC(b, c);
+    rv = b - c;
 
     return(rv);}
 
@@ -96,7 +96,7 @@ complex PM_minus_cc(complex b, complex c)
 complex PM_times_cc(complex b, complex c)
    {complex rv;
 
-    rv = PM_TIMES_CC(b, c);
+    rv = b*c;
 
     return(rv);}
 
@@ -108,7 +108,7 @@ complex PM_times_cc(complex b, complex c)
 complex PM_divide_cc(complex b, complex c)
    {complex rv;
 
-    rv = PM_DIVIDE_CC(b, c);
+    rv = b/c;
 
     return(rv);}
 
@@ -120,7 +120,7 @@ complex PM_divide_cc(complex b, complex c)
 double PM_distance_cc(complex a, complex b)
    {double d;
 
-    d = sqrt(PM_cabs(PM_minus_cc(a, b)));
+    d = sqrt(PM_cabs(a - b));
 
     return(d);}
 
@@ -149,8 +149,7 @@ complex PM_chorner(complex x, double *c, int mn, int mx)
 /* do the positive powers */
     rp = Czero;
     for (i = ix; iz < i; i--)
-        {rp = PM_PLUS_RC(c[i-in], rp);
-	 rp = PM_TIMES_CC(x, rp);};
+        rp = x*(c[i-in] + rp);
 
 /* do the negative powers */
     if (PM_cequal(x, Czero) && (in < 0))
@@ -160,11 +159,9 @@ complex PM_chorner(complex x, double *c, int mn, int mx)
        {xi = PM_crecip(x);
 	rn = Czero;
 	for (i = in; i < iz; i++)
-	    {rn = PM_PLUS_RC(c[i-in], rn);
-	     rn = PM_TIMES_CC(xi, rn);};};
+	    rn = xi*(c[i-in] + rn);};
 
-    r = PM_PLUS_CC(rn, rp);
-    r = PM_PLUS_CC(r, r0);
+    r = rn + rp + r0;
 
     return(r);}
 
@@ -281,8 +278,7 @@ complex PM_crecip(complex c)
     else
        {x = 1.0/(x*x);
 
-	r = PM_cconjugate(c);
-	r = PM_TIMES_RC(x, r);};
+	r = x*PM_cconjugate(c);};
 
     return(r);}
 
@@ -388,7 +384,7 @@ complex PM_clog(complex c)
 
     MLOG(r, c);
 
-    r = PM_TIMES_RC(_PM.ln10e, r);
+    r = _PM.ln10e * r;
 
     return(r);}
 
@@ -400,15 +396,7 @@ complex PM_clog(complex c)
 complex PM_csqr(complex c)
    {complex r;
 
-#ifdef USE_C99_FUNCTIONS
-
     r = c*c;
-
-#else
-
-    r = PM_TIMES_CC(c, c);
-
-#endif
 
     return(r);}
 
@@ -773,10 +761,8 @@ complex PM_casinh(complex c)
 
 #else
 
-    r = PM_TIMES_CC(c, c);
-    r = PM_PLUS_RC(1.0, r);
-    r = PM_csqrt(r);
-    r = PM_PLUS_CC(c, r);
+    r = 1.0 + c*c;
+    r = c + PM_csqrt(r);
     r = PM_cln(r);
 
 #endif
@@ -799,10 +785,8 @@ complex PM_cacosh(complex c)
 
 #else
 
-    r = PM_TIMES_CC(c, c);
-    r = PM_PLUS_RC(-1.0, r);
-    r = PM_csqrt(r);
-    r = PM_PLUS_CC(c, r);
+    r = c*c - 1.0;
+    r = c + PM_csqrt(r);
     r = PM_cln(r);
 
 #endif
@@ -827,11 +811,10 @@ complex PM_catanh(complex c)
 
     complex z1, z2;
 
-    z1 = PM_PLUS_RC(1.0, c);
-    z2 = PM_PLUS_RC(-1.0, c);
-    r  = PM_DIVIDE_CC(z1, z2);
-    r  = PM_cln(r);
-    r  = PM_TIMES_RC(0.5, r);
+    z1 = c + 1.0;
+    z2 = c - 1.0;
+    r  = z1/z2;
+    r  = 0.5*PM_cln(r);
 
 #endif
 
@@ -868,9 +851,7 @@ complex PM_ctchn(complex x, double n)
 	    default :
 	         tc = CMHUGE;
 	         for (i = m-1; i > 0; i--)
-		     {tc = PM_TIMES_CC(x, tb);
-		      tc = PM_TIMES_RC(2, tc);
-		      tc = PM_MINUS_CC(tc, ta);
+		     {tc = 2*(x*tb) - ta;
 		      ta = tb;
 		      tb = tc;};
 		 break;};};
@@ -897,27 +878,22 @@ complex PM_cjn(complex x, double nd)
            {y   = PM_csqr(x);
 	    num = PM_chorner(y, _PM_j0_coeff_na, 0, 5);
             den = PM_chorner(y, _PM_j0_coeff_da, 0, 5);
-            ret = PM_DIVIDE_CC(num, den);}
+            ret = num/den;}
 
         else
            {z   = PM_crecip(x);
-	    s   = PM_csqrt(PM_TIMES_RC(two_ov_pi, z));
-	    z   = PM_TIMES_RC(8.0, z);
+	    s   = PM_csqrt(two_ov_pi*z);
+	    z   = 8.0*z;
             y   = PM_csqr(z);
-            xx  = PM_PLUS_RC(-pi_1_4, x);
+            xx  = x - pi_1_4;
 
 	    num = PM_chorner(y, _PM_j0_coeff_nb, 0, 4);
 	    den = PM_chorner(y, _PM_j0_coeff_db, 0, 4);
 
-	    ct = PM_ccos(xx);
-	    ct = PM_TIMES_CC(num, ct);
+	    ct = num*PM_ccos(xx);
+	    st = den*z*PM_csin(xx);
 
-	    st = PM_csin(xx);
-	    st = PM_TIMES_CC(den, st);
-	    st = PM_TIMES_CC(z, st);
-
-	    ret = PM_MINUS_CC(ct, st);
-	    ret = PM_TIMES_CC(s, ret);};}
+	    ret = s*(ct - st);};}
        
     else if (n == 1)
        {if (ax < 8.0)
@@ -925,49 +901,39 @@ complex PM_cjn(complex x, double nd)
 	    num = PM_chorner(y, _PM_j1_coeff_na, 0, 5);
 	    den = PM_chorner(y, _PM_j1_coeff_da, 0, 5);
 
-            ret = PM_DIVIDE_CC(num, den);
-            ret = PM_TIMES_CC(x, ret);}
+            ret = x*(num/den);}
 
         else
            {z   = PM_crecip(x);
-	    s   = PM_csqrt(PM_TIMES_RC(two_ov_pi, z));
-	    z   = PM_TIMES_RC(8.0, z);
+	    s   = PM_csqrt(two_ov_pi*z);
+	    z   = 8.0*z;
             y   = PM_csqr(z);
-            xx  = PM_PLUS_RC(-pi_3_4, x);
+            xx  = x - pi_3_4;
 
 	    num = PM_chorner(y, _PM_j1_coeff_nb, 0, 4);
 	    den = PM_chorner(y, _PM_j1_coeff_db, 0, 4);
 
-	    ct = PM_ccos(xx);
-	    ct = PM_TIMES_CC(num, ct);
+	    ct = num*PM_ccos(xx);
+	    st = den*z*PM_csin(xx);
 
-	    st = PM_csin(xx);
-	    st = PM_TIMES_CC(den, st);
-	    st = PM_TIMES_CC(z, st);
-
-	    ret = PM_MINUS_CC(ct, st);
-	    ret = PM_TIMES_CC(s, ret);};}
+	    ret = s*(ct - st);};}
 
     else
        {if (ax == 0.0)
            return(Czero);
 
         else if (ax > (double) n)
-           {tox = PM_crecip(x);
-	    tox = PM_TIMES_RC(2.0, tox);
+           {tox = 2.0*PM_crecip(x);
             bjm = PM_cjn(x, 0.0);
             bj  = PM_cjn(x, 1.0);
             for (j = 1; j < n; j++)
-                {bjp = PM_TIMES_CC(tox, bj);
-		 bjp = PM_TIMES_RC(j, bjp);
-		 bjp = PM_MINUS_CC(bjp, bjm);
+                {bjp = j*(tox*bj) - bjm;
                  bjm = bj;
                  bj  = bjp;};
             ret = bj;}
 
         else
-           {tox = PM_crecip(x);
-	    tox = PM_TIMES_RC(2.0, tox);
+           {tox = 2.0*PM_crecip(x);
 
             m    = 2*((n + ((int) sqrt(BESS_ACC*n))) >> 1);
             jtot = 0;
@@ -976,26 +942,23 @@ complex PM_cjn(complex x, double nd)
             tot  = Czero;
             bj   = Cone;
             for (j = m; j > 0; j--)
-                {bjm = PM_TIMES_CC(tox, bj);
-		 bjm = PM_TIMES_RC(j, bjm);
-		 bjm = PM_MINUS_CC(bjm, bjp);
+                {bjm = j*(tox*bj) - bjp;
                  bjp = bj;
                  bj  = bjm;
                  if (PM_cabs(bj) > HUGE)
-                    {bj  = PM_TIMES_RC(SMALL, bj);
-                     bjp = PM_TIMES_RC(SMALL, bjp);
-                     ret = PM_TIMES_RC(SMALL, ret);
-                     tot = PM_TIMES_RC(SMALL, tot);};
+                    {bj  = SMALL*bj;
+                     bjp = SMALL*bjp;
+                     ret = SMALL*ret;
+                     tot = SMALL*tot;};
 
                  if (jtot)
-                    tot = PM_PLUS_CC(tot, bj);
+                    tot += bj;
                  jtot = !jtot;
                  if (j == n)
                     ret = bjp;};
 
-            tot = PM_TIMES_RC(2.0, tot);
-	    tot = PM_MINUS_CC(tot, bj);
-            ret = PM_DIVIDE_CC(ret, tot);};};
+            tot  = 2.0*tot - bj;
+            ret /= tot;};};
 
     return(ret);}
 
@@ -1047,32 +1010,24 @@ complex PM_cyn(complex x, double nd)
 
             jnc = PM_cjn(x, 0.0);
 	    lnc = PM_cln(x);
-            rat = PM_DIVIDE_CC(num, den);
+            rat = num/den;
 
-            ret = PM_TIMES_CC(jnc, lnc);
-            ret = PM_TIMES_RC(two_ov_pi, ret);
-
-            ret = PM_PLUS_CC(rat, ret);}
+            ret = two_ov_pi*(jnc*lnc) + rat;}
 
         else
            {z   = PM_crecip(x);
-	    s   = PM_csqrt(PM_TIMES_RC(two_ov_pi, z));
-	    z   = PM_TIMES_RC(8.0, z);
+	    s   = PM_csqrt(two_ov_pi*z);
+	    z   = 8.0*z;
             y   = PM_csqr(z);
-            xx  = PM_PLUS_RC(-pi_1_4, x);
+            xx  = x - pi_1_4;
 
 	    num = PM_chorner(y, _PM_y0_coeff_nb, 0, 4);
             den = PM_chorner(y, _PM_y0_coeff_db, 0, 4);
 
-	    ct = PM_ccos(xx);
-	    ct = PM_TIMES_CC(den, ct);
-	    ct = PM_TIMES_CC(z, ct);
+	    ct = den*z*PM_ccos(xx);
+	    st = num*PM_csin(xx);
 
-	    st = PM_csin(xx);
-	    st = PM_TIMES_CC(st, num);
-
-	    ret = PM_PLUS_CC(ct, st);
-	    ret = PM_TIMES_CC(s, ret);};}
+	    ret = s*(ct + st);};}
 
     else if (n == 1)
        {if (ax < 8.0)
@@ -1083,46 +1038,31 @@ complex PM_cyn(complex x, double nd)
 
             jnc = PM_cjn(x, 1.0);
 	    lnc = PM_cln(x);
-            rat = PM_DIVIDE_CC(num, den);
-            rat = PM_TIMES_CC(x, rat);
+            rat = x*(num/den);
 
-            ret = PM_TIMES_CC(jnc, lnc);
-            ret = PM_MINUS_CC(ret, xi);
-            ret = PM_TIMES_RC(two_ov_pi, ret);
-
-            ret = PM_PLUS_CC(rat, ret);}
+            ret = two_ov_pi*(jnc*lnc - xi) + rat;}
 
         else
            {z   = PM_crecip(x);
-	    s   = PM_csqrt(PM_TIMES_RC(two_ov_pi, z));
-	    z   = PM_TIMES_RC(8.0, z);
+	    s   = PM_csqrt(two_ov_pi*z);
+	    z   = 8.0*z;
             y   = PM_csqr(z);
-            xx  = PM_PLUS_RC(-pi_3_4, x);
+            xx  = x - pi_3_4;
 
 	    num = PM_chorner(y, _PM_y1_coeff_nb, 0, 4);
             den = PM_chorner(y, _PM_y1_coeff_db, 0, 4);
 
-	    ct = PM_ccos(xx);
-	    ct = PM_TIMES_CC(den, ct);
-	    ct = PM_TIMES_CC(z, ct);
+	    ct = den*z*PM_ccos(xx);
+	    st = num*PM_csin(xx);
 
-	    st = PM_csin(xx);
-	    st = PM_TIMES_CC(num, st);
-
-	    ret = PM_PLUS_CC(ct, st);
-	    ret = PM_TIMES_CC(s, ret);};}
+	    ret = s*(ct + st);};}
 
     else
-       {tox = PM_crecip(x);
-	tox = PM_TIMES_RC(2.0, tox);
-
+       {tox = 2.0*PM_crecip(x);
         by  = PM_cyn(x, 1.0);
         bym = PM_cyn(x, 0.0);
         for (j = 1; j < n; j++)
-            {byp = PM_TIMES_CC(tox, by);
-	     byp = PM_TIMES_RC(j, byp);
-             byp = PM_MINUS_CC(byp, bym);
-
+            {byp = j*(tox*by) - bym;
              bym = by;
              by  = byp;};
 
@@ -1167,59 +1107,50 @@ complex PM_cin(complex x, double nd)
     ax = PM_cabs(x);
     if (n == 0)
        {if (ax < 3.75)
-           {z   = PM_TIMES_RC(1.0/3.75, x);
+           {z   = (1.0/3.75)*x;
 	    y   = PM_csqr(z);
 	    ret = PM_chorner(y, _PM_i0_coeff_na, 0, 6);}
         else
-           {y   = PM_crecip(x);
-	    y   = PM_TIMES_RC(3.75, y);
+           {y   = 3.75*PM_crecip(x);
 	    a1  = PM_chorner(y, _PM_i0_coeff_nb, 0, 8);
             a2  = PM_cexp(x);
-            a2  = PM_TIMES_CC(a1, a2);
-	    a1  = PM_csqrt(x);
-	    ret = PM_DIVIDE_CC(a2, a1);};}
+	    ret = (a1*a2)/PM_csqrt(x);};}
 
     else if (n == 1)
        {if (ax < 3.75)
-           {z   = PM_TIMES_RC(1.0/3.75, x);
+           {z   = (1.0/3.75)*x;
 	    y   = PM_csqr(z);
 	    a1  = PM_chorner(y, _PM_i1_coeff_na, 0, 6);
-	    ret = PM_TIMES_CC(x, a1);}
+	    ret = x*a1;}
         else
-           {y   = PM_crecip(x);
-	    y   = PM_TIMES_RC(3.75, y);
+           {y   = 3.75*PM_crecip(x);
 	    a1  = PM_chorner(y, _PM_i1_coeff_nb, 0, 8);
             a2  = PM_cexp(x);
-            a2  = PM_TIMES_CC(a1, a2);
-	    a1  = PM_csqrt(x);
-	    ret = PM_DIVIDE_CC(a2, a1);};}
+	    ret = (a1*a2)/PM_csqrt(x);};}
 
     else if (ax == 0.0)
       ret = x;
 
     else
-       {tox = PM_crecip(x);
-	tox = PM_TIMES_RC(2.0, tox);
+       {tox = 2.0*PM_crecip(x);
         bi  = Cone;
 	bip = Czero;
         ret = Czero;
 	ns  = 2*(n + (int) sqrt(BESS_ACC*n));
 	for (j = ns; 0 < j; j--)
-	    {bim = PM_TIMES_CC(tox, bi);
-	     bim = PM_TIMES_RC(j, bim);
-	     bim = PM_PLUS_CC(bip, bim);
+	    {bim = j*(tox*bi) + bip;
              bip = bi;
 	     bi  = bim;
 	     if (PM_cabs(bi) > HUGE)
-	        {ret = PM_TIMES_RC(SMALL, ret);
-		 bi  = PM_TIMES_RC(SMALL, bi);
-		 bip = PM_TIMES_RC(SMALL, bip);};
+	        {ret = SMALL*ret;
+		 bi  = SMALL*bi;
+		 bip = SMALL*bip;};
 	     if (j == n)
 	        ret = bip;};
 
 	a1  = PM_cin(x, 0.0);
-	a2  = PM_DIVIDE_CC(a1, bi);
-	ret = PM_TIMES_CC(ret, a2);};
+	a2  = a1/bi;
+	ret *= a2;};
 
     return(ret);}
 
@@ -1260,54 +1191,45 @@ complex PM_ckn(complex x, double nd)
     ax = PM_cabs(x);
     if (n == 0)
        {if (ax <= 2.0)
-           {z   = PM_TIMES_RC(0.5, x);
+           {z   = 0.5*x;
 	    y   = PM_csqr(z);
 	    a1  = PM_chorner(y, _PM_k0_coeff_na, 0, 6);
 	    a2  = PM_cin(x, 0.0);
 	    a3  = PM_cln(z);
-	    a2  = PM_TIMES_CC(a2, a3);
-	    ret = PM_MINUS_CC(a1, a2);}
+	    ret = a1 - a2*a3;}
         else
-           {y   = PM_crecip(x);
-            y   = PM_TIMES_RC(2.0, y);
+           {y   = 2.0*PM_crecip(x);
 	    a1  = PM_chorner(y, _PM_k0_coeff_nb, 0, 6);
-            z   = PM_TIMES_RC(-1.0, x);
+            z   = -x;
             a2  = PM_cexp(z);
 	    a3  = PM_csqrt(x);
-	    a2  = PM_DIVIDE_CC(a2, a3);
-	    ret = PM_TIMES_CC(a1, a2);};}
+	    ret = a1*(a2/a3);};}
 
     else if (n == 1)
        {if (ax <= 2.0)
-           {z   = PM_TIMES_RC(0.5, x);
+           {z   = 0.5*x;
 	    y   = PM_csqr(z);
 	    a1  = PM_chorner(y, _PM_k1_coeff_na, 0, 6);
-	    a1  = PM_DIVIDE_CC(a1, x);
+	    a1  = a1/x;
 	    a2  = PM_cln(z);
 	    a3  = PM_cin(x, 1.0);
-	    a2  = PM_TIMES_CC(a2, a3);
-	    ret = PM_PLUS_CC(a1, a2);}
+	    ret = a1 + a2*a3;}
         else
-           {y   = PM_crecip(x);
-            y   = PM_TIMES_RC(2.0, y);
+           {y   = 2.0*PM_crecip(x);
 	    a1  = PM_chorner(y, _PM_k1_coeff_nb, 0, 6);
-            z   = PM_TIMES_RC(-1.0, x);
+            z   = -x;
             a2  = PM_cexp(z);
 	    a3  = PM_csqrt(x);
-	    a2  = PM_DIVIDE_CC(a2, a3);
-	    ret = PM_TIMES_CC(a1, a2);};}
+	    ret = a1*(a2/a3);};}
 
     else
-       {tox = PM_crecip(x);
-	tox = PM_TIMES_RC(2.0, tox);
+       {tox = 2.0*PM_crecip(x);
 
         bkm = PM_ckn(x, 0.0);
 	bk  = PM_ckn(x, 1.0);
         ret = Czero;
 	for (j = 1; j < n; j++)
-            {bkp = PM_TIMES_CC(tox, bk);
-	     bkp = PM_TIMES_RC(j, bkp);
-             bkp = PM_PLUS_CC(bkp, bkm);
+            {bkp = j*(tox*bk) + bkm;
              bkm = bk;
 	     bk  = bkp;};
 
@@ -1346,15 +1268,7 @@ complex PM_ck1(complex x)
 complex PM_cadd(complex a, complex b)
    {complex c;
 
-#ifdef USE_C99_FUNCTIONS
-
     c = a + b;
-
-#else
-
-    c = PM_PLUS_CC(a, b);
-
-#endif
 
     return(c);}
 
@@ -1366,15 +1280,7 @@ complex PM_cadd(complex a, complex b)
 complex PM_csub(complex a, complex b)
    {complex c;
 
-#ifdef USE_C99_FUNCTIONS
-
     c = a - b;
-
-#else
-
-    c = PM_MINUS_CC(a, b);
-
-#endif
 
     return(c);}
 
@@ -1386,15 +1292,7 @@ complex PM_csub(complex a, complex b)
 complex PM_cmlt(complex a, complex b)
    {complex c;
 
-#ifdef USE_C99_FUNCTIONS
-
     c = a*b;
-
-#else
-
-    c = PM_TIMES_CC(a, b);
-
-#endif
 
     return(c);}
 
@@ -1406,31 +1304,7 @@ complex PM_cmlt(complex a, complex b)
 complex PM_cdiv(complex a, complex b)
    {complex c;
 
-#ifdef USE_C99_FUNCTIONS
-
     c = a/b;
-
-#else
-
-    double br, bi, ratio, den, x, y; 
-
-    br = fabs(PM_REAL_C(b));
-    bi = fabs(PM_IMAGINARY_C(b));
-
-    if (br >= bi)
-       {ratio = PM_IMAGINARY_C(b)/PM_REAL_C(b);
-	den = PM_REAL_C(b) + PM_IMAGINARY_C(b)*ratio;
-	x = (PM_REAL_C(a) + PM_IMAGINARY_C(a)*ratio)/den;
-	y = (PM_IMAGINARY_C(a) - PM_REAL_C(a)*ratio)/den;}
-    else
-       {ratio = PM_REAL_C(b)/PM_IMAGINARY_C(b);
-	den = PM_REAL_C(b)*ratio + PM_IMAGINARY_C(b);
-	x = (PM_REAL_C(a)*ratio + PM_IMAGINARY_C(a))/den;
-	y = (PM_IMAGINARY_C(a)*ratio - PM_REAL_C(a))/den;}
-
-    c = PM_COMPLEX(x, y);
-
-#endif
 
     return(c);}
 
@@ -1499,7 +1373,7 @@ int PM_cclose(complex a, complex b, double tol)
 
     dl = PM_csub(a, b);
     nm = 0.5*(PM_cabs(a) + PM_cabs(b) + SMALL);
-    nd = PM_TIMES_RC(nm, dl);
+    nd = nm*dl;
 
     ar = PM_REAL_C(nd);
     ai = PM_IMAGINARY_C(nd);
