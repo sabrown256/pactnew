@@ -51,8 +51,8 @@ FIXNUM FF_ID(pmrfft, PMRFFT)(double *aoutyr, double *aoutyi, double *aoutx,
 	(cy != NULL) && (rx != NULL))
        {np = n + 1;
 	for (i = 0; i < np; i++)
-	    {aoutyr[i] = PM_REAL_C(cy[i]);
-	     aoutyi[i] = PM_IMAGINARY_C(cy[i]);
+	    {aoutyr[i] = creal(cy[i]);
+	     aoutyi[i] = cimag(cy[i]);
 	     aoutx[i]  = rx[i];};
 
 	CFREE(rx);
@@ -87,7 +87,7 @@ FIXNUM FF_ID(pmcfft, PMCFFT)(double *aoutyr, double *aoutyi, double *aoutx,
 
     incy = CMAKE_N(complex, n);
     for (i = 0; i < n; i++)
-        incy[i] = PM_COMPLEX(ainyr[i], ainyi[i]);
+        incy[i] = CMPLX(ainyr[i], ainyi[i]);
 
     if (!PM_fft_sc_complex_data(&cy, &rx, ainx, incy, n,
 				xmn, xmx, flag, ordr))
@@ -96,8 +96,8 @@ FIXNUM FF_ID(pmcfft, PMCFFT)(double *aoutyr, double *aoutyi, double *aoutx,
     else
        {np = n + 1;
 	for (i = 0; i < np; i++)
-	    {aoutyr[i] = PM_REAL_C(cy[i]);
-	     aoutyi[i] = PM_IMAGINARY_C(cy[i]);
+	    {aoutyr[i] = creal(cy[i]);
+	     aoutyi[i] = cimag(cy[i]);
 	     aoutx[i]  = rx[i];};
 
 	CFREE(rx);

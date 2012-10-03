@@ -54,7 +54,7 @@ static object *_UL_fft(SS_psides *si, object *argl,
 /* make an array of complex values out of the real and imaginary values */
     icy = CMAKE_N(complex, n0);
     for (i = 0; i < n0; i++)
-        icy[i] = PM_COMPLEX(ypr[i], ypi[i]);
+        icy[i] = CMPLX(ypr[i], ypi[i]);
 
 /* GOTCHA: this assumes a common set of domain values for the curves */
     n = PM_fft_sc_complex_data(&cy, &x[0], crvr->x[0], icy, n0,
@@ -66,13 +66,13 @@ static object *_UL_fft(SS_psides *si, object *argl,
 
 /* extract the real part */
     for (i = 0; i < no; i++)
-        x[1][i] = PM_REAL_C(cy[i]);
+        x[1][i] = creal(cy[i]);
     lbl = SC_dsnprintf(FALSE, "Real part %s %c %c", type, crvr->id, crvi->id);
     ch1 = SX_mk_curve(si, no, x, lbl, NULL, UL_plot);
 
 /* extract the imaginary part */
     for (i = 0; i < no; i++)
-        x[1][i] = PM_IMAGINARY_C(cy[i]);
+        x[1][i] = cimag(cy[i]);
     lbl = SC_dsnprintf(FALSE, "Imaginary part %s %c %c", type, crvr->id, crvi->id);
     ch2 = SX_mk_curve(si, no, x, lbl, NULL, UL_plot);
 
@@ -118,13 +118,13 @@ object *UL_fft(SS_psides *si, int j)
 
 /* extract the real part */
 	for (i = 0; i < n; i++)
-	    x[1][i] = PM_REAL_C(cy[i]);
+	    x[1][i] = creal(cy[i]);
 	lbl = SC_dsnprintf(FALSE, "Real part FFT %c", crv->id);
 	cre = SX_mk_curve(si, n, x, lbl, NULL, UL_plot);
 
 /* extract the imaginary part */
 	for (i = 0; i < n; i++)
-	    x[1][i] = PM_IMAGINARY_C(cy[i]);
+	    x[1][i] = cimag(cy[i]);
 	lbl = SC_dsnprintf(FALSE, "Imaginary part FFT %c", crv->id);
 	cim = SX_mk_curve(si, n, x, lbl, NULL, UL_plot);
 

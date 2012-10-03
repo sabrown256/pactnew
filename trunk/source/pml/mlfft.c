@@ -104,23 +104,23 @@ complex *PM_uniform_complex_y(int no, double *xo,
 
 /* interpolate the real part of y */
        {for (i = 0; i < ni; i++)
-	    yti[i] = PM_REAL_C(yi[i]);
+	    yti[i] = creal(yi[i]);
 
 	yto = PM_uniform_real_y(no, xo, ni, xi, yti);
 
 	for (i = 0; i < no; i++)
-	    yo[i] = PM_COMPLEX(yto[i], PM_IMAGINARY_C(yo[i]));
+	    yo[i] = CMPLX(yto[i], cimag(yo[i]));
 
 	CFREE(yto);
 
 /* interpolate the imaginary part of y */
 	for (i = 0; i < ni; i++)
-	    yti[i] = PM_IMAGINARY_C(yi[i]);
+	    yti[i] = cimag(yi[i]);
 
 	yto = PM_uniform_real_y(no, xo, ni, xi, yti);
 
 	for (i = 0; i < no; i++)
-	    yo[i] = PM_COMPLEX(PM_REAL_C(yo[i]), yto[i]);
+	    yo[i] = CMPLX(creal(yo[i]), yto[i]);
 
 	CFREE(yto);
 	CFREE(yti);};
@@ -315,8 +315,8 @@ int PM_fft_sc_complex(complex *x, int n, int flag)
     while (mmax < n)
        {istep = mmax << 1;
         dth   = th0/((double) mmax);
-        dw    = PM_COMPLEX(cos(dth), sin(dth));
-        w     = PM_COMPLEX(1.0, 0.0);
+        dw    = CMPLX(cos(dth), sin(dth));
+        w     = CMPLX(1.0, 0.0);
         for (m = 1; m <= mmax; m++)
             {for (i = m-1; i < n; i += istep)
                  {j = i + mmax;
@@ -364,7 +364,7 @@ complex *PM_fft_sc_real(double *x, int n, int flag)
         return(NULL);};
 
     for (i = 0; i <= n; i++)
-        cx[i] = PM_COMPLEX(x[i], 0.0);
+        cx[i] = CMPLX(x[i], 0.0);
 
     PM_fft_sc_complex(cx, n, flag);
 

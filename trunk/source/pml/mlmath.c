@@ -892,8 +892,8 @@ int PM_smooth_fft(double *x, double *y, int n, int pts,
 		  if ((xa <= x[i]) && (x[i] < xb))
 		     break;};
 	     PM_interp(y[i], x[i],
-		       xa, PM_REAL_C(cx[j]),
-		       xb, PM_REAL_C(cx[j+1]));};
+		       xa, creal(cx[j]),
+		       xb, creal(cx[j+1]));};
 
 /* restore the linear trend */
 	for (i = 0; i < n; i++)
@@ -930,14 +930,14 @@ void PM_smooth_filter(complex *z, int n, double pts)
              z[nh+i] *= mlt;
              z[nh-i] *= mlt;}
          else
-            {z[nh+i] = PM_COMPLEX(0.0, 0.0);
-             z[nh-i] = PM_COMPLEX(0.0, 0.0);};};
+            {z[nh+i] = CMPLX(0.0, 0.0);
+             z[nh-i] = CMPLX(0.0, 0.0);};};
 
     mlt = (1.0 - 0.25*pts*pts);
     if (mlt < 0.0)
        mlt = 0.0;
 
-    z[nh] = PM_COMPLEX(PM_REAL_C(z[nh]), mlt*PM_IMAGINARY_C(z[nh]));
+    z[nh] = CMPLX(creal(z[nh]), mlt*cimag(z[nh]));
 
     return;}
 
