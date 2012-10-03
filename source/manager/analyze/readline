@@ -53,7 +53,8 @@ int main(int c, char **v)
  rv = (f == NULL);
  rl_restore_prompt();
  rl_clear_message();
- printf("%s 0x%04x\n", rl_library_version, rl_readline_version);
+# printf("%s 0x%04x\n", rl_library_version, rl_readline_version);
+ fprintf(stdout, "%s\n", rl_library_version);
  if (rv == 0)
     fprintf(stderr, "TRUE\n");
  else

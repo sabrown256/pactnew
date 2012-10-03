@@ -144,9 +144,10 @@ unset noglob
 #   sed 's/ *\[ */\[/g'
 #   sed 's/ *\] */\]/g'
 #   sed 's/(\*/ (\*/g'                          change 'int(*f)' to 'int (*f)'
-#   sed 's/} ;/};\n/g'                          change '} ;' to '};\n'
+#   sed 's/} ;/};/g'                            change '} ;' to '};'
 
-#   sed 's/;/;\n/g'                             replace ; with ;\n
+#   sed 's/;/;@/g'                              replace ; with ;\n
+#   tr '@' '\n'                                 (broken BSD forces two step)
 #   sed 's/\* */\*/g'                           change '* foo' to '*foo'
 #   sed '/^; *$/d'                              remove lines with only ;
 #   sed 's/^ *//'                               remove leading whitespace
@@ -191,8 +192,9 @@ if (-f $th) then
    sed 's/ *\[ */\[/g'                               |  \
    sed 's/ *\] */\]/g'                               |  \
    sed 's/(\*/ (\*/g'                                |  \
-   sed 's/} ;/};\n/g'                                |  \
-   sed 's/;/;\n/g'                                   |  \
+   sed 's/} ;/};/g'                                  |  \
+   sed 's/;/;@/g'                                    |  \
+   tr '@' '\n'                                       |  \
    sed 's/\* */\*/g'                                 |  \
    sed '/^; *$/d'                                    |  \
    sed 's/^ *//'                                     |  \
