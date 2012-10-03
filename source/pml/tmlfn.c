@@ -45,11 +45,11 @@ static int real_complex_test(char *name,
     ok   = TRUE;
     dlmx = -HUGE;
     for (i = 0, a = amn; a <= amx; a += da, i++)
-        {ci = PM_COMPLEX(a, 0.0);
+        {ci = CMPLX(a, 0.0);
 	 rc = (*fr)(a);
 	 cc = (*fc)(ci);
 
-	 sc = PM_REAL_C(cc);
+	 sc = creal(cc);
 
 	 CHECK_RESULT(rc, sc);
 
@@ -133,7 +133,7 @@ static int c_inverse_test(char *name,
     i    = 0;
     for (a = amn; a <= amx; a += da)
         for (b = bmn; b <= bmx; b += ba)
-	    {c  = PM_COMPLEX(a, b);
+	    {c  = CMPLX(a, b);
 	     fc = (*f)(c);
 	     ic = (*fi)(fc);
 

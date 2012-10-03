@@ -33,12 +33,15 @@
 
 /*--------------------------------------------------------------------------*/
 
+/* define the C11 complex constructor if not already defined */
+#if !defined(CMPLX)
+# define CMPLX(_b, _c)               ((_b) + (_c)*I)
+#endif
+
+#if !defined(HAVE_ANSI_C9X_COMPLEX)
 #define PM_COMPLEX(_b, _c)            ((_b) + (_c)*I)
 #define PM_REAL_C(_c)                 creal(_c)
 #define PM_IMAGINARY_C(_c)            cimag(_c)
-#define PM_COMPLEX_SWAP(_b, _c)       SC_SWAP_VALUE(complex, _b, _c)
-
-#if !defined(HAVE_ANSI_C9X_COMPLEX)
 #define PM_PLUS_CC(_b, _c)            ((_b) + (_c))
 #define PM_PLUS_RC(_b, _c)            ((_b) + (_c))
 #define PM_MINUS_CC(_b, _c)           ((_b) - (_c))
@@ -49,6 +52,8 @@
 #define PM_MODULUS_C(_c)              cabs(_c)
 #define PM_COMPLEX_CONJUGATE(_c)      conj(_c)
 #endif
+
+#define PM_COMPLEX_SWAP(_b, _c)       SC_SWAP_VALUE(complex, _b, _c)
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

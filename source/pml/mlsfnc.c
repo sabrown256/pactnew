@@ -419,7 +419,7 @@ complex PM_Ylm(double theta, double phi, int l, int m)
     yr = nrm*plm*cp;
     yi = nrm*plm*sp;
 
-    ylm = PM_COMPLEX(yr, yi);
+    ylm = CMPLX(yr, yi);
 
     return(ylm);}
 

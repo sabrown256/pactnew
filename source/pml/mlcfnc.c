@@ -13,8 +13,8 @@
 
 #define MEXP_CMP(_cx, _sx, _ey, _eyi, _c)                                   \
     {double _x, _y;                                                         \
-     _x   = PM_REAL_C(_c);                                                  \
-     _y   = PM_IMAGINARY_C(_c);                                             \
+     _x   = creal(_c);                                                      \
+     _y   = cimag(_c);                                                      \
      _ey  = exp(_y);                                                        \
      _eyi = 1.0/_ey;                                                        \
      _cx  = cos(_x);                                                        \
@@ -22,41 +22,41 @@
 
 #define MEXP_CMPH(_ex, _exi, _cy, _sy, _c)                                  \
     {double _x, _y;                                                         \
-     _x   = PM_REAL_C(_c);                                                  \
-     _y   = PM_IMAGINARY_C(_c);                                             \
+     _x   = creal(_c);                                                      \
+     _y   = cimag(_c);                                                      \
      _ex  = exp(_x);                                                        \
      _exi = 1.0/_ex;                                                        \
      _cy  = cos(_y);                                                        \
      _sy  = sin(_y);}
 
 #define MEXP(_rc, _c)                                                       \
-    {xl = PM_REAL_C(_c);                                                    \
-     yl = PM_IMAGINARY_C(_c);                                               \
+    {xl = creal(_c);                                                        \
+     yl = cimag(_c);                                                        \
      al = exp(xl);                                                          \
      cl = cos(yl);                                                          \
      sl = sin(yl);                                                          \
-     _rc = PM_COMPLEX(al*cl, al*sl);}
+     _rc = CMPLX(al*cl, al*sl);}
 
 #define MLOG(_rc, _c)                                                       \
-    {x   = PM_REAL_C(_c);                                                   \
-     y   = PM_IMAGINARY_C(_c);                                              \
+    {x   = creal(_c);                                                       \
+     y   = cimag(_c);                                                       \
      a   = log(HYPOT(x, y));                                                \
      b   = atan2(y, x);                                                     \
-     _rc = PM_COMPLEX(a, b);}
+     _rc = CMPLX(a, b);}
 
 #define MDIV(_rc, _ac, _bc)                                                 \
     {double ar, ai, br, bi, abr, abi, u, brovu, biovu, d;                   \
-     ar = PM_REAL_C(_ac);                                                   \
-     ai = PM_IMAGINARY_C(_ac);                                              \
-     br = PM_REAL_C(_bc);                                                   \
-     bi = PM_IMAGINARY_C(_bc);                                              \
+     ar  = creal(_ac);                                                      \
+     ai  = cimag(_ac);                                                      \
+     br  = creal(_bc);                                                      \
+     bi  = cimag(_bc);                                                      \
      abr = ABS(br);                                                         \
      abi = ABS(bi);                                                         \
-     u  = max(abr,abi);                                                     \
+     u   = max(abr,abi);                                                    \
      brovu = br/u;                                                          \
      biovu = bi/u;                                                          \
      d     = 1.0/(br*brovu + bi*biovu);                                     \
-     _rc   = PM_COMPLEX(d*(ar*brovu + ai*biovu), d*(ai*brovu - ar*biovu));}
+     _rc   = CMPLX(d*(ar*brovu + ai*biovu), d*(ai*brovu - ar*biovu));}
 
 /* the implementation here has superior accuracy to
  * several vendor libraries - so the no-brainer is
@@ -142,7 +142,7 @@ complex PM_chorner(complex x, double *c, int mn, int mx)
 
 /* grab the constant coefficient */
     if ((in <= iz) && (iz <= ix))
-       r0 = PM_COMPLEX(c[iz-in], 0.0);
+       r0 = CMPLX(c[iz-in], 0.0);
     else
        r0 = Czero;
 
@@ -181,7 +181,7 @@ complex PM_crandom(complex c)
     cx = cos(x);
     sx = sin(x);
 
-    c = PM_COMPLEX(cx, sx);
+    c = CMPLX(cx, sx);
 
     return(c);}
 
@@ -201,16 +201,16 @@ double PM_cabs(complex x)
 
     double xr, xi, ratio;
 
-    xr = fabs(PM_REAL_C(x));
-    xi = fabs(PM_IMAGINARY_C(x));
+    xr = fabs(creal(x));
+    xi = fabs(cimag(x));
 
     if ( ( xr == 0.0 ) && ( xi == 0.0 ) )
        {modulus = 0.0;}
     else if ( xr >= xi )
-       {ratio = PM_IMAGINARY_C(x)/PM_REAL_C(x);
+       {ratio   = cimag(x)/creal(x);
 	modulus = xr*sqrt( 1.0 + ratio*ratio );}
     else
-       {ratio = PM_REAL_C(x)/PM_IMAGINARY_C(x);
+       {ratio   = creal(x)/cimag(x);
 	modulus = xi*sqrt( 1.0 + ratio*ratio );}
 
 #endif
@@ -231,7 +231,7 @@ complex PM_cconjugate(complex c)
 
 #else
 
-    c = PM_COMPLEX(PM_REAL_C(c), -1.0*PM_IMAGINARY_C(c));
+    c = CMPLX(creal(c), -1.0*cimag(c));
 
 #endif
 
@@ -253,8 +253,8 @@ double PM_carg(complex c)
 
     double x, y;
 
-    x = PM_REAL_C(c);
-    y = PM_IMAGINARY_C(c);
+    x = creal(c);
+    y = cimag(c);
 
     r = PM_atan(x, y);
 
@@ -293,8 +293,8 @@ complex PM_crecip(complex c)
 double PM_cfloor(complex c)
    {double r, x, y;
 
-    x = PM_REAL_C(c);
-    y = PM_IMAGINARY_C(c);
+    x = creal(c);
+    y = cimag(c);
     r = HYPOT(x, y);
 
     r = floor(r);
@@ -312,8 +312,8 @@ double PM_cfloor(complex c)
 double PM_cround(complex c)
    {double r, x, y;
 
-    x = PM_REAL_C(c);
-    y = PM_IMAGINARY_C(c);
+    x = creal(c);
+    y = cimag(c);
     r = HYPOT(x, y);
 
     r = floor(r + 0.5);
@@ -358,10 +358,10 @@ complex PM_cln(complex c)
 
     double x, y, a, b;
 
-    a = PM_REAL_C(c);
-    b = PM_IMAGINARY_C(c);
+    a = creal(c);
+    b = cimag(c);
     if ((a == 0.0) && (b == 0.0))
-       r = PM_COMPLEX(-HUGE, 0.0);
+       r = CMPLX(-HUGE, 0.0);
 
     else
        {MLOG(r, c);};
@@ -416,8 +416,8 @@ complex PM_csqrt(complex c)
 
     double x, y, a, b, cb;
 
-    x = PM_REAL_C(c);
-    y = PM_IMAGINARY_C(c);
+    x = creal(c);
+    y = cimag(c);
     if ((x != 0.0) || (y != 0.0))
        {a  = sqrt(HYPOT(x, y));
 	b  = atan2(y, x);
@@ -426,7 +426,7 @@ complex PM_csqrt(complex c)
 	x = a*sqrt(0.5*(1.0 + cb));
 	y = copysign(a*sqrt(0.5*(1.0 - cb)), b);};
 
-    r = PM_COMPLEX(x, y);
+    r = CMPLX(x, y);
 #endif
 
     return(r);}
@@ -449,7 +449,7 @@ complex PM_csin(complex c)
 
     MEXP_CMP(cx, sx, ey, eyi, c);
 
-    r = PM_COMPLEX(0.5*sx*(ey + eyi), 0.5*cx*(ey - eyi));
+    r = CMPLX(0.5*sx*(ey + eyi), 0.5*cx*(ey - eyi));
 
 #endif
 
@@ -473,7 +473,7 @@ complex PM_ccos(complex c)
 
     MEXP_CMP(cx, sx, ey, eyi, c);
 
-    r = PM_COMPLEX(0.5*cx*(ey + eyi), 0.5*sx*(eyi - ey));
+    r = CMPLX(0.5*cx*(ey + eyi), 0.5*sx*(eyi - ey));
 
 #endif
 
@@ -498,8 +498,8 @@ complex PM_ctan(complex c)
 
     MEXP_CMP(cx, sx, ey, eyi, c);
 
-    sc = PM_COMPLEX(sx*(ey + eyi), cx*(ey - eyi));
-    cc = PM_COMPLEX(cx*(ey + eyi), sx*(eyi - ey));
+    sc = CMPLX(sx*(ey + eyi), cx*(ey - eyi));
+    cc = CMPLX(cx*(ey + eyi), sx*(eyi - ey));
 
     MDIV(r, sc, cc);
 
@@ -518,8 +518,8 @@ complex PM_ccot(complex c)
 
     MEXP_CMP(cx, sx, ey, eyi, c);
 
-    sc = PM_COMPLEX(sx*(ey + eyi), cx*(ey - eyi));
-    cc = PM_COMPLEX(cx*(ey + eyi), sx*(eyi - ey));
+    sc = CMPLX(sx*(ey + eyi), cx*(ey - eyi));
+    cc = CMPLX(cx*(ey + eyi), sx*(eyi - ey));
 
     MDIV(r, cc, sc);
 
@@ -543,7 +543,7 @@ complex PM_csinh(complex c)
 
     MEXP_CMPH(ex, exi, cy, sy, c);
 
-    r = PM_COMPLEX(0.5*(ex - exi)*cy, 0.5*(ex + exi)*sy);
+    r = CMPLX(0.5*(ex - exi)*cy, 0.5*(ex + exi)*sy);
 
 #endif
 
@@ -567,7 +567,7 @@ complex PM_ccosh(complex c)
 
     MEXP_CMPH(ex, exi, cy, sy, c);
 
-    r = PM_COMPLEX(0.5*(ex + exi)*cy, 0.5*(ex - exi)*sy);
+    r = CMPLX(0.5*(ex + exi)*cy, 0.5*(ex - exi)*sy);
 
 #endif
 
@@ -592,8 +592,8 @@ complex PM_ctanh(complex c)
 
     MEXP_CMPH(ex, exi, cy, sy, c);
 
-    sc = PM_COMPLEX((ex - exi)*cy, (ex + exi)*sy);
-    cc = PM_COMPLEX((ex + exi)*cy, (ex - exi)*sy);
+    sc = CMPLX((ex - exi)*cy, (ex + exi)*sy);
+    cc = CMPLX((ex + exi)*cy, (ex - exi)*sy);
 
     MDIV(r, sc, cc);
 
@@ -612,8 +612,8 @@ complex PM_ccoth(complex c)
 
     MEXP_CMPH(ex, exi, cy, sy, c);
 
-    sc = PM_COMPLEX((ex - exi)*cy, (ex + exi)*sy);
-    cc = PM_COMPLEX((ex + exi)*cy, (ex - exi)*sy);
+    sc = CMPLX((ex - exi)*cy, (ex + exi)*sy);
+    cc = CMPLX((ex + exi)*cy, (ex - exi)*sy);
 
     MDIV(r, cc, sc);
 
@@ -637,8 +637,8 @@ complex PM_casin(complex c)
 
     double a, b, x, y, xp, xm, pq, as, ac, rx;
 
-    x = PM_REAL_C(c);
-    y = PM_IMAGINARY_C(c);
+    x = creal(c);
+    y = cimag(c);
 
     xp = 1.0 + x;
     xm = 1.0 - x;
@@ -657,7 +657,7 @@ complex PM_casin(complex c)
     a = as;
     b = (y > 0.0) ? ac : -ac;
 
-    r = PM_COMPLEX(a, b);
+    r = CMPLX(a, b);
 
 #endif
 
@@ -681,8 +681,8 @@ complex PM_cacos(complex c)
 
     double a, b, x, y, xp, xm, pq, as, ac, rx;
 
-    x = PM_REAL_C(c);
-    y = PM_IMAGINARY_C(c);
+    x = creal(c);
+    y = cimag(c);
 
     xp = 1.0 + x;
     xm = 1.0 - x;
@@ -702,7 +702,7 @@ complex PM_cacos(complex c)
 /*    b = (y >= 0.0) ? ac : -ac; */
     b = (y > 0.0) ? -ac : ac;
 
-    r = PM_COMPLEX(a, b);
+    r = CMPLX(a, b);
 #endif
 
     return(r);}
@@ -729,8 +729,8 @@ complex PM_catan(complex c)
     double x, y, xs, yp, ym, a;
     volatile double b;
 
-    x = PM_REAL_C(c);
-    y = PM_IMAGINARY_C(c);
+    x = creal(c);
+    y = cimag(c);
 
     xs = x*x;
     yp = 1.0 + y;
@@ -739,7 +739,7 @@ complex PM_catan(complex c)
     a = 0.5*atan2(2.0*x, 1.0 - xs - y*y);
     b = 0.25*log((yp*yp + xs)/(ym*ym + xs));
 
-    r = PM_COMPLEX(a, b);
+    r = CMPLX(a, b);
 
 #endif
 
@@ -835,7 +835,7 @@ complex PM_ctchn(complex x, double n)
        tc = CMHUGE;
 
     else
-       {ta = PM_COMPLEX(1.0, 0.0);
+       {ta = CMPLX(1.0, 0.0);
 	tb = x;
 	m  = (int) n;
 
@@ -1348,11 +1348,11 @@ int PM_cequal(complex a, complex b)
 
     double ar, ai, br, bi;
 
-    ar = PM_REAL_C(a);
-    ai = PM_IMAGINARY_C(a);
+    ar = creal(a);
+    ai = cimag(a);
 
-    br = PM_REAL_C(b);
-    bi = PM_IMAGINARY_C(b);
+    br = creal(b);
+    bi = cimag(b);
 
     eq = ((ar == br) && (ai == bi));
 
@@ -1375,8 +1375,8 @@ int PM_cclose(complex a, complex b, double tol)
     nm = 0.5*(PM_cabs(a) + PM_cabs(b) + SMALL);
     nd = nm*dl;
 
-    ar = PM_REAL_C(nd);
-    ai = PM_IMAGINARY_C(nd);
+    ar = creal(nd);
+    ai = cimag(nd);
 
     ar = ABS(ar);
     ai = ABS(ai);
