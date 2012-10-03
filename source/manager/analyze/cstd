@@ -37,6 +37,11 @@ set tmp = $cwd/tmp-std
 set cc = `which $cc`
 if (-x "$cc") then
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# STANDARDS - check standard feature constants
+
    cat >&! $tmp.c << EOF
 #include <stdlib.h>
 #include <stdio.h>
@@ -92,11 +97,198 @@ int main(int c, char **v)
     return(0);}
 EOF
 
-   $cc $cflags $tmp.c -o $tmp
-   if ($status == 0) then
+   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   if ($status != 0) then
+      echo "Compilation '$cc $cflags' not C11 - exiting"
+      exit(1)
+   else
+      echo "Standard optional features"
       $tmp
    endif
    rm -f $tmp $tmp.c
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# ALIGNMENT - specifications:
+#           -   _Alignas specifier
+#           -   alignof
+#           -   aligned_alloc
+#           - see <stdalign.h>
+
+   cat >&! $tmp.c << EOF
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdalign.h>
+int main(int c, char **v)
+   {
+    return(0);}
+EOF
+
+   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   if ($status == 0) then
+      $tmp
+   else
+      echo "No alignment features"
+   endif
+   rm -f $tmp $tmp.c
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# NORETURN - the _Noreturn function specifier
+
+   cat >&! $tmp.c << EOF
+#include <stdlib.h>
+#include <stdio.h>
+int main(int c, char **v)
+   {
+    return(0);}
+EOF
+
+   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   if ($status == 0) then
+      $tmp
+   else
+      echo "No _Noreturn feature"
+   endif
+   rm -f $tmp $tmp.c
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# GENERIC - generic expressions using the _Generic keyword
+#         - example:
+#         -
+#         - #define foo(X) _Generic((X), long double: fool,      \
+#                                   default: foo,                \
+#                                   float: foof)(X)
+# 
+
+   cat >&! $tmp.c << EOF
+#include <stdlib.h>
+#include <stdio.h>
+int main(int c, char **v)
+   {
+    return(0);}
+EOF
+
+   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   if ($status == 0) then
+      $tmp
+   else
+      echo "No _Generic feature"
+   endif
+   rm -f $tmp $tmp.c
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# THREADS - multithreading support:
+#         - _Thread_local storage-class specifier
+#         - <threads.h> header including thread creation/management functions,
+#         - mutex, condition variable and thread-specific storage functionality
+#         - _Atomic type qualifier and <stdatomic.h> for uninterruptible object access).
+
+   cat >&! $tmp.c << EOF
+#include <stdlib.h>
+#include <stdio.h>
+#include <threads.h>
+int main(int c, char **v)
+   {
+    return(0);}
+EOF
+
+   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   if ($status == 0) then
+      $tmp
+   else
+      echo "No thread features"
+   endif
+   rm -f $tmp $tmp.c
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# ATOMIC - _Atomic type qualifier for uninterruptible object access
+#        - see <stdatomic.h>
+
+   cat >&! $tmp.c << EOF
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdatomic.h>
+int main(int c, char **v)
+   {
+    return(0);}
+EOF
+
+   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   if ($status == 0) then
+      $tmp
+   else
+      echo "No atomic features"
+   endif
+   rm -f $tmp $tmp.c
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# UNICODE - Unicode support
+#         - char16_t and char32_t types for storing UTF-16/UTF-32
+#         - see <uchar.h>
+#         - u, U, and u8 prefixes for string literals
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# BOUNDS-CHECKING - Annex K
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# ANALYZABILITY - Annex L
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FP-MACROS - macros for querying the characteristics of FP types:
+#           -   subnormal floating point numbers
+#           -   number of decimal digits for the type
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# ANONYMOUS - anonymous structures and unions
+#           - for example:
+#           -   struct T { int tag; union { float x; int n; }; };
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# ASSERTIONS - static assertions evaluated later than #if and #error
+#            - when types are understood by the translator
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# OPEN-X - exclusive create-and-open mode, "x", for fopen
+#        - like O_CREAT|O_EXCL in POSIX
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# EXIT - quick_exit function
+#      - a third way to terminate a program
+#      - intended to do at least minimal cleanup if exit fails
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# COMPLEX - macros for the construction of complex values
+#         - partly because rp + ip*I might be bad ip is Inf or Nan
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 endif
 
