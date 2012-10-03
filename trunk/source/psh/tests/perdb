@@ -70,7 +70,7 @@ foreach t ($List)
   flog $Log $RM ${t}* *= *@*
 
    set noglob
-   flog $Log ( $FilesDir/$t |& grep -v '\[' >&! $Res )
+   flog $Log ( $FilesDir/$t |& grep -v '\[' | grep -v true >&! $Res )
    set xstatus = $status
    unset noglob
 
