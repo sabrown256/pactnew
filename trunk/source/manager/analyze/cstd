@@ -102,10 +102,15 @@ EOF
       echo "Compilation '$cc $cflags' not C11 - exiting"
       exit(1)
    else
-      echo "Standard optional features"
+      echo "Standard optional features:"
       $tmp
    endif
    rm -f $tmp $tmp.c
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+echo "Standard mandatory features:"
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -121,15 +126,17 @@ EOF
 #include <stdio.h>
 #include <stdalign.h>
 int main(int c, char **v)
-   {
+   {void *p;
+    p = aligned_alloc(0, 8);
     return(0);}
 EOF
 
    $cc $cflags $tmp.c -o $tmp >& /dev/null
    if ($status == 0) then
+      echo "   has alignment"
       $tmp
    else
-      echo "No alignment features"
+      echo "   no alignment"
    endif
    rm -f $tmp $tmp.c
 
@@ -141,16 +148,19 @@ EOF
    cat >&! $tmp.c << EOF
 #include <stdlib.h>
 #include <stdio.h>
+_Noreturn void foo(void) { while (1) sleep(1); }
 int main(int c, char **v)
    {
+    foo();
     return(0);}
 EOF
 
    $cc $cflags $tmp.c -o $tmp >& /dev/null
    if ($status == 0) then
+      echo "   has _Noreturn"
       $tmp
    else
-      echo "No _Noreturn feature"
+      echo "   no _Noreturn"
    endif
    rm -f $tmp $tmp.c
 
@@ -168,6 +178,103 @@ EOF
    cat >&! $tmp.c << EOF
 #include <stdlib.h>
 #include <stdio.h>
+#define foo(x)                                               \
+   _Generic((x),                                             \
+            int: fooi,                                       \
+            float: foof,                                     \
+            default: fool)(x)
+int fooi(int i) {return(i);}
+int fool(long l) {return((int) l);}
+int foof(float f) {return((int) f);}
+int main(int c, char **v)
+   {int i, rv;
+    float f;
+    rv = foo(0);
+    rv = foo(0.1);
+    return(0);}
+EOF
+
+   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   if ($status == 0) then
+      echo "   has _Generic"
+      $tmp
+   else
+      echo "   no _Generic"
+   endif
+   rm -f $tmp $tmp.c
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# UNICODE - Unicode support
+#         - char16_t and char32_t types for storing UTF-16/UTF-32
+#         - see <uchar.h>
+#         - u, U, and u8 prefixes for string literals
+
+   cat >&! $tmp.c << EOF
+#include <stdlib.h>
+#include <stdio.h>
+#include <uchar.h>
+int main(int c, char **v)
+   {char16_t sa;
+    char32_t sb;
+    char *sc = u8"foo";
+    char16_t *sd = u"bar";
+    char32_t *se = U"baz";
+    return(0);}
+EOF
+
+   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   if ($status == 0) then
+      echo "   has unicode types"
+      $tmp
+   else
+      echo "   no unicode types"
+   endif
+   rm -f $tmp $tmp.c
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# ANONYMOUS - anonymous structures and unions
+#           - for example:
+#           -   struct T { int tag; union { float x; int n; }; };
+
+   cat >&! $tmp.c << EOF
+#include <stdlib.h>
+#include <stdio.h>
+typedef struct s_foo foo;
+struct s_foo
+      {int tag;
+       union {float x;
+              int n;};};
+int main(int c, char **v)
+   {foo a;
+    a.n = 1;
+    a.x = 2.0;
+    return(0);}
+EOF
+
+   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   if ($status == 0) then
+      echo "   has anonymous structs"
+      $tmp
+   else
+      echo "   no anonymous structs"
+   endif
+   rm -f $tmp $tmp.c
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# ASSERTIONS - static assertions evaluated later than #if and #error
+#            - when types are understood by the translator
+
+   cat >&! $tmp.c << EOF
+#include <stdlib.h>
+#include <stdio.h>
+_Static_assert(sizeof(size_t) >= 8, "size_t < 8 bytes");
+_Static_assert(sizeof(void *) == sizeof(void(*)()), "pointers missized");
 int main(int c, char **v)
    {
     return(0);}
@@ -175,9 +282,116 @@ EOF
 
    $cc $cflags $tmp.c -o $tmp >& /dev/null
    if ($status == 0) then
+      echo "   has static assertions"
       $tmp
    else
-      echo "No _Generic feature"
+      echo "   no static assertions"
+   endif
+   rm -f $tmp $tmp.c
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FP-MACROS - macros for querying the characteristics of FP types:
+#           -   subnormal floating point numbers
+#           -   number of decimal digits for the type
+
+   cat >&! $tmp.c << EOF
+#include <stdlib.h>
+#include <stdio.h>
+#include <float.h>
+int main(int c, char **v)
+   {int x, y, z;
+    x = DBL_MANT_DIG;
+    y = DBL_TRUE_MIN;
+    z = DBL_HAS_SUBNORM;
+    return(0);}
+EOF
+
+   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   if ($status == 0) then
+      echo "   has floating point macros"
+#      $tmp
+   else
+      echo "   no floating point macros"
+   endif
+   rm -f $tmp $tmp.c
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# OPEN-X - exclusive create-and-open mode, "x", for fopen
+#        - like O_CREAT|O_EXCL in POSIX
+
+   cat >&! $tmp.c << EOF
+#include <stdlib.h>
+#include <stdio.h>
+void foo(void) {return;}
+int main(int c, char **v)
+   {FILE *fp;
+    fp = fopen("fu.bar", "x");
+    fclose(fp);
+    return(0);}
+EOF
+
+   $cc $cflags $tmp.c -o $tmp
+   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   if ($status == 0) then
+      echo "   has fopen x mode"
+#      $tmp
+   else
+      echo "   no fopen x mode"
+   endif
+   rm -f $tmp $tmp.c
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# EXIT - quick_exit function
+#      - a third way to terminate a program
+#      - intended to do at least minimal cleanup if exit fails
+
+   cat >&! $tmp.c << EOF
+#include <stdlib.h>
+#include <stdio.h>
+void foo(void) {return;}
+int main(int c, char **v)
+   {
+    at_quick_exit(foo);
+    quick_exit(0);
+    return(0);}
+EOF
+
+   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   if ($status == 0) then
+      echo "   has quick_exit"
+      $tmp
+   else
+      echo "   no quick_exit"
+   endif
+   rm -f $tmp $tmp.c
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# COMPLEX - macros for the construction of complex values
+#         - partly because rp + ip*I might be bad ip is Inf or Nan
+
+   cat >&! $tmp.c << EOF
+#include <stdlib.h>
+#include <stdio.h>
+#include <complex.h>
+int main(int c, char **v)
+   {double complex foo = CMPLX(1.0, 2.0);
+    return(0);}
+EOF
+
+   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   if ($status == 0) then
+      echo "   has complex constructors"
+      $tmp
+   else
+      echo "   no complex constructors"
    endif
    rm -f $tmp $tmp.c
 
@@ -186,9 +400,9 @@ EOF
 
 # THREADS - multithreading support:
 #         - _Thread_local storage-class specifier
-#         - <threads.h> header including thread creation/management functions,
-#         - mutex, condition variable and thread-specific storage functionality
-#         - _Atomic type qualifier and <stdatomic.h> for uninterruptible object access).
+#         - thread creation/management functions
+#         - mutex, condition variable, and thread-specific storage
+#         - see <threads.h>
 
    cat >&! $tmp.c << EOF
 #include <stdlib.h>
@@ -201,9 +415,10 @@ EOF
 
    $cc $cflags $tmp.c -o $tmp >& /dev/null
    if ($status == 0) then
+      echo "   has thread"
       $tmp
    else
-      echo "No thread features"
+      echo "   no thread"
    endif
    rm -f $tmp $tmp.c
 
@@ -224,19 +439,12 @@ EOF
 
    $cc $cflags $tmp.c -o $tmp >& /dev/null
    if ($status == 0) then
+      echo "   has atomic"
       $tmp
    else
-      echo "No atomic features"
+      echo "   no atomic"
    endif
    rm -f $tmp $tmp.c
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# UNICODE - Unicode support
-#         - char16_t and char32_t types for storing UTF-16/UTF-32
-#         - see <uchar.h>
-#         - u, U, and u8 prefixes for string literals
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -247,45 +455,6 @@ EOF
 #--------------------------------------------------------------------------
 
 # ANALYZABILITY - Annex L
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# FP-MACROS - macros for querying the characteristics of FP types:
-#           -   subnormal floating point numbers
-#           -   number of decimal digits for the type
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# ANONYMOUS - anonymous structures and unions
-#           - for example:
-#           -   struct T { int tag; union { float x; int n; }; };
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# ASSERTIONS - static assertions evaluated later than #if and #error
-#            - when types are understood by the translator
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# OPEN-X - exclusive create-and-open mode, "x", for fopen
-#        - like O_CREAT|O_EXCL in POSIX
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# EXIT - quick_exit function
-#      - a third way to terminate a program
-#      - intended to do at least minimal cleanup if exit fails
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-# COMPLEX - macros for the construction of complex values
-#         - partly because rp + ip*I might be bad ip is Inf or Nan
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
