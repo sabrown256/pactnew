@@ -1,5 +1,5 @@
 #
-# X89 - define the use of ISO C89 plus POSIX and XOPEN extensions
+# CX89 - define the use of ISO C89 plus POSIX and XOPEN extensions
 #
 # Source Version: 3.0
 # Software Release #: LLNL-CODE-422942
