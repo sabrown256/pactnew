@@ -14,13 +14,20 @@ unsetenv cc
 
 set cc     = ""
 set cflags = ""
+set log    = /dev/null
+
 while ($#argv > 0)
    switch ($1)
       case -h:
            echo ""
-           echo "Usage: cstd [-h] <cc> <cflags>"
+           echo "Usage: cstd [-h] [-l] <cc> <cflags>"
            echo ""
            exit(1)
+      case -l:
+           set log = $cwd/log.cstd
+           rm -f $log
+           touch $log
+           breaksw
       default:
            if ("$cc" == "") then
               set cc = $1
@@ -49,60 +56,85 @@ if (-x "$cc") then
 /* #include <threads.h> */
 int main(int c, char **v)
    {
-#ifdef __STDC_VERSION__
-     printf("   standard %ld\n", __STDC_VERSION__);
+    printf("   __STDC_VERSION__         : ");
+#if defined(__STDC_VERSION__)
+     printf("yes (%ld)\n", __STDC_VERSION__);
 #else
-     printf("   non standard\n");
+     printf("no\n");
 #endif
-#ifdef __STDC_ANALYZABLE__
-     printf("   has analyzability\n");
+    printf("   __STDC_UTF_16__          : ");
+#if defined(__STDC_UTF_16__)
+     printf("yes (has UTF-16 char16_t type)\n");
 #else
-     printf("   no analyzability\n");
+     printf("no\n");
 #endif
-#ifdef __STDC_LIB_EXT1__
-     printf("   has bounds checking\n");
+    printf("   __STDC_UTF_32__          : ");
+#if defined(__STDC_UTF_32__)
+     printf("yes (has UTF-32 char32_t type)\n");
 #else
-     printf("   no bounds checking\n");
+     printf("no\n");
 #endif
-#ifdef __STDC_NO_THREADS__
-     printf("   has multithreading\n");
+    printf("   __STDC_IEC_559__         : ");
+#if defined(__STDC_IEC_559__)
+     printf("yes\n");
 #else
-     printf("   no multithreading\n");
+     printf("no\n");
 #endif
-#ifdef __STDC_NO_ATOMICS__
-     printf("   has atomic primitives\n");
+    printf("   __STDC_IEC_559_COMPLEX__ : ");
+#if defined(__STDC_IEC_559_COMPLEX__)
+     printf("yes\n");
 #else
-     printf("   no atomic primitives\n");
+     printf("no\n");
 #endif
-#ifdef __STDC_IEC_559__
-     printf("   has IEC 60559 floating-point arithmetic\n");
+    printf("   __STDC_NO_COMPLEX__      : ");
+#if defined(__STDC_NO_COMPLEX__)
+     printf("yes\n");
 #else
-     printf("   no IEC 60559 floating-point arithmetic\n");
+     printf("no (may support complex types)\n");
 #endif
-#ifdef __STDC_IEC_559_COMPLEX__
-     printf("   has IEC 60559 complex arithmetic\n");
+    printf("   __STDC_NO_VLA__          : ");
+#if defined(__STDC_NO_VLA__)
+     printf("yes\n");
 #else
-     printf("   no IEC 60559 complex arithmetic\n");
+     printf("no (may support variable length arrays)\n");
 #endif
-#ifdef __STDC_NO_COMPLEX__
-     printf("   has complex types\n");
+    printf("   __STDC_NO_THREADS__      : ");
+#if defined(__STDC_NO_THREADS__)
+     printf("yes\n");
 #else
-     printf("   no complex types\n");
+     printf("no (may support threads)\n");
 #endif
-#ifdef __STDC_NO_VLA__
-     printf("   has variable length arrays\n");
+    printf("   __STDC_NO_ATOMICS__      : ");
+#if defined(__STDC_NO_ATOMICS__)
+     printf("yes\n");
 #else
-     printf("   no variable length arrays\n");
+     printf("no (may support atomic types)\n");
 #endif
+
+    printf("   __STDC_ANALYZABLE__      : ");
+#if defined(__STDC_ANALYZABLE__)
+     printf("yes (supports analyzability)\n");
+#else
+     printf("no\n");
+#endif
+    printf("   __STDC_LIB_EXT1__        : ");
+#if defined(__STDC_LIB_EXT1__)
+     printf("yes (supports bounds checking)\n");
+#else
+     printf("no\n");
+#endif
+
     return(0);}
 EOF
 
-   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   echo "------------------------------" >>& $log
+   echo "Predefined constants" >>& $log
+   $cc $cflags $tmp.c -o $tmp >>& $log
    if ($status != 0) then
       echo "Compilation '$cc $cflags' not C11 - exiting"
       exit(1)
    else
-      echo "Standard optional features:"
+      echo "Standard optional feature constants:"
       $tmp
    endif
    rm -f $tmp $tmp.c
@@ -131,7 +163,9 @@ int main(int c, char **v)
     return(0);}
 EOF
 
-   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   echo "------------------------------" >>& $log
+   echo "Alignment" >>& $log
+   $cc $cflags $tmp.c -o $tmp >>& $log
    if ($status == 0) then
       echo "   has alignment"
       $tmp
@@ -155,10 +189,11 @@ int main(int c, char **v)
     return(0);}
 EOF
 
-   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   echo "------------------------------" >>& $log
+   echo "Noreturn" >>& $log
+   $cc $cflags $tmp.c -o $tmp >>& $log
    if ($status == 0) then
       echo "   has _Noreturn"
-      $tmp
    else
       echo "   no _Noreturn"
    endif
@@ -194,7 +229,9 @@ int main(int c, char **v)
     return(0);}
 EOF
 
-   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   echo "------------------------------" >>& $log
+   echo "Generic" >>& $log
+   $cc $cflags $tmp.c -o $tmp >>& $log
    if ($status == 0) then
       echo "   has _Generic"
       $tmp
@@ -224,7 +261,9 @@ int main(int c, char **v)
     return(0);}
 EOF
 
-   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   echo "------------------------------" >>& $log
+   echo "Unicode" >>& $log
+   $cc $cflags $tmp.c -o $tmp >>& $log
    if ($status == 0) then
       echo "   has unicode types"
       $tmp
@@ -255,12 +294,14 @@ int main(int c, char **v)
     return(0);}
 EOF
 
-   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   echo "------------------------------" >>& $log
+   echo "Anonymous" >>& $log
+   $cc $cflags $tmp.c -o $tmp >>& $log
    if ($status == 0) then
-      echo "   has anonymous structs"
+      echo "   has anonymous structs/unions"
       $tmp
    else
-      echo "   no anonymous structs"
+      echo "   no anonymous structs/unions"
    endif
    rm -f $tmp $tmp.c
 
@@ -280,7 +321,9 @@ int main(int c, char **v)
     return(0);}
 EOF
 
-   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   echo "------------------------------" >>& $log
+   echo "Static Asserstions" >>& $log
+   $cc $cflags $tmp.c -o $tmp >>& $log
    if ($status == 0) then
       echo "   has static assertions"
       $tmp
@@ -308,7 +351,9 @@ int main(int c, char **v)
     return(0);}
 EOF
 
-   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   echo "------------------------------" >>& $log
+   echo "FP Macros" >>& $log
+   $cc $cflags $tmp.c -o $tmp >>& $log
    if ($status == 0) then
       echo "   has floating point macros"
 #      $tmp
@@ -334,8 +379,9 @@ int main(int c, char **v)
     return(0);}
 EOF
 
-   $cc $cflags $tmp.c -o $tmp
-   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   echo "------------------------------" >>& $log
+   echo "FOPEN X" >>& $log
+   $cc $cflags $tmp.c -o $tmp >>& $log
    if ($status == 0) then
       echo "   has fopen x mode"
 #      $tmp
@@ -362,7 +408,9 @@ int main(int c, char **v)
     return(0);}
 EOF
 
-   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   echo "------------------------------" >>& $log
+   echo "Quick Exit" >>& $log
+   $cc $cflags $tmp.c -o $tmp >>& $log
    if ($status == 0) then
       echo "   has quick_exit"
       $tmp
@@ -386,7 +434,9 @@ int main(int c, char **v)
     return(0);}
 EOF
 
-   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   echo "------------------------------" >>& $log
+   echo "Complex" >>& $log
+   $cc $cflags $tmp.c -o $tmp >>& $log
    if ($status == 0) then
       echo "   has complex constructors"
       $tmp
@@ -413,7 +463,9 @@ int main(int c, char **v)
     return(0);}
 EOF
 
-   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   echo "------------------------------" >>& $log
+   echo "Threads" >>& $log
+   $cc $cflags $tmp.c -o $tmp >>& $log
    if ($status == 0) then
       echo "   has thread"
       $tmp
@@ -437,7 +489,9 @@ int main(int c, char **v)
     return(0);}
 EOF
 
-   $cc $cflags $tmp.c -o $tmp >& /dev/null
+   echo "------------------------------" >>& $log
+   echo "Atomic" >>& $log
+   $cc $cflags $tmp.c -o $tmp >>& $log
    if ($status == 0) then
       echo "   has atomic"
       $tmp

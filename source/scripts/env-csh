@@ -80,6 +80,7 @@ alias SafeSet   'if ($?\!\!:1 == 0) set \!\!:1 = \!\!:2-$'
 # usage: dbset <var> <value>
 #alias dbset     'setenv \!\!:1 "`$PERDB \!\!:1 = \!\!:2-$`"'
 alias dbset     'set t_ = ( `$PERDB \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
+alias dbsets    'set \!\!:1 = ( `$PERDB -e \!\!:1 = \!\!:2-$` )'
 
 # dbget imports a database variable into the current environment
 # use dbget before referencing the variable
@@ -87,6 +88,7 @@ alias dbset     'set t_ = ( `$PERDB \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ;
 # usage: dbget <var>
 #        echo $<var>
 alias dbget     'setenv \!\!:1 `$PERDB -e \!\!:1`'
+alias dbgets    'set \!\!:1 = ( `$PERDB -e \!\!:1` )'
 
 # dbdef queries database for existence of a variable
 # matches C call dbdef
@@ -110,6 +112,11 @@ alias envini    'if ($?\!\!:1 == 0) setenv \!\!:1 \!\!:2'
 # usage: dbexp <var>
 alias dbexp     'set t_ = ( `$PERDB -l \!\!:1 = $\!\!:1` )'
 alias envexp    'echo "parent \!\!:1($\!\!:1)"'
+
+# fexec logs the gexec command, runs it, and
+# gets gstatus out as a shell variable
+# usage: fexec $log <gexec-specs>
+alias fexec     'echo "Command: gexec \!\!:2-$" >>& \!\!:1 ; gexec \!\!:2-$ >>& \!\!:1 ; set gstatus = `$PERDB -e gstatus`'
 
 setenv MV     "mv -f"
 setenv RM     "rm -f"

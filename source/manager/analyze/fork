@@ -28,22 +28,27 @@ int main(int c, char **v)
     return(rv);}
 EOF
 
+set ok = FALSE
+
 set opt = ""
 set opt = ( $opt $CC_Flags $Cfe_LD_Flags $Cfe_LD_RPath )
 flog $ALog $CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
-   flog $ALog gexec $CFE $Tmp @o2 @e3 fw:/dev/null @ vw:HAVE_FORK_EXEC
+   fexec $ALog $CFE $Tmp @o2 @e3 fw:/dev/null @ vw:HAVE_FORK_EXEC
+   if ($gstatus[1] == 0) then
+      set ok = TRUE
+   endif
 endif
 
 flog $ALog $RM $Tmp.c $Tmp
 
-dbget gstatus
-
-if ("$gstatus" =~ 0*) then
+if ($ok == TRUE) then
    NoteD $ALog "      has working fork/exec"
 else
    NoteD $ALog "      no working fork/exec"
 endif
+
+unset ok
 
 exit(0)
 
