@@ -34,29 +34,91 @@
 /*--------------------------------------------------------------------------*/
 
 /* define the C11 complex constructor if not already defined */
+
 #if !defined(CMPLX)
 # define CMPLX(_b, _c)               ((_b) + (_c)*I)
 #endif
 
-#if !defined(HAVE_ANSI_C9X_COMPLEX)
-#define PM_COMPLEX(_b, _c)            ((_b) + (_c)*I)
-#define PM_REAL_C(_c)                 creal(_c)
-#define PM_IMAGINARY_C(_c)            cimag(_c)
-#define PM_PLUS_CC(_b, _c)            ((_b) + (_c))
-#define PM_PLUS_RC(_b, _c)            ((_b) + (_c))
-#define PM_MINUS_CC(_b, _c)           ((_b) - (_c))
-#define PM_TIMES_CC(_b, _c)           ((_b) * (_c))
-#define PM_TIMES_RC(_b, _c)           ((_b) * (_c))
-#define PM_TIMES_IC(_b, _c)           ((_b) * (_c))
-#define PM_DIVIDE_CC(_b, _c)          ((_b) / (_c))
-#define PM_MODULUS_C(_c)              cabs(_c)
-#define PM_COMPLEX_CONJUGATE(_c)      conj(_c)
+/*--------------------------------------------------------------------------*/
+
+#if defined(HAVE_ANSI_C9X_COMPLEX)
+
+/* if we have C99 or later complex types and functions these
+ * macros give older, pre-C99 complex support
+ */
+
+# define PM_PLUS_CC(_b, _c)            ((_b) + (_c))
+# define PM_PLUS_RC(_b, _c)            ((_b) + (_c))
+# define PM_MINUS_CC(_b, _c)           ((_b) - (_c))
+# define PM_TIMES_CC(_b, _c)           ((_b) * (_c))
+# define PM_TIMES_RC(_b, _c)           ((_b) * (_c))
+# define PM_TIMES_IC(_b, _c)           ((_b) * (_c))
+# define PM_DIVIDE_CC(_b, _c)          ((_b) / (_c))
+
+# define PM_COMPLEX(_b, _c)            ((_b) + (_c)*I)
+# define PM_REAL_C(_c)                 creal(_c)
+# define PM_IMAGINARY_C(_c)            cimag(_c)
+# define PM_MODULUS_C(_c)              cabs(_c)
+# define PM_COMPLEX_CONJUGATE(_c)      conj(_c)
+
+/*--------------------------------------------------------------------------*/
+
+#else
+
+/*--------------------------------------------------------------------------*/
+
+/* if we have C89 or earlier provide complex type and functions
+ * these macros emulate a degree of C99 complex support
+ */
+
+typedef struct s_complex complex;
+
+struct s_complex
+   {double real;
+    double imag;};
+
+# define PM_PLUS_CC                    PM_plus_cc
+# define PM_PLUS_RC(_b, _c)            {(_b) + (_c).real, (_c).imag}
+# define PM_MINUS_CC(_b, _c)           PM_minus_cc
+# define PM_TIMES_CC(_b, _c)           PM_times_cc
+# define PM_TIMES_RC(_b, _c)           {(_b)*(_c).real, (_b)*(_c).imag}
+# define PM_TIMES_IC(_b, _c)           {(_b)*(_c).real, (_b)*(_c).imag}
+# define PM_DIVIDE_CC(_b, _c)          PM_divide_cc
+
+# define PM_COMPLEX(_b, _c)            {(_b), (_c)}
+# define PM_REAL_C(_c)                 (_c).real
+# define PM_IMAGINARY_C(_c)            (_c).imag
+# define PM_COMPLEX_CONJUGATE(_c)      (-(_c).imag)
+# define PM_MODULUS_C(_c)                                                   \
+    {(_c).real * (_c).real + (_c).imag * (_c).imag}
+
+# define cabs   PM_cabs
+# define conj   PM_cconjugate
+# define carg   PM_carg
+# define cexp   PM_cexp
+# define clog   PM_cln
+# define csqrt  PM_csqrt
+# define csin   PM_csin
+# define ccos   PM_ccos
+# define ctan   PM_ctan
+# define csinh  PM_csinh
+# define ccosh  PM_ccosh
+# define ctanh  PM_ctanh
+# define casin  PM_casin
+# define cacos  PM_cacos
+# define catan  PM_catan
+# define casinh PM_casinh
+# define cacosh PM_cacosh
+# define catanh PM_catanh
+# define cpow   PM_cpow
+
+/*--------------------------------------------------------------------------*/
+
 #endif
 
-#define PM_COMPLEX_SWAP(_b, _c)       SC_SWAP_VALUE(complex, _b, _c)
+/*--------------------------------------------------------------------------*/
 
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
+#define PM_COMPLEX_SWAP(_b, _c)       SC_SWAP_VALUE(complex, _b, _c)
 
 #define PM_CLOSETO_COMPLEX(_ok, _x, _y, _tol)                                \
    {long double _del;                                                        \
