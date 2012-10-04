@@ -70,13 +70,8 @@ EOF
    set opt   = ( $opt $CC_Flags $Cfe_LD_Flags $Cfe_LD_RPath $libl )
    flog $ALog $CC_Exe $Tmp.c -o $Tmp $opt
    if ($status == 0) then
-      flog $ALog gexec $CFE $Tmp @o2 @e3 vw:READLINE_Version @ vw:HAVE_READLINE
-
-      set vl = ( gstatus READLINE_Version )
-
-      source $MngDir/write/import-db
-
-      if ("$gstatus" =~ 0*) then
+      fexec $ALog $CFE $Tmp @o2 @e3 vw:READLINE_Version @ vw:HAVE_READLINE
+      if ($gstatus[1] == 0) then
          set ok = TRUE
       endif
    endif
@@ -85,11 +80,14 @@ EOF
    if ($ok == TRUE) then
       flog $ALog set llib = ( $libl )
       flog $ALog setenv MD_Pck        "RL $MD_Pck"
+      dbget READLINE_Version
       NoteD $ALog "      has readline $READLINE_Version ($llib)"
    else
       NoteD $ALog "      no readline"
    endif
+
    unset libl
+   unset ok
 
    flog $ALog $RM $Tmp.c $Tmp
 

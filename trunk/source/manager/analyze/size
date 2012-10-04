@@ -57,7 +57,7 @@ EOF
 
 flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
 if ($status == 0) then
-   flog $ALog gexec $CFE $Tmp @o2 @e3 vw:INT4 @ fw:/dev/null
+   fexec $ALog $CFE $Tmp @o2 @e3 vw:INT4 @ fw:/dev/null
 endif
 
 flog $ALog rm -f $Tmp.c $Tmp
@@ -125,7 +125,7 @@ COMPILE:
 
 flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt
 if ($status == 0) then
-   flog $ALog gexec $CFE $Tmp @o2 @e3 vw:INT8 @ fw:/dev/null
+   fexec $ALog $CFE $Tmp @o2 @e3 vw:INT8 @ fw:/dev/null
 endif
 
 flog $ALog rm -f $Tmp.c $Tmp

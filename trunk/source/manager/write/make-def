@@ -182,9 +182,8 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
 #    Note $STDOUT ""
 
 # Compiler info
-    gexec ../scripts/gcc-info $CC_Exe @o vw:eGCCInfo
-    dbget eGCCInfo
-    set GCCInfo = ( $eGCCInfo )
+    gexec ../scripts/gcc-info $CC_Exe @o2 @e3 vw:GCCInfo @ fa:/dev/null
+    dbgets GCCInfo
 #    set GCCInfo = ( `../scripts/gcc-info $CC_Exe |& cat` )
     if ($GCCInfo[2] == yes) then    
        Note $STDOUT "#"
@@ -630,14 +629,13 @@ PrintRule:
 
     echo '	@[ ! -f ${LibDir}/.lock ] || { echo "${LibDir} is locked" ; exit 1 ; }' >> $STDOUT
 
-#    gexec vr:$Val @o grep "\\t" @o fa:/dev/null
-#    gexec grep "\\t" @i+1 @o+2 vr:$Val @ fa:/dev/null
-#    dbget gstatus
-#    if ($gstatus[1] == 0) then
+    fexec $Log vr:$Val @o grep "\\t" @b fa:/dev/null
+    if ($gstatus[2] == 0) then
 
-    printenv $Val |& grep "\\t" >>& /dev/null
-    if ($status == 0) then
+#    printenv $Val |& grep "\\t" >>& /dev/null
+#    if ($status == 0) then
 
+       Note $Log "Process formatting characters the hard way"
        set STDAUX = tmp-$System
 
        printenv $Val >! $STDAUX
@@ -648,6 +646,7 @@ PrintRule:
 
        $RM $STDAUX
     else
+       Note $Log "Process formatting characters the easy way"
        printenv $Val | sed 's/\\n/\n/g' | sed 's/\\t/\t/g' >> $STDOUT
     endif
 

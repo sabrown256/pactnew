@@ -50,9 +50,8 @@ flog $ALog cat $Tmp.c
 
 flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $ccopt -lm
 if ($status == 0) then
-   flog $ALog gexec $CFE $Tmp @o2 @e3 fa:$ALog @ vw:HAVE_ANSI_FLOAT16
-   dbget gstatus
-   if ("$gstatus" =~ 0*) then
+   fexec $ALog $CFE $Tmp @o2 @e3 fa:$ALog @ vw:HAVE_ANSI_FLOAT16
+   if ($gstatus[1] == 0) then
       set ok = TRUE
    endif
 endif
@@ -64,6 +63,8 @@ if ($ok == TRUE) then
 else
    NoteD $ALog "      no long double support"
 endif
+
+unset ok
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

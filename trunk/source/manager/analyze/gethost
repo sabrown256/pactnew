@@ -36,20 +36,27 @@ EOF
 
 setenv HAVE_GETHOSTBYNAME FALSE
 
+set ok = FALSE
+
 set opt = ""
 set opt = ( $opt $CC_Flags $Cfe_LD_Flags $Cfe_LD_RPath )
 flog $ALog $CC_Exe $Tmp.c -o $Tmp $opt
 if ($status == 0) then
-   flog $ALog gexec $CFE $Tmp `uname -n` @o2 @e3 vw:HAVE_GETHOSTBYNAME @ fw:/dev/null
+   fexec $ALog $CFE $Tmp `uname -n` @o2 @e3 vw:HAVE_GETHOSTBYNAME @ fw:/dev/null
+   if ($gstatus[1] == 0) then
+      set ok = TRUE
+   endif
 endif
 
 flog $ALog rm -f $Tmp.c $Tmp
 
-dbget gstatus
-
-if ("$gstatus" !~ 0*) then
+if ($ok == TRUE) then
+   NoteD $ALog "      has gethostbyname"
+else
    NoteD $ALog "      no gethostbyname"
 endif
+
+unset ok
 
 exit(0)
 
