@@ -26,7 +26,8 @@ TGTScr = do-local do-stats do-automake distribute \
          scs-sync scs-revert scs-init \
          winer
 
-TGTEtc = env-csh csh-subroutines
+TGTEtc = env-csh csh-subroutines \
+         functions-pact.csh functions-pact.sh functions-pact.pl
 
 IncAction = sinstall cross-info ${BinDir}
 
