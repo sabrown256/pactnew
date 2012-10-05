@@ -52,7 +52,7 @@ while ($#argv > 0)
    shift
 end
 
-source ../scripts/env-csh
+source ../scripts/functions-pact.csh
 
 set OS     = `uname -s | tr "[A-Z]" "[a-z]"`
 set TstDir = cfg-test-$OS

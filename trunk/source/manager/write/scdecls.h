@@ -17,7 +17,7 @@ set ScrDir = $2
 
 eval `$ScrDir/prune-env pact`
 set path = ( $ScrDir $path )
-source $ScrDir/env-csh
+source $ScrDir/functions-pact.csh
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------

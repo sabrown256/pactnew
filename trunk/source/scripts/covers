@@ -42,7 +42,7 @@ unalias *
 set LPact    = `which pact`
 set PACTRoot = $LPact:h
 set PACTRoot = $PACTRoot:h
-source $PACTRoot/etc/env-csh
+source $PACTRoot/etc/functions-pact.csh
 source $PACTRoot/etc/csh-subroutines
 HAVE_SUBROUTINES
 

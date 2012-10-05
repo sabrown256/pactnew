@@ -34,7 +34,7 @@ if ($?ScrDir == 0) then
 endif
 set BaseDir = $ScrDir:h
 set ScrDir  = $BaseDir/scripts
-source $ScrDir/env-csh
+source $ScrDir/functions-pact.csh
 source $ScrDir/csh-subroutines
 HAVE_SUBROUTINES
 

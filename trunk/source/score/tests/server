@@ -9,9 +9,9 @@
 
 set Package = score
 if (-d ../../scripts) then
-   source ../../scripts/env-csh
+   source ../../scripts/functions-pact.csh
 else if (-d ../../../scripts) then
-   source ../../../scripts/env-csh
+   source ../../../scripts/functions-pact.csh
 endif
 
 set KillSrv = FALSE

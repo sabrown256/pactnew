@@ -12,7 +12,7 @@ umask 007
 
 setenv TestScrDir $cwd
 foreach f (../scripts ../../scripts ../../../scripts ../../../../scripts)
-   if (-f $f/env-csh) then
+   if (-f $f/functions-pact.csh) then
       pushd $f >>& /dev/null
       setenv TestScrDir $cwd
       setenv BaseDir $cwd:h
@@ -20,7 +20,7 @@ foreach f (../scripts ../../scripts ../../../scripts ../../../../scripts)
       break
    endif
 end
-source $TestScrDir/env-csh
+source $TestScrDir/functions-pact.csh
 setenv TEST_CHECK $TestScrDir/test-check
 
 if ($?TEST_ADVISORY == 0) then

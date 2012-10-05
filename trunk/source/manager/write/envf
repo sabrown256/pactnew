@@ -11,14 +11,14 @@
 
 unalias *
 
-if (-f ../scripts/env-csh) then
+if (-f ../scripts/functions-pact.csh) then
    set SrcDir = $cwd
-else if (-f ../../scripts/env-csh) then
+else if (-f ../../scripts/functions-pact.csh) then
    set SrcDir = $cwd:h
 endif
 set ldir = $SrcDir:h/scripts
 set path = ( $ldir $path )
-source $ldir/env-csh
+source $ldir/functions-pact.csh
 
 set vl = ""
 set vl = ( $vl HAVE_OPENMP HAVE_READLINE )

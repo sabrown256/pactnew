@@ -21,7 +21,7 @@ if ($?pruned == 0) then
    set pruned = TRUE
 endif
 
-source $ScrDir/env-csh
+source $ScrDir/functions-pact.csh
 
 source $ScrDir/csh-subroutines
 HAVE_SUBROUTINES

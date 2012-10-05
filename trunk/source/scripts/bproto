@@ -23,7 +23,7 @@ set opt = "-l"
 set opt = ""
 
 source ../dev/$arch/etc/env-pact.csh
-source ../scripts/env-csh
+source ../scripts/functions-pact.csh
 
 InitLog Log $cwd/z-$arch/obj/bproto
 

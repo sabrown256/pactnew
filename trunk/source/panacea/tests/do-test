@@ -4,7 +4,7 @@
 #
 
 set Package = panacea
-source ../../scripts/env-csh
+source ../../scripts/functions-pact.csh
 
 set exe = $BinDir/panache
 set io  = flog

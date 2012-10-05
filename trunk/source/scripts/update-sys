@@ -22,7 +22,7 @@ if (!(-d $Root/include)) then
    set Root = $Exe:h
    set Root = $Root:h
 endif
-source $Root/etc/env-csh
+source $Root/etc/functions-pact.csh
 
 Intervene help.update-sys
 

@@ -9,7 +9,7 @@ set t = var
 
 @ err = 0
 
-source $TestScrDir/env-csh
+source $TestScrDir/functions-pact.csh
 
 set f = ( `fill-string -n 8 -c ' ' $t` )
 NoteD $Log -n "                        $f "

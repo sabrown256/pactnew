@@ -40,6 +40,7 @@ inc panace.h scheme.h syntax.h sx.h
 
 etc do-run-db cfg.pl cfg.db
 etc env-csh csh-subroutines 
+etc functions-pact.csh functions-pact.sh functions-pact.pl
 
 f90 panacea.mod panaceatypes.mod pdb.mod pdbtypes.mod pgs.mod
 f90 pgstypes.mod pml.mod pmltypes.mod scheme.mod score.mod

@@ -22,7 +22,7 @@ set BinDir = $Root/bin
 set EtcDir = $Root/etc
 set path   = ( $BinDir $path )
 
-source $EtcDir/env-csh
+source $EtcDir/functions-pact.csh
 
 if ($cwd:t == ppc) then
    set SrcDir = $cwd

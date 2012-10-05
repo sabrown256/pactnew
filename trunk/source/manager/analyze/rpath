@@ -8,11 +8,11 @@
 # include "cpyright.h"
 #
 
-if (-f ../scripts/env-csh) then
+if (-f ../scripts/functions-pact.csh) then
    pushd ../scripts >& /dev/null
-else if (-f ../../scripts/env-csh) then
+else if (-f ../../scripts/functions-pact.csh) then
    pushd ../../scripts >& /dev/null
-else if (-f ../../../scripts/env-csh) then
+else if (-f ../../../scripts/functions-pact.csh) then
    pushd ../../../scripts >& /dev/null
 endif
 set SrcDir = $cwd
@@ -20,7 +20,7 @@ popd >& /dev/null
 
 set ldir = $SrcDir:h/scripts
 set path = ( $ldir $path )
-source $ldir/env-csh
+source $ldir/functions-pact.csh
 source $ldir/csh-subroutines
 HAVE_SUBROUTINES
 

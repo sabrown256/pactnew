@@ -8,14 +8,14 @@
 # include "cpyright.h"
 #
 
-if (-f ../scripts/env-csh) then
+if (-f ../scripts/functions-pact.csh) then
    set SrcDir = $cwd
-else if (-f ../../scripts/env-csh) then
+else if (-f ../../scripts/functions-pact.csh) then
    set SrcDir = $cwd:h
 endif
 set ldir = $SrcDir:h/scripts
 set path = ( $ldir $path )
-source $ldir/env-csh
+source $ldir/functions-pact.csh
 
 if ($?Bits == 0) then
    setenv Bits `nbit -d`
