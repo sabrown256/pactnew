@@ -18,7 +18,7 @@ set ScrDir  = $BaseDir/scripts
 set PshDir  = $BaseDir/psh
 set SccDir  = $BaseDir/scc
 
-source $ScrDir/env-csh
+source $ScrDir/functions-pact.csh
 
 if ($?USER == 0) then
    if ($?LOGNAME == 0) then

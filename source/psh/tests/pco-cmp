@@ -42,7 +42,7 @@ setenv SC_EXEC_N_ATTEMPTS  1
 set tsys = `cfgman use`
 set tdir = z-$tsys
 
-source ../scripts/env-csh
+source ../scripts/functions-pact.csh
 
 # if run under pstest use existing log otherwise make new one
 if ($?Log == 1) then

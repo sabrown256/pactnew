@@ -19,7 +19,7 @@ set devlib = $lbase/lib
 set devetc = $lbase/etc
 
 source $devetc/env-pact.csh
-source $devetc/env-csh
+source $devetc/functions-pact.csh
 
 setenv PERDB_PATH $lbase/etc/cfg
 

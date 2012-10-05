@@ -18,7 +18,7 @@ if ($?MngDir == 0) then
    setenv ScrDir $BaseDir/scripts
 endif
 
-source $ScrDir/env-csh
+source $ScrDir/functions-pact.csh
 source $ScrDir/csh-subroutines
 HAVE_SUBROUTINES
 

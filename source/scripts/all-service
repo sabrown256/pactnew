@@ -9,7 +9,7 @@
 # include "cpyright.h"
 #
 
-source $PACT/etc/env-csh
+source $PACT/etc/functions-pact.csh
 
 set Types = "-t all"
 set Mode  = "-exh"

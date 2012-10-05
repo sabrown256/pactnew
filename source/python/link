@@ -7,7 +7,7 @@
 set PyPACTVers = 2
 set PyPACTLib  = libpy_$PyPACTVers
 
-source ../scripts/env-csh
+source ../scripts/functions-pact.csh
 
 set Python = `which python`
 if (!(-x "$Python")) then

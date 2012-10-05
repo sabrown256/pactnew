@@ -14,9 +14,9 @@ set lbase  = $bindir:h
 unset bindir
 
 if (-d ../scripts) then
-   source ../scripts/env-csh
+   source ../scripts/functions-pact.csh
 else
-   source $lbase/etc/env-csh
+   source $lbase/etc/functions-pact.csh
 endif
 
 set lperdb_path = $lbase/etc/cfg

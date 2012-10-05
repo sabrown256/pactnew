@@ -40,7 +40,7 @@ set BinDir = $SysDir/bin
 set IncDir = $SysDir/include
 set EtcDir = $SysDir/etc
 
-source ../scripts/env-csh
+source ../scripts/functions-pact.csh
 
 InitLog Log $cwd/log.verify-cfg.$Arch
 

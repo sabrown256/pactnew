@@ -15,7 +15,7 @@ unalias *
 set MngDir = $cwd
 set ScrDir = $MngDir:h/scripts
 
-source $ScrDir/env-csh
+source $ScrDir/functions-pact.csh
 source $ScrDir/csh-subroutines
 HAVE_SUBROUTINES
 

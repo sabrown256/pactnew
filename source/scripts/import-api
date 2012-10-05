@@ -16,9 +16,9 @@ set devinc = $lbase/include
 set devetc = $lbase/etc
 
 if (-d ../scripts) then
-   source ../scripts/env-csh
+   source ../scripts/functions-pact.csh
 else
-   source $lbase/etc/env-csh
+   source $lbase/etc/functions-pact.csh
 endif
 
 unset bindir

@@ -39,7 +39,7 @@ while ($#argv > 0)
 end
 
 eval `sys-site`
-source $DAS_ROOT/pactnew/etc/env-csh
+source $DAS_ROOT/pactnew/etc/functions-pact.csh
 
 set ID   = `system-id`
 set Site = `echo $SYS_SITE | tr "[A-Z]" "[a-z]"`

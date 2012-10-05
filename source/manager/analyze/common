@@ -19,9 +19,9 @@ if ($?ALog == 0) then
    setenv ALog $cwd/cfg-$System/log.analyze
 endif
 
-if (-f ../scripts/env-csh) then
+if (-f ../scripts/functions-pact.csh) then
    set MngDir = $cwd
-else if (-f ../../scripts/env-csh) then
+else if (-f ../../scripts/functions-pact.csh) then
    set MngDir = $cwd:h
 endif
 set ldir = $MngDir:h/scripts
@@ -50,7 +50,7 @@ endif
 alias DSET  'perdb \!\!:1=\!\!:2-$'
 alias DGET  'perdb \!\!1'
 
-source $ldir/env-csh
+source $ldir/functions-pact.csh
 source $ldir/csh-subroutines
 
 set Tmp = tmp-$Exe

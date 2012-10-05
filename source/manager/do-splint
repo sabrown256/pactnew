@@ -33,7 +33,7 @@ endif
 set path = ( /usr/gapps/pact/scripts $path )
 set arch = `../scripts/cfgman use`
 
-source ../dev/$arch/etc/env-csh
+source ../dev/$arch/etc/functions-pact.csh
 
 InitLog log $cwd/log.splint
 

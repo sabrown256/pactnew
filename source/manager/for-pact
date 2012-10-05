@@ -28,7 +28,7 @@ unalias *
 
 onintr CLEANUP
 
-source ../scripts/env-csh
+source ../scripts/functions-pact.csh
 source ../scripts/csh-subroutines
 HAVE_SUBROUTINES
 

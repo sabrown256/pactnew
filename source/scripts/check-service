@@ -20,7 +20,7 @@ set Root   = $Exe:h
 set BinDir = $Root/bin
 set EtcDir = $Root/etc
 
-source $EtcDir/env-csh
+source $EtcDir/functions-pact.csh
 
 InitLog Log $HOME/.log.check-service
 

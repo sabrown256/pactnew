@@ -12,7 +12,7 @@ unalias *
 
 onintr INTERRUPT
 
-source ../scripts/env-csh
+source ../scripts/functions-pact.csh
 source ../scripts/csh-subroutines
 HAVE_SUBROUTINES
 

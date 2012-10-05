@@ -17,7 +17,7 @@ set ScrDir = $2
 
 eval `$ScrDir/prune-env pact`
 set path = ( $ScrDir $path )
-source $ScrDir/env-csh
+source $ScrDir/functions-pact.csh
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -206,7 +206,7 @@ source $MngDir/write/import-db
        Note $STDOUT 'unset inf'
        Note $STDOUT ''
 
-       Note $STDOUT 'foreach file (env-pact.csh env-pact.sh env-pact.dk env-pact.mod env-mio env-csh csh-subroutines)'
+       Note $STDOUT 'foreach file (env-pact.csh env-pact.sh env-pact.dk env-pact.mod env-mio functions-pact.csh csh-subroutines)'
        Note $STDOUT '   if (-f $file) then'
        Note $STDOUT '      touch $DestDir/.lock'
 #       Note $STDOUT '      sinstall -p 664 $file $DestDir'
@@ -301,7 +301,7 @@ source $MngDir/write/import-db
 # NOTE: temporarily link to certain etc files
 # this can go after about 12/2012
        Note $STDOUT 'pushd $DestDir >& /dev/null'
-       Note $STDOUT 'foreach file (env-pact.csh env-pact.sh env-pact.dk env-pact.mod env-mio env-csh csh-subroutines cfg.db)'
+       Note $STDOUT 'foreach file (env-pact.csh env-pact.sh env-pact.dk env-pact.mod env-mio functions-pact.csh csh-subroutines cfg.db)'
        Note $STDOUT '   rm -f $file'
        Note $STDOUT '   ln -s ../etc/$file $file'
        Note $STDOUT 'end'

@@ -25,7 +25,7 @@ set BinDir  = $SysDir/bin
 set LibDir  = $SysDir/lib
 setenv ScrDir $BaseDir/scripts
 
-source $ScrDir/env-csh
+source $ScrDir/functions-pact.csh
 
 set AR     = `pact +l -info AR`
 set AROpt  = `pact +l -info AROpt`
