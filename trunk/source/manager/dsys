@@ -79,7 +79,6 @@ set EtcDir  = $SysDir/etc
 set LogDir  = $SysDir/log
 set ScmDir  = $SysDir/scheme
 set PACT    = $BinDir/pact
-set PERDB   = $BinDir/perdb
 set EnvCsh  = $EtcDir/env-pact.csh
 
 set PCKS    = "-"
@@ -101,6 +100,9 @@ set BugTck     = /usr/gapps/pact/pactbug
 if (-x $BugTck) then
    set HaveTicket = TRUE
 endif
+
+setenv PERDB   $BinDir/perdb
+setenv GEXEC   $BinDir/gexec
 
 set Cmnd = $1
 shift
@@ -930,7 +932,9 @@ switch ($Cmnd)
         set LogDir = $SysDir/log
         set ScmDir = $SysDir/scheme
         set PACT   = $BinDir/pact
-        set PERDB  = $BinDir/perdb
+
+        setenv PERDB  $BinDir/perdb
+        setenv GEXEC  $BinDir/gexec
 
         if ($ExplSystem == FALSE) then
            set EnvCsh = $EtcDir/env-pact.csh
@@ -2008,8 +2012,7 @@ CFG_DONE:
         Note $LogFile do-net -e $DO_PACT $DArgs $CArgs
 
 #        do-net -e $DO_PACT $DArgs $CArgs |& tee -ai $LogFile
-	gexec do-net -e $DO_PACT $DArgs $CArgs @b tee -ai $LogFile
-        dbget gstatus
+	fexec $LogFile do-net -e $DO_PACT $DArgs $CArgs @b tee -ai $LogFile
         set RStatus = $gstatus[1]
 
         breaksw
@@ -3469,8 +3472,7 @@ CFG_DONE:
         Note $Log "Command: $Cmd"
 
 #        $Cmd |& tee -ai $Log
-        gexec $Cmd @b tee -ai $Log
-        dbget gstatus
+        fexec $Log $Cmd @b tee -ai $Log
         set RStatus = $gstatus[1]
 
         breaksw

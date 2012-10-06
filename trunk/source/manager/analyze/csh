@@ -16,8 +16,7 @@ Note $Log "Analyze: csh"
 
 set inf = ( `ls -l /bin/csh` )
 @ n = $#inf
-echo "$inf" | grep -e '->' >& /dev/null
-if ($status == 0) then
+if ("$inf" =~ *-\>*) then
    set exe = ( `which $inf[$n]` )
 else
    set exe = "/bin/csh"
