@@ -205,14 +205,21 @@ if ($Cfg_CC_Exe != "") then
       Note $ALog "Compiler version = $inf"
       Note $ALog "GCC version      = $gccv"
       if ("$gccv" =~ 3.*) then
-         set lcfg = ( `echo "$Cfg_CC_Flags" | sed "s| -fsignaling-nans||"` )
-         flog $ALog setenv Cfg_CC_Flags "$lcfg"
+
+         fexec $ALog echo "$Cfg_CC_Flags" @o sed "s| -fsignaling-nans||" @o vw:Cfg_CC_Flags
+         fexec $ALog echo "$Save_CFLAGS" @o sed "s| -fsignaling-nans||" @o vw:Save_CFLAGS
+
+#         set lcfg = ( `echo "$Cfg_CC_Flags" | sed "s| -fsignaling-nans||"` )
+#         flog $ALog setenv Cfg_CC_Flags "$lcfg"
+
+#         set lcfg = ( `echo "$Save_CFLAGS" | sed "s| -fsignaling-nans||"` )
+#         flog $ALog setenv Save_CFLAGS "$lcfg"
+
+#         fexec $ALog echo "$CC_Flags" @o sed "s| -fsignaling-nans||" @o vw:CC_Flags
 
          set lcfg = ( `echo "$CC_Flags" | sed "s| -fsignaling-nans||"` )
          flog $ALog setenv CC_Flags "$lcfg"
 
-         set lcfg = ( `echo "$Save_CFLAGS" | sed "s| -fsignaling-nans||"` )
-         flog $ALog setenv Save_CFLAGS "$lcfg"
       endif
       flog $ALog $Cfg_CC_Exe $CC_Version
       flog $ALog set CmpVers = any
@@ -383,11 +390,11 @@ EOF
 
    Note $ALog ""
    Note $ALog "Results of C compiler analysis ($ETime)"
-   Note $ALog "   AnsiCC          = |$AnsiCC|"
-   Note $ALog "   CC_Exe          = |$CC_Exe|"
-   Note $ALog "   Cfg_CC_Exe      = |$Cfg_CC_Exe|"
+   Note $ALog "   AnsiCC             = |$AnsiCC|"
+   Note $ALog "   CC_Exe             = |$CC_Exe|"
+   Note $ALog "   Cfg_CC_Exe         = |$Cfg_CC_Exe|"
    Note $ALog "   FC_INT_PTR_DIFFER  = |$FC_INT_PTR_DIFFER|"
-   Note $ALog "   LONG64          = |$LONG64|"
+   Note $ALog "   LONG64             = |$LONG64|"
    Note $ALog ""
 
 endif
