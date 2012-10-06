@@ -52,8 +52,9 @@ if ("$Yacc_Exe" == "") then
 # check whether this is bison or yacc
 else
    NoteD $ALog -n "$Yacc_Exe"
-   flog $ALog ( $Yacc_Exe --help |& grep bison )
-   if ($status == 0) then
+   Note $ALog ""
+   fexec $ALog $Yacc_Exe --help @b grep bison
+   if ($gstatus[2] == 0) then
       setenv Yacc_Flags "-y $Yacc_Flags"
       NoteD $ALog " (bison)"
    else

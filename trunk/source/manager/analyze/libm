@@ -30,17 +30,14 @@ envini LibM_RPath   ""
 
 if (-d "$IMF_Path") then
    set nbits = `nbit -d`
-   if ($nbits == 64) then
-#      set inf = ( `ls -rt $IMF_Path/i*/lib/*64/libimf.a |& grep -v beta | tail -n 1` )
-      set inf = ( `ls -rt $IMF_Path/ic*/lib/libimf.a |& grep -v beta | tail -n 1` )
-   else
-      set inf = ( `ls -rt $IMF_Path/ic*/lib/libimf.a |& grep -v beta | tail -n 1` )
-   endif
+
+   set inf = ( `ls -rt $IMF_Path/ic*/lib/libimf.a |& grep -v beta | tail -n 1` )
+
 else
    set inf = ""
 endif
 Note $ALog "IMF_Path = |$IMF_Path|"
-Note $ALog "inf       = |$inf|"
+Note $ALog "inf      = |$inf|"
 
 if (-f "$inf") then
    set root = $inf:h

@@ -61,7 +61,8 @@ Note $ALog "OS_Release = $OS_Release"
 Note $ALog "OS_Type    = $OS_Type"
 
 if ($OS_Name == Darwin) then
-   setenv OSX_Version `echo $Arch | sed 's/osx-10\.//' | sed 's/-.*//'`
+   fexec $ALog echo $Arch @o sed 's/osx-10\.//' @o sed 's/-.*//' @o vw:OSX_Version`
+#   setenv OSX_Version `echo $Arch | sed 's/osx-10\.//' | sed 's/-.*//'`
 endif
 
 # there are systems that put out garbage if this is on a single echo (AIX)
@@ -71,7 +72,7 @@ NoteD $ALog " ($OS_Type)"
 setenv OS_Type USE_$OS_Type
 
 dbexp OS_Type
-dbexp OSX_Version
+#dbexp OSX_Version
 
 envexp OS_Name
 
