@@ -16,7 +16,15 @@ unalias mv
 # nasty bootstrapping issue here when building PACT for the first time
 # we are not supposed to be doing a lot of work in this script
 #setenv PERDB `where perdb | head -n 1`
-setenv PERDB perdb
+if ($?PERDB == 0) then
+   setenv PERDB perdb
+endif
+if ($?GEXEC == 0) then
+   setenv GEXEC gexec
+endif
+setenv MV     "mv -f"
+setenv RM     "rm -f"
+setenv RMDir  "rm -rf"
 
 # these two go together
 alias GOSUB     'set tJump = \!\!:1 ; set Return = ( \!\!:2 $Return ) ; set CallArgs = \!\!:3-$ ; if ($Trace == TRUE) echo "Calling $tJump (from $Return[2])" ; goto $tJump'
@@ -77,7 +85,7 @@ alias SafeSet   'if ($?\!\!:1 == 0) set \!\!:1 = \!\!:2-$'
 # use dbset instead of setenv
 # matches C call dbset
 # usage: dbset <var> <value>
-#alias dbset     'setenv \!\!:1 "`$PERDB \!\!:1 = \!\!:2-$`"'
+
 alias dbset     'set t_ = ( `$PERDB \!\!:1 = \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
 alias dbsets    'set \!\!:1 = ( `$PERDB -e \!\!:1 = \!\!:2-$` )'
 
@@ -86,6 +94,7 @@ alias dbsets    'set \!\!:1 = ( `$PERDB -e \!\!:1 = \!\!:2-$` )'
 # matches C call dbget
 # usage: dbget <var>
 #        echo $<var>
+
 alias dbget     'setenv \!\!:1 `$PERDB -e \!\!:1`'
 alias dbgets    'set \!\!:1 = ( `$PERDB -e \!\!:1` )'
 
@@ -96,12 +105,14 @@ alias dbgets    'set \!\!:1 = ( `$PERDB -e \!\!:1` )'
 #           echo "defined"
 #        else
 #           echo "undefined"
+
 alias dbdef     '$PERDB \!\!:1 \?'
 
 # dbini initializes <var> to <val> in the database iff <var>
 # does not already have a value
 # matches C call dbinitv
 # usage: dbini <var> <val>
+
 alias dbini     'set t_ = ( `$PERDB \!\!:1 =\? \!\!:2-$` ) ; setenv \!\!:1 "$t_" ; unset t_'
 alias envini    'if ($?\!\!:1 == 0) setenv \!\!:1 \!\!:2'
 
@@ -109,15 +120,13 @@ alias envini    'if ($?\!\!:1 == 0) setenv \!\!:1 \!\!:2'
 # back to the database
 # matches C call dbexp
 # usage: dbexp <var>
+
 alias dbexp     'set t_ = ( `$PERDB -l \!\!:1 = $\!\!:1` )'
 alias envexp    'echo "parent \!\!:1($\!\!:1)"'
 
 # fexec logs the gexec command, runs it, and
 # gets gstatus out as a shell variable
 # usage: fexec $log <gexec-specs>
-alias fexec     'echo "Command: gexec \!\!:2-$" >>& \!\!:1 ; gexec \!\!:2-$ >>& \!\!:1 ; set gstatus = `$PERDB -e gstatus`'
 
-setenv MV     "mv -f"
-setenv RM     "rm -f"
-setenv RMDir  "rm -rf"
+alias fexec     'echo "Command: $GEXEC \!\!:2-$" >>& \!\!:1 ; $GEXEC \!\!:2-$ >>& \!\!:1 ; set gstatus = (`$PERDB -e gstatus`)'
 
