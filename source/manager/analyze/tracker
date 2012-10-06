@@ -25,8 +25,8 @@ foreach d ( /usr/apps/tracker $DAS_ROOT/tracker /usr /usr/local )
 
 # if it works we will get a help message if not
 # maybe some complaints about missing so's
-         set inf = ( `$d/bin/tracker |& grep "help screen for more information"` )
-         if ("$inf" != "") then
+         fexec $ALog $d/bin/tracker @b grep "help screen for more information
+         if ($gstatus[2] == 0) then
             setenv TRACKER_Exe $d/bin/tracker
             setenv HAVE_TRACKER TRUE
             break
