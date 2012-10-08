@@ -45,55 +45,68 @@ $RMDir = "rm -rf";
 #
 
 sub flog {
-    my $log = shift;
+    local *lf = shift;
     my $cmd = shift;
-    print($log, "Command: $cmd\n");
-    `$cmd >>& $log`;
+    print(lf "Command: $cmd\n");
+    open(pp, "$cmd|");
+    while (<pp>)
+       {print(lf $_);};
 }
 
 sub ftee {
-    my $log = shift;
+    local *lf = shift;
     my $cmd = shift;
-    print($log, "Command: $cmd\n");
-    `$cmd |& tee -ai $log`;
+    my $s;
+    print(lf "Command: $cmd\n");
+    open(pp, "$cmd|");
+    while (<pp>)
+       {$s = $_;
+	print(lf $s);
+        print($s);};
 }
 
 sub ftty {
-    my $log = shift;
+    local *lf = shift;
     my $cmd = shift;
-    print($log, "Command: $cmd\n");
-    print($log, "$cmd\n");
-    `$cmd >>& $log`;
+    print(lf "Command: $cmd\n");
+    print("$cmd\n");
+    open(pp, "$cmd|");
+    while (<pp>)
+       {print(lf $_);};
 }
 
 sub Note {
-    my $log = shift;
+    local *lf = shift;
     my $msg = shift;
-    print($log, $msg);
+    print(lf "$msg\n");
 }
 
 sub NoteD {
-    my $log = shift;
+    local *lf = shift;
     my $msg = shift;
-    print($log, $msg);
-    print($msg);
+    print(lf "$msg\n");
+    print("$msg\n");
 }
 
 sub Separator {
-    my $log = shift;
-    print($log, "--------------------------------------------------------------------------\n");
-    print($log, "");
+    local *lf = shift;
+    print(lf "--------------------------------------------------------------------------\n");
+    print(lf "\n");
 }
 
 sub InitLog {
-    my $log = shift;
     my $file = shift;
-    rm -f $file;
-    echo $USER >&! $file;
-    date >> $file;
-    pwd >> $file;
-    echo "" >> $file;
-    $ENV{$log} = $file;
+    local *lf;
+
+    unlink($file);
+
+    open(lf, ">> $file");
+    print lf "$USER\n";
+    print lf `date`;
+    print lf `pwd`;
+    print lf "\n";
+
+    return *lf;
 }
 
 # dbset sets a variable in the database and the current environment
@@ -139,7 +152,7 @@ sub dbgets {
 
 sub dbdef {
     my $var = shift;
-    $PERDB $var \?
+    `$PERDB $var \?`;
 }
 
 # dbini initializes <var> to <val> in the database iff <var>
@@ -151,14 +164,14 @@ sub dbini {
     my $var = shift;
     my $val = shift;
     my $t = `$PERDB $var =\? $val`;
-    setenv $var "$t"
+    $ENV{$var} = "$t";
 }
 
 sub envini {
     my $var = shift;
     my $val = shift;
-    if ($?$var == 0)
-       {setenv $var $val;};
+    if ($ENV{$var} == 0)
+       {$ENV{$var} = $val;};
 }
 
 # dbexp export the current value of environment variable <var>
@@ -174,8 +187,8 @@ sub dbexp {
 
 sub envexp {
     my $var = shift;
-    my $val = ${$var};
-    print "parent $var($val)"'
+    my $val = $ENV{$var};
+    print "parent $var($val)\n";
 }
 
 # fexec logs the gexec command, runs it, and
@@ -183,10 +196,12 @@ sub envexp {
 # usage: fexec $log <gexec-specs>
 
 sub fexec {
-    my $log = shift;
+    local *lf = shift;
     my $cmd = shift;
-    print($log, "Command: gexec $cmd\n");
-    gexec $cmd >>& $log;
+    print(lf "Command: gexec $cmd\n");
+    open(pp, "gexec $cmd|");
+    while (<pp>)
+       {print(lf $_);};
     $gstatus = `$PERDB -e gstatus`;
 }
 

@@ -104,13 +104,13 @@ InitLog () {
 dbset () {
    var=$1
    val=${2-}
-   export $var=`$PERDB $var = $val`
+   export $var="`$PERDB $var = $val`"
 }
 
 dbsets () {
    var=$1
    val=${2-}
-   $var=`$PERDB -e $var = $val`
+   $var="`$PERDB -e $var = $val`"
 }
 
 # dbget imports a database variable into the current environment
@@ -121,12 +121,13 @@ dbsets () {
 
 dbget () {
    var=$1
-   export $var=`$PERDB -e $var`
+   export $var="`$PERDB -e $var`"
 }
 
 dbgets () {
    var=$1
-   $var=`$PERDB -e $var`
+   s="`$PERDB -e $var`"
+   eval $var=$s
 }
 
 # dbdef queries database for existence of a variable
@@ -160,7 +161,7 @@ envini () {
    var=$1
    val=$2
    if [ $var ] ; then
-      export $var=$val
+      export $var="$val"
    fi
 }
 
@@ -170,13 +171,13 @@ envini () {
 # usage: dbexp <var>
 dbexp () {
    var=$1
-   val=${$var}
+   val=`printenv $var`
    $PERDB -l $var = $val
 }
 
 envexp () {
    var=$1
-   val=${$var}
+   val=`printenv $var`
    echo "parent $var($val)"
 }
 
