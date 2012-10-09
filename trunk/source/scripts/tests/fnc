@@ -1,0 +1,79 @@
+#!/bin/csh -f
+#
+# FNC - test functions-pact variants
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+source ../../tests/common
+
+set msg = "FNC Test ......................."
+
+set lst = ""
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: fnc [-h] [ csh | sh | pl ]"
+           echo "   h  this help message"
+           echo ""
+           exit(1);
+      default:
+           set lst = ( $lst $1 )
+           breaksw
+   endsw
+   shift
+end
+
+if ("$lst" == "") then
+   set lst = ( csh sh pl )
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# FNC - test functions-pact
+
+NoteD $Log "                    $msg"
+
+flog $Log cp $SrcDir/tests/{fnc*} .
+
+foreach t ($lst)
+   Separator $Log
+
+   set f = ( `fill-string -n 28 $t` )
+
+   NoteD $Log -n "                        $f "
+   Note $Log ""
+
+   set Res = fnc-$t.res
+   set Ref = $SrcDir/tests/ref/fnc-$t
+
+   fnc.$t >&! $Res
+   flog $Log @ nerr = $nerr + $status
+
+   if (-f $Ref) then
+      flog $Log diff -b -B -w $Res $Ref
+      set xstatus = $status
+      if ($xstatus == 0) then
+         NoteD $Log "ok"
+         set rpf = ( $rpf $Res $Ref )
+      else
+         NoteD $Log "ng"
+         flog $Log @ nerr = $nerr + 1
+      endif
+   else
+      NoteD $Log "add"
+      flog $Log cp $Res $Ref
+   endif
+end
+
+set rpf = ( $rpf fnc* )
+
+$TEST_CHECK part -a fnc -e $nerr -rpf "$rpf" "$msg"
+
+exit($status)
