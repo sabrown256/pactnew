@@ -89,7 +89,10 @@ static int report_var(infodes *st, char *dir, char *fname,
 			    {*p++ = '\0';
 			     txt  = p;}
 			 else
-			    txt = tok;}
+			    {if (litrl && !compl)
+			        continue;
+			     else
+			        txt = tok;};}
 
 /* with env-pact.csh you WILL get here with txt <val> and tok <var> */
 		     else

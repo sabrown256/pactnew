@@ -1076,7 +1076,7 @@ static int _PD_wr_cksum_iii(PDBfile *file)
 
     ok = TRUE;
 
-    if (file->use_cksum & PD_MD5_RW)
+    if (file->cksum.use & PD_MD5_RW)
        {ok &= _PD_put_string(1, "Checksums:\n");
 
 	for (i = 0; SC_hasharr_next(file->symtab, &i, &nm, NULL, (void **) &ep); i++)

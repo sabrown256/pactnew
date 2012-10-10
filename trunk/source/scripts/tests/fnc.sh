@@ -47,19 +47,19 @@ Separator $log
 
 dbset foo "a b c"
 flog $log printenv foo
-flog $log foo=
+flog $log unset foo
 
 dbsets bar "x y z"
 flog $log echo $bar
-flog $log bar=
+flog $log unset bar
 
 dbget foo
 flog $log printenv foo
-flog $log foo=
+flog $log unset foo
 
 dbgets bar
 flog $log echo $bar
-flog $log bar=
+flog $log unset bar
 
 dbdef foo
 if [ $? == 0 ] ; then
@@ -68,29 +68,32 @@ fi
 
 dbini foo "1 2 3"
 flog $log printenv foo
-flog $log foo=
+flog $log unset foo
 
 dbini baz "4 5 6"
 flog $log printenv baz
-flog $log baz=
+flog $log unset baz
 
 envini foo "1 2 3"
 flog $log printenv foo
-flog $log foo=
+flog $log unset foo
 
 envini baz "4 5 6"
 flog $log printenv baz
-flog $log baz=
+flog $log unset baz
 
-#alias SafeSet   'if ($?\!\!:1 == 0) set \!\!:1 = \!\!:2-$'
+#alias SafeSet
 
 dbexp HOME
 
-envexp PERDB_PATH
+Foo="the quick brown fox"
+export Foo
+envexp Foo
 
 fexec $log echo "foo" @b cat -n
 Note $log gstatus = $gstatus
 
 flog $log perdb quit:
+flog $log rm -f fnc-sh.*
 
 exit $err

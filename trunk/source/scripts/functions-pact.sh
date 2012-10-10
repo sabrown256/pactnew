@@ -46,21 +46,24 @@ export RMDir="rm -rf"
 
 flog () {
    log=$1
-   cmd=${2-}
+   shift
+   cmd=$*
    echo "Command: $cmd" >> $log 2>&1
    $cmd >> $log 2>&1
 }
 
 ftee () {
    log=$1
-   cmd=${2-}
+   shift
+   cmd=$*
    echo "Command: $cmd" >> $log 2>&1
-   $cmd |& tee -ai $log
+   $cmd 2>&1 | tee -ai $log
 }
 
 ftty () {
    log=$1
-   cmd=${2-}
+   shift
+   cmd=$*
    echo "Command: $cmd" >> $log 2>&1
    echo "$cmd"
    $cmd >> $log 2>&1
@@ -68,13 +71,15 @@ ftty () {
 
 Note () {
    log=$1
-   msg=${2-}
+   shift
+   msg=$*
    echo $msg >> $log 2>&1
 }
 
 NoteD () {
    log=$1
-   msg=${2-}
+   shift
+   msg=$*
    echo $msg >> $log 2>&1
    echo $msg
 }
@@ -89,7 +94,7 @@ InitLog () {
    log=$1
    file=$2
    rm -f $file
-   echo $USER >&! $file
+   echo $USER >& $file
    date >> $file
    pwd >> $file
    echo "" >> $file
@@ -103,14 +108,16 @@ InitLog () {
 
 dbset () {
    var=$1
-   val=${2-}
+   shift
+   val=$*
    export $var="`$PERDB $var = $val`"
 }
 
 dbsets () {
    var=$1
-   val=${2-}
-   $var="`$PERDB -e $var = $val`"
+   shift
+   val=$*
+   export -n $var="`$PERDB -e $var = $val`"
 }
 
 # dbget imports a database variable into the current environment
@@ -126,8 +133,7 @@ dbget () {
 
 dbgets () {
    var=$1
-   s="`$PERDB -e $var`"
-   eval $var=$s
+   export -n $var="`$PERDB -e $var`"
 }
 
 # dbdef queries database for existence of a variable
@@ -152,9 +158,9 @@ dbdef () {
 
 dbini () {
    var=$1
-   val=${2-}
-   t_=( `$PERDB $var =\? $val` )
-   export $var="$t_"
+   shift
+   val=$*
+   export $var="`$PERDB $var =\? $val`"
 }
 
 envini () {
@@ -172,7 +178,8 @@ envini () {
 dbexp () {
    var=$1
    val=`printenv $var`
-   $PERDB -l $var = $val
+   t_="`$PERDB -l $var = $val`"
+   unset t_
 }
 
 envexp () {
@@ -187,7 +194,8 @@ envexp () {
 
 fexec () {
    log=$1
-   cmd=${2-}
+   shift
+   cmd=$*
    echo "Command: gexec $cmd" >> $log 2>&1
    gexec $cmd >> $log 2>&1
    gstatus=`$PERDB -e gstatus`

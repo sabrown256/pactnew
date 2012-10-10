@@ -1,4 +1,51 @@
+
+--------------------------------------------------------------------------
+
+Test MV
+Test MV
+Test RMDir
+--------------------------------------------------------------------------
+
+Test Note
 Test NoteD
+--------------------------------------------------------------------------
+
+Command: echo Test flog
+Test flog
+Command: echo Test ftee
 Test ftee
-echo Test ftty
-parent PERDB_PATH(/gapps/codes/pact/wrk/scripts/z-ognu/test/fnc-csh)
+Command: echo Test ftty
+Test ftty
+--------------------------------------------------------------------------
+
+Command: printenv foo
+"a b c"
+Command: unsetenv foo
+Command: echo x y z
+x y z
+Command: unset bar
+Command: printenv foo
+a b c
+Command: unsetenv foo
+Command: echo x y z
+x y z
+Command: unset bar
+foo defined
+Command: printenv foo
+a b c
+Command: unsetenv foo
+Command: printenv baz
+4 5 6
+Command: unsetenv baz
+Command: printenv foo
+1 2 3
+Command: unsetenv foo
+Command: printenv baz
+4 5 6
+Command: unsetenv baz
+Command: gexec echo foo @b cat -n
+     1	foo
+gstatus = 0 0
+Command: perdb quit:
+done
+Command: rm -f fnc-csh.*

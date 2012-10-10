@@ -443,11 +443,18 @@ void PM_md5_checksum_file(FILE *file, int64_t start, int64_t stop,
     t0 = SC_wall_clock_time();
 #endif
 
+int l, j = 0, doit=0;
+
     _PM_md5_init(&mc);
 
     for (ib = nb; ib > 0; )
         {seg = min(ib, sz);
 	 len = io_read(bf, 1, seg, file);  
+if (doit == TRUE)
+{printf("bf %8ld %4d ", (long) nb, j++);
+for (l = 0; l < len; l++)
+    printf("%02x", bf[l]);
+printf("\n");};
 	 if (len == seg)
 	    {_PM_md5_update(&mc, bf, len);
 	     ib -= len;}
@@ -475,8 +482,6 @@ long PM_md5_hash(void *key, int size)
    {long nc, v;
     unsigned char d[33];
     char *s;
-    extern void PM_md5_checksum_array(void *arr, u_int64_t ni, u_int64_t bpi,
-				      unsigned char *dig);
 
     s  = (char *) key;
     nc = strlen(s);

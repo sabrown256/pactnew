@@ -274,7 +274,7 @@ FIXNUM FF_ID(pfgfdt, PFGFDT)(FIXNUM *sfid, FIXNUM *sncd, char *date)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PFGCSM - FORTRAN interface routine to fetch file->use_cksum */
+/* PFGCSM - FORTRAN interface routine to fetch file->cksum.use */
 
 FIXNUM FF_ID(pfgcsm, PFGCSM)(FIXNUM *sfid, FIXNUM *sv)
    {FIXNUM rv;
@@ -282,14 +282,14 @@ FIXNUM FF_ID(pfgcsm, PFGCSM)(FIXNUM *sfid, FIXNUM *sv)
 
     file = SC_GET_POINTER(PDBfile, *sfid);
 
-    rv = file->use_cksum;
+    rv = file->cksum.use;
 
     return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PFSCSM - FORTRAN interface routine to set file->use_cksum */
+/* PFSCSM - FORTRAN interface routine to set file->cksum.use */
 
 FIXNUM FF_ID(pfscsm, PFSCSM)(FIXNUM *sfid, FIXNUM *sv)
    {FIXNUM rv;
