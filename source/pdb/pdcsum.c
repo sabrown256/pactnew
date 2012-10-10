@@ -51,12 +51,12 @@ int _PD_cksum_close(PDBfile *file)
  * before we flush/close the file, so that a valid checksum is recomputed
  * and added to the file
  */
-    if ((((file->use_cksum & PD_MD5_FILE) == 0) &&
-	 ((file->file_cksum & PD_MD5_FILE) != 0)) &&
+    if ((((file->cksum.use & PD_MD5_FILE) == 0) &&
+	 ((file->cksum.file & PD_MD5_FILE) != 0)) &&
 	(file->virtual_internal == FALSE))
        {ok = PD_verify(file);
         if (ok == FALSE)
-	   file->use_cksum |= PD_MD5_FILE;};
+	   file->cksum.use |= PD_MD5_FILE;};
 
     return(ret);}
 
@@ -78,7 +78,7 @@ int _PD_cksum_var_read(PDBfile *file, char *name, char *type,
     rv = TRUE;
 
 /* if requested, check MD5 checksum for this var */
-    if ((file->use_cksum & PD_MD5_RW) && (strstr(name, PD_MD5_DIR) == NULL)) 
+    if ((file->cksum.use & PD_MD5_RW) && (strstr(name, PD_MD5_DIR) == NULL)) 
        {len  = strlen(PD_MD5_DIR) + strlen(name) + strlen(PD_MD5_SUFFIX) + 2;
         path = CMAKE_N(char, len);
 
@@ -139,7 +139,7 @@ int _PD_cksum_var_write(PDBfile *file, char *name, syment *ef)
     rv = TRUE;
 
 /* if requested, add an MD5 checksum for this var */
-    if ((ef != NULL) && (file->use_cksum & PD_MD5_RW))
+    if ((ef != NULL) && (file->cksum.use & PD_MD5_RW))
        {if (strpbrk(name, ".[(") != NULL)
 	   {strcpy(bf, name);
 	    name = SC_strtok(bf, ".[(", s);};
@@ -193,7 +193,7 @@ int _PD_cksum_block_read(PDBfile *file, char *name, syment *ep, long n)
     rv = TRUE;
 
 /* if requested, check MD5 checksum for this block */
-    if ((ep != NULL) && (file->use_cksum & PD_MD5_RW))
+    if ((ep != NULL) && (file->cksum.use & PD_MD5_RW))
        {bl = ep->blocks;
 	nb = SC_array_get_n(bl);
 	if (n < 0)
@@ -261,7 +261,7 @@ int _PD_cksum_block_write(PDBfile *file, syment *ep, long n)
     rv = TRUE;
 
 /* if requested, check MD5 checksum for this block */
-    if ((ep != NULL) && (file->use_cksum & PD_MD5_RW))
+    if ((ep != NULL) && (file->cksum.use & PD_MD5_RW))
        {bl   = ep->blocks;
 	type = PD_entry_type(ep);
 	_PD_block_get_desc(&addr, &ni, bl, n);
@@ -276,7 +276,7 @@ int _PD_cksum_block_write(PDBfile *file, syment *ep, long n)
 
 	rv = _PD_block_set_cksum(bl, n, cdig);
 
-        file->file_cksum |= PD_MD5_RW;};
+        file->cksum.file |= PD_MD5_RW;};
                     
     return(rv);}
 
@@ -293,7 +293,7 @@ int _PD_cksum_reserve(PDBfile *file)
 /* allocate space for the MD5 checksum (128 bits => 16 unsigned chars)
  * NOTE: this MUST be the last extra in the file !!!
  */
-    if (file->use_cksum & PD_MD5_FILE) 
+    if (file->cksum.use & PD_MD5_FILE) 
        rv = _PD_put_string(1, "%s:00000000000000000000000000000000\n",
 			   PD_CKSUM_SIG);
     else
@@ -320,7 +320,7 @@ int _PD_cksum_file_write(PDBfile *file)
  * WARNING: no more writes to the file other than the checksum
  * from here on out
  */
-    if (file->use_cksum & PD_MD5_FILE)
+    if (file->cksum.use & PD_MD5_FILE)
        {_PD_md5_checksum(file, dig);
 
 	addr = _PD_locate_checksum(file);
@@ -395,7 +395,8 @@ int PD_verify(PDBfile *file ARG(,,cls))
   
 		ok = _PD_cksum_compare(cso, csn);
 
-		file->file_cksum |= PD_MD5_FILE;};};};
+		file->cksum.verified = ok;
+		file->cksum.file    |= PD_MD5_FILE;};};};
     
     return(ok);}
 
@@ -414,8 +415,8 @@ int PD_verify(PDBfile *file ARG(,,cls))
 int PD_activate_cksum(PDBfile *file ARG(,,cls), PD_checksum_mode flag) 
     {int ov;
 
-     ov              = file->use_cksum;
-     file->use_cksum = flag;
+     ov              = file->cksum.use;
+     file->cksum.use = flag;
    
      return(ov);}
      

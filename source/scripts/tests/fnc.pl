@@ -83,15 +83,17 @@ envini(baz, "4 5 6");
 flog($log, "printenv baz");
 flog($log, "unsetenv baz");
 
-#alias SafeSet   'if ($?\!\!:1 == 0) set \!\!:1 = \!\!:2-$'
+#alias SafeSet
 
 dbexp(HOME);
 
-envexp(PERDB_PATH);
+$ENV{Foo} = "the quick brown fox";
+envexp(Foo);
 
 fexec($log, 'echo "foo" @b cat -n');
 Note($log, "gstatus = $gstatus");
 
 flog($log, "perdb quit:");
+flog($log, "rm -f fnc-pl.*");
 
 exit($err)

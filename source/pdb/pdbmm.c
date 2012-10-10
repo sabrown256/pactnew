@@ -194,10 +194,11 @@ PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
 	file->headaddr = 0;
 	file->bfsz     = 0;
 
-	file->use_cksum  = PD_MD5_OFF;
-	file->file_cksum = PD_MD5_OFF;
-	file->fix_denorm = FALSE;
+	file->cksum.verified = FALSE;
+	file->cksum.use      = PD_MD5_OFF;
+	file->cksum.file     = PD_MD5_OFF;
 
+	file->fix_denorm = FALSE;
 	file->delim      = NULL;
         file->radix      = 10;
 

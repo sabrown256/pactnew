@@ -1,4 +1,3 @@
-
 /*
  * PDPRNT.C - PDB write functionality in PD
  *
@@ -235,6 +234,16 @@ void PD_write_extras(FILE *f0, PDBfile *file ARG(,,cls))
     else
        PRINT(f0, "Array Order: COLUMN MAJOR (FORTRAN)\n");
 
+/* checksum info */
+    if (file->cksum.use != PD_MD5_OFF)
+       {PRINT(f0, "Checksums: ");
+	if (file->cksum.use & PD_MD5_FILE)
+	   PRINT(f0, "file ");
+	if (file->cksum.use & PD_MD5_RW)
+	   PRINT(f0, "variable ");
+	PRINT(f0, "\n");};
+
+/* type info */
     PRINT(f0, "Types Needing Conversion:");
     for (i = 0; SC_hasharr_next(file->chart, &i, NULL, NULL, (void **) &dp); i++)
         {if (dp->convert > 0)
@@ -250,6 +259,7 @@ void PD_write_extras(FILE *f0, PDBfile *file ARG(,,cls))
     if (file->previous_file != NULL)
        PRINT(f0, "Previous file in family: %s\n", file->previous_file);
 
+/* symtab and chart info */
     if (file->virtual_internal)
        {PRINT(f0, "Symbol Table Address: 0x%lx\n", file->symtab);
 	PRINT(f0, "Structure Chart Address: 0x%lx\n", file->chart);}

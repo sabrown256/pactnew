@@ -25,10 +25,61 @@ if ($OS != AIX) then
 
    if ("$Valgrind" == "") then
 
-      echo -n "                       "
-      echo "chunks  Dsize  Bsize    Ratio   # writes"
+      echo -n "                "
+      echo "chunks   Dsize  Bsize    Ratio   # writes  # seeks"
+
+# select cases
+      set c = 4
+      foreach s ( 1024 1048576 )
+         Separator $Log
+
+         set rat = 1
+
+         if ($s < 1000000) then
+            @ mt = $s / 1000
+            set mr = ${mt}K
+         else if ($s < 1000000000) then
+            @ mt = $s / 1000000
+            set mr = ${mt}M
+         else
+            @ mt = $s / 1000000000
+            set mr = ${mt}G
+         endif
+
+         if ($s < 1000000) then
+            @ nt = $s / 1000
+            set nr = ${nt}K
+         else if ($s < 1000000000) then
+            @ nt = $s / 1000000
+            set nr = ${nt}M
+         else
+            @ nt = $s / 1000000000
+            set nr = ${nt}G
+         endif
+
+         set opt = ( $ropt -n $s -b $s -c $c )
+
+# run without strace
+         if ("$STRACE" == "") then
+            source ../../../scripts/test-run
+
+            $TEST_CHECK part -a bufa_${s} -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" ""
+            @ nerr = $nerr + $status
+
+# run with strace
+         else
+            Note $Log "Command: $STRACE $exe $opt"
+            @ nwr = ( `$STRACE $exe $opt |& grep write | tee -a $Log | wc -l` )
+            echo "$c $nr $mr $rat $nwr" | \
+            awk '{printf("                       %3d      %4s  %5s %8s    %5d\n",  \
+                         $1, $2, $3, $4, $5);}'
+         endif
+      end
+
+# scan
       foreach n ( 100000 1000000 10000000 )
          foreach m ( -1 10000 1000000 100000000 )
+            set csum = ""
             if ($m < 0) then
                set rat = sys
             else if ($m < $n) then
@@ -37,6 +88,9 @@ if ($OS != AIX) then
             else
                @ fr = $m / $n
                set rat = "$fr"
+               if ($fr > 10) then
+                  set csum = "-s"
+               endif
             endif
 
             if ($m < 0) then
@@ -67,7 +121,7 @@ if ($OS != AIX) then
             foreach c ( 4 )
                Separator $Log
 
-               set opt = ( $ropt -n $n -b $m -c $c )
+               set opt = ( $ropt $csum -n $n -b $m -c $c )
 
 # run without strace
                if ("$STRACE" == "") then

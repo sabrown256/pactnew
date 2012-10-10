@@ -848,6 +848,8 @@ syment *_PD_write(PDBfile *file, char *name, char *intype, char *outtype,
 
     ep = _PD_effective_ep(file, fullpath, FALSE, NULL);
 
+    file->cksum.verified = FALSE;
+
 #ifdef USE_REQUESTS
     CFREE(file->req.base_type);
     file->req.base_type = CSTRSAVE(intype);

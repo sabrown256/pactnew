@@ -30,7 +30,7 @@ while ($#argv > 0)
 end
 
 if ("$lst" == "") then
-   set lst = ( csh sh pl )
+   set lst = ( csh pl sh )
 endif
 
 #--------------------------------------------------------------------------
@@ -40,6 +40,11 @@ endif
 
 NoteD $Log "                    $msg"
 
+# make sure these are set without full path
+setenv PERDB perdb
+setenv GEXEC gexec
+
+flog $Log rm -f fnc*
 flog $Log cp $SrcDir/tests/{fnc*} .
 
 foreach t ($lst)
@@ -56,12 +61,15 @@ foreach t ($lst)
    fnc.$t >&! $Res
    flog $Log @ nerr = $nerr + $status
 
+   flog $Log ( tail -n+4 log.fnc.$t | grep -v $cwd >>& $Res )
+
    if (-f $Ref) then
+      flog $Log cat $Res
       flog $Log diff -b -B -w $Res $Ref
       set xstatus = $status
       if ($xstatus == 0) then
          NoteD $Log "ok"
-         set rpf = ( $rpf $Res $Ref )
+         flog $Log rm -f fnc*$t* log.fnc.$t
       else
          NoteD $Log "ng"
          flog $Log @ nerr = $nerr + 1

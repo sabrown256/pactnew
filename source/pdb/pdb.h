@@ -262,6 +262,7 @@ typedef struct s_dimind dimind;
 typedef struct s_attribute attribute;
 typedef struct s_attribute_value attribute_value;
 typedef struct s_PD_address PD_address;
+typedef struct s_PD_cksumdes PD_cksumdes;
 typedef struct s_PD_image PD_image;
 typedef struct s_PD_pfm_fnc PD_pfm_fnc;
 typedef struct s_PD_scope_public PD_scope_public;
@@ -499,6 +500,11 @@ struct s_PD_address
     char *ptr;                 /* memory address of data */
     syment *entry;};           /* symbol table entry */
 
+struct s_PD_cksumdes
+   {int verified;              /* is the file currently verified */
+    PD_checksum_mode use;      /* session use of checksums */
+    PD_checksum_mode file;};   /* file use of checksums */
+
 /*
  * #bind derived PDBfile character-A G_PDBFILE PP_PDBfileObject NULL
  */
@@ -541,8 +547,7 @@ struct s_PDBfile
     int64_t symtaddr;
     int64_t chrtaddr;
     int64_t bfsz;                     /* buffer size for chart, symtab, ... */
-    PD_checksum_mode use_cksum;       /* session use of checksums */
-    PD_checksum_mode file_cksum;      /* file use of checksums */
+    PD_cksumdes cksum;                /* checksum state */
     int fix_denorm;
     PD_delay_mode delay_sym;
 

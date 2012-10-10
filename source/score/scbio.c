@@ -65,7 +65,7 @@ static int
  _SC_bio_debug = 0;
 
 static long
- bio_stats[5] = { 0L, 0L, 0L, 0L, 0L };
+ bio_stats[6] = { 0L, 0L, 0L, 0L, 0L, 0L };
 
 static int
  _SC_bfr_remove(bio_desc *bid, int i, bio_frame *fr, int fl, int orig);
@@ -140,7 +140,7 @@ static INLINE void _SC_bio_audit(bio_desc *bid, char *tag)
 /* _SC_BIO_SET_ADDR - update the address and size of BID */
 
 static INLINE int64_t _SC_bio_set_addr(bio_desc *bid, int64_t addr, int chsz,
-				     char *tag)
+				       char *tag)
    {
 
     addr = max(addr, 0);
@@ -212,7 +212,7 @@ static void _SC_bio_free(bio_desc *bid, int total)
 #ifndef USE_C_BUFFERED_IO
 
 static int
- _SC_bio_seek(bio_desc *bid, int64_t offs, int wh);
+ _SC_bio_seek(bio_desc *bid, int64_t offs, int wh, bio_oper op);
 
 /*--------------------------------------------------------------------------*/
 
@@ -407,7 +407,7 @@ static int _SC_bfr_remove(bio_desc *bid, int i, bio_frame *fr, int fl, int orig)
 	if (orig == TRUE)
 	   ad = bid->curr;
 
-	ok = _SC_bio_seek(bid, fi[0], SEEK_SET);
+	ok = _SC_bio_seek(bid, fi[0], SEEK_SET, BIO_OPER_NONE);
 	SC_ASSERT(ok >= 0);
 
 /* GOTCHA: does this go past end of file? */
@@ -420,7 +420,7 @@ static int _SC_bfr_remove(bio_desc *bid, int i, bio_frame *fr, int fl, int orig)
 	   {ad = fi[1];
 	    _SC_bio_set_addr(bid, ad, TRUE, "flush");}
 	else
-	   _SC_bio_seek(bid, ad, SEEK_SET);};
+	   _SC_bio_seek(bid, ad, SEEK_SET, BIO_OPER_NONE);};
 
     _SC_bfr_free(fr);
 
@@ -535,7 +535,7 @@ static void _SC_bfr_remove_overlap(bio_desc *bid, bio_frame *fr, bio_kind rw)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SC_BFR_PUSH - push a read buffer onto the BID stack */
+/* _SC_BFR_PUSH - push a buffer onto the BID stack */
 
 static void _SC_bfr_push(bio_desc *bid, bio_frame *fr, int rm)
    {
@@ -642,7 +642,7 @@ static void _SC_bio_read_opt(bio_desc *bid, char *mode, int64_t bsz)
 
 /* _SC_BIO_SEEK - seek to location in file */
 
-static int _SC_bio_seek(bio_desc *bid, int64_t offs, int wh)
+static int _SC_bio_seek(bio_desc *bid, int64_t offs, int wh, bio_oper op)
    {int ret;
     int64_t addr;
 
@@ -676,7 +676,16 @@ static int _SC_bio_seek(bio_desc *bid, int64_t offs, int wh)
 
 #else
 
-    if (addr != bid->curr)
+/* NOTE: when doing reads where the buffer size is a multiple of the
+ * number of bytes to read, bid->curr may not be the same as the
+ * file position so we must check for coverage by a read buffer frame
+ * and do an lseek if necessary.  This happens reading checksums
+ * in PDB files for example.
+ * We must not check the frames if addr is different from bid->curr
+ * when doing writes, as PDB filter applications demonstrate.
+ */
+/*    if (addr != bid->curr) */
+    if ((addr != bid->curr) || (op == BIO_OPER_READ))
        {int sk;
 	bio_frame *fr;
 
@@ -953,7 +962,7 @@ static int64_t _SC_bio_in(void *bf, int64_t bpi, int64_t ni, bio_desc *bid)
  */
 		 if ((olc != bid->curr) || (i == 0))
 		    {na += (bid->curr - nlc);
-		     ad  = _SC_bio_seek(bid, nlc, SEEK_SET);
+		     ad  = _SC_bio_seek(bid, nlc, SEEK_SET, BIO_OPER_READ);
 		     SC_ASSERT(ad >= 0);};
 
 		 fr = _SC_bfr_read_setup(bid, fr);
@@ -970,7 +979,7 @@ static int64_t _SC_bio_in(void *bf, int64_t bpi, int64_t ni, bio_desc *bid)
 		nlc = olc + bsz;
 		if (olc != bid->curr)
 		   {na += (bid->curr - nlc);
-		    ad  = _SC_bio_seek(bid, nlc, SEEK_SET);
+		    ad  = _SC_bio_seek(bid, nlc, SEEK_SET, BIO_OPER_READ);
 		    SC_ASSERT(ad >= 0);};
 
 		fr = _SC_bfr_read_setup(bid, fr);
@@ -1048,7 +1057,7 @@ static int64_t _SC_bio_out(void *bf, int64_t bpi, int64_t ni, bio_desc *bid)
 	    if (fr->nb == fr->sz)
 	       {if (fr->addr != bid->curr)
 		   {na += (bid->curr - fr->addr);
-		    ad  = _SC_bio_seek(bid, fr->addr, SEEK_SET);
+		    ad  = _SC_bio_seek(bid, fr->addr, SEEK_SET, BIO_OPER_WRITE);
 		    SC_ASSERT(ad >= 0);};
 
 		nbw = SC_write_sigsafe(bid->fd, fr->bf, fr->nb);
@@ -1113,7 +1122,7 @@ static int _SC_bseek(FILE *fp, long offs, int wh)
 
     ACCESS(fp);
 
-    ret = _SC_bio_seek(bid, offs, wh);
+    ret = _SC_bio_seek(bid, offs, wh, BIO_OPER_NONE);
 
     return(ret);}
 
@@ -1178,7 +1187,7 @@ static int _SC_blseek(FILE *fp, int64_t offs, int wh)
 
     ACCESS(fp);
 
-    ret = _SC_bio_seek(bid, offs, wh);
+    ret = _SC_bio_seek(bid, offs, wh, BIO_OPER_NONE);
 
     return(ret);}
 
@@ -1363,7 +1372,7 @@ static int _SC_bungetc(int c, FILE *fp)
 #endif
 
     if (rv != EOF)
-       _SC_bio_seek(bid, -1, SEEK_CUR);
+       _SC_bio_seek(bid, -1, SEEK_CUR, BIO_OPER_WRITE);
 /*       _SC_bio_set_addr(bid, bid->curr - 1, TRUE, "ungetc"); */
 
     return(rv);}
@@ -1424,7 +1433,7 @@ static char *_SC_bgets(char *s, int n, FILE *fp)
 		   s[nb] = '\0';
 
 		nb = min(nb, nbr);
-		_SC_bio_seek(bid, pos + nb, SEEK_SET);};
+		_SC_bio_seek(bid, pos + nb, SEEK_SET, BIO_OPER_WRITE);};
        
 	    r = (nbr > 0) ? s : NULL;
 
@@ -1453,7 +1462,8 @@ static int _SC_bclose(FILE *fp)
     bio_stats[1] += bid->nhits[BIO_OPER_READ];
     bio_stats[2] += bid->nhw;
     bio_stats[3] += bid->nhits[BIO_OPER_WRITE];
-    bio_stats[4] = max(bio_stats[4], bid->nbfmx);
+    bio_stats[4]  = max(bio_stats[4], bid->nbfmx);
+    bio_stats[5] += bid->nhits[BIO_OPER_SEEK];
 
     _SC_bio_free(bid, TRUE);
 

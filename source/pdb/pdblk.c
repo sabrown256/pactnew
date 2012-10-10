@@ -655,7 +655,7 @@ int _PD_block_cksum_write(PDBfile *file, syment *ep, char *name)
 
     ok = TRUE;
 
-    if (file->use_cksum & PD_MD5_RW)
+    if (file->cksum.use & PD_MD5_RW)
        {bl = ep->blocks;
 	n  = SC_array_get_n(bl);
 
@@ -740,7 +740,7 @@ int _PD_block_cksum_read(PDBfile *file)
 		    {_PD_block_set_cksum(bl, j, dig);
 		     _PD_block_set_valid(bl, j, PD_BLOCK_UNVERIFIED);};};};};
 
-    file->file_cksum |= PD_MD5_RW;
+    file->cksum.file |= PD_MD5_RW;
 
     return(ok);}
 

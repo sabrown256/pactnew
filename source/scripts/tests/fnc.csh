@@ -43,7 +43,7 @@ flog $log echo "Test flog"
 ftee $log echo "Test ftee"
 ftty $log echo "Test ftty"
 
-#alias Intervene 'test -f ~/\!\!:1 && source ~/\!\!:1'
+#alias Intervene
 
 Separator $log
 
@@ -84,15 +84,17 @@ envini baz "4 5 6"
 flog $log printenv baz
 flog $log unsetenv baz
 
-#alias SafeSet   'if ($?\!\!:1 == 0) set \!\!:1 = \!\!:2-$'
+#alias SafeSet
 
 dbexp HOME
 
-envexp PERDB_PATH
+setenv Foo "the quick brown fox"
+envexp Foo
 
 fexec $log echo "foo" @b cat -n
 Note $log gstatus = $gstatus
 
 flog $log perdb quit:
+flog $log rm -f fnc-csh.*
 
 exit($err)
