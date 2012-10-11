@@ -74,7 +74,8 @@ source $MngDir/write/import-db
     @ nl = $length[1]
     @ il = 1
     while ($il <= $nl)
-       set ln = `head -n $il $SEFile | tail -n 1`
+       get_line ln $SEFile $il
+#       set ln = `head -n $il $SEFile | tail -n 1`
        set var = $ln[1]
        set val = "$ln[2-]"
 

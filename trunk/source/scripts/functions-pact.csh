@@ -71,6 +71,7 @@ endif
 #       If <var> is not defined, define it with value <default>
 #
 
+alias get_line  'set \!\!:1 = `awk "NR == \!\!:3 { print ; exit }" \!\!:2`'
 alias flog      'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ >>& \!\!:1'
 alias ftee      'echo "Command: \!\!:2-$" >>& \!\!:1 ; \!\!:2-$ |& tee -ai \!\!:1'
 alias ftty      'echo "Command: \!\!:2-$" >>& \!\!:1 ; echo "\!\!:2-$" ; \!\!:2-$ >>& \!\!:1'

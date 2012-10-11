@@ -58,11 +58,12 @@ EOF
 
    set lIncDirs = ""
    set lLibDirs = ""
+   set lrpath   = ( `var-list -l $RPATH` )
    foreach i ($PNG_Path)
       set lIncDirs = ( $lIncDirs $i/include )
       set lLibDirs = ( $lLibDirs $i/lib )
    end
-   set lLibDirs = ( $lLibDirs `echo $RPATH | sed 's|:| |g'` )
+   set lLibDirs = ( $lLibDirs $lrpath )
    set lLibDirs = ( $lLibDirs $DAS_ROOT/lib /usr/local/lib /usr/$LIB /$LIB )
    set lIncDirs = ( $lIncDirs $DAS_ROOT/include /usr/local/include $RootInc )
 
@@ -73,10 +74,12 @@ EOF
    set lFile    = $Tmp
 
    set lALibs = ""
-   foreach i ( `echo $RPATH | sed 's|:| |g'` )
+   foreach i ( $lrpath )
        set lALibs = ( $lALibs -L$i )
    end
    set lALibs = ( $lALibs $LD_Lib $LibM_Lib )
+
+   unset lrpath
 
    source $AnaDir/find-package
 

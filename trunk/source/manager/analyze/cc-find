@@ -66,13 +66,15 @@ end
 cat << EOF >! $Tmp.c
 #include <stdio.h>
 int main(int c, char **v)
-{
+{int rv;
 #ifdef __STDC__
+rv = 0;
 printf("ANSI");
 #else
+rv = 1;
 printf("PCC");
 #endif
-return(0);}
+return(rv);}
 EOF
 
 #--------------------------------------------------------------------------
@@ -153,14 +155,14 @@ foreach cc ($cclst)
                set tcc = $cc
             endif
 
-            set ret = `$CFE $Tmp |& awk '{ print $1 }' | tr -d "[0-9]:"`
-            if ("$ret" =~ *ANSI*) then
+            gexec $CFE $Tmp @b fw:/dev/null
+            dbgets gstatus
+            if ($gstatus[1] == 0) then
                set allcc = ( $allcc $tcc )
                set ansicc = ( $ansicc $tcc )
-            else if ("$ret" =~ *PCC*) then
+            else
                set allcc = ( $allcc $tcc )
             endif
-            unset tcc
 
          else if ($Verbose > 0) then
             echo "Test built by $cc failed - check for shared libraries"

@@ -33,11 +33,10 @@ if (-d "$IMF_Path") then
 
    fexec $ALog ls -rt $IMF_Path/ic*/lib/libimf.a @b grep -v beta @o tail -n 1 @o vw:t
    dbget t
-#   set t = ( `ls -rt $IMF_Path/ic*/lib/libimf.a |& grep -v beta | tail -n 1` )
-
 else
    set t = ""
 endif
+
 Note $ALog "IMF_Path = |$IMF_Path|"
 Note $ALog "t        = |$t|"
 

@@ -33,11 +33,13 @@ foreach dir ($lroot/lib64 $lroot/lib)
 end
 
 # find out whether we have 64 bit objects or not
-set lLib = `echo $lBits | awk '{for (i = 1; i <= NF; i++) {if ($i ~ /bit/) {print $i};};}' | sed 's/-bit//'`
-if ($#lLib > 1) then
-   set lLib = $lLib[1]
+gexec echo "$lBits" @o awk '{for (i = 1; i <= NF; i++) {if ($i ~ /bit/) {print $i};};}' @o sed 's/-bit//' @o vw:t
+dbgets t
+if ($#t > 1) then
+   set t = $t[1]
 endif
-if ($lLib == 64) then
+
+if ($t == 64) then
 
 # determine whether we want to use 64 bit objects or not (default is yes)
    set lUSE_64 = TRUE
@@ -53,8 +55,8 @@ if ($lLib == 64) then
    endif
 endif
 
+unset t
 unset lDir
 unset lBits
-unset lLib
 unset lUSE_64
 

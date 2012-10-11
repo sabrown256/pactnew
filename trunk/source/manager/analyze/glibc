@@ -18,7 +18,7 @@ setenv GLIBC_VERSION ""
 set GCC = `$Which gcc`
 if (-x "$GCC") then
 
-cat << EOF >! $Tmp.c
+   cat << EOF >! $Tmp.c
 #include <stdio.h>
 int main(int c, char **v)
    {char *s;
@@ -35,10 +35,13 @@ EOF
    set ok = FALSE
    if (-x $Tmp) then
       set lvers = `$Tmp`
-      set inf   = ( `echo "$lvers" | sed 's/\./ /g'`)
-      if ($#inf > 1) then
-         @ MajorV = $inf[1]
-         @ MinorV = $inf[2]
+
+      fexec $ALog echo "$lvers" @o sed 's/\./ /g' @o vw:t
+      dbgets t
+
+      if ($#t > 1) then
+         @ MajorV = $t[1]
+         @ MinorV = $t[2]
    
          if (($MajorV >= 2) && ($MinorV >= 2)) then
             set ok = TRUE
@@ -46,9 +49,9 @@ EOF
       endif
       NoteD $ALog "      has GNU LibC $lvers"
       setenv GLIBC_VERSION $lvers
-      unset inf
+      unset t
       unset lvers
-else
+   else
       NoteD $ALog "      no GNU LibC version"
    endif
 

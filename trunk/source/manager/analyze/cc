@@ -184,46 +184,38 @@ if ($Cfg_CC_Exe != "") then
       flog $ALog set CmpVers = any
       set xstatus = $status
    else if ($PACT_CC_FAMILY == GNU) then
-      flog $ALog ( $Cfg_CC_Exe $CC_Version | grep $PACT_CC_VERSION )
+      flog $ALog gexec $Cfg_CC_Exe $CC_Version @b grep $PACT_CC_VERSION
       flog $ALog set CmpVers = $PACT_CC_VERSION
       set xstatus = $status
    else if ($PACT_CC_FAMILY == PGI) then
-      flog $ALog ( $Cfg_CC_Exe $CC_Version | grep $PACT_CC_VERSION )
+      flog $ALog gexec $Cfg_CC_Exe $CC_Version @b grep $PACT_CC_VERSION
       flog $ALog set CmpVers = $PACT_CC_VERSION
       set xstatus = $status
    else if ($PACT_CC_FAMILY == INTEL) then
-      flog $ALog ( $Cfg_CC_Exe $CC_Version | grep $PACT_CC_VERSION )
+      flog $ALog gexec $Cfg_CC_Exe $CC_Version @b grep $PACT_CC_VERSION
       flog $ALog set CmpVers = $PACT_CC_VERSION
       set xstatus = $status
    else if ($PACT_CC_FAMILY == PATHSCALE) then
-      flog $ALog ( $Cfg_CC_Exe $CC_Version | grep $PACT_CC_VERSION )
+      flog $ALog gexec $Cfg_CC_Exe $CC_Version @b grep $PACT_CC_VERSION
       flog $ALog set CmpVers = $PACT_CC_VERSION
       set xstatus = $status
    else
-      set inf  = ( `$Cfg_CC_Exe $CC_Version |& grep version` )
-      set gccv = ( `echo $inf | sed 's/gcc version//'` )
-      Note $ALog "Compiler version = $inf"
-      Note $ALog "GCC version      = $gccv"
-      if ("$gccv" =~ 3.*) then
+      fexec $ALog $Cfg_CC_Exe $CC_Version @b grep version @o vw:t
+      dbgets t
+      Note $ALog "Compiler version = $t"
 
+      fexec $ALog echo $t @o sed 's/gcc version//' @o vw:t
+      dbgets t
+      Note $ALog "GCC version      = $t"
+      if ("$t" =~ 3.*) then
          fexec $ALog echo "$Cfg_CC_Flags" @o sed "s| -fsignaling-nans||" @o vw:Cfg_CC_Flags
          fexec $ALog echo "$Save_CFLAGS" @o sed "s| -fsignaling-nans||" @o vw:Save_CFLAGS
-
-#         set lcfg = ( `echo "$Cfg_CC_Flags" | sed "s| -fsignaling-nans||"` )
-#         flog $ALog setenv Cfg_CC_Flags "$lcfg"
-
-#         set lcfg = ( `echo "$Save_CFLAGS" | sed "s| -fsignaling-nans||"` )
-#         flog $ALog setenv Save_CFLAGS "$lcfg"
-
-#         fexec $ALog echo "$CC_Flags" @o sed "s| -fsignaling-nans||" @o vw:CC_Flags
-
-         set lcfg = ( `echo "$CC_Flags" | sed "s| -fsignaling-nans||"` )
-         flog $ALog setenv CC_Flags "$lcfg"
-
+         fexec $ALog echo "$CC_Flags" @o sed "s| -fsignaling-nans||" @o vw:CC_Flags
       endif
       flog $ALog $Cfg_CC_Exe $CC_Version
       flog $ALog set CmpVers = any
       set xstatus = $status
+      unset t
    endif
 
    if ($xstatus == 0) then

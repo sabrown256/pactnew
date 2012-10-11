@@ -107,7 +107,6 @@ if ($CDecls == TRUE) then
    set CF = $MngDir/clib.fncs
    chmod a+x $Tmp
    fexec $ALog fr:$CF @o $Tmp $CF $ANSI
-#   cat $CF | $Tmp $CF $ANSI
 
    rm -f $Tmp
 

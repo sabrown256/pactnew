@@ -1100,7 +1100,8 @@ ReadLine:
     end
 
     if ($ok == TRUE) then
-       set Line  = `head -n $iline $lfile | tail -n 1`
+       get_line Line $lfile $iline
+#       set Line  = `head -n $iline $lfile | tail -n 1`
        @   iline = $iline + 1
 
        set CfgStk = ( $lfile $iline $nline $CfgStk )

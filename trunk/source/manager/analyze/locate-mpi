@@ -86,7 +86,8 @@ unsetenv DP_Path
 if (-f local/mpi-db) then
    set noglob
 
-   @ nl = `wc -l local/mpi-db | awk '{print $1}'`
+   set t = ( `wc -l local/mpi-db` )
+   @ nl = $t[1]
    @ il = 0
 
    call RESET_STATE()
@@ -98,7 +99,7 @@ if (-f local/mpi-db) then
 
    while ($il < $nl)
       @ il = $il + 1
-      set line = ( `head -n $il local/mpi-db | tail -n 1` )
+      get_line line local/mpi-db $il
 
       if (("$line" =~ \#*) || ("$line" == "")) continue
 
