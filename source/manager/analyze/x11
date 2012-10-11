@@ -109,7 +109,7 @@ EOF
    set lFile    = $Tmp
 
    set lALibs = ""
-   foreach i ( `echo $RPATH | sed 's|:| |g'` )
+   foreach i ( `var-list -l $RPATH` )
        set lALibs = ( $lALibs -L$i )
    end
 

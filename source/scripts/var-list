@@ -1,0 +1,52 @@
+#!/bin/csh -f
+#
+# VAR-LIST - change form of lists in variables
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+unalias *
+
+@ err = 0
+
+set lst = ""
+set fmt = list
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: var-list [-h] [-l] [-p] <tokens>*"
+           echo "   h   this help message"
+           echo "   l   output form: a b c"
+           echo "   p   output form: a:b:c"
+           echo ""
+           exit(1)
+      case -l:
+           set fmt = list
+           breaksw
+      case -p:
+           set fmt = path
+           breaksw
+      default:
+           set t   = ( `echo $1 | sed 's|:| |g'` )
+           set lst = ( $lst $t )
+           breaksw
+   endsw
+   shift
+end
+
+switch ($fmt)
+   case path:
+        echo "$lst" | sed 's| |:|g'
+        breaksw
+   default:
+   case list:
+        echo "$lst"
+        breaksw
+endsw
+
+exit($err)

@@ -65,7 +65,7 @@ foreach j ($DP_Inc $RootInc)
    if ($GotIt == TRUE) then
       flog $ALog set lParComm = ( mpi $lParComm )
       if ("$STD_PARALLEL_COMM" == "") then
-         set STD_PARALLEL_COMM = `echo mpi | tr "[a-z]" "[A-Z]"`
+         setenv STD_PARALLEL_COMM MPI
       endif
       break
    endif
@@ -144,20 +144,15 @@ EOF
       flog $ALog ldd $Tmp
 
       flog $ALog $PFE -dr -v -p 2 $Tmp $BE
-      echo "a" | $PFE -v -p 2 $Tmp $BE >&! $Tmp.res
-      set LStat = $status
-      if ($LStat == 0) then
-         @ NOut = `grep "Proc" $Tmp.res |& wc -l`
-         if ($NOut > 1) then
-            setenv HAVE_MPI_STDIN_ALL TRUE
-            set MPIStdIO = "all processes"
-         else
-            set MPIStdIO = "one process"
-         endif
+      fexec $ALog echo a @o $PFE -v -p 2 $Tmp $BE @b grep Proc @o wc -l @o vw:t
+      dbgets t
+      if (($gstatus[2] == 0) && ($t > 1)) then
+         flog $ALog setenv HAVE_MPI_STDIN_ALL TRUE
+         flog $ALog set MPIStdIO = "all processes"
       else
-         set MPIStdIO = "one process (assumed)"
+         flog $ALog set MPIStdIO = "one process"
       endif
-      Note $ALog "MPIStdIO = |$MPIStdIO|"
+      unset t
    endif
 
    flog $ALog rm -f $Tmp $Tmp.c $Tmp.res
@@ -196,7 +191,7 @@ EOF
    if ($status == 0) then
       set vrs = ( `$PFE $Tmp` )
       if ("$vrs" =~ 2.*) then
-         setenv HAVE_MPI_2 TRUE
+         flog $ALog setenv HAVE_MPI_2 TRUE
       endif
    endif
 

@@ -197,7 +197,7 @@ switch ($Tgt)
         breaksw
 
    case del:
-        set lrpath = ( `echo $RPATH | sed 's|:| |g'` )
+        set lrpath = ( `var-list -l $RPATH` )
         set nrpath = ""
         foreach d ($lrpath)
            if ($d != $Dir) then
@@ -206,7 +206,7 @@ switch ($Tgt)
         end
         setenv RPATH $nrpath
 
-        set lrpath = ( `echo $Cfg_RPATH | sed 's|:| |g'` )
+        set lrpath = ( `var-list -l $Cfg_RPATH` )
         set nrpath = ""
         foreach d ($lrpath)
            if ($d != $Dir) then
@@ -239,11 +239,12 @@ switch ($Out)
         echo $nlink
         breaksw
    case rpath:
-        set nlink = ""
         if (($?LD_RPath == 1) && ("$RPATH" != "")) then
-           set nlink = ( `echo "$LD_RPath" | sed 's|\@|'$RPATH'|'` )
+           gexec echo "$LD_RPath" @o sed "s|\@|$RPATH|"
+#           echo "$LD_RPath" | sed 's|\@|'$RPATH'|'
+        else
+           echo ""
         endif
-        echo $nlink
         breaksw
 endsw
 
@@ -261,7 +262,8 @@ CLEAN_PATH:
 
     set npath = ""
     if ("$lval" != "") then
-       set lpath = ( `printenv $lvar | sed 's/:/ /g'` )
+       set lpath = ( `printenv $lvar` )
+       set lpath = ( `var-list -l $lpath` )
        foreach i ($lpath)
           if (-d $i) then
              set ok = TRUE
@@ -276,7 +278,7 @@ CLEAN_PATH:
              endif
           endif
        end
-       set lpath = ( `echo "$npath" | sed 's/ /:/g'` )
+       set lpath = ( `var-list -p $npath` )
        setenv $lvar $lpath
     endif
 

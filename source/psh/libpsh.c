@@ -350,6 +350,72 @@ int unsetenv(char *var)
 
 /*--------------------------------------------------------------------------*/
 
+/* DELIMITED - return substring of S between matched delimiters BGN and END
+ *           - example:
+ *           -   "aa (foo(bar)) zz"  with  "(" and ")"
+ *           - should return "foo(bar)"
+ *           - NOTE: S will be terminated at the first delimiter instance
+ */
+
+char *delimited(char *s, char *bgn, char *end)
+   {int nc, ncb, nce;
+    char *tb, *te, *val, *ps, *wh;
+
+    tb    = s + strcspn(s, bgn);
+    *tb++ = '\0';
+
+    val   = tb;
+/*
+    tb    = val + strcspn(val, end);
+    *tb++ = '\0';
+*/
+    nc  = 1;
+    ncb = strlen(bgn);
+    nce = strlen(end);
+
+    for (ps = tb; IS_NULL(ps) == FALSE; )
+        {tb = strstr(ps, bgn);
+	 te = strstr(ps, end);
+	 if ((tb != NULL) && (tb[ncb] != '\'') &&
+	     (te != NULL) && (te[nce] != '\''))
+	    wh = (tb < te) ? tb : te;
+	 else if ((tb != NULL) && (tb[ncb] != '\''))
+	    wh = tb;
+	 else if ((te != NULL) && (te[nce] != '\''))
+	    wh = te;
+	 else
+	    wh = NULL;
+
+/* no instance of BGN or END */
+	 if (wh == NULL)
+	    {if (nc == 0)
+	        nstrcat(s, LRG, ps);
+	     ps = NULL;}
+
+/* if an instance of END came first
+ * check end first to handle case where BGN and END are the same
+ * as it is for quotes
+ */
+	 else if (wh == te)
+	    {nc--;
+	     if (nc == 0)
+	        {*te = '\0';
+		 ps  = NULL;}
+	     else
+	        ps = te + nce;}
+
+/* if an instance of BGN came first */
+	 else if (wh == tb)
+	    {nc++;
+	     if (nc == 1)
+	        val = tb;
+	     ps = tb + ncb;};};
+
+    return(val);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* TOKENIZE - return an array of strings obtained by
  *          - tokenizing the string S according to the delimiters DELIM
  *          - the array is terminated by a NULL string
@@ -382,6 +448,22 @@ char **tokenize(char *s, char *delim)
 		         {c = *p;
 			  if (c == '\\')
 			     p++;
+
+/* skip to matching quotes when we find one */
+			  else if ((c == '\"') || (c == '\''))
+			     {char dl[2];
+			      char *sb, *u;
+
+			      u = MAKE_N(char, n);
+			      nstrncpy(u, n, p, -1);
+
+			      dl[0] = c;
+			      dl[1] = '\0';
+			      sb = delimited(u, dl, dl);
+			      p += (strlen(sb) + 1);
+
+			      FREE(u);}
+
 			  else if (strchr(delim, c) != NULL)
 			     break;};
 
@@ -2172,69 +2254,6 @@ void key_val(char **key, char **val, char *s, char *dlm)
        *val = v;
 
     return;}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* DELIMITED - return substring of S between matched delimiters BGN and END
- *           - example:
- *           -   "aa (foo(bar)) zz"  with  "(" and ")"
- *           - should return "foo(bar)"
- *           - NOTE: S will be terminated at the first delimiter instance
- */
-
-char *delimited(char *s, char *bgn, char *end)
-   {int nc, ncb, nce;
-    char *tb, *te, *val, *ps, *wh;
-
-    tb    = s + strcspn(s, bgn);
-    *tb++ = '\0';
-
-    val   = tb;
-/*
-    tb    = val + strcspn(val, end);
-    *tb++ = '\0';
-*/
-    nc  = 1;
-    ncb = strlen(bgn);
-    nce = strlen(end);
-
-    for (ps = tb; IS_NULL(ps) == FALSE; )
-        {tb = strstr(ps, bgn);
-	 te = strstr(ps, end);
-	 if ((tb != NULL) && (tb[ncb] != '\'') &&
-	     (te != NULL) && (te[nce] != '\''))
-	    wh = (tb < te) ? tb : te;
-	 else if ((tb != NULL) && (tb[ncb] != '\''))
-	    wh = tb;
-	 else if ((te != NULL) && (te[nce] != '\''))
-	    wh = te;
-	 else
-	    wh = NULL;
-
-/* no instance of BGN or END */
-	 if (wh == NULL)
-	    {if (nc == 0)
-	        nstrcat(s, LRG, ps);
-	     ps = NULL;}
-
-/* if an instance of BGN came first */
-	 else if (wh == tb)
-	    {nc++;
-	     if (nc == 1)
-	        val = tb;
-	     ps = tb + ncb;}
-
-/* if an instance of END came first */
-	 else if (wh == te)
-	    {nc--;
-	     if (nc == 0)
-	        {*te = '\0';
-		 ps  = NULL;}
-	     else
-	        ps = te + nce;};};
-
-    return(val);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

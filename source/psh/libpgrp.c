@@ -1313,7 +1313,7 @@ static void parse_pgrp(statement *s)
 	 if (t == NULL)
 	    continue;
 
-	 else if (strchr(t, PROCESS_DELIM) != NULL)
+	 else if (t[0] == PROCESS_DELIM)
 	    {for (j = i; j < nc; j++)
 	         {if (strchr(sa[j], PROCESS_DELIM) != NULL)
 		     {ios = lst_add(ios, sa[j]);
@@ -1321,9 +1321,6 @@ static void parse_pgrp(statement *s)
 		  else
 		     break;};
 	     term = TRUE;}
-
-	 else if (strpbrk(t, "[]()$*`") != NULL)
-	    dosh = TRUE;
 
 	 else if (strncmp(t, "if", 2) == 0)
 	    {doif = TRUE;
@@ -2200,6 +2197,22 @@ statement *parse_statement(char *s, char **env, char *shell,
 	         {if (c == '\\')
 		     continue;
 
+/* skip to matching quotes when we find one */
+		  else if ((c == '\"') || (c == '\''))
+		     {char dl[2];
+		      char *sb, *u;
+
+		      u = MAKE_N(char, n);
+		      nstrncpy(u, n, --ps, -1);
+
+		      dl[0] = c;
+		      dl[1] = '\0';
+		      sb = delimited(u, dl, dl);
+		      ps += (strlen(sb) + 2);
+
+                      FREE(u);
+                      continue;};
+
 /* handle ';' statement separator */
 		  if (c == ';')
 		     {ps[-1] = '\0';
@@ -2392,7 +2405,10 @@ int gexec(char *db, int c, char **v, char **env, PFPCAL (*map)(char *s))
 /* concatenate command line arguments into one big string */
     s = NULL;
     for (i = 0; i < c; i++)
-        s = append_tok(s, ' ', "%s", v[i]);
+        {if (strpbrk(v[i], " \t") == NULL)
+	    s = append_tok(s, ' ', "%s", v[i]);
+	 else
+	    s = append_tok(s, ' ', "\"%s\"", v[i]);};
 
 /* parse command to list of statements - ;, &&, or || */
     sl = parse_statement(s, env, shell, map);

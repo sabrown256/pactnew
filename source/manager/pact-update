@@ -594,6 +594,7 @@ flog $Log cd $mngdir
 
    set root   = $base/dev/$System
    set etcdir = $root/etc
+   set logdir = $root/log
    set scrdir = $base/scripts
    set envf   = $etcdir/env-pact.csh
    set versid = `cat ./.pact-version`

@@ -135,19 +135,19 @@ if ($FC_Exe != "") then
       set CmpVers = any
       set xstatus = $status
    else if ($PACT_FC_FAMILY == 1) then
-      flog $ALog ( $Cfg_FC_Exe $FC_Version | grep $PACT_FC_VERSION )
+      flog $ALog gexec $Cfg_FC_Exe $FC_Version @b grep $PACT_FC_VERSION
       set CmpVers = $PACT_FC_VERSION
       set xstatus = $status
    else if ($PACT_FC_FAMILY == PGI) then
-      flog $ALog ( $Cfg_FC_Exe $FC_Version | grep $PACT_FC_VERSION )
+      flog $ALog gexec $Cfg_FC_Exe $FC_Version @b grep $PACT_FC_VERSION
       set CmpVers = $PACT_FC_VERSION
       set xstatus = $status
    else if ($PACT_FC_FAMILY == INTEL) then
-      flog $ALog ( $Cfg_FC_Exe $FC_Version | grep $PACT_FC_VERSION )
+      flog $ALog gexec $Cfg_FC_Exe $FC_Version @b grep $PACT_FC_VERSION
       set CmpVers = $PACT_FC_VERSION
       set xstatus = $status
    else if ($PACT_FC_FAMILY == PATHSCALE) then
-      flog $ALog ( $Cfg_FC_Exe $FC_Version | grep $PACT_FC_VERSION )
+      flog $ALog gexec $Cfg_FC_Exe $FC_Version @b grep $PACT_FC_VERSION
       set CmpVers = $PACT_FC_VERSION
       set xstatus = $status
    else
@@ -198,10 +198,11 @@ EOF
    if (-f $Tmp.o) then
 
 # check for appended characters (such as underscores)
+
       flog $ALog $NM $Tmp.o
-      Note $ALog "Command: ($NM $Tmp.o | grep -i foo | tr [A-Z] [a-z] >! $Tmp.nm)"
-      $NM $Tmp.o | grep -i foo | tr "[A-Z]" "[a-z]" >! $Tmp.nm
+      flog $ALog gexec $NM $Tmp.o @b grep -i foo @o tr '[A-Z]' '[a-z]' @o fw:$Tmp.nm
       flog $ALog cat $Tmp.nm
+
       set FID = `awk '{for (i = 1; i <= NF; i++) {if ($i ~ /foo/) { print $i };};}' $Tmp.nm`
       Note $ALog "Number of tokens = $#FID"
 
@@ -221,7 +222,7 @@ EOF
       flog $ALog setenv FC_ID_UNDERSCORE "$FID_app"
 
 # check for handling of identifier case
-      flog $ALog ($NM $Tmp.o | grep -i bar >! $Tmp.nm)
+      flog $ALog gexec $NM $Tmp.o @b grep -i bar @o fw:$Tmp.nm
       flog $ALog cat $Tmp.nm
       set Lower = `awk '{for (i = 1; i <= NF; i++) {if ($i ~ /bar/) { print $i };};}' $Tmp.nm`
       set Upper = `awk '{for (i = 1; i <= NF; i++) {if ($i ~ /BAR/) { print $i };};}' $Tmp.nm`

@@ -78,7 +78,7 @@ EOF
    set lFile    = $Tmp
 
    set lALibs = ""
-   foreach i ( `echo $RPATH | sed 's|:| |g'` )
+   foreach i ( `var-list -l $RPATH` )
        set lALibs = ( $lALibs -L$i )
    end
    set lALibs = ( $lALibs $LD_Lib $LibM_Lib -lz )
@@ -139,7 +139,7 @@ EOF
    set lFile    = $Tmp
 
    set lALibs = ""
-   foreach i ( `echo $RPATH | sed 's|:| |g'` )
+   foreach i ( `var-list -l $RPATH` )
        set lALibs = ( $lALibs -L$i )
    end
    set lALibs = ( $lALibs $LD_Lib )
