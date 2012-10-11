@@ -205,3 +205,21 @@ sub fexec {
     $gstatus = `$PERDB -e gstatus`;
 }
 
+
+# fexvar logs the gexec command, runs it,
+# sets <var> to the result, and
+# gets gstatus out as a shell variable
+# usage: fexvar $log <var> <gexec-specs>
+
+sub fexvar {
+    local *lf = shift;
+    my $var = shift;
+    my $cmd = shift;
+    print(lf "Command: gexec $cmd @b vw:$var\n");
+    open(pp, "gexec $cmd @b vw:$var|");
+    while (<pp>)
+       {print(lf $_);};
+    ${$var}  = `$PERDB -g $var`;
+    $gstatus = `$PERDB -e gstatus`;
+}
+

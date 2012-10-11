@@ -31,9 +31,12 @@ set opt = ""
 set opt = ( $opt $Cfe_CC_Flags )
 set opt = ( $opt $Cfe_LD_Flags $Cfe_LD_RPath )
 
-flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
-@ NErr = `$Cfe_CC_Exe $Tmp.c -o $Tmp $opt |& wc -l`
-if ($NErr == 0) then
+fexec $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt @b wc -l @o vw:t
+dbget t
+
+#flog $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
+#@ t = `$Cfe_CC_Exe $Tmp.c -o $Tmp $opt |& wc -l`
+if ($t == 0) then
    setenv GETSOCKOPT_TYPE "int"
 else
    setenv GETSOCKOPT_TYPE "unsigned int"

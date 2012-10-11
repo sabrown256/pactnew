@@ -201,3 +201,20 @@ fexec () {
    gstatus=`$PERDB -e gstatus`
 }
 
+# fexvar logs the gexec command, runs it,
+# sets <var> to the result, and
+# gets gstatus out as a shell variable
+# usage: fexvar $log <var> <gexec-specs>
+
+fexvar () {
+   log=$1
+   shift
+   var=$1
+   shift
+   cmd=$*
+   echo "Command: gexec $cmd @b vw:$var >> $log 2>&1
+   gexec $cmd @b vw:$var >> $log 2>&1
+   export -n $var="`$PERDB -e $var`"
+   gstatus=`$PERDB -e gstatus`
+}
+

@@ -59,21 +59,30 @@ if (-d ../../python) then
 
 # NOTE: get it into the log what is going on here
          flog $ALog $PY_Exe ../../python/python-cc.py
-         set LStat1 = $status
-         set lPY_Inc = ( `$PY_Exe ../../python/python-inc-dir.py |& cat` )
-         if (($LStat1 != 0) || !(-f "$lPY_Inc/Python.h")) then
+         set xstatus = $status
+
+         fexec $ALog $PY_Exe ../../python/python-inc-dir.py @b vw:PY_Inc
+	 dbget PY_Inc
+         if (($gstatus[1] != 0) || !(-f "$PY_Inc/Python.h")) then
             flog $ALog setenv PY_Exe ""
          else
-            set pyv = `$PY_Exe -V |& awk '{ print $2 }'`
-            if ($#pyv > 2) continue
+            fexec $ALog $PY_Exe -V @b vw:t
+	    dbgets t
+            if ($#t > 2) continue
 
             flog $ALog setenv HAVE_PYTHON TRUE
-            setenv PY_CC  `$PY_Exe ../../python/python-cc.py |& awk '{ print $1 }'`
+            fexec $ALog $PY_Exe ../../python/python-cc.py @b vw:t
+	    dbgets t
+            setenv PY_CC $t[1]
+
             setenv PY_Inc `$PY_Exe ../../python/python-inc-dir.py`
-            setenv PY_Lib `echo $PY_Inc | sed 's/include/lib/'`
+
+            fexec $ALog echo $PY_Inc @b sed 's/include/lib/' @o vw:PY_Lib
+            dbget PY_Lib
+
             setenv PY_Cfg `$PY_Exe ../../python/python-cfg-dir.py`
 
-            NoteD $ALog "$PY_Exe ($pyv)"
+            NoteD $ALog "$PY_Exe ($t)"
             NoteD $ALog "      compiled with $PY_CC"
             NoteD $ALog "      has include directory $PY_Inc"
             set lPY_Vers = `$PY_Exe ../../python/python-version.py`

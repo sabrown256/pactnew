@@ -106,7 +106,8 @@ if ($CDecls == TRUE) then
 
    set CF = $MngDir/clib.fncs
    chmod a+x $Tmp
-   cat $CF | $Tmp $CF $ANSI
+   fexec $ALog fr:$CF @o $Tmp $CF $ANSI
+#   cat $CF | $Tmp $CF $ANSI
 
    rm -f $Tmp
 
@@ -119,6 +120,4 @@ else
    Note $ALog "      Checking C header files"
 
 endif
-
-#exit(0)
 
