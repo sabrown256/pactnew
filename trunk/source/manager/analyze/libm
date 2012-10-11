@@ -31,16 +31,18 @@ envini LibM_RPath   ""
 if (-d "$IMF_Path") then
    set nbits = `nbit -d`
 
-   set inf = ( `ls -rt $IMF_Path/ic*/lib/libimf.a |& grep -v beta | tail -n 1` )
+   fexec $ALog ls -rt $IMF_Path/ic*/lib/libimf.a @b grep -v beta @o tail -n 1 @o vw:t
+   dbget t
+#   set t = ( `ls -rt $IMF_Path/ic*/lib/libimf.a |& grep -v beta | tail -n 1` )
 
 else
-   set inf = ""
+   set t = ""
 endif
 Note $ALog "IMF_Path = |$IMF_Path|"
-Note $ALog "inf      = |$inf|"
+Note $ALog "t        = |$t|"
 
-if (-f "$inf") then
-   set root = $inf:h
+if (-f "$t") then
+   set root = $t:h
    flog $ALog setenv IMF_Path $root
 else
    flog $ALog setenv IMF_Path ""

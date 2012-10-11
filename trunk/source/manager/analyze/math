@@ -50,15 +50,8 @@ dbini LAPACK_Path ""
 #--------------------------------------------------------------------------
 
 foreach i ("linpack" "slatec" "imsl")
-   rm -f $Tmp.res
-   (man $i | head) >& $Tmp.res
-
-# AIX grep says: "No match found in database for foo"
-# UNIX grep says: "No manual entry for foo"
-# ULTRIX says: grep exits with 0 if it doesn't crash outright (can't use $status)
-
-   set res = `grep -i "no ma" $Tmp.res`
-   if (("$res" == "") && ($i != "foo")) then
+   fexec $ALog man $i @b grep -i "no\ ma"
+   if (($gstatus[1] == 0) || ($gstatus[2] == 0)) then
       set MathLib = ($MathLib $i)
    endif
 end
@@ -66,8 +59,6 @@ end
 if ("$MathLib" != "") then
    NoteD $ALog "      math packages: $MathLib"
 endif
-
-flog $ALog rm -f $Tmp.res
 
 dbexp GSL_Path
 dbexp BLAS_Path
