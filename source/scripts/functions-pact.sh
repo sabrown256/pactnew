@@ -94,7 +94,7 @@ InitLog () {
    log=$1
    file=$2
    rm -f $file
-   echo $USER >& $file
+   echo $USER > $file 2>&1
    date >> $file
    pwd >> $file
    echo "" >> $file
@@ -212,7 +212,7 @@ fexvar () {
    var=$1
    shift
    cmd=$*
-   echo "Command: gexec $cmd @b vw:$var >> $log 2>&1
+   echo "Command: gexec $cmd @b vw:$var" >> $log 2>&1
    gexec $cmd @b vw:$var >> $log 2>&1
    export -n $var="`$PERDB -e $var`"
    gstatus=`$PERDB -e gstatus`
