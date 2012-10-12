@@ -38,8 +38,7 @@ else
       Note $ALog "Searching for libbfd in:"
       Note $ALog "   $ldir"
       foreach d ($ldir)
-         fexec $ALog ls $d/libbfd*.so $d/libbfd*.la $d/libbfd* @b vw:t
-         dbgets t
+         fexvars $ALog t ls $d/libbfd*.so $d/libbfd*.la $d/libbfd*
          if ("$t" != "") then
             set lbfd = $t[1]
             if (-f $lbfd) then
@@ -119,8 +118,7 @@ EOF
    endif
 
 # check for static vs dynamic linking
-   fexec $ALog ldd $Tmp @b grep libbfd @o vw:t
-   dbgets t
+   fexvars $ALog t ldd $Tmp @b grep libbfd
    if ($#t > 2) then
       set lSO = $t[3];
       Note $ALog "Shared library for libbfd: |$lSO|"
@@ -136,8 +134,7 @@ EOF
       if ($status == 0) then
          foreach i ($BFD_Path/libbfd*.so)
             set l = $i:t
-            fexec $ALog echo $l:r @o sed "'s/-/\ /g'" @o vw:t
-            dbgets t
+            fexvars $ALog t echo $l:r @o sed "'s/-/\ /g'"
             if ($#t > 1) then
                setenv BFD_Version  $t[2]
             endif

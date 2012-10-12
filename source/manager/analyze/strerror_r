@@ -43,8 +43,7 @@ set noglob
 set opt = ""
 set opt = ( $opt $Cfe_LD_Lib )
 
-fexec $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt @b vw:t
-dbgets t
+fexvars $ALog t $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
 Note $ALog "Result: $t"
 if ("$t" == "") then
    flog $ALog setenv HAVE_POSIX_STRERROR TRUE
@@ -73,10 +72,7 @@ EOF
 set opt = ""
 set opt = ( $opt $Cfe_LD_Lib )
 
-fexec $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt @b vw:t
-dbgets t
-#Note $ALog "Command: $Cfe_CC_Exe $Tmp.c -o $Tmp $opt"
-#set t = ( `$Cfe_CC_Exe $Tmp.c -o $Tmp $opt |& cat` )
+fexvars $ALog t $Cfe_CC_Exe $Tmp.c -o $Tmp $opt
 Note $ALog "Result: $t"
 if ("$t" == "") then
    flog $ALog setenv HAVE_GNU_STRERROR TRUE

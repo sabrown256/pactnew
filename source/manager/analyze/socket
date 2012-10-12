@@ -31,14 +31,14 @@ set opt = ""
 set opt = ( $opt $Cfe_CC_Flags )
 set opt = ( $opt $Cfe_LD_Flags $Cfe_LD_RPath )
 
-fexec $ALog $Cfe_CC_Exe $Tmp.c -o $Tmp $opt @b wc -l @o vw:t
-dbget t
+fexvars $ALog t $Cfe_CC_Exe $Tmp.c -o $Tmp $opt @b wc -l
 if ($t == 0) then
    setenv GETSOCKOPT_TYPE "int"
 else
    setenv GETSOCKOPT_TYPE "unsigned int"
 endif
 NoteD $ALog $GETSOCKOPT_TYPE
+unset t
 
 flog $ALog rm -f $Tmp.c $Tmp
 

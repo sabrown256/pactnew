@@ -61,24 +61,20 @@ if (-d ../../python) then
          flog $ALog $PY_Exe ../../python/python-cc.py
          set xstatus = $status
 
-         fexec $ALog $PY_Exe ../../python/python-inc-dir.py @b vw:PY_Inc
-	 dbget PY_Inc
+         fexvar $ALog PY_Inc $PY_Exe ../../python/python-inc-dir.py
          if (($gstatus[1] != 0) || !(-f "$PY_Inc/Python.h")) then
             flog $ALog setenv PY_Exe ""
          else
-            fexec $ALog $PY_Exe -V @b vw:t
-	    dbgets t
+            fexvars $ALog t $PY_Exe -V
             if ($#t > 2) continue
 
             flog $ALog setenv HAVE_PYTHON TRUE
-            fexec $ALog $PY_Exe ../../python/python-cc.py @b vw:t
-	    dbgets t
+            fexvars $ALog t $PY_Exe ../../python/python-cc.py
             setenv PY_CC $t[1]
 
             setenv PY_Inc `$PY_Exe ../../python/python-inc-dir.py`
 
-            fexec $ALog echo $PY_Inc @b sed 's/include/lib/' @o vw:PY_Lib
-            dbget PY_Lib
+            fexvar $ALog PY_Lib echo $PY_Inc @b sed 's/include/lib/'
 
             setenv PY_Cfg `$PY_Exe ../../python/python-cfg-dir.py`
 
