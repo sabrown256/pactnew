@@ -61,7 +61,8 @@ foreach t ($lst)
    fnc.$t >&! $Res
    flog $Log @ nerr = $nerr + $status
 
-   flog $Log ( tail -n+4 log.fnc.$t | grep -v $cwd >>& $Res )
+#   flog $Log ( tail -n+4 log.fnc.$t | grep -v $cwd >>& $Res )
+   flog $Log ( tail -n+4 log.fnc.$t | grep -v /z- >>& $Res )
 
    if (-f $Ref) then
       flog $Log cat $Res

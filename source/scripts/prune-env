@@ -10,6 +10,8 @@
 
 unalias *
 
+alias get_line  'set \!\!:1 = `awk "NR == \!\!:3 { print ; exit }" \!\!:2`'
+
 set lbin = `dirname $0`
 set path = ( $lbin $path )
 unset lbin
@@ -91,7 +93,7 @@ switch ($tgt)
            @ il = 0
            while ($il < $nl)
               @ il = $il + 1
-              set line = ( `head -n $il $inf | tail -n 1` )
+              get_line line $inf $il
               if ($#line > 2) then
                  if ("$line[1]" == setenv) then
                     set var = $line[2]
@@ -124,7 +126,8 @@ switch ($tgt)
            @ il = 0
            while ($il < $nl)
               @ il = $il + 1
-              set var = ( `head -n $il $db | tail -n 1 | sed 's|=.*$||'` )
+              get_line var $db $il
+              set var = ( `echo $var | sed 's|=.*$||'` )
               if ($#var == 1) then
                  set ok = TRUE
                  foreach v ($exc)

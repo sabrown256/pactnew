@@ -198,7 +198,7 @@ if (!(-f $bind)) then
    @ il = 0
    while ($il < $nl)
       @ il = $il + 1
-      set line = ( `head -n $il $proto | tail -n 1` )
+      get_line line $proto $il
 
 #echo "$il> $line"
 

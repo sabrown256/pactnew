@@ -214,6 +214,18 @@ fexvar () {
    cmd=$*
    echo "Command: gexec $cmd @b vw:$var" >> $log 2>&1
    gexec $cmd @b vw:$var >> $log 2>&1
+   export $var="`$PERDB -e $var`"
+   gstatus=`$PERDB -e gstatus`
+}
+
+fexvars () {
+   log=$1
+   shift
+   var=$1
+   shift
+   cmd=$*
+   echo "Command: gexec $cmd @b vw:$var" >> $log 2>&1
+   gexec $cmd @b vw:$var >> $log 2>&1
    export -n $var="`$PERDB -e $var`"
    gstatus=`$PERDB -e gstatus`
 }
