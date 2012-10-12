@@ -184,7 +184,6 @@ alias VAR_VALUE  'set value = `printenv \!\!:1_\!\!:2`'
 # Compiler info
     gexec ../scripts/gcc-info $CC_Exe @o2 @e3 vw:GCCInfo @ fa:/dev/null
     dbgets GCCInfo
-#    set GCCInfo = ( `../scripts/gcc-info $CC_Exe |& cat` )
     if ($GCCInfo[2] == yes) then    
        Note $STDOUT "#"
        Note $STDOUT "# GCC Info"
