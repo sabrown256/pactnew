@@ -18,8 +18,7 @@ set varl = ( `env | grep _RPath | grep Cfg_ | sed 's|=.*$| |'` )
 
 foreach var ( $varl )
    if ("$Cfg_RPATH" != "") then
-      set lst = ( `printenv $var` )
-      set val = ( `echo "$lst" | sed 's|\@|'$Cfg_RPATH'|'` )
+      set val = ( `printenv $var | sed 's|\@|'$Cfg_RPATH'|'` )
    else
       set val = ""
    endif
@@ -31,8 +30,7 @@ set varl = ( `env | grep _RPath | grep -v Cfg_ | sed 's|=.*$| |'` )
 
 foreach var ( $varl )
    if ("$RPATH" != "") then
-      set lst = ( `printenv $var` )
-      set val = ( `echo "$lst" | sed 's|\@|'$RPATH'|'` )
+      set val = ( `printenv $var | sed 's|\@|'$RPATH'|'` )
    else
       set val = ""
    endif

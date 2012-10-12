@@ -241,7 +241,6 @@ switch ($Out)
    case rpath:
         if (($?LD_RPath == 1) && ("$RPATH" != "")) then
            gexec echo "$LD_RPath" @o sed "s|\@|$RPATH|"
-#           echo "$LD_RPath" | sed 's|\@|'$RPATH'|'
         else
            echo ""
         endif
